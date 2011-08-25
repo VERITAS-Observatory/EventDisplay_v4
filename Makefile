@@ -686,6 +686,7 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 				./obj/VExposure.o ./obj/VExposure_Dict.o \
 				./obj/VASlalib.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+				./obj/VUtilities.o \
 				./obj/VTS.calculateExposureFromDB.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"	
