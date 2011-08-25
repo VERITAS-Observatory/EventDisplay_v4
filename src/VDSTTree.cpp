@@ -1,0 +1,530 @@
+/*! \class VDSTTree
+    \brief writes data summary files with sums and times for each pixel
+
+    output is after pedestal substraction, gain and toffset correction
+
+    Revision $Id: VDSTTree.cpp,v 1.1.2.17.2.1.2.1 2011/02/11 22:58:51 gmaier Exp $
+
+    \author
+Gernot Maier
+*/
+
+#include <VDSTTree.h>
+
+VDSTTree::VDSTTree()
+{
+// source data monte carlo?
+    fMC = true;
+    fFullTree = false;
+
+    fMCtree = 0;
+    fDST_tree = 0;
+
+// initialize
+    fDSTLTrig = 0;
+    fDSTNTrig = 0;
+    fDSTgpsyear = 0;
+    fDSTATgpsyear = 0;
+    fDSTgps0 = 0;
+    fDSTgps1 = 0;
+    fDSTgps2 = 0;
+    fDSTgps3 = 0;
+    fDSTgps4 = 0;
+    fDSTntel_data = 0;
+
+    fDSTrunnumber = 0;
+    fDSTeventnumber = 0;
+    fDSTeventtype = 0;
+    fDSTprimary = 0;
+    fDSTenergy = 0.;
+    fDSTxcore = 0.;
+    fDSTycore = 0.;
+    fDSTze = 0;
+    fDSTaz = 0;
+    fDSTTel_xoff = 0;
+    fDSTTel_yoff = 0;
+
+}
+
+
+bool VDSTTree::initMCTree()
+{
+    fMCtree = new TTree( "mc", "mc events" );
+    fMCtree->SetMaxTreeSize(1000*Long64_t(2000000000));
+    fMCtree->Branch( "runNumber", &fDSTrunnumber, "runNumber/i" );
+    fMCtree->Branch( "eventNumber", &fDSTeventnumber, "eventNumber/i" );
+    fMCtree->Branch( "MCprim", &fDSTprimary, "MCprimary/s" );
+    fMCtree->Branch( "MCe0", &fDSTenergy, "MCenergy/F" );
+    fMCtree->Branch( "MCxcore", &fDSTxcore, "MCxcore/F" );
+    fMCtree->Branch( "MCycore", &fDSTycore, "MCycore/F" );
+    fMCtree->Branch( "MCze", &fDSTze, "MCze/F" );
+    fMCtree->Branch( "MCaz", &fDSTaz, "MCaz/F" );
+    fMCtree->Branch( "MCxoff", &fDSTTel_xoff, "MCxoff/F" );
+    fMCtree->Branch( "MCyoff", &fDSTTel_yoff, "MCyoff/F" );
+
+    return true;
+}
+
+/*
+   init DST tree for writing
+*/
+bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
+{
+    char tname[1000];
+
+// DST tree definition
+    fDST_tree = new TTree( "dst", "data summary tree" );
+    fDST_tree->SetMaxTreeSize(1000*Long64_t(2000000000));
+    fDST_tree->Branch( "runNumber", &fDSTrunnumber, "runNumber/i" );
+    fDST_tree->Branch( "eventNumber", &fDSTeventnumber, "eventNumber/i" );
+    fDST_tree->Branch( "eventtype", &fDSTeventtype, "eventtype/i" );
+    if( iFullTree )
+    {
+        fDST_tree->Branch( "gpsyear", &fDSTgpsyear, "gpsyear/i" );
+        fDST_tree->Branch( "ATgpsyear", &fDSTATgpsyear, "ATgpsyear/i" );
+        fDST_tree->Branch( "gps0", &fDSTgps0, "gps0/i" );
+        fDST_tree->Branch( "gps1", &fDSTgps1, "gps1/i" );
+        fDST_tree->Branch( "gps2", &fDSTgps2, "gps2/i" );
+        fDST_tree->Branch( "gps3", &fDSTgps3, "gps3/i" );
+        fDST_tree->Branch( "gps4", &fDSTgps4, "gps4/i" );
+    }
+    fDST_tree->Branch( "ntel", &fDSTntel, "ntel/i" );
+// all following array are filled for all telescopes
+    fDST_tree->Branch( "Paz", &fDSTpointAzimuth, "Paz[ntel]/F" );
+    fDST_tree->Branch( "Pel", fDSTpointElevation, "Pel[ntel]/F" );
+// following arrays are filled only for all triggered telescopes
+    fDST_tree->Branch( "ltrig", &fDSTLTrig, "ltrig/i" );
+    fDST_tree->Branch( "ntrig", &fDSTNTrig, "ntrig/i" );
+    fDST_tree->Branch( "ltrig_list", fDSTLTrig_list, "ltrig_list[ntrig]/i" );
+    if( fMC )
+    {
+        fDST_tree->Branch( "LTtime", fDSTLTtime, "LTtime[ntrig]" );
+        if( iFullTree ) fDST_tree->Branch( "LDTtime", fDSTLDTtime, "LDTtime[ntrig]" );
+    }
+// following arrays are filed only for all telescopes with data
+    fDST_tree->Branch( "ntel_data", &fDSTntel_data, "ntel_data/i" );
+    fDST_tree->Branch( "tel_data", fDSTtel_data, "tel_data[ntel_data]/i" );
+    sprintf( tname, "chan[ntel_data][%d]/s", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "chan", fDSTChan, tname );
+    fDST_tree->Branch( "nL1trig", fDSTnL1trig, "nL1trig[ntel_data]/s" );
+    sprintf( tname, "L1trig[ntel_data][%d]/s", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "L1trig", fDSTL1trig, tname );
+    sprintf( tname, "sum[ntel_data][%d]/F", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "sum", fDSTsums, tname );
+    sprintf( tname, "dead[ntel_data][%d]/F", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "dead", fDSTdead, tname );
+    sprintf( tname, "sumwindow[ntel_data][%d]/s", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "sumwindow", fDSTsumwindow, tname );
+    if( iFullTree )
+    {
+        sprintf( tname, "sumfirst[ntel_data][%d]/s", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "sumfirst", fDSTsumfirst, tname );
+    }
+    sprintf( tname, "tzero[ntel_data][%d]/F", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "tzero", fDSTt0, tname );
+    sprintf( tname, "Width[ntel_data][%d]/F", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "Width", fDSTTraceWidth, tname );
+// timing levels
+    sprintf( tname, "pulsetiminglevel[ntel_data][%d]/F", VDST_MAXTIMINGLEVELS );
+    fDST_tree->Branch( "pulsetiminglevel", fDSTpulsetiminglevels, tname );
+    sprintf( tname, "pulsetiming[ntel_data][%d][%d]/F", VDST_MAXTIMINGLEVELS, VDST_MAXCHANNELS );
+    fDST_tree->Branch( "pulsetiming", fDSTpulsetiming, tname );
+    sprintf( tname, "Max[ntel_data][%d]/S", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "Max", fDSTMax, tname );
+    if( iFullTree )
+    {
+        sprintf( tname, "RawMax[ntel_data][%d]/S", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "RawMax", fDSTRawMax, tname );
+    }
+    sprintf( tname, "HiLo[ntel_data][%d]/s", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "HiLo", fDSTHiLo, tname );
+    if( iFullTree )
+    {
+        sprintf( tname, "N255[ntel_data][%d]/s", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "N255", fDSTN255, tname );
+    }
+
+// photo diode data
+    if( iPhotoDiode )
+    {
+        fDST_tree->Branch( "PDMax", fDSTPDMax, "PDMax[ntel_data]/F" );
+        fDST_tree->Branch( "PDSum", fDSTPDSum, "PDSum[ntel_data]/F" );
+    }
+
+// trace fit part might be out of date
+    if( iTraceFit )
+    {
+        sprintf( tname, "Chi2[ntel_data][%d]/F", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "Chi2", fDSTChi2, tname );
+        sprintf( tname, "RT[ntel_data][%d]/F", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "RT", fDSTRT, tname );
+        sprintf( tname, "FT[ntel_data][%d]/F", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "FT", fDSTFT, tname );
+        sprintf( tname, "RTpar[ntel_data][%d]/F", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "RTpar", fDSTRTpar, tname );
+        sprintf( tname, "FTpar[ntel_data][%d]/F", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "FTpar", fDSTFTpar, tname );
+        sprintf( tname, "Norm[ntel_data][%d]/F", VDST_MAXCHANNELS );
+        fDST_tree->Branch( "Norm", fDSTTraceNorm, tname );
+    }
+
+// MC block
+    if( fMC )
+    {
+        fDST_tree->Branch( "MCprim", &fDSTprimary, "MCprimary/s" );
+        fDST_tree->Branch( "MCe0", &fDSTenergy, "MCenergy/F" );
+        fDST_tree->Branch( "MCxcore", &fDSTxcore, "MCxcore/F" );
+        fDST_tree->Branch( "MCycore", &fDSTycore, "MCycore/F" );
+        fDST_tree->Branch( "MCze", &fDSTze, "MCze/F" );
+        fDST_tree->Branch( "MCaz", &fDSTaz, "MCaz/F" );
+        fDST_tree->Branch( "MCxoff", &fDSTTel_xoff, "MCxoff/F" );
+        fDST_tree->Branch( "MCyoff", &fDSTTel_yoff, "MCyoff/F" );
+    }
+    resetDataVectors();
+
+    return true;
+}
+
+
+void VDSTTree::resetDataVectors( unsigned int iCH )
+{
+    fDSTLTrig = 0;
+    fDSTNTrig = 0;
+// reset the data vectors
+    for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    {
+        fDSTLTtime[i] = 0.;
+        fDSTLDTtime[i] = 0.;
+        fDSTpointAzimuth[i] = 0.;
+        fDSTpointElevation[i] = 0.;
+        fDSTLTrig_list[i] = 0;
+        fDSTnL1trig[i] = 0;
+	fDSTtel_data[i] = 0;
+        for( unsigned int j = 0; j < VDST_MAXCHANNELS; j++ )
+        {
+            if( iCH == 0 ) fDSTChan[i][j] = j;
+            else           fDSTChan[i][j] = iCH;
+            fDSTsums[i][j] = 0.;
+            fDSTsumwindow[i][j] = 0;
+            fDSTsumfirst[i][j] = 0;
+            fDSTt0[i][j] = 0.;
+            fDSTChi2[i][j] = 0.;
+            fDSTRT[i][j] = 0.;
+            fDSTFT[i][j] = 0.;
+            fDSTRTpar[i][j] = 0.;
+            fDSTFTpar[i][j] = 0.;
+            fDSTMax[i][j] = 0;
+            fDSTRawMax[i][j] = 0;
+            fDSTTraceWidth[i][j] = 0.;
+            fDSTHiLo[i][j] = 0;
+            fDSTL1trig[i][j] = 0;
+            fDSTN255[i][j] = 0;
+            fDSTTraceNorm[i][j] = 0.;
+            fDSTdead[i][j] = 0;
+	    for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ )
+	    {
+	       fDSTpulsetiming[i][t][j] = 0.;
+            }
+        }
+        fDSTPDMax[i] = 0.;
+        fDSTPDSum[i] = 0.;
+        for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ ) fDSTpulsetiminglevels[i][t] = 0.;
+    }
+}
+
+/*
+     init DST tree for reading
+*/
+bool VDSTTree::initDSTTree( TTree *t, TTree *c )
+{
+    fDST_tree = t;
+    fDST_conf = c;
+
+    fDST_vlist_of_telescopes.clear();
+    unsigned int iNChannels = 0;
+    int fTelID;
+    fDST_conf->SetBranchAddress( "NPixel", &iNChannels );
+    fDST_conf->SetBranchAddress( "TelID", &fTelID );
+    fDSTntel = (unsigned int)fDST_conf->GetEntries();
+    for( int i = 0; i < fDST_conf->GetEntries(); i++ )
+    {
+        fDST_conf->GetEntry( i );
+
+        fDSTnchannel[i] = iNChannels;
+        fDST_vlist_of_telescopes.push_back( fTelID );
+    }
+
+    if( fDST_tree->GetBranch( "gpsyear" ) ) fFullTree = true;
+    if( fDST_tree->GetBranch( "MCe0" ) )    fMC = true;
+
+    fDST_tree->SetBranchAddress( "runNumber", &fDSTrunnumber );
+    fDST_tree->SetBranchAddress( "eventNumber", &fDSTeventnumber );
+    fDST_tree->SetBranchAddress( "ntel", &fDSTntel );
+    if( fFullTree )
+    {
+        fDST_tree->SetBranchAddress( "gpsyear", &fDSTgpsyear );
+        fDST_tree->SetBranchAddress( "ATgpsyear", &fDSTATgpsyear );
+        fDST_tree->SetBranchAddress( "gps0", &fDSTgps0 );
+        fDST_tree->SetBranchAddress( "gps1", &fDSTgps1 );
+        fDST_tree->SetBranchAddress( "gps2", &fDSTgps2 );
+    }
+    fDST_tree->SetBranchAddress( "Paz", fDSTpointAzimuth );
+    fDST_tree->SetBranchAddress( "Pel", fDSTpointElevation );
+    fDST_tree->SetBranchAddress( "ltrig", &fDSTLTrig );
+    fDST_tree->SetBranchAddress( "ntrig", &fDSTNTrig );
+    fDST_tree->SetBranchAddress( "ltrig_list", fDSTLTrig_list );
+    if( fMC )
+    {
+        fDST_tree->SetBranchAddress( "LTtime", fDSTLTtime );
+        if( fFullTree ) fDST_tree->SetBranchAddress( "LDTtime", fDSTLDTtime );
+    }
+    fDST_tree->SetBranchAddress( "ntel_data", &fDSTntel_data );
+    fDST_tree->SetBranchAddress( "tel_data", fDSTtel_data );
+    fDST_tree->SetBranchAddress( "nL1trig", fDSTnL1trig );
+    fDST_tree->SetBranchAddress( "L1trig", fDSTL1trig );
+    fDST_tree->SetBranchAddress( "sum", fDSTsums );
+    fDST_tree->SetBranchAddress( "dead", fDSTdead );
+    fDST_tree->SetBranchAddress( "tzero", fDSTt0 );
+    fDST_tree->SetBranchAddress( "Width", fDSTTraceWidth );
+    fDST_tree->SetBranchAddress( "pulsetiminglevel", fDSTpulsetiminglevels );
+    fDST_tree->SetBranchAddress( "pulsetiming", fDSTpulsetiming );
+    fDST_tree->SetBranchAddress( "Max", fDSTMax );
+    if( fFullTree ) fDST_tree->SetBranchAddress( "RawMax", fDSTRawMax );
+    fDST_tree->SetBranchAddress( "dead", fDSTdead );
+    fDST_tree->SetBranchAddress( "HiLo", fDSTHiLo );
+    if( fMC )
+    {
+        fDST_tree->SetBranchAddress( "MCprim", &fDSTprimary );
+        fDST_tree->SetBranchAddress( "MCe0", &fDSTenergy );
+        fDST_tree->SetBranchAddress( "MCxcore", &fDSTxcore );
+        fDST_tree->SetBranchAddress( "MCycore", &fDSTycore );
+        fDST_tree->SetBranchAddress( "MCze", &fDSTze );
+        fDST_tree->SetBranchAddress( "MCaz", &fDSTaz );
+        fDST_tree->SetBranchAddress( "MCxoff", &fDSTTel_xoff );
+        fDST_tree->SetBranchAddress( "MCyoff", &fDSTTel_yoff );
+    }
+
+    resetDataVectors();
+
+    return fMC;
+}
+
+
+int VDSTTree::hasData( int iTelID )
+{
+/*   for( unsigned int i = 0; i < fDSTntel_data; i++ )
+   {
+      if( iTelID == (int)fDSTtel_data[i] ) return i;
+   }
+   return -1; */
+
+    if( iTelID < 0 ) return -1;
+    if( iTelID >= (int)fDST_vlist_of_telescopes.size() ) return -1;
+
+    for( unsigned int j = 0; j < fDSTNTrig; j++ )
+    {
+        if( fDST_vlist_of_telescopes[iTelID] == fDSTtel_data[j] ) return j;
+    }
+    return -1;
+}
+
+
+int VDSTTree::hasLocalTrigger( int iTelID )
+{
+/*   for( unsigned int i = 0; i < fDSTNTrig; i++ )
+   {
+      if( iTelID == (int)fDSTLTrig_list[i] )
+      {
+         return i;
+      }
+   } */
+    if( iTelID < 0 ) return -1;
+    if( iTelID >= (int)fDST_vlist_of_telescopes.size() ) return -1;
+
+    for( unsigned int j = 0; j < fDSTNTrig; j++ )
+    {
+        if( fDST_vlist_of_telescopes[iTelID] == fDSTLTrig_list[j] ) return 1;
+    }
+    return -1;
+}
+
+
+double VDSTTree::getDSTSums( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else
+    {
+        return fDSTsums[iTel][iChannelID];
+    }
+
+    return 0;
+}
+
+
+double VDSTTree::getDSTMax( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else return (double)(fDSTMax[iTel][iChannelID]);
+
+    return 0;
+}
+
+
+double VDSTTree::getDSTRawMax( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else return (double)(fDSTRawMax[iTel][iChannelID])/100.;
+
+    return 0;
+}
+
+
+double VDSTTree::getDSTWidth( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else return (double)(fDSTTraceWidth[iTel][iChannelID]);
+
+    return 0;
+}
+
+
+double VDSTTree::getDSTTZeros( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else return (double)(fDSTt0[iTel][iChannelID]);
+
+    return 0;
+}
+
+double VDSTTree::getDSTpulsetiming( int iTelID, int iChannelID, int iTimingLevelN )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else if( iTimingLevelN < VDST_MAXTIMINGLEVELS )
+    {
+       return (double)(fDSTpulsetiming[iTel][iTimingLevelN][iChannelID]);
+    }
+
+    return 0;
+}
+
+
+unsigned int VDSTTree::getDSTDead( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
+    else return fDSTdead[iTel][iChannelID];
+
+    return 0;
+}
+
+
+UShort_t VDSTTree::getDSTHiLo( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
+    else return fDSTHiLo[iTel][iChannelID];
+
+    return 0;
+}
+
+
+unsigned int VDSTTree::getTrigL1( int iTelID, int iChannelID )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
+    else return fDSTL1trig[iTel][iChannelID];
+
+    return 0;
+}
+
+
+bool VDSTTree::getDSTLocalTrigger( int iTelID )
+{
+    int iTel = hasLocalTrigger( iTelID );
+    if( iTel < 0 ) return false;
+
+    return true;
+}
+
+
+float VDSTTree::getDSTLocalTriggerTime( int iTelID )
+{
+    int iTel = hasLocalTrigger( iTelID );
+    if( iTel < 0 ) return 0;
+
+    return fDSTLTtime[iTel];
+}
+
+
+float VDSTTree::getDSTLocalDelayedTriggerTime( int iTelID )
+{
+    int iTel = hasLocalTrigger( iTelID );
+    if( iTel < 0 ) return 0;
+
+    return fDSTLDTtime[iTel];
+}
+
+
+map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
+{
+    fDST_list_of_telescopes.clear();
+    if( iFile.size() == 0 ) return fDST_list_of_telescopes;
+
+    ifstream is;
+    is.open( iFile.c_str(), ifstream::in );
+    if( !is )
+    {
+        cout << "VDSTTree::readArrayConfig error: file not found, " << iFile << endl;
+        return fDST_list_of_telescopes;
+    }
+    string iLine;
+    string iT1;
+    string iT2;
+    cout << "reading sub-array configuration from " << iFile << endl;
+
+    while( getline( is, iLine ) )
+    {
+        if( iLine.size() > 0 )
+        {
+            istringstream is_stream( iLine );
+            is_stream >> iT1;
+            is_stream >> iT2;
+            fDST_list_of_telescopes[atoi(iT1.c_str())] = atof( iT2.c_str() );
+        }
+    }
+    is.close();
+
+    map< unsigned int, float >::iterator iter;
+    for( iter = fDST_list_of_telescopes.begin(); iter != fDST_list_of_telescopes.end(); iter++ )
+    {
+        cout << "\t Telescope ID " << iter->first << "  FOV " << iter->second << endl;
+    }
+
+    return fDST_list_of_telescopes;
+}
+
+
+float VDSTTree::getDSTMCaz()
+{
+    return fDSTaz;
+}
+
+unsigned int VDSTTree::getDSTpulsetiminglevelsN()
+{
+   return (unsigned int)(VDST_MAXTIMINGLEVELS);
+}

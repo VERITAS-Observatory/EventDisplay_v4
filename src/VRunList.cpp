@@ -1,0 +1,58 @@
+/*! \class VRunList
+    \brief data class
+
+    Revision $Id: VRunList.cpp,v 1.1.2.8.10.2.2.2 2010/12/06 11:43:34 gmaier Exp $
+
+    \author Gernot Maier
+*/
+
+#include "VRunList.h"
+
+#ifndef VRUNLIST_CPP
+#define VRUNLIST_CPP
+
+ClassImp(VRunList)
+
+VRunList::VRunList()
+{
+    reset();
+}
+
+
+void VRunList::reset()
+{
+    runnumber = 0;
+    MJD = 0.;
+    tOn = 0.;
+    deadTimeFraction = 0.;
+    NOn = 0.;
+    NOff = 0.;
+    OffNorm = 0.;
+    elevationOn = 0.;
+    elevationOff = 0.;
+    pedvarsOn = 0.;
+    alpha = 1.;
+    energyThreshold = 0.;
+    TargetRAJ2000 = 0.;
+    TargetDecJ2000 = 0.;
+    phase = -1.e9;
+}
+
+
+void VRunList::print()
+{
+    cout << "Run: " << runnumber;
+    cout << setprecision( 6 ) << " (MJD " << MJD << ")";
+    cout << " tOn [min]: " << setprecision(2) << fixed << tOn/60.;
+    cout << " (dead time " << setprecision(2) << (1.-deadTimeFraction)*100. << "%) ";
+    cout << " Non/NOff: " << setw( 8 ) << fixed << NOn << "/" << NOff;
+    cout << setprecision(3) << setw( 8 ) << " alpha: " << alpha;
+    cout << " elevation [deg]: " << setw( 8 );
+    if( elevationOn > 0. ) cout << elevationOn;
+    else                   cout << elevationOff << " (OFF) ";
+    cout << " mean pedvar: " << pedvarsOn;
+    if( energyThreshold > 0. ) cout << " energy threshold [GeV]: " << energyThreshold*1.e3;
+    if( phase > 0. ) cout << " phase: " << phase;
+    cout << endl;
+}
+#endif

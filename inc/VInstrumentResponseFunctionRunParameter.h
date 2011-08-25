@@ -1,0 +1,86 @@
+//! VInstrumentResponseFunctionRunParameter run parameters for response function calculator (effective areas)
+// Revision $Id: VInstrumentResponseFunctionRunParameter.h,v 1.1.2.3 2011/04/11 16:09:05 gmaier Exp $
+
+#ifndef VInstrumentResponseFunctionRunParameter_H
+#define VInstrumentResponseFunctionRunParameter_H
+
+#include "Ctelconfig.h"
+#include "VMonteCarloRunHeader.h"
+#include "VTableLookupRunParameter.h"
+
+#include <fstream>
+#include <getopt.h>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include "TChain.h"
+#include "TNamed.h"
+
+using namespace std;
+
+class VInstrumentResponseFunctionRunParameter : public TNamed
+{
+   private:
+
+   bool            readRunParameters( string ifilename );
+
+   public:
+
+   unsigned int    fFillingMode;              // filling mode
+
+   string          fCutFileName;
+   int             fCutSelector;
+
+   unsigned int    fEnergyReconstructionMethod;
+   unsigned int    fEnergyAxisBins_log10;
+   bool            fIgnoreEnergyReconstructionQuality;
+   unsigned int    fNSpectralIndex;
+   double          fSpectralIndexMin;
+   double          fSpectralIndexStep;
+   vector< double > fSpectralIndex;
+   double          fMCEnergy_min;
+   double          fMCEnergy_max;
+   double          fMCEnergy_index;
+   bool            fFillMCHistograms;
+
+   string          fCoreScatterMode;
+   double          fCoreScatterRadius;
+
+   bool            fAzimuthBins;
+   bool            fIsotropicArrivalDirections;
+
+   bool            fTelescopeTypeCuts;
+
+   string          fdatafile;
+   string          fMCdatafile_tree;
+   string          fMCdatafile_histo;
+   string          fGammaHadronProbabilityFile;
+
+   double          fze;
+   int             fnoise;
+   double          fpedvar;
+   double          fXoff;
+   double          fYoff;
+   vector< double > fAzMin;
+   vector< double > fAzMax;
+
+   unsigned int    telconfig_ntel;
+   double          telconfig_arraycentre_X;
+   double          telconfig_arraycentre_Y;
+   double          telconfig_arraymax;
+
+
+   VInstrumentResponseFunctionRunParameter();
+  ~VInstrumentResponseFunctionRunParameter() {}
+
+   void                  print();
+   VMonteCarloRunHeader* readMCRunHeader();
+   bool                  readRunParameterFromTextFile( string iFile );
+   bool                  testRunparameters();
+
+   ClassDef( VInstrumentResponseFunctionRunParameter, 2 );
+};
+
+#endif
