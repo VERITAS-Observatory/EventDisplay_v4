@@ -9,6 +9,7 @@
 #include "VDBTools.h"
 #include "VStarCatalogue.h"
 #include "VGlobalRunParameter.h"
+#include "VUtilities.h"
 
 #include <fstream>
 #include <iostream>
@@ -96,15 +97,18 @@ class VExposure : public TObject, public VGlobalRunParameter
 	double fTexTable_EFlux_min;
 	double fTexTable_EFlux_max;
 
-        void aitoff2xy(Double_t l, Double_t b, Double_t &Al, Double_t &Ab);
-	bool doDQM( unsigned int iIndex, double iMinDuration = 600. );
-        void drawAitoffCoordinateSystem();
+        void   aitoff2xy(Double_t l, Double_t b, Double_t &Al, Double_t &Ab);
+	bool   doDQM( unsigned int iIndex, double iMinDuration = 600. );
+        void   drawAitoffCoordinateSystem();
         double getAcceptance( double r );
-        void getDBMJDTime( string itemp, int &MJD, double &Time, bool bStrip );
-        bool getDBSourceCoordinates( TSQLServer *f_db, string iSource, double &iEVNTargetDec, double &iEVNTargetRA );
-        void analyseCatalogue( string iCatalogue = "../../eventdisplay/astro/tevcat.dat", double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180., TH2D *h = 0, bool bAitoff = false, int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45.  );
-        TCanvas* plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2D *h, double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180., bool bAitoff = false );
-	string search_and_replace( string, string, string );
+        void   getDBMJDTime( string itemp, int &MJD, double &Time, bool bStrip );
+        bool   getDBSourceCoordinates( TSQLServer *f_db, string iSource, double &iEVNTargetDec, double &iEVNTargetRA );
+        void   analyseCatalogue( string iCatalogue = "../../eventdisplay/astro/tevcat.dat",
+	                         double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
+				 TH2D *h = 0, bool bAitoff = false, int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45.  );
+        TCanvas* plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2D *h,
+	                         double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
+				 bool bAitoff = false );
         void set_plot_style();
         void resetDataVectors();
 

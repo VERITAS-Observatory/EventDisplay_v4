@@ -1009,7 +1009,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 	     int z = 0;
 	     for( it_set = iVERITAS_targets.begin(); it_set != iVERITAS_targets.end(); it_set++ )
 	     {
-	         string a = search_and_replace( *it_set, "_", " " );
+	         string a = VUtilities::search_and_replace( *it_set, "_", " " );
 		 if( iVERITAS_targets.size() == 1 ) sprintf( iTexTable, "%s %s  ", iTexTable, a.c_str() );
 	         else if( z < (int)(iVERITAS_targets.size()) - 1 ) sprintf( iTexTable, "%s %s, ", iTexTable, a.c_str() );
 //		 else                                  sprintf( iTexTable, "%s %s ", iTexTable, a.c_str() );                                
@@ -1023,7 +1023,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 	     sprintf( iTexTable, "%s & %.1f (%.1f)", iTexTable, r_tot/3600., r_tot_V5/3600. );
 	     if( tev_select >= 0 && tev->getStarName( tev_select ) != "NONAME" )
 	     {
-		 string a = search_and_replace( tev->getStarName( tev_select ), "_", " " );
+		 string a = VUtilities::search_and_replace( tev->getStarName( tev_select ), "_", " " );
 	         sprintf( iTexTable, "%s & {\\color{green} %s}", iTexTable, a.c_str() );
              }
 	     else
@@ -1058,16 +1058,6 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
     if( fEventList_inFOV ) fEventList_inFOV->Write();
     if( fEventList_inFOV_noTevcat ) fEventList_inFOV_noTevcat->Write();
     if( fEventListfile ) fEventListfile->Close();
-}
-
-string VExposure::search_and_replace( string i1, string iO, string iN )
-{
-    size_t j;
-    for ( ; (j = i1.find( iO )) != string::npos ; ) 
-    {
-       i1.replace( j, iO.length(), iN );
-    }
-    return i1;
 }
 
 void VExposure::printTexTable()

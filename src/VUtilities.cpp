@@ -96,3 +96,18 @@ string VUtilities::removeSpaces( string stringIn )
    return stringIn;
 } 
 
+/*
+
+   search and replace a certain letter in a string
+
+*/
+string VUtilities::search_and_replace( string i1, string iO, string iN )
+{
+    size_t j;
+    for ( ; (j = i1.find( iO )) != string::npos ; ) 
+    {
+       i1.replace( j, iO.length(), iN );
+    }
+    return i1;
+}
+

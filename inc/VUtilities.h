@@ -22,6 +22,7 @@ namespace VUtilities
 
    template<class Seq> void purge( Seq& c );
 
+   string search_and_replace( string i1, string iO, string iN );
    string testFileLocation( string iFile, string iDirectory, bool bEVNDISPDATA );
 }
 #endif
