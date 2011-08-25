@@ -549,12 +549,14 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 {
     if( !h ) return 0;
 
+// canvas
     TCanvas *cGal = new TCanvas( iName.c_str(), iTitle.c_str(), ix, iy, iwx, iwy );
     cGal->SetGridx( 0 );
     cGal->SetGridy( 0 );
     cGal->SetRightMargin( 0.15 );
     cGal->Draw();
 
+// set axis ranges of galactic map
     h->SetAxisRange( ibmin, ibmax, "Y" );
     h->SetAxisRange( -1.*ilmax, -1.*ilmin, "X" );
 
@@ -598,10 +600,13 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 
     for( unsigned int t = 0; t < fCatalogue.size(); t++ )
     {
-        if( fCatalogue[t].size() > 0 ) analyseCatalogue( fCatalogue[t], ibmin, ibmax, ilmin, ilmax, h, bAitoff, fCatalogueMarkerStyle[t], fCatalogueMarkerColor[t], fCatalogueTextAngle[t] );
+        if( fCatalogue[t].size() > 0 )
+	{
+	   analyseCatalogue( fCatalogue[t], ibmin, ibmax, ilmin, ilmax, h, bAitoff, fCatalogueMarkerStyle[t], fCatalogueMarkerColor[t], fCatalogueTextAngle[t] );
+        }
     }
 
-// draw coordinate system
+// draw aitoff coordinate system
     if( bAitoff ) drawAitoffCoordinateSystem();
 
     cGal->Update();
@@ -615,7 +620,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 */
 void VExposure::drawAitoffCoordinateSystem()
 {
-    double radeg = TMath::Pi() / 180;
+    double radeg = TMath::Pi() / 180.;
     double la, lo, x, y, z;
 
     const int Nl = 11;                            // Number of drawn latitudes
@@ -663,6 +668,7 @@ void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax,
 {
     VStarCatalogue *s = new VStarCatalogue();
     s->init( 54626., iCatalogue );
+    s->printCatalogue();
 
     double l = 0.;
     double b = 0.;
@@ -911,8 +917,10 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 	double r_N = 0.;
 	double r_meanElevation = 0.;
 
+	cout << "Testing now ";
 	cout << s->getStarName( i );
 	cout << " (l,b) = " << s->getStar_l(i) << ", " << s->getStar_b(i);
+	cout << " (ra,dec) = " << s->getStarRA2000( i ) << ", " << s->getStarDec2000( i );
 	cout << endl;
 
 
@@ -948,7 +956,8 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 	for( unsigned int j = 0; j < fRunRA.size(); j++ )
 	{
 // calculate distance of catalogue object to camera center
-            r_centre = slaDsep(s->getStarRA2000(i)*TMath::Pi()/180.,s->getStarDec2000(i)*TMath::Pi()/180.,(fRunRA[j]+fRunoffsetRA[j])*TMath::Pi()/180.,(fRunDec[j]+fRunoffsetDec[j])*TMath::Pi()/180. ) * 180./TMath::Pi();
+            r_centre = slaDsep(s->getStarRA2000(i)*TMath::Pi()/180.,s->getStarDec2000(i)*TMath::Pi()/180.,
+	               (fRunRA[j]+fRunoffsetRA[j])*TMath::Pi()/180.,(fRunDec[j]+fRunoffsetDec[j])*TMath::Pi()/180. ) * 180./TMath::Pi();
 // do dqm
 	    if( !doDQM(j, iMinDuration ) ) continue;
 
@@ -956,19 +965,20 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
             if( r_centre < iR )
 	    {
 // calculate distance of catalogue object to VERITAS object
-	       r_VA_object = slaDsep(s->getStarRA2000(i)*TMath::Pi()/180.,s->getStarDec2000(i)*TMath::Pi()/180.,fRunRA[j]*TMath::Pi()/180.,fRunDec[j]*TMath::Pi()/180. ) * 180./TMath::Pi();
+	       r_VA_object = slaDsep(s->getStarRA2000(i)*TMath::Pi()/180.,s->getStarDec2000(i)*TMath::Pi()/180.,
+	                             fRunRA[j]*TMath::Pi()/180.,fRunDec[j]*TMath::Pi()/180. ) * 180./TMath::Pi();
 // total time on object (all array configurations)
 	       r_tot += fRunDuration[j];
 // total time on object (new array configuration only)
 	       if( fRun[j] > 46642 )  r_tot_V5 += fRunDuration[j];
 // print some information about this run
-	       cout << "\t\t RUN " << fRun[j];
+	       cout << "\tRUN " << fRun[j];
 	       if( fRunSourceID[j].size() > 0 ) cout << "\t" << fRunSourceID[j];
 	       cout << "\t MJD " << fRunStartMJD[j];
 	       cout << "\t CONFIGMASK " << fRunConfigMask[j];
 	       cout << "\t (ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
 	       cout << "\t DIST " << r_centre << " deg";
-	       cout << "\t DIST (V) " << r_VA_object << " deg";
+	       cout << "\t DIST (VTS pointing) " << r_VA_object << " deg";
 	       cout << endl;
 // mean calculation
 	       r_centre_mean += r_centre;
@@ -981,14 +991,14 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 // print summary only if some data was taken 
          if( r_tot > 0. )
 	 {
-	     fEventList_inFOV->Enter( i );
+	     if( fEventList_inFOV ) fEventList_inFOV->Enter( i );
 	     cout << "\t\t total time: " << r_tot/3600. << " [h] (V5: " << r_tot_V5/3600. << ")" << endl;
 	     if( r_N > 0. )
 	     {
 	        cout << "\t\t mean distance to camera centre: " << r_centre_mean/r_N << " [deg]" << endl;
 		cout << "\t\t mean distance to VERITAS object: " << r_VA_object_mean/r_N << " [deg]" << endl;
 		cout << "\t\t mean elevation: " << r_meanElevation/r_N << " [deg]" << endl;
-		if(  r_VA_object_mean/r_N > 0.1 ) fEventList_inFOV_noTevcat->Enter( i );
+		if( fEventList_inFOV && r_VA_object_mean/r_N > 0.1 ) fEventList_inFOV_noTevcat->Enter( i );
              }
 ///////////////////////////////////
 // add a line to the tex table

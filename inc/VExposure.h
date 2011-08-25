@@ -140,6 +140,6 @@ class VExposure : public TObject, public VGlobalRunParameter
         void listCatalogues();
         bool removeCataloge( unsigned int iB );
 
-        ClassDef(VExposure,5);
+        ClassDef(VExposure,6);
 };
 #endif
