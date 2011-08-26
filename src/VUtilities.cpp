@@ -97,6 +97,31 @@ string VUtilities::removeSpaces( string stringIn )
 } 
 
 /*
+   
+   remove all leading spaces in a string
+
+*/
+string VUtilities::remove_leading_spaces( string stringIn )
+{
+   string::size_type pos = 0;
+   bool spacesLeft = true;
+
+   while( spacesLeft )
+   {
+      pos = stringIn.find(" ");
+      if( pos != 0 )
+      {
+         pos = stringIn.find("\t");
+      }
+      
+      if( pos == 0 && pos != string::npos ) stringIn.erase( pos, 1 );
+      else spacesLeft = false;
+   }
+
+   return stringIn;
+} 
+
+/*
 
    search and replace a certain letter in a string
 

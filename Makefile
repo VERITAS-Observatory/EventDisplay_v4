@@ -507,7 +507,7 @@ ifneq ($(FITS),FALSE)
   SHAREDOBJS	+= ./obj/VFITS.o # ../obj/VFITS_Dict.o
 endif
 
-slib:   $(SHAREDOBJS)
+slib lsib:   $(SHAREDOBJS)
 	$(LD) $(SOFLAGS) $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
 ifneq ($(ROOT_MINUIT2),yes)
 	@echo "ROOT NOT COMPILED WITH MUINUIT2"

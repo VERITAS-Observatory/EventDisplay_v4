@@ -252,7 +252,7 @@ bool VStarCatalogue::readCatalogue()
                 is_stream >> iT1;
                 is_stream >> iT2;
                 if( fCatalogueVersion != 6 && fCatalogueVersion != 7 ) is_stream >> iT3;
-                else          iT3 = "0";
+                else                                                   iT3 = "0";
                 i_Star.fRA2000 = 15.*( atof( iT1.c_str() ) + atof( iT2.c_str() ) / 60. + atof( iT3.c_str() ) / 3600. );
 // dec2000
                 is_stream >> iT1;
@@ -260,7 +260,7 @@ bool VStarCatalogue::readCatalogue()
                 if( fCatalogueVersion != 6 && fCatalogueVersion != 7 ) is_stream >> iT3;
                 else          iT3 = "0";
                 if( iT1.find("-",0) != string::npos  )     i_Star.fDec2000 = atof( iT1.c_str() ) - atof( iT2.c_str() ) / 60. - atof( iT3.c_str() ) / 3600.;
-                else                                   i_Star.fDec2000 = atof( iT1.c_str() ) + atof( iT2.c_str() ) / 60. + atof( iT3.c_str() ) / 3600.;
+                else                                       i_Star.fDec2000 = atof( iT1.c_str() ) + atof( iT2.c_str() ) / 60. + atof( iT3.c_str() ) / 3600.;
             }
             i_Star.fBrightness_V = 9999;
             i_Star.fBrightness_B = 9999;
@@ -280,7 +280,8 @@ bool VStarCatalogue::readCatalogue()
             }
             else if( fCatalogueVersion == 5 )
             {
-                i_Star.fStarName = iLine.substr( 22, iLine.size() );
+		i_Star.fStarName = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ).c_str();
+		i_Star.fStarName = VUtilities::remove_leading_spaces( i_Star.fStarName );
             }
             else if ( fCatalogueVersion == 6 || fCatalogueVersion == 7 )
             {
@@ -583,7 +584,7 @@ void VStarCatalogue::printCatalogue( unsigned int i_nRows, double iMinBrightness
         if( iBand == "V" && fStars[i].fBrightness_V > iMinBrightness ) continue;
         else if( iBand == "B" && fStars[i].fBrightness_B > iMinBrightness ) continue;
 
-        cout << fStars[i].fStarID << "\t" << fStars[i].fStarName;
+        cout << fStars[i].fStarID << "\t_" << fStars[i].fStarName;
         cout << ", ra2000 = " << fStars[i].fRA2000 << ", dec2000 = " << fStars[i].fDec2000;
         cout << ", l = " << fStars[i].fRunGalLong1958 << ", b = " << fStars[i].fRunGalLat1958 << "\t";
         if( fStars[i].fBrightness_V < 999. ) cout << "\t mag_V = " << fStars[i].fBrightness_V;
@@ -602,7 +603,8 @@ void VStarCatalogue::printCatalogue( unsigned int i_nRows, double iMinBrightness
             cout << " +- " << fStars[i].fSpectralIndexError;
         }
         cout << endl;
-        if( fStars[i].fFluxEnergyMin.size() > 0 && fStars[i].fFluxEnergyMin.size() == fStars[i].fFluxEnergyMax.size() && fStars[i].fFlux.size() == fStars[i].fFluxEnergyMin.size() && fStars[i].fFluxError.size() == fStars[i].fFluxEnergyMin.size()  )
+        if( fStars[i].fFluxEnergyMin.size() > 0 && fStars[i].fFluxEnergyMin.size() == fStars[i].fFluxEnergyMax.size()
+	 && fStars[i].fFlux.size() == fStars[i].fFluxEnergyMin.size() && fStars[i].fFluxError.size() == fStars[i].fFluxEnergyMin.size()  )
         {
             for( unsigned int e = 0; e < fStars[i].fFluxEnergyMin.size(); e++ )
             {

@@ -19,6 +19,7 @@ namespace VUtilities
    string lowerCase(string& s);
    string upperCase(string& s);
    string removeSpaces( string );
+   string remove_leading_spaces( string );
 
    template<class Seq> void purge( Seq& c );
 

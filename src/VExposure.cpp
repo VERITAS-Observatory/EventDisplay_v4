@@ -668,7 +668,7 @@ void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax,
 {
     VStarCatalogue *s = new VStarCatalogue();
     s->init( 54626., iCatalogue );
-    s->printCatalogue();
+//    s->printCatalogue();
 
     double l = 0.;
     double b = 0.;

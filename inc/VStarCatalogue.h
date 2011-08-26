@@ -15,6 +15,7 @@
 
 #include "VASlalib.h"
 #include "VGlobalRunParameter.h"
+#include "VUtilities.h"
 
 #include <fstream>
 #include <iostream>
