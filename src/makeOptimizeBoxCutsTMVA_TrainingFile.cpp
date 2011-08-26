@@ -68,7 +68,9 @@ int main( int argc, char *argv[] )
        cout << endl;
        cout << "makeOptimizeBoxCutsTMVA_TrainingFile <run parameter file> <output directory for mscw_energy file> <maximum theta2 value [deg^2]> <seed>" << endl;
        cout << endl;
-       cout << "<run parameter file>   parameter file with list of background mscw file (same format as in makeOptimizeBoxCutsTMVA)" << endl;
+       cout << "<run parameter file>";
+       cout << "parameter file with list of background mscw file (same format as in makeOptimizeBoxCutsTMVA)" << endl;
+       cout << "<seed>                 seed for random generator (default: 0)" << endl;
        cout << endl;
        cout << "Note: no wobble offsets are implemented yet" << endl;
        cout << "Note: you might want to have some additional cuts (e.g. distance to the camera center) hardwired" << endl;
@@ -105,8 +107,8 @@ int main( int argc, char *argv[] )
       if( fInput->IsZombie() )
       {
 	 cout << "error reading input file " << iIfile << endl;
+	 cout << "exit..." << endl;
 	 exit( -1 );
-      
       }
 // input data tree
       TTree *fInputData = (TTree*)fInput->Get( "data" );
