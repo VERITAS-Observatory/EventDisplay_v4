@@ -1,3 +1,9 @@
+svn checkout of EVNDISP
+=======================
+
+svn checkout https://svnsrv.desy.de/desy/EVNDISP
+
+
 Creating your own svn branch
 ============================
 
