@@ -1,0 +1,8 @@
+EVENTDISPLAY - IACT event analysis and display - analysis library
+=================================================================
+
+The shared libary $EVNDISP/lib/libVAnaSum.so contains many useful classes to analyse and plot the eventdisplay data products.
+
+Usage: on the root command line
+
+(.... please fill this documentation .....)

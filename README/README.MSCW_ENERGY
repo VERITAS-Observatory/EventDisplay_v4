@@ -1,0 +1,74 @@
+
+mscw_energy
+===========
+calculation of mean scaled width and length, and energy with lookup tables
+--------------------------------------------------------------------------
+
+command line parameters:
+
+general parameters: 
+	 -arrayrecid=0/1/... 	 choose evendisplay array reconstruction record (default 0)
+	 -pe                     input data is in pe's (not in [dc])
+	 -debug=UINT             debug output level (0=default, 1=low, 2=high)
+
+table filling:
+	 -filltables=1
+	 -inputfile FILE 	 evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
+	 -tablefile FILE 	 root file with all the tables (existing files are updated)
+	 -minshowerperbin=INT    minimum number of showers per bin required for analysis (default=5)
+	 -ze=FLOAT       	 zenith angle of simulations
+	 -woff=FLOAT      	 wobble offset of simulations [deg]
+	 -noise=NINT     	 mean pedestal variance (in GrIsu units)
+	 -useMedianforEnergy=0/1 use median of size distribution for energy determination (default 1)
+	 -write1DHistograms 	 write 1D-histograms for median determination to disk (default off)
+	 -maxCoreError=MAX 	 use events with small error in core reconstruction only (default = 60 m)
+	 -spectralIndex=FLOAT 	 weight MC events to this power law spectrum (default=2.0)
+	                         OBS: MC energy range and index are hardcoded in VDataHandler !!
+	 -selectRandom=[0,1] 	 selected events randomly (give probability)
+	 -selectRandomSeed=INT 	 set seed for random select (default=17)
+	 -mindistancetocameracenter=FLOAT  minimum distance of events from camera center (MC distance, default = -1.e10)
+	 -maxdistancetocameracenter=FLOAT  maximum distance of events from camera center (MC distance, default =  1.e10)
+
+table reading:
+	 -filltables=0 (default 0)
+	 -inputfile FILE 	 evndisp root file as input (wildcards possible, use -inputfile "YOUR_DATA_DIRECTORY/*.root")
+	 -outputfile FILE 	 name of output file
+	 -update=0/1 		 update existing root outputfile file (false=0, true=1, default=false)
+	 -tablefile FILE 	 file with lookup tables
+	                 	 (see file "Where-to-find-tables" to get existing lookup tables)
+                                 (tablefile are by default located in the directory ./tables)
+	 -noNoTrigger 		 don't fill events without array trigger into output tree (Monte Carlo only)
+	 -writeReconstructedEventsOnly=INT	 write only reconstructed events to output tree (default=-1)
+	 -shorttree 		 write only a short version of the output tree to disk (can be used for effective area calculation)
+	 -esysfile FILE 	 get correction for systematics in energy reconstruction from this file (default=no correction)
+	 -interpolate=0/1/2 	 use interpolated lookup tables (default=0, 1 = simple, 2 = Gaussian)
+	 -maxnevents=INT         maximum number of events to read from eventdisplay file (default=all)
+	 -maxruntime=FLOAT       maximum amount of time in this run to analyse in [s]
+	 -nomctree               do not copy MC tree to mscw output file
+
+print run parameters for an existing mscw file
+	 -printrunparameters FILE 	 
+
+To calculate mscw,mscl, and energy using default parameters:
+mscw_energy -inputfile <myinputfile.root>
+
+
+EXAMPLES: 
+
+ i) using a eventdisplay output file called 33072.root and a table file called table_ID00.root
+
+      mscw_energy -tablefile tables/table_ID00.root -inputfile 33072.root
+
+      this produces an output file called 33072.mscw.root with mscw, mscl, and energy assign for each event
+
+  ii) using a eventdisplay output file called 33072.root for array reconstruction ID 8 and table file table_ID8.root
+
+      mscw_energy -tablefile tables/table_ID8root -inputfile 33072.root -arrayrecid=8
+
+      this produces an output file called 33072.mscw.root with mscw, mscl, and energy assign for each event
+
+ iii) using a bunch of simulations files (say runnumbers 521000 to 5210010)
+     (with size cut, but no distance cut applied in eventdisplay array analysis): 
+
+      mscw_energy -tablefile tables/table.root -inputfile "52100[0-1].root" -outputfile simu.mscw.root
+

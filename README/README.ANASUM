@@ -1,0 +1,37 @@
+anasum - make sky plots, fill energy spectra etc.
+=================================================
+
+required options are:
+	-l --runlist       [run list file name, see runlist.dat for an example]
+	-d --datadir       [directory for input ROOT files (from mscw_energy)]
+
+optional options are:
+	-o --outfile       [output ROOT file name (default output.root)]
+	-i --infile        [read anasum outputfile, redo combined plots only]
+	-u --infile        [read anasum outputfile, do the calculations for new runs and redo combined plots (data directory with option -l is required)]
+	-r --randomseed    [seed for random generator, default=17]
+	-p --printtargets  [print list of sources]
+	-f --parameterfile [run parameter file, default=runparameter.dat]
+
+--------------------------------------------------------
+
+examples:
+
+standard full stereo analysis:
+
+	 $EVNDISPSYS/bin/anasum -l runlist.dat -d data/Crab -o crab_analysis.root
+
+use the plotting tools in the shared library to plot the results:
+
+         on the root command line do:
+
+	 .L $EVNDISPSYS/lib/libVAnaSum.so
+
+	 VPlotAnasumHistograms a("crab_analysis.root");
+	 a.help();
+	 a.plot_radec();
+
+	 VEnergySpectrum b("crab_analysis.root");
+	 b.plot();
+
+--------------------------------------------------------

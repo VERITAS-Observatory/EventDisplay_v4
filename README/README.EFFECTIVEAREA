@@ -1,0 +1,16 @@
+EVENTDISPLAY - IACT event analysis and display - effective area calculation
+===========================================================================
+
+$EVNDISPSYS/bin/makeEffectiveArea
+
+Command line syntax:
+
+makeEffectiveArea <runparameter file> <output effective area file>
+
+see scripts for typical usage:
+
+$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/CTA/CTA.EFFAREA.qsub_analyse.sh
+
+or
+
+$EVNDISPSYS/scripts/VTSVTS.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/VTSVTS.EFFAREA.qsub_analyse.sh
