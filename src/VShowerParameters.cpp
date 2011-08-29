@@ -245,10 +245,6 @@ void VShowerParameters::reset( unsigned int iNTel )
         fShowerAz[i] = 0.;
         fDec[i] = -90.;
         fRA[i] = 0.;
-        fTelDec[i] = 0.;
-        fTelRA[i] = 0.;
-        fTelPointingErrorX[i] = 0.;
-        fTelPointingErrorY[i] = 0.;
         fShower_stdS[i] = 0.;
         fShower_Xoffset[i] = 0.;
         fShower_Yoffset[i] = 0.;
@@ -279,6 +275,13 @@ void VShowerParameters::reset( unsigned int iNTel )
         fTelElevationVBF[j] = 0.;
         fTelAzimuthVBF[j] = 0.;
         fTelPointingMismatch[j] = 0.;
+        fTelDec[j] = 0.;
+        fTelRA[j] = 0.;
+        fTelPointingErrorX[j] = 0.;
+        fTelPointingErrorY[j] = 0.;
+	fTel_x_SC[j] = 0.;
+	fTel_y_SC[j] = 0.;
+	fTel_z_SC[j] = 0.;
     }
 // MC parameters
     MCprimary = 0;
