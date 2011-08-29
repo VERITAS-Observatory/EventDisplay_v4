@@ -308,7 +308,7 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
 // test if this coordinates are in source area
             if( sqrt( (i_xbin+fRunList.fWobbleWestMod)*(i_xbin+fRunList.fWobbleWestMod) + (i_ybin+fRunList.fWobbleNorthMod)*(i_ybin+fRunList.fWobbleNorthMod) ) > fRunList.fmaxradius ) continue;
 
-// get filling factor (fraction of bin in theta2 circle
+// get filling factor (fraction of bin in theta2 circle)
 	    if( fRunList.fNBoxSmooth > 0. )
 	    {
 	       double p = 0.;
