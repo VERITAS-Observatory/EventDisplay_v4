@@ -385,6 +385,28 @@ TGraph* VTMVAEvaluator::getBoxCut_Theta2_Graph()
    return g;
 }
 
+/*
+   return a graph with all the box theta(!no ^2!) cuts
+
+   (is a memory leak...)
+
+*/
+TGraph* VTMVAEvaluator::getBoxCut_Theta_Graph()
+{
+   TGraph *g = getBoxCut_Theta2_Graph();
+   if( !g ) return 0;
+
+   double x = 0.;
+   double y = 0.;
+   for( int i = 0; i < g->GetN(); i++ )
+   {
+      g->GetPoint( i, x, y );
+      if( y > 0. ) y = sqrt( y );
+      g->SetPoint( i, x, y );
+   }
+   return g;
+}
+
 void VTMVAEvaluator::plotBoxCuts()
 {
     if( fBoxCutValue_Name.size() != fBoxCutValue_min.size() || fBoxCutValue_Name.size() != fBoxCutValue_max.size() )
@@ -437,7 +459,7 @@ void VTMVAEvaluator::plotBoxCuts()
 	   c->Draw();
 	   pN++;
 
-	   setGraphPlottingStyle( gN, i+1, 2., 20, 1. );
+	   setGraphPlottingStyle( gN, 1, 2., 20, 1. );
 
 	   gN->Draw( "alp" );
 	   if( gN->GetHistogram() )
@@ -475,7 +497,7 @@ void VTMVAEvaluator::plotBoxCuts()
 	   c->Draw();
 	   pX++;
 
-	   setGraphPlottingStyle( gX, i+1, 2., 20, 1. );
+	   setGraphPlottingStyle( gX, 1, 2., 20, 1. );
 
 	   gX->Draw( "alp" );
 	   if( gX->GetHistogram() )

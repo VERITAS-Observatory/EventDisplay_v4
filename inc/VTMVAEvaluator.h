@@ -77,6 +77,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    double evaluate( double, double );
    double getBoxCut_Theta2( double iEnergy_log10TeV );
+   TGraph* getBoxCut_Theta_Graph();
    TGraph* getBoxCut_Theta2_Graph();
    vector< double > getBoxCut_Theta2() { return fBoxCutValue_theta2; }
    unsigned int getSpectralWeightedEnergyBin();
