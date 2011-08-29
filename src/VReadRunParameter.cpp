@@ -408,6 +408,11 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fDBVPM = true;
             fRunPara->fDBTracking = true;
         }
+        else if( iTemp.rfind( "-usenodbvpm" ) < iTemp.size() ) 
+	{
+            fRunPara->fDBVPM = false;
+            fRunPara->fDBTracking = true;
+        }
 	else if( iTemp.rfind( "-usedbrotations" ) < iTemp.size() )
 	{
 	    fRunPara->fDBCameraRotationMeasurements = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
@@ -1287,7 +1292,7 @@ void VReadRunParameter::printHelp()
     cout << "\t -useDBtracking \t use database to calculate pointing errors (default: on, switch off with -usenodbtracking )" << endl;
     cout << "\t -useTCorrectionfrom SQL-DATE \t use pointing calculated with T-point correction valid for this data (default: not applied, example: -useTCorrectionfrom \"2007-10-10\"" << endl;
     cout << "\t -pointingmonitortxt DIRECTORY \t find pointing monitor text files in this directory (default: not applied, expect filename as pointing_VPM.37195.t1.dat)" << endl;
-    cout << "\t -usedbvpm \t\t use calibrated pointing monitor data from DB" << endl;
+    cout << "\t -usedbvpm \t\t use calibrated pointing monitor data from DB (usenodbvpm to switch it off)" << endl;
 // (obsolete)  cout << "\t -fillhistos \t\t fill diagnostic histograms (default=" << fRunPara->ffillhistos << ")" << endl;
     cout << "\t -dstfile FILENAME \t name of dst output file (root file, default: dstfile.root)" << endl;
     cout << "\t -dstallpixel=INT \t write data from all pixels to dst files (0: write image/border pixel only; default: 1)" << endl;

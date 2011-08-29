@@ -94,7 +94,7 @@ VEvndispRunParameter::VEvndispRunParameter()
 #ifdef RUNWITHDB
     fDBTracking = true;
     fDBCameraRotationMeasurements = true;
-    fDBVPM = true;
+    fDBVPM = false;
 #else
     fDBTracking = false;
     fDBCameraRotationMeasurements = false;
