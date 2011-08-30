@@ -1,8 +1,8 @@
-//!< VEnergy calculate effective areas and energy spectra
-//  Revision $Id: VEnergy.h,v 1.18.2.12.4.3.12.5.4.1.2.7.2.4.8.3.2.7.4.3 2011/03/31 14:50:58 gmaier Exp $
+//!< VEffectiveAreaCalculator calculate effective areas and energy spectra
+//  Revision $Id: VEffectiveAreaCalculator.h,v 1.18.2.12.4.3.12.5.4.1.2.7.2.4.8.3.2.7.4.3 2011/03/31 14:50:58 gmaier Exp $
 
-#ifndef VENERGY_H
-#define VENERGY_H
+#ifndef VEffectiveAreaCalculator_H
+#define VEffectiveAreaCalculator_H
 
 #include "CData.h"
 #include "VGammaHadronCuts.h"
@@ -34,7 +34,7 @@
 
 using namespace std;
 
-class VEnergy
+class VEffectiveAreaCalculator
 {
     private:
         double degrad;
@@ -169,7 +169,7 @@ class VEnergy
 // effective areas fit functions
         vector< TF1* > fEffAreaFitFunction;
 
-        void   binomialDivide( TGraphAsymmErrors *g, TH1D *hrec, TH1D *hmc );
+        bool   binomialDivide( TGraphAsymmErrors *g, TH1D *hrec, TH1D *hmc );
         void   copyProfileHistograms( TProfile*,  TProfile*, string );
         void   copyHistograms( TH1*,  TH1*, bool );
         double getAzMean( double azmin, double azmax );
@@ -178,6 +178,7 @@ class VEnergy
         double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,
 	                                        double iSpectralIndex, bool bAddtoMeanEffectiveArea = true,
 						bool iEffectiveAreaVsEnergyMC = false );
+	bool   getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms* );
         vector< unsigned int > getUpperLowBins( vector< double > i_values, double d );
         bool   initializeEffectiveAreasFromHistograms( TTree *, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
         double interpolate_WL( double ze, double ze1, double ze2, double w1, double w2, bool iCos = true );
@@ -187,9 +188,9 @@ class VEnergy
 
     public:
 
-        VEnergy( string ieffFile, double azmin, double azmax, double iPedVar, double iIndex,  vector< double> fMCZe, int iSmoothIter = -1, double iSmoothThreshold = 1., bool iEffectiveAreaVsEnergyMC = false );
-		VEnergy( VInstrumentResponseFunctionRunParameter*, VGammaHadronCuts* );
-        ~VEnergy();
+        VEffectiveAreaCalculator( string ieffFile, double azmin, double azmax, double iPedVar, double iIndex,  vector< double> fMCZe, int iSmoothIter = -1, double iSmoothThreshold = 1., bool iEffectiveAreaVsEnergyMC = false );
+		VEffectiveAreaCalculator( VInstrumentResponseFunctionRunParameter*, VGammaHadronCuts* );
+        ~VEffectiveAreaCalculator();
 
         void cleanup();
         void fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod );

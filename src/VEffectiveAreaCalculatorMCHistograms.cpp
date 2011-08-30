@@ -29,8 +29,12 @@ void VEffectiveAreaCalculatorMCHistograms::listEntries()
        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
        {
            cout << "\t Azimuth bin: [" << fVMinAz[j] << ", " << fVMaxAz[j] << "]";
-	   if( getHistogram_Emc( j, i ) ) cout << "\t\t" << getHistogram_Emc( j, i )->GetEntries();
-	   if( getHistogram_EmcWeight( j, i ) ) cout << "\t\t" << getHistogram_EmcWeight( j, i )->GetEntries();
+	   if( getHistogram_Emc( j, i ) ) cout << "\tEntries (MC): " << getHistogram_Emc( j, i )->GetEntries();
+	   if( getHistogram_EmcWeight( j, i ) )
+	   {
+	      cout << "\tEntries (MCweights): ";
+	      cout << getHistogram_EmcWeight( j, i )->GetEntries();
+           }
 	   cout << endl;
        }
     }

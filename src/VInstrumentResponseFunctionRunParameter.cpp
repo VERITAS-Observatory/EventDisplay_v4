@@ -355,24 +355,29 @@ void VInstrumentResponseFunctionRunParameter::print()
     cout << endl;
     if( fFillMCHistograms ) cout << " filling MC histograms only" << endl << endl;
 
+    cout << endl;
     cout << "data files:" << endl;
-    cout << "\t file with shower data:   " << fdatafile << endl;
-    if( fMCdatafile_tree.size() > 0 ) cout <<  "\t file with MC data:     " << fMCdatafile_tree << endl;
-    if( fMCdatafile_histo.size() > 0 ) cout << "\t file with MC histograms:   " << fMCdatafile_histo << endl;
-    if( fGammaHadronProbabilityFile.size() > 0 ) cout << "\t file with gamma/hadron probabilities: " << fGammaHadronProbabilityFile << endl;
+    cout << "  shower data:   " << fdatafile << endl;
+    if( fMCdatafile_tree.size() > 0 ) cout <<  "  MC data:     " << fMCdatafile_tree << endl;
+    if( fMCdatafile_histo.size() > 0 ) cout << "  MC histograms:   " << fMCdatafile_histo << endl;
+    if( fGammaHadronProbabilityFile.size() > 0 ) cout << "  gamma/hadron probabilities: " << fGammaHadronProbabilityFile << endl;
 
-    cout << "\t cuts: "; 
-    cout << "\t cut file " << fCutFileName << " (selector " << fCutSelector << ")";
+    cout << endl;
+    cout << "cuts: "; 
+    cout << " cut file " << fCutFileName;
+    cout << " cut selector " << fCutSelector;
     if( fIgnoreEnergyReconstructionQuality ) cout << ", ignoring cut on quality of energy reconstruction";
     if( fTelescopeTypeCuts ) cout << ", telescope type dependent cuts";
     cout << endl;
-    cout << "\t energy reconstruction method " << fEnergyReconstructionMethod << endl;
+    cout << "energy reconstruction method " << fEnergyReconstructionMethod << endl;
     cout << endl;
 
-    cout << "input Monte Carlo with following parameters: " << endl; 
-    cout << "\t core range: " << fCoreScatterRadius << ", scatter mode " << fCoreScatterMode;
+    cout << "input Monte Carlo with following parameters (might be modified later): " << endl; 
+    cout << "\t core range: " << fCoreScatterRadius;
+    if( fCoreScatterMode.size() > 0 ) cout << ", scatter mode " << fCoreScatterMode;
+    else                              cout << ", (no scatter mode) ";
     cout << ", energy range [TeV]: " << fMCEnergy_min << ", " << fMCEnergy_max << ", " << fMCEnergy_index << endl;
-    cout << "\t ze=" << fze << " [deg], noise=" << fnoise << "(pedvar: " << fpedvar;
+    cout << "\t ze=" << fze << " [deg], noise=" << fnoise << " (pedvar: " << fpedvar;
     cout << "), wobble offset w=" << sqrt( fXoff*fXoff + fYoff*fYoff) << " [deg]";
     cout << endl;
 
@@ -382,10 +387,13 @@ void VInstrumentResponseFunctionRunParameter::print()
 
     cout << endl;
     cout << "array configuration: "; 
-    cout << telconfig_ntel << " telescopes, array dimensions: centre (" << telconfig_arraycentre_X << "," << telconfig_arraycentre_Y << ")";
+    cout << telconfig_ntel;
+    cout << " telescopes, array dimensions: centre (";
+    cout << telconfig_arraycentre_X << "," << telconfig_arraycentre_Y << ")";
     cout << ", max telescope distance to centre: " << telconfig_arraymax << endl;
     cout << endl;
-    cout << "calculate response function assuming power laws fith following index (" << fNSpectralIndex << ", " << fSpectralIndexMin << ", " << fSpectralIndexStep << "): ";
+    cout << "calculate response function assuming power laws with following index (";
+    cout << fNSpectralIndex << ", " << fSpectralIndexMin << ", " << fSpectralIndexStep << "): ";
     for( unsigned int i = 0; i < fSpectralIndex.size(); i++ ) cout << fSpectralIndex[i] << " ";
     cout << endl << endl;
 

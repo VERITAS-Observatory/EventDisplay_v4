@@ -1,13 +1,13 @@
-/*! \class VEnergy
+/*! \class VEffectiveAreaCalculator
  *  \brief calculate effective areas and energy spectra
  *
  *  \author
  *  Gernot Maier
  *
- *  Revision $Id: VEnergy.cpp,v 1.23.2.14.4.9.10.1.2.11.4.1.2.15.2.11.6.2.2.11.2.18.2.1.2.7 2011/03/31 14:50:58 gmaier Exp $
+ *  Revision $Id: VEffectiveAreaCalculator.cpp,v 1.23.2.14.4.9.10.1.2.11.4.1.2.15.2.11.6.2.2.11.2.18.2.1.2.7 2011/03/31 14:50:58 gmaier Exp $
  */
 
-#include "VEnergy.h"
+#include "VEffectiveAreaCalculator.h"
 
 /*!
  *  CALLED FOR CALCULATION OF EFFECTIVE AREAS
@@ -16,11 +16,11 @@
  *  (calculation of effective areas)
  *
  */
-VEnergy::VEnergy( VInstrumentResponseFunctionRunParameter *iRunPara, VGammaHadronCuts* icuts )
+VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionRunParameter *iRunPara, VGammaHadronCuts* icuts )
 {
     if( !iRunPara )
 	{
-	   cout << "VEnergy: no run parameters given" << endl;
+	   cout << "VEffectiveAreaCalculator: no run parameters given" << endl;
 	   cout << "...exiting..." << endl;
 	   exit( -1 );
     }
@@ -210,7 +210,7 @@ VEnergy::VEnergy( VInstrumentResponseFunctionRunParameter *iRunPara, VGammaHadro
 }
 
 
-void VEnergy::initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex )
+void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex )
 {
     fVMinAz = iAzMin;
     fVMaxAz = iAzMax;
@@ -340,7 +340,7 @@ void VEnergy::initializeHistograms( vector< double > iAzMin, vector< double > iA
  *  called from anasum
  *
  */
-VEnergy::VEnergy( string iInputFile, double azmin, double azmax, double ipedvar, double iSpectralIndex, vector< double > iMCZe, int iSmoothIter, double iSmoothThreshold, bool iEffectiveAreaVsEnergyMC )
+VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double azmin, double azmax, double ipedvar, double iSpectralIndex, vector< double > iMCZe, int iSmoothIter, double iSmoothThreshold, bool iEffectiveAreaVsEnergyMC )
 {
     reset();
 
@@ -409,7 +409,7 @@ VEnergy::VEnergy( string iInputFile, double azmin, double azmax, double ipedvar,
     }
     if( !bEffectiveAreasareHistograms && !bEffectiveAreasareFunctions )
     {
-        cout << "VEnergy ERROR: no effective areas found" << endl;
+        cout << "VEffectiveAreaCalculator ERROR: no effective areas found" << endl;
         cout << "all energy spectra will be invalid" << endl;
         bNOFILE = true;
     }
@@ -419,7 +419,7 @@ VEnergy::VEnergy( string iInputFile, double azmin, double azmax, double ipedvar,
 }
 
 
-double VEnergy::getAzMean( double azmin, double azmax )
+double VEffectiveAreaCalculator::getAzMean( double azmin, double azmax )
 {
 // mean azimuth angle
     double iAzMean = 0.;
@@ -436,7 +436,7 @@ double VEnergy::getAzMean( double azmin, double azmax )
 /*
  *  CALLED TO USE EFFECTIVE AREAS
  */
-bool VEnergy::getEffectiveAreasFromFitFunction( TTree* iEffFit, double azmin, double azmax, double iSpectralIndex )
+bool VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( TTree* iEffFit, double azmin, double azmax, double iSpectralIndex )
 {
     if( !iEffFit ) return false;
 
@@ -470,8 +470,8 @@ bool VEnergy::getEffectiveAreasFromFitFunction( TTree* iEffFit, double azmin, do
 
         if( (int)bEffectiveAreaVsEnergyMC != iAMC )
         {
-            if( bEffectiveAreaVsEnergyMC ) cout << "VEnergy::getEffectiveAreasFromFitFunction: expected effective area vs MC energy" << endl;
-            else                           cout << "VEnergy::getEffectiveAreasFromFitFunction: expected effective area vs reconstructed energy" << endl;
+            if( bEffectiveAreaVsEnergyMC ) cout << "VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction: expected effective area vs MC energy" << endl;
+            else                           cout << "VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction: expected effective area vs reconstructed energy" << endl;
             return false;
         }
         if( fabs( iSpectralIndex - index ) > 0.01 ) continue;
@@ -504,7 +504,7 @@ bool VEnergy::getEffectiveAreasFromFitFunction( TTree* iEffFit, double azmin, do
 }
 
 
-vector< double > VEnergy::interpolate_effectiveArea( double iV, double iVLower, double iVupper, vector< double > iElower, vector< double > iEupper, bool iCos )
+vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV, double iVLower, double iVupper, vector< double > iElower, vector< double > iEupper, bool iCos )
 {
     vector< double > i_temp;
     if( iElower.size() == iEupper.size() )
@@ -527,7 +527,7 @@ vector< double > VEnergy::interpolate_effectiveArea( double iV, double iVLower, 
  *
  *
  */
-bool VEnergy::initializeEffectiveAreasFromHistograms( TTree *iEffArea, TH1D* i_hEMC, double azmin, double azmax,
+bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iEffArea, TH1D* i_hEMC, double azmin, double azmax,
                                                       double iSpectralIndex, double ipedvar )
 {
     if( !iEffArea ) return false;
@@ -582,7 +582,7 @@ bool VEnergy::initializeEffectiveAreasFromHistograms( TTree *iEffArea, TH1D* i_h
 
     if( !i_hEMC )
     {
-        cout << "VEnergy::initializeEffectiveAreasFromHistograms error: no effective area histogram found" << endl;
+        cout << "VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms error: no effective area histogram found" << endl;
         return false;
     }
 
@@ -661,7 +661,7 @@ bool VEnergy::initializeEffectiveAreasFromHistograms( TTree *iEffArea, TH1D* i_h
 // check binning of effective areas
         if( i_hEMC && (int)i_hEMC->GetNbinsX() != (int)fNBins )
         {
-            cout << "VEnergy::initializeEffectiveAreasFromHistograms error: effective area curve with different binning";
+            cout << "VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms error: effective area curve with different binning";
             cout << " " << i_hEMC->GetNbinsX() << " " << fNBins << endl;
             cout << "abort reading effective area tree..." << endl;
             return false;
@@ -843,7 +843,7 @@ bool VEnergy::initializeEffectiveAreasFromHistograms( TTree *iEffArea, TH1D* i_h
             {
                 cout << "WARNING : incomplete effective areas for id " << i_ID << endl;
 		cout << i_index_index << "\t" << i_index_noise << "\t" << i_index_woff << "\t" << i_index_ze << endl;
-                cout << "in bool VEnergy::initializeEffectiveAreasFromHistograms(";
+                cout << "in bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(";
 		cout << "TTree *iEffArea, double azmin, double azmax, double iSpectralIndex )" << endl;
 		cout << "Missing effective area:";
 		if( i_index_ze < fZe.size() ) cout << " ze = " << fZe[i_index_ze] << " [deg],"; 
@@ -1010,7 +1010,7 @@ bool VEnergy::initializeEffectiveAreasFromHistograms( TTree *iEffArea, TH1D* i_h
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-VEnergy::~VEnergy()
+VEffectiveAreaCalculator::~VEffectiveAreaCalculator()
 {
     for( unsigned int i = 0; i < fEffAreaFitFunction.size(); i++ )
     {
@@ -1022,7 +1022,7 @@ VEnergy::~VEnergy()
 }
 
 
-void VEnergy::reset()
+void VEffectiveAreaCalculator::reset()
 {
     degrad = 45./ atan( 1. );
     raddeg = 1./degrad;
@@ -1094,12 +1094,47 @@ void VEnergy::reset()
     gMeanSystematicErrorGraph = 0;
 }
 
+bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms *iMC_histo )
+{
+   char hname[800];
+// loop over az bins
+// (MC az [-180., 180.])
+   for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
+   {
+// loop over all spectral index
+       for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
+       {
+          if( s < hVEmc.size() && i_az < hVEmc[s].size() )
+          {
+            sprintf( hname, "hVEmc_%d_%d", s, i_az );
+            if( iMC_histo->getHistogram_Emc( i_az, s ) )
+	    {
+	        hVEmc[s][i_az] = (TH1D*)iMC_histo->getHistogram_Emc( i_az, s )->Clone( hname );
+            }
+	    else hVEmc[s][i_az] = 0;
+          }
+          if( s < hVEmcSWeight.size() && i_az < hVEmcSWeight[s].size() )
+          {
+            sprintf( hname, "hVEmcSWeight_%d_%d", s, i_az );
+            if( iMC_histo->getHistogram_EmcWeight( i_az, s ) )
+	    {
+	       hVEmcSWeight[s][i_az] = (TProfile*)iMC_histo->getHistogram_EmcWeight( i_az, s )->Clone( hname );
+            }
+	    else hVEmcSWeight[s][i_az] = 0;
+          }
+       }
+   }
+
+   return true;
+}
+
 /*
  *
  *  CALLED FOR CALCULATION OF EFFECTIVE AREAS
  *
  */
-void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod )
+void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
+                    VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod )
 {
     bool bDebugCuts = false;          // lots of debug output
 
@@ -1126,7 +1161,7 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
     }
     else
     {
-        cout << "VEnergy::fill ERROR: unknown CORSIKA scatter mode: " << fScatterMode[ize] << endl;
+        cout << "VEffectiveAreaCalculator::fill ERROR: unknown CORSIKA scatter mode: " << fScatterMode[ize] << endl;
         return;
     }
 
@@ -1135,15 +1170,16 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
     cout << endl;
     cout << "calculating effective areas: " << endl;
     cout << "\t zenith angle: " << fZe[ize];
-    cout << ", wobble offset (x,y): " << fXWobble[ize] << ", " << fYWobble[ize] << " (" << sqrt(fXWobble[ize]*fXWobble[ize]+fYWobble[ize]*fYWobble[ize]) << " deg)" << endl;
+    cout << ", wobble offset (x,y): " << fXWobble[ize] << ", " << fYWobble[ize];
+    cout << " (" << sqrt(fXWobble[ize]*fXWobble[ize]+fYWobble[ize]*fYWobble[ize]) << " deg)" << endl;
     cout << "\t noise level: " << fNoise[ize] << " (pedvar: " << fPedVar[ize] << ")" << endl;
-    cout << "\t area (" << fScatterMode[ize] << ") [m]: " << totarea << " (scatter radius " << fAreaRadius[ize] << " [m])" << endl;
+    cout << "\t area (" << fScatterMode[ize] << ") [m]: " << totarea;
+    cout << " (scatter radius " << fAreaRadius[ize] << " [m])" << endl;
     cout << "\t energy reconstruction method: " << iMethod << endl;
     if( fIsotropicArrivalDirections ) cout << "\t assuming isotropic arrival directions" << endl;
 
-    cout << "\t =========================================================================================" << endl;
+    cout << endl;
     if( fSpectralWeight ) fSpectralWeight->print();
-    cout << "\t =========================================================================================" << endl;
     cout << endl;
 
 // make sure that all pointers to the data exist
@@ -1156,30 +1192,13 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
     double eRecLin = 0.;
 // MC energy (log10)
     double eMC = 0.;
-// MC az [-180., 180.]
 
 ////////////////////////////////////////////////////////////////////////////
 // get MC histograms
-////////////////////////////////////////////////////////////////////////////
-
-   char hname[800];
-// loop over az bins
-   for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
+   if( !getMonteCarloSpectra( iMC_histo ) )
    {
-// loop over all spectral index
-       for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
-       {
-          if( s < hVEmc.size() && i_az < hVEmc[s].size() )
-          {
-            sprintf( hname, "hVEmc_%d_%d", s, i_az );
-            hVEmc[s][i_az] = (TH1D*)iMC_histo->getHistogram_Emc( i_az, s )->Clone( hname );
-          }
-          if( s < hVEmcSWeight.size() && i_az < hVEmcSWeight[s].size() )
-          {
-            sprintf( hname, "hVEmcSWeight_%d_%d", s, i_az );
-            hVEmcSWeight[s][i_az] = (TProfile*)iMC_histo->getHistogram_EmcWeight( i_az, s )->Clone( hname );
-          }
-       }
+      cout << "VEffectiveAreaCalculator::fill error while getting MC spectra" << endl;
+      return;
    }
 
 ///////////////////////////////////////////////////////
@@ -1209,7 +1228,12 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
 // apply general quality and gamma/hadron separation cuts
 
 // apply reconstruction cuts
-         if( bDebugCuts ) cout << "CUT A " << fCuts->applyInsideFiducialAreaCut() << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true) << endl;
+         if( bDebugCuts )
+	 {
+	    cout << "CUT A ";
+	    cout << fCuts->applyInsideFiducialAreaCut();
+	    cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true) << endl;
+         }
 
 // apply fiducial area cuts
          if( !fCuts->applyInsideFiducialAreaCut( true ) ) continue;
@@ -1242,7 +1266,12 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
 
 //////////////////////////////////////
 // apply gamma hadron cuts
-         if( bDebugCuts ) cout << "CUT ISGAMMA " << fCuts->isGamma(i) << "\t" << fCuts->applyEnergyReconstructionQualityCuts( iMethod ) << endl;
+         if( bDebugCuts )
+	 {
+	    cout << "CUT ISGAMMA ";
+	    cout << fCuts->isGamma(i);
+	    cout << "\t" << fCuts->applyEnergyReconstructionQualityCuts( iMethod ) << endl;
+         }
          if( !fCuts->isGamma( i, true ) ) continue;
          hEcutSub[5]->Fill( eMC, i_weight );
 
@@ -1323,6 +1352,7 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
 
     ze = fZe[ize];
     fTNoise = fNoise[ize];
+// WARNING: hardwired values - not used to my knowledge anywhere? (GM)
     fTNoisePE = (double)(fNoise[ize]) / 0.15 * 1.e9;
     fTPedvar = fPedVar[ize];
     fXoff = fXWobble[ize];
@@ -1342,9 +1372,21 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
 
 // bayesdivide works only for weights == 1
 // errors might be wrong, since histograms are filled with weights != 1
-            binomialDivide( gEffAreaMC, hVEcut[s][i_az], hVEmc[s][i_az] );
-            binomialDivide( gRecProb, hVEcut[s][i_az], hVEmc[s][i_az] );
-            binomialDivide( gEffAreaRec, hVEcutRec[s][i_az], hVEmc[s][i_az] );
+            if( !binomialDivide( gEffAreaMC, hVEcut[s][i_az], hVEmc[s][i_az] ) )
+	    {
+	       cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs MC energy" << endl;
+	       cout << "s : " << s << " , az: " << i_az << endl;
+            }
+            if( !binomialDivide( gRecProb, hVEcut[s][i_az], hVEmc[s][i_az] ) )
+	    {
+	       cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs prob energy" << endl;
+	       cout << "s : " << s << " , az: " << i_az << endl;
+            }
+            if( !binomialDivide( gEffAreaRec, hVEcutRec[s][i_az], hVEmc[s][i_az] ) )
+	    {
+	       cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs rec energy" << endl;
+	       cout << "s : " << s << " , az: " << i_az << endl;
+            }
 
             nbins = gEffAreaMC->GetN();
 
@@ -1422,7 +1464,7 @@ void VEnergy::fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalcu
  *
  *
  */
-double VEnergy::getEffectiveArea( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, bool bAddtoMeanEffectiveArea, bool iEffectiveAreaVsEnergyMC )
+double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, bool bAddtoMeanEffectiveArea, bool iEffectiveAreaVsEnergyMC )
 {
     if( bNOFILE ) return 1.;
 
@@ -1487,7 +1529,7 @@ double VEnergy::getEffectiveArea( double erec, double ze, double woff, double iP
 /*!
  *  CALLED TO USE EFFECTIVE AREAS
  */
-void VEnergy::getEffectiveAreasFromFitFunction( unsigned int ize_low, unsigned int ize_up, double lerec, double &ie_zelow, double &ie_zeup )
+void VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( unsigned int ize_low, unsigned int ize_up, double lerec, double &ie_zelow, double &ie_zeup )
 {
     if( ize_low < fEffAreaFitFunction.size() && fEffAreaFitFunction[ize_low] ) ie_zelow = fEffAreaFitFunction[ize_low]->Eval( lerec );
     if( ize_up  < fEffAreaFitFunction.size() && fEffAreaFitFunction[ize_up]  ) ie_zeup  = fEffAreaFitFunction[ize_up]->Eval( lerec );
@@ -1497,7 +1539,7 @@ void VEnergy::getEffectiveAreasFromFitFunction( unsigned int ize_low, unsigned i
 /*
       this function always returns a vector of size 2
 */
-vector< unsigned int > VEnergy::getUpperLowBins( vector< double > i_values, double d )
+vector< unsigned int > VEffectiveAreaCalculator::getUpperLowBins( vector< double > i_values, double d )
 {
     vector< unsigned int > i_temp( 2, 0 );
 
@@ -1564,7 +1606,7 @@ vector< unsigned int > VEnergy::getUpperLowBins( vector< double > i_values, doub
  *
  *
  */
-double VEnergy::getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, bool bAddtoMeanEffectiveArea, bool iEffectiveAreaVsEnergyMC )
+double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, bool bAddtoMeanEffectiveArea, bool iEffectiveAreaVsEnergyMC )
 {
     vector< double > i_eff_temp( fNBins, 0. );
 
@@ -1625,7 +1667,7 @@ double VEnergy::getEffectiveAreasFromHistograms( double erec, double ze, double 
                         }
                         else
                         {
-                            cout << "VEnergy::getEffectiveAreasFromHistograms error: spectral index index out of range: ";
+                            cout << "VEffectiveAreaCalculator::getEffectiveAreasFromHistograms error: spectral index index out of range: ";
 			    cout << i_ze_bins[i] << " " << fEff_SpectralIndex.size();
                             if( i_ze_bins[i] < fEff_SpectralIndex.size() )
 			    {
@@ -1644,7 +1686,7 @@ double VEnergy::getEffectiveAreasFromHistograms( double erec, double ze, double 
                 }
                 else
                 {
-                    cout << "VEnergy::getEffectiveAreasFromHistograms error: noise index out of range: " << i_ze_bins[i] << " " << fEff_Noise.size();
+                    cout << "VEffectiveAreaCalculator::getEffectiveAreasFromHistograms error: noise index out of range: " << i_ze_bins[i] << " " << fEff_Noise.size();
                     if( i_ze_bins[i] < fEff_Noise.size() ) cout << " " << i_woff_bins[w] << " " << fEff_Noise[i_ze_bins[i]].size() << endl;
                     cout << endl;
                     return 0.;
@@ -1654,7 +1696,7 @@ double VEnergy::getEffectiveAreasFromHistograms( double erec, double ze, double 
         }
         else
         {
-            cout << "VEnergy::getEffectiveAreasFromHistograms error: woff index out of range: " << i_ze_bins[i] << " " << fEff_WobbleOffsets.size() << endl;
+            cout << "VEffectiveAreaCalculator::getEffectiveAreasFromHistograms error: woff index out of range: " << i_ze_bins[i] << " " << fEff_WobbleOffsets.size() << endl;
             return 0.;
         }
     }
@@ -1726,7 +1768,7 @@ double VEnergy::getEffectiveAreasFromHistograms( double erec, double ze, double 
 
     weighted by cos ze
 */
-double VEnergy::interpolate_WL( double ze, double ze1, double ze2, double w1, double w2, bool iCos )
+double VEffectiveAreaCalculator::interpolate_WL( double ze, double ze1, double ze2, double w1, double w2, bool iCos )
 {
 // don't interpolate if one or two values are not valid
     if( w1 < -90. || w2 < -90. ) return -99.;
@@ -1756,7 +1798,7 @@ double VEnergy::interpolate_WL( double ze, double ze1, double ze2, double w1, do
 /*
  *  CALLED FOR CALCULATION OF EFFECTIVE AREAS
  */
-void VEnergy::resetHistograms( unsigned int ize )
+void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
 {
     if( ize >= fZe.size() ) return;
 
@@ -1818,7 +1860,7 @@ void VEnergy::resetHistograms( unsigned int ize )
 }
 
 
-void VEnergy::setWobbleOffset( double x, double y )
+void VEffectiveAreaCalculator::setWobbleOffset( double x, double y )
 {
     if( fXWobble.size() == 0 ) fXWobble.push_back( x );
     else                       fXWobble[0] = x;
@@ -1827,7 +1869,7 @@ void VEnergy::setWobbleOffset( double x, double y )
 
 }
 
-void VEnergy::setNoiseLevel( int iN, double iP )
+void VEffectiveAreaCalculator::setNoiseLevel( int iN, double iP )
 {
    if( fNoise.size() == 0 ) fNoise.push_back( iN );
    else                     fNoise[0] = iN;
@@ -1839,7 +1881,7 @@ void VEnergy::setNoiseLevel( int iN, double iP )
 /*!
     set azimuth cut for effective area fillings
 */
-void VEnergy::setAzimuthCut( int iAzBin, double iAzMin, double iAzMax )
+void VEffectiveAreaCalculator::setAzimuthCut( int iAzBin, double iAzMin, double iAzMax )
 {
     fAzBin = iAzBin;
     fMinAz = iAzMin;
@@ -1847,8 +1889,24 @@ void VEnergy::setAzimuthCut( int iAzBin, double iAzMin, double iAzMax )
 }
 
 
-void VEnergy::binomialDivide( TGraphAsymmErrors *g, TH1D *hrec, TH1D *hmc )
+bool VEffectiveAreaCalculator::binomialDivide( TGraphAsymmErrors *g, TH1D *hrec, TH1D *hmc )
 {
+    if( !g )
+    {
+       cout << "VEffectiveAreaCalculator::binomialDivide error: no return graph given" << endl;
+       return false;
+    }
+    if( !hrec )
+    {
+       cout << "VEffectiveAreaCalculator::binomialDivide error: no histogram with reconstructed events given" << endl;
+       return false;
+    }
+    if( !hmc )
+    {
+       cout << "VEffectiveAreaCalculator::binomialDivide error: no histogram with simulated events given" << endl;
+       return false;
+    }
+
     int z = 0;
     double pj = 0.;
     double pr = 0.;
@@ -1862,8 +1920,10 @@ void VEnergy::binomialDivide( TGraphAsymmErrors *g, TH1D *hrec, TH1D *hmc )
             pj = hrec->GetBinContent( b ) / hmc->GetBinContent( b );
             pr = hrec->GetBinError( b );
             pm = hmc->GetBinError( b );
-// NEW FORMULA
-            if( pj != 1. ) sj = TMath::Abs( ( ( 1.-2.*pj)*pr*pr + pj*pj*pm*pm)/(hmc->GetBinContent( b )*hmc->GetBinContent( b )) );
+            if( pj != 1. )
+	    {
+	       sj = TMath::Abs( ( ( 1.-2.*pj)*pr*pr + pj*pj*pm*pm)/(hmc->GetBinContent( b )*hmc->GetBinContent( b )) );
+            }
             else           sj = 0.;
             sj = sqrt( sj );
 
@@ -1873,10 +1933,12 @@ void VEnergy::binomialDivide( TGraphAsymmErrors *g, TH1D *hrec, TH1D *hmc )
         }
     }
     g->Set( z );
+
+    return true;
 }
 
 
-void VEnergy::smoothEffectiveAreas( map< unsigned int, vector< double > > m )
+void VEffectiveAreaCalculator::smoothEffectiveAreas( map< unsigned int, vector< double > > m )
 {
     cout << "\t smooth effective areas, parameters: " << fSmoothIter << ", " << fSmoothThreshold << endl;
 
@@ -1909,7 +1971,7 @@ void VEnergy::smoothEffectiveAreas( map< unsigned int, vector< double > > m )
 }
 
 
-void VEnergy::copyProfileHistograms( TProfile *h1,  TProfile*h2, string iopt )
+void VEffectiveAreaCalculator::copyProfileHistograms( TProfile *h1,  TProfile*h2, string iopt )
 {
     if( !h1 || !h2 ) return;
 
@@ -1937,7 +1999,7 @@ void VEnergy::copyProfileHistograms( TProfile *h1,  TProfile*h2, string iopt )
 }
 
 
-void VEnergy::copyHistograms( TH1 *h1,  TH1 *h2, bool b2D )
+void VEffectiveAreaCalculator::copyHistograms( TH1 *h1,  TH1 *h2, bool b2D )
 {
     if( !h1 || !h2 ) return;
 
@@ -1971,7 +2033,7 @@ void VEnergy::copyHistograms( TH1 *h1,  TH1 *h2, bool b2D )
     values are filled ....
 
 */
-TGraphAsymmErrors* VEnergy::getMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC )
+TGraphAsymmErrors* VEffectiveAreaCalculator::getMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC )
 {
     TGraphAsymmErrors *g = 0;
     unsigned int n = 0;
@@ -2012,7 +2074,7 @@ TGraphAsymmErrors* VEnergy::getMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC 
 }
 
 
-void VEnergy::resetHistogramsVectors( unsigned int ize )
+void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
 {
     for( unsigned int i = 0; i < hVEmc.size(); i++ )
     {
@@ -2094,7 +2156,7 @@ void VEnergy::resetHistogramsVectors( unsigned int ize )
 }
 
 
-TH1D* VEnergy::getHistogramhEmc()
+TH1D* VEffectiveAreaCalculator::getHistogramhEmc()
 {
     if( !hEmc ) return 0;
 
@@ -2104,7 +2166,7 @@ TH1D* VEnergy::getHistogramhEmc()
 }
 
 
-TGraphErrors* VEnergy::getMeanSystematicErrorHistogram()
+TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 {
     if( fEffectiveAreas_meanN <= 0. )
     {
@@ -2185,7 +2247,7 @@ TGraphErrors* VEnergy::getMeanSystematicErrorHistogram()
 }
 
 
-bool VEnergy::setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex )
+bool VEffectiveAreaCalculator::setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex )
 {
    if( fSpectralWeight )
    {
@@ -2193,6 +2255,6 @@ bool VEnergy::setMonteCarloEnergyRange( double iMin, double iMax, double iMCInde
       return true;
    }
 
-   cout << "VEnergy::setMonteCarloEnergyRange error: not spectral weighter defined" << endl;
+   cout << "VEffectiveAreaCalculator::setMonteCarloEnergyRange error: not spectral weighter defined" << endl;
    return false;
 }

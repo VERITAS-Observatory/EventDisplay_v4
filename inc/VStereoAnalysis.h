@@ -12,7 +12,7 @@
 #include "VASlalib.h"
 #include "VTimeMask.h"
 #include "VDeadTime.h"
-#include "VEnergy.h"
+#include "VEffectiveAreaCalculator.h"
 #include "VStereoHistograms.h"
 #include "VStereoMaps.h"
 #include "VSkyCoordinatesUtilities.h"

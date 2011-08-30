@@ -376,7 +376,7 @@ makeRadialAcceptance:	$(ACCOBJECT)
 # effective area code (makeEffectiveArea_
 ########################################################
 
-EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o ./obj/VEnergy.o \
+EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o ./obj/VEffectiveAreaCalculator.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
@@ -412,7 +412,7 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
                 ./obj/VAstroSource.o\
                 ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o \
 		./obj/VStereoMaps.o ./obj/VRatePlots.o \
-		./obj/VRadialAcceptance.o ./obj/VEnergy.o ./obj/VRunSummary.o \
+		./obj/VRadialAcceptance.o ./obj/VEffectiveAreaCalculator.o ./obj/VRunSummary.o \
 		./obj/VDeadTime.o \
 		./obj/VTimeMask.o ./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 		./obj/VRunList.o ./obj/VRunList_Dict.o \

@@ -22,7 +22,7 @@
 #include "Ctelconfig.h"
 #include "VGammaHadronCuts.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
-#include "VEnergy.h"
+#include "VEffectiveAreaCalculator.h"
 #include "VInstrumentResponseFunction.h"
 #include "VInstrumentResponseFunctionRunParameter.h"
 #include "VMonteCarloRunHeader.h"
@@ -86,7 +86,7 @@ int main( int argc, char *argv[] )
 
 /////////////////////////////////////////////////////////////////////////////
 // set effective area class
-    VEnergy e( fRunPara, fCuts );
+    VEffectiveAreaCalculator e( fRunPara, fCuts );
 
 /////////////////////////////////////////////////////////////////////////////
 // set effective area Monte Carlo histogram class

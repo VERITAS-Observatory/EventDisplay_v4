@@ -345,7 +345,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 // spetcral energy reconstruction (effective areas, etc.)
 // effective area class
-	VEnergy fEnergy( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, iAzMin, iAzMax, iPedVar, fRunPara->fEnergyReconstructionSpectralIndex, fRunPara->fMCZe, fRunPara->fEnergyEffectiveAreaSmoothingIterations, fRunPara->fEnergyEffectiveAreaSmoothingThreshold, fRunPara->bEffectiveAreaVsEnergyMC );
+	VEffectiveAreaCalculator fEnergy( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, iAzMin, iAzMax, iPedVar, fRunPara->fEnergyReconstructionSpectralIndex, fRunPara->fMCZe, fRunPara->fEnergyEffectiveAreaSmoothingIterations, fRunPara->fEnergyEffectiveAreaSmoothingThreshold, fRunPara->bEffectiveAreaVsEnergyMC );
 	double iEnergyWeighting = 1.;
 	double iErec = 0.;
 	double iErecC2 = 0.;
