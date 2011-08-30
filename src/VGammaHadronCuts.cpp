@@ -519,15 +519,22 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                     fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
                 }
             }
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // TMVA values
             if( temp == "TMVACUTS" )
             {
                if( !is_stream.eof() ) is_stream >> fTMVASignalEfficiency;
+// probability threshold not important for box cuts
                if( !is_stream.eof() ) is_stream >> fTMVAProbabilityThreshold;
+// files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFileIndex_min;
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFileIndex_max;
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFile;
+// do not apply theta2 cut in TMVA
+// (results from TMVA are read from XML file and applied later by hand; 
+// necessary to get solid angle information into the sensitivity calculator)
 	       if( !is_stream.eof() ) is_stream >> fTMVAIgnoreTheta2Cut;
+////////////////////////////////////////////////////////////////////////////////////////////////////
             }
 // read in values for energy dependent theta2 cut (TEMPORARY: MC only)
 // * theta2file <root file> <scale factor> <minimum theta> <maximum theta> <function name>
@@ -563,6 +570,7 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 		    exit( -1 );
                  }
             }   
+////////////////////////////////////////////////////////////////////////////////////////////////////
         }
     }
     return true;
