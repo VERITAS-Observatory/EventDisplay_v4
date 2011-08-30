@@ -221,7 +221,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
    cout << endl;
    cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")" << endl;
    cout << "Observatory: " << fObservatory;
-   cout << " (long " << fObservatory_Longitude_deg << " deg, " << fObservatory_Latitude_deg << " deg,";
+   cout << " (long " << fObservatory_Longitude_deg << " deg, lat " << fObservatory_Latitude_deg << " deg,";
    cout << " alt " << fObservatory_Height_m << " m)" << endl;
    cout << endl;
    if( fDBServer.size() > 0 ) cout << "DB server " << fDBServer << endl;
