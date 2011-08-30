@@ -27,7 +27,6 @@ mkdir -p $LDIR
 # delete old log files
 rm -f $LDIR/$TFIL.log
 
-
 ###############################################
 # mscw_energy command line options
 ###############################################
