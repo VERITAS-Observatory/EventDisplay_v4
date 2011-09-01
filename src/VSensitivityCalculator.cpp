@@ -1117,7 +1117,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	{
 	   return getDifferentialFluxVectorfromMC_ErrorMessage( "diffent number of bins in gamma and background effective areas" );
         }
-        if( TMath::Abs( fMC_Data[1]->effArea_Emin - (*i_MCData_iterator).second->effArea_Emin ) > 0.05 || TMath::Abs( fMC_Data[1]->effArea_Emax - (*i_MCData_iterator).second->effArea_Emax ) > 0.05 )
+        if( TMath::Abs( fMC_Data[1]->effArea_Emin - (*i_MCData_iterator).second->effArea_Emin ) > 0.05
+	 || TMath::Abs( fMC_Data[1]->effArea_Emax - (*i_MCData_iterator).second->effArea_Emax ) > 0.05 )
 	{
 	   return getDifferentialFluxVectorfromMC_ErrorMessage( "different energy axis definition in gamma and background effective areas" );
         }
@@ -1156,12 +1157,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
             i_flux.Energy_upEdge  = fMC_Data[1]->energy[i] + iBinSize/2.;
             i_flux.Energy_lowEdge_bin = i;
             i_flux.Energy_upEdge_bin = i;
-// energies are on linear scale here
+// energies are on linear scale
             i_flux.Energy_lowEdge = TMath::Power( 10., i_flux.Energy_lowEdge );
             i_flux.Energy_upEdge  = TMath::Power( 10., i_flux.Energy_upEdge );
 
             i_flux.dE = i_flux.Energy_upEdge - i_flux.Energy_lowEdge;
-// simplified (should somehow be weighted by the shape of the energy spectrum)
+// simplified (maybe should somehow be weighted by the shape of the energy spectrum)
             i_flux.Energy = (i_flux.Energy_lowEdge + i_flux.Energy_upEdge)/2.;
             i_flux.EnergyWeightedMean = i_flux.Energy;
 // convert from [h] to [s]
@@ -1170,7 +1171,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
             v_flux.push_back( i_flux );
             if( fDebug )
             {
-                cout << "ENERGY: " << v_flux.size() << "\t" << i_flux.Energy_lowEdge << " - " << i_flux.Energy_upEdge << "\t" << i_flux.Energy << "\t" << i_flux.EnergyWeightedMean;
+                cout << "ENERGY: " << v_flux.size() << "\t" << i_flux.Energy_lowEdge << " - " << i_flux.Energy_upEdge;
+		cout << "\t" << i_flux.Energy << "\t" << i_flux.EnergyWeightedMean;
                 cout << "\t" << i_flux.dE << "\t" << i_flux.ObsTime << "\t" << fObservationTime << "  Off: ";
 		map< unsigned int, int >::iterator iEnergyScaleOffset_iter;
 		for( iEnergyScaleOffset_iter = iEnergyScaleOffset.begin(); iEnergyScaleOffset_iter != iEnergyScaleOffset.end(); iEnergyScaleOffset_iter++ )
@@ -1215,7 +1217,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
             {
                 if( TMath::Abs( fMC_Data[1]->energy[i] - iBinSize/2. - iBinEnergyMin ) < 1.e-2 )
                 {
-                    i_flux.Energy_lowEdge = fMC_Data[1]->energy[i] - iBinSize/2.;
+                    i_flux.Energy_lowEdge = fMC_Data[1]->energy[i] - iBinSize/2.;                    // temporary: Energy_lowEdge should be on lin scale, here it is on log scale
                     i_flux.Energy_lowEdge_bin = i;
                     i_eff_found = true;
                     break;
@@ -1226,11 +1228,11 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 // upper energy bin
                 if( i_flux.Energy_lowEdge_bin + int(dE_Log10/iBinSize) < fMC_Data[1]->energy.size() )
                 {
-                    i_flux.Energy_upEdge = i_flux.Energy_lowEdge + dE_Log10;
+                    i_flux.Energy_upEdge     = i_flux.Energy_lowEdge + dE_Log10;
                     i_flux.Energy_upEdge_bin = i_flux.Energy_lowEdge_bin + int(dE_Log10/iBinSize);
-// energies are on linear scale here
+// energies are on linear scale 
                     i_flux.Energy_lowEdge = TMath::Power( 10., i_flux.Energy_lowEdge );
-                    i_flux.Energy_upEdge = TMath::Power( 10., i_flux.Energy_upEdge );
+                    i_flux.Energy_upEdge  = TMath::Power( 10., i_flux.Energy_upEdge );
 
                     i_flux.dE = i_flux.Energy_upEdge - i_flux.Energy_lowEdge;
 // simplified
@@ -1263,7 +1265,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 //      purgeEnergies( fMC_Data[1]->energy, v_flux );
     for( unsigned int i = 0; i < v_flux.size(); i++ )
     {
-        v_flux[i].NOn       = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab, *fMC_Data[1] );
+        v_flux[i].NOn       = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab, *fMC_Data[1], false );
 	v_flux[i].NOn_error = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab, *fMC_Data[1], true );
     }
 
@@ -1523,7 +1525,9 @@ void VSensitivityCalculator::setMonteCarloParameters( unsigned int iParticleID, 
 /*!
    calculate rate (in [1/min]) from given spectral shape and effective areas
 */
-double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up, VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara, bool iRateError )
+double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up, 
+                                                   VEnergySpectrumfromLiterature i_Espec, 
+						   VSensitivityCalculatorDataResponseFunctions iMCPara, bool iRateError )
 {
     VMonteCarloRateCalculator iMCR;
 
@@ -1914,6 +1918,26 @@ void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentia
     gNoff->Draw( "p" );
 
     cPlotDebug[0]->Update();
+
+// write graphs with on and off events to disk
+    if( fDebugParticleNumberFile.size() > 0 )
+    {
+        cout << "writing graphs with on/off events to file: " << fDebugParticleNumberFile << endl;
+
+	TFile iF( fDebugParticleNumberFile.c_str(), "RECREATE" );
+	if( iF.IsZombie() )
+	{
+	    cout << "VSensitivityCalculator::plotDebugPlotsParticleNumbers: error opening particle number file (write): " << endl;
+	    cout << fDebugParticleNumberFile << endl;
+	    return;
+        }
+	gNon->SetName( "gNOn" );
+	gNon->Write();
+	gNoff->SetName( "gNOff" );
+	gNoff->Write();
+
+	iF.Close();
+     }
 }
 
 /*!
