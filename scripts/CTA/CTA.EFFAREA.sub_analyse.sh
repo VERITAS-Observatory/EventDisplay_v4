@@ -9,10 +9,11 @@
 #
 
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <array> <recid> <particle> <input> [cutfile template]"
+   echo "CTA.EFFAREA.sub_analyse.sh <array> <recid> <particle> <input> <cutfile template>"
+   echo "================================================================================"
    echo
    echo "make effective areas for CTA"
    echo 
@@ -25,14 +26,14 @@ then
    echo "     reconstruction ID from array reconstruction"
    echo
    echo "<particle>"
-   echo "     gamma_onSource/gamma_cone10/electron/proton/helium"
+   echo "     gamma_onSource / gamma_cone10 / electron / proton / helium "
    echo
    echo "<input>"
    echo "     msc      use mscw files as input (slow, but necessary at least once)"
    echo "     eff      use effective area files (note: hardwired file location)"
    echo 
-   echo "[cutfile template]"
-   echo "     template for gamma/hadron cut file (default: ANASUM.GammaHadron.XYOFF)"
+   echo "<cutfile template>"
+   echo "     template for gamma/hadron cut file"
    echo
    exit
 fi
@@ -49,11 +50,7 @@ ARRAY=$1
 RECID=$2
 PART=$3
 INPU=$4
-CFIL="$CTA_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.GammaHadron.XYOFF.dat"
-if [ -n "$5" ]
-then
-  CFIL=$5
-fi
+CFIL=$5
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] && [ $PART != "helium" ]
@@ -81,6 +78,7 @@ echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
 DDIR=$CTA_DATA_DIR/analysis/$ARRAY/Analysis/
+#DDIR=$CTA_USER_DATA_DIR/analysis/"s4-2-120"/"Analysis_132066"/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
@@ -88,7 +86,7 @@ FDIR=$CTA_USER_LOG_DIR"/queueEffArea/$DATE/"
 echo $FDIR
 mkdir -p $FDIR
 echo "output data directory"
-ODIR=$CTA_USER_DATA_DIR"/analysis/EffectiveArea/$ARRAY/$DATE/"
+ODIR=$CTA_USER_DATA_DIR"/analysis/EffectiveArea/$ARRAY/$DATE"
 echo $ODIR
 mkdir -p $ODIR
 
@@ -107,6 +105,7 @@ then
 # NOTE: this is theta2
    THETA2MIN=( -1. )
 #   THETA2MAX=( 0.008 )
+#   THETA2MAX=( 0.04 )
 # using TMVA
    THETA2MAX=( -1 )
    ISOTROPY="0"
@@ -197,7 +196,8 @@ do
 
 ###############################################################################
 # create cut file
-      iCFIL=$FDIR/effectiveArea-CTA-$PART-$i-$j.$CFIL
+      iCBFILE=`basename $CFIL`      
+      iCFIL=$FDIR/effectiveArea-CTA-$PART-$i-$j.$iCBFILE
       cp -f $CFIL $iCFIL.dat
 
       sed -e "s|OFFMIN|$iMIN|" $iCFIL.dat > $iCFIL-a.dat
@@ -252,7 +252,9 @@ do
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
 
+# shape cut index 0: std MSC/MSCL cuts
 #      echo "* SHAPECUTINDEX 0" >> $MSCF
+# shape cut index 42: TMVA cuts
       echo "* SHAPECUTINDEX 42" >> $MSCF
       echo "* CUTFILE $iCFIL.dat" >> $MSCF
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
