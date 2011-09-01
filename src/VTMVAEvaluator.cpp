@@ -201,8 +201,11 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	  ostringstream iFullFileNameRoot;
           iFullFileNameRoot << iWeightFileName << iWeightFileIndex_min+i << ".root";
 
-// note (TODO): assume that this is the first method written to the TMVA root file
-          optimizeSensitivity( i, iFullFileNameRoot.str() );
+          if( !optimizeSensitivity( i, iFullFileNameRoot.str() ) )
+	  {
+	     cout << "VTMVAEvaluator::initializeWeightFiles: error while calculating optimized sensitivity" << endl;
+	     return false;
+          }
       }
 
 /////////////////////////////////////////////////////////
@@ -617,14 +620,29 @@ void VTMVAEvaluator::setSignalEfficiency( double iE )
    fSignalEfficiencyNoVec = iE;
 }
 
+void VTMVAEvaluator::printSignalEfficiency()
+{
+   cout << "energy dependent signal (background) efficiency: " << endl;
+   for( unsigned int i = 0; i < fSignalEfficiency.size(); i++ )
+   {
+      if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() )
+      {
+         cout << "E [" << fEnergyCut_Log10TeV_min[i] << "," << fEnergyCut_Log10TeV_max[i] << "] TeV :\t ";
+      }
+      cout << fSignalEfficiency[i];
+      if( i < fBackgroundEfficiency.size() ) cout << "\t(" << fBackgroundEfficiency[i] << ")";
+      cout << endl;
+   }
+}
+
 /*
 
     calculate the optimal signal to noise ratio for a given particle number spectrum
 
 */
-double VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVARootFile )
+bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVARootFile )
 {
-   if( fParticleNumberFileName.size() == 0 ) return -99.;
+   if( fParticleNumberFileName.size() == 0 ) return false;
 
 //////////////////////////////////////////////////////
 // read file with  NOn and Noff graphs
@@ -635,7 +653,7 @@ double VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMV
        cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
        cout << " cannot read particle number file " << fParticleNumberFileName << endl;
        cout << " (energy bin " << iEnergyBin << ")" << endl;
-       return -99.;
+       return false;
    }
    cout << "TVMAEvaluator::getOptimalSignalEfficiency reading: " << fParticleNumberFileName << endl;
 // get the NOn and Noff graphs
@@ -646,7 +664,7 @@ double VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMV
        cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
        cout << " cannot read graphs from particle number file " << endl;
        cout << i_on << "\t" << i_of << endl;
-       return -99.;
+       return false;
    }
 //////////////////////////////////////////////////////
 // get mean energy of the considered bins
@@ -661,7 +679,7 @@ double VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMV
       cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
       cout << " invalid energy range ";
       cout << iEnergyBin << "\t" << fEnergyCut_Log10TeV_min.size() << endl;
-      return -99.;
+      return false;
    }
 //////////////////////////////////////////////////////
 // get number of events in this energy bin 
@@ -682,7 +700,7 @@ double VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMV
       cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
       cout << " cannot read TMVA file " << iTMVARootFile << endl;
       cout << " (energy bin " << iEnergyBin << ")" << endl;
-      return -99.;
+      return false;
    }
    char hname[200];
    sprintf( hname, "%s/%d/MVA_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodCounter, fTMVAMethodCounter );
@@ -695,7 +713,7 @@ double VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMV
       cout << " cannot find signal and/or background efficiency histogram(s)" << endl;
       cout << effS << "\t" << effB << endl;
       cout << hname << endl;
-      return -99.;
+      return false;
    }
 
 //////////////////////////////////////////////////////
@@ -748,11 +766,13 @@ double VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMV
       plotEfficiencyPlotsPerEnergy( iEnergyBin, iGSignal_to_sqrtNoise, iHSignal_to_sqrtNoise, effS, effB, fEnergyCut_Log10TeV_min[iEnergyBin], fEnergyCut_Log10TeV_max[iEnergyBin] );
    }
 
-   return i_SignalEfficiency_AtMaximum;
+   return true;
 }
 
 
-void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iGSignal_to_sqrtNoise, TH1F* iHSignal_to_sqrtNoise, TH1F* hEffS, TH1F* hEffB, double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max )
+void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iGSignal_to_sqrtNoise, 
+                                                   TH1F* iHSignal_to_sqrtNoise, TH1F* hEffS, TH1F* hEffB, 
+						   double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max )
 {
    char hname[800];
    char htitle[800];

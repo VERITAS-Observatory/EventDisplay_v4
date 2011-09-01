@@ -78,7 +78,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    bool     bPlotEfficiencyPlotsPerEnergy;
 
-   double           optimizeSensitivity( unsigned int i, string iTMVARootFile );
+   bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
    vector< string > getTrainingVariables( string );
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iGSignal_to_sqrtNoise, TH1F* iHSignal_to_sqrtNoise, TH1F* hEffS, TH1F* hEffB, double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max );
    void     reset();
@@ -99,6 +99,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool   IsZombie() { return fIsZombie; }
    void   plotBoxCuts();
    void   plotSignalAndBackgroundEfficiencies();
+   void   printSignalEfficiency();
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
    void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001 ) { fOptmizationSourceStrengthCrabUnits = iSourceStrength; }

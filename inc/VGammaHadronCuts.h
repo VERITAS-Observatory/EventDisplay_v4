@@ -116,6 +116,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	unsigned int    fTMVAWeightFileIndex_max;
 	double          fTMVASignalEfficiency;
 	double          fTMVAProbabilityThreshold;
+	string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
+	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
 	bool            fTMVAIgnoreTheta2Cut;
 	TGraph*         fTMVABoxCut_Theta2_max;                     //!
 
