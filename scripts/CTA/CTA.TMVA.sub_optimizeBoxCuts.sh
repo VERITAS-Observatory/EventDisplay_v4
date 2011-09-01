@@ -30,8 +30,12 @@ OFIL=$3
 # energy reconstruction method
 EREC=0
 # energy bins
-EMIN=( -2.5 -1.0 -0.5 0.0 0.5 1.0 )
-EMAX=( -1.0 -0.5  0.0 0.5 1.0 2.5 )
+#EMIN=( -2.5 -1.0 -0.5 0.0 0.5 1.0 )
+#EMAX=( -1.0 -0.5  0.0 0.5 1.0 2.5 )
+EMIN=( -2.50 -1.75 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 )
+EMAX=( -1.25 -1.00 -0.75 -0.50 -0.25  0.00  0.25 0.50 0.75 1.00 1.50 2.50 )
+#EMIN=( -2.50 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 )
+#EMAX=( -0.50 -0.25  0.00  0.25  0.50 0.75 1.00 2.50 )
 NENE=${#EMIN[@]}
 #####################################
 
@@ -80,7 +84,7 @@ do
 
 # submit job to queue
 
-  qsub -V -l h_cpu=30:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
+  qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
 
 done
 
