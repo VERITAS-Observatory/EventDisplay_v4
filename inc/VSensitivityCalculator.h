@@ -161,6 +161,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 // plotting debug stuff
         vector< TCanvas * > cPlotDebug;
         string fPlotDebugName;
+	string fDebugParticleNumberFile;                // write non/noff to disk
 // values of Crab fluxes to be plotted as lines into the sensitivity vs energy graph (in Crab Units)
 	vector< double > fPlottingCrabFlux_CU;
 
@@ -234,13 +235,17 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         void     setFluxRange_PFLUX( double iMin = 1.e-15, double iMax = 5.e-11 ) { fPlot_flux_PFLUX_min = iMin; fPlot_flux_PFLUX_max = iMax; }
         void     setFluxRange_ENERG( double iMin = 9.e-15, double iMax = 8.e-12 ) { fPlot_flux_ENERG_min = iMin; fPlot_flux_ENERG_max = iMax; }
         void     setFluxRange_CU( double iMin = 1.e-4, double iMax = 10. ) { fPlot_flux_CU_min = iMin; fPlot_flux_CU_max = iMax; }
-        void     setMonteCarloParameters( unsigned int iParticleID, string iSpectralParameterFile, unsigned int iSpectralParameterID, string iGammaEffectiveAreaFile, double ze = 20., int az = 0, double woff = 0.5, int noise = 150, double index = 2.5, double alpha = 0.1, double iEnergy_min_lin = -10., double iEnergy_max_lin = 10. );
+        void     setMonteCarloParameters( unsigned int iParticleID, string iSpectralParameterFile, unsigned int iSpectralParameterID,
+	                                  string iGammaEffectiveAreaFile, double ze = 20., 
+					  int az = 0, double woff = 0.5, int noise = 150, double index = 2.5,
+					  double alpha = 0.1, double iEnergy_min_lin = -10., double iEnergy_max_lin = 10. );
         void     setObservationTimeRange( double iObs_min = 0.5e-3, double iObs_max = 5.e4, int iObs_steps = 1000 );    // hours
         void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50., double iMinBackgroundEvents = 10. );
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );
         void     setSourceStrengthVector_CU();
         void     setSourceStrengthVector_CU( vector< double > );
+	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,5);
+        ClassDef(VSensitivityCalculator,6);
 };
 #endif
