@@ -1134,7 +1134,7 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
  *
  */
 void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
-                    VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod )
+                                     VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod )
 {
     bool bDebugCuts = false;          // lots of debug output
 

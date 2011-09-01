@@ -134,8 +134,12 @@ void VGammaHadronCuts::resetCutValues()
     fArrayNTel_max = 100000;
     fArrayMSCW_min = -1.;
     fArrayMSCW_max = 1.;
-    fArrayMSCW_min = -1.;
-    fArrayMSCW_max = 1.;
+    fArrayMSCL_min = -1.;
+    fArrayMSCL_max = 1.;
+    fArrayMSW_min = -1.;
+    fArrayMSW_max = 10.;
+    fArrayMSL_min = -1.;
+    fArrayMSL_max = 10.;
     fArrayxyoff_min = -1.;
     fArrayxyoff_max = 100.;
     fArrayxyoff_MC_min = -1.;

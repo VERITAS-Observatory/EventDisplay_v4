@@ -28,7 +28,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    VGammaHadronCuts *fCuts;                                     //! don't write cuts to output file (preliminary)
 
 // spectral weight calculator
-   VSpectralWeight *fSpectralWeight;
+   vector< VSpectralWeight* > fSpectralWeight;
 
    public:
 
@@ -45,7 +45,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
   ~VEffectiveAreaCalculatorMCHistograms() {}
 
    bool      add();
-   bool      fill( double i_ze, TChain *i_MCData );
+   bool      fill( double i_ze, TChain *i_MCData, bool iBAzimuthBins );
    VGammaHadronCuts* getAnaCuts() { return fCuts; }
    TH1D*     getHistogram_Emc( unsigned int iAz, unsigned int iIndex );
    TProfile* getHistogram_EmcWeight( unsigned int iAz, unsigned int iIndex );
@@ -56,7 +56,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    void      setCuts( VGammaHadronCuts* iAnaCuts ) { fCuts = iAnaCuts; }
    bool      setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
 
-   ClassDef( VEffectiveAreaCalculatorMCHistograms, 3 );
+   ClassDef( VEffectiveAreaCalculatorMCHistograms, 4 );
 };
 
 #endif

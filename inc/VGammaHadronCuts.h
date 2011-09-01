@@ -117,13 +117,13 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	double          fTMVASignalEfficiency;
 	double          fTMVAProbabilityThreshold;
 	bool            fTMVAIgnoreTheta2Cut;
-	TGraph*         fTMVABoxCut_Theta2_max;
+	TGraph*         fTMVABoxCut_Theta2_max;                     //!
 
 
 // parameters for energy dependent theta2 cuts
 // (implemented for MC only)
         string fFileNameAngRes;
-        TFile *fFileAngRes;
+        TFile *fFileAngRes;                                         //!
         string fF1AngResName;
         TF1   *fF1AngRes;
         double fAngRes_ScalingFactor;
@@ -226,7 +226,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fArrayxyoff_MC_max;
 
         double fProbabilityCut;
-
 
 
         VGammaHadronCuts();

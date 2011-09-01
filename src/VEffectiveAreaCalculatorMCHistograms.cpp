@@ -16,8 +16,6 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
 
    fCuts = 0;
 
-   fSpectralWeight = new VSpectralWeight();
-   fSpectralWeight->setMCParameter( 2.0, 0.05, 50. );
 }
 
 void VEffectiveAreaCalculatorMCHistograms::listEntries()
@@ -77,12 +75,12 @@ bool VEffectiveAreaCalculatorMCHistograms::readFromEffectiveAreaFile( string iFi
    return false;
 }
 
-bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData )
+bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData, bool bAzimuthBins )
 {
     cout << endl;
     cout << "filling MC histograms for effective area calculation" << endl;
     cout << "=========================================================================================" << endl;
-    if( fSpectralWeight ) fSpectralWeight->print();
+    if( fSpectralWeight.size() > 0 && fSpectralWeight[0] ) fSpectralWeight[0]->print();
     cout << "=========================================================================================" << endl;
     cout << endl;
 
@@ -97,7 +95,7 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData )
     float i_fMCxoff = 0.;
     float i_fMCyoff = 0.;
     i_MCData->SetBranchAddress( "MCe0", &i_fMCE0 );
-    i_MCData->SetBranchAddress( "MCaz", &i_fMCAz );
+    if( bAzimuthBins ) i_MCData->SetBranchAddress( "MCaz", &i_fMCAz );
     if( fCuts && fCuts->isMCCuts() )
     {
        i_MCData->SetBranchAddress( "MCxoff", &i_fMCxoff );
@@ -108,6 +106,10 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData )
     double i_weight = 1.;
 // MC energy (log10)
     double eMC = 0.;
+
+// array lengths
+    unsigned int i_vMinAzSize        = fVMinAz.size();
+    unsigned int i_vSpectralIndexSize = fSpectralWeight.size();
 
 // entries in MC tree (must be long, chain could contain lots of events)
     Long64_t nentries = i_MCData->GetEntries();
@@ -127,10 +129,10 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData )
         eMC = log10( i_fMCE0 );
 
 // fill the MC histogram for all az bins
-	for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
+	for( unsigned int i_az = 0; i_az < i_vMinAzSize; i_az++ )
 	{
 // check which azimuth bin we are
-	   if( i_ze > 3. )
+	   if( bAzimuthBins && i_ze > 3. )
 	   {
 // confine MC az to -180., 180.
 	      if( i_fMCAz > 180. ) i_fMCAz -= 360.;
@@ -146,11 +148,10 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData )
 	      }
 	   }
 // loop over all spectral index
-	   for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
+	   for( unsigned int s = 0; s < i_vSpectralIndexSize; s++ )
 	   {
 // weight by spectral index
-              fSpectralWeight->setSpectralIndex( fVSpectralIndex[s] );
-              i_weight = fSpectralWeight->getSpectralWeight( i_fMCE0 );
+              i_weight = fSpectralWeight[s]->getSpectralWeight( i_fMCE0 );
 
 // fill MC histograms
 	      if( hVEmc[s][i_az] )        hVEmc[s][i_az]->Fill(        eMC, i_weight );
@@ -199,16 +200,22 @@ void VEffectiveAreaCalculatorMCHistograms::initializeHistograms( vector< double 
         }
         hVEmcSWeight.push_back( iT_TProfile );
     }
+
+// set spectral weight vector
+    for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
+    {
+        fSpectralWeight.push_back( new VSpectralWeight() );
+// weight by spectral index
+        fSpectralWeight.back()->setSpectralIndex( fVSpectralIndex[s] );
+        fSpectralWeight.back()->setMCParameter( 2.0, 0.05, 50. );
+    }
 }
 
 bool VEffectiveAreaCalculatorMCHistograms::setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex )
 {
-   if( fSpectralWeight )
+   for( unsigned int i = 0; i < fSpectralWeight.size(); i++ )
    {
-      fSpectralWeight->setMCParameter( iMCIndex, iMin, iMax );
-      return true;
+      if( fSpectralWeight[i] ) fSpectralWeight[i]->setMCParameter( iMCIndex, iMin, iMax );
    }
-
-   cout << "VEffectiveAreaCalculatorMCHistograms::setMonteCarloEnergyRange error: not spectral weighter defined" << endl;
-   return false;
+   return true;
 }

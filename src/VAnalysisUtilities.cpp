@@ -14,6 +14,15 @@ VAnalysisUtilities::VAnalysisUtilities()
 
     fAnasumDataFile = 0;
 
+    fSkyMapCentreDecJ2000 = 0.;
+    fSkyMapCentreRAJ2000 = 0.;
+    fTargetShiftWest = 0.;
+    fTargetShiftNorth = 0.;
+    fTargetDec = 0.;
+    fTargetRA = 0.;
+    fTargetDecJ2000 = 0.;
+    fTargetRAJ2000 = 0.;
+
     setRunListMJDRange();
     setPhaseFoldingValues();
 

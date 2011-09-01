@@ -15,6 +15,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TMath.h"
+#include "TStopwatch.h"
 #include "TTree.h"
 
 #include "VGlobalRunParameter.h"
@@ -74,6 +75,10 @@ int main( int argc, char *argv[] )
 /////////////////////////////////////////////////////////////////
 // read MC header (might not be there, no problem; but depend on right input in runparameter file)
     VMonteCarloRunHeader *iMonteCarloHeader = fRunPara->readMCRunHeader();
+
+/////////////////////////////////////////////////////////////////
+// stopwatch to keep track of execution time
+    TStopwatch fStopWatch;
 
 /////////////////////////////////////////////////////////////////
 // open output file and write results to dist
@@ -191,13 +196,19 @@ int main( int argc, char *argv[] )
 // fill MC histograms
      if( c2 && fRunPara->fFillingMode != 1 )
      {
+        fStopWatch.Start();
         fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, fRunPara->fEnergyAxisBins_log10, e.getEnergyAxis_minimum_defaultValue(), e.getEnergyAxis_maximum_defaultValue() );
-        fMC_histo->fill( fRunPara->fze, c2 );
+        fMC_histo->fill( fRunPara->fze, c2, fRunPara->fAzimuthBins );
         fMC_histo->listEntries();
-     }
+        fStopWatch.Print();
+     }  
 
 // fill effective areas
-     if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 ) e.fill( 0, hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
+     if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 )
+     {
+        e.fill( 0, hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
+        fStopWatch.Print();
+     }
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
