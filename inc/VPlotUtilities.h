@@ -83,26 +83,26 @@ class VPlotUtilities
 	int    getPlottingLineStyle() { return fPlottingLineStyle; }
 	double getPlottingLineWidth() { return fPlottingLineWidth; }
 	int    getPlottingFillStyle() { return fPlottingFillStyle; }
-        int  getColorAxisColor( double iV );
+        int    getColorAxisColor( double iV );
 	unsigned int listPlottingAxis();
-        void setColorAxisDataVector_minmax( double imin = 0., double imax = 0. );
-        void setColorAxisPalette( int palette = 1, int ncolors = 100 );
-	void setArrowPlottingStyle( TArrow *iArr );
-	void setFunctionPlottingStyle( TF1 *iF );
-	void setFunctionPlottingStyle( TF1 *iF, int icolor, double iwidth = 1., double isize = 1., int imarker = 1, int iFillStyle = 1 );
-        void setHistogramPlottingStyle( TH1D* his );
-        void setHistogramPlottingStyle( TH1D* his, int icolor, double iwidth = 1., double isize = 1., int imarker = 1, int irebin = 1, int iFillStyle = 1 );
-        void setHistogramPlottingStyle( TH2D* his, double iminF);
-        void setGraphPlottingStyle( TGraph *g );
-        void setGraphPlottingStyle( TGraph *g, int icolor, double iwidth = 1., int imarker = 20, double isize = 1., int iFillStyle = 0, int iLineStyle = 1 );
+        void   setColorAxisDataVector_minmax( double imin = 0., double imax = 0. );
+        void   setColorAxisPalette( int palette = 1, int ncolors = 100 );
+	void   setArrowPlottingStyle( TArrow *iArr );
+	void   setFunctionPlottingStyle( TF1 *iF );
+	void   setFunctionPlottingStyle( TF1 *iF, int icolor, double iwidth = 1., double isize = 1., int imarker = 1, int iFillStyle = 1 );
+        void   setHistogramPlottingStyle( TH1* his );
+        void   setHistogramPlottingStyle( TH1* his, int icolor, double iwidth = 1., double isize = 1., int imarker = 1, int irebin = 1, int iFillStyle = 1 );
+        void   setHistogramPlottingStyle( TH2D* his, double iminF);
+        void   setGraphPlottingStyle( TGraph *g );
+        void   setGraphPlottingStyle( TGraph *g, int icolor, double iwidth = 1., int imarker = 20, double isize = 1., int iFillStyle = 0, int iLineStyle = 1 );
 	unsigned int setPlottingAxis( string iName = "energy", string iAxis = "X", bool iLog = true, double xmin = 0.03, double xmax = 200., string iAxisTitle = "" );
-        void setPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2., int iMarkerStyle = 20, float iMarkerSize = 2., int iFillStyle = 1001 )
-	                     { fPlottingColor = iColor; fPlottingLineStyle = iStyle; fPlottingLineWidth = iWidth; fPlottingMarkerStyle = iMarkerStyle;
-			       fPlottingMarkerSize = iMarkerSize; fPlottingFillStyle = iFillStyle; }
-	void setPadMargins( TCanvas *c, int nPads, double lM, double rM );
-	void setTitles( TH1 *his, string iname, string ititle, string ytitle );
-	void setBlackAndWhitePalette();
-	TH2D* removeOuterRing( TH2D *h, double r, double ivalue );
+        void   setPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2., int iMarkerStyle = 20, float iMarkerSize = 2., int iFillStyle = 1001 )
+	                       { fPlottingColor = iColor; fPlottingLineStyle = iStyle; fPlottingLineWidth = iWidth; fPlottingMarkerStyle = iMarkerStyle;
+		    	         fPlottingMarkerSize = iMarkerSize; fPlottingFillStyle = iFillStyle; }
+	void   setPadMargins( TCanvas *c, int nPads, double lM, double rM );
+	void   setTitles( TH1 *his, string iname, string ititle, string ytitle );
+	void   setBlackAndWhitePalette();
+	TH2D*  removeOuterRing( TH2D *h, double r, double ivalue );
 
         ClassDef(VPlotUtilities,7);
 };

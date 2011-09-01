@@ -90,13 +90,13 @@ void VPlotUtilities::plot_nullHistogram( TPad *c, TH1 *h, bool bLogX, bool bLogY
 }
 
 
-void VPlotUtilities::setHistogramPlottingStyle( TH1D* h )
+void VPlotUtilities::setHistogramPlottingStyle( TH1* h )
 {
     setHistogramPlottingStyle( h, fPlottingColor, fPlottingLineWidth, fPlottingMarkerSize, fPlottingMarkerStyle, 1, fPlottingFillStyle );
 }
 
 
-void VPlotUtilities::setHistogramPlottingStyle( TH1D* his, int icolor, double iwidth, double isize, int imarker, int irebin, int iFillStyle )
+void VPlotUtilities::setHistogramPlottingStyle( TH1* his, int icolor, double iwidth, double isize, int imarker, int irebin, int iFillStyle )
 {
     if( !his ) return;
 

@@ -359,13 +359,13 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
     if( fPlotCorrelated ) sprintf( hname, "hmap_stereoUC_on" );
     else                  sprintf( hname, "hmap_stereo_on" );
     hmap_stereo_on = (TH2D*)getHistogram(hname, fRunNumber,"skyHistograms");
-    setHistogramPlottingStyle( hmap_stereo_on, -9999 );
+    setHistogramPlottingStyle( hmap_stereo_on, -9999. );
 
     TH2D *hmap_stereo_off = 0;
     if( fPlotCorrelated ) sprintf( hname, "hmap_stereoUC_off" );
     else                  sprintf( hname, "hmap_stereo_off" );
     hmap_stereo_off = (TH2D*)getHistogram(hname, fRunNumber,"skyHistograms");
-    setHistogramPlottingStyle( hmap_stereo_off, -9999 );
+    setHistogramPlottingStyle( hmap_stereo_off, -9999. );
 
     TH2D *hmap_stereo_diff = 0;
     if( fPlotCorrelated ) sprintf( hname, "hmap_stereoUC_diff" );
@@ -377,13 +377,13 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
     if( fPlotCorrelated ) sprintf( hname, "hmap_alphaUC_on" );
     else                  sprintf( hname, "hmap_alpha_on" );
     hmap_alpha_on = (TH2D*)getHistogram(hname, fRunNumber,"skyHistograms");
-    setHistogramPlottingStyle( hmap_alpha_on, -9999 );
+    setHistogramPlottingStyle( hmap_alpha_on, -9999. );
 
     TH2D *hmap_alpha_off = 0;
     if( fPlotCorrelated ) sprintf( hname, "hmap_alphaUC_off" );
     else                  sprintf( hname, "hmap_alpha_off" );
     hmap_alpha_off = (TH2D*)getHistogram(hname, fRunNumber,"skyHistograms");
-    setHistogramPlottingStyle( hmap_alpha_off, -9999 );
+    setHistogramPlottingStyle( hmap_alpha_off, -9999. );
 
     TH2D *hmap_alpha_diff = 0;
     if( fPlotCorrelated ) sprintf( hname, "hmap_alphaUC_diff" );
