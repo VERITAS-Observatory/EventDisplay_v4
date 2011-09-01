@@ -7,6 +7,7 @@
 #include "CData.h"
 #include "VMathsandFunctions.h"
 #include "VPlotUtilities.h"
+#include "VStatistics.h"
 #include "VTMVARunData.h"
 
 #include <fstream>
@@ -16,6 +17,7 @@
 #include <vector>
 
 #include "TCanvas.h"
+#include "TFile.h"
 #include "TGraph.h"
 #include "TGraphAsymmErrors.h"
 #include "TMath.h"
@@ -42,10 +44,17 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    vector< double >        fEnergyCut_Log10TeV_max;
    vector< unsigned int >  fEnergyReconstructionMethod;
    vector< TString >       fTMVAMethodTag;
+   vector< double >        fSignalEfficiency;                // from user or best signal/sqrt(noise)
+   vector< double >        fBackgroundEfficiency;            // from best signal/sqrt(noise)
+   double                  fSignalEfficiencyNoVec;
+
+   string                  fParticleNumberFileName;          // particle numbers are read from this file
+   double                  fOptmizationSourceStrengthCrabUnits; 
 
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
 
-   double   fSignalEfficiency;
+   string   fTMVAMethodName;
+   unsigned int fTMVAMethodCounter;
 
    double   fSpectralIndexForEnergyWeighting;        // used to calculate the spectral weighted mean of an energy bin
 
@@ -54,7 +63,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    vector< vector< Double_t > > fBoxCutValue_min;
    vector< vector< Double_t > > fBoxCutValue_max;
-   vector< vector< string > > fBoxCutValue_Name;
+   vector< vector< string > >   fBoxCutValue_Name;
 
 // gamma/hadron separation variables
    float    fNImages; 
@@ -67,7 +76,11 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    float    fdE;
    float    fTheta2;
 
+   bool     bPlotEfficiencyPlotsPerEnergy;
+
+   double           optimizeSensitivity( unsigned int i, string iTMVARootFile );
    vector< string > getTrainingVariables( string );
+   void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iGSignal_to_sqrtNoise, TH1F* iHSignal_to_sqrtNoise, TH1F* hEffS, TH1F* hEffB, double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max );
    void     reset();
 
    public:
@@ -85,12 +98,17 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool   initializeDataStrutures( CData* iC );
    bool   IsZombie() { return fIsZombie; }
    void   plotBoxCuts();
+   void   plotSignalAndBackgroundEfficiencies();
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
-   void   setSignalEfficiency( double iE = 0.5 ) { fSignalEfficiency = iE; }
+   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001 ) { fOptmizationSourceStrengthCrabUnits = iSourceStrength; }
+   void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
+   void   setPlotEffiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
+   void   setSignalEfficiency( double iE = 0.5 );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
+   void   setTMVAFileParameters( string iMethodName = "Method_Cuts", unsigned int iMethodCounter = 0 ) { fTMVAMethodName = iMethodName; fTMVAMethodCounter = iMethodCounter; }
 
-   ClassDef(VTMVAEvaluator, 2 );
+   ClassDef(VTMVAEvaluator, 3 );
 };
 
 #endif
