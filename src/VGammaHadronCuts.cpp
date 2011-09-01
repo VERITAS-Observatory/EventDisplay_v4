@@ -70,6 +70,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
     fTMVAOptimizeSignalEfficiencySourceStrengthCU = 0.001;     // optimize for mili-Crab source
+    fTMVABoxCut_Theta2_max = 0;
 
 // energy dependent theta2 cut
     fFileNameAngRes = "";

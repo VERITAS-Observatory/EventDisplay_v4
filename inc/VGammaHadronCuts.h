@@ -119,7 +119,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
 	bool            fTMVAIgnoreTheta2Cut;
-	TGraph*         fTMVABoxCut_Theta2_max;                     //!
+	TGraph*         fTMVABoxCut_Theta2_max;                
 
 
 // parameters for energy dependent theta2 cuts
