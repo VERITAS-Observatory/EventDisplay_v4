@@ -8,18 +8,14 @@
 |  \ \_\\//_/ /    F    R  RR  OOO   GGG  SSSS     \ \_\\//_/ /    |
 |   ~~  ~~  ~~                                      ~~  ~~  ~~     |
 | svincent@physics.utah.edu             lebohec@physics.utah.edu   |
-|                    VERSION FEBRUARY 21st 2011                    |
+|                  VERSION 1.00 AUGUST 24th 2011                   |
+|  For license issues, see www.physics.utah.edu/gammaray/FROGS     |
 \*================================================================*/
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multifit_nlin.h> //Levenberg-Marquardt 
 #include <gsl/gsl_blas.h> //Levenberg-Marquardt linear algebra
-//#include <gsl/gsl_rng.h> //REMOVE AFTER TEST
-//#include <gsl/gsl_randist.h> //REMOVE AFTER TEST
-//#include <gsl/gsl_errno.h>
-//#include <gsl/gsl_multimin.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_interp.h>
-#include <cmath>
 //================================================================
 //================================================================
 #define FROGS_DEG_PER_RAD 57.295779513082325  //Number of degrees in one radian
@@ -40,12 +36,12 @@
 #define FROGS_LNTWOPI 1.837877066409345 //log(2.0*PI)
 #define FROGS_LARGE_PE_SIGNAL 50.0      /*Limit beyond which Poisson can be 
 				    replaced by Gauss statistics*/
-#define FROGS_NUMBER_OF_SIGMA 5.0      /*Number of standard deviations to be 
+#define FROGS_NUMBER_OF_SIGMA 10.0      /*Number of standard deviations to be 
 				    explored around a signal. 15 is 
 				    certainly too large*/
 #define FROGS_INTERP_ORDER 2    /*Interpolation order should be 
 				  set to 1 (linear) or 2 (quadratic)*/
-#define FROGS_NBEVENT_GDNS_CALIBR 0 /*Number of eents used to build a goodness 
+#define FROGS_NBEVENT_GDNS_CALIBR 0 /*Number of events used to build a goodness 
 				  calibration file. Must be set to a positive 
 				  number to activate the good ness 
 				  calibration output. */
@@ -152,13 +148,10 @@ struct frogs_gsl_func_param {
 //================================================================
 //================================================================
 struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d);
-
-//struct frogs_imgtmplt_in frogs_convert_from_grisu(struct array_event *taevnt,
-//						  struct array *ta,
-//						  int adc_type,
-//						  struct array_ped *taped);
-struct frogs_imgtmplt_in frogs_convert_from_ed(int eventNumber, int adc_type);
-
+struct frogs_imgtmplt_in frogs_convert_from_grisu(struct array_event *taevnt,
+						  struct array *ta,
+						  int adc_type,
+						  struct array_ped *taped);
 struct frogs_imgtemplate frogs_read_template_elev(float elevation);
 struct frogs_imgtemplate frogs_read_template_file(char fname[FROGS_FILE_NAME_MAX_LENGTH]); 
 struct frogs_imgtmplt_out frogs_likelihood_optimization(struct frogs_imgtmplt_in *d, 
@@ -166,21 +159,19 @@ struct frogs_imgtmplt_out frogs_likelihood_optimization(struct frogs_imgtmplt_in
 struct frogs_imgtmplt_out frogs_null_imgtmplt_out();
 int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f);
 int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J);
-int frogs_likelihood_derivative_old(const gsl_vector *v, void *ptr, gsl_matrix *J);
 int frogs_likelihood_fdf(const gsl_vector *v, void *ptr, gsl_vector *f, 
 		   gsl_matrix *J);
 int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,struct frogs_imgtmplt_in *d, 
 	     struct frogs_imgtemplate *tmplt);
 
-float frogs_goodness_correction(float goodness0,float ped);
+float frogs_goodness_correction(float goodness0,float ped,float mu);
 double frogs_probability_density(float q,double mu,float ped,float exnoise);
-//double frogs_mean_pix_lkhd(float q,double mu,float ped,float exnoise);
 double frogs_mean_pix_lkhd(double q, double mu, double ped, double exnoise);
 double frogs_poisson_distribution(double mu, long int n);
 double frogs_logarithm_factorial(long int n);
 double frogs_integrand_for_averaging(double q, void *par);
 double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
-		struct frogs_imgtmplt_in *d,
+		       struct frogs_imgtmplt_in *d,
 		       struct frogs_imgtemplate *tmplt,int *intemplate);
 void frogs_showxerror(const char *msg);
 int frogs_print_param_spc_point(struct frogs_imgtmplt_out output);
@@ -200,11 +191,13 @@ int frogs_printfrog(void);
 int frogs_print_raw_event(struct frogs_imgtmplt_in d);
 int frogs_release_memory(struct frogs_imgtmplt_in *d);
 int frogs_is_a_good_number(double x);
-double frogs_pix_lkhd_deriv(int pix, int tel,struct frogs_reconstruction pnt, 
-			    struct frogs_reconstruction delta,
-			    struct frogs_imgtmplt_in *d,
-			    struct frogs_imgtemplate *tmplt,int gsl_par_id);
 double frogs_pix_lkhd_deriv_2ndorder(int pix, int tel,
+				     struct frogs_reconstruction pnt, 
+				     struct frogs_reconstruction delta,
+				     struct frogs_imgtmplt_in *d,
+				     struct frogs_imgtemplate *tmplt,
+				     int gsl_par_id);
+double frogs_pix_lkhd_deriv_4thorder(int pix, int tel,
 				     struct frogs_reconstruction pnt, 
 				     struct frogs_reconstruction delta,
 				     struct frogs_imgtmplt_in *d,
@@ -218,3 +211,4 @@ int frogs_gdns_calibr_out(int event_id, int tel, int pix, float q,
 int frogs_event_display(int event_id, float q,float mu,float xtel,
 			float ytel,float xpix,float ypix,int pix_in_img);
 int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);
+float floatwrap(float x,float min,float max);

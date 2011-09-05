@@ -25,6 +25,7 @@
 #
 SHELL = /bin/sh
 ARCH = $(shell uname)
+GSL_DIR = ${GSLSYS}
 
 #############################
 # basic numbers 

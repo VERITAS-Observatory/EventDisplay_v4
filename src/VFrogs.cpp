@@ -1,12 +1,12 @@
 /*! /class VFrogs
+  
+\brief  Called from VEventLoop. Opens templates and does minimization.
 
-  \brief  Called from VEventLoop. Opens templates and does minimization.
+\todo   Lots and Lots.
+\todo   Check geometery.
+\todo   Get output file working right.
 
-  \todo   Lots and Lots.
-  \todo   Check geometery.
-  \todo   Get output file working right.
-
-  \author S Vincent, G Hughes.
+\author S Vincent, G Hughes.
 
 */
 
@@ -16,49 +16,47 @@
 
 VFrogs::VFrogs()
 {
-
-
-    fFrogParameters = new VFrogParameters();
-
+  fFrogParameters = new VFrogParameters();
 }
 
 VFrogs::~VFrogs()
 {
-
+  
 }
 
-
+//================================================================
 //================================================================
 void VFrogs::doFrogsStuff( int eventNumber ) {
-
-// only at first call in the analysis run: initialize data class, set trees
-  if( !fInitialized )
-  {
-      initAnalysis();
-      fInitialized = true;
-      readTableFrogs();
+  
+  // only at first call in the analysis run: initialize data class, set trees
+  if( !fInitialized ) {
+    initAnalysis();
+    fInitialized = true;
+    readTableFrogs();
   }
-
+  
   initFrogEvent();
-
+  
   int adc=2;
   double inEnergy = getFrogsStartEnergy(eventNumber);
-
+  
   //Store data from the GrISU analysis to a FROGS structure
   //In this example the function frogs_convert_from_grisu takes 
   //arguments corresponding the the GrISU analysis. An equivalent 
   //function should be written for any other analysis package to 
   //make the FROGS analysis usable. 
+
   struct frogs_imgtmplt_in d;
   d=frogs_convert_from_ed(eventNumber,adc,inEnergy);
-
+  
   //Print out the data contained in the FROGS structure frogs_imgtmplt_in
   //This is useful when developing a frogs_convert_from_XXXX function
   frogs_print_raw_event(d);
-
+  
   //Call the FROGS analysis
   struct frogs_imgtmplt_out output;
   output=frogs_img_tmplt(&d);
+
 
   frogsEventID     = output.event_id;
   frogsGSLConStat  = output.gsl_convergence_status;
@@ -108,7 +106,6 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   //The values returned by frogs_img_tmplt really are to be stored in 
   //structures used in the analysis package in which FROGS is being sed. 
   frogs_print_param_spc_point(output);
-
  
   //return FROGS_OK;
   return; 
@@ -190,17 +187,19 @@ int VFrogs::getFrogsNpixBkg()
   return frogsNpixBkg;
 }
 //================================================================
+//================================================================
 void VFrogs::initFrogEvent()
 {
-//    if( fDebug ) cout << "void VArrayAnalyzer::initEvent()" << endl;
+  //    if( fDebug ) cout << "void VArrayAnalyzer::initEvent()" << endl;
+  
+  //    setAnalysisArrayEventStatus( 0 );
 
-//    setAnalysisArrayEventStatus( 0 );
-
-// reset shower parameters
-//    getShowerParameters()->reset( getNTel() );
-
-// get basic infos for this event
+  // reset shower parameters
+  //    getShowerParameters()->reset( getNTel() );
+  
+  // get basic infos for this event
 }
+//================================================================
 //================================================================
 void VFrogs::initAnalysis()
 {
@@ -212,131 +211,136 @@ void VFrogs::initAnalysis()
     initFrogTree();
 }
 //================================================================
+//================================================================
 void VFrogs::initOutput()
 {
-    if( fDebug ) cout << "void VFrogs::initOuput()" << endl;
-// check if root outputfile exist
-    if( fOutputfile != 0 )
+  if( fDebug ) cout << "void VFrogs::initOuput()" << endl;
+  // check if root outputfile exist
+  if( fOutputfile != 0 )
     {
-       printf("FROGPUT: Frogs Output File Exists\n");
-       return;
+      printf("FROGPUT: Frogs Output File Exists\n");
+      return;
     }
 // otherwise create it
-    if( fRunPar->foutputfileName != "-1" )
+  if( fRunPar->foutputfileName != "-1" )
     {
-        printf("FROGPUT: Frogs foutputfileName = -1 : Attempt to create file\n");
-        char i_textTitle[300];
-        sprintf( i_textTitle, "VERSION %d", getRunParameter()->getEVNDISP_TREE_VERSION() );
-        if( getRunParameter()->fShortTree ) sprintf( i_textTitle, "%s (short tree)", i_textTitle );
-        fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle );
+      printf("FROGPUT: Frogs foutputfileName = -1 : Attempt to create file\n");
+      char i_textTitle[300];
+      sprintf( i_textTitle, "VERSION %d", getRunParameter()->getEVNDISP_TREE_VERSION() );
+      if( getRunParameter()->fShortTree ) sprintf( i_textTitle, "%s (short tree)", i_textTitle );
+      fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle );
     }
-
-    if (FROGSDEBUG)
-      printf("FROGPUT Are we initOutput??\n");
-
+  
+  if (FROGSDEBUG)
+    printf("FROGPUT Are we initOutput??\n");
+  
 }
+//================================================================
 //================================================================
 void VFrogs::initFrogTree()
 {
 
-    if (FROGSDEBUG)
-      printf("FROGPUT Check in initTree\n");
-
-//   todo Need Debug Statement here.
-//     if( fDebug ) cout << "void VArrayAnalyzer::initTrees() " <<  endl;
- 
- //    fOutputfile->cd();
- // now book the tree (for MC with additional MC block)
-    char i_text[300];
-    char i_textTitle[300];
-    sprintf( i_text, "frogspars" );
- // tree versioning numbers used in mscw_energy
-    sprintf( i_textTitle, "FROGPUT: Frogs Parameters (VERSION %d)\n", getRunParameter()->getEVNDISP_TREE_VERSION() );
-    if( getRunParameter()->fShortTree ) sprintf( i_textTitle, "%s (short tree)", i_textTitle );
-    sprintf( i_textTitle, "%s (short tree)", i_textTitle );
-    fFrogParameters->initTree( i_text, i_textTitle );
-
+  if (FROGSDEBUG)
+    printf("FROGPUT Check in initTree\n");
+  
+  //   todo Need Debug Statement here.
+  //     if( fDebug ) cout << "void VArrayAnalyzer::initTrees() " <<  endl;
+  
+  //    fOutputfile->cd();
+  // now book the tree (for MC with additional MC block)
+  char i_text[300];
+  char i_textTitle[300];
+  sprintf( i_text, "frogspars" );
+  // tree versioning numbers used in mscw_energy
+  sprintf( i_textTitle, "FROGPUT: Frogs Parameters (VERSION %d)\n", getRunParameter()->getEVNDISP_TREE_VERSION() );
+  if( getRunParameter()->fShortTree ) sprintf( i_textTitle, "%s (short tree)", i_textTitle );
+  sprintf( i_textTitle, "%s (short tree)", i_textTitle );
+  fFrogParameters->initTree( i_text, i_textTitle );
+  
 }
+//================================================================
 //================================================================
 void VFrogs::readTableFrogs()
 {
+  
+  int eventNumber;
+  double Erec;
+  
+  string fmscwFrogsFile = getRunParameter()->ffrogsmscwfile;
+  cout << "FROGS readTableFrogs " << getRunParameter()->ffrogsmscwfile.c_str() << endl;
+  
+  TFile *mscwFrogsFile = new TFile( fmscwFrogsFile.c_str() , "READ" );
+  
+  if( mscwFrogsFile->IsZombie() )
+    {
+      cout << "VFrogs::readTableFrogs error: File " << fmscwFrogsFile.c_str() << " does not exist!" << endl;
+      exit( -1 );
+    }
 
-   int eventNumber;
-   double Erec;
-
-   string fmscwFrogsFile = getRunParameter()->ffrogsmscwfile;
-   cout << "FROGS readTableFrogs " << getRunParameter()->ffrogsmscwfile.c_str() << endl;
-
-   TFile *mscwFrogsFile = new TFile( fmscwFrogsFile.c_str() , "READ" );
-
-   if( mscwFrogsFile->IsZombie() )
-   {
-     cout << "VFrogs::readTableFrogs error: File " << fmscwFrogsFile.c_str() << " does not exist!" << endl;
-     exit( -1 );
-   }
-
-   TTree *mscwTreeFrogs = (TTree*)mscwFrogsFile->Get("data");
-   mscwTreeFrogs->SetBranchAddress("eventNumber",&eventNumber);
-   mscwTreeFrogs->SetBranchAddress("ErecS",&Erec);
-
-   for ( int i=0 ; i < mscwTreeFrogs->GetEntries() ; i++ ) 
-   { 
+  TTree *mscwTreeFrogs = (TTree*)mscwFrogsFile->Get("data");
+  mscwTreeFrogs->SetBranchAddress("eventNumber",&eventNumber);
+  mscwTreeFrogs->SetBranchAddress("ErecS",&Erec);
+  
+  for ( int i=0 ; i < mscwTreeFrogs->GetEntries() ; i++ ) 
+    { 
       mscwTreeFrogs->GetEntry(i);
       fTableRunNumber.push_back(eventNumber);
       fTableEnergy.push_back(Erec);
-   }
+    }
 
-   mscwFrogsFile->Close();
-
+  mscwFrogsFile->Close();
+  
   cout << "Finished Reading: " << fTableRunNumber.size() << " with size " << fTableEnergy.size() << endl;
-
+  
 }
+//================================================================
 //================================================================
 double VFrogs::getFrogsStartEnergy(int eventNumber)
 {
-
-   int mscwTotal = fTableRunNumber.size();
-
-   for( int i=0 ; i < mscwTotal ; i++ )
-     if( eventNumber == fTableRunNumber[i] )
-       return fTableEnergy[i];
-   return FROGS_BAD_NUMBER;
-
+  
+  int mscwTotal = fTableRunNumber.size();
+  
+  for( int i=0 ; i < mscwTotal ; i++ )
+    if( eventNumber == fTableRunNumber[i] )
+      return fTableEnergy[i];
+  return FROGS_BAD_NUMBER;
+  
 }
+//================================================================
 //================================================================
 float VFrogs::transformTelescopePosition( int iTel, float i_ze, float i_az, int axis )
 {
 // transform telescope positions from ground into shower coordinates
-    float i_xrot, i_yrot, i_zrot;
-    float i_xcos = 0.;
-    float i_ycos = 0.;
-
-// calculate direction cosinii
-    i_xcos = sin(i_ze / TMath::RadToDeg() ) * sin( (i_az-180.)/TMath::RadToDeg() );
-    i_ycos = sin(i_ze / TMath::RadToDeg() ) * cos( (i_az-180.)/TMath::RadToDeg() );
-
-    setTelID( iTel );
-// call to GrIsu routine
-    tel_impact( i_xcos, i_ycos, getDetectorGeo()->getTelXpos()[iTel], getDetectorGeo()->getTelYpos()[iTel], getDetectorGeo()->getTelZpos()[iTel], &i_xrot, &i_yrot, &i_zrot, false );
-
-    if( axis == 0 ) 
-       return i_xrot;
-    else if( axis == 1 )
-      return i_yrot;
-    else
-      return FROGS_BAD_NUMBER; 
-    
-
+  float i_xrot, i_yrot, i_zrot;
+  float i_xcos = 0.;
+  float i_ycos = 0.;
+  
+  // calculate direction cosinii
+  i_xcos = sin(i_ze / TMath::RadToDeg() ) * sin( (i_az-180.)/TMath::RadToDeg() );
+  i_ycos = sin(i_ze / TMath::RadToDeg() ) * cos( (i_az-180.)/TMath::RadToDeg() );
+  
+  setTelID( iTel );
+  // call to GrIsu routine
+  tel_impact( i_xcos, i_ycos, getDetectorGeo()->getTelXpos()[iTel], getDetectorGeo()->getTelYpos()[iTel], getDetectorGeo()->getTelZpos()[iTel], &i_xrot, &i_yrot, &i_zrot, false );
+  
+  if( axis == 0 ) 
+    return i_xrot;
+  else if( axis == 1 )
+    return i_yrot;
+  else
+    return FROGS_BAD_NUMBER; 
 }
+//================================================================
 //================================================================
 void VFrogs::terminate()
 {
-
+  
   // todo This is not working properly crashed when using display=1
   //getFrogParameters()->getTree()->Write();
   fOutputfile->Flush();
-
+  
 }
+//================================================================
 //================================================================
 struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_type, double inEnergy) {
   /* The frogs_convert_from_grisu function is called with 
@@ -347,8 +351,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
      analysis in a structure that is appropriate.  */
 
    struct frogs_imgtmplt_in rtn;
-
-   //SLB: need to move the event worthyness decision to here. 
  
    //Tracked elevation from telescope 0
    rtn.elevation = fData->getShowerParameters()->fTelElevation[0];
@@ -359,27 +361,28 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
 
   rtn.scope=new struct frogs_telescope [rtn.ntel];
   rtn.nb_live_pix_total=0;//Total number or pixels in use
-  for(int tel=0;tel<rtn.ntel;tel++) 
-  {
+  for(int tel=0;tel<rtn.ntel;tel++) {
     initializeDataReader();
     setTelID(tel);
-
+    
     //Telescope position in the coordonate system used in the reconstruction
-    rtn.scope[tel].xfield = transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 0 );
-    rtn.scope[tel].yfield = transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 1 );
-
+    rtn.scope[tel].xfield = 
+      transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 0 );
+    rtn.scope[tel].yfield = 
+      transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 1 );
+    
     if(FROGSDEBUG)
-     printf("TelSC %d | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f \n",tel,
-	fData->getShowerParameters()->fShowerZe[0],
-	fData->getShowerParameters()->fShowerAz[0],
-	getDetectorGeo()->getTelXpos()[tel]-fData->getShowerParameters()->fShowerXcore[0],
-	getDetectorGeo()->getTelYpos()[tel]-fData->getShowerParameters()->fShowerYcore[0],		
-	getDetectorGeo()->getTelXpos()[tel],
-	getDetectorGeo()->getTelYpos()[tel],
-	rtn.scope[tel].xfield,
-	rtn.scope[tel].yfield,
-	(180.0/3.1415)*atan2(rtn.scope[tel].yfield,rtn.scope[tel].xfield),
-	(180.0/3.1415)*atan2(getDetectorGeo()->getTelYpos()[tel],getDetectorGeo()->getTelXpos()[tel]));
+      printf("TelSC %d | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f \n",tel,
+	     fData->getShowerParameters()->fShowerZe[0],
+	     fData->getShowerParameters()->fShowerAz[0],
+	     getDetectorGeo()->getTelXpos()[tel]-fData->getShowerParameters()->fShowerXcore[0],
+	     getDetectorGeo()->getTelYpos()[tel]-fData->getShowerParameters()->fShowerYcore[0],		
+	     getDetectorGeo()->getTelXpos()[tel],
+	     getDetectorGeo()->getTelYpos()[tel],
+	     rtn.scope[tel].xfield,
+	     rtn.scope[tel].yfield,
+	     (180.0/3.1415)*atan2(rtn.scope[tel].yfield,rtn.scope[tel].xfield),
+	     (180.0/3.1415)*atan2(getDetectorGeo()->getTelYpos()[tel],getDetectorGeo()->getTelXpos()[tel]));
 
     //Telescope effective collection area
     float telarea=94.0; //telescope area could be from the configuration file
@@ -394,7 +397,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
     rtn.scope[tel].exnoise= new float [rtn.scope[tel].npix];
     rtn.scope[tel].pixinuse= new int [rtn.scope[tel].npix];
     rtn.scope[tel].telpixarea= new float [rtn.scope[tel].npix];
-    //float foclen=1000*fData->getDetectorGeo()->getFocalLength()[tel]; //Focal length in mm
+    float foclen=1000*fData->getDetectorGeo()->getFocalLength()[tel]; //Focal length in mm //modified by sv
 
     //Initialize the number of live pixel in the telescope
     rtn.scope[tel].nb_live_pix=0;
@@ -404,9 +407,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
     {
       //Pixel coordinates
       rtn.scope[tel].xcam[pix]=fData->getDetectorGeo()->getX()[pix];
-//        *FROGS_DEG_PER_RAD/foclen;
       rtn.scope[tel].ycam[pix]=fData->getDetectorGeo()->getY()[pix];
-//        *FROGS_DEG_PER_RAD/foclen;
 
       //Excess noise
       rtn.scope[tel].exnoise[pix]=0.35;
@@ -417,13 +418,14 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       //Increment the number of live pixels
       if(rtn.scope[tel].pixinuse[pix]==FROGS_OK) rtn.scope[tel].nb_live_pix++;
       //Pixel effective collecting area in square degrees
-      float tmppixarea=fData->getDetectorGeo()->getTubeRadius_MM(tel)[pix];
-//        FROGS_DEG_PER_RAD/foclen;*/
+      float tmppixarea=
+	fData->getDetectorGeo()->getTubeRadius_MM(tel)[pix]*FROGS_DEG_PER_RAD/foclen;//modified by sv
       tmppixarea=FROGS_PI*tmppixarea*tmppixarea;
       rtn.scope[tel].telpixarea[pix]=telarea*tmppixarea*
 //    todo this is not 1 !
 //     GH WHAT IS THE PMT COLLECTION EFF??
-        1.0; 
+        1.0;
+
       float dc2pe=5.5;  //This is the number of d.c. in one p.e.
       //Initialize the pixel signal and pedestal width to zero
       rtn.scope[tel].q[pix]=0;
@@ -431,17 +433,13 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       //Set them to their values in p.e. if the d.c./p.e. factor is non zero
       if(dc2pe!=0) 
       {
-//        rtn.scope[tel].q[pix]=taevnt->img[tel][adc_type].nbpe[pix]/dc2pe;
         rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
-//        rtn.scope[tel].ped[pix]=taped->nbpedev[adc_type][tel][pix]/dc2pe;
         rtn.scope[tel].ped[pix]=fData->getData()->getPeds()[pix]/dc2pe;
       }
     }
     //Total number of live pixels in the array
     rtn.nb_live_pix_total=rtn.nb_live_pix_total+rtn.scope[tel].nb_live_pix;
-
   } 
-
 
   //Optimization starting point todo y -> -y ??
   rtn.startpt.xs=fData->getShowerParameters()->fShower_Xoffset[0];
@@ -450,60 +448,17 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore_SC[0];
   rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore_SC[0];
   if (FROGSDEBUG) {
-   printf("ShowerSC %f %f\n",getShowerParameters()->fShowerXcore_SC[0],getShowerParameters()->fShowerYcore_SC[0]);
-   printf("Shower %f %f\n",getShowerParameters()->fShowerXcore[0],getShowerParameters()->fShowerYcore[0]);
+    printf("ShowerSC %f %f\n",getShowerParameters()->fShowerXcore_SC[0],getShowerParameters()->fShowerYcore_SC[0]);
+    printf("Shower %f %f\n",getShowerParameters()->fShowerXcore[0],getShowerParameters()->fShowerYcore[0]);
   }
 
   rtn.startpt.lambda=0.3; //We use a fixed value by lack of information. 
 
-  //SLB the energy starting point evaluation should be improved. 
-  //Energy starting point
-  rtn.startpt.log10e=0;
-// GH UNITS HERE!!
-  float cosz = sin(fData->getShowerParameters()->fTelElevation[0]*FROGS_PI/180.0);
-  if(rtn.ntel!=4) 
-    frogs_showxerror("Estimation of starting energy value requires 4 telescopes");
-  float tel_correct[rtn.ntel];
-  tel_correct[0]=0.97;
-  tel_correct[1]=0.95;
-  tel_correct[2]=1.03;
-  tel_correct[3]=1.00;  
-  float Etelsum = 0;
-  int nEtel=0;
-  for(int tel=0; tel<rtn.ntel;tel++) {
-    // impact parameter
-    float dimp =sqrt((rtn.scope[tel].xfield-rtn.startpt.xp)*
-		     (rtn.scope[tel].xfield-rtn.startpt.xp)+
-		     (rtn.scope[tel].yfield-rtn.startpt.yp)*
-		     (rtn.scope[tel].yfield-rtn.startpt.yp));
-    // corrected sum
-//    float corrected_sum = taevnt->img[tel][adc_type].sum/tel_correct[tel];
-    float corrected_sum = fData->getImageParameters()->size/tel_correct[tel];
-    // small image correction in datareader
-//    if(taevnt->img[tel][adc_type].ntub<15) 
-    if(fData->getImageParameters()->ntubes<15) 
-//      corrected_sum *= 1+(15-taevnt->img[tel][adc_type].ntub)*0.015;  
-      corrected_sum *= 1+(15-fData->getImageParameters()->ntubes)*0.015;  
-    // summing all energies from each tel. This is Pierre's weird expression
-    //We should try something simpler and cleaner. 
-    Etelsum += 0.63/(cosz*cosz*cosz)*
-      pow(corrected_sum/exp(0.02*cosz*cosz*(120./cosz-dimp)/
-			    (1+exp(1+0.032*(120.0/cosz-dimp)))),0.86);
-    nEtel++;
-  }
-  if(Etelsum > 0. && nEtel > 0 )
-    rtn.startpt.log10e=log10( (Etelsum/nEtel)/1000.0 );
-  else
-    rtn.startpt.log10e=FROGS_BAD_NUMBER;
-
-  rtn.startpt.log10e = inEnergy;
+  rtn.startpt.log10e = inEnergy; //inEnergy from ED 
   if( rtn.startpt.log10e > 0.0 )
     rtn.startpt.log10e = log10(rtn.startpt.log10e);
   else
     rtn.startpt.log10e = FROGS_BAD_NUMBER;
-
-  if (FROGSDEBUG)
-    printf("Start Energy %f\n",log10((Etelsum/nEtel)/1000.0));
 
   //Decides if the event is worth analysing. 
   rtn.worthy_event=FROGS_OK;
@@ -519,7 +474,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   //Count the number of telescopes with more than 300dc in their image
   int ngoodimages=0;
   for(int tel=0; tel<rtn.ntel;tel++) 
-//    if(taevnt->img[tel][adc_type].sum>300.0) ngoodimages=ngoodimages+1;
     if(fData->getImageParameters()->size>300.0) ngoodimages=ngoodimages+1;
   //Require the number of telescopes with more than 300dc to be at least 3
   if (ngoodimages<3) rtn.worthy_event=FROGS_NOTOK;
@@ -529,11 +483,30 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
 }
 
 //================================================================
+//================================================================
+
+/*================================================================*\
+|      _    _                                        _    _        |
+|     (o)--(o)                                      (o)--(o)       |
+|    /.______.\    FFFF RRRR   OOO   GGG   SSS     /.______.\      |
+|    \________/    F    R   R O   O G     S        \________/      |
+|  ./        \.    FFF  RRRR  O   O G  GG  SSS     ./        \.    |
+| ( .        , )   F    R R   O   O G   G     S   ( .        , )   |
+|  \ \_\\//_/ /    F    R  RR  OOO   GGG  SSSS     \ \_\\//_/ /    |
+|   ~~  ~~  ~~                                      ~~  ~~  ~~     |
+| svincent@physics.utah.edu               lebohec@physics.utah.edu |
+|                  VERSION 1.00 AUGUST 24th 2011                   |
+|  For license issues, see www.physics.utah.edu/gammaray/FROGS     |
+\*================================================================*/
+
+//================================================================
+//================================================================
 int frogs_print_raw_event(struct frogs_imgtmplt_in d) {
   /*This function prints the data stored for the current even in the 
     frogs_imgtmplt_in structure. It is useful when developing a 
     frogs_convert_from_XXXX function*/
-#define OUTUNIT stdout
+  //#define OUTUNIT stdout
+#define OUTUNIT stderr//modified by sv
   fprintf(OUTUNIT,"-------------------------------------------------\n");
   fprintf(OUTUNIT,"EVENT %d\n",d.event_id);
   fprintf(OUTUNIT,"Elevation: %f degrees\n",d.elevation);
@@ -558,7 +531,7 @@ int frogs_print_raw_event(struct frogs_imgtmplt_in d) {
     }
   }
   fprintf(OUTUNIT,".................................................\n");
-  fprintf(OUTUNIT,"            STARTING POINT %d:\n",d.event_id);
+  fprintf(OUTUNIT,"            STARTING POINT:\n");
   fprintf(OUTUNIT,"  xs=%f deg. ys=%f deg. \n",d.startpt.xs,d.startpt.ys);
   fprintf(OUTUNIT,"  xp=%f m. yp=%f m. \n",d.startpt.xp,d.startpt.yp);
   fprintf(OUTUNIT,"  Log10(E/1TeV)=%f \n",d.startpt.log10e);
@@ -569,6 +542,7 @@ int frogs_print_raw_event(struct frogs_imgtmplt_in d) {
   else   fprintf(OUTUNIT,"  BAD EVENT\n");
 
   fprintf(OUTUNIT,"-------------------------------------------------\n");
+  ////exit(0);//modified by sv
   return FROGS_OK;
 }
 //================================================================
@@ -580,21 +554,22 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
      optimization. All the data from the telescopes for the event 
      being  analyzed are in the structure frogs_imgtmplt_in d 
      received as an argument.*/
- 
+  
   struct frogs_imgtmplt_out rtn;
   /* Event selection used to avoid processing bad or poor events 
     worthy_event is calculated in frogs_convert_from_grisu (or 
     equivalent for other analysis packages)*/
+
   if(d->worthy_event==FROGS_NOTOK) {
     rtn=frogs_null_imgtmplt_out();
     rtn.event_id=d->event_id;
     rtn.nb_iter=FROGS_BAD_NUMBER;
     rtn.gsl_convergence_status=FROGS_BAD_NUMBER;
-    //Release memory used in the data structure
+   //Release memory used in the data structure
     frogs_release_memory(d);
     return rtn;
   }
-  
+
   /*This check if a template image needs to be read and reads it if necessary*/
   static struct frogs_imgtemplate tmplt;
   static int firstcall=1;
@@ -734,6 +709,12 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
   rtn.cvrgpt.log10e=gsl_vector_get (s->x, FROGS_LOG10E);
   rtn.cvrgpt.lambda=gsl_vector_get (s->x, FROGS_LAMBDA);
 
+  /*GSL take lambda to any value but only the value used in the model 
+    calculation is directly meaningfull. Here, we convert the value set 
+    by GSL to the actual value used in the model calculation. */
+  float maxlambda=tmplt->min[0]+(tmplt->nstep[0]-1)*tmplt->step[0];
+  rtn.cvrgpt.lambda=floatwrap(rtn.cvrgpt.lambda,tmplt->min[0],maxlambda);
+
   gsl_matrix *covar = gsl_matrix_alloc (p, p);
   gsl_multifit_covar(s->J, 0.0, covar);
   
@@ -768,7 +749,7 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
     frogs_showxerror("Problem encountered in the convergence goodness calculation");
   gsl_multifit_fdfsolver_free(s);
   gsl_matrix_free(covar);
-  
+
   return rtn;
 }
 //================================================================
@@ -810,15 +791,14 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 				  d->scope[tel].ped[pix],mu,pix_goodness);
 
 	  /*Apply the single pixel goodness correction according to the 
-	    pixel pedestal width*/
+	    pixel pedestal width and the model value mu*/
 	  pix_goodness=frogs_goodness_correction(pix_goodness,
-						 d->scope[tel].ped[pix]);  
+						 d->scope[tel].ped[pix],mu);
 
 	  /*Decides if the pixel should be counted in the image 
 	    or background region*/
-	   //int pix_in_img=frogs_image_or_background(tel,pix,d);
+	  //int pix_in_img=frogs_image_or_background(tel,pix,d);
 	  int pix_in_img=pix_in_template;
-
 
 	  //If requested, we produce a display of the event
 	  if(FROGS_NBEVENT_DISPLAY>0) 
@@ -829,6 +809,8 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 
 	  //If the pixel is in the image region
 	  if(pix_in_img==FROGS_OK) {
+	    //pix_goodness=frogs_goodness_correction(pix_goodness,
+	    //d->scope[tel].ped[pix],mu); //changed by SV, april 22
 	    tmplanlz->goodness_img=tmplanlz->goodness_img+pix_goodness;
 	    tmplanlz->npix_img++;
 	  }
@@ -958,7 +940,8 @@ int frogs_gdns_calibr_out(int event_id, int tel, int pix, float q,
   if(first_time==FROGS_OK) {
     first_time=FROGS_NOTOK;
     //Open the file
-    calib=fopen("frogs_goodness_calibration.frogs","w");
+    //calib=fopen("frogs_goodness_calibration.frogs","w");
+    calib=fopen("frogs_goodness_calibration_dummy.frogs","w");
     if(calib==NULL) 
       frogs_showxerror("Failed opening the file frogs_goodness_calibration.frogs for writing");
   }
@@ -1076,18 +1059,40 @@ int frogs_is_a_good_number(double x) {
 }
 //================================================================
 //================================================================
-float frogs_goodness_correction(float goodness0,float ped) {
+float frogs_goodness_correction(float goodness0,float ped,float mu) {
   /* Applies correction to the individual pixel goodness in order to
      compensate for its sensitivity to the pedestal width. The function
      returns the single pixel corrected goodness value
      goodness0 = uncorrected goodness
      ped = pedestal width */
-  if(ped<=1.0) return goodness0+0.6046;
+  
+  /***** Tucson's correction ********/
+  /*if(ped<=1.0) return goodness0+0.6046;
   if(ped>1.0 && ped<=1.5) return goodness0+0.3748;
   if(ped>1.5 && ped<=2.0) return goodness0+0.3860;
   if(ped>2.0 && ped<=2.5) return goodness0+0.4126;
   if(ped>2.5 && ped<=3.0) return goodness0+0.4397;
-  return goodness0+0.5502;
+  return goodness0+0.5502;*/
+  /***** Tucson's correction ********/
+
+  /***** simulation correction ******/
+  float correction=0.;
+  if(mu>0.0) {
+    goodness0 = goodness0 + 1; //goodness=goodness+1
+    if(mu<=40.0)
+      correction = 0.1065*mu+1.0;
+    if(mu>40.0 && mu<=130)
+      correction = 0.0894*mu+0.998;
+    if(mu>130.0 && mu<=200)
+      correction = 0.1481*mu-9.563;
+    if(mu>200)
+      correction = 0.1286*mu-8.781;
+    goodness0 = goodness0/correction - 1;
+  }
+  /***** simulation correction ******/
+
+  return goodness0;
+
 }
 //================================================================
 //================================================================
@@ -1248,7 +1253,7 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
   //Above 65 deg we use the 70 deg template for now
   if(elevation>=65.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/Templates/SimulatedModels/elev70X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"./Templates/SimulatedModels/elev70X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=70.0;
@@ -1258,7 +1263,7 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
     read that file*/
   if(fabs(elevation-60.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/Templates/SimulatedModels/elev60X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"./Templates/SimulatedModels/elev60X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=60.0;
@@ -1266,7 +1271,7 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
   } 
   if(fabs(elevation-50.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/Templates/SimulatedModels/elev50X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"./Templates/SimulatedModels/elev50X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=50.0;
@@ -1331,7 +1336,7 @@ void frogs_showxerror(const char *msg) {
   /*Print the error message received as an argument and stops the analysis*/
   fprintf(stderr,"%s\n",msg);
   fprintf(stderr,"Terminating now\n");
-  exit(0);
+  ////exit(0);
 }
 //================================================================
 //================================================================
@@ -1341,7 +1346,7 @@ int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f) {
      calculated are provided in the gsl vector v. All the data from the 
      telescope and from the template are available through the pointer to 
      void ptr*/
-  
+
   struct frogs_gsl_data_wrapper *dwrap=(struct frogs_gsl_data_wrapper *)ptr;
 
   //Here is the parameter space point
@@ -1353,28 +1358,62 @@ int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f) {
   pnt.log10e=gsl_vector_get(v,FROGS_LOG10E);
   pnt.lambda=gsl_vector_get(v,FROGS_LAMBDA);
 
-  //This is where the model is called to calculate the expected 
-  //value for all pixels in the original version
-  int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
-  for(int tel=0;tel<dwrap->data->ntel;tel++) {
-    for(int pix=0;pix<dwrap->data->scope[tel].npix;pix++) {
-      if(dwrap->data->scope[tel].pixinuse[pix]==FROGS_OK) {
-	int pix_in_template;//FROGS_OK in image, FROGS_NOTOK in background
-	double mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,
-				 &pix_in_template); 
-	if(mu!=FROGS_BAD_NUMBER) {
-	  double pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
-					      mu,
-					      dwrap->data->scope[tel].ped[pix],
-					      dwrap->data->scope[tel].exnoise[pix]);
-	  double pix_lkhd=-2.0*log(pd);
-	  gsl_vector_set (f,gsl_pix_id,pix_lkhd);
-	  gsl_pix_id++;
-	}
-      }//End of test on pixel viability 
-    }//End of pixel loop
-  }//End of telescope loop
-
+  //COMMENTED LINES ARE FOR TESTS SV IS DOING
+  //pnt.log10e=-0.55777;
+  //  pnt.log10e=-1.2;
+  //pnt.lambda=3;
+  //pnt.xp=-138.781403;
+  //pnt.yp=110.559235;
+  //pnt.xs=0.374460;
+  //pnt.ys=-0.331330;
+  //for(int i=0; i<180; i++) {
+  // pnt.log10e += 0.015;
+  //pnt.xp += 5;
+  //pnt.lambda=0.0;
+  //pnt.yp = -400;
+  //pnt.xs += 0.05;
+  //pnt.ys = -2.0;
+  //for(int j=0; j<80; j++) {
+  //pnt.lambda += 0.03;
+  //pnt.yp += 5;
+  //pnt.ys += 0.05;
+  //  fprintf(outpu,"%f %f %f %f %f %f ", 
+  //	    pnt.xs, pnt.ys, pnt.xp, pnt.yp, pnt.log10e, pnt.lambda);
+  //  double lkhdTotal = 0.; //test SV
+    
+    //This is where the model is called to calculate the expected 
+    //value for all pixels in the original version
+    int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
+    for(int tel=0;tel<dwrap->data->ntel;tel++) {
+      //double lkhdTel = 0.; //test SV
+      for(int pix=0;pix<dwrap->data->scope[tel].npix;pix++) {
+	if(dwrap->data->scope[tel].pixinuse[pix]==FROGS_OK) {
+	  int pix_in_template;//FROGS_OK in image, FROGS_NOTOK in background
+	  double mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,
+				    &pix_in_template); 
+	  if(mu!=FROGS_BAD_NUMBER) {
+	    double pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
+						mu,
+						dwrap->data->scope[tel].ped[pix],
+						dwrap->data->scope[tel].exnoise[pix]);
+	    double pix_lkhd=-2.0*log(pd);
+	    gsl_vector_set (f,gsl_pix_id,pix_lkhd);
+	    gsl_pix_id++;
+	    
+	    //    lkhdTel += pix_lkhd; //test SV
+	    // lkhdTotal += pix_lkhd; //test SV
+	  }
+	}//End of test on pixel viability
+      }//End of pixel loop
+      //fprintf(outpu,"%f ", lkhdTel);
+    }//End of telescope loop
+    //fprintf(outpu,"%f ", lkhdTotal);
+    //fprintf(outpu,"\n");
+    //}//End of lambda loop
+    //fprintf(outpu,"\n");
+    //}//End of energy loop
+    //exit(0);
+  
   return GSL_SUCCESS;
 }
 //================================================================
@@ -1402,13 +1441,36 @@ int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J) {
     the estimation of the derivatives. Eventually their values could be 
     coming in the frogs_gsl_data_wrapper structure*/
   struct frogs_reconstruction delta;
-  delta.xs=0.01;
-  delta.ys=0.01;
-  delta.xp=2.0;
-  delta.yp=2.0;
-  delta.log10e=0.02;
-  delta.lambda=0.2;
-  
+
+  delta.xs=0.15;
+  delta.ys=0.15;
+  delta.xp=20.0;
+  delta.yp=20.0;
+  delta.log10e=0.03;
+  delta.lambda=0.3;
+    
+  //pnt.log10e=-1.25; //test SV
+  //pnt.xp=-400.0;
+  //pnt.yp=-400.0;
+  //pnt.xs = -2.0;
+  //pnt.ys = -2.0;
+  //pnt.lambda=-0.03;
+  //for(int i=0; i<15; i++) {
+  //pnt.log10e += 0.015;
+  //pnt.xp += 5;
+  //pnt.yp += 10;
+  //pnt.xs += 0.05;
+  //pnt.ys += 0.05;
+  //pnt.lambda += 0.03;
+  //double dlkhd1 = 0.; //test SV
+  //double dlkhd2 = 0.; //test SV
+  //double dlkhd3 = 0.; //test SV
+  //double dlkhd4 = 0.; //test SV
+  //double dlkhd5 = 0.; //test SV
+  //double dlkhd6 = 0.; //test SV
+  //fprintf(outpu,"%f %f %f %f %f %f ", 
+  //pnt.xs, pnt.ys, pnt.xp, pnt.yp, pnt.log10e, pnt.lambda);
+
   int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
   for(int tel=0;tel<dwrap->data->ntel;tel++) {
     for(int pix=0;pix<dwrap->data->scope[tel].npix;pix++) {
@@ -1416,34 +1478,54 @@ int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J) {
 	double derivative;
 	//Derivative with respect to xs
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-				  dwrap->tmplt,FROGS_XS);
+						 dwrap->tmplt,FROGS_XS);
+	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
+	  dwrap->data,dwrap->tmplt,FROGS_XS);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_XS,derivative);
+	//dlkhd1 += derivative;
 	//Derivative with respect to ys
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-				  dwrap->tmplt,FROGS_YS);
+						 dwrap->tmplt,FROGS_YS);
+	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
+	  dwrap->data,dwrap->tmplt,FROGS_YS);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_YS,derivative);
+	//	dlkhd2 += derivative;
 	//Derivative with respect to xp
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-				  dwrap->tmplt,FROGS_XP);
+						 dwrap->tmplt,FROGS_XP);
+	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
+	dwrap->data,dwrap->tmplt,FROGS_XP);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_XP,derivative);
+	//dlkhd3 += derivative;
 	//Derivative with respect to yp
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-				  dwrap->tmplt,FROGS_YP);
+						 dwrap->tmplt,FROGS_YP);
+	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
+	dwrap->data,dwrap->tmplt,FROGS_YP);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_YP,derivative);
+	//dlkhd4 += derivative;
 	//Derivative with respect to log10e
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-				  dwrap->tmplt,FROGS_LOG10E);
+						 dwrap->tmplt,FROGS_LOG10E);
+	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
+	dwrap->data,dwrap->tmplt,FROGS_LOG10E);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_LOG10E,derivative);
+	//dlkhd5 += derivative;
 	//Derivative with respect to lambda
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-				  dwrap->tmplt,FROGS_LAMBDA);
+						 dwrap->tmplt,FROGS_LAMBDA);
+	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
+	  dwrap->data, dwrap->tmplt,FROGS_LAMBDA); */
 	gsl_matrix_set(J,gsl_pix_id,FROGS_LAMBDA,derivative);
-
+	//	dlkhd6 += derivative;
+	
 	gsl_pix_id++;
-      }
-    }
-  }
-
+      }//End of test on pixel viability
+    }//End of pixel loop
+  }//End of telescope loop
+  //fprintf(outpu,"%f %f %f %f %f %f\n", dlkhd1, dlkhd2, dlkhd3, dlkhd4, dlkhd5, dlkhd6);
+  //}//End of energy loop
+  //exit(0);
   return GSL_SUCCESS;
 }
 //================================================================
@@ -1490,10 +1572,80 @@ double frogs_pix_lkhd_deriv_2ndorder(int pix, int tel,
   if(gsl_par_id==FROGS_LOG10E) delta_param=delta.log10e;
   if(gsl_par_id==FROGS_LAMBDA) delta_param=delta.lambda;
   if(delta_param==0) 
-    frogs_showxerror("Bad parameter identifier in pix_lkhd_deriv");  
+    frogs_showxerror("Bad parameter identifier in pix_lkhd_deriv_2ndorder");  
   rtn=(pix_lkhd_plus-pix_lkhd_minus)/(2.0*delta_param);
+
   return rtn;
 }
+//================================================================
+//================================================================
+double frogs_pix_lkhd_deriv_4thorder(int pix, int tel,
+				     struct frogs_reconstruction pnt, 
+				     struct frogs_reconstruction delta,
+				     struct frogs_imgtmplt_in *d,
+				     struct frogs_imgtemplate *tmplt,
+				     int gsl_par_id) {
+  /*Calculates the derivative of the pixel likelihood for the pixel specified 
+    by tel and pix and with respect to the parameter specified by gsl_par_id. 
+    This function calculate the derivative as 
+    df/dx=[-f(x+2*dx)+8f(x+dx)-8f(x-dx)+f(x-2dx)]/(12*dx)*/
+
+  double rtn;
+  double mu;
+  double pd;
+  int pix_in_template;
+  //Step forward 
+  mu=frogs_img_model(pix,tel,frogs_param_step(pnt,delta,gsl_par_id,1.0),
+		     d,tmplt,&pix_in_template);
+  if(mu==FROGS_BAD_NUMBER) 
+    frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
+  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+			       d->scope[tel].ped[pix],
+			       d->scope[tel].exnoise[pix]);
+  double pix_lkhd_plus=-2.0*log(pd);
+  //Step backward
+  mu=frogs_img_model(pix,tel,frogs_param_step(pnt,delta,gsl_par_id,-1.0),
+		     d,tmplt,&pix_in_template);
+  if(mu==FROGS_BAD_NUMBER) 
+    frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
+  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+			       d->scope[tel].ped[pix],
+			       d->scope[tel].exnoise[pix]);
+  double pix_lkhd_minus=-2.0*log(pd);
+  //two Step forward 
+  mu=frogs_img_model(pix,tel,frogs_param_step(pnt,delta,gsl_par_id,2.0),
+		     d,tmplt,&pix_in_template);
+  if(mu==FROGS_BAD_NUMBER) 
+    frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
+  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+			       d->scope[tel].ped[pix],
+			       d->scope[tel].exnoise[pix]);
+  double pix_lkhd_plus_plus=-2.0*log(pd);
+  //two Step backward
+  mu=frogs_img_model(pix,tel,frogs_param_step(pnt,delta,gsl_par_id,-2.0),
+		     d,tmplt,&pix_in_template);
+  if(mu==FROGS_BAD_NUMBER) 
+    frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
+  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+			       d->scope[tel].ped[pix],
+			       d->scope[tel].exnoise[pix]);
+			       double pix_lkhd_minus_minus=-2.0*log(pd);
+
+  //Evaluate the derivative
+  float delta_param=0;
+  if(gsl_par_id==FROGS_XS) delta_param=delta.xs;
+  if(gsl_par_id==FROGS_YS) delta_param=delta.ys;
+  if(gsl_par_id==FROGS_XP) delta_param=delta.xp;
+  if(gsl_par_id==FROGS_YP) delta_param=delta.yp;
+  if(gsl_par_id==FROGS_LOG10E) delta_param=delta.log10e;
+  if(gsl_par_id==FROGS_LAMBDA) delta_param=delta.lambda;
+  if(delta_param==0) 
+    frogs_showxerror("Bad parameter identifier in pix_lkhd_deriv_2ndorder");  
+  rtn=(-pix_lkhd_plus_plus+8*pix_lkhd_plus-8*pix_lkhd_minus+pix_lkhd_minus_minus)/(12*delta_param);
+  
+  return rtn;
+}
+
 //================================================================
 //================================================================
 struct frogs_reconstruction frogs_param_step(struct frogs_reconstruction pnt,
@@ -1513,181 +1665,6 @@ struct frogs_reconstruction frogs_param_step(struct frogs_reconstruction pnt,
   if(gsl_par_id==FROGS_LAMBDA) rtn.lambda=rtn.lambda+mult*delta.lambda;
   
   return rtn;
-}
-//================================================================
-//================================================================
-int frogs_likelihood_derivative_old(const gsl_vector *v, void *ptr, 
-				    gsl_matrix *J) {
-  //SLB: is it time I delete this function? 
-  /* Calculates the likelihood derivative for each pixel and with respect 
-    to each event physical parameter and store the result in the gsl 
-    matrix J. The event physical parameter for which the likelihood is 
-    calculated are provided in the gsl vector v. All the data from the 
-    telescope and from the template are available through the pointer to 
-    void ptr */
-
-  struct frogs_gsl_data_wrapper *dwrap=(struct frogs_gsl_data_wrapper *)ptr;
-
-  //Here is the parameter space point
-  struct frogs_reconstruction pnt;
-  pnt.xs=gsl_vector_get(v,FROGS_XS);
-  pnt.ys=gsl_vector_get(v,FROGS_YS);
-  pnt.xp=gsl_vector_get(v,FROGS_XP);
-  pnt.yp=gsl_vector_get(v,FROGS_YP);
-  pnt.log10e=gsl_vector_get(v,FROGS_LOG10E);
-  pnt.lambda=gsl_vector_get(v,FROGS_LAMBDA);
-
-  /*This is used to store the finite difference step magnitudes used in 
-    the estimation of the derivatives. Eventually their values could be 
-    coming in the frogs_gsl_data_wrapper structure*/
-  struct frogs_reconstruction delta;
-  delta.xs=0.01;
-  delta.ys=0.01;
-  delta.xp=2.0;
-  delta.yp=2.0;
-  delta.log10e=0.02;
-  delta.lambda=0.2;
-  
-  int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
-  for(int tel=0;tel<dwrap->data->ntel;tel++) {
-    for(int pix=0;pix<dwrap->data->scope[tel].npix;pix++) {
-      if(dwrap->data->scope[tel].pixinuse[pix]==FROGS_OK) {
-	double mu;
-	double pd;
-	double pix_lkhd_plus,pix_lkhd_minus,derivative;
-	int pix_in_template;//FROGS_OK in image, FROGS_NOTOK in background
-	//Derivative with respect to xs
-	pnt.xs=pnt.xs+delta.xs;	//One step forward
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_plus=-2.0*log(pd);
-	pnt.xs=pnt.xs-2.0*delta.xs; //One step back	
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_minus=-2.0*log(pd);
-	derivative=(pix_lkhd_plus-pix_lkhd_minus)/(2.0*delta.xs);
-	gsl_matrix_set(J,gsl_pix_id,FROGS_XS,derivative);
-	pnt.xs=pnt.xs+delta.xs;	//Get back to where we are
-	
-	//Derivative with respect to ys
-	pnt.ys=pnt.ys+delta.ys;	//One step forward
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_plus=-2.0*log(pd);
-	pnt.ys=pnt.ys-2.0*delta.ys; //One step back
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_minus=-2.0*log(pd);
-	derivative=(pix_lkhd_plus-pix_lkhd_minus)/(2.0*delta.ys);
-	gsl_matrix_set(J,gsl_pix_id,FROGS_YS,derivative);
-	pnt.ys=pnt.ys+delta.ys;	//Get back to where we are
-	
-	//Derivative with respect to xp
-	pnt.xp=pnt.xp+delta.xp;	//One step forward
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_plus=-2.0*log(pd);
-	pnt.xp=pnt.xp-2.0*delta.xp; //One step back
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_minus=-2.0*log(pd);
-	derivative=(pix_lkhd_plus-pix_lkhd_minus)/(2.0*delta.xp);
-	gsl_matrix_set(J,gsl_pix_id,FROGS_XP,derivative);
-	pnt.xp=pnt.xp+delta.xp;	//Get back to where we are
-	
-	//Derivative with respect to yp
-	pnt.yp=pnt.yp+delta.yp;	//One step forward
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_plus=-2.0*log(pd);
-	pnt.yp=pnt.yp-2.0*delta.yp; //One step back
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_minus=-2.0*log(pd);
-	derivative=(pix_lkhd_plus-pix_lkhd_minus)/(2.0*delta.yp);
-	gsl_matrix_set(J,gsl_pix_id,FROGS_YP,derivative);
-	pnt.yp=pnt.yp+delta.yp;	//Get back to where we are
-	
-	//Derivative with respect to log10e
-	pnt.log10e=pnt.log10e+delta.log10e;	//One step forward
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_plus=-2.0*log(pd);
-	pnt.log10e=pnt.log10e-2.0*delta.log10e; //One step back
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_minus=-2.0*log(pd);
-	derivative=(pix_lkhd_plus-pix_lkhd_minus)/(2.0*delta.log10e);
-	gsl_matrix_set(J,gsl_pix_id,FROGS_LOG10E,derivative);
-	pnt.log10e=pnt.log10e+delta.log10e;	//Get back to where we are
-	
-	//Derivative with respect to lambda
-	pnt.lambda=pnt.lambda+delta.lambda;	//One step forward
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_plus=-2.0*log(pd);
-	pnt.lambda=pnt.lambda-2.0*delta.lambda; //One step back
-	mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,&pix_in_template);
-	if(mu==FROGS_BAD_NUMBER) 
-	  frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-	pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],mu,
-				     dwrap->data->scope[tel].ped[pix],
-				     dwrap->data->scope[tel].exnoise[pix]);
-	pix_lkhd_minus=-2.0*log(pd);
-	derivative=(pix_lkhd_plus-pix_lkhd_minus)/(2.0*delta.lambda);
-	gsl_matrix_set(J,gsl_pix_id,FROGS_LAMBDA,derivative);
-	pnt.lambda=pnt.lambda+delta.lambda;	//Get back to where we are
-	
-	gsl_pix_id++;
-      }
-    }
-  }
-  
-  return GSL_SUCCESS;
 }
 //================================================================
 //================================================================
@@ -1720,7 +1697,7 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
   
   //Angle between the x direction and the shower image axis
   float phi=atan2(pnt.yp-d->scope[tel].yfield,pnt.xp-d->scope[tel].xfield);
-  phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
+  //phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
   float cphi=cos(phi);
   float sphi=sin(phi);
   //Impact parameter to the telescope
@@ -1729,12 +1706,19 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
 		  (pnt.xp-d->scope[tel].xfield)*
 		  (pnt.xp-d->scope[tel].xfield));
   //Subtract the source coordinate from the pixel coordinate
-  float xrs=(d->scope[tel].xcam[pix]-pnt.xs);
-  float yrs=-(d->scope[tel].ycam[pix]-pnt.ys);
+  float xrs=d->scope[tel].xcam[pix]-pnt.xs;
+  float yrs=d->scope[tel].ycam[pix]-pnt.ys;
   //Apply a rotation to move to the template coordinate system
   float tmpltxpix=xrs*cphi+yrs*sphi; 
   float tmpltypix=-xrs*sphi+yrs*cphi;
 
+  /*The optimization has a tendency to drag the value of lambda 
+    outside the range covered by the template table. In order to avoid 
+    the effects of this on the model, when the value is out of range 
+    we use the lambda value of the range that is the closest.*/
+  float maxlambda=tmplt->min[0]+(tmplt->nstep[0]-1)*tmplt->step[0];
+  pnt.lambda=floatwrap(pnt.lambda,tmplt->min[0],maxlambda);
+  
   //Here we get the pixel value from the template table
   double rtn;
   if(FROGS_INTERP_ORDER==1) rtn=frogs_chertemplate_lin(pnt.lambda,pnt.log10e,
@@ -1890,9 +1874,7 @@ double frogs_chertemplate_quad(float lambda,float log10e,float b,float x,
     bracketing indices*/
   int il1,il2,il3;
   dummy=(lambda-tmplt->min[0])/tmplt->step[0];
-  il1=(int)floor(dummy); il2=il1+1;
-  if(fabs(dummy-il1)>fabs(dummy-il2)) il3=il2+1; 
-  else {il2=il1;il1=il2-1;il3=il2+1;}
+  il1=(int)floor(dummy); il2=il1+1;il3=il2+1;
   if(il1<0) {il1=0;il2=1;il3=2;} 
   if(il3>=tmplt->nstep[0]) {il3=tmplt->nstep[0]-1;il2=il3-1;il1=il2-1;}
   float l1=tmplt->min[0]+il1*tmplt->step[0];
@@ -1902,9 +1884,7 @@ double frogs_chertemplate_quad(float lambda,float log10e,float b,float x,
   //For the energy as well we will use a quadratic interpolation as well. 
   int iloge1,iloge2,iloge3;
   dummy=(log10e-tmplt->min[1])/tmplt->step[1];
-  iloge1=(int)floor(dummy); iloge2=iloge1+1;
-  if(fabs(dummy-iloge1)>fabs(dummy-iloge2)) iloge3=iloge2+1; 
-  else {iloge2=iloge1;iloge1=iloge2-1;iloge3=iloge2+1;}
+  iloge1=(int)floor(dummy); iloge2=iloge1+1; iloge3=iloge2+1;
   if(iloge1<0) {iloge1=0;iloge2=1;iloge3=2;} 
   if(iloge3>=tmplt->nstep[1]) {iloge3=tmplt->nstep[1]-1;iloge2=iloge3-1;iloge1=iloge2-1;}
   float loge1=tmplt->min[1]+iloge1*tmplt->step[1];
@@ -1914,9 +1894,7 @@ double frogs_chertemplate_quad(float lambda,float log10e,float b,float x,
   //For the impact parameter we will use a quadratic interpolation as well
   int ib1,ib2,ib3;
   dummy=(b-tmplt->min[2])/tmplt->step[2];
-  ib1=(int)floor(dummy);ib2=ib1+1;
-  if(fabs(dummy-ib1)>fabs(dummy-ib2)) ib3=ib2+1; 
-  else {ib2=ib1;ib1=ib2-1;ib3=ib2+1;}
+  ib1=(int)floor(dummy);ib2=ib1+1; ib3=ib2+1;
   if(ib1<0) {ib1=0;ib2=1;ib3=2;} 
   if(ib3>=tmplt->nstep[2]) {ib3=tmplt->nstep[2]-1;ib2=ib3-1;ib1=ib2-1;}
   float b1=tmplt->min[2]+ib1*tmplt->step[2];
@@ -2029,7 +2007,7 @@ int frogs_print_param_spc_point(struct frogs_imgtmplt_out output){
   fprintf(stderr,"yp=%f +/- %f m\n",output.cvrgpt.yp,output.cvrgpterr.yp);
   fprintf(stderr,"log10(E/TeV)=%f +/- %f\n",output.cvrgpt.log10e,
 	  output.cvrgpterr.log10e);
-  fprintf(stderr,"lambda=%f +/- %f g/cm2\n",output.cvrgpt.lambda,
+  fprintf(stderr,"xs=%f +/- %f degrees\n",output.cvrgpt.lambda,
 	  output.cvrgpterr.lambda);
   fprintf(stderr,"..............................................\n");
   fprintf(stderr,"Image goodness Gi=%f for %d d.o.f.\n",output.goodness_img,
@@ -2040,6 +2018,7 @@ int frogs_print_param_spc_point(struct frogs_imgtmplt_out output){
 
   return FROGS_OK;
 }
+//================================================================
 //================================================================
 double frogs_linear_interpolation(float x1, float x2, double y1, double y2, 
 				 float x) {
@@ -2066,6 +2045,33 @@ double frogs_quadratic_interpolation(float x1, float x2, float x3, double y1,
 }
 //================================================================
 //================================================================
+float floatwrap(float x,float min,float max) {
+  /*This function returns a value between min and max. It is periodic 
+    in x of periode 2*(max-min). For x in [min,max] the returned value 
+    is x. For x in [max,2*max-min], the return value is 2*max-x. 
+    This function is used on parameters controled by the GSL optimization 
+    to maintain the parameter within the range for which we have models 
+    without introducing any discontinuity
+     
+  rtn ^ 
+    o |         o           o
+  o   o       o | o       o   o       o
+      | o   o   |   o   o       o   o
+      |   o     |     o           o
+      | . |     |     | 
+    0 .---|-----|-----|---------------------> x
+     0   min   max   2*max-min
+*/
+
+  float rtn;
+  if(min>max) frogs_showxerror("In floatwrap, min>max");
+  float range=max-min;
+  float dumx=x-min;
+  rtn=min+range-fabs(dumx-range*(2*floor(0.5*dumx/range)+1));
+  return rtn;
+}
+//================================================================
+//================================================================
 int frogs_printfrog() {
   /*This function clearly is the most important one of the project. */
   fprintf(stderr," ---------------------------------------------------------------- \n");
@@ -2078,9 +2084,10 @@ int frogs_printfrog() {
   fprintf(stderr,"|  \\ \\_\\\\//_/ /    F    R  RR  OOO   GGG  SSSS     \\ \\_\\\\//_/ /  |\n");
   fprintf(stderr,"|   ~~  ~~  ~~                                      ~~  ~~  ~~   |\n");
   fprintf(stderr,"| svincent@physics.utah.edu             lebohec@physics.utah.edu |\n");
+  fprintf(stderr,"|                 VERSION 1.00 AUGUST 24th 2011                  |\n");
+  fprintf(stderr,"|  For license issues, see www.physics.utah.edu/gammaray/FROGS   |\n");
   fprintf(stderr," ---------------------------------------------------------------- \n");
   return FROGS_OK;
 }
 //================================================================
 //================================================================
-
