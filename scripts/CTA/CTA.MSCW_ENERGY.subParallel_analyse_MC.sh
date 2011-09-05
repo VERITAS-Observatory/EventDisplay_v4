@@ -1,29 +1,28 @@
 #!/bin/bash
 #
 # submit jobs to analyse MC files with lookup tables
-# divide large set of proton simulations into smaller sets
-# (tuned to the CTA-MC simulation set)
+# divide large set of e.g. proton simulations into smaller sets
 #
 #
 
-PART=$1
-MET=$2
-TAB=$3
-ARRAY=$4
-RECID=$5
+TAB=$1
+RECID=$2
+ARRAY=$3
+PART=$4
+MET=$5
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
-   echo "./CTA.MSCW_ENERGY.subParallel_analyse_MC.sh <particle> <LL/GEO> <tablefile> <subarray> <recID>"
+   echo "./CTA.MSCW_ENERGY.subParallel_analyse_MC.sh <tablefile> <recid> <subarray> <particle> <LL/GEO>"
    echo "(table files without .root)"
    echo ""
    echo "submit jobs in paralell to analyse MC files with lookup tables"
    echo
-   echo "  <particle>      gamma_onSource/gamma_cone10/electron/proton/helium"
-   echo "  <LL/GEO>        image reconstruction method (not implemented yet)"
    echo "  <tablefile>     table file name (without .root)"
    echo "  <recid>         reconstruction ID"
    echo "  <subarray>      subarray identifier (A,B,C...)"
+   echo "  <particle>      gamma_onSource / gamma_cone10 / electron / proton / helium"
+   echo "  <LL/GEO>        image reconstruction method (not implemented yet)"
    echo
    exit
 fi
