@@ -1697,7 +1697,7 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
   
   //Angle between the x direction and the shower image axis
   float phi=atan2(pnt.yp-d->scope[tel].yfield,pnt.xp-d->scope[tel].xfield);
-  //phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
+  phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
   float cphi=cos(phi);
   float sphi=sin(phi);
   //Impact parameter to the telescope
@@ -1706,8 +1706,8 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
 		  (pnt.xp-d->scope[tel].xfield)*
 		  (pnt.xp-d->scope[tel].xfield));
   //Subtract the source coordinate from the pixel coordinate
-  float xrs=d->scope[tel].xcam[pix]-pnt.xs;
-  float yrs=d->scope[tel].ycam[pix]-pnt.ys;
+  float xrs=  (d->scope[tel].xcam[pix]-pnt.xs);
+  float yrs= -(d->scope[tel].ycam[pix]-pnt.ys);
   //Apply a rotation to move to the template coordinate system
   float tmpltxpix=xrs*cphi+yrs*sphi; 
   float tmpltypix=-xrs*sphi+yrs*cphi;
