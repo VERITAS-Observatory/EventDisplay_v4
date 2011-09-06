@@ -7,12 +7,14 @@
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] 
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ]
 then
-   echo "CTA.TMVA.sub_optimizeBoxCuts.sh <run parameter filename> <directory for run parameter and log files> <output file name>"
+   echo "CTA.TMVA.sub_optimizeBoxCuts.sh <run parameter filename> <directory for run parameter and log files> <output file name> [erec method]"
    echo ""
    echo "<run parameter filename> without .runparameter"
    echo " should be located in the output directory"
+   echo
+   echo "[erec method]  energy reconstruction method (default=0)"
    echo
    echo "note 1: keywords ENERGYBINS and OUTPUTFILE are ignored in the runparameter file"
    echo
@@ -25,10 +27,14 @@ RPAR=$1
 ODIR=$2
 mkdir -p $ODIR
 OFIL=$3
-
-#####################################
 # energy reconstruction method
 EREC=0
+if [ -n "$4" ]
+then
+  EREC="$4"
+fi
+
+#####################################
 # energy bins
 #EMIN=( -2.5 -1.0 -0.5 0.0 0.5 1.0 )
 #EMAX=( -1.0 -0.5  0.0 0.5 1.0 2.5 )
