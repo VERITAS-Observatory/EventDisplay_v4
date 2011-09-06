@@ -364,8 +364,8 @@ void VInstrumentResponseFunctionRunParameter::print()
 
     cout << endl;
     cout << "cuts: "; 
-    cout << " cut file " << fCutFileName;
-    cout << " cut selector " << fCutSelector;
+    cout << "  " << fCutFileName << endl;
+    cout << "  cut selector " << fCutSelector;
     if( fIgnoreEnergyReconstructionQuality ) cout << ", ignoring cut on quality of energy reconstruction";
     if( fTelescopeTypeCuts ) cout << ", telescope type dependent cuts";
     cout << endl;
