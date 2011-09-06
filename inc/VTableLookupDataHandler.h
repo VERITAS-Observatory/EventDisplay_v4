@@ -388,7 +388,6 @@ class VTableLookupDataHandler
         void setMaxEntries( int t ) { fNEntries = t; }
 	void setMCDistanceToCameraCenter( double iMin, double iMax ) { fMC_distance_to_cameracenter_min = iMin; fMC_distance_to_cameracenter_max = iMax; }
         void setNEntries( int iN );
-                                                  //!< set output file (name, option, tablefile)
 	void setDebug( bool iD ) { fDebug = iD; }
         bool setOutputFile( string, string, string );
         void setSelectRandom( double iX, int iS );

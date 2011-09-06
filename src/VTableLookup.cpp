@@ -771,11 +771,6 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NlowZupWup, esys );
                 calculateMSFromTables( s_NlowZupWlow, esys );
                 getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fMeanNoiseLevel );
-/*		cout << "A " << fData->getEventNumber() << "\t" << fevent << endl;
-		cout << "\t" << inoise_low << "\t" << ize_up << "\t" << iwoff_low <<"\t" << iwoff_up << endl;
-		cout << "\t\t" << fTableDirectionOffset.size() << "\t" << endl;
-		cout << "\t\t" << fTableDirectionOffset[inoise_low].size() << "\t" << endl;
-		cout << "\t\t" << fTableDirectionOffset[inoise_low][ize_up].size() << endl; */
                 interpolate( s_NlowZupWlow, fTableDirectionOffset[inoise_low][ize_up][iwoff_low], s_NlowZupWup, fTableDirectionOffset[inoise_low][ize_up][iwoff_up], s_NlowZup, woff );
                 if( fDebug == 2 ) cout << "XXX WOFF INTER 2 " << woff << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_up << " " << s_NlowZupWlow->mscl << " " << s_NlowZupWup->mscl << " " << s_NlowZup->mscl << endl;
 

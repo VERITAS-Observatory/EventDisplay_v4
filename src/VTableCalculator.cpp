@@ -424,7 +424,6 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
         double sigma = 0.;
         double value = 0.;
         double weight = 0.;
-        double delta = 0.;
 // energy per telescope
         double a[VDST_MAXTELESCOPES];
         double b[VDST_MAXTELESCOPES];
@@ -514,15 +513,16 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                     if( med > 0. )
                     {
 // mean scaled calculation
-                        if( !fEnergy && sigma > 0. )
+                        if( !fEnergy && sigma > 0. && w )
                         {
-// new weighting
-                            if( w ) value  += (w[tel]-med)/sigma * (med*med)/(sigma*sigma);
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// weighting used from 2009/04/16 on (use relative error as weighting)
+                            value  += (w[tel]-med)/sigma * (med*med)/(sigma*sigma);
                             weight += (med*med)/(sigma*sigma);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 2009/04/16 (GM) old weighting:
-//		      if( w ) value  += (w[tel]-med)/sigma/(sigma*sigma);
-//		      weight += 1./(sigma*sigma);
+// weighting used until 2009/04/16  (use error as weighting)
+//		            value  += (w[tel]-med)/sigma / (sigma*sigma);
+//		            weight += 1./(sigma*sigma);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                             k++;
                         }
@@ -531,12 +531,12 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                         {
                             if( sigma > 0. )
                             {
-                                value += med / sigma / sigma;
+                                value  += med / sigma / sigma;
                                 weight += 1./sigma/sigma;
                             }
                             else
                             {
-                                value += med;
+                                value  += med;
                                 weight += 1.;
                             }
 // store energy per telescope
@@ -548,7 +548,9 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                 }
             }
         }
-// mean scale value calculation is finished here
+////////////////////////////////////////////////////////////////
+// mean scaled value 
+// (MSCW/MSCL)
         if( !fEnergy )
         {
             if( weight > 0 ) return value/weight;
@@ -565,30 +567,38 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // loop over number if images with valid entries
             if( k > 1 )
             {
-                delta = 0.;
                 chi2 = 0.;
 		dE   = 0.;
-                int z1 = 0;
-                int z2 = 0;
-		double lin_value = TMath::Power( 10., value );
+                double z1 = 0;
+//////////////////////////////////////////////////////////////////////
+// OLD dE definition
+//                int z2 = 0;
+//		double lin_value = TMath::Power( 10., value );
+//////////////////////////////////////////////////////////////////////
                 for( int j = 0; j < k; j++ )
                 {
                     if( b[j] != 0. )
                     {
-                        delta  = ( value - a[j] ) / b[j];
-                        chi2  += delta * delta;
+                        chi2 = ( value - a[j] ) * ( value - a[j] ) / b[j] / b[j];
 			z1++;
                     }
-		    if( lin_value > 0. )
-		    {
-			dE    += ( TMath::Power( 10., a[j] ) - lin_value ) / lin_value;
-                        z2++;
-                    }
+//////////////////////////////////////////////////////////////////////
+// OLD dE definition
+//		    if( lin_value > 0. )
+//		    {
+//			dE    += ( TMath::Power( 10., a[j] ) - lin_value ) / lin_value;
+//                        z2++;
+//                    }
+//////////////////////////////////////////////////////////////////////
                 }
-                if( z1 > 1 ) chi2 /= (z1-1);
+                if( z1 > 1 ) chi2 /= (z1-1.);
                 else         chi2  = -99.;
-		if( z2 > 0 ) dE /=  z2;              // mean value: divide by # of participating telescopes
-		else         dE  = -99.;
+//////////////////////////////////////////////////////////////////////
+// OLD dE definition
+//		if( z2 > 0 ) dE /=  z2;              // mean value: divide by # of participating telescopes
+//		else         dE  = -99.;
+// NEW dE definition
+                dE = sqrt( 1./weight );
             }
             else
 	    {

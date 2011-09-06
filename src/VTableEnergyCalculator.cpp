@@ -351,6 +351,7 @@ double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, do
 
         if( fDebug ) cout << "VTableEnergyCalculator::calc(): number of telescopes " << ntel << endl;
 
+/////////////////////////////////////////////////////
 // loop over all telescopes
         for( tel=0; tel < ntel; tel++ )
         {
@@ -398,38 +399,52 @@ double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, do
                     }
                 }
             }
-        }
+        }  // end of loop over all telescopes
+/////////////////////////////////////////////////////
 
 // calculate mean energy
         if( weight > 0. )
         {
-            logEnergy /= weight ;
+            logEnergy /= weight;
 
             if( k > 1 )
             {
                 chi2 = 0.;
-                int z1 = 0;
-		dE   = 0.;
-                int z2 = 0;
-		double linEnergy = pow(10.,logEnergy);
+                double z1 = 0.;
+//////////////////////////////////////////////////////////////////////
+// OLD dE definition
+//	 	dE   = 0.;
+//                int z2 = 0;
+//		double linEnergy = pow(10.,logEnergy);
+//////////////////////////////////////////////////////////////////////
+
 // loop over all telescopes with valid energy
-                for (int j=0;j<k;j++)
+                for( int j = 0; j < k; j++ )
                 {
                     if( b[j] != 0. )
                     {
                         chi2  += (logEnergy-a[j])*(logEnergy-a[j]) / b[j] / b[j];
                         z1++;
                     }
-		    if( linEnergy > 0 )
-		    {
-		        dE +=  ( TMath::Power( 10., a[j] ) - linEnergy ) / linEnergy;
-			z2++;
-                    }
+//////////////////////////////////////////////////////////////////////
+// OLD dE definition
+//		    if( linEnergy > 0 )
+//		    {
+//		        dE +=  ( TMath::Power( 10., a[j] ) - linEnergy ) / linEnergy;
+//			z2++;
+//                    }
+//////////////////////////////////////////////////////////////////////
                 }
-                if( z1 > 1 ) chi2 /= (z1-1);
+                if( z1 > 1 ) chi2 /= (z1-1.);
                 else         chi2 = -99.;
-		if( z2 > 0 ) dE   /= z2;
-		else         dE   = -99.;
+//////////////////////////////////////////////////////////////////////
+// OLD dE definition
+//		if( z2 > 0 ) dE   /= z2;
+//////////////////////////////////////////////////////////////////////
+//		else         dE   = -99.;
+// NEW dE definition
+// use sqrt of weights
+                dE = sqrt( 1./weight );
             }
             else
             {
