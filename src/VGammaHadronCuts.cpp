@@ -1179,6 +1179,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     TDirectory *cDir = gDirectory;
 
     fTMVAEvaluator = new VTMVAEvaluator();
+//    fTMVAEvaluator->setDebug( true );
     if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
        fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU );

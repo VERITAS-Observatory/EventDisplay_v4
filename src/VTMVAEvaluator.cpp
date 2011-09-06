@@ -27,8 +27,13 @@ void VTMVAEvaluator::reset()
    fMWR = 0.;
    fMLR = 0.;
    fEmissionHeight = 0.;
+   fEmissionHeightChi2_log10 = 0.;
    fEChi2 = 0.;
+   fEChi2_log10 = 0.;
    fdE = 0.;
+   fEChi2S = 0.;
+   fEChi2S_log10 = 0.;
+   fdES = 0.;
    fTheta2 = 0.;
 
    setSignalEfficiency();
@@ -98,7 +103,8 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    }
    if( iWeightFileIndex_min > iWeightFileIndex_max )
    {
-      cout << "VTMVAEvaluator::initializeWeightFiles: min energy bin larger than maximum: " << iWeightFileIndex_min << " > " << iWeightFileIndex_max << endl;
+      cout << "VTMVAEvaluator::initializeWeightFiles: min energy bin larger than maximum: ";
+      cout << iWeightFileIndex_min << " > " << iWeightFileIndex_max << endl;
       fIsZombie = true;
       return false;
    }
@@ -171,13 +177,54 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // note that the following list of variables must be the same as during training
       for( unsigned int t = 0; t < iTrainingVariables.size(); t++ )
       {
-         if( iTrainingVariables[t] == "MSCW" )           fTMVAReader.back()->AddVariable( "MSCW", &fMSCW );
-         if( iTrainingVariables[t] == "MSCL" )           fTMVAReader.back()->AddVariable( "MSCL", &fMSCL );
-	 if( iTrainingVariables[t] == "EmissionHeight" ) fTMVAReader.back()->AddVariable( "EmissionHeight", &fEmissionHeight );
-	 if( iTrainingVariables[t] == "NImages" )        fTMVAReader.back()->AddVariable( "NImages", &fNImages );
-	 if( iTrainingVariables[t] == "dE" )             fTMVAReader.back()->AddVariable( "dE", &fdE );
-	 if( iTrainingVariables[t] == "EChi2" )          fTMVAReader.back()->AddVariable( "EChi2", &fEChi2 );
-	 if( iTrainingVariables[t] == "(Xoff*Xoff+Yoff*Yoff)" ) fTMVAReader.back()->AddVariable( "(Xoff*Xoff+Yoff*Yoff)", &fTheta2 ); 
+         if( iTrainingVariables[t] == "MSCW" ) 
+	 {
+	     fTMVAReader.back()->AddVariable( "MSCW", &fMSCW );
+         }
+         else if( iTrainingVariables[t] == "MSCL" )
+	 {
+	    fTMVAReader.back()->AddVariable( "MSCL", &fMSCL );
+         }
+	 else if( iTrainingVariables[t] == "EmissionHeight" )
+	 {
+	    fTMVAReader.back()->AddVariable( "EmissionHeight", &fEmissionHeight );
+         }
+	 else if( iTrainingVariables[t] == "log10(EmissionHeightChi2)" )
+	 {
+	    fTMVAReader.back()->AddVariable( "log10(EmissionHeightChi2)", &fEmissionHeightChi2_log10 );
+         }
+	 else if( iTrainingVariables[t] == "NImages" ) 
+	 {
+	    fTMVAReader.back()->AddVariable( "NImages", &fNImages );
+         }
+	 else if( iTrainingVariables[t] == "dE" ) 
+	 {
+	    fTMVAReader.back()->AddVariable( "dE", &fdE );
+         }
+	 else if( iTrainingVariables[t] == "EChi2" )
+	 {
+	    fTMVAReader.back()->AddVariable( "EChi2", &fEChi2 );
+         }
+	 else if( iTrainingVariables[t] == "log10(EChi2)" ) 
+	 {
+	    fTMVAReader.back()->AddVariable( "log10(EChi2)", &fEChi2_log10 );
+         }
+	 else if( iTrainingVariables[t] == "dES" ) 
+	 {
+	    fTMVAReader.back()->AddVariable( "dES", &fdES );
+         }
+	 else if( iTrainingVariables[t] == "EChi2S" )
+	 {
+	    fTMVAReader.back()->AddVariable( "EChi2S", &fEChi2S );
+         }
+	 else if( iTrainingVariables[t] == "log10(EChi2S)" )   
+	 {
+	    fTMVAReader.back()->AddVariable( "log10(EChi2S)", &fEChi2S_log10 );
+         }
+	 else if( iTrainingVariables[t] == "(Xoff*Xoff+Yoff*Yoff)" ) 
+	 {
+	    fTMVAReader.back()->AddVariable( "(Xoff*Xoff+Yoff*Yoff)", &fTheta2 ); 
+         }
       }
       if( fDebug )
       {
@@ -185,7 +232,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	 for( unsigned int t = 0; t < iTrainingVariables.size(); t++ ) cout << "\t" << iTrainingVariables[t] << endl;
       }
 	    
-
       if( !fTMVAReader.back()->BookMVA( hname, iFullFileName.str().c_str() ) )
       {
 	  cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing TMVA reader from weight file " << iFullFileName.str() << endl;
@@ -286,8 +332,16 @@ double VTMVAEvaluator::evaluate( double iSignalEfficiency, double iProbabilityTh
        fMWR            = fData->MWR;
        fMLR            = fData->MLR;
        fEmissionHeight = fData->EmissionHeight;
+       if( fData->EmissionHeightChi2 > 0. ) fEmissionHeightChi2_log10 = TMath::Log10( fData->EmissionHeight );
+       else                                 fEmissionHeightChi2_log10 = 0.;
        fEChi2          = fData->EChi2;
+       if( fEChi2 > 0. ) fEChi2_log10 = TMath::Log10( fEChi2 );
+       else              fEChi2_log10 = 0.;
        fdE             = fData->dE;
+       fEChi2S         = fData->EChi2S;
+       if( fEChi2S > 0. ) fEChi2S_log10 = TMath::Log10( fEChi2S );
+       else               fEChi2S_log10 = 0.;
+       fdES            = fData->dES;
        if( fTMVAIgnoreTheta2Cut ) fTheta2 = 1.e-30;
        else                       fTheta2         = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
    }
@@ -297,8 +351,14 @@ double VTMVAEvaluator::evaluate( double iSignalEfficiency, double iProbabilityTh
 
    if( iEnergybin < fTMVAReader.size() && fTMVAReader[iEnergybin] )
    {
-      if( iSignalEfficiency > 0. && iProbabilityThreshold > 0. ) return fTMVAReader[iEnergybin]->GetProba( fTMVAMethodTag[iEnergybin], iSignalEfficiency );
-      else                                                       return fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], iSignalEfficiency );
+      if( iSignalEfficiency > 0. && iProbabilityThreshold > 0. )
+      {
+         return fTMVAReader[iEnergybin]->GetProba( fTMVAMethodTag[iEnergybin], iSignalEfficiency );
+      }
+      else
+      {
+         return fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], iSignalEfficiency );
+      }
    }
 
    return 0.;
@@ -361,7 +421,8 @@ double VTMVAEvaluator::getBoxCut_Theta2( double iEnergy_log10TeV )
 {
     if( fEnergyCut_Log10TeV_min.size() != fBoxCutValue_theta2.size() )
     {
-       cout << "VTMVAEvaluator::getBoxCut_Theta2 error: theta2 and energy vector dimensions inconsistent: " << fEnergyCut_Log10TeV_min.size() << "\t" << fBoxCutValue_theta2.size() << endl;
+       cout << "VTMVAEvaluator::getBoxCut_Theta2 error: theta2 and energy vector dimensions inconsistent: ";
+       cout << fEnergyCut_Log10TeV_min.size() << "\t" << fBoxCutValue_theta2.size() << endl;
        exit( -1 );
     }
 
@@ -811,7 +872,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       iCanvas->SetGridy( 0 );
 
       iGSignal_to_sqrtNoise->SetTitle( "" );
-      setGraphPlottingStyle( iGSignal_to_sqrtNoise, 1., 1., 20 );
+      setGraphPlottingStyle( iGSignal_to_sqrtNoise, 1, 1., 20 );
 
       iGSignal_to_sqrtNoise->Draw( "apl" );
       iGSignal_to_sqrtNoise->GetHistogram()->SetXTitle( "signal efficiency" );

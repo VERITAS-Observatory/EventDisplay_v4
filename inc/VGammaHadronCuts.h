@@ -283,6 +283,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
 
-        ClassDef(VGammaHadronCuts,14);
+        ClassDef(VGammaHadronCuts,15);
 };
 #endif

@@ -72,15 +72,23 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    float    fMWR;
    float    fMLR;
    float    fEmissionHeight;
+   float    fEmissionHeightChi2_log10;
    float    fEChi2;
+   float    fEChi2_log10;
    float    fdE;
+   float    fEChi2S;
+   float    fEChi2S_log10;
+   float    fdES;
    float    fTheta2;
 
    bool     bPlotEfficiencyPlotsPerEnergy;
 
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
    vector< string > getTrainingVariables( string );
-   void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iGSignal_to_sqrtNoise, TH1F* iHSignal_to_sqrtNoise, TH1F* hEffS, TH1F* hEffB, double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max );
+   void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 
+                                                  TGraph* iGSignal_to_sqrtNoise, TH1F* iHSignal_to_sqrtNoise, 
+						  TH1F* hEffS, TH1F* hEffB, 
+						  double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max );
    void     reset();
 
    public:
