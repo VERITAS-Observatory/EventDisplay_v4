@@ -1291,13 +1291,14 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
          else if( iMethod == 1 && d->ErecS > 0. )
          {
              eRec = log10( d->ErecS );
-             eRecLin = d->Erec;
+             eRecLin = d->ErecS;
          }
          else if( fIgnoreEnergyReconstruction )
          {
              eRec = log10( d->MCe0 );
              eRecLin = d->MCe0;
          }
+	 else continue;
          
 // loop over all az bins
          for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
