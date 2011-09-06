@@ -268,9 +268,12 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	    vector< Double_t > i_cuts_max;
 	    vector< string >   i_cuts_name;
 	    i_mcuts->GetCuts( fSignalEfficiency[i], i_cuts_min, i_cuts_max );
-	    cout << "Printing box cuts for a signal efficiency of " << fSignalEfficiency[i];
-	    if( i < fBackgroundEfficiency.size() && fBackgroundEfficiency[i] > 0. ) cout << "(background efficiency: " << fBackgroundEfficiency[i] << ")";
-	    cout << " :" << endl;
+	    cout << "Box cuts for a signal efficiency of " << fSignalEfficiency[i];
+	    if( i < fBackgroundEfficiency.size() && fBackgroundEfficiency[i] > 0. )
+	    {
+	       cout << " (background efficiency: " << fBackgroundEfficiency[i] << ")";
+            }
+	    cout << ":" << endl;
 	    for( unsigned int v = 0; v < i_cuts_min.size(); v++ )
 	    {
 		cout << "\t" << i_cuts_min[v] << " < " << i_mcuts->GetInputVar( v ) << " < " << i_cuts_max[v] << endl;
@@ -304,13 +307,14 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    }
 
 // print some info to screen
-   cout << "Initialized " << fTMVAReader.size() << " MVA readers " << endl;
-   cout << "\t energy binning: " << endl;
+   cout << "VTMVAEvaluator: Initialized " << fTMVAReader.size() << " MVA readers " << endl;
+   cout << "energy binning: " << endl;
    for( unsigned int i = 0; i < fTMVAReader.size(); i++ )
    {
-      cout << "energy bin " << i << "\t" << fEnergyCut_Log10TeV_min[i] << "\t" << fEnergyCut_Log10TeV_max[i];
-      cout << " (reconstruction method " << fEnergyReconstructionMethod[i] << ")" << endl;
+      cout << "\t" << i << "\t" << fEnergyCut_Log10TeV_min[i] << "\t" << fEnergyCut_Log10TeV_max[i];
+      cout << "\t(energy reconstruction method " << fEnergyReconstructionMethod[i] << ")" << endl;
    }
+   cout << endl;
 
    return true;
 }
@@ -380,8 +384,8 @@ unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
    for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
    {
 // choose energy reconstruction method
-      if(      fEnergyReconstructionMethod[i] == 0 && fData->Erec )  iErec = log10( fData->Erec );
-      else if( fEnergyReconstructionMethod[i] == 0 && fData->ErecS ) iErec = log10( fData->ErecS );
+      if(      fEnergyReconstructionMethod[i] == 0 && fData->Erec  > 0. ) iErec = log10( fData->Erec );
+      else if( fEnergyReconstructionMethod[i] == 1 && fData->ErecS > 0. ) iErec = log10( fData->ErecS );
       else iErec = -1.e99;
 
 // mean energy of this energy bin (possibly spectral weighted)
@@ -683,7 +687,7 @@ void VTMVAEvaluator::setSignalEfficiency( double iE )
 
 void VTMVAEvaluator::printSignalEfficiency()
 {
-   cout << "energy dependent signal (background) efficiency: " << endl;
+   cout << " VTMVAEvaluator: energy dependent signal (background) efficiency: " << endl;
    for( unsigned int i = 0; i < fSignalEfficiency.size(); i++ )
    {
       if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() )
@@ -694,6 +698,7 @@ void VTMVAEvaluator::printSignalEfficiency()
       if( i < fBackgroundEfficiency.size() ) cout << "\t(" << fBackgroundEfficiency[i] << ")";
       cout << endl;
    }
+   cout << endl;
 }
 
 /*

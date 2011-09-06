@@ -640,8 +640,8 @@ void VGammaHadronCuts::printCutSummary()
         cout << "\t       weight files: " << fTMVAWeightFile << " (" << fTMVAWeightFileIndex_min << "," << fTMVAWeightFileIndex_max << ")" << endl;
 	if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
 	{
-	   cout << "\t using optimal signal efficiency for " << fTMVAOptimizeSignalEfficiencySourceStrengthCU << " Crab source" << endl;
-	   cout << "\t reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
+	   cout << "\t       using optimal signal efficiency for " << fTMVAOptimizeSignalEfficiencySourceStrengthCU << " Crab source" << endl;
+	   cout << "\t       reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
 	}
 	else
 	{

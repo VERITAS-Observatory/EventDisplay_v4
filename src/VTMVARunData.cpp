@@ -98,8 +98,8 @@ bool VTMVARunData::openDataFiles()
        }
        if( i_SignalList )
        {
-           cout << "number of signal in energy bin " << i << "\t" << i_SignalList->GetN() << "\t required: " << fMinSignalEvents;
-	   cout << "  (cut is " << fQualityCuts << " && " << fEnergyCutData[i]->fEnergyCut << ")" << endl;
+           cout << "number of signal in energy bin " << i << "\t" << i_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
+	   cout << "  (cuts are " << fQualityCuts << " && " << fEnergyCutData[i]->fEnergyCut << ")" << endl;
            if( i_SignalList->GetN() < fMinSignalEvents ) iEnoughEvents = false;
            i_SignalList->Reset();
        }
@@ -113,8 +113,9 @@ bool VTMVARunData::openDataFiles()
        }
        if( i_BackgroundList )
        {
-          cout << "number of background in energy bin " << i << "\t" << i_BackgroundList->GetN() << "\t required " << fMinBackgroundEvents;
-	  cout << "  (cut is " << fQualityCuts << " && " << fEnergyCutData[i]->fEnergyCut << ")" << endl;
+          cout << "number of background in energy bin " << i << "\t" << i_BackgroundList->GetN();
+	  cout << "\t required > " << fMinBackgroundEvents << endl;
+	  cout << "  (cuts are " << fQualityCuts << " && " << fEnergyCutData[i]->fEnergyCut << ")" << endl;
           if( i_BackgroundList->GetN() < fMinBackgroundEvents ) iEnoughEvents = false;
           i_BackgroundList->Reset();
        }
@@ -182,6 +183,11 @@ void VTMVARunData::print()
     cout << "energy bins (" << fEnergyCutData.size() << ")";
     for( unsigned int i = 0; i < fEnergyCutData.size(); i++ ) cout << fEnergyCutData[i]->fEnergyCut_Log10TeV_min << ",";
     cout << endl;
+// all bins should use same energy reconstruction method
+    if( fEnergyCutData.size() > 0 && fEnergyCutData[0] )
+    {
+       cout << "energy reconstruction method " << fEnergyCutData[0]->fEnergyReconstructionMethod << endl;
+    }
     cout << "signal data file(s): " << endl;
     for( unsigned int i = 0; i < fSignalFileName.size(); i++ ) cout << "\t" << fSignalFileName[i] << endl;
     cout << "background data file(s): " << endl;
@@ -391,8 +397,14 @@ bool VTMVARunData::readConfigurationFile( char *iC )
             for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
             {
                 ostringstream iCut;
-                if( iEMethod == 0 ) iCut << "Erec>0.&&"  << iEnergyCut_Log10TeV_min[i]  <<  "<log10(Erec)&&log10(Erec)<" << iEnergyCut_Log10TeV_max[i];
-                else                iCut << "ErecS>0.&&" <<  iEnergyCut_Log10TeV_min[i] <<  "<log10(ErecS)&&log10(ErecS)<" << iEnergyCut_Log10TeV_max[i];
+                if( iEMethod == 0 )
+		{
+		   iCut << "Erec>0.&&"  << iEnergyCut_Log10TeV_min[i]  <<  "<log10(Erec)&&log10(Erec)<" << iEnergyCut_Log10TeV_max[i];
+                }
+                else
+		{
+		   iCut << "ErecS>0.&&" <<  iEnergyCut_Log10TeV_min[i] <<  "<log10(ErecS)&&log10(ErecS)<" << iEnergyCut_Log10TeV_max[i];
+                }
                 iEnergyCut.push_back( iCut.str().c_str() );
             }
 // filling everything into the energy data structure

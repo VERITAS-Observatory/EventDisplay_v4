@@ -35,7 +35,8 @@ bool optimize( VTMVARunData *iRun, unsigned int iEnergyBin )
     if( !iRun ) return false;
     if( iRun->fEnergyCutData.size() < iEnergyBin || iRun->fOutputFile.size() < iEnergyBin )
     {
-        cout << "error in optimize: energy bin out of range " << iEnergyBin << "\t" << iRun->fEnergyCutData.size() << "\t" << iRun->fOutputFile.size() << endl;
+        cout << "error in optimize: energy bin out of range " << iEnergyBin;
+	cout << "\t" << iRun->fEnergyCutData.size() << "\t" << iRun->fOutputFile.size() << endl;
         return false;
     }
 
