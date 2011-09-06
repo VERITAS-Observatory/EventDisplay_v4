@@ -12,7 +12,7 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <array> <recid> <particle> <input> <cutfile template>"
+   echo "CTA.EFFAREA.sub_analyse.sh <array> <recid> <particle> <input> <cutfile template> [erec method]"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
@@ -35,6 +35,9 @@ then
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file"
    echo
+   echo "[erec method]"
+   echo "     energy reconstruction method (default=0)"
+   echo
    exit
 fi
 
@@ -51,6 +54,11 @@ RECID=$2
 PART=$3
 INPU=$4
 CFIL=$5
+EREC=0
+if [ -n "$6" ]
+then
+  EREC="$6"
+fi
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] && [ $PART != "helium" ]
@@ -78,7 +86,7 @@ echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
 DDIR=$CTA_DATA_DIR/analysis/$ARRAY/Analysis/
-#DDIR=$CTA_USER_DATA_DIR/analysis/"s4-2-120"/"Analysis_132066"/
+#DDIR=$CTA_USER_DATA_DIR/analysis/"s4-2-120"/"Analysis_066033"/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
@@ -86,7 +94,7 @@ FDIR=$CTA_USER_LOG_DIR"/queueEffArea/$DATE/"
 echo $FDIR
 mkdir -p $FDIR
 echo "output data directory"
-ODIR=$CTA_USER_DATA_DIR"/analysis/EffectiveArea/$ARRAY/$DATE"
+ODIR=$CTA_USER_DATA_DIR"/analysis/EffectiveArea/$ARRAY/$DATE/"
 echo $ODIR
 mkdir -p $ODIR
 
@@ -225,7 +233,7 @@ do
       echo "* FILLINGMODE 0" >> $MSCF
 # fill IRFs only
 #      echo "* FILLINGMODE 1" >> $MSCF
-      echo "* ENERGYRECONSTRUCTIONMETHOD 0" >> $MSCF
+      echo "* ENERGYRECONSTRUCTIONMETHOD $EREC" >> $MSCF
       echo "* ENERGYAXISBINS 60" >> $MSCF
       echo "* ENERGYRECONSTRUCTIONQUALITY 0" >> $MSCF
 # one azimuth bin only
