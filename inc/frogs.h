@@ -1,3 +1,6 @@
+#ifndef FROGS_H_INC
+#define FROGS_H_INC
+
 /*================================================================*\
 |      _    _                                        _    _        |
 |     (o)--(o)                                      (o)--(o)       |
@@ -8,9 +11,13 @@
 |  \ \_\\//_/ /    F    R  RR  OOO   GGG  SSSS     \ \_\\//_/ /    |
 |   ~~  ~~  ~~                                      ~~  ~~  ~~     |
 | svincent@physics.utah.edu             lebohec@physics.utah.edu   |
-|                  VERSION 1.00 AUGUST 24th 2011                   |
+|                  VERSION 1.01 SEPTEMBER 06th 2011                |
 |  For license issues, see www.physics.utah.edu/gammaray/FROGS     |
 \*================================================================*/
+
+#include <stdio.h>
+#include <string.h>
+
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multifit_nlin.h> //Levenberg-Marquardt 
 #include <gsl/gsl_blas.h> //Levenberg-Marquardt linear algebra
@@ -61,6 +68,9 @@
 #define FROGS_PICTRAD  0.35  //Radius defining the picture
 #define FROGS_NEIGHBORAD 0.16 //Pixels separated by less than that are neighbors
 
+#ifdef __cplusplus
+extern "C" {
+#endif 
 //================================================================
 //================================================================
 struct frogs_reconstruction {
@@ -212,3 +222,7 @@ int frogs_event_display(int event_id, float q,float mu,float xtel,
 			float ytel,float xpix,float ypix,int pix_in_img);
 int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);
 float floatwrap(float x,float min,float max);
+#ifdef __cplusplus
+}
+#endif 
+#endif

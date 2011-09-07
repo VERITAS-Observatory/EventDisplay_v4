@@ -819,7 +819,6 @@ int VEventLoop::analyzeEvent()
           fArrayAnalyzer->doAnalysis();
 // GH Frogs Analysis
 #ifndef NOGSL
-//          if( fRunPar->ffrogsmode && fEventNumber==64.0 )
           if( fRunPar->ffrogsmode )
 	  {
              fFrogs->doFrogsStuff(fEventNumber);

@@ -288,6 +288,7 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VSkyCoordinatesUtilities.o
 
 FROGSOBJECTS =	./obj/VFrogs.o \
+                ./obj/frogs.o \
                 ./obj/VFrogParameters.o
 
 # add frogs objects
@@ -774,6 +775,9 @@ endif
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 ./obj/%.o:	%.C
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+./obj/%.o:	%.c
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 ./obj/%_Dict.o:	./inc/%.h ./inc/%LinkDef.h
