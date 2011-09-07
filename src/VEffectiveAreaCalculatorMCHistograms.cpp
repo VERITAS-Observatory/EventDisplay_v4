@@ -14,12 +14,17 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
 // default name
    SetName( "MChistos" );
 
+   fSpectralWeight = 0;
    fCuts = 0;
 
 }
 
-void VEffectiveAreaCalculatorMCHistograms::listEntries()
+void VEffectiveAreaCalculatorMCHistograms::print()
 {
+    cout << "VEffectiveAreaCalculatorMCHistograms::print(): found ";
+    cout <<  fVSpectralIndex.size() << " spectral index bins, ";
+    cout << fVMinAz.size() << "azimuth bins" << endl;
+
     for( unsigned int i = 0; i < fVSpectralIndex.size(); i++ )
     {
        cout << "Spectral index: " << fVSpectralIndex[i] << endl;
@@ -80,7 +85,7 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData, 
     cout << endl;
     cout << "filling MC histograms for effective area calculation" << endl;
     cout << "=========================================================================================" << endl;
-    if( fSpectralWeight.size() > 0 && fSpectralWeight[0] ) fSpectralWeight[0]->print();
+    if( fVSpectralWeight.size() > 0 && fVSpectralWeight[0] ) fVSpectralWeight[0]->print();
     cout << "=========================================================================================" << endl;
     cout << endl;
 
@@ -109,7 +114,7 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData, 
 
 // array lengths
     unsigned int i_vMinAzSize        = fVMinAz.size();
-    unsigned int i_vSpectralIndexSize = fSpectralWeight.size();
+    unsigned int i_vSpectralIndexSize = fVSpectralWeight.size();
 
 // entries in MC tree (must be long, chain could contain lots of events)
     Long64_t nentries = i_MCData->GetEntries();
@@ -151,7 +156,7 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData, 
 	   for( unsigned int s = 0; s < i_vSpectralIndexSize; s++ )
 	   {
 // weight by spectral index
-              i_weight = fSpectralWeight[s]->getSpectralWeight( i_fMCE0 );
+              i_weight = fVSpectralWeight[s]->getSpectralWeight( i_fMCE0 );
 
 // fill MC histograms
 	      if( hVEmc[s][i_az] )        hVEmc[s][i_az]->Fill(        eMC, i_weight );
@@ -204,18 +209,23 @@ void VEffectiveAreaCalculatorMCHistograms::initializeHistograms( vector< double 
 // set spectral weight vector
     for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
     {
-        fSpectralWeight.push_back( new VSpectralWeight() );
+        fVSpectralWeight.push_back( new VSpectralWeight() );
 // weight by spectral index
-        fSpectralWeight.back()->setSpectralIndex( fVSpectralIndex[s] );
-        fSpectralWeight.back()->setMCParameter( 2.0, 0.05, 50. );
+        fVSpectralWeight.back()->setSpectralIndex( fVSpectralIndex[s] );
+        fVSpectralWeight.back()->setMCParameter( 2.0, 0.05, 50. );
     }
+// backwards compatibility
+    if( fVSpectralWeight.size() > 0 && fVSpectralWeight[0] ) fSpectralWeight = fVSpectralWeight[0];
 }
 
 bool VEffectiveAreaCalculatorMCHistograms::setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex )
 {
-   for( unsigned int i = 0; i < fSpectralWeight.size(); i++ )
+   for( unsigned int i = 0; i < fVSpectralWeight.size(); i++ )
    {
-      if( fSpectralWeight[i] ) fSpectralWeight[i]->setMCParameter( iMCIndex, iMin, iMax );
+      if( fVSpectralWeight[i] ) fVSpectralWeight[i]->setMCParameter( iMCIndex, iMin, iMax );
    }
+// backwards compatibility
+   if( fVSpectralWeight.size() > 0 && fVSpectralWeight[0] ) fSpectralWeight = fVSpectralWeight[0];
+
    return true;
 }

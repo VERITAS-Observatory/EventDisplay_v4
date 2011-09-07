@@ -164,8 +164,7 @@ int main( int argc, char *argv[] )
             cout << "exiting..." << endl;
             exit( -1 );
         }
-        cout << "found MC histograms: " << endl;
-        fMC_histo->listEntries();
+        fMC_histo->print();
      }
 
      CData d( c, true, 6, true );
@@ -199,7 +198,7 @@ int main( int argc, char *argv[] )
         fStopWatch.Start();
         fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, fRunPara->fEnergyAxisBins_log10, e.getEnergyAxis_minimum_defaultValue(), e.getEnergyAxis_maximum_defaultValue() );
         fMC_histo->fill( fRunPara->fze, c2, fRunPara->fAzimuthBins );
-        fMC_histo->listEntries();
+        fMC_histo->print();
         fStopWatch.Print();
      }  
 

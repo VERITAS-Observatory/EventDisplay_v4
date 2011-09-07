@@ -1213,8 +1213,14 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
 // update cut statistics
          fCuts->newEvent();
 
+	 if( bDebugCuts )
+	 {
+	    cout << "============================== " << endl;
+	    cout << "EVENT entry number " << i << endl;
+         }
+
 // apply MC cuts
-        if( bDebugCuts ) cout << "CUT MC " << fCuts->applyMCXYoffCut( d->MCxoff, d->MCyoff, false ) << endl;
+        if( bDebugCuts ) cout << "#0 CUT MC " << fCuts->applyMCXYoffCut( d->MCxoff, d->MCyoff, false ) << endl;
 
         if( !fCuts->applyMCXYoffCut( d->MCxoff, d->MCyoff, true ) ) continue;
 
@@ -1230,7 +1236,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
 // apply reconstruction cuts
          if( bDebugCuts )
 	 {
-	    cout << "CUT A ";
+	    cout << "#1 CUT applyInsideFiducialAreaCut ";
 	    cout << fCuts->applyInsideFiducialAreaCut();
 	    cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true) << endl;
          }
@@ -1244,8 +1250,11 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
          hEcutSub[2]->Fill( eMC, i_weight );
 
 // apply telescope type cut (e.g. for CTA simulations only)
-         if( bDebugCuts ) cout << "Cut NTELType " << fCuts->applyTelTypeTest( false ) << endl;
-         if( fCTA && !fCuts->applyTelTypeTest( true ) ) continue;
+         if( fCTA )
+	 {
+           if( bDebugCuts ) cout << "#2 Cut NTELType " << fCuts->applyTelTypeTest( false ) << endl;
+	   if(!fCuts->applyTelTypeTest( true ) ) continue;
+         }
          hEcutSub[3]->Fill( eMC, i_weight );
 
 //////////////////////////////////////
@@ -1268,9 +1277,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
 // apply gamma hadron cuts
          if( bDebugCuts )
 	 {
-	    cout << "CUT ISGAMMA ";
-	    cout << fCuts->isGamma(i);
-	    cout << "\t" << fCuts->applyEnergyReconstructionQualityCuts( iMethod ) << endl;
+	    cout << "#3 CUT ISGAMMA " << fCuts->isGamma(i) << endl;
          }
          if( !fCuts->isGamma( i, true ) ) continue;
          hEcutSub[5]->Fill( eMC, i_weight );
@@ -1278,6 +1285,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
 // apply energy reconstruction quality cut
          if( !fIgnoreEnergyReconstruction )
          {
+	    if( bDebugCuts ) cout << "#4 EnergyReconstructionQualityCuts " << fCuts->applyEnergyReconstructionQualityCuts( iMethod ) << endl;
             if( !fCuts->applyEnergyReconstructionQualityCuts( iMethod, true ) ) continue;
          }
          hEcutSub[6]->Fill( eMC, i_weight );

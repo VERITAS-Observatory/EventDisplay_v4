@@ -82,6 +82,8 @@ class VGammaHadronCutsStats : public TNamed
 class VGammaHadronCuts : public VAnalysisUtilities
 {
     private:
+        
+	bool   fDebug;                               // lots of debug output
 
         CData *fData;                                       //! transient
         string fDataDirectory;
@@ -278,11 +280,12 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setArrayCentre( double iX = 0., double iY = 0. ) { fArrayCentre_X = iX; fArrayCentre_Y = iY; }
         void   setDataDirectory( string id ) { fDataDirectory = id; }
         bool   setDataTree( CData* idata );
+	void   setDebug( bool iB = false ) { fDebug = iB; }
         void   setEnergyCuts( double imin, double imax ) { fArrayErec_min = imin; fArrayErec_max = imax; }
         void   setNTel( unsigned int itel,  double iX = 0., double iY = 0. ) { fNTel = itel; fArrayCentre_X = iX; fArrayCentre_Y = iY; }
         void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
 
-        ClassDef(VGammaHadronCuts,15);
+        ClassDef(VGammaHadronCuts,16);
 };
 #endif

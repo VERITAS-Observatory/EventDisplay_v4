@@ -38,6 +38,8 @@
 
 VGammaHadronCuts::VGammaHadronCuts()
 {
+    setDebug( false ); 
+
     resetCutValues();
 
     fCutSelector = 0;
@@ -925,11 +927,19 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 
 bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
 {
+    if( fDebug )
+    {
+       cout << "VGammaHadronCuts::isGamma: event " << i;
+       cout << ", cut selector " << fCutSelector;
+       cout << " (" << fCutSelector % 10 << ", " << fCutSelector / 10 << ")";
+       cout << endl;
+    }
 
 /////////////////////////////////////////////////////////////////////////////
 // apply box cuts  (e.g. MSCW/MSCL or MWR/MLR)
     if( fCutSelector % 10 <= 3 )
     {
+	if( fDebug ) cout << "VGammaHadronCuts::isGamma: applyStereoShapeCuts" << endl; 
         if( !applyStereoShapeCuts() )
         {
             if( !bCount ) fStats->fN[eIsGamma]++;
@@ -938,29 +948,28 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
 // all cut selectors >= 10 are different
         if( fCutSelector < 10 ) return true;
     }
-
 /////////////////////////////////////////////////////////////////////////////
 // apply probability threshold cut (e.g. random forest cuts)
     if( fCutSelector / 10 == 1 || fCutSelector / 10 == 2 )
     {
+	if( fDebug ) cout << "VGammaHadronCuts::isGamma: applyProbabilityCut" << endl; 
         if( !applyProbabilityCut( i, fIsOn ) )
         {
             if( !bCount ) fStats->fN[eIsGamma]++;
             return false;
         }
     }
-
 /////////////////////////////////////////////////////////////////////////////
 // apply cut using TMVA reader
-    if( fCutSelector / 10 == 4 )
+    else if( fCutSelector / 10 == 4 )
     {
+	if( fDebug ) cout << "VGammaHadronCuts::isGamma: applyTMVACut" << endl; 
        if( !applyTMVACut( i, fIsOn ) )
        {
           if( !bCount ) fStats->fN[eIsGamma]++;
           return false;
        }
     }
-          
 
     return true;
 }
@@ -972,6 +981,14 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
 */
 bool VGammaHadronCuts::applyTMVACut( int i, bool fIsOn )
 {
+   if( fDebug )
+   {
+      cout << "VGammaHadronCuts::applyTMVACut event " << i;
+      cout << ", signal efficiency " << fTMVASignalEfficiency;
+      cout << ", probability threshold " << fTMVAProbabilityThreshold;
+      cout << " (" << fTMVAEvaluator << ")";
+      cout << endl;
+   }
 
    if( fTMVAEvaluator )
    {
@@ -1179,7 +1196,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     TDirectory *cDir = gDirectory;
 
     fTMVAEvaluator = new VTMVAEvaluator();
-//    fTMVAEvaluator->setDebug( true );
+    fTMVAEvaluator->setDebug( fDebug );
     if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
        fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU );

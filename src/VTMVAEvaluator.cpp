@@ -327,6 +327,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 
 double VTMVAEvaluator::evaluate( double iSignalEfficiency, double iProbabilityThreshold )
 {
+   if( fDebug ) cout << "VTMVAEvaluator::evaluate (" << fData << ")" << endl;
 // copy event data
    if( fData )
    {
@@ -336,15 +337,15 @@ double VTMVAEvaluator::evaluate( double iSignalEfficiency, double iProbabilityTh
        fMWR            = fData->MWR;
        fMLR            = fData->MLR;
        fEmissionHeight = fData->EmissionHeight;
-       if( fData->EmissionHeightChi2 > 0. ) fEmissionHeightChi2_log10 = TMath::Log10( fData->EmissionHeight );
-       else                                 fEmissionHeightChi2_log10 = 0.;
+       if( fData->EmissionHeightChi2 > 0. ) fEmissionHeightChi2_log10 = TMath::Log10( fData->EmissionHeightChi2 );
+       else                                 fEmissionHeightChi2_log10 = 0.;   // !!! not clear what the best value is
        fEChi2          = fData->EChi2;
        if( fEChi2 > 0. ) fEChi2_log10 = TMath::Log10( fEChi2 );
-       else              fEChi2_log10 = 0.;
+       else              fEChi2_log10 = 0.;    // !!! not clear what the best value is
        fdE             = fData->dE;
        fEChi2S         = fData->EChi2S;
        if( fEChi2S > 0. ) fEChi2S_log10 = TMath::Log10( fEChi2S );
-       else               fEChi2S_log10 = 0.;
+       else               fEChi2S_log10 = 0.;    // !!! not clear what the best value is
        fdES            = fData->dES;
        if( fTMVAIgnoreTheta2Cut ) fTheta2 = 1.e-30;
        else                       fTheta2         = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
@@ -361,6 +362,13 @@ double VTMVAEvaluator::evaluate( double iSignalEfficiency, double iProbabilityTh
       }
       else
       {
+	 if( fDebug )
+	 {
+	    cout << "VTMVAEvaluator::evaluate: energy bin " << iEnergybin;
+	    cout << ", MVA Method Tag " << fTMVAMethodTag[iEnergybin];
+	    cout << ", Signal Efficiency " << iSignalEfficiency;
+	    cout << endl;
+         }
          return fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], iSignalEfficiency );
       }
    }
@@ -398,6 +406,13 @@ unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
          i_Diff_Energy = TMath::Abs( iMeanEnergy - iErec );
 	 iEnergyBin = i;
       }
+   }
+   if( fDebug )
+   {
+      cout << "VTMVAEvaluator::getSpectralWeightedEnergyBin() ";
+      cout << "energy bin: " << iEnergyBin;
+      cout << ", log10 energy " << iErec;
+      cout << endl;
    }
 
    return iEnergyBin;
@@ -687,7 +702,7 @@ void VTMVAEvaluator::setSignalEfficiency( double iE )
 
 void VTMVAEvaluator::printSignalEfficiency()
 {
-   cout << " VTMVAEvaluator: energy dependent signal (background) efficiency: " << endl;
+   cout << "VTMVAEvaluator: energy dependent signal (background) efficiency: " << endl;
    for( unsigned int i = 0; i < fSignalEfficiency.size(); i++ )
    {
       if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() )
@@ -695,7 +710,10 @@ void VTMVAEvaluator::printSignalEfficiency()
          cout << "E [" << fEnergyCut_Log10TeV_min[i] << "," << fEnergyCut_Log10TeV_max[i] << "] TeV :\t ";
       }
       cout << fSignalEfficiency[i];
-      if( i < fBackgroundEfficiency.size() ) cout << "\t(" << fBackgroundEfficiency[i] << ")";
+      if( i < fBackgroundEfficiency.size() && fBackgroundEfficiency[i] > 0. )
+      {
+         cout << "\t(" << fBackgroundEfficiency[i] << ")";
+      }
       cout << endl;
    }
    cout << endl;
