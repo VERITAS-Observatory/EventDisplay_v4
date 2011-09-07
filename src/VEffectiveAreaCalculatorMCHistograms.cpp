@@ -22,8 +22,8 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
 void VEffectiveAreaCalculatorMCHistograms::print()
 {
     cout << "VEffectiveAreaCalculatorMCHistograms::print(): found ";
-    cout <<  fVSpectralIndex.size() << " spectral index bins, ";
-    cout << fVMinAz.size() << "azimuth bins" << endl;
+    cout <<  fVSpectralIndex.size() << " spectral index bin(s), ";
+    cout << fVMinAz.size() << " azimuth bin(s)" << endl;
 
     for( unsigned int i = 0; i < fVSpectralIndex.size(); i++ )
     {
