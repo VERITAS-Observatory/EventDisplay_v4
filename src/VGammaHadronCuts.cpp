@@ -1450,14 +1450,6 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
     double theta2_cut_max = -1.;
 
 //////////////////////////////////////////////
-// energy independent theta2 cut
-//////////////////////////////////////////////
-    if( fArrayTheta2_max > 0. )
-    {
-       return fArrayTheta2_max;
-    } 
-
-//////////////////////////////////////////////
 // energy dependent theta2 cut
 //////////////////////////////////////////////
 
@@ -1476,6 +1468,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
        if( theta2_cut_max < fAngRes_AbsoluteMinimum ) return fAngRes_AbsoluteMinimum*fAngRes_AbsoluteMinimum;
        if( theta2_cut_max > fAngRes_AbsoluteMaximum ) return fAngRes_AbsoluteMaximum*fAngRes_AbsoluteMaximum;
        theta2_cut_max *= theta2_cut_max;
+       return theta2_cut_max;
     }
 /////////////////////////////////////////////
 // use IRF graph of angular resolution
@@ -1485,13 +1478,14 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 // for e outside of functions range, return edge values
        if( fIRFAngRes->GetN() > 0 && fIRFAngRes->GetX() && fIRFAngRes->GetY() )
        {
-          if( e < fIRFAngRes->GetX()[0] )                    return fIRFAngRes->GetY()[0];
-	  if( e > fIRFAngRes->GetX()[fIRFAngRes->GetN()-1] ) return fIRFAngRes->GetY()[fIRFAngRes->GetN()-1];
+          if( e < fIRFAngRes->GetX()[0] )                    return fIRFAngRes->GetY()[0] * fAngRes_ScalingFactor;
+	  if( e > fIRFAngRes->GetX()[fIRFAngRes->GetN()-1] ) return fIRFAngRes->GetY()[fIRFAngRes->GetN()-1] * fAngRes_ScalingFactor;
        }
        theta2_cut_max  = fIRFAngRes->Eval( e ) * fAngRes_ScalingFactor;
        if( theta2_cut_max < fAngRes_AbsoluteMinimum ) return fAngRes_AbsoluteMinimum*fAngRes_AbsoluteMinimum;
        if( theta2_cut_max > fAngRes_AbsoluteMaximum ) return fAngRes_AbsoluteMaximum*fAngRes_AbsoluteMaximum;
        theta2_cut_max *= theta2_cut_max;
+       return theta2_cut_max;
     }
 /////////////////////////////////////////////
 // use TMVA determined cut
@@ -1502,6 +1496,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
        theta2_cut_max = fTMVAEvaluator->getBoxCut_Theta2( e );
        if( theta2_cut_max < fAngRes_AbsoluteMinimum ) return fAngRes_AbsoluteMinimum*fAngRes_AbsoluteMinimum;
        if( theta2_cut_max > fAngRes_AbsoluteMaximum ) return fAngRes_AbsoluteMaximum*fAngRes_AbsoluteMaximum;
+       return theta2_cut_max;
     }
 /////////////////////////////////////////////
 // use a vector with theta2 cuts
@@ -1510,7 +1505,15 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
        return fTMVABoxCut_Theta2_max->Eval( log10( e ) );
     }
 
-   return theta2_cut_max;
+//////////////////////////////////////////////
+// energy independent theta2 cut
+//////////////////////////////////////////////
+    if( fArrayTheta2_max > 0. )
+    {
+       return fArrayTheta2_max;
+    } 
+
+    return -1.;
 }
 
 /*
@@ -1576,6 +1579,7 @@ bool VGammaHadronCuts::initAngularResolutionFile()
 	     cout << "VGammaHadronCuts::initAngularResolutionFile error: reading angular resolution graph from " << fF1AngResName << endl;
 	     return false;
           }
+	  fIRFAngRes->SetName( "IRFAngRes" );
       }
       cout << "VGammaHadronCuts::initAngularResolutionFile: read angular resolution graph from file " << fF1AngResName << " : " << endl;
       fIRFAngRes->Print();

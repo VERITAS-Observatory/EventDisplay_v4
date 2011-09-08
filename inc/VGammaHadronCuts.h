@@ -270,6 +270,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double getTheta2Cut_min( double e = 0.1 ) { if( e > 0. ) return fArrayTheta2_min; else return 0.; }
         double getTheta2Cut_max( double e );                           // get theta2 max cut (might be energy dependent)    [TeV] energy (linear)
 	TGraph* getTheta2Cut_TMVA_max()  { return fTMVABoxCut_Theta2_max; }
+	TGraph* getTheta2Cut_IRF_Max() { return fIRFAngRes; }
         void   printCutSummary();
         void   printCutStatistics() { if( fStats ) fStats->printCutStatistics(); }
         bool   readCuts(string i_cutfilename);
@@ -286,6 +287,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
 
-        ClassDef(VGammaHadronCuts,16);
+        ClassDef(VGammaHadronCuts,17);
 };
 #endif
