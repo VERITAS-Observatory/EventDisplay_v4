@@ -12,14 +12,14 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <array> <recid> <particle> <input> <cutfile template> [erec method]"
+   echo "CTA.EFFAREA.sub_analyse.sh <array> <recid> <particle> <input> <cutfile template> <outputdirectory> [erec method]"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
    echo 
    echo "(note: shape cuts hardwired)"
    echo
-   echo "<array"
+   echo "<array>"
    echo "     subarray for analysis (e.g. E)"
    echo
    echo "<recid>"
@@ -34,6 +34,9 @@ then
    echo 
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file"
+   echo
+   echo "<outputdirectory>"
+   echo "     directory with all result and log files"
    echo
    echo "[erec method]"
    echo "     energy reconstruction method (default=0)"
@@ -54,10 +57,11 @@ RECID=$2
 PART=$3
 INPU=$4
 CFIL=$5
+ODIR=$6
 EREC=0
-if [ -n "$6" ]
+if [ -n "$7" ]
 then
-  EREC="$6"
+  EREC="$7"
 fi
 
 # check particle type
@@ -86,7 +90,6 @@ echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
 DDIR=$CTA_DATA_DIR/analysis/$ARRAY/Analysis/
-#DDIR=$CTA_USER_DATA_DIR/analysis/"s4-2-120"/"Analysis_066033"/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
@@ -94,7 +97,7 @@ FDIR=$CTA_USER_LOG_DIR"/queueEffArea/$DATE/"
 echo $FDIR
 mkdir -p $FDIR
 echo "output data directory"
-ODIR=$CTA_USER_DATA_DIR"/analysis/EffectiveArea/$ARRAY/$DATE/"
+#ODIR=$CTA_USER_DATA_DIR"/analysis/EffectiveArea/$ARRAY/$DATE/"
 echo $ODIR
 mkdir -p $ODIR
 
@@ -115,7 +118,7 @@ then
 #   THETA2MAX=( 0.008 )
 #   THETA2MAX=( 0.04 )
 # using TMVA
-   THETA2MAX=( -1 )
+   THETA2MAX=( -1. )
    ISOTROPY="0"
    AZBINS="0"
    TELTYPECUTS="1"
@@ -206,17 +209,18 @@ do
 # create cut file
       iCBFILE=`basename $CFIL`      
       iCFIL=$FDIR/effectiveArea-CTA-$PART-$i-$j.$iCBFILE
-      cp -f $CFIL $iCFIL.dat
+      cp -f $CFIL $iCFIL
 
-      sed -e "s|OFFMIN|$iMIN|" $iCFIL.dat > $iCFIL-a.dat
-      rm -f $iCFIL.dat
-      sed -e "s|OFFMAX|$iMAX|" $iCFIL-a.dat > $iCFIL-b.dat
-      rm -f $iCFIL-a.dat
-      sed -e "s|THETA2MIN|$jMIN|" $iCFIL-b.dat > $iCFIL-c.dat
-      rm -f $iCFIL-b.dat
-      sed -e "s|THETA2MAX|$jMAX|" $iCFIL-c.dat > $iCFIL-d.dat
-      rm -f $iCFIL-c.dat
-      mv -f $iCFIL-d.dat $iCFIL.dat
+      sed -e "s|OFFMIN|$iMIN|" $iCFIL > $iCFIL-a
+      rm -f $iCFIL
+      sed -e "s|OFFMAX|$iMAX|" $iCFIL-a > $iCFIL-b
+      rm -f $iCFIL-a
+      sed -e "s|THETA2MIN|$jMIN|" $iCFIL-b > $iCFIL-c
+      rm -f $iCFIL-b
+      sed -e "s|THETA2MAX|$jMAX|" $iCFIL-c > $iCFIL-d
+      rm -f $iCFIL-c
+      mv -f $iCFIL-d $iCFIL
+      echo $iCFIL
 
 ###############################################################################
 # create run list
@@ -225,12 +229,16 @@ do
       echo "effective area data file for $PART $INPU $i $j" > $MSCF
 ###############################################################################
 # general run parameters
-
 ###############################################################################
 # filling mode
 ###############################################################################
 # fill IRFs and effective areas
-      echo "* FILLINGMODE 0" >> $MSCF
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      then
+	 echo "* FILLINGMODE 0" >> $MSCF
+      else
+	 echo "* FILLINGMODE 2" >> $MSCF
+      fi
 # fill IRFs only
 #      echo "* FILLINGMODE 1" >> $MSCF
       echo "* ENERGYRECONSTRUCTIONMETHOD $EREC" >> $MSCF
@@ -264,7 +272,7 @@ do
 #      echo "* SHAPECUTINDEX 0" >> $MSCF
 # shape cut index 42: TMVA cuts
       echo "* SHAPECUTINDEX 42" >> $MSCF
-      echo "* CUTFILE $iCFIL.dat" >> $MSCF
+      echo "* CUTFILE $iCFIL" >> $MSCF
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
       if [ $INPU = "msc" ]
       then
@@ -295,7 +303,7 @@ do
       echo "--------------------------"
       echo
       echo "gamma/hadron separation file"
-      echo $iCFIL.dat
+      echo $iCFIL
       echo "run script is $QSHELLDIR/$FNAM.sh"
       echo "batch log and error files are written to $FDIR"
       echo "parameter files write written to $FDIR"
