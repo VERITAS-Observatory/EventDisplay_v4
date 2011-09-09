@@ -18,7 +18,7 @@
 
 using namespace std;
 
-class VOrbitalPhase
+class VOrbitalPhase : public TObject
 {
     private:
       TFile *fInFile;

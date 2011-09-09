@@ -7,11 +7,13 @@
 #include <string>
 #include <vector>
 
+#include <TObject.h>
+
 #include "VFluxCalculation.h"
 
 using namespace std;
 
-class VLightCurveData
+class VLightCurveData : public TObject
 {
    private:
 
