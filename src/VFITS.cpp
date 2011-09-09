@@ -132,9 +132,9 @@ bool VFITS::writeSignificanceDistribution(bool iPrint )
     vhist.push_back(make_pair (hsig_1D,"y"));
     if (iPrint) cout<<" Calculated 1-dim significance distribution"<<endl;
 
-    char *colNames[10] = {"Sigma","SigmaWidth","Counts","CountsMinusSource", "CountsMinusStars", "CountsMinusAll"};
-    char *colUnits[10] = {"sigma","Delta sigma","counts","counts","counts","counts"};
-    char *colDataFormat[10] = {"1D","1D","1D","1D","1D","1D"};
+    char *colNames[10] = {(char*)"Sigma",(char*)"SigmaWidth",(char*)"Counts",(char*)"CountsMinusSource", (char*)"CountsMinusStars", (char*)"CountsMinusAll"};
+    char *colUnits[10] = {(char*)"sigma",(char*)"Delta sigma",(char*)"counts",(char*)"counts",(char*)"counts",(char*)"counts"};
+    char *colDataFormat[10] = {(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D"};
     writeVecTH1DFits(vhist, "SignificanceDistribtions", colNames,colUnits,colDataFormat, iPrint);
     if (iPrint) cout<<" transformed significance distribution into FITS-table"<<endl;
 
@@ -186,9 +186,9 @@ bool VFITS::writeThetaSquareDistribution(bool iPrint)
   vhist.push_back(make_pair (hThetaDiff,"ye"));
   if (iPrint) cout<<" Got the theta2 histograms"<<endl;
 
-  char *colNames[10] = {"ThetaSq","ThetaSqWidth","ON","OFF", "Excess", "ExcessError"};
-  char *colUnits[10] = {"deg^2","Delta deg^2","counts","counts","counts","counts"};
-  char *colDataFormat[10] = {"1D","1D","1D","1D","1D","1D"};
+  char *colNames[10] = {(char*)"ThetaSq",(char*)"ThetaSqWidth",(char*)"ON",(char*)"OFF", (char*)"Excess", (char*)"ExcessError"};
+  char *colUnits[10] = {(char*)"deg^2",(char*)"Delta deg^2",(char*)"counts",(char*)"counts",(char*)"counts",(char*)"counts"};
+  char *colDataFormat[10] = {(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D"};
   writeVecTH1DFits(vhist, "ThetaSquare ",colNames,colUnits,colDataFormat, iPrint);
   if (iPrint) cout<<" transformed rates into FITS-table"<<endl;
 
@@ -371,9 +371,9 @@ int VFITS::writeTH1DFits(TH1D* h,string DiagName, string x_name, string y_name, 
     // define Names, Units and DataForms for new FITS BinTable   
     // x_name.insert(0,"X ");
     // y_name.insert(0,"Y ");
-    char *tType[3] = {const_cast<char*>(x_name.c_str()), const_cast<char*>(y_name.c_str()), " Error"};
-    char *tUnit[3] = {const_cast<char*>(x_unit.c_str()),const_cast<char*>(y_unit.c_str())," "};
-    char *tForm[3] = {"1D","1D","1D"};
+    char *tType[3] = {const_cast<char*>(x_name.c_str()), const_cast<char*>(y_name.c_str()), (char*)" Error"};
+    char *tUnit[3] = {const_cast<char*>(x_unit.c_str()),const_cast<char*>(y_unit.c_str()),(char*)" "};
+    char *tForm[3] = {(char*)"1D",(char*)"1D",(char*)"1D"};
     if (iPrint) cout<<"   Set names, units and dataformats for different colums "<<endl;
 
     HduNum = createTableFitsFile( table,tType,tUnit,tForm,DiagName, iPrint);
@@ -411,7 +411,7 @@ int VFITS::writeTGraphFits(TGraph* g,string DiagName, string x_name, string y_na
     string DeltaX("Delta_"+x_name);
     char *tType[3] = {const_cast<char*>(x_name.c_str()),const_cast<char*>(DeltaX.c_str()) ,const_cast<char*>(y_name.c_str())};
     char *tUnit[3] = {const_cast<char*>(x_unit.c_str()),const_cast<char*>(x_unit.c_str()) ,const_cast<char*>(y_unit.c_str())};
-    char *tForm[3] = {"1D","1D","1D"};
+    char *tForm[3] = {(char*)"1D",(char*)"1D",(char*)"1D"};
     if (iPrint) cout<<"   Set names, units and dataformats for different colums "<<endl;
 
     HduNum = createTableFitsFile( table,tType,tUnit,tForm,DiagName, iPrint);
@@ -450,7 +450,7 @@ int VFITS::writeTGraphErrorsFits(TGraphErrors* g,string DiagName, string x_name,
     string ErrorY(y_name+"_Error");
     char *tType[4] = {const_cast<char*>(x_name.c_str()),const_cast<char*>(DeltaX.c_str()) ,const_cast<char*>(y_name.c_str()),const_cast<char*>(ErrorY.c_str())};
     char *tUnit[4] = {const_cast<char*>(x_unit.c_str()),const_cast<char*>(x_unit.c_str()), const_cast<char*>(y_unit.c_str()),const_cast<char*>(y_unit.c_str()),};
-    char *tForm[4] = {"1D","1D","1D","1D"};
+    char *tForm[4] = {(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D"};
     if (iPrint) cout<<"   Set names, units and dataformats for different colums "<<endl;
 
     HduNum = createTableFitsFile( table,tType,tUnit,tForm,DiagName, iPrint);
@@ -588,35 +588,35 @@ bool VFITS::writeFITSimageInfo(long naxis,long *naxes, TH2D *hSkyMap , string Di
     if ( fits_write_key_str(fptr, "EXTNAME",extname ,"Extension Name" , &status) ) return printerror( status );
 
     char radecsys[] = "FK5";
-    if ( fits_update_key(fptr, TSTRING, "RADECSYS", radecsys, "WCS for this file", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, "RADECSYS", radecsys, (char*)"WCS for this file", &status) ) return printerror( status );
 
     float equinoxsys = 2000.;
-    if ( fits_update_key(fptr, TFLOAT, "EQUINOX",&equinoxsys , "Epoch of coordinate system", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "EQUINOX",&equinoxsys , (char*)"Epoch of coordinate system", &status) ) return printerror( status );
 
 
     char ctype1[] = "RA---TAN"; 
-    if ( fits_update_key(fptr, TSTRING, "CTYPE1", ctype1, "Axis type for dim 1 (RA)", &status))   return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, "CTYPE1", ctype1, (char*)"Axis type for dim 1 (RA)", &status))   return printerror( status );
 
-    if ( fits_update_key(fptr, TFLOAT, "CRVAL1", &fTarget_RAJ200, "Sky coord of 1st axis (deg)", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "CRVAL1", &fTarget_RAJ200, (char*)"Sky coord of 1st axis (deg)", &status) ) return printerror( status );
 
     float pix1_origin=naxes[0]/2; 
-    if ( fits_update_key(fptr, TFLOAT, "CRPIX1", &pix1_origin, "Reference point of pixel location axis 1", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "CRPIX1", &pix1_origin, (char*)"Reference point of pixel location axis 1", &status) ) return printerror( status );
 
     float xbinwidth = -1.*hSkyMap->GetXaxis()->GetBinWidth(1); 
-    if ( fits_update_key(fptr, TFLOAT, "CDELT1", &xbinwidth, "X degrees per pixel", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "CDELT1", &xbinwidth, (char*)"X degrees per pixel", &status) ) return printerror( status );
 
 
     char ctype2[] = "DEC--TAN";
-    if ( fits_update_key(fptr, TSTRING, "CTYPE2", ctype2, "Axis type for dim 2 (DEC)", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, "CTYPE2", ctype2, (char*)"Axis type for dim 2 (DEC)", &status) ) return printerror( status );
 
-    if ( fits_update_key(fptr, TFLOAT, "CRVAL2", &fTarget_DecJ2000, "Sky coord of 2nd axis (deg)", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "CRVAL2", &fTarget_DecJ2000, (char*)"Sky coord of 2nd axis (deg)", &status) ) return printerror( status );
 
 
     float pix2_origin=naxes[1]/2;
-    if ( fits_update_key(fptr, TFLOAT, "CRPIX2", &pix2_origin, "Reference point of pixel location axis 2", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "CRPIX2", &pix2_origin, (char*)"Reference point of pixel location axis 2", &status) ) return printerror( status );
 
     float ybinwidth = hSkyMap->GetYaxis()->GetBinWidth(1);
-    if ( fits_update_key(fptr, TFLOAT, "CDELT2", &ybinwidth, "Y degrees per pixel", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "CDELT2", &ybinwidth, (char*)"Y degrees per pixel", &status) ) return printerror( status );
 
 
   return true;
@@ -650,22 +650,22 @@ bool VFITS::writeFITSInfo( bool iPrint)
     int status = 0;
 
     char author[] = "VERITAS_Collaboration";
-    if ( fits_update_key(fptr, TSTRING, "AUTHOR", author, "Author", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, (char*)"AUTHOR", author, (char*)"Author", &status) ) return printerror( status );
 
     char name[] = "VERITAS";
-    if ( fits_update_key(fptr, TSTRING, "TELESCOP", name, "Telescope name", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, (char*)"TELESCOP", name, (char*)"Telescope name", &status) ) return printerror( status );
     char iTarget[600];
     sprintf( iTarget, "%s", fTarget_Name.c_str() );
-    if ( fits_update_key(fptr, TSTRING, "OBJECT", iTarget, "Name of the object", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, (char*)"OBJECT", iTarget, (char*)"Name of the object", &status) ) return printerror( status );
 
-    if ( fits_update_key(fptr, TFLOAT, "RA_OBJ", &fTarget_RAJ200, "RA (deg) of the object", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, (char*)"RA_OBJ", &fTarget_RAJ200, (char*)"RA (deg) of the object", &status) ) return printerror( status );
 
-    if ( fits_update_key(fptr, TFLOAT, "DEC_OBJ", &fTarget_DecJ2000, "Dec (deg) of the Object", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, (char*)"DEC_OBJ", &fTarget_DecJ2000, (char*)"Dec (deg) of the Object", &status) ) return printerror( status );
 
     float equinoxsys = 2000.;
-    if ( fits_update_key(fptr, TFLOAT, "EQUINOX",&equinoxsys , "Epoch of coordinate system", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, (char*)"EQUINOX",&equinoxsys , (char*)"Epoch of coordinate system", &status) ) return printerror( status );
 
-    if ( fits_update_key(fptr, TFLOAT, "EXPOSURE", &fTarget_Exposure, "Total exposure time in sec", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, (char*)"EXPOSURE", &fTarget_Exposure, (char*)"Total exposure time in sec", &status) ) return printerror( status );
 
 
     string str_temp;
@@ -676,7 +676,7 @@ bool VFITS::writeFITSInfo( bool iPrint)
     date = new char[str_temp.size()+1];
     strcpy(date, str_temp.c_str());
 
-    if ( fits_update_key(fptr, TSTRING, "DATE", date,  "FITS file creation date (yyyy-mm-dd)", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, (char*)"DATE", date,  (char*)"FITS file creation date (yyyy-mm-dd)", &status) ) return printerror( status );
     delete date;
 
     string str_temp2;
@@ -687,15 +687,15 @@ bool VFITS::writeFITSInfo( bool iPrint)
     time = new char[str_temp2.size()+1];
     strcpy(time, str_temp2.c_str());
 
-    if ( fits_update_key(fptr, TSTRING, "TIME", time,  "FITS file creation time (hh:mm:ss)", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, (char*)"TIME", time,  (char*)"FITS file creation time (hh:mm:ss)", &status) ) return printerror( status );
     delete time;
 
     char iCreator[100];
     sprintf(iCreator,"%s",fEVDversion.c_str());
-    if ( fits_update_key(fptr, TSTRING, "CREATOR", iCreator, "Software package and version creating file", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, (char*)"CREATOR", iCreator, (char*)"Software package and version creating file", &status) ) return printerror( status );
 
     char iVersion[] = "0.2";
-    if ( fits_update_key(fptr, TSTRING, "VERSION", iVersion, "VERITAS FITS standard version", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TSTRING, (char*)"VERSION", iVersion, (char*)"VERITAS FITS standard version", &status) ) return printerror( status );
 
     return true;
 }
