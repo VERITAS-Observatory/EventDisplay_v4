@@ -14,6 +14,8 @@ set MSCFIL=IIIIFIL
 # effective area file (output)
 set OFIL=TTTTFIL
 ###################################################################################
+# set the right observatory (environmental variables)
+source $EVNDISPSYS/setObservatory.tcsh CTA
 
 ###################################################################################
 # run effective area code

@@ -1261,7 +1261,7 @@ void VStereoAnalysis::setCuts( sRunPara iL, int irun )
 		fCuts->setTheta2Cut( iL.fSourceRadius );
 	}
 	else fCuts->resetCutValues();
-	fCuts->selectCuts( iL.fCutSelect, irun );
+	fCuts->initializeCuts( irun );
 	fCuts->printCutSummary();
 }
 

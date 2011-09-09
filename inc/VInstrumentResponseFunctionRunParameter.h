@@ -31,7 +31,8 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    unsigned int    fFillingMode;              // filling mode
 
    string          fCutFileName;
-   int             fCutSelector;
+   int             fGammaHadronCutSelector;
+   int             fDirectionCutSelector;
 
    unsigned int    fEnergyReconstructionMethod;
    unsigned int    fEnergyAxisBins_log10;
@@ -80,7 +81,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    bool                  readRunParameterFromTextFile( string iFile );
    bool                  testRunparameters();
 
-   ClassDef( VInstrumentResponseFunctionRunParameter, 2 );
+   ClassDef( VInstrumentResponseFunctionRunParameter, 3 );
 };
 
 #endif

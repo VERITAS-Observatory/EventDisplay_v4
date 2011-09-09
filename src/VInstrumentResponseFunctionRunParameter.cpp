@@ -24,7 +24,8 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fMCEnergy_index = 5.;
 
     fCutFileName = "";
-    fCutSelector = -1;
+    fGammaHadronCutSelector = -1;
+    fDirectionCutSelector = -1;
 
     fAzimuthBins = true;
     fIsotropicArrivalDirections = false;
@@ -136,10 +137,6 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
             else if( temp == "TELESCOPETYPECUTS" )
             {
                if( !is_stream.eof() ) is_stream >> fTelescopeTypeCuts;
-            }
-            else if( temp == "SHAPECUTINDEX" )
-            {
-                if( !is_stream.eof() ) is_stream >> fCutSelector;
             }
             else if( temp == "CUTFILE" )
             {
@@ -365,7 +362,13 @@ void VInstrumentResponseFunctionRunParameter::print()
     cout << endl;
     cout << "cuts: "; 
     cout << "  " << fCutFileName << endl;
-    cout << "  cut selector " << fCutSelector;
+    cout << "cut selectors: ";
+    if( fGammaHadronCutSelector >= 0 )
+    {
+       cout << "Gamma/Hadron " << fGammaHadronCutSelector;
+       cout << " Direction " << fDirectionCutSelector;
+    }
+    else cout << " (set later)";
     if( fIgnoreEnergyReconstructionQuality ) cout << ", ignoring cut on quality of energy reconstruction";
     if( fTelescopeTypeCuts ) cout << ", telescope type dependent cuts";
     cout << endl;

@@ -43,6 +43,8 @@ void VTMVAEvaluator::reset()
    setPlotEffiencyPlotsPerEnergy();
    setSensitivityOptimizationParameters();
    setTMVAFileParameters();
+// default: don't expect that the theta2 cut is performed here   
+   setTMVAThetaCutVariable( false );
 }
 
 /*
@@ -121,7 +123,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // number of energy bins
    unsigned int iNbin = iWeightFileIndex_max - iWeightFileIndex_min + 1;
 
-   cout << "VTMVAEvaluator::initializeWeightFiles: reading energies from file " << endl;
+   cout << "VTMVAEvaluator::initializeWeightFiles: reading energies from TMVA root files " << endl; 
 
 //////////////////////////////////////////////////////////////////////////////////////
 // read energy binning from root files
@@ -150,6 +152,13 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
        fTMVAMethodTag.push_back( hname );
        iF.Close();
    }
+   cout << "VTMVAEvaluator: energy binning: " << endl;
+   for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
+   {
+      cout << "\t" << i << "\t" << fEnergyCut_Log10TeV_min[i] << "\t" << fEnergyCut_Log10TeV_max[i];
+      cout << "\t(energy reconstruction method " << fEnergyReconstructionMethod[i] << ")" << endl;
+   }
+   cout << endl;
 
 //////////////////////////////////////////////////////////////////////////////////////
 // create and initialize TMVA readers
@@ -224,6 +233,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	 else if( iTrainingVariables[t] == "(Xoff*Xoff+Yoff*Yoff)" ) 
 	 {
 	    fTMVAReader.back()->AddVariable( "(Xoff*Xoff+Yoff*Yoff)", &fTheta2 ); 
+	    setTMVAThetaCutVariable( true );
          }
       }
       if( fDebug )
@@ -268,7 +278,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	    vector< Double_t > i_cuts_max;
 	    vector< string >   i_cuts_name;
 	    i_mcuts->GetCuts( fSignalEfficiency[i], i_cuts_min, i_cuts_max );
-	    cout << "Box cuts for a signal efficiency of " << fSignalEfficiency[i];
+	    cout << "Box cuts for a signal efficiency at " << fSignalEfficiency[i];
 	    if( i < fBackgroundEfficiency.size() && fBackgroundEfficiency[i] > 0. )
 	    {
 	       cout << " (background efficiency: " << fBackgroundEfficiency[i] << ")";
@@ -308,13 +318,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 
 // print some info to screen
    cout << "VTMVAEvaluator: Initialized " << fTMVAReader.size() << " MVA readers " << endl;
-   cout << "energy binning: " << endl;
-   for( unsigned int i = 0; i < fTMVAReader.size(); i++ )
-   {
-      cout << "\t" << i << "\t" << fEnergyCut_Log10TeV_min[i] << "\t" << fEnergyCut_Log10TeV_max[i];
-      cout << "\t(energy reconstruction method " << fEnergyReconstructionMethod[i] << ")" << endl;
-   }
-   cout << endl;
 
    return true;
 }
@@ -348,7 +351,7 @@ double VTMVAEvaluator::evaluate( double iSignalEfficiency, double iProbabilityTh
        else               fEChi2S_log10 = 0.;    // !!! not clear what the best value is
        fdES            = fData->dES;
        if( fTMVAIgnoreTheta2Cut ) fTheta2 = 1.e-30;
-       else                       fTheta2         = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
+       else                       fTheta2 = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
    }
    else return -1.;
 
@@ -438,6 +441,9 @@ bool VTMVAEvaluator::initializeDataStrutures( CData* iC )
 */
 double VTMVAEvaluator::getBoxCut_Theta2( double iEnergy_log10TeV )
 {
+// ignore when TMVA has no theta2 cut
+    if( !getTMVAThetaCutVariable() ) return -1.;
+
     if( fEnergyCut_Log10TeV_min.size() != fBoxCutValue_theta2.size() )
     {
        cout << "VTMVAEvaluator::getBoxCut_Theta2 error: theta2 and energy vector dimensions inconsistent: ";
@@ -474,6 +480,10 @@ double VTMVAEvaluator::getBoxCut_Theta2( double iEnergy_log10TeV )
 */
 TGraph* VTMVAEvaluator::getBoxCut_Theta2_Graph()
 {
+// ignore when TMVA has no theta2 cut
+    if( !getTMVAThetaCutVariable() ) return 0;
+
+// check consistency
    if( fEnergyCut_Log10TeV_min.size() != fBoxCutValue_theta2.size() )
    {
        cout << "VTMVAEvaluator::getBoxCut_Theta2_Graph: theta2 and energy vector dimensions inconsistent: ";
@@ -838,9 +848,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       i_SignalEfficiency_AtMaximum = effS->GetBinCenter( iHSignal_to_sqrtNoise->GetMaximumBin() );
       i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( iHSignal_to_sqrtNoise->GetMaximumBin() );
    }
-   cout << "===================================================" << endl;
+   cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum is ";
    cout << i_SignalEfficiency_AtMaximum << " with a significance of " << i_Signal_to_sqrtNoise_atMaximum << endl;
-   cout << "===================================================" << endl;
 
    if( iEnergyBin < fSignalEfficiency.size() )     fSignalEfficiency[iEnergyBin]     = i_SignalEfficiency_AtMaximum;
    if( iEnergyBin < fBackgroundEfficiency.size() ) fBackgroundEfficiency[iEnergyBin] = i_BackgroundEfficiency_AtMaximum;

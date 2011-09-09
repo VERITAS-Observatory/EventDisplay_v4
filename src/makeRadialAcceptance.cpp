@@ -30,7 +30,6 @@ string listfilename, cutfilename;
 string outfile = "acceptance.root";
 unsigned int ntel = 4;
 string datadir = "../eventdisplay/output";
-int fCutSelector = 0;
 
 int main( int argc, char *argv[] )
 {
@@ -87,7 +86,7 @@ int main( int argc, char *argv[] )
 // pointer to data tree
         fCuts->setDataTree( d );
 // set gamma/hadron cuts
-        fCuts->selectCuts( fCutSelector, fRunPara->fRunList[i].fRunOff, datadir );
+        fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
 
 // fill acceptance curves
         facc->fillAcceptanceFromData( d );
@@ -118,7 +117,7 @@ int parseOptions(int argc, char *argv[])
             {0,0,0,0}
         };
         int option_index=0;
-        int c=getopt_long(argc, argv, "ht:l:o:d:n:s:c:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ht:l:o:d:n:c:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
         switch(c)
@@ -139,7 +138,6 @@ int parseOptions(int argc, char *argv[])
                 cout << "-d --datadir [directory for input ROOT files]" << endl;
                 cout << "-n --ntel [number of telescopes, default=4]" << endl;
                 cout << "-o --outfile [output ROOT file name]" << endl;
-                cout << "-s --cut [select cuts (1=default, 2 = random forest]" << endl;
                 cout << endl;
 
                 exit(0);
@@ -158,10 +156,6 @@ int parseOptions(int argc, char *argv[])
                 break;
             case 'n':
                 ntel=(unsigned int)atoi(optarg);
-                break;
-            case 's':
-                fCutSelector = atoi( optarg );
-                cout << "Cut selector: " << fCutSelector << endl;
                 break;
             case 'c':
                 cutfilename=optarg;

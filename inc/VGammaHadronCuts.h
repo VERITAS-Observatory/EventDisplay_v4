@@ -28,7 +28,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // enum for efficiency counting of the different types of cuts
-enum EN_AnaCutsStats { eTot, eMC_XYoff, eXYoff, eStereoQuality, eArrayChi2, eNImages, eMSC_Quality, eErec, eCorePos, eLTrig, eSizeSecondMax, eTelType, eDirection, eIsGamma, eEnergyRec };
+enum EN_AnaCutsStats { eTot, eMC_XYoff, eXYoff, eStereoQuality, eArrayChi2, eNImages, eMSC_Quality, 
+                       eErec, eCorePos, eLTrig, eSizeSecondMax, eTelType, eDirection, eIsGamma, eEnergyRec };
 
 ////////////////////////////////////////////////////////////////////////////////
 /*
@@ -89,13 +90,15 @@ class VGammaHadronCuts : public VAnalysisUtilities
         string fDataDirectory;
 
 // cut selector
-        int fCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
+        int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
+	int fDirectionCutSelector;
 
 // array characteristics
         unsigned int fNTel;
         double       fArrayCentre_X;
         double       fArrayCentre_Y;
 
+// number of possible telescope combinations
         unsigned int fNLTrigs;
 
 // values calculated from shower/image parameter 
@@ -120,7 +123,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	double          fTMVAProbabilityThreshold;
 	string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
-	bool            fTMVAIgnoreTheta2Cut;
 	TGraph*         fTMVABoxCut_Theta2_max;                
 
 
@@ -133,6 +135,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fAngRes_ScalingFactor;
         double fAngRes_AbsoluteMinimum;
 	double fAngRes_AbsoluteMaximum;
+// energy dependent theta2 cuts from IRF file
 	TGraphErrors *fIRFAngRes;
 
         bool initAngularResolutionFile();
@@ -220,6 +223,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fArraySizeSecondMax_min;
         double fArraySizeSecondMax_max;
 
+        double fProbabilityCut;
         vector <double> fProbabilityCutRangeLower;
         vector <double> fProbabilityCutRangeUpper;
         	  
@@ -228,8 +232,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   bMCCuts;
         double fArrayxyoff_MC_min;
         double fArrayxyoff_MC_max;
-
-        double fProbabilityCut;
 
 
         VGammaHadronCuts();
@@ -255,12 +257,13 @@ class VGammaHadronCuts : public VAnalysisUtilities
 
         void   newEvent();
 
-
         TF1*   getAngularResolutionFunction() { return fF1AngRes; }
         double getAngularResolutionAbsoluteMinimum() { return fAngRes_AbsoluteMinimum; }
         double getAngularResolutionScaleFactor() { return fAngRes_ScalingFactor; }
         double getArrayCentre_X() { return fArrayCentre_X; }
         double getArrayCentre_Y() { return fArrayCentre_Y; }
+	int    getDirectionCutSelector() { return fDirectionCutSelector; }
+	int    getGammaHadronCutSelector() { return fGammaHadronCutSelector; }
         double getMeanDistance() { return fMeanDistance; }
         double getMeanLength() { return fMeanLength; }
         double getMeanWidth() { return fMeanWidth; }
@@ -273,11 +276,12 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	TGraph* getTheta2Cut_IRF_Max() { return fIRFAngRes; }
         void   printCutSummary();
         void   printCutStatistics() { if( fStats ) fStats->printCutStatistics(); }
+	void   printDirectionCuts();
         bool   readCuts(string i_cutfilename);
         bool   readCuts(string i_cutfilename, bool iPrint );
         bool   readCuts(string i_cutfilename, int iPrint );
         void   resetCutValues();
-        void   selectCuts( int iC, int irun, string iDir = "" );
+        void   initializeCuts( int irun, string iDir = "" );
         void   setArrayCentre( double iX = 0., double iY = 0. ) { fArrayCentre_X = iX; fArrayCentre_Y = iY; }
         void   setDataDirectory( string id ) { fDataDirectory = id; }
         bool   setDataTree( CData* idata );
@@ -287,6 +291,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
 
-        ClassDef(VGammaHadronCuts,17);
+        ClassDef(VGammaHadronCuts,20);
 };
 #endif

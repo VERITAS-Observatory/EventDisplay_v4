@@ -46,7 +46,6 @@ sRunPara::sRunPara()
     fNTel = 4;
     fMaxTelID = fNTel;
 
-    fCutSelect = 0;
     fBackgroundModel = 0;
     fSourceRadius = 0.;                           // actually radius^2
     fmaxradius = 0.;                              // maximum accepted distance from camera center [deg]
@@ -522,9 +521,9 @@ int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bo
                 is_stream >> temp;
                 i_sT.fNTel = (unsigned int)atoi( temp.c_str() );
             }
-// cut selector
+// cut selector (now in cut file)
             is_stream >> temp;
-            i_sT.fCutSelect = atoi(temp.c_str());
+// cut file
             is_stream >> temp;
             i_sT.fCutFile = temp;
 // source radius (actually (source radius)^2 )
@@ -811,7 +810,6 @@ void VAnaSumRunParameter::reset( sRunPara it )
     it.fNTel = 4;
     it.fMaxTelID = it.fNTel;
     it.fTelToAnalyze.clear();
-    it.fCutSelect = 0;
     it.fBackgroundModel = 0;
     it.fSourceRadius = 0.;
     it.fmaxradius = 0.;

@@ -121,7 +121,9 @@ int main( int argc, char *argv[] )
 // read and initialize cuts
     fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
     if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) ) exit( -1 );
-    fCuts->selectCuts( fRunPara->fCutSelector, -1, fRunPara->fGammaHadronProbabilityFile );
+    fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();
+    fRunPara->fDirectionCutSelector   = fCuts->getDirectionCutSelector();
+    fCuts->initializeCuts( -1, fRunPara->fGammaHadronProbabilityFile );
     fCuts->printCutSummary();
 
 /////////////////////////////////////////////////////////////////////////////

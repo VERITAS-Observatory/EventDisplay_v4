@@ -26,7 +26,7 @@ then
    echo "     reconstruction ID from array reconstruction"
    echo
    echo "<particle>"
-   echo "     gamma_onSource / gamma_cone10 / electron / proton / helium "
+   echo "     gamma_onSource / gamma_cone10 / electron / proton / proton_onSource / helium "
    echo
    echo "<input>"
    echo "     msc      use mscw files as input (slow, but necessary at least once)"
@@ -65,7 +65,7 @@ then
 fi
 
 # check particle type
-if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] && [ $PART != "helium" ]
+if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ]
 then
    echo "unknown particle type: " $PART
    exit
@@ -122,6 +122,7 @@ then
    ISOTROPY="0"
    AZBINS="0"
    TELTYPECUTS="1"
+   DIRECTIONCUT="2"
 fi
 # isotropic gamma-rays: analyse in rings in camera distance
 if [ $PART = "gamma_cone10" ]
@@ -137,6 +138,7 @@ then
    ISOTROPY="0"
    AZBINS="0"
    TELTYPECUTS="1"
+   DIRECTIONCUT="2"
 fi
 if [ $PART = "electron" ]
 then
@@ -151,8 +153,9 @@ then
    ISOTROPY="1"
    AZBINS="0"
    TELTYPECUTS="1"
+   DIRECTIONCUT="0"
 fi
-if [ $PART = "proton" ]
+if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
 then
    MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
@@ -160,11 +163,18 @@ then
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
-   THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
-   THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+   if [ $PART = "proton" ] 
+   then
+      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
+      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+   else
+      THETA2MIN=( 0. )
+      THETA2MAX=( 1. )
+   fi
    ISOTROPY="1"
    AZBINS="0"
    TELTYPECUTS="1"
+   DIRECTIONCUT="0"
 fi
 if [ $PART = "helium" ]
 then
@@ -179,6 +189,7 @@ then
    ISOTROPY="1"
    AZBINS="0"
    TELTYPECUTS="1"
+   DIRECTIONCUT="0"
 fi
 NOFF=${#OFFMIN[@]}
 NTH2=${#THETA2MIN[@]}
@@ -199,7 +210,7 @@ do
 
 ###############################################################################
 # theta2 cut of protons and electron should match the rings from the isotropic gammas
-      if [ $PART = "proton" ] || [ $PART = "electron" ] || [ $PART = "helium" ]
+      if [ $PART = "proton" ] || [ $PART = "proton_onSource" ] || [ $PART = "electron" ] || [ $PART = "helium" ]
       then
          jMIN=$(echo "$jMIN*$jMIN" | bc -l )
          jMAX=$(echo "$jMAX*$jMAX" | bc -l )
@@ -219,7 +230,8 @@ do
       rm -f $iCFIL-b
       sed -e "s|THETA2MAX|$jMAX|" $iCFIL-c > $iCFIL-d
       rm -f $iCFIL-c
-      mv -f $iCFIL-d $iCFIL
+      sed -e "s|DIRECTIONCUT|$DIRECTIONCUT|" $iCFIL-d > $iCFIL-e
+      mv -f $iCFIL-e $iCFIL
       echo $iCFIL
 
 ###############################################################################
@@ -251,7 +263,7 @@ do
 # do fill analysis (a 1 would mean that MC histograms would be filled only)
       echo "* FILLMONTECARLOHISTOS 0" >> $MSCF
 # spectral index
-      if [ $PART = "proton" ] 
+      if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.6 0.1" >> $MSCF
       fi
@@ -267,11 +279,6 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
-
-# shape cut index 0: std MSC/MSCL cuts
-#      echo "* SHAPECUTINDEX 0" >> $MSCF
-# shape cut index 42: TMVA cuts
-      echo "* SHAPECUTINDEX 42" >> $MSCF
       echo "* CUTFILE $iCFIL" >> $MSCF
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
       if [ $INPU = "msc" ]

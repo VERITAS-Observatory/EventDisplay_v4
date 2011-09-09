@@ -52,6 +52,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    double                  fOptmizationSourceStrengthCrabUnits; 
 
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
+   bool     fTMVAThetaCutVariableSet;       // check if TMVA provides a theta2 cut variable
 
    string   fTMVAMethodName;
    unsigned int fTMVAMethodCounter;
@@ -102,6 +103,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    TGraph* getBoxCut_Theta2_Graph();
    vector< double > getBoxCut_Theta2() { return fBoxCutValue_theta2; }
    unsigned int getSpectralWeightedEnergyBin();
+   bool   getTMVAThetaCutVariable() { return fTMVAThetaCutVariableSet; }
    bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
    bool   initializeDataStrutures( CData* iC );
    bool   IsZombie() { return fIsZombie; }
@@ -115,6 +117,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setPlotEffiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iE = 0.5 );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
+   void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAFileParameters( string iMethodName = "Method_Cuts", unsigned int iMethodCounter = 0 ) { fTMVAMethodName = iMethodName; fTMVAMethodCounter = iMethodCounter; }
 
    ClassDef(VTMVAEvaluator, 3 );

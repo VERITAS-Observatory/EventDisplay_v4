@@ -79,7 +79,6 @@ class sRunPara
         unsigned int fMaxTelID;
         vector< unsigned int > fTelToAnalyze;
 
-        int fCutSelect;
         int fBackgroundModel;
         double fSourceRadius;                     // actually radius^2
         double fmaxradius;                        // maximum accepted distance from camera center [deg]
