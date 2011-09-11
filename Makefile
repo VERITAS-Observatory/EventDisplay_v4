@@ -162,6 +162,7 @@ ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
 CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
 
 ########################################################
@@ -838,7 +839,7 @@ $(distdir):	FORCEDISTDIR
 	cp README/INSTALL $(distdir)/README
 	cp README/AUTHORS $(distdir)/README
 	mkdir -p $(distdir)/src
-	cp src/*.cpp src/*.C $(distdir)/src
+	cp src/*.cpp src/*.C src/*.c $(distdir)/src
 	mkdir -p $(distdir)/inc
 	cp inc/*.h $(distdir)/inc
 	mkdir -p $(distdir)/macros
