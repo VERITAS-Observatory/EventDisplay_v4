@@ -2535,9 +2535,8 @@ TCanvas* VPlotAnasumHistograms::plot_on( bool iCorrelated, double rmax )
  *  plot_all_maps
  *
  */
-void VPlotAnasumHistograms::plot_all_maps( char *ihis, double rmax, double zmin, double zmax, double rSource, int iN )
+void VPlotAnasumHistograms::plot_all_maps( string ihis, double rmax, double zmin, double zmax, double rSource, int iN )
 {
-
     fPlotMode = "colz";
 
     VFun_gauss *ffun_gauss = new VFun_gauss(); 
@@ -2562,33 +2561,33 @@ void VPlotAnasumHistograms::plot_all_maps( char *ihis, double rmax, double zmin,
     char hname[200];
     char htitle[200];
 // define canvas
-    sprintf( hname, "cAllMaps_%s", ihis );
-    sprintf( htitle, "all maps (%s)", ihis );
+    sprintf( hname, "cAllMaps_%s", ihis.c_str() );
+    sprintf( htitle, "all maps (%s)", ihis.c_str() );
     TCanvas *allMaps = new TCanvas( hname, htitle, 10, 10, 800, 800 );
     allMaps->Divide( nx, ny );
     allMaps->Draw();
 
-    sprintf( hname, "cAllDist_%s", ihis );
-    sprintf( htitle, "all distributions (%s)", ihis );
+    sprintf( hname, "cAllDist_%s", ihis.c_str() );
+    sprintf( htitle, "all distributions (%s)", ihis.c_str() );
     TCanvas *allDist = new TCanvas( hname, htitle, 810, 10, 800, 800 );
     allDist->Divide( nx, ny );
     allDist->Draw();
     gStyle->SetOptFit( 1111 );
 
-    sprintf( hname, "callFit_%s", ihis );
-    sprintf( htitle, "distribution ratio (%s)", ihis );
+    sprintf( hname, "callFit_%s", ihis.c_str() );
+    sprintf( htitle, "distribution ratio (%s)", ihis.c_str() );
     TCanvas *allFit = new TCanvas( hname, htitle, 810, 10, 800, 800 );
     allFit->Divide( nx, ny );
     allFit->Draw();
 
 // distribution of fit parameters
-    sprintf( hname, "hFit_mean_%s", ihis );
+    sprintf( hname, "hFit_mean_%s", ihis.c_str() );
     TH1D *hFit_mean = new TH1D( hname, "", 100, -0.5, 0.5 );
     hFit_mean->SetXTitle( "mean" );
     hFit_mean->SetYTitle( "# of runs" );
     setHistogramPlottingStyle( hFit_mean, 1, 2, 1 );
 
-    sprintf( hname, "hFit_width_%s", ihis );
+    sprintf( hname, "hFit_width_%s", ihis.c_str() );
     TH1D *hFit_width = new TH1D( hname, "", 100, 0., 2. );
     hFit_width->SetXTitle( "width" );
     hFit_width->SetYTitle( "# of runs" );
@@ -2610,7 +2609,7 @@ void VPlotAnasumHistograms::plot_all_maps( char *ihis, double rmax, double zmin,
 
         cout << "now at run " << c->runOn << endl;
  
-        TH2D *h = (TH2D*)getHistogram(ihis, c->runOn,"skyHistograms");	
+        TH2D *h = (TH2D*)getHistogram(ihis.c_str(), c->runOn,"skyHistograms");	
         h->SetStats( 0 );
         setHistogramPlottingStyle( h, 1.5 );
         if( zmax > -90. ) h->SetMaximum( zmax );
@@ -2704,8 +2703,8 @@ void VPlotAnasumHistograms::plot_all_maps( char *ihis, double rmax, double zmin,
 	   gPad->Update(); 
         }
     }
-    sprintf( hname, "cFit_mean_%s", ihis );
-    sprintf( htitle, "mean value of fit (%s)", ihis );
+    sprintf( hname, "cFit_mean_%s", ihis.c_str() );
+    sprintf( htitle, "mean value of fit (%s)", ihis.c_str() );
     TCanvas *cFit_mean = new TCanvas( hname, htitle, 10, 10, 400, 400 );
     cFit_mean->SetGridx( 0 );
     cFit_mean->SetGridy( 0 );
@@ -2713,8 +2712,8 @@ void VPlotAnasumHistograms::plot_all_maps( char *ihis, double rmax, double zmin,
 
     hFit_mean->Draw();
 
-    sprintf( hname, "cFit_width_%s", ihis );
-    sprintf( htitle, "width value of fit (%s)", ihis );
+    sprintf( hname, "cFit_width_%s", ihis.c_str() );
+    sprintf( htitle, "width value of fit (%s)", ihis.c_str() );
     TCanvas *cFit_width = new TCanvas( hname, htitle, 410, 10, 400, 400 );
     cFit_width->SetGridx( 0 );
     cFit_width->SetGridy( 0 );

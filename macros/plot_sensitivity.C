@@ -22,7 +22,10 @@ using namespace std;
 void getPlottingData( bool bIntegral, string bUnit );
 void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIntegral,
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
-		      string iFluxUnit, unsigned int iCrabSpec_ID )
+		      string iFluxUnit, unsigned int iCrabSpec_ID );
+
+void plotDebugComparisionPlots( string iFile, int iColor, double iObservationTime_hours );
+
 /*
 
 */
@@ -116,9 +119,6 @@ void getPlottingData( bool bIntegral, string bUnit )
        fPD.fPlotting_flux_min_PFLUX = 2.e-15;
        fPD.fPlotting_flux_max_PFLUX = 8.e-09;
       
-//        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_s4-2-120_DiffSens_CU.txt" );
-//        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA s4-2-120 (web)" );
-
        fPD.bSet = true;
     }
 ////////////////////
@@ -131,20 +131,17 @@ void getPlottingData( bool bIntegral, string bUnit )
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_LOI_2009_PFLUX.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA_LOI" );
 
-//        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_s4-2-120_DiffSens_CU.txt" );
-//        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA s4-2-120 (web)" );
-
        fPD.bSet = true;
     }
     else if( !bIntegral && bUnit == "CU" )
     {
+        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
+        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
 
-//        //fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_37Tel_120m_5degFOV_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
-//        //fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA_37Tel_120m_5degFOV" );
-       
-//        //fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_s4-2-120_DiffSens_CU.txt" );
-//        //fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA s4-2-120 (web)" );
-
+        fPD.bSet = true;
+    }
+    else if( !bIntegral && bUnit == "ENERGY" )
+    {
         fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
         fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
 
@@ -230,7 +227,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
     a.setEnergySpectrumfromLiterature_ID( iCrabSpec_ID );
 
 // lots of debug output
-//    a.setDebug( true );
+    a.setDebug( false );
 
 //////////////////////////////////////////////////////////////////
 // plot sensitivity canvas
@@ -273,7 +270,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        char hname[600];
        sprintf( hname, "plotDebug_%d", bIntegral );
        b.setPlotDebug( hname );
-       b.setWriteParticleNumberFile( "particleNumbers.root" );
+//       b.setWriteParticleNumberFile( "particleNumbers.root" );
 // energy range to be plotted
        b.setEnergyRange_Lin( 0.01, 150. );
 
@@ -424,7 +421,7 @@ void plotDifferentialSensitivityRatioCTA( string iFluxUnit = "PFLUX", char *iMC_
   getPlottingData( bIntegral, iFluxUnit );
   if( !fPD.bSet )
     {
-      cout << "plotSensitivity error: no plotting datat set for " << iFluxUnit << "\t" << bIntegral << endl;
+      cout << "plotSensitivity error: no plotting data set for " << iFluxUnit << "\t" << bIntegral << endl;
       return;
     }
 
@@ -905,7 +902,57 @@ void plotSensitivityRatio( string iFluxUnit = "PFLUX",
       iL->AddEntry( g, fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles[i].c_str(), "L" ); 
     }
   iL->Draw(); 
+}
 
 
+/*
 
+   plot some debug plots for comparision
+
+*/
+void plotDebugComparisionPlots( string iFileName, int iColor, double iObservationTime_hours )
+{
+   TH1F *hGammaEffArea = 0;
+   TH1F *hBGRate = 0;
+   TH1F *hDiffSens = 0;
+   TCanvas *c = 0;
+
+   TFile *iFile = new TFile( iFileName.c_str() );
+   if( iFile->IsZombie() ) return;
+
+   hGammaEffArea = (TH1F*)iFile->Get( "EffectiveArea" );
+   hBGRate       = (TH1F*)iFile->Get( "BGRate" );
+   hDiffSens     = (TH1F*)iFile->Get( "DiffSens" );
+
+// effective area canvas
+   c = (TCanvas*)gROOT->GetListOfCanvases()->FindObject( "plotDebug_0_1" );
+   if( c && hGammaEffArea )
+   {
+      c->cd();
+      hGammaEffArea->SetLineWidth( 2 );
+      hGammaEffArea->SetLineColor( iColor );
+      hGammaEffArea->Draw( "same" );
+   }
+
+// background rates
+   c = (TCanvas*)gROOT->GetListOfCanvases()->FindObject( "plotDebug_0_0" );
+   if( c && hBGRate )
+   {
+      c->cd();
+      hBGRate->Scale( 60. * iObservationTime_hours );
+      hBGRate->SetLineWidth( 2 );
+      hBGRate->SetLineColor( iColor );
+      hBGRate->Draw( "same" );
+   }
+
+// sensitivity
+// (NEED TO CHECK UNIT OF DIFF FLUX HERE!!)
+   c = (TCanvas*)gROOT->GetListOfCanvases()->FindObject( "iCanvas" );
+   if( c && hDiffSens )
+   {
+      c->cd();
+      hDiffSens->SetLineWidth( 2 );
+      hDiffSens->SetLineColor( iColor );
+      hDiffSens->Draw( "same" );
+   }
 }

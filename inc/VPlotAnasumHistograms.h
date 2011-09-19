@@ -110,7 +110,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    TCanvas*        plot_skyPlots( string iPlotMode = "colz", bool iSingleCanvases = false );
    TCanvas*        plot_significance( bool iCorrelated = false, double rmax = 0., double zmin = -100., double zmax = -100., bool bPoster = false );
    TCanvas*        plot_on(bool iCorrelated = false, double rmax = -1.);
-   void            plot_all_maps(char *ihis = "hmap_stereo_sig", double rmax = -1., double zmin = -100., double zmax = -100., double rSource = 0.4, int iN = -1 );
+   void            plot_all_maps( string ihis = "hmap_stereo_sig", double rmax = -1., double zmin = -100., double zmax = -100., double rSource = 0.4, int iN = -1 );
    void            plot_significanceDistributions( double rmax = 1.2, double rSource = 0.4, double xmin = -6.5, double xmax = 10., TCanvas *c = 0 );
    TCanvas*        plot_radec( int sPlot = 0, double rmax = -3., double zmin = -5., double zmax = -1000.,
                                double xcenter = 0., double ycenter = 0.,

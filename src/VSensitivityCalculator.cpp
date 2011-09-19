@@ -26,13 +26,13 @@ a.list_sensitivity( 0 );
 
 VSensitivityCalculator a;
 // read Crab spectrum and plot integral sensitivity in Crab Unit (CU)
-// (replace "CU" by "PFLUX" for particle flux [1/m2/s] or energy flux "ENERG' [erg/cm2/s])
+// (replace "CU" by "PFLUX" for particle flux [1/m2/s] or energy flux "ENERGY' [erg/cm2/s])
 TCanvas *c = a.plotIntegralSensitivityvsEnergyFromCrabSpectrum(0, "myCrabFile.root", 1, "CU" )
 // plot a sensitivity curve from literature on top of it
 a.plotSensitivityvsEnergyFromTextTFile( c, "SensitivityFromTextFile_CU", 2, 2, 2, "CU" );
 
 // plot differential sensitivity (4 bins per decade)
-a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( 0, "myCrabFile.root", 1, "ENERG", 0.25 );
+a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( 0, "myCrabFile.root", 1, "ENERGY", 0.25 );
 
 ## plot integral and  differential sensitivity vs energy using MC
 
@@ -378,9 +378,9 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
        {
 	  sprintf( hname, "6.0e-10*TMath::Power( x/0.3, -2.31 - 0.26*log10( x/0.3 ) )" );
        }
-       if( bUnit == "PFLUX" )      sprintf( hname, "%s", hname );
-       else if( bUnit == "ENERG" ) sprintf( hname, "%s * 1.e12 * x * x * %f", hname, fConstant_Flux_To_Ergs );
-       else                        sprintf( hname, "%f", 1. );
+       if( bUnit == "PFLUX" )       sprintf( hname, "%s", hname );
+       else if( bUnit == "ENERGY" ) sprintf( hname, "%s * 1.e12 * x * x * %f", hname, fConstant_Flux_To_Ergs );
+       else                         sprintf( hname, "%f", 1. );
        i_fFunCrabFlux = new TF1( "i_fFunCrabFlux" , hname, TMath::Power( 10., fEnergy_min_Log ), 10000. );
     }
 // use spectrum from text file
@@ -393,6 +393,10 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
        else if( bUnit == "CU" )
        {
           i_fFunCrabFlux = new TF1( "i_fFunCrabFlux" , "1.", TMath::Power( 10., fEnergy_min_Log ), 10000. );
+       }
+       else if( bUnit == "ENERGY" )
+       {
+
        }
     }
     if( !i_fFunCrabFlux )
@@ -501,11 +505,27 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 
 // get vector with integral and differential Crab-like spectra for different flux levels
 // (use Whipple spectrum)
-// (GM: don't understand why  (dE_Log10 > 10.), shouldn't it  (dE_Log10 > 0.)??)
     TGraph* i_fFunCrabFlux = 0;
     if( bUnit != "CU" && (dE_Log10 > 10.) )      i_fFunCrabFlux = getCrabSpectrum( true, bUnit, true );
     else if( bUnit != "CU" && (dE_Log10 < 10.) ) i_fFunCrabFlux = getCrabSpectrum( true, "PFLUX", true );
     else                                         i_fFunCrabFlux = getCrabSpectrum( (dE_Log10 < 10.), bUnit, true );
+//    if( bUnit == "CU" ) i_fFunCrabFlux = getCrabSpectrum( true, bUnit, true );
+//    else                i_fFunCrabFlux = getCrabSpectrum( true, "PFLUX", true );
+/*    if( bUnit != "CU" && (dE_Log10 > 10.) )
+    {
+       i_fFunCrabFlux = getCrabSpectrum( true, bUnit, true );
+       cout << "A" << endl;
+    }
+    else if( bUnit != "CU" && (dE_Log10 < 10.) )
+    {
+       i_fFunCrabFlux = getCrabSpectrum( true, "PFLUX", true );
+       cout << "B" << endl;
+    }
+    else
+    {
+       i_fFunCrabFlux = getCrabSpectrum( (dE_Log10 < 10.), bUnit, true );
+       cout << "C" << endl;
+    } */
     if( !i_fFunCrabFlux )
     {
        cout << "VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum: error: no reference spectrum found " << endl;
@@ -590,9 +610,11 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 
 // fill sensitivity graphs
 	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
-        if( i_fFunCrabFlux != 0 && s > 0. && fDifferentialFlux[i].Energy > iEnergyMin_TeV_lin && fDifferentialFlux[i].Energy < iEnergyMax_TeV_lin && noff > fBackgroundEvents_min )
+        if(    i_fFunCrabFlux != 0 && s > 0.
+	    && fDifferentialFlux[i].Energy > iEnergyMin_TeV_lin && fDifferentialFlux[i].Energy < iEnergyMax_TeV_lin
+	    && noff > fBackgroundEvents_min )
         {
-            energy = TMath::Log10( fDifferentialFlux[i].Energy );
+//            energy = TMath::Log10( fDifferentialFlux[i].Energy );
             energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
 // integral sensitivity
             if( dE_Log10 < 0. )
@@ -614,11 +636,15 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 		{
                     gSensitivityvsEnergy->SetPoint( z, energy, s );
 		    gSensitivityvsEnergy->SetPointEYhigh( z, TMath::Abs( s - s_error_U ) );
-		    gSensitivityvsEnergy->SetPointEYlow( z, TMath::Abs( s - s_error_L ) );
+		    gSensitivityvsEnergy->SetPointEYlow(  z, TMath::Abs( s - s_error_L ) );
                 }
-                else if( bUnit == "ENERG" )
+                else if( bUnit == "ENERGY" )
                 {
-                    gSensitivityvsEnergy->SetPoint( z, energy, ( f1 - f2 ) * s / fDifferentialFlux[i].dE * fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean * 1.e12 * fConstant_Flux_To_Ergs );
+                    gSensitivityvsEnergy->SetPoint( z, energy,
+		                                    ( f1 - f2 ) * s / fDifferentialFlux[i].dE * 
+						    fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *
+						    1.e12 * fConstant_Flux_To_Ergs );
+    cout << "XXX " << ( f1 - f2 ) * s / fDifferentialFlux[i].dE * fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *  1.e12 * fConstant_Flux_To_Ergs << "\t" << f1 << "\t" << f2 << endl;
                 }
 		else
 		{
@@ -642,7 +668,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 	     cout << "\t NOFF: " << noff << "(" << noff_error << ")\t";
 	     cout << fDifferentialFlux[i].ObsTime << " [s]\t" << scientific;
 	     if( bUnit == "PFLUX" )       cout <<  i_fFunCrabFlux->Eval( energy ) * s << " [cm^-2s^-1] (" << energy << ")";
-	     else if( bUnit == "ENERG" )  cout <<  i_fFunCrabFlux->Eval( energy ) * s << " [erg cm^-2s^-1]";
+	     else if( bUnit == "ENERGY" ) cout <<  i_fFunCrabFlux->Eval( energy ) * s << " [erg cm^-2s^-1]";
              cout << endl;
         }
     }
@@ -709,7 +735,7 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 	     hnull->SetMaximum( fPlot_flux_PFLUX_max );
 	     hnull->SetMinimum( fPlot_flux_PFLUX_min );
 	 }
-	 else if( bUnit == "ENERG" )
+	 else if( bUnit == "ENERGY" )
 	 {
 	     hnull->SetYTitle( "E_{t} x Integral Flux Sensitivity (E>E_{t}) [erg cm^{-2} s^{-1}]" );
 	     hnull->SetMaximum( fPlot_flux_ENERG_max );
@@ -733,7 +759,7 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 	     hnull->SetMaximum( fPlot_flux_PFLUX_max );
 	     hnull->SetMinimum( fPlot_flux_PFLUX_min );
 	 }
-	 else if( bUnit == "ENERG" )
+	 else if( bUnit == "ENERGY" )
 	 {
 	     hnull->SetYTitle( "E^{2} x Flux Sensitivity [erg cm^{-2} s^{-1}]" );
 	     hnull->SetMaximum( fPlot_flux_ENERG_max );
@@ -755,18 +781,21 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 
      for( unsigned int i = 0; i < fPlottingCrabFlux_CU.size(); i++ )
      {
-	 i_fFunCrabFlux[i]->Draw( "l" );
-
-	 if( bUnit != "CU" )
+	 if( i < i_fFunCrabFlux.size() && i_fFunCrabFlux[i] )
 	 {
-	     if( fPlottingCrabFlux_CU[i]*100. >=1. )         sprintf( htitle, "%d%% Crab", (int)(fPlottingCrabFlux_CU[i]*100) );
-	     else if( fPlottingCrabFlux_CU[i]*100. > 0.09 )  sprintf( htitle, "%.1f%% Crab", fPlottingCrabFlux_CU[i]*100 );
-	     else if( fPlottingCrabFlux_CU[i]*100. > 0.009 ) sprintf( htitle, "%.2f%% Crab", fPlottingCrabFlux_CU[i]*100 );
-	     double e = 1. - 0.3 * (double)i;
-	     TText *iT = new TText( e, i_fFunCrabFlux[i]->Eval( e ) * 1.1, htitle );
-	     iT->SetTextSize( 0.3 * iT->GetTextSize() );
-	     iT->Draw();
-	 }
+	    i_fFunCrabFlux[i]->Draw( "l" );
+
+	    if( bUnit != "CU" )
+	    {
+		if( fPlottingCrabFlux_CU[i]*100. >=1. )         sprintf( htitle, "%d%% Crab", (int)(fPlottingCrabFlux_CU[i]*100) );
+		else if( fPlottingCrabFlux_CU[i]*100. > 0.09 )  sprintf( htitle, "%.1f%% Crab", fPlottingCrabFlux_CU[i]*100 );
+		else if( fPlottingCrabFlux_CU[i]*100. > 0.009 ) sprintf( htitle, "%.2f%% Crab", fPlottingCrabFlux_CU[i]*100 );
+		double e = 1. - 0.3 * (double)i;
+		TText *iT = new TText( e, i_fFunCrabFlux[i]->Eval( e ) * 1.1, htitle );
+		iT->SetTextSize( 0.3 * iT->GetTextSize() );
+		iT->Draw();
+	    }
+         }
      }
      iCanvas->Update();
 
@@ -812,8 +841,8 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas *
 
 // check what units the data is in
     string i_fileUnit = "PFLUX";
-    if( iTextFile.find( "ENERG" ) < iTextFile.size() )   i_fileUnit = "ENERG";
-    else if( iTextFile.find( "CU" ) < iTextFile.size() ) i_fileUnit = "CU";
+    if( iTextFile.find( "ENERGY" ) < iTextFile.size() )   i_fileUnit = "ENERGY";
+    else if( iTextFile.find( "CU" ) < iTextFile.size() )  i_fileUnit = "CU";
 
 // convert energy to log10( energy )
     double i_Energy = 0.;
@@ -822,7 +851,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas *
     {
         g->GetPoint( i, i_Energy, i_fluxSensitivity );
 // convert flux
-        if( bUnit == "ENERG" && i_fileUnit != "ENERG" ) i_fluxSensitivity *= i_Energy * 1.e12 * fConstant_Flux_To_Ergs;
+        if( bUnit == "ENERGY" && i_fileUnit != "ENERGY" ) i_fluxSensitivity *= i_Energy * 1.e12 * fConstant_Flux_To_Ergs;
         i_Energy = log10( i_Energy );
         g->SetPoint( i, i_Energy, i_fluxSensitivity );
     }
@@ -1047,7 +1076,7 @@ void VSensitivityCalculator::setSourceStrengthVector_CU()
 
 bool VSensitivityCalculator::checkUnits( string bUnit )
 {
-    if( bUnit != "CU" && bUnit != "PFLUX" && bUnit != "ENERG" ) return false;
+    if( bUnit != "CU" && bUnit != "PFLUX" && bUnit != "ENERGY" ) return false;
 
     return true;
 }
@@ -1095,6 +1124,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     VEnergySpectrumfromLiterature i_Crab( fMC_Data[1]->fSpectralParameterFile );
     cout << "\t reading Crab Nebula spectrum with ID" <<  fMC_Data[1]->fSpectralParameterID << endl;
     if( i_Crab.isZombie() ) return a;
+    i_Crab.listValues( fMC_Data[1]->fSpectralParameterID );
 
 ///////////////////////////////////////////////////////////////////
 // get effective areas for gamma-rays and background
@@ -1287,6 +1317,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
       VEnergySpectrumfromLiterature i_CR( (*i_MCData_iterator).second->fSpectralParameterFile );
       cout << "\t reading CR spectrum with ID" <<  (*i_MCData_iterator).second->fSpectralParameterID << endl;
       if( i_CR.isZombie() ) return a;
+      i_CR.listValues( (*i_MCData_iterator).second->fSpectralParameterID );
 
 // get CR rate for a certain ze, az, noise, wobble offset
        for( unsigned int i = 0; i < v_flux.size(); i++ )
@@ -1301,8 +1332,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
        {
            if( iEnergyScaleOffset[(*i_MCData_iterator).first] + (int)v_flux[i].Energy_lowEdge_bin >= 0 && iEnergyScaleOffset[(*i_MCData_iterator).first] + (int)v_flux[i].Energy_lowEdge_bin < (int)(*i_MCData_iterator).second->energy.size() )
            {
-            v_flux_NOff[(*i_MCData_iterator).first][i]       = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin + iEnergyScaleOffset[(*i_MCData_iterator).first], v_flux[i].Energy_upEdge_bin + iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second );
-            v_flux_NOff_error[(*i_MCData_iterator).first][i] = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin + iEnergyScaleOffset[(*i_MCData_iterator).first], v_flux[i].Energy_upEdge_bin + iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second, true );
+            v_flux_NOff[(*i_MCData_iterator).first][i]       =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin 
+	                                                        + iEnergyScaleOffset[(*i_MCData_iterator).first], v_flux[i].Energy_upEdge_bin
+								+ iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second );
+            v_flux_NOff_error[(*i_MCData_iterator).first][i] =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin
+	                                                        + iEnergyScaleOffset[(*i_MCData_iterator).first], v_flux[i].Energy_upEdge_bin
+								+ iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second, true );
            }
 	   else continue;
 
@@ -1652,7 +1687,11 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 // (note that lower cut on theta2 is not a function of energy)
        iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV = new TGraph( 1000 );
 
-       if( fDebug && iCuts->getTheta2Cut_TMVA_max() ) iCuts->getTheta2Cut_TMVA_max()->Print();
+//       if( fDebug && iCuts->getTheta2Cut_TMVA_max() )
+       if( iCuts->getTheta2Cut_TMVA_max() )
+       {
+          iCuts->getTheta2Cut_TMVA_max()->Print();
+       }
 
        double e = 0.;
        double iSolidAngle = 0.;
@@ -1673,7 +1712,6 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	     cout << "Error: no theta2 cut given " << endl;
 	     return false;
           }
-
 	  iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV->SetPoint( i, e, iSolidAngle );
        }
     }
@@ -1748,7 +1786,7 @@ void VSensitivityCalculator::prepareDebugPlots()
     for( unsigned int i = 0; i < iCanvasTitle.size(); i++ )
     {
        sprintf( hname, "%s_%d", fPlotDebugName.c_str(), i ); 
-       cPlotDebug.push_back( new TCanvas( hname, iCanvasTitle[i].c_str(), 200+i*200, 200, 300, 300 ) );
+       cPlotDebug.push_back( new TCanvas( hname, iCanvasTitle[i].c_str(), 20+i*350, 650, 300, 300 ) );
 
        cPlotDebug.back()->SetGridx( 0 );
        cPlotDebug.back()->SetGridy( 0 );
@@ -1772,7 +1810,7 @@ void VSensitivityCalculator::plotEffectiveArea()
     for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
     {
        g.push_back( new TGraphErrors( 1 ) );
-       g.back()->SetMinimum( 0.5 );
+       g.back()->SetMinimum( 0.1 );
        g.back()->SetMaximum( 5.e6 );
        setGraphPlottingStyle( g.back(), z+1, 1, 20+z, 2 );
 
