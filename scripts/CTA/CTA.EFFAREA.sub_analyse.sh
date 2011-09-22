@@ -231,6 +231,7 @@ do
       sed -e "s|THETA2MAX|$jMAX|" $iCFIL-c > $iCFIL-d
       rm -f $iCFIL-c
       sed -e "s|DIRECTIONCUT|$DIRECTIONCUT|" $iCFIL-d > $iCFIL-e
+      rm -f $iCFIL-d
       mv -f $iCFIL-e $iCFIL
       echo $iCFIL
 
@@ -252,7 +253,6 @@ do
 	 echo "* FILLINGMODE 2" >> $MSCF
       fi
 # fill IRFs only
-#      echo "* FILLINGMODE 1" >> $MSCF
       echo "* ENERGYRECONSTRUCTIONMETHOD $EREC" >> $MSCF
       echo "* ENERGYAXISBINS 60" >> $MSCF
       echo "* ENERGYRECONSTRUCTIONQUALITY 0" >> $MSCF
