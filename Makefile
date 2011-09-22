@@ -500,7 +500,10 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o ./obj/VLightCurveData.o \
 		./obj/VZDCF.o ./obj/VZDCF_Dict.o ./obj/VZDCFData.o \
 		./obj/VUtilities.o \
-		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o
+		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o \
+		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
+		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+		./obj/Cshowerpars.o ./obj/CtparsShort.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o

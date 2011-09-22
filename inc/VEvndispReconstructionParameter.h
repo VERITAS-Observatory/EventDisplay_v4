@@ -46,6 +46,7 @@ class VEvndispReconstructionParameter : public TNamed
         vector< vector< double > > fimagethresh;
 	vector< vector< double > > fborderthresh;
 	vector< vector< double > > fbrightnonimagetresh;
+
         vector< vector< int > >    fLocalNtubes_min;
         vector< vector< int > >    fLocalNLowGain_max;
         vector< vector< double > > fLocalDistance_min;
