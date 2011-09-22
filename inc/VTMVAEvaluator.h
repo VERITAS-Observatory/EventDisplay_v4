@@ -112,13 +112,15 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   printSignalEfficiency();
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
-   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001 ) { fOptmizationSourceStrengthCrabUnits = iSourceStrength; }
+   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001 )
+          { fOptmizationSourceStrengthCrabUnits = iSourceStrength; }
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
    void   setPlotEffiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iE = 0.5 );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
-   void   setTMVAFileParameters( string iMethodName = "Method_Cuts", unsigned int iMethodCounter = 0 ) { fTMVAMethodName = iMethodName; fTMVAMethodCounter = iMethodCounter; }
+   void   setTMVAFileParameters( string iMethodName = "Method_Cuts", unsigned int iMethodCounter = 0 )
+          { fTMVAMethodName = iMethodName; fTMVAMethodCounter = iMethodCounter; }
 
    ClassDef(VTMVAEvaluator, 3 );
 };

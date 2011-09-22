@@ -62,7 +62,9 @@ class VInstrumentResponseFunction
     VInstrumentResponseFunction();
    ~VInstrumentResponseFunction() {}
     bool   fill();
+    double getContainmentProbability() { return fContainmentProbability; }
     TTree* getDataProduct() { return fDataProduct; }
+    TGraphErrors* getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin );
     bool   initialize( string iName, string iType, unsigned int iNTel, double iMCMaxCoreRadius, double iZe, int iNoise, double iPedvars, double iXoff, double iYoff );
     void   setEnergyReconstructionMethod( unsigned int iMethod );
     void   setCuts( VGammaHadronCuts* iCuts );
@@ -70,7 +72,7 @@ class VInstrumentResponseFunction
     void   setDataTree( CData *iData );
     void   setHistogrambinning( int iN = 20, double iMin = -2., double iMax = 2. );
     void   setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
-	void   setRunParameter( VInstrumentResponseFunctionRunParameter* );
+    void   setRunParameter( VInstrumentResponseFunctionRunParameter* );
 };
 
 #endif

@@ -83,6 +83,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TGraphErrors *gEnergySystematic_Median;
 // angular resolution (filled for CTA only)
     TGraphErrors *gAngularResolution;
+    TGraphErrors *gAngularResolution80;
 // cut efficiencies 
     vector< TH1D* > hCutEfficiency;
     vector< TH1D* > hCutEfficiencyRelativePlots;

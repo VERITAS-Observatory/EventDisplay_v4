@@ -39,6 +39,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     gEnergySystematic_Mean = 0;
     gEnergySystematic_Median = 0;
     gAngularResolution = 0;
+    gAngularResolution80 = 0;
 
     initializeIRFData();
 }
@@ -47,6 +48,7 @@ bool VInstrumentResponseFunctionReader::initializeIRFData()
 {
 // read angular and core resolution
     fIRF_TreeNames.push_back( "t_angular_resolution" );
+    fIRF_TreeNames.push_back( "t_angular_resolution_080p" );
     fIRF_TreeNames.push_back( "t_core_resolution" );
     fIRF_TreeNames.push_back( "t_energy_resolution" );
 
@@ -165,6 +167,11 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     h = (TH1F*)gDirectory->Get( "AngRes" );
     fillResolutionGraphfromHistogram( h, gAngularResolution, true );   // ignore errors in resolution graph
     setGraphPlottingStyle( gAngularResolution );
+
+    gAngularResolution80 = new TGraphErrors( 1 );
+    h = (TH1F*)gDirectory->Get( "AngRes80" );
+    fillResolutionGraphfromHistogram( h, gAngularResolution80, true );   // ignore errors in resolution graph
+    setGraphPlottingStyle( gAngularResolution80 );
 
     return true;
 }

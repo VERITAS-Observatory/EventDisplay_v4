@@ -1281,7 +1281,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
          }
          if( !fCuts->isGamma( i, true ) ) continue;
          hEcutSub[5]->Fill( eMC, i_weight );
-
+	 
 // apply energy reconstruction quality cut
          if( !fIgnoreEnergyReconstruction )
          {

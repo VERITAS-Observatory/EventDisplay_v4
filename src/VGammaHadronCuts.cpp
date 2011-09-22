@@ -95,6 +95,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fAngRes_AbsoluteMinimum = 0.;
     fAngRes_AbsoluteMaximum = 1.e99;
     fIRFAngRes = 0;
+    fAngResContainmentProbability = 0;
 
 // statistics
     fStats = new VGammaHadronCutsStats(); 
@@ -580,6 +581,11 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 		    exit( -1 );
                  }
             }
+// use angular resolution calculated for example from same data with makeEffectiveArea
+            if( temp == "angres" )
+	    {
+	       if( !is_stream.eof() ) is_stream >> fAngResContainmentProbability;    // should be an integer; probability x 100
+            }
 // theta2 scaling
 // * theta2scaling <scale factor> <minimum theta> <maximum theta>
 	    if( temp == "theta2scaling" )
@@ -640,7 +646,15 @@ void VGammaHadronCuts::printDirectionCuts()
     {
         cout << "Direction cut from IRF graph ";
 	if( fIRFAngRes ) fIRFAngRes->Print();
-	else cout << "VGammaHadronCuts::printDirectionCuts WARNING: no function found" << endl;
+	else if( getAngularResolutionContainmentRadius() > 0. )
+	{
+	   cout << " (calculated from same file, containment probability " << ((double)getAngularResolutionContainmentRadius())/100. << ")" << endl; 
+	}
+	else
+	{
+	    cout << endl;
+	    cout << "VGammaHadronCuts::printDirectionCuts WARNING: no function found" << endl;
+        }
     }
 // TMVA
     else if( fDirectionCutSelector == 3 || fDirectionCutSelector == 4 || fDirectionCutSelector == 5 )
@@ -652,7 +666,7 @@ void VGammaHadronCuts::printDirectionCuts()
         }
 	if( fDirectionCutSelector == 4 || fDirectionCutSelector == 5 )
 	{
-	   if( !fTMVAEvaluator->getTMVAThetaCutVariable() )
+	   if( !fTMVAEvaluator || !fTMVAEvaluator->getTMVAThetaCutVariable() )
 	   {
 	      cout << "VGammaHadronCuts::printDirectionCuts WARNING: no theta2 cut defined in TMVA method" << endl;
            }
@@ -672,9 +686,10 @@ void VGammaHadronCuts::printDirectionCuts()
 void VGammaHadronCuts::printCutSummary()
 {
     cout << "-----------------------------------------------------------------------------------------" << endl;
-    cout << "VGammaHadronCuts::printCutSummary(): cuts: g/h " << fGammaHadronCutSelector;
+    cout << "VGammaHadronCuts::printCutSummary()";
     cout << " (ntel=" << fNTel << "): ";
     cout << endl;
+    cout << "Gamma/hadron cut selector: " << fGammaHadronCutSelector << endl;
 
 // direction cuts
    printDirectionCuts();
@@ -685,21 +700,24 @@ void VGammaHadronCuts::printCutSummary()
 // mean reduced scaled cuts
     if( fGammaHadronCutSelector % 10 < 1 )
     {
-        cout << ", " << fArrayMSCW_min << " < MSCW < " << fArrayMSCW_max;
+	cout << "Shape cuts: ";
+        cout << fArrayMSCW_min << " < MSCW < " << fArrayMSCW_max;
         cout << ", " << fArrayMSCL_min << " < MSCL < " << fArrayMSCL_max << ", ";
         cout << "core distance < " << fArrayCore_max << " m";
     }
 // mean cuts
     else if( fGammaHadronCutSelector % 10 == 1 )
     {
-        cout << ", " << fArrayWidth_min  << " < mean width < " << fArrayWidth_max;
+	cout << "Shape cuts: ";
+        cout << fArrayWidth_min  << " < mean width < " << fArrayWidth_max;
         cout << ", " << fArrayLength_min << " < mean length < " << fArrayLength_max << ", ";
         cout << "core distance < " << fArrayCore_max << " m";
     }
 // mean scaled cuts
     else if( fGammaHadronCutSelector % 10 == 3 )
     {
-        cout << ", " << fArrayMSW_min << " < MWR < " << fArrayMSW_max;
+	cout << "Shape cuts: ";
+        cout << fArrayMSW_min << " < MWR < " << fArrayMSW_max;
         cout << ", " << fArrayMSL_min << " < MLR < " << fArrayMSL_max << ", ";
         cout << "core distance < " << fArrayCore_max << " m";
     }
@@ -732,13 +750,13 @@ void VGammaHadronCuts::printCutSummary()
 // other cut parameters
     if( fNTel == 2 ) cout << ", size > " << fArraySize_min;
     cout << endl;
-    cout << "fiducial area (camera) < " << fArrayxyoff_max << " deg, ";
+    cout << "Fiducial area (camera) < " << fArrayxyoff_max << " deg, ";
     cout << fArrayEChi2_min << " <= EChi2 <= " << fArrayEChi2_max;
     cout << ", " << fArraydE_min << " < dE < " << fArraydE_max;
     cout << ", " << fArrayErec_min << " < Erec < " << fArrayErec_max;
     cout << ", " << fArrayEmmission_min << " < Emission height < " << fArrayEmmission_max;
     cout << endl;
-    cout << "fiducial area (core): [" << fCoreX_min - fCoreEdge << "," << fCoreX_max + fCoreEdge;
+    cout << "Fiducial area (core): [" << fCoreX_min - fCoreEdge << "," << fCoreX_max + fCoreEdge;
     cout << "," << fCoreY_min - fCoreEdge << "," << fCoreY_max + fCoreEdge << "] m";
     cout << ", " << fArrayNImages_min << " <= Ntel <= " << fArrayNImages_max;
     cout << endl;
@@ -749,7 +767,7 @@ void VGammaHadronCuts::printCutSummary()
     }
     if( fArrayLTrig.size() > 0 )
     {
-        cout << "tel-combinations: ";
+        cout << "Tel-combinations: ";
         for( unsigned int i = 0; i < fArrayLTrig.size(); i++ )
         {
             cout << i << ": " << fArrayLTrig[i];
@@ -761,6 +779,7 @@ void VGammaHadronCuts::printCutSummary()
     {
            for( unsigned int j = 0; j < fNTelTypeCut.size(); j++ ) fNTelTypeCut[j]->print();
     }
+    cout << "-----------------------------------------------------------------------------------------" << endl;
 }
 
 
@@ -1519,14 +1538,14 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
 */
 double VGammaHadronCuts::getTheta2Cut_max( double e )
 {
-    double theta2_cut_max = -1.;
+    double theta_cut_max = -1.;
 
 //////////////////////////////////////////////
 // energy independent theta2 cut
 //////////////////////////////////////////////
     if( fDirectionCutSelector == 0 )
     {
-       theta2_cut_max = fArrayTheta2_max;
+       theta_cut_max = TMath::Sqrt( fArrayTheta2_max );   // will be later squared
     } 
 //////////////////////////////////////////////
 // energy dependent theta2 cut
@@ -1544,59 +1563,62 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 	  else if( e > fF1AngRes->GetXmax() )  e = fF1AngRes->GetXmax();
 
 // get angular resolution and apply scaling factor
-	  theta2_cut_max  = fF1AngRes->Eval( e );
+	  theta_cut_max  = fF1AngRes->Eval( e );
        }
 /////////////////////////////////////////////
 // use IRF graph for angular resolution
        else if( fDirectionCutSelector == 2 && fIRFAngRes )
        {
 // get theta2 cut
-	  theta2_cut_max  = fIRFAngRes->Eval( e );
+	  theta_cut_max  = fIRFAngRes->Eval( e );
 
 // for e outside of graph range, return edge values
 	  if( fIRFAngRes->GetN() > 0 && fIRFAngRes->GetX() && fIRFAngRes->GetY() )
 	  {
-	     if( e < fIRFAngRes->GetX()[0] )                    theta2_cut_max = fIRFAngRes->GetY()[0];
-	     if( e > fIRFAngRes->GetX()[fIRFAngRes->GetN()-1] ) theta2_cut_max = fIRFAngRes->GetY()[fIRFAngRes->GetN()-1];
+	     if( e < fIRFAngRes->GetX()[0] )                    theta_cut_max = fIRFAngRes->GetY()[0];
+	     if( e > fIRFAngRes->GetX()[fIRFAngRes->GetN()-1] ) theta_cut_max = fIRFAngRes->GetY()[fIRFAngRes->GetN()-1];
 	  }
        }
 /////////////////////////////////////////////
 // use TMVA determined cut
        else if ( fDirectionCutSelector == 3 )
        {
-          theta2_cut_max = -1.;
+          theta_cut_max = -1.;
        }
        else if( fDirectionCutSelector == 4 && fTMVAEvaluator && fTMVAEvaluator->getTMVAThetaCutVariable() )
        {
-           theta2_cut_max = fTMVAEvaluator->getBoxCut_Theta2( e );
+           theta_cut_max = fTMVAEvaluator->getBoxCut_Theta2( e );
+	   if( theta_cut_max > 0. ) theta_cut_max = TMath::Sqrt( theta_cut_max );
+	   else                      theta_cut_max = 0.;
        }
 /////////////////////////////////////////////
 // use a graph with theta2 cuts
        else if( fDirectionCutSelector == 5 && fTMVABoxCut_Theta2_max )
        {
-	  theta2_cut_max = fTMVABoxCut_Theta2_max->Eval( log10( e ) );
+	  theta_cut_max = fTMVABoxCut_Theta2_max->Eval( log10( e ) );
 // for e outside of graph range, return edge values
 	  if( fTMVABoxCut_Theta2_max->GetN() > 0 && fTMVABoxCut_Theta2_max->GetX() && fTMVABoxCut_Theta2_max->GetY() )
 	  {
 	     if( e < fTMVABoxCut_Theta2_max->GetX()[0] ) 
 	     {
-	         theta2_cut_max = fTMVABoxCut_Theta2_max->GetY()[0];
+	         theta_cut_max = fTMVABoxCut_Theta2_max->GetY()[0];
              }
 	     if( e > fTMVABoxCut_Theta2_max->GetX()[fTMVABoxCut_Theta2_max->GetN()-1] )
 	     {
-	         theta2_cut_max = fTMVABoxCut_Theta2_max->GetY()[fTMVABoxCut_Theta2_max->GetN()-1];
+	         theta_cut_max = fTMVABoxCut_Theta2_max->GetY()[fTMVABoxCut_Theta2_max->GetN()-1];
              }
 	  }
+	  if( theta_cut_max > 0. ) theta_cut_max = TMath::Sqrt( theta_cut_max );
+	  else                     theta_cut_max = 0.;
        }
     }
 
 // apply scale factors
-    theta2_cut_max *= fAngRes_ScalingFactor;
-    if( theta2_cut_max < fAngRes_AbsoluteMinimum ) return fAngRes_AbsoluteMinimum*fAngRes_AbsoluteMinimum;
-    if( theta2_cut_max > fAngRes_AbsoluteMaximum ) return fAngRes_AbsoluteMaximum*fAngRes_AbsoluteMaximum;
-    theta2_cut_max *= theta2_cut_max;
+    theta_cut_max *= fAngRes_ScalingFactor;
+    if( theta_cut_max < fAngRes_AbsoluteMinimum ) return fAngRes_AbsoluteMinimum*fAngRes_AbsoluteMinimum;
+    if( theta_cut_max > fAngRes_AbsoluteMaximum ) return fAngRes_AbsoluteMaximum*fAngRes_AbsoluteMaximum;
 
-    return theta2_cut_max;
+    return theta_cut_max*theta_cut_max;
 }
 
 /*
@@ -1672,6 +1694,24 @@ bool VGammaHadronCuts::initAngularResolutionFile()
    return true;
 }
 
+bool VGammaHadronCuts::setIRFGraph( TGraphErrors *g )
+{
+   if( !g )
+   {
+      cout << "VGammaHadronCuts::setIRFGraph warning: IRF pointer is zero" << endl;
+      return false;
+   }
+
+   fIRFAngRes = (TGraphErrors*)g->Clone();
+   fIRFAngRes->SetName( "IRFAngRes" );
+
+// print results
+   printDirectionCuts();
+
+   return true;
+ }
+
+
 /*!
 
      update statistics
@@ -1710,7 +1750,7 @@ bool VNTelTypeCut::test( CData *c )
 
 void VNTelTypeCut::print()
 {
-   cout << "\t       type cut: mintel > " << fNTelType_min << " for types ";
+   cout << "\t       type cut: mintel >= " << fNTelType_min << " for types ";
    for( unsigned int i = 0; i < fTelType_counter.size(); i++ ) cout << fTelType_counter[i] << " ";
    cout << endl;
 }

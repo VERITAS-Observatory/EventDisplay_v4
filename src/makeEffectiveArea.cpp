@@ -71,6 +71,12 @@ int main( int argc, char *argv[] )
 /////////////////////////////////////////////////////////////////
 // gamma/hadron cuts
     VGammaHadronCuts *fCuts = new VGammaHadronCuts();
+    fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
+    if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) ) exit( -1 );
+    fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();
+    fRunPara->fDirectionCutSelector   = fCuts->getDirectionCutSelector();
+    fCuts->initializeCuts( -1, fRunPara->fGammaHadronProbabilityFile );
+    fCuts->printCutSummary();
 
 /////////////////////////////////////////////////////////////////
 // read MC header (might not be there, no problem; but depend on right input in runparameter file)
@@ -104,27 +110,39 @@ int main( int argc, char *argv[] )
 // set angular, core, etc resolution calculation class
     vector< VInstrumentResponseFunction* > f_IRF;
     vector< string > f_IRF_Name;
+    vector< string > f_IRF_Type;
+    string fCuts_AngularResolutionName = "";
     if( fRunPara->fFillingMode != 2 )
     {
-       f_IRF_Name.push_back( "angular_resolution" );
-       f_IRF_Name.push_back( "core_resolution" );
-       f_IRF_Name.push_back( "energy_resolution" );
+       f_IRF_Name.push_back( "angular_resolution" );            f_IRF_Type.push_back( "angular_resolution" );
+       if( fCuts->getAngularResolutionContainmentRadius() )
+       {
+	  char hname[200];
+	  sprintf( hname, "angular_resolution_0%dp", fCuts->getAngularResolutionContainmentRadius() );
+	  fCuts_AngularResolutionName = hname;
+          f_IRF_Name.push_back( fCuts_AngularResolutionName );       f_IRF_Type.push_back( "angular_resolution" );
+       }
+       f_IRF_Name.push_back( "core_resolution" );               f_IRF_Type.push_back( "core_resolution" );
+       f_IRF_Name.push_back( "energy_resolution" );             f_IRF_Type.push_back( "energy_resolution" );
     }
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
     {
         f_IRF.push_back( new VInstrumentResponseFunction() );
 	f_IRF.back()->setRunParameter( fRunPara );
-        f_IRF.back()->initialize( f_IRF_Name[i], f_IRF_Name[i], fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius, fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
+	if( fCuts_AngularResolutionName.size() > 0 && f_IRF_Name[i] == fCuts_AngularResolutionName )
+	{
+	   f_IRF.back()->setContainmentProbability( ((double)fCuts->getAngularResolutionContainmentRadius())/100. );
+	   cout << "setting containment probability to " << f_IRF.back()->getContainmentProbability() << endl;
+        }
+	else
+	{
+	   f_IRF.back()->setContainmentProbability( 0.68 );
+        }
+        f_IRF.back()->initialize( f_IRF_Name[i], f_IRF_Type[i],
+	                          fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,
+				  fRunPara->fze, fRunPara->fnoise, fRunPara->fpedvar, fRunPara->fXoff, fRunPara->fYoff );
     }
 
-/////////////////////////////////////////////////////////////////////////////
-// read and initialize cuts
-    fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
-    if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) ) exit( -1 );
-    fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();
-    fRunPara->fDirectionCutSelector   = fCuts->getDirectionCutSelector();
-    fCuts->initializeCuts( -1, fRunPara->fGammaHadronProbabilityFile );
-    fCuts->printCutSummary();
 
 /////////////////////////////////////////////////////////////////////////////
 // load data chain
@@ -183,8 +201,12 @@ int main( int argc, char *argv[] )
            f_IRF[i]->setDataTree( &d );
            f_IRF[i]->setCuts( fCuts );
            f_IRF[i]->fill();
+	   if( fCuts_AngularResolutionName.size() > 0 && f_IRF_Name[i] == fCuts_AngularResolutionName )
+	   {
+	     fCuts->setIRFGraph( f_IRF[i]->getAngularResolutionGraph( 0, 0 ) );
+           }
         }
-     }
+    }
 
 /////////////////////////////////////////////////////////////////////////////
 // calculate effective areas

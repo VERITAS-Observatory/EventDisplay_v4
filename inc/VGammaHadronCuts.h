@@ -135,6 +135,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fAngRes_ScalingFactor;
         double fAngRes_AbsoluteMinimum;
 	double fAngRes_AbsoluteMaximum;
+	unsigned int fAngResContainmentProbability;
 // energy dependent theta2 cuts from IRF file
 	TGraphErrors *fIRFAngRes;
 
@@ -268,6 +269,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double getMeanLength() { return fMeanLength; }
         double getMeanWidth() { return fMeanWidth; }
 
+	unsigned int getAngularResolutionContainmentRadius() { return fAngResContainmentProbability; }
         double getProbabilityCut_Selector( unsigned int iID = 0 ) { if( iID < fProbabilityCut_NSelectors ) return fProbabilityCut_SelectionCut[iID]; else return -1; }
         double getProbabilityCutAlpha(bool fIsOn);
         double getTheta2Cut_min( double e = 0.1 ) { if( e > 0. ) return fArrayTheta2_min; else return 0.; }
@@ -287,10 +289,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   setDataTree( CData* idata );
 	void   setDebug( bool iB = false ) { fDebug = iB; }
         void   setEnergyCuts( double imin, double imax ) { fArrayErec_min = imin; fArrayErec_max = imax; }
+	bool   setIRFGraph( TGraphErrors *g );
         void   setNTel( unsigned int itel,  double iX = 0., double iY = 0. ) { fNTel = itel; fArrayCentre_X = iX; fArrayCentre_Y = iY; }
         void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
 
-        ClassDef(VGammaHadronCuts,20);
+        ClassDef(VGammaHadronCuts,21);
 };
 #endif

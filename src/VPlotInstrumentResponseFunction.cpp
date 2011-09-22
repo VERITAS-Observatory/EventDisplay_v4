@@ -504,18 +504,24 @@ void VPlotInstrumentResponseFunction::plotEnergySystematics( string iM, double y
     }
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int iDataSetID, string iXaxis )
+TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int iDataSetID, string iXaxis, string iProbabilityString )
 {
-   return plotResolution2D( iDataSetID, "angres", "angular resolution vs " + iXaxis, "angular resolution [deg]",
+   string iResolutionTreeName = "t_angular_resolution";
+   if( iProbabilityString != "68" ) iResolutionTreeName += "_0" + iProbabilityString +"p";
+   return plotResolution2D( iDataSetID, "angres" + iProbabilityString, "angular resolution vs " + iXaxis, 
+                            "angular resolution (" + iProbabilityString + "%) [deg]",
                             getPlottingAxis( "angularesolution_Lin" )->fMinValue,
-			    getPlottingAxis( "angularesolution_Lin" )->fMaxValue, "t_angular_resolution", iXaxis );
+			    getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis )
+TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, string iProbabilityString )
 {
-   return plotResolution( "angres", "angular resolution vs " + iXaxis, "angular resolution [deg]",
+   string iResolutionTreeName = "t_angular_resolution";
+   if( iProbabilityString != "68" ) iResolutionTreeName += "_0" + iProbabilityString +"p";
+   return plotResolution( "angres"  + iProbabilityString, "angular resolution vs " + iXaxis,
+                          "angular resolution (" + iProbabilityString + "%) [deg]",
                           getPlottingAxis( "angularesolution_Lin" )->fMinValue,
-			  getPlottingAxis( "angularesolution_Lin" )->fMaxValue, "t_angular_resolution", iXaxis );
+			  getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
 }
 
 TCanvas* VPlotInstrumentResponseFunction::plotCoreResolution( string iXaxis )
@@ -778,9 +784,10 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
        if( !g )
        {
 // try to get CTA resolution graph
-	   if( iName == "angres" )
+	   if( iName.find( "angres" ) != string::npos )
 	   {
-	       g = fData[i]->gAngularResolution;
+	       if( iName.find( "80" ) != string::npos )  g = fData[i]->gAngularResolution80;
+	       else                                      g = fData[i]->gAngularResolution;
 	       if( g ) cout << "CTA: found angular resolution" << endl;
 	   }
 	   if( !g )

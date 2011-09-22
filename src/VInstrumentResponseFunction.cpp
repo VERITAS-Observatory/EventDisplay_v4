@@ -177,7 +177,8 @@ bool VInstrumentResponseFunction::fill()
     }
 
 // fill resolution graphs
-   cout << "VInstrumentResponseFunction:: terminate " << endl;
+   cout << "VInstrumentResponseFunction::terminate ";
+   cout << " (integration probability: " << fContainmentProbability << ")" << endl;
    for( unsigned int i = 0; i < fIRFData.size(); i++ )
    {
       for( unsigned int j = 0; j < fIRFData[i].size(); j++ )
@@ -256,4 +257,20 @@ void VInstrumentResponseFunction::setCuts( VGammaHadronCuts* iCuts )
 	 }
       }
    }
+}
+
+TGraphErrors* VInstrumentResponseFunction::getAngularResolutionGraph( unsigned int iAzBin, unsigned int iSpectralIndexBin )
+{
+   if( iAzBin < fIRFData.size() && iSpectralIndexBin < fIRFData[iAzBin].size() && fIRFData[iAzBin][iSpectralIndexBin] )
+   {
+       return fIRFData[iAzBin][iSpectralIndexBin]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
+   }
+
+   cout << "VInstrumentResponseFunction::getAngularResolutionGraph: warning index out of range ";
+   cout << iAzBin << "\t" << iSpectralIndexBin << "\t";
+   cout << "(" << fIRFData[iAzBin].size();
+   if( fIRFData.size() ) cout << "\t" << fIRFData[iAzBin].size();
+   cout << ")" << endl;
+
+   return 0;
 }

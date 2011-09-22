@@ -34,7 +34,6 @@ VEvndispReconstructionParameter::VEvndispReconstructionParameter( vector< ULong6
 
     fNTel_type = fTel_type.size();
 
-
     setDefaultThresholds( 5., 2.5, 2.5 );
 }
 
