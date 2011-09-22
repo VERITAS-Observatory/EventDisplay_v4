@@ -939,7 +939,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor, double iObservatio
    if( c && hBGRate )
    {
       c->cd();
-      hBGRate->Scale( 60. * iObservationTime_hours );
+      hBGRate->Scale( 60. * 60. * iObservationTime_hours );
       hBGRate->SetLineWidth( 2 );
       hBGRate->SetLineColor( iColor );
       hBGRate->Draw( "same" );
