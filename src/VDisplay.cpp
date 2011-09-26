@@ -605,7 +605,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 ///////////////////////////////////////////////////////////////////////////////
 // fill trace into histogram
 ///////////////////////////////////////////////////////////////////////////////
-   if( fEventLoop->getReader()->getDataFormat() != "DST" ) 
+   if( fEventLoop->getReader()->hasFADCTrace() )
    {
 // first set the number of bins of the histogram according to the number of samples
        if( int( fEventLoop->getNSamples() ) != i_his->GetNbinsX() )
@@ -617,6 +617,8 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
        for( unsigned int i = 0; i < fEventLoop->getNSamples(); i++ )
        {
 	   itemp = (double)fEventLoop->getReader()->getSample( i_channel, i, false );
+// HORRIBLE FUDGE PARTE II
+	   if( fEventLoop->getReader()->getDataFormat() == "DST" ) itemp += 230.;
 // undo highlow
 	   if( i_channel < (int)fEventLoop->getLowGainMultiplier().size() && fEventLoop->getHiLo()[i_channel] )
 	   {
@@ -629,7 +631,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 ///////////////////////////////////////////////////////////////////////////////
 // DST: fill timing values into histogram
 ///////////////////////////////////////////////////////////////////////////////
-    else
+    else if( !fEventLoop->getReader()->hasFADCTrace() )
     {
 // first set the number of bins of the histogram according to the number of timing bins
 // number of bins is: number of pulse time levels + one bin at the beginning and one at the end of the trace
@@ -683,6 +685,13 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 	   i_his->SetBins( 1, 0., 1. );
 	   i_his->SetBinContent( 1, 0. );
         }
+    }
+    else
+///////////////////////////////////////////////////////////////////////////////
+// DST: with FADC trace
+///////////////////////////////////////////////////////////////////////////////
+    {
+       cout << "UUUUUUUUUUUUUUUUUUU " << endl;
     }
     return i_his;
 }
@@ -775,10 +784,15 @@ void VDisplay::drawFADC( bool iFit )
 // draw everything (trace, pedestal)
         setFADCText();
         fHisFADC->SetTitle( histitle );
-	if( fEventLoop->getHiLo()[fSelectedChan-200000] ) fHisFADC->SetMaximum( -1.*0.1*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
-	else                                              fHisFADC->SetMaximum( -1.*0.8*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
-//        fHisFADC->SetMinimum( -1111 );
-//	fHisFADC->SetMaximum( -1111 );
+	if( fEventLoop->getHiLo()[fSelectedChan-200000] )
+	{
+	    fHisFADC->SetMaximum( -1.*0.1*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
+        }
+	else   
+	{
+	    fHisFADC->SetMaximum( -1.*0.8*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
+        }
+//	fHis <<FADC->SetMaximum( -1111 );
         fHisFADC->SetStats( 0 );
         fCanvasFADC->SetEditable( 1 );
         fCanvasFADC->cd();

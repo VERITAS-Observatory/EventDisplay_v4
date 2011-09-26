@@ -17,8 +17,8 @@
 
 // HARDWIRED MAXIMUM NUMBER OF TELESCOPES AND CHANNELS, etc.
 #define VDST_MAXTELESCOPES  500    // maximum number of telescopes
-#define VDST_MAXCHANNELS   3000    // maximum number of channels per telescopes
-#define VDST_MAXSUMWINDOW   500    // maximum number of summation windows (=maximum number of samples per FADC trace)
+#define VDST_MAXCHANNELS   12000   // maximum number of channels per telescopes
+#define VDST_MAXSUMWINDOW   256    // maximum number of summation windows (=maximum number of samples per FADC trace)
 #define VDST_PEDTIMESLICES 5000    // maximum number of time slices for pedestal calculation
 #define VDST_MAXRECMETHODS  100    // maximum number of arrayreconstruction method
 #define VDST_MAXTIMINGLEVELS 10    // maximum number of timing levels
@@ -37,7 +37,6 @@ class VGlobalRunParameter
    static double       fObservatory_Longitude_deg;
    static double       fObservatory_Height_m;
 
-   static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
 
 // OUTPUT TREE VERSION
 // 
@@ -56,6 +55,8 @@ class VGlobalRunParameter
    static string fEVNDISPOutputDirectory;                  // output- and result files are written into this directory
 
    public:
+
+   static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
 
    VGlobalRunParameter();
    virtual ~VGlobalRunParameter();

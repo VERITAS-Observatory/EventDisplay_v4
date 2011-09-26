@@ -644,7 +644,7 @@ void VGammaHadronCuts::printDirectionCuts()
 // IRF graph
     else if( fDirectionCutSelector == 2 )
     {
-        cout << "Direction cut from IRF graph ";
+        cout << "Direction cut from IRF graph " << endl;
 	if( fIRFAngRes ) fIRFAngRes->Print();
 	else if( getAngularResolutionContainmentRadius() > 0. )
 	{
@@ -1589,7 +1589,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
        {
            theta_cut_max = fTMVAEvaluator->getBoxCut_Theta2( e );
 	   if( theta_cut_max > 0. ) theta_cut_max = TMath::Sqrt( theta_cut_max );
-	   else                      theta_cut_max = 0.;
+	   else                     theta_cut_max = 0.;
        }
 /////////////////////////////////////////////
 // use a graph with theta2 cuts

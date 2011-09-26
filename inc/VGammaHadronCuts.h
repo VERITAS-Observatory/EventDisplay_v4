@@ -238,16 +238,16 @@ class VGammaHadronCuts : public VAnalysisUtilities
         VGammaHadronCuts();
        ~VGammaHadronCuts();
 
-        bool   applyDirectionCuts( unsigned int fEnergyReconstructionMethod = 0, bool bCount = false, double x0 = -99999., double y0 = -99999. );
+        bool   applyDirectionCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, double x0 = -99999., double y0 = -99999. );
         bool   applyEnergyReconstructionQualityCuts();
-        bool   applyEnergyReconstructionQualityCuts( unsigned int iMethod, bool bCount = false );
+        bool   applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount = false );
         bool   applyInsideFiducialAreaCut( bool bCount = false );
         bool   applyMCXYoffCut( double x, double y, bool bCount = false );
 	bool   applyMeanReducedScaledStereoShapeCuts();
 	bool   applyMeanStereoShapeCuts();
         bool   applyMeanScaledStereoShapeCuts();
         bool   applyShowerCoreCuts( bool iMC = false );
-        bool   applyStereoQualityCuts( unsigned int iMethod = 0, bool bCount = false, int iEntry = 0, bool fIsOn = false );
+        bool   applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, int iEntry = 0, bool fIsOn = false );
         bool   applyStereoShapeCuts();
         bool   applyTelTypeTest( bool bCount = false );
 

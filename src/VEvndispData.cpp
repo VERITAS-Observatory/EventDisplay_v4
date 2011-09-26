@@ -476,11 +476,18 @@ valarray<double>& VEvndispData::getPeds( bool iLowGain, double iTime )
     if( !getRunParameter()->fPlotRaw )
     {
         if( iTime < 90. ) return fCalData[fTelID]->getPeds( iLowGain, getEventTime() );
-        else return fCalData[fTelID]->getPeds( iLowGain, iTime );
+        else              return fCalData[fTelID]->getPeds( iLowGain, iTime );
     }
     fPlotRawPedestals.resize( getNChannels(), getDetectorGeometry()->getDefaultPedestal() );
 
     return fPlotRawPedestals;
+}
+
+valarray<double>& VEvndispData::getPedvars( bool iLowGain, unsigned int iSW, bool iSumWindowSmall, double iTime )
+{
+   if( iTime < -90. ) return fCalData[fTelID]->getPedvars( iLowGain, iSW, iSumWindowSmall, getEventTime() );
+
+   return fCalData[fTelID]->getPedvars( iLowGain, iSW, iSumWindowSmall, iTime );
 }
 
 

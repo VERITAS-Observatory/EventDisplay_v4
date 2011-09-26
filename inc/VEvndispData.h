@@ -237,8 +237,7 @@ class VEvndispData
         valarray<double>&   getPedsLowGain( double iTime = -99. ) { return getPeds( true, iTime ); }
 
 // getters for pedestal variation
-        valarray<double>&   getPedvars( bool iLowGain = false, unsigned int iSW = 0, bool iSumWindowSmall = false, double iTime = -99. ) { if( iTime < -90. ) return fCalData[fTelID]->getPedvars( iLowGain, iSW, iSumWindowSmall, getEventTime() ); else return fCalData[fTelID]->getPedvars( iLowGain, iSW, iSumWindowSmall, iTime ); }
-
+        valarray<double>&   getPedvars( bool iLowGain = false, unsigned int iSW = 0, bool iSumWindowSmall = false, double iTime = -99. );
         valarray<double>&   getPedvars( unsigned int iSW, bool iLowGain = false ) { return getPedvars( iLowGain, iSW ); }
         valarray<double>&   getPedvarsSmall( bool iLowGain = false ) { return getPedvars( iLowGain, getSumWindowSmall(), true ); }
         valarray<double>&   getPedvarsLowGain() { return getPedvars( true ); }
@@ -249,8 +248,6 @@ class VEvndispData
         valarray<double>&   getPedrms( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fPedrms; else return fCalData[fTelID]->fLowGainPedsrms; }
         valarray<double>&   getPedsLowGainrms() { return fCalData[fTelID]->fLowGainPedsrms; }
 // padding stuff (probably out of date)
-        valarray<double>&   getPedvarsPadded( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fPedvarsPadded; else return fCalData[fTelID]->fPedvarsPadded; }
-        valarray<double>&   getPedvarsPaddedSmall( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fPedvarsPaddedSmall; else return fCalData[fTelID]->fPedvarsPaddedSmall; }
 /////////////// end pedestals //////////////////////////////
 
         valarray<double>&   getRawTZeros() { return fAnaData[fTelID]->getTZeros( false ); }
@@ -392,10 +389,6 @@ class VEvndispData
 	int              getNcluster_uncleaned() { return fAnaData[fTelID]->fncluster_uncleaned; }; //HP
 /////////////// pedestals /////////////////////
         void                setPeds( unsigned int iChannel, double iPed, bool iLowGain = false ) { fCalData[fTelID]->setPeds( iChannel, iPed, iLowGain ); }
-        void                setPedvarsPadded( unsigned int iChannel, double iPad ) { fCalData[fTelID]->fPedvarsPadded[iChannel] = iPad; }
-        void                setPedvarsPaddedSmall( unsigned int iChannel, double iPad ) { fCalData[fTelID]->fPedvarsPaddedSmall[iChannel] = iPad; }
-        void                setPedvarsPadded( valarray< double> iPadarray ) { fCalData[fTelID]->fPedvarsPadded = iPadarray; }
-        void                setPedvarsPaddedSmall( valarray< double> iPadarraysmall ) { fCalData[fTelID]->fPedvarsPaddedSmall = iPadarraysmall; }
 /////////////// end pedestals /////////////////////
         void                setPedsFromPLine() { fCalData[fTelID]->fPedFromPLine = true; }
         void                setRootDir( unsigned int iTel, TDirectory *iDir ) { fAnaDir[iTel] = iDir; }

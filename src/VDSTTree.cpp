@@ -17,6 +17,8 @@ VDSTTree::VDSTTree()
     fMC = true;
     fFullTree = false;
 
+    setFADC();
+
     fMCtree = 0;
     fDST_tree = 0;
 
@@ -104,8 +106,11 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 // following arrays are filed only for all telescopes with data
     fDST_tree->Branch( "ntel_data", &fDSTntel_data, "ntel_data/i" );
     fDST_tree->Branch( "tel_data", fDSTtel_data, "tel_data[ntel_data]/i" );
+    fDST_tree->Branch( "zero_suppression", fDSTZeroSupression, "zero_suppression[ntel_data]/s" );
     sprintf( tname, "chan[ntel_data][%d]/s", VDST_MAXCHANNELS );
     fDST_tree->Branch( "chan", fDSTChan, tname );
+    sprintf( tname, "recorded[ntel_data][%d]/s", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "recorded", fDSTRecord, tname );
     fDST_tree->Branch( "nL1trig", fDSTnL1trig, "nL1trig[ntel_data]/s" );
     sprintf( tname, "L1trig[ntel_data][%d]/s", VDST_MAXCHANNELS );
     fDST_tree->Branch( "L1trig", fDSTL1trig, tname );
@@ -142,6 +147,13 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
     {
         sprintf( tname, "N255[ntel_data][%d]/s", VDST_MAXCHANNELS );
         fDST_tree->Branch( "N255", fDSTN255, tname );
+    }
+// FADC trace
+    fDST_tree->Branch( "numSamples", fDSTnumSamples, "numSamples[ntel_data]/s" );
+    if( fReadWriteFADC )
+    {
+       sprintf( tname, "FADC[ntel_data][%d][%d]/s", VDST_MAXSUMWINDOW, VDST_MAXCHANNELS );
+       fDST_tree->Branch( "Trace", fDSTtrace, tname );
     }
 
 // photo diode data
@@ -200,10 +212,13 @@ void VDSTTree::resetDataVectors( unsigned int iCH )
         fDSTLTrig_list[i] = 0;
         fDSTnL1trig[i] = 0;
 	fDSTtel_data[i] = 0;
+	fDSTZeroSupression[i] = 0;
+	fDSTnumSamples[i] = 0;
         for( unsigned int j = 0; j < VDST_MAXCHANNELS; j++ )
         {
             if( iCH == 0 ) fDSTChan[i][j] = j;
             else           fDSTChan[i][j] = iCH;
+	    fDSTRecord[i][j] = 1;                    // expect by default that all pixels are there
             fDSTsums[i][j] = 0.;
             fDSTsumwindow[i][j] = 0;
             fDSTsumfirst[i][j] = 0;
@@ -224,6 +239,13 @@ void VDSTTree::resetDataVectors( unsigned int iCH )
 	    for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ )
 	    {
 	       fDSTpulsetiming[i][t][j] = 0.;
+            }
+	    if( fReadWriteFADC )
+	    {
+	       for( unsigned int t = 0; t < VDST_MAXSUMWINDOW; t++ )
+	       {
+		  fDSTtrace[i][t][j] = 0;
+	       }
             }
         }
         fDSTPDMax[i] = 0.;
@@ -280,12 +302,21 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     }
     fDST_tree->SetBranchAddress( "ntel_data", &fDSTntel_data );
     fDST_tree->SetBranchAddress( "tel_data", fDSTtel_data );
+    fDST_tree->SetBranchAddress( "zero_suppression", fDSTZeroSupression );
+    fDST_tree->SetBranchAddress( "recorded", fDSTRecord );
     fDST_tree->SetBranchAddress( "nL1trig", fDSTnL1trig );
     fDST_tree->SetBranchAddress( "L1trig", fDSTL1trig );
     fDST_tree->SetBranchAddress( "sum", fDSTsums );
     fDST_tree->SetBranchAddress( "dead", fDSTdead );
     fDST_tree->SetBranchAddress( "tzero", fDSTt0 );
     fDST_tree->SetBranchAddress( "Width", fDSTTraceWidth );
+    if( fDST_tree->GetBranchStatus( "Trace" ) )
+    {
+       fDST_tree->SetBranchAddress( "Trace", fDSTtrace );
+       cout << "TRACE FOUND" << endl;
+       setFADC( true );
+    }
+    fDST_tree->SetBranchAddress( "numSamples", fDSTnumSamples );
     fDST_tree->SetBranchAddress( "pulsetiminglevel", fDSTpulsetiminglevels );
     fDST_tree->SetBranchAddress( "pulsetiming", fDSTpulsetiming );
     fDST_tree->SetBranchAddress( "Max", fDSTMax );
@@ -430,6 +461,15 @@ unsigned int VDSTTree::getDSTDead( int iTelID, int iChannelID )
     return 0;
 }
 
+unsigned short int VDSTTree::getDSTNumSample( unsigned int iTelID ) 
+{
+   int iTel = hasData( iTelID );
+
+   if( iTel >= 0 ) return fDSTnumSamples[iTelID];
+
+   return 0;
+}
+
 
 UShort_t VDSTTree::getDSTHiLo( int iTelID, int iChannelID )
 {
@@ -441,6 +481,15 @@ UShort_t VDSTTree::getDSTHiLo( int iTelID, int iChannelID )
     return 0;
 }
 
+unsigned short int VDSTTree::getDSTTrace( unsigned int iTelID, unsigned int iChannelID, unsigned short int iSample )
+{
+    int iTel = hasData( iTelID );
+
+    if( iTel < 0 ) return 3;
+
+// HORRIBLE FUDGE
+    return fDSTtrace[iTel][iSample][iChannelID] - 230; 
+}
 
 unsigned int VDSTTree::getTrigL1( int iTelID, int iChannelID )
 {

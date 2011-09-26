@@ -35,3 +35,5 @@ if( $OBSERVATORY == "CTA" ) then
   setenv OBS_USER_DATA_DIR $CTA_USER_DATA_DIR
   setenv OBS_USER_LOG_DIR $CTA_USER_LOG_DIR
 endif
+
+exit

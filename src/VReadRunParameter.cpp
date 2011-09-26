@@ -576,6 +576,8 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fh = 833;
             fRunPara->fw = 1250;
+            fRunPara->fh = (unsigned int)(833*1.5);
+            fRunPara->fw = (unsigned int)(1250*1.5);
         }
         else if( iTemp.find( "telenoff" ) < iTemp.size() )
         {

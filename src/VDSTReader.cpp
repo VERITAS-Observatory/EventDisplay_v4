@@ -43,6 +43,7 @@ TTree* VDSTReader::getMCTree()
 /*!
 
     call this once per run (open source file, init tree, ...)
+
 */
 bool VDSTReader::init()
 {
@@ -93,6 +94,11 @@ bool VDSTReader::init()
         fDSTvltrig.push_back( false );
         fLTtime.push_back( 0. );
         fLDTtime.push_back( 0. );
+// FADC Trace
+        vector< uint8_t > i_trace_sample( VDST_MAXSUMWINDOW, 0 );
+	vector< vector< uint8_t > > i_trace_sample_VV;
+	for( unsigned int t = 0; t < VDST_MAXCHANNELS; t++ ) i_trace_sample_VV.push_back( i_trace_sample );
+	fFADCTrace.push_back( i_trace_sample_VV );
     }
 
     return fDSTTree->isMC();
@@ -165,6 +171,22 @@ bool VDSTReader::getNextEvent()
             fLDTtime[i] = fDSTTree->getDSTLocalDelayedTriggerTime( i );
         }
     }
+// get FADC trace
+    if( fDSTTree->getFADC() )
+    {
+        for( unsigned int i = 0; i < fNTelescopes; i++ )
+        {
+	  for( unsigned int j = 0; j < fNChannel[i]; j++ )
+	  {
+	     for( unsigned short int k = 0; k < fNumSamples; k++ )
+	     {
+	        fFADCTrace[i][j][k] = fDSTTree->getDSTTrace( i, j, k );
+             }
+           }
+        }
+    }
+	        
+
 // increment tree event number
     fDSTtreeEvent++;
     return true;
@@ -208,4 +230,34 @@ VMonteCarloRunHeader* VDSTReader::getMonteCarloHeader()
 {
    if( fDSTfile ) return (VMonteCarloRunHeader*)fDSTfile->Get( "MC_runheader" );
    return 0;
+}
+
+vector< uint8_t > VDSTReader::getSamplesVec()
+{
+  if( fTelID < fFADCTrace.size() )
+  {
+     if( fSelectedHitChannel < fFADCTrace[fTelID].size() ) 
+     {
+        return fFADCTrace[fTelID][fSelectedHitChannel];
+     }
+  }
+
+  return fDummySample;
+}
+
+uint8_t VDSTReader::getSample( unsigned channel, unsigned sample, bool iNewNoiseTrace )
+{
+  if( fTelID < fFADCTrace.size() )
+  {
+     if( channel < fFADCTrace[fTelID].size() ) 
+     {
+        if( sample < fFADCTrace[fTelID][channel].size() )
+	{
+	   return fFADCTrace[fTelID][channel][sample];
+        }
+     }
+  }
+  iNewNoiseTrace = true;
+
+  return 3;
 }

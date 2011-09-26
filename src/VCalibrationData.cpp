@@ -220,14 +220,13 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 
 // high gain channels
     fPeds.resize( i_channel, 20. );
+    fPedVars.resize( i_channel, 20. );
     fVPedvars.resize( nSamples+1, sqrt( fPeds ) );
     fPedrms.resize( i_channel, 0. );
     fVmeanPedvars.resize( nSamples+1, 0. );
     fVmeanRMSPedvars.resize( nSamples+1, 0. );
 
-    fPedvarsPadded.resize( i_channel, 0. );
     fLowGainPedsrms.resize( i_channel, 0. );
-    fPedvarsPaddedSmall.resize( i_channel, 0. );
 
     fGains.resize( i_channel, 0. );
     fGains_DefaultSetting.resize( i_channel, true );
@@ -559,17 +558,6 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
     if( iSW == 0 && !iSumWindowSmall )    iSW = fSumWindow;
     else if( iSW ==0 && iSumWindowSmall ) iSW = fSumWindowSmall;
 
-// most DST styles are without time-dependent pedestals -> ped/pedvars vector have length 1
-    if( iLowGain )
-    {
-        if( iSW < fVLowGainPedvars.size() )      return fVLowGainPedvars[iSW];
-	else if(  fVLowGainPedvars.size() == 1 ) return fVLowGainPedvars[0];
-    }
-    else
-    {
-       if( fVPedvars.size() == 1 ) return fVPedvars[0];
-    }
-
 //////////////////////////////////////////////////////////
 // pedvars in time slices
 //////////////////////////////////////////////////////////
@@ -614,11 +602,20 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
     }
 //////////////////////////////////////////////////////////
 // time independent pedestal variations
-// low gain pedvars for summation window iSW
-    if( iLowGain ) return fVLowGainPedvars[iSW]; 
+// most DST styles are without time-dependent pedestals -> ped/pedvars vector have length 1
+    if( iLowGain )
+    {
+        if( iSW < fVLowGainPedvars.size() )    return fVLowGainPedvars[iSW];
+	else if( fVLowGainPedvars.size() > 0 ) return fVLowGainPedvars[0];
+    }
+    else
+    {
+       if( iSW < fVPedvars.size() )     return fVPedvars[iSW];
+       else if( fVPedvars.size() > 0 ) return fVPedvars[0];
+    }
 
-// high gain pedvars for summation window iSW
-    return fVPedvars[iSW];
+// probably not filled
+    return fPedVars;
 }
 
 

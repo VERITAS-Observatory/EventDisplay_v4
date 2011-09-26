@@ -405,13 +405,15 @@ void VSkyCoordinates::getDerotatedShowerDirection( double ze, double az, float &
 }
 
 
-void VSkyCoordinates::getDifferenceInCameraCoordinates( double tel_ze, double tel_az, double shower_ze,  double shower_az, float &x, float &y, float &z )
+void VSkyCoordinates::getDifferenceInCameraCoordinates( double tel_ze, double tel_az, 
+                                                        double shower_ze,  double shower_az, 
+							float &x, float &y, float &z )
 {
 // convert coordinates from [deg] to [rad]
-    tel_az /= degrad;
-    shower_az /= degrad;
-    double tel_el = (90.-tel_ze)/degrad;
-    double shower_el = (90.-shower_ze)/degrad;
+    tel_az /= TMath::RadToDeg();
+    shower_az /= TMath::RadToDeg();
+    double tel_el = (90.-tel_ze)/TMath::RadToDeg();
+    double shower_el = (90.-shower_ze)/TMath::RadToDeg();
 
     double cx = cos( shower_el ) * sin( shower_az );
     double cy = cos( shower_el ) * cos( shower_az );
@@ -419,9 +421,9 @@ void VSkyCoordinates::getDifferenceInCameraCoordinates( double tel_ze, double te
 
     double i_temp = sin( tel_az ) * cx + cos( tel_az ) * cy;
 
-    x = (cos( tel_az ) * cx - sin( tel_az ) * cy) * degrad;
+    x = (cos( tel_az ) * cx - sin( tel_az ) * cy) * TMath::RadToDeg();
     z = (cos( tel_el ) * i_temp + sin( tel_el ) * cz);
-    y = (-1.*sin( tel_el ) * i_temp + cos( tel_el ) * cz) * degrad;
+    y = (-1.*sin( tel_el ) * i_temp + cos( tel_el ) * cz) * TMath::RadToDeg();
     y *= -1.;
 
     if( fabs( x ) < 1.e-4 ) x = 0.;

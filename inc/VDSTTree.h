@@ -17,7 +17,7 @@
 #include <VGlobalRunParameter.h>
 
 ///////////////////////////////////////////////////////////////////////////////////
-// MAXIMUM NUMBERS OF TELESCOPES AND CHANNELS ARE DEFINED IN EVNDISP_definition.h
+// MAXIMUM NUMBERS OF TELESCOPES AND CHANNELS ARE DEFINED IN inc/VGlobalRunParameter
 ///////////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -29,7 +29,6 @@ class VDSTTree
         TTree *fDST_tree;
         TTree *fDST_conf;
         TTree *fMCtree;
-
                                                   // [telID] = FOV
         map< unsigned int, float > fDST_list_of_telescopes;
 //      map< unsigned int, unsigned int > fTelescope_type_list;  // [telID] = telescope type (=
@@ -57,47 +56,60 @@ class VDSTTree
         unsigned int fDSTLTrig_list[VDST_MAXTELESCOPES];
 // maximum number of telescopes is VDST_MAXTELESCOPES
 // maximum number of channels per camera VDST_MAXCHANNELS
-        unsigned int   fDSTntel;
-        unsigned int   fDSTntel_data;
-        unsigned int   fDSTtel_data[VDST_MAXTELESCOPES];
-        float fDSTpointAzimuth[VDST_MAXTELESCOPES];
-        float fDSTpointElevation[VDST_MAXTELESCOPES];
+        unsigned int fDSTntel;
+        unsigned int fDSTntel_data;
+        unsigned int fDSTtel_data[VDST_MAXTELESCOPES];
+        float        fDSTpointAzimuth[VDST_MAXTELESCOPES];
+        float        fDSTpointElevation[VDST_MAXTELESCOPES];
 
-        unsigned short int   fDSTChan[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-        float fDSTsums[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+        unsigned short int fDSTChan[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+
+// data recording parameters
+	unsigned short int fDSTRecord[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+	unsigned short int fDSTZeroSupression[VDST_MAXTELESCOPES];
+
+// adc parameters
+        float        fDSTsums[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];                // integrated charge
         unsigned short int fDSTdead[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTsumwindow[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTsumfirst[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-                                                  // (float) x 10.
-        float fDSTt0[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-        short fDSTMax[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+        float        fDSTt0[VDST_MAXTELESCOPES][VDST_MAXCHANNELS]; 
+        short        fDSTMax[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 // assume that all pulse timing levels are the same for all channels in a telescope
-	float fDSTpulsetiminglevels[VDST_MAXTELESCOPES][VDST_MAXTIMINGLEVELS];
-	float fDSTpulsetiming[VDST_MAXTELESCOPES][VDST_MAXTIMINGLEVELS][VDST_MAXCHANNELS];
-        short int fDSTRawMax[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-        float fDSTLTtime[VDST_MAXTELESCOPES];
-        float fDSTLDTtime[VDST_MAXTELESCOPES];
+	float        fDSTpulsetiminglevels[VDST_MAXTELESCOPES][VDST_MAXTIMINGLEVELS];
+	float        fDSTpulsetiming[VDST_MAXTELESCOPES][VDST_MAXTIMINGLEVELS][VDST_MAXCHANNELS];
+        short int    fDSTRawMax[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+        float        fDSTLTtime[VDST_MAXTELESCOPES];
+        float        fDSTLDTtime[VDST_MAXTELESCOPES];
         unsigned short int fDSTHiLo[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTN255[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTnL1trig[VDST_MAXTELESCOPES];
         unsigned short int fDSTL1trig[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-// photodiode
+//////////////////////////////////////////////////////////////////////////////////////
+// FADC traces
+	bool               fReadWriteFADC;
+	unsigned short int fDSTnumSamples[VDST_MAXTELESCOPES];
+        unsigned short int fDSTtrace[VDST_MAXTELESCOPES][VDST_MAXSUMWINDOW][VDST_MAXCHANNELS];    
+//////////////////////////////////////////////////////////////////////////////////////
+// photodiode (VTS only)
         float fDSTPDMax[VDST_MAXTELESCOPES];
         float fDSTPDSum[VDST_MAXTELESCOPES];
+//////////////////////////////////////////////////////////////////////////////////////
 // fit parameter
         float fDSTChi2[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-                                                  //!< rise time 10-90%
+//!< rise time 10-90%
         float fDSTRT[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-                                                  //!< fall time 10-90%
+//!< fall time 10-90%
         float fDSTFT[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-                                                  //!< rise time parameter from fit
+//!< rise time parameter from fit
         float fDSTRTpar[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-                                                  //!< fall time parameter from fit
+//!< fall time parameter from fit
         float fDSTFTpar[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-                                                  //< trace width                
+//< trace width                
         float fDSTTraceWidth[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-                                                  //!< trace norm
+//!< trace norm
         float fDSTTraceNorm[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+//////////////////////////////////////////////////////////////////////////////////////
 // MC parameters
         unsigned short int fDSTprimary;
         float fDSTenergy;
@@ -108,9 +120,11 @@ class VDSTTree
         float fDSTTel_xoff;
         float fDSTTel_yoff;
 
+//////////////////////////////////////////////////////////////////////////////////////
         VDSTTree();
         ~VDSTTree() {}
         map< unsigned int, float> getArrayConfig() { return fDST_list_of_telescopes; }
+	bool  getFADC() { return fReadWriteFADC; }
         TTree *getDSTTree() { return fDST_tree; }
         TTree *getMCTree()  { return fMCtree; }
         bool isMC() { return fMC; }
@@ -120,6 +134,7 @@ class VDSTTree
         map< unsigned int, float> readArrayConfig( string );
         map< unsigned int, unsigned int > readTelescopeTypeList( string );
         void resetDataVectors( unsigned int iCH = 0 );
+	void setFADC( bool iFADC = false ) { fReadWriteFADC = iFADC; }
         void setMC( bool iMC = true ) { fMC = iMC; }
 
 // getters for all variables
@@ -154,6 +169,9 @@ class VDSTTree
         UShort_t     getDSTHiLo( int iTelID, int iChannelID );
         unsigned int getNTrigL1( unsigned int iTelID ) { if( iTelID < getDSTNTel() ) return fDSTnL1trig[iTelID]; else return 0; }
         unsigned int getTrigL1( int iTelID, int iChannelID );
+
+	unsigned short int getDSTNumSample( unsigned int iTelID );
+	unsigned short int getDSTTrace( unsigned int iTelID, unsigned int iChannelID, unsigned short int iSample );
 
         unsigned short int getDSTMCPrimary() { return  fDSTprimary; }
         float        getDSTMCEnergy()             // [TeV]

@@ -788,13 +788,10 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
 // read pixel status
         readPixelstatus();
 
-        setPedvarsPadded(getPedvars());
-
 // read summation window dependend values again for doublepass
         if( fRunPar->fDoublePass )
         {
             readPeds( fPedFileNameC[getTeltoAna()[i]], false, getSumWindowSmall(), true );
-            setPedvarsPaddedSmall( getPedvars() );
 
 // read low gain pedestals
             if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
@@ -1950,7 +1947,8 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 
    if( getNTel() != (unsigned int)t->GetEntries() )
    {
-      cout << "VCalibrator::readCalibrationData error: mismatch in number of telescopes: " << getNTel() << "\t" << t->GetEntries() << endl;
+      cout << "VCalibrator::readCalibrationData error: mismatch in number of telescopes: " ;
+      cout << getNTel() << "\t" << t->GetEntries() << endl;
       exit( -1 );
    }
    for( int i = 0; i < t->GetEntries(); i++ )
@@ -1970,7 +1968,10 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        }
        else
        {
-          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: index out of range (peds, high gain): " << nPixel << "\t" << getPeds( false ).size() << endl;
+          cout << "bool VCalibrator::readCalibrationData( string iDSTfile )";
+	  cout << " error: index out of range (peds, high gain): ";
+	  cout << nPixel << "\t" << getPeds( false ).size();
+	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
        if( nPixel == getPeds( true ).size() )
        {
@@ -1982,8 +1983,10 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        }
        else
        {
-          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: index out of range (peds, low gain): " << nPixel << "\t" << getPeds( true ).size();
-	  cout << " (tree entry " << i << ")" << endl;
+          cout << "bool VCalibrator::readCalibrationData( string iDSTfile )";
+	  cout << "error: index out of range (peds, low gain): ";
+	  cout << nPixel << "\t" << getPeds( true ).size();
+	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
 // pedvars
        if( nPixel == getPedvars( false ).size() )
@@ -1996,7 +1999,10 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        }
        else
        {
-          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: index out of range (pedvars, high gain): " << nPixel << "\t" << getPedvars( false ).size() << endl;
+          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: ";
+	  cout << "index out of range (pedvars, high gain): ";
+	  cout << nPixel << "\t" << getPedvars( false ).size();
+	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
        if( nPixel == getPedvars( true ).size() )
        {
@@ -2008,8 +2014,10 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        }
        else
        {
-          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: index out of range (pedvars, low gain): " << nPixel << "\t" << getPedvars( true ).size();
-	  cout << " (tree entry " << i << ")" << endl;
+          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: ";
+	  cout << "index out of range (pedvars, low gain): ";
+	  cout << nPixel << "\t" << getPedvars( true ).size();
+	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
           
    }

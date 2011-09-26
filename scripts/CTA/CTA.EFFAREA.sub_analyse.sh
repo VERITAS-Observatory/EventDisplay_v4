@@ -111,6 +111,7 @@ then
    MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID".mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_onSource."$ARRAY"_ID"$RECID".eff
+   MCFIL=gamma_onSource."$ARRAY"_ID2.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta2
@@ -130,6 +131,7 @@ then
    MSCFILE=$DDIR/gamma_cone10*."$ARRAY"_ID"$RECID".mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_cone10.v2."$ARRAY"_ID"$RECID".eff
+   MCFIL=gamma_cone10.v2."$ARRAY"_ID2.eff
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
    OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
 # NOTE: this is theta2
@@ -145,6 +147,7 @@ then
    MSCFILE=$DDIR/electron*."$ARRAY"_ID"$RECID".mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=electron."$ARRAY"_ID"$RECID".eff
+   MCFIL=electron."$ARRAY"_ID2.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -160,6 +163,7 @@ then
    MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=proton.v2."$ARRAY"_ID"$RECID".eff
+   MCFIL=proton.v2."$ARRAY"_ID2.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -181,6 +185,7 @@ then
    MSCFILE=$DDIR/helium*."$ARRAY"_ID"$RECID".mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=helium."$ARRAY"_ID"$RECID".eff
+   MCFIL=helium."$ARRAY"_ID2.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -287,8 +292,8 @@ do
       fi
       if [ $INPU = "eff" ]
       then
-#         echo "* SIMULATIONFILE_MCHISTO $EFFFILE/$OFIL-$i-$j.root" >> $MSCF
-         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/E/stdCuts/$OFIL-$i-$j.root" >> $MSCF
+#         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/E/stdCuts/$OFIL-$i-$j.root" >> $MSCF
+         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/E/stdCuts/$MCFIL-$i-$j.root" >> $MSCF
       fi
 
 # output file

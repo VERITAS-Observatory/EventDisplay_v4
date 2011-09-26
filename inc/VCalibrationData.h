@@ -60,6 +60,7 @@ class VCalibrationData
         valarray< int > fTS_MJD;                  //!< MJD for pedestals in time slices
         valarray< double > fTS_time;              //!< time for pedestals in time slices
         valarray<double> fPeds;                   //!< mean pedestal
+	valarray<double> fPedVars;
         valarray< valarray < double > > fTS_Peds; //!< time dependant mean pedestal  [time slice][channel]
         vector< valarray< double > > fVPedvars;   //!< pedestal variance (for different sumwindows) [summation window][channel]
                                                   //!< time dependant pedestal variance [time slice][summation window][channel]
@@ -87,15 +88,12 @@ class VCalibrationData
         valarray< valarray< double > > fLowGainTS_fVmeanRMSPedvars;
 
 // high gain channels
-        valarray<double> fPedvarsPadded;          //!< pedestal variance after software padding
         TH1F* fPedDistribution;                   //!< mean pedestal distribution
 
         TH1F* fPedvarsDistribution;               //!< pedestal variance distribution
         valarray<double>  fPedrms;                //!< pedestal variance
         vector< double > fVmeanPedvars;           //!< mean pedestal variance (for different sumwindows)
         vector< double > fVmeanRMSPedvars;        //!< RMS pedestal variance (for different sumwindows)
-
-        valarray<double> fPedvarsPaddedSmall;     //!< pedestal variance after software padding for small sum window
 
         TH1F* fTOffsetsDistribution;              //!< toffset distribution
         TH1F* fTOffsetVarsDistribution;           //!< toffset vars distribution

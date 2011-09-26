@@ -658,6 +658,8 @@ int VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorArea( U
     {
        v = *fTel_type_iter;
        v /= 100000;
+       
+       if( v > 2000 ) v -= 2000;
        if( v > 1000 ) v -= 1000;
        if( v == t ) return z;
        z++;
@@ -681,7 +683,7 @@ int VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorArea_an
        ULong64_t v1 = v/100000;
        if( v1 > 1000 ) v1 -= 1000;
        v2 = v1*100 + (v%100);
-       
+
        if( v2 == t ) return z;
        z++;
     }

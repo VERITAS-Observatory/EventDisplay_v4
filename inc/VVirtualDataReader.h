@@ -186,6 +186,8 @@ class VVirtualDataReader
             return  0.;
         }
 
+	virtual bool hasFADCTrace() { return false; }
+
                                                   //!< has this event an array trigger or not
         virtual bool                       hasArrayTrigger()
         {
