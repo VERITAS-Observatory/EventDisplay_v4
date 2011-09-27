@@ -26,7 +26,7 @@ VDSTReader::VDSTReader(  string isourcefile, bool iMC, int iNTel, int iNChannel,
 
     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
     cout << "NOTE: DST READER FOR CTA SIMULATIONS WITH FADCS IS WORK IN PROGRESS" << endl;
-    cout << "(look for hardwired numbers, cross checks, etc" << endl;
+    cout << "(look for hardwired numbers, cross checks, etc)" << endl;
     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 
 // open source file and init tree
