@@ -32,6 +32,8 @@ class VVirtualDataReader
         std::vector<int> b;
         std::vector<bool> f;
         std::vector<double> d;
+	std::vector< uint16_t > iSampleVec16bit;
+
         string           fSourceFileName;
         vector< unsigned int > fTeltoAna;
         unsigned int fEventStatus;
@@ -101,6 +103,8 @@ class VVirtualDataReader
         vector< unsigned int >&             getTeltoAna() { return fTeltoAna; }
         virtual uint8_t                     getSample( unsigned channel, unsigned sample, bool iNewNoiseTrace = true ) { return 3; }
         virtual std::vector< uint8_t >      getSamplesVec() = 0;
+        virtual uint16_t                    getSample16Bit( unsigned channel, unsigned sample, bool iNewNoiseTrace = true ) { return 3; }
+        virtual std::vector< uint16_t >     getSamplesVec16Bit() { return iSampleVec16bit; }
         virtual void                        selectHitChan(uint32_t) = 0;
 	void                                setNumSamples( uint16_t iS ) { fNumSamplesTemp = iS; }
         void                                setTeltoAna( vector< unsigned int > iT ) { fTeltoAna = iT; }
@@ -187,6 +191,7 @@ class VVirtualDataReader
         }
 
 	virtual bool hasFADCTrace() { return false; }
+	virtual bool has16Bit()     { return false; }
 
                                                   //!< has this event an array trigger or not
         virtual bool                       hasArrayTrigger()

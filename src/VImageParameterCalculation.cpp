@@ -92,8 +92,7 @@ void VImageParameterCalculation::calcTimingParameters(valarray<double> fTZeros, 
 
 //  timing resolution from variable laser pulse studies (run 751)
             et[nclean]=13.0*exp(-0.035*(fSums[i]+30.))+fTOffsetvars[i];
-            if( et[nclean] < 5.e-2 ) et[nclean] = 5.e-2;
-//cout << i << " " <<acos(fParGeo->cosphi)*57.7 << " " <<fParGeo->sinphi<<" "<< xpos[nclean] << " " << ypos[nclean] << endl;
+            if( et[nclean] < 5.e-2 ) et[nclean] = 0.3;
 // min/max/mean times
             if( fTZeros[i]  < fParGeo->tmin ) fParGeo->tmin = fTZeros[i];
             if( fTZeros[i]  > fParGeo->tmax ) fParGeo->tmax = fTZeros[i];

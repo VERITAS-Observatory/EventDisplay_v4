@@ -213,7 +213,9 @@ using namespace std;
 
 */
 
-void getDifferenceInCameraCoordinates( double tel_ze, double tel_az, double shower_ze,  double shower_az, float &x, float &y, float &z )
+void getDifferenceInCameraCoordinates( double tel_ze, double tel_az,
+                                       double shower_ze,  double shower_az, 
+				       float &x, float &y, float &z )
 {
 // convert coordinates from [deg] to [rad]
     tel_az /= TMath::RadToDeg();
@@ -738,7 +740,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
  *  Main program function of read_hess.c program.
  */
 
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
 // stop watch 
    TStopwatch fStopWatch;

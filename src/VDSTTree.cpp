@@ -313,7 +313,6 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     if( fDST_tree->GetBranchStatus( "Trace" ) )
     {
        fDST_tree->SetBranchAddress( "Trace", fDSTtrace );
-       cout << "TRACE FOUND" << endl;
        setFADC( true );
     }
     fDST_tree->SetBranchAddress( "numSamples", fDSTnumSamples );
@@ -487,8 +486,7 @@ unsigned short int VDSTTree::getDSTTrace( unsigned int iTelID, unsigned int iCha
 
     if( iTel < 0 ) return 3;
 
-// HORRIBLE FUDGE
-    return fDSTtrace[iTel][iSample][iChannelID] - 230; 
+    return fDSTtrace[iTel][iSample][iChannelID]; 
 }
 
 unsigned int VDSTTree::getTrigL1( int iTelID, int iChannelID )

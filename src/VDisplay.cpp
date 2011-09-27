@@ -616,9 +616,14 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
        double itemp = 0;
        for( unsigned int i = 0; i < fEventLoop->getNSamples(); i++ )
        {
-	   itemp = (double)fEventLoop->getReader()->getSample( i_channel, i, false );
-// HORRIBLE FUDGE PARTE II
-	   if( fEventLoop->getReader()->getDataFormat() == "DST" ) itemp += 230.;
+	   if( fEventLoop->getReader()->has16Bit() )
+	   {
+	      itemp = (double)fEventLoop->getReader()->getSample16Bit( i_channel, i, false );
+           }
+	   else
+	   {
+	      itemp = (double)fEventLoop->getReader()->getSample( i_channel, i, false );
+           }
 // undo highlow
 	   if( i_channel < (int)fEventLoop->getLowGainMultiplier().size() && fEventLoop->getHiLo()[i_channel] )
 	   {
@@ -766,7 +771,11 @@ void VDisplay::drawFADC( bool iFit )
                 }
                 fFitTraceHandler->setMinuitPrint( true );
 		fEventLoop->getReader()->selectHitChan( chanID );
-                fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(), fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID], fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID], chanID, fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+		fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
+					    fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
+					    fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
+					    chanID,
+					    fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
 		cout << "HILO " << fEventLoop->getHiLo()[fSelectedChan - 200000] << "\t" << fEventLoop->getLowGainMultiplier()[chanID] << endl;
                 fFitTraceHandler->setMinuitPrint( false );
                 if( fFitTraceHandler->getFitted() )
@@ -1153,13 +1162,22 @@ void VDisplay::setFADCText()
 // pedestal variance    
     if( fEventLoop->getRunParameter()->fDoublePass && fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] > 0 )
     {
-       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), integration window %d", fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel], fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel], fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] );
+       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), integration window %d",
+                fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
+		fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
+		fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] );
     }
     else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
     {
        sprintf( cTemp, "no pedestal variance for 0 summation window" );
     }
-    else sprintf( cTemp, "no pedestal variance" );
+    else
+    {
+       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f)",
+                        fEventLoop->getAnalyzer()->getPedvars()[iChannel],
+			fEventLoop->getAnalyzer()->getPedvars( true )[iChannel] );
+//       sprintf( cTemp, "no pedestal variance" );
+    }
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 
     if( fEventLoop->getRunParameter()->fDoublePass )
@@ -1230,7 +1248,9 @@ void VDisplay::setFADCText()
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // sum / pedvar
     double i_var = 0.;
-    if( fEventLoop->getRunParameter()->fsourcetype != 6 && fEventLoop->getRunParameter()->fsourcetype != 7 && iChannel < fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
+    if( fEventLoop->getRunParameter()->fsourcetype != 6 &&
+        fEventLoop->getRunParameter()->fsourcetype != 7 &&
+	iChannel < fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
     {
         unsigned int iSumWindow = fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel];
         if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow ).size() )
@@ -1631,6 +1651,8 @@ bool VDisplay::drawTgradGraphs()
     fEventLoop->getData()->setTelID( fTelescope );
     TGraphErrors* xgraph = fEventLoop->getData()->getXGraph();
     if( !xgraph || xgraph->GetN() < 1 ) return false;
+
+    xgraph->Print();
 
     double y_min = 0.;
     double y_max = 20.;

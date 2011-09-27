@@ -24,6 +24,11 @@ VDSTReader::VDSTReader(  string isourcefile, bool iMC, int iNTel, int iNChannel,
 
     fDSTTree = new VDSTTree();
 
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    cout << "NOTE: DST READER FOR CTA SIMULATIONS WITH FADCS IS WORK IN PROGRESS" << endl;
+    cout << "(look for hardwired numbers, cross checks, etc" << endl;
+    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+
 // open source file and init tree
     init();
 }
@@ -95,11 +100,12 @@ bool VDSTReader::init()
         fLTtime.push_back( 0. );
         fLDTtime.push_back( 0. );
 // FADC Trace
-        vector< uint8_t > i_trace_sample( VDST_MAXSUMWINDOW, 0 );
-	vector< vector< uint8_t > > i_trace_sample_VV;
+        vector< uint16_t > i_trace_sample( VDST_MAXSUMWINDOW, 0 );
+	vector< vector< uint16_t > > i_trace_sample_VV;
 	for( unsigned int t = 0; t < VDST_MAXCHANNELS; t++ ) i_trace_sample_VV.push_back( i_trace_sample );
 	fFADCTrace.push_back( i_trace_sample_VV );
     }
+    fDummySample.assign( VDST_MAXSUMWINDOW, 0 );
 
     return fDSTTree->isMC();
 }
@@ -232,7 +238,7 @@ VMonteCarloRunHeader* VDSTReader::getMonteCarloHeader()
    return 0;
 }
 
-vector< uint8_t > VDSTReader::getSamplesVec()
+vector< uint16_t > VDSTReader::getSamplesVec16Bit()
 {
   if( fTelID < fFADCTrace.size() )
   {
@@ -242,10 +248,33 @@ vector< uint8_t > VDSTReader::getSamplesVec()
      }
   }
 
+  return fDummySample16Bit;
+}
+
+vector< uint8_t > VDSTReader::getSamplesVec()
+{
+  if( fTelID < fFADCTrace.size() )
+  {
+     if( fSelectedHitChannel < fFADCTrace[fTelID].size() ) 
+     {
+        for( unsigned int i = 0; i < getNumSamples(); i++ )
+	{
+	   fDummySample[i] = (uint8_t)fFADCTrace[fTelID][fSelectedHitChannel][i];
+        }
+	return fDummySample;
+     }
+  }
+  fDummySample.assign( VDST_MAXSUMWINDOW, 0 );
+
   return fDummySample;
 }
 
-uint8_t VDSTReader::getSample( unsigned channel, unsigned sample, bool iNewNoiseTrace )
+uint8_t  VDSTReader::getSample( unsigned channel, unsigned sample, bool iNewNoiseTrace )
+{
+   return (uint8_t)getSample16Bit( channel, sample, iNewNoiseTrace );
+}
+
+uint16_t VDSTReader::getSample16Bit( unsigned channel, unsigned sample, bool iNewNoiseTrace )
 {
   if( fTelID < fFADCTrace.size() )
   {

@@ -31,8 +31,6 @@ class VDSTTree
         TTree *fMCtree;
                                                   // [telID] = FOV
         map< unsigned int, float > fDST_list_of_telescopes;
-//      map< unsigned int, unsigned int > fTelescope_type_list;  // [telID] = telescope type (=
-                                                  // [#] = telID
         vector< unsigned int > fDST_vlist_of_telescopes;
 
         bool fMC;
