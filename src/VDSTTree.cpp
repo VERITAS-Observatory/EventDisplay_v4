@@ -302,8 +302,8 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     }
     fDST_tree->SetBranchAddress( "ntel_data", &fDSTntel_data );
     fDST_tree->SetBranchAddress( "tel_data", fDSTtel_data );
-    fDST_tree->SetBranchAddress( "zero_suppression", fDSTZeroSupression );
-    fDST_tree->SetBranchAddress( "recorded", fDSTRecord );
+    if( fDST_tree->GetBranchStatus( "zero_suppression" ) ) fDST_tree->SetBranchAddress( "zero_suppression", fDSTZeroSupression );
+    if( fDST_tree->GetBranchStatus( "recorded" ) )         fDST_tree->SetBranchAddress( "recorded", fDSTRecord );
     fDST_tree->SetBranchAddress( "nL1trig", fDSTnL1trig );
     fDST_tree->SetBranchAddress( "L1trig", fDSTL1trig );
     fDST_tree->SetBranchAddress( "sum", fDSTsums );
@@ -315,7 +315,7 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
        fDST_tree->SetBranchAddress( "Trace", fDSTtrace );
        setFADC( true );
     }
-    fDST_tree->SetBranchAddress( "numSamples", fDSTnumSamples );
+    if( fDST_tree->GetBranchStatus( "numSamples" ) ) fDST_tree->SetBranchAddress( "numSamples", fDSTnumSamples );
     fDST_tree->SetBranchAddress( "pulsetiminglevel", fDSTpulsetiminglevels );
     fDST_tree->SetBranchAddress( "pulsetiming", fDSTpulsetiming );
     fDST_tree->SetBranchAddress( "Max", fDSTMax );
@@ -342,16 +342,10 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
 
 int VDSTTree::hasData( int iTelID )
 {
-/*   for( unsigned int i = 0; i < fDSTntel_data; i++ )
-   {
-      if( iTelID == (int)fDSTtel_data[i] ) return i;
-   }
-   return -1; */
-
     if( iTelID < 0 ) return -1;
     if( iTelID >= (int)fDST_vlist_of_telescopes.size() ) return -1;
 
-    for( unsigned int j = 0; j < fDSTNTrig; j++ )
+    for( unsigned int j = 0; j < fDSTntel_data; j++ )
     {
         if( fDST_vlist_of_telescopes[iTelID] == fDSTtel_data[j] ) return j;
     }
@@ -361,13 +355,6 @@ int VDSTTree::hasData( int iTelID )
 
 int VDSTTree::hasLocalTrigger( int iTelID )
 {
-/*   for( unsigned int i = 0; i < fDSTNTrig; i++ )
-   {
-      if( iTelID == (int)fDSTLTrig_list[i] )
-      {
-         return i;
-      }
-   } */
     if( iTelID < 0 ) return -1;
     if( iTelID >= (int)fDST_vlist_of_telescopes.size() ) return -1;
 
