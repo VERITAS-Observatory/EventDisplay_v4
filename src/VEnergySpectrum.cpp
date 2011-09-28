@@ -1296,9 +1296,9 @@ void VEnergySpectrum::setOriginalBinner(TH1 *h)
    }
 
    nRebinner = new TH1D("nRebinner","nRebinner",Nbins-1,binsx);
-   for(Int_t i = 1; i <=nRebinner->GetNbinsX();i++)
+   for( Int_t i = 1; i <=nRebinner->GetNbinsX();i++ ) 
    {
-        cout << "nRebinner " << TMath::Power(10,nRebinner->GetBinLowEdge(i)) << endl;
+        cout << "nRebinner: new lower bin edges [TeV]: " << TMath::Power(10,nRebinner->GetBinLowEdge(i)) << endl;
    }
 
 }
