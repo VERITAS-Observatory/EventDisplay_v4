@@ -108,7 +108,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool   initializeDataStrutures( CData* iC );
    bool   IsZombie() { return fIsZombie; }
    void   plotBoxCuts();
-   void   plotSignalAndBackgroundEfficiencies();
+   void   plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4 );
    void   printSignalEfficiency();
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
@@ -122,7 +122,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAFileParameters( string iMethodName = "Method_Cuts", unsigned int iMethodCounter = 0 )
           { fTMVAMethodName = iMethodName; fTMVAMethodCounter = iMethodCounter; }
 
-   ClassDef(VTMVAEvaluator, 3 );
+   ClassDef(VTMVAEvaluator, 4 );
 };
 
 #endif

@@ -270,7 +270,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        char hname[600];
        sprintf( hname, "plotDebug_%d", bIntegral );
        b.setPlotDebug( hname );
-//       b.setWriteParticleNumberFile( "particleNumbers.root" );
+       b.setWriteParticleNumberFile( "particleNumbers.tmp.root" );
 // energy range to be plotted
        b.setEnergyRange_Lin( 0.01, 150. );
 

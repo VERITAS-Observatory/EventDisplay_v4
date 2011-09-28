@@ -632,7 +632,7 @@ void VTMVAEvaluator::plotBoxCuts()
      }
 }
 
-void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies()
+void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYmin )
 {
    if( fSignalEfficiency.size() == 0 )
    {
@@ -682,14 +682,15 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies()
    TCanvas *iCanvas = new TCanvas( "cSignalAndBackgroundEfficiencies", "signal and background efficiencies", 10, 10, 400, 400 );
    iCanvas->SetGridx( 0 );
    iCanvas->SetGridy( 0 );
-   if( !bNullEntry ) iCanvas->SetLogy();
+   if( !bNullEntry && iLogY ) iCanvas->SetLogy();
+   else if( !iLogY )          iCanvas->SetLogy( 0 );
    iCanvas->Draw();
 
    TH1D *hnull = new TH1D( "hnullcSignalAndBackgroundEfficiencies", "", 100, fEnergyCut_Log10TeV_min[0], fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
    hnull->SetStats( 0 );
    hnull->SetXTitle( "energy [TeV]" );
    hnull->SetYTitle( "signal/background efficiency" );
-   hnull->SetMinimum( iMinBck*0.5 );
+   hnull->SetMinimum( iYmin );
    hnull->SetMaximum( 1. );
    plot_nullHistogram( iCanvas, hnull, false, false, 1.3, fEnergyCut_Log10TeV_min[0], fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
 
@@ -783,6 +784,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    cout << "TVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
    cout << " non = " << Non;
    cout << " noff = " << Nof;
+   cout << " (energy bin " << iEnergyBin << ", " << iMeanEnergy_TeV << ")";
    cout << endl;
        
 //////////////////////////////////////////////////////
@@ -825,11 +827,17 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       if( effB->GetBinContent( i ) > 0. && Nof > 0. )
       {
          i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof, effB->GetBinContent( i ) * Nof, 1. );
+	 cout << "___________________________________________________________" << endl;
+	 cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t" << Nof << "\t" << effB->GetBinContent( i ) << endl;
+	 cout << "\t" << effS->GetBinContent( i ) * Non << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof << "\t" << effB->GetBinContent( i ) * Nof << endl;
 	 if( iGSignal_to_sqrtNoise )
 	 {
 	    iGSignal_to_sqrtNoise->SetPoint( z, effS->GetBinCenter( i ), i_Signal_to_sqrtNoise );
+	    cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << endl;
 	    z++;
          }
+	 cout << "\t z " << z << "\t" << i_Signal_to_sqrtNoise << endl;
+	 cout << "___________________________________________________________" << endl;
       }
    }
 // fill a histogram from these values and smooth it
@@ -856,7 +864,9 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 
    if( bPlotEfficiencyPlotsPerEnergy )
    {
-      plotEfficiencyPlotsPerEnergy( iEnergyBin, iGSignal_to_sqrtNoise, iHSignal_to_sqrtNoise, effS, effB, fEnergyCut_Log10TeV_min[iEnergyBin], fEnergyCut_Log10TeV_max[iEnergyBin] );
+      plotEfficiencyPlotsPerEnergy( iEnergyBin, iGSignal_to_sqrtNoise, iHSignal_to_sqrtNoise,
+                                    effS, effB,
+				    fEnergyCut_Log10TeV_min[iEnergyBin], fEnergyCut_Log10TeV_max[iEnergyBin] );
    }
 
    return true;
