@@ -373,7 +373,7 @@ void VDisplay::updateCamera( Int_t i )
             gSystem->ProcessEvents();
             if( !checkPlotIntentions( i ) ) return;
         }
-// loop over all telescope we want to see
+// loop over all telescopes we want to see
         for( unsigned int t = 0; t < fTelescopesToShow.size(); t++ )
         {
             fEventLoop->getAnalyzer()->setTelID( fTelescopesToShow[t] );
@@ -1651,8 +1651,6 @@ bool VDisplay::drawTgradGraphs()
     fEventLoop->getData()->setTelID( fTelescope );
     TGraphErrors* xgraph = fEventLoop->getData()->getXGraph();
     if( !xgraph || xgraph->GetN() < 1 ) return false;
-
-    xgraph->Print();
 
     double y_min = 0.;
     double y_max = 20.;
