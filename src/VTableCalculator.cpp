@@ -579,7 +579,7 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                 {
                     if( b[j] != 0. )
                     {
-                        chi2 = ( value - a[j] ) * ( value - a[j] ) / b[j] / b[j];
+                        chi2 += ( value - a[j] ) * ( value - a[j] ) / b[j] / b[j];
 			z1++;
                     }
 //////////////////////////////////////////////////////////////////////

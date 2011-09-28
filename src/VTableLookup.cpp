@@ -891,9 +891,9 @@ void VTableLookup::loop()
 
     weighted by cos ze
 */
-double VTableLookup::interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos,  double iLimitforInterpolation  )
+double VTableLookup::interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos, double iLimitforInterpolation )
 {
-// don't interpolate if one value is not valid
+// don't interpolate if both values are not valid
     if( w1 < -90. && w2 < -90. ) return -99.;
 
 // same zenith angle, don't interpolate
@@ -938,21 +938,21 @@ double VTableLookup::interpolate( double w1, double ze1, double w2, double ze2, 
 
 void VTableLookup::interpolate( VTablesToRead *s1, double w1, VTablesToRead *s2, double w2, VTablesToRead *s, double w, bool iCos )
 {
-    s->mscw = interpolate( s1->mscw, w1, s2->mscw, w2, w, iCos, 0.1 );
-    s->mscl = interpolate( s1->mscl, w1, s2->mscl, w2, w, iCos, 0.1 );
-    s->energyER = interpolate( s1->energyER, w1, s2->energyER, w2, w, iCos, 0.1 );
+    s->mscw =          interpolate( s1->mscw, w1, s2->mscw, w2, w, iCos, 0.1 );
+    s->mscl =          interpolate( s1->mscl, w1, s2->mscl, w2, w, iCos, 0.1 );
+    s->energyER =      interpolate( s1->energyER, w1, s2->energyER, w2, w, iCos, 0.1 );
     s->energyER_Chi2 = interpolate( s1->energyER_Chi2, w1, s2->energyER_Chi2, w2, w, iCos, 0.1 );
     s->energyER_dE =   interpolate( s1->energyER_dE, w1, s2->energyER_dE, w2, w, iCos, 0.1 );
-    s->energySR = interpolate( s1->energySR, w1, s2->energySR, w2, w, iCos, 0.1 );
+    s->energySR =      interpolate( s1->energySR, w1, s2->energySR, w2, w, iCos, 0.1 );
     s->energySR_Chi2 = interpolate( s1->energySR_Chi2, w1, s2->energySR_Chi2, w2, w, iCos, 0.1 );
-    s->energySR_dE = interpolate( s1->energySR_dE, w1, s2->energySR_dE, w2, w, iCos, 0.1 );
+    s->energySR_dE =   interpolate( s1->energySR_dE, w1, s2->energySR_dE, w2, w, iCos, 0.1 );
 
     for( unsigned int i = 0; i < s1->fNTel; i++ )
     {
-        s->mscw_T[i] = interpolate( s1->mscw_T[i], w1, s2->mscw_T[i], w2, w, iCos, 1.e-2 );
-        s->mscl_T[i] = interpolate( s1->mscl_T[i], w1, s2->mscl_T[i], w2, w, iCos, 1.e-2 );
-        s->energyER_T[i] = interpolate( s1->energyER_T[i], w1, s2->energyER_T[i], w2, w, iCos, 1.e-2 );
-        s->energySR_T[i] = interpolate( s1->energySR_T[i], w1, s2->energySR_T[i], w2, w, iCos, 1.e-2 );
+        s->mscw_T[i] =      interpolate( s1->mscw_T[i], w1, s2->mscw_T[i], w2, w, iCos, 1.e-2 );
+        s->mscl_T[i] =      interpolate( s1->mscl_T[i], w1, s2->mscl_T[i], w2, w, iCos, 1.e-2 );
+        s->energyER_T[i] =  interpolate( s1->energyER_T[i], w1, s2->energyER_T[i], w2, w, iCos, 1.e-2 );
+        s->energySR_T[i] =  interpolate( s1->energySR_T[i], w1, s2->energySR_T[i], w2, w, iCos, 1.e-2 );
         s->mscw_Tsigma[i] = interpolate( s1->mscw_Tsigma[i], w1, s2->mscw_Tsigma[i], w2, w, iCos, 1.e-2 );
         s->mscl_Tsigma[i] = interpolate( s1->mscl_Tsigma[i], w1, s2->mscl_Tsigma[i], w2, w, iCos, 1.e-2 );
     }
@@ -1251,10 +1251,14 @@ void VTableLookup::calculateMSFromTables( VTablesToRead *s, double esys )
 // calculate energy (method 1)
     f_calc_energySR->setCalculateEnergies( true );
     f_calc_energySR->setVHistograms( s->henergySRMedian, s->henergySRSigma );
-    s->energySR = f_calc_energySR->calc( (int)fData->getNTel(), fData->getDistanceToCore(), fData->getSize( fTLRunParameter->fEnergySizecorrection ), 0, s->energySR_T, s->energySR_Chi2, s->energySR_dE, s->energySR_Tsigma );
+    s->energySR = f_calc_energySR->calc( (int)fData->getNTel(), fData->getDistanceToCore(),
+                                         fData->getSize( fTLRunParameter->fEnergySizecorrection ), 0,
+					 s->energySR_T, s->energySR_Chi2, s->energySR_dE, s->energySR_Tsigma );
 // calculate energy (method 0)
     f_calc_energy->setVHistograms( s->henergyERMedian, s->henergyERSigma );
-    s->energyER = f_calc_energy->calc( (int)fData->getNTel(), fData->getMCEnergy(), fData->getDistanceToCore(), fData->getSize( fTLRunParameter->fEnergySizecorrection ), fData->getDistance(), s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
+    s->energyER = f_calc_energy->calc( (int)fData->getNTel(), fData->getMCEnergy(), fData->getDistanceToCore(),
+                                       fData->getSize( fTLRunParameter->fEnergySizecorrection ), fData->getDistance(),
+				       s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
 }
 
 

@@ -252,7 +252,7 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
 
                 hMedian->SetBinContent( i+1, j+1, med );
                 hSigma->SetBinContent( i+1, j+1, sigma );
-                if( Oh[i][j]->GetEntries() > 3 ) hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
+                hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
 
                 id=10000+i*100+j;
                 sprintf( hisname , "h%d",id);
@@ -491,7 +491,7 @@ void VTableEnergyCalculator::get_logEnergy(double logSize, int ir, double &med, 
     w2 = hS->GetBinContent( i+2, ir+1 );
 
 // (GM) do not interpolate beyond largest size (s2 > logSize)
-    if( (s1>0) && (s2>0) && (w1>0) && (w2>0) && (s2 > logSize) )
+    if( (s1>0.) && (s2>0.) && (w1>0.) && (w2>0.) && (s2 > logSize) )
     {
         e1 = hM->GetXaxis()->GetBinCenter( i+1 );
         e2 = hM->GetXaxis()->GetBinCenter( i+2 );
@@ -501,7 +501,7 @@ void VTableEnergyCalculator::get_logEnergy(double logSize, int ir, double &med, 
         {
             rest  = (logSize-s1)/delta;
             med   =  (1.-rest)*e1 + rest*e2;
-            sigma   = ( (1.-rest)*w1 + rest*w2) * fLog10;          // observe this has the unit size
+            sigma = ( (1.-rest)*w1 + rest*w2) * fLog10;          // observe this has the unit size
         }
         else
         {
