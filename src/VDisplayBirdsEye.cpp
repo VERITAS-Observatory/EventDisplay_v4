@@ -281,8 +281,18 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
         double degrad = 45. / atan( 1. );
         double i_y = fData->getShowerParameters()->fShower_Yoffset[iM];
         double i_x = fData->getShowerParameters()->fShower_Xoffset[iM];
-        i_xcos = sin( (90.-fData->getPointing()[0]->getTelElevation()+i_x)/degrad) * sin((fData->getPointing()[0]->getTelAzimuth()+i_y - 180.)/degrad);
-        i_ycos = sin( (90.-fData->getPointing()[0]->getTelElevation()+i_x)/degrad) * cos((fData->getPointing()[0]->getTelAzimuth()+i_y - 180.)/degrad);
+	if( fData->getTeltoAna().size() > 0 && fData->getPointing()[fData->getTeltoAna()[0]] )
+	{
+	   i_xcos = sin( (90.-fData->getPointing()[fData->getTeltoAna()[0]]->getTelElevation()+i_x)/degrad) *
+	            sin((fData->getPointing()[fData->getTeltoAna()[0]]->getTelAzimuth()+i_y - 180.)/degrad);
+	   i_ycos = sin( (90.-fData->getPointing()[fData->getTeltoAna()[0]]->getTelElevation()+i_x)/degrad) *
+	            cos((fData->getPointing()[fData->getTeltoAna()[0]]->getTelAzimuth()+i_y - 180.)/degrad);
+        }
+	else
+	{
+	   cout << "VDisplayBirdsEye::drawImageLines_and_Corepositions() error: no telescope coordinates found" << endl;
+	   return;
+        }
     }
 
    for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
