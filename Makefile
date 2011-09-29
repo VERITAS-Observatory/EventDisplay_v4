@@ -844,6 +844,10 @@ $(distdir):	FORCEDISTDIR
 	cp README/README* $(distdir)/README
 	cp README/INSTALL $(distdir)/README
 	cp README/AUTHORS $(distdir)/README
+	mkdir -p $(distdir)/doc
+	cp doc/Manual.tex $(distdir)/doc
+	cp doc/Manual_Title.tex $(distdir)/doc
+	cp doc/Manual.pdf $(distdir)/doc
 	mkdir -p $(distdir)/src
 	cp src/*.cpp src/*.C src/*.c $(distdir)/src
 	mkdir -p $(distdir)/inc

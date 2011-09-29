@@ -21,7 +21,7 @@ Documentation
 -------------
 
 INSTALL   	information on installation the analysis package, dependencies, environmental variables
-REAMDE.CTA      description of a typical CTA analysis
+README.CTA      description of a typical CTA analysis
 README.VTS      description of a typical VERITAS analysis
 AUTHORS		author description
 

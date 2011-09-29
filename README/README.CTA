@@ -5,7 +5,7 @@ General concept
 ===============
 
 To use Eventdisplay for CTA analyses, you first have to convert the simtel.gz file into ROOT format. 
-This you have to do for each subarray seperately.
+This you have to do for each subarray separately.
 Afterwards you can analyse this subarray file running Eventdisplay in the standard way, which means:
 
 i)   EVNDISPSYS/bin/CTA.convert_hessio_to_VDST
