@@ -123,11 +123,18 @@ void VDisplayBirdsEye::drawEventText()
 // mc text
     if( fData->getReader()->isMC() )
     {
-        sprintf( iText, "MC: Ze=%.1f, Az=%.1f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->MCze, fData->getShowerParameters()->MCaz, fData->getShowerParameters()->MCTel_Xoff, fData->getShowerParameters()->MCTel_Yoff, fData->getShowerParameters()->MCxcore, fData->getShowerParameters()->MCycore );
+        sprintf( iText, "MC: E=%.2f, Ze=%.0f, Az=%.0f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->MCenergy, fData->getShowerParameters()->MCze, fData->getShowerParameters()->MCaz, fData->getShowerParameters()->MCTel_Xoff, fData->getShowerParameters()->MCTel_Yoff, fData->getShowerParameters()->MCxcore, fData->getShowerParameters()->MCycore );
         fTextRec.push_back( new TText( 0.02, 0.08, iText ) );
     }
 // shower reconstruction text
     sprintf( iText, "NIm: %u (ID%d)", fData->getShowerParameters()->fShowerNumImages[iM], iM );
+    for( unsigned int i = 0; i < fData->getNTel(); i++ )
+    {
+       if( fData->getShowerParameters()->fTelIDImageSelected_list[iM][i] )
+       {
+	  sprintf( iText, "%s %d", iText, (int)(i+1) );
+       }
+    }
     fTextRec.push_back( new TText( 0.02, 0.05, iText ) );
     sprintf( iText, "Ze=%.1f, Az=%.1f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->fShowerZe[iM], fData->getShowerParameters()->fShowerAz[iM], fData->getShowerParameters()->fShower_Xoffset[iM], fData->getShowerParameters()->fShower_Yoffset[iM], fData->getShowerParameters()->fShowerXcore[iM], fData->getShowerParameters()->fShowerYcore[iM] );
     fTextRec.push_back( new TText( 0.02, 0.02, iText ) );

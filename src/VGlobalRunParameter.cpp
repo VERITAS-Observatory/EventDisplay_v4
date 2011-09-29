@@ -111,9 +111,6 @@ bool VGlobalRunParameter::setDirectories()
        const char *vdata_dir = gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" );
        if( vdata_dir )
        {
-	   cout << endl;
-           cout << "VGlobalRunParameter::setDirectories(): no environmental variable $OBS_EVNDISP_ANA_DIR found" << endl;
-	   cout << "...assuming VERITAS analysis" << endl;
 	   fEVNDISPAnaDataDirectory = vdata_dir;
 	   fEVNDISPAnaDataDirectory += "/";
        }

@@ -198,59 +198,90 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 }
 
 
-void VDSTTree::resetDataVectors( unsigned int iCH )
+void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsigned int iMaxPrevNTel, unsigned int iMaxNChannels, 
+                                 unsigned int iMaxNTimingLevels, unsigned int iMaxNSamples, bool iTriggerReset, bool iIsCTADST )
 {
+// reset the data vectors
+    if( iMaxNTel >= VDST_MAXTELESCOPES )            iMaxNTel = VDST_MAXTELESCOPES;
+    if( iMaxPrevNTel >= VDST_MAXTELESCOPES || iMaxPrevNTel == 0 ) iMaxPrevNTel = VDST_MAXTELESCOPES;
+    if( iMaxNChannels >= VDST_MAXCHANNELS )         iMaxNChannels = VDST_MAXCHANNELS;
+    if( iMaxNTimingLevels >= VDST_MAXTIMINGLEVELS ) iMaxNTimingLevels = VDST_MAXTIMINGLEVELS;
+    if( iMaxNSamples >= VDST_MAXSUMWINDOW )         iMaxNSamples = VDST_MAXSUMWINDOW;
+
+// reset trigger data 
     fDSTLTrig = 0;
     fDSTNTrig = 0;
-// reset the data vectors
-    for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    for( unsigned int i = 0; i < iMaxNTel; i++ )
     {
-        fDSTLTtime[i] = 0.;
-        fDSTLDTtime[i] = 0.;
-        fDSTpointAzimuth[i] = 0.;
-        fDSTpointElevation[i] = 0.;
         fDSTLTrig_list[i] = 0;
         fDSTnL1trig[i] = 0;
+        fDSTLTtime[i] = 0.;
+    }
+// return if previous event changed trigger variables only
+    if( iTriggerReset ) return;
+
+// loop over telescopes
+    for( unsigned int i = 0; i < iMaxNTel; i++ )
+    {
+        fDSTpointAzimuth[i] = 0.;
+        fDSTpointElevation[i] = 0.;
+
+    }
+
+    if( !iIsCTADST )
+    {
+	for( unsigned int i = 0; i < iMaxNTel; i++ )
+	{
+	   fDSTLDTtime[i] = 0.;
+	   for( unsigned int j = 0; j < iMaxNChannels; j++ )
+	   {
+	       fDSTsumfirst[i][j] = 0;
+	       fDSTt0[i][j] = 0.;
+	       fDSTChi2[i][j] = 0.;
+	       fDSTRT[i][j] = 0.;
+	       fDSTFT[i][j] = 0.;
+	       fDSTRTpar[i][j] = 0.;
+	       fDSTFTpar[i][j] = 0.;
+	       fDSTRawMax[i][j] = 0;
+	       fDSTTraceWidth[i][j] = 0.;
+	       fDSTN255[i][j] = 0;
+	       fDSTTraceNorm[i][j] = 0.;
+	   }
+	   fDSTPDMax[i] = 0.;
+	   fDSTPDSum[i] = 0.;
+        }
+    }
+
+// loop over all telescopes with data in the previous event
+    for( unsigned int i = 0; i < iMaxPrevNTel; i++ )
+    {
 	fDSTtel_data[i] = 0;
 	fDSTZeroSupression[i] = 0;
 	fDSTnumSamples[i] = 0;
-        for( unsigned int j = 0; j < VDST_MAXCHANNELS; j++ )
+        for( unsigned int j = 0; j < iMaxNChannels; j++ )
         {
             if( iCH == 0 ) fDSTChan[i][j] = j;
             else           fDSTChan[i][j] = iCH;
 	    fDSTRecord[i][j] = 1;                    // expect by default that all pixels are there
             fDSTsums[i][j] = 0.;
-            fDSTsumwindow[i][j] = 0;
-            fDSTsumfirst[i][j] = 0;
-            fDSTt0[i][j] = 0.;
-            fDSTChi2[i][j] = 0.;
-            fDSTRT[i][j] = 0.;
-            fDSTFT[i][j] = 0.;
-            fDSTRTpar[i][j] = 0.;
-            fDSTFTpar[i][j] = 0.;
-            fDSTMax[i][j] = 0;
-            fDSTRawMax[i][j] = 0;
-            fDSTTraceWidth[i][j] = 0.;
-            fDSTHiLo[i][j] = 0;
-            fDSTL1trig[i][j] = 0;
-            fDSTN255[i][j] = 0;
-            fDSTTraceNorm[i][j] = 0.;
             fDSTdead[i][j] = 0;
-	    for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ )
+            fDSTsumwindow[i][j] = 0;
+            fDSTHiLo[i][j] = 0;
+            fDSTMax[i][j] = 0;
+            fDSTL1trig[i][j] = 0;
+	    for( unsigned int t = 0; t < iMaxNTimingLevels; t++ )
 	    {
 	       fDSTpulsetiming[i][t][j] = 0.;
             }
 	    if( fReadWriteFADC )
 	    {
-	       for( unsigned int t = 0; t < VDST_MAXSUMWINDOW; t++ )
+	       for( unsigned int t = 0; t < iMaxNSamples; t++ )
 	       {
 		  fDSTtrace[i][t][j] = 0;
 	       }
             }
         }
-        fDSTPDMax[i] = 0.;
-        fDSTPDSum[i] = 0.;
-        for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ ) fDSTpulsetiminglevels[i][t] = 0.;
+        for( unsigned int t = 0; t < iMaxNTimingLevels; t++ ) fDSTpulsetiminglevels[i][t] = 0.;
     }
 }
 

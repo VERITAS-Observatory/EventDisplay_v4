@@ -131,7 +131,13 @@ class VDSTTree
         bool initMCTree();
         map< unsigned int, float> readArrayConfig( string );
         map< unsigned int, unsigned int > readTelescopeTypeList( string );
-        void resetDataVectors( unsigned int iCH = 0 );
+        void resetDataVectors( unsigned int iCH = 0,
+	                       unsigned int iMaxNTel = VDST_MAXTELESCOPES,
+			       unsigned int iMaxPrevNTel = VDST_MAXTELESCOPES,
+	                       unsigned int iMaxNChannels = VDST_MAXCHANNELS,
+			       unsigned int iMaxNTimingLevels = VDST_MAXTIMINGLEVELS,
+			       unsigned int iMaxNSamples = VDST_MAXSUMWINDOW,
+			       bool iTriggerReset = false, bool iIsCTADST = false );
 	void setFADC( bool iFADC = false ) { fReadWriteFADC = iFADC; }
         void setMC( bool iMC = true ) { fMC = iMC; }
 

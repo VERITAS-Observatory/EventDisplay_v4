@@ -161,8 +161,10 @@ endif
 ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
-#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
-CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
+# 2010 production
+CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+# 2011 SC 
+#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
 
 ########################################################

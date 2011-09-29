@@ -46,6 +46,16 @@ Options:
 #include "VDSTTree.h"
 #include "VMonteCarloRunHeader.h"
 
+///////////////////////////////////////////////////////
+// maximum number of pixels for the current array configuration
+unsigned int fGlobalMaxNumberofPixels;
+// maximum number of FADC samples for the current array configuration
+unsigned int fGlobalMaxNumberofSamples;
+// maximum number of telescopes in previous event
+unsigned int fGlobalNTelPreviousEvent;
+// set if this event does not pass the minimum number of telescope condition
+bool fGlobalTriggerReset;
+///////////////////////////////////////////////////////
 
 /*!
       hard wired timing configuration:
@@ -200,7 +210,7 @@ static void syntax (char *program)
    printf("   --max-events n   (Skip remaining data after so many triggered events.)\n");
    printf("   -a subarray file (list of telescopes to read with FOV.)\n" );
    printf("   -o dst filename  (name of dst output file)\n" );
-   printf("   -f true/false    (write FADC samples to DST file)\n" );
+   printf("   -f on=1/off=0    (write FADC samples to DST file;default=0)\n" );
 
    exit(1);
 }
@@ -318,7 +328,11 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    if( !fData || !hsdata ) return false;
 
 // reset all arrays
-   fData->resetDataVectors( 99999 );
+   fData->resetDataVectors( 99999, fData->fDSTntel, fGlobalNTelPreviousEvent,
+                            fGlobalMaxNumberofPixels,                            
+			    getPulseTimingLevels().size(),
+			    fGlobalMaxNumberofSamples,
+			    fGlobalTriggerReset, true );
 
 // event data
    fData->fDSTeventnumber = hsdata->mc_event.event;
@@ -361,7 +375,13 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    fData->fDSTLTrig = i_localTrigger.to_ulong();
    fData->fDSTNTrig = i_ntel_trig;
 // check array trigger condition again
-   if( fData->fDSTNTrig < (unsigned int)hsdata->run_header.min_tel_trig ) return true;
+   if( fData->fDSTNTrig < (unsigned int)hsdata->run_header.min_tel_trig )
+   {
+// set trigger reset variable (needed for efficient resetting of DST arrays)
+      fGlobalTriggerReset = true;
+      return true;
+   }
+   fGlobalTriggerReset = false;
 
 // tracking data
    unsigned int z = 0;
@@ -390,6 +410,11 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 
          fData->fDSTZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
 	 fData->fDSTnumSamples[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->num_samples;
+// set maximum number of FADC samples (needed for efficient resetting of DST arrays)
+	 if( fData->fDSTnumSamples[i_ntel_data] > fGlobalMaxNumberofSamples )
+	 {
+	    fGlobalMaxNumberofSamples = fData->fDSTnumSamples[i_ntel_data];
+         }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // find time integration type required for DST
@@ -406,6 +431,11 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	 }
 	 if( hsdata->camera_set[telID].num_pixels < VDST_MAXCHANNELS )
 	 {
+// set maximum number of pixels (needed for efficient resetting of DST arrays)
+	    if( (unsigned int)hsdata->camera_set[telID].num_pixels > fGlobalMaxNumberofPixels )
+	    {
+	       fGlobalMaxNumberofPixels = (unsigned int)hsdata->camera_set[telID].num_pixels;
+            }
 	    for( int p = 0; p < hsdata->camera_set[telID].num_pixels; p++ )
 	    {
 		fData->fDSTChan[i_ntel_data][p] =  0;
@@ -467,6 +497,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
          i_ntel_data++;
       }
    }
+   fGlobalNTelPreviousEvent = i_ntel_data;
    fData->fDSTntel_data = i_ntel_data;
 
 // MC
@@ -759,6 +790,11 @@ int main(int argc, char **argv)
    int showdata = 0, showhistory = 0;
    size_t events = 0, max_events = 0;
    int iarg;
+
+   fGlobalNTelPreviousEvent = 0;
+   fGlobalMaxNumberofPixels = 0;
+   fGlobalMaxNumberofSamples = 0;
+   fGlobalTriggerReset = false;
 
    string config_file = "";   // file with list of telescopes
    string dst_file = "dst.root";      // output dst file
