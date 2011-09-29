@@ -1,0 +1,290 @@
+%*-- Author :    G.Maier   2011/09/25
+\documentclass[titlepage,a4paper,twoside,11pt]{report}
+% floating objects
+\usepackage{float}
+% floating object placements
+\usepackage{afterpage}
+% use more of a page
+\usepackage{a4wide}
+% sort citation numbers
+\usepackage{cite}
+% more symbols, e.g. \blacksquare, \blacktriangle
+\usepackage{amssymb}
+% \usepackage{lscape}  % landscape with \begin{landscape} \end{landscape}
+% header with lines etc.
+\usepackage{fancyheadings}
+\usepackage{longtable} % table longer than one page
+\usepackage{booktabs} % toprule, etc.
+
+% captions in italic
+\usepackage{caption2}
+\renewcommand*\captionfont{\slshape}
+\renewcommand*\captionlabelfont{\upshape}
+% versions
+\usepackage{version}
+ \includeversion{TEV}
+ \excludeversion{GREEN}
+ \excludeversion{LMX}
+ \excludeversion{HMX}
+ \excludeversion{EGRET}
+\excludeversion{TAYLOR}
+
+\usepackage[pdftex]{graphicx}
+\pdfcompresslevel=0   % pdf-file should (not) be compressed
+\usepackage[pdftex]{color}
+% make bookmarks, don't show bookmarks when opening the file
+\usepackage[pdftex,colorlinks=false,bookmarks=false,bookmarksopen=false]{hyperref}
+\pdfinfo
+  {
+      /Title (promo.pdf)
+      /Creator (TeX)
+      /Producer (pdfTeX)
+      /Author (Gernot Maier)
+      /CreationDate (D:20110925180100)
+      /ModDate (D:20110925180100)
+      /Subject (manual)
+      /Keywords (gamma rays, analysis, VERITAS, CTA)
+  }
+%  \usepackage{thumbpdf}
+
+%%%%%%%%%%%%%%%
+%% pdflatex configure file ????
+%% To include a graphics file \includegraphics{filename_to_include}
+%% convert eps files with epstopdf
+
+% no header and no page number, ersetzt \cleardoublepage
+\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+
+% new headers
+\pagestyle{fancyplain}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\lhead[\fancyplain{}{\bfseries\thepage}]{\fancyplain{}{\bfseries\rightmark}}
+\rhead[\fancyplain{}{\bfseries\leftmark}]{\fancyplain{}{\bfseries\thepage}}
+\cfoot{\fancyplain{\thepage}}
+
+% \marginlabel, replaces \marginpar 
+\newcommand{\marginlabel}[1]{\mbox{}\marginpar{\raggedleft\hspace{0pt}{\color{cyan}#1}}}
+% degrees
+\newcommand{\Grad}{$^{\circ}$}
+%% new color
+\definecolor{Grau}{gray}{0.905}
+\usepackage{listings}
+\lstset{language=C++, basicstyle=\small,backgroundcolor=\color{Grau}}
+
+\renewcommand{\textfraction}{0.02}
+\renewcommand{\floatpagefraction}{0.70}
+
+% spelling
+\hyphenation{CRES KRETA KASCADE GHEISHA Karls-ruhe CORSIKA}
+
+\begin{document}
+
+% ########### title page ###########################
+
+\include{Manual_Title}
+
+% ############ Vorspann  ###########################
+
+\pagenumbering{roman}
+\thispagestyle{empty}
+
+\begin{abstract}
+
+eventdisplay is a complete package for VERITAS and CTA analysis (whatever 'complete' means...)
+The package consists of several analysis steps and tools:
+
+\begin{enumerate}
+\item evndisp (calibrate and parametrize images, event reconstruction, stereo analysis)
+\item mscw\_energy (use lookup tables to produce msw, msl, and energies)
+\item anasum (produce maps and calculate analysis results)
+\item shared library tools and macros (see EVNDISP/lib/libVAnaSum.so and EVNDISP/macros/)  (produce the energy spectrum and integral fluxes, plot maps, etc.) 
+\item makeEffectiveArea (calculate effective areas)
+\item makeOptimizeBoxCutsTMVA (tools to optimize cuts)
+\item ...
+\end{enumerate}
+
+This is a very incomplete manual, started in September 2009. Please help updating it.
+
+\end{abstract}
+
+
+\setcounter{page}{1}
+\tableofcontents
+\clearemptydoublepage
+
+
+% ############ main part #####################
+\pagenumbering{arabic}
+
+\chapter{Documentation}
+
+EVNDISP is work-in-progress and the documentation is not in the state it is supposed to be. 
+Apart from the information in this manual, other sources for help are:
+
+\subsection*{README files}
+
+\begin{description}
+\item[INSTALL:]   information on installation the analysis package, dependencies, environmental variables
+\item[README.CTA :]  short description of a typical CTA analysis
+\item[README.VTS:]      description of a typical VERITAS analysis
+\item[AUTHORS:]		author description
+\end{description}
+
+\noindent Description and command line options for the different software parts:
+
+\begin{description}
+\item[README.EVNDISP:]
+\item[README.MSCW\_ENERGY:]
+\item[README.ANASUM:]
+\item[README.EFFECTIVEAREA:]
+\item[README.ANALYSISLIBRARY:]
+\item[README.SCRIPTS:]
+\item[README.MACROS:]
+\end{description}
+
+\subsection*{WIKI pages}
+
+The EVNDISP manual for VERITAS users: 
+
+\url{http://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay\_Manual}
+
+\clearemptydoublepage
+
+\chapter{Introduction}
+
+\chapter{eventdisplay - calibration, image analysis and stereo reconstruction}
+
+% ############ Input data format ######################
+\chapter{Input data format}
+
+\section{VBF - VERITAS Bank Format}
+
+\section{DST - data summary tree}
+
+The DST format is a simple ROOT tree containing standard C++ variables only (no class data).
+
+\subsection{Limitations}
+
+The implementation requires the hardwiring of the maximum number of telescopes, channels, etc. 
+These values can be found in {\texttt inc/VGlobalRunParameter}, for example:
+
+\begin{lstlisting}
+// HARDWIRED MAXIMUM NUMBER OF TELESCOPES AND CHANNELS, etc.
+// maximum number of telescopes
+#define VDST_MAXTELESCOPES  100
+// maximum number of channels per telescopes
+#define VDST_MAXCHANNELS   12000
+// maximum number of summation windows
+// (=maximum number of samples per FADC trace)   
+#define VDST_MAXSUMWINDOW   16
+// maximum number of time slices for pedestal calculation
+#define VDST_PEDTIMESLICES 5000   
+// maximum number of arrayreconstruction method 
+#define VDST_MAXRECMETHODS  100
+// maximum number of timing levels
+#define VDST_MAXTIMINGLEVELS 10    
+\end{lstlisting}
+
+\noindent {\bf NOTE: } These numbers determine the memory requirements of {\it evndisp} and {\it CTA.convert\_hessio\_to\_VDST}.
+
+\noindent {\bf NOTE: } {\it evndisp} must be compiled with the same settings as the writing program.
+
+% ############ CTA analysis ######################
+
+\chapter{CTA analysis}
+
+\section{General concept}
+
+To use Eventdisplay for CTA analyses, you first have to convert the {\it simtel.gz} file into ROOT format. 
+This you have to do for each subarray separately.
+Afterwards you can analyze this subarray file running {\it eventdisplay} in the standard way, which means:
+
+\begin{description}
+\item[\$EVNDISPSYS/bin/CTA.convert\_hessio\_to\_VDST]
+        Convert simtel.gz files into ROOT format
+
+\item[\$EVNDISPSYS/bin/eventdisplay]
+	ImageCleaning \& Calculation of telescope parameters \& Reconstruction of the direction
+
+\item[\$EVNDISPSYS/bin/mscw\_energy]
+        Use lookup tables to estimate the energy
+
+\item[\$EVNDISPSYS/bin/makeEffectiveArea]
+        Make effective areas
+
+\item[\$EVNDISPSYS/macros/plot\_sensitivity.C]
+        plot sensitivity curves
+\end{description}
+
+(For most of the stuff there are scripts to run the analysis on the DESY batch system. Use them to simplify your life!)
+
+\section{Analysis}
+
+{\bf NOTE:}
+By converting a CTA.simtel.gz file into evndisp.root format you have to specify a subarray!
+EVNDISP is not able to handle the complete 275 telescopes at once!
+
+\subsection{Step 1: Converter}
+
+EVNDISPSYS/bin/CTA.convert\_hessio\_to\_VDST
+
+(run it to all the possible inputparameter)
+
+\subsection{Display (event-by-event)}
+
+EVNDISPSYS/bin/evndisp
+
+e.g. 
+
+\$EVNDISPSYS/bin/evndisp -display=1 -highres -useFixedThresholds -imagethresh=10.0 -borderthresh=5.0 -sourcefile \$CTA\_USER\_DATA\_DIR/simtel.root
+
+\subsection{Step 1 \& 2 combined [USE]}
+
+Run the converter and Eventdisplay for a specific subarray: use script \$EVNDISPSYS/scripts/CTA/CTA.EVNDISP.sub\_convert\_and\_analyse\_MC\_VDST.sh
+
+NOTE: The image cleaning thresholds can be specified in the file \$EVNDISPDATA/ParameterFiles/EVNDISP.reconstruction.runparameter file either
+for all telescopes to the same values or for each telescope type seperately. 
+
+\subsection{Step 3: mscw\_energy}
+
+If you use standard configurations maybe some lookup tables already exist (ask Gernot or Heike where you could find them).
+
+If not, you have to create them yourself with
+
+\$EVNDISPSYS/scripts/CTA/CTA.MSCW\_ENERGY.sub\_make\_tables.sh
+
+If you have your lookup tables you have to run mscw\_energy for estimating the energy of each event: 
+
+\$EVNDISPSYS/scripts/CTA/CTA.MSCW\_ENERGY.sub\_analyse\_MC.sh
+
+Step 4: Effective Areas
+-----------------------
+
+To calculate effective areas, look at:
+
+\$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.sub\_analyse.sh
+
+For the first time you have to use mscw files as input since MCpars has to be analysed once. 
+If you change your cuts afterwards (but not the number of input files) you can use the faster version by using
+the effective area file as input (helps a lot for protons).
+
+
+
+% ############ Appendix ######################
+
+\begin{appendix}
+ coordinate systems
+\end{appendix}
+
+
+%\bibliographystyle{plain_gm}
+%\bibliographystyle{hep}
+%\cleardoublepage
+%\addcontentsline{toc}{chapter}{\bibname}
+%\bibliography{BibAstro,BibStat,BibPhys,BibPart,BibEtc,BibKASCADE}
+
+% #############################################
+
+
+\end{document}
