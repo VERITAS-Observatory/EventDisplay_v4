@@ -150,6 +150,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TCanvas*  plotResiduals( TCanvas *c = 0 );
         TCanvas*  plotLifeTimevsEnergy( TCanvas *c = 0 );
 
+	void printEnergyBins();
         void setAddHistogramParameters( bool iB = false ) { fAnalysisHistogramAddingUseLowEdge = iB; }
         void setEnergyBinning( double iBin = 0.2 );
 	bool setEnergyInBinDefinition( unsigned int iE = 2 );
@@ -178,6 +179,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setPlottingSpectralWeightForBinCenter( double iS = -2.5 ) { fPlottingSpectralWeightForBinCenter = iS; }
         void setPlottingYaxis( double iMin = 1.e-14, double iMax = 1.e-8 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
-        ClassDef(VEnergySpectrum,5);
+        ClassDef(VEnergySpectrum,6);
 };
 #endif

@@ -1338,3 +1338,18 @@ bool VEnergySpectrum::setEnergyInBinDefinition( unsigned int iEF )
 
    return false;
 }
+
+void VEnergySpectrum::printEnergyBins()
+{
+    if( hErec )
+    {
+        cout << "Printing energy binning: " << endl;
+	for( int i = 1; i <= hErec->GetNbinsX(); i++ )
+	{
+	   cout << "Energy bin " << i << ":";
+	   printf( " bin edges in log10(E/TeV): [%.2f,%.2f],", hErec->GetBinLowEdge( i ), hErec->GetBinLowEdge( i ) + hErec->GetBinWidth( i ) );
+	   printf( " bin edges in E/TeV: [%.2f,%.2f]", TMath::Power( 10., hErec->GetBinLowEdge( i ) ), TMath::Power( 10., hErec->GetBinLowEdge( i ) + hErec->GetBinWidth( i ) ) );
+	   cout << endl;
+        }
+    }
+}
