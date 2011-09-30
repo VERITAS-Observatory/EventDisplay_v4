@@ -1,7 +1,9 @@
 /*! \class VSensitivityCalculator
     \brief calculate sensitivity from data rates, Monte Carlo, or energy spectra
 
+################################################################################################
 ## plot and list observation time necessary for a given source strength
+################################################################################################
 
 - input: gamma-ray, background rates from Crab Nebula data, background normalisation parameter
 
@@ -20,7 +22,9 @@ a.plotObservationTimevsFlux( 0, 0, 2 );
 // list observation time necessary for a given source strength
 a.list_sensitivity( 0 );
 
+################################################################################################
 ## plot integral and differential sensitivity vs energy using a reconstructed Crab spectrum
+################################################################################################
 
 - input: anasum results file from Crab analysis
 
@@ -34,7 +38,9 @@ a.plotSensitivityvsEnergyFromTextTFile( c, "SensitivityFromTextFile_CU", 2, 2, 2
 // plot differential sensitivity (4 bins per decade)
 a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( 0, "myCrabFile.root", 1, "ENERGY", 0.25 );
 
+################################################################################################
 ## plot integral and  differential sensitivity vs energy using MC
+################################################################################################
 
 -input: MC gamma and proton effective area
 
@@ -490,6 +496,9 @@ TCanvas* VSensitivityCalculator::plotDifferentialSensitivityvsEnergyFromCrabSpec
 
     calculate and plot sensitivities
 
+    integral sensitivity:     dE_Log10 < 0
+    differential sensitivity: dE_Log10 = bin size in log10 E
+
 */
 TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *cSensitivity, string iAnasumCrabFile,
                                                                           int iColor, string bUnit,
@@ -644,7 +653,14 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 		                                    ( f1 - f2 ) * s / fDifferentialFlux[i].dE * 
 						    fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *
 						    1.e12 * fConstant_Flux_To_Ergs );
-    cout << "XXX " << ( f1 - f2 ) * s / fDifferentialFlux[i].dE * fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *  1.e12 * fConstant_Flux_To_Ergs << "\t" << f1 << "\t" << f2 << endl;
+                    gSensitivityvsEnergy->SetPointEYhigh( z, 
+		                                    ( f1 - f2 ) * TMath::Abs( s - s_error_U ) / fDifferentialFlux[i].dE * 
+						    fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *
+						    1.e12 * fConstant_Flux_To_Ergs );
+                    gSensitivityvsEnergy->SetPointEYlow( z, 
+		                                    ( f1 - f2 ) * TMath::Abs( s - s_error_L ) / fDifferentialFlux[i].dE * 
+						    fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *
+						    1.e12 * fConstant_Flux_To_Ergs );
                 }
 		else
 		{
@@ -1857,8 +1873,8 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
    gNon->SetMinimum( 0.0001 );
    gNon->SetMaximum( 1.e6 );
    setGraphPlottingStyle( gNon, 1, 1, 20, 2 );
-    TGraph *gNoff = new TGraph( 1 );
-    setGraphPlottingStyle( gNoff, 1, 1, 24, 2 );
+   TGraph *gNoff = new TGraph( 1 );
+   setGraphPlottingStyle( gNoff, 1, 1, 24, 2 );
    unsigned int z = 0;
    for( unsigned int i = 0; i < iDifferentialFlux.size(); i++ )
    {
