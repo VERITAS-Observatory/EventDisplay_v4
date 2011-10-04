@@ -33,12 +33,6 @@ class VImageAnalyzer : public VImageBaseAnalyzer
 
         bool fInit;
 
-// background library for trace files
-        bool fTraceLibrary;
-        TFile *fTraceFile;                        //!< output file for trace library
-        TTree *fTraceTree;                        //!< trace library tree
-        short int fTrace[500][64];                //!< number of tubes and trace length
-
 // time since run start
         double fTimeSinceRunStart;                //!< time since run start
         double fTimeRunStart;                     //!< time of first event in run
@@ -67,6 +61,5 @@ class VImageAnalyzer : public VImageBaseAnalyzer
         void initOutput();                        //!< open outputfile
         void shutdown();                          //!< close outputfile
         void terminate();                         //!< write results to disk
-        void traceLibrary();                      //!< write a library with traces to disk (for MC background)
 };
 #endif

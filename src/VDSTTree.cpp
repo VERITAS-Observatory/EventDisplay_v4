@@ -120,11 +120,8 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
     fDST_tree->Branch( "dead", fDSTdead, tname );
     sprintf( tname, "sumwindow[ntel_data][%d]/s", VDST_MAXCHANNELS );
     fDST_tree->Branch( "sumwindow", fDSTsumwindow, tname );
-    if( iFullTree )
-    {
-        sprintf( tname, "sumfirst[ntel_data][%d]/s", VDST_MAXCHANNELS );
-        fDST_tree->Branch( "sumfirst", fDSTsumfirst, tname );
-    }
+    sprintf( tname, "sumfirst[ntel_data][%d]/s", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "sumfirst", fDSTsumfirst, tname );
     sprintf( tname, "tzero[ntel_data][%d]/F", VDST_MAXCHANNELS );
     fDST_tree->Branch( "tzero", fDSTt0, tname );
     sprintf( tname, "Width[ntel_data][%d]/F", VDST_MAXCHANNELS );
@@ -235,7 +232,6 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 	   fDSTLDTtime[i] = 0.;
 	   for( unsigned int j = 0; j < iMaxNChannels; j++ )
 	   {
-	       fDSTsumfirst[i][j] = 0;
 	       fDSTt0[i][j] = 0.;
 	       fDSTChi2[i][j] = 0.;
 	       fDSTRT[i][j] = 0.;
@@ -266,6 +262,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
             fDSTsums[i][j] = 0.;
             fDSTdead[i][j] = 0;
             fDSTsumwindow[i][j] = 0;
+	    fDSTsumfirst[i][j] = 0;
             fDSTHiLo[i][j] = 0;
             fDSTMax[i][j] = 0;
             fDSTL1trig[i][j] = 0;

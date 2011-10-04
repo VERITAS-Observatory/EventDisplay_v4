@@ -444,7 +444,7 @@ void VEventLoop::shutdown()
 // write run parameter to disk
         if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW && fRunPar->frunmode != R_PEDLOW ) fRunPar->Write();
 // analysis or trace library mode
-        if( fRunPar->frunmode == R_ANA || fRunPar->frunmode == R_BCK )
+        if( fRunPar->frunmode == R_ANA )
         {
 // write information about detector to disk
             if( getDetectorTree() )
@@ -797,10 +797,6 @@ int VEventLoop::analyzeEvent()
                 }
                 break;
 
-            case R_BCK:                           // make library with background traces (for MC)
-                i_cut = 1;
-                fAnalyzer->traceLibrary();
-                break;
             default:
                 break;
 

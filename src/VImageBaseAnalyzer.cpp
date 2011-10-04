@@ -350,7 +350,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
     if( getDebugFlag() ) cout << "VImageBaseAnalyzer::calcTZerosSums() \t" << iFirstT << "\t" << iLastT << endl;
 
 // for DST source file, ignore everything and just get the sums and tzeros
-    if( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 )
+    if( !fReader->hasFADCTrace() || !getRunParameter()->doFADCAnalysis() )
     {
         if( getDebugFlag() ) cout << "VImageBaseAnalyzer::calcTZerosSums() reading sums from DST file" << endl;
         setSums( fReader->getSums() );
@@ -406,7 +406,9 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
         if(!getDead(getHiLo()[chanID])[chanID])
         {
 // initialize trace handler
-            fTraceHandler->setTrace( fReader, getNSamples(), getPeds(getHiLo()[chanID] )[chanID], getPedrms(getHiLo()[chanID])[chanID], chanID, getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
+            fTraceHandler->setTrace( fReader, getNSamples(), 
+	                             getPeds(getHiLo()[chanID] )[chanID], getPedrms(getHiLo()[chanID])[chanID], 
+				     chanID, getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
 // integration range
 // get time offsets (from laser data)
             int offset=0;
@@ -430,7 +432,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
 // calculate timing parameters (raw and corrected; tzero correction happens later)
 	    setPulseTiming( chanID, fTraceHandler->getPulseTiming( corrfirst, corrlast, 0, getNSamples() ), true );
 // calculate integrated sum and pulse width (summation window not shifted)
-            if( getSumWindowShift() == 0 || getRunParameter()->fFixWindowStart )
+            if( getSumWindowShift() == 0 || getRunParameter()->fFixWindowStart || getRunParameter()->fDoublePass )
             {
                 setSums( chanID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
             }
@@ -472,7 +474,18 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
                 if( chanID == getFADCstopTrig()[c] )
                 {
                     fReader->selectHitChan((uint32_t)i);
-                    fTraceHandler->setTrace(fReader->getSamplesVec(),getPeds(getHiLo()[chanID])[chanID], getPedrms(getHiLo()[chanID])[chanID], chanID, getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
+		    if( fReader->has16Bit() )
+		    {
+		        fTraceHandler->setTrace(fReader->getSamplesVec16Bit(), getPeds(getHiLo()[chanID])[chanID],
+			                        getPedrms(getHiLo()[chanID])[chanID], chanID,
+						getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
+                    }
+		    else
+		    {
+		        fTraceHandler->setTrace(fReader->getSamplesVec(), getPeds(getHiLo()[chanID])[chanID],
+			                        getPedrms(getHiLo()[chanID])[chanID], chanID,
+						getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
+                    }
                     getFADCstopSums()[c] = fTraceHandler->getTraceSum(0, getNSamples(), fRaw );
                 }
             }
@@ -838,7 +851,8 @@ float VImageBaseAnalyzer::getPhotoDiodeMax()
     {
         fReader->selectHitChan(499);
 // hard coded pedestal -> this should not change during a run
-        fTraceHandler->setTrace( fReader->getSamplesVec(), i_photoDiodePed, 1., 499 );
+        if( fReader->has16Bit() ) fTraceHandler->setTrace( fReader->getSamplesVec16Bit(), i_photoDiodePed, 1., 499 );
+	else                      fTraceHandler->setTrace( fReader->getSamplesVec(), i_photoDiodePed, 1., 499 );
         if( !getReader()->getHiLo( 499 ) ) return     fTraceHandler->getTraceMax();
         else                               return -1.*fTraceHandler->getTraceMax();
     }
@@ -859,7 +873,8 @@ float VImageBaseAnalyzer::getPhotoDiodeSum()
     {
         fReader->selectHitChan(499);
 // hard coded pedestal -> this should not change during a run
-        fTraceHandler->setTrace( fReader->getSamplesVec(), i_photoDiodePed, 1., 499 );
+        if( fReader->has16Bit() ) fTraceHandler->setTrace( fReader->getSamplesVec16Bit(), i_photoDiodePed, 1., 499 );
+	else                      fTraceHandler->setTrace( fReader->getSamplesVec(), i_photoDiodePed, 1., 499 );
         if( !getReader()->getHiLo( 499 ) ) return       fTraceHandler->getTraceSum( i_traceSumStart, i_traceSumStart + getSumWindow(), false );
         else                                            return -1. * fTraceHandler->getTraceSum( i_traceSumStart, i_traceSumStart + getSumWindow(), false );
     }
@@ -897,8 +912,10 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
             if( chanID < getHiLo().size() && !getDead(getHiLo()[chanID])[chanID] )
             {
 		if( getRunParameter()->fDynamicIntegrationWindow ) iSumWindow = getDynamicSummationWindow( chanID );
-		setTCorrectedSumLast( chanID, getSumFirst() + iSumWindow );
-		setCurrentSummationWindow( chanID, getSumFirst(), getSumFirst() + iSumWindow );
+                int corrlast = getSumFirst() + iSumWindow;
+                if( corrlast>(int)getNSamples() ) corrlast = (int)getNSamples();
+		setTCorrectedSumLast( chanID, corrlast );
+		setCurrentSummationWindow( chanID, getSumFirst(), corrlast );
             }
         }
         catch(...)
@@ -944,7 +961,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 xpmt = getDetectorGeo()->getX()[chanID] - getImageParameters()->cen_x;
                 ypmt = getDetectorGeo()->getY()[chanID] - getImageParameters()->cen_y;
 // position along the major axis of the image
-                xpos = xpmt*getImageParameters()->cosphi+ ypmt*getImageParameters()->sinphi;
+                xpos = xpmt*getImageParameters()->cosphi + ypmt*getImageParameters()->sinphi;
 // fit time along the major axis of the image
                 if (abs(getImageParameters()->tgrad_x)<200) xtime = getImageParameters()->tgrad_x*xpos+getImageParameters()->tint_x;
                 else xtime = getSumFirst();

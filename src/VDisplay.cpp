@@ -616,14 +616,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
        double itemp = 0;
        for( unsigned int i = 0; i < fEventLoop->getNSamples(); i++ )
        {
-	   if( fEventLoop->getReader()->has16Bit() )
-	   {
-	      itemp = (double)fEventLoop->getReader()->getSample16Bit( i_channel, i, false );
-           }
-	   else
-	   {
-	      itemp = (double)fEventLoop->getReader()->getSample( i_channel, i, false );
-           }
+           itemp = fEventLoop->getReader()->getSample_double( i_channel, i, false );
 // undo highlow
 	   if( i_channel < (int)fEventLoop->getLowGainMultiplier().size() && fEventLoop->getHiLo()[i_channel] )
 	   {
@@ -691,13 +684,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 	   i_his->SetBinContent( 1, 0. );
         }
     }
-    else
-///////////////////////////////////////////////////////////////////////////////
-// DST: with FADC trace
-///////////////////////////////////////////////////////////////////////////////
-    {
-       cout << "UUUUUUUUUUUUUUUUUUU " << endl;
-    }
+
     return i_his;
 }
 
@@ -771,11 +758,22 @@ void VDisplay::drawFADC( bool iFit )
                 }
                 fFitTraceHandler->setMinuitPrint( true );
 		fEventLoop->getReader()->selectHitChan( chanID );
-		fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
-					    fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
-					    fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
-					    chanID,
-					    fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+		if( fEventLoop->getReader()->has16Bit() )
+		{
+		   fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec16Bit(),
+					       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
+					       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
+					       chanID,
+					       fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+                }
+		else
+		{
+		   fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
+					       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
+					       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
+					       chanID,
+					       fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+                }
 		cout << "HILO " << fEventLoop->getHiLo()[fSelectedChan - 200000] << "\t" << fEventLoop->getLowGainMultiplier()[chanID] << endl;
                 fFitTraceHandler->setMinuitPrint( false );
                 if( fFitTraceHandler->getFitted() )
@@ -896,7 +894,8 @@ void VDisplay::drawFADC( bool iFit )
     if( fSelectedChan >= 200000 && fSelectedChan-200000 < fEventLoop->getAnalyzer()->getTCorrectedSumFirst().size() )
     {
 // plot box which indicates integration window
-        if( fEventLoop->getReader()->getDataFormatNum() != 4 && fEventLoop->getReader()->getDataFormatNum() != 6 && fEventLoop->getReader()->getDataFormatNum() != 7 )
+//        if( fEventLoop->getReader()->getDataFormatNum() != 4 && fEventLoop->getReader()->getDataFormatNum() != 6 && fEventLoop->getReader()->getDataFormatNum() != 7 )
+	if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() )
 	{
 	   fGraphFADC->SetPoint( 0, (double)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000], gPad->GetUymin() );
 	   fGraphFADC->SetPoint( 1, (double)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000], gPad->GetUymax() );
@@ -1237,7 +1236,11 @@ void VDisplay::setFADCText()
     sprintf( cTemp, "pulse sum %.2f pulse max %.2f (raw max: %.2f) pulse width: %.2f", fEventLoop->getData()->getSums()[iChannel], fEventLoop->getData()->getTraceMax()[iChannel], fEventLoop->getData()->getTraceRawMax()[iChannel],  fEventLoop->getData()->getTraceWidth()[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // pulse tzeros
-    sprintf( cTemp, "tzero %.1f (raw tzero: %.1f, toffset correction: %.1f, FADC crate trigger: %.1f)", fEventLoop->getTZeros()[iChannel], fEventLoop->getRawTZeros()[iChannel], fEventLoop->getAnalyzer()->getTOffsets()[iChannel], fEventLoop->getAnalyzer()->getFADCStopOffsets()[iChannel] );
+    sprintf( cTemp, "tzero %.1f (raw tzero: %.1f, toffset correction: %.1f, FADC crate trigger: %.1f)",
+                                 fEventLoop->getTZeros()[iChannel], 
+				 fEventLoop->getRawTZeros()[iChannel], 
+				 fEventLoop->getAnalyzer()->getTOffsets()[iChannel], 
+				 fEventLoop->getAnalyzer()->getFADCStopOffsets()[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // pulse timing
     sprintf( cTemp, "pulse timing (raw): " );
@@ -1361,6 +1364,7 @@ void VDisplay::setInfoText()
     i_Text.back()->SetTextSize( i_Text.back()->GetTextSize() * 1.1 );
     for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
     {
+	fEventLoop->getAnalyzer()->setTelID( fEventLoop->getTeltoAna()[i] );
         sprintf( c_Text, "Telescope %d", fEventLoop->getTeltoAna()[i]+1 );
         i_Text.push_back( new TText( xL, yT, c_Text ) );
         sprintf( c_Text, "\t image threshold %.2f", fEventLoop->getAnalyzer()->getImageThresh() );

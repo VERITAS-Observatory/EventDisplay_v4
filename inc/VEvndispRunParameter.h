@@ -136,6 +136,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         double fSumWindowStartAtT0Min;            // for pulses with peaks larger than this values, start summation window at t0 + fTraceWindowShift (doublepass only)
         double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
         string ftracefitfunction;                 // number of tracefit function (default=ev, others: grisu);
+	bool   fperformFADCAnalysis;              // run FADC analysis (important e.g. for CTA DST files, where sim_tel results are available as well )
 
 // FADC timing parameters
         vector< float > fpulsetiminglevels;       // levels at which timing of FADC pulses is calculated
@@ -225,9 +226,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         VEvndispRunParameter();
         ~VEvndispRunParameter() {}
 
+	bool         doFADCAnalysis() { return fperformFADCAnalysis; }
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,106);
+        ClassDef(VEvndispRunParameter,107);
 };
 #endif

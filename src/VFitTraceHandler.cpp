@@ -177,9 +177,12 @@ void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSam
     if( iNSamples != fpTrace.size() )
     {
         fpTrace.clear();
-        for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace.push_back( (double)iReader->getSample( iChanID, i+fMC_FADCTraceStart, (i==0) ) );
+        for( unsigned int i = 0; i < iNSamples; i++ )
+	{
+	   fpTrace.push_back( iReader->getSample_double( iChanID, i+fMC_FADCTraceStart, (i==0) ) );
+        }
     }
-    else for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace[i] = (double)iReader->getSample( iChanID, i+fMC_FADCTraceStart, (i==0) );
+    else for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace[i] = iReader->getSample_double( iChanID, i+fMC_FADCTraceStart, (i==0) );
 
     fpTrazeSize = int(fpTrace.size());
     if( iHiLo > 0. )
@@ -199,6 +202,39 @@ void VFitTraceHandler::setTrace(vector<uint8_t> pTrace, double ped, double pedrm
     setTrace( pTrace, ped, pedrms, chanID, false );
 }
 
+void VFitTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedrms, unsigned int chanID )
+{
+    setTrace( pTrace, ped, pedrms, chanID, false );
+}
+
+/*!
+     set the trace values and fit the peak
+
+*/
+void VFitTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedrms, unsigned int chanID, double iHiLo )
+{
+    fPed = ped;
+    fPedrms = pedrms;
+
+// copy trace
+    unsigned int i_tsize = pTrace.size();
+    if( i_tsize != fpTrace.size() )
+    {
+        fpTrace.clear();
+        for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace.push_back( (double)pTrace[i] );
+    }
+    else for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace[i] = (double)pTrace[i];
+
+    fpTrazeSize = int(fpTrace.size());
+    if( iHiLo > 0. )
+    {
+        apply_lowgain( iHiLo );
+        fHiLo = true;
+    }
+    else fHiLo = false;
+
+    fitTrace( chanID );
+}
 
 /*!
      set the trace values and fit the peak

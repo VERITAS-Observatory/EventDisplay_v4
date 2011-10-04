@@ -164,6 +164,7 @@ class VPEReader : public VVirtualDataReader
         unsigned int getTelescopeID() { return fTelID; }
 	vector< valarray< double > >& getTracePulseTiming() { return fTracePulseTiming[fTelID]; }
         bool      hasArrayTrigger() { return fArrayTrigger; }
+	bool      hasFADCTrace() { return false; }
         bool      hasLocalTrigger( unsigned int iTel ) { if( iTel < fLocalTrigger.size() ) return fLocalTrigger[iTel]; else return false; }
         bool      isMC() { return fMC; }
         void      selectHitChan( uint32_t hit ) { fSelectedHitChannel = hit; }

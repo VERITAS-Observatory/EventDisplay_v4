@@ -534,6 +534,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	{
 	    fRunPara->fMC_FADCTraceStart = (unsigned int)atoi( iTemp.substr(iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
 	}
+	else if( iTemp.find( "traceanalysis" ) < iTemp.size() )
+	{
+	    fRunPara->fperformFADCAnalysis = (bool)atoi( iTemp.substr(iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
+        }
         else if( iTemp.find( "tracedefinesmallpulse" ) < iTemp.size() )
         {
             fRunPara->fSumWindowStartAtT0Min = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
@@ -1511,7 +1515,7 @@ bool VReadRunParameter::getRunParametersFromDST()
     }
     fRunPara->fuseDB = false;
     fRunPara->fDBTracking = false;
-    fRunPara->fDoublePass = false;
+//    fRunPara->fDoublePass = false;
     VEvndispRunParameter *iV = (VEvndispRunParameter*)iF.Get( "runparameterDST" );
     if( !iV) iV = (VEvndispRunParameter*)iF.Get( "runparameterV2" );
     if( iV )

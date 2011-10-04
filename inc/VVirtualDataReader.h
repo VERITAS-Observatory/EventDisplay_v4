@@ -104,6 +104,7 @@ class VVirtualDataReader
         virtual uint8_t                     getSample( unsigned channel, unsigned sample, bool iNewNoiseTrace = true ) { return 3; }
         virtual std::vector< uint8_t >      getSamplesVec() = 0;
         virtual uint16_t                    getSample16Bit( unsigned channel, unsigned sample, bool iNewNoiseTrace = true ) { return 3; }
+	double                              getSample_double( unsigned channel, unsigned sample, bool iNewNoiseTrace = true );
         virtual std::vector< uint16_t >     getSamplesVec16Bit() { return iSampleVec16bit; }
         virtual void                        selectHitChan(uint32_t) = 0;
 	void                                setNumSamples( uint16_t iS ) { fNumSamplesTemp = iS; }
@@ -190,7 +191,7 @@ class VVirtualDataReader
             return  0.;
         }
 
-	virtual bool hasFADCTrace() { return false; }
+	virtual bool hasFADCTrace() { return true; }
 	virtual bool has16Bit()     { return false; }
 
                                                   //!< has this event an array trigger or not

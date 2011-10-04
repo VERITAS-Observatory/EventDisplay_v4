@@ -16,7 +16,6 @@ VImageAnalyzer::VImageAnalyzer()
     fDebug = getDebugFlag();
     if( fDebug ) cout << "VImageAnalyzer::VImageAnalyzer()" << endl;
     for( unsigned int i = 0; i < fNTel; i++ ) fCalibrated.push_back( false );
-    fTraceLibrary = false;
     fRaw = false;
     fOutputfile = 0;
     fInit = false;
@@ -118,10 +117,27 @@ void VImageAnalyzer::doAnalysis()
     timingCorrect();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
+// correct for relative gains (from laser calibration)
+   gainCorrect();
+
+///////////////////////////////////////////////////////////////////////////////////////////
 // image cleaning
-    if( getRunParameter()->fUseFixedThresholds )   fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
-    else if( getRunParameter()->fUseTimeCleaning ) fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() ); //HP
-    else                                           fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
+
+// fixed cleaning levels
+    if( getRunParameter()->fUseFixedThresholds )
+    {
+       fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
+    }
+// time cleaning
+    else if( getRunParameter()->fUseTimeCleaning )
+    {
+        fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+    }
+// signal/noise cleaning
+    else
+    {
+       fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // MC trigger parameter
@@ -130,10 +146,6 @@ void VImageAnalyzer::doAnalysis()
 ///////////////////////////////////////////////////////////////////////////////////////////
 // parallax width cleaning
     if( fRunPar->fPWmethod > -1 ) fVImageCleaning->cleanTriggerFixed( getImageThresh(), getBorderThresh() );
-
-///////////////////////////////////////////////////////////////////////////////////////////
-// correct for relative gains (from laser calibration)
-    if( !fRunPar->fDoublePass ) gainCorrect();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // set parameters for image parameter calculation
@@ -161,8 +173,7 @@ void VImageAnalyzer::doAnalysis()
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 // second pass of image calculation with using time gradient to adjust sum window
-//    (not possible for DST files)
-    if( fRunPar->fDoublePass && fReader->getDataFormatNum() != 4 && fReader->getDataFormatNum() != 6   )
+    if( fReader->hasFADCTrace() && getRunParameter()->doFADCAnalysis() )
     {
 ///////////////////////////////////////////////////////////////////////////////////////////
 // integrate pulses and calculate timing parameters taking time gradients over images into account
@@ -170,6 +181,10 @@ void VImageAnalyzer::doAnalysis()
         {
             calcSecondTZerosSums();
         }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// correct for relative gains (from laser calibration)
+        gainCorrect();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // smoothing of dead or disabled pixels (first part)
@@ -188,9 +203,18 @@ void VImageAnalyzer::doAnalysis()
         }
 ///////////////////////////////////////////////////////////////////////////////////////////
 // image cleaning (second pass)
-        if( getRunParameter()->fUseFixedThresholds )   fVImageCleaning->cleanImageFixed( getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
-   	else if( getRunParameter()->fUseTimeCleaning ) fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() ); //HP
-        else                                           fVImageCleaning->cleanImagePedvars( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), true, false );
+        if( getRunParameter()->fUseFixedThresholds )
+	{
+	    fVImageCleaning->cleanImageFixed( getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
+        }
+   	else if( getRunParameter()->fUseTimeCleaning )
+	{
+	   fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() ); //HP
+        }
+        else
+	{
+	   fVImageCleaning->cleanImagePedvars( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), true, false );
+        }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -214,10 +238,6 @@ void VImageAnalyzer::doAnalysis()
                 getGains(true)[i] = savedGainsLow[i];
             }
         }
-///////////////////////////////////////////////////////////////////////////////////////////
-// correct for relative gains (from laser calibration)
-        gainCorrect();
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 // parallax width trigger parameter calculation
         if( fRunPar->fPWmethod > -1 )
@@ -329,7 +349,7 @@ void VImageAnalyzer::initAnalysis()
 void VImageAnalyzer::terminate()
 {
     if( fDebug ) cout << "VImageAnalyzer::terminate()" << endl;
-    if ( fOutputfile != 0 && fRunPar->foutputfileName != "-1" && !fTraceLibrary )
+    if ( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
     {
         fOutputfile->cd();
         fAnaDir[fTelID]->cd();
@@ -345,14 +365,6 @@ void VImageAnalyzer::terminate()
         getCalData()->terminate( getDead( false ), getDead( true ) );
 // write pointing data from db to disk (if available)
         if( getTelID() < getPointing().size() && getPointing()[getTelID()] ) getPointing()[getTelID()]->terminate( isMC() );
-    }
-
-    if( fTraceLibrary )
-    {
-        fTraceFile->cd();
-        cout << "writing trace library to " << fTraceFile->GetName() << endl;
-        cout << "\t total number of events in library: " << fTraceTree->GetEntries() << endl;
-        fTraceTree->Write();
     }
 
     if( fRunPar->ftracefit >= 0. )
@@ -561,127 +573,6 @@ bool VImageAnalyzer::initEvent()
     return true;
 }
 
-
-/*!
-  this is preliminary, background events are expected in future
-
-  using non image/border events for trace library
-*/
-void VImageAnalyzer::traceLibrary()
-{
-    if( fDebug ) cout << "VImageAnalyzer::traceLibrary" << endl;
-// get size of fTrace array
-    int i_ntubes = sizeof(fTrace)/sizeof(fTrace[0]);
-    int i_nsamples = sizeof(fTrace[0])/sizeof(short int);
-// init the data output file and tree
-    if( fReader->getMaxChannels() > i_ntubes || (int)getNSamples() > i_nsamples )
-    {
-        cout << "void VImageAnalyzer::traceLibrary(): error, number of channels/samples to large ";
-        cout << fReader->getMaxChannels() << "\t" << getNSamples() << endl;
-        exit( -1 );
-    }
-// open output file and define output trees
-    if( !fTraceLibrary )
-    {
-        char i_text[100];
-        sprintf( i_text,"output/%d.traces.root",getRunNumber());
-        fTraceFile = new TFile( i_text, "RECREATE" );
-// for multi telescope mode: number in tree name is telescope number
-        fTraceTree = new TTree( "trace_0", "tracelibrary" );
-//      sprintf( i_text, "ftrace[%d][%d]/B", i_ntubes, i_nsamples );
-// this is preliminary, tracelength should be variable
-        sprintf( i_text, "ftrace[%d][%d]/S", 500, 64 );
-        fTraceTree->Branch( "fTrace", fTrace, i_text );
-    }
-    doAnalysis();
-// write pedestals to file
-// (in principal not necessary, since pedestal file are available
-// but don't want to be dependent on them in the simulation
-    if( !fTraceLibrary )
-    {
-        fTraceFile->cd();
-        double iPed, iPedvars, isumwindow;
-        unsigned int iTubeNumber;
-// for multi telescope mode: number in tree name is telescope number
-        TTree iPedTree( "pedTree_0", "pedestal tree" );
-        iPedTree.Branch( "tubeNumber", &iTubeNumber, "tubeNumber/i" );
-        iPedTree.Branch( "ped", &iPed, "ped/D" );
-        iPedTree.Branch( "pedvar", &iPedvars, "pedvar/D" );
-        iPedTree.Branch( "sumwindow", &isumwindow, "sumwindow/D" );
-        unsigned int nhits = fReader->getNumChannelsHit();
-// (GM) was >= (why?)
-        if( nhits > getPeds().size() )
-        {
-            cout << "void VImageAnalyzer::traceLibrary() error: ped vector size to small " << nhits << "\t" << getPeds().size() << endl;
-            exit( -1 );
-        }
-        for( unsigned int i = 0; i < nhits; i++ )
-        {
-            unsigned int chanID = 0;
-            try
-            {
-                chanID = fReader->getHitID(i);
-                if( chanID < getHiLo().size() )
-                {
-                    iTubeNumber = chanID;
-                    iPed = getPeds( getHiLo()[chanID], getEventTime() )[chanID];
-                    iPedvars = getPedvars( getHiLo()[chanID], 0, false, getEventTime() )[chanID];
-                    isumwindow = getSumWindow();
-                    iPedTree.Fill();
-                }
-            }
-            catch(...)
-            {
-                cout << "VImageAnalyzer::traceLibrary(), index out of range (fReader->getHitID) " << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
-                continue;
-            }
-        }
-        iPedTree.Write();
-        fTraceLibrary = true;
-    }
-    vector< uint8_t > tempSample;
-
-// don't use too large events (> 10 ntubes)
-    if( fVImageParameterCalculation->getParameters()->ntubes < 10 )
-    {
-        unsigned int nhits = fReader->getNumChannelsHit();
-        for (unsigned int i = 0; i < nhits; i++)
-        {
-            unsigned int chanID = 0;
-            try
-            {
-                chanID = fReader->getHitID(i);
-// exclude image and border pixels
-                if ( !getImage()[chanID] && !getBorder()[chanID] )
-                {
-// exclude pixels with very high significances
-                    if( getPedvars(getHiLo()[chanID])[chanID] > 0.  && getSums()[chanID] / getPedvars(getHiLo()[chanID])[chanID] < 10. )
-                    {
-                        fReader->selectHitChan(i);
-                        tempSample = fReader->getSamplesVec();
-                        for( unsigned int j = 0; j < tempSample.size(); j++ )
-                        {
-                            fTrace[chanID][j] = (short int)(tempSample[j]);
-                        }
-                    }
-                }
-            }
-            catch(...)
-            {
-                cout << "VImageAnalyzer::traceLibrary(), index out of range (fReader->getHitID) " << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
-                continue;
-            }
-        }
-    }
-
-// don't expect, that one tube is 3 times in a row a border/image pixel
-    if( getTelescopeEventNumber( getTelID() ) % 3 == 0 )
-    {
-        fTraceTree->Fill();
-    }
-}
-
-
 /*!
 This reduces the effect of dead tubes by assigning them charge and timing values
 derived by taking the average of the neighbouring tubes
@@ -751,7 +642,6 @@ void VImageAnalyzer::smoothDeadTubes()
 */
 void VImageAnalyzer::printTrace( int iChannel )
 {
-    vector< uint8_t > tempSample;
 // calculate mean sum over all pixels
     double i_total=0;
     for(unsigned int i=0; i < getNChannels(); i++ ) i_total +=getSums()[i];
@@ -785,10 +675,10 @@ void VImageAnalyzer::printTrace( int iChannel )
     cout << getTelescopeEventNumber( getTelID() ) << " " << getSums()[fReader->getHitID( iChannel )] << " " << i_totSum << "    ";
     unsigned int chanID = fReader->getHitID( iChannel );
     fReader->selectHitChan( chanID );
-    tempSample = fReader->getSamplesVec();
-    for( unsigned int j = 0; j < tempSample.size(); j++ )
+    for( unsigned int j = 0; j < fReader->getNumSamples(); j++ )
     {
-        cout << (int)tempSample[j] << " ";
+        if( fReader->has16Bit() ) cout << fReader->getSamplesVec16Bit()[j] << " ";
+	else                      cout << fReader->getSamplesVec()[j] << " ";
     }
     cout << endl;
 

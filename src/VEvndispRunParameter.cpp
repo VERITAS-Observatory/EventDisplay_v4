@@ -136,6 +136,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fSmoothDead = false;
     fUsePedEvents = true;
     fFADCChargeUnit = "DC";
+    fperformFADCAnalysis = true;
 // pedestal calculation in time slices
     fLowGainUsePedestalsInTimeSlices = false;
     fUsePedestalsInTimeSlices = true;
@@ -333,6 +334,8 @@ void VEvndispRunParameter::print( int iEv )
 
     if( fCalibrationDataType == 0 ) cout << "no calibration data available" << endl;
     cout << "signal charge unit is " << fFADCChargeUnit << endl;
+    if( fperformFADCAnalysis )   cout << "analysing FADC trace " << endl;
+    else if( fsourcetype == 7 )  cout << "reading trace analysis results from DST file" << endl;
 
     if( frunmode == 0 || frunmode == 4 )
     {

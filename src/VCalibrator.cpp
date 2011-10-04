@@ -485,7 +485,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
                                 this_bin = (int)(j+fCalData[getTeltoAnaID()]->fFADCStopOffsets[i]+1);
                                 if (this_bin > 0 && this_bin <= hpulse[i]->GetNbinsX())
                                 {
-                                    this_content = fReader->getSample( chanID, this_bin, (this_bin==0) ) -  getPeds( iLowGain )[i];
+				    this_content = fReader->getSample_double( chanID, this_bin, (this_bin==0) ) -  getPeds( iLowGain )[i];
                                     if( getRunParameter()->fwritepulses > 0 ) i_pulse->SetBinContent(this_bin,this_content);
                                     hpulse[i]->Fill( this_bin, this_content );
 // time corrected pulse
@@ -2019,7 +2019,51 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 	  cout << nPixel << "\t" << getPedvars( true ).size();
 	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
-          
+// gains
+       if( nPixel == getGains( false ).size() )
+       {
+          for( unsigned int p = 0; p < nPixel; p++ )
+	  {
+	     if( fConv_high[p] > 0. )
+	     {
+		getGains( false )[p] = 1./fConv_high[p];
+		if( getGainDist( false ) ) getGainDist( false )->Fill( 1./fConv_high[p] );
+             }
+	     else
+	     {
+	        getGains( false )[p] = 1.;
+             }
+          }
+       }
+       else
+       {
+          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: ";
+	  cout << "index out of range (gains, high gain): ";
+	  cout << nPixel << "\t" << getGains( false ).size();
+	  cout << " (telescope " << getTelID()+1 << ")" << endl;
+       }
+       if( nPixel == getGains( true ).size() )
+       {
+          for( unsigned int p = 0; p < nPixel; p++ )
+	  {
+	     if( fConv_low[p] > 0. )
+	     {
+		getGains( true )[p] = 1./fConv_low[p];
+		if( getGainDist( true ) ) getGainDist( true )->Fill( 1./fConv_low[p] );
+             }
+	     else
+	     {
+	        getGains( true )[p] = 1.;
+             }
+          }
+       }
+       else
+       {
+          cout << "bool VCalibrator::readCalibrationData( string iDSTfile ) error: ";
+	  cout << "index out of range (gains, low gain): ";
+	  cout << nPixel << "\t" << getGains( true ).size();
+	  cout << " (telescope " << getTelID()+1 << ")" << endl;
+       }
    }
 
    iF.Close();
