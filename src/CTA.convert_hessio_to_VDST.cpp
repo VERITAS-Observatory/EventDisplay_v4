@@ -134,6 +134,7 @@ double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int du
       return 0.;
    if ( ! raw->known )
       return 0.;
+
  
    significant = hsdata->event.teldata[itel].raw->significant[i];
 
@@ -149,7 +150,7 @@ double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int du
 
    if ( !significant ) 
       npe = 0.;
-   else if ( hg_known && sig_hg < 10000 && sig_hg > -1000 )
+   else if ( hg_known && sig_hg < 1000000 && sig_hg > -1000 )
       npe = npe_hg;
    else
    {
@@ -581,8 +582,8 @@ TTree* DST_fillCalibrationTree( AllHessData *hsdata, map< unsigned int, float > 
           }
           fPedvar_high[p] = hsdata->tel_moni[itel].noise[HI_GAIN][p];
           fPedvar_low[p] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
-          fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p];
-          fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p];
+          fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
+          fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
        }
 
        t->Fill();
