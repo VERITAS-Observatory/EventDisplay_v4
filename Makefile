@@ -336,7 +336,7 @@ endif
 MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o  ./obj/CtparsShort.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
 		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
-		./obj/VEnergyCorrection.o ./obj/VInterpolate2DHistos.o \
+		./obj/VEnergyCorrection.o ./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VDeadTime.o ./obj/VUtilities.o \
@@ -504,7 +504,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VZDCF.o ./obj/VZDCF_Dict.o ./obj/VZDCFData.o \
 		./obj/VUtilities.o \
 		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o \
-		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
+#		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 		./obj/Cshowerpars.o ./obj/CtparsShort.o
 
