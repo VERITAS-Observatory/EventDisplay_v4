@@ -50,6 +50,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    string                  fParticleNumberFileName;          // particle numbers are read from this file
    double                  fOptmizationSourceStrengthCrabUnits; 
+   double                  fOptmizationMinBackGroundEvents;
 
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
    bool     fTMVAThetaCutVariableSet;       // check if TMVA provides a theta2 cut variable
@@ -112,8 +113,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   printSignalEfficiency();
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
-   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001 )
-          { fOptmizationSourceStrengthCrabUnits = iSourceStrength; }
+   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001, double iMinBackgroundEvents = 5. )
+          { fOptmizationSourceStrengthCrabUnits = iSourceStrength; fOptmizationMinBackGroundEvents = iMinBackgroundEvents; }
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
    void   setPlotEffiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iE = 0.5 );

@@ -86,8 +86,8 @@ unsigned int getTimingLevelIndex( unsigned int i )
 {
     if( i == 0 )      return 2;        // 100%
     else if( i == 1 ) return 0;        //  20%
-    else if( i == 2 ) return 1;        //  20%
-    else if( i == 4 ) return 3;        //  20%
+    else if( i == 2 ) return 1;        //  50%
+    else if( i == 4 ) return 3;        //  50%
     else if( i == 5 ) return 4;        //  20%
 
     return 9999;

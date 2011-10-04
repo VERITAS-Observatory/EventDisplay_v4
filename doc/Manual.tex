@@ -154,40 +154,6 @@ The EVNDISP manual for VERITAS users:
 
 \chapter{eventdisplay - calibration, image analysis and stereo reconstruction}
 
-% ############ Input data format ######################
-\chapter{Input data format}
-
-\section{VBF - VERITAS Bank Format}
-
-\section{DST - data summary tree}
-
-The DST format is a simple ROOT tree containing standard C++ variables only (no class data).
-
-\subsection{Limitations}
-
-The implementation requires the hardwiring of the maximum number of telescopes, channels, etc. 
-These values can be found in {\texttt inc/VGlobalRunParameter}, for example:
-
-\begin{lstlisting}
-// HARDWIRED MAXIMUM NUMBER OF TELESCOPES AND CHANNELS, etc.
-// maximum number of telescopes
-#define VDST_MAXTELESCOPES  100
-// maximum number of channels per telescopes
-#define VDST_MAXCHANNELS   12000
-// maximum number of summation windows
-// (=maximum number of samples per FADC trace)   
-#define VDST_MAXSUMWINDOW   16
-// maximum number of time slices for pedestal calculation
-#define VDST_PEDTIMESLICES 5000   
-// maximum number of arrayreconstruction method 
-#define VDST_MAXRECMETHODS  100
-// maximum number of timing levels
-#define VDST_MAXTIMINGLEVELS 10    
-\end{lstlisting}
-
-\noindent {\bf NOTE: } These numbers determine the memory requirements of {\it evndisp} and {\it CTA.convert\_hessio\_to\_VDST}.
-
-\noindent {\bf NOTE: } {\it evndisp} must be compiled with the same settings as the writing program.
 
 % ############ CTA analysis ######################
 
@@ -257,8 +223,7 @@ If you have your lookup tables you have to run mscw\_energy for estimating the e
 
 \$EVNDISPSYS/scripts/CTA/CTA.MSCW\_ENERGY.sub\_analyse\_MC.sh
 
-Step 4: Effective Areas
------------------------
+\subsection{Step 4: Effective Areas}
 
 To calculate effective areas, look at:
 
@@ -268,13 +233,72 @@ For the first time you have to use mscw files as input since MCpars has to be an
 If you change your cuts afterwards (but not the number of input files) you can use the faster version by using
 the effective area file as input (helps a lot for protons).
 
+% ############ Input data format ######################
+\chapter{Input data format}
+
+\section{VBF - VERITAS Bank Format}
+
+\section{DST - data summary tree}
+
+The DST format is a simple ROOT tree containing standard C++ variables only (no class data).
+
+\subsection{Limitations}
+
+The implementation requires the hardwiring of the maximum number of telescopes, channels, etc. 
+These values can be found in {\texttt inc/VGlobalRunParameter}, for example:
+
+\begin{lstlisting}
+// HARDWIRED MAXIMUM NUMBER OF TELESCOPES AND CHANNELS, etc.
+// maximum number of telescopes
+#define VDST_MAXTELESCOPES  100
+// maximum number of channels per telescopes
+#define VDST_MAXCHANNELS   12000
+// maximum number of summation windows
+// (=maximum number of samples per FADC trace)   
+#define VDST_MAXSUMWINDOW   16
+// maximum number of time slices for pedestal calculation
+#define VDST_PEDTIMESLICES 5000   
+// maximum number of arrayreconstruction method 
+#define VDST_MAXRECMETHODS  100
+// maximum number of timing levels
+#define VDST_MAXTIMINGLEVELS 10    
+\end{lstlisting}
+
+\noindent {\bf NOTE: } These numbers determine the memory requirements of {\it evndisp} and {\it CTA.convert\_hessio\_to\_VDST}.
+
+\noindent {\bf NOTE: } {\it evndisp} must be compiled with the same settings as the writing program.
+
+% ############ detector geometry ######################
+
+\chapter{Detector Setup}
+
+
+\section{Telescope types}
+
+Different telescope types (e.g. mid-size and small-size telescopes, telescopes with different FOV, etc) are assigned a telescope type number in the code, this number is as well written to the data trees. The telescope type  contains the mirror shape (DC, Parabolic, SC), the mirror area (m$^2$), the field of view ([deg]) and the pixel size ([deg]). For VERITAS, the telescope type correspond simply to the different telescope numbers (and are therefore 0,1,2,3).
+
+For clarification, this is the corresponding code bit from {\texttt src/CTA.convert\_hessio\_to\_VDST.cpp}:
+
+\begin{lstlisting}
+fTelescope_type  = TMath::Nint(pix_size*100.);
+fTelescope_type += TMath::Nint(fFOV*10.)*100;
+fTelescope_type += TMath::Nint(fMirrorArea)*100*10*100;
+// all large telescopes are parabolic, all others are Davies-Cotton (hardwired)
+if( fMirrorArea > fParabolic_mirrorArea )      fTelescope_type += 100000000;
+// Schwarzschild-Couder: check number of mirrors
+else if( fNMirrors == fSC_number_of_mirrors )  fTelescope_type += 200000000;
+\end{lstlisting}
+
+\noindent {\bf Note:} There is currently no way to determine the mirror/telescope shape (parabolic, Davies-Cotton, etc) from the hessio file. This is why the mirror area and the number of mirrors is used. 
+The parabolic shape is assigned to all telescopes with a mirror area  $>$ 400 m$^2$.
+Schwarzschild-Couder Design are all telescopes with 2 mirrors only.
 
 
 % ############ Appendix ######################
 
-\begin{appendix}
- coordinate systems
-\end{appendix}
+%\begin{appendix}
+ %coordinate systems
+%\end{appendix}
 
 
 %\bibliographystyle{plain_gm}

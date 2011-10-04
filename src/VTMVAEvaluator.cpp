@@ -830,6 +830,12 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	 cout << "___________________________________________________________" << endl;
 	 cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t" << Nof << "\t" << effB->GetBinContent( i ) << endl;
 	 cout << "\t" << effS->GetBinContent( i ) * Non << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof << "\t" << effB->GetBinContent( i ) * Nof << endl;
+// check that a minimum number of off events is 
+         if( effB->GetBinContent( i ) * Nof < fOptmizationMinBackGroundEvents )
+	 {
+	    cout << "\t number of background events lower " << fOptmizationMinBackGroundEvents << ": setting signal/sqrt(noise) to 0; bin " << i << endl;
+	    i_Signal_to_sqrtNoise = 0.;
+         }
 	 if( iGSignal_to_sqrtNoise )
 	 {
 	    iGSignal_to_sqrtNoise->SetPoint( z, effS->GetBinCenter( i ), i_Signal_to_sqrtNoise );
@@ -855,6 +861,12 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       i_Signal_to_sqrtNoise_atMaximum = iHSignal_to_sqrtNoise->GetMaximum();
       i_SignalEfficiency_AtMaximum = effS->GetBinCenter( iHSignal_to_sqrtNoise->GetMaximumBin() );
       i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( iHSignal_to_sqrtNoise->GetMaximumBin() );
+// make sure that signal efficency is > 0 (and 1 for the case that there is no maximum found)
+      if( i_Signal_to_sqrtNoise_atMaximum < 1.e-3 )
+      {
+         i_SignalEfficiency_AtMaximum = effS->GetBinContent( effS->GetMaximumBin() );
+	 i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effS->GetMaximumBin() );
+      }
    }
    cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum is ";
    cout << i_SignalEfficiency_AtMaximum << " with a significance of " << i_Signal_to_sqrtNoise_atMaximum << endl;
