@@ -72,6 +72,157 @@ bool VSpectralEnergyDistribution::readTeVEvndispData( string name, string ifile,
 }
 
 
+/*
+    read FermiLAT data from an ascii file
+
+    iname   :   data descriptor
+    ifile   :   file name (ascii format)
+    MJD_min :   MJD of begin of measurements
+    MJD_max:    MJD of end of measurements
+    bPrint  :   print values to screen
+    imarker :   marker style for plotting
+    icolor  :   marker and line color for plotting
+
+all results are added to the vector of photon fluxes (sPhotonFlux)
+
+expected file format (0):
+<frequency (GeV)> <flux (erg cm^-2 s^-1)> <error in Flux (erg cm^-2 s^-1)>
+
+alternative file format (1):
+<frequency (GeV)> <flux (erg cm^-2 s^-1)> <exl> <exh> <eyl> <eyh> 
+
+An upper limit is drawn for fluxes with errors <= 0.
+
+*/
+bool VSpectralEnergyDistribution::readFermiData( string name, string ifile, double MJD_min, double MJD_max, bool bPrint, int imarker, int icolor, int iFormat )
+{
+    sPhotonFlux i_pF_temp;
+    vector< sPhotonFlux > i_photonFlux;
+
+    ifstream is;
+    is.open( ifile.c_str(), ifstream::in );
+    if( !is )
+    {
+        cout << "error reading data from " << ifile << endl;
+        return false;
+    }
+    string is_line;
+    string is_temp;
+    int z = 0;
+    while(  getline( is, is_line ) )
+    {
+        if(  is_line.size() <= 0 ) continue;
+
+        if( is_line.substr( 0, 1 ) == "*" ) continue;
+
+        istringstream is_stream( is_line );
+
+        i_pF_temp.name = name;
+        if( MJD_min > 0. && MJD_max > 0. )
+        {
+            i_pF_temp.MJD_min = MJD_min;
+            i_pF_temp.MJD_max = MJD_max;
+        }
+        else
+        {
+            is_stream >> is_temp;
+            double iT_min = atof( is_temp.c_str() );
+            is_stream >> is_temp;
+            double iT_max = atof( is_temp.c_str() );
+
+// check if following line is at a different time period (if yes, clear the vector and start again)
+            if( z > 0 && (TMath::Abs( i_photonFlux.back().MJD_min - iT_min ) > 1.e-2 || (TMath::Abs( i_photonFlux.back().MJD_max - iT_max ) > 1.e-2 ) )  )
+            {
+                i_pF_temp.energy_Hz.clear();
+                i_pF_temp.energy_Hz_min.clear();
+                i_pF_temp.energy_Hz_max.clear();
+                i_pF_temp.energy_eV.clear();
+                i_pF_temp.energy_eV_min.clear();
+                i_pF_temp.energy_eV_max.clear();
+                i_pF_temp.flux_ergscms.clear();
+                i_pF_temp.flux_error_up_ergscms.clear();
+                i_pF_temp.flux_error_down_ergscms.clear();
+            }
+            i_pF_temp.MJD_min = iT_min;
+            i_pF_temp.MJD_max = iT_max;
+        }
+        i_pF_temp.Marker = imarker;
+        i_pF_temp.Color = icolor;
+
+// energy [GeV]
+        double i_eV = 0.;
+	is_stream >> is_temp;
+	i_eV = atof( is_temp.c_str() ) * 1.e9;
+        if( i_eV  <= 0. ) continue;
+        i_pF_temp.energy_eV.push_back( i_eV );
+        double iHz = i_eV / 1.239841875e-6 * TMath::C();
+        i_pF_temp.energy_Hz.push_back( iHz );
+
+	if( iFormat == 0 )
+	{
+	    i_pF_temp.energy_eV_min.push_back( i_pF_temp.energy_eV.back() );
+	    i_pF_temp.energy_eV_max.push_back( i_pF_temp.energy_eV.back() );
+	    i_pF_temp.energy_Hz_min.push_back( i_pF_temp.energy_Hz.back() );
+	    i_pF_temp.energy_Hz_max.push_back( i_pF_temp.energy_Hz.back() );
+	}
+        is_stream >> is_temp;
+        i_pF_temp.flux_ergscms.push_back( atof( is_temp.c_str() ) );
+
+	if( iFormat == 0 )
+	{
+	    is_stream >> is_temp;
+	    i_pF_temp.flux_error_up_ergscms.push_back( atof( is_temp.c_str() ) );
+	    i_pF_temp.flux_error_down_ergscms.push_back( atof( is_temp.c_str() ) );
+	} 
+	else if( iFormat == 1 )
+	{
+	    double i_eV_low = 0.;
+	    is_stream >> is_temp;
+	    i_eV_low = atof( is_temp.c_str() ) * 1.e9;
+	    
+	    i_pF_temp.energy_eV_min.push_back( i_eV - i_eV_low );
+  	    i_pF_temp.energy_Hz_min.push_back( (i_eV - i_eV_low) / 1.239841875e-6 * TMath::C() );
+
+	    double i_eV_high = 0.;
+	    is_stream >> is_temp;
+	    i_eV_high = atof( is_temp.c_str() ) * 1.e9;
+
+	    i_pF_temp.energy_eV_max.push_back( i_eV + i_eV_high );
+  	    i_pF_temp.energy_Hz_max.push_back( (i_eV+i_eV_high) / 1.239841875e-6 * TMath::C() );
+
+	    is_stream >> is_temp;
+	    i_pF_temp.flux_error_up_ergscms.push_back( atof( is_temp.c_str() ) );
+	    is_stream >> is_temp;
+	    i_pF_temp.flux_error_down_ergscms.push_back( atof( is_temp.c_str() ) );
+	}
+        i_photonFlux.push_back( i_pF_temp );
+
+        z++;
+    }
+    fSpectralFlux.push_back( i_photonFlux );
+
+    if( bPrint )
+    {
+        cout << endl;
+        cout << "reading " << name << " data for MJD = (" << MJD_min << ", " << MJD_max << ")" << " from " << ifile << endl;
+        cout << "------------------------------------------------------------------------------------------------------" << endl;
+        for( unsigned int i = 0; i < i_photonFlux.size(); i++ )
+        {
+            cout << "\t";
+            cout << setprecision( 8 ) << i_photonFlux[i].MJD_min << " " << i_photonFlux[i].MJD_max;
+            cout << setprecision( 6 ) << " " << i_photonFlux[i].energy_Hz[0] << " " << i_photonFlux[i].energy_eV[0] << " ";
+            cout << i_photonFlux[i].flux_ergscms[0] << " ";
+            cout << i_photonFlux[i].flux_error_up_ergscms[0] << " ";
+            cout << i_photonFlux[i].flux_error_down_ergscms[0] << " ";
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+    return true;
+}
+
+
 /* 
    read complete SED for different time periods from an ascii file
 

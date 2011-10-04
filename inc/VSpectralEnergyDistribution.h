@@ -95,11 +95,12 @@ class VSpectralEnergyDistribution
         bool readSED( string iname );
         bool readSwiftData( string name, string txtfile, double MJD_min, double MJD_max, bool bPrint = false, int imarker = 20, int icolor = 1 );
         bool readTeVEvndispData( string name, string txtfile, bool bPrint = false, int imarker = 20, int icolor = 1 );
+        bool readFermiData( string name, string txtfile, double MJD_min, double MJD_max, bool bPrint = false, int imarker = 20, int icolor = 1, int iFormat = 0 );
         bool readXMMData( string name, string txtfile, double MJD_min, double MJD_max, bool bPrint = false, int imarker = 20, int icolor = 1, bool iModel = false, int iFormat = 0 );
         void setPlottingEnergyRange_Hz( double iMin = 1.e9, double iMax = 1.e28 ) { fPlotting_EnergyRange_min_Hz = iMin; fPlotting_EnergyRange_max_Hz = iMax; }
         void setPlottingFluxRange( double iMin = 1.e-14, double iMax = 1.e-9 )    { fPlotting_FluxRange_min = iMin; fPlotting_FluxRange_max = iMax; }
         void setTimeRange( double iMJDmin = 0., double iMJDmax = 1.e14 );
 
-        ClassDef(VSpectralEnergyDistribution,1);
+        ClassDef(VSpectralEnergyDistribution,2);
 };
 #endif
