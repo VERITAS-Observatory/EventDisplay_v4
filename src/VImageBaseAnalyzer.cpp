@@ -432,14 +432,14 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
 // calculate timing parameters (raw and corrected; tzero correction happens later)
 	    setPulseTiming( chanID, fTraceHandler->getPulseTiming( corrfirst, corrlast, 0, getNSamples() ), true );
 // calculate integrated sum and pulse width (summation window not shifted)
-            if( getSumWindowShift() == 0 || getRunParameter()->fFixWindowStart || getRunParameter()->fDoublePass )
+            if( getSumWindowShift() == 0 || getRunParameter()->fFixWindowStart )
             {
                 setSums( chanID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
             }
 // if the trace window should be shifted, it is shifted relativ to calculate tzero
             else
             {
-                corrfirst = (int)getTZeros()[chanID] + getSumWindowShift();
+                corrfirst = (int)getTOffsets()[chanID] + getSumWindowShift();
                 if( corrfirst < 0 ) corrfirst = 0;
                 corrlast = corrfirst + (iLastSum - iFirstSum);
                 setTCorrectedSumFirst( chanID, corrfirst );
