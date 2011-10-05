@@ -72,6 +72,10 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	float transformTelescopePosition( int iTel, float i_ze, float i_az, int axis );
 	void readTableFrogs();
 	double getFrogsStartEnergy(int eventNumber);
+        void finishFrogs(TFile *f);
+
+	TFile *mscwFrogsFile;
+
 
     private:
 	struct 		     frogs_imgtmplt_in frogs_convert_from_ed(int eventNumber, int adc_type, double inEnergy); 
@@ -85,6 +89,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 //	VDetectorGeometry    *fDetector;
 //        VBFDataReader        *fVBFReader;
         VVirtualDataReader   *fReader;
+
 
 	int   frogsEventID;
         int   frogsGSLConStat; 

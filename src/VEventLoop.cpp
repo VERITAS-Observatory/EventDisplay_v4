@@ -506,6 +506,9 @@ void VEventLoop::shutdown()
        {
 	   cout << "Error: problem with eventdisplay output file: " << fRunPar->foutputfileName << endl;
        }
+#ifndef NOGSL
+       if( fFrogs ) fFrogs->finishFrogs(&f);
+#endif
        f.Close();
     }
 // end of analysis

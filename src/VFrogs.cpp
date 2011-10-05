@@ -107,7 +107,6 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   getFrogParameters()->frogsGoodnessBkg = getFrogsGoodnessBkg();
   getFrogParameters()->frogsNpixBkg = getFrogsNpixBkg();
 
-
   getFrogParameters()->getTree()->Fill();
 
   //Print out the results of the image template analysis
@@ -342,11 +341,26 @@ float VFrogs::transformTelescopePosition( int iTel, float i_ze, float i_az, int 
 //================================================================
 void VFrogs::terminate()
 {
-  
-  // todo This is not working properly crashed when using display=1
-  //getFrogParameters()->getTree()->Write();
-  fOutputfile->Flush();
-  
+/* 
+  if ( fRunPara->fdisplaymode == 0 ) {
+    getFrogParameters()->getTree()->Write();
+    fOutputfile->Flush();
+  }
+*/
+}
+
+void VFrogs::finishFrogs(TFile *f)
+{
+
+ 
+  string fmscwFrogsFile = getRunParameter()->ffrogsmscwfile;
+  TFile *mscwFrogsFile = new TFile( fmscwFrogsFile.c_str() , "UPDATE" );
+
+  ((TTree*)f->Get("frogspars"))->CloneTree()->Write();
+  mscwFrogsFile->Close();
+
+  return;
+ 
 }
 //================================================================
 //================================================================
