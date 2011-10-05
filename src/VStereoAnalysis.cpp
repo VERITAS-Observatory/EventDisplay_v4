@@ -473,9 +473,15 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				fHisto[fHisCounter]->hmean_dist->Fill(   fCuts->getMeanDistance() );
 				if( fDataRun->MSCW > -50. ) fHisto[fHisCounter]->hmscw->Fill( fDataRun->MSCW );
 				if( fDataRun->MSCL > -50. ) fHisto[fHisCounter]->hmscl->Fill( fDataRun->MSCL );
-				if( fDataRun->MSCW > -50. && fDataRun->MSCL > -50. ) fHisto[fHisCounter]->hmsc->Fill( fDataRun->MSCW, fDataRun->MSCL );
+				if( fDataRun->MSCW > -50. && fDataRun->MSCL > -50. )
+				{
+				   fHisto[fHisCounter]->hmsc->Fill( fDataRun->MSCW, fDataRun->MSCL );
+                                }
 // probability threshold cuts
-				if( fCuts->getProbabilityCut_Selector() > 0. ) fHisto[fHisCounter]->hrf->Fill( fCuts->getProbabilityCut_Selector() );
+				if( fCuts->getProbabilityCut_Selector() > 0. )
+				{
+				   fHisto[fHisCounter]->hrf->Fill( fCuts->getProbabilityCut_Selector() );
+                                }
 // mean emission height histograms
 				if( fDataRun->EmissionHeight > 0. )
 				{
@@ -513,7 +519,10 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 					if( fDataRun->meanPedvar_Image > 0. ) iPedVar_temp = fDataRun->meanPedvar_Image;
 					else                                  iPedVar_temp = iPedVar;
 
-                                        iEnergyWeighting = fEnergy.getEffectiveArea( iErec, fDataRun->Ze, iDirectionOffset, iPedVar_temp, fRunPara->fEnergyReconstructionSpectralIndex, true, fRunPara->bEffectiveAreaVsEnergyMC );
+                                        iEnergyWeighting = fEnergy.getEffectiveArea( iErec, fDataRun->Ze, 
+					                                             iDirectionOffset, iPedVar_temp, 
+										     fRunPara->fEnergyReconstructionSpectralIndex, true, 
+										     fRunPara->bEffectiveAreaVsEnergyMC );
 // fill energy histograms
 					fHisto[fHisCounter]->herec->Fill( log10( iErec ), iEnergyWeighting );
 					fHisto[fHisCounter]->hLinerec->Fill( iErec, iEnergyWeighting );
@@ -616,9 +625,12 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 // copy effective areas and radial acceptance to anasum output file
 		if( bOn )
 		{
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaEmc );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaErec );
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEsys_MC );
+			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, 
+			                                   "EffectiveAreas", gMeanEffectiveAreaEmc );
+			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, 
+			                                   "EffectiveAreas", gMeanEffectiveAreaErec );
+			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, 
+			                                   "EffectiveAreas", gMeanEsys_MC );
 			if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 )
 			{
 			    fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fAcceptanceFile, "RadialAcceptances", 0 );
@@ -632,13 +644,15 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 				sprintf( hname, "%s_off", gMeanEffectiveAreaEmc->GetName() );
 				gMeanEffectiveAreaEmc->SetName( hname );
 			}
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaEmc );
+			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, 
+			                                   "EffectiveAreas", gMeanEffectiveAreaEmc );
 			if( gMeanEffectiveAreaErec )
 			{
 				sprintf( hname, "%s_off", gMeanEffectiveAreaErec->GetName() );
 				gMeanEffectiveAreaErec->SetName( hname );
 			}
-			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaErec );
+			fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, 
+			                                   "EffectiveAreas", gMeanEffectiveAreaErec );
 		}
 		if( fTreeSelectedEvents ) fTreeSelectedEvents->AutoSave();
 	}
