@@ -116,27 +116,29 @@ void VImageAnalyzer::doAnalysis()
 // apply timing correction from laser calibration
     timingCorrect();
 
-///////////////////////////////////////////////////////////////////////////////////////////
-// correct for relative gains (from laser calibration)
-   gainCorrect();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // image cleaning
+// correct for relative gains (from laser calibration)
+///////////////////////////////////////////////////////////////////////////////////////////
 
 // fixed cleaning levels
     if( getRunParameter()->fUseFixedThresholds )
     {
+       gainCorrect();
        fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
     }
 // time cleaning
     else if( getRunParameter()->fUseTimeCleaning )
     {
-        fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+       fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+       gainCorrect();
     }
 // signal/noise cleaning
     else
     {
        fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
+       gainCorrect();
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -182,9 +184,6 @@ void VImageAnalyzer::doAnalysis()
             calcSecondTZerosSums();
         }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-// correct for relative gains (from laser calibration)
-        gainCorrect();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // smoothing of dead or disabled pixels (first part)
@@ -203,17 +202,26 @@ void VImageAnalyzer::doAnalysis()
         }
 ///////////////////////////////////////////////////////////////////////////////////////////
 // image cleaning (second pass)
+// correct for relative gains (from laser calibration)
+///////////////////////////////////////////////////////////////////////////////////////////
+// fixed threshold cleaning
         if( getRunParameter()->fUseFixedThresholds )
 	{
+            gainCorrect();
 	    fVImageCleaning->cleanImageFixed( getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
         }
+// time cleaning
    	else if( getRunParameter()->fUseTimeCleaning )
 	{
 	   fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() ); //HP
+           gainCorrect();
         }
+// signal/noise cleaning
+// (note that pedvars are not corrected - therefore gain correction after signal/noise cleaning)
         else
 	{
 	   fVImageCleaning->cleanImagePedvars( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), true, false );
+           gainCorrect();
         }
 
 
