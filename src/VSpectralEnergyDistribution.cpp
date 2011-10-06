@@ -665,10 +665,12 @@ expected file format:
 
 additional data needed:
 
-i. file with wavelengths and zero-points for photometric bands (e.g. $OBS_EVNDISP_ANA_DIR/AstroData/Multiwavelengthdata/photometricBands.dat)
+i.  file with wavelengths and zero-points for photometric bands (e.g. $OBS_EVNDISP_ANA_DIR/AstroData/Multiwavelengthdata/photometricBands.dat)
+
+ii. file with galactic extinction correction (for dereddening)
 
 */
-TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string ifile, string iband, bool bPrint, int imarker, int icolor, bool bAverage, double iPlotMagnitudeMultiplier )
+TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string ifile, string iband, bool bPrint, int imarker, int icolor, bool bAverage, double iPlotMagnitudeMultiplier, bool bCorrection, string icorfile )
 {
 // set up the data structure
     sPhotonFlux i_pF_temp;
@@ -719,6 +721,14 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
         double imagnitude = atof( is_temp.c_str() );
         is_stream >> is_temp;
         double imagnitudeError =  atof( is_temp.c_str() );
+
+	if( bCorrection )
+	{
+	    readGalacticExtinction( icorfile, bPrint );
+	    double icor = getGalacticExtinctionCorrection( iband );
+	    imagnitude -= icor;
+	}
+
 
         if( !bAverage )
         {
@@ -892,6 +902,103 @@ double VSpectralEnergyDistribution::getEffectiveWavelength( string iband, string
     }
 
     return 0.;
+}
+
+
+
+/*
+  Copy the galactic extinction numbers from NED
+  The file should then look like this:
+
+U     B     V     R     I     J     H     K     L'
+0.130 0.103 0.079 0.064 0.046 0.022 0.014 0.009 0.004
+
+*/
+bool VSpectralEnergyDistribution::readGalacticExtinction( string ifile, bool iPrint )
+{
+    ifstream is( ifile.c_str(), ifstream::in );
+    if( !is )
+    {
+	cout << "error reading file" << ifile << endl;
+	return false;
+    }
+    if( iPrint ) cout << "successfully opened file " << ifile << endl;
+
+//    vector< sGalacticExtinction > fGalacticExtinction;
+    sGalacticExtinction iGalExt;
+
+    string iband[9];
+    double icorrection[9];
+
+    string is_line;
+    string is_temp;
+
+    int i=0;
+    while( getline( is, is_line ) )
+    {
+//	if( iPrint ) cout << is_line << endl;
+	stringstream is_stream( is_line );
+
+	int k=0;
+	while( !is_stream.eof() )
+	{
+	    is_stream >> is_temp;
+	    if( i==0 )
+	    {
+		iband[k] = is_temp.c_str();
+	    }
+	    if( i==1 )
+	    {
+		icorrection[k] = atof(is_temp.c_str() );
+	    }
+	    k++;
+	}
+	i++;
+    }
+
+    int length = sizeof(iband)/sizeof(string);
+
+    for( int l=0; l<length; l++)
+    {
+	iGalExt.fBand = iband[l];
+	iGalExt.fCorrection = icorrection[l];
+	
+	fGalacticExtinction.push_back( iGalExt );
+    }
+
+    if( iPrint )
+    {
+        cout << endl;
+        cout << "\tgalactic extinction corrections " << endl;
+        cout << "\tband \t correction [mag]" << endl;
+        cout << "\t--------------------------------" << endl;
+        for( unsigned int i = 0; i < fGalacticExtinction.size(); i++ )
+        {
+            cout << "\t";
+            cout << fGalacticExtinction[i].fBand << "\t\t" 
+		 << fGalacticExtinction[i].fCorrection << endl;
+        }
+    }
+
+    return true;
+}
+
+
+
+double VSpectralEnergyDistribution::getGalacticExtinctionCorrection( string iband )
+{
+    double cor = 0;
+
+    for( unsigned int i = 0; i < fGalacticExtinction.size(); i++)
+    {
+	if( fGalacticExtinction[i].fBand == iband )
+	{
+	    cor = fGalacticExtinction[i].fCorrection;
+	    break;
+	}
+    }
+
+    return cor;
 }
 
 

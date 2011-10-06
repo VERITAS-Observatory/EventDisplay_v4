@@ -34,6 +34,17 @@ struct sPhotoMetricBand
     double fF0_UKIRT_Jy;
 };
 
+
+/*
+   source specific galactic extinction correction
+*/
+struct sGalacticExtinction
+{
+    string fBand;
+    double fCorrection;
+};
+
+
 /*
 
  */
@@ -65,6 +76,7 @@ class VSpectralEnergyDistribution
 
 // constants
         vector< sPhotoMetricBand >      fPhotoMetricBand;
+	vector< sGalacticExtinction >   fGalacticExtinction;
 
 // data sets
                                                   // [dataset][data points]
@@ -86,12 +98,14 @@ class VSpectralEnergyDistribution
 
         TCanvas* plot( TCanvas *c = 0, int bLegend = false, int canvas_x = 900, int canvas_y = 600, bool bErrorX = true, bool bPlotName = false );
         double   getEffectiveWavelength( string iband, string iunit );
+	double   getGalacticExtinctionCorrection( string iband );
         double   getFluxfromMagnitude( double magnitude, string band, string system = "CIT" );
         TGraph* plotModel( TCanvas *c, string ifile, int icolor = 1, int ilinestyle = 1, int ilinewidth = 2 );
         void printASCII();
         bool readPhotoMetricBands( string ifile = "$OBS_EVNDISP_ANA_DIR/AstroData/Multiwavelengthdata/photometricBands.dat", bool iPrint = true );
+	bool readGalacticExtinction( string ifile, bool iPrint = true );
         bool readDataFile( string name, string txtfile, double MJD_min, double MJD_max, bool bPrint = false, int imarker = 20, int icolor = 1 );
-        TGraphErrors* readOpticalData( string name, string txtfile, string band, bool bPrint = false, int imarker = 20, int icolor = 1, bool bAverage = false, double iPlotMagnitudeMultiplier = 1. );
+        TGraphErrors* readOpticalData( string name, string txtfile, string band, bool bPrint = false, int imarker = 20, int icolor = 1, bool bAverage = false, double iPlotMagnitudeMultiplier = 1., bool bCorrection = false, string icorfile = "" );
         bool readSED( string iname );
         bool readSwiftData( string name, string txtfile, double MJD_min, double MJD_max, bool bPrint = false, int imarker = 20, int icolor = 1 );
         bool readTeVEvndispData( string name, string txtfile, bool bPrint = false, int imarker = 20, int icolor = 1 );
