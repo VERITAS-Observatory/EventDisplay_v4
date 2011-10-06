@@ -455,7 +455,7 @@ void VEventLoop::shutdown()
 // write array analysis results
             if( fArrayAnalyzer ) fArrayAnalyzer->terminate();
 #ifndef NOGSL
-            if( fFrogs ) fFrogs->terminate();
+            if( fRunPar->ffrogsmode ) fFrogs->terminate();
 #endif
 // write analysis results for each telescope
             if( fAnalyzer )
@@ -507,7 +507,7 @@ void VEventLoop::shutdown()
 	   cout << "Error: problem with eventdisplay output file: " << fRunPar->foutputfileName << endl;
        }
 #ifndef NOGSL
-       if( fFrogs ) fFrogs->finishFrogs(&f);
+       if( fRunPar->ffrogsmode ) fFrogs->finishFrogs(&f);
 #endif
        f.Close();
     }
