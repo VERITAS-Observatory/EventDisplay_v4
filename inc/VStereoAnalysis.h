@@ -5,7 +5,6 @@
 #define VStereoAnalysis_H
 
 #include "CData.h"
-#include "CFrogs.h"
 
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
