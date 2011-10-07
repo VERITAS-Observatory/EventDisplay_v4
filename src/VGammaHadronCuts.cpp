@@ -67,6 +67,9 @@ VGammaHadronCuts::VGammaHadronCuts()
     fMeanLength = 0.;
     fMeanDistance = 0.;
 
+// statistics
+    fStats = new VGammaHadronCutsStatistics(); 
+
 // use probabilities for cuts
     fProbabilityCut_File = 0;
     fProbabilityCut_Tree = 0;
@@ -97,8 +100,6 @@ VGammaHadronCuts::VGammaHadronCuts()
     fIRFAngRes = 0;
     fAngResContainmentProbability = 0;
 
-// statistics
-    fStats = new VGammaHadronCutsStats(); 
 
     setArrayCentre();
 }
@@ -108,6 +109,10 @@ VGammaHadronCuts::~VGammaHadronCuts()
    if( fStats ) delete fStats;
 }
 
+void VGammaHadronCuts::resetCutStatistics()
+{
+   if( fStats ) fStats->reset();
+}
 
 void VGammaHadronCuts::resetCutValues()
 {
@@ -160,7 +165,7 @@ void VGammaHadronCuts::resetCutValues()
     fArrayMSL_max = 10.;
     fArrayxyoff_min = -1.;
     fArrayxyoff_max = 100.;
-    fArrayxyoff_MC_min = -1.;
+    fArrayxyoff_MC_min = -100.;
     fArrayxyoff_MC_max = 100.;
     fArrayCore_min = -99.;
     fArrayCore_max = 99999.;
@@ -795,8 +800,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     {
         if( bCount )
         {
-            fStats->fN[eStereoQuality]++;
-            fStats->fN[eArrayChi2]++;
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eArrayChi2 );
         }
         return false;
     }
@@ -807,8 +812,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     {
         if( bCount )
         {
-            fStats->fN[eStereoQuality]++;
-            fStats->fN[eNImages]++;
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+            fStats->updateCutCounter( VGammaHadronCutsStatistics::eNImages );
         }
         return false;
     }
@@ -821,8 +826,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
         {
             if( bCount )
             {
-                fStats->fN[eMSC_Quality]++;
-                fStats->fN[eNImages]++;
+                fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                fStats->updateCutCounter( VGammaHadronCutsStatistics::eMSC_Quality );
             }
             return false;
         }
@@ -831,8 +836,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
         {
             if( bCount )
             {
-                fStats->fN[eMSC_Quality]++;
-                fStats->fN[eNImages]++;
+                fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                fStats->updateCutCounter( VGammaHadronCutsStatistics::eMSC_Quality );
             }
             return false;
         }
@@ -841,13 +846,21 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 // check energy reconstruction
         if( iEnergyReconstructionMethod == 0 )
         {
-            if( fData->Erec > 0. && fData->EChi2 <= 0. ) return false;
+            if( fData->Erec > 0. && fData->EChi2 <= 0. )
+	    {
+                if( bCount )
+                {
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
+                }
+	        return false;
+            }
             if( fData->Erec < fArrayErec_min )
             {
                 if( bCount )
                 {
-                    fStats->fN[eStereoQuality]++;
-                    fStats->fN[eErec]++;
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
                 }
                 return false;
             }
@@ -855,21 +868,29 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
             {
                 if( bCount )
                 {
-                    fStats->fN[eStereoQuality]++;
-                    fStats->fN[eErec]++;
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
                 }
                 return false;
             }
         }
         else if( iEnergyReconstructionMethod == 1 )
         {
-            if( fData->ErecS > 0. && fData->EChi2S <= 0. ) return false;
+            if( fData->ErecS > 0. && fData->EChi2S <= 0. )
+	    {
+                if( bCount )
+                {
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
+                }
+	        return false;
+            }
             if( fData->ErecS < fArrayErec_min )
             {
                 if( bCount )
                 {
-                    fStats->fN[eStereoQuality]++;
-                    fStats->fN[eErec]++;
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
                 }
                 return false;
             }
@@ -877,8 +898,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
             {
                 if( bCount )
                 {
-                    fStats->fN[eStereoQuality]++;
-                    fStats->fN[eErec]++;
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+                    fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
                 }
                 return false;
             }
@@ -903,8 +924,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     {
         if( bCount )
         {
-            fStats->fN[eStereoQuality]++;
-            fStats->fN[eCorePos]++;
+	    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+	    fStats->updateCutCounter( VGammaHadronCutsStatistics::eCorePos );
         }
         return false;
     }
@@ -919,8 +940,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
             {
                 if( bCount )
                 {
-                    fStats->fN[eStereoQuality]++;
-                    fStats->fN[eLTrig]++;
+	            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+	            fStats->updateCutCounter( VGammaHadronCutsStatistics::eLTrig );
                 }
              return false;
             }
@@ -929,8 +950,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
         {
             if( bCount )
             {
-                fStats->fN[eStereoQuality]++;
-                fStats->fN[eLTrig]++;
+	        fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+	        fStats->updateCutCounter( VGammaHadronCutsStatistics::eLTrig );
             }
             return false;
         }
@@ -942,8 +963,8 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     {
         if( bCount )
         {
-            fStats->fN[eStereoQuality]++;
-            fStats->fN[eSizeSecondMax]++;
+	    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+	    fStats->updateCutCounter( VGammaHadronCutsStatistics::eSizeSecondMax );
         }
         return false;
     }
@@ -954,7 +975,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     {
         if( !applyProbabilityCut( iEntry , fIsOn) )
         {
-            if( !bCount ) fStats->fN[eStereoQuality]++;
+            if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
             return false;
         }
     }
@@ -976,31 +997,53 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts()
 */
 bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount )
 {
-    fStats->fN[eEnergyRec] = 0;
     if( iEnergyReconstructionMethod == 0 )
     {
-        if( fData->EChi2 < fArrayEChi2_min ) return false;
-        if( fData->EChi2 > fArrayEChi2_max ) return false;
-        if( fData->Erec < fArrayErec_min )   return false;
-        if( fData->Erec > fArrayErec_max )   return false;
-        if( fData->dE < fArraydE_min )       return false;
+        if( fData->EChi2 < fArrayEChi2_min || fData->EChi2 > fArrayEChi2_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
+        if( fData->Erec < fArrayErec_min || fData->Erec > fArrayErec_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
+        if( fData->dE < fArraydE_min || fData->dE > fArraydE_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
         if( fData->dE > fArraydE_max )       return false;
     }
     else if( iEnergyReconstructionMethod == 1 )
     {
-        if( fData->EChi2S < fArrayEChi2_min ) return false;
-        if( fData->EChi2S > fArrayEChi2_max ) return false;
-        if( fData->ErecS < fArrayErec_min )   return false;
-        if( fData->ErecS > fArrayErec_max )   return false;
-        if( fData->dES < fArraydE_min )       return false;
-        if( fData->dES > fArraydE_max )       return false;
+        if( fData->EChi2S < fArrayEChi2_min || fData->EChi2S > fArrayEChi2_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
+        if( fData->ErecS < fArrayErec_min || fData->ErecS > fArrayErec_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
+        if( fData->dES < fArraydE_min || fData->dES > fArraydE_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
     }
     else if( iEnergyReconstructionMethod == 100 )
     {
         return true;
     }
-    // unknown reconstruction method
-    else return false;
+// unknown reconstruction method
+    else
+    {
+       if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eError );
+       return false;
+    }
 
     return true;
 }
@@ -1028,7 +1071,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
 	if( fDebug ) cout << "VGammaHadronCuts::isGamma: applyStereoShapeCuts" << endl; 
         if( !applyStereoShapeCuts() )
         {
-            if( !bCount ) fStats->fN[eIsGamma]++;
+            if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
             return false;
         }
 // all cut selectors >= 10 are different
@@ -1041,7 +1084,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
 	if( fDebug ) cout << "VGammaHadronCuts::isGamma: applyProbabilityCut" << endl; 
         if( !applyProbabilityCut( i, fIsOn ) )
         {
-            if( !bCount ) fStats->fN[eIsGamma]++;
+            if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
             return false;
         }
     }
@@ -1052,7 +1095,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
         if( fDebug ) cout << "VGammaHadronCuts::isGamma: applyTMVACut" << endl; 
         if( !applyTMVACut( i, fIsOn ) )
         {
-           if( !bCount ) fStats->fN[eIsGamma]++;
+           if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
            return false;
         }
     }
@@ -1288,7 +1331,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     fTMVAEvaluator->setDebug( fDebug );
     if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
-       fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU );
+       fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU, 10. );
        fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
     }
     else
@@ -1371,7 +1414,7 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
 
     if( xy > fArrayxyoff_max*fArrayxyoff_max )
     {
-        if( bCount ) fStats->fN[eXYoff]++;
+        if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
         return false;
     }
 
@@ -1379,7 +1422,7 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
     {
         if( xy < fArrayxyoff_min*fArrayxyoff_min )
         {
-            if( bCount ) fStats->fN[eXYoff]++;
+            if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
             return false;
         }
     }
@@ -1395,13 +1438,13 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
 */
 bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 {
-    if( !isMCCuts() ) return true;
+    if( !fData->isMC() ) return true;
 
     double xy = xoff*xoff + yoff*yoff;
 
     if( xy > fArrayxyoff_MC_max*fArrayxyoff_MC_max )
     {
-        if( bCount ) fStats->fN[eMC_XYoff]++;
+        if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eMC_XYoff );
         return false;
     }
 
@@ -1409,7 +1452,7 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
     {
         if( xy < fArrayxyoff_MC_min*fArrayxyoff_MC_min )
         {
-            if( bCount ) fStats->fN[eMC_XYoff]++;
+            if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eMC_XYoff );
             return false;
         }
     }
@@ -1430,7 +1473,7 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 
    for( unsigned int i = 0; i < fNTelTypeCut.size(); i++ ) icut = ( icut || fNTelTypeCut[i]->test( fData ) );
 
-   if( bCount && !icut ) fStats->fN[eTelType]++;
+   if( bCount && !icut ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eTelType );
 
    return icut;
 }
@@ -1527,7 +1570,8 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
       return true;
    }
 
-   if( bCount ) fStats->fN[eDirection]++;
+   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eDirection );
+
    return false;
 }
 
@@ -1717,93 +1761,17 @@ bool VGammaHadronCuts::setIRFGraph( TGraphErrors *g )
      update statistics
 
 */
-void VGammaHadronCuts::newEvent()
+void VGammaHadronCuts::newEvent( bool iFillTree )
 {
-   fStats->fN[eTot]++;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-VNTelTypeCut::VNTelTypeCut()
-{
-   fNTelType_min = 0;
-}
-
-
-bool VNTelTypeCut::test( CData *c )
-{
-   if( !c ) return false;
-
-   unsigned int ntel_type = 0;
-   for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
+// fill previous event
+   if( iFillTree && fStats->getCounterValue( VGammaHadronCutsStatistics::eTot > 0 ) )
    {
-      if( fTelType_counter[i] < c->NTtype ) ntel_type += c->NImages_Ttype[fTelType_counter[i]];
+      fStats->fill();
    }
-    // OBS! >=
-   if( ntel_type >= fNTelType_min ) return true;
 
-   return false;
+   fStats->updateCutCounter( VGammaHadronCutsStatistics::eTot );
 }
 
-void VNTelTypeCut::print()
-{
-   cout << "\t       type cut: mintel >= " << fNTelType_min << " for types ";
-   for( unsigned int i = 0; i < fTelType_counter.size(); i++ ) cout << fTelType_counter[i] << " ";
-   cout << endl;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-VGammaHadronCutsStats::VGammaHadronCutsStats()
-{
-   fName.push_back( "Tot          " );
-   fName.push_back( "MC_XYoff     " );
-   fName.push_back( "XYoff        " );
-   fName.push_back( "StereoQuality" );
-   fName.push_back( "ArrayChi2    " );
-   fName.push_back( "NImages      " );
-   fName.push_back( "MSC_Quality  " );
-   fName.push_back( "Erec         " );
-   fName.push_back( "CorePos      " );
-   fName.push_back( "LTrig        " );
-   fName.push_back( "SizeSecondMax" );
-   fName.push_back( "TelType      " );
-   fName.push_back( "Direction    " );
-   fName.push_back( "IsGamma      " );
-   fName.push_back( "EnergyRec    " );
-
-   reset();
-}
-
-void VGammaHadronCutsStats::reset()
-{
-   fN.clear();
-
-    // the vector will have exactly the name of EN_AnaCutsStats
-   for( unsigned int i = 0; i < fName.size(); i++ )
-   {
-      fN.push_back( 0 );
-   }
-}
-
-void VGammaHadronCutsStats::printCutStatistics()
-{
-   cout << endl;
-   cout << "\t cut statistics: " << endl;
-   for( unsigned int i = 0; i < fName.size(); i++ )
-   {
-      cout << "\t\t" << fName[i] << "\t";
-      if( i < fN.size() ) cout << fN[i] << endl;
-   }
-   cout << endl;
-}
-   
 
 double VGammaHadronCuts::getProbabilityCutAlpha(bool fIsOn)
 {
@@ -1850,3 +1818,50 @@ double VGammaHadronCuts::getProbabilityCutAlpha(bool fIsOn)
     }
 
 }
+
+void VGammaHadronCuts::terminate()
+{
+   SetName( "GammaHadronCuts" );
+
+   if( fStats->getDataTree() )
+   {
+      fStats->terminate();
+      fStats->getDataTree()->Write();
+   }
+
+   Write();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+VNTelTypeCut::VNTelTypeCut()
+{
+   fNTelType_min = 0;
+}
+
+
+bool VNTelTypeCut::test( CData *c )
+{
+   if( !c ) return false;
+
+   unsigned int ntel_type = 0;
+   for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
+   {
+      if( fTelType_counter[i] < c->NTtype ) ntel_type += c->NImages_Ttype[fTelType_counter[i]];
+   }
+    // OBS! >=
+   if( ntel_type >= fNTelType_min ) return true;
+
+   return false;
+}
+
+void VNTelTypeCut::print()
+{
+   cout << "\t       type cut: mintel >= " << fNTelType_min << " for types ";
+   for( unsigned int i = 0; i < fTelType_counter.size(); i++ ) cout << fTelType_counter[i] << " ";
+   cout << endl;
+}
+

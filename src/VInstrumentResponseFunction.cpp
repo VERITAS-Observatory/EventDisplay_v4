@@ -115,7 +115,7 @@ bool VInstrumentResponseFunction::fill()
     {
          fData->GetEntry( i );
 
-	 fAnaCuts->newEvent();
+	 fAnaCuts->newEvent( false );
 
 // apply MC cuts
 	if( !fAnaCuts->applyMCXYoffCut( fData->MCxoff, fData->MCyoff, true ) ) continue;

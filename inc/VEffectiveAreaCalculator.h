@@ -193,7 +193,7 @@ class VEffectiveAreaCalculator
         ~VEffectiveAreaCalculator();
 
         void cleanup();
-        void fill( unsigned int ize, TH1D *hE0mc, CData *d, VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod );
+        bool fill( TH1D *hE0mc, CData *d, VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod );
         TH1D*     getHistogramhEmc();
         TGraphErrors* getMeanSystematicErrorHistogram();
         TTree* getTree() { return fEffArea; }

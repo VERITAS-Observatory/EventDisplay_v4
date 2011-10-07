@@ -12,6 +12,7 @@
 
 #include "CData.h"
 #include "VAnalysisUtilities.h"
+#include "VGammaHadronCutsStatistics.h"
 #include "VInstrumentResponseFunctionData.h"
 #include "VTMVAEvaluator.h"
 #include "VUtilities.h"
@@ -25,11 +26,6 @@
 #define VANACUTS_PROBSELECTIONCUTS_MAX 1000
 
 using namespace std;
-
-////////////////////////////////////////////////////////////////////////////////
-// enum for efficiency counting of the different types of cuts
-enum EN_AnaCutsStats { eTot, eMC_XYoff, eXYoff, eStereoQuality, eArrayChi2, eNImages, eMSC_Quality, 
-                       eErec, eCorePos, eLTrig, eSizeSecondMax, eTelType, eDirection, eIsGamma, eEnergyRec };
 
 ////////////////////////////////////////////////////////////////////////////////
 /*
@@ -53,11 +49,12 @@ class VNTelTypeCut : public TNamed
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /*
-
-   class to keep track of efficiency of different cuts
+   dummy class (for compatibility reasons)
 
 */
+
 class VGammaHadronCutsStats : public TNamed
 {
    private:
@@ -68,13 +65,13 @@ class VGammaHadronCutsStats : public TNamed
 
    vector< unsigned int > fN;
 
-   VGammaHadronCutsStats();
+   VGammaHadronCutsStats() {}
   ~VGammaHadronCutsStats() {}
 
-   void printCutStatistics();
-   void reset();
+   void printCutStatistics() {}
+   void reset() {}
 
-   ClassDef( VGammaHadronCutsStats, 1 );
+   ClassDef( VGammaHadronCutsStats, 2 );
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +139,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool initAngularResolutionFile();
 
 // cut statistics
-        VGammaHadronCutsStats* fStats;
+        VGammaHadronCutsStatistics* fStats;
 
         bool   applyProbabilityCut( int i, bool fIsOn);
 	bool   applyTMVACut( int i, bool fIsOn );
@@ -256,7 +253,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 
         bool   isMCCuts() { return bMCCuts; }
 
-        void   newEvent();
+        void   newEvent( bool iFillStats = true );
 
         TF1*   getAngularResolutionFunction() { return fF1AngRes; }
         double getAngularResolutionAbsoluteMinimum() { return fAngRes_AbsoluteMinimum; }
@@ -283,6 +280,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   readCuts(string i_cutfilename, bool iPrint );
         bool   readCuts(string i_cutfilename, int iPrint );
         void   resetCutValues();
+	void   resetCutStatistics();
         void   initializeCuts( int irun, string iDir = "" );
         void   setArrayCentre( double iX = 0., double iY = 0. ) { fArrayCentre_X = iX; fArrayCentre_Y = iY; }
         void   setDataDirectory( string id ) { fDataDirectory = id; }
@@ -293,7 +291,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setNTel( unsigned int itel,  double iX = 0., double iY = 0. ) { fNTel = itel; fArrayCentre_X = iX; fArrayCentre_Y = iY; }
         void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
+	void   terminate();
 
-        ClassDef(VGammaHadronCuts,21);
+        ClassDef(VGammaHadronCuts,23);
 };
 #endif

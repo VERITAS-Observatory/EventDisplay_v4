@@ -1691,7 +1691,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 //////////////////////////////////////////////////////////////////////////////////////
 // calculate solid angle from analysis cuts (or from input parameter theta2)
 //////////////////////////////////////////////////////////////////////////////////////
-    VGammaHadronCuts* iCuts = (VGammaHadronCuts*)fEff.Get( "anaCuts" );
+    VGammaHadronCuts* iCuts = (VGammaHadronCuts*)fEff.Get( "GammaHadronCuts" );
     if( iCuts )
     {
 // theta2 might be energy dependent

@@ -59,7 +59,7 @@ int main( int argc, char *argv[] )
 	cout << endl;
 	exit( 0 );
     }
-    string fOutputfile = argv[2];
+    string fOutputfileName = argv[2];
 
 /////////////////////////////////////////////////////////////////
 // read run parameters from file
@@ -67,6 +67,15 @@ int main( int argc, char *argv[] )
     fRunPara->SetName( "makeEffectiveArea_runparameter" );
     if( !fRunPara->readRunParameterFromTextFile( argv[1] ) ) exit( -1 );
     fRunPara->print();
+
+/////////////////////////////////////////////////////////////////
+// open output file and write results to dist
+    TFile *fOutputfile = new TFile( fOutputfileName.c_str(), "RECREATE" );
+    if( fOutputfile->IsZombie() )
+    {
+        cout << "Error in opening output file: " << fOutputfile->GetName() << endl;
+        exit( 0 );
+    }
 
 /////////////////////////////////////////////////////////////////
 // gamma/hadron cuts
@@ -86,18 +95,9 @@ int main( int argc, char *argv[] )
 // stopwatch to keep track of execution time
     TStopwatch fStopWatch;
 
-/////////////////////////////////////////////////////////////////
-// open output file and write results to dist
-    TFile *fO = new TFile( fOutputfile.c_str(), "RECREATE" );
-    if( fO->IsZombie() )
-    {
-        cout << "Error in opening output file: " << fO->GetName() << endl;
-        exit( 0 );
-    }
-
 /////////////////////////////////////////////////////////////////////////////
 // set effective area class
-    VEffectiveAreaCalculator e( fRunPara, fCuts );
+    VEffectiveAreaCalculator fEffectiveAreaCalculator( fRunPara, fCuts );
 
 /////////////////////////////////////////////////////////////////////////////
 // set effective area Monte Carlo histogram class
@@ -214,13 +214,16 @@ int main( int argc, char *argv[] )
      {
 // set azimuth bins and spectral index bins
 // (make sure that spectral index is positive)
-        e.initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
+        fEffectiveAreaCalculator.initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
      }
 // fill MC histograms
      if( c2 && fRunPara->fFillingMode != 1 )
      {
         fStopWatch.Start();
-        fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, fRunPara->fEnergyAxisBins_log10, e.getEnergyAxis_minimum_defaultValue(), e.getEnergyAxis_maximum_defaultValue() );
+        fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, 
+	                                 fRunPara->fEnergyAxisBins_log10, 
+					 fEffectiveAreaCalculator.getEnergyAxis_minimum_defaultValue(), 
+					 fEffectiveAreaCalculator.getEnergyAxis_maximum_defaultValue() );
         fMC_histo->fill( fRunPara->fze, c2, fRunPara->fAzimuthBins );
         fMC_histo->print();
         fStopWatch.Print();
@@ -229,7 +232,8 @@ int main( int argc, char *argv[] )
 // fill effective areas
      if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 )
      {
-        e.fill( 0, hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
+	fOutputfile->cd();
+        fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );
         fStopWatch.Print();
      }
 
@@ -238,19 +242,19 @@ int main( int argc, char *argv[] )
 // write results to disk
     if( !fRunPara->fFillMCHistograms )
     {
-       if( e.getTree() )
+       if( fEffectiveAreaCalculator.getTree() )
        {
-          cout << "writing effective areas (" << e.getTree()->GetName() << ") to " << fO->GetName() << endl;
-          fO->cd();
-          e.getTree()->Write();
+          cout << "writing effective areas (" << fEffectiveAreaCalculator.getTree()->GetName() << ") to " << fOutputfile->GetName() << endl;
+          fOutputfile->cd();
+          fEffectiveAreaCalculator.getTree()->Write();
        }
        else
        {
           cout << "error: no effective area tree found" << endl;
        }
-       if( e.getHistogramhEmc() ) e.getHistogramhEmc()->Write();
+       if( fEffectiveAreaCalculator.getHistogramhEmc() ) fEffectiveAreaCalculator.getHistogramhEmc()->Write();
     }
-    cout << "writing MC histograms to file " << fO->GetName() << endl;
+    cout << "writing MC histograms to file " << fOutputfile->GetName() << endl;
     fMC_histo->Write();
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
     {
@@ -262,8 +266,7 @@ int main( int argc, char *argv[] )
 // writing cuts to disk
     if( fCuts ) 
     {
-       fCuts->SetName( "anaCuts" );
-       fCuts->Write();
+       fCuts->terminate();
     }
 // writing monte carlo header to disk
     if( iMonteCarloHeader ) iMonteCarloHeader->Write();
@@ -271,7 +274,7 @@ int main( int argc, char *argv[] )
 // write run parameters to disk
     if( fRunPara ) fRunPara->Write();
 
-    fO->Close();
+    fOutputfile->Close();
     cout << "end..." << endl;
 }
 

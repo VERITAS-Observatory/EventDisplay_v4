@@ -827,23 +827,34 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       if( effB->GetBinContent( i ) > 0. && Nof > 0. )
       {
          i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof, effB->GetBinContent( i ) * Nof, 1. );
-	 cout << "___________________________________________________________" << endl;
-	 cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t" << Nof << "\t" << effB->GetBinContent( i ) << endl;
-	 cout << "\t" << effS->GetBinContent( i ) * Non << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof << "\t" << effB->GetBinContent( i ) * Nof << endl;
+	 if( fDebug )
+	 {
+	    cout << "___________________________________________________________" << endl;
+	    cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t" << Nof << "\t" << effB->GetBinContent( i ) << endl;
+	    cout << "\t" << effS->GetBinContent( i ) * Non;
+	    cout << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof << "\t" << effB->GetBinContent( i ) * Nof << endl;
+         }
 // check that a minimum number of off events is 
          if( effB->GetBinContent( i ) * Nof < fOptmizationMinBackGroundEvents )
 	 {
-	    cout << "\t number of background events lower " << fOptmizationMinBackGroundEvents << ": setting signal/sqrt(noise) to 0; bin " << i << endl;
+	    if( fDebug ) 
+	    {
+	       cout << "\t number of background events lower ";
+	       cout << fOptmizationMinBackGroundEvents << ": setting signal/sqrt(noise) to 0; bin " << i << endl;
+            }
 	    i_Signal_to_sqrtNoise = 0.;
          }
 	 if( iGSignal_to_sqrtNoise )
 	 {
 	    iGSignal_to_sqrtNoise->SetPoint( z, effS->GetBinCenter( i ), i_Signal_to_sqrtNoise );
-	    cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << endl;
+	    if( fDebug ) cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << endl;
 	    z++;
          }
-	 cout << "\t z " << z << "\t" << i_Signal_to_sqrtNoise << endl;
-	 cout << "___________________________________________________________" << endl;
+	 if( fDebug )
+	 {
+	    cout << "\t z " << z << "\t" << i_Signal_to_sqrtNoise << endl;
+	    cout << "___________________________________________________________" << endl;
+         }
       }
    }
 // fill a histogram from these values and smooth it

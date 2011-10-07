@@ -210,6 +210,11 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 }
 
 
+/*
+
+   set up vectors with histograms for azimuth and spectral index bins
+
+*/
 void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex )
 {
     fVMinAz = iAzMin;
@@ -1133,15 +1138,17 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
  *  CALLED FOR CALCULATION OF EFFECTIVE AREAS
  *
  */
-void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
+bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                                      VEffectiveAreaCalculatorMCHistograms *iMC_histo, unsigned int iMethod )
 {
     bool bDebugCuts = false;          // lots of debug output
 
-    if( !(ize < fZe.size()) )
+// make sure that vectors are initialized
+    unsigned int ize = 0;      // should always be zero
+    if( ize >= fZe.size() )
     {
-        cout << "error, wrong zenith angle bin " << ize << "\t" << fZe.size() << endl;
-        return;
+	cout << "VEffectiveAreaCalculator::fill error: vectors are not correctly initialized " << fZe.size() << "\t" << ize << endl;
+	return false;
     }
     resetHistogramsVectors( ize );
 
@@ -1149,7 +1156,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
     if( fIgnoreEnergyReconstruction ) iMethod = 100;
 
 //////////////////////////////////////////////////////////////////
-// total Monte Carlo core scatter area (depends on CORSIKA core scatter mode)
+// total Monte Carlo core scatter area (depends on CORSIKA shower core scatter mode)
     double totarea = 0.;
     if( fScatterMode[ize] == "VIEWCONE" )
     {
@@ -1162,7 +1169,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
     else
     {
         cout << "VEffectiveAreaCalculator::fill ERROR: unknown CORSIKA scatter mode: " << fScatterMode[ize] << endl;
-        return;
+        return false;
     }
 
 //////////////////////////////////////////////////////////////////
@@ -1182,15 +1189,15 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
     if( fSpectralWeight ) fSpectralWeight->print();
     cout << endl;
 
-// make sure that all pointers to the data exist
-    if( !d || !iMC_histo ) return;
+// make sure that all data pointers exist
+    if( !d || !iMC_histo ) return false;
 
 // spectral weight
     double i_weight = 1.;
-// reconstructed energy (log10)
+// reconstructed energy (TeV, log10)
     double eRec = 0.;
     double eRecLin = 0.;
-// MC energy (log10)
+// MC energy (TeV, log10)
     double eMC = 0.;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1198,8 +1205,12 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
    if( !getMonteCarloSpectra( iMC_histo ) )
    {
       cout << "VEffectiveAreaCalculator::fill error while getting MC spectra" << endl;
-      return;
+      return false;
    }
+
+////////////////////////////////////////////////////////////////////////////
+// reset cut statistics
+   fCuts->resetCutStatistics();
 
 ///////////////////////////////////////////////////////
 // get full data set and loop over all entries
@@ -1311,7 +1322,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
 // loop over all az bins
          for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
          {
-// check which azimuth bin we are
+// check at what azimuth bin we are
              if( fZe[ize] > 3. )
              {
 // confine MC az to -180., 180.
@@ -1338,7 +1349,6 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
                }
                else i_weight = 0.;
 // fill true MC energy (hVEmc is in true MC energies)
-               if( bDebugCuts ) cout << "PAAAAAAAAAAAAAAASED" << endl;
                if( hVEcut[s][i_az] )           hVEcut[s][i_az]->Fill( eMC, i_weight );
                if( hVEcut500[s][i_az] )        hVEcut500[s][i_az]->Fill( eMC, i_weight );
                if( hVEcutLin[s][i_az] )        hVEcutLin[s][i_az]->Fill( eMC, i_weight );
@@ -1350,7 +1360,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
                if( hVEmcCut[s][i_az] )         hVEmcCut[s][i_az]->Fill( eMC, eRec );
              }
            }
-// don't do anything between here and the end of the loop!
+// don't do anything between here and the end of the loop! Never!
     }                                             // end of loop
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -1410,7 +1420,8 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
                 Rec_seff_L[i] = 0.;
                 Rec_seff_U[i] = 0.;
             }
-            double x, y;
+            double x = 0.;
+	    double y = 0.;
             double iSf = 1.;
             for( int i = 0; i < nbins; i++ )
             {
@@ -1460,6 +1471,7 @@ void VEffectiveAreaCalculator::fill( unsigned int ize, TH1D *hE0mc, CData *d,
 
     fCuts->printCutStatistics();
 
+    return true;
 }
 
 

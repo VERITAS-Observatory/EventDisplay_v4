@@ -162,9 +162,9 @@ ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
 # 2010 production
-CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 SC 
-#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
+CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
 
 ########################################################
@@ -357,6 +357,7 @@ mscw_energy:  $(MSCOBJECTS)
 ########################################################
 
 ACCOBJECT = 	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
+		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 		./obj/VAnaSumRunParameter.o ./obj/VRadialAcceptance.o \
 		./obj/VAstroSource.o ./obj/VASlalib.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
@@ -383,6 +384,7 @@ makeRadialAcceptance:	$(ACCOBJECT)
 
 EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o ./obj/VEffectiveAreaCalculator.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
@@ -413,6 +415,7 @@ makeEffectiveArea:	$(EFFOBJECT) ./obj/VASlalib.o ./obj/makeEffectiveArea.o
 ########################################################
 ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
                 ./obj/VStereoHistograms.o \
+		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
                 ./obj/VStereoAnalysis.o ./obj/VMonoPlots.o \
                 ./obj/VAstroSource.o\
                 ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o \
@@ -479,6 +482,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
 		./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
 		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 		./obj/VDetectorGeometry.o ./obj/VDetectorGeometry_Dict.o \
 		./obj/VCameraRead.o ./obj/VCameraRead_Dict.o \
 		./obj/VDetectorTree.o ./obj/VDetectorTree_Dict.o \
@@ -675,6 +679,7 @@ VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 				./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+				./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 				./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 				./obj/VUtilities.o \
 				./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
