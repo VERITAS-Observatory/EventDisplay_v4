@@ -132,7 +132,7 @@ int parseOptions(int argc, char *argv[])
             {0,0,0,0}
         };
         int option_index=0;
-        int c=getopt_long(argc, argv, "h:l:m:o:d:s:r:i:u:f:p", long_options, &option_index);
+        int c=getopt_long(argc, argv, "h:l:m:o:d:s:r:i:u:f:p:g", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
         switch(c)

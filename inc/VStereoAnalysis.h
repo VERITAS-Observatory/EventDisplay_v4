@@ -5,6 +5,7 @@
 #define VStereoAnalysis_H
 
 #include "CData.h"
+#include "CFrogs.h"
 
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
@@ -160,6 +161,7 @@ class VStereoAnalysis
         int  getDataRunNumber() const;            // Check for existence of fDataRun and try to retrieve run number from first entry of the tree
         CData *fDataRun;
 	TTree *fDataRunTree;
+	TTree *fDataFrogsTree;
         TFile *fDataFile;
 
         vector< VAstroSource* > fAstro;           //!< Astronomical source parameters for this analysis

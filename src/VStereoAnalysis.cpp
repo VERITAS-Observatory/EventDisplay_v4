@@ -383,6 +383,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	{
 		fDataRun->GetEntry( i );
 
+
 		if( fDataRun->runNumber == irun )
 		{
 // count how many entries are in this run
@@ -434,7 +435,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
 			fAstro[icounter]->derotateCoords(i_UTC, fDataRun->Xoff, fEVDVersionSign * fDataRun->Yoff, i_xderot, i_yderot);
 			i_yderot *= -1.;
-
+				
 // gamma/hadron separation cuts
 			bIsGamma = fCuts->isGamma( i,false,fIsOn);
 
@@ -1397,6 +1398,16 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 		{
 			cout << "VStereoAnalysis::getDataFromFile() error: cannot find data tree in " << iFileName << endl;
 			exit( -1 );
+		}
+		if ( fRunPara->fFrogs == 1  )
+		{
+		fDataFrogsTree = (TTree*)fDataFile->Get( "frogspars" );
+		  if( !fDataFrogsTree )
+		  {
+			  cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
+		  	  exit( -1 );
+		  }
+		  fDataRunTree->AddFriend(fDataFrogsTree);
 		}
 		c = new CData( fDataRunTree );
 

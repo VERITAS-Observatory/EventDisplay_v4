@@ -413,6 +413,11 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             {
                 fEnergyEffectiveAreaSmoothingThreshold = atof( temp2.c_str() );
             }
+// Frogs Analysis
+            else if( temp == "FROGSANALYSIS" )
+            {
+                fFrogs = atoi( temp2.c_str() );
+            }
             else
             {
                 cout << "Unknown line in parameter file " << i_filename << ": " << endl;

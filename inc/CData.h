@@ -31,6 +31,7 @@ class CData
         bool            fBOOLtheta2_All;
 	bool            fBOOLteltype;
 	bool            fBOOLdE;
+	bool		fFrogs;
 
         bool            fShort;
         int             fVersion;
@@ -139,6 +140,28 @@ class CData
                                                   //[NTelPairs]
         Float_t         EmissionHeightT[MAXTEL*MAXTEL];
 
+//FROGS
+        Int_t   frogsEventID;
+        Int_t   frogsGSLConStat; 
+        Int_t   frogsNB_iter;
+        Double_t frogsXS;
+        Double_t frogsXSerr;
+        Double_t frogsYS;
+        Double_t frogsYSerr;
+        Double_t frogsXP;
+        Double_t frogsXPerr;
+        Double_t frogsYP;
+        Double_t frogsYPerr;
+        Double_t frogsEnergy;
+        Double_t frogsEnergyerr;
+        Double_t frogsLambda;
+        Double_t frogsLambdaerr;
+        Double_t frogsGoodnessImg;
+        Int_t   frogsNpixImg;
+        Double_t frogsGoodnessBkg;
+        Int_t   frogsNpixBkg;
+
+
 // List of branches
         TBranch        *b_runNumber;              //!
         TBranch        *b_eventNumber;            //!
@@ -233,6 +256,27 @@ class CData
         TBranch        *b_NTelPairs;              //!
         TBranch        *b_EmissionHeightT;        //!
 
+//FROGS
+        TBranch *b_frogsEventID;
+        TBranch *b_frogsGSLConStat;
+        TBranch *b_frogsNB_iter;
+        TBranch *b_frogsXS;
+        TBranch *b_frogsXSerr;
+        TBranch *b_frogsYS;
+        TBranch *b_frogsYSerr;
+        TBranch *b_frogsXP;
+        TBranch *b_frogsXPerr;
+        TBranch *b_frogsYP;
+        TBranch *b_frogsYPerr;
+        TBranch *b_frogsEnergy;
+        TBranch *b_frogsEnergyerr;
+        TBranch *b_frogsLambda;
+        TBranch *b_frogsLambdaerr;
+        TBranch *b_frogsGoodnessImg;
+        TBranch *b_frogsNpixImg;
+        TBranch *b_frogsGoodnessBkg;
+        TBranch *b_frogsNpixBkg;
+
         CData(TTree *tree = 0, bool bMC = false, int iVersion = 5, bool bShort = false );
         virtual ~CData();
         virtual Int_t    Cut(Long64_t entry);
@@ -258,6 +302,7 @@ CData::CData( TTree *tree, bool bMC, int iVersion, bool bShort )
     fBOOLtheta2_All = false;
     fBOOLteltype = false;
     fBOOLdE = false;
+    fFrogs = false;
 
     Init(tree);
 }
@@ -336,6 +381,8 @@ void CData::Init(TTree *tree)
     if( tree->GetBranchStatus( "NTtype" ) ) fBOOLteltype = true;
 // test if dE branches exist
     if( tree->GetBranchStatus( "dE" ) ) fBOOLdE = true;
+// test if frogs stuff exists
+    if( tree->GetBranchStatus( "frogsEventID" ) ) fFrogs = true;
 
     fChain = tree;
     fCurrent = -1;
@@ -779,6 +826,32 @@ Bool_t CData::Notify()
         b_NTelPairs = 0;
         b_EmissionHeightT = 0;
     }
+
+
+    if ( fFrogs  )
+    {
+//FROGS
+	    fChain->SetBranchAddress("frogsEventID",&frogsEventID);
+	    fChain->SetBranchAddress("frogsGSLConStat",&frogsGSLConStat);
+	    fChain->SetBranchAddress("frogsNB_iter",&frogsNB_iter);
+	    fChain->SetBranchAddress("frogsXS",&frogsXS);
+	    fChain->SetBranchAddress("frogsXSerr",&frogsXSerr);
+	    fChain->SetBranchAddress("frogsYS",&frogsYS);
+	    fChain->SetBranchAddress("frogsYSerr",&frogsYSerr);
+	    fChain->SetBranchAddress("frogsXP",&frogsXP);
+	    fChain->SetBranchAddress("frogsXPerr",&frogsXPerr);
+	    fChain->SetBranchAddress("frogsYP",&frogsYP);
+	    fChain->SetBranchAddress("frogsYPerr",&frogsYPerr);
+	    fChain->SetBranchAddress("frogsEnergy",&frogsEnergy);
+	    fChain->SetBranchAddress("frogsEnergyerr",&frogsEnergyerr);
+	    fChain->SetBranchAddress("frogsLambda",&frogsLambda);
+	    fChain->SetBranchAddress("frogsLambdaerr",&frogsLambdaerr);
+	    fChain->SetBranchAddress("frogsGoodnessImg",&frogsGoodnessImg);
+	    fChain->SetBranchAddress("frogsNpixImg",&frogsNpixImg);
+	    fChain->SetBranchAddress("frogsGoodnessBkg",&frogsGoodnessBkg);
+	    fChain->SetBranchAddress("frogsNpixBkg",&frogsNpixBkg);
+    }
+
     return kTRUE;
 }
 
