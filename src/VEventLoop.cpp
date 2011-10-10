@@ -637,6 +637,7 @@ bool VEventLoop::nextEvent()
             return false;
         }
         fReader->setTelescopeID( getTeltoAna()[0] );
+	if( !fReader->hasFADCTrace() ) getRunParameter()->fperformFADCAnalysis = false;
         fillTriggerVectors();
 ///////////////////////////////////////////////////////////
 // set eventnumbers

@@ -261,11 +261,11 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
         {
             case C_CHARGE:
                 if( fPlotColor ) setPMTColorScheme( fData->getSums(), false,  100., 0., "charge [d.c.]", true );
-                else setPMTColorForChargeTiming();
+                else             setPMTColorForChargeTiming();
                 break;
             case C_TIMING:
                 if( fPlotColor) setPMTColorScheme( fData->getSums(), false,  0., fScaleMax, "charge [d.c]", true );
-                else setPMTColorForChargeTiming();
+                else            setPMTColorForChargeTiming();
                 break;
             case C_TRIGGER:
                 setPMTColorOnOff( fData->getReader()->getFullTrigVec(), fColorTrigger, fColorTrigger, fFillStylePos );
@@ -444,7 +444,7 @@ void VCamera::setPMTColorForChargeTiming()
     fPMTData = rescaleSums( fPMTData , false );
 
 // all colors > 10 are greyish/brown. Start at 1 again
-    int iTelescopeColor = (fTelescope%10 + 1);
+    int iTelescopeColor = (fTelescope%10)+1;
     if( iTelescopeColor == 0 ) iTelescopeColor += 1;
 
 // loop over all pmts and set tube radii and colors

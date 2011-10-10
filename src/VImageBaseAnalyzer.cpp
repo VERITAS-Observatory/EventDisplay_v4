@@ -502,6 +502,10 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
 void VImageBaseAnalyzer::gainCorrect()
 {
     if( fDebug ) cout << "void VImageBaseAnalyzer::gainCorrect()" << endl;
+
+// do not gain correct if traces where not calculated by evndisp (using e.g. sim_telarray analysis results)
+    if( !getRunParameter()->doFADCAnalysis() ) return;
+
 // loop over all channels
     unsigned int nc = getSums().size();
     for( unsigned int i = 0; i < nc; i++ )
