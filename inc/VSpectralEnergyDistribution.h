@@ -100,7 +100,7 @@ class VSpectralEnergyDistribution
         double   getEffectiveWavelength( string iband, string iunit );
 	double   getGalacticExtinctionCorrection( string iband );
         double   getFluxfromMagnitude( double magnitude, string band, string system = "CIT" );
-        TGraph* plotModel( TCanvas *c, string ifile, int icolor = 1, int ilinestyle = 1, int ilinewidth = 2 );
+        TGraph* plotModel( TCanvas *c, string ifile, int icolor = 1, int ilinestyle = 1, int ilinewidth = 2, bool isJyHz = false );
         void printASCII();
         bool readPhotoMetricBands( string ifile = "$OBS_EVNDISP_ANA_DIR/AstroData/Multiwavelengthdata/photometricBands.dat", bool iPrint = true );
 	bool readGalacticExtinction( string ifile, bool iPrint = true );

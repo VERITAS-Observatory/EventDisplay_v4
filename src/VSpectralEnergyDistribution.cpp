@@ -602,7 +602,7 @@ bool VSpectralEnergyDistribution::readXMMData( string name, string ifile, double
             double i_fle = atof( is_temp.c_str() )  * TMath::Qe() * 1.e3 / 1.e-7;
             i_pF_temp.flux_error_down_ergscms.push_back( i_fle );
             i_pF_temp.flux_error_up_ergscms.push_back( i_fle );
-            if( iModel )
+            if( iModel)
             {
                 is_stream >> is_temp;
                 i_fl = atof( is_temp.c_str() ) * TMath::Qe() * 1.e3 / 1.e-7;
@@ -1201,7 +1201,7 @@ void VSpectralEnergyDistribution::printASCII()
 }
 
 
-TGraph* VSpectralEnergyDistribution::plotModel( TCanvas *c, string ifile, int icolor, int ilinestyle, int ilinewidth )
+TGraph* VSpectralEnergyDistribution::plotModel( TCanvas *c, string ifile, int icolor, int ilinestyle, int ilinewidth, bool isJyHz )
 {
     if( !c || ifile.size() == 0 ) return 0;
 
@@ -1232,7 +1232,16 @@ TGraph* VSpectralEnergyDistribution::plotModel( TCanvas *c, string ifile, int ic
 
         if( atof( is_temp2.c_str() ) > 5.e-50 && atof( is_temp.c_str() ) > 0. )
         {
-            g->SetPoint( z, log10( atof( is_temp.c_str() ) ), atof( is_temp2.c_str() ) );
+	    double flux;
+	    if( isJyHz ) // convert from JyHz to erg s^-1 cm^-2
+	    {
+		flux = atof( is_temp2.c_str() ) * 1e-23 ;
+	    }
+	    else
+	    {
+		flux = atof( is_temp2.c_str() );
+	    }
+	    g->SetPoint( z, log10( atof( is_temp.c_str() ) ), flux );
             z++;
         }
     }
