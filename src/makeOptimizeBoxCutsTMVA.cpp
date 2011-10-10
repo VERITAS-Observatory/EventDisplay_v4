@@ -29,13 +29,13 @@ using namespace std;
 /*!
      run the optimization
 */
-bool optimize( VTMVARunData *iRun, unsigned int iEnergyBin )
+bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 {
 // sanity checks
     if( !iRun ) return false;
     if( iRun->fEnergyCutData.size() < iEnergyBin || iRun->fOutputFile.size() < iEnergyBin )
     {
-        cout << "error in optimize: energy bin out of range " << iEnergyBin;
+        cout << "error in train: energy bin out of range " << iEnergyBin;
 	cout << "\t" << iRun->fEnergyCutData.size() << "\t" << iRun->fOutputFile.size() << endl;
         return false;
     }
@@ -66,7 +66,7 @@ bool optimize( VTMVARunData *iRun, unsigned int iEnergyBin )
 // adding training variables
    if( iRun->fTrainingVariable.size() != iRun->fTrainingVariableType.size() )
    {
-      cout << "optimize: error: trainingvariable vectors have different size" << endl;
+      cout << "train: error: training-variable vectors have different size" << endl;
       return false;
    }
    for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
@@ -84,26 +84,48 @@ bool optimize( VTMVARunData *iRun, unsigned int iEnergyBin )
    factory->PrepareTrainingAndTestTree( iRun->fQualityCuts && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut, iRun->fPrepareTrainingOptions );
       
 //////////////////////////////////////////
-// book methods
-
+// book all methods
    char hname[6000];
    char htitle[6000];
-   sprintf( hname, "%s", iRun->fFitMethod.c_str() );
-   for( unsigned int i = 0; i < iRun->fTrainingVariable_CutRangeMin.size(); i++ ) 
-   {
-      sprintf( hname, "%s:CutRangeMin[%d]=%f", hname, i, iRun->fTrainingVariable_CutRangeMin[i] );
-   }
-   for( unsigned int i = 0; i < iRun->fTrainingVariable_CutRangeMax.size(); i++ )
-   {
-      sprintf( hname, "%s:CutRangeMax[%d]=%f", hname, i, iRun->fTrainingVariable_CutRangeMax[i] );
-   }
-   for( unsigned int i = 0; i < iRun->fTrainingVariable_VarProp.size(); i++ )
-   {
-      sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
-   }
 
-   sprintf( htitle, "%d", iEnergyBin );
+   for( unsigned int i = 0; i < iRun->fMVAMethod.size(); i++ )
+   {
+// BOOSTED DECISION TREES
+       if( iRun->fMVAMethod[i] == "BDT" )
+       {
+	  sprintf( htitle, "BDT_%d", iEnergyBin );
+	  if( i < iRun->fMVAMethod_Options.size() )
+	  {
+	     factory->BookMethod( TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
+          }
+	  else
+	  {
+	     factory->BookMethod( TMVA::Types::kBDT, htitle );
+          }
+       }
+// BOX CUTS
+       if( iRun->fMVAMethod[i] == "BOXCUTS" )
+       {
+          if( i < iRun->fMVAMethod_Options.size() )  sprintf( hname, "%s", iRun->fMVAMethod_Options[i].c_str() );
+
+	  for( unsigned int i = 0; i < iRun->fTrainingVariable_CutRangeMin.size(); i++ ) 
+	  {
+	    sprintf( hname, "%s:CutRangeMin[%d]=%f", hname, i, iRun->fTrainingVariable_CutRangeMin[i] );
+	  }
+	  for( unsigned int i = 0; i < iRun->fTrainingVariable_CutRangeMax.size(); i++ )
+	  {
+	    sprintf( hname, "%s:CutRangeMax[%d]=%f", hname, i, iRun->fTrainingVariable_CutRangeMax[i] );
+	  }
+	  for( unsigned int i = 0; i < iRun->fTrainingVariable_VarProp.size(); i++ )
+	  {
+	    sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
+	  }
+
+	  sprintf( htitle, "BOXCUTS_%d", iEnergyBin );
+       }
+   }
    factory->BookMethod( TMVA::Types::kCuts, htitle, hname );
+
 
 //////////////////////////////////////////
 // start training
@@ -164,11 +186,11 @@ int main( int argc, char *argv[] )
     {
        if( fData->fEnergyCutData[i]->fEnergyCut )
        {
-          cout << "Optimizing energy bin " << fData->fEnergyCutData[i]->fEnergyCut << endl;
+          cout << "Training energy bin " << fData->fEnergyCutData[i]->fEnergyCut << endl;
 	  cout << "===================================================================================" << endl;
 	  cout << endl;
        }
-       optimize( fData, i );
+       train( fData, i );
     }
 
     return 0;

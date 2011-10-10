@@ -113,6 +113,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 
 // TMVA evaluator
         VTMVAEvaluator *fTMVAEvaluator;                             //!
+	string          fTMVA_MVAMethod;
 	string          fTMVAWeightFile;
 	unsigned int    fTMVAWeightFileIndex_min;
 	unsigned int    fTMVAWeightFileIndex_max;

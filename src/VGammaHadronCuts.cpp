@@ -80,13 +80,14 @@ VGammaHadronCuts::VGammaHadronCuts()
 
 // TMVA evaluator
     fTMVAEvaluator = 0;
+    fTMVA_MVAMethod = "";
     fTMVAWeightFileIndex_min = 0;
     fTMVAWeightFileIndex_max = 0;
     fTMVAWeightFile = "";
     fTMVASignalEfficiency = -99.;
     fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
-    fTMVAOptimizeSignalEfficiencySourceStrengthCU = 0.001;     // optimize for mili-Crab source
+    fTMVAOptimizeSignalEfficiencySourceStrengthCU = -99.;
     fTMVABoxCut_Theta2_max = 0;
 
 // energy dependent theta2 cut
@@ -551,18 +552,19 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
             }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TMVA values
-            if( temp == "TMVACUTS" )
+            if( temp == "TMVAPARAMETER" )
             {
-               if( !is_stream.eof() ) is_stream >> fTMVASignalEfficiency;
-// probability threshold not important for box cuts
-               if( !is_stream.eof() ) is_stream >> fTMVAProbabilityThreshold;
+	       if( !is_stream.eof() ) is_stream >> fTMVA_MVAMethod;
 // files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFileIndex_min;
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFileIndex_max;
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFile;
             }
-	    if( temp == "TMVASIGNALEFFICIENCY" )
+	    if( temp == "TMVACUTS" )
 	    {
+               if( !is_stream.eof() ) is_stream >> fTMVASignalEfficiency;
+// probability threshold not important for box cuts
+               if( !is_stream.eof() ) is_stream >> fTMVAProbabilityThreshold;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySourceStrengthCU;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -738,10 +740,10 @@ void VGammaHadronCuts::printCutSummary()
     if( fGammaHadronCutSelector / 10 == 4 )
     {
         cout << endl;
-        cout << "TMVA gamma/hadron separation.";
+        cout << "TMVA gamma/hadron separation with MVA method " << fTMVA_MVAMethod;
 	cout << endl;
         cout << "weight files: " << fTMVAWeightFile << " (" << fTMVAWeightFileIndex_min << "," << fTMVAWeightFileIndex_max << ")" << endl;
-	if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
+	if( fTMVAOptimizeSignalEfficiencySourceStrengthCU > 0. && fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
 	{
 	   cout << "using optimal signal efficiency for " << fTMVAOptimizeSignalEfficiencySourceStrengthCU << " Crab source" << endl;
 	   cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
@@ -1121,7 +1123,7 @@ bool VGammaHadronCuts::applyTMVACut( int i, bool fIsOn )
 
    if( fTMVAEvaluator )
    {
-      return fTMVAEvaluator->evaluate( fTMVASignalEfficiency, fTMVAProbabilityThreshold );
+      return fTMVAEvaluator->evaluate();
    }
 
    return false;
@@ -1329,17 +1331,34 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 
     fTMVAEvaluator = new VTMVAEvaluator();
     fTMVAEvaluator->setDebug( fDebug );
-    if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
+    if( fTMVAOptimizeSignalEfficiencySourceStrengthCU > 0. && fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
        fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU, 10. );
        fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
     }
-    else
+    else if( fTMVASignalEfficiency > 0. )
     {
        fTMVAEvaluator->setSignalEfficiency( fTMVASignalEfficiency );
     }
-    fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_min, iTMVAWeightFileIndex_max );
+    else if( fTMVAProbabilityThreshold > 0. )
+    {
+       fTMVAEvaluator->setMVACutValue( fTMVAProbabilityThreshold );
+    }
+    else
+    {
+       cout << "VGammaHadronCuts::initTMVAEvaluator error: unclear TMVA cut settings" << endl;
+       cout << "exiting... " << endl;
+       exit( -1 );
+    }
+    fTMVAEvaluator->setTMVAMethod( fTMVA_MVAMethod );
+    if( !fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_min, iTMVAWeightFileIndex_max ) )
+    {
+       cout << "VGammaHadronCuts::initTMVAEvaluator: error while initializing TMVA weight files" << endl;
+       cout << "exiting... " << endl;
+       exit( -1 );
+    }
     fTMVAEvaluator->printSignalEfficiency();
+
     if( fDirectionCutSelector == 3 ) fTMVAEvaluator->setIgnoreTheta2Cut( false );
     else                             fTMVAEvaluator->setIgnoreTheta2Cut( true  );
     fTMVABoxCut_Theta2_max = fTMVAEvaluator->getBoxCut_Theta2_Graph();

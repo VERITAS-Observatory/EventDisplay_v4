@@ -20,8 +20,6 @@ VTMVARunData::VTMVARunData()
    fQualityCuts = "";
    fPrepareTrainingOptions = "SplitMode=random:!V";
 
-   fFitMethod = "MC";
-
    fSignalWeight = 1.;
    fBackgroundWeight = 1.;
    fMinSignalEvents = 50;
@@ -39,6 +37,7 @@ bool VTMVARunData::openDataFiles()
 // open signal trees
    fSignalFile.clear();
    fSignalTree.clear();
+
    for( unsigned int i = 0; i < fSignalFileName.size(); i++ )
    {
       fSignalFile.push_back( new TFile( fSignalFileName[i].c_str() ) );
@@ -165,7 +164,13 @@ void VTMVARunData::print()
     cout << "TMVA box cut configuration (" << fName << ")" << endl;
     cout << "=================================" << endl;
     cout << endl;
-    cout << "optimization details: " << fFitMethod << endl;
+    cout << "MVA Methods and options: " << endl;
+    for( unsigned int i = 0; i < fMVAMethod.size(); i++ )
+    {
+       cout << "METHOD: " << fMVAMethod[i];
+       if( i < fMVAMethod_Options.size() ) cout << "  Options: " << fMVAMethod_Options[i];
+       cout << endl;
+    }
     cout << "list of variables: " << endl;
     for( unsigned int i = 0; i < fTrainingVariable.size(); i++ )
     {
@@ -216,6 +221,8 @@ bool VTMVARunData::readConfigurationFile( char *iC )
 
    string is_line;
    string temp;
+   fMVAMethod.clear();
+   fMVAMethod_Options.clear();
 
    while( getline( is, is_line ) )
    {
@@ -229,13 +236,34 @@ bool VTMVARunData::readConfigurationFile( char *iC )
          if( is_stream.eof() ) continue;
 
           is_stream >> temp;
-// optimization details
+///////////////////////////////////////////////////////////////////////////////////////////
+// MVA method and options
+///////////////////////////////////////////////////////////////////////////////////////////
+        if( temp == "MVA_METHOD" )
+	{
+	   if( !is_stream.eof() )
+	   {
+	      is_stream >> temp;
+	      fMVAMethod.push_back( temp );
+           }
+	   if( !is_stream.eof() )
+	   {
+	      is_stream >> temp;
+	      fMVAMethod_Options.push_back( temp );
+           }
+	   else
+	   {
+	      fMVAMethod_Options.push_back( "" );
+           }
+	}
+// Box cuts: kept for backwards compatibility
          if( temp == "OPTIMIZATION_METHOD" )
          {
             if( !is_stream.eof() ) 
             {
-//               fFitMethod = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
-               is_stream >> fFitMethod;
+               is_stream >> temp;
+	       fMVAMethod.push_back( "BOXCUTS" );
+	       fMVAMethod_Options.push_back( temp );
             }
             else
             {
@@ -243,6 +271,7 @@ bool VTMVARunData::readConfigurationFile( char *iC )
                return false;
             }
          }
+///////////////////////////////////////////////////////////////////////////////////////////
 // training variables
          if( temp == "VARIABLE" )
          {

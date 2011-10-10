@@ -124,7 +124,9 @@ void VSensitivityCalculator::reset()
 
    return sensitivity as fraction of data set used
 */
-double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservationTime, double iSignificance, double iMinEvents, double iMinBackgroundEvents, double energy )
+double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservationTime, 
+                                               double iSignificance, double iMinEvents, 
+					       double iMinBackgroundEvents, double energy )
 {
     if( !checkDataSet( iD, "getSensitivity" ) ) return 0.;
 
@@ -165,7 +167,10 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservat
 	   int i_energy = (int)(energy*1.e3);
 	   if( s < iSignificance )                                fSignificanceLimited[i_energy] = s;
 	   if( s > iSignificance && t * f * n_diff < iMinEvents ) fMinEventsLimited[i_energy] = t * f * n_diff;
-	   if( s > iSignificance &&  t * fData[iD].fBackground < fBackgroundEvents_min ) fMinBackgroundEventsLimited[i_energy] = t * fData[iD].fBackground;
+	   if( s > iSignificance &&  t * fData[iD].fBackground < fBackgroundEvents_min )
+	   {
+	      fMinBackgroundEventsLimited[i_energy] = t * fData[iD].fBackground;
+           }
 	}
 
 // require a certain significance and a minimum number of events
@@ -355,6 +360,7 @@ TGraph* VSensitivityCalculator::getCrabSpectrum( bool bInt, string bUnit, bool b
 vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fCrabFlux, bool bInt, string bUnit, bool bReset )
 {
     if( fDebug ) cout << "VSensitivityCalculator::getCrabSpectrum " << i_fCrabFlux.size() << endl;
+    cout << "getCrabSpectrum " << bInt << "\t" << bUnit << "\t" << bReset << "\t" << i_fCrabFlux.size() << endl;
 
 // check if Crab spectrum is already defined
     if( i_fCrabFlux.size() == fCrabFlux_SourceStrength.size() && !bReset ) return fCrabFlux_SourceStrength;
@@ -392,17 +398,14 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 // use spectrum from text file
     else
     {
-       if( bUnit == "PFLUX" )
+       if( bUnit == "PFLUX" || bUnit == "ENERGY" )
        {
-           i_fFunCrabFlux = fEnergySpectrumfromLiterature->getEnergySpectrum( fEnergySpectrumfromLiterature_ID, false, TMath::Power( 10., fEnergy_min_Log ), 10000. );
+           i_fFunCrabFlux = fEnergySpectrumfromLiterature->getEnergySpectrum( fEnergySpectrumfromLiterature_ID, 
+	                                                                      false, TMath::Power( 10., fEnergy_min_Log ), 10000. );
        }
        else if( bUnit == "CU" )
        {
           i_fFunCrabFlux = new TF1( "i_fFunCrabFlux" , "1.", TMath::Power( 10., fEnergy_min_Log ), 10000. );
-       }
-       else if( bUnit == "ENERGY" )
-       {
-
        }
     }
     if( !i_fFunCrabFlux )
@@ -437,13 +440,19 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
     else
     {
         double iE = 0.;
+	double iY = 0.;
 // loop over different Crab fluxes
        for( int p = 0; p < i_GraphCrabFlux->GetN(); p++ )
        {
 // equal intervall in logE
 	  iE = fEnergy_min_Log + p * (fEnergy_max_Log-fEnergy_min_Log)/i_GraphCrabFlux->GetN();
 // differential flux
-	  i_GraphCrabFlux->SetPoint( p, iE, i_fFunCrabFlux->Eval( TMath::Power( 10., iE ) ) );
+          iY = i_fFunCrabFlux->Eval( TMath::Power( 10., iE ) );
+	  if( bUnit == "ENERGY" )
+	  {
+             iY *= 1.e12 * fConstant_Flux_To_Ergs * TMath::Power( 10., iE ) * TMath::Power( 10., iE );
+	  }
+	  i_GraphCrabFlux->SetPoint( p, iE, iY );
        }
     }
 
@@ -514,27 +523,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 
 // get vector with integral and differential Crab-like spectra for different flux levels
 // (use Whipple spectrum)
-    TGraph* i_fFunCrabFlux = 0;
-    if( bUnit != "CU" && (dE_Log10 > 10.) )      i_fFunCrabFlux = getCrabSpectrum( true, bUnit, true );
-    else if( bUnit != "CU" && (dE_Log10 < 10.) ) i_fFunCrabFlux = getCrabSpectrum( true, "PFLUX", true );
-    else                                         i_fFunCrabFlux = getCrabSpectrum( (dE_Log10 < 10.), bUnit, true );
-//    if( bUnit == "CU" ) i_fFunCrabFlux = getCrabSpectrum( true, bUnit, true );
-//    else                i_fFunCrabFlux = getCrabSpectrum( true, "PFLUX", true );
-/*    if( bUnit != "CU" && (dE_Log10 > 10.) )
-    {
-       i_fFunCrabFlux = getCrabSpectrum( true, bUnit, true );
-       cout << "A" << endl;
-    }
-    else if( bUnit != "CU" && (dE_Log10 < 10.) )
-    {
-       i_fFunCrabFlux = getCrabSpectrum( true, "PFLUX", true );
-       cout << "B" << endl;
-    }
-    else
-    {
-       i_fFunCrabFlux = getCrabSpectrum( (dE_Log10 < 10.), bUnit, true );
-       cout << "C" << endl;
-    } */
+    TGraph* i_fFunCrabFlux = getCrabSpectrum( (dE_Log10 < 0.), bUnit, true );
     if( !i_fFunCrabFlux )
     {
        cout << "VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum: error: no reference spectrum found " << endl;
@@ -588,16 +577,16 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 // integral spectrum: add number of events
 	if( dE_Log10 < 0. )
 	{
-	    non  += fDifferentialFlux[i].NOn;
-	    noff += fDifferentialFlux[i].NOff;
+	    non        += fDifferentialFlux[i].NOn;
+	    noff       += fDifferentialFlux[i].NOff;
 	    non_error  += fDifferentialFlux[i].NOn_error * fDifferentialFlux[i].NOn_error;
 	    noff_error += fDifferentialFlux[i].NOff_error * fDifferentialFlux[i].NOff_error;
 	}
 // differential spectrum: number of events per differential bin
 	else
 	{
-	    non  = fDifferentialFlux[i].NOn;
-	    noff = fDifferentialFlux[i].NOff;
+	    non        = fDifferentialFlux[i].NOn;
+	    noff       = fDifferentialFlux[i].NOff;
 	    non_error  = fDifferentialFlux[i].NOn_error * fDifferentialFlux[i].NOn_error;
 	    noff_error = fDifferentialFlux[i].NOff_error * fDifferentialFlux[i].NOff_error;
 	}
@@ -623,8 +612,6 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 	    && fDifferentialFlux[i].Energy > iEnergyMin_TeV_lin && fDifferentialFlux[i].Energy < iEnergyMax_TeV_lin
 	    && noff > fBackgroundEvents_min )
         {
-//            energy = TMath::Log10( fDifferentialFlux[i].Energy );
-            energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
 // integral sensitivity
             if( dE_Log10 < 0. )
             {
@@ -649,18 +636,9 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
                 }
                 else if( bUnit == "ENERGY" )
                 {
-                    gSensitivityvsEnergy->SetPoint( z, energy,
-		                                    ( f1 - f2 ) * s / fDifferentialFlux[i].dE * 
-						    fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *
-						    1.e12 * fConstant_Flux_To_Ergs );
-                    gSensitivityvsEnergy->SetPointEYhigh( z, 
-		                                    ( f1 - f2 ) * TMath::Abs( s - s_error_U ) / fDifferentialFlux[i].dE * 
-						    fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *
-						    1.e12 * fConstant_Flux_To_Ergs );
-                    gSensitivityvsEnergy->SetPointEYlow( z, 
-		                                    ( f1 - f2 ) * TMath::Abs( s - s_error_L ) / fDifferentialFlux[i].dE * 
-						    fDifferentialFlux[i].EnergyWeightedMean * fDifferentialFlux[i].EnergyWeightedMean *
-						    1.e12 * fConstant_Flux_To_Ergs );
+                    gSensitivityvsEnergy->SetPoint( z, energy, s * i_fFunCrabFlux->Eval( energy ) );
+                    gSensitivityvsEnergy->SetPointEYhigh( z, TMath::Abs( s - s_error_U ) * i_fFunCrabFlux->Eval( energy ) );
+                    gSensitivityvsEnergy->SetPointEYlow( z, TMath::Abs( s - s_error_L ) * i_fFunCrabFlux->Eval( energy ) );
                 }
 		else
 		{
@@ -673,18 +651,22 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 // print some debugging information
 	if( fDebug )
 	{
-	     cout << fixed << "FLUX RESULTS: " << z << "\t" << fDifferentialFlux[i].EnergyWeightedMean << " [TeV]\t";
+	     cout << fixed << "FLUX RESULTS " << z << ":\t" << fDifferentialFlux[i].EnergyWeightedMean << " [TeV]\t";
 	     cout << fDifferentialFlux[i].Energy << " [TeV]";
 	     if( dE_Log10 > 0. ) cout << " dE_log10: " << fDifferentialFlux[i].dE << "\t";
 	     cout << "[" << fDifferentialFlux[i].Energy_lowEdge << ", " << fDifferentialFlux[i].Energy_upEdge << "]\t";
 	     cout << "[" << log10(fDifferentialFlux[i].Energy_lowEdge) << ", " << log10(fDifferentialFlux[i].Energy_upEdge) << "]\t";
 	     cout << s << "(" << s_error_L << "," << s_error_U << ") [CU]";
 	     cout << endl;
-	     cout << "\t NON: " << non << "(" << non_error << ")";
-	     cout << "\t NOFF: " << noff << "(" << noff_error << ")\t";
+	     cout << "\t NON: " << non << "(+-" << non_error << ")";
+	     cout << "\t NOFF: " << noff << "(+-" << noff_error << ")\t";
 	     cout << fDifferentialFlux[i].ObsTime << " [s]\t" << scientific;
 	     if( bUnit == "PFLUX" )       cout <<  i_fFunCrabFlux->Eval( energy ) * s << " [cm^-2s^-1] (" << energy << ")";
-	     else if( bUnit == "ENERGY" ) cout <<  i_fFunCrabFlux->Eval( energy ) * s << " [erg cm^-2s^-1]";
+	     else if( bUnit == "ENERGY" )
+	     {
+	         cout << scientific <<  i_fFunCrabFlux->Eval( energy ) * s;
+                 cout << " [erg cm^-2s^-1]";
+             }
              cout << endl;
         }
     }
@@ -1854,6 +1836,7 @@ void VSensitivityCalculator::plotEffectiveArea()
     if( iL ) iL->Draw();
 
     cPlotDebug[1]->Update();
+
 }
 
 /*!
