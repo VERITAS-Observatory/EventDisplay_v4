@@ -1244,10 +1244,14 @@ void VTableLookup::calculateMSFromTables( VTablesToRead *s, double esys )
     f_calc_msc->setCalculateEnergies( false );
 // calculate mscw
     f_calc_msc->setVHistograms( s->hmscwMedian, s->hmscwSigma );
-    s->mscw = f_calc_msc->calc( (int)fData->getNTel(), fData->getDistanceToCore(), fData->getSize( fTLRunParameter->fMSCWSizecorrection ), fData->getWidth(), s->mscw_T, i_dummy, i_dummy, s->mscw_Tsigma );
+    s->mscw = f_calc_msc->calc( (int)fData->getNTel(), fData->getDistanceToCore(), 
+              fData->getSize( fTLRunParameter->fMSCWSizecorrection ), fData->getWidth(),
+	      s->mscw_T, i_dummy, i_dummy, s->mscw_Tsigma );
 // calculate mscl
     f_calc_msc->setVHistograms( s->hmsclMedian, s->hmsclSigma );
-    s->mscl = f_calc_msc->calc( (int)fData->getNTel(), fData->getDistanceToCore(), fData->getSize( fTLRunParameter->fMSCLSizecorrection ), fData->getLength(), s->mscl_T, i_dummy, i_dummy, s->mscl_Tsigma );
+    s->mscl = f_calc_msc->calc( (int)fData->getNTel(), fData->getDistanceToCore(), 
+                                fData->getSize( fTLRunParameter->fMSCLSizecorrection ), fData->getLength(), 
+				s->mscl_T, i_dummy, i_dummy, s->mscl_Tsigma );
 // calculate energy (method 1)
     f_calc_energySR->setCalculateEnergies( true );
     f_calc_energySR->setVHistograms( s->henergySRMedian, s->henergySRSigma );

@@ -512,20 +512,19 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // weighted mean
                     if( med > 0. )
                     {
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 // mean scaled calculation
                         if( !fEnergy && sigma > 0. && w )
                         {
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-// weighting used from 2009/04/16 on (use relative error as weighting)
-                            value  += (w[tel]-med)/sigma * (med*med)/(sigma*sigma);
-                            weight += (med*med)/(sigma*sigma);
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// weighting used until 2009/04/16  (use error as weighting)
-//		            value  += (w[tel]-med)/sigma / (sigma*sigma);
-//		            weight += 1./(sigma*sigma);
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// handle showers with (width==0.) correctly 
+			    if( w[tel] > 0. )
+			    {
+			       value  += (w[tel]-med)/sigma * (med*med)/(sigma*sigma);
+                            }
+			    weight += (med*med)/(sigma*sigma);
                             k++;
                         }
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 // energy calculation
                         else
                         {

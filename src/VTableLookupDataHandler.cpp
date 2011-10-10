@@ -376,7 +376,8 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     {
         bool fReadTPars = false;
 	if( i < ftpars.size() && ftpars[i] ) fReadTPars = true;
-	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 && fTLRunParameter->bWriteReconstructedEventsOnly == fMethod) || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fTLRunParameter->readwrite == 'W'   )
+	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 && fTLRunParameter->bWriteReconstructedEventsOnly == fMethod) 
+	  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fTLRunParameter->readwrite == 'W'   )
 	{
 	   if( fImgSel_list[i] ) fReadTPars = true;
 	   else                  fReadTPars = false;
@@ -1740,7 +1741,10 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
 
 double* VTableLookupDataHandler::getSize( double iSizeCorrection )
 {
-    for( unsigned int i = 0; i < getNTel(); i++ ) fsizeCorr[i] = fsize[i] * iSizeCorrection;
+    for( unsigned int i = 0; i < getNTel(); i++ )
+    {
+       fsizeCorr[i] = fsize[i] * iSizeCorrection;
+    }
     return fsizeCorr;
 }
 
