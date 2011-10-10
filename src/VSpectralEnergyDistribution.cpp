@@ -1230,7 +1230,7 @@ TGraph* VSpectralEnergyDistribution::plotModel( TCanvas *c, string ifile, int ic
         is_stream >> is_temp;
         is_stream >> is_temp2;
 
-        if( atof( is_temp2.c_str() ) > 1.e-50 && atof( is_temp.c_str() ) > 0. )
+        if( atof( is_temp2.c_str() ) > 5.e-50 && atof( is_temp.c_str() ) > 0. )
         {
             g->SetPoint( z, log10( atof( is_temp.c_str() ) ), atof( is_temp2.c_str() ) );
             z++;
