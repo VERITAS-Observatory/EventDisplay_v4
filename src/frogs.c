@@ -8,7 +8,7 @@
 |  \ \_\\//_/ /    F    R  RR  OOO   GGG  SSSS     \ \_\\//_/ /    |
 |   ~~  ~~  ~~                                      ~~  ~~  ~~     |
 | svincent@physics.utah.edu               lebohec@physics.utah.edu |
-|                  VERSION 1.01 SEPTEMBER 06th 2011                |
+|                  VERSION 1.02 OCTOBER 10th 2011                  |
 |  For license issues, see www.physics.utah.edu/gammaray/FROGS     |
 \*================================================================*/
 
@@ -100,15 +100,14 @@ int frogs_print_raw_event(struct frogs_imgtmplt_in d) {
 	    d.scope[tel].xfield,d.scope[tel].yfield);
     fprintf(OUTUNIT,"Number of pixels:%d\n",d.scope[tel].npix);
     fprintf(OUTUNIT,"Number of live pixels:%d\n",d.scope[tel].nb_live_pix);
-    for(int pix=0;pix<d.scope[tel].npix;pix++) {
-
-      fprintf(OUTUNIT,
-	      "Pixel %3d %1d x=%5.2f y=%5.2f q=%f ped=%f xn=%f col=%f\n", 
-	      pix+1,d.scope[tel].pixinuse[pix],d.scope[tel].xcam[pix],
-	      d.scope[tel].ycam[pix],d.scope[tel].q[pix],
-	      d.scope[tel].ped[pix],d.scope[tel].exnoise[pix],
-	      d.scope[tel].telpixarea[pix]);
-    }
+//    for(int pix=0;pix<d.scope[tel].npix;pix++) {
+//      fprintf(OUTUNIT,
+//	      "Pixel %3d %1d x=%5.2f y=%5.2f q=%f ped=%f xn=%f col=%f\n", 
+//	      pix+1,d.scope[tel].pixinuse[pix],d.scope[tel].xcam[pix],
+//	      d.scope[tel].ycam[pix],d.scope[tel].q[pix],
+//	      d.scope[tel].ped[pix],d.scope[tel].exnoise[pix],
+//	      d.scope[tel].telpixarea[pix]);
+//    }
   }
   fprintf(OUTUNIT,".................................................\n");
   fprintf(OUTUNIT,"            STARTING POINT:\n");
@@ -152,17 +151,59 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
   static struct frogs_imgtemplate tmplt;
   static int firstcall=1;
   //On the first call set the template elevation to zero
-  if(firstcall) {tmplt.elevation=0;firstcall=0;}  
+  if(firstcall) {tmplt.elevmin=0;tmplt.elevmax=0;firstcall=0;}
+  //If needed read the template file according to elevation
+  if(d->elevation>tmplt.elevmax || d->elevation<tmplt.elevmin) {
+    tmplt=frogs_read_template_elev(d->elevation);
+  }
+
+  //Optimize the likelihood
+  rtn=frogs_likelihood_optimization(d,&tmplt);
+
+  //Release memory used in the data structure
+  frogs_release_memory(d);
+
+  return rtn;
+}
+//================================================================
+//================================================================
+struct frogs_imgtmplt_out frogs_img_tmplt_old(struct frogs_imgtmplt_in *d) {
+  /* This function performs the image template analysis. It returns a 
+     structure of type frogs_imgtmplt_out containing all the useful 
+     information  regarding the convergence of the likelihood 
+     optimization. All the data from the telescopes for the event 
+     being  analyzed are in the structure frogs_imgtmplt_in d 
+     received as an argument.*/
+
+  struct frogs_imgtmplt_out rtn;
+  /* Event selection used to avoid processing bad or poor events 
+    worthy_event is calculated in frogs_convert_from_grisu (or 
+    equivalent for other analysis packages)*/
+  if(d->worthy_event==FROGS_NOTOK) {
+    rtn=frogs_null_imgtmplt_out();
+    rtn.event_id=d->event_id;
+    rtn.nb_iter=FROGS_BAD_NUMBER;
+    rtn.gsl_convergence_status=FROGS_BAD_NUMBER;
+    //Release memory used in the data structure
+    frogs_release_memory(d);
+    return rtn;
+  }
+
+  /*This check if a template image needs to be read and reads it if necessary*/
+  static struct frogs_imgtemplate tmplt;
+  static int firstcall=1;
+  //On the first call set the template elevation to zero
+  if(firstcall) {tmplt.elevation=0;firstcall=0;}
   //Read the template file according to elevation
   if(fabs(d->elevation-tmplt.elevation)>5.0) {
-    if(tmplt.elevation!=70 || d->elevation<65) {  
+    if(tmplt.elevation!=70 || d->elevation<65) {
       /*This weird logic is due to the fact that as of now, everything 
-	above 65 degree elevation is analysed with templates at 70 deg. 
-	elevation. Change it if you need. */ 
+        above 65 degree elevation is analysed with templates at 70 deg. 
+        elevation. Change it if you need. */
       tmplt=frogs_read_template_elev(d->elevation);
     }
   }
-  
+
   //Optimize the likelihood
   rtn=frogs_likelihood_optimization(d,&tmplt);
 
@@ -833,13 +874,52 @@ double frogs_integrand_for_averaging(double q, void *par) {
 //================================================================
 //================================================================
 struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
+  /* This function reads the file whose name is specified by the variable 
+     FROGS_TEMPLATE_LIST, searching for the first one matching the elevation 
+     provided as an argument. The file should have one line for each template 
+     file to be considered. Each line contains in that order: 
+     1) The smallest elevation for which the template can be used
+     2) The largest elevation for which the template can be used
+     3) The file name for that template 
+  */
+
+  //Open the template files list file
+  FILE *fu; //file pointer
+  if((fu = fopen(FROGS_TEMPLATE_LIST, "r")) == NULL ) {
+    frogs_showxerror("Failed opening the template files list file");
+  }
+
+  /*Read the file until the end is encountered unless a matching 
+    elevation range is found */
+  float minel, maxel; //Min and max elevation to use the listed files
+  char fname[500];
+  struct frogs_imgtemplate rtn; //Variable to hold template data
+  while(fscanf(fu,"%f%f%s",&minel,&maxel,fname)!=EOF) {
+    if(elevation>=minel && elevation<=maxel) {
+      fclose(fu);//Closes the template filename list 
+      //fprintf(stdout,"%f %f %s\n",minel,maxel,fname);
+      rtn=frogs_read_template_file(fname);
+      rtn.elevmin=minel;
+      rtn.elevmax=maxel;
+      return rtn;
+    }
+  }
+  fclose(fu);//Closes the template filename list 
+  fprintf(stderr,"Elevation %f, check file %s\n",elevation,FROGS_TEMPLATE_LIST);
+  frogs_showxerror("FROGS could not find a matching template file");
+  return rtn;
+}
+//================================================================
+//================================================================
+struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
   /* Read the template in a file for which the elevation provided in 
      argument is a good match. The template data is returned. */
   struct frogs_imgtemplate rtn;
   //Above 65 deg we use the 70 deg template for now
   if(elevation>=65.0) {
-    char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"./Templates/SimulatedModels/elev70X0.0-4.0s0.5r085.tmplt"); 
+//    char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
+    char template_file_name[256];
+    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/Templates/SimulatedModels/elev70X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=70.0;
@@ -849,7 +929,7 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
     read that file*/
   if(fabs(elevation-60.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"./Templates/SimulatedModels/elev60X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/Templates/SimulatedModels/elev60X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=60.0;
@@ -857,7 +937,7 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
   } 
   if(fabs(elevation-50.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"./Templates/SimulatedModels/elev50X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/Templates/SimulatedModels/elev50X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=50.0;
@@ -1676,7 +1756,7 @@ int frogs_printfrog() {
   fprintf(stderr,"|  \\ \\_\\\\//_/ /    F    R  RR  OOO   GGG  SSSS     \\ \\_\\\\//_/ /  |\n");
   fprintf(stderr,"|   ~~  ~~  ~~                                      ~~  ~~  ~~   |\n");
   fprintf(stderr,"| svincent@physics.utah.edu             lebohec@physics.utah.edu |\n");
-  fprintf(stderr,"|                 VERSION 1.01 SEPTEMBER 06th 2011               |\n");
+  fprintf(stderr,"|                 VERSION 1.02 OCTOBER 10th 2011                 |\n");
   fprintf(stderr,"|  For license issues, see www.physics.utah.edu/gammaray/FROGS   |\n");
   fprintf(stderr," ---------------------------------------------------------------- \n");
   return FROGS_OK;
