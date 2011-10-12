@@ -20,7 +20,7 @@
 
 #include "frogs.h"
 
-#define FROGSDEBUG 1 
+#define FROGSDEBUG 0
 
 VFrogs::VFrogs()
 {
@@ -59,7 +59,8 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   
   //Print out the data contained in the FROGS structure frogs_imgtmplt_in
   //This is useful when developing a frogs_convert_from_XXXX function
-  frogs_print_raw_event(d);
+
+  if( FROGSDEBUG )  frogs_print_raw_event(d);
   
   //Call the FROGS analysis
   struct frogs_imgtmplt_out output;
@@ -112,7 +113,7 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   //Print out the results of the image template analysis
   //The values returned by frogs_img_tmplt really are to be stored in 
   //structures used in the analysis package in which FROGS is being sed. 
-  frogs_print_param_spc_point(output);
+  if( FROGSDEBUG ) frogs_print_param_spc_point(output);
  
   //return FROGS_OK;
   return; 
@@ -456,7 +457,8 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       if(dc2pe!=0) 
       {
         rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
-        rtn.scope[tel].ped[pix]=fData->getData()->getPeds()[pix]/dc2pe;
+        //rtn.scope[tel].ped[pix]=fData->getData()->getPeds()[pix]/dc2pe;
+        rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]/dc2pe;
       }
     }
     //Total number of live pixels in the array
