@@ -11,7 +11,7 @@
 |  \ \_\\//_/ /    F    R  RR  OOO   GGG  SSSS     \ \_\\//_/ /    |
 |   ~~  ~~  ~~                                      ~~  ~~  ~~     |
 | svincent@physics.utah.edu             lebohec@physics.utah.edu   |
-|                  VERSION 1.01 SEPTEMBER 06th 2011                |
+|                  VERSION 1.02 OCTOBER 10th 2011                  |
 |  For license issues, see www.physics.utah.edu/gammaray/FROGS     |
 \*================================================================*/
 
@@ -25,6 +25,9 @@
 #include <gsl/gsl_interp.h>
 //================================================================
 //================================================================
+/*This is the name of the file holding the list of template file names 
+  and their range of applicatbility:*/
+#define FROGS_TEMPLATE_LIST "./frogs_template_file_list.txt"
 #define FROGS_DEG_PER_RAD 57.295779513082325  //Number of degrees in one radian
 #define FROGS_FILE_NAME_MAX_LENGTH 100 //Maximum file name length
 #define FROGS_MAX_ITER_NBR 100 //Maximum number of iterations
@@ -133,6 +136,8 @@ struct frogs_imgtmplt_out {
 struct frogs_imgtemplate {
   //Holds the template model
   float elevation; //Elevation of the template data in degrees
+  float elevmin;   //Minimal elevation of the template
+  float elevmax;   //Maximal elevation of the template
   int ndim;        //Number of dimension for the parameter space
   float *step;     //Table step size for each parameter
   float *min;      //Table starting value for each parameter
