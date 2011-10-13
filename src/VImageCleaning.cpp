@@ -141,30 +141,37 @@ void VImageCleaning::cleanImagePedvars(double hithresh, double lothresh, double 
 
 
 
-/*
-
-  HP: ImageCleaningRoutine based on Nepomuks time-cluster cleaning algorithm
-      - uses fixed time differences for discrimination of pixels/clusters
-      - adjusts time difference according to the time gradient
-      - handles single core pixel
-      - BrightNonImages not completely implemented yet (needs checks - but who is really using them?)
-
-*/
-
 /*!
-  signal-to-noise tailcut cleaning using pixel timing information
+  Image cleaning routine using pixel timing information
+  based on Nepomuks PhD thesis time-cluster cleaning algorithm
+   - uses fixed time differences for discrimination of pixels/clusters
+   - adjusts time difference according to the time gradient
+   - handles single core pixel
+   - BrightNonImages not completely implemented yet (needs checks - but who is really using them?)
+
    \par hithresh image threshold
    \par lothresh border threshold
    \par brightthresh bright pixel threshold
-   \par timeCutPixel time difference between pixels
+   \par timeCutPixel time diffeence between pixels
    \par timeCutCluster time difference between clusters
    \par minNumPixel minimum number of pixels in a cluster
    \par loop_max number of loops
 */
 
+void VImageCleaning::cleanImageFixedWithTiming( double hithresh, double lothresh, double brightthresh, double timeCutPixel, double timeCutCluster, int minNumPixel, int loop_max )
+{
+    cleanImageWithTiming( hithresh, lothresh, brightthresh, timeCutPixel, timeCutCluster, minNumPixel, loop_max, true );
+}
+
 void VImageCleaning::cleanImagePedvarsWithTiming( double hithresh, double lothresh, double brightthresh, double timeCutPixel, double timeCutCluster, int minNumPixel, int loop_max )
 {
-    if( fData->getDebugFlag() ) cout << "VImageCleaning::cleanImagePedvarsTiming " << fData->getTelID() << endl;
+    cleanImageWithTiming( hithresh, lothresh, brightthresh, timeCutPixel, timeCutCluster, minNumPixel, loop_max, false );
+}
+
+
+void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, double brightthresh, double timeCutPixel, double timeCutCluster, int minNumPixel, int loop_max, bool isFixed )
+{
+    if( fData->getDebugFlag() ) cout << "VImageCleaning::cleanImageWithTiming " << fData->getTelID() << endl;
 
     // check if time gradient was already calculated
     if( fData->getImageParameters()->tgrad_x == 0 && fData->getImageParameters()->tint_x == 0 )
@@ -194,16 +201,21 @@ void VImageCleaning::cleanImagePedvarsWithTiming( double hithresh, double lothre
 
     double i_pedvars_i = 0.;
     for ( unsigned int i = 0; i < i_nchannel; i++)
-      {
+    {
         if (fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead(fData->getHiLo()[i])[i]) continue;
 	
-        i_pedvars_i = fData->getPedvars( fData->getCurrentSumWindow()[i], fData->getHiLo()[i])[i];
-        if( fData->getSums()[i] > hithresh * i_pedvars_i )
-	  {
-	    fData->setImage( i, true );
-	  }
-        if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) fData->setBrightNonImage( i, true );
-      }
+	if( isFixed )
+	{
+	    if( fData->getSums()[i] > hithresh )     fData->setImage( i, true );
+//	    if( fData->getSums()[i] > brightthresh ) fData->setBrightNonImage( i, true );
+	}
+	else
+	{
+	    i_pedvars_i = fData->getPedvars( fData->getCurrentSumWindow()[i], fData->getHiLo()[i])[i];
+	    if( fData->getSums()[i] > hithresh * i_pedvars_i )      fData->setImage( i, true );
+//	    if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) fData->setBrightNonImage( i, true );
+	}
+    }
 
     //////////////////////////////////////////////////////////
     // STEP 2: Make clusters 
@@ -446,16 +458,29 @@ void VImageCleaning::cleanImagePedvarsWithTiming( double hithresh, double lothre
 		for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
 		  {
 		    unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
-		    i_pedvars_k = fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k];
-		    
-		    if( !fData->getImage()[k] && !fData->getBorder()[k] 
-			&& fData->getSums()[k] > lothresh * i_pedvars_k 
-			&& fabs( fData->getTZeros()[i] - fData->getTZeros()[k] ) < timeCutPixel )
-		      {
- 			tmp_border[counter]=k;
- 			tmp_cluster[counter]=i_ID;
-			counter++;
-		      }
+
+		    if( isFixed )
+		    {
+			if( !fData->getImage()[k] && !fData->getBorder()[k] && fData->getSums()[k] > lothresh 
+			    && fabs( fData->getTZeros()[i] - fData->getTZeros()[k] ) < timeCutPixel )
+			{
+			    tmp_border[counter]=k;
+			    tmp_cluster[counter]=i_ID;
+			    counter++;
+			}
+		    }
+		    else 
+		    {
+			i_pedvars_k = fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k];
+			if( !fData->getImage()[k] && !fData->getBorder()[k] 
+			    && fData->getSums()[k] > lothresh * i_pedvars_k 
+			    && fabs( fData->getTZeros()[i] - fData->getTZeros()[k] ) < timeCutPixel )
+			{
+			    tmp_border[counter]=k;
+			    tmp_cluster[counter]=i_ID;
+			    counter++;
+			}
+		    }
 		  }
 	      }
 	  }

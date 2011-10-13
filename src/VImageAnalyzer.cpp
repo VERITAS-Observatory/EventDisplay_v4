@@ -126,19 +126,29 @@ void VImageAnalyzer::doAnalysis()
     if( getRunParameter()->fUseFixedThresholds )
     {
        gainCorrect();
-       fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
-    }
-// time cleaning
-    else if( getRunParameter()->fUseTimeCleaning )
-    {
-       fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
-       gainCorrect();
+
+       if( getRunParameter()->fUseTimeCleaning )
+       {
+	   fVImageCleaning->cleanImageFixedWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+       } 
+       else
+       {
+	   fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
+       }
     }
 // signal/noise cleaning
-    else
+    else 
     {
-       fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
-       gainCorrect();
+	if( getRunParameter()->fUseTimeCleaning )
+	{
+	    fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+	}
+	else
+	{
+	    fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
+	}
+
+	gainCorrect();
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -208,23 +218,29 @@ void VImageAnalyzer::doAnalysis()
         if( getRunParameter()->fUseFixedThresholds )
 	{
             gainCorrect();
-	    fVImageCleaning->cleanImageFixed( getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
-        }
-// time cleaning
-   	else if( getRunParameter()->fUseTimeCleaning )
-	{
-	   fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() ); //HP
-           gainCorrect();
-        }
+	    if( getRunParameter()->fUseTimeCleaning )
+	    {
+		fVImageCleaning->cleanImageFixedWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+	    } 
+	    else
+	    {
+		fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
+	    }
+	}
 // signal/noise cleaning
-// (note that pedvars are not corrected - therefore gain correction after signal/noise cleaning)
-        else
+	else 
 	{
-	   fVImageCleaning->cleanImagePedvars( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), true, false );
-           gainCorrect();
-        }
-
-
+	    if( getRunParameter()->fUseTimeCleaning )
+	    {
+		fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+	    }
+	    else
+	    {
+		fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
+	    }
+	    gainCorrect();
+	}
+	
 ///////////////////////////////////////////////////////////////////////////////////////////
 // muon ring analysis (second pass)
         if( fRunPar->fmuonmode )

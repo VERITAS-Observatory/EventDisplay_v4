@@ -31,8 +31,15 @@ class VImageCleaning
         void cleanImagePedvars(double,double, bool, bool );
                                                   //!< signal to noise tailcut cleaning
         void cleanImagePedvars(double,double, double, bool, bool );
+
+                                                  //!< time image cleaning
+	void cleanImageWithTiming(double, double, double, double, double, int, int, bool );
+                                                  //!< time image cleaning (fixed)
+	void cleanImageFixedWithTiming(double, double, double, double, double, int, int );
                                                   //!< time image cleaning (signal-to-noise)
 	void cleanImagePedvarsWithTiming(double, double, double, double, double, int, int );
+
+
         void cleanImage_clusterCleaning( double threshold_clustersize );
                                                   // MS
         void cleanTriggerFixed( double hithresh, double lothresh );
