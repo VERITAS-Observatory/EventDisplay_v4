@@ -304,7 +304,7 @@ double VLightCurve::getPhase( double iMJD )
       string iCanvasName              	canvas name (for new canvas)
       int iPlotConfidenceInterval 	plot rates as usual (0; Non-Noff with Poisson error)
       					or
-					1 sigma confidence intervalls using Rolke et al (iPlotConfidenceInterval > 0; number is plotting color)
+					1 sigma confidence intervalls using Rolke et al (iPlotConfidenceInterval >= 0; number is plotting color)
 
 */
 TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvasName, int iPlotConfidenceInterval, string iPlottingOption )
@@ -317,12 +317,13 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 // canvas
     if( !iCanvasLightCurve )
     {
-       sprintf( htitle, "%s", iCanvasName.c_str() );
-       sprintf( hname, "light curve" );
+       sprintf( hname, "%s", iCanvasName.c_str() );
+       if( fName.size() > 0 ) sprintf( htitle, "%s", fName.c_str() );
+       else                   sprintf( htitle, "light curve" );
        if( fPhase_Period_days > 0. )
        { 
-          sprintf( htitle, "%s_%d_%d_%d", iCanvasName.c_str(), (int)fPhase_MJD0, (int)fPhase_Period_days, (int)fPhasePlotting );
-	  sprintf( hname, "%s, T_{0}=%.1f, period=%.1f days", iCanvasName.c_str(), fPhase_MJD0, fPhase_Period_days );
+          sprintf( hname, "%s_%d_%d_%d", iCanvasName.c_str(), (int)fPhase_MJD0, (int)fPhase_Period_days, (int)fPhasePlotting );
+	  sprintf( htitle, "%s, T_{0}=%.1f, period=%.1f days", fName.c_str(), fPhase_MJD0, fPhase_Period_days );
        }
 
        fCanvasLightCurve = new TCanvas( hname, htitle, 10, 10, 600, 400 );
@@ -407,7 +408,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 // plot fluxes or confidence intervals
        if( fFluxInterval[i] && fFluxInterval[i]->fFluxError >= 0. )
        {
-	  if( !iPlotConfidenceInterval )
+	  if( iPlotConfidenceInterval < 0 )
 	  {
 	     fLightCurveGraph->SetPoint( z, iMJD_mean, fFluxInterval[i]->fFlux );
 	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, fFluxInterval[i]->fFluxError, fFluxInterval[i]->fFluxError );
@@ -441,7 +442,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
     }
     if( fLightCurveGraph->GetN() > 0 )
     {
-       if( !iPlotConfidenceInterval ) fLightCurveGraph->Draw( iPlottingOption.c_str() );
+       if( iPlotConfidenceInterval < 0 ) fLightCurveGraph->Draw( iPlottingOption.c_str() );
        else
        {
 	  fLightCurveGraph->SetFillColor( iPlotConfidenceInterval );

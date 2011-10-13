@@ -25,6 +25,8 @@ class VLightCurve : public VPlotUtilities
 {
    private:
 
+   string fName;
+
    string fAnaSumFile;
    double fDayInterval;
 
@@ -86,12 +88,13 @@ class VLightCurve : public VPlotUtilities
    bool     initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin = -1., double iMJDMax = -1. );
    bool     initializeXRTLightCurve( string iXRTFile, double iMJDStart = 54857.09977457897 );
    void     printLightCurve( bool bFullDetail = true );
-   TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = 0, string iPlottingOption = "p" );
+   TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1, string iPlottingOption = "p" );
    bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );
    void     setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days =99., bool bPlotPhase = true );
    void     setPlottingParameter( double iPlottingMJDMin, double iPlottingMJDMax );
    void     setSignificanceParameters( double iThresholdSignificance = -9999., double iMinEvents = -9999., double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
    void     setLightCurveAxis( double iYmin = -9.e10, double iYmax = -9.e10, string iAxisTitle = "tevRate" );
+   void     setName( string iName ) { fName = iName; }
    void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
 
    ClassDef( VLightCurve, 1 );
