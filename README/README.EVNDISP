@@ -91,7 +91,7 @@ FADC pulse integration:
 -----------------------
 	 -sumfirst=INT 		 start of summation window (default=2)
 	 -sumwindow=INT 	 length of summation window (default=18)
-	 -fixwindowstart 	 fix the start of the integration windwo to -sumfirst=INT (do not move according to pulse position, incompatible with doublepass, default: off)
+	 -fixwindowstart 	 fix the start of the integration window to -sumfirst=INT (do not move according to pulse position, incompatible with doublepass, default: off)
 	 -tracefit=FLOAT 	 fit FADC traces (-1.=off(default),0=fit all PMTs, >0: fit PMTs with peak value > tracefit x pedestal rms
 	 -fitfunction=FIFU 	 fit function to fit FADC traces (ev or grisu)
 	 Double pass options:
