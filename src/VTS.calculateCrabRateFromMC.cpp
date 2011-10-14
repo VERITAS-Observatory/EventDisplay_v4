@@ -26,14 +26,16 @@ int main( int argc, char *argv[] )
     const double index = 2.4;
     bool bDebug = false;
 
-    VGlobalRunParameter *iGlobalRunParameter = new VGlobalRunParameter();
-    cout << "VTS.calculateCrabRateFromMC (" << iGlobalRunParameter->getEVNDISP_VERSION() << ")" << endl;
+    cout << endl;
+    cout << "VTS.calculateCrabRateFromMC (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
     cout << "--------------------------------" << endl;
     if( argc != 4 )
     {
         cout << "VTS.calculateCrabRateFromMC <effective area file> <outputfile> <energy threshold [TeV]>" << endl;
+        cout << endl;
         exit( 0 );
     }
+    cout << endl;
     cout << "selecting effective areas with spectral index " << index << endl;
 
     string ieff = argv[1];
@@ -83,7 +85,7 @@ int main( int argc, char *argv[] )
     fID.push_back( 6 );                           // MAGIC
     vector< VEnergySpectrumfromLiterature* > fESpecFun;
     char hname[2000];
-    sprintf( hname, "%s/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", iGlobalRunParameter->getDirectory_EVNDISPAnaData().c_str() );
+    sprintf( hname, "%s/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", VGlobalRunParameter::getDirectory_EVNDISPAnaData().c_str() );
     VEnergySpectrumfromLiterature *fESpec = new VEnergySpectrumfromLiterature( hname );
     for( unsigned int i = 0; i < fID.size(); i++ )
     {

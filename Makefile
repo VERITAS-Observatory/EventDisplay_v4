@@ -671,19 +671,11 @@ makeOptimizeBoxCutsbyParameterSpaceSearch:	./obj/CData.o \
 VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 				./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 				./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
-				./obj/VRunList.o ./obj/VRunList_Dict.o \
 				./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-				./obj/VRunList.o \
+				./obj/VRunList_Dict.o ./obj/VRunList.o \
 				./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 				./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-				./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
-				./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
-				./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-				./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
-				./obj/VUtilities.o \
-				./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
-				./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 				./obj/VTS.calculateCrabRateFromMC.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
