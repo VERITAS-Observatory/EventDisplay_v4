@@ -44,8 +44,10 @@ class VImageAnalyzer : public VImageBaseAnalyzer
         valarray< double > savedGainsLow;
 
         void fillOutputTree();                    //!< fill tree with image parameterisation results
+	void imageCleaning();                     //!< image cleaning
         bool initEvent();                         //! reset image calculation for next event
         void initTrees();                         //!  intitalize output tree
+	void muonRingAnalysis();                  //! muon ring analysis
         void printTrace( int i_channel );         //!< print trace information for one channel (debugging)
         void setAnaDir( unsigned int iTel );      //!< set directories in root output file
         void setNTrigger();

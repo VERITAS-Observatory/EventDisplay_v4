@@ -116,40 +116,9 @@ void VImageAnalyzer::doAnalysis()
 // apply timing correction from laser calibration
     timingCorrect();
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////
-// image cleaning
-// correct for relative gains (from laser calibration)
-///////////////////////////////////////////////////////////////////////////////////////////
-
-// fixed cleaning levels
-    if( getRunParameter()->fUseFixedThresholds )
-    {
-       gainCorrect();
-
-       if( getRunParameter()->fUseTimeCleaning )
-       {
-	   fVImageCleaning->cleanImageFixedWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
-       } 
-       else
-       {
-	   fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
-       }
-    }
-// signal/noise cleaning
-    else 
-    {
-	if( getRunParameter()->fUseTimeCleaning )
-	{
-	    fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
-	}
-	else
-	{
-	    fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
-	}
-
-	gainCorrect();
-    }
+// image cleaning & gain correction
+    imageCleaning();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // MC trigger parameter
@@ -175,17 +144,12 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // muon ring analysis
-    if( fRunPar->fmuonmode && !fRunPar->fDoublePass )
-    {
-        fVImageParameterCalculation->muonRingFinder( getSums(),getImage(), getBorder() );
-        fVImageParameterCalculation->muonPixelDistribution( getSums(),getImage(), getBorder() );
-        fVImageParameterCalculation->sizeInMuonRing( getSums(),getImage(), getBorder(), getDead() );
-    }
+    if( fRunPar->fmuonmode && !fRunPar->fDoublePass ) muonRingAnalysis();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 // second pass of image calculation with using time gradient to adjust sum window
-    if( fReader->hasFADCTrace() && getRunParameter()->doFADCAnalysis() )
+    if( fRunPar->fDoublePass && fReader->hasFADCTrace() && getRunParameter()->doFADCAnalysis() )
     {
 ///////////////////////////////////////////////////////////////////////////////////////////
 // integrate pulses and calculate timing parameters taking time gradients over images into account
@@ -194,61 +158,17 @@ void VImageAnalyzer::doAnalysis()
             calcSecondTZerosSums();
         }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 // smoothing of dead or disabled pixels (first part)
-        if( fRunPar->fSmoothDead )
-        {
-            for( unsigned int i = 0; i < getDead().size(); i++ )
-            {
-                getDeadRecovered()[i] = false;
-                savedDead[i] = getDead()[i];
-                savedGains[i] = getGains()[i];
-                savedDeadLow[i] = getDead(true)[i];
-                savedGainsLow = getGains(true)[i];
-            }
-// dead tubes smoothing
-            smoothDeadTubes();
-        }
+        if( fRunPar->fSmoothDead ) smoothDeadTubes();
+
 ///////////////////////////////////////////////////////////////////////////////////////////
-// image cleaning (second pass)
-// correct for relative gains (from laser calibration)
-///////////////////////////////////////////////////////////////////////////////////////////
-// fixed threshold cleaning
-        if( getRunParameter()->fUseFixedThresholds )
-	{
-            gainCorrect();
-	    if( getRunParameter()->fUseTimeCleaning )
-	    {
-		fVImageCleaning->cleanImageFixedWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
-	    } 
-	    else
-	    {
-		fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
-	    }
-	}
-// signal/noise cleaning
-	else 
-	{
-	    if( getRunParameter()->fUseTimeCleaning )
-	    {
-		fVImageCleaning->cleanImagePedvarsWithTiming(getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
-	    }
-	    else
-	    {
-		fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
-	    }
-	    gainCorrect();
-	}
-	
+// image cleaning & gain correction (second pass)
+        imageCleaning();
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // muon ring analysis (second pass)
-        if( fRunPar->fmuonmode )
-        {
-	  fVImageParameterCalculation->muonRingFinder( getSums(),getImage(), getBorder() );
-	  fVImageParameterCalculation->muonPixelDistribution( getSums(),getImage(), getBorder() );
-	  fVImageParameterCalculation->sizeInMuonRing( getSums(),getImage(), getBorder(), getDead() );
-	}
+        if( fRunPar->fmuonmode ) muonRingAnalysis();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // smoothing of dead or disabled pixels (second part)
@@ -286,8 +206,8 @@ void VImageAnalyzer::doAnalysis()
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-// log likelihood analysis
-// calculate image parameters
+// log likelihood image analysis
+// calculate image parameters (mainly for edge images)
     if( fRunPar->fImageLL && getImageParameters()->ntubes > 0 )
     {
 //  do this only if geometrical calculation found border/image channels
@@ -298,6 +218,7 @@ void VImageAnalyzer::doAnalysis()
         }
         else getImageParameters( fRunPar->fImageLL )->reset();
     }
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // fill results into output tree
     fillOutputTree();
@@ -605,6 +526,16 @@ void VImageAnalyzer::smoothDeadTubes()
 {
     unsigned int i_nchannel = getNChannels();
 
+// reset vectors
+    for( unsigned int i = 0; i < getDead().size(); i++ )
+    {
+       getDeadRecovered()[i] = false;
+       savedDead[i] = getDead()[i];
+       savedGains[i] = getGains()[i];
+       savedDeadLow[i] = getDead(true)[i];
+       savedGainsLow = getGains(true)[i];
+    }
+
 // loop over all channels
     for ( unsigned int i=0; i< i_nchannel; i++)
     {
@@ -765,4 +696,43 @@ void VImageAnalyzer::setNTrigger()
         }
     }
     getImageParameters()->ntrig_per_patch = max_num_in_patch;
+}
+
+void VImageAnalyzer::imageCleaning()
+{
+// fixed threshold cleaning
+   if( getRunParameter()->fUseFixedThresholds )
+   {
+      gainCorrect();
+      if( getRunParameter()->fUseTimeCleaning )
+      {
+	  fVImageCleaning->cleanImageFixedWithTiming( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), 
+						      getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+      } 
+      else
+      {
+	  fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
+      }
+   }
+// signal/noise cleaning
+   else 
+   {
+      if( getRunParameter()->fUseTimeCleaning )
+      {
+	  fVImageCleaning->cleanImagePedvarsWithTiming( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(),
+							getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
+      }
+      else
+      {
+	  fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
+      }
+      gainCorrect();
+   }
+}
+
+void VImageAnalyzer::muonRingAnalysis()
+{
+    fVImageParameterCalculation->muonRingFinder( getSums(),getImage(), getBorder() );
+    fVImageParameterCalculation->muonPixelDistribution( getSums(),getImage(), getBorder() );
+    fVImageParameterCalculation->sizeInMuonRing( getSums(),getImage(), getBorder(), getDead() );
 }

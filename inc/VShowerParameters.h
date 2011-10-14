@@ -124,23 +124,23 @@ class VShowerParameters
         float fShower_stdP[VDST_MAXRECMETHODS];   //!<  std (radius) about impact point
         float fShower_Chi2[VDST_MAXRECMETHODS];   //!<  chi2 value where appropriate, < 0. for no reconstruction (-99. or angle between lines for two-images events)
         int MCprimary;
-        float MCenergy;                           //!< energy in [TeV]
-        float MCxcore;
-        float MCycore;
-        float MCzcore;
+        float MCenergy;                           //!< MC energy in [TeV]
+        float MCxcore;                            //!< MC core position in ground coordinates (x)
+        float MCycore;                            //!< MC core position in ground coordinates (y)
+        float MCzcore;                            //!< MC core position in ground coordinates (z)
         float MCxcos;
         float MCycos;
         float MCaz;
         float MCze;
-        float MCTel_Xoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
-        float MCTel_Yoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
+        float MCTel_Xoff;                         //!< MC source offset in MC in deg (grisudet telescope coordinate system)
+        float MCTel_Yoff;                         //!< MC source offset in MC in deg (grisudet telescope coordinate system)
 
-        float MCxcore_SC;                         //!< core position in shower coordinates
-        float MCycore_SC;                         //!< core position in shower coordinates
-        float MCzcore_SC;                         //!< core position in shower coordinates
+        float MCxcore_SC;                         //!< MC core position in shower coordinates
+        float MCycore_SC;                         //!< MC core position in shower coordinates
+        float MCzcore_SC;                         //!< MC core position in shower coordinates
 
         VShowerParameters( int iNTel = 4, unsigned int iShortTree = 0 );
-        ~VShowerParameters();
+       ~VShowerParameters();
 
         void addDISPPoint( unsigned int iTelID, unsigned int iMethod, float x, float y, float idispw = -999. );
         void fill() { if( fTreeSC ) fTreeSC->Fill(); }

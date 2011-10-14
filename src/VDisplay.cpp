@@ -317,7 +317,8 @@ void VDisplay::updateCamera( Int_t i )
             fEventLoop->getAnalyzer()->setTelID( fTelescopesToShow[t] );
 // (GM) only need maximum sum, don't call doAnalysis() (resets all image parameters)
 //	 fEventLoop->getAnalyzer()->doAnalysis();
-            fEventLoop->getAnalyzer()->calcTCorrectedSums(fEventLoop->getRunParameter()->fsumfirst[t], fEventLoop->getRunParameter()->fsumfirst[t]+fEventLoop->getRunParameter()->fsumwindow[t] );
+            fEventLoop->getAnalyzer()->calcTCorrectedSums(fEventLoop->getRunParameter()->fsumfirst[t], 
+	                                                  fEventLoop->getRunParameter()->fsumfirst[t]+fEventLoop->getRunParameter()->fsumwindow[t] );
             i_max.push_back( fEventLoop->getAnalyzer()->getSums().max() );
         }
 // loop over the trace in steps of winsize
@@ -748,7 +749,9 @@ void VDisplay::drawFADC( bool iFit )
             else if( fEventLoop->getAnalyzer()->getDead( fEventLoop->getHiLo()[fSelectedChan - 200000] )[fSelectedChan-200000] ) fHisFADC->SetLineColor( 14 );
             else fHisFADC->SetLineColor( 9 );
 
-// if traces are fitted, fill fit values into histogram
+///////////////////////////////////////////////////////////
+// TRACE FITTING
+// fill fit values into histogram
             if( ( fEventLoop->getRunParameter()->ftracefit > -1. && fEventLoop->getFitTraceHandler() != 0 ) || iFit )
             {
                 unsigned int chanID = fSelectedChan - 200000;
@@ -788,6 +791,7 @@ void VDisplay::drawFADC( bool iFit )
             }
             fF1Ped->SetParameter( 0, -1.* fEventLoop->getAnalyzer()->getPeds(fEventLoop->getHiLo()[fSelectedChan-200000])[fSelectedChan-200000] );
         }
+///////////////////////////////////////////////////////////
 // draw everything (trace, pedestal)
         setFADCText();
         fHisFADC->SetTitle( histitle );
@@ -893,8 +897,7 @@ void VDisplay::drawFADC( bool iFit )
 
     if( fSelectedChan >= 200000 && fSelectedChan-200000 < fEventLoop->getAnalyzer()->getTCorrectedSumFirst().size() )
     {
-// plot box which indicates integration window
-//        if( fEventLoop->getReader()->getDataFormatNum() != 4 && fEventLoop->getReader()->getDataFormatNum() != 6 && fEventLoop->getReader()->getDataFormatNum() != 7 )
+// plot box which indicates integration (summation window) window
 	if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() )
 	{
 	   fGraphFADC->SetPoint( 0, (double)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000], gPad->GetUymin() );
