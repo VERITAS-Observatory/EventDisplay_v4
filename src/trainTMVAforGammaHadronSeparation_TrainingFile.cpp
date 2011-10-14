@@ -1,4 +1,4 @@
-/*  \file  makeOptimizeBoxCutsTMVA_TrainingFile.cpp
+/*  \file  trainTMVAforGammaHadronSeparation_TrainingFile.cpp
     \brief make background training files for TMVA using MC and randomize theta2
 
     Note: no wobble offsets are implemented yet
@@ -66,7 +66,7 @@ int main( int argc, char *argv[] )
    if( argc != 5 )
    {
        cout << endl;
-       cout << "makeOptimizeBoxCutsTMVA_TrainingFile <run parameter file> <output directory for mscw_energy file> <maximum theta2 value [deg^2]> <seed>" << endl;
+       cout << "trainTMVAforGammaHadronSeparation_TrainingFile <run parameter file> <output directory for mscw_energy file> <maximum theta2 value [deg^2]> <seed>" << endl;
        cout << endl;
        cout << "<run parameter file>";
        cout << "parameter file with list of background mscw file (same format as in makeOptimizeBoxCutsTMVA)" << endl;
@@ -79,7 +79,7 @@ int main( int argc, char *argv[] )
    }
 
    cout << endl;
-   cout << "makeOptimizeBoxCutsTMVA_TrainingFile" << endl;
+   cout << "trainTMVAforGammaHadronSeparation_TrainingFile" << endl;
    cout << "====================================" << endl;
    cout << endl;
 

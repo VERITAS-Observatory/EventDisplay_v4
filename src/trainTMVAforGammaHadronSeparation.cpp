@@ -1,9 +1,10 @@
-/*! \file  makeOptimizeBoxCutsTMVA.cpp
-    \brief optimize box cuts using TMVA methods
+/*! \file  trainTMVAforGammaHadronSeparation.cpp
+    \brief  use TMVA methods for gamma/hadron separation
 
-    Revision $Id: makeOptimizeBoxCutsTMVA.cpp,v 1.1.2.4 2011/04/11 16:09:44 gmaier Exp $
+    $Rev$
+    $Date$
+    $Author$
 
-    \author Gernot Maier
 */
 
 #include "TCut.h"
@@ -120,11 +121,10 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 	  {
 	    sprintf( hname, "%s:VarProp[%d]=%s", hname, i, iRun->fTrainingVariable_VarProp[i].c_str() );
 	  }
-
 	  sprintf( htitle, "BOXCUTS_%d", iEnergyBin );
+          factory->BookMethod( TMVA::Types::kCuts, htitle, hname );
        }
    }
-   factory->BookMethod( TMVA::Types::kCuts, htitle, hname );
 
 
 //////////////////////////////////////////
@@ -149,13 +149,15 @@ int main( int argc, char *argv[] )
 {
     if( argc != 2 )
     {
-        cout << "makeOptimizeBoxCutsTMVA <configuration file>" << endl;
+	cout << endl;
+        cout << "trainTMVAforGammaHadronSeparation <configuration file>" << endl;
+	cout << endl;
         exit( 0 );
     }
 
     cout << endl;
-    cout << "makeOptimizeBoxCutsTMVA " << endl;
-    cout << "========================" << endl;
+    cout << "trainTMVAforGammaHadronSeparation " << endl;
+    cout << "=================================" << endl;
     cout << endl;
 
 // data object
