@@ -266,6 +266,8 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
     {
        VSensitivityCalculator b;
        b.setDebug( false );             // creates lots of output
+// set Crab Nebula spectrum
+       b.setEnergySpectrumfromLiterature( fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID );
 // draw some debugging plots
        char hname[600];
        sprintf( hname, "plotDebug_%d", bIntegral );
@@ -304,17 +306,17 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 
 
 // gammas
-       b.setMonteCarloParameters(1, fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20., i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
+       b.setMonteCarloParameters(1, fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
+                                 i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
 // protons
-       b.setMonteCarloParameters(14, fPD.fESpecDataFile_CosmicRays, 0, iMC_Proton, 20., i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
-// helium
-// (spectral index?)
+       b.setMonteCarloParameters(14, fPD.fESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
+                                 i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
+// helium (spectral index?)
        if( iMC_Helium )
        {
           b.setMonteCarloParameters( 402, fPD.fESpecDataFile_CosmicRays, 1, iMC_Helium, 20., 0, 0.0, 200, 2.0 );
        }
-// electrons
-// (spectral index?)
+// electrons (spectral index?)
        if( iMC_Electron )
        {
           b.setMonteCarloParameters( 2, fPD.fESpecDataFile_CosmicRays, 2, iMC_Electron, 20., 0, 0.0, 250, 3.0 );
@@ -451,6 +453,8 @@ void plotDifferentialSensitivityRatioCTA( string iFluxUnit = "PFLUX", char *iMC_
   if( iMC_Gamma1 && iMC_Proton1 )
     {
       VSensitivityCalculator b;
+// set significance parameters
+      b.setSignificanceParameter( 5., 10., 50., 50. );
       b.setDebug( false );
 // draw some debugging plots
       char hname[600];
