@@ -51,7 +51,9 @@ VMonteCarloRateCalculator::VMonteCarloRateCalculator( string ifile )
 
     expect power law
 */
-double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double *e, double *eff, double i_gamma, double i_phi, double iE0, double iEMin, double iEMax, double bDebug )
+double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double *e, double *eff,
+                                                     double i_gamma, double i_phi,
+						     double iE0, double iEMin, double iEMax, double bDebug )
 {
     if( nbins <= 2 || e == 0 || eff == 0 ) return 0.;
 
@@ -69,7 +71,9 @@ double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double *e, doubl
 /*
    energy in log10
 */
-double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff, double i_gamma, double i_phi, double iE0, double iEMin, double iEMax, bool bDebug )
+double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
+                                                     double i_gamma, double i_phi,
+						     double iE0, double iEMin, double iEMax, bool bDebug )
 {
     iEMin = log10( iEMin );
     iEMax = log10( iEMax );

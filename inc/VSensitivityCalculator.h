@@ -240,7 +240,8 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 					  int az = 0, double woff = 0.5, int noise = 150, double index = 2.5,
 					  double alpha = 0.1, double iEnergy_min_lin = -10., double iEnergy_max_lin = 10. );
         void     setObservationTimeRange( double iObs_min = 0.5e-3, double iObs_max = 5.e4, int iObs_steps = 1000 );    // hours
-        void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50., double iMinBackgroundEvents = 10. );
+        void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50.,
+	                                   double iMinBackgroundEvents = 10. );
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );
         void     setSourceStrengthVector_CU();
         void     setSourceStrengthVector_CU( vector< double > );

@@ -162,6 +162,7 @@ void getPlottingData( bool bIntegral, string bUnit )
    plot integral sensitivity from measured data (using Crab spectra) and MC
 
 */
+////////////////////////////////////////////////////////////////////////////////////
 void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
                               char *ifile1 = 0, char *ifile2 = 0,
 			      char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
@@ -177,6 +178,7 @@ void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
 
 
 */
+////////////////////////////////////////////////////////////////////////////////////
 void plotDifferentialSensitivity( string iFluxUnit = "PFLUX",
                                   char *ifile1 = 0, char *ifile2 = 0,
 				  char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
@@ -203,6 +205,7 @@ void plotDifferentialSensitivity( string iFluxUnit = "PFLUX",
    iCrabSpec_ID             Crab Nebula spectrum ID (read from text file with spectral parameters)
 
 */
+////////////////////////////////////////////////////////////////////////////////////
 void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIntegral,
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
 		      string iFluxUnit, unsigned int iCrabSpec_ID )
@@ -413,7 +416,10 @@ void plotSensitivityVStime()
    (probably needs some work)
 
 */
-void plotDifferentialSensitivityRatioCTA( string iFluxUnit = "PFLUX", char *iMC_Gamma1 = 0, char *iMC_Proton1 = 0, char *iMC_Helium1 = 0, char *iMC_Electron1 = 0, char *iMC_Gamma2 = 0, char *iMC_Proton2 = 0, char *iMC_Helium2 = 0, char *iMC_Electron2 = 0, unsigned int iCrabSpec_ID = 6)
+void plotDifferentialSensitivityRatioCTA( string iFluxUnit = "PFLUX", 
+                                          char *iMC_Gamma1 = 0, char *iMC_Proton1 = 0, char *iMC_Helium1 = 0, char *iMC_Electron1 = 0, 
+					  char *iMC_Gamma2 = 0, char *iMC_Proton2 = 0, char *iMC_Helium2 = 0, char *iMC_Electron2 = 0,
+					  unsigned int iCrabSpec_ID = 6)
 {
 
   cout << "ROUTINE NOT READY FOR USE" << endl;
@@ -950,7 +956,6 @@ void plotDebugComparisionPlots( string iFileName, int iColor, double iObservatio
    }
 
 // sensitivity
-// (NEED TO CHECK UNIT OF DIFF FLUX HERE!!)
    c = (TCanvas*)gROOT->GetListOfCanvases()->FindObject( "iCanvas" );
    if( c && hDiffSens )
    {

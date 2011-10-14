@@ -649,7 +649,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
             z++;
         }
 // print some debugging information
-	if( fDebug )
+//	if( fDebug )
 	{
 	     cout << fixed << "FLUX RESULTS " << z << ":\t" << fDifferentialFlux[i].EnergyWeightedMean << " [TeV]\t";
 	     cout << fDifferentialFlux[i].Energy << " [TeV]";
@@ -1272,8 +1272,11 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
                     v_flux.push_back( i_flux );
                     if( fDebug )
                     {
-                        cout << "ENERGY: " << v_flux.size() << "\t" << i_flux.Energy_lowEdge << " - " << i_flux.Energy_upEdge << "\t" << i_flux.Energy << "\t" << i_flux.EnergyWeightedMean;
-                        cout << "\t" << i_flux.dE << "\t" << i_flux.ObsTime << "\t" << log10( i_flux.Energy_lowEdge ) << "\t" << log10( i_flux.Energy_upEdge ) << "\t";
+                        cout << "ENERGY: " << v_flux.size() << "\t";
+			cout << i_flux.Energy_lowEdge << " - " << i_flux.Energy_upEdge;
+			cout << "\t" << i_flux.Energy << "\t" << i_flux.EnergyWeightedMean;
+                        cout << "\t" << i_flux.dE << "\t" << i_flux.ObsTime << "\t";
+			cout << log10( i_flux.Energy_lowEdge ) << "\t" << log10( i_flux.Energy_upEdge ) << "\t";
 			map< unsigned int, int >::iterator iEnergyScaleOffset_iter;
 			for( iEnergyScaleOffset_iter = iEnergyScaleOffset.begin(); iEnergyScaleOffset_iter != iEnergyScaleOffset.end(); iEnergyScaleOffset_iter++ )
 			{
@@ -1328,14 +1331,17 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 // loop over all energy bins
        for( unsigned int i = 0; i < v_flux.size(); i++ )
        {
-           if( iEnergyScaleOffset[(*i_MCData_iterator).first] + (int)v_flux[i].Energy_lowEdge_bin >= 0 && iEnergyScaleOffset[(*i_MCData_iterator).first] + (int)v_flux[i].Energy_lowEdge_bin < (int)(*i_MCData_iterator).second->energy.size() )
+           if( iEnergyScaleOffset[(*i_MCData_iterator).first] + (int)v_flux[i].Energy_lowEdge_bin >= 0 
+	    && iEnergyScaleOffset[(*i_MCData_iterator).first] + (int)v_flux[i].Energy_lowEdge_bin < (int)(*i_MCData_iterator).second->energy.size() )
            {
             v_flux_NOff[(*i_MCData_iterator).first][i]       =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin 
 	                                                        + iEnergyScaleOffset[(*i_MCData_iterator).first], v_flux[i].Energy_upEdge_bin
-								+ iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second );
+								+ iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second,
+								  false );
             v_flux_NOff_error[(*i_MCData_iterator).first][i] =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin
 	                                                        + iEnergyScaleOffset[(*i_MCData_iterator).first], v_flux[i].Energy_upEdge_bin
-								+ iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second, true );
+								+ iEnergyScaleOffset[(*i_MCData_iterator).first], i_CR, *(*i_MCData_iterator).second,
+								  true );
            }
 	   else continue;
 
@@ -1429,7 +1435,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     if( fPlotDebugName.size() > 0 ) plotEffectiveArea();
 
 ////////////////////////////////////////////////////
-// calculate number of on/off events
+// calculate number of on/off events from rates
 ////////////////////////////////////////////////////
     double iTotG = 0.;
     double iTotB = 0.;
@@ -1437,7 +1443,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     {
        for( unsigned int i = v_flux.size()-1; i > 0; i-- )
        { 
-	   v_flux[i].NOn  *= fObservationTime * 60.;               // [min] -> [sec]
+	   v_flux[i].NOn  *= fObservationTime * 60.;               // [min] 
 	   v_flux[i].NOff *= fObservationTime * 60.;
 	   v_flux[i].NOn_error  *= fObservationTime * 60.;
 	   v_flux[i].NOff_error *= fObservationTime * 60.;
