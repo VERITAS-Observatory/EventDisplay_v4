@@ -189,8 +189,8 @@ all:	evndisp \
 	combineLookupTables \
 	makeEffectiveArea \
 	makeRadialAcceptance \
-	makeOptimizeBoxCutsTMVA \
-	makeOptimizeBoxCutsTMVA_TrainingFile \
+	trainTMVAforGammaHadronSeparation \
+	trainTMVAforGammaHadronSeparation_TrainingFile \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
@@ -208,8 +208,8 @@ VTS:	evndisp \
 	combineLookupTables \
 	makeEffectiveArea \
 	makeRadialAcceptance \
-	makeOptimizeBoxCutsTMVA \
-	makeOptimizeBoxCutsTMVA_TrainingFile \
+	trainTMVAforGammaHadronSeparation \
+	trainTMVAforGammaHadronSeparation_TrainingFile \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
@@ -223,8 +223,8 @@ CTA:	evndisp \
 	mscw_energy \
 	combineLookupTables \
 	makeEffectiveArea \
-	makeOptimizeBoxCutsTMVA \
-	makeOptimizeBoxCutsTMVA_TrainingFile \
+	trainTMVAforGammaHadronSeparation \
+	trainTMVAforGammaHadronSeparation_TrainingFile \
 	slib
 
 ########################################################
@@ -615,7 +615,7 @@ combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./o
 	@echo "$@ done"
 
 ########################################################
-# makeOptimizeBoxCutsTMVA
+# trainTMVAforGammaHadronSeparation
 ########################################################
 MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
@@ -624,28 +624,28 @@ MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.
 			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
-			./obj/makeOptimizeBoxCutsTMVA.o
+			./obj/trainTMVAforGammaHadronSeparation.o
 
-./obj/makeOptimizeBoxCutsTMVA.o:	./src/makeOptimizeBoxCutsTMVA.cpp
+./obj/trainTMVAforGammaHadronSeparation.o:	./src/trainTMVAforGammaHadronSeparation.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-makeOptimizeBoxCutsTMVA:	$(MAKEOPTCUTTMVAOBJ)
+trainTMVAforGammaHadronSeparation:	$(MAKEOPTCUTTMVAOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "Done"
 
 ########################################################
-# makeOptimizeBoxCutsTMVA_TrainingFile
+# trainTMVAforGammaHadronSeparation_TrainingFile
 ########################################################
 MAKEOPTCUTTMVATRAININGOBJ= 	./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 				./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/VEvndispRunParameter.o obj/VEvndispRunParameter_Dict.o \
-				./obj/makeOptimizeBoxCutsTMVA_TrainingFile.o
+				./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o
 
-./obj/makeOptimizeBoxCutsTMVA_TrainingFile.o:	./src/makeOptimizeBoxCutsTMVA_TrainingFile.cpp
+./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o:	./src/trainTMVAforGammaHadronSeparation_TrainingFile.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-makeOptimizeBoxCutsTMVA_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ) 	
+trainTMVAforGammaHadronSeparation_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ) 	
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "Done"
 

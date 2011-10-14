@@ -1342,7 +1342,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     }
     else if( fTMVAProbabilityThreshold > 0. )
     {
-       fTMVAEvaluator->setMVACutValue( fTMVAProbabilityThreshold );
+       fTMVAEvaluator->setTMVACutValue( fTMVAProbabilityThreshold );
     }
     else
     {

@@ -20,6 +20,8 @@
 #include "TFile.h"
 #include "TGraph.h"
 #include "TGraphAsymmErrors.h"
+#include "TGraphSmooth.h"
+#include "TLine.h"
 #include "TMath.h"
 #include "TMVA/Config.h"
 #include "TMVA/Configurable.h"
@@ -47,12 +49,13 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    vector< double >        fSignalEfficiency;                // from user or best signal/sqrt(noise)
    vector< double >        fBackgroundEfficiency;            // from best signal/sqrt(noise)
    double                  fSignalEfficiencyNoVec;
-   vector< double >        fMVACutValue;
-   double                  fMVACutValueNoVec;
+   vector< double >        fTMVACutValue;
+   double                  fTMVACutValueNoVec;
 
    string                  fParticleNumberFileName;          // particle numbers are read from this file
    double                  fOptmizationSourceStrengthCrabUnits; 
    double                  fOptmizationMinBackGroundEvents;
+   double                  fOptimizationBackgroundAlpha;
 
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
    bool     fTMVAThetaCutVariableSet;       // check if TMVA provides a theta2 cut variable
@@ -92,7 +95,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
    vector< string > getTrainingVariables( string );
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 
-                                                  TGraph* iGSignal_to_sqrtNoise, TH1F* iHSignal_to_sqrtNoise, 
+                                                  TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
 						  TH1F* hEffS, TH1F* hEffB, 
 						  double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max );
    void     reset();
@@ -116,15 +119,17 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   plotBoxCuts();
    void   plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4 );
    void   printSignalEfficiency();
-   void   setMVACutValue( double iE = -99. );
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
-   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001, double iMinBackgroundEvents = 5. )
-          { fOptmizationSourceStrengthCrabUnits = iSourceStrength; fOptmizationMinBackGroundEvents = iMinBackgroundEvents; }
+   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001, double iMinBackgroundEvents = 5., double iBackgroundAlpha = 1./5. )
+          { fOptmizationSourceStrengthCrabUnits = iSourceStrength; 
+	    fOptmizationMinBackGroundEvents = iMinBackgroundEvents; 
+	    fOptimizationBackgroundAlpha = iBackgroundAlpha; }
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
    void   setPlotEffiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iE = -99. );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
+   void   setTMVACutValue( double iE = -99. );
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "Cuts", unsigned int iMethodCounter = 0 );
 

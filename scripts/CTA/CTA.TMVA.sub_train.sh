@@ -1,24 +1,26 @@
 #!/bin/sh
 #
-# script to optimize cuts with TMVA
+# script to train cuts/MVAs with TMVA
 #
-# Revision $Id: mm_optimizeBoxCuts_TMVA.sh,v 1.1.2.1 2011/04/11 16:11:21 gmaier Exp $
 #
 # Author: Gernot Maier
 #
 
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ]
 then
-   echo "CTA.TMVA.sub_optimizeBoxCuts.sh <run parameter filename> <directory for run parameter and log files> <output file name> [erec method]"
+   echo
+   echo "CTA.TMVA.sub_train.sh <run parameter filename> <directory for run parameter and log files> <output file name> [erec method]"
    echo ""
    echo "<run parameter filename> without .runparameter"
    echo " should be located in the output directory"
    echo
    echo "[erec method]  energy reconstruction method (default=0)"
    echo
-   echo "note 1: keywords ENERGYBINS and OUTPUTFILE are ignored in the runparameter file"
+   echo "   note 1: keywords ENERGYBINS and OUTPUTFILE are ignored in the runparameter file"
    echo
-   echo "note 2: energy bins are hardwired in this scripts"
+   echo "   note 2: energy bins are hardwired in this scripts"
+   echo
+   echo "   note 3: adjust h_cpu depending on your MVA method"
    echo
    exit
 fi
@@ -63,7 +65,7 @@ echo "log directory: " $FDIR
 cp -f $RPAR.runparameter $ODIR
 
 # script name template
-FSCRIPT="CTA.TMVA.qsub_optimizeBoxCuts"
+FSCRIPT="CTA.TMVA.qsub_train"
 
 ###############################################################
 # loop over all energy bins and submit a job for each bin
@@ -90,7 +92,8 @@ do
 
 # submit job to queue
 
-  qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
+#  qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
+  qsub -V -l h_cpu=00:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
 
 done
 

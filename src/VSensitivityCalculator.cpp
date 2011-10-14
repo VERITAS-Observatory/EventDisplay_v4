@@ -1565,7 +1565,10 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low, unsigned
     VMonteCarloRateCalculator iMCR;
 
 // return error on rate (from error on effective area, which is derived from MC statistics)
-    if( iRateError ) return iMCR.getMonteCarloRate( iMCPara.energy, iMCPara.effArea_error, &i_Espec, iMCPara.fSpectralParameterID, iE_low, iE_up, getDebug() );
+    if( iRateError )
+    {
+       return iMCR.getMonteCarloRate( iMCPara.energy, iMCPara.effArea_error, &i_Espec, iMCPara.fSpectralParameterID, iE_low, iE_up, getDebug() );
+    }
 
 // return rate calculated from MC effective areas
     return iMCR.getMonteCarloRate( iMCPara.energy, iMCPara.effArea, &i_Espec, iMCPara.fSpectralParameterID, iE_low, iE_up, getDebug() );
@@ -1932,11 +1935,11 @@ void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentia
 
     if( !cPlotDebug[0] || !cPlotDebug[0]->cd() ) return;
 
-    TGraph *gNon = new TGraph( 1 );
+    TGraphAsymmErrors *gNon = new TGraphAsymmErrors( 1 );
     gNon->SetMinimum( 0.0001 );
     gNon->SetMaximum( 1.e6 );
     setGraphPlottingStyle( gNon, 1, 1, 20, 2 );
-    TGraph *gNoff = new TGraph( 1 );
+    TGraphAsymmErrors *gNoff = new TGraphAsymmErrors( 1 );
     setGraphPlottingStyle( gNoff, 2, 1, 21, 2 );
 
     int z = 0;
@@ -1945,7 +1948,11 @@ void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentia
         if( iDifferentialFlux[i].Energy > 0. )
         {
             gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn );
+	    gNon->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
+	    gNon->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
             gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * alpha );
+	    gNoff->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
+	    gNoff->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
             z++;
         }
     }
