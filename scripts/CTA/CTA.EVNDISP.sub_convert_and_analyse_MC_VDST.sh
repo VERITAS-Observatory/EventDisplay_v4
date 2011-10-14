@@ -99,7 +99,7 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -l h_cpu=04:29:00 -l tmpdir_size=10G -l h_vmem=3G -V -o $QLOG -e $QLOG "$FNAM.sh"
+   qsub -l h_cpu=02:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    echo "writing shell script to $FNAM.sh"
    echo "writing queue log and error files to $QLOG"
 
