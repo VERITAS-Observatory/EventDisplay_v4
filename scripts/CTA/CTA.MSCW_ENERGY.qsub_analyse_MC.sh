@@ -32,7 +32,7 @@ rm -f $LDIR/$TFIL.log
 ###############################################
 
 set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly -shorttree"
-#set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly -maxnevents=1000"
+#set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly"
 
 # analyse MC file
 $EVNDISPSYS/bin/mscw_energy $MOPT -tablefile $TABFIL.root -inputfile "$IFIL*.root" -outputfile $ODIR/$TFIL.root >& $LDIR/$TFIL.log
