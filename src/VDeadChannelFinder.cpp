@@ -6,7 +6,7 @@
 
 VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool iLowGain, bool isMC )
 {
-    fDebug = false;
+    fDebug = true;
 
     frunmode = irunmode;
     fTelID = iTelID;
@@ -248,7 +248,9 @@ unsigned int VDeadChannelFinder::testPedestalVariationsMinOut( unsigned int icha
 // test if pedvars is an outlier
     if( iPedVar < imeanPed - fDEAD_peddev_min * irmsPed )
     {
-        if( fDebug ) cout << "testPedestalVariationsMinOut (3): " << ichannel << " " << fDEAD_peddev_min << " " << imeanPed - fDEAD_peddev_min * irmsPed << " " << imeanPed << " " << irmsPed << " " << iPedVar << endl;
+        if( fDebug ) cout << "testPedestalVariationsMinOut (3): ";
+	cout << ichannel << " " << fDEAD_peddev_min << " ";
+	cout << imeanPed - fDEAD_peddev_min * irmsPed << " " << imeanPed << " " << irmsPed << " " << iPedVar << endl;
         return 3;
     }
 

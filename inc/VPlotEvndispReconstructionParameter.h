@@ -8,19 +8,19 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TH1D.h"
+#include "TMath.h"
 
 #include "Cshowerpars.h"
 #include "CtparsShort.h"
-#include "VDetectorGeometry.h"
-#include "VDetectorTree.h"
 #include "VEvndispReconstructionParameter.h"
 
 #include <iostream>
+#include <string>
 #include <vector>
 
 using namespace std;
 
-class VPlotEvndispReconstructionParameter : public TObject
+class VPlotEvndispReconstructionParameter : public TNamed 
 {
    private:
 
@@ -32,7 +32,6 @@ class VPlotEvndispReconstructionParameter : public TObject
    Cshowerpars                     *fDataShowerPars;
    CtparsShort                     *fDataTpars;
    VEvndispReconstructionParameter *fEvndispReconstructionParameter;
-   VDetectorGeometry               *fDetectorGeometry;
 
    vector< string > fEvndispReconstructionParameterName;
    vector< TH1D* >  fEvndispReconstructionParameterHisto;
@@ -41,7 +40,7 @@ class VPlotEvndispReconstructionParameter : public TObject
    TCanvas *fPlotCanvas;
 
    void reset();
-   bool fill( unsigned int iMethod, unsigned int iTelescope );
+   bool fill( unsigned int iMethod, unsigned int iTelescope, int iTelescopeTypeCounter = 0 );
 
    public:
 
@@ -49,8 +48,8 @@ class VPlotEvndispReconstructionParameter : public TObject
   ~VPlotEvndispReconstructionParameter() {};
 
    bool initialize( string iEventdisplayFileName,
-                    int iNEnergyBins = 50, double iEnergy_TeV_log_min = -2., double iEnergy_TeV_log_max = 2. );
-   void plot( unsigned int iMethod, unsigned int iTelescope );
+                    int iNEnergyBins = 50, double iEnergy_TeV_log_min = -2., double iEnergy_TeV_log_max = 2.5 );
+   void plot( unsigned int iMethod, unsigned int iTelescope, int iTelescopeTypeCounter = 0 );
    void setDebug( bool iB = false ) { fDebug = iB; }
 
    ClassDef(VPlotEvndispReconstructionParameter,1);

@@ -10,20 +10,19 @@
     \Author Gernot Maier
 */
 
-#include "VPlotEvndispReconstructionParameter.h"
+#include "inc/VPlotEvndispReconstructionParameter.h"
 
 VPlotEvndispReconstructionParameter::VPlotEvndispReconstructionParameter()
 {
-   setDebug( false );
+   fDebug = false;
 
    fDataChain = 0;
    fDataFileName = "";
-   fDetectorGeometry = 0;
    fDataFile = 0;
    fPlotCanvas = 0;
    fDataTpars = 0;
    fDataShowerPars = 0;
-   fEvndispReconstructionParameter = 0;
+   fEvndispReconstructionParameter = 0; 
 }
 
 bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileName, 
@@ -57,7 +56,7 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
       cout << "VPlotEvndispReconstructionParameter::initialize() error:";
       cout << " no reconstruction parameters found" << endl;
       return false;
-   }
+   } 
 
 // get telescope type
    TTree *i_telconfig = (TTree*)fDataFile->Get( "telconfig" );
@@ -67,9 +66,6 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
       cout << " no telescope configuration found" << endl;
       return false;
    }
-   fDetectorGeometry = new VDetectorGeometry( i_telconfig->GetEntries(), false );
-   VDetectorTree i_DetectorTree;
-   i_DetectorTree.readDetectorTree( fDetectorGeometry, i_telconfig ); 
 
    fEvndispReconstructionParameterName.push_back( "noCut" );
    fEvndispReconstructionParameterName.push_back( "Size_min" );
@@ -77,13 +73,13 @@ bool VPlotEvndispReconstructionParameter::initialize( string iEventdisplayFileNa
    fEvndispReconstructionParameterName.push_back( "Loss_max" );
    fEvndispReconstructionParameterName.push_back( "Fui_min" );
    fEvndispReconstructionParameterName.push_back( "Saturated_max" );
-/*   fEvndispReconstructionParameterName.push_back( "length_min" );
-   fEvndispReconstructionParameterName.push_back( "length_max" );
-   fEvndispReconstructionParameterName.push_back( "width_min" );
-   fEvndispReconstructionParameterName.push_back( "width_max" );
-   fEvndispReconstructionParameterName.push_back( "dist_min" );
-   fEvndispReconstructionParameterName.push_back( "dist_max" );
-   fEvndispReconstructionParameterName.push_back( "widthlength_max" ); */
+//   fEvndispReconstructionParameterName.push_back( "length_min" );
+//   fEvndispReconstructionParameterName.push_back( "length_max" );
+//   fEvndispReconstructionParameterName.push_back( "width_min" );
+//   fEvndispReconstructionParameterName.push_back( "width_max" );
+//   fEvndispReconstructionParameterName.push_back( "dist_min" );
+//   fEvndispReconstructionParameterName.push_back( "dist_max" );
+//   fEvndispReconstructionParameterName.push_back( "widthlength_max" ); 
 
    char hname[200];
    for( unsigned int i = 0; i < fEvndispReconstructionParameterName.size(); i++ )
@@ -118,13 +114,13 @@ void VPlotEvndispReconstructionParameter::reset()
    }
 }
 
-void VPlotEvndispReconstructionParameter::plot( unsigned int iMethod, unsigned int iTelescope )
+void VPlotEvndispReconstructionParameter::plot( unsigned int iMethod, unsigned int iTelescope, int iTelescopeTypeCounter )
 {
 // reset all histograms
    reset();
 
 // fill all histograms
-   fill( iMethod, iTelescope );
+   fill( iMethod, iTelescope, iTelescopeTypeCounter );
 
 // plot everything
    char hname[200];
@@ -149,20 +145,27 @@ void VPlotEvndispReconstructionParameter::plot( unsigned int iMethod, unsigned i
 	   fEvndispReconstructionParameterHisto[i]->DrawCopy( "same" );
          }
 	 cout << fEvndispReconstructionParameterName[i];
-	 cout << "(color " << fEvndispReconstructionParameterHisto[i]->GetLineColor() << ")" << endl;
+	 cout << " (color " << fEvndispReconstructionParameterHisto[i]->GetLineColor() << ")" << endl;
 	 cout << "\t entries: " << fEvndispReconstructionParameterHisto[i]->GetEntries() << endl;
+      }
+      else if( fEvndispReconstructionParameterHisto[i]->GetEntries() == 0 )
+      {
+	 cout << fEvndispReconstructionParameterName[i] << endl;
+	 cout << "\t no entries " << endl;
       }
    }
    for( unsigned int i = 0; i < fEvndispReconstructionParameterHistoInt.size(); i++ )
    {
      if( z > 0 )
      {
+	cout << fEvndispReconstructionParameterName[i];
+	 cout << "(color " << fEvndispReconstructionParameterHistoInt[i]->GetLineColor() << ")" << endl;
         fEvndispReconstructionParameterHistoInt[i]->DrawCopy( "same" );
      }
    }
 }
 
-bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned int iTelescope )
+bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned int iTelescope, int iTelTypeCounter )
 {
    cout << "filling histograms for method " << iMethod << " and telescope " << iTelescope+1 << endl;
    if( !fDataFile )
@@ -176,20 +179,22 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
       cout << "VPlotEvndispReconstructionParameter::fill() error: method out of range " << endl;
       cout << iMethod << "\t" << fEvndispReconstructionParameter->fNMethods << endl;
       return false;
-   }
+   } 
 
 // check telescope type
-    int iTelType = -1;
-    if( iTelescope < fDetectorGeometry->getTelType().size() )
-    {
-       iTelType = fEvndispReconstructionParameter->getTelescopeType_counter( fDetectorGeometry->getTelType()[iTelescope] );
-    }
-    if( iTelType < 0 )
-    {
+   if( iTelTypeCounter < 0 )
+   {
        cout << "VPlotEvndispReconstructionParameter::fill() error: telescope number not found" << endl;
        return false;
-    }
-    cout << "telescope type " << iTelType << endl;
+   }
+   cout << "telescope type counter " << iTelTypeCounter << endl;
+   cout << endl;
+   cout << "cuts: " << endl;
+   cout << "-----" << endl;
+   cout << "size > " << fEvndispReconstructionParameter->fSize_min[iMethod][iTelTypeCounter] << endl;
+   cout << "ntubes >= " << fEvndispReconstructionParameter->fLocalNtubes_min[iMethod][iTelTypeCounter] << endl;
+   cout << "loss < " << fEvndispReconstructionParameter->fLoss_max[iMethod][iTelTypeCounter] << endl;
+   cout << "FUI > " << fEvndispReconstructionParameter->fFui_min[iMethod][iTelTypeCounter] << endl; 
 
 // shower parameter
    TChain *i_showerpars = new TChain( "showerpars" );
@@ -221,7 +226,7 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 // size cut
       if( fEvndispReconstructionParameterHisto[1] && fEvndispReconstructionParameterHistoInt[1] )
       {
-         if( fDataTpars->size < fEvndispReconstructionParameter->fSize_min[iMethod][iTelType] )  
+         if( fDataTpars->size < fEvndispReconstructionParameter->fSize_min[iMethod][iTelTypeCounter] )  
 	 {
 	    fEvndispReconstructionParameterHisto[1]->Fill( log10( fDataShowerPars->MCe0 ) );
 	    continue;
@@ -234,7 +239,7 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 // ntubes cut
       if( fEvndispReconstructionParameterHisto[2] && fEvndispReconstructionParameterHistoInt[2] )
       {
-         if( fDataTpars->ntubes <= fEvndispReconstructionParameter->fLocalNtubes_min[iMethod][iTelType] )  
+         if( fDataTpars->ntubes <= fEvndispReconstructionParameter->fLocalNtubes_min[iMethod][iTelTypeCounter] )  
 	 {
 	    fEvndispReconstructionParameterHisto[2]->Fill( log10( fDataShowerPars->MCe0 ) );
 	    continue;
@@ -245,9 +250,22 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 	 }   
       }
 // number of saturated events
-      if( fEvndispReconstructionParameterHisto[3] && fEvndispReconstructionParameterHistoInt[3] )
+      if( fEvndispReconstructionParameterHisto[5] && fEvndispReconstructionParameterHistoInt[5] )
       {
-         if( fDataTpars->nsat > fEvndispReconstructionParameter->fLocalNLowGain_max[iMethod][iTelType] )  
+         if( fDataTpars->nsat > fEvndispReconstructionParameter->fLocalNLowGain_max[iMethod][iTelTypeCounter] )  
+	 {
+	    fEvndispReconstructionParameterHisto[5]->Fill( log10( fDataShowerPars->MCe0 ) );
+	    continue;
+         }
+	 else
+	 {
+	    fEvndispReconstructionParameterHistoInt[5]->Fill( log10( fDataShowerPars->MCe0 ) );
+         }
+      }
+// loss cut
+      if( fEvndispReconstructionParameterHisto[3] && fEvndispReconstructionParameterHistoInt[4] )
+      {
+         if( fDataTpars->loss > fEvndispReconstructionParameter->fLoss_max[iMethod][iTelTypeCounter] )  
 	 {
 	    fEvndispReconstructionParameterHisto[3]->Fill( log10( fDataShowerPars->MCe0 ) );
 	    continue;
@@ -257,10 +275,10 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 	    fEvndispReconstructionParameterHistoInt[3]->Fill( log10( fDataShowerPars->MCe0 ) );
          }
       }
-// loss cut
-      if( fEvndispReconstructionParameterHisto[4] && fEvndispReconstructionParameterHistoInt[4] )
+// fui cut
+      if( fEvndispReconstructionParameterHisto[4] && fEvndispReconstructionParameterHistoInt[5] )
       {
-         if( fDataTpars->loss > fEvndispReconstructionParameter->fLoss_max[iMethod][iTelType] )  
+         if( fDataTpars->fui < fEvndispReconstructionParameter->fFui_min[iMethod][iTelTypeCounter] )  
 	 {
 	    fEvndispReconstructionParameterHisto[4]->Fill( log10( fDataShowerPars->MCe0 ) );
 	    continue;
@@ -268,19 +286,6 @@ bool VPlotEvndispReconstructionParameter::fill( unsigned int iMethod, unsigned i
 	 else
 	 {
 	    fEvndispReconstructionParameterHistoInt[4]->Fill( log10( fDataShowerPars->MCe0 ) );
-         }
-      }
-// fui cut
-      if( fEvndispReconstructionParameterHisto[5] && fEvndispReconstructionParameterHistoInt[5] )
-      {
-         if( fDataTpars->fui < fEvndispReconstructionParameter->fFui_min[iMethod][iTelType] )  
-	 {
-	    fEvndispReconstructionParameterHisto[5]->Fill( log10( fDataShowerPars->MCe0 ) );
-	    continue;
-         }
-	 else
-	 {
-	    fEvndispReconstructionParameterHistoInt[5]->Fill( log10( fDataShowerPars->MCe0 ) );
          }
       }
      

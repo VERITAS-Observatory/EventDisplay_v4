@@ -801,7 +801,8 @@ int VImageBaseAnalyzer::fillHiLo()
             {
                 if( getDebugLevel() == 0 )
                 {
-                    cout << "VImageBaseAnalyzer::fillHiLo(), index out of range (fReader->getHitID) " << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
+                    cout << "VImageBaseAnalyzer::fillHiLo(), index out of range (fReader->getHitID) " << i;
+		    cout << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
 // flag this event
                     getAnalysisTelescopeEventStatus()[getTelID()] = 1;
                     setDebugLevel( 1 );
