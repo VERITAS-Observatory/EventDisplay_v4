@@ -144,6 +144,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 
         bool   applyProbabilityCut( int i, bool fIsOn);
 	bool   applyTMVACut( int i, bool fIsOn );
+	bool   applyFrogsCut( int i, bool fIsOn );
         bool   initProbabilityCuts( int irun );
         bool   initProbabilityCuts( string iDir );
 	bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_min, unsigned int iTMVAWeightFileIndex_max );
@@ -232,6 +233,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fArrayxyoff_MC_min;
         double fArrayxyoff_MC_max;
 
+	double frogsGoodnessImgCut;
 
         VGammaHadronCuts();
        ~VGammaHadronCuts();
@@ -240,6 +242,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyEnergyReconstructionQualityCuts();
         bool   applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount = false );
         bool   applyInsideFiducialAreaCut( bool bCount = false );
+        bool   applyInsideFiducialAreaCut( float Xoff, float Yoff );
         bool   applyMCXYoffCut( double x, double y, bool bCount = false );
 	bool   applyMeanReducedScaledStereoShapeCuts();
 	bool   applyMeanStereoShapeCuts();

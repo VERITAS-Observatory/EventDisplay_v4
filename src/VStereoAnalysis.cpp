@@ -404,40 +404,63 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			if( !iDeadtimeDirectory ) fDeadTime[fHisCounter]->fillDeadTime( fDataRun->Time );
 
 // get energy (depending on energy reconstruction method)
-			if( fRunPara->fEnergyReconstructionMethod == 0 )
+			if( fRunPara->fFrogs == 1 )
 			{
-				iErec = fDataRun->Erec;
-				iErecC2 = fDataRun->EChi2;
-			}
-			else if( fRunPara->fEnergyReconstructionMethod == 1 )
-			{
-				iErec = fDataRun->ErecS;
-				iErecC2 = fDataRun->EChi2S;
+			  iErec = fDataRun->frogsEnergy;
+			  iErecC2 = 0.0;
+			} else {
+			  if( fRunPara->fEnergyReconstructionMethod == 0 )
+			  {
+				  iErec = fDataRun->Erec;
+				  iErecC2 = fDataRun->EChi2;
+			  }
+			  else if( fRunPara->fEnergyReconstructionMethod == 1 )
+			  {
+				  iErec = fDataRun->ErecS;
+				  iErecC2 = fDataRun->EChi2S;
+			  }
 			}
 
 ////////////////////////////////////////////////
 // apply all quality cuts
 //
 // check if event is outside fiducial area
-			if( !fCuts->applyInsideFiducialAreaCut() ) continue;
+			//printf("GH CHECK %f %d\n",fDataRun->frogsXS,fDataRun->frogsEventID);
+			if( fRunPara->fFrogs == 1 )
+			  if( !fCuts->applyInsideFiducialAreaCut( fDataRun->frogsXS, -fDataRun->frogsYS) ) continue;
+			else
+			  if( !fCuts->applyInsideFiducialAreaCut() ) continue;
 
 // stereo quality cuts (e.g. successful direction, mscw, mscl reconstruction)
-			if( !fCuts->applyStereoQualityCuts( fRunPara->fEnergyReconstructionMethod, false, i , fIsOn) ) continue;
+			if ( fRunPara->fFrogs != 1 )
+			  if( !fCuts->applyStereoQualityCuts( fRunPara->fEnergyReconstructionMethod, false, i , fIsOn) ) continue;
 
 // fill image and trigger pattern histograms
 			fHisto[fHisCounter]->hTriggerPatternBeforeCuts->Fill( fDataRun->LTrig );
 			fHisto[fHisCounter]->hImagePatternBeforeCuts->Fill( fDataRun->ImgSel);
 
 // direction offset
-			iDirectionOffset = sqrt( fDataRun->Xoff*fDataRun->Xoff + fDataRun->Yoff*fDataRun->Yoff );
+			if( fRunPara->fFrogs )
+			  iDirectionOffset = sqrt( fDataRun->frogsXS*fDataRun->frogsXS + fDataRun->frogsYS*fDataRun->frogsYS );
+			else
+			  iDirectionOffset = sqrt( fDataRun->Xoff*fDataRun->Xoff + fDataRun->Yoff*fDataRun->Yoff );
 
 // derotate coordinates
 // (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
-			fAstro[icounter]->derotateCoords(i_UTC, fDataRun->Xoff, fEVDVersionSign * fDataRun->Yoff, i_xderot, i_yderot);
+			if( fRunPara->fFrogs == 1 )
+			  fAstro[icounter]->derotateCoords(i_UTC, fDataRun->frogsXS, fEVDVersionSign * (-fDataRun->frogsYS), i_xderot, i_yderot);
+			else
+			  fAstro[icounter]->derotateCoords(i_UTC, fDataRun->Xoff, fEVDVersionSign * fDataRun->Yoff, i_xderot, i_yderot);
 			i_yderot *= -1.;
-				
+
+			//printf("%d %d\n",fDataRun->frogsEventID,fDataRun->eventNumber);
+//			if( fRunPara->fFrogs ==1 )
+//			  printf("%d %d | %f %f | %f %f\n",fDataRun->frogsEventID,
+//				fDataRun->eventNumber,fDataRun->frogsXS,
+//				fDataRun->Xoff,fDataRun->frogsYS,fDataRun->Yoff);
+
 // gamma/hadron separation cuts
-			bIsGamma = fCuts->isGamma( i,false,fIsOn);
+		        bIsGamma = fCuts->isGamma( i,false,fIsOn);
 
 // fill stereo maps
 			bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
@@ -460,7 +483,10 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // histograms after shape (or other gamma/hadron separation cuts) cuts only
 			if( bIsGamma )
 			{
-				fHisto[fHisCounter]->hxyoff_stereo->Fill( fDataRun->Xoff, fDataRun->Yoff );
+				if( fRunPara->fFrogs == 1 )
+				  fHisto[fHisCounter]->hxyoff_stereo->Fill( fDataRun->frogsXS, fDataRun->frogsYS );
+				else
+				  fHisto[fHisCounter]->hxyoff_stereo->Fill( fDataRun->Xoff, fDataRun->Yoff );
 			}
 
 /////////////////////////////////////////////////////////
@@ -507,7 +533,10 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				fHisto[fHisCounter]->hTriggerPatternAfterCuts->Fill( fDataRun->LTrig );
 				fHisto[fHisCounter]->hImagePatternAfterCuts->Fill( fDataRun->ImgSel );
 // make core plots
-				fHisto[fHisCounter]->hcore->Fill(fDataRun->Xcore,fDataRun->Ycore );
+				if ( fRunPara->fFrogs == 1 )
+				  fHisto[fHisCounter]->hcore->Fill(fDataRun->frogsXP,fDataRun->frogsYP );
+				else
+				  fHisto[fHisCounter]->hcore->Fill(fDataRun->Xcore,fDataRun->Ycore );
 // apply energy reconstruction cuts
 				if( fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod ) )
 				{

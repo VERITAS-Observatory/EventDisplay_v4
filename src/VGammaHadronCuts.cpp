@@ -550,6 +550,11 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                     fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
                 }
             }
+	    if( temp == "goodnessimgcut" )
+	    {
+	        is_stream >> temp;
+                frogsGoodnessImgCut = atoi( temp.c_str()  );
+	    }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TMVA values
             if( temp == "TMVAPARAMETER" )
@@ -1101,6 +1106,17 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
            return false;
         }
     }
+/////////////////////////////////////////////////////////////////////////////
+// apply Frogs Cuts
+    else if( fGammaHadronCutSelector / 10 == 5 )
+    {
+        if( fDebug ) cout << "VGammaHadronCuts::isGamma: apply Frogs Cuts" << endl; 
+        if( !applyFrogsCut( i, fIsOn ) )
+        {
+           if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
+           return false;
+        }
+    }
 
     return true;
 }
@@ -1125,6 +1141,23 @@ bool VGammaHadronCuts::applyTMVACut( int i, bool fIsOn )
    {
       return fTMVAEvaluator->evaluate();
    }
+
+   return false;
+}
+
+/*
+   appy Cuts to frogs data.
+*/
+
+bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
+{
+   if( fDebug )
+   {
+      cout << "VGammaHadronCuts::applyFrogsCut event " << i << endl;
+   }
+
+   if (fData->frogsGoodnessImg > frogsGoodnessImgCut )
+     return true;
 
    return false;
 }
@@ -1442,6 +1475,26 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
         if( xy < fArrayxyoff_min*fArrayxyoff_min )
         {
             if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff )
+{
+    double xy = Xoff*Xoff + Yoff*Yoff;
+
+    if( xy > fArrayxyoff_max*fArrayxyoff_max )
+    {
+        return false;
+    }
+
+    if( fArrayxyoff_min >= 0. )
+    {
+        if( xy < fArrayxyoff_min*fArrayxyoff_min )
+        {
             return false;
         }
     }

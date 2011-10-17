@@ -27,7 +27,7 @@
 //================================================================
 /*This is the name of the file holding the list of template file names 
   and their range of applicatbility:*/
-#define FROGS_TEMPLATE_LIST "./frogs_template_file_list.txt"
+#define FROGS_TEMPLATE_LIST "/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/frogs_template_file_list.txt"
 #define FROGS_DEG_PER_RAD 57.295779513082325  //Number of degrees in one radian
 #define FROGS_FILE_NAME_MAX_LENGTH 100 //Maximum file name length
 #define FROGS_MAX_ITER_NBR 100 //Maximum number of iterations
@@ -44,7 +44,7 @@
 #define FROGS_TWOPI 6.283185307179586   //2.0*PI
 #define FROGS_SQRTTWOPI 2.506628274631  //sqrt(2.0*PI)
 #define FROGS_LNTWOPI 1.837877066409345 //log(2.0*PI)
-#define FROGS_LARGE_PE_SIGNAL 50.0      /*Limit beyond which Poisson can be 
+#define FROGS_LARGE_PE_SIGNAL -1.0      /*Limit beyond which Poisson can be 
 				    replaced by Gauss statistics*/
 #define FROGS_NUMBER_OF_SIGMA 10.0      /*Number of standard deviations to be 
 				    explored around a signal. 15 is 

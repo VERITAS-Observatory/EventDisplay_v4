@@ -144,21 +144,21 @@ class CData
         Int_t   frogsEventID;
         Int_t   frogsGSLConStat; 
         Int_t   frogsNB_iter;
-        Double_t frogsXS;
-        Double_t frogsXSerr;
-        Double_t frogsYS;
-        Double_t frogsYSerr;
-        Double_t frogsXP;
-        Double_t frogsXPerr;
-        Double_t frogsYP;
-        Double_t frogsYPerr;
-        Double_t frogsEnergy;
-        Double_t frogsEnergyerr;
-        Double_t frogsLambda;
-        Double_t frogsLambdaerr;
-        Double_t frogsGoodnessImg;
+        Float_t frogsXS;
+        Float_t frogsXSerr;
+        Float_t frogsYS;
+        Float_t frogsYSerr;
+        Float_t frogsXP;
+        Float_t frogsXPerr;
+        Float_t frogsYP;
+        Float_t frogsYPerr;
+        Float_t frogsEnergy;
+        Float_t frogsEnergyerr;
+        Float_t frogsLambda;
+        Float_t frogsLambdaerr;
+        Float_t frogsGoodnessImg;
         Int_t   frogsNpixImg;
-        Double_t frogsGoodnessBkg;
+        Float_t frogsGoodnessBkg;
         Int_t   frogsNpixBkg;
 
 
