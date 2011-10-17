@@ -111,8 +111,8 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
         float frogsGoodnessBkg;
         int   frogsNpixBkg;
 
-        bool fInitialized;                        //!< true after initialization
-
+        bool  fInitialized;                        //!< true after initialization
+	int   fStartEnergyLoop;
 
 
 };

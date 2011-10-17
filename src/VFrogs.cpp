@@ -41,18 +41,20 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     initAnalysis();
     fInitialized = true;
     readTableFrogs();
+    fStartEnergyLoop = 0;
   }
   
   initFrogEvent();
   
   int adc=2;
   double inEnergy = getFrogsStartEnergy(eventNumber);
-  
+ 
   //Store data from the GrISU analysis to a FROGS structure
   //In this example the function frogs_convert_from_grisu takes 
   //arguments corresponding the the GrISU analysis. An equivalent 
   //function should be written for any other analysis package to 
   //make the FROGS analysis usable. 
+  if ( inEnergy != FROGS_BAD_NUMBER ) {
 
   struct frogs_imgtmplt_in d;
   d=frogs_convert_from_ed(eventNumber,adc,inEnergy);
@@ -88,7 +90,6 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   frogsNpixBkg     = output.npix_bkg;
 
   getFrogParameters()->frogsEventID = getFrogsEventID();
-  getFrogParameters()->frogsEventID = getFrogsEventID();
   getFrogParameters()->frogsGSLConStat = getFrogsGSLConStat();
   getFrogParameters()->frogsNB_iter = getFrogsNB_iter();
   getFrogParameters()->frogsXS = getFrogsXS();
@@ -114,7 +115,7 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   //The values returned by frogs_img_tmplt really are to be stored in 
   //structures used in the analysis package in which FROGS is being sed. 
   if( FROGSDEBUG ) frogs_print_param_spc_point(output);
- 
+   }
   //return FROGS_OK;
   return; 
 }
@@ -308,9 +309,18 @@ double VFrogs::getFrogsStartEnergy(int eventNumber)
   
   int mscwTotal = fTableRunNumber.size();
   
-  for( int i=0 ; i < mscwTotal ; i++ )
+  for( int i=fStartEnergyLoop ; i < mscwTotal ; i++ ) 
+  {
     if( eventNumber == fTableRunNumber[i] )
+    {
+      fStartEnergyLoop = i - 1;
       return fTableEnergy[i];
+    } 
+    else if( eventNumber < fTableRunNumber[i] )
+    {
+      return FROGS_BAD_NUMBER;
+    }
+  }
   return FROGS_BAD_NUMBER;
   
 }
