@@ -101,6 +101,8 @@ VGammaHadronCuts::VGammaHadronCuts()
     fIRFAngRes = 0;
     fAngResContainmentProbability = 0;
 
+// frogs
+    frogsGoodnessImgCut = 0.;
 
     setArrayCentre();
 }

@@ -297,6 +297,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
 	void   terminate();
 
-        ClassDef(VGammaHadronCuts,23);
+        ClassDef(VGammaHadronCuts,24);
 };
 #endif
