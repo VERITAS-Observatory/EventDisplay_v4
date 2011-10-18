@@ -77,6 +77,9 @@
 % spelling
 \hyphenation{CRES KRETA KASCADE GHEISHA Karls-ruhe CORSIKA}
 
+%indent
+\setlength{\parindent}{0pt}
+
 \begin{document}
 
 % ########### title page ###########################
@@ -90,16 +93,16 @@
 
 \begin{abstract}
 
-eventdisplay is a complete package for VERITAS and CTA analysis (whatever 'complete' means...)
+\noindent eventdisplay is a complete package for VERITAS and CTA analysis (whatever 'complete' means...)
 The package consists of several analysis steps and tools:
 
 \begin{enumerate}
 \item evndisp (calibrate and parametrize images, event reconstruction, stereo analysis)
 \item mscw\_energy (use lookup tables to produce msw, msl, and energies)
 \item anasum (produce maps and calculate analysis results)
-\item shared library tools and macros (see EVNDISP/lib/libVAnaSum.so and EVNDISP/macros/)  (produce the energy spectrum and integral fluxes, plot maps, etc.) 
+\item shared library tools and macros  (produce the energy spectrum and integral fluxes, plot maps, plot sensitivities, etc.) 
 \item makeEffectiveArea (calculate effective areas)
-\item makeOptimizeBoxCutsTMVA (tools to optimize cuts)
+\item trainTMVAforGammaHadronSeparation (tools to train MVA and optimize cuts)
 \item ...
 \end{enumerate}
 
@@ -152,10 +155,38 @@ The EVNDISP manual for VERITAS users:
 
 \chapter{Introduction}
 
+% #############################################
+%
+% ############ Installation and auxiliary data files ######
+%
+% #############################################
+
+\chapter{Installation and auxiliary data files}
+
+\section{Auxiliary data files}
+\label{SECTION.AUXFILE}
+
+The auxiliary data files contain information needed for the analysis. 
+This might be files describing the detector geometry, lookup tables, effective areas file, etc.
+We assume in the following that these files are located in the directory {\it \$EVNDISPDATA}
+
+\subsection{Detector description}
+
+\subsubsection{VERITAS}
+
+\subsubsection{CTA}
+
+No detector description is needed, since the telescope and array description is read directly from the DST file ({\it telconfig} tree).
+The converter from hessio to EVNDISP DST format needs a subarray file, a simple list of telescopes to be selected from the corresponding hyper array. 
+The subarray files for prod1 can be found in {\it \$EVNDISPDATA/DetectorGeometry/*.lis}.
+
 \chapter{eventdisplay - calibration, image analysis and stereo reconstruction}
 
-
+% #############################################
+%
 % ############ CTA analysis ######################
+%
+% #############################################
 
 \chapter{CTA analysis}
 
@@ -166,52 +197,109 @@ This you have to do for each subarray separately.
 Afterwards you can analyze this subarray file running {\it eventdisplay} in the standard way, which means:
 
 \begin{description}
-\item[\$EVNDISPSYS/bin/CTA.convert\_hessio\_to\_VDST]
-        Convert simtel.gz files into ROOT format
+\item[CTA.convert\_hessio\_to\_VDST]
+        convert simtel.gz files into ROOT format
 
-\item[\$EVNDISPSYS/bin/eventdisplay]
-	ImageCleaning \& Calculation of telescope parameters \& Reconstruction of the direction
+\item[eventdisplay]
+	image cleaning \& calculation of telescope parameters \& reconstruction of the direction and core; display
 
-\item[\$EVNDISPSYS/bin/mscw\_energy]
-        Use lookup tables to estimate the energy
+\item[mscw\_energy]
+        train and use lookup tables to estimate the energy and mean scaled parameters
+        
+\item[trainTMVAforGammaHadronSeparation]
+        optimize cuts or train MVA
 
-\item[\$EVNDISPSYS/bin/makeEffectiveArea]
-        Make effective areas
+\item[makeEffectiveArea]
+        make effective areas
 
 \item[\$EVNDISPSYS/macros/plot\_sensitivity.C]
         plot sensitivity curves
 \end{description}
 
-(For most of the stuff there are scripts to run the analysis on the DESY batch system. Use them to simplify your life!)
+(For most of these steps there are scripts to run the analysis on the DESY batch system. Use them to simplify your life.)
 
 \section{Analysis}
 
-{\bf NOTE:}
-By converting a CTA.simtel.gz file into evndisp.root format you have to specify a subarray!
-EVNDISP is not able to handle the complete 275 telescopes at once!
-
+%###########################################################################
 \subsection{Step 1: Converter}
 
-EVNDISPSYS/bin/CTA.convert\_hessio\_to\_VDST
+In this step a simulation data file in hessio format is converted to the EVNDISP DST format 
+(see \ref{SECTION.DST}). These are the possible options to run the converter:
 
-(run it to all the possible inputparameter)
+\begin{lstlisting}
+$EVNDISPSYS/bin/CTA.convert_hessio_to_VDST
 
-\subsection{Display (event-by-event)}
+c_DST: A program to convert hessio data to EVNDISP DST files (v.4.00)
+=====================================================================
 
-EVNDISPSYS/bin/evndisp
+Syntax: ./bin/CTA.convert_hessio_to_VDST [ options ] [ - | input_fname ... ]
+Options:
+   -v               (More verbose output)
+   -q               (Much more quiet output)
+   -s               (Show data explained)
+   -S               (Show data explained, including raw data)
+   --history (-h)   (Show contents of history data block)
+   -i               (Ignore unknown data block types)
+   --max-events n   (Skip remaining data after so many triggered events.)
+   -a subarray file (list of telescopes to read with FOV.)
+   -o dst filename  (name of dst output file)
+   -f on=1/off=0    (write FADC samples to DST file;default=0)
+\end{lstlisting}
 
-e.g. 
+The following options are necessary: -a and -o.
+Note the limitations of the DST format (\ref{SUBSECTION.DST.LIMITATIONS}).
 
-\$EVNDISPSYS/bin/evndisp -display=1 -highres -useFixedThresholds -imagethresh=10.0 -borderthresh=5.0 -sourcefile \$CTA\_USER\_DATA\_DIR/simtel.root
+Note that many of the CTA simulation files contain data for a so called hyper array. 
+To select the actual array, the corresponding subarray has to be specified in a ASCII text file (called {\it subarray} file in the following).
+The following example file selects an array consisting of telescopes 63, 19, 67, and 33, each telescope
+with a field of view of 8 degrees:
 
-\subsection{Step 1 \& 2 combined [USE]}
+\begin{lstlisting}
+63 8
+19 8
+67 8
+33 8
+\end{lstlisting}
+
+Subarray files for most of the typical arrays used in the CTA sensitivities studies are part of the analysis file package 
+(see \ref{SECTION.AUXFILE}). Note that a subarray file is always needed, even if all telescopes from the hessio file are read out.
+
+For a typical run, the following command line should be used:
+
+\begin{lstlisting}
+./CTA.convert_hessio_to_VDST -a subArray.list -o dstfile.dst.root \ 
+          gamma_run12241.simhess.gz  
+\end{lstlisting}
+
+For FADC analysis, add the option {\it -f 1}. Note again the limitations of the DST format (\ref{SUBSECTION.DST.LIMITATIONS}).
+
+
+\subsection{Step 2: Display (event-by-event)}
+
+It is always useful to look at events in the display. 
+To do this, it is best to select a small subarray with the {\it -teltoana} option in evndisp.
+The display might otherwise be quite slow in responding to your input due to the large number of objects to be drawn.
+
+A typical command line to look at events might be (remove the {\it -traceanalysis=1} command for dst files without trace information):
+
+\begin{lstlisting}
+$EVNDISPSYS/bin/evndisp -display=1 \
+-reconstructionparameter ./EVNDISP.reconstruction.runparameter \
+-useFixedThresholds  -imagethresh=10.0 -borderthresh=5.0 \
+-l2setspecialchannels nofile \
+-sourcefile tt.v2.root  -traceanalysis=1
+\end{lstlisting}
+
+\subsection{Step 3: Calibration, image analysis and stereo reconstruction}
+
+\subsection{Step 1 \& 3 combined [USE]}
 
 Run the converter and Eventdisplay for a specific subarray: use script \$EVNDISPSYS/scripts/CTA/CTA.EVNDISP.sub\_convert\_and\_analyse\_MC\_VDST.sh
 
 NOTE: The image cleaning thresholds can be specified in the file \$EVNDISPDATA/ParameterFiles/EVNDISP.reconstruction.runparameter file either
 for all telescopes to the same values or for each telescope type seperately. 
 
-\subsection{Step 3: mscw\_energy}
+\subsection{Step 4: mscw\_energy}
 
 If you use standard configurations maybe some lookup tables already exist (ask Gernot or Heike where you could find them).
 
@@ -223,7 +311,9 @@ If you have your lookup tables you have to run mscw\_energy for estimating the e
 
 \$EVNDISPSYS/scripts/CTA/CTA.MSCW\_ENERGY.sub\_analyse\_MC.sh
 
-\subsection{Step 4: Effective Areas}
+\subsection{Step 5: Optimize cuts or train MVA}
+
+\subsection{Step 6: Effective Areas}
 
 To calculate effective areas, look at:
 
@@ -239,10 +329,12 @@ the effective area file as input (helps a lot for protons).
 \section{VBF - VERITAS Bank Format}
 
 \section{DST - data summary tree}
+\label{SECTION.DST}
 
 The DST format is a simple ROOT tree containing standard C++ variables only (no class data).
 
 \subsection{Limitations}
+\label{SUBSECTION.DST.LIMITATIONS}
 
 The implementation requires the hardwiring of the maximum number of telescopes, channels, etc. 
 These values can be found in {\texttt inc/VGlobalRunParameter}, for example:
@@ -255,7 +347,7 @@ These values can be found in {\texttt inc/VGlobalRunParameter}, for example:
 #define VDST_MAXCHANNELS   12000
 // maximum number of summation windows
 // (=maximum number of samples per FADC trace)   
-#define VDST_MAXSUMWINDOW   16
+#define VDST_MAXSUMWINDOW   64
 // maximum number of time slices for pedestal calculation
 #define VDST_PEDTIMESLICES 5000   
 // maximum number of arrayreconstruction method 
