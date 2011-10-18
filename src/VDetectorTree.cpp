@@ -136,7 +136,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
 
 // define tree
     float fFocalLength = 0.;
-    float fCameraScaleFactor = 0.;
+    float fCameraScaleFactor = 1.;
     float fCameraCentreOffset = 0.;
     float fCameraRotation = 0.;
     float fFOV= 0.;

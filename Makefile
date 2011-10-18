@@ -162,9 +162,9 @@ ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
 # 2010 production
-#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 SC 
-CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
+#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
 
 ########################################################
@@ -509,8 +509,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VUtilities.o \
 		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
-		./obj/Cshowerpars.o ./obj/Cshowerpars_Dict.o \
-		./obj/CtparsShort.o ./obj/CtparsShort_Dict.o \
+		./obj/Cshowerpars.o \
+		./obj/CtparsShort.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o 
 

@@ -434,7 +434,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 // check telescope types
             if( t_temp == -2 )
             {
-                cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts warning: unknown telescope type: " << endl;
+// don not print a warning - is expected
+    /*            cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts warning: unknown telescope type: " << endl;
                 cout << iLine << endl;
 		cout << t_type << "\t" << t_temp << endl;
 		cout << "Possible types are: ";
@@ -444,7 +445,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 		   cout << *fTel_type_iter << " ";
                 }
 		cout << endl;
-		cout << "(this might be ok in case you are using a generic reconstruction parameter file)" << endl;
+		cout << "(this might be ok in case you are using a generic reconstruction parameter file)" << endl; */
                 continue;
             }
 // variable identifier

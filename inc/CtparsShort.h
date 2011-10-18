@@ -242,7 +242,6 @@ class CtparsShort
         virtual void     Show(Long64_t entry = -1);
         bool             isMC() { return bMC; }
         bool             isShort() { return bShort; }
-	ClassDef(CtparsShort,1);
 };
 #endif
 

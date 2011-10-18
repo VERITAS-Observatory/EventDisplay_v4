@@ -600,7 +600,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 // HARDCODED: all large telescopes are parabolic
    double fParabolic_mirrorArea = 400.;
    int    fSC_number_of_mirrors = 2;
-   cout << "\t Warning:";
+   cout << "\t Info:";
    cout << "assume that all telescopes with mirror area larger than " << fParabolic_mirrorArea;
    cout << " m^2 are of parabolic type" << endl;
    cout << "assume that all telescopes with " << fSC_number_of_mirrors;
