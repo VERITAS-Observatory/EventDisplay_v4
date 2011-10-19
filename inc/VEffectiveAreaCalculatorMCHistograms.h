@@ -30,6 +30,10 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
 // spectral weight calculator
    VSpectralWeight           *fSpectralWeight;                 // backwards compatibility
    vector< VSpectralWeight* > fVSpectralWeight;
+   double   fMCEnergyRange_TeV_min;
+   double   fMCEnergyRange_TeV_max;
+   double   fMCSpectralIndex;
+
 
    public:
 
@@ -58,7 +62,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    void      setCuts( VGammaHadronCuts* iAnaCuts ) { fCuts = iAnaCuts; }
    bool      setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
 
-   ClassDef( VEffectiveAreaCalculatorMCHistograms, 6 );
+   ClassDef( VEffectiveAreaCalculatorMCHistograms, 7 );
 };
 
 #endif

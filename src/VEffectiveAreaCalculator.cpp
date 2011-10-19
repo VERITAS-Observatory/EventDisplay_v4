@@ -52,7 +52,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
 // spectral weighting class
     fSpectralWeight = new VSpectralWeight();
-	setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
+    setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
 
 // define output tree (all histograms are written to this tree)
     hisTreeList = new TList();
@@ -1221,6 +1221,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 
     cout << endl;
     if( fSpectralWeight ) fSpectralWeight->print();
+    else                  cout << "(no specral weight given)" << endl;
     cout << endl;
 
 // make sure that all data pointers exist

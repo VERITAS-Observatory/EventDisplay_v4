@@ -17,12 +17,15 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
    fSpectralWeight = 0;
    fCuts = 0;
 
+   fMCEnergyRange_TeV_min = 0.05;
+   fMCEnergyRange_TeV_max = 50.0;
+   fMCSpectralIndex       = 2.0;
 }
 
 void VEffectiveAreaCalculatorMCHistograms::print()
 {
     cout << "VEffectiveAreaCalculatorMCHistograms::print(): found ";
-    cout <<  fVSpectralIndex.size() << " spectral index bin(s), ";
+    cout << fVSpectralIndex.size() << " spectral index bin(s), ";
     cout << fVMinAz.size() << " azimuth bin(s)" << endl;
 
     for( unsigned int i = 0; i < fVSpectralIndex.size(); i++ )
@@ -212,7 +215,7 @@ void VEffectiveAreaCalculatorMCHistograms::initializeHistograms( vector< double 
         fVSpectralWeight.push_back( new VSpectralWeight() );
 // weight by spectral index
         fVSpectralWeight.back()->setSpectralIndex( fVSpectralIndex[s] );
-        fVSpectralWeight.back()->setMCParameter( 2.0, 0.05, 50. );
+        fVSpectralWeight.back()->setMCParameter( fMCSpectralIndex, fMCEnergyRange_TeV_min, fMCEnergyRange_TeV_max );
     }
 // backwards compatibility
     if( fVSpectralWeight.size() > 0 && fVSpectralWeight[0] ) fSpectralWeight = fVSpectralWeight[0];
@@ -220,9 +223,13 @@ void VEffectiveAreaCalculatorMCHistograms::initializeHistograms( vector< double 
 
 bool VEffectiveAreaCalculatorMCHistograms::setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex )
 {
+   fMCEnergyRange_TeV_min = iMin;
+   fMCEnergyRange_TeV_max = iMax;
+   fMCSpectralIndex       = iMCIndex;
+
    for( unsigned int i = 0; i < fVSpectralWeight.size(); i++ )
    {
-      if( fVSpectralWeight[i] ) fVSpectralWeight[i]->setMCParameter( iMCIndex, iMin, iMax );
+      if( fVSpectralWeight[i] ) fVSpectralWeight[i]->setMCParameter( fMCSpectralIndex, fMCEnergyRange_TeV_min, fMCEnergyRange_TeV_max );
    }
 // backwards compatibility
    if( fVSpectralWeight.size() > 0 && fVSpectralWeight[0] ) fSpectralWeight = fVSpectralWeight[0];
