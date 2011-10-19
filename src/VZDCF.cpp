@@ -128,7 +128,7 @@ double VZDCF::getZDCFData_dcf_max( bool bError )
 
 
 
-void VZDCF::plot( TCanvas *c, bool bzdcf )
+TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf )
 {
     char hname[800];
     char htitle[800];
@@ -171,7 +171,7 @@ void VZDCF::plot( TCanvas *c, bool bzdcf )
        {
 	  hZDCF->SetYTitle(  "ZDCF / error " );
 	  hZDCF->SetMinimum( -5. );
-	  hZDCF->SetMaximum(  5. );
+	  hZDCF->SetMaximum(  20. );
        }
        hZDCF->Draw("");
        hZDCF->Draw("AH");
@@ -187,7 +187,7 @@ void VZDCF::plot( TCanvas *c, bool bzdcf )
        {
           cout << "VZDCF::plot: no zdcf histogram found with name hZDCF " << endl;
 	  c->GetListOfPrimitives()->Print();
-	  return;
+	  return 0;
        }
     }
 
@@ -224,7 +224,7 @@ void VZDCF::plot( TCanvas *c, bool bzdcf )
           }
       }
     }
-
+    g->Print();
 
 // draw ML intervall
 
@@ -241,19 +241,20 @@ void VZDCF::plot( TCanvas *c, bool bzdcf )
     }
 
 // draw graph
-
     g->Draw( "p" );
+
+    return c;
 }
 
-void VZDCF::plotZDCF( TCanvas *c )
+TCanvas* VZDCF::plotZDCF( TCanvas *c )
 {
-   plot( c, true );
+   return plot( c, true );
 }
    
    
-void VZDCF::plotZDCFoverError( TCanvas *c )
+TCanvas* VZDCF::plotZDCFoverError( TCanvas *c )
 {
-   plot( c, false );
+   return plot( c, false );
 }
 
 void VZDCF::setMLinterval( double iMLPeak, double iML1Sigma_low, double iML1Sigma_up )
