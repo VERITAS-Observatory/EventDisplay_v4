@@ -227,13 +227,14 @@ bool VRunStats::readDBAnalysisComments()
       fAnalysisComments.push_back( new VDBAnalysisComments() );
 
       fAnalysisComments.back()->runNumber = atoi( db_row->GetField( 0 ) );
+// seg fault ??
       itemp = db_row->GetField( 1 );
-      if( itemp == "good_run" ) fAnalysisComments.back()->status = 0;
+      if( itemp == "good_run" )               fAnalysisComments.back()->status = 0;
       else if( itemp == "needs_adjustments" ) fAnalysisComments.back()->status = 1;
-      else if( itemp == "minor_problems" ) fAnalysisComments.back()->status = 2;
-      else if( itemp == "major_problems" ) fAnalysisComments.back()->status = 3;
-      else if( itemp == "do_not_use" ) fAnalysisComments.back()->status = 4;
-      else if( itemp == "unknown" ) fAnalysisComments.back()->status = 5;
+      else if( itemp == "minor_problems" )    fAnalysisComments.back()->status = 2;
+      else if( itemp == "major_problems" )    fAnalysisComments.back()->status = 3;
+      else if( itemp == "do_not_use" )        fAnalysisComments.back()->status = 4;
+      else if( itemp == "unknown" )           fAnalysisComments.back()->status = 5;
 
       itemp = db_row->GetField( 2 );
       fAnalysisComments.back()->usable_duration  = atof( itemp.substr( 0, itemp.find( ":" ) ).c_str() )*3600.;

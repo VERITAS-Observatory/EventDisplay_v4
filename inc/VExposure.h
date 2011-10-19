@@ -133,7 +133,7 @@ class VExposure : public TObject, public VGlobalRunParameter
         void setPlotExtendedSourcesFromCataloge( bool iB = false ) { fPlotExtendedSources = iB; }
         void setPlotSourceNames( bool iB = false )  { fPlotSourceNames = iB; }
         void setMaximumIntegrationRadius( double iR = 2.5 ) { fMaximumIntegrationRadius = iR; }
-        void setTimeRange( string, string );
+        void setTimeRange( string iStart = "2011-01-01", string iStopp = "2011-02-01" );
         bool writeRootFile( string );
 
         void addCatalogue( string, int iMarker = 5, int iColor = 1, double iAngle = 45. );
