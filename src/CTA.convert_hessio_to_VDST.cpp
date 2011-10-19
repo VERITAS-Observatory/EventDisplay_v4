@@ -411,6 +411,12 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 
          fData->fDSTZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
 	 fData->fDSTnumSamples[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->num_samples;
+	 if( iWriteFADC && fData->fDSTnumSamples[i_ntel_data] == 0 )
+	 {
+	    cout << "Error in DST_fillEvent: sample length in hessio file is null" << endl;
+	    cout << "exiting.." << endl;
+	    exit( 0 );
+         }
 // set maximum number of FADC samples (needed for efficient resetting of DST arrays)
 	 if( fData->fDSTnumSamples[i_ntel_data] > fGlobalMaxNumberofSamples )
 	 {

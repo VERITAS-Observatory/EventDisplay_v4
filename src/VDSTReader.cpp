@@ -24,11 +24,6 @@ VDSTReader::VDSTReader(  string isourcefile, bool iMC, int iNTel, int iNChannel,
 
     fDSTTree = new VDSTTree();
 
-    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    cout << "NOTE: DST READER FOR CTA SIMULATIONS WITH FADCS IS WORK IN PROGRESS" << endl;
-    cout << "(look for hardwired numbers, cross checks, etc)" << endl;
-    cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-
 // open source file and init tree
     init();
 }
@@ -180,6 +175,12 @@ bool VDSTReader::getNextEvent()
 // get FADC trace
     if( fDSTTree->getFADC() )
     {
+        if( fNumSamples == 0 )
+	{
+	   cout << "VDSTReader::getNextEvent() error: sample length is NULL" << endl;
+	   cout << "exiting..." << endl;
+	   exit( 0 );
+        } 
         for( unsigned int i = 0; i < fNTelescopes; i++ )
         {
 	  for( unsigned int j = 0; j < fNChannel[i]; j++ )
