@@ -52,19 +52,19 @@ bool VOrbitalPhase::initialize( int argc, char *argv[] )
 	      i++;
             }
         }
-      else if( iTemp.find( "-refmjd" ) < iTemp.size() )
-        {
-	  if( iTemp2.size() > 0 )
-            {
-	      fRefMJD = atof(iTemp2.c_str());
-	      i++;
-            }
-        }
       else if( iTemp.find( "-orbit" ) < iTemp.size() )
         {
 	  if( iTemp2.size() > 0 )
             {
 	      fOrbit = atof(iTemp2.c_str());
+	      i++;
+            }
+        }
+      else if( iTemp.find( "-refMJD" ) < iTemp.size() )
+        {
+	  if( iTemp2.size() > 0 )
+            {
+	      fRefMJD = atof(iTemp2.c_str());
 	      i++;
             }
         }
@@ -77,21 +77,21 @@ bool VOrbitalPhase::initialize( int argc, char *argv[] )
   // require inputfile name
   if( finputfile.size() == 0 )
     {
-      cout << "error: no input file. Please use ./calculate -help to learn how to run this program" << endl;
+      cout << "error: no input file" << endl;
       cout << "...exiting" << endl;
       return false;
     }
   // require orbit
   if( fOrbit == 0 )
     {
-      cout << "error: no binary orbit. Please use ./calculate -help to learn how to run this program" << endl;
+      cout << "error: no binary orbit given" << endl;
       cout << "...exiting" << endl;
       return false;
     }
   // require refmjd
   if( fRefMJD == 0 )
     {
-      cout << "error: no time of ascending node for the binary. Please use ./calculate -help to learn how to run this program" << endl;
+      cout << "error: no reference time given" << endl;
       cout << "...exiting" << endl;
       return false;
     }
@@ -101,12 +101,12 @@ bool VOrbitalPhase::initialize( int argc, char *argv[] )
     {
       if( finputfile.find( "*" ) < finputfile.size() )
         {
-	  foutputfile = "phase.root";
+	  foutputfile = "orb.root";
         }
       else
         {
 	  foutputfile = finputfile.substr( 0, finputfile.rfind( "." ) );
-	  foutputfile += ".phase.root";
+	  foutputfile += ".orb.root";
         }
     }
 
@@ -135,10 +135,10 @@ void VOrbitalPhase::printBinaryPars()
 void VOrbitalPhase::printHelp()
 {
   cout << "command line parameters:" << endl;
-  cout << "  -inputfile    mscw file as input"  << endl;
-  cout << "  -outputfile   output file,in general will be mscw.phase.root" << endl;
-  cout << "  -orbit        orbit of the binary (in days)" << endl;
-  cout << "  -refmjd       time of ascending node (in mjd)" << endl;
+  cout << "  -input    mscw file as input (required)"  << endl;
+  cout << "  -orbit    orbit of the binary, in days (required)"  << endl;
+  cout << "  -refMJD   time of ascenting node in MJD, reference time for phase=0 (required)"  << endl;
+  cout << "  -output   output file,in general will be mscw.orb.root" << endl;
   cout << endl;
 }
 
@@ -177,7 +177,7 @@ void VOrbitalPhase::fill()
     
       double mjd_event = fDataRun->MJD + fDataRun->Time/24./60./60.;
       calculatePhase(mjd_event);
-      if(i%1000==0)
+      if(i%10000==0)
 	cout << mjd_event << " " << fOrbitalPhase <<  endl; 
 
       fOTree->Fill();

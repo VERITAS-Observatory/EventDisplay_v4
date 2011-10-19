@@ -78,6 +78,11 @@ VGammaHadronCuts::VGammaHadronCuts()
     fProbabilityCut_ProbID = 0;
     for( unsigned int i = 0; i < fProbabilityCut_NSelectors; i++ ) fProbabilityCut_SelectionCut[i] = -1.;
 
+// phase cuts
+    fOrbitalPhase_min = -1.;
+    fOrbitalPhase_max = 1.e99;
+    fUseOrbitalPhaseCuts = false;
+
 // TMVA evaluator
     fTMVAEvaluator = 0;
     fTMVA_MVAMethod = "";
@@ -187,6 +192,9 @@ void VGammaHadronCuts::resetCutValues()
     fArraySizeSecondMax_max = 1.e99; 
 
     fProbabilityCut = 0.5;
+
+    fOrbitalPhase_min = -1.;
+    fOrbitalPhase_max = 1.e99;
 
     fCoreX_min = -1.e10;
     fCoreX_max =  1.e10;
@@ -475,8 +483,16 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                 }
                 else fProbabilityCut_ProbID = 0;
             }
+// phase cuts
+            if (temp == "orbitalPhase") 
+	    {
+	       is_stream >> temp;
+	       fOrbitalPhase_min = atof(temp.c_str());
+	       if( !is_stream.eof() ) fOrbitalPhase_max = atof(temp.c_str());
+	       else                   fOrbitalPhase_max = 1.e99;
+	       fUseOrbitalPhaseCuts = true;
+            }
 
-            
 // to define the lower bounds in probablity cut ranges  (e.g. random forest)
             if( temp == "RFCutLowerVals" )
             {
@@ -742,6 +758,12 @@ void VGammaHadronCuts::printCutSummary()
         cout << "event probability threshold: " << fProbabilityCut << " (element " << fProbabilityCut_ProbID << ")";
         if( fGammaHadronCutSelector / 10 == 3 ) cout << " (applied as quality cut)";
         if( fProbabilityCut_File ) cout << ", read from " << fProbabilityCut_File->GetName();
+    }
+// phase cuts
+    if( useOrbitalPhaseCuts() )
+    {
+        cout << endl;
+        cout << "Orbital Phase bin ( " << fOrbitalPhase_min << ", " << fOrbitalPhase_max << " )";
     }
 // TMVA cuts
     if( fGammaHadronCutSelector / 10 == 4 )
@@ -1340,7 +1362,7 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
         else if( iFile.size() > 0 ) initProbabilityCuts( iFile );
         else
         {
-            cout << "VGammaHadronCuts::initializeCuts: failed setting cuts for " << irun << " " << iFile << endl;
+            cout << "VGammaHadronCuts::initializeCuts: failed setting probability cuts for " << irun << " " << iFile << endl;
             cout << "exiting..." << endl;
             exit( -1 );
         }
@@ -1356,8 +1378,18 @@ void VGammaHadronCuts::initializeCuts( int irun, string iFile )
            exit( -1 );
         }
     }
-
-
+// phase cuts
+    if( useOrbitalPhaseCuts() )
+    {
+       if( irun > 0 )              initPhaseCuts( irun );
+       else if( iFile.size() > 0 ) initPhaseCuts( iFile );
+       else
+       {
+            cout << "VGammaHadronCuts::initializeCuts: failed setting phase cuts for " << irun << " " << iFile << endl;
+            cout << "exiting..." << endl;
+            exit( -1 );
+        }
+    }
 }
 
 bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_min, unsigned int iTMVAWeightFileIndex_max )
@@ -1456,6 +1488,42 @@ bool VGammaHadronCuts::initProbabilityCuts( string iFile )
 
     return true;
 }
+
+
+bool VGammaHadronCuts::initPhaseCuts( int irun )
+{
+    ostringstream iFile;
+    iFile << fDataDirectory << "/" << irun << ".mscw.rf.root";
+
+    return initPhaseCuts( iFile.str() );
+}
+
+
+bool VGammaHadronCuts::initPhaseCuts( string iDir )
+{
+    TDirectory *cDir = gDirectory;
+
+    fPhaseCut_File = new TFile( iDir.c_str() );
+    if( fPhaseCut_File->IsZombie() )
+    {
+        cout << "Error while opening file with phase cuts: " << iDir << endl;
+        exit( 0 );
+    }
+    cout << "\t opening file with phase cuts: " << fPhaseCut_File->GetName() << endl;
+
+    fPhaseCut_Tree = (TTree*)gDirectory->Get( "phase" );
+    if( !fPhaseCut_Tree )
+    {
+        cout << "Error: could not find tree with phase cuts" << endl;
+        exit( 0 );
+    }
+    fPhaseCut_Tree->SetBranchAddress( "phase", &fOrbitalPhase );
+
+    if( cDir ) cDir->cd();
+
+    return true;
+}
+
 
 /*
 
@@ -1905,6 +1973,32 @@ void VGammaHadronCuts::terminate()
 
    Write();
 }
+
+
+/*
+
+    apply orbital or pulsar phase cuts - info is store in a tree called PHASE
+
+*/
+bool VGammaHadronCuts::applyPhaseCut(int i)
+{
+   if( useOrbitalPhaseCuts() )
+   {
+      if( fPhaseCut_Tree && fPhaseCut_Tree->GetEntry(i) )
+      {
+	 if( fOrbitalPhase >= fOrbitalPhase_min && fOrbitalPhase < fOrbitalPhase_max )
+	 {
+	     return true;
+	 }
+	 else return false;
+      }
+      else return false;
+   }
+  
+  return true;
+ 
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

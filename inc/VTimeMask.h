@@ -73,6 +73,9 @@ class VTimeMask
                                                   // Intialise now
         Bool_t      setMask( Int_t run_number, Double_t run_startUTC, Double_t run_endUTC, string file_name="" );
         Bool_t      setMask();                    // Retrieve user-defined mask from mask_file
+	
+	Bool_t      setMaskDuringPhaseCuts(Double_t eventUTC);
+
 
 // Is the event allowed to pass the mask?
         Bool_t      checkAgainstMask( Int_t eventMJD, Double_t eventTime ) { return checkMaskNow( exactMJD_secs( eventMJD, eventTime ) ); }

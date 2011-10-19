@@ -123,6 +123,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
 	TGraph*         fTMVABoxCut_Theta2_max;                
 
+// orbital phase analysis
+	TFile *fPhaseCut_File;
+	TTree *fPhaseCut_Tree;
+	double fOrbitalPhase;
+
 
 // parameters for energy dependent theta2 cuts
 // (implemented for MC only)
@@ -145,6 +150,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyProbabilityCut( int i, bool fIsOn);
 	bool   applyTMVACut( int i, bool fIsOn );
 	bool   applyFrogsCut( int i, bool fIsOn );
+        bool   initPhaseCuts( int irun );
+        bool   initPhaseCuts( string iDir );
         bool   initProbabilityCuts( int irun );
         bool   initProbabilityCuts( string iDir );
 	bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_min, unsigned int iTMVAWeightFileIndex_max );
@@ -235,6 +242,10 @@ class VGammaHadronCuts : public VAnalysisUtilities
 
 	double frogsGoodnessImgCut;
 
+	bool   fUseOrbitalPhaseCuts;
+	double fOrbitalPhase_min;
+	double fOrbitalPhase_max;
+
         VGammaHadronCuts();
        ~VGammaHadronCuts();
 
@@ -247,6 +258,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	bool   applyMeanReducedScaledStereoShapeCuts();
 	bool   applyMeanStereoShapeCuts();
         bool   applyMeanScaledStereoShapeCuts();
+	bool   applyPhaseCut(int i);
         bool   applyShowerCoreCuts( bool iMC = false );
         bool   applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, int iEntry = 0, bool fIsOn = false );
         bool   applyStereoShapeCuts();
@@ -296,7 +308,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fArrayTheta2_max = it2; }
 	void   terminate();
+	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,24);
+        ClassDef(VGammaHadronCuts,25);
 };
 #endif

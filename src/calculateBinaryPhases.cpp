@@ -30,6 +30,8 @@ int main( int argc, char *argv[] )
     cout << "calculate orbital phase of a binary and save it in a tree called phase" << endl;
     cout << endl;
 
+
+// binary analysis : calculates the orbital phase in a binary system, file extension will be "orb"
     VOrbitalPhase *fOrb = new VOrbitalPhase();
     fOrb->initialize(argc, argv);
     // this can be done from the command line. These functions can overwrite those, though. 
@@ -39,6 +41,11 @@ int main( int argc, char *argv[] )
     fOrb->fill();
     fOrb->terminate();
    
+
+    /////// pulsar analysis : need to be implemented, maybe in some functions call VPulsarPhase, file extension will be "psr"
+
+
+
  
     return 1;
 }

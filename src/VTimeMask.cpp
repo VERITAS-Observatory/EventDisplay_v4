@@ -168,6 +168,26 @@ Bool_t          VTimeMask::setMask()
 }
 
 
+Bool_t VTimeMask::setMaskDuringPhaseCuts(Double_t now)
+{
+
+  now = secs_day*now;
+  Int_t instant;
+  if (abs(now - start_time)<0.1)
+    instant = 0;
+  else
+   instant = Int_t( floor( now - start_time ) );
+
+  //  cout << "\t now start_time instant "<< now << " " << start_time << " " << now-start_time << " " << instant << endl;
+  mask.at(instant) = kFALSE;
+  //  set_success = kTRUE
+  //cout << "\t phase cuts are being applied, mask is open "<< endl;
+
+  return kTRUE;
+}
+
+
+
 Bool_t           VTimeMask::checkMaskNow( Double_t now )
 {
     if ( override ) return loadMaskNow( now );

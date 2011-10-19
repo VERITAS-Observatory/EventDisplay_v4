@@ -392,6 +392,16 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // UTC time
 			i_UTC = VSkyCoordinatesUtilities::getUTC(fDataRun->MJD,fDataRun->Time);
 
+
+// phase cuts - this is also a time cut that adds to the previously initialized mask
+			if ( !fCuts->applyPhaseCut(i) ) 
+			{
+			  // open mask (mask_mode = 0)
+			  fTimeMask->setMaskDuringPhaseCuts( i_UTC);
+
+			  continue;
+			}
+
 // make time cut
 			if ( !fTimeMask->checkAgainstMask( i_UTC ) ) continue;
 
