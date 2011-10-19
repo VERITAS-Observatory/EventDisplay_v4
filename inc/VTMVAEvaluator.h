@@ -97,7 +97,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 
                                                   TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
 						  TH1F* hEffS, TH1F* hEffB, 
-						  double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max );
+						  double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max,
+						  TGraph* iGSignalEvents, TGraph* iGBackgroundEvents );
    void     reset();
 
    public:

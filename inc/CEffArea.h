@@ -46,9 +46,11 @@ class CEffArea : public TObject
         Double_t        Rec_seff_U[1000];         //[nbins]
         TH1D            *hEmc;
         TH1D            *hEcut;
+        TH1D            *hEcutUW;
         TH1D            *hEcut500;
         TH1D            *hEcutLin;
         TH1D            *hEcutRec;
+        TH1D            *hEcutRecUW;
         TGraphAsymmErrors *gEffAreaMC;
         TGraphAsymmErrors *gEffAreaRec;
         TGraphAsymmErrors *gRecProb;
@@ -90,9 +92,11 @@ class CEffArea : public TObject
         TBranch        *b_Rec_seff_U;             //!
         TBranch        *b_hEmc;                   //!
         TBranch        *b_hEcut;                  //!
+        TBranch        *b_hEcutUW;                  //!
         TBranch        *b_hEcut500;                  //!
         TBranch        *b_hEcutLin;               //!
         TBranch        *b_hEcutRec;               //!
+        TBranch        *b_hEcutRecUW;               //!
         TBranch        *b_gEffAreaMC;             //!
         TBranch        *b_gEffAreaRec;            //!
         TBranch        *b_gRecProb;               //!
@@ -190,9 +194,11 @@ void CEffArea::Init(TTree *tree)
 // Set object pointer
     hEmc = 0;
     hEcut = 0;
+    hEcutUW = 0;
     hEcut500 = 0;
     hEcutLin = 0;
     hEcutRec = 0;
+    hEcutRecUW = 0;
     gEffAreaMC = 0;
     gEffAreaRec = 0;
     gRecProb = 0;
@@ -242,8 +248,12 @@ void CEffArea::Init(TTree *tree)
     if( fChain->GetBranchStatus("hEcut") )
     {
         fChain->SetBranchAddress("hEcut", &hEcut, &b_hEcut);
+	if( fChain->GetBranchStatus("hEcutUW" ) ) fChain->SetBranchAddress("hEcutUW", &hEcutUW, &b_hEcutUW );
+	else hEcutUW = 0;
         fChain->SetBranchAddress("hEcut500", &hEcut500, &b_hEcut500);
         fChain->SetBranchAddress("hEcutRec", &hEcutRec, &b_hEcutRec);
+        if( fChain->GetBranchStatus("hEcutRecUW" ) ) fChain->SetBranchAddress("hEcutRecUW", &hEcutRecUW, &b_hEcutRecUW );
+	else hEcutRecUW = 0;
         fChain->SetBranchAddress("gEffAreaMC", &gEffAreaMC, &b_gEffAreaMC);
         fChain->SetBranchAddress("gEffAreaRec", &gEffAreaRec, &b_gEffAreaRec);
         fChain->SetBranchAddress("gRecProb", &gRecProb, &b_gRecProb);
@@ -257,8 +267,10 @@ void CEffArea::Init(TTree *tree)
     {
         hEmc = 0;
         hEcut = 0;
+        hEcutUW = 0;
         hEcut500 = 0;
         hEcutRec = 0;
+        hEcutRecUW = 0;
         gEffAreaMC = 0;
         gEffAreaRec = 0;
         gRecProb = 0;

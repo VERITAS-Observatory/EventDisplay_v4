@@ -949,8 +949,11 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    double i_Signal_to_sqrtNoise_atMaximum = 0.;
 
    TGraph *iGSignal_to_sqrtNoise = new TGraph( 1 );
+   TGraph *iGSignalEvents        = new TGraph( 1 );
+   TGraph *iGBackgroundEvents    = new TGraph( 1 );
 
    int z = 0;
+   int z_SB = 0;
    for( int i = 1; i < effS->GetNbinsX(); i++ )
    {
       if( effB->GetBinContent( i ) > 0. && Nof > 0. )
@@ -968,6 +971,12 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	    cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t" << Nof << "\t" << effB->GetBinContent( i ) << endl;
 	    cout << "\t" << effS->GetBinContent( i ) * Non;
 	    cout << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof << "\t" << effB->GetBinContent( i ) * Nof << endl;
+         }
+	 if( effS->GetBinCenter( i ) > 0. && effS->GetBinContent( i ) * Non > 0. )
+	 {
+	    iGSignalEvents->SetPoint( z_SB, effS->GetBinCenter( i ), effS->GetBinContent( i ) * Non );
+	    iGBackgroundEvents->SetPoint( z_SB, effS->GetBinCenter( i ), effB->GetBinContent( i ) * Nof );
+	    z_SB++;
          }
 // check that a minimum number of off events is 
          if( effB->GetBinContent( i ) * Nof < fOptmizationMinBackGroundEvents )
@@ -1036,7 +1045,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    {
       plotEfficiencyPlotsPerEnergy( iEnergyBin, iGSignal_to_sqrtNoise, iGSignal_to_sqrtNoise_Smooth,
                                     effS, effB,
-				    fEnergyCut_Log10TeV_min[iEnergyBin], fEnergyCut_Log10TeV_max[iEnergyBin] );
+				    fEnergyCut_Log10TeV_min[iEnergyBin], fEnergyCut_Log10TeV_max[iEnergyBin],
+				    iGSignalEvents, iGBackgroundEvents );
    }
 
    return true;
@@ -1045,7 +1055,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 
 void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iGSignal_to_sqrtNoise, 
                                                    TGraph* iGSignal_to_sqrtNoise_Smooth, TH1F* hEffS, TH1F* hEffB, 
-						   double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max )
+						   double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max,
+						   TGraph* iGSignalEvents, TGraph* iGBackgroundEvents )
 {
    char hname[800];
    char htitle[800];
@@ -1055,7 +1066,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
    {
       sprintf( hname, "cEfficiencyPlotPerEnergy_%d", iBin );
       sprintf( htitle, "efficiency plots (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
-      TCanvas *iCanvas = new TCanvas( hname, htitle, 10, 10+iBin*30, 600, 600 );
+      TCanvas *iCanvas = new TCanvas( hname, htitle, 10, 10+iBin*30, 400, 400 );
       iCanvas->SetGridx( 0 );
       iCanvas->SetGridy( 0 );
       iCanvas->Draw();
@@ -1090,7 +1101,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
    {
       sprintf( hname, "cSignalToSqrtNoise_%d", iBin );
       sprintf( htitle, "signal / sqrt( noise ) (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
-      TCanvas *iCanvas = new TCanvas( hname, htitle, 610, 10+iBin*30, 600, 600 );
+      TCanvas *iCanvas = new TCanvas( hname, htitle, 425, 10+iBin*30, 400, 400 );
       iCanvas->SetGridx( 0 );
       iCanvas->SetGridy( 0 );
 
@@ -1113,6 +1124,41 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
 	                        fTMVACutValue[iBin], iGSignal_to_sqrtNoise->GetHistogram()->GetMaximum() );
 	 iL->SetLineStyle( 2 );
 	 iL->Draw();
+      }
+   }
+
+// signal and background events numbers
+   if( iGBackgroundEvents )
+   {
+      sprintf( hname, "cEventNumbers_%d", iBin );
+      sprintf( htitle, "event numbers (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
+      TCanvas *iCanvas = new TCanvas( hname, htitle, 850, 10+iBin*30, 400, 400 );
+      iCanvas->SetGridx( 0 );
+      iCanvas->SetGridy( 0 );
+
+      iGBackgroundEvents->SetTitle( "" );
+      setGraphPlottingStyle( iGBackgroundEvents, 1, 1., 20 );
+
+      iGBackgroundEvents->Draw( "apl" );
+      iGBackgroundEvents->GetHistogram()->SetXTitle( "cut value" );
+      iGBackgroundEvents->GetHistogram()->SetYTitle( "number of events" );
+
+      if( iGSignalEvents ) 
+      {
+         setGraphPlottingStyle( iGSignalEvents, 2, 2. );
+         iGSignalEvents->Draw( "pl" );
+      }
+
+      if( iBin < fTMVACutValue.size() )
+      {
+         TLine *iL = new TLine( fTMVACutValue[iBin], iGBackgroundEvents->GetHistogram()->GetMinimum(),
+	                        fTMVACutValue[iBin], iGBackgroundEvents->GetHistogram()->GetMaximum() );
+	 iL->SetLineStyle( 2 );
+	 iL->Draw();
+         TLine *iLMinBack = new TLine( iGBackgroundEvents->GetHistogram()->GetXaxis()->GetXmin(), fOptmizationMinBackGroundEvents,
+	                               iGBackgroundEvents->GetHistogram()->GetXaxis()->GetXmax(), fOptmizationMinBackGroundEvents );
+	 iLMinBack->SetLineStyle( 2 );
+	 iLMinBack->Draw();
       }
    }
 }

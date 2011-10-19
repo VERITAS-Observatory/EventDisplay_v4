@@ -98,6 +98,8 @@ class VEffectiveAreaCalculator
         vector< vector< TH1D* > > hVEcut;
         vector< vector< TH1D* > > hVEcutLin;
         vector< vector< TH1D* > > hVEcutRec;
+        vector< vector< TH1D* > > hVEcutUW;
+        vector< vector< TH1D* > > hVEcutRecUW;
         vector< vector< TProfile* > > hVEmcSWeight;
         vector< vector< TH1D* > > hVEcut500;
         vector< vector< TProfile* > > hVEsysRec;
@@ -112,6 +114,8 @@ class VEffectiveAreaCalculator
         TH1D* hEcut500;
         TH1D* hEcutLin;
         TH1D* hEcutRec;
+        TH1D* hEcutUW;
+        TH1D* hEcutRecUW;
         TGraphAsymmErrors* gEffAreaMC;
         TGraphAsymmErrors* gEffAreaRec;
         TGraphAsymmErrors* gRecProb;

@@ -72,6 +72,8 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TH1D *hEmc;
     TH1D *hEcut;
     TH1D *hEcut_rec;
+    TH1D *hEcutUW;
+    TH1D *hEcut_recUW;
 // energy reconstruction matrix
     TH2D *hERecMatrix;
 // 2D energy error distribution

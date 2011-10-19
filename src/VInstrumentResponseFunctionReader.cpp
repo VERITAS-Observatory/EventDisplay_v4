@@ -33,6 +33,8 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     hEmc = 0;
     hEcut = 0;
     hEcut_rec = 0;
+    hEcutUW = 0;
+    hEcut_recUW = 0;
     hEsys = 0;
     hERecMatrix = 0;
     gEnergyResolution = 0;
@@ -337,6 +339,17 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
            hEcut_rec = (TH1D*)c->hEcutRec->Clone();
 	   setHistogramPlottingStyle( hEcut_rec );
 	   hEcut_rec->SetMarkerStyle( hEcut->GetMarkerStyle()+4 );
+       }
+       if( c->hEcutUW )
+       {
+           hEcutUW = (TH1D*)c->hEcutUW->Clone();
+	   setHistogramPlottingStyle( hEcutUW );
+       }
+       if( c->hEcutRecUW )
+       {
+           hEcut_recUW = (TH1D*)c->hEcutRecUW->Clone();
+	   setHistogramPlottingStyle( hEcut_recUW );
+	   hEcut_recUW->SetMarkerStyle( hEcutUW->GetMarkerStyle()+4 );
        }
 // get energy reconstruction matrix
        hERecMatrix = (TH2D*)c->hEmcCut;

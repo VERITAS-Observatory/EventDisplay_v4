@@ -71,7 +71,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     void         plotEnergyResolution( double ymax = 1. );                                             // from geteffective area
     TCanvas*     plotEnergyResolution( string iXaxis );                                                // from IRF
     TCanvas*     plotEnergyResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );
-    void         plotEnergySpectra();
+    void         plotEnergySpectra( bool iWeighted = true );
     void         plotEnergySystematics( string iM = "mean", double ymin = -1., double ymax = 1. );
     void         plotTheta2( double iTheta2AxisMax = 0.05, bool iCumulative = false );
     void         plotTheta2( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05, bool iCumulative = false );

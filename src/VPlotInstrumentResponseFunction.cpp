@@ -432,18 +432,31 @@ void VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
     }
 }
 
-void VPlotInstrumentResponseFunction::plotEnergySpectra()
+void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted )
 {
     char hname[200];
+    char htitle[200];
 
-    sprintf( hname, "cEA_energy" );
-    TCanvas* iEnergySpectraPlottingCanvas = new TCanvas( hname, "energy spectra", 10, 10, 600, 600 );
+    if( iWeighted )
+    {
+       sprintf( hname, "cEA_energy" );
+       sprintf( htitle, "energy spectra (spectral weighted)" );
+    }
+    else            
+    {
+       sprintf( hname, "cEA_energyUW" );
+       sprintf( htitle, "energy spectra (not spectral weighted)" );
+    }
+    TCanvas* iEnergySpectraPlottingCanvas = new TCanvas( hname, htitle, 10, 10, 600, 600 );
     iEnergySpectraPlottingCanvas->SetGridx( 0 );
     iEnergySpectraPlottingCanvas->SetGridy( 0 );
     iEnergySpectraPlottingCanvas->SetLeftMargin( 0.15 );
     iEnergySpectraPlottingCanvas->SetRightMargin( 0.07 );
 
-    TH1D *he0 = new TH1D( "he0","", 100, log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
+    if( iWeighted ) sprintf( hname, "he0" );
+    else            sprintf( hname, "he0UW" );
+    TH1D *he0 = new TH1D( hname,"", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ),
+                                         log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
     he0->SetStats( 0 );
     he0->SetXTitle( "log_{10} energy [TeV]" );
     he0->SetYTitle( "number of events/bin" );
@@ -460,8 +473,16 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra()
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
        if( fData[i]->hEmc )      fData[i]->hEmc->Draw( "same" );
-       if( fData[i]->hEcut )     fData[i]->hEcut->Draw( "same" );
-       if( fData[i]->hEcut_rec ) fData[i]->hEcut_rec->Draw( "same" );
+       if( iWeighted )
+       {
+	  if( fData[i]->hEcut )     fData[i]->hEcut->Draw( "same" );
+	  if( fData[i]->hEcut_rec ) fData[i]->hEcut_rec->Draw( "same" );
+       }
+       else
+       {
+	  if( fData[i]->hEcutUW )     fData[i]->hEcutUW->Draw( "same" );
+	  if( fData[i]->hEcut_recUW ) fData[i]->hEcut_recUW->Draw( "same" );
+       }
     }
     iEnergySpectraPlottingCanvas->SetLogy( 1 );
 }

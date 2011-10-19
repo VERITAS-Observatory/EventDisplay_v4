@@ -79,6 +79,13 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hEcut->SetYTitle( "entries" );
     hisTreeList->Add( hEcut );
 
+    sprintf( hname, "hEcutUW" );
+    hEcutUW = new TH1D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+    hEcutUW->Sumw2();
+    hEcutUW->SetXTitle( "energy_{MC} [TeV]" );
+    hEcutUW->SetYTitle( "entries (unweighted)" );
+    hisTreeList->Add( hEcutUW );
+
     sprintf( hname, "hEcutLin" );
     hEcutLin  = new TH1D( hname, htitle, 500, 0.03, 4.03 );
     hEcutLin->Sumw2();
@@ -99,6 +106,13 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hEcutRec->SetXTitle( "energy_{rec} [TeV]" );
     hEcutRec->SetYTitle( "entries" );
     hisTreeList->Add( hEcutRec );
+
+    sprintf( hname, "hEcutRecUW" );
+    hEcutRecUW = new TH1D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+    hEcutRecUW->Sumw2();
+    hEcutRecUW->SetXTitle( "energy_{rec} [TeV]" );
+    hEcutRecUW->SetYTitle( "entries" );
+    hisTreeList->Add( hEcutRecUW );
 
     sprintf( hname, "gEffAreaMC" );
     gEffAreaMC = new TGraphAsymmErrors( 1 );
@@ -254,6 +268,15 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
         iT_TH1D.clear();
         for( unsigned int j = 0; j < fVMinAz.size(); j++ )
         {
+            sprintf( hname, "hVEcutUW_%d_%d", i, j );
+            if( hEcutUW ) iT_TH1D.push_back( (TH1D*)hEcutUW->Clone( hname ) );
+            else          iT_TH1D.push_back( 0 );
+        }
+        hVEcutUW.push_back( iT_TH1D );
+
+        iT_TH1D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
             sprintf( hname, "hVEcutLin_%d_%d", i, j );
             if( hEcutLin ) iT_TH1D.push_back( (TH1D*)hEcutLin->Clone( hname ) );
             else           iT_TH1D.push_back( 0 );
@@ -277,6 +300,15 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
             else           iT_TH1D.push_back( 0 );
         }
         hVEcutRec.push_back( iT_TH1D );
+
+        iT_TH1D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
+            sprintf( hname, "hVEcutRecUW_%d_%d", i, j );
+            if( hEcutRecUW ) iT_TH1D.push_back( (TH1D*)hEcutRecUW->Clone( hname ) );
+            else           iT_TH1D.push_back( 0 );
+        }
+        hVEcutRecUW.push_back( iT_TH1D );
 
         iT_TProfile.clear();
         for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -1057,8 +1089,10 @@ void VEffectiveAreaCalculator::reset()
 
     hEmc = 0;
     hEcut = 0;
+    hEcutUW = 0;
     hEcutLin = 0;
     hEcutRec = 0;
+    hEcutRecUW = 0;
     hEcut500 = 0;
     gEffAreaMC = 0;
     gEffAreaRec = 0;
@@ -1239,7 +1273,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
         eMC = log10( d->MCe0 );
 
 // fill trigger cuts
-         hEcutSub[0]->Fill( eMC, i_weight );
+         hEcutSub[0]->Fill( eMC, 1. );
 
 ////////////////////////////////
 // apply general quality and gamma/hadron separation cuts
@@ -1254,11 +1288,11 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 
 // apply fiducial area cuts
          if( !fCuts->applyInsideFiducialAreaCut( true ) ) continue;
-         hEcutSub[1]->Fill( eMC, i_weight );
+         hEcutSub[1]->Fill( eMC, 1. );
 
 // apply reconstruction quality cuts
          if( !fCuts->applyStereoQualityCuts( iMethod, true, i , true) ) continue;
-         hEcutSub[2]->Fill( eMC, i_weight );
+         hEcutSub[2]->Fill( eMC, 1. );
 
 // apply telescope type cut (e.g. for CTA simulations only)
          if( fCTA )
@@ -1266,7 +1300,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
            if( bDebugCuts ) cout << "#2 Cut NTELType " << fCuts->applyTelTypeTest( false ) << endl;
 	   if(!fCuts->applyTelTypeTest( true ) ) continue;
          }
-         hEcutSub[3]->Fill( eMC, i_weight );
+         hEcutSub[3]->Fill( eMC, 1. );
 
 //////////////////////////////////////
 // apply direction cut
@@ -1282,7 +1316,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
          {
             if( !fCuts->applyDirectionCuts( iMethod, true, 0., 0. ) ) continue;          
          }
-         hEcutSub[4]->Fill( eMC, i_weight );
+         hEcutSub[4]->Fill( eMC, 1. );
 
 //////////////////////////////////////
 // apply gamma hadron cuts
@@ -1291,7 +1325,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 	    cout << "#3 CUT ISGAMMA " << fCuts->isGamma(i) << endl;
          }
          if( !fCuts->isGamma( i, true ) ) continue;
-         hEcutSub[5]->Fill( eMC, i_weight );
+         hEcutSub[5]->Fill( eMC, 1. );
 	 
 // apply energy reconstruction quality cut
          if( !fIgnoreEnergyReconstruction )
@@ -1299,7 +1333,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 	    if( bDebugCuts ) cout << "#4 EnergyReconstructionQualityCuts " << fCuts->applyEnergyReconstructionQualityCuts( iMethod ) << endl;
             if( !fCuts->applyEnergyReconstructionQualityCuts( iMethod, true ) ) continue;
          }
-         hEcutSub[6]->Fill( eMC, i_weight );
+         hEcutSub[6]->Fill( eMC, 1. );
 // skip event if no energy has been reconstructed
 // get energy according to which reconstruction method
          if( iMethod == 0 && d->Erec > 0. )
@@ -1350,9 +1384,11 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                else i_weight = 0.;
 // fill true MC energy (hVEmc is in true MC energies)
                if( hVEcut[s][i_az] )           hVEcut[s][i_az]->Fill( eMC, i_weight );
+               if( hVEcutUW[s][i_az] )         hVEcutUW[s][i_az]->Fill( eMC, 1. );
                if( hVEcut500[s][i_az] )        hVEcut500[s][i_az]->Fill( eMC, i_weight );
                if( hVEcutLin[s][i_az] )        hVEcutLin[s][i_az]->Fill( eMC, i_weight );
                if( hVEcutRec[s][i_az] )        hVEcutRec[s][i_az]->Fill( eRec, i_weight );
+               if( hVEcutRecUW[s][i_az] )      hVEcutRecUW[s][i_az]->Fill( eRec, 1. );
                if( hVEsysRec[s][i_az] )        hVEsysRec[s][i_az]->Fill( eRec, eRec - eMC );
                if( hVEsysMC[s][i_az] )         hVEsysMC[s][i_az]->Fill( eMC, eRec - eMC );
                if( hVEsysMCRelative[s][i_az] ) hVEsysMCRelative[s][i_az]->Fill( eMC, ( eRecLin - d->MCe0 ) / d->MCe0 );
@@ -1455,9 +1491,11 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 // copy all histograms
             copyHistograms( hEmc, hVEmc[s][i_az], false );
             copyHistograms( hEcut, hVEcut[s][i_az], false );
+            copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
             copyHistograms( hEcut500, hVEcut500[s][i_az], false );
             copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
             copyHistograms( hEcutRec, hVEcutRec[s][i_az], false );
+            copyHistograms( hEcutRecUW, hVEcutRecUW[s][i_az], false );
             copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az], "" );
             copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az], "s" );
             copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az], "s" );
@@ -1833,17 +1871,25 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
     sprintf( htitle, "energy spectrum, after cuts (%1.f deg)", fZe[ize] );
     hEcut->SetTitle( htitle );
 
+    hEcutUW->Reset();
+    sprintf( htitle, "unweighted energy spectrum, after cuts (%1.f deg)", fZe[ize] );
+    hEcutUW->SetTitle( htitle );
+
     hEcutLin->Reset();
     sprintf( htitle, "energy spectrum, after cuts (%1.f deg)", fZe[ize] );
     hEcutLin->SetTitle( htitle );
 
-   hEcut500->Reset();
-   sprintf( htitle, "energy spectrum, after cuts (%1.f deg)", fZe[ize] );
-   hEcut500->SetTitle( htitle );
+    hEcut500->Reset();
+    sprintf( htitle, "energy spectrum, after cuts (%1.f deg)", fZe[ize] );
+    hEcut500->SetTitle( htitle );
 
     hEcutRec->Reset();
     sprintf( htitle, "energy spectrum, after cutRecs (%1.f deg)", fZe[ize] );
     hEcutRec->SetTitle( htitle );
+
+    hEcutRecUW->Reset();
+    sprintf( htitle, "unweighted energy spectrum, after cutRecs (%1.f deg)", fZe[ize] );
+    hEcutRecUW->SetTitle( htitle );
 
     sprintf( htitle, "effective area vs E_{MC} (%.1f deg)", fZe[ize] );
     gEffAreaMC->SetTitle( htitle );
@@ -2111,6 +2157,13 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
             if( hVEcut[i][j] ) hVEcut[i][j]->Reset();
         }
     }
+    for( unsigned int i = 0; i < hVEcutUW.size(); i++ )
+    {
+        for( unsigned int j = 0; j < hVEcutUW[i].size(); j++ )
+        {
+            if( hVEcutUW[i][j] ) hVEcutUW[i][j]->Reset();
+        }
+    }
     for( unsigned int i = 0; i < hVEcutLin.size(); i++ )
     {
         for( unsigned int j = 0; j < hVEcutLin[i].size(); j++ )
@@ -2130,6 +2183,13 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
         for( unsigned int j = 0; j < hVEcutRec[i].size(); j++ )
         {
             if( hVEcutRec[i][j] ) hVEcutRec[i][j]->Reset();
+        }
+    }
+    for( unsigned int i = 0; i < hVEcutRecUW.size(); i++ )
+    {
+        for( unsigned int j = 0; j < hVEcutRecUW[i].size(); j++ )
+        {
+            if( hVEcutRecUW[i][j] ) hVEcutRecUW[i][j]->Reset();
         }
     }
     for( unsigned int i = 0; i < hVEmcSWeight.size(); i++ )
