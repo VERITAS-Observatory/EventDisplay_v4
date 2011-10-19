@@ -168,7 +168,9 @@ The EVNDISP manual for VERITAS users:
 
 The auxiliary data files contain information needed for the analysis. 
 This might be files describing the detector geometry, lookup tables, effective areas file, etc.
-We assume in the following that these files are located in the directory {\it \$EVNDISPDATA}
+We assume in the following that these files are located in the
+directory {\it \$OBS\_EVNDISP\_ANA\_DIR} where {\it OBS} is your
+observatory (i.e. {\it VERITAS} or {\it CTA}).
 
 \subsection{Detector description}
 
@@ -178,7 +180,7 @@ We assume in the following that these files are located in the directory {\it \$
 
 No detector description is needed, since the telescope and array description is read directly from the DST file ({\it telconfig} tree).
 The converter from hessio to EVNDISP DST format needs a subarray file, a simple list of telescopes to be selected from the corresponding hyper array. 
-The subarray files for prod1 can be found in {\it \$EVNDISPDATA/DetectorGeometry/*.lis}.
+The subarray files for prod1 can be found in {\it \$OBS\_EVNDISP\_ANA\_DIR/DetectorGeometry/*.lis}.
 
 \chapter{eventdisplay - calibration, image analysis and stereo reconstruction}
 
@@ -296,7 +298,7 @@ $EVNDISPSYS/bin/evndisp -display=1 \
 
 Run the converter and Eventdisplay for a specific subarray: use script \$EVNDISPSYS/scripts/CTA/CTA.EVNDISP.sub\_convert\_and\_analyse\_MC\_VDST.sh
 
-NOTE: The image cleaning thresholds can be specified in the file \$EVNDISPDATA/ParameterFiles/EVNDISP.reconstruction.runparameter file either
+NOTE: The image cleaning thresholds can be specified in the file \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter file either
 for all telescopes to the same values or for each telescope type seperately. 
 
 \subsection{Step 4: mscw\_energy}
