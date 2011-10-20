@@ -49,6 +49,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
    ~VPlotInstrumentResponseFunction() {}
 
     bool         addInstrumentResponseData( int iDataID, string iFileList );
+    bool         addInstrumentResponseData( string iInstrumentResponseFile, string iA_MC );
     bool         addInstrumentResponseData( string iInstrumentResponseFile,
     				            double iZe = 20., double iWoff = 0.5, int iAzBin = 0,
 					    double iIndex = 2.4, int iNoise = 200, string iA_MC = "A_MC" );

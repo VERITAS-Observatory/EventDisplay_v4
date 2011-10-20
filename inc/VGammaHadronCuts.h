@@ -124,8 +124,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	TGraph*         fTMVABoxCut_Theta2_max;                
 
 // orbital phase analysis
-	TFile *fPhaseCut_File;
-	TTree *fPhaseCut_Tree;
+	TFile *fPhaseCut_File;                                      //!
+	TTree *fPhaseCut_Tree;                                      //!
 	double fOrbitalPhase;
 
 

@@ -226,6 +226,9 @@ int main( int argc, char *argv[] )
 					 fEffectiveAreaCalculator.getEnergyAxis_maximum_defaultValue() );
         fMC_histo->fill( fRunPara->fze, c2, fRunPara->fAzimuthBins );
         fMC_histo->print();
+	fOutputfile->cd();
+        cout << "writing MC histograms to file " << fOutputfile->GetName() << endl;
+        fMC_histo->Write();
         fStopWatch.Print();
      }  
 
@@ -254,8 +257,6 @@ int main( int argc, char *argv[] )
        }
        if( fEffectiveAreaCalculator.getHistogramhEmc() ) fEffectiveAreaCalculator.getHistogramhEmc()->Write();
     }
-    cout << "writing MC histograms to file " << fOutputfile->GetName() << endl;
-    fMC_histo->Write();
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
     {
         if( f_IRF[i] && f_IRF[i]->getDataProduct() )
@@ -267,7 +268,7 @@ int main( int argc, char *argv[] )
     if( fCuts ) 
     {
        fCuts->terminate();
-    }
+    } 
 // writing monte carlo header to disk
     if( iMonteCarloHeader ) iMonteCarloHeader->Write();
 

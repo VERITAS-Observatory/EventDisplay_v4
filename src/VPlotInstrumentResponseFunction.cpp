@@ -65,7 +65,13 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( int iDataID, st
     return true;
 }
 
-bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, double iZe, double iWoff, int iAzBin, double iIndex, int iNoise, string iA_MC )
+bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, string iA_MC )
+{
+   return addInstrumentResponseData( iFile, 20., 0.0, 0, 0, 200, iA_MC );
+}
+
+bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, double iZe, double iWoff,
+                                                                 int iAzBin, double iIndex, int iNoise, string iA_MC )
 {
 // read effective areas
     VInstrumentResponseFunctionReader *iTempEffectiveArea = new VInstrumentResponseFunctionReader();
