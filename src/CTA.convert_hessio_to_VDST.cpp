@@ -472,8 +472,11 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
                    }
                 }
 		fData->fDSTMax[i_ntel_data][p] = (short)(hsdata->event.teldata[telID].pixtm->pulse_sum_loc[HI_GAIN][p]);
-// (GM) TODO: not clear how low gain switch is set		
-		fData->fDSTHiLo[i_ntel_data][p] = 0;
+// set low gain switch
+                if(  hsdata->event.teldata[telID].raw->threshold > 0 )
+		{
+		   fData->fDSTHiLo[i_ntel_data][p] = hsdata->event.teldata[telID].raw->adc_known[LO_GAIN][p];
+                }
 
 		if( FLAG_AMP_TMP > 0 )
 		{
@@ -625,6 +628,10 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    unsigned int nPixel = 0;
    unsigned int nPixel_active = 0;
    unsigned int nSamples = 0;
+   unsigned int nGains;
+   float fHiLoScale = 0.;
+   int   fHiLoThreshold = 0;
+   float fHiLoOffset = 0.;
    const unsigned int fMaxPixel = 50000;
    float fXTubeMM[fMaxPixel];
    float fYTubeMM[fMaxPixel];
@@ -665,6 +672,10 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    fTreeDet->Branch( "NPixel", &nPixel, "NPixel/i" );
    fTreeDet->Branch( "NPixel_active", &nPixel_active, "NPixel_active/i" );
    fTreeDet->Branch( "NSamples", &nSamples, "NSamples/i" );
+   fTreeDet->Branch( "NGains", &nGains, "NGains/i" );
+   fTreeDet->Branch( "HiLoScale", &fHiLoScale, "HiLoScale/F" );
+   fTreeDet->Branch( "HiLoThreshold", &fHiLoThreshold, "HiLoThreshold/I" );
+   fTreeDet->Branch( "HiLoOffset", &fHiLoOffset, "HiLoOffset/F" );
    fTreeDet->Branch( "XTubeMM", fXTubeMM, "XTubeMM[NPixel]/F" );
    fTreeDet->Branch( "YTubeMM", fYTubeMM, "YTubeMM[NPixel]/F" );
    fTreeDet->Branch( "RTubeMM", fRTubeMM, "RTubeMM[NPixel]/F" );
@@ -705,6 +716,10 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	nPixel = hsdata->camera_set[itel].num_pixels;
 	nDisabled = hsdata->pixel_disabled[itel].num_HV_disabled;
 	nSamples = hsdata->event.teldata[itel].raw->num_samples;
+	nGains = hsdata->event.teldata[itel].raw->num_gains;
+	fHiLoScale = hsdata->event.teldata[itel].raw->scale_hg8;
+	fHiLoThreshold = hsdata->event.teldata[itel].raw->threshold;
+	fHiLoOffset = hsdata->event.teldata[itel].raw->offset_hg8;
 
 	nPixel_active = 0;
 	float maxPix_dist = 0.;

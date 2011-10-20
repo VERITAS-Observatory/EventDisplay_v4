@@ -280,6 +280,7 @@ class VCameraRead : public VGlobalRunParameter
         void                 setConfigDir( string iDir ) { fConfigDir = iDir; }
 	void                 setTelID_matrix( map< unsigned int, unsigned int > m ) { fTelIDGrisu = m; }
         bool                 setLowGainMultiplier( unsigned int iTel, double ival );
+        bool                 setLowGainThreshold( unsigned int iTel, unsigned int ival );
         void                 setCoordinateTransformer( float iX = 1., float iY = 1. ) { fCoordinateTransformerX = iX; fCoordinateTransformerY = iY; }
                                                   //!< set telescope ID for getters
 	void                 setSourceType( int iST ) { fsourcetype = iST; }

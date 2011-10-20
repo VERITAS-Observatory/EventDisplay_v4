@@ -46,6 +46,10 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
     float fCameraRotation = 0.;
     unsigned int nPixel = 0;
     unsigned int nSamples = 0;
+    unsigned int nGains = 2;
+    float fHiLoScale = 0.;
+    int   fHiLoThreshold = 0;
+    float fHiLoOffset = 0.;
     const unsigned int fMaxPixel = 50000;
     float fXTubeMM[fMaxPixel];
     float fYTubeMM[fMaxPixel];
@@ -72,6 +76,10 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
         fTreeDet->Branch( "CameraRotation", &fCameraRotation, "CameraRotation/F" );
         fTreeDet->Branch( "NPixel", &nPixel, "NPixel/i" );
         fTreeDet->Branch( "NSamples", &nSamples, "NSamples/i" );
+	fTreeDet->Branch( "NGains", &nGains, "NGains/i" );
+	fTreeDet->Branch( "HiLoScale", &fHiLoScale, "HiLoScale/F" );
+	fTreeDet->Branch( "HiLoThreshold", &fHiLoThreshold, "HiLoThreshold/I" );
+	fTreeDet->Branch( "HiLoOffset", &fHiLoOffset, "HiLoOffset/F" );
         fTreeDet->Branch( "XTubeMM", fXTubeMM, "XTubeMM[NPixel]/F" );
         fTreeDet->Branch( "YTubeMM", fYTubeMM, "YTubeMM[NPixel]/F" );
         fTreeDet->Branch( "RTubeMM", fRTubeMM, "RTubeMM[NPixel]/F" );
@@ -105,9 +113,11 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
             fCameraCentreOffset = iDet->getCameraCentreOffset()[i];
             fCameraRotation = iDet->getCameraRotation()[i];
             fTelType = iDet->getTelType()[i];
-
             nPixel = iDet->getNChannels( i );
             nSamples = iDet->getNSamples( i );
+	    fHiLoScale = iDet->getLowGainMultiplier()[i];
+	    fHiLoThreshold = iDet->getLowGainThreshold()[i];
+	    fHiLoOffset = 0.;
             if( nPixel < fMaxPixel )
             {
                 for( unsigned int p = 0; p < nPixel; p++ )
@@ -142,6 +152,10 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
     float fFOV= 0.;
     unsigned int nPixel = 0;
     unsigned int nSamples = 0;
+    unsigned int nGains = 0;
+    float fHiLoScale = 0.;
+    int   fHiLoThreshold = 0;
+    float fHiLoOffset = 0.;
     const unsigned int fMaxPixel = 50000;
     float fXTubeMM[fMaxPixel];
     float fYTubeMM[fMaxPixel];
@@ -169,6 +183,10 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
     iTree->SetBranchAddress( "CameraRotation", &fCameraRotation );
     iTree->SetBranchAddress( "NPixel", &nPixel );
     iTree->SetBranchAddress( "NSamples", &nSamples );
+    if( iTree->GetBranchStatus( "NGains" ) ) iTree->SetBranchAddress( "NGains", &nGains );
+    if( iTree->GetBranchStatus( "HiLoScale" ) ) iTree->SetBranchAddress( "HiLoScale", &fHiLoScale );
+    if( iTree->GetBranchStatus( "HiLoThreshold" ) ) iTree->SetBranchAddress( "HiLoThreshold", &fHiLoThreshold );
+    if( iTree->GetBranchStatus( "HiLoOffset" ) ) iTree->SetBranchAddress( "HiLoOffset", &fHiLoOffset );
     iTree->SetBranchAddress( "XTubeMM", fXTubeMM );
     iTree->SetBranchAddress( "YTubeMM", fYTubeMM );
     iTree->SetBranchAddress( "RTubeMM", fRTubeMM );
@@ -211,6 +229,8 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
 
         iDet->getNChannels()[i] = nPixel;
 	iDet->setNSamples( i, nSamples, true );
+	iDet->setLowGainMultiplier( i, fHiLoScale );
+	iDet->setLowGainThreshold( i, (unsigned int)fHiLoThreshold );
 
 	iDet->getNMirrors()[i] = (unsigned int)fNMirrors;
 	iDet->getMirrorArea()[i] = fMirrorArea;

@@ -950,6 +950,18 @@ bool VCameraRead::setLowGainMultiplier( unsigned int iTel, double ival )
     return true;
 }
 
+bool VCameraRead::setLowGainThreshold( unsigned int iTel, unsigned int ival )
+{
+    if( iTel < fLowGainActivator.size() ) fLowGainActivator[iTel] = ival;
+    else
+    {
+        cout << "VCameraRead::setLowGainThreshold: invalid low gain threshold, set value to 0" << endl;
+        return false;
+    }
+    return true;
+}
+
+
 vector<ULong64_t> VCameraRead::getTelType_list()
 {
    vector<ULong64_t> t;
