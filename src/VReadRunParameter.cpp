@@ -1432,7 +1432,8 @@ void VReadRunParameter::setDirectories()
         {
             if( gSystem->mkdir( fRunPara->getDirectory_EVNDISPOutput().c_str() ) != 0 )
             {
-                cout << "VReadRunParameter::test_and_adjustParams() error: unable to create output directory" << endl;
+                cout << "VReadRunParameter::test_and_adjustParams() error: unable to create output directory: " << endl;
+		cout <<  fRunPara->getDirectory_EVNDISPOutput() << endl;
                 exit( -1 );
             }
             else
@@ -1457,7 +1458,9 @@ void VReadRunParameter::setDirectories()
                 cout << "\t creating calibration directory for Telescope " << i+1 << " : " << i_text << endl;
                 if( gSystem->mkdir( i_text, kTRUE ) != 0 )
                 {
-                    cout << "VReadRunParameter::test_and_adjustParams() error: unable to create calibration directory for Telescope " << i+1 << endl;
+                    cout << "VReadRunParameter::test_and_adjustParams() error: unable to create calibration directory for Telescope ";
+		    cout << i+1 << ": " << endl;
+		    cout << i_text << endl;
                     exit( -1 );
                 }
             }
