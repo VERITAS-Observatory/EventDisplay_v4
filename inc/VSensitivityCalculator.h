@@ -233,7 +233,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 	bool     setEnergySpectrumfromLiterature( string iFile, unsigned int iID = 1 );
 	void     setEnergySpectrumfromLiterature_ID( unsigned int iID ) { fEnergySpectrumfromLiterature_ID = iID; }
         void     setFluxRange_PFLUX( double iMin = 1.e-15, double iMax = 5.e-11 ) { fPlot_flux_PFLUX_min = iMin; fPlot_flux_PFLUX_max = iMax; }
-        void     setFluxRange_ENERG( double iMin = 5.e-14, double iMax = 5.e-11 ) { fPlot_flux_ENERG_min = iMin; fPlot_flux_ENERG_max = iMax; }
+        void     setFluxRange_ENERG( double iMin = 1.e-14, double iMax = 2.e-10 ) { fPlot_flux_ENERG_min = iMin; fPlot_flux_ENERG_max = iMax; }
         void     setFluxRange_CU( double iMin = 1.e-4, double iMax = 10. ) { fPlot_flux_CU_min = iMin; fPlot_flux_CU_max = iMax; }
         void     setMonteCarloParameters( unsigned int iParticleID, string iSpectralParameterFile, unsigned int iSpectralParameterID,
 	                                  string iGammaEffectiveAreaFile, double ze = 20., 

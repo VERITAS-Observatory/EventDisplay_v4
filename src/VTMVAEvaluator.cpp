@@ -939,6 +939,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       cout << hname << endl;
       return false;
    }
+   cout << "TMVA Evaluator optimization: ";
+   cout << fOptmizationSourceStrengthCrabUnits << " CU signal source; ";
+   cout << fOptmizationMinBackGroundEvents << " background events required" << endl;
+   cout << " (alpha: " << fOptimizationBackgroundAlpha << ")" << endl;
 
 //////////////////////////////////////////////////////
 // now loop over signal and background efficiency levels
