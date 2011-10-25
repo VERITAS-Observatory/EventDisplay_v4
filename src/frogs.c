@@ -302,7 +302,7 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
   int status=0;
   unsigned int iter = 0;
   do {
-    iter++;  
+    iter++;
     status = gsl_multifit_fdfsolver_iterate(s);
     if (status) break;
     status = gsl_multifit_test_delta (s->dx, s->x, 1e-7, 1e-7);
@@ -483,7 +483,7 @@ int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d){
     it has a direct neighbor whose signal exceeds FROGS_HITHRESH. The 
     thesholds FROGS_HITHRESH and FROGS_LOTHRESH are expressed in units 
     of pedestal standard deviations. 
-*/
+  */
 
   //If the pixel tested is not a pixel in use, returns FROGS_BAD_NUMBER
   if(d->scope[tel].pixinuse[pix]==FROGS_NOTOK) return FROGS_BAD_NUMBER;
@@ -1024,62 +1024,29 @@ int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f) {
   pnt.log10e=gsl_vector_get(v,FROGS_LOG10E);
   pnt.lambda=gsl_vector_get(v,FROGS_LAMBDA);
 
-  //COMMENTED LINES ARE FOR TESTS SV IS DOING
-  //pnt.log10e=-0.55777;
-  //  pnt.log10e=-1.2;
-  //pnt.lambda=3;
-  //pnt.xp=-138.781403;
-  //pnt.yp=110.559235;
-  //pnt.xs=0.374460;
-  //pnt.ys=-0.331330;
-  //for(int i=0; i<180; i++) {
-  // pnt.log10e += 0.015;
-  //pnt.xp += 5;
-  //pnt.lambda=0.0;
-  //pnt.yp = -400;
-  //pnt.xs += 0.05;
-  //pnt.ys = -2.0;
-  //for(int j=0; j<80; j++) {
-  //pnt.lambda += 0.03;
-  //pnt.yp += 5;
-  //pnt.ys += 0.05;
-  //  fprintf(outpu,"%f %f %f %f %f %f ", 
-  //	    pnt.xs, pnt.ys, pnt.xp, pnt.yp, pnt.log10e, pnt.lambda);
-  //  double lkhdTotal = 0.; //test SV
+  //This is where the model is called to calculate the expected 
+  //value for all pixels in the original version
+  int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
+  for(int tel=0;tel<dwrap->data->ntel;tel++) {
+    for(int pix=0;pix<dwrap->data->scope[tel].npix;pix++) {
+      if(dwrap->data->scope[tel].pixinuse[pix]==FROGS_OK) {
+	int pix_in_template;//FROGS_OK in image, FROGS_NOTOK in background
+	double mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,
+				  &pix_in_template); 
+	if(mu!=FROGS_BAD_NUMBER) {
+	  double pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
+					      mu,
+					      dwrap->data->scope[tel].ped[pix],
+					      dwrap->data->scope[tel].exnoise[pix]);
+	  double pix_lkhd=-2.0*log(pd);
+	  gsl_vector_set (f,gsl_pix_id,pix_lkhd);
+	  gsl_pix_id++;
+		  
+	}
+      }//End of test on pixel viability
+    }//End of pixel loop
+  }//End of telescope loop
     
-    //This is where the model is called to calculate the expected 
-    //value for all pixels in the original version
-    int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
-    for(int tel=0;tel<dwrap->data->ntel;tel++) {
-      //double lkhdTel = 0.; //test SV
-      for(int pix=0;pix<dwrap->data->scope[tel].npix;pix++) {
-	if(dwrap->data->scope[tel].pixinuse[pix]==FROGS_OK) {
-	  int pix_in_template;//FROGS_OK in image, FROGS_NOTOK in background
-	  double mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,
-				    &pix_in_template); 
-	  if(mu!=FROGS_BAD_NUMBER) {
-	    double pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
-						mu,
-						dwrap->data->scope[tel].ped[pix],
-						dwrap->data->scope[tel].exnoise[pix]);
-	    double pix_lkhd=-2.0*log(pd);
-	    gsl_vector_set (f,gsl_pix_id,pix_lkhd);
-	    gsl_pix_id++;
-	    
-	    //    lkhdTel += pix_lkhd; //test SV
-	    // lkhdTotal += pix_lkhd; //test SV
-	  }
-	}//End of test on pixel viability
-      }//End of pixel loop
-      //fprintf(outpu,"%f ", lkhdTel);
-    }//End of telescope loop
-    //fprintf(outpu,"%f ", lkhdTotal);
-    //fprintf(outpu,"\n");
-    //}//End of lambda loop
-    //fprintf(outpu,"\n");
-    //}//End of energy loop
-    //exit(0);
-  
   return GSL_SUCCESS;
 }
 //================================================================
@@ -1107,41 +1074,13 @@ int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J) {
     the estimation of the derivatives. Eventually their values could be 
     coming in the frogs_gsl_data_wrapper structure*/
   struct frogs_reconstruction delta;
-  /*delta.xs=0.01;
-  delta.ys=0.01;
-  delta.xp=2.0;
-  delta.yp=2.0;
-  delta.log10e=0.02;
-  delta.lambda=0.2;*/
 
   delta.xs=0.15;
   delta.ys=0.15;
-  delta.xp=20.0;
-  delta.yp=20.0;
+  delta.xp=5.0;
+  delta.yp=5.0;
   delta.log10e=0.03;
   delta.lambda=0.3;
-    
-  //pnt.log10e=-1.25; //test SV
-  //pnt.xp=-400.0;
-  //pnt.yp=-400.0;
-  //pnt.xs = -2.0;
-  //pnt.ys = -2.0;
-  //pnt.lambda=-0.03;
-  //for(int i=0; i<15; i++) {
-  //pnt.log10e += 0.015;
-  //pnt.xp += 5;
-  //pnt.yp += 10;
-  //pnt.xs += 0.05;
-  //pnt.ys += 0.05;
-  //pnt.lambda += 0.03;
-  //double dlkhd1 = 0.; //test SV
-  //double dlkhd2 = 0.; //test SV
-  //double dlkhd3 = 0.; //test SV
-  //double dlkhd4 = 0.; //test SV
-  //double dlkhd5 = 0.; //test SV
-  //double dlkhd6 = 0.; //test SV
-  //fprintf(outpu,"%f %f %f %f %f %f ", 
-  //pnt.xs, pnt.ys, pnt.xp, pnt.yp, pnt.log10e, pnt.lambda);
 
   int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
   for(int tel=0;tel<dwrap->data->ntel;tel++) {
@@ -1154,50 +1093,47 @@ int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J) {
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	  dwrap->data,dwrap->tmplt,FROGS_XS);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_XS,derivative);
-	//dlkhd1 += derivative;
+
 	//Derivative with respect to ys
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
 						 dwrap->tmplt,FROGS_YS);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	  dwrap->data,dwrap->tmplt,FROGS_YS);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_YS,derivative);
-	//	dlkhd2 += derivative;
+
 	//Derivative with respect to xp
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
 						 dwrap->tmplt,FROGS_XP);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	dwrap->data,dwrap->tmplt,FROGS_XP);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_XP,derivative);
-	//dlkhd3 += derivative;
+
 	//Derivative with respect to yp
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
 						 dwrap->tmplt,FROGS_YP);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	dwrap->data,dwrap->tmplt,FROGS_YP);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_YP,derivative);
-	//dlkhd4 += derivative;
+
 	//Derivative with respect to log10e
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
 						 dwrap->tmplt,FROGS_LOG10E);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	dwrap->data,dwrap->tmplt,FROGS_LOG10E);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_LOG10E,derivative);
-	//dlkhd5 += derivative;
+
 	//Derivative with respect to lambda
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
 						 dwrap->tmplt,FROGS_LAMBDA);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	  dwrap->data, dwrap->tmplt,FROGS_LAMBDA); */
 	gsl_matrix_set(J,gsl_pix_id,FROGS_LAMBDA,derivative);
-	//	dlkhd6 += derivative;
 	
 	gsl_pix_id++;
       }//End of test on pixel viability
     }//End of pixel loop
   }//End of telescope loop
-  //fprintf(outpu,"%f %f %f %f %f %f\n", dlkhd1, dlkhd2, dlkhd3, dlkhd4, dlkhd5, dlkhd6);
-  //}//End of energy loop
-  //exit(0);
+
   return GSL_SUCCESS;
 }
 //================================================================
