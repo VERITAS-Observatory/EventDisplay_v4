@@ -140,7 +140,7 @@ mkdir -p $ODIR
 ##############################################################################################
 # noise file
 ##############################################################################################
-set NOISEFILE=NOISE$NOISE.grisu"
+set NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
 echo "NOISE FILE " $NOISEFILE
 echo "SOURCE FILE " $XFIL
 
@@ -165,6 +165,10 @@ set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
 
 ##### old options #####
 # "-MC_FADCTraceStart=2"
+
+echo "RUNNUMBER $SRUN"
+echo "EVNDISP outputfile root file written to $ODIR/$RRR.root"
+echo "EVNDISP log file written to $ODIR/$RRR.dat"
 
 ##############################################################################################
 # run eventdisplay 
