@@ -10,13 +10,13 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array> <list of simtelarray files> <particle> [keep simtel.root files (default off=0)] [method=GEO/LL] "
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array> <list of simtelarray files> <particle> [keep simtel.root files (default off=0)]"
    echo
    echo "  <sub array>               sub array from prod1 (e.g. E)"
-   echo "  <particle>                gamma_onSource, gamma_diffuse, proton, electron (helium, ...)"
+   echo "                            use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
    echo ""
    echo "  [keep simtel.root files]  keep and copy converted simtel files to output directory (default off=0)"
-   echo "  [method]                  reconstruction method (default=GEO)"
    echo ""
    echo " output will be written to: CTA_USER_DATA_DIR/analysis/<subarray>/<particle>/ "
    echo ""
@@ -42,7 +42,7 @@ if [ -n "$4" ]
 then
    KEEP=$4
 fi
-MET="GEO"
+MET="LL"
 if [ -n "$5" ]
 then
   MET=$5
@@ -99,7 +99,13 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -l h_cpu=02:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+   if  [ $ARRAY = "ALL" ]
+   then
+      qsub -l h_cpu=25:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+   else
+      qsub -l h_cpu=02:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+   fi
+
    echo "writing shell script to $FNAM.sh"
    echo "writing queue log and error files to $QLOG"
 
