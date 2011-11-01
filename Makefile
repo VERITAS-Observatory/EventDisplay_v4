@@ -523,9 +523,10 @@ ifneq ($(FITS),FALSE)
 endif
 
 slib lsib:   $(SHAREDOBJS)
+	mkdir -p ./lib
 	$(LD) $(SOFLAGS) $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
 ifneq ($(ROOT_MINUIT2),yes)
-	@echo "ROOT NOT COMPILED WITH MUINUIT2"
+	@echo "ROOT NOT COMPILED WITH MINUIT2"
 	@echo "THEREFORE: NO SOURCE GEOMETRY FITTER AVAILABLE"
 endif
 ifeq ($(FITS),FALSE)
