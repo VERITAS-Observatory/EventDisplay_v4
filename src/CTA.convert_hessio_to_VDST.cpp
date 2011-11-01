@@ -212,6 +212,7 @@ static void syntax (char *program)
    printf("   -a subarray file (list of telescopes to read with FOV.)\n" );
    printf("   -o dst filename  (name of dst output file)\n" );
    printf("   -f on=1/off=0    (write FADC samples to DST file;default=0)\n" );
+   printf("   -r on=1/off=0    (apply camera place scaling for DC telescopes; default=1)\n" );
 
    exit(1);
 }
@@ -602,17 +603,17 @@ TTree* DST_fillCalibrationTree( AllHessData *hsdata, map< unsigned int, float > 
    return t;
 }
 
-TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > telescope_list )
+TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > telescope_list, bool iApplyCameraScaling )
 {
    if( !hsdata ) return 0;
 
 // HARDCODED: all large telescopes are parabolic
    double fParabolic_mirrorArea = 400.;
    int    fSC_number_of_mirrors = 2;
-   cout << "\t Info:";
-   cout << "assume that all telescopes with mirror area larger than " << fParabolic_mirrorArea;
+   cout << "\t Info:" << endl;
+   cout << "\t assume that all telescopes with mirror area larger than " << fParabolic_mirrorArea;
    cout << " m^2 are of parabolic type" << endl;
-   cout << "assume that all telescopes with " << fSC_number_of_mirrors;
+   cout << "\t assume that all telescopes with " << fSC_number_of_mirrors;
    cout << " mirrors are Schwarzschild-Couder telescopes" << endl;
 
 // define tree
@@ -770,13 +771,35 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	fTelescope_type += TMath::Nint(fFOV*10.)*100;
 	fTelescope_type += TMath::Nint(fMirrorArea)*100*10*100;
 // all large telescopes are parabolic, all others are Davies-Cotton (hardwired)
-        if( fMirrorArea > fParabolic_mirrorArea )      fTelescope_type += 100000000;
+        if( fMirrorArea > fParabolic_mirrorArea )
+	{
+	    fTelescope_type += 100000000;
+        }
 // Schwarzschild-Couder: check number of mirrors
-	else if( fNMirrors == fSC_number_of_mirrors )  fTelescope_type += 200000000;
+	else if( fNMirrors == fSC_number_of_mirrors )
+	{
+	   fTelescope_type += 200000000;
+        }
 	else
 	{
-// from raytracing
-           fCameraScaleFactor = 0.965;
+// from raytracing by G.Hughes and optics note by S.Fegan and V.Vassiliev (2009)
+	   if( iApplyCameraScaling )
+	   {
+// assume that CTA MST is of intermediate-1.2 design
+              if( TMath::Abs( fMirrorArea - 100. ) < 5. )
+	      {
+// G.Hughes (2011/10/21): 2.79+-0.06 %
+	         fCameraScaleFactor = 1.-0.0279;
+              }
+// eq 1 from optics note by S.Fegan and V.Vassiliev (2009)
+	      else
+	      {
+// need f/D; unknown?
+//                 fCameraScaleFactor = 1.-1./(TMath::Power(2.,5.)*f_D*f_D) + 1./(TMath::Power(2.,8.) * TMath::Power(f_D,4.) );
+//
+	         fCameraScaleFactor = 1.;
+	      }
+           }
 	}
 
         fTreeDet->Fill();
@@ -818,9 +841,10 @@ int main(int argc, char **argv)
    fGlobalMaxNumberofSamples = 0;
    fGlobalTriggerReset = false;
 
-   string config_file = "";   // file with list of telescopes
-   string dst_file = "dst.root";      // output dst file
-   bool   fWriteFADC = false;   // fill FADC traces into converter
+   string config_file = "";        // file with list of telescopes
+   string dst_file = "dst.root";   // output dst file
+   bool   fWriteFADC = false;      // fill FADC traces into converter
+   bool   fApplyCameraScaling = true;      // apply camera plate scaling according for DC telescopes
    
    static AllHessData *hsdata;
 
@@ -934,6 +958,13 @@ int main(int argc, char **argv)
 	 argv += 2;
 	 continue;
       }
+      else if (strcmp(argv[1],"-r") == 0 )
+      {
+         fApplyCameraScaling = atoi( argv[2] );
+	 argc -= 2;
+	 argv += 2;
+	 continue;
+      }
       else if ( strcmp(argv[1],"--help") == 0 )
       {
         printf("\nc_DST: A program to convert hessio data to EVNDISP DST files.\n\n");
@@ -965,6 +996,7 @@ int main(int argc, char **argv)
    cout << "DST tree will be written to " << dst_file << endl;
    if( fWriteFADC ) cout << "(writing FADC samples to DST file)" << endl;
    else             cout << "(no FADC output)" << endl;
+   if( fApplyCameraScaling ) cout << "Apply camera plate scaling for DC telescopes" << endl;
 
 // new DST tree
    VDSTTree *fDST = new VDSTTree();
@@ -1449,7 +1481,7 @@ int main(int argc, char **argv)
        fDST->getMCTree()->Write();
     }
 // writing detector tree
-    TTree *i_detTree = DST_fill_detectorTree( hsdata, fTelescope_list );
+    TTree *i_detTree = DST_fill_detectorTree( hsdata, fTelescope_list, fApplyCameraScaling );
     if( i_detTree ) i_detTree->Write();
 // writing Monte Carlo header
     if( fMC_header ) fMC_header->Write();
