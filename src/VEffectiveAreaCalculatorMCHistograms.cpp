@@ -120,9 +120,10 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TChain *i_MCData, 
     unsigned int i_vSpectralIndexSize = fVSpectralWeight.size();
 
 // entries in MC tree (must be long, chain could contain lots of events)
-    Long64_t nentries = i_MCData->GetEntries();
+    Long64_t nentries = i_MCData->GetEntriesFast();
     cout << "total number of MC events: " << nentries << endl;
     if( fCuts && fCuts->isMCCuts() ) cout << "(apply MC cuts)" << endl;
+    cout << "total number of MC events: " << nentries << endl;
 //////////////////////////////////////////////////////////
 // now loop over all MC entries
     for( Long64_t i = 0; i < nentries; i++ )
