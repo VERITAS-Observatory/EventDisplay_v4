@@ -28,8 +28,8 @@ mkdir -p $LDIR
 rm -f $LDIR/$TFIL-W$WOFFMEA.log
 
 # location of EVNDISP output files (this is the input for the table filling)
-#set DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/gamma_onSource/3*.root"
-set DDIR="$CTA_DATA_DIR/analysis/$ARRAY/gamma_onSource/3*.root"
+set DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/gamma_onSource/[3-4]*.root"
+#set DDIR="$CTA_DATA_DIR/analysis/$ARRAY/gamma_onSource/3*.root"
 
 # options for table filling
 set MOPT="-pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -mindistancetocameracenter=$WOFFMIN -maxdistancetocameracenter=$WOFFMAX -maxCoreError=250"

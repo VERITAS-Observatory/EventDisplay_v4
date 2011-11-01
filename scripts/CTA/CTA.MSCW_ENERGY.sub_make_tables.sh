@@ -17,6 +17,7 @@ then
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
    echo "  <array ID>         CTA array ID (e.g. E for array E)"
+   echo "                     use ALL for all arrays (A B C D E F G H I J K NA NB)"
    echo
    echo " input data and output directories for tables are fixed in CTA.MSCW_ENERGY.qsub_make_tables.sh"
    exit
@@ -28,6 +29,14 @@ fi
 TFIL=$1
 RECID=$2
 ARRAY=$3
+if [ $ARRAY == "ALL" ]
+then
+  VARRAY=( A B C D E F G H I J K NA NB )
+else 
+  VARRAY=( $ARRAY )
+fi
+NARRAY=${#VARRAY[@]}
+
 MINDIST="-1.e10"
 if [ -n "$4" ]
 then
@@ -69,27 +78,37 @@ mkdir -p $QLOG
 SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/"
 mkdir -p $SHELLDIR
 
+#loop over all arrays
+for (( N = 0 ; N < $NARRAY; N++ ))
+do
+   ARRAY=${VARRAY[$N]}
+   echo "STARTING ARRAY $ARRAY"
+
+# table file
+   TAFIL=$TFIL-$ARRAY
+
 # skeleton script
-FSCRIPT="CTA.MSCW_ENERGY.qsub_make_tables"
+   FSCRIPT="CTA.MSCW_ENERGY.qsub_make_tables"
 
-FNAM="$SHELLDIR/MSCW.table-$TFIL"
+   FNAM="$SHELLDIR/MSCW.table-$TAFIL"
 
-sed -e "s|TABLEFILE|$TFIL|" $FSCRIPT.sh > $FNAM-1.sh
-sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-1.sh > $FNAM-2.sh
-rm -f $FNAM-1.sh
-sed -e "s|WOMIIIIIN|$MINDIST|" $FNAM-2.sh > $FNAM-3.sh
-rm -f $FNAM-2.sh
-sed -e "s|WOMEEEEAN|$MEANDIST|" $FNAM-3.sh > $FNAM-4.sh
-rm -f $FNAM-3.sh
-sed -e "s|ARRRRRRR|$ARRAY|" $FNAM-4.sh > $FNAM-5.sh
-rm -f $FNAM-4.sh
-sed -e "s|WOMAXXXXX|$MAXDIST|" $FNAM-5.sh > $FNAM.sh
-rm -f $FNAM-5.sh
+   sed -e "s|TABLEFILE|$TAFIL|" $FSCRIPT.sh > $FNAM-1.sh
+   sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-1.sh > $FNAM-2.sh
+   rm -f $FNAM-1.sh
+   sed -e "s|WOMIIIIIN|$MINDIST|" $FNAM-2.sh > $FNAM-3.sh
+   rm -f $FNAM-2.sh
+   sed -e "s|WOMEEEEAN|$MEANDIST|" $FNAM-3.sh > $FNAM-4.sh
+   rm -f $FNAM-3.sh
+   sed -e "s|ARRRRRRR|$ARRAY|" $FNAM-4.sh > $FNAM-5.sh
+   rm -f $FNAM-4.sh
+   sed -e "s|WOMAXXXXX|$MAXDIST|" $FNAM-5.sh > $FNAM.sh
+   rm -f $FNAM-5.sh
 
-chmod u+x $FNAM.sh
+   chmod u+x $FNAM.sh
 
 # submit the job
-qsub -l h_cpu=12:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+   qsub -l h_cpu=12:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+done
 
 echo "batch output and error files are written to $QLOG"
 
