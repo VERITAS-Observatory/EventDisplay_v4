@@ -996,7 +996,7 @@ int main(int argc, char **argv)
    cout << "DST tree will be written to " << dst_file << endl;
    if( fWriteFADC ) cout << "(writing FADC samples to DST file)" << endl;
    else             cout << "(no FADC output)" << endl;
-   if( fApplyCameraScaling ) cout << "Apply camera plate scaling for DC telescopes" << endl;
+   if( fApplyCameraScaling ) cout << "Apply camera plate scaling for DC (intermediate) telescopes" << endl;
 
 // new DST tree
    VDSTTree *fDST = new VDSTTree();

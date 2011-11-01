@@ -278,6 +278,8 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        b.setWriteParticleNumberFile( "particleNumbers.tmp.root" );
 // energy range to be plotted
        b.setEnergyRange_Lin( 0.01, 150. );
+// significance parameters
+       b.setSignificanceParameter( 5., 10., 50., 10. );
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
@@ -941,6 +943,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor, double iObservatio
       c->cd();
       hGammaEffArea->SetLineWidth( 2 );
       hGammaEffArea->SetLineColor( iColor );
+      hGammaEffArea->SetMarkerColor( iColor );
       hGammaEffArea->Draw( "same" );
    }
 
@@ -952,6 +955,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor, double iObservatio
       hBGRate->Scale( 60. * 60. * iObservationTime_hours );
       hBGRate->SetLineWidth( 2 );
       hBGRate->SetLineColor( iColor );
+      hBGRate->SetMarkerColor( iColor );
       hBGRate->Draw( "same" );
    }
 
@@ -962,6 +966,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor, double iObservatio
       c->cd();
       hDiffSens->SetLineWidth( 2 );
       hDiffSens->SetLineColor( iColor );
+      hDiffSens->SetMarkerColor( iColor );
       hDiffSens->Draw( "same" );
    }
 }
