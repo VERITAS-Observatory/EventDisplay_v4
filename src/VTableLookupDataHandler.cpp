@@ -537,9 +537,9 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     fEmissionHeightCalculator->setTelescopePositions( fNTel, fTelX, fTelY, fTelZ );
 
 // define trigger histogram
-    long int nBinsX = 0;
-    if( fNTel < 32 ) nBinsX = (int)pow(2.,(double)fNTel);
-    else             nBinsX = 32;
+    Int_t nBinsX = 0;
+    if( fNTel < 28 ) nBinsX = (Int_t)pow(2.,(double)fNTel);
+    else             nBinsX = 28;
     hTrigPattern = new TH1D( "hTrigPattern", "", nBinsX, 0., pow(2.,(double)fNTel) );
     hTrigPattern->SetStats( 0 );
     hTrigPattern->SetFillColor( 4 );
