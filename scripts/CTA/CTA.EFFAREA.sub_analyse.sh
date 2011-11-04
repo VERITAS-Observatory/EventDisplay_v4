@@ -12,21 +12,21 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <array> <recid> <particle> <input> <cutfile template> <outputdirectory> [erec method]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <input> <cutfile template> <outputdirectory>"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
    echo 
    echo "(note: shape cuts hardwired)"
    echo
-   echo "<array>"
-   echo "     subarray for analysis (e.g. E)"
+   echo "<subarray>"
+   echo "     subarray for analysis (e.g. array E)"
    echo
    echo "<recid>"
    echo "     reconstruction ID from array reconstruction"
    echo
    echo "<particle>"
-   echo "     gamma_onSource / gamma_cone10 / electron / proton / proton_onSource / helium "
+   echo "     gamma_onSource / gamma_cone10 / electron / electron_onSource / proton / proton_onSource / helium "
    echo
    echo "<input>"
    echo "     msc      use mscw files as input (slow, but necessary at least once)"
@@ -37,9 +37,6 @@ then
    echo
    echo "<outputdirectory>"
    echo "     directory with all result and log files"
-   echo
-   echo "[erec method]"
-   echo "     energy reconstruction method (default=0)"
    echo
    exit
 fi
@@ -59,13 +56,9 @@ INPU=$4
 CFIL=$5
 ODIR=$6
 EREC=0
-if [ -n "$7" ]
-then
-  EREC="$7"
-fi
 
 # check particle type
-if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ]
+if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ]
 then
    echo "unknown particle type: " $PART
    exit
@@ -89,7 +82,8 @@ QSHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir"
 echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
-DDIR=$CTA_DATA_DIR/analysis/$ARRAY/Analysis/
+#DDIR=$CTA_DATA_DIR/analysis/$ARRAY/Analysis/
+DDIR=$CTA_USER_DATA_DIR/analysis/$ARRAY/Analysis/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
@@ -97,7 +91,7 @@ FDIR=$CTA_USER_LOG_DIR"/queueEffArea/$DATE/"
 echo $FDIR
 mkdir -p $FDIR
 echo "output data directory"
-#ODIR=$CTA_USER_DATA_DIR"/analysis/EffectiveArea/$ARRAY/$DATE/"
+#ODIR=$CTA_USER_DATA_DIR"/analysis/$ARRAY/EffectiveArea/$DATE/"
 echo $ODIR
 mkdir -p $ODIR
 
@@ -108,17 +102,17 @@ mkdir -p $ODIR
 # on source gamma rays
 if [ $PART = "gamma_onSource" ]
 then
-   MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID".mscw.root
+   MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_onSource."$ARRAY"_ID"$RECID".eff
-   MCFIL=gamma_onSource."$ARRAY"_ID2.eff
+   MCFIL=gamma_onSource."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
 #   THETA2MAX=( 0.008 )
 #   THETA2MAX=( 0.04 )
-# using TMVA
+# using TMVA or angular resolution
    THETA2MAX=( -1. )
    ISOTROPY="0"
    AZBINS="0"
@@ -128,31 +122,37 @@ fi
 # isotropic gamma-rays: analyse in rings in camera distance
 if [ $PART = "gamma_cone10" ]
 then
-   MSCFILE=$DDIR/gamma_cone10*."$ARRAY"_ID"$RECID".mscw.root
+   MSCFILE=$DDIR/gamma_cone10."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
-   OFIL=gamma_cone10.v2."$ARRAY"_ID"$RECID".eff
-   MCFIL=gamma_cone10.v2."$ARRAY"_ID2.eff
+   OFIL=gamma_cone10."$ARRAY"_ID"$RECID".eff
+   MCFIL=gamma_cone10."$ARRAY"_ID0.eff
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
    OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
-   THETA2MAX=( 0.008 )
+   THETA2MAX=( -1. )
    ISOTROPY="0"
    AZBINS="0"
    TELTYPECUTS="1"
    DIRECTIONCUT="2"
 fi
-if [ $PART = "electron" ]
+if [ $PART = "electron" ] || [ $PART = "electron_onSource" ]
 then
-   MSCFILE=$DDIR/electron*."$ARRAY"_ID"$RECID".mscw.root
+   MSCFILE=$DDIR/electron."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=electron."$ARRAY"_ID"$RECID".eff
-   MCFIL=electron."$ARRAY"_ID2.eff
+   MCFIL=electron."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
-   THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
-   THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+   if [ $PART = "electron" ]
+   then
+      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
+      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+   else
+      THETA2MIN=( 0. )
+      THETA2MAX=( 1. )
+   fi   
    ISOTROPY="1"
    AZBINS="0"
    TELTYPECUTS="1"
@@ -162,8 +162,8 @@ if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
 then
    MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
-   OFIL=proton.v2."$ARRAY"_ID"$RECID".eff
-   MCFIL=proton.v2."$ARRAY"_ID2.eff
+   OFIL=proton."$ARRAY"_ID"$RECID".eff
+   MCFIL=proton."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -182,10 +182,10 @@ then
 fi
 if [ $PART = "helium" ]
 then
-   MSCFILE=$DDIR/helium*."$ARRAY"_ID"$RECID".mscw.root
+   MSCFILE=$DDIR/helium*."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=helium."$ARRAY"_ID"$RECID".eff
-   MCFIL=helium."$ARRAY"_ID2.eff
+   MCFIL=helium."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -215,7 +215,7 @@ do
 
 ###############################################################################
 # theta2 cut of protons and electron should match the rings from the isotropic gammas
-      if [ $PART = "proton" ] || [ $PART = "proton_onSource" ] || [ $PART = "electron" ] || [ $PART = "helium" ]
+      if [ $PART = "proton" ] || [ $PART = "proton_onSource" ] || [ $PART = "electron" ] || [ $PART = "electron_onSource" ] || [ $PART = "helium" ]
       then
          jMIN=$(echo "$jMIN*$jMIN" | bc -l )
          jMAX=$(echo "$jMAX*$jMAX" | bc -l )
@@ -225,6 +225,12 @@ do
 # create cut file
       iCBFILE=`basename $CFIL`      
       iCFIL=$FDIR/effectiveArea-CTA-$PART-$i-$j.$iCBFILE
+      if [ ! -e $CFIL ]
+      then
+        echo "ERROR: cut file does not exist"
+	echo $CFIL
+	exit
+      fi
       cp -f $CFIL $iCFIL
 
       sed -e "s|OFFMIN|$iMIN|" $iCFIL > $iCFIL-a
@@ -237,7 +243,9 @@ do
       rm -f $iCFIL-c
       sed -e "s|DIRECTIONCUT|$DIRECTIONCUT|" $iCFIL-d > $iCFIL-e
       rm -f $iCFIL-d
-      mv -f $iCFIL-e $iCFIL
+      sed -e "s|SUBARRAY|$ARRAY|" $iCFIL-e > $iCFIL-f
+      rm -f $iCFIL-e
+      mv -f $iCFIL-f $iCFIL
       echo $iCFIL
 
 ###############################################################################
@@ -276,7 +284,7 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.6 0.1" >> $MSCF
       fi
-      if [ $PART = "electron" ] 
+      if [ $PART = "electron" ] || [ $PART = "electron_onSource" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 3.0 0.1" >> $MSCF
       fi
@@ -292,8 +300,9 @@ do
       fi
       if [ $INPU = "eff" ]
       then
-#         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/E/stdCuts/$OFIL-$i-$j.root" >> $MSCF
-         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/E/stdCuts/$MCFIL-$i-$j.root" >> $MSCF
+#         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/E/stdCuts/$MCFIL-$i-$j.root" >> $MSCF
+#         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/E/reconstructionParameter_d20111020_LL/EffectiveAreas/mscEffArea/$MCFIL-$i-$j.root" >> $MSCF
+	 echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/$ARRAY/EffectiveAreas/mscEffArea/$MCFIL-$i-$j.root" >> $MSCF
       fi
 
 # output file
@@ -329,7 +338,12 @@ do
       if [ $INPU = "eff" ]
       then
          echo "submitting to short queue"
-         qsub -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+	 if [ $PART = "gamma_onSource" ]
+	 then
+            qsub -l h_cpu=01:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+         else
+            qsub -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+         fi
       fi
    done
 done

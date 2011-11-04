@@ -35,7 +35,7 @@ set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly -sho
 #set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly"
 
 # analyse MC file
-$EVNDISPSYS/bin/mscw_energy $MOPT -tablefile $TABFIL.root -inputfile "$IFIL*.root" -outputfile $ODIR/$TFIL.root >& $LDIR/$TFIL.log
+$EVNDISPSYS/bin/mscw_energy $MOPT -tablefile $TABFIL-$ARRAY.root -inputfile "$IFIL*.root" -outputfile $ODIR/$TFIL.root >& $LDIR/$TFIL.log
 
 # sleep
 sleep 2

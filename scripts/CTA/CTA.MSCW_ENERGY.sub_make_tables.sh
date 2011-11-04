@@ -9,15 +9,16 @@
 #
 #
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <array ID> [min distance to camera center] [max distance to camera centre] [mean distance to camera centre]"
+   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <array ID> <onSource/cone>"
    echo ""
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
    echo "  <array ID>         CTA array ID (e.g. E for array E)"
    echo "                     use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <onSource/cone>    calculate tables for on source or different wobble offsets"
    echo
    echo " input data and output directories for tables are fixed in CTA.MSCW_ENERGY.qsub_make_tables.sh"
    exit
@@ -36,22 +37,30 @@ else
   VARRAY=( $ARRAY )
 fi
 NARRAY=${#VARRAY[@]}
+CONE="FALSE"
+if [ $4 == "cone" ]
+then
+  CONE="TRUE"
+fi
 
-MINDIST="-1.e10"
-if [ -n "$4" ]
+
+#########################################
+# arrays for different wobble offsets
+#########################################
+DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/"
+if [ $CONE == "TRUE" ]
 then
-   MINDIST=$4
+   OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
+   OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
+   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+   DSUF="gamma_cone10/1"
+else
+   OFFMIN=( "-1.e10" )
+   OFFMAX=( "1.e10" )
+   OFFMEA=( 0.0 )
+   DSUF="gamma_onSource/[3-5]"
 fi
-MAXDIST="1.e10"
-if [ -n "$5" ]
-then
-   MAXDIST=$5
-fi
-MEANDIST="0.0"
-if [ -n "$6" ]
-then
-   MEANDIST=$6
-fi
+NOFF=${#OFFMIN[@]}
 
 #########################################
 # checking the path for binary
@@ -78,38 +87,58 @@ mkdir -p $QLOG
 SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/"
 mkdir -p $SHELLDIR
 
+# skeleton script
+   FSCRIPT="CTA.MSCW_ENERGY.qsub_make_tables"
+
+#########################################
 #loop over all arrays
+#########################################
 for (( N = 0 ; N < $NARRAY; N++ ))
 do
    ARRAY=${VARRAY[$N]}
    echo "STARTING ARRAY $ARRAY"
 
+# data dir
+   DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/$DSUF"
+
 # table file
    TAFIL=$TFIL-$ARRAY
 
-# skeleton script
-   FSCRIPT="CTA.MSCW_ENERGY.qsub_make_tables"
+#########################################
+#loop over wobble offsets
+#########################################
 
-   FNAM="$SHELLDIR/MSCW.table-$TAFIL"
+   for (( M = 0 ; M < $NOFF; M++ ))
+   do
+      MINDIST=${OFFMIN[$M]}
+      MAXDIST=${OFFMAX[$M]}
+      MEANDIST=${OFFMEA[$M]}
 
-   sed -e "s|TABLEFILE|$TAFIL|" $FSCRIPT.sh > $FNAM-1.sh
-   sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-1.sh > $FNAM-2.sh
-   rm -f $FNAM-1.sh
-   sed -e "s|WOMIIIIIN|$MINDIST|" $FNAM-2.sh > $FNAM-3.sh
-   rm -f $FNAM-2.sh
-   sed -e "s|WOMEEEEAN|$MEANDIST|" $FNAM-3.sh > $FNAM-4.sh
-   rm -f $FNAM-3.sh
-   sed -e "s|ARRRRRRR|$ARRAY|" $FNAM-4.sh > $FNAM-5.sh
-   rm -f $FNAM-4.sh
-   sed -e "s|WOMAXXXXX|$MAXDIST|" $FNAM-5.sh > $FNAM.sh
-   rm -f $FNAM-5.sh
+# run scripts
+      FNAM="$SHELLDIR/MSCW.table-$TAFIL-W$MEANDIST"
 
-   chmod u+x $FNAM.sh
+      sed -e "s|TABLEFILE|$TAFIL|" $FSCRIPT.sh > $FNAM-1.sh
+      sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-1.sh > $FNAM-2.sh
+      rm -f $FNAM-1.sh
+      sed -e "s|WOMIIIIIN|$MINDIST|" $FNAM-2.sh > $FNAM-3.sh
+      rm -f $FNAM-2.sh
+      sed -e "s|WOMEEEEAN|$MEANDIST|" $FNAM-3.sh > $FNAM-4.sh
+      rm -f $FNAM-3.sh
+      sed -e "s|ARRRRRRR|$ARRAY|" $FNAM-4.sh > $FNAM-5.sh
+      rm -f $FNAM-4.sh
+      sed -e "s|WOMAXXXXX|$MAXDIST|" $FNAM-5.sh > $FNAM-6.sh
+      rm -f $FNAM-5.sh
+      sed -e "s|DATADIRECT|$DDIR|" $FNAM-6.sh > $FNAM.sh
+      rm -f $FNAM-6.sh
+
+      chmod u+x $FNAM.sh
 
 # submit the job
-   qsub -l h_cpu=12:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -l h_cpu=25:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+   done
 done
 
+echo "shell scripts are written to $SHELLDIR"
 echo "batch output and error files are written to $QLOG"
 
 

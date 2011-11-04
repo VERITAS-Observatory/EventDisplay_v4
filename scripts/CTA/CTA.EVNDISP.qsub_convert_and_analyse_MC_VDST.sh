@@ -21,6 +21,7 @@ MET=MEEET
 if [ $SUBA = "ALL" ] 
 then
   FIELD=( A B C D E F G H I J K NA NB )
+#  FIELD=( "s4-2-120" "s4-2-85" "s4-1-120" )
 else
   FIELD=( $SUBA )
 fi

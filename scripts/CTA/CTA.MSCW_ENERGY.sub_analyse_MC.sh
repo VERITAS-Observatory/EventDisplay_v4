@@ -11,16 +11,18 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray> <particle> [LL/GEO] [wildcard]"
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray> <particle> [wildcard]"
    echo
    echo "  <tablefile>     table file name (without .root)"
+   echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
    echo "  <recid>         reconstruction ID"
    echo "  <subarray>      subarray identifier (A,B,C...)"
-   echo "  <particle>      gamma_onSource/gamma_cone10/electron/proton/helium"
+   echo "                  use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <particle>      gamma_onSource / gamma_cone10 / electron / proton / helium"
    echo
    echo "optional (for a huge amount of MC files):"
-   echo "  [LL/GEO]        image reconstruction method (not implemented yet)"
    echo "  [wildcard]     used in the < CTA.MSCW_ENERGY.subParallel_analyse_MC.sh > script"
+   echo
    exit
 fi
 
@@ -29,16 +31,21 @@ fi
 TABLE=$1
 RECID=$2
 SUBAR=$3
-PART=$4
-METH=""
-if [ -n "$5" ]
-then 
-    METH=$5
-fi
-WC=""
-if [ -n "$6" ]
+if [ $SUBAR == "ALL" ]
 then
-   WC=$6
+#  VARRAY=( A B C D E F G H I J K NA NB )
+  VARRAY=( B C D E F G H I J K NA )
+else
+  VARRAY=( $SUBAR )
+fi
+NARRAY=${#VARRAY[@]}
+
+PART=$4
+METH="LL"
+WC=""
+if [ -n "$5" ]
+then
+   WC=$5
 fi
 
 #########################################
@@ -48,20 +55,6 @@ then
     echo "no EVNDISPSYS env variable defined"
     exit
 fi
-
-#########################################
-# input files
-IFIL="$CTA_DATA_DIR/analysis/$SUBAR/$PART/$WC"
-
-# check if input files exist
-IFILN=`ls -1 $IFIL*.root | wc -l`
-if [ $IFILN -eq 0 ]
-then
-  echo "No input files in $IFIL"
-  echo "exiting..."
-  exit
-fi
-echo "FOUND $IFILN input files in $IFIL"
 
 #########################################
 # output directory for error/output from batch system
@@ -74,37 +67,60 @@ mkdir -p $QLOG
 SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/"
 mkdir -p $SHELLDIR
 
-# output file name for mscw_energy
-TFIL=$PART$NC"."$SUBAR"_ID"$RECID".mscw"
-if [ ${#WC} -gt 0 ]
-then 
-   TFIL=$PART$NC"."$SUBAR"_ID"$RECID"-$WC.mscw"
-fi
+#########################################
+#loop over all arrays
+#########################################
+for (( N = 0 ; N < $NARRAY; N++ ))
+do
+   SUBAR=${VARRAY[$N]}
+   echo "STARTING ARRAY $SUBAR"
 
+#########################################
+# input files
+#IFIL="$CTA_DATA_DIR/analysis/$SUBAR/$PART/$WC"
+   IFIL="$CTA_USER_DATA_DIR/analysis/$SUBAR/$PART/$WC"
+
+# check if input files exist
+   IFILN=`ls -1 $IFIL*.root | wc -l`
+   if [ $IFILN -eq 0 ]
+   then
+     echo "No input files in $IFIL"
+     echo "exiting..."
+     exit
+   fi
+   echo "FOUND $IFILN input files in $IFIL"
+
+
+# output file name for mscw_energy
+   TFIL=$PART$NC"."$SUBAR"_ID"$RECID".mscw"
+   if [ ${#WC} -gt 0 ]
+   then 
+      TFIL=$PART$NC"."$SUBAR"_ID"$RECID"-$WC.mscw"
+   fi
 
 # skeleton script
-FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
+   FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
 
-FNAM="$SHELLDIR/MSCW.ana-ID$RECID-array$SUBAR"
+   FNAM="$SHELLDIR/MSCW.ana-ID$RECID-$PART-array$SUBAR"
 
-sed -e "s|TABLEFILE|$TABLE|" $FSCRIPT.sh > $FNAM-1.sh
-sed -e "s|IIIIFIL|$IFIL|" $FNAM-1.sh > $FNAM-2.sh
-rm -f $FNAM-1.sh
-sed -e "s|TTTTFIL|$TFIL|" $FNAM-2.sh > $FNAM-3.sh
-rm -f $FNAM-2.sh
-sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-3.sh > $FNAM-4.sh
-rm -f $FNAM-3.sh
-sed -e "s|ARRAYYY|$SUBAR|" $FNAM-4.sh > $FNAM.sh
-rm -f $FNAM-4.sh
+   sed -e "s|TABLEFILE|$TABLE|" $FSCRIPT.sh > $FNAM-1.sh
+   sed -e "s|IIIIFIL|$IFIL|" $FNAM-1.sh > $FNAM-2.sh
+   rm -f $FNAM-1.sh
+   sed -e "s|TTTTFIL|$TFIL|" $FNAM-2.sh > $FNAM-3.sh
+   rm -f $FNAM-2.sh
+   sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-3.sh > $FNAM-4.sh
+   rm -f $FNAM-3.sh
+   sed -e "s|ARRAYYY|$SUBAR|" $FNAM-4.sh > $FNAM.sh
+   rm -f $FNAM-4.sh
 
-chmod u+x $FNAM.sh
-echo $FNAM.sh
+   chmod u+x $FNAM.sh
+   echo $FNAM.sh
 
 # submit the job
-qsub -l h_cpu=10:30:00 -l h_vmem=6000M -l tmpdir_size=20G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
-#qsub -l h_cpu=04:30:00 -l h_vmem=3500M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
-echo "run script written to $FNAM.sh"
-echo "queue log and error files written to $QLOG"
+   qsub -l h_cpu=04:30:00 -l h_vmem=3500M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+   echo "run script written to $FNAM.sh"
+   echo "queue log and error files written to $QLOG"
+done
 
 exit
 

@@ -1,0 +1,85 @@
+#!/bin/bash
+#
+# submit jobs for effective area calculation
+#
+#
+
+
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
+then
+   echo ""
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray> <input> <cut file directory> <cutfile template> <output directory>"
+   echo
+   echo "<subarray>"
+   echo "     subarray identifier (A,B,C...)"
+   echo "     use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo
+   echo "<recid>"
+   echo "     reconstruction ID from array reconstruction"
+   echo
+   echo "<input>"
+   echo "     msc      use mscw files as input (slow, but necessary at least once)"
+   echo "     eff      use effective area files (note: hardwired file location)"
+   echo 
+   echo "<cutfile template>"
+   echo "     template for gamma/hadron cut file"
+   echo
+   echo ""
+   exit
+fi
+
+SUBAR=$1
+RECID=0
+ITYPE=$2
+CDIR=$3
+CFIL=$4
+ODIR=$5
+mkdir -p $ODIR
+
+#arrays
+if [ $SUBAR == "ALL" ]
+then
+  VARRAY=( A B C D E F G H I J K NA NB )
+else
+  VARRAY=( $SUBAR )
+fi
+NARRAY=${#VARRAY[@]}
+
+# particle types
+VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
+NPART=${#VPART[@]}
+
+#########################################
+#loop over all arrays
+#########################################
+for (( N = 0 ; N < $NARRAY; N++ ))
+do
+   ARRAY=${VARRAY[$N]}
+   echo "STARTING ARRAY $ARRAY"
+
+###########################################
+# loop over all particle types
+   for ((m = 0; m < $NPART; m++ ))
+   do
+      PART=${VPART[$m]}
+      echo "MC PARTICLE $PART"
+
+      CCUT=$ODIR/$CFIL.$PART.$ARRAY.dat
+      if [ $PART = "gamma_onSource" ]
+      then
+        cp $CDIR/$CFIL.gamma_onSource.dat $CCUT
+      fi
+      if [ $PART = "gamma_cone10" ]
+      then
+        cp $CDIR/$CFIL.gamma_cone10.dat $CCUT
+      fi
+      if [ $PART = "proton" ] || [ $PART = "electron" ] || [ $PART = "helium" ] 
+      then
+        cp $CDIR/$CFIL.CRbck.dat $CCUT
+      fi
+
+      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $ITYPE $CCUT $ODIR
+   done
+done
+
+exit
