@@ -360,6 +360,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    bitset<8*sizeof(unsigned long) > i_localTrigger;
    for( unsigned int t = 0; t < (unsigned int)hsdata->event.central.num_teltrg; t++ )
    {
+		if( hsdata->event.teldata[t].known == 0 ) continue; // the triggered telescopes without image data are skipped
       if( telescope_list.find( hsdata->event.central.teltrg_list[t] ) != telescope_list.end() )
       {
 	 if( hsdata->event.central.teltrg_list[t] < (int)i_localTrigger.size() )
@@ -406,6 +407,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
       {
          fData->fDSTtel_data[i_ntel_data] = (unsigned int)hsdata->event.central.teldata_list[i];
 	 unsigned int telID = fData->fDSTtel_data[i_ntel_data] - 1;
+	 if( hsdata->event.teldata[telID].known == 0 ) continue;
 
 ////////////////////////////////////////////////
 // get pixel (ADC) data
@@ -453,14 +455,16 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 
 // fill FADC trace
 // (NOTE: ignore possible low gain chain)
-                if( iWriteFADC && hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
+ //     cout<<"abcdef  "<<iWriteFADC<<"   "<<hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p]<<endl;
+			if( iWriteFADC && hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
 		{
 		   if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN] )
 		   {
 		      for( int t = 0; t < hsdata->event.teldata[telID].raw->num_samples; t++ )
 		      {
 			 fData->fDSTtrace[i_ntel_data][t][p] = hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN][p][t];
-		      }
+		   //   cout<<"adc_data:\ttel="<<i_ntel_data<<" pixel="<<p<<" sample="<<t<<" value="<<fData->fDSTtrace[i_ntel_data][t][p]<<endl;
+				}
 		   }
 		}
 
@@ -591,7 +595,8 @@ TTree* DST_fillCalibrationTree( AllHessData *hsdata, map< unsigned int, float > 
 	     fPed_low[p] = 0.;
           }
           fPedvar_high[p] = hsdata->tel_moni[itel].noise[HI_GAIN][p];
-          fPedvar_low[p] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
+          //cout<<"****************************************************************************************************        "<<p<<"  "<<itel<<"   "<<fPedvar_high[p]<<endl;
+			 fPedvar_low[p] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
           fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
           fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
        }
@@ -1355,7 +1360,8 @@ int main(int argc, char **argv)
             ntrg++;
 
 // fill EVNDISP DST event
-            DST_fillEvent( fDST, hsdata, fTelescope_list, fWriteFADC );
+            //cout<<"GO ONE EVENT !"<<endl;
+				DST_fillEvent( fDST, hsdata, fTelescope_list, fWriteFADC );
 
             break;
 
