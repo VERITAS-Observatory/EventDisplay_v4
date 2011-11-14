@@ -81,7 +81,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     void         setDebug( bool iB = true ) { fDebug = iB; }
     bool         setResolutionFitting( string iFitFunction = "", double iFitXmin = -1., double iFitXmax = 2. );
     void         setPlottingDefaults();
-    void         setPlottingLogEnergyAxis( bool iB = true ) { if( getPlottingAxis( "energy_X_Lin" ) ) getPlottingAxis( "energy_X_Lin" )->fLogAxis = iB; }
+    void         setPlottingLogEnergyAxis( bool iB = true ) { if( getPlottingAxis( "energy_Lin" ) ) getPlottingAxis( "energy_Lin" )->fLogAxis = iB; }
     bool         write_fitResolutionFunction( string iOutName, string iName = "" );
 
 };

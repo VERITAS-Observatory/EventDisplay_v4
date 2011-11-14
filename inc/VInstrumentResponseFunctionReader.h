@@ -36,7 +36,8 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 
     bool                             calculateCutEfficiencies();
     TGraphAsymmErrors*               calculateEffectiveAreaRatios( TGraphAsymmErrors *g0, TGraphAsymmErrors *g1 );
-    bool                             fillResolutionGraphfromHistogram( TH1F* h, TGraphAsymmErrors* g, bool bIgnoreErrors = false );
+    bool                             fillResolutionGraphfromHistogram( TH1F* h, TGraphAsymmErrors* g,
+                                                                       bool bIgnoreErrors = false, bool bLinXaxis = false );
     bool                             fillResolutionGraphfromHistogram( TH1F* h, TGraphErrors* g, bool bIgnoreErrors = false );
     VInstrumentResponseFunctionData* getIRFFromFile( TTree *, unsigned int );
     bool                             getDataFromFile();

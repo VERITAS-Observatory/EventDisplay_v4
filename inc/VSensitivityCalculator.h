@@ -190,7 +190,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 	void       plotDebugPlotsBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
                                                             map< unsigned int, vector< double > > i_flux_NOff,
 							    map< unsigned int, vector< double > > i_flux_NOff_error );
-        void       plotDebugPlotsParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux, double alpha = 1. );
+        void       plotDebugPlotsParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux, double alpha = 1., bool bDraw = true );
 
     public:
 
@@ -199,6 +199,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 
         unsigned int  addDataSet( double iGammaRayRate, double iBackGroundRate, double iAlpha, string iName );
         double   calculateObservationTimevsFlux( unsigned int iD );
+	bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 	bool     getDebug() { return fDebug; }
         double   getSensitivity( unsigned int iD, double iObservationTime = 50., double iSignificance = 5., double iMinEvents = 10, double iMinBackgroundFraction = 1.00, double energy = -1. );
 

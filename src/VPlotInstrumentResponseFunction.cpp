@@ -128,7 +128,9 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
     heff->Draw("");
     heff->Draw("AH");
 
-    plot_nullHistogram( iEffectiveAreaPlottingCanvas, heff, getPlottingAxis( "energy_Lin" )->fLogAxis, true, 1.3, getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
+    plot_nullHistogram( iEffectiveAreaPlottingCanvas, heff, getPlottingAxis( "energy_Lin" )->fLogAxis,
+                        getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
+			getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
 
     int z = 0;
     for( unsigned int i = 0; i < fData.size(); i++ )
@@ -151,7 +153,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
           z++;
        }
     } 
-    if( z > 0 ) iEffectiveAreaPlottingCanvas->SetLogy( 1 );
+    if( z > 0 && getPlottingAxis( "effarea_Lin" )->fLogAxis ) iEffectiveAreaPlottingCanvas->SetLogy( 1 );
 
     return iEffectiveAreaPlottingCanvas;
 }
@@ -283,11 +285,13 @@ void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iData
     if( !checkDataSetID( iDataSetID ) && iDataSetID < 999 ) return;
 
     char hname[200];
+    char htitle[200];
 
     sprintf( hname, "cEA_cuteffratio_%d_%d", iDataSetID, iCutID );
-    TCanvas *iCutEfficencyRatioPlottingCanvas = new TCanvas( hname, "cut efficiency ratio", 10, 10, 600, 600 );
-    iCutEfficencyRatioPlottingCanvas->SetGridx( 0 );
-    iCutEfficencyRatioPlottingCanvas->SetGridy( 0 );
+    sprintf( htitle, "cut efficiency ratio (%d, %d)", iDataSetID, iCutID ); 
+    TCanvas *iCutEfficencyRatioPlottingCanvas = new TCanvas( hname, htitle, 10, 10, 600, 600 );
+    iCutEfficencyRatioPlottingCanvas->SetGridx( 1 );
+    iCutEfficencyRatioPlottingCanvas->SetGridy( 1 );
 
     sprintf( hname, "hceffratio_%d", iDataSetID );
     TH1D *hceff = new TH1D( hname,"", 100, log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
@@ -295,7 +299,7 @@ void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iData
     hceff->SetXTitle( "log_{10} energy [TeV]" );
     hceff->SetYTitle( "cut efficiency (ratio)" );
     hceff->SetMinimum( 0. );
-    hceff->SetMaximum( 1.5 );
+    hceff->SetMaximum( 1.2 );
     hceff->Draw("");
     hceff->Draw("AH");
 
@@ -786,7 +790,8 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
        {
            if( fData[i]->fIRF_TreeNames[j] == iResolutionTreeName )
            {
-                if( j < fData[i]->fIRF_Data.size() && fData[i]->fIRF_Data[j] && i_Plotting_Selector < fData[i]->fIRF_Data[j]->fResolutionGraph.size() )
+                if( j < fData[i]->fIRF_Data.size() && fData[i]->fIRF_Data[j]
+		 && i_Plotting_Selector < fData[i]->fIRF_Data[j]->fResolutionGraph.size() )
                 {
 // try to get EVNDISP resolution graph
                     g = fData[i]->fIRF_Data[j]->fResolutionGraph[i_Plotting_Selector];
@@ -794,9 +799,11 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 // get containment probability (for first data set only)
                 if( g && i == 0 )
                 {
-                   if( j < fData[i]->fIRF_Data.size() && fData[i]->fIRF_Data[j] && i_Plotting_Selector < fData[i]->fIRF_Data[j]->fContainmentProbability.size() )
+                   if( j < fData[i]->fIRF_Data.size() && fData[i]->fIRF_Data[j] 
+		    && i_Plotting_Selector < fData[i]->fIRF_Data[j]->fContainmentProbability.size() )
                    {
-                       sprintf( hname, "%s (%d%%)", har->GetYaxis()->GetTitle(), (int)(fData[i]->fIRF_Data[j]->fContainmentProbability[i_Plotting_Selector]*100.) );
+                       sprintf( hname, "%s (%d%%)", har->GetYaxis()->GetTitle(), 
+		                                    (int)(fData[i]->fIRF_Data[j]->fContainmentProbability[i_Plotting_Selector]*100.) );
                        har->SetYTitle( hname );
                        plot_nullHistogram( iResolutionPlottingCanvas, har, i_Plotting_log, false, 1.6, i_Plotting_Min, i_Plotting_Max );
                    }
@@ -815,7 +822,6 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 	   {
 	       if( iName.find( "80" ) != string::npos )  g = fData[i]->gAngularResolution80;
 	       else                                      g = fData[i]->gAngularResolution;
-	       if( g ) cout << "CTA: found angular resolution" << endl;
 	   }
 	   if( !g )
 	   {

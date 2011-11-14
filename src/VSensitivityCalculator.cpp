@@ -500,6 +500,15 @@ TCanvas* VSensitivityCalculator::plotDifferentialSensitivityvsEnergyFromCrabSpec
    return plotSensitivityvsEnergyFromCrabSpectrum( cSensitivity, iAnasumCrabFile, iColor, bUnit, dE_Log10, iEnergyMin_TeV_lin, iEnergyMax_TeV_lin );
 }
 
+bool VSensitivityCalculator::calculateParticleNumberGraphs_MC( double dE_Log10 )
+{
+    double alpha = 1.;
+    vector< VDifferentialFlux > i_DifferentialFlux = getDifferentialFluxVectorfromMC( dE_Log10, alpha );
+    plotDebugPlotsParticleNumbers( i_DifferentialFlux, alpha, false );
+
+    return true;
+}
+
 
 /*
 
@@ -1143,6 +1152,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
         if( fMC_Data[1]->effArea_Ebins != (*i_MCData_iterator).second->effArea_Ebins )
 	{
+	   cout << "XXX " << fMC_Data[1]->effArea_Ebins << "\t" << (*i_MCData_iterator).second->effArea_Ebins << endl;
 	   return getDifferentialFluxVectorfromMC_ErrorMessage( "diffent number of bins in gamma and background effective areas" );
         }
         if( TMath::Abs( fMC_Data[1]->effArea_Emin - (*i_MCData_iterator).second->effArea_Emin ) > 0.05
@@ -1617,17 +1627,21 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
     {
         c->GetEntry( i );
 
-        if( TMath::Abs( c->index - iMCPara->index ) > 1.e-2 ) continue;
+// do selection of effective areas only if there are several effective areas
+	if( c->fChain->GetEntries() > 1 )
+	{
+	   if( TMath::Abs( c->index - iMCPara->index ) > 1.e-2 ) continue;
 
-        if( c->noise != iMCPara->noise ) continue;
+	   if( c->noise != iMCPara->noise ) continue;
 
-        if( c->az != iMCPara->az ) continue;
+	   if( c->az != iMCPara->az ) continue;
 
-// ignore everything else for non-gammas (wobble offsets and zenith angles)
-        if( iMCPara->fParticleID == 1 )
-        {
-            if( TMath::Abs( c->ze - iMCPara->ze ) > 2. ) continue;
-            if( TMath::Abs( c->Woff - iMCPara->woff ) > 0.05 ) continue;
+   // ignore everything else for non-gammas (wobble offsets and zenith angles)
+	   if( iMCPara->fParticleID == 1 )
+	   {
+	       if( TMath::Abs( c->ze - iMCPara->ze ) > 2. ) continue;
+	       if( TMath::Abs( c->Woff - iMCPara->woff ) > 0.05 ) continue;
+	   }
         }
 
         cout << "\t found effective area " << i << " with " << c->nbins << " bins" << endl;
@@ -1935,11 +1949,8 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
 }
 
 
-void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux, double alpha )
+void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux, double alpha, bool bDraw )
 {
-    if( cPlotDebug.size() != 3 ) return;
-
-    if( !cPlotDebug[0] || !cPlotDebug[0]->cd() ) return;
 
     TGraphAsymmErrors *gNon = new TGraphAsymmErrors( 1 );
     gNon->SetMinimum( 0.0001 );
@@ -1962,12 +1973,18 @@ void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentia
             z++;
         }
     }
-    gNon->Draw( "ap" );
-    gNon->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
-    gNon->GetHistogram()->SetYTitle( "number of non/noff" );
-    gNoff->Draw( "p" );
+    if( bDraw )
+    {
+       if( cPlotDebug.size() != 3 ) return;
 
-    cPlotDebug[0]->Update();
+       if( !cPlotDebug[0] || !cPlotDebug[0]->cd() ) return;
+       gNon->Draw( "ap" );
+       gNon->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
+       gNon->GetHistogram()->SetYTitle( "number of non/noff" );
+       gNoff->Draw( "p" );
+
+       cPlotDebug[0]->Update();
+    }
 
 // write graphs with on and off events to disk
     if( fDebugParticleNumberFile.size() > 0 )

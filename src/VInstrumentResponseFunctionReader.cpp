@@ -146,32 +146,65 @@ bool VInstrumentResponseFunctionReader::fillData()
 */
 bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 {
+    bool bLinX = false;  // energy axis for effective areas
 
 // gamma-ray effective area
     TH1F *h = (TH1F*)gDirectory->Get( "EffectiveArea" );
-    if( !h ) return false;
+    if( !h )
+    {
+       h = (TH1F*)gDirectory->Get( "harea_gamma" );
+       if( !h ) return false;
+       bLinX = true;
+    }
     
     cout << "reading CTA-style file" << endl;
 
     gEffArea_MC = new TGraphAsymmErrors( 1 );
     setGraphPlottingStyle( gEffArea_MC );
+    fillResolutionGraphfromHistogram( h, gEffArea_MC, false, bLinX );
 
-    fillResolutionGraphfromHistogram( h, gEffArea_MC );
+///////////////////////////////////////////////////////////////
+// name and axis units are not consistent in the CTA files!!!
+///////////////////////////////////////////////////////////////
 
 // energy resolution
     gEnergyResolution = new TGraphErrors( 1 );
+// try Paris style file
     h = (TH1F*)gDirectory->Get( "ERes" );
+    if( !h )
+    {
+       h = (TH1F*)gDirectory->Get( "EnResol_RMS" );
+    }
     fillResolutionGraphfromHistogram( h, gEnergyResolution );
     setGraphPlottingStyle( gEnergyResolution );
 
 // angular resolution
     gAngularResolution = new TGraphErrors( 1 );
     h = (TH1F*)gDirectory->Get( "AngRes" );
+// try Paris style file
+    if( !h )
+    {
+       h = (TH1F*)gDirectory->Get( "AngResolution68" );
+// arcmin -> deg
+       if( h ) 
+       {
+          h->Scale( 1./60. );
+       }
+    }
     fillResolutionGraphfromHistogram( h, gAngularResolution, true );   // ignore errors in resolution graph
     setGraphPlottingStyle( gAngularResolution );
 
     gAngularResolution80 = new TGraphErrors( 1 );
     h = (TH1F*)gDirectory->Get( "AngRes80" );
+    if( !h )
+    {
+       h = (TH1F*)gDirectory->Get( "AngResolution80" );
+// arcmin -> deg
+       if( h ) 
+       {
+          h->Scale( 1./60. );
+       }
+    }
     fillResolutionGraphfromHistogram( h, gAngularResolution80, true );   // ignore errors in resolution graph
     setGraphPlottingStyle( gAngularResolution80 );
 
@@ -197,7 +230,7 @@ bool VInstrumentResponseFunctionReader::fillResolutionGraphfromHistogram( TH1F *
 }
 
 
-bool VInstrumentResponseFunctionReader::fillResolutionGraphfromHistogram( TH1F *h, TGraphAsymmErrors *g, bool bIgnoreErrors )
+bool VInstrumentResponseFunctionReader::fillResolutionGraphfromHistogram( TH1F *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis )
 {
     if( !h || !g ) return false;
 
@@ -206,7 +239,15 @@ bool VInstrumentResponseFunctionReader::fillResolutionGraphfromHistogram( TH1F *
     {
         if( h->GetBinContent( i ) > 0. )
 	{
-	   g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
+	   if( !bLinXaxis ) g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
+	   else
+	   {
+	      if( h->GetXaxis()->GetBinCenter( i ) > 0. )
+	      {
+	         g->SetPoint( z, TMath::Log10( h->GetXaxis()->GetBinCenter( i ) ), h->GetBinContent( i ) );
+              }
+	      else continue;
+           }
 	   if( bIgnoreErrors )
 	   {
 	      g->SetPointEYlow( z, 0. );
