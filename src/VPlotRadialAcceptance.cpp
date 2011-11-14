@@ -70,8 +70,13 @@ TCanvas* VPlotRadialAcceptance::plot( TCanvas *cX )
        return 0;
     }
 
+    bool bPlotSame = false;
 // canvas
-    if( cX ) cX->cd();
+    if( cX )
+    {
+       cX->cd();
+       bPlotSame = true;
+    }
     else
     {
        char hname[2000];
@@ -92,19 +97,22 @@ TCanvas* VPlotRadialAcceptance::plot( TCanvas *cX )
        fAcceptanceHisto->SetAxisRange( 0., 3.5 );
        fAcceptanceHisto->SetTitle( "" );
        setHistogramPlottingStyle( fAcceptanceHisto, getPlottingColor(), 1., 1.5, 20 );
-       fAcceptanceHisto->Draw( "e" );
+       if( bPlotSame ) fAcceptanceHisto->Draw( "e same" );
+       else            fAcceptanceHisto->Draw( "e" );
        fAcceptanceHisto->GetYaxis()->SetTitleOffset( 1.2 );
     }
-    if( fAcceptanceHisto )
-    {
-       fAcceptanceHisto->Draw( "e same" );
-    }
+//    if( fAcceptanceHisto )
+//    {
+//       fAcceptanceHisto->Draw( "e same" );
+//    }
     if( fAcceptanceHistoFit ) 
     {
+       setHistogramPlottingStyle( fAcceptanceHistoFit, getPlottingColor(), 1., 1.5, 20 );
        fAcceptanceHistoFit->Draw( "same" );
     }
     if( fAcceptanceFunction )
     {
+       setFunctionPlottingStyle( fAcceptanceFunction, getPlottingColor() );
        fAcceptanceFunction->Draw( "same" );
     }
 
