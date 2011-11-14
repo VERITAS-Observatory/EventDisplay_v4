@@ -48,13 +48,13 @@ Options:
 
 ///////////////////////////////////////////////////////
 // maximum number of pixels for the current array configuration
-unsigned int fGlobalMaxNumberofPixels;
+unsigned int fGlobalMaxNumberofPixels = 0;
 // maximum number of FADC samples for the current array configuration
-unsigned int fGlobalMaxNumberofSamples;
+unsigned int fGlobalMaxNumberofSamples = 0;
 // maximum number of telescopes in previous event
-unsigned int fGlobalNTelPreviousEvent;
+unsigned int fGlobalNTelPreviousEvent = 0;
 // set if this event does not pass the minimum number of telescope condition
-bool fGlobalTriggerReset;
+bool fGlobalTriggerReset = false;
 ///////////////////////////////////////////////////////
 
 /*!
@@ -309,9 +309,9 @@ bool DST_fillMCEvent( VDSTTree *fData, AllHessData *hsdata )
    fData->fDSTycore = hsdata->mc_event.xcore;
 /////////////////////////////////////////////////////////////////////////////
 // calculate offset in camera coordinates from telescope and MC direction
-// (OBS: HARDWIRED CORSIKA DIRECTION)
-   double i_tel_el = 70.;
-   double i_tel_az = 90.;
+// (Note: assume that all telescope point into the same direction)
+   double i_tel_el = hsdata->run_header.direction[1]*TMath::RadToDeg();
+   double i_tel_az = hsdata->run_header.direction[0]*TMath::RadToDeg();
    float i_x = 0.;
    float i_y = 0.;
    float i_z = 0.;
@@ -455,7 +455,6 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 
 // fill FADC trace
 // (NOTE: ignore possible low gain chain)
- //     cout<<"abcdef  "<<iWriteFADC<<"   "<<hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p]<<endl;
 			if( iWriteFADC && hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
 		{
 		   if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN] )
@@ -463,8 +462,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 		      for( int t = 0; t < hsdata->event.teldata[telID].raw->num_samples; t++ )
 		      {
 			 fData->fDSTtrace[i_ntel_data][t][p] = hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN][p][t];
-		   //   cout<<"adc_data:\ttel="<<i_ntel_data<<" pixel="<<p<<" sample="<<t<<" value="<<fData->fDSTtrace[i_ntel_data][t][p]<<endl;
-				}
+    		      }
 		   }
 		}
 
@@ -595,8 +593,7 @@ TTree* DST_fillCalibrationTree( AllHessData *hsdata, map< unsigned int, float > 
 	     fPed_low[p] = 0.;
           }
           fPedvar_high[p] = hsdata->tel_moni[itel].noise[HI_GAIN][p];
-          //cout<<"****************************************************************************************************        "<<p<<"  "<<itel<<"   "<<fPedvar_high[p]<<endl;
-			 fPedvar_low[p] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
+ 	  fPedvar_low[p] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
           fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
           fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
        }
@@ -856,7 +853,8 @@ int main(int argc, char **argv)
    cout << endl;
    cout << "c_DST: A program to convert hessio data to EVNDISP DST files";
    cout << " (" << VGlobalRunParameter::fEVNDISP_VERSION << ")" << endl;
-   cout << "=====================================================================" << endl << endl;
+   cout << "=====================================================================" << endl;
+   cout << "(SVN " << VGlobalRunParameter::fEVNDISP_SVNREVISION << ")" << endl;
    
    /* Show command line on output */
    if ( getenv("SHOWCOMMAND") != NULL )
@@ -988,7 +986,6 @@ int main(int argc, char **argv)
       showhistory = 1;
 
 ///////////////////////////////////////////////////////////////////
-   cout << endl << "NOTE: FIXED ZE/AZ FOR SHOWERS WITH NO DATA (20/90)" << endl;
    cout << endl << "NOTE: FIXED TIMING LEVELS!!" << endl << endl;
 ///////////////////////////////////////////////////////////////////
 // open DST file
@@ -1360,8 +1357,7 @@ int main(int argc, char **argv)
             ntrg++;
 
 // fill EVNDISP DST event
-            //cout<<"GO ONE EVENT !"<<endl;
-				DST_fillEvent( fDST, hsdata, fTelescope_list, fWriteFADC );
+	    DST_fillEvent( fDST, hsdata, fTelescope_list, fWriteFADC );
 
             break;
 

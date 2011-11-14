@@ -75,6 +75,7 @@ class VGlobalRunParameter
    static unsigned int getEVNDISP_TREE_VERSION() { return fEVNDISP_TREE_VERSION; }
    static unsigned int getEVNDISP_TREE_VERSION( TTree* );
    static bool         getEVNDISP_TREE_isShort( TTree* );
+   static string       getSVN_VERSION() { return fEVNDISP_SVNREVISION; }
    string       getObservatory()                { return fObservatory; }
    double       getObservatory_Height_m()       { return fObservatory_Height_m; }
    double       getObservatory_Latitude_deg()    { return fObservatory_Latitude_deg; }
