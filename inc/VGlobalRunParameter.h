@@ -57,6 +57,7 @@ class VGlobalRunParameter
    public:
 
    static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
+   static string       fEVNDISP_SVNREVISION;                         // SVN REVISION
 
    VGlobalRunParameter();
    virtual ~VGlobalRunParameter();

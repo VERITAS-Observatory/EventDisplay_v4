@@ -217,7 +217,8 @@ void VGlobalRunParameter::printGlobalRunParameter()
    cout << "reading global run parameters from " << getDirectory_EVNDISPParameterFiles();
    cout << "EVNDISP.global.runparameter" << endl;
    cout << endl;
-   cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")" << endl;
+   cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")";
+   cout << " (SVN REVISION " << fEVNDISP_SVNREVISION << ")" << endl;
    cout << "Observatory: " << fObservatory;
    cout << " (long " << fObservatory_Longitude_deg << " deg, lat " << fObservatory_Latitude_deg << " deg,";
    cout << " alt " << fObservatory_Height_m << " m)" << endl;
@@ -240,6 +241,7 @@ string VGlobalRunParameter::fObservatory = "Whipple";
 bool VGlobalRunParameter::bReadRunParameter = false;
 unsigned int VGlobalRunParameter::fEVNDISP_TREE_VERSION = 8;
 string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.00";
+string VGlobalRunParameter::fEVNDISP_SVNREVISION = "$Rev$";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fEVNDISPAnaDataDirectory = "";
 string VGlobalRunParameter::fVBFRawDataDirectory = "";
