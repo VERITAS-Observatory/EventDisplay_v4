@@ -80,8 +80,10 @@ void VMonteCarloRunHeader::print()
     cout << detector_prog_id << " (" << detector_prog_vers << "), ";
     cout << converter_prog_vers << endl;
     cout << "date: " << shower_date << "\t" << detector_date << endl;
-    cout << "Primary " << primary_id << ", atmosphere " << atmosphere << endl;
-    cout << "Core scattering: " << core_range[0] << "\t" << core_range[1];
+    cout << "number of showers: " << num_showers << " (each shower used " << num_use << " times)" << endl;
+    cout << "Primary " << primary_id << endl;
+    cout << "Energy range: [" << E_range[0] << ", " << E_range[1] << "] TeV, powerlaw index " << spectral_index << endl;
+    cout << "Core scattering: " << core_range[0] << "\t" << core_range[1] << " [m]";
     if( core_pos_mode == 0 ) cout << " (fixed)";
     else if( core_pos_mode == 1 ) cout << " (circular)";
     else if( core_pos_mode == 2 ) cout << " (rectangular)";
@@ -89,8 +91,12 @@ void VMonteCarloRunHeader::print()
     cout << "Azimuth range: [" << az_range[0]*45./atan(1.) << ", " << az_range[1]*45./atan(1.) << "]" << endl;
     cout << "Zenith range: [" << 90.-alt_range[0]*45./atan(1.) << ", " << 90.-alt_range[1]*45./atan(1.) << "]" << endl;
     cout << "Viewcone: [" << viewcone[0] << ", " << viewcone[1] << "] (" << diffuse << ")" << endl;
-    cout << "Energy range: [" << E_range[0] << ", " << E_range[1] << "], powerlaw index " << spectral_index << endl;
+    cout << "Observatory height " << obsheight << " [m]" << endl;
     cout << "B-Field: " << B_total << " microT (" << B_inclination*45./atan(1.) << "," << B_declination*45./atan(1.) << ")" << endl;
+    cout << "Atmospheric model: " << atmosphere << endl;
+    cout << "Cherenkov photon wavelength range: [" << corsika_wlen_min << ", " << corsika_wlen_max << "]" << endl;
+    cout << "CORSIKA interaction models: lowE " << corsika_low_E_detail << ", highE " << corsika_high_E_detail;
+    cout << ", transition energy " << corsika_low_high_E << " GeV" << endl;
 // print CHERENKOV FLAG
     cout << "CORSIKA iact options: " << corsika_iact_options << endl;
     bitset<32> EVTH76 = corsika_iact_options;
