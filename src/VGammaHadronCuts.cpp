@@ -581,7 +581,12 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 // files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFileIndex_min;
                if( !is_stream.eof() ) is_stream >> fTMVAWeightFileIndex_max;
-               if( !is_stream.eof() ) is_stream >> fTMVAWeightFile;
+	       string iWeightFileDirectory;
+               if( !is_stream.eof() ) is_stream >> iWeightFileDirectory;
+	       string iWeightFileName;
+               if( !is_stream.eof() ) is_stream >> iWeightFileName;
+	       fTMVAWeightFile = gSystem->ExpandPathName( iWeightFileDirectory.c_str() );
+	       fTMVAWeightFile += iWeightFileName;
             }
 	    if( temp == "TMVACUTS" )
 	    {

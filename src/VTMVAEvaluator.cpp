@@ -130,6 +130,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 
 //////////////////////////////////////////////////////////////////////////////////////
 // read energy binning from root files
+   unsigned int iMinMissingBin = 0;
    for( unsigned int i = 0; i < iNbin; i++ )
    {
        ostringstream iFullFileName;
@@ -137,9 +138,21 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
        TFile iF( iFullFileName.str().c_str() );
        if( iF.IsZombie() )
        {
-	  cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing energies from TMVA root file " << iFullFileName.str() << endl;
-	  fIsZombie = true;
-	  return false;
+// allow that first files are missing (this happens when there are no training events in the first energy bins)
+          if( i == iMinMissingBin )
+	  {
+	      cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName.str() << endl;
+	      cout << "  assume this is a low-energy empty bin (bin number " << i << ";";
+	      cout << " number of missing bins: " << iMinMissingBin+1 << ")" << endl;
+	      iMinMissingBin++;
+	      continue;
+          }
+          else
+	  {
+	     cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing energies from TMVA root file " << iFullFileName.str() << endl;
+	     fIsZombie = true;
+	     return false;
+          }
        }
        VTMVARunDataEnergyCut *iEnergyData = (VTMVARunDataEnergyCut*)iF.Get( "fDataEnergyCut" );
        if( !iEnergyData )
@@ -166,18 +179,19 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 //////////////////////////////////////////////////////////////////////////////////////
 // create and initialize TMVA readers
 // loop over all  energy bins: open one weight (XML) file per energy bin
-   for( unsigned int i = 0; i < iNbin; i++ )
+   unsigned int z = 0;
+   for( unsigned int i = iMinMissingBin; i < iNbin; i++ )
    {
       fTMVAReader.push_back( new TMVA::Reader() );
 
 // make sure that signal efficiency is set correctly
-      if( i >= fSignalEfficiency.size() )
+      if( z >= fSignalEfficiency.size() )
       {
           fSignalEfficiency.push_back( fSignalEfficiencyNoVec );
 	  fBackgroundEfficiency.push_back( -99. );
       }
 // make sure that MVA cut value is set correctly
-      if( i >= fTMVACutValue.size() )
+      if( z >= fTMVACutValue.size() )
       {
          fTMVACutValue.push_back( fTMVACutValueNoVec );
       }
@@ -185,7 +199,8 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // weight file for this energy bin
       sprintf( hname, "MVA%d", i );
       ostringstream iFullFileName;
-      iFullFileName << iWeightFileName << iWeightFileIndex_min+i << "_" << fTMVAMethodName << "_" << fTMVAMethodCounter << ".weights.xml";
+      iFullFileName << iWeightFileName << iWeightFileIndex_min+i;
+      iFullFileName << "_" << fTMVAMethodName << "_" << fTMVAMethodCounter << ".weights.xml";
       if( fDebug ) cout << "reading TMVA XML weight file: " << iFullFileName << endl;
 
 // get list of training variables
@@ -269,7 +284,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	  ostringstream iFullFileNameRoot;
           iFullFileNameRoot << iWeightFileName << iWeightFileIndex_min+i << ".root";
 
-          if( !optimizeSensitivity( i, iFullFileNameRoot.str() ) )
+          if( !optimizeSensitivity( z, iFullFileNameRoot.str() ) )
 	  {
 	     cout << "VTMVAEvaluator::initializeWeightFiles: error while calculating optimized sensitivity" << endl;
 	     return false;
@@ -289,11 +304,14 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	    vector< Double_t > i_cuts_min;
 	    vector< Double_t > i_cuts_max;
 	    vector< string >   i_cuts_name;
-	    i_mcuts->GetCuts( fSignalEfficiency[i], i_cuts_min, i_cuts_max );
-	    cout << "Box cuts for a signal efficiency at " << fSignalEfficiency[i];
-	    if( i < fBackgroundEfficiency.size() && fBackgroundEfficiency[i] > 0. )
+	    i_mcuts->GetCuts( fSignalEfficiency[z], i_cuts_min, i_cuts_max );
+	    if( z < fSignalEfficiency.size() )
 	    {
-	       cout << " (background efficiency: " << fBackgroundEfficiency[i] << ")";
+	       cout << "Box cuts for a signal efficiency at " << fSignalEfficiency[z];
+            }
+	    if( z < fBackgroundEfficiency.size() && fBackgroundEfficiency[z] > 0. )
+	    {
+	       cout << " (background efficiency: " << fBackgroundEfficiency[z] << ")";
             }
 	    cout << ":" << endl;
 	    for( unsigned int v = 0; v < i_cuts_min.size(); v++ )
@@ -315,6 +333,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
             }
          }
       }
+      z++;
    }
 
 
@@ -707,7 +726,7 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
    TGraphAsymmErrors *igBck = 0;
    if( fBackgroundEfficiency.size() > 0 ) igBck = new TGraphAsymmErrors( 1 );
    TGraphAsymmErrors *igCVa = 0;
-   if( fTMVACutValue.size() > 0 )          igCVa = new TGraphAsymmErrors( 1 );
+   if( fTMVACutValue.size() > 0 )         igCVa = new TGraphAsymmErrors( 1 );
 
    bool bNullEntry = false;
    double iMinBck = 1.;
@@ -868,6 +887,13 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    {
       iMeanEnergy_TeV = 0.5*( TMath::Power( 10., fEnergyCut_Log10TeV_min[iEnergyBin] ) + TMath::Power( 10., fEnergyCut_Log10TeV_max[iEnergyBin] ));
       iMeanEnergy_TeV = TMath::Log10( iMeanEnergy_TeV ); // log10 energy
+// make sure that energy is not lower or higher then minimum/maximum bins in graphs
+      double x = 0.;
+      double y = 0.;
+      i_on->GetPoint( 0, x, y );
+      if( iMeanEnergy_TeV < x ) iMeanEnergy_TeV = TMath::Log10( TMath::Power( 10., x ) * 1.2 );
+      i_on->GetPoint( i_on->GetN()-1, x, y );
+      if( iMeanEnergy_TeV > x ) iMeanEnergy_TeV = TMath::Log10( TMath::Power( 10., x ) * 0.8 );
    }
    else
    {
@@ -878,8 +904,12 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    } 
 //////////////////////////////////////////////////////
 // get number of events at this energy 
-   double Non = i_on->Eval( iMeanEnergy_TeV ) * fOptmizationSourceStrengthCrabUnits;
-   double Nof = i_on->Eval( iMeanEnergy_TeV );
+   double Non = 0.;
+   double Nof = 0.;
+
+   Non = i_on->Eval( iMeanEnergy_TeV ) * fOptmizationSourceStrengthCrabUnits;
+   Nof = i_on->Eval( iMeanEnergy_TeV );
+
    cout << "TVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
    cout << " non = " << Non << " (" << Non / fOptmizationSourceStrengthCrabUnits << ")";
    cout << " noff = " << Nof;
