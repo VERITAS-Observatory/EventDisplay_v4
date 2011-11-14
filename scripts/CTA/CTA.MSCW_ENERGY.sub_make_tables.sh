@@ -32,7 +32,7 @@ RECID=$2
 ARRAY=$3
 if [ $ARRAY == "ALL" ]
 then
-  VARRAY=( A B C D E F G H I J K NA NB )
+  VARRAY=( A B C D E F G H I J K NA NB "s4-1-120" "s4-2-120" "s4-2-85" )
 else 
   VARRAY=( $ARRAY )
 fi

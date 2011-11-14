@@ -14,15 +14,18 @@ then
    echo "     subarray identifier (A,B,C...)"
    echo "     use ALL for all arrays (A B C D E F G H I J K NA NB)"
    echo
-   echo "<recid>"
-   echo "     reconstruction ID from array reconstruction"
-   echo
    echo "<input>"
    echo "     msc      use mscw files as input (slow, but necessary at least once)"
    echo "     eff      use effective area files (note: hardwired file location)"
    echo 
+   echo "<cut file directory>"
+   echo "     direction where cut files are located"  
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file"
+   echo "     (suffix must be .gamma_onSource/.gamma_cone10/.CRbck ; this will be added by this script)"
+   echo 
+   echo "<output directory>"
+   echo "     directory name for output effective areas files"
    echo
    echo ""
    exit
@@ -39,7 +42,7 @@ mkdir -p $ODIR
 #arrays
 if [ $SUBAR == "ALL" ]
 then
-  VARRAY=( A B C D E F G H I J K NA NB )
+  VARRAY=( A B C D E F G H I J K NA NB "s4-1-120" "s4-2-120" "s4-2-85" )
 else
   VARRAY=( $SUBAR )
 fi

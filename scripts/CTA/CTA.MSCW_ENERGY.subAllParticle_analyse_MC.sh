@@ -51,16 +51,16 @@ do
    then
       RR=( 3 4 5 )
    fi
-   NRR=${#RR[@]}
 # one single output file
    if [ $PART = "electron" ]
    then
-      NRR=0
+      RR=( 3 4 5 )
    fi
    if [ $PART = "helium" ]
    then
-      NRR=0
+      RR=( 5 )
    fi
+   NRR=${#RR[@]}
 
    echo $PART $NRR
 

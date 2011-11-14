@@ -33,8 +33,7 @@ RECID=$2
 SUBAR=$3
 if [ $SUBAR == "ALL" ]
 then
-#  VARRAY=( A B C D E F G H I J K NA NB )
-  VARRAY=( B C D E F G H I J K NA )
+  VARRAY=( E A B C D F G H I J K NA NB "s4-1-120" "s4-2-120" "s4-2-85" )
 else
   VARRAY=( $SUBAR )
 fi

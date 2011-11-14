@@ -58,7 +58,7 @@ ODIR=$6
 EREC=0
 
 # check particle type
-if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ]
+if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
 then
    echo "unknown particle type: " $PART
    exit
@@ -180,17 +180,23 @@ then
    TELTYPECUTS="1"
    DIRECTIONCUT="0"
 fi
-if [ $PART = "helium" ]
+if [ $PART = "helium" ] || [ $PART = "helium_onSource" ]
 then
-   MSCFILE=$DDIR/helium*."$ARRAY"_ID"$RECID"-*.mscw.root
+   MSCFILE=$DDIR/helium."$ARRAY"_ID"$RECID"-*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=helium."$ARRAY"_ID"$RECID".eff
    MCFIL=helium."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
-   THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
-   THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+   if [ $PART = "helium" ] 
+   then
+      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
+      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+   else
+      THETA2MIN=( 0. )
+      THETA2MAX=( 1. )
+   fi
    ISOTROPY="1"
    AZBINS="0"
    TELTYPECUTS="1"
@@ -250,7 +256,7 @@ do
 
 ###############################################################################
 # create run list
-      MSCF=$FDIR/effectiveArea-CTA-$PART-$INPU-$i-$j.dat
+      MSCF=$FDIR/effectiveArea-CTA-$PART-$INPU-$i-$j.$ARRAY.dat
       rm -f $MSCF
       echo "effective area data file for $PART $INPU $i $j" > $MSCF
 ###############################################################################
@@ -261,8 +267,10 @@ do
 # fill IRFs and effective areas
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then
+# filling mode 0: fill and use angular resolution for energy dependent theta2 cuts
 	 echo "* FILLINGMODE 0" >> $MSCF
       else
+# background: use fixed theta2 cut
 	 echo "* FILLINGMODE 2" >> $MSCF
       fi
 # fill IRFs only
@@ -300,13 +308,16 @@ do
       fi
       if [ $INPU = "eff" ]
       then
-#         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/E/stdCuts/$MCFIL-$i-$j.root" >> $MSCF
-#         echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/E/reconstructionParameter_d20111020_LL/EffectiveAreas/mscEffArea/$MCFIL-$i-$j.root" >> $MSCF
-	 echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/$ARRAY/EffectiveAreas/mscEffArea/$MCFIL-$i-$j.root" >> $MSCF
+	 echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/MCHistograms/$MCFIL-$i-$j.root" >> $MSCF
       fi
 
 # output file
-      OFIX=$ODIR/$OFIL-$i-$j
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      then
+         OFIX=$ODIR/$OFIL-$i
+      else
+         OFIX=$ODIR/$OFIL-$j
+      fi
 
 # create run script
       FNAM="CTAeffArea-$PART-$INPU-$ARRAY-$i-$j"
@@ -333,7 +344,7 @@ do
       if [ $INPU = "msc" ]
       then
          echo "submitting to long queue"
-         qsub -l h_cpu=40:29:00 -l h_vmem=6000M -l tmpdir_size=35G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+         qsub -l h_cpu=46:29:00 -l h_vmem=6000M -l tmpdir_size=35G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
       fi
       if [ $INPU = "eff" ]
       then
