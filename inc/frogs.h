@@ -44,7 +44,7 @@
 #define FROGS_TWOPI 6.283185307179586   //2.0*PI
 #define FROGS_SQRTTWOPI 2.506628274631  //sqrt(2.0*PI)
 #define FROGS_LNTWOPI 1.837877066409345 //log(2.0*PI)
-#define FROGS_LARGE_PE_SIGNAL -1.0      /*Limit beyond which Poisson can be 
+#define FROGS_LARGE_PE_SIGNAL 50.0      /*Limit beyond which Poisson can be 
 				    replaced by Gauss statistics*/
 #define FROGS_NUMBER_OF_SIGMA 10.0      /*Number of standard deviations to be 
 				    explored around a signal. 15 is 

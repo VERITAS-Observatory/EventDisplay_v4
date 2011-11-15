@@ -64,6 +64,11 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	float getFrogsGoodnessBkg();
 	int   getFrogsNpixBkg();
 
+	float getFrogsXPStart();
+	float getFrogsYPStart();
+	float getFrogsXSStart();
+	float getFrogsYSStart();
+
         void initAnalysis();
         void initFrogTree();
         void initOutput();
@@ -110,6 +115,11 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
         int   frogsNpixImg;
         float frogsGoodnessBkg;
         int   frogsNpixBkg;
+
+	float frogsXPStart;
+	float frogsYPStart;
+	float frogsXSStart;
+	float frogsYSStart;
 
         bool  fInitialized;                        //!< true after initialization
 	int   fStartEnergyLoop;

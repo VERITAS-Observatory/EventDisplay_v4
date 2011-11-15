@@ -51,5 +51,10 @@ class VFrogParameters
         float frogsGoodnessBkg;
         int   frogsNpixBkg;
 
+	float frogsXPStart;
+	float frogsYPStart;
+	float frogsXSStart;
+	float frogsYSStart;
+
 };
 #endif

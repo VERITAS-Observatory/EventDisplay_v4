@@ -89,6 +89,12 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   frogsGoodnessBkg = output.goodness_bkg;
   frogsNpixBkg     = output.npix_bkg;
 
+  frogsXPStart     = getShowerParameters()->fShowerXcore[0];
+  frogsYPStart     = getShowerParameters()->fShowerXcore[0];
+  frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[0];
+  frogsYSStart     = -1.0*fData->getShowerParameters()->fShower_Yoffset[0];
+
+
   getFrogParameters()->frogsEventID = getFrogsEventID();
   getFrogParameters()->frogsGSLConStat = getFrogsGSLConStat();
   getFrogParameters()->frogsNB_iter = getFrogsNB_iter();
@@ -108,6 +114,12 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   getFrogParameters()->frogsNpixImg = getFrogsNpixImg();
   getFrogParameters()->frogsGoodnessBkg = getFrogsGoodnessBkg();
   getFrogParameters()->frogsNpixBkg = getFrogsNpixBkg();
+
+  getFrogParameters()->frogsXPStart = getFrogsXPStart();
+  getFrogParameters()->frogsYPStart = getFrogsYPStart();
+  getFrogParameters()->frogsXSStart = getFrogsXSStart();
+  getFrogParameters()->frogsYSStart = getFrogsYSStart();
+
 
   getFrogParameters()->getTree()->Fill();
 
@@ -194,6 +206,22 @@ float VFrogs::getFrogsGoodnessBkg()
 int VFrogs::getFrogsNpixBkg()
 {
   return frogsNpixBkg;
+}
+float VFrogs::getFrogsXPStart()
+{
+  return frogsXPStart;
+}
+float VFrogs::getFrogsYPStart()
+{
+  return frogsYPStart;
+}
+float VFrogs::getFrogsXSStart()
+{
+  return frogsXSStart;
+}
+float VFrogs::getFrogsYSStart()
+{
+  return frogsYSStart;
 }
 //================================================================
 //================================================================
@@ -481,6 +509,8 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
 
   rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore_SC[0];
   rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore_SC[0];
+//  rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore[0];
+//  rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore[0];
   if (FROGSDEBUG) {
     printf("ShowerSC %f %f\n",getShowerParameters()->fShowerXcore_SC[0],getShowerParameters()->fShowerYcore_SC[0]);
     printf("Shower %f %f\n",getShowerParameters()->fShowerXcore[0],getShowerParameters()->fShowerYcore[0]);

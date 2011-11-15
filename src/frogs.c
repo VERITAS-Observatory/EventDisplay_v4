@@ -1075,8 +1075,8 @@ int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J) {
     coming in the frogs_gsl_data_wrapper structure*/
   struct frogs_reconstruction delta;
 
-  delta.xs=0.15;
-  delta.ys=0.15;
+  delta.xs=0.07;
+  delta.ys=0.07;
   delta.xp=5.0;
   delta.yp=5.0;
   delta.log10e=0.03;
