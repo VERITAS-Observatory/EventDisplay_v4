@@ -8,10 +8,6 @@
   
 \brief  Called from VEventLoop. Opens templates and does minimization.
 
-\todo   Lots and Lots.
-\todo   Check geometery.
-\todo   Get output file working right.
-
 \author S Vincent, G Hughes.
 
 */
@@ -89,10 +85,12 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
   frogsGoodnessBkg = output.goodness_bkg;
   frogsNpixBkg     = output.npix_bkg;
 
-  frogsXPStart     = getShowerParameters()->fShowerXcore[0];
-  frogsYPStart     = getShowerParameters()->fShowerXcore[0];
-  frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[0];
-  frogsYSStart     = -1.0*fData->getShowerParameters()->fShower_Yoffset[0];
+  frogsXPStart     = getShowerParameters()->fShowerXcore_SC[5];
+  frogsYPStart     = getShowerParameters()->fShowerYcore_SC[5];
+  frogsXPED        = getShowerParameters()->fShowerXcore[5];
+  frogsYPED        = getShowerParameters()->fShowerYcore[5];
+  frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[5];
+  frogsYSStart     = -1.0*fData->getShowerParameters()->fShower_Yoffset[5];
 
 
   getFrogParameters()->frogsEventID = getFrogsEventID();
@@ -117,6 +115,8 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
 
   getFrogParameters()->frogsXPStart = getFrogsXPStart();
   getFrogParameters()->frogsYPStart = getFrogsYPStart();
+  getFrogParameters()->frogsXPED = getFrogsXPED();
+  getFrogParameters()->frogsYPED = getFrogsYPED();
   getFrogParameters()->frogsXSStart = getFrogsXSStart();
   getFrogParameters()->frogsYSStart = getFrogsYSStart();
 
@@ -215,6 +215,16 @@ float VFrogs::getFrogsYPStart()
 {
   return frogsYPStart;
 }
+
+float VFrogs::getFrogsXPED()
+{
+  return frogsXPED;
+}
+float VFrogs::getFrogsYPED()
+{
+  return frogsYPED;
+}
+
 float VFrogs::getFrogsXSStart()
 {
   return frogsXSStart;
@@ -434,10 +444,10 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
     
     if(FROGSDEBUG)
       printf("TelSC %d | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f \n",tel,
-	     fData->getShowerParameters()->fShowerZe[0],
-	     fData->getShowerParameters()->fShowerAz[0],
-	     getDetectorGeo()->getTelXpos()[tel]-fData->getShowerParameters()->fShowerXcore[0],
-	     getDetectorGeo()->getTelYpos()[tel]-fData->getShowerParameters()->fShowerYcore[0],		
+	     fData->getShowerParameters()->fShowerZe[5],
+	     fData->getShowerParameters()->fShowerAz[5],
+	     getDetectorGeo()->getTelXpos()[tel]-fData->getShowerParameters()->fShowerXcore[5],
+	     getDetectorGeo()->getTelYpos()[tel]-fData->getShowerParameters()->fShowerYcore[5],		
 	     getDetectorGeo()->getTelXpos()[tel],
 	     getDetectorGeo()->getTelYpos()[tel],
 	     rtn.scope[tel].xfield,
@@ -504,16 +514,16 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   } 
 
   //Optimization starting point todo y -> -y ??
-  rtn.startpt.xs=fData->getShowerParameters()->fShower_Xoffset[0];
-  rtn.startpt.ys=-1.0*fData->getShowerParameters()->fShower_Yoffset[0];
+  rtn.startpt.xs=fData->getShowerParameters()->fShower_Xoffset[5];
+  rtn.startpt.ys=-1.0*fData->getShowerParameters()->fShower_Yoffset[5];
 
-  rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore_SC[0];
-  rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore_SC[0];
-//  rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore[0];
-//  rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore[0];
+  rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore_SC[5];
+  rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore_SC[5];
+//  rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore[5];
+//  rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore[5];
   if (FROGSDEBUG) {
-    printf("ShowerSC %f %f\n",getShowerParameters()->fShowerXcore_SC[0],getShowerParameters()->fShowerYcore_SC[0]);
-    printf("Shower %f %f\n",getShowerParameters()->fShowerXcore[0],getShowerParameters()->fShowerYcore[0]);
+    printf("ShowerSC %f %f\n",getShowerParameters()->fShowerXcore_SC[5],getShowerParameters()->fShowerYcore_SC[5]);
+    printf("Shower %f %f\n",getShowerParameters()->fShowerXcore[5],getShowerParameters()->fShowerYcore[5]);
   }
 
   rtn.startpt.lambda=0.3; //We use a fixed value by lack of information. 

@@ -68,7 +68,9 @@ void VFrogParameters::initTree( string iName, string iTitle )
     fTreeFrog->Branch("frogsNpixBkg", &frogsNpixBkg, "frogsNpixBkg/I" );
 
     fTreeFrog->Branch("frogsXPStart", &frogsXPStart, "frogsXPStart/F" );
-    fTreeFrog->Branch("frogsYPStart", &frogsXPStart, "frogsYPStart/F" );
+    fTreeFrog->Branch("frogsYPStart", &frogsYPStart, "frogsYPStart/F" );
+    fTreeFrog->Branch("frogsXPED", &frogsXPED, "frogsXPED/F" );
+    fTreeFrog->Branch("frogsYPED", &frogsYPED, "frogsYPED/F" );
     fTreeFrog->Branch("frogsXSStart", &frogsXSStart, "frogsXSStart/F" );
     fTreeFrog->Branch("frogsYSStart", &frogsXSStart, "frogsYSStart/F" );
 

@@ -53,6 +53,8 @@ class VFrogParameters
 
 	float frogsXPStart;
 	float frogsYPStart;
+	float frogsXPED;
+	float frogsYPED;
 	float frogsXSStart;
 	float frogsYSStart;
 

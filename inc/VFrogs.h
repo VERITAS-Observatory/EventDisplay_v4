@@ -66,6 +66,8 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 
 	float getFrogsXPStart();
 	float getFrogsYPStart();
+	float getFrogsXPED();
+	float getFrogsYPED();
 	float getFrogsXSStart();
 	float getFrogsYSStart();
 
@@ -118,6 +120,8 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 
 	float frogsXPStart;
 	float frogsYPStart;
+	float frogsXPED;
+	float frogsYPED;
 	float frogsXSStart;
 	float frogsYSStart;
 
