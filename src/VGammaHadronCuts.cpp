@@ -93,6 +93,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
     fTMVAOptimizeSignalEfficiencySourceStrengthCU = -99.;
+    fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
     fTMVABoxCut_Theta2_max = 0;
 
 // energy dependent theta2 cut
@@ -229,7 +230,7 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
     if( iPrint == 1 )      cout << "\t reading analysis cuts from " << i_cutfilename << endl;
     else if( iPrint == 2 ) cout << "reading analysis cuts from " << i_cutfilename << endl;
 
-    is.open(i_cutfilename.c_str(),ifstream::in);
+    is.open( gSystem->ExpandPathName( i_cutfilename.c_str() ),ifstream::in);
     if(!is)
     {
         cout << "VGammaHadronCuts::readCuts: cut input file not found, " << i_cutfilename << endl;
@@ -594,6 +595,7 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 // probability threshold not important for box cuts
                if( !is_stream.eof() ) is_stream >> fTMVAProbabilityThreshold;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySourceStrengthCU;
+	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyObservationTime_h;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
             }
@@ -602,20 +604,19 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 // (note that fF1AngResName == "IRF" means that the graph from the IRF file is extrapolated)
             if( temp == "theta2file" )
             {
-                 if( !is_stream.eof() ) is_stream >> fFileNameAngRes;
+                 if( !is_stream.eof() )
+		 {
+		    string iFileNameAngRes;
+		    is_stream >> iFileNameAngRes;
+		    fFileNameAngRes = gSystem->ExpandPathName( iFileNameAngRes.c_str() );
+                 }
                  if( !is_stream.eof() )
                  {
                     is_stream >> fF1AngResName;
                  }
                  else fF1AngResName = "fitAngRes";
-
-                 if( !initAngularResolutionFile() )
-		 {
-		    cout << "VGammaHadronCuts::readCuts error: error initializing angular resolution file" << endl;
-		    cout << "exiting..." << endl;
-		    exit( -1 );
-                 }
             }
+
 // use angular resolution calculated for example from same data with makeEffectiveArea
             if( temp == "angres" )
 	    {
@@ -644,6 +645,15 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 ////////////////////////////////////////////////////////////////////////////////////////////////////
         }
     }
+    if( fFileNameAngRes.size() > 0 )
+    {
+       if( !initAngularResolutionFile() )
+       {
+	   cout << "VGammaHadronCuts::readCuts error: error initializing angular resolution file" << endl;
+	   cout << "exiting..." << endl;
+	   exit( -1 );
+       }
+    }
     return true;
 }
 
@@ -665,19 +675,14 @@ void VGammaHadronCuts::printDirectionCuts()
        cout << endl;
     }
 // energy dependent TF1 function
-    else if( fDirectionCutSelector == 1 )
+    else if( fFileAngRes && fF1AngRes )
     {
         cout << "Direction cut from angular resolution function in file: ";
-	if( fFileAngRes )
-	{
-	   cout << fFileAngRes->GetName();
-	   if( fF1AngRes ) cout << "(" << fF1AngRes->GetName() << ")";
-        }
-	else              cout << "(no file given)";
-	if( !fF1AngRes ) cout << "VGammaHadronCuts::printDirectionCuts WARNING: no function found" << endl;
+	cout << fFileAngRes->GetName();
+	cout << "(" << fF1AngRes->GetName() << ")";
     }
 // IRF graph
-    else if( fDirectionCutSelector == 2 )
+    else if( fIRFAngRes || fDirectionCutSelector == 2 )
     {
         cout << "Direction cut from IRF graph " << endl;
 	if( fIRFAngRes ) fIRFAngRes->Print();
@@ -779,7 +784,8 @@ void VGammaHadronCuts::printCutSummary()
         cout << "weight files: " << fTMVAWeightFile << " (" << fTMVAWeightFileIndex_min << "," << fTMVAWeightFileIndex_max << ")" << endl;
 	if( fTMVAOptimizeSignalEfficiencySourceStrengthCU > 0. && fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
 	{
-	   cout << "using optimal signal efficiency for " << fTMVAOptimizeSignalEfficiencySourceStrengthCU << " Crab source" << endl;
+	   cout << "using optimal signal efficiency for " << fTMVAOptimizeSignalEfficiencySourceStrengthCU << " Crab source ";
+	   cout << " and " << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
 	   cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
 	}
 	else
@@ -1405,7 +1411,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     fTMVAEvaluator->setDebug( fDebug );
     if( fTMVAOptimizeSignalEfficiencySourceStrengthCU > 0. && fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
-       fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU, 10. );
+       fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU, 1.e-10, 0.2,
+                                                             fTMVAOptimizeSignalEfficiencyObservationTime_h );
        fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
     }
     else if( fTMVASignalEfficiency > 0. )
@@ -1758,7 +1765,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
        }
 /////////////////////////////////////////////
 // use IRF graph for angular resolution
-       else if( fDirectionCutSelector == 2 && fIRFAngRes )
+       else if( (fDirectionCutSelector == 1 || fDirectionCutSelector == 2 ) && fIRFAngRes )
        {
 // get theta2 cut
 	  theta_cut_max  = fIRFAngRes->Eval( e );
@@ -1836,20 +1843,29 @@ bool VGammaHadronCuts::initAngularResolutionFile()
    if( fF1AngResName != "IRF" )
    {
 // get energy dependent theta values (probably angular resolution)
-      fF1AngRes = (TF1*)fFileAngRes->Get( fF1AngResName.c_str() )->Clone();
-      if( !fF1AngRes )
+      if( fFileAngRes->Get( fF1AngResName.c_str() ) )
+      {
+	 fF1AngRes = (TF1*)fFileAngRes->Get( fF1AngResName.c_str() )->Clone();
+	 cout << "VGammaHadronCuts::initAngularResolutionFile: read angular resolution fit function from file " << fF1AngResName << " : " << endl;
+	 fF1AngRes->Print();
+      }
+      else
       {
 	  cout << "VGammaHadronCuts::initAngularResolutionFile: error finding angular resolution function with name ";
 	  cout << fF1AngResName << " in " << fFileAngRes->GetName() << endl;
 	  return false;
       }
-      cout << "VGammaHadronCuts::initAngularResolutionFile: read angular resolution fit function from file " << fF1AngResName << " : " << endl;
-      fF1AngRes->Print();
    }
 // read angular resolution from instrument response function tree
    else
    {
-      TTree *t = (TTree*)fFileAngRes->Get( "t_angular_resolution" );
+      char iTreeName[200];
+      sprintf( iTreeName, "t_angular_resolution" );
+      if( getAngularResolutionContainmentRadius() - 68 != 0 ) sprintf( iTreeName, "%s_%03dp", iTreeName, getAngularResolutionContainmentRadius() );
+
+      cout << "VGammaHadronCuts::initAngularResolutionFile: reading angular resolution graph from file (" << iTreeName << "):" << endl;
+      cout << fFileAngRes->GetName() << endl;
+      TTree *t = (TTree*)fFileAngRes->Get( iTreeName );
       if( !t )
       {
          cout << "VGammaHadronCuts::initAngularResolutionFile: error finding tree with instrument response function for angular resolution " << endl;
@@ -1878,7 +1894,6 @@ bool VGammaHadronCuts::initAngularResolutionFile()
           }
 	  fIRFAngRes->SetName( "IRFAngRes" );
       }
-      cout << "VGammaHadronCuts::initAngularResolutionFile: read angular resolution graph from file " << fF1AngResName << endl;
    }
    if( fFileAngRes ) fFileAngRes->Close();
 
@@ -1897,6 +1912,7 @@ bool VGammaHadronCuts::setIRFGraph( TGraphErrors *g )
    fIRFAngRes->SetName( "IRFAngRes" );
 
 // print results
+   cout << "replaced IRF graph for direction cut" << endl;
    printDirectionCuts();
 
    return true;

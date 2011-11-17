@@ -48,6 +48,7 @@ void VTMVAEvaluator::reset()
    setTMVAMethod();
 // default: don't expect that the theta2 cut is performed here   
    setTMVAThetaCutVariable( false );
+   setTMVAErrorFraction();
 }
 
 /*
@@ -906,15 +907,21 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 // get number of events at this energy 
    double Non = 0.;
    double Nof = 0.;
+   double Ndif = 0.;
 
-   Non = i_on->Eval( iMeanEnergy_TeV ) * fOptmizationSourceStrengthCrabUnits;
-   Nof = i_on->Eval( iMeanEnergy_TeV );
+   Non = i_on->Eval( iMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
+   Nof = i_of->Eval( iMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
+   if( Nof < 0. ) Nof = 0.;
+   Ndif= Non - Nof;
 
    cout << "TVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
-   cout << " non = " << Non << " (" << Non / fOptmizationSourceStrengthCrabUnits << ")";
+   cout << " non = " << Non;
    cout << " noff = " << Nof;
+   cout << " ndif = " << Ndif << " (" << Ndif*fOptmizationSourceStrengthCrabUnits << ")";
    cout << " (energy bin " << iEnergyBin << "," << iMeanEnergy_TeV << " [TeV] )";
    cout << endl;
+// apply source strength
+   Ndif *= fOptmizationSourceStrengthCrabUnits;
        
 //////////////////////////////////////////////////////
 // get signal and background efficiency histograms
@@ -938,7 +945,6 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), 
 							fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
    }
-   cout << hname << endl;
    TH1F *effS = (TH1F*)iTMVAFile.Get( hname );
    if( !effS )
    {
@@ -969,9 +975,41 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       cout << hname << endl;
       return false;
    }
+// evaluate errors on determination of box cut efficiency and remove bins with large errors
+   if( fTMVAMethodName != "BOXCUTS" )
+   {
+      sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_B", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), 
+							fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
+      TH1F *effB_counts = (TH1F*)iTMVAFile.Get( hname );
+      if( effB_counts )
+      {
+	 double iMaxMVACutValue = -1.;
+         for( int i = effB_counts->GetNbinsX()-1; i > 0; i-- )
+	 {
+	    if( effB_counts->GetBinContent( i ) > 0. )
+	    {
+	       if( effB_counts->GetBinError( i ) / effB_counts->GetBinContent( i ) > fTMVAErrorFraction_min )
+	       {
+		  iMaxMVACutValue = effB_counts->GetBinCenter( i );
+               }
+	       else break;
+            }
+	 }
+	 if( iMaxMVACutValue > 0. )
+	 {
+	    cout << "TVMAEvaluator::getOptimalSignalEfficiency() removing low significance bins from background efficiency curve (";
+	    cout << fTMVAErrorFraction_min << ", " << iMaxMVACutValue << ")" << endl;
+	    for( int i = 1; i <= effB->GetNbinsX(); i++ )
+	    {
+		if( effB->GetBinCenter( i ) > iMaxMVACutValue ) effB->SetBinContent( i, 0. );
+	    }
+         }
+      }
+   }
+   
    cout << "TMVA Evaluator optimization: ";
    cout << fOptmizationSourceStrengthCrabUnits << " CU signal source; ";
-   cout << fOptmizationMinBackGroundEvents << " background events required" << endl;
+   cout << "at least " << fOptmizationMinBackGroundEvents << " background events required";
    cout << " (alpha: " << fOptimizationBackgroundAlpha << ")" << endl;
 
 //////////////////////////////////////////////////////
@@ -994,7 +1032,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       {
 	 if( fOptimizationBackgroundAlpha > 0. )
 	 {
-	    i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof,
+	    i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
 								   effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
 								   fOptimizationBackgroundAlpha );
          }
@@ -1002,17 +1040,20 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	 if( fDebug )
 	 {
 	    cout << "___________________________________________________________" << endl;
-	    cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t" << Nof << "\t" << effB->GetBinContent( i ) << endl;
-	    cout << "\t" << effS->GetBinContent( i ) * Non;
+	    cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t";
+	    cout << Nof << "\t" << effB->GetBinContent( i ) << "\t";
+	    cout << Ndif << endl;
+	    cout << "\t" << effS->GetBinContent( i ) * Ndif * fOptmizationSourceStrengthCrabUnits;
+	    cout << "\t" << effS->GetBinContent( i ) * Ndif * fOptmizationSourceStrengthCrabUnits + effB->GetBinContent( i ) * Nof;
 	    cout << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof << "\t" << effB->GetBinContent( i ) * Nof << endl;
          }
-	 if( effS->GetBinCenter( i ) > 0. && effS->GetBinContent( i ) * Non > 0. )
+	 if( effS->GetBinCenter( i ) > 0. && effS->GetBinContent( i ) * Ndif > 0. )
 	 {
-	    iGSignalEvents->SetPoint( z_SB, effS->GetBinCenter( i ), effS->GetBinContent( i ) * Non );
+	    iGSignalEvents->SetPoint( z_SB, effS->GetBinCenter( i ),  effS->GetBinContent( i ) * Ndif );
 	    iGBackgroundEvents->SetPoint( z_SB, effS->GetBinCenter( i ), effB->GetBinContent( i ) * Nof );
 	    z_SB++;
          }
-// check that a minimum number of off events is 
+// check that a minimum number of off events is available
          if( effB->GetBinContent( i ) * Nof < fOptmizationMinBackGroundEvents )
 	 {
 	    if( fDebug ) 
@@ -1040,7 +1081,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    if( iGSignal_to_sqrtNoise )
    {
       TGraphSmooth *iGSmooth = new TGraphSmooth("s");
-      iGSignal_to_sqrtNoise_Smooth = iGSmooth->SmoothKern( iGSignal_to_sqrtNoise, "normal", 0.1, 100 );
+      iGSignal_to_sqrtNoise_Smooth = iGSmooth->SmoothKern( iGSignal_to_sqrtNoise, "normal", 0.05, 100 );
 // get maximum values
       double x = 0.;
       double y = 0.;
@@ -1109,8 +1150,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       hEffS->SetTitle( "" );
       hEffS->SetLineWidth( 2 );
       hEffS->SetXTitle( "cut value" );
-      hEffS->SetYTitle( "Efficiency" );
-
+      hEffS->SetYTitle( "signal/background efficiency" );
       hEffS->DrawCopy();
 
       if( hEffB )
