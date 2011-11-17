@@ -58,10 +58,11 @@ class VMonteCarloRunHeader : public TNamed
 
    VMonteCarloRunHeader();
   ~VMonteCarloRunHeader() {}
-   void print();
-   void reset();
-   bool VOLUMEDET_set();
+   double getMeanZenithAngle_Deg();
+   void   print();
+   void   reset();
+   bool   VOLUMEDET_set();
 
-   ClassDef(VMonteCarloRunHeader,2);
+   ClassDef(VMonteCarloRunHeader,3);
 };
 #endif

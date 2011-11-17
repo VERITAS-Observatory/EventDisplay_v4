@@ -269,6 +269,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fwriteMCtree = 0;
         }
+	else if( iTemp.find( "fillmchisto" ) < iTemp.size() )
+	{
+	    fRunPara->fFillMCHistos = true;
+        }
 // use db for run infos
         else if( iTemp.find( "usedbinfo" ) < iTemp.size() && !(iTemp.find( "donotusedbinfo" ) < iTemp.size()) )
         {
@@ -1223,177 +1227,180 @@ void VReadRunParameter::printHelp()
     cout << endl;
     cout << "General:" << endl;
     cout << "--------" << endl;
-    cout << "\t -runmode=0-6 \t\t 0=analysis (default)" << endl;
-    cout << "\t              \t\t 1=pedestal calculation (high gain channels)" << endl;
-    cout << "\t              \t\t 2=gain/toffset calculation (high gain channels)" << endl;
-    cout << "\t              \t\t 3=trace library" << endl;
-    cout << "\t              \t\t 4=write dstfile" << endl;
-    cout << "\t              \t\t 5=gain/toffset calculation (low gain channels)" << endl;
-    cout << "\t              \t\t 6=pedestal calculation (low gain channels)" << endl;
-    cout << "\t -sourcefile FILENAME \t full path + filename" << endl;
-    cout << "\t -sourcetype=0-7 \t source data file format" << endl;
-    cout << "\t              \t\t 0=rawdata" << endl;
-    cout << "\t              \t\t 1=GrIsu Monte Carlo (ascii file)" << endl;
-    cout << "\t              \t\t 2=MC in vbf/cvbf format" << endl;
-    cout << "\t              \t\t 3=rawdata in vbf/cvbf format (default)" << endl;
-    cout << "\t              \t\t 4=DST (data)" << endl;
-    cout << "\t              \t\t 5=multiple GrISu MC files" << endl;
-    cout << "\t              \t\t 6=PE file" << endl;
-    cout << "\t              \t\t 7=DST (MC) file" << endl;
-    cout << "\t -runnumber=INT \t set runnumber (default: get run number from sourcefile name)" << endl;
-    cout << "\t -useDBinfo\t\t get run info (target, wobble offsets, etc.) from database (attention, this might overwrite some of the given command line parameters, default: on, switch of with -donotusedbinfo )" << endl;
-    cout << "\t -teltoana=INT \t analyze only this telescope (Telescope 1=1,..., Telescopes 2 and 3 = 23, Telescopes 1,2,4 = 124, default 1234)" << endl;
-    cout << "\t -output FILE.root \t file with analysis results (FILE=-1 means no output) (default=RUNNUMBER.root)" << endl;
-    cout << "\t -nevents=NEVENTS \t loop over NEVENTS events in display=0 mode (<0 = no limit) (default=" << fRunPara->fnevents << ")" << endl;
+    cout << "\t -runmode=0-6 \t\t\t\t 0=analysis (default)" << endl;
+    cout << "\t              \t\t\t\t 1=pedestal calculation (high gain channels)" << endl;
+    cout << "\t              \t\t\t\t 2=gain/toffset calculation (high gain channels)" << endl;
+    cout << "\t              \t\t\t\t 3=trace library" << endl;
+    cout << "\t              \t\t\t\t 4=write dstfile" << endl;
+    cout << "\t              \t\t\t\t 5=gain/toffset calculation (low gain channels)" << endl;
+    cout << "\t              \t\t\t\t 6=pedestal calculation (low gain channels)" << endl;
+    cout << "\t -sourcefile FILENAME \t\t\t full path + filename" << endl;
+    cout << "\t -sourcetype=0-7 \t\t\t source data file format" << endl;
+    cout << "\t              \t\t\t\t 0=rawdata" << endl;
+    cout << "\t              \t\t\t\t 1=GrIsu Monte Carlo (ascii file)" << endl;
+    cout << "\t              \t\t\t\t 2=MC in vbf/cvbf format" << endl;
+    cout << "\t              \t\t\t\t 3=rawdata in vbf/cvbf format (default)" << endl;
+    cout << "\t              \t\t\t\t 4=DST (data)" << endl;
+    cout << "\t              \t\t\t\t 5=multiple GrISu MC files" << endl;
+    cout << "\t              \t\t\t\t 6=PE file" << endl;
+    cout << "\t              \t\t\t\t 7=DST (MC) file" << endl;
+    cout << "\t -runnumber=INT \t\t\t set runnumber (default: get run number from sourcefile name)" << endl;
+    cout << "\t -useDBinfo\t\t\t\t get run info (target, wobble offsets, etc.) from database" << endl;
+    cout << "\t\t\t\t\t\t (attention, this might overwrite some of the given command line parameters, default: on, switch of with -donotusedbinfo )" << endl;
+    cout << "\t -nevents=NEVENTS \t\t\t loop over NEVENTS events in display=0 mode (<0 = no limit) (default=" << fRunPara->fnevents << ")" << endl;
     cout << "\t -reconstructionparameter FILENAME \t file with reconstruction parameters (e.g., array analysis cuts)" << endl;
+    cout << endl;
+
+    cout << "Output:" << endl;
+    cout << "-------" << endl;
+    cout << "\t -output FILE.root \t\t\t file with analysis results (FILE=-1 means no output) (default=RUNNUMBER.root)" << endl;
+    cout << "\t -writeallMC \t\t\t\t write all events to showerpars and tpars trees (default: off)" << endl;
+    cout << "\t -writenoMCTree \t\t\t do not write MC event tree to output file (default: " << fRunPara->fwriteMCtree << ")" << endl;
     cout << endl;
 
     cout << "Detector definition:" << endl;
     cout << "--------------------" << endl;
-    cout << "\t -ntelescopes=INT \t number of telescopes (any integer, default 4)" << endl;
-    cout << "\t -camera=CAMERA \t set detector geometry file (default=veritasBC4_080117_Autumn2007-4.1.2_EVNDISP.cfg)" << endl;
-    cout << "\t -vbfnsamples \t use number of FADC samples from VBF file (default=" << fRunPara->fUseVBFSampleLength << ")" << endl;
+    cout << "\t -ntelescopes=INT \t\t\t number of telescopes (any integer, default 4)" << endl;
+    cout << "\t -teltoana=INT \t\t\t\t analyze only these telescopes" << endl;
+    cout << "\t\t\t\t\t\t (Telescope 1=1,..., Telescopes 2 and 3 = 23, Telescopes 1,2,4 = 124, or 1,2,10,25; default 1234, )" << endl;
+    cout << "\t -camera=CAMERA \t\t\t set detector geometry file (default=veritasBC4_080117_Autumn2007-4.1.2_EVNDISP.cfg)" << endl;
+    cout << "\t -vbfnsamples \t\t\t\t use number of FADC samples from VBF file (default=" << fRunPara->fUseVBFSampleLength << ")" << endl;
     cout << endl;
 
     cout << "Calibration:" << endl;
     cout << "------------" << endl;
-    cout << "\t -calibrationfile FILENAME \t file with names of pedestal/gain/toffset/pixel status files (assume path ../data/calibration/calib.dat)" << endl;
-    cout << "\t--------------------------" << endl;
-    cout << "\t -gaincorrection=FLOAT \t apply correction to gains (default=1)" << endl;
-    cout << "\t -usepeds \t\t use only true pedestal events (event type=2; use -donotusepeds to switch it off)" << endl;
-    cout << "\t -lasermin=INT \t\t minimal total charge sum for a event to be a laser event (default=" << fRunPara->fLaserSumMin << ")" << endl;
+    cout << "\t -calibrationfile FILENAME \t\t file with names of pedestal/gain/toffset/pixel status files (assume path ../data/calibration/calib.dat)" << endl;
+    cout << "\t -gaincorrection=FLOAT \t\t\t apply correction to gains (default=1)" << endl;
+    cout << "\t -usepeds \t\t\t\t use only true pedestal events (event type=2; use -donotusepeds to switch it off)" << endl;
+    cout << "\t -lasermin=INT \t\t\t\t minimal total charge sum for a event to be a laser event (default=" << fRunPara->fLaserSumMin << ")" << endl;
     cout << "\t -l2setspecialchannels FILENAME \t set special channels for l2 feed into FADC crates (default=specialChannel.dat)" << endl;
-    cout << "\t -l2timecorrect=0/1 \t apply FADC stop time corrections based on L2 pulses (default=true)" << endl;
-    cout << "\t--------------------------" << endl;
-    cout << "\t -usePedestalsInTimeSlices=0/1 \t use time dependent pedestals (high gain channels) (default = on(1))" << endl;
+    cout << "\t -l2timecorrect=0/1 \t\t\t apply FADC stop time corrections based on L2 pulses (default=true)" << endl;
+    cout << "\t -usePedestalsInTimeSlices=0/1 \t\t use time dependent pedestals (high gain channels) (default = on(1))" << endl;
     cout << "\t -usePedestalsInTimeSlicesLowGain=0/1 \t use time dependent pedestals (low gain channels) (default = off(0))" << endl;
-    cout << "\t -PedestalsInTimeSlices \t calculate pedestals on short time scale (default=false)" << endl;
+    cout << "\t -PedestalsInTimeSlices \t\t calculate pedestals on short time scale (default=false)" << endl;
     cout << "\t -PedestalsLengthOfTimeSlice=FLOAT \t length of time slices for pedestal variations (default=180s)" << endl;
     cout << "\t -PedestalsInTimeSlicesSumWindow=INT \t length of sum window for pedestal variations (default=4)" << endl;
     cout << "\t -PedestalsInTimeSlicesSumFirst=INT \t start of sum window for pedestal variations (default=0)" << endl;
-    cout << "\t--------------------------" << endl;
-    cout << "\t -deadchannelfile FILE \t read this file with dead channel definitions (default=deadChannelDefinition.dat)" << endl;
+    cout << "\t -deadchannelfile FILE \t\t\t read this file with dead channel definitions (default=deadChannelDefinition.dat)" << endl;
     cout << endl;
 
     cout << "Pointing: " << endl;
     cout << "---------" << endl;
-    cout << "\t -elevation \t\t telescope elevation (preli)" << endl;
-    cout << "\t -azimuth \t\t telescope azimuth (preli)" << endl;
-    cout << "\t -target TARGET \t telescope is pointed to this target (use -print targets to print available targets)" << endl;
-    cout << "\t -printtargets \t\t print available targets" << endl;
-    cout << "\t -declination=DEC \t target is at this declination (J2000)" << endl;
-    cout << "\t -rightascension=RA \t target is at this right ascension (J2000)" << endl;
-    cout << "\t -decoffset=DEC \t offset added to target declination (degrees)" << endl;
-    cout << "\t -raoffset=RA \t\t offset added to target right ascension (degrees - e.g. +/- 7.5 for 30 minutes OFF source)" << endl;
-    cout << "\t -wobblenorth=FLOAT \t wobble offset NORTH (degrees)" << endl;
-    cout << "\t -wobbleeast=FLOAT \t wobble offset EAST (degrees)" << endl;
-    cout << "\t -checkpointing=FLOAT \t abort of difference between calculated pointing direction and vbf pointing direction is larger than this value" << endl;
-    cout << "\t\t\t\t ([deg], default=" << fRunPara->fCheckPointing << " deg)"  << endl;
-    cout << "\t -pointingErrorX=INT:FLOAT \t take pointing error in array reconstruction into account" << endl;
-    cout << "\t\t\t\t\t (camera x-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorX=1:0.05)" << endl;
-    cout << "\t\t\t\t\t (NOTE: experts only; option disables reading of pointing values from the DB)" << endl;
-    cout << "\t -pointingErrorY=INT:FLOAT \t take pointing error in array reconstruction into account" << endl;
-    cout << "\t\t\t\t\t (camera y-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorY=1:0.05)" << endl;
-    cout << "\t\t\t\t\t (NOTE: experts only; option disables reading of pointing values from the DB)" << endl;
-    cout << "\t -useDBtracking \t use database to calculate pointing errors (default: on, switch off with -usenodbtracking )" << endl;
-    cout << "\t -useTCorrectionfrom SQL-DATE \t use pointing calculated with T-point correction valid for this data (default: not applied, example: -useTCorrectionfrom \"2007-10-10\"" << endl;
-    cout << "\t -pointingmonitortxt DIRECTORY \t find pointing monitor text files in this directory (default: not applied, expect filename as pointing_VPM.37195.t1.dat)" << endl;
-    cout << "\t -usedbvpm \t\t use calibrated pointing monitor data from DB (usenodbvpm to switch it off)" << endl;
+    cout << "\t -elevation \t\t\t\t telescope elevation (preli)" << endl;
+    cout << "\t -azimuth \t\t\t\t telescope azimuth (preli)" << endl;
+    cout << "\t -target TARGET \t\t\t telescope is pointed to this target (use -print targets to print available targets)" << endl;
+    cout << "\t -printtargets \t\t\t\t print available targets" << endl;
+    cout << "\t -declination=DEC \t\t\t target is at this declination (J2000)" << endl;
+    cout << "\t -rightascension=RA \t\t\t target is at this right ascension (J2000)" << endl;
+    cout << "\t -decoffset=DEC \t\t\t offset added to target declination (degrees)" << endl;
+    cout << "\t -raoffset=RA \t\t\t\t offset added to target right ascension (degrees - e.g. +/- 7.5 for 30 minutes OFF source)" << endl;
+    cout << "\t -wobblenorth=FLOAT \t\t\t wobble offset NORTH (degrees)" << endl;
+    cout << "\t -wobbleeast=FLOAT \t\t\t wobble offset EAST (degrees)" << endl;
+    cout << "\t -checkpointing=FLOAT \t\t\t abort of difference between calculated pointing direction and vbf pointing direction is larger than this value" << endl;
+    cout << "\t\t\t\t\t\t ([deg], default=" << fRunPara->fCheckPointing << " deg)"  << endl;
+    cout << "\t -pointingErrorX=INT:FLOAT \t\t take pointing error in array reconstruction into account" << endl;
+    cout << "\t\t\t\t\t\t (camera x-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorX=1:0.05)" << endl;
+    cout << "\t\t\t\t\t\t (NOTE: experts only; option disables reading of pointing values from the DB)" << endl;
+    cout << "\t -pointingErrorY=INT:FLOAT \t\t\t take pointing error in array reconstruction into account" << endl;
+    cout << "\t\t\t\t\t\t (camera y-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorY=1:0.05)" << endl;
+    cout << "\t\t\t\t\t\t (NOTE: experts only; option disables reading of pointing values from the DB)" << endl;
+    cout << "\t -useDBtracking \t\t\t use database to calculate pointing errors (default: on, switch off with -usenodbtracking )" << endl;
+    cout << "\t -useTCorrectionfrom SQL-DATE \t\t use pointing calculated with T-point correction valid for this data (default: not applied, example: -useTCorrectionfrom \"2007-10-10\"" << endl;
+    cout << "\t -pointingmonitortxt DIRECTORY \t\t find pointing monitor text files in this directory (default: not applied, expect filename as pointing_VPM.37195.t1.dat)" << endl;
+    cout << "\t -usedbvpm \t\t\t\t use calibrated pointing monitor data from DB (usenodbvpm to switch it off)" << endl;
 // (obsolete)  cout << "\t -fillhistos \t\t fill diagnostic histograms (default=" << fRunPara->ffillhistos << ")" << endl;
-    cout << "\t -dstfile FILENAME \t name of dst output file (root file, default: dstfile.root)" << endl;
-    cout << "\t -dstallpixel=INT \t write data from all pixels to dst files (0: write image/border pixel only; default: 1)" << endl;
-    cout << "-----------------------" << endl;
+    cout << "\t -dstfile FILENAME \t\t\t name of dst output file (root file, default: dstfile.root)" << endl;
+    cout << "\t -dstallpixel=INT \t\t\t write data from all pixels to dst files (0: write image/border pixel only; default: 1)" << endl;
     cout << endl;
 
     cout << "FADC pulse integration:" << endl;
     cout << "-----------------------" << endl;
-    cout << "\t -sumfirst=INT \t\t start of summation window (default=" << fRunPara->fsumfirst[0] << ")" << endl;
-    cout << "\t -sumwindow=INT \t length of summation window (default=" << fRunPara->fsumwindow[0] << ")" << endl;
-    cout << "\t -fixwindowstart \t fix the start of the integration windwo to -sumfirst=INT (do not move according to pulse position, incompatible with doublepass, default: off)" << endl;
-    cout << "\t -tracefit=FLOAT \t fit FADC traces (-1.=off(default),0=fit all PMTs, >0: fit PMTs with peak value > tracefit x pedestal rms" << endl;
-    cout << "\t -fitfunction=FIFU \t fit function to fit FADC traces (ev or grisu)" << endl;
-    cout << "\t Double pass options:" << endl;
-    cout << "\t -doublepass \t\t optimize sum window parameters (default: on, use -nodoublepass to switch off)" << endl;
-    cout << "\t -tracewindowshift=INT \t shift the summation window by value (in doublepass: low gain channels only, default: -1 (0 for -fixwindowstart))" << endl;
-    cout << "\t -tracedefinesmallpulse=INT \t use double pass window placement for pulses with maximum smaller than this value (default: 15 d.c.)" << endl;
-    cout << "\t -sumwindow_doublepass=INT \t length of summation window for second pass in double pass method (default=" << fRunPara->fsumwindowsmall[0] << ")" << endl;
-    cout << "\t -MC_FADCTraceStart=INT \t MC FADC trace start (observe: nsamples+MC_FADCTraceStart<n_simulated_samples; default=0)" << endl;
-    cout << "-----------------------" << endl;
+    cout << "\t -sumfirst=INT \t\t\t\t start of summation window (default=" << fRunPara->fsumfirst[0] << ")" << endl;
+    cout << "\t -sumwindow=INT \t\t\t length of summation window (default=" << fRunPara->fsumwindow[0] << ")" << endl;
+    cout << "\t -fixwindowstart \t\t\t fix the start of the integration windwo to -sumfirst=INT (do not move according to pulse position, incompatible with doublepass, default: off)" << endl;
+    cout << "\t -tracefit=FLOAT \t\t\t fit FADC traces (-1.=off(default),0=fit all PMTs, >0: fit PMTs with peak value > tracefit x pedestal rms" << endl;
+    cout << "\t -fitfunction=FIFU \t\t\t fit function to fit FADC traces (ev or grisu)" << endl;
+    cout << "\t -MC_FADCTraceStart=INT \t\t MC FADC trace start (observe: nsamples+MC_FADCTraceStart<n_simulated_samples; default=0)" << endl;
+    cout << "  Double pass options:" << endl;
+    cout << "\t -doublepass \t\t\t\t optimize sum window parameters (default: on, use -nodoublepass to switch off)" << endl;
+    cout << "\t -tracewindowshift=INT \t\t\t shift the summation window by value (in doublepass: low gain channels only, default: -1 (0 for -fixwindowstart))" << endl;
+    cout << "\t -tracedefinesmallpulse=INT \t\t use double pass window placement for pulses with maximum smaller than this value (default: 15 d.c.)" << endl;
+    cout << "\t -sumwindow_doublepass=INT \t\t length of summation window for second pass in double pass method (default=" << fRunPara->fsumwindowsmall[0] << ")" << endl;
     cout << endl;
+
     cout << "Image cleaning and calculation:" << endl;
     cout << "-------------------------------" << endl;
-    cout << "\t -useFixedThresholds \t use fixed image/border thresholds (default: off, use multiples of pedestal variations)" << endl;
-    cout << "\t -imagethresh=FLOAT \t image threshold (default=" << fRunPara->fimagethresh[0] << ")" << endl;
-    cout << "\t -borderthresh=FLOAT \t border threshold (default=" << fRunPara->fborderthresh[0] << ")" << endl;
-    cout << "\t -brightnonimage=FLOAT \t bright non image threshold (default=" << fRunPara->fbrightnonimagetresh[0] << ")" << endl;
-    cout << "\t -useTimeCleaning \t use advanced time cleaning (default: off)" << endl; //HP
-    cout << "\t -timecutpixel=FLOAT \t time cut between pixels (default=" << fRunPara->ftimecutpixel[0] << ")" << endl; //HP
-    cout << "\t -timecutcluster=FLOAT \t time cut between cluster (default=" << fRunPara->ftimecutcluster[0] << ") " << endl; //HP
-    cout << "\t -minpixelcluster=INT \t minimum number of pixels in cluster (default=" << fRunPara->fminpixelcluster[0] << ")" << endl; //HP
-    cout << "\t -loops=INT \t\t number of loops for border pixel finding (default=" << fRunPara->floops[0] << ")" << endl; //HP
-    cout << "\t -smoothdead \t\t smooth over dead pixels" << endl;
-    cout << "\t -logl=0/1/2 \t\t perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)" << endl;
-    cout << "\t -loglminloss=FLOAT \t  perform loglikelihood image parameterisation for images with loss > values (default=off=1.)" << endl;
-    cout << "\t -fuifactor=FLOAT \t fraction of image/border pixel under image ellipse fact (default=" << fRunPara->fImageAnalysisFUIFactor << ")" << endl;
-    cout << "\t -padrun=RUN \t\t padding run number" << endl;
+    cout << "\t -useFixedThresholds \t\t\t use fixed image/border thresholds (default: off, use multiples of pedestal variations)" << endl;
+    cout << "\t -imagethresh=FLOAT \t\t\t image threshold (default=" << fRunPara->fimagethresh[0] << ")" << endl;
+    cout << "\t -borderthresh=FLOAT \t\t\t border threshold (default=" << fRunPara->fborderthresh[0] << ")" << endl;
+    cout << "\t -brightnonimage=FLOAT \t\t\t bright non image threshold (default=" << fRunPara->fbrightnonimagetresh[0] << ")" << endl;
+    cout << "\t -useTimeCleaning \t\t\t use advanced time cleaning (default: off)" << endl; //HP
+    cout << "\t -timecutpixel=FLOAT \t\t\t time cut between pixels (default=" << fRunPara->ftimecutpixel[0] << ")" << endl; //HP
+    cout << "\t -timecutcluster=FLOAT \t\t\t time cut between cluster (default=" << fRunPara->ftimecutcluster[0] << ") " << endl; //HP
+    cout << "\t -minpixelcluster=INT \t\t\t minimum number of pixels in cluster (default=" << fRunPara->fminpixelcluster[0] << ")" << endl; //HP
+    cout << "\t -loops=INT \t\t\t\t number of loops for border pixel finding (default=" << fRunPara->floops[0] << ")" << endl; //HP
+    cout << "\t -smoothdead \t\t\t\t smooth over dead pixels" << endl;
+    cout << "\t -logl=0/1/2 \t\t\t\t perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)" << endl;
+    cout << "\t -loglminloss=FLOAT \t\t\t perform loglikelihood image parameterisation for images with loss > values (default=off=1.)" << endl;
+    cout << "\t -fuifactor=FLOAT \t\t\t fraction of image/border pixel under image ellipse fact (default=" << fRunPara->fImageAnalysisFUIFactor << ")" << endl;
+    cout << "\t -padrun=RUN \t\t\t\t padding run number" << endl;
     cout << endl;                                 // MS
 
     cout << "Parallaxwidth calculation"<<endl;    // MS
     cout << "--------------------------" << endl;
                                                   // MS
-    cout << "\t -PWmethod=-1/0/1/2, \t default = "<<fRunPara->fPWmethod<<endl;
+    cout << "\t -PWmethod=-1/0/1/2, \t\t\t default = "<<fRunPara->fPWmethod<<endl;
                                                   // MS
-    cout << "\t\t -1 = no trigger-map parameters calculated"<<endl;
+    cout << "\t\t\t\t\t\t -1 = no trigger-map parameters calculated"<<endl;
                                                   // MS
-    cout << "\t\t 0 = cleaned CFD hits, requiring center pixels to have at least PWcleanNeighbors"<<endl;
+    cout << "\t\t\t\t\t\t 0  = cleaned CFD hits, requiring center pixels to have at least PWcleanNeighbors"<<endl;
                                                   // MS
-    cout << "\t\t 1 = cleaned CFD hits, center + nearest neighbor pixels are accepted in the map"<<endl;
+    cout << "\t\t\t\t\t\t 1  = cleaned CFD hits, center + nearest neighbor pixels are accepted in the map"<<endl;
                                                   // MS
-    cout << "\t\t 2 = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors"<<endl;
+    cout << "\t\t\t\t\t\t 2  = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors"<<endl;
                                                   // MS
-    cout << "\t\t 3 = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors, nearest-neighbor pixels are also accepted in the trigger map"<<endl;
+    cout << "\t\t\t\t\t\t 3  = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors," << endl;
+    cout << "\t\t\t\t                 nearest-neighbor pixels are also accepted in the trigger map"<<endl;
                                                   // MS
-    cout << "\t -PWcleanNeighbors=0/1/2/3..."<<endl;
-                                                  // MS
-    cout << "\t \t sets the number of neighbors required for a pixel to survive cleaning, default = "<<fRunPara->fPWcleanNeighbors<<endl;
-    cout << "\t -PWcleanThreshold=FLOAT  software cleaning threshold to use for method 3, default = "<<fRunPara->fPWcleanThreshold<<endl;
-    cout << "\t -PWlimit=0...INT, \t limits the number of pixels PER trigger-sector transmitted to the moment-generating function. Setting of 0 transmits all pixels. Default: "<<fRunPara->fPWlimit <<endl;
+    cout << "\t -PWcleanNeighbors=0/1/2/3..." "\t\t sets the number of neighbors required for a pixel to survive cleaning, default = "<<fRunPara->fPWcleanNeighbors<<endl;
+    cout << "\t -PWcleanThreshold=FLOAT \t\t software cleaning threshold to use for method 3, default = "<<fRunPara->fPWcleanThreshold<<endl;
+    cout << "\t -PWlimit=0...INT, \t\t\t limits the number of pixels PER trigger-sector transmitted to the moment-generating function. Setting of 0 transmits all pixels. Default: "<<fRunPara->fPWlimit <<endl;
     cout << endl;
+
     cout << "Display options:" << endl;
     cout << "----------------" << endl;
-    cout << "\t -display=0/1 \t\t show eventdisplay (default=" << fRunPara->fdisplaymode << ")" << endl;
-    cout << "\t -loop \t\t\t infinite loop (default=" << fRunPara->floopmode << ")" << endl;
-    cout << "\t -highres \t\t large display" << endl;
-    cout << "\t -photodiode \t\t show photodiode" << endl;
-    cout << "\t -plotraw \t\t fast plotting without pedestals/gains/toffsets" << endl;
-    cout << "\t -plotpaper \t\t clean plots for talks/papers (no dead channels, no small text, ..., default=false)" << endl;
-    cout << "\t -plotmethod=INT \t results of this array reconstrutions are shown in 'all in one' display (default=0)" << endl;
-    cout << "--------------------------" << endl;
+    cout << "\t -display=0/1 \t\t\t\t show eventdisplay (default=" << fRunPara->fdisplaymode << ")" << endl;
+    cout << "\t -loop \t\t\t\t\t infinite loop (default=" << fRunPara->floopmode << ")" << endl;
+    cout << "\t -highres \t\t\t\t large display" << endl;
+    cout << "\t -photodiode \t\t\t\t show photodiode" << endl;
+    cout << "\t -plotraw \t\t\t\t fast plotting without pedestals/gains/toffsets" << endl;
+    cout << "\t -plotpaper \t\t\t\t clean plots for talks/papers (no dead channels, no small text, ..., default=false)" << endl;
+    cout << "\t -plotmethod=INT \t\t\t results of this array reconstrutions are shown in 'all in one' display (default=0)" << endl;
     cout << endl;
+
     cout << "Simulations: " << endl;
     cout << "-------------" << endl;
-    cout << "\t -isMC=0/1/2 \t\t source data is MC (not/write all MC events/only triggered MC events, default=0)" << endl;
-    cout << "\t -teleNoff=INT \t\t offset in telescope counting (default: first tel. = 1; for grisu MC raw files only)" << endl;
-    cout << "\t -sampleoff=INT \t offset in FADC sample reading (default: 0)" << endl;
-    cout << "\t -tracelib FILE.root \t trace library file for MC background creation" << endl;
-    cout << "\t -ignoredead \t\t ignore dead channel labeling in camera configuration files (default=false)" << endl;
-    cout << "\t -ndeadchannel=INT \t number of pixels to set randomly dead (default=0)" << endl;
-    cout << "\t -seedndead=INT \t seed for setting pixels randomly dead (default=0)" << endl;
-    cout << "\t -ndeadboard=INT \t number of boards to set randomly dead (default=0)" << endl;
-    cout << "\t -fadcscale=float \t scale factor for traces (default=1.)" << endl;
-    cout << "\t -pedestalseed=int \t seed for pedestal calculation (default=0)" << endl;
-    cout << "\t -pedestalfile FILENAME \t use pedestals from P lines in this pedestal file (default: Off)" << endl;
-    cout << "\t -pedestalnoiselevel=int \t GrIsu noise level used for external pedestal file (default=250)" << endl;
-    cout << "\t -pedestalDefaultPedestal=float \t  GrIsu default pedestals used in simulations (default=15.)" << endl;
-    cout << "\t -writeallMC \t\t write all events to showerpars and tpars trees (default: off)" << endl;
-    cout << "\t--------------------------" << endl;
+    cout << "\t -isMC=0/1/2 \t\t\t\t source data is MC (not/write all MC events/only triggered MC events, default=0)" << endl;
+    cout << "\t -fillmchisto \t\t\t\t fill MC histograms (default " << fRunPara->fFillMCHistos << ")" << endl;
+    cout << "\t -teleNoff=INT \t\t\t\t offset in telescope counting (default: first tel. = 1; for grisu MC raw files only)" << endl;
+    cout << "\t -sampleoff=INT \t\t\t offset in FADC sample reading (default: 0)" << endl;
+    cout << "\t -tracelib FILE.root \t\t\t trace library file for MC background creation" << endl;
+    cout << "\t -ignoredead \t\t\t\t ignore dead channel labeling in camera configuration files (default=false)" << endl;
+    cout << "\t -ndeadchannel=INT \t\t\t number of pixels to set randomly dead (default=0)" << endl;
+    cout << "\t -seedndead=INT \t\t\t seed for setting pixels randomly dead (default=0)" << endl;
+    cout << "\t -ndeadboard=INT \t\t\t number of boards to set randomly dead (default=0)" << endl;
+    cout << "\t -fadcscale=float \t\t\t scale factor for traces (default=1.)" << endl;
+    cout << "\t -pedestalseed=int \t\t\t seed for pedestal calculation (default=0)" << endl;
+    cout << "\t -pedestalfile FILENAME \t\t use pedestals from P lines in this pedestal file (default: Off)" << endl;
+    cout << "\t -pedestalnoiselevel=int \t\t GrIsu noise level used for external pedestal file (default=250)" << endl;
+    cout << "\t -pedestalDefaultPedestal=float \t GrIsu default pedestals used in simulations (default=15.)" << endl;
     cout << endl;
     cout << "Others:" << endl;
     cout << "-------" << endl;
-    cout << "\t -debug \t\t print lots of debug output" << endl;
-    cout << "\t -muon \t\t\t search for muon rings" << endl;
-    cout << "\t -frogs \t\t\t use frogs template analysis" << endl;
-    cout << "\t -user USERNAME \t username" << endl;
+    cout << "\t -debug \t\t\t\t print lots of debug output" << endl;
+    cout << "\t -muon \t\t\t\t\t search for muon rings" << endl;
+    cout << "\t -frogs \t\t\t\t use frogs template analysis" << endl;
+    cout << "\t -user USERNAME \t\t\t username" << endl;
     cout << endl;
     cout << endl;
     cout << "for installation see file INSTALL" << endl;

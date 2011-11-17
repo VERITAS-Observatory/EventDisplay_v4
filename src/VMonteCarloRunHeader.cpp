@@ -113,3 +113,8 @@ void VMonteCarloRunHeader::print()
     cout << "SLANT " << EVTH76.test( 8 ) << endl;
     cout << endl << endl;
 }    
+
+double VMonteCarloRunHeader::getMeanZenithAngle_Deg()
+{
+   return 0.5*(90.-alt_range[0]*45./atan(1.)+90.-alt_range[1]*45./atan(1.));
+}

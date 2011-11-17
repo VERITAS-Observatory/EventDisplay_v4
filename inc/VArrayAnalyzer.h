@@ -8,6 +8,7 @@
 #include "VEvndispData.h"
 #include "VDispTableAnalyzer.h"
 #include "VGrIsuAnalyzer.h"
+#include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VMLPAnalyzer.h"
 #include "VShowerParameters.h"
 #include "VSkyCoordinatesUtilities.h"

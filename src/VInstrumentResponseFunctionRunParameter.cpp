@@ -348,7 +348,8 @@ void VInstrumentResponseFunctionRunParameter::print()
     cout << "filling mode " << fFillingMode;
     if( fFillingMode == 0 ) cout << " (calculating complete set of response functions (effective areas, energy, core and angular resolution curves))";
     if( fFillingMode == 1 ) cout << " (calculating core and angular resolution curves)";
-    if( fFillingMode == 2 ) cout << " (calculating effective areas and energy resolution curves)";
+    if( fFillingMode == 2 ) cout << " (calculating angular resolution curves)";
+    if( fFillingMode == 3 ) cout << " (calculating effective areas and energy resolution curves)";
     cout << endl;
     if( fFillMCHistograms ) cout << " filling MC histograms only" << endl << endl;
 

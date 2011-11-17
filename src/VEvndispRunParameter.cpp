@@ -172,6 +172,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fWriteTriggerOnly = true;
     fShortTree = 0;
     fwriteMCtree = 1;
+    fFillMCHistos = true;
 
 // muon parameters
     fmuonmode = false;

@@ -103,8 +103,6 @@ int main( int argc, char *argv[] )
 // set effective area Monte Carlo histogram class
     TFile *fMC_histoFile = 0;
     VEffectiveAreaCalculatorMCHistograms *fMC_histo = new VEffectiveAreaCalculatorMCHistograms();
-    fMC_histo->setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
-    fMC_histo->setCuts( fCuts );
 
 /////////////////////////////////////////////////////////////////////////////
 // set angular, core, etc resolution calculation class
@@ -112,7 +110,7 @@ int main( int argc, char *argv[] )
     vector< string > f_IRF_Name;
     vector< string > f_IRF_Type;
     string fCuts_AngularResolutionName = "";
-    if( fRunPara->fFillingMode != 2 )
+    if( fRunPara->fFillingMode != 3 )
     {
        f_IRF_Name.push_back( "angular_resolution" );            f_IRF_Type.push_back( "angular_resolution" );
        if( fCuts->getAngularResolutionContainmentRadius() )
@@ -122,8 +120,11 @@ int main( int argc, char *argv[] )
 	  fCuts_AngularResolutionName = hname;
           f_IRF_Name.push_back( fCuts_AngularResolutionName );       f_IRF_Type.push_back( "angular_resolution" );
        }
-       f_IRF_Name.push_back( "core_resolution" );               f_IRF_Type.push_back( "core_resolution" );
-       f_IRF_Name.push_back( "energy_resolution" );             f_IRF_Type.push_back( "energy_resolution" );
+       if( fRunPara->fFillingMode != 2 )
+       {
+	  f_IRF_Name.push_back( "core_resolution" );               f_IRF_Type.push_back( "core_resolution" );
+	  f_IRF_Name.push_back( "energy_resolution" );             f_IRF_Type.push_back( "energy_resolution" );
+       }
     }
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
     {
@@ -184,6 +185,7 @@ int main( int argc, char *argv[] )
             cout << "exiting..." << endl;
             exit( -1 );
         }
+	fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
         fMC_histo->print();
      }
 
@@ -203,7 +205,7 @@ int main( int argc, char *argv[] )
            f_IRF[i]->fill();
 	   if( fCuts_AngularResolutionName.size() > 0 && f_IRF_Name[i] == fCuts_AngularResolutionName )
 	   {
-	     fCuts->setIRFGraph( f_IRF[i]->getAngularResolutionGraph( 0, 0 ) );
+	     if( fCuts->getDirectionCutSelector() == 2 ) fCuts->setIRFGraph( f_IRF[i]->getAngularResolutionGraph( 0, 0 ) );
            }
         }
     }
@@ -217,9 +219,11 @@ int main( int argc, char *argv[] )
         fEffectiveAreaCalculator.initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
      }
 // fill MC histograms
-     if( c2 && fRunPara->fFillingMode != 1 )
+     if( c2 && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
      {
         fStopWatch.Start();
+        fMC_histo->setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
+        fMC_histo->setCuts( fCuts->fArrayxyoff_MC_min, fCuts->fArrayxyoff_MC_max );
         fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, 
 	                                 fRunPara->fEnergyAxisBins_log10, 
 					 fEffectiveAreaCalculator.getEnergyAxis_minimum_defaultValue(), 
@@ -233,7 +237,7 @@ int main( int argc, char *argv[] )
      }  
 
 // fill effective areas
-     if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 )
+     if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
      {
 	fOutputfile->cd();
         fEffectiveAreaCalculator.fill( hE0mc, &d, fMC_histo, fRunPara->fEnergyReconstructionMethod );

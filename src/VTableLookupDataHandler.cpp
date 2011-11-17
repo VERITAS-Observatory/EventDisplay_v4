@@ -1092,7 +1092,7 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
 
         if( fIsMC )
 	{
-	   cout << "\t writing MC histograms" << endl;
+	   cout << "\t writing MC debug histograms" << endl;
 	   hisList->Write();
         }
 
@@ -1105,6 +1105,7 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
         }
 
         if( fIsMC && bWriteMCPars ) copyMCTree();
+	if( fIsMC ) copyMCHistograms();
 	if( fIsMC ) copyMCRunheader();
 
         fOutFile->Close();
@@ -1172,6 +1173,46 @@ void VTableLookupDataHandler::copyMCTree()
         iMC.Merge( fOutFile, 0, "keep" );
         cout << "done "<< endl;
     }
+}
+
+void VTableLookupDataHandler::copyMCHistograms()
+{
+   VEffectiveAreaCalculatorMCHistograms *iMC_his = 0;
+   if( fTshowerpars )
+   {
+// loop over all files and add MC histograms
+        TObjArray *fileElements = fTshowerpars->GetListOfFiles();
+        TChainElement *chEl=0;
+        TIter next(fileElements);
+	unsigned int z = 0;
+	while( (chEl = (TChainElement*)next()) )
+	{
+           TFile *ifInput = new TFile( chEl->GetTitle() );
+	   if( !ifInput->IsZombie() )
+	   {
+	      if( z == 0 )
+	      {
+	         iMC_his = (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" );
+              }
+	      else
+	      {
+	         if( iMC_his )
+		 {
+		    iMC_his->add( (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" ) );
+                 }
+		 ifInput->Close();
+              }
+	      z++;
+           }
+        }
+	if( iMC_his && fOutFile )
+	{ 
+	   cout << "writing MC histograms" << endl;
+	   iMC_his->print();
+	   fOutFile->cd();
+	   iMC_his->Write();
+        }
+   }
 }
 
 

@@ -268,6 +268,8 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VDST.o \
 		./obj/VDSTTree.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VPedestalCalculator.o \
 		./obj/VDeadChannelFinder.o \
 		./obj/VSpecialChannel.o \
@@ -337,6 +339,8 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o  ./obj/CtparsShort.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
 		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
 		./obj/VEnergyCorrection.o ./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
+		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VDeadTime.o ./obj/VUtilities.o \

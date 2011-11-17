@@ -392,26 +392,48 @@ void VArrayAnalyzer::terminate()
         cout << getShowerParameters()->getTree()->GetEntries();
         cout << " entries) to : " << fOutputfile->GetName() << endl;
         getShowerParameters()->getTree()->Write();
+// MC tree and histograms
         if( isMC() && getRunParameter()->fwriteMCtree )
         {
+// get MC tree
+            TTree *i_tMC = 0;
             if( getRunParameter()->fsourcetype == 7 )
             {
                 if( getReader()->getMCTree() )
                 {
-		    cout << "copying MC tree " << endl;
-                    TTree *t = (TTree*)getReader()->getMCTree()->CloneTree( -1, "fast" );
-                    if( t )
-                    {
-                        t->SetName( "MCpars" );
-			cout << "(number of MC events in tree " << t->GetName() << ": " << t->GetEntries() << ")" << endl;
-                        t->Write();
+                    if( getRunParameter()->fwriteMCtree )
+		    {
+		       if( getRunParameter()->fwriteMCtree ) i_tMC = (TTree*)getReader()->getMCTree()->CloneTree( -1, "fast" );
+		       if( i_tMC ) i_tMC->SetName( "MCpars" );
                     }
-		    cout << "...done" << endl;
+                    else                                  i_tMC = (TTree*)getReader()->getMCTree();
                 }
             }
             else
             {
-                if( getMCParameters()->getTree() ) getMCParameters()->getTree()->Write();
+                if( getMCParameters()->getTree() ) i_tMC = getMCParameters()->getTree();
+            }
+	    if( getRunParameter()->fwriteMCtree && i_tMC )
+	    {
+		 cout << "writing MC tree " << endl;
+	         i_tMC->Write();
+		 cout << "(number of MC events in tree " << i_tMC->GetName() << ": " << i_tMC->GetEntries() << ")" << endl;
+   	         cout << "...done" << endl;
+            }
+	    if( getRunParameter()->fFillMCHistos && i_tMC )
+	    {
+	        cout << "filling MC histograms" << endl;
+		VEffectiveAreaCalculatorMCHistograms iMC_histos;
+		if( getReader()->getMonteCarloHeader() )
+		{
+		   iMC_histos.setMonteCarloEnergyRange( getReader()->getMonteCarloHeader()->E_range[0], getReader()->getMonteCarloHeader()->E_range[1],
+		                                         TMath::Abs( getReader()->getMonteCarloHeader()->spectral_index ) );
+                }
+		iMC_histos.setDefaultValues();
+		iMC_histos.initializeHistograms();
+		iMC_histos.fill( getReader()->getMonteCarloHeader()->getMeanZenithAngle_Deg(), i_tMC, true );
+		iMC_histos.print();
+		iMC_histos.Write();
             }
         }
         if( getArrayAnalysisCuts() ) getArrayAnalysisCuts()->Write();

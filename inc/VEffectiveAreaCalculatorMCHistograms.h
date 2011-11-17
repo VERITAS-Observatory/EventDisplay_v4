@@ -11,7 +11,6 @@
 #include "TProfile.h"
 #include "TTree.h"
 
-#include "VGammaHadronCuts.h"
 #include "VSpectralWeight.h"
 
 #include <iostream>
@@ -24,8 +23,12 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
 {
    private:
 
+   bool     fDebug;
+
 // cuts
-   VGammaHadronCuts *fCuts;                                     //! don't write cuts to output file (preliminary)
+   bool     fMCCuts;
+   double   fArrayxyoff_MC_min;
+   double   fArrayxyoff_MC_max;
 
 // spectral weight calculator
    VSpectralWeight           *fSpectralWeight;                 // backwards compatibility
@@ -34,6 +37,11 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    double   fMCEnergyRange_TeV_max;
    double   fMCSpectralIndex;
 
+   int      fEnergyAxisBins_log10;
+   double   fEnergyAxisMin_log10;
+   double   fEnergyAxisMax_log10;
+
+   bool      checkParameters( const VEffectiveAreaCalculatorMCHistograms* );
 
    public:
 
@@ -49,20 +57,26 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    VEffectiveAreaCalculatorMCHistograms();
   ~VEffectiveAreaCalculatorMCHistograms() {}
 
-   bool      add();
-   bool      fill( double i_ze, TChain *i_MCData, bool iBAzimuthBins );
-   VGammaHadronCuts* getAnaCuts() { return fCuts; }
+   bool      add( const VEffectiveAreaCalculatorMCHistograms* );
+   bool      fill( double i_ze, TTree *i_MCData, bool iBAzimuthBins );
    TH1D*     getHistogram_Emc( unsigned int iAz, unsigned int iIndex );
    TProfile* getHistogram_EmcWeight( unsigned int iAz, unsigned int iIndex );
-   void      initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex, int nbins = 60, double iMin = -2., double iMax = 4. );
+   void      initializeHistograms();
+   void      initializeHistograms( vector< double > iAzMin, vector< double > iAzMax,
+                                   vector< double > iSpectralIndex, 
+				   int nbins = 60, double iMin = -2., double iMax = 4. );
+   bool      isMCCuts() { return fMCCuts; }
    void      listEntries() { print(); }
    void      print();
    bool      readFromEffectiveAreaTree( string iFile );
    bool      readFromEffectiveAreaFile( string iFile );
-   void      setCuts( VGammaHadronCuts* iAnaCuts ) { fCuts = iAnaCuts; }
+   bool      matchDataVectors( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
+   void      setCuts( double iArrayxyoff_MC_min = -99., double iArrayxyoff_MC_max = -99. );
+   void      setDebug( bool iB = false ) { fDebug = iB; }
+   void      setDefaultValues();
    bool      setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
 
-   ClassDef( VEffectiveAreaCalculatorMCHistograms, 7 );
+   ClassDef( VEffectiveAreaCalculatorMCHistograms, 9 );
 };
 
 #endif

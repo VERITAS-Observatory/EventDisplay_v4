@@ -186,6 +186,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         unsigned int fShortTree;                  // 0: full tree; 1: short tree
 	unsigned int fwriteMCtree;                // 0: do not write MC tree
         bool fWriteTriggerOnly;                   // true: write triggered events for simulation only
+	bool fFillMCHistos;                       // true: fill MC histograms with thrown events
 
 // display parameters
         bool   fdisplaymode;                      // display mode or command line mode
@@ -230,6 +231,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,107);
+        ClassDef(VEvndispRunParameter,108);
 };
 #endif

@@ -50,7 +50,7 @@ template<class Seq> void VUtilities::purge( Seq& c )
 string VUtilities::testFileLocation( string iFile, string iDirectory, bool bEVNDISPDATA )
 {
     ifstream is;
-    is.open( iFile.c_str(), ifstream::in);
+    is.open( gSystem->ExpandPathName( iFile.c_str() ), ifstream::in);
     if( !is )
     {
 	string itemp;

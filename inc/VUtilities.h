@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "TSystem.h"
+
 #include "VGlobalRunParameter.h"
 
 using namespace std;

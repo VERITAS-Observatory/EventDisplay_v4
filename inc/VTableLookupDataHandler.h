@@ -6,6 +6,7 @@
 
 #include "VEnergyCorrection.h"
 #include "VDeadTime.h"
+#include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VMonteCarloRunHeader.h"
 #include "VTableLookupRunParameter.h"
 
@@ -155,6 +156,7 @@ class VTableLookupDataHandler
         void calcDistances( int );                //!< calculate distances between telescopes and shower core
         void calcEmissionHeights();
         double calculateMeanNoiseLevel( bool bCurrentNoiseLevel = false );
+	void   copyMCHistograms();
 	void   copyMCRunheader();
         void   copyMCTree();
 	void   copy_telconfig();
