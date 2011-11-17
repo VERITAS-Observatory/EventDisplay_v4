@@ -278,7 +278,8 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 // energy range to be plotted
        b.setEnergyRange_Lin( 0.01, 150. );
 // significance parameters
-       b.setSignificanceParameter( 5., 10., 50., 10. );
+//       b.setSignificanceParameter( 5., 10., 50., 10. );
+       b.setSignificanceParameter( 5., 1.e-5, 50., 1.e-5 );
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
@@ -396,7 +397,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor, double iObservatio
    if( c && hBGRate )
    {
       c->cd();
-      hBGRate->Scale( 60. * 60. * iObservationTime_hours );
+      hBGRate->Scale( 60. * iObservationTime_hours );
       hBGRate->SetLineWidth( 2 );
       hBGRate->SetLineColor( iColor );
       hBGRate->SetMarkerColor( iColor );
@@ -475,7 +476,8 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
     (for all sub arrays)
 
 */
-void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_Proton = "proton", char *iMC_Electron = "electron", int iRecID = 0 )
+void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_Proton = "proton", char *iMC_Electron = "electron",
+                                  int iOffSetCounter = 0, int iRecID = 0 )
 {
    vector< string > SubArray;
    SubArray.push_back( "A" );
@@ -504,9 +506,9 @@ void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_
    {
       cout << "STARTING SUBARRAY " << SubArray[i] << endl;
 
-      sprintf( iGamma, "%s.%s_ID%d.eff-0-0.root", iMC_Gamma, SubArray[i].c_str(), iRecID );
-      sprintf( iProton, "%s.%s_ID%d.eff-0-0.root", iMC_Proton, SubArray[i].c_str(), iRecID );
-      sprintf( iElectron, "%s.%s_ID%d.eff-0-0.root", iMC_Electron, SubArray[i].c_str(), iRecID );
+      sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma, SubArray[i].c_str(), iRecID, iOffSetCounter );
+      sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, iOffSetCounter );
+      sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, iOffSetCounter );
 
       sprintf( iParticleNumberFile, "ParticleNumbers.%s.root", SubArray[i].c_str() );
 
