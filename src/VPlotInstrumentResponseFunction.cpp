@@ -22,11 +22,11 @@ VPlotInstrumentResponseFunction::VPlotInstrumentResponseFunction()
 
 void VPlotInstrumentResponseFunction::setPlottingDefaults()
 {
-   setPlottingAxis( "energy_Lin", "X", false, 0.03, 200., "energy [TeV]" );
+   setPlottingAxis( "energy_Lin", "X", true, 0.03, 200., "energy [TeV]" );
    setPlottingAxis( "distance_Lin", "X", false, 0., 500., "distance [m]" );
    setPlottingAxis( "nimages_Lin", "X", false, 0., 5., "number of images" );
 
-   setPlottingAxis( "effarea_Lin", "Y", false, 0.1, 1.e6, "effective area [m^{2}]" );
+   setPlottingAxis( "effarea_Lin", "Y", true, 1.0, 5.e7, "effective area [m^{2}]" );
    setPlottingAxis( "angularesolution_Lin", "Y", false, 0., 0.25, "angular resolution [deg]" );
    setPlottingAxis( "coreresolution_Lin", "Y", false, 0., 40.0, "core resolution [m]" );
    setPlottingAxis( "energyresolution_Lin", "Y", false, 0., 0.40, "energy resolution" );
@@ -549,7 +549,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, 
 {
    string iResolutionTreeName = "t_angular_resolution";
    if( iProbabilityString != "68" ) iResolutionTreeName += "_0" + iProbabilityString +"p";
-   return plotResolution( "angres"  + iProbabilityString, "angular resolution vs " + iXaxis,
+   return plotResolution( "angres"  + iProbabilityString, "angular resolution vs " + iXaxis + "(" + iProbabilityString + "%)",
                           "angular resolution (" + iProbabilityString + "%) [deg]",
                           getPlottingAxis( "angularesolution_Lin" )->fMinValue,
 			  getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
