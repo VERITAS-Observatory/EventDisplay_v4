@@ -12,7 +12,7 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <input> <cutfile template> <outputdirectory>"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <input> <cutfile template> <outputdirectory> [filling mode]"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
@@ -38,6 +38,9 @@ then
    echo "<outputdirectory>"
    echo "     directory with all result and log files"
    echo
+   echo "[filling mode]"
+   echo "     effective area filling mode (use 2 to calculate angular resolution only"
+   echo
    exit
 fi
 
@@ -56,6 +59,11 @@ INPU=$4
 CFIL=$5
 ODIR=$6
 EREC=0
+GFILLING=0
+if [ -n "$7" ]
+then
+  GFILLING=$7
+fi
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
@@ -268,10 +276,10 @@ do
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then
 # filling mode 0: fill and use angular resolution for energy dependent theta2 cuts
-	 echo "* FILLINGMODE 0" >> $MSCF
+	 echo "* FILLINGMODE $GFILLING" >> $MSCF
       else
 # background: use fixed theta2 cut
-	 echo "* FILLINGMODE 2" >> $MSCF
+	 echo "* FILLINGMODE 3" >> $MSCF
       fi
 # fill IRFs only
       echo "* ENERGYRECONSTRUCTIONMETHOD $EREC" >> $MSCF

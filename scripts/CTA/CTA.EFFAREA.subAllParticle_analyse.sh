@@ -8,7 +8,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray> <input> <cut file directory> <cutfile template> <output directory>"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray> <input> <cut file directory> <cutfile template> <output directory> [filling mode]"
    echo
    echo "<subarray>"
    echo "     subarray identifier (A,B,C...)"
@@ -27,6 +27,9 @@ then
    echo "<output directory>"
    echo "     directory name for output effective areas files"
    echo
+   echo "[filling mode]"
+   echo "effective area filling mode (use 2 to calculate angular resolution only"
+   echo
    echo ""
    exit
 fi
@@ -37,10 +40,15 @@ ITYPE=$2
 CDIR=$3
 CFIL=$4
 ODIR=$5
+GMOD=0
+if [ -n "$6" ]
+then
+  GMOD=$6
+fi
 mkdir -p $ODIR
 
 #arrays
-if [ $SUBAR == "ALL" ]
+if [ $SUBAR = "ALL" ]
 then
   VARRAY=( A B C D E F G H I J K NA NB "s4-1-120" "s4-2-120" "s4-2-85" )
 else
@@ -49,7 +57,13 @@ fi
 NARRAY=${#VARRAY[@]}
 
 # particle types
-VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
+#if [ $GFILL = "0" ]
+if [ $GMOD = "0" ]
+then
+   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
+else
+   VPART=( "gamma_onSource" "gamma_cone10" )
+fi
 NPART=${#VPART[@]}
 
 #########################################
@@ -81,7 +95,7 @@ do
         cp $CDIR/$CFIL.CRbck.dat $CCUT
       fi
 
-      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $ITYPE $CCUT $ODIR
+      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $ITYPE $CCUT $ODIR $GMOD
    done
 done
 
