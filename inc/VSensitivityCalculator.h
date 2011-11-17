@@ -114,7 +114,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 
 
 // observing time
-        double fObservationTime;                  //! [h]
+        double fObservationTime_h;                  // [h]
         double fObservationTime_min;
         double fObservationTime_max;
         int fObservationTime_steps;
@@ -201,8 +201,8 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         double   calculateObservationTimevsFlux( unsigned int iD );
 	bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 	bool     getDebug() { return fDebug; }
-        double   getSensitivity( unsigned int iD, double iObservationTime = 50., double iSignificance = 5., double iMinEvents = 10, double iMinBackgroundFraction = 1.00, double energy = -1. );
-
+        double   getSensitivity( unsigned int iD, double iSignificance = 5.,
+	                         double iMinEvents = 10, double iMinBackgroundFraction = 1.00, double energy = -1. );
         unsigned int  listDataSets();
         void     listUnits();
         void     list_sensitivity( unsigned int iD );

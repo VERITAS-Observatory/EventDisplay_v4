@@ -124,7 +124,7 @@ void VSensitivityCalculator::reset()
 
    return sensitivity as fraction of data set used
 */
-double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservationTime, 
+double VSensitivityCalculator::getSensitivity( unsigned int iD, 
                                                double iSignificance, double iMinEvents, 
 					       double iMinBackgroundEvents, double energy )
 {
@@ -132,7 +132,7 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservat
 
     double f = 0.;
     double s = 0.;
-    double t = iObservationTime * 60.;            // h -> min
+    double t = fObservationTime_h * 60.;            // h -> min
 
 // fSignal = gamma-ray + background rates in source region
 // fBackground = background counts in off source regions
@@ -143,7 +143,7 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservat
 
     if( fDebug && energy > 0. )
     {
-        cout << "getSensitivity " << iD << " energy: " << energy << "\t obstime: " << iObservationTime;
+        cout << "getSensitivity " << iD << " energy: " << energy << "\t obstime: " << fObservationTime_h;
 	cout << "\t sig > " << iSignificance << "\t events > " << iMinEvents;
 	cout << "\t min number of background events > " << iMinBackgroundEvents << endl;
         cout << "\t signal+background rate: " << fData[iD].fSignal;
@@ -174,9 +174,7 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservat
 	}
 
 // require a certain significance and a minimum number of events
-// often as well required: n_diff > 0.05 N_bck (TODO)
-//        if( s > iSignificance && t * f * n_diff > iMinEvents && fData[iD].fBackground > fBackgroundEvents_min )
-        if( s > iSignificance && t * f * n_diff > iMinEvents )
+        if( s > iSignificance && t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha) > iMinEvents )
         {
             if( n > 0 )
             {
@@ -197,27 +195,6 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double iObservat
             }
             break;
         }
-	else
-	{
-// print out reasons for failure on above cut:
-/*	    if( fDebug )
-            {
-	       if( s > iSignificance )
-	       {
-		 cout << "\t PASSED SIGNIFICANCE " << endl;
-		 cout << "\t n: " << n-1 << "\t f " << f;
-		 cout << "\t significance: " << s << " (" << iSignificance << ")";
-		 cout << "\t min events: " << t * f * fData[iD].fSignal << " (" << iMinEvents << ")";
-		 cout << "\t bck fraction: " << b << " (" << fBackgroundEvents_min << ")";
-		 cout << "\t ndiff: " << t * ( f * n_diff );
-		 cout << "\t non: " << t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha);
-		 cout << "\t noff: " << t * fData[iD].fBackground;
-		 cout << "\t alpha: " << fData[iD].fAlpha;
-		 cout << "\t t: " << t;
-		 cout << endl;
-               }
-           } */
-	}
     }
 
     if( !bSuccess ) return -1.;
@@ -608,12 +585,12 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 // observe that the signal rate is defined differently for list_sensitivity() etc...
 	unsigned int iD = addDataSet( non / fDifferentialFlux[i].ObsTime * 60., noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" );
 // get fraction of Crab flux for XX sigma etc...
-	s = getSensitivity( iD, fObservationTime, fSignificance_min, fEvents_min, fBackgroundEvents_min, fDifferentialFlux[i].Energy );
+	s = getSensitivity( iD, fSignificance_min, fEvents_min, fBackgroundEvents_min, fDifferentialFlux[i].Energy );
 // get error on sensitivity estimate
 	iD = addDataSet( (non+non_error) / fDifferentialFlux[i].ObsTime * 60., (noff-noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
-	s_error_U = getSensitivity( iD, fObservationTime, fSignificance_min, fEvents_min, fBackgroundEvents_min );
+	s_error_U = getSensitivity( iD, fSignificance_min, fEvents_min, fBackgroundEvents_min );
 	iD = addDataSet( (non-non_error) / fDifferentialFlux[i].ObsTime * 60., (noff+noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
-	s_error_L = getSensitivity( iD, fObservationTime, fSignificance_min, fEvents_min, fBackgroundEvents_min );
+	s_error_L = getSensitivity( iD, fSignificance_min, fEvents_min, fBackgroundEvents_min );
 
 // fill sensitivity graphs
 	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
@@ -898,11 +875,12 @@ void VSensitivityCalculator::setEnergyRange_Lin( double iN, double iX )
 }
 
 
-void VSensitivityCalculator::setSignificanceParameter( double iSignificance, double iMinEvents, double iObservationTime, double iBackgroundEvents_min )
+void VSensitivityCalculator::setSignificanceParameter( double iSignificance, double iMinEvents, 
+                                                       double iObservationTime, double iBackgroundEvents_min )
 {
     fSignificance_min = iSignificance;
     fEvents_min = iMinEvents;
-    fObservationTime = iObservationTime;
+    fObservationTime_h = iObservationTime;
     fBackgroundEvents_min = iBackgroundEvents_min;
 }
 
@@ -1162,7 +1140,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
         }
         if( (*i_MCData_iterator).second->energy.size() == 0 )
 	{
-	   sprintf( hname, "VSensitivityCalculator::getDifferentialFluxVectorfromMC error: effective area (%s) vector with length 0", (*i_MCData_iterator).second->fName.c_str() );
+	   sprintf( hname, "VSensitivityCalculator::getDifferentialFluxVectorfromMC error: effective area (%s) vector with length 0",
+	                   (*i_MCData_iterator).second->fName.c_str() );
 	   return getDifferentialFluxVectorfromMC_ErrorMessage( hname );
         }
      }
@@ -1204,14 +1183,14 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
             i_flux.Energy = (i_flux.Energy_lowEdge + i_flux.Energy_upEdge)/2.;
             i_flux.EnergyWeightedMean = i_flux.Energy;
 // convert from [h] to [s]
-            i_flux.ObsTime = fObservationTime * 60. * 60.;
+            i_flux.ObsTime = fObservationTime_h * 60. * 60.;
 
             v_flux.push_back( i_flux );
             if( fDebug )
             {
                 cout << "ENERGY: " << v_flux.size() << "\t" << i_flux.Energy_lowEdge << " - " << i_flux.Energy_upEdge;
 		cout << "\t" << i_flux.Energy << "\t" << i_flux.EnergyWeightedMean;
-                cout << "\t" << i_flux.dE << "\t" << i_flux.ObsTime << "\t" << fObservationTime << "  Off: ";
+                cout << "\t" << i_flux.dE << "\t" << i_flux.ObsTime << "\t" << fObservationTime_h << "  Off: ";
 		map< unsigned int, int >::iterator iEnergyScaleOffset_iter;
 		for( iEnergyScaleOffset_iter = iEnergyScaleOffset.begin(); iEnergyScaleOffset_iter != iEnergyScaleOffset.end(); iEnergyScaleOffset_iter++ )
 		{
@@ -1277,7 +1256,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
                     i_flux.Energy = (i_flux.Energy_lowEdge + i_flux.Energy_upEdge)/2.;
                     i_flux.EnergyWeightedMean = i_flux.Energy;
 // convert from [h] to [s]
-                    i_flux.ObsTime = fObservationTime * 60. * 60.;
+                    i_flux.ObsTime = fObservationTime_h * 60. * 60.;
 
                     v_flux.push_back( i_flux );
                     if( fDebug )
@@ -1453,12 +1432,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     {
        for( unsigned int i = v_flux.size()-1; i > 0; i-- )
        { 
-	   v_flux[i].NOn  *= fObservationTime * 60.;               // [min] 
-	   v_flux[i].NOff *= fObservationTime * 60.;
-	   v_flux[i].NOn_error  *= fObservationTime * 60.;
-	   v_flux[i].NOff_error *= fObservationTime * 60.;
-	   iTotG += (v_flux[i].NOn - v_flux[i].NOff * alpha)/(fObservationTime * 60.);
-	   iTotB += v_flux[i].NOff*alpha/(fObservationTime * 60.);
+	   v_flux[i].NOn  *= fObservationTime_h * 60.;               // [min] 
+	   v_flux[i].NOff *= fObservationTime_h * 60.;
+	   v_flux[i].NOn_error  *= fObservationTime_h * 60.;
+	   v_flux[i].NOff_error *= fObservationTime_h * 60.;
+	   iTotG += (v_flux[i].NOn - v_flux[i].NOff * alpha)/(fObservationTime_h * 60.);
+	   iTotB += v_flux[i].NOff*alpha/(fObservationTime_h * 60.);
 	   if( fDebug )
 	   {
 	       cout << "NUMBER OF MC ON/OFF EVENTS: " << i << "\t";
@@ -1786,7 +1765,7 @@ void VSensitivityCalculator::plotSignificanceParameters( TCanvas *cSensitivity )
     }
 
     char hname[400];
-    sprintf( hname, "%.0f hours, %.0f #sigma, >%.0f events", fObservationTime, fSignificance_min, fEvents_min );
+    sprintf( hname, "%.0f hours, %.0f #sigma, >%.0f events", fObservationTime_h, fSignificance_min, fEvents_min );
     TLatex *iL = new TLatex( 0.17, 0.15, hname );
     iL->SetTextSize( 0.03 );
     iL->SetNDC();
@@ -1886,8 +1865,8 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
    {
        if( iDifferentialFlux[i].Energy > 0. )
        {
-           gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn * fObservationTime * 60. );
-           gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * fObservationTime * 60. );
+           gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn * fObservationTime_h * 60. );
+           gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * fObservationTime_h * 60. );
            z++;
        }
    }
@@ -1900,7 +1879,7 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
    }
    gNon->Draw( "ap" );
    gNon->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
-   gNon->GetHistogram()->SetYTitle( "number of non/noff" );
+   gNon->GetHistogram()->SetYTitle( "on/off rate [1/min]" );
    gNoff->Draw( "p" );
 
    vector< TGraphErrors* > g;
@@ -1925,7 +1904,7 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
        {
           if( i < (*i_flux_NOff_iter).second.size() )
 	  {
-	     g[z]->SetPoint( i, log10( iDifferentialFlux[i].Energy ), (*i_flux_NOff_iter).second[i] * fObservationTime * 60. );
+	     g[z]->SetPoint( i, log10( iDifferentialFlux[i].Energy ), (*i_flux_NOff_iter).second[i] * fObservationTime_h * 60. );
           }
 	  z++;
        }
@@ -1962,12 +1941,12 @@ void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentia
     int z = 0;
     for( unsigned int i = 0; i < iDifferentialFlux.size(); i++ )
     {
-        if( iDifferentialFlux[i].Energy > 0. )
+        if( iDifferentialFlux[i].Energy > 0. && fObservationTime_h > 0. )
         {
-            gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn );
+            gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn / (fObservationTime_h*60.) );
 	    gNon->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
 	    gNon->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
-            gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * alpha );
+            gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * alpha / (fObservationTime_h*60.) );
 	    gNoff->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
 	    gNoff->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
             z++;
