@@ -14,6 +14,7 @@
 % header with lines etc.
 \usepackage{fancyheadings}
 \usepackage{longtable} % table longer than one page
+\usepackage{tabularx}
 \usepackage{booktabs} % toprule, etc.
 
 % captions in italic
@@ -183,6 +184,124 @@ The converter from hessio to EVNDISP DST format needs a subarray file, a simple 
 The subarray files for prod1 can be found in {\it \$OBS\_EVNDISP\_ANA\_DIR/DetectorGeometry/*.lis}.
 
 \chapter{eventdisplay - calibration, image analysis and stereo reconstruction}
+
+\chapter{mscw\_energy - using lookup tables}
+
+\section{Energy reconstruction}
+\label{SECTION.ENERGYRECONSTRUCTION} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%   GAMMA HADRON SEPARATION 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+
+\chapter{Gamma/hadron separation}
+
+\section{Cut parameters}
+\label{SECTION.CUTS.PARAMETERFILE}
+
+\begin{longtable}{r  r  r r  p{4cm}}
+\toprule
+\hfill
+Option & Number of & Allowed & Default & Description  \\
+             & parameters & value(s) & value(s) & \\
+\midrule
+cutselection & 2  & &  & type of gamma/hadron and direction cut \\
+\multicolumn{2}{r@{}}{Parameter \#1} & ?     & 0 & gamma/hadron cut id \\
+\multicolumn{2}{r@{}}{Parameter \#2} & 0-5 & 0  & direction cut id: fixed $\Theta^2$ cut (0, needs parameter {\it theta2cut}), energy dependent $\Theta^2$ from a function read from a IRF file (1, needs parameter {\it theta2file}), from a IRF graph (2, needs parameter {\it theta2file} and option {\it IRF}), all other values: experimental (3-5, TMVA) \\
+angres & 1 & $]0,100]$ & 0 & containment probability for energy dependent $\Theta^2$ cut (in \%) \\
+\bottomrule
+\caption{Parameter definition and range for gamma/hadron cut files. This is used for example in the effective area calculation or for data analysis.}
+\end{longtable}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\caption{Gamma/hadron cut selector values. They consist of two digits: ID1+ID2*10}
+\begin{tabularx}{\linewidth}{c X }
+\toprule
+\hfill
+gamma/hadron cut  & Description \\
+selector & \\
+\midrule
+\multicolumn{2}{@{}l@{}}{ID2} \\
+     0 & apply gamma/hadron cuts on parameters in given data tree \\
+     1 & apply gamma/hadron cuts on probabilities given by a friend to the data tree (e.g. random forest analysis) \\
+     2 & same as 2 \\
+     3 & apply cuts on probabilities given by a friend to the data tree already at the level of the event quality level (e.g. of use for analysis of certain binary phases only) \\
+     4 & TMVA gamma/hadron separation \\
+     
+\midrule
+\multicolumn{2}{@{}l@{}}{ID1} \\
+
+    0 & apply cuts on MSCW/MSCL (mean reduced scaled width/length) \\
+    1 & apply cuts on mean width/length (no lookup tables necessary) \\
+     2 & no cut applied (always passed) \\
+     3 & apply cuts on MWR/MLR (mean scaled width/length)  \\
+     
+ \midrule    
+ \multicolumn{2}{@{}l@{}}{Example:} \\
+
+     0 & apply MSCW/MSCL cuts (default) \\
+     22 & apply event probability cuts \\
+    10  & apply cuts from a tree AND apply MSCW/MSCL cuts \\
+    40 & use TMVA  AND apply MSCW/MSCL cuts    \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{makeEffectiveArea - instrument response functions}
+
+Instrument response functions (IRF), i.e. effective areas and angular, core and energy resolution and bias curve can be calculated using {\it makeEffectiveArea}. 
+
+\begin{small}
+\begin{longtable}{r  r  r r  p{3.5cm}}
+\toprule
+\hfill
+Option & Number of & Allowed & Default & Description  \\
+             & parameters & value(s) & value(s) & \\
+\midrule
+%\multicolumn{6}{c}{keine Atmosph"aren-Korrektur} \\
+\midrule
+FILLINGMODE  & 1 & 0,1,2,3 & 0 & filling of IRFs: fill all IRFs (0), resolution plots only (1), angular resolution plot only (2), effective areas only (3) \\
+
+ENERGYRECONSTRUCTIONMETHOD & 1 & 0,1 & 0 &  energy reconstruction method (see \ref{SECTION.ENERGYRECONSTRUCTION}) \\
+
+ENERGYAXISBINS & 1 & $>0$ & 60 & number of bins on $\log_{10}$ energy axis \\
+
+ENERGYRECONSTRUCTIONQUALITY & 1 & 0,1 & 0 &  \\
+
+AZIMUTHBINS & 1 & 0,1 & 1 & define azimuth bins and calculate IRFs in each azimuth bin. Bins are hardwired with a bin width of $22.5^{\mathrm{o}}$ (16 bins), bin 17 contains the full azimuth range \\
+
+ISOTROPICARRIVALDIRECTIONS & 1 & 0,1 & 0 & input MC are simulated with random direction (wobble) offsets (use for gamma rays only) \\
+
+TELESCOPETYPECUTS & 1 & 0,1 & 0 & apply telescope type dependent cuts {\color{red} CHECK! STILL USEFUL?}\\
+
+FILLMONTECARLOHISTOS & 1 & 0,1 & 0 & fill histograms with MC spectra only (no IRF calculation) \\
+
+ENERGYSPECTRUMINDEX  & 3 &  &  & reweight events to this set of spectral indexes \\
+& \#1 & $>0$ & 1 & number of different spectral indexes \\
+& \#2 & $>0.$ & 2.0 & lower value \\ 
+& \#3 & $>0.$ & 0.1 & step size \\
+
+CUTFILE & 1 & & & cut file (full path, see \ref{SECTION.CUTS.PARAMETERFILE}) \\
+
+SIMULATIONFILE\_DATA & 1  & & & simulation data file (mscw file) \\
+
+SIMULATIONFILE\_MCHISTO  & 1  & & & data file with thrown events. This can be either a full mscw file (slow) or a file with the filled MC histograms \\
+
+\bottomrule
+\caption{Parameters in the run parameter file for the IRF calculation.}
+\end{longtable}
+\end{small}
+
 
 % #############################################
 %
