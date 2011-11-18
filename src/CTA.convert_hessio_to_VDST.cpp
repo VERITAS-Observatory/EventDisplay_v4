@@ -360,7 +360,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    bitset<8*sizeof(unsigned long) > i_localTrigger;
    for( unsigned int t = 0; t < (unsigned int)hsdata->event.central.num_teltrg; t++ )
    {
-		if( hsdata->event.teldata[t].known == 0 ) continue; // the triggered telescopes without image data are skipped
+		//if( hsdata->event.teldata[t].known == 0 ) continue; // the triggered telescopes without image data are skipped
       if( telescope_list.find( hsdata->event.central.teltrg_list[t] ) != telescope_list.end() )
       {
 	 if( hsdata->event.central.teltrg_list[t] < (int)i_localTrigger.size() )
@@ -412,7 +412,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 ////////////////////////////////////////////////
 // get pixel (ADC) data
 
-         fData->fDSTZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
+       fData->fDSTZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
 	 fData->fDSTnumSamples[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->num_samples;
 	 if( iWriteFADC && fData->fDSTnumSamples[i_ntel_data] == 0 )
 	 {
