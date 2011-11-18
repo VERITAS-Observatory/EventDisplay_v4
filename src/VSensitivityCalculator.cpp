@@ -1690,14 +1690,16 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
     TFile fEff( iMCPara->fEffectiveAreaFile.c_str() );
     if( fEff.IsZombie() )
     {
-        cout << "VSensitivityCalculator::getMonteCarlo_EffectiveArea: cannot find effective area file " << iMCPara->fEffectiveAreaFile.c_str() << endl;
-        return false;
+        cout << "VSensitivityCalculator::getMonteCarlo_EffectiveArea: cannot find effective area file ";
+	cout << iMCPara->fEffectiveAreaFile.c_str() << endl;
+	exit( -1 );
     }
     TTree *t = (TTree*)fEff.Get( "fEffArea" );
     if( !t )
     {
-        cout << "VSensitivityCalculator::getMonteCarlo_EffectiveArea: cannot find effective area tree in " << iMCPara->fEffectiveAreaFile.c_str() << endl;
-        return false;
+        cout << "VSensitivityCalculator::getMonteCarlo_EffectiveArea: cannot find effective area tree in ";
+	cout << iMCPara->fEffectiveAreaFile.c_str() << endl;
+	exit( -1 );
     }
     CEffArea *c = new CEffArea( t );
     if( !c ) return false;
