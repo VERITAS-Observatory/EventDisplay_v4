@@ -1104,9 +1104,12 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
             fDeadTime->writeHistograms();
         }
 
-        if( fIsMC && bWriteMCPars ) copyMCTree();
-	if( fIsMC ) copyMCHistograms();
-	if( fIsMC ) copyMCRunheader();
+	if( fIsMC )
+	{
+	   bool iMCTree_exists = copyMCRunheader();
+	   if( bWriteMCPars && iMCTree_exists ) copyMCTree();
+	   copyMCHistograms();
+        }
 
         fOutFile->Close();
         cout << "...outputfile closed" << endl;
@@ -1140,15 +1143,18 @@ void VTableLookupDataHandler::copy_telconfig()
    copy MC run header from first file
 
    OBS: assume that all run headers in all files are the same!!!!
+
+   check additionally if MCpars tree exists
 */
-void VTableLookupDataHandler::copyMCRunheader()
+bool VTableLookupDataHandler::copyMCRunheader()
 {
-    TChain iMC( "MCpars" );
-    int iNFil = iMC.Add( finputfile.c_str() );
+// use chain to get list of files
+    TChain iTel( "telconfig" );
+    int iNFil = iTel.Add( finputfile.c_str() );
 
     if( iNFil > 0 )
     {
-       TFile *f = iMC.GetFile();
+       TFile *f = iTel.GetFile();
        if( f )
        {
           if( (VMonteCarloRunHeader*)f->Get( "MC_runheader" ) )
@@ -1157,8 +1163,10 @@ void VTableLookupDataHandler::copyMCRunheader()
 	     f->Get( "MC_runheader" )->Write();
 	     cout << "MC run header found and copied" << endl;
           }
+	  if( f->Get( "MCpars" ) ) return true;
        }
     }
+    return false;
 }
 
 
@@ -1167,7 +1175,7 @@ void VTableLookupDataHandler::copyMCTree()
     TChain iMC( "MCpars" );
     int iNFil = iMC.Add( finputfile.c_str() );
 
-    if( iNFil > 0 )
+    if( iNFil > 0 && iMC.GetEntries() > 0 )
     {
         cout << "\t copying MC tree with " << iMC.GetEntries() << " entries..." << flush;
         iMC.Merge( fOutFile, 0, "keep" );

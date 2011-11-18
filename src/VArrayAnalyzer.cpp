@@ -393,7 +393,7 @@ void VArrayAnalyzer::terminate()
         cout << " entries) to : " << fOutputfile->GetName() << endl;
         getShowerParameters()->getTree()->Write();
 // MC tree and histograms
-        if( isMC() && getRunParameter()->fwriteMCtree )
+        if( isMC() )
         {
 // get MC tree
             TTree *i_tMC = 0;

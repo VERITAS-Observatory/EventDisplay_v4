@@ -157,7 +157,7 @@ class VTableLookupDataHandler
         void calcEmissionHeights();
         double calculateMeanNoiseLevel( bool bCurrentNoiseLevel = false );
 	void   copyMCHistograms();
-	void   copyMCRunheader();
+	bool   copyMCRunheader();
         void   copyMCTree();
 	void   copy_telconfig();
         bool   fillNextEvent( bool bShort );

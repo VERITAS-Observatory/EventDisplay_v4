@@ -12,9 +12,11 @@
  */
 
 #include "TChain.h"
+#include "TChainElement.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TMath.h"
+#include "TObjArray.h"
 #include "TStopwatch.h"
 #include "TTree.h"
 
@@ -37,6 +39,8 @@
 #include <vector>
 
 using namespace std;
+
+VEffectiveAreaCalculatorMCHistograms* copyMCHistograms( TChain *c );
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +106,7 @@ int main( int argc, char *argv[] )
 /////////////////////////////////////////////////////////////////////////////
 // set effective area Monte Carlo histogram class
     TFile *fMC_histoFile = 0;
-    VEffectiveAreaCalculatorMCHistograms *fMC_histo = new VEffectiveAreaCalculatorMCHistograms();
+    VEffectiveAreaCalculatorMCHistograms *fMC_histo = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 // set angular, core, etc resolution calculation class
@@ -154,40 +158,6 @@ int main( int argc, char *argv[] )
          cout << "exiting..." << endl;
          exit( -1 );
     }
-/////////////////////////////////////////////////////////////////////////////
-// load MC data
-    TChain *c2 = 0;
-    if( fRunPara->fMCdatafile_tree.size() > 0 && fRunPara->fMCdatafile_tree != "0" )
-    {
-// MC chain
-	c2 = new TChain( "MCpars" );
-        if( !c2->Add( fRunPara->fMCdatafile_tree.c_str(), -1 ) )
-        {
-           cout << "Error while trying to read MC data file: " << fRunPara->fMCdatafile_tree << endl;
-           cout << "exiting..." << endl;
-           exit( -1 );
-        }
-     }
-// read MC histograms from disk
-     else if( fRunPara->fMCdatafile_histo.size() > 0 )
-     {
-        fMC_histoFile = new TFile( fRunPara->fMCdatafile_histo.c_str() );
-        if( fMC_histoFile->IsZombie() )
-        {
-            cout << "Error reading MC histograms from file " << fRunPara->fMCdatafile_histo << endl;
-            cout << "exiting..." << endl;
-            exit( -1 );
-        }
-        fMC_histo = (VEffectiveAreaCalculatorMCHistograms*)fMC_histoFile->Get( "MChistos" );
-        if( !fMC_histo )
-        {
-            cout << "Error reading MC histograms from file " << fRunPara->fMCdatafile_histo << " (no histograms)" << endl;
-            cout << "exiting..." << endl;
-            exit( -1 );
-        }
-	fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
-        fMC_histo->print();
-     }
 
      CData d( c, true, 6, true );
      fCuts->setDataTree( &d );
@@ -218,21 +188,64 @@ int main( int argc, char *argv[] )
 // (make sure that spectral index is positive)
         fEffectiveAreaCalculator.initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
      }
-// fill MC histograms
-     if( c2 && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
-     {
+
+//////////////////////////////////////////////////////////////////////////////
+// MC histograms
+    if( fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
+    {
         fStopWatch.Start();
-        fMC_histo->setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
-        fMC_histo->setCuts( fCuts->fArrayxyoff_MC_min, fCuts->fArrayxyoff_MC_max );
-        fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, 
-	                                 fRunPara->fEnergyAxisBins_log10, 
-					 fEffectiveAreaCalculator.getEnergyAxis_minimum_defaultValue(), 
-					 fEffectiveAreaCalculator.getEnergyAxis_maximum_defaultValue() );
-        fMC_histo->fill( fRunPara->fze, c2, fRunPara->fAzimuthBins );
-        fMC_histo->print();
-	fOutputfile->cd();
-        cout << "writing MC histograms to file " << fOutputfile->GetName() << endl;
-        fMC_histo->Write();
+	if( fRunPara->fMCdatafile_tree.size() == 0 && fRunPara->fMCdatafile_histo.size() == 0 )
+	{
+	   fMC_histo = copyMCHistograms( c );
+	   if( fMC_histo )
+	   {
+	      fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
+	      fMC_histo->print();
+	   }
+        }
+// read MC histograms from a separate file
+	else if( fRunPara->fMCdatafile_histo.size() > 0 )
+	{
+	   fMC_histoFile = new TFile( fRunPara->fMCdatafile_histo.c_str() );
+	   if( fMC_histoFile->IsZombie() )
+	   {
+	       cout << "Error reading MC histograms from file " << fRunPara->fMCdatafile_histo << endl;
+	       cout << "exiting..." << endl;
+	       exit( -1 );
+	   }
+	   fMC_histo = (VEffectiveAreaCalculatorMCHistograms*)fMC_histoFile->Get( "MChistos" );
+	   if( !fMC_histo )
+	   {
+	       cout << "Error reading MC histograms from file " << fRunPara->fMCdatafile_histo << " (no histograms)" << endl;
+	       cout << "exiting..." << endl;
+	       exit( -1 );
+	   }
+	   fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
+	   fMC_histo->print();
+	}
+// recalulate MC spectra from MCpars tree. Very slow! 
+       else if( fRunPara->fMCdatafile_tree.size() > 0 && fRunPara->fMCdatafile_tree != "0" )
+       {
+	   TChain *c2 = new TChain( "MCpars" );
+	   if( !c2->Add( fRunPara->fMCdatafile_tree.c_str(), -1 ) )
+	   {
+	      cout << "Error while trying to read MC data file: " << fRunPara->fMCdatafile_tree << endl;
+	      cout << "exiting..." << endl;
+	      exit( -1 );
+	   }
+	   fMC_histo = new VEffectiveAreaCalculatorMCHistograms();
+	   fMC_histo->setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
+	   fMC_histo->setCuts( fCuts->fArrayxyoff_MC_min, fCuts->fArrayxyoff_MC_max );
+	   fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, 
+					    fRunPara->fEnergyAxisBins_log10, 
+					    fEffectiveAreaCalculator.getEnergyAxis_minimum_defaultValue(), 
+					    fEffectiveAreaCalculator.getEnergyAxis_maximum_defaultValue() );
+	   fMC_histo->fill( fRunPara->fze, c2, fRunPara->fAzimuthBins );
+	   fMC_histo->print();
+	   fOutputfile->cd();
+	   cout << "writing MC histograms to file " << fOutputfile->GetName() << endl;
+	   fMC_histo->Write();
+	}
         fStopWatch.Print();
      }  
 
@@ -281,6 +294,40 @@ int main( int argc, char *argv[] )
 
     fOutputfile->Close();
     cout << "end..." << endl;
+}
+
+VEffectiveAreaCalculatorMCHistograms* copyMCHistograms( TChain *c )
+{
+   VEffectiveAreaCalculatorMCHistograms *iMC_his = 0;
+   if( c )
+   {
+// loop over all files and add MC histograms
+        TObjArray *fileElements = c->GetListOfFiles();
+        TChainElement *chEl=0;
+        TIter next(fileElements);
+	unsigned int z = 0;
+	while( (chEl = (TChainElement*)next()) )
+	{
+           TFile *ifInput = new TFile( chEl->GetTitle() );
+	   if( !ifInput->IsZombie() )
+	   {
+	      if( z == 0 )
+	      {
+	         iMC_his = (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" );
+              }
+	      else
+	      {
+	         if( iMC_his )
+		 {
+		    iMC_his->add( (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" ) );
+                 }
+		 ifInput->Close();
+              }
+	      z++;
+           }
+        }
+   }
+   return iMC_his;
 }
 
 
