@@ -278,8 +278,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 // energy range to be plotted
        b.setEnergyRange_Lin( 0.01, 150. );
 // significance parameters
-//       b.setSignificanceParameter( 5., 10., 50., 10. );
-       b.setSignificanceParameter( 5., 1.e-5, 50., 1.e-5 );
+       b.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
@@ -328,12 +327,15 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        }
 
 // energy range determined by looking at number of noff events (need off events to determine sensitivity)
-       if( bIntegral ) b.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.16, 0.003 );
-       else            b.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.2, 0.03 );
+       if( bIntegral ) b.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.16, 0.001 );
+       else            b.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.2, 0.01 );
+
+       b.plotSensitivityLimitations( c );
     }
     return;
 // plot different limitations in sensitivity calculation
     a.plotSensitivityLimitations( c );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -367,7 +369,7 @@ void plotSensitivityVStime()
    plot some debug plots for comparision
 
 */
-void plotDebugComparisionPlots( string iFileName, int iColor, double iObservationTime_hours )
+void plotDebugComparisionPlots( string iFileName, int iColor )
 {
    TH1F *hGammaEffArea = 0;
    TH1F *hBGRate = 0;
@@ -397,7 +399,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor, double iObservatio
    if( c && hBGRate )
    {
       c->cd();
-      hBGRate->Scale( 60. * iObservationTime_hours );
+      hBGRate->Scale( 60. );
       hBGRate->SetLineWidth( 2 );
       hBGRate->SetLineColor( iColor );
       hBGRate->SetMarkerColor( iColor );
