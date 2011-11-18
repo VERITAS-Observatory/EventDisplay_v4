@@ -1104,9 +1104,19 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 // make sure that signal efficency is > 0 (and 1 for the case that there is no maximum found)
       if( i_Signal_to_sqrtNoise_atMaximum < 1.e-3 )
       {
-         i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->GetMaximumBin() );
-	 i_TMVACutValue_AtMaximum         = effS->GetBinCenter( effS->GetMaximumBin() );
-	 i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effS->GetMaximumBin() );
+// first try: take previous bin:
+         if( iEnergyBin > 0 )
+	 {
+	    i_SignalEfficiency_AtMaximum     = fSignalEfficiency[iEnergyBin-1];
+	    i_TMVACutValue_AtMaximum         = fTMVACutValue[iEnergyBin-1];
+	    i_BackgroundEfficiency_AtMaximum = fBackgroundEfficiency[iEnergyBin-1];
+         }
+	 else
+	 {
+	    i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->GetMaximumBin() );
+	    i_TMVACutValue_AtMaximum         = effS->GetBinCenter( effS->GetMaximumBin() );
+	    i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effS->GetMaximumBin() );
+         }
       } 
    }
    cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum is ";
