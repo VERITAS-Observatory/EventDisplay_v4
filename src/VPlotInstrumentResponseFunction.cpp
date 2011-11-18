@@ -22,7 +22,7 @@ VPlotInstrumentResponseFunction::VPlotInstrumentResponseFunction()
 
 void VPlotInstrumentResponseFunction::setPlottingDefaults()
 {
-   setPlottingAxis( "energy_Lin", "X", true, 0.03, 200., "energy [TeV]" );
+   setPlottingAxis( "energy_Lin", "X", false, 0.03, 200., "energy [TeV]" );
    setPlottingAxis( "distance_Lin", "X", false, 0., 500., "distance [m]" );
    setPlottingAxis( "nimages_Lin", "X", false, 0., 5., "number of images" );
 

@@ -112,33 +112,36 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 	unsigned int fEnergySpectrumfromLiterature_ID;
 	vector< TGraph* > fCrabFlux_SourceStrength;
 
-
 // observing time
         double fObservationTime_h;                  // [h]
         double fObservationTime_min;
         double fObservationTime_max;
-        int fObservationTime_steps;
+        int    fObservationTime_steps;
 
 // significance calculation
         unsigned int fLiAndMaEqu;
         double       fSignificance_min;
         double       fEvents_min;
 	double       fBackgroundEvents_min;
+	double       fMinBackgroundRateRatio_min;
+	double       fAlpha;
 
-	map< int, double > fSignificanceLimited;                 //! sensitivity is significance limited at this energy (linear) [GeV] !!!
-	map< int, double > fMinEventsLimited;                    //! sensitivity is limited by minimum number of events at this energy [GeV] !!!
-	map< int, double > fMinBackgroundEventsLimited;          //! sensitivity is limited by minimum number of background events at this energy [GeV] !!!
+	map< int, double > fSignificanceLimited;             // sensitivity is significance limited at this energy (linear) [GeV] !!!
+	map< int, double > fMinEventsLimited;                // sensitivity is limited by minimum number of events at this energy [GeV] !!!
+	map< int, double > fMinBackgroundEventsLimited;      // sensitivity is limited by minimum number of background events at this energy [GeV] !!!
 
         double fEnergy_min_Log;
         double fEnergy_max_Log;
-
+	double fEnergy_dE_log10;
 
 // data vectors for MC and int/diff sensitivity calculation
 	map< unsigned int, VSensitivityCalculatorDataResponseFunctions* > fMC_Data;                        //! [particle ID]
 	map< unsigned int, VSensitivityCalculatorDataResponseFunctions* >::iterator fMC_Data_iterator;     //! [particle ID]
         VSensitivityCalculatorDataResponseFunctions fMC_GammaData;
-        VSensitivityCalculatorDataResponseFunctions fMC_ProtonData;                     //! should be a vector looping over all background particle species
+        VSensitivityCalculatorDataResponseFunctions fMC_ProtonData;           
 	double fMC_BackgroundMissingParticleFraction;     //! this is the fraction of background missing due to missing He/.. simulations  
+
+	string fMCCTA_File;
 
         unsigned int    fCurrentDataSet;
         vector< sSensitivityData > fData;
@@ -171,13 +174,14 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         TGraph*           getCrabSpectrum( bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
         vector< TGraph* > getCrabSpectrum( vector< double > i_fCrabFlux, bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
-        TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, string iAnasumCrabFile, 
-	                                                    int iColor = 1, string bUnit = "CU",
+	bool       calculateSensitivityvsEnergyFromCrabSpectrum( string iAnasumCrabFile, string bUnit = "CU",
 							    double dE_Log10 = 0.25, double iEnergyMin = 0.01, double iEnergyMax = 1.e6 );
+        TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
         void       purgeEnergies( vector< double > e, vector< VDifferentialFlux >& v_flux );
 
         vector< VDifferentialFlux > getDifferentFluxVectorfromData( string iAnasumCrabFile, double dE_Log10, double &iNorm );
         vector< VDifferentialFlux > getDifferentialFluxVectorfromMC( double dE_Log10, double &iNorm );
+	vector< VDifferentialFlux > getDifferentialFluxVectorfromCTA_MC( double dE_Log10, double &iNorm );
         vector< VDifferentialFlux > getDifferentialFluxVectorfromMC_ErrorMessage( string );
 
         bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara );
@@ -201,8 +205,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         double   calculateObservationTimevsFlux( unsigned int iD );
 	bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 	bool     getDebug() { return fDebug; }
-        double   getSensitivity( unsigned int iD, double iSignificance = 5.,
-	                         double iMinEvents = 10, double iMinBackgroundFraction = 1.00, double energy = -1. );
+        double   getSensitivity( unsigned int iD, double energy = -1. );
         unsigned int  listDataSets();
         void     listUnits();
         void     list_sensitivity( unsigned int iD );
@@ -213,9 +216,13 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         TCanvas* plotSensitivityvsEnergyFromTextTFile( TCanvas *c, string iTextFile,
 	                                               int iColor = 1, double iLineWidth = 2, int iLineStyle = 2,
 						       string bUnit = "CU", bool bIntegralSensitivity = true );
+	bool     calculateDifferentialSensitivityvsEnergyFromCrabSpectrum( string iAnasumCrabFile, string bUnit = "CU",
+	                                                                   double dE_Log10 = 0.25,
+									   double iEnergyMin_TeV_lin = 0.01, double iEnergyMax_TeV_lin = 1.e6 );
         TCanvas* plotDifferentialSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, string iAnasumCrabFile,
 	                                                              int iColor = 1, string bUnit = "CU",
-								      double dE_Log10 = 0.25, double iEnergyMin_TeV_lin = 0.01, double iEnergyMax_TeV_lin = 1.e6 );
+								      double dE_Log10 = 0.25, 
+								      double iEnergyMin_TeV_lin = 0.01, double iEnergyMax_TeV_lin = 1.e6 );
         TCanvas* plotIntegralSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, string iAnasumCrabFile,
 	                                                          int iColor = 1, string bUnit = "CU",
 								  double iEnergyMin_TeV_lin = 0.01, double iEnergyMax_TeV_lin = 1.e6 );
@@ -236,18 +243,19 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         void     setFluxRange_PFLUX( double iMin = 1.e-15, double iMax = 5.e-11 ) { fPlot_flux_PFLUX_min = iMin; fPlot_flux_PFLUX_max = iMax; }
         void     setFluxRange_ENERG( double iMin = 1.e-14, double iMax = 2.e-10 ) { fPlot_flux_ENERG_min = iMin; fPlot_flux_ENERG_max = iMax; }
         void     setFluxRange_CU( double iMin = 1.e-4, double iMax = 10. ) { fPlot_flux_CU_min = iMin; fPlot_flux_CU_max = iMax; }
+	bool     setMonteCarloParametersCTA_MC( string iCTA_MCFile, string iSpectralParameterFile, unsigned int iSpectralParameterID );
         void     setMonteCarloParameters( unsigned int iParticleID, string iSpectralParameterFile, unsigned int iSpectralParameterID,
 	                                  string iGammaEffectiveAreaFile, double ze = 20., 
 					  int az = 0, double woff = 0.5, int noise = 150, double index = 2.5,
-					  double alpha = 0.1, double iEnergy_min_lin = -10., double iEnergy_max_lin = 10. );
+					  double iEnergy_min_lin = -10., double iEnergy_max_lin = 10. );
         void     setObservationTimeRange( double iObs_min = 0.5e-3, double iObs_max = 5.e4, int iObs_steps = 1000 );    // hours
         void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50.,
-	                                   double iMinBackgroundEvents = 10. );
+	                                   double iMinBackgroundRateRatio = 0.05, double alpha = 0.2 );
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );
         void     setSourceStrengthVector_CU();
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,6);
+        ClassDef(VSensitivityCalculator,7);
 };
 #endif
