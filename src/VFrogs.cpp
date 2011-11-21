@@ -495,7 +495,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       rtn.scope[tel].telpixarea[pix]=telarea*tmppixarea*
 //    todo this is not 1 !
 //     GH WHAT IS THE PMT COLLECTION EFF??
-        1.0;
+        0.81;
 
       float dc2pe=5.5;  //This is the number of d.c. in one p.e.
       //Initialize the pixel signal and pedestal width to zero
