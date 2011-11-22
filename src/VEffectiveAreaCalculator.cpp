@@ -18,7 +18,8 @@
  */
 VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionRunParameter *iRunPara, VGammaHadronCuts* icuts )
 {
-    if( !iRunPara )
+    fRunPara = iRunPara;
+    if( !fRunPara )
 	{
 	   cout << "VEffectiveAreaCalculator: no run parameters given" << endl;
 	   cout << "...exiting..." << endl;
@@ -30,13 +31,13 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     bNOFILE = true;
 
 // number of bins for histograms
-    nbins = iRunPara->fEnergyAxisBins_log10;
+    nbins = fRunPara->fEnergyAxisBins_log10;
 
 // cuts
     fCuts = icuts;
-    fZe.push_back( iRunPara->fze );
-    fAreaRadius.push_back( iRunPara->fCoreScatterRadius );
-    fScatterMode.push_back( iRunPara->fCoreScatterMode );
+    fZe.push_back( fRunPara->fze );
+    fAreaRadius.push_back( fRunPara->fCoreScatterRadius );
+    fScatterMode.push_back( fRunPara->fCoreScatterMode );
     for( unsigned int i = 0; i < fZe.size(); i++ )
     {
         fXWobble.push_back( 0. );
@@ -44,15 +45,15 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
         fNoise.push_back( 0 );
         fPedVar.push_back( 0. );
     }
-    setIgnoreEnergyReconstructionCuts( iRunPara->fIgnoreEnergyReconstructionQuality );
-    setIsotropicArrivalDirections( iRunPara->fIsotropicArrivalDirections );
-    setCTA( iRunPara->fTelescopeTypeCuts );
-    setWobbleOffset( iRunPara->fXoff, iRunPara->fYoff );
-    setNoiseLevel( iRunPara->fnoise, iRunPara->fpedvar );
+    setIgnoreEnergyReconstructionCuts( fRunPara->fIgnoreEnergyReconstructionQuality );
+    setIsotropicArrivalDirections( fRunPara->fIsotropicArrivalDirections );
+    setCTA( fRunPara->fTelescopeTypeCuts );
+    setWobbleOffset( fRunPara->fXoff, fRunPara->fYoff );
+    setNoiseLevel( fRunPara->fnoise, fRunPara->fpedvar );
 
 // spectral weighting class
     fSpectralWeight = new VSpectralWeight();
-    setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
+    setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
 
 // define output tree (all histograms are written to this tree)
     hisTreeList = new TList();
@@ -62,7 +63,8 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     char htitle[400];
 
 // define range and binning of energy axis of effective area plots
-    cout << "histogram parameters (bins, log10(Emin), log10(Emax)): " << nbins << ", " << fEnergyAxis_minimum_defaultValue << ", " << fEnergyAxis_maximum_defaultValue << endl;
+    cout << "histogram parameters (bins, log10(Emin), log10(Emax)): " << nbins;
+    cout << ", " << fEnergyAxis_minimum_defaultValue << ", " << fEnergyAxis_maximum_defaultValue << endl;
     sprintf( htitle, "title" );
 
     sprintf( hname, "hEmc" );
@@ -93,12 +95,12 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hEcutLin->SetYTitle( "entries" );
     hisTreeList->Add( hEcutLin );
 
-   sprintf( hname, "hEcut500" );
-   hEcut500 = new TH1D( hname, htitle, 500, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
-   hEcut500->Sumw2();
-   hEcut500->SetXTitle( "energy_{MC} [TeV]" );
-   hEcut500->SetYTitle( "entries" );
-   hisTreeList->Add( hEcut500 );
+    sprintf( hname, "hEcut500" );
+    hEcut500 = new TH1D( hname, htitle, 500, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+    hEcut500->Sumw2();
+    hEcut500->SetXTitle( "energy_{MC} [TeV]" );
+    hEcut500->SetYTitle( "entries" );
+    hisTreeList->Add( hEcut500 );
 
     sprintf( hname, "hEcutRec" );
     hEcutRec = new TH1D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
@@ -377,9 +379,13 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
  *  called from anasum
  *
  */
-VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double azmin, double azmax, double ipedvar, double iSpectralIndex, vector< double > iMCZe, int iSmoothIter, double iSmoothThreshold, bool iEffectiveAreaVsEnergyMC )
+VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double azmin, double azmax, double ipedvar,
+                                                    double iSpectralIndex, vector< double > iMCZe,
+						    int iSmoothIter, double iSmoothThreshold, bool iEffectiveAreaVsEnergyMC )
 {
     reset();
+
+    fRunPara = 0;
 
 // MC intervalls
     fMCZe = iMCZe;
@@ -1133,8 +1139,33 @@ void VEffectiveAreaCalculator::reset()
     gMeanSystematicErrorGraph = 0;
 }
 
+double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
+{
+   double iSolAngleNorm = 1.;
+   if( fCuts && fRunPara )
+   {
+      if( fRunPara->fViewcone_max > 0. && fCuts->fArrayxyoff_MC_max > 0. )
+	 {
+// solid angle of simulated showers
+	    double iSN_mc = (1.-cos(fRunPara->fViewcone_max * TMath::DegToRad()));
+	    if( fRunPara->fViewcone_min > 0. ) iSN_mc -= (1.-cos(fRunPara->fViewcone_min * TMath::DegToRad()));
+// solid angle of angular bin
+	    double iSN_cu = (1.-cos(fCuts->fArrayxyoff_MC_max * TMath::DegToRad()));
+	    if( fCuts->fArrayxyoff_MC_min > 0. ) iSN_cu -= (1.-cos(fCuts->fArrayxyoff_MC_min * TMath::DegToRad()));
+
+	    if( iSN_mc > 0. ) iSolAngleNorm = iSN_cu / iSN_mc;
+	 }
+   }
+
+   return iSolAngleNorm;
+}
+
 bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms *iMC_histo )
 {
+// get solid angle normalization
+   double iSolAngleNorm = getMCSolidAngleNormalization();
+   cout << "VEffectiveAreaCalculator::getMonteCarloSpectra: solid angle normalization factor: " << iSolAngleNorm << endl;
+
    char hname[800];
 // loop over az bins
 // (MC az [-180., 180.])
@@ -1149,6 +1180,7 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
             if( iMC_histo->getHistogram_Emc( i_az, s ) )
 	    {
 	        hVEmc[s][i_az] = (TH1D*)iMC_histo->getHistogram_Emc( i_az, s )->Clone( hname );
+		if( hVEmc[s][i_az] ) hVEmc[s][i_az]->Scale( iSolAngleNorm );
             }
 	    else hVEmc[s][i_az] = 0;
           }
@@ -1158,6 +1190,7 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
             if( iMC_histo->getHistogram_EmcWeight( i_az, s ) )
 	    {
 	       hVEmcSWeight[s][i_az] = (TProfile*)iMC_histo->getHistogram_EmcWeight( i_az, s )->Clone( hname );
+	       if( hVEmcSWeight[s][i_az] ) hVEmcSWeight[s][i_az]->Scale( iSolAngleNorm );
             }
 	    else hVEmcSWeight[s][i_az] = 0;
           }

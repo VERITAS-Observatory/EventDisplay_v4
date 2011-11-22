@@ -1680,7 +1680,8 @@ void VGammaHadronCuts::setShowerCoreCuts( double xmin, double xmax, double ymin,
     fCoreY_min = ymin;
     fCoreY_max = ymax;
     if( iEdge >= 0. ) fCoreEdge = iEdge;
-    cout << "setting shower core cuts: " << fCoreX_min << "\t" << fCoreX_max << "\t" << fCoreY_min << "\t" << fCoreY_max << "\t" << fCoreEdge << endl;
+    cout << "setting shower core cuts: " << fCoreX_min << "\t" << fCoreX_max;
+    cout << "\t" << fCoreY_min << "\t" << fCoreY_max << "\t" << fCoreEdge << endl;
 }
 
 /*

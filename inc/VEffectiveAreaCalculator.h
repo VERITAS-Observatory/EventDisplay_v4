@@ -79,6 +79,8 @@ class VEffectiveAreaCalculator
         double fEnergyAxis_minimum_defaultValue;
         double fEnergyAxis_maximum_defaultValue;
 
+	VInstrumentResponseFunctionRunParameter *fRunPara;
+
         VGammaHadronCuts *fCuts;
         bool fIgnoreEnergyReconstruction;
         bool fIsotropicArrivalDirections;
@@ -183,17 +185,21 @@ class VEffectiveAreaCalculator
 	                                        double iSpectralIndex, bool bAddtoMeanEffectiveArea = true,
 						bool iEffectiveAreaVsEnergyMC = false );
 	bool   getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms* );
+	double getMCSolidAngleNormalization();
         vector< unsigned int > getUpperLowBins( vector< double > i_values, double d );
         bool   initializeEffectiveAreasFromHistograms( TTree *, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
         double interpolate_WL( double ze, double ze1, double ze2, double w1, double w2, bool iCos = true );
-        vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper, vector< double > iEL, vector< double > iEU, bool iCos = true );
+        vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
+	                                            vector< double > iEL, vector< double > iEU, bool iCos = true );
         void   reset();
         void   smoothEffectiveAreas( map< unsigned int, vector< double > > );
 
     public:
 
-        VEffectiveAreaCalculator( string ieffFile, double azmin, double azmax, double iPedVar, double iIndex,  vector< double> fMCZe, int iSmoothIter = -1, double iSmoothThreshold = 1., bool iEffectiveAreaVsEnergyMC = false );
-		VEffectiveAreaCalculator( VInstrumentResponseFunctionRunParameter*, VGammaHadronCuts* );
+        VEffectiveAreaCalculator( string ieffFile, double azmin, double azmax, double iPedVar, double iIndex,
+	                          vector< double> fMCZe, int iSmoothIter = -1, double iSmoothThreshold = 1.,
+				  bool iEffectiveAreaVsEnergyMC = false );
+	VEffectiveAreaCalculator( VInstrumentResponseFunctionRunParameter*, VGammaHadronCuts* );
         ~VEffectiveAreaCalculator();
 
         void cleanup();
@@ -203,7 +209,8 @@ class VEffectiveAreaCalculator
         TTree* getTree() { return fEffArea; }
 	double getEnergyAxis_minimum_defaultValue() { return fEnergyAxis_minimum_defaultValue; }
 	double getEnergyAxis_maximum_defaultValue() { return fEnergyAxis_maximum_defaultValue; }
-        double getEffectiveArea( double erec, double ze, double iWoff, double iPedvar, double iSpectralIndex = -2.5, bool bAddtoMeanEffectiveArea = true, bool iEffectiveAreaVsEnergyMC = false );
+        double getEffectiveArea( double erec, double ze, double iWoff, double iPedvar, double iSpectralIndex = -2.5,
+	                         bool bAddtoMeanEffectiveArea = true, bool iEffectiveAreaVsEnergyMC = false );
         TGraphAsymmErrors* getMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC = true );
         void initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
         void resetHistograms( unsigned int iZe );

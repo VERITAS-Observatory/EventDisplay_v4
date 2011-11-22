@@ -24,6 +24,10 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
    fArrayxyoff_MC_min = -1.e5;
    fArrayxyoff_MC_max =  1.e5;
 
+   fEnergyAxisBins_log10 = 60;
+   fEnergyAxisMin_log10  = -2.;
+   fEnergyAxisMax_log10  =  4.;
+
    setDebug();
 }
 

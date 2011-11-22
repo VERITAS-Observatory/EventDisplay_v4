@@ -31,8 +31,8 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    double   fArrayxyoff_MC_max;
 
 // spectral weight calculator
-   VSpectralWeight           *fSpectralWeight;                 // backwards compatibility
-   vector< VSpectralWeight* > fVSpectralWeight;
+   VSpectralWeight           *fSpectralWeight;                 //! backwards compatibility
+   vector< VSpectralWeight* > fVSpectralWeight;                //!
    double   fMCEnergyRange_TeV_min;
    double   fMCEnergyRange_TeV_max;
    double   fMCSpectralIndex;
@@ -76,7 +76,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    void      setDefaultValues();
    bool      setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
 
-   ClassDef( VEffectiveAreaCalculatorMCHistograms, 9 );
+   ClassDef( VEffectiveAreaCalculatorMCHistograms, 10 );
 };
 
 #endif

@@ -235,7 +235,6 @@ int main( int argc, char *argv[] )
 	   }
 	   fMC_histo = new VEffectiveAreaCalculatorMCHistograms();
 	   fMC_histo->setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
-	   fMC_histo->setCuts( fCuts->fArrayxyoff_MC_min, fCuts->fArrayxyoff_MC_max );
 	   fMC_histo->initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex, 
 					    fRunPara->fEnergyAxisBins_log10, 
 					    fEffectiveAreaCalculator.getEnergyAxis_minimum_defaultValue(), 
