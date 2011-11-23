@@ -58,6 +58,7 @@ class CEffArea : public TObject
         TProfile        *hEsysRec;
         TProfile        *hEsysMC;
         TProfile        *hEsysMCRelative;
+        TH2D            *hEsysMCRelative2D;
         TH2D            *hEsys2D;
         TH2D            *hEmcCut;
 	TH1D            *hhEcutTrigger;
@@ -104,6 +105,7 @@ class CEffArea : public TObject
         TBranch        *b_hEsysRec;               //!
         TBranch        *b_hEsysMC;                //!
         TBranch        *b_hEsysMCRelative;        //!
+        TBranch        *b_hEsysMCRelative2D;        //!
         TBranch        *b_hEsys2D;                //!
         TBranch        *b_hEmcCut;                //!
 	TBranch        *b_hhEcutTrigger;   //!
@@ -206,6 +208,7 @@ void CEffArea::Init(TTree *tree)
     hEsysRec = 0;
     hEsysMC = 0;
     hEsysMCRelative = 0;
+    hEsysMCRelative2D = 0;
     hEsys2D = 0;
     hEmcCut = 0;
    hhEcutTrigger = 0;
@@ -278,6 +281,7 @@ void CEffArea::Init(TTree *tree)
         hEsysRec = 0;
         hEsysMC = 0;
         hEsysMCRelative = 0;
+        hEsysMCRelative2D = 0;
         hEsys2D = 0;
         hEmcCut = 0;
     }
@@ -285,6 +289,8 @@ void CEffArea::Init(TTree *tree)
     else                                         hEcutLin = 0;
     if( fChain->GetBranchStatus( "hEsysMCRelative" ) ) fChain->SetBranchAddress("hEsysMCRelative", &hEsysMCRelative, &b_hEsysMCRelative);
     else                                               hEsysMCRelative = 0;
+    if( fChain->GetBranchStatus( "hEsysMCRelative2D" ) ) fChain->SetBranchAddress("hEsysMCRelative2D", &hEsysMCRelative2D, &b_hEsysMCRelative2D);
+    else                                               hEsysMCRelative2D = 0;
     if( fChain->GetBranchStatus( "hhEcutTrigger" ) )
     {
 	fChain->SetBranchAddress("hhEcutTrigger", &hhEcutTrigger, &b_hhEcutTrigger);

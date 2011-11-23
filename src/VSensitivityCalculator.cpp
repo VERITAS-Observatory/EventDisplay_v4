@@ -99,6 +99,10 @@ void VSensitivityCalculator::reset()
 
 // sensitivity graph
     gSensitivityvsEnergy = 0;
+    gBGRate = 0;
+    gBGRateSqDeg = 0;
+    gProtonRate = 0;
+    gElectronRate = 0;
 
     setPlotCanvasSize();
     setEnergyRange_Log();
@@ -502,7 +506,7 @@ bool VSensitivityCalculator::calculateParticleNumberGraphs_MC( double dE_Log10 )
 {
     double alpha = 1.;
     vector< VDifferentialFlux > i_DifferentialFlux = getDifferentialFluxVectorfromMC( dE_Log10, alpha );
-    plotDebugPlotsParticleNumbers( i_DifferentialFlux, alpha, false );
+    fillParticleNumbersGraphs( i_DifferentialFlux, alpha );
 
     return true;
 }
@@ -706,7 +710,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
     }
     if( fDebug ) gSensitivityvsEnergy->Print();
 
-    if( fPlotDebugName.size() > 0 ) plotDebugPlotsParticleNumbers( fDifferentialFlux, alpha );
+    fillParticleNumbersGraphs( fDifferentialFlux, alpha );
+    if( fPlotDebugName.size() > 0 ) plotDebugPlotsParticleNumbers();
 
     return true;
 }
@@ -1501,6 +1506,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
       v_flux[i].NOn_error  =  sqrt( v_flux[i].NOn_error );
       v_flux[i].NOff_error =  sqrt( v_flux[i].NOff_error );
    }
+   fillBackgroundParticleNumbers( v_flux, v_flux_NOff, v_flux_NOff_error );
    if( fPlotDebugName.size() > 0 ) plotDebugPlotsBackgroundParticleNumbers( v_flux, v_flux_NOff, v_flux_NOff_error );
 
 // calculate mean alpha
@@ -1797,6 +1803,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 // solid angle vs energy is stored in a TGraph
 // (note that lower cut on theta2 is not a function of energy)
        iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV = new TGraph( 1000 );
+       iMCPara->gTheta2Cuts_vsEnergylgTeV = new TGraph( 1000 );
 
 //       if( fDebug && iCuts->getTheta2Cut_TMVA_max() )
        if( iCuts->getTheta2Cut_TMVA_max() )
@@ -1824,6 +1831,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	     return false;
           }
 	  iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV->SetPoint( i, e, iSolidAngle );
+	  iMCPara->gTheta2Cuts_vsEnergylgTeV->SetPoint( i, e, itheta2 );
        }
     }
 
@@ -1952,6 +1960,43 @@ void VSensitivityCalculator::plotEffectiveArea()
 
 }
 
+void VSensitivityCalculator::fillBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
+							    map< unsigned int, vector< double > > i_flux_NOff,
+							    map< unsigned int, vector< double > > i_flux_NOffError )
+{
+   gProtonRate = new TGraphErrors( 1 );
+   gElectronRate = new TGraphErrors( 1 );
+
+   if( i_flux_NOff.find( 14 ) != i_flux_NOff.end() && i_flux_NOffError.find( 14 ) != i_flux_NOffError.end() )
+   {
+      for( unsigned int i = 0; i < iDifferentialFlux.size(); i++ )
+      {
+         if( i < i_flux_NOff[14].size() )
+	 {
+	    gProtonRate->SetPoint( i, log10( iDifferentialFlux[i].Energy ), i_flux_NOff[14][i] * fObservationTime_h * 60. );
+         }
+	 if( i < i_flux_NOffError[14].size() )
+	 {
+	    gProtonRate->SetPointError( i, 0., i_flux_NOffError[14][i] * fObservationTime_h * 60. );
+         }
+      }
+   }
+   if( i_flux_NOff.find( 2 ) != i_flux_NOff.end() && i_flux_NOffError.find( 2 ) != i_flux_NOffError.end() )
+   {
+      for( unsigned int i = 0; i < iDifferentialFlux.size(); i++ )
+      {
+         if( i < i_flux_NOff[2].size() )
+	 {
+	    gElectronRate->SetPoint( i, log10( iDifferentialFlux[i].Energy ), i_flux_NOff[2][i] * fObservationTime_h * 60. );
+         }
+	 if( i < i_flux_NOffError[2].size() )
+	 {
+	    gElectronRate->SetPointError( i, 0., i_flux_NOffError[2][i] * fObservationTime_h * 60. );
+         }
+      }
+   }
+}
+
 /*!
 
     plot particle numbers
@@ -1965,12 +2010,13 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
 
    if( !cPlotDebug[2] || !cPlotDebug[2]->cd() ) return;
 
-   TGraph *gNon = new TGraph( 1 );
+   TGraphAsymmErrors* gNon = new TGraphAsymmErrors( 1 );
+   TGraphAsymmErrors* gNoff= new TGraphAsymmErrors( 1 );
    gNon->SetMinimum( 0.0001 );
    gNon->SetMaximum( 1.e6 );
    setGraphPlottingStyle( gNon, 1, 1, 20, 2 );
-   TGraph *gNoff = new TGraph( 1 );
    setGraphPlottingStyle( gNoff, 1, 1, 24, 2 );
+
    unsigned int z = 0;
    for( unsigned int i = 0; i < iDifferentialFlux.size(); i++ )
    {
@@ -1983,11 +2029,12 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
    }
    if( fDebug )
    {
-      cout << "particle numbers: signal (on) region): " << endl;
-      gNon->Print();
-      cout << "particle numbers: signal (off) region): " << endl;
-      gNoff->Print();
+       cout << "particle numbers: signal (on) region): " << endl;
+       gNon->Print();
+       cout << "particle numbers: signal (off) region): " << endl;
+       gNoff->Print();
    }
+
    gNon->Draw( "ap" );
    gNon->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
    gNon->GetHistogram()->SetYTitle( "number of on/off events" );
@@ -2038,44 +2085,25 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
    cPlotDebug[2]->Update();
 }
 
-
-void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux, double alpha, bool bDraw )
+void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha )
 {
-
-    TGraphAsymmErrors *gNon = new TGraphAsymmErrors( 1 );
-    gNon->SetMinimum( 0.0001 );
-    gNon->SetMaximum( 1.e2 );
-    setGraphPlottingStyle( gNon, 1, 1, 20, 2 );
-    TGraphAsymmErrors *gNoff = new TGraphAsymmErrors( 1 );
-    setGraphPlottingStyle( gNoff, 2, 1, 21, 2 );
+    gSignalRate = new TGraphAsymmErrors( 1 );
+    gBGRate     = new TGraphAsymmErrors( 1 );
 
     int z = 0;
     for( unsigned int i = 0; i < iDifferentialFlux.size(); i++ )
     {
         if( iDifferentialFlux[i].Energy > 0. && fObservationTime_h > 0. )
         {
-            gNon->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn / (fObservationTime_h*60.) );
-	    gNon->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
-	    gNon->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
-            gNoff->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * alpha / (fObservationTime_h*60.) );
-	    gNoff->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
-	    gNoff->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
+            gSignalRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn / (fObservationTime_h*60.) );
+	    gSignalRate->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
+	    gSignalRate->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
+            gBGRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * alpha / (fObservationTime_h*60.) );
+	    gBGRate->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
+	    gBGRate->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
             z++;
         }
     }
-    if( bDraw )
-    {
-       if( cPlotDebug.size() != 3 ) return;
-
-       if( !cPlotDebug[0] || !cPlotDebug[0]->cd() ) return;
-       gNon->Draw( "ap" );
-       gNon->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
-       gNon->GetHistogram()->SetYTitle( "on/off rate [1/min]" );
-       gNoff->Draw( "p" );
-
-       cPlotDebug[0]->Update();
-    }
-
 // write graphs with on and off events to disk
     if( fDebugParticleNumberFile.size() > 0 )
     {
@@ -2084,17 +2112,39 @@ void VSensitivityCalculator::plotDebugPlotsParticleNumbers( vector< VDifferentia
 	TFile iF( fDebugParticleNumberFile.c_str(), "RECREATE" );
 	if( iF.IsZombie() )
 	{
-	    cout << "VSensitivityCalculator::plotDebugPlotsParticleNumbers: error opening particle number file (write): " << endl;
+	    cout << "VSensitivityCalculator::fillParticleNumbersGraphs: error opening particle number file (write): " << endl;
 	    cout << fDebugParticleNumberFile << endl;
 	    return;
         }
-	gNon->SetName( "gNOn" );
-	gNon->Write();
-	gNoff->SetName( "gNOff" );
-	gNoff->Write();
+	gSignalRate->SetName( "gSignalRate" );
+	gSignalRate->Write();
+	gBGRate->SetName( "gBGRate" );
+	gBGRate->Write();
 
 	iF.Close();
      }
+
+}
+
+
+void VSensitivityCalculator::plotDebugPlotsParticleNumbers()
+{
+    if( !gSignalRate || !gBGRate ) return;
+
+    gSignalRate->SetMinimum( 0.0001 );
+    gSignalRate->SetMaximum( 1.e2 );
+    setGraphPlottingStyle( gSignalRate, 1, 1, 20, 2 );
+    setGraphPlottingStyle( gBGRate, 2, 1, 21, 2 );
+
+    if( cPlotDebug.size() != 3 ) return;
+
+    if( !cPlotDebug[0] || !cPlotDebug[0]->cd() ) return;
+    gSignalRate->Draw( "ap" );
+    gSignalRate->GetHistogram()->SetXTitle( "log_{10} energy [TeV]" );
+    gSignalRate->GetHistogram()->SetYTitle( "on/off rate [1/min]" );
+    gBGRate->Draw( "p" );
+
+    cPlotDebug[0]->Update();
 }
 
 /*!
@@ -2205,6 +2255,69 @@ bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, 
     return true;
 }
 
+bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F* iBGRate, TH1F* iBGRateSqDeg,
+                                                        TH1F* iProtonRate,  TH1F* iElectronRate)
+{
+    double x = 0.;
+    double y = 0.;
+    if( iSensitivity && gSensitivityvsEnergy )
+    {
+       fillSensitivityHistogramfromGraph( gSensitivityvsEnergy, iSensitivity, 1. );
+    }
+    if( iBGRate && gBGRate )
+    {
+       fillSensitivityHistogramfromGraph( gBGRate, iBGRate, 1./60. );
+    }
+    if( iBGRateSqDeg && fMC_Data.find( 1 ) != fMC_Data.end() && fMC_Data[1]->gTheta2Cuts_vsEnergylgTeV && gBGRate )
+    {
+       for( int i = 0; i < gBGRate->GetN(); i++ )
+       {
+          gBGRate->GetPoint( i, x, y );
+	  if( y > 0. )
+	  {
+	     double iT2 = fMC_Data[1]->gTheta2Cuts_vsEnergylgTeV->Eval( x );
+	     if( iT2 > 0. )
+	     {
+	        y /= iT2;
+		iBGRateSqDeg->SetBinContent( iBGRate->FindBin( x ), y/60. );
+		iBGRateSqDeg->SetBinError( iBGRateSqDeg->FindBin( x ), 0.5*(gBGRate->GetErrorYlow(i)+gBGRate->GetErrorYhigh(i))/iT2/60. );
+             }
+          }
+       } 
+    } 
+    if( iProtonRate && gProtonRate )
+    {
+       fillSensitivityHistogramfromGraph( gProtonRate, iProtonRate, 1./60. );
+    }
+    if( iElectronRate && gElectronRate )
+    {
+       fillSensitivityHistogramfromGraph( gElectronRate, iElectronRate, 1./60. );
+    }
+       
+
+    return true;
+}
+
+bool VSensitivityCalculator::fillSensitivityHistogramfromGraph( TGraph* g, TH1F *h, double iScale )
+{
+   if( !h || !g ) return false;
+
+   double x = 0.;
+   double y = 0.;
+   for( int i = 0; i < g->GetN(); i++ )
+   {
+       g->GetPoint( i, x, y );
+       if( y > 0. && iScale != 0. )
+       {
+	  h->SetBinContent( h->FindBin( x ), y / iScale );
+	  h->SetBinError( h->FindBin( x ), 0.5*(g->GetErrorYlow(i)+g->GetErrorYhigh(i))/iScale );
+       }
+   }
+
+   return true;
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2232,6 +2345,7 @@ VSensitivityCalculatorDataResponseFunctions::VSensitivityCalculatorDataResponseF
 //    theta2_max = -1.;
     theta2_MCScatterAngle = 0.;
     gSolidAngle_DirectionCut_vs_EnergylgTeV = 0;
+    gTheta2Cuts_vsEnergylgTeV = 0;
     SolidAngle_MCScatterAngle = 0.;
     alpha = 0.;
     effArea_Ebins = 0;

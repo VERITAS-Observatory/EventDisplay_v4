@@ -37,6 +37,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     hEcut_recUW = 0;
     hEsys = 0;
     hERecMatrix = 0;
+    hEsysMCRelative2D = 0;
     gEnergyResolution = 0;
     gEnergySystematic_Mean = 0;
     gEnergySystematic_Median = 0;
@@ -175,7 +176,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     {
        h = (TH1F*)gDirectory->Get( "EnResol_RMS" );
     }
-    fillResolutionGraphfromHistogram( h, gEnergyResolution );
+    fillResolutionGraphfromHistogram( h, gEnergyResolution, true );
     setGraphPlottingStyle( gEnergyResolution );
 
 // angular resolution
@@ -396,11 +397,13 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
        hERecMatrix = (TH2D*)c->hEmcCut;
 // get error in energy reconstruction
        hEsys = (TH2D*)c->hEsys2D;
+// erec/emc
+       hEsysMCRelative2D = (TH2D*)c->hEsysMCRelative2D;
 // get energy resolution
        getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bis
-       get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
+       gEnergySystematic_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
        setGraphPlottingStyle( gEnergySystematic_Mean );
        gEnergySystematic_Median = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "median", 1, -10. );
        setGraphPlottingStyle( gEnergySystematic_Median ); 
@@ -638,3 +641,83 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
 
     return g;
 }
+
+bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F *h, string iContainmentRadius, string iResolutionTreeName )
+{
+    if( !h ) return false;
+
+    if( iContainmentRadius != "68" ) iResolutionTreeName += "_0" + iContainmentRadius + "p";
+
+    for( unsigned int j = 0; j < fIRF_TreeNames.size(); j++ )
+    {
+	if( fIRF_TreeNames[j] == iResolutionTreeName )
+	{
+	     if( j < fIRF_Data.size() && fIRF_Data[j] )
+	     {
+// try to get EVNDISP resolution graph
+		 TGraphErrors *g = fIRF_Data[j]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
+		 if( g )
+		 {
+		    double x = 0.;
+		    double y = 0.;
+		    for( int i = 0; i < g->GetN(); i++ )
+		    {
+		       g->GetPoint( i, x, y );
+		       if( y > 0. ) h->SetBinContent( h->FindBin( x ), y ); 
+                    }
+		}
+            }
+       }
+   }
+
+   return true;
+}
+
+bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F *hEffRec, string iContainmentRadius, TH1F *hEff_MC )
+{
+    if( !hEffRec ) return false;
+
+    if( iContainmentRadius.size() > 0 )
+    {
+       cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms() warning: " << endl;
+       cout << "\t assuming that effective areas are calculated using a 80% containment on direction" << endl;
+    }
+
+    if( gEffArea_Rec )
+    {
+	double x = 0.;
+	double y = 0.;
+	for( int i = 0; i < gEffArea_Rec->GetN(); i++ )
+	{
+	   gEffArea_Rec->GetPoint( i, x, y );
+	   if( y > 0. )
+	   {
+	      hEffRec->SetBinContent( hEffRec->FindBin( x ), y ); 
+	      hEffRec->SetBinError( hEffRec->FindBin( x ), 0.5*(gEffArea_Rec->GetErrorYlow(i)+gEffArea_Rec->GetErrorYhigh(i)) );
+           }	      
+	}
+    }
+    else 
+    {
+       cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms() warning: " << endl;
+       cout << "\t no effective are graph found" << endl;
+       return false;
+    }
+    if( gEffArea_MC && hEff_MC )
+    {
+	double x = 0.;
+	double y = 0.;
+	for( int i = 0; i < gEffArea_MC->GetN(); i++ )
+	{
+	   gEffArea_MC->GetPoint( i, x, y );
+	   if( y > 0. )
+	   {
+	      hEff_MC->SetBinContent( hEff_MC->FindBin( x ), y ); 
+	      hEff_MC->SetBinError( hEff_MC->FindBin( x ), 0.5*(gEffArea_MC->GetErrorYlow(i)+gEffArea_MC->GetErrorYhigh(i)) );
+           }	      
+        }
+    }
+    
+    return true;
+}
+

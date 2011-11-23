@@ -39,7 +39,8 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
     double  fArrayCentre_X;
     double  fArrayCentre_Y;
 
-    TList*  calculateResolution( TH2D *iHistogram, TGraphErrors *iResult, string iHistoName, double iContainmentProbability, double iContainmentProbabilityError );
+    TList*  calculateResolution( TH2D *iHistogram, TGraphErrors *iResult, string iHistoName,
+                                 double iContainmentProbability, double iContainmentProbabilityError );
     double  getResolutionErrorfromToyMC( double i68, double iN );
     int     testResponseFunctionType( string iType );
 

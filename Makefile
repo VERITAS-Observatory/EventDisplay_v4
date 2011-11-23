@@ -472,6 +472,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VASlalib.o ./obj/VASlalib_Dict.o \
+		./obj/Ctelconfig.o \
+		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VPlotRunSummary.o ./obj/VPlotRunSummary_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VStereoReconstruction.o ./obj/VStereoReconstruction_Dict.o \
@@ -609,6 +611,34 @@ PRINTDISPTABLESOBJ= 	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dic
 
 printDISPTables:	$(PRINTDISPTABLESOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# writeCTAWPPhysSensitivityFiles 
+########################################################
+WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
+			./obj/writeCTAWPPhysSensitivityFiles.o \
+			./lib/libVAnaSum.so
+#			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
+			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
+			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
+			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
+			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
+			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
+			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
+			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
+			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+			./obj/VRunList_Dict.o ./obj/VRunList.o \
+
+./obj/writeCTAWPPhysSensitivityFiles.o: 	./src/writeCTAWPPhysSensitivityFiles.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+writeCTAWPPhysSensitivityFiles:	$(WRITECTAPHYSOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib -lVAnaSum $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 ########################################################

@@ -24,6 +24,7 @@
 #include "TGraph.h"
 #include "TGraphAsymmErrors.h"
 #include "TH1D.h"
+#include "TH1F.h"
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TLine.h"
@@ -71,6 +72,7 @@ class VSensitivityCalculatorDataResponseFunctions
 //    double theta2_max;                                     // [deg^2]      direction cut (if energy independent)
     double theta2_MCScatterAngle;                          // [deg^2]      scattering angle^2 of primary direction in CORSIKA (e.g. 10deg in most CTA simulations)
     TGraph* gSolidAngle_DirectionCut_vs_EnergylgTeV;       // [sr, lg TeV] solid angle of direction cut (as function of energy)
+    TGraph* gTheta2Cuts_vsEnergylgTeV;                     // [deg, TeV]   theta2 cut vs energy
     double SolidAngle_MCScatterAngle;                      // [sr]         scattering solid angle of primary direction in CORSIKA (e.g. 10deg in most CTA simulations)
     double alpha;
     int effArea_Ebins;
@@ -160,6 +162,11 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 
 // sensitivity graph
         TGraphAsymmErrors *gSensitivityvsEnergy;
+	TGraphAsymmErrors *gSignalRate;
+	TGraphAsymmErrors *gBGRate;
+	TGraphAsymmErrors *gBGRateSqDeg;
+	TGraphErrors *gProtonRate;
+	TGraphErrors *gElectronRate;
 
 // plotting debug stuff
         vector< TCanvas * > cPlotDebug;
@@ -171,30 +178,33 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 // private functions
         bool       checkDataSet( unsigned int iD, string iName );
         bool       checkUnits( string iUnit );
+	bool       fillSensitivityHistogramfromGraph( TGraph* g, TH1F *h, double iScale );
         TGraph*           getCrabSpectrum( bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
         vector< TGraph* > getCrabSpectrum( vector< double > i_fCrabFlux, bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
-        void       plot_guidingLines( double x, TGraph *g, bool iHours );
-	bool       calculateSensitivityvsEnergyFromCrabSpectrum( string iAnasumCrabFile, string bUnit = "CU",
-							    double dE_Log10 = 0.25, double iEnergyMin = 0.01, double iEnergyMax = 1.e6 );
-        TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
-        void       purgeEnergies( vector< double > e, vector< VDifferentialFlux >& v_flux );
 
         vector< VDifferentialFlux > getDifferentFluxVectorfromData( string iAnasumCrabFile, double dE_Log10, double &iNorm );
         vector< VDifferentialFlux > getDifferentialFluxVectorfromMC( double dE_Log10, double &iNorm );
 	vector< VDifferentialFlux > getDifferentialFluxVectorfromCTA_MC( double dE_Log10, double &iNorm );
         vector< VDifferentialFlux > getDifferentialFluxVectorfromMC_ErrorMessage( string );
 
+	void       fillBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
+						  map< unsigned int, vector< double > > i_flux_NOff,
+						  map< unsigned int, vector< double > > i_flux_NOff_error );
+	void       fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha );
         bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
 				       bool iRateError = false );
 
-        void       prepareDebugPlots();
+        void       plot_guidingLines( double x, TGraph *g, bool iHours );
+        TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
         void       plotEffectiveArea();
 	void       plotDebugPlotsBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
-                                                            map< unsigned int, vector< double > > i_flux_NOff,
-							    map< unsigned int, vector< double > > i_flux_NOff_error );
-        void       plotDebugPlotsParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux, double alpha = 1., bool bDraw = true );
+						  map< unsigned int, vector< double > > i_flux_NOff,
+						  map< unsigned int, vector< double > > i_flux_NOff_error );
+        void       plotDebugPlotsParticleNumbers();
+        void       prepareDebugPlots();
+        void       purgeEnergies( vector< double > e, vector< VDifferentialFlux >& v_flux );
 
     public:
 
@@ -204,8 +214,11 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         unsigned int  addDataSet( double iGammaRayRate, double iBackGroundRate, double iAlpha, string iName );
         double   calculateObservationTimevsFlux( unsigned int iD );
 	bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
+	bool     fillSensitivityHistograms( TH1F* iSensitivity = 0, TH1F* iBGRate = 0, TH1F* iBGRateSqDeg = 0, 
+	                                    TH1F* iProtonRate = 0,  TH1F* iElectronRate = 0 );
 	bool     getDebug() { return fDebug; }
         double   getSensitivity( unsigned int iD, double energy = -1. );
+	TGraphAsymmErrors*  getSensitivityGraph() { return gSensitivityvsEnergy; }
         unsigned int  listDataSets();
         void     listUnits();
         void     list_sensitivity( unsigned int iD );
@@ -216,9 +229,9 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         TCanvas* plotSensitivityvsEnergyFromTextTFile( TCanvas *c, string iTextFile,
 	                                               int iColor = 1, double iLineWidth = 2, int iLineStyle = 2,
 						       string bUnit = "CU", bool bIntegralSensitivity = true );
-	bool     calculateDifferentialSensitivityvsEnergyFromCrabSpectrum( string iAnasumCrabFile, string bUnit = "CU",
-	                                                                   double dE_Log10 = 0.25,
-									   double iEnergyMin_TeV_lin = 0.01, double iEnergyMax_TeV_lin = 1.e6 );
+	bool     calculateSensitivityvsEnergyFromCrabSpectrum( string iAnasumCrabFile, string bUnit = "CU",
+							         double dE_Log10 = 0.25, 
+								 double iEnergyMin = 0.01, double iEnergyMax = 1.e6 );
         TCanvas* plotDifferentialSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, string iAnasumCrabFile,
 	                                                              int iColor = 1, string bUnit = "CU",
 								      double dE_Log10 = 0.25, 
@@ -256,6 +269,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,7);
+        ClassDef(VSensitivityCalculator,8);
 };
 #endif

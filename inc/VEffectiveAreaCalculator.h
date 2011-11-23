@@ -107,6 +107,7 @@ class VEffectiveAreaCalculator
         vector< vector< TProfile* > > hVEsysRec;
         vector< vector< TProfile* > > hVEsysMC;
         vector< vector< TProfile* > > hVEsysMCRelative;
+        vector< vector< TH2D* > > hVEsysMCRelative2D;
         vector< vector< TH2D* > > hVEsys2D;
         vector< vector< TH2D* > > hVEmcCut;
 
@@ -125,6 +126,7 @@ class VEffectiveAreaCalculator
         TProfile* hEsysRec;
         TProfile* hEsysMC;
         TProfile* hEsysMCRelative;
+        TH2D* hEsysMCRelative2D;
         TH2D* hEsys2D;
         TH2D* hEmcCut;
 	vector< TH1D* > hEcutSub;                //! events after individual cuts

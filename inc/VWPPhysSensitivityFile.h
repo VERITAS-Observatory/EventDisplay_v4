@@ -1,0 +1,95 @@
+// VWPPhysSensitivityFile write write CTA WP Phys sensitivity files
+
+#ifndef VWPPhysSensitivityFile_H
+#define VWPPhysSensitivityFile_H
+
+#include "TFile.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TList.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "VASlalib.h"
+#include "VInstrumentResponseFunctionReader.h"
+#include "VSensitivityCalculator.h"
+
+using namespace std;
+
+class VWPPhysSensitivityFile
+{
+    private:
+
+    bool         fDebug;
+
+    TFile*       fOutFile;
+    string       fDataFile_gamma_onSource;
+    string       fDataFile_gamma_cone10;
+    string       fDataFile_proton;
+    string       fDataFile_electron;
+
+    string       fSubArray;
+    double       fObservingTime_h;
+
+    string       fCrabSpectrumFile;
+    unsigned int fCrabSpectrumID;
+    string       fCosmicRaySpectrumFile;
+    unsigned int fProtonSpectrumID;
+    unsigned int fElectronSpectrumID;
+
+    TList *hisList;
+    TList *hisList2D;
+
+    TH1F* fSensitivity;
+    TH1F* fBGRate;
+    TH1F* fBGRateSqDeg;
+    TH1F* fProtRate;
+    TH1F* fElecRate;
+    TH1F* fEffArea;
+    TH1F* fEffAreaMC;
+    TH1F* fEffArea80;
+    TH1F* fAngRes68;
+    TH1F* fAngRes80;
+    TH1F* fEres;
+
+    TH1F* fSensitivity2D;
+    TH1F* fBGRate2D;
+    TH1F* fBGRateSqDeg2D;
+    TH1F* fProtRate2D;
+    TH1F* fElecRate2D;
+    TH1F* fEffArea2D;
+    TH1F* fEffAreaMC2D;
+    TH1F* fEffArea802D;
+    TH1F* fAngRes682D;
+    TH1F* fAngRes802D;
+    TH1F* fEres2D;
+
+    bool fillHistograms1D( string iDataDirectory );
+
+    public:
+
+    VWPPhysSensitivityFile();
+   ~VWPPhysSensitivityFile() {}
+
+    bool fillHistograms( string iDataDirectory );
+    bool initializeHistograms( int iEnergyXaxisNbins = 20, double iEnergyXaxis_min = -1.8, double iEnergyXaxis_max = 2.2,
+                               int iEnergyTrue2DXaxisNbins = 500, double iEnergyTrue2DXaxis_min = -1.8, double iEnergyTrue2DXaxis_max = 2.2,
+                               int iEnergyRec2DXaxisNbins = 400, double iEnergyRec2DXaxis_min = -2.3, double iEnergyRec2DXaxis_max = 2.7 );
+    bool initializeWobbleOffsets( vector< double > iWobble_min, vector< double > iWobble_max, string iHistogramDimension );
+    bool initializeOutputFile( string iOutputFile );
+    void setCrabSpectrum( string iCrabSpectrum, unsigned int iID = 5 ) { fCrabSpectrumFile = iCrabSpectrum; fCrabSpectrumID = iID; }
+    void setCosmicRaySpectrum( string iCRSpectrum, unsigned iPID = 0, unsigned iEID = 2  ) 
+                                                                       { fCosmicRaySpectrumFile = iCRSpectrum; 
+								          fProtonSpectrumID = iPID;
+									  fElectronSpectrumID = iEID; }
+    void setDebug( bool iB = false ) { fDebug = iB; }
+    void setObservationTime( double iO_h = 50. ) { fObservingTime_h = iO_h; }
+    void setSubArray( string iA = "E" );
+    bool terminate();
+
+};
+
+#endif
+

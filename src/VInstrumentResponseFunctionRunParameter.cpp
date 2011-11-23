@@ -37,6 +37,9 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fCoreScatterMode = "";
     fCoreScatterRadius = 0.;
 
+    fViewcone_min = -1.;
+    fViewcone_max = -1.;
+
     fdatafile = "";
     fMCdatafile_tree = "";
     fMCdatafile_histo = "";
@@ -246,6 +249,9 @@ VMonteCarloRunHeader* VInstrumentResponseFunctionRunParameter::readMCRunHeader()
    }
    if( iMC->VOLUMEDET_set() ) fCoreScatterMode = "VIEWCONE";
    else                       fCoreScatterMode = "FLAT";
+// get view cone
+   fViewcone_min = iMC->viewcone[0];
+   fViewcone_max = iMC->viewcone[1];
    if( fMCEnergy_min > -90. )
    {
       cout << "readMCRunheader: WARNING overridung user defined Monte Carlo energy range" << endl;

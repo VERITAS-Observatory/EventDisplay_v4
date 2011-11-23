@@ -157,8 +157,15 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     sprintf( hname, "hEsysMCRelative" );
     hEsysMCRelative = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
     hEsysMCRelative->SetXTitle( "energy_{MC} [TeV]" );
-    hEsysMCRelative->SetYTitle( "systematic error (E_{rec} - E_{MC})/E_{MC}" );
+    hEsysMCRelative->SetYTitle( "systematic error E_{rec}/E_{MC}" );
     hisTreeList->Add( hEsysMCRelative );
+
+// use CTA WP Phys binning
+    sprintf( hname, "hEsysMCRelative2D" );
+    hEsysMCRelative2D = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 300, 0., 3. );
+    hEsysMCRelative2D->SetXTitle( "energy_{MC} [TeV]" );
+    hEsysMCRelative2D->SetYTitle( "systematic error E_{rec}/E_{MC}" );
+    hisTreeList->Add( hEsysMCRelative2D );
 
     sprintf( hname, "hEsys2D" );
     hEsys2D = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 100, -0.98, 2.02 );
@@ -166,10 +173,11 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hEsys2D->SetYTitle( "log_{10} E_{rec} - log_{10} E_{MC}" );
     hisTreeList->Add( hEsys2D );
 
+// following CTA WP Phys binning convention
     sprintf( hname, "hEmcCut" );
-    hEmcCut = new TH2D( hname, htitle, 2*nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 2*nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
-    hEmcCut->SetXTitle( "energy_{MC} [TeV]" );
-    hEmcCut->SetYTitle( "energy_{rec} [TeV]" );
+    hEmcCut = new TH2D( hname, htitle, 500, -1.8, 2.2, 400, -2.3, 2.7 );
+    hEmcCut->SetYTitle( "energy_{MC} [TeV]" );
+    hEmcCut->SetXTitle( "energy_{rec} [TeV]" );
     hisTreeList->Add( hEmcCut );
 
 // individual cuts
@@ -348,6 +356,15 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
             else                  iT_TProfile.push_back( 0 );
         }
         hVEsysMCRelative.push_back( iT_TProfile );
+
+        iT_TH2D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
+            sprintf( hname, "hVEsysMCRelative2D_%d_%d", i, j );
+            if( hEsysMCRelative2D ) iT_TH2D.push_back( (TH2D*)hEsysMCRelative2D->Clone( hname ) );
+            else          iT_TH2D.push_back( 0 );
+        }
+        hVEsysMCRelative2D.push_back( iT_TH2D );
 
         iT_TH2D.clear();
         for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -645,7 +662,10 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
     if( i_hEsysMCRelative ) i_temp_EsysE.assign( i_hEsysMCRelative->GetNbinsX(), 0. );
     if( i_hEsysMCRelative )
     {
-        for( int i = 1; i <= i_hEsysMCRelative->GetNbinsX(); i++ ) fEff_EsysMCRelative_EnergyAxis.push_back( i_hEsysMCRelative->GetXaxis()->GetBinCenter( i ) );
+        for( int i = 1; i <= i_hEsysMCRelative->GetNbinsX(); i++ )
+	{
+	   fEff_EsysMCRelative_EnergyAxis.push_back( i_hEsysMCRelative->GetXaxis()->GetBinCenter( i ) );
+        }
     }
 
     cout << "\t selecting effective areas for mean az " << iAzMean << " deg, spectral index ";
@@ -1107,6 +1127,7 @@ void VEffectiveAreaCalculator::reset()
     hEsysRec = 0;
     hEsysMC = 0;
     hEsysMCRelative = 0;
+    hEsysMCRelative2D = 0;
     hEsys2D = 0;
     hEmcCut = 0;
     fEffArea = 0;
@@ -1425,9 +1446,10 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                if( hVEcutRecUW[s][i_az] )      hVEcutRecUW[s][i_az]->Fill( eRec, 1. );
                if( hVEsysRec[s][i_az] )        hVEsysRec[s][i_az]->Fill( eRec, eRec - eMC );
                if( hVEsysMC[s][i_az] )         hVEsysMC[s][i_az]->Fill( eMC, eRec - eMC );
-               if( hVEsysMCRelative[s][i_az] ) hVEsysMCRelative[s][i_az]->Fill( eMC, ( eRecLin - d->MCe0 ) / d->MCe0 );
+               if( hVEsysMCRelative[s][i_az] ) hVEsysMCRelative[s][i_az]->Fill( eMC, eRecLin / eMC );
+               if( hVEsysMCRelative2D[s][i_az] ) hVEsysMCRelative2D[s][i_az]->Fill( eMC, eRecLin / eMC );
                if( hVEsys2D[s][i_az] )         hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
-               if( hVEmcCut[s][i_az] )         hVEmcCut[s][i_az]->Fill( eMC, eRec );
+               if( hVEmcCut[s][i_az] )         hVEmcCut[s][i_az]->Fill( eRec, eMC );
              }
            }
 // don't do anything between here and the end of the loop! Never!
@@ -1534,6 +1556,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az], "s" );
             copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az], "s" );
             copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az], "s" );
+            copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
             copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
             copyHistograms( hEmcCut, hVEmcCut[s][i_az], true );
 
@@ -1946,12 +1969,16 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
     sprintf( htitle, "energy reconstruction (%.1f deg)", fZe[ize] );
     hEsysMCRelative->SetTitle( htitle );
 
+    hEsysMCRelative2D->Reset();
+    sprintf( htitle, "energy reconstruction (%.1f deg)", fZe[ize] );
+    hEsysMCRelative2D->SetTitle( htitle );
+
     hEsys2D->Reset();
     sprintf( htitle, "energy reconstruction, distributions (%.1f deg)", fZe[ize] );
     hEsys2D->SetTitle( htitle );
 
     hEmcCut->Reset();
-    sprintf( htitle, "reconstructed energy vs. MC energy (%.1f deg)", fZe[ize] );
+    sprintf( htitle, "migration matrix (%.1f deg)", fZe[ize] );
     hEmcCut->SetTitle( htitle );
 
     hEmcSWeight->Reset();
@@ -2252,6 +2279,13 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
         for( unsigned int j = 0; j < hVEsysMCRelative[i].size(); j++ )
         {
             if( hVEsysMCRelative[i][j] ) hVEsysMCRelative[i][j]->Reset();
+        }
+    }
+    for( unsigned int i = 0; i < hVEsysMCRelative2D.size(); i++ )
+    {
+        for( unsigned int j = 0; j < hVEsysMCRelative2D[i].size(); j++ )
+        {
+            if( hVEsysMCRelative2D[i][j] ) hVEsysMCRelative2D[i][j]->Reset();
         }
     }
     for( unsigned int i = 0; i < hVEsys2D.size(); i++ )

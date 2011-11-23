@@ -49,6 +49,9 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    string          fCoreScatterMode;
    double          fCoreScatterRadius;
 
+   double          fViewcone_min;
+   double          fViewcone_max;
+
    bool            fAzimuthBins;
    bool            fIsotropicArrivalDirections;
 
@@ -81,7 +84,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    bool                  readRunParameterFromTextFile( string iFile );
    bool                  testRunparameters();
 
-   ClassDef( VInstrumentResponseFunctionRunParameter, 3 );
+   ClassDef( VInstrumentResponseFunctionRunParameter, 4 );
 };
 
 #endif

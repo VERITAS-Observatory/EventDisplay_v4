@@ -77,6 +77,8 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TH1D *hEcut_recUW;
 // energy reconstruction matrix
     TH2D *hERecMatrix;
+// e_rec/e_mc
+    TH2D *hEsysMCRelative2D;
 // 2D energy error distribution
     TH2D *hEsys;
 // energy resolution
@@ -108,13 +110,17 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
    ~VInstrumentResponseFunctionReader() {}
 
     bool calculateEffectiveAreaRatios( TGraphAsymmErrors *g0 );
+    bool fillEffectiveAreasHistograms( TH1F *h = 0, string iContainmentRadius = "", TH1F *hMC = 0 );
+    bool fillResolutionHistogram( TH1F *h = 0, string iContainmentRadius = "68", string iResolutionTreeName = "t_angular_resolution" );
     bool fillData();
     bool fillData( string iDataLine, int iDataID );
     bool fillData( string iFile, double iZe = 20., double iWoff = 0.5, int iAzBin = 0, double iIndex = 2.4, int iNoise = 200, string iA_MC = "A_MC" );
+    TH2D* getRecvsMCEnergy() { return hEsysMCRelative2D; }
+    TH2D* getMigrationMatrix() { return hERecMatrix; }
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 1 );
+    ClassDef( VInstrumentResponseFunctionReader, 2 );
 };
 
 
