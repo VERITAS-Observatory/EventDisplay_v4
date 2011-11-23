@@ -16,8 +16,8 @@ then
    echo ""
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
-   echo "  <array ID>         CTA array ID (e.g. E for array E)"
-   echo "                     use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <array ID>         CTA array ID (e.g. E for array E or HYBRID1 for Hybrid-1 with 61 telescopes)"
+   echo "                     use ALL for all arrays (A B C D E F G H I J K NA NB HYBRID1)"
    echo "  <onSource/cone>    calculate tables for on source or different wobble offsets"
    echo
    echo " input data and output directories for tables are fixed in CTA.MSCW_ENERGY.qsub_make_tables.sh"
