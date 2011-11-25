@@ -12,7 +12,7 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <input> <cutfile template> <outputdirectory> [filling mode]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <outputdirectory> [filling mode]"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
@@ -28,10 +28,6 @@ then
    echo "<particle>"
    echo "     gamma_onSource / gamma_cone10 / electron / electron_onSource / proton / proton_onSource / helium "
    echo
-   echo "<input>"
-   echo "     msc      use mscw files as input (slow, but necessary at least once)"
-   echo "     eff      use effective area files (note: hardwired file location)"
-   echo 
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file"
    echo
@@ -39,7 +35,7 @@ then
    echo "     directory with all result and log files"
    echo
    echo "[filling mode]"
-   echo "     effective area filling mode (use 2 to calculate angular resolution only"
+   echo "     effective area filling mode (use 2 to calculate angular resolution only)"
    echo
    exit
 fi
@@ -55,14 +51,14 @@ echo
 ARRAY=$1
 RECID=$2
 PART=$3
-INPU=$4
-CFIL=$5
-ODIR=$6
+INPU="eff"
+CFIL=$4
+ODIR=$5
 EREC=0
 GFILLING=0
-if [ -n "$7" ]
+if [ -n "$6" ]
 then
-  GFILLING=$7
+  GFILLING=$6
 fi
 
 # check particle type
@@ -116,6 +112,7 @@ then
    MCFIL=gamma_onSource."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
+   OFFMEA=( "0.0" )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
 #   THETA2MAX=( 0.008 )
@@ -136,6 +133,9 @@ then
    MCFIL=gamma_cone10."$ARRAY"_ID0.eff
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
    OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+#   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+# use on axis TMVA for all off axis gamma/hadron separation
+   OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
    THETA2MAX=( -1. )
@@ -157,9 +157,13 @@ then
    then
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+# use on axis TMVA for all off axis gamma/hadron separation
+      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
+      OFFMEA=( 0.0 )
    fi   
    ISOTROPY="1"
    AZBINS="0"
@@ -179,9 +183,13 @@ then
    then
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+# use on axis TMVA for all off axis gamma/hadron separation
+      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
+      OFFMEA=( 0.0 )
    fi
    ISOTROPY="1"
    AZBINS="0"
@@ -201,9 +209,13 @@ then
    then
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
+#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+# use on axis TMVA for all off axis gamma/hadron separation
+      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
+      OFFMEA=( 0.0 )
    fi
    ISOTROPY="1"
    AZBINS="0"
@@ -259,7 +271,14 @@ do
       rm -f $iCFIL-d
       sed -e "s|SUBARRAY|$ARRAY|" $iCFIL-e > $iCFIL-f
       rm -f $iCFIL-e
-      mv -f $iCFIL-f $iCFIL
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      then
+         sed -e "s|WOBBLEOFFSET|${OFFMEA[$i]}|" $iCFIL-f > $iCFIL-g
+      else
+         sed -e "s|WOBBLEOFFSET|${OFFMEA[$j]}|" $iCFIL-f > $iCFIL-g
+      fi
+      rm -f $iCFIL-f
+      mv -f $iCFIL-g $iCFIL
       echo $iCFIL
 
 ###############################################################################
@@ -310,14 +329,14 @@ do
       fi
       echo "* CUTFILE $iCFIL" >> $MSCF
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
-      if [ $INPU = "msc" ]
-      then
-         echo "* SIMULATIONFILE_MC $MSCFILE" >> $MSCF
-      fi
-      if [ $INPU = "eff" ]
-      then
-	 echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/MCHistograms/$MCFIL-$i-$j.root" >> $MSCF
-      fi
+#      if [ $INPU = "msc" ]
+#      then
+#         echo "* SIMULATIONFILE_MC $MSCFILE" >> $MSCF
+#      fi
+#      if [ $INPU = "eff" ]
+#      then
+#	 echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/MCHistograms/$MCFIL-$i-$j.root" >> $MSCF
+#      fi
 
 # output file
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
@@ -357,9 +376,9 @@ do
       if [ $INPU = "eff" ]
       then
          echo "submitting to short queue"
-	 if [ $PART = "gamma_onSource" ]
+         if [ $PART = "gamma_onSource" ]
 	 then
-            qsub -l h_cpu=01:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+            qsub -l h_cpu=03:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
          else
             qsub -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
          fi

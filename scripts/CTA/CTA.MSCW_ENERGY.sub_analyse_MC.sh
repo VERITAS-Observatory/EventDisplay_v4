@@ -33,7 +33,9 @@ RECID=$2
 SUBAR=$3
 if [ $SUBAR == "ALL" ]
 then
-  VARRAY=( E A B C D F G H I J K NA NB "s4-1-120" "s4-2-120" "s4-2-85" )
+  VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "s4-1-120" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
+#    VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "s4-1-120" "I-noLST" "I-noSST" )
+# VARRAY=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
 else
   VARRAY=( $SUBAR )
 fi
@@ -116,7 +118,7 @@ do
    echo $FNAM.sh
 
 # submit the job
-   qsub -l h_cpu=04:30:00 -l h_vmem=3500M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+   qsub -l h_cpu=10:29:00 -l h_vmem=3500M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
    echo "run script written to $FNAM.sh"
    echo "queue log and error files written to $QLOG"
 done

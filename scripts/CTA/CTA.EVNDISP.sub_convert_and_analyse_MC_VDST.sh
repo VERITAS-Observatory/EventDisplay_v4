@@ -72,7 +72,7 @@ mkdir -p $SHELLDIR
 FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST"
 
 Z=0
-N=100
+N=300
 
 # loop over all files in files loop
 for AFIL in $FILES
@@ -101,9 +101,9 @@ do
 
    if  [ $ARRAY = "ALL" ]
    then
-      qsub -l h_cpu=25:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+      qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    else
-      qsub -l h_cpu=02:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+      qsub -l h_cpu=08:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    fi
 
    echo "writing shell script to $FNAM.sh"
@@ -111,7 +111,7 @@ do
 
    let "Z = $Z + 1"
 
-   if [ $Z -gt 200 ]
+   if [ $Z -gt 50 ]
    then
       let "N = $N + 1"
       Z=0

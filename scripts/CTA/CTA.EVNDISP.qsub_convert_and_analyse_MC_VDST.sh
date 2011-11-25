@@ -20,8 +20,8 @@ MET=MEEET
 # set array
 if [ $SUBA = "ALL" ] 
 then
-  FIELD=( A B C D E F G H I J K NA NB )
-#  FIELD=( "s4-2-120" "s4-2-85" "s4-1-120" )
+  FIELD=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
+#  FIELD=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
 else
   FIELD=( $SUBA )
 fi
@@ -67,7 +67,7 @@ do
 
 ####################################################################
 # execute eventdisplay
-  $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root -reconstructionparameter $ACUT $OPT -outputdirectory $TMPDIR >& $LDIR/$OFIL.evndisp.log
+  $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root -writenoMCTree -reconstructionparameter $ACUT $OPT -outputdirectory $TMPDIR >& $LDIR/$OFIL.evndisp.log
 
 ####################################################################
 # move evndisp files to data directory

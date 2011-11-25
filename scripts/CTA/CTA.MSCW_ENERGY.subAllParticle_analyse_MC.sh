@@ -27,7 +27,8 @@ then
    exit
 fi
 
-VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
+#VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
+VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 NPART=${#VPART[@]}
 
 ###########################################

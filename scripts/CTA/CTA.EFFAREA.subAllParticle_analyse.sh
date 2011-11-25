@@ -5,19 +5,15 @@
 #
 
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] 
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray> <input> <cut file directory> <cutfile template> <output directory> [filling mode]"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray> <cut file directory> <cutfile template> <output directory> [filling mode]"
    echo
    echo "<subarray>"
    echo "     subarray identifier (A,B,C...)"
    echo "     use ALL for all arrays (A B C D E F G H I J K NA NB)"
    echo
-   echo "<input>"
-   echo "     msc      use mscw files as input (slow, but necessary at least once)"
-   echo "     eff      use effective area files (note: hardwired file location)"
-   echo 
    echo "<cut file directory>"
    echo "     direction where cut files are located"  
    echo "<cutfile template>"
@@ -36,21 +32,22 @@ fi
 
 SUBAR=$1
 RECID=0
-ITYPE=$2
-CDIR=$3
-CFIL=$4
-ODIR=$5
+CDIR=$2
+CFIL=$3
+ODIR=$4
 GMOD=0
-if [ -n "$6" ]
+if [ -n "$5" ]
 then
-  GMOD=$6
+  GMOD=$5
 fi
 mkdir -p $ODIR
 
 #arrays
 if [ $SUBAR = "ALL" ]
 then
-  VARRAY=( A B C D E F G H I J K NA NB "s4-1-120" "s4-2-120" "s4-2-85" )
+#  VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
+  VARRAY=( E I J )
+#  VARRAY=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
 else
   VARRAY=( $SUBAR )
 fi
@@ -60,7 +57,8 @@ NARRAY=${#VARRAY[@]}
 #if [ $GFILL = "0" ]
 if [ $GMOD = "0" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
+#   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
+   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 else
    VPART=( "gamma_onSource" "gamma_cone10" )
 fi
@@ -95,7 +93,7 @@ do
         cp $CDIR/$CFIL.CRbck.dat $CCUT
       fi
 
-      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $ITYPE $CCUT $ODIR $GMOD
+      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ODIR $GMOD
    done
 done
 

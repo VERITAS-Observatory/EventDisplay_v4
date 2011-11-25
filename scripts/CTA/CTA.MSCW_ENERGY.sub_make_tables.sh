@@ -12,7 +12,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <array ID> <onSource/cone>"
+   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <array ID> <onSource/cone10>"
    echo ""
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
@@ -32,13 +32,15 @@ RECID=$2
 ARRAY=$3
 if [ $ARRAY == "ALL" ]
 then
-  VARRAY=( A B C D E F G H I J K NA NB "s4-1-120" "s4-2-120" "s4-2-85" )
+  VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "s4-1-120" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
+#  VARRAY=( "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
+#  VARRAY=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
 else 
   VARRAY=( $ARRAY )
 fi
 NARRAY=${#VARRAY[@]}
 CONE="FALSE"
-if [ $4 == "cone" ]
+if [ $4 == "cone10" ] || [ $4 == "cone" ]
 then
   CONE="TRUE"
 fi
