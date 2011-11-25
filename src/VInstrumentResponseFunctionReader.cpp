@@ -19,7 +19,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     fAzbin = 0;
     fIndex = 0.;
     fNoise = 0;
-    fPlotOption = "p";
+    fPlotOption = "pl";
     fColor = 1;
     fLineStyle = 1;
     fMarkerStyle = 20;
@@ -400,9 +400,10 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 // erec/emc
        hEsysMCRelative2D = (TH2D*)c->hEsysMCRelative2D;
 // get energy resolution
-       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
+//       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
+       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
-// get energy bis
+// get energy bias
        gEnergySystematic_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
        setGraphPlottingStyle( gEnergySystematic_Mean );
        gEnergySystematic_Median = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "median", 1, -10. );
@@ -534,13 +535,13 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TProfile *iP, i
                 gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), iP->GetBinError(b) );
                 if( iP->GetBinEntries(b) > 0. )
 		{
-		    gEnergyResolution->SetPointError( zz, 0., iP->GetBinError(b)/sqrt(iP->GetBinEntries(b) ) );
+		    gEnergyResolution->SetPointError( zz, 0., iP->GetBinError(b)/sqrt(iP->GetBinEntries(b)-1. ) );
                 }
                 else                            gEnergyResolution->SetPointError( zz, 0., 0. );
             }
             else
             {
-                gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), iP->GetBinError(b)*sqrt(iP->GetBinEntries(b)) );
+                gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), iP->GetBinError(b)*sqrt(iP->GetBinEntries(b)-1.) );
                 gEnergyResolution->SetPointError( zz, 0., iP->GetBinError(b) );
             }
             zz++;
@@ -656,6 +657,10 @@ bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F *h, string
 	     {
 // try to get EVNDISP resolution graph
 		 TGraphErrors *g = fIRF_Data[j]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
+		 if( iResolutionTreeName == "t_energy_resolution" )
+		 {
+		    g = gEnergyResolution;
+                 }
 		 if( g )
 		 {
 		    double x = 0.;

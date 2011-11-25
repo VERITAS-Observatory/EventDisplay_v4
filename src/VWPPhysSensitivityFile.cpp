@@ -46,113 +46,236 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fAngRes802D = 0;
     fEres2D = 0; 
 
-    hisList2D = 0;
+    fOffsetCounter = 9999;
+
 }
 
 
 bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double iEnergyXaxis_min, double iEnergyXaxis_max,
                                int iEnergyTrue2DXaxisNbins, double iEnergyTrue2DXaxis_min, double iEnergyTrue2DXaxis_max,
-                               int iEnergyRec2DXaxisNbins, double iEnergyRec2DXaxis_min, double iEnergyRec2DXaxis_max )
+                               int iEnergyRec2DXaxisNbins, double iEnergyRec2DXaxis_min, double iEnergyRec2DXaxis_max,
+			       unsigned int iOffsetCounter )
 {
 
-   hisList = new TList();
+   char hname[200];
+   fOffsetCounter = iOffsetCounter;
 
 // sensitivity and background rates
-   fSensitivity = new TH1F( "DiffSens", "Diff. Sens.", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "DiffSens" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fSensitivity = new TH1F( hname, "Diff. Sens.", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fSensitivity->SetXTitle( "log_{10} (E/TeV)" );
    fSensitivity->SetYTitle( "E^{2} dF/dE [erg cm^{-2} s^{-1}]" );
    fSensitivity->Print();
-   hisList->Add( fSensitivity );
+   hisList.push_back( fSensitivity );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fSensitivity );
 
-   fBGRate = new TH1F( "BGRate", "Background Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "BGRate" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fBGRate = new TH1F( hname, "Background Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fBGRate->SetXTitle( "log_{10} (E/TeV)" );
    fBGRate->SetYTitle( "background rate [1/s]" );
-   hisList->Add( fBGRate );
+   hisList.push_back( fBGRate );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fBGRate );
 
-   fProtRate = new TH1F( "ProtRate", "Proton Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "ProtRate" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fProtRate = new TH1F( hname, "Proton Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fProtRate->SetXTitle( "log_{10} (E/TeV)" );
    fProtRate->SetYTitle( "background rate [1/s]" );
-   hisList->Add( fProtRate );
+   hisList.push_back( fProtRate );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fProtRate );
 
-   fElecRate = new TH1F( "ElecRate", "Electron Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "ElecRate" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fElecRate = new TH1F( hname, "Electron Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fElecRate->SetXTitle( "log_{10} (E/TeV)" );
    fElecRate->SetYTitle( "background rate [1/s]" );
-   hisList->Add( fElecRate );
+   hisList.push_back( fElecRate );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fElecRate );
 
-   fBGRateSqDeg = new TH1F( "BGRatePerSqDeg", "Background rate per square deg", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "BGRatePerSqDeg" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fBGRateSqDeg = new TH1F( hname, "Background rate per square deg", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fBGRateSqDeg->SetXTitle( "log_{10} (E/TeV)" );
    fBGRateSqDeg->SetYTitle( "background rate [1/s/deg^{2}]" );
-   hisList->Add( fBGRateSqDeg );
+   hisList.push_back( fBGRateSqDeg );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fBGRateSqDeg );
 
-   fEffArea = new TH1F( "EffectiveArea", "Effective Area", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "EffectiveArea" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fEffArea = new TH1F( hname, "Effective Area", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fEffArea->SetXTitle( "log_{10} (E/TeV)" );
    fEffArea->SetYTitle( "effective area [m^{2}]" );
-   hisList->Add( fEffArea );
+   hisList.push_back( fEffArea );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEffArea );
 
-   fEffAreaMC = new TH1F( "EffectiveAreaEtrue", "Effective Area in true energy", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "EffectiveAreaEtrue" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fEffAreaMC = new TH1F( hname, "Effective Area in true energy", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fEffAreaMC->SetXTitle( "log_{10} (E_{MC}/TeV)" );
    fEffAreaMC->SetYTitle( "effective area [m^{2}]" );
-   hisList->Add( fEffAreaMC );
+   hisList.push_back( fEffAreaMC );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEffAreaMC );
 
-   fEffArea80 = new TH1F( "EffectiveArea80", "Effective Area for 80% point-source containment", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "EffectiveArea80" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fEffArea80 = new TH1F( hname, "Effective Area for 80% point-source containment", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fEffArea80->SetXTitle( "log_{10} (E/TeV)" );
    fEffArea80->SetYTitle( "effective area [m^{2}]" );
-   hisList->Add( fEffArea80 );
+   hisList.push_back( fEffArea80 );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEffArea80 );
 
 // angular resolution histograms
-   fAngRes68 = new TH1F( "AngRes", "Angular resolution (68% containment)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "AngRes" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fAngRes68 = new TH1F( hname, "Angular resolution (68% containment)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fAngRes68->SetXTitle( "log_{10} (E/TeV)" );
    fAngRes68->SetYTitle( "containment radius (68%) [deg]" );
-   hisList->Add( fAngRes68 );
+   hisList.push_back( fAngRes68 );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fAngRes68 );
 
-   fAngRes80 = new TH1F( "AngRes80", "Angular resolution (80% containment)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "AngRes80" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fAngRes80 = new TH1F( hname, "Angular resolution (80% containment)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fAngRes80->SetXTitle( "log_{10} (E/TeV)" );
    fAngRes80->SetYTitle( "containment radius (80%) [deg]" );
-   hisList->Add( fAngRes80 );
+   hisList.push_back( fAngRes80 );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fAngRes80 );
 
-   fEres = new TH1F( "ERes", "Energy resolution", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   sprintf( hname, "Eres" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fEres = new TH1F( hname, "Energy resolution", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fEres->SetXTitle( "log_{10} (E/TeV)" );
    fEres->SetYTitle( "Relative Energy resolution (68% containment around Eres/Etrue=1)" );
-   hisList->Add( fEres );
+   hisList.push_back( fEres );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEres );
 
 // loop over all histograms
-   TIter next( hisList );
-   while( TH1 *obj = (TH1*)next() )
+   for( unsigned int i = 0; i < hisList.size(); i++ )
    {
-      if( obj )
+      if( hisList[i] )
       {
-         obj->SetStats( 0 );
-	 obj->GetXaxis()->SetTitleOffset( 1.1 );
-	 obj->GetYaxis()->SetTitleOffset( 1.3 );
+         hisList[i]->SetStats( 0 );
+	 hisList[i]->GetXaxis()->SetTitleOffset( 1.1 );
+	 hisList[i]->GetYaxis()->SetTitleOffset( 1.3 );
       }
    }
    return true;
 }
 
-bool VWPPhysSensitivityFile:: initializeWobbleOffsets( vector< double > iWobble_min, vector< double > iWobble_max, string iHistogramDimension )
+bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vector< double > iWobble_max )
 {
-
-// define 2D histograms
-   if( iHistogramDimension == "2D" )
+   cout << endl << endl << "=================================================================================" << endl;
+   if( iWobble_min.size() != iWobble_max.size() )
    {
-      hisList2D = new TList();
+      cout << "VWPPhysSensitivityFile::fillHistograms2D: error, inconsistent dimensions of wobble vectors" << endl;
+      return false;
+   }
+   char hname[200];
 
+// wobble offset might be variable binning
+   int nbins_woff = (int) iWobble_min.size();
+   if( nbins_woff > 2000 )
+   {
+       cout << "VWPPhysSensitivityFile::fillHistograms2D: cannot handle more than 2000 offset bins" << endl;
+       return false;
+   }
+   Double_t woff[2000];
+   for( int i = 0; i < nbins_woff; i++ )
+   {
+      woff[i] = iWobble_min[i];
+   }
+   woff[nbins_woff] = iWobble_max[iWobble_max.size()-1];
+
+// fill all multidimensional histograms
+   map< string, TH2F* > iHis2D;
+   map< string, TH3F* > iHis3D;
+   for( unsigned int i = 0; i < hisList.size(); i++ )
+   {
+      if( hisList[i] )
+      {
+	 string iHisName = hisList[i]->GetName();
+	 string iClass   = hisList[i]->ClassName();
+	 string iHisName2D;
+	 for( unsigned int j = 0; j < iWobble_min.size(); j++ )
+	 {
+	      sprintf( hname, "_%d", j );
+	      iHisName2D = iHisName.substr( 0, iHisName.find( hname ) ) + "_offaxis";
+	      if( iHisName.find( hname ) != string::npos )
+	      {
+// firs element in loop: create new histograms
+		if( j == 0 )
+		{
+		   if( iClass == "TH1F" )
+		   {
+		      iHis2D[iHisName2D] = new TH2F( iHisName2D.c_str(), hisList[i]->GetTitle(), 
+		                                hisList[i]->GetNbinsX(), hisList[i]->GetXaxis()->GetXmin(), hisList[i]->GetXaxis()->GetXmax(),
+						nbins_woff, woff );
+		      iHis2D[iHisName2D]->SetXTitle( hisList[i]->GetXaxis()->GetTitle() );
+		      iHis2D[iHisName2D]->SetYTitle( "off-axis angle [deg]" );
+		      iHis2D[iHisName2D]->SetStats( 0 );
+		      hisListToDisk.push_back( iHis2D[iHisName2D] );
+                   }
+		   else if( iClass == "TH2F" || iClass == "TH2D" )
+		   {
+		      iHis3D[iHisName2D] = new TH3F( iHisName2D.c_str(), hisList[i]->GetTitle(), 
+		                                hisList[i]->GetNbinsX(), hisList[i]->GetXaxis()->GetXbins()->GetArray(),
+		                                hisList[i]->GetNbinsY(), hisList[i]->GetYaxis()->GetXbins()->GetArray(),
+						nbins_woff, woff );
+		      iHis3D[iHisName2D]->SetXTitle( hisList[i]->GetXaxis()->GetTitle() );
+		      iHis3D[iHisName2D]->SetYTitle( hisList[i]->GetYaxis()->GetTitle() );
+		      iHis3D[iHisName2D]->SetZTitle( "off-axis angle [deg]" );
+		      iHis3D[iHisName2D]->SetStats( 0 );
+		      hisListToDisk.push_back( iHis3D[iHisName2D] );
+                   }
+		}
+// fill histograms
+		if( iClass == "TH1F" && iHis2D.find( iHisName2D ) != iHis2D.end() )
+                {
+		   for( int b = 0; b < hisList[i]->GetNbinsX(); b++ )
+		   {
+		      iHis2D[iHisName2D]->SetBinContent( b, j+1, hisList[i]->GetBinContent( b ) );
+                   }
+                }
+		if( (iClass == "TH2F" || iClass == "TH2D") && iHis3D.find( iHisName2D ) != iHis3D.end() )
+                {
+		   for( int bx = 0; bx < hisList[i]->GetNbinsX(); bx++ )
+		   {
+		      for( int by = 0; by < hisList[i]->GetNbinsY(); by++ )
+		      {
+			 iHis3D[iHisName2D]->SetBinContent( bx, by, j+1, hisList[i]->GetBinContent( bx, by ) );
+                      }
+                   }
+                }
+	     }
+         }
+      }
    }
 
    return true;
 }
 
-bool VWPPhysSensitivityFile::fillHistograms( string iDataDirectory )
-{
-   return fillHistograms1D( iDataDirectory );
-}
 
 bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
 {
+   char hname[2000];
 ////////////////////////////////////////////////////////////////////////
 // instrument response function reader
    VInstrumentResponseFunctionReader i_IRF;
-   if( !i_IRF.fillData( iDataDirectory + fDataFile_gamma_onSource + "0.root" ) ) return false;
+   if( fOffsetCounter < 9999 )
+   {
+      sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone10.c_str(), fOffsetCounter );
+   }
+   else
+   {
+      sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+   }
+   cout << endl;
+   cout << "=================================================================" << endl;
+   cout << "reading " << hname << endl;
+   cout << endl;
+   if( !i_IRF.fillData( hname ) ) return false;
 // fill angular resolution histograms
    i_IRF.fillResolutionHistogram( fAngRes68, "68", "t_angular_resolution" );
    i_IRF.fillResolutionHistogram( fAngRes68, "80", "t_angular_resolution" );
@@ -162,21 +285,27 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
    i_IRF.fillEffectiveAreasHistograms( fEffArea80, "80" );
    if( i_IRF.getMigrationMatrix() )
    {
-      TH2F *hMigMatrix = (TH2F*)i_IRF.getMigrationMatrix()->Clone( "MigMatrix" );
+      if( fOffsetCounter < 9999 ) sprintf( hname, "MigMatrix_%d", fOffsetCounter );
+      else                        sprintf( hname, "MigMatrix" );
+      TH2F *hMigMatrix = (TH2F*)i_IRF.getMigrationMatrix()->Clone( hname );
       hMigMatrix->SetTitle( "Migration Matrix" );
       hMigMatrix->SetStats( 0 );
       hMigMatrix->SetXTitle( "log_{10} (E_{rec}/TeV)" );
       hMigMatrix->SetYTitle( "log_{10} (E_{MC}/TeV)" );
-      hisList->Add( hMigMatrix );
+      hisList.push_back( hMigMatrix );
+      if( fOffsetCounter == 9999 ) hisListToDisk.push_back( hMigMatrix );
    }
    if( i_IRF.getRecvsMCEnergy() ) 
    {
-      TH2F *hhEsysMCRelative = (TH2F*)i_IRF.getRecvsMCEnergy()->Clone( "EestOverEtrue" );
+      if( fOffsetCounter < 9999 ) sprintf( hname, "EestOverEtrue_%d", fOffsetCounter );
+      else                        sprintf( hname, "EestOverEtrue" );
+      TH2F *hhEsysMCRelative = (TH2F*)i_IRF.getRecvsMCEnergy()->Clone( hname );
       hhEsysMCRelative->SetTitle( "Eest/Etrue vs. Etrue" );
       hhEsysMCRelative->SetStats( 0 );
       hhEsysMCRelative->SetXTitle( "log_{10} (E_{rec}/TeV)" );
       hhEsysMCRelative->SetYTitle( "E_{rec}/E_{MC}" );
-      hisList->Add( hhEsysMCRelative );
+      hisList.push_back( hhEsysMCRelative );
+      if( fOffsetCounter == 9999 ) hisListToDisk.push_back( hhEsysMCRelative );
    }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,9 +332,16 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO CTA" << endl; 
 //////////////////////////////////////////////////////////////////////////
 // effective area files
-    string iMC_Gamma    = iDataDirectory + fDataFile_gamma_onSource + "0.root";
-    string iMC_Proton   = iDataDirectory + fDataFile_proton + "0.root";
-    string iMC_Electron = iDataDirectory + fDataFile_electron + "0.root";
+    if( fOffsetCounter < 9999 ) sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone10.c_str(), fOffsetCounter );
+    else                        sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+    string iMC_Gamma    = hname;
+    if( fOffsetCounter == 9999 ) sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_proton.c_str() );
+    else                         sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_proton.c_str(), fOffsetCounter );
+    string iMC_Proton   = hname;
+    if( fOffsetCounter == 9999 ) sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_electron.c_str() );
+    else                         sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_electron.c_str(), fOffsetCounter );
+    cout << hname << endl;
+    string iMC_Electron = hname;
 // gammas
     i_Sens.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
@@ -225,7 +361,9 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
 
 bool VWPPhysSensitivityFile::initializeOutputFile( string iOutputFile )
 {
-   string iFileName = iOutputFile + "." + fSubArray + ".root";
+   char hname[200];
+   sprintf( hname, "%s.%s.%.1fh.root", iOutputFile.c_str(), fSubArray.c_str(), fObservingTime_h );
+   string iFileName = hname;
 // define output file
    fOutFile = new TFile( iFileName.c_str(), "RECREATE" );
    if( fOutFile->IsZombie() )
@@ -245,10 +383,13 @@ bool VWPPhysSensitivityFile::terminate()
    {
       fOutFile->cd();
       cout << "writing histograms to " << fOutFile->GetName() << endl;
-      if( hisList )
+      for( unsigned int i = 0; i < hisListToDisk.size(); i++ )
       {
-         hisList->Print();
-         hisList->Write();
+	 if( hisListToDisk[i] )
+	 {
+	    cout << "\t" << hisListToDisk[i]->GetName() << endl;
+	    hisListToDisk[i]->Write();
+	 }
       }
       fOutFile->Close();
    }

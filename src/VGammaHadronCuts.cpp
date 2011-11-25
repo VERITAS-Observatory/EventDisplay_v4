@@ -90,6 +90,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAWeightFileIndex_max = 0;
     fTMVAWeightFile = "";
     fTMVASignalEfficiency = -99.;
+// Note: for TMVA is this not the probability threshold but the MVA cut value
     fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
     fTMVAOptimizeSignalEfficiencySourceStrengthCU = -99.;
@@ -593,6 +594,7 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 	    {
                if( !is_stream.eof() ) is_stream >> fTMVASignalEfficiency;
 // probability threshold not important for box cuts
+// Note: for TMVA is this not the probability threshold but the MVA cut value
                if( !is_stream.eof() ) is_stream >> fTMVAProbabilityThreshold;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySourceStrengthCU;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyObservationTime_h;
@@ -1419,7 +1421,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     {
        fTMVAEvaluator->setSignalEfficiency( fTMVASignalEfficiency );
     }
-    else if( fTMVAProbabilityThreshold > 0. )
+// Note: for TMVA is this not the probability threshold but the MVA cut value
+    else if( fTMVAProbabilityThreshold > -99. )
     {
        fTMVAEvaluator->setTMVACutValue( fTMVAProbabilityThreshold );
     }

@@ -96,8 +96,10 @@ class VPlotUtilities
         void   setGraphPlottingStyle( TGraph *g );
         void   setGraphPlottingStyle( TGraph *g, int icolor, double iwidth = 1., int imarker = 20, double isize = 1., int iFillStyle = 0, int iLineStyle = 1 );
 	unsigned int setPlottingAxis( string iName = "energy", string iAxis = "X", bool iLog = true, double xmin = 0.03, double xmax = 200., string iAxisTitle = "" );
-        void   setPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2., int iMarkerStyle = 20, float iMarkerSize = 2., int iFillStyle = 1001 )
-	                       { fPlottingColor = iColor; fPlottingLineStyle = iStyle; fPlottingLineWidth = iWidth; fPlottingMarkerStyle = iMarkerStyle;
+        void   setPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2., int iMarkerStyle = 20,
+	                         float iMarkerSize = 2., int iFillStyle = 1001 )
+	                       { fPlottingColor = iColor; fPlottingLineStyle = iStyle; fPlottingLineWidth = iWidth;
+			         fPlottingMarkerStyle = iMarkerStyle;
 		    	         fPlottingMarkerSize = iMarkerSize; fPlottingFillStyle = iFillStyle; }
 	void   setPadMargins( TCanvas *c, int nPads, double lM, double rM );
 	void   setTitles( TH1 *his, string iname, string ititle, string ytitle );

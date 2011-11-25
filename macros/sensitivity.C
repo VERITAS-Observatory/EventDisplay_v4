@@ -24,7 +24,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
 		      string iFluxUnit, unsigned int iCrabSpec_ID );
 
-void plotDebugComparisionPlots( string iFile, int iColor, double iObservationTime_hours );
+void plotDebugComparisionPlots( string iFile, int iColor );
 
 /*
 
@@ -279,6 +279,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        b.setEnergyRange_Lin( 0.01, 150. );
 // significance parameters
        b.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
+//       b.setSignificanceParameter( 5., 10., 5., 0.05, 0.2 );
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
@@ -482,12 +483,12 @@ void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_
                                   int iOffSetCounter = 0, int iRecID = 0 )
 {
    vector< string > SubArray;
-   SubArray.push_back( "A" );
+/*   SubArray.push_back( "A" );
    SubArray.push_back( "B" );
    SubArray.push_back( "C" );
-   SubArray.push_back( "D" );
+   SubArray.push_back( "D" ); */
    SubArray.push_back( "E" );
-   SubArray.push_back( "F" );
+/*   SubArray.push_back( "F" );
    SubArray.push_back( "G" );
    SubArray.push_back( "H" );
    SubArray.push_back( "I" ); 
@@ -497,7 +498,7 @@ void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_
    SubArray.push_back( "NB" );
    SubArray.push_back( "s4-1-120" );
    SubArray.push_back( "s4-2-120" ); 
-   SubArray.push_back( "s4-2-85" ); 
+   SubArray.push_back( "s4-2-85" );  */
 
    char iGamma[200];
    char iProton[200];
@@ -518,3 +519,45 @@ void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_
 
    }
 }
+
+/*
+
+   plot all IRFs and sensitivity in comparision
+
+*/
+
+void plotIRF( string iSubArray, bool iSensitivity, string iObservingTime_H, string iWPPhysSensitivityDirectory )
+{
+    string iGammaEffArea    = "gamma_onSource." + iSubArray + "_ID0.eff-0.root";
+    string iProtonEffArea   = "proton." + iSubArray + "_ID0.eff-0.root";
+    string iElectronEffArea = "electron." + iSubArray + "_ID0.eff-0.root";
+
+    string iIFAE = iWPPhysSensitivityDirectory + "IFAEPerformanceBCDEINANB_Nov2011/Subarray";
+    iIFAE += iSubArray + "_IFAE_" + iObservingTime_H + "hours_20111109.root";
+    string iISDC = iWPPhysSensitivityDirectory + "ISDC/ISDC_2000m_KonradB_optimal_";
+    iISDC += iSubArray;
+    if( iObservingTime_H == "50" ) iISDC += "_50.0";
+    iISDC += "h_20deg_20110615.root";
+
+    VPlotInstrumentResponseFunction a;
+
+    a.setPlottingAxis( "energy_Lin", "X", true, 0.01, 200 );
+    a.setPlottingAxis( "effarea_Lin", "X", true, 50., 5.e7 );
+    a.setPlottingAxis( "energyresolution_Lin", "X", false, 0., 0.7 );
+
+    a.addInstrumentResponseData( iGammaEffArea );
+    a.addInstrumentResponseData( iIFAE );
+    a.addInstrumentResponseData( iISDC );
+
+    a.plotEffectiveArea();
+    a.plotAngularResolution();
+    a.plotEnergyResolution( 0.7 );
+
+    if( iSensitivity )
+    {
+        plotDifferentialSensitivity( "ENERGY", 0, 0, iGammaEffArea, iProtonEffArea, 0, iElectronEffArea );
+	plotDebugComparisionPlots( iIFAE, 2 );
+	plotDebugComparisionPlots( iISDC, 3 );
+    }
+}
+

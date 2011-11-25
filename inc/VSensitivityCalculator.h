@@ -196,6 +196,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 	                               VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
 				       bool iRateError = false );
 
+	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile();
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
         TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
         void       plotEffectiveArea();

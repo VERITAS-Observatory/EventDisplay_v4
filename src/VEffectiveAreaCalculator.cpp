@@ -1165,7 +1165,8 @@ double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
    double iSolAngleNorm = 1.;
    if( fCuts && fRunPara )
    {
-      if( fRunPara->fViewcone_max > 0. && fCuts->fArrayxyoff_MC_max > 0. )
+      if( fRunPara->fViewcone_max > 0. && fCuts->fArrayxyoff_MC_max > 0. && fCuts->fArrayxyoff_MC_max < 1000. 
+         && fCuts->fArrayxyoff_MC_max < fRunPara->fViewcone_max )
 	 {
 // solid angle of simulated showers
 	    double iSN_mc = (1.-cos(fRunPara->fViewcone_max * TMath::DegToRad()));
@@ -1446,7 +1447,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                if( hVEcutRecUW[s][i_az] )      hVEcutRecUW[s][i_az]->Fill( eRec, 1. );
                if( hVEsysRec[s][i_az] )        hVEsysRec[s][i_az]->Fill( eRec, eRec - eMC );
                if( hVEsysMC[s][i_az] )         hVEsysMC[s][i_az]->Fill( eMC, eRec - eMC );
-               if( hVEsysMCRelative[s][i_az] ) hVEsysMCRelative[s][i_az]->Fill( eMC, eRecLin / eMC );
+               if( hVEsysMCRelative[s][i_az] ) hVEsysMCRelative[s][i_az]->Fill( eMC, (eRecLin-eMC) / eMC );
                if( hVEsysMCRelative2D[s][i_az] ) hVEsysMCRelative2D[s][i_az]->Fill( eMC, eRecLin / eMC );
                if( hVEsys2D[s][i_az] )         hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
                if( hVEmcCut[s][i_az] )         hVEmcCut[s][i_az]->Fill( eRec, eMC );

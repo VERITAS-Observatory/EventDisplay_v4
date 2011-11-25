@@ -39,9 +39,15 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     double fXmax_fitResolution;
     TF1*   fTF1_fitResolution;
 
+// canvas size
+    int    fCanvasSize_X;
+    int    fCanvasSize_Y;
+
 // general resolution plotter
-    TCanvas* plotResolution( string iName, string iCanvasTitle, string iYTitle, double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
-    TCanvas* plotResolution2D( unsigned int iDataSetID, string iName, string iCanvasTitle, string iYTitle, double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
+    TCanvas* plotResolution( string iName, string iCanvasTitle, string iYTitle,
+                             double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
+    TCanvas* plotResolution2D( unsigned int iDataSetID, string iName, string iCanvasTitle, string iYTitle,
+                               double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
 
     public:
 
@@ -52,7 +58,9 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     bool         addInstrumentResponseData( string iInstrumentResponseFile, string iA_MC );
     bool         addInstrumentResponseData( string iInstrumentResponseFile,
     				            double iZe = 20., double iWoff = 0.5, int iAzBin = 0,
-					    double iIndex = 2.4, int iNoise = 200, string iA_MC = "A_MC" );
+					    double iIndex = 2.4, int iNoise = 200, string iA_MC = "A_MC",
+					    int iColor = -99, int iLineStyle = -99, 
+					    int iMarkerStyle = -99, float iMarkerSize = -99. );
     bool         checkDataSetID( unsigned int iDataSetID );
     bool         fitResolution( TGraphErrors *g  );
     unsigned int getNumberOfDataSets() { return fData.size(); }
@@ -78,6 +86,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     void         plotTheta2( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05, bool iCumulative = false );
     bool         removeInstrumentResponseData( int iDataSetID );
     void         resetInstrumentResponseData();
+    void         setCanvasSize( int iX = 600, int iY = 600 ) { fCanvasSize_X = iX; fCanvasSize_Y = iY; }
     void         setDebug( bool iB = true ) { fDebug = iB; }
     bool         setResolutionFitting( string iFitFunction = "", double iFitXmin = -1., double iFitXmax = 2. );
     void         setPlottingDefaults();

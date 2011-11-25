@@ -518,7 +518,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/Cshowerpars.o \
 		./obj/CtparsShort.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
-		./obj/VImageParameter.o 
+		./obj/VImageParameter.o  \
+		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o

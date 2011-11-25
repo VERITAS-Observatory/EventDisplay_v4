@@ -497,7 +497,10 @@ TCanvas* VSensitivityCalculator::plotDifferentialSensitivityvsEnergyFromCrabSpec
 										      double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin )
 {
    if( fPlotDebugName.size() > 0 ) prepareDebugPlots();
-   calculateSensitivityvsEnergyFromCrabSpectrum( iAnasumCrabFile, bUnit, dE_Log10, iEnergyMin_TeV_lin, iEnergyMax_TeV_lin );
+   if( !calculateSensitivityvsEnergyFromCrabSpectrum( iAnasumCrabFile, bUnit, dE_Log10, iEnergyMin_TeV_lin, iEnergyMax_TeV_lin ) )
+   {
+      return 0;
+   }
 
    return plotSensitivityvsEnergyFromCrabSpectrum( cSensitivity, iColor, bUnit, dE_Log10 );
 }
@@ -525,7 +528,8 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 {
     if( gSensitivityvsEnergy )
     {
-       setGraphPlottingStyle( gSensitivityvsEnergy, iColor, 4., 28, 1.1, 1001 );
+//       setGraphPlottingStyle( gSensitivityvsEnergy, iColor, 4., 28, 1.1, 1001 );
+       setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, fPlottingMarkerStyle, fPlottingMarkerSize, 1001, fPlottingLineStyle );
     }
 
 // get canvas
@@ -537,6 +541,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
     cSensitivity->cd();
 
 // plot everything
+    gSensitivityvsEnergy->Print();
     if(  dE_Log10 < 0. ) gSensitivityvsEnergy->Draw( "l3" );
     else                 gSensitivityvsEnergy->Draw( "lp" );
 
@@ -580,6 +585,13 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
     else if( iAnasumCrabFile == "CTA-MC" )
     {
         fDifferentialFlux = getDifferentialFluxVectorfromCTA_MC( dE_Log10, alpha );
+    }
+// read sensitivity directly from root file
+    else if( iAnasumCrabFile == "CTA-PHYS" )
+    {
+        gSensitivityvsEnergy = getSensitivityGraphFromWPPhysFile();
+	if( !gSensitivityvsEnergy ) return false;
+        return true;
     }
     else
     {
@@ -1114,6 +1126,36 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     return a;
 }
 
+TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
+{
+    TFile f( fMCCTA_File.c_str() );
+    if( f.IsZombie() )
+    {
+       cout << "VSensitivityCalculate::getSensitivityGraphFromWPPhysFile(): error: CTA-MC file not found" << endl;
+       return 0;
+    }
+    cout << "reading CTA-MC file: " << fMCCTA_File << endl;
+    TH1F *hSens = (TH1F*)f.Get( "DiffSens" );
+    if( hSens )
+    {
+       TGraphAsymmErrors* g = new TGraphAsymmErrors( 1 );
+       int z = 0;
+       for( int i = 1; i < hSens->GetNbinsX(); i++ )
+       {
+          if( hSens->GetBinContent( i ) > 0 )
+	  {
+	     g->SetPoint( z, hSens->GetBinCenter( i ), hSens->GetBinContent( i ) );
+	     g->SetPointEYhigh( z, hSens->GetBinError( i ) );
+	     g->SetPointEYlow( z, hSens->GetBinError( i ) );
+	     z++;
+          }
+       }
+       return g;
+    }
+
+    return 0;
+}
+
 /*
 
    calculate different or integral flux from CTA-MC files
@@ -1172,12 +1214,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	   i_flux.NOff = hBck->GetBinContent( i ) * i_flux.ObsTime;
 	   i_flux.NOn = iMCR.getMonteCarloRate( iEnergy, iEff, fEnergySpectrumfromLiterature, fEnergySpectrumfromLiterature_ID,
 	                                        i_flux.Energy_lowEdge_bin, i_flux.Energy_upEdge_bin );
-
-           cout << i << "\t" << hBck->GetBinCenter( i ) << "\t" << hBck->GetBinContent( i );
-           cout << "\t" << hEff->GetBinCenter( i ) << "\t" << hEff->GetBinContent( i ) << endl;
-
            i_flux.NOn *= i_flux.ObsTime / 60.;
-	   cout << "XX " << i_flux.NOn << "\t" << i_flux.NOff  << endl;
 	   i_flux.NOn += i_flux.NOff;
 
 	   a.push_back( i_flux );
@@ -2089,6 +2126,8 @@ void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlu
 {
     gSignalRate = new TGraphAsymmErrors( 1 );
     gBGRate     = new TGraphAsymmErrors( 1 );
+    setGraphPlottingStyle( gSignalRate, 1, 1, 20, 2 );
+    setGraphPlottingStyle( gBGRate, 2, 1, 21, 2 );
 
     int z = 0;
     for( unsigned int i = 0; i < iDifferentialFlux.size(); i++ )

@@ -873,7 +873,9 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    cout << "TVMAEvaluator::getOptimalSignalEfficiency reading: " << fParticleNumberFileName << endl;
 // get the NOn and Noff graphs
    TGraph *i_on = (TGraph*)iPN.Get( "gNOn" );
+   if( !i_on ) i_on = (TGraph*)iPN.Get( "gSignalRate" );
    TGraph *i_of = (TGraph*)iPN.Get( "gNOff" );
+   if( !i_of ) i_of = (TGraph*)iPN.Get( "gBGRate" );
    if( !i_on || !i_of )
    {
        cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;

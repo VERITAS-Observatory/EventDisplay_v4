@@ -18,6 +18,7 @@ VTMVARunData::VTMVARunData()
    fOutputFileName = "";
 
    fQualityCuts = "";
+   fMCxyoffCut = "";
    fPrepareTrainingOptions = "SplitMode=random:!V";
 
    fSignalWeight = 1.;
@@ -91,14 +92,15 @@ bool VTMVARunData::openDataFiles()
        {
           if( fSignalTree[j] )
           {
-             fSignalTree[j]->Draw(">>+signalList", fQualityCuts && fEnergyCutData[i]->fEnergyCut, "entrylist");
+             fSignalTree[j]->Draw(">>+signalList", fQualityCuts && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut, "entrylist");
              i_SignalList =(TEntryList*)gDirectory->Get( "signalList" );
           }
        }
        if( i_SignalList )
        {
            cout << "number of signal in energy bin " << i << "\t" << i_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
-	   cout << "  (cuts are " << fQualityCuts << " && " << fEnergyCutData[i]->fEnergyCut << ")" << endl;
+	   cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
+	   cout << "&&" << fEnergyCutData[i]->fEnergyCut << ")" << endl;
            if( i_SignalList->GetN() < fMinSignalEvents ) iEnoughEvents = false;
            i_SignalList->Reset();
        }
@@ -106,7 +108,7 @@ bool VTMVARunData::openDataFiles()
        {
           if( fBackgroundTree[j] )
           {
-             fBackgroundTree[j]->Draw(">>+BackgroundList", fQualityCuts && fEnergyCutData[i]->fEnergyCut, "entrylist");
+             fBackgroundTree[j]->Draw(">>+BackgroundList", fQualityCuts && fMCxyoffCut && fEnergyCutData[i]->fEnergyCut, "entrylist");
              i_BackgroundList =(TEntryList*)gDirectory->Get( "BackgroundList" );
           }
        }
@@ -114,7 +116,8 @@ bool VTMVARunData::openDataFiles()
        {
           cout << "number of background in energy bin " << i << "\t" << i_BackgroundList->GetN();
 	  cout << "\t required > " << fMinBackgroundEvents << endl;
-	  cout << "  (cuts are " << fQualityCuts << " && " << fEnergyCutData[i]->fEnergyCut << ")" << endl;
+	  cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
+	  cout << "&&" << fEnergyCutData[i]->fEnergyCut << ")" << endl;
           if( i_BackgroundList->GetN() < fMinBackgroundEvents ) iEnoughEvents = false;
           i_BackgroundList->Reset();
        }
@@ -183,6 +186,7 @@ void VTMVARunData::print()
     }
     cout << endl;
     cout << "pre-training selection cuts: " << fQualityCuts << endl;
+    cout << "cut on MC arrival directions: " << fMCxyoffCut << endl;
     cout << endl;
     cout << "prepare traing options: " << fPrepareTrainingOptions << endl;
     cout << "energy bins (" << fEnergyCutData.size() << ")";
@@ -310,6 +314,20 @@ bool VTMVARunData::readConfigurationFile( char *iC )
                return false;
             }
          } 
+// MC arrival direction cut
+         if( temp == "MCXYOFF" )
+         {
+            if( !is_stream.eof() ) 
+            {
+               fMCxyoffCut = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ).c_str();
+            }
+            else
+            {
+               cout << "VTMVARunData::readConfigurationFile error while reading input for variable MCXYOFF" << endl;
+               return false;
+            }
+         } 
+    
 // prepare training options
          if( temp == "PREPARE_TRAINING_OPTIONS" )
 	 {

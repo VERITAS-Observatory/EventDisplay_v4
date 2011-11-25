@@ -82,7 +82,7 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 //////////////////////////////////////////
 // prepare training events
 // nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
-   factory->PrepareTrainingAndTestTree( iRun->fQualityCuts && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut, iRun->fPrepareTrainingOptions );
+   factory->PrepareTrainingAndTestTree( iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut, iRun->fPrepareTrainingOptions );
       
 //////////////////////////////////////////
 // book all methods

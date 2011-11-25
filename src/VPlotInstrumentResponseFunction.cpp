@@ -15,6 +15,7 @@ VPlotInstrumentResponseFunction::VPlotInstrumentResponseFunction()
 
    fTF1_fitResolution = 0;
    setResolutionFitting();
+   setCanvasSize();
 
    setPlottingDefaults();
 
@@ -71,12 +72,18 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, s
 }
 
 bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, double iZe, double iWoff,
-                                                                 int iAzBin, double iIndex, int iNoise, string iA_MC )
+                                                                 int iAzBin, double iIndex, int iNoise, string iA_MC,
+								 int iColor, int iLineStyle,
+								 int iMarkerStyle, float iMarkerSize )
 {
 // read effective areas
     VInstrumentResponseFunctionReader *iTempEffectiveArea = new VInstrumentResponseFunctionReader();
     iTempEffectiveArea->setDebug( fDebug );
-    iTempEffectiveArea->setPlottingStyle( fData.size()+1, 1, 2., 20+fData.size() );
+    if( iColor < 0 ) iColor = fData.size()+1;
+    if( iLineStyle < 0 ) iLineStyle = 1;
+    if( iMarkerStyle < 0 ) iMarkerStyle =  20+fData.size();
+    if( iMarkerSize < 0 )  iMarkerSize  = 2.;
+    iTempEffectiveArea->setPlottingStyle( iColor, iLineStyle, 2., iMarkerStyle, iMarkerSize );
     if( !iTempEffectiveArea->fillData( iFile, iZe, iWoff, iAzBin, iIndex, iNoise, iA_MC ) )
     {
        cout << "VPlotInstrumentResponseFunction::addInstrumentResponseData() error filling effective area data" << endl;
@@ -115,7 +122,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
     char hname[200];
 
     sprintf( hname, "cEA_EFF" );
-    TCanvas* iEffectiveAreaPlottingCanvas = new TCanvas( hname, "effective area", 10, 10, 600, 600 );
+    TCanvas* iEffectiveAreaPlottingCanvas = new TCanvas( hname, "effective area", 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEffectiveAreaPlottingCanvas->SetGridx( 0 );
     iEffectiveAreaPlottingCanvas->SetGridy( 0 );
 
@@ -175,7 +182,7 @@ void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID
     char hname[200];
 
     sprintf( hname, "cEA_cuteff_%d", iDataSetID );
-    TCanvas* iCutEfficencyPlottingCanvas = new TCanvas( hname, "cut efficiency", 10, 10, 600, 600 );
+    TCanvas* iCutEfficencyPlottingCanvas = new TCanvas( hname, "cut efficiency", 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iCutEfficencyPlottingCanvas->SetGridx( 0 );
     iCutEfficencyPlottingCanvas->SetGridy( 0 );
 
@@ -219,7 +226,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionError( unsigned in
 
     sprintf( hname, "cEA_Eerr_%d", iDataSetID );
     sprintf( htitle, "error in energy reconstruction (%d)", iDataSetID );
-    TCanvas* iEnergyReconstructionErrorCanvas = new TCanvas( hname, htitle, 610, 10, 600, 600 );
+    TCanvas* iEnergyReconstructionErrorCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergyReconstructionErrorCanvas->SetGridx( 0 );
     iEnergyReconstructionErrorCanvas->SetGridy( 0 );
     iEnergyReconstructionErrorCanvas->Draw();
@@ -253,7 +260,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 
     sprintf( hname, "cEA_Ematrix_%d", iDataSetID );
     sprintf( htitle, "energy reconstruction matrix (%d)", iDataSetID );
-    TCanvas *iEnergyReconstructionMatrixCanvas = new TCanvas( hname, htitle, 610, 10, 600, 600 );
+    TCanvas *iEnergyReconstructionMatrixCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergyReconstructionMatrixCanvas->SetGridx( 0 );
     iEnergyReconstructionMatrixCanvas->SetGridy( 0 );
     iEnergyReconstructionMatrixCanvas->SetLeftMargin( 0.11 );
@@ -363,7 +370,7 @@ void VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iData
     char hname[200];
 
     sprintf( hname, "cEA_EFFRatio" );
-    TCanvas *iEffectiveAreaRatioPlottingCanvas = new TCanvas( hname, "effective area ratio", 10, 10, 600, 600 );
+    TCanvas *iEffectiveAreaRatioPlottingCanvas = new TCanvas( hname, "effective area ratio", 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEffectiveAreaRatioPlottingCanvas->SetGridx( 0 );
     iEffectiveAreaRatioPlottingCanvas->SetGridy( 0 );
 
@@ -411,7 +418,7 @@ void VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
 // canvas
     char hname[200];
     sprintf( hname, "cEA_energyResolution" );
-    TCanvas *iEnergyResolutionPlottingCanvas = new TCanvas( hname, "energy resolution", 10, 10, 600, 600 );
+    TCanvas *iEnergyResolutionPlottingCanvas = new TCanvas( hname, "energy resolution", 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergyResolutionPlottingCanvas->SetGridx( 0 );
     iEnergyResolutionPlottingCanvas->SetGridy( 0 );
     iEnergyResolutionPlottingCanvas->SetLeftMargin( 0.15 );
@@ -438,7 +445,10 @@ void VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
 
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
-       if( fData[i]->gEnergyResolution ) fData[i]->gEnergyResolution->Draw( "p" );
+       if( fData[i]->gEnergyResolution )
+       {
+          fData[i]->gEnergyResolution->Draw( "pl" );
+       }
     }
 }
 
@@ -457,7 +467,7 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted )
        sprintf( hname, "cEA_energyUW" );
        sprintf( htitle, "energy spectra (not spectral weighted)" );
     }
-    TCanvas* iEnergySpectraPlottingCanvas = new TCanvas( hname, htitle, 10, 10, 600, 600 );
+    TCanvas* iEnergySpectraPlottingCanvas = new TCanvas( hname, htitle, 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergySpectraPlottingCanvas->SetGridx( 0 );
     iEnergySpectraPlottingCanvas->SetGridy( 0 );
     iEnergySpectraPlottingCanvas->SetLeftMargin( 0.15 );
@@ -502,7 +512,7 @@ void VPlotInstrumentResponseFunction::plotEnergySystematics( string iM, double y
     char hname[200];
 
     sprintf( hname, "cEA_energy_bias" );
-    TCanvas* iEnergySystematicsPlottingCanvas = new TCanvas( hname, "energy bias", 10, 10, 600, 600 );
+    TCanvas* iEnergySystematicsPlottingCanvas = new TCanvas( hname, "energy bias", 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergySystematicsPlottingCanvas->SetGridx( 0 );
     iEnergySystematicsPlottingCanvas->SetGridy( 0 );
     iEnergySystematicsPlottingCanvas->SetLeftMargin( 0.15 );
@@ -648,7 +658,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
 
 // create canvas
     sprintf( hname, "c2D%s_%s", iName.c_str(), iXaxis.c_str() );
-    TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, 600, 600 );
+    TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, fCanvasSize_X, fCanvasSize_Y );
     iResolutionPlottingCanvas->SetGridx( 0 );
     iResolutionPlottingCanvas->SetGridy( 0 );
     iResolutionPlottingCanvas->SetLeftMargin( 0.13 );
@@ -763,7 +773,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 
 // create canvas
     sprintf( hname, "c%s_%s", iName.c_str(), iXaxis.c_str() );
-    TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, 600, 600 );
+    TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, fCanvasSize_X, fCanvasSize_Y );
     iResolutionPlottingCanvas->SetGridx( 0 );
     iResolutionPlottingCanvas->SetGridy( 0 );
     iResolutionPlottingCanvas->SetLeftMargin( 0.13 );

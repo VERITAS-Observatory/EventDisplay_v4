@@ -6,9 +6,11 @@
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TH3F.h"
 #include "TList.h"
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -39,8 +41,10 @@ class VWPPhysSensitivityFile
     unsigned int fProtonSpectrumID;
     unsigned int fElectronSpectrumID;
 
-    TList *hisList;
-    TList *hisList2D;
+    unsigned int fOffsetCounter;
+
+    vector< TH1* > hisList;
+    vector< TH1* > hisListToDisk;
 
     TH1F* fSensitivity;
     TH1F* fBGRate;
@@ -66,18 +70,18 @@ class VWPPhysSensitivityFile
     TH1F* fAngRes802D;
     TH1F* fEres2D;
 
-    bool fillHistograms1D( string iDataDirectory );
 
     public:
 
     VWPPhysSensitivityFile();
    ~VWPPhysSensitivityFile() {}
 
-    bool fillHistograms( string iDataDirectory );
+    bool fillHistograms1D( string iDataDirectory );
+    bool fillHistograms2D( vector< double > iWobble_min, vector< double > iWobble_max );
     bool initializeHistograms( int iEnergyXaxisNbins = 20, double iEnergyXaxis_min = -1.8, double iEnergyXaxis_max = 2.2,
                                int iEnergyTrue2DXaxisNbins = 500, double iEnergyTrue2DXaxis_min = -1.8, double iEnergyTrue2DXaxis_max = 2.2,
-                               int iEnergyRec2DXaxisNbins = 400, double iEnergyRec2DXaxis_min = -2.3, double iEnergyRec2DXaxis_max = 2.7 );
-    bool initializeWobbleOffsets( vector< double > iWobble_min, vector< double > iWobble_max, string iHistogramDimension );
+                               int iEnergyRec2DXaxisNbins = 400, double iEnergyRec2DXaxis_min = -2.3, double iEnergyRec2DXaxis_max = 2.7,
+			       unsigned int iOffsetCounter = 9999 );
     bool initializeOutputFile( string iOutputFile );
     void setCrabSpectrum( string iCrabSpectrum, unsigned int iID = 5 ) { fCrabSpectrumFile = iCrabSpectrum; fCrabSpectrumID = iID; }
     void setCosmicRaySpectrum( string iCRSpectrum, unsigned iPID = 0, unsigned iEID = 2  ) 
