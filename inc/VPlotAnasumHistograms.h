@@ -90,7 +90,6 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    void convert_derotated_RADECJ2000( double x=0, double y=0 );
 
    void drawPSF( TCanvas *c = 0, string iFile = 0, TH2D *h2 = 0, float iPSF = 0.1 );
-   void print_RADECJ2000( double x=0, double y=0 );
    void fit_energy(double minE = -0.5, double maxE = 0.5 );
 
    void help();                                                       // this will print all available functions
