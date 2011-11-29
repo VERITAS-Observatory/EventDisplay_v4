@@ -2269,42 +2269,6 @@ void VPlotAnasumHistograms::plot_qfactors( char *varexp, char *selection, char *
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-/*
- *      
- *
- */
-void VPlotAnasumHistograms::print_RADECJ2000( double x, double y )
-{
-
-  cout << "(this is very preliminary)" << endl << endl;
-
-  cout << "Sky map centre: " << fSkyMapCentreRAJ2000 << " " << fSkyMapCentreDecJ2000 << endl;
-
-  double i_decDiff = 0.;
-  double i_raDiff = 0.;
-
-  VSkyCoordinatesUtilities::getWobbleOffsets( y, -1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
-
-  double ra = fSkyMapCentreRAJ2000+i_raDiff;
-  double dec = fSkyMapCentreDecJ2000+i_decDiff;
-
-  cout << "(RA,Dec) (J2000) for (x,y)=(" << x << "," << y << "): ";
-  cout << "(" << ra << "," << dec << ")" << endl;
-  double hours = (double)((int)(ra * 24. / 360.) );
-  double min   = (double)((int)(60.*(ra * 24. / 360. - hours)));
-  double sec   = (ra - hours * 360./24. - min * 360. / 24. / 60.)*24./360.*60.*60.;
-  double dec_d = (double)(int)(dec);
-  double dec_m = (double)(int)((dec - dec_d)*60.);
-  double dec_s = (dec-dec_d - dec_m/60.)*3600.;
-  cout << "(RA, DEC) (J2000) for( x,y)=(" << x << "," << y << "): ";
-  cout << "(" << hours << " " << min << " " << sec;
-  cout << ", ";
-  if( dec_d > 0 ) cout << "+";
-  cout << dec_d << " " << dec_m << " " << dec_s;
-  cout << ")" << endl;
-  
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 /*
