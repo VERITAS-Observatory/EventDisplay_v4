@@ -2034,11 +2034,11 @@ void VSensitivityCalculator::fillBackgroundParticleNumbers( vector< VDifferentia
       {
          if( i < i_flux_NOff[14].size() )
 	 {
-	    gProtonRate->SetPoint( i, log10( iDifferentialFlux[i].Energy ), i_flux_NOff[14][i] * fObservationTime_h * 60. );
+	    gProtonRate->SetPoint( i, log10( iDifferentialFlux[i].Energy ), i_flux_NOff[14][i] );
          }
 	 if( i < i_flux_NOffError[14].size() )
 	 {
-	    gProtonRate->SetPointError( i, 0., i_flux_NOffError[14][i] * fObservationTime_h * 60. );
+	    gProtonRate->SetPointError( i, 0., i_flux_NOffError[14][i] );
          }
       }
    }
@@ -2048,11 +2048,11 @@ void VSensitivityCalculator::fillBackgroundParticleNumbers( vector< VDifferentia
       {
          if( i < i_flux_NOff[2].size() )
 	 {
-	    gElectronRate->SetPoint( i, log10( iDifferentialFlux[i].Energy ), i_flux_NOff[2][i] * fObservationTime_h * 60. );
+	    gElectronRate->SetPoint( i, log10( iDifferentialFlux[i].Energy ), i_flux_NOff[2][i] );
          }
 	 if( i < i_flux_NOffError[2].size() )
 	 {
-	    gElectronRate->SetPointError( i, 0., i_flux_NOffError[2][i] * fObservationTime_h * 60. );
+	    gElectronRate->SetPointError( i, 0., i_flux_NOffError[2][i] );
          }
       }
    }
@@ -2357,7 +2357,6 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
     {
        fillSensitivityHistogramfromGraph( gElectronRate, iElectronRate, 1./60. );
     }
-       
 
     return true;
 }
@@ -2421,8 +2420,8 @@ bool VSensitivityCalculator::fillSensitivityHistogramfromGraph( TGraph* g, TH1F 
        g->GetPoint( i, x, y );
        if( y > 0. && iScale != 0. )
        {
-	  h->SetBinContent( h->FindBin( x ), y / iScale );
-	  h->SetBinError( h->FindBin( x ), 0.5*(g->GetErrorYlow(i)+g->GetErrorYhigh(i))/iScale );
+	  h->SetBinContent( h->FindBin( x ), y*iScale );
+	  h->SetBinError( h->FindBin( x ), 0.5*(g->GetErrorYlow(i)+g->GetErrorYhigh(i))*iScale );
        }
    }
 

@@ -143,7 +143,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    hisList.push_back( fAngRes80 );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fAngRes80 );
 
-   sprintf( hname, "Eres" );
+   sprintf( hname, "ERes" );
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
    fEres = new TH1F( hname, "Energy resolution", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fEres->SetXTitle( "log_{10} (E/TeV)" );
@@ -278,7 +278,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
    if( !i_IRF.fillData( hname ) ) return false;
 // fill angular resolution histograms
    i_IRF.fillResolutionHistogram( fAngRes68, "68", "t_angular_resolution" );
-   i_IRF.fillResolutionHistogram( fAngRes68, "80", "t_angular_resolution" );
+   i_IRF.fillResolutionHistogram( fAngRes80, "80", "t_angular_resolution" );
    i_IRF.fillResolutionHistogram( fEres, "68", "t_energy_resolution" );
 // fill effective area histograms
    i_IRF.fillEffectiveAreasHistograms( fEffArea, "", fEffAreaMC );
