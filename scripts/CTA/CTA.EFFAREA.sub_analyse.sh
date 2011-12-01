@@ -29,10 +29,10 @@ then
    echo "     gamma_onSource / gamma_cone10 / electron / electron_onSource / proton / proton_onSource / helium "
    echo
    echo "<cutfile template>"
-   echo "     template for gamma/hadron cut file"
+   echo "     template for gamma/hadron cut file (full path and file name)"
    echo
    echo "<outputdirectory>"
-   echo "     directory with all result and log files"
+   echo "     directory with all result and log files (full path)"
    echo
    echo "[filling mode]"
    echo "     effective area filling mode (use 2 to calculate angular resolution only)"
@@ -134,7 +134,7 @@ then
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
    OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
 #   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
-# use on axis TMVA for all off axis gamma/hadron separation
+# PRELIMINARY! use on axis TMVA for all off axis gamma/hadron separation
    OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
@@ -253,7 +253,7 @@ do
       iCFIL=$FDIR/effectiveArea-CTA-$PART-$i-$j.$iCBFILE
       if [ ! -e $CFIL ]
       then
-        echo "ERROR: cut file does not exist"
+        echo "ERROR: cut file does not exist:"
 	echo $CFIL
 	exit
       fi
