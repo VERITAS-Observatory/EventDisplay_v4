@@ -117,6 +117,7 @@ void VSensitivityCalculator::reset()
     fData.clear();
 
     fMCCTA_File = "";
+    fMCCTA_cameraoffset_deg = 0.;
     fEnergy_dE_log10 = 0.25;
 }
 
@@ -356,7 +357,6 @@ TGraph* VSensitivityCalculator::getCrabSpectrum( bool bInt, string bUnit, bool b
 vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fCrabFlux, bool bInt, string bUnit, bool bReset )
 {
     if( fDebug ) cout << "VSensitivityCalculator::getCrabSpectrum " << i_fCrabFlux.size() << endl;
-    cout << "getCrabSpectrum " << bInt << "\t" << bUnit << "\t" << bReset << "\t" << i_fCrabFlux.size() << endl;
 
 // check if Crab spectrum is already defined
     if( i_fCrabFlux.size() == fCrabFlux_SourceStrength.size() && !bReset ) return fCrabFlux_SourceStrength;
@@ -528,7 +528,6 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 {
     if( gSensitivityvsEnergy )
     {
-//       setGraphPlottingStyle( gSensitivityvsEnergy, iColor, 4., 28, 1.1, 1001 );
        setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, fPlottingMarkerStyle, fPlottingMarkerSize, 1001, fPlottingLineStyle );
     }
 
@@ -541,7 +540,6 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
     cSensitivity->cd();
 
 // plot everything
-    gSensitivityvsEnergy->Print();
     if(  dE_Log10 < 0. ) gSensitivityvsEnergy->Draw( "l3" );
     else                 gSensitivityvsEnergy->Draw( "lp" );
 
@@ -1126,8 +1124,16 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     return a;
 }
 
+/*
+
+    read integral/differential sensitivities and backround rates (total, proton, electron) from WP Phys File
+
+*/
 TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
 {
+    TGraphAsymmErrors *g = 0;
+    TH1F *h = 0;
+
     TFile f( fMCCTA_File.c_str() );
     if( f.IsZombie() )
     {
@@ -1135,25 +1141,43 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
        return 0;
     }
     cout << "reading CTA-MC file: " << fMCCTA_File << endl;
-    TH1F *hSens = (TH1F*)f.Get( "DiffSens" );
-    if( hSens )
+// sensitivities
+    h = get_CTA_IRF_Histograms( "DiffSens", fMCCTA_cameraoffset_deg );
+    if( h ) 
     {
-       TGraphAsymmErrors* g = new TGraphAsymmErrors( 1 );
-       int z = 0;
-       for( int i = 1; i < hSens->GetNbinsX(); i++ )
-       {
-          if( hSens->GetBinContent( i ) > 0 )
-	  {
-	     g->SetPoint( z, hSens->GetBinCenter( i ), hSens->GetBinContent( i ) );
-	     g->SetPointEYhigh( z, hSens->GetBinError( i ) );
-	     g->SetPointEYlow( z, hSens->GetBinError( i ) );
-	     z++;
-          }
-       }
-       return g;
+       g = new TGraphAsymmErrors( 1 );
+       get_Graph_from_Histogram( h, g, true, false );
     }
 
-    return 0;
+// background rates
+    h = 0;
+    h = get_CTA_IRF_Histograms( "BGRate", fMCCTA_cameraoffset_deg );
+    if( h )
+    {
+       gBGRate     = new TGraphAsymmErrors( 1 );
+       get_Graph_from_Histogram( h, gBGRate, true, false );
+       setGraphPlottingStyle( gBGRate, 1, 2, 20, 2 );
+    }
+// proton rates
+    h = 0;
+    h = get_CTA_IRF_Histograms( "ProtRate", fMCCTA_cameraoffset_deg );
+    if( h )
+    {
+       gProtonRate = new TGraphErrors( 1 );
+       get_Graph_from_Histogram( h, gProtonRate, true );
+       setGraphPlottingStyle( gProtonRate, 2, 2, 21, 2 );
+    }
+// electron rates
+    h = 0;
+    h = get_CTA_IRF_Histograms( "ElecRate", fMCCTA_cameraoffset_deg );
+    if( h )
+    {
+       gElectronRate = new TGraphErrors( 1 );
+       get_Graph_from_Histogram( h, gElectronRate, true );
+       setGraphPlottingStyle( gElectronRate, 3, 2, 22, 2 );
+    }
+
+    return g;
 }
 
 /*
@@ -2284,11 +2308,12 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
 
 }
 
-bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, string iSpectralParameterFile,
-                                                            unsigned int iSpectralParameterID )
+bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, double iMCCTA_cameraoffset_deg,
+                                                            string iSpectralParameterFile, unsigned int iSpectralParameterID )
 {
     if( !setEnergySpectrumfromLiterature( iSpectralParameterFile, iSpectralParameterID ) ) return false;
 
+    fMCCTA_cameraoffset_deg = iMCCTA_cameraoffset_deg;
     fMCCTA_File = iCTA_MCFile;
 
     return true;
@@ -2335,6 +2360,54 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
        
 
     return true;
+}
+
+TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas *c, int iLineStyle, double iRateMinimum, double iRateMaximum )
+{
+   bool bNewCanvas = false;
+   if( !c )
+   {
+      c = new TCanvas( "cSignalBackgroundRates", "signal and background rates", 0, 0, 400, 400 );
+      c->SetGridx( 0 );
+      c->SetGridx( 0 );
+      c->SetLeftMargin( 0.15 );
+      c->SetRightMargin( 0.07 );
+      c->Draw();
+      bNewCanvas = true;
+
+      TH1D *h = new TH1D( "hnullSignalParticleRates", "", 10, fEnergy_min_Log, fEnergy_max_Log );
+      h->SetStats( 0 );
+      h->SetMaximum( iRateMaximum );
+      h->SetMinimum( iRateMinimum );
+      h->SetXTitle( "log_{10} energy [TeV]" );
+      h->SetYTitle( "rate [1/s]" );
+      plot_nullHistogram( c, h, true, true, 1.7, TMath::Power( 10., fEnergy_min_Log ), TMath::Power( 10., fEnergy_max_Log ) );
+      c->SetLogy( 1 );
+   }
+   else
+   {
+      c->cd();
+   }
+
+   if( gBGRate )
+   {
+       if( iLineStyle > 0 ) setGraphPlottingStyle( gBGRate, 1, 2, 1, 1, 0, iLineStyle );
+       else                 setGraphPlottingStyle( gBGRate, 1, 2, 1, 1, 0, 1 );
+       gBGRate->Draw( "l" );
+
+       if( gProtonRate ) 
+       {
+          if( iLineStyle > 0 ) setGraphPlottingStyle( gProtonRate, 2, 2, 1, 1, 0, iLineStyle );
+          gProtonRate->Draw( "l" );
+       }
+       if( gElectronRate )
+       {
+          if( iLineStyle > 0 ) setGraphPlottingStyle( gElectronRate, 3, 2, 1, 1, 0, iLineStyle );
+          gElectronRate->Draw( "l" );
+       }    
+   }
+
+   return c;
 }
 
 bool VSensitivityCalculator::fillSensitivityHistogramfromGraph( TGraph* g, TH1F *h, double iScale )

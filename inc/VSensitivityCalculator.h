@@ -95,7 +95,7 @@ class VSensitivityCalculatorDataResponseFunctions
 //
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class VSensitivityCalculator : public TObject, public VPlotUtilities
+class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHistogramUtilities
 {
     private:
 
@@ -144,6 +144,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 	double fMC_BackgroundMissingParticleFraction;     //! this is the fraction of background missing due to missing He/.. simulations  
 
 	string fMCCTA_File;
+	double fMCCTA_cameraoffset_deg;
 
         unsigned int    fCurrentDataSet;
         vector< sSensitivityData > fData;
@@ -160,7 +161,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         double fPlot_flux_CU_min;
         double fPlot_flux_CU_max;
 
-// sensitivity graph
+// sensitivity and rate graph
         TGraphAsymmErrors *gSensitivityvsEnergy;
 	TGraphAsymmErrors *gSignalRate;
 	TGraphAsymmErrors *gBGRate;
@@ -226,6 +227,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
 	TCanvas* plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity );
         TCanvas* plotObservationTimevsFlux( unsigned int iD = 0, TCanvas *c = 0, int iLineColor = 1, double iLineWidth = 4. );
         void     plotObservationTimevsFluxFromTextFile( TCanvas*c, string iTextFile, int iLineColor = 4, double iLineWidth = 1., int iLineStyle = 2 );
+	TCanvas* plotSignalBackgroundRates( TCanvas *c = 0, int iLineStyle = -1, double iRateMinimum = 2.e-7, double iRateMaximum = 1.e-1  );
 	void     plotSensitivityLimitations( TCanvas *cSensitivity = 0, double iY = -9999. );
         TCanvas* plotSensitivityvsEnergyFromTextTFile( TCanvas *c, string iTextFile,
 	                                               int iColor = 1, double iLineWidth = 2, int iLineStyle = 2,
@@ -257,7 +259,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         void     setFluxRange_PFLUX( double iMin = 1.e-15, double iMax = 5.e-11 ) { fPlot_flux_PFLUX_min = iMin; fPlot_flux_PFLUX_max = iMax; }
         void     setFluxRange_ENERG( double iMin = 1.e-14, double iMax = 2.e-10 ) { fPlot_flux_ENERG_min = iMin; fPlot_flux_ENERG_max = iMax; }
         void     setFluxRange_CU( double iMin = 1.e-4, double iMax = 10. ) { fPlot_flux_CU_min = iMin; fPlot_flux_CU_max = iMax; }
-	bool     setMonteCarloParametersCTA_MC( string iCTA_MCFile, string iSpectralParameterFile, unsigned int iSpectralParameterID );
+	bool     setMonteCarloParametersCTA_MC( string iCTA_MCFile, double iMCCTA_cameraoffset_deg, string iSpectralParameterFile, unsigned int iSpectralParameterID );
         void     setMonteCarloParameters( unsigned int iParticleID, string iSpectralParameterFile, unsigned int iSpectralParameterID,
 	                                  string iGammaEffectiveAreaFile, double ze = 20., 
 					  int az = 0, double woff = 0.5, int noise = 150, double index = 2.5,
@@ -270,6 +272,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,8);
+        ClassDef(VSensitivityCalculator,9);
 };
 #endif

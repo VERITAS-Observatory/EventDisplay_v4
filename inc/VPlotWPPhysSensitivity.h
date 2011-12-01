@@ -24,10 +24,13 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 
    vector< string > fAnalysis;
    vector< int >    fAnalysisColor;
+   vector< int >    fAnalysisLineStyle;
    vector< double > fObservationTime_H;
    vector< string > fSubArray;
+   vector< double > fCameraOffset_deg;
 
    vector< string > fSensitivityFile;   // [Analysis][SubArray+SObsTime];
+   vector< double > fIRFCameraOffset_deg;
    vector< int >    fPlottingColor;
    vector< int >    fPlottingLineStyle;
 
@@ -36,7 +39,8 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    VPlotWPPhysSensitivity();
   ~VPlotWPPhysSensitivity() {}
 
-   void addAnalysis( string iAnalysis, int iColor = 1 );           // NOTE: hardwired analysis file names
+   void addAnalysis( string iAnalysis, int iColor = 1, int iLineStyle = -1 );           // NOTE: hardwired analysis file names
+   void addCameraOffset( double iCameraOffset_deg = 0. );
    void addObservationTime( double iObsTime );
    void addSubArray( string iArray );
    bool initialize();

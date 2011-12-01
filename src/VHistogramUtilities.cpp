@@ -220,3 +220,88 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
     }
     return h1D;
 }
+
+bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphErrors *g, bool bIgnoreErrors )
+{
+    if( !h || !g ) return false;
+
+    unsigned int z = 0;
+    for( int i = 1; i <= h->GetNbinsX(); i++ )
+    {
+        if( h->GetBinContent( i ) > 0. )
+	{
+	   g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
+	   if( bIgnoreErrors ) g->SetPointError( z, 0., 0. );
+	   else                g->SetPointError( z, 0., h->GetBinError( i ) );
+           z++;
+        }
+    }
+    return true;
+}
+
+
+bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis )
+{
+    if( !h || !g ) return false;
+
+    unsigned int z = 0;
+    for( int i = 1; i <= h->GetNbinsX(); i++ )
+    {
+        if( h->GetBinContent( i ) > 0. )
+	{
+	   if( !bLinXaxis ) g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
+	   else
+	   {
+	      if( h->GetXaxis()->GetBinCenter( i ) > 0. )
+	      {
+	         g->SetPoint( z, TMath::Log10( h->GetXaxis()->GetBinCenter( i ) ), h->GetBinContent( i ) );
+              }
+	      else continue;
+           }
+	   if( bIgnoreErrors )
+	   {
+	      g->SetPointEYlow( z, 0. );
+	      g->SetPointEYhigh( z, 0 );
+           }
+	   else
+	   {
+	      g->SetPointEYlow( z, h->GetBinError( i ) );
+	      g->SetPointEYhigh( z, h->GetBinError( i ) );
+           }
+           z++;
+        }
+    }
+    return true;
+}
+
+/*
+
+    get histograms from CTA WP Phys sensitivity files
+
+    not clear if this is the right place, but used by VInstrumentResponseFunctionReader and VSensitivityCalculator
+
+*/
+TH1F* VHistogramUtilities::get_CTA_IRF_Histograms( string iHistogramName, double iCameraOffset )
+{
+    TH1F *h = 0;
+    TH2F *h2D = 0;
+    char hname[200];
+// gamma-ray effective area
+// get on-axis results
+    if( iCameraOffset <= 1.e-2 )
+    {
+       h = (TH1F*)gDirectory->Get( iHistogramName.c_str() );
+    }
+// get off-axis results
+    else
+    {
+       sprintf( hname, "%s_offaxis", iHistogramName.c_str() );
+       h2D = (TH2F*)gDirectory->Get( hname );
+       if( !h2D ) return 0;
+       sprintf( hname, "%s_px", h2D->GetName() );
+       h = (TH1F*)h2D->ProjectionX( hname, h2D->GetYaxis()->FindBin( iCameraOffset ), h2D->GetYaxis()->FindBin( iCameraOffset  ) );
+       if( !h ) return 0;
+    }
+
+    return h;
+}

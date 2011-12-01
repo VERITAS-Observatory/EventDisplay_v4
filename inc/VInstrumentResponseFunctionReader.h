@@ -15,6 +15,7 @@
 #include "TH1D.h"
 #include "TH1F.h"
 #include "TH2D.h"
+#include "TH2F.h"
 #include "TMath.h"
 #include "TProfile.h"
 #include "TTree.h"
@@ -36,9 +37,6 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 
     bool                             calculateCutEfficiencies();
     TGraphAsymmErrors*               calculateEffectiveAreaRatios( TGraphAsymmErrors *g0, TGraphAsymmErrors *g1 );
-    bool                             fillResolutionGraphfromHistogram( TH1F* h, TGraphAsymmErrors* g,
-                                                                       bool bIgnoreErrors = false, bool bLinXaxis = false );
-    bool                             fillResolutionGraphfromHistogram( TH1F* h, TGraphErrors* g, bool bIgnoreErrors = false );
     VInstrumentResponseFunctionData* getIRFFromFile( TTree *, unsigned int );
     bool                             getDataFromFile();
     bool                             getDataFromCTAFile();
@@ -120,7 +118,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 2 );
+    ClassDef( VInstrumentResponseFunctionReader, 3 );
 };
 
 

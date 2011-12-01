@@ -125,6 +125,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
     TCanvas* iEffectiveAreaPlottingCanvas = new TCanvas( hname, "effective area", 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEffectiveAreaPlottingCanvas->SetGridx( 0 );
     iEffectiveAreaPlottingCanvas->SetGridy( 0 );
+    iEffectiveAreaPlottingCanvas->SetLeftMargin( 0.15 );
+    iEffectiveAreaPlottingCanvas->SetRightMargin( 0.07 );
 
     TH1D *heff = new TH1D( "heff","", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
     heff->SetStats( 0 );
@@ -441,7 +443,9 @@ void VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
        cout << getPlottingAxis( "energy_Lin" )->fMinValue << "\t" << getPlottingAxis( "energy_Lin" )->fMaxValue << endl;
        return;
     }
-    plot_nullHistogram( iEnergyResolutionPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis, false, he0->GetYaxis()->GetTitleOffset()*1.3, getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
+    plot_nullHistogram( iEnergyResolutionPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis, 
+                        false, he0->GetYaxis()->GetTitleOffset()*1.3, 
+			getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
 
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
@@ -679,7 +683,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
              if( h )
              {
 // get containment probability
-                if( j < fData[iDataSetID]->fIRF_Data.size() && fData[iDataSetID]->fIRF_Data[j] && i_Plotting_Selector < fData[iDataSetID]->fIRF_Data[j]->fContainmentProbability.size() )
+                if( j < fData[iDataSetID]->fIRF_Data.size() && fData[iDataSetID]->fIRF_Data[j] 
+		  && i_Plotting_Selector < fData[iDataSetID]->fIRF_Data[j]->fContainmentProbability.size() )
                 {
                     sprintf( hname, "%s (%d%%)", h->GetYaxis()->GetTitle(), (int)(fData[iDataSetID]->fIRF_Data[j]->fContainmentProbability[i_Plotting_Selector]*100.) );
                     h->SetYTitle( hname );
@@ -726,7 +731,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
     double i_Plotting_L_Max = 0.;
     bool   i_Plotting_log = false;
     string iXTitle = "";
-    if( iXaxis == "energy" )        i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF;
+    if(      iXaxis == "energy" )   i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIFF;
     else if( iXaxis == "nimages" )  i_Plotting_Selector = VInstrumentResponseFunctionData::E_NIMAG;
     else if( iXaxis == "distance" ) i_Plotting_Selector = VInstrumentResponseFunctionData::E_DIST;
     string iPlottingAxis = iXaxis + "_Lin";
@@ -830,8 +835,14 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 // try to get CTA resolution graph
 	   if( iName.find( "angres" ) != string::npos )
 	   {
-	       if( iName.find( "80" ) != string::npos )  g = fData[i]->gAngularResolution80;
-	       else                                      g = fData[i]->gAngularResolution;
+	       if( iName.find( "80" ) != string::npos )
+	       {
+	          g = fData[i]->gAngularResolution80;
+               }
+	       else
+	       {
+	          g = fData[i]->gAngularResolution;
+               }
 	   }
 	   if( !g )
 	   {

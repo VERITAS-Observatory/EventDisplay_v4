@@ -149,119 +149,83 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 {
     bool bLinX = false;  // energy axis for effective areas
 
+    TH1F *h = 0;
 // gamma-ray effective area
-    TH1F *h = (TH1F*)gDirectory->Get( "EffectiveArea" );
-    if( !h )
+    h = get_CTA_IRF_Histograms( "EffectiveArea", fWoff );
+    if( !h ) 
     {
-       h = (TH1F*)gDirectory->Get( "harea_gamma" );
+       h = get_CTA_IRF_Histograms( "harea_gamma", fWoff );
        if( !h ) return false;
        bLinX = true;
     }
-    
-    cout << "reading CTA-style file" << endl;
 
     gEffArea_MC = new TGraphAsymmErrors( 1 );
     setGraphPlottingStyle( gEffArea_MC );
-    fillResolutionGraphfromHistogram( h, gEffArea_MC, false, bLinX );
+    get_Graph_from_Histogram( h, gEffArea_MC, false, bLinX );
 
 ///////////////////////////////////////////////////////////////
 // name and axis units are not consistent in the CTA files!!!
 ///////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////
 // energy resolution
+    h = 0;
     gEnergyResolution = new TGraphErrors( 1 );
-// try Paris style file
-    h = (TH1F*)gDirectory->Get( "ERes" );
-    if( !h )
+    h = get_CTA_IRF_Histograms( "ERes", fWoff );
+    if( !h ) h = get_CTA_IRF_Histograms( "EnResol_RMS", fWoff );
+    if( h )
     {
-       h = (TH1F*)gDirectory->Get( "EnResol_RMS" );
+       get_Graph_from_Histogram( h, gEnergyResolution, true );
+       setGraphPlottingStyle( gEnergyResolution );
     }
-    fillResolutionGraphfromHistogram( h, gEnergyResolution, true );
-    setGraphPlottingStyle( gEnergyResolution );
 
-// angular resolution
+///////////////////////////////////////////////////////////////
+// 68% angular resolution
+    h = 0;
     gAngularResolution = new TGraphErrors( 1 );
-    h = (TH1F*)gDirectory->Get( "AngRes" );
+    h = get_CTA_IRF_Histograms( "AngRes", fWoff );
 // try Paris style file
     if( !h )
     {
-       h = (TH1F*)gDirectory->Get( "AngResolution68" );
+       h = get_CTA_IRF_Histograms( "AngResolution68", fWoff );
 // arcmin -> deg
        if( h ) 
        {
-          h->Scale( 1./60. );
+	  h->Scale( 1./60. );
        }
     }
-    fillResolutionGraphfromHistogram( h, gAngularResolution, true );   // ignore errors in resolution graph
-    setGraphPlottingStyle( gAngularResolution );
+    if( h )
+    {
+       get_Graph_from_Histogram( h, gAngularResolution, true );   // ignore errors in resolution graph
+       setGraphPlottingStyle( gAngularResolution );
+    }
 
+///////////////////////////////////////////////////////////////
+// 80% angular resolution
+    h = 0;
     gAngularResolution80 = new TGraphErrors( 1 );
-    h = (TH1F*)gDirectory->Get( "AngRes80" );
+    h = get_CTA_IRF_Histograms( "AngRes80", fWoff );
+// try Paris style file
     if( !h )
     {
-       h = (TH1F*)gDirectory->Get( "AngResolution80" );
+       h = get_CTA_IRF_Histograms( "AngResolution80", fWoff );
 // arcmin -> deg
        if( h ) 
        {
-          h->Scale( 1./60. );
+	  h->Scale( 1./60. );
        }
     }
-    fillResolutionGraphfromHistogram( h, gAngularResolution80, true );   // ignore errors in resolution graph
-    setGraphPlottingStyle( gAngularResolution80 );
-
-    return true;
-}
-
-bool VInstrumentResponseFunctionReader::fillResolutionGraphfromHistogram( TH1F *h, TGraphErrors *g, bool bIgnoreErrors )
-{
-    if( !h || !g ) return false;
-
-    unsigned int z = 0;
-    for( int i = 1; i <= h->GetNbinsX(); i++ )
+    if( h )
     {
-        if( h->GetBinContent( i ) > 0. )
-	{
-	   g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
-	   if( bIgnoreErrors ) g->SetPointError( z, 0., 0. );
-	   else                g->SetPointError( z, 0., h->GetBinError( i ) );
-           z++;
-        }
+       get_Graph_from_Histogram( h, gAngularResolution80, true );   // ignore errors in resolution graph
+       setGraphPlottingStyle( gAngularResolution80 );
     }
-    return true;
-}
-
-
-bool VInstrumentResponseFunctionReader::fillResolutionGraphfromHistogram( TH1F *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis )
-{
-    if( !h || !g ) return false;
-
-    unsigned int z = 0;
-    for( int i = 1; i <= h->GetNbinsX(); i++ )
+    if( h )
     {
-        if( h->GetBinContent( i ) > 0. )
-	{
-	   if( !bLinXaxis ) g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
-	   else
-	   {
-	      if( h->GetXaxis()->GetBinCenter( i ) > 0. )
-	      {
-	         g->SetPoint( z, TMath::Log10( h->GetXaxis()->GetBinCenter( i ) ), h->GetBinContent( i ) );
-              }
-	      else continue;
-           }
-	   if( bIgnoreErrors )
-	   {
-	      g->SetPointEYlow( z, 0. );
-	      g->SetPointEYhigh( z, 0 );
-           }
-	   else
-	   {
-	      g->SetPointEYlow( z, h->GetBinError( i ) );
-	      g->SetPointEYhigh( z, h->GetBinError( i ) );
-           }
-           z++;
-        }
+       get_Graph_from_Histogram( h, gAngularResolution80, true );   // ignore errors in resolution graph
+       setGraphPlottingStyle( gAngularResolution80 );
     }
+
     return true;
 }
 
@@ -643,40 +607,6 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
     return g;
 }
 
-bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F *h, string iContainmentRadius, string iResolutionTreeName )
-{
-    if( !h ) return false;
-
-    if( iContainmentRadius != "68" ) iResolutionTreeName += "_0" + iContainmentRadius + "p";
-
-    for( unsigned int j = 0; j < fIRF_TreeNames.size(); j++ )
-    {
-	if( fIRF_TreeNames[j] == iResolutionTreeName )
-	{
-	     if( j < fIRF_Data.size() && fIRF_Data[j] )
-	     {
-// try to get EVNDISP resolution graph
-		 TGraphErrors *g = fIRF_Data[j]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
-		 if( iResolutionTreeName == "t_energy_resolution" )
-		 {
-		    g = gEnergyResolution;
-                 }
-		 if( g )
-		 {
-		    double x = 0.;
-		    double y = 0.;
-		    for( int i = 0; i < g->GetN(); i++ )
-		    {
-		       g->GetPoint( i, x, y );
-		       if( y > 0. ) h->SetBinContent( h->FindBin( x ), y ); 
-                    }
-		}
-            }
-       }
-   }
-
-   return true;
-}
 
 bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F *hEffRec, string iContainmentRadius, TH1F *hEff_MC )
 {
