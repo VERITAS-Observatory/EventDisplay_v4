@@ -32,7 +32,7 @@ class VDST : public VImageBaseAnalyzer, public VDSTTree
 
     public:
         VDST( bool iMode, bool iMC );
-        ~VDST() {}
+       ~VDST();
         void fill();                              //!< fill dst tree
         void initialize();
         void terminate();                         //!< write dst tree do disk

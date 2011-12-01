@@ -36,6 +36,12 @@ VDST::VDST( bool iMode, bool iMC )
     fVImageCleaning = new VImageCleaning( getData() );
 }
 
+VDST::~VDST()
+{
+   if( fDSTfile && !fDSTfile->IsZombie() ) fDSTfile->Close();
+   if( fVImageCleaning ) delete fVImageCleaning;
+}
+
 
 void VDST::initialize()
 {
