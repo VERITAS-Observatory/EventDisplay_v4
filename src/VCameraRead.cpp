@@ -764,10 +764,30 @@ void VCameraRead::rotateCamera()
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         double iR = fCameraRotation[i] / degrad;
-        for( unsigned int j = 0; j < fXTube[i].size(); j++ )
-        {
-            fRotXTube[i][j] = fXTube[i][j] * cos( iR ) - fYTube[i][j] * sin( iR );
-            fRotYTube[i][j] = fXTube[i][j] * sin( iR ) + fYTube[i][j] * cos( iR );
+	if( i < fXTube.size() && i < fYTube.size() && i < fRotXTube.size() && i < fRotYTube.size() )
+	{
+	   for( unsigned int j = 0; j < fXTube[i].size(); j++ )
+	   {
+	       if( j < fRotXTube[i].size() && j < fRotYTube[i].size() && j < fYTube[i].size() )
+	       {
+		  fRotXTube[i][j] = fXTube[i][j] * cos( iR ) - fYTube[i][j] * sin( iR );
+		  fRotYTube[i][j] = fXTube[i][j] * sin( iR ) + fYTube[i][j] * cos( iR );
+               }
+	       else
+	       {
+		   cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expeced " << i << "," << j << "): ";
+		   cout << fXTube[i].size() << "\t" << fYTube[i].size() << "\t" << fRotXTube[i].size() << "\t" << fRotYTube[i].size() << endl;
+		   cout << "exiting..." << endl;
+		   exit( -1 );
+	       }
+	   }
+        }
+	else
+	{
+	   cout << "VCameraRead::rotateCamera() error: invalid vector sizes (expeced " << i << "): ";
+	   cout << fXTube.size() << "\t" << fYTube.size() << "\t" << fRotXTube.size() << "\t" << fRotYTube.size() << endl;
+	   cout << "exiting..." << endl;
+	   exit( -1 );
         }
     }
 }

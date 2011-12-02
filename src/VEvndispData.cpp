@@ -164,7 +164,11 @@ void VEvndispData::resetAnaData()
     }
 }
 
+/*
 
+   define detector geometry (telescope positions, pixel position, pixel numbering, etc)
+
+*/
 void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCamera, string iDir )
 {
     if( fDebug )
@@ -172,16 +176,21 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
         cout << "VEvndispData::setDetectorGeometry " << iNTel << "\t" << iDir << endl;
         for( unsigned int i = 0; i < iCamera.size(); i++ ) cout << "\t T" << i+1 << "\t" << iCamera[i] << endl;
     }
-// all cases but DSTs
+// read detector geometry from a configuration file and/or DB    
+// (all cases but DSTs)
     if( getRunParameter()->fsourcetype != 7 && getRunParameter()->fsourcetype != 4 )
     {
-        fDetectorGeo = new VDetectorGeometry( iNTel, iCamera, iDir, fDebug, getRunParameter()->fCameraCoordinateTransformX, getRunParameter()->fCameraCoordinateTransformY, getRunParameter()->fsourcetype );
+        fDetectorGeo = new VDetectorGeometry( iNTel, iCamera, iDir, fDebug, 
+	                                      getRunParameter()->fCameraCoordinateTransformX, getRunParameter()->fCameraCoordinateTransformY, 
+					      getRunParameter()->fsourcetype );
+// get camera rotations from the DB
 	if( getRunParameter()->fDBCameraRotationMeasurements )
 	{
 	   fDetectorGeo->readDetectorGeometryFromDB( getRunParameter()->fDBRunStartTimeSQL, getRunParameter()->fDBCameraRotationMeasurements );
         }
     }
 // for DST files: read detector geometry from DST file
+// (telconfig tree)
     else
     {
         fDetectorGeo = new VDetectorGeometry( iNTel, fDebug );
@@ -202,8 +211,8 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
         iDetectorTree.readDetectorTree( fDetectorGeo, iTree );
         if( fDebug ) cout << "VEvndispData::setDetectorGeometry reading detector geometry from DST file" << endl;
     }
+// print most important parameters of the detector
     if( fDetectorGeo ) fDetectorGeo->print( false );
-
 }
 
 TTree* VEvndispData::getDetectorTree() 
