@@ -600,7 +600,15 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     if( !fTshowerpars )
     {
         cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2)" << endl;
+        cout << "exiting..." << endl;
         exit( -1 );
+    }
+// check validity of showerpars tree
+    if( !fTshowerpars->GetBranchStatus( "runNumber" ) )
+    {
+       cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2b)" << endl;
+       cout << "exiting..." << endl;
+       exit( -1 );
     }
 // check if input data is MC
     if( fTshowerpars->GetBranchStatus( "MCe0" ) )
@@ -1066,7 +1074,7 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
     if( hImagePattern->GetEntries() > 0 ) hImagePattern->Scale( 1./hImagePattern->GetEntries()*100. );
     if( fOutFile )
     {
-        cout << "writing events to " << fOutFile->GetName() << endl;
+        cout << "writing data to " << fOutFile->GetName() << endl;
         fOutFile->cd();
 
         cout << endl << "\t total number of events in output tree: " << fOTree->GetEntries() << endl << endl;

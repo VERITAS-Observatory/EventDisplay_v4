@@ -294,10 +294,12 @@ void VArrayAnalyzer::initAnalysis()
         }
     }
 
+// (GM 20111102) moved to VEventLoop::initializeAnalyzers()
+// (in order to write empty trees in case of no input events)
 // init output file
-    initOutput();
+//     initOutput();
 // init data trees
-    initTree();
+//   initTree();
 
 }
 

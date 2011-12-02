@@ -643,7 +643,7 @@ void VImageAnalyzer::printTrace( int iChannel )
 void VImageAnalyzer::shutdown()
 {
     if( fDebug ) cout << "void VImageAnalyzer::shutdown()" << endl;
-    fOutputfile->Close();
+    if( fOutputfile && fOutputfile->IsOpen() ) fOutputfile->Close();
 }
 
 

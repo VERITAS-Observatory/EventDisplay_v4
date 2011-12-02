@@ -46,7 +46,6 @@ class VImageAnalyzer : public VImageBaseAnalyzer
         void fillOutputTree();                    //!< fill tree with image parameterisation results
 	void imageCleaning();                     //!< image cleaning
         bool initEvent();                         //! reset image calculation for next event
-        void initTrees();                         //!  intitalize output tree
 	void muonRingAnalysis();                  //! muon ring analysis
         void printTrace( int i_channel );         //!< print trace information for one channel (debugging)
         void setAnaDir( unsigned int iTel );      //!< set directories in root output file
@@ -61,6 +60,7 @@ class VImageAnalyzer : public VImageBaseAnalyzer
 	VImageCleaning*  getImageCleaner() { return fVImageCleaning; }   //! return pointer to image cleaner
         void initAnalysis();                      //!< set the data vectors, read the calibration data (called once at the beginning of the analysis)
         void initOutput();                        //!< open outputfile
+        void initTrees();                         //!  intitalize output tree
         void shutdown();                          //!< close outputfile
         void terminate();                         //!< write results to disk
 };

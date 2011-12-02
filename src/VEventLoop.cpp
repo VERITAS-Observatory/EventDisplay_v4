@@ -25,6 +25,11 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
 
 // total number of telescopes
     fNTel = fRunPar->fNTelescopes;
+    if( fNTel < 1 )
+    {
+       cout << "VEventLoop::VEventLoop error: no telescopes defined" << endl;
+       exit( -1 );
+    }
 
 // data readers
     fReader = 0;                                  // this pointer is used in the program for accesing any data source (raw or MC)
@@ -385,7 +390,12 @@ void VEventLoop::initializeAnalyzers()
         fAnalyzer->initializeDataReader();
         fAnalyzer->initOutput();
     }
-    if( fArrayAnalyzer ) fArrayAnalyzer->initializeDataReader();
+    if( fArrayAnalyzer )
+    {
+       fArrayAnalyzer->initializeDataReader();
+       fArrayAnalyzer->initOutput();
+       fArrayAnalyzer->initTree();
+    }
     if( fDST ) fDST->initialize();
 
 // set analysis data storage classes
@@ -428,9 +438,9 @@ void VEventLoop::shutdown()
 {
     if( fDebug ) cout << "VEventLoop::shutdown()" << endl;
     endOfRunInfo();
-// write only something to disk if at least one event was analyzed
     cout << endl << "-----------------------------------------------" << endl;
-    if( fEventNumber > 0 )
+// (GM): write a root file even if no event was analyzed
+//    if( fEventNumber >= 0 )
     {
 // write detector parameter tree to disk
         if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
@@ -477,7 +487,11 @@ void VEventLoop::shutdown()
 	       getReader()->getMonteCarloHeader()->print();
 	       getReader()->getMonteCarloHeader()->Write();
 	    }
-// close analyzer output file (!! CLOSE !!)
+// FROGS finishing here
+#ifndef NOGSL
+	    if( fRunPar->ffrogsmode ) fFrogs->finishFrogs(getOutputFile());
+#endif
+// close output file here (!! CLOSE !!)
             fAnalyzer->shutdown();
         }
 // write calibration/analysis results for each telescope
@@ -501,14 +515,16 @@ void VEventLoop::shutdown()
 // final check of output file; just open and close it again
     if( fRunMode == R_ANA )
     {
+       if( fDebug ) cout << "VEventLoop::shutdown: final check of output file" << endl;
        TFile f( fRunPar->foutputfileName.c_str(), "READ" );
        if( f.IsZombie() )
        {
 	   cout << "Error: problem with eventdisplay output file: " << fRunPar->foutputfileName << endl;
        }
-#ifndef NOGSL
-       if( fRunPar->ffrogsmode ) fFrogs->finishFrogs(&f);
-#endif
+       else
+       {
+           cout << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
+       }
        f.Close();
     }
 // end of analysis

@@ -290,6 +290,12 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     fDST_tree = t;
     fDST_conf = c;
 
+// inform about empty trees
+    if( fDST_tree && fDST_tree->GetEntries() == 0 )
+    {
+       cout << "DST tree found: no entries" << endl;
+    }
+
     fDST_vlist_of_telescopes.clear();
     unsigned int iNChannels = 0;
     int fTelID;

@@ -1957,6 +1957,9 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 
        setTelID( i );
 
+// no calibration data available for this telescope
+       if( nPixel == 0 ) continue;
+
 // peds
        if( nPixel == getPeds( false ).size() )
        {

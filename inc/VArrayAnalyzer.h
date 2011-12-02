@@ -52,8 +52,6 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         void getNumImages();                      //!< calculate number if images
         double getMeanPointingMismatch( unsigned int iTel);
         void initEvent();                         //!< reset vectors, etc. (called for each event)
-        void initOuput();                         //!< check for output file,
-        void initTree();
         int  rcs_method_0( unsigned int );        //!< GrIsu reconstruction method 1(!)
         int  rcs_method_3( unsigned int );
         int  rcs_method_4( unsigned int );
@@ -98,5 +96,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         void initAnalysis();
         void initOutput();
         void terminate();
+//        void initOuput();                         //!< check for output file,
+        void initTree();
 };
 #endif

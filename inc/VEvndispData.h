@@ -321,8 +321,8 @@ class VEvndispData
         void                setBorderThresh( double ithresh ) { fRunPar->fborderthresh[fTelID] = ithresh; }
         void                setBrightNonImageThresh( double ithresh ) { fRunPar->fbrightnonimagetresh[fTelID] = ithresh; }
         void                setCalData() { fCalData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getDebugFlag() ); }
-        void                setCalibrated() { fCalibrated[fTelID] = true; }
-        void                setCalibrated( bool iCal ) { fCalibrated[fTelID] = iCal; }
+        void                setCalibrated() { if( fTelID < fCalibrated.size() ) fCalibrated[fTelID] = true; }
+        void                setCalibrated( bool iCal ) { if( fTelID < fCalibrated.size() ) fCalibrated[fTelID] = iCal; }
         void                setCurrentSummationWindow( unsigned int iw ) { fAnaData[fTelID]->fCurrentSummationWindow = iw; }
         void                setCurrentSummationWindow( unsigned int imin, unsigned int imax );
         void                setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax );
