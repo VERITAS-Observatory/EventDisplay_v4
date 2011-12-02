@@ -227,7 +227,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	TCanvas* plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity );
         TCanvas* plotObservationTimevsFlux( unsigned int iD = 0, TCanvas *c = 0, int iLineColor = 1, double iLineWidth = 4. );
         void     plotObservationTimevsFluxFromTextFile( TCanvas*c, string iTextFile, int iLineColor = 4, double iLineWidth = 1., int iLineStyle = 2 );
-	TCanvas* plotSignalBackgroundRates( TCanvas *c = 0, int iLineStyle = -1, double iRateMinimum = 2.e-7, double iRateMaximum = 1.e-1  );
+	TCanvas* plotSignalBackgroundRates( TCanvas *c = 0, bool bPlotParticleBackground = false, double iRateMinimum = 2.e-7, double iRateMaximum = 1.e-1  );
 	void     plotSensitivityLimitations( TCanvas *cSensitivity = 0, double iY = -9999. );
         TCanvas* plotSensitivityvsEnergyFromTextTFile( TCanvas *c, string iTextFile,
 	                                               int iColor = 1, double iLineWidth = 2, int iLineStyle = 2,

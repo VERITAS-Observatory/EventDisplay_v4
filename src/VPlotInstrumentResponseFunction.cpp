@@ -445,7 +445,7 @@ void VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iData
     } 
 }
 
-void VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
+TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
 {
     if( fDebug ) cout << "VPlotInstrumentResponseFunction::plotEnergyResolution " << ymax << endl;
 
@@ -473,7 +473,7 @@ void VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
     {
        cout << "VPlotInstrumentResponseFunction::plotEnergyResolution error: negative energy axis: ";
        cout << getPlottingAxis( "energy_Lin" )->fMinValue << "\t" << getPlottingAxis( "energy_Lin" )->fMaxValue << endl;
-       return;
+       return 0;
     }
     plot_nullHistogram( iEnergyResolutionPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis, 
                         false, he0->GetYaxis()->GetTitleOffset()*1.3, 
@@ -486,6 +486,8 @@ void VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
           fData[i]->gEnergyResolution->Draw( "pl" );
        }
     }
+
+    return iEnergyResolutionPlottingCanvas;
 }
 
 void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted )

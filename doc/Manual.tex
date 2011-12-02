@@ -164,6 +164,9 @@ The EVNDISP manual for VERITAS users:
 
 \chapter{Installation and auxiliary data files}
 
+\section{Environmental variables}
+\label{SECTION.ENVIRON}
+
 \section{Auxiliary data files}
 \label{SECTION.AUXFILE}
 
@@ -313,9 +316,9 @@ SIMULATIONFILE\_MCHISTO  & 1  & & & data file with thrown events. This can be ei
 
 \section{General concept}
 
-To use Eventdisplay for CTA analyses, you first have to convert the {\it simtel.gz} file into ROOT format. 
-This you have to do for each subarray separately.
-Afterwards you can analyze this subarray file running {\it eventdisplay} in the standard way, which means:
+To use Eventdisplay for CTA analyses, the {\it simtel.gz} files have first to be converted into ROOT format (called in the following DST format). 
+This must be done for each subarray separately.
+The following list shows the binaries and macros needed to produce CTA sensitivity files:
 
 \begin{description}
 \item[CTA.convert\_hessio\_to\_VDST]
@@ -333,13 +336,20 @@ Afterwards you can analyze this subarray file running {\it eventdisplay} in the 
 \item[makeEffectiveArea]
         make effective areas
 
-\item[\$EVNDISPSYS/macros/plot\_sensitivity.C]
-        plot sensitivity curves
+\item[\$EVNDISPSYS/macros/sensitivity.C]
+        calculate and plot sensitivity curves
+
+\item[writeCTAWPPhysSensitivityFiles]
+        write sensitivity files (WP-Phys style root file)
+        
 \end{description}
 
-(For most of these steps there are scripts to run the analysis on the DESY batch system. Use them to simplify your life.)
+There are scripts to simplify these steps in the \$EVNDISP/scripts/CTA directory. 
+It is easy with their help to analyze many simtel.gz files for several subarrays, offsets, and so on. 
+The scripts expect several environmental variables to be set (see \ref{SECTION.ENVIRON}).
+Most of the scripts work fine on the DESY batch system, they might need some adjustment for other computing environments.
 
-\section{Analysis}
+\section{Analysis steps for CTA IRF and sensitivity calculation}
 
 %###########################################################################
 \subsection{Step 1: Converter}
@@ -370,7 +380,7 @@ Options:
 The following options are necessary: -a and -o.
 Note the limitations of the DST format (\ref{SUBSECTION.DST.LIMITATIONS}).
 
-Note that many of the CTA simulation files contain data for a so called hyper array. 
+Many of the CTA simulation files contain data for a so called hyper array. 
 To select the actual array, the corresponding subarray has to be specified in a ASCII text file (called {\it subarray} file in the following).
 The following example file selects an array consisting of telescopes 63, 19, 67, and 33, each telescope
 with a field of view of 8 degrees:
@@ -383,7 +393,7 @@ with a field of view of 8 degrees:
 \end{lstlisting}
 
 Subarray files for most of the typical arrays used in the CTA sensitivities studies are part of the analysis file package 
-(see \ref{SECTION.AUXFILE}). Note that a subarray file is always needed, even if all telescopes from the hessio file are read out.
+(see \ref{SECTION.AUXFILE}). Note that a subarray file is always needed, even if all telescopes from the hessio file are read out and analyzed.
 
 For a typical run, the following command line should be used:
 

@@ -78,7 +78,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     void         plotEnergyReconstructionError( unsigned int iDataSetID = 0, string iM = "mean", double ymin = -0.8, double ymax = 0.8 );
     void         plotEnergyReconstructionRelativeErrors( unsigned int iDataSetID = 0, double iYmin = 0., double iYmax = 3. );
     void         plotEnergyReconstructionMatrix( unsigned int iDataSetID = 0 );
-    void         plotEnergyResolution( double ymax = 1. );                                             // from geteffective area
+    TCanvas*     plotEnergyResolution( double ymax = 1. );                                             // from geteffective area
     TCanvas*     plotEnergyResolution( string iXaxis );                                                // from IRF
     TCanvas*     plotEnergyResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );
     void         plotEnergySpectra( bool iWeighted = true );

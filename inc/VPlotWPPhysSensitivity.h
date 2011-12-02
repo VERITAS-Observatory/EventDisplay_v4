@@ -11,6 +11,7 @@
 #include "TCanvas.h"
 #include "TH1D.h"
 #include "TH1F.h"
+#include "TLegend.h"
 
 #include "VPlotInstrumentResponseFunction.h"
 #include "VPlotUtilities.h"
@@ -33,6 +34,9 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    vector< double > fIRFCameraOffset_deg;
    vector< int >    fPlottingColor;
    vector< int >    fPlottingLineStyle;
+   vector< string > fLegend;
+
+   bool    plotLegend( TCanvas *c = 0, bool iLeft = false );
 
    public:
 
