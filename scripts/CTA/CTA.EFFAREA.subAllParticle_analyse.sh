@@ -8,11 +8,10 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] 
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray> <cut file directory> <cutfile template> <output directory> [filling mode]"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cut file directory> <cutfile template> <output directory> [filling mode]"
    echo
-   echo "<subarray>"
-   echo "     subarray identifier (A,B,C...)"
-   echo "     use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "<subarray list>"
+   echo "     text file with list of subarray IDs"
    echo
    echo "<cut file directory>"
    echo "     direction where cut files are located"  
@@ -43,18 +42,9 @@ fi
 mkdir -p $ODIR
 
 #arrays
-if [ $SUBAR = "ALL" ]
-then
-#  VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
-  VARRAY=( E I J )
-#  VARRAY=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
-else
-  VARRAY=( $SUBAR )
-fi
-NARRAY=${#VARRAY[@]}
+VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
 
 # particle types
-#if [ $GFILL = "0" ]
 if [ $GMOD = "0" ]
 then
 #   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
@@ -67,9 +57,8 @@ NPART=${#VPART[@]}
 #########################################
 #loop over all arrays
 #########################################
-for (( N = 0 ; N < $NARRAY; N++ ))
+for ARRAY in $VARRAY
 do
-   ARRAY=${VARRAY[$N]}
    echo "STARTING ARRAY $ARRAY"
 
 ###########################################

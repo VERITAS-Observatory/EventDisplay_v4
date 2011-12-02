@@ -9,10 +9,10 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <array ID> <run parameter filename> <directory for run parameter and log files> <output file name> <onSource/cone10>"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <run parameter filename> <directory for run parameter and log files> <output file name> <onSource/cone10>"
    echo ""
-   echo "  <array ID>         CTA array ID (e.g. E for array E)"
-   echo "                     use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <subarray list>   text file with list of subarray IDs"
+   echo
    echo "<run parameter filename> without .runparameter"
    echo
    echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
@@ -26,7 +26,6 @@ then
    exit
 fi
 
-ARRAY=$1
 RPAR=$2
 RXPAR=`basename $RPAR.runparameter runparameter`
 DDIR=$3
@@ -38,15 +37,7 @@ if [ $5 == "cone10" ] || [ $5 == "cone" ]
 then
   CONE="TRUE"
 fi
-
-if [ $ARRAY == "ALL" ]
-then
-  VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "s4-1-120" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
-  VARRAY=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
-else 
-  VARRAY=( $ARRAY )
-fi
-NARRAY=${#VARRAY[@]}
+VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #####################################
 # energy bins
@@ -88,9 +79,8 @@ FSCRIPT="CTA.TMVA.qsub_train"
 
 ###############################################################
 # loop over all arrays
-for (( N = 0 ; N < $NARRAY; N++ ))
+for ARRAY in $VARRAY
 do
-   ARRAY=${VARRAY[$N]}
    echo "STARTING ARRAY $ARRAY"
 
    for (( W = 0; W < $NOFF; W++ ))
@@ -138,7 +128,7 @@ do
 
 #################################
 # submit job to queue
-# short queue: BDT 
+# medium queue: BDT 
 	 qsub -V -l h_cpu=10:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
 # long queue: needed for box cut optimization
 #         qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"

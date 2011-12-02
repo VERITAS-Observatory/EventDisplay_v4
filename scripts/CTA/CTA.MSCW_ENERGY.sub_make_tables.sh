@@ -12,12 +12,11 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <array ID> <onSource/cone10>"
+   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone10>"
    echo ""
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
-   echo "  <array ID>         CTA array ID (e.g. E for array E or HYBRID1 for Hybrid-1 with 61 telescopes)"
-   echo "                     use ALL for all arrays (A B C D E F G H I J K NA NB HYBRID1)"
+   echo "  <subarray list>    text file with list of subarray IDs"
    echo "  <onSource/cone>    calculate tables for on source or different wobble offsets"
    echo
    echo " input data and output directories for tables are fixed in CTA.MSCW_ENERGY.qsub_make_tables.sh"
@@ -29,15 +28,7 @@ fi
 #########################################
 TFIL=$1
 RECID=$2
-ARRAY=$3
-if [ $ARRAY == "ALL" ]
-then
-  VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "s4-1-120" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
-#  VARRAY=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
-else 
-  VARRAY=( $ARRAY )
-fi
-NARRAY=${#VARRAY[@]}
+VARRAY=`awk '{printf "%s ",$0} END {print ""}' $3`
 CONE="FALSE"
 if [ $4 == "cone10" ] || [ $4 == "cone" ]
 then
@@ -94,16 +85,15 @@ mkdir -p $SHELLDIR
 #########################################
 #loop over all arrays
 #########################################
-for (( N = 0 ; N < $NARRAY; N++ ))
+for ARRAY in $VARRAY
 do
-   ARRAY=${VARRAY[$N]}
    echo "STARTING ARRAY $ARRAY"
 
 # data dir
    DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/$DSUF"
 
 # table file
-   TAFIL=$TFIL-$ARRAY
+   TAFIL=$TFIL
 
 #########################################
 #loop over wobble offsets
@@ -116,7 +106,7 @@ do
       MEANDIST=${OFFMEA[$M]}
 
 # run scripts
-      FNAM="$SHELLDIR/MSCW.table-$TAFIL-W$MEANDIST"
+      FNAM="$SHELLDIR/MSCW.table-$TAFIL-W$MEANDIST-$ARRAY"
 
       sed -e "s|TABLEFILE|$TAFIL|" $FSCRIPT.sh > $FNAM-1.sh
       sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-1.sh > $FNAM-2.sh

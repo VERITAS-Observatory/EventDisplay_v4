@@ -11,13 +11,12 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray> <particle> [wildcard]"
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <particle> [wildcard]"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
    echo "  <recid>         reconstruction ID"
-   echo "  <subarray>      subarray identifier (A,B,C...)"
-   echo "                  use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <subarraylist > text file with list of subarray IDs"
    echo "  <particle>      gamma_onSource / gamma_cone10 / electron / proton / helium"
    echo
    echo "optional (for a huge amount of MC files):"
@@ -30,15 +29,7 @@ fi
 # input parameters
 TABLE=$1
 RECID=$2
-SUBAR=$3
-if [ $SUBAR == "ALL" ]
-then
-  VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "s4-1-120" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
-#  VARRAY=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
-else
-  VARRAY=( $SUBAR )
-fi
-NARRAY=${#VARRAY[@]}
+VARRAY=`awk '{printf "%s ",$0} END {print ""}' $3`
 
 PART=$4
 METH="LL"
@@ -70,9 +61,8 @@ mkdir -p $SHELLDIR
 #########################################
 #loop over all arrays
 #########################################
-for (( N = 0 ; N < $NARRAY; N++ ))
+for SUBAR in $VARRAY
 do
-   SUBAR=${VARRAY[$N]}
    echo "STARTING ARRAY $SUBAR"
 
 #########################################

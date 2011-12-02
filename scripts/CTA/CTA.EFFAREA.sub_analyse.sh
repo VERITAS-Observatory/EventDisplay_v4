@@ -278,7 +278,9 @@ do
          sed -e "s|WOBBLEOFFSET|${OFFMEA[$j]}|" $iCFIL-f > $iCFIL-g
       fi
       rm -f $iCFIL-f
-      mv -f $iCFIL-g $iCFIL
+      sed -e "s|OFFAXISBIN|$i|" $iCFIL-g > $iCFIL-h
+      rm -f $iCFIL-g
+      mv -f $iCFIL-h $iCFIL
       echo $iCFIL
 
 ###############################################################################

@@ -10,10 +10,10 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
-   echo "./CTA.EVNDISP.check_convert_and_analyse_MC_VDST.sh <sub array> <list of simtelarray files> <particle> <list of failed jobs>"
+   echo "./CTA.EVNDISP.check_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> <list of failed jobs>"
    echo
-   echo "  <sub array>               sub array from prod1 (e.g. E)"
-   echo "                            use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <sub array list>          text file with list of subarray IDs"
+   echo
    echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
    echo ""
    echo "  <list of failed jobs>     list of failed jobs" 
@@ -31,18 +31,9 @@ then
 fi
 FAILED=$FAILED.$PART
 
-#arrays
-if [ $SUBAR = "ALL" ]
-then
-VARRAY=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
-#VARARY=("s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
-else
-  VARRAY=( $SUBAR )
-fi
-NARRAY=${#VARRAY[@]}
-for (( N = 0 ; N < $NARRAY; N++ ))
+VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
+for ARRAY in $VARRAY
 do
-   ARRAY=${VARRAY[$N]}
    rm -f $FAILED.$ARRAY.list
    touch $FAILED.$ARRAY.list
 done
@@ -60,9 +51,8 @@ do
 #  echo "CHECKING RUN $F1"
   RUN=${F1%___*}
 
-  for (( N = 0 ; N < $NARRAY; N++ ))
+  for ARRAY in $VARRAY
   do
-      ARRAY=${VARRAY[$N]}
 
  # check that simtel fil exists
      if [ ! -e $AFIL ]

@@ -10,10 +10,10 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array> <list of simtelarray files> <particle> [keep simtel.root files (default off=0)]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> [keep simtel.root files (default off=0)]"
    echo
-   echo "  <sub array>               sub array from prod1 (e.g. E)"
-   echo "                            use ALL for all arrays (A B C D E F G H I J K NA NB)"
+   echo "  <sub array list>          text file with list of subarray IDs"
+   echo
    echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
    echo ""
    echo "  [keep simtel.root files]  keep and copy converted simtel files to output directory (default off=0)"
@@ -87,7 +87,8 @@ do
    sed -e "s|SIMTELFILE|$AFIL|" $FSCRIPT.sh > $FNAM-1.sh
    sed -e "s|PAAART|$PART|" $FNAM-1.sh > $FNAM-2.sh
    rm -f $FNAM-1.sh
-   sed -e "s|ARRAY|$ARRAY|" $FNAM-2.sh > $FNAM-3.sh
+   LIST=`awk '{printf "%s ",$0} END {print ""}' $ARRAY`
+   sed -e "s!ARRAY!$LIST!" $FNAM-2.sh > $FNAM-3.sh
    rm -f $FNAM-2.sh
    sed -e "s|KEEEEEEP|$KEEP|" $FNAM-3.sh > $FNAM-4.sh
    rm -f $FNAM-3.sh
@@ -99,10 +100,13 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   if  [ $ARRAY = "ALL" ]
+   NARRAY=`cat $ARRAY | wc -l`
+   if  [ $NARRAY -gt 1 ]
    then
+      echo "long queue"
       qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    else
+      echo "short queue"
       qsub -l h_cpu=08:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    fi
 

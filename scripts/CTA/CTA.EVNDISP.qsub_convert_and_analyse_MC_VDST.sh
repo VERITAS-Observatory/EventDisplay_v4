@@ -12,20 +12,13 @@ source $EVNDISPSYS/setObservatory.sh CTA
 
 IFIL=SIMTELFILE
 PART=PAAART
-SUBA=ARRAY
+SUBA="ARRAY"
 KEEP=KEEEEEEP
 ACUT=ARC
 MET=MEEET
 
 # set array
-if [ $SUBA = "ALL" ] 
-then
-  FIELD=( A B C D E F G H I J K NA NB "s4-2-120" "s4-2-85" "I-noLST" "I-noSST" "g60" "g85" "g120" "g170" "g240" "s9-2-120" "s9-2-170" )
-#  FIELD=( "s2-1-75" "s3-1-210" "s3-3-260" "s3-3-346" "s3-4-240" "s4-1-105" "s4-2-170" "s4-3-200" "s4-4-140" "s4-4-150" "s4-5-125" )
-else
-  FIELD=( $SUBA )
-fi
-NFIELD=${#FIELD[@]}
+FIELD=$SUBA
 
 OFIL=`basename $IFIL .gz`
 
@@ -47,15 +40,15 @@ echo "$IFIL"
 cp -v -f $IFIL $TMPDIR"/"
 
 #loop over all arrays
-for (( N = 0 ; N < $NFIELD; N++ ))
+for N in $FIELD
 do
-   echo "RUNNING  ${FIELD[$N]}"
+   echo "RUNNING  $N"
 # output data files are written to this directory
-   ODIR=$CTA_USER_DATA_DIR"/analysis/"${FIELD[$N]}"/"$PART"/"
+   ODIR=$CTA_USER_DATA_DIR"/analysis/"$N"/"$PART"/"
    mkdir -p $ODIR
 
 # output log files are written to this directory
-   LDIR=$CTA_USER_LOG_DIR"/analysis/"${FIELD[$N]}"/"$PART"/"
+   LDIR=$CTA_USER_LOG_DIR"/analysis/"$N"/"$PART"/"
    mkdir -p $LDIR
 # remove existing log files
    rm -f $LDIR/$OFIL.convert.log
@@ -63,7 +56,7 @@ do
 
 ####################################################################
 # execute converter
-   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST -a $CTA_EVNDISP_ANA_DIR/DetectorGeometry/CTA.prod1.${FIELD[$N]}.lis -o $TMPDIR/$OFIL.root $TMPDIR/$OFIL.gz >& $LDIR/$OFIL.convert.log
+   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST -a $CTA_EVNDISP_ANA_DIR/DetectorGeometry/CTA.prod1.$N.lis -o $TMPDIR/$OFIL.root $TMPDIR/$OFIL.gz >& $LDIR/$OFIL.convert.log
 
 ####################################################################
 # execute eventdisplay

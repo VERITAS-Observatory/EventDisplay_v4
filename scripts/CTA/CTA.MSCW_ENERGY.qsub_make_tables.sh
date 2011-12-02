@@ -34,7 +34,7 @@ set MOPT="-pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -mindistancetocame
 #########################################
 # fill tables
 cd $EVNDISPSYS/bin/
-./mscw_energy $MOPT -arrayrecid=$RECID -tablefile "$ODIR/$TFIL-W$WOFFMEA.root" -inputfile "$DDIR*.root" > $LDIR/$TFIL-W$WOFFMEA.log
+./mscw_energy $MOPT -arrayrecid=$RECID -tablefile "$ODIR/$TFIL-W$WOFFMEA-$ARRAY.root" -inputfile "$DDIR*.root" > $LDIR/$TFIL-W$WOFFMEA-$ARRAY.log
 #########################################
 
 # sleep
