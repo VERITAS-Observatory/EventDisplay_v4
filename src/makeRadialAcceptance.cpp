@@ -14,6 +14,7 @@
 #include "CData.h"
 #include "TFile.h"
 
+#include "VEvndispRunParameter.h"
 #include "VRadialAcceptance.h"
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
@@ -63,7 +64,7 @@ int main( int argc, char *argv[] )
         exit( 0 );
     }
 
-    cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
+   cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
 
 // create acceptance object
     VRadialAcceptance *facc = new VRadialAcceptance( fCuts, fRunPara );
@@ -83,6 +84,20 @@ int main( int argc, char *argv[] )
 // get data tree
         TTree *c = (TTree*)fTest.Get( "data" );
         CData *d = new CData( c, false );
+
+// Check number of telescopes in run
+        VEvndispRunParameter *iParV2 = (VEvndispRunParameter*)fTest.Get( "runparameterV2" );
+        if( iParV2 )
+        {
+          if( ntel != iParV2->fTelToAnalyze.size() )
+          {
+            cout << endl;
+            cout << "error: Number of Telesocpes ntel " << ntel << " does not equal number in run " << iParV2->fTelToAnalyze.size() << " (defaul ntel 4)." << endl;
+            cout << "To specify us -n ntel option" << endl;
+            exit(0);
+          }
+        }
+
 // pointer to data tree
         fCuts->setDataTree( d );
 // set gamma/hadron cuts
