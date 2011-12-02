@@ -95,7 +95,7 @@ void VSensitivityCalculator::reset()
     fPlottingCrabFlux_CU.push_back( 1.e-1 );
     fPlottingCrabFlux_CU.push_back( 1.e-2 );
     fPlottingCrabFlux_CU.push_back( 1.e-3 );
-    fPlottingCrabFlux_CU.push_back( 1.e-4 );
+//    fPlottingCrabFlux_CU.push_back( 1.e-4 );
 
 // sensitivity graph
     gSensitivityvsEnergy = 0;
@@ -1142,7 +1142,8 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
     }
     cout << "reading CTA-MC file: " << fMCCTA_File << endl;
 // sensitivities
-    h = get_CTA_IRF_Histograms( "DiffSens", fMCCTA_cameraoffset_deg );
+    h = get_CTA_IRF_Histograms( "DiffSensE2Erg", fMCCTA_cameraoffset_deg );
+    if( !h ) h = get_CTA_IRF_Histograms( "DiffSens", fMCCTA_cameraoffset_deg );
     if( h ) 
     {
        g = new TGraphAsymmErrors( 1 );
@@ -1165,7 +1166,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
     {
        gProtonRate = new TGraphErrors( 1 );
        get_Graph_from_Histogram( h, gProtonRate, true );
-       setGraphPlottingStyle( gProtonRate, 2, 2, 21, 2 );
+       setGraphPlottingStyle( gProtonRate, 1, 2, 21, 2 );
     }
 // electron rates
     h = 0;
@@ -1174,7 +1175,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
     {
        gElectronRate = new TGraphErrors( 1 );
        get_Graph_from_Histogram( h, gElectronRate, true );
-       setGraphPlottingStyle( gElectronRate, 3, 2, 22, 2 );
+       setGraphPlottingStyle( gElectronRate, 1, 2, 22, 2 );
     }
 
     return g;
@@ -2361,7 +2362,7 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
     return true;
 }
 
-TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas *c, int iLineStyle, double iRateMinimum, double iRateMaximum )
+TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas *c, bool bPlotParticleBackground, double iRateMinimum, double iRateMaximum )
 {
    bool bNewCanvas = false;
    if( !c )
@@ -2390,18 +2391,19 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas *c, int iLin
 
    if( gBGRate )
    {
-       if( iLineStyle > 0 ) setGraphPlottingStyle( gBGRate, 1, 2, 1, 1, 0, iLineStyle );
-       else                 setGraphPlottingStyle( gBGRate, 1, 2, 1, 1, 0, 1 );
+       setGraphPlottingStyle( gBGRate );
        gBGRate->Draw( "l" );
 
-       if( gProtonRate ) 
+       if( gProtonRate && bPlotParticleBackground ) 
        {
-          if( iLineStyle > 0 ) setGraphPlottingStyle( gProtonRate, 2, 2, 1, 1, 0, iLineStyle );
+	  setGraphPlottingStyle( gProtonRate );
+	  gProtonRate->SetLineStyle( 2 );
           gProtonRate->Draw( "l" );
        }
-       if( gElectronRate )
+       if( gElectronRate && bPlotParticleBackground )
        {
-          if( iLineStyle > 0 ) setGraphPlottingStyle( gElectronRate, 3, 2, 1, 1, 0, iLineStyle );
+          setGraphPlottingStyle( gElectronRate );
+	  gElectronRate->SetLineStyle( 3 );
           gElectronRate->Draw( "l" );
        }    
    }
