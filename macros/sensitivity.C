@@ -13,6 +13,7 @@
 #include "TGraph.h"
 #include "TLegend.h"
 
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -479,26 +480,21 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
     (for all sub arrays)
 
 */
-void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_Proton = "proton", char *iMC_Electron = "electron",
-                                  int iOffSetCounter = 0, int iRecID = 0 )
+void writeAllParticleNumberFiles( char *iSubArrayFile = 0,
+                                  int iOffSetCounter = 8, int iRecID = 0,
+                                  char *iMC_Gamma_onSource = "gamma_onSource", char *iMC_Gamma_cone10 = "gamma_cone10",
+                                  char *iMC_Proton = "proton", char *iMC_Electron = "electron" ) 
 {
    vector< string > SubArray;
-/*   SubArray.push_back( "A" );
-   SubArray.push_back( "B" );
-   SubArray.push_back( "C" );
-   SubArray.push_back( "D" ); */
-   SubArray.push_back( "E" );
-/*   SubArray.push_back( "F" );
-   SubArray.push_back( "G" );
-   SubArray.push_back( "H" );
-   SubArray.push_back( "I" ); 
-   SubArray.push_back( "J" );
-   SubArray.push_back( "K" );
-   SubArray.push_back( "NA" );
-   SubArray.push_back( "NB" );
-   SubArray.push_back( "s4-1-120" );
-   SubArray.push_back( "s4-2-120" ); 
-   SubArray.push_back( "s4-2-85" );  */
+   ifstream is;
+   is.open( iSubArrayFile, ifstream::in );
+   if( !is ) return;
+
+   string is_line;
+   while( getline( is, is_line ) ) 
+   {
+      SubArray.push_back( is_line );
+   }
 
    char iGamma[200];
    char iProton[200];
@@ -509,14 +505,25 @@ void writeAllParticleNumberFiles( char *iMC_Gamma = "gamma_onSource", char *iMC_
    {
       cout << "STARTING SUBARRAY " << SubArray[i] << endl;
 
-      sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma, SubArray[i].c_str(), iRecID, iOffSetCounter );
-      sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, iOffSetCounter );
-      sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, iOffSetCounter );
+      sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_onSource, SubArray[i].c_str(), iRecID, 0 );
+      sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, 0 );
+      sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, 0 );
 
-      sprintf( iParticleNumberFile, "ParticleNumbers.%s.root", SubArray[i].c_str() );
+      sprintf( iParticleNumberFile, "ParticleNumbers.%s.0.root", SubArray[i].c_str() );
 
       writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
 
+// offset files
+      for( int j = 1; j < iOffSetCounter; j++ ) // use first bin on source particle file
+      {
+	 sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_cone10, SubArray[i].c_str(), iRecID, j );
+	 sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, j );
+	 sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, j );
+
+	 sprintf( iParticleNumberFile, "ParticleNumbers.%s.%d.root", SubArray[i].c_str(), j );
+
+	 writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+      }
    }
 }
 
