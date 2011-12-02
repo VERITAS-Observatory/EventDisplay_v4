@@ -436,10 +436,10 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
             {
                 setSums( chanID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
             }
-// if the trace window should be shifted, it is shifted relativ to calculate tzero
+// shift the summation window
             else
             {
-                corrfirst = (int)getTOffsets()[chanID] + getSumWindowShift();
+                corrfirst = iFirstSum + (int)getTOffsets()[chanID] + getSumWindowShift();
                 if( corrfirst < 0 ) corrfirst = 0;
                 corrlast = corrfirst + (iLastSum - iFirstSum);
                 setTCorrectedSumFirst( chanID, corrfirst );
