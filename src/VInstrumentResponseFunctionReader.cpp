@@ -364,8 +364,8 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 // erec/emc
        hEsysMCRelative2D = (TH2D*)c->hEsysMCRelative2D;
 // get energy resolution
-//       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
-       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
+       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
+//       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bias
        gEnergySystematic_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
@@ -655,4 +655,36 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F *hEff
     
     return true;
 }
+bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F *h, string iContainmentRadius, string iResolutionTreeName )
+{
+    if( !h ) return false;
 
+    if( iContainmentRadius != "68" ) iResolutionTreeName += "_0" + iContainmentRadius + "p";
+
+    for( unsigned int j = 0; j < fIRF_TreeNames.size(); j++ )
+    {
+	if( fIRF_TreeNames[j] == iResolutionTreeName )
+	{
+	    if( j < fIRF_Data.size() && fIRF_Data[j] )
+	    {
+// try to get EVNDISP resolution graph
+    		 TGraphErrors *g = fIRF_Data[j]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
+		 if( iResolutionTreeName == "t_energy_resolution" )
+                 {
+		    g = gEnergyResolution;
+		 }
+		if( g )
+		{ 
+		    double x = 0.; 
+		    double y = 0.; 
+		    for( int i = 0; i < g->GetN(); i++ ) 
+		    { 
+		       g->GetPoint( i, x, y ); 
+		       if( y > 0. ) h->SetBinContent( h->FindBin( x ), y );
+		    } 
+		 } 
+             } 
+	 } 
+    }
+    return true;
+}

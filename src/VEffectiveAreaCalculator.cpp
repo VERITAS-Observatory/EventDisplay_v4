@@ -1439,18 +1439,18 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                }
                else i_weight = 0.;
 // fill true MC energy (hVEmc is in true MC energies)
-               if( hVEcut[s][i_az] )           hVEcut[s][i_az]->Fill( eMC, i_weight );
-               if( hVEcutUW[s][i_az] )         hVEcutUW[s][i_az]->Fill( eMC, 1. );
-               if( hVEcut500[s][i_az] )        hVEcut500[s][i_az]->Fill( eMC, i_weight );
-               if( hVEcutLin[s][i_az] )        hVEcutLin[s][i_az]->Fill( eMC, i_weight );
-               if( hVEcutRec[s][i_az] )        hVEcutRec[s][i_az]->Fill( eRec, i_weight );
-               if( hVEcutRecUW[s][i_az] )      hVEcutRecUW[s][i_az]->Fill( eRec, 1. );
-               if( hVEsysRec[s][i_az] )        hVEsysRec[s][i_az]->Fill( eRec, eRec - eMC );
-               if( hVEsysMC[s][i_az] )         hVEsysMC[s][i_az]->Fill( eMC, eRec - eMC );
-               if( hVEsysMCRelative[s][i_az] ) hVEsysMCRelative[s][i_az]->Fill( eMC, (eRecLin-eMC) / eMC );
-               if( hVEsysMCRelative2D[s][i_az] ) hVEsysMCRelative2D[s][i_az]->Fill( eMC, eRecLin / eMC );
-               if( hVEsys2D[s][i_az] )         hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
-               if( hVEmcCut[s][i_az] )         hVEmcCut[s][i_az]->Fill( eRec, eMC );
+               if( hVEcut[s][i_az] )             hVEcut[s][i_az]->Fill( eMC, i_weight );
+               if( hVEcutUW[s][i_az] )           hVEcutUW[s][i_az]->Fill( eMC, 1. );
+               if( hVEcut500[s][i_az] )          hVEcut500[s][i_az]->Fill( eMC, i_weight );
+               if( hVEcutLin[s][i_az] )          hVEcutLin[s][i_az]->Fill( eMC, i_weight );
+               if( hVEcutRec[s][i_az] )          hVEcutRec[s][i_az]->Fill( eRec, i_weight );
+               if( hVEcutRecUW[s][i_az] )        hVEcutRecUW[s][i_az]->Fill( eRec, 1. );
+               if( hVEsysRec[s][i_az] )          hVEsysRec[s][i_az]->Fill( eRec, eRec - eMC );
+               if( hVEsysMC[s][i_az] )           hVEsysMC[s][i_az]->Fill( eMC, eRec - eMC );
+               if( hVEsysMCRelative[s][i_az] )   hVEsysMCRelative[s][i_az]->Fill( eMC, (eRecLin-d->MCe0) / d->MCe0 );
+               if( hVEsysMCRelative2D[s][i_az] ) hVEsysMCRelative2D[s][i_az]->Fill( eMC, eRecLin / d->MCe0 );
+               if( hVEsys2D[s][i_az] )           hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
+               if( hVEmcCut[s][i_az] )           hVEmcCut[s][i_az]->Fill( eRec, eMC );
              }
            }
 // don't do anything between here and the end of the loop! Never!

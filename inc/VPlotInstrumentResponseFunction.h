@@ -76,6 +76,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     TCanvas*     plotEffectiveArea( double iEffAreaMax_m2 = -1. );
     void         plotEffectiveAreaRatio( unsigned int iDataSetID = 0, double ymin = 0., double ymax = 1.3 );
     void         plotEnergyReconstructionError( unsigned int iDataSetID = 0, string iM = "mean", double ymin = -0.8, double ymax = 0.8 );
+    void         plotEnergyReconstructionRelativeErrors( unsigned int iDataSetID = 0, double iYmin = 0., double iYmax = 3. );
     void         plotEnergyReconstructionMatrix( unsigned int iDataSetID = 0 );
     void         plotEnergyResolution( double ymax = 1. );                                             // from geteffective area
     TCanvas*     plotEnergyResolution( string iXaxis );                                                // from IRF

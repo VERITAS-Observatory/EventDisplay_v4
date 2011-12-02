@@ -219,6 +219,38 @@ void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID
     if( z > 0 ) iCutEfficencyPlottingCanvas->SetLogy( 1 );
 }
 
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionRelativeErrors( unsigned int iDataSetID, double iYmin, double iYmax )
+{
+    if( !checkDataSetID( iDataSetID ) ) return;
+
+    char hname[200];
+    char htitle[200];
+
+    sprintf( hname, "cREA_Eerr_%d", iDataSetID );
+    sprintf( htitle, "relative error in energy reconstruction (%d)", iDataSetID );
+    TCanvas* iEnergyReconstructionErrorCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
+    iEnergyReconstructionErrorCanvas->SetGridx( 0 );
+    iEnergyReconstructionErrorCanvas->SetGridy( 0 );
+    iEnergyReconstructionErrorCanvas->Draw();
+
+    if( fData[iDataSetID]->hEsysMCRelative2D )
+    {
+       fData[iDataSetID]->hEsysMCRelative2D->SetTitle( "" );
+       fData[iDataSetID]->hEsysMCRelative2D->GetYaxis()->SetTitleOffset( 1.2 );
+       fData[iDataSetID]->hEsysMCRelative2D->SetStats( 0 );
+       fData[iDataSetID]->hEsysMCRelative2D->SetAxisRange( iYmin, iYmax, "Y" );
+       fData[iDataSetID]->hEsysMCRelative2D->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
+                                                           log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "X" );
+       if( fData[iDataSetID]->hEsysMCRelative2D->GetEntries() > 0. ) iEnergyReconstructionErrorCanvas->SetLogz( 1 );
+       fData[iDataSetID]->hEsysMCRelative2D->Draw( "colz" );
+// line at 1
+       TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 1., log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 1. );
+       iL->SetLineStyle( 2 );
+       iL->Draw();
+    }
+}
+
+
 void VPlotInstrumentResponseFunction::plotEnergyReconstructionError( unsigned int iDataSetID, string iM, double iYmin, double iYmax )
 {
     if( !checkDataSetID( iDataSetID ) ) return;
@@ -553,7 +585,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int 
 {
    string iResolutionTreeName = "t_angular_resolution";
    if( iProbabilityString != "68" ) iResolutionTreeName += "_0" + iProbabilityString +"p";
-   return plotResolution2D( iDataSetID, "angres" + iProbabilityString, "angular resolution vs " + iXaxis, 
+   return plotResolution2D( iDataSetID, 
+                            "angres" + iProbabilityString, "angular resolution vs " + iXaxis,
                             "angular resolution (" + iProbabilityString + "%) [deg]",
                             getPlottingAxis( "angularesolution_Lin" )->fMinValue,
 			    getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
@@ -606,7 +639,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
 
     if( fData.size() == 0 ) return 0;
 
-    char hname[200];
+    char hname[800];
+    char htitle[800];
 
     unsigned int i_Plotting_Selector = 0;
     double i_Plotting_Min = 0.;
@@ -661,8 +695,9 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
     }
 
 // create canvas
-    sprintf( hname, "c2D%s_%s", iName.c_str(), iXaxis.c_str() );
-    TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, fCanvasSize_X, fCanvasSize_Y );
+    sprintf( hname, "c2D%s_%s_%d", iName.c_str(), iXaxis.c_str(), iDataSetID );
+    sprintf( htitle, "%s (data set %d)", iCanvasTitle.c_str(), iDataSetID );
+    TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, htitle, 210, 10, fCanvasSize_X, fCanvasSize_Y );
     iResolutionPlottingCanvas->SetGridx( 0 );
     iResolutionPlottingCanvas->SetGridy( 0 );
     iResolutionPlottingCanvas->SetLeftMargin( 0.13 );

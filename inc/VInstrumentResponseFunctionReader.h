@@ -118,7 +118,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 3 );
+    ClassDef( VInstrumentResponseFunctionReader, 4 );
 };
 
 

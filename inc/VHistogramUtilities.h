@@ -41,7 +41,9 @@ class VHistogramUtilities
 
    TH1F*            get_CTA_IRF_Histograms( string iHistogramName, double iCameraOffset );
 
-    void            setDebug( bool iB = true ) { fDebug = iB; }
+   void            setDebug( bool iB = true ) { fDebug = iB; }
+
+   ClassDefNV( VHistogramUtilities, 1 );
 };
 
 #endif
