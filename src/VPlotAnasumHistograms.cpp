@@ -98,7 +98,7 @@ void VPlotAnasumHistograms::help()
  */
 void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y )
 {
-  cout << "(this is preliminary)" << endl << endl;
+  //cout << "(this is preliminary)" << endl << endl;
 
   cout << "Sky map centre: " << fSkyMapCentreRAJ2000 << " " << fSkyMapCentreDecJ2000 << endl;
 
@@ -124,6 +124,9 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y )
   if( dec_d > 0 ) cout << "+";
   cout << dec_d << " " << dec_m << " " << dec_s;
   cout << ")" << endl;
+  double offset = sqrt(x*x + y*y);
+  cout << "Offset from camera center = " << offset << " deg"<< endl;
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -556,11 +559,11 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
 
        // get 68% containment radius (up to theta2 = 0.15deg2)
        double nt2 = 0.;
-       for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.15 ); i++ ) nt2 += htheta2_diff->GetBinContent( i );
+       for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.05 ); i++ ) nt2 += htheta2_diff->GetBinContent( i );
        double nt2_68 = 0.;
        if( nt2 > 0. )
        {
-	 for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.15 ); i++ )
+	 for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.05 ); i++ )
 	 {
 	   nt2_68 += htheta2_diff->GetBinContent( i );
 	   if( nt2_68/nt2 > 0.68 )
