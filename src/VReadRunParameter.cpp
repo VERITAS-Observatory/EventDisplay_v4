@@ -941,7 +941,9 @@ void VReadRunParameter::test_and_adjustParams()
 	       {
 		 if( fRunPara->fTelToAnalyze.size() == 1 ) 
 		 {
-		    if( fRunPara->fTelToAnalyze[0] < iL.size() ) cout << iL[fRunPara->fTelToAnalyze[0]] << endl;
+//		    if( fRunPara->fTelToAnalyze[0] < iL.size() ) cout << iL[fRunPara->fTelToAnalyze[0]] << endl;
+// GH edit
+		    if( fRunPara->fTelToAnalyze[0] < iL.size() ) cout << iL[fTelToAna-1] << endl;
 		 }
 		 else
 		 {

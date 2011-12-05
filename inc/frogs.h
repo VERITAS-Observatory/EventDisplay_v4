@@ -71,6 +71,8 @@
 #define FROGS_PICTRAD  0.35  //Radius defining the picture
 #define FROGS_NEIGHBORAD 0.16 //Pixels separated by less than that are neighbors
 
+#define frogs_pedwidth_correction 1.00
+
 #ifdef __cplusplus
 extern "C" {
 #endif 
@@ -227,6 +229,8 @@ int frogs_event_display(int event_id, float q,float mu,float xtel,
 			float ytel,float xpix,float ypix,int pix_in_img);
 int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);
 float floatwrap(float x,float min,float max);
+
+
 #ifdef __cplusplus
 }
 #endif 

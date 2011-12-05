@@ -63,7 +63,7 @@ iii) at a fraction of the maximum value of the effective area (i.e.10%)
 
 VEnergyThreshold::VEnergyThreshold()
 {
-    fDebug = true;
+    fDebug = false;
 
     fEffArea = 0;
 
@@ -81,7 +81,7 @@ VEnergyThreshold::VEnergyThreshold()
 
 VEnergyThreshold::VEnergyThreshold( string ioutfilename)
 {
-    fDebug = true;
+    fDebug = false;
 
     fEffArea = 0;
 
@@ -101,7 +101,7 @@ VEnergyThreshold::VEnergyThreshold( string ioutfilename)
 
 VEnergyThreshold::VEnergyThreshold( double iEnergyThresholdFixed, string iEnergyThresholdFile )
 {
-    fDebug = true;
+    fDebug = false;
 
     fEffArea = 0;
 

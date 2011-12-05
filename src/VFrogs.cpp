@@ -506,7 +506,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       {
         rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
         //rtn.scope[tel].ped[pix]=fData->getData()->getPeds()[pix]/dc2pe;
-        rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]/dc2pe;
+        rtn.scope[tel].ped[pix]=fData->getData()->getPedvarsSmall()[pix]*frogs_pedwidth_correction/dc2pe;
       }
     }
     //Total number of live pixels in the array
