@@ -30,10 +30,13 @@ class VStereoHistograms
         double fBinSize;
         double fBinSizeUC;
         double fBinSizeEnergy;
+        double fBinSizeTime;
         double fSkyMapSizeXmin;
         double fSkyMapSizeXmax;
         double fSkyMapSizeYmin;
         double fSkyMapSizeYmax;
+	double fTimeMin;
+	double fTimeMax;
 
         void defineHistograms( int i_count, int irun, string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, bool ion );
         bool readHistograms( TList*, string );
@@ -76,14 +79,21 @@ class VStereoHistograms
 
 // energy histograms (logarithmic energy axis)
         TH1D* herecCounts;                        //!< reconstructed energy
+	TH2D* herecCounts2DtimeBinned;            //!< reconstructed energy (2D)
         TH1D* herecRaw;                           //!< reconstructed differential energy spectrum
+	TH2D* herecRaw2DtimeBinned;
         TH1D* herec;                              //!< reconstructed differential energy spectrum, weighted by effective area
+	//time-dependent differential energy spectrum
+	TH2D* herec2DtimeBinned;
         TH2D* herecWeights;                       //!< weights vs.  reconstructed energy
         TProfile *herecEffectiveArea;             //!< effective area vs reconstructed energy
 // energy histograms (linear energy axis)
         TH1D* hLinerecCounts;                     //!< reconstructed energy
+	TH2D* hLinerecCounts2DtimeBinned;  
         TH1D* hLinerecRaw;                        //!< reconstructed differential energy spectrum
+	TH2D* hLinerecRaw2DtimeBinned;
         TH1D* hLinerec;                           //!< reconstructed differential energy spectrum, weighted by effective area
+	TH2D* hLinerec2DtimeBinned;               // >time-dependent 
         TH2D* hLinerecWeights;                    //!< weights vs.  reconstructed energy
         TProfile *hLinerecEffectiveArea;          //!< effective area vs reconstructed energy
 
@@ -106,7 +116,7 @@ class VStereoHistograms
         TH1D* hrate_10sec;                        //!< Event Rate Histogram (10 second bins)
         TH1D* hrate_1min;                         //!< Event Rate Histogram (1 minute bins)
 
-        VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, bool ion );
+        VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, double iTimeBinSize, double iTimeMin, double iTimeMax,  bool ion );
         void defineHistograms();
         void deleteParameterHistograms();
         void deleteSkyPlots();
@@ -118,6 +128,5 @@ class VStereoHistograms
         void setSkyMapSize( double xmin, double xmax, double ymin, double ymax );
         void writeObjects( string, string, TObject* );
         void writeHistograms();
-
 };
 #endif

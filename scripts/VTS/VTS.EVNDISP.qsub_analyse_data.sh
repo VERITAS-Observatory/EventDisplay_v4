@@ -46,7 +46,7 @@ set OPT="-shorttree "
 # OFF data run
 #set OPT="$OPT -raoffset=6.25"
 # use calib.dat
-#set OPT="$OPT -calibrationfile calib.dat"
+# set OPT="$OPT -calibrationfile calib.dat"
 
 # GEO (standard reconstruction)
 if( $MET == "GEO" ) then

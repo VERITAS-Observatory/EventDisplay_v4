@@ -21,6 +21,7 @@
 #include "TDirectory.h"
 #include "TDirectoryFile.h"
 #include "TGraphAsymmErrors.h"
+#include "TGraph2DErrors.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TList.h"
@@ -39,7 +40,8 @@ class VStereoAnalysis
 {
     public:
 
-        VStereoAnalysis( bool isOnrun, string i_hsuffix, VAnaSumRunParameter* irunpara, vector< TDirectory* > iRDir, TDirectory *iDir, string iDataDir, int iRandomSeed, bool iTotalAnalysisOnly );
+        VStereoAnalysis( bool isOnrun, string i_hsuffix, VAnaSumRunParameter* irunpara,
+	                 vector< TDirectory* > iRDir, TDirectory *iDir, string iDataDir, int iRandomSeed, bool iTotalAnalysisOnly );
         ~VStereoAnalysis() {}
         double fillHistograms( int icounter, int irun, double AzMin, double AzMax, double iPedVar );
         TH2D  *getAlpha();
@@ -90,6 +92,7 @@ class VStereoAnalysis
 
         bool fDebug;
         double degrad;
+	int fTimeBinCounter; // counter for EffArea Time BINs
 
         bool bTotalAnalysisOnly;
 
@@ -107,6 +110,8 @@ class VStereoAnalysis
 
         TGraphAsymmErrors *gMeanEffectiveAreaErec;
         TGraphAsymmErrors *gMeanEffectiveAreaEmc;
+	TGraph2DErrors    *gTimeBinnedMeanEffectiveAreaErec;
+        TGraph2DErrors    *gTimeBinnedMeanEffectiveAreaEmc;
         TGraphErrors      *gMeanEsys_MC;
 
         VStereoMaps* fMap;
@@ -148,6 +153,8 @@ class VStereoAnalysis
 
         double fTotCount;
 
+	map < int, double > f_t_in_s_min;
+	map < int, double > f_t_in_s_max;
         double fMeanAzimuth;
         double fMeanElevation;
         double fNMeanElevation;

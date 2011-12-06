@@ -91,6 +91,7 @@ void VFluxCalculation::reset()
     fCanvasFluxesVSMJD = 0;
 
     fRXTE = 0;
+
 }
 
 
@@ -105,26 +106,46 @@ void VFluxCalculation::resetRunList()
     fRunPedvars.clear();
     fRunNdiff.clear();
     fRunNdiffE.clear();
+    fIntraRunNdiff.clear();
+    fIntraRunNdiffE.clear();
     fRunRate.clear();
     fRunRateE.clear();
     fRunNon.clear();
+    fIntraRunNon.clear();
     fRunNoff.clear();
+    fIntraRunNoff.clear();
     fRunNorm.clear();
     fRunSigni.clear();
+    fIntraRunSigni.clear();
     fRunUFL.clear();
+    fIntraRunUFL.clear();
     fRunCI_up_1sigma.clear();
     fRunCI_lo_1sigma.clear();
     fRunCI_up_3sigma.clear();
     fRunCI_lo_3sigma.clear();
+    fIntraRunCI_up_1sigma.clear();
+    fIntraRunCI_lo_1sigma.clear();
+    fIntraRunCI_up_3sigma.clear();
+    fIntraRunCI_lo_3sigma.clear();
     fRunFlux.clear();
     fRunFluxE.clear();
     fRunFluxConstant.clear();
     fRunFluxConstantE.clear();
     fRunEffArea.clear();
+    fIntraRunFlux.clear();
+    fIntraRunFluxE.clear();
+    fIntraRunFluxConstant.clear();
+    fIntraRunFluxConstantE.clear();
+    fIntraRunEffArea.clear();
     fRunFluxCI_lo_1sigma.clear();
     fRunFluxCI_up_1sigma.clear();
     fRunFluxCI_lo_3sigma.clear();
     fRunFluxCI_up_3sigma.clear();
+    fIntraRunFluxCI_lo_1sigma.clear();
+    fIntraRunFluxCI_up_1sigma.clear();
+    fIntraRunFluxCI_lo_3sigma.clear();
+    fIntraRunFluxCI_up_3sigma.clear();
+
 }
 
 
@@ -269,6 +290,17 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
     return fRunList.size();
 }
 
+void VFluxCalculation::printRunList()
+{
+   for( unsigned int i = 0; i < fRunList.size(); i++ )
+   {
+      cout << "RUN " << fRunList[i];
+      cout << ",  TOn: " << fRunTOn[i];
+      cout << ", Ze [deg]: " << fRunZe[i];
+      cout << endl;
+   }
+}
+
 
 bool VFluxCalculation::openDataFile( string ifile )
 {
@@ -292,6 +324,40 @@ bool VFluxCalculation::openDataFile( vector< string > ifile )
     return false;
 }
 
+/*
+
+    calculate spectral weighted effective area average for this energy interval
+
+*/
+double VFluxCalculation::integrateEffectiveAreaInterval( double x0, double x1, double x2, double ieff_mean )
+{
+// return value
+   double i_InterEffArea = 0.;
+
+// energy bin
+   double iE_low = TMath::Power( 10., (x0 + x1)/2. );
+   double iE_up  = TMath::Power( 10., (x1 + x2)/2. );
+   double dE = 0.;
+
+// apply lower energy threshold cut
+   if( iE_up  < fMinEnergy ) return -99.;
+   if( iE_low < fMinEnergy ) iE_low = fMinEnergy;
+// MC statistic only good up to this energy
+   if( iE_low > fMaxEnergy ) return -99.;
+   if( iE_up  > fMaxEnergy ) iE_up = fMaxEnergy;
+
+// width of energy bin (on linear scale)
+   dE = iE_up - iE_low;
+
+// integrate spectral weighted effective area
+// using trapezoidal rule
+   i_InterEffArea  = ieff_mean * dE * 0.5 * (TMath::Power( iE_up / fE0, fAlpha ) + TMath::Power( iE_low / fE0, fAlpha ) );
+// (correction term at E_low in order to maximize second derivative)
+   i_InterEffArea -=  1./12. * dE * dE * dE * ieff_mean * fAlpha * (fAlpha-1.) / fE0 / fE0 
+                    * TMath::Power( iE_low / fE0, fAlpha - 2. );
+
+   return i_InterEffArea;
+}
 
 /*!
     read effective areas from anasum output file for each run
@@ -322,7 +388,6 @@ void VFluxCalculation::getIntegralEffectiveArea( bool bAMC )
 // loop over all runs in this file
         fFile[f]->cd();
         if( fDebug ) cout << "now at file " << fFile[f]->GetName() << " (runlist size: " << fRunList.size() << ")" << endl;
-
         char hname[800];
         for( unsigned int i = 0; i < fRunList.size(); i++ )
         {
@@ -363,56 +428,98 @@ void VFluxCalculation::getIntegralEffectiveArea( bool bAMC )
                     continue;
                 }
             }
+
+	    double ieff_int = 0.;
             double ieff_mean = 0.;
             double ieff_meanA = 0.;
             double x0, x1, x2;
-            double dE = 0.;
-            double iE_low = 0.;
-            double iE_up = 0.;
 
 /////////////////////////////////////////////////////////////////////
 // calculate spectral weighted integral effective area
             fRunEffArea[i] = 0.;
 // loop over all bins in effective area histogram
             for( int b = 1; b < g->GetN()-1; b++ )
-            {
+	    {
 // get energies and effective areas
                 g->GetPoint( b-1, x0, ieff_mean );
                 g->GetPoint( b+1, x2, ieff_mean );
                 g->GetPoint( b  , x1, ieff_mean );
 
-// energy bin
-                iE_up  = TMath::Power( 10., (x1 + x2)/2.  );
-                iE_low = TMath::Power( 10., (x0 + x1 )/2. );
-
-// apply lower energy threshold cut
-                if( iE_up  < fMinEnergy ) continue;
-                if( iE_low < fMinEnergy ) iE_low = fMinEnergy;
-// MC statistic only good up to this energy
-                if( iE_low > fMaxEnergy ) break;
-                if( iE_up  > fMaxEnergy ) iE_up = fMaxEnergy;
-
-// width of energy bin (on linear scale)
-                dE = iE_up - iE_low;
-
-// integrate spectral weighted effective area
-// using trapezoidal rule
-                fRunEffArea[i] += ieff_mean * dE * 0.5 * (TMath::Power( iE_up / fE0, fAlpha ) + TMath::Power( iE_low / fE0, fAlpha ) );
-// (correction term at E_low in order to maximize second derivative)
-                fRunEffArea[i] -=  1./12. * dE * dE * dE * ieff_mean * fAlpha * (fAlpha-1.) / fE0 / fE0 * TMath::Power( iE_low / fE0, fAlpha - 2. );
+		ieff_int = integrateEffectiveAreaInterval( x0, x1, x2, ieff_mean );
+		if( ieff_int > 0. ) fRunEffArea[i] += ieff_int;
+		else                continue;
 
 // integral effective area
                 ieff_meanA += ieff_mean;
             }
 // debug output
             if( fDebug )
-            {
-                cout << " t_obs " << setprecision( 5 ) << fRunTOn[i] / 60. << " [min], < A > " << setprecision( 6 ) << fRunEffArea[i] << " [m^2]";
+	    {
+                cout << " t_obs " << setprecision( 5 ) << fRunTOn[i] / 60. << " [min],";
+		cout << "< A > " << setprecision( 6 ) << fRunEffArea[i] << " [m^2]";
                 cout << ", integral effective area [m^2]: " << ieff_meanA << endl;
             }
-        }
-    }                                             // end of loop over all files
 
+/////////////////////////////////////////////////////////////////////
+// TIME dependent effective areas
+/////////////////////////////////////////////////////////////////////
+	    vector < double > i_IntraEffArea;
+
+// read effective area graphs for time binned intra run light curves
+	    if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC" );
+            else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec" );
+	    TGraph2DErrors *g_time = (TGraph2DErrors*)gDirectory->Get( hname );
+// find 2D graph with time dependent effective areas
+            if( !g_time )
+            {
+// if not try go get off graph
+                if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC_off" );
+                else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec_off" );
+                g_time = (TGraph2DErrors*)gDirectory->Get( hname );
+                if( !g_time )
+		{
+                    cout << "error: 2D effective area graph not found" << endl;
+                    cout << "continue..." << endl;
+                    fRunEffArea[i] = 0.;
+                    continue;
+		}
+            }
+
+// calculate spectral weighted integral effective area
+	    double *Xaxis = g_time->GetX();
+	    double *Yaxis = g_time->GetY();
+	    double *Zaxis = g_time->GetZ();
+	    double InterEffArea=0.;
+
+// Time of first bin
+	    double Time=Zaxis[0];
+
+// loop over all points in effective area histogram
+	    for( int b = 1; b < g_time->GetN(); b++ )
+	    {
+// get energies and effective areas
+	       x0=Xaxis[b-1];
+	       x2=Xaxis[b+1];
+	       x1=Xaxis[b];
+	       ieff_mean=Yaxis[b];
+
+	       ieff_int = integrateEffectiveAreaInterval( x0, x1, x2, ieff_mean );
+	       if( ieff_int > 0. ) InterEffArea += ieff_int;
+	       else                continue;
+		
+// increment time bin counter
+	       if(Zaxis[b]>Time)
+	       {
+		   Time=Zaxis[b];
+		   i_IntraEffArea.push_back( InterEffArea );
+		   InterEffArea=0;
+	       }
+	     }
+	     i_IntraEffArea.push_back( InterEffArea );
+	     fIntraRunEffArea.push_back( i_IntraEffArea );
+	}
+    }
+  
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
@@ -422,9 +529,9 @@ void VFluxCalculation::getIntegralEffectiveArea( bool bAMC )
     double iTTot = 0.;
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
-        if( fRunList[i] < 0. ) continue;
-        fRunEffArea[fRunList.size()-1] += fRunEffArea[i] * fRunTOn[i];
-        iTTot += fRunTOn[i];
+      if( fRunList[i] < 0. ) continue;
+      fRunEffArea[fRunList.size()-1] += fRunEffArea[i] * fRunTOn[i];
+      iTTot += fRunTOn[i];
     }
     if( iTTot > 0. ) fRunEffArea[fRunList.size()-1] /= iTTot;
     else             fRunEffArea[fRunList.size()-1] = 0.;
@@ -556,6 +663,18 @@ double VFluxCalculation::getFluxInErgs( double iF, double iE )
 */
 void VFluxCalculation::calculateFluxes()
 {
+
+  vector < double > IntraFlux;
+  vector < double > IntraFluxE;
+  vector < double > IntraFluxConstant;
+  vector < double > IntraFluxConstantE;
+  vector < double > IntraFluxCI_lo_1sigma;
+  vector < double > IntraFluxCI_up_1sigma;
+  vector < double > IntraFluxCI_lo_3sigma;
+  vector < double > IntraFluxCI_up_3sigma;
+
+
+
     if( fDebug )
     {
         cout << "calculating fluxes" << endl;
@@ -575,6 +694,16 @@ void VFluxCalculation::calculateFluxes()
 // loop over all runs in run list
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
+
+      IntraFlux.clear();
+      IntraFluxE.clear();
+      IntraFluxConstant.clear();
+      IntraFluxConstantE.clear();
+      IntraFluxCI_lo_1sigma.clear();
+      IntraFluxCI_up_1sigma.clear();
+      IntraFluxCI_lo_3sigma.clear();
+      IntraFluxCI_up_3sigma.clear();   
+      
 // effective area * observation time / dead time
         if( fRunList[i] > 0 ) iEffNorm = fRunEffArea[i] * fRunTOn[i] * ( 1. - fRunDeadTime[i] );
         else                  iEffNorm = fRunEffArea[i] * iTot;
@@ -610,12 +739,18 @@ void VFluxCalculation::calculateFluxes()
 // calculate integral flux
         if( fMinEnergy > 0. )
         {
-            fRunFlux[i]  = -1./( fAlpha + 1. ) * fRunFluxConstant[i] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
-            fRunFluxE[i] = -1./( fAlpha + 1. ) * fRunFluxConstantE[i] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
-	    fRunFluxCI_lo_1sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_lo_1sigma[i] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
-	    fRunFluxCI_up_1sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_up_1sigma[i] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
-	    fRunFluxCI_lo_3sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_lo_3sigma[i] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
-	    fRunFluxCI_up_3sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_up_3sigma[i] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
+            fRunFlux[i]             = -1./( fAlpha + 1. ) * fRunFluxConstant[i] 
+	                             * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
+            fRunFluxE[i]            = -1./( fAlpha + 1. ) * fRunFluxConstantE[i] 
+	                             * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
+	    fRunFluxCI_lo_1sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_lo_1sigma[i]
+	                             * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
+	    fRunFluxCI_up_1sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_up_1sigma[i] 
+	                             * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
+	    fRunFluxCI_lo_3sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_lo_3sigma[i] 
+	                             * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
+	    fRunFluxCI_up_3sigma[i] = -1./( fAlpha + 1. ) * fRunFluxCI_up_3sigma[i] 
+	                             * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha );
         }
         else if( fRunFluxConstantE[i] > 0. )
         {
@@ -635,12 +770,118 @@ void VFluxCalculation::calculateFluxes()
 	    fRunFluxCI_lo_3sigma[i] = -99.;
 	    fRunFluxCI_up_3sigma[i] = -99.;
         }
+// Time BINs
+	if( i < fIntraRunEffArea.size() )
+	{
+	  for( unsigned int t = 0; t < fIntraRunEffArea[i].size(); t++)
+	  {
+// effective area * observation time / dead time
+	     if( fRunList[i] > 0 )
+	     {
+	       iEffNorm = fIntraRunEffArea[i][t] * fRunTOn[i] * ( 1. - fRunDeadTime[i] )/(double)(fIntraRunEffArea[i].size());
+	     }
+	     else 
+	     {  
+	       iEffNorm = fIntraRunEffArea[i][t] * iTot / (double)(fIntraRunEffArea[i].size());
+	     }
+	    
+
+// calculate fluxes (numbers/norm)
+	  if( iEffNorm > 0. )
+	    {
+	      if( fIntraRunUFL[i][t] < 0. )
+		{
+		  IntraFluxConstant.push_back( fIntraRunNdiff[i][t] / iEffNorm / 1.e4 );            // m^2 to cm^2
+		  IntraFluxConstantE.push_back( fIntraRunNdiffE[i][t] / iEffNorm / 1.e4 );
+		}
+	      else
+		{
+		  IntraFluxConstant.push_back( fIntraRunUFL[i][t] / iEffNorm / 1.e4 );
+		  IntraFluxConstantE.push_back( 0. );
+		}
+	      IntraFluxCI_lo_1sigma.push_back( fIntraRunCI_lo_1sigma[i][t] / iEffNorm / 1.e4 );
+	      IntraFluxCI_up_1sigma.push_back( fIntraRunCI_up_1sigma[i][t] / iEffNorm / 1.e4 );
+	      IntraFluxCI_lo_3sigma.push_back( fIntraRunCI_lo_3sigma[i][t] / iEffNorm / 1.e4 );
+	      IntraFluxCI_up_3sigma.push_back( fIntraRunCI_up_3sigma[i][t] / iEffNorm / 1.e4 );
+	    }
+	  else
+	    {
+	      IntraFluxConstant.push_back( 0. );
+	      IntraFluxConstantE.push_back( 0. );
+	      IntraFluxCI_lo_1sigma.push_back( 0. );
+	      IntraFluxCI_up_1sigma.push_back( 0. );
+	      IntraFluxCI_lo_3sigma.push_back( 0. );
+	      IntraFluxCI_up_3sigma.push_back( 0. );
+	    }
+///////////////////////////////////////////////////////////////
+// calculate integral flux
+	  if( fMinEnergy > 0. )
+	    {
+	      IntraFlux.push_back(-1./( fAlpha + 1. ) * IntraFluxConstant[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxE.push_back( -1./( fAlpha + 1. ) * IntraFluxConstantE[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_lo_1sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_up_1sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_lo_3sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_up_3sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	    }
+	  else if( fIntraRunFluxConstantE[i][t] > 0. )
+	    {
+	      IntraFlux.push_back( -1./( fAlpha + 1. ) * IntraFluxConstant[t] );
+	      IntraFluxE.push_back( -1./( fAlpha + 1. ) * IntraFluxConstantE[t] );
+	      IntraFluxCI_lo_1sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_lo_1sigma[t] );
+	      IntraFluxCI_up_1sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_up_1sigma[t] );
+	      IntraFluxCI_lo_3sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_lo_3sigma[t] );
+	      IntraFluxCI_up_3sigma.push_back( -1./( fAlpha + 1. ) * IntraFluxCI_up_3sigma[t] );
+	    }
+	  else
+	    {
+	      IntraFlux.push_back( -99. );
+	      IntraFluxE.push_back( -99. );
+	      IntraFluxCI_lo_1sigma.push_back( -99. );
+	      IntraFluxCI_up_1sigma.push_back( -99. );
+	      IntraFluxCI_lo_3sigma.push_back( -99. );
+	      IntraFluxCI_up_3sigma.push_back( -99. );
+	    }
+	}
+
+	  fIntraRunFlux.push_back( IntraFlux );
+	fIntraRunFluxE.push_back( IntraFluxE );
+	fIntraRunFluxConstant.push_back( IntraFluxConstant );
+	fIntraRunFluxConstantE.push_back( IntraFluxConstantE );
+	fIntraRunFluxCI_lo_1sigma.push_back( IntraFluxCI_lo_1sigma );
+	fIntraRunFluxCI_up_1sigma.push_back( IntraFluxCI_up_1sigma );
+	fIntraRunFluxCI_lo_3sigma.push_back( IntraFluxCI_lo_3sigma );
+	fIntraRunFluxCI_up_3sigma.push_back( IntraFluxCI_up_3sigma );
+	}
     }
 }
 
 /*
 
-    set spectral parameters
+    set spectral parameters);
+	      IntraFluxE.push_back( -1./( fAlpha + 1. ) * fIntraFluxConstantE[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_lo_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_up_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_1sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_lo_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	      IntraFluxCI_up_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_3sigma[t] * TMath::Power( fMinEnergy, fAlpha + 1. ) / TMath::Power( fE0, fAlpha ) );
+	    }
+	  else if( fIntraRunFluxConstantE[i][t] > 0. )
+	    {
+            IntraFlux.push_back( -1./( fAlpha + 1. ) * fIntraFluxConstant[t];
+            IntraFluxE.push_back( -1./( fAlpha + 1. ) * fIntraFluxConstantE[t];
+	    IntraFluxCI_lo_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_1sigma[t];
+	    IntraFluxCI_up_1sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_1sigma[t];
+	    IntraFluxCI_lo_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_lo_3sigma[t];
+	    IntraFluxCI_up_3sigma.push_back( -1./( fAlpha + 1. ) * fIntraFluxCI_up_3sigma[t];
+	    }
+	  else
+	    {
+            IntraFlux.push_back([t] = -99.;
+            IntraFluxE.push_back([t] = -99.;
+	    IntraFluxCI_lo_1sigma.push_back([t] = -99.;
+	    IntraFluxCI_up_1sigma.push_back([t] = -99.;
+	    IntraFluxCI_lo_3sigma.push_back([t] = -99.;
+	    IntraFluxCI_up_3sigma
 
     these values are used to calculate a spectral weighted effective area (good values are important!)
 
@@ -692,13 +933,28 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 	double iTotOffNormN = 0.;
 
         TH1D *hon = 0;
+	TH2D *hon2DtimeBinned = 0;
         TH1D *hoff = 0;
+	TH2D *hoff2DtimeBinned = 0;
+
+	vector < double > IntraNon;
+        vector < double > IntraNoff;
+        vector < double > IntraNdiff;
+	vector < double > IntraNdiffE;
+
 
         char hname[200];
 ///////////////////////////////////////////////////
 // loop over all runs in run list
         for( unsigned int i = 0; i < fRunList.size(); i++ )
         {
+
+	  IntraNon.clear();
+	  IntraNoff.clear();
+	  IntraNdiff.clear();
+	  IntraNdiffE.clear();
+
+
 // calculate number of events above given energy threshold for this run
             if( (int)fRunList[i] > 0 )
             {
@@ -712,10 +968,17 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
                     return;
                 }
                 hon = (TH1D*)gDirectory->Get( "hLinerecCounts_on" );
+		hon2DtimeBinned = (TH2D*)gDirectory->Get( "hLinerecCounts2DtimeBinned_on" );
                 hoff = (TH1D*)gDirectory->Get( "hLinerecCounts_off" );
+		hoff2DtimeBinned = (TH2D*)gDirectory->Get( "hLinerecCounts2DtimeBinned_off" );
                 if( !hon || !hoff )
                 {
                     cout << "error finding counting histogram (energy): " << hon << "\t" << hoff << "\t" << (int)fRunList[i] << endl;
+                    return;
+                }
+		if( !hon2DtimeBinned || !hoff2DtimeBinned )
+                {
+                    cout << "error finding time binned 2D counting histogram (energy): " << hon2DtimeBinned << "\t" << hoff2DtimeBinned << "\t" << (int)fRunList[i] << endl;
                     return;
                 }
 // get number of on events above energy threshold
@@ -726,6 +989,20 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
                     fRunNon[i] += hon->GetBinContent( b );
                 }
                 iTotOn += fRunNon[i];
+// get number of on events above energy threshold in Time BIN
+		for( int t = 0; t < hon2DtimeBinned->GetNbinsY(); t++)
+		{
+		  double Non=0.;
+		  
+		  for( int b = hon2DtimeBinned->GetNbinsX(); b > 0; b-- )
+		  {
+		      if( hon2DtimeBinned->GetXaxis()->GetBinLowEdge( b ) < fMinEnergy ) break;
+		      Non += hon2DtimeBinned->GetBinContent( hon2DtimeBinned->GetBin( b, t+1));
+		     
+		  }
+		  IntraNon.push_back( Non );
+		}
+
 // get number of off events above energy threshold
                 fRunNoff[i] = 0.;
                 for( int b = hoff->GetNbinsX(); b > 0; b-- )
@@ -734,6 +1011,21 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
                     fRunNoff[i] += hoff->GetBinContent( b );
                 }
                 iTotOff += fRunNoff[i];
+
+// get number of off events above energy threshold in Time BIN
+		for( int t = 0; t < hoff2DtimeBinned->GetNbinsY(); t++)
+		{
+		  double Noff=0.;
+		  for( int b = hoff2DtimeBinned->GetNbinsX(); b > 0; b-- )
+		    {
+		      if( hoff2DtimeBinned->GetXaxis()->GetBinLowEdge( b ) < fMinEnergy ) break;
+		      Noff += hoff2DtimeBinned->GetBinContent( hoff2DtimeBinned->GetBin( b, t+1));
+	
+		    }
+		  IntraNoff.push_back( Noff );
+		  IntraNdiff.push_back( IntraNon[t] - IntraNoff[t] * fRunNorm[i] );
+		  IntraNdiffE.push_back ( sqrt( IntraNon[t] + IntraNoff[t] * fRunNorm[i] * fRunNorm[i] ) );}
+
 // mean off norm
 	        if( fRunNorm[i] > 0. )
 		{
@@ -764,7 +1056,16 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 
             if( hon )  gDirectory->RecursiveRemove( hon );
             if( hoff ) gDirectory->RecursiveRemove( hoff );
-        }
+	
+// Fill IntraRun Vectors
+	    fIntraRunNon.push_back( IntraNon );
+	    fIntraRunNoff.push_back( IntraNoff );
+	    fIntraRunNdiff.push_back( IntraNdiff );
+	    fIntraRunNdiffE.push_back( IntraNdiffE );
+
+
+
+	}
         fFile[f]->cd();
     }                                             // end loop over all files
     if( fDebug ) cout << "END: VFluxCalculation::getNumberOfEventsAboveEnergy " << iMinEnergy << endl;
@@ -777,6 +1078,14 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 */
 void VFluxCalculation::calculateSignificancesAndUpperLimits()
 {
+
+  vector < double > IntraUFL;
+  vector < double > IntraSigni;
+  vector < double > IntraCI_lo_1sigma;
+  vector < double > IntraCI_up_1sigma;
+  vector < double > IntraCI_lo_3sigma;
+  vector < double > IntraCI_up_3sigma;
+
     if( fDebug )
     {
         cout << "calculating significances and upper flux limits" << endl;
@@ -792,10 +1101,26 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
+       IntraUFL.clear();
+       IntraSigni.clear();
+       IntraCI_lo_1sigma.clear();
+       IntraCI_up_1sigma.clear();
+       IntraCI_lo_3sigma.clear();
+       IntraCI_up_3sigma.clear();
+	
         if( fRunNorm[i] > 0. )
 	{
 // calculcate significance
 	   fRunSigni[i] = VStatistics::calcSignificance( fRunNon[i], fRunNoff[i], fRunNorm[i], fLiMaEqu );
+
+	   if( i < fIntraRunNon.size() && i < fIntraRunNoff.size() )
+	   {
+	      for( unsigned int t=0; t < fIntraRunNon[i].size();t++ )
+	      {
+	         IntraSigni.push_back( VStatistics::calcSignificance( fIntraRunNon[i][t], fIntraRunNoff[i][t], fRunNorm[i], fLiMaEqu ) );
+              }
+           }
+	   else IntraSigni.push_back( -99. );
 
 // calculate upper flux if necessary
 	   if( fRunSigni[i] < fThresholdSignificance || fRunNon[i] < fMinEvents )
@@ -825,7 +1150,37 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 	       i_Rolke.SetPoissonBkgKnownEff( (int)fRunNon[i], (int)fRunNoff[i], 1./fRunNorm[i], 1. );
 	       fRunCI_lo_3sigma[i] = i_Rolke.GetLowerLimit();
 	       fRunCI_up_3sigma[i] = i_Rolke.GetUpperLimit();
-            }
+	   }
+//Time BINs
+	   if( i < fIntraRunNon.size() && i < fIntraRunNoff.size() )
+	   {
+	     for( unsigned int t = 0; t<fIntraRunNon[i].size();t++)
+	     {
+	       if( IntraSigni[t] < fThresholdSignificance || fIntraRunNon[i][t] < fMinEvents )
+	       {
+	          IntraUFL.push_back( VStatistics::calcUpperLimit( fIntraRunNon[i][t], fIntraRunNoff[i][t], 
+		                                                   fRunNorm[i], fUpperLimit, fUpperLimitMethod ) );
+		  IntraCI_lo_1sigma.push_back( -99. );
+		  IntraCI_up_1sigma.push_back( -99. );
+		  IntraCI_lo_3sigma.push_back( -99. );
+		  IntraCI_up_3sigma.push_back( -99. );
+	       }
+	       else
+	       {
+		  IntraUFL.push_back( -99. );
+// calculate confidence intervals for fluxes
+		  TRolke i_Rolke; 
+		  i_Rolke.SetCLSigmas( 1. );
+		  i_Rolke.SetPoissonBkgKnownEff( (int)fIntraRunNon[i][t], (int)fIntraRunNoff[i][t], 1./fRunNorm[i], 1. );
+		  IntraCI_lo_1sigma.push_back( i_Rolke.GetLowerLimit() );
+		  IntraCI_up_1sigma.push_back( i_Rolke.GetUpperLimit() );
+		  i_Rolke.SetCLSigmas( 3. );
+		  i_Rolke.SetPoissonBkgKnownEff( (int)fIntraRunNon[i][t], (int)fIntraRunNoff[i][t], 1./fRunNorm[i], 1. );
+		  IntraCI_lo_3sigma.push_back( i_Rolke.GetLowerLimit() );
+		  IntraCI_up_3sigma.push_back( i_Rolke.GetUpperLimit() );
+	       }
+             }
+	   }
         }
 	else
 	{
@@ -835,7 +1190,28 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 	   fRunCI_up_1sigma[i] = -99.;
 	   fRunCI_lo_3sigma[i] = -99.;
 	   fRunCI_up_3sigma[i] = -99.;
+	   if( i < fIntraRunNon.size() )
+	   {
+	     for( unsigned int t = 0; t<fIntraRunNon[i].size();t++)
+	     {
+		 IntraSigni.push_back( 99. );
+		 IntraUFL.push_back( -99. );
+		 IntraCI_lo_1sigma.push_back( -99. );
+		 IntraCI_up_1sigma.push_back( -99. );
+		 IntraCI_lo_3sigma.push_back( -99. );
+		 IntraCI_up_3sigma.push_back( -99. );
+	     }
+           }
         }
+	
+	fIntraRunSigni.push_back( IntraSigni );
+	fIntraRunUFL.push_back(	IntraUFL );
+	fIntraRunCI_lo_1sigma.push_back( IntraCI_lo_1sigma );
+	fIntraRunCI_up_1sigma.push_back( IntraCI_up_1sigma );
+	fIntraRunCI_lo_3sigma.push_back( IntraCI_lo_3sigma );
+	fIntraRunCI_up_3sigma.push_back( IntraCI_up_3sigma );
+
+	
     }
 }
 
@@ -1205,6 +1581,8 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
 
     double iMeanFlux = 0.;
 
+    
+    
     int z = 0;
     for( unsigned int i = 0; i < fRunMJD.size(); i++ )
     {
@@ -1213,7 +1591,6 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
             gFluxMJD->SetPoint( z, fRunMJD[i] - iMJDOffset, fRunFlux[i] );
             gFluxMJD->SetPointError( z, fRunTOn[i]/86400./2., fRunFluxE[i] );
             z++;
-
             iV_Run.push_back( (int)fRunList[i] );
             iV_Flux.push_back( fRunFlux[i] );
             iV_FluxE.push_back( fRunFluxE[i] );
@@ -1242,6 +1619,120 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
 
     return gFluxMJD;
 }
+
+// Plot Time Binned Fluxes
+
+TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char *iTex, double iMJDOffset, TCanvas *cFMJD, int iMarkerColor, int iMarkerStyle, bool bDrawAxis)
+{
+    char hname[500];
+
+    string sFluxMult="10^{-7}";
+    double fluxMult = 1.e7;
+
+    if( !cFMJD )
+    {
+        fCanvasFluxesInBINs = new TCanvas( "fCanvasFluxesInBINs", "fluxes vs MJD", 10, 10, 600, 400 );
+        fCanvasFluxesInBINs->SetGridx( 0 );
+        fCanvasFluxesInBINs->SetGridy( 0 );
+        fCanvasFluxesInBINs->Draw();
+        bDrawAxis = true;
+	cFMJD = fCanvasFluxesInBINs;
+    }
+    else fCanvasFluxesInBINs = cFMJD;
+    fCanvasFluxesInBINs->cd();
+
+    TGraphErrors *gFluxInBINs = new TGraphErrors();
+    gFluxInBINs->SetTitle( "" );
+    gFluxInBINs->SetMarkerStyle( iMarkerStyle );
+    gFluxInBINs->SetMarkerColor( iMarkerColor );
+    gFluxInBINs->SetLineColor( iMarkerColor );
+    gFluxInBINs->SetMarkerSize( 2 );
+    gFluxInBINs->SetLineWidth( 2 );
+
+    vector< int > iV_Run;
+    vector< double > iV_Flux;
+    vector< double > iV_FluxE;
+
+    double iMeanFlux = 0.;
+
+    int z = 0;
+
+    // double flux=0;
+
+    if(run < 0)
+    { 
+      cout << "plotFluxesInBINs( int run = -1, char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false )" << endl;
+      cout << "WARNING: run variable < 0 - all runs are plotted " << endl;
+      cout << "run = 0 ... Nruns" << endl;
+
+      for( unsigned int i = 0; i < fRunMJD.size(); i++ ) 
+      { 
+	 if( i < fIntraRunFluxE.size() )
+	 {
+	   for( unsigned int t = 0; t < fIntraRunFlux[i].size(); t++)
+	   {
+	      if( fRunMJD[i] > 10 )
+	      {
+	     
+		  gFluxInBINs->SetPoint( z, fRunMJD[i] - iMJDOffset + (t-(double)(fIntraRunFlux[i].size())/2)*fRunTOn[i]/(double)(fIntraRunFlux[i].size())/86400., fIntraRunFlux[i][t] );
+		  gFluxInBINs->SetPointError( z, fRunTOn[i]/(double)(fIntraRunFlux[i].size())/86400./2., fIntraRunFluxE[i][t] );
+		  z++;
+		  iV_Run.push_back( (int)fRunList[i] );
+		  iV_Flux.push_back( fIntraRunFlux[i][t] );
+		  iV_FluxE.push_back( fIntraRunFluxE[i][t] );
+	      }
+	      else iMeanFlux = fIntraRunFlux[i][t];
+	    }
+          }
+	}
+    }
+    else if( run > 0 )
+    {
+// get run number
+        unsigned iRunIndex = getIndexOfRun( run );
+	if( iRunIndex >= fIntraRunFlux.size() )
+	{
+	   cout << "run not found " << run << endl;
+	   return 0;
+        }
+// loop over all time bins
+	for( unsigned int t = 0; t < fIntraRunFlux[iRunIndex].size(); t++)
+	{
+	   if( fRunMJD[iRunIndex] > 10 )
+	   {
+	     gFluxInBINs->SetPoint( z, fRunMJD[iRunIndex] - iMJDOffset + (t-(double)(fIntraRunFlux[iRunIndex].size())/2)*fRunTOn[iRunIndex]/(double)(fIntraRunFlux[iRunIndex].size())/86400. , fIntraRunFlux[iRunIndex][t] );
+	       gFluxInBINs->SetPointError( z, fRunTOn[iRunIndex]/(double)(fIntraRunFlux[iRunIndex].size())/86400./2., fIntraRunFluxE[iRunIndex][t] );
+	       z++;
+	       iV_Run.push_back( (int)fRunList[iRunIndex] );
+	       iV_Flux.push_back( fIntraRunFlux[iRunIndex][t] );
+	       iV_FluxE.push_back( fIntraRunFluxE[iRunIndex][t] );
+	     }
+	   else iMeanFlux = fIntraRunFlux[iRunIndex][t];
+	 }
+    }
+ 
+    if( bDrawAxis ) gFluxInBINs->Draw( "ap" );
+    else            gFluxInBINs->Draw( "p" );
+    if ( iMJDOffset > 0 ) sprintf( hname, "MJD - %d", (int)iMJDOffset );
+    else                  sprintf( hname, "MJD" );
+    gFluxInBINs->GetHistogram()->SetXTitle( hname );
+    if( fMinEnergy < 1. ) sprintf( hname, "F(E>%d GeV) [cm^{-2}s^{-1}]", (int)(fMinEnergy*1.e3) );
+    else                  sprintf( hname, "F(E>%.1f TeV) [cm^{-2}s^{-1}]", fMinEnergy );
+    gFluxInBINs->GetHistogram()->SetYTitle( hname );
+
+    TLine *iL2 = new TLine( gFluxInBINs->GetHistogram()->GetXaxis()->GetXmin(), 0., gFluxInBINs->GetHistogram()->GetXaxis()->GetXmax(), 0. );
+    iL2->SetLineStyle( 2 );
+    iL2->Draw();
+
+    if( iTex )
+    {
+        sprintf( hname, "   &[$%s$ cm$^{-2}$s$^{-1}$]", sFluxMult.c_str() );
+        writeTexFileForFluxValues( iTex, iV_Run, iV_Flux, iV_FluxE, fluxMult , "run & flux",  "   &[$10^9$ cm$^{-2}$s$^{-1}$]" );
+    }
+
+    return gFluxInBINs;
+}
+
 
 
 /*!
@@ -1454,6 +1945,26 @@ bool VFluxCalculation::readRXTE( string ifile )
     return fRXTE->readFile( ifile, "RXTE", 0., 0. );
 }
 
+bool VFluxCalculation::IsInRunList( int iRun )
+{
+   for( unsigned int i = 0; i < fRunList.size(); i++ )
+   {
+      if( fRunList[i] == iRun ) return true;
+   }
+
+   return false;
+}
+
+unsigned int VFluxCalculation::getIndexOfRun( int iRun )
+{
+   for( unsigned int i = 0; i < fRunList.size(); i++ )
+   {
+      if( fRunList[i] == iRun ) return i;
+   }
+
+   return 99999;
+}
+
 //######################################################################################
 //######################################################################################
 //######################################################################################
@@ -1579,4 +2090,4 @@ bool VXRayData::readFile( string ifile, string tname, double iMJDmin, double iMJ
     if( bDebug ) cout << "END: VXRayData::readFile " << endl;
 
     return true;
-}
+  }

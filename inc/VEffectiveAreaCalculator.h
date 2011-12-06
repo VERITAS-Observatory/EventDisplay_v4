@@ -18,6 +18,7 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "TGraphErrors.h"
+#include "TGraph2DErrors.h"
 #include "TGraphAsymmErrors.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -39,6 +40,9 @@ class VEffectiveAreaCalculator
     private:
         double degrad;
         double raddeg;
+	vector< vector< double > > fEffArea_time_EMC;
+	vector< vector< double > > fEffArea_time_Erec;
+	vector< double > timebins;
 
         bool bNOFILE;
         TDirectory *fGDirectory;
@@ -62,11 +66,17 @@ class VEffectiveAreaCalculator
         map< unsigned int, vector< double > > fEff_EsysMCRelative;
         map< unsigned int, vector< double > > fEff_EsysMCRelativeE;
         unsigned int fNMeanEffectiveAreaEMC;
+	unsigned int fNTimeBinnedMeanEffectiveAreaEMC;
         vector< double > fVMeanEffectiveAreaEMC;
+	vector< double > fVTimeBinnedMeanEffectiveAreaEMC;
         TGraphAsymmErrors *gMeanEffectiveAreaEMC;
+	TGraph2DErrors *gTimeBinnedMeanEffectiveAreaEMC;
         unsigned int fNMeanEffectiveAreaErec;
+	unsigned int fNTimeBinnedMeanEffectiveAreaErec;
         vector< double > fVMeanEffectiveAreaErec;
+	vector< double > fVTimeBinnedMeanEffectiveAreaErec;
         TGraphAsymmErrors *gMeanEffectiveAreaErec;
+	TGraph2DErrors *gTimeBinnedMeanEffectiveAreaErec;
         TGraphErrors *gMeanSystematicErrorGraph;
 
         vector< double > fAreaRadius;
@@ -214,6 +224,9 @@ class VEffectiveAreaCalculator
         double getEffectiveArea( double erec, double ze, double iWoff, double iPedvar, double iSpectralIndex = -2.5,
 	                         bool bAddtoMeanEffectiveArea = true, bool iEffectiveAreaVsEnergyMC = false );
         TGraphAsymmErrors* getMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC = true );
+	TGraph2DErrors* getTimeBinnedMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC = true);
+	void setTimeBinnedMeanEffectiveAreaErec();
+	void setTimeBinnedMeanEffectiveAreaEMC();
         void initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
         void resetHistograms( unsigned int iZe );
         void resetHistogramsVectors( unsigned int iZe );
@@ -225,5 +238,7 @@ class VEffectiveAreaCalculator
         void setIgnoreEnergyReconstructionCuts( bool iB = false ) { fIgnoreEnergyReconstruction = iB; }
         void setIsotropicArrivalDirections( bool iB = false ) { fIsotropicArrivalDirections = iB; }
         void setAzimuthCut( int iAzBin, double iAzMin, double iAzMax );
+	void resetTimeBin();
+	void setTimeBin(double time);
 };
 #endif

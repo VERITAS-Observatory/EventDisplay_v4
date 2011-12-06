@@ -64,6 +64,7 @@ class VAnaSum
         double getAzRange( int i_run, string i_treename, double &azmin, double &azmax );
         double getNoiseLevel( int i_run, double iNoiseLevel );
         void makeEnergySpectrum( int ionrun, TList*, double );
+	void make2DEnergySpectrum( int ionrun, TList* l);
 
         bool bTotalAnalysisOnly;
         bool bUpdateAnalysis;

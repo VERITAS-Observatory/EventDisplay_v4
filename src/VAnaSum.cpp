@@ -764,6 +764,8 @@ void VAnaSum::makeEnergySpectrum( int ionrun, TList* l, double it )
 // divide by elapsed time
 // (expect time in seconds)
         if( it <= 0. ) it = 1.;
+	// set time intevall for 2D histo
+	if( itemp.find( "2D" ) < itemp.size() ) {it = fStereoOn->getRateTimeIntervall()[0];}
         h->Scale( 1./it );
 // apply dead time correction
         if( fStereoOn->getDeadTimeFraction() > 0. ) h->Scale( 1.+fStereoOn->getDeadTimeFraction() );
@@ -773,6 +775,61 @@ void VAnaSum::makeEnergySpectrum( int ionrun, TList* l, double it )
 // expect energy axis in [TeV]
         double elow = 0.;
         double ehigh = 0.;
+
+
+// Set Energy Bins for 2D
+
+   if( itemp.find( "2D" ) < itemp.size() )
+   {
+// linear energy axis                                                                                                                                                                                      
+   if( itemp.find( "Lin" ) < itemp.size() )
+     {
+       for( int i = 1; i <= h->GetNbinsX(); i++ )
+	 {
+	   for( int j = 1; j <= h->GetNbinsY(); j++)
+	     {
+	       elow = h->GetBinLowEdge( i );
+	       ehigh = h->GetBinLowEdge( i ) +h->GetBinWidth( i );
+
+	       if( ehigh - elow > 0. )
+		 {
+
+		   h->SetBinContent( h->GetBin(i,j), h->GetBinContent( h->GetBin(i,j) ) / (ehigh - elow) );
+		   
+		   h->SetBinError( h->GetBin(i,j), h->GetBinError( h->GetBin(i,j) ) / (ehigh - elow) );
+		
+		 }
+	     }
+	 }
+	   
+     }
+   else
+     {
+       // logarithmic energy axis                                                                                                                                                                                 
+       for( int i = 1; i <= h->GetNbinsX(); i++ )
+	 {
+	   for( int j = 1 ; j<= h->GetNbinsY(); j++)
+	     {
+		  
+	       elow = pow( 10., h->GetBinLowEdge( i ) );
+	       ehigh = pow( 10., h->GetBinLowEdge( i )+h->GetBinWidth( i ) );
+
+	       if( ehigh - elow > 0. )
+		 {
+		
+		   h->SetBinContent( h->GetBin(i,j), h->GetBinContent( h->GetBin(i,j) ) / (ehigh - elow) );
+		   h->SetBinError( h->GetBin(i,j), h->GetBinError(h->GetBin( i,j) ) / (ehigh - elow) );
+		
+		 }
+	     }
+	 }
+	    
+	    
+       
+     }
+
+   continue;
+ }
 
 // linear energy axis
         if( itemp.find( "Lin" ) < itemp.size() )

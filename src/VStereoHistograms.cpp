@@ -9,15 +9,18 @@
 
 #include "VStereoHistograms.h"
 
-VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, bool iIsOn )
+VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, double iTimeBinSize, double iTimeMin, double iTimeMax, bool iIsOn )
 {
-//   defineHistograms( i_count, irun, i_hsuffix, ibinsize, ibinsizeUC, iEnergyBinSize, iIsOn );
+//   defineHistograms( i_count, irun, i_hsuffix, ibinsize, ibinsizeUC, iEnergyBinSize, iIsOn );                                                                                                            
 
     bIsOn = iIsOn;
     fHisSuffix = i_hsuffix;
     fBinSize = ibinsize;
     fBinSizeUC = ibinsizeUC;
     fBinSizeEnergy = iEnergyBinSize;
+    fBinSizeTime = iTimeBinSize;
+    fTimeMin = iTimeMin;
+    fTimeMax = iTimeMax;
 
     fSkyMapSizeXmin = -2.;
     fSkyMapSizeXmax =  2.;
@@ -90,6 +93,10 @@ void VStereoHistograms::defineHistograms()
     double i_Linemin = 0.05;
     double i_Linemax = 50.;
     int    i_Linebin = int((i_Linemax-i_Linemin)/0.01);
+// 2D time binning
+    double i_tmin = fTimeMin; 
+    double i_tmax = fTimeMax; 
+    int i_tbin = int((i_tmax-i_tmin)/fBinSizeTime + 0.5); 
 
     sprintf(i_key,"htheta2_%s", fHisSuffix.c_str());
     sprintf( i_name, "#theta^{2} Histogram (%s)", fHisSuffix.c_str());
@@ -306,6 +313,29 @@ void VStereoHistograms::defineHistograms()
     hListEnergyHistograms->Add( herec );
     hListNameofParameterHistograms["herec"] = herec;
 
+//! setup 2D energy histogram (logarithmic energy axis)                                                                                                                                                       
+    sprintf(i_key,"herec2DtimeBinned_%s", fHisSuffix.c_str());
+    sprintf( i_name, "energy spectrum (%s)", fHisSuffix.c_str());
+    herec2DtimeBinned = new TH2D( i_key, i_name, i_ebin, i_emin, i_emax, i_tbin, 0 , i_tmax-i_tmin );
+    herec2DtimeBinned->SetXTitle( "log_{10} energy [TeV]" );
+    herec2DtimeBinned->SetZTitle( "dN/dE [cm^{-2} s^{-1} TeV^{-1}]" );
+    herec2DtimeBinned->SetYTitle( "time [s]");
+    hisList->Add( herec2DtimeBinned );
+    hListParameterHistograms->Add( herec2DtimeBinned );
+    hListEnergyHistograms->Add( herec2DtimeBinned );
+    hListNameofParameterHistograms["herec2DtimeBinned"] = herec2DtimeBinned;
+
+    sprintf(i_key,"herecCounts2DtimeBinned_%s", fHisSuffix.c_str());
+    sprintf( i_name, "counting histogram (energy) (%s)", fHisSuffix.c_str());
+    herecCounts2DtimeBinned = new TH2D( i_key, i_name, i_ebin, i_emin, i_emax, i_tbin, 0, i_tmax-i_tmin );
+    herecCounts2DtimeBinned->SetXTitle( "log_{10} energy [TeV]" );
+    herecCounts2DtimeBinned->SetZTitle( "No. of events" );
+    herecCounts2DtimeBinned->SetYTitle( "time [s]");
+    hisList->Add( herecCounts2DtimeBinned );
+    hListParameterHistograms->Add( herecCounts2DtimeBinned );
+    hListEnergyHistograms->Add( herecCounts2DtimeBinned );
+    hListNameofParameterHistograms["herecCounts2DtimeBinned"] = herecCounts2DtimeBinned;
+
     sprintf(i_key,"herecCounts_%s", fHisSuffix.c_str());
     sprintf( i_name, "counting histogram (energy) (%s)", fHisSuffix.c_str());
     herecCounts = new TH1D( i_key, i_name, i_ebin, i_emin, i_emax );
@@ -325,6 +355,17 @@ void VStereoHistograms::defineHistograms()
     hListParameterHistograms->Add( herecRaw );
     hListEnergyHistograms->Add( herecRaw );
     hListNameofParameterHistograms["herecRaw"] = herecRaw;
+
+    sprintf(i_key,"herecRaw2DtimeBinned_%s", fHisSuffix.c_str());
+    sprintf( i_name, "differential unweighted energy spectrum (%s)", fHisSuffix.c_str());
+    herecRaw2DtimeBinned = new TH2D( i_key, i_name, i_ebin, i_emin, i_emax , i_tbin, 0 , i_tmax-i_tmin );
+    herecRaw2DtimeBinned->SetXTitle( "log_{10} energy [TeV]" );
+    herecRaw2DtimeBinned->SetZTitle( "dN/dE [TeV^{-1}]" );
+    herecRaw2DtimeBinned->SetYTitle( "time [s]");
+    hisList->Add( herecRaw2DtimeBinned );
+    hListParameterHistograms->Add( herecRaw2DtimeBinned );
+    hListEnergyHistograms->Add( herecRaw2DtimeBinned );
+    hListNameofParameterHistograms["herecRaw2DtimeBinned"] = herecRaw2DtimeBinned;
 
     sprintf(i_key,"herecWeights_%s", fHisSuffix.c_str());
     sprintf( i_name, "effective area vs. raw energy (%s)", fHisSuffix.c_str());
@@ -357,6 +398,16 @@ void VStereoHistograms::defineHistograms()
     hListEnergyHistograms->Add( hLinerec );
     hListNameofParameterHistograms["hLinerec"] = hLinerec;
 
+    sprintf(i_key,"hLinerec2DtimeBinned_%s", fHisSuffix.c_str());
+    sprintf( i_name, "energy spectrum (%s)", fHisSuffix.c_str());
+    hLinerec2DtimeBinned = new TH2D( i_key, i_name, i_Linebin, i_Linemin, i_Linemax, i_tbin, 0, i_tmax-i_tmin );
+    hLinerec2DtimeBinned->SetXTitle( "energy [TeV]" );
+    hLinerec2DtimeBinned->SetZTitle( "dN/dE [cm^{-2} s^{-1} TeV^{-1}]" );
+    hLinerec2DtimeBinned->SetYTitle( "time [s]");
+    hisList->Add( hLinerec2DtimeBinned );
+    hListParameterHistograms->Add( hLinerec2DtimeBinned );
+    hListEnergyHistograms->Add( hLinerec2DtimeBinned );
+    hListNameofParameterHistograms["hLinerec2DtimeBinned"] = hLinerec2DtimeBinned;
     sprintf(i_key,"hLinerecCounts_%s", fHisSuffix.c_str());
     sprintf( i_name, "counting histogram (energy) (%s)", fHisSuffix.c_str());
     hLinerecCounts = new TH1D( i_key, i_name, i_Linebin, i_Linemin, i_Linemax );
@@ -367,6 +418,16 @@ void VStereoHistograms::defineHistograms()
     hListEnergyHistograms->Add( hLinerecCounts );
     hListNameofParameterHistograms["hLinerecCounts"] = hLinerecCounts;
 
+    sprintf(i_key,"hLinerecCounts2DtimeBinned_%s", fHisSuffix.c_str());
+    sprintf( i_name, "counting histogram (energy) (%s)", fHisSuffix.c_str());
+    hLinerecCounts2DtimeBinned = new TH2D( i_key, i_name, i_Linebin, i_Linemin, i_Linemax, i_tbin, 0, i_tmax-i_tmin );
+    hLinerecCounts2DtimeBinned->SetXTitle( "energy [TeV]" );
+    hLinerecCounts2DtimeBinned->SetZTitle( "No. of events" );
+    hLinerecCounts2DtimeBinned->SetYTitle( "time [s]");
+    hisList->Add( hLinerecCounts2DtimeBinned );
+    hListParameterHistograms->Add( hLinerecCounts2DtimeBinned );
+    hListEnergyHistograms->Add( hLinerecCounts2DtimeBinned );
+    hListNameofParameterHistograms["hLinerecCounts2DtimeBinned"] = hLinerecCounts2DtimeBinned;
     sprintf(i_key,"hLinerecRaw_%s", fHisSuffix.c_str());
     sprintf( i_name, "differential unweighted energy spectrum (%s)", fHisSuffix.c_str());
     hLinerecRaw = new TH1D( i_key, i_name, i_Linebin, i_Linemin, i_Linemax );
@@ -377,6 +438,16 @@ void VStereoHistograms::defineHistograms()
     hListEnergyHistograms->Add( hLinerecRaw );
     hListNameofParameterHistograms["hLinerecRaw"] = hLinerecRaw;
 
+    sprintf(i_key,"hLinerecRaw2DTimeBinned_%s", fHisSuffix.c_str());
+    sprintf( i_name, "differential unweighted energy spectrum (%s)", fHisSuffix.c_str());
+    hLinerecRaw2DtimeBinned = new TH2D( i_key, i_name, i_ebin, i_emin, i_emax , i_tbin, 0, i_tmax-i_tmin );
+    hLinerecRaw2DtimeBinned->SetXTitle( "log_{10} energy [TeV]" );
+    hLinerecRaw2DtimeBinned->SetZTitle( "dN/dE [TeV^{-1}]" );
+    hLinerecRaw2DtimeBinned->SetYTitle( "time [s]");
+    hisList->Add( hLinerecRaw2DtimeBinned );
+    hListParameterHistograms->Add( hLinerecRaw2DtimeBinned );
+    hListEnergyHistograms->Add( hLinerecRaw2DtimeBinned );
+    hListNameofParameterHistograms["hLinerecRaw2DtimeBinned"] = hLinerecRaw2DtimeBinned;
     sprintf(i_key,"hLinerecWeights_%s", fHisSuffix.c_str());
     sprintf( i_name, "effective area vs. raw energy (%s)", fHisSuffix.c_str());
     hLinerecWeights = new TH2D(  i_key, i_name, i_Linebin, i_Linemin, i_Linemax, 140, 1., 7. );
