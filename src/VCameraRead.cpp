@@ -674,9 +674,10 @@ void VCameraRead::fillTelescopeVectors()
     }
 }
 
-
+//void VCameraRead::print( bool bDetailed ){};
 void VCameraRead::print( bool bDetailed )
 {
+  if( fDebug ) cout << "VCameraRead::print()" << endl;
     cout << "Number of telescopes: " << fNTel << endl;
     cout << "telescope positions: " << endl;
     for( unsigned int i = 0; i < fTelXpos.size(); i++ )
@@ -1003,6 +1004,7 @@ vector<ULong64_t> VCameraRead::getTelType_list()
 */
 bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRotationsFromDB )
 {
+  if(fDebug) cout << "VCameraRead::readDetectorGeometryFromDB" << endl;
     cout << "VCameraRead::readDetectorGeometryFromDB for " << iDBStartTime;
     if( iReadRotationsFromDB ) cout << " (read rotations)";
     cout << endl;
@@ -1025,7 +1027,7 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 	   cout << "\t server: " <<  iTempS.str() << endl;
 	   return false;
        }
-       char c_query[100];
+       char c_query[200];
        sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
 
        TSQLResult *db_res = i_DB->Query( c_query );
@@ -1070,6 +1072,6 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 
 // rotate the camera
     rotateCamera();
-
+    if( fDebug ) cout << "rotateCamera() Finished" << endl;
     return true;
 }
