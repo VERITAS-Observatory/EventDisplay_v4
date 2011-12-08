@@ -1669,11 +1669,16 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
                         {
                             getRunParameter()->fPedLowGainFileNumber[i] = atoi( iLowGainPeds.c_str() );
                         }
-                        else if( iLowGainPeds == "-2" && i < getRunParameter()->fPedLowGainFileNumber.size() && getRunParameter()->fPedLowGainFileNumber[i] > 0 )
+                        else if( iLowGainPeds == "-2"
+			        && i < getRunParameter()->fPedLowGainFileNumber.size() && getRunParameter()->fPedLowGainFileNumber[i] > 0 )
                         {
                             ostringstream s_temp;
                             s_temp << getRunParameter()->fPedLowGainFileNumber[i];
                             fLowGainPedFileNameC[i] = s_temp.str();
+                        }
+			else if( iLowGainPeds == "-1" )
+			{
+			   getRunParameter()->fPedLowGainFileNumber[i] = atoi( iLowGainPeds.c_str() );
                         }
                         if( fCalibrationfileVersion > 2 && iLowGainMultiplier != "-1" )
                         {

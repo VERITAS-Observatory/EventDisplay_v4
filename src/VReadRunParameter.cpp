@@ -482,7 +482,12 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
                 return false;
             }
 // MC grisu file
-            if( fRunPara->fsourcetype == 1 || fRunPara->fsourcetype == 2 || fRunPara->fsourcetype == 5 || fRunPara->fsourcetype == 6 || fRunPara->fsourcetype == 7 ) fRunPara->fIsMC = 1;
+            if( fRunPara->fsourcetype == 1 || fRunPara->fsourcetype == 2 
+	     || fRunPara->fsourcetype == 5 || fRunPara->fsourcetype == 6 
+	     || fRunPara->fsourcetype == 7 ) 
+	     {
+	        fRunPara->fIsMC = 1;
+             }
         }
 // fill some diagnostic histograms
         else if( iTemp.find( "fill" ) < iTemp.size() )
@@ -1506,6 +1511,7 @@ bool VReadRunParameter::getRunParametersFromDST()
     {
         return false;
     }
+    if( fDebug ) cout << "VReadRunParameter::getRunParametersFromDST() " << endl;
 
 // open dst file
     TFile iF( fRunPara->fsourcefile.c_str() );
