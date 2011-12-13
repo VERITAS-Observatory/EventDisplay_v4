@@ -14,15 +14,13 @@ MET=$5
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
    echo ""
-   echo "./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh <tablefile> <recid> <subarray>"
+   echo "./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh <tablefile> <recid> <subarray list>"
    echo "(table files without .root)"
    echo ""
    echo "submit jobs in paralell to analyse MC files with lookup tables"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "  <recid>         reconstruction ID"
-   echo "  <subarray>      subarray identifier (A,B,C...)"
-   echo "                  use ALL for all arrays (A B C D E F G H I J K NA NB)"
    echo ""
    exit
 fi

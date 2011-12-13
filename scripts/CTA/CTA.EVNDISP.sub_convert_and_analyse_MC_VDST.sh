@@ -107,7 +107,7 @@ do
       qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    else
       echo "short queue"
-      qsub -l h_cpu=08:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+      qsub -l h_cpu=00:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    fi
 
    echo "writing shell script to $FNAM.sh"
