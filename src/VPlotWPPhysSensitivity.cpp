@@ -17,19 +17,25 @@ void VPlotWPPhysSensitivity::addAnalysis( string iAnalysis, int iColor, int iLin
    fAnalysisLineStyle.push_back( iLineStyle );
 }
 
-void VPlotWPPhysSensitivity::addCameraOffset( double iCameraOffset_deg )
+void VPlotWPPhysSensitivity::addCameraOffset( double iCameraOffset_deg, int iColor, int iLineStyle )
 {
    fCameraOffset_deg.push_back( iCameraOffset_deg );
+   fCameraOffsetColor.push_back( iColor );
+   fCameraOffsetLineStyle.push_back( iLineStyle );
 }
 
-void VPlotWPPhysSensitivity::addObservationTime( double iObsTime )
+void VPlotWPPhysSensitivity::addObservationTime( double iObsTime, int iColor, int iLineStyle )
 {
    fObservationTime_H.push_back( iObsTime );
+   fObservationTimeColor.push_back( iColor );
+   fObservationTimeLineStyle.push_back( iLineStyle );
 }
 
-void VPlotWPPhysSensitivity::addSubArray( string iArray )
+void VPlotWPPhysSensitivity::addSubArray( string iArray, int iColor, int iLineStyle )
 {
    fSubArray.push_back( iArray );
+   fSubArrayColor.push_back( iColor );
+   fSubArrayLineStyle.push_back( iLineStyle );
 }
 
 bool VPlotWPPhysSensitivity::initialize()
@@ -63,7 +69,8 @@ bool VPlotWPPhysSensitivity::initialize()
 	       if( fObservationTime_H[t] > 1. ) sprintf( hname, "%d", (int)fObservationTime_H[t] );
 	       else                             sprintf( hname, "%.1f", fObservationTime_H[t] );
 	       iTemp << "IFAEPerformanceBCDEINANB_Nov2011/Subarray" << fSubArray[a];
-	       iTemp << "_IFAE_" << hname << "hours_20111109.root";
+	       if( fSubArray[a] == "B" || fSubArray[a] == "C" ) iTemp << "_IFAE_" << hname << "hours_20111121.root";
+	       else                                             iTemp << "_IFAE_" << hname << "hours_20111109.root";
 	    }
 	    else if( fAnalysis[i] == "IFAE_OFFAXIS" )
 	    {
@@ -96,7 +103,20 @@ bool VPlotWPPhysSensitivity::initialize()
 	       fSensitivityFile.push_back( iTemp.str() );
 	       sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
 	       fLegend.push_back( hname );
-	       fPlottingColor.push_back( fAnalysisColor[i] );
+// plotting colors and line styles (note hierarchy)
+               if( fAnalysisColor[i] > 0 )
+	       {
+		  fPlottingColor.push_back( fAnalysisColor[i] );
+               }
+	       else if( fSubArrayColor[a] > 0 )
+	       {
+		  fPlottingColor.push_back( fSubArrayColor[a] );
+               }
+	       else
+	       {
+	         fPlottingColor.push_back( 1 );
+               }
+	       cout << "COLORS " << fAnalysisColor[i] << "\t" << fSubArrayColor[a] << fPlottingColor.back() << endl;
 	       if( fAnalysisLineStyle[i] > 0 ) fPlottingLineStyle.push_back( fAnalysisLineStyle[i] );
 	       else                            fPlottingLineStyle.push_back( t+1 );
 	       fIRFCameraOffset_deg.push_back( 0. );
@@ -115,9 +135,48 @@ bool VPlotWPPhysSensitivity::initialize()
 	             sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t], fCameraOffset_deg[c] );
                   }
 		  fLegend.push_back( hname );
-		  fPlottingColor.push_back( fAnalysisColor[i] );
-		  if( fAnalysisLineStyle[i] > 0 ) fPlottingLineStyle.push_back( fAnalysisLineStyle[i] );
-		  else                            fPlottingLineStyle.push_back( t+1 );
+// plotting colors and line styles (note hierarchy)
+		  if( fAnalysisColor[i] > 0 )
+		  {
+		     fPlottingColor.push_back( fAnalysisColor[i] );
+		  }
+		  else if( fSubArrayColor[a] > 0 )
+		  {
+		     fPlottingColor.push_back( fSubArrayColor[a] );
+		  }
+		  else if( fCameraOffsetColor[c] > 0 )
+		  {
+		     fPlottingColor.push_back( fCameraOffsetColor[c] );
+                  }
+		  else if( fObservationTimeColor[t] > 0 )
+		  {
+		     fPlottingColor.push_back( fObservationTimeColor[t] );
+                  }
+		  else
+		  {
+		    fPlottingColor.push_back( 1 );
+		  }
+		  if( fAnalysisLineStyle[i] > 0 )
+		  {
+		     fPlottingLineStyle.push_back( fAnalysisLineStyle[i] );
+		  }
+		  else if( fSubArrayLineStyle[a] > 0 )
+		  {
+		     fPlottingLineStyle.push_back( fSubArrayLineStyle[a] );
+		  }
+		  else if( fCameraOffsetLineStyle[c] > 0 )
+		  {
+		     fPlottingLineStyle.push_back( fCameraOffsetLineStyle[c] );
+                  }
+		  else if( fObservationTimeLineStyle[t] > 0 )
+		  {
+		     fPlottingLineStyle.push_back( fObservationTimeLineStyle[t] );
+                  }
+		  else
+		  {
+		    fPlottingLineStyle.push_back( t+1 );
+		  }
+
 		  fIRFCameraOffset_deg.push_back( fCameraOffset_deg[c] );
                }
             }
@@ -134,7 +193,7 @@ bool VPlotWPPhysSensitivity::initialize()
    return true;
 }
   
-bool VPlotWPPhysSensitivity::plotIRF()
+bool VPlotWPPhysSensitivity::plotIRF( string iPrint )
 {
     fIRF = new VPlotInstrumentResponseFunction();
 
@@ -149,16 +208,33 @@ bool VPlotWPPhysSensitivity::plotIRF()
                                         fPlottingColor[i], fPlottingLineStyle[i], 21, 0.5 );
     }
 
+    char hname[2000];
+
     TCanvas *c = 0;
 
     c = fIRF->plotEffectiveArea();
     plotLegend( c, true );
+    if( iPrint.size() > 0 )
+    {
+       sprintf( hname, "%s-EffArea.eps", iPrint.c_str() );
+       if( c ) c->Print( hname );
+    }
     c = fIRF->plotAngularResolution();
     plotLegend( c, false );
+    if( iPrint.size() > 0 )
+    {
+       sprintf( hname, "%s-AngRes.eps", iPrint.c_str() );
+       if( c ) c->Print( hname );
+    }
     c = fIRF->plotAngularResolution( "energy", "80" );
     plotLegend( c, false );
     c = fIRF->plotEnergyResolution( 0.5 );
     plotLegend( c, false );
+    if( iPrint.size() > 0 )
+    {
+       sprintf( hname, "%s-ERes.eps", iPrint.c_str() );
+       if( c ) c->Print( hname );
+    }
 
     return true;
 }
@@ -186,7 +262,7 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown )
    return true; 
 }
 
-bool VPlotWPPhysSensitivity::plotSensitivity()
+bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint )
 {
    string iCrabFile = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
    unsigned int iCrabID = 6;
@@ -206,8 +282,27 @@ bool VPlotWPPhysSensitivity::plotSensitivity()
       else         c_temp = a->plotSignalBackgroundRates( cBck, false );
       if( c_temp ) cBck = c_temp;
    }
-   if( cSens ) plotLegend( cSens, false );
-   if( cBck )  plotLegend( cBck, false );
+   if( cSens )
+   {
+      plotLegend( cSens, false );
+      if( iPrint.size() > 0 )
+      {
+	  char hname[2000];
+	  sprintf( hname, "%s-Sensitivity.eps", iPrint.c_str() );
+	  if( cSens ) cSens->Print( hname );
+      }
+   }
+   if( cBck )
+   {
+      plotLegend( cBck, false );
+      if( iPrint.size() > 0 )
+      {
+	  char hname[2000];
+	  sprintf( hname, "%s-BRates.eps", iPrint.c_str() );
+	  if( cBck ) cBck->Print( hname );
+      }
+   }
+
 
    return true;
 }

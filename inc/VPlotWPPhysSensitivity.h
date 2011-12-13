@@ -27,8 +27,14 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    vector< int >    fAnalysisColor;
    vector< int >    fAnalysisLineStyle;
    vector< double > fObservationTime_H;
+   vector< int >    fObservationTimeColor;
+   vector< int >    fObservationTimeLineStyle;
    vector< string > fSubArray;
+   vector< int >    fSubArrayColor;
+   vector< int >    fSubArrayLineStyle;
    vector< double > fCameraOffset_deg;
+   vector< int >    fCameraOffsetColor;
+   vector< int >    fCameraOffsetLineStyle;
 
    vector< string > fSensitivityFile;   // [Analysis][SubArray+SObsTime];
    vector< double > fIRFCameraOffset_deg;
@@ -43,13 +49,13 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    VPlotWPPhysSensitivity();
   ~VPlotWPPhysSensitivity() {}
 
-   void addAnalysis( string iAnalysis, int iColor = 1, int iLineStyle = -1 );           // NOTE: hardwired analysis file names
-   void addCameraOffset( double iCameraOffset_deg = 0. );
-   void addObservationTime( double iObsTime );
-   void addSubArray( string iArray );
+   void addAnalysis( string iAnalysis, int iColor = -1, int iLineStyle = -1 );           // NOTE: hardwired analysis file names
+   void addCameraOffset( double iCameraOffset_deg = 0., int iColor = -1, int iLineStyle = -1 );
+   void addObservationTime( double iObsTime, int iColor = -1, int iLineStyle = -1 );
+   void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1 );
    bool initialize();
-   bool plotIRF();
-   bool plotSensitivity();
+   bool plotIRF( string iPrint = "" );
+   bool plotSensitivity( string iPrint = "" );
 
 };
 

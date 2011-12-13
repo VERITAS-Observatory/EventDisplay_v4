@@ -2380,7 +2380,7 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas *c, bool bPl
       h->SetMaximum( iRateMaximum );
       h->SetMinimum( iRateMinimum );
       h->SetXTitle( "log_{10} energy [TeV]" );
-      h->SetYTitle( "rate [1/s]" );
+      h->SetYTitle( "background rate [1/s]" );
       plot_nullHistogram( c, h, true, true, 1.7, TMath::Power( 10., fEnergy_min_Log ), TMath::Power( 10., fEnergy_max_Log ) );
       c->SetLogy( 1 );
    }
