@@ -479,6 +479,7 @@ void VCamera::setPMTColorForChargeTiming()
                 fgraphTubesEntry[i]->SetFillColor( fColorBorder );
                 if( fBoolAllinOne )
                 {
+		    cout << "XX " << iTelescopeColor << endl;
                     fgraphTubesEntry[i]->SetLineColor( iTelescopeColor );
                     fgraphTubesEntry[i]->SetFillColor( iTelescopeColor );
                 }
@@ -681,7 +682,7 @@ void VCamera::drawEventText()
         fTextMC[3]->SetTitle( iText );
         sprintf( iText, "Ycos: %.3f (Az: %.2f)", fData->getShowerParameters()->MCycos, fData->getShowerParameters()->MCaz );
         fTextMC[4]->SetTitle( iText );
-        sprintf( iText, "X_{off}: %.3f Y_{off}: %.3f", fData->getShowerParameters()->MCTel_Yoff, fData->getShowerParameters()->MCTel_Yoff );
+        sprintf( iText, "X_{off}: %.3f Y_{off}: %.3f", fData->getShowerParameters()->MCTel_Xoff, fData->getShowerParameters()->MCTel_Yoff );
         fTextMC[5]->SetTitle( iText );
         i_TextY = 0.25;
         for( unsigned int i = 0; i < fTextMC.size(); i++ )

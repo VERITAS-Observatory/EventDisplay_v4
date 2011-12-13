@@ -511,10 +511,11 @@ void writeAllParticleNumberFiles( char *iSubArrayFile = 0,
 
       sprintf( iParticleNumberFile, "ParticleNumbers.%s.0.root", SubArray[i].c_str() );
 
-      writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+//      writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
 
 // offset files
-      for( int j = 1; j < iOffSetCounter; j++ ) // use first bin on source particle file
+//      for( int j = 1; j < iOffSetCounter; j++ ) // use first bin on source particle file
+      for( int j = 8; j < iOffSetCounter; j++ ) // use first bin on source particle file
       {
 	 sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_cone10, SubArray[i].c_str(), iRecID, j );
 	 sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, j );

@@ -41,6 +41,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool                             getDataFromFile();
     bool                             getDataFromCTAFile();
     void                             getEnergyResolutionPlot( TProfile *iP, int i_rebin = 2, double iMinEnergy = -10. );
+    void                             getEnergyResolutionPlot( TH2D *iP, int i_rebin = 2, double iMinEnergy = -10. );
 
     bool                             initializeIRFData();
 
@@ -77,6 +78,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TH2D *hERecMatrix;
 // e_rec/e_mc
     TH2D *hEsysMCRelative2D;
+    TProfile *hEsysMCRelative;
 // 2D energy error distribution
     TH2D *hEsys;
 // energy resolution
@@ -118,7 +120,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 4 );
+    ClassDef( VInstrumentResponseFunctionReader, 5 );
 };
 
 

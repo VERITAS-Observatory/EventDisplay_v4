@@ -157,8 +157,14 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     sprintf( hname, "hEsysMCRelative" );
     hEsysMCRelative = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
     hEsysMCRelative->SetXTitle( "energy_{MC} [TeV]" );
-    hEsysMCRelative->SetYTitle( "systematic error E_{rec}/E_{MC}" );
+    hEsysMCRelative->SetYTitle( "systematic error (E_{rec}-E_{MC})/E_{MC}" );
     hisTreeList->Add( hEsysMCRelative );
+
+    sprintf( hname, "hEsysMCRelativeRMS" );
+    hEsysMCRelativeRMS = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 3000, -5., 5. );
+    hEsysMCRelativeRMS->SetXTitle( "energy_{MC} [TeV]" );
+    hEsysMCRelativeRMS->SetYTitle( "systematic error (E_{rec}-E_{MC})/E_{MC}" );
+    hisTreeList->Add( hEsysMCRelativeRMS );
 
 // use CTA WP Phys binning
     sprintf( hname, "hEsysMCRelative2D" );
@@ -356,6 +362,16 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
             else                  iT_TProfile.push_back( 0 );
         }
         hVEsysMCRelative.push_back( iT_TProfile );
+
+        iT_TH2D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
+            sprintf( hname, "hVEsysMCRelativeRMS_%d_%d", i, j );
+            if( hEsysMCRelativeRMS ) iT_TH2D.push_back( (TH2D*)hEsysMCRelativeRMS->Clone( hname ) );
+            else          iT_TH2D.push_back( 0 );
+        }
+        hVEsysMCRelativeRMS.push_back( iT_TH2D );
+
 
         iT_TH2D.clear();
         for( unsigned int j = 0; j < fVMinAz.size(); j++ )
@@ -1500,6 +1516,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                if( hVEsysRec[s][i_az] )          hVEsysRec[s][i_az]->Fill( eRec, eRec - eMC );
                if( hVEsysMC[s][i_az] )           hVEsysMC[s][i_az]->Fill( eMC, eRec - eMC );
                if( hVEsysMCRelative[s][i_az] )   hVEsysMCRelative[s][i_az]->Fill( eMC, (eRecLin-d->MCe0) / d->MCe0 );
+               if( hVEsysMCRelativeRMS[s][i_az] )   hVEsysMCRelativeRMS[s][i_az]->Fill( eMC, (eRecLin-d->MCe0) / d->MCe0 );
                if( hVEsysMCRelative2D[s][i_az] ) hVEsysMCRelative2D[s][i_az]->Fill( eMC, eRecLin / d->MCe0 );
                if( hVEsys2D[s][i_az] )           hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
                if( hVEmcCut[s][i_az] )           hVEmcCut[s][i_az]->Fill( eRec, eMC );
@@ -1605,10 +1622,11 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             copyHistograms( hEcutLin, hVEcutLin[s][i_az], false );
             copyHistograms( hEcutRec, hVEcutRec[s][i_az], false );
             copyHistograms( hEcutRecUW, hVEcutRecUW[s][i_az], false );
-            copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az], "" );
-            copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az], "s" );
-            copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az], "s" );
-            copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az], "s" );
+            copyProfileHistograms( hEmcSWeight, hVEmcSWeight[s][i_az] );
+            copyProfileHistograms( hEsysRec,  hVEsysRec[s][i_az] );
+            copyProfileHistograms( hEsysMC, hVEsysMC[s][i_az] );
+            copyProfileHistograms( hEsysMCRelative, hVEsysMCRelative[s][i_az] );
+            copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
             copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
             copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
             copyHistograms( hEmcCut, hVEmcCut[s][i_az], true );
@@ -2192,7 +2210,7 @@ void VEffectiveAreaCalculator::smoothEffectiveAreas( map< unsigned int, vector< 
 }
 
 
-void VEffectiveAreaCalculator::copyProfileHistograms( TProfile *h1,  TProfile*h2, string iopt )
+void VEffectiveAreaCalculator::copyProfileHistograms( TProfile *h1,  TProfile*h2 )
 {
     if( !h1 || !h2 ) return;
 
@@ -2202,14 +2220,14 @@ void VEffectiveAreaCalculator::copyProfileHistograms( TProfile *h1,  TProfile*h2
     {
         h1->SetBinContent( b, h2->GetBinContent( b ) * h2->GetBinEntries( b ) );
 
-        if( TMath::Abs( h2->GetBinError( b ) ) < 1.e-4 ) h1->SetBinError( b, 0 );
+        if( TMath::Abs( h2->GetBinError( b ) ) < 1.e-4 ) h1->SetBinError( b, 0. );
         else
         {
             if( h2->GetBinEntries( b ) > 0. )
             {
                 double iE = h2->GetBinError(b);
+//		h1->SetBinError( b, iE );
                 if( iEOption != "s" ) iE = h2->GetBinError(b) * sqrt( h2->GetBinEntries( b ) );
-
                 h1->SetBinError( b,  sqrt( h2->GetBinEntries( b ) * ( h2->GetBinContent( b ) *  h2->GetBinContent( b ) + iE*iE ) ) );
             }
             else h1->SetBinError( b, 0. );
@@ -2443,6 +2461,13 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
         for( unsigned int j = 0; j < hVEsysMCRelative[i].size(); j++ )
         {
             if( hVEsysMCRelative[i][j] ) hVEsysMCRelative[i][j]->Reset();
+        }
+    }
+    for( unsigned int i = 0; i < hVEsysMCRelativeRMS.size(); i++ )
+    {
+        for( unsigned int j = 0; j < hVEsysMCRelativeRMS[i].size(); j++ )
+        {
+            if( hVEsysMCRelativeRMS[i][j] ) hVEsysMCRelativeRMS[i][j]->Reset();
         }
     }
     for( unsigned int i = 0; i < hVEsysMCRelative2D.size(); i++ )

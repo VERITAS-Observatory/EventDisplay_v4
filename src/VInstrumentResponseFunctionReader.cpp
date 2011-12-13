@@ -37,6 +37,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     hEcut_recUW = 0;
     hEsys = 0;
     hERecMatrix = 0;
+    hEsysMCRelative = 0;
     hEsysMCRelative2D = 0;
     gEnergyResolution = 0;
     gEnergySystematic_Mean = 0;
@@ -362,9 +363,11 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 // get error in energy reconstruction
        hEsys = (TH2D*)c->hEsys2D;
 // erec/emc
+       hEsysMCRelative = (TProfile*)c->hEsysMCRelative;
        hEsysMCRelative2D = (TH2D*)c->hEsysMCRelative2D;
 // get energy resolution
        getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
+//       getEnergyResolutionPlot( (TH2D*)c->hEsysMCRelativeRMS );
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bias
@@ -437,19 +440,19 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
        if( t->GetEntries() > 1 )
        {
 // azimuth
-	   if( fDebug ) cout << "AZ: " << j << "\t" << c->fAz_bin << "\t" << fAzbin << endl;
+	   if( fDebug ) cout << "IRF AZ: " << j << "\t" << c->fAz_bin << "\t" << fAzbin << endl;
 	   if( c->fAz_bin != fAzbin ) continue;
 // spectral index
-           if( fDebug ) cout << "Index: " << j << "\t" << c->fSpectralIndex << "\t" << fIndex << endl;
+           if( fDebug ) cout << "IRF Index: " << j << "\t" << c->fSpectralIndex << "\t" << fIndex << endl;
 	   if( TMath::Abs( c->fSpectralIndex - fIndex ) > 0.05 ) continue;
 // wobble offset
-           if( fDebug ) cout << "Woff: " << j << "\t" << c->fWobble << "\t" << fWoff << endl;
+           if( fDebug ) cout << "IRF Woff: " << j << "\t" << c->fWobble << "\t" << fWoff << endl;
 	   if( TMath::Abs( c->fWobble - fWoff ) > 0.05 ) continue;
 // noise level
-	   if( fDebug ) cout << "Noise: " << j << "\t" << c->fNoise << "\t" << fNoise << endl;
+	   if( fDebug ) cout << "IRF Noise: " << j << "\t" << c->fNoise << "\t" << fNoise << endl;
 	   if( c->fNoise != fNoise ) continue;
 // zenith angle
-	   if( fDebug ) cout << "Ze: " << j << "\t" << c->fZe << "\t" << fZe << endl;
+	   if( fDebug ) cout << "IRF Ze: " << j << "\t" << c->fZe << "\t" << fZe << endl;
 	   if( TMath::Abs( c->fZe - fZe ) > 3. ) continue; 
        }
        if( c && c->fResolutionGraph.size() > 0 )
@@ -465,6 +468,41 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
     }
 
     return 0;
+}
+
+void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D *iP, int i_rebin, double iMinEnergy )
+{
+    if( !iP )
+    {
+       gEnergyResolution = 0;
+       return;
+    }
+
+    gEnergyResolution = new TGraphErrors( 1 );
+    gEnergyResolution->SetMarkerStyle( 20 );
+    gEnergyResolution->SetMarkerSize( 2 );
+    gEnergyResolution->SetLineWidth( 2 );
+    gEnergyResolution->SetTitle( "" );
+    gEnergyResolution->SetName( "" );
+    setGraphPlottingStyle( gEnergyResolution );
+
+    int zz = 0;
+    for( int b = 1; b <= iP->GetNbinsX(); b++ )
+    {
+        TH1D *h = iP->ProjectionY( "p_x", b, b+1 );
+        if( h && h->GetEntries() > 3. )
+        {
+            if( iP->GetXaxis()->GetBinCenter( b ) < iMinEnergy ) continue;
+	    gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), h->GetRMS() );
+	    if( h->GetEntries() > 1. )
+	    {
+		 gEnergyResolution->SetPointError( zz, 0., h->GetRMS()/sqrt(h->GetEntries()-1. ) );
+	    }
+	    else                            gEnergyResolution->SetPointError( zz, 0., 0. );
+            zz++;
+        }
+    }
+    return;
 }
 
 

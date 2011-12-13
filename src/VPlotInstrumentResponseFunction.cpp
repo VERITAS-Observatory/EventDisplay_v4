@@ -247,7 +247,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionRelativeErrors( un
        TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 1., log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 1. );
        iL->SetLineStyle( 2 );
        iL->Draw();
-    }
+    } 
 }
 
 

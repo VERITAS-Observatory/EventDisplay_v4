@@ -117,6 +117,7 @@ class VEffectiveAreaCalculator
         vector< vector< TProfile* > > hVEsysRec;
         vector< vector< TProfile* > > hVEsysMC;
         vector< vector< TProfile* > > hVEsysMCRelative;
+        vector< vector< TH2D* > > hVEsysMCRelativeRMS;
         vector< vector< TH2D* > > hVEsysMCRelative2D;
         vector< vector< TH2D* > > hVEsys2D;
         vector< vector< TH2D* > > hVEmcCut;
@@ -136,6 +137,7 @@ class VEffectiveAreaCalculator
         TProfile* hEsysRec;
         TProfile* hEsysMC;
         TProfile* hEsysMCRelative;
+	TH2D* hEsysMCRelativeRMS;
         TH2D* hEsysMCRelative2D;
         TH2D* hEsys2D;
         TH2D* hEmcCut;
@@ -188,7 +190,7 @@ class VEffectiveAreaCalculator
         vector< TF1* > fEffAreaFitFunction;
 
         bool   binomialDivide( TGraphAsymmErrors *g, TH1D *hrec, TH1D *hmc );
-        void   copyProfileHistograms( TProfile*,  TProfile*, string );
+        void   copyProfileHistograms( TProfile*,  TProfile* );
         void   copyHistograms( TH1*,  TH1*, bool );
         double getAzMean( double azmin, double azmax );
         bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
