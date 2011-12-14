@@ -12,6 +12,7 @@ ClassImp(VPlotAnasumHistograms)
   
 */
 
+
 VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
 {
 
@@ -96,7 +97,7 @@ void VPlotAnasumHistograms::help()
  *      
  *
  */
-void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y )
+void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , double xerr, double yerr)
 {
   //cout << "(this is preliminary)" << endl << endl;
 
@@ -110,20 +111,70 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y )
   double ra = fSkyMapCentreRAJ2000+i_raDiff;
   double dec = fSkyMapCentreDecJ2000+i_decDiff;
 
-  cout << "(RA,Dec) (J2000) for (x,y)=(" << x << "," << y << "): ";
-  cout << "(" << ra << "," << dec << ")" << endl;
-  double hours = (double)((int)(ra * 24. / 360.) );
-  double min   = (double)((int)(60.*(ra * 24. / 360. - hours)));
-  double sec   = (ra - hours * 360./24. - min * 360. / 24. / 60.)*24./360.*60.*60.;
-  double dec_d = (double)(int)(dec);
-  double dec_m = (double)(int)((dec - dec_d)*60.);
-  double dec_s = (dec-dec_d - dec_m/60.)*3600.;
-  cout << "(Ra,Dec) (J2000) for (x,y)=(" << x << "," << y << "): ";
-  cout << "(" << hours << "h " << min << "' " << sec << "''";
-  cout << ", ";
-  if( dec_d > 0 ) cout << "+";
-  cout << dec_d << " " << dec_m << " " << dec_s;
-  cout << ")" << endl;
+
+  double ra_err;
+  double dec_err; 
+
+  if ( xerr !=0 && yerr !=0 )
+  {
+    i_decDiff = 0.;
+    i_raDiff = 0.;
+
+    VSkyCoordinatesUtilities::getWobbleOffsets( y+yerr, -1.*(x+xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+    ra_err  =  abs(fSkyMapCentreRAJ2000+i_raDiff - ra);
+    dec_err =  fSkyMapCentreDecJ2000+i_decDiff - dec;  
+  }  
+
+
+  if ( xerr == 0 && yerr == 0 )
+  {
+    cout << "(RA,Dec) (J2000) for (x,y)=(" << x << "," << y << "): ";
+    cout << "(" << ra << "," << dec << ")" << endl;
+    double hours = (double)((int)(ra * 24. / 360.) );
+    double min   = (double)((int)(60.*(ra * 24. / 360. - hours)));
+    double sec   = (ra - hours * 360./24. - min * 360. / 24. / 60.)*24./360.*60.*60.;
+    double dec_d = (double)(int)(dec);
+    double dec_m = (double)(int)((dec - dec_d)*60.);
+    double dec_s = (dec-dec_d - dec_m/60.)*3600.;
+    cout << "(Ra,Dec) (J2000) for (x,y)=(" << x << "," << y << "): ";
+    cout << "(" << hours << "h " << min << "' " << sec << "''";
+    cout << ", ";
+    if( dec_d > 0 ) cout << "+";
+    cout << dec_d << " " << dec_m << " " << dec_s;
+    cout << ")" << endl;
+  }
+  else
+  {
+
+    cout << "(RA,Dec) (J2000) for (x,y)=( " << x << "+/-" << xerr << " , " << y << "+-" << yerr << " ): ";
+    cout << "( " << ra << "+/-" << ra_err << " , " << dec << "+/-" << dec_err <<  " )" << endl;
+
+    double hours = (double)((int)(ra * 24. / 360.) );
+    double min   = (double)((int)(60.*(ra * 24. / 360. - hours)));
+    double sec   = (ra - hours * 360./24. - min * 360. / 24. / 60.)*24./360.*60.*60.;
+    double dec_d = (double)(int)(dec);
+    double dec_m = (double)(int)((dec - dec_d)*60.);
+    double dec_s = (dec-dec_d - dec_m/60.)*3600.;
+
+    double hours_err = (double)((int)(ra_err * 24. / 360.) );
+    double min_err   = (double)((int)(60.*(ra_err * 24. / 360. - hours_err)));
+    double sec_err   = (ra_err - hours_err * 360./24. - min_err * 360. / 24. / 60.)*24./360.*60.*60.;
+    double dec_d_err = (double)(int)(dec_err);
+    double dec_m_err = (double)(int)((dec_err - dec_d_err)*60.);
+    double dec_s_err = (dec_err-dec_d_err - dec_m_err/60.)*3600.;
+
+
+    cout << "(RA,Dec) (J2000) for (x,y)=( " << x << "+/-" << xerr << " , " << y << "+-" << yerr << " ): ";
+    cout << "( " << hours << "h " << min << "' " << sec << "''" << " +/- " << hours_err << "h " << min_err << "' " << sec_err << "''" ;
+    cout << ", ";
+    if( dec_d > 0 ) cout << "+";
+    cout << dec_d << " " << dec_m << " " << dec_s << " +/- " << dec_d_err << " " << dec_m_err << " " << dec_s_err << " ";
+    cout << " )" << endl;
+
+  }  
+
+
+  /// calculating and printing the offset of the centroid wrt camera center
   double offset = sqrt(x*x + y*y);
   cout << "Offset from camera center = " << offset << " deg"<< endl;
 
@@ -566,7 +617,7 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
 	 for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.05 ); i++ )
 	 {
 	   nt2_68 += htheta2_diff->GetBinContent( i );
-	   if( nt2_68/nt2 > 0.68 )
+	   if( nt2_68/nt2 > 0.39 )
 	   {
 	     cout << "Theta2 containment radius (68%): " << htheta2_diff->GetXaxis()->GetBinLowEdge( i ) << " deg2" << endl;
 	     break;
