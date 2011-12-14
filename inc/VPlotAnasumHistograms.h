@@ -87,7 +87,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    VPlotAnasumHistograms( string ifile, int ion = -1 );
    ~VPlotAnasumHistograms() {};
    
-   void convert_derotated_RADECJ2000( double x=0, double y=0 );
+   void convert_derotated_RADECJ2000( double x=0, double y=0, double xerr=0, double yerr=0 );
 
    void drawPSF( TCanvas *c = 0, string iFile = 0, TH2D *h2 = 0, float iPSF = 0.1 );
    void fit_energy(double minE = -0.5, double maxE = 0.5 );
