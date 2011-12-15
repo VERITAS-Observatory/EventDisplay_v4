@@ -1606,21 +1606,22 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     double iTotB = 0.;
     if( v_flux.size() > 0 )
     {
-       for( unsigned int i = v_flux.size()-1; i > 0; i-- )
+       for( unsigned int i = v_flux.size(); i > 0; i-- )
        { 
-	   v_flux[i].NOn  *= fObservationTime_h * 60.;               // [min] 
-	   v_flux[i].NOff *= fObservationTime_h * 60.;
-	   v_flux[i].NOn_error  *= fObservationTime_h * 60.;
-	   v_flux[i].NOff_error *= fObservationTime_h * 60.;
-	   iTotG += (v_flux[i].NOn - v_flux[i].NOff * alpha)/(fObservationTime_h * 60.);
-	   iTotB += v_flux[i].NOff*alpha/(fObservationTime_h * 60.);
+           unsigned int z = i-1;
+	   v_flux[z].NOn  *= fObservationTime_h * 60.;               // [min] 
+	   v_flux[z].NOff *= fObservationTime_h * 60.;
+	   v_flux[z].NOn_error  *= fObservationTime_h * 60.;
+	   v_flux[z].NOff_error *= fObservationTime_h * 60.;
+	   iTotG += (v_flux[z].NOn - v_flux[z].NOff * alpha)/(fObservationTime_h * 60.);
+	   iTotB += v_flux[z].NOff*alpha/(fObservationTime_h * 60.);
 	   if( fDebug )
 	   {
-	       cout << "NUMBER OF MC ON/OFF EVENTS: " << i << "\t";
-	       cout << v_flux[i].Energy_lowEdge << " - " << v_flux[i].Energy_upEdge << " TeV,\t";
-	       cout << "Non-Noff: " << v_flux[i].NOn - v_flux[i].NOff * alpha  << "\t";
-	       cout << "NON: " << v_flux[i].NOn << " (" << v_flux[i].NOn_error << "), ";
-	       cout << "NOFF: " << v_flux[i].NOff << "(" << v_flux[i].NOff_error << "), "  << v_flux[i].NOff * alpha << "\t" << alpha << "\t";
+	       cout << "NUMBER OF MC ON/OFF EVENTS: " << z << "\t";
+	       cout << v_flux[z].Energy_lowEdge << " - " << v_flux[z].Energy_upEdge << " TeV,\t";
+	       cout << "Non-Noff: " << v_flux[z].NOn - v_flux[z].NOff * alpha  << "\t";
+	       cout << "NON: " << v_flux[z].NOn << " (" << v_flux[z].NOn_error << "), ";
+	       cout << "NOFF: " << v_flux[z].NOff << "(" << v_flux[z].NOff_error << "), "  << v_flux[z].NOff * alpha << "\t" << alpha << "\t";
 	       cout << "RateG: " << iTotG << " [1/min], " << iTotB << " [1/min]";
 	       cout << endl;
 	   }
