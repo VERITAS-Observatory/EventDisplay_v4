@@ -10,11 +10,13 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> [keep simtel.root files (default off=0)]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)]"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo
    echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
+   echo
+   echo "  <data set>                e.g. cta-ultra3, ISDC3700, ..."
    echo ""
    echo "  [keep simtel.root files]  keep and copy converted simtel files to output directory (default off=0)"
    echo ""
@@ -38,15 +40,12 @@ ARRAY=$1
 BLIST=$2
 PART=$3
 KEEP=0
-if [ -n "$4" ]
-then
-   KEEP=$4
-fi
-MET="LL"
 if [ -n "$5" ]
 then
-  MET=$5
+   KEEP=$5
 fi
+MET="LL"
+DSET=$4
 
 # checking the path for binary
 if [ -z $EVNDISPSYS ]
@@ -94,8 +93,10 @@ do
    rm -f $FNAM-3.sh
    sed -e "s|ARC|$ARRAYCUTS|" $FNAM-4.sh > $FNAM-5.sh
    rm -f $FNAM-4.sh
-   sed -e "s|MEEET|$MET|" $FNAM-5.sh > $FNAM.sh
+   sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-6.sh
    rm -f $FNAM-5.sh
+   sed -e "s|MEEET|$MET|" $FNAM-6.sh > $FNAM.sh
+   rm -f $FNAM-6.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh
@@ -107,7 +108,7 @@ do
       qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    else
       echo "short queue"
-      qsub -l h_cpu=00:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+      qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    fi
 
    echo "writing shell script to $FNAM.sh"

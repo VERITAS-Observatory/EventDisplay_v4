@@ -8,15 +8,17 @@
 #
 #######################################################################
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
-   echo "./CTA.EVNDISP.check_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> <list of failed jobs>"
+   echo "./CTA.EVNDISP.check_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> <list of failed jobs> <data set>"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo
    echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
    echo ""
    echo "  <list of failed jobs>     list of failed jobs" 
+   echo
+   echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo ""
    exit
 fi
@@ -30,6 +32,7 @@ then
    FAILED=$4
 fi
 FAILED=$FAILED.$PART
+DSET=$5
 
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
 for ARRAY in $VARRAY
@@ -62,8 +65,8 @@ do
        continue
      fi
 
-      DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/$PART/"
-      LDIR="$CTA_USER_LOG_DIR/analysis/$ARRAY/$PART/"
+      DDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$PART/"
+      LDIR="$CTA_USER_LOG_DIR/analysis/AnalysisData/$DSET/$ARRAY/$PART/"
 
 # check evndisp log file
       LFIL=`basename $AFIL .gz`

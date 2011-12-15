@@ -16,6 +16,7 @@ SUBA="ARRAY"
 KEEP=KEEEEEEP
 ACUT=ARC
 MET=MEEET
+DSET=DATASET
 
 # set array
 FIELD=$SUBA
@@ -44,11 +45,11 @@ for N in $FIELD
 do
    echo "RUNNING  $N"
 # output data files are written to this directory
-   ODIR=$CTA_USER_DATA_DIR"/analysis/"$N"/"$PART"/"
+   ODIR=$CTA_USER_DATA_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART"/"
    mkdir -p $ODIR
 
 # output log files are written to this directory
-   LDIR=$CTA_USER_LOG_DIR"/analysis/"$N"/"$PART"/"
+   LDIR=$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART"/"
    mkdir -p $LDIR
 # remove existing log files
    rm -f $LDIR/$OFIL.convert.log

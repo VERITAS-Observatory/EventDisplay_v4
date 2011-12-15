@@ -6,16 +6,18 @@
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$5" ]
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <subarray list> <run parameter filename> <directory for run parameter and log files> <output file name> <onSource/cone10>"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <run parameter filename> <directory for run parameter and log files> <output file name> <onSource/cone10> <data set>"
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
    echo
-   echo "<run parameter filename> without .runparameter"
+   echo "  <run parameter filename> without .runparameter"
    echo
    echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
+   echo
+   echo "  <data set>         e.g. cta-ultra3, ISDC3700, ...  "
    echo
    echo "   note 1: keywords ENERGYBINS and OUTPUTFILE are ignored in the runparameter file"
    echo
@@ -37,6 +39,7 @@ if [ $5 == "cone10" ] || [ $5 == "cone" ]
 then
   CONE="TRUE"
 fi
+DSET=$6
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #####################################
@@ -85,14 +88,14 @@ do
 
    for (( W = 0; W < $NOFF; W++ ))
    do
-      ODIR=$CTA_USER_DATA_DIR/analysis/$ARRAY/TMVA/$DDIR-${OFFMEA[$W]}
+      ODIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/TMVA/$DDIR-${OFFMEA[$W]}
       mkdir -p $ODIR
 # copy run parameter file
       cp -f $RPAR.runparameter $ODIR
 
 # signal and background files
-      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/$ARRAY/Analysis/$DSUF."$ARRAY"_ID0*.root`
-      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/$ARRAY/Analysis/proton."$ARRAY"_ID0*.root`
+      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/Analysis/$DSUF."$ARRAY"_ID0*.root`
+      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/Analysis/proton."$ARRAY"_ID0*.root`
 
 ###############################################################
 # loop over all energy bins and submit a job for each bin

@@ -13,16 +13,17 @@ set WOFFMAX=WOMAXXXXX
 set WOFFMEA=WOMEEEEAN
 set ARRAY=ARRRRRRR
 set DDIR="DATADIRECT"
+set DSET="DATASET"
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh CTA
 
 # output data files are written to this directory
-set ODIR=$CTA_USER_DATA_DIR"/analysis/"$ARRAY"/Tables/"
+set ODIR=$CTA_USER_DATA_DIR"/analysis/AnalysisData/$DSET/"$ARRAY"/Tables/"
 mkdir -p $ODIR
 
 # output log files are written to this directory
-set LDIR=$CTA_USER_LOG_DIR"/analysis/"$ARRAY"/Tables/"
+set LDIR=$CTA_USER_LOG_DIR"/analysis/AnalysisData/$DSET/"$ARRAY"/Tables/"
 mkdir -p $LDIR
 
 # delete old log files

@@ -8,14 +8,16 @@
 #
 #######################################################################
 
-if [ ! -n "$1" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ]
 then
    echo
-   echo "./CTA.MSCW.check_convert_and_analyse_MC_VDST.sh <subarray list>"
+   echo "./CTA.MSCW.check_convert_and_analyse_MC_VDST.sh <subarray list> <data set>"
    echo
    echo "simple script to check that table analysis was running properly"
    echo 
    echo "  <sub array list>          text file with list of subarray IDs"
+   echo
+   echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    exit
 fi
@@ -38,8 +40,7 @@ do
    do
       PRIM=${PART[$P]}
 
-
-      DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/Analysis/"
+      DDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$2/$ARRAY/Analysis/"
 
  # check number of root files
       NFIL=`ls $DDIR/$PRIM* | wc -l`

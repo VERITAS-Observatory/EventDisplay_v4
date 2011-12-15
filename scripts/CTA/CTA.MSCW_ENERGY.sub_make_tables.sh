@@ -9,15 +9,16 @@
 #
 #
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]  && [ ! -n "$5" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone10>"
+   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone10> <data set>"
    echo ""
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
    echo "  <subarray list>    text file with list of subarray IDs"
-   echo "  <onSource/cone>    calculate tables for on source or different wobble offsets"
+   echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
+   echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo " input data and output directories for tables are fixed in CTA.MSCW_ENERGY.qsub_make_tables.sh"
    exit
@@ -34,12 +35,12 @@ if [ $4 == "cone10" ] || [ $4 == "cone" ]
 then
   CONE="TRUE"
 fi
+DSET=$5
 
 
 #########################################
 # arrays for different wobble offsets
 #########################################
-DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/"
 if [ $CONE == "TRUE" ]
 then
    OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
@@ -90,7 +91,7 @@ do
    echo "STARTING ARRAY $ARRAY"
 
 # data dir
-   DDIR="$CTA_USER_DATA_DIR/analysis/$ARRAY/$DSUF"
+   DDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$DSUF"
 
 # table file
    TAFIL=$TFIL
@@ -119,8 +120,10 @@ do
       rm -f $FNAM-4.sh
       sed -e "s|WOMAXXXXX|$MAXDIST|" $FNAM-5.sh > $FNAM-6.sh
       rm -f $FNAM-5.sh
-      sed -e "s|DATADIRECT|$DDIR|" $FNAM-6.sh > $FNAM.sh
+      sed -e "s|DATADIRECT|$DDIR|" $FNAM-6.sh > $FNAM-7.sh
       rm -f $FNAM-6.sh
+      sed -e "s|DATASET|$DSET|" $FNAM-7.sh > $FNAM.sh
+      rm -f $FNAM-7.sh
 
       chmod u+x $FNAM.sh
 

@@ -5,10 +5,10 @@
 #
 
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] 
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$4" ]
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cut file directory> <cutfile template> <output directory> [filling mode]"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cut file directory> <cutfile template> <output directory> <data set> [filling mode]"
    echo
    echo "<subarray list>"
    echo "     text file with list of subarray IDs"
@@ -21,6 +21,8 @@ then
    echo 
    echo "<output directory>"
    echo "     directory name for output effective areas files"
+   echo
+   echo " <data set>         e.g. cta-ultra3, ISDC3700, ...  "
    echo
    echo "[filling mode]"
    echo "effective area filling mode (use 2 to calculate angular resolution only"
@@ -35,9 +37,10 @@ CDIR=$2
 CFIL=$3
 ODIR=$4
 GMOD=0
-if [ -n "$5" ]
+DSET=$5
+if [ -n "$6" ]
 then
-  GMOD=$5
+  GMOD=$6
 fi
 mkdir -p $ODIR
 
@@ -82,7 +85,7 @@ do
         cp $CDIR/$CFIL.CRbck.dat $CCUT
       fi
 
-      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ODIR $GMOD
+      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ODIR $DSET $GMOD
    done
 done
 

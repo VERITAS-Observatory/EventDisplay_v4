@@ -12,16 +12,17 @@ set RECID=RECONSTRUCTIONID
 set IFIL="IIIIFIL"
 set TFIL=TTTTFIL
 set ARRAY=ARRAYYY
+set DSET=DATASET
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh CTA
 
 # output data files are written to this directory
-set ODIR=$CTA_USER_DATA_DIR"/analysis/"$ARRAY"/Analysis/"
+set ODIR=$CTA_USER_DATA_DIR"/analysis/AnalysisData/"$DSET"/"$ARRAY"/Analysis/"
 mkdir -p $ODIR
 
 # output log files are written to this directory
-set LDIR=$CTA_USER_LOG_DIR"/analysis/"$ARRAY"/Analysis/"
+set LDIR=$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET"/"$ARRAY"/Analysis/"
 mkdir -p $LDIR
 
 # delete old log files

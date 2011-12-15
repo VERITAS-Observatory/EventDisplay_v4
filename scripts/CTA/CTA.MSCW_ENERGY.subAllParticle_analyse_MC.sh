@@ -11,16 +11,17 @@ ARRAY=$3
 PART=$4
 MET=$5
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
    echo ""
-   echo "./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh <tablefile> <recid> <subarray list>"
+   echo "./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh <tablefile> <recid> <subarray list> <data set>"
    echo "(table files without .root)"
    echo ""
    echo "submit jobs in paralell to analyse MC files with lookup tables"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "  <recid>         reconstruction ID"
+   echo "  <data set>      e.g. ultra, ISDC3700, ..."
    echo ""
    exit
 fi
@@ -72,11 +73,11 @@ do
 	 I=${RR[$j]}
 	 for (( k = 0; k < 10; k++ ))
 	 do
-	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $I$k
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $I$k
 	 done
       done
    else
-      ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART
+      ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4
    fi
 done
 

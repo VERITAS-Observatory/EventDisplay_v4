@@ -9,10 +9,10 @@
 #
 
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <outputdirectory> [filling mode]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <outputdirectory> <data set> [filling mode]"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
@@ -33,6 +33,8 @@ then
    echo
    echo "<outputdirectory>"
    echo "     directory with all result and log files (full path)"
+   echo
+   echo "  <data set>         e.g. cta-ultra3, ISDC3700, ...  "
    echo
    echo "[filling mode]"
    echo "     effective area filling mode (use 2 to calculate angular resolution only)"
@@ -56,10 +58,12 @@ CFIL=$4
 ODIR=$5
 EREC=0
 GFILLING=0
-if [ -n "$6" ]
+DSET=$6
+if [ -n "$7" ]
 then
-  GFILLING=$6
+  GFILLING=$7
 fi
+TMVACUT="20111212"
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
@@ -86,8 +90,7 @@ QSHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir"
 echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
-#DDIR=$CTA_DATA_DIR/analysis/$ARRAY/Analysis/
-DDIR=$CTA_USER_DATA_DIR/analysis/$ARRAY/Analysis/
+DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/Analysis/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
@@ -95,7 +98,6 @@ FDIR=$CTA_USER_LOG_DIR"/queueEffArea/$DATE/"
 echo $FDIR
 mkdir -p $FDIR
 echo "output data directory"
-#ODIR=$CTA_USER_DATA_DIR"/analysis/$ARRAY/EffectiveArea/$DATE/"
 echo $ODIR
 mkdir -p $ODIR
 
@@ -278,9 +280,13 @@ do
          sed -e "s|WOBBLEOFFSET|${OFFMEA[$j]}|" $iCFIL-f > $iCFIL-g
       fi
       rm -f $iCFIL-f
-      sed -e "s|OFFAXISBIN|$i|" $iCFIL-g > $iCFIL-h
+      sed -e "s|TMVACUTDIR|$TMVACUT|" $iCFIL-g > $iCFIL-h
       rm -f $iCFIL-g
-      mv -f $iCFIL-h $iCFIL
+      sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
+      rm -f $iCFIL-j
+      sed -e "s|OFFAXISBIN|$i|" $iCFIL-i > $iCFIL-j
+      rm -f $iCFIL-i
+      mv -f $iCFIL-j $iCFIL
       echo $iCFIL
 
 ###############################################################################

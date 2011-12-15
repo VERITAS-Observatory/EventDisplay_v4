@@ -11,13 +11,14 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <particle> [wildcard]"
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <particle> <data set> [wildcard]"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
    echo "  <recid>         reconstruction ID"
    echo "  <subarraylist > text file with list of subarray IDs"
    echo "  <particle>      gamma_onSource / gamma_cone10 / electron / proton / helium"
+   echo "  <data set>      e.g. ultra, ISDC3700m, ..."
    echo
    echo "optional (for a huge amount of MC files):"
    echo "  [wildcard]     used in the < CTA.MSCW_ENERGY.subParallel_analyse_MC.sh > script"
@@ -34,9 +35,10 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $3`
 PART=$4
 METH="LL"
 WC=""
-if [ -n "$5" ]
+DSET="$5"
+if [ -n "$6" ]
 then
-   WC=$5
+   WC=$6
 fi
 
 #########################################
@@ -68,7 +70,7 @@ do
 #########################################
 # input files
 #IFIL="$CTA_DATA_DIR/analysis/$SUBAR/$PART/$WC"
-   IFIL="$CTA_USER_DATA_DIR/analysis/$SUBAR/$PART/$WC"
+   IFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/$WC"
 
 # check if input files exist
    IFILN=`ls -1 $IFIL*.root | wc -l`
@@ -100,8 +102,10 @@ do
    rm -f $FNAM-2.sh
    sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-3.sh > $FNAM-4.sh
    rm -f $FNAM-3.sh
-   sed -e "s|ARRAYYY|$SUBAR|" $FNAM-4.sh > $FNAM.sh
+   sed -e "s|ARRAYYY|$SUBAR|" $FNAM-4.sh > $FNAM-5.sh
    rm -f $FNAM-4.sh
+   sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM.sh
+   rm -f $FNAM-5.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh
