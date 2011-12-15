@@ -183,9 +183,9 @@ void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
 void plotDifferentialSensitivity( string iFluxUnit = "PFLUX",
                                   char *ifile1 = 0, char *ifile2 = 0,
 				  char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
-				  unsigned int iCrabSpec_ID = 6 )
+				  unsigned int iCrabSpec_ID = 6, string iObservatory = "CTA" )
 {
-     plotSensitivity( ifile1, ifile2, false, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID );
+     plotSensitivity( ifile1, ifile2, false, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory );
 }
 
 
@@ -209,7 +209,7 @@ void plotDifferentialSensitivity( string iFluxUnit = "PFLUX",
 ////////////////////////////////////////////////////////////////////////////////////
 void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIntegral,
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
-		      string iFluxUnit, unsigned int iCrabSpec_ID )
+		      string iFluxUnit, unsigned int iCrabSpec_ID, string iObservatory )
 {
 
 // get values for plotting
@@ -284,19 +284,6 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
-// VERITAS
-/*
-       int i_Azbin_gamma = 0;
-       double i_index_gamma = 2.0;
-       int i_noise_gamma = 200;
-       double i_woff_gamma = 0.5;
-
-       int i_Azbin_proton = 0;
-       double i_index_proton = 2.4;
-       int i_noise_proton = 200;
-       double i_woff_proton = 0.;  
-       cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO VERITAS" << endl; 
-*/
 // CTA
        int i_Azbin_gamma = 0;
        double i_index_gamma = 2.5;
@@ -307,7 +294,24 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        double i_index_proton = 2.6;
        int i_noise_proton = 250;
        double i_woff_proton = 0.;  
-       cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO CTA" << endl; 
+
+       if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+       {
+           i_Azbin_gamma = 0;
+	   i_index_gamma = 2.4;
+	   i_noise_gamma = 130;
+	   i_noise_gamma = 200;
+	   i_woff_gamma = 0.5;
+
+	   i_Azbin_proton = 0;
+	   i_index_proton = 2.6;
+	   i_noise_proton = 130;
+	   i_woff_proton = 0.;
+
+	   i_noise_proton = 200;
+	   i_woff_proton = 0.;
+       }
+       cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl; 
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -430,7 +434,8 @@ void plotDebugComparisionPlots( string iFileName, int iColor )
 
 */
 void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Electron = 0,
-                              unsigned int iCrabSpec_ID = 6, char *iParticleNumberFile = "particleNumbers.tmp.root" )
+                              unsigned int iCrabSpec_ID = 6, char *iParticleNumberFile = "particleNumbers.tmp.root",
+			      string iObservatory = "CTA" )
 {
     string iESpecDataFile_CrabNebula = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
     string iESpecDataFile_CosmicRays = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
@@ -453,7 +458,7 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
        double i_index_proton = 2.6;
        int i_noise_proton = 250;
        double i_woff_proton = 0.;  
-       cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO CTA" << endl; 
+       cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl; 
 //////////////////////////////////////////////////////////////////////////
 
 // gammas
@@ -511,11 +516,10 @@ void writeAllParticleNumberFiles( char *iSubArrayFile = 0,
 
       sprintf( iParticleNumberFile, "ParticleNumbers.%s.0.root", SubArray[i].c_str() );
 
-//      writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+      writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
 
 // offset files
-//      for( int j = 1; j < iOffSetCounter; j++ ) // use first bin on source particle file
-      for( int j = 8; j < iOffSetCounter; j++ ) // use first bin on source particle file
+      for( int j = 1; j < iOffSetCounter; j++ ) // use first bin on source particle file
       {
 	 sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_cone10, SubArray[i].c_str(), iRecID, j );
 	 sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, j );
