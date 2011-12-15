@@ -1304,7 +1304,9 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
         if( fMC_Data[1]->effArea_Ebins != (*i_MCData_iterator).second->effArea_Ebins )
 	{
-	   return getDifferentialFluxVectorfromMC_ErrorMessage( "diffent number of bins in gamma and background effective areas" );
+	   sprintf( hname, "diffent number of bins in gamma and background effective area (%d, %d)", 
+	                    fMC_Data[1]->effArea_Ebins, (*i_MCData_iterator).second->effArea_Ebins  );
+	   return getDifferentialFluxVectorfromMC_ErrorMessage( hname );
         }
         if( TMath::Abs( fMC_Data[1]->effArea_Emin - (*i_MCData_iterator).second->effArea_Emin ) > 0.05
 	 || TMath::Abs( fMC_Data[1]->effArea_Emax - (*i_MCData_iterator).second->effArea_Emax ) > 0.05 )
