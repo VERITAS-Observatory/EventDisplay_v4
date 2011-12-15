@@ -269,13 +269,28 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
    }
    else
    {
-      sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+      if( fSubArray != "V5" && fSubArray != "V6" )
+      {
+         sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+      }	  
+      else
+      {
+         sprintf( hname, "%s/%s.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+      }	  
    }
    cout << endl;
    cout << "=================================================================" << endl;
    cout << "reading " << hname << endl;
    cout << endl;
-   if( !i_IRF.fillData( hname ) ) return false;
+   if( fSubArray != "V5" && fSubArray != "V6" )
+   {
+      if( !i_IRF.fillData( hname ) ) return false;
+   }
+   else
+   {
+      if( fSubArray == "V5" && !i_IRF.fillData( hname, 20, 0.5, 16, 2.0, 130 ) ) return false;
+      if( fSubArray == "V6" && !i_IRF.fillData( hname, 20, 0.5, 16, 2.0, 200 ) ) return false;
+   }
 // fill angular resolution histograms
    i_IRF.fillResolutionHistogram( fAngRes68, "68", "t_angular_resolution" );
    i_IRF.fillResolutionHistogram( fAngRes80, "80", "t_angular_resolution" );
@@ -329,18 +344,71 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     double i_index_proton = 2.6;
     int i_noise_proton = 250;
     double i_woff_proton = 0.;  
-    cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO CTA" << endl; 
+    if( fSubArray == "V5" )
+    {
+       i_Azbin_gamma = 16;
+       i_index_gamma = 2.4;
+       i_noise_gamma = 130;
+       i_woff_gamma = 0.5;
+       i_Azbin_proton = i_Azbin_gamma;
+       i_index_proton = 2.6;
+       i_noise_proton = i_noise_gamma;
+       i_woff_proton = 0.;
+    }
+    else if( fSubArray == "V6" )
+    {
+       i_Azbin_gamma = 16;
+       i_index_gamma = 2.0;
+       i_noise_gamma = 200;
+       i_woff_gamma = 0.5;
+       i_Azbin_proton = i_Azbin_gamma;
+       i_index_proton = 2.0;
+       i_noise_proton = i_noise_gamma;
+       i_woff_proton = 0.;
+    }
+
+    cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << fSubArray << endl; 
 //////////////////////////////////////////////////////////////////////////
 // effective area files
     if( fOffsetCounter < 9999 ) sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone10.c_str(), fOffsetCounter );
-    else                        sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+    else
+    {
+      if( fSubArray != "V5" && fSubArray != "V6" )
+      {
+	 sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+      }
+      else
+      {
+	 sprintf( hname, "%s/%s.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+      }
+    }
     string iMC_Gamma    = hname;
-    if( fOffsetCounter == 9999 ) sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_proton.c_str() );
-    else                         sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_proton.c_str(), fOffsetCounter );
+    if( fOffsetCounter == 9999 )
+    {
+       if( fSubArray != "V5" && fSubArray != "V6" )
+       {
+	  sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_proton.c_str() );
+       }
+       else
+       {
+	  sprintf( hname, "%s/%s.root", iDataDirectory.c_str(), fDataFile_proton.c_str() );
+       }
+    }	  
+    else sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_proton.c_str(), fOffsetCounter );
     string iMC_Proton   = hname;
-    if( fOffsetCounter == 9999 ) sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_electron.c_str() );
+    if( fOffsetCounter == 9999 )
+    {
+       if( fSubArray != "V5" && fSubArray != "V6" )
+       {
+          sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_electron.c_str() );
+       }
+       else if( fDataFile_electron.size() > 0 )
+       {
+          sprintf( hname, "%s/%s.root", iDataDirectory.c_str(), fDataFile_electron.c_str() );
+       }
+       else sprintf( hname, "NOFILE" );
+    }
     else                         sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_electron.c_str(), fOffsetCounter );
-    cout << hname << endl;
     string iMC_Electron = hname;
 // gammas
     i_Sens.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
@@ -349,7 +417,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     i_Sens.setMonteCarloParameters(14, fCosmicRaySpectrumFile, fProtonSpectrumID , iMC_Proton, 20.,
 			      i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
 // electrons (spectral index)
-    if( iMC_Electron.size() > 0 )
+    if( iMC_Electron.size() > 0 && iMC_Electron != "NOFILE" )
     {
        i_Sens.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20., 0, 0.0, 250, 3.0 );
     }
@@ -400,8 +468,25 @@ void VWPPhysSensitivityFile::setSubArray( string iA )
 {
     fSubArray = iA;
 
-    fDataFile_gamma_onSource = "gamma_onSource." + fSubArray + "_ID0.eff-";
-    fDataFile_gamma_cone10 = "gamma_cone10." + fSubArray + "_ID0.eff-";
-    fDataFile_proton = "proton." + fSubArray + "_ID0.eff-";
-    fDataFile_electron = "electron." + fSubArray + "_ID0.eff-";
+    if( iA != "V5" && iA != "V6" )
+    {
+       fDataFile_gamma_onSource = "gamma_onSource." + fSubArray + "_ID0.eff-";
+       fDataFile_gamma_cone10 = "gamma_cone10." + fSubArray + "_ID0.eff-";
+       fDataFile_proton = "proton." + fSubArray + "_ID0.eff-";
+       fDataFile_electron = "electron." + fSubArray + "_ID0.eff-";
+    }
+    else if( iA == "V5" )
+    {
+       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE130_ID30.eff";
+       fDataFile_gamma_cone10 = "";
+       fDataFile_proton = "proton_20deg_050deg_NOISE130_ID30.eff";
+       fDataFile_electron = "";
+    }
+    else if( iA == "V6" )
+    {
+       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE200_ID30.eff";
+       fDataFile_gamma_cone10 = "";
+       fDataFile_proton = "proton_20deg_050deg_NOISE200_ID30.eff";
+       fDataFile_electron = "";
+    }
 }

@@ -403,7 +403,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
        cout << "reading IRF " << fIRF_TreeNames[i].c_str() << endl;
        TTree *t_a = (TTree*)iFile->Get( fIRF_TreeNames[i].c_str() );
        fIRF_Data[i] = getIRFFromFile( t_a, i );
-       if( !fIRF_Data[i] ) cout << " ...not found" << endl;
+       if( !fIRF_Data[i] ) cout << " ...not found (index " << i << ")" << endl;
        else
        {
           fIRF_Data[i]->setPlottingStyle( getPlottingColor(), getPlottingLineWidth(), getPlottingMarkerStyle(), getPlottingMarkerSize(), getPlottingFillStyle(), getPlottingLineStyle() );
