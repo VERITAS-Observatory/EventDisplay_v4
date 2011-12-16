@@ -33,6 +33,7 @@ class VWPPhysSensitivityFile
     string       fDataFile_electron;
 
     string       fSubArray;
+    string       fObservatory;
     double       fObservingTime_h;
 
     string       fCrabSpectrumFile;
@@ -83,6 +84,7 @@ class VWPPhysSensitivityFile
                                int iEnergyRec2DXaxisNbins = 400, double iEnergyRec2DXaxis_min = -2.3, double iEnergyRec2DXaxis_max = 2.7,
 			       unsigned int iOffsetCounter = 9999 );
     bool initializeOutputFile( string iOutputFile );
+    unsigned int isVTS();
     void setCrabSpectrum( string iCrabSpectrum, unsigned int iID = 5 ) { fCrabSpectrumFile = iCrabSpectrum; fCrabSpectrumID = iID; }
     void setCosmicRaySpectrum( string iCRSpectrum, unsigned iPID = 0, unsigned iEID = 2  ) 
                                                                        { fCosmicRaySpectrumFile = iCRSpectrum; 
@@ -90,6 +92,7 @@ class VWPPhysSensitivityFile
 									  fElectronSpectrumID = iEID; }
     void setDebug( bool iB = false ) { fDebug = iB; }
     void setObservationTime( double iO_h = 50. ) { fObservingTime_h = iO_h; }
+    void setObservatory( string iO = "CTA" ) { fObservatory = iO; }
     void setSubArray( string iA = "E" );
     bool terminate();
 

@@ -793,7 +793,7 @@ void VGammaHadronCuts::printCutSummary()
 	else
 	{
            cout << "signal efficiency: " << fTMVASignalEfficiency;
-	   cout << ", probability threshold: " << fTMVAProbabilityThreshold << endl;
+	   cout << ", probability threshold/MVA cut: " << fTMVAProbabilityThreshold << endl;
         }
     }
 // other cut parameters
@@ -1169,7 +1169,7 @@ bool VGammaHadronCuts::applyTMVACut( int i, bool fIsOn )
    {
       cout << "VGammaHadronCuts::applyTMVACut event " << i;
       cout << ", signal efficiency " << fTMVASignalEfficiency;
-      cout << ", probability threshold " << fTMVAProbabilityThreshold;
+      cout << ", probability threshold/MVA cut " << fTMVAProbabilityThreshold;
       cout << " (" << fTMVAEvaluator << ")";
       cout << endl;
    }

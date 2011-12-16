@@ -695,6 +695,11 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
             }
             z++;
         }
+        else
+        {
+	    cout << "ENERGY DISCARDED: " << fDifferentialFlux[i].Energy << "\t" << iEnergyMin_TeV_lin << "\t" << iEnergyMax_TeV_lin;
+	    cout << "\t" << s << endl;
+        }
 // print some debugging information
 //	if( fDebug )
 	{
@@ -703,7 +708,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	     if( dE_Log10 > 0. ) cout << " dE_log10: " << fDifferentialFlux[i].dE << "\t";
 	     cout << "[" << fDifferentialFlux[i].Energy_lowEdge << ", " << fDifferentialFlux[i].Energy_upEdge << "]\t";
 	     cout << "[" << log10(fDifferentialFlux[i].Energy_lowEdge) << ", " << log10(fDifferentialFlux[i].Energy_upEdge) << "]\t";
-	     cout << s << "(" << s_error_L << "," << s_error_U << ") [CU]";
+	     cout << endl;
+	     cout << "\t SIG: " << s << "(" << s_error_L << "," << s_error_U << ") [CU]";
 	     cout << endl;
 	     cout << "\t NON: " << non << " (+-" << non_error << ")";
 	     cout << "\t NOFF: " << noff << " (+-" << noff_error << ")";
@@ -1392,11 +1398,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
         double iBinEnergyMin = fMC_Data[1]->effArea_Emin;
 // get minimum energy bin
-        while( iBinEnergyMin < fMC_Data[1]->energy[0] - iBinSize/2. )
+        while( iBinEnergyMin - (fMC_Data[1]->energy[0] - iBinSize/2.) < 0. )
         {
             iBinEnergyMin += dE_Log10;
         }
-        if( TMath::Abs( iBinEnergyMin - ( fMC_Data[1]->energy[0] - iBinSize/2. ) ) > 1.e-2 ) iBinEnergyMin += dE_Log10;
+// (GM) changed while loop above to prevent from binning errors
+// (GM)        if( TMath::Abs( iBinEnergyMin - ( fMC_Data[1]->energy[0] - iBinSize/2. ) ) > 1.e-2 ) iBinEnergyMin += dE_Log10;
 
 // now fill vector with energies and energy bins
         while( iBinEnergyMin < fMC_Data[1]->effArea_Emax )

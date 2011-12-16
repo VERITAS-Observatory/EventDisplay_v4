@@ -95,6 +95,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    bool     bPlotEfficiencyPlotsPerEnergy;
 
+   double           getTMVACutValueFromSignalEfficiency( double iSignalEfficiency, unsigned int iBin, string iWeightFileName );
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
    vector< string > getTrainingVariables( string );
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 

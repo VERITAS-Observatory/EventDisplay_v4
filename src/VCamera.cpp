@@ -479,7 +479,6 @@ void VCamera::setPMTColorForChargeTiming()
                 fgraphTubesEntry[i]->SetFillColor( fColorBorder );
                 if( fBoolAllinOne )
                 {
-		    cout << "XX " << iTelescopeColor << endl;
                     fgraphTubesEntry[i]->SetLineColor( iTelescopeColor );
                     fgraphTubesEntry[i]->SetFillColor( iTelescopeColor );
                 }

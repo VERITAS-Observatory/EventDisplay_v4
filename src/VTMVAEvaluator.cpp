@@ -194,7 +194,14 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // make sure that MVA cut value is set correctly
       if( z >= fTMVACutValue.size() )
       {
-         fTMVACutValue.push_back( fTMVACutValueNoVec );
+	 if( fTMVACutValueNoVec < 0. && fSignalEfficiencyNoVec > 0. )
+	 {
+	     fTMVACutValue.push_back( getTMVACutValueFromSignalEfficiency( fSignalEfficiency.back(), i, iWeightFileName ) );
+         }
+	 else
+	 {
+	    fTMVACutValue.push_back( fTMVACutValueNoVec );
+         }
       }
 
 // weight file for this energy bin
@@ -352,6 +359,48 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    cout << "VTMVAEvaluator: Initialized " << fTMVAReader.size() << " MVA readers " << endl;
 
    return true;
+}
+
+/* 
+
+   get TMVA cut value for a given signal efficiency
+
+*/
+double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEfficiency, unsigned int iBin, string iWeightFileName )
+{
+    if( iWeightFileName.size() == 0 ) return -99.;
+
+    ostringstream iFullFileName;
+    iFullFileName << iWeightFileName << iBin  << ".root";
+    TFile iTMVAFile( iFullFileName.str().c_str() );
+    if( iTMVAFile.IsZombie() )
+    {
+       cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency() error reading TMVA root file: " << iFullFileName.str() << endl;
+       return -99.;
+    }
+    char hname[800];
+    sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(),
+                                                      fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
+    TH1F *effS = (TH1F*)iTMVAFile.Get( hname );
+    if( !effS )
+    {
+        sprintf( hname, "Method_%s/%d/MVA_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodCounter, fTMVAMethodCounter );
+	effS = (TH1F*)iTMVAFile.Get( hname );
+    }
+    if( !effS )
+    {
+        cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency() error finding signal efficiency from " << iFullFileName.str() << endl;
+	return -99.;
+    }
+
+    double iT = effS->GetBinCenter( effS->FindLastBinAbove( iSignalEfficiency ) );
+
+    cout << "TMVA CUT VALUE FOR SIGNAL EFFICIENCY " << iSignalEfficiency << ": " << iT;
+    cout << " (bin " << effS->FindLastBinAbove( iSignalEfficiency ) << ")" << endl;
+
+    iTMVAFile.Close();
+
+    return iT;
 }
 
 /*!

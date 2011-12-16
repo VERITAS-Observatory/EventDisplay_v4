@@ -15,20 +15,22 @@ int main( int argc, char *argv[] )
     if( argc != 6 )
     {
         cout << endl;
-	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory> <1D/2D> <outputfile>" << endl;
+	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory> <outputfile> <observatory (CTA/V5/V6)" << endl;
 	cout << endl;
 	exit( 0 );
     }
     string fSubArray = argv[1];
     double fObservingTime_h = atof( argv[2] );
     string fDataDirectory = argv[3];
-    string fHistogramDimension = argv[4];
-    string fOutputFile = argv[5];
+    string fOutputFile = argv[4];
+    string fObservatory = argv[5];
 
+    VWPPhysSensitivityFile *iData = new VWPPhysSensitivityFile();
+    iData->setObservatory( fObservatory );
 // Note: offset binning hardwired
     vector< double > iWobbleMin;
     vector< double > iWobbleMax;
-    if( fSubArray != "V5" && fSubArray != "V6" )
+    if( iData->isVTS() == 0 && fSubArray != "V5" && fSubArray != "V6" )
     {
        iWobbleMin.push_back( 0.0 ); iWobbleMax.push_back( 1. );
        iWobbleMin.push_back( 1.0 ); iWobbleMax.push_back( 2.0 );
@@ -40,8 +42,6 @@ int main( int argc, char *argv[] )
        iWobbleMin.push_back( 5.0 ); iWobbleMax.push_back( 5.5 );
        iWobbleMin.push_back( 5.5 ); iWobbleMax.push_back( 6.0 );
     }
-
-    VWPPhysSensitivityFile *iData = new VWPPhysSensitivityFile();
 // sub array
     iData->setSubArray( fSubArray );
 // observing time
