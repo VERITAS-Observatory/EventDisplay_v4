@@ -480,16 +480,16 @@ void VWPPhysSensitivityFile::setSubArray( string iA )
     }
     else if( isVTS() == 5 )
     {
-       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE130_ID34.eff";
+       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE130_ID30.eff";
        fDataFile_gamma_cone10 = "";
-       fDataFile_proton = "proton_20deg_050deg_NOISE130_ID34.eff";
+       fDataFile_proton = "proton_20deg_050deg_NOISE130_ID30.eff";
        fDataFile_electron = "";
     }
     else if( isVTS() == 6 )
     {
-       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE200_ID34.eff";
+       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE200_ID30.eff";
        fDataFile_gamma_cone10 = "";
-       fDataFile_proton = "proton_20deg_050deg_NOISE200_ID34.eff";
+       fDataFile_proton = "proton_20deg_050deg_NOISE200_ID30.eff";
        fDataFile_electron = "";
     } 
 }

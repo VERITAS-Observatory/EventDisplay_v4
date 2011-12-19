@@ -148,6 +148,14 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	      iMinMissingBin++;
 	      continue;
           }
+	  else if( i == iWeightFileIndex_max )
+	  {
+	      cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName.str() << endl;
+	      cout << "  assume this is a high-energy empty bin (bin number " << i << ";";
+	      iNbin--;
+	      iWeightFileIndex_max--;
+	      continue;
+          }
           else
 	  {
 	     cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing energies from TMVA root file " << iFullFileName.str() << endl;

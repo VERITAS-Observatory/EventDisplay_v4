@@ -32,15 +32,15 @@ int main( int argc, char *argv[] )
     vector< double > iWobbleMax;
     if( iData->isVTS() == 0 && fSubArray != "V5" && fSubArray != "V6" )
     {
-       iWobbleMin.push_back( 0.0 ); iWobbleMax.push_back( 1. );
+/*       iWobbleMin.push_back( 0.0 ); iWobbleMax.push_back( 1. );
        iWobbleMin.push_back( 1.0 ); iWobbleMax.push_back( 2.0 );
        iWobbleMin.push_back( 2.0 ); iWobbleMax.push_back( 3.0 );
        iWobbleMin.push_back( 3.0 ); iWobbleMax.push_back( 3.5 );
        iWobbleMin.push_back( 3.5 ); iWobbleMax.push_back( 4.0 );
        iWobbleMin.push_back( 4.0 ); iWobbleMax.push_back( 4.5 );
        iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 );
-       iWobbleMin.push_back( 5.0 ); iWobbleMax.push_back( 5.5 );
-       iWobbleMin.push_back( 5.5 ); iWobbleMax.push_back( 6.0 );
+       iWobbleMin.push_back( 5.0 ); iWobbleMax.push_back( 5.5 ); */
+//       iWobbleMin.push_back( 5.5 ); iWobbleMax.push_back( 6.0 );
     }
 // sub array
     iData->setSubArray( fSubArray );

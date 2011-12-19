@@ -490,7 +490,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
     return iEnergyResolutionPlottingCanvas;
 }
 
-void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted )
+void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double iYMax )
 {
     char hname[200];
     char htitle[200];
@@ -519,10 +519,11 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted )
     he0->SetXTitle( "log_{10} energy [TeV]" );
     he0->SetYTitle( "number of events/bin" );
     he0->SetMinimum( 0.5 );
-    if( fData[0]->hEmc )
+    if( fData[0]->hEmc && iYMax < 0. )
     {
        he0->SetMaximum( fData[0]->hEmc->GetMaximum()*1.5 );
     }
+    else he0->SetMaximum( iYMax );
     he0->Draw("");
     he0->Draw("AH");
 
