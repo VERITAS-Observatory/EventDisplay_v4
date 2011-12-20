@@ -541,8 +541,14 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
     cSensitivity->cd();
 
 // plot everything
-    if(  dE_Log10 < 0. ) gSensitivityvsEnergy->Draw( "l3" );
-    else                 gSensitivityvsEnergy->Draw( "lp" );
+    if(  dE_Log10 < 0. )
+    {
+       gSensitivityvsEnergy->Draw( "l3" );
+    }
+    else                
+    {
+       gSensitivityvsEnergy->Draw( "l3" );
+    }
 
     cSensitivity->Update();
 
@@ -1157,7 +1163,8 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
     if( h ) 
     {
        g = new TGraphAsymmErrors( 1 );
-       get_Graph_from_Histogram( h, g, true, false );
+//       get_Graph_from_Histogram( h, g, true, false );
+       get_Graph_from_Histogram( h, g, false, false, 2. );
     }
 
 // background rates

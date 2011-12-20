@@ -53,15 +53,26 @@ bool VPlotWPPhysSensitivity::initialize()
 	 for( unsigned int i = 0; i < fAnalysis.size(); i++ )
 	 {
 	    ostringstream iTemp;
-	    if( fAnalysis[i] == "DESY" )
+	    if( fAnalysis[i] == "DESY" || fAnalysis[i] == "DESY.ISDC3700m" || fAnalysis[i] == "DESY.cta-ultra3-2000m" )
 	    {
 	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
-	       iTemp << "DESY_20111123/DESY." << fSubArray[a] << "." << hname << ".root";
+	       iTemp << "DESY_20111123/" << fAnalysis[i] << "." << fSubArray[a] << "." << hname << ".root";
+	    }
+	    else if( fAnalysis[i] == "VTS" )
+	    {
+	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
+	       iTemp << "VTS/VTS." << fSubArray[a] << "." << hname << ".root";
 	    }
 	    else if( fAnalysis[i] == "ISDC" )
 	    {
 	       sprintf( hname, "%.1f", fObservationTime_H[t] );
 	       iTemp << "ISDC/ISDC_2000m_KonradB_optimal_"  << fSubArray[a] << "_" << hname;
+	       iTemp << "h_20deg_20110615.root";
+	    }
+	    else if( fAnalysis[i] == "ISDC.3700m" )
+	    {
+	       sprintf( hname, "%.1f", fObservationTime_H[t] );
+	       iTemp << "ISDC/ISDC_3700m_optimal_"  << fSubArray[a] << "_" << hname;
 	       iTemp << "h_20deg_20110615.root";
 	    }
 	    else if( fAnalysis[i] == "IFAE" )
@@ -101,8 +112,13 @@ bool VPlotWPPhysSensitivity::initialize()
 	    if( fCameraOffset_deg.size() == 0 )
 	    {
 	       fSensitivityFile.push_back( iTemp.str() );
-	       sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
-	       fLegend.push_back( hname );
+	       if( fAnalysis[i] != "DESY" ) sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
+	       else                         sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t] );
+// check that sensitivity file exists
+               TFile iF( fSensitivityFile.back().c_str() );
+	       if( !iF.IsZombie() ) fLegend.push_back( hname );
+	       else                 fLegend.push_back( "" );
+	       iF.Close();
 // plotting colors and line styles (note hierarchy)
                if( fAnalysisColor[i] > 0 )
 	       {
@@ -128,13 +144,18 @@ bool VPlotWPPhysSensitivity::initialize()
 		  fSensitivityFile.push_back( iTemp.str() );
 		  if( fCameraOffset_deg.size() == 1 )
 		  {
-		     sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
+		     if( fAnalysis[i] != "DESY" ) sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
+	             else  sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t] );
                   }
 		  else
 		  {
-	             sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t], fCameraOffset_deg[c] );
+	             if( fAnalysis[i] != "DESY" ) sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t], fCameraOffset_deg[c] );
+	             else  sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t], fCameraOffset_deg[c] );
                   }
-		  fLegend.push_back( hname );
+		  TFile iF( fSensitivityFile.back().c_str() );
+		  if( !iF.IsZombie() ) fLegend.push_back( hname );
+		  else                 fLegend.push_back( "" );
+		  iF.Close();
 // plotting colors and line styles (note hierarchy)
 		  if( fAnalysisColor[i] > 0 )
 		  {
@@ -176,6 +197,7 @@ bool VPlotWPPhysSensitivity::initialize()
 		  {
 		    fPlottingLineStyle.push_back( t+1 );
 		  }
+	          cout << "COLORS OFFSET " << fAnalysisColor[i] << "\t" << fSubArrayColor[a] << "\t" << fPlottingColor.back() << endl;
 
 		  fIRFCameraOffset_deg.push_back( fCameraOffset_deg[c] );
                }
@@ -187,19 +209,23 @@ bool VPlotWPPhysSensitivity::initialize()
 // print data sets
    for( unsigned int i = 0; i < fSensitivityFile.size(); i++ )
    {
-      cout << fSensitivityFile[i] << "\t" << fPlottingColor[i] << "\t" << fPlottingLineStyle[i] << "(" << fLegend[i] << ")" << endl;
+      cout << fSensitivityFile[i] << "\t" << fPlottingColor[i] << "\t" << fPlottingLineStyle[i] << "( " << fLegend[i] << ")" << endl;
+   }
+   if( fSensitivityFile.size() == 0 )
+   {
+      cout << "no data sets defined" << endl;
    }
 
    return true;
 }
   
-bool VPlotWPPhysSensitivity::plotIRF( string iPrint )
+bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMax, double iEnergyResolutionMax )
 {
     fIRF = new VPlotInstrumentResponseFunction();
 
     fIRF->setCanvasSize( 400, 400 );
     fIRF->setPlottingAxis( "energy_Lin", "X", true, 0.01, 200, "energy [TeV]" );
-    fIRF->setPlottingAxis( "effarea_Lin", "X", true, 50., 5.e7 );
+    fIRF->setPlottingAxis( "effarea_Lin", "X", true, 50., iEffAreaMax );
     fIRF->setPlottingAxis( "energyresolution_Lin", "X", false, 0., 0.7 );
 
     for( unsigned int i = 0; i < fSensitivityFile.size(); i++ )
@@ -228,7 +254,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint )
     }
     c = fIRF->plotAngularResolution( "energy", "80" );
     plotLegend( c, false );
-    c = fIRF->plotEnergyResolution( 0.5 );
+    c = fIRF->plotEnergyResolution( iEnergyResolutionMax );
     plotLegend( c, false );
     if( iPrint.size() > 0 )
     {
@@ -256,13 +282,13 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown )
       g->SetLineColor( fPlottingColor[i] );
       g->SetLineStyle( fPlottingLineStyle[i] );
       g->SetMarkerStyle( 1 );
-      iL->AddEntry( g, fLegend[i].c_str(), "l" );
+      if( fLegend[i].size() > 0 ) iL->AddEntry( g, fLegend[i].c_str(), "l" );
    }
    iL->Draw();
    return true; 
 }
 
-bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint )
+bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity )
 {
    string iCrabFile = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
    unsigned int iCrabID = 6;
@@ -273,9 +299,10 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint )
    {
       VSensitivityCalculator *a = new VSensitivityCalculator();
       a->setMonteCarloParametersCTA_MC( fSensitivityFile[i], fIRFCameraOffset_deg[i], iCrabFile, iCrabID );
-      a->setEnergyRange_Lin( 0.01, 200. );
+      a->setEnergyRange_Lin( 0.01, 50. );
       a->setPlotCanvasSize( 900, 600 );
       a->setPlottingStyle( fPlottingColor[i], fPlottingLineStyle[i], 2., 1 );
+      a->setFluxRange_ENERG( iMinSensitivity, iMaxSensitivity );
       TCanvas *c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fPlottingColor[i], "ENERGY", 0.2, 0.01 );
       if( c_temp ) cSens = c_temp;
       if( i == 0 ) c_temp = a->plotSignalBackgroundRates( cBck, true );   // plot protons and electrons
@@ -304,5 +331,24 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint )
    }
 
 
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+VWPPhysMinimumRequirements::VWPPhysMinimumRequirements( string iName )
+{
+   fName = iName;
+
+   fEnergyRange_TeV_Min = -1.;
+   fEnergyRange_TeV_Max = -1.;
+   fEnergyThreshold_TeV = -1.;
+}
+
+bool VWPPhysMinimumRequirements::readWPPhysMinimumRequirements( string iFile )
+{
    return true;
 }

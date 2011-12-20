@@ -240,7 +240,7 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphErrors *g, bo
 }
 
 
-bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis )
+bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis, double iCutUnrealisticErrors )
 {
     if( !h || !g ) return false;
 
@@ -249,6 +249,25 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphAsymmErrors *
     {
         if( h->GetBinContent( i ) > 0. )
 	{
+	   if( bIgnoreErrors )
+	   {
+	      g->SetPointEYlow( z, 0. );
+	      g->SetPointEYhigh( z, 0 );
+           }
+	   else
+	   {
+// remove unrealistic errors (e.g. error is iCutUnrealisticErrorsx the bin content)
+	      if( iCutUnrealisticErrors > 0. && h->GetBinContent( i ) && h->GetBinError( i )/h->GetBinContent( i ) > iCutUnrealisticErrors )
+	      {
+		 g->SetPointEYlow( z, 0. );
+		 g->SetPointEYhigh( z, 0. );
+              }
+	      else
+	      {
+		 g->SetPointEYlow( z, h->GetBinError( i ) );
+		 g->SetPointEYhigh( z, h->GetBinError( i ) );
+              }
+           }
 	   if( !bLinXaxis ) g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
 	   else
 	   {
@@ -257,16 +276,6 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphAsymmErrors *
 	         g->SetPoint( z, TMath::Log10( h->GetXaxis()->GetBinCenter( i ) ), h->GetBinContent( i ) );
               }
 	      else continue;
-           }
-	   if( bIgnoreErrors )
-	   {
-	      g->SetPointEYlow( z, 0. );
-	      g->SetPointEYhigh( z, 0 );
-           }
-	   else
-	   {
-	      g->SetPointEYlow( z, h->GetBinError( i ) );
-	      g->SetPointEYhigh( z, h->GetBinError( i ) );
            }
            z++;
         }

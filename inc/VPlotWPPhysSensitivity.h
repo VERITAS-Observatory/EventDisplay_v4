@@ -17,6 +17,28 @@
 #include "VPlotUtilities.h"
 #include "VSensitivityCalculator.h"
 
+class VWPPhysMinimumRequirements
+{
+    public:
+
+    string fName;
+    double fEnergyRange_TeV_Min;
+    double fEnergyRange_TeV_Max;
+    double fEnergyThreshold_TeV;
+    vector< double > fEnergyResolution_Energy_TeV_Min;
+    vector< double > fEnergyResolution_Energy_TeV_Max;
+    vector< double > fEnergyResolution;
+    vector< double > fAngularResolution_Energy_TeV_Min;
+    vector< double > fAngularResolution_Energy_TeV_Max;
+    vector< double > fAngularResolution_deg;
+    vector< double > fDifferentalSensitivity_Energy_TeV;
+    vector< double > fDifferentalSensitivity_erg_s_m2;
+
+    VWPPhysMinimumRequirements( string iName );
+   ~VWPPhysMinimumRequirements() {}
+    bool readWPPhysMinimumRequirements( string iFile );
+};
+
 class VPlotWPPhysSensitivity : public VPlotUtilities
 {
    private:
@@ -54,8 +76,8 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    void addObservationTime( double iObsTime, int iColor = -1, int iLineStyle = -1 );
    void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1 );
    bool initialize();
-   bool plotIRF( string iPrint = "" );
-   bool plotSensitivity( string iPrint = "" );
+   bool plotIRF( string iPrint = "", double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
+   bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10  );
 
 };
 
