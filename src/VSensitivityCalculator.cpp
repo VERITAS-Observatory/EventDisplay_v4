@@ -2539,7 +2539,14 @@ bool VSensitivityCalculator::fillSensitivityHistogramfromGraph( TGraph* g, TH1F 
        if( y > 0. && iScale != 0. )
        {
 	  h->SetBinContent( h->FindBin( x ), y*iScale );
-	  h->SetBinError( h->FindBin( x ), 0.5*(g->GetErrorYlow(i)+g->GetErrorYhigh(i))*iScale );
+	  if( 0.5*(g->GetErrorYlow(i)+g->GetErrorYhigh(i))*iScale < y*iScale )
+	  {
+	     h->SetBinError( h->FindBin( x ), 0.5*(g->GetErrorYlow(i)+g->GetErrorYhigh(i))*iScale );
+          }
+	  else
+	  {
+	     h->SetBinError( h->FindBin( x ), TMath::Min( g->GetErrorYlow(i), g->GetErrorYhigh(i) ) * iScale );
+          }
        }
    }
 
