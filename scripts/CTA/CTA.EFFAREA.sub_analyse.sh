@@ -34,7 +34,7 @@ then
    echo "<outputdirectory>"
    echo "     directory with all result and log files (full path)"
    echo
-   echo "  <data set>         e.g. cta-ultra3, ISDC3700, ...  "
+   echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo "[filling mode]"
    echo "     effective area filling mode (use 2 to calculate angular resolution only)"
@@ -64,6 +64,7 @@ then
   GFILLING=$7
 fi
 TMVACUT="20111212"
+TMVACUT="20111220"
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
@@ -252,7 +253,7 @@ do
 ###############################################################################
 # create cut file
       iCBFILE=`basename $CFIL`      
-      iCFIL=$FDIR/effectiveArea-CTA-$PART-$i-$j.$iCBFILE
+      iCFIL=$FDIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
       if [ ! -e $CFIL ]
       then
         echo "ERROR: cut file does not exist:"
@@ -291,7 +292,7 @@ do
 
 ###############################################################################
 # create run list
-      MSCF=$FDIR/effectiveArea-CTA-$PART-$INPU-$i-$j.$ARRAY.dat
+      MSCF=$FDIR/effectiveArea-CTA-$DSET-$PART-$INPU-$i-$j.$ARRAY.dat
       rm -f $MSCF
       echo "effective area data file for $PART $INPU $i $j" > $MSCF
 ###############################################################################
@@ -386,9 +387,10 @@ do
          echo "submitting to short queue"
          if [ $PART = "gamma_onSource" ]
 	 then
-            qsub -l h_cpu=03:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+            qsub -l os="sl*" -l h_cpu=06:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+#            qsub -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
          else
-            qsub -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+            qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
          fi
       fi
    done

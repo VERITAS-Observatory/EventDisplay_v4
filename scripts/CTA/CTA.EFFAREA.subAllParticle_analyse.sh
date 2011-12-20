@@ -22,10 +22,10 @@ then
    echo "<output directory>"
    echo "     directory name for output effective areas files"
    echo
-   echo " <data set>         e.g. cta-ultra3, ISDC3700, ...  "
+   echo " <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo "[filling mode]"
-   echo "effective area filling mode (use 2 to calculate angular resolution only"
+   echo "effective area filling mode (use 2 to calculate angular resolution only)"
    echo
    echo ""
    exit

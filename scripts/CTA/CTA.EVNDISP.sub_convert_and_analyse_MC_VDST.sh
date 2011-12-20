@@ -16,7 +16,7 @@ then
    echo
    echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
    echo
-   echo "  <data set>                e.g. cta-ultra3, ISDC3700, ..."
+   echo "  <data set>                e.g. cta-ultra3, ISDC3700m, ..."
    echo ""
    echo "  [keep simtel.root files]  keep and copy converted simtel files to output directory (default off=0)"
    echo ""

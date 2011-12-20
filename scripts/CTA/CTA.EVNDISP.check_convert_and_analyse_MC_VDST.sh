@@ -14,7 +14,7 @@ then
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo
-   echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
+   echo "  <particle>                gamma_onSource , gamma_cone10 , proton , electron (helium, ...)"
    echo ""
    echo "  <list of failed jobs>     list of failed jobs" 
    echo

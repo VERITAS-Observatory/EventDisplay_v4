@@ -8,9 +8,9 @@
 #
 #######################################################################
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
-   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name>"
+   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name> <offset=0/1>"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo ""
@@ -25,7 +25,7 @@ OUTNAME=$4
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
 for ARRAY in $VARRAY
 do
-   $EVNDISPSYS/bin/writeCTAWPPhysSensitivityFiles $ARRAY $OBSTIME $DDIR 1D $OUTNAME
+   $EVNDISPSYS/bin/writeCTAWPPhysSensitivityFiles $ARRAY $OBSTIME $DDIR $OUTNAME CTA $5
 done
 
 ############################################################################

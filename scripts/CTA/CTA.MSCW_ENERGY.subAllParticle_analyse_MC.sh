@@ -36,49 +36,10 @@ for ((m = 0; m < $NPART; m++ ))
 do
    PART=${VPART[$m]}
 
-# proton data set
-   if [ $PART = "proton" ]
-   then
-     RR=( 3 4 5 6 7 8 9 10 11 12 )
-   fi
-# gamma rays (isotropic simulations)
-   if [ $PART = "gamma_cone10" ]
-   then
-      RR=( 12 13 )
-   fi
-# gamma rays (on source)
-   if [ $PART = "gamma_onSource" ]
-   then
-      RR=( 3 4 5 )
-   fi
-# one single output file
-   if [ $PART = "electron" ]
-   then
-      RR=( 3 4 5 )
-   fi
-   if [ $PART = "helium" ]
-   then
-      RR=( 5 )
-   fi
-   NRR=${#RR[@]}
-
-   echo $PART $NRR
-
-###########################################
-# loop over all data sets and submit jobs
-   if [ $NRR -gt 0 ]
-   then
-      for ((j = 0; j < $NRR; j++ ))
-      do
-	 I=${RR[$j]}
-	 for (( k = 0; k < 10; k++ ))
-	 do
-	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $I$k
-	 done
-      done
-   else
-      ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4
-   fi
+   for (( k = 0; k < 10; k++ ))
+   do
+      ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $k
+   done
 done
 
 exit
