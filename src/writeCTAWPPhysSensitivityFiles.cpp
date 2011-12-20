@@ -12,10 +12,10 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
-    if( argc != 6 )
+    if( argc != 7 )
     {
         cout << endl;
-	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory> <outputfile> <observatory (CTA/V5/V6)" << endl;
+	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory> <outputfile> <observatory (CTA/V5/V6)> <offset=0/1>" << endl;
 	cout << endl;
 	exit( 0 );
     }
@@ -24,22 +24,23 @@ int main( int argc, char *argv[] )
     string fDataDirectory = argv[3];
     string fOutputFile = argv[4];
     string fObservatory = argv[5];
+    bool   fWriteOffsetFiles = atoi( argv[6] );
 
     VWPPhysSensitivityFile *iData = new VWPPhysSensitivityFile();
     iData->setObservatory( fObservatory );
 // Note: offset binning hardwired
     vector< double > iWobbleMin;
     vector< double > iWobbleMax;
-    if( iData->isVTS() == 0 && fSubArray != "V5" && fSubArray != "V6" )
+    if( fWriteOffsetFiles )
     {
-/*       iWobbleMin.push_back( 0.0 ); iWobbleMax.push_back( 1. );
+       iWobbleMin.push_back( 0.0 ); iWobbleMax.push_back( 1. );
        iWobbleMin.push_back( 1.0 ); iWobbleMax.push_back( 2.0 );
        iWobbleMin.push_back( 2.0 ); iWobbleMax.push_back( 3.0 );
        iWobbleMin.push_back( 3.0 ); iWobbleMax.push_back( 3.5 );
        iWobbleMin.push_back( 3.5 ); iWobbleMax.push_back( 4.0 );
        iWobbleMin.push_back( 4.0 ); iWobbleMax.push_back( 4.5 );
        iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 );
-       iWobbleMin.push_back( 5.0 ); iWobbleMax.push_back( 5.5 ); */
+       iWobbleMin.push_back( 5.0 ); iWobbleMax.push_back( 5.5 ); 
 //       iWobbleMin.push_back( 5.5 ); iWobbleMax.push_back( 6.0 );
     }
 // sub array
