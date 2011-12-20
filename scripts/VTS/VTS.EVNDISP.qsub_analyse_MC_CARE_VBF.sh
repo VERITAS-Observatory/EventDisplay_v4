@@ -1,0 +1,157 @@
+#!/bin/tcsh
+#
+# script to run evndisp on one of the cluster nodes (VBF)
+#
+# Revision $Id: qsub_evndisp_MC_VBF.sh,v 1.1.2.3.2.9.4.1.2.2 2011/04/06 12:22:24 gmaier Exp $
+#
+# Gernot Maier
+#
+##############################################################################################
+# variables set by parent script
+##############################################################################################
+set RUN=UUUAAA
+set ZEW=123456789
+set WOB=987654321
+set WOG=WOGWOG
+set NOISE=NOISENOISE
+set METHOD=RECMETH
+set ARRAY=XXXXXX
+set FDIR=DATADIR
+set YDIR=OUTDIR
+set SW=SUMWINDOW
+set PART=IDIDID
+set ATMO=AAAAAAAA
+##############################################################################################
+# input files
+# (observe that these might need some adjustments)
+##############################################################################################
+
+source $EVNDISPSYS/setObservatory.tcsh VERITAS
+
+if( $PART == "1" ) then
+   set IFIL=gamma_"$ZEW"deg_"$WOG"wobble_noise"$NOISE"MHz___
+endif
+if( $PART == "2" ) then
+   set IFIL=electron_"$ZEW"deg_noise"$NOISE"MHz___
+endif
+if( $PART == "14" ) then
+   set IFIL=proton_"$ZEW"deg_noise"$NOISE"MHz___
+endif
+
+##############################################################################################
+# directory with executable
+cd $EVNDISPSYS/scripts/VTS/
+##############################################################################################
+# detector configuration and cuts
+# telescopes
+set TTA="1234"
+#set TTA="234"
+set ACUT="EVNDISP.reconstruction.runparameter"
+# dead channel definitions
+set DEAD="EVNDISP.validchannels.dat"
+# camera geometry
+set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
+##############################################################################################
+
+#####################################################
+# temporary data directory
+set DDIR=$TMPDIR"/evn_"$ZEW"_"$SW"_"$NOISE"_"$WOB
+echo $DDIR
+mkdir -p $DDIR
+
+##############################################################################################
+# unzip vbf file to local scratch directory
+##############################################################################################
+set VFIL=$IFIL"$RUN".vbf
+echo "SOURCEFILE $FDIR/$IFIL"$RUN".vbf.gz"
+if (! -e $DDIR/$VFIL ) then
+ if ( -e $FDIR/$IFIL"$RUN".vbf.gz ) then
+    echo "copying $FDIR/$IFIL"$RUN".vbf.gz to $DDIR"
+    cp -f $FDIR/$IFIL"$RUN".vbf.gz $DDIR/
+    echo " (vbf file copied)"
+    gunzip -f -v $DDIR/$IFIL"$RUN".vbf.gz
+ else if( -e $FDIR/$IFIL"$RUN".vbf.bz2 ) then
+    echo "copying $FDIR/$IFIL"$RUN".vbf.bz2 to $DDIR"
+    cp -f $FDIR/$IFIL"$RUN".vbf.bz2 $DDIR/
+    echo " (vbf file copied)"
+    bunzip2 -f -v $DDIR/$IFIL"$RUN".vbf.bz2
+ endif
+endif
+set XFIL=$DDIR/$IFIL"$RUN".vbf
+if (! -e $XFIL ) then
+  echo "no source file found: $XFIL"
+  echo "$FDIR/$IFIL"$RUN".vbf*"
+  exit
+endif
+
+##############################################################################################
+# output directory
+##############################################################################################
+set ODIR=$YDIR/analysis_d20111209_ATM"$ATMO"_"$TTA"_SW"$SW"_NOISE"$NOISE"_"$METHOD"/
+mkdir -p $ODIR
+
+##############################################################################################
+#fix run numbers
+##############################################################################################
+if( $ARRAY == "V4" ) then
+   set RUN="4$RUN"
+endif
+if( $ARRAY == "V5" ) then
+   set RUN="5$RUN"
+endif
+if( $ARRAY == "V6" ) then
+   set RUN="6$RUN"
+endif
+
+##############################################################################################
+# calculate pedestals
+##############################################################################################
+
+echo "CALCULATING PEDESTALS FOR RUN $RUN"
+rm -f $ODIR/$RUN.ped.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN -sumfirst=0 -sumwindow=20 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
+
+set CALIBDATA=$VERITAS_EVNDISP_ANA_DIR/Calibration/calib.dat
+if (! -e $CALIBDATA ) then
+  touch $CALIBDATA 
+endif
+echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
+
+##############################################################################################
+# eventdisplay run options
+##############################################################################################
+
+##### reconstruction method #####
+set OPT=""
+if( $METHOD == "GEO" ) then
+  set OPT="$OPT"
+endif
+if( $METHOD == "LL" ) then
+  set OPT="$OPT -loglminloss=0.00"
+endif
+
+
+##### pedestal options #####
+set PEDOPT="-calibrationfile calib.dat -pedestalnoiselevel=$NOISE"
+
+##### MC options #####
+set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
+
+##### old options #####
+# "-MC_FADCTraceStart=2"
+
+echo "RUNNUMBER $RUN"
+echo "EVNDISP outputfile root file written to $ODIR/$RUN.root"
+echo "EVNDISP log file written to $ODIR/$RUN.dat"
+
+##############################################################################################
+# run eventdisplay 
+##############################################################################################
+$EVNDISPSYS/bin/evndisp -runnumber=$RUN -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RUN.root -sumwindow_doublepass=$SW -teltoana=$TTA $MCOPT $PEDOPT $OPT  >& $ODIR/$RUN.log
+
+##############################################################################################
+
+# remove temporary vbf file
+rm -f -v $XFIL
+
+exit
