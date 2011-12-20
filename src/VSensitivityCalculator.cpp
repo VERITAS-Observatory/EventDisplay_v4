@@ -112,6 +112,7 @@ void VSensitivityCalculator::reset()
     setObservationTimeRange();
     setSignificanceParameter();
     setBackgroundMissingParticleFraction();
+    setUseEffectiveAreas_vs_reconstructedEnergy();
 
     fGraphObsvsTime.clear();
     fData.clear();
@@ -645,14 +646,17 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	if( TMath::Abs( non ) < 1.e-2 && TMath::Abs( noff ) < 1.e-2 ) continue;
 
 // observe that the signal rate is defined differently for list_sensitivity() etc...
-	unsigned int iD = addDataSet( non / fDifferentialFlux[i].ObsTime * 60., noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" );
+	unsigned int iD = addDataSet( non  / fDifferentialFlux[i].ObsTime * 60.,
+	                              noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" );
 // get fraction of Crab flux for XX sigma etc...
 	s = getSensitivity( iD, fDifferentialFlux[i].Energy );
 // get error on sensitivity estimate
-	iD = addDataSet( (non+non_error) / fDifferentialFlux[i].ObsTime * 60., (noff-noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
-	s_error_U = getSensitivity( iD );
-	iD = addDataSet( (non-non_error) / fDifferentialFlux[i].ObsTime * 60., (noff+noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
+	iD = addDataSet( (non+non_error)   / fDifferentialFlux[i].ObsTime * 60., 
+	                 (noff-noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
 	s_error_L = getSensitivity( iD );
+	iD = addDataSet( (non-non_error)   / fDifferentialFlux[i].ObsTime * 60.,
+	                 (noff+noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
+	s_error_U = getSensitivity( iD );
 
 // fill sensitivity graphs
 	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
@@ -1296,7 +1300,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     
     for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
     {
-       if( !getMonteCarlo_EffectiveArea( (*i_MCData_iterator).second ) ) return a;
+       if( !getMonteCarlo_EffectiveArea( (*i_MCData_iterator).second, dE_Log10 ) ) return a;
     }
 
 ///////////////////////////////////////////////////////////////////
@@ -1373,7 +1377,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		cout << "\t" << i_flux.Energy << "\t" << i_flux.EnergyWeightedMean;
                 cout << "\t" << i_flux.dE << "\t" << i_flux.ObsTime << "\t" << fObservationTime_h << "  Off: ";
 		map< unsigned int, int >::iterator iEnergyScaleOffset_iter;
-		for( iEnergyScaleOffset_iter = iEnergyScaleOffset.begin(); iEnergyScaleOffset_iter != iEnergyScaleOffset.end(); iEnergyScaleOffset_iter++ )
+		for( iEnergyScaleOffset_iter = iEnergyScaleOffset.begin(); 
+		     iEnergyScaleOffset_iter != iEnergyScaleOffset.end(); iEnergyScaleOffset_iter++ )
 		{
 		   cout << (*iEnergyScaleOffset_iter).second << "\t";
                 }
@@ -1559,8 +1564,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
        {
           if( i < (*v_flux_NOff_iter).second.size() )
 	  {
-	     v_flux[i].NOn  += (*v_flux_NOff_iter).second[i];
-	     v_flux[i].NOff += (*v_flux_NOff_iter).second[i];
+// require that at least some proton events
+	     if( i < v_flux_NOff[14].size() && v_flux_NOff[14][i] > 0. )
+	     {
+		v_flux[i].NOn  += (*v_flux_NOff_iter).second[i];
+		v_flux[i].NOff += (*v_flux_NOff_iter).second[i];
+             }
           }
        }
    }
@@ -1760,7 +1769,7 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low, unsigned
 /*!
     fill effective area vector into VSensitivityCalculatorDataResponseFunctions
 */
-bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara )
+bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara, double dE_Log10 )
 {
 //////////////////////////////////////////////////////////////////////////////////////
 // read effective areas from file
@@ -1804,7 +1813,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 
 	   if( c->az != iMCPara->az ) continue;
 
-   // ignore everything else for non-gammas (wobble offsets and zenith angles)
+// ignore everything else for non-gammas (wobble offsets and zenith angles)
 	   if( iMCPara->fParticleID == 1 )
 	   {
 	       if( TMath::Abs( c->ze - iMCPara->ze ) > 2. ) continue;
@@ -1818,10 +1827,59 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 // fill effective areas vs reconstructed energy (log10!)
         for( int n = 0; n < c->Rec_nbins; n++ )
         {
-            if( c->Rec_e0[n] < iMCPara->energy_min_log || c->Rec_e0[n] > iMCPara->energy_max_log ) continue;
-            iMCPara->energy.push_back( c->Rec_e0[n] );
-            iMCPara->effArea.push_back( c->Rec_eff[n] );
-	    iMCPara->effArea_error.push_back( c->Rec_seff_L[n] );  // ignore upper and lower errors from effective area file
+	    if( bUseEffectiveAreas_vs_reconstructedEnergy )
+	    {
+	       if( c->Rec_e0[n] < iMCPara->energy_min_log || c->Rec_e0[n] > iMCPara->energy_max_log ) continue;
+// require more than one event per pair of bins 
+// (effective areas are usually in finer bins than differential sensitivity)
+	       if( c->hEcutRecUW &&
+		   c->hEcutRecUW->GetBinContent( c->hEcutRecUW->FindBin( c->Rec_e0[n] ) ) + 
+		   c->hEcutRecUW->GetBinContent( c->hEcutRecUW->FindBin( c->Rec_e0[n] ) + 1 ) > 1.
+		|| !c->hEcutRecUW )
+	       {
+		  iMCPara->energy.push_back( c->Rec_e0[n] );
+		  if( c->hEmc )
+		  {
+		    iMCPara->energy_lowEdge.push_back( c->hEmc->GetBinLowEdge( c->hEmc->FindBin( c->Rec_e0[n] ) ) );
+		    iMCPara->energy_upEdge.push_back( iMCPara->energy_lowEdge.back() + c->hEmc->GetBinWidth( c->hEmc->FindBin( c->Rec_e0[n] ) ) );
+		  }
+		  else
+		  {
+		    iMCPara->energy_lowEdge.push_back( -1. );
+		    iMCPara->energy_upEdge.push_back( -1. );
+		  }
+
+		  iMCPara->effArea.push_back( c->Rec_eff[n] );
+		  iMCPara->effArea_error.push_back( 0.5*(c->Rec_seff_L[n]+c->Rec_seff_U[n]) );  
+	       }
+           }
+// use effective areas vs MC energy
+           else
+	   {
+	       if( c->e0[n] < iMCPara->energy_min_log || c->e0[n] > iMCPara->energy_max_log ) continue;
+// require more than one event per pair of bins 
+// (effective areas are usually in finer bins than differential sensitivity)
+	       if( c->hEcutUW &&
+		   c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) ) + 
+		   c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) + 1 ) > 1.
+		|| !c->hEcutUW )
+	       {
+		  iMCPara->energy.push_back( c->e0[n] );
+		  if( c->hEmc )
+		  {
+		    iMCPara->energy_lowEdge.push_back( c->hEmc->GetBinLowEdge( c->hEmc->FindBin( c->e0[n] ) ) );
+		    iMCPara->energy_upEdge.push_back( iMCPara->energy_lowEdge.back() + c->hEmc->GetBinWidth( c->hEmc->FindBin( c->e0[n] ) ) );
+		  }
+		  else
+		  {
+		    iMCPara->energy_lowEdge.push_back( -1. );
+		    iMCPara->energy_upEdge.push_back( -1. );
+		  }
+
+		  iMCPara->effArea.push_back( c->eff[n] );
+		  iMCPara->effArea_error.push_back( 0.5*(c->seff_L[n]+c->seff_U[n]) );  
+	       }
+           }
         }
 // get global energy binning
         if( c->hEmc )
@@ -1837,6 +1895,55 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
         }
         break;
     }
+// remove single filled bins in effective areas
+    bool bGoodBin = false;
+    for( unsigned int i = iMCPara->energy.size()-1; i > 0; i-- )
+    {
+        if( TMath::Abs( iMCPara->energy_lowEdge[i] - iMCPara->energy_upEdge[i-1] ) > 1.e-3 && !bGoodBin )
+	{
+	  cout << "\t" << iMCPara->energy_lowEdge[i] << "\t" << iMCPara->energy_upEdge[i-1] << "\t" << i << "\t" << iMCPara->energy.size() << endl;
+          iMCPara->energy.erase( iMCPara->energy.begin()+i, iMCPara->energy.end() );
+          iMCPara->energy_upEdge.erase( iMCPara->energy_upEdge.begin()+i, iMCPara->energy_upEdge.end() );
+          iMCPara->energy_lowEdge.erase( iMCPara->energy_lowEdge.begin()+i, iMCPara->energy_lowEdge.end() );
+          iMCPara->effArea.erase( iMCPara->effArea.begin()+i, iMCPara->effArea.end() );
+          iMCPara->effArea_error.erase( iMCPara->effArea_error.begin()+i, iMCPara->effArea_error.end() ); 
+        }
+	else
+	{
+	   bGoodBin = true;
+        }
+    }
+// adjust energy binning for differential sensitivity
+    if( dE_Log10 > 0. && iMCPara->energy_upEdge.size() > 1 )
+    {
+// make sure that high energy bin edge corresponds to a bin edge in differential sensitivity binning
+       unsigned int z = 0;
+       double iDiff =  TMath::Abs( iMCPara->energy_upEdge[iMCPara->energy_upEdge.size()-1]/dE_Log10
+                     - TMath::Nint(iMCPara->energy_upEdge[iMCPara->energy_upEdge.size()-1]/dE_Log10) );
+       unsigned int nCounter = iMCPara->energy_upEdge.size()-2;
+       while( iDiff > 1.e-3 && nCounter != 1 )
+       {
+          iDiff = TMath::Abs( iMCPara->energy_upEdge[nCounter]/dE_Log10-TMath::Nint(iMCPara->energy_upEdge[nCounter]/dE_Log10) );
+	  z++;
+	  nCounter--;
+       }
+       z = iMCPara->energy_upEdge.size() - z - 1;
+       if( z > 0 && z < iMCPara->energy_upEdge.size()-1 )
+       {
+	  cout << "Adjusting effective areas to binning for differential sensitivity, removing " << z << " point(s) at upper edge" << endl;
+          iMCPara->energy.erase( iMCPara->energy.begin()+z, iMCPara->energy.end() );
+          iMCPara->energy_upEdge.erase( iMCPara->energy_upEdge.begin()+z, iMCPara->energy_upEdge.end() );
+          iMCPara->energy_lowEdge.erase( iMCPara->energy_lowEdge.begin()+z, iMCPara->energy_lowEdge.end() );
+          iMCPara->effArea.erase( iMCPara->effArea.begin()+z, iMCPara->effArea.end() );
+          iMCPara->effArea_error.erase( iMCPara->effArea_error.begin()+z, iMCPara->effArea_error.end() );
+       }
+       if( iMCPara->energy.size() > 0 )
+       {
+	  cout << "\t highest energy bin: " << iMCPara->energy[iMCPara->energy.size()-1] << "\t";
+	  cout << iMCPara->energy_upEdge[iMCPara->energy_upEdge.size()-1] << endl;
+       }
+    }
+    cout << "\t total number of bins in effective area after adjustment: " << iMCPara->energy.size() << endl;
     if( !bFound ) cout << "\t no effective area found!" << endl;
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -1877,7 +1984,6 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
        iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV = new TGraph( 1000 );
        iMCPara->gTheta2Cuts_vsEnergylgTeV = new TGraph( 1000 );
 
-//       if( fDebug && iCuts->getTheta2Cut_TMVA_max() )
        if( iCuts->getTheta2Cut_TMVA_max() )
        {
           iCuts->getTheta2Cut_TMVA_max()->Print();

@@ -60,7 +60,8 @@ class VSensitivityCalculatorDataResponseFunctions
 
     string fName;
     unsigned int fParticleID;                              //              particle ID (1=gamma,2=electron,14=proton,402=helium)
-    string fSpectralParameterFile;                         //              data file (+path) with spectral information (e.g. Crab Nebula or proton spectrum)
+    string fSpectralParameterFile;                         //              data file (+path) with spectral information 
+                                                           //              (e.g. Crab Nebula or proton spectrum)
     unsigned int fSpectralParameterID;                     //              ID of spectrum in given file fSpectralParameterFile
     string fEffectiveAreaFile;                             //              file name (+path) of effective area file
     double ze;                                             // [deg]        zenith angle of selected effective area
@@ -70,10 +71,12 @@ class VSensitivityCalculatorDataResponseFunctions
     double index;                                          //              spectral index of selected effective area
     double theta2_min;                                     // [deg^2]      direction cut (if energy independent)
 //    double theta2_max;                                     // [deg^2]      direction cut (if energy independent)
-    double theta2_MCScatterAngle;                          // [deg^2]      scattering angle^2 of primary direction in CORSIKA (e.g. 10deg in most CTA simulations)
+    double theta2_MCScatterAngle;                          // [deg^2]      scattering angle^2 of primary direction in CORSIKA
+                                                           //              (e.g. 10deg in most CTA simulations)
     TGraph* gSolidAngle_DirectionCut_vs_EnergylgTeV;       // [sr, lg TeV] solid angle of direction cut (as function of energy)
     TGraph* gTheta2Cuts_vsEnergylgTeV;                     // [deg, TeV]   theta2 cut vs energy
-    double SolidAngle_MCScatterAngle;                      // [sr]         scattering solid angle of primary direction in CORSIKA (e.g. 10deg in most CTA simulations)
+    double SolidAngle_MCScatterAngle;                      // [sr]         scattering solid angle of primary direction in CORSIKA 
+                                                           //              (e.g. 10deg in most CTA simulations)
     double alpha;
     int effArea_Ebins;
     double effArea_Emin;
@@ -81,6 +84,8 @@ class VSensitivityCalculatorDataResponseFunctions
     double energy_min_log;
     double energy_max_log;
     vector< double > energy;
+    vector< double > energy_lowEdge;
+    vector< double > energy_upEdge;
     vector< double > effArea;
     vector< double > effArea_error;
 
@@ -135,6 +140,8 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double fEnergy_min_Log;
         double fEnergy_max_Log;
 	double fEnergy_dE_log10;
+
+	bool   bUseEffectiveAreas_vs_reconstructedEnergy;
 
 // data vectors for MC and int/diff sensitivity calculation
 	map< unsigned int, VSensitivityCalculatorDataResponseFunctions* > fMC_Data;                        //! [particle ID]
@@ -192,7 +199,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 						  map< unsigned int, vector< double > > i_flux_NOff,
 						  map< unsigned int, vector< double > > i_flux_NOff_error );
 	void       fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha );
-        bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara );
+        bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara, double dE_Log10 );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
 				       bool iRateError = false );
@@ -270,8 +277,9 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );
         void     setSourceStrengthVector_CU();
         void     setSourceStrengthVector_CU( vector< double > );
+	void     setUseEffectiveAreas_vs_reconstructedEnergy( bool iB = true ) { bUseEffectiveAreas_vs_reconstructedEnergy = iB; }
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,9);
+        ClassDef(VSensitivityCalculator,10);
 };
 #endif
