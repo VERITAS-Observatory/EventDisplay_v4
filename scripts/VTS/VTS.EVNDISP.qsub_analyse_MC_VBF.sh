@@ -168,12 +168,12 @@ set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
 
 echo "RUNNUMBER $SRUN"
 echo "EVNDISP outputfile root file written to $ODIR/$RRR.root"
-echo "EVNDISP log file written to $ODIR/$RRR.dat"
+echo "EVNDISP log file written to $ODIR/$RRR.log"
 
 ##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -sumwindow_doublepass=$SW -teltoana=$TTA $MCOPT $PEDOPT $OPT  >& $ODIR/$RRR.dat
+$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -sumwindow_doublepass=$SW -teltoana=$TTA $MCOPT $PEDOPT $OPT  >& $ODIR/$RRR.log
 ##############################################################################################
 
 # remove temporary vbf file
