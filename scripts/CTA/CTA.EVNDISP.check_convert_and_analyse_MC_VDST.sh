@@ -14,7 +14,7 @@ then
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo
-   echo "  <particle>                gamma_onSource , gamma_cone10 , proton , electron (helium, ...)"
+   echo "  <particle>                gamma_onSource , gamma_cone10, proton , electron (helium, ...)"
    echo ""
    echo "  <list of failed jobs>     list of failed jobs" 
    echo
@@ -51,8 +51,10 @@ do
 
 # get run number 
   F1=${AFIL#*run}
-#  echo "CHECKING RUN $F1"
-  RUN=${F1%___*}
+  F2=${F1%___*}
+# remove zeros in the beginning in case they exist
+  RUN=`zsh -c "echo $F2 | sed 's/^0\+//'"`
+
 
   for ARRAY in $VARRAY
   do
