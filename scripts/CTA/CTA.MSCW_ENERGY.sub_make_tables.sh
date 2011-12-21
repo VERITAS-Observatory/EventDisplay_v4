@@ -51,7 +51,7 @@ else
    OFFMIN=( "-1.e10" )
    OFFMAX=( "1.e10" )
    OFFMEA=( 0.0 )
-   DSUF="gamma_onSource/[3-5]"
+   DSUF="gamma_onSource/[1-9]"
 fi
 NOFF=${#OFFMIN[@]}
 
@@ -128,7 +128,7 @@ do
       chmod u+x $FNAM.sh
 
 # submit the job
-      qsub -l h_cpu=25:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -l os="sl*"  -l h_cpu=25:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 
