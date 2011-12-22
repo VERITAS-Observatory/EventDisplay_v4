@@ -10,32 +10,36 @@ VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
 }
 
 
-void VPlotWPPhysSensitivity::addAnalysis( string iAnalysis, int iColor, int iLineStyle )
+void VPlotWPPhysSensitivity::addAnalysis( string iAnalysis, int iColor, int iLineStyle, int iFillStyle )
 {
    fAnalysis.push_back( iAnalysis );
    fAnalysisColor.push_back( iColor );
    fAnalysisLineStyle.push_back( iLineStyle );
+   fAnalysisFillStyle.push_back( iFillStyle );
 }
 
-void VPlotWPPhysSensitivity::addCameraOffset( double iCameraOffset_deg, int iColor, int iLineStyle )
+void VPlotWPPhysSensitivity::addCameraOffset( double iCameraOffset_deg, int iColor, int iLineStyle, int iFillStyle )
 {
    fCameraOffset_deg.push_back( iCameraOffset_deg );
    fCameraOffsetColor.push_back( iColor );
    fCameraOffsetLineStyle.push_back( iLineStyle );
+   fCameraOffsetFillStyle.push_back( iFillStyle );
 }
 
-void VPlotWPPhysSensitivity::addObservationTime( double iObsTime, int iColor, int iLineStyle )
+void VPlotWPPhysSensitivity::addObservationTime( double iObsTime, int iColor, int iLineStyle, int iFillStyle )
 {
    fObservationTime_H.push_back( iObsTime );
    fObservationTimeColor.push_back( iColor );
    fObservationTimeLineStyle.push_back( iLineStyle );
+   fObservationTimeFillStyle.push_back( iFillStyle );
 }
 
-void VPlotWPPhysSensitivity::addSubArray( string iArray, int iColor, int iLineStyle )
+void VPlotWPPhysSensitivity::addSubArray( string iArray, int iColor, int iLineStyle, int iFillStyle )
 {
    fSubArray.push_back( iArray );
    fSubArrayColor.push_back( iColor );
    fSubArrayLineStyle.push_back( iLineStyle );
+   fSubArrayFillStyle.push_back( iFillStyle );
 }
 
 bool VPlotWPPhysSensitivity::initialize()
@@ -119,22 +123,22 @@ bool VPlotWPPhysSensitivity::initialize()
 	       if( !iF.IsZombie() ) fLegend.push_back( hname );
 	       else                 fLegend.push_back( "" );
 	       iF.Close();
-// plotting colors and line styles (note hierarchy)
-               if( fAnalysisColor[i] > 0 )
-	       {
-		  fPlottingColor.push_back( fAnalysisColor[i] );
-               }
-	       else if( fSubArrayColor[a] > 0 )
-	       {
-		  fPlottingColor.push_back( fSubArrayColor[a] );
-               }
-	       else
-	       {
-	         fPlottingColor.push_back( 1 );
-               }
-	       cout << "COLORS " << fAnalysisColor[i] << "\t" << fSubArrayColor[a] << fPlottingColor.back() << endl;
-	       if( fAnalysisLineStyle[i] > 0 ) fPlottingLineStyle.push_back( fAnalysisLineStyle[i] );
-	       else                            fPlottingLineStyle.push_back( t+1 );
+// plotting colors/line and fill styles (note hierarchy)
+               if( fAnalysisColor[i] > 0 )                 fPlottingColor.push_back( fAnalysisColor[i] );
+	       else if( fSubArrayColor[a] > 0 )            fPlottingColor.push_back( fSubArrayColor[a] );
+	       else if( fObservationTimeColor[t] > 0 )     fPlottingColor.push_back( fObservationTimeColor[t] );
+	       else                                        fPlottingColor.push_back( 1 );
+
+	       if( fAnalysisLineStyle[i] > 0 )             fPlottingLineStyle.push_back( fAnalysisLineStyle[i] );
+	       else if( fSubArrayLineStyle[a] > 0 )        fPlottingLineStyle.push_back( fSubArrayLineStyle[a] );
+	       else if( fObservationTimeLineStyle[t] > 0 ) fPlottingLineStyle.push_back( fObservationTimeLineStyle[t] );
+	       else                                        fPlottingLineStyle.push_back( t+1 );
+
+	       if( fAnalysisFillStyle[i] > 0 )             fPlottingFillStyle.push_back( fAnalysisFillStyle[i] );
+	       else if( fSubArrayFillStyle[a] > 0 )        fPlottingFillStyle.push_back( fSubArrayFillStyle[a] );
+	       else if( fObservationTimeFillStyle[t] > 0 ) fPlottingFillStyle.push_back( fObservationTimeFillStyle[t] );
+	       else                                        fPlottingFillStyle.push_back( 1001 );
+
 	       fIRFCameraOffset_deg.push_back( 0. );
             }
 	    else
@@ -157,47 +161,23 @@ bool VPlotWPPhysSensitivity::initialize()
 		  else                 fLegend.push_back( "" );
 		  iF.Close();
 // plotting colors and line styles (note hierarchy)
-		  if( fAnalysisColor[i] > 0 )
-		  {
-		     fPlottingColor.push_back( fAnalysisColor[i] );
-		  }
-		  else if( fSubArrayColor[a] > 0 )
-		  {
-		     fPlottingColor.push_back( fSubArrayColor[a] );
-		  }
-		  else if( fCameraOffsetColor[c] > 0 )
-		  {
-		     fPlottingColor.push_back( fCameraOffsetColor[c] );
-                  }
-		  else if( fObservationTimeColor[t] > 0 )
-		  {
-		     fPlottingColor.push_back( fObservationTimeColor[t] );
-                  }
-		  else
-		  {
-		    fPlottingColor.push_back( 1 );
-		  }
-		  if( fAnalysisLineStyle[i] > 0 )
-		  {
-		     fPlottingLineStyle.push_back( fAnalysisLineStyle[i] );
-		  }
-		  else if( fSubArrayLineStyle[a] > 0 )
-		  {
-		     fPlottingLineStyle.push_back( fSubArrayLineStyle[a] );
-		  }
-		  else if( fCameraOffsetLineStyle[c] > 0 )
-		  {
-		     fPlottingLineStyle.push_back( fCameraOffsetLineStyle[c] );
-                  }
-		  else if( fObservationTimeLineStyle[t] > 0 )
-		  {
-		     fPlottingLineStyle.push_back( fObservationTimeLineStyle[t] );
-                  }
-		  else
-		  {
-		    fPlottingLineStyle.push_back( t+1 );
-		  }
-	          cout << "COLORS OFFSET " << fAnalysisColor[i] << "\t" << fSubArrayColor[a] << "\t" << fPlottingColor.back() << endl;
+		  if( fAnalysisColor[i] > 0 )                 fPlottingColor.push_back( fAnalysisColor[i] );
+		  else if( fSubArrayColor[a] > 0 )            fPlottingColor.push_back( fSubArrayColor[a] );
+		  else if( fCameraOffsetColor[c] > 0 )        fPlottingColor.push_back( fCameraOffsetColor[c] );
+		  else if( fObservationTimeColor[t] > 0 )     fPlottingColor.push_back( fObservationTimeColor[t] );
+		  else fPlottingColor.push_back( 1 );
+
+		  if( fAnalysisLineStyle[i] > 0 )             fPlottingLineStyle.push_back( fAnalysisLineStyle[i] );
+		  else if( fSubArrayLineStyle[a] > 0 )        fPlottingLineStyle.push_back( fSubArrayLineStyle[a] );
+		  else if( fCameraOffsetLineStyle[c] > 0 )    fPlottingLineStyle.push_back( fCameraOffsetLineStyle[c] );
+		  else if( fObservationTimeLineStyle[t] > 0 ) fPlottingLineStyle.push_back( fObservationTimeLineStyle[t] );
+		  else                                        fPlottingLineStyle.push_back( t+1 );
+
+		  if( fAnalysisFillStyle[i] > 0 )             fPlottingFillStyle.push_back( fAnalysisFillStyle[i] );
+		  else if( fSubArrayFillStyle[a] > 0 )        fPlottingFillStyle.push_back( fSubArrayFillStyle[a] );
+		  else if( fCameraOffsetFillStyle[c] > 0 )    fPlottingFillStyle.push_back( fCameraOffsetFillStyle[c] );
+		  else if( fObservationTimeFillStyle[t] > 0 ) fPlottingFillStyle.push_back( fObservationTimeFillStyle[t] );
+		  else                                        fPlottingFillStyle.push_back( t+1 );
 
 		  fIRFCameraOffset_deg.push_back( fCameraOffset_deg[c] );
                }
@@ -301,7 +281,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
       a->setMonteCarloParametersCTA_MC( fSensitivityFile[i], fIRFCameraOffset_deg[i], iCrabFile, iCrabID );
       a->setEnergyRange_Lin( 0.01, 50. );
       a->setPlotCanvasSize( 900, 600 );
-      a->setPlottingStyle( fPlottingColor[i], fPlottingLineStyle[i], 2., 1 );
+      a->setPlottingStyle( fPlottingColor[i], fPlottingLineStyle[i], 2., 1, 2., fPlottingFillStyle[i] );
       a->setFluxRange_ENERG( iMinSensitivity, iMaxSensitivity );
       TCanvas *c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fPlottingColor[i], "ENERGY", 0.2, 0.01 );
       if( c_temp ) cSens = c_temp;

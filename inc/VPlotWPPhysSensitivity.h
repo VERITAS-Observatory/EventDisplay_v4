@@ -48,20 +48,28 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    vector< string > fAnalysis;
    vector< int >    fAnalysisColor;
    vector< int >    fAnalysisLineStyle;
+   vector< int >    fAnalysisFillStyle;
+
    vector< double > fObservationTime_H;
    vector< int >    fObservationTimeColor;
    vector< int >    fObservationTimeLineStyle;
+   vector< int >    fObservationTimeFillStyle;
+
    vector< string > fSubArray;
    vector< int >    fSubArrayColor;
    vector< int >    fSubArrayLineStyle;
+   vector< int >    fSubArrayFillStyle;
+
    vector< double > fCameraOffset_deg;
    vector< int >    fCameraOffsetColor;
    vector< int >    fCameraOffsetLineStyle;
+   vector< int >    fCameraOffsetFillStyle;
 
    vector< string > fSensitivityFile;   // [Analysis][SubArray+SObsTime];
    vector< double > fIRFCameraOffset_deg;
    vector< int >    fPlottingColor;
    vector< int >    fPlottingLineStyle;
+   vector< int >    fPlottingFillStyle;
    vector< string > fLegend;
 
    bool    plotLegend( TCanvas *c = 0, bool iLeft = false );
@@ -71,10 +79,10 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    VPlotWPPhysSensitivity();
   ~VPlotWPPhysSensitivity() {}
 
-   void addAnalysis( string iAnalysis, int iColor = -1, int iLineStyle = -1 );           // NOTE: hardwired analysis file names
-   void addCameraOffset( double iCameraOffset_deg = 0., int iColor = -1, int iLineStyle = -1 );
-   void addObservationTime( double iObsTime, int iColor = -1, int iLineStyle = -1 );
-   void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1 );
+   void addAnalysis( string iAnalysis, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );           // NOTE: hardwired analysis file names
+   void addCameraOffset( double iCameraOffset_deg = 0., int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
+   void addObservationTime( double iObsTime, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
+   void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
    bool initialize();
    bool plotIRF( string iPrint = "", double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10  );

@@ -529,7 +529,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 {
     if( gSensitivityvsEnergy )
     {
-       setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, fPlottingMarkerStyle, fPlottingMarkerSize, 1001, fPlottingLineStyle );
+       setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, fPlottingMarkerStyle, fPlottingMarkerSize, fPlottingFillStyle, fPlottingLineStyle );
     }
 
 // get canvas
@@ -1163,8 +1163,8 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
     if( h ) 
     {
        g = new TGraphAsymmErrors( 1 );
-//       get_Graph_from_Histogram( h, g, true, false );
-       get_Graph_from_Histogram( h, g, false, false, 2. );
+//       get_Graph_from_Histogram( h, g, false, false, 2. );
+       get_Graph_from_Histogram( h, g, false, false, 1.e3 );
     }
 
 // background rates
