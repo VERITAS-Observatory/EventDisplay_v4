@@ -237,6 +237,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 		   for( int b = 0; b < hisList[i]->GetNbinsX(); b++ )
 		   {
 		      iHis2D[iHisName2D]->SetBinContent( b, j+1, hisList[i]->GetBinContent( b ) );
+		      iHis2D[iHisName2D]->SetBinError( b, j+1, hisList[i]->GetBinError( b ) );
                    }
                 }
 		if( (iClass == "TH2F" || iClass == "TH2D") && iHis3D.find( iHisName2D ) != iHis3D.end() )
@@ -246,6 +247,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 		      for( int by = 0; by < hisList[i]->GetNbinsY(); by++ )
 		      {
 			 iHis3D[iHisName2D]->SetBinContent( bx, by, j+1, hisList[i]->GetBinContent( bx, by ) );
+			 iHis3D[iHisName2D]->SetBinError( bx, by, j+1, hisList[i]->GetBinError( bx, by ) );
                       }
                    }
                 }

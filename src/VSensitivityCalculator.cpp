@@ -1904,21 +1904,23 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
     }
 // remove single filled bins in effective areas
     bool bGoodBin = false;
-    for( unsigned int i = iMCPara->energy.size()-1; i > 0; i-- )
+    if( iMCPara->energy.size() > 1 )
     {
-        if( TMath::Abs( iMCPara->energy_lowEdge[i] - iMCPara->energy_upEdge[i-1] ) > 1.e-3 && !bGoodBin )
-	{
-	  cout << "\t" << iMCPara->energy_lowEdge[i] << "\t" << iMCPara->energy_upEdge[i-1] << "\t" << i << "\t" << iMCPara->energy.size() << endl;
-          iMCPara->energy.erase( iMCPara->energy.begin()+i, iMCPara->energy.end() );
-          iMCPara->energy_upEdge.erase( iMCPara->energy_upEdge.begin()+i, iMCPara->energy_upEdge.end() );
-          iMCPara->energy_lowEdge.erase( iMCPara->energy_lowEdge.begin()+i, iMCPara->energy_lowEdge.end() );
-          iMCPara->effArea.erase( iMCPara->effArea.begin()+i, iMCPara->effArea.end() );
-          iMCPara->effArea_error.erase( iMCPara->effArea_error.begin()+i, iMCPara->effArea_error.end() ); 
-        }
-	else
-	{
-	   bGoodBin = true;
-        }
+       for( unsigned int i = iMCPara->energy.size()-1; i > 0; i-- )
+       {
+	   if( TMath::Abs( iMCPara->energy_lowEdge[i] - iMCPara->energy_upEdge[i-1] ) > 1.e-3 && !bGoodBin )
+	   {
+	     iMCPara->energy.erase( iMCPara->energy.begin()+i, iMCPara->energy.end() );
+	     iMCPara->energy_upEdge.erase( iMCPara->energy_upEdge.begin()+i, iMCPara->energy_upEdge.end() );
+	     iMCPara->energy_lowEdge.erase( iMCPara->energy_lowEdge.begin()+i, iMCPara->energy_lowEdge.end() );
+	     iMCPara->effArea.erase( iMCPara->effArea.begin()+i, iMCPara->effArea.end() );
+	     iMCPara->effArea_error.erase( iMCPara->effArea_error.begin()+i, iMCPara->effArea_error.end() ); 
+	   }
+	   else
+	   {
+	      bGoodBin = true;
+	   }
+       }
     }
 // adjust energy binning for differential sensitivity
     if( dE_Log10 > 0. && iMCPara->energy_upEdge.size() > 1 )
