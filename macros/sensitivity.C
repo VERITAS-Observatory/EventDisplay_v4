@@ -183,7 +183,7 @@ void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
 void plotDifferentialSensitivity( string iFluxUnit = "PFLUX",
                                   char *ifile1 = 0, char *ifile2 = 0,
 				  char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
-				  unsigned int iCrabSpec_ID = 6, string iObservatory = "CTA" )
+				  unsigned int iCrabSpec_ID = 5, string iObservatory = "CTA" )
 {
      plotSensitivity( ifile1, ifile2, false, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory );
 }
@@ -281,6 +281,8 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 // significance parameters
        b.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
 //       b.setSignificanceParameter( 5., 10., 5., 0.05, 0.2 );
+// energy axis
+       b.setUseEffectiveAreas_vs_reconstructedEnergy( true );
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
