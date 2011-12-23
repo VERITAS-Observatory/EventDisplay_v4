@@ -57,7 +57,7 @@ bool VPlotWPPhysSensitivity::initialize()
 	 for( unsigned int i = 0; i < fAnalysis.size(); i++ )
 	 {
 	    ostringstream iTemp;
-	    if( fAnalysis[i] == "DESY" || fAnalysis[i] == "DESY.ISDC3700m" || fAnalysis[i] == "DESY.cta-ultra3-2000m" )
+	    if( fAnalysis[i].find( "DESY" ) != string::npos )
 	    {
 	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
 	       iTemp << "DESY_20111123/" << fAnalysis[i] << "." << fSubArray[a] << "." << hname << ".root";
