@@ -20,7 +20,7 @@ VInstrumentResponseFunctionData::VInstrumentResponseFunctionData()
 
    fListofResponseFunctionTypes.push_back( "angular_resolution" );    // fType_numeric == 0
    fListofResponseFunctionTypes.push_back( "core_resolution" );       // fType_numeric == 1
-   fListofResponseFunctionTypes.push_back( "energy_resolution" );       // fType_numeric == 2
+   fListofResponseFunctionTypes.push_back( "energy_resolution" );     // fType_numeric == 2
 
    setEnergyReconstructionMethod();
 
@@ -313,9 +313,11 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
    if( fType_numeric == 0 )
    {
 // angular difference
-      iDiff = sqrt( (fData->Xoff - fData->MCxoff) * (fData->Xoff - fData->MCxoff) + (fData->Yoff - fData->MCyoff) * (fData->Yoff - fData->MCyoff) );
+      iDiff = sqrt( (fData->Xoff - fData->MCxoff) * (fData->Xoff - fData->MCxoff) +
+                    (fData->Yoff - fData->MCyoff) * (fData->Yoff - fData->MCyoff) );
 // error
-      iError = sqrt( fData->Xoff*fData->Xoff + fData->Xoff*fData->Xoff) - sqrt( fData->MCxoff*fData->MCxoff + fData->MCyoff*fData->MCyoff );
+      iError = sqrt( fData->Xoff*fData->Xoff + fData->Xoff*fData->Xoff) - 
+               sqrt( fData->MCxoff*fData->MCxoff + fData->MCyoff*fData->MCyoff );
 // relative error (not sure if it is useful)
       iErrorRelative = -99.e6;
    }
@@ -324,9 +326,11 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
    else if( fType_numeric == 1 )
    {
 // core difference
-      iDiff = sqrt( (fData->Xcore - fData->MCxcore) * (fData->Xcore - fData->MCxcore) + (fData->Ycore - fData->MCycore) * (fData->Ycore - fData->MCycore) );   
+      iDiff = sqrt( (fData->Xcore - fData->MCxcore) * (fData->Xcore - fData->MCxcore) + 
+                    (fData->Ycore - fData->MCycore) * (fData->Ycore - fData->MCycore) );   
 // core error
-      iError = sqrt( fData->Xcore*fData->Xcore + fData->Xcore*fData->Xcore) - sqrt( fData->MCxcore*fData->MCxcore + fData->MCycore*fData->MCycore ); 
+      iError = sqrt( fData->Xcore*fData->Xcore + fData->Xcore*fData->Xcore) - 
+               sqrt( fData->MCxcore*fData->MCxcore + fData->MCycore*fData->MCycore ); 
 // relative error
       if( sqrt( fData->MCxcore*fData->MCxcore + fData->MCycore*fData->MCycore ) > 0. ) 
       {
@@ -338,13 +342,13 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 // energy resolution
    else if( fType_numeric == 2 )
    {
-       double iErec_log = -99.e6;
-       if( fEnergyReconstructionMethod == 0 && fData->Erec > 0. )       iErec_log = log10( fData->Erec );
-       else if( fEnergyReconstructionMethod == 1 && fData->ErecS > 0. ) iErec_log = log10( fData->ErecS );
+       double iErec_lin = -99.e6;
+       if( fEnergyReconstructionMethod == 0 && fData->Erec > 0. )       iErec_lin = fData->Erec;
+       else if( fEnergyReconstructionMethod == 1 && fData->ErecS > 0. ) iErec_lin = fData->ErecS;
 
-       if( fData->MCe0 > 0. ) iDiff = iErec_log - log10( fData->MCe0 );
+       if( fData->MCe0 > 0. ) iDiff = TMath::Abs( 1. - iErec_lin / fData->MCe0 );
        iError = iDiff;
-       if( fData->MCe0 > 0. ) iErrorRelative = ( TMath::Power( 10., iErec_log ) - fData->MCe0  ) / fData->MCe0;
+       if( fData->MCe0 > 0. ) iErrorRelative = ( iErec_lin - fData->MCe0  ) / fData->MCe0;
        else                   iErrorRelative = -99.e6;
    }
 
@@ -363,14 +367,18 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 // difference vs core distance
    if( E_DIST < f2DHisto.size() && f2DHisto[E_DIST] )
    {
-      f2DHisto[E_DIST]->Fill( sqrt( (fData->MCxcore-fArrayCentre_X)*(fData->MCxcore-fArrayCentre_X) + (fData->MCycore-fArrayCentre_Y)*(fData->MCycore-fArrayCentre_Y) ), iDiff, iWeight );
+      f2DHisto[E_DIST]->Fill( sqrt( (fData->MCxcore-fArrayCentre_X)*(fData->MCxcore-fArrayCentre_X) + 
+                                    (fData->MCycore-fArrayCentre_Y)*(fData->MCycore-fArrayCentre_Y) ), iDiff, iWeight );
    }
 
 // error vs energy
    if( E_ERROR < f2DHisto.size() && f2DHisto[E_ERROR] )  f2DHisto[E_ERROR]->Fill( log10( fData->MCe0 ), iError, iWeight );
 
 // relative error vs energy
-   if( E_RELA < f2DHisto.size() && f2DHisto[E_RELA] && iErrorRelative > -98.e6 ) f2DHisto[E_RELA]->Fill( log10( fData->MCe0 ), iErrorRelative, iWeight );
+   if( E_RELA < f2DHisto.size() && f2DHisto[E_RELA] && iErrorRelative > -98.e6 )
+   {
+      f2DHisto[E_RELA]->Fill( log10( fData->MCe0 ), iErrorRelative, iWeight );
+   }
 }
 
 

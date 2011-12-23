@@ -366,7 +366,8 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
        hEsysMCRelative = (TProfile*)c->hEsysMCRelative;
        hEsysMCRelative2D = (TH2D*)c->hEsysMCRelative2D;
 // get energy resolution
-       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
+//       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
+       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
 //       getEnergyResolutionPlot( (TH2D*)c->hEsysMCRelativeRMS );
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
@@ -468,6 +469,48 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
     }
 
     return 0;
+}
+
+void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, double iMinEnergy )
+{
+    if( !iP )
+    {
+       gEnergyResolution = 0;
+       return;
+    }
+
+    gEnergyResolution = new TGraphErrors( 1 );
+    gEnergyResolution->SetMarkerStyle( 20 );
+    gEnergyResolution->SetMarkerSize( 2 );
+    gEnergyResolution->SetLineWidth( 2 );
+    gEnergyResolution->SetTitle( "" );
+    gEnergyResolution->SetName( "" );
+    setGraphPlottingStyle( gEnergyResolution );
+
+    int zz = 0;
+    for( int b = 1; b <= iP->GetNbinsX(); b++ )
+    {
+        TH1D *h = iP->ProjectionY( "p_x", b, b+1 );
+        if( h && h->GetEntries() > 3. )
+        {
+// calculate quantiles
+            double xq[3];
+	    double yq[3];
+	    xq[0] = 0.5-0.3174;
+	    xq[1] = 0.50;
+	    xq[2] = 0.5+0.3174;
+	    h->GetQuantiles( 3, yq, xq );
+            if( iP->GetXaxis()->GetBinCenter( b ) < iMinEnergy ) continue;
+	    gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), (yq[2]-yq[0])*0.5 );
+	    if( h->GetEntries() > 1. )
+	    {
+		 gEnergyResolution->SetPointError( zz, 0., h->GetRMS()/sqrt(h->GetEntries()-1. ) );
+	    }
+	    else                            gEnergyResolution->SetPointError( zz, 0., 0. );
+            zz++;
+        }
+    }
+    return;
 }
 
 void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D *iP, int i_rebin, double iMinEnergy )
