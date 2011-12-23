@@ -21,7 +21,7 @@ then
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "  <recid>         reconstruction ID"
-   echo "  <data set>      e.g. ultra, ISDC3700, ..."
+   echo "  <data set>      e.g. ultra, ISDC3700m, ..."
    echo ""
    exit
 fi
