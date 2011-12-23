@@ -1198,6 +1198,11 @@ void VTableLookupDataHandler::copyMCHistograms()
    {
 // loop over all files and add MC histograms
         TObjArray *fileElements = fTshowerpars->GetListOfFiles();
+	if( !fileElements )
+	{
+	   cout << "VTableLookupDataHandler::copyMCHistograms(): no list of files found" << endl;
+	   return;
+        }
         TChainElement *chEl=0;
         TIter next(fileElements);
 	unsigned int z = 0;
