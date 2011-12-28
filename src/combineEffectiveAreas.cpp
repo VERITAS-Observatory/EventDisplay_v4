@@ -1,7 +1,6 @@
-/*! \file mergeEffectiveAreas.C
-    \brief merge effective areas
+/*! \file combineEffectiveAreas.cpp
+    \brief combine effective areas
 
-    Revision $Id: merge_effectiveAreas.C,v 1.1.2.5.10.2 2010/03/08 07:45:11 gmaier Exp $
 
     \author Gernot Maier
 */
@@ -15,13 +14,9 @@
 #include <iostream>
 #include <stdlib.h>
 
-void help()
-{
-    cout << "merge( char *ifile, char *outputfile, bool bFull = false )" << endl;
-    cout << endl;
-    cout << "   ifile and outputfile without .root" << endl;
-    cout << "   .log files are combined" << endl;
-}
+#include <VGlobalRunParameter.h>
+
+using namespace std;
 
 
 void merge( char *ifile, char *outputfile, bool bFull = false )
@@ -85,6 +80,25 @@ void merge( char *ifile, char *outputfile, bool bFull = false )
 
     sprintf( hname, "cat %s*.log > %s.log", ifile, outputfile );
     system( hname );
+}
+
+int main( int argc, char *argv[] )
+{
+   if( argc < 3 )
+   {
+       cout << endl;
+       cout << "combineEffectiveAreas <effective area files> <combined file> <write all histograms (default=false)" << endl;
+       cout << endl;
+       cout << "   <effective area files>    without .root suffix" << endl;
+       cout << endl;
+       exit( 0 );
+   }
+   cout << endl;
+   cout << "combineEffectiveAreas (v" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+   cout << endl;
+
+   merge( argv[1], argv[2], (bool)atoi(argv[3]) );
+
 }
 
 

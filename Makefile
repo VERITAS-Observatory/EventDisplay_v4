@@ -95,7 +95,7 @@ endif
 ########################################################################################################################
 # compiler and linker general values
 CXX           = g++ 
-CXXFLAGS      = -O3 -g -Wall -fPIC  -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
+ CXXFLAGS      = -O3 -g -Wall  -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
 LD            = g++
@@ -621,7 +621,7 @@ printDISPTables:	$(PRINTDISPTABLESOBJ)
 ########################################################
 WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/writeCTAWPPhysSensitivityFiles.o \
-			./lib/libVAnaSum.so
+			$(EVNDISPSYS)/lib/libVAnaSum.so
 
 ./obj/writeCTAWPPhysSensitivityFiles.o: 	./src/writeCTAWPPhysSensitivityFiles.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -639,6 +639,18 @@ writeCTAWPPhysSensitivityFiles:	$(WRITECTAPHYSOBJ)
 combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
+
+########################################################
+# combineEffectiveAreas
+########################################################
+./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+combineEffectiveAreas:	./obj/combineEffectiveAreas.o \
+			$(EVNDISPSYS)/lib/libVAnaSum.so
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
 
 ########################################################
 # trainTMVAforGammaHadronSeparation
