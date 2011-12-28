@@ -559,15 +559,16 @@ void VSkyCoordinates::updatePointingError( int MJD, double iTime )
         fPointingDB->updatePointing( MJD, iTime );
 
 // this is where telescopes are pointing to
-        fTelAzimuthDB = fPointingDB->getTelAzimuthDB();
+        fTelAzimuthDB   = fPointingDB->getTelAzimuthDB();
         fTelElevationDB = fPointingDB->getTelElevationDB();
-        fEventStatus = fPointingDB->getEventStatus();
+        fEventStatus    = fPointingDB->getEventStatus();
 
         if( fEventStatus != 3 )
         {
 // calculate pointing error in camera coordinates (using slalib)
-            double iPx, iPy;
-            int j;
+            double iPx = 0.;
+	    double iPy = 0.;
+            int j = 0;
             slaDs2tp( fTelAzimuth/degrad, fTelElevation/degrad, fTelAzimuthDB/degrad, fTelElevationDB/degrad, &iPx, &iPy, &j );
             if( j == 0 )
             {
