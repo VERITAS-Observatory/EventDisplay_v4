@@ -20,7 +20,7 @@
 
 using namespace std;
 
-void getPlottingData( bool bIntegral, string bUnit );
+void getPlottingData( bool bIntegral, string bUnit, string iObservatory );
 void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIntegral,
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
 		      string iFluxUnit, unsigned int iCrabSpec_ID );
@@ -60,8 +60,8 @@ struct cSensitivityPlottingData
 
     string fESpecDataFile_CrabNebula;
     string fESpecDataFile_CosmicRays;
-    double fPlotting_flux_min_PFLUX;
-    double fPlotting_flux_max_PFLUX;
+    double fPlotting_flux_min;             // note: can have different units
+    double fPlotting_flux_max;
     double fPlotting_energy_min_TeV;
     double fPlotting_energy_max_TeV;
     vector< string > fSensitivityvsEnergyFromTextTFile;
@@ -79,7 +79,7 @@ cSensitivityPlottingData fPD;
      (axis dimensions, etc)
 
 */
-void getPlottingData( bool bIntegral, string bUnit )
+void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 {
     fPD.bSet = false;
     fPD.fSensitivityvsEnergyFromTextTFile.clear();
@@ -94,6 +94,11 @@ void getPlottingData( bool bIntegral, string bUnit )
 // energy axis (min and max in TeV)
     fPD.fPlotting_energy_min_TeV = 0.01;
     fPD.fPlotting_energy_max_TeV = 150.00;
+    if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+    {
+       fPD.fPlotting_energy_min_TeV = 0.06;
+       fPD.fPlotting_energy_max_TeV = 15.00;
+    }
 
 //////////////////
 // integral flux
@@ -101,8 +106,8 @@ void getPlottingData( bool bIntegral, string bUnit )
     if( bIntegral && bUnit == "PFLUX" )
     {
        fPD.bIntegral = true;
-       fPD.fPlotting_flux_min_PFLUX = 2.e-15;
-       fPD.fPlotting_flux_max_PFLUX = 8.e-09;
+       fPD.fPlotting_flux_min = 2.e-15;
+       fPD.fPlotting_flux_max = 8.e-09;
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/HESS_IntegralSensitivity_Achieved_Moriond2009.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "HESS" );
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGIC_IntegralSensitivity_Data_Colin2010_PFLUX.txt" );
@@ -117,8 +122,8 @@ void getPlottingData( bool bIntegral, string bUnit )
     else if( bIntegral && bUnit == "CU" )
     {
        fPD.bIntegral = true;
-       fPD.fPlotting_flux_min_PFLUX = 2.e-15;
-       fPD.fPlotting_flux_max_PFLUX = 8.e-09;
+       fPD.fPlotting_flux_min = 2.e-15;
+       fPD.fPlotting_flux_max = 8.e-09;
       
        fPD.bSet = true;
     }
@@ -127,26 +132,54 @@ void getPlottingData( bool bIntegral, string bUnit )
     else if( !bIntegral && bUnit == "PFLUX" )
     {
        fPD.bIntegral = false;
-       fPD.fPlotting_flux_min_PFLUX = 2.e-15;
-       fPD.fPlotting_flux_max_PFLUX = 8.e-09;
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_LOI_2009_PFLUX.txt" );
-       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA_LOI" );
+       fPD.fPlotting_flux_min = 2.e-15;
+       fPD.fPlotting_flux_max = 8.e-09;
+       if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+       {
+	  fPD.fPlotting_flux_min = 1.e-15;
+	  fPD.fPlotting_flux_max = 2.e-08;
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_PFLUX.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
+       }
+       else
+       {
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_LOI_2009_PFLUX.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA_LOI" );
+       }
 
        fPD.bSet = true;
     }
     else if( !bIntegral && bUnit == "CU" )
     {
-        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
-        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
+       if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+       {
+	  fPD.fPlotting_flux_min = 0.002;
+	  fPD.fPlotting_flux_max = 0.85;
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_CU.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
+       }
+       else
+       {
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
+       }
 
-        fPD.bSet = true;
+       fPD.bSet = true;
     }
     else if( !bIntegral && bUnit == "ENERGY" )
     {
-        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
-        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
+       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
+       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
+       fPD.fPlotting_flux_min = 1.e-15;
+       fPD.fPlotting_flux_max = 2.e-08;
 
-        fPD.bSet = true;
+       if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+       {
+	  fPD.fPlotting_flux_min = 2.e-13;
+	  fPD.fPlotting_flux_max = 2.e-10;
+       }
+
+       fPD.bSet = true;
     }
 
 // marker colors and line styles
@@ -213,7 +246,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 {
 
 // get values for plotting
-    getPlottingData( bIntegral, iFluxUnit );
+    getPlottingData( bIntegral, iFluxUnit, iObservatory );
     if( !fPD.bSet )
     {
        cout << "plotSensitivity error: no plotting datat set for " << iFluxUnit << "\t" << bIntegral << endl;
@@ -223,15 +256,28 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 // sensitivity plotter
     VSensitivityCalculator a;
     a.setEnergyRange_Lin( fPD.fPlotting_energy_min_TeV, fPD.fPlotting_energy_max_TeV );           // x-axis range: in TeV
-    a.setFluxRange_PFLUX( fPD.fPlotting_flux_min_PFLUX, fPD.fPlotting_flux_max_PFLUX );           // y-axis range: in 1/cm2/s
+// Monte Carlo only
+    if( iFluxUnit == "PFLUX" ) 
+    {
+       a.setFluxRange_PFLUX( fPD.fPlotting_flux_min, fPD.fPlotting_flux_max );           // y-axis range: in 1/cm2/s
+    }
+    else if( iFluxUnit == "ENERGY" )
+    {
+        a.setFluxRange_ENERGY( fPD.fPlotting_flux_min, fPD.fPlotting_flux_max );
+    }
+    else                         
+    {
+        a.setFluxRange_CU( fPD.fPlotting_flux_min, fPD.fPlotting_flux_max );
+    }
     a.setPlotCanvasSize( 900, 600 );                                                              // size of canvases
 
 // set Crab Nebula spectrum used for relative flux calculation
-    if( !a.setEnergySpectrumfromLiterature( fPD.fESpecDataFile_CrabNebula, 1 ) ) return;
-    a.setEnergySpectrumfromLiterature_ID( iCrabSpec_ID );
+    if( !a.setEnergySpectrumfromLiterature( fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID ) ) return;
 
 // lots of debug output
     a.setDebug( false );
+
+    a.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
 
 //////////////////////////////////////////////////////////////////
 // plot sensitivity canvas
@@ -246,6 +292,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 	                                        fPD.fSensitivityvsEnergyFromTextTFile_LineColor[i], 3, fPD.fSensitivityvsEnergyFromTextTFile_LineStyle[i],
 						iFluxUnit );
     }
+    a.setPlottingStyle( 1, 1, 2, 20, 2., 3002 );
 
 //////////////////////////////////////////////////////////////////////
 // calculate sensitivities from data taken towards the Crab Nebula
@@ -253,13 +300,14 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
     if( iData_anasumFile1 != 0 )
     {
         if( bIntegral ) a.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile1, 1, iFluxUnit, 0.2, 100. );
-	else            a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile1, 1, iFluxUnit, 0.2, 0.2, 100. );
+	else            a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile1, 1, iFluxUnit, 0.2, 0.05, 8. );
     }
 // plot second file
     if( iData_anasumFile2 != 0 )
     {
+        a.setPlottingStyle( 3, 1, 2, 20, 2., 3002 );
         if( bIntegral ) a.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile2, 3, iFluxUnit, 0.05, 100. );
-	else            a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile2, 3, iFluxUnit, 0.2, 0.2, 100. );
+	else            a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile2, 3, iFluxUnit, 0.2, 0.05, 100. );
     }
 
 
@@ -283,6 +331,8 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 //       b.setSignificanceParameter( 5., 10., 5., 0.05, 0.2 );
 // energy axis
        b.setUseEffectiveAreas_vs_reconstructedEnergy( true );
+// set colors different in case data is plotted
+       if( iData_anasumFile1 ) b.setPlottingStyle( 4, 1, 2, 20, 2., 3002 );
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
@@ -297,25 +347,40 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        int i_noise_proton = 250;
        double i_woff_proton = 0.;  
 
+       int i_Azbin_electron = 0;
+       double i_index_electron = 3.0;
+       int i_noise_electron = 250;
+       double i_woff_electron = 0.;  
+
        if( iObservatory == "VTS" || iObservatory == "VERITAS" )
        {
            i_Azbin_gamma = 0;
 	   i_index_gamma = 2.4;
-	   i_noise_gamma = 130;
 	   i_noise_gamma = 200;
+
+	   i_noise_gamma = 130;
 	   i_woff_gamma = 0.5;
 
 	   i_Azbin_proton = 0;
 	   i_index_proton = 2.6;
-	   i_noise_proton = 130;
-	   i_woff_proton = 0.;
 
 	   i_noise_proton = 200;
 	   i_woff_proton = 0.;
+
+	   i_noise_proton = 130;
+	   i_woff_proton = 0.;
+
+	   i_Azbin_electron = 0;
+	   i_index_electron = 3.0;
+
+	   i_noise_electron = 200;
+	   i_woff_electron = 0.;
+
+	   i_noise_electron = 130;
+	   i_woff_electron = 0.;
        }
        cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl; 
 //////////////////////////////////////////////////////////////////////////
-
 
 // gammas
        b.setMonteCarloParameters(1, fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
@@ -331,7 +396,8 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 // electrons (spectral index?)
        if( iMC_Electron )
        {
-          b.setMonteCarloParameters( 2, fPD.fESpecDataFile_CosmicRays, 2, iMC_Electron, 20., 0, 0.0, 250, 3.0 );
+          b.setMonteCarloParameters( 2, fPD.fESpecDataFile_CosmicRays, 2, iMC_Electron, 20.,
+	                             i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
        }
 
 // energy range determined by looking at number of noff events (need off events to determine sensitivity)
