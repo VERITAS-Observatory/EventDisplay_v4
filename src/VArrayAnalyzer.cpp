@@ -433,7 +433,14 @@ void VArrayAnalyzer::terminate()
                 }
 		iMC_histos.setDefaultValues();
 		iMC_histos.initializeHistograms();
-		iMC_histos.fill( getReader()->getMonteCarloHeader()->getMeanZenithAngle_Deg(), i_tMC, true );
+		double i_ze = getReader()->getMonteCarloHeader()->getMeanZenithAngle_Deg();
+// backwards compatibility: no ze in MC run header for old files
+		if( TMath::Abs( i_ze - 90. ) < 1.e-3 )
+		{
+		   cout << "\t MC run header seems to be of old type without correct zenith/azimuth range" << endl;
+		   i_ze = getShowerParameters()->MCze;
+                }
+		iMC_histos.fill( i_ze, i_tMC, true );
 		iMC_histos.print();
 		iMC_histos.Write();
             }
