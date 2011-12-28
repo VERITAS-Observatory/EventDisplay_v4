@@ -663,6 +663,11 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	iD = addDataSet( (non-non_error)   / fDifferentialFlux[i].ObsTime * 60.,
 	                 (noff+noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
 	s_error_U = getSensitivity( iD );
+// Preliminary: catch cases were lower sensitivity cannnot be calculated
+	if( s_error_L < 0. )
+	{
+	   s_error_L = s;
+        }
 
 // fill sensitivity graphs
 	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
@@ -884,6 +889,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas *
     g->SetLineColor( iColor );
     g->SetLineWidth( (Width_t)iLineWidth );
     g->SetLineStyle( iLineStyle );
+    g->Print();
 
 // check what units the data is in
     string i_fileUnit = "PFLUX";

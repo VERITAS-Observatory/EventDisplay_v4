@@ -84,6 +84,7 @@ int main( int argc, char *argv[] )
 /////////////////////////////////////////////////////////////////
 // gamma/hadron cuts
     VGammaHadronCuts *fCuts = new VGammaHadronCuts();
+    fCuts->initialize();
     fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
     if( !fCuts->readCuts( fRunPara->fCutFileName, 2 ) ) exit( -1 );
     fRunPara->fGammaHadronCutSelector = fCuts->getGammaHadronCutSelector();
@@ -289,7 +290,7 @@ int main( int argc, char *argv[] )
     if( iMonteCarloHeader ) iMonteCarloHeader->Write();
 
 // write run parameters to disk
-    if( fRunPara ) fRunPara->Write();
+    if( fRunPara ) fRunPara->Write(); 
 
     fOutputfile->Close();
     cout << "end..." << endl;

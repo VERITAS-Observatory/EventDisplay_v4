@@ -130,7 +130,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	TTree *fPhaseCut_Tree;                                      //!
 	double fOrbitalPhase;
 
-
 // parameters for energy dependent theta2 cuts
 // (implemented for MC only)
         string fFileNameAngRes;
@@ -147,7 +146,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool initAngularResolutionFile();
 
 // cut statistics
-        VGammaHadronCutsStatistics* fStats;
+        VGammaHadronCutsStatistics* fStats;                       //!
 
         bool   applyProbabilityCut( int i, bool fIsOn);
 	bool   applyTMVACut( int i, bool fIsOn );
@@ -266,6 +265,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyStereoShapeCuts();
         bool   applyTelTypeTest( bool bCount = false );
 
+        void   initialize();
+
         bool   isGamma() { return isGamma( 0 ); }
         bool   isGamma( int i, bool bCount = false, bool fIsOn = true);
 
@@ -312,6 +313,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,26);
+        ClassDef(VGammaHadronCuts,27);
 };
 #endif

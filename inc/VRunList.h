@@ -28,14 +28,14 @@ class VRunList : public TObject
 	double TargetDecJ2000;
         double pedvarsOn;
         double alpha;
-        double energyThreshold;                   //! TeV (lin)
-	double phase;                             //! e.g. orbital phase
+        double energyThreshold;                   //  TeV (lin)
+	double phase;                             //  e.g. orbital phase
 
         VRunList();
         ~VRunList() {}
         void print();
         void reset();
 
-        ClassDef (VRunList, 3 );
+        ClassDef (VRunList, 4 );
 };
 #endif

@@ -38,13 +38,14 @@ class VGammaHadronCutsStatistics : public TNamed
    void         fill();
    unsigned int getCounterValue( unsigned int iCut );
    TTree*       getDataTree() { return fData; }
+   void         initialize();
    void         printCutStatistics();
    void         reset();
    void         setCutCounter( unsigned int iCut, unsigned int iValue );
    void         terminate();
    void         updateCutCounter( unsigned int iCut );
   
-   ClassDef( VGammaHadronCutsStatistics, 1 );
+   ClassDef( VGammaHadronCutsStatistics, 2 );
 };
 
 

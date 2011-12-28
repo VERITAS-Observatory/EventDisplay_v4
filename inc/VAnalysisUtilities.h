@@ -45,7 +45,7 @@ class VAnalysisUtilities : public TNamed
 	double fTargetRAJ2000; 
 
 	// anasum data file
-        TFile *fAnasumDataFile;
+        TFile *fAnasumDataFile;                                                //!
 
 // run list
         double fRunList_MJD_min;
@@ -94,6 +94,6 @@ class VAnalysisUtilities : public TNamed
 	void     setRunListCutMJDRange( double iMJDMin = -1., double iMDJMax = -1. ) { fRunListCut_MJD_min = iMJDMin; fRunListCut_MJD_max = iMDJMax; }
 	void     setRunListCutPhaseRange( double iPhaseMin = -1., double iPhaseMax = -1. ) { fRunListCut_Phase_min = iPhaseMin; fRunListCut_Phase_max = iPhaseMax; }
 
-        ClassDef(VAnalysisUtilities,9);
+        ClassDef(VAnalysisUtilities,10);
 };
 #endif

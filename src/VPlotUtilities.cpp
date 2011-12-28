@@ -11,6 +11,8 @@ VPlotUtilities::VPlotUtilities()
 {
     setPlottingStyle();
     setColorAxisPalette();
+    setColorAxisDataVector_minmax();
+    fColorAxis_axis = 0;
 }
 
 

@@ -54,6 +54,8 @@ VGammaHadronCuts::VGammaHadronCuts()
 
     resetCutValues();
 
+    fStats = 0;
+
     fGammaHadronCutSelector = 0;
     fDirectionCutSelector = 0;
     bMCCuts = false;
@@ -67,8 +69,6 @@ VGammaHadronCuts::VGammaHadronCuts()
     fMeanLength = 0.;
     fMeanDistance = 0.;
 
-// statistics
-    fStats = new VGammaHadronCutsStatistics(); 
 
 // use probabilities for cuts
     fProbabilityCut_File = 0;
@@ -112,6 +112,13 @@ VGammaHadronCuts::VGammaHadronCuts()
     frogsGoodnessImgCut = 0.;
 
     setArrayCentre();
+}
+
+void VGammaHadronCuts::initialize()
+{
+// statistics
+    fStats = new VGammaHadronCutsStatistics(); 
+    fStats->initialize();
 }
 
 VGammaHadronCuts::~VGammaHadronCuts()
@@ -1994,7 +2001,7 @@ void VGammaHadronCuts::terminate()
    {
       fStats->terminate();
       fStats->getDataTree()->Write();
-   }
+   }   
 
    Write();
 }

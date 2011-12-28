@@ -124,7 +124,7 @@ bool VEffectiveAreaCalculatorMCHistograms::readFromEffectiveAreaFile( string iFi
 bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TTree *i_MCData, bool bAzimuthBins )
 {
     cout << endl;
-    cout << "filling MC histograms for effective area calculation" << endl;
+    cout << "filling MC histograms for effective area calculation for ze " << i_ze << " [deg]" << endl;
     cout << "=========================================================================================" << endl;
     if( fVSpectralWeight.size() > 0 && fVSpectralWeight[0] ) fVSpectralWeight[0]->print();
     cout << "=========================================================================================" << endl;
@@ -156,6 +156,7 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TTree *i_MCData, b
 // array lengths
     unsigned int i_vMinAzSize        = fVMinAz.size();
     unsigned int i_vSpectralIndexSize = fVSpectralWeight.size();
+    cout << "\t array lengths az: " << i_vMinAzSize << ", spectral index: " << i_vSpectralIndexSize << endl;
 
 // entries in MC tree (must be long, chain could contain lots of events)
     Long64_t nentries = i_MCData->GetEntries();

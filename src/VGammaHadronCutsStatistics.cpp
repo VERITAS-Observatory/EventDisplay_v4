@@ -14,6 +14,13 @@ VGammaHadronCutsStatistics::VGammaHadronCutsStatistics()
 {
    fData = 0;
 
+   fData = 0;
+
+   reset();
+}
+
+void VGammaHadronCutsStatistics::initialize()
+{
    fCutName.push_back( "Tot          " );
    fCutName.push_back( "MC_XYoff     " );
    fCutName.push_back( "XYoff        " );
@@ -33,8 +40,6 @@ VGammaHadronCutsStatistics::VGammaHadronCutsStatistics()
 
    fData = new TTree( "GammaHadronCutsStats", "cut statistics for gamma/hadron cuts" );
    fData->Branch( "cut", &fCut_bitset_ulong, "cut/l" );
-
-   reset();
 }
 
 void VGammaHadronCutsStatistics::reset()

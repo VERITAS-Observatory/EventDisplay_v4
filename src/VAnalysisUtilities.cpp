@@ -23,6 +23,10 @@ VAnalysisUtilities::VAnalysisUtilities()
     fTargetDecJ2000 = 0.;
     fTargetRAJ2000 = 0.;
 
+    fAnasumDataFile = 0;
+    fRunList_MJD_min = 0.;
+    fRunList_MJD_max = 0;
+
     setRunListMJDRange();
     setPhaseFoldingValues();
 
