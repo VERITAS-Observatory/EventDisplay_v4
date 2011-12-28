@@ -73,12 +73,13 @@ if [ ! -d $QLOG ]
 then
   mkdir -p $QLOG
 fi
-LOGDIR=$VERITAS_USER_LOG_DIR"/analysis/Tables/"$DATE/
+echo "SHELLS AND LOG FILES: $QLOG"
+LOGDIR=$VERITAS_USER_LOG_DIR"/analysis/EVDv400/Tables/"$DATE/
 if [ ! -d $LOGDIR ]
 then
   mkdir -p $LOGDIR
 fi
-ODDIR=$VERITAS_DATA_DIR"/analysis/Tables/"$DATE/
+ODDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/Tables/"$DATE/
 if [ ! -d $ODDIR ]
 then
   mkdir -p $ODDIR
@@ -119,7 +120,7 @@ do
 
 # submit job
      #qsub -V -l h_cpu=45:29:00 -l h_vmem=8000M -l tmpdir_size=10G -o $QLOG/run/ -e $QLOG/run/ "$FNAM.sh"
-     qsub -V -l h_cpu=04:29:00 -l h_vmem=6000M -l tmpdir_size=100G -o $QLOG/run/ -e $QLOG/run/ "$FNAM.sh"
+     qsub -V -l os="sl*" -l h_cpu=06:29:00 -l h_vmem=6000M -l tmpdir_size=100G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 exit

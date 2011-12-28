@@ -15,10 +15,10 @@ set PED=PEEED
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 # output data files are written to this directory
-set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-SW"$SW"-"$MET"/"
+set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-SW"$SW"-"$MET"-VPM/"
 mkdir -p $ODIR
 # output log files are written to this directory
-set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-SW"$SW"-"$MET"/"
+set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-SW"$SW"-"$MET"-VPM/"
 mkdir -p $LDIR
 
 
@@ -42,7 +42,7 @@ set OPT="-shorttree "
 # pointing from pointing monitor (text file)
 #set OPT="$OPT -pointingmonitortxt /raid/pevray/maierg/veritas/VPM/results/"
 # pointing from pointing monitor (DB)
-#set OPT="$OPT -usedbvpm "
+set OPT="$OPT -usedbvpm "
 # OFF data run
 #set OPT="$OPT -raoffset=6.25"
 # use calib.dat

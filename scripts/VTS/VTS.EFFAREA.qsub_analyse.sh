@@ -7,6 +7,9 @@
 # Author: Gernot Maier
 #
 
+cd $EVNDISPSYS
+source ./setObservatory.tcsh VTS
+
 ###################################################################
 # parameters set by parent scripts
 ###################################################################
@@ -25,6 +28,6 @@ mkdir -p $LDIR
 ###################################################################
 # calculate effective areas
 rm -f $ODIR/$EFF.root $LDIR/$EFF.log
-$EVNDISPSYS400/bin/makeEffectiveArea $IFI $ODIR/$EFF.root > $LDIR/$EFF.log
+$EVNDISPSYS/bin/makeEffectiveArea $IFI $ODIR/$EFF.root > $LDIR/$EFF.log
 
 exit

@@ -60,6 +60,7 @@ fi
 NNOISE=${#NOISE[@]}
 # wobble offsets
 WOBBLE=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+WOBBLE=( 0.5 )
 NWOBBLE=${#WOBBLE[@]}
 
 
@@ -116,7 +117,7 @@ do
       chmod u+x $FDIR/$FNAM.sh
 
 # submit the job
-      qsub -l h_cpu=04:00:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh
+      qsub -l os="sl*" -l h_cpu=04:00:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh
       echo "qsub -l h_cpu=04:00:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh"
      done
    done

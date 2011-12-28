@@ -23,17 +23,20 @@ set SUMW=WWWWWWW
 set FTRE=FUUUUUL
 set ARRAY=ARRRRAY
 
+cd $EVNDISPSYS/
+source ./setObservatory.tcsh VTS
+
 ###############################################
 # hardwired values
 ###############################################
 # date of analysis
 set DAT="d20110406"
 # output files are written to this directory
-set ODIR="$VERITAS_DATA_DIR"/analysis/"$ARRAY"_FLWO/mscw_SW"$SUMW"_"$MET"_ATM"$ATMOS"_"$DAT"
+set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_SW"$SUMW"_"$MET"_ATM"$ATMOS"_"$DAT"
 # directory with MC eventdisplay files
 set SDIR="analysis_"$DAT"_ATM"$ATMOS"_"$ANAC"_SW"$SUMW"_NOISE"$NOISE"_"$MET""
 # full path to MC eventdisplay files 
-set XDIR=$VERITAS_DATA_DIR"/analysis/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*.root"
+set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*.root"
 # mscw_energy command line options
 set MOPT="-noNoTrigger -nomctree -shorttree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 if( $FTRE == "TRUE" ) then

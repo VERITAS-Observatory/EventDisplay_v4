@@ -31,8 +31,8 @@ NAME=$6
 IZE=( 00 20 30 35 40 45 50 55 60 65 )
 INOI=( 075 100 150 200 250 325 425 550 750 1000 )
 WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-IZE=( 20 )
-INOI=( 200 )
+IZE=( 00 20 30 35 40 45 50 )
+INOI=( 075 100 150 200 250 325 425 550 750 1000 )
 WOFF=( 0.5 )
 ############################################################################################
 # run scripts and output is written into this directory
@@ -43,13 +43,13 @@ then
   mkdir -p $QLOG
   chmod -R g+w $QLOG
 fi
-LOGDIR=$VERITAS_USER_LOG_DIR"/analysis/EffectiveAreas/"$DATE/
+LOGDIR=$VERITAS_USER_LOG_DIR"/analysis/EVDv400/EffectiveAreas/"$DATE/
 if [ ! -d $LOGDIR ]
 then
   mkdir -p $LOGDIR
   chmod -R g+w $LOGDIR
 fi
-ODDIR=$VERITAS_DATA_DIR"/analysis/EffectiveAreas/"$DATE/
+ODDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/EffectiveAreas/"$DATE/
 if [ ! -d $ODDIR ]
 then
   mkdir -p $ODDIR
@@ -81,21 +81,21 @@ do
 	 if [ ! -e $FFIL ]
 	 then
 	    echo "INPUT FILE NOT FOUND: $FFIL"
-	    exit
+# ttt	    exit
          fi
 # data file with MC data and parameters
-	 XFIL="$FDIR"G/gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana1234_NOISE250_1.root
+	 XFIL="$FDIR"/gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana1234_NOISE250_1.root
 	 if [ ! -e $XFIL ]
 	 then
-	    echo "INPUT FILE (MC) NOT FOUND: "$FDIR"G/$XFIL.root"
-	    exit
+	    echo "INPUT FILE (MC) NOT FOUND: "$FDIR"/$XFIL.root"
+# ttt	    exit
          fi
 ###########################################################################################
 ###########################################################################################
 # directory for parameter and cut files
 	 FFIR="$IFIL-$REID-${IZE[$i]}-${WOFF[$k]}-${INOI[$j]}"
 # cp cut files to temp directory
-         cp $EVNDISPDATA400/ParameterFiles/$CUTS.dat $LOGDIR/$FFIR-$CUTS.dat
+         cp $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/$CUTS.dat $LOGDIR/$FFIR-$CUTS.dat
 # create parameter file
 	 rm -f $LOGDIR/$FFIR.dat
 	 touch $LOGDIR/$FFIR.dat
@@ -105,16 +105,16 @@ do
 	 echo "* ENERGYAXISBINS 60" >> $LOGDIR/$FFIR.dat
          echo "* AZIMUTHBINS 1" >> $LOGDIR/$FFIR.dat
 	 echo "* FILLMONTECARLOHISTOS 0" >> $LOGDIR/$FFIR.dat
-	 echo "* ENERGYSPECTRUMINDEX 15 1.8 0.2" >> $LOGDIR/$FFIR.dat
+	 echo "* ENERGYSPECTRUMINDEX 20 2.0 0.1" >> $LOGDIR/$FFIR.dat
 	 echo "* FILLMONTECARLOHISTOS 0" >> $LOGDIR/$FFIR.dat
 	 echo "* SHAPECUTINDEX 0" >> $LOGDIR/$FFIR.dat
 	 echo "* CUTFILE $LOGDIR/$FFIR-$CUTS.dat" >> $LOGDIR/$FFIR.dat
 	 echo >> $LOGDIR/$FFIR.dat
 	 echo "* SIMULATIONFILE_DATA $FFIL" >> $LOGDIR/$FFIR.dat
-	 echo "* SIMULATIONFILE_MC $XFIL" >> $LOGDIR/$FFIR.dat
+#	 echo "* SIMULATIONFILE_MC $XFIL" >> $LOGDIR/$FFIR.dat
 
 # set parameters in run script
-         FNAM="$QLOG/MK-EA.$DATE.MC"
+         FNAM="$QLOG/MK-EA.$REID.$DATE.MC"
 
 	 sed -e "s|EFFFILE|$FFIR|" VTS.EFFAREA.qsub_analyse.sh > $FNAM-3.sh
 	 sed -e "s|OOOOOOO|$ODDIR|" $FNAM-3.sh > $FNAM-4.sh
@@ -127,14 +127,15 @@ do
 	 chmod u+x $FNAM.sh
 	 echo $FNAM.sh
 # submit job
-         qsub -l h_cpu=00:29:00 -l h_vmem=4000M -l tmpdir_size=5G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+         qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+#         qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
 	 echo "writing queue log and error files to $QLOG"
 	 echo "writing analysis parameter files to $FNAM.sh"
 	 echo "writing results to $ODDIR"
 	 echo "writing log files to $LOGDIR"
 
-         sleep 2.0
+         sleep 0.5
      done
    done
 done

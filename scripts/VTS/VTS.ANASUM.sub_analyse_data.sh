@@ -9,7 +9,7 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ]  && [ ! -n "$3" ]  && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
-   echo "analyse.sh <run list> <data directory> <output directory> <output name> <run parameter file>"
+   echo "VTS.ANASUM.sub_analyse_data.sh <run list> <data directory> <output directory> <output name> <run parameter file>"
    echo ""
    echo "   <output name> without .root"
    exit
