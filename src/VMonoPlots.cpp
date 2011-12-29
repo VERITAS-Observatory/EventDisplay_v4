@@ -217,28 +217,28 @@ double VMonoPlots::fillHistograms( unsigned int itelid, int irun )
                 iInitRun = fData->runNumber;
             }
 
-            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() && cutMaxOne() )
+            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() )
                 halpha->Fill(fData->alpha[fTelID]);
-            if(cutSize() && cutAlpha() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() && cutMaxOne() )
+            if(cutSize() && cutAlpha() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() )
                 hlength->Fill(fData->length[fTelID]);
-            if(cutSize() && cutLength() && cutAlpha() && cutDistance() && cutLoS() && cutAsymm() && cutMaxOne() )
+            if(cutSize() && cutLength() && cutAlpha() && cutDistance() && cutLoS() && cutAsymm() )
                 hwidth->Fill(fData->width[fTelID]);
-            if(cutSize() && cutLength() && cutWidth() && cutAlpha() && cutLoS() && cutAsymm() && cutMaxOne() )
+            if(cutSize() && cutLength() && cutWidth() && cutAlpha() && cutLoS() && cutAsymm() )
                 hdist->Fill(fData->dist[fTelID]);
-            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutAlpha() && cutAsymm() && cutMaxOne() )
+            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutAlpha() && cutAsymm() )
                 hlos->Fill(fData->los[fTelID]);
-            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAlpha() && cutMaxOne() )
+            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAlpha() )
                 hasymm->Fill(fData->asym[fTelID]);
-            if(cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() && cutAlpha() && fData->size[fTelID]>0. && cutMaxOne() )
+            if(cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() && cutAlpha() && fData->size[fTelID]>0. )
                 hlogsize->Fill(log10(fData->size[fTelID]));
 
-            if(cutSize() && cutLength() && cutWidth() &&  cutLoS() && cutAsymm() && cutMaxOne() )
+            if(cutSize() && cutLength() && cutWidth() &&  cutLoS() && cutAsymm() )
             {
                 makeCentroidsMap();
                 makeTwoD_BoxSmooth();
             }
 
-            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() && cutAlpha() && cutMaxOne() )
+            if(cutSize() && cutLength() && cutWidth() && cutDistance() && cutLoS() && cutAsymm() && cutAlpha() )
             {
                 hntubes->Fill(fData->ntubes[fTelID]);
 

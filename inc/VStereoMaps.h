@@ -58,9 +58,6 @@ class VStereoMaps
 
         int fInitRun;
 
-        double f_r0;                              //!< smoothing radius
-
-        void makeTwoDStereo_BoxSmooth( double, double, double );
         void makeTwoDStereo_BoxSmooth( double, double, double, double );
 
 // theta2 calculation
@@ -112,10 +109,6 @@ class VStereoMaps
         bool initialize_FOVBackgroundModel( bool iIsOn );
         void FOVM_getAlpha( bool );
 
-// TEMPLATE BACKGROUND MODEL
-
-        void TE_fillAlpha( int, double, double, bool );
-
 // etc
         void   cleanup();                         // delete all objects not needed anymore
         bool   defineAcceptance();
@@ -130,8 +123,8 @@ class VStereoMaps
         TH1D *hAux_theta2Off;
         TH1D *hAux_theta2Ratio;
 
-        VStereoMaps( double, bool, int );
-        ~VStereoMaps() {}
+        VStereoMaps( bool, int );
+       ~VStereoMaps() {}
 
         void              calculateTheta2( bool, double, double );
         bool              fill( bool is_on, double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts );

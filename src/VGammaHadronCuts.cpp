@@ -65,12 +65,12 @@ VGammaHadronCuts::VGammaHadronCuts()
     fNLTrigs = 0;
     fDataDirectory = "";
 
+// mean width/length/distance
     fMeanWidth = 0.;
     fMeanLength = 0.;
     fMeanDistance = 0.;
 
-
-// use probabilities for cuts
+// probabilities cuts
     fProbabilityCut_File = 0;
     fProbabilityCut_Tree = 0;
     fProbabilityCut_QualityFlag = 0;
@@ -133,14 +133,12 @@ void VGammaHadronCuts::resetCutStatistics()
 
 void VGammaHadronCuts::resetCutValues()
 {
+// single telescope cuts
 //! Best cuts for data from telescope 1 (as of 2005)
-
     fAlpha_min=0.0;
     fAlpha_max=8.0;
     fDistance_min=0.27;
     fDistance_max=1.06;
-    fMaxone_min=-100.;
-    fMaxtwo_min=-100.;
     fLos_min=0.0;
     fLos_max=0.00017;
     fLength_min=0.12;
@@ -151,9 +149,8 @@ void VGammaHadronCuts::resetCutValues()
     fAsymm_max=10.0;
     fSize_min=-1000;
     fSize_max=1.e99;
-    fMaxone_min=-100.;
-    fMaxtwo_min=-100.;
 
+// array cuts
     fArrayDistance_min=-100;
     fArrayDistance_max=100;
     fArrayTheta2_min=-100;
@@ -226,13 +223,18 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, bool iPrint )
     return readCuts( i_cutfilename, 0 );
 }
 
+/*
 
+    read cuts from a text file
+
+*/
 bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 {
 // reset trigger vector
     fNLTrigs = 0;
     fArrayLTrig.clear();
 
+// open text file
     ifstream is;
     i_cutfilename = VUtilities::testFileLocation( i_cutfilename, "ParameterFiles", true );
     if( iPrint == 1 )      cout << "\t reading analysis cuts from " << i_cutfilename << endl;
@@ -259,6 +261,7 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                if( !is_stream.eof() ) is_stream >> fGammaHadronCutSelector;
                if( !is_stream.eof() ) is_stream >> fDirectionCutSelector;
             }
+// single telescope cuts
             if( temp == "alpha" )
             {
                 is_stream >> temp;
@@ -286,13 +289,6 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                 fLos_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fLos_max=(atof(temp.c_str()));
-            }
-            if( temp == "maxonetwo" )
-            {
-                is_stream >> temp;
-                fMaxone_min=(atof(temp.c_str()));
-                is_stream >> temp;
-                fMaxtwo_min=(atof(temp.c_str()));
             }
             if( temp == "asymm" )
             {
@@ -391,13 +387,6 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                     is_stream >> temp;
                     fCoreEdge = atof( temp.c_str() );
                 }
-            }
-            if( temp == "arraytheta2" || temp == "theta2cut" ) 
-            {
-                is_stream >> temp;
-                fArrayTheta2_min=(atof(temp.c_str()));
-                is_stream >> temp;
-                fArrayTheta2_max=(atof(temp.c_str()));
             }
             if( temp == "mscw" || temp == "arraymscw" )
             {
@@ -608,7 +597,19 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
             }
-// read in values for energy dependent theta2 cut (TEMPORARY: MC only)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// direction cut values
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// fixed theta2 cut
+            if( temp == "arraytheta2" || temp == "theta2cut" ) 
+            {
+                is_stream >> temp;
+                fArrayTheta2_min=(atof(temp.c_str()));
+                is_stream >> temp;
+                fArrayTheta2_max=(atof(temp.c_str()));
+            }
+// read in values for energy dependent theta2 cut 
 // * theta2file <root file> <function name>
 // (note that fF1AngResName == "IRF" means that the graph from the IRF file is extrapolated)
             if( temp == "theta2file" )
@@ -959,6 +960,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
 /////////////////////////////////////////////////////////////////////////////////
 // check core positions
+// (average distance to telescopes)
     double iR = 0.;
     double iNTR = 0.;
     for( unsigned int i = 0; i < fNTel; i++ )
@@ -1554,7 +1556,12 @@ bool VGammaHadronCuts::initPhaseCuts( string iDir )
 */
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
 {
-    double xy = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
+    return applyInsideFiducialAreaCut( fData->Xoff, fData->Yoff, bCount );
+}
+
+bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool bCount )
+{
+    double xy = Xoff*Xoff + Yoff*Yoff;
 
     if( xy > fArrayxyoff_max*fArrayxyoff_max )
     {
@@ -1567,26 +1574,6 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
         if( xy < fArrayxyoff_min*fArrayxyoff_min )
         {
             if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff )
-{
-    double xy = Xoff*Xoff + Yoff*Yoff;
-
-    if( xy > fArrayxyoff_max*fArrayxyoff_max )
-    {
-        return false;
-    }
-
-    if( fArrayxyoff_min >= 0. )
-    {
-        if( xy < fArrayxyoff_min*fArrayxyoff_min )
-        {
             return false;
         }
     }

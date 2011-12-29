@@ -91,8 +91,6 @@ class VStereoAnalysis
     private:
 
         bool fDebug;
-        double degrad;
-	int fTimeBinCounter; // counter for EffArea Time BINs
 
         bool bTotalAnalysisOnly;
 
@@ -103,8 +101,6 @@ class VStereoAnalysis
 
         double fMeanSourceDec;
         double fMeanSourceRA;
-
-        TRandom3 *fRandom;
 
         VAnaSumRunParameter *fRunPara;
 

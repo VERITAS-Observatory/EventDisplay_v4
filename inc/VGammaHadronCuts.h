@@ -91,7 +91,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
 	int fDirectionCutSelector;
 
-// array characteristics
+// array characteristics (number of telescopes, 
         unsigned int fNTel;
         double       fArrayCentre_X;
         double       fArrayCentre_Y;
@@ -168,8 +168,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fAlpha_max;
         double fDistance_min;
         double fDistance_max;
-        double fMaxone_min;
-        double fMaxtwo_min;
         double fLos_min;
         double fLos_max;
         double fLength_min;
@@ -254,7 +252,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyEnergyReconstructionQualityCuts();
         bool   applyEnergyReconstructionQualityCuts( unsigned int iEnergyReconstructionMethod, bool bCount = false );
         bool   applyInsideFiducialAreaCut( bool bCount = false );
-        bool   applyInsideFiducialAreaCut( float Xoff, float Yoff );
+        bool   applyInsideFiducialAreaCut( float Xoff, float Yoff, bool bCount = false );
         bool   applyMCXYoffCut( double x, double y, bool bCount = false );
 	bool   applyMeanReducedScaledStereoShapeCuts();
 	bool   applyMeanStereoShapeCuts();
@@ -313,6 +311,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,27);
+        ClassDef(VGammaHadronCuts,28);
 };
 #endif

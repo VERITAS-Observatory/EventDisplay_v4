@@ -85,7 +85,6 @@ class VMonoPlots
             if(fData->size[fTelID] > fCuts->fSize_min && fData->size[fTelID] < fCuts->fSize_max )
                 return true; else return false;
         }
-        bool cutMaxOne() { if(fData->max1[fTelID] > fCuts->fMaxone_min ) return true; else return false; }
 
         bool  fDebug;
 
