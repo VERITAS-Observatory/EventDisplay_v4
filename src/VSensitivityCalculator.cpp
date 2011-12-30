@@ -419,6 +419,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
        double *x = new double[np];
        double *y = new double[np];
        double iE = 0.;
+       double iY = 0.;
 
        i_fFunCrabFlux->CalcGaussLegendreSamplingPoints( np, x, y, 1.e-14 );
 // loop over different Crab flux
@@ -427,7 +428,12 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 // equal intervall in logE
 	  iE = fEnergy_min_Log + p * (fEnergy_max_Log-fEnergy_min_Log)/i_GraphCrabFlux->GetN();
 // integrate above this energy
-	  i_GraphCrabFlux->SetPoint( p, iE, i_fFunCrabFlux->IntegralFast( np, x, y, TMath::Power( 10., iE ), 10000. ) );
+          iY = i_fFunCrabFlux->IntegralFast( np, x, y, TMath::Power( 10., iE ), 10000. );
+	  if( bUnit == "ENERGY" )
+	  {
+             iY *= 1.e12 * fConstant_Flux_To_Ergs * TMath::Power( 10., iE );
+	  }
+	  i_GraphCrabFlux->SetPoint( p, iE, iY );
        }
        delete x;
        delete y;
@@ -482,7 +488,10 @@ TCanvas* VSensitivityCalculator::plotIntegralSensitivityvsEnergyFromCrabSpectrum
 										  double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin )
 {
    if( fPlotDebugName.size() > 0 ) prepareDebugPlots();
-   calculateSensitivityvsEnergyFromCrabSpectrum( iAnasumCrabFile, bUnit, -1., iEnergyMin_TeV_lin, iEnergyMax_TeV_lin );
+   if( !calculateSensitivityvsEnergyFromCrabSpectrum( iAnasumCrabFile, bUnit, -1., iEnergyMin_TeV_lin, iEnergyMax_TeV_lin ) )
+   {
+      return 0;
+   }
    return plotSensitivityvsEnergyFromCrabSpectrum( cSensitivity, iColor, bUnit, -1. );
 }
 
@@ -677,9 +686,18 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // integral sensitivity
             if( dE_Log10 < 0. )
             {
-                gSensitivityvsEnergy->SetPoint( z, energy, i_fFunCrabFlux->Eval( energy ) * s );
-                gSensitivityvsEnergy->SetPointEYhigh( z, i_fFunCrabFlux->Eval( energy ) * TMath::Abs( s - s_error_U ) );
-                gSensitivityvsEnergy->SetPointEYlow( z, i_fFunCrabFlux->Eval( energy ) * TMath::Abs( s - s_error_L ) );
+		if( bUnit == "CU" )
+		{
+		   gSensitivityvsEnergy->SetPoint( z, energy, s );
+		   gSensitivityvsEnergy->SetPointEYhigh( z, TMath::Abs( s - s_error_U ) );
+		   gSensitivityvsEnergy->SetPointEYlow( z, TMath::Abs( s - s_error_L ) );
+		}
+		else
+		{
+		   gSensitivityvsEnergy->SetPoint( z, energy, i_fFunCrabFlux->Eval( energy ) * s );
+		   gSensitivityvsEnergy->SetPointEYhigh( z, i_fFunCrabFlux->Eval( energy ) * TMath::Abs( s - s_error_U ) );
+		   gSensitivityvsEnergy->SetPointEYlow( z, i_fFunCrabFlux->Eval( energy ) * TMath::Abs( s - s_error_L ) );
+                }
             }
 // differential sensitivity
             else
@@ -889,7 +907,6 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas *
     g->SetLineColor( iColor );
     g->SetLineWidth( (Width_t)iLineWidth );
     g->SetLineStyle( iLineStyle );
-    g->Print();
 
 // check what units the data is in
     string i_fileUnit = "PFLUX";

@@ -114,20 +114,28 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC" );
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGICII_IntegralSensitivity_MC_Colin2010_PFLUX.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC II" );
+
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/GLAST5Y_IntegralSensitivity_LOI_2009_PFLUX.txt" );
-       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "Fermi LAT 5y" );
+       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "Fermi LAT 5y" );  
 
        fPD.bSet = true;
     }
     else if( bIntegral && bUnit == "CU" )
     {
        fPD.bIntegral = true;
-       fPD.fPlotting_flux_min = 2.e-15;
-       fPD.fPlotting_flux_max = 8.e-09;
+       fPD.fPlotting_flux_min = 0.0002;
+       fPD.fPlotting_flux_max = 0.85;
       
        fPD.bSet = true;
-    }
-////////////////////
+    } 
+    else if( bIntegral && bUnit == "ENERGY" )
+    {
+       fPD.bIntegral = true;
+       fPD.fPlotting_flux_min = 1.e-14;
+       fPD.fPlotting_flux_max = 1.e-11;
+
+       fPD.bSet = true;
+    } 
 // differential flux
     else if( !bIntegral && bUnit == "PFLUX" )
     {
@@ -170,8 +178,8 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
     {
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
-       fPD.fPlotting_flux_min = 1.e-15;
-       fPD.fPlotting_flux_max = 2.e-08;
+       fPD.fPlotting_flux_min = 1.e-14;
+       fPD.fPlotting_flux_max = 2.e-10;
 
        if( iObservatory == "VTS" || iObservatory == "VERITAS" )
        {
@@ -200,9 +208,9 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
                               char *ifile1 = 0, char *ifile2 = 0,
 			      char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
-			      unsigned int iCrabSpec_ID = 6 )
+			      unsigned int iCrabSpec_ID = 6, string iObservatory = "CTA" )
 {
-     plotSensitivity( ifile1, ifile2, true, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID );
+     plotSensitivity( ifile1, ifile2, true, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +271,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
     }
     else if( iFluxUnit == "ENERGY" )
     {
-        a.setFluxRange_ENERGY( fPD.fPlotting_flux_min, fPD.fPlotting_flux_max );
+        a.setFluxRange_ENERG( fPD.fPlotting_flux_min, fPD.fPlotting_flux_max );
     }
     else                         
     {
@@ -299,7 +307,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 //////////////////////////////////////////////////////////////////////
     if( iData_anasumFile1 != 0 )
     {
-        if( bIntegral ) a.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile1, 1, iFluxUnit, 0.2, 100. );
+        if( bIntegral ) a.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile1, 1, iFluxUnit, 0.05, 100. );
 	else            a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile1, 1, iFluxUnit, 0.2, 0.05, 8. );
     }
 // plot second file
@@ -356,27 +364,23 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        {
            i_Azbin_gamma = 0;
 	   i_index_gamma = 2.4;
-	   i_noise_gamma = 200;
-
 	   i_noise_gamma = 130;
+	   i_noise_gamma = 200;
 	   i_woff_gamma = 0.5;
 
 	   i_Azbin_proton = 0;
 	   i_index_proton = 2.6;
 
-	   i_noise_proton = 200;
-	   i_woff_proton = 0.;
-
 	   i_noise_proton = 130;
+	   i_noise_proton = 200;
 	   i_woff_proton = 0.;
 
 	   i_Azbin_electron = 0;
 	   i_index_electron = 3.0;
 
-	   i_noise_electron = 200;
-	   i_woff_electron = 0.;
-
 	   i_noise_electron = 130;
+	   i_noise_electron = 200;
+
 	   i_woff_electron = 0.;
        }
        cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl; 
@@ -401,7 +405,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        }
 
 // energy range determined by looking at number of noff events (need off events to determine sensitivity)
-       if( bIntegral ) b.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.16, 0.001 );
+       if( bIntegral ) b.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.01, 500. );
        else            b.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.2, 0.01 );
 
        b.plotSensitivityLimitations( c );
