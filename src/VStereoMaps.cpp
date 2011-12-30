@@ -93,7 +93,6 @@ void VStereoMaps::setHistograms( TH2D* i_map_stereo, TH2D* i_map_alpha )
     hmap_ratio = 0;
     fSourcePositionBinX = hmap_stereo->GetXaxis()->FindBin( fRunList.fWobbleWestMod );
     fSourcePositionBinY = hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod );
-
 }
 
 
@@ -118,8 +117,8 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
     double i_weight = 1.;
 
 // calculate theta2: - relative wobble position + shift in derotated sky coordinates
-    double theta2  = (x - fRunList.fWobbleWestMod + fTargetShiftWest )*(x - fRunList.fWobbleWestMod + fTargetShiftWest );
-    theta2 += (y - fRunList.fWobbleNorthMod + fTargetShiftNorth )*(y - fRunList.fWobbleNorthMod + fTargetShiftNorth );
+    double theta2  = (x - fRunList.fWobbleWestMod  + fTargetShiftWest  )*(x - fRunList.fWobbleWestMod  + fTargetShiftWest );
+           theta2 += (y - fRunList.fWobbleNorthMod + fTargetShiftNorth )*(y - fRunList.fWobbleNorthMod + fTargetShiftNorth );
 
     if( i_isGamma )
     {
@@ -606,13 +605,13 @@ bool VStereoMaps::fill_ReflectedRegionModel(  double x, double y, int irun, bool
         if( f_RE_ystopp > i_nbinsY ) f_RE_ystopp = i_nbinsY;
 
 // normalisation for uncorrelated plots
-//   (off regions are still of source region, this is not the bin size)
+// (off regions are still of source region, this is not the bin size)
         f_RE_AreaNorm = 1.;
-        if( bUncorrelatedSkyMaps )
+        if( bUncorrelatedSkyMaps && fRunList.fSourceRadius > 0. )
         {
             f_RE_AreaNorm = hmap_stereo->GetXaxis()->GetBinWidth( 2 ) * hmap_stereo->GetYaxis()->GetBinWidth( 2 ) / TMath::Pi() / fRunList.fSourceRadius;
+            if( f_RE_AreaNorm > 0. ) f_RE_AreaNorm = 1./f_RE_AreaNorm;
         }
-        f_RE_AreaNorm = 1./f_RE_AreaNorm;
 
 // bin of source direction
         f_RE_WW = hmap_stereo->GetXaxis()->FindBin( fRunList.fWobbleWestMod - fTargetShiftWest  );
@@ -660,8 +659,9 @@ bool VStereoMaps::fill_ReflectedRegionModel(  double x, double y, int irun, bool
 
                 for( unsigned int p = 0; p < i_nr; p++ )
                 {
-// is event in this background region?
-                    if( (x-fRE_off[i][j].xoff[p])*(x-fRE_off[i][j].xoff[p])+(y-fRE_off[i][j].yoff[p])*(y-fRE_off[i][j].yoff[p]) < fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
+// apply theta2 cut in background region
+                    if( (x-fRE_off[i][j].xoff[p])*(x-fRE_off[i][j].xoff[p])+(y-fRE_off[i][j].yoff[p])*(y-fRE_off[i][j].yoff[p]) <
+		        fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
                     {
                         hmap_stereo->Fill( i_cx-fRunList.fWobbleWestMod, i_cy-fRunList.fWobbleNorthMod );
                         hmap_alpha->Fill(  i_cx-fRunList.fWobbleWestMod, i_cy-fRunList.fWobbleNorthMod, (double)fRE_off[i][j].noff * f_RE_AreaNorm );
@@ -680,13 +680,17 @@ bool VStereoMaps::fill_ReflectedRegionModel(  double x, double y, int irun, bool
         {
             if(p < 25)
             {
-                fTheta2_All[p] = (x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])*(x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])+(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p])*(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p]);
+                fTheta2_All[p] = (x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])*(x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])+
+		                 (y-fRE_off[f_RE_WW][f_RE_WN].yoff[p])*(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p]);
             }
 
-            if( (x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])*(x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])+(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p])*(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p]) < fRE_off[f_RE_WW][f_RE_WN].roff[p]*fRE_off[f_RE_WW][f_RE_WN].roff[p] )
+            if( (x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])*(x-fRE_off[f_RE_WW][f_RE_WN].xoff[p]) +
+	        (y-fRE_off[f_RE_WW][f_RE_WN].yoff[p])*(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p]) <
+		fRE_off[f_RE_WW][f_RE_WN].roff[p]*fRE_off[f_RE_WW][f_RE_WN].roff[p] )
             {
                 double t2temp = fTheta2_All[0];
-                fTheta2_All[0] = (x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])*(x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])+(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p])*(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p]);
+                fTheta2_All[0] = (x-fRE_off[f_RE_WW][f_RE_WN].xoff[p])*(x-fRE_off[f_RE_WW][f_RE_WN].xoff[p]) + 
+		                 (y-fRE_off[f_RE_WW][f_RE_WN].yoff[p])*(y-fRE_off[f_RE_WW][f_RE_WN].yoff[p]);
                 fTheta2_All[p] = t2temp;
                 is_inside = true;
             }
@@ -710,8 +714,6 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
     cout << "\t initialize REFLECTED REGION MODEL for run " << fInitRun;
     if( bUncorrelatedSkyMaps ) cout << " (uncorrelated plots)";
     cout << endl;
-
-    double degrad = 45./atan(1.);
 
 //  control histograms and delete the one from the previous runs
     initialize_ReflectedRegionHistograms();
@@ -909,7 +911,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                         {
 // get off-source positions
                             phi_i = phi_0 + TMath::Pi() + (2*p+1-n_r) * w;
-                            phi_i += ((double)(t))/degrad;
+                            phi_i += ((double)(t))/TMath::RadToDeg();
                             x_t = ids * cos( phi_i );
                             y_t = ids * sin( phi_i );
 
