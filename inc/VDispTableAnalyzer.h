@@ -52,7 +52,8 @@ class VDispTableAnalyzer
 
         VDispTableAnalyzer( string iFile = "" );
         ~VDispTableAnalyzer();
-	void  calculateMeanDirection( float &xs, float &ys, vector< float > x, vector< float > y, vector< float > cosphi, vector< float > sinphi, vector< float > v_disp, vector< float > v_weight );
+	void  calculateMeanDirection( float &xs, float &ys, vector< float > x, vector< float > y,
+	                              vector< float > cosphi, vector< float > sinphi, vector< float > v_disp, vector< float > v_weight );
         float evaluate( float iWidth, float iLength, float iSize, float iPedvar, float iZe, float iAz, bool b2D = true );
 	float getDisp() { return f_disp; }
 	float getDispE() { return f_dispE; }

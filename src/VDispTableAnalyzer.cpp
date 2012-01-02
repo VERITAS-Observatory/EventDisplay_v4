@@ -266,7 +266,7 @@ void VDispTableAnalyzer::calculateMeanDirection( float &xs, float &ys, vector< f
 
 // prepare bit mask to go through all possible combinations of sign for disp calculation
      vector< bitset< NTOT_MAX > > iComb;
-     for( unsigned int i = 0; i < TMath::Power( 2, iNTel_max ); i++ )
+     for( unsigned int i = 0; i < TMath::Power( 2, (Int_t)iNTel_max ); i++ )
      {
         iComb.push_back( i );
      }

@@ -370,7 +370,7 @@ bool VEventLoop::initEventLoop( string iFileName )
     }
 // set coordinates in run parameter (get direction of first telescope)
 // (J2000)
-    if( getTeltoAna()[0] < fPointing.size() > 0 && fPointing[getTeltoAna()[0]] )
+    if( getTeltoAna()[0] < fPointing.size() && fPointing[getTeltoAna()[0]] )
     {
         getRunParameter()->fTargetDec = fPointing[getTeltoAna()[0]]->getTargetDec();
         getRunParameter()->fTargetRA  = fPointing[getTeltoAna()[0]]->getTargetRA();
