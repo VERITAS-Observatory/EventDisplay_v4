@@ -106,8 +106,8 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
     if( bIntegral && bUnit == "PFLUX" )
     {
        fPD.bIntegral = true;
-       fPD.fPlotting_flux_min = 2.e-15;
-       fPD.fPlotting_flux_max = 8.e-09;
+       fPD.fPlotting_flux_min = 8.e-16;
+       fPD.fPlotting_flux_max = 2.e-10;
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/HESS_IntegralSensitivity_Achieved_Moriond2009.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "HESS" );
        fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGIC_IntegralSensitivity_Data_Colin2010_PFLUX.txt" );
