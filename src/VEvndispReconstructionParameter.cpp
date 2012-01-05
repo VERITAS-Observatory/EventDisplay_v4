@@ -251,7 +251,10 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     fNImages_min.push_back( 2 );
     fAxesAngles_min.push_back( 0. );
     fMLPFileName.push_back( "" );
+    fTMVAFileName.push_back( "" );
     fDispFileName.push_back( "" );
+    fMODDISP_MinAngleForDisp.push_back( 25. );
+    fMODDISP_MinAngleExpFactor.push_back( 0.02 );
 
     for( unsigned int i = 0; i < fNTel_type; i++ ) i_d.push_back( fDefault_imagethresh );
     fimagethresh.push_back( i_d );
@@ -335,7 +338,13 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
         cout << endl;
         cout << "\t\t minimum number of images: " << fNImages_min[m] << ", minimum angle between image axes [deg]: " << fAxesAngles_min[m] << endl;
         if( fMLPFileName[m].size() > 0 ) cout << "\t\t MLP file: " << fMLPFileName[m] << endl;
+	if( fTMVAFileName[m].size() > 0 ) cout << "\t\t TMVA (BDT) file: " << fTMVAFileName[m] << endl;
         if( fDispFileName[m].size() > 0 ) cout << "\t\t DISP table: " << fDispFileName[m] << endl;
+	if( fMethodID[m] == 9 )
+	{
+	   cout << "\t\t Minimum angle to change from geometric to MVA method: [deg]: " << fMODDISP_MinAngleForDisp[m];
+	   cout << " (exp " << fMODDISP_MinAngleExpFactor[m] << ")" << endl;
+        }
         cout << "\t\t Telescope\t\t\t\t\t\t\t ";
         for( unsigned int i = 0; i < fLocalNtubes_min[m].size(); i++ ) cout << i+1 << "\t";
         cout << endl;
@@ -401,6 +410,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
     string iLine;
     string iTemp;
     string iTemp2;
+    string iTemp3;
     ULong64_t t_type = 0;
     int t_temp = 0;
     int m_temp = -1;
@@ -452,6 +462,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             is_stream >> iTemp;
             iTemp = VUtilities::upperCase( iTemp );
             is_stream >> iTemp2;
+	    if( !is_stream.eof() ) is_stream >> iTemp3;
+	    else                   iTemp3 == "";
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -465,10 +477,10 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 addNewMethod( m_temp );
                 fMethodID[m_temp] = atoi( iTemp2.c_str() );
 // hardwired: allowed array reconstruction numbers
-                if( fMethodID[m_temp] != 0 && fMethodID[m_temp] != 1 && fMethodID[m_temp] != 3 && fMethodID[m_temp] != 4 && fMethodID[m_temp] != 5 && fMethodID[m_temp] != 6 && fMethodID[m_temp] != 7 && fMethodID[m_temp] != 8 )
+                if( fMethodID[m_temp] != 0 && fMethodID[m_temp] != 1 && fMethodID[m_temp] != 3 && fMethodID[m_temp] != 4 && fMethodID[m_temp] != 5 && fMethodID[m_temp] != 6 && fMethodID[m_temp] != 7 && fMethodID[m_temp] != 8 && fMethodID[m_temp] != 9 )
                 {
                     cout << "VEvndispReconstructionParameter: invalid array reconstruction method: " << fMethodID[m_temp] << endl;
-                    cout << "(allowed is 0,1,3,4,5,6,7,8)" << endl;
+                    cout << "(allowed is 0,1,3,4,5,6,7,8,9)" << endl;
                     cout << "...exiting" << endl;
                     exit( 0 );
                 }
@@ -500,9 +512,18 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 fMLPFileName[m_temp] = iTemp2;
             }
+	    else if( iTemp == "TMVABDTFILE" )
+	    {
+	        fTMVAFileName[m_temp] = iTemp2;
+            }
             else if( iTemp == "DISPFILE" )
             {
                 fDispFileName[m_temp] = iTemp2;
+            }
+	    else if( iTemp == "GEOMETRIC_MINANGLE" )
+	    {
+	        fMODDISP_MinAngleForDisp[m_temp] = atof( iTemp2.c_str() );
+		if( iTemp3.size() > 0 ) fMODDISP_MinAngleExpFactor[m_temp] = atof( iTemp3.c_str() );
             }
 	    else if( iTemp == "IMAGETHRESHOLD" )
 	    {

@@ -15,6 +15,8 @@
 #include <TFile.h>
 #include <TMath.h>
 
+#include <vector>
+
 class Ctelconfig
 {
     public :
@@ -141,6 +143,7 @@ void Ctelconfig::Init(TTree *tree)
     fCurrent = -1;
     fChain->SetMakeClass(1);
 
+    NTel = 0;
     fChain->SetBranchAddress("NTel", &NTel, &b_NTel);
     if( tree->GetBranchStatus( "TelType" ) ) fChain->SetBranchAddress("TelType", &TelType, &b_TelType);
     else                                     TelType = 1;
@@ -250,7 +253,13 @@ double Ctelconfig::getArrayMaxSize()
 
 unsigned int Ctelconfig::getNTel()
 {
-   if( fChain ) return fChain->GetEntries();
+   if( NTel > 0 ) return NTel;
+
+   if( fChain && fChain->GetEntries() > 0 )
+   {
+       fChain->GetEntry( 0 );
+       return NTel;
+   }
 
    return 0;
 }

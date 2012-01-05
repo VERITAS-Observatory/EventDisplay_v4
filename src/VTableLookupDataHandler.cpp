@@ -1389,6 +1389,7 @@ void VTableLookupDataHandler::calcEmissionHeights()
     fNTelPairs = fEmissionHeightCalculator->getNTelPairs();
     fEmissionHeightMean = (float)fEmissionHeightCalculator->getMeanEmissionHeight();
     fEmissionHeightChi2 = (float)fEmissionHeightCalculator->getMeanEmissionHeightChi2();
+    if( fEmissionHeightChi2 <= 0. ) fEmissionHeightChi2 = 1.e-10;
     for( unsigned int i = 0; i < fNTelPairs; i++ )
     {
         if( i >= getMaxNbrTel() || i >= fEmissionHeightCalculator->getEmissionHeights().size() ) break;

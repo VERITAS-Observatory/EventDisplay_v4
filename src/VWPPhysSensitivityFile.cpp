@@ -349,6 +349,12 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     double i_index_proton = 2.6;
     int i_noise_proton = 250;
     double i_woff_proton = 0.;  
+
+    int i_Azbin_electron = 0;
+    double i_index_electron = 3.0;
+    int i_noise_electron = 250;
+    double i_woff_electron = 0.;  
+
     if( fSubArray == "V5" )
     {
        i_Azbin_gamma = 16;
@@ -359,6 +365,11 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
        i_index_proton = 2.6;
        i_noise_proton = i_noise_gamma;
        i_woff_proton = 0.;
+
+       i_Azbin_electron = i_Azbin_gamma;
+       i_index_electron = 3.0;
+       i_noise_electron = i_noise_gamma;
+       i_woff_electron = 0.;
     }
     else if( fSubArray == "V6" )
     {
@@ -370,6 +381,11 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
        i_index_proton = 2.0;
        i_noise_proton = i_noise_gamma;
        i_woff_proton = 0.;
+
+       i_Azbin_electron = i_Azbin_gamma;
+       i_index_electron = 3.0;
+       i_noise_electron = i_noise_gamma;
+       i_woff_electron = 0.;
     }
 
     cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << fSubArray << endl; 
@@ -424,7 +440,8 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
 // electrons (spectral index)
     if( iMC_Electron.size() > 0 && iMC_Electron != "NOFILE" )
     {
-       i_Sens.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20., 0, 0.0, 250, 3.0 );
+       i_Sens.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20.,
+                              i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
     }
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
@@ -484,17 +501,17 @@ void VWPPhysSensitivityFile::setSubArray( string iA )
     }
     else if( isVTS() == 5 )
     {
-       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE130_ID30.eff";
+       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE130_ID30_SW07.eff";
        fDataFile_gamma_cone10 = "";
-       fDataFile_proton = "proton_20deg_050deg_NOISE130_ID30.eff";
-       fDataFile_electron = "";
+       fDataFile_proton = "proton_20deg_050deg_NOISE130_ID30_SW07.eff";
+       fDataFile_electron = "electron_20deg_050deg_NOISE130_ID30_SW07.eff";
     }
     else if( isVTS() == 6 )
     {
-       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE200_ID30.eff";
+       fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE200_ID30_SW05.eff";
        fDataFile_gamma_cone10 = "";
-       fDataFile_proton = "proton_20deg_050deg_NOISE200_ID30.eff";
-       fDataFile_electron = "";
+       fDataFile_proton = "proton_20deg_050deg_NOISE200_ID30_SW05.eff";
+       fDataFile_electron = "electron_20deg_050deg_NOISE200_ID30_SW05.eff";
     } 
 }
 

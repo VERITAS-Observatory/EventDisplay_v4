@@ -36,6 +36,8 @@ void VTMVAEvaluator::reset()
    fdES = 0.;
    fSizeSecondMax_log10 = 0;
    fTheta2 = 0.;
+   fCoreDist = 0.;
+   fDummy = 0.;
 
    fTMVAMethodName_BOXCUTS = false;
    setTMVACutValue();
@@ -56,7 +58,7 @@ void VTMVAEvaluator::reset()
     get list of training variables
 
 */
-vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile )
+vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< bool >& iSpectator )
 {
    vector< string > iVar;
 
@@ -86,7 +88,10 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile )
 // AGAIN, NOTE: extreme dependendence on the structure of the TMVA XML file
       if( is_line.find( "Expression=\"" ) != string::npos )
       {
-         iVar.push_back( is_line.substr( is_line.find( "Expression=\"" ) + 12, is_line.find( "Label=" ) - is_line.find( "Expression=\"" ) - 14 ) );
+	 iVar.push_back( is_line.substr( is_line.find( "Expression=\"" ) + 12, is_line.find( "Label=" ) - 
+					 is_line.find( "Expression=\"" ) - 14 ) );
+          if( is_line.find( "SpecIndex" ) != string::npos ) iSpectator.push_back( true );
+	  else                                              iSpectator.push_back( false );
 	 if( fDebug ) cout << "\t reading TMVA XML file: new variable: " << iVar.back() << endl;
       }
    }
@@ -220,7 +225,8 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
       if( fDebug ) cout << "reading TMVA XML weight file: " << iFullFileName << endl;
 
 // get list of training variables
-      vector< string > iTrainingVariables = getTrainingVariables( iFullFileName.str() );
+      vector< bool > iVariableIsASpectator;
+      vector< string > iTrainingVariables = getTrainingVariables( iFullFileName.str(), iVariableIsASpectator );
 
 // note that the following list of variables must be the same as during training
       for( unsigned int t = 0; t < iTrainingVariables.size(); t++ )
@@ -241,7 +247,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	 {
 	    fTMVAReader.back()->AddVariable( "log10(EmissionHeightChi2)", &fEmissionHeightChi2_log10 );
          }
-	 else if( iTrainingVariables[t] == "NImages" ) 
+	 else if( iTrainingVariables[t] == "NImages" && !iVariableIsASpectator[t] ) 
 	 {
 	    fTMVAReader.back()->AddVariable( "NImages", &fNImages );
          }
@@ -278,11 +284,21 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	    fTMVAReader.back()->AddVariable( "(Xoff*Xoff+Yoff*Yoff)", &fTheta2 ); 
 	    setTMVAThetaCutVariable( true );
          }
+	 else if( iTrainingVariables[t] == "sqrt(Xcore*Xcore+Ycore*Ycore)" )
+	 {
+	    fTMVAReader.back()->AddVariable( "sqrt(Xcore*Xcore+Ycore*Ycore)", &fCoreDist );
+         }
+	 else if( iVariableIsASpectator[t] )
+	 {
+	    fTMVAReader.back()->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
+         }
       }
-      if( fDebug )
+      cout << "Following variables have been found and are used for TMVA separation: " << endl;
+      for( unsigned int t = 0; t < iTrainingVariables.size(); t++ ) 
       {
-         cout << "Following variables have been found: " << endl;
-	 for( unsigned int t = 0; t < iTrainingVariables.size(); t++ ) cout << "\t" << iTrainingVariables[t] << endl;
+	 cout << "\t" << iTrainingVariables[t];
+	 if( iVariableIsASpectator[t] ) cout << " (spectator)";
+	 cout << endl;
       }
 	    
       if( !fTMVAReader.back()->BookMVA( hname, iFullFileName.str().c_str() ) )
@@ -430,7 +446,7 @@ double VTMVAEvaluator::evaluate()
        fMLR            = fData->MLR;
        fEmissionHeight = fData->EmissionHeight;
        if( fData->EmissionHeightChi2 > 0. ) fEmissionHeightChi2_log10 = TMath::Log10( fData->EmissionHeightChi2 );
-       else                                 fEmissionHeightChi2_log10 = 0.;   // !!! not clear what the best value is
+       else                                 fEmissionHeightChi2_log10 = -10.;   // !!! not clear what the best value is
        fEChi2          = fData->EChi2;
        if( fEChi2 > 0. ) fEChi2_log10 = TMath::Log10( fEChi2 );
        else              fEChi2_log10 = 0.;    // !!! not clear what the best value is
@@ -444,6 +460,7 @@ double VTMVAEvaluator::evaluate()
        else                      fSizeSecondMax_log10 = 0.;  // !!! not clear what the best value is
        if( fTMVAIgnoreTheta2Cut ) fTheta2 = 1.e-30;
        else                       fTheta2 = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
+       fCoreDist = sqrt( fData->Xcore*fData->Xcore+fData->Ycore*fData->Ycore );
    }
    else return -1.;
 

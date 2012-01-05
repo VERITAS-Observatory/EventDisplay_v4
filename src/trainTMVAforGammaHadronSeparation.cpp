@@ -74,6 +74,11 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
    {
       factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
    }
+// adding spectator variables
+   for( unsigned int i = 0; i < iRun->fSpectatorVariable.size(); i++ )
+   {
+      factory->AddSpectator( iRun->fSpectatorVariable[i].c_str() );
+   }
 
 // weight expression
 //   factory->SetWeightExpression( "InputWeight" );
@@ -82,7 +87,9 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 //////////////////////////////////////////
 // prepare training events
 // nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
-   factory->PrepareTrainingAndTestTree( iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut, iRun->fPrepareTrainingOptions );
+   factory->PrepareTrainingAndTestTree( iRun->fQualityCuts && iRun->fMCxyoffCut && 
+                                        iRun->fEnergyCutData[iEnergyBin]->fEnergyCut, 
+					iRun->fPrepareTrainingOptions );
       
 //////////////////////////////////////////
 // book all methods

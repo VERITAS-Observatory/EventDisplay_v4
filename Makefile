@@ -164,7 +164,7 @@ HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 # 2010 production
 CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 SC 
-#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
+# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
 
 ########################################################
@@ -253,9 +253,11 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
                 ./obj/VImageAnalyzer.o \
 		./obj/VArrayAnalyzer.o \
 		./obj/VMLPAnalyzer.o \
+		./obj/VDispAnalyzer.o \
 		./obj/VDispTableReader.o \
 		./obj/VDispTableReader_Dict.o \
 		./obj/VDispTableAnalyzer.o \
+		./obj/VTMVADispAnalyzer.o \
 		./obj/VShowerParameters.o \
 		./obj/VMCParameters.o \
 		./obj/VGrIsuAnalyzer.o \
@@ -637,6 +639,24 @@ writeCTAWPPhysSensitivityFiles:	$(WRITECTAPHYSOBJ)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# trainTMVAforAngularReconstruction
+########################################################
+./obj/trainTMVAforAngularReconstruction.o:	./src/trainTMVAforAngularReconstruction.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
+					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+					./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+					./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+					./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+					./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+					./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+					./obj/VUtilities.o \
+					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/CtparsShort.o 
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 

@@ -184,6 +184,15 @@ void VTMVARunData::print()
        if( i < fTrainingVariable_VarProp.size() )     cout << "\t" << fTrainingVariable_VarProp[i];
        cout << endl;
     }
+    if( fSpectatorVariable.size() > 0 )
+    {
+       cout << endl;
+       cout << "list of spectator variables: " << endl;
+       for( unsigned int i = 0; i < fSpectatorVariable.size(); i++ )
+       {
+          cout << "\t spectator: " << fSpectatorVariable[i] << endl;
+       }
+    }
     cout << endl;
     cout << "pre-training selection cuts: " << fQualityCuts << endl;
     cout << "cut on MC arrival directions: " << fMCxyoffCut << endl;
@@ -299,6 +308,14 @@ bool VTMVARunData::readConfigurationFile( char *iC )
             {
                cout << "VTMVARunData::readConfigurationFile error while reading input for variable VARIABLE" << endl;
                return false;
+            }
+         }
+// spectator variables
+	 if( temp == "SPECTATOR" )
+	 {
+	    if( !is_stream.eof() )
+	    {
+	       fSpectatorVariable.push_back( is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ) );
             }
          }
 // preselection cut

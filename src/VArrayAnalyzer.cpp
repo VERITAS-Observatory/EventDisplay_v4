@@ -261,7 +261,7 @@ void VArrayAnalyzer::initAnalysis()
     fMeanPointingMismatch.assign( getNTel(), 0. );
     fNMeanPointingMismatch.assign( getNTel(), 0. );
 
-// loop over all methods and read in necessary MLPs, etc....
+// loop over all methods and read in necessary MLPs, TMVAs, tables, etc....
     for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
     {
 // set reconstruction method
@@ -269,38 +269,30 @@ void VArrayAnalyzer::initAnalysis()
         {
             if( getArrayAnalysisCuts()->fMethodID[i] == 5 )
             {
-                fMLPAnalyzer.push_back( new VMLPAnalyzer( getArrayAnalysisCuts()->fMLPFileName[i] ) );
-                if( fMLPAnalyzer.back()->isZombie() )
-                {
-                    cout << "VArrayAnalyzer::initAnalysis() error while initializing MLP for ";
-                    cout << getArrayAnalysisCuts()->fMLPFileName[i] << endl;
-                    exit( -1 );
-                }
+	        fDispAnalyzer.push_back( new VDispAnalyzer() );
+		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
+		if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fMLPFileName[i], "MLP" ) ) exit( -1 );
             }
-            else fMLPAnalyzer.push_back( 0 );
-            if( getArrayAnalysisCuts()->fMethodID[i] == 6 || getArrayAnalysisCuts()->fMethodID[i] == 7 || getArrayAnalysisCuts()->fMethodID[i] == 8 )
+	    else if( getArrayAnalysisCuts()->fMethodID[i] == 7 )
+	    {
+	        fDispAnalyzer.push_back( new VDispAnalyzer() );
+		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
+		if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
+	    }
+	    else if( getArrayAnalysisCuts()->fMethodID[i] == 6 ||
+	             getArrayAnalysisCuts()->fMethodID[i] == 8 || 
+		     getArrayAnalysisCuts()->fMethodID[i] == 9 )
             {
 		cout << "init array analysis for analysis cut set " << fDispAnalyzer.size();
 		cout << " and reconstruction method " << getArrayAnalysisCuts()->fMethodID[i] << endl;
-                fDispAnalyzer.push_back( new VDispTableAnalyzer( getArrayAnalysisCuts()->fDispFileName[i] ) );
-                if( fDispAnalyzer.back()->isZombie() )
-                {
-                    cout << "VArrayAnalyzer::initAnalysis() error while initializing MLP for ";
-                    cout << getArrayAnalysisCuts()->fDispFileName[i] << endl;
-                    exit( -1 );
-                }
+	        fDispAnalyzer.push_back( new VDispAnalyzer() );
+		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
+//                if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fDispFileName[i], "DISPTABLE" ) ) exit( -1 );
+		if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
             }
             else fDispAnalyzer.push_back( 0 );
         }
     }
-
-// (GM 20111102) moved to VEventLoop::initializeAnalyzers()
-// (in order to write empty trees in case of no input events)
-// init output file
-//     initOutput();
-// init data trees
-//   initTree();
-
 }
 
 
@@ -353,10 +345,6 @@ void VArrayAnalyzer::terminate()
 {
     if( fDebug ) cout << "void VArrayAnalyzer::terminate()" << endl;
 
-    for( unsigned int i = 0; i < fMLPAnalyzer.size(); i++ )
-    {
-        if( fMLPAnalyzer[i] ) fMLPAnalyzer[i]->terminate();
-    }
     for( unsigned int i = 0; i < fDispAnalyzer.size(); i++ )
     {
         if( fDispAnalyzer[i] ) fDispAnalyzer[i]->terminate();
@@ -364,7 +352,6 @@ void VArrayAnalyzer::terminate()
 
     if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
     {
-
 // write pointing mismatch
         if( !getNoPointing() && getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]]->getTargetName() != "laser" && !fReader->isMC() )
         {
@@ -592,8 +579,9 @@ void VArrayAnalyzer::calcShowerDirection_and_Core()
             else if( getArrayAnalysisCuts()->fMethodID[i] == 4 ) rcs_method_4( i );
             else if( getArrayAnalysisCuts()->fMethodID[i] == 5 ) rcs_method_5( i, 5 );
             else if( getArrayAnalysisCuts()->fMethodID[i] == 6 ) rcs_method_5( i, 6 );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 7 ) rcs_method_7( i );
+            else if( getArrayAnalysisCuts()->fMethodID[i] == 7 ) rcs_method_5( i, 7 );
             else if( getArrayAnalysisCuts()->fMethodID[i] == 8 ) rcs_method_8( i );
+            else if( getArrayAnalysisCuts()->fMethodID[i] == 9 ) rcs_method_9( i );
             else
             {
                 cout << "VArrayAnalyzer::calcShowerDirection_and_Core(): unknown array reconstruction method " << getArrayAnalysisCuts()->fMethodID[i] << endl;
@@ -666,7 +654,8 @@ direction with the image centroids. Impact
     {
         float iangdiff = fabs(atan(m[0])-atan(m[1]));
         getShowerParameters()->fiangdiff[iMethod] = iangdiff*TMath::RadToDeg();
-        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
+	    fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
         {
             getShowerParameters()->fShower_Chi2[iMethod] = -1.*fabs(atan(m[0])-atan(m[1]))*TMath::RadToDeg();
             return 0;
@@ -960,7 +949,8 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
     {
         float iangdiff = fabs(atan(m[0])-atan(m[1]));
         getShowerParameters()->fiangdiff[iMethod] = iangdiff*TMath::RadToDeg();
-        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
+	    fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
         {
             getShowerParameters()->fShower_Chi2[iMethod] = -1.*fabs(atan(m[0])-atan(m[1]))*TMath::RadToDeg();
             return 0;
@@ -996,8 +986,8 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
 
             iangdiff = sin( fabs(atan(m[jj])-atan(m[ii])) );
 
-// discard all pairs with almost parallell lines
-            if( fabs( iangdiff ) < 0.2 ) continue;
+// discard all pairs with almost parallel lines
+            if( fabs( iangdiff ) < 0.2 ) continue; // TODO this should not be hardcoded
 
             iweight  = 1./(1./w[ii] + 1./w[jj]);
             iweight *= 1./(l[ii] + l[jj]);
@@ -1092,7 +1082,8 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
     {
         float iangdiff = fabs(atan(m[0])-atan(m[1]));
         getShowerParameters()->fiangdiff[iMethod] = iangdiff*TMath::RadToDeg();
-        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
+	    fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
         {
             getShowerParameters()->fShower_Chi2[iMethod] = -1.*fabs(atan(m[0])-atan(m[1]))*TMath::RadToDeg();
             return 0;
@@ -1133,7 +1124,7 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
             iweight  = 1./(1./w[ii] + 1./w[jj]);      // weight 1: size of images
             iweight *= (1.-l[ii])*(1.-l[jj]);         // weight 2: elongation of images (width/length)
             iweight *= iangdiff;                      // weight 3: angular differences between the two image axis
-	        iweight *= iweight;                       // use squared value
+	    iweight *= iweight;                       // use squared value
 
             ixs += xs * iweight;
             iys += ys * iweight;
@@ -1198,7 +1189,8 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
     double az = 0.;
     if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
     {
-       getPointing()[getTeltoAna()[0]]->getRotatedShowerDirection( -1.*getShowerParameters()->fShower_Yoffset[iMethod], -1.*getShowerParameters()->fShower_Xoffset[iMethod], ze, az );
+       getPointing()[getTeltoAna()[0]]->getRotatedShowerDirection( -1.*getShowerParameters()->fShower_Yoffset[iMethod], 
+                                                                   -1.*getShowerParameters()->fShower_Xoffset[iMethod], ze, az );
     }
     if( isnan( ze ) ) ze = -99999.;
     if( isnan( az ) ) az = -99999.;
@@ -1217,7 +1209,8 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 	   iUTC = VSkyCoordinatesUtilities::getUTC( getShowerParameters()->MJD, getShowerParameters()->time );
 	   if( getTelID() < getPointing().size() && getPointing()[getTelID()] )
 	   {
-	      getPointing()[getTelID()]->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod], getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
+	      getPointing()[getTelID()]->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod], 
+	                                                       getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
            }
         }	   
 
@@ -1260,6 +1253,8 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
     loss.clear();
     dist.clear();
     pedvar.clear();
+    teltype.clear();
+    tgrad.clear();
     ze.clear();
     az.clear();
 
@@ -1320,8 +1315,10 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
             asym.push_back( getImageParameters( getRunParameter()->fImageLL )->asymmetry );
             dist.push_back( getImageParameters( getRunParameter()->fImageLL )->dist );
             pedvar.push_back( getImageParameters( getRunParameter()->fImageLL )->fmeanPedvar_Image );
+	    tgrad.push_back(  getImageParameters( getRunParameter()->fImageLL )->tgrad_x );
             ze.push_back( 90.-getShowerParameters()->fTelElevation[tel] );
             az.push_back( getShowerParameters()->fTelAzimuth[tel] );
+	    teltype.push_back( getDetectorGeometry()->getTelType()[tel] );
         }
     }
 }
@@ -1379,13 +1376,17 @@ void VArrayAnalyzer::prepareforCoreReconstruction( unsigned int iMethodIndex, fl
 /*!
       reconstruction of shower direction and core
 
-      Table and MLP based stereo disp method
+      modified disp method
+
+      method 5: MLP disp analysis
+      method 6: table based disp analysis
+      method 7: TMVA BDT based anlaysis
 
       todo: core construction
 */
 int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp  )
 {
-    if( fDebug ) cout << "VArrayAnalyzer::rcs_method_5/6 " << iMethod << endl;
+    if( fDebug ) cout << "VArrayAnalyzer::rcs_method_5/6/7 " << iMethod << endl;
 
 // number of images included in the fit
     int num_images = 0;
@@ -1411,66 +1412,36 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp  )
         return 0;
     }
 
-// check that MLPAnalyzer exists
-    if( iDisp == 5 )
+// check that disp analyzer exists
+    if( iMethod >= fDispAnalyzer.size() || !fDispAnalyzer[iMethod] || fDispAnalyzer[iMethod]->isZombie() )
     {
-        if( iMethod >= fMLPAnalyzer.size() || !fMLPAnalyzer[iMethod] || fMLPAnalyzer[iMethod]->isZombie() )
-        {
-            fillShowerDirection( iMethod, 0., 0., -2. );
-            return 0;
-        }
-    }
-// check that disp table analyzer exists
-    else if( iDisp == 6 )
-    {
-        if( iMethod >= fDispAnalyzer.size() || !fDispAnalyzer[iMethod] || fDispAnalyzer[iMethod]->isZombie() )
-        {
-            fillShowerDirection( iMethod, 0., 0., -2. );
-            return 0;
-        }
+	fillShowerDirection( iMethod, 0., 0., -2. );
+	return 0;
     }
 
 /////////////////////////////////////////////////////
-// direction reconstruction with MLP or disp tables
+// direction reconstruction with MLP/TMVA or disp tables
 ////////////////////////////////////////////////////
 
     float disp = 0.;
 
-    vector< float > v_xs;
-    vector< float > v_ys;
     vector< float > v_disp;
     vector< float > v_weight;
 
     for( unsigned int ii = 0; ii < m.size(); ii++ )
     {
-        if( iDisp == 5 )
-        {
-            disp = fMLPAnalyzer[iMethod]->evaluate( width[ii], length[ii], asym[ii], w[ii], dist[ii] );
-	    v_xs.push_back( x[ii] - disp * cosphi[ii] );
-	    v_ys.push_back( y[ii] - disp * sinphi[ii] );
-            getShowerParameters()->addDISPPoint( telID[ii], iMethod, v_xs.back(), v_ys.back(), 1. );
-        }
-        else if( iDisp == 6 )
-        {
-            disp = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], w[ii], pedvar[ii], ze[ii], az[ii], true );
-        }
+	disp = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], asym[ii], dist[ii], w[ii], pedvar[ii],
+	                                                     tgrad[ii], teltype[ii], ze[ii], az[ii], true  );
         v_disp.push_back( disp );
         if( fDispAnalyzer[iMethod]->getDispE() > 0. ) v_weight.push_back( 1./fDispAnalyzer[iMethod]->getDispE() );
 	else                                          v_weight.push_back( 1. );
     }
-// calculate simple mean for MLP analyzer (preliminary)
-    if( iDisp == 5 ) calculateMeanDirection( xs, ys, v_xs, v_ys, v_weight );
-// calculate mean direction for disp method
-    else
+    fDispAnalyzer[iMethod]->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
+    for( unsigned int ii = 0; ii < m.size(); ii++ )
     {
-       fDispAnalyzer[iMethod]->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
-
-       for( unsigned int ii = 0; ii < m.size(); ii++ )
-       {
-          getShowerParameters()->addDISPPoint( telID[ii], iMethod, fDispAnalyzer[iMethod]->getXcoordinate_disp( ii ), fDispAnalyzer[iMethod]->getYcoordinate_disp( ii ), 1. );
-       }
+       getShowerParameters()->addDISPPoint( telID[ii], iMethod, fDispAnalyzer[iMethod]->getXcoordinate_disp( ii, x[ii], cosphi[ii] ), 
+                                                                fDispAnalyzer[iMethod]->getYcoordinate_disp( ii, y[ii], sinphi[ii] ), 1. );
     }
-
     if( !fillShowerDirection( iMethod, xs, ys, 0. ) ) return 0;
 
 ////////////////////////////////////////////////
@@ -1491,35 +1462,6 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp  )
     getShowerParameters()->fShower_Chi2[iMethod] = 0.0;
 
     return 0;
-}
-
-
-/*!
-    calculate mean direction from a vector
-*/
-float VArrayAnalyzer::calculateMeanDirection( float &xs, float &ys, vector< float > v_xs, vector< float > v_ys, vector< float > v_weight )
-{
-    float itotweight = 0.;
-    float ixs = 0.;
-    float iys = 0.;
-
-    for( unsigned int ii = 0; ii < v_xs.size(); ii++ )
-    {
-        ixs += v_xs[ii] * v_weight[ii];
-        iys += v_ys[ii] * v_weight[ii];
-        itotweight += v_weight[ii];
-    }
-    if( itotweight > 0. )
-    {
-        xs = ixs / itotweight;
-        ys = iys / itotweight;
-    }
-    else
-    {
-        xs = -99999.;
-        ys = -99999.;
-    }
-    return -1.;
 }
 
 
@@ -1568,7 +1510,7 @@ bool VArrayAnalyzer::fillSimulationEvent()
       weighted by f(cos(ze)) (after M.Beilicke 2010)
 
 */
-int VArrayAnalyzer::rcs_method_7( unsigned int iMethod )
+int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
 {
     double cosze = 0.;
     if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
@@ -1609,15 +1551,14 @@ int VArrayAnalyzer::rcs_method_7( unsigned int iMethod )
 /*!
       reconstruction of shower direction and core
 
-      combine method 4 and 6
-
-      (preliminary: optimize)
+      combine method 4 (intersection of pairs) and 6 (modified disp method)
 
       todo: core construction
 */
-int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
+int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 {
-    if( fDebug ) cout << "VArrayAnalyzer::rcs_method_8 " << iMethod << endl;
+    if( fDebug ) cout << "VArrayAnalyzer::rcs_method_9 " << iMethod << endl;
+
     int num_images = 0;                           /* number of images included in the fit */
 
     float xs = 0.;
@@ -1631,7 +1572,7 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
 
     num_images = getShowerParameters()->fShowerNumImages[iMethod];
 
-// are there enough images the run an array analysis
+// cut on minimum number of images
     if( num_images >= (int)fArrayAnalysisCuts->fNImages_min[iMethod] )
     {
         prepareforDirectionReconstruction( iMethod, 4 );
@@ -1642,9 +1583,10 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
         return 0;
     }
 
-///////////////////////////////
+////////////////////////////////////////////////
 // direction reconstruction
 ////////////////////////////////////////////////
+
 // check that disp table analyzer exists
     if( iMethod >= fDispAnalyzer.size() || !fDispAnalyzer[iMethod] || fDispAnalyzer[iMethod]->isZombie() )
     {
@@ -1662,7 +1604,7 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
     float iys = 0.;
     float b1 = 0.;
     float b2 = 0.;
-// disp vectors
+// disp vectors (two points only, fitting pairs)
     vector< float > v_disp( 2, 0. );
     vector< float > v_weight( 2, 0. );
     vector< float > v_x( 2, 0. );
@@ -1683,12 +1625,16 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
 
 ////////////////////////////////////////////////////////
 // determine weight between line intersection and disp method
+// (weight depend on angle between to pairs of images)
 ////////////////////////////////////////////////////////
             iangdiff = fabs( sin( fabs(atan(m[jj])-atan(m[ii])) ) );
-            if( iangdiff * TMath::RadToDeg() > 10. ) idispweight = 0.;
+// use modified disp methods for pairs with small angles between them only
+            if( iangdiff * TMath::RadToDeg() > getArrayAnalysisCuts()->fMODDISP_MinAngleForDisp[iMethod] ) idispweight = 0.; 
 	    else
 	    {
-	       idispweight = 1.-TMath::Exp( -0.04*(iangdiff*TMath::RadToDeg()-10.)*(iangdiff*TMath::RadToDeg()-10.));    // not optimized yet
+	       idispweight = 1.-TMath::Exp( -1.* getArrayAnalysisCuts()->fMODDISP_MinAngleExpFactor[iMethod]*
+	                                        (iangdiff*TMath::RadToDeg()-getArrayAnalysisCuts()->fMODDISP_MinAngleForDisp[iMethod])*
+	                                        (iangdiff*TMath::RadToDeg()-getArrayAnalysisCuts()->fMODDISP_MinAngleForDisp[iMethod]));
             }
 
 ////////////////////////////////////////////////////////
@@ -1702,14 +1648,15 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
             ys = m[ii] * xs + b1;
 
 ////////////////////////////////////////////////////////
-// reconstructed shower direction from disp
+// reconstructed shower direction from modified disp
 ////////////////////////////////////////////////////////
 
 // run disp method only for nonzero weights
             if( idispweight > 1.e-4 )
 	    {
 // P1
-	       v_disp[0] = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], w[ii], pedvar[ii], ze[ii], az[ii], true  );
+	       v_disp[0] = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], asym[ii], dist[ii], w[ii], pedvar[ii],
+	                                                     tgrad[ii], teltype[ii], ze[ii], az[ii], true  );
 	       v_x[0] = x[ii];
 	       v_y[0] = y[ii];
 	       v_cosphi[0] = cosphi[ii];
@@ -1717,7 +1664,8 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
 	       if( fDispAnalyzer[iMethod]->getDispE() > 0. ) v_weight[0] = 1./fDispAnalyzer[iMethod]->getDispE();
 	       else                                          v_weight[0] = 1.;
 // P2
-	       v_disp[1] = fDispAnalyzer[iMethod]->evaluate( width[jj], length[jj], w[jj], pedvar[jj], ze[jj], az[jj], true );
+	       v_disp[1] = fDispAnalyzer[iMethod]->evaluate( width[jj], length[jj], asym[ii], dist[ii], w[jj], pedvar[jj],
+	                                                     tgrad[jj], teltype[ii], ze[jj], az[jj], true );
 	       v_x[1] = x[jj];
 	       v_y[1] = y[jj];
 	       v_cosphi[1] = cosphi[jj];
@@ -1732,7 +1680,7 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
 	       yd = ys;
             }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////           
-// temporary (debug&dev)
+// temporary (debug&dev): write out results from pairs of images
 	    if( iMethod ==0 && npairs < VDST_MAXRECMETHODS )
 	    {
 	       getShowerParameters()->fShower_PairXS[npairs] = xs;
@@ -1753,8 +1701,6 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
 // weights for individual images from shower size, width, length
             iweight  = 1./(1./w[ii] + 1./w[jj]);      // weight 1: size of images
             iweight *= (1.-l[ii])*(1.-l[jj]);         // weight 2: elongation of images (width/length)
-// remove this weight compared to method 4: disp method is used for small angles between pairs of lines
-//            iweight *= iangdiff;                      // weight 3: angular differences between the two image axis 
 	    iweight *= iweight;                       // use squared value
 
 ////////////////////////////////////////////////////////
@@ -1777,8 +1723,9 @@ int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
         xs = -99999.;
         ys = -99999.;
     }
-    if( num_images == 2 ) getShowerParameters()->fShower_Chi2[iMethod] = -1.*iangdiff;
-    getShowerParameters()->fiangdiff[iMethod] = 0.;
+    if( num_images == 2 ) getShowerParameters()->fiangdiff[iMethod] = iangdiff*TMath::RadToDeg();
+    else                  getShowerParameters()->fiangdiff[iMethod] = 0.;
+    getShowerParameters()->fShower_Chi2[iMethod] = 0.;
 
     if( !fillShowerDirection( iMethod, xs, ys, 0. ) ) return 0;
 

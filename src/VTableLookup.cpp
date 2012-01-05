@@ -328,7 +328,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
  //       cout << iDName[n] << "\t" << fTableNoiseLevel.back() << "\t" << iDName[n].substr( 6, 5 ) << "\t" << n << endl;
 
         fLookupTableFile->cd( iDName[n].c_str() );
-        if( fDebug == 2 ) cout << "XXX DIR " << " " << gDirectory->GetPath() << endl;
+        if( fDebug == 2 ) cout << "DEBUG  DIR " << " " << gDirectory->GetPath() << endl;
 // ZENITH ANGLE
         TDirectory *iDirZe = gDirectory;
         vector< string > iDNameZE = getSortedListOfDirectories( iDirZe );
@@ -719,16 +719,16 @@ void VTableLookup::loop()
 // get noise level for this event
                 readNoiseLevel( false );
 
-                if( fDebug == 2 ) cout << endl << endl << "XXX NEW EVENT " << fData->getEventCounter() << endl;
+                if( fDebug == 2 ) cout << endl << endl << "DEBUG  NEW EVENT " << fData->getEventCounter() << endl;
 /////////////////////////////
 // NOISE (low) ZENITH (low)
-                if( fDebug == 2 ) cout << "XXX NOISE LOW ZENITH LOW" << endl;
+                if( fDebug == 2 ) cout << "DEBUG  NOISE LOW ZENITH LOW" << endl;
                 for( int t = 0; t < fNTel; t++ )
                 {
                     if( fDebug == 2 )
                     {
-                        cout << "XXX TELESCOPE " << t << " (T" << t+1 << ")" << endl;
-                        cout << "XXX     zenith " << ze << ", noise " << fNoiseLevel[t] << ", woff " << woff << ", az " << fData->getAz() << ", az bin " << i_az << endl;
+                        cout << "DEBUG  TELESCOPE " << t << " (T" << t+1 << ")" << endl;
+                        cout << "DEBUG      zenith " << ze << ", noise " << fNoiseLevel[t] << ", woff " << woff << ", az " << fData->getAz() << ", az bin " << i_az << endl;
                     }
 // noise (low)
                     getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fNoiseLevel[t] );
@@ -736,7 +736,7 @@ void VTableLookup::loop()
                     getIndexBoundary( &ize_up, &ize_low, fTableZe[inoise_low], ze );
                     if( fDebug == 2 )
                     {
-                        cout << "XXX WOFF " << t << " " << inoise_low << " " << inoise_up << " " << fNoiseLevel[t] << "\t" << fTableNoiseLevel.size();
+                        cout << "DEBUG  WOFF " << t << " " << inoise_low << " " << inoise_up << " " << fNoiseLevel[t] << "\t" << fTableNoiseLevel.size();
                         for( unsigned int ii = 0; ii < fTableNoiseLevel.size(); ii++ ) cout << "    " << fTableNoiseLevel[ii];
                         cout << endl;
                     }
@@ -751,7 +751,7 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NlowZlowWup, esys );
                 calculateMSFromTables( s_NlowZlowWlow, esys );
                 interpolate( s_NlowZlowWlow, fTableDirectionOffset[inoise_low][ize_low][iwoff_low], s_NlowZlowWup, fTableDirectionOffset[inoise_low][ize_low][iwoff_up], s_NlowZlow, woff );
-                if( fDebug == 2 ) cout << "XXX WOFF INTER 1 " << woff << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_low << " " << s_NlowZlowWlow->mscl << " " << s_NlowZlowWup->mscl << " " << s_NlowZlow->mscl << endl;
+                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 1 " << woff << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_low << " " << s_NlowZlowWlow->mscl << " " << s_NlowZlowWup->mscl << " " << s_NlowZlow->mscl << endl;
 
 ///////////////////////////
 // NOISE (low) ZENITH (up)
@@ -772,21 +772,21 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NlowZupWlow, esys );
                 getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fMeanNoiseLevel );
                 interpolate( s_NlowZupWlow, fTableDirectionOffset[inoise_low][ize_up][iwoff_low], s_NlowZupWup, fTableDirectionOffset[inoise_low][ize_up][iwoff_up], s_NlowZup, woff );
-                if( fDebug == 2 ) cout << "XXX WOFF INTER 2 " << woff << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_up << " " << s_NlowZupWlow->mscl << " " << s_NlowZupWup->mscl << " " << s_NlowZup->mscl << endl;
+                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 2 " << woff << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_up << " " << s_NlowZupWlow->mscl << " " << s_NlowZupWup->mscl << " " << s_NlowZup->mscl << endl;
 
                 interpolate( s_NlowZlow, fTableZe[inoise_low][ize_low], s_NlowZup, fTableZe[inoise_low][ize_up], s_Nlow, ze, true );
-                if( fDebug == 2 ) cout << "XXX ZE INTER 1 " << ze << " " << fTableZe[inoise_low][ize_low] << " " << fTableZe[inoise_low][ize_up] << " " << inoise_low << " " << inoise_up << " " << s_NlowZlow->mscl << " " << s_NlowZup->mscl << " " << s_Nlow->mscl << endl;
+                if( fDebug == 2 ) cout << "DEBUG  ZE INTER 1 " << ze << " " << fTableZe[inoise_low][ize_low] << " " << fTableZe[inoise_low][ize_up] << " " << inoise_low << " " << inoise_up << " " << s_NlowZlow->mscl << " " << s_NlowZup->mscl << " " << s_Nlow->mscl << endl;
 
 ///////////////////////////
 // NOISE (up) ZENITH (low)
-                if( fDebug == 2 ) cout << "XXX HIGH NOISE" << endl;
+                if( fDebug == 2 ) cout << "DEBUG  HIGH NOISE" << endl;
                 for( int t = 0; t < fNTel; t++ )
                 {
 // noise (up)
                     getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fNoiseLevel[t] );
 // get zenith angle
                     getIndexBoundary( &ize_up, &ize_low, fTableZe[inoise_up], ze );
-                    if( fDebug == 2 ) cout << "XXX WOFF " << t << " " << inoise_low << " " << inoise_up << " " << fNoiseLevel[t] << endl;
+                    if( fDebug == 2 ) cout << "DEBUG  WOFF " << t << " " << inoise_low << " " << inoise_up << " " << fNoiseLevel[t] << endl;
 
 // zenith angle (low)
 // get direction offset index
@@ -798,7 +798,7 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NupZlowWlow, esys );
                 getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fMeanNoiseLevel );
                 interpolate( s_NupZlowWlow, fTableDirectionOffset[inoise_up][ize_low][iwoff_low], s_NupZlowWup, fTableDirectionOffset[inoise_up][ize_low][iwoff_up], s_NupZlow, woff );
-                if( fDebug == 2 ) cout << "XXX WOFF INTER 1 " << woff << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_up] <<  " " << inoise_low << " " << inoise_up << " " << s_NupZlowWlow->mscl << " " << s_NupZlowWup->mscl << " " << s_NupZlow->mscl << endl;
+                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 1 " << woff << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_up] <<  " " << inoise_low << " " << inoise_up << " " << s_NupZlowWlow->mscl << " " << s_NupZlowWup->mscl << " " << s_NupZlow->mscl << endl;
 
 ///////////////////////////
 // NOISE (up) ZENITH (up)
@@ -819,13 +819,13 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NupZupWlow, esys );
                 getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fMeanNoiseLevel );
                 interpolate( s_NupZupWlow, fTableDirectionOffset[inoise_up][ize_up][iwoff_low], s_NupZupWup, fTableDirectionOffset[inoise_up][ize_up][iwoff_up], s_NupZup, woff );
-                if( fDebug == 2 ) cout << "XXX WOFF INTER 2 " << woff << " " << fTableDirectionOffset[inoise_up][ize_up][iwoff_low] << " " << fTableDirectionOffset[inoise_up][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << s_NupZupWlow->mscl << " " << s_NupZupWup->mscl << " " << s_NupZup->mscl << endl;
+                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 2 " << woff << " " << fTableDirectionOffset[inoise_up][ize_up][iwoff_low] << " " << fTableDirectionOffset[inoise_up][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << s_NupZupWlow->mscl << " " << s_NupZupWup->mscl << " " << s_NupZup->mscl << endl;
 ///////////////////////////
 
                 interpolate( s_NupZlow, fTableZe[inoise_up][ize_low], s_NupZup, fTableZe[inoise_up][ize_up], s_Nup, ze, true );
-                if( fDebug == 2 ) cout << "XXX ZE INTER 2 " << ze << " " << inoise_low << " " << inoise_up << " " << s_NupZlow->mscl << " " << s_NupZup->mscl << " " << s_Nup->mscl << endl;
+                if( fDebug == 2 ) cout << "DEBUG  ZE INTER 2 " << ze << " " << inoise_low << " " << inoise_up << " " << s_NupZlow->mscl << " " << s_NupZup->mscl << " " << s_Nup->mscl << endl;
                 interpolate( s_Nlow, fTableNoiseLevel[inoise_low], s_Nup, fTableNoiseLevel[inoise_up], s_N, fMeanNoiseLevel, false );
-                if( fDebug == 2 ) cout << "XXX NOISE INTER " << fMeanNoiseLevel << " " << fTableNoiseLevel[inoise_low] << " " << fTableNoiseLevel[inoise_up] << " " << inoise_low << " " << inoise_up << " " << s_Nlow->mscl << " " << s_Nup->mscl << " " << s_N->mscl << endl;
+                if( fDebug == 2 ) cout << "DEBUG  NOISE INTER " << fMeanNoiseLevel << " " << fTableNoiseLevel[inoise_low] << " " << fTableNoiseLevel[inoise_up] << " " << inoise_low << " " << inoise_up << " " << s_Nlow->mscl << " " << s_Nup->mscl << " " << s_N->mscl << endl;
 
 // determine number of telescopes with MSCW values
                 for( unsigned int j = 0; j < s_N->fNTel; j++ )
@@ -1212,12 +1212,12 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize, unsigned in
     }
     if( fDebug == 2 )
     {
-        cout << "XXX getTables() "  << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << endl;
-        cout << "XXX " << fmscw[inoise][ize][iwoff][iaz][telX] << endl;
-        cout << "XXX MEDIAN (MSCW) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " " << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t" << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t" << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
-        cout << "XXX MEDIAN (MSCW,2) " << fmscw[inoise].size() << endl;
-        cout << "XXX MEDIAN (MSCL) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " " << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t" << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t" << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
-        cout << "XXX MEDIAN (MSCL,2) " << fmscl[inoise].size() << endl;
+        cout << "DEBUG  getTables() "  << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << endl;
+        cout << "DEBUG  " << fmscw[inoise][ize][iwoff][iaz][telX] << endl;
+        cout << "DEBUG  MEDIAN (MSCW) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " " << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t" << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t" << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
+        cout << "DEBUG  MEDIAN (MSCW,2) " << fmscw[inoise].size() << endl;
+        cout << "DEBUG  MEDIAN (MSCL) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " " << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t" << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t" << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
+        cout << "DEBUG  MEDIAN (MSCL,2) " << fmscl[inoise].size() << endl;
     }
 
     s->hmscwMedian[tel] = fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian();

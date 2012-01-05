@@ -69,7 +69,11 @@ class VEvndispReconstructionParameter : public TNamed
         vector< vector< bool > > fLocalUseImage;
 
         vector< string > fMLPFileName;
+	vector< string > fTMVAFileName;
         vector< string > fDispFileName;
+
+	vector< float >  fMODDISP_MinAngleForDisp;
+	vector< float >  fMODDISP_MinAngleExpFactor;
 
         VEvndispReconstructionParameter();
         VEvndispReconstructionParameter( vector< ULong64_t > itel_type );
@@ -87,6 +91,6 @@ class VEvndispReconstructionParameter : public TNamed
 	void   setDebug( bool iD = false ) { fDebug = iD; }
 	void   setDefaultThresholds( double imagethresh, double borderthresh, double brightimagethresh );
 
-        ClassDef(VEvndispReconstructionParameter,9);
+        ClassDef(VEvndispReconstructionParameter,12);
 };
 #endif

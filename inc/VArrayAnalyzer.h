@@ -6,7 +6,7 @@
 #include "TMath.h"
 
 #include "VEvndispData.h"
-#include "VDispTableAnalyzer.h"
+#include "VDispAnalyzer.h"
 #include "VGrIsuAnalyzer.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VMLPAnalyzer.h"
@@ -30,8 +30,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         vector< double > fSelectDist;             //!< maximum distance of image in camera to be included in shower reconstruction
         vector< double > fSelectAlpha;            //!< maximum alpha of image in camera to be included in shower reconstruction
 
-        vector< VMLPAnalyzer* > fMLPAnalyzer;     //! MLP based dips method : 1 element per reconstructed cuts (confusing: called sometimes method!)
-        vector< VDispTableAnalyzer* > fDispAnalyzer;
+        vector< VDispAnalyzer* > fDispAnalyzer;
 
         vector< unsigned int > frcs_img_req;      //!< minimum number of images required per reconstruction method
         double fmin_ang;                          //!< minum angle for reconstruction with two images only
@@ -40,7 +39,6 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         vector< double > fNMeanPointingMismatch;
 
         float adjustAzimuthToRange( float az );
-        float calculateMeanDirection( float &xs, float &ys, vector< float > v_xs, vector< float > v_ys, vector< float > v_weight );
         void calcShowerDirection_and_Core();      //!< calculate shower core and direction
         void checkPointing();                     //!< check if pointing directions
         void prepareforCoreReconstruction( unsigned int iMeth, float xs, float ys );
@@ -58,6 +56,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         int  rcs_method_5( unsigned int, unsigned int );
         int  rcs_method_7( unsigned int );
         int  rcs_method_8( unsigned int );
+        int  rcs_method_9( unsigned int );
         float recalculateImagePhi( double, double );
         void selectShowerImages( unsigned int );  //!< select shower images to be used in determinate of shower coordinates
                                                   //!< transform telescope positions into shower coordinates
@@ -81,8 +80,10 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         vector< float > loss;
         vector< float > dist;
         vector< float > pedvar;
+	vector< float > tgrad;
         vector< float > az;
         vector< float > ze;
+	vector<ULong64_t> teltype;
 
         vector< float > xtelnew;
         vector< float > ytelnew;

@@ -92,12 +92,14 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    float    fdES;
    float    fSizeSecondMax_log10;
    float    fTheta2;
+   float    fCoreDist;
+   float    fDummy;
 
    bool     bPlotEfficiencyPlotsPerEnergy;
 
    double           getTMVACutValueFromSignalEfficiency( double iSignalEfficiency, unsigned int iBin, string iWeightFileName );
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
-   vector< string > getTrainingVariables( string );
+   vector< string > getTrainingVariables( string iFile, vector< bool >& iSpectator  );
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 
                                                   TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
 						  TH1F* hEffS, TH1F* hEffB, 
@@ -141,7 +143,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 8 );
+   ClassDef(VTMVAEvaluator, 9 );
 };
 
 #endif

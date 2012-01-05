@@ -112,11 +112,8 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
     sprintf( i_des, "ImgSel_list[NMethods][%d]/b", VDST_MAXTELESCOPES );
     fTreeSC->Branch( "ImgSel_list", fTelIDImageSelected_list, i_des );
 
-    if( fShortTree < 1 )
-    {
-        sprintf( i_des, "img2_ang[NMethods]/F" );
-        fTreeSC->Branch( "img2_ang", fiangdiff, i_des );
-    }
+    sprintf( i_des, "img2_ang[NMethods]/F" );
+    fTreeSC->Branch( "img2_ang", fiangdiff, i_des );
 
     sprintf( i_des, "Ze[NMethods]/F" );
     fTreeSC->Branch( "Ze", fShowerZe, i_des );

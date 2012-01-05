@@ -59,6 +59,9 @@ class VTMVARunData : public TNamed
     vector< float >   fTrainingVariable_CutRangeMax;
     vector< string >  fTrainingVariable_VarProp;
 
+// spectator variables
+    vector< string > fSpectatorVariable;
+
 // quality and energy cuts
     unsigned int      fMinSignalEvents;
     unsigned int      fMinBackgroundEvents;
@@ -79,7 +82,7 @@ class VTMVARunData : public TNamed
     void setDebug( bool iB = true ) { fDebug = iB; }
     void setName( string iN ) { fName = iN; }
 
-    ClassDef(VTMVARunData, 4 );
+    ClassDef(VTMVARunData, 5 );
 };
 
 #endif
