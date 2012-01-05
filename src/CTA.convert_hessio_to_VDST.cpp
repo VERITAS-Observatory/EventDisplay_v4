@@ -407,7 +407,10 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
       {
          fData->fDSTtel_data[i_ntel_data] = (unsigned int)hsdata->event.central.teldata_list[i];
 	 unsigned int telID = fData->fDSTtel_data[i_ntel_data] - 1;
-//	 if( hsdata->event.teldata[telID].known == 0 ) continue;
+// newer hessio version needs this statement
+#if CTA_SC>1
+	 if( hsdata->event.teldata[telID].known == 0 ) continue;
+#endif
 
 ////////////////////////////////////////////////
 // get pixel (ADC) data
