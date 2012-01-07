@@ -863,8 +863,8 @@ endif
 
 ./obj/VDisplay_Dict.o:	
 	@echo "A Generating dictionary $@.."
-	@echo rootcint -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
-	@rootcint -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	@echo rootcint -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
+	@rootcint -f $(basename $@).cpp  -c -p -I./inc/ $(VBFCFLAGS) $(VBFFLAG) $(GSLCFLAGS) ./inc/VDisplay.h ./inc/VDisplayLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
 
 ./obj/VLightCurve_Dict.o:	
