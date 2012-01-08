@@ -1203,9 +1203,9 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
    }
 
    if (fData->frogsGoodnessImg > frogsGoodnessImgCut )
-     return true;
+      return false;
 
-   return false;
+   return true;
 }
 
 /*
@@ -1556,7 +1556,11 @@ bool VGammaHadronCuts::initPhaseCuts( string iDir )
 */
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( bool bCount )
 {
-    return applyInsideFiducialAreaCut( fData->Xoff, fData->Yoff, bCount );
+
+    if( fData->fFrogs == 1 )
+     return applyInsideFiducialAreaCut( fData->frogsXS, fData->frogsYS, bCount );
+    else 
+     return applyInsideFiducialAreaCut( fData->Xoff, fData->Yoff, bCount );
 }
 
 bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool bCount )

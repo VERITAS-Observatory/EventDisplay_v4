@@ -23,11 +23,11 @@
 #include <string>
 #include <vector>
 
-#include <gsl/gsl_vector.h>
-#include <gsl/gsl_multifit_nlin.h> //Levenberg-Marquardt 
-#include <gsl/gsl_blas.h> //Levenberg-Marquardt linear algebra
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_interp.h>
+//#include <gsl/gsl_vector.h>
+//#include <gsl/gsl_multifit_nlin.h> //Levenberg-Marquardt 
+//#include <gsl/gsl_blas.h> //Levenberg-Marquardt linear algebra
+//#include <gsl/gsl_integration.h>
+//#include <gsl/gsl_interp.h>
 
 
 
@@ -80,6 +80,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	void readTableFrogs();
 	double getFrogsStartEnergy(int eventNumber);
         void finishFrogs(TFile *f);
+        //void finishFrogs();
 
 	TFile *mscwFrogsFile;
 

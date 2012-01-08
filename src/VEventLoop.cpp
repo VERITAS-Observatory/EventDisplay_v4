@@ -487,10 +487,6 @@ void VEventLoop::shutdown()
 	       getReader()->getMonteCarloHeader()->print();
 	       getReader()->getMonteCarloHeader()->Write();
 	    }
-// FROGS finishing here
-#ifndef NOGSL
-	    if( fRunPar->ffrogsmode ) fFrogs->finishFrogs(getOutputFile());
-#endif
 // close output file here (!! CLOSE !!)
             fAnalyzer->shutdown();
         }
@@ -511,7 +507,6 @@ void VEventLoop::shutdown()
 // delete readers
     if( fRunPar->fsourcetype != 0 && fGrIsuReader ) delete fGrIsuReader;
     if( fDebug ) cout << "VEventLoop::shutdown() ... finished" << endl;
-
 // final check of output file; just open and close it again
     if( fRunMode == R_ANA )
     {
@@ -525,6 +520,10 @@ void VEventLoop::shutdown()
        {
            cout << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
        }
+// FROGS finishing here
+#ifndef NOGSL
+    if( fRunPar->ffrogsmode ) fFrogs->finishFrogs(&f);
+#endif
        f.Close();
     }
 // end of analysis

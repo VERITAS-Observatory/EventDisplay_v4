@@ -301,7 +301,8 @@ void VFrogs::initFrogTree()
   // tree versioning numbers used in mscw_energy
   sprintf( i_textTitle, "FROGPUT: Frogs Parameters (VERSION %d)\n", getRunParameter()->getEVNDISP_TREE_VERSION() );
   if( getRunParameter()->fShortTree ) sprintf( i_textTitle, "%s (short tree)", i_textTitle );
-  sprintf( i_textTitle, "%s (short tree)", i_textTitle );
+  // Is the next line needed?
+  //sprintf( i_textTitle, "%s (short tree)", i_textTitle );
   fFrogParameters->initTree( i_text, i_textTitle );
   
 }
@@ -390,23 +391,42 @@ float VFrogs::transformTelescopePosition( int iTel, float i_ze, float i_az, int 
 //================================================================
 void VFrogs::terminate()
 {
-/* 
-  if ( fRunPara->fdisplaymode == 0 ) {
+ 
     getFrogParameters()->getTree()->Write();
-    fOutputfile->Flush();
-  }
-*/
+    //fOutputfile->Flush();
+
 }
 
 void VFrogs::finishFrogs(TFile *f)
+//void VFrogs::finishFrogs()
 {
 
- 
+  // Open outfile again to copy frogs tree to mscw file.
+  //TFile f( fRunPar->foutputfileName.c_str(), "READ" );
+
+  // reopen mscw file 
   string fmscwFrogsFile = getRunParameter()->ffrogsmscwfile;
   TFile *mscwFrogsFile = new TFile( fmscwFrogsFile.c_str() , "UPDATE" );
+  if( mscwFrogsFile->IsZombie() )
+  {
+     cout << "Finish Frogs:" << endl;
+     cout << "VFrogs::readTableFrogs error: File " << fmscwFrogsFile.c_str() << " does not exist!" << endl;
+     exit( -1 );
+  }
 
-  ((TTree*)f->Get("frogspars"))->CloneTree()->Write();
+  // Clone tree to mscw file checking it opened
+  if( f->IsZombie() )
+  {
+    cout << "error: finish Frogs f file problem: "  << endl;
+  }
+  else
+  {
+    ((TTree*)f->Get("frogspars"))->CloneTree()->Write();
+  }
+
+// Close the files
   mscwFrogsFile->Close();
+  //f.Close();
 
   return;
  

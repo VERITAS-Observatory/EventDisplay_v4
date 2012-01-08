@@ -389,6 +389,24 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
   tmplanlz->npix_img=0;
   tmplanlz->goodness_bkg=0;
   tmplanlz->npix_bkg=0;
+
+/*
+  for( int imu=0; imu <500; imu++ )
+  {
+    for( int iq=0 ; iq<500; iq++)
+    {
+      double xx=(double)imu*10./500.;
+      double yy=(double)iq*10./500. - 1.0;
+      double dumby1 = frogs_probability_density(yy,xx,0.3,0.4);
+      double dumby2 = frogs_mean_pix_lkhd(yy,xx,0.3,0.4);
+      double dumby3 = -2.0*log(dumby1) - dumby2;
+      printf("%f %f %f %f %f\n",xx,yy,dumby1,dumby2,dumby3);
+    }
+  }
+
+  exit(0);
+*/
+
   for(int tel=0;tel<d->ntel;tel++) {
     for(int pix=0;pix<d->scope[tel].npix;pix++) {
       if(d->scope[tel].pixinuse[pix]==FROGS_OK) {
@@ -404,6 +422,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 					       d->scope[tel].ped[pix],
 					       d->scope[tel].exnoise[pix]);
 	  double pix_goodness=-2.0*log(pd)-mean_lkhd;
+
 	  //If requested we produce a calibration output
 	  if(FROGS_NBEVENT_GDNS_CALIBR>0) 
 	    frogs_gdns_calibr_out(d->event_id, tel, pix, d->scope[tel].q[pix],
@@ -411,13 +430,17 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 
 	  /*Apply the single pixel goodness correction according to the 
 	    pixel pedestal width and the model value mu*/
-	  pix_goodness=frogs_goodness_correction(pix_goodness,
-						 d->scope[tel].ped[pix],mu);
 
 	  /*Decides if the pixel should be counted in the image 
 	    or background region*/
-	  int pix_in_img=frogs_image_or_background(tel,pix,d);
-	  //int pix_in_img=pix_in_template; //changed by SV, april 6th
+//GHTEMP
+//	  int pix_in_img=frogs_image_or_background(tel,pix,d);
+
+	  int pix_in_img=FROGS_NOTOK;
+	  if ( mu > 0. )
+	    pix_in_img=FROGS_OK;
+
+	  //int pix_in_img=pix_in_template; // old definition of image 
 
 
 	  //If requested, we produce a display of the event
@@ -429,13 +452,30 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 
 	  //If the pixel is in the image region
 	  if(pix_in_img==FROGS_OK) {
-	    //pix_goodness=frogs_goodness_correction(pix_goodness,
-	    //d->scope[tel].ped[pix],mu); //changed by SV, april 22
+// Backgrnd goodness is already corrected by sigma_p correction.
+// Only the image goodness needs to be corrected.
+//	    pix_goodness=frogs_goodness_correction(pix_goodness,
+//						 d->scope[tel].ped[pix],mu);
+/*
+	    if(d->scope[tel].q[pix]<0.0)
+	      pix_goodness -= -0.737119*d->scope[tel].q[pix]-1.0;
+	    else if( d->scope[tel].q[pix] >= 0. && d->scope[tel].q[pix] < 8.0 )
+	      pix_goodness -= 0.491269*d->scope[tel].q[pix]-1.0;
+	    else
+	      pix_goodness -= 0.0859841*d->scope[tel].q[pix]+1.81024;
+*/
+
 	    tmplanlz->goodness_img=tmplanlz->goodness_img+pix_goodness;
 	    tmplanlz->npix_img++;
 	  }
 	  //If the pixel is in the background region
 	  if(pix_in_img==FROGS_NOTOK) {
+/*
+	    if(d->scope[tel].q[pix]<0.0)
+	      pix_goodness -= -0.5859*d->scope[tel].q[pix]-1.0;
+	    else
+	      pix_goodness -= 0.9901*d->scope[tel].q[pix]-1.0;
+*/
 	    tmplanlz->goodness_bkg=tmplanlz->goodness_bkg+pix_goodness;
 	    tmplanlz->npix_bkg++;
 	  }
@@ -696,6 +736,7 @@ float frogs_goodness_correction(float goodness0,float ped,float mu) {
   /***** Tucson's correction ********/
 
   /***** simulation correction ******/
+/*
   float correction=0.;
   if(mu>0.0) {
     goodness0 = goodness0 + 1; //goodness=goodness+1
@@ -709,13 +750,13 @@ float frogs_goodness_correction(float goodness0,float ped,float mu) {
       correction = 0.1286*mu-8.781;
     goodness0 = goodness0/correction - 1;
   }
+*/
   /***** simulation correction ******/
-
-  /******* new correction **************/
-  //if(mu>0) {
-  //float correction=1.774*pow(mu,0.17);
-  //return (goodness0+1)/correction-1;
-  //}
+  /******* very new correction 06.12.2011 **************/
+  if( mu > 0.0 ) {
+    float correction=pow((mu+1.0),-0.48643);
+    return (goodness0 + 1.0)*correction - 1.0;
+  }
   /******* new correction **************/
 
   return goodness0;
@@ -943,7 +984,9 @@ struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
     rtn.elevation=50.0;
     return rtn;
   } 
-  
+ 
+  printf("\nDo we bother cominging in here?????\n\n");
+ 
   //If we arrive here, that means no appropriate template file was found
   fprintf(stderr,"Elevation=%f\n",elevation);
   frogs_showxerror("Could not find an appropriate template file");

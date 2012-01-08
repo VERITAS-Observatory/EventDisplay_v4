@@ -147,6 +147,33 @@ class VStereoAnalysis
 	float fTreeSelected_EmissionHeight;
 	float fTreeSelected_EmissionHeightChi2;
 
+	int fTreeSelescted_frogsEventID;
+	int fTreeSelescted_frogsGSLConStat;
+	int fTreeSelescted_frogsNB_iter;
+	double fTreeSelescted_frogsXS;
+	double fTreeSelescted_frogsXSerr;
+	double fTreeSelescted_frogsYS;
+	double fTreeSelescted_frogsYSerr;
+	double fTreeSelescted_frogsXP;
+	double fTreeSelescted_frogsXPerr;
+	double fTreeSelescted_frogsYP;
+	double fTreeSelescted_frogsYPerr;
+	double fTreeSelescted_frogsEnergy;
+	double fTreeSelescted_frogsEnergyerr;
+	double fTreeSelescted_frogsLambda;
+	double fTreeSelescted_frogsLambdaerr;
+	double fTreeSelescted_frogsGoodnessImg;
+	int fTreeSelescted_frogsNpixImg;
+	double fTreeSelescted_frogsGoodnessBkg;
+	int fTreeSelescted_frogsNpixBkg;
+	double fTreeSelescted_frogsXPStart;
+	double fTreeSelescted_frogsYPStart;
+	double fTreeSelescted_frogsXPED;
+	double fTreeSelescted_frogsYPED;
+	double fTreeSelescted_frogsXSStart;
+	double fTreeSelescted_frogsYSStart;
+
+
         double fTotCount;
 
 	map < int, double > f_t_in_s_min;
@@ -193,5 +220,41 @@ class VStereoAnalysis
 	void fill_TreeWithSelectedEvents( CData* );
 	bool init_TreeWithSelectedEvents( int, bool );
 	void reset_TreeWithSelectedEvents();
+
+// Returning frogs value for 
+	double getXcore()
+        {
+	  if( fDataRun->fFrogs )
+	    return fDataRun->frogsXP;
+	  else
+	    return fDataRun->Xcore;
+	}
+
+	double getYcore()
+        {
+	  if( fDataRun->fFrogs )
+	    return fDataRun->frogsYP;
+	  else
+	    return fDataRun->Ycore;
+	}
+
+	double getXoff()
+        {
+	  if( fDataRun->fFrogs )
+	    return fDataRun->frogsXS;
+	  else
+	    return fDataRun->Xoff;
+	}
+
+	double getYoff()
+        {
+	  if( fDataRun->fFrogs )
+// -1 sign difference for frogs ED
+	    return -1.0*fDataRun->frogsYS;
+	  else
+	    return fDataRun->Yoff;
+	}
+
+
 };
 #endif

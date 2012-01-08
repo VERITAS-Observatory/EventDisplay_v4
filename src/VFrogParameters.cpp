@@ -44,7 +44,7 @@ void VFrogParameters::initTree( string iName, string iTitle )
     fTreeFrog = new TTree( iName.c_str(), iTitle.c_str() );
     fTreeFrog->SetMaxTreeSize(1000*Long64_t(2000000000));
 //    fTreeFrog->SetAutoSave(100000000);              // autosave when 100 Mbytes written
-    fTreeFrog->SetAutoSave(10);              // autosave when 100 Mbytes written
+    fTreeFrog->SetAutoSave(1000);              
 
 //  Branches:
     fTreeFrog->Branch("frogsEventID", &frogsEventID, "frogsEventID/I" );
