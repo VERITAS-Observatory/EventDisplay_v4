@@ -28,7 +28,7 @@ VLightCurve::VLightCurve()
    setPhaseFoldingValues( -99., -99., false );
 }
 
-bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDStart )
+bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, double iMJDMax, double iMJDStart )
 {
    fDataType = "XRT_ascii";
 
@@ -45,8 +45,8 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDStart )
    double iTemp1 = 0.;
    double iTemp2 = 0.;
 
-   double iMJDMin = 1.e99;
-   double iMJDMax = -1.e99;
+   double iMJDDataMin = 1.e99;
+   double iMJDDataMax = -1.e99;
 
    string is_line;
 
@@ -56,8 +56,6 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDStart )
 
        istringstream is_stream( is_line );
 
-       fFluxInterval.push_back( new VLightCurveData() ); 
-
 //! no errors are catched here..
        is_stream >> iTemp1;     // second since iMJDStart
        is_stream >> iTemp2;     // error [s]
@@ -65,11 +63,15 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDStart )
        iTemp1  = iMJDStart + iTemp1/(24.0*60.0*60.0);
        iTemp2 /= (24.0*60.0*60.0);
 
+       if( iMJDMin > 0. && iTemp1 - iTemp2 < iMJDMin ) continue;
+       if( iMJDMax > 0. && iTemp1 + iTemp2 > iMJDMax ) continue;
+
+       fFluxInterval.push_back( new VLightCurveData() ); 
        fFluxInterval.back()->fMJD_Data_min = iTemp1 - iTemp2;
        fFluxInterval.back()->fMJD_Data_max = iTemp1 + iTemp2;
 
-       if( fFluxInterval.back()->fMJD_Data_min < iMJDMin ) iMJDMin = fFluxInterval.back()->fMJD_Data_min;
-       if( fFluxInterval.back()->fMJD_Data_max > iMJDMax ) iMJDMax = fFluxInterval.back()->fMJD_Data_max;
+       if( fFluxInterval.back()->fMJD_Data_min < iMJDDataMin ) iMJDDataMin = fFluxInterval.back()->fMJD_Data_min;
+       if( fFluxInterval.back()->fMJD_Data_max > iMJDDataMax ) iMJDDataMax = fFluxInterval.back()->fMJD_Data_max;
 
        is_stream >> iTemp1;     // rate
        is_stream >> iTemp2;     // rate error
@@ -79,8 +81,8 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDStart )
    }
 
 // plotting range
-   if( fPlottingMJDMin < 0. ) fPlottingMJDMin = iMJDMin - 5.;
-   if( fPlottingMJDMax < 0. ) fPlottingMJDMax = iMJDMax + 5.;
+   if( fPlottingMJDMin < 0. ) fPlottingMJDMin = iMJDDataMin - 5.;
+   if( fPlottingMJDMax < 0. ) fPlottingMJDMax = iMJDDataMax + 5.;
 
    is.close();
 
@@ -177,6 +179,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
       cout << "VLightCurve::initializeLightCurve error reading anasum file" << endl;
       return false;
    }
+   fFluxCombined->setTimeBinnedAnalysis(false );
 
 /////////////////////////////////
 // setup time bins
@@ -378,9 +381,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        if( !hLightCurve )
        {
           cout << "VLightCurve::plot: no light curve histogram found with name " << htitle << endl;
-	  cout << "XXX " << fPhase_Period_days << endl;
 	  fCanvasLightCurve->GetListOfPrimitives()->Print();
-	  return 0;
+	  return fCanvasLightCurve;
        }
     }
 

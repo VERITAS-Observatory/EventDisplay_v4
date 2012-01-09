@@ -72,7 +72,6 @@ class VLightCurve : public VPlotUtilities
 
    double   getLightCurveAxisRange_Min();
    double   getLightCurveAxisRange_Max();
-   double   getPhase( double iMJD );
 
    public:
 
@@ -83,10 +82,11 @@ class VLightCurve : public VPlotUtilities
    vector< VLightCurveData* > getLightCurveData();
    TGraphAsymmErrors*         getLightCurveGraph() { return fLightCurveGraph; }
    string   getLightCurveAxisTitle();
+   double   getPhase( double iMJD );
    string   getRateAxisTitle() { return fRateAxisTitle; }
    bool     initializeTeVLightCurve( string iASCIIFile );
    bool     initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin = -1., double iMJDMax = -1. );
-   bool     initializeXRTLightCurve( string iXRTFile, double iMJDStart = 54857.09977457897 );
+   bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1., double iMJDStart = 54857.09977457897 );
    void     printLightCurve( bool bFullDetail = true );
    TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1, string iPlottingOption = "p" );
    bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );
