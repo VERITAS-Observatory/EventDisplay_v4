@@ -50,6 +50,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
       cout << "VLightCurveData::fill error reading anasum file: " << fDataFileName << endl;
       return false;
    }
+   fFluxCalculation.setTimeBinnedAnalysis(false );
    fFluxCalculation.setDebug( false );
    fFluxCalculation.setSignificanceParameters( -999., -999. );
    fFluxCalculation.setSignificanceParameters( iThresholdSignificance, iMinEvents, iUpperLimit, iUpperlimitMethod, iLiMaEqu );

@@ -65,6 +65,8 @@ class VFluxCalculation : public TObject
 
         bool fDebug;
 
+	bool fTimebinned;
+
 // input parameters read from anasum file (from run summary tree)
         vector< double > fRunList;                //!< run number
         vector< double > fRunMJD;                 //!< MJD
@@ -197,9 +199,11 @@ class VFluxCalculation : public TObject
         bool          readRXTE( string ifile );
         void          setDebug( bool iB ) { fDebug = iB; }
         void          setSpectralParameters( double iMinEnergy_TeV = 0., double E0 = 1., double alpha = -2.5 );
-        void          setSignificanceParameters( double iThresholdSignificance = 3., double iMinEvents = 5, double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
+        void          setSignificanceParameters( double iThresholdSignificance = 3., double iMinEvents = 5, 
+	                                         double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
+        void          setTimeBinnedAnalysis( bool iB = true ) { fTimebinned = iB; }
         void          writeResults( char *ifile );
 
-        ClassDef(VFluxCalculation,7);
+        ClassDef(VFluxCalculation,8);
 };
 #endif

@@ -16,6 +16,8 @@ VFluxCalculation::VFluxCalculation()
 {
     reset();
 
+    setTimeBinnedAnalysis();
+
     bZombie = true;
 }
 
@@ -463,61 +465,64 @@ void VFluxCalculation::getIntegralEffectiveArea( bool bAMC )
 /////////////////////////////////////////////////////////////////////
 // TIME dependent effective areas
 /////////////////////////////////////////////////////////////////////
-	    vector < double > i_IntraEffArea;
+            if( fTimebinned )
+	    {
+	       vector < double > i_IntraEffArea;
 
 // read effective area graphs for time binned intra run light curves
-	    if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC" );
-            else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec" );
-	    TGraph2DErrors *g_time = (TGraph2DErrors*)gDirectory->Get( hname );
+	       if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC" );
+	       else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec" );
+	       TGraph2DErrors *g_time = (TGraph2DErrors*)gDirectory->Get( hname );
 // find 2D graph with time dependent effective areas
-            if( !g_time )
-            {
+	       if( !g_time )
+	       {
 // if not try go get off graph
-                if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC_off" );
-                else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec_off" );
-                g_time = (TGraph2DErrors*)gDirectory->Get( hname );
-                if( !g_time )
-		{
-                    cout << "error: 2D effective area graph not found" << endl;
-                    cout << "continue..." << endl;
-                    fRunEffArea[i] = 0.;
-                    continue;
-		}
-            }
+		   if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC_off" );
+		   else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec_off" );
+		   g_time = (TGraph2DErrors*)gDirectory->Get( hname );
+		   if( !g_time )
+		   {
+		       cout << "error: 2D effective area graph not found" << endl;
+		       cout << "continue..." << endl;
+		       fRunEffArea[i] = 0.;
+		       continue;
+		   }
+	       }
 
 // calculate spectral weighted integral effective area
-	    double *Xaxis = g_time->GetX();
-	    double *Yaxis = g_time->GetY();
-	    double *Zaxis = g_time->GetZ();
-	    double InterEffArea=0.;
+	       double *Xaxis = g_time->GetX();
+	       double *Yaxis = g_time->GetY();
+	       double *Zaxis = g_time->GetZ();
+	       double InterEffArea=0.;
 
 // Time of first bin
-	    double Time=Zaxis[0];
+	       double Time=Zaxis[0];
 
 // loop over all points in effective area histogram
-	    for( int b = 1; b < g_time->GetN(); b++ )
-	    {
+	       for( int b = 1; b < g_time->GetN(); b++ )
+	       {
 // get energies and effective areas
-	       x0=Xaxis[b-1];
-	       x2=Xaxis[b+1];
-	       x1=Xaxis[b];
-	       ieff_mean=Yaxis[b];
+		  x0=Xaxis[b-1];
+		  x2=Xaxis[b+1];
+		  x1=Xaxis[b];
+		  ieff_mean=Yaxis[b];
 
-	       ieff_int = integrateEffectiveAreaInterval( x0, x1, x2, ieff_mean );
-	       if( ieff_int > 0. ) InterEffArea += ieff_int;
-	       else                continue;
+		  ieff_int = integrateEffectiveAreaInterval( x0, x1, x2, ieff_mean );
+		  if( ieff_int > 0. ) InterEffArea += ieff_int;
+		  else                continue;
 		
 // increment time bin counter
-	       if(Zaxis[b]>Time)
-	       {
-		   Time=Zaxis[b];
-		   i_IntraEffArea.push_back( InterEffArea );
-		   InterEffArea=0;
-	       }
-	     }
-	     i_IntraEffArea.push_back( InterEffArea );
-	     fIntraRunEffArea.push_back( i_IntraEffArea );
-	}
+		  if(Zaxis[b]>Time)
+		  {
+		      Time=Zaxis[b];
+		      i_IntraEffArea.push_back( InterEffArea );
+		      InterEffArea=0;
+		  }
+		}
+		i_IntraEffArea.push_back( InterEffArea );
+		fIntraRunEffArea.push_back( i_IntraEffArea );
+	   }
+        }
     }
   
 //////////////////////////////////////////////////////////////
@@ -968,18 +973,22 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
                     return;
                 }
                 hon = (TH1D*)gDirectory->Get( "hLinerecCounts_on" );
-		hon2DtimeBinned = (TH2D*)gDirectory->Get( "hLinerecCounts2DtimeBinned_on" );
                 hoff = (TH1D*)gDirectory->Get( "hLinerecCounts_off" );
-		hoff2DtimeBinned = (TH2D*)gDirectory->Get( "hLinerecCounts2DtimeBinned_off" );
                 if( !hon || !hoff )
                 {
                     cout << "error finding counting histogram (energy): " << hon << "\t" << hoff << "\t" << (int)fRunList[i] << endl;
                     return;
                 }
-		if( !hon2DtimeBinned || !hoff2DtimeBinned )
-                {
-                    cout << "error finding time binned 2D counting histogram (energy): " << hon2DtimeBinned << "\t" << hoff2DtimeBinned << "\t" << (int)fRunList[i] << endl;
-                    return;
+		if( fTimebinned )
+		{
+		   hon2DtimeBinned = (TH2D*)gDirectory->Get( "hLinerecCounts2DtimeBinned_on" );
+		   hoff2DtimeBinned = (TH2D*)gDirectory->Get( "hLinerecCounts2DtimeBinned_off" );
+		   if(!hon2DtimeBinned || !hoff2DtimeBinned )
+		   {
+		      cout << "error finding time binned 2D counting histogram (energy): ";
+		      cout << hon2DtimeBinned << "\t" << hoff2DtimeBinned << "\t" << (int)fRunList[i] << endl;
+		      return;
+		   }
                 }
 // get number of on events above energy threshold
                 fRunNon[i] = 0.;
@@ -990,18 +999,21 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
                 }
                 iTotOn += fRunNon[i];
 // get number of on events above energy threshold in Time BIN
-		for( int t = 0; t < hon2DtimeBinned->GetNbinsY(); t++)
+                if( fTimebinned && hon2DtimeBinned )
 		{
-		  double Non=0.;
-		  
-		  for( int b = hon2DtimeBinned->GetNbinsX(); b > 0; b-- )
-		  {
-		      if( hon2DtimeBinned->GetXaxis()->GetBinLowEdge( b ) < fMinEnergy ) break;
-		      Non += hon2DtimeBinned->GetBinContent( hon2DtimeBinned->GetBin( b, t+1));
+		   for( int t = 0; t < hon2DtimeBinned->GetNbinsY(); t++)
+		   {
+		     double Non=0.;
 		     
-		  }
-		  IntraNon.push_back( Non );
-		}
+		     for( int b = hon2DtimeBinned->GetNbinsX(); b > 0; b-- )
+		     {
+			 if( hon2DtimeBinned->GetXaxis()->GetBinLowEdge( b ) < fMinEnergy ) break;
+			 Non += hon2DtimeBinned->GetBinContent( hon2DtimeBinned->GetBin( b, t+1));
+			
+		     }
+		     IntraNon.push_back( Non );
+		   }
+                }
 
 // get number of off events above energy threshold
                 fRunNoff[i] = 0.;
@@ -1013,18 +1025,22 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
                 iTotOff += fRunNoff[i];
 
 // get number of off events above energy threshold in Time BIN
-		for( int t = 0; t < hoff2DtimeBinned->GetNbinsY(); t++)
+		if( fTimebinned && hoff2DtimeBinned )
 		{
-		  double Noff=0.;
-		  for( int b = hoff2DtimeBinned->GetNbinsX(); b > 0; b-- )
-		    {
-		      if( hoff2DtimeBinned->GetXaxis()->GetBinLowEdge( b ) < fMinEnergy ) break;
-		      Noff += hoff2DtimeBinned->GetBinContent( hoff2DtimeBinned->GetBin( b, t+1));
-	
-		    }
-		  IntraNoff.push_back( Noff );
-		  IntraNdiff.push_back( IntraNon[t] - IntraNoff[t] * fRunNorm[i] );
-		  IntraNdiffE.push_back ( sqrt( IntraNon[t] + IntraNoff[t] * fRunNorm[i] * fRunNorm[i] ) );}
+		   for( int t = 0; t < hoff2DtimeBinned->GetNbinsY(); t++)
+		   {
+		     double Noff=0.;
+		     for( int b = hoff2DtimeBinned->GetNbinsX(); b > 0; b-- )
+		     {
+			 if( hoff2DtimeBinned->GetXaxis()->GetBinLowEdge( b ) < fMinEnergy ) break;
+			 Noff += hoff2DtimeBinned->GetBinContent( hoff2DtimeBinned->GetBin( b, t+1));
+	   
+		     }
+		     IntraNoff.push_back( Noff );
+		     IntraNdiff.push_back( IntraNon[t] - IntraNoff[t] * fRunNorm[i] );
+		     IntraNdiffE.push_back ( sqrt( IntraNon[t] + IntraNoff[t] * fRunNorm[i] * fRunNorm[i] ) );
+		   }
+                }
 
 // mean off norm
 	        if( fRunNorm[i] > 0. )
@@ -1152,7 +1168,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 	       fRunCI_up_3sigma[i] = i_Rolke.GetUpperLimit();
 	   }
 //Time BINs
-	   if( i < fIntraRunNon.size() && i < fIntraRunNoff.size() )
+	   if( fTimebinned && i < fIntraRunNon.size() && i < fIntraRunNoff.size() )
 	   {
 	     for( unsigned int t = 0; t<fIntraRunNon[i].size();t++)
 	     {
