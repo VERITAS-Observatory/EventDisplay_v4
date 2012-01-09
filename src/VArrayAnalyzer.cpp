@@ -756,7 +756,7 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
        i_ycos = 0.;
     }
     tel_impact( i_xcos, i_ycos, ximp, yimp, zimp, &igx, &igy, &igz, true );
-    if( isinf( igx ) || isinf( igy ) )
+    if( isinf( igx ) || isinf( igy ) || isnan( igx ) || isnan( igy ) )
     {
         igx = -99999;
         igy = -99999;

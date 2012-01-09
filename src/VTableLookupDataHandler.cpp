@@ -325,6 +325,12 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     fAz = fshowerpars->Az[fMethod];
     fXcore = fshowerpars->Xcore[fMethod];
     fYcore = fshowerpars->Ycore[fMethod];
+    if( TMath::IsNaN( fXcore ) || TMath::IsNaN( fYcore ) )
+    {
+        fXcore =  -999999.;
+	fYcore =  -999999.;
+	return false;
+    }
     fXoff = fshowerpars->Xoff[fMethod];
     fYoff = fshowerpars->Yoff[fMethod];
     fImgSel = (ULong64_t)fshowerpars->ImgSel[fMethod];
