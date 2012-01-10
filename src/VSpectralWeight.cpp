@@ -24,6 +24,8 @@ void VSpectralWeight::setMCParameter( double iMCSpectralIndex, double iMCEnergy_
    fMCSpectralIndex = iMCSpectralIndex;
    fMCMinEnergy_TeV_Lin = iMCEnergy_min_TeV_Lin;
    fMCMaxEnergy_TeV_Lin = iMCEnergy_max_TeV_Lin;
+
+   setSpectralIndex( fIndex );
 }
 
 /*
@@ -46,13 +48,17 @@ void VSpectralWeight::setSpectralIndex( double iG, bool iPrint )
     }
 }
 
+/*
 
-double VSpectralWeight::getSpectralWeight( double iE )
+    energy in TeV (linear scale)
+
+*/
+double VSpectralWeight::getSpectralWeight( double iE_TeV_lin )
 {
     if( fabs( fIndex - fMCSpectralIndex ) < 0.01 ) return 1.;
     else 
     {
-       return fSpectralWeightAlpha * TMath::Power( iE, -1.*fIndex + fMCSpectralIndex );
+       return fSpectralWeightAlpha * TMath::Power( iE_TeV_lin, -1.*fIndex + fMCSpectralIndex );
     }
     return 1.;
 }    
