@@ -65,9 +65,11 @@ then
 fi
 TMVACUT="20111212"
 TMVACUT="20111220"
+TMVACUT="20120104-N2_Core"
+TMVACUT="20111201"
 
 # check particle type
-if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
+if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ] && [ $PART != "gamma_onSourceDISP" ]
 then
    echo "unknown particle type: " $PART
    exit
@@ -109,7 +111,7 @@ mkdir -p $ODIR
 # on source gamma rays
 if [ $PART = "gamma_onSource" ]
 then
-   MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID"-*.mscw.root
+   MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_onSource."$ARRAY"_ID"$RECID".eff
    MCFIL=gamma_onSource."$ARRAY"_ID0.eff
@@ -127,10 +129,31 @@ then
    TELTYPECUTS="1"
    DIRECTIONCUT="2"
 fi
+# on source gamma rays
+if [ $PART = "gamma_onSourceDISP" ]
+then
+   MSCFILE=$DDIR/gamma_onSourceDISP."$ARRAY"_ID"$RECID"*.mscw.root
+   EFFFILE=$DDIR/EffectiveAreas/
+   OFIL=gamma_onSourceDISP."$ARRAY"_ID"$RECID".eff
+   MCFIL=gamma_onSourceDISP."$ARRAY"_ID0.eff
+   OFFMIN=( 0. )
+   OFFMAX=( 100000. )
+   OFFMEA=( "0.0" )
+# NOTE: this is theta2
+   THETA2MIN=( -1. )
+#   THETA2MAX=( 0.008 )
+#   THETA2MAX=( 0.04 )
+# using TMVA or angular resolution
+   THETA2MAX=( -1. )
+   ISOTROPY="0"
+   AZBINS="0"
+   TELTYPECUTS="1"
+   DIRECTIONCUT="2"
+fi
 # isotropic gamma-rays: analyse in rings in camera distance
 if [ $PART = "gamma_cone10" ]
 then
-   MSCFILE=$DDIR/gamma_cone10."$ARRAY"_ID"$RECID"-*.mscw.root
+   MSCFILE=$DDIR/gamma_cone10."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_cone10."$ARRAY"_ID"$RECID".eff
    MCFIL=gamma_cone10."$ARRAY"_ID0.eff
@@ -149,7 +172,7 @@ then
 fi
 if [ $PART = "electron" ] || [ $PART = "electron_onSource" ]
 then
-   MSCFILE=$DDIR/electron."$ARRAY"_ID"$RECID"-*.mscw.root
+   MSCFILE=$DDIR/electron."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=electron."$ARRAY"_ID"$RECID".eff
    MCFIL=electron."$ARRAY"_ID0.eff
@@ -175,7 +198,7 @@ then
 fi
 if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
 then
-   MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID"-*.mscw.root
+   MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=proton."$ARRAY"_ID"$RECID".eff
    MCFIL=proton."$ARRAY"_ID0.eff
@@ -201,7 +224,7 @@ then
 fi
 if [ $PART = "helium" ] || [ $PART = "helium_onSource" ]
 then
-   MSCFILE=$DDIR/helium."$ARRAY"_ID"$RECID"-*.mscw.root
+   MSCFILE=$DDIR/helium."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=helium."$ARRAY"_ID"$RECID".eff
    MCFIL=helium."$ARRAY"_ID0.eff
@@ -274,7 +297,7 @@ do
       rm -f $iCFIL-d
       sed -e "s|SUBARRAY|$ARRAY|" $iCFIL-e > $iCFIL-f
       rm -f $iCFIL-e
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
       then
          sed -e "s|WOBBLEOFFSET|${OFFMEA[$i]}|" $iCFIL-f > $iCFIL-g
       else
@@ -283,7 +306,12 @@ do
       rm -f $iCFIL-f
       sed -e "s|TMVACUTDIR|$TMVACUT|" $iCFIL-g > $iCFIL-h
       rm -f $iCFIL-g
-      sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
+      if [ $DSET = "v_leeds" ]
+      then
+	 sed -e "s|DATASET|cta-ultra3|" $iCFIL-h > $iCFIL-i
+      else
+	 sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
+      fi
       rm -f $iCFIL-j
       sed -e "s|OFFAXISBIN|$i|" $iCFIL-i > $iCFIL-j
       rm -f $iCFIL-i
@@ -301,7 +329,7 @@ do
 # filling mode
 ###############################################################################
 # fill IRFs and effective areas
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
       then
 # filling mode 0: fill and use angular resolution for energy dependent theta2 cuts
 	 echo "* FILLINGMODE $GFILLING" >> $MSCF
@@ -332,7 +360,7 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 3.0 0.1" >> $MSCF
       fi
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
@@ -348,7 +376,7 @@ do
 #      fi
 
 # output file
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
       then
          OFIX=$ODIR/$OFIL-$i
       else
@@ -385,7 +413,7 @@ do
       if [ $INPU = "eff" ]
       then
          echo "submitting to short queue"
-         if [ $PART = "gamma_onSource" ]
+         if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_onSourceDISP" ]
 	 then
             qsub -l os="sl*" -l h_cpu=06:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
 #            qsub -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
