@@ -26,6 +26,7 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fElectronSpectrumID = 2;
 
     fSensitivity = 0;
+    fSensitivityCU = 0;
     fBGRate = 0;
     fBGRateSqDeg = 0;
     fProtRate = 0;
@@ -37,6 +38,7 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fEres = 0; 
 
     fSensitivity2D = 0;
+    fSensitivityCU2D = 0;
     fBGRate2D = 0;
     fBGRateSqDeg2D = 0;
     fProtRate2D = 0;
@@ -70,6 +72,15 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    fSensitivity->Print();
    hisList.push_back( fSensitivity );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fSensitivity );
+
+   sprintf( hname, "DiffSensCU" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fSensitivityCU = new TH1F( hname, "Diff. Sens. (CU)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   fSensitivityCU->SetXTitle( "log_{10} (E/TeV)" );
+   fSensitivityCU->SetYTitle( "Differential Flux Sensitivity [C.U.]" );
+   fSensitivityCU->Print();
+   hisList.push_back( fSensitivityCU );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fSensitivityCU );
 
    sprintf( hname, "BGRate" );
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
@@ -329,14 +340,19 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
 ////////////////////////////////////////////////////////////////////////
 // sensitivity plots
     VSensitivityCalculator i_Sens;
+    VSensitivityCalculator i_SensCU;
 // set Crab Nebula spectrum
     i_Sens.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
+    i_SensCU.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
 // energy range to be plotted
     i_Sens.setEnergyRange_Lin( 0.01, 150. );
+    i_SensCU.setEnergyRange_Lin( 0.01, 150. );
 // significance parameters
     i_Sens.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
+    i_SensCU.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
 // energy axis
     i_Sens.setUseEffectiveAreas_vs_reconstructedEnergy( true );
+    i_SensCU.setUseEffectiveAreas_vs_reconstructedEnergy( true );
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
 // CTA
@@ -434,17 +450,26 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
 // gammas
     i_Sens.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
+    i_SensCU.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
+                                 i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
 // protons
     i_Sens.setMonteCarloParameters(14, fCosmicRaySpectrumFile, fProtonSpectrumID , iMC_Proton, 20.,
+			      i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
+    i_SensCU.setMonteCarloParameters(14, fCosmicRaySpectrumFile, fProtonSpectrumID , iMC_Proton, 20.,
 			      i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
 // electrons (spectral index)
     if( iMC_Electron.size() > 0 && iMC_Electron != "NOFILE" )
     {
        i_Sens.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20.,
                               i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
+       i_SensCU.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20.,
+                              i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
     }
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
+
+    i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
+    i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
 
     return true;
 }

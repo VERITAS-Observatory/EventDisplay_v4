@@ -48,6 +48,7 @@ class VWPPhysSensitivityFile
     vector< TH1* > hisListToDisk;
 
     TH1F* fSensitivity;
+    TH1F* fSensitivityCU;
     TH1F* fBGRate;
     TH1F* fBGRateSqDeg;
     TH1F* fProtRate;
@@ -60,6 +61,7 @@ class VWPPhysSensitivityFile
     TH1F* fEres;
 
     TH1F* fSensitivity2D;
+    TH1F* fSensitivityCU2D;
     TH1F* fBGRate2D;
     TH1F* fBGRateSqDeg2D;
     TH1F* fProtRate2D;
