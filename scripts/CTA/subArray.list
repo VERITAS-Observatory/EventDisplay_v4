@@ -15,6 +15,7 @@ s4-2-120
 s4-2-85
 I-noLST
 I-noSST
+I-noMST
 g60
 g85
 g120
@@ -32,3 +33,12 @@ s4-3-200
 s4-4-140
 s4-4-150
 s4-5-125
+I-LST
+I-MST
+I-SST
+E-LST
+E-MST
+E-SST
+E-noLST
+E-noMST
+E-noSST
