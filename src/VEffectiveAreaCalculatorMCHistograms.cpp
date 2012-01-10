@@ -174,7 +174,6 @@ bool VEffectiveAreaCalculatorMCHistograms::fill( double i_ze, TTree *i_MCData, b
 	{
 	   if( i_fMCxoff*i_fMCxoff + i_fMCyoff*i_fMCyoff > fArrayxyoff_MC_max ) continue;
 	   if( i_fMCxoff*i_fMCxoff + i_fMCyoff*i_fMCyoff < fArrayxyoff_MC_min ) continue;
-	    
         }
 
 // log of MC energy

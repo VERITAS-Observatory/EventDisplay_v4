@@ -321,7 +321,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 }
 
 
-void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iDataSetID, unsigned int iCutID )
+void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iDataSetID, unsigned int iCutID, double iPlotMaximum )
 {
     if( !checkDataSetID( iDataSetID ) && iDataSetID < 999 ) return;
 
@@ -340,7 +340,7 @@ void VPlotInstrumentResponseFunction::plotCutEfficiencyRatio( unsigned int iData
     hceff->SetXTitle( "log_{10} energy [TeV]" );
     hceff->SetYTitle( "cut efficiency (ratio)" );
     hceff->SetMinimum( 0. );
-    hceff->SetMaximum( 1.2 );
+    hceff->SetMaximum( iPlotMaximum );
     hceff->Draw("");
     hceff->Draw("AH");
 
@@ -527,7 +527,8 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
     he0->Draw("");
     he0->Draw("AH");
 
-    plot_nullHistogram( iEnergySpectraPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis, true, he0->GetYaxis()->GetTitleOffset()*1.3, getPlottingAxis( "energy_Lin" ) ->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
+    plot_nullHistogram( iEnergySpectraPlottingCanvas, he0, getPlottingAxis( "energy_Lin" )->fLogAxis, true, he0->GetYaxis()->GetTitleOffset()*1.3, 
+                                                           getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
 
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
