@@ -60,7 +60,7 @@ bool VPlotWPPhysSensitivity::initialize()
 	    if( fAnalysis[i].find( "DESY" ) != string::npos )
 	    {
 	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
-	       iTemp << "DESY_20111123/" << fAnalysis[i] << "." << fSubArray[a] << "." << hname << ".root";
+	       iTemp << "DESY/" << fAnalysis[i] << "." << fSubArray[a] << "." << hname << ".root";
 	    }
 	    else if( fAnalysis[i] == "VTS" )
 	    {
@@ -268,7 +268,7 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown )
    return true; 
 }
 
-bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity )
+bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit )
 {
    string iCrabFile = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
    unsigned int iCrabID = 6;
@@ -282,8 +282,9 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
       a->setEnergyRange_Lin( 0.01, 50. );
       a->setPlotCanvasSize( 900, 600 );
       a->setPlottingStyle( fPlottingColor[i], fPlottingLineStyle[i], 2., 1, 2., fPlottingFillStyle[i] );
-      a->setFluxRange_ENERG( iMinSensitivity, iMaxSensitivity );
-      TCanvas *c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fPlottingColor[i], "ENERGY", 0.2, 0.01 );
+      if( iUnit == "ENERGY" )  a->setFluxRange_ENERG( iMinSensitivity, iMaxSensitivity );
+      else if( iUnit == "CU" ) a->setFluxRange_CU( iMinSensitivity, iMaxSensitivity );
+      TCanvas *c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fPlottingColor[i], iUnit, 0.2, 0.01 );
       if( c_temp ) cSens = c_temp;
       if( i == 0 ) c_temp = a->plotSignalBackgroundRates( cBck, true );   // plot protons and electrons
       else         c_temp = a->plotSignalBackgroundRates( cBck, false );

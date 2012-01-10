@@ -204,7 +204,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	                               VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
 				       bool iRateError = false );
 
-	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile();
+	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit = "ENERGY" );
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
         TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
         void       plotEffectiveArea();
@@ -280,6 +280,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	void     setUseEffectiveAreas_vs_reconstructedEnergy( bool iB = true ) { bUseEffectiveAreas_vs_reconstructedEnergy = iB; }
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,10);
+        ClassDef(VSensitivityCalculator,11);
 };
 #endif

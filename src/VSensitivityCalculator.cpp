@@ -603,7 +603,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // read sensitivity directly from root file
     else if( iAnasumCrabFile == "CTA-PHYS" )
     {
-        gSensitivityvsEnergy = getSensitivityGraphFromWPPhysFile();
+        gSensitivityvsEnergy = getSensitivityGraphFromWPPhysFile( bUnit );
 	if( !gSensitivityvsEnergy ) return false;
         return true;
     }
@@ -1168,7 +1168,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     read integral/differential sensitivities and backround rates (total, proton, electron) from WP Phys File
 
 */
-TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
+TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( string bUnit )
 {
     TGraphAsymmErrors *g = 0;
     TH1F *h = 0;
@@ -1181,8 +1181,15 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile()
     }
     cout << "reading CTA-MC file: " << fMCCTA_File << endl;
 // sensitivities
-    h = get_CTA_IRF_Histograms( "DiffSensE2Erg", fMCCTA_cameraoffset_deg );
-    if( !h ) h = get_CTA_IRF_Histograms( "DiffSens", fMCCTA_cameraoffset_deg );
+    if( bUnit == "ENERGY" )
+    {
+       h = get_CTA_IRF_Histograms( "DiffSensE2Erg", fMCCTA_cameraoffset_deg );
+       if( !h ) h = get_CTA_IRF_Histograms( "DiffSens", fMCCTA_cameraoffset_deg );
+    }
+    else
+    {
+       h = get_CTA_IRF_Histograms( "DiffSensCU", fMCCTA_cameraoffset_deg );
+    }
     if( h ) 
     {
        g = new TGraphAsymmErrors( 1 );

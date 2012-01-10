@@ -85,7 +85,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
    bool initialize();
    bool plotIRF( string iPrint = "", double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
-   bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10  );
+   bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10, string iUnit = "ENERGY"  );
 
 };
 
