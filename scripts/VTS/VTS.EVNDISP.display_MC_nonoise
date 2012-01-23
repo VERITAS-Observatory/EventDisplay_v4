@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+# plot a MC vbf file using an external noise file
+#
+
+if [ ! -n "$1" ] 
+then
+   echo
+   echo "./VTS.EVNDISP.display_MC_nonoise <input vbf file> <run number> <noise level>"
+   echo
+   echo "  display a simulation vbf file (with external noise file)"
+   echo
+fi
+
+SOURF="$1"
+
+if [ -n "$2" ]
+then
+  RUNN="$2"
+else
+  RUNN="65432"
+fi
+
+if [ -n "$3" ]
+then
+  NOISEV="$3"
+else
+  NOISEV="200"
+fi
+
+SOPT="-display=1 -runnumber=$RUNN -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISEV"
+
+# default noise levels
+PEDLEV="20."
+NOISE="$EVNDISPDATA//NOISE/NOISE$NOISEV.grisu"
+
+# dead channel definition for MC
+# DEAD="deadChannelDefinition_VERITAS_MC_d20101110.dat"
+
+# array analysis cuts
+# ACUTS="array_analysis_cuts_VERITAS_d20101110.dat"
+##############################################
+
+
+# $EVNDISPSYS/bin/evndisp -sourcefile $SOURF -pedestalfile $NOISE -deadchannelfile $DEAD -pedestalDefaultPedestal=$PEDLEV -arraycuts $ACUTS  $SOPT
+$EVNDISPSYS/bin/evndisp -sourcefile $SOURF -pedestalfile $NOISE  -pedestalDefaultPedestal=$PEDLEV $SOPT
+
+exit
