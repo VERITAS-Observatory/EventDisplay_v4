@@ -269,7 +269,9 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
 
     if( fNoiseFileReader )
     {
-        return iSampleValue + fNoiseFileReader->getNoiseSample( fTelID, channel, sample, iNewNoiseTrace );
+	uint8_t iNoiseSampleValue = fNoiseFileReader->getNoiseSample( fTelID, channel, sample, iNewNoiseTrace );
+	if( iSampleValue > iNoiseSampleValue && iSampleValue > 255 - iNoiseSampleValue ) return 255;
+        return iSampleValue + iNoiseSampleValue;
     }
     return iSampleValue;
 }

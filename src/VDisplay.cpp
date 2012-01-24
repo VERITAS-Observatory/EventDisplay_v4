@@ -106,7 +106,10 @@ VDisplay::VDisplay(const TGWindow *p, unsigned int h, unsigned int w, VEventLoop
     fCanvasCamera->SetEditable( false );
 
     char i_wname[300];
-    sprintf( i_wname, "%s event analysis and display %s", fEventLoop->getRunParameter()->getObservatory().c_str(), fEventLoop->getEventDisplayVersion().c_str() );
+    sprintf( i_wname, "%s event analysis and display %s (%s)", 
+                      fEventLoop->getRunParameter()->getObservatory().c_str(),
+		      fEventLoop->getEventDisplayVersion().c_str(),
+		      fEventLoop->getRunParameter()->getSVN_VERSION().c_str() );
     SetWindowName( i_wname );
     MapSubwindows();
     Layout();
