@@ -120,11 +120,11 @@ echo "LOG AND DATA FILES: $ODIR"
 # submit the job
 if [ $METH = "GEO" ]
 then
-  qsub -V -l h_cpu=10:00:00 -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+  qsub -V -l h_cpu=10:00:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 fi
 if [ $METH = "LL" ]
 then
-  qsub -V -l h_cpu=11:49:00 -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+  qsub -V -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 fi
 
 exit

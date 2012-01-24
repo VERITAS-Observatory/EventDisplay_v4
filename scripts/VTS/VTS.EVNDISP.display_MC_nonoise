@@ -6,10 +6,11 @@
 if [ ! -n "$1" ] 
 then
    echo
-   echo "./VTS.EVNDISP.display_MC_nonoise <input vbf file> <run number> <noise level>"
+   echo "./VTS.EVNDISP.display_MC_nonoise <input vbf file> [run number] [noise level] [noise file]"
    echo
    echo "  display a simulation vbf file (with external noise file)"
    echo
+   exit
 fi
 
 SOURF="$1"
@@ -28,11 +29,17 @@ else
   NOISEV="200"
 fi
 
+if [ -n "$4" ]
+then
+   NOISE="$4"
+else
+   NOISE="$EVNDISPDATA//NOISE/NOISE$NOISEV.grisu"
+fi
+
 SOPT="-display=1 -runnumber=$RUNN -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISEV"
 
 # default noise levels
-PEDLEV="20."
-NOISE="$EVNDISPDATA//NOISE/NOISE$NOISEV.grisu"
+PEDLEV="16."
 
 # dead channel definition for MC
 # DEAD="deadChannelDefinition_VERITAS_MC_d20101110.dat"
