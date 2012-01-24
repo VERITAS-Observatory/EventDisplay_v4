@@ -1536,7 +1536,9 @@ void VCalibrator::getCalibrationRunNumbers()
         else
         {
             cout << "VCalibrator::getCalibrationRunNumbers() error: no calibration information found for run ";
-            cout << getRunNumber() << " in file " << getRunParameter()->fcalibrationfile <<  endl;
+            cout << getRunNumber();
+	    if( getRunParameter()->fcalibrationfile.size() > 0 ) cout << " in file " << getRunParameter()->fcalibrationfile <<  endl;
+	    else                                                 cout << ": no file given " << endl;
 	    cout << "(run type " << getRunParameter()->fDBRunType << ")" << endl;
             exit( -1 );
         }

@@ -92,6 +92,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         bool                        getHiLo(uint32_t i);
         unsigned int                getTelescopeID() { return fTelID; }
         void                        selectHitChan(uint32_t i);
+	bool                        isZeroSuppressed( unsigned int iChannel );
         bool                        wasLossyCompressed();
 
 // rawfile

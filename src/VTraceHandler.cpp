@@ -27,15 +27,10 @@ VTraceHandler::VTraceHandler()
 }
 
 
-void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int iChanID )
-{
-    setTrace( iReader, iNSamples, ped, pedrms, iChanID, -1. );
-}
-
 /*
     analysis routines call this function
 */
-void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int iChanID, double iHiLo )
+void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int iChanID, unsigned int iHitID, double iHiLo )
 {
     fPed=ped;
     fPedrms = pedrms;
@@ -51,9 +46,9 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
     if( iNSamples != fpTrace.size() )
     {
         fpTrace.clear();
-        for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace.push_back( iReader->getSample_double( iChanID, i+fMC_FADCTraceStart, (i==0) ) );
+        for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace.push_back( iReader->getSample_double( iHitID, i+fMC_FADCTraceStart, (i==0) ) );
     }
-    else for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace[i] = iReader->getSample_double( iChanID, i+fMC_FADCTraceStart, (i==0) );
+    else for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace[i] = iReader->getSample_double( iHitID, i+fMC_FADCTraceStart, (i==0) );
 
     fpTrazeSize = int(fpTrace.size());
     if( iHiLo > 0. )

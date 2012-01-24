@@ -638,9 +638,25 @@ void VCamera::drawEventText()
 
     if( fData->getImageParameters()->ntubes > 0 )
     {
-        sprintf( iText, "MLL: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,#alpha=%.2f,size=%.0f,Fitstat=%d", fData->getImageParametersLogL()->cen_x,fData->getImageParametersLogL()->cen_y,fData->getImageParametersLogL()->dist,fData->getImageParametersLogL()->length,fData->getImageParametersLogL()->width,fData->getImageParametersLogL()->alpha,fData->getImageParametersLogL()->size, fData->getImageParametersLogL()->Fitstat );
+        sprintf( iText, "MLL: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,#alpha=%.2f,size=%.0f,Fitstat=%d",
+	                fData->getImageParametersLogL()->cen_x,
+			fData->getImageParametersLogL()->cen_y,
+			fData->getImageParametersLogL()->dist,
+			fData->getImageParametersLogL()->length,
+			fData->getImageParametersLogL()->width,
+			fData->getImageParametersLogL()->alpha,
+			fData->getImageParametersLogL()->size,
+			fData->getImageParametersLogL()->Fitstat );
         fTextEvent[fTextEvent.size()-1]->SetTitle( iText );
-        sprintf( iText, "GEO: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,size=%.0f,loss=%.2f,fui=%.2f", fData->getImageParameters()->cen_x,fData->getImageParameters()->cen_y,fData->getImageParameters()->dist,fData->getImageParameters()->length,fData->getImageParameters()->width,fData->getImageParameters()->size, fData->getImageParameters()->loss, fData->getImageParameters()->fui );
+        sprintf( iText, "GEO: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,size=%.0f,loss=%.2f,fui=%.2f",
+	                fData->getImageParameters()->cen_x,
+			fData->getImageParameters()->cen_y,
+			fData->getImageParameters()->dist,
+			fData->getImageParameters()->length,
+			fData->getImageParameters()->width,
+			fData->getImageParameters()->size, 
+			fData->getImageParameters()->loss, 
+			fData->getImageParameters()->fui );
         fTextEvent[fTextEvent.size()-2]->SetTitle( iText );
     }
 
@@ -690,21 +706,6 @@ void VCamera::drawEventText()
             if( !fPlotPaper ) fTextMC[i]->DrawLatex( i_TextX, i_TextY-=i_TextdY, fTextMC[i]->GetTitle() );
         }
     }
-
-/*      if( fBoolAllinOne )
-      {
-         for( unsigned int t = 0; t < fTheta2Circle.size(); t++ )
-     {
-        fTheta2Circle[t]->SetLineWidth( 1 );
-        fTheta2Circle[t]->SetLineStyle( 2 );
-        fTheta2Circle[t]->SetLineColor( t+1 );
-        fTheta2Circle[t]->SetX1( convertX(0.) );
-        fTheta2Circle[t]->SetY1( convertY(0.) );
-        fTheta2Circle[t]->SetR1( convertScale(0.1+0.2*t) );
-        fTheta2Circle[t]->SetR2( convertScale(0.1+0.2*t) );
-fTheta2Circle[t]->Draw();
-}
-} */
 }
 
 

@@ -46,9 +46,8 @@ class VTraceHandler
         virtual void setTrace(vector< uint8_t >, double, double, unsigned int, double );
         virtual void setTrace(vector< uint16_t >, double, double, unsigned int, double );
                                                   //!< pass the trace values (with hilo)
-        virtual void setTrace(VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int iChanID, double iHilo );
-                                                  //!< pass the trace values
-        virtual void setTrace(VVirtualDataReader*, unsigned int, double, double, unsigned int );
+        virtual void setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms,
+	                       unsigned int iChanID, unsigned int iHitID, double iHilo = -1. );
 // methods for getting quick trace parameters between specified limits
         void   apply_lowgain( double );
         void   calcQuickPed(int ,int);

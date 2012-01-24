@@ -241,24 +241,37 @@ bool VBaseRawDataReader::initTraceNoiseGenerator( unsigned int iType, string iT,
     return iB;
 }
 
+bool VBaseRawDataReader::isZeroSuppressed( unsigned int channel )
+{
+   pair< bool, uint32_t > i_hitIndexPair = getChannelHitIndex( channel );
+
+   if( !i_hitIndexPair.first ) return true;
+
+   return false;
+}
+
 
 uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool iNewNoiseTrace )
 {
-    if( !fNoiseFileReader )
+    uint8_t iSampleValue = 0;
+    try
     {
-        if( fEvent[fTelID] )
-        {
-            return fEvent[fTelID]->getSample( channel, sample );
-        }
+       if( fEvent[fTelID] )
+       {
+	  iSampleValue = fEvent[fTelID]->getSample( channel, sample );
+       }
     }
-    else
+    catch(...)
     {
-        if( fEvent[fTelID] )
-        {
-            return fEvent[fTelID]->getSample( channel, sample ) + fNoiseFileReader->getNoiseSample( fTelID, channel, sample, iNewNoiseTrace );
-        }
+       cout << "VBaseRawDataReader::getSample error: failed for channel " << channel << " and sample " << sample << endl;
+       return 0;
     }
-    return 0;
+
+    if( fNoiseFileReader )
+    {
+        return iSampleValue + fNoiseFileReader->getNoiseSample( fTelID, channel, sample, iNewNoiseTrace );
+    }
+    return iSampleValue;
 }
 
 

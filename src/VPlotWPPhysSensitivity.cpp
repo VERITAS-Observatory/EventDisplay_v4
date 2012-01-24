@@ -198,6 +198,16 @@ bool VPlotWPPhysSensitivity::initialize()
 
    return true;
 }
+
+void VPlotWPPhysSensitivity::addSensitivityFile( string iSensitivityFile, string iLegend, int iColor, int iLineStyle, int iFillStyle )
+{
+    fSensitivityFile.push_back( iSensitivityFile );
+    fLegend.push_back( iLegend );
+    fPlottingColor.push_back( iColor );
+    fPlottingLineStyle.push_back( iLineStyle );
+    fPlottingFillStyle.push_back( iFillStyle );
+    fIRFCameraOffset_deg.push_back( 0. );
+}
   
 bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMax, double iEnergyResolutionMax )
 {
@@ -314,6 +324,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 
    return true;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

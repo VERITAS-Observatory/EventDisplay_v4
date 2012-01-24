@@ -192,6 +192,7 @@ class VVirtualDataReader
         }
 
 	virtual bool hasFADCTrace() { return true; }
+	virtual bool isZeroSuppressed( unsigned int iChannel ) { return false; }
 	virtual bool has16Bit()     { return false; }
 
                                                   //!< has this event an array trigger or not

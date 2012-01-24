@@ -279,7 +279,6 @@ void VEvndispRunParameter::print( int iEv )
     if( fEventDisplayBuildCompiler.size() > 0 ) cout << fEventDisplayBuildCompiler << "\t";
     if( fEventDisplayBuildCompilerVersion.size() > 0 ) cout << fEventDisplayBuildCompilerVersion << endl;
     if( fEventDisplayBuildDir.size() > 0 )  cout << fEventDisplayBuildDir << endl;
-    cout << endl;
     if( fEventDisplaySystemInfo )
     {
        cout << fEventDisplaySystemInfo->fModel << ", " << fEventDisplaySystemInfo->fOS;

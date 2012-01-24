@@ -65,7 +65,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    vector< int >    fCameraOffsetLineStyle;
    vector< int >    fCameraOffsetFillStyle;
 
-   vector< string > fSensitivityFile;   // [Analysis][SubArray+SObsTime];
+   vector< string > fSensitivityFile;   // 
    vector< double > fIRFCameraOffset_deg;
    vector< int >    fPlottingColor;
    vector< int >    fPlottingLineStyle;
@@ -82,6 +82,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    void addAnalysis( string iAnalysis, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );           // NOTE: hardwired analysis file names
    void addCameraOffset( double iCameraOffset_deg = 0., int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
    void addObservationTime( double iObsTime, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
+   void addSensitivityFile( string iSensitivityFile, string iLegend, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
    void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
    bool initialize();
    bool plotIRF( string iPrint = "", double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );

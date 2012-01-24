@@ -126,9 +126,8 @@ class VFitTraceHandler : public VTraceHandler
                                                   //!< set trace, pedestal, pedestal rms
         void   setTrace( vector< uint16_t >, double, double, unsigned int, double );
                                                   //!< set trace, pedestal, pedestal rms
-        void   setTrace( VVirtualDataReader*, unsigned int, double, double, unsigned int );
-                                                  //!< set trace, pedestal, pedestal rms
-        void   setTrace( VVirtualDataReader*, unsigned int, double, double, unsigned int, double );
+	void   setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms,
+	                                   unsigned int iChanID, unsigned int iHitID, double iHilo = -1. );
         void   terminate();                       //!< write analysis histograms to disk
 };
 #endif

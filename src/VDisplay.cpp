@@ -49,6 +49,8 @@ VDisplay::VDisplay(const TGWindow *p, unsigned int h, unsigned int w, VEventLoop
 // drawing mode in the beging is each telescope in seperate canvas
     fBoolDrawOne = false;
     fBoolDrawAllinOne = false;
+    fBool_M_OPT_COL_SCHE_Checked = true;
+    fBool_M_OPT_BW_SCHE_Checked = false;
 // birds view
     fBirdsEye = new VDisplayBirdsEye();
     if( fEventLoop->getRunParameter()->fPlotPaper ) fBirdsEye->setPlotPaper();
@@ -603,10 +605,13 @@ void VDisplay::searchChannel( int i_channel )
 */
 TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 {
+   if( !i_his ) return 0;
+   i_his->Reset();
+
 ///////////////////////////////////////////////////////////////////////////////
 // fill trace into histogram
 ///////////////////////////////////////////////////////////////////////////////
-   if( fEventLoop->getReader()->hasFADCTrace() )
+   if( fEventLoop->getReader()->hasFADCTrace() && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
    {
 // first set the number of bins of the histogram according to the number of samples
        if( int( fEventLoop->getNSamples() ) != i_his->GetNbinsX() )
@@ -617,20 +622,25 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
        double itemp = 0;
        for( unsigned int i = 0; i < fEventLoop->getNSamples(); i++ )
        {
-           itemp = fEventLoop->getReader()->getSample_double( i_channel, i, false );
-// undo highlow
-	   if( i_channel < (int)fEventLoop->getLowGainMultiplier().size() && fEventLoop->getHiLo()[i_channel] )
+	   pair< bool, uint32_t > i_hitIndexPair = fEventLoop->getReader()->getChannelHitIndex( i_channel );
+	   if( i_hitIndexPair.first )
 	   {
-	       itemp  = (itemp-fEventLoop->getPeds(fEventLoop->getHiLo()[i_channel])[i_channel])*fEventLoop->getLowGainMultiplier()[i_channel];
-	       itemp += fEventLoop->getPeds(fEventLoop->getHiLo()[i_channel])[i_channel];
-	   }
+	      itemp = fEventLoop->getReader()->getSample_double( i_hitIndexPair.second, i, false );
+// undo highlow
+	      if( i_channel < (int)fEventLoop->getLowGainMultiplier().size() && fEventLoop->getHiLo()[i_channel] )
+	      {
+		  itemp  = (itemp-fEventLoop->getPeds(fEventLoop->getHiLo()[i_channel])[i_channel])*fEventLoop->getLowGainMultiplier()[i_channel];
+		  itemp += fEventLoop->getPeds(fEventLoop->getHiLo()[i_channel])[i_channel];
+	      }
+           } 
+	   else itemp = 0.;
 	   i_his->SetBinContent( i + 1, i_his->GetBinContent( i+1 ) - itemp );
        }
     }
 ///////////////////////////////////////////////////////////////////////////////
 // DST: fill timing values into histogram
 ///////////////////////////////////////////////////////////////////////////////
-    else if( !fEventLoop->getReader()->hasFADCTrace() )
+    else if( !fEventLoop->getReader()->hasFADCTrace() && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
     {
 // first set the number of bins of the histogram according to the number of timing bins
 // number of bins is: number of pulse time levels + one bin at the beginning and one at the end of the trace
@@ -692,7 +702,10 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 
 /*!
 
+     draw the FADC trace
+
      for option tracefit, draw as well the result of the fit
+
 */
 void VDisplay::drawFADC( bool iFit )
 {
@@ -723,7 +736,7 @@ void VDisplay::drawFADC( bool iFit )
 
     fEventLoop->getAnalyzer()->setTelID( fTelescope );
 // plot trace of one channel (click on channel)
-    if( fSelectedChan >= 200000 )
+    if( fSelectedChan >= 200000 && !fEventLoop->getReader()->isZeroSuppressed( fSelectedChan - 200000 ) )
     {
 // photodiode
         if( fEventLoop->getRunParameter()->fShowPhotoDiode && fSelectedChan == 2499 ) sprintf( histitle, "Photodiode (Channel 499, Telescope %d)", fTelescope+1 );
@@ -760,13 +773,14 @@ void VDisplay::drawFADC( bool iFit )
                     fFitTraceHandler = fEventLoop->getFitTraceHandler();
                 }
                 fFitTraceHandler->setMinuitPrint( true );
-		fEventLoop->getReader()->selectHitChan( chanID );
+		pair< bool, uint32_t > i_hitIndexPair = fEventLoop->getReader()->getChannelHitIndex( chanID );
+		fEventLoop->getReader()->selectHitChan( i_hitIndexPair.second );
 		if( fEventLoop->getReader()->has16Bit() )
 		{
 		   fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec16Bit(),
 					       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
 					       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
-					       chanID,
+					       chanID, 
 					       fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
                 }
 		else
@@ -774,10 +788,9 @@ void VDisplay::drawFADC( bool iFit )
 		   fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
 					       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
 					       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
-					       chanID,
+					       chanID, 
 					       fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
                 }
-		cout << "HILO " << fEventLoop->getHiLo()[fSelectedChan - 200000] << "\t" << fEventLoop->getLowGainMultiplier()[chanID] << endl;
                 fFitTraceHandler->setMinuitPrint( false );
                 if( fFitTraceHandler->getFitted() )
                 {
@@ -810,7 +823,7 @@ void VDisplay::drawFADC( bool iFit )
         fHisFADC->Draw( fHisFADCDrawString.c_str() );
     }
 // plot all image signals into one canvas, click beside camera and use switch in 'option' menu
-    else if( fBoolDrawImageTraces )
+    else if( fBoolDrawImageTraces && !(fSelectedChan >= 200000) )
     {
         bool i_FADCdrawn = false;
         sprintf( histitle, "image traces (Telescope %d)", fTelescope+1 );
@@ -822,7 +835,7 @@ void VDisplay::drawFADC( bool iFit )
             if( fEventLoop->getAnalyzer()->getImage()[i] )
             {
                 fHisFADC->Reset();
-                fHisFADC = fillFADC( i, fHisFADC );
+                if( !fEventLoop->getReader()->isZeroSuppressed( i ) ) fHisFADC = fillFADC( i, fHisFADC );
                 if( fHisFADC->GetMinimum() < i_traceMax ) i_traceMax = fHisFADC->GetMinimum();
             }
         }
@@ -834,7 +847,7 @@ void VDisplay::drawFADC( bool iFit )
             if( fEventLoop->getAnalyzer()->getImage()[i] )
             {
                 fHisFADC->Reset();
-                fHisFADC = fillFADC( i, fHisFADC );
+                if( !fEventLoop->getReader()->isZeroSuppressed( i ) ) fHisFADC = fillFADC( i, fHisFADC );
                 fHisFADC->SetMinimum( i_traceMax ); fHisFADC->SetMaximum( -1111 );
                 fHisFADC->SetStats( 0 );
                 fHisFADC->SetLineStyle( i_TraceStyle );
@@ -865,7 +878,7 @@ void VDisplay::drawFADC( bool iFit )
         }
     }
 // plot sum signal (sum of all image pixels), click beside camera for that
-    else
+    else if( !(fSelectedChan >= 200000) )
     {
         sprintf( histitle, "sum signal (Telescope %d)", fTelescope+1 );
         int i_image = 0;
@@ -873,7 +886,7 @@ void VDisplay::drawFADC( bool iFit )
         {
             if( fEventLoop->getAnalyzer()->getImage()[i] )
             {
-                fHisFADC = fillFADC( i, fHisFADC );
+                if( !fEventLoop->getReader()->isZeroSuppressed( i ) ) fHisFADC = fillFADC( i, fHisFADC );
                 i_image++;
             }
         }
@@ -924,10 +937,24 @@ void VDisplay::drawFADC( bool iFit )
         }
 // change color of low gain pedestal is used
         if( fEventLoop->getHiLo()[fSelectedChan-200000] ) fF1Ped->SetLineColor( 50 );
-        else                                                       fF1Ped->SetLineColor( 44 );
+        else                                              fF1Ped->SetLineColor( 44 );
 // for individual pulses, draw fit function
         fF1Ped->Draw( "same" );
         if( iTraceFits ) iTraceFits->Draw( "lsame" );
+    }
+    if( fSelectedChan >= 200000 && fEventLoop->getReader()->isZeroSuppressed( fSelectedChan - 200000 ) )
+    {
+        setFADCText();
+        if( fEventLoop->getRunParameter()->fShowPhotoDiode && fSelectedChan == 2499 ) sprintf( histitle, "Photodiode (Channel 499, Telescope %d)", fTelescope+1 );
+        else sprintf( histitle, "Channel #%d (Telescope %d)", fSelectedChan -200000, fTelescope+1 );
+	fHisFADC->SetTitle( histitle );
+	fHisFADC->SetStats( 0 );
+        fCanvasFADC->SetEditable( 1 );
+        fCanvasFADC->cd();
+	fHisFADC->Draw();
+	TText *iT = new TText( 2, 0.5, "ZERO SUPPRESSED" );
+        iT->Draw();
+        fCanvasFADC->Update();
     }
     fCanvasFADC->RedrawAxis();
 
@@ -1128,7 +1155,9 @@ void VDisplay::setCameraPads( bool iFieldView )
 }
 
 /*
+
    text printed below FADC trace
+
 */
 void VDisplay::setFADCText()
 {
@@ -1142,6 +1171,7 @@ void VDisplay::setFADCText()
 
     fCanvasFADCText->SetEditable( true );
 
+// text placement
     float xL = 0.02;
     float yT = 0.92;
     float ystep = 0.04 * 1.5;
@@ -1333,7 +1363,7 @@ void VDisplay::setInfoText()
 
     float xL = 0.02;
     float yT = 0.96;
-    float ystep = 0.04;
+    float ystep = 0.03;
     float textsize = 0.030;
 
     fCanvasInfo->Clear();
@@ -1344,42 +1374,42 @@ void VDisplay::setInfoText()
     i_Text.push_back( new TText( xL, yT, "" ) );
     sprintf( c_Text, "data file: %s ", fEventLoop->getDataFileName().c_str() );
     i_Text.push_back( new TText( xL, yT, c_Text ) );
-    if( fEventLoop->getReader()->getDataFormat() == "rawdata"  ||  fEventLoop->getReader()->getDataFormat() == "Rawvbf" )
-    {
-        sprintf( c_Text, "pedestal runs: " );
-        for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ ) sprintf( c_Text, "%s T%d: %d", c_Text, fEventLoop->getTeltoAna()[i]+1, fEventLoop->getRunParameter()->fPedFileNumber[fEventLoop->getTeltoAna()[i]] );
-        i_Text.push_back( new TText( xL, yT, c_Text ) );
-        sprintf( c_Text, "low gain pedestal runs: " );
-        for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ ) sprintf( c_Text, "%s T%d: %d", c_Text, fEventLoop->getTeltoAna()[i]+1, fEventLoop->getRunParameter()->fPedLowGainFileNumber[fEventLoop->getTeltoAna()[i]] );
-        i_Text.push_back( new TText( xL, yT, c_Text ) );
-
-        sprintf( c_Text, "gains file: " );
-        for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ ) sprintf( c_Text, "%s T%d: %d", c_Text, fEventLoop->getTeltoAna()[i]+1, fEventLoop->getRunParameter()->fGainFileNumber[fEventLoop->getTeltoAna()[i]] );
-        i_Text.push_back( new TText( xL, yT, c_Text ) );
-
-        sprintf( c_Text, "time offset file: " );
-        for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ ) sprintf( c_Text, "%s T%d: %d", c_Text, fEventLoop->getTeltoAna()[i]+1, fEventLoop->getRunParameter()->fTOffFileNumber[fEventLoop->getTeltoAna()[i]] );
-        i_Text.push_back( new TText( xL, yT, c_Text ) );
-    }
     i_Text.push_back( new TText( xL, yT, "" ) );
-    sprintf( c_Text, "analysis parameter:" );
-    i_Text.push_back( new TText( xL, yT, c_Text ) );
     i_Text.back()->SetTextSize( i_Text.back()->GetTextSize() * 1.1 );
+
+// run info
+    sprintf( c_Text, "Target: %s (ra,dec)=(%.2f,%.2f), wobble E %.2f, N %.2f", fEventLoop->getRunParameter()->fTargetName.c_str(),
+                                                        fEventLoop->getRunParameter()->fTargetRA,
+							fEventLoop->getRunParameter()->fTargetDec,
+							fEventLoop->getRunParameter()->fWobbleEast,
+							fEventLoop->getRunParameter()->fWobbleNorth );
+    i_Text.push_back( new TText( xL, yT, c_Text ) );
+    i_Text.push_back( new TText( xL, yT, "" ) );
+
+// calibration and analysis parameters
     for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
     {
-	fEventLoop->getAnalyzer()->setTelID( fEventLoop->getTeltoAna()[i] );
-        sprintf( c_Text, "Telescope %d", fEventLoop->getTeltoAna()[i]+1 );
+        sprintf( c_Text, "Telescope %d:", fEventLoop->getTeltoAna()[i]+1 );
         i_Text.push_back( new TText( xL, yT, c_Text ) );
-        sprintf( c_Text, "\t image threshold %.2f", fEventLoop->getAnalyzer()->getImageThresh() );
+        if( fEventLoop->getReader()->getDataFormat() == "rawdata"  ||  fEventLoop->getReader()->getDataFormat() == "Rawvbf" )
+        {
+	   sprintf( c_Text, "    pedestal (low): %d (%d), rel.gain %d time offset %d ",
+			     fEventLoop->getRunParameter()->fPedFileNumber[fEventLoop->getTeltoAna()[i]],
+			     fEventLoop->getRunParameter()->fPedLowGainFileNumber[fEventLoop->getTeltoAna()[i]],
+			     fEventLoop->getRunParameter()->fGainFileNumber[fEventLoop->getTeltoAna()[i]],
+			     fEventLoop->getRunParameter()->fTOffFileNumber[fEventLoop->getTeltoAna()[i]] );
+	   fEventLoop->getAnalyzer()->setTelID( fEventLoop->getTeltoAna()[i] );
+           i_Text.push_back( new TText( xL, yT, c_Text ) );
+        }
+        sprintf( c_Text, "    image/border threshold %.2f/%.2f", fEventLoop->getAnalyzer()->getImageThresh(), fEventLoop->getAnalyzer()->getBorderThresh() );
         i_Text.push_back( new TText( xL, yT, c_Text ) );
-        sprintf( c_Text, "\t border threshold %.2f", fEventLoop->getAnalyzer()->getBorderThresh() );
-        i_Text.push_back( new TText( xL, yT, c_Text ) );
-        sprintf( c_Text, "\t window size %d (%d)", fEventLoop->getAnalyzer()->getSumWindow(), fEventLoop->getAnalyzer()->getSumWindowSmall() );
-        i_Text.push_back( new TText( xL, yT, c_Text ) );
-        sprintf( c_Text, "\t window start (not time corrected) %d", fEventLoop->getAnalyzer()->getSumFirst() );
+        sprintf( c_Text, "    window size %d (%d), window start (not time corrected) %d",
+	                 fEventLoop->getAnalyzer()->getSumWindow(), fEventLoop->getAnalyzer()->getSumWindowSmall(),
+			 fEventLoop->getAnalyzer()->getSumFirst() );
         i_Text.push_back( new TText( xL, yT, c_Text ) );
     }
 
+// draw everything
     for( unsigned int i = 0; i < i_Text.size(); i++ )
     {
         i_Text[i]->SetTextSize( textsize );
@@ -1970,7 +2000,7 @@ void VDisplay::defineGui()
     fFrameOpt = fTabAna->AddTab( "options" );
     fCompOpt =  new TGCompositeFrame(fFrameOpt, 60, 20, kVerticalFrame);
     fFrameOpt->AddFrame( fCompOpt, fL6 );
-    fGroupOptRun = new TGGroupFrame( fCompOpt, "run options", kHorizontalFrame );
+    fGroupOptRun = new TGGroupFrame( fCompOpt, "autorun options", kHorizontalFrame );
     fCompOpt->AddFrame( fGroupOptRun, fL4 );
     fLabelOptAutoRun = new TGLabel( fGroupOptRun, "timing delay (ms):" );
     fGroupOptRun->AddFrame( fLabelOptAutoRun, fL6 );
@@ -1986,7 +2016,7 @@ void VDisplay::defineGui()
     fGroupOptRun->AddFrame( fNEntryOInc, fL6 );
 
 // frame with display options
-    fGroupOptDis = new TGButtonGroup( fCompOpt, "display", kHorizontalFrame );
+    fGroupOptDis = new TGButtonGroup( fCompOpt, "coordinate system", kHorizontalFrame );
     fCompOpt->AddFrame( fGroupOptDis, fL4 );
 //  fChButtonColor = new TGCheckButton( fGroupOptDis, "&color scheme" , B_DCOLOR  );
 //  fChButtonColor->Associate( this );
@@ -2532,6 +2562,10 @@ void VDisplay::subprocessComboBox( Long_t parm1 )
         setCameraPads( false );
         fBoolDrawOne = false;
         fBoolDrawAllinOne = false;
+	if( fBool_M_OPT_COL_SCHE_Checked ) fMenuOpt->CheckEntry( M_OPT_COL_SCHE );
+	else                               fMenuOpt->UnCheckEntry( M_OPT_COL_SCHE );
+	if( fBool_M_OPT_BW_SCHE_Checked  ) fMenuOpt->CheckEntry( M_OPT_BW_SCHE );
+	else                               fMenuOpt->UnCheckEntry( M_OPT_BW_SCHE );
         setColorScheme();
 // check radio buttons for channel printings
         for( unsigned int i = 0; i < fTelescopesToShow.size(); i++ )
@@ -2547,7 +2581,9 @@ void VDisplay::subprocessComboBox( Long_t parm1 )
         for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ ) fTelescopesToShow.push_back( fEventLoop->getTeltoAna()[i] );
         fBoolDrawAllinOne = true;
 // color scheme not possible for all in one
+        if( fMenuOpt->IsEntryChecked( M_OPT_COL_SCHE ) ) fBool_M_OPT_COL_SCHE_Checked = true;
         fMenuOpt->UnCheckEntry( M_OPT_COL_SCHE );
+	if( fMenuOpt->IsEntryChecked( M_OPT_BW_SCHE ) ) fBool_M_OPT_BW_SCHE_Checked = true;  
         fMenuOpt->UnCheckEntry( M_OPT_BW_SCHE );
         setColorScheme();
     }

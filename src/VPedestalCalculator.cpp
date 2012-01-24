@@ -267,7 +267,8 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
                     if( !getDead()[chanID] && chanID < fpedcal_mean[telID].size() )
                     {
                         fReader->selectHitChan(i);
-                        fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[chanID], getPedrms()[chanID], chanID, getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
+                        fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[chanID], getPedrms()[chanID], chanID, i,
+			                         getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
 // loop over all summation windows
                         unsigned int iTempSW = fpedcal_mean[telID][chanID].size();
                         if( getRunParameter()->fsumwindow[telID] < (int)iTempSW ) iTempSW = getRunParameter()->fsumwindow[telID];

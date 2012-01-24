@@ -156,13 +156,7 @@ VFitTraceHandler::~VFitTraceHandler()
 }
 
 
-void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int chanID )
-{
-    setTrace( iReader, iNSamples, ped, pedrms, chanID );
-}
-
-
-void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int iChanID, double iHiLo )
+void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSamples, double ped, double pedrms, unsigned int iChanID, unsigned int iHitID, double iHiLo )
 {
     fPed = ped;
     fPedrms = pedrms;
@@ -179,10 +173,10 @@ void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSam
         fpTrace.clear();
         for( unsigned int i = 0; i < iNSamples; i++ )
 	{
-	   fpTrace.push_back( iReader->getSample_double( iChanID, i+fMC_FADCTraceStart, (i==0) ) );
+	   fpTrace.push_back( iReader->getSample_double( iHitID, i+fMC_FADCTraceStart, (i==0) ) );
         }
     }
-    else for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace[i] = iReader->getSample_double( iChanID, i+fMC_FADCTraceStart, (i==0) );
+    else for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace[i] = iReader->getSample_double( iHitID, i+fMC_FADCTraceStart, (i==0) );
 
     fpTrazeSize = int(fpTrace.size());
     if( iHiLo > 0. )
@@ -193,7 +187,6 @@ void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSam
     else fHiLo = false;
 
     fitTrace( iChanID );
-
 }
 
 
@@ -336,11 +329,11 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
         fTraceMax =  fF1Trace->GetMinimum( (double)0., (double)fMaxSamples );
         fTraceMaxX = fF1Trace->GetMinimumX( (double)0., (double)fMaxSamples );
 // status of the error matrix
-        double edm;
-        double amin;
-        double errdef;
-        int nvpar;
-        int nparx;
+        double edm = 0.;
+        double amin = 0.;
+        double errdef = 0.;
+        int nvpar = 0;
+        int nparx = 0;
         gMinuit->mnstat( amin, edm, errdef, nvpar, nparx, fnstat );
         if( fnstat < 3 ) fH1Trace->SetLineStyle( 2 );
         fHfitstat->Fill( fnstat );

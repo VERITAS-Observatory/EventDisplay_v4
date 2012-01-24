@@ -287,6 +287,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fUseFixedThresholds = true;
         }
+        else if( iTemp.find( "usesignalnoisethresholds" ) < iTemp.size() )
+        {
+            fRunPara->fUseFixedThresholds = false;
+        }
         else if( iTemp.find( "usetimecleaning" ) < iTemp.size() )  // HP
         {
             fRunPara->fUseTimeCleaning = true;
@@ -1337,20 +1341,21 @@ void VReadRunParameter::printHelp()
 
     cout << "Image cleaning and calculation:" << endl;
     cout << "-------------------------------" << endl;
-    cout << "\t -useFixedThresholds \t\t\t use fixed image/border thresholds (default: off, use multiples of pedestal variations)" << endl;
-    cout << "\t -imagethresh=FLOAT \t\t\t image threshold (default=" << fRunPara->fimagethresh[0] << ")" << endl;
-    cout << "\t -borderthresh=FLOAT \t\t\t border threshold (default=" << fRunPara->fborderthresh[0] << ")" << endl;
+    cout << "\t -useSignalNoiseThresholds \t\t use use multiples of pedestal variations (default: on)" << endl;
+    cout << "\t -useFixedThresholds \t\t\t use fixed image/border thresholds (default: off)" << endl;
+    cout << "\t -imagethresh=FLOAT \t\t\t image threshold (default=" << fRunPara->fimagethresh[0] << ", units depend on cleaning method)" << endl;
+    cout << "\t -borderthresh=FLOAT \t\t\t border threshold (default=" << fRunPara->fborderthresh[0] << ", units depend on cleaning method)" << endl;
     cout << "\t -brightnonimage=FLOAT \t\t\t bright non image threshold (default=" << fRunPara->fbrightnonimagetresh[0] << ")" << endl;
     cout << "\t -useTimeCleaning \t\t\t use advanced time cleaning (default: off)" << endl; //HP
-    cout << "\t -timecutpixel=FLOAT \t\t\t time cut between pixels (default=" << fRunPara->ftimecutpixel[0] << ")" << endl; //HP
-    cout << "\t -timecutcluster=FLOAT \t\t\t time cut between cluster (default=" << fRunPara->ftimecutcluster[0] << ") " << endl; //HP
-    cout << "\t -minpixelcluster=INT \t\t\t minimum number of pixels in cluster (default=" << fRunPara->fminpixelcluster[0] << ")" << endl; //HP
-    cout << "\t -loops=INT \t\t\t\t number of loops for border pixel finding (default=" << fRunPara->floops[0] << ")" << endl; //HP
+    cout << "\t\t -timecutpixel=FLOAT \t\t\t time cut between pixels (default=" << fRunPara->ftimecutpixel[0] << ")" << endl; //HP
+    cout << "\t\t -timecutcluster=FLOAT \t\t\t time cut between cluster (default=" << fRunPara->ftimecutcluster[0] << ") " << endl; //HP
+    cout << "\t\t -minpixelcluster=INT \t\t\t minimum number of pixels in cluster (default=" << fRunPara->fminpixelcluster[0] << ")" << endl; //HP
+    cout << "\t\t -loops=INT \t\t\t\t number of loops for border pixel finding (default=" << fRunPara->floops[0] << ")" << endl; //HP
     cout << "\t -smoothdead \t\t\t\t smooth over dead pixels" << endl;
     cout << "\t -logl=0/1/2 \t\t\t\t perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)" << endl;
     cout << "\t -loglminloss=FLOAT \t\t\t perform loglikelihood image parameterisation for images with loss > values (default=off=1.)" << endl;
     cout << "\t -fuifactor=FLOAT \t\t\t fraction of image/border pixel under image ellipse fact (default=" << fRunPara->fImageAnalysisFUIFactor << ")" << endl;
-    cout << "\t -padrun=RUN \t\t\t\t padding run number" << endl;
+    cout << "\t -padrun=RUN \t\t\t\t padding run number (use with care)" << endl;
     cout << endl;                                 // MS
 
     cout << "Parallaxwidth calculation"<<endl;    // MS

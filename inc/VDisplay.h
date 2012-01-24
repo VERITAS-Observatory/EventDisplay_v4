@@ -117,6 +117,8 @@ class VDisplay : public TGMainFrame
         TGPopupMenu *fMenuPrint;
         TGPopupMenu *fMenuCalib;
         TGPopupMenu *fMenuOpt;
+	bool   fBool_M_OPT_COL_SCHE_Checked;
+	bool   fBool_M_OPT_BW_SCHE_Checked;
         TGCompositeFrame *fFrameControl;
         TGHorizontalFrame *fHorizontalEvent;
         TGTextButton *fButtonNext;
