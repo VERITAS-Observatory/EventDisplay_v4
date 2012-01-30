@@ -30,6 +30,9 @@ class VMonteCarloRateCalculator : public VPlotUtilities
         unsigned int fnrates;
         double fMCrate[1000];
 
+	vector< double > fenergy;
+	vector< double > feffectiveArea;
+
         void getMinMaxRates( unsigned int n, double *r, double &i_mean, double &i_min, double &i_max );
 
     public:
@@ -38,8 +41,10 @@ class VMonteCarloRateCalculator : public VPlotUtilities
         virtual ~VMonteCarloRateCalculator() {}
 
 // fill rates
-        double getMonteCarloRate( int nbins, double *e0, double *eff, double i_gamma, double i_phi, double iE0 = 1., double iEMin = 1.e-20, double iEMax = 1.e20, double bDebug = false );
-        double getMonteCarloRate( vector< double > e, vector< double > eff, double i_gamma, double i_phi, double iE0 = 1., double iEMin = 1.e-20, double iEMax = 1.e20, bool bDebug = false );
+        double getMonteCarloRate( int nbins, double *e0, double *eff, double i_gamma, double i_phi, double iE0 = 1.,
+	                          double iEMin = 1.e-20, double iEMax = 1.e20, double bDebug = false );
+        double getMonteCarloRate( vector< double >& e, vector< double >& eff, double i_gamma, double i_phi, double iE0 = 1., 
+	                          double iEMin = 1.e-20, double iEMax = 1.e20, bool bDebug = false );
         double getMonteCarloRate( int nbins, double *e0, double *eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 	                          double iEMinBin, double iEMaxBin, bool bDebug = false );
         double getMonteCarloRate( vector< double > e, vector< double > eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,

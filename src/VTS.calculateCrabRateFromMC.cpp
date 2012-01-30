@@ -43,6 +43,7 @@ int main( int argc, char *argv[] )
 // energy threshold
     double fEnergyThreshold = atof( argv[3] );
     cout << "energy threshold: " << fEnergyThreshold << " TeV" << endl;
+    if( fEnergyThreshold < 1.e-2 ) fEnergyThreshold = 1.e-2; // take care of log(fEnergyThreshold)
 
     double ze = 0.;
     int az = 0;
@@ -80,13 +81,15 @@ int main( int argc, char *argv[] )
 // Crab Nebula Spectra
     vector< unsigned int > fID;
     fID.push_back( 1 );                           // Whipple
-    fID.push_back( 2 );                           // H.E.S.S.
+/*    fID.push_back( 2 );                           // H.E.S.S.
     fID.push_back( 5 );                           // HEGRA
-    fID.push_back( 6 );                           // MAGIC
+    fID.push_back( 6 );                           // MAGIC */
     vector< VEnergySpectrumfromLiterature* > fESpecFun;
     char hname[2000];
-    sprintf( hname, "%s/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", VGlobalRunParameter::getDirectory_EVNDISPAnaData().c_str() );
+    VGlobalRunParameter *fRunParameter = new VGlobalRunParameter();
+    sprintf( hname, "%s/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", fRunParameter->getDirectory_EVNDISPAnaData().c_str() );
     VEnergySpectrumfromLiterature *fESpec = new VEnergySpectrumfromLiterature( hname );
+    if( fESpec->isZombie() ) exit( -1 );
     for( unsigned int i = 0; i < fID.size(); i++ )
     {
         fESpecFun.push_back( fESpec );
@@ -112,24 +115,36 @@ int main( int argc, char *argv[] )
     cout << "reading " << c->fChain->GetEntries() << " effective areas " << endl;
 
 // loop over all effective areas and calculate expected rates
-    for( unsigned int i = 0; i < c->fChain->GetEntries(); i++ )
+    unsigned int iN = c->fChain->GetEntries();
+    for( unsigned int i = 0; i < iN; i++ )
     {
         c->GetEntry( i );
 
         if( TMath::Abs( c->index - index ) > 1.e-2 ) continue;
+	if( i % 5000  == 0 ) cout << "now at entry " << i << endl;
 
-        ze = c->ze;
-        az = c->az;
-        Woff = c->Woff;
-        noise = c->noise;
+        ze     = c->ze;
+        az     = c->az;
+        Woff   = c->Woff;
+        noise  = c->noise;
         pedvar = c->pedvar;
 
-        nrates = fESpecFun.size();
-        for( unsigned int t = 0; t < fESpecFun.size(); t++ )
-        {
-            MCrate[t] = fMCR->getMonteCarloRate( c->nbins, c->e0, c->eff, fESpecFun[t], fID[t], fEnergyThreshold, 1.e7, bDebug );
-            if( bDebug ) cout << "MC Rate " << ze << "\t" << MCrate[t] << endl;
+	vector< double > fenergy;
+	vector< double > feffectivearea;
+	for( int e = 0; e < c->nbins; e++ )
+	{
+	   fenergy.push_back( c->e0[e] );
+	   feffectivearea.push_back( c->eff[e] );
         }
+
+// hardwire Whipple spectrum (much faster than outer functino call)
+	nrates = 1;
+        MCrate[0] = fMCR->getMonteCarloRate( fenergy, feffectivearea, -2.440, 3.250e-11, 1., fEnergyThreshold, 1.e7, bDebug );
+/*        for( unsigned int t = 0; t < fESpecFun.size(); t++ )
+        {
+            MCrate[t] = fMCR->getMonteCarloRate( fenergy, feffectivearea, fESpecFun[t], fID[t], fEnergyThreshold, 1.e7, bDebug );
+            if( bDebug ) cout << "MC Rate " << ze << "\t" << MCrate[t] << endl;
+        }   */
         fMC->Fill();
     }
     cout << endl;

@@ -95,7 +95,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 
 // calibration (pedestals, gains, etc.)
 	bool   fcalibrationrun;                   // true if this is a pedestal/gain/toff calculation run
-        string fcalibrationfile;                  // file with all file names for calibration
+        string fcalibrationfile;                  // file with file names for calibration
+	string fLowGainCalibrationFile;           // file with file name for low-gain calibration 
         vector< int > fGainFileNumber;
         vector< int > fTOffFileNumber;
         vector< int > fPedFileNumber;
@@ -231,6 +232,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,108);
+        ClassDef(VEvndispRunParameter,109);
 };
 #endif

@@ -61,6 +61,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fcamera.push_back( "veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg" );
     fCalibrationDataType = 1;  // should be 0 for e.g. CTA DSTs
     fcalibrationfile = "";
+    fLowGainCalibrationFile = "";
     fcalibrationrun = false;
     fLaserSumMin = 50000.;
     fGainFileNumber.push_back( 0 );
@@ -319,6 +320,7 @@ void VEvndispRunParameter::print( int iEv )
     if( frunmode == 4 ) cout << "dstfile: " << fdstfile << " (mintubes: " << fdstminntubes << ")" << endl;
     cout << endl;
     if( fcalibrationfile.size() > 0 )         cout << "calibration file: " << fcalibrationfile << endl;
+    if( fLowGainCalibrationFile.size() > 0 )  cout << "calibration file (low gain): " << fLowGainCalibrationFile << endl;
     else if( frunmode != 2 && frunmode != 5 && !fIsMC ) cout << "reading laser/flasher run numbers from database" << endl;
     if( frunmode == 2 ) cout << "lasermin: " << fLaserSumMin << endl;
     if( ( fsourcetype == 1 || fsourcetype == 2 || fsourcetype == 5 ) && fsimu_pedestalfile.size() > 0 )

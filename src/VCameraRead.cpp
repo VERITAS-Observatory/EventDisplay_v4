@@ -690,7 +690,8 @@ void VCameraRead::print( bool bDetailed )
         cout << "Focal length: " << fMirFocalLength[i] << " [m], ";
         cout << "FOV: " << fCameraFieldofView[i] << " [deg], ";
         cout << "NChannel: " << fCNChannels[i] << ", ";
-        cout << "NSamples: " << fCNSamples[i] << endl;
+// number of samples are determined with the first event, possible not known yet
+//        cout << "NSamples: " << fCNSamples[i] << endl;
         if( fXTube.size() > 0 )
         {
 	    if( bDetailed )

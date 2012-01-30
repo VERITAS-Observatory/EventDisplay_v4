@@ -59,6 +59,7 @@ class VCalibrator : public VImageBaseAnalyzer
         TTree* fillToffTree( unsigned int tel );
         void getCalibrationRunNumbers();
 	int  getCalibrationRunNumbers_fromCalibFile();
+	int  getLowGainCalibrationRunNumbers_fromCalibFile();
 	string getCalibrationFileName( int iTel, int irun, string iSuffix );
         void readCalibrationData( bool iPeds, bool iGains );
         bool readCalibrationData( string iSourceFile );

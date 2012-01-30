@@ -1247,6 +1247,7 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
     return true;
 }
 
+
 string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix )
 {
    if( irun <= 0 ) return "";
@@ -1412,7 +1413,8 @@ void VCalibrator::initialize()
     {
         setTelID( i );
 
-	fCalData.push_back( new VCalibrationData( i, fRunPar->getDirectory_EVNDISPCalibrationData(), fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i] ));
+	fCalData.push_back( new VCalibrationData( i, fRunPar->getDirectory_EVNDISPCalibrationData(), 
+	                                          fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i] ));
         fCalData.back()->setSumWindows( getSumWindow( i ), getSumWindowSmall( i ) );
 
         fNumberPedestalEvents.push_back( 0 );
@@ -1426,7 +1428,8 @@ void VCalibrator::initialize()
 // read the calibration files
     if( fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 4 )
     {
-        readCalibrationData( (fRunPar->frunmode != 1 && fRunPar->frunmode != 6 ), ( fRunPar->frunmode != 2 && fRunPar->frunmode != 1 && fRunPar->frunmode != 6 ) );
+        readCalibrationData( ( fRunPar->frunmode != 1 && fRunPar->frunmode != 6 ),
+	                     ( fRunPar->frunmode != 2 && fRunPar->frunmode != 1 && fRunPar->frunmode != 6 ) );
     }
 // PE mode: set gains to 1
     else
@@ -1473,7 +1476,12 @@ void VCalibrator::setCalibrationFileNames()
    }
 }
 
+/*
 
+    getting calibration run numbers
+
+    ped, gains, toffs (high and low gain)
+*/
 void VCalibrator::getCalibrationRunNumbers()
 {
     if( fDebug ) cout << "VCalibrator::getCalibrationRunNumbers()" << endl;
@@ -1494,7 +1502,12 @@ void VCalibrator::getCalibrationRunNumbers()
        iCaliLines = getCalibrationRunNumbers_fromCalibFile();
        if( iCaliLines > 0 ) setCalibrationFileNames();
     }
-    
+    int iLowGainCaliLines = 0;
+    if( getRunParameter()->fLowGainCalibrationFile.size() > 0 )
+    {
+       iLowGainCaliLines = getLowGainCalibrationRunNumbers_fromCalibFile();
+       if( iLowGainCaliLines > 0 ) setCalibrationFileNames();
+    }
 
 // take pedestals from grisu output file ('P'-lines), gains=1, and toff = 0.
     if( iCaliLines == 0 &&  (fReader->getDataFormat() == "grisu" || getRunParameter()->fsimu_pedestalfile.size() > 0 )  )
@@ -1518,7 +1531,11 @@ void VCalibrator::getCalibrationRunNumbers()
             for( unsigned int i = 0; i < getNTel(); i++ ) fPedFileNameC[i] = "";
         }
 // calibration run numbers are taken from DB
-	else if( getRunParameter()->fsimu_pedestalfile.size() == 0 && getRunParameter()->fuseDB && getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 && getRunParameter()->frunmode != 1 && getRunParameter()->frunmode != 6 )
+	else if( getRunParameter()->fsimu_pedestalfile.size() == 0 &&
+	         getRunParameter()->fuseDB && getRunParameter()->frunmode != 2 &&
+		 getRunParameter()->frunmode != 5 &&
+		 getRunParameter()->frunmode != 1 &&
+		 getRunParameter()->frunmode != 6 )
 	{
             cout << "VCalibrator::getCalibrationRunNumbers() info: using laser file number from DB" << endl;
 	}
@@ -1551,8 +1568,87 @@ void VCalibrator::getCalibrationRunNumbers()
     }
     cout << endl;
     
-
     return;
+}
+
+int VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile()
+{
+    int iLinesFound = 0;
+// open file with calibration information
+    string is_Temp;
+    is_Temp = fRunPar->getDirectory_EVNDISPCalibrationData();
+    is_Temp += getRunParameter()->fLowGainCalibrationFile;
+    ifstream is;
+    is.open( is_Temp.c_str(), ifstream::in);
+    if( !is )
+    {
+        cout << "VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile: error, calibration data file not found: ";
+        cout <<  is_Temp << endl;
+        exit( -1 );
+    }
+
+    string is_line;
+    int iRunMin = 0;
+    int iRunMax = 0;
+    int iTel = -1;
+
+    string iLowGainPeds;
+    for( unsigned int i = 0; i < fBlockTel.size(); i++ ) fBlockTel[i] = false;
+
+    while( getline( is, is_line ) )
+    {
+        if(  is_line.size() > 0 )
+        {
+            istringstream is_stream( is_line );
+// only line with '*' as first characters are valid lines
+            is_stream >> is_Temp;
+            if( is_Temp != "*" ) continue;
+
+	    if( is_stream.eof() ) continue;
+	    is_stream >> is_Temp;
+	    if( is_Temp == "LOWGAINPED" )
+	    {
+	       if( is_stream.eof() ) continue;
+	       is_stream >> iTel;
+	       iTel--;              // internal counting starts at 0
+	       if( is_stream.eof() ) continue;
+	       is_stream >> iRunMin;
+	       if( is_stream.eof() ) continue;
+	       is_stream >> iRunMax;
+// check run number range
+               if( getRunNumber() >= iRunMin && getRunNumber() <= iRunMax )
+	       {
+	          cout << "reading low-gain pedestal run numbers for run range " << iRunMin << ", " << iRunMax << endl;
+	          if( is_stream.eof() ) continue;
+		  is_stream >> iLowGainPeds;
+		  iLinesFound++;
+		  if( iTel < 0 )
+		  {
+		     for( unsigned int i = 0; i < getNTel(); i++ )
+		     {
+		        if( !fBlockTel[i] )
+			{
+			   if( atoi( iLowGainPeds.c_str() ) > 0 )
+			   {
+			      getRunParameter()->fPedLowGainFileNumber[i] = atoi( iLowGainPeds.c_str() );
+                           }
+                        }
+                     }
+                  }
+		  else if( iTel < (int)getNTel() )
+		  {
+		    if( atoi( iLowGainPeds.c_str() ) > 0 )
+		    {
+		       getRunParameter()->fPedLowGainFileNumber[iTel] = atoi( iLowGainPeds.c_str() );
+		       fBlockTel[iTel] = true;
+                    }
+                  }
+              }
+           }
+        }
+   }
+
+   return iLinesFound;
 }
 
 
@@ -1574,7 +1670,7 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 
     string is_line;
     string iPed, iPad, iGain, iToff, iPix, iLowGainPeds, iLowGainMultiplier, iLowGainGains, iLowGainToff;
-    int iTel;
+    int iTel = 0;
     int iCaliLines = 0;
     bool bReset = false;
     while( getline( is, is_line ) )
@@ -1584,14 +1680,14 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
             istringstream is_stream( is_line );
 // only line with '*' as first characters are valid lines
             is_stream >> is_Temp;
-            if( is_Temp != "*" && is_Temp != "*V2" && is_Temp != "*V3" && is_Temp != "*V4" ) continue;
+            if( is_Temp != "*" && is_Temp != "*V1" && is_Temp != "*V2" && is_Temp != "*V3" && is_Temp != "*V4" ) continue;
 
 // get version number
-            if( is_Temp == "*V2" ) fCalibrationfileVersion = 2;
+            if( is_Temp == "*V2" )      fCalibrationfileVersion = 2;
             else if( is_Temp == "*V3" ) fCalibrationfileVersion = 3;
             else if( is_Temp == "*V4" ) fCalibrationfileVersion = 4;
 
-// get run number
+// get and check run number
             is_stream >> is_Temp;
             if( atoi( is_Temp.c_str() ) != getRunNumber() ) continue;
             iCaliLines++;

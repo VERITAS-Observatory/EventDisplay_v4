@@ -180,7 +180,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fsimu_pedestalfile_DefaultPed = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
 // calibration file
-        else if( iTemp.find( "calibrationfi" ) < iTemp.size() )
+        else if( iTemp.find( "calibrationfi" ) < iTemp.size() && !(iTemp.find( "lowgain" ) < iTemp.size() )  )
         {
             if( iTemp2.size() > 0 )
             {
@@ -188,6 +188,15 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
                 i++;
             }
             else  fRunPara->fcalibrationfile = "";
+        }
+	else if( iTemp.find( "lowgaincalibrationfile" ) )
+	{
+	   if( iTemp2.size() > 0 )
+	   {
+	      fRunPara->fLowGainCalibrationFile = iTemp2;
+	      i++;
+           }
+	   else fRunPara->fLowGainCalibrationFile = "";
         }
         else if( iTemp.find( "arraycuts" ) < iTemp.size() || iTemp.find( "recopara" ) < iTemp.size() || iTemp.find( "reconstructionparameter" ) < iTemp.size() )
         {
@@ -874,8 +883,10 @@ void VReadRunParameter::test_and_adjustParams()
 // reading low gain pedestals
 	   else
 	   {
-	      if( i >= fRunPara->fPedLowGainFileNumber.size() ) fRunPara->fPedLowGainFileNumber.push_back( 36862 );
-	      else                                              fRunPara->fPedLowGainFileNumber[i] = 36862;
+//	      if( i >= fRunPara->fPedLowGainFileNumber.size() ) fRunPara->fPedLowGainFileNumber.push_back( 36862 );
+//	      else                                              fRunPara->fPedLowGainFileNumber[i] = 36862;
+	      if( i >= fRunPara->fPedLowGainFileNumber.size() ) fRunPara->fPedLowGainFileNumber.push_back( 0 );
+	      else                                              fRunPara->fPedLowGainFileNumber[i] = 0;
            }
         }
 	if( i >= fRunPara->fLowGainMultiplierFileNumber.size() ) fRunPara->fLowGainMultiplierFileNumber.push_back( 0 );
@@ -1280,7 +1291,8 @@ void VReadRunParameter::printHelp()
 
     cout << "Calibration:" << endl;
     cout << "------------" << endl;
-    cout << "\t -calibrationfile FILENAME \t\t file with names of pedestal/gain/toffset/pixel status files (assume path ../data/calibration/calib.dat)" << endl;
+    cout << "\t -calibrationfile FILENAME \t\t file with names of pedestal/gain/toffset/pixel status files (assume path $EVNDATA/calibration/)" << endl;
+    cout << "\t -lowgaincalibrationfile FILENAME \t file with names for pedestals and high/low gain multiplier files (assume path $EVNDATA/calibration/)" << endl;
     cout << "\t -gaincorrection=FLOAT \t\t\t apply correction to gains (default=1)" << endl;
     cout << "\t -usepeds \t\t\t\t use only true pedestal events (event type=2; use -donotusepeds to switch it off)" << endl;
     cout << "\t -lasermin=INT \t\t\t\t minimal total charge sum for a event to be a laser event (default=" << fRunPara->fLaserSumMin << ")" << endl;

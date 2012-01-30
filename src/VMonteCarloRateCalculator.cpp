@@ -55,23 +55,23 @@ double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double *e, doubl
                                                      double i_gamma, double i_phi,
 						     double iE0, double iEMin, double iEMax, double bDebug )
 {
-    if( nbins <= 2 || e == 0 || eff == 0 ) return 0.;
+   if( nbins <= 2 || e == 0 || eff == 0 ) return 0.;
 
-    vector< double > energy;
-    vector< double > effectiveArea;
-    for( int i = 0; i < nbins; i++ )
-    {
-        energy.push_back( e[i] );
-        effectiveArea.push_back( eff[i] );
-    }
-    return getMonteCarloRate( energy, effectiveArea, i_gamma, i_phi, iE0, iEMin, iEMax, bDebug );
+   fenergy.clear();
+   feffectiveArea.clear(); 
+   for( int i = 0; i < nbins; i++ )
+   {
+        fenergy.push_back( e[i] );
+        feffectiveArea.push_back( eff[i] );
+   } 
+   return getMonteCarloRate( fenergy, feffectiveArea, i_gamma, i_phi, iE0, iEMin, iEMax, bDebug );
 }
 
 
 /*
-   energy in log10
+   energy vector in log10
 */
-double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
+double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector< double >& eff,
                                                      double i_gamma, double i_phi,
 						     double iE0, double iEMin, double iEMax, bool bDebug )
 {
@@ -241,6 +241,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 						     unsigned int iEMinBin, unsigned int iEMaxBin, bool bDebug )
 {
+   cout << "A " << iEMinBin << "\t" << iEMaxBin << endl;
    return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, 0., 0., bDebug );
 }
 
@@ -258,6 +259,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     if( iEMinBin > e.size() ) return 0.;
 // adjust maximum bin
     if( iEMaxBin > e.size() - 1 ) iEMaxBin = e.size() - 1;
+   cout << "B " << iEMinBin << "\t" << iEMaxBin << endl;
 
     if( e.size() != eff.size() )
     {
