@@ -653,10 +653,12 @@ void VStarCatalogue::printStarsInFOV( double iMinBrightness, string iBand )
         if( iBand == "V" && fStarsinFOV[i].fBrightness_V > iMinBrightness ) continue;
         if( iBand == "B" && fStarsinFOV[i].fBrightness_B > iMinBrightness ) continue;
 
-        cout << fStarsinFOV[i].fStarID << "\t" << fStars[i].fStarName << "\t" << fStarsinFOV[i].fRA2000 << "\t" << fStarsinFOV[i].fDec2000 << "\t";
-        cout << fStarsinFOV[i].fRACurrentEpoch << "\t" << fStarsinFOV[i].fDecCurrentEpoch << "\t" << fStarsinFOV[i].fBrightness_V;
-        cout << "\t" << fStarsinFOV[i].fBrightness_B;
-        cout << "\t" << fStars[i].fMajorDiameter << endl;
+        cout << fStarsinFOV[i].fStarID << "\t" << fStars[i].fStarName;
+	cout << "  RA2000: " << fStarsinFOV[i].fRA2000 << "  DEC2000: " << fStarsinFOV[i].fDec2000 << "\t";
+        cout << fStarsinFOV[i].fRACurrentEpoch << "\t" << fStarsinFOV[i].fDecCurrentEpoch;
+	cout << " V: " << fStarsinFOV[i].fBrightness_V;
+        cout << " B: " << fStarsinFOV[i].fBrightness_B;
+        cout << " Diameter: " << fStarsinFOV[i].fMajorDiameter << endl;
     }
 }
 
@@ -819,6 +821,48 @@ double VStarCatalogue::getStarSpectralIndex( unsigned int iID )
    if( iID < fStars.size() ) return fStars[iID].fSpectralIndex;
 
    return 0.;
+}
+
+unsigned int VStarCatalogue::setFOV( string ra_hour, string dec, double FOV_x, double FOV_y, bool bJ2000 )
+{
+   istringstream is_stream( ra_hour );
+   string temp2;
+
+   double d_tt = 0.;
+   is_stream >> temp2;
+   d_tt += atof( temp2.c_str() );
+   if( !is_stream.eof() )
+   {
+      is_stream >> temp2;
+      d_tt += atof( temp2.c_str() ) / 60.;
+   }
+   if( !is_stream.eof() )
+   {
+      is_stream >> temp2;
+      d_tt += atof( temp2.c_str() ) / 3600.;
+   }
+   double iSkyMapCentreRAJ2000 = d_tt / 24. * 360.;
+
+   istringstream is_dec( dec );
+
+   d_tt = 0.;
+   is_dec >> temp2;
+   d_tt += atof( temp2.c_str() );
+   if( !is_dec.eof() )
+   {
+      is_dec >> temp2;
+      d_tt += atof( temp2.c_str() ) / 60.;
+   }
+   if( !is_dec.eof() )
+   {
+      is_dec >> temp2;
+      d_tt += atof( temp2.c_str() ) / 3600.;
+   }
+   double iSkyMapCentreDecJ2000 = d_tt;
+
+   cout << "FOV Centre in deg: " << iSkyMapCentreRAJ2000 << "\t" << iSkyMapCentreDecJ2000 << endl;
+
+   return setFOV( iSkyMapCentreRAJ2000, iSkyMapCentreDecJ2000, FOV_x, FOV_y, bJ2000 );
 }
 
 

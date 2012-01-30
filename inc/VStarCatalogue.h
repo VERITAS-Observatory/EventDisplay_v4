@@ -109,9 +109,10 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
         void          printStarsInFOV( double iMinBrightness, string iBand = "B" );
         void          purge();
         bool          readVERITASsources( string );
-        unsigned int  setFOV( double ra, double dec, double FOV_x, double FOV_y, bool bJ2000 );
+        unsigned int  setFOV( double ra_deg, double dec_deg, double FOV_x, double FOV_y, bool bJ2000 = true );
+        unsigned int  setFOV( string ra_hour, string dec, double FOV_x, double FOV_y, bool bJ2000 = true );
         bool          writeCatalogueToRootFile( string iRootFile );
 
-        ClassDef(VStarCatalogue,2);
+        ClassDef(VStarCatalogue,3);
 };
 #endif
