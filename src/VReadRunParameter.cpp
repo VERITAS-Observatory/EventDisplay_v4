@@ -87,7 +87,8 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fShowPhotoDiode = true;
         }
 // camera
-        else if( iTemp.find( "camera" ) < iTemp.size() && !(iTemp.find( "cameradirectory" ) < iTemp.size() ) && !(iTemp.find( "cameracoordinatetransformx" ) < iTemp.size() )  && !(iTemp.find( "cameracoordinatetransformy" ) < iTemp.size() )  )
+        else if( iTemp.find( "camera" ) < iTemp.size() && !(iTemp.find( "cameradirectory" ) < iTemp.size() )
+	    && !(iTemp.find( "cameracoordinatetransformx" ) < iTemp.size() )  && !(iTemp.find( "cameracoordinatetransformy" ) < iTemp.size() )  )
         {
 // reading iTemp1, to get upper/lower cases right
             fRunPara->fcamera[0] = iTemp1.substr( iTemp1.rfind( "=" )+1, iTemp1.size() );
@@ -189,7 +190,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
             else  fRunPara->fcalibrationfile = "";
         }
-	else if( iTemp.find( "lowgaincalibrationfile" ) )
+	else if( iTemp.find( "lowgaincalibrationfile" ) < iTemp.size() )
 	{
 	   if( iTemp2.size() > 0 )
 	   {
@@ -228,7 +229,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fdstminntubes = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
 // calculate pedestal variations on a short time scale for tracking tests
-        else if( iTemp.find( "pedestalsintimeslices" ) < iTemp.size() && !(iTemp.find( "pedestalsintimeslicessumwindow" ) < iTemp.size() ) && !(iTemp.find( "pedestalsintimeslicessumfirst" ) < iTemp.size() ) && !( iTemp.find( "usepedestalsintimeslices" ) < iTemp.size() ) && !(iTemp.find( "usepedestalsintimesliceslowgain" ) < iTemp.size() ) )
+        else if( iTemp.find( "pedestalsintimeslices" ) < iTemp.size() && !(iTemp.find( "pedestalsintimeslicessumwindow" ) < iTemp.size() ) 
+	    && !(iTemp.find( "pedestalsintimeslicessumfirst" ) < iTemp.size() )
+	    && !( iTemp.find( "usepedestalsintimeslices" ) < iTemp.size() )
+	    && !(iTemp.find( "usepedestalsintimesliceslowgain" ) < iTemp.size() ) )
         {
             fRunPara->fPedestalsInTimeSlices = true;
             fRunPara->fUsePedestalsInTimeSlices = true;
@@ -576,7 +580,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->floopmode = true;
         }
-        else if( iTemp.find( "-printoutputfile" ) < iTemp.size() )
+        else if( iTemp.find( "printoutputfile" ) < iTemp.size() )
         {
             fPrintOutputFile = true;
         }
