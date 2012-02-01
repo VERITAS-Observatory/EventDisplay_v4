@@ -329,6 +329,9 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     {
         fXcore =  -999999.;
 	fYcore =  -999999.;
+	fEventCounter++;
+	fEventStatus = false;
+	if( fDebug > 1 ) cout << "\t RECONSTRUCTED CORE NAN" << endl;
 	return false;
     }
     fXoff = fshowerpars->Xoff[fMethod];
