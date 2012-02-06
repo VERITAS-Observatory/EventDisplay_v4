@@ -906,7 +906,7 @@ int VEventLoop::checkCuts()
         float muonSize, muonRadius, muonRSigma;   // muon Martin
         short int fLocalTrigger;
         float MCenergy;
-        unsigned short int ntubes, bad, nsat;
+        unsigned short int ntubes, bad, nlowgain, nsat;
         int muonValid;
 
         i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
@@ -923,6 +923,7 @@ int VEventLoop::checkCuts()
         i_tree.Branch( "phi", &phi, "phi/F" );
         i_tree.Branch( "cosphi", &cosphi, "cosphi/F" );
         i_tree.Branch( "sinphi", &sinphi, "sinphi/F" );
+        i_tree.Branch( "nlowgain", &nlowgain, "nlowgain/s" );
         i_tree.Branch( "nsat", &nsat, "nsat/s" );
         i_tree.Branch( "ntubes", &ntubes, "ntubes/s" );
         i_tree.Branch( "bad", &bad, "bad/s" );
@@ -948,6 +949,7 @@ int VEventLoop::checkCuts()
         sinphi = fAnalyzer->getImageParameters()->sinphi;
         ntubes = fAnalyzer->getImageParameters()->ntubes;
         nsat = fAnalyzer->getImageParameters()->nsat;
+	nlowgain = fAnalyzer->getImageParameters()->nlowgain;
         bad = fAnalyzer->getImageParameters()->bad;
         MCenergy = fAnalyzer->getImageParameters()->MCenergy;
         fLocalTrigger = fAnalyzer->getImageParameters()->fLocalTrigger;

@@ -115,12 +115,12 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
    }
 
 // saturated channels
-   if( iImageParameter->nsat > fLocalNLowGain_max[iMeth][iTelType] )
+   if( iImageParameter->nlowgain > fLocalNLowGain_max[iMeth][iTelType] )
    {
       iArrayCut = false;
       if( fDebug )
       {
-         cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: nsat cut: " << iImageParameter->nsat;
+         cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: nlowgain cut: " << iImageParameter->nlowgain;
 	 cout << " (" << fLocalNLowGain_max[iMeth][iTelType] << ")" << endl;
       }
    }

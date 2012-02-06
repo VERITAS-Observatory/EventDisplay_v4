@@ -5,7 +5,7 @@
 #define VDispTable_H
 
 #include "Cshowerpars.h"
-#include "CtparsShort.h"
+#include "Ctpars.h"
 
 #include "VDispTableReader.h"
 
@@ -55,7 +55,7 @@ class VDispTable
 	double fQC_Loss_max;
 
         bool prepareTraining( string );
-	bool isGoodEvent( CtparsShort* );                              // check quality cuts
+	bool isGoodEvent( Ctpars* );                              // check quality cuts
 
     public:
 

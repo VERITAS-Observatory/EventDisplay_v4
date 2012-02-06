@@ -81,6 +81,7 @@ class Ctpars
         UShort_t        ntrig;
         UShort_t        ntrig_per_patch;
         UShort_t        nsat;
+        UShort_t        nlowgain;
         UShort_t        bad;
         Float_t         max[3];
         UShort_t        index_of_max[3];
@@ -137,6 +138,7 @@ class Ctpars
         Int_t           ntrig;
         Int_t           ntrig_per_patch;
         Int_t           nsat;
+	Int_t		nlowgain;
         Int_t           bad;
         Double_t        max[3];
         Int_t           index_of_max[3];
@@ -207,6 +209,7 @@ class Ctpars
         TBranch        *b_ntrig;                  //!
         TBranch        *b_ntrig_per_patch;        //!
         TBranch        *b_nsat;                   //!
+        TBranch        *b_nlowgain;               //!
         TBranch        *b_bad;                    //!
         TBranch        *b_max;                    //!
         TBranch        *b_index_of_max;           //!
@@ -333,6 +336,8 @@ void Ctpars::Init(TTree *tree)
     if( fChain->GetBranchStatus( "ntubesBNI" ) ) fChain->SetBranchAddress("ntubesBNI", &ntubesBNI );
     else ntubesBNI = 0;
     fChain->SetBranchAddress("nsat",&nsat);
+    if( fChain->GetBranchStatus("nlowgain" ) ) fChain->SetBranchAddress("nlowgain",&nlowgain);
+    else nlowgain = 0;
     fChain->SetBranchAddress("max",max);
     fChain->SetBranchAddress("index_of_max",index_of_max);
     fChain->SetBranchAddress("asymmetry",&asymmetry);
@@ -386,8 +391,10 @@ Bool_t Ctpars::Notify()
         b_sinphi = 0;
     }
     if( fChain->GetBranchStatus( "ntubesBNI" ) ) b_ntubesBNI = fChain->GetBranch("ntubesBNI" );
-    else ntubesBNI = 0;
+    else b_ntubesBNI = 0;
     b_nsat = fChain->GetBranch("nsat");
+    if( fChain->GetBranchStatus( "nlowgain" ) ) b_nlowgain = fChain->GetBranch("nlowgain");
+    else b_nlowgain = 0;
     b_max = fChain->GetBranch("max");
     b_index_of_max = fChain->GetBranch("index_of_max");
     b_asymmetry = fChain->GetBranch("asymmetry");

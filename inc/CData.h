@@ -107,6 +107,7 @@ class CData
         Int_t           ntubes[MAXTEL];
         Int_t           ntubesBNI[MAXTEL];
         UShort_t        nsat[MAXTEL];
+        UShort_t        nlowgain[MAXTEL];
         Double_t        alpha[MAXTEL];
         Double_t        los[MAXTEL];
         Double_t        asym[MAXTEL];
@@ -226,6 +227,7 @@ class CData
         TBranch        *b_ntubes;                 //!
         TBranch        *b_ntubesBNI;              //!
         TBranch        *b_nsat;                   //!
+        TBranch        *b_nlowgain;               //!
         TBranch        *b_alpha;                  //!
         TBranch        *b_los;                    //!
         TBranch        *b_asym;                   //!
@@ -573,6 +575,11 @@ void CData::Init(TTree *tree)
         {
             for( int i = 0; i < MAXTEL; i++ ) nsat[i] = 0;
         }
+	if( fChain->GetBranchStatus( "nlowgain" ) ) fChain->SetBranchAddress( "nlowgain", nlowgain );
+	else
+        {
+            for( int i = 0; i < MAXTEL; i++ ) nlowgain[i] = 0;
+        }
         fChain->SetBranchAddress("ntubesBNI",ntubesBNI);
         fChain->SetBranchAddress("alpha",alpha);
         fChain->SetBranchAddress("los",los);
@@ -601,6 +608,7 @@ void CData::Init(TTree *tree)
             length[i] = 0.;
             ntubes[i] = 0;
             nsat[i] = 0;
+	    nlowgain[i] = 0;
             ntubesBNI[i] = 0;
             alpha[i] = 0.;
             los[i] = 0.;
@@ -779,7 +787,6 @@ Bool_t CData::Notify()
     b_width = fChain->GetBranch("width");
     b_length = fChain->GetBranch("length");
     b_ntubes = fChain->GetBranch("ntubes");
-//   if( fChain->GetBranchStatus( "ntubesBNI" ) ) b_ntubesBNI = fChain->GetBranch("ntubesBNI");
     b_ntubesBNI = fChain->GetBranch("ntubesBNI");
     b_alpha = fChain->GetBranch("alpha");
     b_los = fChain->GetBranch("los");

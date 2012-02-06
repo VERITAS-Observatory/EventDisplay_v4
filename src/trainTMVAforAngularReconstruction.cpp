@@ -23,7 +23,7 @@
 
 #include "Ctelconfig.h"
 #include "Cshowerpars.h"
-#include "CtparsShort.h"
+#include "Ctpars.h"
 #include "VCameraRead.h"
 #include "VDetectorTree.h"
 #include "VGlobalRunParameter.h"
@@ -234,7 +234,7 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
        iTreeName << "Tel_" << i+1 << "/tpars";
        TChain i_tparsTree( iTreeName.str().c_str() );
        i_tparsTree.Add( iInputFile.c_str(), 0 );
-       CtparsShort i_tpars( &i_tparsTree, true, 6, true );
+       Ctpars i_tpars( &i_tparsTree, true, 6, true );
 
        cout << "\t found tree " << iTreeName.str() << ", entries: " << i_showerpars.fChain->GetEntries() << ", ";
        cout << i_tpars.fChain->GetEntries() << endl;

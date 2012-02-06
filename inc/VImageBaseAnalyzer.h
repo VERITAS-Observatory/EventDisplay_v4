@@ -27,7 +27,6 @@ class VImageBaseAnalyzer : public VEvndispData
         bool setSpecialChannels();
         void timingCorrect();
         TTree* makeDeadChannelTree();
-        void printpedvardebug( unsigned int i, string iD, int iF = 0, int iL = 0 );
 
     public:
         VImageBaseAnalyzer() {}
@@ -35,6 +34,7 @@ class VImageBaseAnalyzer : public VEvndispData
 
         void  calcTCorrectedSums(int ,int);
         int   fillHiLo();                          //!< fill hi/low gain vector
+	int   fillSaturatedChannels();
         void  findDeadChans( bool iLowGain = false, bool iFirst = true );
         void  gainCorrect();
         float getPhotoDiodeMax();

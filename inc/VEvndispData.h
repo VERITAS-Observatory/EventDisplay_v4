@@ -418,6 +418,7 @@ class VEvndispData
         void                setTraceMax( unsigned int iChannel, double iS ) { fAnaData[fTelID]->fTraceMax[iChannel] = iS; }
         void                setTraceMax( double iV ) { fAnaData[fTelID]->fTraceMax= iV; }
         void                setTraceMax( valarray< double > iV ) { fAnaData[fTelID]->fTraceMax = iV; }
+        void                setTraceN255( unsigned int iS ) { fAnaData[fTelID]->fTraceN255 = iS; }
         void                setTraceN255( unsigned int iChannel, unsigned int iS ) { fAnaData[fTelID]->fTraceN255[iChannel] = iS; }
         void                setTraceRawMax( unsigned int iChannel, double iS ) { fAnaData[fTelID]->fRawTraceMax[iChannel] = iS; }
         void                setTraceRawMax( double iV ) { fAnaData[fTelID]->fRawTraceMax= iV; }

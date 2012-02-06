@@ -34,6 +34,7 @@ fi
 ############################################################################
 # FIXED PARAMETERS
 ARRAYCUTS="EVNDISP.reconstruction.runparameter"
+# ARRAYCUTS="EVNDISP.reconstruction.TMVA.runparameter"
 ############################################################################
 
 ARRAY=$1
@@ -105,7 +106,7 @@ do
    if  [ $NARRAY -gt 1 ]
    then
       echo "long queue"
-      qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+      qsub -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    else
       echo "short queue"
       qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"

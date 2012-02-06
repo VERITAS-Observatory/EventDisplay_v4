@@ -90,7 +90,8 @@ class VImageParameter
         unsigned short int ntubesBrightNoImage;   //!< number of tubes which are bright but not in the image
         unsigned short int ntrig;                 //!< number of tubes triggering their CFD
         unsigned short int ntrig_per_patch;       //!< number of tubes triggering their CFD per 19 pixel patch
-        unsigned short int nsat;                  //!< number of tubes triggering Hi/Lo gain switch
+        unsigned short int nlowgain;              //!< number of tubes triggering Hi/Lo gain switch
+        unsigned short int nsat;                  //!< number of saturated tubes
         unsigned short int bad;                   //!< Good event?
         unsigned short int badLow;                //!< Good event?
         float max[3];                             //!< The three largest adc values

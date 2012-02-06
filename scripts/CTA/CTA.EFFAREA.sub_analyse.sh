@@ -66,7 +66,7 @@ fi
 TMVACUT="20111212"
 TMVACUT="20111220"
 TMVACUT="20120104-N2_Core"
-TMVACUT="20111201"
+TMVACUT="20111213"
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ] && [ $PART != "gamma_onSourceDISP" ]
@@ -415,10 +415,10 @@ do
          echo "submitting to short queue"
          if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_onSourceDISP" ]
 	 then
-            qsub -l os="sl*" -l h_cpu=06:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+            qsub -l os="sl*" -l h_cpu=26:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
 #            qsub -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
          else
-            qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+            qsub -l os="sl*" -l h_cpu=12:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
          fi
       fi
    done

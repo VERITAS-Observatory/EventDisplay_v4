@@ -68,7 +68,7 @@ class VTraceHandler
         virtual double getTraceTZero( int fFirst, int fLast, int fTFirst ) { return getQuickTZero( fFirst, fLast, fTFirst ); }
 	virtual vector< float >& getPulseTiming( int fFirst, int fLast, int fTFirst, int fTLast );
         virtual double getTraceMax();
-        virtual double getTraceMax( unsigned int &n255 );
+        virtual double getTraceMax( unsigned int &n255, double iHiLo = 6. );
                                                   //!< get maximum value in trace
         virtual void   getTraceMax( double&, double& );
         virtual void   getTraceMax( int fFirst, int fLast, double &max, int &maxpos ) { getQuickMax( fFirst, fLast, max, maxpos ); }

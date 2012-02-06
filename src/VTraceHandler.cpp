@@ -17,7 +17,7 @@ VTraceHandler::VTraceHandler()
     fChanID = 0;
     fpTrazeSize = 0;
     fHiLo = false;
-    fDynamicRange = 255;
+    fDynamicRange = 216;                 // 8bit FADC, switch to low-gain
     fMaxThreshold = 200;
     fMC_FADCTraceStart = 0;
 
@@ -319,14 +319,15 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 
 void VTraceHandler::getQuickMax(int fFirst, int fLast, double &tmax, int &maxpos )
 {
-    unsigned int n255;
+    unsigned int n255 = 0;
     getQuickMax( fFirst, fLast, tmax, maxpos, n255 );
 }
 
 
 void VTraceHandler::getQuickMax(int fFirst, int fLast, double &tmax, int &maxpos, unsigned int &n255 )
 {
-    double it;
+    double it = 0.;
+    int nMax = (int)(fDynamicRange*tmax);
     n255 = 0;
     tmax=-10000.;
     maxpos=-100;
@@ -343,8 +344,6 @@ void VTraceHandler::getQuickMax(int fFirst, int fLast, double &tmax, int &maxpos
                     tmax=it;
                     maxpos=i;
                 }
-// this is as hardcoded as it can be
-                if( it > 254.9 ) n255++;
             }
             tmax -= fPed;
             fMax = tmax;
@@ -365,6 +364,7 @@ void VTraceHandler::getQuickMax(int fFirst, int fLast, double &tmax, int &maxpos
                     tmax=it;
                     maxpos=i;
                 }
+		if( nMax > 0 && it > nMax ) n255++;
             }
             tmax -= fPed;
             fMax = tmax;
@@ -375,18 +375,18 @@ void VTraceHandler::getQuickMax(int fFirst, int fLast, double &tmax, int &maxpos
 
 double VTraceHandler::getTraceMax()
 {
-    double tmax;
-    int maxposInt;
-    unsigned int n255;
+    double tmax = 0.;
+    int maxposInt = 0;
+    unsigned int n255 = 0;
     getQuickMax( 0, fpTrazeSize, tmax, maxposInt, n255 );
     return tmax;
 }
 
 
-double VTraceHandler::getTraceMax( unsigned int &n255 )
+double VTraceHandler::getTraceMax( unsigned int &n255, double iHiLo )
 {
-    double tmax;
-    int maxposInt;
+    double tmax = iHiLo;
+    int maxposInt = 0;
     n255 = 0;
     getQuickMax( 0, fpTrazeSize, tmax, maxposInt, n255 );
     return tmax;
@@ -395,8 +395,8 @@ double VTraceHandler::getTraceMax( unsigned int &n255 )
 
 void VTraceHandler::getTraceMax( double &tmax, double &maxpos )
 {
-    int maxposInt;
-    unsigned int n255;
+    int maxposInt = 0;
+    unsigned int n255 = 0;
     getQuickMax( 0, fpTrazeSize, tmax, maxposInt, n255 );
     maxpos = (double)maxposInt;
 }

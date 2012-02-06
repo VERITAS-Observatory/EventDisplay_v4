@@ -50,6 +50,6 @@ PEDLEV="16."
 
 
 # $EVNDISPSYS/bin/evndisp -sourcefile $SOURF -pedestalfile $NOISE -deadchannelfile $DEAD -pedestalDefaultPedestal=$PEDLEV -arraycuts $ACUTS  $SOPT
-$EVNDISPSYS/bin/evndisp -sourcefile $SOURF -pedestalfile $NOISE  -pedestalDefaultPedestal=$PEDLEV $SOPT
+$EVNDISPSYS/bin/evndisp -donotusedbinfo -sourcefile $SOURF -pedestalfile $NOISE  -pedestalDefaultPedestal=$PEDLEV $SOPT
 
 exit

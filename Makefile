@@ -162,6 +162,8 @@ HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
 # 2010 production
 CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+# 2011 production for Leeds
+# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_ULTRA
 # 2011 SC 
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
@@ -336,7 +338,7 @@ endif
 ########################################################
 # lookup table code (mscw_energy)
 ########################################################
-MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o  ./obj/CtparsShort.o \
+MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
 		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
 		./obj/VEnergyCorrection.o ./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
@@ -517,7 +519,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 		./obj/Cshowerpars.o \
-		./obj/CtparsShort.o \
+		./obj/Ctpars.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o  \
 		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o
@@ -570,7 +572,7 @@ printRunParameter:	$(PRINTRUNOBJ)
 MAKEDISPTABLESOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 			./obj/VDispTable.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
-			./obj/Cshowerpars.o ./obj/CtparsShort.o \
+			./obj/Cshowerpars.o ./obj/Ctpars.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
@@ -589,7 +591,7 @@ makeDISPTables:	$(MAKEDISPTABLESOBJ)
 COMBINEDISPTABLESOBJ=	./obj/VDispTable.o \
 			./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-			./obj/Cshowerpars.o ./obj/CtparsShort.o \
+			./obj/Cshowerpars.o ./obj/Ctpars.o \
 			./obj/combineDISPTables.o
 
 ./obj/combineDISPTables.o:	./src/combineDISPTables.cpp
@@ -607,7 +609,7 @@ PRINTDISPTABLESOBJ= 	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dic
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 			./obj/VDispTable.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
-			./obj/Cshowerpars.o ./obj/CtparsShort.o \
+			./obj/Cshowerpars.o ./obj/Ctpars.o \
 			./obj/printDISPTables.o
 
 ./obj/printDISPTables.o:	./src/printDISPTables.cpp
@@ -655,7 +657,7 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 					./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 					./obj/VUtilities.o \
-					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/CtparsShort.o 
+					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o 
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 

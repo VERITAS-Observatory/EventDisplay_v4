@@ -111,6 +111,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
                                                   // MS contains number of triggered pixels
     tpars->Branch("trig_tubes", &trig_tubes, "trig_tubes/s");
     tpars->Branch("nsat", &nsat, "nsat/s");
+    tpars->Branch("nlowgain", &nlowgain, "nlowgain/s");
     tpars->Branch("ntubesBNI", &ntubesBrightNoImage, "ntubesBNI/s");
     tpars->Branch("max", &max, "max[3]/F");
     tpars->Branch("index_of_max", &index_of_max, "index_of_max[3]/s");
@@ -253,6 +254,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     ntrig = 0;
     ntrig_per_patch = 0;
     nsat = 0;
+    nlowgain = 0;
     bad = 0;
     badLow = 0;
     for( int i = 0; i < 3; i++ ) max[i] = 0.;

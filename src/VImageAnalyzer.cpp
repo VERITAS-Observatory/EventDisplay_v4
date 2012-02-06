@@ -108,6 +108,9 @@ void VImageAnalyzer::doAnalysis()
 // integrate pulses and calculate timing parameters 
     calcTZerosSums( getSumFirst(), getSumFirst()+getSumWindow(), getSumFirst(), getSumFirst()+getSumWindow() );
 
+// fill saturated channels
+    getImageParameters()->nsat = fillSaturatedChannels();
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // correct for jitter timing
     if( fRunPar->fL2TimeCorrect ) FADCStopCorrect();
@@ -452,7 +455,7 @@ bool VImageAnalyzer::initEvent()
     if( fReader->isGrisuMC() ) setNTrigger();
 
 // fill high/low gain vector
-    getImageParameters()->nsat = fillHiLo();
+    getImageParameters()->nlowgain = fillHiLo();
 
     if( fRunPar->fImageLL )
     {

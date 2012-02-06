@@ -25,7 +25,6 @@
 #include "Cshowerpars.h"
 #include "Ctelconfig.h"
 #include "Ctpars.h"
-#include "CtparsShort.h"
 
 #include <bitset>
 #include <cmath>
@@ -92,7 +91,7 @@ class VTableLookupDataHandler
         TChain* fTtelconfig;
         Ctelconfig* ftelconfig;
         vector< TChain* > fTtpars;
-        vector< CtparsShort* > ftpars;
+        vector< Ctpars* > ftpars;
 
         double fEventWeight;
 
@@ -241,6 +240,7 @@ class VTableLookupDataHandler
 	double flength_telType[VDST_MAXTELESCOPES];
         int    fntubes   [VDST_MAXTELESCOPES];
         unsigned short int fnsat[VDST_MAXTELESCOPES];
+        unsigned short int fnlowgain[VDST_MAXTELESCOPES];
         int    fntubesBNI[VDST_MAXTELESCOPES];
         double falpha    [VDST_MAXTELESCOPES];
         double flos      [VDST_MAXTELESCOPES];

@@ -193,7 +193,7 @@ void VDispTable::setQualityCuts( int iNtubes_min, double iSize_min, double iLeng
 /*!
     apply quality cuts
 */
-bool VDispTable::isGoodEvent( CtparsShort *c )
+bool VDispTable::isGoodEvent( Ctpars *c )
 {
    if( !c ) return false; 
    
@@ -274,7 +274,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
             cout << "VDispTable::fillTable error finding tree tpars for telescope " << i+1 << endl;
             continue;
         }
-        CtparsShort *c = new CtparsShort( t, true, 6, true );
+        Ctpars *c = new Ctpars( t, true, 6, true );
         if( !c ) continue;
 
         if( m->fChain->GetEntries() != c->fChain->GetEntries() )
@@ -345,7 +345,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
             cout << "VDispTable::fillTable error finding tree tpars for telescope " << i+1 << endl;
             continue;
         }
-        CtparsShort *c = new CtparsShort( t, true, 6, true );
+        Ctpars *c = new Ctpars( t, true, 6, true );
         if( !c ) continue;
 
         if( m->fChain->GetEntries() != c->fChain->GetEntries() )

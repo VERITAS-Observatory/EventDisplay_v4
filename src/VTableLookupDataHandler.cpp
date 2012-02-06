@@ -434,6 +434,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
                 }
                 fntubes[i] = ftpars[i]->ntubes;
                 fnsat[i] = ftpars[i]->nsat;
+                fnlowgain[i] = ftpars[i]->nlowgain;
                 fntubesBNI[i] = ftpars[i]->ntubesBNI;
                 falpha[i] = ftpars[i]->alpha;
                 flos[i] = ftpars[i]->los;
@@ -675,7 +676,7 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
                     if( iT->GetBranchStatus( "loss" ) ) fEventDisplayFileFormat = 3;
                     if( iT->GetBranchStatus( "meanPed_Image" ) ) fEventDisplayFileFormat = 5;
                 }
-                ftpars.push_back( new CtparsShort( iT, fIsMC, fEventDisplayFileFormat, bShort ) );
+                ftpars.push_back( new Ctpars( iT, fIsMC, fEventDisplayFileFormat, bShort ) );
             }
         }
         else
@@ -899,6 +900,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "ntubesBNI", fntubesBNI, iTT );
         sprintf( iTT, "nsat[%d]/s", fNTel );
         fOTree->Branch( "nsat", fnsat, iTT );
+        sprintf( iTT, "nlowgain[%d]/s", fNTel );
+        fOTree->Branch( "nlowgain", fnlowgain, iTT );
         sprintf( iTT, "alpha[%d]/D", fNTel );
         fOTree->Branch( "alpha", falpha, iTT );
         sprintf( iTT, "los[%d]/D", fNTel );
@@ -1366,6 +1369,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
     fntubes[i] = 0;
     fmeanPedvar_ImageT[i] = 0.;
     fnsat[i] = 0;
+    fnlowgain[i] = 0;
     fntubesBNI[i] = 0;
     falpha[i] = 0.;
     flos[i] = 0.;
@@ -1516,6 +1520,7 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fntubes[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fmeanPedvar_ImageT[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fnsat[i] = 0;
+    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fnlowgain[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fntubesBNI[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) falpha[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) flos[i] = 0.;

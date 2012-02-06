@@ -627,7 +627,7 @@ void VCamera::drawEventText()
     fTextEvent[3]->SetTitle( iText );
     sprintf( iText, "Num Tubes %d", fData->getImageParameters()->ntubes );
     fTextEvent[4]->SetTitle( iText );
-    sprintf( iText, "Num LowGain %d", fData->getImageParameters()->nsat );
+    sprintf( iText, "Num LowGain %d", fData->getImageParameters()->nlowgain );
     fTextEvent[5]->SetTitle( iText );
     int i_numtrig = 0;
     int i_numtrig2 = 0;

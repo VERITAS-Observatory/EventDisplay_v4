@@ -11,7 +11,7 @@
 #include "TMath.h"
 
 #include "Cshowerpars.h"
-#include "CtparsShort.h"
+#include "Ctpars.h"
 #include "VEvndispReconstructionParameter.h"
 
 #include <iostream>
@@ -30,7 +30,7 @@ class VPlotEvndispReconstructionParameter : public TNamed
    TChain                          *fDataChain;
    TFile                           *fDataFile;
    Cshowerpars                     *fDataShowerPars;
-   CtparsShort                     *fDataTpars;
+   Ctpars                     *fDataTpars;
    VEvndispReconstructionParameter *fEvndispReconstructionParameter;
 
    vector< string > fEvndispReconstructionParameterName;

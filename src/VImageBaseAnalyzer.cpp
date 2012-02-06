@@ -393,6 +393,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
     }
     setPulseTiming( 0., true );    // corrected   times
     setPulseTiming( 0., false );   // uncorrected times
+    setTraceN255( 0 );
 
 // calculates the sum over a sample range, corrected for time offsets, for all channels
 
@@ -472,7 +473,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstT, int iLastT, int iFirstSum,
                 setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast );
                 setSums( i_channelHitID, fTraceHandler->getTraceSum(corrfirst, corrlast, fRaw ) );
             }
-            i_tempTraceMax = fTraceHandler->getTraceMax( i_tempN255 );
+            i_tempTraceMax = fTraceHandler->getTraceMax( i_tempN255, getLowGainMultiplier()[i_channelHitID] );
             setTraceMax( i_channelHitID, i_tempTraceMax );
             setTraceRawMax( i_channelHitID, i_tempTraceMax + getPeds(getHiLo()[i_channelHitID] )[i_channelHitID] );
             setTraceN255( i_channelHitID, i_tempN255 );
@@ -794,19 +795,6 @@ void VImageBaseAnalyzer::timingCorrect()
 }
 
 
-void VImageBaseAnalyzer::printpedvardebug( unsigned int i, string iD, int ifirst, int ilast )
-{
-    if( getEventNumber() > 50146 )
-    {
-        cout << "PEDVARDEBUG " << iD << " " << getEventNumber() << "\t" << getTelID() << "\t" << i;
-        cout << "\t" << getCurrentSumWindow()[i] << "\t" << getHiLo()[i];
-        cout << "\t" << ifirst << "\t" << ilast;
-        cout << endl;
-        cout << "\t\t" << getPedvars( getCurrentSumWindow()[i], getHiLo()[i])[i] << endl;
-    }
-}
-
-
 int VImageBaseAnalyzer::fillHiLo()
 {
 // reset all channels
@@ -843,6 +831,16 @@ int VImageBaseAnalyzer::fillHiLo()
         }
     }
     return z;
+}
+
+int VImageBaseAnalyzer::fillSaturatedChannels()
+{
+   int z = 0;
+   for( unsigned int i = 0; i < getTraceN255().size(); i++ )
+   {
+      if( getTraceN255()[i] > 0 ) z++;
+   }
+   return z;
 }
 
 

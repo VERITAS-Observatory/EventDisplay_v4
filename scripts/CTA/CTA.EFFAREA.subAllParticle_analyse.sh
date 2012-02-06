@@ -54,6 +54,7 @@ then
    VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 else
    VPART=( "gamma_onSource" "gamma_cone10" )
+#   VPART=( "gamma_onSourceDISP" )
 fi
 NPART=${#VPART[@]}
 
@@ -75,6 +76,10 @@ do
       if [ $PART = "gamma_onSource" ]
       then
         cp $CDIR/$CFIL.gamma_onSource.dat $CCUT
+      fi
+      if [ $PART = "gamma_onSourceDISP" ]
+      then
+        cp $CDIR/$CFIL.gamma_onSourceDISP.dat $CCUT
       fi
       if [ $PART = "gamma_cone10" ]
       then
