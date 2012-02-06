@@ -104,14 +104,14 @@ INCLUDEFLAGS  = -I. -I./inc/
 # linux depending flags
 ifeq ($(ARCH),Linux)
 LDFLAGS       = -O
-SOFLAGS       = -current_version $(version) -shared -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
+SOFLAGS       = -shared -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
 LDFLAGS       = -bind_at_load
 DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
-SOFLAGS       = -current_version $(version) -dynamiclib -single_module -undefined $(UNDEFOPT) -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
+SOFLAGS       = -dynamiclib -single_module -undefined $(UNDEFOPT) -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
 endif
 
 ########################################################
