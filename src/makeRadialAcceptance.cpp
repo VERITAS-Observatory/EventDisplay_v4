@@ -72,7 +72,7 @@ int main( int argc, char *argv[] )
     char ifile[1800];
     for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
     {
-        sprintf( ifile, "%s%d.mscw.root", datadir.c_str(), fRunPara->fRunList[i].fRunOff );
+        sprintf( ifile, "%s/%d.mscw.root", datadir.c_str(), fRunPara->fRunList[i].fRunOff );
         cout << "now chaining " << ifile << " (wobble offset " << -1.*fRunPara->fRunList[i].fWobbleNorth << ", " << fRunPara->fRunList[i].fWobbleWest << ")" << endl;
 // test if file exists
         TFile fTest( ifile );
@@ -92,9 +92,9 @@ int main( int argc, char *argv[] )
           if( ntel != iParV2->fTelToAnalyze.size() )
           {
             cout << endl;
-            cout << "error: Number of Telesocpes ntel " << ntel << " does not equal number in run " << iParV2->fTelToAnalyze.size() << " (defaul ntel 4)." << endl;
+            cout << "error: Number of Telecopes ntel " << ntel << " does not equal number in run " << iParV2->fTelToAnalyze.size() << " (defaul ntel 4)." << endl;
             cout << "To specify us -n ntel option" << endl;
-            exit(0);
+            exit(-1);
           }
         }
 

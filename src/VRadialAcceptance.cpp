@@ -94,8 +94,10 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
    fZe.push_back( 40. ); */
     fZe.push_back( 70. );
 
-    double xymax = 2.0;
-    int nxybin = 20;
+/* (20120120)    double xymax = 2.0;
+    int nxybin = 20; */
+    double xymax = 5.0;
+    int nxybin = 50;
 
 // range used to normalise acceptance histograms
     fAccZeFitMinBin = 1;
@@ -567,15 +569,27 @@ bool VRadialAcceptance::terminate( string ofile )
         {
             scaleArea( hAccAz[i] );
             isc = 0.;
-            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ ) isc +=  hAccAz[i]->GetBinContent( j )/i_normBin;
+	    i_normBin = 0.;
+            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ ) 
+	    {
+	       isc +=  hAccAz[i]->GetBinContent( j )/(hAccAz[i]->GetBinError( j ) * hAccAz[i]->GetBinError( j ));
+	       i_normBin += 1./hAccAz[i]->GetBinError( j )/hAccAz[i]->GetBinError( j );
+            }
+	    if( i_normBin > 0. ) isc /= i_normBin;
             if( isc > 0 ) hAccAz[i]->Scale( 1./isc );
         }
 // run wise histograms
         for( unsigned int i = 0; i < hAccRun.size(); i++ )
         {
             isc = 0.;
+	    i_normBin = 0.;
             scaleArea( hAccRun[i] );
-            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ ) isc +=  hAccRun[i]->GetBinContent( j )/i_normBin;
+            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ )
+	    {
+	       isc +=  hAccRun[i]->GetBinContent( j )/(hAccRun[i]->GetBinError( j ) * hAccRun[i]->GetBinError( j ));
+	       i_normBin += 1./hAccRun[i]->GetBinError( j )/hAccRun[i]->GetBinError( j );
+            }
+	    if( i_normBin > 0. ) isc /= i_normBin;
             if( isc > 0 ) hAccRun[i]->Scale( 1./isc );
         }
     }
@@ -630,6 +644,14 @@ bool VRadialAcceptance::terminate( string ofile )
     cout << endl << "writing acceptance curves to " << ofile << endl;
 
     hList->Write();
+
+// write cuts to disk
+
+    if( fCuts )
+    {
+       fCuts->SetName( "GammaHadronCuts" );
+       fCuts->Write();
+    }
 
     fo->Close();
 

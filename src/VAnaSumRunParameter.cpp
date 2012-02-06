@@ -960,7 +960,7 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
     {
         i_run = fRunList[i].fRunOn;
 
-        sprintf( i_temp, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run,fSuffix.c_str() );
+        sprintf( i_temp, "%s/%s%d%s", fDatadir.c_str(), fPrefix.c_str(), i_run,fSuffix.c_str() );
         TFile *i_f = new TFile(i_temp);
         if( i_f->IsZombie() )
         {
