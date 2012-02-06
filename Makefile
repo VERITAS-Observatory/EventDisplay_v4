@@ -94,7 +94,7 @@ endif
 ########################################################################################################################
 # compiler and linker general values
 CXX           = g++ 
- CXXFLAGS      = -O3 -g -Wall  -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
+CXXFLAGS      = -O3 -g -Wall  -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
 LD            = g++
@@ -104,14 +104,14 @@ INCLUDEFLAGS  = -I. -I./inc/
 # linux depending flags
 ifeq ($(ARCH),Linux)
 LDFLAGS       = -O
-SOFLAGS       = -shared
+SOFLAGS       = -current_version $(version) -shared -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
 LDFLAGS       = -bind_at_load
 DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
-SOFLAGS       = -dynamiclib -single_module -undefined $(UNDEFOPT)
+SOFLAGS       = -current_version $(version) -dynamiclib -single_module -undefined $(UNDEFOPT) -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
 endif
 
 ########################################################
@@ -534,7 +534,7 @@ endif
 
 slib lsib:   $(SHAREDOBJS)
 	mkdir -p ./lib
-	$(LD) $(SOFLAGS) $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
+	$(LD) $(SOFLAGS) -install_name $(EVNDISPSYS)/lib/libVAnaSum.so $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
 ifneq ($(ROOT_MINUIT2),yes)
 	@echo "ROOT NOT COMPILED WITH MINUIT2"
 	@echo "THEREFORE: NO SOURCE GEOMETRY FITTER AVAILABLE"
