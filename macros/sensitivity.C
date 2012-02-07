@@ -88,8 +88,8 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
     fPD.fSensitivityvsEnergyFromTextTFile_LineStyle.clear();
 
 // Crab Nebula and Cosmic ray fluxes
-    fPD.fESpecDataFile_CrabNebula = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
-    fPD.fESpecDataFile_CosmicRays = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
+    fPD.fESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
+    fPD.fESpecDataFile_CosmicRays = "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
 
 // energy axis (min and max in TeV)
     fPD.fPlotting_energy_min_TeV = 0.01;
@@ -108,14 +108,14 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
        fPD.bIntegral = true;
        fPD.fPlotting_flux_min = 8.e-16;
        fPD.fPlotting_flux_max = 2.e-10;
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/HESS_IntegralSensitivity_Achieved_Moriond2009.txt" );
+       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/HESS_IntegralSensitivity_Achieved_Moriond2009.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "HESS" );
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGIC_IntegralSensitivity_Data_Colin2010_PFLUX.txt" );
+       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/MAGIC_IntegralSensitivity_Data_Colin2010_PFLUX.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC" );
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGICII_IntegralSensitivity_MC_Colin2010_PFLUX.txt" );
+       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/MAGICII_IntegralSensitivity_MC_Colin2010_PFLUX.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC II" );
 
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/GLAST5Y_IntegralSensitivity_LOI_2009_PFLUX.txt" );
+       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/GLAST5Y_IntegralSensitivity_LOI_2009_PFLUX.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "Fermi LAT 5y" );  
 
        fPD.bSet = true;
@@ -146,12 +146,12 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
        {
 	  fPD.fPlotting_flux_min = 1.e-15;
 	  fPD.fPlotting_flux_max = 2.e-08;
-	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_PFLUX.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$VERITAS_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_PFLUX.txt" );
 	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
        }
        else
        {
-	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_LOI_2009_PFLUX.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_LOI_2009_PFLUX.txt" );
 	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA_LOI" );
        }
 
@@ -163,12 +163,12 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
        {
 	  fPD.fPlotting_flux_min = 0.002;
 	  fPD.fPlotting_flux_max = 0.85;
-	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_CU.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$VERITAS_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_CU.txt" );
 	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
        }
        else
        {
-	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
 	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
        }
 
@@ -176,7 +176,7 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
     }
     else if( !bIntegral && bUnit == "ENERGY" )
     {
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$EVNDISPDATA/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
+       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
        fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
        fPD.fPlotting_flux_min = 1.e-14;
        fPD.fPlotting_flux_max = 2.e-10;
@@ -509,8 +509,8 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
                               unsigned int iCrabSpec_ID = 6, char *iParticleNumberFile = "particleNumbers.tmp.root",
 			      string iObservatory = "CTA" )
 {
-    string iESpecDataFile_CrabNebula = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
-    string iESpecDataFile_CosmicRays = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
+    string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
+    string iESpecDataFile_CosmicRays = "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
 
     if( iMC_Gamma && iMC_Proton )
     {
