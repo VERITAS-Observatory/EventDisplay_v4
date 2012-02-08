@@ -250,7 +250,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "SKYMAPCENTRE_XY" )
             {
-                if( checkNumberOfArguments( is_line ) != 4 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_RADECJ2000_DEG x y" );
+                if( checkNumberOfArguments( is_line ) != 4 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_XY x y" );
 
                 fSkyMapCentreWest = -1.*atof( temp2.c_str() );
                 is_stream >> temp2;
@@ -265,7 +265,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "SKYMAPCENTRE_RADECJ2000_HOUR" )
             {
-                if( checkNumberOfArguments( is_line ) != 8 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_RADECJ2000_DEG RA(Hour Min Sec)  DEC(Deg Min Sec)" );
+                if( checkNumberOfArguments( is_line ) != 8 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
 
                 double d_tt = 0.;
                 d_tt += atof( temp2.c_str() );
