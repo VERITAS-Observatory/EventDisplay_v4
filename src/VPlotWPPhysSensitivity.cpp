@@ -79,6 +79,12 @@ bool VPlotWPPhysSensitivity::initialize()
 	       iTemp << "ISDC/ISDC_3700m_optimal_"  << fSubArray[a] << "_" << hname;
 	       iTemp << "h_20deg_20110615.root";
 	    }
+	    else if( fAnalysis[i] == "ISDC.moon" )
+	    {
+	       sprintf( hname, "%.1f", fObservationTime_H[t] );
+	       iTemp << "ISDC/ISDC_2000m_moonlight_optimal_"  << fSubArray[a] << "_" << hname;
+	       iTemp << "h_20deg_20110615.root";
+	    }
 	    else if( fAnalysis[i] == "IFAE" )
 	    {
 	       if( fObservationTime_H[t] > 1. ) sprintf( hname, "%d", (int)fObservationTime_H[t] );
@@ -280,7 +286,7 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown )
 
 bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit )
 {
-   string iCrabFile = "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
+   string iCrabFile = "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
    unsigned int iCrabID = 6;
 
    TCanvas *cSens = 0;

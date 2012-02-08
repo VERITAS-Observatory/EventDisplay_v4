@@ -50,9 +50,9 @@ int main( int argc, char *argv[] )
 // output file
     if( !iData->initializeOutputFile( fOutputFile ) ) exit( -1 );
 // default Crab spectrum from HEGRA
-    iData->setCrabSpectrum( "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
+    iData->setCrabSpectrum( "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
 // CR spectra
-    iData->setCosmicRaySpectrum( "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 2 );
+    iData->setCosmicRaySpectrum( "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 2 );
 
 // on source histograms
     iData->initializeHistograms( 20, -1.8, 2.2, 500, -1.8, 2.2, 400, -2.3, 2.7, 9999 );
