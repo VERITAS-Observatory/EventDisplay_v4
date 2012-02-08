@@ -381,6 +381,12 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
         cout << "\t\t minimum image/border pixel fraction under image: \t\t";
         for( unsigned int i = 0; i < fFui_min[m].size(); i++ ) cout << fFui_min[m][i] << "\t";
         cout << endl;
+
+	for( unsigned int i = 0; i < fNTel_type; i++ ) 
+	{
+	    if ( fLocalNtubes_min[m][i] <= 2 || fLoss_max[m][i] == 1e10 )
+		cout << "Warning: You may haven't specified the array analysis cuts for telescope type " << i+1 << " [set number: " << m << "]" << endl;
+	}
     }
     cout << "------------------------------" << endl;
     cout << endl;
