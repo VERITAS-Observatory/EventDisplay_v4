@@ -367,7 +367,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	 {
 	    i_localTrigger.set( hsdata->event.central.teltrg_list[t]-1, true );
 	 }
-	 if( t < VDST_MAXTELESCOPES )
+	 if( t < (unsigned int)hsdata->run_header.ntel )
 	 {
 	    fData->fDSTLTrig_list[i_ntel_trig] = hsdata->event.central.teltrg_list[t];
 	    fData->fDSTLTtime[i_ntel_trig] = hsdata->event.central.teltrg_time[t];
