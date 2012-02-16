@@ -31,7 +31,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     bWriteReconstructedEventsOnly = -1;
     bShortTree = false;
     bWriteMCPars = true;
-    rec_method = 8;
+    rec_method = 0;
     point_source = false;
     esysfile = "";
     fWrite1DHistograms = false;
