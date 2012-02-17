@@ -53,6 +53,7 @@ void VSkyCoordinatesUtilities::getWobbleOffsets( double iNorth, double iEast, do
     double theta_rad = sqrt(iNorth*iNorth + iEast*iEast ) / degrad;
     double phi_rad = -1.*atan2( iEast, iNorth );
     if( phi_rad < 0. ) phi_rad += TMath::TwoPi();
+
     VSkyCoordinatesUtilities::rotate( -theta_rad, z, x );
     VSkyCoordinatesUtilities::rotate( phi_rad, y, x );
 // declination

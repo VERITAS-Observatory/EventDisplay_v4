@@ -86,7 +86,7 @@ class VLightCurve : public VPlotUtilities
    string   getRateAxisTitle() { return fRateAxisTitle; }
    bool     initializeTeVLightCurve( string iASCIIFile );
    bool     initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin = -1., double iMJDMax = -1. );
-   bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1., double iMJDStart = 54857.09977457897 );
+   bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1., double iMJDStart = 54857.09977457897, unsigned int iFormatID = 0 );
    void     printLightCurve( bool bFullDetail = true );
    TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1, string iPlottingOption = "p" );
    bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );

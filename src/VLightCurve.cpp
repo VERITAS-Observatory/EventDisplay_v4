@@ -28,7 +28,15 @@ VLightCurve::VLightCurve()
    setPhaseFoldingValues( -99., -99., false );
 }
 
-bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, double iMJDMax, double iMJDStart )
+/*
+
+    read XRT light curve from a ASCII file
+
+    iFormatID == 0 :  Leicester format
+    iFormatID == 1 :  MJD, half width of the MJD time bin, deabsorbed 0.3-10 keV flux, error in the flux (in 10^-12 ergs/cm2/s)
+
+*/
+bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, double iMJDMax, double iMJDStart, unsigned int iFormatID )
 {
    fDataType = "XRT_ascii";
 
@@ -42,6 +50,7 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, doub
       cout << "VLightCurve::initializeXRTLightCurve error reading XRT file: " << iXRTFile << endl;
       return false;
    }
+   cout << "VLightCurve::initializeXRTLightCurve reading " << iXRTFile << endl;
    double iTemp1 = 0.;
    double iTemp2 = 0.;
 
@@ -60,8 +69,11 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, doub
        is_stream >> iTemp1;     // second since iMJDStart
        is_stream >> iTemp2;     // error [s]
 
-       iTemp1  = iMJDStart + iTemp1/(24.0*60.0*60.0);
-       iTemp2 /= (24.0*60.0*60.0);
+       if( iFormatID == 0 )
+       {
+	  iTemp1  = iMJDStart + iTemp1/(24.0*60.0*60.0);
+	  iTemp2 /= (24.0*60.0*60.0);
+       }
 
        if( iMJDMin > 0. && iTemp1 - iTemp2 < iMJDMin ) continue;
        if( iMJDMax > 0. && iTemp1 + iTemp2 > iMJDMax ) continue;
@@ -558,8 +570,8 @@ string VLightCurve::getLightCurveAxisTitle()
 
     if( fRateAxisTitle == "tevRate" )
     {
-       if( fEnergy_max_TeV < 0. ) sprintf( hname, "F(E>%.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
-       else                       sprintf( hname, "F( %.1f - %.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV, fEnergy_max_TeV );
+       if( fEnergy_max_TeV < 0. ) sprintf( hname, "Flux (E>%.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
+       else                       sprintf( hname, "Flux ( %.1f - %.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV, fEnergy_max_TeV );
 
        string iTemp = hname;
        fRateAxisTitle = hname;
