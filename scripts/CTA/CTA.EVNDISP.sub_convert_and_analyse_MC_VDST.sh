@@ -10,7 +10,7 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter]"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo
@@ -44,6 +44,11 @@ KEEP=0
 if [ -n "$5" ]
 then
    KEEP=$5
+fi
+FLL=""
+if [ -n "$6" ]
+then
+  FLL="$6"
 fi
 MET="LL"
 DSET=$4
@@ -96,8 +101,10 @@ do
    rm -f $FNAM-4.sh
    sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-6.sh
    rm -f $FNAM-5.sh
-   sed -e "s|MEEET|$MET|" $FNAM-6.sh > $FNAM.sh
+   sed -e "s|MEEET|$MET|" $FNAM-6.sh > $FNAM-7.sh
    rm -f $FNAM-6.sh
+   sed -e "s|FLL|$FLL|" $FNAM-7.sh > $FNAM.sh
+   rm -f $FNAM-7.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh
@@ -109,7 +116,7 @@ do
       qsub -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    else
       echo "short queue"
-      qsub -l h_cpu=11:29:00 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+      qsub -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
    fi
 
    echo "writing shell script to $FNAM.sh"

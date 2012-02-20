@@ -17,6 +17,7 @@ KEEP=KEEEEEEP
 ACUT=ARC
 MET=MEEET
 DSET=DATASET
+LOGF=FLL
 
 # set array
 FIELD=$SUBA
@@ -49,7 +50,7 @@ do
    mkdir -p $ODIR
 
 # output log files are written to this directory
-   LDIR=$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART"/"
+   LDIR=$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART-$LOGF"/"
    mkdir -p $LDIR
 # remove existing log files
    rm -f $LDIR/$OFIL.convert.log
