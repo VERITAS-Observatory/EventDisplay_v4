@@ -758,7 +758,6 @@ int VAnaSumRunParameter::checkNumberOfArguments( string is )
     while( !is_stream.eof() )
     {
         is_stream >> itemp;
-        if( itemp.find( " " ) == 0 ) cout << "A" << endl;
         z++;
     }
     return z;

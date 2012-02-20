@@ -241,7 +241,6 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 						     unsigned int iEMinBin, unsigned int iEMaxBin, bool bDebug )
 {
-   cout << "A " << iEMinBin << "\t" << iEMaxBin << endl;
    return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, 0., 0., bDebug );
 }
 
@@ -259,7 +258,6 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     if( iEMinBin > e.size() ) return 0.;
 // adjust maximum bin
     if( iEMaxBin > e.size() - 1 ) iEMaxBin = e.size() - 1;
-   cout << "B " << iEMinBin << "\t" << iEMaxBin << endl;
 
     if( e.size() != eff.size() )
     {
