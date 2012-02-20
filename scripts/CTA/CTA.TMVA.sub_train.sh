@@ -13,7 +13,7 @@ then
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
    echo
-   echo "  <run parameter filename> without .runparameter"
+   echo "  <run parameter filename> without .runparameter (full path)"
    echo
    echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
    echo
