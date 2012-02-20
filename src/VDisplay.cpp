@@ -932,6 +932,7 @@ void VDisplay::drawFADC( bool iFit )
 	   fLineFADC->Draw("same");
         }
 // trace line indicating pedestals
+        fF1Ped->SetRange( fHisFADC->GetXaxis()->GetXmax(), fHisFADC->GetXaxis()->GetXmin() );
         fF1Ped->SetParameter( 0, -1.* fEventLoop->getAnalyzer()->getPeds(fEventLoop->getHiLo()[fSelectedChan-200000])[fSelectedChan-200000] );
         if( !fBoolDrawImageTraces || fSelectedChan >= 200000 )
         {
