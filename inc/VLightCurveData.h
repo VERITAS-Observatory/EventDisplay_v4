@@ -50,7 +50,9 @@ class VLightCurveData : public TObject
 
    VLightCurveData( string iName = "lightcurvedata" );
   ~VLightCurveData() {}
-   bool   fillTeVEvndispData( string iAnaSumFile, double iThresholdSignificance = -99999., double iMinEvents = -9999., double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17, double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
+   bool   fillTeVEvndispData( string iAnaSumFile, double iThresholdSignificance = -99999., double iMinEvents = -9999., 
+                              double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17, double iMinEnergy = 0., 
+			      double E0 = 1., double alpha = -2.5 );
    double getMJD();
    double getMJDError();
    void   setFluxCalculationEnergyInterval( double iEnergy_min_TeV = 1., double iEnergy_max_TeV = -1. );

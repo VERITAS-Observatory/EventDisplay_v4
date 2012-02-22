@@ -514,6 +514,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VLightCurve.o ./obj/VLightCurve_Dict.o ./obj/VLightCurveData.o \
+		./obj/VLightCurveUtilities.o ./obj/VLightCurveUtilities_Dict.o \
+		./obj/VLombScargle.o ./obj/VLombScargle_Dict.o \
 		./obj/VZDCF.o ./obj/VZDCF_Dict.o ./obj/VZDCFData.o \
 		./obj/VUtilities.o \
 		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o \

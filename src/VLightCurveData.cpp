@@ -40,7 +40,13 @@ void VLightCurveData::setFluxCalculationEnergyInterval( double iEMin, double iEM
    fEnergy_max_TeV = iEMax;
 }
 
-bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdSignificance, double iMinEvents, double iUpperLimit, int iUpperlimitMethod, int iLiMaEqu, double iMinEnergy, double E0, double alpha )
+/*
+
+   calculate and fill a single flux value from a anasum result file
+
+*/
+bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdSignificance, double iMinEvents, double iUpperLimit, 
+                                          int iUpperlimitMethod, int iLiMaEqu, double iMinEnergy, double E0, double alpha )
 {
    fDataFileName = iAnaSumFile;
 

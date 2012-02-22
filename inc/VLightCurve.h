@@ -12,16 +12,20 @@
 
 #include "VFluxCalculation.h"
 #include "VLightCurveData.h"
+#include "VLightCurveUtilities.h"
 #include "VPlotUtilities.h"
 
 #include "TArrow.h"
 #include "TCanvas.h"
 #include "TGraphAsymmErrors.h"
+#include "TH2D.h"
 #include "TLine.h"
+#include "TProfile.h"
+#include "TRandom.h"
 
 using namespace std;
 
-class VLightCurve : public VPlotUtilities
+class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 {
    private:
 
@@ -33,7 +37,7 @@ class VLightCurve : public VPlotUtilities
    string fDataType;           // possible data types are TeV_anasum, TeV_ascii, XRT_ascii
 
    VFluxCalculation*           fFluxCombined;     // does this has to be global? used in initializeTeVLightCurve() only
-   vector< VLightCurveData* >  fFluxInterval;
+
    double                      fEnergy_min_TeV;
    double                      fEnergy_max_TeV;
 
@@ -50,16 +54,13 @@ class VLightCurve : public VPlotUtilities
    double fUpperLimit;
    int    fUpperLimitMethod;
 
-// phases
-   double   fPhase_MJD0;
-   double   fPhase_Period_days;
-   bool     fPhasePlotting;
-
 // plotting
    TCanvas *fCanvasLightCurve;
    double   fPlottingMJDMin;
    double   fPlottingMJDMax;
    TGraphAsymmErrors *fLightCurveGraph;
+   TH2D*    fMCRandomizedPhaseogram;
+   TProfile* fMCRandomizedPhaseogramProf;
 
    double   fRateAxisMin;
    double   fRateAxisMax;
@@ -79,25 +80,24 @@ class VLightCurve : public VPlotUtilities
   ~VLightCurve() {}
    bool     fill( double iEMin_TeV = 1., double iEMax_TeV = -1., bool iPrint = false );       // energy [TeV]
    string   getDataType() { return fDataType; }
-   vector< VLightCurveData* > getLightCurveData();
    TGraphAsymmErrors*         getLightCurveGraph() { return fLightCurveGraph; }
    string   getLightCurveAxisTitle();
-   double   getPhase( double iMJD );
+   TH2D*    getRandomizedPhaseogram()      { return fMCRandomizedPhaseogram; }
+   TProfile* getRandomizedPhaseogramProf() { return fMCRandomizedPhaseogramProf; }
+   bool     fillRandomizedPhaseogram( double iMCCycles, double iPhaseError_low, double iPhaseErrorUp, string iHisName, double iHisMin_y, double iHisMax_y );
    string   getRateAxisTitle() { return fRateAxisTitle; }
    bool     initializeTeVLightCurve( string iASCIIFile );
    bool     initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin = -1., double iMJDMax = -1. );
-   bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1., double iMJDStart = 54857.09977457897, unsigned int iFormatID = 0 );
-   void     printLightCurve( bool bFullDetail = true );
+   bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1. );
    TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1, string iPlottingOption = "p" );
    bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );
-   void     setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days =99., bool bPlotPhase = true );
    void     setPlottingParameter( double iPlottingMJDMin, double iPlottingMJDMax );
    void     setSignificanceParameters( double iThresholdSignificance = -9999., double iMinEvents = -9999., double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
    void     setLightCurveAxis( double iYmin = -9.e10, double iYmax = -9.e10, string iAxisTitle = "tevRate" );
    void     setName( string iName ) { fName = iName; }
    void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
 
-   ClassDef( VLightCurve, 1 );
+   ClassDef( VLightCurve, 3 );
 };
 
 #endif

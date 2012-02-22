@@ -19,6 +19,8 @@ VLightCurve::VLightCurve()
 
    fLightCurveGraph = 0;
    fCanvasLightCurve = 0;
+   fMCRandomizedPhaseogram = 0;
+   fMCRandomizedPhaseogramProf = 0;
 
    setSignificanceParameters();
    setSpectralParameters();
@@ -32,77 +34,27 @@ VLightCurve::VLightCurve()
 
     read XRT light curve from a ASCII file
 
-    iFormatID == 0 :  Leicester format
-    iFormatID == 1 :  MJD, half width of the MJD time bin, deabsorbed 0.3-10 keV flux, error in the flux (in 10^-12 ergs/cm2/s)
-
 */
-bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, double iMJDMax, double iMJDStart, unsigned int iFormatID )
+bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, double iMJDMax )
 {
    fDataType = "XRT_ascii";
 
-// resetting light curve data vector
-   fFluxInterval.clear();
-
 // read in ascii file
-   ifstream is( iXRTFile.c_str() );
-   if( !is )
-   {
-      cout << "VLightCurve::initializeXRTLightCurve error reading XRT file: " << iXRTFile << endl;
-      return false;
-   }
-   cout << "VLightCurve::initializeXRTLightCurve reading " << iXRTFile << endl;
-   double iTemp1 = 0.;
-   double iTemp2 = 0.;
-
-   double iMJDDataMin = 1.e99;
-   double iMJDDataMax = -1.e99;
-
-   string is_line;
-
-   while(  getline( is, is_line ) )
-   {
-       if( is_line.size() == 0 ) continue;
-
-       istringstream is_stream( is_line );
-
-//! no errors are catched here..
-       is_stream >> iTemp1;     // second since iMJDStart
-       is_stream >> iTemp2;     // error [s]
-
-       if( iFormatID == 0 )
-       {
-	  iTemp1  = iMJDStart + iTemp1/(24.0*60.0*60.0);
-	  iTemp2 /= (24.0*60.0*60.0);
-       }
-
-       if( iMJDMin > 0. && iTemp1 - iTemp2 < iMJDMin ) continue;
-       if( iMJDMax > 0. && iTemp1 + iTemp2 > iMJDMax ) continue;
-
-       fFluxInterval.push_back( new VLightCurveData() ); 
-       fFluxInterval.back()->fMJD_Data_min = iTemp1 - iTemp2;
-       fFluxInterval.back()->fMJD_Data_max = iTemp1 + iTemp2;
-
-       if( fFluxInterval.back()->fMJD_Data_min < iMJDDataMin ) iMJDDataMin = fFluxInterval.back()->fMJD_Data_min;
-       if( fFluxInterval.back()->fMJD_Data_max > iMJDDataMax ) iMJDDataMax = fFluxInterval.back()->fMJD_Data_max;
-
-       is_stream >> iTemp1;     // rate
-       is_stream >> iTemp2;     // rate error
-
-       fFluxInterval.back()->fFlux = iTemp1;
-       fFluxInterval.back()->fFluxError = iTemp2;
-   }
+   readASCIIFile( iXRTFile, iMJDMin, iMJDMax );
+   if( isZombie() ) return false;
 
 // plotting range
-   if( fPlottingMJDMin < 0. ) fPlottingMJDMin = iMJDDataMin - 5.;
-   if( fPlottingMJDMax < 0. ) fPlottingMJDMax = iMJDDataMax + 5.;
-
-   is.close();
-
-   cout << "VLightCurve::initializeXRTLightCurve total number of light curve data: " << fFluxInterval.size() << endl;
+   if( fPlottingMJDMin < 0. ) fPlottingMJDMin = getLightCurveMJD_min() - 5.;
+   if( fPlottingMJDMax < 0. ) fPlottingMJDMax = getLightCurveMJD_max() + 5.;
 
    return true;
 }
 
+/*
+
+    read TeV fluxes from ASCII file
+
+*/
 bool VLightCurve::initializeTeVLightCurve( string iASCIIFile )
 {
 // make sure that this is really a ascii file
@@ -113,70 +65,22 @@ bool VLightCurve::initializeTeVLightCurve( string iASCIIFile )
 
    fDataType = "TeV_ascii";
 
-// resetting light curve data vector
-   fFluxInterval.clear();
-
 // read in ascii file
-   ifstream is( iASCIIFile.c_str() );
-   if( !is )
-   {
-      cout << "VLightCurve::initializeTeVLightCurve error reading TeV ascii file: " << iASCIIFile << endl;
-      return false;
-   }
-   double iTemp1 = 0.;
-   double iTemp2 = 0.;
-
-   double iMJDMin = 1.e99;
-   double iMJDMax = -1.e99;
-
-   string is_line;
-
-   while(  getline( is, is_line ) )
-   {
-       if( is_line.size() == 0 ) continue;
-
-       istringstream is_stream( is_line );
-
-       fFluxInterval.push_back( new VLightCurveData() ); 
-
-       is_stream >> iTemp1;     // MJD min
-       is_stream >> iTemp2;     // MJD max
-
-       fFluxInterval.back()->fMJD_Data_min = iTemp1;
-       fFluxInterval.back()->fMJD_Data_max = iTemp2;
-       fFluxInterval.back()->setMJDInterval( fFluxInterval.back()->fMJD_Data_min, fFluxInterval.back()->fMJD_Data_max );
-
-       if( fFluxInterval.back()->fMJD_Data_min < iMJDMin ) iMJDMin = fFluxInterval.back()->fMJD_Data_min;
-       if( fFluxInterval.back()->fMJD_Data_max > iMJDMax ) iMJDMax = fFluxInterval.back()->fMJD_Data_max;
-
-       is_stream >> iTemp1;     // flux
-       is_stream >> iTemp2;     // flux error
-
-       if( iTemp2 > 0. )
-       {
-          fFluxInterval.back()->fFlux = iTemp1;
-          fFluxInterval.back()->fFluxError = iTemp2;
-       }
-       else if( iTemp1 > 0. && iTemp2 < 0. )
-       {
-          fFluxInterval.back()->fUpperFluxLimit = iTemp1;
-       }
-
-       if( !is_stream.eof() ) 
-       {
-          is_stream >> fFluxInterval.back()->fName;
-       }
-   }
+   readASCIIFile( iASCIIFile );
+   if( isZombie() ) return false;
 
 // plotting range
-   if( fPlottingMJDMin < 0. ) fPlottingMJDMin = iMJDMin - 5.;
-   if( fPlottingMJDMax < 0. ) fPlottingMJDMax = iMJDMax + 5.;
-
-   is.close();
+   if( fPlottingMJDMin < 0. ) fPlottingMJDMin = getLightCurveMJD_min() - 5.;
+   if( fPlottingMJDMax < 0. ) fPlottingMJDMax = getLightCurveMJD_max() + 5.;
 
    return true;
 }
 
+/*
+
+    read fluxes etc from anasum file
+
+*/
 bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin, double iMJDMax )
 {
    fDataType = "TeV_anasum";
@@ -220,7 +124,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
    cout << "Defining " << iNbins << " time " << (iNbins==1 ? "interval" : "intervals") << " from " << iMJDMin << " to " << iMJDMax << endl;
 
 // resetting light curve data vector
-   fFluxInterval.clear();
+   fLightCurveData.clear();
 
 // fill all light curve bins (might be a run, or XX days long)
    for( unsigned int i = 0; i < iNbins; i++ )
@@ -235,12 +139,12 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 // get observing epoch
 	       if( z == 0 )
 	       {
-	          fFluxInterval.push_back( new VLightCurveData() ); 
-		  fFluxInterval.back()->setMJDInterval( iMJDMin + i * iDayInterval, iMJDMin + (i+1) * iDayInterval );
+	          fLightCurveData.push_back( new VLightCurveData() ); 
+		  fLightCurveData.back()->setMJDInterval( iMJDMin + i * iDayInterval, iMJDMin + (i+1) * iDayInterval );
                }
-	       if( fFluxInterval.back() )
+	       if( fLightCurveData.back() )
 	       {
-	          fFluxInterval.back()->fRunList.push_back( fFluxCombined->getRunList()[j] );
+	          fLightCurveData.back()->fRunList.push_back( fFluxCombined->getRunList()[j] );
                }
 	       z++;
 	   }
@@ -280,35 +184,19 @@ bool VLightCurve::fillXRT_ascii( bool iPrint )
 bool VLightCurve::fillTeV_anasum( bool iPrint )
 {
 // loop over all light curve data and calculate fluxes   
-   for( unsigned int i = 0; i < fFluxInterval.size(); i++ )
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
    {
-       if( fFluxInterval[i] )
+       if( fLightCurveData[i] )
        {
-          fFluxInterval[i]->setFluxCalculationEnergyInterval( fEnergy_min_TeV, fEnergy_max_TeV );
-          fFluxInterval[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha );
-//	  fFluxInterval[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, fUpperLimit, fUpperLimitMethod, fLiMaEqu );
+          fLightCurveData[i]->setFluxCalculationEnergyInterval( fEnergy_min_TeV, fEnergy_max_TeV );
+          fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha );
+//	  fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, fUpperLimit, fUpperLimitMethod, fLiMaEqu );
        }
    }
 
    if( iPrint ) printLightCurve();
 
    return true;
-}
-
-void VLightCurve::setPhaseFoldingValues( double iZeroPhase_MJD, double iPhase_Days, bool bPlotPhase )
-{
-   fPhase_MJD0 = iZeroPhase_MJD;
-   fPhase_Period_days = iPhase_Days;
-   fPhasePlotting = bPlotPhase;
-}
-
-double VLightCurve::getPhase( double iMJD )
-{
-   iMJD = ( iMJD - fPhase_MJD0 ) / fPhase_Period_days;
-   iMJD =   iMJD - TMath::Floor( iMJD );
-   if( !fPhasePlotting ) iMJD  *= fPhase_Period_days;
-
-   return iMJD;
 }
 
 /*
@@ -406,11 +294,11 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 
 // loop over all measured values
     unsigned int z = 0;
-    for( unsigned int i = 0; i < fFluxInterval.size(); i++ )
+    for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
     {
 // x-axis: MJD or phase 
-       double iMJD_mean =  fFluxInterval[i]->getMJD();
-       double iMJD_error = fFluxInterval[i]->getMJDError();
+       double iMJD_mean =  fLightCurveData[i]->getMJD();
+       double iMJD_error = fLightCurveData[i]->getMJDError();
 // phase dependent analysis
        if( fPhase_Period_days > 0. )
        {
@@ -420,29 +308,29 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 
 /////////////
 // plot fluxes or confidence intervals
-       if( fFluxInterval[i] && fFluxInterval[i]->fFluxError >= 0. )
+       if( fLightCurveData[i] && fLightCurveData[i]->fFluxError >= 0. )
        {
 	  if( iPlotConfidenceInterval < 0 )
 	  {
-	     fLightCurveGraph->SetPoint( z, iMJD_mean, fFluxInterval[i]->fFlux );
-	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, fFluxInterval[i]->fFluxError, fFluxInterval[i]->fFluxError );
+	     fLightCurveGraph->SetPoint( z, iMJD_mean, fLightCurveData[i]->fFlux );
+	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, fLightCurveData[i]->fFluxError, fLightCurveData[i]->fFluxError );
 	  }
 	  else
 	  {
 // plot coincidence intervals
-	     double iFMean = 0.5*(fFluxInterval[i]->fRunFluxCI_lo_1sigma+fFluxInterval[i]->fRunFluxCI_up_1sigma);
+	     double iFMean = 0.5*(fLightCurveData[i]->fRunFluxCI_lo_1sigma+fLightCurveData[i]->fRunFluxCI_up_1sigma);
 	     fLightCurveGraph->SetPoint( z, iMJD_mean, iFMean );
 // (minimum width -> make sure that line is visible...)
 	     if( iMJD_error < 0.3 && !(fPhase_Period_days > 0. ) ) iMJD_error = 0.3;
-	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, iFMean-fFluxInterval[i]->fRunFluxCI_lo_1sigma, fFluxInterval[i]->fRunFluxCI_up_1sigma-iFMean );
+	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, iFMean-fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma-iFMean );
 	  }
 	  z++;
        }
 /////////////
 // plot upper flux limits
-       else if( fFluxInterval[i]->fUpperFluxLimit > 0. )
+       else if( fLightCurveData[i]->fUpperFluxLimit > 0. )
        {
-           TArrow *fUL = new TArrow( iMJD_mean, fFluxInterval[i]->fUpperFluxLimit, iMJD_mean, fFluxInterval[i]->fUpperFluxLimit - 0.05*hLightCurve->GetMaximum(), 0.01, "|-|>" );
+           TArrow *fUL = new TArrow( iMJD_mean, fLightCurveData[i]->fUpperFluxLimit, iMJD_mean, fLightCurveData[i]->fUpperFluxLimit - 0.05*hLightCurve->GetMaximum(), 0.01, "|-|>" );
 	   setArrowPlottingStyle( fUL );
 	   fUL->Draw(); 
        }
@@ -450,8 +338,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 // plot observational periods
        else
        {
-           cout << "no plotting for flux intervall " << i << "\t" << fFluxInterval[i]->fMJD_min << "\t" << fFluxInterval[i]->fMJD_max << ":" << endl;
-	   cout << "\t" << fFluxInterval[i]->fFlux << " +- " << fFluxInterval[i]->fFluxError << " , UL" << fFluxInterval[i]->fUpperFluxLimit << endl;
+           cout << "no plotting for flux intervall " << i << "\t" << fLightCurveData[i]->fMJD_min << "\t" << fLightCurveData[i]->fMJD_max << ":" << endl;
+	   cout << "\t" << fLightCurveData[i]->fFlux << " +- " << fLightCurveData[i]->fFluxError << " , UL" << fLightCurveData[i]->fUpperFluxLimit << endl;
        }
     }
     if( fLightCurveGraph->GetN() > 0 )
@@ -525,15 +413,15 @@ double VLightCurve::getLightCurveAxisRange_Min()
    if( fRateAxisMin >= -1.e5 ) iFluxMin = fRateAxisMin;
    else
    {
-       for( unsigned int i = 0; i < fFluxInterval.size(); i++ )
+       for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
        {
-	  if( fFluxInterval[i] && fFluxInterval[i]->fFluxError > 0. && fFluxInterval[i]->fFlux - fFluxInterval[i]->fFluxError < iFluxMin )
+	  if( fLightCurveData[i] && fLightCurveData[i]->fFluxError > 0. && fLightCurveData[i]->fFlux - fLightCurveData[i]->fFluxError < iFluxMin )
 	  {
-	     iFluxMin = fFluxInterval[i]->fFlux - fFluxInterval[i]->fFluxError;
+	     iFluxMin = fLightCurveData[i]->fFlux - fLightCurveData[i]->fFluxError;
 	  }
-	  else if( fFluxInterval[i] && fFluxInterval[i]->fUpperFluxLimit > 0. && fFluxInterval[i]->fUpperFluxLimit < iFluxMin )
+	  else if( fLightCurveData[i] && fLightCurveData[i]->fUpperFluxLimit > 0. && fLightCurveData[i]->fUpperFluxLimit < iFluxMin )
 	  {
-	     iFluxMin = fFluxInterval[i]->fUpperFluxLimit;
+	     iFluxMin = fLightCurveData[i]->fUpperFluxLimit;
 	  }
        }
     }
@@ -548,15 +436,15 @@ double VLightCurve::getLightCurveAxisRange_Max()
    if( fRateAxisMax >= 0. ) iFluxMax = fRateAxisMax;
    else
    {
-       for( unsigned int i = 0; i < fFluxInterval.size(); i++ )
+       for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
        {
-	  if( fFluxInterval[i] && fFluxInterval[i]->fFluxError > 0. && fFluxInterval[i]->fFlux + fFluxInterval[i]->fFluxError > iFluxMax )
+	  if( fLightCurveData[i] && fLightCurveData[i]->fFluxError > 0. && fLightCurveData[i]->fFlux + fLightCurveData[i]->fFluxError > iFluxMax )
 	  {
-	     iFluxMax = fFluxInterval[i]->fFlux + fFluxInterval[i]->fFluxError;
+	     iFluxMax = fLightCurveData[i]->fFlux + fLightCurveData[i]->fFluxError;
 	  }
-	  else if( fFluxInterval[i] && fFluxInterval[i]->fUpperFluxLimit > 0. && fFluxInterval[i]->fUpperFluxLimit > iFluxMax )
+	  else if( fLightCurveData[i] && fLightCurveData[i]->fUpperFluxLimit > 0. && fLightCurveData[i]->fUpperFluxLimit > iFluxMax )
 	  {
-	     iFluxMax = fFluxInterval[i]->fUpperFluxLimit;
+	     iFluxMax = fLightCurveData[i]->fUpperFluxLimit;
 	  }
        }
    }
@@ -582,52 +470,73 @@ string VLightCurve::getLightCurveAxisTitle()
     return fRateAxisTitle;
 }
 
-void VLightCurve::printLightCurve( bool bFullDetail )
+/*
+
+   show impact of error on period on phaseograms by using randomizing the period and filling a 2D histogram
+
+*/
+bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError_low, double iPhaseErrorUp, string iHisName, double iHisMin_y, double iHisMax_y )
 {
-// print light curve with many details
-   if( bFullDetail )
+// 2D histogram
+   if( fMCRandomizedPhaseogram == 0 )
    {
-      for( unsigned int i = 0; i < fFluxInterval.size(); i++ )
-      {
-	 cout << i << "\tMJD " << fFluxInterval[i]->fMJD_min << " - " << fFluxInterval[i]->fMJD_max;
-	 cout << " (" << fFluxInterval[i]->getMJD() << " +- " << fFluxInterval[i]->getMJDError() << ")";
-	 if( fPhase_Period_days > 0. )
-	 {
-	     double iMJD_mean = fFluxInterval[i]->getMJD();
-	     cout << ", Phase " << getPhase( iMJD_mean );
-	 }
-	 if( fFluxInterval[i]->fRunList.size() > 0 ) cout << " # runs: " << fFluxInterval[i]->fRunList.size();
-	 cout << endl;
-	 if( fFluxInterval[i]->fNon >= 0. ) cout << "\tNon " << fFluxInterval[i]->fNon << "\tNoff " << fFluxInterval[i]->fNoff;
-	 cout << "\t Significance: " << fFluxInterval[i]->fSignificance;
-	 cout << "\t Tot Time [h]: " << fFluxInterval[i]->fRunTime/3600.;
-	 cout << endl;
-	 cout << "\tFlux " << fFluxInterval[i]->fFlux;
-	 cout << " +- " << fFluxInterval[i]->fFluxError << "\tUL " << fFluxInterval[i]->fUpperFluxLimit;
-	 if( fFluxInterval[i]->fRunFluxCI_lo_1sigma >= 0. )
-	 {
-	    cout << "\t CI (1 sigma): " << fFluxInterval[i]->fRunFluxCI_lo_1sigma << "\t" << fFluxInterval[i]->fRunFluxCI_up_1sigma;
-	    cout << "\t CI (3 sigma): " << fFluxInterval[i]->fRunFluxCI_lo_3sigma << "\t" << fFluxInterval[i]->fRunFluxCI_up_3sigma;
-	 }
-	 cout << endl;
-	 if( fFluxInterval[i]->fName.size() > 0 ) cout << "\t (" << fFluxInterval[i]->fName << ")" << endl;
-      }
+      fMCRandomizedPhaseogram = new TH2D( iHisName.c_str(), "", 100, 0., 1., 100., iHisMin_y, iHisMax_y );
+      fMCRandomizedPhaseogram->SetStats( 0 );
    }
-// print values useful for e.g. z-correlation analysis
    else
    {
-      for( unsigned int i = 0; i < fFluxInterval.size(); i++ )
-      {
-         cout << "  "    << fFluxInterval[i]->getMJD();
-	 cout << "     " << fFluxInterval[i]->fFlux;
-	 cout << "     " << fFluxInterval[i]->fFluxError;
-	 cout << endl;
-      }
+      fMCRandomizedPhaseogram->Reset();
+   }
+// profile histogram
+   if( fMCRandomizedPhaseogramProf == 0 )
+   {
+      iHisName += "prof";
+      fMCRandomizedPhaseogramProf = new TProfile( iHisName.c_str(), "", 100, 0., 1., iHisMin_y, iHisMax_y );
+      fMCRandomizedPhaseogramProf->SetStats( 0 );
+   }
+   else
+   {
+      fMCRandomizedPhaseogramProf->Reset();
    }
 
-}
+// keep old period
+   double iPhase_Period_days_backup = fPhase_Period_days;
 
-vector< VLightCurveData* > VLightCurve::getLightCurveData()
-{
-   return fFluxInterval;
+   double x = 0.;
+   double y = 0.;
+   double iPhaseOrbit = 0.;
+   double iPhaseOrbitError = 0.;
+
+   for( unsigned int i = 0; i < iMCCycles; i++ )
+   {
+	 if( gRandom->Uniform( 1. ) < 0.5 )
+	 {
+	    iPhaseOrbitError = -1.*TMath::Abs( gRandom->Gaus( 0., iPhaseError_low ) );
+	 }
+	 else
+	 {
+	    iPhaseOrbitError = TMath::Abs( gRandom->Gaus( 0., iPhaseErrorUp ) );
+	 }
+	 iPhaseOrbit = iPhase_Period_days_backup + iPhaseOrbitError;
+
+	 setPhaseFoldingValues( fPhase_MJD0, iPhaseOrbit, fPhasePlotting );
+
+	 for( unsigned int j = 0; j < fLightCurveData.size(); j++ )
+	 {
+// second MC cycle: take errors in flux into account
+	     x = getPhase( fLightCurveData[j]->getMJD() );
+             for( unsigned int k = 0; k < iMCCycles; k++ )
+	     {
+		y = gRandom->Gaus( fLightCurveData[j]->fFlux, fLightCurveData[j]->fFluxError );
+
+		fMCRandomizedPhaseogram->Fill( x, y );
+		fMCRandomizedPhaseogramProf->Fill( x, y );
+             }
+	 } 
+   }
+
+// restore old phase values
+   setPhaseFoldingValues( fPhase_MJD0, iPhase_Period_days_backup, fPhasePlotting );
+
+   return true;
 }
