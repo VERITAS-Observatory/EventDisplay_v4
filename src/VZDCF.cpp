@@ -16,6 +16,8 @@
 VZDCF::VZDCF()
 {
 
+  setMLinterval();
+
 }
 
 bool VZDCF::readZDCF( string iFile )

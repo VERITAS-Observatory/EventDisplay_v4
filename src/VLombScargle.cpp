@@ -1,6 +1,8 @@
 /* \class VLombScargle
    \brief spectral analysis of unevenly sampled data (after Lomb/Scargle)
 
+   see e.g. Scargle, J., ApJ 263, 835 (1982)
+
    TODO:
 
    calculate of error on period (shuffling of light curve inside errors)
@@ -225,7 +227,9 @@ void VLombScargle::plotProbabilityLevelsFromToyMC( unsigned int iMCCycles, unsig
 // calculate probability levels
    cout << "calculating probability levels" << endl;
 
-   TCanvas *c = new TCanvas( "c", "", 400, 500, 500, 500 );
+   TCanvas *c = new TCanvas( "c", "Toy MC probability level calculation (debug histogram)", 400, 500, 500, 500 );
+   c->SetGridx( 0 );
+   c->SetGridy( 0 );
    hC.DrawCopy( "colz" );
 
    for( unsigned int i = 0; i < fProbabilityLevels.size(); i++ )
