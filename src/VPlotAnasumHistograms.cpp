@@ -97,6 +97,7 @@ void VPlotAnasumHistograms::help()
  *      
  *
  */
+
 void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , double xerr, double yerr)
 {
   //cout << "(this is preliminary)" << endl << endl;
@@ -106,21 +107,33 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , d
   double i_decDiff = 0.;
   double i_raDiff = 0.;
 
-  VSkyCoordinatesUtilities::getWobbleOffsets( y, -1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+  if (x>0)
+    VSkyCoordinatesUtilities::getWobbleOffsets( y, -1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
 
+  if (x<0)
+    VSkyCoordinatesUtilities::getWobbleOffsets( y, 1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+
+  cout << "i_raDiff " << i_raDiff << " i_decDiff " << i_decDiff << endl;
   double ra = fSkyMapCentreRAJ2000+i_raDiff;
   double dec = fSkyMapCentreDecJ2000+i_decDiff;
 
 
-  double ra_err = 0.;
-  double dec_err = 0.; 
+  double ra_err;
+  double dec_err; 
 
   if ( xerr !=0 && yerr !=0 )
   {
     i_decDiff = 0.;
     i_raDiff = 0.;
 
-    VSkyCoordinatesUtilities::getWobbleOffsets( y+yerr, -1.*(x+xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+    if (y<0)
+      yerr = -1*yerr;
+
+    if(x>0)
+      VSkyCoordinatesUtilities::getWobbleOffsets( y+yerr, -1.*(x+xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+    if(x<0)
+      VSkyCoordinatesUtilities::getWobbleOffsets( y+yerr, (x-xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+
     ra_err  =  abs(fSkyMapCentreRAJ2000+i_raDiff - ra);
     dec_err =  fSkyMapCentreDecJ2000+i_decDiff - dec;  
   }  
@@ -179,6 +192,8 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , d
   cout << "Offset from camera center = " << offset << " deg"<< endl;
 
 }
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /*
