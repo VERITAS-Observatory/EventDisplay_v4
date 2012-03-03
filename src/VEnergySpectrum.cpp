@@ -579,8 +579,9 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 // debug output
         if( fDebug == 3 )
 	{
+	   cout << setprecision( 3 );
 	   cout << "bin " << i << ", E " << hErec->GetBinCenter( i ) << "\t" << hErec->GetBinWidth( i ) << endl;
-	   cout << "\thErec " << y << "\t" << yerr << "\t" << i_non << "\t" << i_noff << endl;
+	   cout << "\thErec " << y << "\t" << yerr << "\t" << (int)i_non << "\t" << (int)i_noff << endl;
 	   cout << "\thOn  " << hErecCountsOn->GetBinCenter( i ) << "\t" << hErecCountsOn->GetBinContent( i );
 	   cout << "\t" << i_non << endl;
 	   cout << "\thOff " << hErecCountsOff->GetBinCenter( i ) << "\t" << hErecCountsOff->GetBinContent( i );
@@ -729,6 +730,11 @@ void VEnergySpectrum::calculateDifferentialFluxes()
         }
 // observation time
         i_flux.ObsTime = hErecTotalTime->GetBinContent( i );
+	if( i_flux.ObsTime < 1.e-5 )
+	{
+	   if( fDebug == 3 ) cout << "\t\t no observation time " << endl;
+	   continue;
+        }
 
 // calculate significance (using Li&Ma, note: event number might be too low here for Li & Ma
         i_flux.Significance = VStatistics::calcSignificance( i_flux.NOn, i_flux.NOff, fTotalNormalisationFactor, fAnalysisLiAndMaEquation );
@@ -1094,7 +1100,10 @@ void VEnergySpectrum::plotFitValues()
 TCanvas* VEnergySpectrum::plotResiduals( TCanvas *c )
 {
     if( !fSpectralFitter ) return 0;
-    if( !gEnergySpectrum ) return 0;
+    if( !gEnergySpectrum )
+    {
+       return 0;
+    }
 
     gEnergySpectrumFitResiduals = new TGraphErrors( gEnergySpectrum->GetN() );
     gEnergySpectrumFitResiduals->SetMarkerColor( fPlottingColor );
