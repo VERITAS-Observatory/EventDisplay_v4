@@ -170,8 +170,12 @@ namespace VStatistics
     iMethod == 3: Feldman & Cousins
     iMethod == 4: Rolke Model 3
     iMethod == 5: Rolke Model 4
+
+    ratio = ratio between on and off exposure
+
+    CL    = confidence limit (e.g. 0.99 for 99% probability)
 */
-    inline double calcUpperLimit(double nOn, double nOff,double ratio, double CL, int iMethod = 0, double method4_em = 1., double method4_sdem = 0.3, double method5_e = 1. )
+    inline double calcUpperLimit( double nOn, double nOff, double ratio, double CL, int iMethod = 0 )
     {
 // Helene taking ratio into account
         if( iMethod == 0 ) return Helene( nOn, nOff, ratio, CL );
@@ -211,16 +215,20 @@ namespace VStatistics
             i_Rolke.SetCL( CL );
 
             double sdb = ratio*sqrt( nOff );
-            return i_Rolke.CalculateInterval((int)nOn, 0, 0, ratio*nOff, method4_em, 0., 3, method4_sdem, sdb, 0., 0., 0 );
+
+	    i_Rolke.SetGaussBkgGaussEff( (int)nOn, ratio*nOff, 1., 0.3, sdb );
+
+	    return i_Rolke.GetUpperLimit();
         }
 // Rolke Model 4 Background - Poisson, Efficiency - known
 // method5_e    efficiency
-        else if( iMethod == 5 )
+        else if( iMethod == 5 && ratio > 0. )
         {
             TRolke i_Rolke;
             i_Rolke.SetCL( CL );
+	    i_Rolke.SetPoissonBkgKnownEff( (int)nOn, (int)nOff, 1./ratio, 1. );
 
-            return i_Rolke.CalculateInterval((int)nOn, (int)nOff, 0, 0., 0., method5_e, 4, 0., 0., ratio, 0., 0 );
+	    return i_Rolke.GetUpperLimit();
         }
         else
         {
