@@ -539,13 +539,20 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
     VOnOff *fstereo_onoff = new VOnOff();
 
 // 1D histograms
-    fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm, i_norm_alpha, (onrun == -1) );
+    fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), 
+                                                  fStereoOff->getParameterHistograms(), 
+						  i_norm, i_norm_alpha, (onrun == -1) );
 
 // correlated maps
-    fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), fStereoOff->getSkyHistograms( false ), i_norm, fStereoOff->getAlphaNorm(), (onrun == -1) );
+    fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), 
+                                            fStereoOff->getSkyHistograms( false ), 
+					    i_norm, fStereoOff->getAlphaNorm(), (onrun == -1) );
 // uncorrelated maps
-    fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), fStereoOff->getSkyHistograms( true ), i_norm, fStereoOff->getAlphaNormUC(), (onrun == -1) );
+    fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), 
+                                            fStereoOff->getSkyHistograms( true ), 
+					    i_norm, fStereoOff->getAlphaNormUC(), (onrun == -1) );
 
+// print out maximum in maps
     cout << "\t Maximum in CORRELATED maps: " << endl;
     TH2D *hStSig = (TH2D*)fstereo_onoff->do2DSignificance( fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), fStereoOff->getAlphaNorm() );
     cout << "\t Maximum in UNCORRELATED maps: " << endl;
@@ -733,11 +740,11 @@ void VAnaSum::doLightCurves( TDirectory *iDir, double ialpha, VStereoAnalysis *i
 }
 
 
-/*!
- *
- *  calculate differential energy spectrum
- *
- */
+/*
+  
+    calculate differential energy spectrum
+  
+*/
 void VAnaSum::makeEnergySpectrum( int ionrun, TList* l, double it )
 {
     TIter next( l );
@@ -758,14 +765,16 @@ void VAnaSum::makeEnergySpectrum( int ionrun, TList* l, double it )
             if( inorm > 0. ) h->Scale( 1./inorm );
             continue;
         }
-//////////////////////
-// single runs only from here on
+
+///////////////////////////////////////////////////////
+// individual runs only from here on
+///////////////////////////////////////////////////////
 
 // divide by elapsed time
+// set time intevall for 2D histo
+	if( itemp.find( "2D" ) < itemp.size() ) {it = fStereoOn->getRateTimeIntervall()[0];}
 // (expect time in seconds)
         if( it <= 0. ) it = 1.;
-	// set time intevall for 2D histo
-	if( itemp.find( "2D" ) < itemp.size() ) {it = fStereoOn->getRateTimeIntervall()[0];}
         h->Scale( 1./it );
 // apply dead time correction
         if( fStereoOn->getDeadTimeFraction() > 0. ) h->Scale( 1.+fStereoOn->getDeadTimeFraction() );
@@ -778,59 +787,47 @@ void VAnaSum::makeEnergySpectrum( int ionrun, TList* l, double it )
 
 
 // Set Energy Bins for 2D
-
    if( itemp.find( "2D" ) < itemp.size() )
    {
-// linear energy axis                                                                                                                                                                                      
-   if( itemp.find( "Lin" ) < itemp.size() )
-     {
-       for( int i = 1; i <= h->GetNbinsX(); i++ )
-	 {
-	   for( int j = 1; j <= h->GetNbinsY(); j++)
-	     {
-	       elow = h->GetBinLowEdge( i );
-	       ehigh = h->GetBinLowEdge( i ) +h->GetBinWidth( i );
+// linear energy axis
+      if( itemp.find( "Lin" ) < itemp.size() )
+      {
+	  for( int i = 1; i <= h->GetNbinsX(); i++ )
+	  {
+	      for( int j = 1; j <= h->GetNbinsY(); j++)
+	      {
+		  elow = h->GetBinLowEdge( i );
+		  ehigh = h->GetBinLowEdge( i ) +h->GetBinWidth( i );
 
-	       if( ehigh - elow > 0. )
-		 {
+		  if( ehigh - elow > 0. )
+		  {
+		      h->SetBinContent( h->GetBin(i,j), h->GetBinContent( h->GetBin(i,j) ) / (ehigh - elow) );
+		      h->SetBinError(   h->GetBin(i,j), h->GetBinError(   h->GetBin(i,j) ) / (ehigh - elow) );
+		  }
+		}
+	    }
+	      
+	}
+	else
+	{
+// logarithmic energy axis
+	    for( int i = 1; i <= h->GetNbinsX(); i++ )
+	    {
+		for( int j = 1 ; j<= h->GetNbinsY(); j++)
+		{
+		    elow  = pow( 10., h->GetBinLowEdge( i ) );
+		    ehigh = pow( 10., h->GetBinLowEdge( i )+h->GetBinWidth( i ) );
 
-		   h->SetBinContent( h->GetBin(i,j), h->GetBinContent( h->GetBin(i,j) ) / (ehigh - elow) );
-		   
-		   h->SetBinError( h->GetBin(i,j), h->GetBinError( h->GetBin(i,j) ) / (ehigh - elow) );
-		
-		 }
-	     }
-	 }
-	   
-     }
-   else
-     {
-       // logarithmic energy axis                                                                                                                                                                                 
-       for( int i = 1; i <= h->GetNbinsX(); i++ )
-	 {
-	   for( int j = 1 ; j<= h->GetNbinsY(); j++)
-	     {
-		  
-	       elow = pow( 10., h->GetBinLowEdge( i ) );
-	       ehigh = pow( 10., h->GetBinLowEdge( i )+h->GetBinWidth( i ) );
-
-	       if( ehigh - elow > 0. )
-		 {
-		
-		   h->SetBinContent( h->GetBin(i,j), h->GetBinContent( h->GetBin(i,j) ) / (ehigh - elow) );
-		   h->SetBinError( h->GetBin(i,j), h->GetBinError(h->GetBin( i,j) ) / (ehigh - elow) );
-		
-		 }
-	     }
-	 }
-	    
-	    
-       
-     }
-
-   continue;
- }
-
+		    if( ehigh - elow > 0. )
+		    {
+			 h->SetBinContent( h->GetBin(i,j), h->GetBinContent( h->GetBin(i,j) ) / (ehigh - elow) );
+			 h->SetBinError(   h->GetBin(i,j), h->GetBinError(   h->GetBin(i,j) ) / (ehigh - elow) );
+		    }
+		}
+	    }
+	}
+        continue;
+   }
 // linear energy axis
         if( itemp.find( "Lin" ) < itemp.size() )
         {

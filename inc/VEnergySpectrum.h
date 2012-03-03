@@ -16,10 +16,12 @@
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TFile.h"
+#include "TGraphAsymmErrors.h"
 #include "TGraphErrors.h"
 #include "TH1D.h"
 #include "TLatex.h"
 #include "TMath.h"
+#include "TRolke.h"
 #include "TTree.h"
 
 #include <iomanip>
@@ -34,10 +36,9 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
     private:
 
         bool  bZombie;                            //! status of files
-
         bool  bCombineRuns;                       //! rerun combine runs
 
-        int  fTotalRun;
+        int  fTotalRun;                           // total number of runs found and used
 
         string fDataSetName;                      //! name for histogram, canvases, etc. (no spaces, special characters)
 
@@ -60,6 +61,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         double fAnalysisUpperLimits;
         int    fAnalysisLiAndMaEquation;
         int    fAnalysisUpperLimitAlgorithm;
+	string fErrorCalculationMethod;
 
 // spectral fit variables
         VSpectralFitter *fSpectralFitter;
@@ -79,7 +81,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         double fPlottingMinEnergy;                // linear energy axis [TeV]
         double fPlottingMaxEnergy;                // linear energy axis [TeV]
         bool   fPlottingLogEnergyAxis;            // plot log or lin values on energy axis (default=true)
-        TGraphErrors *gEnergySpectrum;
+        TGraphAsymmErrors *gEnergySpectrum;
         TGraphErrors *gEnergySpectrumFitResiduals;
 
 // rebinning of energy spectra
@@ -98,6 +100,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void   addObservationTime( TH1* h, double iTObs, double iEThreshold, bool bLinearX = false );
         void   addHistogram( TH1*h1, TH1* h2, double iEThreshold, bool bLinearX );
         void   divideEnergySpectrumbydE( TH1* h, bool blin = false );
+	int    getRebinningGrouping( TH1* h, double iNewBinWidth );
         void   rebinEnergySpectrum( TH1D* h, double iER, bool bLin = false );
         void   multiplyEnergySpectrumbydE( TH1* h, bool blin = false );
 	TH1*   setVariableBinning(TH1 *a);
@@ -121,7 +124,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         double fTotalNormalisationFactor;
 
 // fill and plot energy spectrum graph
-        TGraphErrors* plot_energySpectrum();
+        TGraphAsymmErrors* plot_energySpectrum();
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
@@ -130,7 +133,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         VEnergySpectrum( string ifile, string iname = "E", int irun = -1  );
         ~VEnergySpectrum() {}
 
-	double    calculateIntegralFlux( double iMinEnergy_TeV, double iMaxEnergy_TeV = 1.e6 );
+	double    calculateIntegralFluxFromFitFunction( double iMinEnergy_TeV, double iMaxEnergy_TeV = 1.e6 );
         void      calculateDifferentialFluxes();
         bool      combineRuns();
         bool      combineRuns( vector< int > iRunList, bool blin = false );
@@ -138,7 +141,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TH1D*     getEnergyHistogram() { return hErec; }
         TH1D*     getEnergyCountingOnHistogram() { return hErecCountsOn; }
         TH1D*     getEnergyCountingOffHistogram() { return hErecCountsOff; }
-        TGraphErrors* getEnergySpectrumGraph();
+        TGraphAsymmErrors* getEnergySpectrumGraph();
         TH1D*     getTotalTimeHistogram() { return hErecTotalTime; }
         double    getTotalNormalisationFactor() { return fTotalNormalisationFactor; }
         bool      isZombie() { return bZombie; }
@@ -151,9 +154,10 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TCanvas*  plotLifeTimevsEnergy( TCanvas *c = 0 );
 
 	void printEnergyBins();
-        void setAddHistogramParameters( bool iB = false ) { fAnalysisHistogramAddingUseLowEdge = iB; }
+        void setAddHistogramParameters( bool iB = true ) { fAnalysisHistogramAddingUseLowEdge = iB; }
         void setEnergyBinning( double iBin = 0.2 );
 	bool setEnergyInBinDefinition( unsigned int iE = 2 );
+	bool setErrorCalculationMethod( string iMeth = "Rolke" );
 	void setReBinningGroupings( vector< int > g ) { newBinningGroupings = g; }
 	void setRebinBool(bool i_rebin);
         void setEnergyRangeLinear( double xmin, double max );
@@ -162,23 +166,25 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setEnergyThreshold( string a ) { fEnergyThresholdFileName = a; }
         void setEnergyThresholdDefinition( unsigned int iDef = 2, double iSys = 0.1, double iMaxEff = 0.1 )
 	                                 { fAnalysisEnergyThresholdDefinition = iDef; fAnalysisMaxEnergySystematic = iSys; fAnalysisMaxEffectiveAreaFraction = iMaxEff; }
-        void setSignificanceParameters( double iSig = 2., double iMinEvents = 5., double iUpperLimit = 0.99, int iLiAndMa = 5, int iULAlgo = 0 );
+        void setSignificanceParameters( double iSig = 2., double iMinOnEvents = 3., double iUpperLimit = 0.95, int iLiAndMa = 17, int iULAlgo = 5 );
 
         TF1* fitEnergySpectrum( string iname = "fit", bool bDraw = true );
         void setSpectralFitFunction( int iD  = 0 ) { fSpectralFitFunction = iD; }
         void setSpectralFitFluxNormalisationEnergy( double iS = 1. ) { fSpectralFitFluxNormalisationEnergy = iS; }
         void setSpectralFitRangeLin( double xmin = 0.1, double xmax = 10. ) { fSpectralFitEnergy_min = xmin; fSpectralFitEnergy_max = xmax; }
-        void setSpectralFitRangeLog( double xmin = 0.1, double xmax = 10. ) { fSpectralFitEnergy_min = TMath::Power( 10., xmin ); fSpectralFitEnergy_max = TMath::Power( 10., xmax ); }
+        void setSpectralFitRangeLog( double xmin = 0.1, double xmax = 10. )
+	      { fSpectralFitEnergy_min = TMath::Power( 10., xmin ); fSpectralFitEnergy_max = TMath::Power( 10., xmax ); }
         void setSpectralFitPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2. );
 
         TCanvas* getPlottingCanvas() { return fPlottingCanvas; }
         void setPlottingEnergyRangeLinear( double Emin_TeV = 0.05, double Emax_TeV = 20. ) { fPlottingMinEnergy = Emin_TeV; fPlottingMaxEnergy = Emax_TeV; }
-        void setPlottingEnergyRangeLog( double xmin = -1.2, double xmax = 1.3 ) { fPlottingMinEnergy = TMath::Power( 10., xmin ); fPlottingMaxEnergy = TMath::Power( 10., xmax ); }
+        void setPlottingEnergyRangeLog( double xmin = -1.2, double xmax = 1.3 ) 
+	      { fPlottingMinEnergy = TMath::Power( 10., xmin ); fPlottingMaxEnergy = TMath::Power( 10., xmax ); }
         void setPlottingLogEnergyAxis( bool iB = true ) { fPlottingLogEnergyAxis = iB; }
         void setPlottingMultiplierIndex( double iS = 0. ) { fPlottingMultiplierIndex = iS; }
         void setPlottingSpectralWeightForBinCenter( double iS = -2.5 ) { fPlottingSpectralWeightForBinCenter = iS; }
         void setPlottingYaxis( double iMin = 1.e-14, double iMax = 1.e-8 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
-        ClassDef(VEnergySpectrum,6);
+        ClassDef(VEnergySpectrum,7);
 };
 #endif

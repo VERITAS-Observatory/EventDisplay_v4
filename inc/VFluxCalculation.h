@@ -188,6 +188,7 @@ class VFluxCalculation : public TObject
         double        getNOn( int irun );
         double        getNOff( int irun );
         double        getAlpha( int irun );
+	double        getRunElevation( int irun );
         double        getRunTime( int irun );
         TGraphAsymmErrors* getRXTEvsMJD() { if( fRXTE ) return fRXTE->gFluxMJD; else return 0; }
         TGraphAsymmErrors* getRXTEvsPhase() { if( fRXTE ) return fRXTE->gFluxPhase; else return 0; }
@@ -204,6 +205,6 @@ class VFluxCalculation : public TObject
         void          setTimeBinnedAnalysis( bool iB = true ) { fTimebinned = iB; }
         void          writeResults( char *ifile );
 
-        ClassDef(VFluxCalculation,8);
+        ClassDef(VFluxCalculation,9);
 };
 #endif

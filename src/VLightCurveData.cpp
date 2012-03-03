@@ -12,6 +12,8 @@ VLightCurveData::VLightCurveData( string iName )
    fName = iName;
    fDataFileName = "";
 
+   bIsZombie = false;
+
    fMJD_min = 0.;
    fMJD_max = 0.;
 
@@ -21,6 +23,7 @@ VLightCurveData::VLightCurveData( string iName )
    fMJD_Data_min = 0.;
    fMJD_Data_max = 0.;
    fRunTime = 0.;
+   fRunElevation = 0.;
    fNon = 0.;
    fNoff = 0.;
    fNoffAlpha = 0.;
@@ -54,6 +57,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
    if( fFluxCalculation.IsZombie() )
    {
       cout << "VLightCurveData::fill error reading anasum file: " << fDataFileName << endl;
+      bIsZombie = true;
       return false;
    }
    fFluxCalculation.setTimeBinnedAnalysis(false );
@@ -87,6 +91,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
    fNoff     = fFluxCalculation.getNOff( -1 );
    fNoffAlpha= fFluxCalculation.getAlpha( -1 );
    fRunTime  = fFluxCalculation.getRunTime( -1 );
+   fRunElevation = fFluxCalculation.getRunElevation( -1 );
    fSignificance = fFluxCalculation.getSignificance( -1 );
    fFluxCalculation.getFlux( -1, fFlux, fFluxError, fUpperFluxLimit );
    fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_1sigma, fRunFluxCI_up_1sigma, true );

@@ -112,6 +112,44 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
    return true;
 }
 
+/* 
+
+   print a row for a typical latex table
+
+*/
+void VLightCurveUtilities::printLightCurveLaTexTableRow( double iSigmaMinFluxLimits, double iFluxMultiplicator )
+{
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+   {
+      cout << (int)fLightCurveData[i]->fMJD_Data_min << " - " << (int)fLightCurveData[i]->fMJD_Data_max << " & ";  
+      cout << "VERITAS & ";
+// observing time in minutes
+      cout << (int)(fLightCurveData[i]->fRunTime/60.) << " & ";
+// mean elevation
+      cout << setprecision(1) << fixed << fLightCurveData[i]->fRunElevation << " & ";
+// on and off events
+      cout << (int)fLightCurveData[i]->fNon  << " & ";
+      cout << (int)fLightCurveData[i]->fNoff << " & ";
+// alpha
+      cout << setprecision(2) << fixed << fLightCurveData[i]->fNoffAlpha << " & ";
+// significance
+      cout << setprecision(1) << fLightCurveData[i]->fSignificance << " & ";
+// flux (with error) or upper flux limit)
+      if( iSigmaMinFluxLimits != 1 ) cout << fixed;
+      else                           cout << scientific;
+      if( fLightCurveData[i]->fFluxError > 0. && fLightCurveData[i]->fSignificance > iSigmaMinFluxLimits )
+      {
+         cout << setprecision(1) << fLightCurveData[i]->fFlux*iFluxMultiplicator << " $\\pm$ " << fLightCurveData[i]->fFluxError*iFluxMultiplicator;
+      }
+      else
+      {
+         cout << " $<$ " << fLightCurveData[i]->fUpperFluxLimit*iFluxMultiplicator;
+      }
+      cout << " \\\\";
+      cout << endl;
+   }
+}
+
 
 void VLightCurveUtilities::printLightCurve( bool bFullDetail )
 {

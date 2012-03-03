@@ -62,7 +62,6 @@ bool VLightCurve::initializeTeVLightCurve( string iASCIIFile )
    {
        return initializeTeVLightCurve( iASCIIFile, 1. );
    }
-
    fDataType = "TeV_ascii";
 
 // read in ascii file
@@ -109,7 +108,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
       return false;
    }
 
-// get MJD min
+// get MJD for the case that no time limits are given
    if( iMJDMin < 0 ) iMJDMin = TMath::Floor( fMJD[0] );
    if( iMJDMax < 0 ) iMJDMax = TMath::Floor( fMJD[fMJD.size()-2] ) + 1;
 
@@ -117,9 +116,9 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
    if( fPlottingMJDMin < 0. ) fPlottingMJDMin = iMJDMin - 5.;
    if( fPlottingMJDMax < 0. ) fPlottingMJDMax = iMJDMax + 5.;
 
-   unsigned int iNbins = (unsigned int)( (iMJDMax-iMJDMin)/iDayInterval + 0.5);
+   unsigned int iNbins = (unsigned int)TMath::Nint( (iMJDMax-iMJDMin)/fDayInterval + 0.5 );
    if( iNbins == 0 && iMJDMax > iMJDMin ) iNbins = 1;
-   iMJDMax = iMJDMin + iNbins * iDayInterval;
+   if( iMJDMax < 0 ) iMJDMax = iMJDMin + iNbins * fDayInterval;
 
    cout << "Defining " << iNbins << " time " << (iNbins==1 ? "interval" : "intervals") << " from " << iMJDMin << " to " << iMJDMax << endl;
 
@@ -134,13 +133,20 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
        for( unsigned int j = 0; j < fMJD.size() - 1; j++ )
        {
 // check if there are data in this MJD interval
-           if( fMJD[j] >= iMJDMin + i * iDayInterval && fMJD[j] < iMJDMin + (i+1) * iDayInterval )
+           if( fMJD[j] >= iMJDMin + i * fDayInterval && fMJD[j] < iMJDMin + (i+1) * fDayInterval && fMJD[j] < iMJDMax )
 	   {
 // get observing epoch
 	       if( z == 0 )
 	       {
 	          fLightCurveData.push_back( new VLightCurveData() ); 
-		  fLightCurveData.back()->setMJDInterval( iMJDMin + i * iDayInterval, iMJDMin + (i+1) * iDayInterval );
+		  if( iMJDMin + (i+1) * fDayInterval < iMJDMax )
+		  {
+		     fLightCurveData.back()->setMJDInterval( iMJDMin + i * fDayInterval, iMJDMin + (i+1) * fDayInterval );
+                  }
+		  else
+		  {
+		     fLightCurveData.back()->setMJDInterval( iMJDMin + i * fDayInterval, iMJDMax );
+                  }
                }
 	       if( fLightCurveData.back() )
 	       {
@@ -190,11 +196,13 @@ bool VLightCurve::fillTeV_anasum( bool iPrint )
        {
           fLightCurveData[i]->setFluxCalculationEnergyInterval( fEnergy_min_TeV, fEnergy_max_TeV );
           fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha );
-//	  fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, fUpperLimit, fUpperLimitMethod, fLiMaEqu );
        }
    }
 
-   if( iPrint ) printLightCurve();
+   if( iPrint )
+   {
+      printLightCurve();
+   }
 
    return true;
 }
@@ -322,7 +330,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 	     fLightCurveGraph->SetPoint( z, iMJD_mean, iFMean );
 // (minimum width -> make sure that line is visible...)
 	     if( iMJD_error < 0.3 && !(fPhase_Period_days > 0. ) ) iMJD_error = 0.3;
-	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, iFMean-fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma-iFMean );
+	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, 
+	                                         iFMean-fLightCurveData[i]->fRunFluxCI_lo_1sigma, fLightCurveData[i]->fRunFluxCI_up_1sigma-iFMean );
 	  }
 	  z++;
        }
@@ -330,7 +339,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 // plot upper flux limits
        else if( fLightCurveData[i]->fUpperFluxLimit > 0. )
        {
-           TArrow *fUL = new TArrow( iMJD_mean, fLightCurveData[i]->fUpperFluxLimit, iMJD_mean, fLightCurveData[i]->fUpperFluxLimit - 0.05*hLightCurve->GetMaximum(), 0.01, "|-|>" );
+           TArrow *fUL = new TArrow( iMJD_mean, fLightCurveData[i]->fUpperFluxLimit, iMJD_mean, 
+	                             fLightCurveData[i]->fUpperFluxLimit - 0.05*hLightCurve->GetMaximum(), 0.01, "|-|>" );
 	   setArrowPlottingStyle( fUL );
 	   fUL->Draw(); 
        }

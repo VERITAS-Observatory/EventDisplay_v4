@@ -57,10 +57,10 @@ class VAnalysisUtilities : public TNamed
 	double  fPhase_Period_days;
 
 // run list cuts
-        double  fRunListCut_MJD_min;
-        double  fRunListCut_MJD_max;
-	double  fRunListCut_Phase_min;
-	double  fRunListCut_Phase_max;
+        vector< double > fRunListCut_MJD_min;
+        vector< double > fRunListCut_MJD_max;
+	vector< double > fRunListCut_Phase_min;
+	vector< double > fRunListCut_Phase_max;
 
         bool openEnergyThresholdFile();
 	bool readTargetCoordinatesFromtRunSummary( TTree* t, int irun );
@@ -78,6 +78,8 @@ class VAnalysisUtilities : public TNamed
 	vector< VRunList >& getRunList() { return fRunList; }
         double   getRunList_MJD_min() { return fRunList_MJD_min; }
         double   getRunList_MJD_max() { return fRunList_MJD_max; }
+	vector< double > getRunListCut_MJD_minVector() { return fRunListCut_MJD_min; }
+	vector< double > getRunListCut_MJD_maxVector() { return fRunListCut_MJD_max; }
 	CRunSummary* getRunSummaryTree( int iTot );
 	double   getSkyMapCentreRAJ2000()  { return fSkyMapCentreRAJ2000; }
 	double   getSkyMapCentreDecJ2000() { return fSkyMapCentreDecJ2000; }
@@ -91,9 +93,11 @@ class VAnalysisUtilities : public TNamed
         void     setDebug( unsigned int iDebug = true ) { fDebug = iDebug; }
 	void     setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days = 99. ) { fPhase_MJD0 = iZeroPhase_MJD; fPhase_Period_days = iPhase_Days; }
 	void     setRunListMJDRange( double iMJDMin = 0., double iMDJMax = 0. ) { fRunList_MJD_min = iMJDMin; fRunList_MJD_max = iMDJMax; }
-	void     setRunListCutMJDRange( double iMJDMin = -1., double iMDJMax = -1. ) { fRunListCut_MJD_min = iMJDMin; fRunListCut_MJD_max = iMDJMax; }
-	void     setRunListCutPhaseRange( double iPhaseMin = -1., double iPhaseMax = -1. ) { fRunListCut_Phase_min = iPhaseMin; fRunListCut_Phase_max = iPhaseMax; }
+	void     setRunListCutMJDRange( double iMJDMin = -1., double iMDJMax = -1. );
+	void     setRunListCutMJDRangeVector( vector< double > iMJDMin, vector< double > iMDJMax );
+	void     setRunListCutPhaseRange( double iPhaseMin = -1., double iPhaseMax = -1. );
+	void     setRunListCutPhaseRangeVector( vector< double > iPhaseMinV, vector< double > iPhaseMaxV );
 
-        ClassDef(VAnalysisUtilities,10);
+        ClassDef(VAnalysisUtilities,11);
 };
 #endif

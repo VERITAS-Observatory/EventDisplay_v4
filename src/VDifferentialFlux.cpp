@@ -25,13 +25,18 @@ VDifferentialFlux::VDifferentialFlux()
     dE = 0.;
     DifferentialFlux = 0.;
     DifferentialFluxError = 0.;
+    DifferentialFluxError_low = 0.;
+    DifferentialFluxError_up = 0.;
     DifferentialFlux_vFv = 0.;
     DifferentialFluxError_vFv = 0.;
+    DifferentialFluxError_low_vFv = 0.;
+    DifferentialFluxError_up_vFv = 0.;
     ObsTime = 0.;
     NOn = 0.;
     NOn_error = 0.;
     NOff = 0.;
     NOff_error = 0.;
+    NOff_alpha = 1.;
     Significance = 0.;
 }
 
@@ -45,15 +50,16 @@ void VDifferentialFlux::print( bool bSED )
 {
     if( !bSED )
     {
-        cout << "Energy: " << setprecision( 2 ) << setw( 4 ) << Energy << " [TeV]";
-	cout << " (dE = (" << Energy_lowEdge << "-" << Energy_upEdge << ") TeV";
+        cout << "E: " << setprecision( 2 ) << setw( 4 ) << Energy << " [TeV]";
+	cout << " (dE = (" << Energy_lowEdge << "-" << Energy_upEdge << ")TeV";
         cout << " = " << dE << " TeV)";
         if( DifferentialFluxError > 0. ) cout << scientific << setprecision( 2 ) <<  "\tdiff flux: " << DifferentialFlux << " +- " << DifferentialFluxError;
-        else                             cout << scientific << setprecision( 2 ) << "\tupper limit: " << DifferentialFlux;
-        cout << " [1/cm^2/s/TeV]";
-        cout << setw( 7 ) << fixed << setprecision( 1 ) << "NOn: " << NOn << "(" << NOn_error << ")";
-        cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tNOff: " << NOff << "(" << NOff_error << ")";
-        cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tSignificance: " << Significance << " sigma";
+        else                             cout << scientific << setprecision( 2 ) << "\tUL: " << DifferentialFlux;
+        cout << " [1/cm^2/s/TeV]" << endl;
+        cout << setw( 7 ) << fixed << setprecision( 1 ) << "NOn: " << NOn << "+-" << NOn_error;
+        cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tNOff: " << NOff << "+-" << NOff_error;
+	cout << setprecision( 2 ) << " (alpha=" << NOff_alpha << ")";
+        cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tSign.: " << Significance << " sigma";
         cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tObs.Time: " << ObsTime << "[s]";
         cout << endl;
     }

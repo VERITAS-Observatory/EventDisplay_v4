@@ -31,13 +31,18 @@ class VDifferentialFlux : public TObject
         double dE;                                // size of energy bin (in TeV)
         double DifferentialFlux;                  // [1/cm2/s/TeV]
         double DifferentialFluxError;             // [1/cm2/s/TeV]
+        double DifferentialFluxError_up;             // [1/cm2/s/TeV]
+        double DifferentialFluxError_low;             // [1/cm2/s/TeV]
         double DifferentialFlux_vFv;              // vF_v [ergs/cm2/s]
         double DifferentialFluxError_vFv;         // error in vF_v [ergs/cm2/s]
+        double DifferentialFluxError_up_vFv;         // error in vF_v [ergs/cm2/s]
+        double DifferentialFluxError_low_vFv;         // error in vF_v [ergs/cm2/s]
         double ObsTime;                           // observation time [s]
         double NOn;
 	double NOn_error;
         double NOff;
 	double NOff_error;
+	double NOff_alpha;
         double Significance;
 
         VDifferentialFlux();
@@ -48,6 +53,6 @@ class VDifferentialFlux : public TObject
         double convertEnergy_TeV_to_Hz( double energy_TeV );
         double convertPhotonFlux_to_Ergs( double energy_TeV, double flux_photons_per_cm2_s, bool bLin = true );
 
-        ClassDef(VDifferentialFlux,3);
+        ClassDef(VDifferentialFlux,4);
 };
 #endif

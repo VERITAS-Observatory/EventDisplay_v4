@@ -1,5 +1,5 @@
 /*! \class VOnOff
- *  \brief do signal - background histogramming
+ *  \brief do signal - background histogramming for sky maps and 1D histograms (e.g. energy spectra, mscw histograms, ...)
  *
  *  \author
  *  Gernot Maier
@@ -110,27 +110,20 @@ void VOnOff::doOnOffforParameterHistograms( TList *iponlist, TList *ipofflist, d
             hTemp->Add( hon, hoff, 1., -1.*i_norm );
             hTheta2_diff = (TH1D*)hTemp;
         }
-// energy histogram with x-axis in logE
-        else if( itemp.find( "herec" ) == 0 )
+// energy histogram with x-axis in logE or linE
+        else if( itemp.find( "herec" ) == 0 || itemp.find( "hLinerec" ) == 0 )
         {
-            if( !isCombined ) hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
-            else              hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
+            hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
         }
-// energy histogram with x-axis in linE
-        else if( itemp.find( "hLinerec" ) == 0 )
-        {
-            if( !isCombined ) hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
-            else              hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
-        }
-// QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
-// check if MSCW/MSCL histograms are fine for a single run
-// QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
 // all other histograms
         else
         {
-            if( !isCombined ) hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
+            if( !isCombined ) 
+	    {
+	       hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
+	       hoff->Scale(  i_norm_alpha );
+            }
             else              hTemp->Add( hon, hoff, 1., -1. );
-            if( !isCombined ) hoff->Scale(  i_norm_alpha );
         }
 
 // fill the corresponding lists
@@ -192,7 +185,6 @@ void VOnOff::doOnOffforSkyHistograms( TList *ionlist, TList *iofflist, double i_
                     }
                 }
             }
-//	  cleanSigHistogram( (TH2D*)hTemp, -999. );
         }
         else
         {

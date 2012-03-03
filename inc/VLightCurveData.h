@@ -17,6 +17,8 @@ class VLightCurveData : public TObject
 {
    private:
 
+   bool   bIsZombie;
+
    public:
 
    string fName;
@@ -36,6 +38,7 @@ class VLightCurveData : public TObject
    double fMJD_Data_min;
    double fMJD_Data_max;
    double fRunTime;
+   double fRunElevation;
    double fNon;
    double fNoff;
    double fNoffAlpha;
@@ -55,10 +58,11 @@ class VLightCurveData : public TObject
 			      double E0 = 1., double alpha = -2.5 );
    double getMJD();
    double getMJDError();
+   bool   isZombie() { return bIsZombie; }
    void   setFluxCalculationEnergyInterval( double iEnergy_min_TeV = 1., double iEnergy_max_TeV = -1. );
    void   setMJDInterval( double iMJD_min, double iMJD_max ) { fMJD_min = iMJD_min; fMJD_max = iMJD_max; }
 
-   ClassDef( VLightCurveData, 1 );
+   ClassDef( VLightCurveData, 2 );
 };
 
 #endif

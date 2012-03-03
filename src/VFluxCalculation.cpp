@@ -1064,6 +1064,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 ////////////////////////
 // calculate N_diff
             fRunNdiff[i] = fRunNon[i] - fRunNoff[i] * fRunNorm[i];
+// assuming poisson errors
             fRunNdiffE[i] = sqrt( fRunNon[i] + fRunNoff[i] * fRunNorm[i] * fRunNorm[i] );
             if( fRunTOn[i] > 0. ) fRunRate[i] = fRunNdiff[i] / fRunTOn[i] * 60.;
             else                  fRunRate[i] = 0.;
@@ -1314,6 +1315,15 @@ double VFluxCalculation::getRunTime( int irun )
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
         if( irun == fRunList[i] ) return fRunTOn[i];
+    }
+    return -99.;
+}
+
+double VFluxCalculation::getRunElevation( int irun )
+{
+    for( unsigned int i = 0; i < fRunList.size(); i++ )
+    {
+        if( irun == fRunList[i] ) return 90.-fRunZe[i];
     }
     return -99.;
 }

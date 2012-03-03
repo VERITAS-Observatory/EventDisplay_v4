@@ -23,9 +23,10 @@ VAnalysisUtilities::VAnalysisUtilities()
     fTargetDecJ2000 = 0.;
     fTargetRAJ2000 = 0.;
 
-    fAnasumDataFile = 0;
     fRunList_MJD_min = 0.;
-    fRunList_MJD_max = 0;
+    fRunList_MJD_max = 0.;
+
+    fAnasumDataFile = 0;
 
     setRunListMJDRange();
     setPhaseFoldingValues();
@@ -267,10 +268,36 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
             }
 
 // apply run list cuts
-            if( fRunListCut_MJD_min > 0. && i_temp.MJD < fRunListCut_MJD_min ) continue;
-            if( fRunListCut_MJD_max > 0. && i_temp.MJD > fRunListCut_MJD_max ) continue;
-            if( fRunListCut_Phase_min > 0. && i_temp.phase < fRunListCut_Phase_min ) continue;
-            if( fRunListCut_Phase_max > 0. && i_temp.phase > fRunListCut_Phase_max ) continue;
+            bool iCut = true;
+	    for( unsigned int i = 0; i < fRunListCut_MJD_min.size(); i++ )
+	    {
+	       if(    fRunListCut_MJD_min[i] > 0 && i_temp.MJD > fRunListCut_MJD_min[i]
+	           && fRunListCut_MJD_max[i] > 0 && i_temp.MJD < fRunListCut_MJD_max[i] )
+               {
+	          iCut = false;
+	       }
+	       else if( fRunListCut_MJD_min[i] < 1. && fRunListCut_MJD_max[i] < 1. )
+	       {
+	          iCut = false;
+               }
+	    }
+	    if( iCut ) continue;
+
+	    iCut = true;
+	    for( unsigned int i = 0; i < fRunListCut_Phase_min.size(); i++ )
+	    {
+	       if(    fRunListCut_Phase_min[i] > 0 && i_temp.phase > fRunListCut_Phase_min[i] 
+	           && fRunListCut_Phase_max[i] > 0 && i_temp.phase < fRunListCut_Phase_max[i] )
+               {
+	          iCut = false;
+               }
+	       else if( fRunListCut_Phase_min[i] < 0. && fRunListCut_Phase_max[i] < 0. )
+	       {
+	          iCut = false;
+               }
+	    }
+	    if( iCut ) continue;
+
 
             fRunList.push_back( i_temp );
         }
@@ -384,4 +411,34 @@ void VAnalysisUtilities::printRunList()
    {
       getRunList()[i].print();
    }
+}
+
+void VAnalysisUtilities::setRunListCutMJDRange( double iMJDMin, double iMJDMax )
+{
+   fRunListCut_MJD_min.clear();
+   fRunListCut_MJD_min.push_back( iMJDMin );
+
+   fRunListCut_MJD_max.clear();
+   fRunListCut_MJD_max.push_back( iMJDMax );
+}
+
+void VAnalysisUtilities::setRunListCutMJDRangeVector( vector< double > iMJDMinV, vector< double > iMJDMaxV )
+{
+   fRunListCut_MJD_min = iMJDMinV;
+   fRunListCut_MJD_max = iMJDMaxV;
+}
+
+void VAnalysisUtilities::setRunListCutPhaseRange( double iPhaseMin, double iPhaseMax )
+{
+   fRunListCut_Phase_min.clear();
+   fRunListCut_Phase_min.push_back( iPhaseMin );
+
+   fRunListCut_Phase_max.clear();
+   fRunListCut_Phase_max.push_back( iPhaseMax );
+}
+
+void VAnalysisUtilities::setRunListCutPhaseRangeVector( vector< double > iPhaseMinV, vector< double > iPhaseMaxV )
+{
+   fRunListCut_Phase_min = iPhaseMinV;
+   fRunListCut_Phase_max = iPhaseMaxV;
 }
