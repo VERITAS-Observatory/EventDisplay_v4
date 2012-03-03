@@ -1020,7 +1020,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
             TH1D *h1 = 0;
             TH1D *h2 = 0;
             TH1D *h3 = 0;
-            sprintf( hname, "%s_Slice", hmap->GetName() );
+            sprintf( hname, "%s_Slice_%d", hmap->GetName(), gRandom->Integer( 100 ) );
             sprintf( htitle, "%s_SliceO", hmap->GetName() );
             if( bProjX )
             {
