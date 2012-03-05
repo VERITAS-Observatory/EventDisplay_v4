@@ -1376,7 +1376,10 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
     {
         if( (*i_MCData_iterator).first == 1 ) continue;
-	iEnergyScaleOffset[(*i_MCData_iterator).first] = (int)( ( fMC_Data[1]->energy[0] - (*i_MCData_iterator).second->energy[0] ) / iBinSize );
+	if( fMC_Data[1]->energy.size() > 0 && (*i_MCData_iterator).second->energy.size() > 0 )
+	{
+	   iEnergyScaleOffset[(*i_MCData_iterator).first] = (int)( ( fMC_Data[1]->energy[0] - (*i_MCData_iterator).second->energy[0] ) / iBinSize );
+        }
     }
 
 ///////////////////////////////////////////////////////////////////
@@ -1440,13 +1443,10 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
         double iBinEnergyMin = fMC_Data[1]->effArea_Emin;
 // get minimum energy bin
-        while( iBinEnergyMin - (fMC_Data[1]->energy[0] - iBinSize/2.) < 0. )
+        while( fMC_Data[1]->energy.size() > 0 && ( iBinEnergyMin - (fMC_Data[1]->energy[0] - iBinSize/2.) < 0. ) )
         {
             iBinEnergyMin += dE_Log10;
         }
-// (GM) changed while loop above to prevent from binning errors
-// (GM)        if( TMath::Abs( iBinEnergyMin - ( fMC_Data[1]->energy[0] - iBinSize/2. ) ) > 1.e-2 ) iBinEnergyMin += dE_Log10;
-
 // now fill vector with energies and energy bins
         while( iBinEnergyMin < fMC_Data[1]->effArea_Emax )
         {
@@ -1871,7 +1871,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 // (effective areas are usually in finer bins than differential sensitivity)
 	       if( c->hEcutRecUW &&
 		   c->hEcutRecUW->GetBinContent( c->hEcutRecUW->FindBin( c->Rec_e0[n] ) ) + 
-		   c->hEcutRecUW->GetBinContent( c->hEcutRecUW->FindBin( c->Rec_e0[n] ) + 1 ) > 1.
+		   c->hEcutRecUW->GetBinContent( c->hEcutRecUW->FindBin( c->Rec_e0[n] ) + 1 ) >= 1.
 		|| !c->hEcutRecUW )
 	       {
 		  iMCPara->energy.push_back( c->Rec_e0[n] );
