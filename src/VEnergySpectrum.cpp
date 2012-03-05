@@ -1406,7 +1406,8 @@ bool VEnergySpectrum::setErrorCalculationMethod( string iMethod )
 */
 int VEnergySpectrum::getRebinningGrouping( TH1* h, double iNewBinWidth )
 {
-// get current binning of energy axis
+// get current binning of energy axis 
+// (assume all bins are the same: is this ok?)
     double iBW = h->GetXaxis()->GetBinWidth( 1 );
     if( iBW - iNewBinWidth > 1.e-5 && !bUseRebinner )
     {

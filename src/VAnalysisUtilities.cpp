@@ -400,13 +400,17 @@ double VAnalysisUtilities::getNormalisationFactor(int iRun)
   
 }
 
+void VAnalysisUtilities::printEnergyThresholds()
+{
+   for( unsigned int i = 0; i < fRunList.size(); i++ )
+   {
+     cout << "RUN " << fRunList[i].runnumber;
+     cout << "  Threshold [GeV]: " <<  fRunList[i].energyThreshold*1.e3 << endl;
+   }
+}
+
 void VAnalysisUtilities::printRunList()
 {
-   if( !readRunList() )
-   {
-     cout << "VAnalysisUtilities::printRunList warning: no open file" << endl;
-     return;
-   }
    for( unsigned int i = 0; i < getRunList().size(); i++ )
    {
       getRunList()[i].print();

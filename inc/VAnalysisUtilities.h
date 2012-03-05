@@ -87,6 +87,7 @@ class VAnalysisUtilities : public TNamed
 	double   getTargetShiftNorth() { return fTargetShiftNorth; }
         bool     IsZombie() { return bZombie; }
         bool     openFile( string ifile, int irun = -1, bool iStereo = true, bool iPrint = true );
+	void     printEnergyThresholds();
 	void     printRunList();
         bool     readRunList();
         bool     readRunList( vector< int > irunlist, int iTot = 1 );
