@@ -40,6 +40,11 @@ void VLombScargle::setProbabilityLevels( vector< double > iProbabilityLevels, ve
     fProbabilityLevelDigits = iProbabilityLevelDigits;
 }
 
+/*
+
+   calculate powers for the given range of frequencies
+
+*/
 void VLombScargle::fillPeriodigram( bool iShuffle )
 {
     fVPeriodigram.clear();
@@ -59,7 +64,7 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
 // frequency
         f  =  fFrequency_min + (double)i * (fFrequency_max-fFrequency_min)/((double)fNFrequencies);
 	f += 0.5*(fFrequency_max-fFrequency_min)/((double)fNFrequencies);
-	w  = 2.*TMath::Pi() * f;
+	w  = 2.* TMath::Pi() * f;
 
 // tau
 	double i_sin = 0.;
@@ -130,6 +135,7 @@ TGraph* VLombScargle::getPeriodigramGraph()
 
 TH1D* VLombScargle::getPeriodigramHistogram( string iName )
 {
+   cout << "creating histogram for " << fNFrequencies << "(" << fFrequency_min << "," << fFrequency_max << ")" << endl;
    fPeriodigramHisto = new TH1D( iName.c_str(), "", fNFrequencies, fFrequency_min, fFrequency_max );
    setHistogramPlottingStyle( fPeriodigramHisto, 1, 1., 1., 1, 1, 0 );
    fPeriodigramHisto->GetYaxis()->SetTitleOffset( 1.1 );

@@ -56,7 +56,7 @@ class VLombScargle : public VLightCurveUtilities, public VPlotUtilities, public 
     void    plotPeriodigram( string iXTitle = "", string iYTitle = "", bool bLogX = true );
     void    plotProbabilityLevels( bool iPlotinColor = false );
     void    plotProbabilityLevelsFromToyMC( unsigned int iMCCycles = 500, unsigned int iSeed = 0, bool iPlotinColor = false );
-    void    setFrequencyRange( unsigned int iNFrequencies = 100, double iFrequency_min = 10., double iFrequency_max = 1. );
+    void    setFrequencyRange( unsigned int iNFrequencies = 1000, double iFrequency_min = 1./1000., double iFrequency_max = 1./10. );
     void    setProbabilityLevels( vector< double > iProbabilityLevels );
     void    setProbabilityLevels( vector< double > iProbabilityLevels, vector< int > iProbabilityLevelDigits );
 };
