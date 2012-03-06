@@ -22,6 +22,8 @@ VLightCurveData::VLightCurveData( string iName )
 
    fMJD_Data_min = 0.;
    fMJD_Data_max = 0.;
+   fPhase_Data_min = 0.;
+   fPhase_Data_max = 0.;
    fRunTime = 0.;
    fRunElevation = 0.;
    fNon = 0.;
@@ -35,6 +37,41 @@ VLightCurveData::VLightCurveData( string iName )
    fRunFluxCI_up_1sigma = 0.;
    fRunFluxCI_lo_3sigma = 0.;
    fRunFluxCI_up_3sigma = 0.;
+}
+
+VLightCurveData::VLightCurveData( const VLightCurveData& p )
+{
+   bIsZombie = p.bIsZombie;
+
+   fName = p.fName;
+   fDataFileName = p.fDataFileName;
+
+   fRunList = p.fRunList;
+
+   fMJD_min = p.fMJD_min;
+   fMJD_max = p.fMJD_max;
+
+   fEnergy_min_TeV = p.fEnergy_min_TeV;
+   fEnergy_max_TeV = p.fEnergy_max_TeV;
+
+   fMJD_Data_min = p.fMJD_Data_min;
+   fMJD_Data_max = p.fMJD_Data_max;
+   fPhase_Data_min = p.fPhase_Data_min;
+   fPhase_Data_max = p.fPhase_Data_max;
+   fRunTime = p.fRunTime;
+   fRunElevation = p.fRunElevation;
+   fNon = p.fNon;
+   fNoff = p.fNoff;
+   fNoffAlpha = p.fNoffAlpha;
+   fSignificance = p.fSignificance;
+   fFlux = p.fFlux;
+   fFluxError = p.fFluxError;
+   fUpperFluxLimit = p.fUpperFluxLimit;
+   fRunFluxCI_lo_1sigma = p.fRunFluxCI_lo_1sigma;
+   fRunFluxCI_up_1sigma = p.fRunFluxCI_up_1sigma; 
+   fRunFluxCI_lo_3sigma = p.fRunFluxCI_lo_3sigma;
+   fRunFluxCI_up_3sigma = p.fRunFluxCI_up_3sigma;
+
 }
 
 void VLightCurveData::setFluxCalculationEnergyInterval( double iEMin, double iEMax )
@@ -122,4 +159,14 @@ double VLightCurveData::getMJD()
 double VLightCurveData::getMJDError()
 {
    return 0.5*( fMJD_Data_max-fMJD_Data_min );
+}
+
+double VLightCurveData::getPhase()
+{
+   return 0.5*(fPhase_Data_min+fPhase_Data_max);
+}
+
+double VLightCurveData::getPhaseError()
+{
+   return 0.5*( fPhase_Data_max-fPhase_Data_min );
 }

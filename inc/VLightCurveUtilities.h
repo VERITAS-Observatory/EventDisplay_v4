@@ -5,6 +5,9 @@
 
 #include "VLightCurveData.h"
 
+#include "TF1.h"
+#include "TRandom.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -43,8 +46,12 @@ class VLightCurveUtilities
     vector< VLightCurveData* > getLightCurveData()  { return fLightCurveData; }
     double getLightCurveMJD_max() { return fLightCurveMJD_max; }
     double getLightCurveMJD_min() { return fLightCurveMJD_min; }
+    double getFlux_Max();
+    double getFlux_Min();
     double getFlux_Mean();
     double getFlux_Variance();
+    double getFluxError_Mean();
+    double getMeanObservationInterval();
     double getPhase( double iMJD );
     bool   getXRTTimeSettings() { return fXRTTimeSettings; }
     bool   isZombie() { return fIsZombie; }
@@ -55,6 +62,10 @@ class VLightCurveUtilities
     void   setASCIIFormSecondColumnIsObservingInterval( bool iB = true ) { fASCIIFormSecondColumnIsObservingInterval = iB; }
     void   setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days = 99., bool bPlotPhase = true );
     void   setXRTTimeSettings( bool iB = true, double iMJDMissionTimeStart = 54857.09977457897 ) { fXRTTimeSettings = iB; fXRTMissionTimeStart = iMJDMissionTimeStart; }
+    bool   updatePhaseFoldingValues();
+    bool   writeASCIIFile( string iFile );
+    bool   writeASCIIFile( string iFile, vector< VLightCurveData* > iV );
+    bool   writeASCIIFile( string iFile, TF1 *f, unsigned int iNPoints, double iMJD_min, double iMJD_max, double iFluxMeanError = 0.25, bool bClear = true );
 };
 
 #endif

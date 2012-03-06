@@ -18,6 +18,7 @@
 #include "TArrow.h"
 #include "TCanvas.h"
 #include "TGraphAsymmErrors.h"
+#include "TH1D.h"
 #include "TH2D.h"
 #include "TLine.h"
 #include "TProfile.h"
@@ -54,6 +55,9 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    double fUpperLimit;
    int    fUpperLimitMethod;
 
+// light curve filling
+   TH1D    *fObservingInvervallHisto;
+
 // plotting
    TCanvas *fCanvasLightCurve;
    double   fPlottingMJDMin;
@@ -84,6 +88,8 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    string   getLightCurveAxisTitle();
    TH2D*    getRandomizedPhaseogram()      { return fMCRandomizedPhaseogram; }
    TProfile* getRandomizedPhaseogramProf() { return fMCRandomizedPhaseogramProf; }
+   TH1D*    fillObservingIntervallHistogram( bool bPlot = false, double iPlotMax = 10., string iName = "hIntervalls" );
+   bool     fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFill_days = 20., double iPhaseBinning = 0.025, bool bPlotDebug = false );
    bool     fillRandomizedPhaseogram( double iMCCycles, double iPhaseError_low, double iPhaseErrorUp, string iHisName, double iHisMin_y, double iHisMax_y );
    string   getRateAxisTitle() { return fRateAxisTitle; }
    bool     initializeTeVLightCurve( string iASCIIFile );

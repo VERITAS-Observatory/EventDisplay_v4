@@ -32,6 +32,33 @@ void VLightCurveUtilities::resetLightCurveData()
    fLightCurveMJD_max = -1.e99;
 }
 
+bool VLightCurveUtilities::writeASCIIFile( string iFile )
+{
+    return writeASCIIFile( iFile, fLightCurveData );
+}
+
+bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData* > iV )
+{
+   ofstream is( iFile.c_str() );
+   if( !is )
+   {
+      cout << "VLightCurveUtilities::writeASCIIFile() error writing light curve to " << iFile << endl;
+      return false;
+   }
+   for( unsigned int i = 0; i < iV.size(); i++ )
+   {
+      if( iV[i] )
+      {
+         is << iV[i]->getMJD() << "\t" << iV[i]->getMJDError() << "\t";
+	 is << iV[i]->fFlux << "\t" << iV[i]->fFluxError;
+	 is << endl;
+       }
+   }
+   is.close();
+
+   return true;
+}
+
 bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double iMJDMax )
 {
    resetLightCurveData();
@@ -81,13 +108,21 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
        else
        {
 	  fLightCurveData.back()->fMJD_Data_min = iTemp1;
-	  fLightCurveData.back()->fMJD_Data_max = iTemp2;
+	  if( iTemp2 > 0. && iTemp2 > iTemp1 ) fLightCurveData.back()->fMJD_Data_max = iTemp2;
+	  else                                 fLightCurveData.back()->fMJD_Data_max = iTemp1;
 // TODO: check this
 	  fLightCurveData.back()->setMJDInterval( fLightCurveData.back()->fMJD_Data_min, fLightCurveData.back()->fMJD_Data_max );
        }
 
        if( fLightCurveData.back()->fMJD_Data_min < fLightCurveMJD_min ) fLightCurveMJD_min = fLightCurveData.back()->fMJD_Data_min;
-       if( fLightCurveData.back()->fMJD_Data_max > fLightCurveMJD_max ) fLightCurveMJD_max = fLightCurveData.back()->fMJD_Data_max;
+       if( fLightCurveData.back()->fMJD_Data_max > 0. && fLightCurveData.back()->fMJD_Data_max > fLightCurveMJD_max ) 
+       {
+          fLightCurveMJD_max = fLightCurveData.back()->fMJD_Data_max;
+       }
+       else if( fLightCurveData.back()->fMJD_Data_min > fLightCurveMJD_max )
+       {
+          fLightCurveMJD_max = fLightCurveData.back()->fMJD_Data_min;
+       }
 
        is_stream >> iTemp1;     // rate
        is_stream >> iTemp2;     // rate error
@@ -104,10 +139,13 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
        }
 
    }
-
    is.close();
 
+// update phase folding values
+   updatePhaseFoldingValues();
+
    cout << "VLightCurve::readASCIIFile() total number of light curve data: " << fLightCurveData.size() << endl;
+   cout << "\t(MJD range: " << fLightCurveMJD_min << "," << fLightCurveMJD_max << ")" << endl;
 
    return true;
 }
@@ -201,6 +239,8 @@ void VLightCurveUtilities::setPhaseFoldingValues( double iZeroPhase_MJD, double 
    fPhase_MJD0 = iZeroPhase_MJD;
    fPhase_Period_days = iPhase_Days;
    fPhasePlotting = bPlotPhase;
+
+   updatePhaseFoldingValues();
 }
 
 double VLightCurveUtilities::getPhase( double iMJD )
@@ -229,6 +269,23 @@ double VLightCurveUtilities::getFlux_Mean()
    return -1.e99;
 }
 
+double VLightCurveUtilities::getFluxError_Mean()
+{
+   double iMean = 0.;
+   double iNN = 0.;
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+   {
+      if( fLightCurveData[i] )
+      {
+          iMean += fLightCurveData[i]->fFluxError;
+	  iNN++;
+      }
+   }
+   if( iNN > 0. ) return iMean / iNN;
+
+   return -1.e99;
+}
+
 double VLightCurveUtilities::getFlux_Variance()
 {
    double Sx = 0.;
@@ -248,4 +305,104 @@ double VLightCurveUtilities::getFlux_Variance()
    if( iNN > 1. ) return (1./(iNN-1.) * (Sxx - 1./iNN * Sx * Sx ) );
 
    return 0.;
+}
+
+double VLightCurveUtilities::getFlux_Max()
+{
+   double iF_max = -1.e90;
+
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+   {
+      if( fLightCurveData[i] )
+      {
+          if( fLightCurveData[i]->fFlux > iF_max ) iF_max = fLightCurveData[i]->fFlux;
+      }
+   }
+
+   return iF_max;
+}
+
+double VLightCurveUtilities::getFlux_Min()
+{
+   double iF_Min = 1.e90;
+
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+   {
+      if( fLightCurveData[i] )
+      {
+          if( fLightCurveData[i]->fFlux < iF_Min ) iF_Min = fLightCurveData[i]->fFlux;
+      }
+   }
+
+   return iF_Min;
+}
+
+bool VLightCurveUtilities::updatePhaseFoldingValues()
+{
+   if( fPhase_MJD0 < 0 || fPhase_Period_days < 0 ) return false;
+
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+   {
+      if( fLightCurveData[i] )
+      {
+          fLightCurveData[i]->fPhase_Data_min = getPhase( fLightCurveData[i]->fMJD_Data_min );
+          fLightCurveData[i]->fPhase_Data_max = getPhase( fLightCurveData[i]->fMJD_Data_max );
+      }
+   }
+   return true;
+}
+   
+double VLightCurveUtilities::getMeanObservationInterval()
+{
+   double iM = 0.;
+   double iN = 0.;
+
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+   {
+      if( fLightCurveData[i] )
+      {
+          iM += fLightCurveData[i]->getMJDError();
+	  iN++;
+      }
+   }
+
+   if( iN > 0. ) return iM / iN;
+
+   return 0.;
+}
+
+/*
+
+   produce a dummy light curve according the given function
+
+*/
+bool VLightCurveUtilities::writeASCIIFile( string iFile, TF1 *f1, unsigned int iNPoints, double iMJD_min, double iMJD_max, double iFluxMeanError, bool bClear )
+{
+     if( !f1 ) return false;
+
+     if( bClear )
+     {
+        fLightCurveData.clear();
+
+	for( unsigned int i = 0; i < iNPoints; i++ )
+	{
+	    fLightCurveData.push_back( new VLightCurveData() );
+	    fLightCurveData.back()->fMJD_Data_min = iMJD_min + i * (iMJD_max-iMJD_min)/((double)iNPoints);
+	    fLightCurveData.back()->fMJD_Data_max = fLightCurveData.back()->fMJD_Data_min;
+	    fLightCurveData.back()->fFlux = f1->Eval( fLightCurveData.back()->fMJD_Data_min );
+	    fLightCurveData.back()->fFluxError = TMath::Abs( gRandom->Gaus( 0., iFluxMeanError ) );
+	 }
+      }
+      else
+      {
+         for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+	 {
+	    if( fLightCurveData[i] )
+	    {
+	       fLightCurveData[i]->fFlux = f1->Eval( fLightCurveData[i]->getMJD() );
+            }
+         }
+      }
+      cout << "VLightCurveUtilities::writeASCIIFile: total number of data points: " << fLightCurveData.size() << endl;
+      return writeASCIIFile( iFile );
 }
