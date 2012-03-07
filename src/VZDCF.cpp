@@ -130,7 +130,7 @@ double VZDCF::getZDCFData_dcf_max( bool bError )
 
 
 
-TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf )
+TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, double ymax )
 {
     char hname[800];
     char htitle[800];
@@ -159,7 +159,10 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf )
        else        sprintf( hname, "hZDCF_sig" );
 
 // histogram values
-       hZDCF = new TH1D( hname, "", 100, getZDCFData_tau_min( true ) - 5., getZDCFData_tau_max( true ) + 5. );
+       if( taumin < 0. ) taumin = getZDCFData_tau_min( true ) - 5.;
+       if( taumax < 0. ) taumax = getZDCFData_tau_max( true ) + 5.;
+
+       hZDCF = new TH1D( hname, "", 100, taumin, taumax );
        hZDCF->SetStats( 0 );
        hZDCF->SetXTitle( "time delay [days]" );
        hZDCF->GetXaxis()->CenterTitle( true );	  
@@ -173,12 +176,12 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf )
        {
 	  hZDCF->SetYTitle(  "ZDCF / error " );
 	  hZDCF->SetMinimum( -5. );
-	  hZDCF->SetMaximum(  20. );
+	  hZDCF->SetMaximum(  ymax );
        }
        hZDCF->Draw("");
        hZDCF->Draw("AH");
 
-       plot_nullHistogram( c, hZDCF, false, true, 1.2, getZDCFData_tau_min( true ) - 5., getZDCFData_tau_max( true ) + 5. );
+       plot_nullHistogram( c, hZDCF, false, true, 1.2, taumin, taumax );
 
     }
     else
@@ -226,7 +229,6 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf )
           }
       }
     }
-    g->Print();
 
 // draw ML intervall
 
@@ -248,15 +250,15 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf )
     return c;
 }
 
-TCanvas* VZDCF::plotZDCF( TCanvas *c )
+TCanvas* VZDCF::plotZDCF( TCanvas *c, double taumin, double taumax )
 {
-   return plot( c, true );
+   return plot( c, true, taumin, taumax, -1. );
 }
    
    
-TCanvas* VZDCF::plotZDCFoverError( TCanvas *c )
+TCanvas* VZDCF::plotZDCFoverError( TCanvas *c, double taumin, double taumax, double ymax )
 {
-   return plot( c, false );
+   return plot( c, false, taumin, taumax, ymax );
 }
 
 void VZDCF::setMLinterval( double iMLPeak, double iML1Sigma_low, double iML1Sigma_up )

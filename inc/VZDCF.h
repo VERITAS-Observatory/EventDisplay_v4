@@ -36,15 +36,15 @@ class VZDCF : public VPlotUtilities
    double getZDCFData_tau_min( bool bError = false );
    double getZDCFData_tau_max( bool bError = false );
 
-   TCanvas* plot( TCanvas *c = 0, bool bZDCF = true );
+   TCanvas* plot( TCanvas *c = 0, bool bZDCF = true, double tau_min = -9999., double tau_max = -9999., double ymax = 20. );
 
    public:
 
    VZDCF();
   ~VZDCF() {}
 
-   TCanvas* plotZDCF( TCanvas *c = 0 );
-   TCanvas* plotZDCFoverError( TCanvas *c = 0 );
+   TCanvas* plotZDCF( TCanvas *c = 0, double tau_min = -9999., double tau_max = -9999. );
+   TCanvas* plotZDCFoverError( TCanvas *c = 0, double tau_min = -9999., double tau_max = -9999., double ymax = 20. );
    bool     print();
    bool     readZDCF( string iFile );
    void     setMLinterval( double iMLPeak = -9999., double iML1Sigma_low = -99999., double iML1Sigma_up = -99999. );
