@@ -490,7 +490,7 @@ TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax,
 */
 bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFill_days, double iPhaseBinning, bool bPlotDebug )
 {
-   bool bFillRandomMC = true;
+   bool bFillRandomMC = false;
 
    if( iPhaseBinning <= 0. ) return false;
 
@@ -537,7 +537,8 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 		      iL->fMJD_Data_min = iMJD_new_min;
 		      iL->fMJD_Data_max = iMJD_new_max;
 
-		      iL->fFlux = hPTemp.GetBinContent( hPTemp.FindBin( getPhase( iMJD_new_min ) ) ) + gRandom->Gaus( 0., hPTemp.GetBinError( hPTemp.FindBin( getPhase( iMJD_new_min ) ) ) );
+		      iL->fFlux =   hPTemp.GetBinContent( hPTemp.FindBin( getPhase( iMJD_new_min ) ) ) 
+		                 + gRandom->Gaus( 0., hPTemp.GetBinError( hPTemp.FindBin( getPhase( iMJD_new_min ) ) ) );
 		      iL->fFluxError = TMath::Abs( gRandom->Gaus( 0., getFluxError_Mean() ) );
 
 		      iMCLightCurveData.push_back( iL );
@@ -560,19 +561,22 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 	     iL->fFluxError = fLightCurveData[i]->fFluxError;
 
 	     iMCLightCurveData.push_back( iL );
-	     if( getPhase( fLightCurveData[i]->getMJD() ) < 0.5 && getPhase( fLightCurveData[i]->getMJD() ) > 0.4 )
+
+/*	     if( getPhase( fLightCurveData[i]->getMJD() ) < 0.5 && getPhase( fLightCurveData[i]->getMJD() ) > 0.4 )
 	     {
 	         iMCLightCurveData.back()->fFlux =  gRandom->Gaus( getFlux_Mean(), getFluxError_Mean() );
-             }
+             } */
 
 	     if( getPhase( fLightCurveData[i]->getMJD() ) < 0.5 )
 	     {
-	         iL = new VLightCurveData();
+		 double i_MJD_new = fLightCurveData[i]->fMJD_Data_min + fPhase_Period_days/2.;;
+
+		 iL = new VLightCurveData();
 		 iL->fMJD_Data_min = fLightCurveData[i]->fMJD_Data_min + fPhase_Period_days/2.;
 		 iL->fMJD_Data_max = iL->fMJD_Data_min + fLightCurveData[i]->getMJDError();
 
-// (GM)		 iL->fFlux = fLightCurveData[i]->fFlux;
-		 iL->fFlux = gRandom->Gaus( getFlux_Mean(), getFluxError_Mean() );
+		 iL->fFlux = fLightCurveData[i]->fFlux;
+// (GM)		 iL->fFlux = gRandom->Gaus( getFlux_Mean(), getFluxError_Mean() );
 		 iL->fFluxError = fLightCurveData[i]->fFluxError;
 
 		 iMCLightCurveData.push_back( iL );
