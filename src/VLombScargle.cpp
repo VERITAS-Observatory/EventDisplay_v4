@@ -5,7 +5,7 @@
 
    TODO:
 
-   calculate of error on period (shuffling of light curve inside errors)
+   calculate of error on resulting period (shuffling of light curve inside errors)
 
 */
 
