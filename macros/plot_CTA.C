@@ -50,6 +50,8 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
     TTree *t = (TTree*)f1->Get( "telconfig");
     if( !t ) return 0;
 
+    cout << "Array " << iname << ": telconfig tree found with " << t->GetEntries() << " telescopes" << endl;
+
     TCanvas *c = new TCanvas( "c2", "array layout", 10, 10, 600, 600 );
     c->SetGridx( 0 );
     c->SetGridy( 0 );
@@ -81,6 +83,11 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
     telconfig->SetMarkerSize( 0.7 * iMarkerMult );
     telconfig->Draw("TelY:TelX", "TelType/100000<40", "same" );
 
+    telconfig->SetMarkerStyle( 20 );
+    telconfig->SetMarkerColor( 4 );
+    telconfig->SetMarkerSize( 0.7 * iMarkerMult );
+    telconfig->Draw("TelY:TelX", "TelType==7309930", "same" );
+
     if( iname )
     {
        TText *it = new TText( 0.35*xmax, 0.8*ymax, iname );
@@ -89,16 +96,23 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
 
     return c;
 }
-     
+
+/*
+
+    plot all array layout from a list of runs
+
+    (read telconfig trees from evndisp output files
+
+*/
 void plot_allArrayLayouts( string iArrayListFile, string iFileName, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450. )
 {
    vector< string > iVArray = getListofArrrays( iArrayListFile );
 
    char hname[2000];
 
-   for( unsigned int i = 0; i < iVArray; i++ )
+   for( unsigned int i = 0; i < iVArray.size(); i++ )
    {
-      sprintf( hname, "$CTA_USER_DATA_DIR/analysis/%s/gamma_onSource/%s", iVArray[i].c_str(), iFileName.c_str() );
+      sprintf( hname, "$CTA_USER_DATA_DIR/analysis/AnalysisData/cta-ultra3/%s/gamma_onSource/%s", iVArray[i].c_str(), iFileName.c_str() );
 
       TCanvas *cC = plot_array( hname, iVArray[i].c_str(), iMarkerMult, xmax, ymax );
       if( cC )
