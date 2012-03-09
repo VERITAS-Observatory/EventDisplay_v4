@@ -1,6 +1,10 @@
 /* \class VDispAnalyzer
 
 
+     calculate displacement as function of width, length, size, ... 
+
+     call different methods to get disp (lookup tables, neural network, boosted decision trees)
+
 */
 
 #include "VDispAnalyzer.h"
