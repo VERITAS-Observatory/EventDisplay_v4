@@ -133,6 +133,12 @@ struct frogs_imgtmplt_out {
   int nb_iter;  //Number of iterations in the optimization
   int gsl_convergence_status; //Status of the GSL convergence
   int event_id; //Event identification number
+
+  float tel_goodnessImg[4];
+  float tel_goodnessBkg[4];
+
+  double tmplt_tubes[4][500];
+
 };
 //----------------------------------------------------------------
 struct frogs_imgtemplate {
@@ -233,5 +239,5 @@ float floatwrap(float x,float min,float max);
 
 #ifdef __cplusplus
 }
-#endif 
 #endif
+#endif 

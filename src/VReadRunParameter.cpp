@@ -129,6 +129,15 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
             else fRunPara->ffrogsmscwfile = "";
         }
+        else if( iTemp.find( "frogid" ) < iTemp.size() && fRunPara->ffrogsmode == 1 )
+        {
+            if( iTemp2.size() > 0 )
+            {
+              fRunPara->ffrogsRecID = atoi( iTemp2.c_str() );
+              i++;
+            }
+            else fRunPara->ffrogsRecID = -1;;
+        }
 // source file
         else if( iTemp.find( "sourcefi" ) < iTemp.size() )
         {

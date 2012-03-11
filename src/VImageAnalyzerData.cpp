@@ -66,6 +66,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fLowGainDead.resize( iChannels, 0 );
     fLowGainDeadRecovered.resize( iChannels, false );
     fLowGainDeadUI.resize( iChannels, 0 );
+    fTemplateMu.resize( iChannels, 0. );
     fSums.resize( iChannels, 0. );
     fHiLo.resize( iChannels, false );
     fLLEst.resize( iChannels, false );

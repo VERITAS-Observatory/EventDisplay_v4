@@ -1307,6 +1307,14 @@ void VDisplay::setFADCText()
     else if( fEventLoop->getData()->getBorder()[iChannel] ) fTextFADC.back()->SetTextColor( 8 );
     else fTextFADC.back()->SetTextColor( 1 );
 
+// Template Expectation Value
+
+    if( fEventLoop->getRunParameter()->ffrogsmode == 1 )
+    {
+      sprintf( cTemp, "Mu %.2f (%.2f) ImgGood %.2f BkgGood %.2f  (%.2f) Frogs Energy %.2f", fEventLoop->getData()->getTemplateMu()[iChannel], 5.3*fEventLoop->getData()->getTemplateMu()[iChannel], fEventLoop->getData()->getFrogParameters()->frogsGoodnessImg, fEventLoop->getData()->getFrogParameters()->frogsGoodnessBkg, pow(fEventLoop->getAnalyzer()->getSums()[iChannel]/fEventLoop->getAnalyzer()->getPedvars( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] )[iChannel],2.0) - 1.0, fEventLoop->getData()->getFrogParameters()->frogsEnergy  );
+      fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    }
+
 // dead channel text
 
     fTextFADC.push_back( new TText( xL, yT, "" ) );
@@ -1874,6 +1882,7 @@ void VDisplay::defineGui()
     fComboCameraView->AddEntry( "status (high)", 19 );
     fComboCameraView->AddEntry( "status (low)", 20 );
     fComboCameraView->AddEntry( "trigger-evndisp", 21 );
+    fComboCameraView->AddEntry( "template (frogs)", 22 );
     fComboCameraView->Select( 0 );
     fComboCameraView->Associate( this );
     fComboCameraView->Resize( 110, 20 );

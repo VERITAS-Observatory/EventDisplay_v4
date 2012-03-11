@@ -440,8 +440,13 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // get energy (depending on energy reconstruction method)
 	     if( fRunPara->fFrogs == 1 )
 	     {
-	       iErec = fDataRun->frogsEnergy;
+	       iErec = (float)(fDataRun->frogsEnergy);
+	       iErec = pow(10.0, iErec);
 	       iErecChi2 = 0.0;
+
+	       //iErecChi2 = fDataRun->EChi2;
+	       //iErec = fDataRun->Erec;
+	       //iErecChi2 = fDataRun->EChi2;
 	     } 
 	     else
 	     {
@@ -1600,6 +1605,14 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
      fTreeSelectedEvents->Branch("frogsNpixImg", &fTreeSelescted_frogsNpixImg, "frogsNpixImg/I" );
      fTreeSelectedEvents->Branch("frogsGoodnessBkg", &fTreeSelescted_frogsGoodnessBkg, "frogsGoodnessBkg/D" );
      fTreeSelectedEvents->Branch("frogsNpixBkg", &fTreeSelescted_frogsNpixBkg, "frogsNpixBkg/I" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessImg0", &fTreeSelescted_frogsTelGoodnessImg0, "frogsTelGoodnessImg0/D" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessImg1", &fTreeSelescted_frogsTelGoodnessImg1, "frogsTelGoodnessImg1/D" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessImg2", &fTreeSelescted_frogsTelGoodnessImg2, "frogsTelGoodnessImg2/D" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessImg3", &fTreeSelescted_frogsTelGoodnessImg3, "frogsTelGoodnessImg3/D" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessBkg0", &fTreeSelescted_frogsTelGoodnessBkg0, "frogsTelGoodnessBkg0/D" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessBkg1", &fTreeSelescted_frogsTelGoodnessBkg1, "frogsTelGoodnessBkg1/D" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessBkg2", &fTreeSelescted_frogsTelGoodnessBkg2, "frogsTelGoodnessBkg2/D" );
+     fTreeSelectedEvents->Branch("frogsTelGoodnessBkg3", &fTreeSelescted_frogsTelGoodnessBkg3, "frogsTelGoodnessBkg3/D" );
 /*
      fTreeSelectedEvents->Branch("frogsXPStart", &fTreeSelescted_frogsXPStart, "frogsXPStart/F" );
      fTreeSelectedEvents->Branch("frogsYPStart", &fTreeSelescted_frogsYPStart, "frogsYPStart/F" );
@@ -1656,6 +1669,14 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
         fTreeSelescted_frogsNpixImg = 0;
         fTreeSelescted_frogsGoodnessBkg = 0.;
         fTreeSelescted_frogsNpixBkg = 0;
+        fTreeSelescted_frogsTelGoodnessImg0 = 0.;
+        fTreeSelescted_frogsTelGoodnessImg1 = 0.;
+        fTreeSelescted_frogsTelGoodnessImg2 = 0.;
+        fTreeSelescted_frogsTelGoodnessImg3 = 0.;
+        fTreeSelescted_frogsTelGoodnessBkg0 = 0.;
+        fTreeSelescted_frogsTelGoodnessBkg1 = 0.;
+        fTreeSelescted_frogsTelGoodnessBkg2 = 0.;
+        fTreeSelescted_frogsTelGoodnessBkg3 = 0.;
 /*
         fTreeSelescted_frogsXPStart = 0.;
         fTreeSelescted_frogsYPStart = 0.;
@@ -1693,25 +1714,33 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
       fTreeSelected_EmissionHeight = c->EmissionHeight;
       fTreeSelected_EmissionHeightChi2 = c->EmissionHeightChi2;
 
-        fTreeSelescted_frogsEventID = c->frogsEventID;
-        fTreeSelescted_frogsGSLConStat = c->frogsGSLConStat;
-        fTreeSelescted_frogsNB_iter = c->frogsNB_iter;
-        fTreeSelescted_frogsXS = c->frogsXS;
-        fTreeSelescted_frogsXSerr = c->frogsXSerr;
-        fTreeSelescted_frogsYS = c->frogsYS;
-        fTreeSelescted_frogsYSerr = c->frogsYSerr;
-        fTreeSelescted_frogsXP = c->frogsXP;
-        fTreeSelescted_frogsXPerr = c->frogsXPerr;
-        fTreeSelescted_frogsYP = c->frogsYP;
-        fTreeSelescted_frogsYPerr = c->frogsYPerr;
-        fTreeSelescted_frogsEnergy = c->frogsEnergy;
-        fTreeSelescted_frogsEnergyerr = c->frogsEnergyerr;
-        fTreeSelescted_frogsLambda = c->frogsLambda;
-        fTreeSelescted_frogsLambdaerr = c->frogsLambdaerr;
-        fTreeSelescted_frogsGoodnessImg = c->frogsGoodnessImg;
-        fTreeSelescted_frogsNpixImg = c->frogsNpixImg;
-        fTreeSelescted_frogsGoodnessBkg = c->frogsGoodnessBkg;
-        fTreeSelescted_frogsNpixBkg = c->frogsNpixBkg;
+      fTreeSelescted_frogsEventID = c->frogsEventID;
+      fTreeSelescted_frogsGSLConStat = c->frogsGSLConStat;
+      fTreeSelescted_frogsNB_iter = c->frogsNB_iter;
+      fTreeSelescted_frogsXS = c->frogsXS;
+      fTreeSelescted_frogsXSerr = c->frogsXSerr;
+      fTreeSelescted_frogsYS = c->frogsYS;
+      fTreeSelescted_frogsYSerr = c->frogsYSerr;
+      fTreeSelescted_frogsXP = c->frogsXP;
+      fTreeSelescted_frogsXPerr = c->frogsXPerr;
+      fTreeSelescted_frogsYP = c->frogsYP;
+      fTreeSelescted_frogsYPerr = c->frogsYPerr;
+      fTreeSelescted_frogsEnergy = c->frogsEnergy;
+      fTreeSelescted_frogsEnergyerr = c->frogsEnergyerr;
+      fTreeSelescted_frogsLambda = c->frogsLambda;
+      fTreeSelescted_frogsLambdaerr = c->frogsLambdaerr;
+      fTreeSelescted_frogsGoodnessImg = c->frogsGoodnessImg;
+      fTreeSelescted_frogsNpixImg = c->frogsNpixImg;
+      fTreeSelescted_frogsGoodnessBkg = c->frogsGoodnessBkg;
+      fTreeSelescted_frogsNpixBkg = c->frogsNpixBkg;
+      fTreeSelescted_frogsTelGoodnessImg0 = c->frogsTelGoodnessImg0;
+      fTreeSelescted_frogsTelGoodnessImg1 = c->frogsTelGoodnessImg1;
+      fTreeSelescted_frogsTelGoodnessImg2 = c->frogsTelGoodnessImg2;
+      fTreeSelescted_frogsTelGoodnessImg3 = c->frogsTelGoodnessImg3;
+      fTreeSelescted_frogsTelGoodnessBkg0 = c->frogsTelGoodnessBkg0;
+      fTreeSelescted_frogsTelGoodnessBkg1 = c->frogsTelGoodnessBkg1;
+      fTreeSelescted_frogsTelGoodnessBkg2 = c->frogsTelGoodnessBkg2;
+      fTreeSelescted_frogsTelGoodnessBkg3 = c->frogsTelGoodnessBkg3;
 /*
         fTreeSelescted_frogsXPStart = c->frogsXPStart;
         fTreeSelescted_frogsYPStart = c->frogsYPStart;

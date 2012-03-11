@@ -35,7 +35,7 @@ class VCamera
         VEvndispData*      fData;                        //!< pointer to data class
         unsigned int fTelescope;                  //!< this is the camera of telescope fTelescope
 
-        enum cameraMode {C_CHARGE, C_TZERO, C_TRIGGER,C_HIT,C_HILO,C_TIMING,C_SUMWINDOW, C_SUMWINDOWSTART, C_PEDMEAN,C_PEDVAR,C_PEDMEANLOW,C_PEDVARLOW,C_GAINS,C_GAINVARS,C_GAINSLOW,C_GAINVARSLOW,C_TOFF,C_TOFFLOW, C_LOWGAIN, C_STATUS, C_STATUSLOW, C_TRIGGER_EVNDISP };
+        enum cameraMode {C_CHARGE, C_TZERO, C_TRIGGER,C_HIT,C_HILO,C_TIMING,C_SUMWINDOW, C_SUMWINDOWSTART, C_PEDMEAN,C_PEDVAR,C_PEDMEANLOW,C_PEDVARLOW,C_GAINS,C_GAINVARS,C_GAINSLOW,C_GAINVARSLOW,C_TOFF,C_TOFFLOW, C_LOWGAIN, C_STATUS, C_STATUSLOW, C_TRIGGER_EVNDISP, C_TEMPLATE };
 
         unsigned int fcameraModus;                //!< camera modus (trigger/charge/hit/timing/etc.)
         bool fBoolAllinOne;                       //!< plot all images in one camera

@@ -161,7 +161,14 @@ class CData
         Int_t   frogsNpixImg;
         Float_t frogsGoodnessBkg;
         Int_t   frogsNpixBkg;
-
+	Float_t frogsTelGoodnessImg0;
+	Float_t frogsTelGoodnessImg1;
+	Float_t frogsTelGoodnessImg2;
+	Float_t frogsTelGoodnessImg3;
+	Float_t frogsTelGoodnessBkg0;
+	Float_t frogsTelGoodnessBkg1;
+	Float_t frogsTelGoodnessBkg2;
+	Float_t frogsTelGoodnessBkg3;
 
 // List of branches
         TBranch        *b_runNumber;              //!
@@ -278,6 +285,14 @@ class CData
         TBranch *b_frogsNpixImg;
         TBranch *b_frogsGoodnessBkg;
         TBranch *b_frogsNpixBkg;
+        TBranch *b_frogsTelGoodnessImg0;
+        TBranch *b_frogsTelGoodnessImg1;
+        TBranch *b_frogsTelGoodnessImg2;
+        TBranch *b_frogsTelGoodnessImg3;
+        TBranch *b_frogsTelGoodnessBkg0;
+        TBranch *b_frogsTelGoodnessBkg1;
+        TBranch *b_frogsTelGoodnessBkg2;
+        TBranch *b_frogsTelGoodnessBkg3;
 
         CData(TTree *tree = 0, bool bMC = false, int iVersion = 5, bool bShort = false );
         virtual ~CData();
@@ -857,6 +872,14 @@ Bool_t CData::Notify()
 	    fChain->SetBranchAddress("frogsNpixImg",&frogsNpixImg);
 	    fChain->SetBranchAddress("frogsGoodnessBkg",&frogsGoodnessBkg);
 	    fChain->SetBranchAddress("frogsNpixBkg",&frogsNpixBkg);
+	    fChain->SetBranchAddress("frogsTelGoodnessImg0",&frogsTelGoodnessImg0);
+	    fChain->SetBranchAddress("frogsTelGoodnessImg1",&frogsTelGoodnessImg1);
+	    fChain->SetBranchAddress("frogsTelGoodnessImg2",&frogsTelGoodnessImg2);
+	    fChain->SetBranchAddress("frogsTelGoodnessImg3",&frogsTelGoodnessImg3);
+	    fChain->SetBranchAddress("frogsTelGoodnessBkg0",&frogsTelGoodnessBkg0);
+	    fChain->SetBranchAddress("frogsTelGoodnessBkg1",&frogsTelGoodnessBkg1);
+	    fChain->SetBranchAddress("frogsTelGoodnessBkg2",&frogsTelGoodnessBkg2);
+	    fChain->SetBranchAddress("frogsTelGoodnessBkg3",&frogsTelGoodnessBkg3);
     }
 
     return kTRUE;

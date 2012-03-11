@@ -172,6 +172,14 @@ class VStereoAnalysis
 	double fTreeSelescted_frogsYPED;
 	double fTreeSelescted_frogsXSStart;
 	double fTreeSelescted_frogsYSStart;
+	double fTreeSelescted_frogsTelGoodnessImg0;
+	double fTreeSelescted_frogsTelGoodnessImg1;
+	double fTreeSelescted_frogsTelGoodnessImg2;
+	double fTreeSelescted_frogsTelGoodnessImg3;
+	double fTreeSelescted_frogsTelGoodnessBkg0;
+	double fTreeSelescted_frogsTelGoodnessBkg1;
+	double fTreeSelescted_frogsTelGoodnessBkg2;
+	double fTreeSelescted_frogsTelGoodnessBkg3;
 
 
         double fTotCount;

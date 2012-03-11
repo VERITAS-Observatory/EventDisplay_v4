@@ -1202,10 +1202,12 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
       cout << "VGammaHadronCuts::applyFrogsCut event " << i << endl;
    }
 
-   if (fData->frogsGoodnessImg > frogsGoodnessImgCut )
-      return false;
+//   if (fData->frogsGoodnessImg > frogsGoodnessImgCut )
+//      return false;
 
-   return true;
+// For know cuts not applied
+
+   return false;
 }
 
 /*

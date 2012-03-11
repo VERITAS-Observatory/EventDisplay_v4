@@ -155,6 +155,8 @@ void VEvndispData::resetAnaData()
         fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow[fTelID];
         fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow[fTelID];
 
+	fAnaData[fTelID]->fTemplateMu = 0;
+
         if( getTraceFit() > -1. )
         {
             fAnaData[fTelID]->fRiseTime = 0.;
@@ -705,6 +707,7 @@ VShowerParameters* VEvndispData::fShowerParameters = 0;
 VMCParameters* VEvndispData::fMCParameters = 0;
 VEvndispReconstructionParameter* VEvndispData::fArrayAnalysisCuts = 0;
 VFrogParameters* VEvndispData::fFrogParameters = 0;
+//vector< VFrogImageData* > VEvndispData::fFrogData;
 
 // timing graphs
 vector< TGraphErrors* > VEvndispData::fXGraph;

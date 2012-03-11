@@ -58,5 +58,14 @@ class VFrogParameters
 	float frogsXSStart;
 	float frogsYSStart;
 
+	float frogsTelGoodnessImg0;
+	float frogsTelGoodnessImg1;
+	float frogsTelGoodnessImg2;
+	float frogsTelGoodnessImg3;
+	float frogsTelGoodnessBkg0;
+	float frogsTelGoodnessBkg1;
+	float frogsTelGoodnessBkg2;
+	float frogsTelGoodnessBkg3;
+
 };
 #endif

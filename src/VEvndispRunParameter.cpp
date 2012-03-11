@@ -181,6 +181,7 @@ VEvndispRunParameter::VEvndispRunParameter()
 
 // Frogs parameters
     ffrogsmode = false;
+    ffrogsRecID = -1;
 
 // output parameters
     ffillhistos = false;                          // obsolete

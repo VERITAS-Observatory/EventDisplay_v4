@@ -251,6 +251,14 @@ struct frogs_imgtmplt_out frogs_null_imgtmplt_out() {
   rtn.cvrgpterr.yp=FROGS_BAD_NUMBER;
   rtn.cvrgpterr.log10e=FROGS_BAD_NUMBER;
   rtn.cvrgpterr.lambda=FROGS_BAD_NUMBER;
+  rtn.tel_goodnessImg[0] = FROGS_BAD_NUMBER;
+  rtn.tel_goodnessImg[1] = FROGS_BAD_NUMBER;
+  rtn.tel_goodnessImg[2] = FROGS_BAD_NUMBER;
+  rtn.tel_goodnessImg[3] = FROGS_BAD_NUMBER;
+  rtn.tel_goodnessBkg[0] = FROGS_BAD_NUMBER;
+  rtn.tel_goodnessBkg[1] = FROGS_BAD_NUMBER;
+  rtn.tel_goodnessBkg[2] = FROGS_BAD_NUMBER;
+  rtn.tel_goodnessBkg[3] = FROGS_BAD_NUMBER;
   return rtn;
 }
 //================================================================
@@ -382,13 +390,25 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
      calculated. d is a pointer to a structure holding all the data from the 
      telescopes while tmplt is a pointer to a structure holding the image 
      template data */
-  
+ 
+  int telnpix; // pixel counter for single camera 
+  double correctionB = -99999.;
+ 
   /*Initialize goodnesses and the number of pixels for both image 
     and background regions*/
   tmplanlz->goodness_img=0;
   tmplanlz->npix_img=0;
   tmplanlz->goodness_bkg=0;
   tmplanlz->npix_bkg=0;
+
+  tmplanlz->tel_goodnessImg[0] = FROGS_BAD_NUMBER; 
+  tmplanlz->tel_goodnessImg[1] = FROGS_BAD_NUMBER; 
+  tmplanlz->tel_goodnessImg[2] = FROGS_BAD_NUMBER; 
+  tmplanlz->tel_goodnessImg[3] = FROGS_BAD_NUMBER; 
+  tmplanlz->tel_goodnessBkg[0] = FROGS_BAD_NUMBER;
+  tmplanlz->tel_goodnessBkg[1] = FROGS_BAD_NUMBER;
+  tmplanlz->tel_goodnessBkg[2] = FROGS_BAD_NUMBER;
+  tmplanlz->tel_goodnessBkg[3] = FROGS_BAD_NUMBER;
 
 /*
   for( int imu=0; imu <500; imu++ )
@@ -408,12 +428,31 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 */
 
   for(int tel=0;tel<d->ntel;tel++) {
+    telnpix = 0;
     for(int pix=0;pix<d->scope[tel].npix;pix++) {
       if(d->scope[tel].pixinuse[pix]==FROGS_OK) {
 	//Here call image model and calculate expected signal
 	int pix_in_template;//FROGS_OK in image, FROGS_NOTOK in background
 	double mu=frogs_img_model(pix,tel,tmplanlz->cvrgpt,d,
 				  tmplt,&pix_in_template);
+
+// ED OUTPUT
+//	if( mu > 1.0e-18 )
+	  tmplanlz->tmplt_tubes[tel][pix] = mu;
+//	else 
+//	  tmplanlz->tmplt_tubes[tel][pix] = 0.0;
+
+/*
+	if(mu>1.0e-18) {
+	  tmplanlz->tmplt_tubes[tel][pix] = d->scope[tel].q[pix] - mu;
+	  tmplanlz->tmplt_tubes[tel][pix] /= mu;
+	} else {
+	  tmplanlz->tmplt_tubes[tel][pix] = d->scope[tel].q[pix];
+	  tmplanlz->tmplt_tubes[tel][pix] /= d->scope[tel].ped[pix];
+	  tmplanlz->tmplt_tubes[tel][pix] = 0.0;
+	}
+*/
+
 	if(mu!=FROGS_BAD_NUMBER) { 
 	  double pd=frogs_probability_density(d->scope[tel].q[pix],mu,
 					      d->scope[tel].ped[pix],
@@ -421,7 +460,24 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	  double mean_lkhd=frogs_mean_pix_lkhd(d->scope[tel].q[pix],mu,
 					       d->scope[tel].ped[pix],
 					       d->scope[tel].exnoise[pix]);
+
 	  double pix_goodness=-2.0*log(pd)-mean_lkhd;
+
+	  if( pd <= 10.0*FROGS_SMALL_NUMBER )
+	  {
+	    if( mu < 1.0e-18 )
+	    {
+		pix_goodness  = d->scope[tel].q[pix]*d->scope[tel].q[pix];
+		pix_goodness /= d->scope[tel].ped[pix]*d->scope[tel].ped[pix];
+		pix_goodness -= 1.0;
+            } else
+	    {
+		pix_goodness  = d->scope[tel].q[pix] - mu;
+		pix_goodness *= d->scope[tel].q[pix] - mu;
+		pix_goodness /= d->scope[tel].ped[pix]*d->scope[tel].ped[pix] + mu*(1.0 + d->scope[tel].exnoise[pix]*d->scope[tel].exnoise[pix]);
+		pix_goodness -= 1.0;
+	    }
+	  }
 
 	  //If requested we produce a calibration output
 	  if(FROGS_NBEVENT_GDNS_CALIBR>0) 
@@ -434,15 +490,83 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	  /*Decides if the pixel should be counted in the image 
 	    or background region*/
 //GHTEMP
-//	  int pix_in_img=frogs_image_or_background(tel,pix,d);
+	  int pix_in_img=frogs_image_or_background(tel,pix,d);
 
-	  int pix_in_img=FROGS_NOTOK;
-	  if ( mu > 0. )
-	    pix_in_img=FROGS_OK;
+//	  int pix_in_img=FROGS_NOTOK;
+//	  if ( mu >= 1E-3 )
+//	    pix_in_img=FROGS_OK;
 
 	  //int pix_in_img=pix_in_template; // old definition of image 
 
+// Corrections based on On Data Crab
+/*
+	  if(d->scope[tel].ped[pix]<1.5) pix_goodness=pix_goodness*0.420-0.072;
+	  if(d->scope[tel].ped[pix]>=1.5 && d->scope[tel].ped[pix]<1.557) pix_goodness=pix_goodness*0.425-0.079;
+	  if(d->scope[tel].ped[pix]>=1.557 && d->scope[tel].ped[pix]<1.597) pix_goodness=pix_goodness*0.515-0.080;
+	  if(d->scope[tel].ped[pix]>=1.597 && d->scope[tel].ped[pix]<1.686) pix_goodness=pix_goodness*0.435-0.076;
+	  if(d->scope[tel].ped[pix]>=1.686 && d->scope[tel].ped[pix]<1.72) pix_goodness=pix_goodness*0.52-0.079;
+	  if(d->scope[tel].ped[pix]>=1.72 && d->scope[tel].ped[pix]<1.73) pix_goodness=pix_goodness*0.407-0.0635;
+	  if(d->scope[tel].ped[pix]>=1.73 && d->scope[tel].ped[pix]<1.752) pix_goodness=pix_goodness*0.50-0.066;
+	  if(d->scope[tel].ped[pix]>=1.778) pix_goodness=pix_goodness*0.499-0.078; 
+*/
 
+// New Corrections based MC 20120301
+/*
+	  if( mu < 1E-3 )
+	  {
+
+            if(d->scope[tel].ped[pix]<0.971) 
+              correctionB = 0.012 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(0.012-0.012);
+            if(d->scope[tel].ped[pix]>=0.971 && d->scope[tel].ped[pix]<1.11) 
+              correctionB = 0.012 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(0.012-0.012);
+            if(d->scope[tel].ped[pix]>=1.11 && d->scope[tel].ped[pix]<1.33) 
+              correctionB = 0.0173 + ( (d->scope[tel].ped[pix]-1.33)/(1.33-1.11) )*(0.0173-0.012);
+            if(d->scope[tel].ped[pix]>=1.33 && d->scope[tel].ped[pix]<1.533) 
+              correctionB = 0.0195 + ( (d->scope[tel].ped[pix]-1.533)/(1.533-1.11) )*(0.0195-0.0173);
+            if(d->scope[tel].ped[pix]>=1.533 && d->scope[tel].ped[pix]<1.696) 
+              correctionB = 0.011 + ( (d->scope[tel].ped[pix]-1.696)/(1.696-1.533) )*(0.011-0.0195);
+            if(d->scope[tel].ped[pix]>=1.696 && d->scope[tel].ped[pix]<1.932) 
+              correctionB = 0.016 + ( (d->scope[tel].ped[pix]-1.932)/(1.932-1.696) )*(0.016-0.011);
+            if(d->scope[tel].ped[pix]>=1.932 && d->scope[tel].ped[pix]<2.201) 
+              correctionB = 0.0159 + ( (d->scope[tel].ped[pix]-2.201)/(2.201-1.932) )*(0.0159-0.016);
+            if(d->scope[tel].ped[pix]>=2.201 && d->scope[tel].ped[pix]<2.494) 
+              correctionB = 0.017 + ( (d->scope[tel].ped[pix]-2.494)/(2.494-2.201) )*(0.017-0.0159);
+            if(d->scope[tel].ped[pix]>=2.494 && d->scope[tel].ped[pix]<2.901) 
+              correctionB = 0.017 + ( (d->scope[tel].ped[pix]-2.901)/(2.901-2.494) )*(0.017-0.017);
+            if(d->scope[tel].ped[pix]>=2.901 && d->scope[tel].ped[pix]<3.348) 
+              correctionB = 0.018 + ( (d->scope[tel].ped[pix]-3.348)/(3.348-2.901) )*(0.018-0.017);
+            if(d->scope[tel].ped[pix]>=3.348) 
+              correctionB = 0.017 + ( (d->scope[tel].ped[pix]-2.901)/(3.348-2.901) )*(0.018-0.017);
+
+	  } else {
+
+            if(d->scope[tel].ped[pix]<0.971) 
+               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(-0.230-(-0.220));
+             if(d->scope[tel].ped[pix]>=0.971 && d->scope[tel].ped[pix]<1.11) 
+               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(-0.230-(-0.220));
+             if(d->scope[tel].ped[pix]>=1.11 && d->scope[tel].ped[pix]<1.33) 
+               correctionB = -0.245 + ( (d->scope[tel].ped[pix]-1.33)/(1.33-1.11) )*(-0.245-(-0.220));
+             if(d->scope[tel].ped[pix]>=1.33 && d->scope[tel].ped[pix]<1.533) 
+               correctionB = -0.237 + ( (d->scope[tel].ped[pix]-1.533)/(1.533-1.33) )*(-0.237-(-0.245));
+             if(d->scope[tel].ped[pix]>=1.533 && d->scope[tel].ped[pix]<1.696) 
+               correctionB = -0.237 + ( (d->scope[tel].ped[pix]-1.696)/(1.696-1.533) )*(-0.237-(-0.237));
+             if(d->scope[tel].ped[pix]>=1.696 && d->scope[tel].ped[pix]<1.932) 
+               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-1.932)/(1.932-1.696) )*(-0.230-(-0.237));
+             if(d->scope[tel].ped[pix]>=1.932 && d->scope[tel].ped[pix]<2.201) 
+               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-2.201)/(2.201-1.932) )*(-0.230-(-0.230));
+             if(d->scope[tel].ped[pix]>=2.201 && d->scope[tel].ped[pix]<2.494) 
+               correctionB = -0.215 + ( (d->scope[tel].ped[pix]-2.494)/(2.494-2.201) )*(-0.215-(-0.23));
+             if(d->scope[tel].ped[pix]>=2.494 && d->scope[tel].ped[pix]<2.901) 
+               correctionB = -0.205 + ( (d->scope[tel].ped[pix]-2.901)/(2.901-2.494) )*(-0.205-(-0.215));
+             if(d->scope[tel].ped[pix]>=2.901 && d->scope[tel].ped[pix]<3.348) 
+               correctionB = -0.200 + ( (d->scope[tel].ped[pix]-3.348)/(3.348-2.901) )*(-0.200-(-0.205));
+             if(d->scope[tel].ped[pix]>=3.348) 
+               correctionB = -0.200 + ( (d->scope[tel].ped[pix]-3.348)/(3.348-2.901) )*(-0.200-(-0.205));
+	  }
+
+// Make correction using above
+	  pix_goodness += correctionB;
+*/
 	  //If requested, we produce a display of the event
 	  if(FROGS_NBEVENT_DISPLAY>0) 
 	    frogs_event_display(d->event_id, d->scope[tel].q[pix],mu,
@@ -452,48 +576,37 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 
 	  //If the pixel is in the image region
 	  if(pix_in_img==FROGS_OK) {
-// Backgrnd goodness is already corrected by sigma_p correction.
-// Only the image goodness needs to be corrected.
-//	    pix_goodness=frogs_goodness_correction(pix_goodness,
-//						 d->scope[tel].ped[pix],mu);
-/*
-	    if(d->scope[tel].q[pix]<0.0)
-	      pix_goodness -= -0.737119*d->scope[tel].q[pix]-1.0;
-	    else if( d->scope[tel].q[pix] >= 0. && d->scope[tel].q[pix] < 8.0 )
-	      pix_goodness -= 0.491269*d->scope[tel].q[pix]-1.0;
-	    else
-	      pix_goodness -= 0.0859841*d->scope[tel].q[pix]+1.81024;
-*/
-
 	    tmplanlz->goodness_img=tmplanlz->goodness_img+pix_goodness;
 	    tmplanlz->npix_img++;
-	  }
+	    tmplanlz->tel_goodnessImg[tel] += pix_goodness;
+	    telnpix++;
+ 	  }
 	  //If the pixel is in the background region
 	  if(pix_in_img==FROGS_NOTOK) {
-/*
-	    if(d->scope[tel].q[pix]<0.0)
-	      pix_goodness -= -0.5859*d->scope[tel].q[pix]-1.0;
-	    else
-	      pix_goodness -= 0.9901*d->scope[tel].q[pix]-1.0;
-*/
 	    tmplanlz->goodness_bkg=tmplanlz->goodness_bkg+pix_goodness;
 	    tmplanlz->npix_bkg++;
+    	    tmplanlz->tel_goodnessBkg[tel] += pix_goodness;
+	    telnpix++;
 	  }
 	}//End of background/image region test
       } //End of test on pixel viability
     }//End of pixel loop
-  }//End of telescope loop
+    tmplanlz->tel_goodnessImg[tel] /= sqrt(2.0*(telnpix-(tmplt->ndim+1)));
+    tmplanlz->tel_goodnessBkg[tel] /= sqrt(2.0*(telnpix-(tmplt->ndim+1)));
+ }//End of telescope loop
 
   //Finilize the background goodness calculation (*** See note)
   if(tmplanlz->npix_bkg>tmplt->ndim+1) 
     tmplanlz->goodness_bkg=tmplanlz->goodness_bkg/
-      sqrt(2.0*(tmplanlz->npix_bkg-(tmplt->ndim+1))); 
+      //sqrt(2.0*(tmplanlz->npix_bkg-(tmplt->ndim+1))); 
+      sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1))); 
   else
     tmplanlz->goodness_bkg=FROGS_BAD_NUMBER;
   //Finilize the image goodness calculation (*** See note)
   if(tmplanlz->npix_img>tmplt->ndim+1) 
     tmplanlz->goodness_img=tmplanlz->goodness_img/
-      sqrt(2.0*(tmplanlz->npix_img-(tmplt->ndim+1)));
+      //sqrt(2.0*(tmplanlz->npix_img-(tmplt->ndim+1)));
+      sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
   else
     tmplanlz->goodness_img=FROGS_BAD_NUMBER;
 
@@ -620,6 +733,7 @@ int frogs_gdns_calibr_out(int event_id, int tel, int pix, float q,
     fclose(calib);
     //Stop the execussion
     frogs_showxerror("Done writing the calibration file data in frogs_goodness_calibration.frogs");
+
     return FROGS_OK;
   }
 
@@ -775,7 +889,7 @@ double frogs_probability_density(float q, double mu, float ped,
      exnoise = exess noise for that pixel */
   
   //Case mu=0
-  if(mu==0.0) rtn=exp(-q*q/(2.0*ped*ped))/(FROGS_SQRTTWOPI*ped);
+  if( mu < 1.0e-18 ) rtn=exp(-q*q/(2.0*ped*ped))/(FROGS_SQRTTWOPI*ped);
   
   //Case where mu is large enough the poisson distribution is gauss-like
   if(mu>=FROGS_LARGE_PE_SIGNAL) {
@@ -785,7 +899,7 @@ double frogs_probability_density(float q, double mu, float ped,
   }
 
   //Detailed calculation for intermediate values of mu
-  if(mu>0 && mu<FROGS_LARGE_PE_SIGNAL) {
+  if(mu>=1.0e-18 && mu<FROGS_LARGE_PE_SIGNAL) {
     float stdev=sqrt(mu*(1+exnoise*exnoise)+ped*ped);
     int Nmin=(int)(floor(mu-FROGS_NUMBER_OF_SIGMA*stdev));
     if(Nmin<0) Nmin=0;
@@ -860,7 +974,7 @@ double frogs_mean_pix_lkhd(double q,double mu, double ped,double exnoise) {
      exnoise = exess noise for that pixel */
   
   //Case mu=0
-  if(mu==0.0) rtn=1.0+FROGS_LNTWOPI+2.0*log(ped);
+  if(mu < 1.0e-18) rtn=1.0+FROGS_LNTWOPI+2.0*log(ped);
   
   //Case where mu is large enough the poisson distribution is gauss-like
   if(mu>=FROGS_LARGE_PE_SIGNAL) {
@@ -869,7 +983,7 @@ double frogs_mean_pix_lkhd(double q,double mu, double ped,double exnoise) {
   }
   
   //Detailed calculation for intermediate values of mu
-  if(mu>0.0 && mu<FROGS_LARGE_PE_SIGNAL) {
+  if(mu>=1.0e-18 && mu<FROGS_LARGE_PE_SIGNAL) {
     //We use GSL for the integration calculating the average
     gsl_integration_workspace * w = gsl_integration_workspace_alloc(3000);
     double error;
@@ -1280,7 +1394,7 @@ double frogs_pix_lkhd_deriv_4thorder(int pix, int tel,
   pd=frogs_probability_density(d->scope[tel].q[pix],mu,
 			       d->scope[tel].ped[pix],
 			       d->scope[tel].exnoise[pix]);
-			       double pix_lkhd_minus_minus=-2.0*log(pd);
+  double pix_lkhd_minus_minus=-2.0*log(pd);
 
   //Evaluate the derivative
   float delta_param=0;

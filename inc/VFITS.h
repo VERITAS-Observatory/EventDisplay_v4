@@ -22,8 +22,8 @@
 #include "TFile.h"
 #include "TTree.h"
 
-#include <fitsio.h>
-
+#include "/afs/ifh.de/group//cta/VERITAS/software/FITS/cfitsio//include/fitsio.h"
+#include "/afs/ifh.de/group//cta/VERITAS/software/FITS/cfitsio//include/longnam.h"
 #include "CRunSummary.h"
 
 #include "VAnalysisUtilities.h"

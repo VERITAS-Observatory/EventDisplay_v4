@@ -205,6 +205,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 // Frogs parameters
         bool ffrogsmode;                          // for Frogs template Analysis, GH
 	string ffrogsmscwfile;			  // frogs file for getting table energy
+	int ffrogsRecID;			  // RecID or Cut_ID Frogs Uses - combine with table
 
 // write pulse histograms to gain files
         int fwritepulses;                         // number of pulse histogram written to gain file

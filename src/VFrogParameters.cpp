@@ -66,6 +66,14 @@ void VFrogParameters::initTree( string iName, string iTitle )
     fTreeFrog->Branch("frogsNpixImg", &frogsNpixImg, "frogsNpixImg/I" );
     fTreeFrog->Branch("frogsGoodnessBkg", &frogsGoodnessBkg, "frogsGoodnessBkg/F" );
     fTreeFrog->Branch("frogsNpixBkg", &frogsNpixBkg, "frogsNpixBkg/I" );
+    fTreeFrog->Branch("frogsTelGoodnessImg0", &frogsTelGoodnessImg0, "frogsTelGoodnessImg0/F" );
+    fTreeFrog->Branch("frogsTelGoodnessImg1", &frogsTelGoodnessImg1, "frogsTelGoodnessImg1/F" );
+    fTreeFrog->Branch("frogsTelGoodnessImg2", &frogsTelGoodnessImg2, "frogsTelGoodnessImg2/F" );
+    fTreeFrog->Branch("frogsTelGoodnessImg3", &frogsTelGoodnessImg3, "frogsTelGoodnessImg3/F" );
+    fTreeFrog->Branch("frogsTelGoodnessBkg0", &frogsTelGoodnessBkg0, "frogsTelGoodnessBkg0/F" );
+    fTreeFrog->Branch("frogsTelGoodnessBkg1", &frogsTelGoodnessBkg1, "frogsTelGoodnessBkg1/F" );
+    fTreeFrog->Branch("frogsTelGoodnessBkg2", &frogsTelGoodnessBkg2, "frogsTelGoodnessBkg2/F" );
+    fTreeFrog->Branch("frogsTelGoodnessBkg3", &frogsTelGoodnessBkg3, "frogsTelGoodnessBkg3/F" );
 
     fTreeFrog->Branch("frogsXPStart", &frogsXPStart, "frogsXPStart/F" );
     fTreeFrog->Branch("frogsYPStart", &frogsYPStart, "frogsYPStart/F" );

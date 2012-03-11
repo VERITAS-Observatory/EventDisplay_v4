@@ -347,6 +347,12 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                                                   // MS
                 setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
                 break;
+	    case C_TEMPLATE:
+                if( fData->getRunParameter()->ffrogsmode==1 )
+		{
+		  setPMTColorScheme( log10(fData->getTemplateMu()), false,  -1.0*fData->getTemplateMuMin(), log10(1.1*fData->getTemplateMuMax()), "photons [p.e.]", false );
+		}
+                break;
             default:
                 break;
         }

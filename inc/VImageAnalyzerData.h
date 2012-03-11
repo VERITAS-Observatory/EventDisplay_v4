@@ -36,6 +36,8 @@ class VImageAnalyzerData
         VImageParameter* fImageParameterLogL;         //!< image parameter from log likelihood analysis
         VImageAnalyzerHistograms* fAnaHistos;               //!< analysis test histograms
 
+        valarray<double> fTemplateMu;
+
         valarray<double> fSums;
         vector<bool> fLLEst;                      //!< true for dead channels with estimated sum from loglikelihood fit
         unsigned int fNDead;

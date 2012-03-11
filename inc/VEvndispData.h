@@ -22,6 +22,7 @@
 #include <VFitTraceHandler.h>
 #include <VShowerParameters.h>
 #include <VFrogParameters.h>
+//#include <VFrogImageData.h>
 #include <VSkyCoordinates.h>
 #include <VTraceHandler.h>
 
@@ -116,6 +117,7 @@ class VEvndispData
                                                   //!< data class with analysis results from all telescopes
         static VShowerParameters *fShowerParameters;
         static VFrogParameters *fFrogParameters;
+//	static vector< VFrogImageData* > fFrogData;    //!< frogs Template tube information
         static VMCParameters *fMCParameters;      //!< data class with MC parameters
 
 // timing results
@@ -258,6 +260,9 @@ class VEvndispData
         VFrogParameters*    getFrogParameters() { return fFrogParameters; }
         unsigned int        getSumFirst() { return fRunPar->fsumfirst[fTelID]; }
         valarray<double>&   getSums() { return fAnaData[fTelID]->fSums; }
+        valarray<double>&   getTemplateMu() { return fAnaData[fTelID]->fTemplateMu; }
+        double              getTemplateMuMin() { return fAnaData[fTelID]->fTemplateMu.min(); }
+        double              getTemplateMuMax() { return fAnaData[fTelID]->fTemplateMu.max(); }
         unsigned int        getSumWindow() { return fRunPar->fsumwindow[fTelID]; }
         unsigned int        getSumWindowSmall() { return fRunPar->fsumwindowsmall[fTelID]; }
         unsigned int        getSumWindow( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow.size() ) return fRunPar->fsumwindow[iTelID]; else return 0; }
@@ -397,6 +402,7 @@ class VEvndispData
         void                setSums( double iSum ) { fAnaData[fTelID]->fSums = iSum; }
         void                setSums( unsigned int iChannel, double iSum ) { fAnaData[fTelID]->fSums[iChannel] = iSum; }
         void                setSums( valarray< double > iVSum ) { fAnaData[fTelID]->fSums = iVSum; }
+        void                setTemplateMu( valarray< double > iVTemplateMu ) { fAnaData[fTelID]->fTemplateMu = iVTemplateMu; }
         void                setSumWindow( int iWindow ) { fRunPar->fsumwindow[fTelID] = iWindow; }
         void                setTCorrectedSumFirst( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst = iT; }
         void                setTCorrectedSumFirst( unsigned int iChannel, unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst[iChannel] = iT; }
