@@ -136,6 +136,8 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
        else if( iTemp1 > 0. && iTemp2 < 0. )
        {
           fLightCurveData.back()->fUpperFluxLimit = iTemp1;
+          fLightCurveData.back()->fFlux = -99.;
+          fLightCurveData.back()->fFluxError = -99.;
        }
 
    }
@@ -186,6 +188,43 @@ void VLightCurveUtilities::printLightCurveLaTexTableRow( double iSigmaMinFluxLim
       cout << " \\\\";
       cout << endl;
    }
+}
+
+void VLightCurveUtilities::printLightCurveWiki( double iMinEnergy_TeV )
+{
+    cout << "{| border=\"1\" cellspacing=\"0\" cellpadding=\"5\" align=\"center\"" << endl;
+    cout << "!MJD" << endl;
+    if( fPhase_Period_days > 0. ) cout << "!Phase" << endl;
+    cout << "!Observation Time [min]" << endl;
+    cout << "!Significance <math>\\sigma</math>" << endl;
+    cout << "!Non" << endl;
+    cout << "!Noff" << endl;
+    cout << "!Alpha" << endl;
+    cout << "!Flux (>" << setprecision(2) << iMinEnergy_TeV << " TeV) [cm^-2 s^-1]" << endl;
+
+    for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+    {
+      cout << "|- align=\"center\"" << endl;
+      cout << "| " << fixed << setprecision( 1 ) << fLightCurveData[i]->getMJD() << endl;
+      if( fPhase_Period_days > 0. ) cout << "| " << setprecision( 2 ) << getPhase( fLightCurveData[i]->getMJD() ) << endl;
+      cout << "| " << setprecision( 1 ) << fLightCurveData[i]->fRunTime / 60. << endl;
+      cout << "| " << setprecision( 1 ) << fLightCurveData[i]->fSignificance << endl;
+      cout << "| " << (int)fLightCurveData[i]->fNon << endl;
+      cout << "| " << (int)fLightCurveData[i]->fNoff << endl;
+      cout << "| " << setprecision(2) << fLightCurveData[i]->fNoffAlpha << endl;
+      if( fLightCurveData[i]->fFluxError >  0. )
+      {
+         cout << "| " << setprecision( 1 ) << scientific << fLightCurveData[i]->fFlux << "+-" << fLightCurveData[i]->fFluxError << endl;
+      }
+      else
+      {
+        cout << "| <" << setprecision( 1 ) << scientific << fLightCurveData[i]->fUpperFluxLimit << endl;
+      }
+    }
+
+    cout << "|}" << fixed << endl;
+
+
 }
 
 

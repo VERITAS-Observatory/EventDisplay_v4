@@ -57,6 +57,7 @@ class VLightCurveUtilities
     bool   isZombie() { return fIsZombie; }
     void   printLightCurve( bool bFullDetail = true );
     void   printLightCurveLaTexTableRow( double iSigmaMinFluxLimits = -99., double iFluxMultiplicator = 1. );
+    void   printLightCurveWiki( double iMinEnergy_TeV = 1. );
     bool   readASCIIFile( string iFile, double iMJDMin = -99., double iMJDMax = -99. );
     void   resetLightCurveData();
     void   setASCIIFormSecondColumnIsObservingInterval( bool iB = true ) { fASCIIFormSecondColumnIsObservingInterval = iB; }

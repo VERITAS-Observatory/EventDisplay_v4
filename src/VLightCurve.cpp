@@ -569,8 +569,6 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 
 	     if( getPhase( fLightCurveData[i]->getMJD() ) < 0.5 )
 	     {
-		 double i_MJD_new = fLightCurveData[i]->fMJD_Data_min + fPhase_Period_days/2.;;
-
 		 iL = new VLightCurveData();
 		 iL->fMJD_Data_min = fLightCurveData[i]->fMJD_Data_min + fPhase_Period_days/2.;
 		 iL->fMJD_Data_max = iL->fMJD_Data_min + fLightCurveData[i]->getMJDError();
@@ -650,12 +648,38 @@ string VLightCurve::getLightCurveAxisTitle()
 
     if( fRateAxisTitle == "tevRate" )
     {
-       if( fEnergy_max_TeV < 0. ) sprintf( hname, "Flux (E>%.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
-       else                       sprintf( hname, "Flux ( %.1f - %.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV, fEnergy_max_TeV );
+       if( fEnergy_max_TeV < 0. )
+       {
+// determine number of decimal places (do not allow more than three)
+	  if( (int)(fEnergy_min_TeV*10.)%10 == 0 && (int)(fEnergy_min_TeV*100.)%10 == 0 && (int)(fEnergy_min_TeV*1000.)%10 == 0 )
+	  {
+	      sprintf( hname, "Flux (E>%.0f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
+	  }
+	  else if( (int)(fEnergy_min_TeV*100.)%10 == 0 && (int)(fEnergy_min_TeV*1000.)%10 == 0 )
+	  {
+	      sprintf( hname, "Flux (E>%.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
+	  }
+	  else if( (int)(fEnergy_min_TeV*1000.)%10 == 0 )
+	  {
+	      sprintf( hname, "Flux (E>%.2f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
+	  }
+	  else
+	  {
+	      sprintf( hname, "Flux (E>%.3f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
+          }
+       }
+       else  
+       {
+           sprintf( hname, "Flux ( %.1f - %.1f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV, fEnergy_max_TeV );
+       }
 
        string iTemp = hname;
        fRateAxisTitle = hname;
        return iTemp;
+    }
+    else
+    {
+       fRateAxisTitle = "no title";
     }
 
 
