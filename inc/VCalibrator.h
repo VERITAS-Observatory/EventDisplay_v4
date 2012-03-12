@@ -68,6 +68,7 @@ class VCalibrator : public VImageBaseAnalyzer
         bool readPeds( string iFile, bool, unsigned int );
 	bool readPeds_from_grisufile( string iFile, bool, unsigned int );
 	bool readPeds_from_rootfile( string iFile, bool, unsigned int );
+	bool readPeds_from_textfile( string iFile, bool iLowGain, unsigned int i_SumWindow );
         void readPixelstatus();
         void readTOffsets( bool iLowGain = false );
 	void setCalibrationFileNames();

@@ -1020,6 +1020,102 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
    return false;
 }
 
+
+/*
+   read pedestals from text file
+*/
+bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned int i_SumWindow )
+{
+   ifstream infile;
+   infile.open( iFile.c_str(), ifstream::in);
+   if( !infile )
+   {
+       cout << "VCalibrator::readPeds_from_textfile error: unable to open pedestal file " << iFile << endl;
+       cout << "\t exiting..." << endl;
+       exit( -1 );
+   }
+
+   cout << "Telescope " << getTelID()+1;
+   if( !iLowGain ) cout << ": reading pedestals for high gain channels";
+   else            cout << ": reading pedestals for low gain channels";
+   cout << " and sumwindow " << i_SumWindow << " from: " << endl;
+   cout << "Telescope " << getTelID()+1 << ": ";
+   cout << iFile << endl;
+
+// resetting all vectors
+   getPeds( iLowGain, -99. ) = 1.0;
+   getPedvars( iLowGain, i_SumWindow, -99. ) = 1.0;
+   getPedrms( iLowGain ) = 1.0;
+   unsigned int tel = 0;
+   unsigned int ch = 0;
+   float mean = 0.;
+   float rms = 0.;
+   int i_testCounter = 0;
+// loop over pedestal file (text format)	    
+   string i_Line;
+   while( getline( infile, i_Line ) )
+   {
+       if( i_Line.size() > 0 )
+       {
+	   std::istringstream is_stream( i_Line );
+// telescope number
+	   is_stream >> tel;
+	   if( tel == fTelID )
+	   {
+	       i_testCounter++;
+// channel number
+	       is_stream >> ch;
+// pedestal
+	       is_stream >> mean;
+	       if ( ch < getPeds( iLowGain, -99. ).size() )
+	       {
+		   getPeds( iLowGain, -99. )[ch]=mean;
+		   if( !iLowGain ) getPedDist()->Fill( mean );
+		   else            getPedLowGainDist()->Fill( mean );
+	       }
+	       unsigned int count=0;
+// pedestal variances
+	       do
+	       {
+		   count+=1;
+		   is_stream >> rms;
+// ther might be more than NSamples values in the file; stop when reached NSamples
+		   if( ( count==i_SumWindow || (iLowGain && count == getNSamples() ) )  && ch < getPedvars( iLowGain, i_SumWindow, -99. ).size() )
+		   {
+		       getPedvars( iLowGain, i_SumWindow, -99. )[ch] = rms;
+		       if( count == i_SumWindow )
+		       {
+			   if( !iLowGain ) getPedvarsDist()->Fill( rms );
+			   else getPedvarsLowGainDist()->Fill( rms );
+			   
+		       }
+		   }
+		   if( count <  getPedvarsAllSumWindows( iLowGain ).size() && ch < getPedvarsAllSumWindows( iLowGain )[count].size() )
+		   {
+		      getPedvarsAllSumWindows( iLowGain )[count][ch] = rms;
+		   }
+		   if( count == 1 && ch < getPedrms( iLowGain ).size() ) getPedrms( iLowGain )[ch] = rms;
+	       } while( !is_stream.eof());
+	       if( count < i_SumWindow )
+	       {
+		   cout << "VCalibrator::readPeds_from_textfile error:";
+		   cout << "no pedestal found for this sumwindow : " << i_SumWindow << " (" << count << "), tel, channel " << tel+1 << ", " << ch << endl;
+		   if( iLowGain ) cout << "VCalibrator::readPeds_from_textfile: using pedestals for window " << count << " for low gain channels" << endl;
+	       }
+	   }
+       }
+   }
+   if( i_testCounter == 1 )
+   {
+       cout << "VCalibrator::readPeds: problem with reading pedestal file" << endl;
+       cout << "\t probably old pedestal file format. Rerun pedestal calculation" << endl;
+       cout << "\t exiting....." << endl;
+       exit( 0 );
+   }
+
+   return true;
+}
+
 bool VCalibrator::readPeds_from_grisufile( string i_pedfile, bool iLowGain, unsigned int i_SumWindow )
 {
    cout << "Telescope " << getTelID()+1 << ": reading peds from 'P' lines (sumwindow " << i_SumWindow;
@@ -1082,7 +1178,7 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
 // read pedestals from root file
       if( !readPeds_from_rootfile( i_pedfile, iLowGain, i_SumWindow ) )
       {
-         exit( -1 );
+          readPeds_from_textfile( i_pedfile, iLowGain, i_SumWindow );
       }
    }
 ////////////////////////////////////////////////////////////////
