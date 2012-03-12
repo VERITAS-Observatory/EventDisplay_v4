@@ -125,9 +125,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 
 // FADC integration
 	string      fFADCChargeUnit;              // FADC charge unit (DC or PE)
+	vector< unsigned int > fTraceIntegrationMethod;   // trace integration method
+	vector< unsigned int > fTraceIntegrationMethod_pass1;   // trace integration method for pass 1 (doublepass only)
         vector<int> fsumfirst;                    // parameter for window summation start
-        vector<int> fsumwindow;                   // parameter for window summation
-        vector<int> fsumwindowsmall;              // parameter for window summation on second pass (when doublepass=true)
+        vector<int> fsumwindow_1;                 // parameter for window summation (window 1)
+        vector<int> fsumwindow_2;                 // parameter for window summation (window 2)
+	vector<int> fsumwindow_pass1;             // parameter for window summation (double pass - pass 1)
         bool   fFixWindowStart;                   // fix the location of the window (do not move depending on t0)
         bool   fDoublePass;                       // double pass image cleaning (default: off )
 	bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
@@ -145,26 +148,31 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	unsigned int fpulsetiming_width_index;
 	unsigned int fpulsetiming_max_index;
 
-// image analysis
-        bool fUseFixedThresholds;                 // use fixed image/border thresholds instead of multiples of pedestal variances
+// image cleaning
         vector<double> fimagethresh;              // parameter for image threshold
         vector<double> fborderthresh;             // parameter for border threshold
         vector<double> fbrightnonimagetresh;      // parameter for bright pixels threshold
-        int fImageLL;                             // loglikelihood image parameterisation 0=off/1=on/2=verbose mode (default: 0=off )
-        float fLogLikelihoodLoss_min;             // do loglikelihood image parameterisation if loss is larger than this value
-        float  fImageAnalysisFUIFactor;           // FUI factor for image analysis
-        bool   fRemoveIsolatedPixel;
-        bool   fFillImageBorderNeighbours;
-        bool   fSmoothDead;                       // smooth dead pixels (default: off )
 
-        bool fUseTimeCleaning;                    // HP: use time cluster cleaning
+        bool fUseFixedThresholds;                 // use fixed image/border thresholds instead of multiples of pedestal variances
+	unsigned int fImageCleaningMethod;        // 0: standard two level cleaning; 1: time cluster cleaning, 2: Maxim...
+
+// time cluster cleaning
 	vector<double> ftimecutpixel;             // HP: parameter for time cut between pixels
 	vector<double> ftimecutcluster;           // HP: parameter for time cut between clusters
 	vector<int> fminpixelcluster;             // HP: parameter for minimum number of pixels in cluster
 	vector<int> floops;                       // HP: parameter for number of loops for border pixel finding
 
-// stereo analysis
-        string farrayanalysiscutfile;             // file with cuts for array analysis
+// image analysis
+        int    fImageLL;                          // loglikelihood image parameterisation 0=off/1=on/2=verbose mode (default: 0=off )
+        vector< float > fLogLikelihoodLoss_min;   // do loglikelihood image parameterisation if loss is larger than this value
+	vector< int > fLogLikelihood_Ntubes_min; //  do loglikelihood image parameterisation if ntubes is larger than this value
+        float  fImageAnalysisFUIFactor;           // FUI factor for image analysis
+        bool   fRemoveIsolatedPixel;
+        bool   fFillImageBorderNeighbours;
+        bool   fSmoothDead;                       // smooth dead pixels (default: off )
+
+// reconstruction parameter file
+        string freconstructionparameterfile;      // reconstruction parameter file
 // MC parameters
         string fsimu_pedestalfile;                // use external pedestal file for MC
         int    fsimu_noiselevel;                  // noise level used for this external file
@@ -230,9 +238,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         ~VEvndispRunParameter() {}
 
 	bool         doFADCAnalysis() { return fperformFADCAnalysis; }
+	string       getImageCleaningMethod();
+	unsigned int getImageCleaningMethodIndex() { return fImageCleaningMethod; }
+	bool         setImageCleaningMethod( string iMethod );
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,110);
+        ClassDef(VEvndispRunParameter,112);
 };
 #endif

@@ -21,7 +21,7 @@ class VImageBaseAnalyzer : public VEvndispData
         void calcSecondTZerosSums();
         void calcSums(int ,int, bool);
         void calcTZeros(int ,int);
-        void calcTZerosSums(int, int, int, int );
+        void calcTZerosSums(int, int, unsigned int );
 	unsigned int getDynamicSummationWindow( unsigned int chanID );
         void FADCStopCorrect();
         bool setSpecialChannels();

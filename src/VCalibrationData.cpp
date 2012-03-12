@@ -220,7 +220,6 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 
 // high gain channels
     fPeds.resize( i_channel, 20. );
-    fPedVars.resize( i_channel, 20. );
     fVPedvars.resize( nSamples+1, sqrt( fPeds ) );
     fPedrms.resize( i_channel, 0. );
     fVmeanPedvars.resize( nSamples+1, 0. );
@@ -552,11 +551,8 @@ valarray<double>& VCalibrationData::getPeds( bool iLowGain, double iTime )
 }
 
 
-valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW, bool iSumWindowSmall, double iTime )
+valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW, double iTime )
 {
-// no summation window given -> take global defined ones
-    if( iSW == 0 && !iSumWindowSmall )    iSW = fSumWindow;
-    else if( iSW ==0 && iSumWindowSmall ) iSW = fSumWindowSmall;
 
 //////////////////////////////////////////////////////////
 // pedvars in time slices
@@ -614,8 +610,8 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
        else if( fVPedvars.size() > 0 ) return fVPedvars[0];
     }
 
-// probably not filled
-    return fPedVars;
+// should never arrive here
+    return fValArrayDouble;
 }
 
 
@@ -628,11 +624,8 @@ void VCalibrationData::setPeds( unsigned int iChannel, double iPed, bool iLowGai
 }
 
 
-double VCalibrationData::getmeanPedvars( bool iLowGain, unsigned int iSW, bool iSumWindowSmall, double iTime )
+double VCalibrationData::getmeanPedvars( bool iLowGain, unsigned int iSW )
 {
-    if( iSW == 0 && !iSumWindowSmall ) iSW = fSumWindow;
-    if( iSW == 0 &&  iSumWindowSmall ) iSW = fSumWindowSmall;
-
     if( !iLowGain && iSW < fVmeanPedvars.size() ) return fVmeanPedvars[iSW];
 
     if( iLowGain && iSW < fVmeanLowGainPedvars.size() ) return fVmeanLowGainPedvars[iSW];
@@ -641,11 +634,8 @@ double VCalibrationData::getmeanPedvars( bool iLowGain, unsigned int iSW, bool i
 }
 
 
-double VCalibrationData::getmeanRMSPedvars( bool iLowGain, unsigned int iSW, bool iSumWindowSmall, double iTime )
+double VCalibrationData::getmeanRMSPedvars( bool iLowGain, unsigned int iSW )
 {
-    if( iSW == 0 && !iSumWindowSmall ) iSW = fSumWindow;
-    if( iSW == 0 &&  iSumWindowSmall ) iSW = fSumWindowSmall;
-
     if( !iLowGain && iSW < fVmeanRMSPedvars.size() ) return fVmeanRMSPedvars[iSW];
 
     if( iLowGain && iSW < fVmeanRMSLowGainPedvars.size() ) return fVmeanRMSLowGainPedvars[iSW];
@@ -654,7 +644,7 @@ double VCalibrationData::getmeanRMSPedvars( bool iLowGain, unsigned int iSW, boo
 }
 
 
-void VCalibrationData::getmeanPedvars( double &imean, double &irms, bool iLowGain, unsigned int iSW, bool iSumWindowSmall, double iTime )
+void VCalibrationData::getmeanPedvars( double &imean, double &irms, bool iLowGain, unsigned int iSW, double iTime )
 {
     imean = 0.;
     irms  = 0.;
@@ -664,9 +654,9 @@ void VCalibrationData::getmeanPedvars( double &imean, double &irms, bool iLowGai
     double its_sum2 = 0.;
 
     double iMinPedVars = 2.5;
-    if( iSumWindowSmall ) iMinPedVars = 0.5;
+    if( iSW < 8 ) iMinPedVars = 0.5;
 
-    valarray< double > ipedvar = getPedvars( iLowGain, iSW, iSumWindowSmall, iTime );
+    valarray< double > ipedvar = getPedvars( iLowGain, iSW, iTime );
 
     for( unsigned int i = 0; i < ipedvar.size(); i++ )
     {

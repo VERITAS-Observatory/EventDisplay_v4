@@ -139,7 +139,7 @@ class VShowerParameters
         float MCycore_SC;                         //!< MC core position in shower coordinates
         float MCzcore_SC;                         //!< MC core position in shower coordinates
 
-        VShowerParameters( int iNTel = 4, unsigned int iShortTree = 0 );
+        VShowerParameters( int iNTel = 4, unsigned int iShortTree = 0, unsigned int iNMethods = 1 );
        ~VShowerParameters();
 
         void addDISPPoint( unsigned int iTelID, unsigned int iMethod, float x, float y, float idispw = -999. );

@@ -29,6 +29,8 @@ class VCalibrationData
         unsigned int fSumWindow;
         unsigned int fSumWindowSmall;
 
+	valarray< double > fValArrayDouble;
+
         TList *hisList;
         TFile *fPedFile;
         TFile *fGainFile;
@@ -60,7 +62,6 @@ class VCalibrationData
         valarray< int > fTS_MJD;                  //!< MJD for pedestals in time slices
         valarray< double > fTS_time;              //!< time for pedestals in time slices
         valarray<double> fPeds;                   //!< mean pedestal
-	valarray<double> fPedVars;
         valarray< valarray < double > > fTS_Peds; //!< time dependant mean pedestal  [time slice][channel]
         vector< valarray< double > > fVPedvars;   //!< pedestal variance (for different sumwindows) [summation window][channel]
                                                   //!< time dependant pedestal variance [time slice][summation window][channel]
@@ -174,7 +175,7 @@ class VCalibrationData
 
         void              setPeds( unsigned int iChannel, double iPed, bool iLowGain = false, double iTime = -99. );
         valarray<double>& getPeds( bool iLowGain = false, double iTime = -99. );
-        valarray<double>& getPedvars( bool iLowGain = false, unsigned int iSW = 0, bool iSumWindowSmall = false, double iTime = -99. );
+        valarray<double>& getPedvars( bool iLowGain = false, unsigned int iSW = 0, double iTime = -99. );
 
         unsigned int         getTSTimeIndex( double iTime, unsigned int& i1, unsigned int& i2, double& ifrac1, double& ifrac2 );
         valarray< int >&     getMJDTS_vector() { return fTS_MJD; }
@@ -187,9 +188,9 @@ class VCalibrationData
 	unsigned int getNSummationWindows() { return fVLowGainPedvars.size(); }
 	double   getPed_min( bool iLowGain = false );
 	double   getPed_max( bool iLowGain = false );
-        double   getmeanPedvars( bool iLowGain = false, unsigned int iSumWindow = 0, bool iSumWindowSmall = false, double iTime = -99. );
-        double   getmeanRMSPedvars( bool iLowGain = false, unsigned int iSumWindow = 0,  bool iSumWindowSmall = false, double iTime = -99. );
-        void     getmeanPedvars( double &imean, double &irms, bool iLowGain = false, unsigned int iSumWindow = 0, bool iSumWindowSmall = false, double iTime = -99. );
+        double   getmeanPedvars( bool iLowGain = false, unsigned int iSumWindow = 0 );
+        double   getmeanRMSPedvars( bool iLowGain, unsigned int iSumWindow );
+        void     getmeanPedvars( double &imean, double &irms, bool iLowGain = false, unsigned int iSumWindow = 0, double iTime = -99. );
 
 	void     recoverLowGainPedestals();
         bool     usePedestalsInTimeSlices( bool iB ) { if( !iB ) return fUsePedestalsInTimeSlices; else return fLowGainUsePedestalsInTimeSlices; }

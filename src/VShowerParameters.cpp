@@ -13,14 +13,14 @@
 
 #include "VShowerParameters.h"
 
-VShowerParameters::VShowerParameters( int iNTel, unsigned int iShortTree )
+VShowerParameters::VShowerParameters( int iNTel, unsigned int iShortTree, unsigned int iNMethod )
 {
     fDebug = false;
     if( fDebug ) cout << "VShowerParameters::VShowerParameters( int iNTel ) " << iNTel << endl;
     fMC = false;
     fTreeSC = 0;
     fNTel = iNTel;
-    fNMethods = VDST_MAXRECMETHODS;
+    fNMethods = iNMethod;
     fShortTree = iShortTree;
     reset();
 

@@ -152,8 +152,8 @@ void VEvndispData::resetAnaData()
     {
         fAnaData[fTelID]->fSums = 0.;
         fAnaData[fTelID]->fTCorrectedSumFirst = fRunPar->fsumfirst[fTelID];
-        fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow[fTelID];
-        fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow[fTelID];
+        fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow_1[fTelID];
+        fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow_1[fTelID];
 
 	fAnaData[fTelID]->fTemplateMu = 0;
 
@@ -251,36 +251,28 @@ void VEvndispData::setDeadChannelText()
     fDeadChannelText.push_back( "disabled: MC set" );
 }
 
-bool VEvndispData::get_array_analysis_cuts( string ifile )
+bool VEvndispData::get_reconstruction_parameters( string ifile )
 {
-    fArrayAnalysisCuts = new VEvndispReconstructionParameter( getDetectorGeometry()->getTelType() );
-    fArrayAnalysisCuts->SetName( "EvndispReconstructionParameter" );
+    fEvndispReconstructionParameter = new VEvndispReconstructionParameter( getDetectorGeometry()->getTelType(), getRunParameter() );
+    fEvndispReconstructionParameter->SetName( "EvndispReconstructionParameter" );
 
     unsigned int iNMethods = 0;
     if( ifile.size() > 0 )
     {
-        fArrayAnalysisCuts->setDefaultThresholds( getImageThresh(), getBorderThresh(), getBrightNonImageThresh() );
 // read array analysis cuts
         if( ifile.find( "/" ) != string::npos ) 
 	{
-	   iNMethods = fArrayAnalysisCuts->read_arrayAnalysisCuts( ifile );
+	   iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( ifile );
         }
 	else
 	{
-	   iNMethods = fArrayAnalysisCuts->read_arrayAnalysisCuts( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + ifile );
+	   iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + ifile );
         }
         if( !iNMethods )
         {
             return false;
         }
-// set image border thresholds
-        for( unsigned int i = 0; i < getNTel(); i++ )
-	{
-	    getRunParameter()->fimagethresh[i] = fArrayAnalysisCuts->getImageThreshold( getDetectorGeometry()->getTelType()[i] );
-	    getRunParameter()->fborderthresh[i] = fArrayAnalysisCuts->getBorderThreshold( getDetectorGeometry()->getTelType()[i] );
-	    getRunParameter()->fbrightnonimagetresh[i] = fArrayAnalysisCuts->getBrightNonImageThreshold( getDetectorGeometry()->getTelType()[i] );
-        }
-        fArrayAnalysisCuts->print_arrayAnalysisCuts();
+        fEvndispReconstructionParameter->print_arrayAnalysisCuts();
         if( fShowerParameters ) fShowerParameters->setNArrayReconstructionMethods( iNMethods );
     }
     else return false;
@@ -494,11 +486,12 @@ valarray<double>& VEvndispData::getPeds( bool iLowGain, double iTime )
     return fPlotRawPedestals;
 }
 
-valarray<double>& VEvndispData::getPedvars( bool iLowGain, unsigned int iSW, bool iSumWindowSmall, double iTime )
+valarray<double>& VEvndispData::getPedvars( bool iLowGain, unsigned int iSW, double iTime )
 {
-   if( iTime < -90. ) return fCalData[fTelID]->getPedvars( iLowGain, iSW, iSumWindowSmall, getEventTime() );
+   if( iSW == 0 ) iSW = getSumWindow();
+   if( iTime < -90. ) return fCalData[fTelID]->getPedvars( iLowGain, iSW, getEventTime() );
 
-   return fCalData[fTelID]->getPedvars( iLowGain, iSW, iSumWindowSmall, iTime );
+   return fCalData[fTelID]->getPedvars( iLowGain, iSW, iTime );
 }
 
 
@@ -551,7 +544,8 @@ void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned in
 // this should never happen
     if( fAnaData[fTelID]->fCurrentSummationWindow[iChannel] > getNSamples() )
     {
-        cout << "VEvndispData::setCurrentSummationWindow (b) error: summation window too large: " << fTelID << "\t" << iChannel << "\t" << imin << "\t" << imax << "\t" << fAnaData[fTelID]->fCurrentSummationWindow[iChannel] << endl;
+        cout << "VEvndispData::setCurrentSummationWindow (b) error: summation window too large: ";
+	cout << fTelID << "\t" << iChannel << "\t" << imin << "\t" << imax << "\t" << fAnaData[fTelID]->fCurrentSummationWindow[iChannel] << endl;
         fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
     }
 }
@@ -643,6 +637,17 @@ void VEvndispData::setPulseTimingCorrection( unsigned int iChannel, double iCorr
    }
 }
 
+unsigned int VEvndispData::getLargestSumWindow()
+{
+   unsigned int iSW = 0;
+
+   if( getSumWindow() > iSW )       iSW = getSumWindow();
+   if( getSumWindow_2() > iSW )     iSW = getSumWindow_2();
+   if( getSumWindow_Pass1() > iSW ) iSW = getSumWindow_Pass1();
+
+   return iSW;
+}
+
 
 bool VEvndispData::fDebug = false;
 int VEvndispData::fDebugLevel = 0;
@@ -705,7 +710,7 @@ vector< TDirectory* > VEvndispData::fAnaDir;
 vector< VImageAnalyzerData* > VEvndispData::fAnaData;
 VShowerParameters* VEvndispData::fShowerParameters = 0;
 VMCParameters* VEvndispData::fMCParameters = 0;
-VEvndispReconstructionParameter* VEvndispData::fArrayAnalysisCuts = 0;
+VEvndispReconstructionParameter* VEvndispData::fEvndispReconstructionParameter = 0;
 VFrogParameters* VEvndispData::fFrogParameters = 0;
 //vector< VFrogImageData* > VEvndispData::fFrogData;
 

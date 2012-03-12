@@ -18,7 +18,7 @@ VArrayAnalyzer::VArrayAnalyzer()
     fInitialized = false;
 
 // set up data storage class (all analysis results are stored here)
-    fShowerParameters = new VShowerParameters( getNTel(), getRunParameter()->fShortTree );
+    fShowerParameters = new VShowerParameters( getNTel(), getRunParameter()->fShortTree, getEvndispReconstructionParameter()->fNMethods );
 // set up MC data storage class
     fMCParameters = new VMCParameters( fDebug );
 // test if number of telescopes exceeds value in fShowerParameters
@@ -265,30 +265,30 @@ void VArrayAnalyzer::initAnalysis()
     for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
     {
 // set reconstruction method
-        if( i < getArrayAnalysisCuts()->fMethodID.size() )
+        if( i < getEvndispReconstructionParameter()->fMethodID.size() )
         {
-            if( getArrayAnalysisCuts()->fMethodID[i] == 5 )
+            if( getEvndispReconstructionParameter()->fMethodID[i] == 5 )
             {
 	        fDispAnalyzer.push_back( new VDispAnalyzer() );
 		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-		if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fMLPFileName[i], "MLP" ) ) exit( -1 );
+		if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fMLPFileName[i], "MLP" ) ) exit( -1 );
             }
-	    else if( getArrayAnalysisCuts()->fMethodID[i] == 7 )
+	    else if( getEvndispReconstructionParameter()->fMethodID[i] == 7 )
 	    {
 	        fDispAnalyzer.push_back( new VDispAnalyzer() );
 		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-		if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
+		if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
 	    }
-	    else if( getArrayAnalysisCuts()->fMethodID[i] == 6 ||
-	             getArrayAnalysisCuts()->fMethodID[i] == 8 || 
-		     getArrayAnalysisCuts()->fMethodID[i] == 9 )
+	    else if( getEvndispReconstructionParameter()->fMethodID[i] == 6 ||
+	             getEvndispReconstructionParameter()->fMethodID[i] == 8 || 
+		     getEvndispReconstructionParameter()->fMethodID[i] == 9 )
             {
 		cout << "init array analysis for analysis cut set " << fDispAnalyzer.size();
-		cout << " and reconstruction method " << getArrayAnalysisCuts()->fMethodID[i] << endl;
+		cout << " and reconstruction method " << getEvndispReconstructionParameter()->fMethodID[i] << endl;
 	        fDispAnalyzer.push_back( new VDispAnalyzer() );
 		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-//                if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fDispFileName[i], "DISPTABLE" ) ) exit( -1 );
-		if( !fDispAnalyzer.back()->initialize( getArrayAnalysisCuts()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
+//                if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fDispFileName[i], "DISPTABLE" ) ) exit( -1 );
+		if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
             }
             else fDispAnalyzer.push_back( 0 );
         }
@@ -432,7 +432,7 @@ void VArrayAnalyzer::terminate()
 		iMC_histos.Write();
             }
         }
-        if( getArrayAnalysisCuts() ) getArrayAnalysisCuts()->Write();
+        if( getEvndispReconstructionParameter() ) getEvndispReconstructionParameter()->Write();
 	if( fOutputfile ) fOutputfile->Flush();
         cout << "---------------------------------------------------------------------------------------------------------" << endl;
     }
@@ -518,7 +518,7 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
         if( fSelectDebug ) cout << "VArrayAnalyzer::selectShowerImages eventstatus " << getImageParameters( getRunParameter()->fImageLL )->eventStatus << endl;
 
 // get telescope type for this telescope
-	int iTelType = fArrayAnalysisCuts->getTelescopeType_counter( getDetectorGeometry()->getTelType()[t] );
+	int iTelType = fEvndispReconstructionParameter->getTelescopeType_counter( getDetectorGeometry()->getTelType()[t] );
 	if( iTelType < 0 )
 	{
 	   cout << "VArrayAnalyzer::selectShowerImages error: invalid telescope counter: " << t << "\t" << iTelType << endl;
@@ -526,7 +526,7 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 	   continue;
         }
 // apply array analysis cuts
-        getShowerParameters()->fTelIDImageSelected[iMeth].back() = fArrayAnalysisCuts->applyArrayAnalysisCuts( iMeth, iTelType, getImageParameters( getRunParameter()->fImageLL ) );
+        getShowerParameters()->fTelIDImageSelected[iMeth].back() = fEvndispReconstructionParameter->applyArrayAnalysisCuts( iMeth, t, iTelType, getImageParameters( getRunParameter()->fImageLL ) );
 
 ///////////////////////////
 
@@ -567,30 +567,31 @@ void VArrayAnalyzer::calcShowerDirection_and_Core()
     for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
     {
 // set reconstruction method
-        if( i < getArrayAnalysisCuts()->fMethodID.size() )
+        if( i < getEvndispReconstructionParameter()->fMethodID.size() )
         {
-            getShowerParameters()->fMethodID[i] = getArrayAnalysisCuts()->fMethodID[i];
+            getShowerParameters()->fMethodID[i] = getEvndispReconstructionParameter()->fMethodID[i];
 // select shower images to be used to determinate of shower coordinates
             selectShowerImages( i );
 
 // call reconstruction method
-            if( getArrayAnalysisCuts()->fMethodID[i] == 0 )      rcs_method_0( i );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 3 ) rcs_method_3( i );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 4 ) rcs_method_4( i );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 5 ) rcs_method_5( i, 5 );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 6 ) rcs_method_5( i, 6 );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 7 ) rcs_method_5( i, 7 );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 8 ) rcs_method_8( i );
-            else if( getArrayAnalysisCuts()->fMethodID[i] == 9 ) rcs_method_9( i );
+            if( getEvndispReconstructionParameter()->fMethodID[i] == 0 )      rcs_method_0( i );
+            else if( getEvndispReconstructionParameter()->fMethodID[i] == 3 ) rcs_method_3( i );
+            else if( getEvndispReconstructionParameter()->fMethodID[i] == 4 ) rcs_method_4( i );
+            else if( getEvndispReconstructionParameter()->fMethodID[i] == 5 ) rcs_method_5( i, 5 );
+            else if( getEvndispReconstructionParameter()->fMethodID[i] == 6 ) rcs_method_5( i, 6 );
+            else if( getEvndispReconstructionParameter()->fMethodID[i] == 7 ) rcs_method_5( i, 7 );
+            else if( getEvndispReconstructionParameter()->fMethodID[i] == 8 ) rcs_method_8( i );
+            else if( getEvndispReconstructionParameter()->fMethodID[i] == 9 ) rcs_method_9( i );
             else
             {
-                cout << "VArrayAnalyzer::calcShowerDirection_and_Core(): unknown array reconstruction method " << getArrayAnalysisCuts()->fMethodID[i] << endl;
+                cout << "VArrayAnalyzer::calcShowerDirection_and_Core(): unknown array reconstruction method " << getEvndispReconstructionParameter()->fMethodID[i] << endl;
                 continue;
             }
         }
         else
         {
             cout << "VArrayAnalyzer::calcShowerDirection_and_Core(): error, analysis vectors with different size" << endl;
+	    cout << "(nmethods: " << getShowerParameters()->fNMethods << ", v size: " << getEvndispReconstructionParameter()->fMethodID.size() << ")" << endl;
             cout << "...fatal error" << endl;
             exit( 0 );
         }
@@ -639,7 +640,7 @@ direction with the image centroids. Impact
     num_images = getShowerParameters()->fShowerNumImages[iMethod];
 
 // are there enough images the run an array analysis
-    if( num_images >= (int)fArrayAnalysisCuts->fNImages_min[iMethod] )
+    if( num_images >= (int)fEvndispReconstructionParameter->fNImages_min[iMethod] )
     {
         prepareforDirectionReconstruction( iMethod, 0 );
     }
@@ -654,8 +655,8 @@ direction with the image centroids. Impact
     {
         float iangdiff = fabs(atan(m[0])-atan(m[1]));
         getShowerParameters()->fiangdiff[iMethod] = iangdiff*TMath::RadToDeg();
-        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
-	    fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+        if( iangdiff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
+	    fabs(180./TMath::RadToDeg()-iangdiff) < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
         {
             getShowerParameters()->fShower_Chi2[iMethod] = -1.*fabs(atan(m[0])-atan(m[1]))*TMath::RadToDeg();
             return 0;
@@ -935,7 +936,7 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
     num_images = getShowerParameters()->fShowerNumImages[iMethod];
 
 // are there enough images the run an array analysis
-    if( num_images >= (int)fArrayAnalysisCuts->fNImages_min[iMethod] )
+    if( num_images >= (int)fEvndispReconstructionParameter->fNImages_min[iMethod] )
     {
         prepareforDirectionReconstruction( iMethod, 3 );
     }
@@ -949,8 +950,8 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
     {
         float iangdiff = fabs(atan(m[0])-atan(m[1]));
         getShowerParameters()->fiangdiff[iMethod] = iangdiff*TMath::RadToDeg();
-        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
-	    fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+        if( iangdiff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
+	    fabs(180./TMath::RadToDeg()-iangdiff) < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
         {
             getShowerParameters()->fShower_Chi2[iMethod] = -1.*fabs(atan(m[0])-atan(m[1]))*TMath::RadToDeg();
             return 0;
@@ -1067,7 +1068,7 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
     num_images = getShowerParameters()->fShowerNumImages[iMethod];
 
 // are there enough images the run an array analysis
-    if( num_images >= (int)fArrayAnalysisCuts->fNImages_min[iMethod] )
+    if( num_images >= (int)fEvndispReconstructionParameter->fNImages_min[iMethod] )
     {
         prepareforDirectionReconstruction( iMethod, 4 );
     }
@@ -1082,8 +1083,8 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
     {
         float iangdiff = fabs(atan(m[0])-atan(m[1]));
         getShowerParameters()->fiangdiff[iMethod] = iangdiff*TMath::RadToDeg();
-        if( iangdiff < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
-	    fabs(180./TMath::RadToDeg()-iangdiff) < fArrayAnalysisCuts->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+        if( iangdiff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
+	    fabs(180./TMath::RadToDeg()-iangdiff) < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
         {
             getShowerParameters()->fShower_Chi2[iMethod] = -1.*fabs(atan(m[0])-atan(m[1]))*TMath::RadToDeg();
             return 0;
@@ -1266,7 +1267,7 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
         {
             telID.push_back( tel );
 // get pointing difference between expected pointing towards source and measured pointing (by command line, tracking program or pointing monitors)
-            if( !fArrayAnalysisCuts->fUseEventdisplayPointing[iMethodIndex] && tel < getPointing().size() && getPointing()[tel] )
+            if( !fEvndispReconstructionParameter->fUseEventdisplayPointing[iMethodIndex] && tel < getPointing().size() && getPointing()[tel] )
             {
                 iPointingErrorX = getPointing()[tel]->getPointingErrorX();
                 iPointingErrorY = getPointing()[tel]->getPointingErrorY();
@@ -1402,7 +1403,7 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp  )
     num_images = getShowerParameters()->fShowerNumImages[iMethod];
 
 // are there enough images the run an array analysis
-    if( num_images >= (int)fArrayAnalysisCuts->fNImages_min[iMethod] )
+    if( num_images >= (int)fEvndispReconstructionParameter->fNImages_min[iMethod] )
     {
         prepareforDirectionReconstruction( iMethod, 5 );
     }
@@ -1573,7 +1574,7 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
     num_images = getShowerParameters()->fShowerNumImages[iMethod];
 
 // cut on minimum number of images
-    if( num_images >= (int)fArrayAnalysisCuts->fNImages_min[iMethod] )
+    if( num_images >= (int)fEvndispReconstructionParameter->fNImages_min[iMethod] )
     {
         prepareforDirectionReconstruction( iMethod, 4 );
     }
@@ -1629,12 +1630,12 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 ////////////////////////////////////////////////////////
             iangdiff = fabs( sin( fabs(atan(m[jj])-atan(m[ii])) ) );
 // use modified disp methods for pairs with small angles between them only
-            if( iangdiff * TMath::RadToDeg() > getArrayAnalysisCuts()->fMODDISP_MinAngleForDisp[iMethod] ) idispweight = 0.; 
+            if( iangdiff * TMath::RadToDeg() > getEvndispReconstructionParameter()->fMODDISP_MinAngleForDisp[iMethod] ) idispweight = 0.; 
 	    else
 	    {
-	       idispweight = 1.-TMath::Exp( -1.* getArrayAnalysisCuts()->fMODDISP_MinAngleExpFactor[iMethod]*
-	                                        (iangdiff*TMath::RadToDeg()-getArrayAnalysisCuts()->fMODDISP_MinAngleForDisp[iMethod])*
-	                                        (iangdiff*TMath::RadToDeg()-getArrayAnalysisCuts()->fMODDISP_MinAngleForDisp[iMethod]));
+	       idispweight = 1.-TMath::Exp( -1.* getEvndispReconstructionParameter()->fMODDISP_MinAngleExpFactor[iMethod]*
+	                                        (iangdiff*TMath::RadToDeg()-getEvndispReconstructionParameter()->fMODDISP_MinAngleForDisp[iMethod])*
+	                                        (iangdiff*TMath::RadToDeg()-getEvndispReconstructionParameter()->fMODDISP_MinAngleForDisp[iMethod]));
             }
 
 ////////////////////////////////////////////////////////

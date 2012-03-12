@@ -293,7 +293,7 @@ Bool_t VDisplay::ProcessMessage(Long_t msg, Long_t parm1, Long_t)
 */
 void VDisplay::updateCamera( Int_t i )
 {
-    if( fDebug ) cout << "VDisplay::updateCamera " << i << "\t" << fCamera.size() << endl;
+    if( fDebug ) cout << "VDisplay::updateCamera " << i << "\t" << fCamera.size() << "\t" << fTelescopesToShow.size() << endl;
 
     fCanvasCamera->SetEditable( true );
 // get tab identification
@@ -323,7 +323,7 @@ void VDisplay::updateCamera( Int_t i )
 // (GM) only need maximum sum, don't call doAnalysis() (resets all image parameters)
 //	 fEventLoop->getAnalyzer()->doAnalysis();
             fEventLoop->getAnalyzer()->calcTCorrectedSums(fEventLoop->getRunParameter()->fsumfirst[t], 
-	                                                  fEventLoop->getRunParameter()->fsumfirst[t]+fEventLoop->getRunParameter()->fsumwindow[t] );
+	                                                  fEventLoop->getRunParameter()->fsumfirst[t]+fEventLoop->getRunParameter()->fsumwindow_1[t] );
             i_max.push_back( fEventLoop->getAnalyzer()->getSums().max() );
         }
 // loop over the trace in steps of winsize
@@ -337,7 +337,6 @@ void VDisplay::updateCamera( Int_t i )
                 fEventLoop->getAnalyzer()->setTelID( fTelescopesToShow[t] );
                 fEventLoop->getAnalyzer()->calcTCorrectedSums(j,j+winsize);
                 fEventLoop->getAnalyzer()->gainCorrect();
-//                 fEventLoop->getAnalyzer()->cleanImageFixed(30.0,15.0);
                 if( fEventLoop->getAnalyzer()->getImageCleaner() ) fEventLoop->getAnalyzer()->getImageCleaner()->cleanImageFixed(30.0,15.0);
                 if( fBoolDrawOne ) fCamera[fTelescopesToShow[t]]->setCanvas( fCanvasCamera );
                 else fCamera[fTelescopesToShow[t]]->setCanvas( fPadsCamera[fTelescopesToShow[t]] );
@@ -1196,7 +1195,7 @@ void VDisplay::setFADCText()
     sprintf( cTemp, "pedestal %.2f (low gain: %.2f)", fEventLoop->getAnalyzer()->getPeds()[iChannel], fEventLoop->getAnalyzer()->getPeds(true)[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // pedestal variance    
-    if( fEventLoop->getRunParameter()->fDoublePass && fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] > 0 )
+    if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] > 0 )
     {
        sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), integration window %d",
                 fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
@@ -1207,50 +1206,34 @@ void VDisplay::setFADCText()
     {
        sprintf( cTemp, "no pedestal variance for 0 summation window" );
     }
-    else
+    fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    if( fEventLoop->getAnalyzer()->getSumWindow_2() > 0 )
     {
-       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f)",
-                        fEventLoop->getAnalyzer()->getPedvars()[iChannel],
-			fEventLoop->getAnalyzer()->getPedvars( true )[iChannel] );
-//       sprintf( cTemp, "no pedestal variance" );
+       int iSW = fEventLoop->getAnalyzer()->getSumWindow_2();
+       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), 2nd integration window %d",
+                fEventLoop->getAnalyzer()->getPedvars( false, iSW )[iChannel],
+		fEventLoop->getAnalyzer()->getPedvars( true, iSW )[iChannel],
+		iSW );
+    }
+    else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
+    {
+       sprintf( cTemp, "no pedestal variance for 0 summation window" );
     }
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-
-    if( fEventLoop->getRunParameter()->fDoublePass )
+    if( fEventLoop->getRunParameter()->fDoublePass && fEventLoop->getAnalyzer()->getSumWindow_Pass1() > 0 )
     {
-        unsigned int iSumWindow = fEventLoop->getSumWindow( fTelescope );
-
-        if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow ).size() && iSumWindow > 0 )
-        {
-            sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), integration window %d", fEventLoop->getAnalyzer()->getPedvars( iSumWindow )[iChannel], fEventLoop->getAnalyzer()->getPedvars( iSumWindow )[iChannel], iSumWindow );
-        }
-	else if( iSumWindow == 0 )
-	{
-	    sprintf( cTemp, "no pedestal variance for integration window size %d", iSumWindow );
-        }
-        else sprintf( cTemp, "Error" );
+       int iSW = fEventLoop->getAnalyzer()->getSumWindow_Pass1();
+       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), DP1 integration window %d",
+                fEventLoop->getAnalyzer()->getPedvars( false, iSW )[iChannel],
+		fEventLoop->getAnalyzer()->getPedvars( true, iSW )[iChannel],
+		iSW );
     }
-    else if( fEventLoop->getRunParameter()->fsourcetype != 6 && fEventLoop->getRunParameter()->fsourcetype != 7 )
+    else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
     {
-        unsigned int iSumWindow = 0;
-        if( iChannel < fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
-        {
-            iSumWindow = fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel];
-            if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow ).size() && iSumWindow > 0 ) 
-            {
-                if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow, true ).size() )
-                {
-                    sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), integration window %d", fEventLoop->getAnalyzer()->getPedvars( iSumWindow )[iChannel], fEventLoop->getAnalyzer()->getPedvars( iSumWindow, true)[iChannel], iSumWindow );
-                }
-            }
-	    else if( iSumWindow == 0 )
-	    {
-	       sprintf( cTemp, "no pedestal variance for integration window size %d", iSumWindow );
-            }
-        }
+       sprintf( cTemp, "no pedestal variance for 0 summation window" );
     }
-    else sprintf( cTemp, " " );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+// gain
 // gain
     sprintf( cTemp, "gain %.2f (low gain channel: %.2f)", fEventLoop->getAnalyzer()->getGains()[iChannel], fEventLoop->getAnalyzer()->getGains( true )[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
@@ -1270,7 +1253,11 @@ void VDisplay::setFADCText()
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     fTextFADC.push_back( new TText( xL, yT, "" ) );
 // pulse sum
-    sprintf( cTemp, "pulse sum %.2f pulse max %.2f (raw max: %.2f) pulse width: %.2f", fEventLoop->getData()->getSums()[iChannel], fEventLoop->getData()->getTraceMax()[iChannel], fEventLoop->getData()->getTraceRawMax()[iChannel],  fEventLoop->getData()->getTraceWidth()[iChannel] );
+    sprintf( cTemp, "pulse sum %.2f (LW: %.2f) pulse max %.2f (raw max: %.2f) pulse width: %.2f", fEventLoop->getData()->getSums()[iChannel], 
+												  fEventLoop->getData()->getSums2()[iChannel],
+                                                                                                  fEventLoop->getData()->getTraceMax()[iChannel], 
+												  fEventLoop->getData()->getTraceRawMax()[iChannel], 
+												  fEventLoop->getData()->getTraceWidth()[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // pulse tzeros
     sprintf( cTemp, "tzero %.1f (raw tzero: %.1f, toffset correction: %.1f, FADC crate trigger: %.1f)",
@@ -1401,6 +1388,7 @@ void VDisplay::setInfoText()
 // calibration and analysis parameters
     for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
     {
+	fEventLoop->getAnalyzer()->setTelID( fEventLoop->getTeltoAna()[i] );
         sprintf( c_Text, "Telescope %d:", fEventLoop->getTeltoAna()[i]+1 );
         i_Text.push_back( new TText( xL, yT, c_Text ) );
         if( fEventLoop->getReader()->getDataFormat() == "rawdata"  ||  fEventLoop->getReader()->getDataFormat() == "Rawvbf" )
@@ -1410,13 +1398,12 @@ void VDisplay::setInfoText()
 			     fEventLoop->getRunParameter()->fPedLowGainFileNumber[fEventLoop->getTeltoAna()[i]],
 			     fEventLoop->getRunParameter()->fGainFileNumber[fEventLoop->getTeltoAna()[i]],
 			     fEventLoop->getRunParameter()->fTOffFileNumber[fEventLoop->getTeltoAna()[i]] );
-	   fEventLoop->getAnalyzer()->setTelID( fEventLoop->getTeltoAna()[i] );
            i_Text.push_back( new TText( xL, yT, c_Text ) );
         }
         sprintf( c_Text, "    image/border threshold %.2f/%.2f", fEventLoop->getAnalyzer()->getImageThresh(), fEventLoop->getAnalyzer()->getBorderThresh() );
         i_Text.push_back( new TText( xL, yT, c_Text ) );
         sprintf( c_Text, "    window size %d (%d), window start (not time corrected) %d",
-	                 fEventLoop->getAnalyzer()->getSumWindow(), fEventLoop->getAnalyzer()->getSumWindowSmall(),
+	                 fEventLoop->getAnalyzer()->getSumWindow(), fEventLoop->getAnalyzer()->getSumWindow_2(),
 			 fEventLoop->getAnalyzer()->getSumFirst() );
         i_Text.push_back( new TText( xL, yT, c_Text ) );
     }
@@ -1490,8 +1477,8 @@ void VDisplay::drawCalibrationHistos()
     {
         if( fSelectedChan >= 200000 )
         {
-            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow[fTelescope] );
-            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow[fTelescope], true );
+            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope] );
+            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope], true );
         }
         else
         {
@@ -1503,8 +1490,8 @@ void VDisplay::drawCalibrationHistos()
     {
         if( fSelectedChan >= 200000 )
         {
-            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow[fTelescope] );
-            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow[fTelescope], true );
+            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope] );
+            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope], true );
         }
         else
         {
@@ -1891,6 +1878,7 @@ void VDisplay::defineGui()
     if( fEventLoop->getTeltoAna().size() > 1 )
     {
         fComboTelescopeN->AddEntry( "All telescopes", 0 );
+        fComboTelescopeN->AddEntry( "All in one", -1 );
         for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
         {
             sprintf( i_text, "Telescope %d", fEventLoop->getTeltoAna()[i]+1 );
@@ -1906,7 +1894,6 @@ void VDisplay::defineGui()
 // (GM) works only for four telescopes
 //  if( fEventLoop->getTeltoAna().size() == 4 ) fComboTelescopeN->AddEntry( "Field view", -2 );
 // all in one camera only if there is more than one telescopes
-    if( fEventLoop->getTeltoAna().size() > 1 )  fComboTelescopeN->AddEntry( "All in one", -1 );
 // default is plotting all telescopes if there are less than 10 telescopes
     fComboTelescopeN->Select( 0 );
     fComboTelescopeN->Associate( this );
@@ -2393,8 +2380,8 @@ void VDisplay::subprocessButton( Long_t parm1 )
                 fEventLoop->setCutNTrigger( (int)fNEntryOTri->GetNumber() );
                 fEventLoop->setCutNArrayTrigger( (int)fNEntryOATri->GetNumber() );
                 fEventLoop->setCutNArrayImages( (int)fNEntryOAIma->GetNumber() );
-                fEventLoop->getAnalyzer()->setSumFirst( (int)fNEntryOSum->GetNumber() );
-                fEventLoop->getAnalyzer()->setSumWindow( (int)fNEntryOWin->GetNumber() );
+// (GM)               fEventLoop->getAnalyzer()->setSumFirst( (int)fNEntryOSum->GetNumber() );
+// (GM)                fEventLoop->getAnalyzer()->setSumWindow( (int)fNEntryOWin->GetNumber() );
                 fEventLoop->getAnalyzer()->setImageThresh( fNEntryOIma->GetNumber() );
                 fEventLoop->getAnalyzer()->setBorderThresh( fNEntryOBor->GetNumber() );
             }

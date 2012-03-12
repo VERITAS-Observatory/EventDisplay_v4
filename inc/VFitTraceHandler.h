@@ -97,6 +97,7 @@ class VFitTraceHandler : public VTraceHandler
         }
                                                   //!< rise parameter of fit function (ystart, ystop in %)
         double getTraceRiseTime( double fPed, double ystart, double ystop );
+	double getTraceAverageTime() { return 0.; }
         double getTraceMax() { return -1.*fTraceMax-fPed; }
                                                   //!< get maximum value in trace
         void   getTraceMax( int ,int, double&, int& );

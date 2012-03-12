@@ -46,10 +46,14 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
 
     fpulsetiming_tzero_index = 9999;
     fpulsetiming_width_index = 9999;
+
+    setTraceIntegrationMethod();
 }
 
 
-void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxChannel, bool iTraceFit, bool iDebug, int iseed, unsigned int iSamples, unsigned int ipulsetiminglevel, unsigned int ipulsetiming_tzero_index, unsigned int ipulsetiming_width_index )
+void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxChannel, bool iTraceFit, bool iDebug, 
+                                     int iseed, unsigned int iSamples, unsigned int ipulsetiminglevel, 
+				     unsigned int ipulsetiming_tzero_index, unsigned int ipulsetiming_width_index )
 {
     if( iDebug ) cout << "VImageAnalyzerData::initialize" << endl;
     fNChannels = iChannels;
@@ -68,10 +72,12 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fLowGainDeadUI.resize( iChannels, 0 );
     fTemplateMu.resize( iChannels, 0. );
     fSums.resize( iChannels, 0. );
+    fSums2.resize( iChannels, 0. );
     fHiLo.resize( iChannels, false );
     fLLEst.resize( iChannels, false );
     fPulseTimingUncorrected.resize( ipulsetiminglevel, fSums );
     fPulseTimingCorrected.resize( ipulsetiminglevel, fSums );
+    fPulseTimingAverageTime.resize( iChannels, 0. );
     fTCorrectedSumLast.resize( iChannels,0 );
     fTCorrectedSumFirst.resize( iChannels,0 );
     fCurrentSummationWindow.resize( iChannels,0 );
@@ -217,6 +223,14 @@ double VImageAnalyzerData::getHIGHQE_gainfactor( unsigned int iChannel )
 
 valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
 {
+
+// return tzero from average pulse time
+   if( fTraceIntegrationMethod == 1 )
+   {
+      return fPulseTimingAverageTime;
+   }
+
+// return tzero according to pulse timing vector
    if( iCorrected && fpulsetiming_tzero_index < fPulseTimingCorrected.size() ) return fPulseTimingCorrected[fpulsetiming_tzero_index];
    else if( fpulsetiming_tzero_index < fPulseTimingUncorrected.size() )        return fPulseTimingUncorrected[fpulsetiming_tzero_index];
 

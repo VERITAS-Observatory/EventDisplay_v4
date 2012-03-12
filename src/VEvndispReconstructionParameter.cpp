@@ -1,5 +1,5 @@
 /*! \class VEvndispReconstructionParameter
-    \brief storage class for array analysis cuts
+    \brief reading and storage class for eventdisplay reconstruction parameters
 
     note: due to historical reasons, the term 'method' is not used in the right way
     in this routine and in VArrayAnalyzer.cpp
@@ -8,10 +8,10 @@
 
     there should be one instance per reconstruction method of this class
 
-Revision $Id: VEvndispReconstructionParameter.cpp,v 1.11.8.2.4.1.4.2.8.1.2.1.2.1.2.1.4.3.2.7.2.1.2.2 2011/04/11 07:56:27 prokoph Exp $
 
-\author
-Gernot Maier
+    \author
+    Gernot Maier
+
 */
 
 #include "VEvndispReconstructionParameter.h"
@@ -21,44 +21,35 @@ ClassImp(VEvndispReconstructionParameter)
 VEvndispReconstructionParameter::VEvndispReconstructionParameter()
 {
     reset();
-
-    setDefaultThresholds( 5., 2.5, 2.5 );
 }
 
 
-VEvndispReconstructionParameter::VEvndispReconstructionParameter( vector< ULong64_t > i_telType )
+VEvndispReconstructionParameter::VEvndispReconstructionParameter( vector< ULong64_t > i_telType, VEvndispRunParameter* iRunPara )
 {
     reset();
 
-    for( unsigned int i = 0; i < i_telType.size(); i++ ) fTel_type.insert( i_telType[i] );
+    fRunPara = iRunPara;
 
+    fTel_type_V = i_telType;
+
+// get set with telescope types
+    for( unsigned int i = 0; i < i_telType.size(); i++ ) fTel_type.insert( fTel_type_V[i] );
     fNTel_type = fTel_type.size();
 
-    setDefaultThresholds( 5., 2.5, 2.5 );
 }
 
 void VEvndispReconstructionParameter::reset()
 {
    fDebug = false;
-   fDefault_imagethresh = 0.;
-   fDefault_borderthresh = 0.;
-   fDefault_brightimagethresh = 0.;
+   fRunPara = 0;
    fNMethods = 0;
-   fNTel_type = 4;
 }
    
-
-void VEvndispReconstructionParameter::setDefaultThresholds( double imagethresh, double borderthresh, double brightimagethresh )
-{
-   fDefault_imagethresh = imagethresh;
-   fDefault_borderthresh = borderthresh;
-   fDefault_brightimagethresh = brightimagethresh;
-}
 
 /*
      apply array analysis cuts for this set of image parameters
 */
-bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTelType, VImageParameter* iImageParameter )
+bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, VImageParameter* iImageParameter )
 {
 // sanity checks
    if( iMeth >= fNMethods )
@@ -179,6 +170,17 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
+// cut on successfull reconstruction on the edge of the FOV
+   if( fRunPara )
+   {
+      if( iTel < fRunPara->fLogLikelihoodLoss_min.size() && iTel < fRunPara->fLogLikelihood_Ntubes_min.size() )
+      {
+         if( iImageParameter->ntubes <= fRunPara->fLogLikelihood_Ntubes_min[iTel] ) iArrayCut = false;
+
+         if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 ) iArrayCut = false;
+      }
+   }
+
 // width/length cut
    if( iImageParameter->length > 0. && iImageParameter->width/iImageParameter->length > fWidthLength_max[iMeth][iTelType] )
    {
@@ -256,15 +258,6 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     fMODDISP_MinAngleForDisp.push_back( 25. );
     fMODDISP_MinAngleExpFactor.push_back( 0.02 );
 
-    for( unsigned int i = 0; i < fNTel_type; i++ ) i_d.push_back( fDefault_imagethresh );
-    fimagethresh.push_back( i_d );
-    i_d.clear();
-    for( unsigned int i = 0; i < fNTel_type; i++ ) i_d.push_back( fDefault_borderthresh );
-    fborderthresh.push_back( i_d );
-    i_d.clear();
-    for( unsigned int i = 0; i < fNTel_type; i++ ) i_d.push_back( fDefault_brightimagethresh );
-    fbrightnonimagetresh.push_back( i_d );
-    i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ ) i_t.push_back( 2 );
     fLocalNtubes_min.push_back( i_t );
     i_t.clear();
@@ -329,6 +322,7 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
     cout << endl;
     cout << "------------------------------" << endl;
     cout << "----- Array Analysis Cuts ----" << endl;
+    cout << "------(" << fNMethods << " methods)------" << endl;
     cout << endl;
      set< ULong64_t >::iterator fTel_type_iter;
     for( unsigned m = 0; m < fNMethods; m++ )
@@ -397,6 +391,7 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 
 
 /*!
+
    A RECMETHOD LINE STARTS ALWAYS A NEW RECORD
 
    line without '*' in the beginning are ignored
@@ -420,6 +415,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
     string iTemp;
     string iTemp2;
     string iTemp3;
+    string iTemp4;
     ULong64_t t_type = 0;
     int t_temp = 0;
     int m_temp = -1;
@@ -450,29 +446,134 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	       t_temp = getTelescopeType_counter_from_MirrorArea_and_PixelSize( t_type );
 	    }
 	    else t_temp = -1;
-// check telescope types
-            if( t_temp == -2 )
-            {
-// don not print a warning - is expected
-    /*            cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts warning: unknown telescope type: " << endl;
-                cout << iLine << endl;
-		cout << t_type << "\t" << t_temp << endl;
-		cout << "Possible types are: ";
-		set< ULong64_t >::iterator fTel_type_iter;
-		for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
-		{
-		   cout << *fTel_type_iter << " ";
-                }
-		cout << endl;
-		cout << "(this might be ok in case you are using a generic reconstruction parameter file)" << endl; */
-                continue;
-            }
-// variable identifier
+// unknown telescope types
+            if( t_temp == -2 ) continue;
+
+// read variable identifier
             is_stream >> iTemp;
             iTemp = VUtilities::upperCase( iTemp );
             is_stream >> iTemp2;
 	    if( !is_stream.eof() ) is_stream >> iTemp3;
-	    else                   iTemp3 == "";
+	    else                   iTemp3 = "";
+	    if( !is_stream.eof() ) is_stream >> iTemp4;
+	    else                   iTemp4 = "";
+
+// fadc trace analysis
+            if( iTemp == "FADCANALYSIS" && fRunPara )
+	    {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+	       {
+		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fTraceIntegrationMethod.size() ) fRunPara->fTraceIntegrationMethod[i] = atoi( iTemp2.c_str() );
+		  }
+               }
+	       continue;
+            }
+	    else if( iTemp == "FADCDOUBLEPASS" && fRunPara )
+	    {
+	       if( iTemp2.size() > 0 ) fRunPara->fDoublePass = atoi( iTemp2.c_str() );
+	       if( iTemp3.size() > 0 )
+	       {
+		  for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+		  {
+		     if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		     {
+			if( i < fRunPara->fsumwindow_pass1.size() ) fRunPara->fsumwindow_pass1[i] = atoi( iTemp3.c_str() );
+		     }
+		  }
+               }
+	       if( iTemp4.size() > 0 )
+	       {
+		  for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+		  {
+		     if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		     {
+			if( i < fRunPara->fTraceIntegrationMethod_pass1.size() ) fRunPara->fTraceIntegrationMethod_pass1[i] = atoi( iTemp4.c_str() );
+		     }
+		  }
+               }
+	       continue;
+            }
+	    else if( iTemp == "FADCSUMMATIONWINDOW" && fRunPara )
+	    {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+	       {
+		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fsumwindow_1.size() ) fRunPara->fsumwindow_1[i] = atoi( iTemp2.c_str() );
+		     if( iTemp3.size() > 0 ) 
+		     {
+			 if( i < fRunPara->fsumwindow_2.size() ) fRunPara->fsumwindow_2[i] = atoi( iTemp3.c_str() );
+		     }
+		     else 
+		     {
+// window 1 and 2 are the same unless stated differently
+                         if( i < fRunPara->fsumwindow_2.size() ) fRunPara->fsumwindow_2[i] = atoi( iTemp2.c_str() );
+		     }
+		  }
+               }
+	       continue;
+            }
+	    else if( iTemp == "FADCSUMMATIONSTART" && fRunPara )
+	    {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+	       {
+		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fsumfirst.size() ) fRunPara->fsumfirst[i] = atoi( iTemp2.c_str() );
+		     if( iTemp3.size() > 0 ) 
+		     {
+			 if( i < fRunPara->fTraceWindowShift.size() ) fRunPara->fTraceWindowShift[i] = atoi( iTemp3.c_str() );
+		     }
+		  }
+               }
+	       continue;
+	    }
+// image cleaning parameters
+            else if( iTemp == "IMAGECLEANINGMETHOD" && fRunPara )
+	    {
+	       if( !fRunPara->setImageCleaningMethod( iTemp2 ) )
+	       {
+	          cout << "VEvndispReconstructionParameter: unknown image cleaning method: " << iTemp2 << endl;
+               }
+	       if( iTemp3.size() > 0 )
+	       {
+	          if( iTemp3 == "FIXED" ) fRunPara->fUseFixedThresholds = true;
+		  else                    fRunPara->fUseFixedThresholds = false;
+               }
+	       continue;
+	    }
+	    else if( iTemp == "IMAGECLEANINGTHRESHOLDS" && fRunPara )
+	    {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+	       {
+		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fimagethresh.size() ) fRunPara->fimagethresh[i] = atof( iTemp2.c_str() );
+		     if( iTemp3.size() > 0 ) 
+		     {
+			 if( i < fRunPara->fborderthresh.size() ) fRunPara->fborderthresh[i] = atof( iTemp3.c_str() );
+		     }
+		  }
+               }
+	       continue;
+            }
+	    else if( iTemp == "LLEDGEFIT" && fRunPara )
+	    {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+	       {
+		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fLogLikelihoodLoss_min.size() ) fRunPara->fLogLikelihoodLoss_min[i] = atof( iTemp2.c_str() );
+		     if( iTemp3.size() > 0 )
+		     {
+		        if( i < fRunPara->fLogLikelihood_Ntubes_min.size() ) fRunPara->fLogLikelihood_Ntubes_min[i] = atof( iTemp3.c_str() );
+                     }
+		  }
+               }
+	       continue;
+	    }
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -533,33 +634,6 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	    {
 	        fMODDISP_MinAngleForDisp[m_temp] = atof( iTemp2.c_str() );
 		if( iTemp3.size() > 0 ) fMODDISP_MinAngleExpFactor[m_temp] = atof( iTemp3.c_str() );
-            }
-	    else if( iTemp == "IMAGETHRESHOLD" )
-	    {
-	       if( t_temp < 0 ) for( unsigned int i = 0; i < fimagethresh[m_temp].size(); i++ ) fimagethresh[m_temp][i] = atof( iTemp2.c_str() );
-	       else fimagethresh[m_temp][t_temp] = atof( iTemp2.c_str() );
-	       if( m_temp != 0 )
-	       {
-	          cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts WARNING: same cleaning thresholds are used for all methods (from method 0)" << endl;
-               }
-            }
-	    else if( iTemp == "BORDERTHRESHOLD" )
-	    {
-	       if( t_temp < 0 ) for( unsigned int i = 0; i < fborderthresh[m_temp].size(); i++ ) fborderthresh[m_temp][i] = atof( iTemp2.c_str() );
-	       else fborderthresh[m_temp][t_temp] = atof( iTemp2.c_str() );
-	       if( m_temp != 0 )
-	       {
-	          cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts WARNING: same cleaning thresholds are used for all methods (from method 0)" << endl;
-               }
-            }
-	    else if( iTemp == "BRIGHTNONIMAGETHRESHOLD" )
-	    {
-	       if( t_temp < 0 ) for( unsigned int i = 0; i < fbrightnonimagetresh[m_temp].size(); i++ ) fbrightnonimagetresh[m_temp][i] = atof( iTemp2.c_str() );
-	       else fbrightnonimagetresh[m_temp][t_temp] = atof( iTemp2.c_str() );
-	       if( m_temp != 0 )
-	       {
-	          cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts WARNING: same cleaning thresholds are used for all methods (from method 0)" << endl;
-               }
             }
             else if( iTemp == "MINTUBES" )
             {
@@ -721,32 +795,3 @@ int VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorArea_an
     return -2;
 }
 
-double VEvndispReconstructionParameter::getImageThreshold( ULong64_t i_tel_type )
-{
-   if( fimagethresh.size() > 0 )
-   {
-      int iTelCounter = getTelescopeType_counter( i_tel_type );
-      if( iTelCounter >= 0 && (unsigned int)iTelCounter < fimagethresh[0].size() ) return fimagethresh[0][iTelCounter];
-   }
-   return 0.;
-}
-         
-double VEvndispReconstructionParameter::getBorderThreshold( ULong64_t i_tel_type )
-{
-   if( fborderthresh.size() > 0 )
-   {
-      int iTelCounter = getTelescopeType_counter( i_tel_type );
-      if( iTelCounter >= 0 && (unsigned int)iTelCounter < fborderthresh[0].size() ) return fborderthresh[0][iTelCounter];
-   }
-   return 0.;
-}
-
-double VEvndispReconstructionParameter::getBrightNonImageThreshold( ULong64_t i_tel_type )
-{
-   if( fbrightnonimagetresh.size() > 0 )
-   {
-      int iTelCounter = getTelescopeType_counter( i_tel_type );
-      if( iTelCounter >= 0 && (unsigned int)iTelCounter < fbrightnonimagetresh[0].size() ) return fbrightnonimagetresh[0][iTelCounter];
-   }
-   return 0.;
-}

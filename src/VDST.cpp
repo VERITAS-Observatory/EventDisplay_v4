@@ -183,15 +183,15 @@ void VDST::fill()
 //	findDeadChans( false, false );
 //	findDeadChans( true, false );
 // integrate FADC traces -> calculate integrated charges and pulse timing
-	   calcTZerosSums( getSumFirst(), getSumFirst()+getSumWindow(), getSumFirst(), getSumFirst()+getSumWindow() );
+	   calcTZerosSums( getSumFirst(), getSumFirst()+getSumWindow(), getTraceIntegrationMethod() );
 // image cleaning if image threshold is > 0.
 	   if( getImageThresh() > 0. )
 	   {
-	       if( fVImageCleaning ) fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(), false, false );
+	       if( fVImageCleaning ) fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBorderThresh() );
 	       if( getRunParameter()->fDoublePass )
 	       {
 		   calcSecondTZerosSums();
-		   if( fVImageCleaning ) fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(), false, false );
+		   if( fVImageCleaning ) fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBorderThresh() );
 	       }
 	   }
 	   else

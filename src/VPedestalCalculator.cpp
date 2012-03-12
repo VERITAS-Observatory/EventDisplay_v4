@@ -177,7 +177,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
     {
 // loop over all summation windows
         unsigned int iTempSW = fpedcal_mean[telID][p].size();
-        if( getRunParameter()->fsumwindow[getTeltoAna()[telID]] < (int)iTempSW ) iTempSW = getRunParameter()->fsumwindow[getTeltoAna()[telID]];
+        if( getRunParameter()->fsumwindow_1[getTeltoAna()[telID]] < (int)iTempSW ) iTempSW = getRunParameter()->fsumwindow_1[getTeltoAna()[telID]];
         for( unsigned int w = 0; w < iTempSW; w++ )
         {
 // get pedestal values
@@ -271,7 +271,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 			                         getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
 // loop over all summation windows
                         unsigned int iTempSW = fpedcal_mean[telID][chanID].size();
-                        if( getRunParameter()->fsumwindow[telID] < (int)iTempSW ) iTempSW = getRunParameter()->fsumwindow[telID];
+                        if( getRunParameter()->fsumwindow_1[telID] < (int)iTempSW ) iTempSW = getRunParameter()->fsumwindow_1[telID];
                         for( unsigned int w = 0; w < iTempSW; w++ )
                         {
                             i_tr_sum = fTraceHandler->getTraceSum( fSumFirst, fSumFirst+(w+1), true );

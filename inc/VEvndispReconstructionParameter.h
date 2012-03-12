@@ -4,6 +4,7 @@
 #ifndef VARRAYANALYSISCUTS_H
 #define VARRAYANALYSISCUTS_H
 
+#include "VEvndispRunParameter.h"
 #include "VImageParameter.h"
 #include "VUtilities.h"
 
@@ -26,27 +27,24 @@ class VEvndispReconstructionParameter : public TNamed
 
     bool   fDebug;
 
-    double fDefault_imagethresh;
-    double fDefault_borderthresh;
-    double fDefault_brightimagethresh;
+    VEvndispRunParameter  *fRunPara;
+
+    unsigned int fNTel_type;
+    vector< ULong64_t > fTel_type_V;
+    set< ULong64_t > fTel_type;
 
     void addNewMethod( unsigned int iMethodID );
     void reset();
 
     public:
         unsigned int fNMethods;                   // total number of methods
-        unsigned int fNTel_type;
-	set< ULong64_t > fTel_type;
 
         vector< unsigned int > fRecordCounter;
         vector< unsigned int > fMethodID;
         vector< int > fNImages_min;
         vector< double > fAxesAngles_min;
-// [methodID][telescope type] (not telescope number!!)
-        vector< vector< double > > fimagethresh;
-	vector< vector< double > > fborderthresh;
-	vector< vector< double > > fbrightnonimagetresh;
 
+// [methodID][telescope type] (not telescope number!!)
         vector< vector< int > >    fLocalNtubes_min;
         vector< vector< int > >    fLocalNLowGain_max;
         vector< vector< double > > fLocalDistance_min;
@@ -64,6 +62,7 @@ class VEvndispReconstructionParameter : public TNamed
         vector< vector< double > > fLoss_max;
         vector< vector< double > > fFui_min;
         vector< vector< double > > fWidthLength_max;
+
         vector< bool > fUseEventdisplayPointing;
 // C. Duke: 20oct06  added vector to store select image results
         vector< vector< bool > > fLocalUseImage;
@@ -76,20 +75,16 @@ class VEvndispReconstructionParameter : public TNamed
 	vector< float >  fMODDISP_MinAngleExpFactor;
 
         VEvndispReconstructionParameter();
-        VEvndispReconstructionParameter( vector< ULong64_t > itel_type );
+        VEvndispReconstructionParameter( vector< ULong64_t > itel_type, VEvndispRunParameter* iRunPara );
         ~VEvndispReconstructionParameter() {}
 
-	bool   applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, VImageParameter* iImageParameter );
-	double getImageThreshold( ULong64_t i_tel_type );
-	double getBorderThreshold( ULong64_t i_tel_type );
-	double getBrightNonImageThreshold( ULong64_t i_tel_type );
+	bool   applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, VImageParameter* iImageParameter );
         int    getTelescopeType_counter( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea_and_PixelSize( ULong64_t t );
         void   print_arrayAnalysisCuts();
         unsigned int read_arrayAnalysisCuts( string ifile );
 	void   setDebug( bool iD = false ) { fDebug = iD; }
-	void   setDefaultThresholds( double imagethresh, double borderthresh, double brightimagethresh );
 
         ClassDef(VEvndispReconstructionParameter,12);
 };

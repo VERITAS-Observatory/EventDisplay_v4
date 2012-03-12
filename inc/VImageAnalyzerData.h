@@ -26,6 +26,8 @@ class VImageAnalyzerData
         unsigned int fMaxChannels;
         unsigned int fNSamples;
 
+	unsigned int fTraceIntegrationMethod;
+
     public:
 
         bool fFillMeanTraces;
@@ -39,6 +41,7 @@ class VImageAnalyzerData
         valarray<double> fTemplateMu;
 
         valarray<double> fSums;
+        valarray<double> fSums2;
         vector<bool> fLLEst;                      //!< true for dead channels with estimated sum from loglikelihood fit
         unsigned int fNDead;
         vector<unsigned int> fDead;               //!< dead channel (bit coded)
@@ -57,6 +60,7 @@ class VImageAnalyzerData
 	unsigned int fpulsetiming_width_index;    //!< position of second 50% value in pulse timing level vector
 	vector< valarray<double> > fPulseTimingUncorrected; //!< pulse timing at certain fraction of pulse maxima (uncorrected values)
 	vector< valarray<double> > fPulseTimingCorrected; //!< pulse timing at certain fraction of pulse maxima (corrected values)
+	valarray< double >     fPulseTimingAverageTime; //!< average pulse time
         valarray<unsigned int> fTCorrectedSumFirst;
         valarray<unsigned int> fTCorrectedSumLast;
         valarray<unsigned int> fCurrentSummationWindow;
@@ -96,7 +100,7 @@ class VImageAnalyzerData
        VSpecialChannel *fSpecialChannel;
 
 // FADCstop info
-        vector< double >  fFADCstopTZero;
+        vector< double > fFADCstopTZero;
         vector< double > fFADCstopSum;
 
 // mean pulse histograms
@@ -113,20 +117,22 @@ class VImageAnalyzerData
         VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree = 0, bool bCalibration = false );
         ~VImageAnalyzerData() {}
 
-        void fillPulseSum( unsigned int, double, bool );
+        void                     fillPulseSum( unsigned int, double, bool );
+        TList*                   getMeanPulseHistograms() { return hMeanPulses; }
+        TList*                   getIntegratedChargeHistograms() { return hPulseSum; }
 	vector< unsigned int >&  getFADCstopTrigChannelID();
-	double                  getHIGHQE_gainfactor( unsigned int iChannel );
-        int  getRandomDeadChannel() { return fRandomMakeDeadChannels->Integer( fDead.size() ); }
-        int  getRandomDeadChannelSeed() { return fRandomMakeDeadChannelsSeed; }
-	valarray<double>&   getTZeros( bool iCorrected );
-	valarray<double>&   getTraceWidth( bool iCorrected );
-	VSpecialChannel* getSpecialChannel() { return fSpecialChannel; }
-        void initialize( unsigned int iChannels, unsigned int iMaxChannels, bool iTraceFit, bool iDebug, int iseed, unsigned int iSamples, unsigned int ipulsetiminglevel, unsigned int iTzeroIndex, unsigned int iWidthIndex );
-        void initializeMeanPulseHistograms();
-        void initializeIntegratedChargeHistograms();
-	bool readSpecialChannels( int iRunNumber, string iFile, string iDirectory );
-        void setTrace( unsigned int iChannel, vector< double > fT, bool iHiLo, double fPeds );
-        TList *getMeanPulseHistograms() { return hMeanPulses; }
-        TList *getIntegratedChargeHistograms() { return hPulseSum; }
+	double                   getHIGHQE_gainfactor( unsigned int iChannel );
+        int                      getRandomDeadChannel() { return fRandomMakeDeadChannels->Integer( fDead.size() ); }
+        int                      getRandomDeadChannelSeed() { return fRandomMakeDeadChannelsSeed; }
+	valarray<double>&        getTZeros( bool iCorrected );
+	valarray<double>&        getTraceWidth( bool iCorrected );
+	VSpecialChannel*         getSpecialChannel() { return fSpecialChannel; }
+        void                     initialize( unsigned int iChannels, unsigned int iMaxChannels, bool iTraceFit, bool iDebug, int iseed, 
+	                                     unsigned int iSamples, unsigned int ipulsetiminglevel, unsigned int iTzeroIndex, unsigned int iWidthIndex );
+        void                     initializeMeanPulseHistograms();
+        void                     initializeIntegratedChargeHistograms();
+	bool                     readSpecialChannels( int iRunNumber, string iFile, string iDirectory );
+	void                     setTraceIntegrationMethod( unsigned iN = 0 ) { fTraceIntegrationMethod = iN; }
+        void                     setTrace( unsigned int iChannel, vector< double > fT, bool iHiLo, double fPeds );
 };
 #endif

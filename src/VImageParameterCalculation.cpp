@@ -520,19 +520,19 @@ void VImageParameterCalculation::muonPixelDistribution( valarray<double> fSums, 
 
 //****************************************************************///
 
-void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<bool> fImage, vector<bool> fBorder )
+void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarray<double> fSums2, vector<bool> fImage, vector<bool> fBorder )
 {
     vector< bool > iBrightNoImage;
     iBrightNoImage.resize( fImage.size(), false );
-    calcParameters( fSums, fImage, fBorder, iBrightNoImage, iBrightNoImage, iBrightNoImage );
+    calcParameters( fSums, fSums2, fImage, fBorder, iBrightNoImage, iBrightNoImage, iBrightNoImage );
 }
 
 
-void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<bool> fImage, vector<bool> fBorder, vector< bool > fBrightNoImage )
+void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarray<double> fSums2, vector<bool> fImage, vector<bool> fBorder, vector< bool > fBrightNoImage )
 {
     vector< bool > iHiLo;
     iHiLo.resize( fImage.size(), false );
-    calcParameters( fSums, fImage, fBorder, fBrightNoImage, iHiLo, iHiLo );
+    calcParameters( fSums, fSums2, fImage, fBorder, fBrightNoImage, iHiLo, iHiLo );
 }
 
 
@@ -590,7 +590,9 @@ void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 /*!
     see Fegan, D.J. J. Phys. G: Nucl. Part. Phys. 23 (1997) 1013-1060
 */
-void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<bool> fImage, vector<bool> fBorder, vector< bool > fBrightNoImage, vector< bool > fHiLo, vector< bool > fImageBorderNeighbour )
+void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarray<double> fSums2, 
+                                                 vector<bool> fImage, vector<bool> fBorder, vector< bool > fBrightNoImage,
+						 vector< bool > fHiLo, vector< bool > fImageBorderNeighbour )
 {
     if( fDebug ) cout << "VImageParameterCalculation::calcParameters " << fImageBorderNeighbour.size() << endl;
     const double ZeroTolerence = 1e-8;
@@ -608,6 +610,7 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<
     }
 
     double sumsig=0;
+    double sumsig_2 = 0.;
     double sumxsig=0;
     double sumysig=0;
     double sumx2sig=0;
@@ -639,8 +642,7 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<
                     if( j < fData->getPeds().size() )
                     {
                         fParGeo->fmeanPed_Image += fData->getPeds()[j];
-                        if( fData->getRunParameter()->fDoublePass ) fParGeo->fmeanPedvar_Image += fData->getPedvars( fData->getSumWindowSmall() )[j];
-                        else                                        fParGeo->fmeanPedvar_Image += fData->getPedvars( fData->getSumWindow() )[j];
+			fParGeo->fmeanPedvar_Image += fData->getPedvars( fData->getSumWindow() )[j];
                     }
                     nPixPed++;
                 }
@@ -656,7 +658,7 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<
             fParGeo->fmeanPed_Image = 0.;         // -> pead = 0 means that pedvar is meanpedvar over camera
             if( fData )
             {
-                fParGeo->fmeanPedvar_Image = fData->getmeanPedvars( false, 0, fData->getRunParameter()->fDoublePass );
+                fParGeo->fmeanPedvar_Image = fData->getmeanPedvars( false, fData->getSumWindow() );
             }
             else fParGeo->fmeanPedvar_Image = 0.;
         }
@@ -683,6 +685,7 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<
 
             const double si=(double)fSums[j];     // charge (dc)
             sumsig += si;
+	    sumsig_2 += (double)fSums2[j];
             if( getDetectorGeo()->getNNeighbours()[j] < getDetectorGeo()->getMaxNeighbour() ) sumOuterRing += si;
             if( fHiLo[j] ) sumLowGain += si;
 
@@ -784,6 +787,7 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, vector<
         const double dist    = sqrt(xmean2+ymean2);
 
         fParGeo->size=sumsig;
+        fParGeo->size2=sumsig_2;
         fParGeo->cen_x=xmean;
         fParGeo->cen_y=ymean;
         fParGeo->dist=dist;
@@ -1073,7 +1077,7 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     if( fLLDebug ) cout << "FLL FITTER limits " << fdistXmax << "\t" << fdistXmin << "\t" << fdistYmax << "\t" << fdistYmin << "\t" << fll_Sums.size() << endl;
 
 // take geometrical values as start values (calculate if not already calculated)
-    if( !fboolCalcGeo ) calcParameters( iData->getSums(), iData->getImage(), iData->getBorder() );
+    if( !fboolCalcGeo ) calcParameters( iData->getSums(), iData->getSums2(), iData->getImage(), iData->getBorder() );
 
 // define fit variables
     double rho = 0.;

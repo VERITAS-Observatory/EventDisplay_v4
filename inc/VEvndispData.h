@@ -108,7 +108,7 @@ class VEvndispData
 
 //  analysis cuts
                                                   //!< cuts for array analysis
-        static VEvndispReconstructionParameter* fArrayAnalysisCuts;
+        static VEvndispReconstructionParameter* fEvndispReconstructionParameter;
 
 // analysis results
         static TFile *fOutputfile;                //!< root output file for image parameter trees, histograms, etc.
@@ -139,14 +139,15 @@ class VEvndispData
         ~VEvndispData() {}
         void                dumpTreeData();       //!< print all tree data to stdout
         void                endOfRunInfo();       //!< print some statistics at end of run
-        bool                get_array_analysis_cuts( string ifile );
+        bool                get_reconstruction_parameters( string ifile );
 // getters apply always to current telescope (fTelID) if telID is not a function argument
         VImageAnalyzerData*      getAnaData( unsigned int iTel ) { if( iTel < fAnaData.size() ) return fAnaData[iTel]; }
         VImageAnalyzerData*      getAnaData() { return fAnaData[fTelID]; }
         vector< TDirectory* > getAnaDirectories() { return fAnaDir; }
         VImageAnalyzerHistograms*     getAnaHistos() { return fAnaData[fTelID]->fAnaHistos; }
         VImageAnalyzerHistograms*     getAnaHistos( unsigned int itelID ) { return fAnaData[itelID]->fAnaHistos; }
-        VEvndispReconstructionParameter* getArrayAnalysisCuts() { return fArrayAnalysisCuts; }
+        VEvndispReconstructionParameter* getArrayAnalysisCuts() { return fEvndispReconstructionParameter; }                   // kept for backwards compatibility
+        VEvndispReconstructionParameter* getEvndispReconstructionParameter() { return fEvndispReconstructionParameter; }
         unsigned int        getAnalysisArrayEventStatus() { return fAnalysisArrayEventStatus; }
         vector< unsigned int >& getAnalysisTelescopeEventStatus() { return fAnalysisTelescopeEventStatus; }
         vector<bool>&       getBorder() {return fAnaData[fTelID]->fBorder;}
@@ -195,9 +196,9 @@ class VEvndispData
         VImageAnalyzerHistograms*     getHistograms() { return fAnaData[fTelID]->fAnaHistos; }
         vector<bool>&       getImage() { return fAnaData[fTelID]->fImage; }
         vector<bool>&       getImageBorderNeighbour() { return fAnaData[fTelID]->fImageBorderNeighbour; }
-        VImageParameter*   getImageParameters() { return fAnaData[fTelID]->fImageParameter; }
-        VImageParameter*   getImageParameters( int );
-        VImageParameter*   getImageParametersLogL() { return fAnaData[fTelID]->fImageParameterLogL; }
+        VImageParameter*    getImageParameters() { return fAnaData[fTelID]->fImageParameter; }
+        VImageParameter*    getImageParameters( int );
+        VImageParameter*    getImageParametersLogL() { return fAnaData[fTelID]->fImageParameterLogL; }
         double              getImageThresh() { return fRunPar->fimagethresh[fTelID]; }
         vector<int>&        getImageUser() { return fAnaData[fTelID]->fImageUser; }
         vector<bool>&       getLLEst() { return fAnaData[fTelID]->fLLEst; }
@@ -212,9 +213,9 @@ class VEvndispData
         VMCParameters*      getMCParameters() { return fMCParameters; }
 	unsigned int        getMC_FADC_TraceStart() { return fRunPar->fMC_FADCTraceStart; }
 
-        double              getmeanPedvars( bool iLowGain = false, unsigned int iSumWindow = 0,  bool iSumWindowSmall = false ) { return getCalData()->getmeanPedvars( iLowGain, iSumWindow, iSumWindowSmall ); }
-        double              getmeanRMSPedvars( bool iLowGain = false, unsigned int iSumWindow = 0,  bool iSumWindowSmall = false ) { return getCalData()->getmeanRMSPedvars( iLowGain, iSumWindow, iSumWindowSmall, getEventTime() ); }
-        void                getmeanPedvars( double &imean, double &irms, bool iLowGain = false, unsigned int iSumWindow = 0,  bool iSumWindowSmall = false, double iTime = -99. ) { if( iTime < -90. ) getCalData()->getmeanPedvars( imean, irms, iLowGain, iSumWindow, iSumWindowSmall, getEventTime() ); else getCalData()->getmeanPedvars( imean, irms, iLowGain, iSumWindow, iSumWindowSmall, getEventTime() ); }
+        double              getmeanPedvars( bool iLowGain = false, unsigned int iSumWindow = 0 ) { return getCalData()->getmeanPedvars( iLowGain, iSumWindow ); }
+        double              getmeanRMSPedvars( bool iLowGain, unsigned int iSumWindow ) { return getCalData()->getmeanRMSPedvars( iLowGain, iSumWindow );  }
+        void                getmeanPedvars( double &imean, double &irms, bool iLowGain = false, unsigned int iSumWindow = 0,  double iTime = -99. ) { if( iTime < -90. ) getCalData()->getmeanPedvars( imean, irms, iLowGain, iSumWindow, getEventTime() ); else getCalData()->getmeanPedvars( imean, irms, iLowGain, iSumWindow, getEventTime() ); }
 
         vector< double >&   getmeanPedvarsAllSumWindow( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fVmeanPedvars; else return fCalData[fTelID]->fVmeanLowGainPedvars; }
         vector< double >&   getmeanRMSPedvarsAllSumWindow( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fVmeanRMSPedvars; else return fCalData[fTelID]->fVmeanRMSLowGainPedvars; }
@@ -239,11 +240,11 @@ class VEvndispData
         valarray<double>&   getPedsLowGain( double iTime = -99. ) { return getPeds( true, iTime ); }
 
 // getters for pedestal variation
-        valarray<double>&   getPedvars( bool iLowGain = false, unsigned int iSW = 0, bool iSumWindowSmall = false, double iTime = -99. );
+        valarray<double>&   getPedvars( bool iLowGain = false, unsigned int iSW = 0, double iTime = -99. );
         valarray<double>&   getPedvars( unsigned int iSW, bool iLowGain = false ) { return getPedvars( iLowGain, iSW ); }
-        valarray<double>&   getPedvarsSmall( bool iLowGain = false ) { return getPedvars( iLowGain, getSumWindowSmall(), true ); }
+        valarray<double>&   getPedvarsSmall( bool iLowGain = false ) { return getPedvars( iLowGain, getSumWindowSmall() ); }
         valarray<double>&   getPedvarsLowGain() { return getPedvars( true ); }
-        valarray<double>&   getPedvarsLowGainSmall() { return getPedvars( true, getSumWindowSmall(), true ); }
+        valarray<double>&   getPedvarsLowGainSmall() { return getPedvars( true, getSumWindowSmall() ); }
 
         vector< valarray<double> >& getPedvarsAllSumWindows(  bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fVPedvars; else return fCalData[fTelID]->fVLowGainPedvars; }
 // getter for pedestal rms
@@ -260,13 +261,19 @@ class VEvndispData
         VFrogParameters*    getFrogParameters() { return fFrogParameters; }
         unsigned int        getSumFirst() { return fRunPar->fsumfirst[fTelID]; }
         valarray<double>&   getSums() { return fAnaData[fTelID]->fSums; }
+        valarray<double>&   getSums2() { return fAnaData[fTelID]->fSums2; }
         valarray<double>&   getTemplateMu() { return fAnaData[fTelID]->fTemplateMu; }
         double              getTemplateMuMin() { return fAnaData[fTelID]->fTemplateMu.min(); }
         double              getTemplateMuMax() { return fAnaData[fTelID]->fTemplateMu.max(); }
-        unsigned int        getSumWindow() { return fRunPar->fsumwindow[fTelID]; }
-        unsigned int        getSumWindowSmall() { return fRunPar->fsumwindowsmall[fTelID]; }
-        unsigned int        getSumWindow( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow.size() ) return fRunPar->fsumwindow[iTelID]; else return 0; }
-        unsigned int        getSumWindowSmall( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindowsmall.size() ) return fRunPar->fsumwindowsmall[iTelID]; else return 0; }
+	unsigned int        getLargestSumWindow();
+        unsigned int        getSumWindow() { return fRunPar->fsumwindow_1[fTelID]; }
+        unsigned int        getSumWindow_2() { return fRunPar->fsumwindow_2[fTelID]; }
+        unsigned int        getSumWindowSmall() { return fRunPar->fsumwindow_1[fTelID]; }
+	unsigned int        getSumWindow_Pass1() { return fRunPar->fsumwindow_pass1[fTelID]; }
+        unsigned int        getSumWindow( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_1.size() ) return fRunPar->fsumwindow_1[iTelID]; else return 0; }
+        unsigned int        getSumWindow_2( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_2.size() ) return fRunPar->fsumwindow_2[iTelID]; else return 0; }
+        unsigned int        getSumWindowSmall( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_1.size() ) return fRunPar->fsumwindow_1[iTelID]; else return 0; }
+	unsigned int        getSumWindow_Pass1( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_pass1.size() ) return fRunPar->fsumwindow_pass1[iTelID]; else return 0; }
         valarray< unsigned int >& getCurrentSumWindow() { return fAnaData[fTelID]->fCurrentSummationWindow; }
         int                 getSumWindowShift() { return fRunPar->fTraceWindowShift[fTelID]; }
         double              getDBSumWindowMaxTimedifference() { return fRunPar->fDBSumWindowMaxTimedifference[fTelID]; }
@@ -280,10 +287,17 @@ class VEvndispData
         unsigned int        getTeltoAnaID( unsigned int iTelID );
         vector< unsigned int>& getTeltoAna() { return fTeltoAna; }
         double              getTimeSinceRunStart() { return fAnaData[fTelID]->fTimeSinceRunStart; }
-        TH1F*               getToffsetDist( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsetsDistribution; else return fCalData[fTelID]->fLowGainTOffsetsDistribution; }
-        TH1F*               getToffsetVarsDist( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsetVarsDistribution; else return fCalData[fTelID]->fLowGainTOffsetVarsDistribution; }
-        valarray<double>&   getTOffsets( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsets; else return fCalData[fTelID]->fLowGainTOffsets; }
-        valarray<double>&   getTOffsetvars( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsetvars; else return fCalData[fTelID]->fLowGainTOffsetvars; }
+        TH1F*               getToffsetDist( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsetsDistribution; 
+	                                                              else return fCalData[fTelID]->fLowGainTOffsetsDistribution; }
+        TH1F*               getToffsetVarsDist( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsetVarsDistribution; 
+	                                                                  else return fCalData[fTelID]->fLowGainTOffsetVarsDistribution; }
+        valarray<double>&   getTOffsets( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsets; 
+	                                                           else return fCalData[fTelID]->fLowGainTOffsets; }
+        valarray<double>&   getTOffsetvars( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fTOffsetvars; 
+	                                                              else return fCalData[fTelID]->fLowGainTOffsetvars; }
+	valarray<double>&   getTraceAverageTime() { return fAnaData[fTelID]->fPulseTimingAverageTime; }
+	unsigned int        getTraceIntegrationMethod() { return fRunPar->fTraceIntegrationMethod[fTelID]; }
+	unsigned int        getTraceIntegrationMethod_pass1() { return fRunPar->fTraceIntegrationMethod_pass1[fTelID]; }
         double              getTraceFit() { return fRunPar->ftracefit; }
         valarray<double>&   getTraceFitChi2() { return fAnaData[fTelID]->fChi2; }
         valarray<double>&   getTraceFitFallTime() { return fAnaData[fTelID]->fFallTime; }
@@ -402,19 +416,28 @@ class VEvndispData
         void                setSums( double iSum ) { fAnaData[fTelID]->fSums = iSum; }
         void                setSums( unsigned int iChannel, double iSum ) { fAnaData[fTelID]->fSums[iChannel] = iSum; }
         void                setSums( valarray< double > iVSum ) { fAnaData[fTelID]->fSums = iVSum; }
+        void                setSums2( double iSum ) { fAnaData[fTelID]->fSums2 = iSum; }
+        void                setSums2( unsigned int iChannel, double iSum ) { fAnaData[fTelID]->fSums2[iChannel] = iSum; }
+        void                setSums2( valarray< double > iVSum ) { fAnaData[fTelID]->fSums2 = iVSum; }
         void                setTemplateMu( valarray< double > iVTemplateMu ) { fAnaData[fTelID]->fTemplateMu = iVTemplateMu; }
-        void                setSumWindow( int iWindow ) { fRunPar->fsumwindow[fTelID] = iWindow; }
         void                setTCorrectedSumFirst( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst = iT; }
         void                setTCorrectedSumFirst( unsigned int iChannel, unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst[iChannel] = iT; }
         void                setTCorrectedSumLast( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumLast = iT; }
         void                setTCorrectedSumLast( unsigned int iChannel, unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumLast[iChannel] = iT; }
         void                setTelID( unsigned int iTel );
         void                setTeltoAna( vector< unsigned int > iT );
-        void                setTOffsets( double iToff, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fTOffsets = iToff; else fCalData[fTelID]->fLowGainTOffsets = iToff; }
-        void                setTOffsets( unsigned int iChannel, double iToff, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fTOffsets[iChannel] = iToff; else fCalData[fTelID]->fLowGainTOffsets[iChannel] = iToff; }
-        void                setTOffsetvars( double iToffv, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fTOffsetvars = iToffv; else fCalData[fTelID]->fLowGainTOffsetvars = iToffv; }
-        void                setTOffsetvars( unsigned int iChannel, double iToffv, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fTOffsetvars[iChannel] = iToffv; else fCalData[fTelID]->fLowGainTOffsetvars[iChannel] = iToffv; }
+        void                setTOffsets( double iToff, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fTOffsets = iToff; 
+	                                                                         else fCalData[fTelID]->fLowGainTOffsets = iToff; }
+        void                setTOffsets( unsigned int iChannel, double iToff, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fTOffsets[iChannel] = iToff; 
+	                                                                                                else fCalData[fTelID]->fLowGainTOffsets[iChannel] = iToff; }
+        void                setTOffsetvars( double iToffv, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fTOffsetvars = iToffv; 
+	                                                                             else fCalData[fTelID]->fLowGainTOffsetvars = iToffv; }
+        void                setTOffsetvars( unsigned int iChannel, double iToffv, bool iLowGain = false ) 
+	                                        { if( !iLowGain ) fCalData[fTelID]->fTOffsetvars[iChannel] = iToffv; 
+						  else fCalData[fTelID]->fLowGainTOffsetvars[iChannel] = iToffv; }
         void                setTrace( unsigned int iChannel, vector< double > fT, bool iHiLo, double iPeds ) { fAnaData[fTelID]->setTrace( iChannel, fT, iHiLo, iPeds ); }
+        void                setTraceAverageTime( double iT ) { fAnaData[fTelID]->fPulseTimingAverageTime = iT; }
+        void                setTraceAverageTime( unsigned int iChannel, double iT ) { fAnaData[fTelID]->fPulseTimingAverageTime[iChannel] = iT; }
         void                setTraceChi2( unsigned int iChannel, double iS ) { fAnaData[fTelID]->fChi2[iChannel] = iS; }
         void                setTraceChi2( double iV ) { fAnaData[fTelID]->fChi2 = iV; }
         void                setTraceFallTime( unsigned int iChannel, double iS ) { fAnaData[fTelID]->fFallTime[iChannel] = iS; }

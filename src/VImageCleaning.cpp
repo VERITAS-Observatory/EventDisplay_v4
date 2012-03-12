@@ -21,16 +21,6 @@ void VImageCleaning::printDataError( string iFunctionName )
   tailcut cleaning with fixed thresholds
    \par hithresh image threshold
    \par lothresh border threshold
-*/
-void VImageCleaning::cleanImageFixed(double hithresh, double lothresh )
-{
-    cleanImageFixed( hithresh, lothresh, -999. );
-};
-
-/*!
-  tailcut cleaning with fixed thresholds
-   \par hithresh image threshold
-   \par lothresh border threshold
    \par brightthresh bright pixel threshold
 */
 void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double brightthresh )
@@ -74,23 +64,15 @@ void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double br
 
 
 /*!
-  signal-to-noise tailcut cleaning
-   \par hithresh image threshold
-   \par lothresh border threshold
-*/
-void VImageCleaning::cleanImagePedvars(double hithresh, double lothresh, bool iSmall, bool iPad )
-{
-    cleanImagePedvars( hithresh, lothresh, lothresh, iSmall, iPad );
-}
 
-
-/*!
   signal-to-noise tailcut cleaning
+
    \par hithresh image threshold
    \par lothresh border threshold
    \par brightthresh bright pixel threshold
+
 */
-void VImageCleaning::cleanImagePedvars(double hithresh, double lothresh, double brightthresh, bool iSmall, bool iPad )
+void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double brightthresh )
 {
     if( fData->getDebugFlag() ) cout << "VImageCleaning::cleanImagePedvars " << fData->getTelID() << endl;
 // calculates the vector of tubes to be included in the parameterization
@@ -131,11 +113,20 @@ void VImageCleaning::cleanImagePedvars(double hithresh, double lothresh, double 
     {
        if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 || fData->getReader()->getDataFormatNum() == 6 ) fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
     }
-    else cout << "XXXXXXXXXXXXXXXXXXXXXXXXXX " << fData->getReader() << endl;
 // (end of preli)
 
     removeIsolatedPixels();
     fillImageBorderNeighbours();
+}
+
+void VImageCleaning::cleanImageFixedMaxim()
+{
+
+}
+
+void VImageCleaning::cleanImagePedvarsMaxim()
+{
+
 }
 
 
@@ -825,27 +816,17 @@ void VImageCleaning::removeIsolatedPixels()
         }
     }
 
-// check if any channels are user enabled/disabled
-// (GM) don't know what this does
-/*  if( fData->getRunParameter()->frunmode != 4 )
-  {
-     for (unsigned int i=0; i<fData->getNChannels(); i++)
-     {
-     if( fData->getImageUser()[i] == 1 )
-     {
-         setImage( i, true );
-         setBorder( i, false );
-     }
-     else if( fData->getImageUser()[i] == -1 )
-     {
-setImage( i, false );
-setBorder( i, false );
-}
-}
-} */
 }
 
+/*
 
+   not clear what this function does...
+
+   Who implemented it?
+
+   Obsolete?
+
+*/
 void VImageCleaning::cleanImage_clusterCleaning( double threshold_clustersize )
 {
 // calculates the valarray of tubes to be included in the parameterization

@@ -106,7 +106,14 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // integrate pulses and calculate timing parameters 
-    calcTZerosSums( getSumFirst(), getSumFirst()+getSumWindow(), getSumFirst(), getSumFirst()+getSumWindow() );
+    if( fRunPar->fDoublePass )
+    {
+       calcTZerosSums( getSumFirst(), getSumFirst()+getSumWindow_Pass1(), getTraceIntegrationMethod_pass1() );
+    }
+    else
+    {
+       calcTZerosSums( getSumFirst(), getSumFirst()+getSumWindow(), getTraceIntegrationMethod() );
+    }
 
 // fill saturated channels
     getImageParameters()->nsat = fillSaturatedChannels();
@@ -142,7 +149,7 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // image parameter calculation
-    fVImageParameterCalculation->calcParameters( getSums(),getImage(), getBorder(), getBrightNonImage(), getHiLo(), getImageBorderNeighbour() );
+    fVImageParameterCalculation->calcParameters( getSums(), getSums2(), getImage(), getBorder(), getBrightNonImage(), getHiLo(), getImageBorderNeighbour() );
     fVImageParameterCalculation->calcTimingParameters( getTZeros(), getTOffsetvars(), getSums(), getImage(), getBorder(),(VEvndispData*)this );
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -195,12 +202,12 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // image parameter calculation
-        fVImageParameterCalculation->calcParameters( getSums(), getImage(), getBorder(), getBrightNonImage(), getHiLo(), getImageBorderNeighbour() );
+        fVImageParameterCalculation->calcParameters( getSums(), getSums2(), getImage(), getBorder(), getBrightNonImage(), getHiLo(), getImageBorderNeighbour() );
         fVImageParameterCalculation->calcTimingParameters( getTZeros(),getTOffsetvars(),getSums(),getImage(), getBorder(), (VEvndispData*)this );
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-// do a log likelihood analysis on events on the camera edge only
-        if( getImageParameters()->ntubes > 0 && getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min )
+// do a log likelihood image fitting on events on the camera edge only
+        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
         {
             fVImageParameterCalculation->setParametersLogL( getImageParameters() );
             setLLEst( fVImageParameterCalculation->calcLL( (VEvndispData*)this ) );
@@ -242,7 +249,7 @@ void VImageAnalyzer::fillOutputTree()
     getImageParameters()->fncluster_cleaned = getNcluster_cleaned(); // HP
     getImageParameters()->fncluster_uncleaned = getNcluster_uncleaned(); // HP
     getImageParameters()->fsumfirst = getSumFirst();
-    getImageParameters()->fsumwindow = getSumWindow();
+    getImageParameters()->fsumwindow = getSumWindow_2();
     getImageParameters()->fsumwindowsmall = getSumWindowSmall();
     if( fReader->hasLocalTrigger(getTelID()) ) getImageParameters()->fLocalTrigger = 1;
     else getImageParameters()->fLocalTrigger = 0;
@@ -707,27 +714,35 @@ void VImageAnalyzer::imageCleaning()
    if( getRunParameter()->fUseFixedThresholds )
    {
       gainCorrect();
-      if( getRunParameter()->fUseTimeCleaning )
+      if( getRunParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
       {
-	  fVImageCleaning->cleanImageFixedWithTiming( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(), 
+	  fVImageCleaning->cleanImageFixedWithTiming( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), 
 						      getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
       } 
-      else
+      else if( getRunParameter()->getImageCleaningMethod() == "MAXIMCLEANING" )
       {
-	  fVImageCleaning->cleanImageFixed(getImageThresh(),getBorderThresh(), getBrightNonImageThresh() );
+         fVImageCleaning->cleanImageFixedMaxim();
+      }
+      else 
+      {
+	  fVImageCleaning->cleanImageFixed( getImageThresh(), getBorderThresh(), getBrightNonImageThresh() );
       }
    }
 // signal/noise cleaning
    else 
    {
-      if( getRunParameter()->fUseTimeCleaning )
+      if( getRunParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
       {
 	  fVImageCleaning->cleanImagePedvarsWithTiming( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(),
 							getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
       }
+      else if( getRunParameter()->getImageCleaningMethod() == "MAXIMCLEANING" )
+      {
+         fVImageCleaning->cleanImagePedvarsMaxim();
+      }
       else
       {
-	  fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh(), false, false );
+	  fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh() );
       }
       gainCorrect();
    }

@@ -112,19 +112,21 @@ VEvndispRunParameter::VEvndispRunParameter()
 
 // analyzer parameters
     fUseFixedThresholds = false;
+    fImageCleaningMethod = 0;
     fimagethresh.push_back( 5.0 );
     fborderthresh.push_back( 2.5 );
     fbrightnonimagetresh.push_back( 2.5 );
-    fUseTimeCleaning = false;         //HP
     ftimecutpixel.push_back( 0.5 );   //HP
     ftimecutcluster.push_back( 2.0 ); //HP
     fminpixelcluster.push_back( 3 );  //HP
     floops.push_back( 2 );            //HP
     fsumfirst.push_back( 2 );
-    fsumwindow.push_back( 18 );
-    fsumwindowsmall.push_back( 12 );
+    fsumwindow_1.push_back( 12 );
+    fsumwindow_2.push_back( 12 );
+    fsumwindow_pass1.push_back( 18 );
     fImageLL=0;
-    fLogLikelihoodLoss_min = 1.e3;
+    fLogLikelihoodLoss_min.push_back( 1.e3 );
+    fLogLikelihood_Ntubes_min.push_back( 0 );
     fImageAnalysisFUIFactor = 2.;
     fFixWindowStart = false;
     fDoublePass = true;
@@ -132,6 +134,8 @@ VEvndispRunParameter::VEvndispRunParameter()
     fRemoveIsolatedPixel = true;
     fFillImageBorderNeighbours = true;
     fTraceWindowShift.push_back( -1 );
+    fTraceIntegrationMethod.push_back( 0 );
+    fTraceIntegrationMethod_pass1.push_back( 0 );
     fDBSumWindowMaxTimedifference.push_back( 10. );
     fSumWindowStartAtT0Min = 1.e9;
     fSmoothDead = false;
@@ -149,7 +153,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fsetSpecialChannels = "EVNDISP.specialchannels.dat";
     ftracefit = -1.;
     ftracefitfunction = "ev";
-    farrayanalysiscutfile = "EVNDISP.reconstruction.runparameter";
+    freconstructionparameterfile = "EVNDISP.reconstruction.runparameter";
 
 ////////////////////////////////////////////////////////////////////////////////
 // pulse timing (fraction of maximum where times are determined)
@@ -338,7 +342,13 @@ void VEvndispRunParameter::print( int iEv )
 
     if( fCalibrationDataType == 0 ) cout << "no calibration data available" << endl;
     cout << "signal charge unit is " << fFADCChargeUnit << endl;
-    if( fperformFADCAnalysis )   cout << "analysing FADC traces " << endl;
+    if( fperformFADCAnalysis )
+    {
+       cout << "analysing FADC traces";
+       cout << "(trace integration method " << fTraceIntegrationMethod[0];
+       if( fDoublePass ) cout << ", "  << " for pass 1 in doublepass: " << fTraceIntegrationMethod_pass1[0];
+       cout << ")" << endl;
+    }
     else if( fsourcetype == 7 )  cout << "reading trace analysis results from DST file" << endl;
 
     if( frunmode == 0 || frunmode == 4 )
@@ -374,7 +384,6 @@ void VEvndispRunParameter::print( int iEv )
                                      cout << " (using these images for the array reconstruction)";
                                      cout << endl;
         }
-        if( fLogLikelihoodLoss_min < 1. ) cout << "loglikelihood fitting of images for images with loss > " << fLogLikelihoodLoss_min << endl;
         cout << "Fraction of image/border pixel under image ellipse fact (FUI-factor): " << fImageAnalysisFUIFactor << endl;
     }
     if( ftracefile.size() > 0 )      cout << "\t tracelib file: " << ftracefile << endl;
@@ -397,27 +406,25 @@ void VEvndispRunParameter::print( int iEv )
     {
         cout << endl;
         if( fUseFixedThresholds ) cout << "using fixed image/border thresholds" << endl;
-        if( fUseTimeCleaning ) cout << "using time cleaning" << endl; //HP
-                                                  // MS
+	cout << "cleaning method: " << getImageCleaningMethod() << endl;
         cout << "Parallaxwidth: trigger map input type: "<< fPWmethod <<endl;
-                                                  // MS
         cout << "Parallaxwidth: number of neighbors required for cleaning: "<< fPWcleanNeighbors << endl;
         if( fPWmethod ==3 )
-                                                  // MS
             cout << "Parallaxwidth: FADC cleaning threshold for identifying triggered pixels (for method 3): "<< fPWcleanThreshold << endl;
         for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
         {
             cout << "Telescope " << i+1 << ": image/border/brightnonimage " << fimagethresh[i] << "/" << fborderthresh[i] << "/" << fbrightnonimagetresh[i];
-            cout << ", window size/start: " << fsumwindow[i] << "/" << fsumfirst[i];
+            cout << ", window size (start: " << fsumwindow_1[i] << "/" << fsumwindow_2[i] << "(" << fsumfirst[i] << ")";
             if( fDoublePass )
             {
-                cout << ", window size (doublepass): " << fsumwindowsmall[i];
+                cout << ", window size (doublepass, pass 1): " << fsumwindow_pass1[i];
                 cout << ", window shift: " << fTraceWindowShift[i];
                 cout << ", max TD: " << fDBSumWindowMaxTimedifference[i];
                 cout << ", max T0 threshold " << fSumWindowStartAtT0Min;
             }
-	    if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds)" << endl;
-	    if( fUseTimeCleaning ) cout << " (time cleaning)" << endl; //HP
+	    if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds,";
+	    else                      cout << " (signal/noise cleaning thesholds,";
+	    cout << " cleaning method " << getImageCleaningMethodIndex() << endl;
             cout << endl;
             cout << "\t\t";
             cout << "pedestal file: " << fPedFileNumber[i];
@@ -501,4 +508,22 @@ void VEvndispRunParameter::setSystemParameters()
 // get root info
     fEventDisplayBuildROOTVersion = gROOT->GetVersion();
     fEventDisplayBuildROOTVersionInt = gROOT->GetVersionInt();
+}
+
+string VEvndispRunParameter::getImageCleaningMethod()
+{
+   if( fImageCleaningMethod == 1 )      return "TIMECLUSTERCLEANING";
+   else if( fImageCleaningMethod == 2 ) return "MAXIMCLEANING";
+
+   return "TWOLEVELCLEANING";
+}
+
+bool VEvndispRunParameter::setImageCleaningMethod( string iMethod )
+{
+   if( iMethod == "TWOLEVELCLEANING" )         fImageCleaningMethod = 0;
+   else if( iMethod == "TIMECLUSTERCLEANING" ) fImageCleaningMethod = 1;
+   else if( iMethod == "MAXIMCLEANING" )       fImageCleaningMethod = 2;
+   else return false;
+
+   return true;
 }

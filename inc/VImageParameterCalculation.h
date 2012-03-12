@@ -67,11 +67,11 @@ class VImageParameterCalculation : public TObject
                                                   //!< MS: calculate trigger-level image parameters
         void calcTriggerParameters( vector<bool> fTrigger );
                                                   //!< calculate image parameters (geo.)
-        void calcParameters( valarray<double>, vector<bool>, vector<bool> );
+        void calcParameters( valarray<double>, valarray<double>, vector<bool>, vector<bool> );
                                                   //!< calculate image parameters (geo.)
-        void calcParameters( valarray<double>, vector<bool>, vector<bool>, vector< bool > );
+        void calcParameters( valarray<double>, valarray<double>, vector<bool>, vector<bool>, vector< bool > );
                                                   //!< calculate image parameters (geo.)
-        void calcParameters( valarray<double>, vector<bool>, vector<bool>, vector< bool >, vector< bool >, vector< bool > );
+        void calcParameters( valarray<double>, valarray<double>, vector<bool>, vector<bool>, vector< bool >, vector< bool >, vector< bool > );
         void calcTimingParameters( valarray<double>, valarray<double>, valarray<double>, vector<bool>, vector<bool>, VEvndispData* iData);
         void initMinuit( int );                   //!< initialize minuit
         vector<double>& getPedvars()              //!< return data vector for minuit function

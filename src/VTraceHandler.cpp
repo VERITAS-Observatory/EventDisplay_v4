@@ -14,6 +14,7 @@ VTraceHandler::VTraceHandler()
     fPedrms = 0.;
     fMax = 0.;
     fSum = 0.;
+    fTraceAverageTime = 0.;
     fChanID = 0;
     fpTrazeSize = 0;
     fHiLo = false;
@@ -26,6 +27,13 @@ VTraceHandler::VTraceHandler()
     fpulsetiminglevels_size = 0;
 }
 
+void VTraceHandler::reset()
+{
+   fSum = 0.;
+   fTraceAverageTime = 0.;
+   fSumWindowFirst = 0;
+   fSumWindowLast  = 0;
+}
 
 /*
     analysis routines call this function
@@ -35,6 +43,8 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
     fPed=ped;
     fPedrms = pedrms;
     fChanID = iChanID;
+
+    reset();
 
     if( !iReader )
     {
@@ -65,6 +75,7 @@ void VTraceHandler::setTrace(vector<uint8_t> pTrace, double ped, double pedrms, 
     fPed=ped;
     fPedrms = pedrms;
     fChanID = iChanID;
+    reset();
 // copy trace
     unsigned int i_tsize = pTrace.size();
     if( i_tsize != fpTrace.size() )
@@ -82,6 +93,7 @@ void VTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedrms,
     fPed=ped;
     fPedrms = pedrms;
     fChanID = iChanID;
+    reset();
 // copy trace
     unsigned int i_tsize = pTrace.size();
     if( i_tsize != fpTrace.size() )
@@ -100,6 +112,7 @@ void VTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedrms,
     fPed=ped;
     fPedrms = pedrms;
     fChanID = iChanID;
+    reset();
 // copy trace
     unsigned int i_tsize = pTrace.size();
     if( i_tsize != fpTrace.size() )
@@ -123,6 +136,7 @@ void VTraceHandler::setTrace(vector<uint8_t> pTrace, double ped, double pedrms, 
     fPed=ped;
     fPedrms = pedrms;
     fChanID = iChanID;
+    reset();
 // copy trace
     unsigned int i_tsize = pTrace.size();
     if( i_tsize != fpTrace.size() )
@@ -470,3 +484,108 @@ void VTraceHandler::setPulseTimingLevels( vector< float > iP )
    fpulsetiming.assign( fpulsetiminglevels_size, 0. );
    fpulsetiming_maxPV = (fpulsetiminglevels_size-1)/2;
 }
+
+/*
+
+    select trace integration method
+
+    0: get trace sum between given integration range
+
+
+    1: get maximum sum from sliding window method (use integration range to calculate integration window only)
+
+*/
+bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
+{
+// check method numbers
+   if( iT > 1 ) return false;
+
+   fTraceIntegrationMethod = iT;
+
+   return true;
+}
+
+double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw ) 
+{
+    if( fTraceIntegrationMethod == 0 )
+    {
+       fSumWindowFirst = fFirst;
+       fSumWindowLast  = fLast;
+       return getQuickSum( fFirst, fLast, fRaw );
+    }
+    else if( fTraceIntegrationMethod == 1 )
+    {
+        return getQuickMaximumSum( fLast - fFirst, fRaw );
+    }
+
+    return 0.;
+}
+
+/*
+
+   get maximum sum from sliding window 
+
+   (Maxim)
+*/
+double VTraceHandler::getQuickMaximumSum( int iIntegrationWindow, bool fRaw )
+{
+    int n=fpTrace.size();
+    int saturflag=0;
+    int max = 0;
+    int window=iIntegrationWindow;
+    int windowcalib=2*iIntegrationWindow;
+    int lolimit=0, lolimitcal=0;
+    int uplimit=0, uplimitcal=0;
+    //float SaturLimit=fDynamicRange*10.;//FIXME (needed to be discussed with Gernot)
+    float tcharge=0, tcharge2=0;
+    float arrtime=0, arrtime2=0;
+    double charge=0, charge2=0, ampl=0.;
+
+    float muxBINS[n], FADC[n];
+    for(int i=1;i<=n;i++) {muxBINS[i-1]=i-0.5; FADC[i-1]=(float)fpTrace.at(i-1)-fPed;}
+
+    charge=0, charge2=0;
+    tcharge=0, tcharge2=0;
+    //maxbin   = LocMax(ampl);
+    //if(ampl>=SaturLimit) saturflag=1;
+
+    if  (n <= 0) return -1;
+    float xmax =0, xmax2=0;
+    for (Int_t i = 0; i < int(window); i++)   {xmax+=FADC[i]; }
+    for (Int_t i = 0; i < int(windowcalib); i++){xmax2+=FADC[i];}
+    // extract charge for small window **********************************
+    for (Int_t i = 0; i < n - int(window); i++){
+        if(charge<xmax){
+            charge=xmax; max=i;
+            uplimit=max+window; if(uplimit>n) uplimit=n;
+            lolimit=max;        if(lolimit<0)  lolimit=0; }
+        xmax=xmax-FADC[i]+FADC[i+window];
+    }
+    // extract charge for big window ************************************
+    uplimitcal=uplimit+(windowcalib-window)/2; if(uplimitcal>n) uplimitcal=n;
+    lolimitcal=lolimit-(windowcalib-window)/2; if(lolimitcal<0)  lolimitcal=0;
+    // arrival times *****************************************************
+    for(int k=lolimit; k<uplimit;k++)       { tcharge+=muxBINS[k]*FADC[k];                   }
+    for(int k=lolimitcal; k<uplimitcal;k++) { tcharge2+=muxBINS[k]*FADC[k]; charge2+=FADC[k];}
+    // extract saturated charge (integrate everything to the end) ************************************
+    if(saturflag){
+        tcharge=0; charge=0; charge2=0;
+        uplimitcal=n;
+        lolimitcal=lolimit-(windowcalib-window)/2; if(lolimitcal<0)  lolimitcal=0;
+        for(int k=lolimitcal; k<uplimitcal;k++)  { tcharge+=muxBINS[k]*FADC[k]; charge2+=FADC[k];}
+    }
+
+    if(charge!=0) arrtime=tcharge/charge;
+    if(charge2!=0)arrtime2=tcharge2/charge2;
+    if(arrtime<0)   arrtime=0;  if(arrtime>n)  arrtime=n;
+    if(arrtime2<0)  arrtime2=0; if(arrtime2>n) arrtime2=n;
+    ampl-=fPed;
+
+    fSum = charge;
+    fTraceAverageTime = arrtime;
+    fSumWindowFirst = lolimit;
+    fSumWindowLast  = uplimit;
+
+    return charge;
+}
+

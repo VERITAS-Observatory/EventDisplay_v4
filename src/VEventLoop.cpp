@@ -60,6 +60,14 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
 // set dead channel text
     setDeadChannelText();
 
+// read reconstruction parameters
+    if( !get_reconstruction_parameters( fRunPar->freconstructionparameterfile ) )
+    {
+       cout << "VEventLoop error while reading file with reconstruction parameters:" << endl;
+       cout << fRunPar->freconstructionparameterfile << endl;
+       exit( -1 );
+    }
+
 // set standard tracehandler
     if( fRunPar->ftracefit < 0. ) fTraceHandler = new VTraceHandler();
 // set fit tracehandler
@@ -70,6 +78,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
         fFitTraceHandler->setFitThresh( fRunPar->ftracefit );
         fTraceHandler = (VTraceHandler*)fFitTraceHandler;
     }
+    if( getRunParameter()->fTraceIntegrationMethod.size() > 0 ) fTraceHandler->setTraceIntegrationmethod( getRunParameter()->fTraceIntegrationMethod[0] );
     fTraceHandler->setMC_FADCTraceStart( getRunParameter()->fMC_FADCTraceStart );
     fTraceHandler->setPulseTimingLevels( getRunParameter()->fpulsetiminglevels );
 
@@ -92,17 +101,6 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
 // Frogs Stuff
     fFrogs = new VFrogs();
 #endif
-
-// read array analysis cuts
-    if( fRunMode != R_PED && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_PEDLOW )
-    {
-        if( !get_array_analysis_cuts( fRunPar->farrayanalysiscutfile ) )
-        {
-            cout << "VEventLoop error while reading array analysis cuts ";
-            cout << fRunPar->farrayanalysiscutfile << endl;
-            exit( 0 );
-        }
-    }
 
 // reset cut strings and variables
     resetRunOptions();
@@ -127,12 +125,16 @@ void VEventLoop::printRunInfos()
         setTelID( fRunPar->fTelToAnalyze[i] );
 
         cout << "Telescope " << fRunPar->fTelToAnalyze[i]+1 << endl;
+	cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
+	if( fRunPar->fDoublePass ) cout << "  (doublepass: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
+	cout << endl;
         cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
         cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples";
         if( fRunPar->fDoublePass ) cout << ", max T0 threshold " << fRunPar->fSumWindowStartAtT0Min << " d.c.)" << endl;
         else                       cout << ")" << endl;
-        cout << "\t length of summation window: \t" << fRunPar->fsumwindow[fRunPar->fTelToAnalyze[i]];
-        if( fRunPar->fDoublePass ) cout << "\t length of second summation window: \t" << fRunPar->fsumwindowsmall[fRunPar->fTelToAnalyze[i]];
+        cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
+	cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
+        if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];
         cout << endl;
         cout << "\t image threshold: \t" << fRunPar->fimagethresh[fRunPar->fTelToAnalyze[i]];
         cout << "\t\t border threshold: \t" << fRunPar->fborderthresh[fRunPar->fTelToAnalyze[i]];
@@ -147,8 +149,12 @@ void VEventLoop::printRunInfos()
             }
         }
         else cout << "\t (no low gain multiplier distributions)";
-        cout << "\t additional gain correction: " << fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]];
-        cout << endl;
+	if( TMath::Abs( fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]] ) - 1. > 1.e-2 )
+	{
+	   cout << "\t additional gain correction: " << fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]];
+        }
+	cout << endl;
+	cout << "\t LL edge fit: \t\t loss > " << fRunPar->fLogLikelihoodLoss_min[i] << "\t ntubes > " << fRunPar->fLogLikelihood_Ntubes_min[i] << endl;
     }
 }
 
@@ -236,7 +242,8 @@ bool VEventLoop::initEventLoop( string iFileName )
 // sourcefile is MC vbf file; noise is read from separate file
             if( fRawDataReader && fRunPar->fsourcetype == 2 && fRunPar->fsimu_pedestalfile.size() > 0 )
             {
-                fRawDataReader->initTraceNoiseGenerator( 0, fRunPar->fsimu_pedestalfile, getDetectorGeo(), fRunPar->fsumwindow, fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile_DefaultPed, fRunPar->fGainCorrection );
+                fRawDataReader->initTraceNoiseGenerator( 0, fRunPar->fsimu_pedestalfile, getDetectorGeo(), fRunPar->fsumwindow_1, 
+		                                         fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile_DefaultPed, fRunPar->fGainCorrection );
             }
         }
     }
@@ -255,7 +262,9 @@ bool VEventLoop::initEventLoop( string iFileName )
     if( fRunPar->fsourcetype == 1 )
     {
 	 if( fGrIsuReader != 0 ) delete fGrIsuReader;
-	 fGrIsuReader = new VGrIsuReader( getDetectorGeo(), getDetectorGeo()->getNumTelescopes(), fRunPar->fsourcefile, fRunPar->fsumwindow, fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, false, fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile, fRunPar->fIgnoreCFGversions );
+	 fGrIsuReader = new VGrIsuReader( getDetectorGeo(), getDetectorGeo()->getNumTelescopes(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
+	                                  fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, false, fDebug, fRunPar->fgrisuseed, 
+					  fRunPar->fsimu_pedestalfile, fRunPar->fIgnoreCFGversions );
 	 fGrIsuReader->setTraceFile( fRunPar->ftracefile );
     }
 
@@ -265,7 +274,9 @@ bool VEventLoop::initEventLoop( string iFileName )
     {
 	 if( fMultipleGrIsuReader != 0 ) delete fMultipleGrIsuReader;
 	 fMultipleGrIsuReader = new VMultipleGrIsuReader( fNTel, "", fRunPar->fTelToAnalyze, fDebug );
-	 fMultipleGrIsuReader->init( getDetectorGeo(), fRunPar->fsourcefile, fRunPar->fsumwindow, fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, false, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile, true, fRunPar->fsimu_pedestalfile_DefaultPed );
+	 fMultipleGrIsuReader->init( getDetectorGeo(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
+	                             fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, false, 
+				     fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile, true, fRunPar->fsimu_pedestalfile_DefaultPed );
 	 fMultipleGrIsuReader->setTraceFile( fRunPar->ftracefile );
     }
 // ============================
@@ -409,12 +420,16 @@ void VEventLoop::initializeAnalyzers()
             fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, (fRunMode == R_PED || fRunMode == R_PEDLOW) ) );
             int iseed = fRunPar->fMCNdeadSeed;
             if( iseed != 0 ) iseed += i;
-            fAnaData.back()->initialize( getNChannels(), getReader()->getMaxChannels(), (getTraceFit()>-1.), getDebugFlag(), iseed, getNSamples(), getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, getRunParameter()->fpulsetiming_width_index );
+            fAnaData.back()->initialize( getNChannels(), getReader()->getMaxChannels(), (getTraceFit()>-1.), 
+	                                 getDebugFlag(), iseed, getNSamples(), 
+					 getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, 
+					 getRunParameter()->fpulsetiming_width_index );
             if( fRunMode == R_DST )
             {
                 fAnaData.back()->initializeMeanPulseHistograms();
                 fAnaData.back()->initializeIntegratedChargeHistograms();
             }
+	    fAnaData.back()->setTraceIntegrationMethod( getRunParameter()->fTraceIntegrationMethod[i] );
         }
 // reading special channels for all requested telescopes
         for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
@@ -723,24 +738,34 @@ int VEventLoop::analyzeEvent()
         }
 
 // check the requested sumwindow is not larger than the number of samples
-        if( (int)getNSamples() < (int)fRunPar->fsumwindow[fRunPar->fTelToAnalyze[i]] )
+        if( (int)getNSamples() < (int)fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] )
         {
             if( fBoolSumWindowChangeWarning < 1 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
 	    {
-	         cout << "VEventLoop::analyzeEvent: resetting summation window from ";
-		 cout << fRunPar->fsumwindow[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+	         cout << "VEventLoop::analyzeEvent: resetting summation window 1 from ";
+		 cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
-            fRunPar->fsumwindow[fRunPar->fTelToAnalyze[i]] = getNSamples();
+            fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
         }
-        if( (int)getNSamples() < fRunPar->fsumwindowsmall[fRunPar->fTelToAnalyze[i]] )
+        if( (int)getNSamples() < (int)fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] )
+        {
+            if( fBoolSumWindowChangeWarning < 1 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
+	    {
+	         cout << "VEventLoop::analyzeEvent: resetting summation window 2 from ";
+		 cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+            }
+            fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] = getNSamples();
+            fBoolSumWindowChangeWarning = 1;
+        }
+        if( (int)getNSamples() < fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] )
         {
             if( fBoolSumWindowChangeWarning < 2 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
 	    {
-	       cout << "VEventLoop::analyzeEvent: resetting small summation window from ";
-	       cout << fRunPar->fsumwindowsmall[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+	       cout << "VEventLoop::analyzeEvent: resetting double pass summation window from ";
+	       cout << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
-            fRunPar->fsumwindowsmall[fRunPar->fTelToAnalyze[i]] = getNSamples();
+            fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 2;
         } 
 
