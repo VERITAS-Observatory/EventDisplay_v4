@@ -24,6 +24,7 @@ ZEW=$1
 ARRAY=$2
 SW=$3
 PART=$4
+# METH="GEO"
 METH="LL"
 RUN=$5
 ATMO="06"
