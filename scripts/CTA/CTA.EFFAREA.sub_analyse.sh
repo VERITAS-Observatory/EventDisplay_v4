@@ -67,6 +67,7 @@ TMVACUT="20111212"
 TMVACUT="20111220"
 TMVACUT="20120104-N2_Core"
 TMVACUT="20111213"
+TMVACUT="20120214"
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ] && [ $PART != "gamma_onSourceDISP" ]

@@ -15,7 +15,8 @@
 # evndisp reconstruction runparamter
 ACUT="EVNDISP.reconstruction.runparameter"
 # run options
-OPT="-display=1 -useFixedThresholds -reconstructionparameter $ACUT -traceanalysis=0"
+# OPT="-display=1 -useFixedThresholds -reconstructionparameter $ACUT -traceanalysis=0"
+OPT="-display=1 -useFixedThresholds -reconstructionparameter $ACUT"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################

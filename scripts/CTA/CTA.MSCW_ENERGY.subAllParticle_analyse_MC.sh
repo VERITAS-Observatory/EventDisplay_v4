@@ -27,7 +27,6 @@ then
 fi
 
 #VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
-VPART=( "proton" )
 VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 NPART=${#VPART[@]}
 
@@ -41,9 +40,9 @@ do
    do
       if [ $4 = "v_leeds" ]
       then
-	 echo "v_leeds 1$k"
 	 for (( l = 0; l < 10; l++ ))
 	 do
+	    echo "v_leeds $k$l"
 	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $k$l
          done
       else

@@ -52,6 +52,7 @@ if [ $GMOD = "0" ]
 then
 #   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
    VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "electron" "proton" )
 else
    VPART=( "gamma_onSource" "gamma_cone10" )
 #   VPART=( "gamma_onSourceDISP" )
