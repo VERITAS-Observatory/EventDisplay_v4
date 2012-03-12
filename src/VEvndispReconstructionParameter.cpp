@@ -385,7 +385,10 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 	for( unsigned int i = 0; i < fNTel_type; i++ ) 
 	{
 	    if ( fLocalNtubes_min[m][i] <= 2 || fLoss_max[m][i] == 1e10 )
-		cout << "Warning: You may haven't specified the array analysis cuts for telescope type " << i+1 << " [set number: " << m << "]" << endl;
+	    {
+		cout << "Warning: not clear if array analysis cuts have been given for telescope type ";
+		cout << i+1 << " [set number: " << m << "]" << endl;
+            }
 	}
     }
     cout << "------------------------------" << endl;

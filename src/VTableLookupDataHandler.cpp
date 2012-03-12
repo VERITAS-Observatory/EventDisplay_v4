@@ -1115,6 +1115,7 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
 	   cout << "\t writing MC debug histograms" << endl;
 	   hisList->Write();
         }
+	cout << "AAA " << endl;
 
         if( fDeadTime )
         {

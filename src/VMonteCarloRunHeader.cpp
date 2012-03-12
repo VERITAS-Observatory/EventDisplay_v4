@@ -95,7 +95,8 @@ void VMonteCarloRunHeader::print()
     cout << "B-Field: " << B_total << " microT (" << B_inclination*45./atan(1.) << "," << B_declination*45./atan(1.) << ")" << endl;
     cout << "Atmospheric model: " << atmosphere << endl;
     cout << "Cherenkov photon wavelength range: [" << corsika_wlen_min << ", " << corsika_wlen_max << "]" << endl;
-    cout << "CORSIKA interaction models: lowE " << corsika_low_E_detail << ", highE " << corsika_high_E_detail;
+    cout << "CORSIKA interaction detail: lowE " << corsika_low_E_detail << ", highE " << corsika_high_E_detail;
+    cout << "CORSIKA interaction models: lowE " << corsika_low_E_model << ", highE " << corsika_high_E_model;
     cout << ", transition energy " << corsika_low_high_E << " GeV" << endl;
 // print CHERENKOV FLAG
     cout << "CORSIKA iact options: " << corsika_iact_options << endl;

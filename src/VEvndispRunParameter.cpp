@@ -314,7 +314,8 @@ void VEvndispRunParameter::print( int iEv )
     cout << endl;
     cout << "detector configuration file: " << fcamera[0];
     if( fIgnoreCFGversions ) cout << " (ignoring cfg version numbering)";
-    if( fUseVBFSampleLength ) cout << "; using number of FADC samples from cfg file" << endl;
+    cout << endl;
+    if( fUseVBFSampleLength ) cout << "\t using number of FADC samples from cfg file" << endl;
     cout << endl;
     cout << "runmode: " << frunmode << endl;
     if( fnevents > 0 ) cout << "number of events to analyse: " << fnevents << endl;
@@ -337,7 +338,7 @@ void VEvndispRunParameter::print( int iEv )
 
     if( fCalibrationDataType == 0 ) cout << "no calibration data available" << endl;
     cout << "signal charge unit is " << fFADCChargeUnit << endl;
-    if( fperformFADCAnalysis )   cout << "analysing FADC trace " << endl;
+    if( fperformFADCAnalysis )   cout << "analysing FADC traces " << endl;
     else if( fsourcetype == 7 )  cout << "reading trace analysis results from DST file" << endl;
 
     if( frunmode == 0 || frunmode == 4 )

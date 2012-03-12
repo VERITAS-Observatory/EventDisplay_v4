@@ -1179,7 +1179,7 @@ int main(int argc, char **argv)
 
 	    if ( verbose || rc != 0 )
                printf("read_hess_mcrunheader(), rc = %d\n",rc);
-            if ( showdata )
+//            if ( showdata )
                print_hess_mcrunheader(iobuf);
 
 // fill EVNDISP DST run header
@@ -1193,7 +1193,7 @@ int main(int argc, char **argv)
                corsika_inputs.text = NULL;
                corsika_inputs.next = NULL;
 	       read_input_lines(iobuf,&corsika_inputs);
-	       if ( verbose && corsika_inputs.text != NULL )
+	       if ( corsika_inputs.text != NULL )
 	       {
 	          struct linked_string *xl = NULL, *xln = NULL;
                   if ( ! quiet )
