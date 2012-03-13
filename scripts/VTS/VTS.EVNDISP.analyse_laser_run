@@ -37,7 +37,7 @@ fi
 #######################################
 # run options
 #######################################
-OPT="-sumfirst=3 -sumwindow=18"
+OPT="-calibrationsumwindow=18 -calibrationsumfirst=2"
 
 # source (VBF) file
 # check first if source file exists
