@@ -58,7 +58,7 @@ bool VSimulationDataReader::printSimulationHeader( VPacket* packet, bool bPrintC
         cout << ", simulated by " << h->fSimulator;
 	cout << ", simulation package " << (int)h->fSimulationPackage;
         cout << ", array configurations from " << h->fDateOfArrayForSims << endl;
-        cout << "\t atmospheric model : " << h->fAtmosphericModel << " (not filled yet)" << endl;
+        cout << "\t atmospheric model : " << h->fAtmosphericModel << endl;
         cout << "\t array configuration: " << endl;
         for( unsigned int i = 0; i < h->fArray.size(); i++ )
         {
@@ -128,10 +128,10 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 	   {
 	      float i_f = 0.;
 	      if( !is_stream.eof() ) is_stream >> i_f;
-	      if( i_f != iMCRunHeader->obsheight )
+	      if( TMath::Abs( i_f - iMCRunHeader->obsheight ) > 10. )
 	      {
 	         cout << "VSimulationDataReader::fillSimulationHeader warning: different observation level in runheader and simconfig string ";
-		 cout << iMCRunHeader->obsheight << "\t" << i_f << endl;
+		 cout << fixed << iMCRunHeader->obsheight << "\t" << i_f << endl;
               }
            }
 	   else if( iTemp == "ALTITUDE" )
