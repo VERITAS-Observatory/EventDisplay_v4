@@ -10,7 +10,7 @@ MCD=`date`
 
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
 then
-  echo "VTS.EVNDISP.sub_analyse_MC_CARE_VBF.sh <ze> <array=V4/V5/V6> <summation window> <particle=1/2/14/402> <run nunmber> <noise>"
+  echo "VTS.EVNDISP.sub_analyse_MC_CARE_VBF.sh <ze> <array=V4/V5/V6> <reconstruction parameter file> <particle=1/2/14/402> <run nunmber> <noise>"
   echo "V4: array before T1 move (before Autumn 2009)"
   echo "V5: array after T1 move (from Autumn 2009)"
   echo "V6: array after camera upgrade (from Autumn 2012)"
@@ -22,10 +22,8 @@ fi
 ################################################
 ZEW=$1
 ARRAY=$2
-SW=$3
+ACUT=$3
 PART=$4
-# METH="GEO"
-METH="LL"
 RUN=$5
 ATMO="06"
 WOB="0.5"
@@ -64,7 +62,7 @@ fi
 QLOGDIR=$FDIR
 
 CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_CARE_VBF"
-OSCRIPT="qsub_evndisp_MC_CARE_VBF-$ZEW-$WOB-$SW-$NOIS-$METH-$ATMO"
+OSCRIPT="qsub_evndisp_MC_CARE_VBF-$ZEW-$WOB-$ACUT-$NOIS-$ACUT-$ATMO"
 
 # set zenith angle
 sed -e "s/123456789/$ZEW/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-b.sh
@@ -74,12 +72,8 @@ sed -e "s|DATADIR|$DDIR|" $FDIR/$OSCRIPT-b.sh > $FDIR/$OSCRIPT-c.sh
 rm -f $FDIR/$OSCRIPT-b.sh
 
 # atmosphere
-sed -e "s|AAAAAAAA|$ATMO|" $FDIR/$OSCRIPT-c.sh > $FDIR/$OSCRIPT-d.sh
+sed -e "s|AAAAAAAA|$ATMO|" $FDIR/$OSCRIPT-c.sh > $FDIR/$OSCRIPT-f.sh
 rm -f $FDIR/$OSCRIPT-c.sh
-
-# reconstruction method
-sed -e "s|RECMETH|$METH|" $FDIR/$OSCRIPT-d.sh > $FDIR/$OSCRIPT-f.sh
-rm -f $FDIR/$OSCRIPT-d.sh
 
 # add output directory
 sed -e "s|OUTDIR|$ODIR|" $FDIR/$OSCRIPT-f.sh > $FDIR/$OSCRIPT-c.sh
@@ -98,7 +92,7 @@ sed -e "s/NOISENOISE/$NOISE/" $FDIR/$OSCRIPT-e.sh > $FDIR/$OSCRIPT-r.sh
 rm -f $FDIR/$OSCRIPT-e.sh
 
 # summation window
-sed -e "s/SUMWINDOW/$SW/" $FDIR/$OSCRIPT-r.sh > $FDIR/$OSCRIPT-s.sh
+sed -e "s|ACUT|$ACUT|" $FDIR/$OSCRIPT-r.sh > $FDIR/$OSCRIPT-s.sh
 rm -f $FDIR/$OSCRIPT-r.sh
 
 # V4 or V5?
@@ -119,13 +113,6 @@ echo "QFILES $QLOGDIR/"
 echo "LOG AND DATA FILES: $ODIR"
 
 # submit the job
-if [ $METH = "GEO" ]
-then
-  qsub -V -l h_cpu=10:00:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
-fi
-if [ $METH = "LL" ]
-then
-  qsub -V -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
-fi
+qsub -V -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
 exit

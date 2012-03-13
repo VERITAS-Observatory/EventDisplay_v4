@@ -14,11 +14,10 @@ set ZEW=123456789
 set WOB=987654321
 set WOG=WOGWOG
 set NOISE=NOISENOISE
-set METHOD=RECMETH
 set ARRAY=XXXXXX
 set FDIR=DATADIR
 set YDIR=OUTDIR
-set SW=SUMWINDOW
+set RECFILE=ACUT
 set PART=IDIDID
 set ATMO=AAAAAAAA
 ##############################################################################################
@@ -46,7 +45,6 @@ cd $EVNDISPSYS/scripts/VTS/
 # telescopes
 set TTA="1234"
 #set TTA="234"
-set ACUT="EVNDISP.reconstruction.runparameter"
 # dead channel definitions
 set DEAD="EVNDISP.validchannels.dat"
 # camera geometry
@@ -55,7 +53,7 @@ set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
 
 #####################################################
 # temporary data directory
-set DDIR=$TMPDIR"/evn_"$ZEW"_"$SW"_"$NOISE"_"$WOB
+set DDIR=$TMPDIR"/evn_"$ZEW"_"$RECFILE"_"$NOISE"_"$WOB
 echo $DDIR
 mkdir -p $DDIR
 
@@ -87,7 +85,7 @@ endif
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20111209_ATM"$ATMO"_"$TTA"_SW"$SW"_NOISE"$NOISE"_"$METHOD"/
+set ODIR=$YDIR/analysis_d20120313_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -109,9 +107,9 @@ endif
 
 echo "CALCULATING PEDESTALS FOR RUN $RUN"
 rm -f $ODIR/$RUN.ped.log
-$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN -sumfirst=0 -sumwindow=20 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
 
-set CALIBDATA=$VERITAS_EVNDISP_ANA_DIR/Calibration/calib.dat
+set CALIBDATA=$OBS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
 if (! -e $CALIBDATA ) then
   touch $CALIBDATA 
 endif
@@ -121,18 +119,11 @@ echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
 # eventdisplay run options
 ##############################################################################################
 
-##### reconstruction method #####
-set OPT=""
-if( $METHOD == "GEO" ) then
-  set OPT="$OPT"
-endif
-if( $METHOD == "LL" ) then
-  set OPT="$OPT -loglminloss=0.00"
-endif
-
+##### reconstruction parameter file #####
+set OPT="-reconstructionparameter $RECFILE -nevents=1000000"
 
 ##### pedestal options #####
-set PEDOPT="-calibrationfile calib.dat -pedestalnoiselevel=$NOISE"
+set PEDOPT="-calibrationfile calibrationlist.dat -pedestalnoiselevel=$NOISE"
 
 ##### MC options #####
 set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
@@ -147,7 +138,7 @@ echo "EVNDISP log file written to $ODIR/$RUN.dat"
 ##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$RUN -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RUN.root -sumwindow_doublepass=$SW -teltoana=$TTA $MCOPT $PEDOPT $OPT  >& $ODIR/$RUN.log
+$EVNDISPSYS/bin/evndisp -runnumber=$RUN -sourcefile $XFIL -deadchannelfile $DEAD -outputfile $ODIR/$RUN.root -teltoana=$TTA $MCOPT $PEDOPT $OPT  >& $ODIR/$RUN.log
 
 ##############################################################################################
 
