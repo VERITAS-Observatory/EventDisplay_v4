@@ -86,6 +86,6 @@ class VEvndispReconstructionParameter : public TNamed
         unsigned int read_arrayAnalysisCuts( string ifile );
 	void   setDebug( bool iD = false ) { fDebug = iD; }
 
-        ClassDef(VEvndispReconstructionParameter,12);
+        ClassDef(VEvndispReconstructionParameter,13);
 };
 #endif
