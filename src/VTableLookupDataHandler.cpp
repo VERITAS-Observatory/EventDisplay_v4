@@ -379,8 +379,8 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     bitset<8*sizeof(unsigned long)> i_nimage;     // for imagepattern
     i_nimage.reset();
 
-    Double_t SizeFirstMax_temp = -1000;           //AMC 04022009
-    Double_t SizeSecondMax_temp = -100;           //AMC 04022009
+    Double_t SizeFirstMax_temp = -1000.;           //AMC 04022009
+    Double_t SizeSecondMax_temp = -100.;           //AMC 04022009
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         bool fReadTPars = false;
@@ -400,22 +400,23 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
 
             fdist[i] = ftpars[i]->dist;
             fsize[i] = ftpars[i]->size;
+            fsize2[i] = ftpars[i]->size2;
             floss[i] = ftpars[i]->loss;
 	    ffui[i] = ftpars[i]->fui;
             fwidth[i] = ftpars[i]->width;
             flength[i] = ftpars[i]->length;
 
 //AMC 09102009
-            if(ftpars[i]->size > SizeSecondMax_temp)
+            if( fsize[i] > SizeSecondMax_temp)
             {
-                if(ftpars[i]->size > SizeFirstMax_temp)
+                if( fsize[i] > SizeFirstMax_temp)
                 {
                     SizeSecondMax_temp = SizeFirstMax_temp;
-                    SizeFirstMax_temp = ftpars[i]->size;
+                    SizeFirstMax_temp = fsize[i];
                 }
                 else
                 {
-                    SizeSecondMax_temp = ftpars[i]->size;
+                    SizeSecondMax_temp = fsize[i];
                 }
             }
 //AMC 09102009
@@ -874,6 +875,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "dist", fdist, iTT );
         sprintf( iTT, "size[%d]/D", fNTel );
         fOTree->Branch( "size", fsize, iTT );
+        sprintf( iTT, "size2[%d]/D", fNTel );
+        fOTree->Branch( "size2", fsize2, iTT );
         sprintf( iTT, "loss[%d]/D", fNTel );
         fOTree->Branch( "loss", floss, iTT );
 	sprintf( iTT, "fui[%d]/F", fNTel );
@@ -1363,6 +1366,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 
     fdist[i] = 0.;
     fsize[i] = 0.;
+    fsize2[i] = 0.;
     floss[i] = 0.;
     ffui[i] = 0.;
     fwidth[i] = 0.;
@@ -1507,7 +1511,9 @@ void VTableLookupDataHandler::resetAll()
     fmeanPedvar_Image = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fdist[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fsize[i] = 0.;
+    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fsize2[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fsizeCorr[i] = 0.;
+    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fsize_telType[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) floss[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ffui[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fmax1[i] = 0.;
@@ -1834,6 +1840,29 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
        if( fTel_type[i] == iTelType )
        {
           fsize_telType[z] = fsize[i] * iSizeCorrection;
+	  z++;
+       }
+    }
+    return fsize_telType;
+}
+
+double* VTableLookupDataHandler::getSize2( double iSizeCorrection )
+{
+    for( unsigned int i = 0; i < getNTel(); i++ )
+    {
+       fsizeCorr[i] = fsize2[i] * iSizeCorrection;
+    }
+    return fsizeCorr;
+}
+
+double* VTableLookupDataHandler::getSize2( double iSizeCorrection,  ULong64_t iTelType )
+{
+    unsigned int z = 0;
+    for( unsigned int i = 0; i < getNTel(); i++ )
+    {
+       if( fTel_type[i] == iTelType )
+       {
+          fsize_telType[z] = fsize2[i] * iSizeCorrection;
 	  z++;
        }
     }

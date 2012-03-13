@@ -79,6 +79,7 @@ class VTableEnergyCalculator
         vector< TH2F* > hVMedian;
         vector< TH2F* > hVSigma;
         TProfile2D *hMean;
+	string hMeanName;
         TDirectory *fOutDir;
         bool fWrite1DHistograms;
         bool fReadHistogramsFromFile;

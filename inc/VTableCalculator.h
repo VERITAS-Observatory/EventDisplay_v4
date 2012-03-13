@@ -74,11 +74,13 @@ class VTableCalculator
 
         vector< vector< TH1F* > > Oh;
         TProfile2D *hMean;
+	string hMeanName;
         TH2F* hMedian;
         string hMedianName;
         TH2F* hSigma;
         string hSigmaName;
         TH2F* hNevents;
+	string hNeventsName;
         vector< TH2F* > hVMedian;
         vector< TH2F* > hVSigma;
 

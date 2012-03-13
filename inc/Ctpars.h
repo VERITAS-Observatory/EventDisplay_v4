@@ -66,6 +66,7 @@ class Ctpars
         Float_t         length;
         Float_t         width;
         Float_t         size;
+        Float_t         size2;
         Float_t         loss;
         Float_t         fui;
         Float_t         dist;
@@ -125,6 +126,7 @@ class Ctpars
         Double_t        length;
         Double_t        width;
         Double_t        size;
+        Double_t        size2;
         Double_t        loss;
         Double_t        dist;
         Double_t        azwidth;
@@ -194,6 +196,7 @@ class Ctpars
         TBranch        *b_length;                 //!
         TBranch        *b_width;                  //!
         TBranch        *b_size;                   //!
+        TBranch        *b_size2;                  //!
         TBranch        *b_loss;                   //!
         TBranch        *b_fui;                    //!
         TBranch        *b_dist;                   //!
@@ -313,6 +316,9 @@ void Ctpars::Init(TTree *tree)
     fChain->SetBranchAddress("length",&length);
     fChain->SetBranchAddress("width",&width);
     fChain->SetBranchAddress("size",&size);
+    size = 0;
+    if( fChain->GetBranchStatus( "size2" ) ) fChain->SetBranchAddress("size2",&size2);
+    else                                     fChain->SetBranchAddress("size",&size2);
     if( fVersion > 2 ) fChain->SetBranchAddress("loss",&loss);
     else               loss = 0.;
     if( fVersion > 6 ) fChain->SetBranchAddress("fui", &fui);
@@ -368,6 +374,8 @@ Bool_t Ctpars::Notify()
     b_length = fChain->GetBranch("length");
     b_width = fChain->GetBranch("width");
     b_size = fChain->GetBranch("size");
+    if( fChain->GetBranchStatus( "size2" ) ) b_size2 = fChain->GetBranch("size2");
+    else                                     b_size2 = fChain->GetBranch("size");
     if( fVersion > 2 ) b_loss = fChain->GetBranch("loss");
     else               b_loss = 0;
     if( fVersion > 6 ) b_fui = fChain->GetBranch("fui" );

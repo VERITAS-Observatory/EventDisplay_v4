@@ -583,10 +583,10 @@ void VTableLookup::loop()
 									 fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
                             fenergyEnergyvsRadius[0][0][0][a][i_Tel_type_counter]->calc( fData->getNTel_type( t ), fData->getMCEnergy(),
 			                                                                 fData->getDistanceToCore( t ),
-											 fData->getSize( fTLRunParameter->fEnergySizecorrection, t ),
+											 fData->getSize2( fTLRunParameter->fEnergySizecorrection, t ),
 											 fData->getDistance( t ), idummy1, iEventWeight, idummy3, 0. );
                             fenergySizevsRadius[0][0][0][a][i_Tel_type_counter]->calc( fData->getNTel_type( t ), fData->getDistanceToCore(t),
-			                                                               fData->getSize( fTLRunParameter->fEnergySizecorrection, t ),
+			                                                               fData->getSize2( fTLRunParameter->fEnergySizecorrection, t ),
 										       fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 ); 
 			    i_Tel_type_counter++;
                         }
@@ -612,10 +612,10 @@ void VTableLookup::loop()
 								      fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
 			 fenergyEnergyvsRadius[0][0][0][a][i_Tel_type_counter]->calc( fData->getNTel_type( t ), fData->getMCEnergy(),
 			                                                              fData->getDistanceToCore( t ), 
-										      fData->getSize( fTLRunParameter->fEnergySizecorrection, t ), 
+										      fData->getSize2( fTLRunParameter->fEnergySizecorrection, t ), 
 										      fData->getDistance( t ), idummy1, iEventWeight, idummy3, 0. );
 			 fenergySizevsRadius[0][0][0][a][i_Tel_type_counter]->calc( fData->getNTel_type( t ), fData->getDistanceToCore(t), 
-			                                                            fData->getSize( fTLRunParameter->fEnergySizecorrection, t ), 
+			                                                            fData->getSize2( fTLRunParameter->fEnergySizecorrection, t ), 
 										    fData->getMCEnergyArray(), idummy1, iEventWeight, idummy3, idummy1 ); 
 			 i_Tel_type_counter++;
 		     }
@@ -1256,12 +1256,12 @@ void VTableLookup::calculateMSFromTables( VTablesToRead *s, double esys )
     f_calc_energySR->setCalculateEnergies( true );
     f_calc_energySR->setVHistograms( s->henergySRMedian, s->henergySRSigma );
     s->energySR = f_calc_energySR->calc( (int)fData->getNTel(), fData->getDistanceToCore(),
-                                         fData->getSize( fTLRunParameter->fEnergySizecorrection ), 0,
+                                         fData->getSize2( fTLRunParameter->fEnergySizecorrection ), 0,
 					 s->energySR_T, s->energySR_Chi2, s->energySR_dE, s->energySR_Tsigma );
 // calculate energy (method 0)
     f_calc_energy->setVHistograms( s->henergyERMedian, s->henergyERSigma );
     s->energyER = f_calc_energy->calc( (int)fData->getNTel(), fData->getMCEnergy(), fData->getDistanceToCore(),
-                                       fData->getSize( fTLRunParameter->fEnergySizecorrection ), fData->getDistance(),
+                                       fData->getSize2( fTLRunParameter->fEnergySizecorrection ), fData->getDistance(),
 				       s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
 }
 

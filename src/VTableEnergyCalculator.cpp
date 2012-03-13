@@ -25,6 +25,8 @@ VTableEnergyCalculator::VTableEnergyCalculator( int intel )
     }
     hMedian = 0;
     hSigma = 0;
+    hNevents = 0;
+    hMean = 0;
 
 // minimum number per bin required for reconstruction
     fMinShowerPerBin = 5.;
@@ -62,6 +64,10 @@ VTableEnergyCalculator::VTableEnergyCalculator(const char* hname_add,char m, TDi
         cout << "Energy: error accessing data directory in root file" << endl;
         exit( -1 );
     }
+    hMedian = 0;
+    hSigma = 0;
+    hNevents = 0;
+    hMean = 0;
 
     initialize();
 
@@ -150,6 +156,9 @@ VTableEnergyCalculator::VTableEnergyCalculator(const char* hname_add,char m, TDi
 
         sprintf( hname, "hNevents_energy_%s", hname_add );
         hNeventsName = hname;
+
+        sprintf( hname, "hMean_energy_%s", hname_add );
+        hMeanName = hname;
 
         fInterpolationString = iInterpolate;
 
@@ -271,10 +280,10 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
             if( xtitle ) hMedian->SetTitle( xtitle );
             if( hNevents && hMedian ) hMedian->SetEntries( hNevents->GetEntries() );
             if( hNevents && hSigma )  hSigma->SetEntries( hNevents->GetEntries() );
-            hMedian->Write();
-            hSigma->Write();
-            hNevents->Write();
-            hMean->Write();
+            if( hMedian )  hMedian->Write();
+            if( hSigma )   hSigma->Write();
+            if( hNevents ) hNevents->Write();
+            if( hMean )    hMean->Write();
         }
     }
 }
@@ -622,6 +631,7 @@ bool VTableEnergyCalculator::readHistograms()
         hMedian = (TH2F*)fOutDir->Get( hMedianName.c_str() );
         hSigma = (TH2F*)fOutDir->Get( hSigmaName.c_str() );
         hNevents = (TH2F*)fOutDir->Get( hNeventsName.c_str() );
+	hMean = (TProfile2D*)fOutDir->Get( hMeanName.c_str() );
 
         fReadHistogramsFromFile = true;
 

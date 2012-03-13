@@ -224,6 +224,7 @@ class VTableLookupDataHandler
         double fdist     [VDST_MAXTELESCOPES];
 	double fdist_telType[VDST_MAXTELESCOPES];
         double fsize     [VDST_MAXTELESCOPES];
+        double fsize2    [VDST_MAXTELESCOPES];
         double fsizeCorr [VDST_MAXTELESCOPES];
 	double fsize_telType[VDST_MAXTELESCOPES];
         double floss     [VDST_MAXTELESCOPES];
@@ -347,6 +348,8 @@ class VTableLookupDataHandler
         TFile* getOutputFile() { return fOutFile; }
         double* getSize( double iSizeCorrection = 1. );
 	double* getSize( double iSizeCorrection, ULong64_t iTelType );
+        double* getSize2( double iSizeCorrection = 1. );
+	double* getSize2( double iSizeCorrection, ULong64_t iTelType );
         double *getWeight() { return fweight; }
         double *getWidth() { return fwidth; }
 	double *getWidth( ULong64_t iTelType );

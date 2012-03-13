@@ -24,6 +24,8 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
     }
     hMedian = 0;
     hSigma = 0;
+    hMean = 0;
+    hNevents = 0;
 
     Omode = 'r';
 
@@ -53,6 +55,8 @@ VTableCalculator::VTableCalculator( vector< TH2F* > iMedian, vector< TH2F* > iSi
 
     hMedian = 0;
     hSigma = 0;
+    hMean = 0;
+    hNevents = 0;
 
     hVMedian = iMedian;
     hVSigma = iSigma;
@@ -187,6 +191,10 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         hMedianName = hname;
         sprintf( hname, "%s_sigma_%s", fpara.c_str(), hname_add.c_str() );
         hSigmaName = hname;
+	sprintf( hname, "hNevents_energy_%s", hname_add.c_str() );
+	hNeventsName = hname;
+	sprintf( hname, "hMean_energy_%s", hname_add.c_str() );
+	hMeanName = hname;
     }
 
 }
@@ -619,8 +627,7 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 /* compute size index */
 int VTableCalculator::SizeIndex(double size)
 {
-    int i;
-    i = (int)((log10(size)-amp_offset)/amp_delta);
+    int i = (int)((log10(size)-amp_offset)/amp_delta);
     if (i>NumSize-1) i=-1;
     if (i<0) i=0;
     return i;
@@ -630,8 +637,7 @@ int VTableCalculator::SizeIndex(double size)
 /* compute distance from telescopes index */
 int VTableCalculator::DistIndex(double dist)
 {
-    int j;
-    j = (int)(dist / dist_delta);
+    int j = (int)(dist / dist_delta);
 
     if (j>NumDist-1) j=-1;
 
@@ -750,6 +756,8 @@ bool VTableCalculator::readHistograms()
     {
         hMedian = (TH2F*)fOutDir->Get( hMedianName.c_str() );
         hSigma = (TH2F*)fOutDir->Get( hSigmaName.c_str() );
+	hNevents = (TH2F*)fOutDir->Get( hNeventsName.c_str() );
+	hMean = (TProfile2D*)fOutDir->Get( hMeanName.c_str() );
 
         return true;
     }

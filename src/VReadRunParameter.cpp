@@ -818,6 +818,7 @@ void VReadRunParameter::test_and_adjustParams()
         fRunPara->fuseDB = false;
 	fRunPara->fL2TimeCorrect = false;
 	fRunPara->fDBCameraRotationMeasurements = false;
+	fRunPara->fLowGainCalibrationFile = "";
     }
 
 // CTA/AGIS adjustments
