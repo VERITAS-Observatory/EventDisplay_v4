@@ -118,8 +118,8 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , d
   double dec = fSkyMapCentreDecJ2000+i_decDiff;
 
 
-  double ra_err;
-  double dec_err; 
+  double ra_err = 0.;
+  double dec_err = 0.; 
 
   if ( xerr !=0 && yerr !=0 )
   {
