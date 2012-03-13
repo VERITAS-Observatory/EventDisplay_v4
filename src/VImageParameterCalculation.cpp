@@ -1053,10 +1053,12 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     double fdistXmax = 0.;
     double fdistYmin = 0.;
     double fdistYmax = 0.;
-    double iPixelrad = 0.;
     for( unsigned int j = 0; j < iData->getSums().size(); j++ )
     {
-        if( !iData->getDead()[j] )
+// ignore dead channels
+        if( iData->getDead()[j] ) continue;
+// only image/border pixels are used in the fit
+        if( iData->getImage()[j] || iData->getBorder()[j])
         {
             double xi = getDetectorGeo()->getX()[j];
             double yi = getDetectorGeo()->getY()[j];
@@ -1068,10 +1070,8 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
 
             fll_X.push_back( xi );
             fll_Y.push_back( yi );
-            iPixelrad = getDetectorGeo()->getTubeRadius()[j];
-// only sums from image/border pixels are taken in the fit
-            if( iData->getImage()[j] || iData->getBorder()[j]) fll_Sums.push_back( iData->getSums()[j] );
-            else                         fll_Sums.push_back( 0. );
+
+	    fll_Sums.push_back( iData->getSums()[j] );
         }
     }
     if( fLLDebug ) cout << "FLL FITTER limits " << fdistXmax << "\t" << fdistXmin << "\t" << fdistYmax << "\t" << fdistYmin << "\t" << fll_Sums.size() << endl;
@@ -1490,14 +1490,14 @@ void get_LL_imageParameter_2DGauss( Int_t &npar, Double_t *gin, Double_t &f, Dou
 
     if( par[0] * par[0] < 1. && par[2] > 0. && par[4] > 0. )
     {
-        unsigned int nSums = iImageCalculation->getSums().size();
+        unsigned int nSums = iImageCalculation->getLLSums().size();
         for( unsigned int i = 0; i < nSums; i++ )
         {
-            n = iImageCalculation->getSums()[i];
+            n = iImageCalculation->getLLSums()[i];
             if( n > -999. )
             {
-                x = iImageCalculation->getX()[i];
-                y = iImageCalculation->getY()[i];
+                x = iImageCalculation->getLLX()[i];
+                y = iImageCalculation->getLLY()[i];
                 sum  = ( x - par[1] ) * ( x - par[1] ) / par[2] / par[2];
                 sum += ( y - par[3] ) * ( y - par[3] ) / par[4] / par[4];
                 sum += -2. * par[0] * ( x - par[1] ) / par[2] * ( y - par[3] ) / par[4];
