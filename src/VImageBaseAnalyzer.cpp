@@ -406,6 +406,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
     {
         if( getDebugFlag() ) cout << "VImageBaseAnalyzer::calcTZerosSums() reading sums from DST file" << endl;
         setSums( fReader->getSums() );
+        setSums2( fReader->getSums() );
 	setPulseTiming( fReader->getTracePulseTiming(), true );
 	setPulseTiming( fReader->getTracePulseTiming(), false );
         setTraceMax( fReader->getTraceMax() );
