@@ -97,21 +97,21 @@ CXX           = g++
 CXXFLAGS      = -O3 -g -Wall  -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
-LD            = g++
+LD            = g++ 
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
 
 # linux depending flags
 ifeq ($(ARCH),Linux)
 LDFLAGS       = -O
-SOFLAGS       = -shared -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
+SOFLAGS       = -shared 
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
 LDFLAGS       = -bind_at_load
 DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
-SOFLAGS       = -dynamiclib -single_module -undefined $(UNDEFOPT) -install_name $(EVNDISPSYS)/lib/libVAnaSum.so
+SOFLAGS       = -dynamiclib -single_module -undefined $(UNDEFOPT)
 endif
 
 ########################################################
@@ -161,9 +161,9 @@ ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
 # 2010 production
-CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 production for Leeds
-# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_ULTRA
+CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_ULTRA
 # 2011 SC 
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
@@ -524,7 +524,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/Ctpars.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o  \
-		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o
+		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o \
+		./obj/VPedestalCombineLowGainFiles.o ./obj/VPedestalCombineLowGainFiles_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
@@ -536,7 +537,7 @@ endif
 
 slib lsib:   $(SHAREDOBJS)
 	mkdir -p ./lib
-	$(LD) $(SOFLAGS) -install_name $(EVNDISPSYS)/lib/libVAnaSum.so $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
+	$(LD) $(SOFLAGS) $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
 ifneq ($(ROOT_MINUIT2),yes)
 	@echo "ROOT NOT COMPILED WITH MINUIT2"
 	@echo "THEREFORE: NO SOURCE GEOMETRY FITTER AVAILABLE"
