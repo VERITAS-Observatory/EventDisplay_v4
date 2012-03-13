@@ -324,7 +324,7 @@ bool VEventLoop::initEventLoop( string iFileName )
     initializeAnalyzers();
     if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
     {
-	 fPedestalCalculator->initialize( (fRunMode == R_PED),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice, fRunPar->fPedestalsInTimeSlicesSumFirst, fRunPar->fPedestalsInTimeSlicesSumWindow );
+	 fPedestalCalculator->initialize( (fRunMode == R_PED),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice, fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumWindow );
     }
 // print run informations
     printRunInfos();

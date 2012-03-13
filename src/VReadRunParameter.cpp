@@ -262,13 +262,13 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fUsePedestalsInTimeSlices = true;
             fRunPara->fLowGainUsePedestalsInTimeSlices = true;
         }
-        else if( iTemp.find( "pedestalsintimeslicessumwindow" ) < iTemp.size() && iTemp != "pedestalsintimeslices" )
+        else if( iTemp.find( "calibrationsumwindow" ) < iTemp.size() && iTemp != "pedestalsintimeslices" )
         {
-            fRunPara->fPedestalsInTimeSlicesSumWindow = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+            fRunPara->fCalibrationSumWindow = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-        else if( iTemp.find( "pedestalsintimeslicessumfirst" ) < iTemp.size() && iTemp != "pedestalsintimeslices" )
+        else if( iTemp.find( "calibrationsumfirst" ) < iTemp.size() && iTemp != "pedestalsintimeslices" )
         {
-            fRunPara->fPedestalsInTimeSlicesSumFirst = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+            fRunPara->fCalibrationSumFirst = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
 // fast plotting without pedestals
         else if( iTemp.find( "plotraw" ) < iTemp.size() )
@@ -1223,18 +1223,6 @@ void VReadRunParameter::test_and_adjustParams()
         for( unsigned int t = 0; t < fRunPara->fTraceWindowShift.size(); t++ ) fRunPara->fTraceWindowShift[t] = 0;
     }
 
-    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 6 )
-    {
-        if( fRunPara->fsumwindow_1.size() > 0 ) fRunPara->fPedestalsInTimeSlicesSumWindow = fRunPara->fsumwindow_1[0];
-    }
-
-/*   if( fRunPara->fUsePedEvents && fRunPara->fsourcetype != 3 )
-   {
-      fRunPara->fUsePedEvents = false;
-      cout << "Warning: pedestal events only work with the VBF file reader" << endl;
-      cout << "         Check your file is vbf and specify sourcetype=3" << endl;
-   } */
-
 // MS: throws an error if its a simulation file and it was asked to calculate the PW parameters from the CFD hits, since CFDs don't exist in the simulation record
     if( fRunPara->fIsMC > 0 && ( fRunPara->fPWmethod == 0 || fRunPara->fPWmethod == 1) )
     {
@@ -1329,12 +1317,12 @@ void VReadRunParameter::printHelp()
     cout << "\t -lasermin=INT \t\t\t\t minimal total charge sum for a event to be a laser event (default=" << fRunPara->fLaserSumMin << ")" << endl;
     cout << "\t -l2setspecialchannels FILENAME \t set special channels for l2 feed into FADC crates (default=specialChannel.dat)" << endl;
     cout << "\t -l2timecorrect=0/1 \t\t\t apply FADC stop time corrections based on L2 pulses (default=true)" << endl;
+    cout << "\t -Pedestalsumwindow=INT \t length of sum window for pedestal variations (default=20)" << endl;
+    cout << "\t -Pedestalssumfirst=INT \t start of sum window for pedestal variations (default=0)" << endl;
     cout << "\t -usePedestalsInTimeSlices=0/1 \t\t use time dependent pedestals (high gain channels) (default = on(1))" << endl;
     cout << "\t -usePedestalsInTimeSlicesLowGain=0/1 \t use time dependent pedestals (low gain channels) (default = off(0))" << endl;
     cout << "\t -PedestalsInTimeSlices \t\t calculate pedestals on short time scale (default=false)" << endl;
     cout << "\t -PedestalsLengthOfTimeSlice=FLOAT \t length of time slices for pedestal variations (default=180s)" << endl;
-    cout << "\t -PedestalsInTimeSlicesSumWindow=INT \t length of sum window for pedestal variations (default=4)" << endl;
-    cout << "\t -PedestalsInTimeSlicesSumFirst=INT \t start of sum window for pedestal variations (default=0)" << endl;
     cout << "\t -deadchannelfile FILE \t\t\t read this file with dead channel definitions (default=deadChannelDefinition.dat)" << endl;
     cout << endl;
 
@@ -1396,6 +1384,7 @@ void VReadRunParameter::printHelp()
     cout << "\t\t -timecutcluster=FLOAT \t\t\t time cut between cluster (default=" << fRunPara->ftimecutcluster[0] << ") " << endl; //HP
     cout << "\t\t -minpixelcluster=INT \t\t\t minimum number of pixels in cluster (default=" << fRunPara->fminpixelcluster[0] << ")" << endl; //HP
     cout << "\t\t -loops=INT \t\t\t\t number of loops for border pixel finding (default=" << fRunPara->floops[0] << ")" << endl; //HP
+    cout << endl;
 
     cout << "Image calculation:" << endl;
     cout << "------------------" << endl;

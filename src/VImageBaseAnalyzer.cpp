@@ -70,7 +70,7 @@ bool VImageBaseAnalyzer::setSpecialChannels()
    (to be used for calibration)
 
 */
-void VImageBaseAnalyzer::calcSums(int iFirst, int iLast, bool iMakingPeds)
+void VImageBaseAnalyzer::calcSums(int iFirst, int iLast, bool iMakingPeds, bool iLowGainOnly )
 {
     if( getDebugFlag() ) cout << "VImageBaseAnalyzer::calcSums() " << iFirst << "\t" << iLast << endl;
 
@@ -105,6 +105,9 @@ void VImageBaseAnalyzer::calcSums(int iFirst, int iLast, bool iMakingPeds)
         try
         {
             i_channelHitID = fReader->getHitID(i);
+// for low gain pedestal calibration: ignore high gain channels
+	    if( iLowGainOnly && i_channelHitID < getHiLo().size() && !getHiLo()[i_channelHitID] ) continue;
+
             if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead(getHiLo()[i_channelHitID]).size() && !getDead(getHiLo()[i_channelHitID])[i_channelHitID] )
             {
                 fReader->selectHitChan(i);

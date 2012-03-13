@@ -266,6 +266,7 @@ class VEvndispData
         double              getTemplateMuMin() { return fAnaData[fTelID]->fTemplateMu.min(); }
         double              getTemplateMuMax() { return fAnaData[fTelID]->fTemplateMu.max(); }
 	unsigned int        getLargestSumWindow();
+	unsigned int        getLargestSumWindow( unsigned int iTelID );
         unsigned int        getSumWindow() { return fRunPar->fsumwindow_1[fTelID]; }
         unsigned int        getSumWindow_2() { return fRunPar->fsumwindow_2[fTelID]; }
         unsigned int        getSumWindowSmall() { return fRunPar->fsumwindow_1[fTelID]; }

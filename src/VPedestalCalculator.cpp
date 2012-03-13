@@ -37,6 +37,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
     fSumWindow = iSumWindow;
     fNPixel = iNPixel;
 
+    cout << endl;
     cout << "Initialize pedestal calculator (length of time slice: " << fLengthofTimeSlice << " [s], sum window starts at ";
     cout << fSumFirst << " with lengths up to " << fSumWindow << " samples)" << endl;
 // test if camera is not too big
@@ -177,7 +178,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
     {
 // loop over all summation windows
         unsigned int iTempSW = fpedcal_mean[telID][p].size();
-        if( getRunParameter()->fsumwindow_1[getTeltoAna()[telID]] < (int)iTempSW ) iTempSW = getRunParameter()->fsumwindow_1[getTeltoAna()[telID]];
+        if( getRunParameter()->fCalibrationSumWindow < (int)iTempSW ) iTempSW = getRunParameter()->fCalibrationSumWindow;
         for( unsigned int w = 0; w < iTempSW; w++ )
         {
 // get pedestal values
@@ -271,7 +272,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 			                         getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
 // loop over all summation windows
                         unsigned int iTempSW = fpedcal_mean[telID][chanID].size();
-                        if( getRunParameter()->fsumwindow_1[telID] < (int)iTempSW ) iTempSW = getRunParameter()->fsumwindow_1[telID];
+                        if( getRunParameter()->fCalibrationSumWindow < (int)iTempSW ) iTempSW = getRunParameter()->fCalibrationSumWindow;
                         for( unsigned int w = 0; w < iTempSW; w++ )
                         {
                             i_tr_sum = fTraceHandler->getTraceSum( fSumFirst, fSumFirst+(w+1), true );

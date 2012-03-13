@@ -568,7 +568,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 		     if( i < fRunPara->fLogLikelihoodLoss_min.size() ) fRunPara->fLogLikelihoodLoss_min[i] = atof( iTemp2.c_str() );
 		     if( iTemp3.size() > 0 )
 		     {
-		        if( i < fRunPara->fLogLikelihood_Ntubes_min.size() ) fRunPara->fLogLikelihood_Ntubes_min[i] = atof( iTemp3.c_str() );
+		        if( i < fRunPara->fLogLikelihood_Ntubes_min.size() ) fRunPara->fLogLikelihood_Ntubes_min[i] = atoi( iTemp3.c_str() );
                      }
 		  }
                }

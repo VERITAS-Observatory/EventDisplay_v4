@@ -40,13 +40,13 @@ void VCalibrator::calculatePedestals( bool iLowGain )
         {
 // create histogram, one for each telescope, channel and sumwindow
 // loop over all telescopes
-            int telID;
+            int telID = 0;
             for( unsigned int t = 0; t < getNTel(); t++ )
             {
                 telID = t+1;
                 vector< vector<TH1F* > > iped_vec;
 // loop over all sumwindows
-                for( int i= 0; i < fRunPar->fsumwindow_1[fTelID]; i++)
+                for( int i = 0; i < getRunParameter()->fCalibrationSumWindow; i++ )
                 {
                     vector<TH1F* > ihped;
 // loop over all channels
@@ -99,7 +99,7 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 // loop over all sumwindows
     for( unsigned int i = 0; i < hped_vec[fTelID].size(); i++ )
     {
-        calcSums(fRunPar->fsumfirst[fTelID],fRunPar->fsumfirst[fTelID]+(i+1), true);
+        calcSums( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst+(i+1), true, iLowGain );
 // loop over all channels
         for(unsigned int j=0;j<hped_vec[fTelID][i].size();j++)
         {
@@ -161,7 +161,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
         for(unsigned int i=0;i<hped_vec[t][0].size();i++)
         {
 // get pedestal and pedestal variances from pedestal histograms
-            os   << t << " " << i << " " << hped_vec[t][fRunPar->fsumwindow_1[t]-1][i]->GetMean()/(double)fRunPar->fsumwindow_1[t] << " ";
+            os   << t << " " << i << " " << hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow << " ";
 // loop over all window sizes
             for(unsigned int j=0;j<hped_vec[t].size();j++)
             {
@@ -210,8 +210,13 @@ bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculat
 
     if( t >= hped_vec.size() || tel >= getTeltoAna().size() )
     {
-        cout << "VCalibrator::fillPedestalTree warning, telescope number out of range " << t << "\t" << hped_vec.size() << endl;
+        cout << "VCalibrator::fillPedestalsInTimeSlices warning, telescope number out of range " << t << "\t" << hped_vec.size() << endl;
         return false;
+    }
+    if( !iP )
+    {
+       cout << "VCalibrator::fillPedestalsInTimeSlices error: no pedestal calculator given" << endl;
+       return false;
     }
 
     char iname[800];
@@ -242,6 +247,7 @@ bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculat
     Float_t TSpedmean[nSlices];
     for( int i = 0; i < nSlices; i++ )
     {
+	TSMJD[i] = 0;
         TStime[i] = 0.;
         TSnevents[i] = 0;
         TSpedmean[i] = 0.;
@@ -276,9 +282,9 @@ bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculat
     {
         ichannel = (Int_t)i;
 // get pedestal and pedestal variances from pedestal histograms
-        if( fRunPar->fsumwindow_1[t] > 0 ) iped = hped_vec[t][fRunPar->fsumwindow_1[t]-1][i]->GetMean()/(double)fRunPar->fsumwindow_1[t];
-        else                             iped = 0.;
-        inevents = (Int_t)hped_vec[t][fRunPar->fsumwindow_1[t]-1][i]->GetEntries();
+        if( fRunPar->fCalibrationSumWindow > 0 ) iped = hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow;
+        else                               iped = 0.;
+        inevents = (Int_t)hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetEntries();
 // loop over all window sizes
 
         insumw = (UInt_t)hped_vec[t].size();
@@ -297,9 +303,9 @@ bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculat
             if( i < iP->v_ped[tel][ts].size() && iP->v_ped[tel][ts][i].size() > 0 )
             {
                 unsigned int iSW_mean = iP->v_ped[tel][ts][i].size()-1;
-                if( iSW_mean > (unsigned int)getRunParameter()->fsumwindow_1[getTeltoAna()[tel]] && getRunParameter()->fsumwindow_1[getTeltoAna()[tel]] > 0 )
+                if( iSW_mean > (unsigned int)getRunParameter()->fCalibrationSumWindow && getRunParameter()->fCalibrationSumWindow > 0 )
 		{
-		   iSW_mean = getRunParameter()->fsumwindow_1[getTeltoAna()[tel]] - 1;
+		   iSW_mean = getRunParameter()->fCalibrationSumWindow - 1;
                 }
                 TSnevents[ts] = (UInt_t)iP->v_pedEntries[tel][ts][i][iSW_mean];
                 TSpedmean[ts] = iP->v_ped[tel][ts][i][iSW_mean];
@@ -338,6 +344,8 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
             exit( -1 );
         }
         cout << "opened gain file: " << opfgain->GetName() << endl;
+	cout << "calculate gains and toffsets with summation window " << fRunPar->fCalibrationSumWindow;
+	cout << " (start at " << fRunPar->fCalibrationSumFirst << ")" << endl;
 
 // create histograms
         for( unsigned int i = 0; i < getNChannels(); i++ )
@@ -390,9 +398,9 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 
     fillHiLo();
 
-//! using full FADC window for gain calculation
-    calcSums( fRunPar->fsumfirst[fTelID],fRunPar->fsumfirst[fTelID]+fRunPar->fsumwindow_1[fTelID]+5, false);
-    calcTZeros( fRunPar->fsumfirst[fTelID],fRunPar->fsumfirst[fTelID]+fRunPar->fsumwindow_1[fTelID]+5);
+//! calculate sums and tzeros
+    calcSums(   fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst+fRunPar->fCalibrationSumWindow, false );
+    calcTZeros( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst+fRunPar->fCalibrationSumWindow );
 
     if( fRunPar->fL2TimeCorrect ) FADCStopCorrect();
 

@@ -61,7 +61,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fcamera.push_back( "veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg" );
     fCalibrationDataType = 1;  // should be 0 for e.g. CTA DSTs
     fcalibrationfile = "";
-    fLowGainCalibrationFile = "";
+    fLowGainCalibrationFile = "calibrationlist.LowGain.dat";
     fcalibrationrun = false;
     fLaserSumMin = 50000.;
     fGainFileNumber.push_back( 0 );
@@ -147,8 +147,8 @@ VEvndispRunParameter::VEvndispRunParameter()
     fUsePedestalsInTimeSlices = true;
     fPedestalsInTimeSlices = true;
     fPedestalsLengthOfTimeSlice = 180.;            //!< [s]
-    fPedestalsInTimeSlicesSumWindow = 4;
-    fPedestalsInTimeSlicesSumFirst = 0;
+    fCalibrationSumWindow = 20;
+    fCalibrationSumFirst = 0;
     fL2TimeCorrect = true;
     fsetSpecialChannels = "EVNDISP.specialchannels.dat";
     ftracefit = -1.;

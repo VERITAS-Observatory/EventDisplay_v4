@@ -78,15 +78,15 @@ class VImageParameterCalculation : public TObject
         {
             return fll_Pedvars;
         }
-        vector<double>& getSums()                 //!< return data vector for minuit function
+        vector<double>& getLLSums()                 //!< return data vector for minuit function
         {
             return fll_Sums;
         }
-        vector<double>& getX()                    //!< return data vector for minuit function
+        vector<double>& getLLX()                    //!< return data vector for minuit function
         {
             return fll_X;
         }
-        vector<double>& getY()                    //!< return data vector for minuit function
+        vector<double>& getLLY()                    //!< return data vector for minuit function
         {
             return fll_Y;
         }

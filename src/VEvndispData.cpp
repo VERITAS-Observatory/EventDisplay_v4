@@ -272,7 +272,10 @@ bool VEvndispData::get_reconstruction_parameters( string ifile )
         {
             return false;
         }
-        fEvndispReconstructionParameter->print_arrayAnalysisCuts();
+	if( fRunPar->frunmode != 1 && fRunPar->frunmode != 2 && fRunPar->frunmode != 5 && fRunPar->frunmode != 6 )
+	{
+	   fEvndispReconstructionParameter->print_arrayAnalysisCuts();
+        }
         if( fShowerParameters ) fShowerParameters->setNArrayReconstructionMethods( iNMethods );
     }
     else return false;
@@ -644,6 +647,17 @@ unsigned int VEvndispData::getLargestSumWindow()
    if( getSumWindow() > iSW )       iSW = getSumWindow();
    if( getSumWindow_2() > iSW )     iSW = getSumWindow_2();
    if( getSumWindow_Pass1() > iSW ) iSW = getSumWindow_Pass1();
+
+   return iSW;
+}
+
+unsigned int VEvndispData::getLargestSumWindow( unsigned int iTelID )
+{
+   unsigned int iSW = 0;
+
+   if( getSumWindow() > iSW )       iSW = getSumWindow( iTelID );
+   if( getSumWindow_2() > iSW )     iSW = getSumWindow_2( iTelID );
+   if( getSumWindow_Pass1() > iSW ) iSW = getSumWindow_Pass1( iTelID );
 
    return iSW;
 }

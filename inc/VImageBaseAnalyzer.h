@@ -19,7 +19,7 @@ class VImageBaseAnalyzer : public VEvndispData
         bool fRaw;
 
         void calcSecondTZerosSums();
-        void calcSums(int ,int, bool);
+        void calcSums( int iFirst ,int iLast, bool iMakingPeds, bool iLowGainOnly = false );
         void calcTZeros(int ,int);
         void calcTZerosSums(int, int, unsigned int );
 	unsigned int getDynamicSummationWindow( unsigned int chanID );

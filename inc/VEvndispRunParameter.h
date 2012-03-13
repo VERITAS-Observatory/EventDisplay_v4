@@ -117,8 +117,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool   fLowGainUsePedestalsInTimeSlices;  // use pedestals in time slices for image calculation (low gain)
         bool   fPedestalsInTimeSlices;            // calculate pedestal variations for tracking tests
         double fPedestalsLengthOfTimeSlice;       // length of a time slice for pedestal calculations (tracking test)
-        int    fPedestalsInTimeSlicesSumWindow;   // sumwindow for pedestal calculation (tracking test)
-        int    fPedestalsInTimeSlicesSumFirst;    // starting point for pedestal calculation (tracking test)
+        int    fCalibrationSumWindow;             // sumwindow for all calibration calculation
+        int    fCalibrationSumFirst;              // starting point all calibration calculation
         string fsetSpecialChannels;               // set channels with L2 channels to correct for FADC crate time offsets (file name of channel settings)
         bool   fL2TimeCorrect;                    // use L2 pulses to correct FADC times (default: on )
 	unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
