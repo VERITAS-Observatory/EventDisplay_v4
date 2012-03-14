@@ -11,6 +11,8 @@ VMCParameters::VMCParameters( bool iDebug )
 {
     fDebug = iDebug;
 
+    fTree = 0;
+
     reset();
 }
 
