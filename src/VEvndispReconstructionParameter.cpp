@@ -173,11 +173,18 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 // cut on successfull reconstruction on the edge of the FOV
    if( fRunPara )
    {
-      if( iTel < fRunPara->fLogLikelihoodLoss_min.size() && iTel < fRunPara->fLogLikelihood_Ntubes_min.size() )
+      if( iTel < fRunPara->fLogLikelihoodLoss_min.size() )
       {
-         if( iImageParameter->ntubes <= fRunPara->fLogLikelihood_Ntubes_min[iTel] ) iArrayCut = false;
-
          if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 ) iArrayCut = false;
+// check number of events at the edge of the FOV
+         if( iTel < fRunPara->fLogLikelihoodLoss_min.size() && iTel < fRunPara->fLogLikelihood_Ntubes_min.size() )
+	 {
+	    if(    iImageParameter->loss   >  fRunPara->fLogLikelihoodLoss_min[iTel] 
+		&& iImageParameter->ntubes <= fRunPara->fLogLikelihood_Ntubes_min[iTel] )
+		{
+		   iArrayCut = false;
+                }
+         }
       }
    }
 
