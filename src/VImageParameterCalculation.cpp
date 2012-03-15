@@ -1049,10 +1049,10 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
 // will be true if sum in pixel is estimated by fit
     fLLEst.assign( iData->getSums().size(), false );
 // maximum size of the camera (for fit parameter limits)
-    double fdistXmin = 0.;
-    double fdistXmax = 0.;
-    double fdistYmin = 0.;
-    double fdistYmax = 0.;
+    double fdistXmin =  1.e99;
+    double fdistXmax = -1.e99;
+    double fdistYmin =  1.e99;
+    double fdistYmax = -1.e99;
     for( unsigned int j = 0; j < iData->getSums().size(); j++ )
     {
 // ignore dead channels
@@ -1074,7 +1074,11 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
 	    fll_Sums.push_back( iData->getSums()[j] );
         }
     }
-    if( fLLDebug ) cout << "FLL FITTER limits " << fdistXmax << "\t" << fdistXmin << "\t" << fdistYmax << "\t" << fdistYmin << "\t" << fll_Sums.size() << endl;
+    if( fLLDebug )
+    {
+       cout << "FLL FITTER limits:  xmax: " << fdistXmax << "  xmin: " << fdistXmin;
+       cout << " ymax: " << fdistYmax << " ymin: " << fdistYmin << " #: " << fll_Sums.size() << endl;
+    }  
 
 // take geometrical values as start values (calculate if not already calculated)
     if( !fboolCalcGeo ) calcParameters( iData->getSums(), iData->getSums2(), iData->getImage(), iData->getBorder() );
@@ -1112,11 +1116,33 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     fLLFitter->Release( 3 );
     fLLFitter->DefineParameter( 0, "rho", rho, step, 0., 0. );
     if( fParGeo->sigmaX > 0. ) fLLFitter->DefineParameter( 1, "meanX", cen_x, step, cen_x - 2.*fParGeo->sigmaX, cen_x + 2.*fParGeo->sigmaX );
-    else                       fLLFitter->DefineParameter( 1, "meanX", cen_x, step, fdistXmin, fdistXmax );
-    fLLFitter->DefineParameter( 2, "sigmaX", sigmaX, step, 0., fdistXmax * 2. + 0.1 );
+    else                       
+    {
+        if( iData->getDetectorGeometry() &&  iData->getTelID() < iData->getDetectorGeometry()->getFieldofView().size() )
+	{
+	   fLLFitter->DefineParameter( 1, "meanX", cen_x, step, fdistXmin, 
+	                               fdistXmax+iData->getDetectorGeometry()->getFieldofView()[iData->getTelID()] );
+        }
+	else
+	{
+	   fLLFitter->DefineParameter( 1, "meanX", cen_x, step, fdistXmin, fdistXmax+10. );
+	}
+    }
+    fLLFitter->DefineParameter( 2, "sigmaX", sigmaX, step, 0., 2.*fParGeo->sigmaX + 1. );
     if( fParGeo->sigmaY > 0. ) fLLFitter->DefineParameter( 3, "meanY", cen_y, step, cen_y - 2.*fParGeo->sigmaY, cen_y + 2.*fParGeo->sigmaY );
-    else              fLLFitter->DefineParameter( 3, "meanY", cen_y, step, fdistYmin, fdistYmax );
-    fLLFitter->DefineParameter( 4, "sigmaY", sigmaY, step, 0., fdistYmax * 2. + 0.1 );
+    else
+    {
+        if( iData->getDetectorGeometry() &&  iData->getTelID() < iData->getDetectorGeometry()->getFieldofView().size() )
+	{
+	   fLLFitter->DefineParameter( 1, "meanY", cen_y, step, fdistYmin, 
+	                               fdistYmax+iData->getDetectorGeometry()->getFieldofView()[iData->getTelID()] );
+        }
+	else
+	{
+	   fLLFitter->DefineParameter( 1, "meanY", cen_y, step, fdistYmin, fdistYmax+10. );
+	}
+    }
+    fLLFitter->DefineParameter( 4, "sigmaY", sigmaY, step, 0., 2.*fParGeo->sigmaY + 1. );
     fLLFitter->DefineParameter( 5, "signal", signal, step, 0., 1.e6 );
 
     if( fLLDebug ) cout << "FLLFITTER START " << rho << "\t" << cen_x << "\t" << sigmaX << "\t" << cen_y << "\t" << sigmaY << "\t" << signal << endl;
