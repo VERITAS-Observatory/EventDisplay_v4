@@ -808,12 +808,14 @@ void VGammaHadronCuts::printCutSummary()
     if( fNTel == 2 ) cout << ", size > " << fArraySize_min;
     cout << endl;
     cout << "Fiducial area (camera) < " << fArrayxyoff_max << " deg, ";
+    cout << " stereo reconstruction: " << fArrayChi2_min << " <= sChi2 <= " << fArrayChi2_max << endl;
+    cout << "Energy reconstrution: ";
     cout << fArrayEChi2_min << " <= EChi2 <= " << fArrayEChi2_max;
     cout << ", " << fArraydE_min << " < dE < " << fArraydE_max;
     cout << ", " << fArrayErec_min << " < Erec < " << fArrayErec_max;
     cout << ", " << fArrayEmmission_min << " < Emission height < " << fArrayEmmission_max;
     cout << endl;
-    cout << "Fiducial area (core): [" << fCoreX_min - fCoreEdge << "," << fCoreX_max + fCoreEdge;
+    cout << "Fiducial area (shower core): [" << fCoreX_min - fCoreEdge << "," << fCoreX_max + fCoreEdge;
     cout << "," << fCoreY_min - fCoreEdge << "," << fCoreY_max + fCoreEdge << "] m";
     cout << ", " << fArrayNImages_min << " <= Ntel <= " << fArrayNImages_max;
     cout << endl;

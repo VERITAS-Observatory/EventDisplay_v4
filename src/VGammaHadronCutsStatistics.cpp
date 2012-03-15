@@ -21,22 +21,22 @@ VGammaHadronCutsStatistics::VGammaHadronCutsStatistics()
 
 void VGammaHadronCutsStatistics::initialize()
 {
-   fCutName.push_back( "Tot          " );
-   fCutName.push_back( "MC_XYoff     " );
-   fCutName.push_back( "XYoff        " );
-   fCutName.push_back( "StereoQuality" );
-   fCutName.push_back( "ArrayChi2    " );
-   fCutName.push_back( "NImages      " );
-   fCutName.push_back( "MSC_Quality  " );
-   fCutName.push_back( "Erec         " );
-   fCutName.push_back( "CorePos      " );
-   fCutName.push_back( "LTrig        " );
-   fCutName.push_back( "SizeSecondMax" );
-   fCutName.push_back( "TelType      " );
-   fCutName.push_back( "Direction    " );
-   fCutName.push_back( "IsGamma      " );
-   fCutName.push_back( "EnergyRec    " );
-   fCutName.push_back( "Error        " );
+   fCutName.push_back( "Tot               " );
+   fCutName.push_back( "MC_XYoff          " );
+   fCutName.push_back( "XYoff             " );
+   fCutName.push_back( "StereoQuality     " );
+   fCutName.push_back( "  QC ArrayChi2    " );
+   fCutName.push_back( "  QC NImages      " );
+   fCutName.push_back( "  QC MSC_Quality  " );
+   fCutName.push_back( "  QC Erec         " );
+   fCutName.push_back( "  QC CorePos      " );
+   fCutName.push_back( "  QC LTrig        " );
+   fCutName.push_back( "SizeSecondMax     " );
+   fCutName.push_back( "TelType           " );
+   fCutName.push_back( "Direction         " );
+   fCutName.push_back( "IsGamma           " );
+   fCutName.push_back( "EnergyRec         " );
+   fCutName.push_back( "Error             " );
 
    fData = new TTree( "GammaHadronCutsStats", "cut statistics for gamma/hadron cuts" );
    fData->Branch( "cut", &fCut_bitset_ulong, "cut/l" );
