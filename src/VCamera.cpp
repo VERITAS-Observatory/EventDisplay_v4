@@ -451,7 +451,7 @@ void VCamera::setPMTColorForChargeTiming()
 
 // all colors > 10 are greyish/brown. Start at 1 again
     int iTelescopeColor = (fTelescope%10)+1;
-    if( iTelescopeColor == 0 ) iTelescopeColor += 1;
+    if( iTelescopeColor%10 == 0 ) iTelescopeColor += 1;
 
 // loop over all pmts and set tube radii and colors
     for( unsigned int i = 0; i < fPMTData.size(); i++ )
