@@ -487,10 +487,10 @@ bool VSpectralEnergyDistribution::readDataFile( string name, string ifile, doubl
         {
             cout << "\t";
             cout << setprecision( 8 ) << i_photonFlux[i].MJD_min << " " << i_photonFlux[i].MJD_max;
-            cout << setprecision( 6 ) << " " << i_photonFlux[i].energy_Hz[0] << " " << i_photonFlux[i].energy_eV[0] << " ";
-            cout << i_photonFlux[i].flux_ergscms[0] << " ";
-            cout << i_photonFlux[i].flux_error_up_ergscms[0] << " ";
-            cout << i_photonFlux[i].flux_error_down_ergscms[0] << " ";
+            cout << setprecision( 6 ) << " " << i_photonFlux[i].energy_Hz[i] << " " << i_photonFlux[i].energy_eV[i] << " ";
+            cout << i_photonFlux[i].flux_ergscms[i] << " ";
+            cout << i_photonFlux[i].flux_error_up_ergscms[i] << " ";
+            cout << i_photonFlux[i].flux_error_down_ergscms[i] << " ";
             cout << endl;
         }
         cout << endl;
@@ -634,10 +634,10 @@ bool VSpectralEnergyDistribution::readXMMData( string name, string ifile, double
         {
             cout << "\t";
             cout << setprecision( 8 ) << i_photonFlux[i].MJD_min << " " << i_photonFlux[i].MJD_max;
-            cout << setprecision( 6 ) << " " << i_photonFlux[i].energy_Hz[0] << " " << i_photonFlux[i].energy_eV[0] << " ";
-            cout << i_photonFlux[i].flux_ergscms[0] << " ";
-            cout << i_photonFlux[i].flux_error_up_ergscms[0] << " ";
-            cout << i_photonFlux[i].flux_error_down_ergscms[0] << " ";
+            cout << setprecision( 6 ) << " " << i_photonFlux[i].energy_Hz[i] << " " << i_photonFlux[i].energy_eV[i] << " ";
+            cout << i_photonFlux[i].flux_ergscms[i] << " ";
+            cout << i_photonFlux[i].flux_error_up_ergscms[i] << " ";
+            cout << i_photonFlux[i].flux_error_down_ergscms[i] << " ";
             cout << endl;
         }
         cout << endl;
@@ -781,10 +781,10 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
         {
             cout << "\t";
             cout << setprecision(8) << i_photonFlux[i].MJD_min;
-            cout << setprecision(6) << " " << i_photonFlux[i].energy_Hz[0] << " " << i_photonFlux[i].energy_eV[0] << " ";
-            cout << i_photonFlux[i].flux_ergscms[0] << " ";
-            cout << i_photonFlux[i].flux_error_up_ergscms[0] << " ";
-            cout << i_photonFlux[i].flux_error_down_ergscms[0] << " ";
+            cout << setprecision(6) << " " << i_photonFlux[i].energy_Hz[i] << " " << i_photonFlux[i].energy_eV[i] << " ";
+            cout << i_photonFlux[i].flux_ergscms[i] << " ";
+            cout << i_photonFlux[i].flux_error_up_ergscms[i] << " ";
+            cout << i_photonFlux[i].flux_error_down_ergscms[i] << " ";
             cout << endl;
         }
         cout << endl;
@@ -1155,18 +1155,13 @@ void VSpectralEnergyDistribution::printASCII()
             if( fSpectralFlux[i][j].MJD_min < fMJDMin && fSpectralFlux[i][j].MJD_max < fMJDMin ) continue;
             if( fSpectralFlux[i][j].MJD_min > fMJDMax && fSpectralFlux[i][j].MJD_max > fMJDMax ) continue;
 
-// loop over all data points
-            for( unsigned int k = 0; k < fSpectralFlux[i][j].energy_Hz.size(); k++ )
-            {
-                iFlux.insert( make_pair( fSpectralFlux[i][j].energy_Hz[k], fSpectralFlux[i][j].flux_ergscms[k] ) );
+	    iFlux.insert( make_pair( fSpectralFlux[i][j].energy_Hz[j], fSpectralFlux[i][j].flux_ergscms[j] ) );
 
-                if( fSpectralFlux[i][j].flux_error_up_ergscms[k] < 1.e-19 ) iFlux_U.insert( make_pair( fSpectralFlux[i][j].energy_Hz[k], 0. ) );
-                else iFlux_U.insert( make_pair( fSpectralFlux[i][j].energy_Hz[k], fSpectralFlux[i][j].flux_error_up_ergscms[k] ));
-
-                if( fSpectralFlux[i][j].flux_error_down_ergscms[k] < 1.e-19 ) iFlux_D.insert( make_pair( fSpectralFlux[i][j].energy_Hz[k], 0. ) );
-                else iFlux_D.insert( make_pair( fSpectralFlux[i][j].energy_Hz[k], fSpectralFlux[i][j].flux_error_down_ergscms[k] ) );
-
-            }
+	    if( fSpectralFlux[i][j].flux_error_up_ergscms[j] < 1.e-19 )	iFlux_U.insert( make_pair( fSpectralFlux[i][j].energy_Hz[j], 0. ) );
+	    else iFlux_U.insert( make_pair( fSpectralFlux[i][j].energy_Hz[j], fSpectralFlux[i][j].flux_error_up_ergscms[j] ));
+	    
+	    if( fSpectralFlux[i][j].flux_error_down_ergscms[j] < 1.e-19 ) iFlux_D.insert( make_pair( fSpectralFlux[i][j].energy_Hz[j], 0. ) );
+	    else iFlux_D.insert( make_pair( fSpectralFlux[i][j].energy_Hz[j], fSpectralFlux[i][j].flux_error_down_ergscms[j] ) );
         }
     }
 
