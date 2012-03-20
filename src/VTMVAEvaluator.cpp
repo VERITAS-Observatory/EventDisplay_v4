@@ -128,6 +128,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    fBoxCutValue_Name.clear();
    fEnergyCut_Log10TeV_min.clear();
    fEnergyCut_Log10TeV_max.clear();
+   vector< unsigned int > iFileNumber;
 
 // number of energy bins
    unsigned int iNbin = iWeightFileIndex_max - iWeightFileIndex_min + 1;
@@ -156,22 +157,23 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	  else if( i == iWeightFileIndex_max )
 	  {
 	      cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName.str() << endl;
-	      cout << "  assume this is a high-energy empty bin (bin number " << i << ";";
+	      cout << "  assume this is a high-energy empty bin (bin number " << i << ")" << endl;
 	      iNbin--;
 	      iWeightFileIndex_max--;
 	      continue;
           }
           else
 	  {
-	     cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing energies from TMVA root file " << iFullFileName.str() << endl;
-	     fIsZombie = true;
-	     return false;
+	     cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while initializing energies from TMVA root file " << iFullFileName.str() << endl;
+	     cout << "(this might be not a problem if the sensitive energy range of the given array is relatively small)" << endl;
+	     continue;
           }
        }
+       iFileNumber.push_back( i );
        VTMVARunDataEnergyCut *iEnergyData = (VTMVARunDataEnergyCut*)iF.Get( "fDataEnergyCut" );
        if( !iEnergyData )
        {
-	  cout << "VTMVAEvaluator::initializeWeightFiles: error while reading energies from TMVA root file " << iFullFileName.str() << endl;
+	  cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while reading energies from TMVA root file " << iFullFileName.str() << endl;
 	  fIsZombie = true;
 	  return false;
        }
@@ -182,6 +184,12 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
        fTMVAMethodTag.push_back( hname );
        iF.Close();
    }
+   if( iFileNumber.size() == 0 )
+   {
+      fIsZombie = true;
+      return false;
+   }
+
    cout << "VTMVAEvaluator: energy binning: " << endl;
    for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
    {
@@ -194,8 +202,10 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // create and initialize TMVA readers
 // loop over all  energy bins: open one weight (XML) file per energy bin
    unsigned int z = 0;
-   for( unsigned int i = iMinMissingBin; i < iNbin; i++ )
+   for( unsigned int b = 0; b < iFileNumber.size(); b++ )
    {
+      unsigned int i = iFileNumber[b];
+
       fTMVAReader.push_back( new TMVA::Reader() );
 
 // make sure that signal efficiency is set correctly
@@ -416,6 +426,8 @@ double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEffici
         cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency() error finding signal efficiency from " << iFullFileName.str() << endl;
 	return -99.;
     }
+    cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency: evaluating " << iTMVAFile.GetName() << endl;
+    cout << "\t method: " << hname << endl;
 
     double iT = effS->GetBinCenter( effS->FindLastBinAbove( iSignalEfficiency ) );
 
@@ -908,7 +920,7 @@ void VTMVAEvaluator::printSignalEfficiency()
    {
       if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() )
       {
-         cout << "E [" << fEnergyCut_Log10TeV_min[i] << "," << fEnergyCut_Log10TeV_max[i] << "] TeV :\t ";
+         cout << "E [" << showpoint << setprecision( 3 ) << fEnergyCut_Log10TeV_min[i] << "," << fEnergyCut_Log10TeV_max[i] << "] TeV :\t ";
       }
       cout << fSignalEfficiency[i];
       if( i < fBackgroundEfficiency.size() && fBackgroundEfficiency[i] > 0. )
@@ -917,11 +929,11 @@ void VTMVAEvaluator::printSignalEfficiency()
       }
       if( i < fTMVACutValue.size() )
       {
-         cout << "\t MVACut: " << fTMVACutValue[i] << endl;
+         cout << "\t MVACut: " << fTMVACutValue[i];
       }
       cout << endl;
    }
-   cout << endl;
+   cout << noshowpoint << endl;
 }
 
 /*
