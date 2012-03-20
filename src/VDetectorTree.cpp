@@ -57,6 +57,8 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
     float fXTubeDeg[fMaxPixel];
     float fYTubeDeg[fMaxPixel];
     float fRTubeDeg[fMaxPixel];
+    float fMirrorArea = 0.;
+    int   fNMirrors = 0;
 
     if( fTreeDet == 0 )
     {
@@ -69,6 +71,8 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
         fTreeDet->Branch( "TelX", &fTelxpos, "TelX/F" );
         fTreeDet->Branch( "TelY", &fTelypos, "TelY/F" );
         fTreeDet->Branch( "TelZ", &fTelzpos, "TelZ/F" );
+	fTreeDet->Branch( "NMirrors", &fNMirrors, "NMirrors/I" );
+	fTreeDet->Branch( "MirrorArea", &fMirrorArea, "MirrorArea/F" );
 	fTreeDet->Branch( "FOV", &fFOV, "FOV/F" );
         fTreeDet->Branch( "FocalLength", &fFocalLength, "FocalLength/F" );
         fTreeDet->Branch( "CameraScaleFactor", &fCameraScaleFactor, "CameraScaleFactor/F" );
@@ -109,6 +113,10 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
             fTelzpos = iDet->getTelZpos()[i];
             fFocalLength = iDet->getFocalLength()[i];
 	    fFOV = iDet->getFieldofView()[i];
+	    if( i < iDet->getNMirrors().size() )   fMirrorArea = (int)iDet->getNMirrors()[i];
+	    else                                   fMirrorArea = 0;
+	    if( i < iDet->getMirrorArea().size() ) fNMirrors = (int)iDet->getMirrorArea()[i];
+	    else                                   fNMirrors = 0;
             fCameraScaleFactor = iDet->getCameraScaleFactor()[i];
             fCameraCentreOffset = iDet->getCameraCentreOffset()[i];
             fCameraRotation = iDet->getCameraRotation()[i];
@@ -168,7 +176,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
     ULong64_t fTelType = 1;
     int fTelID;
     int fNMirrors = 0;
-    float fMirrorArea;
+    float fMirrorArea = 0.;
 
     iTree->SetBranchAddress( "NTel", &fNTel );
     iTree->SetBranchAddress( "TelID", &fTelID );

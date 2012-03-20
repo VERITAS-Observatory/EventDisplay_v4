@@ -25,16 +25,25 @@ class Ctelconfig
 
 // Declaration of leaf types
         UInt_t          NTel;
+        Int_t           TelID;
         ULong64_t       TelType;
+        UInt_t          TelID_hyperArray;
         Float_t         TelX;
         Float_t         TelY;
         Float_t         TelZ;
+        Int_t           NMirrors;
+        Float_t         MirrorArea;
+        Float_t         FOV;
         Float_t         FocalLength;
         Float_t         CameraScaleFactor;
         Float_t         CameraCentreOffset;
         Float_t         CameraRotation;
         UInt_t          NPixel;
         UInt_t          NSamples;
+	UInt_t          NGains;
+	Float_t         HiLoScale;
+	Int_t           HiLoThreshold;
+	Float_t         HiLoOffset;
         Float_t         XTubeMM[VDST_MAXCHANNELS];//[NPixel]
         Float_t         YTubeMM[VDST_MAXCHANNELS];//[NPixel]
         Float_t         RTubeMM[VDST_MAXCHANNELS];//[NPixel]
@@ -47,16 +56,25 @@ class Ctelconfig
 
 // List of branches
         TBranch        *b_NTel;                   //!
+	TBranch        *b_TelID;                  //! 
         TBranch        *b_TelType;                //!
+	TBranch        *b_TelID_hyperArray;       //!
         TBranch        *b_TelX;                   //!
         TBranch        *b_TelY;                   //!
         TBranch        *b_TelZ;                   //!
+	TBranch        *b_NMirrors;   //!
+	TBranch        *b_MirrorArea;   //! 
+	TBranch        *b_FOV;   //! 
         TBranch        *b_FocalLength;            //!
         TBranch        *b_CameraScaleFactor;      //!
         TBranch        *b_CameraCentreOffset;     //!
         TBranch        *b_CameraRotation;         //!
         TBranch        *b_NPixel;                 //!
         TBranch        *b_NSamples;               //!
+	TBranch        *b_NGains;   //! 
+	TBranch        *b_HiLoScale;   //!
+	TBranch        *b_HiLoThreshold;   //!
+	TBranch        *b_HiLoOffset;   //! 
         TBranch        *b_XTubeMM;                //!
         TBranch        *b_YTubeMM;                //!
         TBranch        *b_RTubeMM;                //!
@@ -145,17 +163,35 @@ void Ctelconfig::Init(TTree *tree)
 
     NTel = 0;
     fChain->SetBranchAddress("NTel", &NTel, &b_NTel);
-    if( tree->GetBranchStatus( "TelType" ) ) fChain->SetBranchAddress("TelType", &TelType, &b_TelType);
+    if( fChain->GetBranchStatus( "TelID" ) )  fChain->SetBranchAddress("TelID", &TelID, &b_TelID);
+    else                                    TelID = 0;
+    if( fChain->GetBranchStatus( "TelType" ) ) fChain->SetBranchAddress("TelType", &TelType, &b_TelType);
     else                                     TelType = 1;
+    if( fChain->GetBranchStatus( "TelID_hyperArray" ) ) fChain->SetBranchAddress("TelID_hyperArray", &TelID_hyperArray, &b_TelID_hyperArray);
+    else                                     TelID_hyperArray = 0;
     fChain->SetBranchAddress("TelX", &TelX, &b_TelX);
     fChain->SetBranchAddress("TelY", &TelY, &b_TelY);
     fChain->SetBranchAddress("TelZ", &TelZ, &b_TelZ);
+    if( fChain->GetBranchStatus( "NMirrors" ) ) fChain->SetBranchAddress("NMirrors", &NMirrors, &b_NMirrors);
+    else                                       NMirrors = 0;
+    if( fChain->GetBranchStatus( "MirrorArea" ) ) fChain->SetBranchAddress("MirrorArea", &MirrorArea, &b_MirrorArea);
+    else MirrorArea = 0;                   
+    if( fChain->GetBranchStatus( "FOV" ) ) fChain->SetBranchAddress("FOV", &FOV, &b_FOV);
+    else FOV = 0;
     fChain->SetBranchAddress("FocalLength", &FocalLength, &b_FocalLength);
     fChain->SetBranchAddress("CameraScaleFactor", &CameraScaleFactor, &b_CameraScaleFactor);
     fChain->SetBranchAddress("CameraCentreOffset", &CameraCentreOffset, &b_CameraCentreOffset);
     fChain->SetBranchAddress("CameraRotation", &CameraRotation, &b_CameraRotation);
     fChain->SetBranchAddress("NPixel", &NPixel, &b_NPixel);
     fChain->SetBranchAddress("NSamples", &NSamples, &b_NSamples);
+    if( fChain->GetBranchStatus( "NGains" ) ) fChain->SetBranchAddress("NGains", &NGains, &b_NGains);
+    else NGains = 0;
+    if( fChain->GetBranchStatus( "HiLoScale" ) ) fChain->SetBranchAddress("HiLoScale", &HiLoScale, &b_HiLoScale);
+    else HiLoScale = 0.;
+    if( fChain->GetBranchStatus( "HiLoThreshold" ) ) fChain->SetBranchAddress("HiLoThreshold", &HiLoThreshold, &b_HiLoThreshold);
+    else HiLoThreshold = 0;
+    if( fChain->GetBranchStatus( "HiLoOffset" ) ) fChain->SetBranchAddress("HiLoOffset", &HiLoOffset, &b_HiLoOffset);
+    else HiLoOffset = 0.;
     fChain->SetBranchAddress("XTubeMM", XTubeMM, &b_XTubeMM);
     fChain->SetBranchAddress("YTubeMM", YTubeMM, &b_YTubeMM);
     fChain->SetBranchAddress("RTubeMM", RTubeMM, &b_RTubeMM);
