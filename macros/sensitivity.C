@@ -564,8 +564,12 @@ void writeAllParticleNumberFiles( char *iSubArrayFile = 0,
 {
    vector< string > SubArray;
    ifstream is;
-   is.open( iSubArrayFile, ifstream::in );
-   if( !is ) return;
+   is.open( gSystem->ExpandPathName( iSubArrayFile ), ifstream::in );
+   if( !is )
+   {
+      cout << "error opening subarray file " << iSubArrayFile << endl;
+      return;
+   }
 
    string is_line;
    while( getline( is, is_line ) ) 
