@@ -5,19 +5,17 @@
 #
 
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$4" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$4" ] && [ ! -n "$4" ]
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cut file directory> <cutfile template> <output directory> <data set> [filling mode]"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <output directory> <data set> [filling mode]"
    echo
    echo "<subarray list>"
    echo "     text file with list of subarray IDs"
    echo
-   echo "<cut file directory>"
-   echo "     direction where cut files are located"  
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file"
-   echo "     (suffix must be .gamma_onSource/.gamma_cone10/.CRbck ; this will be added by this script)"
+   echo "     (suffix must be .gamma/.CRbck ; this will be added by this script)"
    echo 
    echo "<output directory>"
    echo "     directory name for output effective areas files"
@@ -33,14 +31,14 @@ fi
 
 SUBAR=$1
 RECID=0
-CDIR=$2
-CFIL=$3
-ODIR=$4
+CDIR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/"
+CFIL=$2
+ODIR=$3
 GMOD=0
-DSET=$5
-if [ -n "$6" ]
+DSET=$4
+if [ -n "$5" ]
 then
-  GMOD=$6
+  GMOD=$5
 fi
 mkdir -p $ODIR
 
@@ -50,12 +48,19 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
 # particle types
 if [ $GMOD = "0" ]
 then
-#   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
-   VPART=( "gamma_onSource" "electron" "proton" )
+   if [ $DSET = "cta-ultra3" ]
+   then
+      VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   else
+      VPART=( "gamma_onSource" "electron" "proton" )
+   fi
 else
-   VPART=( "gamma_onSource" "gamma_cone10" )
-#   VPART=( "gamma_onSourceDISP" )
+   if [ $DSET = "cta-ultra3" ]
+   then
+      VPART=( "gamma_onSource" "gamma_cone10" )
+   else
+      VPART=( "gamma_onSource" )
+   fi
 fi
 NPART=${#VPART[@]}
 
@@ -74,17 +79,9 @@ do
       echo "MC PARTICLE $PART"
 
       CCUT=$ODIR/$CFIL.$PART.$ARRAY.dat
-      if [ $PART = "gamma_onSource" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then
-        cp $CDIR/$CFIL.gamma_onSource.dat $CCUT
-      fi
-      if [ $PART = "gamma_onSourceDISP" ]
-      then
-        cp $CDIR/$CFIL.gamma_onSourceDISP.dat $CCUT
-      fi
-      if [ $PART = "gamma_cone10" ]
-      then
-        cp $CDIR/$CFIL.gamma_cone10.dat $CCUT
+        cp $CDIR/$CFIL.gamma.dat $CCUT
       fi
       if [ $PART = "proton" ] || [ $PART = "electron" ] || [ $PART = "helium" ] 
       then

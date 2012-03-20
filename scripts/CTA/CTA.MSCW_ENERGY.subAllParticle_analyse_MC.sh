@@ -27,7 +27,12 @@ then
 fi
 
 #VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
-VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+if [ $4 = "cta-ultra3" ]
+then
+   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+else
+   VPART=( "gamma_onSource" "electron" "proton" )
+fi
 NPART=${#VPART[@]}
 
 ###########################################

@@ -32,9 +32,8 @@ then
 fi
 
 ############################################################################
-# FIXED PARAMETERS
+# RUN PARAMETERS
 ARRAYCUTS="EVNDISP.reconstruction.runparameter"
-# ARRAYCUTS="EVNDISP.reconstruction.TMVA.runparameter"
 ############################################################################
 
 ARRAY=$1
@@ -50,7 +49,6 @@ if [ -n "$6" ]
 then
   FLL="$6"
 fi
-MET="LL"
 DSET=$4
 
 # checking the path for binary
@@ -99,25 +97,15 @@ do
    rm -f $FNAM-3.sh
    sed -e "s|ARC|$ARRAYCUTS|" $FNAM-4.sh > $FNAM-5.sh
    rm -f $FNAM-4.sh
-   sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-6.sh
+   sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-7.sh
    rm -f $FNAM-5.sh
-   sed -e "s|MEEET|$MET|" $FNAM-6.sh > $FNAM-7.sh
-   rm -f $FNAM-6.sh
    sed -e "s|FLL|$FLL|" $FNAM-7.sh > $FNAM.sh
    rm -f $FNAM-7.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   NARRAY=`cat $ARRAY | wc -l`
-   if  [ $NARRAY -gt 1 ]
-   then
-      echo "long queue"
-      qsub -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
-   else
-      echo "short queue"
-      qsub -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
-   fi
+   qsub -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 
    echo "writing shell script to $FNAM.sh"
    echo "writing queue log and error files to $QLOG"

@@ -13,9 +13,6 @@ NA
 NB
 s4-2-120
 s4-2-85
-I-noLST
-I-noSST
-I-noMST
 g60
 g85
 g120
@@ -33,9 +30,14 @@ s4-3-200
 s4-4-140
 s4-4-150
 s4-5-125
+B-LST
+B-MST
 I-LST
 I-MST
 I-SST
+I-noLST
+I-noSST
+I-noMST
 E-LST
 E-MST
 E-SST

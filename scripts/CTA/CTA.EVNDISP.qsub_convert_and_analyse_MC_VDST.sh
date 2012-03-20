@@ -15,7 +15,6 @@ PART=PAAART
 SUBA="ARRAY"
 KEEP=KEEEEEEP
 ACUT=ARC
-MET=MEEET
 DSET=DATASET
 LOGF=FLL
 
@@ -25,17 +24,7 @@ FIELD=$SUBA
 OFIL=`basename $IFIL .gz`
 
 # eventdisplay optimization
-OPT="-useFixedThresholds -shorttree -l2setspecialchannels nofile"
-# GEO (standard reconstruction)
-if [ $MET == "GEO" ]
-then
-   OPT="$OPT"
-fi
-# LL
-if [ $MET == "LL" ]
-then
-   OPT="$OPT -loglminloss=0.00"
-fi
+OPT="-shorttree -l2setspecialchannels nofile"
 
 # cp simtelarray.gz file to TMPDIR
 echo "$IFIL"

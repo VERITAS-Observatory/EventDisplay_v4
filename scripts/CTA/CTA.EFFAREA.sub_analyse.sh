@@ -313,10 +313,22 @@ do
       else
 	 sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
       fi
+# angular resolution file
       rm -f $iCFIL-j
-      sed -e "s|OFFAXISBIN|$i|" $iCFIL-i > $iCFIL-j
+      if [ $PART = "gamma_onSource" ] 
+      then
+         ANGRESFILE="$CTA_USER_DATA_DIR/analysis/EffectiveArea/AnalysisData/$DSET/AngularResolution/gamma_onSource."$ARRAY"_ID0.eff-0.root"
+      else
+         ANGRESFILE="$CTA_USER_DATA_DIR/analysis/EffectiveArea/AnalysisData/$DSET/AngularResolution/gamma_cone10."$ARRAY"_ID0.eff-$i.root"
+      fi
+      sed -e "s|ANGRESFILE|$ANGRESFILE|" $iCFIL-i > $iCFIL-j
       rm -f $iCFIL-i
-      mv -f $iCFIL-j $iCFIL
+
+# off axis bin
+      rm -f $iCFIL-k
+      sed -e "s|OFFAXISBIN|$i|" $iCFIL-j > $iCFIL-k
+      rm -f $iCFIL-j
+      mv -f $iCFIL-k $iCFIL
       echo $iCFIL
 
 ###############################################################################
