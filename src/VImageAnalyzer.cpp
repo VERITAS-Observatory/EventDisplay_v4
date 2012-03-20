@@ -151,6 +151,16 @@ void VImageAnalyzer::doAnalysis()
 // image parameter calculation
     fVImageParameterCalculation->calcParameters( getSums(), getSums2(), getImage(), getBorder(), getBrightNonImage(), getHiLo(), getImageBorderNeighbour() );
     fVImageParameterCalculation->calcTimingParameters( getTZeros(), getTOffsetvars(), getSums(), getImage(), getBorder(),(VEvndispData*)this );
+///////////////////////////////////////////////////////////////////////////////////////////
+// do a log likelihood image fitting on events on the camera edge only
+    if( !fRunPar->fDoublePass || !fReader->hasFADCTrace() )
+    {
+        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
+        {
+            fVImageParameterCalculation->setParametersLogL( getImageParameters() );
+            setLLEst( fVImageParameterCalculation->calcLL( (VEvndispData*)this ) );
+        }
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // muon ring analysis

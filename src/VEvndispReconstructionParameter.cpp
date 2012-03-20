@@ -71,7 +71,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
        exit( -1 );
    }
 
-   if( fDebug ) cout << "APPLY ARRAY ANALYSIS CUTS FOR METHOD " << iMeth << " AND TELESCOPE TYPE " << iTelType << endl;
+   if( fDebug ) cout << "APPLY ARRAY ANALYSIS CUTS FOR METHOD " << iMeth << " AND TELESCOPE " << iTel+1 << ", TYPE " << iTelType << endl;
 
 // return value
    bool iArrayCut = true;
@@ -175,7 +175,15 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
    {
       if( iTel < fRunPara->fLogLikelihoodLoss_min.size() )
       {
-         if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 ) iArrayCut = false;
+         if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 && iImageParameter->Fitstat >=0 )
+	 {
+	    iArrayCut = false;
+	    if( fDebug )
+	    {
+	       cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: fit stat cut: ";
+	       cout << iImageParameter->Fitstat << endl;
+            }
+         }
 // check number of events at the edge of the FOV
          if( iTel < fRunPara->fLogLikelihoodLoss_min.size() && iTel < fRunPara->fLogLikelihood_Ntubes_min.size() )
 	 {
@@ -183,6 +191,12 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		&& iImageParameter->ntubes <= fRunPara->fLogLikelihood_Ntubes_min[iTel] )
 		{
 		   iArrayCut = false;
+		   if( fDebug )
+		   {
+		      cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: LL ntubes cut: ";
+		      cout << iImageParameter->ntubes;
+		      cout << " (" <<  fRunPara->fLogLikelihood_Ntubes_min[iTel] << ")" << endl;
+		   }
                 }
          }
       }

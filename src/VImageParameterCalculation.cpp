@@ -1058,7 +1058,8 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
 // ignore dead channels
         if( iData->getDead()[j] ) continue;
 // only image/border pixels are used in the fit
-        if( iData->getImage()[j] || iData->getBorder()[j])
+	if( j < iData->getImageBorderNeighbour().size() && iData->getImageBorderNeighbour()[j] )
+//        if( iData->getImage()[j] || iData->getBorder()[j])
         {
             double xi = getDetectorGeo()->getX()[j];
             double yi = getDetectorGeo()->getY()[j];
@@ -1071,7 +1072,8 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
             fll_X.push_back( xi );
             fll_Y.push_back( yi );
 
-	    fll_Sums.push_back( iData->getSums()[j] );
+	    if( iData->getImage()[j] || iData->getBorder()[j]) fll_Sums.push_back( iData->getSums()[j] );
+	    else                                               fll_Sums.push_back( 0. );
         }
     }
     if( fLLDebug )
@@ -1162,7 +1164,7 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     fLLFitter->mnstat( amin, edm, errdef, nvpar, nparx, nstat );
     fParLL->Fitstat = nstat;
 
-    if( fLLDebug ) cout << "FLLFITTER " << nstat << endl;
+    if( fLLDebug ) cout << "FLLFITTER STAT " << nstat << endl;
 
 // get fit results
     fLLFitter->GetParameter( 0, rho, drho );
