@@ -375,6 +375,7 @@ Options:
    -a subarray file (list of telescopes to read with FOV.)
    -o dst filename  (name of dst output file)
    -f on=1/off=0    (write FADC samples to DST file;default=0)
+   -r on=1/off=0    (apply camera place scaling for DC telescopes; default=1)
 \end{lstlisting}
 
 The following options are necessary: -a and -o.
@@ -425,7 +426,7 @@ $EVNDISPSYS/bin/evndisp -display=1 \
 
 \subsection{Step 1 \& 3 combined [USE]}
 
-Run the converter and Eventdisplay for a specific subarray: use script \$EVNDISPSYS/scripts/CTA/CTA.EVNDISP.sub\_convert\_and\_analyse\_MC\_VDST.sh
+T trun the converter and eventdisplay for a specific subarray use the script \$EVNDISPSYS/scripts/CTA/CTA.EVNDISP.sub\_convert\_and\_analyse\_MC\_VDST.sh
 
 NOTE: The image cleaning thresholds can be specified in the file \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter file either
 for all telescopes to the same values or for each telescope type seperately. 
@@ -433,26 +434,110 @@ for all telescopes to the same values or for each telescope type seperately.
 \subsection{Step 4: mscw\_energy}
 
 If you use standard configurations maybe some lookup tables already exist (ask Gernot or Heike where you could find them).
+If not, you have to create them from gamma-ray simulations yourself
+with \$EVNDISPSYS/scripts/CTA/CTA.MSCW\_ENERGY.sub\_make\_tables.sh
 
-If not, you have to create them yourself with
+Copy or move the created tables to your directory 
+\$CTA\_EVNDISP\_ANA\_DIR/Tables/
 
-\$EVNDISPSYS/scripts/CTA/CTA.MSCW\_ENERGY.sub\_make\_tables.sh
-
-If you have your lookup tables you have to run mscw\_energy for estimating the energy of each event: 
+Now you have to run mscw\_energy for estimating the energy of each
+event: 
 
 \$EVNDISPSYS/scripts/CTA/CTA.MSCW\_ENERGY.sub\_analyse\_MC.sh
 
+For all different particle types, use 
+\$EVNDISPSYS/scripts/CTA/CTA.subAllParticles\_analyse\_MC.sh
+
 \subsection{Step 5: Optimize cuts or train MVA}
+
+Gamma-hadron separation is based on TMVA and needs to be trained for
+each subarray due to their different layouts. Here an example how to
+do this for Boosted Decicion Trees (BDT):
+
+\begin{lstlisting}
+$EVNDISPSYS/scripts/CTA/CTA.TMVA.sub_train.sh subArray.list \
+TMVA.BDT.runparameter BDT.20120321 BDT onSource ISDC3700m 
+\end{lstlisting}
 
 \subsection{Step 6: Effective Areas}
 
-To calculate effective areas, look at:
-
+For using TMVA based gamma-hadron cuts, you have to run through
+several steps now. All of them are based on the script
 \$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.sub\_analyse.sh
 
-For the first time you have to use mscw files as input since MCpars has to be analysed once. 
-If you change your cuts afterwards (but not the number of input files) you can use the faster version by using
-the effective area file as input (helps a lot for protons).
+
+{\bf Angular resolution:} 
+
+Calculate the angular resolution from gamma-ray simulations
+
+\begin{lstlisting}
+$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.subAllParticles_analyse.sh \
+subArray.list $CTA_EVNDISP_ANA_DIR/ParameterFiles \
+ANASUM.GammaHadron.TMVAFixedSignal.gamma.dat \
+$CTA_USER_DATA_DIR/analysis/EffectiveArea/<DataSet>/AngularResolution \
+<DataSet> 2
+\end{lstlisting}
+
+{\bf Quality cuts:}
+
+Apply quality cuts and calculate the particle numbers using a root macro.
+
+\begin{lstlisting}
+$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.subAllParticles_analyse.sh \
+subArray.list $CTA_EVNDISP_ANA_DIR/ParameterFiles \
+ANASUM.GammaHadron.QC \
+$CTA_USER_DATA_DIR/analysis/EffectiveArea/<DataSet>/QualityCuts \
+<DataSet> 
+\end{lstlisting}
+
+\begin{lstlisting}
+% cd $CTA_USER_DATA_DIR/analysis/EffectiveArea/<DataSet>/QualityCuts
+% root 
+root [0] .L $EVNDISPSYS/lib/libVAnaSum.so
+root [1] .L $EVNDISPSYS/macros/sensitivity.C
+root [2] writeAllParticleNumberFiles( "subArray.list", 0 )
+\end{lstlisting}
+
+{\bf Make effective areas:}
+
+Make effective area while applying the TMVA-based gamma-hadron cuts
+trained bafore.
+
+\begin{lstlisting}
+$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.subAllParticles_analyse.sh \
+subArray.list $CTA_EVNDISP_ANA_DIR/ParameterFiles \
+ANASUM.GammaHadron.TMVA \
+$CTA_USER_DATA_DIR/analysis/EffectiveArea/<DataSet>/TMVA/BDT.20120321 \
+<DataSet> 
+\end{lstlisting}
+
+Plotting the effective areas and instrument response functions using
+the shared library from evndisplay: 
+
+\begin{lstlisting}
+% root
+root [0] .L $EVNDISPSYS/lib/libVAnaSum.so
+root [1] VPlotInstrumentResponseFunction a;
+root [2] a.addInstrumentResponseData("gamma_onSource.E_ID0.eff-0.root")
+root [3] a.plotEffectiveArea()
+root [4] a.plotAngularResolution()
+root [5] a.plot...
+\end{lstlisting}
+
+
+\subsection{Step 7: Sensitivity curves \& WP-Phys files}
+
+Writing the IRF and sensitivity curves in the agreed WP-Phys format
+
+\begin{lstlisting}
+$EVNDISPSYS/scripts/CTA/CTA.WPPhysWriter.sh <sub array list> \
+<directory with effective areas> <observation time [h]> \
+<output file name> <offset=0/1>
+\end{lstlisting}
+
+This can then be used as well to plot all the sensitivities using the
+root macro \$EVNDISPSYS/macros/sensitivity.C
+
 
 % ############ Input data format ######################
 \chapter{Input data format}
