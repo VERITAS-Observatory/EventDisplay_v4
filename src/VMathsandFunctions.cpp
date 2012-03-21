@@ -117,3 +117,12 @@ double VMathsandFunctions::getMeanEnergy( double e_min_log10, double e_max_log10
 
     return TMath::Log10( 0.5*(xL+xU) );
 }
+
+double VMathsandFunctions::getMeanEnergyInBin( unsigned int iMethod, double e_min_log10, double e_max_log10, double iSpectralIndex )
+{
+    if( iMethod == 0 )      return getMeanEnergy( e_min_log10, e_max_log10 );
+    else if( iMethod == 1 ) return getBaryCentricMeanEnergy( e_min_log10, e_max_log10, iSpectralIndex );
+    else if( iMethod == 2 ) return getSpectralWeightedMeanEnergy( e_min_log10, e_max_log10, iSpectralIndex );
+
+    return -1.e99;
+}

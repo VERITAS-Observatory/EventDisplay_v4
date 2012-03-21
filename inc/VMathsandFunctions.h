@@ -32,6 +32,7 @@ class VFun_gauss : public VAnalysisUtilities, public VPlotUtilities
 
 namespace VMathsandFunctions
 {
+   double getMeanEnergyInBin( unsigned int iMethod, double e_min_log10, double e_max_log10, double iSpectralIndex );
    double getBaryCentricMeanEnergy( double e_min_log10, double e_max_log10, double iSpectralIndex );
    double getMeanEnergy( double e_min_log10, double e_max_log10 );
    double getSpectralWeightedMeanEnergy( double e_min_log10, double e_max_log10, double iSpectralIndex );

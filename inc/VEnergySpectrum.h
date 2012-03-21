@@ -97,7 +97,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 
         TF1   *fEnergySpectrumFit;
 
-        void   addObservationTime( TH1* h, double iTObs, double iEThreshold, bool bLinearX = false );
+        void   addValueToHistogram( TH1* h, double iTObs, double iEThreshold, bool bLinearX = false );
+        void   addValueToHistogram( TH1* h, TGraph *g, double iTObs, double iEThreshold, bool bLinearX = false );
         void   addHistogram( TH1*h1, TH1* h2, double iEThreshold, bool bLinearX );
         void   divideEnergySpectrumbydE( TH1* h, bool blin = false );
 	int    getRebinningGrouping( TH1* h, double iNewBinWidth );
@@ -111,6 +112,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TH1D *hErecCountsOn;
         TH1D *hErecCountsOff;
         TH1D *hErecTotalTime;
+	TH1D *hErecTotalTimeDeadTimeCorrected;
+	TH1D *hEffArea;
 
 // definition of energy value in a log bin
         unsigned int fEnergyInBinDefinition;    // 0 = mean of (lin) energy, 1 = barycentric mean, 2 = spectral weighted mean
@@ -121,6 +124,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 
 // total numbers
         double fTotalObservationTime;
+	double fTotalObservationTimeDeadTimeCorrected;
         double fTotalNormalisationFactor;
 
 // fill and plot energy spectrum graph
@@ -142,7 +146,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TH1D*     getEnergyCountingOnHistogram() { return hErecCountsOn; }
         TH1D*     getEnergyCountingOffHistogram() { return hErecCountsOff; }
         TGraphAsymmErrors* getEnergySpectrumGraph();
-        TH1D*     getTotalTimeHistogram() { return hErecTotalTime; }
+        TH1D *getTotalTimeHistogram( bool iDeadtimeCorrected = false ) { if( iDeadtimeCorrected ) return hErecTotalTimeDeadTimeCorrected; else return hErecTotalTime; }
         double    getTotalNormalisationFactor() { return fTotalNormalisationFactor; }
         bool      isZombie() { return bZombie; }
         void      printDifferentialFluxes( bool bSED = false );
@@ -154,7 +158,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TCanvas*  plotLifeTimevsEnergy( TCanvas *c = 0 );
 
 	void printEnergyBins();
-        void setAddHistogramParameters( bool iB = true ) { fAnalysisHistogramAddingUseLowEdge = iB; }
+        void setAddHistogramParameters( bool iB = false ) { fAnalysisHistogramAddingUseLowEdge = iB; }
         void setEnergyBinning( double iBin = 0.2 );
 	bool setEnergyInBinDefinition( unsigned int iE = 2 );
 	bool setErrorCalculationMethod( string iMeth = "Rolke" );
@@ -166,7 +170,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setEnergyThreshold( string a ) { fEnergyThresholdFileName = a; }
         void setEnergyThresholdDefinition( unsigned int iDef = 2, double iSys = 0.1, double iMaxEff = 0.1 )
 	                                 { fAnalysisEnergyThresholdDefinition = iDef; fAnalysisMaxEnergySystematic = iSys; fAnalysisMaxEffectiveAreaFraction = iMaxEff; }
-        void setSignificanceParameters( double iSig = 2., double iMinOnEvents = 3., double iUpperLimit = 0.95, int iLiAndMa = 17, int iULAlgo = 5 );
+        void setSignificanceParameters( double iSig = 2., double iMinOnEvents = 3., double iUpperLimit = 0.95, int iLiAndMa = 17, int iULAlgo = 0 );
 
         TF1* fitEnergySpectrum( string iname = "fit", bool bDraw = true );
         void setSpectralFitFunction( int iD  = 0 ) { fSpectralFitFunction = iD; }
