@@ -230,7 +230,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	TGraphAsymmErrors*  getSensitivityGraph() { return gSensitivityvsEnergy; }
         unsigned int  listDataSets();
         void     listUnits();
-        void     list_sensitivity( unsigned int iD );
+        void     list_sensitivity( unsigned int iD = 0 );
 	TCanvas* plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity );
         TCanvas* plotObservationTimevsFlux( unsigned int iD = 0, TCanvas *c = 0, int iLineColor = 1, double iLineWidth = 4. );
         void     plotObservationTimevsFluxFromTextFile( TCanvas*c, string iTextFile, int iLineColor = 4, double iLineWidth = 1., int iLineStyle = 2 );
@@ -280,6 +280,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	void     setUseEffectiveAreas_vs_reconstructedEnergy( bool iB = true ) { bUseEffectiveAreas_vs_reconstructedEnergy = iB; }
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,11);
+        ClassDef(VSensitivityCalculator,12);
 };
 #endif
