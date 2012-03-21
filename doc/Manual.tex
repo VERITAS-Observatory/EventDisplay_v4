@@ -92,25 +92,6 @@
 \pagenumbering{roman}
 \thispagestyle{empty}
 
-\begin{abstract}
-
-\noindent eventdisplay is a complete package for VERITAS and CTA analysis (whatever 'complete' means...)
-The package consists of several analysis steps and tools:
-
-\begin{enumerate}
-\item evndisp (calibrate and parametrize images, event reconstruction, stereo analysis)
-\item mscw\_energy (use lookup tables to produce msw, msl, and energies)
-\item anasum (produce maps and calculate analysis results)
-\item shared library tools and macros  (produce the energy spectrum and integral fluxes, plot maps, plot sensitivities, etc.) 
-\item makeEffectiveArea (calculate effective areas)
-\item trainTMVAforGammaHadronSeparation (tools to train MVA and optimize cuts)
-\item ...
-\end{enumerate}
-
-This is a very incomplete manual, started in September 2009. Please help updating it.
-
-\end{abstract}
-
 
 \setcounter{page}{1}
 \tableofcontents
@@ -156,6 +137,24 @@ The EVNDISP manual for VERITAS users:
 
 \chapter{Introduction}
 
+\noindent eventdisplay is a complete package for VERITAS and CTA analysis (whatever 'complete' means...)
+The package consists of several analysis steps and tools:
+
+\begin{enumerate}
+\item evndisp (calibrate and parametrize images, event reconstruction, stereo analysis)
+\item mscw\_energy (use lookup tables to produce msw, msl, and energies)
+\item anasum (produce maps and calculate analysis results)
+\item shared library tools and macros  (produce the energy spectrum and integral fluxes, plot maps, plot sensitivities, etc.) 
+\item makeEffectiveArea (calculate effective areas)
+\item trainTMVAforGammaHadronSeparation (tools to train MVA and optimize cuts)
+\item ...
+\end{enumerate}
+
+This is a very incomplete manual, started in September 2011. Please help updating it.
+
+The original developers are Gernot Maier (DESY) and Jamie Holder (University of Delaware). 
+A large number of people contributed, among others: ..
+
 % #############################################
 %
 % ############ Installation and auxiliary data files ######
@@ -163,9 +162,9 @@ The EVNDISP manual for VERITAS users:
 % #############################################
 
 \chapter{Installation and auxiliary data files}
-
-\section{Environmental variables}
 \label{SECTION.ENVIRON}
+
+The installation, compilation, and needed or useful environmental variables are described in detail in the file {\it README/INSTALL} in the EVNDISP source code.
 
 \section{Auxiliary data files}
 \label{SECTION.AUXFILE}
@@ -180,13 +179,54 @@ observatory (i.e. {\it VERITAS} or {\it CTA}).
 
 \subsubsection{VERITAS}
 
+The detector description is read from a configuration file in GrIsu style. There are examples for the different detector configurations (e.g. pre or post-upgrade) in 
+the tar ball with all the analysis files. 
+Check the files in  {\it \$OBS\_EVNDISP\_ANA\_DIR/*.cfg}.
+
 \subsubsection{CTA}
 
 No detector description is needed, since the telescope and array description is read directly from the DST file ({\it telconfig} tree).
 The converter from hessio to EVNDISP DST format needs a subarray file, a simple list of telescopes to be selected from the corresponding hyper array. 
 The subarray files for prod1 can be found in {\it \$OBS\_EVNDISP\_ANA\_DIR/DetectorGeometry/*.lis}.
 
+
+
+
+\subsection{Analysis parameters files}
+
+Detailed description of these files can be found in the corresponding chapters of the different analysis stages.
+
+% #############################################
+%
+% ############ Trace integration and image analysis  ###
+%
+% #############################################
+
 \chapter{eventdisplay - calibration, image analysis and stereo reconstruction}
+
+\section{Trace integration}
+
+\section{Image analysis}
+
+\subsection{Log-likelihood fitting of images}
+
+The status of the covariance matrix is returned and saved to the image parameter tree {\it tpars} in the variable {\it Fitstat}. 
+No fitting has been applied to images with $Fitstat=-1$ 
+
+\section{Image cleaning}
+
+\chapter{Displaying events}
+
+eventdisplay can be used to display events. 
+Camera images of integrated charges, timing and calibration values, image cleaning and parameterization, core and direction reconstruction results can be displayed. 
+There are example scripts for display files, see
+
+\begin{itemize}
+\item for CTA:  \$EVNDISP/scripts/CTA/CTA.EVNDISP.display
+\item for VERITAS:  \$EVNDISP/scripts/VTS.EVNDISP.display
+\end{itemize} 
+
+Note that the display can be a bit slow for arrays with a large number of telescopes.
 
 \chapter{mscw\_energy - using lookup tables}
 
@@ -384,7 +424,7 @@ Note the limitations of the DST format (\ref{SUBSECTION.DST.LIMITATIONS}).
 Many of the CTA simulation files contain data for a so called hyper array. 
 To select the actual array, the corresponding subarray has to be specified in a ASCII text file (called {\it subarray} file in the following).
 The following example file selects an array consisting of telescopes 63, 19, 67, and 33, each telescope
-with a field of view of 8 degrees:
+with a field of view of 8 degrees (the FOV can be reduced compared to the simulated FOV by setting the corresponding pixels dead):
 
 \begin{lstlisting}
 63 8
@@ -405,32 +445,51 @@ For a typical run, the following command line should be used:
 
 For FADC analysis, add the option {\it -f 1}. Note again the limitations of the DST format (\ref{SUBSECTION.DST.LIMITATIONS}).
 
-
+%###########################################################################
 \subsection{Step 2: Display (event-by-event)}
 
 It is always useful to look at events in the display. 
 To do this, it is best to select a small subarray with the {\it -teltoana} option in evndisp.
 The display might otherwise be quite slow in responding to your input due to the large number of objects to be drawn.
 
-A typical command line to look at events might be (remove the {\it -traceanalysis=1} command for dst files without trace information):
+A typical command line to look at events might be:
 
 \begin{lstlisting}
 $EVNDISPSYS/bin/evndisp -display=1 \
 -reconstructionparameter ./EVNDISP.reconstruction.runparameter \
--useFixedThresholds  -imagethresh=10.0 -borderthresh=5.0 \
 -l2setspecialchannels nofile \
--sourcefile tt.v2.root  -traceanalysis=1
+-sourcefile tt.v2.root 
 \end{lstlisting}
 
-\subsection{Step 3: Calibration, image analysis and stereo reconstruction}
+%###########################################################################
+\subsection{Step 3, Eventdisplay: Calibration, image analysis and stereo reconstruction}
 
+%###########################################################################
 \subsection{Step 1 \& 3 combined [USE]}
 
-T trun the converter and eventdisplay for a specific subarray use the script \$EVNDISPSYS/scripts/CTA/CTA.EVNDISP.sub\_convert\_and\_analyse\_MC\_VDST.sh
+Run the converter and Eventdisplay for a specific subarray: use script 
+(in \$EVNDISPSYS/scripts/CTA)
 
-NOTE: The image cleaning thresholds can be specified in the file \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter file either
-for all telescopes to the same values or for each telescope type seperately. 
+\begin{lstlisting}
+./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh
 
+ <sub array list>          text file with list of subarray IDs
+  
+ <list of simtelarray files>  
+
+ <particle>                gamma_onSource , gamma_cone10, proton , ...
+
+ <data set>                e.g. cta-ultra3, ISDC3700m, ...
+\end{lstlisting}
+
+NOTE: The image cleaning thresholds can be specified in the file 
+
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter}
+
+file either for all telescopes to the same values or for each telescope type seperately
+(see section XXXX). 
+
+%###########################################################################
 \subsection{Step 4: mscw\_energy}
 
 If you use standard configurations maybe some lookup tables already exist (ask Gernot or Heike where you could find them).
@@ -448,6 +507,7 @@ event:
 For all different particle types, use 
 \$EVNDISPSYS/scripts/CTA/CTA.subAllParticles\_analyse\_MC.sh
 
+%###########################################################################
 \subsection{Step 5: Optimize cuts or train MVA}
 
 Gamma-hadron separation is based on TMVA and needs to be trained for
@@ -459,14 +519,20 @@ $EVNDISPSYS/scripts/CTA/CTA.TMVA.sub_train.sh subArray.list \
 TMVA.BDT.runparameter BDT.20120321 BDT onSource ISDC3700m 
 \end{lstlisting}
 
+%###########################################################################
 \subsection{Step 6: Effective Areas}
 
 For using TMVA based gamma-hadron cuts, you have to run through
-several steps now. All of them are based on the script
+several steps now. 
+The reason for this is that the cuts on the MVA variable is optimized 'on the fly', 
+depending on the energy spectrum of the source, the source strength and the observation time.
+First the typical angular resolution for the given array is calculated, then the signal and background 
+rates after quality cuts, and finally, the optimal MVA cut value.
+
+All scripts needed can be found in  \\
 \$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.sub\_analyse.sh
 
-
-{\bf Angular resolution:} 
+\subsubsection{Angular resolution:} 
 
 Calculate the angular resolution from gamma-ray simulations
 
@@ -478,7 +544,7 @@ $CTA_USER_DATA_DIR/analysis/EffectiveArea/<DataSet>/AngularResolution \
 <DataSet> 2
 \end{lstlisting}
 
-{\bf Quality cuts:}
+\subsubsection{Quality cuts:}
 
 Apply quality cuts and calculate the particle numbers using a root macro.
 
@@ -495,13 +561,15 @@ $CTA_USER_DATA_DIR/analysis/EffectiveArea/<DataSet>/QualityCuts \
 % root 
 root [0] .L $EVNDISPSYS/lib/libVAnaSum.so
 root [1] .L $EVNDISPSYS/macros/sensitivity.C
-root [2] writeAllParticleNumberFiles( "subArray.list", 0 )
+root [2] writeAllParticleNumberFiles( "subArray.list", 0 );
+// or for several (e.g. 8) offsets:
+root [2] writeAllParticleNumberFiles( "subArray.list", 8 );
 \end{lstlisting}
 
-{\bf Make effective areas:}
+\subsubsection{Make effective areas:}
 
 Make effective area while applying the TMVA-based gamma-hadron cuts
-trained bafore.
+trained before.
 
 \begin{lstlisting}
 $EVNDISPSYS/scripts/CTA/CTA.EFFAREA.subAllParticles_analyse.sh \
@@ -524,7 +592,7 @@ root [4] a.plotAngularResolution()
 root [5] a.plot...
 \end{lstlisting}
 
-
+%###########################################################################
 \subsection{Step 7: Sensitivity curves \& WP-Phys files}
 
 Writing the IRF and sensitivity curves in the agreed WP-Phys format
@@ -537,7 +605,6 @@ $EVNDISPSYS/scripts/CTA/CTA.WPPhysWriter.sh <sub array list> \
 
 This can then be used as well to plot all the sensitivities using the
 root macro \$EVNDISPSYS/macros/sensitivity.C
-
 
 % ############ Input data format ######################
 \chapter{Input data format}
@@ -601,6 +668,124 @@ else if( fNMirrors == fSC_number_of_mirrors )  fTelescope_type += 200000000;
 The parabolic shape is assigned to all telescopes with a mirror area  $>$ 400 m$^2$.
 Schwarzschild-Couder Design are all telescopes with 2 mirrors only.
 
+% ############ light curve analysis ######################
+
+\chapter{Light curve analysis}
+
+Several methods for light curve analysis are currently under development. We describe in the following the existing tools, for further details please check the different sections in the code.
+
+Light curve data can be read from evndisplay result files ({\it anasum} files) or from ascii files.
+
+\section{Code organization}
+
+\begin{itemize}
+\item {\it VLightCurveData:} data class (contains a single point of the light curve)
+\item {\it VLightCurveUtilities:} basic functions to read ascii files, print light curves, and get light curve properties (e.g. mean, variance)
+\item {\it VLightCurve:} light curve reader and plotter for ascii and evndisplay result files ({\it anasum} files)
+\item {\it  VLombScargle:} discrete Fourier transform for unevenly spaced data  after Lomb and Scargle
+\item {\it VZDCF:} plotting class for Z-transformed discrete correlation functions
+\end{itemize}
+
+\section{Light curve plotting}
+
+Example for plotting light curves using an evndisplay result files ({\it anasum} file:
+
+\begin{lstlisting}
+.L $EVNDISPSYS/lib/libVAnaSum.so 
+VLightCurve *iLightCurve = new VLightCurve();
+iLightCurve->setName( "VHE light curve" );
+// iDayInterval = 15. e.g. 15 day binning
+// iMJDmin and iMJDmax to restrict light curve range in MJD
+iLightCurve->initializeTeVLightCurve( "myanasumfile.root", 
+                       iDayInterval, iMJDmin, iMJDmax );
+// plot points above 2 sigma or at least 3 on events as flux points, 
+// all others as upper flux limits
+iLightCurve->setSignificanceParameters( 2., 3. );
+// for binaries: phase folding
+iLightCurve->setPhaseFoldingValues( PhaseMJD0, PhaseOrbitdays );
+// fill light curve with fluxes above 500 GeV
+iLightCurve->fill( 0.5 );
+// plot light curve
+iLightCurve->plotLightCurve();
+\end{lstlisting}
+
+Text file example (observation date (MJD), length of observation (in days), flux and flux error):
+
+\begin{lstlisting}
+ 54857.173780       0.074748        1.27275        0.17745  
+ 54858.178508       0.074864        1.27704        0.17042  
+ 54859.139628       0.101489        1.30742        0.18451  
+ 54860.154963       0.105847        1.31362        0.17415  
+ 54867.274058       0.262490        1.09824        0.15957  
+\end{lstlisting}
+
+Note the first two columns can be as well: begin and end of observations in MJD.
+
+Example for plotting light curves using a simple text file:
+
+\begin{lstlisting}
+.L $EVNDISPSYS/lib/libVAnaSum.so 
+VLightCurve b;
+// plot 95\% upper flux limits for points with 
+// significances $<2 \sigma$:
+b.setSignificanceParameters( 2., -9999., 0.95 );
+// set spectral parameters assumed in the flux calculation:
+b.setSpectralParameters( 0., 1., -2.5 );
+b.initializeXRTLightCurve("mylightcurve.txt");
+b.setPlottingStyle( 2, 1, 1., 20, 1. );
+b.setLightCurveAxis( 0., 2., "counting rate" );
+b.plotLightCurve();
+\end{lstlisting}
+
+Additionally to the described functions, there are several functions to fill gaps in light curves. 
+This is work in progress and should be used only after carefully reading of the code.
+
+{\it VLightCurve} and {\it VLightCurveUtillities} provide several methods to print details of the calculations to the screen and fill Latex and Wiki tables.
+
+\section{Lomb Scargle analysis}
+
+The discrete Fourier transform for unevenly spaced data  after Lomb and Scargle is implemented in the {\it VLombScargle} class \cite{Scargle-1982}. 
+The basic light curve reader classes can be used to read in a light curve from a text or eventdisplay result file.
+
+There are two different implementations for the calculation of the significances of the peaks:
+\begin{enumerate}
+\item the calculation provided by Lomb \& Scargle taking into account the number of independent frequencies scanned and Poissonian errors
+\item a toy MC based method: the light curve is randomly shuffled $N$ times with the flux points changed randomly according to their errors. For each of the resulting light curve the periodigram is calculated. The probability/significance is derived from the distribution of powers at each frequency bin (note: a large number of toy light curves have to be produced for larger values of significance).
+\end{enumerate}
+
+Example:
+
+\begin{lstlisting}
+.L $EVNDISPSYS/lib/libVAnaSum.so 
+ VLombScargle g;
+g.readASCIIFile("mylightcurve.txt");
+// scan 1000 frequencies between 50. and 1000. days
+g.setFrequencyRange(1000., 1./1000., 1./50. );
+g.plotPeriodigram();
+// plot a line at the give frequency
+g.plotFrequencyLine(1./315. );
+// plot probability levels using the Lomb \& Scargle calculation
+g.plotProbabilityLevels();
+// plot probability levels using a toy MC with 500 MC light curve realisations
+g.plotProbabilityLevelsFromToyMC( 500);
+\end{lstlisting}
+
+\section{ZDCF Autocorrelation analysis}
+
+No autocorrelation analysis is implemented yet. We used until now the Z-transformed discrete correlation functions and the code provided by the authors of ZDCF\footnote{http://www.weizmann.ac.il/weizsites/tal/research/software/}.
+
+There is a small class in eventdisplay provided to plot the ZDCF results, see the following example:
+
+\begin{lstlisting}
+.L $EVNDISPSYS/lib/libVAnaSum.so 
+VZDCF a;
+a.readZDCF( "XRT20120216.dcf");
+a.setMLinterval( 315., 315.+6., 315.-3.86 );  // error provided by plike
+a.plotZDCFoverError( 0, 45., 405., 12. );
+a.plotZDCF( 0, 45., 405. );
+\end{lstlisting}
+
+
 
 % ############ Appendix ######################
 
@@ -617,5 +802,8 @@ Schwarzschild-Couder Design are all telescopes with 2 mirrors only.
 
 % #############################################
 
+\begin{thebibliography}{}
+\bibitem[Scargle(1982)]{Scargle-1982} Scargle, J. 1982, ApJ 263, 835
+\end{thebibliography}
 
 \end{document}
