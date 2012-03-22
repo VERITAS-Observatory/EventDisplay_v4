@@ -124,7 +124,9 @@ void VEventLoop::printRunInfos()
     {
         setTelID( fRunPar->fTelToAnalyze[i] );
 
-        cout << "Telescope " << fRunPar->fTelToAnalyze[i]+1 << endl;
+        cout << "Telescope " << fRunPar->fTelToAnalyze[i]+1;
+	if( i < getDetectorGeometry()->getTelType().size() ) cout << " (type " << getDetectorGeometry()->getTelType()[i] << ")";
+	cout << endl;
 	cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
 	if( fRunPar->fDoublePass ) cout << "  (doublepass: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
 	cout << endl;

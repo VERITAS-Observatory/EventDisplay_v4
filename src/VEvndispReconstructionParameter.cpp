@@ -399,7 +399,7 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 
 	for( unsigned int i = 0; i < fNTel_type; i++ ) 
 	{
-	    if ( fLocalNtubes_min[m][i] <= 2 || fLoss_max[m][i] == 1e10 )
+	    if ( fLocalNtubes_min[m][i] <= 2 || fLoss_max[m][i] == 1.e10 )
 	    {
 		cout << "Warning: not clear if array analysis cuts have been given for telescope type ";
 		cout << i+1 << " [set number: " << m << "]" << endl;
@@ -439,6 +439,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
     string iTemp4;
     ULong64_t t_type = 0;
     int t_temp = 0;
+    vector< int > v_temp;
     int m_temp = -1;
 
     while( getline( is, iLine ) )
@@ -451,20 +452,24 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 // proceed
             is_stream >> iTemp;
 // telescope type
+            v_temp.clear();
             if( atoi( iTemp.c_str() ) >= 0 )
 	    {
 	       t_type = ULong64_t( atoi( iTemp.c_str() ) );
                t_temp = getTelescopeType_counter( t_type );
+	       v_temp = getTelescopeType_counterVector( t_type );
             }
 	    else if( atoi( iTemp.c_str() ) < -10 &&  atoi( iTemp.c_str() ) > -1000 )
 	    {
 	       t_type = ULong64_t( -1*atoi( iTemp.c_str() ) );
 	       t_temp = getTelescopeType_counter_from_MirrorArea( t_type );
+	       v_temp = getTelescopeType_counter_from_MirrorAreaVector( t_type );
 	    }
 	    else if( atoi( iTemp.c_str() ) < -1000 )
 	    {
 	       t_type = ULong64_t( -1*atoi( iTemp.c_str() ) );
 	       t_temp = getTelescopeType_counter_from_MirrorArea_and_PixelSize( t_type );
+	       v_temp = getTelescopeType_counter_from_MirrorArea_and_PixelSizeVector( t_type );
 	    }
 	    else t_temp = -1;
 // unknown telescope types
@@ -608,7 +613,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 addNewMethod( m_temp );
                 fMethodID[m_temp] = atoi( iTemp2.c_str() );
 // hardwired: allowed array reconstruction numbers
-                if( fMethodID[m_temp] != 0 && fMethodID[m_temp] != 1 && fMethodID[m_temp] != 3 && fMethodID[m_temp] != 4 && fMethodID[m_temp] != 5 && fMethodID[m_temp] != 6 && fMethodID[m_temp] != 7 && fMethodID[m_temp] != 8 && fMethodID[m_temp] != 9 )
+                if( fMethodID[m_temp] != 0 && fMethodID[m_temp] != 1 && fMethodID[m_temp] != 3 && fMethodID[m_temp] != 4 
+		 && fMethodID[m_temp] != 5 && fMethodID[m_temp] != 6 && fMethodID[m_temp] != 7 && fMethodID[m_temp] != 8 && fMethodID[m_temp] != 9 )
                 {
                     cout << "VEvndispReconstructionParameter: invalid array reconstruction method: " << fMethodID[m_temp] << endl;
                     cout << "(allowed is 0,1,3,4,5,6,7,8,9)" << endl;
@@ -659,72 +665,72 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             else if( iTemp == "MINTUBES" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLocalNtubes_min[m_temp].size(); i++ ) fLocalNtubes_min[m_temp][i] = atoi( iTemp2.c_str() );
-                else fLocalNtubes_min[m_temp][t_temp] = atoi( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLocalNtubes_min[m_temp][v_temp[i]] = atoi( iTemp2.c_str() );
             }
             else if( iTemp == "MAXLOWGAIN" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLocalNLowGain_max[m_temp].size(); i++ ) fLocalNLowGain_max[m_temp][i] = atoi( iTemp2.c_str() );
-                else fLocalNLowGain_max[m_temp][t_temp] = atoi( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLocalNLowGain_max[m_temp][v_temp[i]] = atoi( iTemp2.c_str() );
             }
             else if( iTemp == "MINDIST" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLocalDistance_min[m_temp].size(); i++ ) fLocalDistance_min[m_temp][i] = atof( iTemp2.c_str() );
-                else fLocalDistance_min[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLocalDistance_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MAXDIST" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLocalDistance_max[m_temp].size(); i++ ) fLocalDistance_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fLocalDistance_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLocalDistance_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MINSIZE" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fSize_min[m_temp].size(); i++ ) fSize_min[m_temp][i] = atof( iTemp2.c_str() );
-                else fSize_min[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fSize_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MAXSIZE" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fSize_max[m_temp].size(); i++ ) fSize_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fSize_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fSize_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MINWIDTH" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fWidth_min[m_temp].size(); i++ ) fWidth_min[m_temp][i] = atof( iTemp2.c_str() );
-                else fWidth_min[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fWidth_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MAXWIDTH" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fWidth_max[m_temp].size(); i++ ) fWidth_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fWidth_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fWidth_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MINLENGTH" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLength_min[m_temp].size(); i++ ) fLength_min[m_temp][i] = atof( iTemp2.c_str() );
-                else fLength_min[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLength_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MAXLENGTH" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLength_max[m_temp].size(); i++ ) fLength_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fLength_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLength_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MINASYM" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fAsym_min[m_temp].size(); i++ ) fAsym_min[m_temp][i] = atof( iTemp2.c_str() );
-                else fAsym_min[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fAsym_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MAXASYM" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fAsym_max[m_temp].size(); i++ ) fAsym_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fAsym_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fAsym_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MINALPHA" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLocalAlpha_min[m_temp].size(); i++ ) fLocalAlpha_min[m_temp][i] = atof( iTemp2.c_str() );
-                else fLocalAlpha_min[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLocalAlpha_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MAXALPHA" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLocalAlpha_max[m_temp].size(); i++ ) fLocalAlpha_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fLocalAlpha_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLocalAlpha_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
 // C. Duke 20oct06 new record in cut file
             else if ( iTemp == "USEIMAGE" )
@@ -732,23 +738,23 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 if ( t_temp >= 0)                 // use defaults for telescope number < 0
                 {
                     int tmpi = atoi(iTemp2.c_str());
-                    if (!tmpi) fLocalUseImage[m_temp][t_temp] = false;
+                    if (!tmpi) for( unsigned int i = 0; i < v_temp.size(); i++ ) fLocalUseImage[m_temp][v_temp[i]] = false;
                 }
             }
             else if( iTemp == "MAXLOSS" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLoss_max[m_temp].size(); i++ )  fLoss_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fLoss_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLoss_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MAXWIDTHLENGTH" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fWidthLength_max[m_temp].size(); i++ ) fWidthLength_max[m_temp][i] = atof( iTemp2.c_str() );
-                else fWidthLength_max[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fWidthLength_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else if( iTemp == "MINFUI" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fFui_min[m_temp].size(); i++ ) fFui_min[m_temp][i] = atof( iTemp2.c_str() );
-                else fFui_min[m_temp][t_temp] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fFui_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else
             {
@@ -815,4 +821,67 @@ int VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorArea_an
     }
     return -2;
 }
+
+
+vector< int > VEvndispReconstructionParameter::getTelescopeType_counterVector( ULong64_t t )
+{
+    unsigned int z = 0;
+    vector< int > v;
+    set< ULong64_t >::iterator fTel_type_iter;
+    for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
+    {
+       if( *fTel_type_iter == t ) v.push_back( (int)z );
+       z++;
+    }
+    return v;
+}
+
+/*
+   use mirror area flag to identify array analysis cut
+*/
+vector< int > VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorAreaVector( ULong64_t t )
+{
+    unsigned int z = 0;
+    ULong64_t v = 0;
+    vector< int > x;
+    set< ULong64_t >::iterator fTel_type_iter;
+    for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
+    {
+       v = *fTel_type_iter;
+       v /= 100000;
+       
+       if( v > 2000 ) v -= 2000;
+       if( v > 1000 ) v -= 1000;
+       if( v == t )
+       {
+           x.push_back( z );
+       }
+       z++;
+    }
+    return x;
+}
+
+/*
+   use mirror area and pixel size to identify array analysis cut
+*/
+vector< int > VEvndispReconstructionParameter::getTelescopeType_counter_from_MirrorArea_and_PixelSizeVector( ULong64_t t )
+{
+    unsigned int z = 0;
+    vector< int > x;
+    ULong64_t v = 0;
+    ULong64_t v2 = 0;
+    set< ULong64_t >::iterator fTel_type_iter;
+    for( fTel_type_iter = fTel_type.begin(); fTel_type_iter != fTel_type.end(); fTel_type_iter++ )
+    {
+       v = *fTel_type_iter;
+
+       ULong64_t v1 = v/100000;
+       if( v1 > 1000 ) v1 -= 1000;
+       v2 = v1*100 + (v%100);
+
+       if( v2 == t ) x.push_back( z );
+       z++;
+    }
+    return x;
+} 
 

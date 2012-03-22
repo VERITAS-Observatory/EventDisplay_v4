@@ -82,6 +82,9 @@ class VEvndispReconstructionParameter : public TNamed
         int    getTelescopeType_counter( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea_and_PixelSize( ULong64_t t );
+        vector <int >    getTelescopeType_counterVector( ULong64_t t );
+	vector< int >    getTelescopeType_counter_from_MirrorAreaVector( ULong64_t t );
+	vector< int >    getTelescopeType_counter_from_MirrorArea_and_PixelSizeVector( ULong64_t t );
         void   print_arrayAnalysisCuts();
         unsigned int read_arrayAnalysisCuts( string ifile );
 	void   setDebug( bool iD = false ) { fDebug = iD; }
