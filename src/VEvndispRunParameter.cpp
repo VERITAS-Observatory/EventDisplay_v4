@@ -175,7 +175,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     setPulseZeroIndex();
 
     fWriteTriggerOnly = true;
-    fShortTree = 0;
+    fShortTree = 1;
     fwriteMCtree = 1;
     fFillMCHistos = true;
 
@@ -305,6 +305,7 @@ void VEvndispRunParameter::print( int iEv )
         {
             cout << "\t T" << fTelToAnalyze[i]+1 << ": " << fPointingErrorX[fTelToAnalyze[i]] << ", " << fPointingErrorY[fTelToAnalyze[i]];
         }
+	cout << endl;
     }
     else
     {

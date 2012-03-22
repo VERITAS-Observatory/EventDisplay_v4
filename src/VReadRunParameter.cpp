@@ -305,18 +305,18 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fuseDB = false;
         }
-        else if( iTemp.find( "usefixedthresholds" ) < iTemp.size() )
+/*        else if( iTemp.find( "usefixedthresholds" ) < iTemp.size() )
         {
             fRunPara->fUseFixedThresholds = true;
-        }
-        else if( iTemp.find( "usesignalnoisethresholds" ) < iTemp.size() )
+        } */
+/*        else if( iTemp.find( "usesignalnoisethresholds" ) < iTemp.size() )
         {
             fRunPara->fUseFixedThresholds = false;
-        }
-        else if( iTemp.find( "imagecleaningmethod" ) < iTemp.size() )  // HP
+        } */
+/*        else if( iTemp.find( "imagecleaningmethod" ) < iTemp.size() )  // HP
         {
             fRunPara->fImageCleaningMethod = (unsigned int)(atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() ));
-        }
+        } */
 // ignore configuration file versions
         else if( iTemp.find( "ignorecfgversions" ) < iTemp.size() )
         {
@@ -521,14 +521,14 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             cout << "Warning: Parameter -fillhistos obsolete" << endl;
 //          fRunPara->ffillhistos = true;
         }
-        else if( iTemp.find( "image" ) < iTemp.size() )
+/*        else if( iTemp.find( "image" ) < iTemp.size() )
         {
             fRunPara->fimagethresh[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
         }
         else if( iTemp.find( "border" ) < iTemp.size() )
         {
             fRunPara->fborderthresh[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        }
+        } */
         else if( iTemp.find( "brightnonimage" ) < iTemp.size() )
         {
             fRunPara->fbrightnonimagetresh[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
@@ -549,7 +549,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	{
 	    fRunPara->floops[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
 	}
-        else if( iTemp.find( "sumfirst" ) < iTemp.size() || iTemp.find( "sumstart" ) < iTemp.size() )
+/*        else if( iTemp.find( "sumfirst" ) < iTemp.size() || iTemp.find( "sumstart" ) < iTemp.size() )
         {
             fRunPara->fsumfirst[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
         }
@@ -561,16 +561,16 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         else if( iTemp.find( "sumwindow_doublepass" ) < iTemp.size() )
         {
             fRunPara->fsumwindow_pass1[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        }
+        } */
         else if( iTemp.find( "tracewindowshift" ) < iTemp.size() )
         {
             fRunPara->fTraceWindowShift[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
         }
-	else if( iTemp.find( "traceintegrationmethod" ) < iTemp.size() )
+/*	else if( iTemp.find( "traceintegrationmethod" ) < iTemp.size() )
 	{
 	    fRunPara->fTraceIntegrationMethod[0] = (unsigned int)(atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() ) );
 	    fRunPara->fTraceIntegrationMethod_pass1[0] = (unsigned int)(atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() ) );
-        }
+        } */
 	else if( iTemp.find( "mc_fadctracestart" ) < iTemp.size() )
 	{
 	    fRunPara->fMC_FADCTraceStart = (unsigned int)atoi( iTemp.substr(iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
@@ -657,14 +657,14 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fRemoveIsolatedPixel = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
             i++;
         }
-        else if( iTemp.find( "fixwindowstart" ) < iTemp.size() && !(iTemp.find( "nofixwindowstart" ) < iTemp.size()) )
+/*        else if( iTemp.find( "fixwindowstart" ) < iTemp.size() && !(iTemp.find( "nofixwindowstart" ) < iTemp.size()) )
         {
             fRunPara->fFixWindowStart = true;
         }
         else if( iTemp.find( "nofixwindowstart" ) < iTemp.size() )
         {
             fRunPara->fFixWindowStart = false;
-        }
+        } */
         else if( iTemp.find( "smoothdead" ) < iTemp.size() )
         {
             fRunPara->fSmoothDead = true;
@@ -739,11 +739,14 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fIsMC = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-        else if( iTemp.find( "shorttree" ) < iTemp.size() )
+        else if( iTemp.find( "shorttree" ) < iTemp.size() && !(iTemp.find( "noshorttree" ) < iTemp.size() ) )
         {
             fRunPara->fShortTree = 1;
         }
-                                                  // MS
+        else if( iTemp.find( "noshorttree" ) < iTemp.size() )
+        {
+            fRunPara->fShortTree = 0;
+        }
         else if( iTemp.find( "pwmethod" ) < iTemp.size() )
         {
             fRunPara->fPWmethod = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
@@ -1358,28 +1361,28 @@ void VReadRunParameter::printHelp()
 
     cout << "FADC pulse integration:" << endl;
     cout << "-----------------------" << endl;
-    cout << "\t -traceintegrationmethod=0/1 \t\t choose trace integration method (choices: 0, 1) " << endl;
-    cout << "\t -sumfirst=INT \t\t\t\t start of summation window (default=" << fRunPara->fsumfirst[0] << ")" << endl;
-    cout << "\t -sumwindow=INT \t\t\t length of summation window (default=" << fRunPara->fsumwindow_1[0] << ")" << endl;
-    cout << "\t -fixwindowstart \t\t\t fix the start of the integration windwo to -sumfirst=INT (do not move according to pulse position, incompatible with doublepass, default: off)" << endl;
+//    cout << "\t -traceintegrationmethod=0/1 \t\t choose trace integration method (choices: 0, 1) " << endl;
+//    cout << "\t -sumfirst=INT \t\t\t\t start of summation window (default=" << fRunPara->fsumfirst[0] << ")" << endl;
+//    cout << "\t -sumwindow=INT \t\t\t length of summation window (default=" << fRunPara->fsumwindow_1[0] << ")" << endl;
+//    cout << "\t -fixwindowstart \t\t\t fix the start of the integration windwo to -sumfirst=INT (do not move according to pulse position, incompatible with doublepass, default: off)" << endl;
     cout << "\t -tracefit=FLOAT \t\t\t fit FADC traces (-1.=off(default),0=fit all PMTs, >0: fit PMTs with peak value > tracefit x pedestal rms" << endl;
     cout << "\t -fitfunction=FIFU \t\t\t fit function to fit FADC traces (ev or grisu)" << endl;
     cout << "\t -MC_FADCTraceStart=INT \t\t MC FADC trace start (observe: nsamples+MC_FADCTraceStart<n_simulated_samples; default=0)" << endl;
-    cout << "  Double pass options:" << endl;
-    cout << "\t -doublepass \t\t\t\t optimize sum window parameters (default: on, use -nodoublepass to switch off)" << endl;
-    cout << "\t -tracewindowshift=INT \t\t\t shift the summation window by value (in doublepass: low gain channels only, default: -1 (0 for -fixwindowstart))" << endl;
-    cout << "\t -tracedefinesmallpulse=INT \t\t use double pass window placement for pulses with maximum smaller than this value (default: 15 d.c.)" << endl;
-    cout << "\t -sumwindow_doublepass=INT \t\t length of summation window for first pass in double pass method (default=" << fRunPara->fsumwindow_pass1 [0] << ")" << endl;
+//    cout << "  Double pass options:" << endl;
+//    cout << "\t -doublepass \t\t\t\t optimize sum window parameters (default: on, use -nodoublepass to switch off)" << endl;
+//    cout << "\t -tracewindowshift=INT \t\t\t shift the summation window by value (in doublepass: low gain channels only, default: -1 (0 for -fixwindowstart))" << endl;
+//    cout << "\t -tracedefinesmallpulse=INT \t\t use double pass window placement for pulses with maximum smaller than this value (default: 15 d.c.)" << endl;
+//    cout << "\t -sumwindow_doublepass=INT \t\t length of summation window for first pass in double pass method (default=" << fRunPara->fsumwindow_pass1 [0] << ")" << endl;
     cout << endl;
 
     cout << "Image cleaning:" << endl;
     cout << "---------------" << endl;
-    cout << "\t -useSignalNoiseThresholds \t\t use use multiples of pedestal variations (default: on)" << endl;
-    cout << "\t -useFixedThresholds \t\t\t use fixed image/border thresholds (default: off)" << endl;
-    cout << "\t -imagethresh=FLOAT \t\t\t image threshold (default=" << fRunPara->fimagethresh[0] << ", units depend on cleaning method)" << endl;
-    cout << "\t -borderthresh=FLOAT \t\t\t border threshold (default=" << fRunPara->fborderthresh[0] << ", units depend on cleaning method)" << endl;
-    cout << "\t -brightnonimage=FLOAT \t\t\t bright non image threshold (default=" << fRunPara->fbrightnonimagetresh[0] << ")" << endl;
-    cout << "\t -imagecleaningmethod=INT \t\t specify image cleaning method (0=two level cleaning (default), 1=time cluster cleaning, 2=..." << endl;
+//    cout << "\t -useSignalNoiseThresholds \t\t use use multiples of pedestal variations (default: on)" << endl;
+//    cout << "\t -useFixedThresholds \t\t\t use fixed image/border thresholds (default: off)" << endl;
+//    cout << "\t -imagethresh=FLOAT \t\t\t image threshold (default=" << fRunPara->fimagethresh[0] << ", units depend on cleaning method)" << endl;
+//    cout << "\t -borderthresh=FLOAT \t\t\t border threshold (default=" << fRunPara->fborderthresh[0] << ", units depend on cleaning method)" << endl;
+//    cout << "\t -brightnonimage=FLOAT \t\t\t bright non image threshold (default=" << fRunPara->fbrightnonimagetresh[0] << ")" << endl;
+//    cout << "\t -imagecleaningmethod=INT \t\t specify image cleaning method (0=two level cleaning (default), 1=time cluster cleaning, 2=..." << endl;
     cout << "  time cleaning options" << endl;
     cout << "\t\t -timecutpixel=FLOAT \t\t\t time cut between pixels (default=" << fRunPara->ftimecutpixel[0] << ")" << endl; //HP
     cout << "\t\t -timecutcluster=FLOAT \t\t\t time cut between cluster (default=" << fRunPara->ftimecutcluster[0] << ") " << endl; //HP
@@ -1391,7 +1394,7 @@ void VReadRunParameter::printHelp()
     cout << "------------------" << endl;
     cout << "\t -smoothdead \t\t\t\t smooth over dead pixels" << endl;
     cout << "\t -logl=0/1/2 \t\t\t\t perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)" << endl;
-    cout << "\t -loglminloss=FLOAT \t\t\t perform loglikelihood image parameterisation for images with loss > values (default=off=1.)" << endl;
+//    cout << "\t -loglminloss=FLOAT \t\t\t perform loglikelihood image parameterisation for images with loss > values (default=off=1.)" << endl;
     cout << "\t -fuifactor=FLOAT \t\t\t fraction of image/border pixel under image ellipse fact (default=" << fRunPara->fImageAnalysisFUIFactor << ")" << endl;
     cout << "\t -padrun=RUN \t\t\t\t padding run number (use with care)" << endl;
     cout << endl;                                 // MS
