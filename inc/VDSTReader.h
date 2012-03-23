@@ -29,6 +29,8 @@ class VDSTReader : public VVirtualDataReader
         VDSTTree *fDSTTree;                       //!< data tree
         bool   fMC;                               //!< source data is Monte Carlo
 
+	bool   fPerformFADCAnalysis;              //!< look at FADC traces
+
         unsigned int fTelID;
         unsigned int fNTelescopes;
 	uint16_t     fNumSamples;
@@ -156,6 +158,7 @@ class VDSTReader : public VVirtualDataReader
         bool      isMC() { return fMC; }
         void      selectHitChan( uint32_t hit ) { fSelectedHitChannel = hit; }
 	void      setNumSamples( uint16_t iS ) { fNumSamples = iS; }
+	void      setPerformFADCAnalysis( bool iB ) { fPerformFADCAnalysis = iB; }
         bool      setTelescopeID( unsigned int );
                                                   //!< set trigger values
         void      setTrigger( vector<bool> iImage, vector<bool> iBorder );

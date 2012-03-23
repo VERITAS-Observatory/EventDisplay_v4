@@ -18,6 +18,8 @@ VDSTReader::VDSTReader(  string isourcefile, bool iMC, int iNTel, int iNChannel,
     fNTelescopes = iNTel;
     fSourceFileName = isourcefile;
 
+    setPerformFADCAnalysis( true );
+
     fDSTtreeEvent = 0;
 
     fMC = iMC;
@@ -173,7 +175,7 @@ bool VDSTReader::getNextEvent()
         }
     }
 // get FADC trace
-    if( fDSTTree->getFADC() )
+    if( fPerformFADCAnalysis && fDSTTree->getFADC() )
     {
         if( fNumSamples == 0 )
 	{
@@ -254,7 +256,7 @@ vector< uint16_t > VDSTReader::getSamplesVec16Bit()
 
 vector< uint8_t > VDSTReader::getSamplesVec()
 {
-  if( fTelID < fFADCTrace.size() )
+  if( fPerformFADCAnalysis && fTelID < fFADCTrace.size() )
   {
      if( fSelectedHitChannel < fFADCTrace[fTelID].size() ) 
      {
@@ -277,7 +279,7 @@ uint8_t  VDSTReader::getSample( unsigned channel, unsigned sample, bool iNewNois
 
 uint16_t VDSTReader::getSample16Bit( unsigned channel, unsigned sample, bool iNewNoiseTrace )
 {
-  if( fTelID < fFADCTrace.size() )
+  if( fPerformFADCAnalysis && fTelID < fFADCTrace.size() )
   {
      if( channel < fFADCTrace[fTelID].size() ) 
      {

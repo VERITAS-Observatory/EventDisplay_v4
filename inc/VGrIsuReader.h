@@ -361,6 +361,7 @@ class VGrIsuReader : public VVirtualDataReader
             return  fMC_Yoffset;
         }
 	VMonteCarloRunHeader* getMonteCarloHeader() { return 0; }
+	void setPerformFADCAnalysis( bool iB ) { ; }
 
 };
 #endif

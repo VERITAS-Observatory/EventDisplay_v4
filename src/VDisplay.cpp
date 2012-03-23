@@ -613,7 +613,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 ///////////////////////////////////////////////////////////////////////////////
 // fill trace into histogram
 ///////////////////////////////////////////////////////////////////////////////
-   if( fEventLoop->getReader()->hasFADCTrace() && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
+   if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
    {
 // first set the number of bins of the histogram according to the number of samples
        if( int( fEventLoop->getNSamples() ) != i_his->GetNbinsX() )
@@ -642,7 +642,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 ///////////////////////////////////////////////////////////////////////////////
 // DST: fill timing values into histogram
 ///////////////////////////////////////////////////////////////////////////////
-    else if( !fEventLoop->getReader()->hasFADCTrace() && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
+    else if( (!fEventLoop->getReader()->hasFADCTrace() || !fEventLoop->getRunParameter()->doFADCAnalysis() ) && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
     {
 // first set the number of bins of the histogram according to the number of timing bins
 // number of bins is: number of pulse time levels + one bin at the beginning and one at the end of the trace

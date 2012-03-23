@@ -174,5 +174,6 @@ class VPEReader : public VVirtualDataReader
         bool      wasLossyCompressed() { return false; }
 
 	VMonteCarloRunHeader* getMonteCarloHeader() { return 0; }
+	void setPerformFADCAnalysis( bool iB ) { ; }
 };
 #endif

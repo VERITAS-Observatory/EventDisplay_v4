@@ -102,6 +102,7 @@ bool VEvndispData::initializeDataReader()
     if( !fReader ) return false;
 
     fReader->setTeltoAna( fTeltoAna );
+    fReader->setPerformFADCAnalysis( getRunParameter()->fperformFADCAnalysis );
 
     return true;
 }

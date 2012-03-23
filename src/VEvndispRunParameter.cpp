@@ -346,7 +346,7 @@ void VEvndispRunParameter::print( int iEv )
     if( fperformFADCAnalysis )
     {
        cout << "analysing FADC traces";
-       cout << "(trace integration method " << fTraceIntegrationMethod[0];
+       cout << " (trace integration method " << fTraceIntegrationMethod[0];
        if( fDoublePass ) cout << ", "  << " for pass 1 in doublepass: " << fTraceIntegrationMethod_pass1[0];
        cout << ")" << endl;
     }

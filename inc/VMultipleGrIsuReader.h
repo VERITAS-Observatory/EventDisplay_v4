@@ -190,5 +190,6 @@ class VMultipleGrIsuReader : public VVirtualDataReader
         float                      getMC_Yoffset();
 
 	VMonteCarloRunHeader* getMonteCarloHeader() { return 0; }
+	void setPerformFADCAnalysis( bool iB ) { ; }
 };
 #endif

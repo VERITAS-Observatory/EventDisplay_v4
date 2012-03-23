@@ -127,17 +127,24 @@ void VEventLoop::printRunInfos()
         cout << "Telescope " << fRunPar->fTelToAnalyze[i]+1;
 	if( i < getDetectorGeometry()->getTelType().size() ) cout << " (type " << getDetectorGeometry()->getTelType()[i] << ")";
 	cout << endl;
-	cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
-	if( fRunPar->fDoublePass ) cout << "  (doublepass: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
-	cout << endl;
-        cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
-        cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples";
-        if( fRunPar->fDoublePass ) cout << ", max T0 threshold " << fRunPar->fSumWindowStartAtT0Min << " d.c.)" << endl;
-        else                       cout << ")" << endl;
-        cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
-	cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
-        if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];
-        cout << endl;
+	if( fRunPar->fperformFADCAnalysis )
+	{
+	   cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
+	   if( fRunPar->fDoublePass ) cout << "  (doublepass: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
+	   cout << endl;
+	   cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
+	   cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples";
+	   if( fRunPar->fDoublePass ) cout << ", max T0 threshold " << fRunPar->fSumWindowStartAtT0Min << " d.c.)" << endl;
+	   else                       cout << ")" << endl;
+	   cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
+	   cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
+	   if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];
+	   cout << endl;
+        }
+	else
+	{
+	   cout << "\t no trace integration" << endl;
+        }
         cout << "\t image threshold: \t" << fRunPar->fimagethresh[fRunPar->fTelToAnalyze[i]];
         cout << "\t\t border threshold: \t" << fRunPar->fborderthresh[fRunPar->fTelToAnalyze[i]];
         if( fRunPar->fUseFixedThresholds ) cout << " (fixed image/border thresholds)";

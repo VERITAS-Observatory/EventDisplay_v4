@@ -491,7 +491,14 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	       {
 		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
 		  {
-		     if( i < fRunPara->fTraceIntegrationMethod.size() ) fRunPara->fTraceIntegrationMethod[i] = atoi( iTemp2.c_str() );
+		     if( atoi( iTemp2.c_str() ) < 0 )
+		     {
+		        fRunPara->fperformFADCAnalysis = false;
+                     }
+		     else
+		     {
+			if( i < fRunPara->fTraceIntegrationMethod.size() ) fRunPara->fTraceIntegrationMethod[i] = atoi( iTemp2.c_str() );
+                     }
 		  }
                }
 	       continue;
