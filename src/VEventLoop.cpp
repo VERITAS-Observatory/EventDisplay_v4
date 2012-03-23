@@ -405,12 +405,12 @@ void VEventLoop::initializeAnalyzers()
     if( fDebug ) cout << "VEventLoop::initializeAnalyzers()" << endl;
 
 // initialize the analyzers
-    if( fAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW )
+    if( fAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW )
     {
         fAnalyzer->initializeDataReader();
         fAnalyzer->initOutput();
     }
-    if( fArrayAnalyzer )
+    if( fArrayAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW )
     {
        fArrayAnalyzer->initializeDataReader();
        fArrayAnalyzer->initOutput();
@@ -426,7 +426,7 @@ void VEventLoop::initializeAnalyzers()
         {
             if( i < fAnaDir.size() && fAnaDir[i] ) fAnaDir[i]->cd();
             setTelID( i );
-            fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, (fRunMode == R_PED || fRunMode == R_PEDLOW) ) );
+            fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, (fRunMode == R_PED || fRunMode == R_PEDLOW || fRunMode == R_GTO || fRunMode == R_GTOLOW ) ) );
             int iseed = fRunPar->fMCNdeadSeed;
             if( iseed != 0 ) iseed += i;
             fAnaData.back()->initialize( getNChannels(), getReader()->getMaxChannels(), (getTraceFit()>-1.), 
@@ -471,7 +471,7 @@ void VEventLoop::shutdown()
         {
             fOutputfile->cd();
         }
-        else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW )
+        else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW )
         {
             cout << "VEventLoop::shutdown: Error accessing output file" << endl;
         }
