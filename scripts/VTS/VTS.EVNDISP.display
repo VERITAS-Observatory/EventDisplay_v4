@@ -12,14 +12,10 @@
 #####################################
 ## HARDCODED VAVLUES
 #####################################
-# image threshold
-IMAG="5."
-# border threshold
-BORD="2.5"
 # evndisp reconstruction runparamter
 ACUT="EVNDISP.reconstruction.runparameter"
 # run options
-OPT="-display=1 -imagethresh=$IMAG -borderthresh=$BORD -teltoana=$TEL -reconstructionparameter $ACUT -photodiode -vbfnsamples"
+OPT="-display=1 -teltoana=$TEL -reconstructionparameter $ACUT -photodiode -vbfnsamples"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################

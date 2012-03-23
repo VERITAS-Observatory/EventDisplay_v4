@@ -10,25 +10,15 @@
 
 if [ ! -n "$1" ]
 then
-   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [sumwindow (default=12)] [pedestal calculation (default=1=on)] [method=GEO/LL (default=LL)]"
+   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [pedestal calculation (default=1=on)]" 
    exit
 fi
 
 RLIST=$1
-SW=12
 PED=1
-MET=LL
 if [ -n "$2" ]
 then
-  SW=$2
-fi
-if [ -n "$3" ]
-then
-  PED=$3
-fi
-if [ -n "$4" ]
-then
-  MET=$4
+  PED=$2
 fi
 
 # checking the path for binary
@@ -38,13 +28,9 @@ then
     exit
 fi
 
-
-
 ###############################################################################################################
-
 FILES=`cat $RLIST`
 echo $FILES
-
 #########################################
 # output directory for error/output from batch system
 # in case you submit a lot of scripts: QLOG=/dev/null
@@ -67,25 +53,13 @@ do
    FNAM="$SHELLDIR/EVN.data-$AFIL"
 
    sed -e "s|RRRRR|$AFIL|" $FSCRIPT.sh > $FNAM-1.sh
-   sed -e "s|SUMWINDOW|$SW|" $FNAM-1.sh > $FNAM-2.sh
+   sed -e "s|PEEED|$PED|" $FNAM-1.sh > $FNAM.sh
    rm -f $FNAM-1.sh
-   sed -e "s|MEEET|$MET|" $FNAM-2.sh > $FNAM-3.sh
-   rm -f $FNAM-2.sh
-   sed -e "s|PEEED|$PED|" $FNAM-3.sh > $FNAM.sh
-   rm -f $FNAM-3.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-# GEO is much faster than LL
-   if [ $MET = "LL" ]
-   then
-      qsub -V -l h_cpu=04:00:00 -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
-   fi
-   if [ $MET = "GEO" ]
-   then
-      qsub -V -l h_cpu=01:30:00 -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
-   fi
+   qsub -V -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 exit
