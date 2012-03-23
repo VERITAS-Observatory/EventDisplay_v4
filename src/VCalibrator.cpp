@@ -1495,7 +1495,7 @@ void VCalibrator::getCalibrationRunNumbers()
        if( iCaliLines > 0 ) setCalibrationFileNames();
     }
     int iLowGainCaliLines = 0;
-    if( getRunParameter()->fLowGainCalibrationFile.size() > 0 )
+    if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
     {
        iLowGainCaliLines = getLowGainCalibrationRunNumbers_fromCalibFile();
        if( iLowGainCaliLines > 0 ) setCalibrationFileNames();

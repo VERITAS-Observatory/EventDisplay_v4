@@ -221,7 +221,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
    cout << " (SVN REVISION " << fEVNDISP_SVNREVISION << ")" << endl;
    cout << "Observatory: " << fObservatory;
    cout << " (long " << fObservatory_Longitude_deg << " deg, lat " << fObservatory_Latitude_deg << " deg,";
-   cout << " alt " << fObservatory_Height_m << " m)" << endl;
+   cout << " altitude " << fObservatory_Height_m << " m)" << endl;
    cout << endl;
    if( fDBServer.size() > 0 ) cout << "DB server " << fDBServer << endl;
    cout << "Directories: " << endl;

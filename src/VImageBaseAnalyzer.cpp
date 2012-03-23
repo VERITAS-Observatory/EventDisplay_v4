@@ -587,6 +587,8 @@ void VImageBaseAnalyzer::gainCorrect()
 // correct gains
         if ( getGains()[i] > 0  && !getDead(getHiLo()[i])[i] ) setSums( i, getSums()[i] / (getGains()[i] * iHIGHQE) );
         else setSums( i, 0. );
+        if ( getGains()[i] > 0  && !getDead(getHiLo()[i])[i] ) setSums2( i, getSums2()[i] / (getGains()[i] * iHIGHQE) );
+        else setSums2( i, 0. );
     }
 }
 
