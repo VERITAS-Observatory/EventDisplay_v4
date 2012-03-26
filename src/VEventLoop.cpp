@@ -221,10 +221,11 @@ bool VEventLoop::initEventLoop( string iFileName )
 // open temporary file (do make sure that event numbering is correct)
 // get number of samples
                 VBFDataReader i_tempReader( fRunPar->fsourcefile, fRunPar->fsourcetype, fRunPar->fNTelescopes, fDebug );
-		bool i_bSampleBreak = false;
 // loop over several events
 // (note: MC might have no telescope event data until the first triggered event)
-// (note, TODO: depending that all telescope have at the same time a telescope event)
+// (note: zero suppressed data)
+		vector< bool > i_nSampleSet( fRunPar->fTelToAnalyze.size(), false );
+		unsigned int i_counter = 0;
 		for( ;; )
 		{
 		   i_tempReader.getNextEvent();
@@ -235,16 +236,27 @@ bool VEventLoop::initEventLoop( string iFileName )
 		     if( i_tempReader.getNumSamples() != 0 )
 		     {
 		        setNSamples( fRunPar->fTelToAnalyze[i], i_tempReader.getNumSamples() );
-			i_bSampleBreak = true;
+			i_nSampleSet[i] = true;
                      }
 		   }
-		   if( i_bSampleBreak ) break;
-                }
-		if( getNSamples() == 0 ) 
+		   unsigned int z = 0;
+		   for( unsigned int i = 0; i < i_nSampleSet.size(); i++ )
+		   {
+		       if( i_nSampleSet[i] ) z++;
+                   }
+		   if( z == i_nSampleSet.size() ) break;
+		   i_counter++;
+		   if( i_counter == 1000 )
+		   {
+		      cout << "VEventLoop warning: could not find number of samples in the first 1000 events" << endl;
+                   }
+		   if( i_counter > 9999 ) break;
+                } 
+		if( getNSamples() == 0 || i_counter > 9999 ) 
 		{
 		   cout << "VEventLoop::initEventLoop error: could not find any telescope events to determine sample length" << endl;
 		   cout << "exciting..." << endl;
-		   exit( 0 );
+		   exit( -1 );
                 }
 ///////////////////////////////////////////////////////////////
             }

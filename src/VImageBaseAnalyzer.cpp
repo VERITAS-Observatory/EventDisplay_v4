@@ -227,8 +227,6 @@ void VImageBaseAnalyzer::FADCStopCorrect()
        if( getFADCstopTrig()[t] >= 0 && getFADCstopTrig()[t] < getNChannels() ) iPedFADCTrigChan = getFADCstopTrig()[t];
     }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // now get channel jitter
 
@@ -245,7 +243,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
        double offset = 0.;
        try
        {
-	   if( i < fReader->getMaxChannels() )
+	   if( i < fReader->getMaxChannels() && !getReader()->isZeroSuppressed( i ) )
 	   {
 	       i_channelHitID = fReader->getHitID(i);
 	       fReader->selectHitChan((uint32_t)i);
@@ -254,10 +252,9 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 		   fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
 	       }
 // take pedestal from another FADC trig channel
-	       else if( iPedFADCTrigChan < getPeds().size() ) 
+	       else if( iPedFADCTrigChan < getPeds().size() && !getReader()->isZeroSuppressed( iPedFADCTrigChan ) ) 
 	       {
-		   i_channelHitID = fReader->getHitID( iPedFADCTrigChan );
-		   fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
+		   fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[iPedFADCTrigChan], getPedrms()[iPedFADCTrigChan], i_channelHitID, i, 0. );
 		   i_channelHitID = fReader->getHitID( i );
 	       }
 	       else continue;
@@ -309,12 +306,13 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 	   {
 	       cout << "VImageBaseAnalyzer::FADCStopCorrect(), index out of range warning (fReader->getHitID) ";
 	       cout << "channel " << i << ", hit ID " << i_channelHitID << endl;
-	       cout << " (Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
+	       cout << "zero suppression " << getReader()->isZeroSuppressed(i) << endl;
+	       cout << " (Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")";
+	       cout << endl;
 	       setDebugLevel( 1 );
 	   }
        }
    }
-
 }
 
 

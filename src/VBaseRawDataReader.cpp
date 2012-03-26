@@ -120,7 +120,7 @@ uint16_t VBaseRawDataReader::getMaxChannels()
 
 uint16_t VBaseRawDataReader::getNumSamples()
 {
-    if( !fEvent[fTelID] ) return 128;
+    if( !fEvent[fTelID] ) return 0;
     if( fTelID < fEvent.size() )
     {
         if( fEvent[fTelID] )
@@ -128,7 +128,7 @@ uint16_t VBaseRawDataReader::getNumSamples()
             return fEvent[fTelID]->getNumSamples();
         }
     }
-    return 128;
+    return 0;
 } 
 
 
