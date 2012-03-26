@@ -1,7 +1,7 @@
-//! VPedestalCombineLowGainFiles  combine two low gain pedestal files into a single file
+//! VPedestalLowGain  combine two low gain pedestal files into a single file
 
-#ifndef VPedestalCombineLowGainFiles_H
-#define VPedestalCombineLowGainFiles_H
+#ifndef VPedestalLowGain_H
+#define VPedestalLowGain_H
 
 #include <fstream>
 #include <iostream>
@@ -16,7 +16,7 @@
 
 using namespace std;
 
-class VPedestalCombineLowGainFiles
+class VPedestalLowGain
 {
    private:
 
@@ -37,20 +37,31 @@ class VPedestalCombineLowGainFiles
    vector< TH1F* > fHped;
    vector< string > fPedLine;
 
-   TFile* readLowGainHistograms( string iFile, unsigned int iChannel_min, unsigned int iChannel_max );
-   void   reset();
+   vector< double > fPed1;
+   vector< double > fPed2;
+
+
+   TFile*           readLowGainHistograms( string iFile, unsigned int iChannel_min, unsigned int iChannel_max );
+   vector< double > readPedestalFiles( string iFile );
+   void             reset();
 
    public:
 
-   VPedestalCombineLowGainFiles();
-  ~VPedestalCombineLowGainFiles() {}
+   VPedestalLowGain();
+  ~VPedestalLowGain() {}
 
+// combine two low gain pedestal files
    bool readLowGainPedestalFiles( string iFile1, string iFile2 );
    void setChannelNumberRange( unsigned int iChannel1_min = 0, unsigned int iChannel1_max = 249, unsigned int iChannel2_min = 250, unsigned int iChannel2_max = 499 );
    void setSummationWindowRange( unsigned int iSumWindow_min = 1, unsigned int iSumWindow_max = 20 ) { fSumWindow_min = iSumWindow_min; fSumWindow_max = iSumWindow_max; }
    void setTelescopeID( unsigned int iTelID = 1 ) { fTelescopeID = iTelID; }
    bool combineLowGainPedestalFileForAllTelescopes( unsigned int iNTel, string iCalibrationDirectory, string iRun1, string iRun2, string iOutRun );
    bool writeLowGainPedestalFile( string iOutFileName );
+
+// compare two low gain pedestal files
+   void printDifferences( double iTolerance = 0.5 );
+   bool readPedestalFiles( string iFile1, string iFile2 );
+
 };
 
 #endif

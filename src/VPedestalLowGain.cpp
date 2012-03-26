@@ -1,4 +1,4 @@
-/*! \class VPedestalCombineLowGainFiles
+/*! \class VPedestalLowGain
 
     low gain calibration fles are taken with one half of the camera at high voltage,
     while the other half is kept at nominal voltage
@@ -12,9 +12,9 @@
 
 */
 
-#include "VPedestalCombineLowGainFiles.h"
+#include "VPedestalLowGain.h"
 
-VPedestalCombineLowGainFiles::VPedestalCombineLowGainFiles()
+VPedestalLowGain::VPedestalLowGain()
 {
     fDebug = false;
 
@@ -26,7 +26,7 @@ VPedestalCombineLowGainFiles::VPedestalCombineLowGainFiles()
     setTelescopeID();
 }
 
-void VPedestalCombineLowGainFiles::setChannelNumberRange( unsigned int iChannel1_min, unsigned int iChannel1_max, unsigned int iChannel2_min, unsigned int iChannel2_max )
+void VPedestalLowGain::setChannelNumberRange( unsigned int iChannel1_min, unsigned int iChannel1_max, unsigned int iChannel2_min, unsigned int iChannel2_max )
 {
    fChannel1_min = iChannel1_min;
    fChannel1_max = iChannel1_max;
@@ -34,7 +34,7 @@ void VPedestalCombineLowGainFiles::setChannelNumberRange( unsigned int iChannel1
    fChannel2_max = iChannel2_max;
 }
 
-bool VPedestalCombineLowGainFiles::readLowGainPedestalFiles( string iFile1, string iFile2 )
+bool VPedestalLowGain::readLowGainPedestalFiles( string iFile1, string iFile2 )
 {
     fFile1 = readLowGainHistograms( iFile1, fChannel1_min, fChannel1_max );
     if( !fFile1 ) return false;
@@ -44,7 +44,7 @@ bool VPedestalCombineLowGainFiles::readLowGainPedestalFiles( string iFile1, stri
     return true;
 }
 
-TFile* VPedestalCombineLowGainFiles::readLowGainHistograms( string iFile, unsigned int iChannel_min, unsigned int iChannel_max )
+TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChannel_min, unsigned int iChannel_max )
 {
    char hname[2000];
 
@@ -53,7 +53,7 @@ TFile* VPedestalCombineLowGainFiles::readLowGainHistograms( string iFile, unsign
    TFile *fFile = new TFile( hname );
    if( fFile->IsZombie() )
    {
-      cout << "VPedestalCombineLowGainFiles::readLowGainHistograms error reading " << hname << endl;
+      cout << "VPedestalLowGain::readLowGainHistograms error reading " << hname << endl;
       return fFile;
    }
    if( !fFile->cd( "distributions" ) ) return fFile;
@@ -69,7 +69,7 @@ TFile* VPedestalCombineLowGainFiles::readLowGainHistograms( string iFile, unsign
 	 if( h ) fHped.push_back( h );
 	 else
 	 {
-	    cout << "VPedestalCombineLowGainFiles::readLowGainHistograms warning: histogram not found " << hname << endl;
+	    cout << "VPedestalLowGain::readLowGainHistograms warning: histogram not found " << hname << endl;
          }
       }
    }
@@ -80,7 +80,7 @@ TFile* VPedestalCombineLowGainFiles::readLowGainHistograms( string iFile, unsign
    is.open( hname, ifstream::in );
    if( !is )
    {
-      cout << "VPedestalCombineLowGainFiles::readLowGainHistograms error reading " << hname << endl;
+      cout << "VPedestalLowGain::readLowGainHistograms error reading " << hname << endl;
    }
    string is_line;
    unsigned int iTemp;
@@ -104,7 +104,7 @@ TFile* VPedestalCombineLowGainFiles::readLowGainHistograms( string iFile, unsign
    return fFile;
 }
 
-bool VPedestalCombineLowGainFiles::writeLowGainPedestalFile( string iOutFileName )
+bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
 {
    char hname[2000];
 
@@ -113,7 +113,7 @@ bool VPedestalCombineLowGainFiles::writeLowGainPedestalFile( string iOutFileName
    TFile iF( hname, "RECREATE" );
    if( iF.IsZombie() )
    {
-      cout << "VPedestalCombineLowGainFiles::writeLowGainPedestalFile error creating output file " << iOutFileName << endl;
+      cout << "VPedestalLowGain::writeLowGainPedestalFile error creating output file " << iOutFileName << endl;
       return false;
    }
    cout << "writing root file: " << hname << endl;
@@ -132,7 +132,7 @@ bool VPedestalCombineLowGainFiles::writeLowGainPedestalFile( string iOutFileName
    is.open( hname, ifstream::out );
    if( !is )
    {
-      cout << "VPedestalCombineLowGainFiles::writeLowGainPedestalFile error reading " << hname << endl;
+      cout << "VPedestalLowGain::writeLowGainPedestalFile error reading " << hname << endl;
    }
    cout << "writing text file: " << hname << " (" << fPedLine.size() << ")" << endl;
    for( unsigned int i = 0; i< fPedLine.size(); i++ )
@@ -144,7 +144,7 @@ bool VPedestalCombineLowGainFiles::writeLowGainPedestalFile( string iOutFileName
    return true;
 }
 
-void VPedestalCombineLowGainFiles::reset()
+void VPedestalLowGain::reset()
 {
    fPedLine.clear();
    fHped.clear();
@@ -152,7 +152,7 @@ void VPedestalCombineLowGainFiles::reset()
    if( fFile2 ) delete fFile2;
 }
 
-bool VPedestalCombineLowGainFiles::combineLowGainPedestalFileForAllTelescopes( unsigned int iNTel, string iCalibrationDirectory, string iRun1, string iRun2, string iOutRun )
+bool VPedestalLowGain::combineLowGainPedestalFileForAllTelescopes( unsigned int iNTel, string iCalibrationDirectory, string iRun1, string iRun2, string iOutRun )
 {
    char hname1[2000];
    char hname2[2000];
@@ -171,4 +171,69 @@ bool VPedestalCombineLowGainFiles::combineLowGainPedestalFileForAllTelescopes( u
 
    }
    return true;
+}
+
+// pedestal comparision
+
+bool VPedestalLowGain::readPedestalFiles( string iFile1, string iFile2 )
+{
+   fPed1 = readPedestalFiles( iFile1 );
+   fPed2 = readPedestalFiles( iFile2 );
+
+   return true;
+}
+
+
+vector< double > VPedestalLowGain::readPedestalFiles( string iFile )
+{
+   vector< double > iPed;
+
+// read text file
+   ifstream is;
+   is.open( iFile.c_str(), ifstream::in );
+   if( !is )
+   {
+      cout << "VPedestalLowGain::readLowGainHistograms error reading " << iFile << endl;
+      return iPed;
+   }
+   string is_line;
+   unsigned int iTemp = 0;
+   double iTempD = 0.;
+
+   while( getline( is, is_line ) )
+   {
+      if( is_line.size() == 0 ) continue;
+
+      istringstream is_stream( is_line );
+
+      is_stream >> iTemp;
+
+      is_stream >> iTemp;
+
+      is_stream >> iTempD;
+
+      iPed.push_back( iTempD );
+   }
+
+   cout << "Found " << iPed.size() << " pedestals in file " << iFile << endl;
+   return iPed;
+}
+
+void VPedestalLowGain::printDifferences( double iTolerance )
+{
+   if( fPed1.size() != fPed2.size() )
+   {
+      cout << "VPedestalLowGain::printDifferences error: pedestal vectors with different sizes" << endl;
+      cout << "\t" << fPed1.size() << "\t" << fPed2.size() << endl;
+      return;
+   }
+
+   for( unsigned int i = 0; i < fPed1.size(); i++ )
+   {
+      if( TMath::Abs( fPed1[i] - fPed2[i] ) > iTolerance )
+      {
+         cout << "difference > tolerance for channel " << i << " (" << fPed1[i] << ", " << fPed2[i] << ")" << endl;
+      }
+   }
+
 }
