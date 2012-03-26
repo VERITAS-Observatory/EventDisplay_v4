@@ -120,16 +120,13 @@ echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
 ##############################################################################################
 
 ##### reconstruction parameter file #####
-set OPT="-reconstructionparameter $RECFILE -nevents=1000000"
+set OPT="-reconstructionparameter $RECFILE"
 
 ##### pedestal options #####
 set PEDOPT="-calibrationfile calibrationlist.dat -pedestalnoiselevel=$NOISE"
 
 ##### MC options #####
 set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
-
-##### old options #####
-# "-MC_FADCTraceStart=2"
 
 echo "RUNNUMBER $RUN"
 echo "EVNDISP outputfile root file written to $ODIR/$RUN.root"

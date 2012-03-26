@@ -13,11 +13,9 @@ set ZEW=123456789
 set WOB=987654321
 set WOG=WOGWOG
 set NOISE=NOISENOISE
-set METHOD=RECMETH
 set ARRAY=XXXXXX
 set FDIR=DATADIR
 set YDIR=OUTDIR
-set SW=SUMWINDOW
 set PART=IDIDID
 set ATMO=AAAAAAAA
 ##############################################################################################
@@ -30,11 +28,6 @@ source $EVNDISPSYS/setObservatory.tcsh VERITAS
 ###################### V4 #################################################
 if( $ARRAY == "V4" ) then
    if( $PART == "1" ) then
-#      set IFIL=gamma_"$ZEW"deg_750m_wobble"$WOB"_2008_2009_
-#      set RUN=( 8"$ZEW"0 9"$ZEW"0 9"$ZEW"5 )
-#      set NRUN=3
-#      set IFIL=gamma_Sept09_oldArray_"$ZEW"deg_"$WOG"
-#      set RUN=( "wobb" )
       set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47460
@@ -51,7 +44,6 @@ endif
 ###################### V5 #################################################
 if( $ARRAY == "V5" ) then
    if( $PART == "1" ) then
-#      set IFIL=gamma_Sept09_newArray_"$ZEW"deg_"$WOG"
       set IFIL=Nov10_na_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47570
@@ -89,7 +81,7 @@ set PEDLEV="16."
 
 #####################################################
 # temporary data directory
-set DDIR=$TMPDIR"/evn_"$ZEW"_"$SW"_"$NOISE"_"$WOB
+set DDIR=$TMPDIR"/evn_"$ZEW"_"$NOISE"_"$WOB
 echo $DDIR
 mkdir -p $DDIR
 
@@ -134,7 +126,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20110406_ATM"$ATMO"_"$TTA"_SW"$SW"_NOISE"$NOISE"_"$METHOD"/
+set ODIR=$YDIR/analysis_d20120320_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -148,23 +140,11 @@ echo "SOURCE FILE " $XFIL
 # eventdisplay run options
 ##############################################################################################
 
-##### reconstruction method #####
-set OPT=""
-if( $METHOD == "GEO" ) then
-  set OPT="$OPT"
-endif
-if( $METHOD == "LL" ) then
-  set OPT="$OPT -loglminloss=0.00"
-endif
-
 ##### pedestal options #####
 set PEDOPT="-pedestalfile $NOISEFILE -pedestalseed=$RRR -pedestalDefaultPedestal=$PEDLEV -pedestalnoiselevel=$NOISE"
 
 ##### MC options #####
-set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
-
-##### old options #####
-# "-MC_FADCTraceStart=2"
+set MCOPT="-sourcetype=2 -camera=$CFG -nevents=5000"
 
 echo "RUNNUMBER $SRUN"
 echo "EVNDISP outputfile root file written to $ODIR/$RRR.root"
@@ -173,7 +153,7 @@ echo "EVNDISP log file written to $ODIR/$RRR.log"
 ##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -sumwindow_doublepass=$SW -teltoana=$TTA $MCOPT $PEDOPT $OPT  >& $ODIR/$RRR.log
+$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT >& $ODIR/$RRR.log
 ##############################################################################################
 
 # remove temporary vbf file

@@ -113,6 +113,6 @@ echo "QFILES $QLOGDIR/"
 echo "LOG AND DATA FILES: $ODIR"
 
 # submit the job
-qsub -V -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+qsub -V -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
 exit
