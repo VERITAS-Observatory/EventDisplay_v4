@@ -126,7 +126,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20120320_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20120326_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -144,7 +144,7 @@ echo "SOURCE FILE " $XFIL
 set PEDOPT="-pedestalfile $NOISEFILE -pedestalseed=$RRR -pedestalDefaultPedestal=$PEDLEV -pedestalnoiselevel=$NOISE"
 
 ##### MC options #####
-set MCOPT="-sourcetype=2 -camera=$CFG -nevents=5000"
+set MCOPT="-sourcetype=2 -camera=$CFG"
 
 echo "RUNNUMBER $SRUN"
 echo "EVNDISP outputfile root file written to $ODIR/$RRR.root"

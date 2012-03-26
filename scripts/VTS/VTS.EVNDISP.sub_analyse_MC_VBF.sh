@@ -128,7 +128,7 @@ do
 
 # submit the job
 #   qsub -l os="sl*" -V -l h_cpu=40:00:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
-   qsub -l os="sl*" -V -l h_cpu=0:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+   qsub -l os="sl*" -V -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
   done
 
