@@ -72,6 +72,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fGainLowGainFileNumber.push_back( 0 );
     fTOffLowGainFileNumber.push_back( 0 );
     fPixFileNumber.push_back( 0 );
+    fIgnoreDSTGains = false;
 
     fTelToAnalyze.push_back( 0 );
 
@@ -111,15 +112,8 @@ VEvndispRunParameter::VEvndispRunParameter()
     fLowGainPeds = true;
 
 // analyzer parameters
-    fUseFixedThresholds = false;
-    fImageCleaningMethod = 0;
-    fimagethresh.push_back( 5.0 );
-    fborderthresh.push_back( 2.5 );
-    fbrightnonimagetresh.push_back( 2.5 );
-    ftimecutpixel.push_back( 0.5 );   //HP
-    ftimecutcluster.push_back( 2.0 ); //HP
-    fminpixelcluster.push_back( 3 );  //HP
-    floops.push_back( 2 );            //HP
+    fImageCleaningParameters.push_back( new VImageCleaningRunParameter() ); 
+
     fsumfirst.push_back( 2 );
     fsumwindow_1.push_back( 12 );
     fsumwindow_2.push_back( 12 );
@@ -346,9 +340,6 @@ void VEvndispRunParameter::print( int iEv )
     if( fperformFADCAnalysis )
     {
        cout << "analysing FADC traces";
-       cout << " (trace integration method " << fTraceIntegrationMethod[0];
-       if( fDoublePass ) cout << ", "  << " for pass 1 in doublepass: " << fTraceIntegrationMethod_pass1[0];
-       cout << ")" << endl;
     }
     else if( fsourcetype == 7 )  cout << "reading trace analysis results from DST file" << endl;
 
@@ -406,16 +397,17 @@ void VEvndispRunParameter::print( int iEv )
     if( iEv == 2 )
     {
         cout << endl;
-        if( fUseFixedThresholds ) cout << "using fixed image/border thresholds" << endl;
-	cout << "cleaning method: " << getImageCleaningMethod() << endl;
-        cout << "Parallaxwidth: trigger map input type: "<< fPWmethod <<endl;
-        cout << "Parallaxwidth: number of neighbors required for cleaning: "<< fPWcleanNeighbors << endl;
         if( fPWmethod ==3 )
-            cout << "Parallaxwidth: FADC cleaning threshold for identifying triggered pixels (for method 3): "<< fPWcleanThreshold << endl;
+	{
+	   cout << "Parallaxwidth: trigger map input type: "<< fPWmethod <<endl;
+	   cout << "Parallaxwidth: number of neighbors required for cleaning: "<< fPWcleanNeighbors << endl;
+	   cout << "Parallaxwidth: FADC cleaning threshold for identifying triggered pixels (for method 3): "<< fPWcleanThreshold << endl;
+	}
         for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
         {
-            cout << "Telescope " << i+1 << ": image/border/brightnonimage " << fimagethresh[i] << "/" << fborderthresh[i] << "/" << fbrightnonimagetresh[i];
-            cout << ", window size (start: " << fsumwindow_1[i] << "/" << fsumwindow_2[i] << "(" << fsumfirst[i] << ")";
+	    if( i < fImageCleaningParameters.size() ) fImageCleaningParameters[i]->print();
+	    
+            cout << " window size (start: " << fsumwindow_1[i] << "/" << fsumwindow_2[i] << "(" << fsumfirst[i] << ")" << endl;
             if( fDoublePass )
             {
                 cout << ", window size (doublepass, pass 1): " << fsumwindow_pass1[i];
@@ -423,10 +415,8 @@ void VEvndispRunParameter::print( int iEv )
                 cout << ", max TD: " << fDBSumWindowMaxTimedifference[i];
                 cout << ", max T0 threshold " << fSumWindowStartAtT0Min;
             }
-	    if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds,";
-	    else                      cout << " (signal/noise cleaning thesholds,";
-	    cout << " cleaning method " << getImageCleaningMethodIndex() << endl;
             cout << endl;
+
             cout << "\t\t";
             cout << "pedestal file: " << fPedFileNumber[i];
             if( fPedLowGainFileNumber[i] > 0 ) cout << ", low gain pedestal file: " << fPedLowGainFileNumber[i];
@@ -509,22 +499,4 @@ void VEvndispRunParameter::setSystemParameters()
 // get root info
     fEventDisplayBuildROOTVersion = gROOT->GetVersion();
     fEventDisplayBuildROOTVersionInt = gROOT->GetVersionInt();
-}
-
-string VEvndispRunParameter::getImageCleaningMethod()
-{
-   if( fImageCleaningMethod == 1 )      return "TIMECLUSTERCLEANING";
-   else if( fImageCleaningMethod == 2 ) return "MAXIMCLEANING";
-
-   return "TWOLEVELCLEANING";
-}
-
-bool VEvndispRunParameter::setImageCleaningMethod( string iMethod )
-{
-   if( iMethod == "TWOLEVELCLEANING" )         fImageCleaningMethod = 0;
-   else if( iMethod == "TIMECLUSTERCLEANING" ) fImageCleaningMethod = 1;
-   else if( iMethod == "MAXIMCLEANING" )       fImageCleaningMethod = 2;
-   else return false;
-
-   return true;
 }

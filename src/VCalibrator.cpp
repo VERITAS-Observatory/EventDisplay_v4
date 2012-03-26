@@ -2105,7 +2105,7 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        {
           for( unsigned int p = 0; p < nPixel; p++ )
 	  {
-	     if( fConv_high[p] > 0. )
+	     if( fConv_high[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
 	     {
 		getGains( false )[p] = 1./fConv_high[p];
 		if( getGainDist( false ) ) getGainDist( false )->Fill( 1./fConv_high[p] );
@@ -2127,7 +2127,7 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        {
           for( unsigned int p = 0; p < nPixel; p++ )
 	  {
-	     if( fConv_low[p] > 0. )
+	     if( fConv_low[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
 	     {
 		getGains( true )[p] = 1./fConv_low[p];
 		if( getGainDist( true ) ) getGainDist( true )->Fill( 1./fConv_low[p] );

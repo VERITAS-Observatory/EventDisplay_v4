@@ -36,6 +36,7 @@
 #include <string>
 #include <vector>
 
+
 using namespace std;
 
 class VEvndispData
@@ -151,8 +152,8 @@ class VEvndispData
         unsigned int        getAnalysisArrayEventStatus() { return fAnalysisArrayEventStatus; }
         vector< unsigned int >& getAnalysisTelescopeEventStatus() { return fAnalysisTelescopeEventStatus; }
         vector<bool>&       getBorder() {return fAnaData[fTelID]->fBorder;}
-        double              getBorderThresh() { return fRunPar->fborderthresh[fTelID]; }
-        double              getBrightNonImageThresh() { return fRunPar->fbrightnonimagetresh[fTelID]; }
+        double              getBorderThresh() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->fborderthresh; else return 0.; }
+        double              getBrightNonImageThresh() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->fbrightnonimagetresh; else return 0.; }
         VCalibrationData*   getCalData() { return fCalData[fTelID]; }
         VCalibrationData*   getCalData( unsigned int iTel ) { if( iTel < fCalData.size() ) return fCalData[iTel]; else return 0; }
         VCalibrationData*   getCalibrationData() { return fCalData[fTelID]; }
@@ -195,11 +196,12 @@ class VEvndispData
         vector<bool>&       getHiLo() { return fAnaData[fTelID]->fHiLo; }
         VImageAnalyzerHistograms*     getHistograms() { return fAnaData[fTelID]->fAnaHistos; }
         vector<bool>&       getImage() { return fAnaData[fTelID]->fImage; }
+	VImageCleaningRunParameter* getImageCleaningParameter() { if( fTelID < getRunParameter()->fImageCleaningParameters.size() ) return getRunParameter()->fImageCleaningParameters[fTelID]; else return 0; }
         vector<bool>&       getImageBorderNeighbour() { return fAnaData[fTelID]->fImageBorderNeighbour; }
         VImageParameter*    getImageParameters() { return fAnaData[fTelID]->fImageParameter; }
         VImageParameter*    getImageParameters( int );
         VImageParameter*    getImageParametersLogL() { return fAnaData[fTelID]->fImageParameterLogL; }
-        double              getImageThresh() { return fRunPar->fimagethresh[fTelID]; }
+        double              getImageThresh() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->fimagethresh; else return 0.; }
         vector<int>&        getImageUser() { return fAnaData[fTelID]->fImageUser; }
         vector<bool>&       getLLEst() { return fAnaData[fTelID]->fLLEst; }
         TList*              getIntegratedChargeHistograms() { return fAnaData[fTelID]->getIntegratedChargeHistograms(); }
@@ -338,8 +340,8 @@ class VEvndispData
         void                setAnaData() { fAnaData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getReader()->getMaxChannels(), (getTraceFit()>-1.), getDebugFlag(), getRunParameter()->fMCNdeadSeed, getNSamples(), getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, getRunParameter()->fpulsetiming_width_index ); }
         void                setBorder( bool iBo ) {  fAnaData[fTelID]->fBorder.assign( fDetectorGeo->getNChannels( fTelID ), iBo ); }
         void                setBorder( unsigned int iChannel, bool iBo ) { fAnaData[fTelID]->fBorder[iChannel] = iBo; }
-        void                setBorderThresh( double ithresh ) { fRunPar->fborderthresh[fTelID] = ithresh; }
-        void                setBrightNonImageThresh( double ithresh ) { fRunPar->fbrightnonimagetresh[fTelID] = ithresh; }
+        void                setBorderThresh( double ithresh ) { if( getImageCleaningParameter() ) getImageCleaningParameter()->fborderthresh = ithresh; }
+        void                setBrightNonImageThresh( double ithresh ) { if( getImageCleaningParameter() ) getImageCleaningParameter()->fbrightnonimagetresh = ithresh; }
         void                setCalData() { fCalData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getDebugFlag() ); }
         void                setCalibrated() { if( fTelID < fCalibrated.size() ) fCalibrated[fTelID] = true; }
         void                setCalibrated( bool iCal ) { if( fTelID < fCalibrated.size() ) fCalibrated[fTelID] = iCal; }
@@ -363,7 +365,7 @@ class VEvndispData
         void                setImage( bool iIm ) {  fAnaData[fTelID]->fImage.assign( fDetectorGeo->getNChannels( fTelID ), iIm ); }
         void                setImageBorderNeighbour( bool iIm ) {  fAnaData[fTelID]->fImageBorderNeighbour.assign( fDetectorGeo->getNChannels( fTelID ), iIm ); }
         void                setImage( unsigned int iChannel, bool iIm ) {  fAnaData[fTelID]->fImage[iChannel] = iIm; }
-        void                setImageThresh( double ithresh ) { fRunPar->fimagethresh[fTelID] = ithresh; }
+        void                setImageThresh( double ithresh ) { if( getImageCleaningParameter() ) getImageCleaningParameter()->fimagethresh = ithresh; }
         void                setImageUser( int iIu ) { fAnaData[fTelID]->fImageUser.assign( fDetectorGeo->getNChannels( fTelID ), iIu ); }
         void                setImageUser( unsigned int iChannel, int iIu ) { fAnaData[fTelID]->fImageUser[iChannel] = iIu; }
         void                setLowGainPedestals() { fCalData[fTelID]->fBoolLowGainPedestals = true; }
@@ -381,10 +383,10 @@ class VEvndispData
         void                setNSamples( unsigned int iTelID, unsigned int iSamp ) { fDetectorGeo->setNSamples( iTelID, iSamp, fRunPar->fUseVBFSampleLength ); }
         void                setDebugLevel( int i );
 /////////////// time image cleaning /////////////////////
-	double           getTimeCutPixel() { return fRunPar->ftimecutpixel[fTelID]; }; //HP
-	double           getTimeCutCluster() { return fRunPar->ftimecutcluster[fTelID]; }; //HP
-	int              getMinNumPixelsInCluster() { return fRunPar->fminpixelcluster[fTelID]; }; //HP
-	int              getNumLoops() { return fRunPar->floops[fTelID]; }; //HP
+	double           getTimeCutPixel() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->ftimecutpixel; else return 0.; } //HP
+	double           getTimeCutCluster() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->ftimecutcluster; else return 0.; } //HP
+	int              getMinNumPixelsInCluster() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->fminpixelcluster; else return 0; } //HP
+	int              getNumLoops() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->floops; else return 0; } //HP
 
 	void             setClusterNpix( int iID, int clusterNpix )    { fAnaData[fTelID]->fClusterNpix[iID] = clusterNpix; } //HP
         vector<int>&     getClusterNpix() { return fAnaData[fTelID]->fClusterNpix;  } //HP

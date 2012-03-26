@@ -271,6 +271,7 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VDST.o \
 		./obj/VDSTTree.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VPedestalCalculator.o \
@@ -345,6 +346,7 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VDeadTime.o ./obj/VUtilities.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
@@ -391,6 +393,7 @@ makeRadialAcceptance:	$(ACCOBJECT)
 
 EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o ./obj/VEffectiveAreaCalculator.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
@@ -442,6 +445,7 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/Ctelconfig.o ./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o ./obj/VTableLookupRunParameter.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter_Dict.o ./obj/VTargets.o ./obj/VASlalib.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -484,6 +488,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VExposure.o ./obj/VExposure_Dict.o \
 		./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
 		./obj/VSpectralEnergyDistribution.o ./obj/VSpectralEnergyDistribution_Dict.o \
@@ -553,6 +558,7 @@ endif
 # printRunParameter
 ########################################################
 PRINTRUNOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VUtilities.o ./obj/VTableLookupRunParameter.o \
 		./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
@@ -573,6 +579,7 @@ printRunParameter:	$(PRINTRUNOBJ)
 # makeDISPTables
 ########################################################
 MAKEDISPTABLESOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 			./obj/VDispTable.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
 			./obj/Cshowerpars.o ./obj/Ctpars.o \
@@ -608,6 +615,7 @@ combineDISPTables:	$(COMBINEDISPTABLESOBJ)
 # printDISPTables
 ########################################################
 PRINTDISPTABLESOBJ= 	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VUtilities.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
@@ -655,6 +663,7 @@ combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./o
 trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 					./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+					./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 					./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 					./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 					./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
@@ -680,6 +689,7 @@ combineEffectiveAreas:	./obj/combineEffectiveAreas.o \
 # trainTMVAforGammaHadronSeparation
 ########################################################
 MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			./obj/VTMVARunData.o ./obj/VTMVARunData_Dict.o \
@@ -701,6 +711,7 @@ trainTMVAforGammaHadronSeparation:	$(MAKEOPTCUTTMVAOBJ)
 MAKEOPTCUTTMVATRAININGOBJ= 	./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 				./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VEvndispRunParameter.o obj/VEvndispRunParameter_Dict.o \
 				./obj/trainTMVAforGammaHadronSeparation_TrainingFile.o
 
@@ -767,6 +778,7 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 
 calculateBinaryPhases:	./obj/CData.o \
 			./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VOrbitalPhase.o ./obj/VOrbitalPhase_Dict.o \
@@ -818,6 +830,7 @@ endif
 CTA.convert_hessio_to_VDST:	./obj/VDSTTree.o \
 				./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/CTA.convert_hessio_to_VDST.o
 	   $(LD) $(LDFLAGS) $(GLIBS) $(SOEXEFLAGS) \

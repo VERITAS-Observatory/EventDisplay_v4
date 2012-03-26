@@ -199,6 +199,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
             else  fRunPara->fcalibrationfile = "";
         }
+	else if( iTemp.find( "ignoredstgains" ) < iTemp.size() )
+	{
+	   fRunPara->fIgnoreDSTGains = true;
+        }
 	else if( iTemp.find( "lowgaincalibrationfile" ) < iTemp.size() )
 	{
 	   if( iTemp2.size() > 0 )
@@ -305,18 +309,6 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fuseDB = false;
         }
-/*        else if( iTemp.find( "usefixedthresholds" ) < iTemp.size() )
-        {
-            fRunPara->fUseFixedThresholds = true;
-        } */
-/*        else if( iTemp.find( "usesignalnoisethresholds" ) < iTemp.size() )
-        {
-            fRunPara->fUseFixedThresholds = false;
-        } */
-/*        else if( iTemp.find( "imagecleaningmethod" ) < iTemp.size() )  // HP
-        {
-            fRunPara->fImageCleaningMethod = (unsigned int)(atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() ));
-        } */
 // ignore configuration file versions
         else if( iTemp.find( "ignorecfgversions" ) < iTemp.size() )
         {
@@ -521,56 +513,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             cout << "Warning: Parameter -fillhistos obsolete" << endl;
 //          fRunPara->ffillhistos = true;
         }
-/*        else if( iTemp.find( "image" ) < iTemp.size() )
-        {
-            fRunPara->fimagethresh[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        }
-        else if( iTemp.find( "border" ) < iTemp.size() )
-        {
-            fRunPara->fborderthresh[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        } */
-        else if( iTemp.find( "brightnonimage" ) < iTemp.size() )
-        {
-            fRunPara->fbrightnonimagetresh[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        }
-	else if( iTemp.find( "timecutpixel" ) < iTemp.size() )  //HP
-	{
-	    fRunPara->ftimecutpixel[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-	}
-	else if( iTemp.find( "timecutcluster" ) < iTemp.size() )  //HP
-	{
-	    fRunPara->ftimecutcluster[0] = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-	}
-	else if( iTemp.find( "minpixelcluster" ) < iTemp.size() )  //HP
-	{
-	    fRunPara->fminpixelcluster[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-	}
-	else if( iTemp.find( "loops" ) < iTemp.size() )  //HP
-	{
-	    fRunPara->floops[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-	}
-/*        else if( iTemp.find( "sumfirst" ) < iTemp.size() || iTemp.find( "sumstart" ) < iTemp.size() )
-        {
-            fRunPara->fsumfirst[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        }
-        else if( iTemp.find( "sumwindow" ) < iTemp.size() && !(iTemp.find( "sumwindow_doublepass" ) < iTemp.size()) )
-        {
-            fRunPara->fsumwindow_1[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-            fRunPara->fsumwindow_2[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        }
-        else if( iTemp.find( "sumwindow_doublepass" ) < iTemp.size() )
-        {
-            fRunPara->fsumwindow_pass1[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
-        } */
         else if( iTemp.find( "tracewindowshift" ) < iTemp.size() )
         {
             fRunPara->fTraceWindowShift[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
         }
-/*	else if( iTemp.find( "traceintegrationmethod" ) < iTemp.size() )
-	{
-	    fRunPara->fTraceIntegrationMethod[0] = (unsigned int)(atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() ) );
-	    fRunPara->fTraceIntegrationMethod_pass1[0] = (unsigned int)(atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() ) );
-        } */
 	else if( iTemp.find( "mc_fadctracestart" ) < iTemp.size() )
 	{
 	    fRunPara->fMC_FADCTraceStart = (unsigned int)atoi( iTemp.substr(iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
@@ -882,17 +828,6 @@ void VReadRunParameter::test_and_adjustParams()
        fRunPara->fUsePedestalsInTimeSlices = false;
        fRunPara->fLowGainUsePedestalsInTimeSlices = false;
     }
-// use fixed image/border thresholds for the case of no pedvars in the DSTs
-    if( fRunPara->fCalibrationDataType == 0 )
-    {
-            fRunPara->fUseFixedThresholds = true;
-    }
-// check image cleaning methods
-    if( fRunPara->fImageCleaningMethod > 2 )
-    {
-       cout << "VReadRunParameter::test_and_adjustParams() error: invalid image cleaning method (0,1,2): " << fRunPara->fImageCleaningMethod << endl;
-       exit( -1 );
-    }
 
 /////////////////////////////////////////////////////////////////
 // set vector sizes for calibration numbers
@@ -1111,14 +1046,14 @@ void VReadRunParameter::test_and_adjustParams()
         for( unsigned int i = 1; i < fRunPara->fNTelescopes; i++ )
         {
             fRunPara->fcamera.push_back( fRunPara->fcamera[0] );
-            fRunPara->fimagethresh.push_back( fRunPara->fimagethresh[0] );
+	    fRunPara->fImageCleaningParameters.push_back( new VImageCleaningRunParameter() );
+	    fRunPara->fImageCleaningParameters.back()->setTelID( i );
+// use fixed image/border thresholds for the case of no pedvars in the DSTs
+	    if( fRunPara->fCalibrationDataType == 0 )
+	    {
+	       fRunPara->fImageCleaningParameters.back()->fUseFixedThresholds = true;
+	    }
             fRunPara->fGainCorrection.push_back( fRunPara->fGainCorrection[0] );
-            fRunPara->fborderthresh.push_back( fRunPara->fborderthresh[0] );
-            fRunPara->fbrightnonimagetresh.push_back( fRunPara->fbrightnonimagetresh[0] );
-            fRunPara->ftimecutpixel.push_back( fRunPara->ftimecutpixel[0] );
-            fRunPara->ftimecutcluster.push_back( fRunPara->ftimecutcluster[0] );
-            fRunPara->fminpixelcluster.push_back( fRunPara->fminpixelcluster[0] );
-            fRunPara->floops.push_back( fRunPara->floops[0] );
             fRunPara->fsumwindow_1.push_back( fRunPara->fsumwindow_1[0] );
             fRunPara->fsumwindow_2.push_back( fRunPara->fsumwindow_2[0] );
             fRunPara->fsumwindow_pass1.push_back( fRunPara->fsumwindow_pass1[0] );
@@ -1373,21 +1308,6 @@ void VReadRunParameter::printHelp()
 //    cout << "\t -tracewindowshift=INT \t\t\t shift the summation window by value (in doublepass: low gain channels only, default: -1 (0 for -fixwindowstart))" << endl;
 //    cout << "\t -tracedefinesmallpulse=INT \t\t use double pass window placement for pulses with maximum smaller than this value (default: 15 d.c.)" << endl;
 //    cout << "\t -sumwindow_doublepass=INT \t\t length of summation window for first pass in double pass method (default=" << fRunPara->fsumwindow_pass1 [0] << ")" << endl;
-    cout << endl;
-
-    cout << "Image cleaning:" << endl;
-    cout << "---------------" << endl;
-//    cout << "\t -useSignalNoiseThresholds \t\t use use multiples of pedestal variations (default: on)" << endl;
-//    cout << "\t -useFixedThresholds \t\t\t use fixed image/border thresholds (default: off)" << endl;
-//    cout << "\t -imagethresh=FLOAT \t\t\t image threshold (default=" << fRunPara->fimagethresh[0] << ", units depend on cleaning method)" << endl;
-//    cout << "\t -borderthresh=FLOAT \t\t\t border threshold (default=" << fRunPara->fborderthresh[0] << ", units depend on cleaning method)" << endl;
-//    cout << "\t -brightnonimage=FLOAT \t\t\t bright non image threshold (default=" << fRunPara->fbrightnonimagetresh[0] << ")" << endl;
-//    cout << "\t -imagecleaningmethod=INT \t\t specify image cleaning method (0=two level cleaning (default), 1=time cluster cleaning, 2=..." << endl;
-    cout << "  time cleaning options" << endl;
-    cout << "\t\t -timecutpixel=FLOAT \t\t\t time cut between pixels (default=" << fRunPara->ftimecutpixel[0] << ")" << endl; //HP
-    cout << "\t\t -timecutcluster=FLOAT \t\t\t time cut between cluster (default=" << fRunPara->ftimecutcluster[0] << ") " << endl; //HP
-    cout << "\t\t -minpixelcluster=INT \t\t\t minimum number of pixels in cluster (default=" << fRunPara->fminpixelcluster[0] << ")" << endl; //HP
-    cout << "\t\t -loops=INT \t\t\t\t number of loops for border pixel finding (default=" << fRunPara->floops[0] << ")" << endl; //HP
     cout << endl;
 
     cout << "Image calculation:" << endl;

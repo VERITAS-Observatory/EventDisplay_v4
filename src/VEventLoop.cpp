@@ -130,7 +130,7 @@ void VEventLoop::printRunInfos()
 	if( fRunPar->fperformFADCAnalysis )
 	{
 	   cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
-	   if( fRunPar->fDoublePass ) cout << "  (doublepass: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
+	   if( fRunPar->fDoublePass ) cout << "  (doublepass, integration method pass 1: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
 	   cout << endl;
 	   cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
 	   cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples";
@@ -145,9 +145,11 @@ void VEventLoop::printRunInfos()
 	{
 	   cout << "\t no trace integration" << endl;
         }
-        cout << "\t image threshold: \t" << fRunPar->fimagethresh[fRunPar->fTelToAnalyze[i]];
-        cout << "\t\t border threshold: \t" << fRunPar->fborderthresh[fRunPar->fTelToAnalyze[i]];
-        if( fRunPar->fUseFixedThresholds ) cout << " (fixed image/border thresholds)";
+	cout << "\t image/border/brightnonimage " << getImageThresh() << "/" << getBorderThresh();
+	cout << "\t cleaning method " << getImageCleaningParameter()->getImageCleaningMethod();
+	cout << " (" << getImageCleaningParameter()->getImageCleaningMethodIndex() << ",";
+	if( getImageCleaningParameter()->fUseFixedThresholds ) cout << " fixed image/border thresholds)";
+	else                                                   cout << " variable image/border thresholds)";
         cout << endl;
         if( getCalData()->getLowGainDist() )
         {
@@ -458,6 +460,20 @@ void VEventLoop::initializeAnalyzers()
 	   if( getTeltoAna()[i] < fAnaData.size() && fAnaData[getTeltoAna()[i]] )
 	   {
 	      fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->fsetSpecialChannels, getRunParameter()->getDirectory_EVNDISPParameterFiles() );
+           }
+        }
+// initialize cleaning
+        for( unsigned int i = 0; i < fNTel; i++ )
+	{
+	   setTelID( i );
+	   if( getImageCleaningParameter() )
+	   {
+	      getImageCleaningParameter()->initialize();
+	   }
+	   else
+	   {
+	      cout << "VEventLoop::initializeAnalyzers() error initializing image cleaning for telescope " << getTelID()+1 << endl;
+	      exit( -1 );
            }
         }
     }

@@ -491,14 +491,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	       {
 		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
 		  {
-		     if( atoi( iTemp2.c_str() ) < 0 )
-		     {
-		        fRunPara->fperformFADCAnalysis = false;
-                     }
-		     else
-		     {
-			if( i < fRunPara->fTraceIntegrationMethod.size() ) fRunPara->fTraceIntegrationMethod[i] = atoi( iTemp2.c_str() );
-                     }
+		     if( i < fRunPara->fTraceIntegrationMethod.size() ) fRunPara->fTraceIntegrationMethod[i] = atoi( iTemp2.c_str() );
 		  }
                }
 	       continue;
@@ -565,17 +558,26 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	    }
 // image cleaning parameters
             else if( iTemp == "IMAGECLEANINGMETHOD" && fRunPara )
-	    {
-	       if( !fRunPara->setImageCleaningMethod( iTemp2 ) )
+            {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
 	       {
-	          cout << "VEvndispReconstructionParameter: unknown image cleaning method: " << iTemp2 << endl;
+	          if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fImageCleaningParameters.size() )
+		     {
+		        if( !fRunPara->fImageCleaningParameters[i]->setImageCleaningMethod( iTemp2 ) )
+			{
+			   cout << "VEvndispReconstructionParameter: unknown image cleaning method: " << iTemp2 << endl;
+                        }
+			if( iTemp3.size() > 0 )
+			{
+			   if( iTemp3 == "FIXED" ) fRunPara->fImageCleaningParameters[i]->fUseFixedThresholds = true;
+			   else                    fRunPara->fImageCleaningParameters[i]->fUseFixedThresholds = false;
+			}
+                     }
+                  }
                }
-	       if( iTemp3.size() > 0 )
-	       {
-	          if( iTemp3 == "FIXED" ) fRunPara->fUseFixedThresholds = true;
-		  else                    fRunPara->fUseFixedThresholds = false;
-               }
-	       continue;
+               continue;
 	    }
 	    else if( iTemp == "IMAGECLEANINGTHRESHOLDS" && fRunPara )
 	    {
@@ -583,14 +585,14 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	       {
 		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
 		  {
-		     if( i < fRunPara->fimagethresh.size() ) fRunPara->fimagethresh[i] = atof( iTemp2.c_str() );
+		     if( i < fRunPara->fImageCleaningParameters.size() ) fRunPara->fImageCleaningParameters[i]->fimagethresh = atof( iTemp2.c_str() );
 		     if( iTemp3.size() > 0 ) 
 		     {
-			 if( i < fRunPara->fborderthresh.size() ) fRunPara->fborderthresh[i] = atof( iTemp3.c_str() );
+			 if( i < fRunPara->fImageCleaningParameters.size() ) fRunPara->fImageCleaningParameters[i]->fborderthresh = atof( iTemp3.c_str() );
 		     }
 		  }
                }
-	       continue;
+               continue;
             }
 	    else if( iTemp == "LLEDGEFIT" && fRunPara )
 	    {

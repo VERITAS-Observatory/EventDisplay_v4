@@ -720,18 +720,20 @@ void VImageAnalyzer::setNTrigger()
 
 void VImageAnalyzer::imageCleaning()
 {
+   if( !getImageCleaningParameter() ) return;
+
 // fixed threshold cleaning
-   if( getRunParameter()->fUseFixedThresholds )
+   if( getImageCleaningParameter()->fUseFixedThresholds )
    {
       gainCorrect();
-      if( getRunParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
+      if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
       {
 	  fVImageCleaning->cleanImageFixedWithTiming( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), 
 						      getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
       } 
-      else if( getRunParameter()->getImageCleaningMethod() == "MAXIMCLEANING" )
+      else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
       {
-         fVImageCleaning->cleanImageFixedMaxim();
+         fVImageCleaning->cleanNNImageFixed();
       }
       else 
       {
@@ -741,14 +743,14 @@ void VImageAnalyzer::imageCleaning()
 // signal/noise cleaning
    else 
    {
-      if( getRunParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
+      if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
       {
 	  fVImageCleaning->cleanImagePedvarsWithTiming( getImageThresh(),getBorderThresh(), getBrightNonImageThresh(),
 							getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
       }
-      else if( getRunParameter()->getImageCleaningMethod() == "MAXIMCLEANING" )
+      else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
       {
-         fVImageCleaning->cleanImagePedvarsMaxim();
+         fVImageCleaning->cleanNNImagePedvars();
       }
       else
       {

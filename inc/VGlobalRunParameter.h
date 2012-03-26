@@ -17,8 +17,8 @@
 
 // HARDWIRED MAXIMUM NUMBER OF TELESCOPES AND CHANNELS, etc.
 #define VDST_MAXTELESCOPES  100    // maximum number of telescopes
-#define VDST_MAXCHANNELS  12000   // maximum number of channels per telescopes
-#define VDST_MAXSUMWINDOW   64    // maximum number of summation windows (=maximum number of samples per FADC trace)
+#define VDST_MAXCHANNELS   2900   // maximum number of channels per telescopes
+#define VDST_MAXSUMWINDOW   500    // maximum number of summation windows (=maximum number of samples per FADC trace)
 #define VDST_PEDTIMESLICES 5000    // maximum number of time slices for pedestal calculation
 #define VDST_MAXRECMETHODS  100    // maximum number of arrayreconstruction method
 #define VDST_MAXTIMINGLEVELS 10    // maximum number of timing levels

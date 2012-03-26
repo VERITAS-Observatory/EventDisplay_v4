@@ -32,13 +32,36 @@ class VImageCleaning
 // time cluster cleaning
 	void cleanImageFixedWithTiming( double, double, double, double, double, int, int );             
 	void cleanImagePedvarsWithTiming(double, double, double, double, double, int, int );           
-
-// 
-        void cleanImageFixedMaxim();
-        void cleanImagePedvarsMaxim();
-
-// obsolete?
         void cleanImage_clusterCleaning( double threshold_clustersize );
+
+// NN image cleaning
+        bool  kInitNNImageCleaning;
+        
+        TF1*  fProbCurve4nn;
+        TF1*  fProbCurve3nnrel;
+        TF1*  fProbCurve2plus1;
+        TF1*  fProbCurve2nn;
+        TF1*  fProbCurveBound;
+        int   VALIDITY[VDST_MAXCHANNELS];      //
+        int   VALIDITYBOUND[VDST_MAXCHANNELS]; //
+        int   VALIDITYBUF[VDST_MAXCHANNELS];   //
+        unsigned int nRings;
+        float CoincWinLimit;                   //ns
+        float INTENSITY[VDST_MAXCHANNELS];     //
+        float TIMES[VDST_MAXCHANNELS];         //
+
+        int   LocMin(int n, float *ptr, float &min);
+        int   LocMax(int n, float *ptr, float &max);
+
+        // main functions
+        bool  BoundarySearch(int type, float thresh, TF1* fProbCurve, float refdT, int refvalidity, int idx);
+        int   NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreCut);
+        int   NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, float PreCut);
+        float ImageCleaningCharge(int type, float NSBscale, int& ngroups);
+        void  cleanNNImageFixed();
+        void  cleanNNImagePedvars();
+        bool  InitNNImageCleaning();
+
 
 // MS
         void cleanTriggerFixed( double hithresh, double lothresh );

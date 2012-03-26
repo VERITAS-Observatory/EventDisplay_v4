@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "VGlobalRunParameter.h"
+#include "VImageCleaningRunParameter.h"
 
 using namespace std;
 
@@ -110,6 +111,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         float fCameraCoordinateTransformX;        // multiply all X coordinates in camera by this value
         float fCameraCoordinateTransformY;        // multiply all Y coordinates in camera by this value
         vector< double > fGainCorrection;         // all gains are divided by this number
+	bool   fIgnoreDSTGains;
         double fLaserSumMin;                      // minimal total charge sum for a event to be a laser event
         bool   fUsePedEvents;                     // use only true pedestal events (evttype=2) for pedestal analysis (default: off )
         bool   fLowGainPeds;                      // calculate pedestals from low gain channels only
@@ -149,18 +151,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	unsigned int fpulsetiming_max_index;
 
 // image cleaning
-        vector<double> fimagethresh;              // parameter for image threshold
-        vector<double> fborderthresh;             // parameter for border threshold
-        vector<double> fbrightnonimagetresh;      // parameter for bright pixels threshold
-
-        bool fUseFixedThresholds;                 // use fixed image/border thresholds instead of multiples of pedestal variances
-	unsigned int fImageCleaningMethod;        // 0: standard two level cleaning; 1: time cluster cleaning, 2: Maxim...
-
-// time cluster cleaning
-	vector<double> ftimecutpixel;             // HP: parameter for time cut between pixels
-	vector<double> ftimecutcluster;           // HP: parameter for time cut between clusters
-	vector<int> fminpixelcluster;             // HP: parameter for minimum number of pixels in cluster
-	vector<int> floops;                       // HP: parameter for number of loops for border pixel finding
+        vector< VImageCleaningRunParameter* >  fImageCleaningParameters;
 
 // image analysis
         int    fImageLL;                          // loglikelihood image parameterisation 0=off/1=on/2=verbose mode (default: 0=off )
@@ -238,12 +229,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         ~VEvndispRunParameter() {}
 
 	bool         doFADCAnalysis() { return fperformFADCAnalysis; }
-	string       getImageCleaningMethod();
-	unsigned int getImageCleaningMethodIndex() { return fImageCleaningMethod; }
-	bool         setImageCleaningMethod( string iMethod );
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,112);
+        ClassDef(VEvndispRunParameter,113);
 };
 #endif
