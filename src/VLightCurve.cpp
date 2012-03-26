@@ -696,7 +696,7 @@ bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError
 // 2D histogram
    if( fMCRandomizedPhaseogram == 0 )
    {
-      fMCRandomizedPhaseogram = new TH2D( iHisName.c_str(), "", 100, 0., 1., 100., iHisMin_y, iHisMax_y );
+      fMCRandomizedPhaseogram = new TH2D( iHisName.c_str(), "", 100, 0., 1., 100, iHisMin_y, iHisMax_y );
       fMCRandomizedPhaseogram->SetStats( 0 );
    }
    else

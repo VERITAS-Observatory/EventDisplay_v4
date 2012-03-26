@@ -67,7 +67,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     unsigned int getNumberOfGoodDataSets();
     TH1D*        getTheta2Histogram( unsigned int iDataSetID = 0, double i_Energy_TeV_lin = 1. );
     void         listDataSets();
-    TCanvas*     plotAngularResolution( string iXaxis = "energy", string iProbabilityString = "68" );
+    TCanvas*     plotAngularResolution( string iXaxis = "energy", string iProbabilityString = "68", double iMax = -1.e99 );
     TCanvas*     plotAngularResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy", string iProbabilityString = "68" );
     TCanvas*     plotCoreResolution( string iXaxis = "energy" );
     TCanvas*     plotCoreResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );

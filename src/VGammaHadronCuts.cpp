@@ -812,7 +812,8 @@ void VGammaHadronCuts::printCutSummary()
     cout << "Energy reconstrution: ";
     cout << fArrayEChi2_min << " <= EChi2 <= " << fArrayEChi2_max;
     cout << ", " << fArraydE_min << " < dE < " << fArraydE_max;
-    cout << ", " << fArrayErec_min << " < Erec < " << fArrayErec_max;
+    cout << ", " << fArrayErec_min << " < Erec < " << fArrayErec_max << endl;
+    cout << "SizeSecondMax: " << fArraySizeSecondMax_min << " < SizeSecondMax < " << fArraySizeSecondMax_max;
     cout << ", " << fArrayEmmission_min << " < Emission height < " << fArrayEmmission_max;
     cout << endl;
     cout << "Fiducial area (shower core): [" << fCoreX_min - fCoreEdge << "," << fCoreX_max + fCoreEdge;

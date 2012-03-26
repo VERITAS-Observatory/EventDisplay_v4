@@ -596,9 +596,10 @@ TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int 
 			    getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, string iProbabilityString )
+TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, string iProbabilityString, double iMax )
 {
    string iResolutionTreeName = "t_angular_resolution";
+   if( iMax > 0. ) getPlottingAxis( "angularesolution_Lin" )->fMaxValue = iMax;
    if( iProbabilityString != "68" ) iResolutionTreeName += "_0" + iProbabilityString +"p";
    return plotResolution( "angres"  + iProbabilityString, "angular resolution vs " + iXaxis + "(" + iProbabilityString + "%)",
                           "angular resolution (" + iProbabilityString + "%) [deg]",
