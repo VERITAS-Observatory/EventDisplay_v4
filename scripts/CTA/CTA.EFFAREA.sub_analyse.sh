@@ -63,11 +63,7 @@ if [ -n "$7" ]
 then
   GFILLING=$7
 fi
-TMVACUT="20111212"
-TMVACUT="20111220"
-TMVACUT="20120104-N2_Core"
-TMVACUT="20111213"
-TMVACUT="20120214"
+TMVACUT="20120323"
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ] && [ $PART != "gamma_onSourceDISP" ]
@@ -317,9 +313,9 @@ do
       rm -f $iCFIL-j
       if [ $PART = "gamma_onSource" ] 
       then
-         ANGRESFILE="$CTA_USER_DATA_DIR/analysis/EffectiveArea/AnalysisData/$DSET/AngularResolution/gamma_onSource."$ARRAY"_ID0.eff-0.root"
+	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/EffectiveArea/AngularResolution/gamma_onSource."$ARRAY"_ID0.eff-0.root"
       else
-         ANGRESFILE="$CTA_USER_DATA_DIR/analysis/EffectiveArea/AnalysisData/$DSET/AngularResolution/gamma_cone10."$ARRAY"_ID0.eff-$i.root"
+	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/EffectiveArea/AngularResolution/gamma_cone10."$ARRAY"_ID0.eff-$i.root"
       fi
       sed -e "s|ANGRESFILE|$ANGRESFILE|" $iCFIL-i > $iCFIL-j
       rm -f $iCFIL-i

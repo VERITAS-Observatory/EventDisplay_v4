@@ -41,7 +41,7 @@ for ((m = 0; m < $NPART; m++ ))
 do
    PART=${VPART[$m]}
 
-   for (( k = 0; k < 10; k++ ))
+   for (( k = 1; k < 10; k++ ))
    do
       if [ $4 = "v_leeds" ]
       then

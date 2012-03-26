@@ -6,14 +6,12 @@
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$5" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] 
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <subarray list> <run parameter filename> <directory for run parameter and log files> <output file name> <onSource/cone10> <data set>"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <output directory for run parameter and log files> <onSource/cone10> <data set>"
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
-   echo
-   echo "  <run parameter filename> without .runparameter (full path)"
    echo
    echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
    echo
@@ -25,21 +23,23 @@ then
    echo
    echo "   note 3: adjust h_cpu depending on your MVA method"
    echo
+   echo "   note 4: default TMVA parameter file is $CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.runparameter"
+   echo
    exit
 fi
 
-RPAR=$2
+RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
 RXPAR=`basename $RPAR.runparameter runparameter`
-DDIR=$3
-OFIL=$4
+DDIR=$2
+OFIL="BDT"
 # energy reconstruction method
 EREC=0
 CONE="FALSE"
-if [ $5 == "cone10" ] || [ $5 == "cone" ]
+if [ $3 == "cone10" ] || [ $3 == "cone" ]
 then
   CONE="TRUE"
 fi
-DSET=$6
+DSET=$4
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #####################################
