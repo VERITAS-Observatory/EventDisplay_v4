@@ -12,10 +12,8 @@ ANAC=TELESCOPES
 RECID=RECONSTRUCTIONID
 NOISEX=NOISEI
 NOISEY=NOISET
-SUMW=WWWWW
 ARRAY=AAAAA
 ATMO=BBBBBBB
-METHOD=RECMETH
 LOGDIR=CCCCCC
 ODDIR=DDDDDD
 
@@ -28,8 +26,9 @@ touch $LOGDIR/$TFIL.log
 
 # zenith angle bins
 # IZE=( 00 20 30 35 40 45 50 55 60 65 ) 
-IZE=( 20 )
+IZE=( 00 20 30 35 40 )
 NZE=${#IZE[@]}
+# wobble off bins
 # WOFF=( 0.00 0.25 0.5 0.75 1.00 1.25 1.50 1.75 2.00 )
 WOFF=( 0.5 )
 NWOF=${#WOFF[@]}
@@ -49,7 +48,7 @@ do
       echo "   WOFF BIN $W $NWOF ${WOFF[$W]}"
 
 # directory with input file
-      DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"${IZE[$N]}"deg_750m/wobble_"${WOFF[$W]}"/analysis_d20110406_ATM"$ATMO"_"$ANAC"_SW"$SUMW"_NOISE"$NOISEX"_"$METHOD"/*.root"
+      DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"${IZE[$N]}"deg_750m/wobble_"${WOFF[$W]}"/analysis_d20120326_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
 
 # make the tables
       $EVNDISPSYS/bin/mscw_energy -filltables=1 -inputfile "$DDIR" -tablefile $ODDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.root -ze=${IZE[$N]} -arrayrecid=$RECID -woff=${WOFF[$W]} -noise=$NOISEY >> $LOGDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.log

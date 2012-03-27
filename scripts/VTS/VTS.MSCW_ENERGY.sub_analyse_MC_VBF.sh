@@ -7,15 +7,13 @@
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ] || [ ! -n "$7" ]  || [ ! -n "$8" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ]
 then
    echo
-   echo "VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh <table file> <ana combination> <recid> <method (GEO/LL)> <atm (06/20/21/22)> <sumwindow> <full (TRUE/FALSE)> <array (V4/V5) > [gamma/proton/helium]" 
+   echo "VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh <table file> <recid> <atm (21/22)> <array (V4/V5) > [gamma/proton/helium]" 
    echo
    echo "analyse MC data (loop over zenith angles, noise levels and wobble offsets)"
    echo "<table file>       table file name (without .root and full path)"
-   echo "<ana combination>  e.g. 12, 123, 24, etc."
-   echo "<full>             write full MCpars to mscw file"
    echo "optional: [helium/proton/helium (default=gamma)]" 
    exit
 fi
@@ -24,24 +22,17 @@ fi
 # input variables
 ##############################################
 TFIL=$1
-ANAC=$2
-RECID=$3
-METH=$4
-ATMO=$5
-SUMW=$6
-FTRE=$7
-ARRAY=$8
+ANAC="1234"
+RECID=$2
+ATMO=$3
+FTRE="FALSE"
+ARRAY=$4
 PART="gamma"
 RUNN="1"
-if [ -n "$9" ]
+if [ -n "$5" ]
 then
-   PART=$9
+   PART=$5
 fi
-
-#if [ -n $10 ]
-#then
-#   RUNN="$10"
-#fi
 
 FSCRIPT="VTS.MSCW_ENERGY.qsub_analyse_MC_VBF"
 
@@ -97,12 +88,8 @@ do
       rm -f $FDIR/$FSCRIPT-2a.sh
       sed -e "s/ATMOOOS/$ATMO/" $FDIR/$FSCRIPT-2b.sh > $FDIR/$FSCRIPT-2c.sh
       rm -f $FDIR/$FSCRIPT-2b.sh
-      sed -e "s/METTTT/$METH/" $FDIR/$FSCRIPT-2c.sh > $FDIR/$FSCRIPT-2d.sh
+      sed -e "s/FUUUUUL/$FTRE/" $FDIR/$FSCRIPT-2c.sh > $FDIR/$FSCRIPT-2f.sh
       rm -f $FDIR/$FSCRIPT-2c.sh
-      sed -e "s/WWWWWWW/$SUMW/" $FDIR/$FSCRIPT-2d.sh > $FDIR/$FSCRIPT-2e.sh
-      rm -f $FDIR/$FSCRIPT-2d.sh
-      sed -e "s/FUUUUUL/$FTRE/" $FDIR/$FSCRIPT-2e.sh > $FDIR/$FSCRIPT-2f.sh
-      rm -f $FDIR/$FSCRIPT-2e.sh
       sed -e "s/WWWOBB/$WOFF/" $FDIR/$FSCRIPT-2f.sh > $FDIR/$FSCRIPT-3.sh
       rm -f $FDIR/$FSCRIPT-2f.sh
       sed -e "s/PAAAAART/$PART/" $FDIR/$FSCRIPT-3.sh > $FDIR/$FSCRIPT-3a.sh
@@ -117,7 +104,7 @@ do
       chmod u+x $FDIR/$FNAM.sh
 
 # submit the job
-      qsub -l os="sl*" -l h_cpu=04:00:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh
+      qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh
       echo "qsub -l h_cpu=04:00:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh"
      done
    done
