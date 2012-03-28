@@ -121,7 +121,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 // write 1D histograms to disk (default=off)
     fWrite1DHistograms = iWrite1DHistograms;
 // create the table file
-    fLookupTableFile = new TFile( itablefile.c_str(), "NEW", iFileTitle.c_str() );
+    fLookupTableFile = new TFile( itablefile.c_str(), "UPDATE", iFileTitle.c_str() );
     if( fLookupTableFile->IsZombie() )
     {
         cout << "VTableLookup::setMCTableFiles error while opening table file: " << itablefile << endl;
