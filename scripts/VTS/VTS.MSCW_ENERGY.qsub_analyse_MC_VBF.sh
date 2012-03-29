@@ -42,16 +42,11 @@ if( $FTRE == "TRUE" ) then
   set MOPT="-noNoTrigger -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 endif
 
-echo ${XDIR}
-echo ${ODIR}
-
 ###############################################
 # temporary directories
 ###############################################
 set DDIR=$TMPDIR"/mscwMCSW"$ZE"deg"$WOFF"degNOISE"$NOISE"ID"$RECID
 mkdir -p $DDIR
-echo "cp $XDIR $DDIR/"
-cp $XDIR $DDIR/
 
 ###############################################
 # output file name
@@ -63,7 +58,7 @@ mkdir -p $ODIR
 # run MSCW
 ###############################################
 cd $EVNDISPSYS/bin/
-./mscw_energy $MOPT -inputfile "$DDIR/*.root" -outputfile $DDIR/$OFIL.root -noise=$NOISE > $ODIR/$OFIL.log
+./mscw_energy $MOPT -inputfile "$XDIR" -outputfile $DDIR/$OFIL.root -noise=$NOISE > $ODIR/$OFIL.log
 
 ###############################################
 # cp results file back to data directory and clean up
