@@ -12,7 +12,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] || [ ! -n "$4" ]
 then
    echo
-   echo "VTS.MSCW_ENERGY.sub_make_tables.sh <table file> <recid> <array=V4/V5> <atmo ID=21/22>"
+   echo "VTS.MSCW_ENERGY.sub_make_tables.sh <table file> <recid> <atmo ID=21/22> <array=V4/V5>"
    echo
    echo " < recid: array rec id according to array_analysis_cuts.txt"
    echo
@@ -22,8 +22,8 @@ fi
 TFIL=$1
 ANAC="1234"
 RECID=$2
-ARRAY=$3
-ATMO=$4
+ARRAY=$4
+ATMO=$3
 
 if [ -e $TFIL ]
 then
