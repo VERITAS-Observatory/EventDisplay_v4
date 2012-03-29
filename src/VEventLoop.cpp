@@ -127,7 +127,7 @@ void VEventLoop::printRunInfos()
         cout << "Telescope " << fRunPar->fTelToAnalyze[i]+1;
 	if( i < getDetectorGeometry()->getTelType().size() ) cout << " (type " << getDetectorGeometry()->getTelType()[i] << ")";
 	cout << endl;
-	if( fRunPar->fperformFADCAnalysis )
+	if( fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]] )
 	{
 	   cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
 	   if( fRunPar->fDoublePass ) cout << "  (doublepass, integration method pass 1: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
@@ -699,7 +699,13 @@ bool VEventLoop::nextEvent()
             return false;
         }
         fReader->setTelescopeID( getTeltoAna()[0] );
-	if( !fReader->hasFADCTrace() ) getRunParameter()->fperformFADCAnalysis = false;
+	if( !fReader->hasFADCTrace() ) 
+	{
+	   for( unsigned int i = 0; i < getRunParameter()->fTraceIntegrationMethod.size(); i++ )
+	   {
+	      getRunParameter()->fTraceIntegrationMethod[i] = 0;
+           }
+        }
         fillTriggerVectors();
 ///////////////////////////////////////////////////////////
 // set eventnumbers

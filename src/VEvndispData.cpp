@@ -102,7 +102,14 @@ bool VEvndispData::initializeDataReader()
     if( !fReader ) return false;
 
     fReader->setTeltoAna( fTeltoAna );
-    fReader->setPerformFADCAnalysis( getRunParameter()->fperformFADCAnalysis );
+// PRELI: require right now that all telescopes should have FADCs (or not)
+    bool iperformFADCAnalysis = true;
+    for( unsigned int i = 0; i < getRunParameter()->fTraceIntegrationMethod.size(); i++ )
+    {
+       if( getRunParameter()->fTraceIntegrationMethod[i] == 0 ) iperformFADCAnalysis = false;
+    }
+    getRunParameter()->fperformFADCAnalysis = iperformFADCAnalysis;
+    fReader->setPerformFADCAnalysis( iperformFADCAnalysis );
 
     return true;
 }

@@ -498,7 +498,7 @@ void VTraceHandler::setPulseTimingLevels( vector< float > iP )
 bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 {
 // check method numbers
-   if( iT > 1 ) return false;
+   if( iT > 2 ) return false;
 
    fTraceIntegrationMethod = iT;
 
@@ -507,13 +507,13 @@ bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 
 double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw ) 
 {
-    if( fTraceIntegrationMethod == 0 )
+    if( fTraceIntegrationMethod == 1 )
     {
        fSumWindowFirst = fFirst;
        fSumWindowLast  = fLast;
        return getQuickSum( fFirst, fLast, fRaw );
     }
-    else if( fTraceIntegrationMethod == 1 )
+    else if( fTraceIntegrationMethod == 2 )
     {
         return getQuickMaximumSum( fLast - fFirst, fRaw );
     }

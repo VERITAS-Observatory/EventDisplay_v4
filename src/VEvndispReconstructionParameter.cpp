@@ -494,7 +494,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	       {
 		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
 		  {
-		     if( i < fRunPara->fTraceIntegrationMethod.size() ) fRunPara->fTraceIntegrationMethod[i] = atoi( iTemp2.c_str() );
+		     if( i < fRunPara->fTraceIntegrationMethod.size() ) fRunPara->fTraceIntegrationMethod[i] = (unsigned int)atoi( iTemp2.c_str() );
 		  }
                }
 	       continue;
@@ -518,7 +518,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 		  {
 		     if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
 		     {
-			if( i < fRunPara->fTraceIntegrationMethod_pass1.size() ) fRunPara->fTraceIntegrationMethod_pass1[i] = atoi( iTemp4.c_str() );
+			if( i < fRunPara->fTraceIntegrationMethod_pass1.size() ) fRunPara->fTraceIntegrationMethod_pass1[i] = (unsigned int)atoi( iTemp4.c_str() );
 		     }
 		  }
                }

@@ -128,8 +128,8 @@ VEvndispRunParameter::VEvndispRunParameter()
     fRemoveIsolatedPixel = true;
     fFillImageBorderNeighbours = true;
     fTraceWindowShift.push_back( -1 );
-    fTraceIntegrationMethod.push_back( 0 );
-    fTraceIntegrationMethod_pass1.push_back( 0 );
+    fTraceIntegrationMethod.push_back( 1 );
+    fTraceIntegrationMethod_pass1.push_back( 1 );
     fDBSumWindowMaxTimedifference.push_back( 10. );
     fSumWindowStartAtT0Min = 1.e9;
     fSmoothDead = false;
@@ -337,11 +337,6 @@ void VEvndispRunParameter::print( int iEv )
 
     if( fCalibrationDataType == 0 ) cout << "no calibration data available" << endl;
     cout << "signal charge unit is " << fFADCChargeUnit << endl;
-    if( fperformFADCAnalysis )
-    {
-       cout << "analysing FADC traces";
-    }
-    else if( fsourcetype == 7 )  cout << "reading trace analysis results from DST file" << endl;
 
     if( frunmode == 0 || frunmode == 4 )
     {
