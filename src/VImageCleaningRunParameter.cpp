@@ -31,11 +31,16 @@ bool VImageCleaningRunParameter::initialize()
 
 void VImageCleaningRunParameter::print()
 {
-   cout << "Telescope " << fTelID+1;
-   cout << ": image/border/brightnonimage " << fimagethresh << "/" << fborderthresh << "/" << fbrightnonimagetresh;
-   if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds,";
-   else                      cout << " (signal/noise cleaning thesholds,";
-   cout << " cleaning method " << getImageCleaningMethod() << " (" << getImageCleaningMethodIndex() << ")" << endl;
+//   cout << "Telescope " << fTelID+1;
+    cout << "\t cleaning method \t \t" << getImageCleaningMethod() << " (" << getImageCleaningMethodIndex() << ")" << endl;
+    cout << "\t image/border/brightnonimage \t" << fimagethresh << "/" << fborderthresh << "/" << fbrightnonimagetresh;
+    if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds)" << endl;
+    else                      cout << " (signal/noise cleaning thesholds)" << endl;
+    if( getImageCleaningMethodIndex() == 1 ) 
+    {
+	cout << "\t Tpixel/Tcluster/nMin/nLoops \t" << ftimecutpixel << "/" << ftimecutcluster 
+	     << "/" << fminpixelcluster << "/" << floops << endl;
+    }
 }
 
 
@@ -52,7 +57,7 @@ bool VImageCleaningRunParameter::setImageCleaningMethod( string iMethod )
 {
    if( iMethod == "TWOLEVELCLEANING" )         fImageCleaningMethod = 0;
    else if( iMethod == "TIMECLUSTERCLEANING" ) fImageCleaningMethod = 1;
-   else if( iMethod == "TIMENEXTNEIGHBOUR" )       fImageCleaningMethod = 2;
+   else if( iMethod == "TIMENEXTNEIGHBOUR" )   fImageCleaningMethod = 2;
    else return false;
 
    return true;

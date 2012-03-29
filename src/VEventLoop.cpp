@@ -145,12 +145,7 @@ void VEventLoop::printRunInfos()
 	{
 	   cout << "\t no trace integration" << endl;
         }
-	cout << "\t image/border/brightnonimage " << getImageThresh() << "/" << getBorderThresh();
-	cout << "\t cleaning method " << getImageCleaningParameter()->getImageCleaningMethod();
-	cout << " (" << getImageCleaningParameter()->getImageCleaningMethodIndex() << ",";
-	if( getImageCleaningParameter()->fUseFixedThresholds ) cout << " fixed image/border thresholds)";
-	else                                                   cout << " variable image/border thresholds)";
-        cout << endl;
+	getImageCleaningParameter()->print();
         if( getCalData()->getLowGainDist() )
         {
             cout << "\t low gain multiplier: \t" << setprecision( 3 ) << getCalData()->getLowGainDist()->GetMean() << "+-" << getCalData()->getLowGainDist()->GetRMS();

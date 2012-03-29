@@ -437,6 +437,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
     string iTemp2;
     string iTemp3;
     string iTemp4;
+    string iTemp5; 
     ULong64_t t_type = 0;
     int t_temp = 0;
     vector< int > v_temp;
@@ -483,6 +484,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	    else                   iTemp3 = "";
 	    if( !is_stream.eof() ) is_stream >> iTemp4;
 	    else                   iTemp4 = "";
+	    if( !is_stream.eof() ) is_stream >> iTemp5;
+	    else                   iTemp5 = "";
 
 // fadc trace analysis
             if( iTemp == "FADCANALYSIS" && fRunPara )
@@ -589,6 +592,29 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 		     if( iTemp3.size() > 0 ) 
 		     {
 			 if( i < fRunPara->fImageCleaningParameters.size() ) fRunPara->fImageCleaningParameters[i]->fborderthresh = atof( iTemp3.c_str() );
+		     }
+		  }
+               }
+               continue;
+            }
+	    else if( iTemp == "TIMECLEANINGPARAMETERS" && fRunPara )
+	    {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+	       {
+		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fImageCleaningParameters.size() ) fRunPara->fImageCleaningParameters[i]->ftimecutpixel = atof( iTemp2.c_str() );
+		     if( iTemp3.size() > 0 ) 
+		     {
+			 if( i < fRunPara->fImageCleaningParameters.size() ) fRunPara->fImageCleaningParameters[i]->ftimecutcluster = atof( iTemp3.c_str() );
+		     }
+		     if( iTemp4.size() > 0 ) 
+		     {
+			 if( i < fRunPara->fImageCleaningParameters.size() ) fRunPara->fImageCleaningParameters[i]->fminpixelcluster = atoi( iTemp4.c_str() );
+		     }
+		     if( iTemp5.size() > 0 ) 
+		     {
+			 if( i < fRunPara->fImageCleaningParameters.size() ) fRunPara->fImageCleaningParameters[i]->floops = atoi( iTemp5.c_str() );
 		     }
 		  }
                }
