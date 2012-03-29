@@ -21,8 +21,6 @@ source $EVNDISPSYS/setObservatory.sh VERITAS
 
 # this is where the executable can be found
 cd $EVNDISPSYS/bin
-rm -f $LOGDIR/$TFIL.log
-touch $LOGDIR/$TFIL.log
 
 # zenith angle bins
 # IZE=( 00 20 30 35 40 45 50 55 60 65 ) 
@@ -34,8 +32,22 @@ WOFF=( 0.5 )
 NWOF=${#WOFF[@]}
 
 ##############################################
+# clean up disk
+N=0
+while [ $N -lt $NZE ]
+do
+    W=0
+    while [ $W -lt $NWOF ]
+    do
+       rm -f $ODDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.root
+       rm -f $LOGDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.log
+       let "W = $W + 1"
+   done
+   let "N = $N + 1"
+done
+
+##############################################
 # loop over all zenith angle bins
-#set N = 1
 N=0
 while [ $N -lt $NZE ]
 do
