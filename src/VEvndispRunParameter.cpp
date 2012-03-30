@@ -80,7 +80,7 @@ VEvndispRunParameter::VEvndispRunParameter()
 
     fCameraCoordinateTransformX = 1.;
     fCameraCoordinateTransformY = 1.;
-
+    
 // pointing parameters
     fTargetName = "NONAME";
     fTargetDec = -999.;
@@ -386,7 +386,7 @@ void VEvndispRunParameter::print( int iEv )
        cout << "\t raw data: " << getDirectory_VBFRawData() << endl;
     }
     cout << "\t output: " << getDirectory_EVNDISPOutput() << endl;
-    if( fShortTree ) cout << "shortened tree output " << endl;
+    if( fShortTree ) cout << endl << "shortened tree output " << endl;
 
 // print analysis parameters
     if( iEv == 2 )
@@ -400,20 +400,38 @@ void VEvndispRunParameter::print( int iEv )
 	}
         for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
         {
-	    if( i < fImageCleaningParameters.size() ) fImageCleaningParameters[i]->print();
-	    
-            cout << " window size (start: " << fsumwindow_1[i] << "/" << fsumwindow_2[i] << "(" << fsumfirst[i] << ")" << endl;
-            if( fDoublePass )
-            {
-                cout << ", window size (doublepass, pass 1): " << fsumwindow_pass1[i];
-                cout << ", window shift: " << fTraceWindowShift[i];
-                cout << ", max TD: " << fDBSumWindowMaxTimedifference[i];
-                cout << ", max T0 threshold " << fSumWindowStartAtT0Min;
-            }
-            cout << endl;
+	    cout << "Telescope " << fTelToAnalyze[i]+1 << endl;
 
-            cout << "\t\t";
-            cout << "pedestal file: " << fPedFileNumber[i];
+	    // trace integration method
+ 	    if( fTraceIntegrationMethod[fTelToAnalyze[i]] != 0 )
+	    {
+		cout << "\t trace integration method: \t" << fTraceIntegrationMethod[fTelToAnalyze[i]];
+		if( fDoublePass ) cout << "\t (doublepass, integration method pass 1: " << fTraceIntegrationMethod_pass1[fTelToAnalyze[i]] << ")";
+		cout << endl;
+		cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
+		cout << "\t (shifted by " << fTraceWindowShift[i] << " samples";
+		if( fDoublePass ) cout << ", max T0 threshold " << fSumWindowStartAtT0Min << " d.c.)" << endl;
+		else              cout << ")" << endl;
+		cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];
+		cout << "/" << fsumwindow_2[fTelToAnalyze[i]];
+		if( fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fsumwindow_pass1[fTelToAnalyze[i]];
+		cout << endl;
+	    }
+	    else
+	    {
+		cout << "\t no trace integration" << endl;
+	    }
+	    // image cleaning method and values
+	    if( i < fImageCleaningParameters.size() ) fImageCleaningParameters[i]->print();
+	    cout << "\t LL edge fit: \t\t\tloss > " << fLogLikelihoodLoss_min[i] << "\t ntubes > " << fLogLikelihood_Ntubes_min[i] << endl;	    
+
+	    // calibration
+	    if( TMath::Abs( fGainCorrection[fTelToAnalyze[i]] ) - 1. > 1.e-2 )
+	    {
+		cout << "\t additional gain correction: " << fGainCorrection[fTelToAnalyze[i]];
+	    }
+// 	    cout << endl;
+            cout << "\t pedestal file: " << fPedFileNumber[i];
             if( fPedLowGainFileNumber[i] > 0 ) cout << ", low gain pedestal file: " << fPedLowGainFileNumber[i];
             cout << ", gain file: " << fGainFileNumber[i];
             if( fGainLowGainFileNumber[i] > 0 ) cout << ", low gain gain file: " << fGainLowGainFileNumber[i];

@@ -31,11 +31,10 @@ bool VImageCleaningRunParameter::initialize()
 
 void VImageCleaningRunParameter::print()
 {
-//   cout << "Telescope " << fTelID+1;
     cout << "\t cleaning method \t \t" << getImageCleaningMethod() << " (" << getImageCleaningMethodIndex() << ")" << endl;
     cout << "\t image/border/brightnonimage \t" << fimagethresh << "/" << fborderthresh << "/" << fbrightnonimagetresh;
     if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds)" << endl;
-    else                      cout << " (signal/noise cleaning thesholds)" << endl;
+    else                      cout << " (signal-to-noise cleaning thesholds)" << endl;
     if( getImageCleaningMethodIndex() == 1 ) 
     {
 	cout << "\t Tpixel/Tcluster/nMin/nLoops \t" << ftimecutpixel << "/" << ftimecutcluster 
