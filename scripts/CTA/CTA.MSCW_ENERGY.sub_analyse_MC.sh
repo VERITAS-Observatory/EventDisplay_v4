@@ -69,7 +69,6 @@ do
 
 #########################################
 # input files
-#IFIL="$CTA_DATA_DIR/analysis/$SUBAR/$PART/$WC"
    IFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/$WC"
 
 # check if input files exist

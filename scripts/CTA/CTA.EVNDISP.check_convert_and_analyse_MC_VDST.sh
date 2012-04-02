@@ -68,7 +68,7 @@ do
      fi
 
       DDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$PART/"
-      LDIR="$CTA_USER_LOG_DIR/analysis/AnalysisData/$DSET/$ARRAY/$PART/"
+      LDIR="$CTA_USER_LOG_DIR/analysis/AnalysisData/$DSET/$ARRAY/$PART-/"
 
 # check evndisp log file
       LFIL=`basename $AFIL .gz`

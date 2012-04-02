@@ -15,6 +15,8 @@ then
    echo
    echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
    echo
+   echo "  <output directory for run parameter and log files>  this is not the full path"
+   echo
    echo "  <data set>         e.g. cta-ultra3, ISDC3700, ...  "
    echo
    echo "   note 1: keywords ENERGYBINS and OUTPUTFILE are ignored in the runparameter file"

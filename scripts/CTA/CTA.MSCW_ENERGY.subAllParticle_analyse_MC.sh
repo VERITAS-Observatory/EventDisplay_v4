@@ -26,7 +26,6 @@ then
    exit
 fi
 
-#VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "helium" )
 if [ $4 = "cta-ultra3" ]
 then
    VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
