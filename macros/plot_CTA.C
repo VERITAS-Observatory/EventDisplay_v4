@@ -68,20 +68,29 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
     hnull->Draw();
 
     telconfig->SetMarkerStyle( 20 );
+    telconfig->SetMarkerColor( 5 );
+    telconfig->SetMarkerSize( 0.5 * iMarkerMult );
+    telconfig->Draw("TelY:TelX", "", "same" );
+
+    telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 2 );
     telconfig->SetMarkerSize( 1.5 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TelType/100000 > 400 ", "same" );
-    telconfig->Draw("TelY:TelX", "TelType==141304909", "same" );
+    telconfig->Draw("TelY:TelX", "TelType==141305009", "same" );
 
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 1 );
     telconfig->SetMarkerSize( 1.0 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TMath::Abs(TelType/100000-100)<5", "same" );
+    telconfig->Draw("TelY:TelX", "TelType==10007818", "same" );
+
+    telconfig->SetMarkerStyle( 20 );
+    telconfig->SetMarkerColor( 6 );
+    telconfig->SetMarkerSize( 1.0 * iMarkerMult );
+    telconfig->Draw("TelY:TelX", "TelType==10009725", "same" );
 
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 3 );
     telconfig->SetMarkerSize( 0.7 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TelType/100000<40", "same" );
+    telconfig->Draw("TelY:TelX", "TelType==3709725", "same" );
 
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 4 );
