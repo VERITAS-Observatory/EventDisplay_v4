@@ -10,7 +10,7 @@ MCD=`date`
 
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
 then
-  echo "VTS.EVNDISP.sub_analyse_MC_CARE_VBF.sh <ze> <array=V4/V5/V6> <reconstruction parameter file> <particle=1/2/14/402> <run nunmber> <noise>"
+  echo "VTS.EVNDISP.sub_analyse_MC_CARE_VBF.sh <ze> <array=V4/V5/V6> <reconstruction parameter file> <particle=1/2/14/402> <run number> <noise>"
   echo "V4: array before T1 move (before Autumn 2009)"
   echo "V5: array after T1 move (from Autumn 2009)"
   echo "V6: array after camera upgrade (from Autumn 2012)"
@@ -37,17 +37,17 @@ NOISE=$6
 if [ $PART = "1" ]
 then
    DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/care_optics_Nov10/ATM$ATMO/"
-   ODIR=$VERITAS_DATA_DIR"/analysis/"$ARRAY"_FLWO/care_optics_Nov10/gamma_"$ZEW"deg_750m/wobble_$WOB/"
+   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/care_optics_Nov10/gamma_"$ZEW"deg_750m/wobble_$WOB/"
 fi 
 if [ $PART = "2" ]
 then
    DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/care_optics_Nov10/ATM$ATMO/"
-   ODIR=$VERITAS_DATA_DIR"/analysis/"$ARRAY"_FLWO/care_optics_Nov10/electron_"$ZEW"deg_750m/wobble_$WOB/"
+   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/care_optics_Nov10/electron_"$ZEW"deg_750m/wobble_$WOB/"
 fi
 if [ $PART = "14" ]
 then
    DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/care_optics_Nov10/ATM$ATMO/"
-   ODIR=$VERITAS_DATA_DIR"/analysis/"$ARRAY"_FLWO/care_optics_Nov10/proton_"$ZEW"deg_750m/wobble_$WOB/"
+   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/care_optics_Nov10/proton_"$ZEW"deg_750m/wobble_$WOB/"
 fi
 echo $DDIR
 
@@ -62,7 +62,7 @@ fi
 QLOGDIR=$FDIR
 
 CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_CARE_VBF"
-OSCRIPT="qsub_evndisp_MC_CARE_VBF-$ZEW-$WOB-$ACUT-$NOIS-$ACUT-$ATMO"
+OSCRIPT="qsub_evndisp_MC_CARE_VBF-$ZEW-$WOB-$NOIS-$ACUT-$ATMO"
 
 # set zenith angle
 sed -e "s/123456789/$ZEW/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-b.sh
@@ -113,6 +113,6 @@ echo "QFILES $QLOGDIR/"
 echo "LOG AND DATA FILES: $ODIR"
 
 # submit the job
-qsub -V -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+qsub -V 10 -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
 exit

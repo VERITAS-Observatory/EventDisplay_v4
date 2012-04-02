@@ -31,7 +31,7 @@ NAME=$6
 IZE=( 00 20 30 35 40 45 50 55 60 65 )
 INOI=( 075 100 150 200 250 325 425 550 750 1000 )
 WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-IZE=( 00 20 30 35 40 45 50 )
+IZE=( 00 20 30 35 40 45 )
 INOI=( 075 100 150 200 250 325 425 550 750 1000 )
 WOFF=( 0.5 )
 ############################################################################################
@@ -119,16 +119,13 @@ do
 	 sed -e "s|EFFFILE|$FFIR|" VTS.EFFAREA.qsub_analyse.sh > $FNAM-3.sh
 	 sed -e "s|OOOOOOO|$ODDIR|" $FNAM-3.sh > $FNAM-4.sh
 	 rm -f $FNAM-3.sh
-	 sed -e "s|LLLLLLL|$LOGDIR|" $FNAM-4.sh > $FNAM-5.sh
+	 sed -e "s|MSCWFILE|$LOGDIR/$FFIR.dat|" $FNAM-4.sh > $FNAM.sh
 	 rm -f $FNAM-4.sh
-	 sed -e "s|MSCWFILE|$LOGDIR/$FFIR.dat|" $FNAM-5.sh > $FNAM.sh
-	 rm -f $FNAM-5.sh
 
 	 chmod u+x $FNAM.sh
 	 echo $FNAM.sh
 # submit job
          qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
-#         qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
 	 echo "writing queue log and error files to $QLOG"
 	 echo "writing analysis parameter files to $FNAM.sh"

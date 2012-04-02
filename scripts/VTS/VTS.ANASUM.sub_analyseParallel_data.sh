@@ -79,7 +79,7 @@ do
 
        chmod u+x $FSCRIPT.sh
 
-       qsub -V -l h_cpu=0:30:00 -l h_vmem=4000M -l tmpdir_size=10G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
+       qsub -V -l h_cpu=0:29:30 -l h_vmem=4000M -l tmpdir_size=10G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
 
     fi
 done 

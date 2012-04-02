@@ -85,7 +85,7 @@ endif
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20120313_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20120329_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -105,15 +105,15 @@ endif
 # calculate pedestals
 ##############################################################################################
 
-echo "CALCULATING PEDESTALS FOR RUN $RUN"
-rm -f $ODIR/$RUN.ped.log
-$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
+# echo "CALCULATING PEDESTALS FOR RUN $RUN"
+# rm -f $ODIR/$RUN.ped.log
+# $EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
 
-set CALIBDATA=$OBS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
-if (! -e $CALIBDATA ) then
-  touch $CALIBDATA 
-endif
-echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
+# set CALIBDATA=$OBS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
+# if (! -e $CALIBDATA ) then
+#   touch $CALIBDATA 
+# endif
+# echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
 
 ##############################################################################################
 # eventdisplay run options

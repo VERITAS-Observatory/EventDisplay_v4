@@ -19,15 +19,12 @@ set IFI=MSCWFILE
 set EFF=EFFFILE
 # output directory
 set ODIR=OOOOOOO
-# log directory
-set LDIR=LLLLLLL
 ###################################################################
 mkdir -p $ODIR
-mkdir -p $LDIR
 
 ###################################################################
 # calculate effective areas
 rm -f $ODIR/$EFF.root $LDIR/$EFF.log
-$EVNDISPSYS/bin/makeEffectiveArea $IFI $ODIR/$EFF.root > $LDIR/$EFF.log
+$EVNDISPSYS/bin/makeEffectiveArea $IFI $ODIR/$EFF.root > $ODIR/$EFF.log
 
 exit
