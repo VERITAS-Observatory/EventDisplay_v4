@@ -206,6 +206,69 @@ Detailed description of these files can be found in the corresponding chapters o
 
 \section{Trace integration}
 
+\section{Calibration}
+
+\subsection{Low gain calibration}
+
+{\bf\color{red}VERITAS only}
+
+For the calibration of the low-gain chain two values are important: the low-gain pedestal and the ratio between low and high-gain channel (usually between 5 and 6).
+
+\subsubsection{Low-gain pedestal calibration}
+
+Pedestal values of the low-gain chain are not sensitive to changes in the NSB as the high-gain chain.
+Therefore new calibration is only necessary after changes in the electronics, e.g. the after swapping a FADC board.
+For a list of good low-gain calibration runs and the valid time ranges look the VERITAS wiki page {\it Low gain calibration}.
+There is a list of documents linked to this page, valuable for background information.
+
+Low-gain calibration runs are taken by raising the HV in part of the cameras - therefore a pair of flasher runs is needed for
+the calibration (exception is the first run, 36862).
+The calculation of the low-gain pedestal values consists of two steps: 
+i) the calculation of the pedestal values and ii) merging these files into single pedestal files.
+
+Step 1 (script is in \$EVNDISPSYS/scripts/VTS)
+\begin{lstlisting}
+VTS.EVNDISP.analyse_pedestal_events <telescope number> \\
+				<sourcefile> [runnumber] [lowgain]
+
+use parameter lowgain=1 to calculate low-gain pedestals
+
+    VTS.EVNDISP.analyse_pedestal_events -1 /d20110213/55083.cvbf 55083 1
+
+\end{lstlisting}
+
+Results are written into the calibration directory in \$VERITAS\_EVNDISP\_ANA\_DIR, 
+files with suffixes {\it.lped} and {\it .lped.root}.
+
+Step 2: merge files into a single low-gain pedestal file
+
+Use the EVNDISP shared library and the class {\it VPedestalCombineLowGainFiles}:
+
+\begin{lstlisting}
+root [0] .L $EVNDISPSYS/lib/libVAnaSum.so
+root [1] VPedestalCombineLowGainFiles a;
+root [2] a.combineLowGainPedestalFileForAllTelescopes( unsigned int iNTel, \\
+string iCalibrationDirectory, \\
+string iRun1, string iRun2, string iOutRun );
+\end{lstlisting}
+
+The list of run numbers and the corresponding valid ranges are listen in the file
+{\it calibrationlist.LowGain.dat} in the calibration direction in \$VERITAS\_EVNDISP\_ANA\_DIR:
+
+\begin{lstlisting}
+
+LOWGAINPED <TELESCOPE> <RUNSTART> <RUNSTOP> <LOW GAIN PEDESTAL RUN NUMBER>
+(all comparisons are >= and <=)
+
+RUNS 55975 and 55978 (128 samples)
+* LOWGAINPED -1 46642 60000 5597578 
+....
+....
+
+\end{lstlisting}
+
+\subsubsection{Low-gain multiplicator}
+
 \section{Image analysis}
 
 \subsection{Log-likelihood fitting of images}
@@ -667,6 +730,106 @@ else if( fNMirrors == fSC_number_of_mirrors )  fTelescope_type += 200000000;
 \noindent {\bf Note:} There is currently no way to determine the mirror/telescope shape (parabolic, Davies-Cotton, etc) from the hessio file. This is why the mirror area and the number of mirrors is used. 
 The parabolic shape is assigned to all telescopes with a mirror area  $>$ 400 m$^2$.
 Schwarzschild-Couder Design are all telescopes with 2 mirrors only.
+
+%############# VERITAS data analysis tools #################
+
+\chapter{Tools for VERITAS analysis}
+
+\section{Exposure maps and run lists for any point in the sky}
+
+This small tools allows you to 
+
+\begin{itemize}
+\item plot exposure maps in Galactic coordinates for VERITAS (with and without radial acceptance)
+\item get a list of data runs for a given direction in the sky
+\item get a list of data runs for objects from a catalogue
+\item print a LaTex-style table for the selected list of objects with exposure, zenith angles, observing angle, etc.
+\end{itemize}
+
+Usage example:
+
+\begin{lstlisting}
+ // load shared library
+.L lib/libVAnaSum.so
+VExposure f;
+// read VERITAS db for a given period
+// (only necessary if no root file with
+// exposures is available)
+f.setTimeRange("20070901", "20071231" );
+f.readFromDB();
+// the results can be saved to a root file (fast access)
+f.writeRootFile( "myrootfile.root" );
+// and later retrieved with
+f.readRootFile("myrootfile.root" );
+// for radial acceptance correction an acceptance curve is needed
+f.readAcceptanceCurveFromFile("myacceptance.root" );
+// fill maps: (this may take a while)
+f.fillExposureMap();
+// plot the maps for a given l, b range
+f.plot(-10., 10., 60, 100., "" );
+// plot the maps with some objects from a catalogue:
+// (there are some examples of catalogues in the directory
+// with the auxiliary files:
+// AstroData/Catalogues/: tevcat.dat, ... 
+f.plot(-10., 10., 60, 100., "mycatalogue.dat" );
+// print list of runs of data taken e.g. around the Galactic centre (5 deg circle)
+f.printListOfRuns( 0., 0., 5. ); 
+// print list of runs around the objects in the given catalogue
+f.printListOfRuns(  "mycatalogue.dat" );
+\end{lstlisting}
+
+\section{Radiosonde Atmospheric Data}
+
+Download radiosonde balloon data from Tucson airport using a wget script and create a root file of the data.
+
+Use the download script, for example get data for the entire year of 2010: 
+
+\begin{lstlisting}
+cd $EVNDISPSYS/scripts/VTS/
+./VTS.downloadSoundingDatafromUWYO.sh 2010
+\end{lstlisting}
+
+Combine the monthly data into one file and create a list of files (in this case just the total file): 
+
+\begin{lstlisting}
+cat sounding_2010* > all_2010.dat
+ls all_2010.dat > list_2010.dat
+\end{lstlisting}
+
+Use a root file of radiosonde data and plot results 
+
+\begin{lstlisting}
+root -l
+.L ../../../../sharedLib/libVAnaSum.so 
+VAtmosphereSoundings a;
+a.readSoundingsFromTextFile("list_2010.dat");
+a.writeRootFile("all_2010.root");
+.q
+\end{lstlisting}
+
+Use the VAtmosphereSoundings class to plot the data: 
+
+\begin{lstlisting}
+root -l
+gROOT->SetStyle("Plain");
+gStyle->SetCanvasBorderMode(0);
+gStyle->SetPadBorderMode(0);
+gStyle->SetPalette(1); 
+.L ../../../../sharedLib/libVAnaSum.so 
+VAtmosphereSoundings a( "all_2010.root"); 
+a.plotAverages(2010,1,2010,12);
+a.plot2DProfiles(2010,1,2010,12);
+.q
+\end{lstlisting}
+
+\begin{itemize}
+\item please read through \$EVNDISPSYS/src/VAtmosphereSoundings.cpp for full analysis details 
+\item for a detailed overview of the results please see: Atmosphere 
+\item radiosonde data is from http://weather.uwyo.edu/upperair/sounding.html 
+\end{itemize}
+
+There is a root macro in {\it \$EVNDISPSYS/macros/VTS/atmosphericSounding.C} to plot monthly/yearly average and compare 
+with atmospheric profiles from simulations.
 
 % ############ light curve analysis ######################
 
