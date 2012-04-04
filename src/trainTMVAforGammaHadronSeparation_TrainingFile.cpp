@@ -69,7 +69,7 @@ int main( int argc, char *argv[] )
        cout << "trainTMVAforGammaHadronSeparation_TrainingFile <run parameter file> <output directory for mscw_energy file> <maximum theta2 value [deg^2]> <seed>" << endl;
        cout << endl;
        cout << "<run parameter file>";
-       cout << "parameter file with list of background mscw file (same format as in makeOptimizeBoxCutsTMVA)" << endl;
+       cout << "parameter file with list of background mscw file (same format as in trainTMVAforGammaHadronSeparation)" << endl;
        cout << "<seed>                 seed for random generator (default: 0)" << endl;
        cout << endl;
        cout << "Note: no wobble offsets are implemented yet" << endl;

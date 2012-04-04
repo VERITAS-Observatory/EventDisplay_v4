@@ -1328,6 +1328,9 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
         cout << "VEffectiveAreaCalculator::fill ERROR: unknown CORSIKA scatter mode: " << fScatterMode[ize] << endl;
         return false;
     }
+// reset unique event counter
+    fUniqueEventCounter.clear();
+    int iSuccessfullEventStatistics = 0;
 
 //////////////////////////////////////////////////////////////////
 // print some run information
@@ -1476,6 +1479,24 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
              eRecLin = d->MCe0;
          }
 	 else continue;
+
+// unique event counter
+// (make sure that map doesn't get too big)
+         if( iSuccessfullEventStatistics >= 0 )
+	 {
+	    iSuccessfullEventStatistics++;
+            if( fUniqueEventCounter.size() < 100000 )
+	    {
+	       unsigned int iUIEnergy = (unsigned int)(d->MCe0*1.e5);
+	       if( fUniqueEventCounter.find( iUIEnergy ) != fUniqueEventCounter.end() ) fUniqueEventCounter[iUIEnergy]++;
+	       else                                                                     fUniqueEventCounter[iUIEnergy] = 1;
+             }
+	     else iSuccessfullEventStatistics *= -1;
+         }
+	 else
+	 {
+            iSuccessfullEventStatistics--;
+	 }
          
 // loop over all az bins
          for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
@@ -1636,6 +1657,22 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
     }
 
     fCuts->printCutStatistics();
+
+// uniqueness of events
+    cout << "event statistics: " << endl;
+    if( iSuccessfullEventStatistics > 0 )
+    {
+       map< unsigned int, unsigned short int>::iterator it;
+       for( it = fUniqueEventCounter.begin(); it != fUniqueEventCounter.end(); it++ )
+       {
+	  if( (*it).second > 1 )
+	  {
+	     cout << "\t multiple event after cuts at " << (double)((*it).first)/1.e5 << " TeV, used " << (*it).second << " times" << endl;
+	  }
+       }
+    }
+    else iSuccessfullEventStatistics *= -1;
+    cout << "\t total number of events after cuts: " << iSuccessfullEventStatistics << endl;
 
     return true;
 }

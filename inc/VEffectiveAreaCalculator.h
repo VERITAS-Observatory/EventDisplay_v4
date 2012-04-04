@@ -79,6 +79,9 @@ class VEffectiveAreaCalculator
 	TGraph2DErrors *gTimeBinnedMeanEffectiveAreaErec;
         TGraphErrors *gMeanSystematicErrorGraph;
 
+// unique event counting
+        map< unsigned int, unsigned short int> fUniqueEventCounter;
+
         vector< double > fAreaRadius;
         vector< string > fScatterMode;
         vector< double > fXWobble;                //!< wobble offset in camera coordinates (grisudet)

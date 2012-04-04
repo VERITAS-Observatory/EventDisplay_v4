@@ -268,7 +268,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 {
     if( ifilename.find( "*" ) < ifilename.size() )
     {
-        cout << "Warning: using first file in list of files to determinate run parameters" << endl;
+        cout << "Information: using first file in list of files to determinate run parameters" << endl;
         cout << "(all files should have same energy range and spectral index)" << endl;
     }
 

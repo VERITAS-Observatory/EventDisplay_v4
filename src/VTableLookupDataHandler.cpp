@@ -209,7 +209,6 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
             fEventCounter++;
             return true;
         }
-// if( !fwrite ) reset();
         fEventWeight = 1.;
 
         bool iNE = true;
