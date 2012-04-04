@@ -949,13 +949,13 @@ double VStereoAnalysis::combineHistograms()
       for( unsigned h = 0; h < n_histo; h++ )
       {
       	fDirTotRun[h]->cd();
-      // read in tree with selected events
+// read in tree with selected events
       	if( fDirTotRun[h]->Get( "data_on" ) ) iTreeList->Add( fDirTotRun[h]->Get( "data_on" ) );
       	else if( fDirTotRun[h]->Get( "data_off" ) ) iTreeList->Add( fDirTotRun[h]->Get( "data_off" ) );
-      // read in sky plots from disk
+// read in sky plots from disk
       	fHisto[h]->readSkyPlots();
 
-      // UNCORRELATED PLOTS
+// UNCORRELATED PLOTS
       	int nxbin = fHistoTot->hmap_stereoUC->GetNbinsX();
       	int nybin = fHistoTot->hmap_stereoUC->GetNbinsY();
       	for( int i = 1; i <= nxbin; i++ )
@@ -970,7 +970,7 @@ double VStereoAnalysis::combineHistograms()
       		}
       	}
 
-      // CORRELATED PLOTS
+// CORRELATED PLOTS
       	nxbin = fHistoTot->hmap_stereo->GetNbinsX();
       	nybin = fHistoTot->hmap_stereo->GetNbinsY();
       	for( int i = 1; i <= nxbin; i++ )
@@ -998,9 +998,13 @@ double VStereoAnalysis::combineHistograms()
       	TIter nexth( fHisto[h]->hListParameterHistograms );
       	while( TH1 *h1 = (TH1*)next() )
       	{
-      		TH1 *h2 = (TH1*)nexth();
+	     TH1 *h2 = (TH1*)nexth();
+	     if( !h1 || !h2 ) continue;
 
-      		h1->Add( h2 );
+	     string iTemp = h1->GetName();
+	     if( iTemp.find( "2D" ) != string::npos ) continue;
+
+	     h1->Add( h2 );
       	}
       	fHisto[h]->deleteParameterHistograms();
       }
