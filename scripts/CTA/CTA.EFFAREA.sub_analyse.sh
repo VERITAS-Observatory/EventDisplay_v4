@@ -109,6 +109,10 @@ mkdir -p $ODIR
 if [ $PART = "gamma_onSource" ]
 then
    MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID"*.mscw.root
+   if [ $ARRAY = "V5" ]
+   then
+      MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID".mscw.root
+   fi
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_onSource."$ARRAY"_ID"$RECID".eff
    MCFIL=gamma_onSource."$ARRAY"_ID0.eff
@@ -196,6 +200,10 @@ fi
 if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
 then
    MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID"*.mscw.root
+   if [ $ARRAY = "V5" ]
+   then
+      MSCFILE=$DDIR/proton."$ARRAY"_ID"$RECID".mscw.root
+   fi
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=proton."$ARRAY"_ID"$RECID".eff
    MCFIL=proton."$ARRAY"_ID0.eff
@@ -310,7 +318,7 @@ do
 	 sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
       fi
 # angular resolution file
-      rm -f $iCFIL-j
+      rm -f $iCFIL-h
       if [ $PART = "gamma_onSource" ] 
       then
 	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/EffectiveArea/AngularResolution/gamma_onSource."$ARRAY"_ID0.eff-0.root"

@@ -51,6 +51,9 @@ then
    if [ $DSET = "cta-ultra3" ]
    then
       VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   elif [ $DSET = "VTS" ]
+   then
+     VPART=( "gamma_onSource" "proton" )
    else
       VPART=( "gamma_onSource" "electron" "proton" )
    fi
