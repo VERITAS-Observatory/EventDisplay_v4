@@ -24,7 +24,7 @@ mkdir -p $ODIR
 
 ###################################################################
 # calculate effective areas
-rm -f $ODIR/$EFF.root $LDIR/$EFF.log
+rm -f $ODIR/$EFF.root 
 $EVNDISPSYS/bin/makeEffectiveArea $IFI $ODIR/$EFF.root > $ODIR/$EFF.log
 
 exit
