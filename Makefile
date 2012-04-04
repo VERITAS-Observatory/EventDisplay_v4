@@ -32,6 +32,8 @@ ARCH = $(shell uname)
 package = EVNDISP
 version = 4.00
 distdir = $(package)-$(version)
+ctapara = $(distdir).CTA.runparameter
+vtspara = $(distdir).VTS.runparameter
 #############################
 # check root version number
 #############################
@@ -690,6 +692,8 @@ combineEffectiveAreas:	./obj/combineEffectiveAreas.o \
 ########################################################
 MAKEOPTCUTTMVAOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+			./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+			./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 			./obj/VTMVARunData.o ./obj/VTMVARunData_Dict.o \
@@ -926,6 +930,10 @@ $(distdir):	FORCEDISTDIR
 	cp inc/*.h $(distdir)/inc
 	mkdir -p $(distdir)/macros
 	cp -r macros/*.C $(distdir)/macros
+	mkdir -p $(distdir)/macros/CTA
+	cp -r macros/CTA/*.C $(distdir)/macros/CTA
+	mkdir -p $(distdir)/macros/VTS
+	cp -r macros/VTS/*.C $(distdir)/macros/VTS
 	mkdir -p $(distdir)/scripts/VTS
 	mkdir -p $(distdir)/scripts/CTA
 	cp -r scripts/CTA/*.sh $(distdir)/scripts/CTA
@@ -934,6 +942,84 @@ $(distdir):	FORCEDISTDIR
 FORCEDISTDIR:
 	rm -rf $(distdir).tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
+
+###############################################################################################################################
+# make a tar package with all run parameter files
+###############################################################################################################################
+
+# CTA
+
+CTA.runparameter:	$(ctapara).tar.gz
+
+$(ctapara).tar.gz:	$(ctapara)
+	find $(ctapara) -type f -print | cpio -o -H ustar > $(ctapara).tar
+	gzip $(ctapara).tar
+	rm -rf $(ctapara)
+
+$(ctapara):
+	rm -rf $(ctapara).tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(ctapara)
+	cp -r $(CTA_EVNDISP_ANA_DIR)/AstroData/Catalogues $(ctapara)
+	cp -r $(CTA_EVNDISP_ANA_DIR)/AstroData/TeV_data $(ctapara)
+	mkdir -p $(ctapara)/DetectorGeometry
+	cp -r $(CTA_EVNDISP_ANA_DIR)/DetectorGeometry/CTA.prod1* $(ctapara)/DetectorGeometry/
+	mkdir -p $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.QC.* $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVAFixedSignal.* $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVA.* $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
+	mkdir -p $(ctapara)/RadialAcceptances
+	mkdir -p $(ctapara)/Calibration
+	mkdir -p $(ctapara)/EffectiveAreas
+
+# VTS
+
+VTS.runparameter:	$(vtspara).tar.gz
+
+$(vtspara).tar.gz:	$(vtspara)
+	find $(vtspara) -type f -print | cpio -o -H ustar > $(vtspara).tar
+	gzip $(vtspara).tar
+	rm -rf $(vtspara)
+
+$(vtspara):
+	rm -rf $(vtspara).tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(vtspara)
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/AstroData/Catalogues $(vtspara)
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/AstroData/TeV_data $(vtspara)
+	mkdir -p $(vtspara)/Calibration/Tel_1
+	mkdir -p $(vtspara)/Calibration/Tel_2
+	mkdir -p $(vtspara)/Calibration/Tel_3
+	mkdir -p $(vtspara)/Calibration/Tel_4
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_1/36862.lpe* $(vtspara)/Calibration/Tel_1/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_2/36862.lpe* $(vtspara)/Calibration/Tel_2/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_3/36862.lpe* $(vtspara)/Calibration/Tel_3/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_4/36862.lpe* $(vtspara)/Calibration/Tel_4/
+# 7-digits lped files
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_1/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_1/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_2/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_2/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_3/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_3/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/Tel_4/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_4/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/calibrationlist.dat $(vtspara)/Calibration/
+	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/calibrationlist.LowGain.dat $(vtspara)/Calibration/
+	mkdir -p $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg $(vtspara)/DetectorGeometry
+	mkdir -p $(vtspara)/NOISE
+	cp -LR $(VERITAS_EVNDISP_ANA_DIR)/NOISE/*.grisu $(vtspara)/NOISE
+	mkdir -p $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.d20120322-cut-N* $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
+	mkdir -p $(vtspara)/RadialAcceptances
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/acceptance_ID8_cut-NImage34.root $(vtspara)/RadialAcceptances
+	mkdir -p $(vtspara)/EffectiveAreas
+
 
 ###############################################################################################################################
 # print environment and compilation parameters
