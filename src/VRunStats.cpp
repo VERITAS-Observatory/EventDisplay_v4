@@ -223,6 +223,10 @@ bool VRunStats::readDBAnalysisComments()
       TSQLRow *db_row = db_res->Next();
 
       if( !db_row ) break;
+      if( !db_row->GetField( 0 ) ) continue;
+      if( !db_row->GetField( 1 ) ) continue;
+      if( !db_row->GetField( 2 ) ) continue;
+      if( !db_row->GetField( 4 ) ) continue;
 
       fAnalysisComments.push_back( new VDBAnalysisComments() );
 
