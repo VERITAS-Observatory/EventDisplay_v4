@@ -78,7 +78,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     }
 
 // image parameters
-    tpars->Branch( "meanPed_Image", &fmeanPed_Image, "meanPed_Image/F" );
+    if( fShortTree < 1 ) tpars->Branch( "meanPed_Image", &fmeanPed_Image, "meanPed_Image/F" );
     tpars->Branch( "meanPedvar_Image", &fmeanPedvar_Image, "meanPedvar_Image/F" );
     tpars->Branch("cen_x", &cen_x, "cen_x/F");
     tpars->Branch("cen_y", &cen_y, "cen_y/F");
@@ -114,8 +114,11 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     tpars->Branch("nsat", &nsat, "nsat/s");
     tpars->Branch("nlowgain", &nlowgain, "nlowgain/s");
     tpars->Branch("ntubesBNI", &ntubesBrightNoImage, "ntubesBNI/s");
-    tpars->Branch("max", &max, "max[3]/F");
-    tpars->Branch("index_of_max", &index_of_max, "index_of_max[3]/s");
+    if( fShortTree < 1 )
+    {
+       tpars->Branch("max", &max, "max[3]/F");
+       tpars->Branch("index_of_max", &index_of_max, "index_of_max[3]/s");
+    }
     tpars->Branch("asymmetry",&asymmetry, "asymmetry/F");
     if( fShortTree < 1 )
     {

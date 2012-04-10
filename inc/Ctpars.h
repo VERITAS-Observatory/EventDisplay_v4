@@ -344,8 +344,20 @@ void Ctpars::Init(TTree *tree)
     fChain->SetBranchAddress("nsat",&nsat);
     if( fChain->GetBranchStatus("nlowgain" ) ) fChain->SetBranchAddress("nlowgain",&nlowgain);
     else nlowgain = 0;
-    fChain->SetBranchAddress("max",max);
-    fChain->SetBranchAddress("index_of_max",index_of_max);
+    if( !bShort )
+    {
+       fChain->SetBranchAddress("max",max);
+       fChain->SetBranchAddress("index_of_max",index_of_max);
+    }
+    else
+    {
+       max[0] = 0.;
+       max[1] = 0.;
+       max[2] = 0.;
+       index_of_max[0] = 0;
+       index_of_max[1] = 0;
+       index_of_max[2] = 0;
+    }
     fChain->SetBranchAddress("asymmetry",&asymmetry);
     fChain->SetBranchAddress("tgrad_x",&tgrad_x);
     if( !bShort )
@@ -403,8 +415,16 @@ Bool_t Ctpars::Notify()
     b_nsat = fChain->GetBranch("nsat");
     if( fChain->GetBranchStatus( "nlowgain" ) ) b_nlowgain = fChain->GetBranch("nlowgain");
     else b_nlowgain = 0;
-    b_max = fChain->GetBranch("max");
-    b_index_of_max = fChain->GetBranch("index_of_max");
+    if( !bShort )
+    {
+       b_max = fChain->GetBranch("max");
+       b_index_of_max = fChain->GetBranch("index_of_max");
+    }
+    else
+    {
+       b_max = 0;
+       b_index_of_max = 0;
+    }
     b_asymmetry = fChain->GetBranch("asymmetry");
     b_tgrad_x = fChain->GetBranch("tgrad_x");
     if( !bShort )

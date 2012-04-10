@@ -674,7 +674,7 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
                 if( fEventDisplayFileFormat < 5 )
                 {
                     if( iT->GetBranchStatus( "loss" ) ) fEventDisplayFileFormat = 3;
-                    if( iT->GetBranchStatus( "meanPed_Image" ) ) fEventDisplayFileFormat = 5;
+                    if( iT->GetBranchStatus( "meanPedvar_Image" ) ) fEventDisplayFileFormat = 5;
                 }
                 ftpars.push_back( new Ctpars( iT, fIsMC, fEventDisplayFileFormat, bShort ) );
             }
