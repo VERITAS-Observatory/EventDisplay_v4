@@ -209,6 +209,7 @@ VTS:	evndisp \
 	combineDISPTables \
 	printDISPTables \
 	combineLookupTables \
+	combineEffectiveAreas \
 	makeEffectiveArea \
 	makeRadialAcceptance \
 	trainTMVAforGammaHadronSeparation \
@@ -228,6 +229,7 @@ CTA:	evndisp \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
 	trainTMVAforGammaHadronSeparation_TrainingFile \
+	writeCTAWPPhysSensitivityFiles \
 	slib
 
 ########################################################
