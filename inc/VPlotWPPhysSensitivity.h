@@ -72,6 +72,9 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    vector< int >    fPlottingFillStyle;
    vector< string > fLegend;
 
+   double fMinEnergy_TeV;
+   double fMaxEnergy_TeV;
+
    bool    plotLegend( TCanvas *c = 0, bool iLeft = false );
 
    public:
@@ -87,6 +90,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    bool initialize();
    bool plotIRF( string iPrint = "", double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10, string iUnit = "ENERGY"  );
+   void setEnergyRange_Lin_TeV( double iMinEnergy_TeV = 0.01, double iMaxEnergy_TeV = 50. ) { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
 
 };
 

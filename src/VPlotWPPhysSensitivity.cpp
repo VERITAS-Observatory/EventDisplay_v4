@@ -7,6 +7,7 @@
 VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
 {
    fIRF = 0;
+   setEnergyRange_Lin_TeV();
 }
 
 
@@ -220,7 +221,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMax, double 
     fIRF = new VPlotInstrumentResponseFunction();
 
     fIRF->setCanvasSize( 400, 400 );
-    fIRF->setPlottingAxis( "energy_Lin", "X", true, 0.01, 200, "energy [TeV]" );
+    fIRF->setPlottingAxis( "energy_Lin", "X", true, fMinEnergy_TeV, fMaxEnergy_TeV, "energy [TeV]" );
     fIRF->setPlottingAxis( "effarea_Lin", "X", true, 50., iEffAreaMax );
     fIRF->setPlottingAxis( "energyresolution_Lin", "X", false, 0., 0.7 );
 
@@ -295,7 +296,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
    {
       VSensitivityCalculator *a = new VSensitivityCalculator();
       a->setMonteCarloParametersCTA_MC( fSensitivityFile[i], fIRFCameraOffset_deg[i], iCrabFile, iCrabID );
-      a->setEnergyRange_Lin( 0.01, 50. );
+      a->setEnergyRange_Lin( fMinEnergy_TeV, fMaxEnergy_TeV );
       a->setPlotCanvasSize( 900, 600 );
       a->setPlottingStyle( fPlottingColor[i], fPlottingLineStyle[i], 2., 1, 2., fPlottingFillStyle[i] );
       if( iUnit == "ENERGY" )  a->setFluxRange_ENERG( iMinSensitivity, iMaxSensitivity );
