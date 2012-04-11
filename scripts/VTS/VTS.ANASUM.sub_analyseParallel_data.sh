@@ -35,6 +35,9 @@ DATE=`date +"%y%m%d"`
 LDIR=$VERITAS_USER_LOG_DIR"/queueAnasum/"$DATE"/"
 mkdir -p $LDIR
 
+# output directory
+mkdir -p $ODIR
+
 FNAM="$LDIR/ANA.$ONAM"
 
 # temporary run list
