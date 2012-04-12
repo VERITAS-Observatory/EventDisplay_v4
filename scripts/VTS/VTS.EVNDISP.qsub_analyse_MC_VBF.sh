@@ -126,7 +126,8 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20120326_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+# set ODIR=$YDIR/analysis_d20120326_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20120410_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -153,7 +154,7 @@ echo "EVNDISP log file written to $ODIR/$RRR.log"
 ##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT >& $ODIR/$RRR.log
+$EVNDISPSYS/bin/evndisp -runnumber=$SRUN  -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT >& $ODIR/$RRR.log
 ##############################################################################################
 
 # remove temporary vbf file

@@ -16,56 +16,22 @@ ARRAY=AAAAA
 ATMO=BBBBBBB
 LOGDIR=CCCCCC
 ODDIR=DDDDDD
+IZE=ZENITH
+WOFF=WOBBLEOFFSET
 
 source $EVNDISPSYS/setObservatory.sh VERITAS
 
 # this is where the executable can be found
 cd $EVNDISPSYS/bin
 
-# zenith angle bins
-# IZE=( 00 20 30 35 40 45 50 55 60 65 ) 
-IZE=( 00 20 30 35 40 )
-NZE=${#IZE[@]}
-# wobble off bins
-# WOFF=( 0.00 0.25 0.5 0.75 1.00 1.25 1.50 1.75 2.00 )
-WOFF=( 0.5 )
-NWOF=${#WOFF[@]}
-
-##############################################
-# clean up disk
-N=0
-while [ $N -lt $NZE ]
-do
-    W=0
-    while [ $W -lt $NWOF ]
-    do
-       rm -f $ODDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.root
-       rm -f $LOGDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.log
-       let "W = $W + 1"
-   done
-   let "N = $N + 1"
-done
-
-##############################################
-# loop over all zenith angle bins
-N=0
-while [ $N -lt $NZE ]
-do
-##############################################
-# loop over all wobble offsets
-    echo "ZE BIN $N $NZE ${IZE[$N]}"
-    W=0
-    while [ $W -lt $NWOF ]
-    do
-      echo "   WOFF BIN $W $NWOF ${WOFF[$W]}"
-
 # directory with input file
-      DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"${IZE[$N]}"deg_750m/wobble_"${WOFF[$W]}"/analysis_d20120326_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
+DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/analysis_d20120410_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
+
+# remove existing log and table file
+rm -f $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.root
+rm -f $LOGDIR/$TFIL-NOISE$NOISEY-$IZE-${WOFF[$W]}.log
 
 # make the tables
-      $EVNDISPSYS/bin/mscw_energy -filltables=1 -inputfile "$DDIR" -tablefile $ODDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.root -ze=${IZE[$N]} -arrayrecid=$RECID -woff=${WOFF[$W]} -noise=$NOISEY >> $LOGDIR/$TFIL-NOISE$NOISEX-${WOFF[$W]}.log
+$EVNDISPSYS/bin/mscw_energy -filltables=1 -inputfile "$DDIR" -tablefile $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.root -ze=$IZE -arrayrecid=$RECID -woff=$WOFF -noise=$NOISEY > $LOGDIR/$TFIL-NOISE$NOISEY-$IZE-${WOFF[$W]}.log
 
-      let "W = $W + 1"
-   done
-   let "N = $N + 1"
-done
+exit

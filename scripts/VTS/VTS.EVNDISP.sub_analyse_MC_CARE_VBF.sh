@@ -62,7 +62,7 @@ fi
 QLOGDIR=$FDIR
 
 CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_CARE_VBF"
-OSCRIPT="qsub_evndisp_MC_CARE_VBF-$ZEW-$WOB-$NOIS-$ACUT-$ATMO"
+OSCRIPT="qsub_evndisp_MC_CARE_VBF-$ZEW-$WOB-$NOIS-$ATMO"
 
 # set zenith angle
 sed -e "s/123456789/$ZEW/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-b.sh
@@ -113,6 +113,7 @@ echo "QFILES $QLOGDIR/"
 echo "LOG AND DATA FILES: $ODIR"
 
 # submit the job
-qsub -V 10 -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+echo $FDIR/$OSCRIPT.sh
+qsub -V -js 10 -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
 exit

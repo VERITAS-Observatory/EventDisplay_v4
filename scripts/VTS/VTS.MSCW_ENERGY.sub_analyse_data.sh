@@ -7,12 +7,11 @@
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] && [ ! -n "$2" ]  && [ ! -n "$3" ]  && [ ! -n "$4" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ]  && [ ! -n "$3" ]
 then
-   echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run> <rec id>"
+   echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run>"
    echo
    echo "   <table file>  table file name (without .root)"
-   echo "   <rec ID>      EVNDISP reconstruction parameter"
    exit
 fi
 
@@ -21,7 +20,7 @@ fi
 TFIL=$1
 EFIL=$2
 BLIST=$3
-ID=$4
+ID=0
 
 # checking the path for binary
 if [ -z $EVNDISPSYS ]
