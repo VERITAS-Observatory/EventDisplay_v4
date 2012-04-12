@@ -179,12 +179,7 @@ void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSam
     else for( unsigned int i = 0; i < iNSamples; i++ ) fpTrace[i] = iReader->getSample_double( iHitID, i+fMC_FADCTraceStart, (i==0) );
 
     fpTrazeSize = int(fpTrace.size());
-    if( iHiLo > 0. )
-    {
-        apply_lowgain( iHiLo );
-        fHiLo = true;
-    }
-    else fHiLo = false;
+    apply_lowgain( iHiLo );
 
     fitTrace( iChanID );
 }
@@ -219,12 +214,7 @@ void VFitTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedr
     else for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace[i] = (double)pTrace[i];
 
     fpTrazeSize = int(fpTrace.size());
-    if( iHiLo > 0. )
-    {
-        apply_lowgain( iHiLo );
-        fHiLo = true;
-    }
-    else fHiLo = false;
+    apply_lowgain( iHiLo );
 
     fitTrace( chanID );
 }
@@ -248,12 +238,7 @@ void VFitTraceHandler::setTrace(vector<uint8_t> pTrace, double ped, double pedrm
     else for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace[i] = (double)pTrace[i];
 
     fpTrazeSize = int(fpTrace.size());
-    if( iHiLo > 0. )
-    {
-        apply_lowgain( iHiLo );
-        fHiLo = true;
-    }
-    else fHiLo = false;
+    apply_lowgain( iHiLo );
 
     fitTrace( chanID );
 }

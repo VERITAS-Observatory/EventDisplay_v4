@@ -51,7 +51,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
         tpars->Branch( "fborderthresh", &fborderthresh, "fborderthresh/D" );
         tpars->Branch( "fsumfirst", &fsumfirst, "fsumfirst/I" );
         tpars->Branch( "fsumwindow", &fsumwindow, "fsumwindow/I" );
-        tpars->Branch( "fsumwindowsmall", &fsumwindowsmall, "fsumwindowsmall/I" );
+        tpars->Branch( "fsumwindow_2", &fsumwindow_2, "fsumwindow_2/I" );
         tpars->Branch( "LocalTrigger", &fLocalTrigger, "fLocalTrigger/S" );
         tpars->Branch( "fncluster_cleaned", &fncluster_cleaned, "fncluster_cleaned/I" );
         tpars->Branch( "fncluster_uncleaned", &fncluster_uncleaned, "fncluster_uncleaned/I" );
@@ -198,7 +198,7 @@ void VImageParameter::reset( unsigned int resetLevel )
        fborderthresh = 2.;
        fsumfirst = 8;
        fsumwindow = 15;
-       fsumwindowsmall = 5;
+       fsumwindow_2= 5;
        fLocalTrigger = 0;
 
 // telescope positions in shower coordinates

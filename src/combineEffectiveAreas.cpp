@@ -84,12 +84,12 @@ void merge( char *ifile, char *outputfile, bool bFull = false )
 
 int main( int argc, char *argv[] )
 {
-   if( argc < 3 )
+   if( argc < 4 )
    {
        cout << endl;
-       cout << "combineEffectiveAreas <effective area files> <combined file> <write all histograms (default=false)" << endl;
+       cout << "combineEffectiveAreas <effective area files> <combined file> <write all histograms (default=false)>" << endl;
        cout << endl;
-       cout << "   <effective area files>    without .root suffix" << endl;
+       cout << "   <effective area files>    without .root suffix (e.g. effArea*)" << endl;
        cout << endl;
        exit( 0 );
    }

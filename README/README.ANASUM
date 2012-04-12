@@ -10,7 +10,6 @@ optional options are:
 	-i --infile        [read anasum outputfile, redo combined plots only]
 	-u --infile        [read anasum outputfile, do the calculations for new runs and redo combined plots (data directory with option -l is required)]
 	-r --randomseed    [seed for random generator, default=17]
-	-p --printtargets  [print list of sources]
 	-f --parameterfile [run parameter file, default=runparameter.dat]
 
 --------------------------------------------------------

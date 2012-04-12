@@ -35,7 +35,7 @@ class VImageParameter
         double fborderthresh;                     //!< parameter for border threshold
         int fsumfirst;                            //!< parameter for window summation start
         int fsumwindow;                           //!< parameter for window summation
-        int fsumwindowsmall;                      //!< parameter for window summation on second pass (when doublepass=true)
+        int fsumwindow_2;                      //!< parameter for window summation for energy reconstruction
         short int fLocalTrigger;                  //!< 1 of this telescope had a local trigger
  	int fncluster_cleaned;                    //!< HP: number of clusters after image cleaning 
  	int fncluster_uncleaned;                  //!< HP: number of clusters after image cleaning 

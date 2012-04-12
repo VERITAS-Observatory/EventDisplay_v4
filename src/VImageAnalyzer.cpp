@@ -259,8 +259,8 @@ void VImageAnalyzer::fillOutputTree()
     getImageParameters()->fncluster_cleaned = getNcluster_cleaned(); // HP
     getImageParameters()->fncluster_uncleaned = getNcluster_uncleaned(); // HP
     getImageParameters()->fsumfirst = getSumFirst();
-    getImageParameters()->fsumwindow = getSumWindow_2();
-    getImageParameters()->fsumwindowsmall = getSumWindowSmall();
+    getImageParameters()->fsumwindow = getSumWindow();
+    getImageParameters()->fsumwindow_2 = getSumWindow_2();
     if( fReader->hasLocalTrigger(getTelID()) ) getImageParameters()->fLocalTrigger = 1;
     else getImageParameters()->fLocalTrigger = 0;
 //  there is always a trigger in the real data, but not in MC
@@ -566,7 +566,6 @@ void VImageAnalyzer::smoothDeadTubes()
 
         double ave_sum=0.;
         double ave_pedvar=0.;
-        double ave_pedvar_small=0.;
         double ave_gain=0.;
         double ave_tzero=0.;
         double ave_toffvars=0.;
@@ -580,7 +579,6 @@ void VImageAnalyzer::smoothDeadTubes()
 
             ave_sum+=getSums()[k];
             ave_pedvar+=getPedvars()[k];
-            ave_pedvar_small+=getPedvarsSmall()[k];
             ave_gain+=getGains()[k];
             ave_tzero+=getTZeros()[k];
             ave_toffvars+=getTOffsetvars()[k];
@@ -590,7 +588,6 @@ void VImageAnalyzer::smoothDeadTubes()
         {
             ave_sum/=count;
             ave_pedvar/=count;
-            ave_pedvar_small/=count;
             ave_gain/=count;
             ave_tzero/=count;
             ave_toffvars/=count;
@@ -598,7 +595,6 @@ void VImageAnalyzer::smoothDeadTubes()
 // this does not work when dead channel list is time dependent
             getSums()[i]=ave_sum;
             getPedvars()[i]=ave_pedvar;
-            getPedvarsSmall()[i]=ave_pedvar_small;
             getGains()[i]=ave_gain;
             getTZeros()[i]=ave_tzero;
             getTOffsetvars()[i]=ave_toffvars;

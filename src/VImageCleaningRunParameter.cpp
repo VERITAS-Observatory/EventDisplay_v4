@@ -32,7 +32,7 @@ bool VImageCleaningRunParameter::initialize()
 void VImageCleaningRunParameter::print()
 {
     cout << "\t cleaning method \t \t" << getImageCleaningMethod() << " (" << getImageCleaningMethodIndex() << ")" << endl;
-    cout << "\t image/border/brightnonimage \t" << fimagethresh << "/" << fborderthresh << "/" << fbrightnonimagetresh;
+    cout << "\t image/border\t" << fimagethresh << "/" << fborderthresh;
     if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds)" << endl;
     else                      cout << " (signal-to-noise cleaning thesholds)" << endl;
     if( getImageCleaningMethodIndex() == 1 ) 

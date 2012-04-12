@@ -11,6 +11,7 @@
 #include "TDirectory.h"
 #include "TDirectoryFile.h"
 #include "TFile.h"
+#include "TH2F.h"
 #include "TTree.h"
 #include "TKey.h"
 #include "TSystem.h"
@@ -25,7 +26,9 @@
 
 using namespace std;
 
-void copyDirectory( TDirectory *source, char *hx = 0 );
+void copyDirectory( TDirectory *source, const char *hx = 0 );
+
+TH2F* reduceHistogramSize( TH2F *h = 0 );
 
 vector< string > readListOfFiles( string iFile )
 {
@@ -80,14 +83,13 @@ int main( int argc, char *argv[] )
     }
     cout << "combining " << nFiles << " table files into " << fOFile << endl;
 
-    TFile *fROFile = new TFile( fOFile.c_str(), "UPDATE" );
+    TFile *fROFile = new TFile( fOFile.c_str(), "RECREATE" );
     if( fROFile->IsZombie() )
     {
         cout << "error while opening combined file: " << fOFile << endl;
         exit( 0 );
     }
     TFile *fIn = 0;
-    char hname[200];
     for( unsigned int f = 0; f < fInFiles.size(); f++ )
     {
         fIn = new TFile( fInFiles[f].c_str() );
@@ -98,54 +100,23 @@ int main( int argc, char *argv[] )
         }
         cout << "now reading file " << f << ": " << fInFiles[f] << endl;
 
-        for( int r = 100; r < 99999; r++ )
-        {
-            sprintf( hname, "ze_%03d", r );
-            if( fIn->Get( hname ) )
-            {
-                TDirectory *iSource = (TDirectory*)fIn->Get( hname );
-                if( !iSource ) continue;
-                fROFile->cd();
-                cout << "\t copying " << hname << endl;
-                copyDirectory( iSource );
-            }
-            else
-            {
-                sprintf( hname, "NOISE_%03d", r );
-                if( fIn->Get( hname ) )
-                {
-                    TDirectory *iSource = (TDirectory*)fIn->Get( hname );
-                    if( !iSource ) continue;
-                    fROFile->cd();
-                    sprintf( hname, "NOISE_%05d", r );
-                    cout << "\t copying " << hname << "..." << endl;
-                    copyDirectory( iSource, hname );
-                    cout << "done" << endl;
-                    continue;
-                }
-                sprintf( hname, "NOISE_%04d", r );
-                if( fIn->Get( hname ) )
-                {
-                    TDirectory *iSource = (TDirectory*)fIn->Get( hname );
-                    if( !iSource ) continue;
-                    fROFile->cd();
-                    sprintf( hname, "NOISE_%05d", r );
-                    cout << "\t copying (4) " << hname << "..." << endl;
-                    copyDirectory( iSource, hname );
-                    cout << "done" << endl;
-                    continue;
-                }
-                sprintf( hname, "NOISE_%05d", r );
-                if( fIn->Get( hname ) )
-                {
-                    TDirectory *iSource = (TDirectory*)fIn->Get( hname );
-                    if( !iSource ) continue;
-                    fROFile->cd();
-                    cout << "\t copying (5) " << hname << "..." << endl;
-                    copyDirectory( iSource, 0 );
-                    cout << "done" << endl;
-                }
-            }
+//loop on all entries of this directory
+       TKey *key;
+       TIter nextkey( fIn->GetListOfKeys() );
+       while( (key = (TKey*)nextkey()) )
+       {
+	   const char *classname = key->GetClassName();
+	   TClass *cl = gROOT->GetClass(classname);
+	   if (!cl) continue;
+	   if ( cl->InheritsFrom("TDirectory") )
+	   {
+	      TDirectory *iSource = (TDirectory*)key->ReadObj();
+	      if( !iSource ) continue;
+	      fROFile->cd();
+	      const char *hname = iSource->GetName();
+	      cout << "\t copying " << hname << endl;
+	      copyDirectory( iSource, hname );
+	   }
         }
         fIn->Close();
     }
@@ -160,7 +131,7 @@ int main( int argc, char *argv[] )
  *
  *   Author: Rene Brun
  */
-void copyDirectory( TDirectory *source, char *hx )
+void copyDirectory( TDirectory *source, const char *hx )
 {
 //copy all objects and subdirs of directory source as a subdir of the current directory
     TDirectory *savdir = gDirectory;
@@ -199,22 +170,122 @@ void copyDirectory( TDirectory *source, char *hx )
             copyDirectory(subdir);
             adir->cd();
         }
-        else if (cl->InheritsFrom("TTree"))
-        {
-            TTree *T = (TTree*)source->Get(key->GetName());
-            adir->cd();
-            TTree *newT = T->CloneTree();
-            newT->Write();
-        }
         else
         {
             source->cd();
             TObject *obj = key->ReadObj();
-            adir->cd();
-            obj->Write();
+	    string iName = obj->GetName();
+	    TH2F *hNew = 0;
+	    if( iName.find( "median" ) != string::npos 
+	       || iName.find( "Median" ) != string::npos )
+	    {
+	       hNew = reduceHistogramSize( (TH2F*)obj );
+	       adir->cd();
+//	       obj->Write();
+	       if( hNew )
+	       {
+		  hNew->SetName( obj->GetName() );
+	          hNew->Write();
+               }
+            }
             delete obj;
+	    if( hNew ) delete hNew;
         }
     }
     adir->SaveSelf(kTRUE);
     savdir->cd();
+}
+
+TH2F* reduceHistogramSize( TH2F *h )
+{
+   if( !h ) return 0;
+
+   bool bFilled = false;
+
+   int nBinX_min = -1;
+   int nBinX_max = -1;
+   int nBinY_max = -1;
+
+// get minimum x
+   bFilled = false;
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
+   {
+      for( int j = 1; j <= h->GetNbinsY(); j++ )
+      {
+         if( h->GetBinContent( i, j ) > 0. )
+	 {
+	    bFilled = true;
+	    break;
+         }
+      }
+      if( bFilled )
+      {
+         nBinX_min = i;
+	 break;
+      }
+   }
+// get maximum x
+   bFilled = false;
+   for( int i = h->GetNbinsX(); i > 0; i-- )
+   {
+      for( int j = 1; j <= h->GetNbinsY(); j++ )
+      {
+         if( h->GetBinContent( i, j ) > 0. )
+	 {
+	    bFilled = true;
+	    break;
+         }
+      }
+      if( bFilled )
+      {
+         nBinX_max = i;
+	 break;
+      }
+   }
+// get maximum y
+   bFilled = false;
+   for( int i = h->GetNbinsY(); i > 0; i-- )
+   {
+      for( int j = 1; j <= h->GetNbinsX(); j++ )
+      {
+         if( h->GetBinContent( j, i ) > 0. )
+	 {
+	    bFilled = true;
+	    break;
+         }
+      }
+      if( bFilled )
+      {
+         nBinY_max = i;
+	 break;
+      }
+   }
+// create new histogram with reduced binning
+   char hname[200];
+   sprintf( hname, "new_%s", h->GetName() );
+
+   float xmin = h->GetXaxis()->GetBinLowEdge( 1 );
+   if( nBinX_min > 0 ) xmin = h->GetXaxis()->GetBinLowEdge( nBinX_min );
+   float xmax = h->GetXaxis()->GetBinLowEdge( 1 ) +  h->GetXaxis()->GetBinWidth( 1 );
+   if( nBinX_max > 0 ) xmax = h->GetXaxis()->GetBinLowEdge( nBinX_max ) + h->GetXaxis()->GetBinWidth( nBinX_max );
+   float ymin = h->GetYaxis()->GetBinLowEdge( 1 );
+   float ymax = h->GetYaxis()->GetBinLowEdge( 1 ) +  h->GetYaxis()->GetBinWidth( 1 );
+   if( ymax > 0 ) ymax = h->GetYaxis()->GetBinLowEdge( nBinY_max ) + h->GetYaxis()->GetBinWidth( nBinY_max ); 	
+
+   TH2F *hNew = new TH2F( hname, h->GetTitle(), nBinX_max - nBinX_min + 1, xmin, xmax, nBinY_max, ymin, ymax );
+   hNew->Sumw2();
+
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
+   {
+       for( int j = 1; j <= h->GetNbinsY(); j++ )
+       {
+          if( h->GetBinContent( i, j ) > 0. )
+	  {
+	     hNew->SetBinContent( hNew->GetXaxis()->FindBin( h->GetXaxis()->GetBinCenter( i ) ), hNew->GetYaxis()->FindBin( h->GetYaxis()->GetBinCenter( j ) ), h->GetBinContent( i, j ) );
+	     hNew->SetBinError(   hNew->GetXaxis()->FindBin( h->GetXaxis()->GetBinCenter( i ) ), hNew->GetYaxis()->FindBin( h->GetYaxis()->GetBinCenter( j ) ), h->GetBinError( i, j ) );
+          }
+       }
+   }
+
+   return hNew;
 }

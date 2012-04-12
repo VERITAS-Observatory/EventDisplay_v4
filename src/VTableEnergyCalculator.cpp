@@ -21,7 +21,6 @@ VTableEnergyCalculator::VTableEnergyCalculator( int intel )
     for( int i = 0; i < intel; i++ )
     {
         hVMedian.push_back( 0 );
-        hVSigma.push_back( 0 );
     }
     hMedian = 0;
     hSigma = 0;
@@ -260,6 +259,7 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
                 }
 
                 hMedian->SetBinContent( i+1, j+1, med );
+		hMedian->SetBinError( i+1, j+1, sigma );
                 hSigma->SetBinContent( i+1, j+1, sigma );
                 hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
 
@@ -473,10 +473,8 @@ double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, do
 void VTableEnergyCalculator::get_logEnergy(double logSize, int ir, double &med, double &sigma, unsigned int tel )
 {
     TH2F *hM = hMedian;
-    TH2F *hS = hSigma;
     if( hVMedian.size() > 0 && tel < hVMedian.size() ) hM = hVMedian[tel];
-    if( hVSigma.size() > 0 && tel < hVSigma.size() )   hS = hVSigma[tel];
-    if( !hM || !hS ) return;
+    if( !hM ) return;
 // this assumes strict proportionality between energy and size for a given distance
 // check if size is too small
     int i_eNumEneMax = hM->GetNbinsX() - 4;
@@ -489,15 +487,15 @@ void VTableEnergyCalculator::get_logEnergy(double logSize, int ir, double &med, 
 
 // (GM) ?? Why going back? Why not taking this bin value and no interpolation?
 // if the next bin is empty, go back one bin
-    if( hS->GetBinContent( i+1, ir+1 ) > 0. && hS->GetBinContent( i+2, ir+1 ) < 1.e-6 && i > 0 ) i--;
+    if( hM->GetBinError( i+1, ir+1 ) > 0. && hM->GetBinError( i+2, ir+1 ) < 1.e-6 && i > 0 ) i--;
 
     double e1,e2,s1,s2,w1,w2,delta,rest;
 
     s1 = hM->GetBinContent( i+1, ir+1 );
     s2 = hM->GetBinContent( i+2, ir+1 );
 
-    w1 = hS->GetBinContent( i+1, ir+1 );
-    w2 = hS->GetBinContent( i+2, ir+1 );
+    w1 = hM->GetBinError( i+1, ir+1 );
+    w2 = hM->GetBinError( i+2, ir+1 );
 
 // (GM) do not interpolate beyond largest size (s2 > logSize)
     if( (s1>0.) && (s2>0.) && (w1>0.) && (w2>0.) && (s2 > logSize) )
@@ -536,10 +534,8 @@ void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double &
 {
 // get histogram
     TH2F *hM = hMedian;
-    TH2F *hS = hSigma;
     if( hVMedian.size() > 0 && itel < hVMedian.size() ) hM = hVMedian[itel];
-    if( hVSigma.size() > 0 && itel < hVSigma.size() )   hS = hVSigma[itel];
-    if( !hM || !hS ) return;
+    if( !hM ) return;
 
 // get bin number for distance r (counting from 0)
     int ir1 = hM->GetYaxis()->FindBin( r ) - 1;
@@ -601,10 +597,9 @@ void VTableEnergyCalculator::setInterpolationConstants( int iwidth, int iinter )
 }
 
 
-void VTableEnergyCalculator::setVHistograms( vector< TH2F* >& hM, vector< TH2F* >& hS )
+void VTableEnergyCalculator::setVHistograms( vector< TH2F* >& hM )
 {
     hVMedian = hM;
-    hVSigma = hS;
 }
 
 
@@ -629,9 +624,6 @@ bool VTableEnergyCalculator::readHistograms()
     if( fOutDir )
     {
         hMedian = (TH2F*)fOutDir->Get( hMedianName.c_str() );
-        hSigma = (TH2F*)fOutDir->Get( hSigmaName.c_str() );
-        hNevents = (TH2F*)fOutDir->Get( hNeventsName.c_str() );
-	hMean = (TProfile2D*)fOutDir->Get( hMeanName.c_str() );
 
         fReadHistogramsFromFile = true;
 
@@ -642,21 +634,19 @@ bool VTableEnergyCalculator::readHistograms()
             if( fInterpolationString == "simple" )
             {
                 hMedian = iInter.doSimpleInterpolation( hMedian, "interpol", fInterPolWidth, fInterPolIter, false );
-                hSigma  = iInter.doSimpleInterpolation( hSigma, "interpol", fInterPolWidth, fInterPolIter, true );
             }
             else if( fInterpolationString == "gaussian" )
             {
                 hMedian = iInter.doGaussianInterpolation( hMedian, "interpol", hNevents, 1, 1. );
-                hSigma  = iInter.doGaussianInterpolation( hSigma, "interpol", hNevents, 1, 1. );
             }
         }
 
     }
-    if( !hMedian || !hSigma )
+    if( !hMedian )
     {
         cout << "energy: table histograms not found in " << gDirectory->GetName() << endl;
 	cout << "\t" << gDirectory->GetPath() << endl;
-	cout << "\t" << hMedian << "\t" << hSigma << endl;
+	cout << "\t" << hMedian << endl;
         exit( -1 );
     }
 

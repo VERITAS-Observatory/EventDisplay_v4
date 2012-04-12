@@ -205,10 +205,10 @@ class VEvndispData
         vector<int>&        getImageUser() { return fAnaData[fTelID]->fImageUser; }
         vector<bool>&       getLLEst() { return fAnaData[fTelID]->fLLEst; }
         TList*              getIntegratedChargeHistograms() { return fAnaData[fTelID]->getIntegratedChargeHistograms(); }
-        double              getMeanLowGainMultiplier( bool bSmall = false ) { if( !bSmall ) return fCalData[fTelID]->fmeanLowGainMult; else return fCalData[fTelID]->fmeanLowGainMultSmall; }
-        double              getRMSLowGainMultiplier( bool bSmall = false ) { if( !bSmall ) return fCalData[fTelID]->frmsLowGainMult; else return fCalData[fTelID]->frmsLowGainMultSmall; }
-        valarray< double >& getLowGainMultiplier( bool bSmall = false ) { if( !bSmall ) return fCalData[fTelID]->fLowGainMult; else return fCalData[fTelID]->fLowGainMultSmall; }
-        valarray< double >& getLowGainMultiplierError( bool bSmall = false ) { if( !bSmall ) return fCalData[fTelID]->fLowGainMultError; else return fCalData[fTelID]->fLowGainMultErrorSmall; }
+        double              getMeanLowGainMultiplier( unsigned int iSumWindow = 9999 ) { return fCalData[fTelID]->getMeanLowGainMultiplier( iSumWindow ); }
+        double              getRMSLowGainMultiplier( unsigned int iSumWindow = 9999 ) { return fCalData[fTelID]->getRMSLowGainMultiplier( iSumWindow ); }
+        valarray< double >& getLowGainMultiplier( unsigned int iSumWindow = 9999 ) { return fCalData[fTelID]->getLowGainMultiplier( iSumWindow ); }
+        valarray< double >& getLowGainMultiplierError( unsigned int iSumWindow = 9999 ) { return fCalData[fTelID]->getLowGainMultiplierError( iSumWindow ); }
         bool                getLowGainPedestals() { return fCalData[fTelID]->fBoolLowGainPedestals; }
         bool                getLowGainGains() { return fCalData[fTelID]->fBoolLowGainGains; }
         bool                getLowGainTOff() { return fCalData[fTelID]->fBoolLowGainTOff; }
@@ -244,9 +244,7 @@ class VEvndispData
 // getters for pedestal variation
         valarray<double>&   getPedvars( bool iLowGain = false, unsigned int iSW = 0, double iTime = -99. );
         valarray<double>&   getPedvars( unsigned int iSW, bool iLowGain = false ) { return getPedvars( iLowGain, iSW ); }
-        valarray<double>&   getPedvarsSmall( bool iLowGain = false ) { return getPedvars( iLowGain, getSumWindowSmall() ); }
         valarray<double>&   getPedvarsLowGain() { return getPedvars( true ); }
-        valarray<double>&   getPedvarsLowGainSmall() { return getPedvars( true, getSumWindowSmall() ); }
 
         vector< valarray<double> >& getPedvarsAllSumWindows(  bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fVPedvars; else return fCalData[fTelID]->fVLowGainPedvars; }
 // getter for pedestal rms
@@ -271,11 +269,9 @@ class VEvndispData
 	unsigned int        getLargestSumWindow( unsigned int iTelID );
         unsigned int        getSumWindow() { return fRunPar->fsumwindow_1[fTelID]; }
         unsigned int        getSumWindow_2() { return fRunPar->fsumwindow_2[fTelID]; }
-        unsigned int        getSumWindowSmall() { return fRunPar->fsumwindow_1[fTelID]; }
 	unsigned int        getSumWindow_Pass1() { return fRunPar->fsumwindow_pass1[fTelID]; }
         unsigned int        getSumWindow( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_1.size() ) return fRunPar->fsumwindow_1[iTelID]; else return 0; }
         unsigned int        getSumWindow_2( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_2.size() ) return fRunPar->fsumwindow_2[iTelID]; else return 0; }
-        unsigned int        getSumWindowSmall( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_1.size() ) return fRunPar->fsumwindow_1[iTelID]; else return 0; }
 	unsigned int        getSumWindow_Pass1( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_pass1.size() ) return fRunPar->fsumwindow_pass1[iTelID]; else return 0; }
         valarray< unsigned int >& getCurrentSumWindow() { return fAnaData[fTelID]->fCurrentSummationWindow; }
         int                 getSumWindowShift() { return fRunPar->fTraceWindowShift[fTelID]; }
@@ -372,9 +368,9 @@ class VEvndispData
         void                setLowGainGains() { fCalData[fTelID]->fBoolLowGainGains = true; }
         void                setLowGainTOff() { fCalData[fTelID]->fBoolLowGainTOff = true; }
         void                setLLEst( vector<bool> iEst ) { fAnaData[fTelID]->fLLEst = iEst; }
-        void                setLowGainMultiplier( double iV, unsigned int iChannel, bool iSmall = false ) { fCalData[fTelID]->setLowGainMultiplier( iV, iChannel, iSmall ); }
-        void                setMeanLowGainMultiplier( double g, bool bSmall = false ) { if( !bSmall ) fCalData[fTelID]->fmeanLowGainMult = g; else fCalData[fTelID]->fmeanLowGainMultSmall = g; }
-        void                setRMSLowGainMultiplier( double g, bool bSmall = false ) { if( !bSmall ) fCalData[fTelID]->frmsLowGainMult = g; else fCalData[fTelID]->frmsLowGainMultSmall = g; }
+        void                setLowGainMultiplier( double iV, unsigned int iChannel, unsigned int iSumWindow = 9999 ) { fCalData[fTelID]->setLowGainMultiplier( iV, iChannel, iSumWindow ); }
+        bool                setMeanLowGainMultiplier( double g, unsigned int iSumWindow = 9999 ) { return fCalData[fTelID]->setMeanLowGainMultiplier( g, iSumWindow ); }
+        bool                setRMSLowGainMultiplier( double g, unsigned int iSumWindow = 9999 ) { return fCalData[fTelID]->setRMSLowGainMultiplier( g, iSumWindow ); }
         void                setNChannels( unsigned int iChan ) { fDetectorGeo->setNChannels( fTelID, iChan ); }
         void                setBrightNonImage( bool iIm ) {  fAnaData[fTelID]->fBrightNonImage.assign( fDetectorGeo->getNChannels( fTelID ), iIm ); }
         void                setBrightNonImage( unsigned int iChannel, bool iIm ) {  fAnaData[fTelID]->fBrightNonImage[iChannel] = iIm; }

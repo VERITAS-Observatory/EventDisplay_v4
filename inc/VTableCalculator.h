@@ -28,7 +28,6 @@ class VTableCalculator
 // creator: reads or writes table
 // mode can be 'r' or 'w'
         VTableCalculator( int intel = 0 , bool iEnergy = false, bool iPE = false );
-        VTableCalculator( vector< TH2F* > iMedian, vector< TH2F* > iSigma, bool iEnergy, bool iPE = false );
         VTableCalculator( string fpara, string hname, char m, TDirectory *iDir, bool iEnergy, string iInterpolate = "", bool iPE = false );
 
 // Destructor
@@ -44,7 +43,7 @@ class VTableCalculator
         void setCalculateEnergies( bool iB ) { fEnergy = iB; }
 	void setDebug( unsigned int iB = 0 ) { fDebug = iB; }
 	void setMinRequiredShowerPerBin( float iM = 5. ) { fMinShowerPerBin = iM; }
-        void setVHistograms( vector< TH2F* >& hM, vector< TH2F* >& hS );
+        void setVHistograms( vector< TH2F* >& hM );
         void setInterpolationConstants( int, int );
         void setOutputDirectory( TDirectory *iF ) { fOutDir = iF; }
         void setWrite1DHistograms( bool iB ) { fWrite1DHistograms = iB; }
@@ -82,7 +81,6 @@ class VTableCalculator
         TH2F* hNevents;
 	string hNeventsName;
         vector< TH2F* > hVMedian;
-        vector< TH2F* > hVSigma;
 
 // histogram interpolation
         int fInterPolWidth;

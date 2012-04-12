@@ -59,12 +59,12 @@ class VCalibrator : public VImageBaseAnalyzer
         TTree* fillToffTree( unsigned int tel );
         void getCalibrationRunNumbers();
 	int  getCalibrationRunNumbers_fromCalibFile();
-	int  getLowGainCalibrationRunNumbers_fromCalibFile();
+	int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
 	string getCalibrationFileName( int iTel, int irun, string iSuffix );
         void readCalibrationData( bool iPeds, bool iGains );
         bool readCalibrationData( string iSourceFile );
         void readGains( bool iLowGain = false );
-        bool readLowGainMultiplier( bool iSmall );
+        bool readLowGainMultiplier( int iSumWindow );
         bool readPeds( string iFile, bool, unsigned int );
 	bool readPeds_from_grisufile( string iFile, bool, unsigned int );
 	bool readPeds_from_rootfile( string iFile, bool, unsigned int );

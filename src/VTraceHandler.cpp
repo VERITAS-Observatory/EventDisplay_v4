@@ -29,10 +29,11 @@ VTraceHandler::VTraceHandler()
 
 void VTraceHandler::reset()
 {
-   fSum = 0.;
-   fTraceAverageTime = 0.;
-   fSumWindowFirst = 0;
-   fSumWindowLast  = 0;
+    fSum = 0.;
+    fTraceAverageTime = 0.;
+    fSumWindowFirst = 0;
+    fSumWindowLast  = 0;
+    fHiLo = false;
 }
 
 /*
@@ -69,8 +70,7 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
     else fHiLo = false;
 }
 
-
-void VTraceHandler::setTrace(vector<uint8_t> pTrace, double ped, double pedrms, unsigned int iChanID )
+void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
 {
     fPed=ped;
     fPedrms = pedrms;
@@ -86,9 +86,10 @@ void VTraceHandler::setTrace(vector<uint8_t> pTrace, double ped, double pedrms, 
     else for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace[i] = (double)pTrace[i];
 
     fpTrazeSize = int(fpTrace.size());
+    fHiLo = apply_lowgain( iHiLo );
 }
 
-void VTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedrms, unsigned int iChanID )
+void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
 {
     fPed=ped;
     fPedrms = pedrms;
@@ -104,67 +105,23 @@ void VTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedrms,
     else for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace[i] = (double)pTrace[i];
 
     fpTrazeSize = int(fpTrace.size());
+    fHiLo = apply_lowgain( iHiLo );
 }
 
 
-void VTraceHandler::setTrace(vector<uint16_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
-{
-    fPed=ped;
-    fPedrms = pedrms;
-    fChanID = iChanID;
-    reset();
-// copy trace
-    unsigned int i_tsize = pTrace.size();
-    if( i_tsize != fpTrace.size() )
-    {
-        fpTrace.clear();
-        for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace.push_back( (double)pTrace[i] );
-    }
-    else for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace[i] = (double)pTrace[i];
-
-    fpTrazeSize = int(fpTrace.size());
-    if( iHiLo > 0. )
-    {
-        apply_lowgain( iHiLo );
-        fHiLo = true;
-    }
-    else fHiLo = false;
-}
-
-void VTraceHandler::setTrace(vector<uint8_t> pTrace, double ped, double pedrms, unsigned int iChanID, double iHiLo )
-{
-    fPed=ped;
-    fPedrms = pedrms;
-    fChanID = iChanID;
-    reset();
-// copy trace
-    unsigned int i_tsize = pTrace.size();
-    if( i_tsize != fpTrace.size() )
-    {
-        fpTrace.clear();
-        for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace.push_back( (double)pTrace[i] );
-    }
-    else for( unsigned int i = 0; i < i_tsize; i++ ) fpTrace[i] = (double)pTrace[i];
-
-    fpTrazeSize = int(fpTrace.size());
-    if( iHiLo > 0. )
-    {
-        apply_lowgain( iHiLo );
-        fHiLo = true;
-    }
-    else fHiLo = false;
-}
-
-
-void VTraceHandler::apply_lowgain( double iHiLo )
+bool VTraceHandler::apply_lowgain( double iHiLo )
 {
 // hilo switch is set
-    for( int i = 0; i < fpTrazeSize; i++ )
+    if( iHiLo > 0. )
     {
-// this assumes same pedestal values for low gain (which is only an approximation)
-        fpTrace[i]  = (fpTrace[i]-fPed)*iHiLo;
-        fpTrace[i] += fPed;
+       for( int i = 0; i < fpTrazeSize; i++ )
+       {
+	   fpTrace[i]  = (fpTrace[i]-fPed)*iHiLo;
+	   fpTrace[i] += fPed;
+       }
+       return true;
     }
+    return false;
 }
 
 

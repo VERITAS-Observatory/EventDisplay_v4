@@ -20,7 +20,6 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
     for( int i = 0; i < intel; i++ )
     {
         hVMedian.push_back( 0 );
-        hVSigma.push_back( 0 );
     }
     hMedian = 0;
     hSigma = 0;
@@ -42,28 +41,6 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
 
     fReadHistogramsFromFile = false;
 
-}
-
-
-VTableCalculator::VTableCalculator( vector< TH2F* > iMedian, vector< TH2F* > iSigma, bool iEnergy, bool iPE )
-{
-    setDebug();
-
-    setConstants( iPE );
-// using lookup tables to calculate energies
-    fEnergy = iEnergy;
-
-    hMedian = 0;
-    hSigma = 0;
-    hMean = 0;
-    hNevents = 0;
-
-    hVMedian = iMedian;
-    hVSigma = iSigma;
-
-    Omode = 'r';
-
-    fReadHistogramsFromFile = false;
 }
 
 
@@ -105,9 +82,12 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     }
     Omode  = m;
 
-    int i,j;
+    int i = 0;
+    int j = 0;
     char hname[1000];
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// table writing
     if ((Omode=='w')||(Omode=='W'))
     {
         if( !fOutDir->IsWritable() )
@@ -297,6 +277,7 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
                     sigma=0.;
                 }
                 hMedian->SetBinContent( i+1, j+1, med );
+		hMedian->SetBinError( i+1, j+1, sigma );
                 hSigma->SetBinContent( i+1, j+1, sigma );
                 if( Oh[i][j]->GetEntries() > 5 ) hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
 
@@ -415,10 +396,9 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
         {
             cout << "read tables from " << fOutDir->GetPath() << endl;
             hMedian = (TH2F*)fOutDir->Get( hMedianName.c_str() );
-            hSigma = (TH2F*)fOutDir->Get( hSigmaName.c_str() );
             fReadHistogramsFromFile = true;
 
-            if( !hMedian || !hSigma )
+            if( !hMedian )
             {
                 cout << "VTableCalculator error: table histograms not found in " << gDirectory->GetName() << endl;
                 exit( -1 );
@@ -452,12 +432,12 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
             {
                 ir = 0;
 		is = 0;
-		if( hMedian && hSigma )
+		if( hMedian )
 		{
 		     is = hMedian->GetXaxis()->FindBin( log10( s[tel] ) );
 		     ir = hMedian->GetYaxis()->FindBin( r[tel] ); 
 		}
-		else if( hVMedian.size() == (unsigned int)ntel && hVSigma.size() == (unsigned int)ntel && hVMedian[tel] && hVSigma[tel] )
+		else if( hVMedian.size() == (unsigned int)ntel && hVMedian[tel] )
                 {
 		     is = hVMedian[tel]->GetXaxis()->FindBin( log10( s[tel] ) );
 		     ir = hVMedian[tel]->GetYaxis()->FindBin( r[tel] ); 
@@ -467,15 +447,15 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                 if( ir > 0 && is > 0 )
                 {
 // get expected value and sigma of expected value
-                    if( hMedian && hSigma )
+                    if( hMedian )
                     {
                         med = hMedian->GetBinContent( is, ir );
-                        sigma = hSigma->GetBinContent( is, ir );
+                        sigma = hMedian->GetBinError( is, ir );
                     }
-                    else if( hVMedian.size() == (unsigned int)ntel && hVSigma.size() == (unsigned int)ntel && hVMedian[tel] && hVSigma[tel] )
+                    else if( hVMedian.size() == (unsigned int)ntel && hVMedian[tel] )
                     {
                         med   = hVMedian[tel]->GetBinContent( is, ir );
-                        sigma = hVSigma[tel]->GetBinContent( is, ir );
+                        sigma = hVMedian[tel]->GetBinError( is, ir );
 			if( fDebug && fEnergy )
 			{
 			   cout << "\t  double VTableCalculator::calc() getting energy from table for tel " << tel;
@@ -725,10 +705,9 @@ double VTableCalculator::getWeightMeanBinContent( TH2F *h, int ix0, int iy0, dou
 }
 
 
-void VTableCalculator::setVHistograms( vector< TH2F* >& hM, vector< TH2F* >& hS )
+void VTableCalculator::setVHistograms( vector< TH2F* >& hM )
 {
     hVMedian = hM;
-    hVSigma  = hS;
 
     fReadHistogramsFromFile = true;
 }
@@ -755,13 +734,10 @@ bool VTableCalculator::readHistograms()
     if( fOutDir )
     {
         hMedian = (TH2F*)fOutDir->Get( hMedianName.c_str() );
-        hSigma = (TH2F*)fOutDir->Get( hSigmaName.c_str() );
-	hNevents = (TH2F*)fOutDir->Get( hNeventsName.c_str() );
-	hMean = (TProfile2D*)fOutDir->Get( hMeanName.c_str() );
 
         return true;
     }
-    if( !hMedian || !hSigma )
+    if( !hMedian )
     {
         cout << "VTableCalculator error: table histograms not found in " << fOutDir->GetPath() << endl;
         exit( -1 );

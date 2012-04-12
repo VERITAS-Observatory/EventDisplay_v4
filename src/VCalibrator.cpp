@@ -577,8 +577,6 @@ void VCalibrator::writeGains( bool iLowGain )
 
         for( unsigned int i = 0; i < hpulse.size(); i++ )
         {
-// (GM) write mean pulse to disk
-// XX     if( hpulse[i]->GetEntries() > 0. ) hpulse[i]->Scale( 1./hpulse[i]->GetEntries() );
             hpulse[i]->Write();
             htcpulse[i]->Write();
         }
@@ -771,8 +769,8 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
         }
 
 // read low gain multiplier
-        readLowGainMultiplier( false );
-        if( fRunPar->fDoublePass ) readLowGainMultiplier( true );
+// (PRELI: for one summation window only)
+        readLowGainMultiplier( getSumWindow_2() );
 
         if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 )
         {
@@ -801,9 +799,9 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
 // (preli) fill high gain value if low value is not available
 	 else
 	 {
-	    for( unsigned int g = 0; g < getPedvarsLowGainSmall().size(); g++ )
+	    for( unsigned int g = 0; g < getPedsLowGain().size(); g++ )
 	    {
-		if( fabs( getPedsLowGain()[g] ) < 0.5 || fabs( getPedvarsLowGainSmall()[g] ) < 0.5 )
+		if( fabs( getPedsLowGain()[g] ) < 0.5 || fabs( getPedvarsLowGain()[g] ) < 0.5 )
 		{
 		    getPedsLowGain()[g] = getPeds()[g];
 		}
@@ -1407,8 +1405,9 @@ void VCalibrator::initialize()
 
 	fCalData.push_back( new VCalibrationData( i, fRunPar->getDirectory_EVNDISPCalibrationData(), 
 	                                          fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i] ));
-        fCalData.back()->setSumWindows( getSumWindow( i ), getSumWindowSmall( i ) );
-
+	fCalData.back()->setSumWindows( getSumWindow( i ) );
+// PRELI: low gain multiplier does not depend on summation window (yet)
+	fCalData.back()->setLowGainMultiplierFixedSummationWindow( getSumWindow_2() );
         fNumberPedestalEvents.push_back( 0 );
         fNumberGainEvents.push_back( 0 );
 
@@ -1497,7 +1496,7 @@ void VCalibrator::getCalibrationRunNumbers()
     int iLowGainCaliLines = 0;
     if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
     {
-       iLowGainCaliLines = getLowGainCalibrationRunNumbers_fromCalibFile();
+       iLowGainCaliLines = readLowGainCalibrationValues_fromCalibFile( "LOWGAINPED" );
        if( iLowGainCaliLines > 0 ) setCalibrationFileNames();
     }
 
@@ -1563,7 +1562,7 @@ void VCalibrator::getCalibrationRunNumbers()
     return;
 }
 
-int VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile()
+int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, unsigned int iTelescopeSelect, int iSumWindow )
 {
     int iLinesFound = 0;
 // open file with calibration information
@@ -1574,7 +1573,7 @@ int VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile()
     is.open( is_Temp.c_str(), ifstream::in);
     if( !is )
     {
-        cout << "VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile: error, calibration data file not found: ";
+        cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: error, calibration data file not found: ";
         cout <<  is_Temp << endl;
         exit( -1 );
     }
@@ -1598,7 +1597,7 @@ int VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile()
 
 	    if( is_stream.eof() ) continue;
 	    is_stream >> is_Temp;
-	    if( is_Temp == "LOWGAINPED" )
+	    if( is_Temp == iVariable )
 	    {
 	       if( is_stream.eof() ) continue;
 	       is_stream >> iTel;
@@ -1610,7 +1609,10 @@ int VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile()
 // check run number range
                if( getRunNumber() >= iRunMin && getRunNumber() <= iRunMax )
 	       {
-	          cout << "reading low-gain pedestal run numbers for run range " << iRunMin << ", " << iRunMax << endl;
+	          if( iVariable == "LOWGAINPED" )
+		  {
+		     cout << "reading low-gain parameters for run range " << iRunMin << ", " << iRunMax << endl;
+                  }
 	          if( is_stream.eof() ) continue;
 		  is_stream >> iLowGainPeds;
 		  iLinesFound++;
@@ -1620,18 +1622,43 @@ int VCalibrator::getLowGainCalibrationRunNumbers_fromCalibFile()
 		     {
 		        if( !fBlockTel[i] )
 			{
-			   if( atoi( iLowGainPeds.c_str() ) > 0 )
+			   if( iVariable == "LOWGAINPED" && atoi( iLowGainPeds.c_str() ) > 0 )
 			   {
 			      getRunParameter()->fPedLowGainFileNumber[i] = atoi( iLowGainPeds.c_str() );
+                           }
+			   else if( iVariable == "LOWGAINMULTIPLIER" && atof( iLowGainPeds.c_str() ) > 0. )
+			   {
+			      cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile() warning: ";
+			      cout << " low-gain multiplier need to be set for each telescope " << endl;
+			      cout << "(ignored this entry)" << endl;
                            }
                         }
                      }
                   }
 		  else if( iTel < (int)getNTel() )
 		  {
-		    if( atoi( iLowGainPeds.c_str() ) > 0 )
+		    if( iVariable == "LOWGAINPED" && atoi( iLowGainPeds.c_str() ) > 0 )
 		    {
 		       getRunParameter()->fPedLowGainFileNumber[iTel] = atoi( iLowGainPeds.c_str() );
+		       fBlockTel[iTel] = true;
+                    }
+		    else if( iVariable == "LOWGAINMULTIPLIER" && atof( iLowGainPeds.c_str() ) > 0. && iTel == (int)iTelescopeSelect )
+		    {
+		       double iG = atof( iLowGainPeds.c_str() );
+		       setMeanLowGainMultiplier( iG, iSumWindow );
+		       if( is_stream.eof() ) setRMSLowGainMultiplier( 0, iSumWindow );
+		       else
+		       {
+			  is_stream >> is_Temp;
+			  setRMSLowGainMultiplier( atof( is_Temp.c_str() ), iSumWindow );
+                       }
+		       for( unsigned int j = 0; j < getLowGainMultiplier( iSumWindow ).size(); j++ )
+		       {
+// NOTE: set low gain multiplier for all summation windows
+			  setLowGainMultiplier( iG, j, 9999 );
+			  getLowGainMultiplierError( iSumWindow )[j] = 0.;
+			  getCalData()->getLowGainMultiplierDistribution()->Fill( getLowGainMultiplier()[j] );
+                       }
 		       fBlockTel[iTel] = true;
                     }
                   }
@@ -1875,16 +1902,17 @@ void VCalibrator::readPixelstatus()
 
 /*!
 
-     file name might not be right!!!!
+     NOTE: READING LOW GAIN MULTIPLIERS FROM TREES NEED SOME WORK
+
+     SHOULD BE AS WELL ONE LOW GAIN MULTIPLIER PER SUMMATION WINDOW
 
      TODO: check that this is read out correctly for all summation windows
 
 */
-bool VCalibrator::readLowGainMultiplier( bool iSmall )
+bool VCalibrator::readLowGainMultiplier( int iSumWindow )
 {
-    int iSumWindow = fRunPar->fsumwindow_1[getTelID()];
-    if( iSmall ) iSumWindow  = fRunPar->fsumwindow_2[getTelID()];
-
+// read low gain multipliers from a root file 
+// (read for one summation only)
     if( fLowGainMultiplierNameC[getTelID()].size() > 0 )
     {
         cout << "Telescope " << getTelID()+1 << ": ";
@@ -1911,9 +1939,9 @@ bool VCalibrator::readLowGainMultiplier( bool iSmall )
 	    cout << "\t exiting..." << endl;
 	    exit( -1 );
         }
-        unsigned int chanID;
-        double gainMult;
-        double gainMultE;
+        unsigned int chanID = 0;
+        double gainMult = 0.;
+        double gainMultE = 0.;
         t->SetBranchAddress( "chanID", &chanID );
         t->SetBranchAddress( "gainMult", &gainMult );
         t->SetBranchAddress( "gainMultE", &gainMultE );
@@ -1938,8 +1966,9 @@ bool VCalibrator::readLowGainMultiplier( bool iSmall )
         }
         if( iNMeanLG > 0. ) iMeanLG /= iNMeanLG;
         else                iMeanLG = getDetectorGeometry()->getLowGainMultiplier()[getTelID()];
-        setMeanLowGainMultiplier( iMeanLG, iSmall );
-        if( iNMeanLG > 1. ) setRMSLowGainMultiplier( sqrt( (iMeanLG2 - iNMeanLG * iMeanLG)/(iNMeanLG-1.)/iNMeanLG ), iSmall );
+// set low gain multiplier (PRELI: for all summation windows)
+        setMeanLowGainMultiplier( iMeanLG );
+        if( iNMeanLG > 1. ) setRMSLowGainMultiplier( sqrt( (iMeanLG2 - iNMeanLG * iMeanLG)/(iNMeanLG-1.)/iNMeanLG ) );
 
         for( int i = 0; i < t->GetEntries(); i++ )
         {
@@ -1949,16 +1978,16 @@ bool VCalibrator::readLowGainMultiplier( bool iSmall )
             {
                 if( gainMultE > 1.e-7 )
                 {
-                    getLowGainMultiplier( iSmall )[chanID] = gainMult;
-                    getLowGainMultiplierError( iSmall )[chanID] = gainMultE;
-                    getCalData()->getLowGainDist( iSmall )->Fill( gainMult );
+                    getLowGainMultiplier( iSumWindow )[chanID] = gainMult;
+                    getLowGainMultiplierError( iSumWindow )[chanID] = gainMultE;
+                    getCalData()->getLowGainMultiplierDistribution()->Fill( gainMult );
                 }
 // set gain multipliers in channels without measurement to mean value over all channels
                 else
                 {
-                    getLowGainMultiplier( iSmall )[chanID] = iMeanLG;
-                    getLowGainMultiplierError( iSmall )[chanID] = 0.;
-                    getCalData()->getLowGainDist( iSmall )->Fill( iMeanLG );
+                    getLowGainMultiplier( iSumWindow )[chanID] = iMeanLG;
+                    getLowGainMultiplierError( iSumWindow )[chanID] = 0.;
+                    getCalData()->getLowGainMultiplierDistribution()->Fill( iMeanLG );
                 }
             }
         }
@@ -1966,14 +1995,25 @@ bool VCalibrator::readLowGainMultiplier( bool iSmall )
         i_f.Close();
     }
 //////////////////////////////////////////////////////////////////
-// fill low gain multipliers set in .cfg file
-    else
+// read low gain multiplier from low gain calibration file
+// (one value per telescope)
+    else if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
     {
-        for( unsigned int i = 0; i < getLowGainMultiplier( iSmall ).size(); i++ )
+	cout << "Telescope " << getTelID()+1 << ": ";
+        cout << "reading low gain multiplier from " << getRunParameter()->fLowGainCalibrationFile << endl;
+	readLowGainCalibrationValues_fromCalibFile( "LOWGAINMULTIPLIER", getTelID(), iSumWindow );
+	getDetectorGeometry()->setLowGainMultiplier( getTelID(), getCalData()->getMeanLowGainMultiplier() );
+    }
+//////////////////////////////////////////////////////////////////
+// fill low gain multipliers set in .cfg file
+// (one value per telescope)
+    else if( getDetectorGeometry()->isLowGainSet() )
+    {
+        for( unsigned int i = 0; i < getLowGainMultiplier( iSumWindow ).size(); i++ )
         {
-            getLowGainMultiplier( iSmall )[i] = getDetectorGeometry()->getLowGainMultiplier()[getTelID()];
-            getLowGainMultiplierError( iSmall )[i] = 0.;
-            getCalData()->getLowGainDist( iSmall )->Fill( getLowGainMultiplier()[i] );
+            getLowGainMultiplier( iSumWindow )[i] = getDetectorGeometry()->getLowGainMultiplier()[getTelID()];
+            getLowGainMultiplierError( iSumWindow )[i] = 0.;
+            getCalData()->getLowGainMultiplierDistribution()->Fill( getLowGainMultiplier()[i] );
         }
     }
 
@@ -1981,7 +2021,7 @@ bool VCalibrator::readLowGainMultiplier( bool iSmall )
 }
 
 /*
-    preliminary, not completed yet (GM) (Oct 2010: but what is missing?)
+
 */
 bool VCalibrator::readCalibrationData( string iDSTfile )
 {

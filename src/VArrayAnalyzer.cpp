@@ -86,11 +86,11 @@ void VArrayAnalyzer::doAnalysis()
     if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
     {
        getShowerParameters()->fTargetElevation = getPointing()[getTeltoAna()[0]]->getTargetElevation();
-       getShowerParameters()->fTargetAzimuth = getPointing()[getTeltoAna()[0]]->getTargetAzimuth();
-       getShowerParameters()->fTargetDec = getPointing()[getTeltoAna()[0]]->getTargetDec();
-       getShowerParameters()->fTargetRA = getPointing()[getTeltoAna()[0]]->getTargetRA();
-       getShowerParameters()->fWobbleNorth = getPointing()[getTeltoAna()[0]]->getWobbleNorth();
-       getShowerParameters()->fWobbleEast = getPointing()[getTeltoAna()[0]]->getWobbleEast();
+       getShowerParameters()->fTargetAzimuth   = getPointing()[getTeltoAna()[0]]->getTargetAzimuth();
+       getShowerParameters()->fTargetDec       = getPointing()[getTeltoAna()[0]]->getTargetDec();
+       getShowerParameters()->fTargetRA        = getPointing()[getTeltoAna()[0]]->getTargetRA();
+       getShowerParameters()->fWobbleNorth     = getPointing()[getTeltoAna()[0]]->getWobbleNorth();
+       getShowerParameters()->fWobbleEast      = getPointing()[getTeltoAna()[0]]->getWobbleEast();
     }
     else
     {
@@ -108,16 +108,16 @@ void VArrayAnalyzer::doAnalysis()
         if( i < getPointing().size() && getPointing()[i] )
 	{
 	   getShowerParameters()->fTelElevation[i] = getPointing()[i]->getTelElevation();
-	   getShowerParameters()->fTelAzimuth[i] = getPointing()[i]->getTelAzimuth();
-	   getShowerParameters()->fTelDec[i] = getPointing()[i]->getTelDec();
-	   getShowerParameters()->fTelRA[i] = getPointing()[i]->getTelRA();
+	   getShowerParameters()->fTelAzimuth[i]   = getPointing()[i]->getTelAzimuth();
+	   getShowerParameters()->fTelDec[i]       = getPointing()[i]->getTelDec();
+	   getShowerParameters()->fTelRA[i]        = getPointing()[i]->getTelRA();
         }
 	else
 	{
 	   getShowerParameters()->fTelElevation[i] = 0.;
-	   getShowerParameters()->fTelAzimuth[i] = 0.;
-	   getShowerParameters()->fTelDec[i] = 0.;
-	   getShowerParameters()->fTelRA[i] = 0.;
+	   getShowerParameters()->fTelAzimuth[i]   = 0.;
+	   getShowerParameters()->fTelDec[i]       = 0.;
+	   getShowerParameters()->fTelRA[i]        = 0.;
         }
 // compare calculated pointing with vbf pointing
         checkPointing();
@@ -151,7 +151,8 @@ void VArrayAnalyzer::doAnalysis()
 	   getShowerParameters()->fDec[i] = getPointing()[getTeltoAna()[0]]->getTelDec() + getShowerParameters()->fShower_YoffsetDeRot[i];
 	   if( cos(getShowerParameters()->fDec[i]/TMath::RadToDeg()) != 0. )
 	   {
-	       getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA() + getShowerParameters()->fShower_XoffsetDeRot[i]/cos(getShowerParameters()->fDec[i]/TMath::RadToDeg() );
+	       getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA() 
+	                                     + getShowerParameters()->fShower_XoffsetDeRot[i]/cos(getShowerParameters()->fDec[i]/TMath::RadToDeg() );
 	   }
 	   else getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA();
 	}

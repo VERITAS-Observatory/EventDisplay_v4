@@ -975,7 +975,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
     if( nhits > getDead(false).size() ) nhits = getDead(false).size();
 
 // set integration window
-    unsigned int iSumWindow = getSumWindowSmall();
+    unsigned int iSumWindow = getSumWindow();
     setTCorrectedSumFirst( getSumFirst() );
 // set dynamic integration window
 // (depending on the measured integrated charge in first pass)
@@ -1062,7 +1062,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // integration start might be before sample 0 -> set to sample 0
                 if (corrfirst < 0 )
                 {
-                    unsigned int isw = getSumWindowSmall();
+                    unsigned int isw = getSumWindow();
                     if( -1*corrfirst > (int)isw ) isw = 0;
                     else                          isw += corrfirst;
                     corrfirst = 0;
@@ -1126,9 +1126,9 @@ unsigned int VImageBaseAnalyzer::getDynamicSummationWindow( unsigned int i_chann
       return 12;
    }
 // for integrated pulses below a certain threshold: return smallest dynamical window
-   if( getSums()[i_channelHitID] < 0 ) return getSumWindowSmall();
+   if( getSums()[i_channelHitID] < 0 ) return getSumWindow();
 
 // calculate integration window
 
-   return getSumWindowSmall();
+   return getSumWindow();
 }

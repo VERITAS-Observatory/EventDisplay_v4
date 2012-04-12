@@ -146,20 +146,20 @@ void VEventLoop::printRunInfos()
 	   cout << "\t no trace integration" << endl;
         }
 	getImageCleaningParameter()->print();
-        if( getCalData()->getLowGainDist() )
+        if( getCalData()->getLowGainMultiplierDistribution() )
         {
-            cout << "\t low gain multiplier: \t" << setprecision( 3 ) << getCalData()->getLowGainDist()->GetMean() << "+-" << getCalData()->getLowGainDist()->GetRMS();
-            if( fRunPar->fDoublePass && getCalData()->getLowGainDist(true) )
-            {
-                cout << " (LG: " << getCalData()->getLowGainDist(true)->GetMean() << "+-" << getCalData()->getLowGainDist(true)->GetRMS() << ")";
+            cout << "\t low gain multiplier: \t" << setprecision( 3 ) << getCalData()->getLowGainMultiplierDistribution()->GetMean();
+	    if( getCalData()->getLowGainMultiplierDistribution()->GetRMS() > 1.e-3 )
+	    {
+	       cout << "+-" << getCalData()->getLowGainMultiplierDistribution()->GetRMS();
             }
+	    cout << endl;
         }
         else cout << "\t (no low gain multiplier distributions)";
 	if( TMath::Abs( fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]] ) - 1. > 1.e-2 )
 	{
 	   cout << "\t additional gain correction: " << fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]];
         }
-	cout << endl;
 	cout << "\t LL edge fit: \t\t loss > " << fRunPar->fLogLikelihoodLoss_min[i] << "\t ntubes > " << fRunPar->fLogLikelihood_Ntubes_min[i] << endl;
     }
 }
@@ -359,11 +359,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 	{
 	   fPointing.push_back( new VSkyCoordinates( i ) );
 	   fPointing.back()->setObservatory( fRunPar->getObservatory_Longitude_deg(), fRunPar->getObservatory_Latitude_deg() );
+///////////////////////////////////////////////////////////////////////////////////////////
+// Monte Carlo file
 	   if( fRunPar->fIsMC != 0 ) fPointing.back()->setMC();
+///////////////////////////////////////////////////////////////////////////////////////////
+// data
 	   else
 	   {
 ///////////////////////////////////////////////////////////////////////////////////////////
 // set target by name (this means target coordinates must be hard wired into VTargets.cpp)
+// (this should not be used in any serious analysis!!)
 ///////////////////////////////////////////////////////////////////////////////////////////
 	       if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
 	       {
@@ -375,7 +380,7 @@ bool VEventLoop::initEventLoop( string iFileName )
 		   }
 	       }
 ///////////////////////////////////////////////////////////////////////////////////////////
-// set target coordinates from command line or from db
+// set target coordinates from command line or from DB
 ///////////////////////////////////////////////////////////////////////////////////////////
 	       else if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
 	       {
@@ -386,7 +391,10 @@ bool VEventLoop::initEventLoop( string iFileName )
 // add any offsets to the pointing
 	   fPointing.back()->setPointingOffset( fRunPar->fTargetRAOffset, fRunPar->fTargetDecOffset );
 // set pointing error
-	   if( fRunPar->fDBTracking ) fPointing.back()->getPointingErrorFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory, fRunPar->fDBVPM );
+	   if( fRunPar->fDBTracking )
+	   {
+	       fPointing.back()->getPointingErrorFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory, fRunPar->fDBVPM );
+           }
 	   else
 	   {
 	       fPointing.back()->setPointingError( fRunPar->fPointingErrorX[i], fRunPar->fPointingErrorY[i] );

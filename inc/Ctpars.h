@@ -47,6 +47,7 @@ class Ctpars
         Double_t        fborderthresh;
         Int_t           fsumfirst;
         Int_t           fsumwindow;
+        Int_t           fsumwindow_2;
         Int_t           fsumwindowsmall;
         Short_t         LocalTrigger;
         Short_t           MCprim;
@@ -109,6 +110,7 @@ class Ctpars
         Double_t        fborderthresh;
         Int_t           fsumfirst;
         Int_t           fsumwindow;
+        Int_t           fsumwindow_2;
         Int_t           fsumwindowsmall;
         Short_t         LocalTrigger;
         Int_t           MCprim;
@@ -176,6 +178,7 @@ class Ctpars
         TBranch        *b_fborderthresh;          //!
         TBranch        *b_fsumfirst;              //!
         TBranch        *b_fsumwindow;             //!
+        TBranch        *b_fsumwindow_2;             //!
         TBranch        *b_fsumwindowsmall;        //!
         TBranch        *b_LocalTrigger;           //!
         TBranch        *b_MCprim;                 //!

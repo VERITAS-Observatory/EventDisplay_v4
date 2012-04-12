@@ -85,8 +85,8 @@ class VCameraRead : public VGlobalRunParameter
         vector< vector<float> > fGain;            //!< gain
         vector< vector<float> > fTOff;            //!< toffsets
 // electronics
-        bool                 fLowGainIsSet;       //!< low gain multiplier is set in cfg file
-        vector< double >     fLowGainMultiplier;  //!< low gain multiplier (usually 6.)
+        bool                  fLowGainIsSet;       //!< low gain multiplier is set in cfg file
+        vector< double >      fLowGainMultiplier;  //!< low gain multiplier (usually 6.)
         vector< unsigned int> fLowGainActivator;  //!< threshold for low gain activation (usually 255)
 
         void                 cleanNeighbourList();

@@ -43,7 +43,7 @@ class VTableEnergyCalculator
         double getMinSizePerTelescope() { return fMinSize; }
         double getMaxDistanceFromTelescope() { return fMaxDistance; }
         double getMaxLocalDistanceFromTelescope() { return fMaxLocalDistance; }
-        void setVHistograms( vector< TH2F* >& hM, vector< TH2F* >& hS );
+        void setVHistograms( vector< TH2F* >& hM );
         void setMinSizePerTelescope( double iS ) { fMinSize = iS; }
         void setCutValues( double iSize, double iLocalDist, double iDist );
 	void setMinRequiredShowerPerBin( float iM = 5. ) { fMinShowerPerBin = iM; }
@@ -77,7 +77,6 @@ class VTableEnergyCalculator
         TH2F *hNevents;
         string hNeventsName;
         vector< TH2F* > hVMedian;
-        vector< TH2F* > hVSigma;
         TProfile2D *hMean;
 	string hMeanName;
         TDirectory *fOutDir;

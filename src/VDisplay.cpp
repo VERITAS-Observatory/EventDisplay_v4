@@ -1477,7 +1477,7 @@ void VDisplay::drawCalibrationHistos()
     }
     else if( E_cameraIdent( fCameraDisplay ) == C_LOWGAIN )
     {
-        ihis = fEventLoop->getCalData( fTelescope )->getLowGainDist( fEventLoop->getRunParameter()->fDoublePass );
+        ihis = fEventLoop->getCalData( fTelescope )->getLowGainMultiplierDistribution();
         if( ihis ) ihis->SetAxisRange( 0., 10. );
     }
     if( ihis )

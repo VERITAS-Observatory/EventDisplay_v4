@@ -657,7 +657,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       if(dc2pe!=0) 
       {
         rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
-        rtn.scope[tel].ped[pix]=fData->getData()->getPedvarsSmall()[pix]*frogs_pedwidth_correction/dc2pe;
+        rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]*frogs_pedwidth_correction/dc2pe;
         //rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(1,false)[pix]*frogs_pedwidth_correction/dc2pe;
 	//cout << " What " << pix << " " << getPedvars(1,false)[pix] << endl;
       }

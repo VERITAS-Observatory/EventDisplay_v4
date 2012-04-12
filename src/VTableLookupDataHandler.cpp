@@ -460,10 +460,10 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
         }
         fweight[i] = 1.;
 
-        if( !bShort && fntubes[i] > 4 && i < i_nimage.size() ) i_nimage.set( i, 1 );
+        if( !bShort && fntubes[i] > 4 && i < i_nimage.size() && i < 10 ) i_nimage.set( i, 1 );
     }
     fmeanPedvar_Image = calculateMeanNoiseLevel( true );
-    if( !bShort && fNTrig >= 2 && i_nimage.to_ulong() > 0 ) hImagePattern->Fill( ((double)i_nimage.to_ulong()) );
+    if( !bShort && fNTrig >= 2 && i_nimage.to_ulong() > 0 && getNTel() < 10 ) hImagePattern->Fill( ((double)i_nimage.to_ulong()) );
 
                                                   //AMC 09102009
     if(SizeSecondMax_temp > 0) fSizeSecondMax = SizeSecondMax_temp;
@@ -550,19 +550,21 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     Int_t nBinsX = 0;
     if( fNTel < 28 ) nBinsX = (Int_t)pow(2.,(double)fNTel);
     else             nBinsX = 28;
-    hTrigPattern = new TH1D( "hTrigPattern", "", nBinsX, 0., pow(2.,(double)fNTel) );
+    hTrigPattern = new TH1D( "hTrigPattern", "", nBinsX, 0., (double)nBinsX );
     hTrigPattern->SetStats( 0 );
     hTrigPattern->SetFillColor( 4 );
     hTrigPattern->SetYTitle( "% of all triggered events" );
     hTrigPattern->GetYaxis()->SetTitleOffset( 1.2 );
-    hisList->Add( hTrigPattern );
+// might result in dodgy root files for large numbers of telescopes
+//    hisList->Add( hTrigPattern );
 
-    hImagePattern = new TH1D( "hImagePattern", "", nBinsX, 0., pow(2.,(double)fNTel) );
+    hImagePattern = new TH1D( "hImagePattern", "", nBinsX, 0., (double)nBinsX );
     hImagePattern->SetStats( 0 );
     hImagePattern->SetFillColor( 4 );
     hImagePattern->SetYTitle( "% of all reconstructed events" );
     hImagePattern->GetYaxis()->SetTitleOffset( 1.2 );
-    hisList->Add( hImagePattern );
+// might result in dodgy root files for large numbers of telescopes
+//    hisList->Add( hImagePattern );
 
     sTrigPattern.push_back( "Tel.1");
     sTrigPattern.push_back( "Tel.2");
@@ -708,35 +710,29 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
 	   }
 	   gErrorIgnoreLevel = 5000;
 	   double pedvar = 0.;
-	   double pedvarSmall = 0.;
 	   double mpedvar = 0.;
-	   double mpedvarSmall = 0.;
 	   double npedvar = 0.;
-	   double npedvarSmall = 0.;
 	   double state = 0;
 	   iPedVars.SetBranchAddress( "pedvar", &pedvar );
-	   iPedVars.SetBranchAddress( "pedvarSmall", &pedvarSmall );
 	   if( iPedVars.GetBranchStatus( "state" ) ) iPedVars.SetBranchAddress( "state", &state );
 
 	   sprintf( iName, "ht_%d", i+1 );
 	   TH1D h( iName, "", 1000, 0., 50. );
 
-	   if( fDebug > 1 ) cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope " << i+1 << ", number of entries: " << iPedVars.GetEntries() << endl;
+	   if( fDebug > 1 )
+	   {
+	       cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope ";
+	       cout << i+1 << ", number of entries: " << iPedVars.GetEntries() << endl;
+           }
 	   for( int n = 0; n < iPedVars.GetEntries(); n++ )
 	   {
 	       iPedVars.GetEntry( n );
 
-	       if( pedvar > 0. && pedvarSmall <= 0. && state == 0 )
+	       if( pedvar > 0. && state == 0 )
 	       {
 		   mpedvar += pedvar;
 		   npedvar++;
-		   h.Fill( pedvarSmall );
-	       }
-	       else if( pedvarSmall > 0. && state == 0 )
-	       {
-		   mpedvarSmall += pedvarSmall;
-		   npedvarSmall++;
-		   h.Fill( pedvarSmall );
+		   h.Fill( pedvar );
 	       }
 	   }
 	   double xq[1];
@@ -1117,7 +1113,6 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
 	   cout << "\t writing MC debug histograms" << endl;
 	   hisList->Write();
         }
-
         if( fDeadTime )
         {
             fDeadTime->calculateDeadTime();

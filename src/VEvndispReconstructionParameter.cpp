@@ -175,7 +175,9 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
    {
       if( iTel < fRunPara->fLogLikelihoodLoss_min.size() )
       {
-         if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 && iImageParameter->Fitstat >=0 )
+// (GM) changed d20120405 if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 && iImageParameter->Fitstat >=0 )
+// (GM): fitstat cut: do we have to require a successfull covariance matrix? Not clear...
+         if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 1 )
 	 {
 	    iArrayCut = false;
 	    if( fDebug )
@@ -343,7 +345,8 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
     cout << endl;
     cout << "------------------------------" << endl;
     cout << "----- Array Analysis Cuts ----" << endl;
-    cout << "------(" << fNMethods << " methods)------" << endl;
+    if( fNMethods > 1 ) cout << "------(" << fNMethods << " methods)------" << endl;
+    else                cout << "------(" << fNMethods << " method)------" << endl;
     cout << endl;
      set< ULong64_t >::iterator fTel_type_iter;
     for( unsigned m = 0; m < fNMethods; m++ )

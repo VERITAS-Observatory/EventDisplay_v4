@@ -325,7 +325,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
     for( unsigned int n = 0; n < iDName.size(); n++ )
     {
         fTableNoiseLevel.push_back( atof( iDName[n].substr( 6, 5 ).c_str() ) / 100. );
- //       cout << iDName[n] << "\t" << fTableNoiseLevel.back() << "\t" << iDName[n].substr( 6, 5 ) << "\t" << n << endl;
 
         fLookupTableFile->cd( iDName[n].c_str() );
         if( fDebug == 2 ) cout << "DEBUG  DIR " << " " << gDirectory->GetPath() << endl;
@@ -342,7 +341,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
         for( unsigned z = 0; z < iDNameZE.size(); z++ )
         {
             i_ze.push_back( atof( iDNameZE[z].substr( 3, 3).c_str() ) / 10. );
-//            cout <<  "\t" << iDNameZE[z] << "\t" << i_ze.back() << "\t" << z << endl;
             iii_mscw.clear();
             iii_mscl.clear();
             iii_energy.clear();
@@ -357,7 +355,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
             for( unsigned int w = 0; w < iDNameWoff.size(); w++ )
             {
                 i_DirectionOffset.push_back( atof( iDNameWoff[w].substr( 5, 4 ).c_str() ) / 1000. );
- //               cout << "\t\t" << iDNameWoff[w] << "\t" << i_DirectionOffset.back() << "\t" << w << endl;
                 ii_mscw.clear();
                 ii_mscl.clear();
                 ii_energy.clear();
@@ -377,7 +374,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 	            i_telType.clear();
 
                     iDirAz->cd( iDNameAz[a].c_str() );
-//		    cout << "\t\t\t" << iDNameAz[a] << "\t" << a << "\t";
 // TELESCOPE
                     TDirectory *iDirTel = gDirectory;
                     vector< string > iDNameTel = getSortedListOfDirectories( iDirTel );
@@ -385,7 +381,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
                     {
 // READ IN ALL TABLES
                         iDirTel->cd( iDNameTel[t].c_str() );
-//  		        cout << iDNameTel[t] << "\t" << t << "\t";
                         TDirectory *iDir = (TDirectory*)gDirectory->Get( "mscw" );
 // telescope type
                         i_telType.push_back( (ULong64_t)(atoi)(iDNameTel[t].substr( 4, iDNameTel[t].size() ).c_str() ) );
@@ -406,7 +401,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
                         iDir = (TDirectory*)gDirectory->Get( "energySR" );
                         i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, iDir, true ) );
                     }                             // telescopes
-//		    cout << endl;
                     ii_mscw.push_back( i_mscw );
                     ii_mscl.push_back( i_mscl );
                     ii_energy.push_back( i_energy );
@@ -1221,13 +1215,9 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize, unsigned in
     }
 
     s->hmscwMedian[tel] = fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-    s->hmscwSigma[tel]  = fmscw[inoise][ize][iwoff][iaz][telX]->getHistoSigma();
     s->hmsclMedian[tel] = fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-    s->hmsclSigma[tel]  = fmscl[inoise][ize][iwoff][iaz][telX]->getHistoSigma();
     s->henergySRMedian[tel] = fenergySizevsRadius[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-    s->henergySRSigma[tel]  = fenergySizevsRadius[inoise][ize][iwoff][iaz][telX]->getHistoSigma();
     s->henergyERMedian[tel] = fenergyEnergyvsRadius[inoise][ize][iwoff][iaz][telX]->getHistoMedian();
-    s->henergyERSigma[tel]  = fenergyEnergyvsRadius[inoise][ize][iwoff][iaz][telX]->getHistoSigma();
 }
 
 
@@ -1243,23 +1233,23 @@ void VTableLookup::calculateMSFromTables( VTablesToRead *s, double esys )
 
     f_calc_msc->setCalculateEnergies( false );
 // calculate mscw
-    f_calc_msc->setVHistograms( s->hmscwMedian, s->hmscwSigma );
+    f_calc_msc->setVHistograms( s->hmscwMedian );
     s->mscw = f_calc_msc->calc( (int)fData->getNTel(), fData->getDistanceToCore(), 
               fData->getSize( fTLRunParameter->fMSCWSizecorrection ), fData->getWidth(),
 	      s->mscw_T, i_dummy, i_dummy, s->mscw_Tsigma );
 // calculate mscl
-    f_calc_msc->setVHistograms( s->hmsclMedian, s->hmsclSigma );
+    f_calc_msc->setVHistograms( s->hmsclMedian );
     s->mscl = f_calc_msc->calc( (int)fData->getNTel(), fData->getDistanceToCore(), 
                                 fData->getSize( fTLRunParameter->fMSCLSizecorrection ), fData->getLength(), 
 				s->mscl_T, i_dummy, i_dummy, s->mscl_Tsigma );
 // calculate energy (method 1)
     f_calc_energySR->setCalculateEnergies( true );
-    f_calc_energySR->setVHistograms( s->henergySRMedian, s->henergySRSigma );
+    f_calc_energySR->setVHistograms( s->henergySRMedian );
     s->energySR = f_calc_energySR->calc( (int)fData->getNTel(), fData->getDistanceToCore(),
                                          fData->getSize2( fTLRunParameter->fEnergySizecorrection ), 0,
 					 s->energySR_T, s->energySR_Chi2, s->energySR_dE, s->energySR_Tsigma );
 // calculate energy (method 0)
-    f_calc_energy->setVHistograms( s->henergyERMedian, s->henergyERSigma );
+    f_calc_energy->setVHistograms( s->henergyERMedian );
     s->energyER = f_calc_energy->calc( (int)fData->getNTel(), fData->getMCEnergy(), fData->getDistanceToCore(),
                                        fData->getSize2( fTLRunParameter->fEnergySizecorrection ), fData->getDistance(),
 				       s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
