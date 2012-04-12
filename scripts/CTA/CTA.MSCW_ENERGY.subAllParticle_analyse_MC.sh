@@ -29,6 +29,9 @@ fi
 if [ $4 = "cta-ultra3" ]
 then
    VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+elif [ $4 = "v_leeds" ]
+then
+   VPART=( "proton" )
 else
    VPART=( "gamma_onSource" "electron" "proton" )
 fi

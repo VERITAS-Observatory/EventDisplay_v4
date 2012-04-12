@@ -54,6 +54,7 @@ do
    ODIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/WPPhys/
    OXUTNAME=$ODIR/$OUTNAME
    mkdir -p $ODIR
+   echo "WP Phys file written to $OXUTNAME"
 
    rm -f $ODIR/$FSCRIPT-$ARRAY-1.sh
    cp $FSCRIPT.sh $ODIR/$FSCRIPT-$ARRAY-1.sh
