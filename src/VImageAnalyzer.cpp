@@ -510,7 +510,7 @@ bool VImageAnalyzer::initEvent()
         if( fPointing[getTelID()]->isSet() && fPointing[getTelID()]->getTargetName() != "laser" )
         {
 // this calculates telescope elevation and azimuth from telescope pointing in ra and dec
-            fPointing[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time );
+            fPointing[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time, true );
             if (!fPointing[getTelID()]->isPrecessed())
             {
                 fPointing[getTelID()]->precessTarget( getImageParameters()->MJD );

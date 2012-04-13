@@ -206,7 +206,7 @@ void VArrayAnalyzer::initEvent()
         {
 	    if( getTeltoAna()[i]  < getPointing().size() && getPointing()[getTeltoAna()[i]] )
 	    {
-	       getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time, true );
+	       getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time, true, true );
             }
         }
     }
@@ -369,7 +369,7 @@ void VArrayAnalyzer::terminate()
                 }
                 else
                 {
-                    cout << "\t mean pointing mismatch between eventdisplay and VBF pointing data for Telescope " << getTeltoAna()[i]+1 << ": ";
+                    cout << "\t mean pointing mismatch between pointing data (analysis and VBF) for Telescope " << getTeltoAna()[i]+1 << ": ";
                     cout << getMeanPointingMismatch( getTeltoAna()[i] ) << " deg" << endl;
                 }
             }
@@ -747,9 +747,11 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
 // taking pointing direction of first telescope in teltoana vector
     if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
     {
-       i_xcos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() ) * sin( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
+       i_xcos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() )
+              * sin( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
        if( fabs( i_xcos ) < 1.e-7 ) i_xcos = 0.;
-       i_ycos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() ) * cos( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
+       i_ycos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() )
+              * cos( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
        if( fabs( i_ycos ) < 1.e-7 ) i_ycos = 0.;
     }
     else
@@ -826,10 +828,13 @@ void VArrayAnalyzer::checkPointing()
             if( ivbf == 9999 ) continue;
 
 	    getShowerParameters()->fTelElevationVBF[i] = getReader()->getArrayTrigger()->getAltitude( ivbf );
-	    getShowerParameters()->fTelAzimuthVBF[i] = getReader()->getArrayTrigger()->getAzimuth( ivbf );
+	    getShowerParameters()->fTelAzimuthVBF[i]   = getReader()->getArrayTrigger()->getAzimuth( ivbf );
 	    if( i < getPointing().size() && getPointing()[i] )
 	    {
-	       iPointingDiff = (float)angDist( getPointing()[i]->getTelAzimuth()/TMath::RadToDeg(), (90.-getPointing()[i]->getTelElevation())/TMath::RadToDeg(), getReader()->getArrayTrigger()->getAzimuth( ivbf )/TMath::RadToDeg(), (90. - getReader()->getArrayTrigger()->getAltitude( ivbf ))/TMath::RadToDeg() );
+	       iPointingDiff = (float)angDist( getPointing()[i]->getTelAzimuth()/TMath::RadToDeg(), 
+	                                       (90.-getPointing()[i]->getTelElevation())/TMath::RadToDeg(),
+					       getReader()->getArrayTrigger()->getAzimuth( ivbf )/TMath::RadToDeg(),
+					       (90. - getReader()->getArrayTrigger()->getAltitude( ivbf ))/TMath::RadToDeg() );
 
 	       getShowerParameters()->fTelPointingMismatch[i] = iPointingDiff;
 	       getShowerParameters()->fTelPointingErrorX[i] = getPointing()[i]->getPointingErrorX();
@@ -842,8 +847,10 @@ void VArrayAnalyzer::checkPointing()
 	       if( getRunParameter()->fCheckPointing < 900. && iPointingDiff > getRunParameter()->fCheckPointing )
 	       {
 		   cout << "VArrayAnalyzer::checkPointing() large mismatch between calculated telescope pointing direction and VBF pointing: " << iPointingDiff << " deg" << endl;
-		   cout << "\t calculated telescope pointing direction: " << getPointing()[i]->getTelAzimuth() << "\t" << getPointing()[i]->getTelElevation() << endl;
-		   cout << "\t VBF telescope pointing direction:        " << getReader()->getArrayTrigger()->getAzimuth( ivbf ) << "\t" << getReader()->getArrayTrigger()->getAltitude( ivbf ) << endl;
+		   cout << "\t calculated telescope pointing direction: ";
+		   cout << getPointing()[i]->getTelAzimuth() << "\t" << getPointing()[i]->getTelElevation() << endl;
+		   cout << "\t VBF telescope pointing direction:        ";
+		   cout << getReader()->getArrayTrigger()->getAzimuth( ivbf ) << "\t" << getReader()->getArrayTrigger()->getAltitude( ivbf ) << endl;
 		   cout << "ABORT due to large pointing error (>" << getRunParameter()->fCheckPointing << " deg, event " << getEventNumber() << ")" << endl;
 		   exit( 0 );
 	       }

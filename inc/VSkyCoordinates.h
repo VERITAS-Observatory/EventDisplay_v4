@@ -27,6 +27,7 @@ class VSkyCoordinates
         bool   fSet;                              //!< true if target or dec/ra is set
         bool   fPrecessed;                        //!< true if target position has been precessed
         bool   fMC;                               //!< true for Monte Carlo run
+	bool   fUseDB;                            //!< uses DB to calculate pointing directions
 
         unsigned int fMJD;
         double fTime;
@@ -43,41 +44,48 @@ class VSkyCoordinates
         double fWobbleNorth;                      //!< [deg] wobble offset north
         double fWobbleEast;                       //!< [deg] wobble offset east
 
-        double fTelAzimuth;                       //!< [deg]
-        double fTelElevation;                     //!< [deg]
-        float fTelAzimuth_float;                  //!< [deg]
-        float fTelElevation_float;                //!< [deg]
+// telescope orientation
+        double fTelAzimuth;                       //!< [deg]  return value to be used in the analysis
+        double fTelElevation;                     //!< [deg]  return value to be used in the analysis
+	float  fTelAzimuthCalculated;             //!< [deg]  elevation from source coordinates
+	float  fTelElevationCalculated;           //!< [deg]  elevation from source coordinates
+        float  fTelAzimuthDB;                     //!< [deg]  azimuth from VTS DB (from positioner or pointing monitor)
+        float  fTelElevationDB;                   //!< [deg]  elevation from VTS DB (from positioner or pointing monitor)
 
         double fObsLatitude;                      //!< [rad]
         double fObsLongitude;                     //!< [rad]
 
-        int bPointingError;                       //!< 0: no pointing error, 1: from command line, 2: from tracking code (DB), 3: from pointing monitor text file, 4: from pointing monitor (DB)
+        unsigned int fPointingType;               //!< 0: pointing calculated from source coordinates (+wobble offsets)
+	                                          //!< 1: pointing calculated from source coordinates (+wobble offsets), added error from command line, 
+	                                          //!< 2: read T-Point corrected positioner data from VERITAS DB
+						  //!< 3: read raw positioner data from VERITAS DB and apply tracking corrections
+						  //!< 4: from pointing monitor (text file)
+						  //!< 5: from pointing monitor (DB)
         unsigned int fEventStatus;
         float fPointingErrorX;                    //!< [deg]
         float fPointingErrorY;                    //!< [deg]
         unsigned int fMeanPointingErrorN;
         double fMeanPointingErrorX;               //!< [deg]
         double fMeanPointingErrorY;               //!< [deg]
+	double fMeanPointingDistance;             //!< [deg]
         unsigned int fNEventsWithNoDBPointing;
 
 
         VPointingDB *fPointingDB;
-        float fTelAzimuthDB;
-        float fTelElevationDB;
 
         TTree *fPointingTree;
-
-        double degrad;
 
         void fillPointingTree();
         void initializePointingTree();
         void reset();
-        void updatePointingError( int, double );
+        bool updatePointingfromDB( int, double );
 
     public:
+
         VSkyCoordinates( bool bReset = true, unsigned int iTelID = 0 );
         VSkyCoordinates( unsigned int itelID );
-        ~VSkyCoordinates() {}
+       ~VSkyCoordinates() {}
+
         double adjustAzimuthToRange( double );
         void   derotateCoords( double i_UTC, double i_xin, double i_yin, double & i_xout, double & i_yout);
         double getDerotationAngle(double i_UTC);
@@ -93,6 +101,7 @@ class VSkyCoordinates
         void   getDifferenceInCameraCoordinates( double tel_ze, double tel_az, double shower_ze,  double shower_az, float &x, float &y, float &z );
         float  getPointingErrorX();
         float  getPointingErrorY();
+	unsigned int getPointingType() { return fPointingType; }
         VTargets* getTarget() { return fTarget; }
         double getTargetDec() { return fTargetDec * 180./TMath::Pi(); }
         double getTargetRA() { return fTargetRA * 180./TMath::Pi(); }
@@ -104,27 +113,23 @@ class VSkyCoordinates
         double getTelRA() { return fTelRA * 180./TMath::Pi(); }
         double getTelLatitude() { return fObsLatitude*45./atan(1.); }
         double getTelLongitude() { return fObsLongitude*45./atan(1.); }
-        void   getTelPointing( int MJD, double time, double &el, double &az );
-        void   getPointingErrorFromDB( int irun, string iTCorrections, string iVPMDirectory, bool iVPMDB );
+        void   getPointingFromDB( int irun, string iTCorrections, string iVPMDirectory, bool iVPMDB );
         unsigned int getTelID() { return fTelID; }
         double getWobbleNorth() { return fWobbleNorth; }
         double getWobbleEast() { return fWobbleEast; }
+        bool   isPrecessed(){return fPrecessed;}
         bool   isSet() { return fSet; }
+        void   precessTarget (int iMJD);
         void   rotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double & i_xout, double & i_yout);
         void   setMC() { fMC = true; }
-	void   setObservatory( double iLongitude = 0., double iLatitude = 0. );
+	void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
         bool   setPointingOffset( double i_raOff, double i_decOff );
         bool   setTarget( string iTargetName );
         bool   setTarget( double iDec, double iRA );
         void   setTargetName( string iTargetName ) { fTargetName = iTargetName; }
-        void   precessTarget (int iMJD);
-        bool   isPrecessed(){return fPrecessed;}
         void   setTelElevation( double );         //!< set telescope elevation (for MC)
         void   setTelAzimuth( double );           //!< set telescope azimuth (for MC)
-        void   setTelPointing( int MJD, double time );
-        void   setTelPointing( int MJD, double time, bool iGetPointingError );
-                                                  //!< set telescope position ([deg])
-        void   setTelPosition( double iLat, double iLong );
+        void   setTelPointing( int MJD, double time, bool iUseDB = false, bool iFillPointingTree = false );
         void   setPointingError( double, double );//!< Pointing error [deg]
         void   setWobbleOffset( double iWobbleNorth, double iWobbleEast );
         void   terminate( bool i_IsMC = false );
