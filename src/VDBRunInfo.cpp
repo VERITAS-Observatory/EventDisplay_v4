@@ -43,16 +43,10 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 {
     stringstream iTempS;
     iTempS << iDBserver << "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
-    if( !f_db )
-    {
-        cout << "VDBRunInfo: failed to connect to database server" << endl;
-        cout << "\t server: " <<  iDBserver << endl;
-        fDBStatus = false;
-        return;
-    }
-    char c_query[1000];
+    TSQLServer *f_db = connectToSQLServer( iTempS.str() );
+    if( !f_db ) return;
 
+    char c_query[1000];
     sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunNumber );
 
     TSQLResult *db_res = f_db->Query( c_query );
@@ -244,16 +238,33 @@ void VDBRunInfo::print()
     cout << endl;
 }
 
+TSQLServer* VDBRunInfo::connectToSQLServer( string iDBserver )
+{
+   TSQLServer *f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
+// if not successfull: sleep for 10 s and try again
+   if( !f_db )
+   {
+      cout << "VDBRunInfo: info: failed to connect to database server, sleep for 10 and try again..." << endl;
+      gSystem->Sleep( 10000 );
+      f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
+       if( !f_db )
+       {
+	   cout << "VDBRunInfo: failed to connect to database server" << endl;
+	   cout << "\t server: " <<  iDBserver << endl;
+	   fDBStatus = false;
+	   return false;
+       }
+   }
+   return f_db;
+}
+
 vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel )
 {
     stringstream iTempS;
     iTempS << iDBserver << "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
+    TSQLServer *f_db = connectToSQLServer( iTempS.str() );
     if( !f_db )
     {
-        cout << "VDBRunInfo: failed to connect to database server" << endl;
-        cout << "\t server: " <<  iDBserver << endl;
-        fDBStatus = false;
         return fLaserRunID;
     }
     char c_query[1000];

@@ -10,6 +10,7 @@
 #include <TSQLResult.h>
 #include <TSQLRow.h>
 #include <TSQLServer.h>
+#include <TSystem.h>
 
 #include <bitset>
 #include <iostream>
@@ -50,6 +51,7 @@ class VDBRunInfo
         string fWeather;
 	vector< unsigned int > fLaserRunID;
 
+	TSQLServer*            connectToSQLServer( string iDBserver );
 	vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
         void                   readRunInfoFromDB( string );
 
