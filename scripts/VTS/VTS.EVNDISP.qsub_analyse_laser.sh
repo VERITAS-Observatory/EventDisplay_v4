@@ -24,6 +24,8 @@ set DFIL=`find -L $DDIR -name "$RUN.cvbf"`
 
 #########################################
 # run eventdisplay
+rm -f $LDIR/$RUN.laser.log
+
 $EVNDISPSYS/scripts/VTS/VTS.EVNDISP.analyse_laser_run -1 $DFIL >! $LDIR/$RUN.laser.log
 
 

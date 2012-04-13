@@ -19,7 +19,6 @@ mkdir -p $ODIR
 set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400/"
 mkdir -p $LDIR
 
-
 # eventdisplay reconstruction parameter
 set ACUTS="EVNDISP.reconstruction.runparameter"
 
@@ -29,6 +28,7 @@ cd $EVNDISPSYS/bin/
 
 # pedestal
 if( $PED == "1" ) then
+    rm -f $LDIR/$RUN.ped.log
     ./evndisp -runnumber=$RUN -runmode=1  > $LDIR/$RUN.ped.log
 endif
 
@@ -47,6 +47,7 @@ set OPT=" "
 # set OPT="$OPT -calibrationfile calib.dat"
 
 # run eventdisplay
+rm -f $LDIR/$RUN.log
 ./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $ODIR/$RUN.root $OPT > $LDIR/$RUN.log
 
 # sleep for 20 s 
