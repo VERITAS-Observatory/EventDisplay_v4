@@ -687,7 +687,7 @@ VDetectorGeometry* VEvndispData::fDetectorGeo = 0;
 VDetectorTree* VEvndispData::fDetectorTree = 0;
 
 // pointing
-vector<VSkyCoordinates*> VEvndispData::fPointing;
+vector<VPointing*> VEvndispData::fPointing;
 bool VEvndispData::fNoTelescopePointing = false;
 
 // reader

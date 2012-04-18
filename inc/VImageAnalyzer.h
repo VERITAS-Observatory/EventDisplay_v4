@@ -11,7 +11,6 @@
 
 #include <VImageBaseAnalyzer.h>
 #include <VImageParameterCalculation.h>
-#include <VSkyCoordinates.h>
 #include <VImageCleaning.h>
 
 #include <iostream>

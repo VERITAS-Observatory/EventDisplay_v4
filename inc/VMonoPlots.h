@@ -7,9 +7,9 @@
 #include "CData.h"
 
 #include "VGammaHadronCuts.h"
-#include "VAstroSource.h"
 #include "VAnaSumRunParameter.h"
 #include "VASlalib.h"
+#include "VSkyCoordinates.h"
 #include "VSkyCoordinatesUtilities.h"
 #include "VTargets.h"
 
@@ -114,7 +114,7 @@ class VMonoPlots
         TH2D* hmap;                               //!< Map of reconstructed source position
 
         VAnaSumRunParameter *fRunPar;
-        VAstroSource* fAstro;                     //!< Astronomical source parameters for this analysis
+        VSkyCoordinates* fAstro;                     //!< Astronomical source parameters for this analysis
         VGammaHadronCuts* fCuts;                          //!< Parameter Cuts
 
         double f_eta;                             //!< source location parameter

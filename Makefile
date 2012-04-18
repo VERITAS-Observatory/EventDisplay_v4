@@ -290,6 +290,7 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
         	./obj/VUtilities.o \
          	./obj/VASlalib.o \
+		./obj/VPointing.o \
 	 	./obj/VPointingDB.o \
 		./obj/VSkyCoordinates.o \
 		./obj/VTargets.o \
@@ -369,26 +370,15 @@ mscw_energy:  $(MSCOBJECTS)
 # makeRadialAcceptance
 ########################################################
 
-ACCOBJECT = 	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
-		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
-		./obj/VAnaSumRunParameter.o ./obj/VRadialAcceptance.o \
-		./obj/VAstroSource.o ./obj/VASlalib.o \
-		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
-		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o ./obj/VTargets.o \
-		./obj/VRunList.o ./obj/VRunList_Dict.o \
-		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
-		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-		./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
-		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
-		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
-		./obj/makeRadialAcceptance.o
+ACCOBJECT = 	./obj/makeRadialAcceptance.o \
+		./obj/VRadialAcceptance.o \
+		$(EVNDISPSYS)/lib/libVAnaSum.so
 
 ./obj/makeRadialAcceptance.o:	./src/makeRadialAcceptance.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 makeRadialAcceptance:	$(ACCOBJECT)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	$(LD) $(LDFLAGS) $^ $(GLIBS)  -L./lib -lVAnaSum $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 ########################################################
@@ -431,7 +421,7 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
                 ./obj/VStereoHistograms.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
                 ./obj/VStereoAnalysis.o ./obj/VMonoPlots.o \
-                ./obj/VAstroSource.o\
+                ./obj/VSkyCoordinates.o \
                 ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o \
 		./obj/VStereoMaps.o ./obj/VRatePlots.o \
 		./obj/VRadialAcceptance.o ./obj/VEffectiveAreaCalculator.o ./obj/VRunSummary.o \
@@ -492,6 +482,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VExposure.o ./obj/VExposure_Dict.o \
 		./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VAnaSumRunParameter.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
@@ -835,6 +826,8 @@ endif
 
 CTA.convert_hessio_to_VDST:	./obj/VDSTTree.o \
 				./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+				./obj/VASlalib.o \
+				./obj/VSkyCoordinatesUtilities.o \
 				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \

@@ -485,7 +485,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // derotate coordinates
 // (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
 // ( don't change signs if you don't know why! )
-	     fAstro[icounter]->derotateCoords(i_UTC, getXoff(), fEVDVersionSign * getYoff(), i_xderot, i_yderot);
+	     fAstro[icounter]->derotateCoords( i_UTC, getXoff(), fEVDVersionSign * getYoff(), i_xderot, i_yderot);
              i_yderot *= -1.;
 
 // gamma/hadron separation cuts
@@ -1215,9 +1215,9 @@ void VStereoAnalysis::defineAstroSource()
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreNorth) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreNorth = 0.;
       	}
 
-      /////////////////////////////////////////////////////////
-      // set and get target shifts
-      // (calculated relative to sky map centre)
+/////////////////////////////////////////////////////////
+// set and get target shifts
+// (calculated relative to sky map centre)
       // (this is where all 1D histograms (theta2, energy spectra, etc) are calculated)
       	if( fIsOn )
       	{
@@ -1241,11 +1241,11 @@ void VStereoAnalysis::defineAstroSource()
       	     fRunPara->setTargetShifts( i, fRunPara->fRunList[i].fTargetShiftWest, fRunPara->fRunList[i].fTargetShiftNorth, 
       	                                   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
       	}
-      /////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 
       	i_dec = fTarget.getTargetDecJ2000();      // in [rad]
       	i_ra  = fTarget.getTargetRAJ2000();
-      // precess source coordinates
+// precess source coordinates
       	double iMJD = 0.;
       	if( fIsOn ) iMJD = (double)fRunPara->fRunList[i].fMJDOn;
       	else        iMJD = (double)fRunPara->fRunList[i].fMJDOff;
@@ -1254,16 +1254,16 @@ void VStereoAnalysis::defineAstroSource()
       	if( fIsOn )
       	{
       		cout << "Run " << fRunPara->fRunList[i].fRunOn <<" ---------------------------"<< endl;
-      	// set target coordinates into run parameter list
+// set target coordinates into run parameter list
       		fRunPara->setTargetRADec( i, i_ra*TMath::RadToDeg(), i_dec*TMath::RadToDeg() );
-      	// print target info to screen
+// print target info to screen
       		cout << "\tTarget: " << fRunPara->fRunList[i].fTarget << " (ra,dec)=(";
       		cout << fRunPara->fRunList[i].fTargetRA << ", " << fRunPara->fRunList[i].fTargetDec << ")";
       		cout << " (precessed, MJD=" << iMJD << "), ";
       		cout << "(ra,dec)_J2000 = (" << fRunPara->fRunList[i].fTargetRAJ2000 << ", " << fRunPara->fRunList[i].fTargetDecJ2000 << ")";
       		cout << ", pair offset [min]: " << fRunPara->fRunList[i].fPairOffset  << endl;
       	}
-      // get wobble offsets in ra,dec
+// get wobble offsets in ra,dec
       	double i_decDiff =  0.;
       	double i_raDiff = 0.;
       	VSkyCoordinatesUtilities::getWobbleOffsets( fRunPara->fRunList[i].fWobbleNorth, fRunPara->fRunList[i].fWobbleWest, i_dec*TMath::RadToDeg(), i_ra*TMath::RadToDeg(), i_decDiff, i_raDiff );
@@ -1293,34 +1293,45 @@ void VStereoAnalysis::defineAstroSource()
       		cout << endl;
       	}
 
-      // define offset for off run (usually 30. min, specified in runlist file)
-      // offset is as well defined for on run if on and off runnumber are the same
+// define offset for off run (usually 30. min, specified in runlist file)
+// offset is as well defined for on run if on and off runnumber are the same
       	i_off = 0.;
       	if( !fIsOn || fRunPara->fRunList[i].fRunOn == fRunPara->fRunList[i].fRunOff ) i_off = fRunPara->fRunList[i].fPairOffset/60./24.*360./TMath::RadToDeg();
 
-      // define source and tracking class
-      	fAstro.push_back( new VAstroSource( i_ra + i_raDiff/TMath::RadToDeg() + i_off ,i_dec + i_decDiff/TMath::RadToDeg(), i_ra, i_dec  ) );
+// define source and tracking class
+      	fAstro.push_back( new VSkyCoordinates() );
+	fAstro.back()->setTelDec_deg( i_dec * TMath::RadToDeg() + i_decDiff );
+	fAstro.back()->setTelRA_deg( i_ra * TMath::RadToDeg() + i_raDiff + i_off * TMath::RadToDeg() );
       	fAstro.back()->setObservatory( fRunPara->getObservatory_Longitude_deg(), fRunPara->getObservatory_Latitude_deg() );
       	if( fIsOn )
       	{
-      		fAstro.back()->init( fRunPara->fStarCatalogue, iMJD, fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax, fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
-      		fAstro.back()->getStarCatalogue()->purge();
-      		if( fAstro.back()->getStarCatalogue()->getListOfStarsinFOV().size() > 0 )
+      		fAstro.back()->initStarCatalogue( fRunPara->fStarCatalogue, iMJD, fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, 
+		                                                     fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax, 
+								     fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
+		VStarCatalogue *iStarCatalogue = fAstro.back()->getStarCatalogue();
+		if( !iStarCatalogue )
+		{
+		   cout << "VStereoAnalysis::defineAstroSource() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
+		   cout << "exiting..." << endl;
+		   exit( -1 );
+                }
+      		iStarCatalogue->purge();
+      		if( iStarCatalogue->getListOfStarsinFOV().size() > 0 )
       		{
       			cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
       			cout << fRunPara->fStarExlusionRadius << " deg) in field of view (J2000): " << endl;
       			cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
       			double i_brightness = 100.;
-      			for( unsigned int i = 0; i < fAstro.back()->getStarCatalogue()->getListOfStarsinFOV().size(); i++ )
+      			for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
       			{
-      				if( fRunPara->fStarBand == "V" )      i_brightness = fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fBrightness_V;
-      				else if( fRunPara->fStarBand == "B" ) i_brightness = fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fBrightness_B;
+      				if( fRunPara->fStarBand == "V" )      i_brightness = iStarCatalogue->getListOfStarsinFOV()[i].fBrightness_V;
+      				else if( fRunPara->fStarBand == "B" ) i_brightness = iStarCatalogue->getListOfStarsinFOV()[i].fBrightness_B;
 
       				if( i_brightness < fRunPara->fStarMinBrightness )
       				{
-      					cout << "\t\t" << fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fStarID << "\t";
-      					cout << fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fRA2000 << "\t";
-      					cout << fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fDec2000 << "\t";
+      					cout << "\t\t" << iStarCatalogue->getListOfStarsinFOV()[i].fStarID << "\t";
+      					cout << iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 << "\t";
+      					cout << iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 << "\t";
       					cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
       					cout << endl;
       				// add this to exclusion regions
@@ -1330,22 +1341,26 @@ void VStereoAnalysis::defineAstroSource()
       						bool b_isExcluded = false;
       						for( unsigned int e = 0; e < fRunPara->fExcludeFromBackground_StarID.size(); e++ )
       						{
-      							if( fRunPara->fExcludeFromBackground_StarID[e] >= 0 && fRunPara->fExcludeFromBackground_StarID[e] == (int)fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fStarID ) b_isExcluded = true;
+      							if( fRunPara->fExcludeFromBackground_StarID[e] >= 0
+							 && fRunPara->fExcludeFromBackground_StarID[e] == (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID )
+							{
+							   b_isExcluded = true;
+                                                        }
       						}
       						if( !b_isExcluded )
       						{
-      							fRunPara->fExcludeFromBackground_RAJ2000.push_back( fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fRA2000 );
-      							fRunPara->fExcludeFromBackground_DecJ2000.push_back( fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fDec2000 );
+      							fRunPara->fExcludeFromBackground_RAJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 );
+      							fRunPara->fExcludeFromBackground_DecJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 );
       							fRunPara->fExcludeFromBackground_Radius.push_back( fRunPara->fStarExlusionRadius );
       							fRunPara->fExcludeFromBackground_North.push_back( 0. );
       							fRunPara->fExcludeFromBackground_West.push_back( 0. );
-      							fRunPara->fExcludeFromBackground_StarID.push_back( (int)fAstro.back()->getStarCatalogue()->getListOfStarsinFOV()[i].fStarID );
+      							fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID );
       						}
       					}
       				}
       			}
       		}
-      		fAstro.back()->getStarCatalogue()->purge();
+      		iStarCatalogue->purge();
       	}
       // doesn't work if different sources are analyzed with RA <> 360 deg
       /////////////////////////////////////////////////////////
@@ -1355,8 +1370,10 @@ void VStereoAnalysis::defineAstroSource()
       	{
       		if( fRunPara->fExcludeFromBackground_DecJ2000[k] > -90. )
       		{
-      			fRunPara->fExcludeFromBackground_West[k]  = -1.* fTarget.getTargetShiftWest( fRunPara->fExcludeFromBackground_RAJ2000[k], fRunPara->fExcludeFromBackground_DecJ2000[k] ) * -1.;
-      			fRunPara->fExcludeFromBackground_North[k] = -1.* fTarget.getTargetShiftNorth( fRunPara->fExcludeFromBackground_RAJ2000[k], fRunPara->fExcludeFromBackground_DecJ2000[k] );
+      			fRunPara->fExcludeFromBackground_West[k]  = -1.* fTarget.getTargetShiftWest( fRunPara->fExcludeFromBackground_RAJ2000[k], 
+			                                                                             fRunPara->fExcludeFromBackground_DecJ2000[k] ) * -1.;
+      			fRunPara->fExcludeFromBackground_North[k] = -1.* fTarget.getTargetShiftNorth( fRunPara->fExcludeFromBackground_RAJ2000[k], 
+			                                                                              fRunPara->fExcludeFromBackground_DecJ2000[k] );
       			fRunPara->fExcludeFromBackground_West[k]  += fRunPara->fRunList[i].fSkyMapCentreWest;
       			fRunPara->fExcludeFromBackground_North[k] += fRunPara->fRunList[i].fSkyMapCentreNorth;
       			if( TMath::Abs( fRunPara->fExcludeFromBackground_North[k] ) < 1.e-4 ) fRunPara->fExcludeFromBackground_North[k] = 0.;
@@ -1462,24 +1479,6 @@ TH1D* VStereoAnalysis::getTheta2()
       else if( fHisCounter < (int)fHisto.size() )  return fHisto[fHisCounter]->htheta2;
 
       return 0;
-}
-
-
-double VStereoAnalysis::getTargetDec()
-{
-      if( fHisCounter < 0 ) return fMeanSourceDec;
-      else if( fHisCounter < (int)fAstro.size() ) return fAstro[fHisCounter]->getSourceDec() * 180. / TMath::Pi();
-
-      return 0.;
-}
-
-
-double VStereoAnalysis::getTargetRA()
-{
-      if( fHisCounter < 0 ) return fMeanSourceRA;
-      else if( fHisCounter < (int)fAstro.size() ) return fAstro[fHisCounter]->getSourceRA() * 180. / TMath::Pi();
-
-      return 0.;
 }
 
 

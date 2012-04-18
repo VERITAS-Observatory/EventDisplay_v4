@@ -19,7 +19,7 @@
 
 #include <VDetectorGeometry.h>
 #include "VMonteCarloRunHeader.h"
-#include <VSkyCoordinates.h>
+#include <VSkyCoordinatesUtilities.h>
 #include <VVirtualDataReader.h>
 
 using namespace std;
@@ -39,8 +39,6 @@ class VGrIsuReader : public VVirtualDataReader
 
         streampos sp;                             //!< current position in data file
         string fDataFormat;
-
-        VSkyCoordinates *fPointing;
 
         string fSourceFileName;
         bool fBZipped;                            //!< source file is zipped

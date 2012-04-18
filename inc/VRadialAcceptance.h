@@ -4,7 +4,9 @@
 #ifndef VACCEPTANCE_H
 #define VACCEPTANCE_H
 
-#include "CData.h"
+#include <cmath>
+#include <iostream>
+#include <string>
 
 #include "TF1.h"
 #include "TFile.h"
@@ -14,26 +16,20 @@
 #include "TKey.h"
 #include "TList.h"
 
+#include "CData.h"
 #include "VGammaHadronCuts.h"
-#include "VAstroSource.h"
 #include "VAnaSumRunParameter.h"
-#include "VSkyCoordinatesUtilities.h"
-#include "VTargets.h"
 #include "VUtilities.h"
-
-#include "cmath"
 
 using namespace std;
 
+// fit function for radial acceptance
 Double_t VRadialAcceptance_fit_acceptance_function(Double_t *x, Double_t *par);
 
+// class definition
 class VRadialAcceptance
 {
     private:
-
-        double degrad;
-
-        bool fSimuAcceptance;
 
         bool fAcceptanceFunctionDefined;
 
@@ -48,31 +44,20 @@ class VRadialAcceptance
         vector<double> fYE;
         vector<double> fRE;
 
-// acceptance curves from simulations
-
-        TF1 *fAccp5;
-        TH1D *hAccp5;
-
-        void initAcceptancefromSimulations();
-
 // calculate acceptance from data
-        VGammaHadronCuts *fCuts;
+        VGammaHadronCuts    *fCuts;
         VAnaSumRunParameter *fRunPar;
-        VAstroSource *fAstro;
 
         TList *hList;
         TH1D *hscale;
 // acceptance curves as mean over all runs
-        vector< double > fZe;                     //!< ze bins (upper limit of zenith angle bin)
-        vector< TH1D* > hAccZe;                   //!< zenith angle dependent acceptance curves
-        vector< TF1* > fAccZe;                    //!< zenith angle dependent acceptance curves
-        vector< TH1D* > hAccZeFit;                //!< zenith angle dependent acceptance curves
-        unsigned int fAccZeFitMinBin;             //!< range (in bins) for normalisation of acceptance curves
-        unsigned int fAccZeFitMaxBin;
+        vector< double > fZe;                      //!< ze bins (upper limit of zenith angle bin)
+        vector< TH1D* >  hAccZe;                   //!< zenith angle dependent acceptance curves
+        vector< TF1* >   fAccZe;                   //!< zenith angle dependent acceptance curves
+        vector< TH1D* >  hAccZeFit;                //!< zenith angle dependent acceptance curves
+        unsigned int     fAccZeFitMinBin;          //!< range (in bins) for normalisation of acceptance curves
+        unsigned int     fAccZeFitMaxBin;
 
-// azimuth angle dependent acceptance curves, mean over all zenith angles
-        vector< double > fAz;
-        vector< TH1D* > hAccAz;
 // acceptance vs yoff vs xoff, azimuth angle dependent
         TH2D *hXYAccTot;
         vector< TH2D* > hXYAcc;
@@ -87,42 +72,24 @@ class VRadialAcceptance
         TFile *fAccFile;
 
         void scaleArea( TH1D* );
-
         void reset();
 
     public:
 
-        VRadialAcceptance();                            //!< use acceptance curve from simulation
-                                                  //!< set data source and cuts for acceptance curve calculation
-        VRadialAcceptance( VGammaHadronCuts*iCuts, VAnaSumRunParameter *irun );
-        VRadialAcceptance( string ifile );              //!< use acceptance curve from this file
-        ~VRadialAcceptance();
+        VRadialAcceptance();                                                            //!< use acceptance curve from simulation
+        VRadialAcceptance( VGammaHadronCuts*iCuts, VAnaSumRunParameter *irun );         //!< set data source and cuts for acceptance curve calculation
+        VRadialAcceptance( string ifile );                                              //!< use acceptance curve from this file
+       ~VRadialAcceptance();
 
-        bool fillAcceptanceFromData( CData *c );
-                                                  //!< acceptance
-        double getAcceptance( double x, double y, double erec = 0., double ze = 0. );
-                                                  //!< correction factor (1/acceptance)
-        double getCorrectionFactor( double x, double y, double erec );
-        TF1 *getFunction()                        //!< return acceptance function
-        {
-            return fAccp5;
-        }
-        TH1D* getAcceptanceHistogram()            //!< return acceptance histogram
-        {
-            return hAccp5;
-        }
-        double getNumberofRawFiles();
-        bool isExcluded( double, double );        //!< region excluded from analysis
-                                                  //!< region excluded from background analysis
-        bool isExcludedfromBackground( double, double );
-                                                  //!< region excluded from source analyis
-        bool isExcludedfromSource( double, double );
-                                                  //!< set source position, radius, and minimal distance between source and background
-        void setSource( double x, double y, double r, double idist );
-                                                  //!< set source position, radius, and minimal distance between source and background
-        void setSource( double x, double y, double r, double idist, double imaxdist );
-                                                  //set the region to be exclude in the analysis
-        void setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r );
-        bool terminate( string ofile );
+        bool   fillAcceptanceFromData( CData *c );
+        double getAcceptance( double x, double y, double erec = 0., double ze = 0. );   //!< return radial acceptance
+        double getCorrectionFactor( double x, double y, double erec );                  //!< return correction factor (1/radial acceptance)
+        double getNumberofRawFiles() { return fNumberOfRawFiles; }
+        bool   isExcluded( double, double );                                            //!< region excluded from analysis
+        bool   isExcludedfromBackground( double, double );                              //!< region excluded from background analysis
+        bool   isExcludedfromSource( double, double );                                  //!< region excluded from source analyis
+        void   setSource( double x, double y, double r, double idist, double imaxdist = 5. ); //!< set source position, radius, and minimal distance between source and background
+        void   setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r ); //set the region to be exclude in the analysis
+        bool   terminate( string ofile );
 };
 #endif

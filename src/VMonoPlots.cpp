@@ -169,7 +169,9 @@ VMonoPlots::VMonoPlots( bool ison, CData *tree, string i_hsuffix, VAnaSumRunPara
         }
         slaPreces("FK5",2000.0, 2006.0, &i_ra, &i_dec);
 
-        fAstro = new VAstroSource(i_ra+i_off,i_dec, i_ra, i_dec );
+	fAstro = new VSkyCoordinates();
+	fAstro->setTelDec_deg( i_dec );
+	fAstro->setTelRA_deg( i_ra + i_off );
     }
 
 //! define the cuts

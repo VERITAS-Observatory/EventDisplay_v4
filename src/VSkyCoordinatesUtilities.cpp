@@ -42,15 +42,13 @@ void VSkyCoordinatesUtilities::rotate( const double theta_rad, double& x, double
 */
 void VSkyCoordinatesUtilities::getWobbleOffsets( double iNorth, double iEast, double idec, double ira, double &idiffdec, double &idiffra )
 {
-    double degrad = 45./atan( 1. );
-
-    idec /= degrad;
-    ira /= degrad;
+    idec /= TMath::RadToDeg();
+    ira  /= TMath::RadToDeg();
 
     double x = 0.;
     double y = 0.;
     double z = 1.;
-    double theta_rad = sqrt(iNorth*iNorth + iEast*iEast ) / degrad;
+    double theta_rad = sqrt(iNorth*iNorth + iEast*iEast ) / TMath::RadToDeg();
     double phi_rad = -1.*atan2( iEast, iNorth );
     if( phi_rad < 0. ) phi_rad += TMath::TwoPi();
 
@@ -58,11 +56,11 @@ void VSkyCoordinatesUtilities::getWobbleOffsets( double iNorth, double iEast, do
     VSkyCoordinatesUtilities::rotate( phi_rad, y, x );
 // declination
     VSkyCoordinatesUtilities::rotate( TMath::PiOver2()-idec, z, x );
-    idiffdec = (atan2( z, sqrt(x*x+y*y) ) - idec) * degrad;
+    idiffdec = (atan2( z, sqrt(x*x+y*y) ) - idec) * TMath::RadToDeg();
 // right ascension
     idiffra = atan2( y, x );
     if( idiffra < 0. ) idiffra += TMath::TwoPi();
-    idiffra *= -1.*degrad;
+    idiffra *= -1.*TMath::RadToDeg();
 
     if( TMath::Abs( idiffra ) < 1.e-9 )   idiffra  = 0.;
     if( TMath::Abs( idiffdec ) < 1.e-9 )  idiffdec = 0.;
@@ -96,5 +94,95 @@ double VSkyCoordinatesUtilities::addToMeanAzimuth( double iMean, double iAz )
     else iMean += iAz;
 
     return iMean;
+}
+
+
+/*
+     difference between to pointing directions in camera coordinates
+
+     input coordinates in [deg]
+*/
+void VSkyCoordinatesUtilities::getDifferenceInCameraCoordinates( double tel_ze, double tel_az, 
+                                                        double shower_ze,  double shower_az, 
+							float &x, float &y, float &z )
+{
+// convert coordinates from [deg] to [rad]
+    tel_az    /= TMath::RadToDeg();
+    shower_az /= TMath::RadToDeg();
+    double tel_el    = (90.-tel_ze)/TMath::RadToDeg();
+    double shower_el = (90.-shower_ze)/TMath::RadToDeg();
+
+    double cx = cos( shower_el ) * sin( shower_az );
+    double cy = cos( shower_el ) * cos( shower_az );
+    double cz = sin( shower_el );
+
+    double i_temp = sin( tel_az ) * cx + cos( tel_az ) * cy;
+
+    x = (cos( tel_az ) * cx - sin( tel_az ) * cy) * TMath::RadToDeg();
+    z = (cos( tel_el ) * i_temp + sin( tel_el ) * cz);
+    y = (-1.*sin( tel_el ) * i_temp + cos( tel_el ) * cz) * TMath::RadToDeg();
+    y *= -1.;
+
+    if( fabs( x ) < 1.e-4 ) x = 0.;
+    if( fabs( y ) < 1.e-4 ) y = 0.;
+    if( fabs( z ) < 1.e-4 ) z = 0.;
+}
+
+/*
+    calculate shower direction from telescope pointing and reconstruction shower direction
+
+     small angle approximation, assume small x,y (neglect z)
+*/
+
+void VSkyCoordinatesUtilities::getRotatedShowerDirection( double ze, double az, double y, double x, double &rze, double &raz )
+{
+// get all directions in [rad]
+    x /= TMath::RadToDeg();
+    y /= (-1.*TMath::RadToDeg());
+// assume all telescopes point in same directions
+    double el = (90.-ze)/TMath::RadToDeg();
+    az = az/TMath::RadToDeg();
+// these are the resulting directions
+
+    double r = sqrt( 1. + x*x + y*y );
+    double cx = x/r;
+    double cy = 1./r;
+    double cz = y/r;
+
+// rotate telescope around elevation axis
+    double ex = cx;
+    double ey = cy * cos( el ) - cz * sin( el );
+    double ez = cy * sin( el ) + cz * cos( el );
+// rotate around azimuth
+    double rx, ry, rz;
+    rx =     ex * cos( az ) + ey * sin( az );
+    ry = -1.*ex * sin( az ) + ey * cos( az );
+    rz = ez;
+// calculate new azimuth, zenith
+    r = sqrt( rx*rx + ry*ry );
+// small value check
+    if( fabs(r) < 1.e-10 ) r = 0.;
+    if( fabs(rx) < 1.e-10 ) rx = 0.;
+    if( fabs(ry) < 1.e-10 ) ry = 0.;
+    if( fabs(rz) < 1.e-10 ) rz = 0.;
+
+    if( r == 0. ) raz = az * TMath::RadToDeg();
+    else
+    {
+        raz = (TMath::Pi()/2.-atan2(ry,rx))*TMath::RadToDeg();
+        if( raz > 180. )  raz = -1.*(360.-raz);
+        if( raz < -180. ) raz *= -1.;
+    }
+    if( rz == 0. ) rze = 90. - el*TMath::RadToDeg();
+    else
+    {
+        rze = 90.-atan2(rz,r)*TMath::RadToDeg();
+    }
+}
+
+
+double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az )
+{
+    return slaDranrm( az/TMath::RadToDeg()) * TMath::RadToDeg();
 }
 

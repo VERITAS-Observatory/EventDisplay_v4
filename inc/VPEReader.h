@@ -15,7 +15,7 @@
 #include "VDetectorGeometry.h"
 #include "VMonteCarloRunHeader.h"
 #include "VPETree.h"
-#include "VSkyCoordinates.h"
+#include "VSkyCoordinatesUtilities.h"
 #include "VVirtualDataReader.h"
 
 using namespace std;
@@ -30,7 +30,6 @@ class VPEReader : public VVirtualDataReader
         string fSourceFileName;
 
         VDetectorGeometry *fDetectorGeometry;
-        VSkyCoordinates *fPointing;
 
         TFile *fPE_file;                          //!< pe source file
         unsigned int fPE_treeEvent;               //!< tree event number

@@ -515,9 +515,9 @@ bool VImageAnalyzer::initEvent()
             fPointing[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time, true );
             if (!fPointing[getTelID()]->isPrecessed())
             {
-                fPointing[getTelID()]->precessTarget( getImageParameters()->MJD );
+                fPointing[getTelID()]->precessTarget( getImageParameters()->MJD, getTelID() );
 // set wobble offsets
-                fPointing[getTelID()]->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast );
+                fPointing[getTelID()]->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, getTelID() );
                 fPointing[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time );
             }
         }

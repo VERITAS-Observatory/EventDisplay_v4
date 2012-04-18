@@ -357,7 +357,7 @@ bool VEventLoop::initEventLoop( string iFileName )
     {
         if( isTeltoAna( i ) )
 	{
-	   fPointing.push_back( new VSkyCoordinates( i ) );
+	   fPointing.push_back( new VPointing( i ) );
 	   fPointing.back()->setObservatory( fRunPar->getObservatory_Longitude_deg(), fRunPar->getObservatory_Latitude_deg() );
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Monte Carlo file

@@ -1,7 +1,6 @@
 /*! \class VRadialAcceptance
  *  \brief radial acceptance for a given point on the sky
  *
- *   OBSERVE: some hard-wired stuff
  *
  *    \author
  *    Gernot Maier 
@@ -19,8 +18,6 @@ VRadialAcceptance::VRadialAcceptance()
     reset();
 
     fAcceptanceFunctionDefined = false;
-
-    initAcceptancefromSimulations();
 }
 
 
@@ -94,8 +91,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
    fZe.push_back( 40. ); */
     fZe.push_back( 70. );
 
-/* (20120120)    double xymax = 2.0;
-    int nxybin = 20; */
+// maximal offset
     double xymax = 5.0;
     int nxybin = 50;
 
@@ -149,30 +145,6 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 
         ize = fZe[i];
     }
-// azimuth dependent acceptance curves
-    for( int i = 0; i < 6; i++ ) fAz.push_back( 60. + (double)i*60. );
-    double iAz = 0;
-    for( unsigned int i = 0; i < fAz.size(); i++ )
-    {
-        sprintf( hname, "hAccAz_%d", i );
-        sprintf( htitle, "%.0f < Az < %.0f", iAz, fAz[i] );
-        hAccAz.push_back( new TH1D( hname, htitle, nxybin, 0., xymax ) );
-        hAccAz.back()->SetXTitle( "distance to camera center [deg]" );
-        hAccAz.back()->SetYTitle( "relative rate" );
-        hAccAz.back()->SetMarkerSize( 2 );
-        hAccAz.back()->SetLineWidth( 2 );
-        hAccAz.back()->Sumw2();
-        hList->Add( hAccAz.back() );
-
-        sprintf( hname, "hAccXY_%d", i );
-        sprintf( htitle, "%.0f < Az < %.0f", iAz, fAz[i] );
-        hXYAcc.push_back( new TH2D( hname, htitle, 20, -2., 2., 20, -2., 2. ) );
-        hXYAcc.back()->SetXTitle( "x_{off} [deg]" );
-        hXYAcc.back()->SetYTitle( "y_{off} [deg]" );
-        hList->Add( hXYAcc.back() );
-
-        iAz = fAz[i];
-    }
     hXYAccTot = new TH2D( "hXYaccTot", "",  40, -2., 2., 40, -2., 2. );
     hXYAccTot->SetXTitle( "x_{off} [deg]" );
     hXYAccTot->SetYTitle( "y_{off} [deg]" );
@@ -198,14 +170,11 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 VRadialAcceptance::~VRadialAcceptance()
 {
     if( fAccFile ) delete fAccFile;
-    if( fAccp5 ) delete fAccp5;
 }
 
 
 void VRadialAcceptance::reset()
 {
-    degrad = 45./atan(1.);
-
     fNumberOfRawFiles = 0.;
 
     fAcceptanceFunctionDefined = false;
@@ -213,7 +182,6 @@ void VRadialAcceptance::reset()
     fRunPar = 0;
     fCuts = 0;
     hList = 0;
-    fAstro = 0;
 
     fXs = 0.;
     fYs = 0.;
@@ -221,9 +189,6 @@ void VRadialAcceptance::reset()
     fDs = 0.;
     fMs = 5.;
 
-    fSimuAcceptance = false;
-    fAccp5 = 0;
-    hAccp5 = 0;
     hscale = 0;
     hXYAccTot = 0;
     fAccFile = 0;
@@ -234,77 +199,20 @@ void VRadialAcceptance::reset()
 }
 
 
-void VRadialAcceptance::initAcceptancefromSimulations()
-{
-    fSimuAcceptance = true;
-
-//   cout << "\t using acceptance curve from simulations" << endl;
-
-//
-// Acceptance curve from a crude fit to simulation data for 300 GeV
-//
-// ignore energy dependence
-//
-// flux(2,"V2/electron_V2_9_0_2202.root");
-//
-
-    if( !gDirectory->Get( "fAccp5" ) )
-    {
-        fAccp5 = new TF1( "fAccp5", "[0]+x*([1]+x*([2]+x*([3]+x*([4]+x*[5]))))", 0., 3.5 );
-        fAccp5->SetParameter( 0, 1./1.02 );
-        fAccp5->SetParameter( 1, 0.393958/1.14 );
-        fAccp5->SetParameter( 2, -1.799709/1.14 );
-        fAccp5->SetParameter( 3, 1.115985/1.14 );
-        fAccp5->SetParameter( 4, -0.271452/1.14 );
-        fAccp5->SetParameter( 5, 0.023679/1.14 );
-        fAccp5->SetNpx( 1000 );
-    }
-
-    if( !gDirectory->Get( "hAccp5" ) )
-    {
-        hAccp5 = new TH1D( "hAccp5", "radial acceptance curve", 1000, 0., 3.5 );
-        hAccp5->SetXTitle( "distance to camera center [deg]" );
-        hAccp5->SetYTitle( "relative acceptance" );
-        hAccp5->SetLineWidth( 2 );
-        hAccp5->SetStats( 0 );
-        for( int i = 1; i <= hAccp5->GetNbinsX(); i++ ) hAccp5->SetBinContent( i, getAcceptance( hAccp5->GetBinCenter( i ), 0., 0. ) );
-    }
-}
-
-
 /*!
  *   get radial acceptance
  */
 double VRadialAcceptance::getAcceptance( double x, double y, double erec, double ze )
 {
     double idist = sqrt( x*x + y*y );
-
     double iacc = 1.;
 
-//////////////////////////////
-//  from simulations (no zenith angle/energy dependence)
-/////////////////////////////
-
-    if( fSimuAcceptance )
+    if( fAcceptanceFunctionDefined )
     {
-// fAccp5 very crude fit, set to 1 for idist < 0.15
-        if( idist < 0.15 ) iacc = 1.;
-// fAccp5 very crude fit, set to 0 for idist > 2.5
-        else if( idist > 2.5 ) iacc = 0.;
-        else iacc = fAccp5->Eval( idist );
-    }
-//////////////////////////////
-//  from data
-/////////////////////////////
-    else
-    {
-        if( fAcceptanceFunctionDefined )
-        {
-            if( idist > 2.5 ) iacc = 0.;
-            else iacc = fAccZe[0]->Eval( idist );
-            if( iacc > 1. ) iacc = 1.;
-            if( iacc < 0. ) iacc = 0.;
-        }
+	 if( idist > 2.5 ) iacc = 0.;
+	 else iacc = fAccZe[0]->Eval( idist );
+	 if( iacc > 1. ) iacc = 1.;
+	 if( iacc < 0. ) iacc = 0.;
     }
 
     return iacc;
@@ -383,16 +291,8 @@ void VRadialAcceptance::setSource( double x, double y, double r, double idist, d
     fMs = imaxdist;
 }
 
-
-void VRadialAcceptance::setSource( double x, double y, double r, double idist )
-{
-    setSource( x, y, r, idist, 5. );
-}
-
-
 void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r)
 {
-
     fXE = x;
     fYE = y;
     fRE = r;
@@ -420,11 +320,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
     if( fCuts ) fCuts->printCutSummary();
 
     double idist = 0;
-    double iaz = 0.;
-
     int i_entries_after_cuts = 0;
-
-    int iInitRun = 0;
 
 ////////////////////////////////////////////////////////
 // loop over input data tree
@@ -435,56 +331,12 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
 
         if( i == 0 and iData->isMC() ) cout << "\t (analysing MC data)" << endl;
 
-// first event for this run
-        if( !iData->isMC() && iInitRun != iData->runNumber )
-        {
-            for( unsigned r = 0; r < fRunPar->fRunList.size(); r++ )
-            {
-                if( fRunPar->fRunList[r].fRunOff == iData->runNumber )
-                {
-                    iInitRun = iData->runNumber;
-// set targets and get coordinates
-                    VTargets fTarget;
-// set source coordinates from VRunParameter or from list of targets
-                    if( fRunPar->fRunList[r].fTargetDecJ2000 > -85. )
-                    {
-                        fTarget.setTarget( fRunPar->fRunList[r].fTarget, fRunPar->fRunList[r].fTargetRAJ2000, fRunPar->fRunList[r].fTargetDecJ2000 );
-                    }
-                    else if ( !fTarget.selectTargetbyName( fRunPar->fRunList[r].fTarget ) )
-                    {
-                        cout << "ERROR in VRadialAcceptance::fillAcceptanceFromData: invalid target " << fRunPar->fRunList[r].fTarget << endl;
-                        cout << "\t" << fRunPar->fRunList[r].fTargetDecJ2000 << endl;
-                        exit( 0 );
-                    }
-// get MJD
-                    double i_dec = fTarget.getTargetDecJ2000();
-                    double i_ra  = fTarget.getTargetRAJ2000();
-                    double iMJD = (double)iData->MJD;
-                    cout << "Target: " << fRunPar->fRunList[r].fTarget << " (ra,dec)=(";
-                    cout << i_ra*degrad << "," << i_dec*degrad << ")" << endl;
-                    VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec);
-                    cout << "(precessed, MJD=" << iMJD << ", (ra,dec)=(";
-                    cout << i_ra*degrad << "," << i_dec*degrad << "))" << endl;
-                    cout << endl;
-
-                    double i_off = fRunPar->fRunList[r].fPairOffset/60./24.*360./degrad;
-                    double i_raDiff = 0.;
-                    double i_decDiff = 0.;
-                    VSkyCoordinatesUtilities::getWobbleOffsets( fRunPar->fRunList[r].fWobbleNorth, -1.*fRunPar->fRunList[r].fWobbleWest, i_dec*degrad, i_ra*degrad, i_decDiff, i_raDiff );
-// does this need a delete?
-                    fAstro = new VAstroSource( i_ra - i_raDiff/degrad + i_off ,i_dec - i_decDiff/degrad, i_ra, i_dec );
-                    break;
-                }
-                else fAstro = 0;
-            }
-        }
-
 // apply some basic quality cuts
         if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( 0, false, i , true) )
         {
 // gamma/hadron cuts
             if( !fCuts->isGamma( 0, false ) ) continue;
-//	 if( !fCuts->applyEnergyReconstructionQualityCuts() ) continue;
+// TODO REALLY?	 if( !fCuts->applyEnergyReconstructionQualityCuts() ) continue;
 
 // now fill histograms
             i_entries_after_cuts++;
@@ -499,23 +351,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
                     break;
                 }
             }
-            double i_xoff = iData->Xoff;
-            double i_yoff = iData->Yoff;
-            if( iData->isMC() && fAstro ) fAstro->derotateCoords( VSkyCoordinatesUtilities::getUTC(iData->MJD,iData->Time), iData->Xoff, iData->Yoff, i_xoff, i_yoff );
-// fill azimuth angle dependent histograms (telescope azimuth)
-            for( unsigned int j = 0; j < fAz.size(); j++ )
-            {
-                iaz = atan2(i_yoff, i_xoff ) * 45./atan(1.)+180.;
-                if( iaz < fAz[j] )
-                {
-                    idist = sqrt( i_xoff*i_xoff + i_yoff*i_yoff );
-                    if( idist > 0 ) hAccAz[j]->Fill( idist );
-// xy acceptance
-                    hXYAcc[j]->Fill( i_xoff, i_yoff );
-                    break;
-                }
-            }
-            hXYAccTot->Fill( i_xoff, i_yoff );
+            hXYAccTot->Fill( iData->Xoff, iData->Yoff );
 // fill run dependent histograms
             for( unsigned int j = 0; j < fRunPar->fRunList.size(); j++ )
             {
@@ -563,20 +399,6 @@ bool VRadialAcceptance::terminate( string ofile )
             }
             if( i_normBin > 0. ) isc /= i_normBin;
             if( isc > 0 ) hAccZe[i]->Scale( 1./isc );
-        }
-// az histograms
-        for( unsigned int i = 0; i < hAccAz.size(); i++ )
-        {
-            scaleArea( hAccAz[i] );
-            isc = 0.;
-	    i_normBin = 0.;
-            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ ) 
-	    {
-	       isc +=  hAccAz[i]->GetBinContent( j )/(hAccAz[i]->GetBinError( j ) * hAccAz[i]->GetBinError( j ));
-	       i_normBin += 1./hAccAz[i]->GetBinError( j )/hAccAz[i]->GetBinError( j );
-            }
-	    if( i_normBin > 0. ) isc /= i_normBin;
-            if( isc > 0 ) hAccAz[i]->Scale( 1./isc );
         }
 // run wise histograms
         for( unsigned int i = 0; i < hAccRun.size(); i++ )
@@ -634,7 +456,6 @@ bool VRadialAcceptance::terminate( string ofile )
     }
 
 // write everything to disk
-
     TFile *fo = new TFile( ofile.c_str(), "RECREATE" );
     if( fo->IsZombie() )
     {
@@ -646,7 +467,6 @@ bool VRadialAcceptance::terminate( string ofile )
     hList->Write();
 
 // write cuts to disk
-
     if( fCuts )
     {
        fCuts->SetName( "GammaHadronCuts" );
@@ -677,13 +497,6 @@ void VRadialAcceptance::scaleArea( TH1D *h )
         }
     }
 }
-
-
-double VRadialAcceptance::getNumberofRawFiles()
-{
-    return fNumberOfRawFiles;
-}
-
 
 /*
    fit function for acceptance curves

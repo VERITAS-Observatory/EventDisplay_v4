@@ -45,15 +45,12 @@ VPEReader::VPEReader(  string isourcefile, vector< unsigned int > iTeltoAna, VDe
 
 // open source file and init tree
     init();
-
-// pointing class for coordinate transformations
-    fPointing = new VSkyCoordinates();
 }
 
 
 VPEReader::~VPEReader()
 {
-    if( fPointing ) delete fPointing;
+
 }
 
 
@@ -200,19 +197,11 @@ bool VPEReader::getNextEvent()
             for( unsigned int t = 0; t < fTelElevation.size(); t++ ) fTelElevation[t] =  90. - fPE_ze * degrad;
             for( unsigned int t = 0; t < fTelAzimuth.size(); t++ )   fTelAzimuth[t] = fPE_az * degrad;
 // add wobble offset
-            if( fPointing )
-            {
-                double az = 0.;
-                double ze = 0.;
-                fPointing->getRotatedShowerDirection( fPE_ze*degrad, fPE_az*degrad, fPE_Tel_yoff, -1.*fPE_Tel_xoff, ze, az );
-                fPE_ze = ze;
-                fPE_az = fPointing->adjustAzimuthToRange( az );
-            }
-            else
-            {
-                fPE_ze *= degrad;
-                fPE_az *= degrad;
-            }
+	     double az = 0.;
+	     double ze = 0.;
+	     VSkyCoordinatesUtilities::getRotatedShowerDirection( fPE_ze*degrad, fPE_az*degrad, fPE_Tel_yoff, -1.*fPE_Tel_xoff, ze, az );
+	     fPE_ze = ze;
+	     fPE_az = VSkyCoordinatesUtilities::adjustAzimuthToRange( az );
         }
 
         if( fPE_Tree[i]->v_f_time && fPE_Tree[i]->v_f_ID )

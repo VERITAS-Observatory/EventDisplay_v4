@@ -23,7 +23,7 @@
 #include <VShowerParameters.h>
 #include <VFrogParameters.h>
 //#include <VFrogImageData.h>
-#include <VSkyCoordinates.h>
+#include <VPointing.h>
 #include <VTraceHandler.h>
 
 #include "TDirectory.h"
@@ -57,7 +57,7 @@ class VEvndispData
         static unsigned int fTelID;               //!< telescope number of current telescope
         static vector< unsigned int > fTeltoAna;  //!< analyze only this subset of telescopes (this is dynamic and can change from event to event)
 // telescope pointing (one per telescope)
-        static vector< VSkyCoordinates* > fPointing;
+        static vector< VPointing* > fPointing;
 // no pointing information
         static bool fNoTelescopePointing;
 // cameras
@@ -321,7 +321,7 @@ class VEvndispData
         TGraphErrors*       getXGraph() { return fXGraph[fTelID]; }
         TGraphErrors*       getYGraph() { return fYGraph[fTelID]; }
         TGraphErrors*       getRGraph() { return fRGraph[fTelID]; }
-        vector< VSkyCoordinates* >    getPointing() { return fPointing; }
+        vector< VPointing* > getPointing() { return fPointing; }
         void                incrementNumberofIncompleteEvents() { fNumberofIncompleteEvents++; }
         void                incrementNumberofGoodEvents() { fNumberofGoodEvents++; }
                                                   //!< set pointer to data reader

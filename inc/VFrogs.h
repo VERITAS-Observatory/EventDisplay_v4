@@ -14,9 +14,6 @@
 #include "VShowerParameters.h"
 #include "VFrogParameters.h"
 #include <VEvndispRunParameter.h>
-#include <VAstroSource.h>
-#include <VSkyCoordinates.h>
-#include <VTargets.h>
 #include <VDetectorGeometry.h>
 #include <VGrIsuAnalyzer.h>
 
@@ -104,9 +101,6 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	VShowerParameters    *fShowerParam;
 //	VFrogParameters      *fFrogParameters;
         VEvndispRunParameter *fRunPara;                //!< data class for all run parameters
-        VAstroSource         *fAstro;
-        VSkyCoordinates      *fSky;
-        VTargets             *fTarget;
 //	VDetectorGeometry    *fDetector;
 //        VBFDataReader        *fVBFReader;
         VVirtualDataReader   *fReader;

@@ -352,8 +352,9 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
 
         float x = 0.;
         float y = 0.;
-        VSkyCoordinates i_skyCoordinates( false );
-        i_skyCoordinates.getDifferenceInCameraCoordinates( fSimulationData->fObservationZenithDeg, fSimulationData->fObservationAzimuthDeg, fSimulationData->fPrimaryZenithDeg, fSimulationData->fPrimaryAzimuthDeg, x, y );
+	float z = 0.;
+        VSkyCoordinatesUtilities::getDifferenceInCameraCoordinates( fSimulationData->fObservationZenithDeg, fSimulationData->fObservationAzimuthDeg,
+	                                                            fSimulationData->fPrimaryZenithDeg, fSimulationData->fPrimaryAzimuthDeg, x, y, z );
         fMCXoff = x;
         fMCYoff = y;
 #endif

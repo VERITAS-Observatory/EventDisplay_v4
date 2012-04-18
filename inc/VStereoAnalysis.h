@@ -8,13 +8,13 @@
 
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
-#include "VAstroSource.h"
 #include "VASlalib.h"
 #include "VTimeMask.h"
 #include "VDeadTime.h"
 #include "VEffectiveAreaCalculator.h"
 #include "VStereoHistograms.h"
 #include "VStereoMaps.h"
+#include "VSkyCoordinates.h"
 #include "VSkyCoordinatesUtilities.h"
 #include "VTargets.h"
 
@@ -78,8 +78,6 @@ class VStereoAnalysis
 
         TH2D* getStereoSkyMap();
         TH2D* getStereoSkyMapUC();
-        double getTargetRA();
-        double getTargetDec();
 
         map< int, double > getRunMJD() const { return fRunMJD; }
         double getMJD( int i_run ) { return ( fRunMJD.find( i_run ) != fRunMJD.end() ? fRunMJD[i_run] : 0. ); }
@@ -201,8 +199,8 @@ class VStereoAnalysis
 	TTree *fDataFrogsTree;
         TFile *fDataFile;
 
-        vector< VAstroSource* > fAstro;           //!< Astronomical source parameters for this analysis
-        VGammaHadronCuts* fCuts;                          //!< Parameter Cuts
+        vector< VSkyCoordinates* > fAstro;        //!< Astronomical source parameters for this analysis
+        VGammaHadronCuts* fCuts;                  //!< Parameter Cuts
         VTimeMask* fTimeMask;                     //!< Time Cuts
 
 // dead time calculators

@@ -9,30 +9,14 @@
 
 #include "VSkyCoordinates.h"
 
-VSkyCoordinates::VSkyCoordinates( bool bReset, unsigned int iTelID )
+VSkyCoordinates::VSkyCoordinates()
 {
-    fTelID = iTelID;
-    fTarget = 0;
-    fPointingTree = 0;
-    fPointingDB = 0;
-
-    if( bReset ) reset();
-    setObservatory();
-}
-
-
-VSkyCoordinates::VSkyCoordinates( unsigned int iTelID )
-{
-    fTelID = iTelID;
-    fTarget = 0;
-    fPointingTree = 0;
-    fPointingDB = 0;
+    fStarCatalogue = 0;
 
     reset();
     setObservatory();
-
-    initializePointingTree();
 }
+
 
 void VSkyCoordinates::setObservatory( double iLongitude, double iLatitude )
 {
@@ -46,11 +30,7 @@ void VSkyCoordinates::reset()
     fSet = false;
     fPrecessed = false;
     fWobbleSet = false;
-    fUseDB = false;
 
-    if( !fTarget ) fTarget = new VTargets();
-
-    fPointingType = 0;
     fTelDec = 0.;
     fTelRA  = 0.;
     fTelDec_deg = 0.;
@@ -61,61 +41,22 @@ void VSkyCoordinates::reset()
     fTelElevation = 0.;
     fTelAzimuthCalculated = 0.;
     fTelElevationCalculated = 0.;
-    fTelAzimuthDB = 0.;
-    fTelElevationDB = 0.;
 
     fTargetAzimuth = 0.;
     fTargetElevation = 0.;
     fWobbleNorth = 0.;
     fWobbleEast = 0.;
 
-    fEventStatus = 0;
-    fPointingErrorX = 0.;
-    fPointingErrorY = 0.;
-    fMeanPointingErrorN = 0;
-    fMeanPointingErrorX = 0.;
-    fMeanPointingErrorY = 0.;
-    fMeanPointingDistance = 0.;
-    fNEventsWithNoDBPointing = 0;
-
     fMJD = 0;
     fTime = 0.;
-    fEventStatus = 0;
-
-    fPointingDB = 0;
 }
 
-
-
-void VSkyCoordinates::setTelElevation( double iEl )
-{
-    fTelElevation = iEl;
-}
-
-
-void VSkyCoordinates::setTelAzimuth( double iAz )
-{
-    fTelAzimuth = iAz;
-}
-
-double VSkyCoordinates::getTelElevation()
-{
-    return fTelElevation;
-}
-
-
-double VSkyCoordinates::getTelAzimuth()
-{
-    return fTelAzimuth;
-}
-
-
-void VSkyCoordinates::precessTarget( int iMJD )
+void VSkyCoordinates::precessTarget( int iMJD, unsigned int iTelID )
 {
     if( !fPrecessed )
     {
         cout << "---------------------------------------------------------------------------------------------------------" << endl;
-        cout << "Pointing telescope " << fTelID+1 << endl;
+        cout << "Pointing telescope " << iTelID+1 << endl;
         cout << "\tPrecessing target ( " << getTargetName() << " ) from J2000 to MJD " << iMJD << endl;
         cout << "\tJ2000   \t\t RA=" << setprecision( 6 ) << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
 
@@ -149,20 +90,14 @@ bool VSkyCoordinates::setTarget( double iDec, double iRA )
     return true;
 }
 
-
-string VSkyCoordinates::getTargetName()
-{
-    return fTargetName;
-}
-
-
 bool VSkyCoordinates::setTarget( string iTargetName )
 {
-    if( fTarget && fTarget->selectTargetbyName( iTargetName ) )
+    VTargets iTarget;
+    if( iTarget.selectTargetbyName( iTargetName ) )
     {
         fTargetName = iTargetName;
-        fTargetDec = fTarget->getTargetDec();
-        fTargetRA  = fTarget->getTargetRA();
+        fTargetDec = iTarget.getTargetDec();
+        fTargetRA  = iTarget.getTargetRA();
         fTelRA = fTargetRA;
         fTelDec = fTargetDec;
         fTelRA_deg = fTelRA * TMath::RadToDeg();
@@ -184,11 +119,10 @@ bool VSkyCoordinates::setTarget( string iTargetName )
     calculate azimuth and elevation of target
 
  */
-void VSkyCoordinates::setTelPointing( int MJD, double time, bool iUseDB, bool iFillPointingTree )
+void VSkyCoordinates::updatePointing( int MJD, double time )
 {
     fMJD = (unsigned int)MJD;
     fTime = time;
-    fUseDB = iUseDB;
 
     double iTime = 0.;
     double ha = 0.;
@@ -212,28 +146,8 @@ void VSkyCoordinates::setTelPointing( int MJD, double time, bool iUseDB, bool iF
 // telescope elevation/azimuth calculated from source coordinates and time
     fTelAzimuthCalculated   = (float)az;
     fTelElevationCalculated = (float)el;
-// telescope elevation/azimuth calculated from VERITAS DB entries
-    if( fUseDB )
-    {
-        updatePointingfromDB( fMJD, fTime );
-    }
-// calulation from source should always be successful
-    else
-    {
-       fEventStatus = 1;
-    }
-
-// now set the global elevation/azimuth to be used for the analysis
-    if( fUseDB && fPointingType > 1 )
-    {
-       fTelElevation = fTelElevationDB;
-       fTelAzimuth   = fTelAzimuthDB;
-    }
-    else
-    {
-       fTelElevation = fTelElevationCalculated;
-       fTelAzimuth   = fTelAzimuthCalculated;
-    }
+    fTelElevation = fTelElevationCalculated;
+    fTelAzimuth   = fTelAzimuthCalculated;
 
 //////////////////////////////////////////////////
 // set target azimuth/elevation
@@ -246,9 +160,6 @@ void VSkyCoordinates::setTelPointing( int MJD, double time, bool iUseDB, bool iF
     slaDe2h( ha, fTargetDec, fObsLatitude, &fTargetAzimuth, &fTargetElevation );
     fTargetAzimuth   *= TMath::RadToDeg();
     fTargetElevation *= TMath::RadToDeg();
-
-// fill pointing tree
-    if( iFillPointingTree ) fillPointingTree();
 
 }
 
@@ -316,9 +227,9 @@ void VSkyCoordinates::getHorizonCoordinates( int MJD, double time, double dec, d
 
 bool VSkyCoordinates::setPointingOffset( double i_raOff, double i_decOff )
 {
-    fTelRA  = fTargetRA + i_raOff/TMath::RadToDeg();
-    fTelDec = fTargetDec + i_decOff/TMath::RadToDeg();
-    fTelRA_deg = fTelRA * TMath::RadToDeg();
+    fTelRA      = fTargetRA + i_raOff/TMath::RadToDeg();
+    fTelDec     = fTargetDec + i_decOff/TMath::RadToDeg();
+    fTelRA_deg  = fTelRA * TMath::RadToDeg();
     fTelDec_deg = fTelDec * TMath::RadToDeg();
 
     return true;
@@ -331,105 +242,14 @@ bool VSkyCoordinates::setPointingOffset( double i_raOff, double i_decOff )
 
 void VSkyCoordinates::getRotatedShowerDirection( double y, double x, double &rze, double &raz )
 {
-    getRotatedShowerDirection( 90.-fTelElevation, fTelAzimuth, y, x, rze, raz );
-}
-
-
-/*
-    calculate shower direction from telescope pointing and reconstruction shower direction
-
-     small angle approximation, assume small x,y (neglect z)
-*/
-
-void VSkyCoordinates::getRotatedShowerDirection( double ze, double az, double y, double x, double &rze, double &raz )
-{
-// get all directions in [rad]
-    x /= TMath::RadToDeg();
-    y /= (-1.*TMath::RadToDeg());
-// assume all telescopes point in same directions
-    double el = (90.-ze)/TMath::RadToDeg();
-    az = az/TMath::RadToDeg();
-// these are the resulting directions
-
-    double r = sqrt( 1. + x*x + y*y );
-    double cx = x/r;
-    double cy = 1./r;
-    double cz = y/r;
-
-// rotate telescope around elevation axis
-    double ex = cx;
-    double ey = cy * cos( el ) - cz * sin( el );
-    double ez = cy * sin( el ) + cz * cos( el );
-// rotate around azimuth
-    double rx, ry, rz;
-    rx =     ex * cos( az ) + ey * sin( az );
-    ry = -1.*ex * sin( az ) + ey * cos( az );
-    rz = ez;
-// calculate new azimuth, zenith
-    r = sqrt( rx*rx + ry*ry );
-// small value check
-    if( fabs(r) < 1.e-10 ) r = 0.;
-    if( fabs(rx) < 1.e-10 ) rx = 0.;
-    if( fabs(ry) < 1.e-10 ) ry = 0.;
-    if( fabs(rz) < 1.e-10 ) rz = 0.;
-
-    if( r == 0. ) raz = az * TMath::RadToDeg();
-    else
-    {
-        raz = (TMath::Pi()/2.-atan2(ry,rx))*TMath::RadToDeg();
-        if( raz > 180. )  raz = -1.*(360.-raz);
-        if( raz < -180. ) raz *= -1.;
-    }
-    if( rz == 0. ) rze = 90. - el*TMath::RadToDeg();
-    else
-    {
-        rze = 90.-atan2(rz,r)*TMath::RadToDeg();
-    }
-}
-
-
-/*
-     difference between to pointing directions in camera coordinates
-
-     input coordinates in [deg]
-*/
-void VSkyCoordinates::getDifferenceInCameraCoordinates( double tel_ze, double tel_az, double shower_ze,  double shower_az, float &x, float &y )
-{
-    float z;
-    getDifferenceInCameraCoordinates( tel_ze, tel_az, shower_ze, shower_az, x, y, z );
+    VSkyCoordinatesUtilities::getRotatedShowerDirection( 90.-fTelElevation, fTelAzimuth, y, x, rze, raz );
 }
 
 
 void VSkyCoordinates::getDerotatedShowerDirection( double ze, double az, float &y, float &x, double rze, double raz )
 {
-    getDifferenceInCameraCoordinates( ze, az, rze, raz, y, x );
-}
-
-
-void VSkyCoordinates::getDifferenceInCameraCoordinates( double tel_ze, double tel_az, 
-                                                        double shower_ze,  double shower_az, 
-							float &x, float &y, float &z )
-{
-// convert coordinates from [deg] to [rad]
-    tel_az /= TMath::RadToDeg();
-    shower_az /= TMath::RadToDeg();
-    double tel_el = (90.-tel_ze)/TMath::RadToDeg();
-    double shower_el = (90.-shower_ze)/TMath::RadToDeg();
-
-    double cx = cos( shower_el ) * sin( shower_az );
-    double cy = cos( shower_el ) * cos( shower_az );
-    double cz = sin( shower_el );
-
-    double i_temp = sin( tel_az ) * cx + cos( tel_az ) * cy;
-
-    x = (cos( tel_az ) * cx - sin( tel_az ) * cy) * TMath::RadToDeg();
-    z = (cos( tel_el ) * i_temp + sin( tel_el ) * cz);
-    y = (-1.*sin( tel_el ) * i_temp + cos( tel_el ) * cz) * TMath::RadToDeg();
-    y *= -1.;
-
-    if( fabs( x ) < 1.e-4 ) x = 0.;
-    if( fabs( y ) < 1.e-4 ) y = 0.;
-    if( fabs( z ) < 1.e-4 ) z = 0.;
+    float z = 0.;
+    VSkyCoordinatesUtilities::getDifferenceInCameraCoordinates( ze, az, rze, raz, y, x, z );
 }
 
 
@@ -474,7 +294,7 @@ void VSkyCoordinates::rotateCoords( int i_mjd, double i_seconds, double i_xin, d
  *  should be called after precession, etc.
  *
  */
-void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast )
+void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, unsigned int iTelID )
 {
     fWobbleNorth = iNorth;
     fWobbleEast = iEast;
@@ -489,7 +309,7 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast )
 	fTelRA  = fTargetRA + i_RADiff/TMath::RadToDeg();
 	fTelDec = fTargetDec + i_decDiff/TMath::RadToDeg();
 
-        cout << "\tWobble mode, telescope " << fTelID+1 << " pointing to (ra,dec) = (" << fTelRA*TMath::RadToDeg() << ", " << fTelDec*TMath::RadToDeg() << ")";
+        cout << "\tWobble mode, telescope " << iTelID+1 << " pointing to (ra,dec) = (" << fTelRA*TMath::RadToDeg() << ", " << fTelDec*TMath::RadToDeg() << ")";
         cout << ", (delta ra, delta dec) = (" << i_RADiff << ", " << i_decDiff << ")";
         cout << endl;
 
@@ -504,197 +324,29 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast )
     cout << "---------------------------------------------------------------------------------------------------------" << endl;
 }
 
-/*
-
-   return pointing error given by user
-
-*/
-float VSkyCoordinates::getPointingErrorX()
+bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD, double xmin, double xmax, double ymin, double ymax, 
+                                         double iRASkyMapCentre, double iDecSkyMapCentre )
 {
-    if( fPointingType == 1 ) return fPointingErrorX;
-
-    return 0.;
-}
-
-/*
-
-   return pointing error given by user
-
-*/
-float VSkyCoordinates::getPointingErrorY()
-{
-    if( fPointingType == 1 ) return fPointingErrorY;
-
-    return 0.;
-}
-
-
-void VSkyCoordinates::getPointingFromDB( int irun, string iTCorrection, string iVPMDirectory, bool iVPMDB  )
-{
-    fPointingType = 2;
-    if( iVPMDB == true )                fPointingType = 5;    // read VPM data from VERITAS DB
-    else if( iVPMDirectory.size() > 0 ) fPointingType = 4;    // read VPM data from a text file
-    else if( iTCorrection.size() > 0 )  fPointingType = 3;    // read raw positioner data from VERITAS DB and apply tracking corrections
-    else                                fPointingType = 2;    // read T-Point corrected positioner data from VERITAS DB
-
-#ifdef RUNWITHDB
-    fPointingDB = new VPointingDB( fTelID, irun, iTCorrection, iVPMDirectory, iVPMDB );
-    if( !fPointingDB->isGood() )
+    if( !fStarCatalogue )
     {
-        cout << endl;
-        cout << "FATAL ERROR: cannot connect to VERITAS database" << endl;
-        cout << "exiting..." << endl;
-        exit( 0 );
+       fStarCatalogue = new VStarCatalogue();
     }
-    fPointingDB->setObservatory( fObsLongitude*TMath::RadToDeg(), fObsLatitude*TMath::RadToDeg() );          // work in [deg]
-#else
-    fPointingDB = 0;
-#endif
-}
-
-/*
-
-   set an artifical pointing error (e.g. from command line)
-
-*/
-void VSkyCoordinates::setPointingError( double iX, double iY )
-{
-    fPointingType = 1;
-    fPointingErrorX = iX;
-    fPointingErrorY = iY;
-
-    fMeanPointingErrorN = 1;
-    fMeanPointingErrorX = fPointingErrorX;
-    fMeanPointingErrorY = fPointingErrorY;
-    fMeanPointingDistance = sqrt( fPointingErrorX*fPointingErrorX + fPointingErrorY*fPointingErrorY );
-}
-
-/*
-   
-   update pointing from VERITAS database
-
-*/
-bool VSkyCoordinates::updatePointingfromDB( int MJD, double iTime )
-{
-// do something if we read stuff from the db
-    if( fPointingDB )
+    if( fStarCatalogue )
     {
-        fPointingDB->updatePointing( MJD, iTime );
-
-// telescope pointings
-        fTelAzimuthDB   = fPointingDB->getTelAzimuthDB();
-        fTelElevationDB = fPointingDB->getTelElevationDB();
-        fEventStatus    = fPointingDB->getEventStatus();
-
-        if( fEventStatus != 3 )
+        double i_x = 0.;
+        double i_y = 0.;
+        if( fabs( xmin ) > fabs( xmax ) ) i_x = fabs( xmin );
+        else                              i_x = fabs( xmax );
+        if( fabs( ymin ) > fabs( ymax ) ) i_y = fabs( ymin );
+        else                              i_y = fabs( ymax );
+        if( !fStarCatalogue->init( iMJD, iCatalogueName ) )
         {
-// calculate pointing error in camera coordinates (using slalib)
-            double iPx = 0.;
-	    double iPy = 0.;
-            int j = 0;
-            slaDs2tp( fTelAzimuthCalculated/TMath::RadToDeg(), fTelElevationCalculated/TMath::RadToDeg(), 
-	              fTelAzimuthDB/TMath::RadToDeg(), fTelElevationDB/TMath::RadToDeg(),
-		      &iPx, &iPy, &j );
-            if( j == 0 )
-            {
-// azimuth from North to East
-                fPointingErrorX = iPx*TMath::RadToDeg();
-// evndisp camera is upside down
-                fPointingErrorY = iPy*TMath::RadToDeg();
-            }
-// star not on tangent plane
-            else
-            {
-                fPointingErrorX = 0.;
-                fPointingErrorY = 0.;
-                fEventStatus = 4;
-            }
+            cout << "Error reading star catalogue: " << iCatalogueName << endl;
+            cout << "exiting..." << endl;
+            return false;
         }
-        else
-        {
-            fPointingErrorX = 0.;
-            fPointingErrorY = 0.;
-            fNEventsWithNoDBPointing++;
-        }
-        fMeanPointingErrorN++;
-        fMeanPointingErrorX += fPointingErrorX;
-        fMeanPointingErrorY += fPointingErrorY;
-	fMeanPointingDistance += sqrt( fPointingErrorX*fPointingErrorX + fPointingErrorY*fPointingErrorY );
-    }
-    if( fEventStatus != 3 && fEventStatus != 4 ) return true;
-
-    return false;
-}
-
-/*
-
-   mainly check that the different information about pointing matches
-
-   write results to disk
-
-*/
-void VSkyCoordinates::terminate( bool i_isMC )
-{
-// don't do anything for MC
-    if( i_isMC ) return;
-
-    cout << "\t mean pointing mismatch between eventdisplay and DB for telescope " << getTelID()+1 << ":  (x,y,r) [deg] ";
-    if( fMeanPointingErrorN > 0 )
-    {
-        cout << fMeanPointingErrorX/(double)fMeanPointingErrorN << ", " << fMeanPointingErrorY/(double)fMeanPointingErrorN;
-	cout << ", " << fMeanPointingDistance/(double)fMeanPointingErrorN;
-    }
-    else                          cout << "0., 0., 0.";
-    if( fNEventsWithNoDBPointing > 0 ) cout << ", number of events with no pointing information from the database: " << fNEventsWithNoDBPointing;
-    cout << endl;
-
-    if( fMeanPointingErrorN > 0 && (fMeanPointingDistance/(double)fMeanPointingErrorN > 0.1) )
-    {
-        cout << "WARNING: LARGE MISMATCH BETWEEN EVENTDISPLAY AND DB POINTING DATA FOR TELESCOPE " << getTelID()+1 << endl;
+        fStarCatalogue->setFOV( iRASkyMapCentre, iDecSkyMapCentre, i_x, i_y, true );
     }
 
-//  write results to disk
-    if( fPointingDB )
-    {
-        TTree *t = fPointingDB->getTreePointingDB();
-        if( t ) t->Write();
-        fPointingDB->terminate();
-    }
-    if( fPointingTree ) fPointingTree->Write();
-}
-
-
-void VSkyCoordinates::initializePointingTree()
-{
-    char hname[200];
-    char htitle[200];
-
-    sprintf( hname, "pointing_%d", getTelID()+1 );
-    sprintf( htitle, "pointing (Telescope %d)", getTelID()+1 );
-    fPointingTree = new TTree( hname, htitle );
-    fPointingTree->Branch( "MJD", &fMJD, "MJD/i" );
-    fPointingTree->Branch( "Time", &fTime, "Time/D" );
-    fPointingTree->Branch( "TargetAzimuth", &fTargetAzimuth, "TargetAzimuth/D" );
-    fPointingTree->Branch( "TargetElevation", &fTargetElevation, "TargetElevation/D" );
-    fPointingTree->Branch( "TelAzimuth", &fTelAzimuth, "TelAzimuth/D" );
-    fPointingTree->Branch( "TelElevation", &fTelElevation, "TelElevation/D" );
-    fPointingTree->Branch( "PointingType", &fPointingType, "fPointingType/i" );
-    fPointingTree->Branch( "TelAzimuthCalculated", &fTelAzimuthCalculated, "TelAzimuthCalculated/F" );
-    fPointingTree->Branch( "TelElevationCalculated", &fTelElevationCalculated, "TelElevationCalculated/F" );
-    fPointingTree->Branch( "TelAzimuthDB", &fTelAzimuthDB, "TelAzimuthDB/F" );
-    fPointingTree->Branch( "TelElevationDB", &fTelElevationDB, "TelElevationDB/F" );
-    fPointingTree->Branch( "PointingErrorX", &fPointingErrorX, "PointingErrorX/F" );
-    fPointingTree->Branch( "PointingErrorY", &fPointingErrorY, "PointingErrorY/F" );
-    fPointingTree->Branch( "EventStatus", &fEventStatus, "EventStatus/i" );
-}
-
-void VSkyCoordinates::fillPointingTree()
-{
-    if( fPointingTree ) fPointingTree->Fill();
-}
-
-
-double VSkyCoordinates::adjustAzimuthToRange( double az )
-{
-    return slaDranrm( az/TMath::RadToDeg()) * TMath::RadToDeg();
+    return true;
 }

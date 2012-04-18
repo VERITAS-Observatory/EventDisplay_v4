@@ -45,6 +45,7 @@ Options:
 #include "VEvndispRunParameter.h"
 #include "VDSTTree.h"
 #include "VMonteCarloRunHeader.h"
+#include "VSkyCoordinatesUtilities.h"
 
 ///////////////////////////////////////////////////////
 // maximum number of pixels for the current array configuration
@@ -219,38 +220,6 @@ static void syntax (char *program)
 
 using namespace std;
 
-/*
-
-   from EVNDISP/src/VSkyCoordinates.cpp
-
-*/
-
-void getDifferenceInCameraCoordinates( double tel_ze, double tel_az,
-                                       double shower_ze,  double shower_az, 
-				       float &x, float &y, float &z )
-{
-// convert coordinates from [deg] to [rad]
-    tel_az /= TMath::RadToDeg();
-    shower_az /= TMath::RadToDeg();
-    double tel_el = (90.-tel_ze)/TMath::RadToDeg();
-    double shower_el = (90.-shower_ze)/TMath::RadToDeg();
-
-    double cx = cos( shower_el ) * sin( shower_az );
-    double cy = cos( shower_el ) * cos( shower_az );
-    double cz = sin( shower_el );
-
-    double i_temp = sin( tel_az ) * cx + cos( tel_az ) * cy;
-
-    x = (cos( tel_az ) * cx - sin( tel_az ) * cy) * TMath::RadToDeg();
-    z = (cos( tel_el ) * i_temp + sin( tel_el ) * cz);
-    y = (-1.*sin( tel_el ) * i_temp + cos( tel_el ) * cz) * TMath::RadToDeg();
-    y *= -1.;
-
-    if( fabs( x ) < 1.e-4 ) x = 0.;
-    if( fabs( y ) < 1.e-4 ) y = 0.;
-    if( fabs( z ) < 1.e-4 ) z = 0.;
-}
-
 bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata )
 {
    f->shower_prog_id = hsdata->mc_run_header.shower_prog_id;
@@ -315,7 +284,7 @@ bool DST_fillMCEvent( VDSTTree *fData, AllHessData *hsdata )
    float i_x = 0.;
    float i_y = 0.;
    float i_z = 0.;
-   getDifferenceInCameraCoordinates( 90.-i_tel_el, i_tel_az, fData->fDSTze, fData->fDSTaz, i_x, i_y, i_z );
+   VSkyCoordinatesUtilities::getDifferenceInCameraCoordinates( 90.-i_tel_el, i_tel_az, fData->fDSTze, fData->fDSTaz, i_x, i_y, i_z );
    fData->fDSTTel_xoff = i_x;
    fData->fDSTTel_yoff = i_y;
 /////////////////////////////////////////////////////////////////////////////
@@ -533,7 +502,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    float i_x = 0.;
    float i_y = 0.;
    float i_z = 0.;
-   getDifferenceInCameraCoordinates( 90.-i_tel_el, i_tel_az, fData->fDSTze, fData->fDSTaz, i_x, i_y, i_z );
+   VSkyCoordinatesUtilities::getDifferenceInCameraCoordinates( 90.-i_tel_el, i_tel_az, fData->fDSTze, fData->fDSTaz, i_x, i_y, i_z );
    fData->fDSTTel_xoff = i_x;
    fData->fDSTTel_yoff = i_y;
 /////////////////////////////////////////////////////////////////////////////

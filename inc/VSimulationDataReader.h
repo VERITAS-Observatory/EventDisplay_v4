@@ -17,7 +17,7 @@
 #include <VRawEventData.h>
 #include <VSimulationData.h>
 
-#include "VSkyCoordinates.h"
+#include "VSkyCoordinatesUtilities.h"
 
 using namespace std;
 

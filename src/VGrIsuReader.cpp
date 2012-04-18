@@ -101,9 +101,6 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry *iDetGeo, unsigned int intel, stri
     fNoiseTraceStart = 0;
     bNoiseTraceFilled = false;
 
-    fPointing = new VSkyCoordinates();
-    fPointing->setObservatory( 110.952, 31.675 );          // set VERITAS coordinates (expect the grisu is used for VERITAS only)
-
     degrad = 45. / atan( 1. );
 
 // constants
@@ -191,7 +188,6 @@ VGrIsuReader::~VGrIsuReader()
         i_com += fSourceFileName;
         gSystem->Exec( i_com.c_str() );
     }
-    if( fPointing ) delete fPointing;
 }
 
 
@@ -702,14 +698,11 @@ bool VGrIsuReader::getNextShowerEvent()
                 fTelAzimuth[i] = fMC_Az * degrad;
             }
 // add wobble offset
-            if( fPointing )
-            {
-                double az = 0.;
-                double ze = 0.;
-                fPointing->getRotatedShowerDirection( fMC_Ze*degrad, fMC_Az*degrad, fMC_Yoffset, -1.*fMC_Xoffset, ze, az );
-                fMC_Ze = ze/degrad;
-                fMC_Az = fPointing->adjustAzimuthToRange( az ) / degrad;
-            }
+	    double az = 0.;
+	    double ze = 0.;
+	    VSkyCoordinatesUtilities::getRotatedShowerDirection( fMC_Ze*degrad, fMC_Az*degrad, fMC_Yoffset, -1.*fMC_Xoffset, ze, az );
+	    fMC_Ze = ze/degrad;
+	    fMC_Az = VSkyCoordinatesUtilities::adjustAzimuthToRange( az ) / degrad;
             resetEvent();
             i_eventFound = true;
             if( fDebug )
