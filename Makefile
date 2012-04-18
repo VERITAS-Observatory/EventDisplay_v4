@@ -191,12 +191,12 @@ all:	evndisp \
 	printDISPTables \
 	combineLookupTables \
 	makeEffectiveArea \
-	makeRadialAcceptance \
 	trainTMVAforGammaHadronSeparation \
 	trainTMVAforGammaHadronSeparation_TrainingFile \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
+	makeRadialAcceptance \
 	calculateBinaryPhases \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
@@ -211,12 +211,12 @@ VTS:	evndisp \
 	combineLookupTables \
 	combineEffectiveAreas \
 	makeEffectiveArea \
-	makeRadialAcceptance \
 	trainTMVAforGammaHadronSeparation \
 	trainTMVAforGammaHadronSeparation_TrainingFile \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
+	makeRadialAcceptance \
 	calculateBinaryPhases \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB
