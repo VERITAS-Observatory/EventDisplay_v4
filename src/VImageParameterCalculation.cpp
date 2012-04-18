@@ -57,20 +57,20 @@ void VImageParameterCalculation::initMinuit( int iVmode )
 }
 
 
-void VImageParameterCalculation::calcTimingParameters(valarray<double> fTZeros, valarray<double> fTOffsetvars, valarray<double> fSums, vector<bool> fImage, vector<bool> fBorder, VEvndispData *iData )
+void VImageParameterCalculation::calcTimingParameters()
 {
     if( fDebug ) cout << "VImageParameterCalculation::calcTimingParameters" << endl;
 // calculate timing parameters
     if (!fboolCalcGeo) return;
-    if(fTZeros.size()==0)return;
+    if(fData->getTZeros().size()==0)return;
 
-    unsigned int num=fTZeros.size();
+    unsigned int num=fData->getTZeros().size();
     double xpos[num], ypos[num], rpos[num], t[num];
     double ex[num], ey[num], er[num], et[num];
     int nclean=0;
-    for( unsigned int i = 0; i < fTZeros.size(); i++ )
+    for( unsigned int i = 0; i < fData->getTZeros().size(); i++ )
     {
-        if( (fImage[i] || fBorder[i]) && fTZeros[i]>0. && !iData->getHiLo()[i] )
+        if( (fData->getImage()[i] || fData->getBorder()[i]) && fData->getTZeros()[i]>0. && !fData->getHiLo()[i] )
         {
             double xi = getDetectorGeo()->getX()[i];
             double yi = getDetectorGeo()->getY()[i];
@@ -88,22 +88,22 @@ void VImageParameterCalculation::calcTimingParameters(valarray<double> fTZeros, 
 //radial position from camera centre
             rpos[nclean]=sqrt(yi*yi + xi*xi );
             er[nclean]=0;                         // error on rpos (deg)
-            t[nclean]=fTZeros[i];
+            t[nclean]=fData->getTZeros()[i];
 
 //  timing resolution from variable laser pulse studies (run 751)
-            et[nclean]=13.0*exp(-0.035*(fSums[i]+30.))+fTOffsetvars[i];
+            et[nclean]=13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i];
 // make that the timing resolution is not too small (important for MC)
             if( et[nclean] < 5.e-2 ) et[nclean] = 0.3;
 // min/max/mean times
-            if( fTZeros[i]  < fParGeo->tmin ) fParGeo->tmin = fTZeros[i];
-            if( fTZeros[i]  > fParGeo->tmax ) fParGeo->tmax = fTZeros[i];
-            fParGeo->tmean += fTZeros[i];
+            if( fData->getTZeros()[i]  < fParGeo->tmin ) fParGeo->tmin = fData->getTZeros()[i];
+            if( fData->getTZeros()[i]  > fParGeo->tmax ) fParGeo->tmax = fData->getTZeros()[i];
+            fParGeo->tmean += fData->getTZeros()[i];
 
             nclean+=1;
         }
     }
 
-    TGraphErrors *xgraph = iData->getXGraph();
+    TGraphErrors *xgraph = fData->getXGraph();
     if( xgraph )
     {
         xgraph->Set( nclean );
@@ -136,7 +136,7 @@ void VImageParameterCalculation::calcTimingParameters(valarray<double> fTZeros, 
             fParGeo->tint_dr=-999.;
             fParGeo->tgrad_dr=-999.;
             fParGeo->tchisq_r=-999.;
-            iData->setXGraph(xgraph);
+            fData->setXGraph(xgraph);
         }
     }
     else
@@ -170,10 +170,10 @@ input: pointer to pixels passing cleaning
 output: return the likely location of x0, y0, and R with sigmaR
 ****************************************************************************
 */
-void VImageParameterCalculation::muonRingFinder( valarray<double> fSums, vector<bool> fImage, vector<bool> fBorder  )
+void VImageParameterCalculation::muonRingFinder()
 {
     if( fDebug ) cout << "VImageParameterCalculation::muonRingFinder" << endl;
-    if( fSums.size()==0)
+    if( fData->getSums().size()==0)
     {
         fParGeo->muonX0 = 0.0;
         fParGeo->muonY0 = 0.0;
@@ -210,9 +210,9 @@ void VImageParameterCalculation::muonRingFinder( valarray<double> fSums, vector<
     double xi, yi;
 
 //calculate r to each point in the filtered binary image & thereby mean of r
-    for( i=0; i<fSums.size(); i++ )
+    for( i=0; i<fData->getSums().size(); i++ )
     {
-        if( fImage[i] || fBorder[i] )
+        if( fData->getImage()[i] || fData->getBorder()[i] )
         {
             counter++;
             xi = getDetectorGeo()->getX()[i];
@@ -255,9 +255,9 @@ void VImageParameterCalculation::muonRingFinder( valarray<double> fSums, vector<
         rTotal = 0;
         rSquaredTotal = 0;
         tmp = 0;
-        for( i=0; i<fSums.size(); i++ )
+        for( i=0; i<fData->getSums().size(); i++ )
         {
-            if( fImage[i] || fBorder[i] )
+            if( fData->getImage()[i] || fData->getBorder()[i] )
             {
                 xi = getDetectorGeo()->getX()[i];
                 yi = getDetectorGeo()->getY()[i];
@@ -277,9 +277,9 @@ void VImageParameterCalculation::muonRingFinder( valarray<double> fSums, vector<
             rTotal = 0;
             rSquaredTotal = 0;
             tmp = 0;
-            for( i=0; i<fSums.size(); i++ )
+            for( i=0; i<fData->getSums().size(); i++ )
             {
-                if( fImage[i] || fBorder[i] )
+                if( fData->getImage()[i] || fData->getBorder()[i] )
                 {
                     xi = getDetectorGeo()->getX()[i];
                     yi = getDetectorGeo()->getY()[i];
@@ -317,9 +317,9 @@ void VImageParameterCalculation::muonRingFinder( valarray<double> fSums, vector<
         rTotal = 0;
         rSquaredTotal = 0;
         tmp = 0;
-        for( i=0; i<fSums.size(); i++ )
+        for( i=0; i<fData->getSums().size(); i++ )
         {
-            if( fImage[i] || fBorder[i] )
+            if( fData->getImage()[i] || fData->getBorder()[i] )
             {
                 xi = getDetectorGeo()->getX()[i];
                 yi = getDetectorGeo()->getY()[i];
@@ -339,9 +339,9 @@ void VImageParameterCalculation::muonRingFinder( valarray<double> fSums, vector<
             rTotal = 0;
             rSquaredTotal = 0;
             tmp = 0;
-            for( i=0; i<fSums.size(); i++ )
+            for( i=0; i<fData->getSums().size(); i++ )
             {
-                if( fImage[i] || fBorder[i] )
+                if( fData->getImage()[i] || fData->getBorder()[i] )
                 {
                     xi = getDetectorGeo()->getX()[i];
                     yi = getDetectorGeo()->getY()[i];
@@ -386,16 +386,17 @@ output: sum of all pixel values in the ring +-2 sigmaR
 notes: this needs to correct for the fraction of tubes off in the ring region
 	   this is rather tricky because the intensity depends on the ring diamter and the blurring!
 *****************************************************************************/
-void VImageParameterCalculation::sizeInMuonRing( valarray<double> fSums, vector<bool> fImage, vector<bool> fBorder, vector< unsigned int > fDead  )
+void VImageParameterCalculation::sizeInMuonRing()
 {
   if( fDebug ) cout << "VImageParameterCalculation::sizeInMuonRing" << endl;
+  if( !fData ) return;
   if( fParGeo->muonValid == 0 )
       {
       fParGeo->muonSize = 0.0;      
       return;
       }
 
-  if( fSums.size()==0 || fParGeo->muonRadius == 0.0 )
+  if( fData->getSums().size()==0 || fParGeo->muonRadius == 0.0 )
     {
       fParGeo->muonSize = 0.0;     
       return;
@@ -415,7 +416,7 @@ void VImageParameterCalculation::sizeInMuonRing( valarray<double> fSums, vector<
   radius = fParGeo->muonRadius;
   rsigma = fParGeo->muonRSigma;
 
-  for( i=0; i<fSums.size(); i++ )
+  for( i=0; i<fData->getSums().size(); i++ )
     {
       xi = getDetectorGeo()->getX()[i];
       yi = getDetectorGeo()->getY()[i];
@@ -424,13 +425,13 @@ void VImageParameterCalculation::sizeInMuonRing( valarray<double> fSums, vector<
 //      if( rp > radius - 1.5* rsigma && rp < radius + 1.5* rsigma  )
       if( rp > radius - 0.15 && rp < radius + 0.15  )
 	{
-	if( fBorder[i] || fImage[i] )
+	if( fData->getBorder()[i] || fData->getImage()[i] )
 	    {
-	    si=(double)fSums[i]; // charge (dc)
+	    si=(double)fData->getSums()[i]; // charge (dc)
 	    size += si;
 	    totalPixels ++;
 	    }
-	if( fDead[i] )
+	if( fData->getDead()[i] )
 	    offPixels ++;  // list of pixels turned off
 	}
     }
@@ -448,10 +449,10 @@ output: return 1 if there are at least 1 pixels in each octant segment of the ri
         AND at least half the pixels fall within +-1 sigmaR,
         otherwise returns 0
 *****************************************************************************/
-void VImageParameterCalculation::muonPixelDistribution( valarray<double> fSums, vector<bool> fImage, vector<bool> fBorder  )
+void VImageParameterCalculation::muonPixelDistribution()
 {
     if( fDebug ) cout << "VImageParameterCalculation::muonPixelDistribution" << endl;
-    if( fSums.size()==0 || fParGeo->muonRadius == 0.0 )
+    if( !fData || fData->getSums().size()==0 || fParGeo->muonRadius == 0.0 )
     {
         fParGeo->muonValid = 0;
         return;
@@ -472,8 +473,8 @@ void VImageParameterCalculation::muonPixelDistribution( valarray<double> fSums, 
     radius = fParGeo->muonRadius;
     rsigma = fParGeo->muonRSigma;
 
-    for( i=0; i<fSums.size(); i++ )
-        if( fImage[i] || fBorder[i] )
+    for( i=0; i<fData->getSums().size(); i++ )
+        if( fData->getImage()[i] || fData->getBorder()[i] )
     {
         totalPixels++;
         xi = getDetectorGeo()->getX()[i];
@@ -515,24 +516,6 @@ void VImageParameterCalculation::muonPixelDistribution( valarray<double> fSums, 
 
     fParGeo->muonValid = pass;
 
-}
-
-
-//****************************************************************///
-
-void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarray<double> fSums2, vector<bool> fImage, vector<bool> fBorder )
-{
-    vector< bool > iBrightNoImage;
-    iBrightNoImage.resize( fImage.size(), false );
-    calcParameters( fSums, fSums2, fImage, fBorder, iBrightNoImage, iBrightNoImage, iBrightNoImage );
-}
-
-
-void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarray<double> fSums2, vector<bool> fImage, vector<bool> fBorder, vector< bool > fBrightNoImage )
-{
-    vector< bool > iHiLo;
-    iHiLo.resize( fImage.size(), false );
-    calcParameters( fSums, fSums2, fImage, fBorder, fBrightNoImage, iHiLo, iHiLo );
 }
 
 
@@ -590,16 +573,16 @@ void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 /*!
     see Fegan, D.J. J. Phys. G: Nucl. Part. Phys. 23 (1997) 1013-1060
 */
-void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarray<double> fSums2, 
-                                                 vector<bool> fImage, vector<bool> fBorder, vector< bool > fBrightNoImage,
-						 vector< bool > fHiLo, vector< bool > fImageBorderNeighbour )
+void VImageParameterCalculation::calcParameters()
 {
-    if( fDebug ) cout << "VImageParameterCalculation::calcParameters " << fImageBorderNeighbour.size() << endl;
+    if( !fData ) return;
+
+    if( fDebug ) cout << "VImageParameterCalculation::calcParameters " << fData->getImageBorderNeighbour().size() << endl;
     const double ZeroTolerence = 1e-8;
 
-    if( fSums.size() == 0 )
+    if( fData->getSums().size() == 0 )
     {
-       if( fDebug ) cout << "\t VImageParameterCalculation::calcParameters: fSums.size() " << fSums.size() << endl;
+       if( fDebug ) cout << "\t VImageParameterCalculation::calcParameters: fData->getSums().size() " << fData->getSums().size() << endl;
        return;
     }
 
@@ -622,7 +605,8 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarra
     double sumxy2sig=0;
     int pntubes=0;
     int pntubesBrightNoImage = 0;
-    double sumOuterRing = 0.;                     // sum signal of image in out ring
+    double sumOuterRing = 0.;                     // sum signal of image in outer ring
+    double sumDeadRing = 0.;                      // sum signal of image ring around dead pixel
     double sumLowGain = 0.;
 
 // calculate mean ped and pedvar
@@ -632,9 +616,9 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarra
 
     if( fData->getRunParameter()->doFADCAnalysis() && fData->getReader()->hasFADCTrace() )
     {
-        for( unsigned int j = 0; j < fImageBorderNeighbour.size(); j++ )
+        for( unsigned int j = 0; j < fData->getImageBorderNeighbour().size(); j++ )
         {
-            if( fImageBorderNeighbour[j] )
+            if( fData->getImageBorderNeighbour()[j] )
             {
 // mean ped and pedvar over image
                 if( fData )
@@ -669,12 +653,12 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarra
 /////////////////////////////////////////
 
 // loop over all pixels
-    for( unsigned int j = 0; j < fSums.size(); j++ )
+    for( unsigned int j = 0; j < fData->getSums().size(); j++ )
     {
-        if( fBrightNoImage[j] ) pntubesBrightNoImage++;
+        if( fData->getBrightNonImage()[j] ) pntubesBrightNoImage++;
 
 // select image or border pixel
-        if( fImage[j] || fBorder[j])
+        if( fData->getImage()[j] || fData->getBorder()[j])
         {
             pntubes +=1;
 
@@ -683,11 +667,28 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarra
             double xi = getDetectorGeo()->getX()[j];
             double yi = getDetectorGeo()->getY()[j];
 
-            const double si=(double)fSums[j];     // charge (dc)
+            const double si=(double)fData->getSums()[j];     // charge (dc)
             sumsig += si;
-	    sumsig_2 += (double)fSums2[j];
+	    sumsig_2 += (double)fData->getSums2()[j];
+// sum in outer ring
             if( getDetectorGeo()->getNNeighbours()[j] < getDetectorGeo()->getMaxNeighbour() ) sumOuterRing += si;
-            if( fHiLo[j] ) sumLowGain += si;
+// sum around dead pixels
+	    if( j < getDetectorGeo()->getNeighbours().size() || getDetectorGeo()->getNNeighbours()[j] < getDetectorGeo()->getMaxNeighbour() )
+	    {
+	       bool iDead = false;
+	       for (unsigned int n = 0; n < getDetectorGeo()->getNeighbours()[j].size(); n++ )
+	       {
+	           unsigned int k = getDetectorGeo()->getNeighbours()[j][n];
+		   if( k < fData->getDead().size() && fData->getDead()[k] )
+		   {
+		      sumDeadRing += si;
+		      iDead = true;
+		      break;              // each pixel should only be added once
+                   }
+               }
+	       if( !iDead && getDetectorGeo()->getNNeighbours()[j] < getDetectorGeo()->getMaxNeighbour() ) sumDeadRing += si;
+            }
+            if( fData->getHiLo()[j] ) sumLowGain += si;
 
             const double sixi=si*xi;
             const double siyi=si*yi;
@@ -711,8 +712,17 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarra
     }
     fParGeo->ntubes=pntubes;
     fParGeo->ntubesBrightNoImage = pntubesBrightNoImage;
-    if( sumsig > 0. ) fParGeo->loss = sumOuterRing / sumsig;
-    else              fParGeo->loss = 0.;
+    if( sumsig > 0. )
+    {
+       fParGeo->loss = sumOuterRing / sumsig;
+       fParGeo->lossAndDead = sumDeadRing / sumsig;
+    }
+    else
+    {
+       fParGeo->loss = 0.;
+       fParGeo->lossAndDead = 0.;
+    }
+    if( fParGeo->lossAndDead > 1. ) cout << "XXX " << fData->getTelID()+1 << "\t" << fData->getEventNumber() << "\t" << fParGeo->loss << "\t" << fParGeo->lossAndDead << endl;
     if( sumLowGain > 0. ) fParGeo->fracLow = sumLowGain / sumsig;
     else                  fParGeo->fracLow = 0.;
 
@@ -726,27 +736,27 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarra
     i_index[1]=0;
     i_index[2]=0;
 
-    for (unsigned int i=0;i<fSums.size();i++)
+    for (unsigned int i=0;i<fData->getSums().size();i++)
     {
-        if (fSums[i]>i_max[0])
+        if (fData->getSums()[i]>i_max[0])
         {
             i_max[2]=i_max[1];
             i_max[1]=i_max[0];
-            i_max[0]=fSums[i];
+            i_max[0]=fData->getSums()[i];
             i_index[2]=i_index[1];
             i_index[1]=i_index[0];
             i_index[0]=i;
         }
-        else if (fSums[i]>i_max[1])
+        else if (fData->getSums()[i]>i_max[1])
         {
             i_max[2]=i_max[1];
-            i_max[1]=fSums[i];
+            i_max[1]=fData->getSums()[i];
             i_index[2]=i_index[1];
             i_index[1]=i;
         }
-        else if (fSums[i]>i_max[2])
+        else if (fData->getSums()[i]>i_max[2])
         {
-            i_max[2]=fSums[i];
+            i_max[2]=fData->getSums()[i];
             i_index[2]=i;
         }
     }
@@ -900,7 +910,7 @@ void VImageParameterCalculation::calcParameters( valarray<double> fSums, valarra
 ///////// fraction of image/border pixels located under image ellipse /////////////
 ///////////////////////////////////////////////////////////////////////////////////
 
-        fParGeo->fui = getFractionOfImageBorderPixelUnderImage( fImage, fBorder, xmean, ymean, width, length, cosphi, sinphi );
+        fParGeo->fui = getFractionOfImageBorderPixelUnderImage( xmean, ymean, width, length, cosphi, sinphi );
 
 ////////////////////////////////////////////////////////////////////////////
 /////////////////////// orientation: sinalpha and alpha ////////////////////
@@ -1020,9 +1030,9 @@ In this case there is a large probablitity that the parameters are wrong.
 
 (GM)
 */
-vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
+vector<bool> VImageParameterCalculation::calcLL()
 {
-    if( !iData )
+    if( !fData )
     {
         vector< bool > a;
         cout << "VImageParameterCalculation::calcLL error: data vector is zero" << endl;
@@ -1032,7 +1042,7 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     {
         cout << endl;
         cout << "=================================================================" << endl;
-        cout << "Telescope " << iData->getTelID()+1 << endl;
+        cout << "Telescope " << fData->getTelID()+1 << endl;
         cout << "=================================================================" << endl;
         cout << endl;
     }
@@ -1041,25 +1051,24 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
 // fit will fail for width < this value
     const double iFMinWidth = 0.001;
 
-// get pixel values, all nonimage/nonborder pixels have iData->getSums()=0.
-// if there are dead channels, size of these vectors is < iData->getSums().size() !!
+// get pixel values, all nonimage/nonborder pixels have fData->getSums()=0.
+// if there are dead channels, size of these vectors is < fData->getSums().size() !!
     fll_X.clear();
     fll_Y.clear();
     fll_Sums.clear();
 // will be true if sum in pixel is estimated by fit
-    fLLEst.assign( iData->getSums().size(), false );
+    fLLEst.assign( fData->getSums().size(), false );
 // maximum size of the camera (for fit parameter limits)
     double fdistXmin =  1.e99;
     double fdistXmax = -1.e99;
     double fdistYmin =  1.e99;
     double fdistYmax = -1.e99;
-    for( unsigned int j = 0; j < iData->getSums().size(); j++ )
+    for( unsigned int j = 0; j < fData->getSums().size(); j++ )
     {
 // ignore dead channels
-        if( iData->getDead()[j] ) continue;
+        if( fData->getDead()[j] ) continue;
 // only image/border pixels are used in the fit
-	if( j < iData->getImageBorderNeighbour().size() && iData->getImageBorderNeighbour()[j] )
-//        if( iData->getImage()[j] || iData->getBorder()[j])
+	if( j < fData->getImageBorderNeighbour().size() && fData->getImageBorderNeighbour()[j] )
         {
             double xi = getDetectorGeo()->getX()[j];
             double yi = getDetectorGeo()->getY()[j];
@@ -1072,7 +1081,7 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
             fll_X.push_back( xi );
             fll_Y.push_back( yi );
 
-	    if( iData->getImage()[j] || iData->getBorder()[j]) fll_Sums.push_back( iData->getSums()[j] );
+	    if( fData->getImage()[j] || fData->getBorder()[j]) fll_Sums.push_back( fData->getSums()[j] );
 	    else                                               fll_Sums.push_back( 0. );
         }
     }
@@ -1083,7 +1092,7 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     }  
 
 // take geometrical values as start values (calculate if not already calculated)
-    if( !fboolCalcGeo ) calcParameters( iData->getSums(), iData->getSums2(), iData->getImage(), iData->getBorder() );
+    if( !fboolCalcGeo ) calcParameters();
 
 // define fit variables
     double rho = 0.;
@@ -1120,10 +1129,10 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     if( fParGeo->sigmaX > 0. ) fLLFitter->DefineParameter( 1, "meanX", cen_x, step, cen_x - 2.*fParGeo->sigmaX, cen_x + 2.*fParGeo->sigmaX );
     else                       
     {
-        if( iData->getDetectorGeometry() &&  iData->getTelID() < iData->getDetectorGeometry()->getFieldofView().size() )
+        if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
 	{
 	   fLLFitter->DefineParameter( 1, "meanX", cen_x, step, fdistXmin, 
-	                               fdistXmax+iData->getDetectorGeometry()->getFieldofView()[iData->getTelID()] );
+	                               fdistXmax+fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] );
         }
 	else
 	{
@@ -1134,10 +1143,10 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     if( fParGeo->sigmaY > 0. ) fLLFitter->DefineParameter( 3, "meanY", cen_y, step, cen_y - 2.*fParGeo->sigmaY, cen_y + 2.*fParGeo->sigmaY );
     else
     {
-        if( iData->getDetectorGeometry() &&  iData->getTelID() < iData->getDetectorGeometry()->getFieldofView().size() )
+        if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
 	{
 	   fLLFitter->DefineParameter( 1, "meanY", cen_y, step, fdistYmin, 
-	                               fdistYmax+iData->getDetectorGeometry()->getFieldofView()[iData->getTelID()] );
+	                               fdistYmax+fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] );
         }
 	else
 	{
@@ -1184,16 +1193,16 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
 // assume that all pixel are of the same size
         double cen_x_recentered = 0.;
         double cen_y_recentered = 0.;
-        if( iData->getDetectorGeo()->getTubeRadius().size() > 0 && iData->getDetectorGeo()->getTubeRadius()[0] > 0. )
+        if( fData->getDetectorGeo()->getTubeRadius().size() > 0 && fData->getDetectorGeo()->getTubeRadius()[0] > 0. )
         {
-            cen_x_recentered = cen_x - iData->getDetectorGeo()->getTubeRadius()[0]*2.*(int)(cen_x/iData->getDetectorGeo()->getTubeRadius()[0]/2. );
-            cen_y_recentered = cen_y - iData->getDetectorGeo()->getTubeRadius()[0]*2.*(int)(cen_y/iData->getDetectorGeo()->getTubeRadius()[0]/2. );
+            cen_x_recentered = cen_x - fData->getDetectorGeo()->getTubeRadius()[0]*2.*(int)(cen_x/fData->getDetectorGeo()->getTubeRadius()[0]/2. );
+            cen_y_recentered = cen_y - fData->getDetectorGeo()->getTubeRadius()[0]*2.*(int)(cen_y/fData->getDetectorGeo()->getTubeRadius()[0]/2. );
         }
         if( fLLDebug ) cout << "FLLFITTER RECENTERED " << cen_x_recentered << "\t" << cen_y_recentered << endl;
 ////////////////////////////////////////////////////////////////////
 // calculate new size from fit function (not from measured charges!)
         iSize = 0.;
-        for( unsigned int i = 0; i < iData->getSums().size(); i++ )
+        for( unsigned int i = 0; i < fData->getSums().size(); i++ )
         {
             iSize +=  getFitValue( i, rho, cen_x_recentered, sigmaX, cen_y_recentered, sigmaY, signal );
         }
@@ -1327,7 +1336,7 @@ vector<bool> VImageParameterCalculation::calcLL( VEvndispData *iData )
     fParLL->phi = phi;
     fParLL->cosphi = cos( fParLL->phi );
     fParLL->sinphi = sin( fParLL->phi );
-    fParLL->fui = getFractionOfImageBorderPixelUnderImage( iData->getImage(), iData->getBorder(), cen_x, cen_y, width, length, fParLL->cosphi, fParLL->sinphi );
+    fParLL->fui = getFractionOfImageBorderPixelUnderImage( cen_x, cen_y, width, length, fParLL->cosphi, fParLL->sinphi );
     fParLL->dcen_x = dcen_x;
     fParLL->dcen_y = dcen_y;
     fParLL->dlength = dlength;
@@ -1378,26 +1387,6 @@ double VImageParameterCalculation::getFitValue( unsigned int iChannel, double rh
 
 
 /*!
- */
-double VImageParameterCalculation::getMeanSignal( int i, VEvndispData *iData )
-{
-// otherwise take mean value from surrounding pixels
-    double iLLsums = 0.;
-    int iNllsums;
-    iNllsums = 0;
-    for( unsigned int j = 0; j < fDetectorGeometry->getNeighbours()[i].size(); j++ )
-    {
-        unsigned int k = fDetectorGeometry->getNeighbours()[i][j];
-        iLLsums += iData->getSums()[k];
-        iNllsums++;
-    }
-    if( iNllsums > 0 ) iLLsums /= iNllsums;
-    else iLLsums = 0.;
-    return iLLsums;
-}
-
-
-/*!
    reduce angles to values in [0.,iMax]
 */
 double VImageParameterCalculation::redang( double iangle, double iMax )
@@ -1421,7 +1410,7 @@ double VImageParameterCalculation::redang( double iangle, double iMax )
 
     For a perfect image this is 1, for many cosmic rays this is < 1
 */
-double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( vector< bool > fImage, vector< bool > fBorder, double cen_x, double cen_y, double width, double length, double cosphi, double sinphi )
+double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( double cen_x, double cen_y, double width, double length, double cosphi, double sinphi )
 {
     float i_ImageCoverFactor = 2.;
     if( fData ) i_ImageCoverFactor = fData->getRunParameter()->fImageAnalysisFUIFactor;
@@ -1436,7 +1425,7 @@ double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( vect
     if( length > 1.e-2 && width > 1.e-2 )
     {
 // loop over all image and check if they are close to the image ellipse
-        for( unsigned int i = 0; i < fImage.size(); i++ )
+        for( unsigned int i = 0; i < fData->getImage().size(); i++ )
         {
 // pixel coordinates rotated into frame of image ellipse
             double xi =     cosphi * (getDetectorGeo()->getX()[i]-cen_x) + sinphi * (getDetectorGeo()->getY()[i]-cen_y);
@@ -1446,7 +1435,7 @@ double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( vect
             if( xi*xi/length/length/i_ImageCoverFactor/i_ImageCoverFactor + yi*yi/width/width/i_ImageCoverFactor/i_ImageCoverFactor < 1. )
             {
                 i_ImageCoverNPixel++;
-                if( fImage[i] || fBorder[i]) i_ImageCoverNPixelImageBorder++;
+                if( fData->getImage()[i] || fData->getBorder()[i]) i_ImageCoverNPixelImageBorder++;
             }
         }
         if( fDebug )

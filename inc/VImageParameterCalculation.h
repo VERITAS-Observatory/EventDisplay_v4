@@ -35,7 +35,7 @@ class VImageParameterCalculation : public TObject
         bool fLLDebug;
 
         VDetectorGeometry *fDetectorGeometry;     //< the detector geometry
-        VImageParameter *fParGeo;                     //!< image parameters (geo.)
+        VImageParameter *fParGeo;                 //!< image parameters (geo.)
         bool fboolCalcGeo;                        //!< switch to show if there was a geometrical analysis
         bool fboolCalcTiming;                     //!< switch to show if there was a timing analysis
         VImageParameter *fParLL;                      //!< image parameters (log lik.)
@@ -48,31 +48,20 @@ class VImageParameterCalculation : public TObject
         vector<double> fll_Pedvars;               //!< data vector for minuit function
         vector<bool> fLLEst;                      //!< true if channel has an estimated sum from the LL fit
 
-        double getFractionOfImageBorderPixelUnderImage( vector<bool>, vector<bool>, double, double, double, double, double, double );
-        double getMeanSignal( int, VEvndispData* );      //!< calculate signal in a channel from the sum in the surrounding channels
-                                                  //!< reduce angle to intervall [0.,maxI]
-        double redang( double angle, double maxI );
+        double getFractionOfImageBorderPixelUnderImage( double, double, double, double, double, double );
+        double redang( double angle, double maxI );  //!< reduce angle to intervall [0.,maxI]
 
     public:
 
         VImageParameterCalculation( unsigned int iShortTree = 0, VEvndispData *iData = 0 );
         ~VImageParameterCalculation();
-        vector<bool> calcLL( VEvndispData* iData );      //!< calculate image parameters (log like)
-                                                  //!< fit a single ring to the image to look for muons
-        void muonRingFinder( valarray<double>, vector<bool>, vector<bool> );
-                                                  //! calculate the brightness of the muon ring
-        void sizeInMuonRing( valarray<double>, vector<bool>, vector<bool>, vector< unsigned int > );
-                                                  //!< determine the distribution of pixels in the image
-        void muonPixelDistribution( valarray<double>, vector<bool>, vector<bool> );
-                                                  //!< MS: calculate trigger-level image parameters
-        void calcTriggerParameters( vector<bool> fTrigger );
-                                                  //!< calculate image parameters (geo.)
-        void calcParameters( valarray<double>, valarray<double>, vector<bool>, vector<bool> );
-                                                  //!< calculate image parameters (geo.)
-        void calcParameters( valarray<double>, valarray<double>, vector<bool>, vector<bool>, vector< bool > );
-                                                  //!< calculate image parameters (geo.)
-        void calcParameters( valarray<double>, valarray<double>, vector<bool>, vector<bool>, vector< bool >, vector< bool >, vector< bool > );
-        void calcTimingParameters( valarray<double>, valarray<double>, valarray<double>, vector<bool>, vector<bool>, VEvndispData* iData);
+        vector<bool> calcLL();                                                                 //!< calculate image parameters (log like)
+        void muonRingFinder();                                                                 //!< fit a single ring to the image to look for muons
+        void sizeInMuonRing();                                                                 //! calculate the brightness of the muon ring
+        void muonPixelDistribution();                                                          //!< determine the distribution of pixels in the image
+        void calcTriggerParameters( vector<bool> fTrigger );                                   //!< MS: calculate trigger-level image parameters
+        void calcParameters();                                                                 //!< calculate image parameters (geo.)
+        void calcTimingParameters();
         void initMinuit( int );                   //!< initialize minuit
         vector<double>& getPedvars()              //!< return data vector for minuit function
         {

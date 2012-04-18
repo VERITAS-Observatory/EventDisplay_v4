@@ -654,7 +654,7 @@ void VCamera::drawEventText()
 			fData->getImageParametersLogL()->size,
 			fData->getImageParametersLogL()->Fitstat );
         fTextEvent[fTextEvent.size()-1]->SetTitle( iText );
-        sprintf( iText, "GEO: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,size=%.0f,loss=%.2f,fui=%.2f",
+        sprintf( iText, "GEO: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,size=%.0f,loss=%.2f,lossDead=%.2f,fui=%.2f",
 	                fData->getImageParameters()->cen_x,
 			fData->getImageParameters()->cen_y,
 			fData->getImageParameters()->dist,
@@ -662,6 +662,7 @@ void VCamera::drawEventText()
 			fData->getImageParameters()->width,
 			fData->getImageParameters()->size, 
 			fData->getImageParameters()->loss, 
+			fData->getImageParameters()->lossAndDead,
 			fData->getImageParameters()->fui );
         fTextEvent[fTextEvent.size()-2]->SetTitle( iText );
     }

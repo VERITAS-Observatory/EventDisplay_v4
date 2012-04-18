@@ -74,6 +74,7 @@ class VImageParameter
         float asymmetry;                          //!< measure of shower skew
 
         float loss;                               //!< fraction of image size in outer pixel
+	float lossAndDead;                        //!< fraction if image size in outer pixels and at the edge of dead pixels
         float fracLow;                            //!< fraction of image size in low gain pixel
         float fui;                                //!< fraction of image/border pixel under estimate image ellipse
 

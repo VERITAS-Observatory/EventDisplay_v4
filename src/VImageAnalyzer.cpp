@@ -149,16 +149,17 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // image parameter calculation
-    fVImageParameterCalculation->calcParameters( getSums(), getSums2(), getImage(), getBorder(), getBrightNonImage(), getHiLo(), getImageBorderNeighbour() );
-    fVImageParameterCalculation->calcTimingParameters( getTZeros(), getTOffsetvars(), getSums(), getImage(), getBorder(),(VEvndispData*)this );
+    fVImageParameterCalculation->calcParameters();
+    fVImageParameterCalculation->calcTimingParameters();
 ///////////////////////////////////////////////////////////////////////////////////////////
 // do a log likelihood image fitting on events on the camera edge only
     if( !fRunPar->fDoublePass || !fReader->hasFADCTrace() )
     {
+//        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->lossAndDead > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
         if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
         {
             fVImageParameterCalculation->setParametersLogL( getImageParameters() );
-            setLLEst( fVImageParameterCalculation->calcLL( (VEvndispData*)this ) );
+            setLLEst( fVImageParameterCalculation->calcLL() );
         }
     }
 
@@ -212,15 +213,16 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // image parameter calculation
-        fVImageParameterCalculation->calcParameters( getSums(), getSums2(), getImage(), getBorder(), getBrightNonImage(), getHiLo(), getImageBorderNeighbour() );
-        fVImageParameterCalculation->calcTimingParameters( getTZeros(),getTOffsetvars(),getSums(),getImage(), getBorder(), (VEvndispData*)this );
+        fVImageParameterCalculation->calcParameters();
+        fVImageParameterCalculation->calcTimingParameters();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // do a log likelihood image fitting on events on the camera edge only
+//        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->lossAndDead > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
         if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
         {
             fVImageParameterCalculation->setParametersLogL( getImageParameters() );
-            setLLEst( fVImageParameterCalculation->calcLL( (VEvndispData*)this ) );
+            setLLEst( fVImageParameterCalculation->calcLL() );
         }
 
     }
@@ -234,7 +236,7 @@ void VImageAnalyzer::doAnalysis()
         if( getImageParameters()->ntubes > 0 )
         {
             fVImageParameterCalculation->setParametersLogL( getImageParametersLogL() );
-            setLLEst( fVImageParameterCalculation->calcLL( (VEvndispData*)this ) );
+            setLLEst( fVImageParameterCalculation->calcLL() );
         }
         else getImageParameters( fRunPar->fImageLL )->reset();
     }
@@ -758,7 +760,7 @@ void VImageAnalyzer::imageCleaning()
 
 void VImageAnalyzer::muonRingAnalysis()
 {
-    fVImageParameterCalculation->muonRingFinder( getSums(),getImage(), getBorder() );
-    fVImageParameterCalculation->muonPixelDistribution( getSums(),getImage(), getBorder() );
-    fVImageParameterCalculation->sizeInMuonRing( getSums(),getImage(), getBorder(), getDead() );
+    fVImageParameterCalculation->muonRingFinder();
+    fVImageParameterCalculation->muonPixelDistribution();
+    fVImageParameterCalculation->sizeInMuonRing();
 }
