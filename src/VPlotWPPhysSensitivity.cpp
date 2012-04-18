@@ -61,36 +61,36 @@ bool VPlotWPPhysSensitivity::initialize()
 	    if( fAnalysis[i].find( "DESY" ) != string::npos )
 	    {
 	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
-	       iTemp << "DESY/" << fAnalysis[i] << "." << fSubArray[a] << "." << hname << ".root";
+	       iTemp << "data/DESY/" << fAnalysis[i] << "." << fSubArray[a] << "." << hname << ".root";
 	    }
 	    else if( fAnalysis[i] == "VTS" )
 	    {
 	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
-	       iTemp << "VTS/VTS." << fSubArray[a] << "." << hname << ".root";
+	       iTemp << "data/VTS/VTS." << fSubArray[a] << "." << hname << ".root";
 	    }
 	    else if( fAnalysis[i] == "ISDC" )
 	    {
 	       sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "ISDC/ISDC_2000m_KonradB_optimal_"  << fSubArray[a] << "_" << hname;
+	       iTemp << "data/ISDC/ISDC_2000m_KonradB_optimal_"  << fSubArray[a] << "_" << hname;
 	       iTemp << "h_20deg_20110615.root";
 	    }
 	    else if( fAnalysis[i] == "ISDC.3700m" )
 	    {
 	       sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "ISDC/ISDC_3700m_optimal_"  << fSubArray[a] << "_" << hname;
+	       iTemp << "data/ISDC/ISDC_3700m_optimal_"  << fSubArray[a] << "_" << hname;
 	       iTemp << "h_20deg_20110615.root";
 	    }
 	    else if( fAnalysis[i] == "ISDC.moon" )
 	    {
 	       sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "ISDC/ISDC_2000m_moonlight_optimal_"  << fSubArray[a] << "_" << hname;
+	       iTemp << "data/ISDC/ISDC_2000m_moonlight_optimal_"  << fSubArray[a] << "_" << hname;
 	       iTemp << "h_20deg_20110615.root";
 	    }
 	    else if( fAnalysis[i] == "IFAE" )
 	    {
 	       if( fObservationTime_H[t] > 1. ) sprintf( hname, "%d", (int)fObservationTime_H[t] );
 	       else                             sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "IFAEPerformanceBCDEINANB_Nov2011/Subarray" << fSubArray[a];
+	       iTemp << "data/IFAEPerformanceBCDEINANB_Nov2011/Subarray" << fSubArray[a];
 	       if( fSubArray[a] == "B" || fSubArray[a] == "C" ) iTemp << "_IFAE_" << hname << "hours_20111121.root";
 	       else                                             iTemp << "_IFAE_" << hname << "hours_20111109.root";
 	    }
@@ -98,21 +98,21 @@ bool VPlotWPPhysSensitivity::initialize()
 	    {
 	       if( fObservationTime_H[t] > 1. ) sprintf( hname, "%d", (int)fObservationTime_H[t] );
 	       else                             sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "IFAEOffaxisPerformanceBEI_Nov2011/Subarray" << fSubArray[a];
+	       iTemp << "data/IFAEOffaxisPerformanceBEI_Nov2011/Subarray" << fSubArray[a];
 	       iTemp << "_IFAE_" << hname << "hours_20111121_offaxis.root";
             }
 	    else if( fAnalysis[i] == "HD_KB" || fAnalysis[i] == "MPIK" )
 	    {
 	       if( fObservationTime_H[t] > 1. ) sprintf( hname, "%d", (int)fObservationTime_H[t] );
 	       else                             sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "data_KB/kb_" << fSubArray[a];
+	       iTemp << "data/data_KB/kb_" << fSubArray[a];
 	       iTemp << "_" << hname << "h_20deg_v3.root";
             }
 	    else if( fAnalysis[i] == "ParisMVA" )
 	    {
 	       if( fObservationTime_H[t] > 1. ) sprintf( hname, "%d", (int)fObservationTime_H[t] );
 	       else                             sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "ParisMVA/Subarray" << fSubArray[a];
+	       iTemp << "data/ParisMVA/Subarray" << fSubArray[a];
 	       iTemp << "_ParisMVA_" << hname << "hours.root";
             }
 	    else 
