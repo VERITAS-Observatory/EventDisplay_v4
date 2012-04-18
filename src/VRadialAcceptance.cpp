@@ -336,7 +336,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
         {
 // gamma/hadron cuts
             if( !fCuts->isGamma( 0, false ) ) continue;
-// TODO REALLY?	 if( !fCuts->applyEnergyReconstructionQualityCuts() ) continue;
+// 	 if( !fCuts->applyEnergyReconstructionQualityCuts() ) continue;
 
 // now fill histograms
             i_entries_after_cuts++;
