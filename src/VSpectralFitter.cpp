@@ -68,6 +68,7 @@ TF1* VSpectralFitter::fit( TGraph *g, string fitname )
    fSpectralFitFunction == 0 :  power law
    fSpectralFitFunction == 1 :  power law with exponential cutoff
    fSpectralFitFunction == 2 :  broken power law
+   fSpectralFitFunction == 3 :  curved power law
 */
 bool VSpectralFitter::defineFitFunction()
 {
@@ -96,7 +97,7 @@ bool VSpectralFitter::defineFitFunction()
         fFitFunction = new TF1( fFitName.c_str(), hname, log10( fSpectralFitEnergy_min ), log10( fSpectralFitEnergy_max ) );
         fFitFunction->SetParameter( 0, 1.e-7 );
         fFitFunction->SetParameter( 1, -2. );
-        fFitFunction->SetParameter( 1, 10. );
+        fFitFunction->SetParameter( 2, 10. );
         sprintf( hname, "[0] * TMath::Power( x  / %f, [1] ) * TMath::Exp( -1. * x / [3] )", fSpectralFitFluxNormalisationEnergy );
 	fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
     }
@@ -107,6 +108,16 @@ bool VSpectralFitter::defineFitFunction()
         fFitFunction = 0;
 	fFitFunction_lin = 0;
         return false;
+    }
+//curved power law fit
+    else if( fSpectralFitFunction == 3 )
+    {
+      cout << "curved power law fit" << endl;
+      sprintf( hname, "[0] * TMath::Power( TMath::Power( 10, x ) / %f, [1]+[2]*TMath::Power( 10, x ) )", fSpectralFitFluxNormalisationEnergy );
+      fFitFunction = new TF1( fFitName.c_str(), hname, log10( fSpectralFitEnergy_min), log10( fSpectralFitEnergy_max));
+      fFitFunction->SetParameter( 0, 1.e-7 );
+      fFitFunction->SetParameter( 1, -2. );
+      fFitFunction->SetParameter( 2, -0.01 );
     }
     else
     {
