@@ -1164,7 +1164,25 @@ void VEnergySpectrum::plotFitValues()
 // get spectral index
     double i_indexV = fEnergy->GetParameter( 1 ) - fPlottingMultiplierIndex;
     double i_indexE = fEnergy->GetParError( 1 );
-    sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE );
+
+// curvature index
+    double i_curvatureV;
+    double i_curvatureE;
+
+    if (fSpectralFitFunction==0)
+    { // 1) simple power law 
+      sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE );
+    }
+    else if (fSpectralFitFunction==3)
+    {
+      // get curvature index
+      i_curvatureV = fEnergy->GetParameter( 2 );
+      i_curvatureE = fEnergy->GetParError( 2 );
+
+      // 4) curved power law
+      sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f + (%.2f#pm%.2f)E} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_curvatureV, i_curvatureE );
+    }
+
     tL2->SetNDC( 1 );
     tL2->SetTextSize( 0.030 );
     tL2->DrawLatex( 0.18, 0.19, hname );
