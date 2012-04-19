@@ -1164,14 +1164,26 @@ void VEnergySpectrum::plotFitValues()
 // get spectral index
     double i_indexV = fEnergy->GetParameter( 1 ) - fPlottingMultiplierIndex;
     double i_indexE = fEnergy->GetParError( 1 );
-
+// cutoff energy
+    double i_ecutoffV;
+    double i_ecutoffE;
 // curvature index
     double i_curvatureV;
     double i_curvatureE;
 
-    if (fSpectralFitFunction==0)
+
+ if (fSpectralFitFunction==0)
     { // 1) simple power law 
       sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE );
+    }
+    else if (fSpectralFitFunction==1)
+    {
+      // get energy cutoff
+      i_ecutoffV = fEnergy->GetParameter( 2 );
+      i_ecutoffE = fEnergy->GetParError( 2 );
+
+      // 2) power law with exponential cutoff
+      sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f}e^{E/(%.2f#pm%.2f)} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_ecutoffV, i_ecutoffE );
     }
     else if (fSpectralFitFunction==3)
     {
@@ -1179,7 +1191,7 @@ void VEnergySpectrum::plotFitValues()
       i_curvatureV = fEnergy->GetParameter( 2 );
       i_curvatureE = fEnergy->GetParError( 2 );
 
-      // 4) curved power law
+      // 3) curved power law
       sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f + (%.2f#pm%.2f)E} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_curvatureV, i_curvatureE );
     }
 
