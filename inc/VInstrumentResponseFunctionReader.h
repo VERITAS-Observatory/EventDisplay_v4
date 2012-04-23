@@ -85,8 +85,10 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 // energy resolution
     TGraphErrors *gEnergyResolution;
 // energy bias
-    TGraphErrors *gEnergySystematic_Mean;
-    TGraphErrors *gEnergySystematic_Median;
+    TGraphErrors *gEnergyBias_Mean;
+    TGraphErrors *gEnergyBias_Median;
+    TGraphErrors *gEnergyLogBias_Mean;
+    TGraphErrors *gEnergyLogBias_Median;
 // angular resolution (filled for CTA only)
     TGraphErrors *gAngularResolution;
     TGraphErrors *gAngularResolution80;

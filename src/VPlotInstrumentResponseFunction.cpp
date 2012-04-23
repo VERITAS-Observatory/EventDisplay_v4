@@ -219,7 +219,7 @@ void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID
     if( z > 0 ) iCutEfficencyPlottingCanvas->SetLogy( 1 );
 }
 
-void VPlotInstrumentResponseFunction::plotEnergyReconstructionRelativeErrors( unsigned int iDataSetID, double iYmin, double iYmax )
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias2D( unsigned int iDataSetID, double iYmin, double iYmax )
 {
     if( !checkDataSetID( iDataSetID ) ) return;
 
@@ -251,7 +251,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionRelativeErrors( un
 }
 
 
-void VPlotInstrumentResponseFunction::plotEnergyReconstructionError( unsigned int iDataSetID, string iM, double iYmin, double iYmax )
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigned int iDataSetID, string iM, double iYmin, double iYmax )
 {
     if( !checkDataSetID( iDataSetID ) ) return;
 
@@ -275,8 +275,8 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionError( unsigned in
        if( fData[iDataSetID]->hEsys->GetEntries() > 0. ) iEnergyReconstructionErrorCanvas->SetLogz( 1 );
        fData[iDataSetID]->hEsys->Draw( "colz" );
 // plot energy systematics
-       if( iM == "mean"     && fData[iDataSetID]->gEnergySystematic_Mean )   fData[iDataSetID]->gEnergySystematic_Mean->Draw( "p" );
-       if( iM == "median"   && fData[iDataSetID]->gEnergySystematic_Median ) fData[iDataSetID]->gEnergySystematic_Median->Draw( "p" );
+       if( iM == "mean"     && fData[iDataSetID]->gEnergyLogBias_Mean )   fData[iDataSetID]->gEnergyLogBias_Mean->Draw( "p" );
+       if( iM == "median"   && fData[iDataSetID]->gEnergyLogBias_Median ) fData[iDataSetID]->gEnergyLogBias_Median->Draw( "p" );
        
 // line at 0
        TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 0., log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 0. );
@@ -547,41 +547,71 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
     iEnergySpectraPlottingCanvas->SetLogy( 1 );
 }
 
-void VPlotInstrumentResponseFunction::plotEnergySystematics( string iM, double ymin, double ymax )
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias( string iM, double ymin, double ymax )
+{
+    plotEnergyReconstructionBias( iM, ymin, ymax, true );
+}
+
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string iM, double ymin, double ymax, bool iLogBias )
 {
     char hname[200];
+    char htitle[200];
 
-    sprintf( hname, "cEA_energy_bias" );
-    TCanvas* iEnergySystematicsPlottingCanvas = new TCanvas( hname, "energy bias", 10, 10, fCanvasSize_X, fCanvasSize_Y );
+    sprintf( hname, "cEA_energy_bias_%d", (int)iLogBias );
+    if( iLogBias ) sprintf( htitle, "log energy bias" );
+    else           sprintf( htitle, "energy bias" );
+    TCanvas* iEnergySystematicsPlottingCanvas = new TCanvas( hname, htitle, 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergySystematicsPlottingCanvas->SetGridx( 0 );
     iEnergySystematicsPlottingCanvas->SetGridy( 0 );
     iEnergySystematicsPlottingCanvas->SetLeftMargin( 0.15 );
     iEnergySystematicsPlottingCanvas->SetRightMargin( 0.07 );
 
-    TH1D *he0_sys = new TH1D( "he0_sys","", 100, log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
+    sprintf( hname, "he0_sys" );
+    if( iLogBias ) sprintf( hname, "he0_sysL" );
+    TH1D *he0_sys = new TH1D( hname,"", 100, log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
     he0_sys->SetStats( 0 );
     he0_sys->SetXTitle( "log_{10} energy [TeV]" );
-    he0_sys->SetYTitle( "energy bias" );
+    if( iLogBias ) he0_sys->SetYTitle( "energy bias (log_{10} E_{rec}/E_{MC})" );
+    else           he0_sys->SetYTitle( "energy bias (E_{rec}-E_{MC})/E_{MC}" );
     he0_sys->SetMinimum( ymin );
     he0_sys->SetMaximum( ymax );
     he0_sys->Draw("");
     he0_sys->Draw("AH");
 
-    plot_nullHistogram( iEnergySystematicsPlottingCanvas, he0_sys, getPlottingAxis( "energy_Lin" )->fLogAxis, false, he0_sys->GetYaxis()->GetTitleOffset()*1.3, getPlottingAxis( "energy_Lin" ) ->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
+    plot_nullHistogram( iEnergySystematicsPlottingCanvas, he0_sys, getPlottingAxis( "energy_Lin" )->fLogAxis, 
+                        false, he0_sys->GetYaxis()->GetTitleOffset()*1.3, 
+			getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
 
     for( unsigned int i = 0; i < fData.size(); i++ )
     {
-       if( iM == "mean"   && fData[i]->gEnergySystematic_Mean )
+       if( iLogBias )
        {
-          fData[i]->gEnergySystematic_Mean->Draw( "p" );
-          if( fDebug ) fData[i]->gEnergySystematic_Mean->Print();
+	  if( iM == "mean"   && fData[i]->gEnergyLogBias_Mean )
+	  {
+	     fData[i]->gEnergyLogBias_Mean->Draw( "p" );
+	     if( fDebug ) fData[i]->gEnergyLogBias_Mean->Print();
+	  }
+	  else if( iM == "median" && fData[i]->gEnergyLogBias_Median )
+	  {
+	     fData[i]->gEnergyLogBias_Median->Draw( "p" );
+	     if( fDebug ) fData[i]->gEnergyLogBias_Median->Print();
+	  }
+	  else cout << "no (log) graph found" << endl;
        }
-       else if( iM == "median" && fData[i]->gEnergySystematic_Median )
+       else
        {
-          fData[i]->gEnergySystematic_Median->Draw( "p" );
-          if( fDebug ) fData[i]->gEnergySystematic_Median->Print();
+	  if( iM == "mean"   && fData[i]->gEnergyBias_Mean )
+	  {
+	     fData[i]->gEnergyBias_Mean->Draw( "p" );
+	     if( fDebug ) fData[i]->gEnergyBias_Mean->Print();
+	  }
+	  else if( iM == "median" && fData[i]->gEnergyBias_Median )
+	  {
+	     fData[i]->gEnergyBias_Median->Draw( "p" );
+	     if( fDebug ) fData[i]->gEnergyBias_Median->Print();
+	  }
+	  else cout << "no (log) graph found" << endl;
        }
-       else cout << "no graph found" << endl;
     }
 }
 

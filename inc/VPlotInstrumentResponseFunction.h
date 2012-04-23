@@ -75,14 +75,15 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     void         plotCutEfficiencyRatio( unsigned int iDataSetID = 0, unsigned int iCutID = 999, double iPlotMaximum = 1.2 );
     TCanvas*     plotEffectiveArea( double iEffAreaMax_m2 = -1. );
     void         plotEffectiveAreaRatio( unsigned int iDataSetID = 0, double ymin = 0., double ymax = 1.3 );
-    void         plotEnergyReconstructionError( unsigned int iDataSetID = 0, string iM = "mean", double ymin = -0.8, double ymax = 0.8 );
-    void         plotEnergyReconstructionRelativeErrors( unsigned int iDataSetID = 0, double iYmin = 0., double iYmax = 3. );
+    void         plotEnergyReconstructionBias( string iM = "mean", double ymin = -1., double ymax = 1., bool iLogBias = false );
+    void         plotEnergyReconstructionBias2D( unsigned int iDataSetID = 0, double iYmin = 0., double iYmax = 3. );
+    void         plotEnergyReconstructionLogBias( string iM = "mean", double ymin = -1., double ymax = 1. );
+    void         plotEnergyReconstructionLogBias2D( unsigned int iDataSetID = 0, string iM = "mean", double ymin = -0.8, double ymax = 0.8 );
     void         plotEnergyReconstructionMatrix( unsigned int iDataSetID = 0 );
     TCanvas*     plotEnergyResolution( double ymax = 1. );                                             // from geteffective area
     TCanvas*     plotEnergyResolution( string iXaxis );                                                // from IRF
     TCanvas*     plotEnergyResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );
     void         plotEnergySpectra( bool iWeighted = true, double iYMax = -1. );
-    void         plotEnergySystematics( string iM = "mean", double ymin = -1., double ymax = 1. );
     void         plotTheta2( double iTheta2AxisMax = 0.05, bool iCumulative = false );
     void         plotTheta2( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05, bool iCumulative = false );
     bool         removeInstrumentResponseData( int iDataSetID );

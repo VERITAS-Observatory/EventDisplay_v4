@@ -40,8 +40,10 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     hEsysMCRelative = 0;
     hEsysMCRelative2D = 0;
     gEnergyResolution = 0;
-    gEnergySystematic_Mean = 0;
-    gEnergySystematic_Median = 0;
+    gEnergyBias_Mean = 0;
+    gEnergyBias_Median = 0;
+    gEnergyLogBias_Mean = 0;
+    gEnergyLogBias_Median = 0;
     gAngularResolution = 0;
     gAngularResolution80 = 0;
 
@@ -372,10 +374,14 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bias
-       gEnergySystematic_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
-       setGraphPlottingStyle( gEnergySystematic_Mean );
-       gEnergySystematic_Median = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "median", 1, -10. );
-       setGraphPlottingStyle( gEnergySystematic_Median ); 
+       gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelative2D, 0, "mean", 1, -10., 1. );
+       setGraphPlottingStyle( gEnergyBias_Mean );
+       gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelative2D, 0, "median", 1, -10., 1. );
+       setGraphPlottingStyle( gEnergyBias_Median );
+       gEnergyLogBias_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
+       setGraphPlottingStyle( gEnergyLogBias_Mean );
+       gEnergyLogBias_Median = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "median", 1, -10. );
+       setGraphPlottingStyle( gEnergyLogBias_Median ); 
 // get cut efficiencies
        if( c->hhEcutTrigger )              hCutEfficiency.push_back( (TH1D*)c->hhEcutTrigger->Clone() );
        else                                hCutEfficiency.push_back( 0 );
