@@ -1249,8 +1249,12 @@ void VDisplay::setFADCText()
     sprintf( cTemp, "L2 channels FADC stop: %.2f %.2f %.2f %.2f", fEventLoop->getAnalyzer()->getFADCstopTZero()[0], fEventLoop->getAnalyzer()->getFADCstopTZero()[1], fEventLoop->getAnalyzer()->getFADCstopTZero()[2], fEventLoop->getAnalyzer()->getFADCstopTZero()[3] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // low gain multiplier
-    sprintf( cTemp, "low gain multiplier: %.2f+-%.2f", fEventLoop->getAnalyzer()->getLowGainMultiplier()[iChannel], fEventLoop->getAnalyzer()->getLowGainMultiplierError()[iChannel] );
-    fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    if( iChannel < fEventLoop->getAnalyzer()->getLowGainMultiplier().size() 
+     && iChannel < fEventLoop->getAnalyzer()->getLowGainMultiplierError().size() )
+    {
+       sprintf( cTemp, "low gain multiplier: %.2f+-%.2f", fEventLoop->getAnalyzer()->getLowGainMultiplier()[iChannel], fEventLoop->getAnalyzer()->getLowGainMultiplierError()[iChannel] );
+       fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    }
 // pulse sum
     sprintf( cTemp, "pulse sum %.2f (LW: %.2f) pulse max %.2f (raw max: %.2f) pulse width: %.2f", fEventLoop->getData()->getSums()[iChannel], 
 												  fEventLoop->getData()->getSums2()[iChannel],
