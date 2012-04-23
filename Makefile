@@ -209,13 +209,13 @@ VTS:	evndisp \
 	combineDISPTables \
 	printDISPTables \
 	combineLookupTables \
-	combineEffectiveAreas \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
 	trainTMVAforGammaHadronSeparation_TrainingFile \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
+	combineEffectiveAreas \
 	makeRadialAcceptance \
 	calculateBinaryPhases \
 	VTS.calculateCrabRateFromMC \
@@ -354,6 +354,7 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VDeadTime.o ./obj/VUtilities.o \
+		./obj/VStatistics_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -1012,8 +1013,11 @@ $(vtspara):
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
 	mkdir -p $(vtspara)/RadialAcceptances
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/acceptance_ID8_cut-NImage34.root $(vtspara)/RadialAcceptances
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/radialAcceptance-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/RadialAcceptances/
 	mkdir -p $(vtspara)/EffectiveAreas
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/EffectiveAreas/effArea-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/EffectiveAreas/
+	mkdir -p $(vtspara)/Tables
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20120410_GrIsu_ATM21_V5_ID0.* $(vtspara)/Tables/
 
 
 ###############################################################################################################################
