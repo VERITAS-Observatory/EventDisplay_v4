@@ -126,3 +126,4 @@ double VMathsandFunctions::getMeanEnergyInBin( unsigned int iMethod, double e_mi
 
     return -1.e99;
 }
+

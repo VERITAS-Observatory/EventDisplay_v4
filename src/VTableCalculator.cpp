@@ -55,19 +55,14 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     fReadHistogramsFromFile = false;
 
     fWrite1DHistograms = true;
+    fHName_Add = hname_add;
 
     fName = fpara;
 
     fInterPolWidth = 1;
     fInterPolIter = 3;
 
-    fBinning1DXlow = 0.;
-    fBinning1DXhigh = 1.;
-    if( fEnergy )
-    {
-        fBinning1DXlow =  1.;
-        fBinning1DXhigh = 5.;
-    }
+    setBinning();
 
     fOutDir = iDir;
     if( !fOutDir )
@@ -105,7 +100,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         hMedian->SetXTitle( "log_{10} size" );
         hMedian->SetYTitle( "distance [m]" );
         if( !fEnergy ) sprintf( htitle, "%s (median) [deg]", fpara.c_str() );
-        else           sprintf( htitle, "log_{10} %s (median) [GeV]", fpara.c_str() );
+        else           sprintf( htitle, "%s (median) [TeV]", fpara.c_str() );
         hMedian->SetZTitle( htitle );
 // sigma of median (16-84% (2sigma for Gauss))
         sprintf( hname, "%s_sigma_%s", fpara.c_str(), hname_add.c_str() );
@@ -114,7 +109,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         hSigma->SetXTitle( "log_{10} size" );
         hSigma->SetYTitle( "distance [m]" );
         if( !fEnergy ) sprintf( htitle, "%s (2xsigma) [deg]", fpara.c_str() );
-        else           sprintf( htitle, "log_{10} %s (2xsigma) [GeV]", fpara.c_str() );
+        else           sprintf( htitle, "%s (2xsigma) [TeV]", fpara.c_str() );
         hSigma->SetZTitle( htitle );
 // mean and rms
         sprintf( hname, "%s_mean_%s", fpara.c_str(), hname_add.c_str() );
@@ -123,7 +118,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         hMean->SetXTitle( "log_{10} size" );
         hMean->SetYTitle( "distance [m]" );
         if( !fEnergy ) sprintf( htitle, "%s (mean) [deg]", fpara.c_str() );
-        else           sprintf( htitle, "log_{10} %s (mean) [GeV]", fpara.c_str() );
+        else           sprintf( htitle, "%s (mean) [TeV]", fpara.c_str() );
         hMean->SetZTitle( fpara.c_str() );
 // number of events
         sprintf( hname, "%s_nevents_%s", fpara.c_str(), hname_add.c_str() );
@@ -132,31 +127,13 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         hNevents->SetXTitle( "log_{10} size" );
         hNevents->SetYTitle( "distance [m]" );
         if( !fEnergy ) sprintf( htitle, "%s (2xsigma) [deg]", fpara.c_str() );
-        else           sprintf( htitle, "log_{10} %s (2xsigma) [GeV]", fpara.c_str() );
+        else           sprintf( htitle, "%s (2xsigma) [TeV]", fpara.c_str() );
         hNevents->SetZTitle( fpara.c_str() );
 // 1d histograms for variable distribution
-        char hisname[200];
-        char histitle[200];
-        int id;
-        double is1, is2;
-        double id1, id2;
         for (i=0;i<NumSize;i++)
         {
             vector< TH1F* > iH1;
-            for (j=0;j<NumDist;j++)
-            {
-                id=i*1000+j;
-                sprintf( hisname , "h%d",id);
-                is1 = amp_offset + i*amp_delta;
-                is2 = amp_offset + (i+1)*amp_delta;
-                id1 = j*dist_delta;
-                id2 = (j+1)*dist_delta;
-                sprintf( histitle, "%.2f < log10 size < %.2f, %.1f < r < %.1f (%s)", is1, is2, id1, id2, hname_add.c_str() );
-                iH1.push_back( new TH1F(hisname,histitle,HistBins,fBinning1DXlow,fBinning1DXhigh) );
-                if( !fEnergy ) sprintf( histitle, "%s [deg]", fpara.c_str() );
-                else           sprintf( histitle, "log_{10} %s [GeV]", fpara.c_str() );
-                iH1.back()->SetXTitle( histitle );
-            }
+            for (j=0;j<NumDist;j++) iH1.push_back( 0 );	        
             Oh.push_back( iH1 );
         }
     }
@@ -177,6 +154,42 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 	hMeanName = hname;
     }
 
+}
+
+void VTableCalculator::setBinning()
+{
+    fBinning1DXlow = 0.;
+    fBinning1DXhigh = 1.;
+    if( fEnergy )
+    {
+        fBinning1DXlow =  0.01;
+        fBinning1DXhigh = 250.;
+        HistBins = int( fBinning1DXhigh / 0.005 );
+    }
+}
+ 
+bool VTableCalculator::create1DHistogram( int i, int j )
+{
+   if( i >= 0 && j >= 0 && i < (int)Oh.size() && j < (int)Oh[i].size() && !Oh[i][j] )
+   {
+        if( !fOutDir->cd() ) return false;
+        char hisname[200];
+        char histitle[200];
+        int id = i*1000+j;
+
+        sprintf( hisname , "h%d",id);
+        double is1 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 );
+        double is2 = hMedian->GetXaxis()->GetBinLowEdge( i + 1 ) + hMedian->GetXaxis()->GetBinWidth( i+1 );
+        double id1 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 );
+        double id2 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 ) + hMedian->GetYaxis()->GetBinWidth( j+1 );
+        sprintf( histitle, "%.2f < log10 size < %.2f, %.1f < r < %.1f (%s)", is1, is2, id1, id2, fHName_Add.c_str() );
+	Oh[i][j] = new TH1F(hisname,histitle,HistBins,fBinning1DXlow,fBinning1DXhigh);
+   }
+   else
+   {
+      return false;
+   }
+   return true;
 }
 
 
@@ -231,50 +244,32 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
 
 /* EVALUATION OF HISTOGRAMS */
 
-        int i,j,k,id;
-        float sum1,sum2,delta,med,sigma;
-        int i1,i2,i3;
+        float med = 0.;
+	float sigma = 0.;
+	int id = 0;
 
         char hisname[800];
         char histitle[800];
 
-        for( i = 0; i < NumSize; i++ )
+	double i_a[] = { 0.16, 0.5, 0.84 };
+	double i_b[] = { 0.0,  0.0, 0.0  };
+
+        for( int i = 0; i < NumSize; i++ )
         {
-            for( j = 0; j < NumDist; j++ )
+            for( int j = 0; j < NumDist; j++ )
             {
-                sum1=0.;
-// but ignore first bin (zero bin)
-                for( k = 2; k < HistBins; k++ )
-                {
-                    sum1 += Oh[i][j]->GetBinContent(k);
-                }
+		if( !Oh[i][j] ) continue;
 
-// require at least XX showers per bin
-                if( sum1 > fMinShowerPerBin  )
-                {
-                    sum2 = 0.;
-                    i1=i2=i3=0;
-// calculate median and rms
-// but ignore first bin (zero bin)
-                    for( k = 2; k < HistBins - 2; k++ )
-                    {
-                        sum2 += Oh[i][j]->GetBinContent(k);
-                        if( sum2 < 0.16 * sum1 ) i1=k;
-                        if( sum2 < 0.50 * sum1 ) i2=k;
-                        if( sum2 < 0.84 * sum1 ) i3=k;
-                    }
-                    delta = (fBinning1DXhigh-fBinning1DXlow)/(float)HistBins;
-
-// the best estimate for the true median value lies in between the
-// bin centers of the i2'th and i2+1'th bin -
-// that points happens to be at i2+1 * delta.
-                    med   = fBinning1DXlow + (i2+1) * delta;
-                    sigma = (i3-i1)*delta;
+	        if( Oh[i][j]->GetEntries() > 5 )
+		{
+		   Oh[i][j]->GetQuantiles( 3, i_b, i_a );
+		   med   = i_b[1];
+		   sigma = i_b[2] - i_b[0];
                 }
-                else
-                {
-                    med  =0.;
-                    sigma=0.;
+		else
+		{
+		   med = 0.;
+		   sigma = 0.;
                 }
                 hMedian->SetBinContent( i+1, j+1, med );
 		hMedian->SetBinError( i+1, j+1, sigma );
@@ -298,12 +293,12 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
         {
             cout << "\t msc tables: evaluating " << fName << " histograms ";
             fOutDir->cd();
-            if( xtitle && hMedian ) hMedian->SetTitle( xtitle );
+            if( xtitle && hMedian )   hMedian->SetTitle( xtitle );
             if( hNevents && hMedian ) hMedian->SetEntries( hNevents->GetEntries() );
             if( hNevents && hSigma )  hSigma->SetEntries( hNevents->GetEntries() );
-            if( hMedian ) hMedian->Write();
-            if( hSigma ) hSigma->Write();
-            if( hMean ) hMean->Write();
+            if( hMedian )  hMedian->Write();
+            if( hSigma )   hSigma->Write();
+            if( hMean )    hMean->Write();
             if( hNevents ) hNevents->Write();
             if( hMedian ) cout << "(" << hMedian->GetEntries() << " entries)";
             cout << endl;
@@ -358,26 +353,45 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 ///////////////////////////////////////////////////////////////////////////////////////
     if( Omode=='w' || Omode=='W' )
     {
+// don't allow zero or negative weights
+        if( chi2 <= 0. ) return -99.;
+// loop over all telescopes
         for( tel = 0; tel < ntel; tel++ )
         {
-            if( r[tel] >= 0. )
+            if( r[tel] >= 0. && s[tel] > 0. )
             {
 // this cut only applies to mscw/mscl calculations (remove images with width/length 0)
                 if( !fEnergy && w[tel] < 1.e-3 ) continue;
+// check limits (to avoid under/overflows)
+                if( log10( s[tel] ) > hMedian->GetXaxis()->GetXmax() ) continue;
+                if( log10( s[tel] ) < hMedian->GetXaxis()->GetXmin() ) continue;
+		if( r[tel] > hMedian->GetYaxis()->GetXmax() ) continue;
+		if( r[tel] < hMedian->GetYaxis()->GetXmin() ) continue;
 
 // calculate log energy (translate from TeV to GeV)
-                if( fEnergy && w[tel] > 0. ) w[tel] = log10( w[tel] ) + 3.;
-
-                is = SizeIndex(s[tel]);
-                ir = DistIndex(r[tel]);
+		is = hMedian->GetXaxis()->FindBin( log10( s[tel] ) ) - 1;
+		ir = hMedian->GetYaxis()->FindBin( r[tel] ) - 1;
 // reject showers in the first size bin
-                if( ir >= 0 && is > 0 )
+                if( ir >= 0 && is >= 0 && is < (int)Oh.size() && ir < (int)Oh[is].size() )
                 {
+		    if( !Oh[is][ir] )
+		    {
+		       if( !create1DHistogram( is, ir ) ) continue;
+                    }
+// check limits (to avoid under/overflows)
+                    if( w[tel] < Oh[is][ir]->GetXaxis()->GetXmin() || w[tel] > Oh[is][ir]->GetXaxis()->GetXmax() ) continue;
+// fill width/length/energy into a 1D histogram
                     Oh[is][ir]->Fill( w[tel], chi2 );
-                    double id = r[tel];
-                    if( id > NumDist*dist_delta ) id = NumDist*dist_delta-0.1;
 // chi2 is here an external weight (from e.g. spectral weighting)
-                    hMean->Fill( log10(s[tel]), id, w[tel] * chi2 );
+                    hMean->Fill( log10(s[tel]), r[tel], w[tel] * chi2 );
+                }
+		else
+		{
+		   cout << "VTableCalculator::calc(): warning index out of range: ";
+		   cout << is << "\t" << ir << "\t";
+		   cout << Oh.size() << "\t";
+		   if( is >= 0 && is < (int)Oh.size() ) cout << Oh[is].size();
+		   cout << endl;
                 }
             }
         }
@@ -449,13 +463,13 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // get expected value and sigma of expected value
                     if( hMedian )
                     {
-                        med = hMedian->GetBinContent( is, ir );
-                        sigma = hMedian->GetBinError( is, ir );
+                        med   = interpolate( hMedian, log10( s[tel] ), r[tel], false );
+			sigma = interpolate( hMedian, log10( s[tel] ), r[tel], true );
                     }
                     else if( hVMedian.size() == (unsigned int)ntel && hVMedian[tel] )
                     {
-                        med   = hVMedian[tel]->GetBinContent( is, ir );
-                        sigma = hVMedian[tel]->GetBinError( is, ir );
+                        med   = interpolate( hVMedian[tel], log10( s[tel] ), r[tel], false );
+                        sigma = interpolate( hVMedian[tel], log10( s[tel] ), r[tel], true );
 			if( fDebug && fEnergy )
 			{
 			   cout << "\t  double VTableCalculator::calc() getting energy from table for tel " << tel;
@@ -479,13 +493,8 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // (log10 energy should be > 0, good reason why we work in GeV here)
                     if( med > 0. )
                     {
-// GeV -> TeV
-                        if( fEnergy ) mt[tel] = pow(10.,med-3.);
-                        else
-                        {
-                            mt[tel] = med;
-                            if( st ) st[tel] = sigma;
-                        }
+                        mt[tel] = med;
+			if( st ) st[tel] = sigma;
                     }
                     else
                     {
@@ -518,8 +527,8 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                         {
                             if( sigma > 0. )
                             {
-                                value  += med / sigma / sigma;
-                                weight += 1./sigma/sigma;
+                                value  += med / (sigma*sigma);
+                                weight += 1./(sigma*sigma);
                             }
                             else
                             {
@@ -592,9 +601,7 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 	       chi2 = -99;
 	         dE = -99.;
             }
-
-// internal work with GeV, translate here to TeV
-            return (pow(10.,(value-3.)));
+            return value;
         }
         else return -99.;
     }
@@ -602,30 +609,6 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // should never reach this point
     return -99.;
 }
-
-
-/* compute size index */
-int VTableCalculator::SizeIndex(double size)
-{
-    int i = (int)((log10(size)-amp_offset)/amp_delta);
-    if (i>NumSize-1) i=-1;
-    if (i<0) i=0;
-    return i;
-}
-
-
-/* compute distance from telescopes index */
-int VTableCalculator::DistIndex(double dist)
-{
-    int j = (int)(dist / dist_delta);
-
-    if (j>NumDist-1) j=-1;
-
-    if (j<0) j=0;
-
-    return j;
-}
-
 
 void VTableCalculator::setInterpolationConstants( int iwidth, int iinter )
 {
@@ -743,4 +726,51 @@ bool VTableCalculator::readHistograms()
         exit( -1 );
     }
     return false;
+}
+
+double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
+{
+   if( !h ) return 0.;
+
+   int i_x = h->GetXaxis()->FindBin( x );
+   int i_y = h->GetYaxis()->FindBin( y );
+   if( i_x == 1 || i_y <= 2 || i_x == h->GetNbinsX() || i_y == h->GetNbinsY() )
+   {
+      if( iError ) return h->GetBinError( i_x, i_y );
+      else         return h->GetBinContent( i_x, i_y );
+   }
+   if( y < h->GetYaxis()->GetBinCenter( i_y ) ) i_y--;
+   if( x < h->GetXaxis()->GetBinCenter( i_x ) ) i_x--;
+
+   double e1 = 0.;
+   double e2 = 0.;
+   double v = 0.;
+
+// first interpolate on distance axis, then on size axis
+   if( !iError )
+   {
+      e1 = VStatistics::interpolate( h->GetBinContent( i_x, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
+				     h->GetBinContent( i_x, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
+				     y, false );
+      e2 = VStatistics::interpolate( h->GetBinContent( i_x+1, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
+				     h->GetBinContent( i_x+1, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
+				     y, false );
+      
+      v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );
+   }
+   else
+   {
+      e1 = VStatistics::interpolate( h->GetBinError( i_x, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
+				     h->GetBinError( i_x, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
+				     y, false );
+      e2 = VStatistics::interpolate( h->GetBinError( i_x+1, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
+				     h->GetBinError( i_x+1, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
+				     y, false );
+      
+      v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );
+   }
+   if( e1 > 1.e-2 && e2 < 1.e-2 ) return e1;
+   if( e1 < 1.e-2 && e2 > 1.e-2 ) return e2;
+
+   return v;
 }

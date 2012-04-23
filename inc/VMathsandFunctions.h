@@ -4,10 +4,10 @@
 #ifndef VMathsandFunctions_h
 #define VMathsandFunctions_h
 
-#include "TMath.h"
-
 #include "VAnalysisUtilities.h"
 #include "VPlotUtilities.h"
+
+#include "TMath.h"
 
 using namespace std;
 

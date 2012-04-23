@@ -157,20 +157,20 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     sprintf( hname, "hEsysMCRelative" );
     hEsysMCRelative = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
     hEsysMCRelative->SetXTitle( "energy_{MC} [TeV]" );
-    hEsysMCRelative->SetYTitle( "systematic error (E_{rec}-E_{MC})/E_{MC}" );
+    hEsysMCRelative->SetYTitle( "energy bias (E_{rec}-E_{MC})/E_{MC}" );
     hisTreeList->Add( hEsysMCRelative );
 
     sprintf( hname, "hEsysMCRelativeRMS" );
     hEsysMCRelativeRMS = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 3000, -5., 5. );
     hEsysMCRelativeRMS->SetXTitle( "energy_{MC} [TeV]" );
-    hEsysMCRelativeRMS->SetYTitle( "systematic error (E_{rec}-E_{MC})/E_{MC}" );
+    hEsysMCRelativeRMS->SetYTitle( "energy bias (E_{rec}-E_{MC})/E_{MC}" );
     hisTreeList->Add( hEsysMCRelativeRMS );
 
 // use CTA WP Phys binning
     sprintf( hname, "hEsysMCRelative2D" );
     hEsysMCRelative2D = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 300, 0., 3. );
     hEsysMCRelative2D->SetXTitle( "energy_{MC} [TeV]" );
-    hEsysMCRelative2D->SetYTitle( "systematic error E_{rec}/E_{MC}" );
+    hEsysMCRelative2D->SetYTitle( "energy bias E_{rec}/E_{MC}" );
     hisTreeList->Add( hEsysMCRelative2D );
 
     sprintf( hname, "hEsys2D" );

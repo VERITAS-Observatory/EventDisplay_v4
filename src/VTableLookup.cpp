@@ -53,16 +53,7 @@ VTableLookup::VTableLookup( char ireadwrite, unsigned int iDebug )
     cout << "-------------------------------------------------------" << endl;
     cout << endl;
 
-// conversion from radiant to degrees
-    degrad = 45/atan(1.);
-    raddeg = 1./degrad;
-
 // maximum core distance for events to be taken into account
-    fMaxDistance = -99.;
-    fMinSize = 0.;
-    fMaxLocalDistance = 99.;
-    fMinAngle = 15.;
-    fMaxCoreError = 60.;
     fMeanNoiseLevel = 0.;
 
     fnmscw = 0;
@@ -223,7 +214,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
 	    i_mscl.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 // energy reconstruction
             i_energy.push_back( new VTableEnergyCalculator( isuff.c_str(), freadwrite, fDirEnergyER, fUseMedianSizeforEnergyDetermination ) );
-            i_energy.back()->setCutValues( fMinSize, fMaxLocalDistance, fMaxDistance );
+            i_energy.back()->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxlocaldistance, fTLRunParameter->fmaxdist );
 	    i_energy.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
             i_energy.back()->setWrite1DHistograms( fWrite1DHistograms );
             i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, fDirEnergySR, true, "", fTLRunParameter->fPE ) );
@@ -394,7 +385,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
                         iDirTel->cd( iDNameTel[t].c_str() );
                         iDir = (TDirectory*)gDirectory->Get( "energyER" );
                         i_energy.push_back( new VTableEnergyCalculator( isuff.c_str(), freadwrite, iDir, true, iInterpolString ) );
-                        i_energy.back()->setCutValues( fMinSize, fMaxLocalDistance, fMaxDistance );
+                        i_energy.back()->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxlocaldistance, fTLRunParameter->fmaxdist );
 			i_energy.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 // get energy directory (size vs radius method)
                         iDirTel->cd( iDNameTel[t].c_str() );
@@ -444,15 +435,6 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
     }
 
     if( fDebug ) cout << "END void VTableLookup::setMCTableFiles( string itablefile, string isuff )" << endl;
-}
-
-
-/*!
- *  set array reconstruction methods in VTableLookupDataHandler
- */
-void VTableLookup::setArrayReconstruction( int method )
-{
-    fData->setMethod( method );
 }
 
 
@@ -745,7 +727,13 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NlowZlowWup, esys );
                 calculateMSFromTables( s_NlowZlowWlow, esys );
                 interpolate( s_NlowZlowWlow, fTableDirectionOffset[inoise_low][ize_low][iwoff_low], s_NlowZlowWup, fTableDirectionOffset[inoise_low][ize_low][iwoff_up], s_NlowZlow, woff );
-                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 1 " << woff << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_low << " " << s_NlowZlowWlow->mscl << " " << s_NlowZlowWup->mscl << " " << s_NlowZlow->mscl << endl;
+                if( fDebug == 2 )
+		{
+		    cout << "DEBUG  WOFF INTER 1 ";
+		    cout << woff << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_low][iwoff_up];
+		    cout << " " << inoise_low << " " << inoise_up << " " << ize_low << " ";
+		    cout << s_NlowZlowWlow->mscl << " " << s_NlowZlowWup->mscl << " " << s_NlowZlow->mscl << endl;
+                }
 
 ///////////////////////////
 // NOISE (low) ZENITH (up)
@@ -766,10 +754,20 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NlowZupWlow, esys );
                 getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fMeanNoiseLevel );
                 interpolate( s_NlowZupWlow, fTableDirectionOffset[inoise_low][ize_up][iwoff_low], s_NlowZupWup, fTableDirectionOffset[inoise_low][ize_up][iwoff_up], s_NlowZup, woff );
-                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 2 " << woff << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_low] << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_up << " " << s_NlowZupWlow->mscl << " " << s_NlowZupWup->mscl << " " << s_NlowZup->mscl << endl;
-
+                if( fDebug == 2 )
+		{
+		   cout << "DEBUG  WOFF INTER 2 ";
+		   cout << woff << " " << fTableDirectionOffset[inoise_low][ize_up][iwoff_low] << " ";
+		   cout << fTableDirectionOffset[inoise_low][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << ize_up;
+		   cout << " " << s_NlowZupWlow->mscl << " " << s_NlowZupWup->mscl << " " << s_NlowZup->mscl << endl;
+                }
                 interpolate( s_NlowZlow, fTableZe[inoise_low][ize_low], s_NlowZup, fTableZe[inoise_low][ize_up], s_Nlow, ze, true );
-                if( fDebug == 2 ) cout << "DEBUG  ZE INTER 1 " << ze << " " << fTableZe[inoise_low][ize_low] << " " << fTableZe[inoise_low][ize_up] << " " << inoise_low << " " << inoise_up << " " << s_NlowZlow->mscl << " " << s_NlowZup->mscl << " " << s_Nlow->mscl << endl;
+                if( fDebug == 2 )
+		{
+		   cout << "DEBUG  ZE INTER 1 " << ze << " " << fTableZe[inoise_low][ize_low] << " ";
+		   cout << fTableZe[inoise_low][ize_up] << " " << inoise_low << " ";
+		   cout << inoise_up << " " << s_NlowZlow->mscl << " " << s_NlowZup->mscl << " " << s_Nlow->mscl << endl;
+                }
 
 ///////////////////////////
 // NOISE (up) ZENITH (low)
@@ -792,7 +790,12 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NupZlowWlow, esys );
                 getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fMeanNoiseLevel );
                 interpolate( s_NupZlowWlow, fTableDirectionOffset[inoise_up][ize_low][iwoff_low], s_NupZlowWup, fTableDirectionOffset[inoise_up][ize_low][iwoff_up], s_NupZlow, woff );
-                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 1 " << woff << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_up] <<  " " << inoise_low << " " << inoise_up << " " << s_NupZlowWlow->mscl << " " << s_NupZlowWup->mscl << " " << s_NupZlow->mscl << endl;
+                if( fDebug == 2 )
+		{
+		   cout << "DEBUG  WOFF INTER 1 ";
+		   cout << woff << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_low] << " " << fTableDirectionOffset[inoise_up][ize_low][iwoff_up];
+		   cout <<  " " << inoise_low << " " << inoise_up << " " << s_NupZlowWlow->mscl << " " << s_NupZlowWup->mscl << " " << s_NupZlow->mscl << endl;
+                }
 
 ///////////////////////////
 // NOISE (up) ZENITH (up)
@@ -813,14 +816,27 @@ void VTableLookup::loop()
                 calculateMSFromTables( s_NupZupWlow, esys );
                 getIndexBoundary( &inoise_up, &inoise_low, fTableNoiseLevel, fMeanNoiseLevel );
                 interpolate( s_NupZupWlow, fTableDirectionOffset[inoise_up][ize_up][iwoff_low], s_NupZupWup, fTableDirectionOffset[inoise_up][ize_up][iwoff_up], s_NupZup, woff );
-                if( fDebug == 2 ) cout << "DEBUG  WOFF INTER 2 " << woff << " " << fTableDirectionOffset[inoise_up][ize_up][iwoff_low] << " " << fTableDirectionOffset[inoise_up][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " " << s_NupZupWlow->mscl << " " << s_NupZupWup->mscl << " " << s_NupZup->mscl << endl;
+                if( fDebug == 2 )
+		{
+		   cout << "DEBUG  WOFF INTER 2 ";
+		   cout << woff << " " << fTableDirectionOffset[inoise_up][ize_up][iwoff_low] << " ";
+		   cout << fTableDirectionOffset[inoise_up][ize_up][iwoff_up] << " " << inoise_low << " " << inoise_up << " ";
+		   cout << s_NupZupWlow->mscl << " " << s_NupZupWup->mscl << " " << s_NupZup->mscl << endl;
+                }
 ///////////////////////////
-
                 interpolate( s_NupZlow, fTableZe[inoise_up][ize_low], s_NupZup, fTableZe[inoise_up][ize_up], s_Nup, ze, true );
-                if( fDebug == 2 ) cout << "DEBUG  ZE INTER 2 " << ze << " " << inoise_low << " " << inoise_up << " " << s_NupZlow->mscl << " " << s_NupZup->mscl << " " << s_Nup->mscl << endl;
+                if( fDebug == 2 )
+		{
+		   cout << "DEBUG  ZE INTER 2 " << ze << " " << inoise_low << " " << inoise_up << " ";
+		   cout << s_NupZlow->mscl << " " << s_NupZup->mscl << " " << s_Nup->mscl << endl;
+                }
                 interpolate( s_Nlow, fTableNoiseLevel[inoise_low], s_Nup, fTableNoiseLevel[inoise_up], s_N, fMeanNoiseLevel, false );
-                if( fDebug == 2 ) cout << "DEBUG  NOISE INTER " << fMeanNoiseLevel << " " << fTableNoiseLevel[inoise_low] << " " << fTableNoiseLevel[inoise_up] << " " << inoise_low << " " << inoise_up << " " << s_Nlow->mscl << " " << s_Nup->mscl << " " << s_N->mscl << endl;
-
+                if( fDebug == 2 )
+		{
+		   cout << "DEBUG  NOISE INTER " << fMeanNoiseLevel << " " << fTableNoiseLevel[inoise_low] << " ";
+		   cout << fTableNoiseLevel[inoise_up] << " " << inoise_low << " " << inoise_up << " ";
+		   cout << s_Nlow->mscl << " " << s_Nup->mscl << " " << s_N->mscl << endl;
+                }
 // determine number of telescopes with MSCW values
                 for( unsigned int j = 0; j < s_N->fNTel; j++ )
                 {
@@ -878,77 +894,25 @@ void VTableLookup::loop()
 }
 
 
-/*!
-    interpolate between two zenith angles
-
-    ze [deg]
-
-    weighted by cos ze
-*/
-double VTableLookup::interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos, double iLimitforInterpolation )
-{
-// don't interpolate if both values are not valid
-    if( w1 < -90. && w2 < -90. ) return -99.;
-
-// same zenith angle, don't interpolate
-    if( fabs( ze1 - ze2 ) < 1.e-3 )
-    {
-       if( w1 < -90. )      return w2;
-       else if( w2 < -90. ) return w1;
-       return (w1+w2)/2.;
-    }
-
-// interpolate
-    double id, f1, f2;
-    if( iCos )
-    {
-        id = cos( ze1*raddeg ) - cos( ze2*raddeg );
-        f1 = 1. - (cos( ze1*raddeg ) - cos( ze*raddeg )) / id;
-        f2 = 1. - (cos( ze*raddeg ) - cos( ze2*raddeg )) / id;
-    }
-    else
-    {
-        id = ze1 - ze2;
-        f1 = 1. - ( ze1 - ze ) / id;
-        f2 = 1. - ( ze  - ze2 ) / id;
-    }
-
-// one of the values is not valid:
-// return valid value only when f1/f2 > 0.5 (this value is almost randomly chosen)
-    if( w1 > -90. && w2 < -90. )
-    {
-        if( f1 > iLimitforInterpolation ) return w1;
-        else           return -99.;
-    }
-    else if( w1 < -90. && w2 > -90. )
-    {
-        if( f2 > iLimitforInterpolation ) return w2;
-        else          return -99.;
-    }
-
-    return (w1*f1+w2*f2);
-}
-
-
 void VTableLookup::interpolate( VTablesToRead *s1, double w1, VTablesToRead *s2, double w2, VTablesToRead *s, double w, bool iCos )
 {
-    s->mscw =          interpolate( s1->mscw, w1, s2->mscw, w2, w, iCos, 0.1 );
-    s->mscl =          interpolate( s1->mscl, w1, s2->mscl, w2, w, iCos, 0.1 );
-    s->energyER =      interpolate( s1->energyER, w1, s2->energyER, w2, w, iCos, 0.1 );
-    s->energyER_Chi2 = interpolate( s1->energyER_Chi2, w1, s2->energyER_Chi2, w2, w, iCos, 0.1 );
-    s->energyER_dE =   interpolate( s1->energyER_dE, w1, s2->energyER_dE, w2, w, iCos, 0.1 );
-    s->energySR =      interpolate( s1->energySR, w1, s2->energySR, w2, w, iCos, 0.1 );
-    s->energySR_Chi2 = interpolate( s1->energySR_Chi2, w1, s2->energySR_Chi2, w2, w, iCos, 0.1 );
-    s->energySR_dE =   interpolate( s1->energySR_dE, w1, s2->energySR_dE, w2, w, iCos, 0.1 );
+    s->mscw =          VStatistics::interpolate( s1->mscw, w1, s2->mscw, w2, w, iCos, 0.1 );
+    s->mscl =          VStatistics::interpolate( s1->mscl, w1, s2->mscl, w2, w, iCos, 0.1 );
+    s->energyER =      VStatistics::interpolate( s1->energyER, w1, s2->energyER, w2, w, iCos, 0.1 );
+    s->energyER_Chi2 = VStatistics::interpolate( s1->energyER_Chi2, w1, s2->energyER_Chi2, w2, w, iCos, 0.1 );
+    s->energyER_dE =   VStatistics::interpolate( s1->energyER_dE, w1, s2->energyER_dE, w2, w, iCos, 0.1 );
+    s->energySR =      VStatistics::interpolate( s1->energySR, w1, s2->energySR, w2, w, iCos, 0.1 );
+    s->energySR_Chi2 = VStatistics::interpolate( s1->energySR_Chi2, w1, s2->energySR_Chi2, w2, w, iCos, 0.1 );
+    s->energySR_dE =   VStatistics::interpolate( s1->energySR_dE, w1, s2->energySR_dE, w2, w, iCos, 0.1 );
 
     for( unsigned int i = 0; i < s1->fNTel; i++ )
     {
-        s->mscw_T[i] =      interpolate( s1->mscw_T[i], w1, s2->mscw_T[i], w2, w, iCos, 1.e-2 );
-        s->mscl_T[i] =      interpolate( s1->mscl_T[i], w1, s2->mscl_T[i], w2, w, iCos, 1.e-2 );
-        s->energyER_T[i] =  interpolate( s1->energyER_T[i], w1, s2->energyER_T[i], w2, w, iCos, 1.e-2 );
-        s->energySR_T[i] =  interpolate( s1->energySR_T[i], w1, s2->energySR_T[i], w2, w, iCos, 1.e-2 );
-        s->mscw_Tsigma[i] = interpolate( s1->mscw_Tsigma[i], w1, s2->mscw_Tsigma[i], w2, w, iCos, 1.e-2 );
-        s->mscl_Tsigma[i] = interpolate( s1->mscl_Tsigma[i], w1, s2->mscl_Tsigma[i], w2, w, iCos, 1.e-2 );
+        s->mscw_T[i] =      VStatistics::interpolate( s1->mscw_T[i], w1, s2->mscw_T[i], w2, w, iCos, 1.e-2 );
+        s->mscl_T[i] =      VStatistics::interpolate( s1->mscl_T[i], w1, s2->mscl_T[i], w2, w, iCos, 1.e-2 );
+        s->energyER_T[i] =  VStatistics::interpolate( s1->energyER_T[i], w1, s2->energyER_T[i], w2, w, iCos, 1.e-2 );
+        s->energySR_T[i] =  VStatistics::interpolate( s1->energySR_T[i], w1, s2->energySR_T[i], w2, w, iCos, 1.e-2 );
+        s->mscw_Tsigma[i] = VStatistics::interpolate( s1->mscw_Tsigma[i], w1, s2->mscw_Tsigma[i], w2, w, iCos, 1.e-2 );
+        s->mscl_Tsigma[i] = VStatistics::interpolate( s1->mscl_Tsigma[i], w1, s2->mscl_Tsigma[i], w2, w, iCos, 1.e-2 );
     }
 }
 
@@ -1036,11 +1000,6 @@ void VTableLookup::setSpectralIndex( double iS )
 }
 
 
-void VTableLookup::setSelectRandom( double iF, int iS )
-{
-    if( fData ) fData->setSelectRandom( iF, iS );
-}
-
 
 bool VTableLookup::setInputFiles( string iInputFiles )
 {
@@ -1053,7 +1012,7 @@ bool VTableLookup::setInputFiles( string iInputFiles )
     f_calc_energySR = new VTableCalculator( fNTel, true );
     f_calc_energySR->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
     f_calc_energy = new VTableEnergyCalculator( fNTel );
-    f_calc_energy->setCutValues( fMinSize, fMaxLocalDistance, fMaxDistance );
+    f_calc_energy->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxlocaldistance, fTLRunParameter->fmaxdist );
     f_calc_energy->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 
     return bMC;
@@ -1208,9 +1167,15 @@ void VTableLookup::getTables( unsigned int inoise, unsigned int ize, unsigned in
     {
         cout << "DEBUG  getTables() "  << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << endl;
         cout << "DEBUG  " << fmscw[inoise][ize][iwoff][iaz][telX] << endl;
-        cout << "DEBUG  MEDIAN (MSCW) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " " << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t" << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t" << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
+        cout << "DEBUG  MEDIAN (MSCW) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " ";
+	cout << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t";
+	cout << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t";
+	cout << fmscw[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
         cout << "DEBUG  MEDIAN (MSCW,2) " << fmscw[inoise].size() << endl;
-        cout << "DEBUG  MEDIAN (MSCL) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " " << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t" << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t" << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
+        cout << "DEBUG  MEDIAN (MSCL) " << inoise << " " << ize << " " << iwoff << " " << iaz << " " << telX << " ";
+	cout << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetEntries() << "\t";
+	cout << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetTitle() << "\t";
+	cout << fmscl[inoise][ize][iwoff][iaz][telX]->getHistoMedian()->GetDirectory()->GetPath() << endl;
         cout << "DEBUG  MEDIAN (MSCL,2) " << fmscl[inoise].size() << endl;
     }
 
@@ -1253,6 +1218,7 @@ void VTableLookup::calculateMSFromTables( VTablesToRead *s, double esys )
     s->energyER = f_calc_energy->calc( (int)fData->getNTel(), fData->getMCEnergy(), fData->getDistanceToCore(),
                                        fData->getSize2( fTLRunParameter->fEnergySizecorrection ), fData->getDistance(),
 				       s->energyER_T, s->energyER_Chi2, s->energyER_dE, esys );
+
 }
 
 
@@ -1269,34 +1235,11 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
     fData = new VTableLookupDataHandler( fwrite, fTLRunParameter );
     fData->fillTables( fwrite );
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////// TODO: all these setters can be replaced: VEvndispData knows now about VTableLookupRunParameter .... ////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// use a random subset of input data
-    setSelectRandom( fTLRunParameter->fSelectRandom, fTLRunParameter->fSelectRandomSeed );
 // if false, don't fill events without array trigger into output tree (MC only)
     setNoTriggerEvents( fTLRunParameter->bNoNoTrigger );
-// write a shorted version of the output tree to save disk space
-    setShortTree( fTLRunParameter->bShortTree );
-// write MC tree to output file
-    setMCTree( fTLRunParameter->bWriteMCPars );
-// set some basic quality cuts (use with caution!)
-    setMaxDistance( fTLRunParameter->fmaxdist );
-    setMinSize( fTLRunParameter->fminsize );
-    setMaxLocalDistance( fTLRunParameter->fmaxlocaldistance );
-    setMaxWobbleOffset( fTLRunParameter->fmaxwobbleoffset );
-// set maximum core error allowed for table filling
-    if( fTLRunParameter->readwrite == 'W' ) setMaxCoreError( fTLRunParameter->fmaxcoreerror );
-// obsolete
-//    setTelescopeCombination( fTLRunParameter->fTelComb );
     cout << endl;
-// set array reconstruction method
-    setArrayReconstruction( fTLRunParameter->rec_method );
 // use median or mean value for energy determination
     setUseMedianForEnergyDetermination( fTLRunParameter->fUseMedianEnergy );
-// set maximum time and maximum number of entries
-    setMaxTotalTime( fTLRunParameter->fMaxRunTime, fTLRunParameter->fNentries );
 // set input file names
     fTLRunParameter->isMC = setInputFiles( fTLRunParameter->inputfile );
 // weight event to this spectral index

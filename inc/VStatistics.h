@@ -237,5 +237,60 @@ namespace VStatistics
         }
         return 0.;
     }
+
+/*!
+    interpolate between two zenith angles (iCos = true )
+    interpolate between two values (iCos = false )
+
+    ze [deg]
+
+    weighted by cos ze
+*/
+inline double interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos = false, double iLimitforInterpolation = 0.5 )
+{
+// don't interpolate if both values are not valid
+    if( w1 < -90. && w2 < -90. ) return -99.;
+
+// same zenith angle, don't interpolate
+    if( fabs( ze1 - ze2 ) < 1.e-3 )
+    {
+       if( w1 < -90. )      return w2;
+       else if( w2 < -90. ) return w1;
+       return (w1+w2)/2.;
+    }
+
+// interpolate
+    double id = 0.;
+    double f1 = 0.;
+    double f2 = 0.;
+    if( iCos )
+    {
+        id = cos( ze1*TMath::DegToRad() ) - cos( ze2*TMath::DegToRad() );
+        f1 = 1. - (cos( ze1*TMath::DegToRad() ) - cos( ze*TMath::DegToRad() )) / id;
+        f2 = 1. - (cos( ze*TMath::DegToRad() ) - cos( ze2*TMath::DegToRad() )) / id;
+    }
+    else
+    {
+        id = ze1 - ze2;
+        f1 = 1. - ( ze1 - ze ) / id;
+        f2 = 1. - ( ze  - ze2 ) / id;
+    }
+
+// one of the values is not valid:
+// return valid value only when f1/f2 > 0.5 (this value is almost randomly chosen)
+    if( w1 > -90. && w2 < -90. )
+    {
+        if( f1 > iLimitforInterpolation ) return w1;
+        else           return -99.;
+    }
+    else if( w1 < -90. && w2 > -90. )
+    {
+        if( f2 > iLimitforInterpolation ) return w2;
+        else          return -99.;
+    }
+
+    return (w1*f1+w2*f2);
+}
+
 }
 #endif

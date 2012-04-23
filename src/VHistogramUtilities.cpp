@@ -57,7 +57,7 @@ TH1D* VHistogramUtilities::get_ResidualHistogram_from_TF1( string iname, TH1D *h
        median :  median value
 
 */
-TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D *iP, TGraphErrors *g, string iMeanType, int rbin, double iXaxisValue )
+TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D *iP, TGraphErrors *g, string iMeanType, int rbin, double iXaxisValue, double iMinusValue )
 {
     if( !iP ) return 0;
 
@@ -75,12 +75,14 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D *iP, TGraphErrors
        {
 	   if( iP->GetXaxis()->GetBinCenter( b ) < iXaxisValue ) continue;
 
-	   TH1D *h = (TH1D*)iP->ProjectionY( "a", b, b );
+	   string hname = iP->GetName();
+	   hname += "_AA";
+	   TH1D *h = (TH1D*)iP->ProjectionY( hname.c_str(), b, b );
 	   if( h && h->GetEntries() > 3. )
 	   {
 	       h->GetQuantiles( 3, i_b, i_a );
 
-	       g->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), i_b[1] );
+	       g->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), i_b[1] - iMinusValue );
 	       g->SetPointError( zz, 0., (i_b[0]+i_b[2])/2./TMath::Sqrt( h->GetEntries() ) );
 	       zz++;
 	   }
@@ -97,7 +99,7 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D *iP, TGraphErrors
 	   TH1D *h = (TH1D*)iP->ProjectionY( "a", b, b );
 	   if( h && h->GetEntries() > 3. )
 	   {
-	      g->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), h->GetMean() );
+	      g->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), h->GetMean() - iMinusValue );
 	      if( iMeanType == "meanS" ) g->SetPointError( zz, 0., h->GetRMS() );
 	      else                       g->SetPointError( zz, 0., h->GetRMS()/TMath::Sqrt( h->GetEntries() ) );   
 	      zz++;

@@ -469,50 +469,93 @@ double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, do
 
 
 
-/* get energy from table */
-void VTableEnergyCalculator::get_logEnergy(double logSize, int ir, double &med, double &sigma, unsigned int tel )
+/* 
+    get energy from table 
+    
+    Note that this implementation is a bit of a night mare: it requires strict proportionality between size and energy
+    (a few tricks are applied to be robust against fluctuations;
+     events for which the proportionality cannot be seen are discarded!)
+
+    
+*/
+void VTableEnergyCalculator::get_logEnergy( double logSize, int ir, double &med, double &sigma, unsigned int tel )
 {
     TH2F *hM = hMedian;
     if( hVMedian.size() > 0 && tel < hVMedian.size() ) hM = hVMedian[tel];
     if( !hM ) return;
-// this assumes strict proportionality between energy and size for a given distance
-// check if size is too small
+
+// weird things happen at the upper end of the histograms
     int i_eNumEneMax = hM->GetNbinsX() - 4;
     int i = 0;
-    for( i = 0; i < i_eNumEneMax; i++ )
+    int j = 0;
+    int ij = 0;
+////////////////////
+// get energy bin number for corresponding size
+// this assumes strict proportionality between energy and size for a given distance
+
+// check if size is too small
+    for( i = 1; i <= i_eNumEneMax; i++ )
     {
-        if(  hM->GetBinContent( i+1, ir+1 ) > logSize ) break;
+        if(  hM->GetBinContent( i, ir ) > logSize )
+	{
+// check that the next 4 bins are higher than the current one (be more robust against fluctuations)
+   	   bool i_bContinue = false;
+           for( int k = 1; k < 5; k++ )
+	   {
+	      if( i+k < hM->GetNbinsX() && hM->GetBinContent( i+k, ir ) < hM->GetBinContent( i, ir ) )
+	      {
+		 i_bContinue = true;
+	      }
+           }
+	   if( i_bContinue ) continue;
+	   break;
+        }
     }
-    if( i > 0 ) i--;
+    if( i > 1 ) i--;
+    for( j = i_eNumEneMax; j > 1; j-- )
+    {
+        if( hM->GetBinContent( j, ir ) > 0. && hM->GetBinContent( j, ir ) < logSize ) break;
+    }
+////////////////////
+// check consistency between both methods
 
-// (GM) ?? Why going back? Why not taking this bin value and no interpolation?
-// if the next bin is empty, go back one bin
-    if( hM->GetBinError( i+1, ir+1 ) > 0. && hM->GetBinError( i+2, ir+1 ) < 1.e-6 && i > 0 ) i--;
+// discard event for inconsistent results
+    if( i - j != 0 )
+    {
+	med  =-99.;
+	sigma=-99.;
+	return;
+    }
+// consistent results
+    else ij = i;
 
-    double e1,e2,s1,s2,w1,w2,delta,rest;
+    if( hM->GetBinError( ij, ir ) > 0. && hM->GetBinError( ij+1, ir ) < 1.e-6 && ij > 0 )
+    {
+       cout << "Error alarm  " << endl;
+       ij--;
+    }
 
-    s1 = hM->GetBinContent( i+1, ir+1 );
-    s2 = hM->GetBinContent( i+2, ir+1 );
-
-    w1 = hM->GetBinError( i+1, ir+1 );
-    w2 = hM->GetBinError( i+2, ir+1 );
+// interpolation
+    double s1 = hM->GetBinContent( ij, ir );
+    double s2 = hM->GetBinContent( ij+1, ir );
+    double w1 = hM->GetBinError( ij, ir );
+    double w2 = hM->GetBinError( ij+1, ir );
 
 // (GM) do not interpolate beyond largest size (s2 > logSize)
     if( (s1>0.) && (s2>0.) && (w1>0.) && (w2>0.) && (s2 > logSize) )
     {
-        e1 = hM->GetXaxis()->GetBinCenter( i+1 );
-        e2 = hM->GetXaxis()->GetBinCenter( i+2 );
+        double e1 = hM->GetXaxis()->GetBinCenter( ij );
+        double e2 = hM->GetXaxis()->GetBinCenter( ij+1 );
 
-        delta =  s2-s1;
+        double delta = s2-s1;
         if( delta != 0. )
         {
-            rest  = (logSize-s1)/delta;
+            double rest  = (logSize-s1)/delta;
             med   =  (1.-rest)*e1 + rest*e2;
             sigma = ( (1.-rest)*w1 + rest*w2) * fLog10;          // observe this has the unit size
         }
         else
         {
-            rest = 0.;
             med = e1;
             sigma = 0.;
         }
@@ -537,10 +580,10 @@ void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double &
     if( hVMedian.size() > 0 && itel < hVMedian.size() ) hM = hVMedian[itel];
     if( !hM ) return;
 
-// get bin number for distance r (counting from 0)
-    int ir1 = hM->GetYaxis()->FindBin( r ) - 1;
+// get bin number for distance r 
+    int ir1 = hM->GetYaxis()->FindBin( r );
 // check that r is not in under or overflow of histograms
-    if( ir1 < 0 || ir1+1 >= hM->GetNbinsY() )
+    if( ir1 < 1 || ir1 >= hM->GetNbinsY() )
     {
         med = -99.;
         sigma = -99.;
@@ -548,13 +591,16 @@ void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double &
         return;
     }
 // check if distance r is larger or smaller than corresponding bin center (interpolation)
-    if( r < hM->GetYaxis()->GetBinCenter( ir1+1 ) ) ir1--;
-    double re = hM->GetYaxis()->GetBinCenter( ir1+1 );
+    if( r < hM->GetYaxis()->GetBinCenter( ir1 ) && ir1 > 1 ) ir1--;
+    double re = hM->GetYaxis()->GetBinCenter( ir1 );
 
-    double rest  = ( r - re ) / hM->GetYaxis()->GetBinWidth( ir1+1 );
-    double e1,e2,s1,s2;
+    double rest  = ( r - re ) / hM->GetYaxis()->GetBinWidth( ir1 );
+    double e1 = 0.;
+    double e2 = 0.;
+    double s1 = 0.;
+    double s2 = 0.;
 
-// get energies for these two bins
+// get energies for these two radius bins
     get_logEnergy( logSize, ir1, e1, s1, itel );
     get_logEnergy( logSize, ir1+1, e2, s2, itel );
 

@@ -14,6 +14,7 @@
 
 #include "VGlobalRunParameter.h"
 #include "VInterpolate2DHistos.h"
+#include "VStatistics.h"
 
 #include <cmath>
 #include <iostream>
@@ -68,6 +69,7 @@ class VTableCalculator
         float xhigh;
 
         string fName;
+	string fHName_Add;
 
         bool fEnergy;                             //!< true if tables are used for energy calculation
 
@@ -92,10 +94,12 @@ class VTableCalculator
 
         char    Omode;
 
-        int SizeIndex(double size);
-        int DistIndex(double dist);
+	bool   create1DHistogram( int i, int j );
         double getWeightMeanBinContent( TH2F*, int, int, double, double );
+	double interpolate( TH2F* h, double x, double y, bool iError );
         bool   readHistograms();
+	void   setBinning();
         void   setConstants( bool iPE = false );
+
 };
 #endif

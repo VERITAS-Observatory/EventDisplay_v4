@@ -52,11 +52,12 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         int fWobbleOffset;
         int fNoiseLevel;
 
-        double fmaxcoreerror;
+	unsigned int fTableFillingCut_NImages_min;
+	double       fTableFillingCut_CoreError_max;
+	double       fTableFillingCut_WobbleCut_max;
         double fmaxlocaldistance;
         double fmaxdist;
         double fminsize;
-        double fmaxwobbleoffset;
         double fSelectRandom;
         int fSelectRandomSeed;
 	double fMC_distance_to_cameracenter_min;
@@ -79,6 +80,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef(VTableLookupRunParameter,15);
+        ClassDef(VTableLookupRunParameter,16);
 };
 #endif

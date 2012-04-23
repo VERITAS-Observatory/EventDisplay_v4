@@ -22,25 +22,25 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
     }
     fDebug = fTLRunParameter->fDebug;
     fwrite = iwrite;
+    fNEntries = fTLRunParameter->fNentries;
     fEventDisplayFileFormat = 2;
     fTshowerpars = 0;
     fshowerpars = 0;
     fOTree = 0;
-    fShortTree = false;
-    bWriteMCPars = true;
+    fShortTree = fTLRunParameter->bShortTree;
+    bWriteMCPars = fTLRunParameter->bWriteMCPars;
     fNTel = 0;
     fNTelComb = 0;
     fTtelconfig = 0;
     finputfile = "";
     foutputfile = "";
     fEmissionHeightCalculator = new VEnergyCorrection();
-    fMaxCoreError = 60.;
-    fMaxWobbleOffset = 1.e5;
 
     fEventStatus = true;
 
 // random number generator is needed only for random selection of events (optional)
     fRandom = new TRandom3();
+    setSelectRandom( fTLRunParameter->fSelectRandom, fTLRunParameter->fSelectRandomSeed );
 
     fDeadTime = new VDeadTime();
     fDeadTime->defineHistograms();
@@ -48,7 +48,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
     fOutFile = 0;
 
     fNMethods = 0;
-    fMethod = 0;
+    fMethod = fTLRunParameter->rec_method;
 
     fIsMC = false;
     fMCEnergy = 0.;
@@ -129,7 +129,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
     hisList->Add( hWE0trig );
 
 // time cuts
-    fMaxTotalTime = 1.e9;
+    fMaxTotalTime = fTLRunParameter->fMaxRunTime;
     fTotalTime = 0.;
     fTotalTime0 = 0.;
 
@@ -350,9 +350,9 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
        }
     }
 
+    fimg2_ang = fshowerpars->img2_ang[fMethod];
     if( !bShort && !fShortTree )
     {
-        fimg2_ang = fshowerpars->img2_ang[fMethod];
         fRA = fshowerpars->ra[fMethod];
         fDec = fshowerpars->dec[fMethod];
         fstdS = fshowerpars->stds[fMethod];
@@ -842,7 +842,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "NTtype", &fNTelTypes, "NTtype/i" );
     fOTree->Branch( "NImages_Ttype", NImages_Ttype, "NImages_Ttype[NTtype]/i" );
 
-    if( !fShortTree ) fOTree->Branch( "img2_ang", &fimg2_ang, "img2_ang/D" );
+    fOTree->Branch( "img2_ang", &fimg2_ang, "img2_ang/D" );
     fOTree->Branch( "RecID", &fMethod, "RecID/I" );
     fOTree->Branch( "Ze", &fZe, "Ze/D" );
     fOTree->Branch( "Az", &fAz, "Az/D" );
@@ -1062,7 +1062,7 @@ void VTableLookupDataHandler::printCutStatistics()
     cout << "\t removed by cut on core misreconstruction: \t\t" << fNStats_CoreErrorCut;
     cout << " (fraction removed/# of events left: " << (float)fNStats_CoreErrorCut/(float)fNStats_All << "; " << nTOT << ")" << endl;
     nTOT = nTOT - fNStats_WobbleCut + fNStats_CoreErrorCut;
-    cout << "\t removed by wobble cut (<" << fMaxWobbleOffset << "): \t\t" << fNStats_WobbleCut;
+    cout << "\t removed by wobble cut (<" << fTLRunParameter->fTableFillingCut_WobbleCut_max << "): \t\t" << fNStats_WobbleCut;
     cout << " (fraction removed/# of events left: " << (float)fNStats_WobbleCut/(float)fNStats_All << "; " << nTOT << ")" << endl;
     nTOT = nTOT - fNStats_WobbleMinCut + fNStats_WobbleCut;
     cout << "\t removed by MC wobble min cut (>" << fMC_distance_to_cameracenter_min << "): \t\t" << fNStats_WobbleMinCut;
@@ -1243,17 +1243,6 @@ void VTableLookupDataHandler::copyMCHistograms()
 	   iMC_his->Write();
         }
    }
-}
-
-
-/*!
-  set evndisp method array reconstruction method number (usually 0)
-
-  \param iMeth method number (0 or 1)
-*/
-void VTableLookupDataHandler::setMethod( int iMeth )
-{
-    fMethod = iMeth;
 }
 
 
@@ -1452,7 +1441,6 @@ void VTableLookupDataHandler::resetAll()
     fEventStatus = true;
     runNumber = 0;
     eventNumber = 0;
-    fNEntries = 0;
     MJD = 0;
     time = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fTelElevation[i] = 0.;
@@ -1560,7 +1548,6 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fEmissionHeightT[i] = 0.;
     fSizeSecondMax = 0.;
 
-    fMaxTotalTime = 1.e9;
     fTotalTime = 0.;
     fTotalTime0 = 0.;
 
@@ -1589,7 +1576,7 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 // count all events
     fNStats_All++;
 // require at least two images
-    if( fNImages < 2 )
+    if( fNImages < (int)fTLRunParameter->fTableFillingCut_NImages_min )
     {
        fNStats_NImagesCut++;
        return false;
@@ -1608,14 +1595,15 @@ bool VTableLookupDataHandler::cut( bool bWrite )
     if( bWrite )
     {
 // core error cut
-        if( ((fXcore-fMCxcore)*(fXcore-fMCxcore) + (fYcore-fMCycore)*(fYcore-fMCycore) ) > fMaxCoreError * fMaxCoreError )
+        if( ((fXcore-fMCxcore)*(fXcore-fMCxcore) + (fYcore-fMCycore)*(fYcore-fMCycore) ) 
+	     > fTLRunParameter->fTableFillingCut_CoreError_max*fTLRunParameter->fTableFillingCut_CoreError_max )
 	{
 	   fNStats_CoreErrorCut++;
 	   return false;
         }
     } 
 
-    if( getWobbleOffset() > fMaxWobbleOffset )
+    if( getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
     {
        fNStats_WobbleCut++;
        return false;

@@ -38,8 +38,9 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     fSpectralIndex = 2.0;
     fWobbleOffset = 500;
     fNoiseLevel = 250;
-    fmaxcoreerror = 1.e6;
-    fmaxwobbleoffset = 15.;
+    fTableFillingCut_CoreError_max = 1.e6;
+    fTableFillingCut_NImages_min = 2;
+    fTableFillingCut_WobbleCut_max = 15.;
     fmaxlocaldistance = 99.;
     fmaxdist = 50000.;
     fminsize = 0.;
@@ -193,7 +194,11 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
         }
         else if( iTemp.find( "-maxCoreError" ) < iTemp.size() )
         {
-            fmaxcoreerror = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+            fTableFillingCut_CoreError_max = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }
+        else if( iTemp.find( "-minImages" ) < iTemp.size() )
+        {
+            fTableFillingCut_NImages_min = (unsigned int)atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
         else if( iTemp.find( "-spectralIndex" ) < iTemp.size() )
         {
@@ -349,7 +354,8 @@ void VTableLookupRunParameter::print( int iP )
         cout << " zenith " << ze << ", direction offset " << fWobbleOffset << " [deg], ";
         cout << "noise level " << fNoiseLevel << ", spectral index " << fSpectralIndex << endl;
         if( fWrite1DHistograms ) cout << "write 1D histograms to disk" << endl;
-        cout << "\t maximum allowed uncertainty in core reconstruction [m]: " << fmaxcoreerror << endl;
+	cout << "\t minimum telescope multiplicity: " << fTableFillingCut_NImages_min << endl;
+        cout << "\t maximum allowed uncertainty in core reconstruction [m]: " << fTableFillingCut_CoreError_max << endl;
 	cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <" << fMC_distance_to_cameracenter_max << " [deg]" << endl;
     }
     if( iP == 2 ) cout << "zenith angle " << ze << " [deg], wobble offset " << fWobbleOffset/100. << " [deg], noise level " << fNoiseLevel << endl;

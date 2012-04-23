@@ -809,7 +809,7 @@ void VGammaHadronCuts::printCutSummary()
     cout << endl;
     cout << "Fiducial area (camera) < " << fArrayxyoff_max << " deg, ";
     cout << " stereo reconstruction: " << fArrayChi2_min << " <= sChi2 <= " << fArrayChi2_max << endl;
-    cout << "Energy reconstrution: ";
+    cout << "Energy reconstruction: ";
     cout << fArrayEChi2_min << " <= EChi2 <= " << fArrayEChi2_max;
     cout << ", " << fArraydE_min << " < dE < " << fArraydE_max;
     cout << ", " << fArrayErec_min << " < Erec < " << fArrayErec_max << endl;

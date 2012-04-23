@@ -66,8 +66,7 @@ class VTableLookupDataHandler
         TRandom3 *fRandom;
 
 // MC parameter
-        double fMaxCoreError;
-        double fMaxWobbleOffset;
+	unsigned int fMinImages;
 	double fMC_distance_to_cameracenter_min;
 	double fMC_distance_to_cameracenter_max;
 
@@ -166,6 +165,7 @@ class VTableLookupDataHandler
         void   resetImageParameters();
         void   resetImageParameters( unsigned int i );
         void   setEventWeightfromMCSpectrum();
+        void   setSelectRandom( double iX, int iS );
 
     public:
 
@@ -330,7 +330,6 @@ class VTableLookupDataHandler
         unsigned int getMaxNbrTel() const { return VDST_MAXTELESCOPES; }
         int* getNtubes() { return fntubes; }
         int* getNtubesBNI() { return fntubesBNI; }
-        double getMaxCoreError() { return fMaxCoreError; }
         double* getMSCWtel() { return ftmscw; }
         double* getMSCLtel() { return ftmscl; }
         double getMCMinEnergy() { return fMCMinEnergy; }
@@ -387,17 +386,10 @@ class VTableLookupDataHandler
         void setMSCWT( int i, double iMSWC, float iMSWC_T = -99. ) { ftmscw[i] = iMSWC; ftmscw_sigma[i] = iMSWC_T; }
         void setMWR( double iM ) { fmwr = iM; }
         void setMLR( double iM ) { fmlr = iM; }
-        void setMaxCoreError( double ie ) { fMaxCoreError = ie; }
-        void setMaxWobbleOffset( double iD ) { fMaxWobbleOffset = iD; }
-        void setMaxTotalTime( double t ) { fMaxTotalTime = t; }
-        void setMaxEntries( int t ) { fNEntries = t; }
 	void setMCDistanceToCameraCenter( double iMin, double iMax ) { fMC_distance_to_cameracenter_min = iMin; fMC_distance_to_cameracenter_max = iMax; }
         void setNEntries( int iN );
 	void setDebug( bool iD ) { fDebug = iD; }
         bool setOutputFile( string, string, string );
-        void setSelectRandom( double iX, int iS );
-        void setShortTree( bool iB ) { fShortTree = iB; }
-        void setWriteMCTree( bool iB ) { bWriteMCPars = iB; }
         bool terminate( TNamed* );                //!< write everything to disk
 };
 #endif
