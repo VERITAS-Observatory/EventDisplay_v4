@@ -167,7 +167,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
         }
 // get laser run number (will exit after printing this)
-        else if( iTemp.find( "getlaserrunnumber" ) < iTemp.size() )
+        else if( iTemp.find( "getlaserrunnumber" ) < iTemp.size() && iTemp != "run" )
 	{
 	   fGetLaserRunNumber = true;
         }
@@ -325,7 +325,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fPlotPaper = true;
         }
 // set run number from command line (default: get it from source file name)
-        else if( iTemp.rfind( "runnum" ) < iTemp.size() )
+        else if( iTemp.rfind( "runnum" ) < iTemp.size() || iTemp == "run" )
         {
             fRunPara->frunnumber = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
@@ -599,14 +599,6 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fRemoveIsolatedPixel = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
             i++;
         }
-/*        else if( iTemp.find( "fixwindowstart" ) < iTemp.size() && !(iTemp.find( "nofixwindowstart" ) < iTemp.size()) )
-        {
-            fRunPara->fFixWindowStart = true;
-        }
-        else if( iTemp.find( "nofixwindowstart" ) < iTemp.size() )
-        {
-            fRunPara->fFixWindowStart = false;
-        } */
         else if( iTemp.find( "smoothdead" ) < iTemp.size() )
         {
             fRunPara->fSmoothDead = true;
@@ -710,7 +702,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         }
         else if( i > 1 )
         {
-            cout << "unknown run parameter: " << iTemp << endl;
+            cout << "unknown command line parameter: " << iTemp << endl;
             cout << "exiting..." << endl;
             exit( -1 );
         }
