@@ -183,6 +183,7 @@ void VGammaHadronCuts::resetCutValues()
     fArrayxyoff_MC_max = 100.;
     fArrayCore_min = -99.;
     fArrayCore_max = 99999.;
+    fArrayCoreTel_max = 1.e99;
     fArraydE_min = -99.;
     fArraydE_max = 1.e12;
     fArrayEChi2_min = 0.;
@@ -431,6 +432,10 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                 fArrayxyoff_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fArrayxyoff_max=(atof(temp.c_str()));
+            }
+	    if( temp == "telcoredistance" )
+	    {
+	       if( !is_stream.eof() ) is_stream >> fArrayCoreTel_max;
             }
             if( temp == "arraycore" )
             {
@@ -753,7 +758,6 @@ void VGammaHadronCuts::printCutSummary()
 	cout << "Shape cuts: ";
         cout << fArrayMSCW_min << " < MSCW < " << fArrayMSCW_max;
         cout << ", " << fArrayMSCL_min << " < MSCL < " << fArrayMSCL_max << ", ";
-        cout << "core distance < " << fArrayCore_max << " m";
     }
 // mean cuts
     else if( fGammaHadronCutSelector % 10 == 1 )
@@ -761,7 +765,6 @@ void VGammaHadronCuts::printCutSummary()
 	cout << "Shape cuts: ";
         cout << fArrayWidth_min  << " < mean width < " << fArrayWidth_max;
         cout << ", " << fArrayLength_min << " < mean length < " << fArrayLength_max << ", ";
-        cout << "core distance < " << fArrayCore_max << " m";
     }
 // mean scaled cuts
     else if( fGammaHadronCutSelector % 10 == 3 )
@@ -769,8 +772,9 @@ void VGammaHadronCuts::printCutSummary()
 	cout << "Shape cuts: ";
         cout << fArrayMSW_min << " < MWR < " << fArrayMSW_max;
         cout << ", " << fArrayMSL_min << " < MLR < " << fArrayMSL_max << ", ";
-        cout << "core distance < " << fArrayCore_max << " m";
     }
+    cout << "core distance < " << fArrayCore_max << " m";
+    cout << " (max distance to a telescopes " << fArrayCoreTel_max << " m)";
 // probability cuts
     if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
     {
@@ -963,15 +967,20 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
 /////////////////////////////////////////////////////////////////////////////////
 // check core positions
-// (average distance to telescopes)
+// (average distance to telescopes with images)
     double iR = 0.;
+    double iR_min = 1.e99;
     double iNTR = 0.;
     for( unsigned int i = 0; i < fNTel; i++ )
+    for( int i = 0; i < fData->NImages; i++ )
     {
-        if( fData->R[i] > 0. )
+	if( fData->ImgSel_list[i] >= fNTel ) continue;
+
+        if( fData->R[fData->ImgSel_list[i]] > 0. )
         {
-            iR += fData->R[i];
+            iR += fData->R[fData->ImgSel_list[i]];
             iNTR++;
+	    if( fData->R[fData->ImgSel_list[i]] < iR_min ) iR_min = fData->R[fData->ImgSel_list[i]];
         }
     }
     if( iNTR > 0. ) iR /= iNTR;
@@ -985,6 +994,16 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
         }
         return false;
     }
+    if( iR_min > fArrayCoreTel_max )
+    {
+        if( bCount )
+        {
+	    fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
+	    fStats->updateCutCounter( VGammaHadronCutsStatistics::eCorePos );
+        }
+        return false;
+    }
+
 
 /////////////////////////////////////////////////////////////////////////////////
 // apply image selection cuts (check which telescopes were used in the reconstruction)

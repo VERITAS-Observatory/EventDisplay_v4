@@ -210,6 +210,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fArrayxyoff_max;
         double fArrayCore_min;
         double fArrayCore_max;
+	double fArrayCoreTel_max;
         double fArraydE_min;
         double fArraydE_max;
         double fArrayEChi2_min;
@@ -311,6 +312,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,29);
+        ClassDef(VGammaHadronCuts,30);
 };
 #endif
