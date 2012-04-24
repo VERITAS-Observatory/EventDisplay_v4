@@ -377,9 +377,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
        gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelative2D, 0, "mean", 1, -10., 1. );
        setGraphPlottingStyle( gEnergyBias_Mean );
        gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelative2D, 0, "median", 1, -10., 1. );
-       setGraphPlottingStyle( gEnergyBias_Median );
+       setGraphPlottingStyle( gEnergyBias_Median, 1, 1., 7 );
        gEnergyLogBias_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
-       setGraphPlottingStyle( gEnergyLogBias_Mean );
+       setGraphPlottingStyle( gEnergyLogBias_Mean, 1, 1., 7 );
        gEnergyLogBias_Median = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "median", 1, -10. );
        setGraphPlottingStyle( gEnergyLogBias_Median ); 
 // get cut efficiencies
@@ -494,6 +494,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, dou
     setGraphPlottingStyle( gEnergyResolution );
 
     int zz = 0;
+    double e_res = 0.;
     for( int b = 1; b <= iP->GetNbinsX(); b++ )
     {
         TH1D *h = iP->ProjectionY( "p_x", b, b+1 );
@@ -502,12 +503,31 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, dou
 // calculate quantiles
             double xq[3];
 	    double yq[3];
-	    xq[0] = 0.5-0.3174;
+	    xq[0] = 0.5-0.6826895/2.;
 	    xq[1] = 0.50;
-	    xq[2] = 0.5+0.3174;
+	    xq[2] = 0.5+0.6826895/2.;
 	    h->GetQuantiles( 3, yq, xq );
             if( iP->GetXaxis()->GetBinCenter( b ) < iMinEnergy ) continue;
-	    gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), (yq[2]-yq[0])*0.5 );
+// +-1 sigma around median
+	    e_res = (yq[2]-yq[0])*0.5;
+// 68% distribution around 1 (expected value)	    
+            TH1D hh( "h", "", h->GetNbinsX(), 0., h->GetXaxis()->GetXmax()-1. );
+	    double bb_ref = 1.;
+	    for( int bb = 1; bb < h->GetNbinsX(); bb++ )
+	    {
+	        if( h->GetBinCenter( bb ) < bb_ref )
+		{
+		   hh.Fill( bb_ref-h->GetBinCenter( bb ), h->GetBinContent( bb ) );
+                }
+		else
+		{
+		   hh.Fill( h->GetBinCenter( bb ) - bb_ref, h->GetBinContent( bb ) );
+                }
+            }
+	    xq[0] = 0.68;
+	    hh.GetQuantiles( 1, yq, xq );
+            e_res = yq[0];
+	    gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), e_res );
 	    if( h->GetEntries() > 1. )
 	    {
 		 gEnergyResolution->SetPointError( zz, 0., h->GetRMS()/sqrt(h->GetEntries()-1. ) );
