@@ -393,8 +393,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
 // read only those telescope which were part of the reconstruction
         if( fReadTPars )
         {
-            if( fIsMC ) fMCEnergyArray[i] = fshowerpars->MCe0;
-
             ftpars[i]->GetEntry( fEventCounter );
 
             fdist[i] = ftpars[i]->dist;
@@ -455,7 +453,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
         }
         else
         {
-            if( fIsMC ) fMCEnergyArray[i] = 0.;
             resetImageParameters( i );
         }
         fweight[i] = 1.;
@@ -529,7 +526,7 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         cout << "\t telescope " << i+1 << "\t";
-	cout << fTelX[i] << "\t" << fTelY[i] << "\t" << fTelZ[i] << "\t";
+	cout << "x:" << fTelX[i] << " [m]\ty:" << fTelY[i] << " [m]\tz:" << fTelZ[i] << " [m]\t";
 	cout << "type " << fTel_type[i] << " (type counter " << getTelType_arraycounter(i) << ")";
 	cout << endl;
     }
@@ -1130,6 +1127,7 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
 
         fOutFile->Close();
         cout << "...outputfile closed" << endl;
+	cout << "(" << fOutFile->GetName() << ")" << endl;
     }
 
     return true;
@@ -1426,13 +1424,19 @@ double VTableLookupDataHandler::getZe()
 
 
 /*!
-  return copy of fMCEnergyArray (mscw modifies it!)
+
+  return copy of fMCEnergy as an array 
+  
+  (note that mscw modifies these values)
+
 */
 double* VTableLookupDataHandler::getMCEnergyArray()
 {
-    memcpy( fMCEnergyArrayCopy, fMCEnergyArray, sizeof( fMCEnergyArrayCopy ) );
-
-    return fMCEnergyArrayCopy;
+    for( unsigned int i = 0; i < fNTel; i++ )
+    {
+       fMCEnergyArray[i] = getMCEnergy();
+    }
+    return fMCEnergyArray;
 }
 
 

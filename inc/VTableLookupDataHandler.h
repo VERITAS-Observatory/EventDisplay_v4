@@ -218,7 +218,6 @@ class VTableLookupDataHandler
 //
 // {1}
         double fMCEnergyArray [VDST_MAXTELESCOPES];
-        double fMCEnergyArrayCopy [VDST_MAXTELESCOPES];
         float  fmeanPedvar_ImageT[VDST_MAXTELESCOPES];
         float  fmeanPedvar_Image;
         double fdist     [VDST_MAXTELESCOPES];
@@ -326,7 +325,7 @@ class VTableLookupDataHandler
         double *getLength() { return flength; }
 	double *getLength( ULong64_t iTelType );
 	map<ULong64_t, unsigned int > getList_of_Tel_type() { return fList_of_Tel_type; }
-        unsigned int                  getNTel_type( ULong64_t t ) { if( fList_of_Tel_type.find(t) != fList_of_Tel_type.end() ) return fList_of_Tel_type[t]; else return 0; }
+        unsigned int getNTel_type( ULong64_t t ) { if( fList_of_Tel_type.find(t) != fList_of_Tel_type.end() ) return fList_of_Tel_type[t]; else return 0; }
         unsigned int getMaxNbrTel() const { return VDST_MAXTELESCOPES; }
         int* getNtubes() { return fntubes; }
         int* getNtubesBNI() { return fntubesBNI; }
