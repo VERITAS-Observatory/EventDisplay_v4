@@ -496,7 +496,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
 	     (180.0/3.1415)*atan2(getDetectorGeo()->getTelYpos()[tel],getDetectorGeo()->getTelXpos()[tel]));
 
     //Telescope effective collection area
-    float telarea=94.0; //telescope area could be from the configuration file
     //Number of pixels 
     rtn.scope[tel].npix=fData->getDetectorGeo()->getNChannels()[tel];
 
@@ -521,7 +520,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       rtn.scope[tel].ycam[pix]=fData->getDetectorGeo()->getY()[pix];
 
       //Excess noise
-      rtn.scope[tel].exnoise[pix]=0.35;
+      rtn.scope[tel].exnoise[pix]=extra_noise;
       //Pixel dead or alive
       rtn.scope[tel].pixinuse[pix]=FROGS_OK;
       if(fData->getDead()[pix]!=0)
@@ -532,9 +531,8 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       float tmppixarea=
 	fData->getDetectorGeo()->getTubeRadius_MM(tel)[pix]*FROGS_DEG_PER_RAD/foclen;//modified by sv
       tmppixarea=FROGS_PI*tmppixarea*tmppixarea;
-      rtn.scope[tel].telpixarea[pix]=telarea*tmppixarea*1.0;
+      rtn.scope[tel].telpixarea[pix]=telarea*tmppixarea*cone_eff;
 
-      float dc2pe=5.3;  //This is the number of d.c. in one p.e.
       //Initialize the pixel signal and pedestal width to zero
       rtn.scope[tel].q[pix]=0;
       rtn.scope[tel].ped[pix]=0;

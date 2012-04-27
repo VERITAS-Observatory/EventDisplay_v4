@@ -73,6 +73,12 @@
 
 #define frogs_pedwidth_correction 1.00
 
+// Conversion values for table
+#define cone_eff    0.81 // Wintson Cone Collection efficency NOTE: CARE sims have this set = 1
+#define telarea     94.0 // Mirror Effective Area m^2
+#define extra_noise 0.35 // PMT electronic noise
+#define dc2pe       5.3  // d.c. to p.e. conversion
+
 // Frogs Calibration Correction 2012 03 13
 
 #define lmuMAX  2.0

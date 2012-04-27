@@ -419,9 +419,15 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	}//End of background/image region test
       } //End of test on pixel viability
     }//End of pixel loop
-    tmplanlz->tel_goodnessImg[tel] /= sqrt(2.0*(telnpix-(tmplt->ndim+1)));
-    tmplanlz->tel_goodnessBkg[tel] /= sqrt(2.0*(telnpix-(tmplt->ndim+1)));
+    tmplanlz->tel_goodnessImg[tel] /= sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
+    tmplanlz->tel_goodnessBkg[tel] /= sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
  }//End of telescope loop
+
+  for( int itel=0; itel<d->ntel; itel++ )
+  {
+    if( tmplanlz->tel_goodnessImg[itel] < 1.0e-18 )  tmplanlz->tel_goodnessImg[itel] = FROGS_BAD_NUMBER;
+    if( tmplanlz->tel_goodnessBkg[itel] < 1.0e-18 )  tmplanlz->tel_goodnessImg[itel] = FROGS_BAD_NUMBER;
+  }
 
   //Finilize the background goodness calculation (*** See note)
   if(tmplanlz->npix_bkg>tmplt->ndim+1) 
