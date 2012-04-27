@@ -36,6 +36,8 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 
 	float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
 
+	bool  fUseSelectedImagesOnly;
+
         double fMSCWSizecorrection;
         double fMSCLSizecorrection;
         double fEnergySizecorrection;
@@ -80,6 +82,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef(VTableLookupRunParameter,16);
+        ClassDef(VTableLookupRunParameter,17);
 };
 #endif

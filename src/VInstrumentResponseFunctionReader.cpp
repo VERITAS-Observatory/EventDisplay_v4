@@ -503,21 +503,21 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, dou
 // calculate quantiles
             double xq[3];
 	    double yq[3];
-	    xq[0] = 0.5-0.6826895/2.;
-	    xq[1] = 0.50;
+/*	    xq[0] = 0.5-0.6826895/2.;
+	    xq[1] = 0.5;
 	    xq[2] = 0.5+0.6826895/2.;
 	    h->GetQuantiles( 3, yq, xq );
             if( iP->GetXaxis()->GetBinCenter( b ) < iMinEnergy ) continue;
 // +-1 sigma around median
-	    e_res = (yq[2]-yq[0])*0.5;
-// 68% distribution around 1 (expected value)	    
+	    e_res = (yq[2]-yq[0])*0.5; */
+// 68% distribution around 1 (bb_ref, expected value)	    
             TH1D hh( "h", "", h->GetNbinsX(), 0., h->GetXaxis()->GetXmax()-1. );
-	    double bb_ref = 1.;
-	    for( int bb = 1; bb < h->GetNbinsX(); bb++ )
+	    double bb_ref = 1.; 
+	    for( int bb = 1; bb <= h->GetNbinsX(); bb++ )
 	    {
 	        if( h->GetBinCenter( bb ) < bb_ref )
 		{
-		   hh.Fill( bb_ref-h->GetBinCenter( bb ), h->GetBinContent( bb ) );
+		   hh.Fill( bb_ref - h->GetBinCenter( bb ), h->GetBinContent( bb ) );
                 }
 		else
 		{

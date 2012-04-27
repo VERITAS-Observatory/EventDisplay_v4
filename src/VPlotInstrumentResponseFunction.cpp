@@ -306,14 +306,17 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
        fData[iDataSetID]->hERecMatrix->GetYaxis()->SetTitleOffset( 1.2 );
        fData[iDataSetID]->hERecMatrix->SetStats( 0 );
        if( fData[iDataSetID]->hERecMatrix->GetEntries() > 0. ) iEnergyReconstructionMatrixCanvas->SetLogz( 1 );
-       fData[iDataSetID]->hERecMatrix->SetXTitle( "log_{10} energy_{MC} [TeV]" );
-       fData[iDataSetID]->hERecMatrix->SetYTitle( "log_{10} energy_{rec} [TeV]" );
+       fData[iDataSetID]->hERecMatrix->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+       fData[iDataSetID]->hERecMatrix->SetYTitle( "log_{10} energy_{MC} [TeV]" );
        fData[iDataSetID]->hERecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "X" );
        fData[iDataSetID]->hERecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "Y" );
        fData[iDataSetID]->hERecMatrix->Draw( "colz" );
 
 // diagonal
-       TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
+       TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ),
+                              log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
+			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 
+			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
        iL->SetLineStyle( 2 );
        iL->Draw();
     }

@@ -522,9 +522,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	     if( bDirectionCuts )
 	     {
 // mean width/length/distance histograms
-	        fHisto[fHisCounter]->hmean_width->Fill(  fCuts->getMeanWidth() );
-	        fHisto[fHisCounter]->hmean_length->Fill( fCuts->getMeanLength() );
-	        fHisto[fHisCounter]->hmean_dist->Fill(   fCuts->getMeanDistance() );
+	        fHisto[fHisCounter]->hmean_width->Fill(  fCuts->getMeanImageWidth() );
+	        fHisto[fHisCounter]->hmean_length->Fill( fCuts->getMeanImageLength() );
+	        fHisto[fHisCounter]->hmean_dist->Fill(   fCuts->getMeanImageDistance() );
 	        if( fDataRun->MSCW > -50. ) fHisto[fHisCounter]->hmscw->Fill( fDataRun->MSCW );
 	        if( fDataRun->MSCL > -50. ) fHisto[fHisCounter]->hmscl->Fill( fDataRun->MSCL );
 	        if( fDataRun->MSCW > -50. && fDataRun->MSCL > -50. ) fHisto[fHisCounter]->hmsc->Fill( fDataRun->MSCW, fDataRun->MSCL );

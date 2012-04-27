@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
@@ -246,16 +247,17 @@ namespace VStatistics
 
     weighted by cos ze
 */
-inline double interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos = false, double iLimitforInterpolation = 0.5 )
+inline double interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos = false,
+                           double iLimitforInterpolation = 0.5, double iMinValidValue = -90. )
 {
 // don't interpolate if both values are not valid
-    if( w1 < -90. && w2 < -90. ) return -99.;
+    if( w1 < iMinValidValue && w2 < iMinValidValue ) return -99.;
 
 // same zenith angle, don't interpolate
     if( fabs( ze1 - ze2 ) < 1.e-3 )
     {
-       if( w1 < -90. )      return w2;
-       else if( w2 < -90. ) return w1;
+       if( w1 < iMinValidValue )      return w2;
+       else if( w2 < iMinValidValue ) return w1;
        return (w1+w2)/2.;
     }
 
@@ -278,12 +280,12 @@ inline double interpolate( double w1, double ze1, double w2, double ze2, double 
 
 // one of the values is not valid:
 // return valid value only when f1/f2 > 0.5 (this value is almost randomly chosen)
-    if( w1 > -90. && w2 < -90. )
+    if( w1 > iMinValidValue && w2 < iMinValidValue )
     {
         if( f1 > iLimitforInterpolation ) return w1;
         else           return -99.;
     }
-    else if( w1 < -90. && w2 > -90. )
+    else if( w1 < iMinValidValue && w2 > iMinValidValue )
     {
         if( f2 > iLimitforInterpolation ) return w2;
         else          return -99.;
@@ -291,6 +293,92 @@ inline double interpolate( double w1, double ze1, double w2, double ze2, double 
 
     return (w1*f1+w2*f2);
 }
+
+/*
+
+   mean
+
+*/
+  inline double getMean( vector< double >& x )
+  {
+     double sum = 0.;
+     for( unsigned int i = 0; i < x.size(); i++ ) sum += x[i];
+     if( x.size() > 0. ) return sum/( (double)x.size() );
+
+     return -999.;
+  }
+
+/*
+
+  weighted mean
+
+*/
+  inline double getWeightedMean( vector< double >& x, vector< double >& w )
+  {
+     if( x.size() != w.size() ) return -999.;
+
+     double sum = 0.;
+     double weight = 0.;
+
+     for( unsigned int i = 0; i < x.size(); i++ )
+     {
+        sum += x[i] * w[i];
+	weight += w[i];
+     }
+     if( weight > 0. ) return sum/( weight );
+
+     return -999.;
+  }
+
+/*
+
+  median
+
+*/
+  inline double getMedian( vector< double > x )
+  {
+     sort( x.begin(), x.end() );
+
+     if( x.size() % 2 == 0 ) 
+     {
+	 unsigned int l = x.size()/2;
+         return 0.5*(x[l]+x[l+1]);
+     }
+
+     return x[x.size()/2];
+  }
+
+/*
+
+   median absolute deviation
+
+   (note for a normal distribution holds sigma = 1.4826 * medianAbsoluteDeviation) 
+
+*/
+  inline double getMedianAbsoluteDeviation( vector< double > x )
+  {
+     double iMedian = getMedian( x );
+     vector< double > MAD( x.size(), 0. );
+     for( unsigned int i = 0; i < MAD.size(); i++ ) MAD[i] = TMath::Abs( x[i] - iMedian );
+
+     return getMedian( MAD );
+  }
+
+/*
+
+   mean absolute error
+
+*/
+  inline double getMeanAbsoluteError( vector< double >& x )
+  {
+     double mean = getMean( x );
+     double iAbs = 0.;
+     for( unsigned int i = 0; i < x.size(); i++ ) iAbs += TMath::Abs( x[i] - mean );
+     if( x.size() > 0. ) return iAbs/( (double)x.size() );
+
+     return 0.;
+  }
+
 
 }
 #endif

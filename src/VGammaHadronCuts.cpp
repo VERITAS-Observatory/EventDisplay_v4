@@ -66,9 +66,9 @@ VGammaHadronCuts::VGammaHadronCuts()
     fDataDirectory = "";
 
 // mean width/length/distance
-    fMeanWidth = 0.;
-    fMeanLength = 0.;
-    fMeanDistance = 0.;
+    fMeanImageWidth = 0.;
+    fMeanImageLength = 0.;
+    fMeanImageDistance = 0.;
 
 // probabilities cuts
     fProbabilityCut_File = 0;
@@ -151,89 +151,73 @@ void VGammaHadronCuts::resetCutValues()
     fSize_max=1.e99;
 
 // array cuts
-    fArrayDistance_min=-100;
-    fArrayDistance_max=100;
-    fArrayTheta2_min=-100;
-    fArrayTheta2_max=100;
-    fArrayChi2_min=-1e6;
-    fArrayChi2_max=1e99;
-    fArrayLength_min=-100;
-    fArrayLength_max=100;
-    fArrayWidth_min=-100;
-    fArrayWidth_max=100;
-    fArrayAsymm_min=-100;
-    fArrayAsymm_max=100;
-    fArraySize_min=-1000;
-    fArraySize_max=1e99;
-    fArrayNtubes_min = 4;
-    fArrayNtubes_max = 5000;
-    fArrayNTel_min = 2;                           //!< use here >= !!!!
-    fArrayNTel_max = 100000;
-    fArrayMSCW_min = -1.;
-    fArrayMSCW_max = 1.;
-    fArrayMSCL_min = -1.;
-    fArrayMSCL_max = 1.;
-    fArrayMSW_min = -1.;
-    fArrayMSW_max = 10.;
-    fArrayMSL_min = -1.;
-    fArrayMSL_max = 10.;
-    fArrayxyoff_min = -1.;
-    fArrayxyoff_max = 100.;
-    fArrayxyoff_MC_min = -100.;
-    fArrayxyoff_MC_max = 100.;
-    fArrayCore_min = -99.;
-    fArrayCore_max = 99999.;
-    fArrayCoreTel_max = 1.e99;
-    fArraydE_min = -99.;
-    fArraydE_max = 1.e12;
-    fArrayEChi2_min = 0.;
-    fArrayEChi2_max = 99999.;
-    fArrayErec_min = 0.;
-    fArrayErec_max = 1.e10;
-    fArrayEmmission_min = 0.;
-    fArrayEmmission_max = 1.e12;
-    fArrayNImages_min = 0;
-    fArrayNImages_max = 100000;
+    fCut_Theta2_min = -100.;
+    fCut_Theta2_max = 100.;
+    fCut_Chi2_min = -1.e6;
+    fCut_Chi2_max = 1.e99;
+    fCut_MeanImageDistance_min = -100;
+    fCut_MeanImageDistance_max = 100;
+    fCut_MeanImageLength_min=-100;
+    fCut_MeanImageLength_max=100;
+    fCut_MeanImageWidth_min=-100;
+    fCut_MeanImageWidth_max=100;
+    fCut_Size_min=-1000;
+    fCut_Size_max=1e99;
+    fCut_Ntubes_min = 4;
+    fCut_Ntubes_max = 50000;
+    fCut_MSCW_min   = -1.;
+    fCut_MSCW_max   = 1.;
+    fCut_MSCL_min   = -1.;
+    fCut_MSCL_max   = 1.;
+    fCut_MSW_min    = -1.;
+    fCut_MSW_max    = 10.;
+    fCut_MSL_min    = -1.;
+    fCut_MSL_max    = 10.;
+    fCut_CameraFiducialSize_min = -1.;
+    fCut_CameraFiducialSize_max = 100.;
+    fCut_CameraFiducialSize_MC_min = -100.;
+    fCut_CameraFiducialSize_MC_max = 100.;
+    fCut_dE_min = -99.;
+    fCut_dE_max = 1.e12;
+    fCut_EChi2_min = 0.;
+    fCut_EChi2_max = 99999.;
+    fCut_Erec_min = 0.;
+    fCut_Erec_max = 1.e10;
+    fCut_Emmission_min = 0.;
+    fCut_Emmission_max = 1.e12;
+    fCut_NImages_min = 0;
+    fCut_NImages_max = 100000;
 
-    fArraySizeSecondMax_min = -1000;  
-    fArraySizeSecondMax_max = 1.e99; 
+    fCut_AverageCoreDistanceToTelescopes_min = -99.;
+    fCut_AverageCoreDistanceToTelescopes_max = 99999.;
+    fCut_MinimumCoreDistanceToTelescopes_max = 1.e99;
+
+    fCut_SizeSecondMax_min = -1000;  
+    fCut_SizeSecondMax_max = 1.e99; 
 
     fProbabilityCut = 0.5;
 
     fOrbitalPhase_min = -1.;
     fOrbitalPhase_max = 1.e99;
 
-    fCoreX_min = -1.e10;
-    fCoreX_max =  1.e10;
-    fCoreY_min = -1.e10;
-    fCoreY_max =  1.e10;
-    fCoreEdge = 0.;
+    fCut_CoreDistanceToArrayCentreX_min = -1.e10;
+    fCut_CoreDistanceToArrayCentreX_max =  1.e10;
+    fCut_CoreDistanceToArrayCentreY_min = -1.e10;
+    fCut_CoreDistanceToArrayCentreY_max =  1.e10;
+    fCut_CoreDistanceEdgeSize = 0.;
 }
 
-
-bool VGammaHadronCuts::readCuts( string i_cutfilename )
-{
-    return readCuts( i_cutfilename, true );
-}
-
-
-bool VGammaHadronCuts::readCuts(string i_cutfilename, bool iPrint )
-{
-    if( iPrint ) return readCuts( i_cutfilename, 1 );
-
-    return readCuts( i_cutfilename, 0 );
-}
 
 /*
 
     read cuts from a text file
 
 */
-bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
+bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 {
 // reset trigger vector
     fNLTrigs = 0;
-    fArrayLTrig.clear();
+    fCut_LTrig.clear();
 
 // open text file
     ifstream is;
@@ -315,46 +299,39 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
             if( temp == "arraywidth" )
             {
                 is_stream >> temp;
-                fArrayWidth_min=(atof(temp.c_str()));
+                fCut_MeanImageWidth_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayWidth_max=(atof(temp.c_str()));
+                fCut_MeanImageWidth_max=(atof(temp.c_str()));
             }
             if( temp == "arraylength" )
             {
                 is_stream >> temp;
-                fArrayLength_min=(atof(temp.c_str()));
+                fCut_MeanImageLength_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayLength_max=(atof(temp.c_str()));
-            }
-            if( temp == "arrayasymm" )
-            {
-                is_stream >> temp;
-                fArrayAsymm_min=(atof(temp.c_str()));
-                is_stream >> temp;
-                fArrayAsymm_max=(atof(temp.c_str()));
+                fCut_MeanImageLength_max=(atof(temp.c_str()));
             }
             if( temp == "arrayntubes" )
             {
                 is_stream >> temp;
-                fArrayNtubes_min = (atoi(temp.c_str()));
+                fCut_Ntubes_min = (atoi(temp.c_str()));
                 is_stream >> temp;
-                fArrayNtubes_max =(atoi(temp.c_str()));
+                fCut_Ntubes_max =(atoi(temp.c_str()));
             }
             if( temp == "arrayntel" )
             {
                 is_stream >> temp;
-                fArrayNImages_min = (atoi(temp.c_str()));
+                fCut_NImages_min = (atoi(temp.c_str()));
                 is_stream >> temp;
-                fArrayNImages_max =(atoi(temp.c_str()));
+                fCut_NImages_max =(atoi(temp.c_str()));
             }
             if( temp == "arraysize" )
             {
                 is_stream >> temp;
-                fArraySize_min=(atof(temp.c_str()));
+                fCut_Size_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArraySize_max=(atof(temp.c_str()));
+                fCut_Size_max=(atof(temp.c_str()));
 // write warning out about size cuts and number of telescopes
-                if( fNTel > 2 && fArraySize_min > 0. )
+                if( fNTel > 2 && fCut_Size_min > 0. )
                 {
                     cout << "--------- VGammaHadronCuts warning: ignoring size cut for data with more than 2 telescopes ------" << endl;
                 }
@@ -362,93 +339,98 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
             if( temp == "arraychi2" )
             {
                 is_stream >> temp;
-                fArrayChi2_min=(atof(temp.c_str()));
+                fCut_Chi2_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayChi2_max=(atof(temp.c_str()));
+                fCut_Chi2_max=(atof(temp.c_str()));
             }
             if( temp == "arraydist" )
             {
                 is_stream >> temp;
-                fArrayDistance_min=(atof(temp.c_str()));
+                fCut_MeanImageDistance_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayDistance_max=(atof(temp.c_str()));
+                fCut_MeanImageDistance_max=(atof(temp.c_str()));
             }
             if( temp == "corearea" )
             {
                 is_stream >> temp;
-                fCoreX_min = (atof(temp.c_str()));
+                fCut_CoreDistanceToArrayCentreX_min = (atof(temp.c_str()));
                 is_stream >> temp;
-                fCoreX_max = (atof(temp.c_str()));
+                fCut_CoreDistanceToArrayCentreX_max = (atof(temp.c_str()));
                 is_stream >> temp;
-                fCoreY_min = (atof(temp.c_str()));
+                fCut_CoreDistanceToArrayCentreY_min = (atof(temp.c_str()));
                 is_stream >> temp;
-                fCoreY_max = (atof(temp.c_str()));
+                fCut_CoreDistanceToArrayCentreY_max = (atof(temp.c_str()));
                 if( !is_stream.eof() )
                 {
                     is_stream >> temp;
-                    fCoreEdge = atof( temp.c_str() );
+                    fCut_CoreDistanceEdgeSize = atof( temp.c_str() );
                 }
             }
             if( temp == "mscw" || temp == "arraymscw" )
             {
                 is_stream >> temp;
-                fArrayMSCW_min=(atof(temp.c_str()));
+                fCut_MSCW_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayMSCW_max=(atof(temp.c_str()));
+                fCut_MSCW_max=(atof(temp.c_str()));
             }
             if( temp == "mscl" || temp == "arraymscl" )
             {
                 is_stream >> temp;
-                fArrayMSCL_min=(atof(temp.c_str()));
+                fCut_MSCL_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayMSCL_max=(atof(temp.c_str()));
+                fCut_MSCL_max=(atof(temp.c_str()));
             }
             if( temp == "msw" || temp == "arraymsw" )
             {
                 is_stream >> temp;
-                fArrayMSW_min=(atof(temp.c_str()));
+                fCut_MSW_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayMSW_max=(atof(temp.c_str()));
+                fCut_MSW_max=(atof(temp.c_str()));
             }
             if( temp == "msl" || temp == "arraymsl" )
             {
                 is_stream >> temp;
-                fArrayMSL_min=(atof(temp.c_str()));
+                fCut_MSL_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayMSL_max =(atof(temp.c_str()));
+                fCut_MSL_max =(atof(temp.c_str()));
             }
             if( temp == "mc_xy_off" || temp == "arrayxyoff_mc" || temp == "mc_xyoff" || temp == "cameraedge_mc" )
             {
                 is_stream >> temp;
-                fArrayxyoff_MC_min=(atof(temp.c_str()));
+                fCut_CameraFiducialSize_MC_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayxyoff_MC_max=(atof(temp.c_str()));
+                fCut_CameraFiducialSize_MC_max=(atof(temp.c_str()));
                 bMCCuts = true;
             }
 
             if( temp == "xy_off" || temp == "arrayxyoff" || temp == "xyoff" || temp == "cameraedge" )
             {
                 is_stream >> temp;
-                fArrayxyoff_min=(atof(temp.c_str()));
+                fCut_CameraFiducialSize_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayxyoff_max=(atof(temp.c_str()));
+                fCut_CameraFiducialSize_max=(atof(temp.c_str()));
             }
 	    if( temp == "telcoredistance" )
 	    {
-	       if( !is_stream.eof() ) is_stream >> fArrayCoreTel_max;
+	       if( !is_stream.eof() ) is_stream >> fCut_MinimumCoreDistanceToTelescopes_max;
             }
             if( temp == "arraycore" )
             {
                 is_stream >> temp;
-                fArrayCore_min = (atof(temp.c_str()));
+                fCut_AverageCoreDistanceToTelescopes_min = (atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayCore_max = (atof(temp.c_str()));
+                fCut_AverageCoreDistanceToTelescopes_max = (atof(temp.c_str()));
             }
 // these allow to deselect certain telescope combinations (changed from ltrig to ImgSel)
             if( temp == "arrayltrig" || temp == "selectImageCombination" )
             {
-                if( fNTel == 0 || fNTel > 10 ) continue;
-                // calculate how many possible telescope combinations exist
+                if( fNTel == 0 || fNTel > 10 )
+		{
+		   cout << "VGammaHadronCuts::readCuts warning: cut identifier " << temp << " not ignored for ";
+		   cout << "current telescope configuration ("<< fNTel << "telescopes)" << endl;
+		   continue;
+                }
+// calculate how many possible telescope combinations exist
                 if( fNLTrigs == 0 )
                 {
                     int num_ltrigs = 0;
@@ -458,7 +440,7 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                     }
                     num_ltrigs += 1;
                     fNLTrigs = num_ltrigs;
-                    for( unsigned int i = 0; i < fNLTrigs; i++ ) fArrayLTrig.push_back(1);
+                    for( unsigned int i = 0; i < fNLTrigs; i++ ) fCut_LTrig.push_back(1);
                 }
 
                 is_stream >> temp;
@@ -466,11 +448,11 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 if( index < 0 )
                 {
-                    for( unsigned int i = 0; i < fArrayLTrig.size(); i++ ) fArrayLTrig[i] = atoi(temp.c_str());
+                    for( unsigned int i = 0; i < fCut_LTrig.size(); i++ ) fCut_LTrig[i] = atoi(temp.c_str());
                 }
-                else if( index < (int)fArrayLTrig.size() )
+                else if( index < (int)fCut_LTrig.size() )
                 {
-                    fArrayLTrig[index] = atoi(temp.c_str());
+                    fCut_LTrig[index] = atoi(temp.c_str());
                 }
 
             }
@@ -528,37 +510,37 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
             if( temp == "arrayechi2" )
             {
                 is_stream >> temp;
-                fArrayEChi2_min = atof(temp.c_str());
+                fCut_EChi2_min = atof(temp.c_str());
                 is_stream >> temp;
-                fArrayEChi2_max = atof(temp.c_str());
+                fCut_EChi2_max = atof(temp.c_str());
             }
             if( temp == "arraydE" )
             {
                 is_stream >> temp;
-                fArraydE_min = atof(temp.c_str());
+                fCut_dE_min = atof(temp.c_str());
                 is_stream >> temp;
-                fArraydE_max = atof(temp.c_str());
+                fCut_dE_max = atof(temp.c_str());
             }
             if( temp == "arrayerec" )
             {
                 is_stream >> temp;
-                fArrayErec_min = atof(temp.c_str());
+                fCut_Erec_min = atof(temp.c_str());
                 is_stream >> temp;
-                fArrayErec_max = atof(temp.c_str());
+                fCut_Erec_max = atof(temp.c_str());
             }
             if( temp == "arrayemission" )
             {
                 is_stream >> temp;
-                fArrayEmmission_min = atof(temp.c_str());
+                fCut_Emmission_min = atof(temp.c_str());
                 is_stream >> temp;
-                fArrayEmmission_max = atof(temp.c_str());
+                fCut_Emmission_max = atof(temp.c_str());
             }
             if( temp == "sizesecondmax" )         //AMC
             {
                 is_stream >> temp;
-                fArraySizeSecondMax_min = atof(temp.c_str());
+                fCut_SizeSecondMax_min = atof(temp.c_str());
                 is_stream >> temp;
-                fArraySizeSecondMax_max = atof(temp.c_str());
+                fCut_SizeSecondMax_max = atof(temp.c_str());
             }                                     //AMC
             if( temp == "teltypegroup" )
             {
@@ -610,9 +592,9 @@ bool VGammaHadronCuts::readCuts(string i_cutfilename, int iPrint )
             if( temp == "arraytheta2" || temp == "theta2cut" ) 
             {
                 is_stream >> temp;
-                fArrayTheta2_min=(atof(temp.c_str()));
+                fCut_Theta2_min=(atof(temp.c_str()));
                 is_stream >> temp;
-                fArrayTheta2_max=(atof(temp.c_str()));
+                fCut_Theta2_max=(atof(temp.c_str()));
             }
 // read in values for energy dependent theta2 cut 
 // * theta2file <root file> <function name>
@@ -680,12 +662,12 @@ void VGammaHadronCuts::printDirectionCuts()
     if( fDirectionCutSelector == 0 )
     {
        cout << "Theta2 cut: ";
-       if( fArrayTheta2_min > 0. )
+       if( fCut_Theta2_min > 0. )
        {
-	   cout << fArrayTheta2_min << " < Theta^2 [deg^2]";
-	   if( fArrayTheta2_max > 0. ) cout << "< " << fArrayTheta2_max;
+	   cout << fCut_Theta2_min << " < Theta^2 [deg^2]";
+	   if( fCut_Theta2_max > 0. ) cout << "< " << fCut_Theta2_max;
        }
-       else if( fArrayTheta2_max > 0. ) cout << "Theta^2 [deg^2] < " << fArrayTheta2_max;
+       else if( fCut_Theta2_max > 0. ) cout << "Theta^2 [deg^2] < " << fCut_Theta2_max;
        else                             cout << "no Theta^2 cut set";
        cout << endl;
     }
@@ -756,25 +738,25 @@ void VGammaHadronCuts::printCutSummary()
     if( fGammaHadronCutSelector % 10 < 1 )
     {
 	cout << "Shape cuts: ";
-        cout << fArrayMSCW_min << " < MSCW < " << fArrayMSCW_max;
-        cout << ", " << fArrayMSCL_min << " < MSCL < " << fArrayMSCL_max << ", ";
+        cout << fCut_MSCW_min << " < MSCW < " << fCut_MSCW_max;
+        cout << ", " << fCut_MSCL_min << " < MSCL < " << fCut_MSCL_max << ", ";
     }
 // mean cuts
     else if( fGammaHadronCutSelector % 10 == 1 )
     {
 	cout << "Shape cuts: ";
-        cout << fArrayWidth_min  << " < mean width < " << fArrayWidth_max;
-        cout << ", " << fArrayLength_min << " < mean length < " << fArrayLength_max << ", ";
+        cout << fCut_MeanImageWidth_min  << " < mean width < " << fCut_MeanImageWidth_max;
+        cout << ", " << fCut_MeanImageLength_min << " < mean length < " << fCut_MeanImageLength_max << ", ";
     }
 // mean scaled cuts
     else if( fGammaHadronCutSelector % 10 == 3 )
     {
 	cout << "Shape cuts: ";
-        cout << fArrayMSW_min << " < MWR < " << fArrayMSW_max;
-        cout << ", " << fArrayMSL_min << " < MLR < " << fArrayMSL_max << ", ";
+        cout << fCut_MSW_min << " < MWR < " << fCut_MSW_max;
+        cout << ", " << fCut_MSL_min << " < MLR < " << fCut_MSL_max << ", ";
     }
-    cout << "core distance < " << fArrayCore_max << " m";
-    cout << " (max distance to a telescopes " << fArrayCoreTel_max << " m)";
+    cout << "average core distance < " << fCut_AverageCoreDistanceToTelescopes_max << " m";
+    cout << " (min distance to telescopes " << fCut_MinimumCoreDistanceToTelescopes_max << " m)";
 // probability cuts
     if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
     {
@@ -809,33 +791,35 @@ void VGammaHadronCuts::printCutSummary()
         }
     }
 // other cut parameters
-    if( fNTel == 2 ) cout << ", size > " << fArraySize_min;
+    if( fNTel == 2 ) cout << ", size > " << fCut_Size_min;
     cout << endl;
-    cout << "Fiducial area (camera) < " << fArrayxyoff_max << " deg, ";
-    cout << " stereo reconstruction: " << fArrayChi2_min << " <= sChi2 <= " << fArrayChi2_max << endl;
+    cout << "Fiducial area (camera) < " << fCut_CameraFiducialSize_max << " deg, ";
+    cout << " stereo reconstruction: " << fCut_Chi2_min << " <= sChi2 <= " << fCut_Chi2_max << endl;
     cout << "Energy reconstruction: ";
-    cout << fArrayEChi2_min << " <= EChi2 <= " << fArrayEChi2_max;
-    cout << ", " << fArraydE_min << " < dE < " << fArraydE_max;
-    cout << ", " << fArrayErec_min << " < Erec < " << fArrayErec_max << endl;
-    cout << "SizeSecondMax: " << fArraySizeSecondMax_min << " < SizeSecondMax < " << fArraySizeSecondMax_max;
-    cout << ", " << fArrayEmmission_min << " < Emission height < " << fArrayEmmission_max;
+    cout << fCut_EChi2_min << " <= EChi2 <= " << fCut_EChi2_max;
+    cout << ", " << fCut_dE_min << " < dE < " << fCut_dE_max;
+    cout << ", " << fCut_Erec_min << " < Erec < " << fCut_Erec_max << endl;
+    cout << "SizeSecondMax: " << fCut_SizeSecondMax_min << " < SizeSecondMax < " << fCut_SizeSecondMax_max;
+    cout << ", " << fCut_Emmission_min << " < Emission height < " << fCut_Emmission_max;
     cout << endl;
-    cout << "Fiducial area (shower core): [" << fCoreX_min - fCoreEdge << "," << fCoreX_max + fCoreEdge;
-    cout << "," << fCoreY_min - fCoreEdge << "," << fCoreY_max + fCoreEdge << "] m";
-    cout << ", " << fArrayNImages_min << " <= Ntel <= " << fArrayNImages_max;
+    cout << "Fiducial area (shower core): [" << fCut_CoreDistanceToArrayCentreX_min - fCut_CoreDistanceEdgeSize << ",";
+    cout << fCut_CoreDistanceToArrayCentreX_max + fCut_CoreDistanceEdgeSize;
+    cout << "," << fCut_CoreDistanceToArrayCentreY_min - fCut_CoreDistanceEdgeSize << ",";
+    cout << fCut_CoreDistanceToArrayCentreY_max + fCut_CoreDistanceEdgeSize << "] m";
+    cout << ", " << fCut_NImages_min << " <= Ntel <= " << fCut_NImages_max;
     cout << endl;
     if( bMCCuts )
     {
-        cout << "MC cuts: " << fArrayxyoff_MC_min << " < fiducial area (camera) < " << fArrayxyoff_MC_max << " deg ";
+        cout << "MC cuts: " << fCut_CameraFiducialSize_MC_min << " < fiducial area (camera) < " << fCut_CameraFiducialSize_MC_max << " deg ";
         cout << endl;
     }
-    if( fArrayLTrig.size() > 0 )
+    if( fCut_LTrig.size() > 0 )
     {
         cout << "Tel-combinations: ";
-        for( unsigned int i = 0; i < fArrayLTrig.size(); i++ )
+        for( unsigned int i = 0; i < fCut_LTrig.size(); i++ )
         {
-            cout << i << ": " << fArrayLTrig[i];
-            if( i < fArrayLTrig.size() - 1 ) cout << ", ";
+            cout << i << ": " << fCut_LTrig[i];
+            if( i < fCut_LTrig.size() - 1 ) cout << ", ";
         }
         cout << endl;
     }
@@ -855,7 +839,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
 /////////////////////////////////////////////////////////////////////////////////
 // require certain quality in stereo reconstruction
-    if( fData->Chi2 < fArrayChi2_min || fData->Chi2 > fArrayChi2_max )
+    if( fData->Chi2 < fCut_Chi2_min || fData->Chi2 > fCut_Chi2_max )
     {
         if( bCount )
         {
@@ -867,7 +851,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
 /////////////////////////////////////////////////////////////////////////////////
 // apply number of images cut
-    if( fData->NImages < fArrayNImages_min || fData->NImages > fArrayNImages_max )
+    if( fData->NImages < fCut_NImages_min || fData->NImages > fCut_NImages_max )
     {
         if( bCount )
         {
@@ -914,7 +898,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
                 }
 	        return false;
             }
-            if( fData->Erec < fArrayErec_min )
+            if( fData->Erec < fCut_Erec_min )
             {
                 if( bCount )
                 {
@@ -923,7 +907,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
                 }
                 return false;
             }
-            if( fData->Erec > fArrayErec_max )
+            if( fData->Erec > fCut_Erec_max )
             {
                 if( bCount )
                 {
@@ -944,7 +928,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
                 }
 	        return false;
             }
-            if( fData->ErecS < fArrayErec_min )
+            if( fData->ErecS < fCut_Erec_min )
             {
                 if( bCount )
                 {
@@ -953,7 +937,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
                 }
                 return false;
             }
-            if( fData->ErecS > fArrayErec_max )
+            if( fData->ErecS > fCut_Erec_max )
             {
                 if( bCount )
                 {
@@ -971,7 +955,6 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     double iR = 0.;
     double iR_min = 1.e99;
     double iNTR = 0.;
-    for( unsigned int i = 0; i < fNTel; i++ )
     for( int i = 0; i < fData->NImages; i++ )
     {
 	if( fData->ImgSel_list[i] >= fNTel ) continue;
@@ -985,7 +968,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
     }
     if( iNTR > 0. ) iR /= iNTR;
 
-    if( iR < fArrayCore_min || iR > fArrayCore_max )
+    if( iR < fCut_AverageCoreDistanceToTelescopes_min || iR > fCut_AverageCoreDistanceToTelescopes_max )
     {
         if( bCount )
         {
@@ -994,7 +977,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
         }
         return false;
     }
-    if( iR_min > fArrayCoreTel_max )
+    if( iR_min > fCut_MinimumCoreDistanceToTelescopes_max )
     {
         if( bCount )
         {
@@ -1007,11 +990,11 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
 /////////////////////////////////////////////////////////////////////////////////
 // apply image selection cuts (check which telescopes were used in the reconstruction)
-    if( fArrayLTrig.size() > 0 )
+    if( fCut_LTrig.size() > 0 )
     {
-        if( fData->ImgSel < fArrayLTrig.size() )
+        if( fData->ImgSel < fCut_LTrig.size() )
         {
-            if( !fArrayLTrig[fData->ImgSel] )
+            if( !fCut_LTrig[fData->ImgSel] )
             {
                 if( bCount )
                 {
@@ -1034,7 +1017,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
 /////////////////////////////////////////////////////////////////////////////////
 // apply cuts on second max
-    if(fData->SizeSecondMax < fArraySizeSecondMax_min || fData->SizeSecondMax > fArraySizeSecondMax_max)
+    if(fData->SizeSecondMax < fCut_SizeSecondMax_min || fData->SizeSecondMax > fCut_SizeSecondMax_max)
     {
         if( bCount )
         {
@@ -1059,12 +1042,6 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 }
 
 
-bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts()
-{
-    return applyEnergyReconstructionQualityCuts( 0 );
-}
-
-
 /*!
   cuts apply in energies in linear scale!
 
@@ -1074,36 +1051,36 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 {
     if( iEnergyReconstructionMethod == 0 )
     {
-        if( fData->EChi2 < fArrayEChi2_min || fData->EChi2 > fArrayEChi2_max )
+        if( fData->EChi2 < fCut_EChi2_min || fData->EChi2 > fCut_EChi2_max )
 	{
 	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 	   return false;
         }
-        if( fData->Erec < fArrayErec_min || fData->Erec > fArrayErec_max )
+        if( fData->Erec < fCut_Erec_min || fData->Erec > fCut_Erec_max )
 	{
 	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 	   return false;
         }
-        if( fData->dE < fArraydE_min || fData->dE > fArraydE_max )
+        if( fData->dE < fCut_dE_min || fData->dE > fCut_dE_max )
 	{
 	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 	   return false;
         }
-        if( fData->dE > fArraydE_max )       return false;
+        if( fData->dE > fCut_dE_max )       return false;
     }
     else if( iEnergyReconstructionMethod == 1 )
     {
-        if( fData->EChi2S < fArrayEChi2_min || fData->EChi2S > fArrayEChi2_max )
+        if( fData->EChi2S < fCut_EChi2_min || fData->EChi2S > fCut_EChi2_max )
 	{
 	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 	   return false;
         }
-        if( fData->ErecS < fArrayErec_min || fData->ErecS > fArrayErec_max )
+        if( fData->ErecS < fCut_Erec_min || fData->ErecS > fCut_Erec_max )
 	{
 	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 	   return false;
         }
-        if( fData->dES < fArraydE_min || fData->dES > fArraydE_max )
+        if( fData->dES < fCut_dE_min || fData->dES > fCut_dE_max )
 	{
 	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 	   return false;
@@ -1281,10 +1258,10 @@ bool VGammaHadronCuts::applyProbabilityCut( int i, bool fIsOn )
 */
 bool VGammaHadronCuts::applyMeanReducedScaledStereoShapeCuts()
 {
-    if( fData->MSCW > fArrayMSCW_max ) return false;
-    if( fData->MSCW < fArrayMSCW_min ) return false;
-    if( fData->MSCL > fArrayMSCL_max ) return false;
-    if( fData->MSCL < fArrayMSCL_min ) return false;
+    if( fData->MSCW > fCut_MSCW_max ) return false;
+    if( fData->MSCW < fCut_MSCW_min ) return false;
+    if( fData->MSCL > fCut_MSCL_max ) return false;
+    if( fData->MSCL < fCut_MSCL_min ) return false;
 
     return true;
 }
@@ -1296,10 +1273,10 @@ bool VGammaHadronCuts::applyMeanReducedScaledStereoShapeCuts()
 */
 bool VGammaHadronCuts::applyMeanScaledStereoShapeCuts()
 {
-    if( fData->MWR > fArrayMSW_max ) return false;
-    if( fData->MWR < fArrayMSW_min ) return false;
-    if( fData->MLR > fArrayMSL_max ) return false;
-    if( fData->MLR < fArrayMSL_min ) return false;
+    if( fData->MWR > fCut_MSW_max ) return false;
+    if( fData->MWR < fCut_MSW_min ) return false;
+    if( fData->MLR > fCut_MSL_max ) return false;
+    if( fData->MLR < fCut_MSL_min ) return false;
 
     return true;
 }
@@ -1313,35 +1290,32 @@ bool VGammaHadronCuts::applyMeanScaledStereoShapeCuts()
 */
 bool VGammaHadronCuts::applyMeanStereoShapeCuts()
 {
-    fMeanWidth = 0.;
-    fMeanLength = 0.;
-    fMeanDistance = 0.;
+    fMeanImageWidth = 0.;
+    fMeanImageLength = 0.;
+    fMeanImageDistance = 0.;
     int intel = 0;
-    double iasym = 0.;
 // loop over all telescopes and calculate mean values
     for( unsigned int i = 0; i < fNTel; i++ )
     {
-	 if( fData->ntubes[i] >= fArrayNtubes_max ||  fData->ntubes[i] <= fArrayNtubes_min ) continue;
-	 if( fData->size[i] <= fArraySize_min || fData->size[i] >= fArraySize_max ) continue;
+	 if( fData->ntubes[i] >= fCut_Ntubes_max ||  fData->ntubes[i] <= fCut_Ntubes_min ) continue;
+	 if( fData->size[i] <= fCut_Size_min || fData->size[i] >= fCut_Size_max )          continue;
 
-	 fMeanWidth += fData->width[i];
-	 fMeanLength += fData->length[i];
-	 fMeanDistance += fData->dist[i];
-	 iasym += fData->asym[i];
+	 fMeanImageWidth += fData->width[i];
+	 fMeanImageLength += fData->length[i];
+	 fMeanImageDistance += fData->dist[i];
 	 intel++;
     }
-    if( intel >= fArrayNTel_min  )
+    if( intel > 0 )
     {
-	 fMeanWidth  /= (double)intel;
-	 fMeanLength /= (double)intel;
-	 fMeanDistance   /= (double)intel;
-	 iasym   /= (double)intel;
+	 fMeanImageWidth      /= (double)intel;
+	 fMeanImageLength     /= (double)intel;
+	 fMeanImageDistance   /= (double)intel;
     }
+    else return false;
 // apply cuts
-    if( fMeanDistance <= fArrayDistance_min || fMeanDistance >= fArrayDistance_max ) return false;
-    if( fMeanLength <= fArrayLength_min || fMeanLength >= fArrayLength_max )         return false;
-    if( fMeanWidth <= fArrayWidth_min || fMeanWidth >= fArrayWidth_max )             return false;
-    if( iasym <= fArrayAsymm_min || iasym >= fArrayAsymm_max )                       return false;
+    if( fMeanImageDistance <= fCut_MeanImageDistance_min || fMeanImageDistance >= fCut_MeanImageDistance_max ) return false;
+    if( fMeanImageLength <= fCut_MeanImageLength_min || fMeanImageLength >= fCut_MeanImageLength_max )         return false;
+    if( fMeanImageWidth <= fCut_MeanImageWidth_min || fMeanImageWidth >= fCut_MeanImageWidth_max )             return false;
 
     return true;
 }
@@ -1381,8 +1355,8 @@ bool VGammaHadronCuts::applyStereoShapeCuts()
 
 /////////////////////////////////////////////////////////////////////////////
 // emission height cuts
-    if( fData->EmissionHeight > 0. && fData->EmissionHeight > fArrayEmmission_max ) return false;
-    if( fData->EmissionHeight > 0. && fData->EmissionHeight < fArrayEmmission_min ) return false;
+    if( fData->EmissionHeight > 0. && fData->EmissionHeight > fCut_Emmission_max ) return false;
+    if( fData->EmissionHeight > 0. && fData->EmissionHeight < fCut_Emmission_min ) return false;
 
 /// temp temp temp GH
 //    if(fData->frogsGoodnessImg >   0.7 ) return false;
@@ -1593,15 +1567,15 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool 
 {
     double xy = Xoff*Xoff + Yoff*Yoff;
 
-    if( xy > fArrayxyoff_max*fArrayxyoff_max )
+    if( xy > fCut_CameraFiducialSize_max*fCut_CameraFiducialSize_max )
     {
         if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
         return false;
     }
 
-    if( fArrayxyoff_min >= 0. )
+    if( fCut_CameraFiducialSize_min >= 0. )
     {
-        if( xy < fArrayxyoff_min*fArrayxyoff_min )
+        if( xy < fCut_CameraFiducialSize_min*fCut_CameraFiducialSize_min )
         {
             if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
             return false;
@@ -1623,15 +1597,15 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 
     double xy = xoff*xoff + yoff*yoff;
 
-    if( xy > fArrayxyoff_MC_max*fArrayxyoff_MC_max )
+    if( xy > fCut_CameraFiducialSize_MC_max*fCut_CameraFiducialSize_MC_max )
     {
         if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eMC_XYoff );
         return false;
     }
 
-    if( fArrayxyoff_MC_min >= 0. )
+    if( fCut_CameraFiducialSize_MC_min >= 0. )
     {
-        if( xy < fArrayxyoff_MC_min*fArrayxyoff_MC_min )
+        if( xy < fCut_CameraFiducialSize_MC_min*fCut_CameraFiducialSize_MC_min )
         {
             if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eMC_XYoff );
             return false;
@@ -1663,7 +1637,7 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 /*!
   check if core is inside a certain area relative to centre of array (ground, not shower coordinates)
 
-  fCoreY_min && fCoreY_max == 0: cut area is circle with radius fCoreX_max
+  fCut_CoreDistanceToArrayCentreY_min && fCut_CoreDistanceToArrayCentreY_max == 0: cut area is circle with radius fCut_CoreDistanceToArrayCentreX_max
   otherwise: cut area is a rectangle
 
   iMC = true:   use MC core
@@ -1681,19 +1655,19 @@ bool VGammaHadronCuts::applyShowerCoreCuts( bool iMC )
     }
 ///////////////////////////////////////////////
 // radius cuts (Y_min and Y_max is 0)
-    if( TMath::Abs( fCoreY_min ) < 1.e-5 && TMath::Abs( fCoreY_max ) < 1.e-5 )
+    if( TMath::Abs( fCut_CoreDistanceToArrayCentreY_min ) < 1.e-5 && TMath::Abs( fCut_CoreDistanceToArrayCentreY_max ) < 1.e-5 )
     {
-        if( sqrt( xcore*xcore+ycore*ycore ) < fCoreX_min ) return false;
-        if( sqrt( xcore*xcore+ycore*ycore ) > fCoreX_max ) return false;
+        if( sqrt( xcore*xcore+ycore*ycore ) < fCut_CoreDistanceToArrayCentreX_min ) return false;
+        if( sqrt( xcore*xcore+ycore*ycore ) > fCut_CoreDistanceToArrayCentreX_max ) return false;
     }
     else
 ///////////////////////////////////////////////
 // box cut
     {
-        if( xcore < fCoreX_min - fCoreEdge ) return false;
-        if( xcore > fCoreX_max + fCoreEdge ) return false;
-        if( ycore < fCoreY_min - fCoreEdge ) return false;
-        if( ycore > fCoreY_max + fCoreEdge ) return false;
+        if( xcore < fCut_CoreDistanceToArrayCentreX_min - fCut_CoreDistanceEdgeSize ) return false;
+        if( xcore > fCut_CoreDistanceToArrayCentreX_max + fCut_CoreDistanceEdgeSize ) return false;
+        if( ycore < fCut_CoreDistanceToArrayCentreY_min - fCut_CoreDistanceEdgeSize ) return false;
+        if( ycore > fCut_CoreDistanceToArrayCentreY_max + fCut_CoreDistanceEdgeSize ) return false;
     }
 
     return true;
@@ -1702,13 +1676,13 @@ bool VGammaHadronCuts::applyShowerCoreCuts( bool iMC )
 
 void VGammaHadronCuts::setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge )
 {
-    fCoreX_min = xmin;
-    fCoreX_max = xmax;
-    fCoreY_min = ymin;
-    fCoreY_max = ymax;
-    if( iEdge >= 0. ) fCoreEdge = iEdge;
-    cout << "setting shower core cuts: " << fCoreX_min << "\t" << fCoreX_max;
-    cout << "\t" << fCoreY_min << "\t" << fCoreY_max << "\t" << fCoreEdge << endl;
+    fCut_CoreDistanceToArrayCentreX_min = xmin;
+    fCut_CoreDistanceToArrayCentreX_max = xmax;
+    fCut_CoreDistanceToArrayCentreY_min = ymin;
+    fCut_CoreDistanceToArrayCentreY_max = ymax;
+    if( iEdge >= 0. ) fCut_CoreDistanceEdgeSize = iEdge;
+    cout << "setting shower core cuts: " << fCut_CoreDistanceToArrayCentreX_min << "\t" << fCut_CoreDistanceToArrayCentreX_max;
+    cout << "\t" << fCut_CoreDistanceToArrayCentreY_min << "\t" << fCut_CoreDistanceToArrayCentreY_max << "\t" << fCut_CoreDistanceEdgeSize << endl;
 }
 
 /*
@@ -1747,7 +1721,7 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
    else if( fEnergyReconstructionMethod == 1 ) i_theta2_cut_max = getTheta2Cut_max( fData->ErecS );
 
 // direction cut (ring around center of camera)
-   if( theta2 < i_theta2_cut_max && theta2 > fArrayTheta2_min )
+   if( theta2 < i_theta2_cut_max && theta2 > fCut_Theta2_min )
    {
       return true;
    }
@@ -1771,7 +1745,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 //////////////////////////////////////////////
     if( fDirectionCutSelector == 0 )
     {
-       theta_cut_max = TMath::Sqrt( fArrayTheta2_max );   // will be later squared
+       theta_cut_max = TMath::Sqrt( fCut_Theta2_max );   // will be later squared
     } 
 //////////////////////////////////////////////
 // energy dependent theta2 cut

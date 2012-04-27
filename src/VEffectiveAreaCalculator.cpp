@@ -1233,15 +1233,15 @@ double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
    double iSolAngleNorm = 1.;
    if( fCuts && fRunPara )
    {
-      if( fRunPara->fViewcone_max > 0. && fCuts->fArrayxyoff_MC_max > 0. && fCuts->fArrayxyoff_MC_max < 1000. 
-         && fCuts->fArrayxyoff_MC_max < fRunPara->fViewcone_max )
+      if( fRunPara->fViewcone_max > 0. && fCuts->fCut_CameraFiducialSize_MC_max > 0. && fCuts->fCut_CameraFiducialSize_MC_max < 1000. 
+         && fCuts->fCut_CameraFiducialSize_MC_max < fRunPara->fViewcone_max )
 	 {
 // solid angle of simulated showers
 	    double iSN_mc = (1.-cos(fRunPara->fViewcone_max * TMath::DegToRad()));
 	    if( fRunPara->fViewcone_min > 0. ) iSN_mc -= (1.-cos(fRunPara->fViewcone_min * TMath::DegToRad()));
 // solid angle of angular bin
-	    double iSN_cu = (1.-cos(fCuts->fArrayxyoff_MC_max * TMath::DegToRad()));
-	    if( fCuts->fArrayxyoff_MC_min > 0. ) iSN_cu -= (1.-cos(fCuts->fArrayxyoff_MC_min * TMath::DegToRad()));
+	    double iSN_cu = (1.-cos(fCuts->fCut_CameraFiducialSize_MC_max * TMath::DegToRad()));
+	    if( fCuts->fCut_CameraFiducialSize_MC_min > 0. ) iSN_cu -= (1.-cos(fCuts->fCut_CameraFiducialSize_MC_min * TMath::DegToRad()));
 
 	    if( iSN_mc > 0. ) iSolAngleNorm = iSN_cu / iSN_mc;
 	 }

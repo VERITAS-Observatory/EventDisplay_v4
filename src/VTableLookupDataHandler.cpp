@@ -270,7 +270,8 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     if( fDebug > 1 )
     {
        cout << "===============================================================================" << endl;
-       cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t" << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod] << endl;
+       cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
+       cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod] << endl;
     }
     time = fshowerpars->Time;
     if( fEventCounter == 0 ) fTotalTime0 = time;
@@ -340,7 +341,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     for( unsigned int i = 0; i < getNTelTypes(); i++ ) NImages_Ttype[i] = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
-       fImgSel_list[i] = fshowerpars->ImgSel_list[fMethod][i];
+       fImgSel_list[i] = (bool)fshowerpars->ImgSel_list[fMethod][i];
        if( fImgSel_list[i] )
        {
           fImgSel_list_short[ii] = i;
@@ -393,6 +394,11 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
 // read only those telescope which were part of the reconstruction
         if( fReadTPars )
         {
+	    if( !ftpars[i] )
+	    {
+	       cout << "VTableLookupDataHandler::fillNextEvent error: tree tpars not found (" << i << ")" << endl;
+	       exit( -1 );
+            }
             ftpars[i]->GetEntry( fEventCounter );
 
             fdist[i] = ftpars[i]->dist;
@@ -1474,7 +1480,7 @@ void VTableLookupDataHandler::resetAll()
     fNImages = 0;
     fImgSel = 0;
     fNTelTypes = 0;
-    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fImgSel_list[i] = 0;
+    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fImgSel_list[i] = false;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fImgSel_list_short[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) NImages_Ttype[i] = 0;
     fimg2_ang = 0.;
@@ -1808,46 +1814,36 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
     return fR_telType;
 }
 
-double* VTableLookupDataHandler::getSize( double iSizeCorrection )
+double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelectedImagesOnly, bool iSize2 )
 {
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
-       fsizeCorr[i] = fsize[i] * iSizeCorrection;
-    }
-    return fsizeCorr;
-}
-
-double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType )
-{
-    unsigned int z = 0;
-    for( unsigned int i = 0; i < getNTel(); i++ )
-    {
-       if( fTel_type[i] == iTelType )
+       if( iSelectedImagesOnly && !fImgSel_list[i] )
        {
-          fsize_telType[z] = fsize[i] * iSizeCorrection;
-	  z++;
+          fsizeCorr[i] = -99.;
+	  continue;
        }
-    }
-    return fsize_telType;
-}
-
-double* VTableLookupDataHandler::getSize2( double iSizeCorrection )
-{
-    for( unsigned int i = 0; i < getNTel(); i++ )
-    {
-       fsizeCorr[i] = fsize2[i] * iSizeCorrection;
+       if( !iSize2 ) fsizeCorr[i] = fsize[i] * iSizeCorrection;
+       else          fsizeCorr[i] = fsize2[i] * iSizeCorrection;
     }
     return fsizeCorr;
 }
 
-double* VTableLookupDataHandler::getSize2( double iSizeCorrection,  ULong64_t iTelType )
+double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTelType, bool iSelectedImagesOnly, bool iSize2 )
 {
     unsigned int z = 0;
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
        if( fTel_type[i] == iTelType )
        {
-          fsize_telType[z] = fsize2[i] * iSizeCorrection;
+	  if( iSelectedImagesOnly && !fImgSel_list[i] )
+	  {
+	     fsize_telType[z] = -99.;
+	     z++;
+	     continue;
+          }
+          if( !iSize2 ) fsize_telType[z] = fsize[i] * iSizeCorrection;
+          else          fsize_telType[z] = fsize2[i] * iSizeCorrection;
 	  z++;
        }
     }

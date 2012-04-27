@@ -28,6 +28,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     writeoption = "recreate";
     fMinRequiredShowerPerBin = 5.;
     bNoNoTrigger = true;
+    fUseSelectedImagesOnly = true;
     bWriteReconstructedEventsOnly = -1;
     bShortTree = false;
     bWriteMCPars = true;
@@ -364,6 +365,8 @@ void VTableLookupRunParameter::print( int iP )
 //    cout << "\t minimum size per telescope: " << fminsize << endl;
 //    cout << "\t maximum local distance of image [deg]: " << fmaxlocaldistance << endl;
     if( fSelectRandom > 0. ) cout << "random event selection: " << fSelectRandom << ", seed:" << fSelectRandomSeed << endl;
+    if( fUseSelectedImagesOnly ) cout << "use evndisp image selection" << endl;
+    else                         cout << "use all images" << endl;
     if( !(readwrite == 'W' || readwrite == 'w' ) || iP == 2 )
     {
         if( esysfile.size() > 0 ) cout << "correct for systematic errors with " << esysfile << endl;

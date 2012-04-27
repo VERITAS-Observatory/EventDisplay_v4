@@ -341,8 +341,6 @@ return value is energy (linear scale)
 double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double *mt, double &chi2, double &dE, double *st )
 {
     int tel = 0;
-    int ir = 0;
-    int is = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // fill the tables
@@ -360,8 +358,8 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
         {
             if( r[tel] >= 0. && s[tel] > 0. )
             {
-// this cut only applies to mscw/mscl calculations (remove images with width/length 0)
-                if( !fEnergy && w[tel] < 1.e-3 ) continue;
+// remove images with width/length 0, invalid energies
+                if( w[tel] < 1.e-3 ) continue;
 // check limits (to avoid under/overflows)
                 if( log10( s[tel] ) > hMedian->GetXaxis()->GetXmax() ) continue;
                 if( log10( s[tel] ) < hMedian->GetXaxis()->GetXmin() ) continue;
@@ -369,8 +367,8 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 		if( r[tel] < hMedian->GetYaxis()->GetXmin() ) continue;
 
 // calculate log energy (translate from TeV to GeV)
-		is = hMedian->GetXaxis()->FindBin( log10( s[tel] ) ) - 1;
-		ir = hMedian->GetYaxis()->FindBin( r[tel] ) - 1;
+		int is = hMedian->GetXaxis()->FindBin( log10( s[tel] ) ) - 1;
+		int ir = hMedian->GetYaxis()->FindBin( r[tel] ) - 1;
 // reject showers in the first size bin
                 if( ir >= 0 && is >= 0 && is < (int)Oh.size() && ir < (int)Oh[is].size() )
                 {
@@ -380,9 +378,9 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                     }
 // check limits (to avoid under/overflows)
                     if( w[tel] < Oh[is][ir]->GetXaxis()->GetXmin() || w[tel] > Oh[is][ir]->GetXaxis()->GetXmax() ) continue;
-// fill width/length/energy into a 1D histogram
+// fill width/length/energy into a 1D and 2D histogram
+// (chi2 is here an external weight (from e.g. spectral weighting))
                     Oh[is][ir]->Fill( w[tel], chi2 );
-// chi2 is here an external weight (from e.g. spectral weighting)
                     hMean->Fill( log10(s[tel]), r[tel], w[tel] * chi2 );
                 }
 		else
@@ -421,14 +419,13 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 
         chi2 = 0.;
 	dE   = 0.;
-        int k = 0;
         double med = 0.;
         double sigma = 0.;
         double value = 0.;
         double weight = 0.;
 // energy per telescope
-        double a[VDST_MAXTELESCOPES];
-        double b[VDST_MAXTELESCOPES];
+        vector< double > energy_tel;
+        vector< double > sigma2_tel;
 
 // reset everything
         for( tel = 0; tel < ntel; tel++ )
@@ -444,22 +441,6 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
         {
             if( r[tel] >= 0. && s[tel] > 0 )
             {
-                ir = 0;
-		is = 0;
-		if( hMedian )
-		{
-		     is = hMedian->GetXaxis()->FindBin( log10( s[tel] ) );
-		     ir = hMedian->GetYaxis()->FindBin( r[tel] ); 
-		}
-		else if( hVMedian.size() == (unsigned int)ntel && hVMedian[tel] )
-                {
-		     is = hVMedian[tel]->GetXaxis()->FindBin( log10( s[tel] ) );
-		     ir = hVMedian[tel]->GetYaxis()->FindBin( r[tel] ); 
-                }
-
-// reject showers in the first size bin
-                if( ir > 0 && is > 0 )
-                {
 // get expected value and sigma of expected value
                     if( hMedian )
                     {
@@ -473,8 +454,8 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 			if( fDebug && fEnergy )
 			{
 			   cout << "\t  double VTableCalculator::calc() getting energy from table for tel " << tel;
-			   cout << ", size " << s[tel] << " (bin " << is << ")";
-			   cout << ", distance " << r[tel] << " (bin " << ir << ")";
+			   cout << ", size " << s[tel];
+			   cout << " , distance " << r[tel];
 			   cout << endl;
                         } 
                     }
@@ -519,30 +500,23 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 			       value  += (w[tel]-med)/sigma * (med*med)/(sigma*sigma);
                             }
 			    weight += (med*med)/(sigma*sigma);
-                            k++;
                         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // energy calculation
-                        else
+                        else if( fEnergy && sigma > 0. )
                         {
-                            if( sigma > 0. )
-                            {
-                                value  += med / (sigma*sigma);
-                                weight += 1./(sigma*sigma);
-                            }
-                            else
-                            {
-                                value  += med;
-                                weight += 1.;
-                            }
 // store energy per telescope
-                            a[k] = med;
-                            b[k] = sigma;
-                            k++;
+			    energy_tel.push_back( med );
+			    sigma2_tel.push_back( 1./(sigma*sigma) );
                         }
+			else
+			{
+			   chi2 = -99;
+			   dE = -99.;
+			   return -99.;
+			} 
                     }
                 }
-            }
         }
 ////////////////////////////////////////////////////////////////
 // mean scaled value 
@@ -556,44 +530,41 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // Energy calculation only
 ///////////////////////////////////////////////////////////////
 // calculate mean energy
-        if( weight > 0. )
+        if( energy_tel.size() > 0 )
         {
-            value /= weight ;
+// Occasionally one energy is significantly off and distorts the mean.
+// therefore: get rid of N sigma outliers
+// use robust statistics (median and mean absolute error
+// Note: applied only to larger events > 4 telescopes
+            double median = VStatistics::getMedian( energy_tel );
+	    double meanAbsoluteError = VStatistics::getMeanAbsoluteError( energy_tel );
+	    weight = 0.;
+	    for( unsigned int j = 0; j < energy_tel.size(); j++ )
+	    {
+	       if( energy_tel.size() < 5 || TMath::Abs( energy_tel[j] - median ) < meanAbsoluteError * 5 )
+	       {
+	          value  += energy_tel[j] * sigma2_tel[j];
+		  weight += sigma2_tel[j];
+               }
+            }
+	    if( weight > 0. ) value /= weight;
 
 // loop over number if images with valid entries
-            if( k > 1 )
+            if( energy_tel.size() > 1 )
             {
                 chi2 = 0.;
 		dE   = 0.;
                 double z1 = 0;
-//////////////////////////////////////////////////////////////////////
-// OLD dE definition
-//                int z2 = 0;
-//		double lin_value = TMath::Power( 10., value );
-//////////////////////////////////////////////////////////////////////
-                for( int j = 0; j < k; j++ )
+                for( unsigned int j = 0; j < energy_tel.size(); j++ )
                 {
-                    if( b[j] != 0. )
+                    if( sigma2_tel[j] != 0. )
                     {
-                        chi2 += ( value - a[j] ) * ( value - a[j] ) / b[j] / b[j];
+                        chi2 += ( value - energy_tel[j] ) * ( value - energy_tel[j] ) * sigma2_tel[j];
 			z1++;
                     }
-//////////////////////////////////////////////////////////////////////
-// OLD dE definition
-//		    if( lin_value > 0. )
-//		    {
-//			dE    += ( TMath::Power( 10., a[j] ) - lin_value ) / lin_value;
-//                        z2++;
-//                    }
-//////////////////////////////////////////////////////////////////////
                 }
                 if( z1 > 1 ) chi2 /= (z1-1.);
                 else         chi2  = -99.;
-//////////////////////////////////////////////////////////////////////
-// OLD dE definition
-//		if( z2 > 0 ) dE /=  z2;              // mean value: divide by # of participating telescopes
-//		else         dE  = -99.;
-// NEW dE definition
                 dE = sqrt( 1./weight );
             }
             else
@@ -739,8 +710,8 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
       if( iError ) return h->GetBinError( i_x, i_y );
       else         return h->GetBinContent( i_x, i_y );
    }
-   if( y < h->GetYaxis()->GetBinCenter( i_y ) ) i_y--;
    if( x < h->GetXaxis()->GetBinCenter( i_x ) ) i_x--;
+   if( y < h->GetYaxis()->GetBinCenter( i_y ) ) i_y--;
 
    double e1 = 0.;
    double e2 = 0.;
@@ -749,22 +720,21 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
 // first interpolate on distance axis, then on size axis
    if( !iError )
    {
-      e1 = VStatistics::interpolate( h->GetBinContent( i_x, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
-				     h->GetBinContent( i_x, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
-				     y, false );
-      e2 = VStatistics::interpolate( h->GetBinContent( i_x+1, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
-				     h->GetBinContent( i_x+1, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
-				     y, false );
-      
-      v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );
+      e1 = VStatistics::interpolate( h->GetBinContent( i_x, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
+				     h->GetBinContent( i_x, i_y+1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
+				     y, false, 0.5, 1.e-5 );
+      e2 = VStatistics::interpolate( h->GetBinContent( i_x+1, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
+				     h->GetBinContent( i_x+1, i_y+1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
+				     y, false, 0.5, 1.e-5 );
+      v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false, 0.5, 1.e-5 );
    }
    else
    {
-      e1 = VStatistics::interpolate( h->GetBinError( i_x, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
-				     h->GetBinError( i_x, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
+      e1 = VStatistics::interpolate( h->GetBinError( i_x, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
+				     h->GetBinError( i_x, i_y+1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
 				     y, false );
-      e2 = VStatistics::interpolate( h->GetBinError( i_x+1, i_y ), h->GetYaxis()->GetBinLowEdge( i_y ),
-				     h->GetBinError( i_x+1, i_y+1 ), h->GetYaxis()->GetBinLowEdge( i_y + 1 ),
+      e2 = VStatistics::interpolate( h->GetBinError( i_x+1, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
+				     h->GetBinError( i_x+1, i_y+1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
 				     y, false );
       
       v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );

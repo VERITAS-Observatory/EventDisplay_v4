@@ -196,7 +196,7 @@ class VTableLookupDataHandler
         int fNImages;
         unsigned int fImgSelS;
         ULong64_t fImgSel;
-        UChar_t fImgSel_list[VDST_MAXTELESCOPES];
+        bool fImgSel_list[VDST_MAXTELESCOPES];
 	unsigned int fImgSel_list_short[VDST_MAXTELESCOPES];
 	unsigned int fNTelTypes;
 	unsigned int NImages_Ttype[VDST_MAXTELESCOPES];
@@ -344,10 +344,11 @@ class VTableLookupDataHandler
         unsigned int getNTel() { return fNTel; }
         unsigned int getNTelTypes() { return fNTelTypes; }
         TFile* getOutputFile() { return fOutFile; }
-        double* getSize( double iSizeCorrection = 1. );
-	double* getSize( double iSizeCorrection, ULong64_t iTelType );
-        double* getSize2( double iSizeCorrection = 1. );
-	double* getSize2( double iSizeCorrection, ULong64_t iTelType );
+        double* getSize( double iSizeCorrection = 1., bool iSelectedImagesOnly = false, bool iSize2 = false );
+	double* getSize( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly, bool iSize2 = false );
+        double* getSize2( double iSizeCorrection = 1., bool iSelectedImagesOnly = false ) { return getSize( iSizeCorrection, iSelectedImagesOnly, true ); }
+	double* getSize2( double iSizeCorrection, ULong64_t iTelType, bool iSelectedImagesOnly ) 
+	                   { return getSize( iSizeCorrection, iTelType, iSelectedImagesOnly, true ); }
         double *getWeight() { return fweight; }
         double *getWidth() { return fwidth; }
 	double *getWidth( ULong64_t iTelType );

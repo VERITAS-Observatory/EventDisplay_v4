@@ -855,18 +855,18 @@ double VAnaSumRunParameter::getRingWidth( double a_on, double rr, double rat )
 double VAnaSumRunParameter::readSourceRadius( string ifile )
 {
     VGammaHadronCuts iC;
-    if( !iC.readCuts( ifile, false ) ) return -1;;
+    if( !iC.readCuts( ifile, 0 ) ) return -1;;
 
-    return iC.fArrayTheta2_max;
+    return iC.fCut_Theta2_max;
 }
 
 
 double VAnaSumRunParameter::readMaximumDistance( string ifile )
 {
     VGammaHadronCuts iC;
-    if( !iC.readCuts( ifile, false ) ) return -1;
+    if( !iC.readCuts( ifile, 0 ) ) return -1;
 
-    return iC.fArrayxyoff_max;
+    return iC.fCut_CameraFiducialSize_max;
 }
 
 
