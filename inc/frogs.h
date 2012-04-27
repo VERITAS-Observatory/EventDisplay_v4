@@ -73,6 +73,20 @@
 
 #define frogs_pedwidth_correction 1.00
 
+// Frogs Calibration Correction 2012 03 13
+
+#define lmuMAX  2.0
+#define lmuMIN -6.0
+#define muN     30
+//#define muSTEP (lmuMAX-lmuMIN)/muN
+
+#define lqMAX  2.0
+#define lqMIN -6.0
+#define qN     30
+//#define qSTEP (lqMAX-lqMIN)/qN
+
+#define N muN*qN
+
 #ifdef __cplusplus
 extern "C" {
 #endif 
@@ -169,7 +183,15 @@ struct frogs_gsl_func_param {
   double mu;  //Expectation valus for a given pixel
 };
 //================================================================
+struct calibration_file {
+//  double *CALIBF = (double*) calloc(900, sizeof(double));
+  double CALIBF[900];
+};
+
 //================================================================
+//struct calibration_file read_calibration_file();
+void read_calibration_file( struct calibration_file *calib );
+
 struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d);
 struct frogs_imgtmplt_in frogs_convert_from_grisu(struct array_event *taevnt,
 						  struct array *ta,
@@ -178,14 +200,14 @@ struct frogs_imgtmplt_in frogs_convert_from_grisu(struct array_event *taevnt,
 struct frogs_imgtemplate frogs_read_template_elev(float elevation);
 struct frogs_imgtemplate frogs_read_template_file(char fname[FROGS_FILE_NAME_MAX_LENGTH]); 
 struct frogs_imgtmplt_out frogs_likelihood_optimization(struct frogs_imgtmplt_in *d, 
-					    struct frogs_imgtemplate *tmplt);
+					    struct frogs_imgtemplate *tmplt, struct calibration_file *calib);
 struct frogs_imgtmplt_out frogs_null_imgtmplt_out();
 int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f);
 int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J);
 int frogs_likelihood_fdf(const gsl_vector *v, void *ptr, gsl_vector *f, 
 		   gsl_matrix *J);
 int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,struct frogs_imgtmplt_in *d, 
-	     struct frogs_imgtemplate *tmplt);
+	     struct frogs_imgtemplate *tmplt, struct calibration_file *calib );
 
 float frogs_goodness_correction(float goodness0,float ped,float mu);
 double frogs_probability_density(float q,double mu,float ped,float exnoise);
@@ -230,7 +252,7 @@ struct frogs_reconstruction frogs_param_step(struct frogs_reconstruction pnt,
 					     struct frogs_reconstruction delta,
 					     int gsl_par_id,float mult);
 int frogs_gdns_calibr_out(int event_id, int tel, int pix, float q,
-			  float ped, float mu,double pix_goodness);
+			  float ped, float mu,double pix_goodness,double energy, double xp, double yp);
 int frogs_event_display(int event_id, float q,float mu,float xtel,
 			float ytel,float xpix,float ypix,int pix_in_img);
 int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);

@@ -153,6 +153,8 @@ class CData
         Float_t frogsXPerr;
         Float_t frogsYP;
         Float_t frogsYPerr;
+        Float_t frogsXPGC;
+        Float_t frogsYPGC;
         Float_t frogsEnergy;
         Float_t frogsEnergyerr;
         Float_t frogsLambda;
@@ -277,6 +279,8 @@ class CData
         TBranch *b_frogsXPerr;
         TBranch *b_frogsYP;
         TBranch *b_frogsYPerr;
+        TBranch *b_frogsXPGC;
+        TBranch *b_frogsYPGC;
         TBranch *b_frogsEnergy;
         TBranch *b_frogsEnergyerr;
         TBranch *b_frogsLambda;
@@ -864,6 +868,8 @@ Bool_t CData::Notify()
 	    fChain->SetBranchAddress("frogsXPerr",&frogsXPerr);
 	    fChain->SetBranchAddress("frogsYP",&frogsYP);
 	    fChain->SetBranchAddress("frogsYPerr",&frogsYPerr);
+	    fChain->SetBranchAddress("frogsXPGC",&frogsXPGC);
+	    fChain->SetBranchAddress("frogsYPGC",&frogsYPGC);
 	    fChain->SetBranchAddress("frogsEnergy",&frogsEnergy);
 	    fChain->SetBranchAddress("frogsEnergyerr",&frogsEnergyerr);
 	    fChain->SetBranchAddress("frogsLambda",&frogsLambda);

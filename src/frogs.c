@@ -12,74 +12,9 @@
 |  For license issues, see www.physics.utah.edu/gammaray/FROGS     |
 \*================================================================*/
 
-/*
-//The FROGS analysis needs the folowing definitions.
-//It also need some less common definition files for GSL. Those are 
-//included in the frogs.h file
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-*/
-
-/*
-//In the GrISU context, FROGS needs the following definition files. 
-#include "./anal_definition.h"  //GrISU/Analysis/
-#include "./showerror.h" //in GrISU/CommonTools
-#include "./read_array.h"  //in GrISU/Config/Read/
-*/
-
 #include "frogs.h"
 
 #define FROGS_TEST 0
-//================================================================
-//================================================================
-/*
-int main(void) {
-  //This main function should be commented out. It is provided to 
-  //give an example of how to call the FROGS analysis in the GrISU 
-  //context. 
-
-  //If the main function is uncommented, the FROGS analysis can be compiled 
-  //with:
-  //INCLUDE=-I/usr/local/include
-  //GSLIB=-L/usr/local/lib -lgsl -lgslcblas
-  //imgtmpl: frogs.c frogs.h Makefile
-  //	 g++ frogs.c  -O -w $(INCLUDE)  $(GSLIB) -o frogs -lm -Wall
-  //in a make file. There will be a segfault at execution time because of 
-  //the GrISU specific structure will not contain any meaningful data. 
-
-  struct array_event taevnt;
-  struct array ta;
-  int adc=2;
-  struct array_ped taped;  
-
-  //Store data from the GrISU analysis to a FROGS structure
-  //In this example the function frogs_convert_from_grisu takes 
-  //arguments corresponding the the GrISU analysis. An equivalent 
-  //function should be written for any other analysis package to 
-  //make the FROGS analysis usable. Reading the frogs_convert_from_grisu 
-  //function and the definition of structure frogs_imgtmplt_in in frogs.h 
-  //should permit to identify what are the necessary data elements. 
-  struct frogs_imgtmplt_in d;
-  d=frogs_convert_from_grisu(&taevnt,&ta,adc,&taped);
-
-  //Print out the data contained in the FROGS structure frogs_imgtmplt_in
-  //This is useful when developing a frogs_convert_from_XXXX function
-  frogs_print_raw_event(d);
-
-  //Call the FROGS analysis
-  struct frogs_imgtmplt_out output;
-  output=frogs_img_tmplt(d);
-  
-  //Print out the results of the image template analysis
-  //The values returned by frogs_img_tmplt really are to be stored in 
-  //structures used in the analysis package in which FROGS is being sed. 
-  frogs_print_param_spc_point(output);
-  
-  return FROGS_OK;
-}
-*/
 //================================================================
 //================================================================
 int frogs_print_raw_event(struct frogs_imgtmplt_in d) {
@@ -100,14 +35,6 @@ int frogs_print_raw_event(struct frogs_imgtmplt_in d) {
 	    d.scope[tel].xfield,d.scope[tel].yfield);
     fprintf(OUTUNIT,"Number of pixels:%d\n",d.scope[tel].npix);
     fprintf(OUTUNIT,"Number of live pixels:%d\n",d.scope[tel].nb_live_pix);
-//    for(int pix=0;pix<d.scope[tel].npix;pix++) {
-//      fprintf(OUTUNIT,
-//	      "Pixel %3d %1d x=%5.2f y=%5.2f q=%f ped=%f xn=%f col=%f\n", 
-//	      pix+1,d.scope[tel].pixinuse[pix],d.scope[tel].xcam[pix],
-//	      d.scope[tel].ycam[pix],d.scope[tel].q[pix],
-//	      d.scope[tel].ped[pix],d.scope[tel].exnoise[pix],
-//	      d.scope[tel].telpixarea[pix]);
-//    }
   }
   fprintf(OUTUNIT,".................................................\n");
   fprintf(OUTUNIT,"            STARTING POINT:\n");
@@ -147,18 +74,24 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
     return rtn;
   }
 
+  static struct calibration_file calib;
+
   /*This check if a template image needs to be read and reads it if necessary*/
   static struct frogs_imgtemplate tmplt;
   static int firstcall=1;
   //On the first call set the template elevation to zero
-  if(firstcall) {tmplt.elevmin=0;tmplt.elevmax=0;firstcall=0;}
+  if(firstcall) {
+    tmplt.elevmin=0;tmplt.elevmax=0;firstcall=0;
+    read_calibration_file(&calib);
+  }
   //If needed read the template file according to elevation
   if(d->elevation>tmplt.elevmax || d->elevation<tmplt.elevmin) {
     tmplt=frogs_read_template_elev(d->elevation);
   }
 
+
   //Optimize the likelihood
-  rtn=frogs_likelihood_optimization(d,&tmplt);
+  rtn=frogs_likelihood_optimization(d,&tmplt,&calib);
 
   //Release memory used in the data structure
   frogs_release_memory(d);
@@ -205,7 +138,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt_old(struct frogs_imgtmplt_in *d) {
   }
 
   //Optimize the likelihood
-  rtn=frogs_likelihood_optimization(d,&tmplt);
+//  rtn=frogs_likelihood_optimization(d,&tmplt);
 
   //Release memory used in the data structure
   frogs_release_memory(d);
@@ -265,7 +198,8 @@ struct frogs_imgtmplt_out frogs_null_imgtmplt_out() {
 //================================================================
 struct frogs_imgtmplt_out
 frogs_likelihood_optimization(struct frogs_imgtmplt_in *d, 
-			      struct frogs_imgtemplate *tmplt) {
+			      struct frogs_imgtemplate *tmplt,
+			      struct calibration_file *calib) {
   /* This function optimizes the likelihood function on the event parameter 
      space. It returns all the relevant information regarding the convergence 
      in a structure frogs_imgtmplt_out. d is a pointer to a structure 
@@ -372,7 +306,7 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
     rtn.cvrgpterr.lambda=FROGS_BAD_NUMBER;
 
   /*Calculate the image and background goodness for the convergence point.*/ 
-  if(frogs_goodness(&rtn,d,tmplt)!=FROGS_OK) 
+  if(frogs_goodness(&rtn,d,tmplt,calib)!=FROGS_OK) 
     frogs_showxerror("Problem encountered in the convergence goodness calculation");
   gsl_multifit_fdfsolver_free(s);
   gsl_matrix_free(covar);
@@ -383,7 +317,8 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
 //================================================================
 int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 		   struct frogs_imgtmplt_in *d, 
-		   struct frogs_imgtemplate *tmplt) {
+		   struct frogs_imgtemplate *tmplt,
+		   struct calibration_file *calib) {
   /* Calculates the image and background goodness whose values and associated 
      number of pixels are passed back in tmplanlz which also contains the 
      values of the event physical parameters for which the goodness is 
@@ -392,7 +327,6 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
      template data */
  
   int telnpix; // pixel counter for single camera 
-  double correctionB = -99999.;
  
   /*Initialize goodnesses and the number of pixels for both image 
     and background regions*/
@@ -401,31 +335,14 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
   tmplanlz->goodness_bkg=0;
   tmplanlz->npix_bkg=0;
 
-  tmplanlz->tel_goodnessImg[0] = FROGS_BAD_NUMBER; 
-  tmplanlz->tel_goodnessImg[1] = FROGS_BAD_NUMBER; 
-  tmplanlz->tel_goodnessImg[2] = FROGS_BAD_NUMBER; 
-  tmplanlz->tel_goodnessImg[3] = FROGS_BAD_NUMBER; 
-  tmplanlz->tel_goodnessBkg[0] = FROGS_BAD_NUMBER;
-  tmplanlz->tel_goodnessBkg[1] = FROGS_BAD_NUMBER;
-  tmplanlz->tel_goodnessBkg[2] = FROGS_BAD_NUMBER;
-  tmplanlz->tel_goodnessBkg[3] = FROGS_BAD_NUMBER;
-
-/*
-  for( int imu=0; imu <500; imu++ )
-  {
-    for( int iq=0 ; iq<500; iq++)
-    {
-      double xx=(double)imu*10./500.;
-      double yy=(double)iq*10./500. - 1.0;
-      double dumby1 = frogs_probability_density(yy,xx,0.3,0.4);
-      double dumby2 = frogs_mean_pix_lkhd(yy,xx,0.3,0.4);
-      double dumby3 = -2.0*log(dumby1) - dumby2;
-      printf("%f %f %f %f %f\n",xx,yy,dumby1,dumby2,dumby3);
-    }
-  }
-
-  exit(0);
-*/
+  tmplanlz->tel_goodnessImg[0] = 0.;
+  tmplanlz->tel_goodnessImg[1] = 0.;
+  tmplanlz->tel_goodnessImg[2] = 0.;
+  tmplanlz->tel_goodnessImg[3] = 0.;
+  tmplanlz->tel_goodnessBkg[0] = 0.;
+  tmplanlz->tel_goodnessBkg[1] = 0.;
+  tmplanlz->tel_goodnessBkg[2] = 0.;
+  tmplanlz->tel_goodnessBkg[3] = 0.;
 
   for(int tel=0;tel<d->ntel;tel++) {
     telnpix = 0;
@@ -437,21 +354,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 				  tmplt,&pix_in_template);
 
 // ED OUTPUT
-//	if( mu > 1.0e-18 )
-	  tmplanlz->tmplt_tubes[tel][pix] = mu;
-//	else 
-//	  tmplanlz->tmplt_tubes[tel][pix] = 0.0;
-
-/*
-	if(mu>1.0e-18) {
-	  tmplanlz->tmplt_tubes[tel][pix] = d->scope[tel].q[pix] - mu;
-	  tmplanlz->tmplt_tubes[tel][pix] /= mu;
-	} else {
-	  tmplanlz->tmplt_tubes[tel][pix] = d->scope[tel].q[pix];
-	  tmplanlz->tmplt_tubes[tel][pix] /= d->scope[tel].ped[pix];
-	  tmplanlz->tmplt_tubes[tel][pix] = 0.0;
-	}
-*/
+	tmplanlz->tmplt_tubes[tel][pix] = mu;
 
 	if(mu!=FROGS_BAD_NUMBER) { 
 	  double pd=frogs_probability_density(d->scope[tel].q[pix],mu,
@@ -482,91 +385,16 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	  //If requested we produce a calibration output
 	  if(FROGS_NBEVENT_GDNS_CALIBR>0) 
 	    frogs_gdns_calibr_out(d->event_id, tel, pix, d->scope[tel].q[pix],
-				  d->scope[tel].ped[pix],mu,pix_goodness);
+				  d->scope[tel].ped[pix],mu,pix_goodness,tmplanlz->cvrgpt.log10e,tmplanlz->cvrgpt.xp,tmplanlz->cvrgpt.yp);
 
 	  /*Apply the single pixel goodness correction according to the 
 	    pixel pedestal width and the model value mu*/
 
 	  /*Decides if the pixel should be counted in the image 
 	    or background region*/
-//GHTEMP
+
 	  int pix_in_img=frogs_image_or_background(tel,pix,d);
 
-//	  int pix_in_img=FROGS_NOTOK;
-//	  if ( mu >= 1E-3 )
-//	    pix_in_img=FROGS_OK;
-
-	  //int pix_in_img=pix_in_template; // old definition of image 
-
-// Corrections based on On Data Crab
-/*
-	  if(d->scope[tel].ped[pix]<1.5) pix_goodness=pix_goodness*0.420-0.072;
-	  if(d->scope[tel].ped[pix]>=1.5 && d->scope[tel].ped[pix]<1.557) pix_goodness=pix_goodness*0.425-0.079;
-	  if(d->scope[tel].ped[pix]>=1.557 && d->scope[tel].ped[pix]<1.597) pix_goodness=pix_goodness*0.515-0.080;
-	  if(d->scope[tel].ped[pix]>=1.597 && d->scope[tel].ped[pix]<1.686) pix_goodness=pix_goodness*0.435-0.076;
-	  if(d->scope[tel].ped[pix]>=1.686 && d->scope[tel].ped[pix]<1.72) pix_goodness=pix_goodness*0.52-0.079;
-	  if(d->scope[tel].ped[pix]>=1.72 && d->scope[tel].ped[pix]<1.73) pix_goodness=pix_goodness*0.407-0.0635;
-	  if(d->scope[tel].ped[pix]>=1.73 && d->scope[tel].ped[pix]<1.752) pix_goodness=pix_goodness*0.50-0.066;
-	  if(d->scope[tel].ped[pix]>=1.778) pix_goodness=pix_goodness*0.499-0.078; 
-*/
-
-// New Corrections based MC 20120301
-/*
-	  if( mu < 1E-3 )
-	  {
-
-            if(d->scope[tel].ped[pix]<0.971) 
-              correctionB = 0.012 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(0.012-0.012);
-            if(d->scope[tel].ped[pix]>=0.971 && d->scope[tel].ped[pix]<1.11) 
-              correctionB = 0.012 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(0.012-0.012);
-            if(d->scope[tel].ped[pix]>=1.11 && d->scope[tel].ped[pix]<1.33) 
-              correctionB = 0.0173 + ( (d->scope[tel].ped[pix]-1.33)/(1.33-1.11) )*(0.0173-0.012);
-            if(d->scope[tel].ped[pix]>=1.33 && d->scope[tel].ped[pix]<1.533) 
-              correctionB = 0.0195 + ( (d->scope[tel].ped[pix]-1.533)/(1.533-1.11) )*(0.0195-0.0173);
-            if(d->scope[tel].ped[pix]>=1.533 && d->scope[tel].ped[pix]<1.696) 
-              correctionB = 0.011 + ( (d->scope[tel].ped[pix]-1.696)/(1.696-1.533) )*(0.011-0.0195);
-            if(d->scope[tel].ped[pix]>=1.696 && d->scope[tel].ped[pix]<1.932) 
-              correctionB = 0.016 + ( (d->scope[tel].ped[pix]-1.932)/(1.932-1.696) )*(0.016-0.011);
-            if(d->scope[tel].ped[pix]>=1.932 && d->scope[tel].ped[pix]<2.201) 
-              correctionB = 0.0159 + ( (d->scope[tel].ped[pix]-2.201)/(2.201-1.932) )*(0.0159-0.016);
-            if(d->scope[tel].ped[pix]>=2.201 && d->scope[tel].ped[pix]<2.494) 
-              correctionB = 0.017 + ( (d->scope[tel].ped[pix]-2.494)/(2.494-2.201) )*(0.017-0.0159);
-            if(d->scope[tel].ped[pix]>=2.494 && d->scope[tel].ped[pix]<2.901) 
-              correctionB = 0.017 + ( (d->scope[tel].ped[pix]-2.901)/(2.901-2.494) )*(0.017-0.017);
-            if(d->scope[tel].ped[pix]>=2.901 && d->scope[tel].ped[pix]<3.348) 
-              correctionB = 0.018 + ( (d->scope[tel].ped[pix]-3.348)/(3.348-2.901) )*(0.018-0.017);
-            if(d->scope[tel].ped[pix]>=3.348) 
-              correctionB = 0.017 + ( (d->scope[tel].ped[pix]-2.901)/(3.348-2.901) )*(0.018-0.017);
-
-	  } else {
-
-            if(d->scope[tel].ped[pix]<0.971) 
-               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(-0.230-(-0.220));
-             if(d->scope[tel].ped[pix]>=0.971 && d->scope[tel].ped[pix]<1.11) 
-               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-0.971)/(1.11-0.971) )*(-0.230-(-0.220));
-             if(d->scope[tel].ped[pix]>=1.11 && d->scope[tel].ped[pix]<1.33) 
-               correctionB = -0.245 + ( (d->scope[tel].ped[pix]-1.33)/(1.33-1.11) )*(-0.245-(-0.220));
-             if(d->scope[tel].ped[pix]>=1.33 && d->scope[tel].ped[pix]<1.533) 
-               correctionB = -0.237 + ( (d->scope[tel].ped[pix]-1.533)/(1.533-1.33) )*(-0.237-(-0.245));
-             if(d->scope[tel].ped[pix]>=1.533 && d->scope[tel].ped[pix]<1.696) 
-               correctionB = -0.237 + ( (d->scope[tel].ped[pix]-1.696)/(1.696-1.533) )*(-0.237-(-0.237));
-             if(d->scope[tel].ped[pix]>=1.696 && d->scope[tel].ped[pix]<1.932) 
-               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-1.932)/(1.932-1.696) )*(-0.230-(-0.237));
-             if(d->scope[tel].ped[pix]>=1.932 && d->scope[tel].ped[pix]<2.201) 
-               correctionB = -0.230 + ( (d->scope[tel].ped[pix]-2.201)/(2.201-1.932) )*(-0.230-(-0.230));
-             if(d->scope[tel].ped[pix]>=2.201 && d->scope[tel].ped[pix]<2.494) 
-               correctionB = -0.215 + ( (d->scope[tel].ped[pix]-2.494)/(2.494-2.201) )*(-0.215-(-0.23));
-             if(d->scope[tel].ped[pix]>=2.494 && d->scope[tel].ped[pix]<2.901) 
-               correctionB = -0.205 + ( (d->scope[tel].ped[pix]-2.901)/(2.901-2.494) )*(-0.205-(-0.215));
-             if(d->scope[tel].ped[pix]>=2.901 && d->scope[tel].ped[pix]<3.348) 
-               correctionB = -0.200 + ( (d->scope[tel].ped[pix]-3.348)/(3.348-2.901) )*(-0.200-(-0.205));
-             if(d->scope[tel].ped[pix]>=3.348) 
-               correctionB = -0.200 + ( (d->scope[tel].ped[pix]-3.348)/(3.348-2.901) )*(-0.200-(-0.205));
-	  }
-
-// Make correction using above
-	  pix_goodness += correctionB;
-*/
 	  //If requested, we produce a display of the event
 	  if(FROGS_NBEVENT_DISPLAY>0) 
 	    frogs_event_display(d->event_id, d->scope[tel].q[pix],mu,
@@ -618,6 +446,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
      the number of pixels in the image and in the background are large 
      compared to the number of optimized parameters.*/
     
+  //printf("Energy %d %f\n",d->event_id,tmplanlz->cvrgpt.log10e);
 
   return FROGS_OK;
 }
@@ -696,7 +525,7 @@ int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d){
 //================================================================
 //================================================================
 int frogs_gdns_calibr_out(int event_id, int tel, int pix, float q,
-			  float ped, float mu,double pix_goodness){
+			  float ped, float mu,double pix_goodness,double energy,double xp,double yp){
   /*This funtion is used to print out information used to establish the 
     calibration correction to be applied to individual pixel goodness 
     values. On the first time it is called, it opens a file named 
@@ -738,8 +567,8 @@ int frogs_gdns_calibr_out(int event_id, int tel, int pix, float q,
   }
 
   //If we get here it means we have an open file and we need to print the data
-  fprintf(calib,"%d %d %d %f %f %f %g\n",event_id,tel,pix,ped,q,mu,
-	  pix_goodness);
+  fprintf(calib,"%d %d %d %f %f %f %g %f %f %f\n",event_id,tel,pix,ped,q,mu,
+	  pix_goodness,energy,xp,yp);
   return FROGS_OK;
 }
 //================================================================
@@ -1028,6 +857,51 @@ double frogs_integrand_for_averaging(double q, void *par) {
 }
 //================================================================
 //================================================================
+/*
+struct calibration_file read_calibration_file() {
+
+  int i;
+  FILE *calibfile;
+
+  struct calibration_file rtn;
+
+  if( (calibfile = fopen("/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/cFILE.txt","r")) == NULL ) {
+    frogs_showxerror("Failed opening the calibration file");
+  }
+
+  while( fscanf(calibfile,"%lf\n",&rtn.CALIBF[i])!=EOF ) {
+    printf("%f\n",rtn.CALIBF[i]);
+    i++;
+  }
+
+  return rtn;
+
+}
+*/
+void read_calibration_file(struct calibration_file *calib) {
+
+  int i=0;
+  FILE *calibfile;
+  double tempval;
+
+  if( (calibfile = fopen("/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/cFILE.txt","r")) == NULL ) {
+    frogs_showxerror("Failed opening the calibration file");
+    exit(-1);
+  }
+
+  while( fscanf(calibfile,"%lf\n",&tempval)!=EOF ) {
+    calib->CALIBF[i] = tempval;
+    //printf("%f\n",calib->CALIBF[i]);
+    i++;
+  }
+
+  fclose(calibfile);
+
+//  return;
+
+}
+//================================================================
+//================================================================
 struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
   /* This function reads the file whose name is specified by the variable 
      FROGS_TEMPLATE_LIST, searching for the first one matching the elevation 
@@ -1074,7 +948,7 @@ struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
   if(elevation>=65.0) {
 //    char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
     char template_file_name[256];
-    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/Templates/SimulatedModels/elev70X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/SimulatedModels/elev70X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=70.0;
@@ -1084,7 +958,7 @@ struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
     read that file*/
   if(fabs(elevation-60.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/Templates/SimulatedModels/elev60X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/SimulatedModels/elev60X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=60.0;
@@ -1092,14 +966,12 @@ struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
   } 
   if(fabs(elevation-50.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/Templates/SimulatedModels/elev50X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/SimulatedModels/elev50X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=50.0;
     return rtn;
   } 
- 
-  printf("\nDo we bother cominging in here?????\n\n");
  
   //If we arrive here, that means no appropriate template file was found
   fprintf(stderr,"Elevation=%f\n",elevation);
@@ -1462,7 +1334,7 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
   
   //Angle between the x direction and the shower image axis
   float phi=atan2(pnt.yp-d->scope[tel].yfield,pnt.xp-d->scope[tel].xfield);
-  phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
+  //phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
   float cphi=cos(phi);
   float sphi=sin(phi);
   //Impact parameter to the telescope

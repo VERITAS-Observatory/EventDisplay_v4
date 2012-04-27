@@ -145,9 +145,9 @@ class VStereoAnalysis
 	float fTreeSelected_EmissionHeight;
 	float fTreeSelected_EmissionHeightChi2;
 
-	int fTreeSelescted_frogsEventID;
-	int fTreeSelescted_frogsGSLConStat;
-	int fTreeSelescted_frogsNB_iter;
+	int   fTreeSelescted_frogsEventID;
+	int   fTreeSelescted_frogsGSLConStat;
+	int   fTreeSelescted_frogsNB_iter;
 	double fTreeSelescted_frogsXS;
 	double fTreeSelescted_frogsXSerr;
 	double fTreeSelescted_frogsYS;
@@ -156,14 +156,16 @@ class VStereoAnalysis
 	double fTreeSelescted_frogsXPerr;
 	double fTreeSelescted_frogsYP;
 	double fTreeSelescted_frogsYPerr;
+	double fTreeSelescted_frogsXPGC;
+	double fTreeSelescted_frogsYPGC;
 	double fTreeSelescted_frogsEnergy;
 	double fTreeSelescted_frogsEnergyerr;
 	double fTreeSelescted_frogsLambda;
 	double fTreeSelescted_frogsLambdaerr;
 	double fTreeSelescted_frogsGoodnessImg;
-	int fTreeSelescted_frogsNpixImg;
+	int   fTreeSelescted_frogsNpixImg;
 	double fTreeSelescted_frogsGoodnessBkg;
-	int fTreeSelescted_frogsNpixBkg;
+	int   fTreeSelescted_frogsNpixBkg;
 	double fTreeSelescted_frogsXPStart;
 	double fTreeSelescted_frogsYPStart;
 	double fTreeSelescted_frogsXPED;

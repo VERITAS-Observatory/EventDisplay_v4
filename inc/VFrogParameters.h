@@ -16,12 +16,11 @@ class VFrogParameters
 {
     private:
         bool fDebug;
-        TTree *fTreeFrog;                           //!< output tree
+        TTree *fTreeFrog;                         //!< output tree
         unsigned int fNTel;                       //!< number of telescopes
 
     public:
 
-//        VFrogParameters( int iNTel = 4, unsigned int iShortTree = 0 );
         VFrogParameters();
         ~VFrogParameters();
 
@@ -42,6 +41,8 @@ class VFrogParameters
         float frogsXPerr;
         float frogsYP;
         float frogsYPerr;
+        float frogsXPGC;
+        float frogsYPGC;
         float frogsEnergy;
         float frogsEnergyerr;
         float frogsLambda;

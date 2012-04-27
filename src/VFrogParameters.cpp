@@ -9,33 +9,11 @@
 VFrogParameters::VFrogParameters()
 {
 
-//    fDebug = false;
-//    if( fDebug ) cout << "VFrogParameters::VFrogParameters( int iNTel ) " << iNTel << endl;
     fTreeFrog = 0;
-//    fNTel = iNTel;
     reset();
 
-//    vector< bool > it( fNTel, 0 );
-//    vector< float > i_f( fNTel, -99. );
-/*
-    for( unsigned int i = 0; i < fNMethods; i++ )
-    {
-        fTelIDImageSelected.push_back( it );
-//C. Duke 19Oct06
-        fTelIDImageSelected_bitcode[i]=0;
-        fShower_Xoff_DISP.push_back( i_f );
-        fShower_Yoff_DISP.push_back( i_f );
-	fShower_Weight_DISP.push_back( i_f );
-    }
-*/
 }
 
-
-/*!
-   initialise this data tree
-   \param iName tree name
-   \param iTitle tree title
-*/
 void VFrogParameters::initTree( string iName, string iTitle )
 {
 
@@ -43,7 +21,6 @@ void VFrogParameters::initTree( string iName, string iTitle )
     
     fTreeFrog = new TTree( iName.c_str(), iTitle.c_str() );
     fTreeFrog->SetMaxTreeSize(1000*Long64_t(2000000000));
-//    fTreeFrog->SetAutoSave(100000000);              // autosave when 100 Mbytes written
     fTreeFrog->SetAutoSave(1000);              
 
 //  Branches:
@@ -58,6 +35,8 @@ void VFrogParameters::initTree( string iName, string iTitle )
     fTreeFrog->Branch("frogsXPerr", &frogsXPerr, "frogsXPerr/F" );
     fTreeFrog->Branch("frogsYP", &frogsYP, "frogsYP/F" );
     fTreeFrog->Branch("frogsYPerr", &frogsYPerr, "frogsYPerr/F" );
+    fTreeFrog->Branch("frogsXPGC", &frogsXPGC, "frogsXPGC/F" );
+    fTreeFrog->Branch("frogsYPGC", &frogsYPGC, "frogsYPGC/F" );
     fTreeFrog->Branch("frogsEnergy", &frogsEnergy, "frogsEnergy/F" );
     fTreeFrog->Branch("frogsEnergyerr", &frogsEnergyerr, "frogsEnergyerr/F" );
     fTreeFrog->Branch("frogsLambda", &frogsLambda, "frogsLambda/F" );
@@ -112,13 +91,10 @@ void VFrogParameters::reset()
 
  }
 
-
+/*
 void VFrogParameters::printParameters()
 {
 
-// Output Stuff
-
-/*
     cout << "Shower parameters: " << endl;
     cout << runNumber << "\t" << eventNumber << " (status " << eventStatus << ")\t" <<  MJD;
     cout << time << "\t" << fNTelescopes << endl;
@@ -129,7 +105,7 @@ void VFrogParameters::printParameters()
     cout << fTargetElevation <<  "\t" << fTargetAzimuth << endl;
     cout <<  fTargetDec <<  "\t" << fTargetRA << endl;
     cout << fWobbleNorth <<  "\t" << fWobbleEast << endl;
-*/
+
 }
 
-
+*/

@@ -1224,12 +1224,10 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
       cout << "VGammaHadronCuts::applyFrogsCut event " << i << endl;
    }
 
-//   if (fData->frogsGoodnessImg > frogsGoodnessImgCut )
-//      return false;
+   if (fData->frogsGoodnessImg > frogsGoodnessImgCut )
+      return false;
 
-// For know cuts not applied
-
-   return false;
+   return true;
 }
 
 /*
@@ -1385,6 +1383,10 @@ bool VGammaHadronCuts::applyStereoShapeCuts()
 // emission height cuts
     if( fData->EmissionHeight > 0. && fData->EmissionHeight > fArrayEmmission_max ) return false;
     if( fData->EmissionHeight > 0. && fData->EmissionHeight < fArrayEmmission_min ) return false;
+
+/// temp temp temp GH
+//    if(fData->frogsGoodnessImg >   0.7 ) return false;
+//    if(fData->frogsGoodnessImg < -10.0 ) return false;
 
     return true;
 }

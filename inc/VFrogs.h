@@ -25,14 +25,6 @@
 #include <vector>
 #include <valarray>
 
-//#include <gsl/gsl_vector.h>
-//#include <gsl/gsl_multifit_nlin.h> //Levenberg-Marquardt 
-//#include <gsl/gsl_blas.h> //Levenberg-Marquardt linear algebra
-//#include <gsl/gsl_integration.h>
-//#include <gsl/gsl_interp.h>
-
-
-
 using namespace std;
 
 class VFrogs : public VEvndispData, public VGrIsuAnalyzer
@@ -49,34 +41,35 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	vector<int>    fAnasumEventNumber;
 
         void  doFrogsStuff(int);                        //!< do the actual analysis (called for each event)
-        int   getFrogsEventID();
-	int   getFrogsGSLConStat();
-	int   getFrogsNB_iter();
-	float getFrogsXS();
-	float getFrogsXSerr();
-	float getFrogsYS();
-	float getFrogsYSerr();
-	float getFrogsXP();
-	float getFrogsXPerr();
-	float getFrogsYP();
-	float getFrogsYPerr();
-	float getFrogsEnergy();
-	float getFrogsEnergyerr();
-	float getFrogsLambda();
-	float getFrogsLambdaerr();
-	float getFrogsGoodnessImg();
-	int   getFrogsNpixImg();
-	float getFrogsGoodnessBkg();
-	int   getFrogsNpixBkg();
-
-	float getFrogsXPStart();
-	float getFrogsYPStart();
-	float getFrogsXPED();
-	float getFrogsYPED();
-	float getFrogsXSStart();
-	float getFrogsYSStart();
-	float getFrogsTelGoodnessImg( int i );
-	float getFrogsTelGoodnessBkg( int i );
+	int   getFrogsEventID() { return frogsEventID; }
+	int   getFrogsGSLConStat() { return frogsGSLConStat; }
+	int   getFrogsNB_iter() { return frogsNB_iter; }
+	float getFrogsXS() { return frogsXS; }
+	float getFrogsXSerr() { return frogsXSerr; }
+	float getFrogsYS() { return frogsYS; }
+	float getFrogsYSerr() { return frogsYSerr; }
+	float getFrogsXP() { return frogsXP; }
+	float getFrogsXPerr() { return frogsXPerr; }
+	float getFrogsYP() { return frogsYP; }
+	float getFrogsYPerr() { return frogsYPerr; }
+	float getFrogsXPGC() { return frogsXPGC; }
+	float getFrogsYPGC() { return frogsYPGC; }
+	float getFrogsEnergy() { return frogsEnergy; }
+	float getFrogsEnergyerr() { return frogsEnergyerr; }
+	float getFrogsLambda() { return frogsLambda; }
+	float getFrogsLambdaerr() { return frogsLambdaerr; }
+	float getFrogsGoodnessImg() { return frogsGoodnessImg; }
+	int   getFrogsNpixImg() { return frogsNpixImg; }
+	float getFrogsGoodnessBkg() { return frogsGoodnessBkg; }
+	int   getFrogsNpixBkg() { return frogsNpixBkg; }
+	float getFrogsXPStart() { return frogsXPStart; }
+	float getFrogsYPStart() { return frogsYPStart; }
+	float getFrogsXPED() { return frogsXPED; }
+	float getFrogsYPED() { return frogsYPED; }
+	float getFrogsXSStart() { return frogsXSStart; }
+	float getFrogsYSStart() { return frogsYSStart; }
+	float getFrogsTelGoodnessImg( int i ) { return frogsTelGoodnessImg[i]; }
+	float getFrogsTelGoodnessBkg( int i ) { return frogsTelGoodnessBkg[i]; }
 
         void initAnalysis();
         void initFrogTree();
@@ -84,12 +77,12 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
         void initFrogEvent();
 	void terminate();
 	float transformTelescopePosition( int iTel, float i_ze, float i_az, int axis );
+ 	float transformShowerPosition( float i_ze, float i_az, float xcore, float ycore, int axis );
 	void readTableFrogs();
 	void readAnasumFrogs();
 	double getFrogsStartEnergy(int eventNumber);
 	int getFrogsAnasumNumber(int eventNumber, int runNumber);
         void finishFrogs(TFile *f);
-        //void finishFrogs();
 
 	TFile *mscwFrogsFile;
 	TFile *AnasumFrogsFile;
@@ -99,10 +92,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	struct 		     frogs_imgtmplt_in frogs_convert_from_ed(int eventNumber, int adc_type, double inEnergy); 
         VEvndispData         *fData;                    //!< pointer to data class
 	VShowerParameters    *fShowerParam;
-//	VFrogParameters      *fFrogParameters;
         VEvndispRunParameter *fRunPara;                //!< data class for all run parameters
-//	VDetectorGeometry    *fDetector;
-//        VBFDataReader        *fVBFReader;
         VVirtualDataReader   *fReader;
 
 	int frogsRecID;
@@ -118,6 +108,8 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
         float frogsXPerr;
         float frogsYP;
         float frogsYPerr;
+        float frogsXPGC;
+        float frogsYPGC;
         float frogsEnergy;
         float frogsEnergyerr;
         float frogsLambda;
