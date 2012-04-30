@@ -11,9 +11,12 @@ VImageCleaning::VImageCleaning( VEvndispData *iData )
 {
     fData = iData;
 
-    // NN Image Cleaning
+// NN Image Cleaning
     kInitNNImageCleaning = false;
-    kInitNNImageCleaning = InitNNImageCleaning();
+    if( fData && fData->getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
+    {
+       kInitNNImageCleaning = InitNNImageCleaning();
+    }
 
     nRings        = 2;
     CoincWinLimit = 16;
