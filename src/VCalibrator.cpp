@@ -64,22 +64,13 @@ void VCalibrator::calculatePedestals( bool iLowGain )
                 hped_vec.push_back( iped_vec );
             }
 // root output file = pedfilename.root
-            for( unsigned int i = 0; i < getNTel(); i++ )
+            for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
             {
+		unsigned int i = getTeltoAna()[tel];
                 if( !iLowGain ) ioutfile = fPedFileNameC[i] + ".root";
                 else            ioutfile = fLowGainPedFileNameC[i] + ".root";
-                if( getTeltoAna().size() == 1 )
-                {
-                    if( getTeltoAna()[0] == i ) fPedOutFile.push_back(new TFile( ioutfile.c_str(), "RECREATE") );
-// prelim ugly workaround (sorry)
-                    else
-                    {
-                        sprintf( ic, "%s/temporary_root_file_0X7.root", getRunParameter()->getDirectory_EVNDISPCalibrationData().c_str() );
-                        fPedOutFile.push_back( new TFile( ic, "RECREATE" ) );
-                    }
-                }
-                else fPedOutFile.push_back(new TFile( ioutfile.c_str(), "RECREATE") );
 
+                fPedOutFile.push_back( new TFile( ioutfile.c_str(), "RECREATE") );
                 if( fPedOutFile.back()->IsZombie() )
                 {
                     cout << "VCalibrator::calculatePedestal error in creating pedestal file: ";
@@ -156,7 +147,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
 	else           cout << " high ";
 	cout << " gain pedestals to " << endl;
         cout << "\t\t" << ioutfile << endl;
-        cout << "\t\t" << fPedOutFile[t]->GetName() << endl;
+        cout << "\t\t" << fPedOutFile[tel]->GetName() << endl;
 // loop over all channels
         for(unsigned int i=0;i<hped_vec[t][0].size();i++)
         {
@@ -171,7 +162,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
         }
         os.close();
 // write histograms to file
-        if( !fPedOutFile[t] || !fPedOutFile[t]->cd() )
+        if( !fPedOutFile[tel] || !fPedOutFile[tel]->cd() )
         {
             cout << "VCalibrator::writePeds(): error accessing pedestal output file " << t << endl;
             cout << "...exiting" << endl;
@@ -179,7 +170,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
         }
         if( usePedestalsInTimeSlices( iLowGain ) ) fillPedestalsInTimeSlices( tel, iPedestalCalculator );
 // write 1D histograms
-        TDirectory *i_dist = fPedOutFile[t]->mkdir( "distributions" );
+        TDirectory *i_dist = fPedOutFile[tel]->mkdir( "distributions" );
         if( i_dist->cd() )
         {
             i_dist->cd();
@@ -194,7 +185,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
                 }
             }
         }
-        fPedOutFile[t]->Close();
+        fPedOutFile[tel]->Close();
 // ugly workaround
         sprintf( ic, "rm -f %s/temporary_root_file_0X7.root", getRunParameter()->getDirectory_EVNDISPCalibrationData().c_str() );
         gSystem->Exec ( ic );
