@@ -82,7 +82,6 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
   //On the first call set the template elevation to zero
   if(firstcall) {
     tmplt.elevmin=0;tmplt.elevmax=0;firstcall=0;
-    read_calibration_file(&calib);
   }
   //If needed read the template file according to elevation
   if(d->elevation>tmplt.elevmax || d->elevation<tmplt.elevmin) {
@@ -863,51 +862,6 @@ double frogs_integrand_for_averaging(double q, void *par) {
 }
 //================================================================
 //================================================================
-/*
-struct calibration_file read_calibration_file() {
-
-  int i;
-  FILE *calibfile;
-
-  struct calibration_file rtn;
-
-  if( (calibfile = fopen("/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/cFILE.txt","r")) == NULL ) {
-    frogs_showxerror("Failed opening the calibration file");
-  }
-
-  while( fscanf(calibfile,"%lf\n",&rtn.CALIBF[i])!=EOF ) {
-    printf("%f\n",rtn.CALIBF[i]);
-    i++;
-  }
-
-  return rtn;
-
-}
-*/
-void read_calibration_file(struct calibration_file *calib) {
-
-  int i=0;
-  FILE *calibfile;
-  double tempval;
-
-  if( (calibfile = fopen("/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/cFILE.txt","r")) == NULL ) {
-    frogs_showxerror("Failed opening the calibration file");
-    exit(-1);
-  }
-
-  while( fscanf(calibfile,"%lf\n",&tempval)!=EOF ) {
-    calib->CALIBF[i] = tempval;
-    //printf("%f\n",calib->CALIBF[i]);
-    i++;
-  }
-
-  fclose(calibfile);
-
-//  return;
-
-}
-//================================================================
-//================================================================
 struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
   /* This function reads the file whose name is specified by the variable 
      FROGS_TEMPLATE_LIST, searching for the first one matching the elevation 
@@ -1340,7 +1294,7 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
   
   //Angle between the x direction and the shower image axis
   float phi=atan2(pnt.yp-d->scope[tel].yfield,pnt.xp-d->scope[tel].xfield);
-  //phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
+  phi=phi+FROGS_PI; //This is for real data only. We'll have to understand that
   float cphi=cos(phi);
   float sphi=sin(phi);
   //Impact parameter to the telescope
