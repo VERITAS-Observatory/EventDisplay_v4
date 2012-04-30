@@ -126,7 +126,6 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
         return;
     }
     string ioutfile;
-    char ic[1000];
 // loop over all telescopes
     for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
     {
@@ -186,9 +185,6 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
             }
         }
         fPedOutFile[tel]->Close();
-// ugly workaround
-        sprintf( ic, "rm -f %s/temporary_root_file_0X7.root", getRunParameter()->getDirectory_EVNDISPCalibrationData().c_str() );
-        gSystem->Exec ( ic );
     }                                             // end loop over all telescopes
 }
 
