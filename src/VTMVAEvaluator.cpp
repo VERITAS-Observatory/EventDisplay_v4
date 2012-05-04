@@ -951,7 +951,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    TFile iPN( fParticleNumberFileName.c_str() );
    if( iPN.IsZombie() )
    {
-       cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
+       cout << "VTVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
        cout << " cannot read particle number file " << fParticleNumberFileName << endl;
        cout << " (energy bin " << iEnergyBin << ")" << endl;
        return false;
@@ -964,7 +964,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    if( !i_of ) i_of = (TGraph*)iPN.Get( "gBGRate" );
    if( !i_on || !i_of )
    {
-       cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
+       cout << "VTVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
        cout << " cannot read graphs from particle number file " << endl;
        cout << i_on << "\t" << i_of << endl;
        return false;
@@ -986,7 +986,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    }
    else
    {
-      cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
+      cout << "VTVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
       cout << " invalid energy range ";
       cout << iEnergyBin << "\t" << fEnergyCut_Log10TeV_min.size() << endl;
       return false;
@@ -1002,11 +1002,11 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    if( Nof < 0. ) Nof = 0.;
    Ndif= Non - Nof;
 
-   cout << "TVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
+   cout << "VTVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
    cout << " non = " << Non;
    cout << " noff = " << Nof;
    cout << " ndif = " << Ndif << " (" << Ndif*fOptmizationSourceStrengthCrabUnits << ")";
-   cout << " (energy bin " << iEnergyBin << "," << iMeanEnergy_TeV << " [TeV] )";
+   cout << " (energy bin " << iEnergyBin << "," << TMath::Power( 10., iMeanEnergy_TeV ) << " [TeV] )";
    cout << endl;
 // apply source strength
    Ndif *= fOptmizationSourceStrengthCrabUnits;
@@ -1017,7 +1017,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    TFile iTMVAFile( iTMVARootFile.c_str() );
    if( iTMVAFile.IsZombie() )
    {
-      cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
+      cout << "VTVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
       cout << " cannot read TMVA file " << iTMVARootFile << endl;
       cout << " (energy bin " << iEnergyBin << ")" << endl;
       return false;
@@ -1057,7 +1057,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    }
    if( !effS || !effB )
    {
-      cout << "TVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
+      cout << "VTVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
       cout << " cannot find signal and/or background efficiency histogram(s)" << endl;
       cout << effS << "\t" << effB << endl;
       cout << hname << endl;
@@ -1085,7 +1085,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	 }
 	 if( iMaxMVACutValue > 0. )
 	 {
-	    cout << "TVMAEvaluator::getOptimalSignalEfficiency() removing low significance bins from background efficiency curve (";
+	    cout << "VTVMAEvaluator::getOptimalSignalEfficiency() removing low significance bins from background efficiency curve (";
 	    cout << fTMVAErrorFraction_min << ", " << iMaxMVACutValue << ")" << endl;
 	    for( int i = 1; i <= effB->GetNbinsX(); i++ )
 	    {
