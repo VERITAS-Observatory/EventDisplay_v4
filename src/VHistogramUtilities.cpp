@@ -270,12 +270,19 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphAsymmErrors *
 		 g->SetPointEYhigh( z, h->GetBinError( i ) );
               }
            }
-	   if( !bLinXaxis ) g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
+	   if( !bLinXaxis )
+	   {
+	      g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
+	      g->SetPointEXlow( z, h->GetXaxis()->GetBinCenter( i )-h->GetXaxis()->GetBinLowEdge( i ) );
+	      g->SetPointEXhigh( z, h->GetXaxis()->GetBinLowEdge( i )+h->GetXaxis()->GetBinWidth( i ) - h->GetXaxis()->GetBinCenter( i ) );
+           }
 	   else
 	   {
 	      if( h->GetXaxis()->GetBinCenter( i ) > 0. )
 	      {
 	         g->SetPoint( z, TMath::Log10( h->GetXaxis()->GetBinCenter( i ) ), h->GetBinContent( i ) );
+		 g->SetPointEXlow( z, TMath::Log10( h->GetXaxis()->GetBinCenter( i )-h->GetXaxis()->GetBinLowEdge( i ) ) );
+		 g->SetPointEXhigh( z, TMath::Log10( h->GetXaxis()->GetBinLowEdge( i )+h->GetXaxis()->GetBinWidth( i ) - h->GetXaxis()->GetBinCenter( i ) ) );
               }
 	      else continue;
            }
