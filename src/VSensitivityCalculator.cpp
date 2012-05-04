@@ -1354,7 +1354,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
         }
         if( (*i_MCData_iterator).second->energy.size() == 0 )
 	{
-	   sprintf( hname, "VSensitivityCalculator::getDifferentialFluxVectorfromMC error: effective area (%s) vector with length 0",
+	   sprintf( hname, "error: effective area (%s) vector with length 0",
 	                   (*i_MCData_iterator).second->fName.c_str() );
 	   return getDifferentialFluxVectorfromMC_ErrorMessage( hname );
         }
@@ -1426,11 +1426,11 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 // dE_Log10 must be a multiple of effective area energy bin size
         if( dE_Log10 < iBinSize )
 	{
-	   return getDifferentialFluxVectorfromMC_ErrorMessage( "VSensitivityCalculator::getDifferentialFluxVectorfromMC error: dE_log10 smaller than bin size of effective areas" );
+	   return getDifferentialFluxVectorfromMC_ErrorMessage( "error: dE_log10 smaller than bin size of effective areas" );
         }
         if( TMath::Abs( dE_Log10 / iBinSize - (int)(dE_Log10 / iBinSize) ) > 1.e-2 )
 	{
-	   return getDifferentialFluxVectorfromMC_ErrorMessage( "VSensitivityCalculator::getDifferentialFluxVectorfromMC error: dE_Log10 must be a multiple of effective area energy bin size" );
+	   return getDifferentialFluxVectorfromMC_ErrorMessage( "error: dE_Log10 must be a multiple of effective area energy bin size" );
         }
 
         double iBinEnergyMin = fMC_Data[1]->effArea_Emin;
