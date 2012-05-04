@@ -98,8 +98,12 @@ bool VPlotWPPhysSensitivity::initialize()
 	    {
 	       if( fObservationTime_H[t] > 1. ) sprintf( hname, "%d", (int)fObservationTime_H[t] );
 	       else                             sprintf( hname, "%.1f", fObservationTime_H[t] );
-	       iTemp << "data/IFAEOffaxisPerformanceBEI_Nov2011/Subarray" << fSubArray[a];
-	       iTemp << "_IFAE_" << hname << "hours_20111121_offaxis.root";
+// Nov 2011
+//	       iTemp << "data/IFAEOffaxisPerformanceBEI_Nov2011/Subarray" << fSubArray[a];
+//	       iTemp << "_IFAE_" << hname << "hours_20111121_offaxis.root";
+// May 2012
+	       iTemp << "data/IFAE_May2012/Subarray" << fSubArray[a];
+	       iTemp << "_IFAE_" << hname << "hours_test_offaxis.root";
             }
 	    else if( fAnalysis[i] == "HD_KB" || fAnalysis[i] == "MPIK" )
 	    {

@@ -536,10 +536,6 @@ bool VSensitivityCalculator::calculateParticleNumberGraphs_MC( double dE_Log10 )
 TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *cSensitivity, int iColor,
                                                                            string bUnit, double dE_Log10 )
 {
-    if( gSensitivityvsEnergy )
-    {
-       setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, fPlottingMarkerStyle, fPlottingMarkerSize, fPlottingFillStyle, fPlottingLineStyle );
-    }
 
 // get canvas
     if( cSensitivity == 0 )
@@ -548,16 +544,12 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 	if( !cSensitivity ) return 0;
     }
     cSensitivity->cd();
+    if( !gSensitivityvsEnergy ) return cSensitivity;
 
 // plot everything
-    if(  dE_Log10 < 0. )
-    {
-       gSensitivityvsEnergy->Draw( "l3" );
-    }
-    else                
-    {
-       gSensitivityvsEnergy->Draw( "l3" );
-    }
+    setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, fPlottingMarkerStyle, fPlottingMarkerSize, fPlottingFillStyle, fPlottingLineStyle );
+
+    gSensitivityvsEnergy->Draw( "l5" );
 
     cSensitivity->Update();
 
@@ -1193,8 +1185,8 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( h ) 
     {
        g = new TGraphAsymmErrors( 1 );
-//       get_Graph_from_Histogram( h, g, false, false, 2. );
        get_Graph_from_Histogram( h, g, false, false, 1.e3 );
+       setGraphPlottingStyle( g, 1, 1, 20, 2 );
     }
 
 // background rates
