@@ -9,10 +9,10 @@
 #
 
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ] || [ ! -n "$7" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <outputdirectory> <data set> [filling mode]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <analysis parameter file> <outputsubdirectory> <data set> [filling mode]"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
@@ -31,7 +31,10 @@ then
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file (full path and file name)"
    echo
-   echo "<outputdirectory>"
+   echo "<analysis parameter file>"
+   echo "     file with analysis parameter"
+   echo 
+   echo "<outputsubdirectory>"
    echo "     directory with all result and log files (full path)"
    echo
    echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
@@ -50,20 +53,34 @@ echo
 ######################################################################
 # input variables
 ######################################################################
+
+#######################################
+# read values from parameter file
+ANAPAR=$5
+if [ ! -e $ANAPAR ]
+then
+  echo "error: analysis parameter file not found: $ANAPAR" 
+  exit
+fi
+echo "reading anaysis parameter from $ANAPAR"
+NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
+ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
+EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
+TMVACUT=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
+EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
+echo $NIMAGESMIN $ANADIR $EREC $TMVACUT $EFFAREADIR
+# parameters from command line
 ARRAY=$1
 RECID=$2
 PART=$3
-INPU="eff"
 CFIL=$4
-ODIR=$5
-EREC=0
+ODIR=$6
 GFILLING=0
-DSET=$6
-if [ -n "$7" ]
+DSET=$7
+if [ -n "$8" ]
 then
-  GFILLING=$7
+  GFILLING=$8
 fi
-TMVACUT="20120323"
 
 # check particle type
 if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ] && [ $PART != "gamma_onSourceDISP" ]
@@ -90,7 +107,7 @@ QSHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir"
 echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
-DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/Analysis/
+DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
@@ -281,7 +298,7 @@ do
 ###############################################################################
 # create cut file
       iCBFILE=`basename $CFIL`      
-      iCFIL=$FDIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
+      iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
       if [ ! -e $CFIL ]
       then
         echo "ERROR: cut file does not exist:"
@@ -300,8 +317,10 @@ do
       rm -f $iCFIL-c
       sed -e "s|DIRECTIONCUT|$DIRECTIONCUT|" $iCFIL-d > $iCFIL-e
       rm -f $iCFIL-d
-      sed -e "s|SUBARRAY|$ARRAY|" $iCFIL-e > $iCFIL-f
+      sed -e "s|SUBARRAY|$ARRAY|" $iCFIL-e > $iCFIL-e1
       rm -f $iCFIL-e
+      sed -e "s|MINIMAGES|$NIMAGESMIN|" $iCFIL-e1 > $iCFIL-f
+      rm -f $iCFIL-e1
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
       then
          sed -e "s|WOBBLEOFFSET|${OFFMEA[$i]}|" $iCFIL-f > $iCFIL-g
@@ -321,25 +340,24 @@ do
       rm -f $iCFIL-h
       if [ $PART = "gamma_onSource" ] 
       then
-	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/EffectiveArea/AngularResolution/gamma_onSource."$ARRAY"_ID0.eff-0.root"
+	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_onSource."$ARRAY"_ID0.eff-0.root"
       else
-	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/EffectiveArea/AngularResolution/gamma_cone10."$ARRAY"_ID0.eff-$i.root"
+	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_cone10."$ARRAY"_ID0.eff-$i.root"
       fi
       sed -e "s|ANGRESFILE|$ANGRESFILE|" $iCFIL-i > $iCFIL-j
       rm -f $iCFIL-i
-
-# off axis bin
-      rm -f $iCFIL-k
-      sed -e "s|OFFAXISBIN|$i|" $iCFIL-j > $iCFIL-k
+# particle number file
+      PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".$i.root"
+      sed -e "s|PARTICLENUMBERFILE|$PNF|" $iCFIL-j > $iCFIL-k
       rm -f $iCFIL-j
       mv -f $iCFIL-k $iCFIL
       echo $iCFIL
 
 ###############################################################################
 # create run list
-      MSCF=$FDIR/effectiveArea-CTA-$DSET-$PART-$INPU-$i-$j.$ARRAY.dat
+      MSCF=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$ARRAY.dat
       rm -f $MSCF
-      echo "effective area data file for $PART $INPU $i $j" > $MSCF
+      echo "effective area data file for $PART $i $j" > $MSCF
 ###############################################################################
 # general run parameters
 ###############################################################################
@@ -383,14 +401,6 @@ do
       fi
       echo "* CUTFILE $iCFIL" >> $MSCF
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
-#      if [ $INPU = "msc" ]
-#      then
-#         echo "* SIMULATIONFILE_MC $MSCFILE" >> $MSCF
-#      fi
-#      if [ $INPU = "eff" ]
-#      then
-#	 echo "* SIMULATIONFILE_MCHISTO $CTA_USER_DATA_DIR/analysis/EffectiveArea/MCHistograms/$MCFIL-$i-$j.root" >> $MSCF
-#      fi
 
 # output file
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
@@ -401,7 +411,7 @@ do
       fi
 
 # create run script
-      FNAM="CTAeffArea-$PART-$INPU-$ARRAY-$i-$j"
+      FNAM="CTAeffArea-$PART-$ARRAY-$i-$j-$EREC"
 # run parameter file
       sed -e "s|IIIIFIL|$MSCF|" $FSCRIPT.sh > $QSHELLDIR/$FSCRIPT-1.sh
 # output file
@@ -422,21 +432,7 @@ do
       echo "parameter files write written to $FDIR"
 
 # submit the job
-      if [ $INPU = "msc" ]
-      then
-         echo "submitting to long queue"
-         qsub -l h_cpu=46:29:00 -l h_vmem=6000M -l tmpdir_size=35G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
-      fi
-      if [ $INPU = "eff" ]
-      then
-         echo "submitting to short queue"
-         if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_onSourceDISP" ]
-	 then
-            qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
-         else
-            qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
-         fi
-      fi
+     qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
    done
 done
 

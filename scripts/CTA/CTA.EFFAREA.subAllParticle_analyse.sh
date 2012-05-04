@@ -8,7 +8,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$4" ] && [ ! -n "$4" ]
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <output directory> <data set> [filling mode]"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <analysis parameter file> <output subdirectory> <data set> [filling mode]"
    echo
    echo "<subarray list>"
    echo "     text file with list of subarray IDs"
@@ -17,8 +17,11 @@ then
    echo "     template for gamma/hadron cut file"
    echo "     (suffix must be .gamma/.CRbck ; this will be added by this script)"
    echo 
-   echo "<output directory>"
-   echo "     directory name for output effective areas files"
+   echo "<analysis parameter file>"
+   echo "     file with analysis parameter"
+   echo
+   echo "<output subdirectory>"
+   echo "    sub-directory name (not the full path) for effective areas files"
    echo
    echo " <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
@@ -33,14 +36,25 @@ SUBAR=$1
 RECID=0
 CDIR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/"
 CFIL=$2
-ODIR=$3
+ANAPAR=$3
+ODIR=$4
 GMOD=0
-DSET=$4
-if [ -n "$5" ]
+DSET=$5
+if [ -n "$6" ]
 then
-  GMOD=$5
+  GMOD=$6
 fi
-mkdir -p $ODIR
+#######################################
+# read values from parameter file
+if [ ! -e $ANAPAR ]
+then
+  echo "error: analysis parameter file not found: $ANAPAR" 
+  exit
+fi
+echo "reading anaysis parameter from $ANAPAR"
+EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
+ODIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/$4/"
+mkdir -v -p $ODIR
 
 #arrays
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
@@ -94,7 +108,7 @@ do
         cp $CDIR/$CFIL.CRbck.dat $CCUT
       fi
 
-      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ODIR $DSET $GMOD
+      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ANAPAR $ODIR $DSET $GMOD
    done
 done
 

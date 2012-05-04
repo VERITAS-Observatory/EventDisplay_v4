@@ -9,13 +9,11 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] 
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <subarray list> <output directory for run parameter and log files> <onSource/cone10> <data set>"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone10> <data set> <analysis parameter file>"
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
    echo
    echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
-   echo
-   echo "  <output directory for run parameter and log files>  this is not the full path"
    echo
    echo "  <data set>         e.g. cta-ultra3, ISDC3700, ...  "
    echo
@@ -30,18 +28,30 @@ then
    exit
 fi
 
+#######################################
+# read values from parameter file
+ANAPAR=$4
+if [ ! -e $ANAPAR ]
+then
+  echo "error: analysis parameter file not found: $ANAPAR" 
+  exit
+fi
+echo "reading anaysis parameter from $ANAPAR"
+NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
+ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
+EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
+DDIR=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
+echo $NIMAGESMIN $ANADIR $EREC $DDIR
+# parameters from command line
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
 RXPAR=`basename $RPAR.runparameter runparameter`
-DDIR=$2
 OFIL="BDT"
-# energy reconstruction method
-EREC=0
 CONE="FALSE"
-if [ $3 == "cone10" ] || [ $3 == "cone" ]
+if [ $2 == "cone10" ] || [ $2 == "cone" ]
 then
   CONE="TRUE"
 fi
-DSET=$4
+DSET=$3
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #####################################
@@ -96,15 +106,15 @@ do
       cp -f $RPAR.runparameter $ODIR
 
 # signal and background files
-      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/Analysis/$DSUF."$ARRAY"_ID0*.root`
-      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/Analysis/proton."$ARRAY"_ID0*.root`
+      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID0*.root`
+      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID0*.root`
 
 ###############################################################
 # loop over all energy bins and submit a job for each bin
       for ((i=0; i < $NENE; i++))
       do
 
-# run parameter file
+# updating the  run parameter file
 	 RFIL=$ODIR/$RXPAR$ARRAY"_$i"
 	 echo $RFIL
 	 rm -f $RFIL
@@ -120,6 +130,16 @@ do
 	 do
 	    echo "* BACKGROUNDFILE $arg" >> $RFIL.runparameter
 	 done
+# setting the cuts correctly in the run parameter file
+         sed -i "s|MINIMAGES|$NIMAGESMIN|" $RFIL.runparameter
+	 if [ $EREC = "0" ]
+	 then
+	    sed -i 's|ENERGYVARIABLE|Erec|' $RFIL.runparameter
+	    sed -i 's|ENERGYCHI2VARIABLE|EChi2|' $RFIL.runparameter
+         else
+	    sed -i 's|ENERGYVARIABLE|ErecS|' $RFIL.runparameter
+	    sed -i 's|ENERGYCHI2VARIABLE|EChi2S|' $RFIL.runparameter
+         fi
 
 # run script
 	 FNAM=$ODIR/$FSCRIPT.$ARRAY"_$i"
