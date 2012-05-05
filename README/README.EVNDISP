@@ -1,7 +1,7 @@
 EVENTDISPLAY - IACT event analysis and display
 ==============================================
 
-$EVNDISPSYS/bin/eventdisp - calibrate and parametrize images, event reconstruction, stereo analysis
+$EVNDISPSYS/bin/evndisp - calibrate and parametrize images, event reconstruction, stereo analysis
 
 Command line options:
 =====================

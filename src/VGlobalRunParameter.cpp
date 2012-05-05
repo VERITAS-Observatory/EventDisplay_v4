@@ -15,6 +15,13 @@ VGlobalRunParameter::VGlobalRunParameter()
       if( !readRunparameterFile( getDirectory_EVNDISPParameterFiles() + "EVNDISP.global.runparameter" ) ) 
       {
          cout << "VGlobalRunParameter: error while reading parameter file with global run parameters" << endl;
+	 cout << endl;
+	 cout << "Note: several parameter files are needed to run the eventdisplay analysis" << endl;
+	 cout << "      they are provided in form of a tar ball and are observatory dependent (CTA or VERITAS)" << endl;
+	 cout << "The file not found is EVNDISP.global.runparameter" << endl;
+	 cout << endl;
+	 cout << "Parameter files are expected to be in the following directory: " << endl;
+	 cout << getDirectory_EVNDISPParameterFiles() << endl;
 	 exit( -1 );
       }
       else
