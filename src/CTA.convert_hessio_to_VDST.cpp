@@ -441,7 +441,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 // fill timing information
 		for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
 		{
-		   if( t < t < fData->getDSTpulsetiminglevelsN() && getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
+		   if( t < fData->getDSTpulsetiminglevelsN() && getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
 		   {
 		      fData->fDSTpulsetiming[i_ntel_data][getTimingLevelIndex(t)][p] = hsdata->event.teldata[telID].pixtm->timval[p][t];
                    }
