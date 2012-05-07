@@ -443,7 +443,8 @@ void VEventLoop::initializeAnalyzers()
         {
             if( i < fAnaDir.size() && fAnaDir[i] ) fAnaDir[i]->cd();
             setTelID( i );
-            fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, (fRunMode == R_PED || fRunMode == R_PEDLOW || fRunMode == R_GTO || fRunMode == R_GTOLOW ) ) );
+            fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, (fRunMode == R_PED || fRunMode == R_PEDLOW || 
+	                                                                         fRunMode == R_GTO || fRunMode == R_GTOLOW ) ) );
             int iseed = fRunPar->fMCNdeadSeed;
             if( iseed != 0 ) iseed += i;
             fAnaData.back()->initialize( getNChannels(), getReader()->getMaxChannels(), (getTraceFit()>-1.), 

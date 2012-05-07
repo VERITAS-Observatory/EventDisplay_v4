@@ -1389,6 +1389,10 @@ void VReadRunParameter::setDirectories()
     char i_text[600];
 
 // outputfilename
+    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 )
+    {
+       fRunPara->foutputfileName = "-1";
+    } 
     if( fRunPara->foutputfileName != "-1" && fRunPara->foutputfileName.size() == 0 )
     {
         sprintf( i_text, "%s/%d.root", fRunPara->getDirectory_EVNDISPOutput().c_str(), fRunPara->frunnumber );
