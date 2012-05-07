@@ -155,7 +155,8 @@ void VImageAnalyzer::doAnalysis()
 // do a log likelihood image fitting on events on the camera edge only
     if( !fRunPar->fDoublePass || !fReader->hasFADCTrace() )
     {
-        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->lossAndDead > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
+        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()] 
+	 && getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
         {
             fVImageParameterCalculation->setParametersLogL( getImageParameters() );
             setLLEst( fVImageParameterCalculation->calcLL() );
@@ -217,7 +218,8 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // do a log likelihood image fitting on events on the camera edge only
-        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()]  && getImageParameters()->lossAndDead > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
+        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()] 
+	&& getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
         {
             fVImageParameterCalculation->setParametersLogL( getImageParameters() );
             setLLEst( fVImageParameterCalculation->calcLL() );
