@@ -148,15 +148,17 @@ bool VDSTReader::getNextEvent()
         fTelAzimuth[i] = fDSTTree->getDSTTelAzimuth( i );
         fTelElevation[i] = fDSTTree->getDSTTelElevation( i );
 
+	fDSTTree->setTelCounter( i );
+
         for( unsigned int j = 0; j < fNChannel[i]; j++ )
         {
-            fSums[i][j] = fDSTTree->getDSTSums( i, j );
-	    for( unsigned int t = 0; t < fDSTTree->getDSTpulsetiminglevelsN(); t++ ) fTracePulseTiming[i][t][j] = fDSTTree->getDSTpulsetiming( i, j, t );
-            fHiLo[i][j] = fDSTTree->getDSTHiLo( i, j );
-            fTraceMax[i][j] = fDSTTree->getDSTMax( i, j );
-            fRawTraceMax[i][j] = fDSTTree->getDSTRawMax( i, j );
-            fDead[i][j] = fDSTTree->getDSTDead( i, j );
-            fFullTrigVec[i][j] = fDSTTree->getTrigL1( i, j );
+            fSums[i][j] = fDSTTree->getDSTSums( j );
+	    for( unsigned int t = 0; t < fDSTTree->getDSTpulsetiminglevelsN(); t++ ) fTracePulseTiming[i][t][j] = fDSTTree->getDSTpulsetiming( j, t );
+            fHiLo[i][j] = fDSTTree->getDSTHiLo( j );
+            fTraceMax[i][j] = fDSTTree->getDSTMax( j );
+            fRawTraceMax[i][j] = fDSTTree->getDSTRawMax( j );
+            fDead[i][j] = fDSTTree->getDSTDead( j );
+            fFullTrigVec[i][j] = fDSTTree->getTrigL1( j );
         }
         fNumberofFullTrigger[i] = fDSTTree->getNTrigL1( i );
     }
@@ -185,11 +187,12 @@ bool VDSTReader::getNextEvent()
         } 
         for( unsigned int i = 0; i < fNTelescopes; i++ )
         {
+	  fDSTTree->setTelCounter( i );
 	  for( unsigned int j = 0; j < fNChannel[i]; j++ )
 	  {
 	     for( unsigned short int k = 0; k < fNumSamples; k++ )
 	     {
-	        fFADCTrace[i][j][k] = fDSTTree->getDSTTrace( i, j, k );
+	        fFADCTrace[i][j][k] = fDSTTree->getDSTTrace( j, k );
              }
            }
         }

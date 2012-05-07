@@ -36,6 +36,9 @@ class VDSTTree
         bool fMC;
         bool fFullTree;
 
+// temporary telescope counter
+        int fTelescopeCounter_temp;
+
         unsigned int fDSTnchannel[VDST_MAXTELESCOPES];
 
         unsigned int fDSTrunnumber;
@@ -162,19 +165,27 @@ class VDSTTree
         float        getDSTLocalTriggerTime( int iTelID );
         float        getDSTLocalDelayedTriggerTime( int iTelID );
 
+        double       getDSTSums( int iChannelID );
         double       getDSTSums( int iTelID, int iChannelID );
+        double       getDSTMax( int iChannelID );
         double       getDSTMax( int iTelID, int iChannelID );
+        double       getDSTRawMax( int iChannelID );
         double       getDSTRawMax( int iTelID, int iChannelID );
         double       getDSTWidth( int iTelID, int iChannelID );
         double       getDSTTZeros( int iTelID, int iChannelID );
 	unsigned int getDSTpulsetiminglevelsN();
+	double       getDSTpulsetiming( int iChannelID, int iTimingLevelN );
 	double       getDSTpulsetiming( int iTelID, int iChannelID, int iTimingLevelN );
+        unsigned int getDSTDead( int iChannelID );
         unsigned int getDSTDead( int iTelID, int iChannelID );
+        UShort_t     getDSTHiLo( int iChannelID );
         UShort_t     getDSTHiLo( int iTelID, int iChannelID );
         unsigned int getNTrigL1( unsigned int iTelID ) { if( iTelID < getDSTNTel() ) return fDSTnL1trig[iTelID]; else return 0; }
+        unsigned int getTrigL1( int iChannelID );
         unsigned int getTrigL1( int iTelID, int iChannelID );
 
 	unsigned short int getDSTNumSample( unsigned int iTelID );
+	unsigned short int getDSTTrace( unsigned int iChannelID, unsigned short int iSample );
 	unsigned short int getDSTTrace( unsigned int iTelID, unsigned int iChannelID, unsigned short int iSample );
 
         unsigned short int getDSTMCPrimary() { return  fDSTprimary; }
@@ -209,6 +220,8 @@ class VDSTTree
 
         int          hasLocalTrigger( int iTelID );
         int          hasData( int iTelID );
+
+	int         setTelCounter( int iTelID );
 
 };
 #endif

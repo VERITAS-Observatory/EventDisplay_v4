@@ -23,6 +23,7 @@ VDSTTree::VDSTTree()
     fDST_tree = 0;
 
 // initialize
+    fTelescopeCounter_temp = -1;
     fDSTLTrig = 0;
     fDSTNTrig = 0;
     fDSTgpsyear = 0;
@@ -402,35 +403,44 @@ int VDSTTree::hasLocalTrigger( int iTelID )
 
 double VDSTTree::getDSTSums( int iTelID, int iChannelID )
 {
-    int iTel = hasData( iTelID );
-
-    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
-    else
-    {
-        return fDSTsums[iTel][iChannelID];
-    }
-
-    return 0;
+    setTelCounter( iTelID );
+    return getDSTSums( iChannelID );
 }
 
+double VDSTTree::getDSTSums( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else
+    {
+        return fDSTsums[fTelescopeCounter_temp][iChannelID];
+    }
+    return 0;
+}
 
 double VDSTTree::getDSTMax( int iTelID, int iChannelID )
 {
-    int iTel = hasData( iTelID );
+   setTelCounter( iTelID );
+   return getDSTMax( iChannelID );
+}
 
-    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
-    else return (double)(fDSTMax[iTel][iChannelID]);
+double VDSTTree::getDSTMax( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else return (double)(fDSTMax[fTelescopeCounter_temp][iChannelID]);
 
     return 0;
 }
 
-
 double VDSTTree::getDSTRawMax( int iTelID, int iChannelID )
 {
-    int iTel = hasData( iTelID );
+   setTelCounter( iTelID );
+   return getDSTRawMax( iChannelID );
+}
 
-    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
-    else return (double)(fDSTRawMax[iTel][iChannelID])/100.;
+double VDSTTree::getDSTRawMax( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else return (double)(fDSTRawMax[fTelescopeCounter_temp][iChannelID])/100.;
 
     return 0;
 }
@@ -459,24 +469,31 @@ double VDSTTree::getDSTTZeros( int iTelID, int iChannelID )
 
 double VDSTTree::getDSTpulsetiming( int iTelID, int iChannelID, int iTimingLevelN )
 {
-    int iTel = hasData( iTelID );
+   setTelCounter( iTelID );
+   return getDSTpulsetiming( iChannelID, iTimingLevelN );
+}
 
-    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+double VDSTTree::getDSTpulsetiming( int iChannelID, int iTimingLevelN )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
     else if( iTimingLevelN < VDST_MAXTIMINGLEVELS )
     {
-       return (double)(fDSTpulsetiming[iTel][iTimingLevelN][iChannelID]);
+       return (double)(fDSTpulsetiming[fTelescopeCounter_temp][iTimingLevelN][iChannelID]);
     }
 
     return 0;
 }
 
-
 unsigned int VDSTTree::getDSTDead( int iTelID, int iChannelID )
 {
-    int iTel = hasData( iTelID );
+   setTelCounter( iTelID );
+   return getDSTDead( iChannelID );
+}
 
-    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
-    else return fDSTdead[iTel][iChannelID];
+unsigned int VDSTTree::getDSTDead( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
+    else return fDSTdead[fTelescopeCounter_temp][iChannelID];
 
     return 0;
 }
@@ -490,32 +507,43 @@ unsigned short int VDSTTree::getDSTNumSample( unsigned int iTelID )
    return 0;
 }
 
-
 UShort_t VDSTTree::getDSTHiLo( int iTelID, int iChannelID )
 {
-    int iTel = hasData( iTelID );
+   setTelCounter( iTelID );
+   return getDSTHiLo( iChannelID );
+}
 
-    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
-    else return fDSTHiLo[iTel][iChannelID];
+UShort_t VDSTTree::getDSTHiLo( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
+    else return fDSTHiLo[fTelescopeCounter_temp][iChannelID];
 
     return 0;
 }
 
 unsigned short int VDSTTree::getDSTTrace( unsigned int iTelID, unsigned int iChannelID, unsigned short int iSample )
 {
-    int iTel = hasData( iTelID );
+    setTelCounter( iTelID );
+    return getDSTTrace( iChannelID, iSample );
+}
 
-    if( iTel < 0 ) return 3;
+unsigned short int VDSTTree::getDSTTrace( unsigned int iChannelID, unsigned short int iSample )
+{
+    if( fTelescopeCounter_temp < 0 ) return 3;
 
-    return fDSTtrace[iTel][iSample][iChannelID]; 
+    return fDSTtrace[fTelescopeCounter_temp][iSample][iChannelID]; 
 }
 
 unsigned int VDSTTree::getTrigL1( int iTelID, int iChannelID )
 {
-    int iTel = hasData( iTelID );
+   setTelCounter( iTelID );
+   return getTrigL1( iChannelID );
+}
 
-    if( iTel < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
-    else return fDSTL1trig[iTel][iChannelID];
+unsigned int VDSTTree::getTrigL1( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
+    else return fDSTL1trig[fTelescopeCounter_temp][iChannelID];
 
     return 0;
 }
@@ -595,4 +623,11 @@ float VDSTTree::getDSTMCaz()
 unsigned int VDSTTree::getDSTpulsetiminglevelsN()
 {
    return (unsigned int)(VDST_MAXTIMINGLEVELS);
+}
+
+int VDSTTree::setTelCounter( int iTelID )
+{
+    fTelescopeCounter_temp = hasData( iTelID );
+
+    return fTelescopeCounter_temp;
 }
