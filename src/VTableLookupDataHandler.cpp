@@ -1053,7 +1053,7 @@ void VTableLookupDataHandler::printCutStatistics()
 
     cout << "\t number of events considered: \t\t" << fNStats_All << " (" << (float)fNStats_All/(float)fNStats_All << ")" << endl;
     nTOT -= fNStats_NImagesCut;
-    cout << "\t removed by >=2 images: \t\t" << fNStats_NImagesCut;
+    cout << "\t removed by >= " << fTLRunParameter->fTableFillingCut_NImages_min  << " images: \t\t" << fNStats_NImagesCut;
     cout << " (fraction removed/# of events left: " << (float)fNStats_NImagesCut/(float)fNStats_All << "; " << nTOT << ")" << endl;
     nTOT = nTOT - fNStats_Chi2Cut + fNStats_NImagesCut;
     cout << "\t removed by Chi2 >=0:   \t\t" << fNStats_Chi2Cut;
