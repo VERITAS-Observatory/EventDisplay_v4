@@ -1155,6 +1155,10 @@ void VEventLoop::terminate( int iAna )
 void VEventLoop::setEventTimeFromReader()
 {
 /////////////////////////////////////////////////////////////////////////
+// ignore event time calculation for DSTs
+   if( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 ) return;
+  
+/////////////////////////////////////////////////////////////////////////
 // event times setting for VBF sources
 #ifndef NOVBF
 /////////////////////////////////////////////////////////////////////////
@@ -1190,7 +1194,8 @@ void VEventLoop::setEventTimeFromReader()
 // check number of telescopes
     if( getNTel() > VDST_MAXTELESCOPES )
     {
-        cout << " VEventLoop::setEventTimeFromReader: warning, cannot apply majority rule to times, too many telescopes: " << VDST_MAXTELESCOPES << " " << getNTel() << endl;
+        cout << " VEventLoop::setEventTimeFromReader: warning, cannot apply majority rule to times, too many telescopes: ";
+	cout << VDST_MAXTELESCOPES << " " << getNTel() << endl;
         return;
     }
     map< unsigned int, double > i_telescope_time;
