@@ -255,8 +255,8 @@ class VTableLookupDataHandler
 // {-1}
         double fR        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
 	double fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)
-        double fMCR        [VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
-        double fMCR_telType[VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
+//        double fMCR        [VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
+//        double fMCR_telType[VDST_MAXTELESCOPES];  //!< distance from each telescope to reconstructed shower core
         double fE        [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 0)
         double fES       [VDST_MAXTELESCOPES];    //!< energy assigned to each telescope (method 1)
         double ftmscw    [VDST_MAXTELESCOPES];    //!< mscw assigned to each telescope
@@ -308,8 +308,8 @@ class VTableLookupDataHandler
 	double* getDistance( ULong64_t iTelType );
         double* getDistanceToCore() { return fR; }
 	double* getDistanceToCore( ULong64_t iTelType );
-        double* getMCDistanceToCore() { return fMCR; }
-        double* getMCDistanceToCore( ULong64_t iTelType );
+//        double* getMCDistanceToCore() { return fMCR; }
+//        double* getMCDistanceToCore( ULong64_t iTelType );
         int    getEventNumber() { return eventNumber; }
 	bool   getEventStatus() { return fEventStatus; }
         double getEventWeight() { return fEventWeight; }

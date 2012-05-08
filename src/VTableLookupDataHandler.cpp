@@ -233,7 +233,6 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
         calcDistances( fNImages );
         if( fNImages > 1 ) if( !bShort ) calcEmissionHeights();
 
-
         setEventWeightfromMCSpectrum();
     }
     else
@@ -824,7 +823,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "MCxcore", &fMCxcore, "MCxcore/D" );
         fOTree->Branch( "MCycore", &fMCycore, "MCycore/D" );
         sprintf( iTT, "MCR[%d]/D", fNTel );
-        fOTree->Branch( "MCR", fMCR, iTT );
+// (nowhere needed)        fOTree->Branch( "MCR", fMCR, iTT );
         if( !fShortTree ) fOTree->Branch( "MCxcore_SC", &fMCxcore_SC, "MCxcore_SC/D" );
         if( !fShortTree ) fOTree->Branch( "MCycore_SC", &fMCycore_SC, "MCycore_SC/D" );
         if( !fShortTree ) fOTree->Branch( "MCxcos", &fMCxcos, "MCxcos/D" );
@@ -1296,23 +1295,24 @@ void VTableLookupDataHandler::calcDistances( int nimages )
     for( unsigned int tel = 0; tel < fNTel; tel++ )
     {
         fR[tel] = -99.;
-        fMCR[tel] = -99.;
+//        fMCR[tel] = -99.;
     }
-// MC first
-    if( fIsMC )
+// check for successfull reconstruction
+    if( nimages < 2 || fZe < 0 ) return;
+
+// reconstructed shower core distance
+    for( unsigned int tel = 0; tel < fNTel; tel++ )
+    {
+        fR[tel] = line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+    }
+// MC distance
+/*   if( fIsMC )
     {
         for( unsigned int tel = 0; tel < fNTel; tel++ )
         {
             fMCR[tel] = line_point_distance( fMCycore, -1.*fMCxcore, 0., fMCze, fMCaz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
         }
-    }
-// check for successfull reconstruction
-    if( nimages < 2 || fZe < 0 ) return;
-
-    for( unsigned int tel = 0; tel < fNTel; tel++ )
-    {
-        fR[tel] = line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
-    }
+    }  */
 }
 
 
@@ -1530,7 +1530,7 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftgrad_x[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftchisq_x[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fR[i] = 0.;
-    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fMCR[i] = 0.;
+//    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fMCR[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftmscw[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftmscl[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftmscw_sigma[i] = 0.;
@@ -1751,8 +1751,6 @@ void VTableLookupDataHandler::setNEntries( int iN )
  */
 double VTableLookupDataHandler::line_point_distance (double x1, double y1, double z1, double ze, double az, double x, double y, double z)
 {
-    double a, a1, a2, a3, b;
-
     double alt = 90. - ze;
     az = 180. - az;
 
@@ -1760,11 +1758,11 @@ double VTableLookupDataHandler::line_point_distance (double x1, double y1, doubl
     double cy = -1.*cos(alt*(TMath::Pi()/180.))*sin(az*(TMath::Pi()/180.));
     double cz = sin(alt*(TMath::Pi()/180.));
 
-    a1 = (y-y1)*cz - (z-z1)*cy;
-    a2 = (z-z1)*cx - (x-x1)*cz;
-    a3 = (x-x1)*cy - (y-y1)*cx;
-    a  = a1*a1 + a2*a2 + a3*a3;
-    b = cx*cx + cy*cy + cz*cz;
+    double a1 = (y-y1)*cz - (z-z1)*cy;
+    double a2 = (z-z1)*cx - (x-x1)*cz;
+    double a3 = (x-x1)*cy - (y-y1)*cx;
+    double a  = a1*a1 + a2*a2 + a3*a3;
+    double b = cx*cx + cy*cy + cz*cz;
 
     if ( a<0. || b<= 0. ) return -1;
 
@@ -1892,6 +1890,7 @@ double* VTableLookupDataHandler::getDistance( ULong64_t iTelType )
     return fdist_telType;
 }
 
+/*
 double* VTableLookupDataHandler::getMCDistanceToCore( ULong64_t iTelType )
 {
     unsigned int z = 0;
@@ -1904,7 +1903,7 @@ double* VTableLookupDataHandler::getMCDistanceToCore( ULong64_t iTelType )
        }
     }
     return fMCR_telType;
-}
+} */
 
 unsigned int VTableLookupDataHandler::getTelType_arraycounter( unsigned int iTelID )
 {
