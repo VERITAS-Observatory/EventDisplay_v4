@@ -529,11 +529,7 @@ void VTableEnergyCalculator::get_logEnergy( double logSize, int ir, double &med,
 // consistent results
     else ij = i;
 
-    if( hM->GetBinError( ij, ir ) > 0. && hM->GetBinError( ij+1, ir ) < 1.e-6 && ij > 0 )
-    {
-       cout << "Error alarm  " << endl;
-       ij--;
-    }
+    if( hM->GetBinError( ij, ir ) > 0. && hM->GetBinError( ij+1, ir ) < 1.e-6 && ij > 0 ) ij--;
 
 // interpolation
     double s1 = hM->GetBinContent( ij, ir );
