@@ -198,7 +198,8 @@ bool VDSTReader::getNextEvent()
         }
     }
 	        
-
+// successfull event
+    setEventStatus( 1 );
 // increment tree event number
     fDSTtreeEvent++;
     return true;
