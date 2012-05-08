@@ -58,7 +58,7 @@ int main( int argc, char *argv[] )
     iData->initializeHistograms( 20, -1.8, 2.2, 500, -1.8, 2.2, 400, -2.3, 2.7, 9999 );
     if( !iData->fillHistograms1D( fDataDirectory ) )
     {
-       exit( -1 );
+       cout << "error filling on source histograms" << endl;
     } 
 
 // off source histograms

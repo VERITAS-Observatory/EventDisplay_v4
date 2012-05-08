@@ -586,16 +586,19 @@ void writeAllParticleNumberFiles( char *iSubArrayFile = 0,
    {
       cout << "STARTING SUBARRAY " << SubArray[i] << endl;
 
-      sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_onSource, SubArray[i].c_str(), iRecID, 0 );
-      sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, 0 );
-      sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, 0 );
+      if( iMC_Gamma_onSource )
+      {
+	 sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_onSource, SubArray[i].c_str(), iRecID, 0 );
+	 sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, 0 );
+	 sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, 0 );
 
-      sprintf( iParticleNumberFile, "ParticleNumbers.%s.0.root", SubArray[i].c_str() );
+	 sprintf( iParticleNumberFile, "ParticleNumbers.%s.0.root", SubArray[i].c_str() );
 
-      writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+	 writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+      }
 
 // offset files
-      for( int j = 1; j < iOffSetCounter; j++ ) // use first bin on source particle file
+      for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
       {
 	 sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_cone10, SubArray[i].c_str(), iRecID, j );
 	 sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, j );
