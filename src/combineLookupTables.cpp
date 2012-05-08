@@ -164,6 +164,8 @@ void copyDirectory( TDirectory *source, const char *hx )
         if (!cl) continue;
         if (cl->InheritsFrom("TDirectory"))
         {
+	    string iName = key->GetName();
+	    if( iName == "histos1D" ) continue;
             source->cd(key->GetName());
             TDirectory *subdir = gDirectory;
             adir->cd();
@@ -273,6 +275,9 @@ TH2F* reduceHistogramSize( TH2F *h )
    if( ymax > 0 ) ymax = h->GetYaxis()->GetBinLowEdge( nBinY_max ) + h->GetYaxis()->GetBinWidth( nBinY_max ); 	
 
    TH2F *hNew = new TH2F( hname, h->GetTitle(), nBinX_max - nBinX_min + 1, xmin, xmax, nBinY_max, ymin, ymax );
+   hNew->SetXTitle( h->GetXaxis()->GetTitle() );
+   hNew->SetYTitle( h->GetYaxis()->GetTitle() );
+   hNew->SetZTitle( h->GetZaxis()->GetTitle() );
    hNew->Sumw2();
 
    for( int i = 1; i <= h->GetNbinsX(); i++ )
