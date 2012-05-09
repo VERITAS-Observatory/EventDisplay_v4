@@ -1466,12 +1466,31 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
          if( iMethod == 0 && d->Erec > 0. )
          {
              eRec = log10( d->Erec );
-             eRecLin = d->Erec ;
+             eRecLin = d->Erec;
          }
          else if( iMethod == 1 && d->ErecS > 0. )
          {
              eRec = log10( d->ErecS );
              eRecLin = d->ErecS;
+         }
+	 else if( iMethod == 2 && d->ErecS > 0. )
+	 {
+	    eRec = log10( d->ErecS );
+	    eRecLin = d->ErecS;
+// *** PRELIMINARY ***
+// quick fix for energies above 1 TeV: 
+//   use at high energies method 0, at low energies method 1 (with smooth transition)
+	    if( eRec > -1. )
+	    {
+	       if( d->Erec > 0. )
+	       {
+	          double i_fr = 0.5*TMath::TanH( 10.*(eRec-0.) )+0.5;
+		  eRec = i_fr * log10(d->Erec) + (1.-i_fr) * log10(d->ErecS);
+		  eRecLin = TMath::Power( 10., eRec );
+               }
+	       else continue;
+	    }
+// *** END PRELIMINARY ***
          }
          else if( fIgnoreEnergyReconstruction )
          {

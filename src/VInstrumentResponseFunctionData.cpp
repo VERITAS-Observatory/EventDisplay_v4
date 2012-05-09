@@ -345,6 +345,7 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
        double iErec_lin = -99.e6;
        if( fEnergyReconstructionMethod == 0 && fData->Erec > 0. )       iErec_lin = fData->Erec;
        else if( fEnergyReconstructionMethod == 1 && fData->ErecS > 0. ) iErec_lin = fData->ErecS;
+       else if( fEnergyReconstructionMethod == 2 && fData->ErecS > 0. ) iErec_lin = fData->ErecS;
 
        if( fData->MCe0 > 0. ) iDiff = TMath::Abs( 1. - iErec_lin / fData->MCe0 );
        iError = iDiff;

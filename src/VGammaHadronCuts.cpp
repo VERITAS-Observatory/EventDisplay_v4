@@ -917,7 +917,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
                 return false;
             }
         }
-        else if( iEnergyReconstructionMethod == 1 )
+        else if( iEnergyReconstructionMethod == 1 || iEnergyReconstructionMethod == 2 )
         {
             if( fData->ErecS > 0. && fData->EChi2S <= 0. )
 	    {
@@ -1069,6 +1069,24 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
         if( fData->dE > fCut_dE_max )       return false;
     }
     else if( iEnergyReconstructionMethod == 1 )
+    {
+        if( fData->EChi2S < fCut_EChi2_min || fData->EChi2S > fCut_EChi2_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
+        if( fData->ErecS < fCut_Erec_min || fData->ErecS > fCut_Erec_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
+        if( fData->dES < fCut_dE_min || fData->dES > fCut_dE_max )
+	{
+	   if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
+	   return false;
+        }
+    }
+    else if( iEnergyReconstructionMethod == 2 )
     {
         if( fData->EChi2S < fCut_EChi2_min || fData->EChi2S > fCut_EChi2_max )
 	{
@@ -1717,8 +1735,14 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // fetch theta2 cut (max) (might be energy dependent)
    double i_theta2_cut_max = -1.;
-   if( fEnergyReconstructionMethod == 0 )      i_theta2_cut_max = getTheta2Cut_max( fData->Erec );
-   else if( fEnergyReconstructionMethod == 1 ) i_theta2_cut_max = getTheta2Cut_max( fData->ErecS );
+   if( fEnergyReconstructionMethod == 0 )
+   {
+      i_theta2_cut_max = getTheta2Cut_max( fData->Erec );
+   }
+   else if( fEnergyReconstructionMethod == 1 || fEnergyReconstructionMethod == 2 )
+   {
+      i_theta2_cut_max = getTheta2Cut_max( fData->ErecS );
+   }
 
 // direction cut (ring around center of camera)
    if( theta2 < i_theta2_cut_max && theta2 > fCut_Theta2_min )
