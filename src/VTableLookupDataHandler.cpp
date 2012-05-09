@@ -49,6 +49,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 
     fNMethods = 0;
     fMethod = fTLRunParameter->rec_method;
+    cout << "AAAAAA " << fMethod << endl;
 
     fIsMC = false;
     fMCEnergy = 0.;
@@ -272,6 +273,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
        cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
        cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod] << endl;
     }
+    cout << "XX " << fMethod << endl;
     time = fshowerpars->Time;
     if( fEventCounter == 0 ) fTotalTime0 = time;
     fTotalTime = time - fTotalTime0;
@@ -1484,7 +1486,6 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fImgSel_list_short[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) NImages_Ttype[i] = 0;
     fimg2_ang = 0.;
-    fMethod = 0;
     fZe = 0.;
     fAz = 0.;
     fRA = 0.;

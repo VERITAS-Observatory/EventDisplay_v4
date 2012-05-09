@@ -341,7 +341,7 @@ void VTableLookupRunParameter::print( int iP )
     cout << "debug level " << fDebug << endl;
     cout << "lookuptable: " << tablefile << endl;
     cout << endl;
-    cout << "ARRAY RECONSTRUCTION METHOD: " << rec_method << endl;
+    cout << "evndisp reconstruction parameter ID: " << rec_method << endl;
     cout << endl;
     cout << "input file(s): " << inputfile;
     if( isMC ) cout << " (input data is MC)";
