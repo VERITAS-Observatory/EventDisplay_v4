@@ -553,6 +553,7 @@ unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
 // choose energy reconstruction method
       if(      fEnergyReconstructionMethod[i] == 0 && fData->Erec  > 0. ) iErec = log10( fData->Erec );
       else if( fEnergyReconstructionMethod[i] == 1 && fData->ErecS > 0. ) iErec = log10( fData->ErecS );
+      else if( fEnergyReconstructionMethod[i] == 2 && fData->ErecS > 0. ) iErec = log10( fData->ErecS );
       else iErec = -1.e99;
 
 // mean energy of this energy bin (possibly spectral weighted)
@@ -846,6 +847,7 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
    TCanvas *iCanvas = new TCanvas( "cSignalAndBackgroundEfficiencies", "signal and background efficiencies", 10, 10, 400, 400 );
    iCanvas->SetGridx( 0 );
    iCanvas->SetGridy( 0 );
+   iCanvas->SetLeftMargin( 0.13 );
    if( !bNullEntry && iLogY ) iCanvas->SetLogy();
    else if( !iLogY )          iCanvas->SetLogy( 0 );
    iCanvas->Draw();
@@ -856,7 +858,7 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
    hnull->SetYTitle( "signal/background efficiency" );
    hnull->SetMinimum( iYmin );
    hnull->SetMaximum( 1. );
-   plot_nullHistogram( iCanvas, hnull, false, false, 1.3, fEnergyCut_Log10TeV_min[0], fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
+   plot_nullHistogram( iCanvas, hnull, false, false, 1.5, fEnergyCut_Log10TeV_min[0], fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
 
    setGraphPlottingStyle( igSignal, 1, 1., 20 );
    if( igBck ) setGraphPlottingStyle( igBck, 2, 1., 21 );
@@ -1242,11 +1244,13 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       TCanvas *iCanvas = new TCanvas( hname, htitle, 10, 10+iBin*30, 400, 400 );
       iCanvas->SetGridx( 0 );
       iCanvas->SetGridy( 0 );
+      iCanvas->SetLeftMargin( 0.13 );
       iCanvas->Draw();
 
       hEffS->SetStats( 0 );
       hEffS->SetTitle( "" );
-      hEffS->SetLineWidth( 2 );
+      hEffS->SetLineWidth( 3 );
+      hEffS->GetYaxis()->SetTitleOffset( 1.5 );
       hEffS->SetXTitle( "cut value" );
       hEffS->SetYTitle( "signal/background efficiency" );
       hEffS->DrawCopy();
@@ -1256,7 +1260,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
 	 hEffB->SetStats( 0 );
 	 hEffB->SetTitle( "" );
 	 hEffB->SetLineColor( 2 );
-	 hEffB->SetLineWidth( 2 );
+	 hEffB->SetLineWidth( 3 );
          hEffB->DrawCopy( "same" );
       }
 
@@ -1264,6 +1268,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       {
          TLine *iL = new TLine( fTMVACutValue[iBin], hEffS->GetMinimum(), fTMVACutValue[iBin], hEffS->GetMaximum() );
 	 iL->SetLineStyle( 2 );
+	 iL->SetLineWidth( 3 );
 	 iL->Draw();
       }
    }
@@ -1274,6 +1279,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       sprintf( hname, "cSignalToSqrtNoise_%d", iBin );
       sprintf( htitle, "signal / sqrt( noise ) (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
       TCanvas *iCanvas = new TCanvas( hname, htitle, 425, 10+iBin*30, 400, 400 );
+      iCanvas->SetLeftMargin( 0.13 );
       iCanvas->SetGridx( 0 );
       iCanvas->SetGridy( 0 );
 
@@ -1281,6 +1287,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       setGraphPlottingStyle( iGSignal_to_sqrtNoise, 1, 1., 20 );
 
       iGSignal_to_sqrtNoise->Draw( "apl" );
+      iGSignal_to_sqrtNoise->GetHistogram()->GetYaxis()->SetTitleOffset( 1.5 );
       iGSignal_to_sqrtNoise->GetHistogram()->SetXTitle( "cut value" );
       iGSignal_to_sqrtNoise->GetHistogram()->SetYTitle( "significance" );
 
@@ -1305,6 +1312,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       sprintf( hname, "cEventNumbers_%d", iBin );
       sprintf( htitle, "event numbers (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
       TCanvas *iCanvas = new TCanvas( hname, htitle, 850, 10+iBin*30, 400, 400 );
+      iCanvas->SetLeftMargin( 0.13 );
       iCanvas->SetGridx( 0 );
       iCanvas->SetGridy( 0 );
 
@@ -1312,6 +1320,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       setGraphPlottingStyle( iGBackgroundEvents, 1, 1., 20 );
 
       iGBackgroundEvents->Draw( "apl" );
+      iGBackgroundEvents->GetHistogram()->GetYaxis()->SetTitleOffset( 1.5 );
       iGBackgroundEvents->GetHistogram()->SetXTitle( "cut value" );
       iGBackgroundEvents->GetHistogram()->SetYTitle( "number of events" );
 
