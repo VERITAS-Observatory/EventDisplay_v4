@@ -324,11 +324,7 @@ void Cshowerpars::Init(TTree *tree)
     }
 
     fChain->SetBranchAddress("NImages",NImages);
-    if( !bShort ) fChain->SetBranchAddress("img2_ang", img2_ang );
-    else
-    {
-        for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ ) img2_ang[i] = 0.;
-    }
+    fChain->SetBranchAddress("img2_ang", img2_ang );
     if( fVersion < 6 ) fChain->SetBranchAddress("ImgSel",ImgSelS);
     else               fChain->SetBranchAddress("ImgSel",ImgSel);
     if( fVersion > 6 ) fChain->SetBranchAddress("ImgSel_list", ImgSel_list, &b_ImgSel_list);

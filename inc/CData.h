@@ -496,8 +496,7 @@ void CData::Init(TTree *tree)
     fChain->SetBranchAddress("NImages",&NImages);
     if( fVersion < 6 ) fChain->SetBranchAddress("ImgSel",&ImgSelS );
     else               fChain->SetBranchAddress("ImgSel",&ImgSel);
-    if( !fShort ) fChain->SetBranchAddress("img2_ang",&img2_ang);
-    else          img2_ang = 0.;
+    fChain->SetBranchAddress("img2_ang",&img2_ang);
     fChain->SetBranchAddress("Ze",&Ze);
     fChain->SetBranchAddress("Az",&Az);
     if( !fShort )
