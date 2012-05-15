@@ -119,7 +119,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
       fIsZombie = true;
       return false;
    }
-   char hname[600];
+   char hname[800];
 
 // reset all vectors
    fBoxCutValue_theta2.clear();
@@ -136,19 +136,36 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    cout << "VTMVAEvaluator::initializeWeightFiles: reading energies from TMVA root files " << endl; 
 
 //////////////////////////////////////////////////////////////////////////////////////
-// read energy binning from root files
+// read energy binning from root files and check that all neccessary object are in the file
    unsigned int iMinMissingBin = 0;
    for( unsigned int i = 0; i < iNbin; i++ )
    {
        ostringstream iFullFileName;
        iFullFileName << iWeightFileName << iWeightFileIndex_min+i << ".root";
        TFile iF( iFullFileName.str().c_str() );
-       if( iF.IsZombie() )
+       bool bGoodRun = true;
+       VTMVARunDataEnergyCut *iEnergyData = 0;
+       if( iF.IsZombie() ) bGoodRun = false;
+       else
+       {
+          iEnergyData = (VTMVARunDataEnergyCut*)iF.Get( "fDataEnergyCut" );
+	  if( !iEnergyData ) bGoodRun = false;
+// signal efficiency
+	  sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(),
+							    fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
+	  if( !iF.Get( hname ) )
+	  {
+	     sprintf( hname, "Method_%s/%d/MVA_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodCounter, fTMVAMethodCounter );
+          }
+          if( !iF.Get( hname ) ) bGoodRun = false;
+       }
+       if( !bGoodRun )
        {
 // allow that first files are missing (this happens when there are no training events in the first energy bins)
           if( i == iMinMissingBin )
 	  {
-	      cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found " << iFullFileName.str() << endl;
+	      cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found or incomplete file: " << endl;
+	      cout << iFullFileName.str() << endl;
 	      cout << "  assume this is a low-energy empty bin (bin number " << i << ";";
 	      cout << " number of missing bins: " << iMinMissingBin+1 << ")" << endl;
 	      iMinMissingBin++;
@@ -170,7 +187,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
           }
        }
        iFileNumber.push_back( i );
-       VTMVARunDataEnergyCut *iEnergyData = (VTMVARunDataEnergyCut*)iF.Get( "fDataEnergyCut" );
        if( !iEnergyData )
        {
 	  cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while reading energies from TMVA root file " << iFullFileName.str() << endl;
@@ -410,7 +426,7 @@ double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEffici
     if( iTMVAFile.IsZombie() )
     {
        cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency() error reading TMVA root file: " << iFullFileName.str() << endl;
-       return -99.;
+       return -9999.;
     }
     char hname[800];
     sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(),
@@ -424,7 +440,7 @@ double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEffici
     if( !effS )
     {
         cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency() error finding signal efficiency from " << iFullFileName.str() << endl;
-	return -99.;
+	return -9999.;
     }
     cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency: evaluating " << iTMVAFile.GetName() << endl;
     cout << "\t method: " << hname << endl;
