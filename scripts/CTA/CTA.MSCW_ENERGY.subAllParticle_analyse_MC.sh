@@ -33,6 +33,7 @@ elif [ $4 = "v_leeds" ]
 then
    VPART=( "proton" )
 else
+   VPART=( "proton" )
    VPART=( "gamma_onSource" "electron" "proton" )
 fi
 NPART=${#VPART[@]}
@@ -43,7 +44,7 @@ for ((m = 0; m < $NPART; m++ ))
 do
    PART=${VPART[$m]}
 
-   for (( k = 1; k < 10; k++ ))
+   for (( k = 0; k < 10; k++ ))
    do
       if [ $4 = "v_leeds" ]
       then
@@ -51,6 +52,12 @@ do
 	 do
 	    echo "v_leeds $k$l"
 	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $k$l
+         done
+      elif [ $4 = "DESY3700m" ]
+      then
+	 for (( l = 0; l < 10; l++ ))
+	 do
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 1$k$l
          done
       else
 	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $k

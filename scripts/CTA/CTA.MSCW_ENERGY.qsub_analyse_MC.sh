@@ -13,7 +13,7 @@ set IFIL="IIIIFIL"
 set TFIL=TTTTFIL
 set ARRAY=ARRAYYY
 set DSET=DATASET
-set ADIR="Analysis-NM3-d20120430"
+set ADIR="Analysis-NM2-ID$RECID-d20120507"
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh CTA
@@ -32,8 +32,8 @@ rm -f $LDIR/$TFIL.log
 ###############################################
 # mscw_energy command line options
 ###############################################
-# set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly -shorttree"
-set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly"
+set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly -shorttree"
+#set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly"
 
 # analyse MC file
 $EVNDISPSYS/bin/mscw_energy $MOPT -tablefile $TABFIL-$ARRAY.root -inputfile "$IFIL*.root" -outputfile $ODIR/$TFIL.root >& $LDIR/$TFIL.log

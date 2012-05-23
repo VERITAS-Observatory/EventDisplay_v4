@@ -110,7 +110,8 @@ do
    echo $FNAM.sh
 
 # submit the job
-   qsub -l h_cpu=11:49:00 -l os="sl*" -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+   qsub -l h_cpu=11:29:00 -l os="sl*" -js 20 -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+#   qsub -l h_cpu=0:29:00 -l os="sl*" -js 20 -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
    echo "run script written to $FNAM.sh"
    echo "queue log and error files written to $QLOG"
 done
