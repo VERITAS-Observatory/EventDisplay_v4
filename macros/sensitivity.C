@@ -592,7 +592,7 @@ void writeAllParticleNumberFiles( char *iSubArrayFile = 0,
 	 sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, 0 );
 	 sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, 0 );
 
-	 sprintf( iParticleNumberFile, "ParticleNumbers.%s.0.root", SubArray[i].c_str() );
+	 sprintf( iParticleNumberFile, "ParticleNumbers.%s.00.root", SubArray[i].c_str() );
 
 	 writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
       }
