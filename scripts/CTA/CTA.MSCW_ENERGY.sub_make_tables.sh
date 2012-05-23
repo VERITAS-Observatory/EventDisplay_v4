@@ -128,7 +128,7 @@ do
       chmod u+x $FNAM.sh
 
 # submit the job
-      qsub -l os="sl*"  -l h_cpu=25:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -l os="sl*" -js 20 -l h_cpu=11:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 

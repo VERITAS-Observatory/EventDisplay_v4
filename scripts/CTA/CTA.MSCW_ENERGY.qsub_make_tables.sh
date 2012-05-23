@@ -30,7 +30,7 @@ mkdir -p $LDIR
 rm -f $LDIR/$TFIL-W$WOFFMEA.log
 
 # options for table filling
-set MOPT="-pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -mindistancetocameracenter=$WOFFMIN -maxdistancetocameracenter=$WOFFMAX -maxCoreError=250 -minImages=3"
+set MOPT="-pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -mindistancetocameracenter=$WOFFMIN -maxdistancetocameracenter=$WOFFMAX -maxCoreError=250 -minImages=2"
 
 #########################################
 # fill tables
