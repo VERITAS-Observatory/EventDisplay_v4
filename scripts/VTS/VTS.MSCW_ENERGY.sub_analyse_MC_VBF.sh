@@ -51,7 +51,6 @@ fi
 NNOISE=${#NOISE[@]}
 # wobble offsets
 WOBBLE=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-WOBBLE=( 0.5 )
 NWOBBLE=${#WOBBLE[@]}
 
 
