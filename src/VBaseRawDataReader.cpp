@@ -357,3 +357,65 @@ valarray<double>& VBaseRawDataReader::getPedRMS()
 
     return v;
 }
+
+bool VBaseRawDataReader::hasFADCTrace()
+{
+   if( fTelID < fEvent.size() && fEvent[fTelID] )
+   {
+       if( fEvent[fTelID]->getNumSamples() == 0 ) return false;
+   }
+   return true;
+}
+
+valarray< double >& VBaseRawDataReader::getSums()
+{
+   if( fTelID < fEvent.size() && fEvent[fTelID] )
+   {
+      if( fSums.size() != fEvent[fTelID]->getNumChannels() )
+      {
+         fSums.resize( fEvent[fTelID]->getNumChannels() );
+      }
+      for( unsigned int i = 0; i < fEvent[fTelID]->getNumChannels(); i++ )
+      {
+         fSums[i] = fEvent[fTelID]->getCharge( i );
+      }
+   }
+   else
+   {
+      fSums = 0.;
+   }
+   return fSums;
+}
+
+valarray< double >& VBaseRawDataReader::getTraceMax()
+{
+   if( fTelID < fEvent.size() && fEvent[fTelID] )
+   {
+      if( fTraceMax.size() != fEvent[fTelID]->getNumChannels() )
+      {
+         fTraceMax.resize( fEvent[fTelID]->getNumChannels() );
+      }
+   }
+   else
+   {
+      fTraceMax = 0.;
+   }
+   return fTraceMax;
+}
+
+vector< valarray< double > >& VBaseRawDataReader::getTracePulseTiming()
+{
+   if( fTelID < fEvent.size() && fEvent[fTelID] )
+   {
+// check only first entry (anyway a dummy vector)
+      if( fTracePulseTiming.size() == VDST_MAXTIMINGLEVELS && fTracePulseTiming[0].size() == fEvent[fTelID]->getNumChannels() )
+      {
+         return fTracePulseTiming;
+      }
+      valarray< double > iTemp( 0., fEvent[fTelID]->getNumChannels() );
+      fTracePulseTiming.clear();
+      for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ ) fTracePulseTiming.push_back( iTemp );
+   }
+   return fTracePulseTiming;
+
+}

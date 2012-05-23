@@ -201,12 +201,6 @@ void VDST::fill()
 	   }
 	   fDSTPDMax[i] = 0.;
 	   fDSTPDSum[i] = 0.;
-// calculate maximum and charge in photodiode channel
-	   if( getRunParameter()->fShowPhotoDiode )
-	   {
-	       fDSTPDMax[i] = getPhotoDiodeMax();
-	       fDSTPDSum[i] = getPhotoDiodeSum();
-	   }
 // calculate total sum over all channels
 	   for(unsigned int j=0; j < getNChannels(); j++ ) i_total +=getSums()[j];
         }

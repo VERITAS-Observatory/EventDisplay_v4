@@ -37,7 +37,5 @@ class VImageBaseAnalyzer : public VEvndispData
 	int   fillSaturatedChannels();
         void  findDeadChans( bool iLowGain = false, bool iFirst = true );
         void  gainCorrect();
-        float getPhotoDiodeMax();
-        float getPhotoDiodeSum();
 };
 #endif

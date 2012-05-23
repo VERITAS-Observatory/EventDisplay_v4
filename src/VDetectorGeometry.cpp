@@ -8,7 +8,9 @@
 
 #include "VDetectorGeometry.h"
 
-VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCamera, string iDir, bool iDebug, float iCoordinateTransformerX, float iCoordinateTransformerY, int iSourceType )
+VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCamera, string iDir, 
+                                      bool iDebug, float iCoordinateTransformerX, float iCoordinateTransformerY,
+				      int iSourceType )
 {
     fDebug = iDebug;
     if( fDebug ) cout << "VDetectorGeometry::VDetectorGeometry" << endl;
@@ -75,7 +77,6 @@ void VDetectorGeometry::setNSamples( unsigned int iTelID, unsigned int iNSamples
         {
             if( fSampleWarning[iTelID] )
             {
-//                cout << "Telescope " << iTelID+1 << ": ignore requested sample length of " << iNSamples << " samples. Use sample length of " << fNSamples[iTelID] << " (cfg file values overwrite)." << endl;
                 fSampleWarning[iTelID] = false;
             }
         }

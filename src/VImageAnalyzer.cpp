@@ -648,10 +648,13 @@ void VImageAnalyzer::printTrace( int iChannel )
     cout << getTelescopeEventNumber( getTelID() ) << " " << getSums()[fReader->getHitID( iChannel )] << " " << i_totSum << "    ";
     unsigned int chanID = fReader->getHitID( iChannel );
     fReader->selectHitChan( chanID );
-    for( unsigned int j = 0; j < fReader->getNumSamples(); j++ )
+    if( fReader->getNumSamples() > 0 )
     {
-        if( fReader->has16Bit() ) cout << fReader->getSamplesVec16Bit()[j] << " ";
-	else                      cout << fReader->getSamplesVec()[j] << " ";
+       for( unsigned int j = 0; j < fReader->getNumSamples(); j++ )
+       {
+	   if( fReader->has16Bit() ) cout << fReader->getSamplesVec16Bit()[j] << " ";
+	   else                      cout << fReader->getSamplesVec()[j] << " ";
+       }
     }
     cout << endl;
 

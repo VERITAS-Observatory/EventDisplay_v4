@@ -211,6 +211,9 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 // don't do this if there is no L2 trigger
     if( !getReader()->hasLocalTrigger( getTelID() ) ) return;
 
+// don't do this if there are no FADCs
+    if( !getReader()->hasFADCTrace() ) return;
+
 // do the FADC stop correction only if all channels are set
     if( getFADCstopTrig().size() == 0 ) return;
     for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
@@ -910,51 +913,6 @@ TTree* VImageBaseAnalyzer::makeDeadChannelTree()
     }
 
     return itc;
-}
-
-
-/*
-   get the maximum value of the photo diode trace
-   (used in dst only)
-*/
-float VImageBaseAnalyzer::getPhotoDiodeMax()
-{
-    const double i_photoDiodePed = 17.8;
-
-    if( fReader->getMaxChannels() >= 499 )
-    {
-        fReader->selectHitChan(499);
-// hard coded pedestal -> this should not change during a run
-        if( fReader->has16Bit() ) fTraceHandler->setTrace( fReader->getSamplesVec16Bit(), i_photoDiodePed, 1., 499 );
-	else                      fTraceHandler->setTrace( fReader->getSamplesVec(), i_photoDiodePed, 1., 499 );
-	fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
-        if( !getReader()->getHiLo( 499 ) ) return     fTraceHandler->getTraceMax();
-        else                               return -1.*fTraceHandler->getTraceMax();
-    }
-    return 0.;
-}
-
-
-/*
-   get the charge value of the photo diode trace
-   (used in dst only)
-*/
-float VImageBaseAnalyzer::getPhotoDiodeSum()
-{
-    const int i_traceSumStart = 7;
-    const double i_photoDiodePed = 17.8;
-
-    if( fReader->getMaxChannels() >= 499 )
-    {
-        fReader->selectHitChan(499);
-// hard coded pedestal -> this should not change during a run
-        if( fReader->has16Bit() ) fTraceHandler->setTrace( fReader->getSamplesVec16Bit(), i_photoDiodePed, 1., 499 );
-	else                      fTraceHandler->setTrace( fReader->getSamplesVec(), i_photoDiodePed, 1., 499 );
-	fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
-        if( !getReader()->getHiLo( 499 ) ) return       fTraceHandler->getTraceSum( i_traceSumStart, i_traceSumStart + getSumWindow(), false );
-        else                                            return -1. * fTraceHandler->getTraceSum( i_traceSumStart, i_traceSumStart + getSumWindow(), false );
-    }
-    return 0.;
 }
 
 

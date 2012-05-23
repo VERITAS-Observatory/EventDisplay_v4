@@ -117,9 +117,9 @@ unsigned int getTimingLevelIndex( unsigned int i )
  * @return Pixel amplitude in peak p.e. units.
  */
 
-double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int dummy);
+double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int dummy, bool& iLowGain );
 
-double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int dummy)
+double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int dummy, bool& iLowGain )
 {
    int i = ipix, npix, significant, hg_known, lg_known;
    double npe, sig_hg, npe_hg, sig_lg, npe_lg;
@@ -149,6 +149,7 @@ double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int du
         hsdata->tel_moni[itel].pedestal[LO_GAIN][i]) : 0.;
    npe_lg = sig_lg * hsdata->tel_lascal[itel].calib[LO_GAIN][i];
 
+   iLowGain = false;
    if ( !significant ) 
       npe = 0.;
    else if ( hg_known && sig_hg < 1000000 && sig_hg > -1000 )
@@ -156,6 +157,7 @@ double calibrate_pixel_amplitude(AllHessData *hsdata, int itel, int ipix, int du
    else
    {
       npe = npe_lg;
+      iLowGain = true;
    }
 
    /* npe is in units of 'mean photo-electrons'. */
@@ -214,6 +216,7 @@ static void syntax (char *program)
    printf("   -o dst filename  (name of dst output file)\n" );
    printf("   -f on=1/off=0    (write FADC samples to DST file;default=0)\n" );
    printf("   -r on=1/off=0    (apply camera place scaling for DC telescopes; default=1)\n" );
+   printf("   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );      
 
    exit(1);
 }
@@ -414,6 +417,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	 if( hsdata->camera_set[telID].num_pixels < VDST_MAXCHANNELS )
 	 {
 // set maximum number of pixels (needed for efficient resetting of DST arrays)
+	    bool iLowGain = false;
 	    if( (unsigned int)hsdata->camera_set[telID].num_pixels > fGlobalMaxNumberofPixels )
 	    {
 	       fGlobalMaxNumberofPixels = (unsigned int)hsdata->camera_set[telID].num_pixels;
@@ -423,11 +427,13 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 		fData->fDSTChan[i_ntel_data][p] =  0;
 		fData->fDSTdead[i_ntel_data][p] = !(hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p]);
 		fData->fDSTRecord[i_ntel_data][p] = hsdata->event.teldata[telID].raw->significant[p];
-		fData->fDSTsums[i_ntel_data][p] = (float)(TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP ) * 100. ))/100.;
+		fData->fDSTsums[i_ntel_data][p] = (float)(TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP, iLowGain ) * 100. ))/100.;
+// set low gain switch
+		fData->fDSTHiLo[i_ntel_data][p] = iLowGain;
 
 // fill FADC trace
 // (NOTE: ignore possible low gain chain)
-			if( iWriteFADC && hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
+   	        if( iWriteFADC && hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
 		{
 		   if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN] )
 		   {
@@ -441,18 +447,12 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 // fill timing information
 		for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
 		{
-		   if( t < fData->getDSTpulsetiminglevelsN() && getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
+		   if( t < (int)fData->getDSTpulsetiminglevelsN() && getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
 		   {
 		      fData->fDSTpulsetiming[i_ntel_data][getTimingLevelIndex(t)][p] = hsdata->event.teldata[telID].pixtm->timval[p][t];
                    }
                 }
 		fData->fDSTMax[i_ntel_data][p] = (short)(hsdata->event.teldata[telID].pixtm->pulse_sum_loc[HI_GAIN][p]);
-// set low gain switch
-                if(  hsdata->event.teldata[telID].raw->threshold > 0 )
-		{
-		   fData->fDSTHiLo[i_ntel_data][p] = hsdata->event.teldata[telID].raw->adc_known[LO_GAIN][p];
-                }
-
 		if( FLAG_AMP_TMP > 0 )
 		{
 		   fData->fDSTsumwindow[i_ntel_data][p] = hsdata->event.teldata[telID].pixtm->after_peak;

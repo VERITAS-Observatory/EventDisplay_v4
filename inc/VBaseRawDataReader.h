@@ -46,6 +46,11 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 
 	VMonteCarloRunHeader* fMonteCarloHeader;
 
+// QADC values
+        std::valarray<double> fSums;
+        std::valarray<double> fTraceMax;
+	std::vector< valarray< double > > fTracePulseTiming;
+
 // placeholders
         std::valarray<double> v;
         std::vector< std::valarray<double> > vv;
@@ -91,6 +96,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         uint32_t                    getHitID(uint32_t i);
         bool                        getHiLo(uint32_t i);
         unsigned int                getTelescopeID() { return fTelID; }
+	bool                        hasFADCTrace(); 
         void                        selectHitChan(uint32_t i);
 	bool                        isZeroSuppressed( unsigned int iChannel );
         bool                        wasLossyCompressed();
@@ -111,6 +117,12 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 // sky to camera coordinates
         float                      getMC_Xoffset() { return -1. * getSMC_Xoffset(); }
         float                      getMC_Yoffset() { return -1. * getSMC_Yoffset(); }
+
+// return QADC values
+        valarray< double >&        getSums();
+	valarray< double >&        getTraceMax();
+	valarray< double >&        getTraceRawMax() { return getTraceMax(); }
+	vector< valarray< double > >& getTracePulseTiming();
 
 // noise file related stuff
         valarray<double>&          getPeds();
