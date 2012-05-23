@@ -33,7 +33,6 @@ then
 fi
 
 SUBAR=$1
-RECID=0
 CDIR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/"
 CFIL=$2
 ANAPAR=$3
@@ -55,6 +54,8 @@ echo "reading anaysis parameter from $ANAPAR"
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
 ODIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/$4/"
 mkdir -v -p $ODIR
+# reconstruction ID
+RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 
 #arrays
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
@@ -72,7 +73,7 @@ then
    then
       VPART=( "proton" )
    else
-      VPART=( "gamma_onSource" "electron" "proton" )
+      VPART=( "gamma_onSource" "electron_onSource" "proton_onSource" )
    fi
 else
    if [ $DSET = "cta-ultra3" ]
@@ -103,7 +104,7 @@ do
       then
         cp $CDIR/$CFIL.gamma.dat $CCUT
       fi
-      if [ $PART = "proton" ] || [ $PART = "electron" ] || [ $PART = "helium" ] 
+      if [ $PART = "proton" ] || [ $PART = "electron" ] || [ $PART = "helium" ] || [ $PART = "electron_onSource" ] || [ $PART = "proton_onSource" ]
       then
         cp $CDIR/$CFIL.CRbck.dat $CCUT
       fi

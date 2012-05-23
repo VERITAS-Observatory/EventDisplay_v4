@@ -132,7 +132,6 @@ then
    fi
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_onSource."$ARRAY"_ID"$RECID".eff
-   MCFIL=gamma_onSource."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
    OFFMEA=( "0.0" )
@@ -153,7 +152,6 @@ then
    MSCFILE=$DDIR/gamma_onSourceDISP."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_onSourceDISP."$ARRAY"_ID"$RECID".eff
-   MCFIL=gamma_onSourceDISP."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
    OFFMEA=( "0.0" )
@@ -174,12 +172,11 @@ then
    MSCFILE=$DDIR/gamma_cone10."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_cone10."$ARRAY"_ID"$RECID".eff
-   MCFIL=gamma_cone10."$ARRAY"_ID0.eff
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
    OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-#   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
 # PRELIMINARY! use on axis TMVA for all off axis gamma/hadron separation
-   OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
+#   OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
    THETA2MAX=( -1. )
@@ -193,7 +190,6 @@ then
    MSCFILE=$DDIR/electron."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=electron."$ARRAY"_ID"$RECID".eff
-   MCFIL=electron."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -201,9 +197,9 @@ then
    then
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
 # use on axis TMVA for all off axis gamma/hadron separation
-      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
+#      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
@@ -223,7 +219,6 @@ then
    fi
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=proton."$ARRAY"_ID"$RECID".eff
-   MCFIL=proton."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -231,9 +226,9 @@ then
    then
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
 # use on axis TMVA for all off axis gamma/hadron separation
-      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
+#      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
@@ -249,7 +244,6 @@ then
    MSCFILE=$DDIR/helium."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=helium."$ARRAY"_ID"$RECID".eff
-   MCFIL=helium."$ARRAY"_ID0.eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
@@ -257,9 +251,9 @@ then
    then
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
 # use on axis TMVA for all off axis gamma/hadron separation
-      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
+#      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
@@ -340,14 +334,22 @@ do
       rm -f $iCFIL-h
       if [ $PART = "gamma_onSource" ] 
       then
-	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_onSource."$ARRAY"_ID0.eff-0.root"
+	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_onSource."$ARRAY"_ID"$RECID".eff-0.root"
       else
-	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_cone10."$ARRAY"_ID0.eff-$i.root"
+	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_cone10."$ARRAY"_ID"$RECID".eff-$i.root"
       fi
       sed -e "s|ANGRESFILE|$ANGRESFILE|" $iCFIL-i > $iCFIL-j
       rm -f $iCFIL-i
 # particle number file
-      PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".$i.root"
+      if [ $PART = "gamma_onSource" ] || [ $PART = "electron_onSource" ] || [ $PART = "proton_onSource" ]
+      then
+	 PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".00.root"
+      elif [ $PART = "gamma_cone10" ]
+      then
+	 PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".$i.root"
+      else
+	 PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".$j.root"
+      fi
       sed -e "s|PARTICLENUMBERFILE|$PNF|" $iCFIL-j > $iCFIL-k
       rm -f $iCFIL-j
       mv -f $iCFIL-k $iCFIL
@@ -427,12 +429,14 @@ do
       echo
       echo "gamma/hadron separation file"
       echo $iCFIL
+      echo $PNF
       echo "run script is $QSHELLDIR/$FNAM.sh"
       echo "batch log and error files are written to $FDIR"
       echo "parameter files write written to $FDIR"
 
 # submit the job
-     qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+#     qsub -l os="sl*" -l h_cpu=0:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+     qsub -l os="sl*" -l h_cpu=11:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
    done
 done
 

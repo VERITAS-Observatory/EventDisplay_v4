@@ -41,6 +41,7 @@ NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
 ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
 DDIR=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
+RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 echo $NIMAGESMIN $ANADIR $EREC $DDIR
 # parameters from command line
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
@@ -106,8 +107,13 @@ do
       cp -f $RPAR.runparameter $ODIR
 
 # signal and background files
-      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID0*.root`
-      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID0*.root`
+      if [ $CONE == "TRUE" ]
+      then
+	 SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
+      else
+	 SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*4.mscw.root`
+      fi
+      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID"*.root`
 
 ###############################################################
 # loop over all energy bins and submit a job for each bin
@@ -154,7 +160,7 @@ do
 #################################
 # submit job to queue
 # medium queue: BDT 
-	 qsub -V -l os="sl*"  -l h_cpu=10:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
+	 qsub -V -js 20 -l os="sl*"  -l h_cpu=0:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
 # long queue: needed for box cut optimization
 #         qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
      done

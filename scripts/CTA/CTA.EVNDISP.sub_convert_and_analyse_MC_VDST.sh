@@ -106,6 +106,7 @@ do
    echo $FNAM.sh
 
    qsub -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+#   qsub -l h_cpu=0:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 
    echo "writing shell script to $FNAM.sh"
    echo "writing queue log and error files to $QLOG"
