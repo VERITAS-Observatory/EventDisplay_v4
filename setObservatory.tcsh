@@ -31,7 +31,9 @@ endif
 setenv LD_LIBRARY_PATH /opt/products/gsl/1.9/lib64/:$LD_LIBRARY_PATH
 
 # VBF
-setenv LD_LIBRARY_PATH $VBFSYS/lib:$LD_LIBRARY_PATH
+if( $OBSERVATORY == "VERITAS" || $OBSERVATORY == "VTS" ) then
+   setenv LD_LIBRARY_PATH $VBFSYS/lib:$LD_LIBRARY_PATH
+endif
 
 # HESSIOSYS needed for reading of CTA sim_telarray files
 if( $OBSERVATORY == "CTA" ) then

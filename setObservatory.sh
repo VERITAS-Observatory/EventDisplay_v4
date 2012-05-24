@@ -31,7 +31,10 @@ fi
 LD_LIBRARY_PATH=/opt/products/gsl/1.9/lib64/:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH 
 
 # VBF
-LD_LIBRARY_PATH=$VBFSYS/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH 
+if [ $OBSERVATORY = "VERITAS" ] || [ $OBSERVATORY = "VTS" ]
+then
+   LD_LIBRARY_PATH=$VBFSYS/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH 
+fi
 
 # HESSIOSYS needed for reading of CTA sim_telarray files
 if [ $OBSERVATORY = "CTA" ]
