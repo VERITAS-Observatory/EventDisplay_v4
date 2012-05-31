@@ -31,7 +31,7 @@ endif
 setenv LD_LIBRARY_PATH /opt/products/gsl/1.9/lib64/:$LD_LIBRARY_PATH
 
 # VBF
-if( $OBSERVATORY == "VERITAS" || $OBSERVATORY == "VTS" ) then
+if ( $?VBFSYS ) then
    setenv LD_LIBRARY_PATH $VBFSYS/lib:$LD_LIBRARY_PATH
 endif
 
