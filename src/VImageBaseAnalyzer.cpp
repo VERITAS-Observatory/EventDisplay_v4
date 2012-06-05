@@ -473,8 +473,8 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
         if(!getDead(getHiLo()[i_channelHitID])[i_channelHitID])
         {
 // initialize trace handler
-            fTraceHandler->setTrace( fReader, getNSamples(), 
-	                             getPeds(getHiLo()[i_channelHitID] )[i_channelHitID], getPedrms(getHiLo()[i_channelHitID])[i_channelHitID], 
+	    fTraceHandler->setTrace( fReader, getNSamples(), 
+				     getPeds(getHiLo()[i_channelHitID] )[i_channelHitID], getPedrms(getHiLo()[i_channelHitID])[i_channelHitID], 
 				     i_channelHitID, i, getLowGainMultiplier()[i_channelHitID]*getHiLo()[i_channelHitID] );
             fTraceHandler->setTraceIntegrationmethod( iTraceIntegrationMethod );
 // integration range
@@ -1026,8 +1026,8 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // fit times are corrected for TOffsets and FADCStopOffsets.
 // undo this to get integration window in FADC trace.
                 corrfirst = (int)(xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
-// (GM) low gain channel have different time -> use tzero
-                if( getHiLo()[i_channelHitID] || getTraceMax()[i_channelHitID] > getRunParameter()->fSumWindowStartAtT0Min )
+// low gain channel have different time -> use tzero (donnot do this for DST sims)
+                if( ( getHiLo()[i_channelHitID] || getTraceMax()[i_channelHitID] > getRunParameter()->fSumWindowStartAtT0Min ) && getRunParameter()->fsourcetype != 7 )
                 {
 // get new tzero for sumwindow starting at corrfirst to the end of the window
 		    float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];

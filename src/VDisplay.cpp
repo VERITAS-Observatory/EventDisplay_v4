@@ -304,7 +304,8 @@ void VDisplay::updateCamera( Int_t i )
 
 // ==================================================
 // timing tab
-    if( E_cameraIdent(i) == C_TIMING && !fBoolDrawAllinOne )
+    if( E_cameraIdent(i) == C_TIMING && !fBoolDrawAllinOne && 
+        fEventLoop->getRunParameter()->fsourcetype != 4 && fEventLoop->getRunParameter()->fsourcetype != 7 )
     {
 // don't do anything for first event
         if( fEventLoop->getEventNumber() == 0 ) return;
@@ -613,7 +614,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 ///////////////////////////////////////////////////////////////////////////////
 // fill trace into histogram
 ///////////////////////////////////////////////////////////////////////////////
-   if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() && !fEventLoop->getZeroSuppressed()[i_channel] )
+   if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() && !fEventLoop->getZeroSuppressed()[i_channel] && fEventLoop->getNSamples() > 0 )
    {
 // first set the number of bins of the histogram according to the number of samples
        if( int( fEventLoop->getNSamples() ) != i_his->GetNbinsX() )

@@ -670,6 +670,13 @@ unsigned int VEvndispData::getLargestSumWindow( unsigned int iTelID )
    return iSW;
 }
 
+unsigned int VEvndispData::checkSummationWindow( unsigned int iTelID, unsigned int iSumWindow )
+{
+    if( iSumWindow <= getNSamples( iTelID ) ) return iSumWindow;
+
+    return getNSamples( iTelID );
+}
+
 bool VEvndispData::setSums( valarray< double > iVSum )
 {
    if( iVSum.size() != getNChannels() )
@@ -678,11 +685,9 @@ bool VEvndispData::setSums( valarray< double > iVSum )
       cout << "exiting..." << endl;
       exit( -1 );
    }
-
    fAnaData[fTelID]->fSums = iVSum;
    return true;
 }
-
 
 bool VEvndispData::fDebug = false;
 int VEvndispData::fDebugLevel = 0;

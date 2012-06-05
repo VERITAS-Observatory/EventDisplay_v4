@@ -84,6 +84,7 @@ class VTableEnergyCalculator
         bool fReadHistogramsFromFile;
 
         double fLog10;
+	string fHName_add;
 
         string fInterpolationString;
 
@@ -104,6 +105,7 @@ class VTableEnergyCalculator
 
         char    Omode;
 
+	bool create1DHistogram( int i, int j );
         void get_logEnergy(double logSize, int ir, double &med, double &sigma, unsigned int itel = 0 );
         void get_logEnergy2D(double logSize, double r, double &med, double &sigma, unsigned int itel = 0 );
         void initialize();

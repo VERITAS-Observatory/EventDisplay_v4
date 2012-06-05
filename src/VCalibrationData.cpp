@@ -242,11 +242,11 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     fLowGainTOffsetvars.resize( i_channel, 0. );
 
 // low gain multiplier settings (per summation window)
-    itemp_ped.resize( i_channel, 6. );
+    itemp_ped.resize( i_channel, 1. );
     fLowGainMultiplier.resize( nSamples+1, itemp_ped );
     itemp_ped = 0.;
     fLowGainMultiplierError.resize( nSamples+1, itemp_ped );
-    fLowGainMultiplier_Mean.resize( nSamples+1, 6. );
+    fLowGainMultiplier_Mean.resize( nSamples+1, 1. );
     fLowGainMultiplier_RMS.resize( nSamples+1, 0. );
 }
 

@@ -367,10 +367,12 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 // erec/emc
        hEsysMCRelative = (TProfile*)c->hEsysMCRelative;
        hEsysMCRelative2D = (TH2D*)c->hEsysMCRelative2D;
-// get energy resolution
+// get energy resolution (!!)
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
-       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
-//       getEnergyResolutionPlot( (TH2D*)c->hEsysMCRelativeRMS );
+// energy resolution caluclation as 68% value
+//       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
+// energy resolution is RMS
+       getEnergyResolutionPlot( (TH2D*)c->hEsysMCRelativeRMS );
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bias
@@ -477,7 +479,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
     return 0;
 }
 
-void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, double iMinEnergy )
+void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, double iMinEnergy, double iReferenceValue )
 {
     if( !iP )
     {
@@ -512,7 +514,17 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, dou
 	    e_res = (yq[2]-yq[0])*0.5; */
 // 68% distribution around 1 (bb_ref, expected value)	    
             TH1D hh( "h", "", h->GetNbinsX(), 0., h->GetXaxis()->GetXmax()-1. );
-	    double bb_ref = 1.; 
+	    double bb_ref = iReferenceValue;
+// < -998: relative to mean
+	    if( iReferenceValue < -998. ) bb_ref = h->GetMean();
+// >  998: relative to median
+	    else if( iReferenceValue > 998. )
+	    {
+	       xq[0] = 0.50;
+	       h.GetQuantiles( 1, yq, xq );
+	       bb_ref = yq[0];
+            }
+// fill 1D histogram before integration
 	    for( int bb = 1; bb <= h->GetNbinsX(); bb++ )
 	    {
 	        if( h->GetBinCenter( bb ) < bb_ref )

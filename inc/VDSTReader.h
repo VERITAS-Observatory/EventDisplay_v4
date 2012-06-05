@@ -33,7 +33,7 @@ class VDSTReader : public VVirtualDataReader
 
         unsigned int fTelID;
         unsigned int fNTelescopes;
-	uint16_t     fNumSamples;
+	vector< uint16_t >     fNumSamples;
         unsigned int fSelectedHitChannel;
         vector< unsigned int > fNChannel;
         vector< valarray< double > > fSums;
@@ -62,43 +62,35 @@ class VDSTReader : public VVirtualDataReader
     public:
         VDSTReader( string isourcefile, bool iMC, int iNTel, int iNChannel, bool iDebug );
         ~VDSTReader() {}
+	bool isZeroSuppressed( unsigned int iChannel );
         std::pair< bool, uint32_t > getChannelHitIndex( uint32_t i_channel );
-        string    getDataFormat() { return "DST"; }
-        unsigned int getDataFormatNum() { return 4; }
+        string                      getDataFormat() { return "DST"; }
+        unsigned int                getDataFormatNum() { return 4; }
         vector<unsigned int>&       getDead() { return fDead[fTelID]; }
-        uint32_t  getEventNumber() { return fDSTTree->getDSTEventNumber(); }
-        uint8_t   getEventType() { return fDSTTree->getDSTEventType(); }
-        uint8_t   getATEventType() { return fDSTTree->getDSTEventType(); }
-        vector< bool > getFullHitVec() { return fFullHitVec[fTelID]; }
-        vector< bool >         getFullTrigVec() { return fFullTrigVec[fTelID]; }
-        int                    getNumberofFullTrigger() { return fNumberofFullTrigger[fTelID]; }
-        uint32_t  getGPS0() { return fDSTTree->getDSTGPS0(); }
-        uint32_t  getGPS1() { return fDSTTree->getDSTGPS1(); }
-        uint32_t  getGPS2() { return fDSTTree->getDSTGPS2(); }
-        uint32_t  getGPS3() { return fDSTTree->getDSTGPS3(); }
-        uint32_t  getGPS4() { return fDSTTree->getDSTGPS4(); }
-        uint16_t  getGPSYear() { return fDSTTree->getDSTGPSYear(); }
-        uint16_t  getATGPSYear() { return fDSTTree->getDSTATGPSYear(); }
-        uint32_t  getHitID( uint32_t );
+        uint32_t                    getEventNumber() { return fDSTTree->getDSTEventNumber(); }
+        uint8_t                     getEventType() { return fDSTTree->getDSTEventType(); }
+        uint8_t                     getATEventType() { return fDSTTree->getDSTEventType(); }
+        vector< bool >              getFullHitVec() { return fFullHitVec[fTelID]; }
+        vector< bool >              getFullTrigVec() { return fFullTrigVec[fTelID]; }
+        int                         getNumberofFullTrigger() { return fNumberofFullTrigger[fTelID]; }
+        uint32_t                    getGPS0() { return fDSTTree->getDSTGPS0(); }
+        uint32_t                    getGPS1() { return fDSTTree->getDSTGPS1(); }
+        uint32_t                    getGPS2() { return fDSTTree->getDSTGPS2(); }
+        uint32_t                    getGPS3() { return fDSTTree->getDSTGPS3(); }
+        uint32_t                    getGPS4() { return fDSTTree->getDSTGPS4(); }
+        uint16_t                    getGPSYear() { return fDSTTree->getDSTGPSYear(); }
+        uint16_t                    getATGPSYear() { return fDSTTree->getDSTATGPSYear(); }
+        uint32_t                    getHitID( uint32_t );
         bool                        getHiLo(uint32_t i) { if( i < fHiLo[fTelID].size() ) return fHiLo[fTelID][i]; else return 0; }
         vector< bool >&             getLocalTrigger() { return fDSTvltrig; }
         vector< float >             getLocalTriggerTime() { return fLTtime; }
         vector< float >             getLocalDelayedTriggerTime() { return fLDTtime; }
-        uint16_t  getMaxChannels() { return fNChannel[fTelID]; }
-        uint16_t  getNumChannelsHit()             //!< preli
-        {
-            return fNChannel[fTelID];
-        }
-        uint16_t  getNumSamples()                 
-        {
-            return fNumSamples;
-        }
-        TTree*    getMCTree();
-        int       getMC_primary()                 //!< MC primary type
-        {
-            return fDSTTree->getDSTMCPrimary();
-        }
-        float     getMC_energy()                  //!< MC primary energy
+        uint16_t                    getMaxChannels() { return fNChannel[fTelID]; }
+        uint16_t                    getNumChannelsHit() { return fNChannel[fTelID]; }
+        uint16_t                    getNumSamples()   { if( fTelID < fNumSamples.size() ) return fNumSamples[fTelID]; else return 0; }
+        TTree*                      getMCTree();                
+        int                         getMC_primary() { return fDSTTree->getDSTMCPrimary(); }   //!< MC primary type
+        float                       getMC_energy()                  //!< MC primary energy
         {
             return fDSTTree->getDSTMCEnergy();
         }
@@ -157,11 +149,10 @@ class VDSTReader : public VVirtualDataReader
         bool      hasLocalTrigger( unsigned int iTel ) { if( fDSTTree->hasLocalTrigger( iTel ) < 0 ) return false; else return true; }
         bool      isMC() { return fMC; }
         void      selectHitChan( uint32_t hit ) { fSelectedHitChannel = hit; }
-	void      setNumSamples( uint16_t iS ) { fNumSamples = iS; }
+	void      setNumSamples( unsigned int iTelID, uint16_t iS ) { if( iTelID < fNumSamples.size() ) fNumSamples[iTelID] = iS; }
 	void      setPerformFADCAnalysis( bool iB ) { fPerformFADCAnalysis = iB; }
         bool      setTelescopeID( unsigned int );
-                                                  //!< set trigger values
-        void      setTrigger( vector<bool> iImage, vector<bool> iBorder );
+        void      setTrigger( vector<bool> iImage, vector<bool> iBorder );          //!< set trigger values
         bool      wasLossyCompressed() { return false; }
 };
 #endif

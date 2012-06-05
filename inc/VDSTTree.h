@@ -67,11 +67,12 @@ class VDSTTree
 
 // data recording parameters
 	unsigned short int fDSTRecord[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-	unsigned short int fDSTZeroSupression[VDST_MAXTELESCOPES];
+	unsigned short int fDSTTelescopeZeroSupression[VDST_MAXTELESCOPES];
 
 // adc parameters
         float        fDSTsums[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];                // integrated charge
         unsigned short int fDSTdead[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+	unsigned short int fDSTZeroSuppressed[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTsumwindow[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTsumfirst[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         float        fDSTt0[VDST_MAXTELESCOPES][VDST_MAXCHANNELS]; 
@@ -178,6 +179,8 @@ class VDSTTree
 	double       getDSTpulsetiming( int iTelID, int iChannelID, int iTimingLevelN );
         unsigned int getDSTDead( int iChannelID );
         unsigned int getDSTDead( int iTelID, int iChannelID );
+	unsigned int getZeroSupppressed( int iChannelID );
+	unsigned int getZeroSupppressed( int iTelID, int iChannelID );
         UShort_t     getDSTHiLo( int iChannelID );
         UShort_t     getDSTHiLo( int iTelID, int iChannelID );
         unsigned int getNTrigL1( unsigned int iTelID ) { if( iTelID < getDSTNTel() ) return fDSTnL1trig[iTelID]; else return 0; }

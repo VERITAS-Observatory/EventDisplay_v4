@@ -92,6 +92,7 @@ bool VDSTReader::init()
         fHiLo.push_back( i_tempF );
         fNumberofFullTrigger.push_back( 0 );
         fTelAzimuth.push_back( 0. );
+	fNumSamples.push_back( 0 );
         fTelElevation.push_back( 0. );
         fDSTvltrig.push_back( false );
         fLTtime.push_back( 0. );
@@ -179,18 +180,14 @@ bool VDSTReader::getNextEvent()
 // get FADC trace
     if( fPerformFADCAnalysis && fDSTTree->getFADC() )
     {
-        if( fNumSamples == 0 )
-	{
-	   cout << "VDSTReader::getNextEvent() error: sample length is NULL" << endl;
-	   cout << "exiting..." << endl;
-	   exit( 0 );
-        } 
         for( unsigned int i = 0; i < fNTelescopes; i++ )
         {
-	  fDSTTree->setTelCounter( i );
-	  for( unsigned int j = 0; j < fNChannel[i]; j++ )
-	  {
-	     for( unsigned short int k = 0; k < fNumSamples; k++ )
+	   fDSTTree->setTelCounter( i );
+// telescope is not read out
+	   if( fNumSamples[i] == 0 ) continue;
+	   for( unsigned int j = 0; j < fNChannel[i]; j++ )
+	   {
+	     for( unsigned short int k = 0; k < fNumSamples[i]; k++ )
 	     {
 	        fFADCTrace[i][j][k] = fDSTTree->getDSTTrace( j, k );
              }
@@ -296,4 +293,11 @@ uint16_t VDSTReader::getSample16Bit( unsigned channel, unsigned sample, bool iNe
   iNewNoiseTrace = true;
 
   return 3;
+}
+
+bool VDSTReader::isZeroSuppressed( unsigned int iChannel ) 
+{
+   if( fDSTTree->getZeroSupppressed( getTelescopeID(), iChannel ) == 0 ) return false;
+
+   return true;
 }

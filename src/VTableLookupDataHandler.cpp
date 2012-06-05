@@ -395,7 +395,8 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
         {
 	    if( !ftpars[i] )
 	    {
-	       cout << "VTableLookupDataHandler::fillNextEvent error: tree tpars not found (" << i << ")" << endl;
+	       cout << "VTableLookupDataHandler::fillNextEvent error: tree tpars not found (telescope " << i+1 << ")" << endl;
+	       cout << "\t(run " << runNumber << ", " << eventNumber << ")" << endl;
 	       exit( -1 );
             }
             ftpars[i]->GetEntry( fEventCounter );

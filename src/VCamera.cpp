@@ -372,13 +372,16 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             if( fgraphTubes[i]->GetR1() > 0. ) fgraphTubesEntry[i]->Draw();
         }
 // mark zero suppressed channels
-        for( unsigned int i = 0; i < fgraphTubesEntry.size(); i++ )
+        if( !fBoolAllinOne )
 	{
-	   if( fData->getZeroSuppressed()[i] ) 
+	   for( unsigned int i = 0; i < fgraphTubesEntry.size(); i++ )
 	   {
-	      TMarker *iZeroSupp = new TMarker(  fgraphTubes[i]->GetX1(), fgraphTubes[i]->GetY1(), 5 );
-	      iZeroSupp->Draw();
-           }
+	      if( fData->getZeroSuppressed()[i] ) 
+	      {
+		 TMarker *iZeroSupp = new TMarker(  fgraphTubes[i]->GetX1(), fgraphTubes[i]->GetY1(), 5 );
+		 iZeroSupp->Draw();
+	      }
+	   }
         }
 // draw tube/channel numbers
         if( fPrintChannel != 0 && fPrintChannel < 3 && !fBoolAllinOne )
@@ -1174,7 +1177,7 @@ void VCamera::drawAnaResults()
 // draw image centroids
             if( !fBoolAllinOne )
             {
-                fAnaShowerCentroid = new TMarker( convertX( fData->getImageParameters()->cen_x ), convertY( fData->getImageParameters()->cen_y ), 5 );
+                fAnaShowerCentroid = new TMarker( convertX( fData->getImageParameters()->cen_x ), convertY( fData->getImageParameters()->cen_y ), 3 );
                 fAnaShowerCentroid->Draw();
             }
 // draw reconstructed shower direction

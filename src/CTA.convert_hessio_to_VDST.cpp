@@ -297,9 +297,13 @@ bool DST_fillMCEvent( VDSTTree *fData, AllHessData *hsdata )
    return true;
 }
 
-bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, float > telescope_list, bool iWriteFADC )
+bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, float > telescope_list, bool iWriteFADC, unsigned int iDynRange )
 {
    if( !fData || !hsdata ) return false;
+
+// set dynamic range for low gain flip
+   float i_maxDynamicRange = 1.e99;
+   if( iDynRange > 0 ) i_maxDynamicRange = TMath::Power( 2., (float)iDynRange ) *0.95;
 
 // reset all arrays
    fData->resetDataVectors( 99999, fData->fDSTntel, fGlobalNTelPreviousEvent,
@@ -308,11 +312,13 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 			    fGlobalMaxNumberofSamples,
 			    fGlobalTriggerReset, true );
 
+/////////////////////////////////////////////////////////////////////////////////////
 // event data
    fData->fDSTeventnumber = hsdata->mc_event.event;
    fData->fDSTrunnumber = hsdata->run_header.run;
    fData->fDSTeventtype = 0;
    fData->fDSTgpsyear = 2010;
+
 // ntel doesn't change from event to event, but needed by VDST
    fData->fDSTntel = (unsigned short int)hsdata->run_header.ntel;
    if( telescope_list.size() == 0 )
@@ -332,7 +338,6 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    bitset<8*sizeof(unsigned long) > i_localTrigger;
    for( unsigned int t = 0; t < (unsigned int)hsdata->event.central.num_teltrg; t++ )
    {
-//      if( hsdata->event.teldata[t].known == 0 ) continue; // the triggered telescopes without image data are skipped
       if( telescope_list.find( hsdata->event.central.teltrg_list[t] ) != telescope_list.end() )
       {
 	 if( hsdata->event.central.teltrg_list[t] < (int)i_localTrigger.size() )
@@ -358,6 +363,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    }
    fGlobalTriggerReset = false;
 
+/////////////////////////////////////////////////////////////////////////////////////
 // tracking data
    unsigned int z = 0;
    for( unsigned short int i = 0; i < (unsigned short int)hsdata->run_header.ntel; i++ )
@@ -370,9 +376,11 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
       }
    }
 
+/////////////////////////////////////////////////////////////////////////////////////
 // event data
    fData->fDSTntel_data = (unsigned short int)hsdata->event.central.num_teldata;
    unsigned short int i_ntel_data = 0;
+// list of telescopes with data
    for( unsigned short int i = 0; i < fData->fDSTntel_data; i++ )
    {
       if( telescope_list.find( hsdata->event.central.teldata_list[i] ) != telescope_list.end() )
@@ -385,14 +393,13 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 #endif
 
 ////////////////////////////////////////////////
-// get pixel (ADC) data
-
-       fData->fDSTZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
+// get pixel (QADC) data
+         fData->fDSTTelescopeZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
 	 fData->fDSTnumSamples[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->num_samples;
 	 if( iWriteFADC && fData->fDSTnumSamples[i_ntel_data] == 0 )
 	 {
 	    cout << "Error in DST_fillEvent: sample length in hessio file is null" << endl;
-	    cout << "exiting.." << endl;
+	    cout << "exiting..." << endl;
 	    exit( 0 );
          }
 // set maximum number of FADC samples (needed for efficient resetting of DST arrays)
@@ -422,6 +429,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	    {
 	       fGlobalMaxNumberofPixels = (unsigned int)hsdata->camera_set[telID].num_pixels;
             }
+// loop over all pixel
 	    for( int p = 0; p < hsdata->camera_set[telID].num_pixels; p++ )
 	    {
 		fData->fDSTChan[i_ntel_data][p] =  0;
@@ -432,17 +440,44 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 		fData->fDSTHiLo[i_ntel_data][p] = iLowGain;
 
 // fill FADC trace
-// (NOTE: ignore possible low gain chain)
-   	        if( iWriteFADC && hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
+		unsigned int iTraceIsZero = 1;
+   	        if( iWriteFADC )
 		{
-		   if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN] )
+		   iTraceIsZero = 0;
+		   iLowGain = false;
+		   if( hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
 		   {
-		      for( int t = 0; t < hsdata->event.teldata[telID].raw->num_samples; t++ )
+		      if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN] )
 		      {
-			 fData->fDSTtrace[i_ntel_data][t][p] = hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN][p][t];
-    		      }
-		   }
-		}
+			 for( int t = 0; t < hsdata->event.teldata[telID].raw->num_samples; t++ )
+			 {
+			    iTraceIsZero += hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN][p][t];
+			    fData->fDSTtrace[i_ntel_data][t][p] = hsdata->event.teldata[telID].raw->adc_sample[HI_GAIN][p][t];
+			    if( fData->fDSTtrace[i_ntel_data][t][p] > i_maxDynamicRange ) iLowGain = true;
+			 }
+		      }
+                   }
+// preli: no low-gain filled
+
+		   if( iLowGain && hsdata->event.teldata[telID].raw->adc_known[LO_GAIN][p] == 1 )
+		   {
+		      if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[LO_GAIN] )
+		      {
+			 for( int t = 0; t < hsdata->event.teldata[telID].raw->num_samples; t++ )
+			 {
+			    iTraceIsZero += hsdata->event.teldata[telID].raw->adc_sample[LO_GAIN][p][t];
+			    fData->fDSTtrace[i_ntel_data][t][p] = hsdata->event.teldata[telID].raw->adc_sample[LO_GAIN][p][t];
+			    fData->fDSTHiLo[i_ntel_data][p] = true;
+			 }
+		      }
+                   } 
+		} 
+// check zero suppression (for FADC case only)
+		if( iTraceIsZero > 0 )   fData->fDSTZeroSuppressed[i_ntel_data][p] = 0;
+		else  
+		{
+		   fData->fDSTZeroSuppressed[i_ntel_data][p] = 1;
+                }
 
 // fill timing information
 		for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
@@ -465,7 +500,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	 {
 	    cout << "ERROR: number of pixels too high: " << telID + 1 << "\t";
 	    cout << hsdata->camera_set[telID].num_pixels << "\t" << VDST_MAXCHANNELS << endl;
-	 exit( 0 );
+	    exit( 0 );
 	 }
 
 // get local trigger data (this is not corrected for clipping!)
@@ -815,10 +850,11 @@ int main(int argc, char **argv)
    fGlobalMaxNumberofSamples = 0;
    fGlobalTriggerReset = false;
 
-   string config_file = "";        // file with list of telescopes
-   string dst_file = "dst.root";   // output dst file
-   bool   fWriteFADC = false;      // fill FADC traces into converter
-   bool   fApplyCameraScaling = true;      // apply camera plate scaling according for DC telescopes
+   string config_file = "";             // file with list of telescopes
+   string dst_file = "dst.root";        // output dst file
+   bool   fWriteFADC = false;           // fill FADC traces into converter
+   unsigned int fDynamicRange = 0;      // dynamic range (for decision of high/low gain)
+   bool   fApplyCameraScaling = true;   // apply camera plate scaling according for DC telescopes
    
    static AllHessData *hsdata;
 
@@ -940,6 +976,13 @@ int main(int argc, char **argv)
 	 argv += 2;
 	 continue;
       }
+      else if (strcmp(argv[1],"-d") == 0 )
+      {
+         fDynamicRange = (unsigned int)atoi( argv[2] );
+	 argc -= 2;
+	 argv += 2;
+	 continue;
+      }
       else if ( strcmp(argv[1],"--help") == 0 )
       {
         printf("\nc_DST: A program to convert hessio data to EVNDISP DST files.\n\n");
@@ -968,8 +1011,9 @@ int main(int argc, char **argv)
        exit( -1 );
    }
    cout << "DST tree will be written to " << dst_file << endl;
-   if( fWriteFADC ) cout << "(writing FADC samples to DST file)" << endl;
-   else             cout << "(no FADC output)" << endl;
+   if( fWriteFADC ) cout << "Writing FADC samples to DST file" << endl;
+   else             cout << "No FADC output" << endl;
+   if( fDynamicRange > 0 ) cout << "Assume " << fDynamicRange << " bit dynamic range" << endl;
    if( fApplyCameraScaling ) cout << "Apply camera plate scaling for DC (intermediate) telescopes" << endl;
 
 // new DST tree
@@ -1329,7 +1373,7 @@ int main(int argc, char **argv)
             ntrg++;
 
 // fill EVNDISP DST event
-	    DST_fillEvent( fDST, hsdata, fTelescope_list, fWriteFADC );
+	    DST_fillEvent( fDST, hsdata, fTelescope_list, fWriteFADC, fDynamicRange );
 
             break;
 

@@ -156,9 +156,11 @@ void VTraceHandler::calcQuickPed(int fFirst, int fLast)
 double VTraceHandler::getQuickSum(int fFirst, int fLast, bool fRaw)
 {
     double sum=0.;
-    for (int i=fFirst; i<fLast; i++)
+    for( int i = fFirst; i < fLast; i++ )
     {
-        if (i<fpTrazeSize)
+// require that trace is >0.
+// (CTA MC write trace values above a certain signal only)
+        if( i<fpTrazeSize && fpTrace[i] > 0. )
         {
             if(!fRaw) sum+= fpTrace[i]-fPed;
             if(fRaw)  sum+= fpTrace[i];

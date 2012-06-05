@@ -130,6 +130,7 @@ class VEvndispData
         static valarray<double> fPlotRawPedestals;
 
 // set detector geometry
+	unsigned int        checkSummationWindow( unsigned int iTelID, unsigned int iSumWindow );
         void                setDetectorGeometry( unsigned int iNTel, vector< string > icamera , string idir );
 
 // names of dead channels
@@ -225,7 +226,8 @@ class VEvndispData
         unsigned int        getNChannels() { return fDetectorGeo->getNChannels( fTelID ); }
         vector<bool>&       getBrightNonImage() { return fAnaData[fTelID]->fBrightNonImage; }
         bool                getNoPointing() { return fNoTelescopePointing; }
-        unsigned int        getNSamples() { return fDetectorGeo->getNSamples( fTelID ); }
+        unsigned int        getNSamples( unsigned int iTelID = 9999 ) { if( iTelID == 9999 ) return fDetectorGeo->getNSamples( fTelID ); 
+	                                                                               else return fDetectorGeo->getNSamples( iTelID ); }
         unsigned int        getNTel() const { return fNTel; }
         TFile*              getOutputFile() { return fOutputfile; }
         bool                getPedsFromPLine() { return fCalData[fTelID]->fPedFromPLine; }
@@ -267,12 +269,12 @@ class VEvndispData
         double              getTemplateMuMax() { return fAnaData[fTelID]->fTemplateMu.max(); }
 	unsigned int        getLargestSumWindow();
 	unsigned int        getLargestSumWindow( unsigned int iTelID );
-        unsigned int        getSumWindow() { return fRunPar->fsumwindow_1[fTelID]; }
-        unsigned int        getSumWindow_2() { return fRunPar->fsumwindow_2[fTelID]; }
-	unsigned int        getSumWindow_Pass1() { return fRunPar->fsumwindow_pass1[fTelID]; }
-        unsigned int        getSumWindow( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_1.size() ) return fRunPar->fsumwindow_1[iTelID]; else return 0; }
-        unsigned int        getSumWindow_2( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_2.size() ) return fRunPar->fsumwindow_2[iTelID]; else return 0; }
-	unsigned int        getSumWindow_Pass1( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_pass1.size() ) return fRunPar->fsumwindow_pass1[iTelID]; else return 0; }
+        unsigned int        getSumWindow() { return checkSummationWindow( fTelID, fRunPar->fsumwindow_1[fTelID] ); }
+        unsigned int        getSumWindow_2() { return checkSummationWindow( fTelID, fRunPar->fsumwindow_2[fTelID] ); }
+	unsigned int        getSumWindow_Pass1() { return checkSummationWindow( fTelID, fRunPar->fsumwindow_pass1[fTelID] ); }
+        unsigned int        getSumWindow( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_1.size() ) return checkSummationWindow( iTelID, fRunPar->fsumwindow_1[iTelID] ); else return 0; }
+        unsigned int        getSumWindow_2( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_2.size() ) return checkSummationWindow( iTelID, fRunPar->fsumwindow_2[iTelID] ); else return 0; }
+	unsigned int        getSumWindow_Pass1( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_pass1.size() ) return checkSummationWindow( iTelID, fRunPar->fsumwindow_pass1[iTelID] ); else return 0; }
         valarray< unsigned int >& getCurrentSumWindow() { return fAnaData[fTelID]->fCurrentSummationWindow; }
         int                 getSumWindowShift() { return fRunPar->fTraceWindowShift[fTelID]; }
         double              getDBSumWindowMaxTimedifference() { return fRunPar->fDBSumWindowMaxTimedifference[fTelID]; }

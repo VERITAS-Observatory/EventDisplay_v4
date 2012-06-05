@@ -107,7 +107,7 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 // following arrays are filed only for all telescopes with data
     fDST_tree->Branch( "ntel_data", &fDSTntel_data, "ntel_data/i" );
     fDST_tree->Branch( "tel_data", fDSTtel_data, "tel_data[ntel_data]/i" );
-    fDST_tree->Branch( "zero_suppression", fDSTZeroSupression, "zero_suppression[ntel_data]/s" );
+    fDST_tree->Branch( "tel_zero_suppression", fDSTTelescopeZeroSupression, "tel_zero_suppression[ntel_data]/s" );
     sprintf( tname, "chan[ntel_data][%d]/s", VDST_MAXCHANNELS );
     fDST_tree->Branch( "chan", fDSTChan, tname );
     sprintf( tname, "recorded[ntel_data][%d]/s", VDST_MAXCHANNELS );
@@ -117,8 +117,10 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
     fDST_tree->Branch( "L1trig", fDSTL1trig, tname );
     sprintf( tname, "sum[ntel_data][%d]/F", VDST_MAXCHANNELS );
     fDST_tree->Branch( "sum", fDSTsums, tname );
-    sprintf( tname, "dead[ntel_data][%d]/F", VDST_MAXCHANNELS );
+    sprintf( tname, "dead[ntel_data][%d]/s", VDST_MAXCHANNELS );
     fDST_tree->Branch( "dead", fDSTdead, tname );
+    sprintf( tname, "zerosuppressed[ntel_data][%d]/s", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "zerosuppressed", fDSTZeroSuppressed, tname );
     sprintf( tname, "sumwindow[ntel_data][%d]/s", VDST_MAXCHANNELS );
     fDST_tree->Branch( "sumwindow", fDSTsumwindow, tname );
     sprintf( tname, "sumfirst[ntel_data][%d]/s", VDST_MAXCHANNELS );
@@ -253,7 +255,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
     for( unsigned int i = 0; i < iMaxPrevNTel; i++ )
     {
 	fDSTtel_data[i] = 0;
-	fDSTZeroSupression[i] = 0;
+	fDSTTelescopeZeroSupression[i] = 0;
 	fDSTnumSamples[i] = 0;
         for( unsigned int j = 0; j < iMaxNChannels; j++ )
         {
@@ -262,6 +264,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 	    fDSTRecord[i][j] = 1;                    // expect by default that all pixels are there
             fDSTsums[i][j] = 0.;
             fDSTdead[i][j] = 0;
+	    fDSTZeroSuppressed[i][j] = 0;
             fDSTsumwindow[i][j] = 0;
 	    fDSTsumfirst[i][j] = 0;
             fDSTHiLo[i][j] = 0;
@@ -337,12 +340,13 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     }
     fDST_tree->SetBranchAddress( "ntel_data", &fDSTntel_data );
     fDST_tree->SetBranchAddress( "tel_data", fDSTtel_data );
-    if( fDST_tree->GetBranchStatus( "zero_suppression" ) ) fDST_tree->SetBranchAddress( "zero_suppression", fDSTZeroSupression );
+    if( fDST_tree->GetBranchStatus( "tel_zero_suppression" ) ) fDST_tree->SetBranchAddress( "tel_zero_suppression", fDSTTelescopeZeroSupression );
     if( fDST_tree->GetBranchStatus( "recorded" ) )         fDST_tree->SetBranchAddress( "recorded", fDSTRecord );
     fDST_tree->SetBranchAddress( "nL1trig", fDSTnL1trig );
     fDST_tree->SetBranchAddress( "L1trig", fDSTL1trig );
     fDST_tree->SetBranchAddress( "sum", fDSTsums );
     fDST_tree->SetBranchAddress( "dead", fDSTdead );
+    if( fDST_tree->GetBranchStatus( "zerosuppressed" ) ) fDST_tree->SetBranchAddress( "zerosuppressed", fDSTZeroSuppressed );
     fDST_tree->SetBranchAddress( "tzero", fDSTt0 );
     fDST_tree->SetBranchAddress( "Width", fDSTTraceWidth );
     if( fDST_tree->GetBranchStatus( "Trace" ) )
@@ -355,7 +359,6 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     fDST_tree->SetBranchAddress( "pulsetiming", fDSTpulsetiming );
     fDST_tree->SetBranchAddress( "Max", fDSTMax );
     if( fFullTree ) fDST_tree->SetBranchAddress( "RawMax", fDSTRawMax );
-    fDST_tree->SetBranchAddress( "dead", fDSTdead );
     fDST_tree->SetBranchAddress( "HiLo", fDSTHiLo );
     if( fMC )
     {
@@ -494,6 +497,23 @@ unsigned int VDSTTree::getDSTDead( int iChannelID )
 {
     if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
     else return fDSTdead[fTelescopeCounter_temp][iChannelID];
+
+    return 0;
+}
+
+unsigned int VDSTTree::getZeroSupppressed( int iTelID, int iChannelID )
+{
+   setTelCounter( iTelID );
+   return getZeroSupppressed( iChannelID );
+}
+
+unsigned int VDSTTree::getZeroSupppressed( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0;
+    else
+    {
+       return fDSTZeroSuppressed[fTelescopeCounter_temp][iChannelID];
+    }
 
     return 0;
 }

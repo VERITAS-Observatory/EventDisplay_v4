@@ -561,10 +561,8 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         }
         else if( iTemp.find( "high" ) < iTemp.size() )
         {
-            fRunPara->fh = 833;
-            fRunPara->fw = 1250;
-            fRunPara->fh = (unsigned int)(833*1.5);
-            fRunPara->fw = (unsigned int)(1250*1.5);
+            fRunPara->fh = (unsigned int)(833*1.2);
+            fRunPara->fw = (unsigned int)(1250*1.2);
         }
         else if( iTemp.find( "telenoff" ) < iTemp.size() )
         {

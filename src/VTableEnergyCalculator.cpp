@@ -44,6 +44,7 @@ VTableEnergyCalculator::VTableEnergyCalculator(const char* hname_add,char m, TDi
     fDebug = 0;
     
     fUseMedianEnergy = iMedian;
+    fHName_add = hname_add;
 
     fWrite1DHistograms = true;
 
@@ -120,23 +121,10 @@ VTableEnergyCalculator::VTableEnergyCalculator(const char* hname_add,char m, TDi
         hMean->SetZTitle( "log_{10} size (mean)" );
 
 /* HSTOGRAM BOOKING */
-        int id;
-        double id1, id2, ie1, ie2;
         for( int i = 0;i < eNumEne; i++ )
         {
             vector< TH1F* > iH1;
-            for( int j = 0; j < eNumDist; j++ )
-            {
-                id = 100000 + i * 1000 + j;
-                sprintf( hname , "h%d",id);
-                ie1 = hMean->GetXaxis()->GetBinLowEdge( i+1 );
-                ie2 = hMean->GetXaxis()->GetBinUpEdge( i+1 );
-                id1 = hMean->GetYaxis()->GetBinLowEdge( j+1 );
-                id2 = hMean->GetYaxis()->GetBinUpEdge( j+1 );
-                sprintf( htitle, "%.2f < log10 E < %.2f, %.1f < r < %.1f (%s)", ie1, ie2, id1, id2, hname_add );
-                iH1.push_back( new TH1F( hname, htitle, eHistBins, exlow, exhigh ) );
-                iH1.back()->SetXTitle( "log_{10} size" );
-            }
+            for( int j = 0; j < eNumDist; j++ ) iH1.push_back( 0 );
             Oh.push_back( iH1 );
         }
     }
@@ -226,7 +214,7 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
                 sum1=0.;
                 for (k=2;k<eHistBins;k++)
                 {
-                    sum1 += Oh[i][j]->GetBinContent(k);
+                    if( Oh[i][j] ) sum1 += Oh[i][j]->GetBinContent(k);
                 }
 
 // require at least 5 showers per bin (not for energies above 10 TeV)
@@ -237,7 +225,7 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
 
                     for (k=2;k<eHistBins-2;k++)
                     {
-                        sum2 += Oh[i][j]->GetBinContent(k);
+                        if( Oh[i][j] ) sum2 += Oh[i][j]->GetBinContent(k);
                         if (sum2<0.16*sum1) i1=k;
                         if (sum2<0.50*sum1) i2=k;
                         if (sum2<0.84*sum1) i3=k;
@@ -247,8 +235,8 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
 // the best estimate for the true median value lies in between the
 // bin centers of the i2'th and i2+1'th bin -
 // that points happens to be at i2+1 * delta.
-                    if( fUseMedianEnergy ) med   = exlow+(i2+1)*delta;
-                    else                   med   = Oh[i][j]->GetMean();
+                    if( fUseMedianEnergy )  med   = exlow+(i2+1)*delta;
+                    else if( Oh[i][j] )     med   = Oh[i][j]->GetMean();
 
                     sigma = (i3-i1)*delta;
                 }
@@ -261,7 +249,7 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
                 hMedian->SetBinContent( i+1, j+1, med );
 		hMedian->SetBinError( i+1, j+1, sigma );
                 hSigma->SetBinContent( i+1, j+1, sigma );
-                hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
+                if( Oh[i][j] ) hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
 
                 id=10000+i*100+j;
                 sprintf( hisname , "h%d",id);
@@ -270,7 +258,7 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
                 {
                     fOutDir->cd();
                     iDir1D->cd();
-                    Oh[i][j]->Write();
+                    if( Oh[i][j] ) Oh[i][j]->Write();
                 }
             }
         }
@@ -331,6 +319,7 @@ double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, do
 // check for overflow bins
 		    if( (unsigned int)ie < Oh.size() && (unsigned int)ir < Oh[ie].size() )
 		    {
+		       if( !Oh[ie][ir] ) create1DHistogram( ie, ir );
 		       Oh[ie][ir]->Fill( (float)(amp), chi2 );
 		       hMean->Fill( log10(e), r[tel], amp * chi2 );
                     }
@@ -695,3 +684,28 @@ bool VTableEnergyCalculator::readHistograms()
     return true;
 
 }
+
+bool VTableEnergyCalculator::create1DHistogram( int i, int j )
+{
+   if( i >= 0 && j >= 0 && i < (int)Oh.size() && j < (int)Oh[i].size() && !Oh[i][j] )
+   {
+        if( !fOutDir->cd() ) return false;
+        char hname[600];
+        char htitle[600];
+        int id = 100000 + i * 1000 + j;
+        sprintf( hname , "h%d",id);
+        double ie1 = hMean->GetXaxis()->GetBinLowEdge( i+1 );
+        double ie2 = hMean->GetXaxis()->GetBinUpEdge( i+1 );
+        double id1 = hMean->GetYaxis()->GetBinLowEdge( j+1 );
+        double id2 = hMean->GetYaxis()->GetBinUpEdge( j+1 );
+        sprintf( htitle, "%.2f < log10 E < %.2f, %.1f < r < %.1f (%s)", ie1, ie2, id1, id2, fHName_add.c_str() );
+        Oh[i][j] = new TH1F( hname, htitle, eHistBins, exlow, exhigh );
+        Oh[i][j]->SetXTitle( "log_{10} size" );
+   }
+   else
+   {
+      return false;
+   }
+   return true;
+}
+

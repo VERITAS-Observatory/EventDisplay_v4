@@ -146,16 +146,16 @@ void VEventLoop::printRunInfos()
 	   cout << "\t no trace integration" << endl;
         }
 	getImageCleaningParameter()->print();
-        if( getCalData()->getLowGainMultiplierDistribution() )
+        if( getCalData()->getLowGainMultiplierDistribution() && getCalData()->getLowGainMultiplierDistribution()->GetEntries() > 0 )
         {
             cout << "\t low gain multiplier: \t" << setprecision( 3 ) << getCalData()->getLowGainMultiplierDistribution()->GetMean();
 	    if( getCalData()->getLowGainMultiplierDistribution()->GetRMS() > 1.e-3 )
 	    {
 	       cout << "+-" << getCalData()->getLowGainMultiplierDistribution()->GetRMS();
             }
-	    cout << endl;
         }
         else cout << "\t (no low gain multiplier distributions)";
+	cout << endl;
 	if( TMath::Abs( fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]] ) - 1. > 1.e-2 )
 	{
 	   cout << "\t additional gain correction: " << fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]];
@@ -304,7 +304,10 @@ bool VEventLoop::initEventLoop( string iFileName )
 	 if( fDSTReader != 0 ) delete fDSTReader;
 	 fDSTReader = new VDSTReader( fRunPar->fsourcefile, fRunPar->fIsMC, fRunPar->fNTelescopes, getNChannels(), fDebug );
 	 if( fDSTReader->isMC() && fRunPar->fIsMC == 0 ) fRunPar->fIsMC = 1;
-	 fDSTReader->setNumSamples( getNSamples() );
+	 for( unsigned int i = 0; i <  fRunPar->fTelToAnalyze.size(); i++ )
+	 {
+	    fDSTReader->setNumSamples( fRunPar->fTelToAnalyze[i], getNSamples( fRunPar->fTelToAnalyze[i] ) );
+         }
     }
 // sourcefile has PE format
     else if( fRunPar->fsourcetype == 6 )
@@ -800,9 +803,9 @@ int VEventLoop::analyzeEvent()
             if( fBoolSumWindowChangeWarning < 1 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
 	    {
 	         cout << "VEventLoop::analyzeEvent: resetting summation window 2 from ";
-		 cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+		 cout << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
-            fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] = getNSamples();
+            fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
         }
         if( (int)getNSamples() < fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] )
@@ -815,7 +818,6 @@ int VEventLoop::analyzeEvent()
             fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 2;
         } 
-
 // get event time
         setEventTimeFromReader();
 

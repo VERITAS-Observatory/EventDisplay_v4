@@ -107,7 +107,7 @@ class VVirtualDataReader
 	double                              getSample_double( unsigned channel, unsigned sample, bool iNewNoiseTrace = true );
         virtual std::vector< uint16_t >     getSamplesVec16Bit() { return iSampleVec16bit; }
         virtual void                        selectHitChan(uint32_t) = 0;
-	void                                setNumSamples( uint16_t iS ) { fNumSamplesTemp = iS; }
+	void                                setNumSamples( unsigned int iT, uint16_t iS ) { fNumSamplesTemp = iS; }
         void                                setTeltoAna( vector< unsigned int > iT ) { fTeltoAna = iT; }
         void                                setEventStatus( unsigned int iS ) { fEventStatus = iS; }
         virtual bool                        wasLossyCompressed() = 0;
