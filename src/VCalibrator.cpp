@@ -2159,12 +2159,14 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        }
        if( nPixel == getGains( true ).size() )
        {
+// use high-gain conversion and understand differences between low and high gain as multiplication factor
           for( unsigned int p = 0; p < nPixel; p++ )
 	  {
-	     if( fConv_low[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
+	     if( fConv_high[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
 	     {
-		getGains( true )[p] = 1./fConv_low[p];
-		if( getGainDist( true ) ) getGainDist( true )->Fill( 1./fConv_low[p] );
+		getGains( true )[p] = 1./fConv_high[p];
+		if( getGainDist( true ) ) getGainDist( true )->Fill( 1./fConv_high[p] );
+		setLowGainMultiplier( fConv_low[p] / fConv_high[p], p );
              }
 	     else
 	     {
