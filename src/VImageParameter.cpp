@@ -112,6 +112,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     tpars->Branch("ntubes", &ntubes, "ntubes/s");
                                                   // MS contains number of triggered pixels
     tpars->Branch("trig_tubes", &trig_tubes, "trig_tubes/s");
+    tpars->Branch("nzerosuppressed", &nzerosuppressed, "nzerosuppressed/s" );
     tpars->Branch("nsat", &nsat, "nsat/s");
     tpars->Branch("nlowgain", &nlowgain, "nlowgain/s");
     tpars->Branch("ntubesBNI", &ntubesBrightNoImage, "ntubesBNI/s");
@@ -262,6 +263,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     ntrig_per_patch = 0;
     nsat = 0;
     nlowgain = 0;
+    nzerosuppressed = 0;
     bad = 0;
     badLow = 0;
     for( int i = 0; i < 3; i++ ) max[i] = 0.;

@@ -211,12 +211,12 @@ class VVirtualDataReader
         virtual float                      getLocalDelayedTriggerTime( unsigned int iTel ) { return -999.; }
 
 // DST returns
-        virtual std::valarray< double >&     getSums() { return v; }
-        virtual std::valarray< double >&     getTZeros() { return v; }
-        virtual std::valarray< double >&     getTraceMax() { return v; }
-        virtual std::valarray< double >&     getTraceRawMax() { return v; }
-        virtual std::valarray< double >&     getTraceWidth() { return v; }
-	virtual std::vector< valarray< double > >& getTracePulseTiming() { return vv; }
+        virtual std::valarray< double >&     getSums( unsigned int iNChannel = 99999 ) { return v; }
+        virtual std::valarray< double >&     getTZeros( unsigned int iNChannel = 99999 ) { return v; }
+        virtual std::valarray< double >&     getTraceMax( unsigned int iNChannel = 99999 ) { return v; }
+        virtual std::valarray< double >&     getTraceRawMax( unsigned int iNChannel = 99999 ) { return v; }
+        virtual std::valarray< double >&     getTraceWidth( unsigned int iNChannel = 99999 ) { return v; }
+	virtual std::vector< valarray< double > >& getTracePulseTiming( unsigned int iNChannel = 99999 ) { return vv; }
         virtual std::vector< unsigned int >& getDead() { return vUI; }
 
 	virtual void setPerformFADCAnalysis( bool iB ) { ; }

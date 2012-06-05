@@ -33,8 +33,9 @@ class VImageBaseAnalyzer : public VEvndispData
        ~VImageBaseAnalyzer() {}
 
         void  calcTCorrectedSums(int ,int);
-        int   fillHiLo();                          //!< fill hi/low gain vector
+        unsigned int   fillHiLo();                          //!< fill hi/low gain vector
 	int   fillSaturatedChannels();
+	unsigned int fillZeroSuppressed();
         void  findDeadChans( bool iLowGain = false, bool iFirst = true );
         void  gainCorrect();
 };

@@ -119,10 +119,10 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
         float                      getMC_Yoffset() { return -1. * getSMC_Yoffset(); }
 
 // return QADC values
-        valarray< double >&        getSums();
-	valarray< double >&        getTraceMax();
-	valarray< double >&        getTraceRawMax() { return getTraceMax(); }
-	vector< valarray< double > >& getTracePulseTiming();
+        valarray< double >&        getSums( unsigned int iNChannel = 99999 );
+	valarray< double >&        getTraceMax( unsigned int iNChannel = 99999);
+	valarray< double >&        getTraceRawMax( unsigned int iNChannel = 99999 ) { return getTraceMax( iNChannel ); }
+	vector< valarray< double > >& getTracePulseTiming( unsigned int iNChannel = 99999 );
 
 // noise file related stuff
         valarray<double>&          getPeds();

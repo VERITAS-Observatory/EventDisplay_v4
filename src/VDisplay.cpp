@@ -613,7 +613,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 ///////////////////////////////////////////////////////////////////////////////
 // fill trace into histogram
 ///////////////////////////////////////////////////////////////////////////////
-   if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
+   if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() && !fEventLoop->getZeroSuppressed()[i_channel] )
    {
 // first set the number of bins of the histogram according to the number of samples
        if( int( fEventLoop->getNSamples() ) != i_his->GetNbinsX() )
@@ -642,7 +642,7 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
 ///////////////////////////////////////////////////////////////////////////////
 // DST: fill timing values into histogram
 ///////////////////////////////////////////////////////////////////////////////
-    else if( (!fEventLoop->getReader()->hasFADCTrace() || !fEventLoop->getRunParameter()->doFADCAnalysis() ) && !fEventLoop->getReader()->isZeroSuppressed( i_channel ) )
+    else if( (!fEventLoop->getReader()->hasFADCTrace() || !fEventLoop->getRunParameter()->doFADCAnalysis() ) && !fEventLoop->getZeroSuppressed()[i_channel] )
     {
 // first set the number of bins of the histogram according to the number of timing bins
 // number of bins is: number of pulse time levels + one bin at the beginning and one at the end of the trace
@@ -738,7 +738,7 @@ void VDisplay::drawFADC( bool iFit )
 
     fEventLoop->getAnalyzer()->setTelID( fTelescope );
 // plot trace of one channel (click on channel)
-    if( fSelectedChan >= 200000 && !fEventLoop->getReader()->isZeroSuppressed( fSelectedChan - 200000 ) )
+    if( fSelectedChan >= 200000 && !fEventLoop->getZeroSuppressed()[fSelectedChan-200000] )
     {
 // photodiode
         if( fEventLoop->getRunParameter()->fShowPhotoDiode && fSelectedChan == 2499 ) sprintf( histitle, "Photodiode (Channel 499, Telescope %d)", fTelescope+1 );
@@ -837,7 +837,7 @@ void VDisplay::drawFADC( bool iFit )
             if( fEventLoop->getAnalyzer()->getImage()[i] )
             {
                 fHisFADC->Reset();
-                if( !fEventLoop->getReader()->isZeroSuppressed( i ) ) fHisFADC = fillFADC( i, fHisFADC );
+                if( !fEventLoop->getZeroSuppressed()[i] ) fHisFADC = fillFADC( i, fHisFADC );
                 if( fHisFADC->GetMinimum() < i_traceMax ) i_traceMax = fHisFADC->GetMinimum();
             }
         }
@@ -849,7 +849,7 @@ void VDisplay::drawFADC( bool iFit )
             if( fEventLoop->getAnalyzer()->getImage()[i] )
             {
                 fHisFADC->Reset();
-                if( !fEventLoop->getReader()->isZeroSuppressed( i ) ) fHisFADC = fillFADC( i, fHisFADC );
+                if( !fEventLoop->getZeroSuppressed()[i] ) fHisFADC = fillFADC( i, fHisFADC );
                 fHisFADC->SetMinimum( i_traceMax ); fHisFADC->SetMaximum( -1111 );
                 fHisFADC->SetStats( 0 );
                 fHisFADC->SetLineStyle( i_TraceStyle );
@@ -888,7 +888,7 @@ void VDisplay::drawFADC( bool iFit )
         {
             if( fEventLoop->getAnalyzer()->getImage()[i] )
             {
-                if( !fEventLoop->getReader()->isZeroSuppressed( i ) ) fHisFADC = fillFADC( i, fHisFADC );
+                if( !fEventLoop->getZeroSuppressed()[i] ) fHisFADC = fillFADC( i, fHisFADC );
                 i_image++;
             }
         }
@@ -945,7 +945,7 @@ void VDisplay::drawFADC( bool iFit )
         fF1Ped->Draw( "same" );
         if( iTraceFits ) iTraceFits->Draw( "lsame" );
     }
-    if( fSelectedChan >= 200000 && fEventLoop->getReader()->isZeroSuppressed( fSelectedChan - 200000 ) )
+    if( fSelectedChan >= 200000 && fEventLoop->getZeroSuppressed()[fSelectedChan - 200000] )
     {
         setFADCText();
         if( fEventLoop->getRunParameter()->fShowPhotoDiode && fSelectedChan == 2499 ) sprintf( histitle, "Photodiode (Channel 499, Telescope %d)", fTelescope+1 );

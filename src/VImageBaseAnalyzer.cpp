@@ -246,60 +246,63 @@ void VImageBaseAnalyzer::FADCStopCorrect()
        double offset = 0.;
        try
        {
-	   if( i < fReader->getMaxChannels() && !getReader()->isZeroSuppressed( i ) )
+	   if( i < fReader->getMaxChannels() )
 	   {
 	       i_channelHitID = fReader->getHitID(i);
-	       fReader->selectHitChan((uint32_t)i);
-	       if( i_channelHitID < getPeds().size() )
+	       if( !getZeroSuppressed()[i_channelHitID] )
 	       {
-		   fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
-	       }
+		  fReader->selectHitChan((uint32_t)i);
+		  if( i_channelHitID < getPeds().size() )
+		  {
+		      fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
+		  }
 // take pedestal from another FADC trig channel
-	       else if( iPedFADCTrigChan < getPeds().size() && !getReader()->isZeroSuppressed( iPedFADCTrigChan ) ) 
-	       {
-		   fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[iPedFADCTrigChan], getPedrms()[iPedFADCTrigChan], i_channelHitID, i, 0. );
-		   i_channelHitID = fReader->getHitID( i );
-	       }
-	       else continue;
-               fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
+		  else if( iPedFADCTrigChan < getPeds().size() && !getZeroSuppressed()[iPedFADCTrigChan] )
+		  {
+		      fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[iPedFADCTrigChan], getPedrms()[iPedFADCTrigChan], i_channelHitID, i, 0. );
+		      i_channelHitID = fReader->getHitID( i );
+		  }
+		  else continue;
+		  fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
 // calculate t0
-	       if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
-	       {
-     	           crateTZero=fTraceHandler->getPulseTiming(0,getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
-		   if( i_channelHitID < getHiLo().size() && getHiLo()[i_channelHitID] ) crateTZero = 0.;
-	       }
-	       getFADCstopTZero()[t] = crateTZero;
+		  if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
+		  {
+		      crateTZero=fTraceHandler->getPulseTiming(0,getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
+		      if( i_channelHitID < getHiLo().size() && getHiLo()[i_channelHitID] ) crateTZero = 0.;
+		  }
+		  getFADCstopTZero()[t] = crateTZero;
 // calculate offsets
-               if( t > 0 )
-	       {
-	          if( getFADCstopTZero()[0] > 0. ) offset = getFADCstopTZero()[0] - crateTZero;
-		  else                             offset = 0.;
-                  unsigned int iC_start = 0;
-		  unsigned int iC_stop =  0;
+		  if( t > 0 )
+		  {
+		     if( getFADCstopTZero()[0] > 0. ) offset = getFADCstopTZero()[0] - crateTZero;
+		     else                             offset = 0.;
+		     unsigned int iC_start = 0;
+		     unsigned int iC_stop =  0;
 // crate 2
-		  if( t == 1 )
-		  {
-		     iC_start = 130;
-		     iC_stop =  250;
-                  }
+		     if( t == 1 )
+		     {
+			iC_start = 130;
+			iC_stop =  250;
+		     }
 // crate 3
-		  else if( t == 2 )
-		  {
-		     iC_start = 250;
-		     iC_stop =  380;
-                  }
+		     else if( t == 2 )
+		     {
+			iC_start = 250;
+			iC_stop =  380;
+		     }
 // crate 4
-		  else if( t == 3 )
-		  {
-		     iC_start = 380;
-		     iC_stop =  getTZeros().size();
-                  }
+		     else if( t == 3 )
+		     {
+			iC_start = 380;
+			iC_stop =  getTZeros().size();
+		     }
 // apply offset
-		  for( unsigned int j= iC_start; j < iC_stop; j++ )
-		  {
-		     if( j != i ) setPulseTimingCorrection( j, offset );
-		     getFADCStopOffsets()[j] = offset;
-                  } 
+		     for( unsigned int j= iC_start; j < iC_stop; j++ )
+		     {
+			if( j != i ) setPulseTimingCorrection( j, offset );
+			getFADCStopOffsets()[j] = offset;
+		     } 
+                  }
                } 
 	   }
        }
@@ -309,7 +312,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 	   {
 	       cout << "VImageBaseAnalyzer::FADCStopCorrect(), index out of range warning (fReader->getHitID) ";
 	       cout << "channel " << i << ", hit ID " << i_channelHitID << endl;
-	       cout << "zero suppression " << getReader()->isZeroSuppressed(i) << endl;
+	       cout << "zero suppression " << getZeroSuppressed()[i_channelHitID] << endl;
 	       cout << " (Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")";
 	       cout << endl;
 	       setDebugLevel( 1 );
@@ -405,13 +408,13 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 // ignore everything and just get the sums and tzeros from data trees
     if( !fReader->hasFADCTrace() || !getRunParameter()->doFADCAnalysis() )
     {
-        if( getDebugFlag() ) cout << "VImageBaseAnalyzer::calcTZerosSums() reading sums from DST file" << endl;
-        setSums( fReader->getSums() );
-        setSums2( fReader->getSums() );
-	setPulseTiming( fReader->getTracePulseTiming(), true );
-	setPulseTiming( fReader->getTracePulseTiming(), false );
-        setTraceMax( fReader->getTraceMax() );
-        setTraceRawMax( fReader->getTraceRawMax() );
+        if( getDebugFlag() ) cout << "VImageBaseAnalyzer::calcTZerosSums() reading sums from DST/QADC file" << endl;
+        setSums( fReader->getSums( getNChannels() ) );
+        setSums2( fReader->getSums( getNChannels() ) );
+	setPulseTiming( fReader->getTracePulseTiming( getNChannels() ), true );
+	setPulseTiming( fReader->getTracePulseTiming( getNChannels() ), false );
+        setTraceMax( fReader->getTraceMax( getNChannels() ) );
+        setTraceRawMax( fReader->getTraceRawMax( getNChannels() ) );
 	setTraceAverageTime( 0. );
         return;
     }
@@ -840,8 +843,24 @@ void VImageBaseAnalyzer::timingCorrect()
     }
 }
 
+unsigned int VImageBaseAnalyzer::fillZeroSuppressed()
+{
+    setZeroSuppressed( false );
 
-int VImageBaseAnalyzer::fillHiLo()
+    int z = 0;
+    for( unsigned int i = 0; i < getZeroSuppressed().size(); i++ )
+    {
+       if( getReader()->isZeroSuppressed(i) )
+       {
+          setZeroSuppressed( i, true );
+	  z++;
+       }
+    }
+
+    return z;
+}
+
+unsigned int VImageBaseAnalyzer::fillHiLo()
 {
 // reset all channels
     setHiLo( false );

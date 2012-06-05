@@ -322,6 +322,7 @@ class VEvndispData
         TGraphErrors*       getYGraph() { return fYGraph[fTelID]; }
         TGraphErrors*       getRGraph() { return fRGraph[fTelID]; }
         vector< VPointing* > getPointing() { return fPointing; }
+	vector<bool>&       getZeroSuppressed() { return fAnaData[fTelID]->fZeroSuppressed; }
         void                incrementNumberofIncompleteEvents() { fNumberofIncompleteEvents++; }
         void                incrementNumberofGoodEvents() { fNumberofGoodEvents++; }
                                                   //!< set pointer to data reader
@@ -378,6 +379,8 @@ class VEvndispData
         void                setNSamples( unsigned int iSamp ) { fDetectorGeo->setNSamples( fTelID, iSamp, fRunPar->fUseVBFSampleLength ); }
         void                setNSamples( unsigned int iTelID, unsigned int iSamp ) { fDetectorGeo->setNSamples( iTelID, iSamp, fRunPar->fUseVBFSampleLength ); }
         void                setDebugLevel( int i );
+	void                setZeroSuppressed( bool iZ ) { fAnaData[fTelID]->fZeroSuppressed.assign( fDetectorGeo->getNChannels( fTelID ), iZ ); }
+	void                setZeroSuppressed(  unsigned int iChannel, bool iZ ) { if( iChannel < fAnaData[fTelID]->fZeroSuppressed.size() ) fAnaData[fTelID]->fZeroSuppressed[iChannel] = iZ; }
 /////////////// time image cleaning /////////////////////
 	double           getTimeCutPixel() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->ftimecutpixel; else return 0.; } //HP
 	double           getTimeCutCluster() { if( getImageCleaningParameter() ) return getImageCleaningParameter()->ftimecutcluster; else return 0.; } //HP
@@ -407,14 +410,14 @@ class VEvndispData
 	int              getNcluster_uncleaned() { return fAnaData[fTelID]->fncluster_uncleaned; }; //HP
 /////////////// pedestals /////////////////////
         void                setPeds( unsigned int iChannel, double iPed, bool iLowGain = false ) { fCalData[fTelID]->setPeds( iChannel, iPed, iLowGain ); }
-/////////////// end pedestals /////////////////////
         void                setPedsFromPLine() { fCalData[fTelID]->fPedFromPLine = true; }
+/////////////// end pedestals /////////////////////
         void                setRootDir( unsigned int iTel, TDirectory *iDir ) { fAnaDir[iTel] = iDir; }
         void                setRunNumber( int iRunN ) { fRunNumber = iRunN; }
         void                setSumFirst( int iSum ) { fRunPar->fsumfirst[fTelID] = iSum; }
         void                setSums( double iSum ) { fAnaData[fTelID]->fSums = iSum; }
         void                setSums( unsigned int iChannel, double iSum ) { fAnaData[fTelID]->fSums[iChannel] = iSum; }
-        void                setSums( valarray< double > iVSum ) { fAnaData[fTelID]->fSums = iVSum; }
+        bool                setSums( valarray< double > iVSum );
         void                setSums2( double iSum ) { fAnaData[fTelID]->fSums2 = iSum; }
         void                setSums2( unsigned int iChannel, double iSum ) { fAnaData[fTelID]->fSums2[iChannel] = iSum; }
         void                setSums2( valarray< double > iVSum ) { fAnaData[fTelID]->fSums2 = iVSum; }

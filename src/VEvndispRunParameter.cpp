@@ -211,8 +211,9 @@ VEvndispRunParameter::VEvndispRunParameter()
     fPlotPaper = false;
     fPlotAllInOneMethod = 0;
 
-// internal parameters
-    fwritepulses = 0;
+// writing of laser pulses
+    fwriteLaserPulseN = 0;
+    fwriteAverageLaserPulse = false;
 
 // dst parameters
     fdstfile = "";

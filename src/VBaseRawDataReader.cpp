@@ -367,17 +367,20 @@ bool VBaseRawDataReader::hasFADCTrace()
    return true;
 }
 
-valarray< double >& VBaseRawDataReader::getSums()
+valarray< double >& VBaseRawDataReader::getSums( unsigned int iNChannel )
 {
+   if( iNChannel != 99999 && fSums.size() != iNChannel ) fSums.resize( iNChannel );
+
    if( fTelID < fEvent.size() && fEvent[fTelID] )
    {
-      if( fSums.size() != fEvent[fTelID]->getNumChannels() )
+      fSums = 0.;
+      for( unsigned int i = 0; i < fEvent[fTelID]->getNumChannelsHit(); i++ )
       {
-         fSums.resize( fEvent[fTelID]->getNumChannels() );
-      }
-      for( unsigned int i = 0; i < fEvent[fTelID]->getNumChannels(); i++ )
-      {
-         fSums[i] = fEvent[fTelID]->getCharge( i );
+         unsigned int i_channelHitID = getHitID(i);
+	 if( i_channelHitID < fSums.size() )
+	 {
+	    fSums[i_channelHitID] = fEvent[fTelID]->getCharge( i );
+         }
       }
    }
    else
@@ -387,32 +390,24 @@ valarray< double >& VBaseRawDataReader::getSums()
    return fSums;
 }
 
-valarray< double >& VBaseRawDataReader::getTraceMax()
+valarray< double >& VBaseRawDataReader::getTraceMax( unsigned int iNChannel )
 {
-   if( fTelID < fEvent.size() && fEvent[fTelID] )
-   {
-      if( fTraceMax.size() != fEvent[fTelID]->getNumChannels() )
-      {
-         fTraceMax.resize( fEvent[fTelID]->getNumChannels() );
-      }
-   }
-   else
-   {
-      fTraceMax = 0.;
-   }
+   if( iNChannel != 99999 && fTraceMax.size() != iNChannel ) fTraceMax.resize( iNChannel );
+   fTraceMax = 0.;
+
    return fTraceMax;
 }
 
-vector< valarray< double > >& VBaseRawDataReader::getTracePulseTiming()
+vector< valarray< double > >& VBaseRawDataReader::getTracePulseTiming( unsigned int iNChannel )
 {
    if( fTelID < fEvent.size() && fEvent[fTelID] )
    {
 // check only first entry (anyway a dummy vector)
-      if( fTracePulseTiming.size() == VDST_MAXTIMINGLEVELS && fTracePulseTiming[0].size() == fEvent[fTelID]->getNumChannels() )
+      if( fTracePulseTiming.size() == VDST_MAXTIMINGLEVELS && fTracePulseTiming[0].size() == iNChannel )
       {
          return fTracePulseTiming;
       }
-      valarray< double > iTemp( 0., fEvent[fTelID]->getNumChannels() );
+      valarray< double > iTemp( 0., iNChannel );
       fTracePulseTiming.clear();
       for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ ) fTracePulseTiming.push_back( iTemp );
    }

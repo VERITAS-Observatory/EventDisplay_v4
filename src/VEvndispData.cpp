@@ -670,6 +670,19 @@ unsigned int VEvndispData::getLargestSumWindow( unsigned int iTelID )
    return iSW;
 }
 
+bool VEvndispData::setSums( valarray< double > iVSum )
+{
+   if( iVSum.size() != getNChannels() )
+   {
+      cout << "VEvndispData::setSums() error: setting wrong vector size for integrated charges: " << getNChannels() << "\t" << iVSum.size() << endl;
+      cout << "exiting..." << endl;
+      exit( -1 );
+   }
+
+   fAnaData[fTelID]->fSums = iVSum;
+   return true;
+}
+
 
 bool VEvndispData::fDebug = false;
 int VEvndispData::fDebugLevel = 0;

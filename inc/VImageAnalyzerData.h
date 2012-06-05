@@ -56,6 +56,7 @@ class VImageAnalyzerData
         int fRandomMakeDeadChannelsSeed;
         TRandom3 *fRandomMakeDeadChannels;        //!< random generator for setting randomly channels dead
         vector< bool > fHiLo;                     //!< true if low gain is set
+	vector< bool > fZeroSuppressed;           //!< true if channel is zero suppressed
 	unsigned int fpulsetiming_tzero_index;    //!< position of first 50% value in pulse timing level vector
 	unsigned int fpulsetiming_width_index;    //!< position of second 50% value in pulse timing level vector
 	vector< valarray<double> > fPulseTimingUncorrected; //!< pulse timing at certain fraction of pulse maxima (uncorrected values)

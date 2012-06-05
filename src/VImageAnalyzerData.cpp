@@ -74,6 +74,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fSums.resize( iChannels, 0. );
     fSums2.resize( iChannels, 0. );
     fHiLo.resize( iChannels, false );
+    fZeroSuppressed.resize( iChannels, false );
     fLLEst.resize( iChannels, false );
     fPulseTimingUncorrected.resize( ipulsetiminglevel, fSums );
     fPulseTimingCorrected.resize( ipulsetiminglevel, fSums );

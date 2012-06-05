@@ -371,6 +371,15 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
         {
             if( fgraphTubes[i]->GetR1() > 0. ) fgraphTubesEntry[i]->Draw();
         }
+// mark zero suppressed channels
+        for( unsigned int i = 0; i < fgraphTubesEntry.size(); i++ )
+	{
+	   if( fData->getZeroSuppressed()[i] ) 
+	   {
+	      TMarker *iZeroSupp = new TMarker(  fgraphTubes[i]->GetX1(), fgraphTubes[i]->GetY1(), 5 );
+	      iZeroSupp->Draw();
+           }
+        }
 // draw tube/channel numbers
         if( fPrintChannel != 0 && fPrintChannel < 3 && !fBoolAllinOne )
         {

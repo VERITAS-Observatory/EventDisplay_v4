@@ -391,7 +391,6 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 
     if( fRunPar->fL2TimeCorrect ) FADCStopCorrect();
 
-//! This will go when we get an event type
 //////////////////////////////////////////
 // test if this is a laser event (by sum of total charge in all channels )
     bool i_laser=false;
@@ -410,7 +409,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
         TDirectory *i_curDir = (TDirectory*)opfgain;
         TDirectory *i_pulseDir = 0;
         TH1D *i_pulse = 0;
-        if( getRunParameter()->fwritepulses > 0 )
+        if( getRunParameter()->fwriteLaserPulseN > 0 )
         {
             i_curDir->cd();
             sprintf( i_name, "zEvent_%d", getEventNumber() );
@@ -458,50 +457,55 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
         for( unsigned int i = 0; i < getNChannels(); i++ )
         {
             int i_entries = (int)hpulse[i]->GetEntries();
-            if( getRunParameter()->fwritepulses > 0 )
+            if( getRunParameter()->fwriteLaserPulseN > 0 )
             {
                 i_pulseDir->cd();
                 sprintf( i_name, "h_%d", i );
                 sprintf( i_title, "event %d, channel %d", getEventNumber(), i );
                 i_pulse = new TH1D( i_name, i_title, hpulse[i]->GetNbinsX(), hpulse[i]->GetXaxis()->GetXmin(), hpulse[i]->GetXaxis()->GetXmax() );
             }
-
+        
             if (m_sums>0.1 || fRunPar->fLaserSumMin < 0.)
             {
-                double this_content = 0.;
-                unsigned int chanID = 0;
-                int this_bin = 0;
-                for( unsigned int k = 0; k<fReader->getNumChannelsHit(); k++)
-                {
-                    try
-                    {
-                        chanID = fReader->getHitID(k);
-                        if( chanID == i )
-                        {
-                            for( unsigned int j=0; j < (unsigned int)hpulse[i]->GetNbinsX(); j++ )
-                            {
-                                this_bin = (int)(j+fCalData[getTeltoAnaID()]->fFADCStopOffsets[i]+1);
-                                if (this_bin > 0 && this_bin <= hpulse[i]->GetNbinsX())
-                                {
-				    this_content = fReader->getSample_double( chanID, this_bin, (this_bin==0) ) -  getPeds( iLowGain )[i];
-                                    if( getRunParameter()->fwritepulses > 0 ) i_pulse->SetBinContent(this_bin,this_content);
-                                    hpulse[i]->Fill( this_bin, this_content );
+// fill average traces
+	        if( getRunParameter()->fwriteAverageLaserPulse )
+		{
+		   double this_content = 0.;
+		   unsigned int chanID = 0;
+		   int this_bin = 0;
+		   for( unsigned int k = 0; k<fReader->getNumChannelsHit(); k++)
+		   {
+		       try
+		       {
+			   chanID = fReader->getHitID(k);
+			   if( chanID == i )
+			   {
+			       for( unsigned int j=0; j < (unsigned int)hpulse[i]->GetNbinsX(); j++ )
+			       {
+				   this_bin = (int)(j+fCalData[getTeltoAnaID()]->fFADCStopOffsets[i]+1);
+				   if (this_bin > 0 && this_bin <= hpulse[i]->GetNbinsX())
+				   {
+				       this_content = fReader->getSample_double( chanID, this_bin, (this_bin==0) ) -  getPeds( iLowGain )[i];
+				       if( getRunParameter()->fwriteLaserPulseN > 0 ) i_pulse->SetBinContent(this_bin,this_content);
+				       hpulse[i]->Fill( this_bin, this_content );
 // time corrected pulse
-                                    if( getTZeros()[i] > -99. ) tcorr = getTZeros()[i] - m_tzero;
-                                    else                        tcorr = 0.;
-                                    htcpulse[i]->Fill( (double)this_bin - tcorr, this_content );
-                                }
-                            }
-                        }
-                    }
-                    catch(...)
-                    {
-                        cout << "VCalibrator::calculateGainsAndTOffsets() index out of range " << k << endl;
-                    }
+				       if( getTZeros()[i] > -99. ) tcorr = getTZeros()[i] - m_tzero;
+				       else                        tcorr = 0.;
+				       htcpulse[i]->Fill( (double)this_bin - tcorr, this_content );
+				   }
+			       }
+			   }
+		       }
+		       catch(...)
+		       {
+			   cout << "VCalibrator::calculateGainsAndTOffsets() index out of range " << k << endl;
+		       }
+		   } 
                 }
-                if( iLowGain && !getHiLo()[i] ) continue;
+   // check status of hi/lo gain bits
+		if( iLowGain && !getHiLo()[i] ) continue;
                 if( !iLowGain && getHiLo()[i] ) continue;
-
+// fill gain and toffset histograms
                 if( (getSums()[i]> 50 || fRunPar->fLaserSumMin < 0. ) && !getDead()[i] && !getMasked()[i] )
                 {
                     hgain[i]->Fill((float)getSums()[i]/m_sums);
@@ -512,7 +516,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
                         htoff_vs_sum[i]->Fill((float)getSums()[i], (float)getTZeros()[i]-m_tzero);
                     }
                 }
-                if( getRunParameter()->fwritepulses > 0 )
+                if( getRunParameter()->fwriteLaserPulseN > 0 )
                 {
                     i_pulse->Write();
                 }
@@ -520,7 +524,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
             if( i_entries != hpulse[i]->GetEntries() ) hpulse[i]->SetEntries( i_entries+1 );
             if( i_entries != htcpulse[i]->GetEntries() ) htcpulse[i]->SetEntries( i_entries+1 );
         }
-        if( getRunParameter()->fwritepulses > 0 ) getRunParameter()->fwritepulses--;
+        if( getRunParameter()->fwriteLaserPulseN > 0 ) getRunParameter()->fwriteLaserPulseN--;
         i_curDir->cd();
     }
 }
@@ -562,10 +566,13 @@ void VCalibrator::writeGains( bool iLowGain )
         opfgain->cd();
         for( unsigned int i = 0; i < hgain.size(); i++ ) hgain[i]->Write();
 
-        for( unsigned int i = 0; i < hpulse.size(); i++ )
-        {
-            hpulse[i]->Write();
-            htcpulse[i]->Write();
+	if( getRunParameter()->fwriteAverageLaserPulse )
+	{
+	   for( unsigned int i = 0; i < hpulse.size(); i++ )
+	   {
+	       hpulse[i]->Write();
+	       htcpulse[i]->Write();
+	   }
         }
         TTree *iTG = fillGainTree( t );
         if( iTG ) iTG->Write();

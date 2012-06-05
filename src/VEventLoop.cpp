@@ -980,7 +980,9 @@ int VEventLoop::checkCuts()
         float MCenergy;
         unsigned short int ntubes, bad, nlowgain, nsat;
         int muonValid;
+	unsigned short int eventType;
 
+	i_tree.Branch( "eventType", &eventType, "eventType/s" );
         i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
         i_tree.Branch( "cen_y", &cen_y, "cen_y/F" );
         i_tree.Branch( "length", &length, "length/F" );
@@ -1006,6 +1008,7 @@ int VEventLoop::checkCuts()
         i_tree.Branch( "muonSize", &muonSize, "muonSize/F" );
         i_tree.Branch( "muonValid", &muonValid, "muonValid/I" );
 
+	eventType = fAnalyzer->getImageParameters()->eventType;
         cen_x = fAnalyzer->getImageParameters()->cen_x;
         cen_y = fAnalyzer->getImageParameters()->cen_y;
         length = fAnalyzer->getImageParameters()->length;
@@ -1158,7 +1161,7 @@ void VEventLoop::setEventTimeFromReader()
 /////////////////////////////////////////////////////////////////////////
 // ignore event time calculation for DSTs
    if( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 ) return;
-  
+
 /////////////////////////////////////////////////////////////////////////
 // event times setting for VBF sources
 #ifndef NOVBF

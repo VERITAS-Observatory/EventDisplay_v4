@@ -98,6 +98,7 @@ void VImageAnalyzer::doAnalysis()
         setBorder( false );
         setImageBorderNeighbour( false );
         setHiLo( false );
+	setZeroSuppressed( false );
         getImageParameters()->reset();
         if( fRunPar->fImageLL ) getImageParameters( fRunPar->fImageLL )->reset();
         return;
@@ -475,6 +476,8 @@ bool VImageAnalyzer::initEvent()
 
 // fill high/low gain vector
     getImageParameters()->nlowgain = fillHiLo();
+// fill vector with zero suppressed channels
+    getImageParameters()->nzerosuppressed = fillZeroSuppressed();
 
     if( fRunPar->fImageLL )
     {

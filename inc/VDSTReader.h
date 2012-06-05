@@ -144,14 +144,14 @@ class VDSTReader : public VVirtualDataReader
 	uint8_t                       getSample( unsigned channel, unsigned sample, bool iNewNoiseTrace = true );
         vector< uint16_t >            getSamplesVec16Bit();
 	uint16_t                      getSample16Bit( unsigned channel, unsigned sample, bool iNewNoiseTrace = true );
-        valarray< double >&           getSums() { return fSums[fTelID]; }
+        valarray< double >&           getSums( unsigned int iNChannel = 99999 ) { return fSums[fTelID]; }
         string                        getSourceFileName() { return fSourceFileName; }
         vector< double >              getTelAzimuth() { return fTelAzimuth; }
         vector< double >              getTelElevation() { return fTelElevation; }
         unsigned int                  getTelescopeID() { return fTelID; }
-        valarray< double >&           getTraceMax() { return fTraceMax[fTelID]; }
-        valarray< double >&           getTraceRawMax() { return fRawTraceMax[fTelID]; }
-	vector< valarray< double > >& getTracePulseTiming() { return fTracePulseTiming[fTelID]; }
+        valarray< double >&           getTraceMax( unsigned int iNChannel = 99999 ) { return fTraceMax[fTelID]; }
+        valarray< double >&           getTraceRawMax(  unsigned int iNChannel = 99999 ) { return fRawTraceMax[fTelID]; }
+	vector< valarray< double > >& getTracePulseTiming(  unsigned int iNChannel = 99999 ) { return fTracePulseTiming[fTelID]; }
 	bool      has16Bit()  { return true; }
 	bool      hasFADCTrace() { if( fDSTTree ) return fDSTTree->getFADC(); else return false; }
         bool      hasLocalTrigger( unsigned int iTel ) { if( fDSTTree->hasLocalTrigger( iTel ) < 0 ) return false; else return true; }

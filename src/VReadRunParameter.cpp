@@ -657,9 +657,13 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fMCNdeadboard = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-        else if( iTemp.find( "writepulses" ) < iTemp.size() )
+        else if( iTemp.find( "writelaserpulsen" ) < iTemp.size() )
         {
-            fRunPara->fwritepulses = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+            fRunPara->fwriteLaserPulseN = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }
+        else if( iTemp.find( "writeaveragelaserpulse" ) < iTemp.size() )
+        {
+            fRunPara->fwriteAverageLaserPulse = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
         else if( iTemp.find( "fadcscale" ) < iTemp.size() )
         {

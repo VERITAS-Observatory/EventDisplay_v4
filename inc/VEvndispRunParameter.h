@@ -207,7 +207,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	int ffrogsRecID;			  // RecID or Cut_ID Frogs Uses - combine with table
 
 // write pulse histograms to gain files
-        int fwritepulses;                         // number of pulse histogram written to gain file
+        int  fwriteLaserPulseN;                    // number of pulse histogram written to gain file
+	bool fwriteAverageLaserPulse;              // write average laser pulse to file
 
 // dst parameters
         string fdstfile;                          // dst output file name (root file)
@@ -232,6 +233,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,113);
+        ClassDef(VEvndispRunParameter,114);
 };
 #endif
