@@ -91,6 +91,6 @@ class VTraceHandler
         void    setMaxThreshold( int iD ) { fMaxThreshold = iD; }
 	void    setMC_FADCTraceStart( unsigned int iO = 0 ) { fMC_FADCTraceStart = iO; }
 	void    setPulseTimingLevels( vector< float > iP );
-	bool    setTraceIntegrationmethod( unsigned int iT = 0 );
+	bool    setTraceIntegrationmethod( unsigned int iT = 1 );
 };
 #endif

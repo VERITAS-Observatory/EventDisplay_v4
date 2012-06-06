@@ -25,6 +25,8 @@ VTraceHandler::VTraceHandler()
     fpTrazeSize = 0;
     fpulsetiming_maxPV = 0;
     fpulsetiminglevels_size = 0;
+
+    fTraceIntegrationMethod = 1;
 }
 
 void VTraceHandler::reset()

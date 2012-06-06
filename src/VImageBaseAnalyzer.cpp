@@ -122,7 +122,9 @@ void VImageBaseAnalyzer::calcSums(int iFirst, int iLast, bool iMakingPeds, bool 
 		                                                    getPedrms(getHiLo()[i_channelHitID])[i_channelHitID],
 								    i_channelHitID, i, getLowGainMultiplier()[i_channelHitID]*getHiLo()[i_channelHitID] );
                 }
-                fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
+// make sure that trace integration is set (important for pedestal calculations in QADC runs)
+                if( getTraceIntegrationMethod() != 0 ) fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
+		else                                   fTraceHandler->setTraceIntegrationmethod( 1 );
                 setSums( i_channelHitID, fTraceHandler->getTraceSum(iFirst, iLast,iMakingPeds) );
             }
         }

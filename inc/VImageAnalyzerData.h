@@ -133,7 +133,7 @@ class VImageAnalyzerData
         void                     initializeMeanPulseHistograms();
         void                     initializeIntegratedChargeHistograms();
 	bool                     readSpecialChannels( int iRunNumber, string iFile, string iDirectory );
-	void                     setTraceIntegrationMethod( unsigned iN = 0 ) { fTraceIntegrationMethod = iN; }
+	void                     setTraceIntegrationMethod( unsigned iN = 1 ) { fTraceIntegrationMethod = iN; }
         void                     setTrace( unsigned int iChannel, vector< double > fT, bool iHiLo, double fPeds );
 };
 #endif
