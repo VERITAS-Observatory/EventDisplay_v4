@@ -103,7 +103,7 @@ bool VPlotWPPhysSensitivity::initialize()
 //	       iTemp << "_IFAE_" << hname << "hours_20111121_offaxis.root";
 // May 2012
 	       iTemp << "data/IFAE_May2012/Subarray" << fSubArray[a];
-	       iTemp << "_IFAE_" << hname << "hours_test_offaxis.root";
+	       iTemp << "_IFAE_" << hname << "hours_20120510_offaxis.root";
             }
 	    else if( fAnalysis[i] == "HD_KB" || fAnalysis[i] == "MPIK" )
 	    {
@@ -220,19 +220,21 @@ void VPlotWPPhysSensitivity::addSensitivityFile( string iSensitivityFile, string
     fIRFCameraOffset_deg.push_back( 0. );
 }
   
-bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMax, double iEnergyResolutionMax )
+bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double iEffAreaMax, double iEnergyResolutionMax )
 {
     fIRF = new VPlotInstrumentResponseFunction();
 
     fIRF->setCanvasSize( 400, 400 );
     fIRF->setPlottingAxis( "energy_Lin", "X", true, fMinEnergy_TeV, fMaxEnergy_TeV, "energy [TeV]" );
-    fIRF->setPlottingAxis( "effarea_Lin", "X", true, 50., iEffAreaMax );
+    fIRF->setPlottingAxis( "effarea_Lin", "X", true, iEffAreaMin, iEffAreaMax );
     fIRF->setPlottingAxis( "energyresolution_Lin", "X", false, 0., 0.7 );
 
     for( unsigned int i = 0; i < fSensitivityFile.size(); i++ )
     {
        fIRF->addInstrumentResponseData( fSensitivityFile[i], 20., fIRFCameraOffset_deg[i], 0, 2.4, 200, "A_MC", 
                                         fPlottingColor[i], fPlottingLineStyle[i], 21, 0.5 );
+       fIRF->addInstrumentResponseData( fSensitivityFile[i], 20., fIRFCameraOffset_deg[i], 0, 2.4, 200, "A_REC", 
+                                        fPlottingColor[i], fPlottingLineStyle[i]+1, 21, 0.5 );
     }
 
     char hname[2000];

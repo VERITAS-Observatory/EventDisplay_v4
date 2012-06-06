@@ -122,7 +122,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
     char hname[200];
 
     sprintf( hname, "cEA_EFF" );
-    TCanvas* iEffectiveAreaPlottingCanvas = new TCanvas( hname, "effective area", 10, 10, fCanvasSize_X, fCanvasSize_Y );
+    TCanvas *iEffectiveAreaPlottingCanvas = new TCanvas( hname, "effective area", 10, 10, fCanvasSize_X, fCanvasSize_Y );
     iEffectiveAreaPlottingCanvas->SetGridx( 0 );
     iEffectiveAreaPlottingCanvas->SetGridy( 0 );
     iEffectiveAreaPlottingCanvas->SetLeftMargin( 0.15 );
@@ -138,8 +138,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
     heff->Draw("AH");
 
     plot_nullHistogram( iEffectiveAreaPlottingCanvas, heff, getPlottingAxis( "energy_Lin" )->fLogAxis,
-                        getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
-			getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
+			   getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
+			   getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
 
     int z = 0;
     for( unsigned int i = 0; i < fData.size(); i++ )

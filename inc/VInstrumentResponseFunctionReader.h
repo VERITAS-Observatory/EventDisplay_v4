@@ -42,7 +42,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool                             getDataFromCTAFile();
     void                             getEnergyResolutionPlot( TProfile *iP, int i_rebin = 2, double iMinEnergy = -10. );
     void                             getEnergyResolutionPlot( TH2D *iP, int i_rebin = 2, double iMinEnergy = -10. );
-    void                             getEnergyResolutionPlot68( TH2D *iP, double iMinEnergy = -10. );
+    void                             getEnergyResolutionPlot68( TH2D *iP, double iMinEnergy = -10., double iReferenceValue = -999. );
 
     bool                             initializeIRFData();
 

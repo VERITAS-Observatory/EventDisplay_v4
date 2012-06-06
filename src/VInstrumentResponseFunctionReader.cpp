@@ -153,7 +153,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     bool bLinX = false;  // energy axis for effective areas
 
     TH1F *h = 0;
-// gamma-ray effective area
+// gamma-ray effective area vs reconstruction energy
     h = get_CTA_IRF_Histograms( "EffectiveArea", fWoff );
     if( !h ) 
     {
@@ -161,10 +161,22 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
        if( !h ) return false;
        bLinX = true;
     }
-
+    gEffArea_Rec = new TGraphAsymmErrors( 1 );
+    setGraphPlottingStyle( gEffArea_Rec );
+    get_Graph_from_Histogram( h, gEffArea_Rec, false, bLinX );
+// gamma-ray effective area vs true energy
+    h = get_CTA_IRF_Histograms( "EffectiveAreaEtrue", fWoff );
+    if( !h ) 
+    {
+       h = get_CTA_IRF_Histograms( "harea_gamma", fWoff );
+       if( !h ) return false;
+       bLinX = true;
+    }
     gEffArea_MC = new TGraphAsymmErrors( 1 );
     setGraphPlottingStyle( gEffArea_MC );
     get_Graph_from_Histogram( h, gEffArea_MC, false, bLinX );
+
+///////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////
 // name and axis units are not consistent in the CTA files!!!
@@ -521,7 +533,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, dou
 	    else if( iReferenceValue > 998. )
 	    {
 	       xq[0] = 0.50;
-	       h.GetQuantiles( 1, yq, xq );
+	       h->GetQuantiles( 1, yq, xq );
 	       bb_ref = yq[0];
             }
 // fill 1D histogram before integration

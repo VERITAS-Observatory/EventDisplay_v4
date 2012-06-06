@@ -88,7 +88,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    void addSensitivityFile( string iSensitivityFile, string iLegend, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
    void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
    bool initialize();
-   bool plotIRF( string iPrint = "", double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
+   bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10, string iUnit = "ENERGY"  );
    void setEnergyRange_Lin_TeV( double iMinEnergy_TeV = 0.01, double iMaxEnergy_TeV = 50. ) { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
 
