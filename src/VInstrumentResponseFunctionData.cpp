@@ -410,7 +410,7 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D *iHistogram, 
 {
    if( !iHistogram || !iResult ) return 0;
 
-   TH1D *iTemp;
+   TH1D *iTemp = 0;
    TList *hList = new TList();
 
    char iname[800];
@@ -427,7 +427,7 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D *iHistogram, 
 
 //////////////////////////////////////////////////////////////////////////////
 // loop over all energy bins and project each bin into a TH1D
-   for( int i = 1; i < iHistogram->GetNbinsX(); i++ )
+   for( int i = 1; i <= iHistogram->GetNbinsX(); i++ )
    {
 
 // define temporary histogram and fill with projection
@@ -436,7 +436,7 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D *iHistogram, 
       {
          sprintf( iname, "iH_%d", i );
       }
-      iTemp = iHistogram->ProjectionY( iname, i, i+1 );
+      iTemp = iHistogram->ProjectionY( iname, i, i );
       sprintf( iname, "log_{10} E_{0} = %.2f", iHistogram->GetXaxis()->GetBinCenter( i ) );
       iTemp->SetTitle( iname );
 
