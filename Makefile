@@ -229,8 +229,8 @@ CTA:	evndisp \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
 	trainTMVAforGammaHadronSeparation_TrainingFile \
-	writeCTAWPPhysSensitivityFiles \
-	slib
+	slib \
+	writeCTAWPPhysSensitivityFiles
 
 ########################################################
 # eventdisplay
