@@ -200,9 +200,18 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
 
 /* EVALUATION OF HISTOGRAMS */
 
-        int i,j,k,id;
-        float sum1,sum2,delta,med,sigma;
-        int i1,i2,i3;
+        int i = 0;
+	int j = 0;
+	int k = 0;
+	int id = 0;
+        float sum1 = 0.;
+	float sum2 = 0.;
+	float delta = 0.;
+	float med = 0.;
+	float sigma = 0.;
+        int i1 = 0;
+	int i2 = 0;
+	int i3 = 0;
 
         char hisname[100];
         char histitle[100];
