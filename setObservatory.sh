@@ -31,7 +31,7 @@ fi
 LD_LIBRARY_PATH=/opt/products/gsl/1.9/lib64/:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH 
 
 # VBF
-if [ -z "$VBFSYS" ]; then
+if [ ! -z "$VBFSYS" ]; then
    LD_LIBRARY_PATH=$VBFSYS/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH 
 fi
 
