@@ -69,6 +69,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    double   fRateAxisMin;
    double   fRateAxisMax;
    string   fRateAxisTitle;
+   bool     fRateAxisTitleUnSet;
 
 // private functions
    bool     fillTeV_anasum( bool iPrint );

@@ -28,6 +28,7 @@ VLightCurve::VLightCurve()
    setSpectralParameters();
 
    setPlottingParameter( -99., -99. );
+   fRateAxisTitleUnSet = false;
    setLightCurveAxis();
    setPhaseFoldingValues( -99., -99., false );
 }
@@ -199,7 +200,8 @@ bool VLightCurve::fillTeV_anasum( bool iPrint )
        if( fLightCurveData[i] )
        {
           fLightCurveData[i]->setFluxCalculationEnergyInterval( fEnergy_min_TeV, fEnergy_max_TeV );
-          fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha );
+          fLightCurveData[i]->fillTeVEvndispData( fAnaSumFile, fThresholdSignificance, fMinEvents, 
+	                                          fUpperLimit, fUpperLimitMethod, fLiMaEqu, fMinEnergy, fE0, fAlpha );
        }
    }
 
@@ -237,7 +239,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        else                   sprintf( htitle, "light curve" );
        if( fPhase_Period_days > 0. )
        { 
-          sprintf( hname, "%s_%d_%d_%d", iCanvasName.c_str(), (int)fPhase_MJD0, (int)fPhase_Period_days, (int)fPhasePlotting );
+          sprintf( hname, "%s_%d_%d_%d_%d", iCanvasName.c_str(), (int)fPhase_MJD0, (int)fPhase_Period_days, (int)fPhasePlotting, (int)(fEnergy_min_TeV*1000.) );
 	  sprintf( htitle, "%s, T_{0}=%.1f, period=%.1f days", fName.c_str(), fPhase_MJD0, fPhase_Period_days );
        }
 
@@ -295,10 +297,11 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        sprintf( htitle, "hLightCurve" );
        if( fPhase_Period_days > 0. ) sprintf( htitle, "%s_%d_%d_%d", htitle, (int)fPhase_MJD0, (int)fPhase_Period_days, (int)fPhasePlotting );
        hLightCurve = (TH1D*)fCanvasLightCurve->GetListOfPrimitives()->FindObject( htitle );
+       if( !hLightCurve ) hLightCurve = (TH1D*)fCanvasLightCurve->GetListOfPrimitives()->FindObject( "hLightCurve" );
        if( !hLightCurve )
        {
           cout << "VLightCurve::plot: no light curve histogram found with name " << htitle << endl;
-	  fCanvasLightCurve->GetListOfPrimitives()->Print();
+//	  fCanvasLightCurve->GetListOfPrimitives()->Print();
 	  return fCanvasLightCurve;
        }
     }
@@ -434,7 +437,7 @@ TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax,
    if( !fObservingInvervallHisto )
    {
       fObservingInvervallHisto = new TH1D( iName.c_str(), "", 10000, 0., 1000. );
-      fObservingInvervallHisto->SetXTitle( "observing interval #Delta t" );
+      fObservingInvervallHisto->SetXTitle( "observing interval #Delta t [d]" );
       setHistogramPlottingStyle( fObservingInvervallHisto );
    }
    else
@@ -677,7 +680,7 @@ string VLightCurve::getLightCurveAxisTitle()
        fRateAxisTitle = hname;
        return iTemp;
     }
-    else
+    else if( fRateAxisTitleUnSet )
     {
        fRateAxisTitle = "no title";
     }

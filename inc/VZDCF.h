@@ -31,8 +31,8 @@ class VZDCF : public VPlotUtilities
 
    vector< VZDCFData* > fZDCFData;
 
-   double getZDCFData_dcf_min( bool bError = false );
-   double getZDCFData_dcf_max( bool bError = false );
+   double getZDCFData_dcf_min( bool bError = false, double iTauMin = -9999., double iTauMax = -9999. );
+   double getZDCFData_dcf_max( bool bError = false, double iTauMin = -9999., double iTauMax = -9999. );
    double getZDCFData_tau_min( bool bError = false );
    double getZDCFData_tau_max( bool bError = false );
 

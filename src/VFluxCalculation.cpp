@@ -947,18 +947,15 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
         vector < double > IntraNdiff;
 	vector < double > IntraNdiffE;
 
-
         char hname[200];
 ///////////////////////////////////////////////////
 // loop over all runs in run list
         for( unsigned int i = 0; i < fRunList.size(); i++ )
         {
-
 	  IntraNon.clear();
 	  IntraNoff.clear();
 	  IntraNdiff.clear();
 	  IntraNdiffE.clear();
-
 
 // calculate number of events above given energy threshold for this run
             if( (int)fRunList[i] > 0 )
@@ -1079,9 +1076,6 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 	    fIntraRunNoff.push_back( IntraNoff );
 	    fIntraRunNdiff.push_back( IntraNdiff );
 	    fIntraRunNdiffE.push_back( IntraNdiffE );
-
-
-
 	}
         fFile[f]->cd();
     }                                             // end loop over all files

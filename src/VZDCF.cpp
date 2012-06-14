@@ -98,7 +98,7 @@ double VZDCF::getZDCFData_tau_max( bool bError )
    return i_m;
 }
 
-double VZDCF::getZDCFData_dcf_min( bool bError )
+double VZDCF::getZDCFData_dcf_min( bool bError, double iTauMin, double iTauMax )
 {
    double i_m = 1.e19;
 
@@ -106,6 +106,8 @@ double VZDCF::getZDCFData_dcf_min( bool bError )
    {
       if( fZDCFData[i] )
       {
+         if( iTauMin > 0. && fZDCFData[i]->tau < iTauMin ) continue;
+	 if( iTauMax > 0. && fZDCFData[i]->tau > iTauMax ) continue;
          if( bError && fZDCFData[i]->dcf - fZDCFData[i]->dcf_error_low < i_m ) i_m = fZDCFData[i]->dcf - fZDCFData[i]->dcf_error_low;
 	 else if( fZDCFData[i]->dcf < i_m )                                    i_m = fZDCFData[i]->dcf;
       }
@@ -113,7 +115,7 @@ double VZDCF::getZDCFData_dcf_min( bool bError )
    return i_m;
 }
 
-double VZDCF::getZDCFData_dcf_max( bool bError )
+double VZDCF::getZDCFData_dcf_max( bool bError, double iTauMin, double iTauMax )
 {
    double i_m = -1.e19;
 
@@ -121,6 +123,8 @@ double VZDCF::getZDCFData_dcf_max( bool bError )
    {
       if( fZDCFData[i] )
       {
+         if( iTauMin > 0. && fZDCFData[i]->tau < iTauMin ) continue;
+	 if( iTauMax > 0. && fZDCFData[i]->tau > iTauMax ) continue;
          if( bError && fZDCFData[i]->dcf + fZDCFData[i]->dcf_error_up > i_m ) i_m = fZDCFData[i]->dcf + fZDCFData[i]->dcf_error_up;
 	 else if( fZDCFData[i]->dcf > i_m )                                   i_m = fZDCFData[i]->dcf;
       }
@@ -169,8 +173,8 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, doub
        if( bzdcf )
        {
 	  hZDCF->SetYTitle(  "ZDCF" );
-	  hZDCF->SetMinimum( getZDCFData_dcf_min( true ) * 1.2 );
-	  hZDCF->SetMaximum( getZDCFData_dcf_max( true ) * 1.2 );
+	  hZDCF->SetMinimum( getZDCFData_dcf_min( true, taumin, taumax ) * 1.1 );
+	  hZDCF->SetMaximum( getZDCFData_dcf_max( true, taumin, taumax ) * 1.1 );
        }
        else
        {
@@ -198,7 +202,7 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, doub
 
 // fill graph 
     TGraphAsymmErrors *g = new TGraphAsymmErrors( 1 );
-    setGraphPlottingStyle( (TGraph*)g );
+    setGraphPlottingStyle( (TGraph*)g, 1, 1., 20, 1. );
 
     int z = 0;
 
