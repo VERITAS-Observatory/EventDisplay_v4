@@ -588,13 +588,18 @@ void writeAllParticleNumberFiles( char *iSubArrayFile = 0,
 
       if( iMC_Gamma_onSource )
       {
+	 sprintf( iParticleNumberFile, "ParticleNumbers.%s.00.root", SubArray[i].c_str() );
 	 sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_onSource, SubArray[i].c_str(), iRecID, 0 );
 	 sprintf( iProton, "%s.%s_ID%d.eff-%d.root", iMC_Proton, SubArray[i].c_str(), iRecID, 0 );
-	 sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, 0 );
-
-	 sprintf( iParticleNumberFile, "ParticleNumbers.%s.00.root", SubArray[i].c_str() );
-
-	 writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+	 if( iMC_Electron )
+	 {
+	    sprintf( iElectron, "%s.%s_ID%d.eff-%d.root", iMC_Electron, SubArray[i].c_str(), iRecID, 0 );
+	    writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+         }
+	 else
+	 {
+	     writeParticleNumberFile( iGamma, iProton, 0, 6, iParticleNumberFile );
+         }
       }
 
 // offset files
