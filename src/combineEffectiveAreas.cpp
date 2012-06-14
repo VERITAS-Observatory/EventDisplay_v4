@@ -89,7 +89,7 @@ int main( int argc, char *argv[] )
        cout << endl;
        cout << "combineEffectiveAreas <effective area files> <combined file> <write all histograms (default=false)>" << endl;
        cout << endl;
-       cout << "   <effective area files>    without .root suffix (e.g. effArea*)" << endl;
+       cout << "   <effective area files>    without .root suffix (e.g. effArea*. Note need of \"...\")" << endl;
        cout << endl;
        exit( 0 );
    }
