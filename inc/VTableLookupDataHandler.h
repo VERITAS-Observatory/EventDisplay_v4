@@ -308,8 +308,6 @@ class VTableLookupDataHandler
 	double* getDistance( ULong64_t iTelType );
         double* getDistanceToCore() { return fR; }
 	double* getDistanceToCore( ULong64_t iTelType );
-//        double* getMCDistanceToCore() { return fMCR; }
-//        double* getMCDistanceToCore( ULong64_t iTelType );
         int    getEventNumber() { return eventNumber; }
 	bool   getEventStatus() { return fEventStatus; }
         double getEventWeight() { return fEventWeight; }

@@ -29,7 +29,7 @@ class VTableCalculator
 // creator: reads or writes table
 // mode can be 'r' or 'w'
         VTableCalculator( int intel = 0 , bool iEnergy = false, bool iPE = false );
-        VTableCalculator( string fpara, string hname, char m, TDirectory *iDir, bool iEnergy, string iInterpolate = "", bool iPE = false );
+        VTableCalculator( string fpara, string hname, char m, TDirectory *iDir, bool iEnergy, string iInterpolate = "", bool iPE = false, bool iUseMedianEnergy = false );
 
 // Destructor
         ~VTableCalculator() {}
@@ -72,16 +72,14 @@ class VTableCalculator
 	string fHName_Add;
 
         bool fEnergy;                             //!< true if tables are used for energy calculation
+	bool fUseMedianEnergy;
 
         vector< vector< TH1F* > > Oh;
         TProfile2D *hMean;
-	string hMeanName;
         TH2F* hMedian;
         string hMedianName;
         TH2F* hSigma;
-        string hSigmaName;
         TH2F* hNevents;
-	string hNeventsName;
         vector< TH2F* > hVMedian;
 
 // histogram interpolation

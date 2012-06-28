@@ -218,7 +218,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
             i_energy.back()->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxlocaldistance, fTLRunParameter->fmaxdist );
 	    i_energy.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
             i_energy.back()->setWrite1DHistograms( fWrite1DHistograms );
-            i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, fDirEnergySR, true, "", fTLRunParameter->fPE ) );
+            i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, fDirEnergySR, true, "", fTLRunParameter->fPE, fTLRunParameter->fUseMedianEnergy ) );
             i_energySR.back()->setWrite1DHistograms( fWrite1DHistograms );
 	    i_energySR.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
         }
@@ -597,7 +597,7 @@ void VTableLookup::loop()
 			                                                              fData->getDistanceToCore( t ), 
 										      fData->getSize2( fTLRunParameter->fEnergySizecorrection, t,
 										      fTLRunParameter->fUseSelectedImagesOnly ), 
-										      fData->getDistance( t ), idummy1, iEventWeight, idummy3, 0. );
+										      fData->getDistance( t ), idummy1, iEventWeight, idummy3, 0. ); 
 			 fenergySizevsRadius[0][0][0][a][i_Tel_type_counter]->calc( fData->getNTel_type( t ), fData->getDistanceToCore(t), 
 			                                                            fData->getSize2( fTLRunParameter->fEnergySizecorrection, t,
 										    fTLRunParameter->fUseSelectedImagesOnly ), 

@@ -16,6 +16,7 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
     if( intel == 0 ) return;
 
     fEnergy = iEnergy;
+    fUseMedianEnergy = false;
 
     for( int i = 0; i < intel; i++ )
     {
@@ -45,13 +46,14 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
 
 
 /* CREATOR */
-VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDirectory *iDir, bool iEnergy, string iInterpolate, bool iPE )
+VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDirectory *iDir, bool iEnergy, string iInterpolate, bool iPE, bool iUseMedianEnergy )
 {
     setDebug();
 
     setConstants( iPE );
 // using lookup tables to calculate energies
     fEnergy = iEnergy;
+    fUseMedianEnergy = iUseMedianEnergy;
     fReadHistogramsFromFile = false;
 
     fWrite1DHistograms = true;
@@ -144,14 +146,16 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     {
         fReadHistogramsFromFile = false;
 
-        sprintf( hname, "%s_median_%s", fpara.c_str(), hname_add.c_str() );
-        hMedianName = hname;
-        sprintf( hname, "%s_sigma_%s", fpara.c_str(), hname_add.c_str() );
-        hSigmaName = hname;
-	sprintf( hname, "hNevents_energy_%s", hname_add.c_str() );
-	hNeventsName = hname;
-	sprintf( hname, "hMean_energy_%s", hname_add.c_str() );
-	hMeanName = hname;
+	if( fUseMedianEnergy )
+	{
+	   sprintf( hname, "%s_median_%s", fpara.c_str(), hname_add.c_str() );
+	   hMedianName = hname;
+        }
+	else
+	{
+	   sprintf( hname, "%s_mean_%s", fpara.c_str(), hname_add.c_str() );
+	   hMedianName = hname;
+        }
     }
 
 }
@@ -275,6 +279,10 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
 		hMedian->SetBinError( i+1, j+1, sigma );
                 hSigma->SetBinContent( i+1, j+1, sigma );
                 if( Oh[i][j]->GetEntries() > 5 ) hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
+		else if( fEnergy )
+		{
+		    hMean->SetBinContent( i+1, j+1, 0. );
+                }
 
                 id=i*1000+j;
                 sprintf( hisname , "h%d",id);
