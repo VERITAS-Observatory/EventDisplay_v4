@@ -215,7 +215,7 @@ static void syntax (char *program)
    printf("   -a subarray file (list of telescopes to read with FOV.)\n" );
    printf("   -o dst filename  (name of dst output file)\n" );
    printf("   -f on=1/off=0    (write FADC samples to DST file;default=0)\n" );
-   printf("   -r on=1/off=0    (apply camera place scaling for DC telescopes; default=1)\n" );
+   printf("   -r on=1/off=0    (apply camera plate scaling for DC telescopes; default=1)\n" );
    printf("   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );      
 
    exit(1);
