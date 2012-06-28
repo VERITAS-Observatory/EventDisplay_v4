@@ -160,7 +160,7 @@ do
 #################################
 # submit job to queue
 # medium queue: BDT 
-	 qsub -V -js 20 -l os="sl*"  -l h_cpu=0:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
+	 qsub -V -js 20 -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
 # long queue: needed for box cut optimization
 #         qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $FDIR -e $FDIR "$FNAM.sh"
      done

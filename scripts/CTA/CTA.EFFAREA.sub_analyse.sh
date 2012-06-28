@@ -172,9 +172,9 @@ then
    MSCFILE=$DDIR/gamma_cone10."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_cone10."$ARRAY"_ID"$RECID".eff
-   OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
-   OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+   OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
+   OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
+   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
 # PRELIMINARY! use on axis TMVA for all off axis gamma/hadron separation
 #   OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
 # NOTE: this is theta2
@@ -195,9 +195,10 @@ then
 # NOTE: this is theta and not theta2
    if [ $PART = "electron" ]
    then
-      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
-      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0  )
+      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
+#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25  )
+      OFFMEA=( 0.0 1.5 2.5 3.25 3.75 4.25 4.75 5.25  )
 # use on axis TMVA for all off axis gamma/hadron separation
 #      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
@@ -224,9 +225,10 @@ then
 # NOTE: this is theta and not theta2
    if [ $PART = "proton" ] 
    then
-      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
-      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
+      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
+#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
+      OFFMEA=( 0.0 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
 # use on axis TMVA for all off axis gamma/hadron separation
 #      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
@@ -249,9 +251,9 @@ then
 # NOTE: this is theta and not theta2
    if [ $PART = "helium" ] 
    then
-      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 5.5 )
-      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 6.0 )
-      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+      THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
+      THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
+      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
 # use on axis TMVA for all off axis gamma/hadron separation
 #      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else

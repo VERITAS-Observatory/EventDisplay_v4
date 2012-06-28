@@ -33,6 +33,7 @@ s4-5-125
 B-LST
 B-MST
 I-LST
+I-2LST
 I-MST
 I-SST
 I-noLST
@@ -42,5 +43,17 @@ E-LST
 E-MST
 E-SST
 E-noLST
+E-3LST
 E-noMST
 E-noSST
+s4-1-105
+s4-1-70
+s3-1-74
+s3-1-105
+s3-1-182
+s4-1-74
+s4-1-105
+s4-1-163
+s5-1-84
+s5-1-130
+s9-1-84

@@ -10,6 +10,7 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
+   echo
    echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter]"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
@@ -18,7 +19,7 @@ then
    echo
    echo "  <data set>                e.g. cta-ultra3, ISDC3700m, ..."
    echo ""
-   echo "  [keep simtel.root files]  keep and copy converted simtel files to output directory (default off=0)"
+   echo "  [keep DST.root files]  keep and copy converted simtel files (DST files) to output directory (default off=0)"
    echo ""
    echo " output will be written to: CTA_USER_DATA_DIR/analysis/<subarray>/<particle>/ "
    echo ""
