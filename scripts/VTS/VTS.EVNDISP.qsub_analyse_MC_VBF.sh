@@ -29,6 +29,7 @@ source $EVNDISPSYS/setObservatory.tcsh VERITAS
 if( $ARRAY == "V4" ) then
    if( $PART == "1" ) then
       set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      set IFIL=Apr12_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47460
       set NRUN=1
@@ -45,6 +46,7 @@ endif
 if( $ARRAY == "V5" ) then
    if( $PART == "1" ) then
       set IFIL=Nov10_na_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      set IFIL=Apr12_na_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47570
       set NRUN=1
@@ -126,7 +128,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20120523_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysisApr12_d20120628_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################

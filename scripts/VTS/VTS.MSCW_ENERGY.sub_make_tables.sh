@@ -94,6 +94,8 @@ do
        while [ $W -lt $NWOF ]
        do
 	 echo "   WOFF BIN $W $NWOF ${WOFF[$W]}"
+	 echo "   LOG DIR $LOGDIR"
+	 echo "   DATA DIR WITH TABLES $ODDIR"
 
 	 FNAM="$QLOG/MK-TBL.$DATE.MC-$ATMO-$ANAC-$RECID-${INOI[$i]}-${IZE[$N]}-${WOFF[$W]}-$ARRAY"
 
@@ -124,7 +126,8 @@ do
 	 chmod u+x $FNAM.sh
 
 # submit job
-	qsub -V -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+##	qsub -V -js 20 -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=20000M -l tmpdir_size=100G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+	qsub -V -js 20 -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=20000M -l tmpdir_size=100G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
         let "W = $W + 1"
      done

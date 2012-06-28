@@ -12,11 +12,7 @@ set OFIL=OOFFIILLEE
 
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
-# this is where the executable can be found
-cd $EVNDISPSYS/VTS/scripts
-
 # combine the tables
-
-$EVNDISPSYS/bin/combineTables $ILIST $OFIL.root > $OFIL.log 
+$EVNDISPSYS/bin/combineLookupTables $ILIST $OFIL.root > $OFIL.log 
 
 exit

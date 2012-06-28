@@ -98,7 +98,7 @@ do
 	 touch $LOGDIR/$FFIR.dat
 
          echo "* FILLINGMODE 0" >> $LOGDIR/$FFIR.dat
-	 echo "* ENERGYRECONSTRUCTIONMETHOD 0" >> $LOGDIR/$FFIR.dat
+	 echo "* ENERGYRECONSTRUCTIONMETHOD 1" >> $LOGDIR/$FFIR.dat
 	 echo "* ENERGYAXISBINS 60" >> $LOGDIR/$FFIR.dat
          echo "* AZIMUTHBINS 1" >> $LOGDIR/$FFIR.dat
 	 echo "* FILLMONTECARLOHISTOS 0" >> $LOGDIR/$FFIR.dat
@@ -121,6 +121,8 @@ do
 
 	 chmod u+x $FNAM.sh
 	 echo $FNAM.sh
+	 echo "DATA DIR: $ODDIR"
+	 echo "LOG DIR: $LOGDIR"
 # submit job
          qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
@@ -129,7 +131,7 @@ do
 	 echo "writing results to $ODDIR"
 	 echo "writing log files to $LOGDIR"
 
-         sleep 0.5
+         sleep 0.1
      done
    done
 done

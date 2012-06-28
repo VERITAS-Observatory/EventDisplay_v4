@@ -28,11 +28,11 @@ source ./setObservatory.tcsh VTS
 # hardwired values
 ###############################################
 # date of analysis
-set DAT="d20120410"
+set DAT="d20120628"
 # output files are written to this directory
 set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
 # directory with MC eventdisplay files
-set SDIR="analysis_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
+set SDIR="analysisApr12_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
 # full path to MC eventdisplay files 
 set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*.root"
 # mscw_energy command line options

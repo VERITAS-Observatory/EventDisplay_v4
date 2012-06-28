@@ -104,7 +104,6 @@ do
 
 # submit the job
       qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh
-      echo "qsub -l h_cpu=04:00:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh"
      done
    done
 done
