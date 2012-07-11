@@ -37,18 +37,6 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fAngRes80 = 0;
     fEres = 0; 
 
-    fSensitivity2D = 0;
-    fSensitivityCU2D = 0;
-    fBGRate2D = 0;
-    fBGRateSqDeg2D = 0;
-    fProtRate2D = 0;
-    fElecRate2D = 0;
-    fEffArea2D = 0;
-    fEffArea802D = 0;
-    fAngRes682D = 0;
-    fAngRes802D = 0;
-    fEres2D = 0; 
-
     fOffsetCounter = 9999;
 
 }
@@ -296,10 +284,12 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
    cout << "=================================================================" << endl;
    cout << "reading " << hname << endl;
    cout << endl;
+// CTA data 
    if( isVTS() == 0 )
    {
       if( !i_IRF.fillData( hname ) ) return false;
    }
+// VERITAS data
    else
    {
       if( isVTS() == 5 && !i_IRF.fillData( hname, 20, 0.5, 16, 2.0, 130 ) ) return false;

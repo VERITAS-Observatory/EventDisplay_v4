@@ -60,20 +60,6 @@ class VWPPhysSensitivityFile
     TH1F* fAngRes80;
     TH1F* fEres;
 
-    TH1F* fSensitivity2D;
-    TH1F* fSensitivityCU2D;
-    TH1F* fBGRate2D;
-    TH1F* fBGRateSqDeg2D;
-    TH1F* fProtRate2D;
-    TH1F* fElecRate2D;
-    TH1F* fEffArea2D;
-    TH1F* fEffAreaMC2D;
-    TH1F* fEffArea802D;
-    TH1F* fAngRes682D;
-    TH1F* fAngRes802D;
-    TH1F* fEres2D;
-
-
     public:
 
     VWPPhysSensitivityFile();
