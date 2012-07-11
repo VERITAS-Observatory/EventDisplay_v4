@@ -1037,8 +1037,13 @@ $(vtspara):
 	cp -LR $(VERITAS_EVNDISP_ANA_DIR)/NOISE/*.grisu $(vtspara)/NOISE
 	mkdir -p $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.d20120322-cut-N* $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.dat $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.runlist $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.QADC.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
 	mkdir -p $(vtspara)/RadialAcceptances
@@ -1047,7 +1052,6 @@ $(vtspara):
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/EffectiveAreas/effArea-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/EffectiveAreas/
 	mkdir -p $(vtspara)/Tables
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20120410_GrIsu_ATM21_V5_ID0.* $(vtspara)/Tables/
-
 
 ###############################################################################################################################
 # print environment and compilation parameters

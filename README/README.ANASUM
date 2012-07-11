@@ -4,21 +4,45 @@ anasum - make sky plots, fill energy spectra etc.
 required options are:
 	-l --runlist       [run list file name, see runlist.dat for an example]
 	-d --datadir       [directory for input ROOT files (from mscw_energy)]
+	-o --outfile       [output ROOT file name (default output.root)]
+	-f --parameterfile [analysis parameter file, default=ANASUM.runparameter]
 
 optional options are:
-	-o --outfile       [output ROOT file name (default output.root)]
 	-i --runType       [type of input data: 0 (default) = mscw files; 1 = anasum single run result files]
 	-u --infile        [read anasum outputfile, do the calculations for new runs and redo combined plots (data directory with option -l is required)]
 	-r --randomseed    [seed for random generator, default=17]
-	-f --parameterfile [run parameter file, default=runparameter.dat]
 
 --------------------------------------------------------
 
-examples:
+Example:
 
 standard full stereo analysis:
 
-	 $EVNDISPSYS/bin/anasum -l runlist.dat -d data/Crab -o crab_analysis.root
+	 $EVNDISPSYS/bin/anasum -l runlist.dat -d data/Crab/ -o crab_analysis.root -f ANASUM.runparameter
+
+--------------------------------------------------------
+
+analysis parameter file with binning, coordinates of sky map pointings, exclusion regions etc:
+
+	see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.runparameter
+
+run list:
+
+        see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.runlist
+
+definition of cuts:
+	
+	see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.GammaHadron.dat
+
+	Please check VERITAS analysis wiki for the standard cut files
+
+list of time cuts (to remove an arbitrary time interval during a run):
+
+	see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.timemask.dat
+
+	The time cut file is defined in the analysis parameter file (keyword TIMEMASKFILE)
+
+--------------------------------------------------------
 
 use the plotting tools in the shared library to plot the results:
 
