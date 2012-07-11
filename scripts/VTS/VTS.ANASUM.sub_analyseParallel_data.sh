@@ -7,12 +7,17 @@
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] && [ ! -n "$2" ]  && [ ! -n "$3" ]  && [ ! -n "$4" ] && [ ! -n "$5" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] 
 then
    echo
-   echo "VTS.ANASUM.sub_analyseParallel_data.sh <run list> <data directory> <output directory> <run parameter file>"
+   echo "VTS.ANASUM.sub_analyseParallel_data.sh <anasum run list> <data directory with mscw files> <output directory> <run parameter file>"
    echo
-   echo "   <output name> without .root"
+   echo "   <anasum run list>     full anasum run list (with effective areas file names, etc)"
+   echo 
+   echo "   <output directory>    anasum output files are written to this directory"
+   echo
+   echo "   <run parameter file>  anasum run parameter file"
+   echo "                         (example can be found in $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.runparameter.dat"
    echo
    exit
 fi
@@ -69,6 +74,8 @@ do
 
 # prepare run scripts
        FSCRIPT="$LDIR/qsub_analyse-"$DATE"-RUN$RUN"
+       echo "run scripts written to $FSCRIPT"
+       echo "temporary run list written to $TEMPLIST"
 
        sed -e "s|FILELIST|$TEMPLIST|" VTS.ANASUM.qsub_analyse_data.sh > $FSCRIPT-1.sh
        sed -e "s|DATADIR|$DDIR|" $FSCRIPT-1.sh > $FSCRIPT-2.sh
@@ -82,7 +89,7 @@ do
 
        chmod u+x $FSCRIPT.sh
 
-       qsub -V -l h_cpu=0:29:30 -l h_vmem=4000M -l tmpdir_size=10G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
+       qsub -V -js 20 -l h_cpu=0:29:30 -l h_vmem=4000M -l tmpdir_size=10G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
 
     fi
 done 

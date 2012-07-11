@@ -10,7 +10,19 @@
 
 if [ ! -n "$1" ]
 then
+   echo
+   echo "EVNDISP data analysis: submit jobs from a simple run list"
+   echo
    echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [pedestal calculation (default=1=on)]" 
+   echo
+   echo "runlist should contain run numbers only"
+   echo
+   echo "example for run list:"
+   echo "48626"
+   echo "58453"
+   echo "61429"
+   echo
+
    exit
 fi
 
