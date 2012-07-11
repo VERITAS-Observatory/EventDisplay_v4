@@ -967,6 +967,7 @@ $(ctapara):
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/scriptsInput.runparameter $(ctapara)/ParameterFiles
 	mkdir -p $(ctapara)/RadialAcceptances
 	mkdir -p $(ctapara)/Calibration
 	mkdir -p $(ctapara)/EffectiveAreas
