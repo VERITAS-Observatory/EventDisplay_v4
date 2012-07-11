@@ -36,7 +36,7 @@ then
   echo "error: analysis parameter file not found: $ANAPAR" 
   exit
 fi
-echo "reading anaysis parameter from $ANAPAR"
+echo "reading analysis parameter from $ANAPAR"
 NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
 ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
@@ -44,6 +44,8 @@ DDIR=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
 RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 echo $NIMAGESMIN $ANADIR $EREC $DDIR
 # parameters from command line
+RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
+# MD200, NTree=1000
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
 RXPAR=`basename $RPAR.runparameter runparameter`
 OFIL="BDT"
@@ -111,7 +113,7 @@ do
       then
 	 SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
       else
-	 SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*4.mscw.root`
+	 SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
       fi
       BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID"*.root`
 
