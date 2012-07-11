@@ -1,7 +1,6 @@
 /*! \file anasum.cpp
-    \brief main program to create an analysis summary
+    \brief main program to create an analysis summary (VERITAS data analysis chain)
 
-   Revision $Id: anasum.cpp,v 1.23.2.5.4.2.2.1.2.1.4.1.2.3.6.1.10.2.2.1.2.1 2011/01/05 14:01:24 gmaier Exp $
 
    \author( Jamie Holder, Gernot Maier )
 */
@@ -32,7 +31,7 @@ unsigned int runType = 0;
 // location of data files (might be mscw file (run type 0) or anasum result file (run type 1 )
 string datadir="";
 // run parameter file
-string fRunParameterfile="runparameter.dat";
+string fRunParameterfile="ANASUM.runparameter";
 // analysis types: mono and stereo
 unsigned int analysisType=3;
 // mono analysis only

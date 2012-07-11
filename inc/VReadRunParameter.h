@@ -28,6 +28,7 @@ class VReadRunParameter
         bool fusercamera;                         //!< default camera or user camera
         void test_and_adjustParams();             //!< get run number, default camera..
         void printHelp();                         //!< print a short help
+	void printShortHelp();
 
         bool f_boolCommandline;                   //!< reading parameters from command line
         bool f_boolConfigfile;                    //!< reading parameters from config file

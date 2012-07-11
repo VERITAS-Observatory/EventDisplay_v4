@@ -855,6 +855,7 @@ double VAnaSumRunParameter::getRingWidth( double a_on, double rr, double rat )
 double VAnaSumRunParameter::readSourceRadius( string ifile )
 {
     VGammaHadronCuts iC;
+    iC.setNTel( 1 );  // irrelevant - but suppressed printing of warnings to screen
     if( !iC.readCuts( ifile, 0 ) ) return -1;;
 
     return iC.fCut_Theta2_max;
@@ -864,6 +865,7 @@ double VAnaSumRunParameter::readSourceRadius( string ifile )
 double VAnaSumRunParameter::readMaximumDistance( string ifile )
 {
     VGammaHadronCuts iC;
+    iC.setNTel( 1 );  // irrelevant - but suppressed printing of warnings to screen
     if( !iC.readCuts( ifile, 0 ) ) return -1;
 
     return iC.fCut_CameraFiducialSize_max;

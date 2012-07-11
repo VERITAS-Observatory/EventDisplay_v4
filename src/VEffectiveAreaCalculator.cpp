@@ -47,7 +47,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     }
     setIgnoreEnergyReconstructionCuts( fRunPara->fIgnoreEnergyReconstructionQuality );
     setIsotropicArrivalDirections( fRunPara->fIsotropicArrivalDirections );
-    setCTA( fRunPara->fTelescopeTypeCuts );
+    setTelescopeTypeCuts( fRunPara->fTelescopeTypeCuts );
     setWobbleOffset( fRunPara->fXoff, fRunPara->fYoff );
     setNoiseLevel( fRunPara->fnoise, fRunPara->fpedvar );
 
@@ -615,7 +615,7 @@ vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV,
         i_temp.assign( iElower.size(), 0. );
         for( unsigned int i = 0; i < iElower.size(); i++ )
         {
-            i_temp[i] = interpolate_WL( iV, iVLower, iVupper, iElower[i], iEupper[i], iCos );
+            i_temp[i] = VStatistics::interpolate( iV, iVLower, iVupper, iElower[i], iEupper[i], iCos, 0.5, -90. );
         }
         return i_temp;
     }
@@ -1421,11 +1421,11 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
          if( !fCuts->applyStereoQualityCuts( iMethod, true, i , true) ) continue;
          hEcutSub[2]->Fill( eMC, 1. );
 
-// apply telescope type cut (e.g. for CTA simulations only)
-         if( fCTA )
+// apply telescope type cut (e.g. for CTA simulations)
+         if( fTelescopeTypeCutsSet )
 	 {
            if( bDebugCuts ) cout << "#2 Cut NTELType " << fCuts->applyTelTypeTest( false ) << endl;
-	   if(!fCuts->applyTelTypeTest( true ) ) continue;
+	   if( !fCuts->applyTelTypeTest( true ) ) continue;
          }
          hEcutSub[3]->Fill( eMC, 1. );
 
@@ -1759,7 +1759,7 @@ double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, doubl
         }
 
 // interpolate between zenith angles (weighted by cos(ze))
-        double ieff = interpolate_WL( ze, fZe[ize_low], fZe[ize_up], ie_zelow, ie_zeup, true );
+        double ieff = VStatistics::interpolate( ze, fZe[ize_low], fZe[ize_up], ie_zelow, ie_zeup, true, 0.5, -90. );
 
 // return inverse
         if( ieff != 0. ) return 1./ieff;
@@ -2036,45 +2036,6 @@ void VEffectiveAreaCalculator::resetTimeBin()
 void VEffectiveAreaCalculator::setTimeBin(double time)
 {
   timebins.push_back( time );
-}
-
-
-
-
-
-/*!
- *  CALLED TO USE EFFECTIVE AREAS
-
-    interpolate between two values
-
-    ze [deg]
-
-    weighted by cos ze
-*/
-double VEffectiveAreaCalculator::interpolate_WL( double ze, double ze1, double ze2, double w1, double w2, bool iCos )
-{
-// don't interpolate if one or two values are not valid
-    if( w1 < -90. || w2 < -90. ) return -99.;
-
-// same zenith angle, don't interpolate
-    if( fabs( ze1 - ze2 ) < 1.e-3 ) return (w1+w2)/2.;
-
-// interpolate
-    double id, f1, f2;
-    if( iCos )
-    {
-        id = cos( ze1*raddeg ) - cos( ze2*raddeg );
-        f1 = 1. - (cos( ze1*raddeg ) - cos( ze*raddeg )) / id;
-        f2 = 1. - (cos( ze*raddeg ) - cos( ze2*raddeg )) / id;
-    }
-    else
-    {
-        id = ze1 - ze2;
-        f1 = 1. - ( ze1 - ze ) / id;
-        f2 = 1. - ( ze  - ze2 ) / id;
-    }
-
-    return (w1*f1+w2*f2);
 }
 
 

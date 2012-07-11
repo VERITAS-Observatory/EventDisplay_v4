@@ -432,7 +432,7 @@ void VLightCurve::setLightCurveAxis( double iYmin, double iYmax, string iAxisTit
    fill a histogram with time intervalls between flux measurements
 
 */
-TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax, string iName )
+TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax, string iName, string iTitle )
 {
    if( !fObservingInvervallHisto )
    {
@@ -470,7 +470,7 @@ TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax,
    if( bPlot )
    {
       iName = "cL" + iName;
-      TCanvas *c = new TCanvas( iName.c_str(), "observing interval distribution", 10, 10, 400, 400 );
+      TCanvas *c = new TCanvas( iName.c_str(), iTitle.c_str(), 10, 10, 400, 400 );
       c->SetGridx( 0 );
       c->SetGridx( 0 );
 

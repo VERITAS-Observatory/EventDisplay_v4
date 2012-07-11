@@ -17,6 +17,9 @@
 #include <string>
 #include <vector>
 
+#include "VStatistics.h"
+#include "VUtilities.h"
+
 using namespace std;
 
 class VEnergyCorrection
@@ -54,10 +57,7 @@ class VEnergyCorrection
         double getEnergyCorrectionFromFunction( double iEmissionHeight, double iEl );
         double getTelescopeDistanceSC( unsigned int iTel1, unsigned int iTel2, double az, double z );
         double imageDistance( double c1x, double c2x, double c1y, double c2y );
-        double interpolate_WL( double ze, double ze1, double ze2, double w1, double w2 );
         string testFileLocation( string iFile, string iDirectory );
-
-	double line_point_distance(double x1, double y1, double z1, double el, double az, double x, double y, double z);
 
     public:
 

@@ -217,7 +217,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 {
 // reset trigger vector
     fNLTrigs = 0;
-    fCut_LTrig.clear();
+    fCut_ImgSelect.clear();
 
 // open text file
     ifstream is;
@@ -241,11 +241,14 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             is_stream >> temp;
             if( temp != "*" ) continue;
             is_stream >> temp;
+//////////////////////////////////////
+// choose gamma/hadron cut selectors and direction cut selector
             if( temp == "cutselection" )
             {
                if( !is_stream.eof() ) is_stream >> fGammaHadronCutSelector;
                if( !is_stream.eof() ) is_stream >> fDirectionCutSelector;
             }
+/////////////////////////////////////
 // single telescope cuts
             if( temp == "alpha" )
             {
@@ -296,6 +299,8 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 fSize_max=(atof(temp.c_str()));
             }
+/////////////////////////////////////
+// stereo ('array') telescope cuts
             if( temp == "arraywidth" )
             {
                 is_stream >> temp;
@@ -317,7 +322,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 fCut_Ntubes_max =(atoi(temp.c_str()));
             }
-            if( temp == "arrayntel" )
+            if( temp == "arrayntel" || "nnimages" )
             {
                 is_stream >> temp;
                 fCut_NImages_min = (atoi(temp.c_str()));
@@ -422,11 +427,11 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 fCut_AverageCoreDistanceToTelescopes_max = (atof(temp.c_str()));
             }
 // these allow to deselect certain telescope combinations (changed from ltrig to ImgSel)
-            if( temp == "arrayltrig" || temp == "selectImageCombination" )
+            if( temp == "arrayltrig" || temp == "allowedImageCombinations" )
             {
                 if( fNTel == 0 || fNTel > 10 )
 		{
-		   cout << "VGammaHadronCuts::readCuts warning: cut identifier " << temp << " not ignored for ";
+		   cout << "VGammaHadronCuts::readCuts warning: cut identifier " << temp << " ignored for ";
 		   cout << "current telescope configuration ( "<< fNTel << "telescopes)" << endl;
 		   continue;
                 }
@@ -440,7 +445,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     }
                     num_ltrigs += 1;
                     fNLTrigs = num_ltrigs;
-                    for( unsigned int i = 0; i < fNLTrigs; i++ ) fCut_LTrig.push_back(1);
+                    for( unsigned int i = 0; i < fNLTrigs; i++ ) fCut_ImgSelect.push_back(1);
                 }
 
                 is_stream >> temp;
@@ -448,11 +453,11 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 if( index < 0 )
                 {
-                    for( unsigned int i = 0; i < fCut_LTrig.size(); i++ ) fCut_LTrig[i] = atoi(temp.c_str());
+                    for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ ) fCut_ImgSelect[i] = atoi(temp.c_str());
                 }
-                else if( index < (int)fCut_LTrig.size() )
+                else if( index < (int)fCut_ImgSelect.size() )
                 {
-                    fCut_LTrig[index] = atoi(temp.c_str());
+                    fCut_ImgSelect[index] = atoi(temp.c_str());
                 }
 
             }
@@ -535,14 +540,16 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 fCut_Emmission_max = atof(temp.c_str());
             }
-            if( temp == "sizesecondmax" )         //AMC
+            if( temp == "sizesecondmax" )     
             {
                 is_stream >> temp;
                 fCut_SizeSecondMax_min = atof(temp.c_str());
                 is_stream >> temp;
                 fCut_SizeSecondMax_max = atof(temp.c_str());
-            }                                     //AMC
-            if( temp == "teltypegroup" )
+            }       
+// telescope type dependent cut on number of images 
+// syntax:  teltype_nnimages <min images> <tel type counter>
+            if( temp == "teltypegroup" || temp == "teltype_nnimages" )
             {
                 fNTelTypeCut.push_back( new VNTelTypeCut() );
                 is_stream >> temp;
@@ -756,7 +763,7 @@ void VGammaHadronCuts::printCutSummary()
         cout << ", " << fCut_MSL_min << " < MLR < " << fCut_MSL_max << ", ";
     }
     cout << "average core distance < " << fCut_AverageCoreDistanceToTelescopes_max << " m";
-    cout << " (min distance to telescopes " << fCut_MinimumCoreDistanceToTelescopes_max << " m)";
+    cout << " (max distance to telescopes (mintel) " << fCut_MinimumCoreDistanceToTelescopes_max << " m)";
 // probability cuts
     if( fGammaHadronCutSelector / 10 >= 1 && fGammaHadronCutSelector / 10 <= 3 )
     {
@@ -813,13 +820,13 @@ void VGammaHadronCuts::printCutSummary()
         cout << "MC cuts: " << fCut_CameraFiducialSize_MC_min << " < fiducial area (camera) < " << fCut_CameraFiducialSize_MC_max << " deg ";
         cout << endl;
     }
-    if( fCut_LTrig.size() > 0 )
+    if( fCut_ImgSelect.size() > 0 )
     {
         cout << "Tel-combinations: ";
-        for( unsigned int i = 0; i < fCut_LTrig.size(); i++ )
+        for( unsigned int i = 0; i < fCut_ImgSelect.size(); i++ )
         {
-            cout << i << ": " << fCut_LTrig[i];
-            if( i < fCut_LTrig.size() - 1 ) cout << ", ";
+            cout << i << ": " << fCut_ImgSelect[i];
+            if( i < fCut_ImgSelect.size() - 1 ) cout << ", ";
         }
         cout << endl;
     }
@@ -990,11 +997,11 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 
 /////////////////////////////////////////////////////////////////////////////////
 // apply image selection cuts (check which telescopes were used in the reconstruction)
-    if( fCut_LTrig.size() > 0 )
+    if( fCut_ImgSelect.size() > 0 )
     {
-        if( fData->ImgSel < fCut_LTrig.size() )
+        if( fData->ImgSel < fCut_ImgSelect.size() )
         {
-            if( !fCut_LTrig[fData->ImgSel] )
+            if( !fCut_ImgSelect[fData->ImgSel] )
             {
                 if( bCount )
                 {
@@ -2050,6 +2057,7 @@ bool VGammaHadronCuts::applyPhaseCut(int i)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cut on number of images per telescope type depend
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 VNTelTypeCut::VNTelTypeCut()
@@ -2067,7 +2075,7 @@ bool VNTelTypeCut::test( CData *c )
    {
       if( fTelType_counter[i] < c->NTtype ) ntel_type += c->NImages_Ttype[fTelType_counter[i]];
    }
-    // OBS! >=
+// OBS! >=
    if( ntel_type >= fNTelType_min ) return true;
 
    return false;

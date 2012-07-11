@@ -89,7 +89,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    string   getLightCurveAxisTitle();
    TH2D*    getRandomizedPhaseogram()      { return fMCRandomizedPhaseogram; }
    TProfile* getRandomizedPhaseogramProf() { return fMCRandomizedPhaseogramProf; }
-   TH1D*    fillObservingIntervallHistogram( bool bPlot = false, double iPlotMax = 10., string iName = "hIntervalls" );
+   TH1D*    fillObservingIntervallHistogram( bool bPlot = false, double iPlotMax = 10., string iName = "hIntervalls", string iTitle = "observing interval distribution" );
    bool     fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFill_days = 20., double iPhaseBinning = 0.025, bool bPlotDebug = false );
    bool     fillRandomizedPhaseogram( double iMCCycles, double iPhaseError_low, double iPhaseErrorUp, string iHisName, double iHisMin_y, double iHisMax_y );
    string   getRateAxisTitle() { return fRateAxisTitle; }
@@ -104,7 +104,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    void     setName( string iName ) { fName = iName; }
    void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
 
-   ClassDef( VLightCurve, 3 );
+   ClassDef( VLightCurve, 4 );
 };
 
 #endif

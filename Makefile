@@ -65,6 +65,7 @@ DBTEST=$(shell root-config --has-mysql)
 ifeq ($(DBTEST),yes)
   DBFLAG=-DRUNWITHDB
 endif
+# DBFLAG=""
 #####################
 # GSL libraries
 #####################
@@ -169,6 +170,10 @@ CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 SC 
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 endif
+########################################################
+# profiler
+########################################################
+#GLIBS        += -lprofiler
 
 ########################################################
 # paths
@@ -219,7 +224,8 @@ VTS:	evndisp \
 	makeRadialAcceptance \
 	calculateBinaryPhases \
 	VTS.calculateCrabRateFromMC \
-	VTS.calculateExposureFromDB
+	VTS.calculateExposureFromDB \
+	compareDatawithMC 
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -623,6 +629,28 @@ PRINTDISPTABLESOBJ= 	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dic
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 printDISPTables:	$(PRINTDISPTABLESOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# compareDatawithMC
+########################################################
+COMPAREDATAMCOBJ=	./obj/VTargets.o \
+                        ./obj/VASlalib.o \
+			./obj/CData.o \
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/VSkyCoordinates.o \
+			./obj/VSkyCoordinatesUtilities.o \
+			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+			./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+			./obj/VUtilities.o \
+			./obj/VDataMCComparision.o \
+			./obj/compareDatawithMC.o
+
+./obj/compareDatawithMC.o:	./src/compareDatawithMC.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+compareDatawithMC:	$(COMPAREDATAMCOBJ)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 

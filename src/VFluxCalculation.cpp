@@ -79,7 +79,7 @@ void VFluxCalculation::reset()
 
 // calculate fluxes above this energy
     fMinEnergy = 0.;
-// maximum energy
+// maximum energy (not clear what defines this value)
     fMaxEnergy = 300.;
 // assumed spectral parameters
     fE0 = 1.;                                     // [TeV]

@@ -1315,9 +1315,13 @@ TCanvas*  VEnergySpectrum::plotCountingHistograms( TCanvas *c )
     TGraph *gErecOn = new TGraph( 1 );
     gErecOn->SetMarkerStyle( 24 );
     gErecOn->SetMarkerColor( 1 );
+    gErecOn->SetLineColor( 1 );
     TGraph *gErecOff = new TGraph( 1 );
     gErecOff->SetMarkerStyle( 25 );
     gErecOff->SetMarkerColor( 2 );
+    gErecOff->SetLineColor( 2 );
+    cout << "Counting histogram on:  color 1" << endl;
+    cout << "Counting histogram off: color 2" << endl;
 
     double i_non = 0.;
     double i_noff = 0.;

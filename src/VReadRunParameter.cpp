@@ -1184,12 +1184,37 @@ void VReadRunParameter::test_and_adjustParams()
     printStartMessage();
 }
 
+void VReadRunParameter::printShortHelp()
+{
+   cout << endl;
+   cout << "Type 'evndisp help' for full list of command line parameters";
+   cout << endl;
+   cout << "VERITAS analysis ";
+   cout << " (please check scripts in directory ./scripts/VTS/)" << endl;
+   cout << endl;
+   cout << "  How to display events: " << endl;
+   cout << endl;
+   cout << "  How to analyse a run" << endl;
+   cout << endl;
+   cout << endl;
+   cout << "CTA analysis: please check scripts in directory ./scripts/CTA" << endl;
+   cout << endl;
+}
+
 
 void VReadRunParameter::printHelp()
 {
-    printStartMessage();
     if( fDebug ) cout << "VReadRunParameter::printHelp()" << endl;
+
+    printStartMessage();
     cout << endl;
+    system( "cat README/README.EVNDISP" );
+
+///////////////////////////////////////////////////////////
+// everything below replaced by README/README.EVNDISP file
+///////////////////////////////////////////////////////////
+
+/*    cout << endl;
     cout << "Command line options:" << endl;
     cout << "=====================" << endl;
     cout << endl;
@@ -1369,7 +1394,7 @@ void VReadRunParameter::printHelp()
     cout << "for installation see file INSTALL" << endl;
     cout << endl;
     cout << "please report any problems and bugs to Gernot Maier or Jamie Holder" << endl;
-    cout << endl;
+    cout << endl; */
 }
 
 

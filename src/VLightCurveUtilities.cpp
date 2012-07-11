@@ -248,14 +248,14 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
 	 cout << "\t Significance: " << fLightCurveData[i]->fSignificance;
 	 cout << "\t Tot Time [h]: " << fLightCurveData[i]->fRunTime/3600.;
 	 cout << endl;
-	 cout << "\tFlux " << fLightCurveData[i]->fFlux;
+	 cout << "\tFlux " << scientific << setprecision( 4 ) << fLightCurveData[i]->fFlux;
 	 cout << " +- " << fLightCurveData[i]->fFluxError << "\tUL " << fLightCurveData[i]->fUpperFluxLimit;
 	 if( fLightCurveData[i]->fRunFluxCI_lo_1sigma >= 0. )
 	 {
 	    cout << "\t CI (1 sigma): " << fLightCurveData[i]->fRunFluxCI_lo_1sigma << "\t" << fLightCurveData[i]->fRunFluxCI_up_1sigma;
 	    cout << "\t CI (3 sigma): " << fLightCurveData[i]->fRunFluxCI_lo_3sigma << "\t" << fLightCurveData[i]->fRunFluxCI_up_3sigma;
 	 }
-	 cout << endl;
+	 cout << fixed << endl;
 	 if( fLightCurveData[i]->fName.size() > 0 ) cout << "\t (" << fLightCurveData[i]->fName << ")" << endl;
       }
    }

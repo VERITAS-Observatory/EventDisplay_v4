@@ -707,6 +707,7 @@ void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax,
                 TMarker *m = new TMarker( al, ab, 5 );
                 m->SetMarkerColor( iMarkerColor );
                 m->SetMarkerStyle( iMarkerStyle );
+		m->SetMarkerSize( 2 );
                 m->Draw();
             }
 

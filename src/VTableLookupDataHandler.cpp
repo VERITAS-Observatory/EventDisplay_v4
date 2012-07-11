@@ -1296,7 +1296,6 @@ void VTableLookupDataHandler::calcDistances( int nimages )
     for( unsigned int tel = 0; tel < fNTel; tel++ )
     {
         fR[tel] = -99.;
-//        fMCR[tel] = -99.;
     }
 // check for successfull reconstruction
     if( nimages < 2 || fZe < 0 ) return;
@@ -1304,16 +1303,8 @@ void VTableLookupDataHandler::calcDistances( int nimages )
 // reconstructed shower core distance
     for( unsigned int tel = 0; tel < fNTel; tel++ )
     {
-        fR[tel] = line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+        fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
     }
-// MC distance
-/*   if( fIsMC )
-    {
-        for( unsigned int tel = 0; tel < fNTel; tel++ )
-        {
-            fMCR[tel] = line_point_distance( fMCycore, -1.*fMCxcore, 0., fMCze, fMCaz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
-        }
-    }  */
 }
 
 
@@ -1732,44 +1723,6 @@ void VTableLookupDataHandler::setNEntries( int iN )
 {
     if( (iN < fNEntries && iN > 0 ) || fNEntries == 0 ) fNEntries = iN;
 }
-
-
-/* ------------------- line_point_distance --------------------- */
-/**
- *  Distance between a straight line and a point in space
- *
- *  @param  x1,y1,z1  reference point on the line
- *  @param  cx,cy,cz  direction cosines of the line
- *  @param  x,y,z     point in space
- *
- *  @return distance
- *
- *
- * OBSERVE:  ground coordinates should be in CORSIKA coordinate system
- *
- *
- */
-double VTableLookupDataHandler::line_point_distance (double x1, double y1, double z1, double ze, double az, double x, double y, double z)
-{
-    double alt = 90. - ze;
-    az = 180. - az;
-
-    double cx = -1.*cos(alt*(TMath::Pi()/180.))*cos(az*(TMath::Pi()/180.));
-    double cy = -1.*cos(alt*(TMath::Pi()/180.))*sin(az*(TMath::Pi()/180.));
-    double cz = sin(alt*(TMath::Pi()/180.));
-
-    double a1 = (y-y1)*cz - (z-z1)*cy;
-    double a2 = (z-z1)*cx - (x-x1)*cz;
-    double a3 = (x-x1)*cy - (y-y1)*cx;
-    double a  = a1*a1 + a2*a2 + a3*a3;
-    double b = cx*cx + cy*cy + cz*cz;
-
-    if ( a<0. || b<= 0. ) return -1;
-
-    return sqrt(a/b);
-}
-
-
 
 
 /* 

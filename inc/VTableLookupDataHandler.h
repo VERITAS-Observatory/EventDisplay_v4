@@ -9,6 +9,7 @@
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VMonteCarloRunHeader.h"
 #include "VTableLookupRunParameter.h"
+#include "VUtilities.h"
 
 #include "TChain.h"
 #include "TChainElement.h"
@@ -159,7 +160,6 @@ class VTableLookupDataHandler
         void   copyMCTree();
 	void   copy_telconfig();
         bool   fillNextEvent( bool bShort );
-        double line_point_distance (double x1, double y1, double z1,  double alt, double az, double x, double y, double z );
 	void   printCutStatistics();
         bool   randomSelected();
         void   resetImageParameters();

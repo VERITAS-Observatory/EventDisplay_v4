@@ -29,11 +29,8 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*
-
-      data class for telescope type dependent multiplicity  cut
-
-*/
+// class for telescope type dependent multiplicity  cut
+////////////////////////////////////////////////////////////////////////////////
 class VNTelTypeCut : public TNamed
 {
    public:
@@ -203,7 +200,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double fCut_MSW_max;
         double fCut_MSL_min;
         double fCut_MSL_max;
-        vector< int > fCut_LTrig;
+        vector< int > fCut_ImgSelect;
         double fCut_CameraFiducialSize_min;
         double fCut_CameraFiducialSize_max;
         bool   bMCCuts;
@@ -297,6 +294,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,31);
+        ClassDef(VGammaHadronCuts,32);
 };
 #endif

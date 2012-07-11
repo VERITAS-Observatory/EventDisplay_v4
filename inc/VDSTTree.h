@@ -225,6 +225,5 @@ class VDSTTree
         int          hasData( int iTelID );
 
 	int         setTelCounter( int iTelID );
-
 };
 #endif

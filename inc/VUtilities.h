@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "TMath.h"
 #include "TSystem.h"
 
 #include "VGlobalRunParameter.h"
@@ -27,5 +28,7 @@ namespace VUtilities
 
    string search_and_replace( string i1, string iO, string iN );
    string testFileLocation( string iFile, string iDirectory, bool bEVNDISPDATA );
+
+   double line_point_distance (double x1, double y1, double z1,  double alt, double az, double x, double y, double z );
 }
 #endif

@@ -10,6 +10,7 @@
 #include "VASlalib.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VInstrumentResponseFunctionRunParameter.h"
+#include "VStatistics.h"
 #include "VSpectralWeight.h"
 #include "VUtilities.h"
 
@@ -97,7 +98,7 @@ class VEffectiveAreaCalculator
         VGammaHadronCuts *fCuts;
         bool fIgnoreEnergyReconstruction;
         bool fIsotropicArrivalDirections;
-	bool fCTA;
+	bool fTelescopeTypeCutsSet;
 
 // effective area calculation
         vector< double > fVMinAz;
@@ -205,7 +206,6 @@ class VEffectiveAreaCalculator
 	double getMCSolidAngleNormalization();
         vector< unsigned int > getUpperLowBins( vector< double > i_values, double d );
         bool   initializeEffectiveAreasFromHistograms( TTree *, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
-        double interpolate_WL( double ze, double ze1, double ze2, double w1, double w2, bool iCos = true );
         vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 	                                            vector< double > iEL, vector< double > iEU, bool iCos = true );
         void   reset();
@@ -235,7 +235,7 @@ class VEffectiveAreaCalculator
         void initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
         void resetHistograms( unsigned int iZe );
         void resetHistogramsVectors( unsigned int iZe );
-     	void setCTA( bool iB = true ) { fCTA = iB; }
+     	void setTelescopeTypeCuts( bool iB = true ) { fTelescopeTypeCutsSet = iB; }
         bool setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
         void setNoiseLevel( int iN, double iP );
         void setWobbleOffset( double x, double y );

@@ -163,8 +163,8 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, doub
        else        sprintf( hname, "hZDCF_sig" );
 
 // histogram values
-       if( taumin < 0. ) taumin = getZDCFData_tau_min( true ) - 5.;
-       if( taumax < 0. ) taumax = getZDCFData_tau_max( true ) + 5.;
+       if( taumin < -9990. ) taumin = getZDCFData_tau_min( true ) - 5.;
+       if( taumax < -9990. ) taumax = getZDCFData_tau_max( true ) + 5.;
 
        hZDCF = new TH1D( hname, "", 100, taumin, taumax );
        hZDCF->SetStats( 0 );

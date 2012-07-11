@@ -247,7 +247,6 @@ double VEnergyCorrection::getTelescopeDistanceSC( unsigned int iTel1, unsigned i
     }
 
     double s[3], t1[3], t2[3];
-// (XX)    double m,d,dist;
 
     az /= degrad;
     z  /= degrad;
@@ -264,49 +263,8 @@ double VEnergyCorrection::getTelescopeDistanceSC( unsigned int iTel1, unsigned i
     t2[1] = fTelY[iTel2];
     t2[2] = fTelZ[iTel2];
 
-    return line_point_distance( t1[0], t1[1], t1[2], z*degrad, az*degrad, t2[0], t2[1], t2[2] );
-/* XX
-
-    m =0.;
-    for( int i = 0; i < 3; i++ ) m += (t1[i]-t2[i])*s[i];
-
-    dist =0.;
-    for( int i = 0; i < 3; i++ )
-    {
-        d = t1[i]+m*s[i]-t2[i];
-        dist += d*d;
-    }
-
-    cout << "Coordinates: " << t1[0] << "\t" << t1[1] << "\t" << t1[2] << "\t" << t2[0] << "\t" << t2[1] << "\t" << t2[2] << "\t" << endl;
-    cout << "DISTANCE (1): " << sqrt( dist ) << endl;
-    cout << "DISTANCE (2): " << line_point_distance( t1[0], t1[1], t1[2], z*degrad, az*degrad, t2[0], t2[1], t2[2] ) << endl;
-    cout << "DISTANCE (3): " << sqrt( (t1[0]-t2[0])*(t1[0]-t2[0]) + (t1[1]-t2[1])*(t1[1]-t2[1]) + (t1[2]-t2[2])*(t1[2]-t2[2]) ) << endl;
-
-    return sqrt( dist ); */
+    return VUtilities::line_point_distance( t1[0], t1[1], t1[2], 90.-z*degrad, az*degrad, t2[0], t2[1], t2[2] );
 }
-
-
-double VEnergyCorrection::line_point_distance(double x1, double y1, double z1, double el, double az, double x, double y, double z)
-{
-    double a, a1, a2, a3, b;
-
-    az = 180. - az;
-
-    double cx = -1.*cos(el*(TMath::Pi()/180.))*cos(az*(TMath::Pi()/180.));
-    double cy = -1.*cos(el*(TMath::Pi()/180.))*sin(az*(TMath::Pi()/180.));
-    double cz = sin(el*(TMath::Pi()/180.));
-
-    a1 = (y-y1)*cz - (z-z1)*cy;
-    a2 = (z-z1)*cx - (x-x1)*cz;
-    a3 = (x-x1)*cy - (y-y1)*cx;
-    a  = a1*a1 + a2*a2 + a3*a3;
-    b = cx*cx + cy*cy + cz*cz;
-
-    if ( a<0. || b<= 0. ) return -1;
-
-    return sqrt(a/b);
-}
-
 
 
 /*!
@@ -381,41 +339,11 @@ double VEnergyCorrection::getEnergyCorrectionFromFunction( double iEmissionHeigh
     if( fDebug )
     {
         cout << "\t" << ze << "\t" << ize_low << "\t" << ize_up << "\t" << fZeDouble.size() << "\t" << iEmissionHeight << "\t" << e_low << "\t" << e_up;
-        cout << "\t" << interpolate_WL( ze, fZeDouble[ize_low], fZeDouble[ize_up], e_low, e_up );
+        cout << "\t" << VStatistics::interpolate( ze, fZeDouble[ize_low], fZeDouble[ize_up], e_low, e_up, true, 0.5, 90. );
         cout << "\t" << fCorrectionCurvesXmin[ize_low] << "\t" << fCorrectionCurvesXmax[ize_low];
         cout << "\t" << fCorrectionCurvesXmin[ize_up] << "\t" << fCorrectionCurvesXmax[ize_up] << endl;
     }
-    return interpolate_WL( ze, fZeDouble[ize_low], fZeDouble[ize_up], e_low, e_up );
-}
-
-
-/*!
-    interpolate between two values
-
-    ze [deg]
-
-    weighted by cos ze
-*/
-double VEnergyCorrection::interpolate_WL( double ze, double ze1, double ze2, double w1, double w2 )
-{
-// don't interpolate if one or two values are not valid
-    if( w1 < -90. && w2 < -90. ) return -99.;
-    else if( w1 > -90. && w2 < -90. ) return w1;
-    else if( w1 < -90. && w2 > -90. ) return w2;
-
-// same zenith angle, don't interpolate
-    if( ze1 == ze2 )
-    {
-        return (w1+w2)/2.;
-    }
-
-// interpolate
-    double id, f1, f2;
-    id = cos( ze1*raddeg ) - cos( ze2*raddeg );
-    f1 = 1. - (cos( ze1*raddeg ) - cos( ze*raddeg )) / id;
-    f2 = 1. - (cos( ze*raddeg ) - cos( ze2*raddeg )) / id;
-
-    return (w1*f1+w2*f2);
+    return VStatistics::interpolate( ze, fZeDouble[ize_low], fZeDouble[ize_up], e_low, e_up, true, 0.5, -90. );
 }
 
 
