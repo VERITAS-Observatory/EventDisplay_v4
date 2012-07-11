@@ -50,7 +50,7 @@ then
   echo "error: analysis parameter file not found: $ANAPAR" 
   exit
 fi
-echo "reading anaysis parameter from $ANAPAR"
+echo "reading analysis parameter from $ANAPAR"
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
 ODIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/$4/"
 mkdir -v -p $ODIR

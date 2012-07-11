@@ -62,7 +62,7 @@ then
   echo "error: analysis parameter file not found: $ANAPAR" 
   exit
 fi
-echo "reading anaysis parameter from $ANAPAR"
+echo "reading analysis parameter from $ANAPAR"
 NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
 ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
