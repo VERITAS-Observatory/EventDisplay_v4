@@ -29,7 +29,7 @@ class VTableCalculator
 // creator: reads or writes table
 // mode can be 'r' or 'w'
         VTableCalculator( int intel = 0 , bool iEnergy = false, bool iPE = false );
-        VTableCalculator( string fpara, string hname, char m, TDirectory *iDir, bool iEnergy, string iInterpolate = "", bool iPE = false, bool iUseMedianEnergy = false );
+        VTableCalculator( string fpara, string hname, char m, TDirectory *iDir, bool iEnergy, string iInterpolate = "", bool iPE = false, bool iUseMedianEnergy = true );
 
 // Destructor
         ~VTableCalculator() {}

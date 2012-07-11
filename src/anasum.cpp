@@ -7,7 +7,6 @@
 */
 
 #include "VAnaSum.h"
-#include "VTargets.h"
 #include "VGlobalRunParameter.h"
 
 #include <getopt.h>
@@ -38,16 +37,9 @@ string fRunParameterfile="runparameter.dat";
 unsigned int analysisType=3;
 // mono analysis only
 int singletel=0;
-// for usage of random generators: see VStereMaps.cpp
+// for usage of random generators: see VStereoMaps.cpp
 int fRandomSeed = 17;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void printTargets()
-{
-    VTargets fTarget;
-    fTarget.printTargets();
-}
-
 
 bool testCommandlineArguments()
 {
@@ -75,7 +67,7 @@ bool testCommandlineArguments()
 
 int main(int argc, char *argv[] )
 {
-    cout << endl << "Veritas Analysis Summary (University of Delaware & DESY) ";
+    cout << endl << "VERITAS Analysis Summary (University of Delaware & DESY) ";
     cout << " (version " << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
     cout <<         "=====================================================================" << endl;
     cout << endl;
@@ -89,7 +81,7 @@ int main(int argc, char *argv[] )
     anasum->initialize( listfilename, singletel-1, runType, outfile, fRandomSeed, fRunParameterfile);
     cout << endl;
 
-// mono analysis
+// mono analysis (GM: DOES NOT WORK ANYMORE)
     if( analysisType == 0 || analysisType == 1 )
     {
         anasum->doMonoAnalysis( (analysisType==1) || (analysisType==5) );
@@ -104,7 +96,7 @@ int main(int argc, char *argv[] )
         cout << endl << "error: unknown run analysisType" << endl;
         exit( -1 );
     }
-// clean up and write things to disk
+// clean up and write results to disk
     anasum->terminate();
 
     cout << endl << "analysis results written to " << outfile << endl;
@@ -120,7 +112,6 @@ int parseOptions(int argc, char *argv[])
         static struct option long_options[]=
         {
             {"help", no_argument, 0, 'h'},
-            {"printtargets", no_argument, 0, 'p'},
             {"runlist", required_argument, 0, 'l'},
             {"analysisType", required_argument, 0, 'm'},
             {"outfile", required_argument, 0, 'o'},
@@ -132,7 +123,7 @@ int parseOptions(int argc, char *argv[])
             {0,0,0,0}
         };
         int option_index=0;
-        int c=getopt_long(argc, argv, "h:l:m:o:d:s:r:i:u:f:p:g", long_options, &option_index);
+        int c=getopt_long(argc, argv, "h:l:m:o:d:s:r:i:u:f:g", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
         switch(c)
@@ -167,9 +158,6 @@ int parseOptions(int argc, char *argv[])
             case 'l':
                 listfilename=optarg;
                 break;
-            case 'p':
-                printTargets();
-                exit( 0 );
             case 'r':
                 fRandomSeed = atoi( optarg );
                 break;

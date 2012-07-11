@@ -427,7 +427,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 if( fNTel == 0 || fNTel > 10 )
 		{
 		   cout << "VGammaHadronCuts::readCuts warning: cut identifier " << temp << " not ignored for ";
-		   cout << "current telescope configuration ("<< fNTel << "telescopes)" << endl;
+		   cout << "current telescope configuration ( "<< fNTel << "telescopes)" << endl;
 		   continue;
                 }
 // calculate how many possible telescope combinations exist

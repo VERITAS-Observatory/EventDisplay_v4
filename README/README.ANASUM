@@ -7,7 +7,7 @@ required options are:
 
 optional options are:
 	-o --outfile       [output ROOT file name (default output.root)]
-	-i --infile        [read anasum outputfile, redo combined plots only]
+	-i --runType       [type of input data: 0 (default) = mscw files; 1 = anasum single run result files]
 	-u --infile        [read anasum outputfile, do the calculations for new runs and redo combined plots (data directory with option -l is required)]
 	-r --randomseed    [seed for random generator, default=17]
 	-f --parameterfile [run parameter file, default=runparameter.dat]
