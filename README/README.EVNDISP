@@ -1,175 +1,83 @@
 EVENTDISPLAY - IACT event analysis and display
 ==============================================
+calibrate and parametrize images, event reconstruction, stereo analysis
 
-$EVNDISPSYS/bin/evndisp - calibrate and parametrize images, event reconstruction, stereo analysis
+----------------------------------------------
 
-Command line options:
-=====================
+For installation see README file README/INSTALL
 
-(observe: default values are good for a standard analysis)
+For a detailed description of the command line parameters see
+README/README.EVNDISP.commandline
 
-General:
---------
-	 -runmode=0-6 		 0=analysis (default)
-	              		 1=pedestal calculation (high gain channels)
-	              		 2=gain/toffset calculation (high gain channels)
-	              		 3=trace library
-	              		 4=write dstfile
-	              		 5=gain/toffset calculation (low gain channels)
-	              		 6=pedestal calculation (low gain channels)
-	 -sourcefile FILENAME 	 full path + filename
-	 -sourcetype=0-7 	 source data file format
-	              		 0=rawdata
-	              		 1=GrIsu Monte Carlo (ascii file)
-	              		 2=MC in vbf/cvbf format
-	              		 3=rawdata in vbf/cvbf format (default)
-	              		 4=DST (data)
-	              		 5=multiple GrISu MC files
-	              		 6=PE file
-	              		 7=DST (MC) file
-	 -runnumber=INT 	 set runnumber (default: get run number from sourcefile name)
-	 -useDBinfo		 get run info (target, wobble offsets, etc.) from database (attention, this might overwrite some of the given command line parameters, default: on, switch of with -donotusedbinfo )
-	 -teltoana=INT 	 analyze only this telescope (Telescope 1=1,..., Telescopes 2 and 3 = 23, Telescopes 1,2,4 = 124, default 1234)
-	 -output FILE.root 	 file with analysis results (FILE=-1 means no output) (default=RUNNUMBER.root)
-	 -nevents=NEVENTS 	 loop over NEVENTS events in display=0 mode (<0 = no limit) (default=-10000)
-	 -reconstructionparameter FILENAME 	 file with reconstruction parameters (e.g., array analysis cuts)
+For a more detailed (but very incomplete) documentation, see
+./doc/Manual.pdf
 
-Detector definition:
---------------------
-	 -ntelescopes=INT 	 number of telescopes (any integer, default 4)
-	 -camera=CAMERA 	 set detector geometry file (default=veritasBC4_080117_Autumn2007-4.1.2_EVNDISP.cfg)
-	 -vbfnsamples 	 use number of FADC samples from VBF file (default=0)
+----------------------------------------------
 
-Calibration:
-------------
-	 -calibrationfile FILENAME 	 file with names of pedestal/gain/toffset/pixel status files (assume path ../data/calibration/calib.dat)
-	--------------------------
-	 -gaincorrection=FLOAT 	 apply correction to gains (default=1)
-	 -usepeds 		 use only true pedestal events (event type=2; use -donotusepeds to switch it off)
-	 -lasermin=INT 		 minimal total charge sum for a event to be a laser event (default=50000)
-	 -l2setspecialchannels FILENAME 	 set special channels for l2 feed into FADC crates (default=specialChannel.dat)
-	 -l2timecorrect=0/1 	 apply FADC stop time corrections based on L2 pulses (default=true)
-	--------------------------
-	 -usePedestalsInTimeSlices=0/1 	 use time dependent pedestals (high gain channels) (default = on(1))
-	 -usePedestalsInTimeSlicesLowGain=0/1 	 use time dependent pedestals (low gain channels) (default = off(0))
-	 -PedestalsInTimeSlices 	 calculate pedestals on short time scale (default=false)
-	 -PedestalsLengthOfTimeSlice=FLOAT 	 length of time slices for pedestal variations (default=180s)
-	 -PedestalsInTimeSlicesSumWindow=INT 	 length of sum window for pedestal variations (default=4)
-	 -PedestalsInTimeSlicesSumFirst=INT 	 start of sum window for pedestal variations (default=0)
-	--------------------------
-	 -deadchannelfile FILE 	 read this file with dead channel definitions (default=deadChannelDefinition.dat)
+Required options for VERITAS [VTS] analysis are:
 
-Pointing: 
----------
-	 -elevation 		 telescope elevation (preli)
-	 -azimuth 		 telescope azimuth (preli)
-	 -target TARGET 	 telescope is pointed to this target (use -print targets to print available targets)
-	 -printtargets 		 print available targets
-	 -declination=DEC 	 target is at this declination (J2000)
-	 -rightascension=RA 	 target is at this right ascension (J2000)
-	 -decoffset=DEC 	 offset added to target declination (degrees)
-	 -raoffset=RA 		 offset added to target right ascension (degrees - e.g. +/- 7.5 for 30 minutes OFF source)
-	 -wobblenorth=FLOAT 	 wobble offset NORTH (degrees)
-	 -wobbleeast=FLOAT 	 wobble offset EAST (degrees)
-	 -checkpointing=FLOAT 	 abort of difference between calculated pointing direction and vbf pointing direction is larger than this value
-				 ([deg], default=999 deg)
-	 -pointingErrorX=INT:FLOAT 	 take pointing error in array reconstruction into account
-					 (camera x-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorX=1:0.05)
-					 (NOTE: experts only; option disables reading of pointing values from the DB)
-	 -pointingErrorY=INT:FLOAT 	 take pointing error in array reconstruction into account
-					 (camera y-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorY=1:0.05)
-					 (NOTE: experts only; option disables reading of pointing values from the DB)
-	 -useDBtracking 	 use database to calculate pointing errors (default: on, switch off with -usenodbtracking )
-	 -useTCorrectionfrom SQL-DATE 	 use pointing calculated with T-point correction valid for this data (default: not applied, example: -useTCorrectionfrom "2007-10-10"
-	 -pointingmonitortxt DIRECTORY 	 find pointing monitor text files in this directory (default: not applied, expect filename as pointing_VPM.37195.t1.dat)
-	 -usedbvpm 		 use calibrated pointing monitor data from DB
-	 -dstfile FILENAME 	 name of dst output file (root file, default: dstfile.root)
-	 -dstallpixel=INT 	 write data from all pixels to dst files (0: write image/border pixel only; default: 1)
------------------------
+	-runnumber=<RUNNUMBER>         [number of the run to analyse]
+	   or
+        -sourcefile <source file name> [name of the vbf file to analyse]
 
-FADC pulse integration:
------------------------
-	 -sumfirst=INT 		 start of summation window (default=2)
-	 -sumwindow=INT 	 length of summation window (default=18)
-	 -fixwindowstart 	 fix the start of the integration window to -sumfirst=INT (do not move according to pulse position, incompatible with doublepass, default: off)
-	 -tracefit=FLOAT 	 fit FADC traces (-1.=off(default),0=fit all PMTs, >0: fit PMTs with peak value > tracefit x pedestal rms
-	 -fitfunction=FIFU 	 fit function to fit FADC traces (ev or grisu)
-	 Double pass options:
-	 -doublepass 		 optimize sum window parameters (default: on, use -nodoublepass to switch off)
-	 -tracewindowshift=INT 	 shift the summation window by value (in doublepass: low gain channels only, default: -1 (0 for -fixwindowstart))
-	 -tracedefinesmallpulse=INT 	 use double pass window placement for pulses with maximum smaller than this value (default: 15 d.c.)
-	 -sumwindow_doublepass=INT 	 length of summation window for second pass in double pass method (default=12)
-	 -MC_FADCTraceStart=INT 	 MC FADC trace start (observe: nsamples+MC_FADCTraceStart<n_simulated_samples; default=0)
------------------------
+	see $EVNDISPSYS/scripts/VTS for scripts for calibration, analysis and
+	efficient submission of a large number of jobs to a computing cluster
 
-Image cleaning and calculation:
--------------------------------
-	 -useFixedThresholds 	 use fixed image/border thresholds (default: off, use multiples of pedestal variations)
-	 -imagethresh=FLOAT 	 image threshold (default=5)
-	 -borderthresh=FLOAT 	 border threshold (default=2.5)
-	 -brightnonimage=FLOAT 	 bright non image threshold (default=2.5)
-	 -useTimeCleaning 	 use advanced time cleaning (default: off)
-	 -timecutpixel=FLOAT 	 time cut between pixels (default=0.5)
-	 -timecutcluster=FLOAT 	 time cut between cluster (default=2) 
-	 -minpixelcluster=INT 	 minimum number of pixels in cluster (default=3)
-	 -loops=INT 		 number of loops for border pixel finding (default=2)
-	 -smoothdead 		 smooth over dead pixels
-	 -logl=0/1/2 		 perform loglikelihood image parameterisation 0=off,1=on,2=on with minuit output (default=off)
-	 -loglminloss=FLOAT 	  perform loglikelihood image parameterisation for images with loss > values (default=off=1.)
-	 -fuifactor=FLOAT 	 fraction of image/border pixel under image ellipse fact (default=2)
-	 -padrun=RUN 		 padding run number
+Required options for CTA [CTA] analysis are:
 
-Parallaxwidth calculation
---------------------------
-	 -PWmethod=-1/0/1/2, 	 default = -1
-		 -1 = no trigger-map parameters calculated
-		 0 = cleaned CFD hits, requiring center pixels to have at least PWcleanNeighbors
-		 1 = cleaned CFD hits, center + nearest neighbor pixels are accepted in the map
-		 2 = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors
-		 3 = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors, nearest-neighbor pixels are also accepted in the trigger map
-	 -PWcleanNeighbors=0/1/2/3...
-	 	 sets the number of neighbors required for a pixel to survive cleaning, default = 2
-	 -PWcleanThreshold=FLOAT  software cleaning threshold to use for method 3, default = 26
-	 -PWlimit=0...INT, 	 limits the number of pixels PER trigger-sector transmitted to the moment-generating function. Setting of 0 transmits all pixels. Default: 0
+        -sourcefile <source file name> [name of the EVNDISP DST file to analyse]
 
-Display options:
-----------------
-	 -display=0/1 		 show eventdisplay (default=0)
-	 -loop 			 infinite loop (default=0)
-	 -highres 		 large display
-	 -photodiode 		 show photodiode
-	 -plotraw 		 fast plotting without pedestals/gains/toffsets
-	 -plotpaper 		 clean plots for talks/papers (no dead channels, no small text, ..., default=false)
-	 -plotmethod=INT 	 results of this array reconstrutions are shown in 'all in one' display (default=0)
---------------------------
+	sim_telarray files can be converted to EVNDISP DST format with 
+	$EVNDISPSYS/bin/CTA.convert_hessio_to_VDST 
 
-Simulations: 
--------------
-	 -isMC=0/1/2 		 source data is MC (not/write all MC events/only triggered MC events, default=0)
-	 -teleNoff=INT 		 offset in telescope counting (default: first tel. = 1; for grisu MC raw files only)
-	 -sampleoff=INT 	 offset in FADC sample reading (default: 0)
-	 -tracelib FILE.root 	 trace library file for MC background creation
-	 -ignoredead 		 ignore dead channel labeling in camera configuration files (default=false)
-	 -ndeadchannel=INT 	 number of pixels to set randomly dead (default=0)
-	 -seedndead=INT 	 seed for setting pixels randomly dead (default=0)
-	 -ndeadboard=INT 	 number of boards to set randomly dead (default=0)
-	 -fadcscale=float 	 scale factor for traces (default=1.)
-	 -pedestalseed=int 	 seed for pedestal calculation (default=0)
-	 -pedestalfile FILENAME 	 use pedestals from P lines in this pedestal file (default: Off)
-	 -pedestalnoiselevel=int 	 GrIsu noise level used for external pedestal file (default=250)
-	 -pedestalDefaultPedestal=float 	  GrIsu default pedestals used in simulations (default=15.)
-	 -writeallMC 		 write all events to showerpars and tpars trees (default: off)
-	--------------------------
+Option to display events:
 
-Others:
--------
-	 -debug 		 print lots of debug output
-	 -muon 			 search for muon rings
-	 -frogs 			 use frogs template analysis
-	 -user USERNAME 	 username
+	-display=<0=off/1=on>          [open the display to look at events]
 
+----------------------------------------------
 
-for installation see file INSTALL
+Required auxilliary files:
 
-please report any problems and bugs to Gernot Maier or Jamie Holder
+   global run parameters (e.g. observatory location and links to database)
+   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.global.runparameter
+
+   analysis and reconstruction parameter file, see e.g.
+   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.reconstruction.runparameter
+
+Optional auxiliary files:
+
+   [VTS] list of special channels (e.g. L2 channels, channels to remove from the analysis)
+   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.specialchannels.dat
+
+   [VTS] list of criteria to find malfunctioning channels
+   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.validchannels.dat
+
+----------------------------------------------
+
+Calibration data:
+
+   [VTS] Calibration files (relative gains and time offsets, pedestals) are located in
+   $VERITAS_EVNDISP_ANA_DIR/Calibration/Tel_NN
+
+   [VTS] Run numbers for low-gain calibration:
+   $VERITAS_EVNDISP_ANA_DIR/Calibration/calibrationlist.LowGain.dat
+
+   [VTS] The following file is ONLY needed in case non-standard flasher files are used
+   (or no connection to the VERITAS DB could be established):
+   $VERITAS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
+
+   [CTA] No calibration files are needed (data is included in EVNDISP DST files)
+
+----------------------------------------------
+
+Detector configuration:
+
+   [VTS] Detector configuration files (with telescope positions, pixel positions, etc):
+   $VERITAS_EVNDISP_ANA_DIR/DetectorGeometry/*.cfg
+
+   [CTA] Detector configuration is read from EVNDISP DST file (telconfig tree)
+   
+----------------------------------------------
+
+Please report any problems and bugs to Gernot Maier or Jamie Holder
 

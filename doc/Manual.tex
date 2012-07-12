@@ -359,6 +359,54 @@ selector & \\
 \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+
+\section{Cut variables}
+
+\subsubsection{nnimages: Minimum number of images (telescope type independent)}
+
+\begin{description}
+\item[Name] nnimages
+\item[Type] Integer
+\item[Comparator] {\it greater equal } $(\geq)$
+\item[Range] 0 to maximum number of telescopes
+\item[Default] 2
+\item[Example]  {\it nnimages 2}   (at least 2 images)
+\end{description}
+
+Note that the  {\it teltype\_nnimages} cut can overwrite this cut (if {\it nnimages $<$ teltype\_nnimages}).
+
+\subsubsection{teltype\_nnimages: Minimum number of images (telescope type dependent)} 
+
+\begin{description}
+\item[Name] teltype\_nnimages
+\item[Type] Integer
+\item[Comparator] {\it greater equal } $(\geq)$
+\item[Range] 0 to number of telescope for the given telescope type
+\item[Default] off
+\item[Example]  {\it teltype\_nnimages 4 2 3}   (at least 4 images for telescope type 2 and 3)
+\end{description}
+
+Note that the  {\it nnimages} cut can overwrite this cut (if {\it nnimages $>$ teltype\_nnimages}).
+
+\subsubsection{corearea: cut on location of core position}
+
+\begin{lstlisting}
+corearea <distance to array center X_min>  <distance to array center X_max> 
+         <distance to array center Y_min>  <distance to array center Y_max>
+         [optional: max allowed distance to edge of array]
+\end{lstlisting}
+
+\begin{description}
+\item[Name] corearea
+\item[Type] Floats
+\item[Unit] meter
+\item[Comparator] {\it greater  } $(>)$
+\item[Default] off
+\item[Example (box cut on core):] {\it corearea -300 300. -400. 400}
+\item[Example (edge cut only):] {\it corearea -1.e10 e.1e10 -1.e10 1.e10 250.}
+\end{description}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -646,7 +694,7 @@ NOTE: The image cleaning thresholds can be specified in the file
 
 {\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter}
 
-file either for all telescopes to the same values or for each telescope type seperately
+file either for all telescopes to the same values or for each telescope type separately
 (see section XXXX). 
 
 \paragraph{Input}

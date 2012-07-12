@@ -51,12 +51,15 @@ int main( int argc, char *argv[] )
 
     cout << endl;
     cout << "mscw_energy (" << fTLRunParameter->getEVNDISP_VERSION() << ")" << endl;
+    cout << "=======================" << endl;
     cout << endl;
+
+    if( !fTLRunParameter->fillParameters( argc, argv ) ) exit( 0 );
+
     cout << "calculation of mean scaled width and length, and energy with lookup tables" << endl;
     cout << "--------------------------------------------------------------------------" << endl;
     cout << endl;
 
-    if( !fTLRunParameter->fillParameters( argc, argv ) ) exit( 0 );
     if( fTLRunParameter->printpara.size() > 0 )
     {
         printParametersFromFile( fTLRunParameter->printpara );

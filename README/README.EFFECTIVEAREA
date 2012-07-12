@@ -1,16 +1,32 @@
-EVENTDISPLAY - IACT event analysis and display - effective area calculation
-===========================================================================
+makeEffectiveArea - determination of effective areas and instrument response functions
+======================================================================================
 
-$EVNDISPSYS/bin/makeEffectiveArea
+Executable: $EVNDISPSYS/bin/makeEffectiveArea
+
+Input data is in the form of result file from the lookup table analysis ( *.mscw.root files )
 
 Command line syntax:
 
-makeEffectiveArea <runparameter file> <output effective area file>
+    makeEffectiveArea <runparameter file> <name of output effective area ROOT file>
 
-see scripts for typical usage:
+---------------------------------------------------
 
-$EVNDISPSYS/scripts/CTA/CTA.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/CTA/CTA.EFFAREA.qsub_analyse.sh
+Required auxilliary files:
 
-or
+   file with analysis run parameters
+       see example $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EFFECTIVEAREA.runparameter
 
-$EVNDISPSYS/scripts/VTSVTS.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/VTSVTS.EFFAREA.qsub_analyse.sh
+   definition of gamma/hadron cuts
+       see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.GammaHadron.dat
+
+---------------------------------------------------
+
+for effiecent usage, see scripts for typical usage:
+
+[VTS] $EVNDISPSYS/scripts/VTS/VTS.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/VTS/VTS.EFFAREA.qsub_analyse.sh
+
+[CTA] $EVNDISPSYS/scripts/CTA/CTA.EFFAREA.sub_analyse.sh and $EVNDISPSYS/scripts/CTA/CTA.EFFAREA.qsub_analyse.sh
+
+--------------------------------------------------------
+
+Please report any problems and bugs to Gernot Maier or Jamie Holder

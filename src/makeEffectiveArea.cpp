@@ -59,7 +59,7 @@ int main( int argc, char *argv[] )
     if( argc != 3 )
     {
 	cout << endl;
-	cout << "makeEffectiveArea <runparameter file> <output effective area file> " << endl;
+	system( "cat $EVNDISPSYS/README/README.EFFECTIVEAREA" );
 	cout << endl;
 	exit( 0 );
     }
