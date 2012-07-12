@@ -984,8 +984,9 @@ $(ctapara):
 	rm -rf $(ctapara).tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(ctapara)
-	cp -r $(CTA_EVNDISP_ANA_DIR)/AstroData/Catalogues $(ctapara)
-	cp -r $(CTA_EVNDISP_ANA_DIR)/AstroData/TeV_data $(ctapara)
+	mkdir -p $(ctapara)/AstroData
+	cp -r $(CTA_EVNDISP_ANA_DIR)/AstroData/Catalogues $(ctapara)/AstroData
+	cp -r $(CTA_EVNDISP_ANA_DIR)/AstroData/TeV_data $(ctapara)/AstroData
 	mkdir -p $(ctapara)/DetectorGeometry
 	cp -r $(CTA_EVNDISP_ANA_DIR)/DetectorGeometry/CTA.prod1* $(ctapara)/DetectorGeometry/
 	mkdir -p $(ctapara)/ParameterFiles
@@ -997,9 +998,10 @@ $(ctapara):
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/scriptsInput.runparameter $(ctapara)/ParameterFiles
-	mkdir -p $(ctapara)/RadialAcceptances
-	mkdir -p $(ctapara)/Calibration
-	mkdir -p $(ctapara)/EffectiveAreas
+	mkdir -p $(ctapara)/RadialAcceptances/
+	mkdir -p $(ctapara)/Calibration/
+	mkdir -p $(ctapara)/EffectiveAreas/
+	mkdir -p $(ctapara)/Tables/
 
 #########################################
 # VTS
