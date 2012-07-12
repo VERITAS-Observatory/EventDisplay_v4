@@ -1,4 +1,5 @@
-# Makefile for evndisp
+##########################################################################
+# Makefile for eventdisplay analysis package
 #
 #  shell variables needed:
 #    ROOTSYS (pointing to root installation)
@@ -19,10 +20,8 @@
 #  for using HESSIO
 #    HESSIOSYS (pointing to HESSIO installation)
 #
-# Revision $Id: Makefile,v 1.1.2.2 2011/04/21 10:48:39 gmaier Exp $
-#
 # Gernot Maier 
-#
+##########################################################################
 SHELL = /bin/sh
 ARCH = $(shell uname)
 
@@ -971,6 +970,7 @@ FORCEDISTDIR:
 # make a tar package with all run parameter files
 ###############################################################################################################################
 
+#########################################
 # CTA
 
 CTA.runparameter:	$(ctapara).tar.gz
@@ -992,6 +992,7 @@ $(ctapara):
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.QC.* $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVAFixedSignal.* $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVA.* $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
@@ -1000,6 +1001,7 @@ $(ctapara):
 	mkdir -p $(ctapara)/Calibration
 	mkdir -p $(ctapara)/EffectiveAreas
 
+#########################################
 # VTS
 
 VTS.runparameter:	$(vtspara).tar.gz
@@ -1041,6 +1043,7 @@ $(vtspara):
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.runlist $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.QADC.runparameter $(vtspara)/ParameterFiles
