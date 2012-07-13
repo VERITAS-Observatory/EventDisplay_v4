@@ -32,9 +32,12 @@ then
 elif [ $4 = "v_leeds" ]
 then
    VPART=( "proton" )
-else
+elif [ $4 = "DESY3700m" ]
+then
    VPART=( "proton" )
-   VPART=( "gamma_onSource" "electron" "proton" )
+else
+#   VPART=( "gamma_onSource" "electron" "proton" )
+   VPART=( "proton" )
 fi
 NPART=${#VPART[@]}
 
