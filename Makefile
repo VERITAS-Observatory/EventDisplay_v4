@@ -215,7 +215,6 @@ VTS:	evndisp \
 	combineLookupTables \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
-	trainTMVAforGammaHadronSeparation_TrainingFile \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	slib \
@@ -233,9 +232,9 @@ CTA:	evndisp \
 	combineLookupTables \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
-	trainTMVAforGammaHadronSeparation_TrainingFile \
 	slib \
 	writeCTAWPPhysSensitivityFiles
+
 
 ########################################################
 # eventdisplay
@@ -541,7 +540,7 @@ ifneq ($(FITS),FALSE)
   SHAREDOBJS	+= ./obj/VFITS.o # ../obj/VFITS_Dict.o
 endif
 
-slib lsib:   $(SHAREDOBJS)
+slib lsib ./lib/libVAnaSum.so:   $(SHAREDOBJS)
 	mkdir -p ./lib
 	$(LD) $(SOFLAGS) $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
 ifneq ($(ROOT_MINUIT2),yes)
@@ -658,7 +657,7 @@ compareDatawithMC:	$(COMPAREDATAMCOBJ)
 ########################################################
 WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/writeCTAWPPhysSensitivityFiles.o \
-			$(EVNDISPSYS)/lib/libVAnaSum.so
+			./lib/libVAnaSum.so
 
 ./obj/writeCTAWPPhysSensitivityFiles.o: 	./src/writeCTAWPPhysSensitivityFiles.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -939,6 +938,7 @@ $(distdir):	FORCEDISTDIR
 	cp setObservatory.tcsh $(distdir)
 	mkdir -p $(distdir)/obj
 	mkdir -p $(distdir)/bin
+	mkdir -p $(distdir)/lib
 	mkdir -p $(distdir)/README
 	cp README/README* $(distdir)/README
 	cp README/INSTALL $(distdir)/README

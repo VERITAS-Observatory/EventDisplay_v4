@@ -555,7 +555,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias( string iM
     plotEnergyReconstructionBias( iM, ymin, ymax, true );
 }
 
-void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string iM, double ymin, double ymax, bool iLogBias )
+TCanvas* VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string iM, double ymin, double ymax, bool iLogBias )
 {
     char hname[200];
     char htitle[200];
@@ -589,7 +589,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string iM, d
     {
        if( iLogBias )
        {
-	  if( iM == "mean"   && fData[i]->gEnergyLogBias_Mean )
+	  if( iM == "mean" && fData[i]->gEnergyLogBias_Mean )
 	  {
 	     fData[i]->gEnergyLogBias_Mean->Draw( "p" );
 	     if( fDebug ) fData[i]->gEnergyLogBias_Mean->Print();
@@ -599,11 +599,11 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string iM, d
 	     fData[i]->gEnergyLogBias_Median->Draw( "p" );
 	     if( fDebug ) fData[i]->gEnergyLogBias_Median->Print();
 	  }
-	  else cout << "no (log) graph found" << endl;
+	  else cout << "no (log) graph found (" << iM << ")" << endl;
        }
        else
        {
-	  if( iM == "mean"   && fData[i]->gEnergyBias_Mean )
+	  if( iM == "mean" && fData[i]->gEnergyBias_Mean )
 	  {
 	     fData[i]->gEnergyBias_Mean->Draw( "p" );
 	     if( fDebug ) fData[i]->gEnergyBias_Mean->Print();
@@ -613,9 +613,11 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string iM, d
 	     fData[i]->gEnergyBias_Median->Draw( "p" );
 	     if( fDebug ) fData[i]->gEnergyBias_Median->Print();
 	  }
-	  else cout << "no (log) graph found" << endl;
+	  else cout << "no (lin) graph found (" << iM << ")" << endl;
        }
     }
+
+    return iEnergySystematicsPlottingCanvas;
 }
 
 TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int iDataSetID, string iXaxis, string iProbabilityString )

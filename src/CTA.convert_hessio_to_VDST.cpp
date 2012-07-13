@@ -861,7 +861,7 @@ int main(int argc, char **argv)
    cout << endl;
    cout << "CTA.convert_hessio_to_VDST: A program to convert hessio data to EVNDISP DST files";
    cout << " (" << VGlobalRunParameter::fEVNDISP_VERSION << ")" << endl;
-   cout << " (based on a skeleton program distributed with the hessio package)
+   cout << " (based on a skeleton program distributed with the hessio package)" << endl;
    cout << "=====================================================================" << endl;
    cout << "(SVN " << VGlobalRunParameter::fEVNDISP_SVNREVISION << ")" << endl;
    

@@ -186,8 +186,8 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 // energy resolution
     h = 0;
     gEnergyResolution = new TGraphErrors( 1 );
-    h = get_CTA_IRF_Histograms( "ERes", fWoff );
-    if( !h ) h = get_CTA_IRF_Histograms( "EnResol_RMS", fWoff );
+    h = (TH1F*)get_CTA_IRF_Histograms( "ERes", fWoff );
+    if( !h ) h = (TH1F*)get_CTA_IRF_Histograms( "EnResol_RMS", fWoff );
     if( h )
     {
        get_Graph_from_Histogram( h, gEnergyResolution, true );
@@ -198,11 +198,11 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 // 68% angular resolution
     h = 0;
     gAngularResolution = new TGraphErrors( 1 );
-    h = get_CTA_IRF_Histograms( "AngRes", fWoff );
+    h = (TH1F*)get_CTA_IRF_Histograms( "AngRes", fWoff );
 // try Paris style file
     if( !h )
     {
-       h = get_CTA_IRF_Histograms( "AngResolution68", fWoff );
+       h = (TH1F*)get_CTA_IRF_Histograms( "AngResolution68", fWoff );
 // arcmin -> deg
        if( h ) 
        {
@@ -219,11 +219,11 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 // 80% angular resolution
     h = 0;
     gAngularResolution80 = new TGraphErrors( 1 );
-    h = get_CTA_IRF_Histograms( "AngRes80", fWoff );
+    h = (TH1F*)get_CTA_IRF_Histograms( "AngRes80", fWoff );
 // try Paris style file
     if( !h )
     {
-       h = get_CTA_IRF_Histograms( "AngResolution80", fWoff );
+       h = (TH1F*)get_CTA_IRF_Histograms( "AngResolution80", fWoff );
 // arcmin -> deg
        if( h ) 
        {
@@ -388,9 +388,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bias
-       gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelative2D, 0, "mean", 1, -10., 1. );
+       gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 1. );
        setGraphPlottingStyle( gEnergyBias_Mean );
-       gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelative2D, 0, "median", 1, -10., 1. );
+       gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "median", 1, -10., 1. );
        setGraphPlottingStyle( gEnergyBias_Median, 1, 1., 7 );
        gEnergyLogBias_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
        setGraphPlottingStyle( gEnergyLogBias_Mean, 1, 1., 7 );
