@@ -147,7 +147,8 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
    fEres = new TH1F( hname, "Energy resolution", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fEres->SetXTitle( "log_{10} (E/TeV)" );
-   fEres->SetYTitle( "Relative Energy resolution (68% containment around Eres/Etrue=1)" );
+//   fEres->SetYTitle( "Relative Energy resolution (68% containment around Eres/Etrue=1)" );
+   fEres->SetYTitle( "energy resolution (RMS)" );
    hisList.push_back( fEres );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEres );
 

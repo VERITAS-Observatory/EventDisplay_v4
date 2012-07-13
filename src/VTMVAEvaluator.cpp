@@ -164,7 +164,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // allow that first files are missing (this happens when there are no training events in the first energy bins)
           if( i == iMinMissingBin )
 	  {
-	      cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found or incomplete file: " << endl;
+	      cout << "VTMVAEvaluator::initializeWeightFiles() warning: TMVA root file not found or incomplete file (" << i << ") " << endl;
 	      cout << iFullFileName.str() << endl;
 	      cout << "  assume this is a low-energy empty bin (bin number " << i << ";";
 	      cout << " number of missing bins: " << iMinMissingBin+1 << ")" << endl;

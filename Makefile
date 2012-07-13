@@ -960,6 +960,7 @@ $(distdir):	FORCEDISTDIR
 	mkdir -p $(distdir)/scripts/VTS
 	mkdir -p $(distdir)/scripts/CTA
 	cp -r scripts/CTA/*.sh $(distdir)/scripts/CTA
+	cp -r scripts/CTA/subArray.list $(distdir)/scripts/CTA
 	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
 
 FORCEDISTDIR:
@@ -993,7 +994,7 @@ $(ctapara):
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.QC.* $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVAFixedSignal.* $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVA.* $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
@@ -1051,12 +1052,13 @@ $(vtspara):
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.QADC.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(vtspara)/ParameterFiles
 	mkdir -p $(vtspara)/RadialAcceptances
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/radialAcceptance-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/RadialAcceptances/
 	mkdir -p $(vtspara)/EffectiveAreas
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/EffectiveAreas/effArea-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/EffectiveAreas/
 	mkdir -p $(vtspara)/Tables
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20120410_GrIsu_ATM21_V5_ID0.* $(vtspara)/Tables/
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20120628_GrIsuApr12*.* $(vtspara)/Tables/
 
 ###############################################################################################################################
 # print environment and compilation parameters

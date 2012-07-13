@@ -233,6 +233,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
     }
     string is_line;
     string temp;
+    string iCutVariable;
     while( getline( is, is_line ) )
     {
         if(  is_line.size() > 0 )
@@ -240,59 +241,59 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             istringstream is_stream( is_line );
             is_stream >> temp;
             if( temp != "*" ) continue;
-            is_stream >> temp;
+            is_stream >> iCutVariable;
 //////////////////////////////////////
 // choose gamma/hadron cut selectors and direction cut selector
-            if( temp == "cutselection" )
+            if( iCutVariable == "cutselection" )
             {
                if( !is_stream.eof() ) is_stream >> fGammaHadronCutSelector;
                if( !is_stream.eof() ) is_stream >> fDirectionCutSelector;
             }
 /////////////////////////////////////
 // single telescope cuts
-            if( temp == "alpha" )
+            else if( iCutVariable == "alpha" )
             {
                 is_stream >> temp;
                 fAlpha_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fAlpha_max=(atof(temp.c_str()));
             }
-            if( temp == "length" )
+            else if( iCutVariable == "length" )
             {
                 is_stream >> temp;
                 fLength_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fLength_max=(atof(temp.c_str()));
             }
-            if( temp == "width" )
+            else if( iCutVariable == "width" )
             {
                 is_stream >> temp;
                 fWidth_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fWidth_max=(atof(temp.c_str()));
             }
-            if( temp == "los" )
+            else if( iCutVariable == "los" )
             {
                 is_stream >> temp;
                 fLos_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fLos_max=(atof(temp.c_str()));
             }
-            if( temp == "asymm" )
+            else if( iCutVariable == "asymm" )
             {
                 is_stream >> temp;
                 fAsymm_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fAsymm_max=(atof(temp.c_str()));
             }
-            if( temp == "distance" )
+            else if( iCutVariable == "distance" )
             {
                 is_stream >> temp;
                 fDistance_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fDistance_max=(atof(temp.c_str()));
             }
-            if( temp == "size" )
+            else if( iCutVariable == "size" )
             {
                 is_stream >> temp;
                 fSize_min=(atof(temp.c_str()));
@@ -301,35 +302,35 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
 /////////////////////////////////////
 // stereo ('array') telescope cuts
-            if( temp == "arraywidth" )
+            else if( iCutVariable == "arraywidth" )
             {
                 is_stream >> temp;
                 fCut_MeanImageWidth_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_MeanImageWidth_max=(atof(temp.c_str()));
             }
-            if( temp == "arraylength" )
+            else if( iCutVariable == "arraylength" )
             {
                 is_stream >> temp;
                 fCut_MeanImageLength_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_MeanImageLength_max=(atof(temp.c_str()));
             }
-            if( temp == "arrayntubes" )
+            else if( iCutVariable == "arrayntubes" )
             {
                 is_stream >> temp;
                 fCut_Ntubes_min = (atoi(temp.c_str()));
                 is_stream >> temp;
                 fCut_Ntubes_max =(atoi(temp.c_str()));
             }
-            if( temp == "arrayntel" || "nnimages" )
+            else if( iCutVariable == "arrayntel" || iCutVariable == "nnimages" )
             {
                 is_stream >> temp;
                 fCut_NImages_min = (atoi(temp.c_str()));
                 is_stream >> temp;
                 fCut_NImages_max =(atoi(temp.c_str()));
             }
-            if( temp == "arraysize" )
+            else if( iCutVariable == "arraysize" )
             {
                 is_stream >> temp;
                 fCut_Size_min=(atof(temp.c_str()));
@@ -341,21 +342,21 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     cout << "--------- VGammaHadronCuts warning: ignoring size cut for data with more than 2 telescopes ------" << endl;
                 }
             }
-            if( temp == "arraychi2" )
+            else if( iCutVariable == "arraychi2" )
             {
                 is_stream >> temp;
                 fCut_Chi2_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_Chi2_max=(atof(temp.c_str()));
             }
-            if( temp == "arraydist" )
+            else if( iCutVariable == "arraydist" )
             {
                 is_stream >> temp;
                 fCut_MeanImageDistance_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_MeanImageDistance_max=(atof(temp.c_str()));
             }
-            if( temp == "corearea" )
+            else if( iCutVariable == "corearea" )
             {
                 is_stream >> temp;
                 fCut_CoreDistanceToArrayCentreX_min = (atof(temp.c_str()));
@@ -371,35 +372,35 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     fCut_CoreDistanceEdgeSize = atof( temp.c_str() );
                 }
             }
-            if( temp == "mscw" || temp == "arraymscw" )
+            else if( iCutVariable == "mscw" || iCutVariable == "arraymscw" )
             {
                 is_stream >> temp;
                 fCut_MSCW_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_MSCW_max=(atof(temp.c_str()));
             }
-            if( temp == "mscl" || temp == "arraymscl" )
+            else if( iCutVariable == "mscl" || iCutVariable == "arraymscl" )
             {
                 is_stream >> temp;
                 fCut_MSCL_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_MSCL_max=(atof(temp.c_str()));
             }
-            if( temp == "msw" || temp == "arraymsw" )
+            else if( iCutVariable == "msw" || iCutVariable == "arraymsw" )
             {
                 is_stream >> temp;
                 fCut_MSW_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_MSW_max=(atof(temp.c_str()));
             }
-            if( temp == "msl" || temp == "arraymsl" )
+            else if( iCutVariable == "msl" || iCutVariable == "arraymsl" )
             {
                 is_stream >> temp;
                 fCut_MSL_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_MSL_max =(atof(temp.c_str()));
             }
-            if( temp == "mc_xy_off" || temp == "arrayxyoff_mc" || temp == "mc_xyoff" || temp == "cameraedge_mc" )
+            else if( iCutVariable == "mc_xy_off" || iCutVariable == "arrayxyoff_mc" || iCutVariable == "mc_xyoff" || iCutVariable == "cameraedge_mc" )
             {
                 is_stream >> temp;
                 fCut_CameraFiducialSize_MC_min=(atof(temp.c_str()));
@@ -408,18 +409,18 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 bMCCuts = true;
             }
 
-            if( temp == "xy_off" || temp == "arrayxyoff" || temp == "xyoff" || temp == "cameraedge" )
+            else if( iCutVariable == "xy_off" || iCutVariable == "arrayxyoff" || iCutVariable == "xyoff" || iCutVariable == "cameraedge" )
             {
                 is_stream >> temp;
                 fCut_CameraFiducialSize_min=(atof(temp.c_str()));
                 is_stream >> temp;
                 fCut_CameraFiducialSize_max=(atof(temp.c_str()));
             }
-	    if( temp == "telcoredistance" )
+	    else if( iCutVariable == "telcoredistance" )
 	    {
 	       if( !is_stream.eof() ) is_stream >> fCut_MinimumCoreDistanceToTelescopes_max;
             }
-            if( temp == "arraycore" )
+            else if( iCutVariable == "arraycore" )
             {
                 is_stream >> temp;
                 fCut_AverageCoreDistanceToTelescopes_min = (atof(temp.c_str()));
@@ -427,7 +428,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 fCut_AverageCoreDistanceToTelescopes_max = (atof(temp.c_str()));
             }
 // these allow to deselect certain telescope combinations (changed from ltrig to ImgSel)
-            if( temp == "arrayltrig" || temp == "allowedImageCombinations" )
+            else if( iCutVariable == "arrayltrig" || iCutVariable == "allowedImageCombinations" )
             {
                 if( fNTel == 0 || fNTel > 10 )
 		{
@@ -462,7 +463,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 
             }
 // probability cut variables (e.g. random forest)
-            if( temp == "RFthresh" || temp == "Probthresh" )
+            else if( iCutVariable == "RFthresh" || iCutVariable == "Probthresh" )
             {
                 is_stream >> temp;
                 fProbabilityCut = (atof(temp.c_str()));
@@ -474,7 +475,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 else fProbabilityCut_ProbID = 0;
             }
 // phase cuts
-            if (temp == "orbitalPhase") 
+            else if (iCutVariable == "orbitalPhase") 
 	    {
 	       is_stream >> temp;
 	       fOrbitalPhase_min = atof(temp.c_str());
@@ -484,7 +485,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
 
 // to define the lower bounds in probablity cut ranges  (e.g. random forest)
-            if( temp == "RFCutLowerVals" )
+            else if( iCutVariable == "RFCutLowerVals" )
             {
                 while(!is_stream.eof() )
                 {
@@ -494,7 +495,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
 
 // to define the upper bounds in probablity cut ranges  (e.g. random forest)
-            if( temp == "RFCutUpperVals" )
+            else if( iCutVariable == "RFCutUpperVals" )
             {
                 while(!is_stream.eof() )
                 {
@@ -504,7 +505,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
 
 // to define the upper bounds in probablity cut ranges  (e.g. random forest)
-            if( temp == "RFProbID" )
+            else if( iCutVariable == "RFProbID" )
             {
                     is_stream >> temp;
                     fProbabilityCut_ProbID = atoi( temp.c_str() );
@@ -512,35 +513,35 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             
             
 // energy reconstruction cuts
-            if( temp == "arrayechi2" )
+            else if( iCutVariable == "arrayechi2" )
             {
                 is_stream >> temp;
                 fCut_EChi2_min = atof(temp.c_str());
                 is_stream >> temp;
                 fCut_EChi2_max = atof(temp.c_str());
             }
-            if( temp == "arraydE" )
+            else if( iCutVariable == "arraydE" )
             {
                 is_stream >> temp;
                 fCut_dE_min = atof(temp.c_str());
                 is_stream >> temp;
                 fCut_dE_max = atof(temp.c_str());
             }
-            if( temp == "arrayerec" )
+            else if( iCutVariable == "arrayerec" )
             {
                 is_stream >> temp;
                 fCut_Erec_min = atof(temp.c_str());
                 is_stream >> temp;
                 fCut_Erec_max = atof(temp.c_str());
             }
-            if( temp == "arrayemission" )
+            else if( iCutVariable == "arrayemission" )
             {
                 is_stream >> temp;
                 fCut_Emmission_min = atof(temp.c_str());
                 is_stream >> temp;
                 fCut_Emmission_max = atof(temp.c_str());
             }
-            if( temp == "sizesecondmax" )     
+            else if( iCutVariable == "sizesecondmax" )     
             {
                 is_stream >> temp;
                 fCut_SizeSecondMax_min = atof(temp.c_str());
@@ -549,7 +550,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }       
 // telescope type dependent cut on number of images 
 // syntax:  teltype_nnimages <min images> <tel type counter>
-            if( temp == "teltypegroup" || temp == "teltype_nnimages" )
+            else if( iCutVariable == "teltypegroup" || iCutVariable == "teltype_nnimages" )
             {
                 fNTelTypeCut.push_back( new VNTelTypeCut() );
                 is_stream >> temp;
@@ -560,14 +561,14 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
                 }
             }
-	    if( temp == "goodnessimgcut" )
+	    else if( iCutVariable == "goodnessimgcut" )
 	    {
 	        is_stream >> temp;
                 frogsGoodnessImgCut = atoi( temp.c_str()  );
 	    }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TMVA values
-            if( temp == "TMVAPARAMETER" )
+            else if( iCutVariable == "TMVAPARAMETER" )
             {
 	       if( !is_stream.eof() ) is_stream >> fTMVA_MVAMethod;
 // files should have endings _fTMVAWeightFileIndex_min to _fTMVAWeightFileIndex_max
@@ -580,7 +581,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 	       fTMVAWeightFile = gSystem->ExpandPathName( iWeightFileDirectory.c_str() );
 	       fTMVAWeightFile += iWeightFileName;
             }
-	    if( temp == "TMVACUTS" )
+	    else if( iCutVariable == "TMVACUTS" )
 	    {
                if( !is_stream.eof() ) is_stream >> fTMVASignalEfficiency;
 // probability threshold not important for box cuts
@@ -596,7 +597,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // fixed theta2 cut
-            if( temp == "arraytheta2" || temp == "theta2cut" ) 
+            else if( iCutVariable == "arraytheta2" || iCutVariable == "theta2cut" ) 
             {
                 is_stream >> temp;
                 fCut_Theta2_min=(atof(temp.c_str()));
@@ -606,7 +607,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 // read in values for energy dependent theta2 cut 
 // * theta2file <root file> <function name>
 // (note that fF1AngResName == "IRF" means that the graph from the IRF file is extrapolated)
-            if( temp == "theta2file" )
+            else if( iCutVariable == "theta2file" )
             {
                  if( !is_stream.eof() )
 		 {
@@ -622,13 +623,13 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
 
 // use angular resolution calculated for example from same data with makeEffectiveArea
-            if( temp == "angres" )
+            else if( iCutVariable == "angres" )
 	    {
 	       if( !is_stream.eof() ) is_stream >> fAngResContainmentProbability;    // should be an integer; probability x 100
             }
 // theta2 scaling
 // * theta2scaling <scale factor> <minimum theta> <maximum theta>
-	    if( temp == "theta2scaling" )
+	    else if( iCutVariable == "theta2scaling" )
 	    {
                  if( !is_stream.eof() )
                  {
@@ -1463,6 +1464,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     else
     {
        cout << "VGammaHadronCuts::initTMVAEvaluator error: unclear TMVA cut settings" << endl;
+       cout << "\t fTMVASignalEfficiency: " << fTMVASignalEfficiency << endl;
+       cout << "\t fTMVAProbabilityThreshold: " << fTMVAProbabilityThreshold << endl;
        cout << "exiting... " << endl;
        exit( -1 );
     }
