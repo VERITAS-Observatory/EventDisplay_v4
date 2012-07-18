@@ -223,7 +223,8 @@ VTS:	evndisp \
 	calculateBinaryPhases \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
-	compareDatawithMC 
+	compareDatawithMC \
+	VTS.getRunListFromDB
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -793,6 +794,23 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 				./obj/VTS.calculateExposureFromDB.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"	
+
+########################################################
+# VTS.getRunListFromDB
+########################################################
+./obj/VTS.getRunListFromDB.o:   ./src/VTS.getRunListFromDB.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+VTS.getRunListFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+			./obj/VExposure.o ./obj/VExposure_Dict.o \
+			./obj/VASlalib.o \
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/VUtilities.o \
+			./obj/VTS.getRunListFromDB.o
+
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
 
 ########################################################
 # calculateBinaryPhases

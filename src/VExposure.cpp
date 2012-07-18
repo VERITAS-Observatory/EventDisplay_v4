@@ -14,7 +14,9 @@ ClassImp(VExposure)
 
 VExposure::VExposure( int nBinsL, int nBinsB )
 {
+
     fDebug = false;
+    fMakeRunList = false;
 
 // VERITAS values
     fObsLongitude = 110.952 * atan(1.)/45;
@@ -73,6 +75,10 @@ void VExposure::set_plot_style()
     gStyle->SetNumberContours(NCont);
 }
 
+void VExposure::setSelectLaser( int iSelectLaser )
+{
+    fSelectLaser = iSelectLaser;
+}
 
 void VExposure::setTimeRange( string iStart, string iStop )
 {
@@ -80,6 +86,20 @@ void VExposure::setTimeRange( string iStart, string iStop )
     fStopDate  = iStop;
 }
 
+void VExposure::setSourceName( string sourceName )
+{
+    fTargetSourceName = sourceName;
+}
+
+void VExposure::setTelMinElevation( double iElevation )
+{
+    fTelMinElevation = iElevation;
+}
+
+void VExposure::setMinDuration( double iDuration )
+{
+    fMinDuration = iDuration;
+}
 
 bool VExposure::setPlannedObservation(vector<double> ra, vector<double> dec, vector<double> t)
 {
@@ -100,6 +120,49 @@ bool VExposure::setPlannedObservation(vector<double> ra, vector<double> dec, vec
   return true;
 }
 
+unsigned int VExposure::getLaserDate( unsigned int iRunNumber )
+{
+
+    string iTempS;
+    iTempS = getDBServer() + "/VERITAS";
+    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
+    if( !f_db )
+    {
+        cout << "error connecting to db" << endl;
+        return -1;
+    }
+//    cout << "reading from " << iTempS << endl;
+
+    char c_query[1000];
+
+    //sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate.c_str(), fStopDate.c_str() );
+    //sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\" and source_id like convert( _utf8 \'%s\' using latin1)", fStartDate.c_str(), fStopDate.c_str(), fTargetSourceName.c_str() );
+    sprintf( c_query, "select * from tblRun_Info where run_id = %d", iRunNumber );
+
+    TSQLResult *db_res = f_db->Query( c_query );
+    if( !db_res )
+    {
+        return -1;
+    }
+
+    string itemp;
+
+    TSQLRow *db_row = db_res->Next();
+
+    if( !db_row ) return -1;
+
+// get date
+    if( db_row->GetField( 6 ) )
+    {
+        string iTemp = db_row->GetField( 6 );
+        if( iTemp.size() > 8 )
+            fDataStartTime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
+    }
+
+    return fDataStartTime;
+
+}
+
 bool VExposure::readFromDB()
 {
     string iTempS;
@@ -114,7 +177,10 @@ bool VExposure::readFromDB()
 
     char c_query[1000];
 
-    sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate.c_str(), fStopDate.c_str() );
+    if( !fMakeRunList )
+      sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate.c_str(), fStopDate.c_str() );
+    else
+      sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\" and source_id like convert( _utf8 \'%s\' using latin1)", fStartDate.c_str(), fStopDate.c_str(), fTargetSourceName.c_str() );
 
     cout << c_query << endl;
 
@@ -160,6 +226,15 @@ bool VExposure::readFromDB()
         if( itemp == "defined" ) continue;
 // don't use runs which are prepared only
         if( itemp == "prepared" ) continue;
+
+// get date
+
+        if( db_row->GetField( 6 ) )
+        {
+            string iTemp = db_row->GetField( 6 );
+            if( iTemp.size() > 8 )
+                fDataStartTime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
+        }
 
         if( fDebug ) cout << j << " " << db_row->GetField( 19 ) <<  " ";
         if( fDebug ) cout << db_row->GetField( 1 ) << " " << db_row->GetField( 3 ) << " " << flush;
@@ -214,6 +289,7 @@ bool VExposure::readFromDB()
         if( fDebug ) cout << "T2 " << iMJD << " " << iTime2 << " ";
         fRunStopMJD.push_back( (double)iMJD + iTime2/86400 );
         fRunDuration.push_back( iTime2 - iTime1 );
+	fRunDate.push_back( fDataStartTime );
 
         if( fDebug ) cout << fRunDuration.back() << " " << flush;
 
@@ -1322,4 +1398,265 @@ void VExposure::plotTimeDifferencesbetweenRuns()
 
     fTimeDifferencesBetweenRuns->SetAxisRange( 0., 10. );
     fTimeDifferencesBetweenRuns->Draw();
+}
+
+//void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDuration, string iTeVCatalogue, double r_min, string iEventListFile )
+void VExposure::printListOfRuns()
+{
+
+  int k = 0;
+  int itemp = 0;
+  double Total_Time = 0;
+
+// loop over all runs 
+  for( unsigned int j = 0; j < fRunRA.size(); j++ )
+  {
+
+// total time on object (new array configuration only)
+//    if( fRun[j] > 46642 && fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
+    if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
+    {
+// print some information about this run
+
+        cout << "\tRUN " << fRun[j];
+//if( fRunSourceID[j].size() > 0 ) cout << "\t" << fRunSourceID[j];
+        cout << "\t" << fRunSourceID[j];
+        cout << "\tMJD " << fRunStartMJD[j];
+        cout <<  "\tDate: " << fRunDate[j];
+        cout << "\tCONFIGMASK " << fRunConfigMask[j];
+        cout << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
+        cout << "\tDuration[s] " << fRunDuration[j];
+        cout << "\t(El,Az) " << fRunTelElevation[j] << " " << fRunTelAzimuth[j];
+//           cout << "\tStatus: " << fRunStatus[j];
+        if( fSelectLaser == 1 )
+        {
+          cout << "\tLaser: " << fRunLaserList[j][0];
+          cout << " " << fRunLaserList[j][1];
+          cout << " " << fRunLaserList[j][2];
+          cout << " " << fRunLaserList[j][3];
+        }
+        cout << endl;
+
+	k++;
+        Total_Time += fRunDuration[j];
+
+	fRunDownload.push_back( fRun[j] );
+	fRunDownloadDate.push_back( fRunDate[j] );
+
+        if( fSelectLaser == 1 )
+        {
+          for( unsigned int i = 0; i < 4 ; i++ )
+	  {
+	    itemp = 0;
+	    for( unsigned int m = 0 ; m < fLaserDownload.size() ; m++ )
+	      if( fLaserDownload[m] == fRunLaserList[j][i] ) itemp = 1;
+	    if( itemp == 0 )
+            {
+              fLaserDownload.push_back( fRunLaserList[j][i] );
+              //fLaserDownloadDate.push_back( fDateLaserList[j] );
+              fLaserDownloadDate.push_back( getLaserDate(fRunLaserList[j][i]) );
+            }
+          }
+        }
+
+    }
+
+  }
+
+  cout << "Selected " << k << " runs after cuts. A total of " << Total_Time/60./60. << " [hrs]." << endl;
+  cout << endl;
+
+}
+
+void VExposure::downloadRunList()
+{
+
+  char filename[500];
+  char filepath[500];
+  char dl_string[500];
+
+  char *ENVIR_VAR;
+
+  char mkdir_string[500];
+  char permision_string[500];
+
+  ENVIR_VAR = getenv ("OBS_DATA_DIR");
+
+  cout << "Download Runs: " << endl;
+
+  for( unsigned int i = 0 ; i < fRunDownload.size(); i++ )
+  {
+
+    sprintf(filename,"%s/data/d%d/%d.cvbf",ENVIR_VAR,fRunDownloadDate[i],fRunDownload[i]);
+    sprintf(filepath,"%s/data/d%d/",ENVIR_VAR,fRunDownloadDate[i]);
+
+    ifstream datafile(filename);
+    if( datafile.is_open() ) 
+      cout << filename << " File Exists!" << endl;
+    else 
+    {
+      ifstream paths(filepath);
+      if( !paths.is_open() )
+      {
+	sprintf(mkdir_string,"mkdir %s",filepath);
+        cout << "COMMAND: " << mkdir_string << endl;
+	system(mkdir_string); 
+        sprintf(permision_string,"chmod g+w %s",filepath);
+	cout << "COMMAND: " << permision_string << endl;
+	system(permision_string); 
+      }
+      // Then Download
+      sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" gamma1.astro.ucla.edu",fRunDownloadDate[i],fRunDownload[i],ENVIR_VAR,fRunDownloadDate[i],fRunDownload[i]);
+      cout << dl_string << endl;
+      system(dl_string);
+    }
+
+  }
+
+  cout << endl;
+
+  if( fSelectLaser == 1 )
+  {
+
+    cout << "Laser Files: " << endl;
+
+    for( unsigned int i = 0 ; i < fLaserDownload.size(); i++ )
+    {
+
+        sprintf(filename,"%s/data/d%d/%d.cvbf",ENVIR_VAR,fLaserDownloadDate[i],fLaserDownload[i]);
+        sprintf(filepath,"%s/data/d%d/",ENVIR_VAR,fLaserDownloadDate[i]);
+
+        ifstream datafile(filename);
+        if( datafile.is_open() ) 
+          cout << filename << " File Exists!" << endl;
+        else
+        {
+          ifstream paths(filepath);
+          if( !paths.is_open() )
+          {
+	    sprintf(mkdir_string,"mkdir %s",filepath);
+            cout << "COMMAND: " << mkdir_string << endl;
+	    system(mkdir_string); 
+            sprintf(permision_string,"chmod g+w %s",filepath);
+	    cout << "COMMAND: " << permision_string << endl;
+	    system(permision_string); 
+          }
+          // Then Download
+          sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" gamma1.astro.ucla.edu",fLaserDownloadDate[i],fLaserDownload[i],ENVIR_VAR,fLaserDownloadDate[i],fLaserDownload[i]);
+          cout << dl_string << endl;
+	  system(dl_string);
+        }
+
+      }
+
+  }
+
+}
+
+void VExposure::getLaserList()
+{
+
+  string iDBserver = "mysql://romulus.ucsc.edu";
+
+  cout << "Reading Laser Runs for selected runs ....... " ;
+
+  for( unsigned int i = 0; i < fRunRA.size(); i++ )
+    fRunLaserList.push_back( getLaserRun(iDBserver,fRun[i],4) );
+
+//  for( unsigned int i = 0; i < fRunLaserList.size(); i++ )
+//    for( unsigned int j = 0; j < 4 ; j++ )
+//      fDateLaserList.push_back( getLaserDate(fRunLaserList[i][j]) );
+
+  cout << "complete." << endl;
+  cout << endl;
+
+  return;
+
+}
+
+vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel )
+{
+
+    string iTempS;
+    iTempS = getDBServer() + "/VERITAS";
+    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
+    if( !f_db )
+    {
+        return fLaserRunID;
+    }
+    char c_query[1000];
+
+    sprintf( c_query, "SELECT info.run_id, grp_cmt.excluded_telescopes FROM tblRun_Info AS info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt, (SELECT group_id FROM tblRun_Group WHERE run_id=%d) AS run_grp WHERE grp_cmt.group_id = run_grp.group_id AND grp_cmt.group_type='laser' AND grp_cmt.group_id=grp.group_id AND grp.run_id=info.run_id AND (info.run_type='flasher' OR info.run_type='laser')", iRunNumber );
+
+    TSQLResult *db_res = f_db->Query( c_query );
+    if( !db_res )
+    {
+//        fDBStatus = false;
+        return fLaserRunID;
+    }
+    vector< unsigned int > iLaserList;
+    vector< unsigned int > iLaserExclude;
+    if( db_res->GetRowCount() > 0 )
+    {
+       while( TSQLRow *db_row = db_res->Next() )
+       {
+          if( !db_row )
+          {
+              cout << "VDBRunInfo: failed reading a row from DB for run " << iRunNumber << endl;
+//              fDBStatus = false;
+              return fLaserRunID;
+          }
+          iLaserList.push_back( atoi( db_row->GetField( 0 ) ) );
+          iLaserExclude.push_back( atoi( db_row->GetField( 1 ) ) );
+       }
+
+    }
+    else
+    {
+       cout << "WARNING: VDBRunInfo::getLaserRun() no laser run found for telescope " << iNTel << " and run " << iRunNumber << endl;
+    }
+    f_db->Close();
+
+
+    fLaserRunID.assign( iNTel, 0 );
+    for( unsigned int t = 0; t < iNTel; t++ )
+    {
+// check if this run is excluded from group
+       for( unsigned int i = 0; i < iLaserList.size(); i++ )
+       {
+          bitset< 8 > ibit( iLaserExclude[i] );
+          if( !ibit.test( t ) ) fLaserRunID[t] = iLaserList[i];
+       }
+    }
+
+    return fLaserRunID;
+}
+
+TSQLServer* VExposure::connectToSQLServer( string iDBserver )
+{
+   TSQLServer *f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
+// if not successfull: sleep for 10 s and try again
+   if( !f_db )
+   {
+      cout << "VDBRunInfo: info: failed to connect to database server, sleep for 10 and try again..." << endl;
+      gSystem->Sleep( 10000 );
+      f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
+       if( !f_db )
+       {
+           cout << "VDBRunInfo: failed to connect to database server" << endl;
+           cout << "\t server: " <<  iDBserver << endl;
+//           fDBStatus = false;
+           return false;
+       }
+   }
+   return f_db;
+}
+
+void VExposure::setMakeRunList( bool iSet )
+{
+
+  if( iSet ) fMakeRunList = true;
+
+  return;
+
 }

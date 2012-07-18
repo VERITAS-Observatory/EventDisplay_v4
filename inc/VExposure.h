@@ -16,6 +16,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <bitset>
 
 #include <TBox.h>
 #include <TCanvas.h>
@@ -43,6 +44,21 @@ class VExposure : public TObject, public VGlobalRunParameter
     private:
 
         bool   fDebug;
+
+
+	bool fMakeRunList;
+	int fSelectLaser;
+        int fDataStartTime; // Start Date
+	vector< unsigned int > fLaserRunID; // Laser Runs
+
+// Minimium Duration
+	double fMinDuration;
+
+// Telscope Min Elevation
+        double fTelMinElevation;
+
+// Target Name
+	string fTargetSourceName;
 
 // date range
         string fStartDate;
@@ -78,6 +94,14 @@ class VExposure : public TObject, public VGlobalRunParameter
         vector< double > fRunGalLat1958;
         vector< double > fRunTelElevation;
         vector< double > fRunTelAzimuth;
+        vector< int >    fRunDate;
+	vector< vector < unsigned int > > fRunLaserList;
+	vector< unsigned int > fDateLaserList;
+
+	vector< int > fRunDownload;
+	vector< int > fRunDownloadDate;
+	vector< unsigned int > fLaserDownload;
+	vector< int > fLaserDownloadDate;
 
         TH2D* fMapGal2D;
         TH2D* fRadAccMapGal2D;
@@ -127,6 +151,7 @@ class VExposure : public TObject, public VGlobalRunParameter
         void plotTimeDifferencesbetweenRuns();
 	void printListOfRuns( string iCatalogue, double iR = 2.5, double iMinDuration = 600., string iTeVCatalogue = "", double r_min = 0.1, string iEventListFile= "" );
         void printListOfRuns( double il, double ib, double iR = 2.5, double iMinDuration = 600., string iDQMfileList = "", string ofile = "", unsigned int iVerbose = 0 );
+        void printListOfRuns();
 	void printTexTable();
         bool readAcceptanceCurveFromFile( string iAcc, double iAcceptance_MaxDistance = 1.e9 );
         bool readRootFile( string iname = "2006_2008.root", double iMinMJD = -99., double iMaxMJD = -99. );
@@ -134,7 +159,17 @@ class VExposure : public TObject, public VGlobalRunParameter
         void setPlotSourceNames( bool iB = false )  { fPlotSourceNames = iB; }
         void setMaximumIntegrationRadius( double iR = 2.5 ) { fMaximumIntegrationRadius = iR; }
         void setTimeRange( string iStart = "2011-01-01", string iStopp = "2011-02-01" );
-        bool writeRootFile( string );
+        void setSourceName( string sourceName = "Crab" );
+        void setTelMinElevation( double iElevation = 0. );
+        void setSelectLaser( int iSelectLaser );
+        void setMinDuration( double iDuration = 0. );
+	bool writeRootFile( string );
+        void setMakeRunList( bool iSet );
+	void getLaserList();
+	unsigned int  getLaserDate( unsigned int iRunNumber );
+	void downloadRunList();
+        vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
+	TSQLServer* connectToSQLServer( string iServer );
 
         void addCatalogue( string, int iMarker = 5, int iColor = 1, double iAngle = 45. );
         void listCatalogues();
