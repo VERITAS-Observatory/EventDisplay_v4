@@ -294,7 +294,10 @@ do
 ###############################################################################
 # create cut file
       iCBFILE=`basename $CFIL`      
-      iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
+#      iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
+      mkdir -p /tmp/EVNDISP/effArea/
+      cd /tmp/EVNDISP/effArea/
+      iCFIL=/tmp/EVNDISP/effArea/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
       if [ ! -e $CFIL ]
       then
         echo "ERROR: cut file does not exist:"
@@ -302,6 +305,7 @@ do
 	exit
       fi
       cp -f $CFIL $iCFIL
+      pwd
 
       sed -e "s|OFFMIN|$iMIN|" $iCFIL > $iCFIL-a
       rm -f $iCFIL
@@ -355,6 +359,9 @@ do
       sed -e "s|PARTICLENUMBERFILE|$PNF|" $iCFIL-j > $iCFIL-k
       rm -f $iCFIL-j
       mv -f $iCFIL-k $iCFIL
+      mv $iCFIL $ODIR/
+      iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
+      cd $EVNDISPSYS/scripts/CTA/
       echo $iCFIL
 
 ###############################################################################
