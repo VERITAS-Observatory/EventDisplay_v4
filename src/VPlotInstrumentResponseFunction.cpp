@@ -605,7 +605,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string i
        {
 	  if( iM == "mean" && fData[i]->gEnergyBias_Mean )
 	  {
-	     fData[i]->gEnergyBias_Mean->Draw( "p" );
+	     fData[i]->gEnergyBias_Mean->Draw( "pl" );
 	     if( fDebug ) fData[i]->gEnergyBias_Mean->Print();
 	  }
 	  else if( iM == "median" && fData[i]->gEnergyBias_Median )

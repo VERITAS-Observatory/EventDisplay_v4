@@ -193,6 +193,17 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
        get_Graph_from_Histogram( h, gEnergyResolution, true );
        setGraphPlottingStyle( gEnergyResolution );
     }
+///////////////////////////////////////////////////////////////
+// energy bias
+    h = 0;
+    gEnergyBias_Mean = new TGraphErrors( 1 );
+    h = (TH1F*)get_CTA_IRF_Histograms( "Ebias", fWoff );
+    if( h )
+    {
+       get_Graph_from_Histogram( h, gEnergyBias_Mean, true, -100. );
+       setGraphPlottingStyle( gEnergyBias_Mean ); 
+    }
+///////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////
 // 68% angular resolution
