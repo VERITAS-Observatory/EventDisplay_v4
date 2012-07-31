@@ -36,6 +36,7 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fAngRes68 = 0;
     fAngRes80 = 0;
     fEres = 0; 
+    fEbias = 0;
 
     fOffsetCounter = 9999;
 
@@ -151,6 +152,14 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    fEres->SetYTitle( "energy resolution (RMS)" );
    hisList.push_back( fEres );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEres );
+
+   sprintf( hname, "Ebias" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fEbias = new TH1F( hname, "Energy bias (mean E_{rec}/E_{MC})", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   fEbias->SetXTitle( "log_{10} (E/TeV)" );
+   fEbias->SetYTitle( "energy reconstruction bias (<E_{rec}/E_{MC}>)" );
+   hisList.push_back( fEbias );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEbias );
 
 // loop over all histograms
    for( unsigned int i = 0; i < hisList.size(); i++ )
@@ -300,6 +309,8 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
    i_IRF.fillResolutionHistogram( fAngRes68, "68", "t_angular_resolution" );
    i_IRF.fillResolutionHistogram( fAngRes80, "80", "t_angular_resolution" );
    i_IRF.fillResolutionHistogram( fEres, "68", "t_energy_resolution" );
+// fill energy bias histograms
+   i_IRF.fillBiasHistograms( fEbias, "mean" );
 // fill effective area histograms
    i_IRF.fillEffectiveAreasHistograms( fEffArea, "", fEffAreaMC );
    i_IRF.fillEffectiveAreasHistograms( fEffArea80, "80" );
@@ -320,7 +331,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
       if( fOffsetCounter < 9999 ) sprintf( hname, "EestOverEtrue_%d", fOffsetCounter );
       else                        sprintf( hname, "EestOverEtrue" );
       TH2F *hhEsysMCRelative = (TH2F*)i_IRF.getRecvsMCEnergy()->Clone( hname );
-      hhEsysMCRelative->SetTitle( "Eest/Etrue vs. Etrue" );
+      hhEsysMCRelative->SetTitle( "E_{rec}/E_{MC} vs. E_{MC}" );
       hhEsysMCRelative->SetStats( 0 );
       hhEsysMCRelative->SetXTitle( "log_{10} (E_{rec}/TeV)" );
       hhEsysMCRelative->SetYTitle( "E_{rec}/E_{MC}" );

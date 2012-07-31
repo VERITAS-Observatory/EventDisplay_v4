@@ -128,6 +128,7 @@ bool VGlobalRunParameter::setDirectories()
        cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP analysis data" << endl;
        cout << "\t looking for " << fEVNDISPAnaDataDirectory << endl;
        cout << "\t is environmental variable $OBS_EVNDISP_ANA_DIR set?" << endl;
+       cout << "\t (see README/INSTALL)" << endl;
        cout << "exiting..." << endl;
        exit( -1 );
     }
@@ -168,6 +169,7 @@ bool VGlobalRunParameter::setDirectories()
        cout << "VGlobalRunParameter::setDirectories(): cannot find directory for EVNDISP output data" << endl;
        cout << "\t looking for " << fEVNDISPOutputDirectory << endl;
        cout << "\t is environmental variable $OBS_USER_DATA_DIR set?" << endl;
+       cout << "\t (see README/INSTALL)" << endl;
        cout << "exiting..." << endl;
        exit( -1 );
     }

@@ -59,6 +59,7 @@ class VWPPhysSensitivityFile
     TH1F* fAngRes68;
     TH1F* fAngRes80;
     TH1F* fEres;
+    TH1F* fEbias;
 
     public:
 

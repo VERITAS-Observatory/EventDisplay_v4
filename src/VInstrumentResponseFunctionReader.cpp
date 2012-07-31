@@ -399,9 +399,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bias
-       gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 1. );
+       gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 0. );
        setGraphPlottingStyle( gEnergyBias_Mean );
-       gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "median", 1, -10., 1. );
+       gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "median", 1, -10., 0. );
        setGraphPlottingStyle( gEnergyBias_Median, 1, 1., 7 );
        gEnergyLogBias_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
        setGraphPlottingStyle( gEnergyLogBias_Mean, 1, 1., 7 );
@@ -797,6 +797,55 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F *hEff
     
     return true;
 }
+
+bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F *h, string iMeanOrMedian )
+{
+   if( !h ) return false;
+
+   TGraphErrors *g = 0;
+   if( iMeanOrMedian == "median" )    g = gEnergyBias_Median;
+   else if( iMeanOrMedian == "mean" ) g = gEnergyBias_Mean;
+   else
+   {
+      cout << "VInstrumentResponseFunctionReader::fillBiasHistograms warning: unknown string: " << iMeanOrMedian << endl;
+      cout << "\t allowed values: mean or median" << endl;
+      return false;
+   }
+   if( !g )
+   {
+      cout << "VInstrumentResponseFunctionReader::fillBiasHistograms warning: no bias graph found" << endl;
+      return false;
+   }
+   if( g->GetN() < 2 )
+   {
+      cout << "VInstrumentResponseFunctionReader::fillBiasHistograms warning: bias graph with no points" << endl;
+      return false;
+   }
+// reset histogram binning
+   double x_axis[g->GetN()+1];
+// Obs: assume fixed binning:
+   double i_binWidth = 0.5*(g->GetX()[1]-g->GetX()[0]);
+   for( int i = 0; i < g->GetN(); i++ )
+   {
+       x_axis[i] = g->GetX()[i] - i_binWidth;
+   }
+   x_axis[g->GetN()] = g->GetX()[g->GetN()-1] + i_binWidth;
+   h->SetBins( g->GetN(), x_axis );
+// fill histogram
+   double x = 0.;
+   double y = 0.;
+   for( int i = 0; i < g->GetN(); i++ )
+   {
+      g->GetPoint( i, x, y );
+      h->SetBinContent( i+1, y );
+      h->SetBinError( i+1, g->GetErrorY( i ) );
+   };
+
+   return true;
+}
+       
+
+
 bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F *h, string iContainmentRadius, string iResolutionTreeName )
 {
     if( !h ) return false;

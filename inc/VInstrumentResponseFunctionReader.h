@@ -113,6 +113,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
    ~VInstrumentResponseFunctionReader() {}
 
     bool calculateEffectiveAreaRatios( TGraphAsymmErrors *g0 );
+    bool fillBiasHistograms( TH1F *h = 0, string iMeanOrMedian = "mean" );
     bool fillEffectiveAreasHistograms( TH1F *h = 0, string iContainmentRadius = "", TH1F *hMC = 0 );
     bool fillResolutionHistogram( TH1F *h = 0, string iContainmentRadius = "68", string iResolutionTreeName = "t_angular_resolution" );
     bool fillData();
