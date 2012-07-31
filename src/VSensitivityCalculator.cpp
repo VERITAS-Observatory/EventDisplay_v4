@@ -191,7 +191,7 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy )
 // require a certain significance and a minimum number of events
         if(    s > fSignificance_min 
 	    && t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha) > fEvents_min
-	    && fData[iD].fBackground * fData[iD].fAlpha > 0.
+// (GM)	    && fData[iD].fBackground * fData[iD].fAlpha > 0.
 	    && n_diff / (fData[iD].fBackground * fData[iD].fAlpha) > fMinBackgroundRateRatio_min 
 	  )
         {
@@ -668,6 +668,12 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	if( s_error_L < 0. )
 	{
 	   s_error_L = s;
+	   s_error_U = s;
+        }
+// remove low-energy points with 0 noff events
+	if( dE_Log10 > 0. && i < (int)fDifferentialFlux.size()-2 && noff == 0. && fDifferentialFlux[i+1].NOff > 0. )
+	{
+	   s*= -1.;
         }
 
 // fill sensitivity graphs
@@ -744,6 +750,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	     else if( bUnit == "ENERGY" )
 	     {
 	         cout << scientific <<  i_fFunCrabFlux->Eval( energy ) * s;
+		 cout << " (+" << TMath::Abs( s - s_error_U ) * i_fFunCrabFlux->Eval( energy );
+		 cout << " -" << TMath::Abs( s - s_error_L ) * i_fFunCrabFlux->Eval( energy ) << ")";
                  cout << " [erg cm^-2s^-1]";
              }
              cout << endl;
