@@ -59,8 +59,8 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #####################################
 # energy bins
-EMIN=( -2.50 -1.75 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 )
-EMAX=( -1.25 -1.00 -0.75 -0.50 -0.25  0.00  0.25 0.50 0.75 1.00 1.50 2.50 )
+EMIN=( -2.50 -1.75 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 1.50 )
+EMAX=( -1.25 -1.00 -0.75 -0.50 -0.25  0.00  0.25 0.50 0.75 1.00 1.30 1.75 2.50 )
 NENE=${#EMIN[@]}
 #####################################
 # 
@@ -143,10 +143,10 @@ do
 	 if [ $EREC = "0" ]
 	 then
 	    sed -i 's|ENERGYVARIABLE|Erec|' $RFIL.runparameter
-	    sed -i 's|ENERGYCHI2VARIABLE|EChi2|' $RFIL.runparameter
+	    sed -i 's|ENERGYCHI2VARIABLE|EChi2|g' $RFIL.runparameter
          else
 	    sed -i 's|ENERGYVARIABLE|ErecS|' $RFIL.runparameter
-	    sed -i 's|ENERGYCHI2VARIABLE|EChi2S|' $RFIL.runparameter
+	    sed -i 's|ENERGYCHI2VARIABLE|EChi2S|g' $RFIL.runparameter
          fi
 
 # run script
