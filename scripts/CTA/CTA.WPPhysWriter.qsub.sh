@@ -18,7 +18,8 @@ source $EVNDISPSYS/setObservatory.tcsh CTA
 
 rm -f $OXUTNAME-$OXBSTIME"h."$AXRRAY.log
 
-$EVNDISPSYS/bin/writeCTAWPPhysSensitivityFiles $AXRRAY $OXBSTIME $DXDIR $OXUTNAME CTA $OXFFSET > $OXUTNAME-$OXBSTIME$AXRRAY.log
+cd $EVNDISPSYS/
+./bin/writeCTAWPPhysSensitivityFiles $AXRRAY $OXBSTIME $DXDIR $OXUTNAME CTA $OXFFSET > $OXUTNAME-$OXBSTIME$AXRRAY.log
 
 ############################################################################
 
