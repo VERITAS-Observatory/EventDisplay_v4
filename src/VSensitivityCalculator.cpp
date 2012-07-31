@@ -651,19 +651,50 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 
 // skip all zero entries
 	if( TMath::Abs( non ) < 1.e-2 && TMath::Abs( noff ) < 1.e-2 ) continue;
+// set errors to zero for no off events
+        if( TMath::Abs( noff ) < 1e-2 ) 
+	{
+	    noff = 0.;
+	    noff_error = 0.;
+        }
 
 // observe that the signal rate is defined differently for list_sensitivity() etc...
 	unsigned int iD = addDataSet( non  / fDifferentialFlux[i].ObsTime * 60.,
 	                              noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" );
 // get fraction of Crab flux for XX sigma etc...
+// PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+// pre July 2012 flux and error calculation
+/*
 	s = getSensitivity( iD, fDifferentialFlux[i].Energy );
 // get error on sensitivity estimate
+	cout << "AAA " << endl;
 	iD = addDataSet( (non+non_error)   / fDifferentialFlux[i].ObsTime * 60., 
 	                 (noff-noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
 	s_error_L = getSensitivity( iD );
 	iD = addDataSet( (non-non_error)   / fDifferentialFlux[i].ObsTime * 60.,
 	                 (noff+noff_error) / fDifferentialFlux[i].ObsTime * 60. , alpha, "" );
 	s_error_U = getSensitivity( iD );
+	cout << "BBB " << endl; */
+// PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+// post July 2012 flux and error calculation
+
+// perform a toy MC to calculate errors (1000 times)
+        TH1F iX( "iX", "", 1000., 0., 10. );
+	for( unsigned int q = 0; q < 1000; q++ )
+	{
+	     double iN_on = gRandom->Gaus( non, non_error );
+	     if( iN_on < 1. ) iN_on = 0.;
+	     double iN_off = gRandom->Gaus( noff, noff_error );
+	     if( iN_off < 1. ) iN_off = 0.;
+	     iD = addDataSet( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
+	                      iN_off / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
+             iX.Fill( getSensitivity( iD ) );
+	}
+	s = iX.GetMean();
+	s_error_L = s - iX.GetRMS();
+	s_error_U = s + iX.GetRMS();
+// PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+
 // Preliminary: catch cases were lower sensitivity cannnot be calculated
 	if( s_error_L < 0. )
 	{
@@ -740,18 +771,18 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	     cout << "[" << fDifferentialFlux[i].Energy_lowEdge << ", " << fDifferentialFlux[i].Energy_upEdge << "]\t";
 	     cout << "[" << log10(fDifferentialFlux[i].Energy_lowEdge) << ", " << log10(fDifferentialFlux[i].Energy_upEdge) << "]\t";
 	     cout << endl;
-	     cout << "\t SIG: " << s << "(" << s_error_L << "," << s_error_U << ") [CU]";
-	     cout << endl;
 	     cout << "\t NON: " << non << " (+-" << non_error << ")";
 	     cout << "\t NOFF: " << noff << " (+-" << noff_error << ")";
 	     cout << "\t NDIFF: " << non-alpha*noff  << "\t";
 	     cout << fDifferentialFlux[i].ObsTime << " [s]\t" << scientific;
+	     cout << endl;
+	     cout << "\t FLUX: " << s << " (" << s_error_L << "," << s_error_U << ") [CU],  ";
 	     if( bUnit == "PFLUX" )       cout <<  i_fFunCrabFlux->Eval( energy ) * s << " [cm^-2s^-1] (" << energy << ")";
 	     else if( bUnit == "ENERGY" )
 	     {
 	         cout << scientific <<  i_fFunCrabFlux->Eval( energy ) * s;
-		 cout << " (+" << TMath::Abs( s - s_error_U ) * i_fFunCrabFlux->Eval( energy );
-		 cout << " -" << TMath::Abs( s - s_error_L ) * i_fFunCrabFlux->Eval( energy ) << ")";
+		 cout << " (" << TMath::Abs( s - s_error_U ) * i_fFunCrabFlux->Eval( energy );
+		 cout << ", " << TMath::Abs( s - s_error_L ) * i_fFunCrabFlux->Eval( energy ) << ")";
                  cout << " [erg cm^-2s^-1]";
              }
              cout << endl;
@@ -1893,6 +1924,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		  }
 
 		  iMCPara->effArea.push_back( c->Rec_eff[n] );
+// set error in effective area as mean upper/lower error
 		  iMCPara->effArea_error.push_back( 0.5*(c->Rec_seff_L[n]+c->Rec_seff_U[n]) );  
 	       }
 	       else if( fDebug )
