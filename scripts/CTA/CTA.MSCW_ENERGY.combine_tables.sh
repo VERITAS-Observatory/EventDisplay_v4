@@ -34,6 +34,8 @@ ODIR=$4
 mkdir -p $ODIR
 DSET=$5
 
+source $EVNDISPSYS/setObservatory.sh CTA
+
 #loop over all arrays
 for ARRAY in $VARRAY
 do
