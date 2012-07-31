@@ -679,7 +679,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // post July 2012 flux and error calculation
 
 // perform a toy MC to calculate errors (1000 times)
-        TH1F iX( "iX", "", 1000., 0., 10. );
+        TH1F iX( "iX", "", 1000, 0., 10. );
 	for( unsigned int q = 0; q < 1000; q++ )
 	{
 	     double iN_on = gRandom->Gaus( non, non_error );
