@@ -1446,17 +1446,19 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 
     fTMVAEvaluator = new VTMVAEvaluator();
     fTMVAEvaluator->setDebug( fDebug );
+// set parameters for optimal MVA cut value search
     if( fTMVAOptimizeSignalEfficiencySourceStrengthCU > 0. && fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
        fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU, 1.e-10, 0.2,
                                                              fTMVAOptimizeSignalEfficiencyObservationTime_h );
        fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
     }
+// set a constant signal efficiency
     else if( fTMVASignalEfficiency > 0. )
     {
        fTMVAEvaluator->setSignalEfficiency( fTMVASignalEfficiency );
     }
-// Note: for TMVA is this not the probability threshold but the MVA cut value
+// set a fixed probability threshold or (for TMVA) a fixed MVA cut value
     else if( fTMVAProbabilityThreshold > -99. )
     {
        fTMVAEvaluator->setTMVACutValue( fTMVAProbabilityThreshold );
@@ -1470,6 +1472,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
        exit( -1 );
     }
     fTMVAEvaluator->setTMVAMethod( fTMVA_MVAMethod );
+// read MVA weight files; set MVA cut values (e.g. find optimal values)
     if( !fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_min, iTMVAWeightFileIndex_max ) )
     {
        cout << "VGammaHadronCuts::initTMVAEvaluator: error while initializing TMVA weight files" << endl;

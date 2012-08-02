@@ -431,6 +431,7 @@ double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEffici
     char hname[800];
     sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(),
                                                       fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
+// read signal efficiency histogram
     TH1F *effS = (TH1F*)iTMVAFile.Get( hname );
     if( !effS )
     {
@@ -445,6 +446,7 @@ double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEffici
     cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency: evaluating " << iTMVAFile.GetName() << endl;
     cout << "\t method: " << hname << endl;
 
+// get signal efficiency from histogram
     double iT = effS->GetBinCenter( effS->FindLastBinAbove( iSignalEfficiency ) );
 
     cout << "TMVA CUT VALUE FOR SIGNAL EFFICIENCY " << iSignalEfficiency << ": " << iT;
@@ -965,7 +967,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 
 //////////////////////////////////////////////////////
 // read file with  NOn and Noff graphs
-// (created from effective areas with quality cuts applied only, use VSensitivity for this)
+// (created from effective areas with quality cuts applied only,
+//  use macro $ENVDISPSYS/macros/sensitivity.C (based on VSensitivity) for this)
    TFile iPN( fParticleNumberFileName.c_str() );
    if( iPN.IsZombie() )
    {
@@ -1015,6 +1018,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    double Nof = 0.;
    double Ndif = 0.;
 
+// Note that observation time is irrelevant for the determination of the optimal MVA cut value
    Non = i_on->Eval( iMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
    Nof = i_of->Eval( iMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
    if( Nof < 0. ) Nof = 0.;

@@ -782,7 +782,10 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             else if( iTemp == "MAXLOSS" )
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fLoss_max[m_temp].size(); i++ )  fLoss_max[m_temp][i] = atof( iTemp2.c_str() );
-                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fLoss_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ )
+		{
+		   fLoss_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
+                }
             }
             else if( iTemp == "MAXWIDTHLENGTH" )
             {

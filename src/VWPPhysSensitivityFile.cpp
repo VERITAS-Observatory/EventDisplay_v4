@@ -519,6 +519,7 @@ void VWPPhysSensitivityFile::setSubArray( string iA )
 
     if( isVTS() == 0 )
     {
+// change here for ID change
        fDataFile_gamma_onSource = "gamma_onSource." + fSubArray + "_ID0.eff-";
        fDataFile_gamma_cone10 = "gamma_cone10." + fSubArray + "_ID0.eff-";
        fDataFile_proton = "proton." + fSubArray + "_ID0.eff-";
