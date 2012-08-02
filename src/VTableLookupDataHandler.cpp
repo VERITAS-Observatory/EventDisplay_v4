@@ -384,7 +384,10 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     {
         bool fReadTPars = false;
 	if( i < ftpars.size() && ftpars[i] ) fReadTPars = true;
-	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 && fTLRunParameter->bWriteReconstructedEventsOnly == fMethod) 
+// (GM) not clear 	
+//	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 && fTLRunParameter->bWriteReconstructedEventsOnly == fMethod) 
+//	  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fTLRunParameter->readwrite == 'W'   )
+	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
 	  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fTLRunParameter->readwrite == 'W'   )
 	{
 	   if( fImgSel_list[i] ) fReadTPars = true;

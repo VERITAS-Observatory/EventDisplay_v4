@@ -258,7 +258,11 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
         }
         else if( iTemp.find( "-writeReconstructedEventsOnly" ) < iTemp.size() )
         {
-            bWriteReconstructedEventsOnly = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+	    if( iTemp.rfind( "=" ) != string::npos )
+	    {
+	       bWriteReconstructedEventsOnly = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+            }
+	    else bWriteReconstructedEventsOnly = 0;
         }
         else if( iTemp.find( "-short" ) < iTemp.size() )
         {
