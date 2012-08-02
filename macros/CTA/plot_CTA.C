@@ -72,26 +72,31 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
     telconfig->SetMarkerSize( 0.5 * iMarkerMult );
     telconfig->Draw("TelY:TelX", "", "same" );
 
+// LSTs (1)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 2 );
     telconfig->SetMarkerSize( 1.5 * iMarkerMult );
     telconfig->Draw("TelY:TelX", "TelType==141305009", "same" );
 
+// standard MSTs (2)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 1 );
     telconfig->SetMarkerSize( 1.0 * iMarkerMult );
     telconfig->Draw("TelY:TelX", "TelType==10007818", "same" );
 
+// large pixel MSTs (4)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 6 );
     telconfig->SetMarkerSize( 1.0 * iMarkerMult );
     telconfig->Draw("TelY:TelX", "TelType==10009725", "same" );
 
+// standard SSTs (3)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 3 );
     telconfig->SetMarkerSize( 0.7 * iMarkerMult );
     telconfig->Draw("TelY:TelX", "TelType==3709725", "same" );
 
+// 7m telescopes (5)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 4 );
     telconfig->SetMarkerSize( 0.7 * iMarkerMult );
@@ -99,7 +104,8 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
 
     if( iname )
     {
-       TText *it = new TText( 0.35*xmax, 0.8*ymax, iname );
+       TText *it = new TText( -1.*0.9*xmax, 0.75*ymax, iname );
+       it->SetTextSize( it->GetTextSize() * 1.5 );
        it->Draw();
     }
 
@@ -110,7 +116,7 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
 
     plot all array layout from a list of runs
 
-    (read telconfig trees from evndisp output files
+    (read telconfig trees from evndisp output files)
 
 */
 void plot_allArrayLayouts( string iArrayListFile, string iFileName, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450. )
