@@ -668,6 +668,20 @@ writeCTAWPPhysSensitivityFiles:	$(WRITECTAPHYSOBJ)
 	@echo "$@ done"
 
 ########################################################
+# writeParticleRateFilesFromEffectiveAreas 
+########################################################
+WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
+			./lib/libVAnaSum.so
+
+./obj/writeParticleRateFilesFromEffectiveAreas.o: 	./src/writeParticleRateFilesFromEffectiveAreas.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+writeParticleRateFilesFromEffectiveAreas:	$(WRITECTAPHYSOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib -lVAnaSum $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+
+########################################################
 # combineLookupTables
 ########################################################
 ./obj/combineLookupTables.o:	./src/combineLookupTables.cpp
