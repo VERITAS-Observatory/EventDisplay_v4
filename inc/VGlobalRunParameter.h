@@ -47,7 +47,8 @@ class VGlobalRunParameter
 // changes from 7 to 8: add MC primary to showerpars
    static unsigned int fEVNDISP_TREE_VERSION;
 
-   static string    fDBServer;                                         // database location
+   static string    fDBServer;                                         // database location (VTS)
+   static string    fRawDataServer;                                    // location of raw data (VTS)
 
 // DIRECTORIES
    static string fEVNDISPAnaDataDirectory;          // directory where all data (calibration, detectorgeometry, ...) is expected and written to (output file)
@@ -80,6 +81,7 @@ class VGlobalRunParameter
    double       getObservatory_Height_m()       { return fObservatory_Height_m; }
    double       getObservatory_Latitude_deg()    { return fObservatory_Latitude_deg; }
    double       getObservatory_Longitude_deg()    { return fObservatory_Longitude_deg; }
+   string       getRawDataServer() const         { return fRawDataServer; }
    void         printGlobalRunParameter();
    bool         readRunparameterFile( string iFile );
    bool         setDirectories();

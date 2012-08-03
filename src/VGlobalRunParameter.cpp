@@ -88,6 +88,17 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
                   }
 		  fDBServer = iTT;
 	       }
+	       else if( temp == "VTSRAWDATA" )
+	       {
+	          fRawDataServer  = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
+// remove all white spaces
+		  string iTT;
+		  for (unsigned int i = 0; i < fRawDataServer.length(); i++)
+		  {
+		     if ( fRawDataServer[i] != ' ') iTT += fRawDataServer[i];
+                  }
+		  fRawDataServer = iTT;
+	       }
             }
 	    else
 	    {
@@ -233,6 +244,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
    cout << " altitude " << fObservatory_Height_m << " m)" << endl;
    cout << endl;
    if( fDBServer.size() > 0 ) cout << "DB server " << fDBServer << endl;
+   if( fRawDataServer.size() > 0 ) cout << "Raw data server " << fRawDataServer << endl;
    cout << "Directories: " << endl;
    if( fEVNDISPAnaDataDirectory.size() > 0 ) cout << "EVNDISP data: " << fEVNDISPAnaDataDirectory << endl;
    if( fVBFRawDataDirectory.size() > 0 )     cout << "VBF raw: " << fVBFRawDataDirectory << endl;
@@ -252,6 +264,7 @@ unsigned int VGlobalRunParameter::fEVNDISP_TREE_VERSION = 8;
 string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.00";
 string VGlobalRunParameter::fEVNDISP_SVNREVISION = "$Revision$";
 string VGlobalRunParameter::fDBServer = "";
+string VGlobalRunParameter::fRawDataServer = "";
 string VGlobalRunParameter::fEVNDISPAnaDataDirectory = "";
 string VGlobalRunParameter::fVBFRawDataDirectory = "";
 string VGlobalRunParameter::fEVNDISPOutputDirectory = "";

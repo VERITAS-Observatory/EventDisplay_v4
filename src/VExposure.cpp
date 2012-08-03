@@ -1471,14 +1471,14 @@ void VExposure::printListOfRuns()
 void VExposure::downloadRunList()
 {
 
-  char filename[500];
-  char filepath[500];
-  char dl_string[500];
+  char filename[800];
+  char filepath[800];
+  char dl_string[800];
 
   char *ENVIR_VAR;
 
-  char mkdir_string[500];
-  char permision_string[500];
+  char mkdir_string[800];
+  char permision_string[800];
 
   ENVIR_VAR = getenv ("OBS_DATA_DIR");
 
@@ -1506,7 +1506,9 @@ void VExposure::downloadRunList()
 	system(permision_string); 
       }
       // Then Download
-      sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" gamma1.astro.ucla.edu",fRunDownloadDate[i],fRunDownload[i],ENVIR_VAR,fRunDownloadDate[i],fRunDownload[i]);
+      sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" %s", fRunDownloadDate[i],fRunDownload[i],
+                                                                                                                  ENVIR_VAR,fRunDownloadDate[i],fRunDownload[i],
+														  getRawDataServer().c_str() );
       cout << dl_string << endl;
       system(dl_string);
     }
@@ -1542,7 +1544,9 @@ void VExposure::downloadRunList()
 	    system(permision_string); 
           }
           // Then Download
-          sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" gamma1.astro.ucla.edu",fLaserDownloadDate[i],fLaserDownload[i],ENVIR_VAR,fLaserDownloadDate[i],fLaserDownload[i]);
+          sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" %s", fLaserDownloadDate[i],fLaserDownload[i],
+	                                                                                                              ENVIR_VAR,fLaserDownloadDate[i],fLaserDownload[i],
+														      getRawDataServer().c_str() );
           cout << dl_string << endl;
 	  system(dl_string);
         }
@@ -1556,12 +1560,10 @@ void VExposure::downloadRunList()
 void VExposure::getLaserList()
 {
 
-  string iDBserver = "mysql://romulus.ucsc.edu";
-
   cout << "Reading Laser Runs for selected runs ....... " ;
 
   for( unsigned int i = 0; i < fRunRA.size(); i++ )
-    fRunLaserList.push_back( getLaserRun(iDBserver,fRun[i],4) );
+    fRunLaserList.push_back( getLaserRun( getDBServer(), fRun[i],4) );
 
 //  for( unsigned int i = 0; i < fRunLaserList.size(); i++ )
 //    for( unsigned int j = 0; j < 4 ; j++ )
