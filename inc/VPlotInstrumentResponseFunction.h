@@ -47,7 +47,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     TCanvas* plotResolution( string iName, string iCanvasTitle, string iYTitle,
                              double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
     TCanvas* plotResolution2D( unsigned int iDataSetID, string iName, string iCanvasTitle, string iYTitle,
-                               double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
+                               double iYmin, double iYmax, string iResolutionTreeName, string iXaxis, double iEnergySlice_GeV = -1. );
 
     public:
 
@@ -68,7 +68,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     TH1D*        getTheta2Histogram( unsigned int iDataSetID = 0, double i_Energy_TeV_lin = 1. );
     void         listDataSets();
     TCanvas*     plotAngularResolution( string iXaxis = "energy", string iProbabilityString = "68", double iMax = -1.e99 );
-    TCanvas*     plotAngularResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy", string iProbabilityString = "68" );
+    TCanvas*     plotAngularResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy", string iProbabilityString = "68", double iEnergySlice_GeV = -1. );
     TCanvas*     plotCoreResolution( string iXaxis = "energy" );
     TCanvas*     plotCoreResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );
     void         plotCutEfficiency( unsigned int iDataSetID = 0 );

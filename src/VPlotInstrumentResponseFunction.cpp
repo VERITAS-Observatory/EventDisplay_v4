@@ -620,7 +620,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyReconstructionBias( string i
     return iEnergySystematicsPlottingCanvas;
 }
 
-TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int iDataSetID, string iXaxis, string iProbabilityString )
+TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int iDataSetID, string iXaxis, string iProbabilityString, double iEnergySlice_GeV )
 {
    string iResolutionTreeName = "t_angular_resolution";
    if( iProbabilityString != "68" ) iResolutionTreeName += "_0" + iProbabilityString +"p";
@@ -628,7 +628,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution2D( unsigned int 
                             "angres" + iProbabilityString, "angular resolution vs " + iXaxis,
                             "angular resolution (" + iProbabilityString + "%) [deg]",
                             getPlottingAxis( "angularesolution_Lin" )->fMinValue,
-			    getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis );
+			    getPlottingAxis( "angularesolution_Lin" )->fMaxValue, iResolutionTreeName, iXaxis, iEnergySlice_GeV );
 }
 
 TCanvas* VPlotInstrumentResponseFunction::plotAngularResolution( string iXaxis, string iProbabilityString, double iMax )
@@ -673,7 +673,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution2D( unsigned int i
 TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSetID, string iName,
                                                             string iCanvasTitle, string iYTitle,
 							    double iYmin, double iYmax,
-							    string iResolutionTreeName, string iXaxis )
+							    string iResolutionTreeName, string iXaxis,
+							    double iEnergySlice_GeV )
 {
     if( !checkDataSetID( iDataSetID ) ) return 0;
 
@@ -735,7 +736,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
     }
 
 // create canvas
-    sprintf( hname, "c2D%s_%s_%d", iName.c_str(), iXaxis.c_str(), iDataSetID );
+    sprintf( hname, "c2D%s_%s_%d_%d", iName.c_str(), iXaxis.c_str(), iDataSetID, (int)iEnergySlice_GeV );
     sprintf( htitle, "%s (data set %d)", iCanvasTitle.c_str(), iDataSetID );
     TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, htitle, 210, 10, fCanvasSize_X, fCanvasSize_Y );
     iResolutionPlottingCanvas->SetGridx( 0 );
@@ -767,8 +768,26 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
                 setHistogramPlottingStyle( h, -99. );
                 h->SetAxisRange( i_Plotting_L_Min, i_Plotting_L_Max, "X" );
                 h->SetAxisRange( iYmin, iYmax, "Y" );
-                h->GetYaxis()->SetTitleOffset( 1.5 );
-                h->Draw( "colz" );
+		cout << iYmin << "\t" << iYmax << endl;
+// plot 2D histogram
+		if( iEnergySlice_GeV < 0. )
+		{
+		   h->GetYaxis()->SetTitleOffset( 1.5 );
+		   h->Draw( "colz" );
+                }
+// plot a slice of the 2D histogram
+                else
+		{
+		   h->SetAxisRange( -1., -1., "Y" );
+		   sprintf( hname, "%s_%d_%d", h->GetName(), (int)iEnergySlice_GeV, h->GetXaxis()->FindBin( log10( iEnergySlice_GeV ) ) );
+		   TH1D *h1D = h->ProjectionY( hname, h->GetXaxis()->FindBin( log10( iEnergySlice_GeV ) ), h->GetXaxis()->FindBin( log10( iEnergySlice_GeV ) ) );
+		   if( h1D )
+		   {
+		      h1D->GetXaxis()->SetTitleOffset( 1.2 );
+//		      h1D = get_Cumulative_Histogram( h1D, true, true );
+		      h1D->Draw();
+                   }
+                }
                 if( fDebug )
                 {
                    cout << "HISTOGRAM " << h->GetName() << endl;
