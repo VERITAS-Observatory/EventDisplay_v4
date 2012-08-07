@@ -18,6 +18,9 @@ VExposure::VExposure( int nBinsL, int nBinsB )
     fDebug = false;
     fMakeRunList = false;
 
+    bPrintVerbose = false;
+    bPrintTimeMask = false;
+
 // VERITAS values
     fObsLongitude = 110.952 * atan(1.)/45;
     fObsLatitude =   31.675 * atan(1.)/45.;
@@ -77,11 +80,12 @@ void VExposure::set_plot_style()
 
 void VExposure::setSelectLaser( int iSelectLaser )
 {
-    fSelectLaser = iSelectLaser;
+      fSelectLaser = iSelectLaser;
 }
 
 void VExposure::setTimeRange( string iStart, string iStop )
 {
+
     fStartDate = iStart;
     fStopDate  = iStop;
 }
@@ -325,6 +329,166 @@ bool VExposure::readFromDB()
     }
     if( f_db ) f_db->Close();
 
+    cout << "total number of runs in runlist: " << fRunStatus.size() << endl;
+
+    return true;
+}
+
+bool VExposure::readFromDBList()
+{
+    string iTempS;
+    iTempS = getDBServer() + "/VERITAS";
+    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
+    if( !f_db )
+    {
+        cout << "error connecting to db" << endl;
+        return false;
+    }
+    cout << "reading from " << iTempS << endl;
+
+    char c_query[1000];
+
+    for( unsigned int i = 0; i < fRunDownloadList.size(); i++ )
+    {
+
+      sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunDownloadList[i] );
+
+      TSQLResult *db_res = f_db->Query( c_query );
+      if( !db_res )
+      {
+          return false;
+      }
+
+      string itemp;
+
+      TSQLRow *db_row = db_res->Next();
+
+      if( !db_row ) break;
+
+//////
+// all fields should be defined (check if field #19 is there)
+      if( !db_row->GetField( 19 ) ) continue;
+      itemp = db_row->GetField( 19 );
+// don't use laser or charge injection runs
+      if( itemp == "NOSOURCE" ) continue;
+
+//////
+// check if this run is an observing run
+      if( !db_row->GetField( 1 ) ) continue;
+      itemp = db_row->GetField( 1 );
+      if( itemp != "observing" ) continue;
+
+//////
+// get run status
+      if( !db_row->GetField( 3 ) ) continue;
+      itemp = db_row->GetField( 3 );
+// don't use aborted runs
+      if( itemp == "aborted" ) continue;
+// don't use runs which are started only
+      if( itemp == "started" ) continue;
+// don't use runs which are defined only
+      if( itemp == "defined" ) continue;
+// don't use runs which are prepared only
+      if( itemp == "prepared" ) continue;
+
+// get date
+
+      if( db_row->GetField( 6 ) )
+      {
+          string iTemp = db_row->GetField( 6 );
+          if( iTemp.size() > 8 )
+              fDataStartTime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
+      }
+      //if( fDebug ) cout << j << " " << db_row->GetField( 19 ) <<  " ";
+      //if( fDebug ) cout << db_row->GetField( 1 ) << " " << db_row->GetField( 3 ) << " " << flush;
+
+//////
+// get source coordinates
+      double iRa = 0.;
+      double iDec = 0.;
+      itemp = db_row->GetField( 19 );
+      if( !getDBSourceCoordinates( f_db, itemp, iDec, iRa ) )
+      {
+          cout << "No coordinates available: " << db_row->GetField( 0 ) << " " << itemp << endl;
+          continue;
+      } 
+
+      fRunSourceID.push_back( itemp );
+      fRunRA.push_back( iRa );
+      fRunDec.push_back( iDec );
+
+      fRunoffsetRA.push_back( atof( db_row->GetField( 15 ) ) * 180./TMath::Pi() );
+      fRunoffsetDec.push_back( atof( db_row->GetField( 16 ) ) * 180./TMath::Pi() );
+      fRunConfigMask.push_back( atoi( db_row->GetField( 10 ) ) );
+
+//////
+// get galactic coordinates
+      double i_b = 0.;
+      double i_l = 0.;
+      iRa  += fRunoffsetRA.back();
+      iDec += fRunoffsetDec.back();
+
+      slaEqgal( iRa / 180. * TMath::Pi(), iDec / 180. * TMath::Pi(), &i_l, &i_b );
+      fRunGalLong1958.push_back( i_l * 180./TMath::Pi() );
+      fRunGalLat1958.push_back( i_b * 180./TMath::Pi() );
+      if( fDebug ) cout << " " << iRa << " " << iDec << " ";
+      if( fDebug ) cout << " " << fRunGalLong1958.back() << " " << fRunGalLat1958.back() << " " << flush;
+
+//////
+// calculate MJD, etc.
+      int iMJD = 0;
+      double iTime1 = 0.;
+      double iTime2 = 0.;
+
+      if( !db_row->GetField( 6 ) ) continue;
+      itemp = db_row->GetField( 6 );
+      getDBMJDTime( itemp, iMJD, iTime1, true );
+      fRunStartMJD.push_back( (double)iMJD + iTime1/86400 );
+      if( fDebug ) cout << "T1 " << iMJD << " " << iTime1 << " ";
+      if( !db_row->GetField( 7 ) ) continue;
+      itemp = db_row->GetField( 7 );
+      if( fDebug ) cout << itemp << " " << flush;
+      getDBMJDTime( itemp, iMJD, iTime2, true );
+      if( fDebug ) cout << "T2 " << iMJD << " " << iTime2 << " ";
+      fRunStopMJD.push_back( (double)iMJD + iTime2/86400 );
+      fRunDuration.push_back( iTime2 - iTime1 );
+      fRunDate.push_back( fDataStartTime );
+
+      if( fDebug ) cout << fRunDuration.back() << " " << flush;
+
+      itemp = db_row->GetField( 0 );
+      if( fDebug ) cout << "RUN " << itemp << " " << flush;
+      fRun.push_back( atoi( itemp.c_str() ) );
+
+//       itemp = db_row->GetField( 2 );
+      fRunStatus.push_back( "" );
+
+//////
+// get local coordinates
+
+      double ha = 0.;
+      double iSid = 0.;
+      double az, el;
+// get Greenwich sideral time
+      iSid = slaGmsta( (double)iMJD, (iTime1+iTime2)/2./86400. );
+// calculate local sideral time
+      iSid = iSid - fObsLongitude;
+// calculate hour angle
+      ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
+// get horizontal coordinates
+      slaDe2h( ha, iDec / 180. * TMath::Pi(), fObsLatitude, &az, &el );
+// fill vectors
+      fRunTelElevation.push_back( el * 180. / TMath::Pi() );
+      fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
+
+////////////////////////////////////////////////////////////////////////
+      if( fDebug ) cout << fRunStatus.back() << " " << fRun.back() << flush;
+
+      if( fDebug ) cout << endl;
+
+    }
+
+    if( f_db ) f_db->Close();
     cout << "total number of runs in runlist: " << fRunStatus.size() << endl;
 
     return true;
@@ -1400,26 +1564,23 @@ void VExposure::plotTimeDifferencesbetweenRuns()
     fTimeDifferencesBetweenRuns->Draw();
 }
 
-//void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDuration, string iTeVCatalogue, double r_min, string iEventListFile )
 void VExposure::printListOfRuns()
 {
 
   int k = 0;
   int itemp = 0;
   double Total_Time = 0;
+  vector< int > tcut;
 
 // loop over all runs 
   for( unsigned int j = 0; j < fRunRA.size(); j++ )
   {
 
 // total time on object (new array configuration only)
-//    if( fRun[j] > 46642 && fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
     if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
     {
-// print some information about this run
 
         cout << "\tRUN " << fRun[j];
-//if( fRunSourceID[j].size() > 0 ) cout << "\t" << fRunSourceID[j];
         cout << "\t" << fRunSourceID[j];
         cout << "\tMJD " << fRunStartMJD[j];
         cout <<  "\tDate: " << fRunDate[j];
@@ -1427,7 +1588,23 @@ void VExposure::printListOfRuns()
         cout << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
         cout << "\tDuration[s] " << fRunDuration[j];
         cout << "\t(El,Az) " << fRunTelElevation[j] << " " << fRunTelAzimuth[j];
-//           cout << "\tStatus: " << fRunStatus[j];
+	if( bPrintVerbose )
+        {
+          cout << "\t Catagory: " << fDataCat[j];
+          cout << "\t Status: " << fStatus[j];
+          cout << "\t Reason: " << fStatReason[j];
+          cout << "\t Telescope Mask: " << fTelCutMask[j];
+          cout << "\t Usable: " << fUsable[j];
+          cout << "\t TimeCut: " << fTimeCutMask[j];
+          cout << "\t Light Level: " << fLightLevel[j];
+          cout << "\t VPM: " << fVPMcon[j];
+          cout << "\t Comment: " << fComment[j];
+          cout << "\t Author: " << fAuthor[j];
+        } else 
+        {
+          cout << "\t " << fStatus[j];
+        }
+
         if( fSelectLaser == 1 )
         {
           cout << "\tLaser: " << fRunLaserList[j][0];
@@ -1453,7 +1630,6 @@ void VExposure::printListOfRuns()
 	    if( itemp == 0 )
             {
               fLaserDownload.push_back( fRunLaserList[j][i] );
-              //fLaserDownloadDate.push_back( fDateLaserList[j] );
               fLaserDownloadDate.push_back( getLaserDate(fRunLaserList[j][i]) );
             }
           }
@@ -1463,8 +1639,47 @@ void VExposure::printListOfRuns()
 
   }
 
+  cout << endl;
   cout << "Selected " << k << " runs after cuts. A total of " << Total_Time/60./60. << " [hrs]." << endl;
   cout << endl;
+
+  if( bPrintTimeMask )
+  {
+    cout << endl;
+    cout << "Time Masks For Eventdisplay:" << endl;
+    cout << endl;
+
+    for( unsigned int j = 0; j < fRunRA.size(); j++ )
+    {
+
+      if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
+      {
+
+	if( fTimeCutMask[j] != " " )
+	{
+	  stringstream stream1(fTimeCutMask[j]);
+	  string word1;
+
+	while( getline(stream1, word1, ',') )
+	{
+	  stringstream stream2(word1);
+	  string word2;
+
+          cout << "* " ;
+          cout << " " << fRun[j];
+	  while( getline(stream2, word2, '/') )
+	  {
+	    cout << " " << word2 ;
+	  }
+          cout << " 0" << endl;
+	}
+        }
+
+      }
+
+    }
+
+  }
 
 }
 
@@ -1661,4 +1876,87 @@ void VExposure::setMakeRunList( bool iSet )
 
   return;
 
+}
+
+void VExposure::readRunListFromFile( string runlist )
+{
+
+  string is_line;
+  ifstream inputfile;
+  inputfile.open(runlist.c_str());
+
+  if( !inputfile )
+  {
+    cout << "ERROR: Input runlist not found: " << runlist << endl;
+    exit(-1);
+  }
+
+  while( getline( inputfile, is_line ) )
+  {
+    fRunDownloadList.push_back( atoi(is_line.c_str()) );
+  }
+
+  inputfile.close();
+
+}
+
+void VExposure::readRunCommentsFromDB()
+{
+
+    stringstream iTempS;
+    iTempS << getDBServer() << "/VOFFLINE";
+    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
+
+    if( !f_db ) return;
+    char c_query[1000];
+    
+    for( unsigned int i = 0; i < fRunDownloadList.size(); i++ )
+    {
+
+      sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRunDownloadList[i] );
+    
+      TSQLResult *db_res = f_db->Query( c_query );
+      if( !db_res ) return;
+    
+      TSQLRow *db_row = db_res->Next();
+      if( !db_row )
+      {
+          cout << "VDBRunInfo: failed reading a row from DB for run " << fRunDownloadList[i] << endl;
+          return;
+      }
+    
+      if( db_row->GetField( 1 ) )  fDataCat.push_back( db_row->GetField( 1 ) );
+      else 			   fDataCat.push_back( " " );
+      if( db_row->GetField( 2 ) )  fStatus.push_back( db_row->GetField( 2 ) );
+      else 			   fStatus.push_back( " " );
+      if( db_row->GetField( 3 ) )  fStatReason.push_back( db_row->GetField( 3 ) );
+      else 			   fStatReason.push_back( " " );
+      if( db_row->GetField( 4 ) )  fTelCutMask.push_back( db_row->GetField( 4 ) );
+      else 			   fTelCutMask.push_back( " " );
+      if( db_row->GetField( 5 ) )  fUsable.push_back( db_row->GetField( 5 ) );
+      else 			   fUsable.push_back( " " );
+      if( db_row->GetField( 6 ) )  fTimeCutMask.push_back( db_row->GetField( 6 ) );
+      else 			   fTimeCutMask.push_back( " " );
+      if( db_row->GetField( 7 ) )  fLightLevel.push_back( db_row->GetField( 7 ) );
+      else 			   fLightLevel.push_back( " " );
+      if( db_row->GetField( 8 ) )  fVPMcon.push_back( db_row->GetField( 8 ) );
+      else 			   fVPMcon.push_back( " " );
+      if( db_row->GetField( 9 ) )  fAuthor.push_back( db_row->GetField( 9 ) );
+      else 			   fAuthor.push_back( " " );
+      if( db_row->GetField( 10 ) ) fComment.push_back( db_row->GetField( 10 ) );
+      else 			   fComment.push_back( " " );
+
+    }
+
+    f_db->Close();
+
+    return;
+}
+void VExposure::setPrintTimeMask( int iPrintTimeMask )
+{
+	if( iPrintTimeMask ) bPrintTimeMask = true;
+}
+void VExposure::setPrintVerbose( int iPrintVerbose )
+{
+	if( iPrintVerbose ) bPrintVerbose = true;
 }
