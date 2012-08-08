@@ -1120,6 +1120,16 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
         {
             if( ii == jj || ii > jj ) continue;
 
+// check minimum angle between image lines; ignore if too small
+            iangdiff = fabs( atan(m[jj])-atan(m[ii]) );
+	    if( iangdiff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() || 
+		  fabs(180./TMath::RadToDeg()-iangdiff) < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+	    {
+		  continue;
+	    }
+// weight is sin of angle between image lines
+            iangdiff = fabs( sin( fabs(atan(m[jj])-atan(m[ii])) ) );
+
             b1 = y[ii] - m[ii] * x[ii];
             b2 = y[jj] - m[jj] * x[jj];
 
@@ -1128,7 +1138,6 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
             else                 xs = 0.;
             ys = m[ii] * xs + b1;
 
-            iangdiff = fabs( sin( fabs(atan(m[jj])-atan(m[ii])) ) );
 
             iweight  = 1./(1./w[ii] + 1./w[jj]);      // weight 1: size of images
             iweight *= (1.-l[ii])*(1.-l[jj]);         // weight 2: elongation of images (width/length)
