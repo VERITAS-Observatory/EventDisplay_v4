@@ -302,8 +302,17 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 {
    if( !fData ) return;
 
-// simple quality check
-    if( fData->Xoff <-50. || fData->Yoff < -50. ) return;
+// default is true here
+   bool bPlotResolution_vs_reconstructedEnergy = true;
+
+// simple quality check (FOV shouldn't be larger than 50 deg)
+   if( fData->Xoff <-50. || fData->Yoff < -50. ) return;
+
+// get reconstructed energy
+   double iErec_lin = -99.e6;
+   if( fEnergyReconstructionMethod == 0 && fData->Erec > 0. )       iErec_lin = fData->Erec;
+   else if( fEnergyReconstructionMethod == 1 && fData->ErecS > 0. ) iErec_lin = fData->ErecS;
+   if( iErec_lin < 0. ) return;
 
    double iDiff = -99.e6;
    double iError = -99.e6;
@@ -342,25 +351,22 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 // energy resolution
    else if( fType_numeric == 2 )
    {
-       double iErec_lin = -99.e6;
-       if( fEnergyReconstructionMethod == 0 && fData->Erec > 0. )       iErec_lin = fData->Erec;
-       else if( fEnergyReconstructionMethod == 1 && fData->ErecS > 0. ) iErec_lin = fData->ErecS;
-       else if( fEnergyReconstructionMethod == 2 && fData->ErecS > 0. ) iErec_lin = fData->ErecS;
-
        if( fData->MCe0 > 0. ) iDiff = TMath::Abs( 1. - iErec_lin / fData->MCe0 );
        iError = iDiff;
        if( fData->MCe0 > 0. ) iErrorRelative = ( iErec_lin - fData->MCe0  ) / fData->MCe0;
        else                   iErrorRelative = -99.e6;
    }
 
+   if( !bPlotResolution_vs_reconstructedEnergy ) iErec_lin = fData->MCe0;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // fill histograms
 
 // difference vs energy 
-   if( E_DIFF < f2DHisto.size() && f2DHisto[E_DIFF] )    f2DHisto[E_DIFF]->Fill( log10( fData->MCe0 ), iDiff, iWeight );
+   if( E_DIFF < f2DHisto.size() && f2DHisto[E_DIFF] )    f2DHisto[E_DIFF]->Fill( log10( iErec_lin ), iDiff, iWeight );
 
 // squared difference vs energy 
-   if( E_DIFF2 < f2DHisto.size() && f2DHisto[E_DIFF2] )  f2DHisto[E_DIFF2]->Fill( log10( fData->MCe0 ), iDiff*iDiff, iWeight );
+   if( E_DIFF2 < f2DHisto.size() && f2DHisto[E_DIFF2] )  f2DHisto[E_DIFF2]->Fill( log10( iErec_lin ), iDiff*iDiff, iWeight );
 
 // difference vs number of images
    if( E_NIMAG < f2DHisto.size() && f2DHisto[E_NIMAG] )  f2DHisto[E_NIMAG]->Fill( fData->NImages, iDiff, iWeight );
@@ -373,12 +379,12 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
    }
 
 // error vs energy
-   if( E_ERROR < f2DHisto.size() && f2DHisto[E_ERROR] )  f2DHisto[E_ERROR]->Fill( log10( fData->MCe0 ), iError, iWeight );
+   if( E_ERROR < f2DHisto.size() && f2DHisto[E_ERROR] )  f2DHisto[E_ERROR]->Fill( log10( iErec_lin ), iError, iWeight );
 
 // relative error vs energy
    if( E_RELA < f2DHisto.size() && f2DHisto[E_RELA] && iErrorRelative > -98.e6 )
    {
-      f2DHisto[E_RELA]->Fill( log10( fData->MCe0 ), iErrorRelative, iWeight );
+      f2DHisto[E_RELA]->Fill( log10( iErec_lin ), iErrorRelative, iWeight );
    }
 }
 
