@@ -513,18 +513,20 @@ bool VWPPhysSensitivityFile::terminate()
    return true;
 }
 
-void VWPPhysSensitivityFile::setSubArray( string iA )
+void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
 {
     fSubArray = iA;
 
     if( isVTS() == 0 )
     {
 // change here for ID change
-       fDataFile_gamma_onSource = "gamma_onSource." + fSubArray + "_ID1.eff-";
-       fDataFile_gamma_cone10 = "gamma_cone10." + fSubArray + "_ID1.eff-";
-       fDataFile_proton = "proton." + fSubArray + "_ID1.eff-";
-       fDataFile_electron = "electron." + fSubArray + "_ID1.eff-";
-       if( fSubArray != "V5" && fSubArray != "V6" ) fDataFile_electron = "electron." + fSubArray + "_ID1.eff-";
+       char hname[200];
+       sprintf( hname, "%d", iRecID );
+       fDataFile_gamma_onSource = "gamma_onSource." + fSubArray + "_ID" + hname + ".eff-";
+       fDataFile_gamma_cone10 = "gamma_cone10." + fSubArray + "_ID" + hname + ".eff-";
+       fDataFile_proton = "proton." + fSubArray + "_ID" + hname + ".eff-";
+       fDataFile_electron = "electron." + fSubArray + "_ID" + hname + ".eff-";
+       if( fSubArray != "V5" && fSubArray != "V6" ) fDataFile_electron = "electron." + fSubArray + "_ID" + hname + ".eff-";
        else                                         fDataFile_electron = "";
     }
     else if( isVTS() == 5 )

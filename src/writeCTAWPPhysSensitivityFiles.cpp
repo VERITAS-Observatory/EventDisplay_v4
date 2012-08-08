@@ -12,10 +12,10 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
-    if( argc != 7 )
+    if( argc != 8 )
     {
         cout << endl;
-	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory> <outputfile> <observatory (CTA/V5/V6)> <offset=0/1>" << endl;
+	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory> <outputfile> <observatory (CTA/V5/V6)> <offset=0/1> <recid>" << endl;
 	cout << endl;
 	exit( 0 );
     }
@@ -25,6 +25,7 @@ int main( int argc, char *argv[] )
     string fOutputFile = argv[4];
     string fObservatory = argv[5];
     bool   fWriteOffsetFiles = atoi( argv[6] );
+    int    fReconstructionID = atoi( argv[7] );
 
     VWPPhysSensitivityFile *iData = new VWPPhysSensitivityFile();
     iData->setObservatory( fObservatory );
@@ -44,7 +45,7 @@ int main( int argc, char *argv[] )
 //       iWobbleMin.push_back( 5.5 ); iWobbleMax.push_back( 6.0 );
     }
 // sub array
-    iData->setSubArray( fSubArray );
+    iData->setDataFiles( fSubArray, fReconstructionID );
 // observing time
     iData->setObservationTime( fObservingTime_h );
 // output file
