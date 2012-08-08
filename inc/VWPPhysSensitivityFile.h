@@ -82,7 +82,7 @@ class VWPPhysSensitivityFile
     void setDebug( bool iB = false ) { fDebug = iB; }
     void setObservationTime( double iO_h = 50. ) { fObservingTime_h = iO_h; }
     void setObservatory( string iO = "CTA" ) { fObservatory = iO; }
-    void setSubArray( string iA = "E" );
+    void setDataFiles( string iA = "E", int iRecID = 0 );
     bool terminate();
 
 };
