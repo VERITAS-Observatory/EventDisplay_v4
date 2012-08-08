@@ -81,7 +81,7 @@ N=300
 # loop over all files in files loop
 for AFIL in $FILES
 do
-   QLOG=$CTA_USER_LOG_DIR/$DATE/conv$N/
+   QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP/conv$N/
    mkdir -p $QLOG
    
    echo "submitting $AFIL ($LDIR)"

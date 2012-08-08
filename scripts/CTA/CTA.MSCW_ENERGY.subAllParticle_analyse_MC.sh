@@ -36,8 +36,7 @@ elif [ $4 = "DESY3700m" ]
 then
    VPART=( "proton" )
 else
-#   VPART=( "gamma_onSource" "electron" "proton" )
-   VPART=( "proton" )
+   VPART=( "gamma_onSource" "electron" "proton" )
 fi
 NPART=${#VPART[@]}
 
@@ -47,7 +46,7 @@ for ((m = 0; m < $NPART; m++ ))
 do
    PART=${VPART[$m]}
 
-   for (( k = 0; k < 10; k++ ))
+   for (( k = 1; k < 10; k++ ))
    do
       if [ $4 = "v_leeds" ]
       then

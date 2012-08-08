@@ -13,10 +13,11 @@
 ## HARDCODED VAVLUES
 #####################################
 # evndisp reconstruction runparamter
-ACUT="EVNDISP.reconstruction.runparameter.d20120317.trigsim"
+#ACUT="EVNDISP.reconstruction.runparameter.d20120317.trigsim"
+ACUT="EVNDISP.reconstruction.runparameter"
 # run options
 # OPT="-display=1 -useFixedThresholds -reconstructionparameter $ACUT -traceanalysis=0"
-OPT="-display=1 -ignoredstgains -reconstructionparameter $ACUT"
+OPT="-highres -display=1 -ignoredstgains -reconstructionparameter $ACUT"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################

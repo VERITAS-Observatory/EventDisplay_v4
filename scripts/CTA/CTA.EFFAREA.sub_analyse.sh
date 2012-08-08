@@ -98,10 +98,6 @@ FSCRIPT="CTA.EFFAREA.qsub_analyse"
 # directories
 ######################################################################
 DATE=`date +"%y%m%d"`
-echo "directory for qsub output/error files"
-QLOGDIR=$CTA_USER_LOG_DIR"/queueLogDir"
-echo $QLOGDIR
-mkdir -p $QLOGDIR
 echo "directory for qsub shell scripts"
 QSHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir"
 echo $QSHELLDIR
@@ -111,9 +107,9 @@ DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
-FDIR=$CTA_USER_LOG_DIR"/queueEffArea/$DATE/"
-echo $FDIR
-mkdir -p $FDIR
+QDIR=$CTA_USER_LOG_DIR"/$DATE/EFFAREA/"
+echo $QDIR
+mkdir -p $QDIR
 echo "output data directory"
 echo $ODIR
 mkdir -p $ODIR
@@ -440,12 +436,12 @@ do
       echo $iCFIL
       echo $PNF
       echo "run script is $QSHELLDIR/$FNAM.sh"
-      echo "batch log and error files are written to $FDIR"
-      echo "parameter files write written to $FDIR"
+      echo "batch log and error files are written to $QDIR"
+      echo "parameter files write written to $QDIR"
 
 # submit the job
-#     qsub -l os="sl*" -l h_cpu=0:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
-     qsub -l os="sl*" -l h_cpu=11:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $FDIR -e $FDIR "$QSHELLDIR/$FNAM.sh"
+#     qsub -l os="sl*" -l h_cpu=0:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+     qsub -l os="sl*" -l h_cpu=11:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
    done
 done
 

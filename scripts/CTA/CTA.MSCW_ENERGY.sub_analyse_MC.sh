@@ -53,7 +53,7 @@ fi
 # output directory for error/output from batch system
 # in case you submit a lot of scripts: QLOG=/dev/null
 DATE=`date +"%y%m%d"`
-QLOG=$CTA_USER_LOG_DIR/$DATE/
+QLOG=$CTA_USER_LOG_DIR/$DATE/ANALYSETABLES/
 mkdir -p $QLOG
 
 # output directory for shell scripts
@@ -72,7 +72,7 @@ do
    IFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/$WC"
 
 # check if input files exist
-   IFILN=`ls -1 $IFIL*.root | wc -l`
+   IFILN=`\ls -1 $IFIL*.root | wc -l`
    if [ $IFILN -eq 0 ]
    then
      echo "No input files in $IFIL"
@@ -92,7 +92,7 @@ do
 # skeleton script
    FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
 
-   FNAM="$SHELLDIR/MSCW.ana-ID$RECID-$PART-array$SUBAR"
+   FNAM="$SHELLDIR/MSCW.ana-$DSET-ID$RECID-$PART-array$SUBAR"
 
    sed -e "s|TABLEFILE|$TABLE|" $FSCRIPT.sh > $FNAM-1.sh
    sed -e "s|IIIIFIL|$IFIL|" $FNAM-1.sh > $FNAM-2.sh

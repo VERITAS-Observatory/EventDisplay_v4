@@ -73,7 +73,7 @@ fi
 # output directory for error/output from batch system
 # in case you submit a lot of scripts: QLOG=/dev/null
 DATE=`date +"%y%m%d"`
-QLOG=$CTA_USER_LOG_DIR/$DATE/
+QLOG=$CTA_USER_LOG_DIR/$DATE/MAKETABLES/
 mkdir -p $QLOG
 
 # output directory for shell scripts

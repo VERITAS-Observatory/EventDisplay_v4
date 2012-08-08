@@ -11,7 +11,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
    echo 
-   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name> <offset=0/1> <data set>"
+   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name> <offset=0/1> <recid> <data set>"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo ""
@@ -25,7 +25,8 @@ DDIR=$2
 OBSTIME=$3
 OUTNAME=$4
 OFFSET=$5
-DSET=$6
+RECID=$6
+DSET=$7
 
 ############################################################################
 
@@ -84,7 +85,11 @@ do
    sed -e "s|ODIR|$ODIR|" $ODIR/$FSCRIPT-$ARRAY-6.sh > $ODIR/$FSCRIPT-$ARRAY-7.sh
    rm -f $ODIR/$FSCRIPT-$ARRAY-6.sh
 
-   mv $ODIR/$FSCRIPT-$ARRAY-7.sh $ODIR/$FSCRIPT-$ARRAY.sh
+   rm -f $ODIR/$FSCRIPT-$ARRAY-8.sh
+   sed -e "s|RRRR|$RECID|" $ODIR/$FSCRIPT-$ARRAY-7.sh > $ODIR/$FSCRIPT-$ARRAY-8.sh
+   rm -f $ODIR/$FSCRIPT-$ARRAY-7.sh
+
+   mv $ODIR/$FSCRIPT-$ARRAY-8.sh $ODIR/$FSCRIPT-$ARRAY.sh
 
    qsub -V -js 20 -l os="sl*"  -l h_cpu=0:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $ODIR -e $ODIR "$ODIR/$FSCRIPT-$ARRAY.sh"
 
