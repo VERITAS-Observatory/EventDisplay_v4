@@ -34,7 +34,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
     fTtelconfig = 0;
     finputfile = "";
     foutputfile = "";
-    fEmissionHeightCalculator = new VEnergyCorrection();
+    fEmissionHeightCalculator = new VEmissionHeightCalculator();
 
     fEventStatus = true;
 
@@ -1384,7 +1384,7 @@ bool VTableLookupDataHandler::isReconstructed()
 
 void VTableLookupDataHandler::calcEmissionHeights()
 {
-    fEmissionHeightCalculator->calculateEmissionHeight( fcen_x, fcen_y, fdist, fsize, fR, fTelAzimuth, fTelElevation );
+    fEmissionHeightCalculator->getEmissionHeight( fcen_x, fcen_y, fdist, fsize, fR, fTelAzimuth, fTelElevation );
     fNTelPairs = fEmissionHeightCalculator->getNTelPairs();
     fEmissionHeightMean = (float)fEmissionHeightCalculator->getMeanEmissionHeight();
     fEmissionHeightChi2 = (float)fEmissionHeightCalculator->getMeanEmissionHeightChi2();

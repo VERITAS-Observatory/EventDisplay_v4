@@ -4,7 +4,7 @@
 #ifndef VTableLookupDataHandler_H
 #define VTableLookupDataHandler_H
 
-#include "VEnergyCorrection.h"
+#include "VEmissionHeightCalculator.h"
 #include "VDeadTime.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "VMonteCarloRunHeader.h"
@@ -60,7 +60,7 @@ class VTableLookupDataHandler
         double fTotalTime;                        //!< time passed in analysing the run (in [s])
         double fTotalTime0;                       //!< time of first event (in [s])
 
-        VEnergyCorrection *fEmissionHeightCalculator;
+        VEmissionHeightCalculator *fEmissionHeightCalculator;
 
         double fSelectRandom;
         int fSelectRandomSeed;
