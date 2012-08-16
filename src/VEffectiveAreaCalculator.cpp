@@ -607,7 +607,8 @@ bool VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( TTree* iEffFit,
 }
 
 
-vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV, double iVLower, double iVupper, vector< double > iElower, vector< double > iEupper, bool iCos )
+vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV, double iVLower, double iVupper, 
+                                                                      vector< double > iElower, vector< double > iEupper, bool iCos )
 {
     vector< double > i_temp;
     if( iElower.size() == iEupper.size() )
@@ -615,7 +616,8 @@ vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV,
         i_temp.assign( iElower.size(), 0. );
         for( unsigned int i = 0; i < iElower.size(); i++ )
         {
-            i_temp[i] = VStatistics::interpolate( iV, iVLower, iVupper, iElower[i], iEupper[i], iCos, 0.5, -90. );
+// XXXXX            i_temp[i] = VStatistics::interpolate( iV, iVLower, iVupper, iElower[i], iEupper[i], iCos, 0.5, -90. );
+            i_temp[i] = VStatistics::interpolate( iElower[i], iVLower, iEupper[i], iVupper, iV, iCos, 0.5, -90. );
         }
         return i_temp;
     }
@@ -1719,6 +1721,7 @@ double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, doubl
 
 ///////////////////////////////////////////
 // read effective areas from functions
+// (do not do this unless you know what your are doing)
 ///////////////////////////////////////////
 
     if( bEffectiveAreasareFunctions )
@@ -1901,11 +1904,19 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                             unsigned int i_ID_1 = i_index_bins[1] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
                             if( iEffectiveAreaVsEnergyMC )
                             {
-                                i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex, fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]], fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]], fEffMC_Eff[i_ID_0], fEffMC_Eff[i_ID_1], false );
+                                i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex,
+				                                                 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
+										 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
+										 fEffMC_Eff[i_ID_0], 
+										 fEffMC_Eff[i_ID_1], false );
                             }
                             else
                             {
-                                i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex, fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]], fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]], fEffRec_Eff[i_ID_0], fEffRec_Eff[i_ID_1], false );
+                                i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex,
+				                                                 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
+										 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
+										 fEffRec_Eff[i_ID_0],
+										 fEffRec_Eff[i_ID_1], false );
                             }
                         }
                         else
@@ -1925,7 +1936,11 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                         }
 ////////////////////////////////////////////////////////
                     }
-                    i_woff_eff_temp[w] = interpolate_effectiveArea( iPedVar, fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]], fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]], i_noise_eff_temp[0], i_noise_eff_temp[1], false );
+                    i_woff_eff_temp[w] = interpolate_effectiveArea( iPedVar, 
+		                                                    fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]], 
+								    fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]], 
+								    i_noise_eff_temp[0], 
+								    i_noise_eff_temp[1], false );
                 }
                 else
                 {
@@ -1935,7 +1950,11 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                     return 0.;
                 }
             }
-            i_ze_eff_temp[i] = interpolate_effectiveArea( woff, fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]], fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]], i_woff_eff_temp[0], i_woff_eff_temp[1], false );
+            i_ze_eff_temp[i] = interpolate_effectiveArea( woff, 
+	                                                  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]], 
+							  fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]], 
+							  i_woff_eff_temp[0], 
+							  i_woff_eff_temp[1], false );
         }
         else
         {
