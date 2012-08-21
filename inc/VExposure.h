@@ -50,6 +50,8 @@ class VExposure : public TObject, public VGlobalRunParameter
 	int fSelectLaser;
         int fDataStartTime; // Start Date
 	vector< unsigned int > fLaserRunID; // Laser Runs
+	bool bPrintVerbose;
+        bool bPrintTimeMask;
 
 // Minimium Duration
 	double fMinDuration;
@@ -102,6 +104,17 @@ class VExposure : public TObject, public VGlobalRunParameter
 	vector< int > fRunDownloadDate;
 	vector< unsigned int > fLaserDownload;
 	vector< int > fLaserDownloadDate;
+	vector< int > fRunDownloadList;
+        vector< string > fDataCat;
+        vector< string > fStatus;
+        vector< string > fStatReason;
+        vector< string > fTelCutMask;
+        vector< string > fUsable;
+        vector< string > fTimeCutMask;
+        vector< string > fLightLevel;
+        vector< string > fVPMcon;
+        vector< string > fAuthor;
+        vector< string > fComment;
 
         TH2D* fMapGal2D;
         TH2D* fRadAccMapGal2D;
@@ -141,6 +154,7 @@ class VExposure : public TObject, public VGlobalRunParameter
         VExposure( int nBinsL = 5000, int nBinB = 2000 );
 
         bool readFromDB();
+        bool readFromDBList();
 	bool setPlannedObservation(vector<double> ra, vector<double> dec, vector<double> t);
         void fillExposureMap();
         TH2D* getGalacticMap() { return fMapGal2D; }
@@ -163,11 +177,15 @@ class VExposure : public TObject, public VGlobalRunParameter
         void setTelMinElevation( double iElevation = 0. );
         void setSelectLaser( int iSelectLaser );
         void setMinDuration( double iDuration = 0. );
+	void setPrintTimeMask( int iPrintTimeMask );
+	void setPrintVerbose( int iPrintVerbose );
 	bool writeRootFile( string );
         void setMakeRunList( bool iSet );
 	void getLaserList();
 	unsigned int  getLaserDate( unsigned int iRunNumber );
+        void readRunListFromFile( string runlist );
 	void downloadRunList();
+	void readRunCommentsFromDB();
         vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
 	TSQLServer* connectToSQLServer( string iServer );
 
