@@ -191,12 +191,13 @@ bool VExposure::readFromDB()
     TSQLResult *db_res = f_db->Query( c_query );
     if( !db_res )
     {
+	cout << "Returning false!" << endl;
         return false;
     }
 
     int fNRows = db_res->GetRowCount();
 
-    cout << "number of runs read form db: " << fNRows << endl;
+    cout << "Number of runs read form db: " << fNRows << endl;
 
     string itemp;
     for( int j = 0; j < fNRows; j++ )
@@ -1643,8 +1644,26 @@ void VExposure::printListOfRuns()
   cout << "Selected " << k << " runs after cuts. A total of " << Total_Time/60./60. << " [hrs]." << endl;
   cout << endl;
 
+  if( fSelectLaser == 1 )
+  {
+
+    cout << endl;
+    cout << "Printing Seperate Set of Laser Run List (for easy copy n paste):" << endl;
+
+    for( unsigned int i = 0 ; i < fLaserDownload.size() ; i++ )
+    {
+	      cout << "\t" << fLaserDownloadDate[i] << "\t" << fRunDownload[i] << endl;
+    }
+    cout << endl;
+
+  }
+
   if( bPrintTimeMask )
   {
+
+    int k = 0;
+    double wordtemp;
+
     cout << endl;
     cout << "Time Masks For Eventdisplay:" << endl;
     cout << endl;
@@ -1667,9 +1686,17 @@ void VExposure::printListOfRuns()
 
           cout << "* " ;
           cout << " " << fRun[j];
+	  k = 0;
 	  while( getline(stream2, word2, '/') )
 	  {
-	    cout << " " << word2 ;
+	    if( k == 0 )
+	    { 
+	      cout << " " << word2 ;
+	      wordtemp = atof(word2.c_str());
+	    }
+	    else if( k == 1 ) cout << " " << atof(word2.c_str()) - wordtemp;
+	    else cout << "WARNING: In Time Mask Calculation." << endl;
+	    k++;
 	  }
           cout << " 0" << endl;
 	}
@@ -1910,10 +1937,13 @@ void VExposure::readRunCommentsFromDB()
     if( !f_db ) return;
     char c_query[1000];
     
-    for( unsigned int i = 0; i < fRunDownloadList.size(); i++ )
+    /////for( unsigned int i = 0; i < fRunDownloadList.size(); i++ )
+    for( unsigned int i = 0; i < fRun.size(); i++ )
     {
 
-      sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRunDownloadList[i] );
+      ////sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRunDownloadList[i] );
+      sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRun[i] );
+
     
       TSQLResult *db_res = f_db->Query( c_query );
       if( !db_res ) return;
@@ -1921,30 +1951,44 @@ void VExposure::readRunCommentsFromDB()
       TSQLRow *db_row = db_res->Next();
       if( !db_row )
       {
-          cout << "VDBRunInfo: failed reading a row from DB for run " << fRunDownloadList[i] << endl;
-          return;
-      }
+          //cout << "VDBRunInfo: failed reading a row from DB for run " << fRunDownloadList[i] << endl;
+          cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << fRun[i] << endl;
+//          return;
+	   fDataCat.push_back( " " );
+	   fStatus.push_back( " " );
+	   fStatReason.push_back( " " );
+	   fTelCutMask.push_back( " " );
+	   fUsable.push_back( " " );
+	   fTimeCutMask.push_back( " " );
+	   fLightLevel.push_back( " " );
+	   fVPMcon.push_back( " " );
+	   fAuthor.push_back( " " );
+	   fComment.push_back( " " );
+
+      } else
+      {
     
-      if( db_row->GetField( 1 ) )  fDataCat.push_back( db_row->GetField( 1 ) );
-      else 			   fDataCat.push_back( " " );
-      if( db_row->GetField( 2 ) )  fStatus.push_back( db_row->GetField( 2 ) );
-      else 			   fStatus.push_back( " " );
-      if( db_row->GetField( 3 ) )  fStatReason.push_back( db_row->GetField( 3 ) );
-      else 			   fStatReason.push_back( " " );
-      if( db_row->GetField( 4 ) )  fTelCutMask.push_back( db_row->GetField( 4 ) );
-      else 			   fTelCutMask.push_back( " " );
-      if( db_row->GetField( 5 ) )  fUsable.push_back( db_row->GetField( 5 ) );
-      else 			   fUsable.push_back( " " );
-      if( db_row->GetField( 6 ) )  fTimeCutMask.push_back( db_row->GetField( 6 ) );
-      else 			   fTimeCutMask.push_back( " " );
-      if( db_row->GetField( 7 ) )  fLightLevel.push_back( db_row->GetField( 7 ) );
-      else 			   fLightLevel.push_back( " " );
-      if( db_row->GetField( 8 ) )  fVPMcon.push_back( db_row->GetField( 8 ) );
-      else 			   fVPMcon.push_back( " " );
-      if( db_row->GetField( 9 ) )  fAuthor.push_back( db_row->GetField( 9 ) );
-      else 			   fAuthor.push_back( " " );
-      if( db_row->GetField( 10 ) ) fComment.push_back( db_row->GetField( 10 ) );
-      else 			   fComment.push_back( " " );
+        if( db_row->GetField( 1 ) )  fDataCat.push_back( db_row->GetField( 1 ) );
+        else 			   fDataCat.push_back( " " );
+        if( db_row->GetField( 2 ) )  fStatus.push_back( db_row->GetField( 2 ) );
+        else 			   fStatus.push_back( " " );
+        if( db_row->GetField( 3 ) )  fStatReason.push_back( db_row->GetField( 3 ) );
+        else 			   fStatReason.push_back( " " );
+        if( db_row->GetField( 4 ) )  fTelCutMask.push_back( db_row->GetField( 4 ) );
+        else 			   fTelCutMask.push_back( " " );
+        if( db_row->GetField( 5 ) )  fUsable.push_back( db_row->GetField( 5 ) );
+        else 			   fUsable.push_back( " " );
+        if( db_row->GetField( 6 ) )  fTimeCutMask.push_back( db_row->GetField( 6 ) );
+        else 			   fTimeCutMask.push_back( " " );
+        if( db_row->GetField( 7 ) )  fLightLevel.push_back( db_row->GetField( 7 ) );
+        else 			   fLightLevel.push_back( " " );
+        if( db_row->GetField( 8 ) )  fVPMcon.push_back( db_row->GetField( 8 ) );
+        else 			   fVPMcon.push_back( " " );
+        if( db_row->GetField( 9 ) )  fAuthor.push_back( db_row->GetField( 9 ) );
+        else 			   fAuthor.push_back( " " );
+        if( db_row->GetField( 10 ) ) fComment.push_back( db_row->GetField( 10 ) );
+        else 			   fComment.push_back( " " );
+      }
 
     }
 
