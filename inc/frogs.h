@@ -282,9 +282,9 @@ int frogs_event_display(int event_id, float q,float mu,float xtel,
 			float ytel,float xpix,float ypix,int pix_in_img);
 int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);
 float floatwrap(float x,float min,float max);
+// Functions dealing with probability density lookup tables:
 void fill_prob_density( struct frogs_probability_array *prob_array );
-//double checkArray(double value[BIN1][BIN2][BIN3], double q, double mu, double ped);
-double checkArray( struct frogs_probability_array *prob_array, double q, double mu, double ped );
+double probabilityArray( struct frogs_probability_array *prob_array, double q, double mu, double ped );
 
 #ifdef __cplusplus
 }
