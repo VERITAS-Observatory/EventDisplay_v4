@@ -350,7 +350,8 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 	    case C_TEMPLATE:
                 if( fData->getRunParameter()->ffrogsmode==1 )
 		{
-		  setPMTColorScheme( log10(fData->getTemplateMu()), false,  -1.0*fData->getTemplateMuMin(), log10(1.1*fData->getTemplateMuMax()), "photons [p.e.]", false );
+		  //setPMTColorScheme( log10(fData->getTemplateMu()), false,  -1.0*fData->getTemplateMuMin(), log10(1.1*fData->getTemplateMuMax()), "photons [p.e.]", false );
+                  setPMTColorScheme( fData->getTemplateMu(), false,  -1.0, 1.1*fData->getTemplateMuMax(), "photons [p.e.]", false );
 		}
                 break;
             default:

@@ -66,7 +66,8 @@
 #define FROGS_LOG10E 4 //minus one so 5 in our case. 
 #define FROGS_LAMBDA 5
 
-#define FROGS_HITHRESH 4.5   //Higher threshold to define the picture
+//#define FROGS_HITHRESH 4.5   //Higher threshold to define the picture
+#define FROGS_HITHRESH 5.0   //Higher threshold to define the picture
 #define FROGS_LOTHRESH 2.5   //Lower threshold to define the picture. 
 #define FROGS_PICTRAD  0.35  //Radius defining the picture
 #define FROGS_NEIGHBORAD 0.16 //Pixels separated by less than that are neighbors
@@ -74,7 +75,7 @@
 #define frogs_pedwidth_correction 1.00
 
 // Conversion values for table
-#define cone_eff    0.81 // Wintson Cone Collection efficency NOTE: CARE sims have this set = 1
+#define cone_eff    0.81 // Wintson Cone Collection efficency NOTE: CARE sims have this set = 1 instrad 0.81
 #define telarea     94.0 // Mirror Effective Area m^2
 #define extra_noise 0.35 // PMT electronic noise
 #define dc2pe       5.3  // d.c. to p.e. conversion
@@ -92,6 +93,19 @@
 //#define qSTEP (lqMAX-lqMIN)/qN
 
 #define N muN*qN
+
+// For filling the probability density stuff
+#define RANGE1 70.
+#define BIN1   101
+#define MIN1   -5.
+
+#define RANGE2 50.
+#define BIN2   101 
+#define MIN2   0.
+
+#define RANGE3 5.
+#define BIN3   101
+#define MIN3   0.
 
 #ifdef __cplusplus
 extern "C" {
@@ -179,6 +193,7 @@ struct frogs_gsl_data_wrapper {
     functions invoked by GSL */
   struct frogs_imgtemplate *tmplt;  //Pointer to the current template
   struct frogs_imgtmplt_in *data;     //Pointer to the structure containing the data
+  struct frogs_probability_array *probarray;
 };
 //----------------------------------------------------------------
 struct frogs_gsl_func_param {
@@ -187,13 +202,16 @@ struct frogs_gsl_func_param {
   double ped;     //Pedestal with of a given pixel
   double exnoise; //Excess noise of a given pixel
   double mu;  //Expectation valus for a given pixel
+  struct frogs_probability_array *probarray; // probability density array
 };
 //================================================================
 struct calibration_file {
 //  double *CALIBF = (double*) calloc(900, sizeof(double));
   double CALIBF[900];
 };
-
+struct frogs_probability_array {
+  double prob_density_table[BIN1][BIN2][BIN3];
+};
 //================================================================
 //struct calibration_file read_calibration_file();
 void read_calibration_file( struct calibration_file *calib );
@@ -206,18 +224,18 @@ struct frogs_imgtmplt_in frogs_convert_from_grisu(struct array_event *taevnt,
 struct frogs_imgtemplate frogs_read_template_elev(float elevation);
 struct frogs_imgtemplate frogs_read_template_file(char fname[FROGS_FILE_NAME_MAX_LENGTH]); 
 struct frogs_imgtmplt_out frogs_likelihood_optimization(struct frogs_imgtmplt_in *d, 
-					    struct frogs_imgtemplate *tmplt, struct calibration_file *calib);
+					    struct frogs_imgtemplate *tmplt, struct calibration_file *calib, struct frogs_probability_array *prob_array );
 struct frogs_imgtmplt_out frogs_null_imgtmplt_out();
 int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f);
 int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J);
 int frogs_likelihood_fdf(const gsl_vector *v, void *ptr, gsl_vector *f, 
 		   gsl_matrix *J);
 int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,struct frogs_imgtmplt_in *d, 
-	     struct frogs_imgtemplate *tmplt, struct calibration_file *calib );
+	     struct frogs_imgtemplate *tmplt, struct calibration_file *calib, struct frogs_probability_array *prob_array );
 
 float frogs_goodness_correction(float goodness0,float ped,float mu);
 double frogs_probability_density(float q,double mu,float ped,float exnoise);
-double frogs_mean_pix_lkhd(double q, double mu, double ped, double exnoise);
+double frogs_mean_pix_lkhd(double q, double mu, double ped, double exnoise, struct frogs_probability_array *prob_array);
 double frogs_poisson_distribution(double mu, long int n);
 double frogs_logarithm_factorial(long int n);
 double frogs_integrand_for_averaging(double q, void *par);
@@ -247,7 +265,8 @@ double frogs_pix_lkhd_deriv_2ndorder(int pix, int tel,
 				     struct frogs_reconstruction delta,
 				     struct frogs_imgtmplt_in *d,
 				     struct frogs_imgtemplate *tmplt,
-				     int gsl_par_id);
+				     int gsl_par_id,
+				     struct frogs_probability_array *prob_array);
 double frogs_pix_lkhd_deriv_4thorder(int pix, int tel,
 				     struct frogs_reconstruction pnt, 
 				     struct frogs_reconstruction delta,
@@ -263,7 +282,9 @@ int frogs_event_display(int event_id, float q,float mu,float xtel,
 			float ytel,float xpix,float ypix,int pix_in_img);
 int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);
 float floatwrap(float x,float min,float max);
-
+void fill_prob_density( struct frogs_probability_array *prob_array );
+//double checkArray(double value[BIN1][BIN2][BIN3], double q, double mu, double ped);
+double checkArray( struct frogs_probability_array *prob_array, double q, double mu, double ped );
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,6 @@
 #ifndef VFROGS_H_INC
 #define VFROGS_H_INC
 
-
 #include "TDirectory.h"
 #include "TError.h"
 #include "TFile.h"

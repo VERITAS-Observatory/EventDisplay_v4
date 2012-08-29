@@ -75,6 +75,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
   }
 
   static struct calibration_file calib;
+  static struct frogs_probability_array prob_array;
 
   /*This check if a template image needs to be read and reads it if necessary*/
   static struct frogs_imgtemplate tmplt;
@@ -82,6 +83,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
   //On the first call set the template elevation to zero
   if(firstcall) {
     tmplt.elevmin=0;tmplt.elevmax=0;firstcall=0;
+    fill_prob_density( &prob_array ); 
   }
   //If needed read the template file according to elevation
   if(d->elevation>tmplt.elevmax || d->elevation<tmplt.elevmin) {
@@ -90,7 +92,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
 
 
   //Optimize the likelihood
-  rtn=frogs_likelihood_optimization(d,&tmplt,&calib);
+  rtn=frogs_likelihood_optimization(d,&tmplt,&calib,&prob_array);
 
   //Release memory used in the data structure
   frogs_release_memory(d);
@@ -198,7 +200,8 @@ struct frogs_imgtmplt_out frogs_null_imgtmplt_out() {
 struct frogs_imgtmplt_out
 frogs_likelihood_optimization(struct frogs_imgtmplt_in *d, 
 			      struct frogs_imgtemplate *tmplt,
-			      struct calibration_file *calib) {
+			      struct calibration_file *calib, 
+			      struct frogs_probability_array *prob_array) {
   /* This function optimizes the likelihood function on the event parameter 
      space. It returns all the relevant information regarding the convergence 
      in a structure frogs_imgtmplt_out. d is a pointer to a structure 
@@ -229,6 +232,7 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
   struct  frogs_gsl_data_wrapper data;
   data.tmplt=tmplt;  //template data
   data.data=d;       //telescope data
+  data.probarray = prob_array;
   func.params = (void *)&data; /*This will be passed to the functions 
   				frogs_likelihood and 
   				frogs_likelihood_derivative 
@@ -305,7 +309,7 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
     rtn.cvrgpterr.lambda=FROGS_BAD_NUMBER;
 
   /*Calculate the image and background goodness for the convergence point.*/ 
-  if(frogs_goodness(&rtn,d,tmplt,calib)!=FROGS_OK) 
+  if(frogs_goodness(&rtn,d,tmplt,calib,prob_array)!=FROGS_OK) 
     frogs_showxerror("Problem encountered in the convergence goodness calculation");
   gsl_multifit_fdfsolver_free(s);
   gsl_matrix_free(covar);
@@ -317,7 +321,8 @@ frogs_likelihood_optimization(struct frogs_imgtmplt_in *d,
 int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 		   struct frogs_imgtmplt_in *d, 
 		   struct frogs_imgtemplate *tmplt,
-		   struct calibration_file *calib) {
+		   struct calibration_file *calib,
+		   struct frogs_probability_array *prob_array) {
   /* Calculates the image and background goodness whose values and associated 
      number of pixels are passed back in tmplanlz which also contains the 
      values of the event physical parameters for which the goodness is 
@@ -325,7 +330,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
      telescopes while tmplt is a pointer to a structure holding the image 
      template data */
  
-  int telnpix; // pixel counter for single camera 
+  int telnpix[4] = {0}; // pixel counter for single camera 
  
   /*Initialize goodnesses and the number of pixels for both image 
     and background regions*/
@@ -344,7 +349,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
   tmplanlz->tel_goodnessBkg[3] = 0.;
 
   for(int tel=0;tel<d->ntel;tel++) {
-    telnpix = 0;
+    telnpix[tel] = 0;
     for(int pix=0;pix<d->scope[tel].npix;pix++) {
       if(d->scope[tel].pixinuse[pix]==FROGS_OK) {
 	//Here call image model and calculate expected signal
@@ -356,12 +361,24 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	tmplanlz->tmplt_tubes[tel][pix] = mu;
 
 	if(mu!=FROGS_BAD_NUMBER) { 
-	  double pd=frogs_probability_density(d->scope[tel].q[pix],mu,
-					      d->scope[tel].ped[pix],
-					      d->scope[tel].exnoise[pix]);
+	  double pd;
+
+//	  double pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+//					      d->scope[tel].ped[pix],
+//					      d->scope[tel].exnoise[pix]);
+//	  if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL ) printf("WHAT:: %.10f %.10f %f %f %f\n",checkArray(prob_array,d->scope[tel].q[pix],mu,d->scope[tel].ped[pix]),pd,d->scope[tel].q[pix],mu,d->scope[tel].ped[pix]);
+
+	  if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
+            pd=checkArray(prob_array,d->scope[tel].q[pix],mu,d->scope[tel].ped[pix]);
+	  else
+	    pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+                                               d->scope[tel].ped[pix],
+                                               d->scope[tel].exnoise[pix]);
+
 	  double mean_lkhd=frogs_mean_pix_lkhd(d->scope[tel].q[pix],mu,
 					       d->scope[tel].ped[pix],
-					       d->scope[tel].exnoise[pix]);
+					       d->scope[tel].exnoise[pix],
+					       prob_array);
 
 	  double pix_goodness=-2.0*log(pd)-mean_lkhd;
 
@@ -405,38 +422,50 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	  if(pix_in_img==FROGS_OK) {
 	    tmplanlz->goodness_img=tmplanlz->goodness_img+pix_goodness;
 	    tmplanlz->npix_img++;
+//	    if(tel==0) printf("I %d %d %f %f\n",d->event_id,pix,tmplanlz->tel_goodnessImg[tel],pix_goodness);
 	    tmplanlz->tel_goodnessImg[tel] += pix_goodness;
-	    telnpix++;
+	    telnpix[tel]++;
  	  }
 	  //If the pixel is in the background region
 	  if(pix_in_img==FROGS_NOTOK) {
 	    tmplanlz->goodness_bkg=tmplanlz->goodness_bkg+pix_goodness;
 	    tmplanlz->npix_bkg++;
+//	    if(tel==0) printf("B %d %d %f %f\n",d->event_id,pix,tmplanlz->tel_goodnessImg[tel],pix_goodness);
     	    tmplanlz->tel_goodnessBkg[tel] += pix_goodness;
-	    telnpix++;
+//	    telnpix++;
 	  }
 	}//End of background/image region test
+//      if( d->scope[tel].q[pix]>3.0 ) printf("%d %d %d %.4f %.4f\n",d->event_id,tel,pix,d->scope[tel].q[pix],mu);
       } //End of test on pixel viability
+
+
     }//End of pixel loop
-    tmplanlz->tel_goodnessImg[tel] /= sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
-    tmplanlz->tel_goodnessBkg[tel] /= sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
+    if(d->nb_live_pix_total>tmplt->ndim+1) 
+      tmplanlz->tel_goodnessImg[tel] /= sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
+    else
+      tmplanlz->tel_goodnessImg[tel] = FROGS_BAD_NUMBER;
+    if(d->nb_live_pix_total>tmplt->ndim+1) 
+      tmplanlz->tel_goodnessBkg[tel] /= sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
+    else
+      tmplanlz->tel_goodnessBkg[tel] = FROGS_BAD_NUMBER;
+
  }//End of telescope loop
 
   for( int itel=0; itel<d->ntel; itel++ )
   {
-    if( tmplanlz->tel_goodnessImg[itel] < 1.0e-18 )  tmplanlz->tel_goodnessImg[itel] = FROGS_BAD_NUMBER;
-    if( tmplanlz->tel_goodnessBkg[itel] < 1.0e-18 )  tmplanlz->tel_goodnessImg[itel] = FROGS_BAD_NUMBER;
+    if( telnpix[itel] == 0 || fabs(tmplanlz->tel_goodnessImg[itel]) < 1.e-7 )  tmplanlz->tel_goodnessImg[itel] = FROGS_BAD_NUMBER;
+    if( telnpix[itel] == 0 || fabs(tmplanlz->tel_goodnessBkg[itel]) < 1.e-7 )  tmplanlz->tel_goodnessBkg[itel] = FROGS_BAD_NUMBER;
   }
 
   //Finilize the background goodness calculation (*** See note)
-  if(tmplanlz->npix_bkg>tmplt->ndim+1) 
+  if(d->nb_live_pix_total>tmplt->ndim+1) 
     tmplanlz->goodness_bkg=tmplanlz->goodness_bkg/
       //sqrt(2.0*(tmplanlz->npix_bkg-(tmplt->ndim+1))); 
       sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1))); 
   else
     tmplanlz->goodness_bkg=FROGS_BAD_NUMBER;
   //Finilize the image goodness calculation (*** See note)
-  if(tmplanlz->npix_img>tmplt->ndim+1) 
+  if(d->nb_live_pix_total>tmplt->ndim+1) 
     tmplanlz->goodness_img=tmplanlz->goodness_img/
       //sqrt(2.0*(tmplanlz->npix_img-(tmplt->ndim+1)));
       sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
@@ -798,7 +827,7 @@ double frogs_logarithm_factorial(long int n) {
 //================================================================
 //================================================================
 //double frogs_mean_pix_lkhd(float q,double mu,float ped,float exnoise) {
-double frogs_mean_pix_lkhd(double q,double mu, double ped,double exnoise) {
+double frogs_mean_pix_lkhd(double q,double mu, double ped,double exnoise, struct frogs_probability_array *prob_array) {
   double rtn=0;
   /* Computes and returns the average of the log-likelihood for the 
      considered pixel for which:  
@@ -827,6 +856,8 @@ double frogs_mean_pix_lkhd(double q,double mu, double ped,double exnoise) {
     par.ped = ped;
     par.exnoise = exnoise;
     par.mu = mu;
+    par.probarray = prob_array;
+
     F.params = (void *)&par;
     
     /* The integral must run over the domain where the probability density has 
@@ -852,7 +883,12 @@ double frogs_integrand_for_averaging(double q, void *par) {
     likelihood average.*/
   struct frogs_gsl_func_param *p = (struct frogs_gsl_func_param *)par;
   
-  double proba_density=frogs_probability_density(q, p->mu,p->ped, p->exnoise);
+  double proba_density;
+//  if( p->mu > 1.e-18 && p->mu < FROGS_LARGE_PE_SIGNAL )
+//    proba_density=checkArray(p->probarray,q,p->mu,p->ped);
+//  else
+    proba_density=frogs_probability_density(q, p->mu,p->ped, p->exnoise);
+
   double loglikelihood=-2.0*log( proba_density );
   
   if(!frogs_is_a_good_number(loglikelihood * proba_density)) 
@@ -908,7 +944,7 @@ struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
   if(elevation>=65.0) {
 //    char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
     char template_file_name[256];
-    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/SimulatedModels/elev70X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/elev70X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=70.0;
@@ -918,7 +954,7 @@ struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
     read that file*/
   if(fabs(elevation-60.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/SimulatedModels/elev60X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/elev60X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=60.0;
@@ -926,7 +962,7 @@ struct frogs_imgtemplate frogs_read_template_elev_old(float elevation) {
   } 
   if(fabs(elevation-50.0)<=5.0) {
     char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
-    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/SimulatedModels/elev50X0.0-4.0s0.5r085.tmplt"); 
+    strcpy(template_file_name,"$OBS_EVNDISP_ANA_DIR/Templates/elev50X0.0-4.0s0.5r085.tmplt"); 
     rtn=frogs_read_template_file(template_file_name);
     //The template file elevation is not stored in the file and we set it here.
     rtn.elevation=50.0;
@@ -1023,10 +1059,31 @@ int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f) {
 	double mu=frogs_img_model(pix,tel,pnt,dwrap->data,dwrap->tmplt,
 				  &pix_in_template); 
 	if(mu!=FROGS_BAD_NUMBER) {
-	  double pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
-					      mu,
-					      dwrap->data->scope[tel].ped[pix],
-					      dwrap->data->scope[tel].exnoise[pix]);
+	  double pd;
+//	  double pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
+//					      mu,
+//					      dwrap->data->scope[tel].ped[pix],
+//					      dwrap->data->scope[tel].exnoise[pix]);
+//	  double pd=checkArray(dwrap->data->probarray,
+//			       dwrap->data->scope[tel].q[pix],
+//                               mu,
+//                               dwrap->data->scope[tel].ped[pix]);
+
+//	printf("check: %f\n",checkArray(dwrap->data->probarray,dwrap->data->scope[tel].q[pix],mu,dwrap->data->scope[tel].ped[pix]));
+//	printf("check: %f\n",checkArray(dwrap->probarray,dwrap->data->scope[tel].q[pix],mu,dwrap->data->scope[tel].ped[pix]));
+
+          if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
+	    pd=checkArray(dwrap->probarray,
+			  dwrap->data->scope[tel].q[pix],
+			  mu,
+			  dwrap->data->scope[tel].ped[pix]);
+	  else
+	    pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
+				         mu,
+				         dwrap->data->scope[tel].ped[pix],
+				         dwrap->data->scope[tel].exnoise[pix]);
+
+
 	  double pix_lkhd=-2.0*log(pd);
 	  gsl_vector_set (f,gsl_pix_id,pix_lkhd);
 	  gsl_pix_id++;
@@ -1078,42 +1135,48 @@ int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J) {
 	double derivative;
 	//Derivative with respect to xs
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-						 dwrap->tmplt,FROGS_XS);
+//						 dwrap->tmplt,FROGS_XS,dwrap->data->probarray);
+						 dwrap->tmplt,FROGS_XS,dwrap->probarray);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	  dwrap->data,dwrap->tmplt,FROGS_XS);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_XS,derivative);
 
 	//Derivative with respect to ys
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-						 dwrap->tmplt,FROGS_YS);
+//						 dwrap->tmplt,FROGS_YS,dwrap->data->probarray);
+						 dwrap->tmplt,FROGS_YS,dwrap->probarray);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	  dwrap->data,dwrap->tmplt,FROGS_YS);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_YS,derivative);
 
 	//Derivative with respect to xp
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-						 dwrap->tmplt,FROGS_XP);
+//						 dwrap->tmplt,FROGS_XP,dwrap->data->probarray);
+						 dwrap->tmplt,FROGS_XP,dwrap->probarray);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	dwrap->data,dwrap->tmplt,FROGS_XP);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_XP,derivative);
 
 	//Derivative with respect to yp
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-						 dwrap->tmplt,FROGS_YP);
+//						 dwrap->tmplt,FROGS_YP,dwrap->data->probarray);
+						 dwrap->tmplt,FROGS_YP,dwrap->probarray);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	dwrap->data,dwrap->tmplt,FROGS_YP);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_YP,derivative);
 
 	//Derivative with respect to log10e
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-						 dwrap->tmplt,FROGS_LOG10E);
+//						 dwrap->tmplt,FROGS_LOG10E,dwrap->data->probarray);
+						 dwrap->tmplt,FROGS_LOG10E,dwrap->probarray);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	dwrap->data,dwrap->tmplt,FROGS_LOG10E);*/
 	gsl_matrix_set(J,gsl_pix_id,FROGS_LOG10E,derivative);
 
 	//Derivative with respect to lambda
 	derivative=frogs_pix_lkhd_deriv_2ndorder(pix,tel,pnt,delta,dwrap->data,
-						 dwrap->tmplt,FROGS_LAMBDA);
+//						 dwrap->tmplt,FROGS_LAMBDA,dwrap->data->probarray);
+						 dwrap->tmplt,FROGS_LAMBDA,dwrap->probarray);
 	/*derivative=frogs_pix_lkhd_deriv_4thorder(pix,tel,pnt,delta,
 	  dwrap->data, dwrap->tmplt,FROGS_LAMBDA); */
 	gsl_matrix_set(J,gsl_pix_id,FROGS_LAMBDA,derivative);
@@ -1132,7 +1195,8 @@ double frogs_pix_lkhd_deriv_2ndorder(int pix, int tel,
 				     struct frogs_reconstruction delta,
 				     struct frogs_imgtmplt_in *d,
 				     struct frogs_imgtemplate *tmplt,
-				     int gsl_par_id) {
+				     int gsl_par_id,
+				     struct frogs_probability_array *prob_array ) {
   /*Calculates the derivative of the pixel likelihood for the pixel specified 
     by tel and pix and with respect to the parameter specified by gsl_par_id. 
     This function calculate the derivative as df/dx=[f(x+dx)-f(x-dx)]/(2*dx)*/
@@ -1146,18 +1210,43 @@ double frogs_pix_lkhd_deriv_2ndorder(int pix, int tel,
 		     d,tmplt,&pix_in_template);
   if(mu==FROGS_BAD_NUMBER) 
     frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
-			       d->scope[tel].ped[pix],
-			       d->scope[tel].exnoise[pix]);
+
+//  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+//			       d->scope[tel].ped[pix],
+//			       d->scope[tel].exnoise[pix]);
+//  pd=checkArray(prob_array,d->scope[tel].q[pix],mu,
+//                d->scope[tel].ped[pix]);
+
+  if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
+    pd=checkArray(prob_array,d->scope[tel].q[pix],mu,
+                  d->scope[tel].ped[pix]);
+  else
+    pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+			         d->scope[tel].ped[pix],
+			         d->scope[tel].exnoise[pix]);
+
+
   double pix_lkhd_plus=-2.0*log(pd);
   //Step backward
   mu=frogs_img_model(pix,tel,frogs_param_step(pnt,delta,gsl_par_id,-1.0),
 		     d,tmplt,&pix_in_template);
   if(mu==FROGS_BAD_NUMBER) 
     frogs_showxerror("frogs_img_model() invoked for an invalid pixel");
-  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
-			       d->scope[tel].ped[pix],
-			       d->scope[tel].exnoise[pix]);
+
+//  pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+//			       d->scope[tel].ped[pix],
+//			       d->scope[tel].exnoise[pix]);
+//  pd=checkArray(prob_array,d->scope[tel].q[pix],mu,
+//                d->scope[tel].ped[pix]);
+
+  if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
+    pd=checkArray(prob_array,d->scope[tel].q[pix],mu,
+                  d->scope[tel].ped[pix]);
+  else
+    pd=frogs_probability_density(d->scope[tel].q[pix],mu,
+			         d->scope[tel].ped[pix],
+			         d->scope[tel].exnoise[pix]);
+
   double pix_lkhd_minus=-2.0*log(pd);
 
   //Evaluate the derivative
@@ -1457,6 +1546,8 @@ double frogs_chertemplate_quad(float lambda,float log10e,float b,float x,
 
   // index for x we will not interpolate
   int ix=(int)floor((x-tmplt->min[3])/tmplt->step[3]);
+  //int ix=(int)floor(((x-0.30)-tmplt->min[3])/tmplt->step[3]); //TEMP GH
+  //int ix=(int)floor(((x-0.44)-tmplt->min[3])/tmplt->step[3]); //TEMP GH
   if(ix<0||ix>=tmplt->nstep[3]) {*intemplate=FROGS_NOTOK;return 0.0;} 
  
   // index for y we will not interpolate
@@ -1562,7 +1653,7 @@ double frogs_chertemplate_quad(float lambda,float log10e,float b,float x,
   double mu000=frogs_quadratic_interpolation(b1,b2,b3,mu001,mu002,mu003,b);
   mu000=FROGS_NONEG(mu000);
 
-  return mu000;
+  return mu000; 
 }
 //================================================================
 //================================================================
@@ -1688,3 +1779,137 @@ int frogs_printfrog() {
 }
 //================================================================
 //================================================================
+void fill_prob_density( struct frogs_probability_array *parray )
+{
+
+ fprintf(stderr,"\nFROGS: Filling Probability Density Table ......... ");
+
+ int i,j,k;
+ double q,mu,ped;
+
+ for( i=0; i<BIN1; i++ )
+ {
+
+   q = ((float)i*(RANGE1-MIN1)/BIN1 + MIN1);
+
+   for( j=0; j<BIN2; j++ )
+   {
+
+     mu = ((float)j*(RANGE2-MIN2)/BIN2 + MIN2);
+
+     //if( fabs(q-mu) < 100. )
+     if( 1 )
+     {
+
+       for( k=0; k<BIN3; k++ )
+       {
+
+         ped = (float)k*(RANGE3-MIN3)/BIN3 + MIN3;
+
+         parray->prob_density_table[i][j][k] = frogs_probability_density(q, mu, ped, 0.35);
+         //printf( "Reading in: %d %d %d %f\n",i,j,k,parray->prob_density_table[i][j][k] );
+
+       }
+     } 
+   }
+ }
+
+ fprintf(stderr," completed reading %d x %d x %d entries.\n\n",BIN1,BIN2,BIN3);
+
+ return;
+
+}
+
+//double checkArray(double value[BIN1][BIN2][BIN3], double q, double mu, double ped)
+double checkArray( struct frogs_probability_array *prob_array, double q, double mu, double ped )
+{
+
+// printf("ARRAY: %f",prob_array->prob_density_table[50][50][50]);
+// return 1.0;
+
+// printf("\nIN: %f %f %f\n",q,mu,ped);
+
+// if( mu < 1.e-18 ) printf("MU MU\n");
+// if( q<MIN1 || q>RANGE1 ) printf("FOOK1\n");
+// if( mu<MIN2 || mu>RANGE2 ) printf("FOOK2\n");
+// if( ped<MIN3 || ped>RANGE2 ) printf("FOOK3\n");
+
+ float ii,jj,kk;
+ int imin,jmin,kmin;
+ int imax,jmax,kmax;
+
+ ii = BIN1*(q-MIN1)/(RANGE1-MIN1);
+ jj = BIN2*(mu-MIN2)/(RANGE2-MIN2);
+ kk = BIN3*(ped-MIN3)/(RANGE3-MIN3);
+
+// printf("kk: %f %d %f %f %f\n",kk,BIN3,ped,MIN3,RANGE3);
+
+ imin = (int)ii;
+ jmin = (int)jj;
+ kmin = (int)kk;
+
+ imax = imin+1;
+ jmax = jmin+1;
+ kmax = kmin+1;
+
+ if( imin < 0 || kmin < 0 || jmin < 0 || imax >= BIN1-1 || jmax >= BIN2-1 || kmax >= BIN3-1 )
+ {
+//   printf("Returning Standard %d %d %d | %d %d %d | %.2f %.2f %.2f\n",imin,jmin,kmin,imax,jmax,kmax,q,mu,ped);
+   return frogs_probability_density(q,mu,ped,0.35);
+ }
+
+// printf("Returning %d %d %d | %d %d %d | %.2f %.2f %.2f\n",imin,jmin,kmin,imax,jmax,kmax,q,mu,ped);
+ 
+ float qmin = imin*(RANGE1-MIN1)/BIN1 + MIN1;
+ float mumin = jmin*(RANGE2-MIN2)/BIN2 + MIN2;
+ float pedmin = kmin*(RANGE3-MIN3)/BIN3 + MIN3;
+
+ float qmax = imax*(RANGE1-MIN1)/BIN1 + MIN1;
+ float mumax = jmax*(RANGE2-MIN2)/BIN2 + MIN2;
+ float pedmax = kmax*(RANGE3-MIN3)/BIN3 + MIN3;
+
+ float qdel = (q-qmin)/(qmax - qmin);
+ float mudel = (mu-mumin)/(mumax - mumin);
+ float peddel = (ped-pedmin)/(pedmax - pedmin);
+
+// printf("is %f %f %f | %d %d %d | %d %d %d\n",ii,jj,kk,imin,jmin,kmin,imax,jmax,kmax);
+// printf("%f %f %f %f %f\n",qdel,mudel,peddel,pedmin,pedmax);
+// printf("%d %d %d\n",BIN1,imin,imax);
+// printf("%d %d %d\n",BIN2,jmin,jmax);
+// printf("%d %d %d\n",BIN3,kmin,kmax);
+// printf("%f %f\n", prob_array->prob_density_table[imin][jmin][kmin],prob_array->prob_density_table[imax][jmax][kmax]);
+
+ double f000 = prob_array->prob_density_table[imin][jmin][kmin];
+ double f001 = prob_array->prob_density_table[imin][jmin][kmax];
+ double f010 = prob_array->prob_density_table[imin][jmax][kmin];
+ double f011 = prob_array->prob_density_table[imin][jmax][kmax];
+ double f100 = prob_array->prob_density_table[imax][jmin][kmin];
+ double f101 = prob_array->prob_density_table[imax][jmin][kmax];
+ double f110 = prob_array->prob_density_table[imax][jmax][kmin];
+ double f111 = prob_array->prob_density_table[imax][jmax][kmax];
+
+// printf("%f %f %f %f %f %f %f %f\n",f000,f001,f010,f011,f100,f101,f110,f111);
+
+ double c0 = f000;
+ double c1 = f100-f000;
+ double c2 = f010-f000;
+ double c3 = f001-f000;
+ double c4 = f110-f010-f100+f000;
+ double c5 = f011-f001-f010+f000;
+ double c6 = f101-f001-f100+f000;
+ double c7 = f111-f011-f101-f110+f100+f001+f010-f000;
+
+ double p = c0;
+ p += c1*qdel;
+ p += c2*mudel;
+ p += c3*peddel;
+ p += c4*qdel*mudel;
+ p += c5*mudel*peddel;
+ p += c6*peddel*qdel;
+ p += c7*qdel*mudel*peddel;
+
+// if(fabs(p-frogs_probability_density(q,mu,ped,0.35))>.1) printf("BBBBAAAALLLLLSSS!!!!!");
+
+ return p;
+
+}

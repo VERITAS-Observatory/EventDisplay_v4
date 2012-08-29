@@ -23,6 +23,8 @@ VFrogs::VFrogs()
   fFrogParameters = new VFrogParameters();
   frogsRecID = getRunParameter()->ffrogsRecID;
 
+  fInitialized = false;
+
 }
 
 VFrogs::~VFrogs()
@@ -35,7 +37,7 @@ VFrogs::~VFrogs()
 void VFrogs::doFrogsStuff( int eventNumber ) {
  
   int i,j;
- 
+
   // only at first call in the analysis run: initialize data class, set trees
   if( !fInitialized ) {
     initAnalysis();
@@ -112,7 +114,8 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     frogsYPStart     = getShowerParameters()->fShowerYcore_SC[frogsRecID];
     frogsXPED        = getShowerParameters()->fShowerXcore[frogsRecID];
     frogsYPED        = getShowerParameters()->fShowerYcore[frogsRecID];
-    frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[frogsRecID];
+    frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //TEMP GH
+    //frogsXSStart     = getShowerParameters()->fShower_Xoffset[frogsRecID];
     frogsYSStart     = -1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
 
     getFrogParameters()->frogsEventID = getFrogsEventID();
@@ -152,6 +155,11 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     getFrogParameters()->frogsTelGoodnessBkg1 = getFrogsTelGoodnessBkg(1);
     getFrogParameters()->frogsTelGoodnessBkg2 = getFrogsTelGoodnessBkg(2);
     getFrogParameters()->frogsTelGoodnessBkg3 = getFrogsTelGoodnessBkg(3);
+
+//    cout << "Out: " << getFrogsXS() << " " << getFrogsYS() << " " << getFrogsXP() << " " << getFrogsYP() << " " << pow(10.,(double)getFrogsEnergy()) << endl;
+
+//    cout << endl;
+//    cout << endl;
 
     getFrogParameters()->getTree()->Fill();
 
@@ -251,7 +259,7 @@ void VFrogs::readTableFrogs()
 
   TTree *mscwTreeFrogs = (TTree*)mscwFrogsFile->Get("data");
   mscwTreeFrogs->SetBranchAddress("eventNumber",&eventNumber);
-  mscwTreeFrogs->SetBranchAddress("ErecS",&Erec);
+  mscwTreeFrogs->SetBranchAddress("Erec",&Erec);
   
   for ( int i=0 ; i < mscwTreeFrogs->GetEntries() ; i++ ) 
     { 
@@ -363,7 +371,7 @@ int VFrogs::getFrogsAnasumNumber( int eventNumber, int runNumber )
 //================================================================
 float VFrogs::transformTelescopePosition( int iTel, float i_ze, float i_az, int axis )
 {
-// transform telescope positions from ground into shower coordinates
+  // transform telescope positions from ground into shower coordinates
   float i_xrot, i_yrot, i_zrot;
   float i_xcos = 0.;
   float i_ycos = 0.;
@@ -551,8 +559,14 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   rtn.startpt.xs=1.0*fData->getShowerParameters()->fShower_Xoffset[frogsRecID];
   rtn.startpt.ys=-1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
 
+//MC  rtn.startpt.xs=1.0*fData->getShowerParameters()->MCTel_Xoff;
+//MC  rtn.startpt.ys=-1.0*fData->getShowerParameters()->MCTel_Yoff;
+
   rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore_SC[frogsRecID];
-  rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore_SC[frogsRecID];
+  rtn.startpt.yp=1.0*fData->getShowerParameters()->fShowerYcore_SC[frogsRecID];
+//MC  rtn.startpt.xp=fData->getShowerParameters()->MCxcore_SC;
+//MC  rtn.startpt.yp=1.0*fData->getShowerParameters()->MCycore_SC;
+
   if (FROGSDEBUG) {
     printf("ShowerSC %f %f\n",getShowerParameters()->fShowerXcore_SC[frogsRecID],getShowerParameters()->fShowerYcore_SC[frogsRecID]);
     printf("Shower %f %f\n",getShowerParameters()->fShowerXcore[frogsRecID],getShowerParameters()->fShowerYcore[frogsRecID]);
@@ -564,7 +578,12 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   if( rtn.startpt.log10e > 0.0 )
     rtn.startpt.log10e = log10(rtn.startpt.log10e);
   else
-    rtn.startpt.log10e = FROGS_BAD_NUMBER;
+   rtn.startpt.log10e = FROGS_BAD_NUMBER;
+//MC  rtn.startpt.log10e = log10(fData->getShowerParameters()->MCenergy); //inEnergy from MC 
+
+//  cout << "MC " << 1.0*fData->getShowerParameters()->MCTel_Xoff << " " << -1.0*fData->getShowerParameters()->MCTel_Yoff << " " << fData->getShowerParameters()->MCxcore_SC << " " << 1.0*fData->getShowerParameters()->MCycore_SC << " " << fData->getShowerParameters()->MCenergy << endl;
+//  cout << "ED " << 1.0*fData->getShowerParameters()->fShower_Xoffset[frogsRecID] << " " << -1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID] << " " << fData->getShowerParameters()->fShowerXcore_SC[frogsRecID] << " " << 1.0*fData->getShowerParameters()->fShowerYcore_SC[frogsRecID] << " " << inEnergy << endl;
+//  cout << endl;
 
   //Decides if the event is worth analysing. 
   rtn.worthy_event=FROGS_OK;
@@ -581,12 +600,14 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
     rtn.worthy_event=FROGS_NOTOK;
   //Count the number of telescopes with more than 300dc in their image
   int ngoodimages=0;
-  for(int tel=0; tel<rtn.ntel;tel++) 
+  for(int tel=0; tel<rtn.ntel;tel++)
+  {
+    setTelID(tel);
     if(fData->getImageParameters()->size>300.0) ngoodimages=ngoodimages+1;
+  }
   //Require the number of telescopes with more than 300dc to be at least 3
   if (ngoodimages<3) rtn.worthy_event=FROGS_NOTOK;
 
   return rtn;
 
 }
-
