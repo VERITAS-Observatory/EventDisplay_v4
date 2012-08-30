@@ -35,7 +35,6 @@ VReadRunParameter::VReadRunParameter()
     fTelToAnaString = "";
 
     fPrintOutputFile = false;
-    fGetLaserRunNumber = false;
 }
 
 
@@ -165,11 +164,6 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
                 fRunPara->fEventDisplayUser = iTemp2;
                 i++;
             }
-        }
-// get laser run number (will exit after printing this)
-        else if( iTemp.find( "getlaserrunnumber" ) < iTemp.size() && iTemp != "run" )
-	{
-	   fGetLaserRunNumber = true;
         }
 // file with dead channel definition
         else if( iTemp.find( "deadchannelfile" ) < iTemp.size() )
@@ -870,6 +864,7 @@ void VReadRunParameter::test_and_adjustParams()
         if( i_DBinfo.isGood() )
         {
             fRunPara->fTargetName = i_DBinfo.getTargetName();
+// (J2000)
             fRunPara->fTargetDec = i_DBinfo.getTargetDec();
             fRunPara->fTargetRA = i_DBinfo.getTargetRA();
             fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();
@@ -912,20 +907,6 @@ void VReadRunParameter::test_and_adjustParams()
 		     fRunPara->fTOffFileNumber[i] = (int)iL[i];
 		  }
 	       }
-	       if( fGetLaserRunNumber )
-	       {
-		 if( fRunPara->fTelToAnalyze.size() == 1 ) 
-		 {
-//		    if( fRunPara->fTelToAnalyze[0] < iL.size() ) cout << iL[fRunPara->fTelToAnalyze[0]] << endl;
-// GH edit
-		    if( fRunPara->fTelToAnalyze[0] < iL.size() ) cout << iL[fTelToAna-1] << endl;
-		 }
-		 else
-		 {
-		    cout << "only one telescope allowed for getlaserrunnumber" << endl;
-		 }
-		 exit( 0 );
-	      }	      
             }
 
             i_DBinfo.print();
