@@ -36,8 +36,6 @@ class VReadRunParameter
         unsigned int fTelToAna;
         string       fTelToAnaString;
 
-	bool fGetLaserRunNumber;
-
                                                   //!< prel pointing error
         map< unsigned int, double > f_pointingErrorX;
                                                   //!< prel pointing error

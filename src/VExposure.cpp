@@ -1648,7 +1648,7 @@ void VExposure::printListOfRuns()
   {
 
     cout << endl;
-    cout << "Printing Seperate Set of Laser Run List (for easy copy n paste):" << endl;
+    cout << "Printing Separate Set of Laser Run List (for easy copy n paste):" << endl;
 
     for( unsigned int i = 0 ; i < fLaserDownload.size() ; i++ )
     {

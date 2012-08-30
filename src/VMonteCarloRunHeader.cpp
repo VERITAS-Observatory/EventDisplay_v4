@@ -74,6 +74,7 @@ bool VMonteCarloRunHeader::VOLUMEDET_set()
 
 void VMonteCarloRunHeader::print()
 {
+    cout << endl;
     cout << "Monte Carlo run header" << endl;
     cout << "======================" << endl;
     cout << "code version: " << shower_prog_id << " (" << shower_prog_vers << "), ";

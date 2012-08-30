@@ -77,8 +77,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 
 // pointing parameters
         string fTargetName;                       // target name
-        double fTargetDec;                        // target declination [deg]
-        double fTargetRA;                         // target RA [deg]
+        double fTargetDec;                        // target declination [deg] (J2000)
+        double fTargetRA;                         // target RA [deg] (J2000)
         double fTargetDecOffset;                  // target offset in dec [deg]
         double fTargetRAOffset;                   // target offset in RA [deg]
         double fWobbleNorth;                      // wobble offset NORTH (deg)
