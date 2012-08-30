@@ -49,10 +49,14 @@ do
 
     for ((i=1; i <= $NTEL; i++ ))
     do
+      RUN=`$EVNDISPSYS/bin/VTS.getLaserRunFromDB $i $AFIL`
 
-      RUN=`$EVNDISPSYS/bin/evndisp -teltoana=$1 -getlaserrunnumber -runnumber=$AFIL`
+      echo $RUN
+
+      continue
 
       echo "checking telescope $i laser run $RUN data run $AFIL"
+
       echo "$GDIR/Tel_"$i"/$RUN.gain.root"
       if [ ! -e "$GDIR/Tel_"$i"/$RUN.gain.root" ] 
       then

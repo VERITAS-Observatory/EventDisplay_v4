@@ -224,7 +224,8 @@ VTS:	evndisp \
 	VTS.calculateCrabRateFromMC \
 	VTS.calculateExposureFromDB \
 	compareDatawithMC \
-	VTS.getRunListFromDB
+	VTS.getRunListFromDB \
+	VTS.getLaserRunFromDB
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -352,7 +353,7 @@ endif
 MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
 		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
-		./obj/VEnergyCorrection.o ./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
+		./obj/VEmissionHeightCalculator.o ./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
@@ -642,6 +643,7 @@ COMPAREDATAMCOBJ=	./obj/VTargets.o \
 			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VUtilities.o \
 			./obj/VDataMCComparision.o \
 			./obj/compareDatawithMC.o
@@ -808,6 +810,23 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 				./obj/VTS.calculateExposureFromDB.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"	
+
+########################################################
+# VTS.getLaserRunFromDB
+########################################################
+./obj/VTS.getLaserRunFromDB.o:   ./src/VTS.getLaserRunFromDB.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+VTS.getLaserRunFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+			./obj/VDBRunInfo.o \
+			./obj/VASlalib.o \
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/VUtilities.o \
+			./obj/VTS.getLaserRunFromDB.o
+
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
 
 ########################################################
 # VTS.getRunListFromDB
