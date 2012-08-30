@@ -1652,7 +1652,7 @@ void VExposure::printListOfRuns()
 
     for( unsigned int i = 0 ; i < fLaserDownload.size() ; i++ )
     {
-	      cout << "\t" << fLaserDownloadDate[i] << "\t" << fRunDownload[i] << endl;
+	      cout << "\t" << fLaserDownloadDate[i] << "\t" << fLaserDownload[i] << endl;
     }
     cout << endl;
 
