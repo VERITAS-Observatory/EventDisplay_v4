@@ -11,12 +11,8 @@
 #####################################
 ## HARDCODED VAVLUES
 #####################################
-# image threshold
-IMAG="5."
-# border threshold
-BORD="2.5"
 # run options (will be overwritten in DST mode)
-OPT="-imagethresh=$IMAG -borderthresh=$BORD"
+OPT="-nevents=2000"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################
