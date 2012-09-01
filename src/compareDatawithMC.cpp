@@ -1,5 +1,6 @@
 /*! \file compareDatawithMC.cc
- *  \brief fill histograms for stereo comparision (MC and data)
+ *  \brief compare MC gamma-ray distributions with on-off distributions from data
+ *         (e.g. Crab Nebula or Mrk 421 flare data)
  *
  *  \Author Gernot Maier
  *
@@ -24,7 +25,6 @@ struct sInputData
    string fType;     // 0 = sims, 1 = on, 2 = off
    string fFileName;
    int    fNTelescopes;
-   string fTarget;
    double fWobbleNorth;
    double fWobbleEast;
    bool   fWobbleFromDataTree;
@@ -44,32 +44,21 @@ double getTelescopePositions( string iF, vector< double >& iX, vector< double >&
      TChain *c = new TChain( "telconfig" );
      if( !c->Add( iF.c_str() ) )
      {
-        cout << "getTelescopePositions warning: telescope configuration tree not found " << endl;
-// set telescope positions by hand
-        cout << "assumming following telescope positions: " << endl;
-        iX.push_back( -37.6 ); iY.push_back( -23.7 ); iZ.push_back( 0. );
-        iX.push_back( 44.1 );  iY.push_back( -47.1 ); iZ.push_back( 0. );
-        if( iNTel > 2 )
-	{
-	   iX.push_back( 29.4 ); iY.push_back( 60.1 ); iZ.push_back( 0. );
-        }
-	for( unsigned int i = 0; i < iX.size(); i++ )
-	{
-	   cout << "\t Tel " << i+1 << "\t" << iX[i] << "\t" << iY[i] << "\t" << iZ[i] << endl;
-        }
-
-	return 66.9;
+         cout << "error: no tree with telescope positions (telconfig) found" << endl;
+	 cout << "exiting..." << endl;
+	 exit( -1 );
      }
      if( c->GetEntries() < iNTel )
      {
-         cout << "invalid number of telescopes " << iNTel << "\t" << c->GetEntries() << endl;
-	 exit( 0 );
+         cout << "error: invalid number of telescopes: expected " << iNTel << ", found " << c->GetEntries() << endl;
+	 cout << "exiting..." << endl;
+	 exit( -1 );
      }
      cout << "reading telescope positions from " << endl;
      cout << "\t" << iF << endl;
-     float x;
-     float y;
-     float z;
+     float x = 0.;
+     float y = 0.;
+     float z = 0.;
      c->SetBranchAddress( "TelX", &x );
      c->SetBranchAddress( "TelY", &y );
      c->SetBranchAddress( "TelZ", &z );
@@ -122,10 +111,10 @@ void readInputfile( string fInputFile )
 	     is_check >> temp;
 	     z++;
          }
-	 if( z != 7 )
+	 if( z != 6 )
 	 {
 	     cout << "error reading input file, not enough parameters in this line: " << endl << is_line << endl;
-	     cout << "require 7, found " << z << endl;
+	     cout << "require 6, found " << z << endl;
 	     cout << "...exiting" << endl;
 	     exit( 0 );
          }
@@ -134,7 +123,6 @@ void readInputfile( string fInputFile )
 	 is_stream >> a.fFileName;
 	 is_stream >> temp;
 	 a.fNTelescopes = atoi( temp.c_str() );
-	 is_stream >> a.fTarget;
 	 is_stream >> temp;
 	 a.fWobbleNorth = atof( temp.c_str() );
 	 is_stream >> temp;
@@ -161,7 +149,7 @@ int main( int argc, char *argv[] )
    if( argc != 4 )
    {
        cout << "compare MC simulations with excess events from data runs " << endl;
-       cout << "(e.g.from Crab Nebula or Mrk 421 observations" << endl;
+       cout << "(e.g.from Crab Nebula or Mrk 421 observations)" << endl;
        cout << endl;
        cout << endl;
        cout << "compareDatawithMC <input file list> <cut> <outputfile>" << endl;
@@ -197,9 +185,9 @@ int main( int argc, char *argv[] )
        {
           if( fInputData[i].fNTelescopes != iNT )
 	  {
-	      cout << "number of telescopes differ, comparision not possible" << endl;
+	      cout << "error: number of telescopes differ, comparision not possible" << endl;
 	      cout << "...exiting" << endl;
-	      exit( 0 );
+	      exit( -1 );
           }
        }
    }
@@ -226,12 +214,11 @@ int main( int argc, char *argv[] )
       fStereoCompare.push_back(  new VDataMCComparision( fInputData[i].fType, false, fInputData[i].fNTelescopes ) );
       fStereoCompare.back()->setAzRange( fAzMin, fAzMax );
 // get telescope coordinates
+      fStereoCompare.back()->resetTelescopeCoordinates();
       for( int t = 0; t < fInputData[i].fNTelescopes; t++ ) 
       {
-         if( !fStereoCompare.back()->setTelescopeCoordinates( t, fInputData[i].fTelX[t], fInputData[i].fTelY[t], fInputData[i].fTelZ[t] ) ) exit( 0 );
+         if( !fStereoCompare.back()->setTelescopeCoordinates( fInputData[i].fTelX[t], fInputData[i].fTelY[t], fInputData[i].fTelZ[t] ) ) exit( 0 );
       }	 
-//      fStereoCompare.back()->setTarget( fInputData[i].fTarget, fInputData[i].fWobbleNorth, fInputData[i].fWobbleEast, 2007. );
-      fStereoCompare.back()->setTarget( fInputData[i].fTarget, -100., -100., 2007 );
       if( fInputData[i].fWobbleFromDataTree ) fStereoCompare.back()->setWobbleFromDataTree();
 // fill histograms
       fStereoCompare.back()->fillHistograms( fInputData[i].fFileName, fSingleTelescopeCuts );

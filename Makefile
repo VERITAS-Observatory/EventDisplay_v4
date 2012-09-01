@@ -639,6 +639,10 @@ COMPAREDATAMCOBJ=	./obj/VTargets.o \
                         ./obj/VASlalib.o \
 			./obj/CData.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+			./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
+			./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 			./obj/VSkyCoordinates.o \
 			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
@@ -646,6 +650,17 @@ COMPAREDATAMCOBJ=	./obj/VTargets.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VUtilities.o \
 			./obj/VDataMCComparision.o \
+			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+		     	./obj/VInstrumentResponseFunction.o \
+		     	./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
+			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VRunList.o ./obj/VRunList_Dict.o ./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o ./obj/Ctelconfig.o \
+			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 			./obj/compareDatawithMC.o
 
 ./obj/compareDatawithMC.o:	./src/compareDatawithMC.cpp

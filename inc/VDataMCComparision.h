@@ -11,11 +11,10 @@
 #include "TProfile.h"
 
 #include "CData.h"
+#include "VGammaHadronCuts.h"
 #include "VMonteCarloRunHeader.h"
-#include "VSkyCoordinates.h"
-#include "VSkyCoordinatesUtilities.h"
 #include "VSpectralWeight.h"
-#include "VTargets.h"
+#include "VUtilities.h"
 
 #include <iostream>
 #include <string>
@@ -34,9 +33,6 @@ class VDataMCComparision
    vector< double > fTel_y;
    vector< double > fTel_z;
 
-   VSkyCoordinates *fAstroSource;
-   string fTargetName;
-
    bool bBckData;
 
 // wobble north offset
@@ -52,7 +48,11 @@ class VDataMCComparision
    VSpectralWeight *fSpectralWeight;
 
 // data tree
-   CData *c;
+   CData *fData;
+
+// cuts
+   VGammaHadronCuts *fCuts;
+   bool fCalculateMVAValues;
 
 // list with all histograms
    TList *hisList;
@@ -72,6 +72,7 @@ class VDataMCComparision
    TH1D *hNimages;
    TH1D *hImgSel;
    TH1D *hEmissionHeight;
+   TH1D *hMVA;
    vector< TH1D * > hR;
    vector< TH2D* > hdistR;
 
@@ -79,7 +80,7 @@ class VDataMCComparision
    vector<TH1D* > hdist;
    vector<TH1D* > hntubes;
    vector<TH1D* > hntubesBNI;
-   vector<TH1D* > hnsat;
+   vector<TH1D* > hnlowgain;
    vector<TH1D* > hwidth;
    vector<TH1D* > hlength;
    vector<TH1D* > hlos;
@@ -103,6 +104,8 @@ class VDataMCComparision
    void setEntries( TH1D* );
    void setEntries( TH2D* );
 
+   void initialGammaHadronCuts();
+
    public:
 
    VDataMCComparision( string, bool, int );
@@ -110,11 +113,11 @@ class VDataMCComparision
    void defineHistograms();
    bool fillHistograms( string ifile, int iSingleTelescopeCuts );
    bool fillHistograms( string ifile, int iSingleTelescopeCuts, double iWobbleNorth, double iWobbleEast );
+   void resetTelescopeCoordinates();
    void scaleHistograms( string );
    void setAzRange( double iAzMin, double iAzMax );
    bool setOnOffHistograms( VDataMCComparision*, VDataMCComparision*, double norm );
-   void setTarget( string, double, double, double );
-   bool setTelescopeCoordinates( unsigned int itelid, double x, double y, double z = 0. );
+   bool setTelescopeCoordinates( double x, double y, double z = 0. );
    void setWobbleFromDataTree() { fWobbleFromDataTree = true; }
    bool writeHistograms( TDirectory* ); 
 };
