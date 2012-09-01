@@ -60,6 +60,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
    bool     fTMVAThetaCutVariableSet;       // check if TMVA provides a theta2 cut variable
+   double   fTMVA_EvaluationResult;         // result from TVMA evaluator
 
    string   fTMVAMethodName;
    bool     fTMVAMethodName_BOXCUTS;
@@ -112,13 +113,14 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    VTMVAEvaluator();
   ~VTMVAEvaluator() {};
 
-   double evaluate();
-   double getBoxCut_Theta2( double iEnergy_log10TeV );
+   bool    evaluate();
+   double  getBoxCut_Theta2( double iEnergy_log10TeV );
    TGraph* getBoxCut_Theta_Graph();
    TGraph* getBoxCut_Theta2_Graph();
    vector< double > getBoxCut_Theta2() { return fBoxCutValue_theta2; }
    unsigned int getSpectralWeightedEnergyBin();
    bool   getTMVAThetaCutVariable() { return fTMVAThetaCutVariableSet; }
+   double getTMVA_EvaluationResult() { return fTMVA_EvaluationResult; }
    bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
    bool   initializeDataStrutures( CData* iC );
    bool   isBoxCuts() { return fTMVAMethodName_BOXCUTS; }

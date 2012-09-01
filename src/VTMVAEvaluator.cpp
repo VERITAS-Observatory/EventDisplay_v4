@@ -51,6 +51,7 @@ void VTMVAEvaluator::reset()
 // default: don't expect that the theta2 cut is performed here   
    setTMVAThetaCutVariable( false );
    setTMVAErrorFraction();
+   fTMVA_EvaluationResult = -99.;
 }
 
 /*
@@ -463,7 +464,7 @@ double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEffici
 
 */
 
-double VTMVAEvaluator::evaluate()
+bool VTMVAEvaluator::evaluate()
 {
    if( fDebug ) cout << "VTMVAEvaluator::evaluate (" << fData << ")" << endl;
 // copy event data
@@ -492,9 +493,10 @@ double VTMVAEvaluator::evaluate()
        else                       fTheta2 = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
        fCoreDist = sqrt( fData->Xcore*fData->Xcore+fData->Ycore*fData->Ycore );
    }
-   else return -1.;
+   else return false;
 
    unsigned int iEnergybin = getSpectralWeightedEnergyBin();
+   fTMVA_EvaluationResult = -99.;
 
    if( iEnergybin < fTMVAReader.size() && fTMVAReader[iEnergybin] )
    {
@@ -509,13 +511,16 @@ double VTMVAEvaluator::evaluate()
 	       cout << ", Signal Efficiency " << fSignalEfficiency[iEnergybin];
 	       cout << endl;
 	    }
-            return fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiency[iEnergybin] );
+	    fTMVA_EvaluationResult = (double)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiency[iEnergybin] );
+            return (bool)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiency[iEnergybin] );
          }
 	 else if( fSignalEfficiencyNoVec > 0. )
 	 {
-	    return fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiencyNoVec );
+	    fTMVA_EvaluationResult = (double)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiencyNoVec );
+	    return (bool)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiencyNoVec );
          }
       }
+// all but box cuts (e.g. BDT, NN, etc)
       else
       {
 	 if( iEnergybin < fTMVACutValue.size() && fTMVACutValue[iEnergybin] > -90. )
@@ -527,7 +532,8 @@ double VTMVAEvaluator::evaluate()
 	       cout << ", MVA Cut value " << fTMVACutValue[iEnergybin];
 	       cout << endl;
 	    }
-	    if( fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin] ) < fTMVACutValue[iEnergybin] )
+	    fTMVA_EvaluationResult = fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin] );
+	    if( fTMVA_EvaluationResult < fTMVACutValue[iEnergybin] )
 	    {
 	       return false;
             }
@@ -538,7 +544,8 @@ double VTMVAEvaluator::evaluate()
          }
 	 else
 	 {
-	    if( fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin] ) < fTMVACutValueNoVec )
+	    fTMVA_EvaluationResult = fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin] );
+	    if( fTMVA_EvaluationResult < fTMVACutValueNoVec )
 	    {
 	       return false;
             }
@@ -550,7 +557,7 @@ double VTMVAEvaluator::evaluate()
       }
    }
 
-   return 0.;
+   return false;
 }
 
 /*

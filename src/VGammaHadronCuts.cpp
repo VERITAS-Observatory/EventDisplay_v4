@@ -96,6 +96,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAOptimizeSignalEfficiencySourceStrengthCU = -99.;
     fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
     fTMVABoxCut_Theta2_max = 0;
+    fTMVA_EvaluationResult = -99.;
 
 // energy dependent theta2 cut
     fFileNameAngRes = "";
@@ -1171,7 +1172,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
     else if( fGammaHadronCutSelector / 10 == 4 )
     {
         if( fDebug ) cout << "VGammaHadronCuts::isGamma: applyTMVACut" << endl; 
-        if( !applyTMVACut( i, fIsOn ) )
+        if( !applyTMVACut( i ) )
         {
            if( bCount ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
            return false;
@@ -1197,7 +1198,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn)
    use TMVA reader and apply cuts
 
 */
-bool VGammaHadronCuts::applyTMVACut( int i, bool fIsOn )
+bool VGammaHadronCuts::applyTMVACut( int i )
 {
    if( fDebug )
    {
@@ -1207,10 +1208,12 @@ bool VGammaHadronCuts::applyTMVACut( int i, bool fIsOn )
       cout << " (" << fTMVAEvaluator << ")";
       cout << endl;
    }
-
+   fTMVA_EvaluationResult = -99.;
    if( fTMVAEvaluator )
    {
-      return fTMVAEvaluator->evaluate();
+      bool i_TMVA_Evaluation = fTMVAEvaluator->evaluate();
+      fTMVA_EvaluationResult = fTMVAEvaluator->getTMVA_EvaluationResult();
+      return i_TMVA_Evaluation;
    }
 
    return false;

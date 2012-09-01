@@ -121,6 +121,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
 	double          fTMVAOptimizeSignalEfficiencyObservationTime_h;
 	TGraph*         fTMVABoxCut_Theta2_max;                
+	double          fTMVA_EvaluationResult;
 
 // orbital phase analysis
 	TFile *fPhaseCut_File;                                      //!
@@ -145,7 +146,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
         VGammaHadronCutsStatistics* fStats;                       //!
 
         bool   applyProbabilityCut( int i, bool fIsOn);
-	bool   applyTMVACut( int i, bool fIsOn );
 	bool   applyFrogsCut( int i, bool fIsOn );
         bool   initAngularResolutionFile();
         bool   initPhaseCuts( int irun );
@@ -253,6 +253,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyShowerCoreCuts( bool iMC = false );
         bool   applyStereoQualityCuts( unsigned int iEnergyReconstructionMethod = 0, bool bCount = false, int iEntry = 0, bool fIsOn = false );
         bool   applyStereoShapeCuts();
+	bool   applyTMVACut( int i );
         bool   applyTelTypeTest( bool bCount = false );
         TF1*   getAngularResolutionFunction() { return fF1AngRes; }
         double getAngularResolutionAbsoluteMinimum() { return fAngRes_AbsoluteMinimum; }
@@ -271,6 +272,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double getTheta2Cut_max( double e );                           // get theta2 max cut (might be energy dependent)    [TeV] energy (linear)
 	TGraph* getTheta2Cut_TMVA_max()  { return fTMVABoxCut_Theta2_max; }
 	TGraph* getTheta2Cut_IRF_Max() { return fIRFAngRes; }
+	double getTMVA_EvaluationResult() { return fTMVA_EvaluationResult; }
         void   initialize();
         bool   isGamma( int i = 0, bool bCount = false, bool fIsOn = true);
         bool   isMCCuts() { return bMCCuts; }
@@ -281,7 +283,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   readCuts(string i_cutfilename, int iPrint = 1 );
         void   resetCutValues();
 	void   resetCutStatistics();
-        void   initializeCuts( int irun, string iDir = "" );
+        void   initializeCuts( int irun = -1, string iDir = "" );
         void   setArrayCentre( double iX = 0., double iY = 0. ) { fArrayCentre_X = iX; fArrayCentre_Y = iY; }
         void   setDataDirectory( string id ) { fDataDirectory = id; }
         bool   setDataTree( CData* idata );

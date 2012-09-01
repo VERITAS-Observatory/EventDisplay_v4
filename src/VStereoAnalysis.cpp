@@ -1583,7 +1583,8 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
    fTreeSelectedEvents->Branch( "EChi2S", &fTreeSelected_EChi2S, "EChi2S/D" );
    fTreeSelectedEvents->Branch( "EmissionHeight", &fTreeSelected_EmissionHeight, "EmissionHeight/F" );
    fTreeSelectedEvents->Branch( "EmissionHeightChi2", &fTreeSelected_EmissionHeightChi2, "EmissionHeightChi2/F" );
-   if ( fRunPara->fFrogs == 1 )
+   fTreeSelectedEvents->Branch( "MVA", &fTreeSelected_MVA, "MVA/D" );
+   if( fRunPara->fFrogs == 1 )
    {
      fTreeSelectedEvents->Branch("frogsEventID", &fTreeSelescted_frogsEventID, "frogsEventID/I" );
      fTreeSelectedEvents->Branch("frogsGSLConStat", &fTreeSelescted_frogsGSLConStat, "frogsGSLConStat/I" );
@@ -1616,7 +1617,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
      fTreeSelectedEvents->Branch("frogsTelGoodnessBkg3", &fTreeSelescted_frogsTelGoodnessBkg3, "frogsTelGoodnessBkg3/D" );
   }
 
-   return true;
+  return true;
 }
 
 void VStereoAnalysis::reset_TreeWithSelectedEvents()
@@ -1642,6 +1643,8 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
       fTreeSelected_EChi2S = 0.;
       fTreeSelected_EmissionHeight = 0.;
       fTreeSelected_EmissionHeightChi2 = 0.;
+
+      fTreeSelected_MVA = -99.;
 
       fTreeSelescted_frogsEventID = 0;
       fTreeSelescted_frogsGSLConStat = 0;
@@ -1700,6 +1703,10 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
       fTreeSelected_EChi2S = c->EChi2S;
       fTreeSelected_EmissionHeight = c->EmissionHeight;
       fTreeSelected_EmissionHeightChi2 = c->EmissionHeightChi2;
+
+      if( fCuts ) fTreeSelected_MVA = fCuts->getTMVA_EvaluationResult();
+      else        fTreeSelected_MVA = -99.;
+      fTreeSelected_MVA -10.;
 
       fTreeSelescted_frogsEventID = c->frogsEventID;
       fTreeSelescted_frogsGSLConStat = c->frogsGSLConStat;
