@@ -264,11 +264,11 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
        sprintf( hname, "%s-ERes.eps", iPrint.c_str() );
        if( c ) c->Print( hname );
     }
-    c = fIRF->plotEnergyReconstructionBias( "mean" );
+    c = fIRF->plotEnergyReconstructionBias( "mean", -0.5, 0.5 );
     plotLegend( c, false );
     if( iPrint.size() > 0 )
     {
-       sprintf( hname, "%s-EBians.eps", iPrint.c_str() );
+       sprintf( hname, "%s-EBias.eps", iPrint.c_str() );
        if( c ) c->Print( hname );
     }
 
