@@ -145,6 +145,8 @@ class VStereoAnalysis
 	float fTreeSelected_EmissionHeight;
 	float fTreeSelected_EmissionHeightChi2;
 
+	double fTreeSelected_MVA;
+
 	int   fTreeSelescted_frogsEventID;
 	int   fTreeSelescted_frogsGSLConStat;
 	int   fTreeSelescted_frogsNB_iter;
