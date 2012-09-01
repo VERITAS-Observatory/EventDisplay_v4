@@ -335,6 +335,8 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     }
     fXoff = fshowerpars->Xoff[fMethod];
     fYoff = fshowerpars->Yoff[fMethod];
+    fXoff_derot = fshowerpars->XoffDeRot[fMethod];
+    fYoff_derot = fshowerpars->YoffDeRot[fMethod];
     fImgSel = (ULong64_t)fshowerpars->ImgSel[fMethod];
     unsigned int ii = 0;
     for( unsigned int i = 0; i < getNTelTypes(); i++ ) NImages_Ttype[i] = 0;
@@ -856,6 +858,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     if( !fShortTree ) fOTree->Branch( "dec", &fDec, "dec/D" );
     fOTree->Branch( "Xoff", &fXoff, "Xoff/D" );
     fOTree->Branch( "Yoff", &fYoff, "Yoff/D" );
+    fOTree->Branch( "Xoff_derot", &fXoff_derot, "Xoff_derot/D" );
+    fOTree->Branch( "Yoff_derot", &fYoff_derot, "Yoff_derot/D" );
     if( !fShortTree ) fOTree->Branch( "stdS", &fstdS, "stdS/D" );
     if( !fShortTree ) fOTree->Branch( "theta2", &ftheta2, "theta2/D" );
     if( !fShortTree ) fOTree->Branch( "theta2_All", &ftheta2_All, "theta2_All[25]/D" );
@@ -1485,6 +1489,8 @@ void VTableLookupDataHandler::resetAll()
     fDec = 0.;
     fXoff = 0.;
     fYoff = 0.;
+    fXoff_derot = 0.;
+    fYoff_derot = 0.;
     fstdS = 0.;
     ftheta2 = 0.;
     fXcore = 0.;

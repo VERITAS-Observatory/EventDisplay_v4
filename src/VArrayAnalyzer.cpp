@@ -1228,7 +1228,7 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 	   if( getTelID() < getPointing().size() && getPointing()[getTelID()] )
 	   {
 	      getPointing()[getTelID()]->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod], 
-	                                                       getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
+                                                           -1.*getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
            }
         }	   
 

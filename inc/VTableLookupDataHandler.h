@@ -207,6 +207,8 @@ class VTableLookupDataHandler
         double fDec;
         double fXoff;
         double fYoff;
+	double fXoff_derot;
+	double fYoff_derot;
         double fstdS;
         double ftheta2;
         double fXcore;

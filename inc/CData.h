@@ -83,6 +83,8 @@ class CData
         Double_t        dec;
         Double_t        Xoff;
         Double_t        Yoff;
+        Double_t        Xoff_derot;
+        Double_t        Yoff_derot;
         Double_t        stdS;
         Double_t        theta2;
         Double_t        Xcore;
@@ -212,6 +214,8 @@ class CData
         TBranch        *b_dec;                    //!
         TBranch        *b_Xoff;                   //!
         TBranch        *b_Yoff;                   //!
+        TBranch        *b_Xoff_derot;             //!
+        TBranch        *b_Yoff_derot;             //!
         TBranch        *b_stdS;                   //!
         TBranch        *b_theta2;                 //!
         TBranch        *b_Xcore;                  //!
@@ -507,6 +511,9 @@ void CData::Init(TTree *tree)
     else ra = dec = 0.;
     fChain->SetBranchAddress("Xoff",&Xoff);
     fChain->SetBranchAddress("Yoff",&Yoff);
+    if( fChain->GetBranchStatus( "Xoff_derot" ) ) fChain->SetBranchAddress("Xoff_derot", &Xoff_derot );
+    if( fChain->GetBranchStatus( "Yoff_derot" ) ) fChain->SetBranchAddress("Yoff_derot", &Yoff_derot );
+
     if( !fShort )
     {
         fChain->SetBranchAddress("stdS",&stdS);
@@ -767,6 +774,8 @@ Bool_t CData::Notify()
     b_Az = fChain->GetBranch("Az");
     b_ra = fChain->GetBranch("ra");
     b_dec = fChain->GetBranch("dec");
+    b_Xoff_derot = fChain->GetBranch("Xoff_derot");
+    b_Yoff_derot = fChain->GetBranch("Yoff_derot");
     b_Xoff = fChain->GetBranch("Xoff");
     b_Yoff = fChain->GetBranch("Yoff");
     b_stdS = fChain->GetBranch("stdS");

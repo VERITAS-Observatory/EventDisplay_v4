@@ -30,6 +30,7 @@ class Cshowerpars
 {
     public :
         bool            bMC;
+	bool            bDeRot;
         bool            bShort;
         int             fVersion;
 
@@ -159,6 +160,8 @@ class Cshowerpars
         TBranch        *b_Az;                     //!
         TBranch        *b_Xoff;                   //!
         TBranch        *b_Yoff;                   //!
+        TBranch        *b_XoffDeRot;                   //!
+        TBranch        *b_YoffDeRot;                   //!
         TBranch        *b_stds;                   //!
         TBranch        *b_dec;                    //!
         TBranch        *b_ra;                     //!
@@ -204,6 +207,7 @@ Cshowerpars::Cshowerpars(TTree *tree, bool iMC, int iVersion, bool iShort )
     if( !tree ) return;
 
     bMC = iMC;
+    bDeRot = false;
     bShort = iShort;
     fVersion = iVersion;
 
@@ -261,6 +265,7 @@ void Cshowerpars::Init(TTree *tree)
     fChain->SetMakeClass(1);
 
     if( tree->GetBranchStatus( "MCe0" ) ) bMC = true;
+    if( tree->GetBranchStatus( "XoffDeRot" ) ) bDeRot = true;
 
     fChain->SetBranchAddress("runNumber",&runNumber);
     fChain->SetBranchAddress("eventNumber",&eventNumber);
@@ -332,13 +337,26 @@ void Cshowerpars::Init(TTree *tree)
     {
         for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ )
         {
-            for( unsigned int j = 0; j < VDST_MAXRECMETHODS; j++ ) ImgSel_list[i][j] = 0;
+            for( unsigned int j = 0; j < VDST_MAXTELESCOPES; j++ ) ImgSel_list[i][j] = 0;
         }
     }
     fChain->SetBranchAddress("Ze",Ze);
     fChain->SetBranchAddress("Az",Az);
     fChain->SetBranchAddress("Xoff",Xoff);
     fChain->SetBranchAddress("Yoff",Yoff);
+    if( bDeRot )
+    {
+       fChain->SetBranchAddress("XoffDeRot",XoffDeRot);
+       fChain->SetBranchAddress("YoffDeRot",YoffDeRot);
+    }
+    else
+    {
+       for( unsigned int i = 0; i < VDST_MAXRECMETHODS; i++ )
+       {
+	  XoffDeRot[i] = 0.;
+	  YoffDeRot[i] = 0.;
+       }
+    }
     if( !bShort )
     {
         fChain->SetBranchAddress("stds",stds);
@@ -469,6 +487,16 @@ Bool_t Cshowerpars::Notify()
     b_Az = fChain->GetBranch("Az");
     b_Xoff = fChain->GetBranch("Xoff");
     b_Yoff = fChain->GetBranch("Yoff");
+    if( bDeRot )
+    {
+       b_XoffDeRot = fChain->GetBranch("XoffDeRot");
+       b_YoffDeRot = fChain->GetBranch("YoffDeRot");
+    }
+    else
+    {
+       b_XoffDeRot = 0;
+       b_YoffDeRot = 0;
+    }
     if( !bShort )
     {
         b_stds = fChain->GetBranch("stds");

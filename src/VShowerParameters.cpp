@@ -62,13 +62,13 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 
     fTreeSC->Branch( "TelElevation", fTelElevation, "TelElevation[NTel]/F" );
     fTreeSC->Branch( "TelAzimuth", fTelAzimuth, "TelAzimuth[NTel]/F" );
+    fTreeSC->Branch( "TelDec", fTelDec, "TelDec[NTel]/F" );
+    fTreeSC->Branch( "TelRA", fTelRA, "TelRA[NTel]/F" );
     if( fShortTree < 1 )
     {
         fTreeSC->Branch( "TelElevationVBF", fTelElevationVBF, "TelElevationVBF[NTel]/F" );
         fTreeSC->Branch( "TelAzimuthVBF", fTelAzimuthVBF, "TelAzimuthVBF[NTel]/F" );
         fTreeSC->Branch( "TelPointingMismatch", fTelPointingMismatch, "TelPointingMismatch[NTel]/F" );
-        fTreeSC->Branch( "TelDec", fTelDec, "TelDec[NTel]/F" );
-        fTreeSC->Branch( "TelRA", fTelRA, "TelRA[NTel]/F" );
         fTreeSC->Branch( "PointingErrorX", fTelPointingErrorX, "PointingErrorX[NTel]/F" );
         fTreeSC->Branch( "PointingErrorY", fTelPointingErrorY, "PointingErrorY[NTel]/F" );
 
@@ -123,12 +123,12 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
     fTreeSC->Branch( "Xoff", fShower_Xoffset, i_des );
     sprintf( i_des, "Yoff[NMethods]/F" );
     fTreeSC->Branch( "Yoff", fShower_Yoffset, i_des );
+    sprintf( i_des, "XoffDeRot[NMethods]/F" );
+    fTreeSC->Branch( "XoffDeRot", fShower_XoffsetDeRot, i_des );
+    sprintf( i_des, "YoffDeRot[NMethods]/F" );
+    fTreeSC->Branch( "YoffDeRot", fShower_YoffsetDeRot, i_des );
     if( fShortTree < 1 )
     {
-        sprintf( i_des, "XoffDeRot[NMethods]/F" );
-        fTreeSC->Branch( "XoffDeRot", fShower_XoffsetDeRot, i_des );
-        sprintf( i_des, "YoffDeRot[NMethods]/F" );
-        fTreeSC->Branch( "YoffDeRot", fShower_YoffsetDeRot, i_des );
         sprintf( i_des, "stds[NMethods]/F" );
         fTreeSC->Branch( "stds", fShower_stdS, i_des );
         sprintf( i_des, "dec[NMethods]/F" );
