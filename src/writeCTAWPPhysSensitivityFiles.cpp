@@ -40,7 +40,7 @@ int main( int argc, char *argv[] )
        iWobbleMin.push_back( 3.0 ); iWobbleMax.push_back( 3.5 );
        iWobbleMin.push_back( 3.5 ); iWobbleMax.push_back( 4.0 );
        iWobbleMin.push_back( 4.0 ); iWobbleMax.push_back( 4.5 );
-       iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 );
+       iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 ); 
 //       iWobbleMin.push_back( 5.0 ); iWobbleMax.push_back( 5.5 ); 
 //       iWobbleMin.push_back( 5.5 ); iWobbleMax.push_back( 6.0 );
     }
@@ -60,7 +60,7 @@ int main( int argc, char *argv[] )
     if( !iData->fillHistograms1D( fDataDirectory ) )
     {
        cout << "error filling on source histograms" << endl;
-    } 
+    }  
 
 // off source histograms
     for( unsigned int i = 0; i < iWobbleMin.size(); i++ )

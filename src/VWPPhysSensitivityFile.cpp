@@ -229,9 +229,17 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
                    }
 		   else if( iClass == "TH2F" || iClass == "TH2D" )
 		   {
+// get axes definitions
+		      Double_t xaxis[hisList[i]->GetNbinsX()+1];
+		      for( int z = 0; z < hisList[i]->GetNbinsX(); z++ ) xaxis[z] = hisList[i]->GetXaxis()->GetBinLowEdge( z );
+		      xaxis[hisList[i]->GetNbinsX()] = hisList[i]->GetXaxis()->GetBinUpEdge( hisList[i]->GetNbinsX() );
+		      Double_t yaxis[hisList[i]->GetNbinsY()+1];
+		      for( int z = 0; z < hisList[i]->GetNbinsY(); z++ ) yaxis[z] = hisList[i]->GetYaxis()->GetBinLowEdge( z );
+		      yaxis[hisList[i]->GetNbinsY()] = hisList[i]->GetYaxis()->GetBinUpEdge( hisList[i]->GetNbinsY() );
+
 		      iHis3D[iHisName2D] = new TH3F( iHisName2D.c_str(), hisList[i]->GetTitle(), 
-		                                hisList[i]->GetNbinsX(), hisList[i]->GetXaxis()->GetXbins()->GetArray(),
-		                                hisList[i]->GetNbinsY(), hisList[i]->GetYaxis()->GetXbins()->GetArray(),
+						hisList[i]->GetNbinsX(), xaxis,
+		                                hisList[i]->GetNbinsY(), yaxis,
 						nbins_woff, woff );
 		      iHis3D[iHisName2D]->SetXTitle( hisList[i]->GetXaxis()->GetTitle() );
 		      iHis3D[iHisName2D]->SetYTitle( hisList[i]->GetYaxis()->GetTitle() );
