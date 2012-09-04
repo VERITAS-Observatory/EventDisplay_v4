@@ -121,16 +121,14 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         hMean->SetYTitle( "distance [m]" );
         if( !fEnergy ) sprintf( htitle, "%s (mean) [deg]", fpara.c_str() );
         else           sprintf( htitle, "%s (mean) [TeV]", fpara.c_str() );
-        hMean->SetZTitle( fpara.c_str() );
+        hMean->SetZTitle( htitle );
 // number of events
         sprintf( hname, "%s_nevents_%s", fpara.c_str(), hname_add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (# of events)", fpara.c_str() );
         hNevents = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
         hNevents->SetXTitle( "log_{10} size" );
         hNevents->SetYTitle( "distance [m]" );
-        if( !fEnergy ) sprintf( htitle, "%s (2xsigma) [deg]", fpara.c_str() );
-        else           sprintf( htitle, "%s (2xsigma) [TeV]", fpara.c_str() );
-        hNevents->SetZTitle( fpara.c_str() );
+        hNevents->SetZTitle( "# of events/bin" );
 // 1d histograms for variable distribution
         for (i=0;i<NumSize;i++)
         {

@@ -296,6 +296,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,32);
+        ClassDef(VGammaHadronCuts,33);
 };
 #endif

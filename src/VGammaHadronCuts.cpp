@@ -213,6 +213,8 @@ void VGammaHadronCuts::resetCutValues()
 
     read cuts from a text file
 
+    iPrint == 0 : surpress printing of any statements to screen
+
 */
 bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 {

@@ -471,6 +471,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 		./obj/CData.o \
 		./obj/VAnalysisUtilities_Dict.o ./obj/VAnalysisUtilities.o \
+		./obj/VPlotLookupTable.o ./obj/VPlotLookupTable_Dict.o \
 		./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 		./obj/VFluxCalculation.o ./obj/VFluxCalculation_Dict.o \
 		./obj/VStatistics_Dict.o \
