@@ -51,6 +51,9 @@ TLIST=$LDIR/$TLIST.tmp
 rm -f $TLIST
 cat $FLIST | grep "*" >> $TLIST
 
+LISTAD=`basename $ODIR`
+echo "LISTAD $LISTAD"
+
 # get list of runs
 NRUNS=`cat $TLIST | wc -l `
 echo "total number of runs to analyse: $NRUNS"
@@ -68,7 +71,7 @@ do
        ONAM="$RUN.anasum"
 
 # temporary file list
-       TEMPLIST=$LDIR/qsub_analyse_fileList_$RUN
+       TEMPLIST=$LDIR/qsub_analyse_fileList_"$LISTAD"_"$RUN"
        rm -f $TEMPLIST
        echo "$LIN" > $TEMPLIST
 
@@ -89,7 +92,7 @@ do
 
        chmod u+x $FSCRIPT.sh
 
-       qsub -V -js 20 -l h_cpu=0:29:30 -l h_vmem=4000M -l tmpdir_size=10G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
+       qsub -V -l h_cpu=0:29:30 -l h_vmem=4000M -l tmpdir_size=10G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
 
     fi
 done 

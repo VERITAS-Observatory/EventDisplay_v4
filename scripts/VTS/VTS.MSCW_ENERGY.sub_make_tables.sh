@@ -126,8 +126,7 @@ do
 	 chmod u+x $FNAM.sh
 
 # submit job
-##	qsub -V -js 20 -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=20000M -l tmpdir_size=100G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
-	qsub -V -js 20 -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=20000M -l tmpdir_size=100G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+	qsub -V -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=20000M -l tmpdir_size=1G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
         let "W = $W + 1"
      done

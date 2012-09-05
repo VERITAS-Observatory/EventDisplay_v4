@@ -85,35 +85,35 @@ endif
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20120418_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20120901_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
 #fix run numbers
 ##############################################################################################
 if( $ARRAY == "V4" ) then
-   set RUN="4$RUN"
+   set RUN="94$RUN"
 endif
 if( $ARRAY == "V5" ) then
-   set RUN="5$RUN"
+   set RUN="95$RUN"
 endif
 if( $ARRAY == "V6" ) then
-   set RUN="6$RUN"
+   set RUN="96$RUN"
 endif
 
 ##############################################################################################
 # calculate pedestals
 ##############################################################################################
 
-# echo "CALCULATING PEDESTALS FOR RUN $RUN"
-# rm -f $ODIR/$RUN.ped.log
-# $EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
+echo "CALCULATING PEDESTALS FOR RUN $RUN"
+rm -f $ODIR/$RUN.ped.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
 
-# set CALIBDATA=$OBS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
-# if (! -e $CALIBDATA ) then
-#   touch $CALIBDATA 
-# endif
-# echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
+set CALIBDATA=$OBS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
+if (! -e $CALIBDATA ) then
+  touch $CALIBDATA 
+endif
+echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
 
 ##############################################################################################
 # eventdisplay run options
