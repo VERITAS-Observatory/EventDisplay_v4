@@ -47,11 +47,11 @@ do
 
 ####################################################################
 # execute converter
-   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST -a $CTA_EVNDISP_ANA_DIR/DetectorGeometry/CTA.prod1.$N.lis -o $TMPDIR/$OFIL.root $TMPDIR/$OFIL.gz >& $LDIR/$OFIL.convert.log
+   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST -a $CTA_EVNDISP_ANA_DIR/DetectorGeometry/CTA.prod1.$N.lis -o $TMPDIR/$OFIL.root $TMPDIR/$OFIL.gz >& $TMPDIR/$OFIL.convert.log
 
 ####################################################################
 # execute eventdisplay
-  $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root -writenoMCTree -reconstructionparameter $ACUT $OPT -outputdirectory $TMPDIR >& $LDIR/$OFIL.evndisp.log
+  $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root -writenoMCTree -reconstructionparameter $ACUT $OPT -outputdirectory $TMPDIR >& $TMPDIR/$OFIL.evndisp.log
 
 ####################################################################
 # move evndisp files to data directory
@@ -63,6 +63,8 @@ do
    rm -f $TMPDIR/$OFIL.root
 
    cp -v -f $TMPDIR/*.root $ODIR
+   cp -v -f $TMPDIR/$OFIL.convert.log $LDIR/$OFIL.convert.log
+   cp -v -f $TMPDIR/$OFIL.evndisp.log $LDIR/$OFIL.evndisp.log
    
 done
 

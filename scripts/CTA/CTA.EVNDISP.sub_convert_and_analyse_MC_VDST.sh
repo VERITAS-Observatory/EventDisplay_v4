@@ -81,12 +81,13 @@ N=300
 # loop over all files in files loop
 for AFIL in $FILES
 do
-   QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP/conv$N/
-   mkdir -p $QLOG
+#   QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP/conv$N/
+#   mkdir -p $QLOG
+   QLOG="/dev/null"
    
    echo "submitting $AFIL ($LDIR)"
 
-   FNAM="$SHELLDIR/EVN.ConvAna-$ARRAY-$PART"
+   FNAM="$SHELLDIR/E-$DSET-$PART-$ARRAY"
 
    sed -e "s|SIMTELFILE|$AFIL|" $FSCRIPT.sh > $FNAM-1.sh
    sed -e "s|PAAART|$PART|" $FNAM-1.sh > $FNAM-2.sh

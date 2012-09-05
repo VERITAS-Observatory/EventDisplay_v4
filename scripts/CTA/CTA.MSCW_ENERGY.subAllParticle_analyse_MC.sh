@@ -56,6 +56,7 @@ do
 	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $k$l
          done
       elif [ $4 = "DESY3700m" ]
+#      elif [ $4 = "ISDC3700m" ]
       then
 	 for (( l = 0; l < 10; l++ ))
 	 do

@@ -107,9 +107,10 @@ DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
-QDIR=$CTA_USER_LOG_DIR"/$DATE/EFFAREA/"
-echo $QDIR
-mkdir -p $QDIR
+# QDIR=$CTA_USER_LOG_DIR"/$DATE/EFFAREA/"
+# echo $QDIR
+# mkdir -p $QDIR
+QDIR="/dev/null"
 echo "output data directory"
 echo $ODIR
 mkdir -p $ODIR
