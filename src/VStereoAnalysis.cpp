@@ -1706,7 +1706,6 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
 
       if( fCuts ) fTreeSelected_MVA = fCuts->getTMVA_EvaluationResult();
       else        fTreeSelected_MVA = -99.;
-      fTreeSelected_MVA -10.;
 
       fTreeSelescted_frogsEventID = c->frogsEventID;
       fTreeSelescted_frogsGSLConStat = c->frogsGSLConStat;
