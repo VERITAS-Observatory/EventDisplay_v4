@@ -1747,6 +1747,13 @@ void VExposure::downloadRunList()
 	cout << "COMMAND: " << permision_string << endl;
 	system(permision_string); 
       }
+
+      if( system("which bbftp") != 0 )
+      {
+        cout << "ERROR: \"which bbftp\" shows no match. Install bbftp and add to you $PATH." << endl;
+	cout << "exiting ...." << endl;
+	exit(-1);
+      }
       // Then Download
       sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" %s", fRunDownloadDate[i],fRunDownload[i],
                                                                                                                   ENVIR_VAR,fRunDownloadDate[i],fRunDownload[i],
@@ -1785,7 +1792,13 @@ void VExposure::downloadRunList()
 	    cout << "COMMAND: " << permision_string << endl;
 	    system(permision_string); 
           }
-          // Then Download
+          if( system("which bbft") == 0 )
+          {
+            cout << "ERROR: \"which bbftp\" shows no match. Install bbftp and add to you $PATH." << endl;
+	    cout << "exiting ...." << endl;
+    	    exit(-1);
+          }
+           // Then Download
           sprintf(dl_string,"bbftp -V -S -p 12 -u bbftp -e \"get /veritas/data/d%d/%d.cvbf %s/data/d%d/%d.cvbf\" %s", fLaserDownloadDate[i],fLaserDownload[i],
 	                                                                                                              ENVIR_VAR,fLaserDownloadDate[i],fLaserDownload[i],
 														      getRawDataServer().c_str() );
