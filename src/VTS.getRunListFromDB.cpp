@@ -36,6 +36,12 @@ int main( int argc, char *argv[] )
     parseOptions(argc, argv);
     VExposure a;
 
+    if( runlist != "" && laserlist != "" )
+    {
+      cout << "Error: Cannot use -m and -l at the same time." << endl;
+      return 0;
+    }
+
     if( runlist != "" )
     {
 
@@ -77,6 +83,8 @@ int main( int argc, char *argv[] )
 
     }
 
+    return 0;
+
 }
 
 void parseOptions(int argc, char *argv[])
@@ -101,7 +109,7 @@ void parseOptions(int argc, char *argv[])
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:lm:b:e:s:z:d:xgtv", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtv", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
