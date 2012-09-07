@@ -2017,3 +2017,29 @@ void VExposure::setPrintVerbose( int iPrintVerbose )
 {
 	if( iPrintVerbose ) bPrintVerbose = true;
 }
+
+void VExposure::readLaserRunListFromFile( string runlist )
+{
+
+  string is_line;
+  ifstream inputfile;
+  inputfile.open(runlist.c_str());
+
+  if( !inputfile )
+  {
+    cout << "ERROR: Input LASER runlist not found: " << runlist << endl;
+    exit(-1);
+  }
+
+  while( getline( inputfile, is_line ) )
+  {
+    cout << atoi(is_line.c_str()) << " " << getLaserDate(atoi(is_line.c_str())) << endl;
+    fLaserDownload.push_back( atoi(is_line.c_str()) );
+    fLaserDownloadDate.push_back( getLaserDate(atoi(is_line.c_str())) );
+  }
+
+  inputfile.close();
+
+}
+
+

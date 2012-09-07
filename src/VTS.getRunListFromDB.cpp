@@ -18,6 +18,7 @@
 
 void parseOptions(int argc, char *argv[]);
 
+string laserlist="";
 string runlist="";
 string startdate="2000-01-01";
 string enddate="2050-01-01";
@@ -35,7 +36,28 @@ int main( int argc, char *argv[] )
     parseOptions(argc, argv);
     VExposure a;
 
-    if( runlist == "" )
+    if( runlist != "" )
+    {
+
+      a.readRunListFromFile(runlist);
+      a.readFromDBList();
+      a.setSelectLaser( laserruns );
+      a.setPrintVerbose( verbose );
+      a.setPrintTimeMask( timemask );
+
+      a.readRunCommentsFromDB();
+      if( laserruns == 1 ) a.getLaserList();
+      a.printListOfRuns();
+      if( getRuns == 1 ) a.downloadRunList();
+
+    } else if( laserlist != "" )
+    {
+
+      a.readLaserRunListFromFile(laserlist);
+      a.setSelectLaser( laserruns );
+      if( getRuns == 1 ) a.downloadRunList();
+
+    } else
     {
 
       a.setMakeRunList( true );
@@ -53,20 +75,6 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
 
-    } else
-    {
-
-      a.readRunListFromFile(runlist);
-      a.readFromDBList();
-      a.setSelectLaser( laserruns );
-      a.setPrintVerbose( verbose );
-      a.setPrintTimeMask( timemask );
-
-      a.readRunCommentsFromDB();
-      if( laserruns == 1 ) a.getLaserList();
-      a.printListOfRuns();
-      if( getRuns == 1 ) a.downloadRunList();
-
     }
 
 }
@@ -79,6 +87,7 @@ void parseOptions(int argc, char *argv[])
         {
             {"help", no_argument, NULL, 'h'},
             {"runlist", required_argument, 0, 'l'},
+            {"laserlist", required_argument, 0, 'm'},
             {"start", required_argument, 0, 'b'},
             {"stop", required_argument, 0, 'e'},
             {"source", required_argument, 0, 's'},
@@ -92,7 +101,7 @@ void parseOptions(int argc, char *argv[])
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:l:b:e:s:z:d:xgtv", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:lm:b:e:s:z:d:xgtv", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
@@ -116,6 +125,9 @@ void parseOptions(int argc, char *argv[])
                 break;
             case 'l':
                 runlist=optarg;
+                break;
+            case 'm':
+                laserlist=optarg;
                 break;
             case 'b':
                 startdate=optarg;
