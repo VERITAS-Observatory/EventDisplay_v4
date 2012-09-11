@@ -37,7 +37,7 @@ void VPlotLookupTable::printLookupTables()
     }
 }
 
-void VPlotLookupTable::plot2DHistogram( TH2F *h, unsigned int iSetID, char* ititle, int iCanvasX, double i_min, double i_max )
+void VPlotLookupTable::plot2DHistogram( TH2F *h, unsigned int iSetID, string ititle, int iCanvasX, double i_min, double i_max )
 {
    if( !h )
    {
@@ -51,7 +51,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F *h, unsigned int iSetID, char* itit
    char htitle[600];
    sprintf( hname, "c%s_%d_%s_%d_%d_%d_%d", h->GetName(), iSetID, fLookupTableData[iSetID]->fLookupTable.c_str(), fLookupTableData[iSetID]->fZe,
 						 fLookupTableData[iSetID]->fAz, fLookupTableData[iSetID]->fNoise, fLookupTableData[iSetID]->fWobbleOffset );
-   sprintf( htitle, "lookup table (%s, %s, %d deg, az %d, noise %d, woff %.2f", ititle,
+   sprintf( htitle, "lookup table (%s, %s, %d deg, az %d, noise %d, woff %.2f", ititle.c_str(),
 	     fLookupTableData[iSetID]->fLookupTable.c_str(), fLookupTableData[iSetID]->fZe,
 	     fLookupTableData[iSetID]->fAz, fLookupTableData[iSetID]->fNoise, 1./100.*(double)fLookupTableData[iSetID]->fWobbleOffset );
 
