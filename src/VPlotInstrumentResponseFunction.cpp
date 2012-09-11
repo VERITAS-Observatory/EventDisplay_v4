@@ -427,8 +427,9 @@ void VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iData
     iL->SetLineStyle( 1 );
     iL->Draw();
 
-    for( unsigned int i = 1; i < fData.size(); i++ )
+    for( unsigned int i = 0; i < fData.size(); i++ )
     {
+       if( i == iDataSetID ) continue;
        TGraphAsymmErrors *g = 0;
 
        if( fData[i]->fA_MC == "A_MC" )
