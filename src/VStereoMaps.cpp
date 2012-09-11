@@ -171,11 +171,13 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
 // this cuts events away further than the maximum distance
 	if( fAcceptance && fAcceptance->isExcludedfromSource( x, y ) ) return false;
 // fill 2D stereo Maps for all models (ON map)
+// (TTTH2)
         makeTwoDStereo_BoxSmooth( x-fRunList.fWobbleWestMod, y-fRunList.fWobbleNorthMod, i_weight, sqrt( fRunList.fSourceRadius ) );
     }
 
 // direction cut
 // (theta2 cut might be energy dependent)
+// (TTTH2)
     if( theta2 < fRunList.fSourceRadius ) return true;
 
     return false;
@@ -606,6 +608,8 @@ bool VStereoMaps::fill_ReflectedRegionModel(  double x, double y, int irun, bool
 
 // normalisation for uncorrelated plots
 // (off regions are still of source region, this is not the bin size)
+// (TTTH2)	
+// add here energy dependent norm for theta2 cut
         f_RE_AreaNorm = 1.;
         if( bUncorrelatedSkyMaps && fRunList.fSourceRadius > 0. )
         {

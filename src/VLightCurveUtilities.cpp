@@ -227,6 +227,17 @@ void VLightCurveUtilities::printLightCurveWiki( double iMinEnergy_TeV )
 
 }
 
+void VLightCurveUtilities::printLightCurveDCF()
+{
+   for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+   {
+       cout << "DCF\t";
+       cout << fLightCurveData[i]->getMJD() << "\t";
+       cout << scientific << setprecision( 4 ) << fLightCurveData[i]->fFlux << "\t";
+       cout << fLightCurveData[i]->fFluxError;
+       cout << fixed << endl;
+   }
+}
 
 void VLightCurveUtilities::printLightCurve( bool bFullDetail )
 {

@@ -134,7 +134,7 @@ double VZDCF::getZDCFData_dcf_max( bool bError, double iTauMin, double iTauMax )
 
 
 
-TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, double ymax )
+TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, double ymin, double ymax )
 {
     char hname[800];
     char htitle[800];
@@ -170,15 +170,20 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, doub
        hZDCF->SetStats( 0 );
        hZDCF->SetXTitle( "time delay [days]" );
        hZDCF->GetXaxis()->CenterTitle( true );	  
-       if( bzdcf )
+       if( bzdcf ) hZDCF->SetYTitle(  "ZDCF" );
+       else        hZDCF->SetYTitle(  "ZDCF / error " );
+       if( ymin > -99. && ymax > -99. )
        {
-	  hZDCF->SetYTitle(  "ZDCF" );
+          hZDCF->SetMinimum( ymin );
+	  hZDCF->SetMaximum( ymax );
+       }
+       else if( bzdcf )
+       {
 	  hZDCF->SetMinimum( getZDCFData_dcf_min( true, taumin, taumax ) * 1.1 );
 	  hZDCF->SetMaximum( getZDCFData_dcf_max( true, taumin, taumax ) * 1.1 );
        }
        else
        {
-	  hZDCF->SetYTitle(  "ZDCF / error " );
 	  hZDCF->SetMinimum( -5. );
 	  hZDCF->SetMaximum(  ymax );
        }
@@ -254,15 +259,15 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, doub
     return c;
 }
 
-TCanvas* VZDCF::plotZDCF( TCanvas *c, double taumin, double taumax )
+TCanvas* VZDCF::plotZDCF( TCanvas *c, double taumin, double taumax, double ymin, double ymax )
 {
-   return plot( c, true, taumin, taumax, -1. );
+   return plot( c, true, taumin, taumax, ymin, ymax );
 }
    
    
-TCanvas* VZDCF::plotZDCFoverError( TCanvas *c, double taumin, double taumax, double ymax )
+TCanvas* VZDCF::plotZDCFoverError( TCanvas *c, double taumin, double taumax, double ymin, double ymax )
 {
-   return plot( c, false, taumin, taumax, ymax );
+   return plot( c, false, taumin, taumax, ymin, ymax );
 }
 
 void VZDCF::setMLinterval( double iMLPeak, double iML1Sigma_low, double iML1Sigma_up )
