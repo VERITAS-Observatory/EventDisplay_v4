@@ -135,12 +135,9 @@ unsigned int VExposure::getLaserDate( unsigned int iRunNumber )
         cout << "error connecting to db" << endl;
         return -1;
     }
-//    cout << "reading from " << iTempS << endl;
 
     char c_query[1000];
 
-    //sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate.c_str(), fStopDate.c_str() );
-    //sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\" and source_id like convert( _utf8 \'%s\' using latin1)", fStartDate.c_str(), fStopDate.c_str(), fTargetSourceName.c_str() );
     sprintf( c_query, "select * from tblRun_Info where run_id = %d", iRunNumber );
 
     TSQLResult *db_res = f_db->Query( c_query );
@@ -400,8 +397,6 @@ bool VExposure::readFromDBList()
           if( iTemp.size() > 8 )
               fDataStartTime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
       }
-      //if( fDebug ) cout << j << " " << db_row->GetField( 19 ) <<  " ";
-      //if( fDebug ) cout << db_row->GetField( 1 ) << " " << db_row->GetField( 3 ) << " " << flush;
 
 //////
 // get source coordinates
@@ -1722,7 +1717,7 @@ void VExposure::downloadRunList()
   char mkdir_string[800];
   char permision_string[800];
 
-  ENVIR_VAR = getenv ("OBS_DATA_DIR");
+  ENVIR_VAR = getenv ("VERITAS_DATA_DIR");
 
   cout << "Download Runs: " << endl;
 
@@ -1792,7 +1787,7 @@ void VExposure::downloadRunList()
 	    cout << "COMMAND: " << permision_string << endl;
 	    system(permision_string); 
           }
-          if( system("which bbft") == 0 )
+          if( system("which bbftp") == 0 )
           {
             cout << "ERROR: \"which bbftp\" shows no match. Install bbftp and add to you $PATH." << endl;
 	    cout << "exiting ...." << endl;
@@ -1819,10 +1814,6 @@ void VExposure::getLaserList()
 
   for( unsigned int i = 0; i < fRunRA.size(); i++ )
     fRunLaserList.push_back( getLaserRun( getDBServer(), fRun[i],4) );
-
-//  for( unsigned int i = 0; i < fRunLaserList.size(); i++ )
-//    for( unsigned int j = 0; j < 4 ; j++ )
-//      fDateLaserList.push_back( getLaserDate(fRunLaserList[i][j]) );
 
   cout << "complete." << endl;
   cout << endl;
@@ -1902,7 +1893,6 @@ TSQLServer* VExposure::connectToSQLServer( string iDBserver )
        {
            cout << "VDBRunInfo: failed to connect to database server" << endl;
            cout << "\t server: " <<  iDBserver << endl;
-//           fDBStatus = false;
            return false;
        }
    }
@@ -1950,11 +1940,9 @@ void VExposure::readRunCommentsFromDB()
     if( !f_db ) return;
     char c_query[1000];
     
-    /////for( unsigned int i = 0; i < fRunDownloadList.size(); i++ )
     for( unsigned int i = 0; i < fRun.size(); i++ )
     {
 
-      ////sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRunDownloadList[i] );
       sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRun[i] );
 
     
@@ -1964,9 +1952,7 @@ void VExposure::readRunCommentsFromDB()
       TSQLRow *db_row = db_res->Next();
       if( !db_row )
       {
-          //cout << "VDBRunInfo: failed reading a row from DB for run " << fRunDownloadList[i] << endl;
-          cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << fRun[i] << endl;
-//          return;
+           if( fRun[i] > 46905 ) cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << fRun[i] << endl;
 	   fDataCat.push_back( " " );
 	   fStatus.push_back( " " );
 	   fStatReason.push_back( " " );
@@ -1977,7 +1963,6 @@ void VExposure::readRunCommentsFromDB()
 	   fVPMcon.push_back( " " );
 	   fAuthor.push_back( " " );
 	   fComment.push_back( " " );
-
       } else
       {
     
@@ -2003,7 +1988,7 @@ void VExposure::readRunCommentsFromDB()
         else 			   fComment.push_back( " " );
       }
 
-    }
+    } 
 
     f_db->Close();
 

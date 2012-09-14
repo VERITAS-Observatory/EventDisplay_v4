@@ -125,7 +125,7 @@ void parseOptions(int argc, char *argv[])
                 break;
             case 'h':
 		char *ENV;
-		ENV = getenv("OBS_EVNDISP_ANA_DIR");
+		ENV = getenv("VERITAS_EVNDISP_ANA_DIR");
 		char readme[500];
 		sprintf(readme,"cat %s/ParameterFiles/EVNDISP.getSourceInfo.runparameter",ENV);
                 system( readme );

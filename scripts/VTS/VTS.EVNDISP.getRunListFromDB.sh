@@ -1,7 +1,6 @@
 #!/bin/zsh
 
-source $EVNDISPSYS/setObservatory.sh VTS
 
-cd $EVNDISPSYS/bin/
+cd $EVNDISPSYS/trunk/bin/
 
 ./VTS.getRunListFromDB $*
