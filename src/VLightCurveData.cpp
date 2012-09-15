@@ -31,7 +31,8 @@ VLightCurveData::VLightCurveData( string iName )
    fNoffAlpha = 0.;
    fSignificance = 0.;
    fFlux = 0.;
-   fFluxError = 0.;
+   fFluxErrorUp = 0.;
+   fFluxErrorDown = 0.;
    fUpperFluxLimit = 0.;
    fRunFluxCI_lo_1sigma = 0.;
    fRunFluxCI_up_1sigma = 0.;
@@ -65,7 +66,8 @@ VLightCurveData::VLightCurveData( const VLightCurveData& p )
    fNoffAlpha = p.fNoffAlpha;
    fSignificance = p.fSignificance;
    fFlux = p.fFlux;
-   fFluxError = p.fFluxError;
+   fFluxErrorUp = p.fFluxErrorUp;
+   fFluxErrorDown = p.fFluxErrorDown;
    fUpperFluxLimit = p.fUpperFluxLimit;
    fRunFluxCI_lo_1sigma = p.fRunFluxCI_lo_1sigma;
    fRunFluxCI_up_1sigma = p.fRunFluxCI_up_1sigma; 
@@ -130,7 +132,9 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
    fRunTime  = fFluxCalculation.getRunTime( -1 );
    fRunElevation = fFluxCalculation.getRunElevation( -1 );
    fSignificance = fFluxCalculation.getSignificance( -1 );
-   fFluxCalculation.getFlux( -1, fFlux, fFluxError, fUpperFluxLimit );
+   double iFluxError = 0;
+   fFluxCalculation.getFlux( -1, fFlux, iFluxError, fUpperFluxLimit );
+   setFluxError( iFluxError );
    fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_1sigma, fRunFluxCI_up_1sigma, true );
    fFluxCalculation.getFluxConfidenceInterval( -1, fRunFluxCI_lo_3sigma, fRunFluxCI_up_3sigma, false );
 
@@ -144,11 +148,26 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
       if( iFluxE > 0. )
       {
          fFlux -= iFlux;
-	 fFluxError = sqrt( fFluxError*fFluxError + iFluxE*iFluxE );
+	 setFluxError( sqrt( getFluxError()*getFluxError() + iFluxE*iFluxE ) );
       }
    }   
 
    return true;
+}
+
+double VLightCurveData::getFluxError()
+{
+   if( fFluxErrorUp > 0. && fFluxErrorDown ) return 0.5*(fFluxErrorUp+fFluxErrorDown);
+   else if( fFluxErrorUp > 0. )              return fFluxErrorUp;
+   else if( fFluxErrorDown > 0. )            return fFluxErrorDown;
+
+   return 0.;
+}
+
+void VLightCurveData::setFluxError( double iL )
+{
+   fFluxErrorUp = iL;
+   fFluxErrorDown = iL;
 }
 
 double VLightCurveData::getMJD()

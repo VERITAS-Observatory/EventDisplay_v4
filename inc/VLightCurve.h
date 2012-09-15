@@ -93,8 +93,8 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    bool     fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFill_days = 20., double iPhaseBinning = 0.025, bool bPlotDebug = false );
    bool     fillRandomizedPhaseogram( double iMCCycles, double iPhaseError_low, double iPhaseErrorUp, string iHisName, double iHisMin_y, double iHisMax_y );
    string   getRateAxisTitle() { return fRateAxisTitle; }
-   bool     initializeTeVLightCurve( string iASCIIFile );
-   bool     initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin = -1., double iMJDMax = -1. );
+   bool     initializeTeVLightCurve( string iASCIIFile, double iFluxMultiplier = 1. );
+   bool     initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin, double iMJDMax );
    bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1. );
    TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1, string iPlottingOption = "p" );
    bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );
@@ -104,7 +104,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    void     setName( string iName ) { fName = iName; }
    void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
 
-   ClassDef( VLightCurve, 4 );
+   ClassDef( VLightCurve, 5 );
 };
 
 #endif

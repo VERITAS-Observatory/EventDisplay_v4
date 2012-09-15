@@ -59,7 +59,7 @@ class VLightCurveUtilities
     void   printLightCurveLaTexTableRow( double iSigmaMinFluxLimits = -99., double iFluxMultiplicator = 1. );
     void   printLightCurveDCF();
     void   printLightCurveWiki( double iMinEnergy_TeV = 1. );
-    bool   readASCIIFile( string iFile, double iMJDMin = -99., double iMJDMax = -99. );
+    bool   readASCIIFile( string iFile, double iMJDMin = -99., double iMJDMax = -99., double iFluxMultiplier = 1. );
     void   resetLightCurveData();
     void   setASCIIFormSecondColumnIsObservingInterval( bool iB = true ) { fASCIIFormSecondColumnIsObservingInterval = iB; }
     void   setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days = 99., bool bPlotPhase = true );

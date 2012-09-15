@@ -50,7 +50,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData
       if( iV[i] )
       {
          is << iV[i]->getMJD() << "\t" << iV[i]->getMJDError() << "\t";
-	 is << iV[i]->fFlux << "\t" << iV[i]->fFluxError;
+	 is << iV[i]->fFlux << "\t" << iV[i]->getFluxError();
 	 is << endl;
        }
    }
@@ -59,7 +59,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, vector< VLightCurveData
    return true;
 }
 
-bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double iMJDMax )
+bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double iMJDMax, double iFluxMultiplier )
 {
    resetLightCurveData();
 
@@ -75,6 +75,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 
    double iTemp1 = 0.;
    double iTemp2 = 0.;
+   double iTemp3 = 0.;
 
    string is_line;
 
@@ -85,7 +86,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
        istringstream is_stream( is_line );
 
 //! no errors are catched here..
-       is_stream >> iTemp1;     // second since fXRTMissionTimeStart
+       is_stream >> iTemp1;     // second since fXRTMissionTimeStart or MJD
        is_stream >> iTemp2;     // error [s]
 
 // times are given in XRT mission sec.
@@ -105,6 +106,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 	  fLightCurveData.back()->fMJD_Data_min = iTemp1 - iTemp2;
 	  fLightCurveData.back()->fMJD_Data_max = iTemp1 + iTemp2;
        }
+// second column is MJD max
        else
        {
 	  fLightCurveData.back()->fMJD_Data_min = iTemp1;
@@ -124,20 +126,27 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
           fLightCurveMJD_max = fLightCurveData.back()->fMJD_Data_min;
        }
 
-       is_stream >> iTemp1;     // rate
-       is_stream >> iTemp2;     // rate error
+       is_stream >> iTemp1;     // rate or flux
+       is_stream >> iTemp2;     // rate or flux error
+       if( !is_stream ) is_stream >> iTemp3;
+       else  iTemp3 = iTemp2;
 
-       if( iTemp2 > 0. )
+       iTemp1 *= iFluxMultiplier;
+       iTemp2 *= iFluxMultiplier;
+       iTemp3 *= iFluxMultiplier;
+
+       if( iTemp2 > 0. && iTemp3 > 0. )
        {
           fLightCurveData.back()->fFlux = iTemp1;
-          fLightCurveData.back()->fFluxError = iTemp2;
+          fLightCurveData.back()->fFluxErrorDown = iTemp3;
+          fLightCurveData.back()->fFluxErrorUp   = iTemp2;
        }
 // error < 0 -> upper flux limit
        else if( iTemp1 > 0. && iTemp2 < 0. )
        {
           fLightCurveData.back()->fUpperFluxLimit = iTemp1;
           fLightCurveData.back()->fFlux = -99.;
-          fLightCurveData.back()->fFluxError = -99.;
+          fLightCurveData.back()->setFluxError( -99. );
        }
 
    }
@@ -177,9 +186,10 @@ void VLightCurveUtilities::printLightCurveLaTexTableRow( double iSigmaMinFluxLim
 // flux (with error) or upper flux limit)
       if( iSigmaMinFluxLimits != 1 ) cout << fixed;
       else                           cout << scientific;
-      if( fLightCurveData[i]->fFluxError > 0. && fLightCurveData[i]->fSignificance > iSigmaMinFluxLimits )
+      if( fLightCurveData[i]->getFluxError() > 0. && fLightCurveData[i]->fSignificance > iSigmaMinFluxLimits )
       {
-         cout << setprecision(1) << fLightCurveData[i]->fFlux*iFluxMultiplicator << " $\\pm$ " << fLightCurveData[i]->fFluxError*iFluxMultiplicator;
+         cout << setprecision(1) << fLightCurveData[i]->fFlux*iFluxMultiplicator << " $\\pm$ ";
+	 cout << fLightCurveData[i]->getFluxError()*iFluxMultiplicator;
       }
       else
       {
@@ -212,9 +222,9 @@ void VLightCurveUtilities::printLightCurveWiki( double iMinEnergy_TeV )
       cout << "| " << (int)fLightCurveData[i]->fNon << endl;
       cout << "| " << (int)fLightCurveData[i]->fNoff << endl;
       cout << "| " << setprecision(2) << fLightCurveData[i]->fNoffAlpha << endl;
-      if( fLightCurveData[i]->fFluxError >  0. )
+      if( fLightCurveData[i]->getFluxError() >  0. )
       {
-         cout << "| " << setprecision( 1 ) << scientific << fLightCurveData[i]->fFlux << "+-" << fLightCurveData[i]->fFluxError << endl;
+         cout << "| " << setprecision( 1 ) << scientific << fLightCurveData[i]->fFlux << "+-" << fLightCurveData[i]->getFluxError() << endl;
       }
       else
       {
@@ -234,7 +244,7 @@ void VLightCurveUtilities::printLightCurveDCF()
        cout << "DCF\t";
        cout << fLightCurveData[i]->getMJD() << "\t";
        cout << scientific << setprecision( 4 ) << fLightCurveData[i]->fFlux << "\t";
-       cout << fLightCurveData[i]->fFluxError;
+       cout << fLightCurveData[i]->getFluxError();
        cout << fixed << endl;
    }
 }
@@ -260,7 +270,7 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
 	 cout << "\t Tot Time [h]: " << fLightCurveData[i]->fRunTime/3600.;
 	 cout << endl;
 	 cout << "\tFlux " << scientific << setprecision( 4 ) << fLightCurveData[i]->fFlux;
-	 cout << " +- " << fLightCurveData[i]->fFluxError << "\tUL " << fLightCurveData[i]->fUpperFluxLimit;
+	 cout << " +- " << fLightCurveData[i]->getFluxError() << "\tUL " << fLightCurveData[i]->fUpperFluxLimit;
 	 if( fLightCurveData[i]->fRunFluxCI_lo_1sigma >= 0. )
 	 {
 	    cout << "\t CI (1 sigma): " << fLightCurveData[i]->fRunFluxCI_lo_1sigma << "\t" << fLightCurveData[i]->fRunFluxCI_up_1sigma;
@@ -276,9 +286,9 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
       for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
       {
          cout << "  "    << fLightCurveData[i]->getMJD();
-	 cout << "     " << fLightCurveData[i]->fFlux;
-	 cout << "     " << fLightCurveData[i]->fFluxError;
-	 cout << endl;
+	 cout << "     " << scientific << fLightCurveData[i]->fFlux;
+	 cout << "     " << scientific << fLightCurveData[i]->getFluxError();
+	 cout << fixed << endl;
       }
    }
 
@@ -327,7 +337,7 @@ double VLightCurveUtilities::getFluxError_Mean()
    {
       if( fLightCurveData[i] )
       {
-          iMean += fLightCurveData[i]->fFluxError;
+          iMean += fLightCurveData[i]->getFluxError();
 	  iNN++;
       }
    }
@@ -440,7 +450,7 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, TF1 *f1, unsigned int i
 	    fLightCurveData.back()->fMJD_Data_min = iMJD_min + i * (iMJD_max-iMJD_min)/((double)iNPoints);
 	    fLightCurveData.back()->fMJD_Data_max = fLightCurveData.back()->fMJD_Data_min;
 	    fLightCurveData.back()->fFlux = f1->Eval( fLightCurveData.back()->fMJD_Data_min );
-	    fLightCurveData.back()->fFluxError = TMath::Abs( gRandom->Gaus( 0., iFluxMeanError ) );
+	    fLightCurveData.back()->setFluxError( TMath::Abs( gRandom->Gaus( 0., iFluxMeanError ) ) );
 	 }
       }
       else

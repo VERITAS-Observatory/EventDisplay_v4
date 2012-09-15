@@ -47,7 +47,8 @@ class VLightCurveData : public TObject
    double fNoffAlpha;
    double fSignificance;
    double fFlux;
-   double fFluxError;
+   double fFluxErrorUp;
+   double fFluxErrorDown;
    double fUpperFluxLimit;
    double fRunFluxCI_lo_1sigma;
    double fRunFluxCI_up_1sigma;
@@ -61,15 +62,19 @@ class VLightCurveData : public TObject
    bool   fillTeVEvndispData( string iAnaSumFile, double iThresholdSignificance = -99999., double iMinEvents = -9999., 
                               double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17, double iMinEnergy = 0., 
 			      double E0 = 1., double alpha = -2.5 );
+   double getFluxError();
+   double getFluxErrorDown();
+   double getFluxErrorUp();
    double getMJD();
    double getMJDError();
    double getPhase();
    double getPhaseError();
    bool   isZombie() { return bIsZombie; }
    void   setFluxCalculationEnergyInterval( double iEnergy_min_TeV = 1., double iEnergy_max_TeV = -1. );
+   void   setFluxError( double iL = 0. );
    void   setMJDInterval( double iMJD_min, double iMJD_max ) { fMJD_min = iMJD_min; fMJD_max = iMJD_max; }
 
-   ClassDef( VLightCurveData, 3 );
+   ClassDef( VLightCurveData, 4 );
 };
 
 class VLightCurveDataLessThan

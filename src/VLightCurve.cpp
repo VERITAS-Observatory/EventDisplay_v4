@@ -58,17 +58,17 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, doub
     read TeV fluxes from ASCII file
 
 */
-bool VLightCurve::initializeTeVLightCurve( string iASCIIFile )
+bool VLightCurve::initializeTeVLightCurve( string iASCIIFile, double iFluxMultiplier )
 {
 // make sure that this is really a ascii file
    if( iASCIIFile.find( ".root" ) != string::npos )
    {
-       return initializeTeVLightCurve( iASCIIFile, 1. );
+       return initializeTeVLightCurve( iASCIIFile, 1., -1., -1. );
    }
    fDataType = "TeV_ascii";
 
 // read in ascii file
-   readASCIIFile( iASCIIFile );
+   readASCIIFile( iASCIIFile, -1., -1., iFluxMultiplier );
    if( isZombie() ) return false;
 
 // plotting range
@@ -301,7 +301,6 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        if( !hLightCurve )
        {
           cout << "VLightCurve::plot: no light curve histogram found with name " << htitle << endl;
-//	  fCanvasLightCurve->GetListOfPrimitives()->Print();
 	  return fCanvasLightCurve;
        }
     }
@@ -328,12 +327,15 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 
 /////////////
 // plot fluxes or confidence intervals
-       if( fLightCurveData[i] && fLightCurveData[i]->fFluxError >= 0. )
+       if( fLightCurveData[i] && fLightCurveData[i]->getFluxError() >= 0. )
        {
 	  if( iPlotConfidenceInterval < 0 )
 	  {
 	     fLightCurveGraph->SetPoint( z, iMJD_mean, fLightCurveData[i]->fFlux );
-	     fLightCurveGraph->SetPointError( z, iMJD_error, iMJD_error, fLightCurveData[i]->fFluxError, fLightCurveData[i]->fFluxError );
+	     fLightCurveGraph->SetPointEXlow( z, iMJD_error );
+	     fLightCurveGraph->SetPointEXhigh( z, iMJD_error );
+	     fLightCurveGraph->SetPointEYlow( z, fLightCurveData[i]->fFluxErrorDown );
+	     fLightCurveGraph->SetPointEYhigh( z, fLightCurveData[i]->fFluxErrorUp );
 	  }
 	  else
 	  {
@@ -361,7 +363,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        else
        {
            cout << "no plotting for flux intervall " << i << "\t" << fLightCurveData[i]->fMJD_min << "\t" << fLightCurveData[i]->fMJD_max << ":" << endl;
-	   cout << "\t" << fLightCurveData[i]->fFlux << " +- " << fLightCurveData[i]->fFluxError << " , UL" << fLightCurveData[i]->fUpperFluxLimit << endl;
+	   cout << "\t" << fLightCurveData[i]->fFlux << " +- " << fLightCurveData[i]->getFluxError() << " , UL" << fLightCurveData[i]->fUpperFluxLimit << endl;
        }
     }
     if( fLightCurveGraph->GetN() > 0 )
@@ -542,7 +544,7 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 
 		      iL->fFlux =   hPTemp.GetBinContent( hPTemp.FindBin( getPhase( iMJD_new_min ) ) ) 
 		                 + gRandom->Gaus( 0., hPTemp.GetBinError( hPTemp.FindBin( getPhase( iMJD_new_min ) ) ) );
-		      iL->fFluxError = TMath::Abs( gRandom->Gaus( 0., getFluxError_Mean() ) );
+		      iL->setFluxError( TMath::Abs( gRandom->Gaus( 0., getFluxError_Mean() ) ) );
 
 		      iMCLightCurveData.push_back( iL );
                    }
@@ -561,14 +563,9 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 	     iL->fMJD_Data_min = fLightCurveData[i]->fMJD_Data_min;
 	     iL->fMJD_Data_max = iL->fMJD_Data_min + fLightCurveData[i]->getMJDError();
 	     iL->fFlux = fLightCurveData[i]->fFlux;
-	     iL->fFluxError = fLightCurveData[i]->fFluxError;
+	     iL->setFluxError( fLightCurveData[i]->getFluxError() );
 
 	     iMCLightCurveData.push_back( iL );
-
-/*	     if( getPhase( fLightCurveData[i]->getMJD() ) < 0.5 && getPhase( fLightCurveData[i]->getMJD() ) > 0.4 )
-	     {
-	         iMCLightCurveData.back()->fFlux =  gRandom->Gaus( getFlux_Mean(), getFluxError_Mean() );
-             } */
 
 	     if( getPhase( fLightCurveData[i]->getMJD() ) < 0.5 )
 	     {
@@ -577,8 +574,7 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 		 iL->fMJD_Data_max = iL->fMJD_Data_min + fLightCurveData[i]->getMJDError();
 
 		 iL->fFlux = fLightCurveData[i]->fFlux;
-// (GM)		 iL->fFlux = gRandom->Gaus( getFlux_Mean(), getFluxError_Mean() );
-		 iL->fFluxError = fLightCurveData[i]->fFluxError;
+		 iL->setFluxError( fLightCurveData[i]->getFluxError() );
 
 		 iMCLightCurveData.push_back( iL );
 	     } 
@@ -608,9 +604,9 @@ double VLightCurve::getLightCurveAxisRange_Min()
    {
        for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
        {
-	  if( fLightCurveData[i] && fLightCurveData[i]->fFluxError > 0. && fLightCurveData[i]->fFlux - fLightCurveData[i]->fFluxError < iFluxMin )
+	  if( fLightCurveData[i] && fLightCurveData[i]->fFluxErrorDown > 0. && fLightCurveData[i]->fFlux - fLightCurveData[i]->fFluxErrorDown < iFluxMin )
 	  {
-	     iFluxMin = fLightCurveData[i]->fFlux - fLightCurveData[i]->fFluxError;
+	     iFluxMin = fLightCurveData[i]->fFlux - fLightCurveData[i]->fFluxErrorDown;
 	  }
 	  else if( fLightCurveData[i] && fLightCurveData[i]->fUpperFluxLimit > 0. && fLightCurveData[i]->fUpperFluxLimit < iFluxMin )
 	  {
@@ -631,9 +627,9 @@ double VLightCurve::getLightCurveAxisRange_Max()
    {
        for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
        {
-	  if( fLightCurveData[i] && fLightCurveData[i]->fFluxError > 0. && fLightCurveData[i]->fFlux + fLightCurveData[i]->fFluxError > iFluxMax )
+	  if( fLightCurveData[i] && fLightCurveData[i]->fFluxErrorUp > 0. && fLightCurveData[i]->fFlux + fLightCurveData[i]->fFluxErrorUp > iFluxMax )
 	  {
-	     iFluxMax = fLightCurveData[i]->fFlux + fLightCurveData[i]->fFluxError;
+	     iFluxMax = fLightCurveData[i]->fFlux + fLightCurveData[i]->fFluxErrorUp;
 	  }
 	  else if( fLightCurveData[i] && fLightCurveData[i]->fUpperFluxLimit > 0. && fLightCurveData[i]->fUpperFluxLimit > iFluxMax )
 	  {
@@ -746,7 +742,7 @@ bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError
 	     x = getPhase( fLightCurveData[j]->getMJD() );
              for( unsigned int k = 0; k < iMCCycles; k++ )
 	     {
-		y = gRandom->Gaus( fLightCurveData[j]->fFlux, fLightCurveData[j]->fFluxError );
+		y = gRandom->Gaus( fLightCurveData[j]->fFlux, fLightCurveData[j]->getFluxError() );
 
 		fMCRandomizedPhaseogram->Fill( x, y );
 		fMCRandomizedPhaseogramProf->Fill( x, y );
