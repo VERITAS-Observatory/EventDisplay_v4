@@ -148,7 +148,6 @@ class VExposure : public TObject, public VGlobalRunParameter
 				 bool bAitoff = false );
         void set_plot_style();
         void resetDataVectors();
-
     public:
 
         VExposure( int nBinsL = 5000, int nBinB = 2000 );
@@ -187,6 +186,9 @@ class VExposure : public TObject, public VGlobalRunParameter
         void readLaserRunListFromFile( string runlist );
 	void downloadRunList();
 	void readRunCommentsFromDB();
+	void setRunNumber( unsigned int number );
+	void setLaserNumber(unsigned int number );
+
         vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
 	TSQLServer* connectToSQLServer( string iServer );
 

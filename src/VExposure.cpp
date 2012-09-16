@@ -1787,7 +1787,7 @@ void VExposure::downloadRunList()
 	    cout << "COMMAND: " << permision_string << endl;
 	    system(permision_string); 
           }
-          if( system("which bbftp") == 0 )
+          if( system("which bbftp") != 0 )
           {
             cout << "ERROR: \"which bbftp\" shows no match. Install bbftp and add to you $PATH." << endl;
 	    cout << "exiting ...." << endl;
@@ -2026,5 +2026,17 @@ void VExposure::readLaserRunListFromFile( string runlist )
   inputfile.close();
 
 }
+void VExposure::setRunNumber( unsigned int number )
+{
 
+ fRunDownloadList.push_back( number );
+
+}
+void VExposure::setLaserNumber( unsigned int number )
+{
+
+  fLaserDownload.push_back( number );
+  fLaserDownloadDate.push_back( getLaserDate(number) );
+
+}
 

@@ -29,6 +29,8 @@ int laserruns=0;
 int getRuns=0;
 int timemask=0;
 int verbose=0;
+unsigned int runnumber=0;
+unsigned int lasernumber=0;
 
 int main( int argc, char *argv[] )
 {
@@ -41,6 +43,36 @@ int main( int argc, char *argv[] )
       cout << "Error: Cannot use -m and -l at the same time." << endl;
       return 0;
     }
+
+    if( runnumber != 0 ) 
+    {
+
+      a.setRunNumber(runnumber);
+      a.readFromDBList();
+      a.setSelectLaser( laserruns );
+      a.setPrintVerbose( verbose );
+      a.setPrintTimeMask( timemask );
+
+      a.readRunCommentsFromDB();
+      if( laserruns == 1 ) a.getLaserList();
+      a.printListOfRuns();
+      a.downloadRunList();
+
+      return 0;
+
+    }
+
+    if( lasernumber != 0 )
+    {
+
+      a.setLaserNumber(lasernumber);
+      a.setSelectLaser( 1 );
+      a.downloadRunList();
+
+      return 0;
+
+    }
+
 
     if( runlist != "" )
     {
@@ -56,12 +88,16 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
 
+      return 0;
+
     } else if( laserlist != "" )
     {
 
       a.readLaserRunListFromFile(laserlist);
       a.setSelectLaser( laserruns );
       if( getRuns == 1 ) a.downloadRunList();
+
+      return 0;
 
     } else
     {
@@ -80,6 +116,8 @@ int main( int argc, char *argv[] )
       if( laserruns == 1 ) a.getLaserList();
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
+
+      return 0;
 
     }
 
@@ -105,11 +143,13 @@ void parseOptions(int argc, char *argv[])
             {"getRuns", no_argument, NULL, 'g'},
             {"timemask", no_argument, NULL, 't'},
             {"verbose", no_argument, NULL, 'v'},
+            {"run", required_argument, 0, 'r'},
+            {"laserrun", required_argument, 0, 'f'},
 	    { 0, 0, 0, 0 }
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtv", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:f:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
@@ -163,6 +203,12 @@ void parseOptions(int argc, char *argv[])
                 break;
             case 'v':
                 verbose=1;
+                break;
+            case 'r':
+                runnumber=atoi(optarg);
+                break;
+            case 'f':
+                lasernumber=atoi(optarg);
                 break;
             case '?':
                 break;
