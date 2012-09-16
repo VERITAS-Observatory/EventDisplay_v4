@@ -63,8 +63,8 @@ class VLightCurveData : public TObject
                               double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17, double iMinEnergy = 0., 
 			      double E0 = 1., double alpha = -2.5 );
    double getFluxError();
-   double getFluxErrorDown();
-   double getFluxErrorUp();
+   double getFluxErrorDown() { return fFluxErrorDown; }
+   double getFluxErrorUp()   { return fFluxErrorUp;   }
    double getMJD();
    double getMJDError();
    double getPhase();
