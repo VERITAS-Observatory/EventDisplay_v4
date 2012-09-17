@@ -9,10 +9,11 @@ MCD=`date`
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] 
 then
   echo
-  echo "./VTS.EVNDISP.sub_evndisp_MC_VBF.sh <ze> <array=V4/V5> <particle=1/14/402> <ATMOSPHERE=21/22>" 
+  echo "./VTS.EVNDISP.sub_evndisp_MC_VBF.sh <ze> <array=V4/V5/V6> <particle=1/14/402> <ATMOSPHERE=21/22>" 
   echo 
   echo "   V4: array before T1 move (before Autumn 2009)"
   echo "   V5: array after T1 move (from Autumn 2009)"
+  echo "   V6: array after camera update (from Autumn 2012)"
   echo 
   exit
 fi

@@ -65,6 +65,28 @@ if( $ARRAY == "V5" ) then
    endif
    set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
 endif
+###################### V6 #################################################
+if( $ARRAY == "V6" ) then
+   if( $PART == "1" ) then
+      set IFIL=UPG_V0_"$ZEW"deg_"$WOG"
+      set RUN=( "wobb" )
+      set SRUN=65000
+      set NRUN=1
+   endif
+   if( $PART == "14" ) then
+      set IFIL=proton_"$ZEW"deg_w"$WOB"_
+      set RUN=( 900 )
+      set NRUN=1
+      set SRUN=47570
+   endif
+   if( $PART == "402" ) then
+      set IFIL=helium_"$ZEW"deg_w"$WOB"_
+      set RUN=( 800 )
+      set NRUN=1
+      set SRUN=47570
+   endif
+   set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
+endif
 
 ##############################################################################################
 # directory with executable
@@ -128,7 +150,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysisApr12_d20120901_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysisApr12_d20120909_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################

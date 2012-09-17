@@ -10,7 +10,7 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ]
 then
    echo
-   echo "VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh <table file> <recid> <atm (21/22)> <array (V4/V5) > [gamma/proton/helium]" 
+   echo "VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh <table file> <recid> <atm (21/22)> <array (V4/V5/V6) > [gamma/proton/helium]" 
    echo
    echo "analyse MC data (loop over zenith angles, noise levels and wobble offsets)"
    echo "<table file>       table file name (without .root and full path)"
@@ -76,7 +76,7 @@ do
        WOFF=${WOBBLE[$w]}
 
       FNAM="$FSCRIPT-$ANAC-$RECID-$IZE-$NNOI-$WOFF-$PART"
-      echo $FNAM
+      echo $FDIR/$FNAM
 
       sed -e "s|TABLEFILE|$TFIL|" $FSCRIPT.sh > $FDIR/$FSCRIPT-1.sh
       sed -e "s/TELESCOPES/$ANAC/" $FDIR/$FSCRIPT-1.sh > $FDIR/$FSCRIPT-2.sh

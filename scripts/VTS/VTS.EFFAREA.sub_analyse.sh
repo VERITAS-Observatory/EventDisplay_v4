@@ -108,7 +108,6 @@ do
 	 echo "* CUTFILE $LOGDIR/$FFIR-$CUTS.dat" >> $LOGDIR/$FFIR.dat
 	 echo >> $LOGDIR/$FFIR.dat
 	 echo "* SIMULATIONFILE_DATA $FFIL" >> $LOGDIR/$FFIR.dat
-#	 echo "* SIMULATIONFILE_MC $XFIL" >> $LOGDIR/$FFIR.dat
 
 # set parameters in run script
          FNAM="$QLOG/MK-EA.$REID.$DATE.MC"

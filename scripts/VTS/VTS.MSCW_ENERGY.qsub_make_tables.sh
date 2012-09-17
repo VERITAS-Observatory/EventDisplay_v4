@@ -25,7 +25,7 @@ source $EVNDISPSYS/setObservatory.sh VERITAS
 cd $EVNDISPSYS/bin
 
 # directory with input file
-DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/analysisApr12_d20120901_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
+DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/analysisApr12_d20120909_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
 
 # remove existing log and table file
 rm -f $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.root
