@@ -9,7 +9,7 @@
 
 #include "VPointingDB.h"
 
-VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun, string iTPointCorrection, string iVPMDirectory, bool iVPMDB )
+VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun )
 {
     fStatus = false;
     fRunNumber = irun;
@@ -43,9 +43,16 @@ VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun, string iTPoint
 
     fNWarnings = 0;
 
+    fTrackingCorrections = 0;
+}
+
+bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bool iVPMDB )
+{
+
+// setup tracking corrections (expert use!)
     if( iTPointCorrection.size() > 0 )
     {
-        fTrackingCorrections = new VTrackingCorrections( iTelID );
+        fTrackingCorrections = new VTrackingCorrections( fTelID );
         if( !fTrackingCorrections->readTrackingCorrectionsFromDB( iTPointCorrection ) )
         {
             cout << "VPointingDB: error while reading tracking correction from VERITAS database" << endl;
@@ -66,21 +73,30 @@ VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun, string iTPoint
     }
 
     fStatus = getDBRunInfo();
-// read pointing from DB or text file
-    if( iVPMDirectory.size() > 0 )             fStatus = readPointingFromVPMTextFile( iVPMDirectory );
+// read pointing from VPM text file
+    if( iVPMDirectory.size() > 0 )
+    {
+       fStatus = readPointingFromVPMTextFile( iVPMDirectory );
+    }
 // read pointing from pointing monitor entries in DB
     else if( iVPMDB )
     {
       fGoodVPM = readPointingMonitorFromDB(); 
+// fall back to DB pointing in case reading of pointing monitor data failed
       if( !fGoodVPM ) fStatus = readPointingFromDB();
-      else fStatus = fGoodVPM;
+      else            fStatus = fGoodVPM;
     }
-
-    else                                       fStatus = readPointingFromDB();
+// read point from DB (no pointing monitor)
+    else
+    {
+       fStatus = readPointingFromDB();
+    }
 
 // Close the connection immediately after all the reading is complete
 // this is important - open connections to the DB cause DB replication problems.
     if( f_db ) f_db->Close();                                                  ;
+    
+    return fStatus;
 }
 
 
@@ -124,21 +140,25 @@ bool VPointingDB::updatePointing( int iMJD, double iTime )
                 {
 /////////////////////////
 // measured elevation and azimuth
-                    fTelElevation = fDBTelElevation[i] * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + fDBTelElevation[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                    fTelElevation =  fDBTelElevation[i]   * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) 
+		                   + fDBTelElevation[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
 // check that we are not around 0 or around 360 degrees
                     if( fabs( fDBTelAzimuth[i] - fDBTelAzimuth[i-1] ) < 1. )
                     {
-                        fTelAzimuth = fDBTelAzimuth[i] * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + fDBTelAzimuth[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                        fTelAzimuth = fDBTelAzimuth[i]   * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) 
+			            + fDBTelAzimuth[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
                     }
                     else
                     {
                         if( fDBTelAzimuth[i] > 359. && fDBTelAzimuth[i-1] < 1. )
                         {
-                            fTelAzimuth = fDBTelAzimuth[i] * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + (fDBTelAzimuth[i-1]+360.) * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                            fTelAzimuth = fDBTelAzimuth[i]         * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1]))
+			               + (fDBTelAzimuth[i-1]+360.) * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
                         }
                         else if( fDBTelAzimuth[i] < 1. && fDBTelAzimuth[i-1] > 359. )
                         {
-                            fTelAzimuth = (fDBTelAzimuth[i]+360.) * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + fDBTelAzimuth[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                            fTelAzimuth = (fDBTelAzimuth[i]+360.) * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) 
+			                 + fDBTelAzimuth[i-1]     * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
                         }
 // this should not happen -> large gap in azimuth between two events
                         else
@@ -151,21 +171,25 @@ bool VPointingDB::updatePointing( int iMJD, double iTime )
                     }
 /////////////////////////
 // target elevation and azimuth
-                    fTelExpectedElevation = fDBTelExpectedElevation[i] * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + fDBTelExpectedElevation[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                    fTelExpectedElevation = fDBTelExpectedElevation[i]   * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) 
+		                          + fDBTelExpectedElevation[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
 // check that we are not around 0 or around 360 degrees
                     if( fabs( fDBTelExpectedAzimuth[i] - fDBTelExpectedAzimuth[i-1] ) < 1. )
                     {
-                        fTelExpectedAzimuth = fDBTelExpectedAzimuth[i] * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + fDBTelExpectedAzimuth[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                        fTelExpectedAzimuth = fDBTelExpectedAzimuth[i]   * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1]))
+			                    + fDBTelExpectedAzimuth[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
                     }
                     else
                     {
                         if( fDBTelExpectedAzimuth[i] > 359. && fDBTelExpectedAzimuth[i-1] < 1. )
                         {
-                            fTelExpectedAzimuth = fDBTelExpectedAzimuth[i] * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + (fDBTelExpectedAzimuth[i-1]+360.) * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                            fTelExpectedAzimuth = fDBTelExpectedAzimuth[i]         * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1]))
+			                       + (fDBTelExpectedAzimuth[i-1]+360.) * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
                         }
                         else if( fDBTelExpectedAzimuth[i] < 1. && fDBTelExpectedAzimuth[i-1] > 359. )
                         {
-                            fTelExpectedAzimuth = (fDBTelExpectedAzimuth[i]+360.) * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) + fDBTelExpectedAzimuth[i-1] * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
+                            fTelExpectedAzimuth = (fDBTelExpectedAzimuth[i]+360.) * (1.-(fDBTime[i] - iTime)/(fDBTime[i]-fDBTime[i-1])) 
+			                         + fDBTelExpectedAzimuth[i-1]     * (1.-(iTime-fDBTime[i-1])/(fDBTime[i]-fDBTime[i-1]));
                         }
 // this should not happen -> large gap in azimuth between two events
                         else
@@ -390,6 +414,7 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 }
 
 /*
+
     reading pointing monitor data from DB  (JG)
 
 */
@@ -457,7 +482,9 @@ bool VPointingDB::readPointingMonitorFromDB()
     raoff = fabs( (3600. * VPMcalibratedPointing[0].ra * degrad) - (3600. * (fDBTargetRA + fDBWobbleEast)) );
     if( decoff > vpmlimit || raoff > vpmlimit )
     {
-	cout << "VPointingDB::readPointingMonitorFromDB warning: For part of this run the pointing monitor data is off by more than " << vpmlimit << " arcsec from the target position for this telescope, reverting to encoder data for this telescope for full duration of the run" <<endl;
+	cout << "VPointingDB::readPointingMonitorFromDB warning: For part of this run the pointing monitor data is off by more than ";
+	cout << vpmlimit;
+	cout << " arcsec from the target position for this telescope, reverting to encoder data for this telescope for full duration of the run" <<endl;
 
 	return false;
       }
@@ -477,7 +504,7 @@ bool VPointingDB::readPointingMonitorFromDB()
   timebin = (int)timebin;
   timelimit = (int)timelimit;
 
-  double starttime = startMJD * 86400;
+  double starttime = startMJD * 86400.;
   int nbad = 0;
   bool timegood;
 
@@ -487,7 +514,8 @@ bool VPointingDB::readPointingMonitorFromDB()
 
     for( uint32_t i = 0; i < VPMcalibratedPointing.size(); i++ ) {
 
-      if( starttime < (VPMcalibratedPointing[i].mjd * 86400) && (starttime + tbinwidth) > (VPMcalibratedPointing[i].mjd * 86400) ) {
+      if( starttime < (VPMcalibratedPointing[i].mjd * 86400) && (starttime + tbinwidth) > (VPMcalibratedPointing[i].mjd * 86400) )
+      {
 	timegood = true;
 	break;
       }
@@ -499,7 +527,9 @@ bool VPointingDB::readPointingMonitorFromDB()
 
   if( nbad > timelimit )
   {
-    cout << "VPointingDB::readPointingMonitorFromDB warning: pointing monitor data is missing for more than " << vpmrunfrac * 100. << "% of the run for this telescope, reverting to encoder data for this telescope for full duration of the run" <<endl;
+    cout << "VPointingDB::readPointingMonitorFromDB warning: pointing monitor data is missing for more than ";
+    cout << vpmrunfrac * 100.;
+    cout << "% of the run for this telescope, reverting to encoder data for this telescope for full duration of the run" << endl;
 
     return false; 
   }
@@ -632,7 +662,7 @@ TTree *VPointingDB::getTreePointingDB()
     float iTelAzT = 0.;
 
     sprintf( hname, "db_pointing_%d", getTelID()+1 );
-    sprintf( htitle, "pointing from db (Telescope %d)", getTelID()+1 );
+    sprintf( htitle, "pointing from DB (Telescope %d)", getTelID()+1 );
     TTree *tD = new TTree( hname, htitle );
     tD->Branch( "MJD", &MJD, "MJD/i" );
     tD->Branch( "Time", &Time, "Time/D" );

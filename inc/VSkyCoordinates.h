@@ -63,7 +63,6 @@ class VSkyCoordinates
         void   getEquatorialCoordinates( int MJD, double time, double az, double ze, double &dec, double &ra );
         double getHourAngle(double i_UTC);
         double getSidereal(double i_UTC);
-        void   getHorizonCoordinates( int MJD, double time, double dec, double ra, double &az, double &ze );
         string getTargetName() { return fTargetName; }
         void   getRotatedShowerDirection( double y, double x, double &rze, double &raz );
         void   getDerotatedShowerDirection( double ze, double az, float &y, float &x, double rze, double raz );

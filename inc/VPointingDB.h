@@ -89,23 +89,23 @@ class VPointingDB : public VGlobalRunParameter
 
     public:
 
-        VPointingDB( unsigned int iTelID, unsigned int iRun, string iTCorrection, string iVPMDirectory, bool iVPMDB );
+        VPointingDB( unsigned int iTelID, unsigned int iRun );
         ~VPointingDB() { if( f_db ) f_db->Close();}
         bool   isGood() { return fStatus; }
         unsigned int getEventStatus() { return fEventStatus; }
         string getSourceNameDB() { return fDBSourceName; }
-        float getTargetDecDB() { return fDBTargetDec; }
-        float getTargetRADB() { return fDBTargetRA; }
-        float getTelExpectedAzimuthDB() { return fTelExpectedAzimuth; }
-        float getTelExpectedElevationDB() { return fTelExpectedElevation; }
-        float getTelAzimuthDB() { return fTelAzimuth; }
-        float getTelElevationDB() { return fTelElevation; }
-        TTree *getTreePointingDB();
+        float  getTargetDecDB() { return fDBTargetDec; }
+        float  getTargetRADB() { return fDBTargetRA; }
+        float  getTelExpectedAzimuthDB() { return fTelExpectedAzimuth; }
+        float  getTelExpectedElevationDB() { return fTelExpectedElevation; }
+        float  getTelAzimuthDB() { return fTelAzimuth; }
+        float  getTelElevationDB() { return fTelElevation; }
+        TTree* getTreePointingDB();
         float  getWobbleNorthDB() { return fDBWobbleNorth; }
         float  getWobbleEastDB() { return fDBWobbleEast; }
         unsigned int getTelID() { return fTelID; }
-        void   setLongitudeLatitude( double iLong, double iLat ) { fObsLongitude = iLong; fObsLatitude = iLat; }
-	void   setObservatory( double iLongitude = 0., double iLatitude = 0. );
+	bool   initialize( string iTPointCorrection, string iVPMDirectory, bool iVPMDB );
+	void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
         bool   terminate();
         bool   updatePointing( int MJD, double iTime );
 };

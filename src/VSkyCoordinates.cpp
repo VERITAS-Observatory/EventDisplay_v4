@@ -192,39 +192,6 @@ void VSkyCoordinates::getEquatorialCoordinates( int MJD, double time, double az,
     ra  *= TMath::RadToDeg();
 }
 
-void VSkyCoordinates::getHorizonCoordinates( int MJD, double time, double dec, double ra, double &az, double &ze )
-{
-    if( fMC )
-    {
-        az = fTelAzimuth;
-        ze = 90. - fTelElevation;
-	return;
-    }
-    ra /= TMath::RadToDeg();
-    dec /= TMath::RadToDeg();
-
-// convert ra into hour angle
-    double ha = 0.;
-    double iTime = 0.;
-    double iSid = 0.;
-// convert time to fraction of a day
-    iTime = time / 86400.;
-// get Greenwich sideral time
-    iSid = slaGmsta( (double)MJD, iTime );
-// calculate local sideral time
-    iSid = iSid - fObsLongitude;
-// calculate right ascension
-    ha = slaDranrm( iSid - ra );
-// calculate equatorial coordinates
-    double el = 0.;
-    slaDe2h( ha, dec, fObsLatitude, &az, &el );
-    el *= TMath::RadToDeg();
-
-    ze = 90.-el;
-    az *= TMath::RadToDeg();
-}
-
-
 bool VSkyCoordinates::setPointingOffset( double i_raOff, double i_decOff )
 {
     fTelRA      = fTargetRA + i_raOff/TMath::RadToDeg();

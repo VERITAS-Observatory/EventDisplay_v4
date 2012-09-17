@@ -88,7 +88,9 @@ void VPointing::getPointingFromDB( int irun, string iTCorrection, string iVPMDir
     else                                fPointingType = 2;    // read T-Point corrected positioner data from VERITAS DB
 
 #ifdef RUNWITHDB
-    fPointingDB = new VPointingDB( fTelID, irun, iTCorrection, iVPMDirectory, iVPMDB );
+    fPointingDB = new VPointingDB( fTelID, irun );
+    fPointingDB->setObservatory( fObsLongitude*TMath::RadToDeg(), fObsLatitude*TMath::RadToDeg() );          // work in [deg]
+    fPointingDB->initialize( iTCorrection, iVPMDirectory, iVPMDB );
     if( !fPointingDB->isGood() )
     {
         cout << endl;
@@ -96,7 +98,6 @@ void VPointing::getPointingFromDB( int irun, string iTCorrection, string iVPMDir
         cout << "exiting..." << endl;
         exit( 0 );
     }
-    fPointingDB->setObservatory( fObsLongitude*TMath::RadToDeg(), fObsLatitude*TMath::RadToDeg() );          // work in [deg]
 #else
     fPointingDB = 0;
 #endif
