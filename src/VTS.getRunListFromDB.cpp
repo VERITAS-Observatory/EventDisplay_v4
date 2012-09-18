@@ -47,6 +47,12 @@ int main( int argc, char *argv[] )
     if( runnumber != 0 ) 
     {
 
+      if( runnumber <= 0 )
+      {
+	cout << "Error: Run Number less than 0." << endl;
+	return 0;
+      }
+
       a.setRunNumber(runnumber);
       a.readFromDBList();
       a.setSelectLaser( laserruns );
@@ -64,6 +70,12 @@ int main( int argc, char *argv[] )
 
     if( lasernumber != 0 )
     {
+
+      if( lasernumber <= 0 )
+      {
+	cout << "Error: Run Number less than 0." << endl;
+	return 0;
+      }
 
       a.setLaserNumber(lasernumber);
       a.setSelectLaser( 1 );
@@ -167,7 +179,7 @@ void parseOptions(int argc, char *argv[])
 		char *ENV;
 		ENV = getenv("EVNDISPSYS");
 		char readme[500];
-		sprintf(readme,"cat %s/README/README.GETRUNLIST",ENV);
+		sprintf(readme,"cat %s/trunk/README/README.GETRUNLIST",ENV);
                 system( readme );
                 exit( 0 );
                 break;
