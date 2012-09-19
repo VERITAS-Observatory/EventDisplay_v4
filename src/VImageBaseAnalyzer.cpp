@@ -1041,7 +1041,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // integration start might be before sample 0 -> set to sample 0
                 if (corrfirst < 0 )
                 {
-                    unsigned int isw = getSumWindow();
+                    unsigned int isw = getDynamicSummationWindow( i_channelHitID );
                     if( -1*corrfirst > (int)isw ) isw = 0;
                     else                          isw += corrfirst;
                     corrfirst = 0;
@@ -1099,10 +1099,10 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 */
 unsigned int VImageBaseAnalyzer::getDynamicSummationWindow( unsigned int i_channelHitID )
 {
-// low gain: return always largest value
+// low gain: return larger integration window (from size2)
    if( getHiLo()[i_channelHitID] ) 
    {
-      return 12;
+      return getSumWindow_2();
    }
 // for integrated pulses below a certain threshold: return smallest dynamical window
    if( getSums()[i_channelHitID] < 0 ) return getSumWindow();
