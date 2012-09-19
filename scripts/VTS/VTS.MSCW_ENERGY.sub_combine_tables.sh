@@ -2,8 +2,6 @@
 #
 # script to combine several table file into one
 #
-# Revision $Id: combineTableFiles.sh,v 1.1.2.1 2011/04/18 07:48:45 gmaier Exp $
-#
 #
 # Author: Gernot Maier
 #

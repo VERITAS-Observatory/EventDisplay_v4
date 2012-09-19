@@ -2,8 +2,6 @@
 #
 # script to analyse data files with lookup tables
 #
-# Revision $Id$
-#
 # Author: Gernot Maier
 #
 ############################################################################################

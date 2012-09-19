@@ -4,8 +4,6 @@
 # read a calibration file produced by write_analysis_scripts.pl
 # (do this only if gain files don't exist yet)
 #
-# Revision $Id: evndisp.analyse_laser_runs_from_calibfile.sh,v 1.1.2.1.2.1 2010/10/30 00:51:33 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

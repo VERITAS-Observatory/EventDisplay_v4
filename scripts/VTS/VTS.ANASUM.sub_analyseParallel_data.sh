@@ -2,8 +2,6 @@
 #
 # script to analyse data files with anasum (parallel analysis)
 #
-# Revision $Id: analyse_parallel.sh,v 1.1.2.2 2011/06/03 21:39:23 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 
@@ -92,7 +90,7 @@ do
 
        chmod u+x $FSCRIPT.sh
 
-       qsub -V -l h_cpu=0:29:30 -l h_vmem=4000M -l tmpdir_size=10G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
+       qsub -V -l h_cpu=0:29:30 -l h_vmem=4000M -l tmpdir_size=1G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
 
     fi
 done 

@@ -2,8 +2,6 @@
 #
 # script to run evndisp on one of the cluster nodes (VBF)
 #
-# Revision $Id: qsub_evndisp_MC_VBF.sh,v 1.1.2.3.2.9.4.1.2.2 2011/04/06 12:22:24 gmaier Exp $
-#
 # Gernot Maier
 #
 ##############################################################################################

@@ -2,8 +2,6 @@
 #
 # script to analyse laser files 
 #
-# Revision $Id: qsub_evndisp_laser.sh,v 1.1.2.1.6.1 2011/03/17 11:01:13 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

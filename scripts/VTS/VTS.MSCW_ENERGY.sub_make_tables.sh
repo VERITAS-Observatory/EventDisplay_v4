@@ -2,8 +2,6 @@
 #
 # script to run over all noise levels and create lookup tables (queue submit)
 #
-# Revision $Id: make_tables.sh,v 1.1.2.2.4.2.12.2.4.1.2.2.2.1.6.2.2.3.2.4.2.2.6.1 2011/03/22 08:27:33 gmaier Exp $
-#
 #
 # Author: Gernot Maier
 #

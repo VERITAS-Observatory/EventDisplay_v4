@@ -2,8 +2,6 @@
 #
 # script to analyse data files with anasum
 #
-# Revision $Id: analyse.sh,v 1.1.2.1.4.1.4.2.2.3 2011/04/06 11:25:32 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

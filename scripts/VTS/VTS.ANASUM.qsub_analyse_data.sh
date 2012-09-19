@@ -2,8 +2,6 @@
 #
 # script to analyse files with anasum
 #
-# Revision $Id: qsub_analyse.sh,v 1.1.2.1.4.1.6.1 2011/04/06 11:25:32 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

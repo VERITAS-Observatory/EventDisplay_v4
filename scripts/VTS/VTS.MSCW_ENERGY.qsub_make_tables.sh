@@ -2,8 +2,6 @@
 #
 # script to run over all zenith angles and telescope combinations and create lookup tables 
 #
-# Revision $Id: qsub_make_tables.sh,v 1.1.2.2.4.1.2.3.2.1.6.3.2.4.2.8.2.5.6.2 2011/04/18 07:48:17 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

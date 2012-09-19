@@ -2,8 +2,6 @@
 #
 # script run eventdisplay with a queue system
 #
-# Revision $Id: mm_sub_evndisp.sh,v 1.1.2.1.4.1.12.3.2.8.2.3 2011/01/03 08:22:27 gmaier Exp $
-#
 #
 # Author: Gernot Maier
 #

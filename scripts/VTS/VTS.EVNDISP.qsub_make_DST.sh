@@ -1,6 +1,6 @@
 #!/bin/tcsh
 #
-# script to analyse files 
+# script to make DSTs
 #
 # Author: Gernot Maier
 #
@@ -8,21 +8,21 @@ set RUN=RRRRR
 set PED=PEEED
 
 # set the right observatory (environmental variables)
-source $EVNDISPSYS/trunk/setObservatory.tcsh VERITAS
+source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 # output data files are written to this directory
-set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400/"
+set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400_DST/"
 mkdir -p $ODIR
 # output log files are written to this directory
-set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400/"
+set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400_DST/"
 mkdir -p $LDIR
 
 # eventdisplay reconstruction parameter
-set ACUTS="EVNDISP.reconstruction.runparameter"
+set ACUTS="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
 #########################################
 # directory with executable
-cd $EVNDISPSYS/trunk/bin/
+cd $EVNDISPSYS/bin/
 
 # pedestal
 if( $PED == "1" ) then
@@ -43,11 +43,12 @@ set OPT=" "
 #set OPT="$OPT -raoffset=6.25"
 # use calib.dat
 # set OPT="$OPT -calibrationfile calib.dat"
-set OPT="$OPT -frogs $VERITAS_USER_DATA_DIR/analysis/EVD400/RecID0/$RUN.mscw.root -frogid 0"
 
 # run eventdisplay
 rm -f $LDIR/$RUN.log
-./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS $OPT -outputfile $ODIR/$RUN.root $OPT > $LDIR/$RUN.log
+./evndisp -runnumber=$RUN -runmode=4 -reconstructionparameter $ACUTS -dstfile $TMPDIR/$RUN.DST.root $OPT > $LDIR/$RUN.DST.log
+
+mv -v -f $TMPDIR/$RUN.DST.root $ODIR/$RUN.DST.root
 
 # sleep for 20 s 
 sleep 20

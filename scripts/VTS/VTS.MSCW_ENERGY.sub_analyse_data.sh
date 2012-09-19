@@ -2,8 +2,6 @@
 #
 # script to analyse data files with lookup tables
 #
-# Revision $Id: analyse.sh,v 1.1.2.2.6.1.2.1.8.2.2.6.2.2.6.1 2011/03/22 08:27:33 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

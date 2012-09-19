@@ -2,8 +2,6 @@
 #
 # script to analyse files 
 #
-# Revision $Id: qsub_evndisp.sh,v 1.1.2.1.4.2.2.1.4.1.4.2.2.6.2.9.2.7.4.1.2.1 2011/04/06 11:46:33 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 set RUN=RRRRR

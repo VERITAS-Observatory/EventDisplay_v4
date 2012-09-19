@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# script run eventdisplay laser analysis with a queue system
+# script run eventdisplay with a queue system
 #
 # Author: Gernot Maier
 #
@@ -8,23 +8,29 @@
 if [ ! -n "$1" ]
 then
    echo
-   echo "Laser analysis: submit jobs from a simple run list"
-   echo 
-   echo "VTS.EVNDISP.sub_analyse_laser.sh <runlist> "
+   echo "EVNDISP DST maker: submit jobs from a simple run list"
    echo
-   echo "runlist should contain laser run numbers"
+   echo "VTS.EVNDISP.sub_make_DST.sh <runlist> [pedestal calculation (default=1=on)]" 
+   echo
+   echo "runlist should contain run numbers only"
    echo
    echo "example for run list:"
    echo "48626"
    echo "58453"
    echo "61429"
    echo
+
    exit
 fi
 
 RLIST=$1
+PED=1
+if [ -n "$2" ]
+then
+  PED=$2
+fi
 
-# checking the path for binaries
+# checking the path for binary
 if [ -z $EVNDISPSYS ]
 then
     echo "no EVNDISPSYS env variable defined"
@@ -32,11 +38,8 @@ then
 fi
 
 ###############################################################################################################
-
 FILES=`cat $RLIST`
-echo "Laser files to analyse:"
-echo "$FILES"
-
+echo $FILES
 #########################################
 # output directory for error/output from batch system
 # in case you submit a lot of scripts: QLOG=/dev/null
@@ -49,31 +52,23 @@ SHELLDIR=$VERITAS_USER_LOG_DIR"/queueShellDir/"
 mkdir -p $SHELLDIR
 
 # skeleton script
-FSCRIPT="VTS.EVNDISP.qsub_analyse_laser"
+FSCRIPT="VTS.EVNDISP.qsub_make_DST"
 
 #########################################
 # loop over all files in files loop
 for AFIL in $FILES
 do
-# check if laser file exists
+   echo "now running $AFIL"
+   FNAM="$SHELLDIR/EVN.DST-$AFIL"
 
-   DFIL=`find -L $VERITAS_DATA_DIR/data/ -name "$AFIL.cvbf"`
-   if [ -z "$DFIL" ]
-   then
-     echo "Error: laser vbf file not found for run $AFIL"
-   else
-      echo "now running $AFIL"
-      FNAM="$SHELLDIR/EVN.laser-$AFIL"
+   sed -e "s|RRRRR|$AFIL|" $FSCRIPT.sh > $FNAM-1.sh
+   sed -e "s|PEEED|$PED|" $FNAM-1.sh > $FNAM.sh
+   rm -f $FNAM-1.sh
 
-      sed -e "s/RRRRR/$AFIL/" $FSCRIPT.sh > $FNAM.sh
+   chmod u+x $FNAM.sh
+   echo $FNAM.sh
 
-      chmod u+x $FNAM.sh
-      echo $FNAM.sh
-
-      qsub -V  -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=2000M -l tmpdir_size=5G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
-
-      sleep 1s
-   fi
+   qsub -V -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 exit

@@ -1,7 +1,5 @@
 #!/bin/tcsh
 #
-# Revision $Id: qsub_getEffectiveArea.sh,v 1.1.2.1.8.2.6.1.2.3.2.3.2.2.6.1 2011/04/21 06:39:21 gmaier Exp $
-#
 # script to calculate effective areas (VERITAS)
 #
 # Author: Gernot Maier

@@ -2,8 +2,6 @@
 #
 # script to analyse MC files with lookup tables
 #
-# Revision $Id: analyse_MC.sh,v 1.1.2.3.4.1.12.2.6.2.2.2.6.2.2.2.2.12.2.7.6.3 2011/04/19 07:39:44 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

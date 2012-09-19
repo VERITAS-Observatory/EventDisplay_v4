@@ -5,8 +5,6 @@
 # and calculates gains/toff for these runs
 # (do this only if gain files don't exist yet)
 #
-# Revision $Id: evndisp.analyse_laser_runs_from_runlist.sh,v 1.1.2.1.2.2 2010/10/30 03:09:36 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 
