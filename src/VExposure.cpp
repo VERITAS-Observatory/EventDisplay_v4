@@ -368,13 +368,13 @@ bool VExposure::readFromDBList()
       if( !db_row->GetField( 19 ) ) continue;
       itemp = db_row->GetField( 19 );
 // don't use laser or charge injection runs
-      if( itemp == "NOSOURCE" ) continue;
+//TEMPTEMPTEMP      if( itemp == "NOSOURCE" ) continue; // Removed to allow -r option to download laser runs
 
 //////
 // check if this run is an observing run
       if( !db_row->GetField( 1 ) ) continue;
       itemp = db_row->GetField( 1 );
-      if( itemp != "observing" ) continue;
+//TEMPTEMPTEMP      if( itemp != "observing" ) continue; // Removed to allow -r option to download laser runs
 
 //////
 // get run status

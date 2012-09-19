@@ -30,7 +30,6 @@ int getRuns=0;
 int timemask=0;
 int verbose=0;
 unsigned int runnumber=0;
-unsigned int lasernumber=0;
 
 int main( int argc, char *argv[] )
 {
@@ -53,6 +52,8 @@ int main( int argc, char *argv[] )
 	return 0;
       }
 
+      a.setTelMinElevation( -99999.0 );
+      a.setMinDuration( -99999.0 );
       a.setRunNumber(runnumber);
       a.readFromDBList();
       a.setSelectLaser( laserruns );
@@ -68,25 +69,7 @@ int main( int argc, char *argv[] )
 
     }
 
-    if( lasernumber != 0 )
-    {
-
-      if( lasernumber <= 0 )
-      {
-	cout << "Error: Run Number less than 0." << endl;
-	return 0;
-      }
-
-      a.setLaserNumber(lasernumber);
-      a.setSelectLaser( 1 );
-      a.downloadRunList();
-
-      return 0;
-
-    }
-
-
-    if( runlist != "" )
+   if( runlist != "" )
     {
 
       a.readRunListFromFile(runlist);
@@ -156,12 +139,11 @@ void parseOptions(int argc, char *argv[])
             {"timemask", no_argument, NULL, 't'},
             {"verbose", no_argument, NULL, 'v'},
             {"run", required_argument, 0, 'r'},
-            {"laserrun", required_argument, 0, 'f'},
 	    { 0, 0, 0, 0 }
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:f:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
@@ -218,9 +200,6 @@ void parseOptions(int argc, char *argv[])
                 break;
             case 'r':
                 runnumber=atoi(optarg);
-                break;
-            case 'f':
-                lasernumber=atoi(optarg);
                 break;
             case '?':
                 break;
