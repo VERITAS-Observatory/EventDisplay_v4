@@ -37,7 +37,7 @@ fi
 #######################################
 # run options
 #######################################
-OPT="-calibrationsumwindow=18 -calibrationsumfirst=2"
+OPT="-calibrationsumwindow=18 -calibrationsumfirst=2 -reconstructionparameter EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
 # source (VBF) file
 # check first if source file exists
