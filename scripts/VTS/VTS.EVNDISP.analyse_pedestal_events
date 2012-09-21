@@ -38,7 +38,7 @@ fi
 OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
 if [ -n "$4" ] && [ $4 = "1" ]
 then
-   OPT="-calibrationsumwindow=20 -calibrationsumfirst=100 -runmode=6 -nevents=5000"
+   OPT="-calibrationsumwindow=20 -calibrationsumfirst=100 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
 fi
 
 # number of telescopes to analyse
