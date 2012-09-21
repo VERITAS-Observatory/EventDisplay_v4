@@ -1,4 +1,4 @@
-#! /bin/bash
+#$ -S /bin/tcsh
 #
 # script to run over all zenith angles and telescope combinations and create lookup tables 
 #

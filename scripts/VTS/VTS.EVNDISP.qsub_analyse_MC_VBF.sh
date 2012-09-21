@@ -1,4 +1,4 @@
-#!/bin/tcsh
+#$ -S /bin/tcsh
 #
 # script to run evndisp on one of the cluster nodes (VBF)
 #

@@ -1,4 +1,4 @@
-#!/bin/tcsh
+#$ -S /bin/tcsh
 #
 # script to analyse laser files 
 #

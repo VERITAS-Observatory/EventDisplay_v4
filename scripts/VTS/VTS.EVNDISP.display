@@ -14,6 +14,7 @@
 #####################################
 # evndisp reconstruction runparamter
 ACUT="EVNDISP.reconstruction.runparameter"
+ACUT="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 # run options
 OPT="-display=1 -teltoana=$TEL -reconstructionparameter $ACUT -photodiode -vbfnsamples"
 #####################################
