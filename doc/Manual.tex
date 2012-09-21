@@ -246,7 +246,7 @@ Use the EVNDISP shared library and the class {\it VPedestalCombineLowGainFiles}:
 
 \begin{lstlisting}
 root [0] .L $EVNDISPSYS/lib/libVAnaSum.so
-root [1] VPedestalCombineLowGainFiles a;
+root [1] VPedestalLowGain a;
 root [2] a.combineLowGainPedestalFileForAllTelescopes( unsigned int iNTel, \\
 string iCalibrationDirectory, \\
 string iRun1, string iRun2, string iOutRun );
