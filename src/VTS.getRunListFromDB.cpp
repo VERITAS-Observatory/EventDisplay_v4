@@ -161,7 +161,7 @@ void parseOptions(int argc, char *argv[])
 		char *ENV;
 		ENV = getenv("EVNDISPSYS");
 		char readme[500];
-		sprintf(readme,"cat %s/trunk/README/README.GETRUNLIST",ENV);
+		sprintf(readme,"cat %s/README/README.GETRUNLIST",ENV);
                 system( readme );
                 exit( 0 );
                 break;
