@@ -274,62 +274,6 @@ void VFrogs::readTableFrogs()
   
 }
 //================================================================
-///================================================================
-void VFrogs::readAnasumFrogs()
-{
- 
-  int i,j,k=0;
-
-  int runOn; 
-  int eventNumber;
- 
-  char dataname[256];
- 
-  string fAnasumFrogsFile = "/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/Crab_20120206.root";
-  cout << "FROGS readAnasumFrogs " << fAnasumFrogsFile.c_str() << endl;
-  
-  TFile *AnasumFrogsFile = new TFile( fAnasumFrogsFile.c_str() , "READ" );
-  
-  if( AnasumFrogsFile->IsZombie() )
-    {
-      cout << "VFrogs::readAnasumFrogs error: File " << fAnasumFrogsFile.c_str() << " does not exist!" << endl;
-      exit( -1 );
-    }
-
-  TTree *tRun = (TTree*)AnasumFrogsFile->Get("total_1/stereo/tRunSummary");
-
-  tRun->SetBranchAddress("runOn",&runOn);
-
-  for( i=0; i<tRun->GetEntries(); i++ )
-  {
-
-    tRun->GetEntry(i);
-
-    if( runOn > 0 )
-    {
-
-      sprintf(dataname,"run_%d/stereo/data_on",runOn);
-      TTree *tData = (TTree*)AnasumFrogsFile->Get(dataname);
-      tData->SetBranchAddress("eventNumber",&eventNumber);
-
-      for( j=0; j<tData->GetEntries(); j++ )
-      {
-         tData->GetEntry(j);
-	 fAnasumRunNumber.push_back(runOn);
-	 fAnasumEventNumber.push_back(eventNumber);
-         k++;
-      }
-
-    }
-
-  }
-
-  cout << "Finished Reading Anasum File " << i << " Runs, " << k << " events read." << endl;
-
-  AnasumFrogsFile->Close();
-  
-}
-//================================================================
 //================================================================
 double VFrogs::getFrogsStartEnergy(int eventNumber)
 {
@@ -487,7 +431,10 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 0 );
     rtn.scope[tel].yfield = 
       transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 1 );
-   
+
+//    rtn.scope[tel].xfield = getImageParameters()->Tel_x_SC;
+//    rtn.scope[tel].yfield = getImageParameters()->Tel_y_SC;
+
     //printf("FROGS Tel Position: %d %f %f\n",tel+1,rtn.scope[tel].xfield,rtn.scope[tel].yfield);
  
     if(FROGSDEBUG)

@@ -903,9 +903,16 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
      3) The file name for that template 
   */
 
+  char *EVN;
+  char FROGS_TEMPLATE_LIST_PATH[500];
+
+  EVN  = getenv("EVNDISPSYS");
+  sprintf(FROGS_TEMPLATE_LIST_PATH,"%s/bin/%s",EVN,FROGS_TEMPLATE_LIST);
+
   //Open the template files list file
   FILE *fu; //file pointer
-  if((fu = fopen(FROGS_TEMPLATE_LIST, "r")) == NULL ) {
+  if((fu = fopen(FROGS_TEMPLATE_LIST_PATH, "r")) == NULL ) {
+    printf("%s\n",FROGS_TEMPLATE_LIST_PATH);
     frogs_showxerror("Failed opening the template files list file");
   }
 
@@ -925,7 +932,7 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
     }
   }
   fclose(fu);//Closes the template filename list 
-  fprintf(stderr,"Elevation %f, check file %s\n",elevation,FROGS_TEMPLATE_LIST);
+  fprintf(stderr,"Elevation %f, check file %s\n",elevation,FROGS_TEMPLATE_LIST_PATH);
   frogs_showxerror("FROGS could not find a matching template file");
   return rtn;
 }

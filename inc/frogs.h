@@ -27,7 +27,7 @@
 //================================================================
 /*This is the name of the file holding the list of template file names 
   and their range of applicatbility:*/
-#define FROGS_TEMPLATE_LIST "/afs/ifh.de/user/g/gahughes/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/frogs_template_file_list.txt"
+#define FROGS_TEMPLATE_LIST "frogs_template_file_list.txt"
 #define FROGS_DEG_PER_RAD 57.295779513082325  //Number of degrees in one radian
 #define FROGS_FILE_NAME_MAX_LENGTH 100 //Maximum file name length
 #define FROGS_MAX_ITER_NBR 100 //Maximum number of iterations
@@ -49,7 +49,7 @@
 #define FROGS_NUMBER_OF_SIGMA 10.0      /*Number of standard deviations to be 
 				    explored around a signal. 15 is 
 				    certainly too large*/
-#define FROGS_INTERP_ORDER 2    /*Interpolation order should be 
+#define FROGS_INTERP_ORDER 1    /*Interpolation order should be 
 				  set to 1 (linear) or 2 (quadratic)*/
 #define FROGS_NBEVENT_GDNS_CALIBR 0 /*Number of events used to build a goodness 
 				  calibration file. Must be set to a positive 

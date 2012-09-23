@@ -78,7 +78,6 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 	float transformTelescopePosition( int iTel, float i_ze, float i_az, int axis );
  	float transformShowerPosition( float i_ze, float i_az, float xcore, float ycore, int axis );
 	void readTableFrogs();
-	void readAnasumFrogs();
 	double getFrogsStartEnergy(int eventNumber);
 	int getFrogsAnasumNumber(int eventNumber, int runNumber);
         void finishFrogs(TFile *f);
