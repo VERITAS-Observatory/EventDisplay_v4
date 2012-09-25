@@ -91,7 +91,7 @@ do
 
    mv $ODIR/$FSCRIPT-$ARRAY-8.sh $ODIR/$FSCRIPT-$ARRAY.sh
 
-   qsub -V -js 20 -l os="sl*"  -l h_cpu=0:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $ODIR -e $ODIR "$ODIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -js 20 -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $ODIR -e $ODIR "$ODIR/$FSCRIPT-$ARRAY.sh"
 
 done
 
