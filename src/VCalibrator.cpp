@@ -151,7 +151,8 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
         for(unsigned int i=0;i<hped_vec[t][0].size();i++)
         {
 // get pedestal and pedestal variances from pedestal histograms
-            os   << t << " " << i << " " << hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow << " ";
+            os << t << " " << i << " ";
+	    os << hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow << " ";
 // loop over all window sizes
             for(unsigned int j=0;j<hped_vec[t].size();j++)
             {

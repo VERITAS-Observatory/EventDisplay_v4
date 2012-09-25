@@ -778,6 +778,18 @@ int VEventLoop::analyzeEvent()
 	{
 	   cout << "setting sample length for telescope " << getTelID()+1 << " to " << getNSamples() << endl;
 	   fBoolPrintSample[getTelID()] = false;
+// make sure that calibration sum window is not too long
+	   if( fRunMode == R_PED )
+	   {
+	      if( fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow >= (int)getNSamples() )
+	      {
+	         cout << "VEventLoop::analyzeEvent: resetting calibration sum window from ";
+		 cout << fRunPar->fCalibrationSumWindow;
+		 fRunPar->fCalibrationSumWindow = getNSamples() - fRunPar->fCalibrationSumFirst;
+	         cout << " to " << fRunPar->fCalibrationSumWindow;
+		 cout << " (sum first at " << fRunPar->fCalibrationSumFirst << ")" << endl;
+              }
+           }
         }
 // quit when number of samples if set to '0'
         if( getNSamples() == 0 && fRunPar->fsourcetype != 7 )
