@@ -1110,15 +1110,20 @@ double VSensitivityCalculator::calculateObservationTimevsFlux( unsigned int iD )
     int z_max = fGraphObsvsTime[iD]->GetN();
     for( int i = 0; i < z_max; i++ )
     {
-// take logarithmic steps in flux
-        x = TMath::Log10( fSourceStrength_min ) + ( TMath::Log10( fSourceStrength_max ) - TMath::Log10( fSourceStrength_min ) ) / (double)fGraphObsvsTime[iD]->GetN() * (double)i;
-        x = TMath::Power( 10., x );
+// take logarithmic steps in flux [log10 CU]
+        x =   TMath::Log10( fSourceStrength_min ) + ( TMath::Log10( fSourceStrength_max ) 
+	    - TMath::Log10( fSourceStrength_min ) ) / (double)fGraphObsvsTime[iD]->GetN() * (double)i;
+// linear flux [CU]
+        x =   TMath::Power( 10., x );
 
 // loop over possible observation lengths
         bool bSuccess = false;
         for( int j = 0; j < fObservationTime_steps; j++ )
         {
-            t = TMath::Log10( fObservationTime_min ) + ( TMath::Log10( fObservationTime_max ) - TMath::Log10( fObservationTime_min ) ) / (double)fObservationTime_steps * (double)j;
+// log10 hours
+            t = TMath::Log10( fObservationTime_min ) + ( TMath::Log10( fObservationTime_max ) - 
+	        TMath::Log10( fObservationTime_min ) ) / (double)fObservationTime_steps * (double)j;
+// log10 hours to min
             t = TMath::Power( 10., t ) * 60.;
 
             s = VStatistics::calcSignificance( iG*t*x + iB*t*alpha, iB*t, alpha, fLiAndMaEqu );
@@ -1342,7 +1347,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     map< unsigned int, VSensitivityCalculatorDataResponseFunctions* >::iterator i_MCData_iterator;
 
 ///////////////////////////////////////////////////////////////////
-// check if data is complete (need gamma-ray data)
+// check if data is complete (need at least gamma-ray data)
     if( fMC_Data.find( 1 ) == fMC_Data.end() ) 
     {
        return getDifferentialFluxVectorfromMC_ErrorMessage( "no gamma-ray MC data given" );
@@ -1832,6 +1837,7 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low, unsigned
     }
 
 // return rate calculated from MC effective areas
+   for( unsigned int i = 0; i < iMCPara.energy.size(); i++ ) cout << iMCPara.energy[i] << "\t" << iMCPara.effArea[i] << endl;
     return iMCR.getMonteCarloRate( iMCPara.energy, iMCPara.effArea, &i_Espec, iMCPara.fSpectralParameterID, iE_low, iE_up, getDebug() );
 }
 

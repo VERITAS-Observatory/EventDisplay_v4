@@ -162,6 +162,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
        bLinX = true;
     }
     gEffArea_Rec = new TGraphAsymmErrors( 1 );
+    gEffArea_Rec->SetName( "gEffArea_Rec" );
     setGraphPlottingStyle( gEffArea_Rec );
     get_Graph_from_Histogram( h, gEffArea_Rec, false, bLinX );
 // gamma-ray effective area vs true energy
@@ -169,12 +170,16 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     if( !h ) 
     {
        h = get_CTA_IRF_Histograms( "harea_gamma", fWoff );
-       if( !h ) return false;
        bLinX = true;
     }
-    gEffArea_MC = new TGraphAsymmErrors( 1 );
-    setGraphPlottingStyle( gEffArea_MC );
-    get_Graph_from_Histogram( h, gEffArea_MC, false, bLinX );
+    if( h )
+    {
+       gEffArea_MC = new TGraphAsymmErrors( 1 );
+       gEffArea_MC->SetName( "gEffArea_MC" );
+       setGraphPlottingStyle( gEffArea_MC );
+       get_Graph_from_Histogram( h, gEffArea_MC, false, bLinX );
+    }
+    else gEffArea_MC = 0;
 
 ///////////////////////////////////////////////////////////////
 

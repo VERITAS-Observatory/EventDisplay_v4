@@ -313,7 +313,6 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 	if( iEMin > 0. && iEMax > 0. )
 	{
 // total flux
-//            if( x1 > log10( iEMin ) && x2 < log10( iEMax ) ) iTot += y1;
             if( x1 - log10( iEMin ) > -1.e-3 && log10( iEMax ) - x2 > -1.e3 ) iTot += y1;
         }
 	else iTot += y1;
