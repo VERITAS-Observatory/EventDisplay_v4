@@ -792,7 +792,8 @@ void VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double 
  *   rmax > 0:  circulate cut for 2D histogram
  *   rmax < 0:  square cut for 2D histograms
 */
-TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin, double zmax, double xcenter, double ycenter, bool bSlices, double fSliceXmin, double fSliceXmax, bool bProjX)
+TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin, double zmax, double xcenter, double ycenter, 
+                                            bool bSlices, double fSliceXmin, double fSliceXmax, bool bProjX)
 {
     cout << "OBSERVE: right ascension axis might on local time settings; adjust offset hours with setPlottingUseHours( bool iB, int iZeroHours )" << endl;
 
@@ -833,7 +834,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
     setHistogramPlottingStyle( hmap, 1.5 );
     hmap = reflectXaxis( hmap );
 
-// signi
+// significance
     TCanvas *c_skysig  = 0;
     if( hmap )
     {
@@ -874,8 +875,8 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
         double xmin, ymin, xmax, ymax, wmin, wmax;
 
         double dec = fSkyMapCentreDecJ2000;
-        double ra = fSkyMapCentreRAJ2000;
-        cout << "(ra,dec) = (" << ra << ", " << dec << ")" << endl;
+        double ra  = fSkyMapCentreRAJ2000;
+        cout << "(ra,dec)_J2000 = (" << ra << ", " << dec << ")" << endl;
 
 // dec axis
         xmin = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x1 ) );
@@ -912,8 +913,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 
         double iRArange = 0.;
         if( cos( (dec-iYRange/2.) * TMath::Pi()/180. ) ) iRArange = iXRange/cos( (dec-iYRange/2.)* TMath::Pi()/180. );
-//       double Xmin = -1.*ra + xmin/
-//       double Xmax = -1.*ra+iRArange/2.;
         double Xmin = -1.*ra;
         double Xmax = -1.*ra;
 
@@ -969,6 +968,13 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
             raLowerAxis->SetNdivisions( 510 );
         }
         raLowerAxis->Draw();
+
+/*	TGraph *gTarget = new TGraph( 1 );
+	gTarget->SetPoint( 0, 0., 0. );
+	gTarget->SetMarkerStyle( 2 );
+	gTarget->SetMarkerSize( 2.5 );
+	gTarget->Draw( "p" ); */
+
 
 /*        if( bDrawSource )
         {
@@ -1145,9 +1151,10 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
  *
  */
 
-vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas *c, string iCatalogue, double iMaxBrightness, string iBand, double iStarRadius, int iColor, int iLineStyle, string hSkyMapName, double iTextAngle, int iMarkerStyle)
+vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas *c, string iCatalogue, double iMaxBrightness, string iBand, double iStarRadius,
+                                                       int iColor, int iLineStyle, string hSkyMapName, double iTextAngle, int iMarkerStyle)
 {
-   // vector with coordinates of objects
+// vector with coordinates of objects
     sSource i_sSource;
     vector< sSource > v_obj_XY;
 
@@ -1156,18 +1163,21 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas *c, string iCatal
 
     if( iCatalogue.size() < 1 ) return v_obj_XY;
 
+// define star catalogue
+// (MJD not important since catalogue and plotting coordinates are J2000)
     VStarCatalogue s;
-    s.init( 54626., iCatalogue );
+    s.init( 55476., iCatalogue );
 
     double dec = fSkyMapCentreDecJ2000;
-    double ra = fSkyMapCentreRAJ2000;
+    double ra  = fSkyMapCentreRAJ2000;
 
-    cout << "Sky map centre used in plot_catalogue: (ra,dec) = (" << ra << ", " << dec << ")" << endl;
+    cout << "Sky map centre used in plot_catalogue: (ra,dec)_J2000 = (" << ra << ", " << dec << ")" << endl;
 
-// get sky map and determinate
+// get sky map 
     TH2D *h = (TH2D*)c->GetListOfPrimitives()->FindObject( hSkyMapName.c_str() );
     if( !h ) return v_obj_XY;
 
+// determine extension of sky map
     double iDecMin = fSkyMapCentreDecJ2000 + h->GetYaxis()->GetXmin();
     double iDecMax = fSkyMapCentreDecJ2000 + h->GetYaxis()->GetXmax();
     double iRAMin  = fSkyMapCentreRAJ2000;
