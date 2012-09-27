@@ -128,6 +128,12 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     gEffAreaRec->SetTitle( htitle );
     hisTreeList->Add( gEffAreaRec );
 
+    sprintf( hname, "gEffAreaProb" );
+    gEffAreaProb = new TGraphAsymmErrors( 1 );
+    gEffAreaProb->SetName( hname );
+    gEffAreaProb->SetTitle( htitle );
+    hisTreeList->Add( gEffAreaProb );
+
     sprintf( hname, "gRecProb" );
     gRecProb = new TGraphAsymmErrors( 1 );
     gRecProb->SetName( hname );
@@ -179,12 +185,19 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hEsys2D->SetYTitle( "log_{10} E_{rec} - log_{10} E_{MC}" );
     hisTreeList->Add( hEsys2D );
 
+    sprintf( hname, "hResponseMatrix" );
+    hResponseMatrix = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
+                                               nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+    hResponseMatrix->SetYTitle( "energy_{MC} [TeV]" );
+    hResponseMatrix->SetXTitle( "energy_{rec} [TeV]" );
+    hisTreeList->Add( hResponseMatrix );
+
 // following CTA WP Phys binning convention
-    sprintf( hname, "hEmcCut" );
-    hEmcCut = new TH2D( hname, htitle, 500, -1.8, 2.2, 400, -2.3, 2.7 );
-    hEmcCut->SetYTitle( "energy_{MC} [TeV]" );
-    hEmcCut->SetXTitle( "energy_{rec} [TeV]" );
-    hisTreeList->Add( hEmcCut );
+    sprintf( hname, "hEmcCutCTA" );
+    hEmcCutCTA = new TH2D( hname, htitle, 500, -1.8, 2.2, 400, -2.3, 2.7 );
+    hEmcCutCTA->SetYTitle( "energy_{MC} [TeV]" );
+    hEmcCutCTA->SetXTitle( "energy_{rec} [TeV]" );
+    hisTreeList->Add( hEmcCutCTA );
 
 // individual cuts
     vector< string > iCutName;
@@ -222,18 +235,19 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
                                                   //
     fEffArea->Branch( "nbins", &nbins, "nbins/I" );
     fEffArea->Branch( "e0", e0, "e0[nbins]/D" );  // log10( energy ) in [TeV]
-                                                  // effective area vs MC energy
-    fEffArea->Branch( "eff", eff, "eff[nbins]/D" );
+    fEffArea->Branch( "eff", eff, "eff[nbins]/D" ); // effective area vs MC energy
     fEffArea->Branch( "seff_L", seff_L, "seff_L[nbins]/D" );
     fEffArea->Branch( "seff_U", seff_U, "seff_U[nbins]/D" );
-                                                  //
     fEffArea->Branch( "Rec_nbins", &Rec_nbins, "Rec_nbins/I" );
-                                                  // log10( energy ) in [TeV]
-    fEffArea->Branch( "Rec_e0", Rec_e0, "Rec_e0[Rec_nbins]/D" );
-                                                  // effective area vs reconstructed energy
-    fEffArea->Branch( "Rec_eff", Rec_eff, "Rec_eff[Rec_nbins]/D" );
+    fEffArea->Branch( "Rec_e0", Rec_e0, "Rec_e0[Rec_nbins]/D" ); // log10( energy ) in [TeV]
+    fEffArea->Branch( "Rec_eff", Rec_eff, "Rec_eff[Rec_nbins]/D" ); // effective area vs reconstructed energy (approximation)
     fEffArea->Branch( "Rec_seff_L", Rec_seff_L, "Rec_seff_L[Rec_nbins]/D" );
     fEffArea->Branch( "Rec_seff_U", Rec_seff_U, "Rec_seff_U[Rec_nbins]/D" );
+    fEffArea->Branch( "Prob_nbins", &Prob_nbins, "Prob_nbins/I" );
+    fEffArea->Branch( "Prob_e0", Prob_e0, "Prob_e0[Prob_nbins]/D" ); // log10( energy ) in [TeV]
+    fEffArea->Branch( "Prob_eff", Prob_eff, "Prob_eff[Prob_nbins]/D" ); // effective area vs reconstructed energy
+    fEffArea->Branch( "Prob_seff_L", Prob_seff_L, "Prob_seff_L[Prob_nbins]/D" );
+    fEffArea->Branch( "Prob_seff_U", Prob_seff_U, "Prob_seff_U[Prob_nbins]/D" );
     fEffArea->Branch( hisTreeList, 64000, 1 );
     fEffArea->SetMarkerStyle( 20 );
 
@@ -394,11 +408,20 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
         iT_TH2D.clear();
         for( unsigned int j = 0; j < fVMinAz.size(); j++ )
         {
-            sprintf( hname, "hVEmcCut_%d_%d", i, j );
-            if( hEmcCut ) iT_TH2D.push_back( (TH2D*)hEmcCut->Clone( hname ) );
+            sprintf( hname, "hVEmcCutCTA_%d_%d", i, j );
+            if( hEmcCutCTA ) iT_TH2D.push_back( (TH2D*)hEmcCutCTA->Clone( hname ) );
             else          iT_TH2D.push_back( 0 );
         }
-        hVEmcCut.push_back( iT_TH2D );
+        hVEmcCutCTA.push_back( iT_TH2D );
+
+        iT_TH2D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
+            sprintf( hname, "hVResponseMatrix_%d_%d", i, j );
+            if( hResponseMatrix ) iT_TH2D.push_back( (TH2D*)hResponseMatrix->Clone( hname ) );
+            else                  iT_TH2D.push_back( 0 );
+        }
+        hVResponseMatrix.push_back( iT_TH2D );
     }
 }
 
@@ -414,7 +437,7 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
  */
 VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double azmin, double azmax, double ipedvar,
                                                     double iSpectralIndex, vector< double > iMCZe,
-						    int iSmoothIter, double iSmoothThreshold, bool iEffectiveAreaVsEnergyMC )
+						    int iSmoothIter, double iSmoothThreshold, int iEffectiveAreaVsEnergyMC )
 {
     reset();
 
@@ -439,43 +462,28 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
     fSpectralWeight = 0;
 
 // effective areas vs E_MC or E_rec
-    bEffectiveAreaVsEnergyMC = iEffectiveAreaVsEnergyMC;
+    fEffectiveAreaVsEnergyMC = iEffectiveAreaVsEnergyMC;
 
 // mean effective area
-    gMeanEffectiveAreaEMC = new TGraphAsymmErrors(1);
-    gMeanEffectiveAreaEMC->SetName( "gMeanEffectiveAreaEMC" );
-    gMeanEffectiveAreaEMC->SetMarkerStyle( 20 );
-    gMeanEffectiveAreaErec = new TGraphAsymmErrors(1);
-    gMeanEffectiveAreaErec->SetName( "gMeanEffectiveAreaErec" );
-    gMeanEffectiveAreaErec->SetMarkerStyle( 20 );
-    gMeanEffectiveAreaErec->SetMarkerColor( 2 );
-    gMeanEffectiveAreaErec->SetLineColor( 2 );
+    gMeanEffectiveArea = new TGraphAsymmErrors(1);
+    gMeanEffectiveArea->SetName( "gMeanEffectiveArea" );
+    gMeanEffectiveArea->SetMarkerStyle( 20 );
+    gMeanEffectiveArea->SetMarkerColor( fEffectiveAreaVsEnergyMC+1 );
+    gMeanEffectiveArea->SetLineColor( fEffectiveAreaVsEnergyMC+1 );
 
 // mean effective area for Time BINS
    
-    gTimeBinnedMeanEffectiveAreaEMC = new TGraph2DErrors(1);
-    gTimeBinnedMeanEffectiveAreaEMC->SetName( "gTimeBinnedMeanEffectiveAreaEMC" );
-    gTimeBinnedMeanEffectiveAreaEMC->SetMarkerStyle( 20 );
-    gTimeBinnedMeanEffectiveAreaEMC->SetMarkerColor( 2 );
-    gTimeBinnedMeanEffectiveAreaEMC->SetLineColor( 2 );
+    gTimeBinnedMeanEffectiveArea = new TGraph2DErrors(1);
+    gTimeBinnedMeanEffectiveArea->SetName( "gTimeBinnedMeanEffectiveArea" );
+    gTimeBinnedMeanEffectiveArea->SetMarkerStyle( 20 );
+    gTimeBinnedMeanEffectiveArea->SetMarkerColor( fEffectiveAreaVsEnergyMC+1 );
+    gTimeBinnedMeanEffectiveArea->SetLineColor( fEffectiveAreaVsEnergyMC+1 );
 
-    for( int i = 0; i < gTimeBinnedMeanEffectiveAreaEMC->GetN(); i++ )
-      {
-	gTimeBinnedMeanEffectiveAreaEMC->SetPoint( i, 0., 0., 0.);
-	gTimeBinnedMeanEffectiveAreaEMC->SetPointError( i, 0., 0., 0. );
-      }
-
-    gTimeBinnedMeanEffectiveAreaErec = new TGraph2DErrors(1);
-    gTimeBinnedMeanEffectiveAreaErec->SetName( "gTimeBinnedMeanEffectiveAreaErec" );
-    gTimeBinnedMeanEffectiveAreaErec->SetMarkerStyle( 20 );
-    gTimeBinnedMeanEffectiveAreaErec->SetMarkerColor( 2 );
-    gTimeBinnedMeanEffectiveAreaErec->SetLineColor( 2 );
-
-    for( int i = 0; i < gTimeBinnedMeanEffectiveAreaErec->GetN(); i++ )
-      {
-	gTimeBinnedMeanEffectiveAreaErec->SetPoint( i, 0., 0., 0.);
-	gTimeBinnedMeanEffectiveAreaErec->SetPointError( i, 0., 0., 0. );
-      }
+    for( int i = 0; i < gTimeBinnedMeanEffectiveArea->GetN(); i++ )
+    {
+	gTimeBinnedMeanEffectiveArea->SetPoint( i, 0., 0., 0.);
+	gTimeBinnedMeanEffectiveArea->SetPointError( i, 0., 0., 0. );
+    }
 
 
 // current directory
@@ -571,10 +579,14 @@ bool VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( TTree* iEffFit,
     {
         iEffFit->GetEntry( i );
 
-        if( (int)bEffectiveAreaVsEnergyMC != iAMC )
+	if( iAMC == 1 && fEffectiveAreaVsEnergyMC != 0 )
+	{
+            cout << "VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction: expected effective area vs MC energy" << endl;
+	    return false;
+        }
+	if( iAMC == 0 && fEffectiveAreaVsEnergyMC != 1 )
         {
-            if( bEffectiveAreaVsEnergyMC ) cout << "VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction: expected effective area vs MC energy" << endl;
-            else                           cout << "VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction: expected effective area vs reconstructed energy" << endl;
+            cout << "VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction: expected effective area vs reconstructed energy" << endl;
             return false;
         }
         if( fabs( iSpectralIndex - index ) > 0.01 ) continue;
@@ -664,16 +676,24 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
     iEffArea->SetBranchAddress( "index", &index );
     iEffArea->SetBranchAddress( "ze", &ze );
     iEffArea->SetBranchAddress( "Woff", &fWoff );
-    iEffArea->SetBranchAddress( "nbins", &nbins );
-    iEffArea->SetBranchAddress( "e0", e0 );
-    iEffArea->SetBranchAddress( "eff", eff );
-    iEffArea->SetBranchAddress( "seff_L", seff_L );
-    iEffArea->SetBranchAddress( "seff_U", seff_U );
-    iEffArea->SetBranchAddress( "Rec_nbins", &Rec_nbins );
-    iEffArea->SetBranchAddress( "Rec_e0", Rec_e0 );
-    iEffArea->SetBranchAddress( "Rec_eff", Rec_eff );
-    iEffArea->SetBranchAddress( "Rec_seff_L", Rec_seff_L );
-    iEffArea->SetBranchAddress( "Rec_seff_U", Rec_seff_U );
+    if( fEffectiveAreaVsEnergyMC == 0 )
+    {
+       iEffArea->SetBranchAddress( "nbins", &nbins );
+       iEffArea->SetBranchAddress( "e0", e0 );
+       iEffArea->SetBranchAddress( "eff", eff );
+    }
+    else if( fEffectiveAreaVsEnergyMC == 1 )
+    {
+       iEffArea->SetBranchAddress( "Rec_nbins", &nbins );
+       iEffArea->SetBranchAddress( "Rec_e0", e0 );
+       iEffArea->SetBranchAddress( "Rec_eff", eff );
+    }
+    else if( iEffArea->GetBranchStatus( "Prob_nbins" ) )
+    {
+       iEffArea->SetBranchAddress( "Prob_nbins", &nbins );
+       iEffArea->SetBranchAddress( "Prob_e0", e0 );
+       iEffArea->SetBranchAddress( "Prob_eff", eff );
+    }
     if( iEffArea->GetBranchStatus( "hEsysMCRelative" ) ) iEffArea->SetBranchAddress( "hEsysMCRelative", &i_hEsysMCRelative );
     if( iEffArea->GetEntries() == 0 ) return false;
 
@@ -695,10 +715,8 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
     for( int b = 1; b <= i_hEMC->GetNbinsX(); b++ ) fEff_E0.push_back( i_hEMC->GetBinCenter( b ) );
     fNBins = fEff_E0.size();
 
-    fVMeanEffectiveAreaEMC.assign( i_hEMC->GetNbinsX(), 0. );
-    fVMeanEffectiveAreaErec.assign( i_hEMC->GetNbinsX(), 0. );
-    fVTimeBinnedMeanEffectiveAreaEMC.assign( i_hEMC->GetNbinsX(), 0.);
-    fVTimeBinnedMeanEffectiveAreaErec.assign( i_hEMC->GetNbinsX(), 0.);
+    fVMeanEffectiveArea.assign( i_hEMC->GetNbinsX(), 0. );
+    fVTimeBinnedMeanEffectiveArea.assign( i_hEMC->GetNbinsX(), 0.);
     vector< double > i_temp_Eff( i_hEMC->GetNbinsX(), 0. );
     vector< double > i_temp_EffL( i_hEMC->GetNbinsX(), 0. );
     vector< double > i_temp_EffU( i_hEMC->GetNbinsX(), 0. );
@@ -719,41 +737,22 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
     cout << "\t\ttotal number of curves: " << iEffArea->GetEntries();
     cout << ", total number of bins on energy axis: " << fNBins << endl;
 
-    fNMeanEffectiveAreaEMC = 0;
-    if( gMeanEffectiveAreaEMC )
+    fNMeanEffectiveArea = 0;
+    if( gMeanEffectiveArea )
     {
-        for( int i = 0; i < gMeanEffectiveAreaEMC->GetN(); i++ )
+        for( int i = 0; i < gMeanEffectiveArea->GetN(); i++ )
         {
-            gMeanEffectiveAreaEMC->SetPoint( i, 0., 0. );
-            gMeanEffectiveAreaEMC->SetPointError( i, 0., 0., 0., 0. );
+            gMeanEffectiveArea->SetPoint( i, 0., 0. );
+            gMeanEffectiveArea->SetPointError( i, 0., 0., 0., 0. );
         }
     }
-    fNMeanEffectiveAreaErec = 0;
-    if( gMeanEffectiveAreaErec )
+    fNTimeBinnedMeanEffectiveArea = 0;
+    if( gTimeBinnedMeanEffectiveArea )
     {
-        for( int i = 0; i < gMeanEffectiveAreaErec->GetN(); i++ )
+        for( int i = 0; i < gTimeBinnedMeanEffectiveArea->GetN(); i++ )
         {
-            gMeanEffectiveAreaErec->SetPoint( i, 0., 0. );
-            gMeanEffectiveAreaErec->SetPointError( i, 0., 0., 0., 0. );
-        }
-    }
-
-    fNTimeBinnedMeanEffectiveAreaEMC = 0;
-    if( gTimeBinnedMeanEffectiveAreaEMC )
-    {
-        for( int i = 0; i < gTimeBinnedMeanEffectiveAreaEMC->GetN(); i++ )
-        {
-	  gTimeBinnedMeanEffectiveAreaEMC->SetPoint( i, 0., 0., 0. );
-	  gTimeBinnedMeanEffectiveAreaEMC->SetPointError( i, 0., 0., 0.);
-        }
-    }
-    fNTimeBinnedMeanEffectiveAreaErec = 0;
-    if( gTimeBinnedMeanEffectiveAreaErec )
-    {
-        for( int i = 0; i < gTimeBinnedMeanEffectiveAreaErec->GetN(); i++ )
-        {
-	  gTimeBinnedMeanEffectiveAreaErec->SetPoint( i, 0., 0. , 0.);
-	  gTimeBinnedMeanEffectiveAreaErec->SetPointError( i, 0., 0., 0.);
+	  gTimeBinnedMeanEffectiveArea->SetPoint( i, 0., 0., 0. );
+	  gTimeBinnedMeanEffectiveArea->SetPointError( i, 0., 0., 0.);
         }
     }
 
@@ -994,44 +993,19 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
 		cout << endl;
                 cout << "please check if this falls into your parameter space" << endl;
             }
-// effective areas vs MC energy
+// effective areas vs energy (decision on vs MC, rec energy etc. has been made earlier)
             for( unsigned int e = 0; e < fNBins; e++ )
             {
                 i_temp_Eff[e] = 0.;
-                i_temp_EffL[e] = 0.;
-                i_temp_EffU[e] = 0.;
                 for( int j = 0; j < nbins; j++ )
                 {
                     if( TMath::Abs( e0[j] - fEff_E0[e] ) < 1.e-5 )
                     {
                         i_temp_Eff[e] = eff[j];
-                        i_temp_EffL[e] = seff_L[j];
-                        i_temp_EffU[e] = seff_U[j];
                     }
                 }
             }
-            fEffMC_Eff[i_ID] = i_temp_Eff;
-            fEffMC_EffL[i_ID] = i_temp_EffL;
-            fEffMC_EffU[i_ID] = i_temp_EffU;
-// effective area vs reconstruction energy
-            for( unsigned int e = 0; e < fNBins; e++ )
-            {
-                i_temp_Eff[e] = 0.;
-                i_temp_EffL[e] = 0.;
-                i_temp_EffU[e] = 0.;
-                for( int j = 0; j < Rec_nbins; j++ )
-                {
-                    if( TMath::Abs( Rec_e0[j] - fEff_E0[e] ) < 1.e-5 )
-                    {
-                        i_temp_Eff[e] = Rec_eff[j];
-                        i_temp_EffL[e] = Rec_seff_L[j];
-                        i_temp_EffU[e] = Rec_seff_U[j];
-                    }
-                }
-            }
-            fEffRec_Eff[i_ID] = i_temp_Eff;
-            fEffRec_EffL[i_ID] = i_temp_EffL;
-            fEffRec_EffU[i_ID] = i_temp_EffU;
+            fEffArea_map[i_ID] = i_temp_Eff;
 
             if( i_hEsysMCRelative )
             {
@@ -1085,13 +1059,13 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
     for( unsigned int i = 0; i < fZe.size()-1; i++ ) cout << fZe[i] << ", ";
     if( fZe.size() > 0 ) cout << fZe[fZe.size()-1];
     cout << ")" << endl;
-    if( bEffectiveAreaVsEnergyMC ) cout << "\t (effective area vs MC energy)" << endl;
-    else                           cout << "\t (effective area vs reconstructed energy)" << endl;
+    if( fEffectiveAreaVsEnergyMC == 0 )      cout << "\t (effective area vs MC energy)" << endl;
+    else if( fEffectiveAreaVsEnergyMC == 1 ) cout << "\t (effective area vs MC energy (approx))" << endl;
+    else                                     cout << "\t (effective area vs reconstructed energy)" << endl;
 
     if( fSmoothIter > 0 )
     {
-        smoothEffectiveAreas( fEffRec_Eff );
-        smoothEffectiveAreas( fEffMC_Eff );
+        smoothEffectiveAreas( fEffArea_map );
     }
 
 ///////////////////////////////////////////////////
@@ -1120,7 +1094,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
                                 {
                                     cout << "\t\t\t index " << s << " " << fEff_SpectralIndex[z][w][n][s] << endl;
                                     unsigned int i_ID = s + 100 * ( n + 100 * ( w + 100 * z ) );
-                                    if( fEffRec_Eff.find( i_ID ) != fEffRec_Eff.end() ) cout << "\t\t\t map " << fEffRec_Eff[i_ID].size() << endl;
+                                    if( fEffArea_map.find( i_ID ) != fEffArea_map.end() ) cout << "\t\t\t map " << fEffArea_map[i_ID].size() << endl;
                                 }
                             }
                         }
@@ -1144,10 +1118,8 @@ VEffectiveAreaCalculator::~VEffectiveAreaCalculator()
     {
         if( fEffAreaFitFunction[i] ) fEffAreaFitFunction[i]->Delete();
     }
-    if( gMeanEffectiveAreaEMC ) delete gMeanEffectiveAreaEMC;
-    if( gMeanEffectiveAreaErec ) delete gMeanEffectiveAreaErec;
-    if( gTimeBinnedMeanEffectiveAreaEMC ) delete gTimeBinnedMeanEffectiveAreaEMC;
-    if( gTimeBinnedMeanEffectiveAreaErec ) delete gTimeBinnedMeanEffectiveAreaErec;
+    if( gMeanEffectiveArea ) delete gMeanEffectiveArea;
+    if( gTimeBinnedMeanEffectiveArea ) delete gTimeBinnedMeanEffectiveArea;
     if( gMeanSystematicErrorGraph ) delete gMeanSystematicErrorGraph;
 }
 
@@ -1158,10 +1130,8 @@ void VEffectiveAreaCalculator::reset()
     raddeg = 1./degrad;
 
     fNBins = 0;
-    gMeanEffectiveAreaEMC = 0;
-    gMeanEffectiveAreaErec = 0;
-    gTimeBinnedMeanEffectiveAreaEMC = 0;
-    gTimeBinnedMeanEffectiveAreaErec = 0;
+    gMeanEffectiveArea = 0;
+    gTimeBinnedMeanEffectiveArea = 0;
 
     bNOFILE = true;
     fGDirectory = 0;
@@ -1180,7 +1150,7 @@ void VEffectiveAreaCalculator::reset()
     fAzBin = 0;
     fMinAz = -1.e3;
     fMaxAz = 1.e3;
-    bEffectiveAreaVsEnergyMC = false;
+    fEffectiveAreaVsEnergyMC = 2;
 
     hEmc = 0;
     hEcut = 0;
@@ -1191,6 +1161,7 @@ void VEffectiveAreaCalculator::reset()
     hEcut500 = 0;
     gEffAreaMC = 0;
     gEffAreaRec = 0;
+    gEffAreaProb = 0;
     gRecProb = 0;
     hEmcSWeight = 0;
     hEsysRec = 0;
@@ -1198,7 +1169,8 @@ void VEffectiveAreaCalculator::reset()
     hEsysMCRelative = 0;
     hEsysMCRelative2D = 0;
     hEsys2D = 0;
-    hEmcCut = 0;
+    hResponseMatrix = 0;
+    hEmcCutCTA = 0;
     fEffArea = 0;
     hisTreeList = 0;
     bEffectiveAreasareFunctions = false;
@@ -1208,6 +1180,7 @@ void VEffectiveAreaCalculator::reset()
     ze = 0.;
     nbins = 60;
     Rec_nbins = 0;
+    Prob_nbins = 0;
     for( int i = 0; i < 1000; i++ )
     {
         e0[i] = 0.;
@@ -1218,6 +1191,10 @@ void VEffectiveAreaCalculator::reset()
         Rec_eff[i] = 0.;
         Rec_seff_L[i] = 0.;
         Rec_seff_U[i] = 0.;
+        Prob_e0[i] = 0.;
+        Prob_eff[i] = 0.;
+        Prob_seff_L[i] = 0.;
+        Prob_seff_U[i] = 0.;
     }
 
     fEffectiveAreas_meanZe = 0.;
@@ -1557,10 +1534,11 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                if( hVEsysRec[s][i_az] )          hVEsysRec[s][i_az]->Fill( eRec, eRec - eMC );
                if( hVEsysMC[s][i_az] )           hVEsysMC[s][i_az]->Fill( eMC, eRec - eMC );
                if( hVEsysMCRelative[s][i_az] )   hVEsysMCRelative[s][i_az]->Fill( eMC, (eRecLin-d->MCe0) / d->MCe0 );
-               if( hVEsysMCRelativeRMS[s][i_az] )   hVEsysMCRelativeRMS[s][i_az]->Fill( eMC, (eRecLin-d->MCe0) / d->MCe0 );
+               if( hVEsysMCRelativeRMS[s][i_az] )hVEsysMCRelativeRMS[s][i_az]->Fill( eMC, (eRecLin-d->MCe0) / d->MCe0 );
                if( hVEsysMCRelative2D[s][i_az] ) hVEsysMCRelative2D[s][i_az]->Fill( eMC, eRecLin / d->MCe0 );
                if( hVEsys2D[s][i_az] )           hVEsys2D[s][i_az]->Fill( eMC, eRec - eMC );
-               if( hVEmcCut[s][i_az] )           hVEmcCut[s][i_az]->Fill( eRec, eMC );
+               if( hVEmcCutCTA[s][i_az] )        hVEmcCutCTA[s][i_az]->Fill( eRec, eMC );
+               if( hVResponseMatrix[s][i_az] )   hVResponseMatrix[s][i_az]->Fill( eRec, eMC );
              }
            }
 // don't do anything between here and the end of the loop! Never!
@@ -1609,8 +1587,13 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 	       cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs rec energy" << endl;
 	       cout << "s : " << s << " , az: " << i_az << endl;
             }
-
-            nbins = gEffAreaMC->GetN();
+            if( !binomialDivide( gEffAreaProb, hVEcut[s][i_az], hVEmc[s][i_az] ) )
+	    {
+	       cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs MC (prob) energy" << endl;
+	       cout << "s : " << s << " , az: " << i_az << endl;
+            }
+	    normalizeResponseMatrix( hVResponseMatrix[s][i_az] );
+	    applyResponseMatrix( hVResponseMatrix[s][i_az], gEffAreaProb );
 
             for( int i = 0; i < 1000; i++ )
             {
@@ -1625,37 +1608,50 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             }
             double x = 0.;
 	    double y = 0.;
-            double iSf = 1.;
+// effective area vs MC energy
+            nbins = gEffAreaMC->GetN();
             for( int i = 0; i < nbins; i++ )
             {
                 gEffAreaMC->GetPoint( i, x, y );
                 e0[i] = x;
-                iSf = totarea;
-                eff[i] = y * iSf;
-                seff_L[i] = gEffAreaMC->GetErrorYlow( i )*iSf;
-                seff_U[i] = gEffAreaMC->GetErrorYhigh( i )*iSf;
+                eff[i] = y * totarea;
+                seff_L[i] = gEffAreaMC->GetErrorYlow( i )*totarea;
+                seff_U[i] = gEffAreaMC->GetErrorYhigh( i )*totarea;
                 gEffAreaMC->SetPoint( i, x, eff[i] );
                 gEffAreaMC->SetPointEYlow( i, seff_L[i] );
                 gEffAreaMC->SetPointEYhigh( i, seff_U[i] );
             }
 
+// effective area vs reconstructed energy (approx)
             Rec_nbins = gEffAreaRec->GetN();
             for( int i = 0; i < Rec_nbins; i++ )
             {
                 gEffAreaRec->GetPoint( i, x, y );
                 Rec_e0[i] = x;
 // this is an approximation, since scatter area is defined over E_MC (GM: don't understand this comment)
-                iSf = totarea;
-                Rec_eff[i] = y * iSf;
-                Rec_seff_L[i] = gEffAreaRec->GetErrorYlow( i )*iSf;
-                Rec_seff_U[i] = gEffAreaRec->GetErrorYhigh( i )*iSf;
+                Rec_eff[i] = y * totarea;
+                Rec_seff_L[i] = gEffAreaRec->GetErrorYlow( i )*totarea;
+                Rec_seff_U[i] = gEffAreaRec->GetErrorYhigh( i )*totarea;
                 gEffAreaRec->SetPoint( i, x, Rec_eff[i] );
                 gEffAreaRec->SetPointEYlow( i, Rec_seff_L[i] );
                 gEffAreaRec->SetPointEYhigh( i, Rec_seff_U[i] );
             }
-            resetHistograms( ize );
+// effective area vs reconstructed energy 
+            Prob_nbins = gEffAreaProb->GetN();
+            for( int i = 0; i < Prob_nbins; i++ )
+            {
+                gEffAreaProb->GetPoint( i, x, y );
+                Prob_e0[i] = x;
+                Prob_eff[i] = y * totarea;
+                Prob_seff_L[i] = gEffAreaProb->GetErrorYlow( i )*totarea;
+                Prob_seff_U[i] = gEffAreaProb->GetErrorYhigh( i )*totarea;
+                gEffAreaProb->SetPoint( i, x, Prob_eff[i] );
+                gEffAreaProb->SetPointEYlow( i, Prob_seff_L[i] );
+                gEffAreaProb->SetPointEYhigh( i, Prob_seff_U[i] );
+            }
 
 // copy all histograms
+            resetHistograms( ize );
             copyHistograms( hEmc, hVEmc[s][i_az], false );
             copyHistograms( hEcut, hVEcut[s][i_az], false );
             copyHistograms( hEcutUW, hVEcutUW[s][i_az], false );
@@ -1670,7 +1666,8 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             copyHistograms( hEsysMCRelativeRMS, hVEsysMCRelativeRMS[s][i_az], true );
             copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
             copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
-            copyHistograms( hEmcCut, hVEmcCut[s][i_az], true );
+            copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
+            copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
 
             fEffArea->Fill();
         }
@@ -1708,7 +1705,8 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
  *
  *
  */
-double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, bool bAddtoMeanEffectiveArea, bool iEffectiveAreaVsEnergyMC )
+double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, 
+                                                   bool bAddtoMeanEffectiveArea, int iEffectiveAreaVsEnergyMC )
 {
     if( bNOFILE ) return 1.;
 
@@ -1716,7 +1714,10 @@ double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, doubl
 // read effective areas from histograms
 // (this is the default case)
 ///////////////////////////////////////////
-    if( bEffectiveAreasareHistograms ) return getEffectiveAreasFromHistograms( erec, ze, woff, iPedVar, iSpectralIndex, bAddtoMeanEffectiveArea, iEffectiveAreaVsEnergyMC );
+    if( bEffectiveAreasareHistograms )
+    {
+       return getEffectiveAreasFromHistograms( erec, ze, woff, iPedVar, iSpectralIndex, bAddtoMeanEffectiveArea, iEffectiveAreaVsEnergyMC );
+    }
 
 ///////////////////////////////////////////
 // read effective areas from functions
@@ -1851,7 +1852,8 @@ vector< unsigned int > VEffectiveAreaCalculator::getUpperLowBins( vector< double
  *
  *
  */
-double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, bool bAddtoMeanEffectiveArea, bool iEffectiveAreaVsEnergyMC )
+double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar, double iSpectralIndex, 
+                                                                  bool bAddtoMeanEffectiveArea, int iEffectiveAreaVsEnergyMC )
 {
     vector< double > i_eff_temp( fNBins, 0. );
 
@@ -1901,22 +1903,11 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                             vector< unsigned int > i_index_bins = getUpperLowBins( fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]], iSpectralIndex );
                             unsigned int i_ID_0 = i_index_bins[0] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
                             unsigned int i_ID_1 = i_index_bins[1] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
-                            if( iEffectiveAreaVsEnergyMC )
-                            {
-                                i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex,
-				                                                 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-										 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-										 fEffMC_Eff[i_ID_0], 
-										 fEffMC_Eff[i_ID_1], false );
-                            }
-                            else
-                            {
-                                i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex,
-				                                                 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-										 fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-										 fEffRec_Eff[i_ID_0],
-										 fEffRec_Eff[i_ID_1], false );
-                            }
+			    i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex,
+									     fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
+									     fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
+									     fEffArea_map[i_ID_0], 
+									     fEffArea_map[i_ID_1], false );
                         }
                         else
                         {
@@ -1957,7 +1948,8 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
         }
         else
         {
-            cout << "VEffectiveAreaCalculator::getEffectiveAreasFromHistograms error: woff index out of range: " << i_ze_bins[i] << " " << fEff_WobbleOffsets.size() << endl;
+            cout << "VEffectiveAreaCalculator::getEffectiveAreasFromHistograms error: woff index out of range: ";
+	    cout << i_ze_bins[i] << " " << fEff_WobbleOffsets.size() << endl;
             return 0.;
         }
     }
@@ -1966,39 +1958,22 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
     if( fEff_E0.size() == 0 ) return 1.;
 
 // mean effective area calculation
-    if( bAddtoMeanEffectiveArea && iEffectiveAreaVsEnergyMC && fVMeanEffectiveAreaEMC.size() == i_eff_temp.size() )
+    if( bAddtoMeanEffectiveArea && fVMeanEffectiveArea.size() == i_eff_temp.size() )
     {
         for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
         {
-            fVMeanEffectiveAreaEMC[i] += i_eff_temp[i];
+            fVMeanEffectiveArea[i] += i_eff_temp[i];
         }
-        fNMeanEffectiveAreaEMC++;
-    }
-    if( bAddtoMeanEffectiveArea && !iEffectiveAreaVsEnergyMC && fVMeanEffectiveAreaErec.size() == i_eff_temp.size() )
-    {
-        for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
-        {
-            fVMeanEffectiveAreaErec[i] += i_eff_temp[i];
-        }
-        fNMeanEffectiveAreaErec++;
+        fNMeanEffectiveArea++;
     }
 
-
-    if( bAddtoMeanEffectiveArea && iEffectiveAreaVsEnergyMC && fVTimeBinnedMeanEffectiveAreaEMC.size() == i_eff_temp.size() )
+    if( bAddtoMeanEffectiveArea && fVTimeBinnedMeanEffectiveArea.size() == i_eff_temp.size() )
     {
         for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
         {
-            fVTimeBinnedMeanEffectiveAreaEMC[i] += i_eff_temp[i];
+            fVTimeBinnedMeanEffectiveArea[i] += i_eff_temp[i];
         }
-        fNTimeBinnedMeanEffectiveAreaEMC++;
-    }
-    if( bAddtoMeanEffectiveArea && !iEffectiveAreaVsEnergyMC && fVTimeBinnedMeanEffectiveAreaErec.size() == i_eff_temp.size() )
-    {
-        for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
-        {
-            fVTimeBinnedMeanEffectiveAreaErec[i] += i_eff_temp[i];
-        }
-        fNTimeBinnedMeanEffectiveAreaErec++;
+        fNTimeBinnedMeanEffectiveArea++;
     }
 
 /////////////////////////////////////////
@@ -2041,12 +2016,11 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 
 void VEffectiveAreaCalculator::resetTimeBin()
 {
-  for( unsigned int i=0; i<fVTimeBinnedMeanEffectiveAreaEMC.size(); i++){
-    fVTimeBinnedMeanEffectiveAreaEMC[i] = 0;}
-  fNTimeBinnedMeanEffectiveAreaEMC = 0;
-  for( unsigned int i=0; i<fVTimeBinnedMeanEffectiveAreaErec.size(); i++){
-    fVTimeBinnedMeanEffectiveAreaErec[i] = 0;}
-  fNTimeBinnedMeanEffectiveAreaErec = 0;
+  for( unsigned int i=0; i<fVTimeBinnedMeanEffectiveArea.size(); i++)
+  {
+     fVTimeBinnedMeanEffectiveArea[i] = 0;
+  }
+  fNTimeBinnedMeanEffectiveArea = 0;
 }
 
 // Set the vector with Time Binning
@@ -2123,9 +2097,13 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
     sprintf( htitle, "energy reconstruction, distributions (%.1f deg)", fZe[ize] );
     hEsys2D->SetTitle( htitle );
 
-    hEmcCut->Reset();
+    hEmcCutCTA->Reset();
+    sprintf( htitle, "migration matrix (fine binning, %.1f deg)", fZe[ize] );
+    hEmcCutCTA->SetTitle( htitle );
+
+    hResponseMatrix->Reset();
     sprintf( htitle, "migration matrix (%.1f deg)", fZe[ize] );
-    hEmcCut->SetTitle( htitle );
+    hResponseMatrix->SetTitle( htitle );
 
     hEmcSWeight->Reset();
     sprintf( htitle, "spectral weights (%.1f deg)", fZe[ize] );
@@ -2307,80 +2285,46 @@ void VEffectiveAreaCalculator::copyHistograms( TH1 *h1,  TH1 *h2, bool b2D )
     values are filled ....
 
 */
-TGraphAsymmErrors* VEffectiveAreaCalculator::getMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC )
+TGraphAsymmErrors* VEffectiveAreaCalculator::getMeanEffectiveArea()
 {
-    TGraphAsymmErrors *g = 0;
-    unsigned int n = 0;
-    vector< double > v;
-    if( iEffectiveAreaVsEnergyMC )
+    if( gMeanEffectiveArea && fNMeanEffectiveArea > 0 )
     {
-        g = gMeanEffectiveAreaEMC;
-        n = fNMeanEffectiveAreaEMC;
-        v = fVMeanEffectiveAreaEMC;
-    }
-    else
-    {
-        g = gMeanEffectiveAreaErec;
-        n = fNMeanEffectiveAreaErec;
-        v = fVMeanEffectiveAreaErec;
-    }
-
-    if( g && n > 0 )
-    {
-        for( int i = 0; i < g->GetN(); i++ )
-        {
-            g->SetPoint( i, 0., 0. );
-            g->SetPointError( i, 0., 0., 0., 0. );
-        }
+	gMeanEffectiveArea->Set( 0 );
         int z = 0;
-        for( unsigned int i = 0; i < v.size(); i++ )
+        for( unsigned int i = 0; i < fVMeanEffectiveArea.size(); i++ )
         {
-            if( v[i] > 0. )
+            if( fVMeanEffectiveArea[i] > 0. )
             {
-                g->SetPoint( z, fEff_E0[i], v[i] / n );
-		//cout<<"Point "<<z<<" Energy "<<fEff_E0[i]<<" EffArea "<<v[i]/n<<endl;
+                gMeanEffectiveArea->SetPoint( z, fEff_E0[i], fVMeanEffectiveArea[i] / fNMeanEffectiveArea );
                 z++;
             }
         }
-        return g;
+        return gMeanEffectiveArea;
     }
 
     return 0;
 }
 
-TGraph2DErrors* VEffectiveAreaCalculator::getTimeBinnedMeanEffectiveArea( bool iEffectiveAreaVsEnergyMC)
+TGraph2DErrors* VEffectiveAreaCalculator::getTimeBinnedMeanEffectiveArea()
 {
-    TGraph2DErrors *g = 0;
-    vector< vector< double > > fEffArea_time;
     int z=0;
     
-    if( iEffectiveAreaVsEnergyMC )
+    if( gTimeBinnedMeanEffectiveArea )
     {
-        g = gTimeBinnedMeanEffectiveAreaEMC;
-	fEffArea_time = fEffArea_time_EMC;
-
-    }
-    else
-    {
-        g = gTimeBinnedMeanEffectiveAreaErec;
-	fEffArea_time = fEffArea_time_Erec;
-    }
-
-    if( g > 0 )
-      {
-       
+        gTimeBinnedMeanEffectiveArea->Set( 0 ); 
         for( unsigned int i = 0; i < fEffArea_time.size(); i++ )
         {
 	  for( unsigned int j = 0; j < fEffArea_time[i].size(); j++) 
-	    {
+	  {
 	      if( fEffArea_time[i][j] > 0. )
-		{
-	      g->SetPoint( z , fEff_E0[j], fEffArea_time[i][j] , timebins[i]);
-	      g->SetPointError( z , 0 , 0 , 0);
-	      z++;}
-	    }
+	      {
+		 gTimeBinnedMeanEffectiveArea->SetPoint( z , fEff_E0[j], fEffArea_time[i][j] , timebins[i]);
+		 gTimeBinnedMeanEffectiveArea->SetPointError( z , 0 , 0 , 0);
+		 z++;
+	      }
+	  }
 	}
-        return g;
+        return gTimeBinnedMeanEffectiveArea;
       }
     
     return 0;
@@ -2388,36 +2332,18 @@ TGraph2DErrors* VEffectiveAreaCalculator::getTimeBinnedMeanEffectiveArea( bool i
 
 
 
-void VEffectiveAreaCalculator::setTimeBinnedMeanEffectiveAreaEMC()
+void VEffectiveAreaCalculator::setTimeBinnedMeanEffectiveArea()
 {
   vector < double > inter;
   
-  for( unsigned int i = 0; i < fVTimeBinnedMeanEffectiveAreaEMC.size(); i++ )
+  for( unsigned int i = 0; i < fVTimeBinnedMeanEffectiveArea.size(); i++ )
   {
-      // if( fVTimeBinnedMeanEffectiveAreaEMC[i] && fNTimeBinnedMeanEffectiveAreaErec > 0. )
-	{
-	  inter.push_back(fVTimeBinnedMeanEffectiveAreaEMC[i]/fNTimeBinnedMeanEffectiveAreaEMC);	
-	}
+   inter.push_back(fVTimeBinnedMeanEffectiveArea[i]/fNTimeBinnedMeanEffectiveArea);	
   }
   
-  fEffArea_time_EMC.push_back( inter );
+  fEffArea_time.push_back( inter );
 }
 
-
-
-void VEffectiveAreaCalculator::setTimeBinnedMeanEffectiveAreaErec()
-{
-  vector < double > inter;
-  
-  for( unsigned int i = 0; i < fVTimeBinnedMeanEffectiveAreaErec.size(); i++ )
-    {
-      //if( fVTimeBinnedMeanEffectiveAreaErec[i] && fNTimeBinnedMeanEffectiveAreaErec >0. )
-	{	  
-	  inter.push_back(fVTimeBinnedMeanEffectiveAreaErec[i]/fNTimeBinnedMeanEffectiveAreaErec);
-	}
-    }
-   fEffArea_time_Erec.push_back( inter );
-}
 
 void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
 {
@@ -2519,11 +2445,18 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
             if( hVEsys2D[i][j] ) hVEsys2D[i][j]->Reset();
         }
     }
-    for( unsigned int i = 0; i < hVEmcCut.size(); i++ )
+    for( unsigned int i = 0; i < hVEmcCutCTA.size(); i++ )
     {
-        for( unsigned int j = 0; j < hVEmcCut[i].size(); j++ )
+        for( unsigned int j = 0; j < hVEmcCutCTA[i].size(); j++ )
         {
-            if( hVEmcCut[i][j] ) hVEmcCut[i][j]->Reset();
+            if( hVEmcCutCTA[i][j] ) hVEmcCutCTA[i][j]->Reset();
+        }
+    }
+    for( unsigned int i = 0; i < hVResponseMatrix.size(); i++ )
+    {
+        for( unsigned int j = 0; j < hVResponseMatrix[i].size(); j++ )
+        {
+            if( hVResponseMatrix[i][j] ) hVResponseMatrix[i][j]->Reset();
         }
     }
 }
@@ -2584,12 +2517,17 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 ////////////////////////////////////////////////////////
 // get lower and upper spectral index bins
 ////////////////////////////////////////////////////////
-                        if( i_ze_bins[i] < fEff_SpectralIndex.size() && i_woff_bins[w] < fEff_SpectralIndex[i_ze_bins[i]].size() && i_noise_bins[n] < fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]].size() )
+                        if( i_ze_bins[i] < fEff_SpectralIndex.size() && i_woff_bins[w] < fEff_SpectralIndex[i_ze_bins[i]].size() 
+			 && i_noise_bins[n] < fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]].size() )
                         {
-                            vector< unsigned int > i_index_bins = getUpperLowBins( fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]], fEffectiveAreas_meanIndex );
+                            vector< unsigned int > i_index_bins = getUpperLowBins( fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]], 
+			                                                           fEffectiveAreas_meanIndex );
                             unsigned int i_ID_0 = i_index_bins[0] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
                             unsigned int i_ID_1 = i_index_bins[1] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
-                            i_noise_eff_temp[n] = interpolate_effectiveArea( fEffectiveAreas_meanIndex, fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]], fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]], fEff_EsysMCRelative[i_ID_0], fEff_EsysMCRelative[i_ID_1], false );
+                            i_noise_eff_temp[n] = interpolate_effectiveArea( fEffectiveAreas_meanIndex, 
+			                                                     fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]], 
+									     fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]], 
+									     fEff_EsysMCRelative[i_ID_0], fEff_EsysMCRelative[i_ID_1], false );
 // don't interpolate errors, assume they are more or less constant
                             i_eff_tempE = fEff_EsysMCRelativeE[i_ID_0];
 
@@ -2631,3 +2569,89 @@ bool VEffectiveAreaCalculator::setMonteCarloEnergyRange( double iMin, double iMa
    cout << "VEffectiveAreaCalculator::setMonteCarloEnergyRange error: not spectral weighter defined" << endl;
    return false;
 }
+
+/*
+
+   normalize histogram along MC energy axis (Y-axis)
+   (needed for forward folding)
+
+*/
+bool VEffectiveAreaCalculator::normalizeResponseMatrix( TH2* h )
+{
+   if( !h ) return false;
+
+   double i_sum = 0.;
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
+   {
+      i_sum = 0.;
+      for( int j = 1; j <= h->GetNbinsY(); j++ )
+      {
+          i_sum += h->GetBinContent( i, j );
+      }
+      if( i_sum > 0. )
+      {
+	 for( int j = 1; j <= h->GetNbinsY(); j++ )
+	 {
+	     h->SetBinContent( i, j, h->GetBinContent( i, j ) / i_sum );
+         }
+      }
+   }
+   return true;
+}
+
+/*
+
+   forward folding of effective area vs MC energy with energy reconstruction matrix
+
+*/
+TGraphAsymmErrors* VEffectiveAreaCalculator::applyResponseMatrix( TH2* h, TGraphAsymmErrors *g )
+{
+   if( !h || !g ) return 0;
+
+   TGraphAsymmErrors *gR = new TGraphAsymmErrors( 1 );
+
+   double v = 0.;
+   double v_l = 0.;
+   double v_h = 0.;
+   double x = 0.;
+   double y = 0.;
+   int j_b = 0;
+   int z = 0;
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
+   {
+       v = 0.;
+       v_l = 0.;
+       v_h = 0.;
+       for( int j = 0; j < g->GetN(); j++ )
+       {
+          g->GetPoint( j, x, y );
+	  j_b = h->GetYaxis()->FindBin( x );
+	  if( h->GetBinContent( i, j_b ) > 0. )
+	  {
+	     v += h->GetBinContent( i, j_b ) * y;
+	     v_l += h->GetBinContent( i, j_b )*g->GetErrorYlow(j) * h->GetBinContent( i, j_b )*g->GetErrorYlow(j);
+	     v_h += h->GetBinContent( i, j_b )*g->GetErrorYhigh(j) * h->GetBinContent( i, j_b )*g->GetErrorYhigh(j);
+          }
+       }
+       if( v > 0. )
+       {
+          gR->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), v );
+	  gR->SetPointEYlow( z, sqrt( v_l ) );
+	  gR->SetPointEYhigh( z, sqrt( v_h ) );
+	  z++;
+       }
+   }
+   g->Set( 0 );
+   for( int i = 0; i < gR->GetN(); i++ )
+   {
+      gR->GetPoint( i, x, y );
+      g->SetPoint( i, x, y );
+      g->SetPointEYlow( i, gR->GetErrorYlow( i ) );
+      g->SetPointEYhigh( i, gR->GetErrorYhigh( i ) );
+      g->SetPointEXlow( i, gR->GetErrorXlow( i ) );
+      g->SetPointEXhigh( i, gR->GetErrorXhigh( i ) );
+   }
+
+   return g;
+}
+

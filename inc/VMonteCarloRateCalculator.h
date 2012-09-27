@@ -48,14 +48,17 @@ class VMonteCarloRateCalculator : public VPlotUtilities
         double getMonteCarloRate( int nbins, double *e0, double *eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 	                          double iEMinBin, double iEMaxBin, bool bDebug = false );
         double getMonteCarloRate( vector< double > e, vector< double > eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-	                          unsigned int iEMinBin, unsigned int iEMaxBin, bool bDebug = false );
+	                          unsigned int iEMinBin, unsigned int iEMaxBin, TH2D *iResponseMatrix = 0, bool bDebug = false );
         double getMonteCarloRate( vector< double > e, vector< double > eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-	                          unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, bool bDebug = false );
+	                          unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, TH2D *iResponseMatrix = 0, bool bDebug = false );
+        double getMonteCarloRate( vector< double > e, vector< double > eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
+	                          unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, TH2D *iResponseMatrix,
+				  vector< double > e_gamma, bool bDebug );
 
 // read rates
         TCanvas* plot_MonteCarloRate_vs_wobbleOffsets( TCanvas *c = 0, double ze = 20., int az = 16, int noise = 200, string iPlottingOption = "3" );
         TGraphAsymmErrors* getMonteCarloRate_vs_wobbleOffsets( double ze = 20., int az = 16, int noise = 200 );
 
-        ClassDef(VMonteCarloRateCalculator,2);
+        ClassDef(VMonteCarloRateCalculator,3);
 };
 #endif

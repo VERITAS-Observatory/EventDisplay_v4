@@ -227,7 +227,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double *e, doubl
         energy.push_back( e[i] );
         effectiveArea.push_back( eff[i] );
     }
-    return getMonteCarloRate( energy, effectiveArea, e_lit, e_lit_ID, 0, energy.size(), iEMin, iEMax, bDebug );
+    return getMonteCarloRate( energy, effectiveArea, e_lit, e_lit_ID, 0, energy.size(), iEMin, iEMax, 0, bDebug );
 }
 
 
@@ -239,34 +239,49 @@ double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double *e, doubl
 */
 double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-						     unsigned int iEMinBin, unsigned int iEMaxBin, bool bDebug )
+						     unsigned int iEMinBin, unsigned int iEMaxBin, TH2D *iResponseMatrix, bool bDebug )
 {
-   return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, 0., 0., bDebug );
+   return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, 0., 0., iResponseMatrix, bDebug );
 }
 
 /*
    energy vector e in log10 [TeV]
 
    iEMin and iEMax on linear axis [TeV]
+
+   (this function is used in VSensitivityCalculator)
 */
 double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-						     unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, bool bDebug )
+						     unsigned int iEMinBin, unsigned int iEMaxBin,
+						     double iEMin, double iEMax, TH2D *iResponseMatrix, bool bDebug )
+{
+    vector< double > e_gamma;
+
+    return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, iEMin, iEMax, iResponseMatrix, e_gamma, bDebug );
+}
+
+double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
+                                                     VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
+						     unsigned int iEMinBin, unsigned int iEMaxBin,
+						     double iEMin, double iEMax, TH2D *iResponseMatrix,
+						     vector< double > e_gamma, bool bDebug )
 {
     if( e.size() == 0 ) return -99;
+    if( e_gamma.size() == 0 ) e_gamma = e;
 // check bin region
-    if( iEMinBin > e.size() ) return 0.;
+    if( iEMinBin > e_gamma.size() ) return 0.;
 // adjust maximum bin
-    if( iEMaxBin > e.size() - 1 ) iEMaxBin = e.size() - 1;
+    if( iEMaxBin > e_gamma.size() - 1 ) iEMaxBin = e_gamma.size() - 1;
 
-    if( e.size() != eff.size() )
+    if( !iResponseMatrix && e_gamma.size() != eff.size() )
     {
         cout <<  "VMonteCarloRateCalculator::getMonteCarloRate error: energy and effective area vector have different length: ";
-	cout << e.size() << "\t" << eff.size() << endl;
+	cout << e_gamma.size() << "\t" << eff.size() << endl;
         return -99.;
     }
 
-// check function ID
+// check function ID of cosmic ray / gamma spectrum
     if( !e_lit || !e_lit->isValidID( e_lit_ID ) ) return -99.;
 
 // dN
@@ -276,54 +291,94 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     double x1 = 0.;
     double x2 = 0.;
     double i_bflux = 0.;
+    int i_Rec_Bin = 0;
+    int j_Rec_Bin = 0;
 
-// loop over all energy bins
+    if( bDebug )
+    {
+        cout << "VMonteCarloRateCalculator::getMonteCarloRate " << e_lit_ID << ": " << e.size() << "\t" << eff.size();
+	cout << " (gamma: " << e_gamma.size() << ")" << endl;
+	cout << "\t";
+	cout << " EMin: " << e_gamma[iEMinBin] << " (" << iEMinBin << ")";
+	cout << " EMax: " << e_gamma[iEMaxBin] << " (" << iEMaxBin << ")";
+	cout << endl;
+    }
+
+// loop over energy intervall in units of effective area vector
     for( unsigned int i = iEMinBin; i <= iEMaxBin; i++ )
     {
 // get energy bin min/max
         if( i == 0 )
         {
-            x1 = e[i];
-            x2 = e[i] + (e[i+1]-e[i])/2.;
+            x1 = e_gamma[i];
+            x2 = e_gamma[i] + (e_gamma[i+1]-e_gamma[i])/2.;
         }
         else if( i == e.size() - 1 )
         {
-            x1 = e[i] - (e[i]-e[i-1])/2.;
-            x2 = e[i];
+            x1 = e_gamma[i] - (e_gamma[i]-e_gamma[i-1])/2.;
+            x2 = e_gamma[i];
         }
         else
         {
-            x1 = e[i] - (e[i]-e[i-1])/2.;
-            x2 = e[i] + (e[i+1]-e[i])/2.;
+            x1 = e_gamma[i] - (e_gamma[i]-e_gamma[i-1])/2.;
+            x2 = e_gamma[i] + (e_gamma[i+1]-e_gamma[i])/2.;
         }
+	if( bDebug )
+	{
+	    cout << "\t\t integrate [" << x1 << ", " << x2 << "]" << endl;
+        }
+// =================================================================
+// apply response matrix
+// (important: expect same binning in response matrix and effective area vector!)
+	if( iResponseMatrix )
+	{
+	   i_Rec_Bin = iResponseMatrix->GetXaxis()->FindBin( e_gamma[i] );
+	   if( bDebug ) cout << "\t\t REC BIN " << i_Rec_Bin << "\t" << e_gamma[i] << endl;
+	   for( unsigned int j = 0; j < e.size(); j++ )
+	   {
+	      j_Rec_Bin = iResponseMatrix->GetYaxis()->FindBin( e[j] );
+	      if( iResponseMatrix->GetBinContent( i_Rec_Bin, j_Rec_Bin ) > 1.e-7 )
+	      {
+// effective area (m2 -> cm2) * response matrix element
+	         y1 = eff[j] * 1.e4 * iResponseMatrix->GetBinContent( i_Rec_Bin, j_Rec_Bin );
+// get integral flux for this bin
+	         i_bflux = e_lit->getIntegralFlux( pow( 10., iResponseMatrix->GetYaxis()->GetBinLowEdge( j_Rec_Bin ) ), 
+		                                   pow( 10., iResponseMatrix->GetYaxis()->GetBinUpEdge( j_Rec_Bin ) ), e_lit_ID );
+// multiply flux by effective areas
+// (this is the number of gammas per energy bin (dN not dN/dE)
+	         y1 *= i_bflux;
+// total flux
+		 iTot += y1;
+              }
+           }
+        }
+// =================================================================
+	else
+	{
 // effective area (m2 -> cm2)
-        y1 = eff[i] * 1.e4;
+	   y1 = eff[i] * 1.e4;
 
 // calculate number of events per energy bin
 // (energy (x) is in log E [TeV]
 
 // get integral flux for this bin
-        i_bflux = e_lit->getIntegralFlux( pow( 10., x1 ), pow( 10., x2 ), e_lit_ID );
+	   i_bflux = e_lit->getIntegralFlux( pow( 10., x1 ), pow( 10., x2 ), e_lit_ID );
 
 // multiply flux by effective areas
 // (this is the number of gammas per energy bin (dN not dN/dE)
-        y1  *= i_bflux;
+	   y1  *= i_bflux;
 
 // this is approximate, iEMin and iEMax can be much smaller than intervall x1, x2
-	if( iEMin > 0. && iEMax > 0. )
-	{
+	   if( iEMin > 0. && iEMax > 0. )
+	   {
 // total flux
-            if( x1 - log10( iEMin ) > -1.e-3 && log10( iEMax ) - x2 > -1.e3 ) iTot += y1;
-        }
-	else iTot += y1;
+	       if( x1 - log10( iEMin ) > -1.e-3 && log10( iEMax ) - x2 > -1.e3 ) iTot += y1;
+	   }
+	   else iTot += y1;
+	}
     }
     if( bDebug )
     {
-        cout << "VMonteCarloRateCalculator::getMonteCarloRate " << e_lit_ID << ": " << e.size() << "\t" << eff.size() << endl;
-	cout << " EMin: " << e[iEMinBin] << " (" << iEMinBin << ")";
-	cout << " EMax: " << e[iEMaxBin] << " (" << iEMaxBin << ")";
-	cout << " Int.Energy bin " << x1 << ", " << x2;
-	cout << " Int flux " << i_bflux;
 	cout << "\tRate [1/s]: " << iTot << " Rate [1/min]: " << iTot*60. << endl;
     }
 

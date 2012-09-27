@@ -29,6 +29,8 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     gEffArea_MC_Ratio = 0;
     gEffArea_Rec = 0;
     gEffArea_Rec_Ratio = 0;
+    gEffArea_Prob = 0;
+    gEffArea_Prob_Ratio = 0;
 
     hEmc = 0;
     hEcut = 0;
@@ -37,6 +39,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     hEcut_recUW = 0;
     hEsys = 0;
     hERecMatrix = 0;
+    hERecMatrixCoarse = 0;
     hEsysMCRelative = 0;
     hEsysMCRelative2D = 0;
     gEnergyResolution = 0;
@@ -360,6 +363,18 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 	   setGraphPlottingStyle( gEffArea_Rec );
        }
        else                 gEffArea_Rec = 0;
+       if( c->gEffAreaProb )
+       {
+          gEffArea_Prob = (TGraphAsymmErrors*)c->gEffAreaProb->Clone();
+	  for( int k = 0; k < c->Prob_nbins; k++ )
+	  {
+	     gEffArea_Rec->SetPoint( k, c->Prob_e0[k], c->Rec_eff[k] );
+	     gEffArea_Rec->SetPointEYlow( k, c->Prob_seff_L[k] );
+	     gEffArea_Rec->SetPointEYhigh( k, c->Prob_seff_U[k] );
+          }
+	  setGraphPlottingStyle( gEffArea_Prob );
+       }
+       else gEffArea_Prob = 0;
 // get energy spectra
        if( c->hEmc )
        {
@@ -389,7 +404,8 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 	   hEcut_recUW->SetMarkerStyle( hEcutUW->GetMarkerStyle()+4 );
        }
 // get energy reconstruction matrix
-       hERecMatrix = (TH2D*)c->hEmcCut;
+       hERecMatrix = (TH2D*)c->hEmcCutCTA;
+       hERecMatrixCoarse = (TH2D*)c->hResponseMatrix;
 // get error in energy reconstruction
        hEsys = (TH2D*)c->hEsys2D;
 // erec/emc
@@ -691,6 +707,7 @@ bool VInstrumentResponseFunctionReader::calculateEffectiveAreaRatios( TGraphAsym
 
     gEffArea_MC_Ratio  = calculateEffectiveAreaRatios( g0, gEffArea_MC );
     gEffArea_Rec_Ratio = calculateEffectiveAreaRatios( g0, gEffArea_Rec );
+    gEffArea_Prob_Ratio = calculateEffectiveAreaRatios( g0, gEffArea_Prob );
 
     return true;
 }

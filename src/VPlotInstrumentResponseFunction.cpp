@@ -147,6 +147,10 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
        TGraphAsymmErrors *g = 0;
 
        if( fData[i]->fA_MC == "A_MC" ) g = fData[i]->gEffArea_MC;
+       else if( fData[i]->fA_MC == "A_PROB" )
+       {
+          g = fData[i]->gEffArea_Prob;
+       }
        else                            g = fData[i]->gEffArea_Rec;
 
        if( !g )
@@ -285,22 +289,23 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigne
     }
 }
 
-void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned int iDataSetID )
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned int iDataSetID, bool bFineBinning )
 {
     if( !checkDataSetID( iDataSetID ) ) return;
 
     char hname[200];
     char htitle[200];
 
-    sprintf( hname, "cEA_Ematrix_%d", iDataSetID );
+    sprintf( hname, "cEA_Ematrix_%d_%d", iDataSetID, bFineBinning );
     sprintf( htitle, "energy reconstruction matrix (%d)", iDataSetID );
+    if( bFineBinning ) sprintf( htitle, "%s (fine binning)", htitle );
     TCanvas *iEnergyReconstructionMatrixCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergyReconstructionMatrixCanvas->SetGridx( 0 );
     iEnergyReconstructionMatrixCanvas->SetGridy( 0 );
     iEnergyReconstructionMatrixCanvas->SetLeftMargin( 0.11 );
     iEnergyReconstructionMatrixCanvas->SetRightMargin( 0.13 );
 
-    if( fData[iDataSetID]->hERecMatrix )
+    if( bFineBinning && fData[iDataSetID]->hERecMatrix )
     {
        fData[iDataSetID]->hERecMatrix->SetTitle( "" );
        fData[iDataSetID]->hERecMatrix->GetYaxis()->SetTitleOffset( 1.2 );
@@ -320,7 +325,26 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
        iL->SetLineStyle( 2 );
        iL->Draw();
     }
+    else if( fData[iDataSetID]->hERecMatrixCoarse )
+    {
+       fData[iDataSetID]->hERecMatrixCoarse->SetTitle( "" );
+       fData[iDataSetID]->hERecMatrixCoarse->GetYaxis()->SetTitleOffset( 1.2 );
+       fData[iDataSetID]->hERecMatrixCoarse->SetStats( 0 );
+       if( fData[iDataSetID]->hERecMatrixCoarse->GetEntries() > 0. ) iEnergyReconstructionMatrixCanvas->SetLogz( 1 );
+       fData[iDataSetID]->hERecMatrixCoarse->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+       fData[iDataSetID]->hERecMatrixCoarse->SetYTitle( "log_{10} energy_{MC} [TeV]" );
+       fData[iDataSetID]->hERecMatrixCoarse->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "X" );
+       fData[iDataSetID]->hERecMatrixCoarse->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "Y" );
+       fData[iDataSetID]->hERecMatrixCoarse->Draw( "colz" );
 
+// diagonal
+       TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ),
+                              log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
+			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 
+			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
+       iL->SetLineStyle( 2 );
+       iL->Draw();
+    }
 }
 
 
@@ -436,6 +460,11 @@ void VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iData
        {
           fData[i]->calculateEffectiveAreaRatios( fData[iDataSetID]->gEffArea_MC );
           g = fData[i]->gEffArea_MC_Ratio;
+       }
+       else if( fData[i]->fA_MC == "A_PROB" )
+       {
+          fData[i]->calculateEffectiveAreaRatios( fData[iDataSetID]->gEffArea_Prob );
+          g = fData[i]->gEffArea_Prob_Ratio;
        }
        else
        {

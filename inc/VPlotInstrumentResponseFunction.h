@@ -79,7 +79,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     void         plotEnergyReconstructionBias2D( unsigned int iDataSetID = 0, double iYmin = 0., double iYmax = 3. );
     void         plotEnergyReconstructionLogBias( string iM = "mean", double ymin = -1., double ymax = 1. );
     void         plotEnergyReconstructionLogBias2D( unsigned int iDataSetID = 0, string iM = "mean", double ymin = -0.8, double ymax = 0.8 );
-    void         plotEnergyReconstructionMatrix( unsigned int iDataSetID = 0 );
+    void         plotEnergyReconstructionMatrix( unsigned int iDataSetID = 0, bool bFineBinning = true );
     TCanvas*     plotEnergyResolution( double ymax = 1. );                                             // from geteffective area
     TCanvas*     plotEnergyResolution( string iXaxis );                                                // from IRF
     TCanvas*     plotEnergyResolution2D( unsigned int iDataSetID = 0, string iXaxis = "energy" );

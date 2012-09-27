@@ -1,10 +1,15 @@
 /* writeParticleRateFilesFromEffectiveAreas 
 
-    write files with particle number spectra for on (gamma) and off (protons+electrons) counts
+   write files with particle number spectra for on (gamma) and off (protons+electrons) counts
 
-    files are needed e.g. for setting the optimal cut value for TMVA cuts
+   files are needed e.g. for setting the optimal cut value for TMVA cuts
 
-    use writeAllParticleNumberFiles() for writing the files for all sub arrays
+   Input:
+       * effective areas (gammas/protons/electrons/ec)
+       * cosmic ray spectra (read from files)
+
+   Output:
+       * root file with signal and background rates
 
 */
 
@@ -27,11 +32,12 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
 
     if( iMC_Gamma && iMC_Proton )
     {
+// use sensitivity calculator for differential flux calculation
        VSensitivityCalculator b;
-       b.setDebug( false );             // creates lots of output
+       b.setDebug( false );             // creates lots of output (if set to true)
 // set Crab Nebula spectrum
        b.setEnergySpectrumfromLiterature( iESpecDataFile_CrabNebula, iCrabSpec_ID );
-// draw some debugging plots
+// set output result file name
        b.setWriteParticleNumberFile( iParticleNumberFile );
 // CTA
        int i_Azbin_gamma = 0;
@@ -57,6 +63,7 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
        {
           b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 2, iMC_Electron, 20., 0, 0.0, 250, 3.0 );
        }
+// calculate differential fluxes for 5 bins per decade (0.2)
        b.calculateParticleNumberGraphs_MC( 0.2 );
     }
 }
@@ -82,6 +89,7 @@ int main( int argc, char *argv[] )
 
    cout << endl;
    cout << "writeParticleRateFilesFromEffectiveAreas" << endl;
+   cout << "========================================" << endl;
    cout << endl;
 
    string SubArray = argv[1];
@@ -112,6 +120,7 @@ int main( int argc, char *argv[] )
 
    cout << "STARTING SUBARRAY " << SubArray << endl;
 
+// on-axis rates
    if( iMC_Gamma_onSource.size() > 0 )
    {
       sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
@@ -128,7 +137,7 @@ int main( int argc, char *argv[] )
       }
    }
 
-// offset files
+// off-axis rates
    for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
    {
 

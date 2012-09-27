@@ -350,7 +350,9 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
 ////////////////////////////////////////////////////////////////////////
 // sensitivity plots
     VSensitivityCalculator i_Sens;
+//    i_Sens.setDebug( true );
     VSensitivityCalculator i_SensCU;
+//    i_SensCU.setDebug( true );
 // set Crab Nebula spectrum
     i_Sens.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
     i_SensCU.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
@@ -361,8 +363,10 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     i_Sens.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
     i_SensCU.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
 // energy axis
-    i_Sens.setUseEffectiveAreas_vs_reconstructedEnergy( true );
-    i_SensCU.setUseEffectiveAreas_vs_reconstructedEnergy( true );
+//    i_Sens.setUseEffectiveAreas_vs_reconstructedEnergy( true );
+//    i_SensCU.setUseEffectiveAreas_vs_reconstructedEnergy( true );
+    i_Sens.setUseEffectiveAreas_vs_reconstructedEnergy( false );
+    i_SensCU.setUseEffectiveAreas_vs_reconstructedEnergy( false );
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
 // CTA
@@ -459,21 +463,21 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     string iMC_Electron = hname;
 // gammas
     i_Sens.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
-                                 i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
+                                 i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma, -10., 10., "ENERGY" );
     i_SensCU.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
-                                 i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
+                                 i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma, -10., 10., "CU" );
 // protons
     i_Sens.setMonteCarloParameters(14, fCosmicRaySpectrumFile, fProtonSpectrumID , iMC_Proton, 20.,
-			      i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
+			      i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton, -10., 10., "ENERGY" );
     i_SensCU.setMonteCarloParameters(14, fCosmicRaySpectrumFile, fProtonSpectrumID , iMC_Proton, 20.,
-			      i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
+			      i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton, -10., 10., "CU" );
 // electrons (spectral index)
     if( iMC_Electron.size() > 0 && iMC_Electron != "NOFILE" )
     {
        i_Sens.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20.,
-                              i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
+                              i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron, -10., 10., "ENERGY" );
        i_SensCU.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20.,
-                              i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
+                              i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron, -10., 10., "CU" );
     }
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );

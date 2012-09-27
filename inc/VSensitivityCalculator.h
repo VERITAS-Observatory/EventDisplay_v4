@@ -71,7 +71,6 @@ class VSensitivityCalculatorDataResponseFunctions
     int noise;                                             // [GrISU]      noise level of selected effective area
     double index;                                          //              spectral index of selected effective area
     double theta2_min;                                     // [deg^2]      direction cut (if energy independent)
-//    double theta2_max;                                     // [deg^2]      direction cut (if energy independent)
     double theta2_MCScatterAngle;                          // [deg^2]      scattering angle^2 of primary direction in CORSIKA
                                                            //              (e.g. 10deg in most CTA simulations)
     TGraph* gSolidAngle_DirectionCut_vs_EnergylgTeV;       // [sr, lg TeV] solid angle of direction cut (as function of energy)
@@ -89,11 +88,13 @@ class VSensitivityCalculatorDataResponseFunctions
     vector< double > energy_upEdge;
     vector< double > effArea;
     vector< double > effArea_error;
+    TH2D *hResponseMatrix;
 
     VSensitivityCalculatorDataResponseFunctions();
-   ~VSensitivityCalculatorDataResponseFunctions() {}
+   ~VSensitivityCalculatorDataResponseFunctions();
 
     double getSolidAngle_DirectionCut( double e );         // get solid angle for direction cut ( energy in lg10 [TeV] )
+    void   initializeHistograms( string );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,7 +204,10 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara, double dE_Log10 );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
-				       bool iRateError = false );
+				       TH2D *iResponseMatrix = 0, bool iRateError = false );
+        double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
+	                               VEnergySpectrumfromLiterature i_Espec, unsigned int e_lit_ID,
+				       vector< double > e_gamma, vector< double > e, vector< double > eff, TH2D *iResponseMatrix = 0 );
 
 	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit = "ENERGY" );
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
@@ -214,7 +218,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 						  map< unsigned int, vector< double > > i_flux_NOff_error );
         void       plotDebugPlotsParticleNumbers();
         void       prepareDebugPlots();
-        void       purgeEnergies( vector< double > e, vector< VDifferentialFlux >& v_flux );
 
     public:
 
@@ -271,16 +274,16 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setMonteCarloParameters( unsigned int iParticleID, string iSpectralParameterFile, unsigned int iSpectralParameterID,
 	                                  string iGammaEffectiveAreaFile, double ze = 20., 
 					  int az = 0, double woff = 0.5, int noise = 150, double index = 2.5,
-					  double iEnergy_min_lin = -10., double iEnergy_max_lin = 10. );
+					  double iEnergy_min_lin = -10., double iEnergy_max_lin = 10., string bUnit = "CU" );
         void     setObservationTimeRange( double iObs_min = 0.5e-3, double iObs_max = 5.e4, int iObs_steps = 1000 );    // hours
         void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50.,
 	                                   double iMinBackgroundRateRatio = 0.05, double alpha = 0.2 );
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );
         void     setSourceStrengthVector_CU();
         void     setSourceStrengthVector_CU( vector< double > );
-	void     setUseEffectiveAreas_vs_reconstructedEnergy( bool iB = true ) { bUseEffectiveAreas_vs_reconstructedEnergy = iB; }
+	void     setUseEffectiveAreas_vs_reconstructedEnergy( bool iB = false ) { bUseEffectiveAreas_vs_reconstructedEnergy = iB; }
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,12);
+        ClassDef(VSensitivityCalculator,14);
 };
 #endif

@@ -66,9 +66,11 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 // effective areas
     TGraphAsymmErrors *gEffArea_MC;
     TGraphAsymmErrors *gEffArea_Rec;
+    TGraphAsymmErrors *gEffArea_Prob;
 // effective area ratios
     TGraphAsymmErrors *gEffArea_MC_Ratio;
     TGraphAsymmErrors *gEffArea_Rec_Ratio;
+    TGraphAsymmErrors *gEffArea_Prob_Ratio;
 // energy spectra
     TH1D *hEmc;
     TH1D *hEcut;
@@ -77,6 +79,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TH1D *hEcut_recUW;
 // energy reconstruction matrix
     TH2D *hERecMatrix;
+    TH2D *hERecMatrixCoarse;
 // e_rec/e_mc
     TH2D *hEsysMCRelative2D;
     TProfile *hEsysMCRelative;

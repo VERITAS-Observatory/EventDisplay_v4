@@ -175,7 +175,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fEnergySpectrumBinSize;
         double fEnergyFitMin;                     // in log10 [TeV]
         double fEnergyFitMax;                     // in log10 [TeV]
-        bool   bEffectiveAreaVsEnergyMC;
+        int    fEffectiveAreaVsEnergyMC;
         int fEnergyEffectiveAreaSmoothingIterations;
         double fEnergyEffectiveAreaSmoothingThreshold;
         vector< double > fMCZe;                   // zenith angle intervall for Monte Carlo
