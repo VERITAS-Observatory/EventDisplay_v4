@@ -154,7 +154,7 @@ int main( int argc, char *argv[] )
        cout << endl;
        cout << "compareDatawithMC <input file list> <cut> <outputfile>" << endl;
        cout << endl;
-       cout << "\t input file list: see example file input.dat" << endl;
+       cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
        cout << "\t cuts: " << endl;
        cout << "\t\t cut=-3:        theta2 cut only" << endl;
        cout << "\t\t cut=-2:        no cuts" << endl;
