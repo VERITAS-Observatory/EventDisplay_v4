@@ -19,9 +19,6 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
       fDirTotRun = iDirRun;
       bTotalAnalysisOnly = iTotalAnalysisOnly;
 
-      fMeanSourceDec = 0.;
-      fMeanSourceRA = 0.;
-
 // simulate background and source, overwrites data!
       bSimulate = false;
       if( bSimulate )
@@ -36,10 +33,8 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 // do full sky plots
       fNoSkyPlots = false;
 
-      gMeanEffectiveAreaEmc = 0;
-      gMeanEffectiveAreaErec = 0;
-      gTimeBinnedMeanEffectiveAreaEmc = 0;
-      gTimeBinnedMeanEffectiveAreaErec = 0;
+      gMeanEffectiveArea = 0;
+      gTimeBinnedMeanEffectiveArea = 0;
       gMeanEsys_MC = 0;
 
       fHisCounter = 0;
@@ -369,7 +364,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
    VEffectiveAreaCalculator fEnergy( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, iAzMin, iAzMax, iPedVar,
 				     fRunPara->fEnergyReconstructionSpectralIndex, fRunPara->fMCZe,
        				     fRunPara->fEnergyEffectiveAreaSmoothingIterations, 
-      				     fRunPara->fEnergyEffectiveAreaSmoothingThreshold, fRunPara->bEffectiveAreaVsEnergyMC );
+      				     fRunPara->fEnergyEffectiveAreaSmoothingThreshold, fRunPara->fEffectiveAreaVsEnergyMC );
    double iEnergyWeighting = 1.;
    double iErec = 0.;
    double iErecChi2 = 0.;
@@ -479,12 +474,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	     iDirectionOffset = sqrt( getXoff()*getXoff() + getYoff()*getYoff() );
 
 // derotate coordinates
-// (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
-// ( don't change signs if you don't know why! )
-	     fAstro[icounter]->derotateCoords( i_UTC, getXoff(), fEVDVersionSign * getYoff(), i_xderot, i_yderot);
-             i_yderot *= -1.;
+             getDerotatedCoordinates( fAstro[icounter], i_UTC, getXoff(), fEVDVersionSign * getYoff(),  i_xderot, i_yderot );
 
-// gamma/hadron separation cuts
+// gamma/hadron cuts
 	     bIsGamma = fCuts->isGamma( i,false, fIsOn);
 
 // fill on/offstereo maps
@@ -578,8 +570,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			  {
 // get mean effective area in Time BIN
 			      fEnergy.setTimeBin(iEffAreaTimeBin[bini]-i_time_intervall/2-f_t_in_s_min[irun]);
-			      fEnergy.setTimeBinnedMeanEffectiveAreaEMC();            
-			      fEnergy.setTimeBinnedMeanEffectiveAreaErec();
+			      fEnergy.setTimeBinnedMeanEffectiveArea();
 			      fEnergy.resetTimeBin();
 			   }
 		        }
@@ -592,7 +583,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		    iEnergyWeighting = fEnergy.getEffectiveArea( iErec, fDataRun->Ze, 
 								 iDirectionOffset, iPedVar_temp, 
 								 fRunPara->fEnergyReconstructionSpectralIndex, true, 
-								 fRunPara->bEffectiveAreaVsEnergyMC );
+								 fRunPara->fEffectiveAreaVsEnergyMC );
 // fill energy histograms
 		    fHisto[fHisCounter]->herec->Fill( log10( iErec ), iEnergyWeighting );
 		    fHisto[fHisCounter]->hLinerec->Fill( iErec, iEnergyWeighting );
@@ -630,8 +621,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
       }
 
       fEnergy.setTimeBin(iEffAreaTimeBin[i_t_bins]-i_time_intervall/2-f_t_in_s_min[irun]);
-      fEnergy.setTimeBinnedMeanEffectiveAreaEMC();            
-      fEnergy.setTimeBinnedMeanEffectiveAreaErec();
+      fEnergy.setTimeBinnedMeanEffectiveArea();
       fEnergy.resetTimeBin();
 
 // fill rate vectors
@@ -653,43 +643,14 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
       }
 
 // get mean effective area
-      if( fEnergy.getMeanEffectiveArea( true ) )
-      {
-          gMeanEffectiveAreaEmc = (TGraphAsymmErrors*)fEnergy.getMeanEffectiveArea( true )->Clone();
-      }
-      else 
-      {
-         gMeanEffectiveAreaEmc = 0;
-      }
-      if( fEnergy.getMeanEffectiveArea( false ) )
-      {
-          gMeanEffectiveAreaErec = (TGraphAsymmErrors*)fEnergy.getMeanEffectiveArea( false )->Clone();
-      }
-      else
-      { 
-         gMeanEffectiveAreaErec = 0;
-      }
+      gMeanEffectiveArea = (TGraphAsymmErrors*)fEnergy.getMeanEffectiveArea();
+      if( gMeanEffectiveArea ) gMeanEffectiveArea = (TGraphAsymmErrors*)gMeanEffectiveArea->Clone();
 // get mean energy systematic histogram (needed possibly for energy threshold determination)
       gMeanEsys_MC = (TGraphErrors*)fEnergy.getMeanSystematicErrorHistogram();
       if( gMeanEsys_MC ) gMeanEsys_MC = (TGraphErrors*)gMeanEsys_MC->Clone();
 
 // get mean effective area for TIME BINs
-      if( fEnergy.getTimeBinnedMeanEffectiveArea( true ) )
-      {
-         gTimeBinnedMeanEffectiveAreaEmc = (TGraph2DErrors*)fEnergy.getTimeBinnedMeanEffectiveArea( true )->Clone();
-      }
-      else
-      {
-         gTimeBinnedMeanEffectiveAreaEmc = 0; 
-      } 
-      if( fEnergy.getTimeBinnedMeanEffectiveArea( false ) )
-      {
-         gTimeBinnedMeanEffectiveAreaErec = (TGraph2DErrors*)fEnergy.getTimeBinnedMeanEffectiveArea( false )->Clone();
-      }
-      else 
-      { 
-         gTimeBinnedMeanEffectiveAreaErec = 0; 
-      } 
+      gTimeBinnedMeanEffectiveArea = (TGraph2DErrors*)fEnergy.getTimeBinnedMeanEffectiveArea()->Clone();
 // get dead time
       fDeadTime[fHisCounter]->calculateDeadTime();
       fDeadTime[fHisCounter]->printDeadTime();
@@ -724,10 +685,8 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 // copy effective areas and radial acceptance to anasum output file
       	if( bOn )
       	{
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaEmc );
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaErec );
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveAreaEmc );
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveAreaErec );
+	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
+	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
 	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEsys_MC );
 	     if( fRunPara->fRunList[fHisCounter].fAcceptanceFile.size() > 0 )
 	     {
@@ -737,30 +696,18 @@ void VStereoAnalysis::writeHistograms( bool bOn )
       	else
       	{
 	     char hname[1000];
-	     if( gMeanEffectiveAreaEmc )
+	     if( gMeanEffectiveArea )
 	     {
-		     sprintf( hname, "%s_off", gMeanEffectiveAreaEmc->GetName() );
-		     gMeanEffectiveAreaEmc->SetName( hname );
+		     sprintf( hname, "%s_off", gMeanEffectiveArea->GetName() );
+		     gMeanEffectiveArea->SetName( hname );
 	     }
-	     if( gTimeBinnedMeanEffectiveAreaEmc )
+	     if( gTimeBinnedMeanEffectiveArea )
 	     {
-		     sprintf( hname, "%s_off", gTimeBinnedMeanEffectiveAreaEmc->GetName() );
-		     gTimeBinnedMeanEffectiveAreaEmc->SetName( hname );
+		     sprintf( hname, "%s_off", gTimeBinnedMeanEffectiveArea->GetName() );
+		     gTimeBinnedMeanEffectiveArea->SetName( hname );
 	     }
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaEmc );
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveAreaEmc );
-	     if( gMeanEffectiveAreaErec )
-	     {
-		     sprintf( hname, "%s_off", gMeanEffectiveAreaErec->GetName() );
-		     gMeanEffectiveAreaErec->SetName( hname );
-	     }
-	     if( gTimeBinnedMeanEffectiveAreaErec )
-	     {
-		     sprintf( hname, "%s_off", gTimeBinnedMeanEffectiveAreaErec->GetName() );
-		     gTimeBinnedMeanEffectiveAreaErec->SetName( hname );
-	     }
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveAreaErec );
-	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveAreaErec );
+	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gMeanEffectiveArea );
+	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
       	}
       	if( fTreeSelectedEvents ) fTreeSelectedEvents->AutoSave();
       }
@@ -1156,33 +1103,24 @@ void VStereoAnalysis::setAlphaOff( TH2D *ih, TH2D *ihUC )
 void VStereoAnalysis::defineAstroSource()
 {
       if( fDebug ) cout << "VStereoAnalysis::defineAstroSource()" << endl;
-      VTargets fTarget;
-      double i_ra=0;
-      double i_dec=0;
-      double i_off = 0.;
-      if (fIsOn) cout     << endl <<"-----------------------------------------------------------------------"<< endl
-        		    << "Defining targets and exclusion regions"<< endl;
+
+      if (fIsOn)
+      {
+         cout << endl <<"-----------------------------------------------------------------------" << endl;
+	 cout << "Defining targets and exclusion regions"<< endl; 
+      }
 
       for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
       {
 /////////////////////////////////////////////////////////
-// set source coordinates
+// check source coordinates
 // (this is the direction of observation)
 /////////////////////////////////////////////////////////
-      	if( fRunPara->fRunList[i].fTargetDecJ2000 > -85. )
-      	{
-      		fTarget.setTarget( fRunPara->fRunList[i].fTarget, fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000 );
-      		fRunPara->setTargetRADecJ2000( i,fTarget.getTargetRAJ2000()*TMath::RadToDeg() , fTarget.getTargetDecJ2000()*TMath::RadToDeg() );
-      	}
-      	else if( fTarget.selectTargetbyName( fRunPara->fRunList[i].fTarget ) )
-      	{
-      		if( fIsOn ) fRunPara->setTargetRADecJ2000( i,fTarget.getTargetRAJ2000()*TMath::RadToDeg() , fTarget.getTargetDecJ2000()*TMath::RadToDeg());
-      	}
-      	else
+      	if( fRunPara->fRunList[i].fTargetDecJ2000 < -85. )
       	{
       		cout << "ERROR in VStereoAnalysis::defineAstroSource: invalid target " << fRunPara->fRunList[i].fTarget << endl;
       		cout << "\t run " << fRunPara->fRunList[i].fRunOn << "\t" << fRunPara->fRunList[i].fTarget << endl;
-      		exit( 0 );
+      		exit( -1 );
       	}
 
 /////////////////////////////////////////////////////////
@@ -1191,13 +1129,12 @@ void VStereoAnalysis::defineAstroSource()
       	{
       		fRunPara->fRunList[i].fSkyMapCentreWest  = fRunPara->fSkyMapCentreWest;
       		fRunPara->fRunList[i].fSkyMapCentreNorth = fRunPara->fSkyMapCentreNorth;
-      		i_dec = fTarget.getTargetDecJ2000();  // in [rad]
-      		i_ra  = fTarget.getTargetRAJ2000();
       		double i_decDiff =  0.;
       		double i_raDiff = 0.;
       		VSkyCoordinatesUtilities::getWobbleOffsets( fRunPara->fRunList[i].fSkyMapCentreNorth, 
       		                                            fRunPara->fRunList[i].fSkyMapCentreWest, 
-      							    i_dec*TMath::RadToDeg(), i_ra*TMath::RadToDeg(), i_decDiff, i_raDiff );
+							    fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+							    i_decDiff, i_raDiff );
       		fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fRunList[i].fTargetRAJ2000 + i_raDiff;
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000 + i_decDiff;
       	}
@@ -1205,8 +1142,10 @@ void VStereoAnalysis::defineAstroSource()
       	{
       		fRunPara->fRunList[i].fSkyMapCentreRAJ2000 = fRunPara->fSkyMapCentreRAJ2000;
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
-      		fRunPara->fRunList[i].fSkyMapCentreWest  = fTarget.getTargetShiftWest( fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
-      		fRunPara->fRunList[i].fSkyMapCentreNorth = fTarget.getTargetShiftNorth( fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
+      		fRunPara->fRunList[i].fSkyMapCentreWest  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+		                                                                                         fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
+      		fRunPara->fRunList[i].fSkyMapCentreNorth = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+		                                                                                          fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreWest ) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreWest = 0.;
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreNorth) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreNorth = 0.;
       	}
@@ -1214,16 +1153,19 @@ void VStereoAnalysis::defineAstroSource()
 /////////////////////////////////////////////////////////
 // set and get target shifts
 // (calculated relative to sky map centre)
-      // (this is where all 1D histograms (theta2, energy spectra, etc) are calculated)
+// (this is the position where all 1D histograms (theta2, energy spectra, etc) are calculated)
       	if( fIsOn )
       	{
       	     if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
       	     {
-      		  fRunPara->fRunList[i].fTargetShiftWest  = fTarget.getTargetShiftWest( fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
-      		  fRunPara->fRunList[i].fTargetShiftNorth = -1.*fTarget.getTargetShiftNorth( fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+      		  fRunPara->fRunList[i].fTargetShiftWest  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+		                                                                                          fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+      		  fRunPara->fRunList[i].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+		                                                                                               fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+
       		  fRunPara->fRunList[i].fTargetShiftWest  += fRunPara->fRunList[i].fSkyMapCentreWest;
       		  fRunPara->fRunList[i].fTargetShiftNorth += fRunPara->fRunList[i].fSkyMapCentreNorth;
-      		  if( TMath::Abs( fRunPara->fRunList[i].fTargetShiftWest ) < 1.e-4 ) fRunPara->fRunList[i].fTargetShiftWest = 0.;
+      		  if( TMath::Abs( fRunPara->fRunList[i].fTargetShiftWest ) < 1.e-4 )  fRunPara->fRunList[i].fTargetShiftWest = 0.;
       		  if( TMath::Abs( fRunPara->fRunList[i].fTargetShiftNorth ) < 1.e-4 ) fRunPara->fRunList[i].fTargetShiftNorth = 0.;
       	     }
       	     else
@@ -1238,10 +1180,10 @@ void VStereoAnalysis::defineAstroSource()
       	                                   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
       	}
 /////////////////////////////////////////////////////////
-
-      	i_dec = fTarget.getTargetDecJ2000();      // in [rad]
-      	i_ra  = fTarget.getTargetRAJ2000();
-// precess source coordinates
+// precess target coordinates
+// (i_dec and i_ra are in current epoch coordinates in the following, not J2000)
+      	double i_dec = fRunPara->fRunList[i].fTargetDecJ2000 * TMath::DegToRad();
+      	double i_ra  = fRunPara->fRunList[i].fTargetRAJ2000 * TMath::DegToRad();
       	double iMJD = 0.;
       	if( fIsOn ) iMJD = (double)fRunPara->fRunList[i].fMJDOn;
       	else        iMJD = (double)fRunPara->fRunList[i].fMJDOff;
@@ -1256,23 +1198,24 @@ void VStereoAnalysis::defineAstroSource()
       		cout << "\tTarget: " << fRunPara->fRunList[i].fTarget << " (ra,dec)=(";
       		cout << fRunPara->fRunList[i].fTargetRA << ", " << fRunPara->fRunList[i].fTargetDec << ")";
       		cout << " (precessed, MJD=" << iMJD << "), ";
-      		cout << "(ra,dec)_J2000 = (" << fRunPara->fRunList[i].fTargetRAJ2000 << ", " << fRunPara->fRunList[i].fTargetDecJ2000 << ")";
+      		cout << "(ra,dec (J2000)) = (" << fRunPara->fRunList[i].fTargetRAJ2000 << ", " << fRunPara->fRunList[i].fTargetDecJ2000 << ")";
       		cout << ", pair offset [min]: " << fRunPara->fRunList[i].fPairOffset  << endl;
       	}
 // get wobble offsets in ra,dec
       	double i_decDiff =  0.;
       	double i_raDiff = 0.;
-      	VSkyCoordinatesUtilities::getWobbleOffsets( fRunPara->fRunList[i].fWobbleNorth, fRunPara->fRunList[i].fWobbleWest, i_dec*TMath::RadToDeg(), i_ra*TMath::RadToDeg(), i_decDiff, i_raDiff );
+      	VSkyCoordinatesUtilities::getWobbleOffsets( fRunPara->fRunList[i].fWobbleNorth, fRunPara->fRunList[i].fWobbleWest,
+	                                            i_dec*TMath::RadToDeg(), i_ra*TMath::RadToDeg(), i_decDiff, i_raDiff );
       	fRunPara->fRunList[i].fDecOffset = i_decDiff;
       	fRunPara->fRunList[i].fRaOffset = i_raDiff;
       	if( fabs( fRunPara->fRunList[i].fRaOffset ) < 1.e-5 ) fRunPara->fRunList[i].fRaOffset = 0.;
 
-      // modify wobble offsets for centering of sky maps
+// modify wobble offsets for centering of sky maps
       	fRunPara->fRunList[i].fWobbleNorthMod = fRunPara->fRunList[i].fWobbleNorth - fRunPara->fRunList[i].fSkyMapCentreNorth;
       	fRunPara->fRunList[i].fWobbleWestMod  = fRunPara->fRunList[i].fWobbleWest  - fRunPara->fRunList[i].fSkyMapCentreWest;
 
-      ///////////////////////////////////////////////////////////////////
-      // some printout
+///////////////////////////////////////////////////////////////////
+// some printout
       	if( fIsOn )
       	{
       		cout << "\tWobble offsets: N: " << fRunPara->fRunList[i].fWobbleNorth << " W: " << fRunPara->fRunList[i].fWobbleWest << ", ";
@@ -1284,26 +1227,31 @@ void VStereoAnalysis::defineAstroSource()
       		cout << "\t1D-histograms calculated at (x,y): " << fRunPara->fRunList[i].fTargetShiftNorth << ", " << fRunPara->fRunList[i].fTargetShiftWest;
       		if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 &&  TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
       		{
-      			cout << " (ra,dec (J2000)) " << fRunPara->fTargetShiftRAJ2000 << ", " << fRunPara->fTargetShiftDecJ2000;
+		     cout << " (ra,dec (J2000)) " << fRunPara->fTargetShiftRAJ2000 << ", " << fRunPara->fTargetShiftDecJ2000;
       		}
       		cout << endl;
       	}
 
 // define offset for off run (usually 30. min, specified in runlist file)
 // offset is as well defined for on run if on and off runnumber are the same
-      	i_off = 0.;
+      	double i_off = 0.;
       	if( !fIsOn || fRunPara->fRunList[i].fRunOn == fRunPara->fRunList[i].fRunOff ) i_off = fRunPara->fRunList[i].fPairOffset/60./24.*360./TMath::RadToDeg();
 
+// =============================================================
 // define source and tracking class
       	fAstro.push_back( new VSkyCoordinates() );
+// setting current epoch coordinates
 	fAstro.back()->setTelDec_deg( i_dec * TMath::RadToDeg() + i_decDiff );
 	fAstro.back()->setTelRA_deg( i_ra * TMath::RadToDeg() + i_raDiff + i_off * TMath::RadToDeg() );
+// set observatory position
       	fAstro.back()->setObservatory( fRunPara->getObservatory_Longitude_deg(), fRunPara->getObservatory_Latitude_deg() );
+// =============================================================
+// set up star catalogue and exclusion regions
       	if( fIsOn )
       	{
       		fAstro.back()->initStarCatalogue( fRunPara->fStarCatalogue, iMJD, fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, 
-		                                                     fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax, 
-								     fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
+						  fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax, 
+						  fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
 		VStarCatalogue *iStarCatalogue = fAstro.back()->getStarCatalogue();
 		if( !iStarCatalogue )
 		{
@@ -1311,6 +1259,7 @@ void VStereoAnalysis::defineAstroSource()
 		   cout << "exiting..." << endl;
 		   exit( -1 );
                 }
+// remove double entries
       		iStarCatalogue->purge();
       		if( iStarCatalogue->getListOfStarsinFOV().size() > 0 )
       		{
@@ -1325,74 +1274,71 @@ void VStereoAnalysis::defineAstroSource()
 
       				if( i_brightness < fRunPara->fStarMinBrightness )
       				{
-      					cout << "\t\t" << iStarCatalogue->getListOfStarsinFOV()[i].fStarID << "\t";
-      					cout << iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 << "\t";
-      					cout << iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 << "\t";
-      					cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
-      					cout << endl;
-      				// add this to exclusion regions
-      					if( fRunPara->fStarExlusionRadius > 0. )
-      					{
-      					// check if this region is already excluded
-      						bool b_isExcluded = false;
-      						for( unsigned int e = 0; e < fRunPara->fExcludeFromBackground_StarID.size(); e++ )
-      						{
-      							if( fRunPara->fExcludeFromBackground_StarID[e] >= 0
-							 && fRunPara->fExcludeFromBackground_StarID[e] == (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID )
-							{
-							   b_isExcluded = true;
-                                                        }
-      						}
-      						if( !b_isExcluded )
-      						{
-      							fRunPara->fExcludeFromBackground_RAJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 );
-      							fRunPara->fExcludeFromBackground_DecJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 );
-      							fRunPara->fExcludeFromBackground_Radius.push_back( fRunPara->fStarExlusionRadius );
-      							fRunPara->fExcludeFromBackground_North.push_back( 0. );
-      							fRunPara->fExcludeFromBackground_West.push_back( 0. );
-      							fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID );
-      						}
-      					}
-      				}
+				     cout << "\t\t" << iStarCatalogue->getListOfStarsinFOV()[i].fStarID << "\t";
+				     cout << iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 << "\t";
+				     cout << iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 << "\t";
+				     cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
+				     cout << endl;
+// add this to set of exclusion regions
+				     if( fRunPara->fStarExlusionRadius > 0. )
+				     {
+// check if this region is already excluded
+				       bool b_isExcluded = false;
+				       for( unsigned int e = 0; e < fRunPara->fExcludeFromBackground_StarID.size(); e++ )
+				       {
+					    if( fRunPara->fExcludeFromBackground_StarID[e] >= 0
+					     && fRunPara->fExcludeFromBackground_StarID[e] == (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID )
+					    {
+					       b_isExcluded = true;
+					    }
+				       }
+				       if( !b_isExcluded )
+				       {
+					    fRunPara->fExcludeFromBackground_RAJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 );
+					    fRunPara->fExcludeFromBackground_DecJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 );
+					    fRunPara->fExcludeFromBackground_Radius.push_back( fRunPara->fStarExlusionRadius );
+					    fRunPara->fExcludeFromBackground_North.push_back( 0. );
+					    fRunPara->fExcludeFromBackground_West.push_back( 0. );
+					    fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID );
+				       }
+				  }
+			     }
       			}
       		}
       		iStarCatalogue->purge();
       	}
-      // doesn't work if different sources are analyzed with RA <> 360 deg
-      /////////////////////////////////////////////////////////
-      // set and get the regions to exclude
-      // (this is set relative to the sky map centre)
+// doesn't work if different sources are analyzed with RA <> 360 deg
+/////////////////////////////////////////////////////////
+// set and get the regions to exclude
+// (this is set relative to the sky map centre)
       	for(unsigned int k = 0 ; k < fRunPara->fExcludeFromBackground_North.size(); k++)
       	{
-      		if( fRunPara->fExcludeFromBackground_DecJ2000[k] > -90. )
-      		{
-      			fRunPara->fExcludeFromBackground_West[k]  = -1.* fTarget.getTargetShiftWest( fRunPara->fExcludeFromBackground_RAJ2000[k], 
-			                                                                             fRunPara->fExcludeFromBackground_DecJ2000[k] ) * -1.;
-      			fRunPara->fExcludeFromBackground_North[k] = -1.* fTarget.getTargetShiftNorth( fRunPara->fExcludeFromBackground_RAJ2000[k], 
-			                                                                              fRunPara->fExcludeFromBackground_DecJ2000[k] );
-      			fRunPara->fExcludeFromBackground_West[k]  += fRunPara->fRunList[i].fSkyMapCentreWest;
-      			fRunPara->fExcludeFromBackground_North[k] += fRunPara->fRunList[i].fSkyMapCentreNorth;
-      			if( TMath::Abs( fRunPara->fExcludeFromBackground_North[k] ) < 1.e-4 ) fRunPara->fExcludeFromBackground_North[k] = 0.;
-      			if( TMath::Abs( fRunPara->fExcludeFromBackground_West[k] ) < 1.e-4 )  fRunPara->fExcludeFromBackground_West[k]  = 0.;
-      		}
-      		else
-      		{
-      			fRunPara->fExcludeFromBackground_West[k]  *= 1.;
-      			fRunPara->fExcludeFromBackground_North[k] *= -1.;
-      		}
-      		fRunPara->fExcludeFromBackground_West[k]  *= -1.;
+	     if( fRunPara->fExcludeFromBackground_DecJ2000[k] > -90. )
+	     {
+		  i_ra  = fRunPara->fExcludeFromBackground_RAJ2000[k]  * TMath::DegToRad();
+		  i_dec = fRunPara->fExcludeFromBackground_DecJ2000[k] * TMath::DegToRad();
+      	          VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec);
+		  fRunPara->fExcludeFromBackground_West[k]  = -1.* VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRA,
+														 fRunPara->fRunList[i].fTargetDec,
+														 i_ra*TMath::RadToDeg(), i_dec*TMath::RadToDeg() ) * -1.;
+		  fRunPara->fExcludeFromBackground_North[k] = -1.* VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRA,
+														  fRunPara->fRunList[i].fTargetDec,
+														  i_ra*TMath::RadToDeg(), i_dec*TMath::RadToDeg() );
+		  fRunPara->fExcludeFromBackground_West[k]  += fRunPara->fRunList[i].fSkyMapCentreWest;
+		  fRunPara->fExcludeFromBackground_North[k] += fRunPara->fRunList[i].fSkyMapCentreNorth;
+		  if( TMath::Abs( fRunPara->fExcludeFromBackground_North[k] ) < 1.e-4 ) fRunPara->fExcludeFromBackground_North[k] = 0.;
+		  if( TMath::Abs( fRunPara->fExcludeFromBackground_West[k] ) < 1.e-4 )  fRunPara->fExcludeFromBackground_West[k]  = 0.;
+	     }
+	     else
+	     {
+		  fRunPara->fExcludeFromBackground_West[k]  *= 1.;
+		  fRunPara->fExcludeFromBackground_North[k] *= -1.;
+	     }
+	     fRunPara->fExcludeFromBackground_West[k]  *= -1.;
       	}
-      /////////////////////////////////////////////////////////
-      	fMeanSourceRA  += i_ra;
-      	fMeanSourceDec += i_dec;
-      }
-// calculate mean ra/dec
-      if( fAstro.size() > 0. )
-      {
-      	fMeanSourceDec = fMeanSourceDec / (double)fAstro.size() * 180. / TMath::Pi();
-      	fMeanSourceRA  = fMeanSourceRA / (double)fAstro.size() * 180. / TMath::Pi();
       }
 }
+/////////////////////////////////////////////////////////
 
 
 void VStereoAnalysis::setCuts( sRunPara iL, int irun )
@@ -1739,4 +1685,14 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
 
       if( fTreeSelectedEvents ) fTreeSelectedEvents->Fill();
 
+}
+
+void VStereoAnalysis::getDerotatedCoordinates( VSkyCoordinates *iAstro,  double i_UTC, double x, double y, double &x_derot, double &y_derot )
+{
+   if( !iAstro ) return;
+
+// (!!!! Y coordinate reflected in eventdisplay for version < v.3.43 !!!!)
+// ( don't change signs if you don't know why! )
+    iAstro->derotateCoords( i_UTC, x, y, x_derot, y_derot );
+    y_derot *= -1.;
 }

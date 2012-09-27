@@ -70,12 +70,6 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             printHelp();
             return false;
         }
-// print target list
-        if( iTemp.rfind( "printtarget" ) < iTemp.size() )
-        {
-            printTargets();
-            exit( 0 );
-        }
         if( iTemp.find( "debug" ) < iTemp.size() )
         {
             fRunPara->fDebug = true;
@@ -1265,8 +1259,6 @@ void VReadRunParameter::printHelp()
     cout << "---------" << endl;
     cout << "\t -elevation \t\t\t\t telescope elevation (preli)" << endl;
     cout << "\t -azimuth \t\t\t\t telescope azimuth (preli)" << endl;
-    cout << "\t -target TARGET \t\t\t telescope is pointed to this target (use -print targets to print available targets)" << endl;
-    cout << "\t -printtargets \t\t\t\t print available targets" << endl;
     cout << "\t -declination=DEC \t\t\t target is at this declination (J2000)" << endl;
     cout << "\t -rightascension=RA \t\t\t target is at this right ascension (J2000)" << endl;
     cout << "\t -decoffset=DEC \t\t\t offset added to target declination (degrees)" << endl;
@@ -1382,13 +1374,6 @@ void VReadRunParameter::printHelp()
 bool VReadRunParameter::readConfigFile( string iCfile )
 {
     return false;
-}
-
-
-void VReadRunParameter::printTargets()
-{
-    VTargets iT;
-    iT.printTargets();
 }
 
 

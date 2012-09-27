@@ -159,8 +159,8 @@ VMonoPlots::VMonoPlots( bool ison, CData *tree, string i_hsuffix, VAnaSumRunPara
     {
         if( fTarget.selectTargetbyName( iTarget ) )
         {
-            i_dec = fTarget.getTargetDec();
-            i_ra  = fTarget.getTargetRA();
+            i_dec = fTarget.getTargetDecJ2000();
+            i_ra  = fTarget.getTargetRAJ2000();
         }
         else
         {

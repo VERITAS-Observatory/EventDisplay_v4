@@ -106,7 +106,7 @@ INCLUDEFLAGS  = -I. -I./inc/
 # linux depending flags
 ifeq ($(ARCH),Linux)
 LDFLAGS       = -O
-SOFLAGS       = -shared 
+SOFLAGS       = -shared
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
@@ -1108,7 +1108,7 @@ $(vtspara):
 	mkdir -p $(vtspara)/NOISE
 	cp -LR $(VERITAS_EVNDISP_ANA_DIR)/NOISE/*.grisu $(vtspara)/NOISE
 	mkdir -p $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.d20120322-cut-N* $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.d20120909-cut-N* $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.GammaHadron.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
@@ -1123,9 +1123,9 @@ $(vtspara):
 	mkdir -p $(vtspara)/RadialAcceptances
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/radialAcceptance-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/RadialAcceptances/
 	mkdir -p $(vtspara)/EffectiveAreas
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/EffectiveAreas/effArea-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/EffectiveAreas/
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/EffectiveAreas/effArea-d20120909-cut* $(vtspara)/EffectiveAreas/
 	mkdir -p $(vtspara)/Tables
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20120628_GrIsuApr12*.* $(vtspara)/Tables/
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20120924_GrIsuApr12* $(vtspara)/Tables/
 
 ###############################################################################################################################
 # print environment and compilation parameters

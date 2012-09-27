@@ -113,7 +113,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 // parameter for energy spectra (in log E)
     fEnergyReconstructionSpectralIndex = 2.5;
     fEnergyReconstructionMethod = 0;
-    bEffectiveAreaVsEnergyMC = false;             // default: use effective areas vs reconstructed energy
+    fEffectiveAreaVsEnergyMC = 2;             // default: use effective areas vs reconstructed energy (accurate method)
     fEnergySpectrumBinSize = 0.05;
     fEnergyFitMin = -0.5;
     fEnergyFitMax = 0.5;
@@ -379,12 +379,13 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             else if( temp == "ENERGYMAXFIT" ) fEnergyFitMax = atof( temp2.c_str() );
             else if( temp == "ENERGYEFFECTIVEAREAS" )
             {
-                if( temp2 == "MC" ) bEffectiveAreaVsEnergyMC = true;
-                else if( temp2 == "REC" ) bEffectiveAreaVsEnergyMC = false;
+                if( temp2 == "MC" )        fEffectiveAreaVsEnergyMC = 0;
+                else if( temp2 == "REC" )  fEffectiveAreaVsEnergyMC = 1;
+		else if( temp2 == "PROB" ) fEffectiveAreaVsEnergyMC = 2;
                 else
                 {
                     cout << "Unknown parameter for ENERGYEFFECTIVEAREAS in parameter file " << i_filename << ": " << temp2 << endl;
-                    cout << "use MC or REC" << endl;
+                    cout << "use MC, REC or PROB (default)" << endl;
                     return 0;
                 }
             }
@@ -691,8 +692,9 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         cout << "\t sky plot binning [deg] " << fSkyMapBinSize << "\t" << fSkyMapBinSizeUC << endl;
         cout << "\t sky plot size [deg]: " << fSkyMapSizeXmin << " < X < " << fSkyMapSizeXmax << ", " << fSkyMapSizeYmin << " < Y < " << fSkyMapSizeYmax << endl;
         cout << "\t energy spectra parameters (binsize, min, max) (log): " << fEnergySpectrumBinSize << "\t" << fEnergyFitMin << "\t" << fEnergyFitMax;
-        if( bEffectiveAreaVsEnergyMC ) cout << " (use effective area A_MC)";
-        else                           cout << " (use effective area A_REC)";
+        if( fEffectiveAreaVsEnergyMC == 0 )      cout << " (use effective area A_MC)";
+	else if( fEffectiveAreaVsEnergyMC == 1 ) cout << " (use effective area A_REC)";
+        else                                     cout << " (use effective area A_PROB)";
         cout << ", Method " << fEnergyReconstructionMethod << endl;
 
         cout << "\t background model: ";
@@ -912,7 +914,8 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
             fMapRunList[fRunList[i].fRunOn].fTargetDecJ2000 = dec;
         }
 // set centre of stereo maps (if this parameter is not set in the file runparameter.dat)
-        if( TMath::Abs( fSkyMapCentreNorth ) < 1.e-8 && TMath::Abs( fSkyMapCentreWest ) < 1.e-8 && TMath::Abs( fSkyMapCentreRAJ2000 ) < 1.e-8 && TMath::Abs( fSkyMapCentreDecJ2000 ) < 1.e-8 )
+        if( TMath::Abs( fSkyMapCentreNorth ) < 1.e-8 && TMath::Abs( fSkyMapCentreWest ) < 1.e-8
+	 && TMath::Abs( fSkyMapCentreRAJ2000 ) < 1.e-8 && TMath::Abs( fSkyMapCentreDecJ2000 ) < 1.e-8 )
         {
             fRunList[i].fSkyMapCentreNorth    = 0.;
             fRunList[i].fSkyMapCentreWest     = 0.;

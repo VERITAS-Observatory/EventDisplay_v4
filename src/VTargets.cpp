@@ -6,7 +6,6 @@
     \author
     Gernot Maier
 
-    Revision $Id: VTargets.cpp,v 1.33.2.1.4.4.12.1.8.2.10.1 2010/03/08 07:39:53 gmaier Exp $
 */
 
 #include "VTargets.h"
@@ -141,7 +140,6 @@ void VTargets::printTargets()
     for( unsigned int i = 0; i < fTargetCode.size(); i++ )
     {
         cout << i << "\t";
-//       cout << fTargetCode[i] << "\t";
         cout << fTargetName[i] << "\t";
         if( fTargetName[i].size() < 8 ) cout << "\t";
         cout << fDec2000[i] << "\t";
@@ -219,14 +217,14 @@ string VTargets::getTargetName()
 }
 
 
-double VTargets::getTargetDec()
+double VTargets::getTargetDecJ2000()
 {
     if( fIndexSelected == 9999 || fDec2000rad.size() <= fIndexSelected ) return -999.;
     return fDec2000rad[fIndexSelected];
 }
 
 
-double VTargets::getTargetRA()
+double VTargets::getTargetRAJ2000()
 {
     if( fIndexSelected == 9999 || fRA2000rad.size() <= fIndexSelected ) return -999.;
     return fRA2000rad[fIndexSelected];
@@ -253,32 +251,3 @@ void VTargets::setTarget( string iname, double iRaJ2000, double iDecJ2000 )
     fIndexSelected = fTargetCode.size() - 1;
 }
 
-
-double VTargets::getTargetShiftWest( double ira, double idec )
-{
-    double degra = atan(1.)/45.;
-
-    double sep  = slaDsep(  getTargetRAJ2000(), getTargetDecJ2000(), ira * degra, idec * degra );
-    double bear = slaDbear( getTargetRAJ2000(), getTargetDecJ2000(), ira * degra, idec * degra );
-
-    double iShift = sep * sin( bear ) / degra;
-
-    if( TMath::Abs( iShift ) < 1.e-8 ) iShift = 0.;
-
-    return iShift;
-}
-
-
-double VTargets::getTargetShiftNorth( double ira, double idec )
-{
-    double degra = atan(1.)/45.;
-
-    double sep  = slaDsep(  getTargetRAJ2000(), getTargetDecJ2000(), ira * degra, idec * degra );
-    double bear = slaDbear( getTargetRAJ2000(), getTargetDecJ2000(), ira * degra, idec * degra );
-
-    double iShift = sep * cos( bear ) / degra;
-
-    if( TMath::Abs( iShift ) < 1.e-8 ) iShift = 0.;
-
-    return iShift;
-}

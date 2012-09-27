@@ -96,8 +96,8 @@ bool VSkyCoordinates::setTarget( string iTargetName )
     if( iTarget.selectTargetbyName( iTargetName ) )
     {
         fTargetName = iTargetName;
-        fTargetDec = iTarget.getTargetDec();
-        fTargetRA  = iTarget.getTargetRA();
+        fTargetDec = iTarget.getTargetDecJ2000();
+        fTargetRA  = iTarget.getTargetRAJ2000();
         fTelRA = fTargetRA;
         fTelDec = fTargetDec;
         fTelRA_deg = fTelRA * TMath::RadToDeg();

@@ -301,7 +301,6 @@ void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<d
         cout << "VRadialAcceptance::setRegionToExcludeAcceptance: error: vectors of exclusion regions have different size: ";
         cout << fXE.size() << " " << fYE.size() << " " << fRE.size() << endl;
     }
-
 }
 
 

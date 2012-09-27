@@ -16,7 +16,6 @@
 #include <VGlobalRunParameter.h>
 #include <VDBRunInfo.h>
 #include <VEvndispRunParameter.h>
-#include <VTargets.h>
 #include <VUtilities.h>
 
 class VReadRunParameter
@@ -52,7 +51,6 @@ class VReadRunParameter
         {
             return fRunPara;
         }
-        void printTargets();                      //!< print targets
 	void printStartMessage();
                                                   //!< read in all run parameters from command line
         bool readCommandline( int argc, char *arg[] );

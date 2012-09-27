@@ -43,15 +43,9 @@ class VTargets
         VTargets();
         ~VTargets() {}
         string getTargetCode();
-        double getTargetDec();
-        double getTargetDecJ2000() { return getTargetDec(); }
+        double getTargetDecJ2000();
         string getTargetName();
-        double getTargetRA();
-        double getTargetRAJ2000() { return getTargetRA(); }
-                                                  // all in [deg]
-        double getTargetShiftWest( double ira, double idec );
-                                                  // all in [deg]
-        double getTargetShiftNorth( double ira, double idec );
+        double getTargetRAJ2000();
         void printTargets();                      // print target list to stdout
         bool readTargets( string iTargetFile );   // read targets from a text file
                                                   // use this target

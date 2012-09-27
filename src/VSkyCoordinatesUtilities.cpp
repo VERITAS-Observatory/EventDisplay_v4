@@ -38,6 +38,8 @@ void VSkyCoordinatesUtilities::rotate( const double theta_rad, double& x, double
 /*!
     calculate wobble offsets in ra,dec
 
+    (all angles in degrees)
+
     based on wobble.cpp from SFegan
 */
 void VSkyCoordinatesUtilities::getWobbleOffsets( double iNorth, double iEast, double idec, double ira, double &idiffdec, double &idiffra )
@@ -66,7 +68,9 @@ void VSkyCoordinatesUtilities::getWobbleOffsets( double iNorth, double iEast, do
     if( TMath::Abs( idiffdec ) < 1.e-9 )  idiffdec = 0.;
 }
 
-
+/*
+   [rad]
+*/
 double VSkyCoordinatesUtilities::precessTarget( double iMJD, double &ra, double &dec )
 {
     int  oy, om, od, j, ny, nd;
@@ -186,3 +190,28 @@ double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az )
     return slaDranrm( az/TMath::RadToDeg()) * TMath::RadToDeg();
 }
 
+
+double VSkyCoordinatesUtilities::getTargetShiftWest( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg )
+{
+    double sep  = slaDsep(  iTargetRA_deg*TMath::DegToRad(), iTargetDec_deg*TMath::DegToRad(), ira_deg*TMath::DegToRad(), idec_deg*TMath::DegToRad() );
+    double bear = slaDbear( iTargetRA_deg*TMath::DegToRad(), iTargetDec_deg*TMath::DegToRad(), ira_deg*TMath::DegToRad(), idec_deg*TMath::DegToRad() );
+
+    double iShift = sep * sin( bear ) * TMath::RadToDeg();
+
+    if( TMath::Abs( iShift ) < 1.e-8 ) iShift = 0.;
+
+    return iShift;
+}
+
+
+double VSkyCoordinatesUtilities::getTargetShiftNorth( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg )
+{
+    double sep  = slaDsep(  iTargetRA_deg*TMath::DegToRad(), iTargetDec_deg*TMath::DegToRad(), ira_deg*TMath::DegToRad(), idec_deg*TMath::DegToRad() );
+    double bear = slaDbear( iTargetRA_deg*TMath::DegToRad(), iTargetDec_deg*TMath::DegToRad(), ira_deg*TMath::DegToRad(), idec_deg*TMath::DegToRad() );
+
+    double iShift = sep * cos( bear ) * TMath::RadToDeg();
+
+    if( TMath::Abs( iShift ) < 1.e-8 ) iShift = 0.;
+
+    return iShift;
+}

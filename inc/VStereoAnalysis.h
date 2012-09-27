@@ -97,15 +97,10 @@ class VStereoAnalysis
         bool fIsOn;
         bool fNoSkyPlots;                         //! do full sky plots (if false, analysed source region only)
 
-        double fMeanSourceDec;
-        double fMeanSourceRA;
-
         VAnaSumRunParameter *fRunPara;
 
-        TGraphAsymmErrors *gMeanEffectiveAreaErec;
-        TGraphAsymmErrors *gMeanEffectiveAreaEmc;
-	TGraph2DErrors    *gTimeBinnedMeanEffectiveAreaErec;
-        TGraph2DErrors    *gTimeBinnedMeanEffectiveAreaEmc;
+        TGraphAsymmErrors *gMeanEffectiveArea;
+	TGraph2DErrors    *gTimeBinnedMeanEffectiveArea;
         TGraphErrors      *gMeanEsys_MC;
 
         VStereoMaps* fMap;
@@ -230,6 +225,9 @@ class VStereoAnalysis
 	void fill_TreeWithSelectedEvents( CData* );
 	bool init_TreeWithSelectedEvents( int, bool );
 	void reset_TreeWithSelectedEvents();
+
+// derotation and J2000
+        void getDerotatedCoordinates( VSkyCoordinates* iAstro, double i_UTC, double x, double y, double &x_derot, double &y_derot );
 
 // Returning frogs value for 
 	double getXcore()
