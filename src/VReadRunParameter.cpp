@@ -580,9 +580,9 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fDoublePass = false;
         }
-        else if( iTemp.find( "removeisolatedpixel" ) < iTemp.size() )
+        else if( iTemp.find( "recoverimagesneardeadpixel" ) < iTemp.size() )
         {
-            fRunPara->fRemoveIsolatedPixel = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
+            fRunPara->frecoverImagePixelNearDeadPixel = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
             i++;
         }
         else if( iTemp.find( "smoothdead" ) < iTemp.size() )

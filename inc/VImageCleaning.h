@@ -15,7 +15,7 @@ class VImageCleaning
 
 	void cleanImageWithTiming( double, double, double, double, double, int, int, bool );                // time image cleaning
         void fillImageBorderNeighbours();
-        void removeIsolatedPixels();
+        void recoverImagePixelNearDeadPixel();
 	void mergeClusters(); 
 	void printDataError( string iFunctionName );
 	void removeSmallClusters( int ); 
@@ -32,7 +32,6 @@ class VImageCleaning
 // time cluster cleaning
 	void cleanImageFixedWithTiming( double, double, double, double, double, int, int );             
 	void cleanImagePedvarsWithTiming(double, double, double, double, double, int, int );           
-        void cleanImage_clusterCleaning( double threshold_clustersize );
 
 // NN image cleaning
         bool  kInitNNImageCleaning;

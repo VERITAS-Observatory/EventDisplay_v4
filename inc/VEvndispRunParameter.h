@@ -158,7 +158,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         vector< float > fLogLikelihoodLoss_min;   // do loglikelihood image parameterisation if loss is larger than this value
 	vector< int > fLogLikelihood_Ntubes_min; //  do loglikelihood image parameterisation if ntubes is larger than this value
         float  fImageAnalysisFUIFactor;           // FUI factor for image analysis
-        bool   fRemoveIsolatedPixel;
+        bool   frecoverImagePixelNearDeadPixel;
         bool   fFillImageBorderNeighbours;
         bool   fSmoothDead;                       // smooth dead pixels (default: off )
 

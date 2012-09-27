@@ -125,7 +125,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fFixWindowStart = false;
     fDoublePass = true;
     fDynamicIntegrationWindow = true;
-    fRemoveIsolatedPixel = true;
+    frecoverImagePixelNearDeadPixel = true;
     fFillImageBorderNeighbours = true;
     fTraceWindowShift.push_back( -1 );
     fTraceIntegrationMethod.push_back( 1 );
