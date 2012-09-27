@@ -188,12 +188,12 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
             cout << " (run " << fRunList[i].runnumber << ")" << endl;
         }
 // get effective area
-        hname = "gMeanEffectiveAreaErec";
+        hname = "gMeanEffectiveArea";
         TGraphErrors *i_gEff = (TGraphErrors*)getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
         if( fAnalysisEnergyThresholdDefinition == 2 && !i_gEff )
         {
 // second choice: try to get off effective areas (might even have better statistics)
-            hname = "gMeanEffectiveAreaErec_off";
+            hname = "gMeanEffectiveArea_off";
 	    i_gEff = (TGraphErrors*)getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
 	    if( !i_gEff )
 	    {
@@ -1555,3 +1555,66 @@ int VEnergySpectrum::getRebinningGrouping( TH1* h, double iNewBinWidth )
     return ngroup;
 }
 
+/*
+
+   short cut to plot the Crab Nebula spectra (sets axis correctly, etc)
+
+*/
+TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierIndex, double i_FitStart_TevLin, double i_FitStop_TeVLin, double i_EnergyBinningLog10 )
+{
+// binning and statistics
+   setEnergyBinning( i_EnergyBinningLog10 );
+   setEnergyRangeLinear( 0.10, 500. );
+   setSignificanceParameters( -5., -5. );
+   setPlottingMultiplierIndex( iPlottingMultiplierIndex );
+
+// plotting
+   setPlottingEnergyRangeLinear( 0.08, 50. );
+   setPlottingYaxis( 1e-15, 1.e-6 );
+   if( iPlottingMultiplierIndex > 2. )
+   {
+      setPlottingYaxis( 9.e-12, 2.e-10 );
+   }
+
+// plot & fit
+   TCanvas *c = plot();
+
+   setSpectralFitFluxNormalisationEnergy( 1. );
+   setSpectralFitRangeLin( i_FitStart_TevLin, i_FitStop_TeVLin );
+   fitEnergySpectrum();
+   if( iPlottingMultiplierIndex < 2. )
+   {
+      plotFitValues();
+      plotEventNumbers();
+   }
+   plotResiduals();
+   plotLifeTimevsEnergy();
+   plotCountingHistograms();
+
+   VEnergySpectrumfromLiterature l( "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat" );
+   l.setPlottingMultiplierIndex( iPlottingMultiplierIndex );
+
+   l.setPlottingStyle( 2, 2, 2, 25 );
+   l.listValues( 1 );
+   l.plot( 1, c );
+   l.setPlottingStyle( 3, 2, 2, 25 );
+   l.listValues( 2 );
+   l.plot( 2, c );
+   l.setPlottingStyle( 4, 2, 2, 25 );
+   l.listValues( 3 );
+   l.plot( 3, c );
+   l.setPlottingStyle( 5, 2, 2, 25 );
+   l.listValues( 4 );
+   l.plot( 4, c );
+   l.setPlottingStyle( 6, 2, 2, 25 );
+   l.listValues( 5 );
+   l.plot( 5, c );
+   l.setPlottingStyle( 7, 2, 2, 25 );
+   l.listValues( 6 );
+   l.plot( 6, c );
+   l.setPlottingStyle( 8, 2, 2, 25 );
+   l.listValues( 7 );
+   l.plot( 7, c );
+
+   return c;
+}

@@ -6,6 +6,7 @@
 
 #include "VAnalysisUtilities.h"
 #include "VDifferentialFlux.h"
+#include "VEnergySpectrumfromLiterature.h"
 #include "VEnergyThreshold.h"
 #include "VMathsandFunctions.h"
 #include "VPlotUtilities.h"
@@ -151,6 +152,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         bool      isZombie() { return bZombie; }
         void      printDifferentialFluxes( bool bSED = false );
         TCanvas*  plot( TCanvas *c = 0 );
+	TCanvas*  plotCrabNebulaSpectrum( double iPlottingMultiplierIndex = 0., double i_FitStart_TevLin = 0.1, double i_FitStop_TeVLin = 20., double i_EnergyBinningLog10 = 0.1 );
         TCanvas*  plotCountingHistograms( TCanvas *c = 0 );
         void      plotEventNumbers( Double_t ts = 0.02 );
         void      plotFitValues();
@@ -189,6 +191,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setPlottingSpectralWeightForBinCenter( double iS = -2.5 ) { fPlottingSpectralWeightForBinCenter = iS; }
         void setPlottingYaxis( double iMin = 1.e-14, double iMax = 1.e-8 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
-        ClassDef(VEnergySpectrum,7);
+        ClassDef(VEnergySpectrum,8);
 };
 #endif
