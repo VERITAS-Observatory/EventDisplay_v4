@@ -70,7 +70,7 @@ void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double br
 // trigger vector are image/border tubes
     if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 || fData->getReader()->getDataFormatNum() == 6 ) fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
 // (end of preli)
-    if( fData->getRunParameter()->fRemoveIsolatedPixel )       removeIsolatedPixels();
+    if( fData->getRunParameter()->frecoverImagePixelNearDeadPixel ) recoverImagePixelNearDeadPixel();
     if( fData->getRunParameter()->fFillImageBorderNeighbours ) fillImageBorderNeighbours();
 }
 
@@ -128,7 +128,7 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
     }
 // (end of preli)
 
-    removeIsolatedPixels();
+    recoverImagePixelNearDeadPixel();
     fillImageBorderNeighbours();
 }
 //*****************************************************************************************************
@@ -609,7 +609,7 @@ void VImageCleaning::cleanNNImageFixed()
 
         }
     }
-    removeIsolatedPixels();
+    recoverImagePixelNearDeadPixel();
     //fillImageBorderNeighbours();
 }
 
@@ -1261,7 +1261,7 @@ void VImageCleaning::fillImageBorderNeighbours()
 }
 
 
-void VImageCleaning::removeIsolatedPixels()
+void VImageCleaning::recoverImagePixelNearDeadPixel()
 {
 // loop again to remove isolated image pixels
 // if neighbour is dead, check neighbours of this dead channel (see e.g. run 329 event 709)
@@ -1308,50 +1308,6 @@ void VImageCleaning::removeIsolatedPixels()
     }
 
 }
-
-/*
-
-   not clear what this function does...
-
-   Who implemented it?
-
-   Obsolete?
-
-*/
-void VImageCleaning::cleanImage_clusterCleaning( double threshold_clustersize )
-{
-// calculates the valarray of tubes to be included in the parameterization
-    fData->setImage( false );
-    fData->setBorder( false );
-    fData->setBrightNonImage( false );
-    fData->setImageBorderNeighbour( false );
-    unsigned int i_nchannel = fData->getNChannels();
-
-    for ( unsigned int i=0; i < i_nchannel; i++)
-    {
-        if( fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead(fData->getHiLo()[i])[i] ) continue;
-
-// calculate size of this cluster
-        double iClusterSize = fData->getSums()[i];
-
-        for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[i].size(); j++ )
-        {
-            unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
-            if( fData->getDetectorGeo()->getAnaPixel()[k] < 1 || fData->getDead(fData->getHiLo()[k])[k] ) continue;
-
-            if( k < fData->getImage().size() ) iClusterSize += fData->getSums()[k];
-        }
-        if( iClusterSize > threshold_clustersize ) fData->setImage( i, true );
-    }
-// (preli) set the trigger vector in MC case (preli)
-// trigger vector are image/border tubes
-    if( fData->getReader()->getDataFormat() == "grisu" || fData->getReader()->getDataFormat() == "DST" ) fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
-// (end of preli)
-
-    removeIsolatedPixels();
-    fillImageBorderNeighbours();
-}
-
 
 //
 // MS: produce a trigger map for calculation of  binary-image Hillas parameters and apply some sort of cleaning algorithm to reject noisy pixels
