@@ -38,6 +38,7 @@ void VTMVAEvaluator::reset()
    fTheta2 = 0.;
    fCoreDist = 0.;
    fDummy = 0.;
+   for( int i = 0; i < VDST_MAXTELESCOPES; i++ ) fImages_Ttype[i] = 0.;
 
    fTMVAMethodName_BOXCUTS = false;
    setTMVACutValue();
@@ -315,6 +316,19 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	 {
 	    fTMVAReader.back()->AddVariable( "sqrt(Xcore*Xcore+Ycore*Ycore)", &fCoreDist );
          }
+// Note: assume not more then 3 different telescope types
+	 else if( iTrainingVariables[t] == "NImages_Ttype[0]" )
+	 {
+	    fTMVAReader.back()->AddVariable( "NImages_Ttype[0]", &fImages_Ttype[0] );
+         }
+	 else if( iTrainingVariables[t] == "NImages_Ttype[1]" )
+	 {
+	    fTMVAReader.back()->AddVariable( "NImages_Ttype[1]", &fImages_Ttype[1] );
+         }
+	 else if( iTrainingVariables[t] == "NImages_Ttype[2]" )
+	 {
+	    fTMVAReader.back()->AddVariable( "NImages_Ttype[2]", &fImages_Ttype[2] );
+         }
 	 else if( iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
@@ -492,6 +506,9 @@ bool VTMVAEvaluator::evaluate()
        if( fTMVAIgnoreTheta2Cut ) fTheta2 = 1.e-30;
        else                       fTheta2 = fData->Xoff*fData->Xoff + fData->Yoff*fData->Yoff;
        fCoreDist = sqrt( fData->Xcore*fData->Xcore+fData->Ycore*fData->Ycore );
+       if( fData->NTtype > 0 ) fImages_Ttype[0] = (float)fData->NImages_Ttype[0];
+       if( fData->NTtype > 1 ) fImages_Ttype[1] = (float)fData->NImages_Ttype[1];
+       if( fData->NTtype > 2 ) fImages_Ttype[2] = (float)fData->NImages_Ttype[2];
    }
    else return false;
 

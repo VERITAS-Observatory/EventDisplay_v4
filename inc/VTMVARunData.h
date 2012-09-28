@@ -70,6 +70,9 @@ class VTMVARunData : public TNamed
     string            fPrepareTrainingOptions;
     vector< VTMVARunDataEnergyCut* > fEnergyCutData;
 
+// analysis variables
+    int               fNTtype;
+
 // MVA methods
     vector< string >  fMVAMethod;
     vector< string >  fMVAMethod_Options;
@@ -82,7 +85,7 @@ class VTMVARunData : public TNamed
     void setDebug( bool iB = true ) { fDebug = iB; }
     void setName( string iN ) { fName = iN; }
 
-    ClassDef(VTMVARunData, 5 );
+    ClassDef(VTMVARunData, 6 );
 };
 
 #endif

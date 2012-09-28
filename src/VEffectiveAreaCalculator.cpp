@@ -1675,8 +1675,8 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 
     fCuts->printCutStatistics();
 
-// uniqueness of events
-    cout << "event statistics: " << endl;
+// print out uniqueness of events
+/*    cout << "event statistics: " << endl;
     if( iSuccessfullEventStatistics > 0 )
     {
        map< unsigned int, unsigned short int>::iterator it;
@@ -1688,7 +1688,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 	  }
        }
     }
-    else iSuccessfullEventStatistics *= -1;
+    else iSuccessfullEventStatistics *= -1; */
     cout << "\t total number of events after cuts: " << iSuccessfullEventStatistics << endl;
 
     return true;

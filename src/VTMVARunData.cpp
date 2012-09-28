@@ -1,7 +1,6 @@
 /*! \class VTMVARunData
     \brief run parameter data class for TMVA optimization
 
-	Revision $Id: VTMVARunData.cpp,v 1.1.2.5 2011/04/11 16:09:05 gmaier Exp $
 
     \author Gernot Maier
 */
@@ -25,6 +24,8 @@ VTMVARunData::VTMVARunData()
    fBackgroundWeight = 1.;
    fMinSignalEvents = 50;
    fMinBackgroundEvents = 0;
+
+   fNTtype = -1;
 }
 
 /*!
@@ -55,6 +56,14 @@ bool VTMVARunData::openDataFiles()
          cout << "aborting..." << endl;
          return false;
       }
+// get for first tree the number of telescope types
+      if( fNTtype < 0 )
+      {
+         UInt_t NTtype = 0;
+	 fSignalTree.back()->SetBranchAddress("NTtype", &NTtype );
+	 fSignalTree.back()->GetEntry( 0 );
+	 fNTtype = (int)NTtype;
+       }
    }
 // open background trees
    fBackgroundFile.clear();

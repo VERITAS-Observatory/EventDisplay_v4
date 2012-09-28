@@ -1,10 +1,7 @@
 /*! \file  trainTMVAforGammaHadronSeparation.cpp
     \brief  use TMVA methods for gamma/hadron separation
 
-    $Rev$
-    $Date$
-    $Author$
-
+    \author Gernot Maier
 */
 
 #include "TCut.h"
@@ -41,7 +38,6 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
         return false;
     }
 
-
     TMVA::Tools::Instance();
 
 // set output directory
@@ -72,7 +68,19 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
    }
    for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
    {
-      factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
+      if( iRun->fTrainingVariable[i].find( "NImages_Ttype" ) != string::npos )
+      {
+	 for( int j = 0; j < iRun->fNTtype; j++ )
+	 {
+	    ostringstream iTemp;
+	    iTemp << iRun->fTrainingVariable[i] << "[" << j << "]";
+	    factory->AddVariable( iTemp.str().c_str(), iRun->fTrainingVariableType[i] );
+	 }
+      }
+      else
+      {
+           factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
+      }
    }
 // adding spectator variables
    for( unsigned int i = 0; i < iRun->fSpectatorVariable.size(); i++ )

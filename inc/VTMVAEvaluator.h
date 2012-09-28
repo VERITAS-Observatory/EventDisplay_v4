@@ -5,6 +5,7 @@
 #define  VTMVAEvaluator_H
 
 #include "CData.h"
+#include "VGlobalRunParameter.h"
 #include "VMathsandFunctions.h"
 #include "VPlotUtilities.h"
 #include "VStatistics.h"
@@ -94,6 +95,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    float    fSizeSecondMax_log10;
    float    fTheta2;
    float    fCoreDist;
+   float    fImages_Ttype[VDST_MAXTELESCOPES];
    float    fDummy;
 
    bool     bPlotEfficiencyPlotsPerEnergy;
@@ -145,7 +147,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 9 );
+   ClassDef(VTMVAEvaluator, 10 );
 };
 
 #endif

@@ -13,12 +13,11 @@
 #include <TChain.h>
 #include <TFile.h>
 
+#include "VGlobalRunParameter.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <string>
-
-// maximum number of telescopes
-#define MAXTEL 100
 
 using namespace std;
 
@@ -43,10 +42,10 @@ class CData
         Int_t           eventNumber;
         Int_t           MJD;
         Double_t        Time;
-        Double_t        TelElevation[MAXTEL];
-        Double_t        TelAzimuth[MAXTEL];
-        Double_t        TelDec[MAXTEL];
-        Double_t        TelRA[MAXTEL];
+        Double_t        TelElevation[VDST_MAXTELESCOPES];
+        Double_t        TelAzimuth[VDST_MAXTELESCOPES];
+        Double_t        TelDec[VDST_MAXTELESCOPES];
+        Double_t        TelRA[VDST_MAXTELESCOPES];
         Double_t        TargetElev;
         Double_t        TargetAz;
         Double_t        TargetDec;
@@ -73,9 +72,9 @@ class CData
         Int_t           NImages;
         UInt_t          ImgSelS;
         ULong64_t       ImgSel;
-	UInt_t          ImgSel_list[MAXTEL];
+	UInt_t          ImgSel_list[VDST_MAXTELESCOPES];
 	UInt_t          NTtype;
-	UInt_t		NImages_Ttype[MAXTEL];
+	UInt_t		NImages_Ttype[VDST_MAXTELESCOPES];
         Double_t        img2_ang;
         Double_t        Ze;
         Double_t        Az;
@@ -94,35 +93,35 @@ class CData
         Double_t        stdP;
         Double_t        Chi2;
         Float_t         meanPedvar_Image;
-        Float_t         meanPedvar_ImageT[MAXTEL];
-        Double_t        dist[MAXTEL];
-        Double_t        size[MAXTEL];
-        Double_t        loss[MAXTEL];
-        Double_t        max1[MAXTEL];
-        Double_t        max2[MAXTEL];
-        Double_t        max3[MAXTEL];
-        Int_t           maxindex1[MAXTEL];
-        Int_t           maxindex2[MAXTEL];
-        Int_t           maxindex3[MAXTEL];
-        Double_t        width[MAXTEL];
-        Double_t        length[MAXTEL];
-        Int_t           ntubes[MAXTEL];
-        Int_t           ntubesBNI[MAXTEL];
-        UShort_t        nsat[MAXTEL];
-        UShort_t        nlowgain[MAXTEL];
-        Double_t        alpha[MAXTEL];
-        Double_t        los[MAXTEL];
-        Double_t        asym[MAXTEL];
-        Double_t        cen_x[MAXTEL];
-        Double_t        cen_y[MAXTEL];
-        Double_t        cosphi[MAXTEL];
-        Double_t        sinphi[MAXTEL];
-        Double_t        tgrad_x[MAXTEL];
-        Double_t        tchisq_x[MAXTEL];
-        Double_t        R[MAXTEL];
-        Double_t        MSCWT[MAXTEL];
-        Double_t        MSCLT[MAXTEL];
-        Double_t        E[MAXTEL];
+        Float_t         meanPedvar_ImageT[VDST_MAXTELESCOPES];
+        Double_t        dist[VDST_MAXTELESCOPES];
+        Double_t        size[VDST_MAXTELESCOPES];
+        Double_t        loss[VDST_MAXTELESCOPES];
+        Double_t        max1[VDST_MAXTELESCOPES];
+        Double_t        max2[VDST_MAXTELESCOPES];
+        Double_t        max3[VDST_MAXTELESCOPES];
+        Int_t           maxindex1[VDST_MAXTELESCOPES];
+        Int_t           maxindex2[VDST_MAXTELESCOPES];
+        Int_t           maxindex3[VDST_MAXTELESCOPES];
+        Double_t        width[VDST_MAXTELESCOPES];
+        Double_t        length[VDST_MAXTELESCOPES];
+        Int_t           ntubes[VDST_MAXTELESCOPES];
+        Int_t           ntubesBNI[VDST_MAXTELESCOPES];
+        UShort_t        nsat[VDST_MAXTELESCOPES];
+        UShort_t        nlowgain[VDST_MAXTELESCOPES];
+        Double_t        alpha[VDST_MAXTELESCOPES];
+        Double_t        los[VDST_MAXTELESCOPES];
+        Double_t        asym[VDST_MAXTELESCOPES];
+        Double_t        cen_x[VDST_MAXTELESCOPES];
+        Double_t        cen_y[VDST_MAXTELESCOPES];
+        Double_t        cosphi[VDST_MAXTELESCOPES];
+        Double_t        sinphi[VDST_MAXTELESCOPES];
+        Double_t        tgrad_x[VDST_MAXTELESCOPES];
+        Double_t        tchisq_x[VDST_MAXTELESCOPES];
+        Double_t        R[VDST_MAXTELESCOPES];
+        Double_t        MSCWT[VDST_MAXTELESCOPES];
+        Double_t        MSCLT[VDST_MAXTELESCOPES];
+        Double_t        E[VDST_MAXTELESCOPES];
         Double_t        ES[4];
         Int_t           NMSCW;
         Double_t        MSCW;
@@ -141,7 +140,7 @@ class CData
         Float_t         EmissionHeightChi2;
         UInt_t          NTelPairs;
                                                   //[NTelPairs]
-        Float_t         EmissionHeightT[MAXTEL*MAXTEL];
+        Float_t         EmissionHeightT[VDST_MAXTELESCOPES*VDST_MAXTELESCOPES];
 
 //FROGS
         Int_t   frogsEventID;
@@ -440,7 +439,7 @@ void CData::Init(TTree *tree)
     }
     else
     {
-        for( unsigned int i = 0; i < MAXTEL; i++ )
+        for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
         {
             TelDec[i] = 0.;
             TelRA[i] = 0.;
@@ -540,14 +539,14 @@ void CData::Init(TTree *tree)
         if( !fShort ) fChain->SetBranchAddress("meanPedvar_ImageT",meanPedvar_ImageT );
         else
         {
-            for( unsigned int i = 0; i < MAXTEL; i++ ) meanPedvar_ImageT[i] = 0.;
+            for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ ) meanPedvar_ImageT[i] = 0.;
         }
 
     }
     else
     {
         meanPedvar_Image = 0.;
-        for( int i = 0; i < MAXTEL; i++ ) meanPedvar_ImageT[i] = 0.;
+        for( int i = 0; i < VDST_MAXTELESCOPES; i++ ) meanPedvar_ImageT[i] = 0.;
     }
 
 //AMC 09102009
@@ -573,7 +572,7 @@ void CData::Init(TTree *tree)
     else
     {
        NTtype = 0;
-       for( unsigned int tt = 0; tt < MAXTEL; tt++ ) NImages_Ttype[tt] = 0;
+       for( unsigned int tt = 0; tt < VDST_MAXTELESCOPES; tt++ ) NImages_Ttype[tt] = 0;
     }
 
     if( !fShort )
@@ -583,7 +582,7 @@ void CData::Init(TTree *tree)
         if( fVersion > 2 ) fChain->SetBranchAddress("loss", loss );
         else
         {
-            for( int i = 0; i < MAXTEL; i++ ) loss[i] = 0.;
+            for( int i = 0; i < VDST_MAXTELESCOPES; i++ ) loss[i] = 0.;
         }
 
         fChain->SetBranchAddress("max1",max1);
@@ -598,12 +597,12 @@ void CData::Init(TTree *tree)
         if( fVersion > 2 ) fChain->SetBranchAddress("nsat", nsat );
         else
         {
-            for( int i = 0; i < MAXTEL; i++ ) nsat[i] = 0;
+            for( int i = 0; i < VDST_MAXTELESCOPES; i++ ) nsat[i] = 0;
         }
 	if( fChain->GetBranchStatus( "nlowgain" ) ) fChain->SetBranchAddress( "nlowgain", nlowgain );
 	else
         {
-            for( int i = 0; i < MAXTEL; i++ ) nlowgain[i] = 0;
+            for( int i = 0; i < VDST_MAXTELESCOPES; i++ ) nlowgain[i] = 0;
         }
         fChain->SetBranchAddress("ntubesBNI",ntubesBNI);
         fChain->SetBranchAddress("alpha",alpha);
@@ -618,7 +617,7 @@ void CData::Init(TTree *tree)
     }
     else
     {
-        for( int i = 0; i < MAXTEL; i++ )
+        for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
         {
             dist[i] = 0.;
             size[i] = 0.;
@@ -654,7 +653,7 @@ void CData::Init(TTree *tree)
     }
     else
     {
-        for( int i = 0; i < MAXTEL; i++ )
+        for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
         {
             MSCWT[i] = 0.;
             MSCLT[i] = 0.;
@@ -667,7 +666,7 @@ void CData::Init(TTree *tree)
     }
     else
     {
-        for( int i = 0; i < MAXTEL; i++ )
+        for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
         {
             ES[i] = 0.;
             E[i] = 0.;
@@ -710,7 +709,7 @@ void CData::Init(TTree *tree)
         if( !fShort ) fChain->SetBranchAddress("EmissionHeightT", EmissionHeightT );
         else
         {
-            for( unsigned int i = 0; i < MAXTEL*MAXTEL; i++ ) EmissionHeightT[i] = 0.;
+            for( unsigned int i = 0; i < VDST_MAXTELESCOPES*VDST_MAXTELESCOPES; i++ ) EmissionHeightT[i] = 0.;
         }
     }
     else
@@ -718,7 +717,7 @@ void CData::Init(TTree *tree)
         EmissionHeight = -999.;
         EmissionHeightChi2 = -999.;
         NTelPairs = 0;
-        for( unsigned int i = 0; i < MAXTEL*MAXTEL; i++ ) EmissionHeightT[i] = 0.;
+        for( unsigned int i = 0; i < VDST_MAXTELESCOPES*VDST_MAXTELESCOPES; i++ ) EmissionHeightT[i] = 0.;
     }
     Notify();
 }
