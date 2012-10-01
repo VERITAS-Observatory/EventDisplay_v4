@@ -6,6 +6,7 @@
 
 #include "TCut.h"
 #include "TFile.h"
+#include "TH1D.h"
 #include "TMath.h"
 #include "TSystem.h"
 #include "TTree.h"
@@ -23,6 +24,66 @@
 #include "VTMVARunData.h"
 
 using namespace std;
+
+/*
+   check if a training variable is constant
+
+   return values:
+
+   -1:  value is variable
+   0-N: value is constant (array identifier)
+
+*/
+bool checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariable, bool iSignal )
+{
+   char hname[2000];
+   char htype[20];
+   TH1D *h = 0;
+   cout << "checking";
+   if( iSignal ) cout << " signal";
+   else          cout << " background";
+   cout << " variable " << iVariable << " for consistency " << endl;
+   vector< TTree* > iTreeVector;
+   if( iSignal ) iTreeVector = iRun->fSignalTree;
+   else          iTreeVector = iRun->fBackgroundTree;
+
+// add cut on number of telescope (per type) for 
+   if( iVariable.find( "NImages_Ttype" ) != string::npos
+    || iVariable.find( "EmissionHeightChi2" ) != string::npos )
+   {
+      sprintf( hname, "%s >=2 ", iVariable.c_str() );
+      TCut ntCut( hname );
+      iCut = iCut && ntCut;
+   }
+
+   for( unsigned  int i = 0; i < iTreeVector.size(); i++ )
+   {
+      if( iTreeVector[i] )
+      {
+	 sprintf( hname, "%s>>hXX_%d", iVariable.c_str(), i );
+	 iTreeVector[i]->Draw( hname, iCut, "goff" );
+	 sprintf( htype, "hXX_%d", i );
+	 h = (TH1D*)gDirectory->Get( htype);
+	 if( h )
+	 {
+	    if( h->GetRMS() > 1.e-5 )
+	    {
+	       cout << "\t variable " << iVariable << " ok, RMS: " << h->GetRMS() << ", tree: " << i;
+	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax() << endl;
+	       return false;
+	    }
+	 }
+      }
+   }
+// means: variable is in all trees constant
+   cout << "\t warning: constant variable  " << iVariable << " in ";
+   if( iSignal ) cout << " signal tree";
+   else          cout << " background tree";
+   if( h ) cout << " (RMS " << h->GetRMS() << ")";
+   cout << ", checked " << iTreeVector.size() << " trees";
+   cout << endl;
+   return true;
+}
 
 /*!
      run the optimization
@@ -60,12 +121,16 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
        factory->AddBackgroundTree( iRun->fBackgroundTree[i], iRun->fBackgroundWeight );
     }
 
+// quality cuts before filling
+   TCut iCut = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
+
 // adding training variables
    if( iRun->fTrainingVariable.size() != iRun->fTrainingVariableType.size() )
    {
       cout << "train: error: training-variable vectors have different size" << endl;
       return false;
    }
+
    for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
    {
       if( iRun->fTrainingVariable[i].find( "NImages_Ttype" ) != string::npos )
@@ -74,12 +139,24 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 	 {
 	    ostringstream iTemp;
 	    iTemp << iRun->fTrainingVariable[i] << "[" << j << "]";
-	    factory->AddVariable( iTemp.str().c_str(), iRun->fTrainingVariableType[i] );
+// check if the training variable is constant
+	    if( !checkIfVariableIsConstant( iRun, iCut, iTemp.str(), true ) 
+	     || !checkIfVariableIsConstant( iRun, iCut, iTemp.str(), false ) )
+	    {
+	       factory->AddVariable( iTemp.str().c_str(), iRun->fTrainingVariableType[i] );
+            }
+	    else cout << "warning: removed constant variable " << iTemp.str() << " from training" << endl;
 	 }
       }
       else
       {
-           factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
+// check if the training variable is constant
+	 if( !checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), true )  
+	  || !checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), false ) )
+	 {
+	   factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
+	 }
+	 else cout << "warning: removed constant variable " << iRun->fTrainingVariable[i] << " from training" << endl;
       }
    }
 // adding spectator variables
@@ -90,6 +167,7 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 
 // weight expression
 //   factory->SetWeightExpression( "InputWeight" );
+
 
 
 //////////////////////////////////////////
@@ -212,4 +290,5 @@ int main( int argc, char *argv[] )
 
     return 0;
 }
+
 
