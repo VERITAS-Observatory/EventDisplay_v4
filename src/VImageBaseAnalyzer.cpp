@@ -10,38 +10,24 @@ bool VImageBaseAnalyzer::setSpecialChannels()
 {
     if( getDebugFlag() ) cout << "VImageBaseAnalyzer::setSpecialChannels " << getEventNumber() << endl;
 
-
 // set masked (FADC trig) channels
     if( getFADCstopTrig().size() > 0 )
     {
-       for ( unsigned int i = 0; i < fReader->getMaxChannels(); i++ )
+       for( unsigned int i = 0; i < getMasked().size(); i++ )
        {
-	   if ( i < fReader->getNumChannelsHit() )
-	   {
-	       unsigned int i_channelHitID = i;
-	       try
-	       {
-		   i_channelHitID = fReader->getHitID(i);
-	       }
-	       catch(...)
-	       {
-		   cout << "VImageBaseAnalyzer::setSpecialChannels(), index out of range (fReader->getHitID) " << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
-		   continue;
-	       }
-	       for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
-	       {
-		   if( i_channelHitID == getFADCstopTrig()[t] && i < getMasked().size() )
-		   {
-		       if(      t == 0 ) getMasked()[i] = 1;
-		       else if( t == 1 ) getMasked()[i] = 2;
-		       else if( t == 2 ) getMasked()[i] = 3;
-		       else if( t == 3 ) getMasked()[i] = 4;
-		   }
-	       }
-	   }
+	  for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
+	  {
+	     if( i == getFADCstopTrig()[t] )
+	     {
+		 if(      t == 0 ) getMasked()[i] = 1;
+		 else if( t == 1 ) getMasked()[i] = 2;
+		 else if( t == 2 ) getMasked()[i] = 3;
+		 else if( t == 3 ) getMasked()[i] = 4;
+	     }
+	  }
        }
     }
-
+          
     if (fReader->isMC()) fRunPar->fL2TimeCorrect=false;
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -677,12 +663,6 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 // FADC stop channels (don't set any other reasons for channels to be dead)
         if( iFirst )
         {
-            if( getMasked()[i] )
-            {
-                setDead( i, 9, iLowGain );
-                continue;
-            }
-// TEMP! quickfix for vbf simulation files
             for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
             {
                 if( getFADCstopTrig()[t] == i )

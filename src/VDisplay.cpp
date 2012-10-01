@@ -1311,7 +1311,14 @@ void VDisplay::setFADCText()
     fTextFADC.push_back( new TText( xL, yT, "" ) );
     sprintf( cTemp, "  " );
     bitset<15> idead = fEventLoop->getDead()[iChannel];
-    if( idead.test( 11 ) ) sprintf( cTemp, "high gain: %s (%s)", fEventLoop->getDeadChannelText()[11].c_str(), idead.to_string<char, char_traits<char>, allocator<char> >().c_str() );
+    if( idead.test( 11 ) )
+    {
+       sprintf( cTemp, "high gain: %s (%s)", fEventLoop->getDeadChannelText()[11].c_str(), idead.to_string<char, char_traits<char>, allocator<char> >().c_str() );
+    }
+    else if( idead.test( 9 ) )
+    {
+       sprintf( cTemp, "high gain: %s (%s)", fEventLoop->getDeadChannelText()[9].c_str(), idead.to_string<char, char_traits<char>, allocator<char> >().c_str() );
+    }
     else
     {
         for( unsigned int s = 0; s < idead.size(); s++ )
