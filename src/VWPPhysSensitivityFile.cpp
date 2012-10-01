@@ -341,7 +341,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
       TH2F *hhEsysMCRelative = (TH2F*)i_IRF.getRecvsMCEnergy()->Clone( hname );
       hhEsysMCRelative->SetTitle( "E_{rec}/E_{MC} vs. E_{MC}" );
       hhEsysMCRelative->SetStats( 0 );
-      hhEsysMCRelative->SetXTitle( "log_{10} (E_{rec}/TeV)" );
+      hhEsysMCRelative->SetXTitle( "log_{10} (E_{MC}/TeV)" );
       hhEsysMCRelative->SetYTitle( "E_{rec}/E_{MC}" );
       hisList.push_back( hhEsysMCRelative );
       if( fOffsetCounter == 9999 ) hisListToDisk.push_back( hhEsysMCRelative );
