@@ -46,7 +46,9 @@ echo $NIMAGESMIN $ANADIR $EREC $DDIR
 # parameters from command line
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
 # MD200, NTree=1000
-RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
+RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927.NT1000"
+RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927.MD200"
+RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927"
 RXPAR=`basename $RPAR.runparameter runparameter`
 OFIL="BDT"
 CONE="FALSE"
@@ -102,21 +104,21 @@ for ARRAY in $VARRAY
 do
    echo "STARTING ARRAY $ARRAY"
 
+# signal and background files
+   if [ $CONE == "TRUE" ]
+   then
+      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
+   else
+      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
+   fi
+   BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID"*.root`
+
    for (( W = 0; W < $NOFF; W++ ))
    do
       ODIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/TMVA/$DDIR-${OFFMEA[$W]}
       mkdir -p $ODIR
 # copy run parameter file
       cp -f $RPAR.runparameter $ODIR
-
-# signal and background files
-      if [ $CONE == "TRUE" ]
-      then
-	 SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
-      else
-	 SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
-      fi
-      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID"*.root`
 
 ###############################################################
 # loop over all energy bins and submit a job for each bin
