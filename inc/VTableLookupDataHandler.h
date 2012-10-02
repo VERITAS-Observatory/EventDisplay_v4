@@ -229,7 +229,6 @@ class VTableLookupDataHandler
         double fsizeCorr [VDST_MAXTELESCOPES];
 	double fsize_telType[VDST_MAXTELESCOPES];
         double floss     [VDST_MAXTELESCOPES];
-        float  ffui[VDST_MAXTELESCOPES];
         double fmax1     [VDST_MAXTELESCOPES];
         double fmax2     [VDST_MAXTELESCOPES];
         double fmax3     [VDST_MAXTELESCOPES];
@@ -243,7 +242,6 @@ class VTableLookupDataHandler
         int    fntubes   [VDST_MAXTELESCOPES];
         unsigned short int fnsat[VDST_MAXTELESCOPES];
         unsigned short int fnlowgain[VDST_MAXTELESCOPES];
-        int    fntubesBNI[VDST_MAXTELESCOPES];
         double falpha    [VDST_MAXTELESCOPES];
         double flos      [VDST_MAXTELESCOPES];
         double fasym     [VDST_MAXTELESCOPES];
@@ -328,7 +326,6 @@ class VTableLookupDataHandler
         unsigned int getNTel_type( ULong64_t t ) { if( fList_of_Tel_type.find(t) != fList_of_Tel_type.end() ) return fList_of_Tel_type[t]; else return 0; }
         unsigned int getMaxNbrTel() const { return VDST_MAXTELESCOPES; }
         int* getNtubes() { return fntubes; }
-        int* getNtubesBNI() { return fntubesBNI; }
         double* getMSCWtel() { return ftmscw; }
         double* getMSCLtel() { return ftmscl; }
         double getMCMinEnergy() { return fMCMinEnergy; }
