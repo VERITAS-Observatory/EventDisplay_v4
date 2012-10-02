@@ -410,7 +410,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
             fsize[i] = ftpars[i]->size;
             fsize2[i] = ftpars[i]->size2;
             floss[i] = ftpars[i]->loss;
-	    ffui[i] = ftpars[i]->fui;
             fwidth[i] = ftpars[i]->width;
             flength[i] = ftpars[i]->length;
 
@@ -444,7 +443,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
                 fntubes[i] = ftpars[i]->ntubes;
                 fnsat[i] = ftpars[i]->nsat;
                 fnlowgain[i] = ftpars[i]->nlowgain;
-                fntubesBNI[i] = ftpars[i]->ntubesBNI;
                 falpha[i] = ftpars[i]->alpha;
                 flos[i] = ftpars[i]->los;
                 fasym[i] = ftpars[i]->asymmetry;
@@ -884,8 +882,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "size2", fsize2, iTT );
         sprintf( iTT, "loss[%d]/D", fNTel );
         fOTree->Branch( "loss", floss, iTT );
-	sprintf( iTT, "fui[%d]/F", fNTel );
-	fOTree->Branch( "fui", ffui, iTT );
         sprintf( iTT, "max1[%d]/D", fNTel );
         fOTree->Branch( "max1", fmax1, iTT );
         sprintf( iTT, "max2[%d]/D", fNTel );
@@ -904,8 +900,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "length", flength, iTT );
         sprintf( iTT, "ntubes[%d]/I", fNTel );
         fOTree->Branch( "ntubes", fntubes, iTT );
-        sprintf( iTT, "ntubesBNI[%d]/I", fNTel );
-        fOTree->Branch( "ntubesBNI", fntubesBNI, iTT );
         sprintf( iTT, "nsat[%d]/s", fNTel );
         fOTree->Branch( "nsat", fnsat, iTT );
         sprintf( iTT, "nlowgain[%d]/s", fNTel );
@@ -1306,6 +1300,7 @@ void VTableLookupDataHandler::calcDistances( int nimages )
     }
 // check for successfull reconstruction
     if( nimages < 2 || fZe < 0 ) return;
+    if( fYcore < -9998. || fYcore < -9998. ) return;
 
 // reconstructed shower core distance
     for( unsigned int tel = 0; tel < fNTel; tel++ )
@@ -1353,14 +1348,12 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
     fsize[i] = 0.;
     fsize2[i] = 0.;
     floss[i] = 0.;
-    ffui[i] = 0.;
     fwidth[i] = 0.;
     flength[i] = 0.;
     fntubes[i] = 0;
     fmeanPedvar_ImageT[i] = 0.;
     fnsat[i] = 0;
     fnlowgain[i] = 0;
-    fntubesBNI[i] = 0;
     falpha[i] = 0.;
     flos[i] = 0.;
     fasym[i] = 0.;
@@ -1506,7 +1499,6 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fsizeCorr[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fsize_telType[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) floss[i] = 0.;
-    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ffui[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fmax1[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fmax2[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fmax3[i] = 0.;
@@ -1519,7 +1511,6 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fmeanPedvar_ImageT[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fnsat[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fnlowgain[i] = 0;
-    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fntubesBNI[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) falpha[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) flos[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fasym[i] = 0.;
