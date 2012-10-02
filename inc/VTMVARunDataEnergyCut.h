@@ -22,8 +22,10 @@ class VTMVARunDataEnergyCut : public TNamed
 
    VTMVARunDataEnergyCut();
   ~VTMVARunDataEnergyCut() {}
+   
+   void print();
 
-   ClassDef(VTMVARunDataEnergyCut,1);
+   ClassDef(VTMVARunDataEnergyCut,2);
 };
 
 #endif

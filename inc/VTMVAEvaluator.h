@@ -132,7 +132,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   printSignalEfficiency();
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
-   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.001, double iMinBackgroundEvents = 0., double iBackgroundAlpha = 1./5.,
+   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.01, double iMinBackgroundEvents = 0., double iBackgroundAlpha = 1./5.,
                                                 double iObservationTime_h = 50. )
           { fOptmizationSourceStrengthCrabUnits = iSourceStrength; 
 	    fOptmizationMinBackGroundEvents = iMinBackgroundEvents; 

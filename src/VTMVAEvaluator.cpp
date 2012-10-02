@@ -613,7 +613,8 @@ unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
    {
       cout << "VTMVAEvaluator::getSpectralWeightedEnergyBin() ";
       cout << "energy bin: " << iEnergyBin;
-      cout << ", log10 energy " << iErec;
+      cout << " [" << fEnergyCut_Log10TeV_min[iEnergyBin] << ", " << fEnergyCut_Log10TeV_max[iEnergyBin];
+      cout << "], log10 energy " << iErec;
       cout << endl;
    }
 
@@ -1284,7 +1285,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
    if( hEffS )
    {
       sprintf( hname, "cEfficiencyPlotPerEnergy_%d", iBin );
-      sprintf( htitle, "efficiency plots (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
+      sprintf( htitle, "efficiency plots (bin %d, %.2f < log10(E) < %.2f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
       TCanvas *iCanvas = new TCanvas( hname, htitle, 10, 10+iBin*30, 400, 400 );
       iCanvas->SetGridx( 0 );
       iCanvas->SetGridy( 0 );
@@ -1321,7 +1322,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
    if( iGSignal_to_sqrtNoise )
    {
       sprintf( hname, "cSignalToSqrtNoise_%d", iBin );
-      sprintf( htitle, "signal / sqrt( noise ) (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
+      sprintf( htitle, "signal / sqrt( noise ) (bin %d, %.2f < log10(E) < %.2f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
       TCanvas *iCanvas = new TCanvas( hname, htitle, 425, 10+iBin*30, 400, 400 );
       iCanvas->SetLeftMargin( 0.13 );
       iCanvas->SetGridx( 0 );
@@ -1354,7 +1355,7 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
    if( iGBackgroundEvents )
    {
       sprintf( hname, "cEventNumbers_%d", iBin );
-      sprintf( htitle, "event numbers (bin %d, %.1f < log10(E) < %.1f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
+      sprintf( htitle, "event numbers (bin %d, %.2f < log10(E) < %.2f)", iBin, iEnergy_Log10TeV_min, iEnergy_Log10TeV_max );
       TCanvas *iCanvas = new TCanvas( hname, htitle, 850, 10+iBin*30, 400, 400 );
       iCanvas->SetLeftMargin( 0.13 );
       iCanvas->SetGridx( 0 );
