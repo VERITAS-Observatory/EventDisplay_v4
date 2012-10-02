@@ -1115,11 +1115,11 @@ $(vtspara):
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/ANASUM.runlist $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.QADC.runparameter $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.reconstruction.* $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(vtspara)/ParameterFiles
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/COMPAREMC.runparameter $(vtspara)/ParameterFiles
 	mkdir -p $(vtspara)/RadialAcceptances
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/radialAcceptance-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/RadialAcceptances/
 	mkdir -p $(vtspara)/EffectiveAreas
