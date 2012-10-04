@@ -96,7 +96,8 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    bool     initializeTeVLightCurve( string iASCIIFile, double iFluxMultiplier = 1. );
    bool     initializeTeVLightCurve( string iAnaSumFile, double iDayInterval, double iMJDMin, double iMJDMax );
    bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1. );
-   TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1, string iPlottingOption = "p" );
+   TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1,
+                            string iPlottingOption = "p", double iMaxMJDError = -1. );
    bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );
    void     setPlottingParameter( double iPlottingMJDMin, double iPlottingMJDMax );
    void     setSignificanceParameters( double iThresholdSignificance = -9999., double iMinEvents = -9999., double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
@@ -104,7 +105,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    void     setName( string iName ) { fName = iName; }
    void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
 
-   ClassDef( VLightCurve, 5 );
+   ClassDef( VLightCurve, 6 );
 };
 
 #endif
