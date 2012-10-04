@@ -59,7 +59,14 @@ int main( int argc, char *argv[] )
     if( argc != 3 )
     {
 	cout << endl;
-	system( "cat $EVNDISPSYS/README/README.EFFECTIVEAREA" );
+	if( gSystem->Getenv( "EVNDISPSYS" ) )
+	{
+	   system( "cat $EVNDISPSYS/README/README.EFFECTIVEAREA" );
+        }
+	else
+	{
+	   cout << "no help files found (environmental variable EVNDISPSYS not set)" << endl;
+        }
 	cout << endl;
 	exit( 0 );
     }

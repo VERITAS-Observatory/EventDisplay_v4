@@ -2,7 +2,6 @@
 
     (VERITAS only)
 
-    Revision $Id$
 
     \author Gareth Hughes
 */
@@ -160,9 +159,16 @@ void parseOptions(int argc, char *argv[])
             case 'h':
 		char *ENV;
 		ENV = getenv("EVNDISPSYS");
-		char readme[500];
-		sprintf(readme,"cat %s/README/README.GETRUNLIST",ENV);
-                system( readme );
+		if( gSystem->Getenv( "EVNDISPSYS" ) )
+		{
+		   char readme[500];
+		   sprintf(readme,"cat %s/README/README.GETRUNLIST",ENV);
+		   system( readme );
+                }
+		else
+		{
+		   cout << " no help available (environmental variable EVNDISPSYS not set)" << endl;
+                }
                 exit( 0 );
                 break;
             case 'l':

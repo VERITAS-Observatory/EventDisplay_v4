@@ -224,7 +224,7 @@ bool VLightCurve::fillTeV_anasum( bool iPrint )
 					1 sigma confidence intervalls using Rolke et al (iPlotConfidenceInterval >= 0; number is plotting color)
 
 */
-TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvasName, int iPlotConfidenceInterval, string iPlottingOption )
+TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvasName, int iPlotConfidenceInterval, string iPlottingOption, double iMaxMJDError )
 {
     char hname[800];
     char htitle[800];
@@ -332,8 +332,16 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 	  if( iPlotConfidenceInterval < 0 )
 	  {
 	     fLightCurveGraph->SetPoint( z, iMJD_mean, fLightCurveData[i]->fFlux );
-	     fLightCurveGraph->SetPointEXlow( z, iMJD_error );
-	     fLightCurveGraph->SetPointEXhigh( z, iMJD_error );
+	     if( iMaxMJDError > 0. && iMJD_error > iMaxMJDError )
+	     {
+		fLightCurveGraph->SetPointEXlow( z, 0. );
+		fLightCurveGraph->SetPointEXhigh( z, 0. );
+             }
+	     else
+	     {
+		fLightCurveGraph->SetPointEXlow( z, iMJD_error );
+		fLightCurveGraph->SetPointEXhigh( z, iMJD_error );
+             }
 	     fLightCurveGraph->SetPointEYlow( z, fLightCurveData[i]->fFluxErrorDown );
 	     fLightCurveGraph->SetPointEYhigh( z, fLightCurveData[i]->fFluxErrorUp );
 	  }

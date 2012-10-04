@@ -136,7 +136,14 @@ int parseOptions(int argc, char *argv[])
                 printf ("\n");
                 break;
             case 'h':
-                system( "cat README/README.ANASUM" );
+		if( gSystem->Getenv( "EVNDISPSYS" ) )
+		{
+		   system( "cat $EVNDISPSYS/README/README.ANASUM" );
+                }
+		else
+		{
+		   cout << " no help find (environmental variable EVNDISPSYS not set)" << endl;
+                }
                 exit( 0 );
                 break;
             case 'd':

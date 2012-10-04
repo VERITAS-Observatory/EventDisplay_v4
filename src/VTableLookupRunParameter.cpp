@@ -333,7 +333,14 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
 
 void VTableLookupRunParameter::printHelp()
 {
-    system( "cat $EVNDISPSYS/README/README.MSCW_ENERGY" );
+    if( gSystem->Getenv( "EVNDISPSYS" ) )
+    {
+       system( "cat $EVNDISPSYS/README/README.MSCW_ENERGY" );
+    }
+    else
+    {
+       cout << "VTableLookupRunParameter::printHelp() no help available (environmental variable EVNDISPSYS not set)" << endl;
+    }
     return;
 }
 
