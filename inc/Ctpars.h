@@ -324,7 +324,7 @@ void Ctpars::Init(TTree *tree)
     else                                     fChain->SetBranchAddress("size",&size2);
     if( fVersion > 2 ) fChain->SetBranchAddress("loss",&loss);
     else               loss = 0.;
-    if( fVersion > 6 ) fChain->SetBranchAddress("fui", &fui);
+    if( fVersion > 6 && fChain->GetBranchStatus( "fui" ) ) fChain->SetBranchAddress("fui", &fui);
     else               fui = 0.;
     fChain->SetBranchAddress("dist",&dist);
     fChain->SetBranchAddress("ntubes",&ntubes);

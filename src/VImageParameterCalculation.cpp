@@ -722,7 +722,6 @@ void VImageParameterCalculation::calcParameters()
        fParGeo->loss = 0.;
        fParGeo->lossAndDead = 0.;
     }
-    if( fParGeo->lossAndDead > 1. ) cout << "XXX " << fData->getTelID()+1 << "\t" << fData->getEventNumber() << "\t" << fParGeo->loss << "\t" << fParGeo->lossAndDead << endl;
     if( sumLowGain > 0. ) fParGeo->fracLow = sumLowGain / sumsig;
     else                  fParGeo->fracLow = 0.;
 

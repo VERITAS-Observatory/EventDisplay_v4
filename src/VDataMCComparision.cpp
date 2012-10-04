@@ -272,14 +272,6 @@ void VDataMCComparision::defineHistograms()
       hTel.push_back( hntubes.back() );
       hisList->Add( hntubes.back() );
 
-      sprintf( hname, "hntubesBNI_%d_%s", i, fName.c_str() );
-      hntubesBNI.push_back( new TH1D( hname, "", 100, 0., 200.0) );
-      hntubesBNI.back()->SetXTitle( "ntubes" );
-      hntubesBNI.back()->Sumw2();
-      hTel.push_back( hntubesBNI.back() );
-      hisList->Add( hntubesBNI.back() );
-
-
       sprintf( hname, "hnlowgain_%d_%s", i, fName.c_str() );
       hnlowgain.push_back( new TH1D( hname, "", 100, 0., 100.0) );
       hnlowgain.back()->SetXTitle( "nlowgain" );
@@ -727,7 +719,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	    if( fData->ntubes[j] > ntubes_min )
 	    {
 	       hntubes[j]->Fill( fData->ntubes[j], weight );
-	       hntubesBNI[j]->Fill( fData->ntubesBNI[j], weight );
 	       if( fData->nlowgain[j] > 0 ) hnlowgain[j]->Fill( (double)fData->nlowgain[j], weight );
 	       hdist[j]->Fill( fData->dist[j], weight );
 	       if( fData->size[j] > 0. ) hsize[j]->Fill( log10( fData->size[j] ), weight );

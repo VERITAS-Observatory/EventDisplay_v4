@@ -2017,6 +2017,8 @@ bool VCalibrator::readLowGainMultiplier( int iSumWindow )
 
 /*
 
+    read calibration data from DST file
+
 */
 bool VCalibrator::readCalibrationData( string iDSTfile )
 {

@@ -898,18 +898,15 @@ TTree* VImageBaseAnalyzer::makeDeadChannelTree()
     sprintf( hname, "tchannel" );
     sprintf( htitle, "channel state (Telescope %d)", getTelID()+1 );
     TTree *itc = new TTree( hname, htitle );
-    int ipix;
-    int istat;
-    int istatLow;
-    itc->Branch( "channel", &ipix, "channel/I" );
-    itc->Branch( "state", &istat, "state/I" );
-    itc->Branch( "stateLow", &istatLow, "stateLow/I" );
+    UShort_t istat;
+    UShort_t istatLow;
+    itc->Branch( "state", &istat, "state/s" );
+    itc->Branch( "stateLow", &istatLow, "stateLow/s" );
 
     for( unsigned int i = 0; i < getDead().size(); i++ )
     {
-        ipix = (int)i;
-        istat = (int)getDead()[i];
-        if( i < getDead( true ).size() ) istatLow = (int)getDead(true)[i];
+        istat = (UShort_t)getDead()[i];
+        if( i < getDead( true ).size() ) istatLow = (UShort_t)getDead(true)[i];
         itc->Fill();
     }
 

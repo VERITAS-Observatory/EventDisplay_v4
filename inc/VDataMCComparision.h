@@ -79,7 +79,6 @@ class VDataMCComparision
 // single telescope histograms
    vector<TH1D* > hdist;
    vector<TH1D* > hntubes;
-   vector<TH1D* > hntubesBNI;
    vector<TH1D* > hnlowgain;
    vector<TH1D* > hwidth;
    vector<TH1D* > hlength;

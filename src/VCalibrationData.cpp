@@ -424,7 +424,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
            }
        }
        fCalibrationTree.Write();
-       hisList->Write();
+// do not write histograms -> same information as in fCalibrationTree
+//       hisList->Write();
     }
 
     iDir->cd();

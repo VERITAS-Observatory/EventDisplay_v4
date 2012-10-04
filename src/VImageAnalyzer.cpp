@@ -75,7 +75,6 @@ void VImageAnalyzer::doAnalysis()
 // find dead channels, fill tree for this set only (but: dead channels are time dependent)
         findDeadChans( false, true );
         findDeadChans( true, true );
-        getAnaHistos()->fillDeadChannelTree( getDead( false ), getDead( true ) );
         fInit = true;
     }
 // find dead channels (time dependence)
@@ -253,8 +252,11 @@ void VImageAnalyzer::fillOutputTree()
     if( fDebug ) cout << "VImageAnalyzer::fillOutputTree()" << endl;
 
 // fill some run quality histograms
-//   getAnaHistos()->fill( getImage(), getBorder(), getSums(), getHiLo(), getTimeSinceRunStart() );
-    getAnaHistos()->fillDiagnosticTree( getRunNumber(), getTelescopeEventNumber( getTelID() ), 0, 0, getFADCstopTZero(), getFADCstopSums() );
+    if( !fReader->isMC() )
+    {
+       getAnaHistos()->fillL2DiagnosticTree( getRunNumber(), getTelescopeEventNumber( getTelID() ),
+                                           0, 0, getFADCstopTZero(), getFADCstopSums() );
+    }
 
 // fill some basic run parameters
     getImageParameters()->fimagethresh = getImageThresh();
@@ -330,7 +332,7 @@ void VImageAnalyzer::terminate()
 // write histograms
         getAnaHistos()->terminate( fOutputfile );
 // write calibration summaries
-        getCalData()->terminate( getDead( false ), getDead( true ) );
+        if( getRunParameter()->fsourcetype != 7 ) getCalibrationData()->terminate( getDead( false ), getDead( true ) );
 // write pointing data from db to disk (if available)
         if( getTelID() < getPointing().size() && getPointing()[getTelID()] ) getPointing()[getTelID()]->terminate( isMC() );
     }

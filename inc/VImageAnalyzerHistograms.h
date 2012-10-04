@@ -21,37 +21,23 @@ class VImageAnalyzerHistograms
 {
     private:
         unsigned int fTelescopeID;
-        unsigned int fNChannels;
-        double fRunLength;
 
     public:
         VImageAnalyzerHistograms( unsigned int iTel );
-        ~VImageAnalyzerHistograms();
+       ~VImageAnalyzerHistograms();
         void init();                              //!< book histograms
-        void fill( vector< bool >& iImage, vector<bool>& iBorder, valarray<double>& iSums, vector<bool>& iHiLo, double itstart );
-        void fillDeadChannelTree( vector< unsigned int >& iDead, vector< unsigned int >& iDeadLow );
-        void fillDiagnosticTree( int rN, int eN, int iMJD, double it, vector< double >& iF, vector< double >& iS );
-        void setNChannels( unsigned int iChannels ) { fNChannels = iChannels; }
-        void setRunLength( double iL ) { fRunLength = iL; }
+        void fillL2DiagnosticTree( int rN, int eN, int iMJD, double it, vector< double >& iF, vector< double >& iS );
         void terminate( TFile* );                 //!< write results to same file as VAnalyzer class
 
         TList *hisList;
-        TH2D *fHis_image;
-        TH2D *fHis_border;
-        TH2D *fHis_hilo;                          //!< high/low gain distribution
-        TH1F *fHis_sums;
 
         TTree *fdiagno;
         int runNumber;
         int eventNumber;
         int MJD;
-        double time;
-        double fFADCstopTZero[4];
-        double fFADCstopSum[4];
+        float time;
+        float fFADCstopTZero[4];
+        float fFADCstopSum[4];
 
-        TTree *fDeadChannels;
-        int channel;
-        int dead;
-        int deadLow;
 };
 #endif                                            // VImageAnalyzerHistograms_H

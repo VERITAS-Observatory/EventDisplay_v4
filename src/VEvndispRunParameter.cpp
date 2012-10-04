@@ -43,7 +43,9 @@ VEvndispRunParameter::VEvndispRunParameter()
     frunmode = 0;
     fRunIsZeroSuppressed = false;
     frunnumber = -1;
-    fsourcetype = 3;                              // 0 = rawdata, 1 = GrIsu simulation, 2 = MC in VBF format, 3 = rawdata in VBF, 4 = DST, 5 = multiple GrIsu file, 6 = PE file
+    fsourcetype = 3;           // 0 = rawdata, 1 = GrIsu simulation, 2 = MC in VBF format, 
+                               // 3 = rawdata in VBF, 4 = DST (data), 5 = multiple GrIsu file, 
+			       // 6 = PE file, 7 = DST (MC)
     fsourcefile = "";
     fDBRunType = "";
     fDBRunStartTimeSQL = "";

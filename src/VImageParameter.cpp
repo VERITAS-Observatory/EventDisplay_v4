@@ -42,7 +42,12 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
         tpars->Branch("Time",  &time,  "time/D");
     }
     tpars->Branch("eventType", &eventType, "eventType/s" );
-    tpars->Branch("eventNumber",  &eventNumber,  "eventNumber/I");
+// tpars tree have same number of events as showerpars tree:
+// showerpars->AddFriend( "Tel_3/tpars", "3224.v3.root" );
+    if( fShortTree < 1 )
+    {
+       tpars->Branch("eventNumber",  &eventNumber,  "eventNumber/I");
+    }
     tpars->Branch("eventStatus", &eventStatus, "eventStatus/i" );
 
     if( fShortTree < 1 )
@@ -84,18 +89,21 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     tpars->Branch("cen_y", &cen_y, "cen_y/F");
     tpars->Branch("cen_x_trig", &cen_x_trig, "cen_x_trig/F");
     tpars->Branch("cen_y_trig", &cen_y_trig, "cen_y_trig/F");
-    tpars->Branch("cen_x2_trig", &cen_x2_trig, "cen_x2_trig/F");
-    tpars->Branch("cen_y2_trig", &cen_y2_trig, "cen_y2_trig/F");
+    if( fShortTree < 1 )
+    {
+       tpars->Branch("cen_x2_trig", &cen_x2_trig, "cen_x2_trig/F");
+       tpars->Branch("cen_y2_trig", &cen_y2_trig, "cen_y2_trig/F");
+    }
     tpars->Branch("length", &length, "length/F");
     tpars->Branch("width", &width, "width/F");
     tpars->Branch("size", &size, "size/F");
     tpars->Branch("size2", &size2, "size2/F");
     tpars->Branch("loss", &loss, "loss/F" );
-    tpars->Branch("lossAndDead", &lossAndDead, "lossAndDead/F" );
-    tpars->Branch("fui", &fui, "fui/F" );
     if( fShortTree < 1 )
     {
-        tpars->Branch("fracLow", &fracLow, "fracLow/F" );
+       tpars->Branch("lossAndDead", &lossAndDead, "lossAndDead/F" );
+       tpars->Branch("fui", &fui, "fui/F" );
+       tpars->Branch("fracLow", &fracLow, "fracLow/F" );
     }
     tpars->Branch("dist", &dist, "dist/F");
     if( fShortTree < 1 )
@@ -115,9 +123,9 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     tpars->Branch("nzerosuppressed", &nzerosuppressed, "nzerosuppressed/s" );
     tpars->Branch("nsat", &nsat, "nsat/s");
     tpars->Branch("nlowgain", &nlowgain, "nlowgain/s");
-    tpars->Branch("ntubesBNI", &ntubesBrightNoImage, "ntubesBNI/s");
     if( fShortTree < 1 )
     {
+       tpars->Branch("ntubesBNI", &ntubesBrightNoImage, "ntubesBNI/s");
        tpars->Branch("max", &max, "max[3]/F");
        tpars->Branch("index_of_max", &index_of_max, "index_of_max[3]/s");
     }
@@ -152,7 +160,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
 
 // log likelihood fit errors/results
 
-    tpars->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
+    if( fShortTree < 1 ) tpars->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
     if( iLL )
     {
                                                   // number of dead tube values estimated by fit
