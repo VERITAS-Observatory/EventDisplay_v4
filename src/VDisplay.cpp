@@ -1473,8 +1473,7 @@ void VDisplay::drawCalibrationHistos()
             ihis2 = fEventLoop->getCalData( fTelescope )->getToffsetDist( true );
         }
     }
-    else if(    E_cameraIdent( fCameraDisplay ) == C_PEDMEAN || E_cameraIdent( fCameraDisplay ) == C_PEDMEANLOW 
-             || E_cameraIdent( fCameraDisplay ) == C_PEDVAR  || E_cameraIdent( fCameraDisplay ) == C_PEDVARLOW ) 
+    else if( E_cameraIdent( fCameraDisplay ) == C_PEDMEAN || E_cameraIdent( fCameraDisplay ) == C_PEDMEANLOW  )
     {
         if( fSelectedChan >= 200000 )
         {
@@ -1485,6 +1484,20 @@ void VDisplay::drawCalibrationHistos()
         {
             ihis = fEventLoop->getCalData( fTelescope )->getPedDist();
             ihis2  = fEventLoop->getCalData( fTelescope )->getPedDist( true );
+        }
+    }
+// pedvar distributions
+    else if( E_cameraIdent( fCameraDisplay ) == C_PEDVAR  || E_cameraIdent( fCameraDisplay ) == C_PEDVARLOW ) 
+    {
+        if( fSelectedChan >= 200000 )
+        {
+            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope] );
+            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope], true );
+        }
+        else
+        {
+            ihis = fEventLoop->getCalData( fTelescope )->getPedvarsDist();
+            ihis2  = fEventLoop->getCalData( fTelescope )->getPedvarsDist( true );
         }
     }
     else if( E_cameraIdent( fCameraDisplay ) == C_LOWGAIN )
