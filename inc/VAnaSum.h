@@ -13,8 +13,6 @@
 #include "VStereoAnalysis.h"
 #include "VTableLookupRunParameter.h"
 
-#include "CData.h"
-
 #include "TBranch.h"
 #include "TChain.h"
 #include "TDirectory.h"
