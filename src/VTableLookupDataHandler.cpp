@@ -1256,7 +1256,6 @@ void VTableLookupDataHandler::reset()
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         fR[i] = -99.;
-//      fMCR[i] = -99.;
         fE[i] = -99.;
         fES[i] = -99.;
         ftmscl[i] = -99.;
@@ -1278,6 +1277,13 @@ void VTableLookupDataHandler::reset()
     fenergyS = -99.;
     fechi2S = -99.;
     fdES = -99.;
+    fXoff = -99.;
+    fYoff = -99.;
+    fXoff_derot = -99.;
+    fYoff_derot = -99.;
+    fXcore = -99.;
+    fYcore = -99.;
+    fstdP = -99.;
 
     fEmissionHeightMean = -99.;
     fEmissionHeightChi2 = -99.;
