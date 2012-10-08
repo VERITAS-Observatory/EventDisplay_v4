@@ -46,7 +46,7 @@ VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun )
     fTrackingCorrections = 0;
 }
 
-bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bool iVPMDB )
+bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bool iVPMDB, bool iUncalibratedVPM )
 {
 
 // setup tracking corrections (expert use!)
@@ -78,11 +78,22 @@ bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bo
     {
        fStatus = readPointingFromVPMTextFile( iVPMDirectory );
     }
-// read pointing from pointing monitor entries in DB
+// read pointing from calibrated pointing monitor (VPM) entries in DB
     else if( iVPMDB )
     {
-      fGoodVPM = readPointingMonitorFromDB(); 
-// fall back to DB pointing in case reading of pointing monitor data failed
+      fGoodVPM = readPointingCalibratedVPMFromDB(); 
+      // fall back to DB pointing if reading pointing monitor data failed
+      if( !fGoodVPM ) {
+	cout << "VPointingDB: quality-selected VPM data not available, reverting to encoder data for telescope "<< getTelID()+1 <<" for full duration of run "<< fRunNumber << endl;
+	fStatus = readPointingFromDB();
+      }
+      else fStatus = fGoodVPM;
+    }
+// read pointing from uncalibrated pointing monitor (VPM) entries in DB
+    else if( iUncalibratedVPM )
+    {
+      fGoodVPM = readPointingUncalibratedVPMFromDB(); 
+      // fall back to DB pointing if reading pointing monitor data failed
       if( !fGoodVPM ) fStatus = readPointingFromDB();
       else            fStatus = fGoodVPM;
     }
@@ -94,7 +105,7 @@ bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bo
 
 // Close the connection immediately after all the reading is complete
 // this is important - open connections to the DB cause DB replication problems.
-    if( f_db ) f_db->Close();                                                  ;
+    if( f_db ) f_db->Close();                                                  
     
     return fStatus;
 }
@@ -250,10 +261,9 @@ bool VPointingDB::updatePointing( int iMJD, double iTime )
 bool VPointingDB::terminate()
 {
     if( f_db ) f_db->Close();
-
+    if( f_dbOFFLINE ) f_dbOFFLINE->Close();
     return true;
 }
-
 
 void VPointingDB::getDBMJDTime( string itemp, int &MJD, double &Time, bool bStrip )
 {
@@ -414,11 +424,100 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 }
 
 /*
-
-    reading pointing monitor data from DB  (JG)
-
+    read calibrated (default) pointing monitor data from DB  (JG)
 */
-bool VPointingDB::readPointingMonitorFromDB()
+bool VPointingDB::readPointingCalibratedVPMFromDB()
+{
+  double startMJD = fMJDRunStart + ( fTimeRunStart / 86400.);
+  double stopMJD = fMJDRunStopp + ( fTimeRunStopp / 86400.);
+
+  // mysql query //
+  char c_query[1000];
+  sprintf( c_query, "SELECT mjd,ra,decl FROM tblPointing_Monitor_Telescope%d_Calibrated_Pointing WHERE mjd<=%.13f AND mjd>=%.13f", getTelID(), stopMJD, startMJD );  
+
+  // use VOFFLINE database for calibrated VPM //
+  string iTempS  = getDBServer();
+  iTempS += "/VOFFLINE";
+  f_dbOFFLINE = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
+  if( !f_dbOFFLINE ) {
+    cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
+    return false; 
+  }
+  
+  TSQLResult *db_res = f_dbOFFLINE->Query( c_query );
+  if( !db_res ) return false;
+  int fNRows = db_res->GetRowCount();
+  cout << "Reading calibrated pointing monitor (VPM) data from database for telescope " << getTelID()+1;
+  cout << ": found " << fNRows << " rows in database" << endl;
+
+  // get VPM quality flag from database 
+  char cflag_query[1000];
+  sprintf( cflag_query, "SELECT vpm_config_mask FROM tblRun_Analysis_Comments WHERE run_id = %d", fRunNumber ); 
+  TSQLResult *db_flag = f_dbOFFLINE->Query( cflag_query );
+  if( !db_flag ) {
+    cout<<"VPointingDB: missing VPM quality flag"<<endl;
+    return false;
+  }
+  TSQLRow *flag_row = db_flag->Next();
+  int maskVPM = atoi( flag_row->GetField(0) );
+
+  if( getTelID() == 0 ) {    // T1 bad  
+    if( maskVPM == 0 || maskVPM == 2 || maskVPM == 4 || maskVPM == 8 ) return false;
+    if( maskVPM == 6 || maskVPM == 10 || maskVPM == 12 || maskVPM == 14 ) return false;
+  }
+  if( getTelID() == 1 ) {    // T2 bad
+    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 4 || maskVPM == 8 ) return false;
+    if( maskVPM == 5 || maskVPM == 9 || maskVPM == 12 || maskVPM == 13 ) return false;
+  }
+  if( getTelID() == 2 ) {    // T3 bad    
+    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 8 ) return false;
+    if( maskVPM == 3 || maskVPM == 9 || maskVPM == 10 || maskVPM == 11 ) return false;
+  }
+  if( getTelID() == 3 ) {    // T4 bad    
+    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 4 ) return false;
+    if( maskVPM == 3 || maskVPM == 5 || maskVPM == 6 || maskVPM == 7 ) return false;
+  }
+
+  // loop over all db entries
+  string itemp;
+  double iMJD;
+  double iITime = 0.;
+  double az = 0.;
+  double ze = 0.;
+  double iRA = 0.;
+  double iDec = 0.;
+  
+  for( int j = 0; j < fNRows; j++ ) {
+    TSQLRow *db_row = db_res->Next();
+    if( !db_row ) continue;
+
+    iMJD = atof( db_row->GetField( 0 ) );
+    iITime = modf( iMJD, &iMJD );
+    fDBMJD.push_back( (unsigned int)iMJD );
+    fDBTime.push_back( iITime * 86400. );
+    fDBTelElevationRaw.push_back( 0. );
+    fDBTelAzimuthRaw.push_back( 0. );
+    
+    iRA = atof( db_row->GetField( 1 ) );
+    iDec = atof( db_row->GetField( 2 ) );
+    getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec*degrad, iRA*degrad, az, ze );
+    fDBTelElevation.push_back( 90. - ze );
+    fDBTelAzimuth.push_back( az );
+    fDBTelExpectedElevation.push_back( 0. );
+    fDBTelExpectedAzimuth.push_back( 0. );
+  }
+
+  fDBNrows = fDBMJD.size();
+
+  if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+
+  return true; 
+}
+
+/*
+    read uncalibrated pointing monitor data from DB  (JG)
+*/
+bool VPointingDB::readPointingUncalibratedVPMFromDB()
 {
   double iMJD = 0.;
   double iITime = 0.;
@@ -471,7 +570,8 @@ bool VPointingDB::readPointingMonitorFromDB()
   }
 
 // hard-wired limit (in arcsec) for offset between VPM and target position //
-  double vpmlimit = 180.; 
+// note: previously was 180, now loosened to 300
+  double vpmlimit = 300.; 
 
   double decoff = 0;
   double raoff = 0;

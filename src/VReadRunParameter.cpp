@@ -416,11 +416,19 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         else if( iTemp.rfind( "-usedbvpm" ) < iTemp.size() ) 
 	{
             fRunPara->fDBVPM = true;
+	    fRunPara->fDBUncalibratedVPM = false;
             fRunPara->fDBTracking = true;
         }
         else if( iTemp.rfind( "-usenodbvpm" ) < iTemp.size() ) 
 	{
             fRunPara->fDBVPM = false;
+	    fRunPara->fDBUncalibratedVPM = false;
+            fRunPara->fDBTracking = true;
+        }
+        else if( iTemp.rfind( "-useuncalibratedvpm" ) < iTemp.size() ) //JG
+	{
+            fRunPara->fDBVPM = false;
+            fRunPara->fDBUncalibratedVPM = true;
             fRunPara->fDBTracking = true;
         }
 	else if( iTemp.rfind( "-usedbrotations" ) < iTemp.size() )

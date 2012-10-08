@@ -57,7 +57,7 @@ class VPointing : public VSkyCoordinates
 	float        getPointingErrorX();
 	float        getPointingErrorY();
 	unsigned int getPointingType() { return fPointingType; }
-        void         getPointingFromDB( int irun, string iTCorrections, string iVPMDirectory, bool iVPMDB );
+        void         getPointingFromDB( int irun, string iTCorrections, string iVPMDirectory, bool iVPMDB, bool iUncalibratedVPM );
 	unsigned int getTelID() { return fTelID; }
 	void         setPointingError( double, double );//!< Pointing error [deg]
         void         setTelPointing( int MJD, double time, bool iUseDB = false, bool iFillPointingTree = false );

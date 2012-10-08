@@ -75,6 +75,7 @@ class VPointingDB : public VGlobalRunParameter
         int fNWarnings;
 
         TSQLServer *f_db;
+        TSQLServer *f_dbOFFLINE;
 
         VTrackingCorrections *fTrackingCorrections;
         string fTPointCorrectionDate;
@@ -84,7 +85,8 @@ class VPointingDB : public VGlobalRunParameter
         void getDBSourceCoordinates( string iSource, float &iEVNTargetDec, float &iEVNTargetRA );
         void getHorizonCoordinates( int MJD, double time, double dec, double ra, double &az, double &ze );
         bool readPointingFromDB();
-	bool readPointingMonitorFromDB();
+	bool readPointingCalibratedVPMFromDB();
+	bool readPointingUncalibratedVPMFromDB();
         bool readPointingFromVPMTextFile( string );
 
     public:
@@ -104,7 +106,7 @@ class VPointingDB : public VGlobalRunParameter
         float  getWobbleNorthDB() { return fDBWobbleNorth; }
         float  getWobbleEastDB() { return fDBWobbleEast; }
         unsigned int getTelID() { return fTelID; }
-	bool   initialize( string iTPointCorrection, string iVPMDirectory, bool iVPMDB );
+	bool   initialize( string iTPointCorrection, string iVPMDirectory, bool iVPMDB, bool iUncalibratedVPM );
 	void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
         bool   terminate();
         bool   updatePointing( int MJD, double iTime );

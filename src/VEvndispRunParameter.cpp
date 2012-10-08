@@ -99,10 +99,12 @@ VEvndispRunParameter::VEvndispRunParameter()
     fDBTracking = true;
     fDBCameraRotationMeasurements = true;
     fDBVPM = false;
+    fDBUncalibratedVPM = false; //JG
 #else
     fDBTracking = false;
     fDBCameraRotationMeasurements = false;
     fDBVPM = false; 
+    fDBUncalibratedVPM = false;
 #endif
     fDBTrackingCorrections = "";
     fPMTextFileDirectory = "";

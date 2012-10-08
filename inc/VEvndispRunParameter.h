@@ -88,7 +88,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool fDBTracking;                         // use tracking from DB
         string fDBTrackingCorrections;            // apply tracking corrections from this period (SQL time string), empty for use of measured values in db
         string fPMTextFileDirectory;              // pointing monitor text file directory
-        bool fDBVPM;                              // use VPM tracking from database    
+        bool fDBVPM;                              // use calibrated VPM tracking from database    
+	bool fDBUncalibratedVPM;                  // use uncalibrated VPM tracking from database (JG)
         vector<double> fPointingErrorX;           // pointing error, in camera coordinates [deg]
         vector<double> fPointingErrorY;           // pointing error, in camera coordinates [deg]
         double fCheckPointing;                    // stop run if pointing difference between calculated pointing direction and vbf is larger than this value
@@ -233,6 +234,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,115);
+        ClassDef(VEvndispRunParameter,116);
 };
 #endif
