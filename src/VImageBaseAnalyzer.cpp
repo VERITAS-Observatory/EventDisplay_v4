@@ -815,7 +815,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 void VImageBaseAnalyzer::timingCorrect()
 {
 // apply timing correction
-    unsigned int nc = getTZeros().size();
+    const unsigned int nc = getTZeros().size();
     if( nc == getTOffsets().size() )
     {
        for( unsigned int i = 0; i < nc; i++ )
@@ -995,7 +995,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 ypmt = getDetectorGeo()->getY()[i_channelHitID] - getImageParameters()->cen_y;
 // position along the major axis of the image
                 xpos = xpmt*getImageParameters()->cosphi + ypmt*getImageParameters()->sinphi;
-// fit time along the major axis of the image
+// fit time along the major axis of the image (hardwired check!)
                 if (abs(getImageParameters()->tgrad_x)<200) xtime = getImageParameters()->tgrad_x*xpos+getImageParameters()->tint_x;
                 else xtime = getSumFirst();
 
@@ -1005,6 +1005,10 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // fit times are corrected for TOffsets and FADCStopOffsets.
 // undo this to get integration window in FADC trace.
                 corrfirst = (int)(xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+		if( corrfirst < (int)getSumFirst() )
+		{
+		   corrfirst = getSumFirst();
+                }
 // low gain channel have different time -> use tzero (donnot do this for DST sims)
                 if( ( getHiLo()[i_channelHitID] || getTraceMax()[i_channelHitID] > getRunParameter()->fSumWindowStartAtT0Min ) && getRunParameter()->fsourcetype != 7 )
                 {
@@ -1021,18 +1025,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                     unsigned int isw = getDynamicSummationWindow( i_channelHitID );
                     if( -1*corrfirst > (int)isw ) isw = 0;
                     else                          isw += corrfirst;
-                    corrfirst = 0;
+                    corrfirst = getSumFirst();
                     setCurrentSummationWindow( i_channelHitID, corrfirst, isw );
                 }
-   	        else if( corrfirst == 0 )
-		{
-// important for low energies: pixels are cleaned away in the first pass, but bright with the shorter summation window
-// below a very preliminary fix; should be treated properly
-		    if( getImageParameters()->tgrad_x < 1.e-2 && getImageParameters()->tint_x < 1.e-2 )
-		    {
-		        corrfirst = getSumFirst() + 3;
-		    }
-                }  
 // integration start is at beyond last sample: set to last sample
                 if (corrfirst> (int)getNSamples()) corrfirst=(int)getNSamples();
 // set start of integration window

@@ -962,7 +962,7 @@ void VTableLookup::terminate()
     else
     {
         if( fNumberOfIgnoredeEvents > 0 ) cout << endl << "\t total number of ignored events: " << fNumberOfIgnoredeEvents << endl;
-    }
+    } 
 ////////////////////////////////////////////////////////////////////    
 // (GM): large amount of objects read from subdirectory of the tablefile might result in 
 //       excessive time needed to close the tablefile

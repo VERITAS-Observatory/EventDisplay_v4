@@ -30,7 +30,6 @@ class VImageParameter
         unsigned int eventStatus;
 
 // telescope parameters
-        string fcamera;                           //!< name of camera
         double fimagethresh;                      //!< parameter for image threshold
         double fborderthresh;                     //!< parameter for border threshold
         int fsumfirst;                            //!< parameter for window summation start

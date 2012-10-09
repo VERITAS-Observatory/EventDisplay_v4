@@ -225,7 +225,6 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
     {
         fDSTpointAzimuth[i] = 0.;
         fDSTpointElevation[i] = 0.;
-
     }
 
     if( !iIsCTADST )

@@ -203,7 +203,6 @@ void VImageParameter::reset( unsigned int resetLevel )
        eventStatus = 0;
 
 // telescope parameters
-       fcamera = "VERITAS_BEFORE592";
        fimagethresh = 4.;
        fborderthresh = 2.;
        fsumfirst = 8;
