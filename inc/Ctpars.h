@@ -309,7 +309,8 @@ void Ctpars::Init(TTree *tree)
     fCurrent = -1;
     fChain->SetMakeClass(1);
 
-    fChain->SetBranchAddress("eventNumber", &eventNumber );
+    if( fChain->GetBranchStatus( "eventNumber" ) ) fChain->SetBranchAddress("eventNumber", &eventNumber );
+    else                                           eventNumber = 0;
     if( fVersion > 3 && fChain->GetBranchStatus( "meanPed_Image" ) ) fChain->SetBranchAddress("meanPed_Image", &meanPed_Image );
     else               meanPed_Image = 0;
     if( fVersion > 3 ) fChain->SetBranchAddress("meanPedvar_Image", &meanPedvar_Image );
