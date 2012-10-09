@@ -38,35 +38,30 @@ do
    ODIR=$CTA_USER_DATA_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART"/"
    mkdir -p $ODIR
 
-# output log files are written to this directory
-   LDIR=$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART-$LOGF"/"
-   mkdir -p $LDIR
-# remove existing log files
-   rm -f $LDIR/$OFIL.convert.log
-   rm -f $LDIR/$OFIL.evndisp.log
-
 ####################################################################
 # execute converter
-   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST -a $CTA_EVNDISP_ANA_DIR/DetectorGeometry/CTA.prod1.$N.lis -o $TMPDIR/$OFIL.root $TMPDIR/$OFIL.gz >& $TMPDIR/$OFIL.convert.log
+   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST -a $CTA_EVNDISP_ANA_DIR/DetectorGeometry/CTA.prod1.$N.lis -o $TMPDIR/$OFIL.root $TMPDIR/$OFIL.gz >& $TMPDIR/$OFIL.$N.convert.log
 
 ####################################################################
 # execute eventdisplay
-  $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root -writenoMCTree -reconstructionparameter $ACUT $OPT -outputdirectory $TMPDIR >& $TMPDIR/$OFIL.evndisp.log
+  $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root -writenoMCTree -reconstructionparameter $ACUT $OPT -outputdirectory $TMPDIR >& $TMPDIR/$OFIL.$N.evndisp.log
 
 ####################################################################
 # move evndisp files to data directory
    if [ $KEEP == "1" ]
    then
       mkdir -p $ODIR/VDST
-      cp -f $TMPDIR/$OFIL.root $ODIR/VDST/
+      cp -v -f $TMPDIR/$OFIL.root $ODIR/VDST/
    fi
-   rm -f $TMPDIR/$OFIL.root
-
+   rm -f -v $TMPDIR/$OFIL.root
    cp -v -f $TMPDIR/*.root $ODIR
-   cp -v -f $TMPDIR/$OFIL.convert.log $LDIR/$OFIL.convert.log
-   cp -v -f $TMPDIR/$OFIL.evndisp.log $LDIR/$OFIL.evndisp.log
-   
 done
+
+# tar the log files
+cd $TMPDIR
+tar -czvf $OFIL.tar.gz *.log
+mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES
+mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES/
 
 exit
 
