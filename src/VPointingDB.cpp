@@ -41,6 +41,9 @@ VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun )
     fCounter = 0;
     fDBNrows = 0;
 
+    f_db = 0;
+    f_dbOFFLINE = 0;
+
     fNWarnings = 0;
 
     fTrackingCorrections = 0;
