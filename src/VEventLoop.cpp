@@ -781,7 +781,7 @@ int VEventLoop::analyzeEvent()
 // make sure that calibration sum window is not too long
 	   if( fRunMode == R_PED )
 	   {
-	      if( fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow >= (int)getNSamples() )
+	      if( fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow > (int)getNSamples() )
 	      {
 	         cout << "VEventLoop::analyzeEvent: resetting calibration sum window from ";
 		 cout << fRunPar->fCalibrationSumWindow;
