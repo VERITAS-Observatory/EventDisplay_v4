@@ -107,7 +107,7 @@ bool VTMVARunData::openDataFiles()
        }
        if( i_SignalList )
        {
-           cout << "number of signal in energy bin " << i << "\t" << i_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
+           cout << "number of signal events in energy bin " << i << "\t" << i_SignalList->GetN() << "\t required > " << fMinSignalEvents << endl;
 	   cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
 	   cout << "&&" << fEnergyCutData[i]->fEnergyCut << ")" << endl;
            if( i_SignalList->GetN() < fMinSignalEvents ) iEnoughEvents = false;
@@ -123,7 +123,7 @@ bool VTMVARunData::openDataFiles()
        }
        if( i_BackgroundList )
        {
-          cout << "number of background in energy bin " << i << "\t" << i_BackgroundList->GetN();
+          cout << "number of background events in energy bin " << i << "\t" << i_BackgroundList->GetN();
 	  cout << "\t required > " << fMinBackgroundEvents << endl;
 	  cout << "  (cuts are " << fQualityCuts << "&&" << fMCxyoffCut;
 	  cout << "&&" << fEnergyCutData[i]->fEnergyCut << ")" << endl;

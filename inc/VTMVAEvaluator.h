@@ -52,6 +52,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    double                  fSignalEfficiencyNoVec;
    vector< double >        fTMVACutValue;
    double                  fTMVACutValueNoVec;
+   vector< bool >          fTMVAOptimumCutValueFound;
 
    string                  fParticleNumberFileName;          // particle numbers are read from this file
    double                  fOptmizationSourceStrengthCrabUnits; 
@@ -139,7 +140,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 	    fOptimizationBackgroundAlpha = iBackgroundAlpha;
 	    fOptimizationObservingTime_h = iObservationTime_h; }
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
-   void   setPlotEffiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
+   void   setPlotEfficiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iE = -99. );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
    void   setTMVACutValue( double iE = -99. );
