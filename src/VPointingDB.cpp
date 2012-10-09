@@ -74,7 +74,6 @@ bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bo
         fStatus = false;
 	exit( -1 );
     }
-
     fStatus = getDBRunInfo();
 // read pointing from VPM text file
     if( iVPMDirectory.size() > 0 )
@@ -87,7 +86,7 @@ bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bo
       fGoodVPM = readPointingCalibratedVPMFromDB(); 
       // fall back to DB pointing if reading pointing monitor data failed
       if( !fGoodVPM ) {
-	cout << "VPointingDB: quality-selected VPM data not available, reverting to encoder data for telescope "<< getTelID()+1 <<" for full duration of run "<< fRunNumber << endl;
+	cout << "VPointingDB warning: quality-selected VPM data not available, reverting to encoder data for telescope "<< getTelID()+1 <<" for full duration of run "<< fRunNumber << endl;
 	fStatus = readPointingFromDB();
       }
       else fStatus = fGoodVPM;
