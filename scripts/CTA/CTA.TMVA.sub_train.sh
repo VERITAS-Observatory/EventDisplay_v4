@@ -45,9 +45,6 @@ RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 echo $NIMAGESMIN $ANADIR $EREC $DDIR
 # parameters from command line
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
-# MD200, NTree=1000
-RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927.NT1000"
-RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927.MD200"
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927"
 RXPAR=`basename $RPAR.runparameter runparameter`
 OFIL="BDT"
@@ -73,8 +70,8 @@ then
    OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
    DSUF="gamma_cone10"
 else
-   OFFMIN=( "-1.e10" )
-   OFFMAX=( "1.e10" )
+   OFFMIN=( "0.0" )
+   OFFMAX=( "1.0" )
    OFFMEA=( 0.0 )
    DSUF="gamma_onSource"
 fi
