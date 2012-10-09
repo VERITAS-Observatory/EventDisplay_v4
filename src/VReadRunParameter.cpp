@@ -425,7 +425,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	    fRunPara->fDBUncalibratedVPM = false;
             fRunPara->fDBTracking = true;
         }
-        else if( iTemp.rfind( "-useuncalibratedvpm" ) < iTemp.size() ) //JG
+        else if( iTemp.rfind( "-useuncalibratedvpm" ) < iTemp.size() )
 	{
             fRunPara->fDBVPM = false;
             fRunPara->fDBUncalibratedVPM = true;

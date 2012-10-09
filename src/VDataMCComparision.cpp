@@ -469,7 +469,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 // quality cuts
    double fCoreMax_QC = 350.;       // cut on core distance
    int    fNImages_min = 3;         // minimum number of images per event
-   double SizeSecondMax_min = 500;  // minimum size of second brightest image
 // stereo cuts
    double theta2_cut = 0.035;
 //   if( fNTel > 2 ) theta2_cut = 0.025;
@@ -526,7 +525,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
    cout << "\t quality cuts: " << endl;
    cout << "\t\t maximum core distance [m]: " << fCoreMax_QC << endl;
    cout << "\t\t minimum number of images per event: " << fNImages_min << endl;
-   cout << "\t\t minimum size of second brightest image: " << SizeSecondMax_min << endl;
    cout << "\t cuts: ";
    if( fSingleTelescopeCuts == -1 )
    {
@@ -597,8 +595,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
       if( fData->MSCW < -50. ) continue;
       if( fData->MSCL < -50. ) continue;
       if( sqrt( fData->Xcore*fData->Xcore + fData->Ycore*fData->Ycore ) > fCoreMax_QC ) continue;
-
-      if( c->SizeSecondMax < SizeSecondMax_min ) continue;
 
 // AZ cut to check azimuth dependence of core distance distributions
       if( fAzRange && (fData->Az < fAzMin || fData->Az > fAzMax ) ) continue; 
