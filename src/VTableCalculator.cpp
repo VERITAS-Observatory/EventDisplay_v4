@@ -711,7 +711,8 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
 
    int i_x = h->GetXaxis()->FindBin( x );
    int i_y = h->GetYaxis()->FindBin( y );
-   if( i_x == 1 || i_y <= 2 || i_x == h->GetNbinsX() || i_y == h->GetNbinsY() )
+// handle under and overflows ( bin nBinsX+1 is needed)
+   if( i_x == 0 || i_y == 0 || i_x == h->GetNbinsX() || i_y == h->GetNbinsY() )
    {
       if( iError ) return h->GetBinError( i_x, i_y );
       else         return h->GetBinContent( i_x, i_y );
@@ -732,7 +733,9 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
       e2 = VStatistics::interpolate( h->GetBinContent( i_x+1, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
 				     h->GetBinContent( i_x+1, i_y+1 ), h->GetYaxis()->GetBinCenter( i_y + 1 ),
 				     y, false, 0.5, 1.e-5 );
-      v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false, 0.5, 1.e-5 );
+      v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ),
+                                    e2, h->GetXaxis()->GetBinCenter( i_x + 1 ),
+				    x, false, 0.5, 1.e-5 );
    }
    else
    {
@@ -745,8 +748,10 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
       
       v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );
    }
-   if( e1 > 1.e-2 && e2 < 1.e-2 ) return e1;
-   if( e1 < 1.e-2 && e2 > 1.e-2 ) return e2;
+// final check on consistency of results 
+// (don't expect to reconstruct anything below 1 GeV)
+   if( e1 > 1.e-3 && e2 < 1.e-3 ) return e1;
+   if( e1 < 1.e-3 && e2 > 1.e-3 ) return e2;
 
    return v;
 }

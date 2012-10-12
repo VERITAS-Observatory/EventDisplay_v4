@@ -253,7 +253,7 @@ inline double interpolate( double w1, double ze1, double w2, double ze2, double 
 // don't interpolate if both values are not valid
     if( w1 < iMinValidValue && w2 < iMinValidValue ) return -99.;
 
-// same zenith angle, don't interpolate
+// same x-value, don't interpolate
     if( fabs( ze1 - ze2 ) < 1.e-3 )
     {
        if( w1 < iMinValidValue )      return w2;
