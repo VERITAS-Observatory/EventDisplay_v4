@@ -221,7 +221,7 @@ void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
 
 */
 ////////////////////////////////////////////////////////////////////////////////////
-void plotDifferentialSensitivity( string iFluxUnit = "PFLUX",
+void plotDifferentialSensitivity( string iFluxUnit = "ENERGY",
                                   char *ifile1 = 0, char *ifile2 = 0,
 				  char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
 				  unsigned int iCrabSpec_ID = 5, string iObservatory = "CTA" )

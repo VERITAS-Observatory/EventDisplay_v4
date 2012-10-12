@@ -28,7 +28,7 @@ void VLightCurveUtilities::resetLightCurveData()
 {
    fLightCurveData.clear();
 
-   fLightCurveMJD_min = 1.e99;
+   fLightCurveMJD_min =  1.e99;
    fLightCurveMJD_max = -1.e99;
 }
 
@@ -86,7 +86,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
        istringstream is_stream( is_line );
 
 //! no errors are catched here..
-       is_stream >> iTemp1;     // second since fXRTMissionTimeStart or MJD
+       is_stream >> iTemp1;     // second since fXRTMissionTimeStart or MJD (depends on fXRTTimeSettings)
        is_stream >> iTemp2;     // error [s]
 
 // times are given in XRT mission sec.
@@ -116,7 +116,10 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 	  fLightCurveData.back()->setMJDInterval( fLightCurveData.back()->fMJD_Data_min, fLightCurveData.back()->fMJD_Data_max );
        }
 
-       if( fLightCurveData.back()->fMJD_Data_min < fLightCurveMJD_min ) fLightCurveMJD_min = fLightCurveData.back()->fMJD_Data_min;
+       if( fLightCurveData.back()->fMJD_Data_min < fLightCurveMJD_min )
+       {
+          fLightCurveMJD_min = fLightCurveData.back()->fMJD_Data_min;
+       }
        if( fLightCurveData.back()->fMJD_Data_max > 0. && fLightCurveData.back()->fMJD_Data_max > fLightCurveMJD_max ) 
        {
           fLightCurveMJD_max = fLightCurveData.back()->fMJD_Data_max;
@@ -156,7 +159,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
    updatePhaseFoldingValues();
 
    cout << "VLightCurve::readASCIIFile() total number of light curve data: " << fLightCurveData.size() << endl;
-   cout << "\t(MJD range: " << fLightCurveMJD_min << "," << fLightCurveMJD_max << ")" << endl;
+   if( fLightCurveData.size() > 0 ) cout << "\t(MJD range: " << fLightCurveMJD_min << "," << fLightCurveMJD_max << ")" << endl;
 
    return true;
 }
@@ -285,7 +288,8 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
    {
       for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
       {
-         cout << "  "    << fLightCurveData[i]->getMJD();
+	 cout << "Light-curve point: ";
+         cout << "  "    << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
 	 cout << "     " << scientific << fLightCurveData[i]->fFlux;
 	 cout << "     " << scientific << fLightCurveData[i]->getFluxError();
 	 cout << fixed << endl;
