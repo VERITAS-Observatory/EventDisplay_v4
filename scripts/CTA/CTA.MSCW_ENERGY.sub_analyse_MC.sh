@@ -2,8 +2,6 @@
 #
 # script to analyse MC files with lookup tables
 #
-# Revision $Id: analyse_MC_CTA.sh,v 1.1.2.1.2.2.2.2 2011/02/14 16:19:27 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 

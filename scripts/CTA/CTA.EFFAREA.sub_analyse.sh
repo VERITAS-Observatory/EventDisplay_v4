@@ -327,12 +327,12 @@ do
       rm -f $iCFIL-f
       sed -e "s|TMVACUTDIR|$TMVACUT|" $iCFIL-g > $iCFIL-h
       rm -f $iCFIL-g
-      if [ $DSET = "v_leeds" ]
-      then
-	 sed -e "s|DATASET|cta-ultra3|" $iCFIL-h > $iCFIL-i
-      else
+#      if [ $DSET = "v_leeds" ]
+#      then
+#	 sed -e "s|DATASET|cta-ultra3|" $iCFIL-h > $iCFIL-i
+#      else
 	 sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
-      fi
+#      fi
 # angular resolution file
       rm -f $iCFIL-h
       if [ $PART = "gamma_onSource" ] 
@@ -441,8 +441,12 @@ do
       echo "parameter files write written to $QDIR"
 
 # submit the job
-#     qsub -l os="sl*" -l h_cpu=0:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
-     qsub -l os="sl*" -l h_cpu=11:29:00 -js 200 -l h_vmem=6000M -l tmpdir_size=10G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+     if [ $GFILLING = "2" ]
+     then
+	qsub -js 200 -l os="sl*" -l h_cpu=0:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+     else
+	qsub -js 200 -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+     fi
    done
 done
 

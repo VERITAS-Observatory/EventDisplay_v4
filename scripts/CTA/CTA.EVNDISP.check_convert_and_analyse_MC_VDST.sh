@@ -59,41 +59,41 @@ do
   for ARRAY in $VARRAY
   do
 
- # check that simtel fil exists
-     if [ ! -e $AFIL ]
-     then
-       echo "NO SIMTEL FILE: $AFIL"
-       echo $AFIL >> $FAILED.$ARRAY.list
-       continue
-     fi
-
+# check that simtel fil exists
+#    if [ ! -e $AFIL ]
+#    then
+#       echo "NO SIMTEL FILE: $AFIL"
+#       echo $AFIL >> $FAILED.$ARRAY.list
+#       continue
+#     fi
+#
       DDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$PART/"
       LDIR="$CTA_USER_LOG_DIR/analysis/AnalysisData/$DSET/$ARRAY/$PART-/"
-
+#
 # check evndisp log file
-      LFIL=`basename $AFIL .gz`
-      if [ -e $LDIR/$LFIL.evndisp.log ]
-      then
-	 LLINE=`grep "END OF ANALYSIS" $LDIR/$LFIL.evndisp.log`
-	 if [ ${#LLINE} -eq 0 ]
-	 then
-	   echo "INCOMPLETE EVNDISP RUN $LDIR/$LFIL.evndisp.log" 
-           echo $AFIL >> $FAILED.$ARRAY.list
-           continue
-	 fi
-	 LLINE=`grep -i "error" $LDIR/$LFIL.evndisp.log`
-	 if [ ${#LLINE} -ne 0 ]
-	 then
-	   echo "ERRORNESS EVNDISP RUN $LDIR/$LFIL.evndisp.log" 
-           echo $AFIL >> $FAILED.$ARRAY.list
-	   continue
-	 fi
-      else
-         echo "NO EVNDISP LOG FILE: $LDIR/$LFIL.evndisp.log"
-         echo $AFIL >> $FAILED.$ARRAY.list
-	 continue
-      fi
-
+#      LFIL=`basename $AFIL .gz`
+#      if [ -e $LDIR/$LFIL.evndisp.log ]
+#      then
+#	 LLINE=`grep "END OF ANALYSIS" $LDIR/$LFIL.evndisp.log`
+#	 if [ ${#LLINE} -eq 0 ]
+#	 then
+#	   echo "INCOMPLETE EVNDISP RUN $LDIR/$LFIL.evndisp.log" 
+#           echo $AFIL >> $FAILED.$ARRAY.list
+#           continue
+#	 fi
+#	 LLINE=`grep -i "error" $LDIR/$LFIL.evndisp.log`
+#	 if [ ${#LLINE} -ne 0 ]
+#	 then
+#	   echo "ERRORNESS EVNDISP RUN $LDIR/$LFIL.evndisp.log" 
+#           echo $AFIL >> $FAILED.$ARRAY.list
+#	   continue
+#	 fi
+#      else
+#         echo "NO EVNDISP LOG FILE: $LDIR/$LFIL.evndisp.log"
+#         echo $AFIL >> $FAILED.$ARRAY.list
+#	 continue
+#      fi
+#
 # check that evndisp output file exists
       if [ ! -e $DDIR/$RUN.root ]
       then

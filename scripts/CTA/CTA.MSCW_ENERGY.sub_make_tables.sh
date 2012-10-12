@@ -2,8 +2,6 @@
 #
 # make tables for CTA
 #
-# Revision $Id: make_tables_CTA.sh,v 1.1.2.1.2.1 2011/01/03 08:23:40 gmaier Exp $
-#
 #
 # Author: Gernot Maier
 #
@@ -128,7 +126,7 @@ do
       chmod u+x $FNAM.sh
 
 # submit the job
-      qsub -l os="sl*" -js 20 -l h_cpu=11:00:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -l os="sl*" -l h_cpu=11:45:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 

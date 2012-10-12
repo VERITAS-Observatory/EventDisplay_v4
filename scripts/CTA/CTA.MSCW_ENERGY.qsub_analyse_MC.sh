@@ -2,8 +2,6 @@
 #
 # script to analyse MC files with lookup tables
 #
-# Revision $Id: qsub_analyse_MC_CTA.sh,v 1.1.2.1.2.1.2.1 2011/02/14 08:09:53 gmaier Exp $
-#
 # Author: Gernot Maier
 #
 
@@ -13,7 +11,7 @@ set IFIL="IIIIFIL"
 set TFIL=TTTTFIL
 set ARRAY=ARRAYYY
 set DSET=DATASET
-set ADIR="Analysis-NM2-ID$RECID-d20120812"
+set ADIR="Analysis-NM2-ID$RECID-d20121007"
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh CTA

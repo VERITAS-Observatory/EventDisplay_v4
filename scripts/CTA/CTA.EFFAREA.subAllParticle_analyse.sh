@@ -68,7 +68,8 @@ then
       VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
    elif [ $DSET = "v_leeds" ]
    then
-      VPART=( "proton" )
+#      VPART=( "gamma_onSource" "gamma_cone10" "electron"  "proton" )
+      VPART=( "electron_onSource" "proton_onSource" )
    elif [ $DSET = "VTS" ]
    then
      VPART=( "gamma_onSource" "proton" )

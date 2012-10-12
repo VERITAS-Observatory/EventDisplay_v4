@@ -8,7 +8,8 @@
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.sh CTA
 
-IFIL=SIMTELFILE
+IFIL=SIMTELDIR
+IRUN=$SGE_TASK_ID
 PART=PAAART
 SUBA="ARRAY"
 KEEP=KEEEEEEP
@@ -19,14 +20,27 @@ LOGF=FLL
 # set array
 FIELD=$SUBA
 
-OFIL=`basename $IFIL .gz`
-
 # eventdisplay optimization
 OPT="-shorttree -l2setspecialchannels nofile"
 
+# hard wired!!
+# DESY 3700m
+IFIL="$IFIL/proton_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simtel.gz"
+# cta-ultra3 gamma_cone10
+#IFIL="$IFIL/gamma_20deg_90deg_run"$IRUN"___cta-ultra3_desert_cone10.simhess.gz"
 # cp simtelarray.gz file to TMPDIR
 echo "$IFIL"
 cp -v -f $IFIL $TMPDIR"/"
+
+if [ ! -e $IFIL ]
+then
+   echo "Warning: SIMTELFILE does not exist"
+   exit
+fi
+
+# output file
+OFIL=`basename $IFIL .gz`
+echo "OUTPUT FILE $OFIL"
 
 #loop over all arrays
 for N in $FIELD
@@ -58,8 +72,8 @@ done
 # tar the log files
 cd $TMPDIR
 tar -czvf $OFIL.tar.gz *.log
-mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES
-mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES/
+mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$LOGF
+mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$LOGF/
 
 exit
 
