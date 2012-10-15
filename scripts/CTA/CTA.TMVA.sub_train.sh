@@ -46,6 +46,7 @@ echo $NIMAGESMIN $ANADIR $EREC $DDIR
 # parameters from command line
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927"
+RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20121013"
 RXPAR=`basename $RPAR.runparameter runparameter`
 OFIL="BDT"
 CONE="FALSE"
@@ -59,11 +60,17 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 #####################################
 # energy bins
 # (default 2012/10/09)
-EMIN=( -2.50 -1.75 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 1.50 )
-EMAX=( -1.25 -1.00 -0.75 -0.50 -0.25  0.00  0.25 0.50 0.75 1.00 1.30 1.75 2.50 )
+# EMIN=( -2.50 -1.75 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 1.50 )
+# EMAX=( -1.25 -1.00 -0.75 -0.50 -0.25  0.00  0.25 0.50 0.75 1.00 1.30 1.75 2.50 )
 # shortened 2012/10/09
 # EMIN=( -2.50 -1.75 -1.00 -0.50 0.00 0.75 )
 # EMAX=( -1.25 -0.75 -0.25  0.25 1.00 2.50 )
+# shortened 2012/10/12
+# EMIN=( -2.50 -1.25 -1.00 -0.50 0.00 0.75 )
+# EMAX=( -1.00 -0.75 -0.25  0.25 1.00 2.50 )
+# shortened 2012/10/14
+EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 )
+EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 2.50 )
 NENE=${#EMIN[@]}
 #####################################
 # 
@@ -75,7 +82,8 @@ then
    DSUF="gamma_cone10"
 else
    OFFMIN=( "0.0" )
-   OFFMAX=( "1.0" )
+#   OFFMAX=( "1.0" )
+   OFFMAX=( "1.e10" )
    OFFMEA=( 0.0 )
    DSUF="gamma_onSource"
 fi

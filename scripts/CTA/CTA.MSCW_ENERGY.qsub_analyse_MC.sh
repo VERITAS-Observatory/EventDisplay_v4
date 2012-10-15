@@ -11,7 +11,7 @@ set IFIL="IIIIFIL"
 set TFIL=TTTTFIL
 set ARRAY=ARRAYYY
 set DSET=DATASET
-set ADIR="Analysis-NM2-ID$RECID-d20121007"
+set ADIR="Analysis-ID$RECID-d20121012"
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh CTA
