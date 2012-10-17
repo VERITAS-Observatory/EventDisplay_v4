@@ -11,10 +11,10 @@ ARRAY=$3
 PART=$4
 MET=$5
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
 then
    echo ""
-   echo "./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh <tablefile> <recid> <subarray list> <data set>"
+   echo "./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <script input parameter file>"
    echo "(table files without .root)"
    echo ""
    echo "submit jobs in paralell to analyse MC files with lookup tables"
@@ -22,6 +22,8 @@ then
    echo "  <tablefile>     table file name (without .root)"
    echo "  <recid>         reconstruction ID"
    echo "  <data set>      e.g. ultra, ISDC3700m, ..."
+   echo "  <script input parameter file>  file with directories, etc.; see example in"
+   echo "                             $CTA_EVNDISP_ANA_DIR/ParameterFiles/scriptsInput.runparameter"
    echo ""
    exit
 fi
@@ -54,17 +56,17 @@ do
 	 for (( l = 0; l < 10; l++ ))
 	 do
 	    echo "v_leeds $k$l"
-	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $k$l
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k$l
          done
 #      elif [ $4 = "DESY3700m" ]
       elif [ $4 = "ISDC3700m" ]
       then
 	 for (( l = 0; l < 10; l++ ))
 	 do
-	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 1$k$l
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 1$k$l
          done
       else
-	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $k
+	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k
       fi
    done
 done

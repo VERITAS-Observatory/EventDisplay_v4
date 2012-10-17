@@ -6,10 +6,10 @@
 #
 
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <particle> <data set> [wildcard]"
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <particle> <data set> <script input parameter file> [wildcard] "
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
@@ -17,6 +17,8 @@ then
    echo "  <subarraylist > text file with list of subarray IDs"
    echo "  <particle>      gamma_onSource / gamma_cone10 / electron / proton / helium"
    echo "  <data set>      e.g. ultra, ISDC3700m, ..."
+   echo "  <script input parameter file>  file with directories, etc.; see example in"
+   echo "                             $CTA_EVNDISP_ANA_DIR/ParameterFiles/scriptsInput.runparameter"
    echo
    echo "optional (for a huge amount of MC files):"
    echo "  [wildcard]     used in the < CTA.MSCW_ENERGY.subParallel_analyse_MC.sh > script"
@@ -34,9 +36,26 @@ PART=$4
 METH="LL"
 WC=""
 DSET="$5"
-if [ -n "$6" ]
+if [ -n "$7" ]
 then
-   WC=$6
+   WC=$7
+fi
+
+#######################################
+# read values from parameter file
+ANAPAR=$6
+if [ ! -e $ANAPAR ]
+then
+  echo "error: analysis parameter file not found: $ANAPAR" 
+  exit
+fi
+echo "reading analysis parameter from $ANAPAR"
+ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
+if [ -z "$ANADIR" ]
+then
+  echo "error: analysis parameter file not found: $ANAPAR" 
+  echo "(no ANADIR given)"
+  exit
 fi
 
 #########################################
@@ -101,14 +120,16 @@ do
    rm -f $FNAM-3.sh
    sed -e "s|ARRAYYY|$SUBAR|" $FNAM-4.sh > $FNAM-5.sh
    rm -f $FNAM-4.sh
-   sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM.sh
+   sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-6.sh
    rm -f $FNAM-5.sh
+   sed -e "s|AAAAADIR|$ANADIR|" $FNAM-6.sh > $FNAM.sh
+   rm -f $FNAM-6.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
 # submit the job
-   qsub -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+#   qsub -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
    echo "run script written to $FNAM.sh"
    echo "queue log and error files written to $QLOG"
 done

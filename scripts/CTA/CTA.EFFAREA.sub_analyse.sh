@@ -12,7 +12,7 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ] || [ ! -n "$7" ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <analysis parameter file> <outputsubdirectory> <data set> [filling mode]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode]"
    echo "================================================================================"
    echo
    echo "make effective areas for CTA"
@@ -31,8 +31,9 @@ then
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file (full path and file name)"
    echo
-   echo "<analysis parameter file>"
+   echo "<scripts parameter file>"
    echo "     file with analysis parameter"
+   echo "     see e.g. CTA_EVNDISP_ANA_DIR/ParameterFiles/scriptsInput.runparameter"
    echo 
    echo "<outputsubdirectory>"
    echo "     directory with all result and log files (full path)"
@@ -68,6 +69,13 @@ ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
 TMVACUT=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
+if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "EREC" ] || [ -z "TMVACUT" ] || [ -z "EFFAREADIR" ]
+then
+  echo "error: analysis parameter file not correct: $ANAPAR" 
+  echo " one variable missing"
+  echo $NIMAGESMIN $ANADIR $EREC $TMVACUT $EFFAREADIR
+  exit
+fi
 echo $NIMAGESMIN $ANADIR $EREC $TMVACUT $EFFAREADIR
 # parameters from command line
 ARRAY=$1
@@ -99,7 +107,7 @@ FSCRIPT="CTA.EFFAREA.qsub_analyse"
 ######################################################################
 DATE=`date +"%y%m%d"`
 echo "directory for qsub shell scripts"
-QSHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir"
+QSHELLDIR=$CTA_USER_DATA_DIR"/queueShellDir"
 echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
@@ -407,6 +415,10 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ] || [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
+      then
+        echo "* IGNOREFRACTIONOFEVENTS 0.5" >> $MSCF
+      fi
       echo "* CUTFILE $iCFIL" >> $MSCF
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
 
@@ -419,14 +431,12 @@ do
       fi
 
 # create run script
-      FNAM="CTAeffArea-$PART-$ARRAY-$i-$j-$EREC"
+      FNAM="CTAeffArea-$DSET-$PART-$ARRAY-$i-$j-$EREC"
 # run parameter file
-      sed -e "s|IIIIFIL|$MSCF|" $FSCRIPT.sh > $QSHELLDIR/$FSCRIPT-1.sh
+      sed -e "s|IIIIFIL|$MSCF|" $FSCRIPT.sh > $QSHELLDIR/$FNAM-1.sh
 # output file
-      sed -e "s|TTTTFIL|$OFIX|" $QSHELLDIR/$FSCRIPT-1.sh > $QSHELLDIR/$FSCRIPT-2.sh
-      rm -f $QSHELLDIR/$FSCRIPT-1.sh
-      mv -f $QSHELLDIR/$FSCRIPT-2.sh $QSHELLDIR/$FNAM.sh
-
+      sed -e "s|TTTTFIL|$OFIX|" $QSHELLDIR/$FNAM-1.sh > $QSHELLDIR/$FNAM.sh
+      rm -f $QSHELLDIR/$FNAM-1.sh
       chmod u+x $QSHELLDIR/$FNAM.sh
 
       echo
