@@ -138,12 +138,11 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	map< int, double > fSignificanceLimited;             // sensitivity is significance limited at this energy (linear) [GeV] !!!
 	map< int, double > fMinEventsLimited;                // sensitivity is limited by minimum number of events at this energy [GeV] !!!
 	map< int, double > fMinBackgroundEventsLimited;      // sensitivity is limited by minimum number of background events at this energy [GeV] !!!
+	map< int, double > fMinNoBackground;                 // no background events
 
         double fEnergy_min_Log;
         double fEnergy_max_Log;
 	double fEnergy_dE_log10;
-
-	bool   bUseEffectiveAreas_vs_reconstructedEnergy;
 
 // data vectors for MC and int/diff sensitivity calculation
 	map< unsigned int, VSensitivityCalculatorDataResponseFunctions* > fMC_Data;                        //! [particle ID]
@@ -230,7 +229,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	bool     fillSensitivityHistograms( TH1F* iSensitivity = 0, TH1F* iBGRate = 0, TH1F* iBGRateSqDeg = 0, 
 	                                    TH1F* iProtonRate = 0,  TH1F* iElectronRate = 0 );
 	bool     getDebug() { return fDebug; }
-        double   getSensitivity( unsigned int iD, double energy = -1. );
+        double   getSensitivity( unsigned int iD, double energy = -1., bool iFillStatistics = true );
 	TGraphAsymmErrors*  getSensitivityGraph() { return gSensitivityvsEnergy; }
         unsigned int  listDataSets();
         void     listUnits();
@@ -281,9 +280,8 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );
         void     setSourceStrengthVector_CU();
         void     setSourceStrengthVector_CU( vector< double > );
-	void     setUseEffectiveAreas_vs_reconstructedEnergy( bool iB = false ) { bUseEffectiveAreas_vs_reconstructedEnergy = iB; }
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,14);
+        ClassDef(VSensitivityCalculator,15);
 };
 #endif
