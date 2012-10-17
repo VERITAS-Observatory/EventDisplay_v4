@@ -1369,7 +1369,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
     {
        i_start = (Long64_t)(fRunPara->fIgnoreFractionOfEvents*d_nentries);
     }
-    cout << "\t total number of data events: " << d_nentries << "(start at " << i_start << ")" << endl;
+    cout << "\t total number of data events: " << d_nentries << " (start at event " << i_start << ")" << endl;
     for( Long64_t i = i_start; i < d_nentries; i++ )
     {
          d->GetEntry( i );
@@ -1703,6 +1703,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
        }
     }
     else iSuccessfullEventStatistics *= -1; */
+    if( iSuccessfullEventStatistics < 0 ) iSuccessfullEventStatistics *= -1;
     cout << "\t total number of events after cuts: " << iSuccessfullEventStatistics << endl;
 
     return true;
