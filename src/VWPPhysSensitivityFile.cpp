@@ -362,11 +362,6 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
 // significance parameters
     i_Sens.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
     i_SensCU.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
-// energy axis
-//    i_Sens.setUseEffectiveAreas_vs_reconstructedEnergy( true );
-//    i_SensCU.setUseEffectiveAreas_vs_reconstructedEnergy( true );
-    i_Sens.setUseEffectiveAreas_vs_reconstructedEnergy( false );
-    i_SensCU.setUseEffectiveAreas_vs_reconstructedEnergy( false );
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
 // CTA

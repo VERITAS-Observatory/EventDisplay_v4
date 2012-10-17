@@ -30,6 +30,8 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fAzimuthBins = true;
     fIsotropicArrivalDirections = false;
 
+    fIgnoreFractionOfEvents = 0.;
+
     fTelescopeTypeCuts = false;
 
     fFillMCHistograms = false;
@@ -135,6 +137,11 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
             else if( temp == "ISOTROPICARRIVALDIRECTIONS" )
             {
                 if( !is_stream.eof() ) is_stream >> fIsotropicArrivalDirections;
+            }
+// ignore first fraction NN of events, scale MC distributions accordingly
+            else if( temp == "IGNOREFRACTIONOFEVENTS" )
+            {
+                if( !is_stream.eof() ) is_stream >> fIgnoreFractionOfEvents;
             }
 // telescope type dependent cuts
             else if( temp == "TELESCOPETYPECUTS" )

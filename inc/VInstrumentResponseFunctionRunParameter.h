@@ -54,6 +54,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 
    bool            fAzimuthBins;
    bool            fIsotropicArrivalDirections;
+   float           fIgnoreFractionOfEvents;
 
    bool            fTelescopeTypeCuts;
 
@@ -84,7 +85,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    bool                  readRunParameterFromTextFile( string iFile );
    bool                  testRunparameters();
 
-   ClassDef( VInstrumentResponseFunctionRunParameter, 4 );
+   ClassDef( VInstrumentResponseFunctionRunParameter, 5 );
 };
 
 #endif

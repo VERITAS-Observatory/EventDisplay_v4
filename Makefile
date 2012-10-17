@@ -1041,7 +1041,7 @@ FORCEDISTDIR:
 #########################################
 # CTA
 
-CTA.runparameter:	$(ctapara).tar.gz
+CTA.runfiles:	$(ctapara).tar.gz
 
 $(ctapara).tar.gz:	$(ctapara)
 	find $(ctapara) -type f -print | cpio -o -H ustar > $(ctapara).tar
@@ -1074,7 +1074,7 @@ $(ctapara):
 #########################################
 # VTS
 
-VTS.runparameter:	$(vtspara).tar.gz
+VTS.runfiles:	$(vtspara).tar.gz
 
 $(vtspara).tar.gz:	$(vtspara)
 	find $(vtspara) -type f -print | cpio -o -H ustar > $(vtspara).tar

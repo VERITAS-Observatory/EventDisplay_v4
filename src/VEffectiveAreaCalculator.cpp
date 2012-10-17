@@ -1249,6 +1249,10 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
 	    {
 	        hVEmc[s][i_az] = (TH1D*)iMC_histo->getHistogram_Emc( i_az, s )->Clone( hname );
 		if( hVEmc[s][i_az] ) hVEmc[s][i_az]->Scale( iSolAngleNorm );
+	        if( hVEmc[s][i_az] && fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
+	        {
+	           hVEmc[s][i_az]->Scale( fRunPara->fIgnoreFractionOfEvents );
+                }
             }
 	    else hVEmc[s][i_az] = 0;
           }
@@ -1259,6 +1263,10 @@ bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCH
 	    {
 	       hVEmcSWeight[s][i_az] = (TProfile*)iMC_histo->getHistogram_EmcWeight( i_az, s )->Clone( hname );
 	       if( hVEmcSWeight[s][i_az] ) hVEmcSWeight[s][i_az]->Scale( iSolAngleNorm );
+	       if( hVEmcSWeight[s][i_az] && fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
+	       {
+	          hVEmcSWeight[s][i_az]->Scale( fRunPara->fIgnoreFractionOfEvents );
+               }
             }
 	    else hVEmcSWeight[s][i_az] = 0;
           }
@@ -1322,6 +1330,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
     cout << " (scatter radius " << fAreaRadius[ize] << " [m])" << endl;
     cout << "\t energy reconstruction method: " << iMethod << endl;
     if( fIsotropicArrivalDirections ) cout << "\t assuming isotropic arrival directions" << endl;
+    if( fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. ) cout << "\t ignore first " << fRunPara->fIgnoreFractionOfEvents*100. << " % of events" << endl;
 
     cout << endl;
     if( fSpectralWeight ) fSpectralWeight->print();
@@ -1355,8 +1364,13 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 // get full data set and loop over all entries
 ///////////////////////////////////////////////////////
     Long64_t d_nentries = d->fChain->GetEntries();
-    cout << "\t total number of data events: " << d_nentries << endl;
-    for( Long64_t i = 0; i < d_nentries; i++ )
+    Long64_t i_start = 0;
+    if( fRunPara &&  fRunPara->fIgnoreFractionOfEvents > 0. )
+    {
+       i_start = (Long64_t)(fRunPara->fIgnoreFractionOfEvents*d_nentries);
+    }
+    cout << "\t total number of data events: " << d_nentries << "(start at " << i_start << ")" << endl;
+    for( Long64_t i = i_start; i < d_nentries; i++ )
     {
          d->GetEntry( i );
 
