@@ -1338,7 +1338,12 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
     cout << endl;
 
 // make sure that all data pointers exist
-    if( !d || !iMC_histo ) return false;
+    if( !d || !iMC_histo )
+    {
+       cout << "VEffectiveAreaCalculator::fill error: no data tree or MC histograms: " << endl;
+       cout << d << "\t" << iMC_histo << endl;
+       return false;
+    }
 
 // spectral weight
     double i_weight = 1.;

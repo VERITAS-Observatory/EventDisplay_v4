@@ -57,13 +57,14 @@ bool VTMVARunData::openDataFiles()
          return false;
       }
 // get for first tree the number of telescope types
+// (note this is the source of the the Error in <TLeafI::GetLen>: Leaf counter is greater than maximum! messages
       if( fNTtype < 0 )
       {
-         UInt_t NTtype = 0;
+         Int_t NTtype = 0;
 	 fSignalTree.back()->SetBranchAddress("NTtype", &NTtype );
-	 fSignalTree.back()->GetEntry( 0 );
-	 fNTtype = (int)NTtype;
-       }
+	 if( fSignalTree.back()->GetEntries() > 0 ) fSignalTree.back()->GetEntry( 0 );
+	 fNTtype = NTtype;
+       } 
    }
 // open background trees
    fBackgroundFile.clear();

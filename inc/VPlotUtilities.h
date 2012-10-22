@@ -95,7 +95,7 @@ class VPlotUtilities
         void   setHistogramPlottingStyle( TH2D* his, double iminF);
         void   setGraphPlottingStyle( TGraph *g );
         void   setGraphPlottingStyle( TGraph *g, int icolor, double iwidth = 1., int imarker = 20, double isize = 1., int iFillStyle = 0, int iLineStyle = 1 );
-	unsigned int setPlottingAxis( string iName = "energy", string iAxis = "X", bool iLog = true, double xmin = 0.03, double xmax = 200., string iAxisTitle = "" );
+	unsigned int setPlottingAxis( string iName = "energy", string iAxis = "X", bool iLog = true, double xmin = 0.005, double xmax = 200., string iAxisTitle = "" );
         void   setPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2., int iMarkerStyle = 20,
 	                         float iMarkerSize = 2., int iFillStyle = 1001 )
 	                       { fPlottingColor = iColor; fPlottingLineStyle = iStyle; fPlottingLineWidth = iWidth;

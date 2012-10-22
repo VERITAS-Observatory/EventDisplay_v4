@@ -210,6 +210,10 @@ int main( int argc, char *argv[] )
 	      fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
 	      fMC_histo->print();
 	   }
+	   else
+	   {
+	      cout << "Warning: failed reading MC histograms" << endl;
+           }
         }
 // read MC histograms from a separate file
 	else if( fRunPara->fMCdatafile_histo.size() > 0 )

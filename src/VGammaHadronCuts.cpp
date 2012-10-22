@@ -2084,7 +2084,7 @@ bool VNTelTypeCut::test( CData *c )
    unsigned int ntel_type = 0;
    for( unsigned int i = 0; i < fTelType_counter.size(); i++ )
    {
-      if( fTelType_counter[i] < c->NTtype ) ntel_type += c->NImages_Ttype[fTelType_counter[i]];
+      if( (int)fTelType_counter[i] < c->NTtype ) ntel_type += c->NImages_Ttype[fTelType_counter[i]];
    }
 // OBS! >=
    if( ntel_type >= fNTelType_min ) return true;

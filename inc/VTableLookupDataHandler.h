@@ -198,7 +198,7 @@ class VTableLookupDataHandler
         ULong64_t fImgSel;
         bool fImgSel_list[VDST_MAXTELESCOPES];
 	unsigned int fImgSel_list_short[VDST_MAXTELESCOPES];
-	unsigned int fNTelTypes;
+	int fNTelTypes;
 	unsigned int NImages_Ttype[VDST_MAXTELESCOPES];
         double fimg2_ang;
         double fZe;                               //!< zenith angle

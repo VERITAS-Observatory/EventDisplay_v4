@@ -521,7 +521,7 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
             else fList_of_Tel_type[ftelconfig->TelType] = 1;
         }
 // number of different telescope types
-        fNTelTypes = fList_of_Tel_type.size();
+        fNTelTypes = (int)fList_of_Tel_type.size();
     }
     else
     {
@@ -845,7 +845,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 
 // telescope type related variables
     fOTree->Branch( "ImgSel_list",  fImgSel_list_short, "ImgSel_list[NImages]/i" );
-    fOTree->Branch( "NTtype", &fNTelTypes, "NTtype/i" );
+    fOTree->Branch( "NTtype", &fNTelTypes, "NTtype/I" );
     fOTree->Branch( "NImages_Ttype", NImages_Ttype, "NImages_Ttype[NTtype]/i" );
 
     fOTree->Branch( "img2_ang", &fimg2_ang, "img2_ang/D" );

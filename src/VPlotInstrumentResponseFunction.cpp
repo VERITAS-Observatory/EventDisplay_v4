@@ -23,7 +23,7 @@ VPlotInstrumentResponseFunction::VPlotInstrumentResponseFunction()
 
 void VPlotInstrumentResponseFunction::setPlottingDefaults()
 {
-   setPlottingAxis( "energy_Lin", "X", false, 0.03, 200., "energy [TeV]" );
+   setPlottingAxis( "energy_Lin", "X", false, 0.005, 200., "energy [TeV]" );
    setPlottingAxis( "distance_Lin", "X", false, 0., 500., "distance [m]" );
    setPlottingAxis( "nimages_Lin", "X", false, 0., 5., "number of images" );
 
@@ -552,7 +552,7 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
     he0->SetXTitle( "log_{10} energy [TeV]" );
     he0->SetYTitle( "number of events/bin" );
     he0->SetMinimum( 0.5 );
-    if( fData[0]->hEmc && iYMax < 0. )
+    if( fData.size() > 0 && fData[0]->hEmc && iYMax < 0. )
     {
        he0->SetMaximum( fData[0]->hEmc->GetMaximum()*1.5 );
     }

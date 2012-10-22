@@ -37,7 +37,6 @@ using namespace std;
 bool checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariable, bool iSignal )
 {
    char hname[2000];
-   char htype[20];
    TH1D *h = 0;
    cout << "checking";
    if( iSignal ) cout << " signal";
@@ -52,36 +51,42 @@ bool checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariable,
     || iVariable.find( "EmissionHeightChi2" ) != string::npos )
    {
       sprintf( hname, "%s >=2 ", iVariable.c_str() );
+      if( iVariable.find( "NImages_Ttype" ) != string::npos ) sprintf( hname, "NTtype>0 && %s", hname );
       TCut ntCut( hname );
       iCut = iCut && ntCut;
    }
 
    for( unsigned  int i = 0; i < iTreeVector.size(); i++ )
    {
+      h = 0;
       if( iTreeVector[i] )
       {
-	 sprintf( hname, "%s>>hXX_%d", iVariable.c_str(), i );
-	 iTreeVector[i]->Draw( hname, iCut, "goff" );
-	 sprintf( htype, "hXX_%d", i );
-	 h = (TH1D*)gDirectory->Get( htype);
+// fill a histogram with the variable to be checked
+	 sprintf( hname, "hXX_%d", i );
+         h = new TH1D( hname, "", 100, -1.e5, 1.e5 );
+	 iTreeVector[i]->Project( h->GetName(), iVariable.c_str(), iCut );
 	 if( h )
 	 {
 	    if( h->GetRMS() > 1.e-5 )
 	    {
 	       cout << "\t variable " << iVariable << " ok, RMS: " << h->GetRMS() << ", tree: " << i;
 	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax() << endl;
+	       h->Delete();
 	       return false;
 	    }
 	 }
       }
+      if( i < iTreeVector.size() - 1 && h ) h->Delete();
    }
 // means: variable is in all trees constant
    cout << "\t warning: constant variable  " << iVariable << " in ";
    if( iSignal ) cout << " signal tree";
    else          cout << " background tree";
-   if( h ) cout << " (RMS " << h->GetRMS() << ")";
+   if( h ) cout << " (mean " << h->GetMean() << ", RMS " << h->GetRMS() << ", entries " << h->GetEntries() << ")";
    cout << ", checked " << iTreeVector.size() << " trees";
    cout << endl;
+   if( h ) h->Delete();
+
    return true;
 }
 

@@ -73,7 +73,7 @@ class CData
         UInt_t          ImgSelS;
         ULong64_t       ImgSel;
 	UInt_t          ImgSel_list[VDST_MAXTELESCOPES];
-	UInt_t          NTtype;
+	Int_t           NTtype;
 	UInt_t		NImages_Ttype[VDST_MAXTELESCOPES];
         Double_t        img2_ang;
         Double_t        Ze;
