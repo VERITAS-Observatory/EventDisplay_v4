@@ -11,7 +11,7 @@ ARRAY=$3
 PART=$4
 MET=$5
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
+if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ]
 then
    echo ""
    echo "./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <script input parameter file>"
@@ -38,8 +38,7 @@ elif [ $4 = "DESY3700m" ]
 then
    VPART=( "proton" )
 else
-#   VPART=( "gamma_onSource" "electron" "proton" )
-   VPART=( "proton" )
+   VPART=( "gamma_onSource" "electron" "proton" )
 fi
 NPART=${#VPART[@]}
 

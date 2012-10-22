@@ -415,6 +415,7 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
+#      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ] 
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ] || [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
       then
         echo "* IGNOREFRACTIONOFEVENTS 0.5" >> $MSCF
