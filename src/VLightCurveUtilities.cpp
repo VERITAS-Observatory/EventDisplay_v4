@@ -169,11 +169,15 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
    print a row for a typical latex table
 
 */
-void VLightCurveUtilities::printLightCurveLaTexTableRow( double iSigmaMinFluxLimits, double iFluxMultiplicator )
+void VLightCurveUtilities::printLightCurveLaTexTableRow( double iSigmaMinFluxLimits, double iFluxMultiplicator, bool iPrintPhaseValues )
 {
    for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
    {
       cout << (int)fLightCurveData[i]->fMJD_Data_min << " - " << (int)fLightCurveData[i]->fMJD_Data_max << " & ";  
+      if( fPhase_Period_days > 0. && iPrintPhaseValues )
+      {
+          cout << setprecision( 2 ) << getPhase( fLightCurveData[i]->getMJD() ) << " & ";
+      }
       cout << "VERITAS & ";
 // observing time in minutes
       cout << (int)(fLightCurveData[i]->fRunTime/60.) << " & ";
