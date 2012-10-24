@@ -676,26 +676,74 @@ compareDatawithMC:	$(COMPAREDATAMCOBJ)
 ########################################################
 WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/writeCTAWPPhysSensitivityFiles.o \
-			./lib/libVAnaSum.so
-
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+			./obj/VASlalib.o \
+			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
+			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
+			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
+			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
+			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
+			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
+			./obj/VRunList.o ./obj/VRunList_Dict.o \
+			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
+			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
+			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
+			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
+			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
+			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+			./obj/VStatistics_Dict.o \
+			./obj/VUtilities.o 
+ 
 ./obj/writeCTAWPPhysSensitivityFiles.o: 	./src/writeCTAWPPhysSensitivityFiles.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 writeCTAWPPhysSensitivityFiles:	$(WRITECTAPHYSOBJ)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib -lVAnaSum $(OutPutOpt) ./bin/$@
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 ########################################################
 # writeParticleRateFilesFromEffectiveAreas 
 ########################################################
 WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
-			./lib/libVAnaSum.so
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+			./obj/VASlalib.o \
+			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
+			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
+			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
+			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
+			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
+			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
+			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
+			./obj/VRunList.o ./obj/VRunList_Dict.o \
+			./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
+			./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
+			./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
+			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
+			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
+			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+			./obj/VStatistics_Dict.o \
+			./obj/VUtilities.o 
 
 ./obj/writeParticleRateFilesFromEffectiveAreas.o: 	./src/writeParticleRateFilesFromEffectiveAreas.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 writeParticleRateFilesFromEffectiveAreas:	$(WRITECTAPHYSOBJ)
-	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib -lVAnaSum $(OutPutOpt) ./bin/$@
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 
