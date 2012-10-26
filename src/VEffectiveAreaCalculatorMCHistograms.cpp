@@ -28,7 +28,7 @@ VEffectiveAreaCalculatorMCHistograms::VEffectiveAreaCalculatorMCHistograms()
    fEnergyAxisMin_log10  = -2.;
    fEnergyAxisMax_log10  =  4.;
 
-   setDebug();
+   fDebug = false;
 }
 
 void VEffectiveAreaCalculatorMCHistograms::setDefaultValues()

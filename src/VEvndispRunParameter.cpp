@@ -69,10 +69,12 @@ VEvndispRunParameter::VEvndispRunParameter()
     fGainFileNumber.push_back( 0 );
     fTOffFileNumber.push_back( 0 );
     fPedFileNumber.push_back( 0 );
+    fTZeroFileNumber.push_back( 0 );
     fLowGainMultiplierFileNumber.push_back( 0 );
     fPedLowGainFileNumber.push_back( 0 );
     fGainLowGainFileNumber.push_back( 0 );
     fTOffLowGainFileNumber.push_back( 0 );
+    fTZeroLowGainFileNumber.push_back( 0 );
     fPixFileNumber.push_back( 0 );
     fIgnoreDSTGains = false;
 
@@ -147,6 +149,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fPedestalsLengthOfTimeSlice = 180.;            //!< [s]
     fCalibrationSumWindow = 20;
     fCalibrationSumFirst = 0;
+    fCalibrationIntSumMin = 50.;
     fL2TimeCorrect = true;
     fsetSpecialChannels = "EVNDISP.specialchannels.dat";
     ftracefit = -1.;
@@ -251,7 +254,7 @@ void VEvndispRunParameter::print( int iEv )
     cout << endl;
     if( iEv == 1 )
     {
-        cout << "\t -----------------------------------------" << endl;
+        cout << "\t ---------------------------------------------" << endl;
         if( frunmode == 0 && !fdisplaymode  )    cout << "\t       ANALYZING DATA" << endl;
 	else if( frunmode == 0 && fdisplaymode ) cout << "\t       DISPLAYING DATA" << endl;
         else if( frunmode == 1 ) cout << "\t       CALCULATING PEDESTALS" << endl;
@@ -260,7 +263,9 @@ void VEvndispRunParameter::print( int iEv )
         else if( frunmode == 4 ) cout << "\t       WRITING DATA SUMMARY FILES" << endl;
         else if( frunmode == 5 ) cout << "\t       CALCULATING GAINS AND TIME OFFSETS (low gain channels)" << endl;
         else if( frunmode == 6 ) cout << "\t       CALCULATING PEDESTALS (low gain channels)" << endl;
-        cout << "\t -----------------------------------------" << endl << endl;
+	else if( frunmode == 7 ) cout << "\t       CALCULATING TZEROS (high gain channels)" << endl;
+	else if( frunmode == 8 ) cout << "\t       CALCULATING TZEROS (low gain channels)" << endl;
+        cout << "\t ---------------------------------------------" << endl << endl;
     }
     if( iEv == 2 )
     {
@@ -443,7 +448,10 @@ void VEvndispRunParameter::print( int iEv )
             if( i < fGainCorrection.size() && TMath::Abs( fGainCorrection[i] - 1. ) > 0.001 ) cout << " (gain correction: " << fGainCorrection[i]  << ")";
             cout << ", toff file: " << fTOffFileNumber[i];
             if( fTOffLowGainFileNumber[i] > 0 ) cout << ", low gain toff file: " << fTOffLowGainFileNumber[i];
-            cout << ", pixel file: " << fPixFileNumber[i] << endl;
+            cout << ", pixel file: " << fPixFileNumber[i];
+	    cout << ", tzero file: " << fTZeroFileNumber[i];
+	    if( fTZeroLowGainFileNumber[i] > 0 ) cout << ", low gain tzero file: " << fTZeroLowGainFileNumber[i];
+	    cout << endl;
         }
     }
 

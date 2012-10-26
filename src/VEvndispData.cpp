@@ -689,6 +689,36 @@ bool VEvndispData::setSums( valarray< double > iVSum )
    return true;
 }
 
+bool VEvndispData::setAverageTZero( unsigned int iChannel, double iTZero, bool iLowGain )
+{
+    if( !iLowGain )
+    {
+      if( iChannel < fCalData[fTelID]->fAverageTzero.size() ) fCalData[fTelID]->fAverageTzero[iChannel] = iTZero;
+      else return false;
+    }
+    else
+    {
+       if( iChannel < fCalData[fTelID]->fLowGainAverageTzero.size() ) fCalData[fTelID]->fLowGainAverageTzero[iChannel] = iTZero;
+       else return false;
+    }
+    return true;
+}
+
+bool VEvndispData::setAverageTZerovars( unsigned int iChannel, double iTZero, bool iLowGain )
+{
+    if( !iLowGain )
+    {
+      if( iChannel < fCalData[fTelID]->fAverageTzerovars.size() ) fCalData[fTelID]->fAverageTzerovars[iChannel] = iTZero;
+      else return false;
+    }
+    else
+    {
+       if( iChannel < fCalData[fTelID]->fLowGainAverageTzerovars.size() ) fCalData[fTelID]->fLowGainAverageTzerovars[iChannel] = iTZero;
+       else return false;
+    }
+    return true;
+}
+
 bool VEvndispData::fDebug = false;
 int VEvndispData::fDebugLevel = 0;
 int VEvndispData::fNDebugMessages = 0;

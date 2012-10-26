@@ -11,33 +11,34 @@
 #include <VCalibrationData.h>
 
 VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedfile, string iGainfile, string iTofffile,
-                                    string iPedLowGainfile, string iGainLowGainFile, string iToffLowGainfile, string iLowGainMultFile )
+                                    string iPedLowGainfile, string iGainLowGainfile, string iToffLowGainfile,
+				    string iLowGainMultfile, string iTzerofile, string iTzeroLowGainfile )
 {
     fUsePedestalsInTimeSlices = true;
     fLowGainUsePedestalsInTimeSlices = true;
 
     fTelID = iTel;
     fCalDirName = iDir;
-    fPedFileName = iPedfile;
-    fGainFileName = iGainfile;
-    fToffFileName = iTofffile;
 
-    fLowGainPedFileName = iPedLowGainfile;
-    fLowgainGainFileName = iPedLowGainfile;
-    fLowGainToffFileName = iGainLowGainFile;
-    fLowGainMultiplierFileName = iLowGainMultFile;
+    fFileName.push_back( iPedfile );                fHistoName.push_back( "pedestal" );
+    fFileName.push_back( iGainfile );               fHistoName.push_back( "gain" );
+    fFileName.push_back( iTofffile );               fHistoName.push_back( "toff" );
+    fFileName.push_back( iPedLowGainfile );         fHistoName.push_back( "pedestal_lowGain" );
+    fFileName.push_back( iGainLowGainfile );        fHistoName.push_back( "gain_lowGain" );
+    fFileName.push_back( iToffLowGainfile );        fHistoName.push_back( "toff_lowGain" );
+    fFileName.push_back( iLowGainMultfile );        fHistoName.push_back( "lowgain_mult" );
+    fFileName.push_back( iTzerofile );              fHistoName.push_back( "tzero" );
+    fFileName.push_back( iTzeroLowGainfile );       fHistoName.push_back( "tzero_lowGain" );
+
+    for( unsigned int i = 0; i < fFileName.size(); i++ )
+    {
+       fFile.push_back( 0 );
+    }
+
 
     fPedFromPLine = false;
 
     fReader = 0;
-
-    fPedFile = 0;
-    fGainFile = 0;
-    fToffFile = 0;
-    fLowGainPedFile = 0;
-    fLowGainGainFile = 0;
-    fLowGainToffFile = 0;
-    fLowGainMultiplierFile = 0;
 
     fBoolLowGainPedestals = false;
     fBoolLowGainGains = false;
@@ -48,75 +49,59 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 
     fTS_ped_temp_time = 0.;
 
+    setAverageTZero( 0., true );
+    setAverageTZero( 0., false );
+
 // summary histograms
 
     hisList = new TList();
 
     char hname[200];
-    sprintf( hname, "hPeds_%d", iTel+1 );
-    fPedDistribution = new TH1F( hname, "", 200, 0., 50. );
-    fPedDistribution->SetXTitle( "mean pedestal [dc]" );
-    hisList->Add( fPedDistribution );
+    char hname_var[200];
+    for( unsigned int i = 0; i < fFile.size(); i++ )
+    {
+       sprintf( hname, "h%s_%d", fHistoName[i].c_str(), iTel+1 );
+       sprintf( hname_var, "h%s_var_%d", fHistoName[i].c_str(), iTel+1 );
+       if( i == C_PED || i == C_PEDLOW )
+       {
+          fHisto_mean.push_back( new TH1F( hname, "", 200, 0., 50. ) );
+	  fHisto_mean.back()->SetXTitle( "mean pedestal [dc]" );
+	  fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 50. ) );
+	  fHisto_variance.back()->SetXTitle( "mean pedestal [dc]" );
+       }
+       else if( i == C_TOFF || i == C_TOFFLOW )
+       {
+          fHisto_mean.push_back( new TH1F( hname, "", 200, -20., 20. ) );
+	  fHisto_mean.back()->SetXTitle( "time offset [sample]" );
+	  fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 10. ) );
+	  fHisto_variance.back()->SetXTitle( "time offset variance [sample]" );
+       }
+       else if( i == C_GAIN || i == C_GAINLOW )
+       {
+          fHisto_mean.push_back( new TH1F( hname, "", 200, 0., 3. ) );
+	  fHisto_mean.back()->SetXTitle( "relative gain" );
+	  fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 2. ) );
+	  fHisto_variance.back()->SetXTitle( "relative gain variance" );
+       }
+       else if( i == C_LOWGAIN )
+       {
+          fHisto_mean.push_back( new TH1F( hname, "", 200, 0., 20. ) );
+	  fHisto_mean.back()->SetXTitle( "low gain multiplier" );
+	  fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 20. ) );
+	  fHisto_variance.back()->SetXTitle( "low gain multiplier variance" );
+       }
+       else if( i == C_TZERO || i == C_TZEROLOW )
+       {
+          fHisto_mean.push_back( new TH1F( hname, "", 200, 0., 20. ) );
+	  fHisto_mean.back()->SetXTitle( "average pulse time t_{0} [sample]" );
+	  fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 20. ) );
+	  fHisto_variance.back()->SetXTitle( "average pulse time t_{0} (variance) [sample]" );
+       }
 
-    sprintf( hname, "hPedsLowGain_%d", iTel+1 );
-    fLowGainPedDistribution = new TH1F( hname, "", 200, 0., 50. );
-    fLowGainPedDistribution->SetXTitle( "mean pedestal [dc]" );
-    hisList->Add( fLowGainPedDistribution );
+       hisList->Add( fHisto_mean.back() );
+       hisList->Add( fHisto_variance.back() );
+    }
 
-    sprintf( hname, "hPedvars_%d", iTel+1 );
-    fPedvarsDistribution = new TH1F( hname, "", 200, 0., 50. );
-    fPedvarsDistribution->SetXTitle( "pedestal variance [int dc]" );
-    hisList->Add( fPedvarsDistribution );
-
-    sprintf( hname, "hPedvarsLowGain_%d", iTel+1 );
-    fLowGainPedvarDistribution = new TH1F( hname, "", 200, 0., 50. );
-    fLowGainPedvarDistribution->SetXTitle( "pedestal variance [int dc]" );
-    hisList->Add( fLowGainPedvarDistribution );
-
-    sprintf( hname, "hToff_%d", iTel+1 );
-    fTOffsetsDistribution = new TH1F( hname, "", 200, -20., 20. );
-    fTOffsetsDistribution->SetXTitle( "time offset [sample]" );
-    hisList->Add( fTOffsetsDistribution );
-
-    sprintf( hname, "hToffvars_%d", iTel+1 );
-    fTOffsetVarsDistribution = new TH1F( hname, "", 200, 0., 10. );
-    fTOffsetVarsDistribution->SetXTitle( "time offset variance [sample]" );
-    hisList->Add( fTOffsetVarsDistribution );
-
-    sprintf( hname, "hGains_%d", iTel+1 );
-    fGainsDistribution = new TH1F( hname, "", 200, 0., 3. );
-    fGainsDistribution->SetXTitle( "relative gain" );
-    hisList->Add( fGainsDistribution );
-
-    sprintf( hname, "hGainvars_%d", iTel+1 );
-    fGainVarsDistribution = new TH1F( hname, "", 200, 0., 2. );
-    fGainVarsDistribution->SetXTitle( "relative gain variance" );
-    hisList->Add( fGainVarsDistribution );
-
-    sprintf( hname, "hLowGainToff_%d", iTel+1 );
-    fLowGainTOffsetsDistribution = new TH1F( hname, "", 200, -20., 20. );
-    fLowGainTOffsetsDistribution->SetXTitle( "time offset [sample]" );
-    hisList->Add( fLowGainTOffsetsDistribution );
-
-    sprintf( hname, "hLowGainToffvars_%d", iTel+1 );
-    fLowGainTOffsetVarsDistribution = new TH1F( hname, "", 200, 0., 10. );
-    fLowGainTOffsetVarsDistribution->SetXTitle( "time offset variance [sample]" );
-    hisList->Add( fLowGainTOffsetVarsDistribution );
-
-    sprintf( hname, "hLowGainGains_%d", iTel+1 );
-    fLowGainGainsDistribution = new TH1F( hname, "", 200, 0., 3. );
-    fLowGainGainsDistribution->SetXTitle( "relative gain" );
-    hisList->Add( fLowGainGainsDistribution );
-
-    sprintf( hname, "hLowGainGainvars_%d", iTel+1 );
-    fLowGainGainVarsDistribution = new TH1F( hname, "", 200, 0., 2. );
-    fLowGainGainVarsDistribution->SetXTitle( "relative gain variance" );
-    hisList->Add( fLowGainGainVarsDistribution );
-
-    sprintf( hname, "hLowGainmult_%d", iTel+1 );
-    fLowGainMultiplierDistribution = new TH1F( hname, "", 200, 0., 20. );
-    fLowGainMultiplierDistribution->SetXTitle( "low gain multiplier" );
-    hisList->Add( fLowGainMultiplierDistribution );
 
 }
 
@@ -128,78 +113,27 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     fUsePedestalsInTimeSlices = iUsePedestalsInTimeSlices;
     fLowGainUsePedestalsInTimeSlices = iLowGainUsePedestalsInTimeSlices;
 
-    fPedDistribution->Reset();
-    fPedvarsDistribution->Reset();
-    fTOffsetsDistribution->Reset();
-    fTOffsetVarsDistribution->Reset();
-    fGainsDistribution->Reset();
-    fGainVarsDistribution->Reset();
-
-    fLowGainPedDistribution->Reset();
-    fLowGainPedvarDistribution->Reset();
-    fLowGainTOffsetsDistribution->Reset();
-    fLowGainTOffsetVarsDistribution->Reset();
-    fLowGainGainsDistribution->Reset();
-    fLowGainGainVarsDistribution->Reset();
-
-    fLowGainMultiplierDistribution->Reset();
+    for( unsigned int i = 0; i < fHisto_mean.size(); i++ ) 
+    {
+       if( fHisto_mean[i] ) fHisto_mean[i]->Reset();
+    }
+    for( unsigned int i = 0; i < fHisto_variance.size(); i++ ) 
+    {
+       if( fHisto_variance[i] ) fHisto_variance[i]->Reset();
+    }
 
     gErrorIgnoreLevel = 50000;
     char c_name[800];
-    if( fPedFileName.size() > 0 )
+    for( unsigned int i = 0; i < fFileName.size(); i++ )
     {
-        sprintf( c_name, "%s.root", fPedFileName.c_str() );
-        fPedFile = new TFile( c_name, "READ" );
-        if( fPedFile->IsZombie() ) fPedFile = 0;
+       if( fFileName[i].size() > 0 )
+       {
+	  sprintf( c_name, "%s.root", fFileName[i].c_str() );
+	  fFile[i] = new TFile( c_name, "READ" );
+	  if( fFile[i]->IsZombie() ) fFile[i] = 0;
+       }
+       else fFile[i] = 0;
     }
-    else fPedFile = 0;
-
-    if( fLowGainPedFileName.size() > 0 )
-    {
-	sprintf( c_name, "%s.root", fLowGainPedFileName.c_str() );
-        fLowGainPedFile = new TFile( c_name, "READ" );
-        if( fLowGainPedFile->IsZombie() ) fLowGainPedFile = 0;
-    }
-    else fLowGainPedFile = 0;
-
-    if( fGainFileName.size() > 0 )
-    {
-	sprintf( c_name, "%s.root", fGainFileName.c_str() );
-        fGainFile = new TFile( c_name, "READ" );
-        if( fGainFile->IsZombie() ) fGainFile = 0;
-    }
-    else fGainFile = 0;
-
-    if( fLowgainGainFileName.size() > 0 )
-    {
-	sprintf( c_name, "%s.root", fGainFileName.c_str() );
-        fLowGainGainFile = new TFile( c_name, "READ" );
-        if( fLowGainGainFile->IsZombie() ) fLowGainGainFile = 0;
-    }
-    else fLowGainGainFile = 0;
-
-    if( fToffFileName.size() > 0 )
-    {
-	sprintf( c_name, "%s.root", fToffFileName.c_str() );
-        fToffFile = new TFile( c_name, "READ" );
-        if( fToffFile->IsZombie() ) fToffFile = 0;
-    }
-    else fToffFile = 0;
-
-    if( fLowGainToffFileName.size() > 0 )
-    {
-	sprintf( c_name, "%s.root", fLowGainToffFileName.c_str() );
-        fLowGainToffFile = new TFile( c_name, "READ" );
-        if( fLowGainToffFile->IsZombie() ) fLowGainToffFile = 0;
-    }
-
-    if( fLowGainMultiplierFileName.size() > 0 )
-    {
-	sprintf( c_name, "%s.root", fLowGainMultiplierFileName.c_str() );
-        fLowGainMultiplierFile = new TFile( c_name, "READ" );
-        if( fLowGainMultiplierFile->IsZombie() ) fLowGainMultiplierFile = 0;
-    }
-    else fLowGainMultiplierFile = 0;
 
     gErrorIgnoreLevel = 0;
 
@@ -228,6 +162,9 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     fTOffsets.resize( i_channel, 0. );
     fTOffsetvars.resize( i_channel, 0. );
 
+    fAverageTzero.resize( i_channel, 0. );
+    fAverageTzerovars.resize( i_channel, 0. );
+
 // low gain channels
     fLowGainPeds.resize( i_channel, 20. );
     fVLowGainPedvars.resize( nSamples+1, fLowGainPeds );
@@ -240,6 +177,8 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 
     fLowGainTOffsets.resize( i_channel, 0. );
     fLowGainTOffsetvars.resize( i_channel, 0. );
+    fLowGainAverageTzero.resize( i_channel, 0. );
+    fLowGainAverageTzerovars.resize( i_channel, 0. );
 
 // low gain multiplier settings (per summation window)
     itemp_ped.resize( i_channel, 1. );
@@ -250,52 +189,95 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     fLowGainMultiplier_RMS.resize( nSamples+1, 0. );
 }
 
+TH1F* VCalibrationData::getHistogram( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize, VCalibrationData::E_PEDTYPE iType )
+{
+    char iHName[200];
+    
+    if( iType == C_PED || iType == C_PEDLOW )
+    {
+       sprintf( iHName, "distributions/hped_%d_%d_%d", iTel, iWindowSize, iChannel );
+    }
+    else if( iType == C_TOFF || iType == C_TOFFLOW )
+    {
+       sprintf( iHName, "htoff_%d", iChannel );
+    }
+    else if( iType == C_TZERO || iType == C_TZEROLOW )
+    {
+       sprintf( iHName, "htzero_%d_%d", iTel+1, iChannel );
+    }
+    else if( iType == C_GAIN || iType == C_GAINLOW )
+    {
+       sprintf( iHName, "hgain_%d", iChannel );
+    }
+    if( iType < (int)fFile.size() && fFile[iType] )
+    {
+       return (TH1F*)fFile[iType]->Get( iHName );
+    }
+
+    return 0;
+}
+
 
 TH1F* VCalibrationData::getHistoPed( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize, bool iLowGain )
 {
-    char iHName[200];
-    sprintf( iHName, "distributions/hped_%d_%d_%d", iTel, iWindowSize, iChannel );
-
     if( fReader && fPedFromPLine )
     {
         if( fReader->getDataFormat() == "grisu" ) return fReader->getPedHisto( iTel, iChannel );
         else return 0;
     }
+    if( iLowGain ) return getHistogram( iTel, iChannel, iWindowSize, C_PEDLOW );
 
-    TFile *iFile = 0;
-    if( !iLowGain ) iFile = fPedFile;
-    else            iFile = fLowGainPedFile;
-
-// no calibration file open
-    if( !iFile ) return 0;
-// get histogram from calibration file
-    return (TH1F*)iFile->Get( iHName );
+    return getHistogram( iTel, iChannel, iWindowSize, C_PED );
 }
 
 
 TH1F* VCalibrationData::getHistoGain( unsigned int iTel, unsigned int iChannel, bool iLowGain )
 {
-    TFile *iFile = 0;
-    if( !iLowGain ) iFile = fGainFile;
-    else            iFile = fLowGainGainFile;
+    if( iLowGain ) return getHistogram( iTel, iChannel, 0, C_GAINLOW );
 
-    if( !iFile ) return 0;
-    char iHName[200];
-    sprintf( iHName, "hgain_%d", iChannel );
-    return (TH1F*)iFile->Get( iHName );
+    return getHistogram( iTel, iChannel, 0, C_GAIN );
 }
 
 
 TH1F* VCalibrationData::getHistoToff( unsigned int iTel, unsigned int iChannel, bool iLowGain )
 {
-    TFile *iFile = 0;
-    if( !iLowGain ) iFile = fToffFile;
-    else            iFile = fLowGainToffFile;
+    if( iLowGain ) return getHistogram( iTel, iChannel, 0, C_TOFFLOW );
 
-    if( !iFile ) return 0;
-    char iHName[200];
-    sprintf( iHName, "htoff_%d", iChannel );
-    return (TH1F*)iFile->Get( iHName );
+    return getHistogram( iTel, iChannel, 0, C_TOFF );
+}
+
+TH1F* VCalibrationData::getHistoAverageTzero( unsigned int iTel, unsigned int iChannel, bool iLowGain )
+{
+    if( iLowGain ) return getHistogram( iTel, iChannel, 0, C_TZEROLOW );
+
+    return getHistogram( iTel, iChannel, 0, C_TZERO );
+}
+
+TH1F*  VCalibrationData::getHistoDist( int iType, bool iDist )
+{
+   if( !iDist )
+   {
+      if( iType < (int)fHisto_variance.size() ) return fHisto_variance[iType];
+   }
+   else
+   {
+      if( iType < (int)fHisto_mean.size() ) return fHisto_mean[iType];
+   }
+   return 0;
+}
+
+double VCalibrationData::getAverageTZero( bool iLowGain )
+{
+    if( iLowGain ) return fAverageTZero_lowgain;
+
+    return fAverageTZero_highgain;
+}
+
+void  VCalibrationData::setAverageTZero( double iAverageTzero, bool iLowGain )
+{
+   if( iLowGain ) fAverageTZero_lowgain = iAverageTzero;
+
+   fAverageTZero_highgain = iAverageTzero;
 }
 
 
@@ -332,6 +314,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
        double igainvar = 0.;
        double itoff = 0.;
        double itoffvar = 0.;
+       double itzero = 0.;
+       double itzerovar = 0.;
        double ipedlowgain = 0.;
        double ipedvarlowgain = 0.;
        double igainMult[iMAXSUMWINDOWS];
@@ -340,6 +324,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
        double igainvarlowgain = 0.;
        double itofflowgain = 0.;
        double itoffvarlowgain = 0.;
+       double itzerolowgain = 0.;
+       double itzerovarlowgain = 0.;
        unsigned int nsumwindows = 0;
        unsigned int sumwindow = 0;
        int istat = 0;
@@ -366,6 +352,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
        fCalibrationTree.Branch( "gainvar", &igainvar, "gainvar/D" );
        fCalibrationTree.Branch( "toff", &itoff, "toff/D" );
        fCalibrationTree.Branch( "toffvar", &itoffvar, "toffvar/D" );
+       fCalibrationTree.Branch( "tzero", &itzero, "tzero/D" );
+       fCalibrationTree.Branch( "tzerovar", &itzerovar, "tzerovar/D" );
        fCalibrationTree.Branch( "pedLowGain", &ipedlowgain, "pedLowGain/D" );
        fCalibrationTree.Branch( "pedvarLowGain", &ipedvarlowgain, "pedvarLowGain/D" );
        fCalibrationTree.Branch( "pedvarVLowGain", pedvarLowGainV, "pedvarVLowGain[nsumwindows]/D" );
@@ -373,6 +361,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
        fCalibrationTree.Branch( "gainvarLowGain", &igainvarlowgain, "gainvarLowGain/D" );
        fCalibrationTree.Branch( "toffLowGain", &itofflowgain, "toffLowGain/D" );
        fCalibrationTree.Branch( "toffvarLowGain", &itoffvarlowgain, "toffvarLowGain/D" );
+       fCalibrationTree.Branch( "tzeroLowGain", &itzerolowgain, "tzeroLowGain/D" );
+       fCalibrationTree.Branch( "tzerovarLowGain", &itzerovarlowgain, "tzerovarLowGain/D" );
        fCalibrationTree.Branch( "gainMult", igainMult, "gainMult[nsumwindows]/D" );
        fCalibrationTree.Branch( "gainMultE", igainMultE, "gainMultE[nsumwindows]/D" );
 
@@ -399,6 +389,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 	       igainvar = fGainvars[i];
 	       itoff = fTOffsets[i];
 	       itoffvar = fTOffsetvars[i];
+	       itzero = fAverageTzero[i];
+	       itzerovar = fAverageTzerovars[i];
 	       ipedlowgain = fLowGainPeds[i]; 
 	       if( sumwindow < fVLowGainPedvars.size() )      ipedvarlowgain = fVLowGainPedvars[sumwindow][i];
 	       else                                           ipedvarlowgain = 0.;
@@ -419,6 +411,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 	       igainvarlowgain = fLowGainGainvars[i];
 	       itofflowgain = fLowGainTOffsets[i];
 	       itoffvarlowgain = fLowGainTOffsetvars[i];  
+	       itzerolowgain = fLowGainAverageTzero[i];
+	       itzerovarlowgain = fLowGainAverageTzerovars[i];
 
                fCalibrationTree.Fill();
            }

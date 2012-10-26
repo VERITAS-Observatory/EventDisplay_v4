@@ -16,14 +16,16 @@ VCalibrator::VCalibrator()
     setCalibrated( false );
     fRaw = true;
 
-    fGainTree = 0;
-    fToffTree = 0;
+    opfgain = 0;
+    opftoff = 0;
 
     fCalibrationfileVersion = 1;
 }
 
 
-/*!
+/*
+
+   pedestal calculation
 
  */
 void VCalibrator::calculatePedestals( bool iLowGain )
@@ -315,6 +317,123 @@ bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculat
     return true;
 }
 
+/*
+
+   calculate average Tzeros from data events
+
+*/
+void VCalibrator::calculateAverageTZero( bool iLowGain )
+{
+    if( getDebugFlag() )
+    {
+       cout << "VCalibrator::calculateAverageTZero() (";
+       if( iLowGain ) cout << "low gain)" << endl;
+       else           cout << "high gain)" << endl;
+    }
+
+// use same histogram definitions as in toff calculation
+    if ( fReader->getMaxChannels() > 0 && htzero.size() == 0 )
+    {
+        int telID = 0;
+	for( unsigned int t = 0; t < getNTel(); t++ )
+	{
+	  telID = t+1;
+// create histograms
+	  vector< TH1F* > ih_tzero;
+	  for( unsigned int i = 0; i < getNChannels(); i++ )
+	  {
+	       char toffkey[100];
+	       char ic[100];
+	       sprintf( toffkey, "htzero_%d_%d", telID, i);
+	       double imin = 0.;
+	       double imax = (double)getNSamples();
+	       sprintf( ic, "TZero distribution (tel %d, channel %d)", telID, i );
+	       ih_tzero.push_back( new TH1F( toffkey, ic, 150, imin, imax) );
+	   }
+	   htzero.push_back( ih_tzero );
+        }
+// root output files 
+	string ioutfile;
+        for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
+	{
+	    unsigned int i = getTeltoAna()[tel];
+	   if( !iLowGain ) ioutfile = fTZeroFileNameC[i] + ".root";
+	   else            ioutfile = fLowGainTZeroFileNameC[i] + ".root";
+
+	   fTZeroOutFile.push_back( new TFile( ioutfile.c_str(), "RECREATE") );
+	   if( fTZeroOutFile.back()->IsZombie() )
+	   {
+	       cout << "Error: calculateAverageTZero() error, can't open output file: " << fTZeroOutFile.back()->GetName() << endl;
+	       exit( -1 );
+	   }
+	   cout << "opened file for average tzeros: " << fTZeroOutFile.back()->GetName() << endl;
+	   setSpecialChannels();
+        }
+
+	cout << "calculate average tzeros with summation window " << fRunPar->fCalibrationSumWindow;
+	cout << " (start at " << fRunPar->fCalibrationSumFirst << ")" << endl;
+	cout << "     (require at least " << fRunPar->fCalibrationIntSumMin << " per channel/event [dc])" << endl;
+
+        setCalibrated();
+    }
+    fillHiLo();
+
+    findDeadChans( iLowGain );
+
+// calculate sums and tzeros
+    calcSums(   fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst+fRunPar->fCalibrationSumWindow, false );
+    calcTZeros( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst+fRunPar->fCalibrationSumWindow );
+
+    if( fRunPar->fL2TimeCorrect ) FADCStopCorrect();
+
+    fNumberTZeroEvents[fTelID]++;
+////////////////////////
+// fill tzeros
+    for( unsigned int i = 0;i < getNChannels(); i++ )
+    {
+      if( iLowGain && !getHiLo()[i] ) continue;
+      if( !iLowGain && getHiLo()[i] ) continue;
+
+// require a min sum for tzero filling
+      if( getSums()[i] > fRunPar->fCalibrationIntSumMin && !getDead()[i] && !getMasked()[i] && getTZeros()[i] > 0. )
+      {
+	  if( i < htzero[fTelID].size() && htzero[fTelID][i] )
+	  {
+	     htzero[fTelID][i]->Fill( getTZeros()[i] );
+	  }
+      }
+    }
+}
+
+void VCalibrator::writeAverageTZeros( bool iLowGain )
+{
+    for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
+    {
+        unsigned int t = getTeltoAna()[tel];
+        setTelID( t );
+
+        if( tel >= fTZeroOutFile.size() || !fTZeroOutFile[t] )
+        {
+            cout << "VCalibrator::writeAverageTZeros() error writing average tzeros for telescope " << t+1 << endl;
+	    cout << "   (tel " << tel << ", " << fTZeroOutFile.size() << ")" << endl;
+            continue;
+        }
+        cout << "\t writing average tzeros to ";
+	cout << fTZeroOutFile[tel]->GetName() << endl;
+
+        fTZeroOutFile[tel]->cd();
+	if( t < htzero.size() )
+	{
+	   for( unsigned int i = 0; i < htzero[t].size(); i++ )
+	   {
+	      if( htzero[t][i] ) htzero[t][i]->Write();
+           }
+	   TTree *i_tree = fillCalibrationSummaryTree( t, "TZero", htzero[t] );
+	   if( i_tree ) i_tree->Write();
+        }
+    }
+}
+
 
 void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 {
@@ -344,7 +463,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
             double imin=0.0;
             double imax=10.0;
             sprintf( ic, "gain distribution (tel %d, channel %d)", getTelID()+1, i );
-            hgain.push_back( new TH1F(gainkey, ic,500,imin,imax) );
+            hgain.push_back( new TH1F(gainkey, ic, 150, imin, imax ) );
 
             char pulsekey[100];
             sprintf(pulsekey,"hpulse_%d",i);
@@ -377,7 +496,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
             imin=-10;
             imax=10;
             sprintf( ic, "TOffset distribution (tel %d, channel %d)", getTelID()+1, i );
-            htoff.push_back( new TH1F(toffkey,ic,500,imin,imax) );
+            htoff.push_back( new TH1F(toffkey,ic,150,imin,imax) );
         }
 	setSpecialChannels();
 
@@ -425,7 +544,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
             if( getHiLo()[i] != 0 && !getDead()[i] ) num_sat+=1;
         }
 // don't do anything if there are not enough channels in low or high gain
-        if( !iLowGain && num_sat > 10 ) return;
+        if( !iLowGain && num_sat >  10 ) return;
         if( iLowGain && num_sat < (int)(0.7*(double)getNChannels()) );
 
         int counttzero=0;
@@ -438,7 +557,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
             if( iLowGain && !getHiLo()[i] ) continue;
             if( !iLowGain && getHiLo()[i] ) continue;
 
-            if( (getSums()[i]>10 || fRunPar->fLaserSumMin < 0. )  && !getDead()[i] && !getMasked()[i] )
+            if( (getSums()[i] > fRunPar->fCalibrationIntSumMin || fRunPar->fLaserSumMin < 0. )  && !getDead()[i] && !getMasked()[i] )
             {
                 countsums++;
                 m_sums  += getSums()[i];
@@ -507,7 +626,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 		if( iLowGain && !getHiLo()[i] ) continue;
                 if( !iLowGain && getHiLo()[i] ) continue;
 // fill gain and toffset histograms
-                if( (getSums()[i]> 50 || fRunPar->fLaserSumMin < 0. ) && !getDead()[i] && !getMasked()[i] )
+                if( (getSums()[i]> fRunPar->fCalibrationIntSumMin || fRunPar->fLaserSumMin < 0. ) && !getDead()[i] && !getMasked()[i] )
                 {
                     hgain[i]->Fill((float)getSums()[i]/m_sums);
                     if(getTZeros()[i]>=0.)
@@ -575,92 +694,65 @@ void VCalibrator::writeGains( bool iLowGain )
 	       htcpulse[i]->Write();
 	   }
         }
-        TTree *iTG = fillGainTree( t );
+        TTree *iTG = fillCalibrationSummaryTree( t, "gain", hgain );
         if( iTG ) iTG->Write();
         opfgain->Close();
     }
 }
 
+/*
 
-TTree *VCalibrator::fillGainTree( unsigned int itel )
+   generic function to write calibration tree for e.g. gains, toffs, average tzeros
+
+*/
+TTree *VCalibrator::fillCalibrationSummaryTree( unsigned int itel, string iName, vector<TH1F* > h )
 {
-
     setTelID( itel );
 
     char iname[200];
     char ititle[200];
 
-    if( fGainTree ) fGainTree->Delete();
+    int ichannel = 0;
+    float i_mean = 0.;
+    float i_median = 0.;
+    float i_rms = 0.;
 
-    int ichannel;
-    float igain;
-    float igainvar;
+    sprintf( iname, "t%s_%d", iName.c_str(), itel+1 );
+    sprintf( ititle, "%s, telescope %d", iName.c_str(), itel+1 );
+    TTree *t = new TTree( iname, ititle );
+    t->Branch( "channel", &ichannel, "channel/I" );
+    sprintf( iname, "%s", iName.c_str() );
+    sprintf( ititle, "%s/F", iName.c_str() );
+    t->Branch( iname, &i_mean, ititle );
+    sprintf( iname, "%smed", iName.c_str() );
+    sprintf( ititle, "%smed/F", iName.c_str() );
+    t->Branch( iname, &i_median, ititle );
+    sprintf( iname, "%svar", iName.c_str() );
+    sprintf( ititle, "%svar/F", iName.c_str() );
+    t->Branch( iname, &i_rms, ititle );
 
-    sprintf( iname, "tGains_%d", itel+1 );
-    sprintf( ititle, "gains, telescope %d", itel+1 );
-    fGainTree = new TTree( iname, ititle );
-    fGainTree->Branch( "channel", &ichannel, "channel/I" );
-    fGainTree->Branch( "gain", &igain, "gain/F" );
-    fGainTree->Branch( "gainvar", &igainvar, "gainvar/F" );
-
+    double i_a[] = { 0.5 };
+    double i_b[] = { 0.0 };
     for( unsigned int i = 0; i < getNChannels(); i++ )
     {
         ichannel = (int)i;
-        if( hgain[i] )
+        if( i < h.size() && h[i] && h[i]->GetEntries() > 0 )
         {
-            igain = hgain[i]->GetMean();
-            igainvar = hgain[i]->GetRMS();
+            i_mean = h[i]->GetMean();
+            i_rms  = h[i]->GetRMS();
+	    h[i]->GetQuantiles( 1, i_b, i_a );
+	    i_median = i_b[0];
         }
         else
         {
-            igain = 0.;
-            igainvar = 0.;
+            i_mean = 0.;
+            i_rms  = 0.;
+	    i_median = 0.;
         }
-        fGainTree->Fill();
+        t->Fill();
     }
 
-    return fGainTree;
-}
-
-
-TTree *VCalibrator::fillToffTree( unsigned int itel )
-{
-
-    setTelID( itel );
-
-    char iname[200];
-    char ititle[200];
-
-    if( fToffTree ) fToffTree->Delete();
-
-    int ichannel;
-    float itoff;
-    float itoffvar;
-
-    sprintf( iname, "tToffs_%d", itel+1 );
-    sprintf( ititle, "time offsets, telescope %d", itel+1 );
-    fToffTree = new TTree( iname, ititle );
-    fToffTree->Branch( "channel", &ichannel, "channel/I" );
-    fToffTree->Branch( "toff", &itoff, "toff/F" );
-    fToffTree->Branch( "toffvar", &itoffvar, "toffvar/F" );
-
-    for( unsigned int i = 0; i < getNChannels(); i++ )
-    {
-        ichannel = (int)i;
-        if( htoff[i] )
-        {
-            itoff = htoff[i]->GetMean();
-            itoffvar = htoff[i]->GetRMS();
-        }
-        else
-        {
-            itoff = 0.;
-            itoffvar = 0.;
-        }
-        fToffTree->Fill();
-    }
-
-    return fToffTree;
+    return t;
 }
 
 
@@ -700,7 +792,7 @@ void VCalibrator::writeTOffsets( bool iLowGain )
             htoff_vs_sum[i]->SetErrorOption("S");
             htoff_vs_sum[i]->Write();
         }
-        TTree *iTT = fillToffTree( t );
+        TTree *iTT = fillCalibrationSummaryTree( t, "toff", htoff );
         if( iTT ) iTT->Write();
         opftoff->Close();
     }
@@ -709,11 +801,18 @@ void VCalibrator::writeTOffsets( bool iLowGain )
 
 void VCalibrator::terminate( VPedestalCalculator* iP )
 {
-    if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 ) writePeds( fRunPar->frunmode == 6, iP );
-    if( fRunPar->frunmode == 2 || fRunPar->frunmode == 5 )
+    if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
+    {
+       writePeds( fRunPar->frunmode == 6, iP );
+    }
+    else if( fRunPar->frunmode == 2 || fRunPar->frunmode == 5 )
     {
         writeGains( fRunPar->frunmode == 5 );
         writeTOffsets( fRunPar->frunmode == 5 );
+    }
+    else if( fRunPar->frunmode == 7 || fRunPar->frunmode == 8 )
+    {
+       writeAverageTZeros( fRunPar->frunmode == 8 );
     }
 }
 
@@ -743,6 +842,17 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
             }
 // set low gain gains equal to high gain gains
             else getGains( true ) = getGains( false );
+        }
+
+// read average tzeros
+        if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 )
+	{
+	   readAverageTZeros( false );
+	   if( fLowGainTZeroFileNameC[getTeltoAna()[i]].size() > 0 )
+	   {
+	      readAverageTZeros( true );
+           }
+	   else getAverageTZeros( true ) = getAverageTZeros( false );
         }
 
 //read high gain pedestals
@@ -777,7 +887,7 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
                 readTOffsets( true );
                 setLowGainTOff();
             }
-            else                                   getTOffsets( true ) = getTOffsets( false );
+            else  getTOffsets( true ) = getTOffsets( false );
         }
 
 // read pixel status
@@ -1079,7 +1189,7 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 	       do
 	       {
 		   count+=1;
-		   is_stream >> rms;
+		   if( !is_stream.eof() ) is_stream >> rms;
 // ther might be more than NSamples values in the file; stop when reached NSamples
 		   if( ( count==i_SumWindow || (iLowGain && count == getNSamples() ) )  && ch < getPedvars( iLowGain, i_SumWindow, -99. ).size() )
 		   {
@@ -1323,6 +1433,83 @@ void VCalibrator::readGains( bool iLowGain )
 
 }
 
+bool VCalibrator::readAverageTZeros( bool iLowGain )
+{
+  if( fDebug ) cout << "VCalibrator::readAverageTZeros (low gain " << iLowGain << ")" << endl;
+
+  string iFile = fTZeroFileNameC[getTelID()];
+  if( iLowGain ) iFile = fLowGainTZeroFileNameC[getTelID()];
+  iFile += ".root";
+
+  setAverageTZero( 0., iLowGain );
+  setAverageTZerovars( 5., iLowGain );
+
+  if( iFile.size() > 5 )
+  {
+     TFile iTZ( iFile.c_str(), "READ" );
+     if( iTZ.IsZombie() )
+     {
+        cout << " VCalibrator::readAverageTZeros error reading average tzero file: " << endl;
+	cout << "\t" << iFile << endl;
+	return false;
+     }
+     char hname[200];
+     sprintf( hname, "tTZero_%d", getTelID()+1 );
+     TTree *t = (TTree*)iTZ.Get( hname );
+     if( !t )
+     {
+        cout << " VCalibrator::readAverageTZeros error finding data tree in average tzero file: " << endl;
+	cout << "\t" << iFile << endl;
+	return false;
+     }
+      cout << "Telescope " << getTelID()+1;
+      if( !iLowGain ) cout << ": reading average tzeros for high gain channels";
+      else            cout << ": reading average tzeros for low gain channels";
+      cout << "from : " << endl;
+      cout << "Telescope " << getTelID()+1 << ": ";
+      cout << iFile << endl;
+
+      int ichannel = 0;
+      float itzero = 0.;
+      float itzero_med = 0.;
+      float itzero_var = 0.;
+      t->SetBranchAddress( "channel", &ichannel );
+      t->SetBranchAddress( "TZero", &itzero );
+      t->SetBranchAddress( "TZeromed", &itzero_med );
+      t->SetBranchAddress( "TZerovar", &itzero_var );
+
+      double n_T0 = 0.;
+      double n_mean = 0.;
+      for( int i = 0; i < t->GetEntries(); i++ )
+      {
+         t->GetEntry( i );
+
+// choose median of distribution as typical average 
+// (distribution is assymetric)
+         setAverageTZero( i, itzero_med, iLowGain );
+         setAverageTZerovars( i, itzero_var, iLowGain );
+	 if( getAverageTZeroDist( iLowGain ) )
+	 {
+	    getAverageTZeroDist( iLowGain )->Fill( itzero_med );
+         }
+	 if( itzero_med > 0. )
+	 {
+	    n_mean += itzero_med;
+	    n_T0++;
+         }
+      }
+      if( n_T0 > 0. ) n_mean /= n_T0;
+      setMeanAverageTZero( n_mean, iLowGain );
+      cout << "Telescope " << getTelID()+1 << ": average tzero for this telescope is ";
+      if( iLowGain ) cout << "(low gain)";
+      cout << getMeanAverageTZero( iLowGain ) << endl;
+      return true;
+   }
+
+   return false;
+  
+}
+
 
 void VCalibrator::readTOffsets( bool iLowGain )
 {
@@ -1399,12 +1586,14 @@ void VCalibrator::initialize()
         setTelID( i );
 
 	fCalData.push_back( new VCalibrationData( i, fRunPar->getDirectory_EVNDISPCalibrationData(), 
-	                                          fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i] ));
+	                                          fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i],
+						  "", "", "", fTZeroFileNameC[i], fLowGainTZeroFileNameC[i] ));
 	fCalData.back()->setSumWindows( getSumWindow( i ) );
 // PRELI: low gain multiplier does not depend on summation window (yet)
 	fCalData.back()->setLowGainMultiplierFixedSummationWindow( getSumWindow_2() );
         fNumberPedestalEvents.push_back( 0 );
         fNumberGainEvents.push_back( 0 );
+	fNumberTZeroEvents.push_back( 0 );
 
         fCalData.back()->initialize( getNChannels(), getNSamples(), usePedestalsInTimeSlices( false ), usePedestalsInTimeSlices( true ), getDebugFlag() );
         if( fReader->getDataFormat() == "grisu" ) fCalData.back()->setReader( fReader );
@@ -1448,6 +1637,8 @@ void VCalibrator::setCalibrationFileNames()
       else                                     fGainFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fGainFileNumber[i], "gain" ) );
       if( i < fToffFileNameC.size() )          fToffFileNameC[i] = getCalibrationFileName( i, getRunParameter()->fTOffFileNumber[i], "toff" );
       else                                     fToffFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fTOffFileNumber[i], "toff" ) );
+      if( i < fTZeroFileNameC.size() )         fTZeroFileNameC[i] = getCalibrationFileName( i, getRunParameter()->fTZeroFileNumber[i], "tzero" );
+      else                                     fTZeroFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fTZeroFileNumber[i], "tzero" ) );
       if( i < fPixFileNameC.size() )           fPixFileNameC[i] = getCalibrationFileName( i, getRunParameter()->fPixFileNumber[i], "pix" );
       else                                     fPixFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fPixFileNumber[i], "pix" ) );
       if( i >= fBlockTel.size()    )           fBlockTel.push_back( false );
@@ -1459,6 +1650,8 @@ void VCalibrator::setCalibrationFileNames()
       else                                     fLowGainGainFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fGainLowGainFileNumber[i], "lgain" ) );
       if( i < fLowGainToffFileNameC.size() )   fLowGainToffFileNameC[i] = getCalibrationFileName( i, getRunParameter()->fTOffLowGainFileNumber[i], "ltoff" );
       else                                     fLowGainToffFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fTOffLowGainFileNumber[i], "ltoff" ) );
+      if( i < fLowGainTZeroFileNameC.size() )  fLowGainTZeroFileNameC[i] = getCalibrationFileName( i, getRunParameter()->fTZeroLowGainFileNumber[i], "tzero" );
+      else                                     fLowGainTZeroFileNameC.push_back( getCalibrationFileName( i, getRunParameter()->fTZeroLowGainFileNumber[i], "tzero" ) );
    }
 }
 

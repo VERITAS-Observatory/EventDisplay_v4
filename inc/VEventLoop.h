@@ -38,7 +38,7 @@ class VEventLoop : public VEvndispData
 {
     private:
 //! run mode (analysis, pedestal calculation, gain/toffset calculation)
-        enum E_runmode {R_ANA, R_PED, R_GTO, R_BCK, R_DST, R_GTOLOW, R_PEDLOW };
+        enum E_runmode {R_ANA, R_PED, R_GTO, R_BCK, R_DST, R_GTOLOW, R_PEDLOW, R_TZERO, R_TZEROLOW };
 
         VCalibrator *fCalibrator;                 //!< default calibration class
         VPedestalCalculator *fPedestalCalculator; //!< default pedestal calculator

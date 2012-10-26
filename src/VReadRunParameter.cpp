@@ -262,6 +262,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fCalibrationSumFirst = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
+	else if( iTemp.find( "calibrationsummin" ) < iTemp.size() && iTemp != "pedestalsintimeslices" )
+	{
+	   fRunPara->fCalibrationIntSumMin = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }
 // fast plotting without pedestals
         else if( iTemp.find( "plotraw" ) < iTemp.size() )
         {
@@ -474,9 +478,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         else if( iTemp.rfind( "mod" ) < iTemp.size() )
         {
             fRunPara->frunmode = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
-            if( fRunPara->frunmode < 0 || fRunPara->frunmode > 6 )
+            if( fRunPara->frunmode < 0 || fRunPara->frunmode > 8 )
             {
-                cout << "invalid rundmode (0=analysis,1=pedestal,2=gains/toffsets,3=trace library,4=dst output,5=gains/toffsets low gain,6=low gain pedestals)" << endl;
+                cout << "Error invalid run mode (0=analysis,1=pedestal,2=gains/toffsets,3=trace library,4=dst output,";
+		cout << "5=gains/toffsets low gain,6=low gain pedestals,7=tzero,8=low gain tzero)" << endl;
                 return false;
             }
         }
@@ -821,8 +826,16 @@ void VReadRunParameter::test_and_adjustParams()
     {
         if( i >= fRunPara->fGainFileNumber.size() ) fRunPara->fGainFileNumber.push_back( 0 );
         if( i >= fRunPara->fTOffFileNumber.size() ) fRunPara->fTOffFileNumber.push_back( 0 );
-        if( i >= fRunPara->fPedFileNumber.size() ) fRunPara->fPedFileNumber.push_back( fRunPara->frunnumber );   // default: take peds from same run
-	else                                       fRunPara->fPedFileNumber[i] = fRunPara->frunnumber;
+        if( i >= fRunPara->fPedFileNumber.size() )
+	{
+	   fRunPara->fPedFileNumber.push_back( fRunPara->frunnumber );   // default: take peds from same run
+	   fRunPara->fTZeroFileNumber.push_back( fRunPara->frunnumber );   // default: take tzeros from same run
+        }
+	else
+	{
+	   fRunPara->fPedFileNumber[i] = fRunPara->frunnumber;
+	   fRunPara->fTZeroFileNumber[i] = fRunPara->frunnumber;
+        }
         if( !fRunPara->fPlotRaw )
 	{
 // writing low gain pedestals
@@ -845,6 +858,7 @@ void VReadRunParameter::test_and_adjustParams()
         if( i >= fRunPara->fTOffLowGainFileNumber.size() ) fRunPara->fTOffLowGainFileNumber.push_back( 0 );
         if( i >= fRunPara->fPixFileNumber.size() ) fRunPara->fPixFileNumber.push_back( 0 );
         if( i >= fRunPara->fPadFileNumber.size() ) fRunPara->fPadFileNumber.push_back( 0 );
+	if( i >= fRunPara->fTZeroLowGainFileNumber.size() ) fRunPara->fTZeroLowGainFileNumber.push_back( 0 );
     }
 // gain and toff calculation: set output run numbers
     if( fRunPara->frunmode == 2 || fRunPara->frunmode == 5 )

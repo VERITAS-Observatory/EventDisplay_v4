@@ -30,27 +30,23 @@ class VCalibrationData
 
 	valarray< double > fValArrayDouble;
 
+	enum E_PEDTYPE { C_PED, C_GAIN, C_TOFF, C_PEDLOW, C_GAINLOW, C_TOFFLOW, C_LOWGAIN, C_TZERO, C_TZEROLOW };
+
         TList *hisList;
-        TFile *fPedFile;
-        TFile *fGainFile;
-        TFile *fToffFile;
-        TFile *fLowGainPedFile;
-        TFile *fLowGainGainFile;
-        TFile *fLowGainMultiplierFile;
-        TFile *fLowGainToffFile;
 
         string fCalDirName;
-        string fPedFileName;
-        string fGainFileName;
-        string fToffFileName;
-        string fLowGainPedFileName;
-        string fLowgainGainFileName;
-        string fLowGainToffFileName;
-        string fLowGainMultiplierFileName;
+	vector< string > fFileName;
+	vector< TFile* > fFile;
+	vector< string > fHistoName;
+	vector< TH1F* >  fHisto_mean;
+	vector< TH1F* >  fHisto_variance;
 
         VVirtualDataReader  *fReader;
 
 	unsigned int setSummationWindow( unsigned int iSumWindow );
+
+	TH1F* getHistogram( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize,  VCalibrationData::E_PEDTYPE );
+	TH1F* getHistoDist( int iType, bool iDist );
 
     public:
         bool fPedFromPLine;
@@ -82,28 +78,21 @@ class VCalibrationData
         valarray< valarray< double > > fLowGainTS_fVmeanRMSPedvars;       //!< time dependent RMS of pedestal variation [time slice][summation window]
 
 // high gain channels
-        TH1F* fPedDistribution;                   //!< mean pedestal distribution
-
-        TH1F* fPedvarsDistribution;               //!< pedestal variance distribution
         valarray<double>  fPedrms;                //!< pedestal variance
         vector< double > fVmeanPedvars;           //!< mean pedestal variance (for different sumwindows)
         vector< double > fVmeanRMSPedvars;        //!< RMS pedestal variance (for different sumwindows)
 
-        TH1F* fTOffsetsDistribution;              //!< toffset distribution
-        TH1F* fTOffsetVarsDistribution;           //!< toffset vars distribution
+        valarray<double> fFADCStopOffsets;        //!< time offsets due to FADC Stop
         valarray<double> fTOffsets;               //!< time offsets
         valarray<double> fTOffsetvars;            //!< time offset variance
-        valarray<double> fFADCStopOffsets;        //!< time offsets due to FADC Stop
         valarray<double> fGains;                  //!< gains
 	valarray< bool > fGains_DefaultSetting;   //!< gain value is set to default value
-        TH1F* fGainsDistribution;                 //!< gain distribution
-        TH1F* fGainVarsDistribution;              //!< gain var distribution
         valarray<double> fGainvars;               //!< gain variance
+	valarray<double> fAverageTzero;
+	valarray<double> fAverageTzerovars;
 
 // low gain channels
         bool fBoolLowGainPedestals;
-        TH1F* fLowGainPedDistribution;            //!< mean pedestal distribution  (low gain)
-        TH1F* fLowGainPedvarDistribution;         //!< pedestal variance distribution (low gain)
 
         valarray<double> fLowGainPedsrms;         //!< low gain mean pedestal variance
         double fmeanLowGainPedvars;
@@ -116,53 +105,51 @@ class VCalibrationData
         vector< valarray<double> > fLowGainMultiplierError;
         vector< double >           fLowGainMultiplier_Mean;
         vector< double >           fLowGainMultiplier_RMS;
-        TH1F*                      fLowGainMultiplierDistribution;
 	unsigned int               fLowGainMultiplier_FixedSummationWindow;   //! if this is set to a reasonable value: all summation window requests are ignored
+
+// average tzero
+        double fAverageTZero_highgain;
+        double fAverageTZero_lowgain;
 
 // low gain: time offsets
         bool fBoolLowGainTOff;
-        TH1F* fLowGainTOffsetsDistribution;       //!< toffset distribution
-        TH1F* fLowGainTOffsetVarsDistribution;    //!< toffset vars distribution
         valarray<double> fLowGainTOffsets;        //!< time offsets
         valarray<double> fLowGainTOffsetvars;     //!< time offset variance
+        valarray<double> fLowGainAverageTzero;        //!< time offsets
+        valarray<double> fLowGainAverageTzerovars;     //!< time offset variance
         valarray<double> fLowGainGains;           //!< gains
 	valarray< bool > fLowGainGains_DefaultSetting;   //!< gain value is set to default value
         bool fBoolLowGainGains;
-        TH1F* fLowGainGainsDistribution;          //!< gain distribution
-        TH1F* fLowGainGainVarsDistribution;       //!< gain var distribution
         valarray<double> fLowGainGainvars;        //!< gain variance
 
         VCalibrationData( unsigned int iTel, string iDir, string iPedfile, string iGainfile, string iTofffile, 
-	                                                   string iPedLowGainfile, string iGainLowGainFile = "", string iToffLowGainFile = "", string iLowGainMultFile = "" );
+	                                                   string iPedLowGainfile, string iGainLowGainFile = "", 
+							   string iToffLowGainFile = "", string iLowGainMultFile = "",
+							   string iTzerofile = "", string iTzeroLowfile = "" );
        ~VCalibrationData() {}
 
-        void initialize( unsigned int iChannel, unsigned int nSamples = 24, bool iTimeSlices = true, bool iLowGainTimeSlices = false, bool iDebug = false );
-        TH1F* getPedDist( bool iHiLo = false ) { if( !iHiLo )     return fPedDistribution; else return fLowGainPedDistribution; }
-        TH1F* getPedvarsDist( bool iHiLo = false ) { if( !iHiLo ) return fPedvarsDistribution; else return fLowGainPedvarDistribution; }
-        TH1F* getToffsetDist( bool iHiLo = false ) { if( !iHiLo ) return fTOffsetsDistribution; else return fLowGainTOffsetsDistribution; }
-        TH1F* getToffsetVarsDist( bool iHiLo = false ) { if( !iHiLo ) return fTOffsetVarsDistribution; else return fLowGainTOffsetVarsDistribution; }
-        TH1F* getGainDist( bool iHiLo = false ) { if( !iHiLo )    return fGainsDistribution; else return fLowGainGainsDistribution; }
-        TH1F* getGainVarsDist( bool iHiLo = false ) { if( !iHiLo ) return fGainVarsDistribution; else return fLowGainGainVarsDistribution; }
         TH1F* getHistoGain( unsigned int iTel, unsigned int iChannel, bool iLowGain = false );
-        TH1F* getHistoGainLowGain( unsigned int iTel, unsigned int iChannel ) { return getHistoGain( iTel, iChannel, true ); }
         TH1F* getHistoPed( unsigned int iTel, unsigned int iChannel, unsigned int iWindowsize, bool iLowGain = false );
-        TH1F* getHistoPedLowGain( unsigned int iTel, unsigned int iChannel, unsigned int iWindowsize );
         TH1F* getHistoToff( unsigned int iTel, unsigned int iChannel, bool iLowGain = false );
-        TH1F* getHistoToffLowGain( unsigned int iTel, unsigned int iChannel ) { return getHistoToff( iTel, iChannel, true ); }
+        TH1F* getHistoAverageTzero( unsigned int iTel, unsigned int iChannel, bool iLowGain = false );
+
+	TH1F* getPedDist( bool iHiLo = false ) { if( iHiLo ) return getHistoDist( C_PED, true ); else return getHistoDist( C_PEDLOW, true ); }
+	TH1F* getPedvarsDist( bool iHiLo = false ) { if( iHiLo ) return getHistoDist( C_PED, false ); else return getHistoDist( C_PEDLOW, false ); }
+        TH1F* getToffsetDist( bool iHiLo = false ) { if( iHiLo ) return getHistoDist( C_TOFF, true ); else return getHistoDist( C_TOFFLOW, true ); }
+        TH1F* getToffsetVarsDist( bool iHiLo = false ) {  if( iHiLo ) return getHistoDist( C_TOFF, false ); else return getHistoDist( C_TOFFLOW, false ); }
+        double getAverageTZero( bool iLowGain = false );
+        void  setAverageTZero( double iAverageTzero = 0., bool iLowGain = false );
+	TH1F* getAverageTzerosetDist( bool iHiLo = false ) {  if( iHiLo ) return getHistoDist( C_TZERO, true ); else return getHistoDist( C_TZEROLOW, true ); }
+        TH1F* getGainDist( bool iHiLo = false ) { if( iHiLo ) return getHistoDist( C_GAIN, true ); else return getHistoDist( C_GAINLOW, true ); }
+        TH1F* getGainVarsDist( bool iHiLo = false ) { if( iHiLo ) return getHistoDist( C_GAIN, false ); else return getHistoDist( C_GAINLOW, false ); }
+        TH1F* getLowGainMultiplierDistribution() { return getHistoDist( C_LOWGAIN, true ); }
+
+        void initialize( unsigned int iChannel, unsigned int nSamples = 24, bool iTimeSlices = true, bool iLowGainTimeSlices = false, bool iDebug = false );
 
 	valarray< double >& getLowGainMultiplier( unsigned int iSumWindow = 9999 );
 	valarray< double >& getLowGainMultiplierError( unsigned int iSumWindow = 9999 );
 	double              getMeanLowGainMultiplier( unsigned int iSumWindow = 9999 );
 	double              getRMSLowGainMultiplier( unsigned int iSumWindow = 9999 );
-        TH1F*               getLowGainMultiplierDistribution() { return fLowGainMultiplierDistribution; }    // PRELI: should be a vector of size nsumwindows
-
-        string getGainFileName() { return fGainFileName; }
-        string getPedFileName() { return fPedFileName; }
-        string getToffFileName() { return fToffFileName; }
-        string getLowGainGainFileName() { return fLowgainGainFileName; }
-        string getLowGainPedFileName() { return fLowGainPedFileName; }
-        string getLowGainToffFileName() { return fLowGainToffFileName; }
-        string getLowGainMultFileName() { return fLowGainMultiplierFileName; }
 
         unsigned int getTelID() { return fTelID; }
         valarray< int >&     getMJDTS_vector() { return fTS_MJD; }

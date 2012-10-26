@@ -197,7 +197,10 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, b
 // require a certain significance and a minimum number of events
         if(    s >= fSignificance_min 
 	    && t * f * n_diff >= fEvents_min
-// (GM)	    && fData[iD].fBackground * fData[iD].fAlpha > 0.
+// require background events 
+// (removes most sensitivity values at large energies, but otherwise transition zone
+//  between signal and background limited zone not well defined)
+	    && fData[iD].fBackground * fData[iD].fAlpha > 0.
 	    && n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min 
 	  )
         {

@@ -102,10 +102,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         vector< int > fGainFileNumber;
         vector< int > fTOffFileNumber;
         vector< int > fPedFileNumber;
+	vector< int > fTZeroFileNumber;
         vector< int > fPedLowGainFileNumber;
         vector< int > fGainLowGainFileNumber;
         vector< int > fTOffLowGainFileNumber;
 	vector< int > fLowGainMultiplierFileNumber;
+	vector< int > fTZeroLowGainFileNumber;
         vector< int > fPixFileNumber;
         vector< int > fPadFileNumber;
         string fDeadChannelFile;
@@ -122,6 +124,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         double fPedestalsLengthOfTimeSlice;       // length of a time slice for pedestal calculations (tracking test)
         int    fCalibrationSumWindow;             // sumwindow for all calibration calculation
         int    fCalibrationSumFirst;              // starting point all calibration calculation
+	float  fCalibrationIntSumMin;             // minimum integrated charge in a channel and event to be taken into account in gain or tzero calibration runs
         string fsetSpecialChannels;               // set channels with L2 channels to correct for FADC crate time offsets (file name of channel settings)
         bool   fL2TimeCorrect;                    // use L2 pulses to correct FADC times (default: on )
 	unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
@@ -234,6 +237,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,116);
+        ClassDef(VEvndispRunParameter,117);
 };
 #endif

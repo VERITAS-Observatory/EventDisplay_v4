@@ -1441,6 +1441,8 @@ void VDisplay::drawCalibrationHistos()
     if( fSelectedChan < 200000 ) iChannel = 0;
     else iChannel = fSelectedChan-200000;
 
+    double iMeanDistributionValue = -99.;
+
     TH1F *ihis = 0;
     TH1F *ihis2 = 0;
     fCanvasCal->cd();
@@ -1500,6 +1502,24 @@ void VDisplay::drawCalibrationHistos()
             ihis2  = fEventLoop->getCalData( fTelescope )->getPedvarsDist( true );
         }
     }
+// tzero distributions
+    else if( E_cameraIdent( fCameraDisplay ) == C_CALTZERO || E_cameraIdent( fCameraDisplay ) == C_CALTZEROLOW )
+    {
+        if( fSelectedChan >= 200000 )
+        {
+            ihis = fEventLoop->getCalData( fTelescope )->getHistoAverageTzero( fTelescope, iChannel );
+            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoAverageTzero( fTelescope, iChannel, true );
+	    fEventLoop->setTelID( fTelescope );
+	    iMeanDistributionValue = fEventLoop->getAverageTZeros()[iChannel];
+        }
+        else
+        {
+            ihis = fEventLoop->getCalData( fTelescope )->getAverageTzerosetDist();
+            ihis2 = fEventLoop->getCalData( fTelescope )->getAverageTzerosetDist( true );
+	    fEventLoop->setTelID( fTelescope );
+	    iMeanDistributionValue = fEventLoop->getMeanAverageTZero();
+        } 
+    }
     else if( E_cameraIdent( fCameraDisplay ) == C_LOWGAIN )
     {
         ihis = fEventLoop->getCalData( fTelescope )->getLowGainMultiplierDistribution();
@@ -1514,6 +1534,12 @@ void VDisplay::drawCalibrationHistos()
             ihis2->SetLineWidth( 2 );
             ihis2->SetLineColor( 2 );
             ihis2->Draw( "sames" );
+        }
+	if( iMeanDistributionValue > -98. )
+	{
+	    TLine *iL = new TLine( iMeanDistributionValue, 0., iMeanDistributionValue, ihis->GetMaximum() );
+	    iL->SetLineStyle( 2 );
+	    iL->Draw();
         }
     }
     else       fCanvasCal->Clear();
@@ -1867,10 +1893,12 @@ void VDisplay::defineGui()
     fComboCameraView->AddEntry( "toff (high)", 16 );
     fComboCameraView->AddEntry( "toff (low)", 17 );
     fComboCameraView->AddEntry( "lowgain mult", 18 );
-    fComboCameraView->AddEntry( "status (high)", 19 );
-    fComboCameraView->AddEntry( "status (low)", 20 );
-    fComboCameraView->AddEntry( "trigger-evndisp", 21 );
-    fComboCameraView->AddEntry( "template (frogs)", 22 );
+    fComboCameraView->AddEntry( "tzero average (high)", 19 );
+    fComboCameraView->AddEntry( "tzero average (low)", 20 );
+    fComboCameraView->AddEntry( "status (high)", 21 );
+    fComboCameraView->AddEntry( "status (low)", 22 );
+    fComboCameraView->AddEntry( "trigger-evndisp", 23 );
+    fComboCameraView->AddEntry( "template (frogs)", 24 );
     fComboCameraView->Select( 0 );
     fComboCameraView->Associate( this );
     fComboCameraView->Resize( 110, 20 );

@@ -1005,9 +1005,14 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // fit times are corrected for TOffsets and FADCStopOffsets.
 // undo this to get integration window in FADC trace.
                 corrfirst = (int)(xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+// no success in start of integration window
+// (usually happens when first pass of cleaning returned no image/border pixels)
 		if( corrfirst < (int)getSumFirst() )
 		{
-		   corrfirst = getSumFirst();
+// take average tzero per telescope and pixel
+		   corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+// take average tzero per telescope
+//		   corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
                 }
 // low gain channel have different time -> use tzero (donnot do this for DST sims)
                 if( ( getHiLo()[i_channelHitID] || getTraceMax()[i_channelHitID] > getRunParameter()->fSumWindowStartAtT0Min ) && getRunParameter()->fsourcetype != 7 )
@@ -1018,14 +1023,18 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                     {
                         corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
                     }
+		    if( corrfirst < 0 ) corrfirst = getSumFirst();
                 }
 // integration start might be before sample 0 -> set to sample 0
-                if (corrfirst < 0 )
+                else if (corrfirst < 0 )
                 {
                     unsigned int isw = getDynamicSummationWindow( i_channelHitID );
                     if( -1*corrfirst > (int)isw ) isw = 0;
                     else                          isw += corrfirst;
-                    corrfirst = getSumFirst();
+// take average tzero per telescope and pixel
+		     corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+// take average tzero per telescope
+//	    	    corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
                     setCurrentSummationWindow( i_channelHitID, corrfirst, isw );
                 }
 // integration start is at beyond last sample: set to last sample

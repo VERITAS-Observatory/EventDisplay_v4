@@ -16,7 +16,9 @@ VSpectralWeight::VSpectralWeight()
     fIndex = 2.;
     fSpectralWeightAlpha = 1.;
 
-    setMCParameter();
+    fMCSpectralIndex = 2.;
+    fMCMinEnergy_TeV_Lin = 0.03;
+    fMCMaxEnergy_TeV_Lin = 200.;
 }
 
 void VSpectralWeight::setMCParameter( double iMCSpectralIndex, double iMCEnergy_min_TeV_Lin, double iMCEnergy_max_TeV_Lin )

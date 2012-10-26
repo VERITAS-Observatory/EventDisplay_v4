@@ -274,13 +274,13 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
         return false;
     }
 
-    string iline;
-    string i_char;
+    string iline = "";
+    string i_char = "";
     unsigned int i_telID = 0;
     unsigned int i_telID_SIMU = 0;
     unsigned int i_chan = 0;
-    unsigned int i_NN;
-    unsigned int i_NTelcfg;
+    unsigned int i_NN = 0;
+    unsigned int i_NTelcfg = 0;
 
     while( getline( inFileStream, iline ) )
     {
@@ -308,10 +308,6 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
         {
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_NTelcfg;
-            if( i_NTelcfg != fNTel )
-            {
-//(GM)	    cout << "VCameraRead::readGrisucfg warning: .cfg for different array size " << fNTel << "\t" << i_NTelcfg << endl;
-            }
             if( i_NTelcfg < fNTel ) fNTel = i_NTelcfg;
             if( fDebug ) cout << "VCameraRead: fNTel = " << fNTel << endl;
             resetTelVectors();
@@ -323,9 +319,9 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
             i_stream >> i_char;
             i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             i_stream >> i_telID_SIMU;
-            i_telID_SIMU -= 1;
+            if( i_telID_SIMU > 0 ) i_telID_SIMU -= 1;
             fTelIDGrisu[i_telID] = i_telID_SIMU;
         }
 // telescope positions
@@ -333,7 +329,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
         {
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             if( i_telID < fNTel )
             {
                 i_stream >> fTelXpos[i_telID];
@@ -375,7 +371,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
         {
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             if( i_telID < fNTel ) i_stream >> fLowGainMultiplier[i_telID];
             fLowGainIsSet = true;
         }
@@ -384,7 +380,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
         {
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             if( i_telID < fNTel )
             {
                 i_stream >> fTelRad[i_telID];
@@ -397,7 +393,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
         {
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             if( i_telID < fNTel )
             {
                 i_stream >> fCNChannels[i_telID];
@@ -405,14 +401,13 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
             }
             if( fDebug ) cout << "VCameraRead: total number of channels: " << fCNChannels[i_telID] << " (" << i_telID+1 << ")" << endl;
             if( fCFGtype == 1 ) for( unsigned int t = 1; t < fCNChannels.size(); t++ ) fCNChannels[t] = fCNChannels[0];
-// (GM) TODO: READ NEXT 2 VARIABLES
         }
 // camera rotation (not a original grisu line)
         else if( iline.find( "CAROT" ) < iline.size() )
         {
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             if( i_telID < fNTel )
             {
                 i_stream >> fCameraRotation[i_telID];
@@ -424,7 +419,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
         {
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             if( i_telID < fNTel )
             {
                 i_stream >> fCameraScaleFactor[i_telID];
@@ -438,9 +433,9 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
             if( fXTubeMM.size() == 0 ) resetCamVectors();
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             i_stream >> i_chan;
-            i_chan -= 1;
+            if( i_chan > 0 ) i_chan -= 1;
             if( fGrIsuVersion >= 400 )
             {
                 i_stream >> i_char;
@@ -466,9 +461,9 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
             i_stream >> i_char; i_stream >> i_char;
             vector< unsigned int > i_pixN;
             i_stream >> i_telID;
-            i_telID -= 1;
+            if( i_telID > 0 ) i_telID -= 1;
             i_stream >> i_chan;
-            i_chan -= 1;
+            if( i_chan > 0 ) i_chan -= 1;
             i_stream >> i_NN;
             if( i_telID < fNTel  && i_chan < fCNChannels[i_telID] ) fNNeighbour[i_telID][i_chan] = i_NN;
             if( i_NN > fMaxNeighbour )

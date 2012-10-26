@@ -27,6 +27,7 @@ class VCalibrator : public VImageBaseAnalyzer
 
         vector<int> fNumberPedestalEvents;        //!< number of events used in pedestal analysis
         vector<int> fNumberGainEvents;            //!< number of events used in gain and toffset analysis
+	vector<int> fNumberTZeroEvents;
 
         vector< TFile* > fPedOutFile;
                                                   //<! one histogram per telescope/channel/sumwindow
@@ -39,8 +40,12 @@ class VCalibrator : public VImageBaseAnalyzer
         vector<TH1F* > htoff;
         vector<TProfile* > htoff_vs_sum;
 
+// average Tzero calculation
+        vector< TFile * > fTZeroOutFile;
+// one histogram per telescope and channel
+	vector< vector< TH1F* > > htzero;
+
 // all calibration data is summarized in the following trees (one tree per telescope)
-        TTree* fGainTree;
         TTree* fToffTree;
 
         vector< string > fPedFileNameC;
@@ -48,15 +53,16 @@ class VCalibrator : public VImageBaseAnalyzer
         vector< string > fGainFileNameC;
         vector< string > fToffFileNameC;
         vector< string > fPixFileNameC;
+	vector< string > fTZeroFileNameC;
         vector< bool > fBlockTel;
         vector< string > fLowGainPedFileNameC;
         vector< string > fLowGainGainFileNameC;
         vector< string > fLowGainToffFileNameC;
         vector< string > fLowGainMultiplierNameC;
+	vector< string > fLowGainTZeroFileNameC;
 
-        TTree *fillGainTree( unsigned int tel );
+	TTree *fillCalibrationSummaryTree( unsigned int itel, string iName, vector<TH1F* > h );
         bool   fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculator *iP );
-        TTree* fillToffTree( unsigned int tel );
         void getCalibrationRunNumbers();
 	int  getCalibrationRunNumbers_fromCalibFile();
 	int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
@@ -71,17 +77,20 @@ class VCalibrator : public VImageBaseAnalyzer
 	bool readPeds_from_textfile( string iFile, bool iLowGain, unsigned int i_SumWindow );
         void readPixelstatus();
         void readTOffsets( bool iLowGain = false );
+        bool readAverageTZeros( bool iLowGain = false );
 	void setCalibrationFileNames();
 
         void writeGains( bool iLowGain = false );
         void writePeds( bool iLowGain = false );
         void writePeds( bool iLowGain, VPedestalCalculator *iP );
         void writeTOffsets( bool iLowGain = false  );
+	void writeAverageTZeros( bool iLowGain = false  );
 
     public:
         VCalibrator();
         ~VCalibrator() {}
 
+	void calculateAverageTZero( bool iLowGain = false );
         void calculatePedestals( bool iLowGain = false );
         void calculateGainsAndTOffsets( bool iLowGain = false );
         void initialize();

@@ -425,12 +425,12 @@ void VEventLoop::initializeAnalyzers()
     if( fDebug ) cout << "VEventLoop::initializeAnalyzers()" << endl;
 
 // initialize the analyzers
-    if( fAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW )
+    if( fAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
     {
         fAnalyzer->initializeDataReader();
         fAnalyzer->initOutput();
     }
-    if( fArrayAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW )
+    if( fArrayAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
     {
        fArrayAnalyzer->initializeDataReader();
        fArrayAnalyzer->initOutput();
@@ -447,7 +447,8 @@ void VEventLoop::initializeAnalyzers()
             if( i < fAnaDir.size() && fAnaDir[i] ) fAnaDir[i]->cd();
             setTelID( i );
             fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, (fRunMode == R_PED || fRunMode == R_PEDLOW || 
-	                                                                         fRunMode == R_GTO || fRunMode == R_GTOLOW ) ) );
+	                                                                         fRunMode == R_GTO || fRunMode == R_GTOLOW ||
+										 fRunMode == R_TZERO || fRunMode == R_TZEROLOW ) ) );
             int iseed = fRunPar->fMCNdeadSeed;
             if( iseed != 0 ) iseed += i;
             fAnaData.back()->initialize( getNChannels(), getReader()->getMaxChannels(), (getTraceFit()>-1.), 
@@ -506,12 +507,16 @@ void VEventLoop::shutdown()
         {
             fOutputfile->cd();
         }
-        else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW )
+        else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
         {
             cout << "VEventLoop::shutdown: Error accessing output file" << endl;
         }
 // write run parameter to disk
-        if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW && fRunPar->frunmode != R_PEDLOW ) fRunPar->Write();
+        if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW
+	 && fRunPar->frunmode != R_PEDLOW && fRunPar->frunmode != R_TZERO && fRunPar->frunmode != R_TZEROLOW )
+	{
+	   fRunPar->Write();
+        }
 // analysis or trace library mode
         if( fRunPar->frunmode == R_ANA )
         {
@@ -550,7 +555,8 @@ void VEventLoop::shutdown()
             fAnalyzer->shutdown();
         }
 // write calibration/analysis results for each telescope
-        else if( fRunPar->frunmode == R_PED || fRunPar->frunmode == R_GTO || fRunPar->frunmode == R_GTOLOW || fRunPar->frunmode == R_PEDLOW )
+        else if( fRunPar->frunmode == R_PED || fRunPar->frunmode == R_GTO || fRunPar->frunmode == R_GTOLOW || fRunPar->frunmode == R_PEDLOW
+	      || fRunPar->frunmode == R_TZERO || fRunPar->frunmode == R_TZEROLOW )
         {
             VPedestalCalculator *iP = 0;
             if( fRunPar->frunmode == R_PED && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
@@ -766,9 +772,10 @@ int VEventLoop::analyzeEvent()
         fDST->fill();
         return 1;
     }
-// analyze all requested telescopes
 
-// analyse each telescope
+////////////////////////////////////
+// analyze all requested telescopes
+////////////////////////////////////
     for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
     {
         setTelID( fRunPar->fTelToAnalyze[i] );
@@ -779,7 +786,7 @@ int VEventLoop::analyzeEvent()
 	   cout << "setting sample length for telescope " << getTelID()+1 << " to " << getNSamples() << endl;
 	   fBoolPrintSample[getTelID()] = false;
 // make sure that calibration sum window is not too long
-	   if( fRunMode == R_PED )
+	   if( fRunMode == R_PED || fRunMode == R_TZERO )
 	   {
 	      if( fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow > (int)getNSamples() )
 	      {
@@ -787,7 +794,9 @@ int VEventLoop::analyzeEvent()
 		 cout << fRunPar->fCalibrationSumWindow;
 		 fRunPar->fCalibrationSumWindow = getNSamples() - fRunPar->fCalibrationSumFirst;
 	         cout << " to " << fRunPar->fCalibrationSumWindow;
-		 cout << " (sum first at " << fRunPar->fCalibrationSumFirst << ")" << endl;
+		 cout << " (sum first at " << fRunPar->fCalibrationSumFirst;
+		 cout << ", min sum per channel " << fRunPar->fCalibrationIntSumMin;
+		 cout << ")" << endl;
               }
            }
         }
@@ -835,7 +844,8 @@ int VEventLoop::analyzeEvent()
 
         switch( fRunMode )
         {
-
+/////////////////
+// analysis
             case R_ANA:                           // analysis mode
 // ignore pedestal events (important for VBF only)
 #ifndef NOVBF
@@ -846,18 +856,19 @@ int VEventLoop::analyzeEvent()
 		   {
 		      fAnalyzer->doAnalysis();
                    }
-// single telescope cuts don't work
+// check user cuts
+// (single telescope cuts don't work
 // what to do:
 // determine cut result for each telescope
-// AND then with vector of cut telescopes
-// check user cuts
+// AND then with vector of cut telescopes )
 		   i_cutTemp = checkCuts();
 		   if( i_cut > 0 && !fCutTelescope ) i_cut = 1;
 		   else                              i_cut = i_cutTemp;
                 }
                 break;
-
-            case R_PED:                           // pedestal calculation (pedestals in time slices are calculated later)
+/////////////////
+// pedestal calculation
+            case R_PED:
                 i_cut = 1;
                 if (fRunPar->fUsePedEvents)
                 {
@@ -874,13 +885,15 @@ int VEventLoop::analyzeEvent()
                     if( !fReader->wasLossyCompressed() ) fCalibrator->calculatePedestals();
                 }
                 break;
-
+/////////////////
+// low gain pedestal calculation
             case R_PEDLOW:
                 i_cut = 1;
                 if( !fReader->wasLossyCompressed() ) fCalibrator->calculatePedestals(true);
                 break;
-
-            case R_GTO:                           // gains/toffset calculation
+/////////////////
+// gain and toffset calculation
+            case R_GTO: 
                 i_cut = 1;
 // don't use pedestal events for gain calculation (vbf file only)
 #ifndef NOVBF
@@ -890,8 +903,9 @@ int VEventLoop::analyzeEvent()
 		    fCalibrator->calculateGainsAndTOffsets();
                 }
                 break;
-
-            case R_GTOLOW:                        // gains/toffset calculation for low gain channels
+/////////////////
+// gains/toffset calculation for low gain channels
+            case R_GTOLOW:
                 i_cut = 1;
 // don't use pedestal events for gain calculation (vbf file only)
 #ifndef NOVBF
@@ -901,17 +915,40 @@ int VEventLoop::analyzeEvent()
 		   fCalibrator->calculateGainsAndTOffsets(true);
                 }
                 break;
-
+/////////////////
+// mean tzero calculation
+            case R_TZERO:
+                i_cut = 1;
+// don't use pedestal events for tzero calculation (vbf file only)
+#ifndef NOVBF
+                if( fReader->getATEventType() != VEventType::PED_TRIGGER )
+#endif
+		{
+		    fCalibrator->calculateAverageTZero();
+                }
+                break;
+/////////////////
+// mean tzero calculation (low gain)
+            case R_TZEROLOW:
+                i_cut = 1;
+// don't use pedestal events for tzero calculation (vbf file only)
+#ifndef NOVBF
+                if( fReader->getATEventType() != VEventType::PED_TRIGGER )
+#endif
+		{
+		    fCalibrator->calculateAverageTZero( true );
+                }
+                break;
+/////////////////
+// this should not happen
             default:
                 break;
 
         }
-//     if( i_cut < 0 ) return -1;   // invalid cut definition
     }
-
 /////////////////////////////////////////////////////////////////////////
 // ARRAY ANALYSIS
-    if( fRunMode != R_PED && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_PEDLOW )
+    if( fRunMode != R_PED && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_PEDLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
     {
 #ifndef NOVBF
        if( fReader->getATEventType() != VEventType::PED_TRIGGER )
@@ -945,8 +982,11 @@ int VEventLoop::analyzeEvent()
             if( fRunPar->fPedestalsInTimeSlices && !fReader->wasLossyCompressed() ) fPedestalCalculator->doAnalysis( fRunMode == R_PEDLOW );
         }
     }
-
-    if( fRunMode != R_PED && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_PEDLOW ) i_cut = int( checkArrayCuts() == 1 && i_cut > 0 );
+// these cuts are important for display mode only
+    if( fRunMode != R_PED && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_PEDLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
+    {
+       i_cut = int( checkArrayCuts() == 1 && i_cut > 0 );
+    }
     return i_cut;
 }
 

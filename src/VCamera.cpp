@@ -308,6 +308,9 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             case C_TOFF:
                 setPMTColorScheme( fData->getTOffsets(), false, -2., 2., "time offset [samples]", false );
                 break;
+            case C_CALTZERO:
+                setPMTColorScheme( fData->getAverageTZeros(), false, 100., 0.,  "time (cal tzero) [samples]", false );
+                break;
             case C_TZERO:
                 setPMTColorScheme( fData->getTZeros(), true, 100., 0., "time [samples]", true );
                 break;
@@ -333,6 +336,9 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 break;
             case C_TOFFLOW:
                 setPMTColorScheme( fData->getTOffsets(true), false, -2., 2., "time offset [samples]", false );
+                break;
+            case C_CALTZEROLOW:
+                setPMTColorScheme( fData->getAverageTZeros(true), false, 100., 0.,  "time (cal tzero) [samples]", false );
                 break;
             case C_STATUS:
                 setPMTColorScheme( fData->getDeadUI(), false, 0., 12., "high gain channel status", false, true );
