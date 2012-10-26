@@ -121,7 +121,7 @@ do
 	 echo "DATA DIR: $ODDIR"
 	 echo "LOG DIR: $LOGDIR"
 # submit job
-         qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+         qsub -l os="sl*" -l h_cpu=05:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
 	 echo "writing queue log and error files to $QLOG"
 	 echo "writing analysis parameter files to $FNAM.sh"

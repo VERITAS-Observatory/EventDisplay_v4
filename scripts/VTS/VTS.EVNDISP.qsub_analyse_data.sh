@@ -5,16 +5,16 @@
 # Author: Gernot Maier
 #
 set RUN=RRRRR
-set PED=PEEED
+set CALIB=PEEED
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 # output data files are written to this directory
-set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400/"
+set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-VPM-TZERO-INV/"
 mkdir -p $ODIR
 # output log files are written to this directory
-set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400/"
+set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-VPM-TZERO-INV/"
 mkdir -p $LDIR
 
 # eventdisplay reconstruction parameter
@@ -24,10 +24,15 @@ set ACUTS="EVNDISP.reconstruction.runparameter"
 # directory with executable
 cd $EVNDISPSYS/bin/
 
-# pedestal
-if( $PED == "1" ) then
+# pedestal calculation
+if( $CALIB == "1" || $CALIB == "2" ) then
     rm -f $LDIR/$RUN.ped.log
     ./evndisp -runnumber=$RUN -runmode=1  > $LDIR/$RUN.ped.log
+endif
+# average tzero calculation
+if( $CALIB == "1" || $CALIB == "3" ) then
+    rm -f $LDIR/$RUN.tzero.log
+    ./evndisp -runnumber=$RUN -runmode=7  > $LDIR/$RUN.tzero.log
 endif
 
 set OPT=" "
@@ -38,7 +43,7 @@ set OPT=" "
 # pointing from pointing monitor (text file)
 #set OPT="$OPT -pointingmonitortxt /raid/pevray/maierg/veritas/VPM/results/"
 # pointing from pointing monitor (DB)
-# set OPT="$OPT -usedbvpm "
+set OPT="$OPT -usedbvpm "
 # OFF data run
 #set OPT="$OPT -raoffset=6.25"
 # use calib.dat

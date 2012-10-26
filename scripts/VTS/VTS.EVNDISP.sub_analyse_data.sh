@@ -10,14 +10,19 @@ then
    echo
    echo "EVNDISP data analysis: submit jobs from a simple run list"
    echo
-   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [pedestal calculation (default=1=on)]" 
+   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [calibration (default=1)]" 
    echo
-   echo "runlist should contain run numbers only"
+   echo "  [calibration]"
+   echo "          1     pedestal & average tzero calculation"
+   echo "          2     pedestal calculation only"
+   echo "          3     average tzero calculation only"
    echo
-   echo "example for run list:"
-   echo "48626"
-   echo "58453"
-   echo "61429"
+   echo "  runlist should contain run numbers only"
+   echo
+   echo "  example for run list:"
+   echo "    48626"
+   echo "    58453"
+   echo "    61429"
    echo
 
    exit
@@ -68,7 +73,7 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -V -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+   qsub -js 200 -V -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 exit

@@ -83,7 +83,7 @@ endif
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20120901_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20121026_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -106,6 +106,10 @@ endif
 echo "CALCULATING PEDESTALS FOR RUN $RUN"
 rm -f $ODIR/$RUN.ped.log
 $EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
+
+echo "CALCULATING AVERAGE TZEROS FOR RUN $RUN"
+rm -f $ODIR/$RUN.tzero.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=500000 >& $ODIR/$RUN.ped.log
 
 set CALIBDATA=$OBS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
 if (! -e $CALIBDATA ) then
