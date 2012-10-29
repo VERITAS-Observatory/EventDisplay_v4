@@ -1,6 +1,6 @@
 #$ -S /bin/tcsh
 #
-# script to run evndisp on one of the cluster nodes (VBF)
+# script to run evndisp for grisu simulations on one of the cluster nodes (VBF)
 #
 # Gernot Maier
 #

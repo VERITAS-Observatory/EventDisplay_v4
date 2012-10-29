@@ -10,10 +10,15 @@ MCD=`date`
 
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
 then
+  echo
   echo "VTS.EVNDISP.sub_analyse_MC_CARE_VBF.sh <ze> <array=V4/V5/V6> <reconstruction parameter file> <particle=1/2/14/402> <run number> <noise>"
-  echo "V4: array before T1 move (before Autumn 2009)"
-  echo "V5: array after T1 move (from Autumn 2009)"
-  echo "V6: array after camera upgrade (from Autumn 2012)"
+  echo
+  echo "  analyse VTS simulations created with CARE (VBF format)"
+  echo
+  echo "    V4: array before T1 move (before Autumn 2009)"
+  echo "    V5: array after T1 move (from Autumn 2009)"
+  echo "    V6: array after camera upgrade (from Autumn 2012)"
+  echo
   exit
 fi
 
@@ -62,7 +67,7 @@ fi
 QLOGDIR=$FDIR
 
 CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_CARE_VBF"
-OSCRIPT="qsub_evndisp_MC_CARE_VBF-$ZEW-$WOB-$NOIS-$ATMO"
+OSCRIPT="$ARRAY-EV_CARE_VBF-$ZEW-$WOB-$NOIS-$ATMO"
 
 # set zenith angle
 sed -e "s/123456789/$ZEW/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-b.sh

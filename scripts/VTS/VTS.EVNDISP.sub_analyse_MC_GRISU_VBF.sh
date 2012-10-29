@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-# submit evndisp for simulations (analyse all noise levels at the same time)
+# submit evndisp for grisu simulations (analyse all noise levels at the same time)
 #
 #
 MACHINE=`hostname`
@@ -9,8 +9,10 @@ MCD=`date`
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] 
 then
   echo
-  echo "./VTS.EVNDISP.sub_evndisp_MC_VBF.sh <ze> <array=V4/V5/V6> <particle=1/14/402> <ATMOSPHERE=21/22>" 
+  echo "./VTS.EVNDISP.sub_evndisp_MC_GRISU_VBF.sh <ze> <array=V4/V5/V6> <particle=1/14/402> <ATMOSPHERE=21/22>" 
   echo 
+  echo " analyse VTS simulations created with grisudet (VBF format)"
+  echo
   echo "   V4: array before T1 move (before Autumn 2009)"
   echo "   V5: array after T1 move (from Autumn 2009)"
   echo "   V6: array after camera update (from Autumn 2012)"
@@ -86,7 +88,7 @@ do
 #     QLOGDIR="/dev/null"
 #   fi
 
-   CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_VBF"
+   CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_GRISU_VBF"
    OSCRIPT="qsub_evndisp_MC_VBF-$ZEW-$WOB-$NOIS-$ATMO"
 
 # set zenith angle
