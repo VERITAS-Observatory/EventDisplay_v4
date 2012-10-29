@@ -452,7 +452,7 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
   cout << "Reading calibrated pointing monitor (VPM) data from database for telescope " << getTelID()+1;
   cout << ": found " << fNRows << " rows in database" << endl;
 
-  // get VPM quality flag from database 
+// get VPM quality flag from database 
   char cflag_query[1000];
   sprintf( cflag_query, "SELECT vpm_config_mask FROM tblRun_Analysis_Comments WHERE run_id = %d", fRunNumber ); 
   TSQLResult *db_flag = f_dbOFFLINE->Query( cflag_query );
@@ -461,6 +461,11 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
     return false;
   }
   TSQLRow *flag_row = db_flag->Next();
+  if( !flag_row || !flag_row->GetField(0) )
+  {
+     cout << "VPointingDB: error while reading VPM quality flag" << endl;
+     return false;
+  }
   int maskVPM = atoi( flag_row->GetField(0) );
 
   if( getTelID() == 0 ) {    // T1 bad  
