@@ -336,9 +336,6 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        b.setEnergyRange_Lin( 0.01, 150. );
 // significance parameters
        b.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
-//       b.setSignificanceParameter( 5., 10., 5., 0.05, 0.2 );
-// energy axis
-       b.setUseEffectiveAreas_vs_reconstructedEnergy( true );
 // set colors different in case data is plotted
        if( iData_anasumFile1 ) b.setPlottingStyle( 4, 1, 2, 20, 2., 3002 );
 
