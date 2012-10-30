@@ -486,11 +486,15 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
         }
 // number of events
-        else if( iTemp.rfind( "neve" ) < iTemp.size() )
+        else if( iTemp.rfind( "neve" ) < iTemp.size() && !(iTemp.find( "calibrationnevents" ) < iTemp.size() ) )
         {
             fRunPara->fnevents = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
             if( fRunPara->fnevents <= 0 ) fRunPara->fnevents = -10000;
         }
+	else if( iTemp.find( "calibrationnevents" ) < iTemp.size() )
+	{
+	   fRunPara->fNCalibrationEvents  = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }	   
 // source type
         else if( iTemp.find( "type" ) < iTemp.size() )
         {
@@ -547,6 +551,18 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	   if( iTemp2.size() > 0 )
 	   {
 	      fRunPara->setDirectory_EVNDISPOutput( iTemp2 );
+	      i++;
+           }
+        }
+	else if( iTemp.find( "calibrationdirectory" ) < iTemp.size() )
+	{
+	   if( iTemp2.size() > 0 )
+	   {
+	      if( !fRunPara->setDirectory_EVNDISPCalibrationData( iTemp2 ) )
+	      {
+	          cout << "exiting..." << endl;
+		  exit( -1 );
+              }
 	      i++;
            }
         }
@@ -803,7 +819,7 @@ void VReadRunParameter::test_and_adjustParams()
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 // settings for pedestal and gain calculations
-    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6  )
+    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 7 )
     { 
         fRunPara->fcalibrationfile = "";
         fRunPara->fDBTracking = false;
@@ -1254,16 +1270,13 @@ void VReadRunParameter::setDirectories()
         gSystem->cd( i_worDir.c_str() );
     }
 
-// check if calibration directories exist
-
-    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 )
+// check if calibration directories exist, otherwise crate
+    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 7 )
     {
-        string i_worDir = gSystem->WorkingDirectory();
         for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
         {
-            sprintf( i_text, "%s/Calibration/Tel_%d/", fRunPara->getDirectory_EVNDISPAnaData().c_str(), i+1 );
-            gSystem->cd( i_worDir.c_str() );
-            if( !gSystem->cd( i_text ) )
+            sprintf( i_text, "%s/Tel_%d/", fRunPara->getDirectory_EVNDISPCalibrationData().c_str(), i+1 );
+	    if( gSystem->AccessPathName( i_text ) )
             {
                 cout << "\t creating calibration directory for Telescope " << i+1 << " : " << i_text << endl;
                 if( gSystem->mkdir( i_text, kTRUE ) != 0 )
@@ -1275,7 +1288,6 @@ void VReadRunParameter::setDirectories()
                 }
             }
         }
-        gSystem->cd( i_worDir.c_str() );
     }
 }
 
@@ -1382,7 +1394,7 @@ void VReadRunParameter::printStartMessage()
     cout << "\t|        IACT event analysis and display          |" << endl;
     cout << "\t|                                                 | " << endl;
     cout << "\t|     \t\t Version " << fRunPara->getEVNDISP_VERSION() << "                   |" << endl;
-    cout << "\t|     \t\t SVN " << fRunPara->getSVN_VERSION() << "             |" << endl;
+    cout << "\t|     \t\t SVN " << fRunPara->getSVN_VERSION() << "            |" << endl;
     cout << "\t|                                                 | " << endl;
     cout << "\t---------------------------------------------------" << endl;
 }

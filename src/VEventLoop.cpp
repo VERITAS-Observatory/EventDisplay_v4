@@ -47,6 +47,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
     fRunMode = (E_runmode)fRunPar->frunmode;
     fEventNumber = 0;
     fNextEventStatus = false;
+    fEndCalibrationRunNow = false;
     fBoolSumWindowChangeWarning = 0;
 
     setRunNumber( fRunPar->frunnumber );
@@ -667,7 +668,7 @@ bool VEventLoop::loop( int iEvents )
         iEventStatus = nextEvent();
         if( !iEventStatus )
         {
-            if( fReader->getEventStatus() > 998 ) break;
+            if( fReader->getEventStatus() > 998 || fEndCalibrationRunNow ) break;
             else
             {
                 fNumberofIncompleteEvents++;
@@ -742,7 +743,10 @@ bool VEventLoop::nextEvent()
 // in displaymode, look for user interaction
         if( fRunPar->fdisplaymode ) gSystem->ProcessEvents();
 // analyze event ( do this always except if searching for a specifing event number in the file)
-        if( fAnalyzeMode ) i_cut = analyzeEvent();
+        if( fAnalyzeMode )
+	{
+	   i_cut = analyzeEvent();
+        }
     } while( i_cut == 0 && fNextEventStatus );
 // user cut failed
     if( i_cut < 0 ) return false;
@@ -921,7 +925,7 @@ int VEventLoop::analyzeEvent()
                 i_cut = 1;
 // don't use pedestal events for tzero calculation (vbf file only)
 #ifndef NOVBF
-                if( fReader->getATEventType() != VEventType::PED_TRIGGER )
+                if( fReader->getATEventType() != VEventType::PED_TRIGGER &&  fReader->hasArrayTrigger() )
 #endif
 		{
 		    fCalibrator->calculateAverageTZero();
@@ -987,6 +991,20 @@ int VEventLoop::analyzeEvent()
     {
        i_cut = int( checkArrayCuts() == 1 && i_cut > 0 );
     }
+
+// number of event in calibration runs
+    if( fRunMode == R_PED || fRunMode == R_PEDLOW || fRunMode == R_TZERO || fRunMode == R_TZEROLOW )
+    {
+        if( fRunPar->fNCalibrationEvents > 0 )
+	{
+           if( (int)fCalibrator->getNumberOfEventsUsedInCalibration( -1, fRunMode ) > fRunPar->fNCalibrationEvents )
+	   {
+	      i_cut = -1;
+	      fEndCalibrationRunNow = true;
+           }
+        }
+    }
+
     return i_cut;
 }
 

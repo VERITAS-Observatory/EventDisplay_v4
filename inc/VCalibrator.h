@@ -65,6 +65,7 @@ class VCalibrator : public VImageBaseAnalyzer
         bool   fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculator *iP );
         void getCalibrationRunNumbers();
 	int  getCalibrationRunNumbers_fromCalibFile();
+	unsigned int getNumberOfEventsUsedInCalibration( vector< int > iE, int iTelID );
 	int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
 	string getCalibrationFileName( int iTel, int irun, string iSuffix );
         void readCalibrationData( bool iPeds, bool iGains );
@@ -93,6 +94,7 @@ class VCalibrator : public VImageBaseAnalyzer
 	void calculateAverageTZero( bool iLowGain = false );
         void calculatePedestals( bool iLowGain = false );
         void calculateGainsAndTOffsets( bool iLowGain = false );
+	unsigned int getNumberOfEventsUsedInCalibration( int iTelID, int iType );
         void initialize();
         void terminate( VPedestalCalculator* );
 };

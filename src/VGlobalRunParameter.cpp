@@ -113,6 +113,33 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
     return true;
 }
 
+/*!
+
+   set calibration directory
+   (require full path here)
+
+*/
+bool VGlobalRunParameter::setDirectory_EVNDISPCalibrationData( string iDir )
+{
+    fEVNDISPCalibrationDataDirectory = iDir;
+    if( gSystem->AccessPathName(  fEVNDISPCalibrationDataDirectory.c_str() ) )
+    {
+       cout << "VGlobalRunParameter::setDirectory_EVNDISPCalibrationData(): creating calibration directory in " << endl;
+       cout << "   " << fEVNDISPCalibrationDataDirectory << endl;
+       gSystem->MakeDirectory( fEVNDISPCalibrationDataDirectory.c_str() );
+       if( gSystem->AccessPathName(  fEVNDISPCalibrationDataDirectory.c_str() ) )
+       {
+          cout << "VGlobalRunParameter::setDirectory_EVNDISPCalibrationData(): error creating calibration directory in " << endl;
+	  cout << "   " << fEVNDISPCalibrationDataDirectory << endl;
+	  return false;
+       }
+    }
+    cout << "VGlobalRunParameter::setDirectory_EVNDISPCalibrationData(): calibration directory is " << endl;
+    cout << "   " << fEVNDISPCalibrationDataDirectory << endl;
+
+    return true;
+}
+
 bool VGlobalRunParameter::setDirectories()
 {
 //////////////////////////////////////////////////////////////////////
@@ -143,6 +170,8 @@ bool VGlobalRunParameter::setDirectories()
        cout << "exiting..." << endl;
        exit( -1 );
     }
+// by default: calibration directory = fEVNDISPAnaDataDirectory
+    if( fEVNDISPCalibrationDataDirectory.size() == 0 ) fEVNDISPCalibrationDataDirectory = fEVNDISPAnaDataDirectory;
 //////////////////////////////////////////////////////////////////////
 // raw data is expected to be here
     const char *raw_dir = gSystem->Getenv( "VERITAS_DATA_DIR" );
@@ -248,6 +277,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
    cout << "Directories: " << endl;
    if( fEVNDISPAnaDataDirectory.size() > 0 ) cout << "EVNDISP data: " << fEVNDISPAnaDataDirectory << endl;
    if( fVBFRawDataDirectory.size() > 0 )     cout << "VBF raw: " << fVBFRawDataDirectory << endl;
+   if( fEVNDISPCalibrationDataDirectory.size() > 0 ) cout << "Calibration data: " << fEVNDISPCalibrationDataDirectory << endl;
    if( fEVNDISPOutputDirectory.size() > 0 )  cout << "EVNDISP output: " << fEVNDISPOutputDirectory << endl;
    cout << endl;
 
@@ -266,6 +296,7 @@ string VGlobalRunParameter::fEVNDISP_SVNREVISION = "$Revision$";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fRawDataServer = "";
 string VGlobalRunParameter::fEVNDISPAnaDataDirectory = "";
+string VGlobalRunParameter::fEVNDISPCalibrationDataDirectory = "";
 string VGlobalRunParameter::fVBFRawDataDirectory = "";
 string VGlobalRunParameter::fEVNDISPOutputDirectory = "";
 double VGlobalRunParameter::fObservatory_Longitude_deg = 0.;

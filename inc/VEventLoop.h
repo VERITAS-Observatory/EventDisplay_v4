@@ -66,6 +66,7 @@ class VEventLoop : public VEvndispData
         int fBoolSumWindowChangeWarning;
 
         bool fNextEventStatus;                    //!< for stopping event loop from display
+	bool fEndCalibrationRunNow;               //!< for stopping event loop for calibration
 
         int      analyzeEvent();                  //!< analyze current event
         int      checkArrayCuts();                //!< check cuts (see tab cut option) for current event

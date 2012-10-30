@@ -51,9 +51,10 @@ class VGlobalRunParameter
    static string    fRawDataServer;                                    // location of raw data (VTS)
 
 // DIRECTORIES
-   static string fEVNDISPAnaDataDirectory;          // directory where all data (calibration, detectorgeometry, ...) is expected and written to (output file)
+   static string fEVNDISPAnaDataDirectory;          // directory where all data (detectorgeometry, ...) is expected and written to (output file)
    static string fVBFRawDataDirectory;              // directory with VERITAS vbf data (vbf files)
-   static string fEVNDISPOutputDirectory;                  // output- and result files are written into this directory
+   static string fEVNDISPCalibrationDataDirectory;  // directory where calibration data is expected and written to
+   static string fEVNDISPOutputDirectory;           // output- and result files are written into this directory
 
    public:
 
@@ -65,7 +66,7 @@ class VGlobalRunParameter
 
    string       getDBServer() const             { return fDBServer; }
    static string getDirectory_EVNDISPAnaData()   { return fEVNDISPAnaDataDirectory; }
-   string       getDirectory_EVNDISPCalibrationData() { return fEVNDISPAnaDataDirectory + "/Calibration/"; }
+   string       getDirectory_EVNDISPCalibrationData() { return fEVNDISPCalibrationDataDirectory + "/Calibration/"; }
    string       getDirectory_EVNDISPDetectorGeometry() { return fEVNDISPAnaDataDirectory + "/DetectorGeometry/"; }
    string       getDirectory_EVNDISPParameterFiles() { return fEVNDISPAnaDataDirectory + "/ParameterFiles/"; }
    string       getDirectory_VBFRawData()       { return fVBFRawDataDirectory; }
@@ -86,6 +87,7 @@ class VGlobalRunParameter
    bool         readRunparameterFile( string iFile );
    bool         setDirectories();
    void         setDirectory_EVNDISPOutput( string iDir ) { fEVNDISPOutputDirectory = iDir; }
+   bool         setDirectory_EVNDISPCalibrationData( string iDir );
    bool         update( TChain *ic );
 
    ClassDef(VGlobalRunParameter,6);

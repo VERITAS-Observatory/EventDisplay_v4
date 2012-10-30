@@ -99,6 +99,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	bool   fcalibrationrun;                   // true if this is a pedestal/gain/toff calculation run
         string fcalibrationfile;                  // file with file names for calibration
 	string fLowGainCalibrationFile;           // file with file name for low-gain calibration 
+	int fNCalibrationEvents;                  // events to be used for calibration 
         vector< int > fGainFileNumber;
         vector< int > fTOffFileNumber;
         vector< int > fPedFileNumber;

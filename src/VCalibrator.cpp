@@ -420,6 +420,7 @@ void VCalibrator::writeAverageTZeros( bool iLowGain )
         }
         cout << "\t writing average tzeros to ";
 	cout << fTZeroOutFile[tel]->GetName() << endl;
+	cout << "\t calculated from " << fNumberTZeroEvents[t] << " event" << endl;
 
         fTZeroOutFile[tel]->cd();
 	if( t < htzero.size() )
@@ -845,7 +846,8 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
         }
 
 // read average tzeros
-        if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 )
+        if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5
+	 && getRunParameter()->frunmode != 7 && getRunParameter()->frunmode != 8 )
 	{
 	   readAverageTZeros( false );
 	   if( fLowGainTZeroFileNameC[getTeltoAna()[i]].size() > 0 )
@@ -1465,7 +1467,7 @@ bool VCalibrator::readAverageTZeros( bool iLowGain )
       cout << "Telescope " << getTelID()+1;
       if( !iLowGain ) cout << ": reading average tzeros for high gain channels";
       else            cout << ": reading average tzeros for low gain channels";
-      cout << "from : " << endl;
+      cout << " from : " << endl;
       cout << "Telescope " << getTelID()+1 << ": ";
       cout << iFile << endl;
 
@@ -1668,6 +1670,7 @@ void VCalibrator::getCalibrationRunNumbers()
 // initialize vectors
     setCalibrationFileNames();
 
+// reading peds etc from grisu files
     if( getRunParameter()->fsimu_pedestalfile.size() > 0 )
     {
         cout << "VCalibrator::getCalibrationRunNumbers() info: taking calibration from grisu files" << endl;
@@ -1723,10 +1726,15 @@ void VCalibrator::getCalibrationRunNumbers()
 	{
 	    cout << "VCalibrator::getCalibrationRunNumbers() info: laser/flasher files, using run number for pedestals and gains" << endl;
 	}
-// this is an calibration run
+// this is an calibration run 
 	else if( getRunParameter()->fsimu_pedestalfile.size() == 0 && getRunParameter()->fcalibrationrun )
 	{
-	   cout << "VCalibrator::getCalibrationRunNumbers() info: calibration run - no calibration run numbers necessary" << endl;
+	   cout << "VCalibrator::getCalibrationRunNumbers() info: calibration run, using run number for pedestals, tzeros and gains" << endl;
+        }
+// this is a MC run 
+	else if( getRunParameter()->fsimu_pedestalfile.size() == 0 && getRunParameter()->fIsMC )
+	{
+	   cout << "VCalibrator::getCalibrationRunNumbers() info: MC run, using run number for pedestals, tzeros and gains" << endl;
         }
 // no calibration data: problem
         else
@@ -2381,4 +2389,42 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 
    iF.Close();
    return true;
+}
+
+unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( int iTelID, int iType )
+{
+   if( iType == 1 || iType == 6 )
+   {
+      return getNumberOfEventsUsedInCalibration( fNumberPedestalEvents, iTelID );
+   }
+   else if( iType == 2 || iType == 5 )
+   {
+      return getNumberOfEventsUsedInCalibration( fNumberGainEvents, iTelID );
+   }
+   else if( iType == 7 || iType == 8 )
+   {
+      return getNumberOfEventsUsedInCalibration( fNumberTZeroEvents, iTelID );
+   }
+   return 0;
+}
+
+unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( vector< int > iE, int iTelID )
+{
+   if( iTelID > 0 && iTelID < (int)iE.size() ) return iE[iTelID];
+   else
+   {
+      int iTot = 0;
+      int iN = 0;
+      for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
+      {
+	 if( tel < iE.size() ) 
+	 {
+	    iTot += iE[tel];
+	    iN++;
+	 }
+      }
+      if( iN > 0 ) return iTot/iN;
+   }
+
+   return 0;
 }

@@ -65,6 +65,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fcalibrationfile = "";
     fLowGainCalibrationFile = "calibrationlist.LowGain.dat";
     fcalibrationrun = false;
+    fNCalibrationEvents = -1;
     fLaserSumMin = 50000.;
     fGainFileNumber.push_back( 0 );
     fTOffFileNumber.push_back( 0 );
@@ -328,6 +329,7 @@ void VEvndispRunParameter::print( int iEv )
     cout << endl;
     cout << "runmode: " << frunmode << endl;
     if( fnevents > 0 ) cout << "number of events to analyse: " << fnevents << endl;
+    if( fNCalibrationEvents > 0 ) cout << "number of events in calibration analysis: " << fNCalibrationEvents << endl;
     if( frunmode == 4 ) cout << "dstfile: " << fdstfile << " (mintubes: " << fdstminntubes << ")" << endl;
     cout << endl;
     if( fcalibrationfile.size() > 0 )         cout << "calibration file: " << fcalibrationfile << endl;
