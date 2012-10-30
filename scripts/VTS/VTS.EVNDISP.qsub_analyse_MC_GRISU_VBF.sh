@@ -173,9 +173,17 @@ echo "EVNDISP outputfile root file written to $ODIR/$RRR.root"
 echo "EVNDISP log file written to $ODIR/$RRR.log"
 
 ##############################################################################################
+# calculating tzeros
+##############################################################################################
+echo "CALCULATING AVERAGE TZEROS FOR RUN $SRUN"
+rm -f $ODIR/$SRUN.tzero.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$SRUN -deadchannelfile $DEAD -arraycuts $ACUT -teltoana=$TTA -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==5000 $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$SRUN.tzero.log
+
+
+##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$SRUN  -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT >& $ODIR/$RRR.log
+$EVNDISPSYS/bin/evndisp -runnumber=$SRUN  -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$RRR.log
 ##############################################################################################
 
 # remove temporary vbf file

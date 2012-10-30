@@ -83,7 +83,7 @@ endif
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20121026_ATM"$ATMO"_"$TTA"_"$RECFILE"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20121026_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -105,17 +105,11 @@ endif
 
 echo "CALCULATING PEDESTALS FOR RUN $RUN"
 rm -f $ODIR/$RUN.ped.log
-$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 >& $ODIR/$RUN.ped.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=1 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=180 -calibrationdirectory $ODIR >& $ODIR/$RUN.ped.log
 
 echo "CALCULATING AVERAGE TZEROS FOR RUN $RUN"
 rm -f $ODIR/$RUN.tzero.log
-$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -nevents=500000 >& $ODIR/$RUN.ped.log
-
-set CALIBDATA=$OBS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
-if (! -e $CALIBDATA ) then
-  touch $CALIBDATA 
-endif
-echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$RUN  -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==50000 -calibrationdirectory $ODIR >& $ODIR/$RUN.tzero.log
 
 ##############################################################################################
 # eventdisplay run options
@@ -124,8 +118,8 @@ echo "*V4 $RUN -1 $RUN -1 -1 -1 -1 -1 -1 -1 -1" >> $CALIBDATA
 ##### reconstruction parameter file #####
 set OPT="-reconstructionparameter $RECFILE"
 
-##### pedestal options #####
-set PEDOPT="-calibrationfile calibrationlist.dat -pedestalnoiselevel=$NOISE"
+##### pedestal and calibration options #####
+set PEDOPT="-pedestalnoiselevel=$NOISE -calibrationdirectory $ODIR"
 
 ##### MC options #####
 set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
