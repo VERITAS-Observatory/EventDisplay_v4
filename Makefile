@@ -782,8 +782,10 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 ./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-combineEffectiveAreas:	./obj/combineEffectiveAreas.o \
-			$(EVNDISPSYS)/lib/libVAnaSum.so
+combineEffectiveAreas:	./obj/combineEffectiveAreas.o  \
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o
+			
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
