@@ -170,7 +170,7 @@ class VExposure : public TObject, public VGlobalRunParameter
         bool readRootFile( string iname = "2006_2008.root", double iMinMJD = -99., double iMaxMJD = -99. );
         void setPlotExtendedSourcesFromCataloge( bool iB = false ) { fPlotExtendedSources = iB; }
         void setPlotSourceNames( bool iB = false )  { fPlotSourceNames = iB; }
-        void setMaximumIntegrationRadius( double iR = 2.5 ) { fMaximumIntegrationRadius = iR; }
+        void setMaximumIntegrationRadius( double iR = 1.5 ) { fMaximumIntegrationRadius = iR; }               // FOV (VERITAS is 3.5 deg, this is the (optimistic) region of constant radial acceptance)
         void setTimeRange( string iStart = "2011-01-01", string iStopp = "2011-02-01" );
         void setSourceName( string sourceName = "Crab" );
         void setTelMinElevation( double iElevation = 0. );

@@ -293,7 +293,12 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
       for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
       {
 	 cout << "Light-curve point: ";
-         cout << "  "    << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
+         cout << "  "    << setprecision( 2 ) << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
+	 if( fPhase_Period_days > 0. )
+	 {
+	     double iMJD_mean = fLightCurveData[i]->getMJD();
+	     cout << " (phase " << getPhase( iMJD_mean ) << ")";
+	 }
 	 cout << "     " << scientific << fLightCurveData[i]->fFlux;
 	 cout << "     " << scientific << fLightCurveData[i]->getFluxError();
 	 cout << fixed << endl;

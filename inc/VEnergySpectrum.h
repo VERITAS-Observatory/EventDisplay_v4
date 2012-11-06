@@ -82,6 +82,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         double fPlottingMinEnergy;                // linear energy axis [TeV]
         double fPlottingMaxEnergy;                // linear energy axis [TeV]
         bool   fPlottingLogEnergyAxis;            // plot log or lin values on energy axis (default=true)
+	bool   fPlottingUpperLimits;              // plot upper limits
         TGraphAsymmErrors *gEnergySpectrum;
         TGraphErrors *gEnergySpectrumFitResiduals;
 
@@ -189,8 +190,9 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setPlottingLogEnergyAxis( bool iB = true ) { fPlottingLogEnergyAxis = iB; }
         void setPlottingMultiplierIndex( double iS = 0. ) { fPlottingMultiplierIndex = iS; }
         void setPlottingSpectralWeightForBinCenter( double iS = -2.5 ) { fPlottingSpectralWeightForBinCenter = iS; }
+	void setPlottingUpperLimits( bool iPlot = true ) { fPlottingUpperLimits = iPlot; }
         void setPlottingYaxis( double iMin = 1.e-14, double iMax = 1.e-8 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
-        ClassDef(VEnergySpectrum,8);
+        ClassDef(VEnergySpectrum,9);
 };
 #endif

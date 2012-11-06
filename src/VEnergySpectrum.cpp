@@ -74,6 +74,7 @@ VEnergySpectrum::VEnergySpectrum( string ifile, string iname, int irun  )
     setPlottingEnergyRangeLog();
     setPlottingLogEnergyAxis();
     setPlottingStyle();
+    setPlottingUpperLimits();
 
     gEnergySpectrum = 0;
     fEnergySpectrumFit = 0;
@@ -197,9 +198,22 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 	    i_gEff = (TGraphErrors*)getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
 	    if( !i_gEff )
 	    {
-	       cout << "WARNING: no mean effective area graph found, ignoring run ";
-	       cout << " (run " << fRunList[i].runnumber << ")" << endl;
-	       continue;
+// third choice for backwards compatibility to v35x version
+	       hname = "gMeanEffectiveAreaErec";
+	       i_gEff = (TGraphErrors*)getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
+// fourth choice for backwards compatibility to v35x version
+               if( !i_gEff )
+	       {
+		  hname = "gMeanEffectiveAreaErec_off";
+		  i_gEff = (TGraphErrors*)getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
+		  if( !i_gEff )
+		  {
+		     cout << "WARNING: no mean effective area graph found, ignoring run ";
+		     cout << " (run " << fRunList[i].runnumber << ")" << endl;
+		     continue;
+                  }
+               }
+	       cout << "WARNING: effective areas not found as expected; reading apparently v35X file" << endl;
             }
         }
 
@@ -986,7 +1000,7 @@ TGraphAsymmErrors* VEnergySpectrum::plot_energySpectrum()
     {
 // upper flux limits
 // (plot as arrows)
-        if( fDifferentialFlux[i].DifferentialFluxError < 0. )
+        if( fDifferentialFlux[i].DifferentialFluxError < 0. && fPlottingUpperLimits )
         {
             if( fDifferentialFlux[i].DifferentialFlux > fPlottingYaxisMin && fDifferentialFlux[i].DifferentialFlux < fPlottingYaxisMax )
             {
