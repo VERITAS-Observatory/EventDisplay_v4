@@ -80,6 +80,7 @@ bool VCameraRead::initialize( unsigned int iNtel, vector< string > iCamera )
         if( !inFileStream )
         {
             cout << "VCameraRead::initialize camera geometry file not found: " << iCamera[i] << endl;
+	    cout << iCameraFile << endl;
             return false;
         }
         string i_Line;

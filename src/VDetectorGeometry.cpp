@@ -27,7 +27,7 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
     setConfigDir( iDir );
 
 // detector configuration file from GrIsu (.cfg)
-    if( iCamera[0].find( ".cfg" ) < iCamera[0].size() )
+    if( iCamera[0].find( ".cfg" ) < iCamera[0].size() || iCamera[0].find( ".txt" ) < iCamera[0].size() )
     {
         if( fDebug ) cout << "VDetectorGeometry::VDetectorGeometry: .cfg file detected" << endl;
         readGrisucfg( iCamera[0], iNTel );
@@ -80,7 +80,10 @@ void VDetectorGeometry::setNSamples( unsigned int iTelID, unsigned int iNSamples
                 fSampleWarning[iTelID] = false;
             }
         }
-        else fNSamples[iTelID] = iNSamples;
+        else
+	{
+	   fNSamples[iTelID] = iNSamples;
+        }
     }
 }
 
