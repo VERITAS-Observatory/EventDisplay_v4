@@ -65,7 +65,7 @@ void VSkyCoordinates::precessTarget( int iMJD, unsigned int iTelID )
 	cout << "\t RA=" << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
         VSkyCoordinatesUtilities::precessTarget( iMJD, fTelRA, fTelDec);
 
-        fTelRA_deg = fTelRA * TMath::RadToDeg();
+        fTelRA_deg  = fTelRA * TMath::RadToDeg();
         fTelDec_deg = fTelDec * TMath::RadToDeg();
         fPrecessed = true;
     }

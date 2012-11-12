@@ -141,6 +141,7 @@ void VArrayAnalyzer::doAnalysis()
     }
 
 // calculate RA and dec
+// (these are current epoch values when precessTarget() was called (default))
     for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
     {
 // test for successfull reconstruction (zenith angle > 0.)
