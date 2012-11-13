@@ -235,7 +235,8 @@ CTA:	evndisp \
 	makeEffectiveArea \
 	trainTMVAforGammaHadronSeparation \
 	slib \
-	writeCTAWPPhysSensitivityFiles
+	writeCTAWPPhysSensitivityFiles \
+	writeParticleRateFilesFromEffectiveAreas
 
 
 ########################################################
@@ -365,7 +366,6 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/mscw_energy.o
-
 ./obj/mscw_energy.o:	./src/mscw_energy.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -379,13 +379,30 @@ mscw_energy:  $(MSCOBJECTS)
 
 ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VRadialAcceptance.o \
-		$(EVNDISPSYS)/lib/libVAnaSum.so
+		./obj/VSkyCoordinatesUtilities.o \
+		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+		./obj/VASlalib.o \
+		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
+		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
+		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
+		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+		./obj/VRunList.o ./obj/VRunList_Dict.o \
+		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+		./obj/VAnaSumRunParameter.o \
+		 ./obj/VUtilities.o 
+
+
+
 
 ./obj/makeRadialAcceptance.o:	./src/makeRadialAcceptance.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 makeRadialAcceptance:	$(ACCOBJECT)
-	$(LD) $(LDFLAGS) $^ $(GLIBS)  -L./lib -lVAnaSum $(OutPutOpt) ./bin/$@
+	$(LD) $(LDFLAGS) $^ $(GLIBS)  $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 ########################################################
