@@ -604,7 +604,11 @@ void CData::Init(TTree *tree)
         {
             for( int i = 0; i < VDST_MAXTELESCOPES; i++ ) nlowgain[i] = 0;
         }
-        fChain->SetBranchAddress("ntubesBNI",ntubesBNI);
+        if( fChain->GetBranchStatus( "ntubesBNI" ) ) fChain->SetBranchAddress("ntubesBNI",ntubesBNI);
+	else
+	{
+	   for( int i = 0; i < VDST_MAXTELESCOPES; i++ ) ntubesBNI[i] = 0;
+        }
         fChain->SetBranchAddress("alpha",alpha);
         fChain->SetBranchAddress("los",los);
         fChain->SetBranchAddress("asym",asym);
