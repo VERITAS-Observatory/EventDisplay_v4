@@ -482,7 +482,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 		./obj/VASlalib.o ./obj/VASlalib_Dict.o \
 		./obj/Ctelconfig.o \
-		./obj/VSkyCoordinatesUtilities.o \
+		./obj/VSkyCoordinatesUtilities.o ./obj/VSkyCoordinatesUtilities_Dict.o \
+		./obj/VSkyCoordinates.o ./obj/VSkyCoordinates_Dict.o \
 		./obj/VPlotRunSummary.o ./obj/VPlotRunSummary_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VStereoReconstruction.o ./obj/VStereoReconstruction_Dict.o \
