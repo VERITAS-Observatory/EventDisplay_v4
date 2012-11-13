@@ -478,6 +478,43 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     return true;
 }
 
+bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain *c )
+{
+   if( !c )
+   {
+      cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: no chain" << endl;
+      return true;
+   }
+
+   TObjArray *fileElements = c->GetListOfFiles();
+   if( !fileElements )
+   {
+      cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: no files in chain" << endl;
+      return true;
+   }
+   TChainElement *chEl = 0;
+   TIter next( fileElements );
+   unsigned int z = 0;
+   while( (chEl = (TChainElement*)next()) )
+   {
+     TFile *ifInput = new TFile( chEl->GetTitle() );
+     if( ifInput->IsZombie() )
+     {
+	cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: file cannot be recovered; possibly not complete" << endl;
+	cout << "\t " << chEl->GetTitle() << endl;
+        return true;
+     }
+     if( ifInput->TestBit(TFile::kRecovered) )
+     {
+        cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: file recovered; possibly not complete" << endl;
+	cout << "\t " << chEl->GetTitle() << endl;
+	return true;
+     }
+     ifInput->Close();
+   }
+
+   return false;
+}
 
 bool VTableLookupDataHandler::setInputFile( string iInput )
 {
@@ -495,6 +532,12 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
         exit( 0 );
     }
     cout << iNFil << " file(s) in chain " << endl;
+    if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
+    {
+       cout << "VTableLookupDataHandler::setInputFile() error: some file are not properly closed" << endl;
+       cout << "exit..." << endl;
+       exit( -1 );
+    }
 
     fList_of_Tel_type.clear();
     if( fTtelconfig )

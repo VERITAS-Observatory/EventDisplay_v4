@@ -152,9 +152,10 @@ class VTableLookupDataHandler
         VDeadTime *fDeadTime;
 
         double angDist( double Az, double Ze, double Traz, double Trze );
-        void calcDistances( int );                //!< calculate distances between telescopes and shower core
-        void calcEmissionHeights();
+        void   calcDistances( int );                //!< calculate distances between telescopes and shower core
+        void   calcEmissionHeights();
         double calculateMeanNoiseLevel( bool bCurrentNoiseLevel = false );
+	bool   checkIfFilesInChainAreRecovered( TChain *c );
 	void   copyMCHistograms();
 	bool   copyMCRunheader();
         void   copyMCTree();
