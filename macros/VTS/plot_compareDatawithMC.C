@@ -77,8 +77,9 @@ void plotLegend( TH1D *hsims, TH1D *hdiff, double x0 = 0.5  )
 /*!
     get scale factor between simulations and data
 
-    bContents = true:   scale to same contents
-    bContents = false:  scale to same maximum value
+    bContents = 1:   scale to same contents
+    bContents = 2:   scale to same maximum value
+    bContents = 3:   scale to same maximum value
 */
 void getScaling( TDirectory *fDir, double &s_sims, double &s_diff, char *his = "MSCW", int bContents = 1, double xmin = -9999., double xmax = 9999. )
 {
@@ -561,8 +562,8 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
     ht2_sims->SetYTitle( "number of shower [a.u.]" );
 
     ht2_diff =  (TH1D*)fDir->Get( "htheta2_DIFF" );
-    if( bPoster ) setHistogramAtt( ht2_diff, 1, 3, 2, 21, 1 );
-    else setHistogramAtt( ht2_diff, 1, 3, 1, 21, 1 );
+    if( bPoster ) setHistogramAtt( ht2_diff, 1, 3, 2, 25, 1 );
+    else setHistogramAtt( ht2_diff, 1, 3, 1, 25, 1 );
 
     ht2_on = (TH1D*)fDir->Get( "htheta2_ON" );
     setHistogramAtt( ht2_on, 3, 3, 1, 20, 1 );
@@ -571,7 +572,7 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
     ht2_off = (TH1D*)fDir->Get( "htheta2_OFF" );
     setHistogramAtt( ht2_off, 4, 3, 1, 21, 1 );
 
-    ht2_sims->SetAxisRange( 0., 0.2 );
+    ht2_sims->SetAxisRange( 0., 0.05 );
     ht2_on->SetAxisRange( 0., 0.2 );
 
 // get the scaling between simulations and data
@@ -585,6 +586,8 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
 // plot everything
 
     cSD->cd(1);
+    gPad->SetLeftMargin( 0.14 );
+    ht2_sims->GetYaxis()->SetTitleOffset( 1.5 );
     ht2_sims->Draw();
     ht2_diff->Draw( "same" );
 
@@ -629,10 +632,11 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
     hlt2_sims = (TH1D*)fDir->Get( "hltheta2_SIMS" );
     if( bPoster ) setHistogramAtt( hlt2_sims, 2, 3, 2, 20, 1 );
     else          setHistogramAtt( hlt2_sims, 2, 3, 1, 20, 1 );
+    hlt2_sims->SetYTitle( "number of shower [a.u.]" );
 
     hlt2_diff =  (TH1D*)fDir->Get( "hltheta2_DIFF" );
-    if( bPoster ) setHistogramAtt( hlt2_diff, 1, 3, 2, 21, 1 );
-    else          setHistogramAtt( hlt2_diff, 1, 3, 1, 21, 1 );
+    if( bPoster ) setHistogramAtt( hlt2_diff, 1, 3, 2, 25, 1 );
+    else          setHistogramAtt( hlt2_diff, 1, 3, 1, 25, 1 );
 
     hlt2_on = (TH1D*)fDir->Get( "hltheta2_ON" );
     setHistogramAtt( hlt2_on, 3, 3, 1, 20, 1 );
@@ -644,10 +648,12 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
     hlt2_sims->Scale( s_sims );
     hlt2_diff->Scale( s_diff );
 
-    hlt2_sims->SetAxisRange( -5., 2. );
+    hlt2_sims->SetAxisRange( -5., -1. );
     hlt2_on->SetAxisRange( -5., 2. );
 
     cSD->cd(2);
+    gPad->SetLeftMargin( 0.14 );
+    hlt2_sims->GetYaxis()->SetTitleOffset( 1.5 );
     hlt2_sims->SetMaximum( hlt2_sims->GetMaximum()*1.3 );
     hlt2_sims->Draw();
     hlt2_diff->Draw( "same" );
@@ -688,12 +694,14 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
    hmscw_off = (TH1D*)fDir->Get( "hMSCW_OFF" );
    setHistogramAtt( hmscw_off, 4, 3, 1, 21, 1 );
 
-   hmscw_sims->SetAxisRange( -2., 3. );
+   hmscw_sims->SetAxisRange( -1., 1. );
    getScaling( fDir, s_sims, s_diff, "MSCW", 2, -0.5, 0.5 );
    if( hmscw_sims->GetEntries() > 0 ) hmscw_sims->Scale( s_sims );
    if( hmscw_diff->GetEntries() > 0 ) hmscw_diff->Scale( s_diff );
 
    cSD->cd(3);
+   gPad->SetLeftMargin( 0.14 );
+   hmscw_sims->GetYaxis()->SetTitleOffset( 1.5 );
    hmscw_sims->SetMaximum( hmscw_sims->GetMaximum()*1.3 );
    hmscw_sims->Draw();
    hmscw_diff->Draw( "same" );
@@ -744,13 +752,15 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
    hmscl_diff->SetLineWidth( 3 );
    hmscl_diff->SetStats( 0 );
 
-   hmscl_sims->SetAxisRange( -2., 3. );
+   hmscl_sims->SetAxisRange( -1., 1. );
    hmscl_on->SetAxisRange( -2., 10. );
    getScaling( fDir, s_sims, s_diff, "MSCL", 2 );
    if( hmscl_sims->GetEntries() > 0 ) hmscl_sims->Scale( s_sims );
    if( hmscl_diff->GetEntries() > 0 ) hmscl_diff->Scale( s_diff );
 
    cSD->cd(4);
+   gPad->SetLeftMargin( 0.14 );
+   hmscl_sims->GetYaxis()->SetTitleOffset( 1.5 );
    hmscl_sims->SetMaximum( hmscl_sims->GetMaximum()*1.3 );
    hmscl_sims->Draw();
    hmscl_diff->Draw( "same");
@@ -1151,7 +1161,7 @@ void distance_plots( char *ifile = "stereo_compare.root", int fNTel = 4, bool bP
  * plot is SIMSDIFF, ONOFF, REL
  *
  */
-void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", string iPlot = "SIMSDIFF", bool iOneCanvas = true, bool bPoster = false, int iScalingMethod = 2 )
+void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", string iPlot = "SIMSDIFF", bool iOneCanvas = true, bool bPoster = false, int iScalingMethod = 1 )
 {
    if( iPlot != "SIMSDIFF" && iPlot != "ONOFF" && iPlot != "REL" )
    {
@@ -1180,7 +1190,7 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
    hname.push_back( "cen_x" );
    hname.push_back( "cen_y" );
    hname.push_back( "ntubes" );
-   hname.push_back( "ntubesBNI" );
+   hname.push_back( "max3" );
    hname.push_back( "mscwt" );
    hname.push_back( "msclt" );
    hname.push_back( "loss" );
@@ -1318,7 +1328,8 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
       hrel->SetMinimum( 0.3 );
       hrel->SetMaximum( 3.0 );
 
-      if( hname[j] != "ntubes" && hname[j] != "nlowgain" ) hdiff->SetMaximum( hdiff->GetMaximum() * 5 );
+//      if( hname[j] != "ntubes" && hname[j] != "nlowgain" ) hdiff->SetMaximum( hdiff->GetMaximum() * 5 );
+      if( hname[j] != "ntubes" && hname[j] != "nlowgain" ) hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
       else                       hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
 
       double xAxis_min = hdiff->GetXaxis()->GetXmin();
@@ -1345,6 +1356,12 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
 	 iL->AddEntry( hdiff, cn, "pl" );
 	 sprintf( cn, "simulations" );
 	 iL->AddEntry( hsims, cn, "pl" );
+	 if( !gPad->GetLogy() )
+	 {
+	    TLine *iL0 = new TLine( hdiff->GetXaxis()->GetXmin(), 0., hdiff->GetXaxis()->GetXmax(), 0. );
+	    iL0->SetLineStyle( 2 );
+	    iL0->Draw();
+         }
       }
       else if( iPlot == "ONOFF" )
       {
