@@ -574,10 +574,21 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
        else
        {
 	  if( fData[i]->hEcutUW )     fData[i]->hEcutUW->Draw( "same" );
-	  if( fData[i]->hEcut_recUW ) fData[i]->hEcut_recUW->Draw( "same" );
+// XX	  if( fData[i]->hEcut_recUW ) fData[i]->hEcut_recUW->Draw( "same" );
        }
     }
-    iEnergySpectraPlottingCanvas->SetLogy( 1 );
+// XX    iEnergySpectraPlottingCanvas->SetLogy( 1 );
+    for( unsigned int i = 0; i < fData[0]->hCutEfficiency.size(); i++ )
+    {
+       if( fData[0]->hCutEfficiency[i] )
+       {
+          fData[0]->hCutEfficiency[i]->Draw( "same" );
+          cout << i+1 << "\t" << fData[0]->hCutEfficiency[i]->GetName();
+          cout << " (color: " << fData[0]->hCutEfficiency[i]->GetMarkerColor();
+          cout << ", marker: " << fData[0]->hCutEfficiency[i]->GetMarkerStyle() << ")";
+          cout << endl;
+       }
+    } 
 }
 
 void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias( string iM, double ymin, double ymax )

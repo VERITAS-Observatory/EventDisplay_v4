@@ -439,9 +439,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
        else                                hCutEfficiency.push_back( 0 );
        if( c->hhEcutDirection )            hCutEfficiency.push_back( (TH1D*)c->hhEcutDirection->Clone() );
        else                                hCutEfficiency.push_back( 0 );
-       if( c->hhEcutGammaHadron )          hCutEfficiency.push_back( (TH1D*)c->hhEcutGammaHadron->Clone() );
-       else                                hCutEfficiency.push_back( 0 );
        if( c->hhEcutEnergyReconstruction ) hCutEfficiency.push_back( (TH1D*)c->hhEcutEnergyReconstruction->Clone() );
+       else                                hCutEfficiency.push_back( 0 );
+       if( c->hhEcutGammaHadron )          hCutEfficiency.push_back( (TH1D*)c->hhEcutGammaHadron->Clone() );
        else                                hCutEfficiency.push_back( 0 );
        for( unsigned int i = 0; i < hCutEfficiency.size(); i++ ) setHistogramPlottingStyle( hCutEfficiency[i], i+1, 1., 1.5, fPlottingMarkerStyle );
 

@@ -343,8 +343,8 @@ void CEffArea::Init(TTree *tree)
 	fChain->SetBranchAddress("hhEcutStereoQuality", &hhEcutStereoQuality, &b_hhEcutStereoQuality);
 	fChain->SetBranchAddress("hhEcutTelType", &hhEcutTelType, &b_hhEcutTelType);
 	fChain->SetBranchAddress("hhEcutDirection", &hhEcutDirection, &b_hhEcutDirection);
-	fChain->SetBranchAddress("hhEcutGammaHadron", &hhEcutGammaHadron, &b_hhEcutGammaHadron);
 	fChain->SetBranchAddress("hhEcutEnergyReconstruction", &hhEcutEnergyReconstruction, &b_hhEcutEnergyReconstruction);
+	fChain->SetBranchAddress("hhEcutGammaHadron", &hhEcutGammaHadron, &b_hhEcutGammaHadron);
     }
     else
     {

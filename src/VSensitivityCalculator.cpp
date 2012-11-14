@@ -1830,7 +1830,9 @@ void VSensitivityCalculator::setMonteCarloParameters( unsigned int iParticleID,
 
 
 /*!
+
    calculate rate (in [1/min]) from given spectral shape and effective areas
+
 */
 double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsigned int iE_up_bin, 
                                                    VEnergySpectrumfromLiterature i_Espec, 

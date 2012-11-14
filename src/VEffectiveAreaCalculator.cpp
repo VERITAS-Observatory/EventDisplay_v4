@@ -206,8 +206,8 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     iCutName.push_back( "hEcutStereoQuality" );
     iCutName.push_back( "hEcutTelType" );
     iCutName.push_back( "hEcutDirection" );
-    iCutName.push_back( "hEcutGammaHadron" );
     iCutName.push_back( "hEcutEnergyReconstruction" );
+    iCutName.push_back( "hEcutGammaHadron" );
 
     for( unsigned int i = 0; i < iCutName.size(); i++ )
     {
@@ -1443,21 +1443,22 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
          hEcutSub[4]->Fill( eMC, 1. );
 
 //////////////////////////////////////
-// apply gamma hadron cuts
-         if( bDebugCuts )
-	 {
-	    cout << "#3 CUT ISGAMMA " << fCuts->isGamma(i) << endl;
-         }
-         if( !fCuts->isGamma( i, true ) ) continue;
-         hEcutSub[5]->Fill( eMC, 1. );
-	 
 // apply energy reconstruction quality cut
          if( !fIgnoreEnergyReconstruction )
          {
 	    if( bDebugCuts ) cout << "#4 EnergyReconstructionQualityCuts " << fCuts->applyEnergyReconstructionQualityCuts( iMethod ) << endl;
             if( !fCuts->applyEnergyReconstructionQualityCuts( iMethod, true ) ) continue;
          }
+         hEcutSub[5]->Fill( eMC, 1. );
+//////////////////////////////////////
+// apply gamma hadron cuts
+         if( bDebugCuts )
+	 {
+	    cout << "#3 CUT ISGAMMA " << fCuts->isGamma(i) << endl;
+         }
+         if( !fCuts->isGamma( i, true ) ) continue;
          hEcutSub[6]->Fill( eMC, 1. );
+	 
 // skip event if no energy has been reconstructed
 // get energy according to which reconstruction method
          if( iMethod == 0 && d->Erec > 0. )
