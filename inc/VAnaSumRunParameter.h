@@ -27,6 +27,7 @@ enum e_background { eONOFF, eRINGMODEL, eREFLECTEDREGION, eFOV, eTEMPLATE };
 
 class sRunPara
 {
+
     public:
 
         string fEventDisplayVersion;
@@ -46,8 +47,6 @@ class sRunPara
         double fTargetDec;                        // [deg], precessed
         double fPairOffset;
 
-        double fRaOffset;                         // [deg]
-        double fDecOffset;                        // [deg]
         double fWobbleNorth;                      // [deg]
         double fWobbleWest;                       // [deg]
         double fWobbleNorthMod;                   // [deg] (modified model: shifted by fSkMapCentreNorth)
@@ -117,7 +116,7 @@ class sRunPara
         double fTE_mscl_max;
 
         sRunPara();
-        ~sRunPara() {}
+       ~sRunPara() {}
 };
 
 class VAnaSumRunParameter : public VGlobalRunParameter

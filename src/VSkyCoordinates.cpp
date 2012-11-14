@@ -51,12 +51,12 @@ void VSkyCoordinates::reset()
     fTime = 0.;
 }
 
-void VSkyCoordinates::precessTarget( int iMJD, unsigned int iTelID )
+void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 {
     if( !fPrecessed )
     {
         cout << "---------------------------------------------------------------------------------------------------------" << endl;
-        cout << "Pointing telescope " << iTelID+1 << endl;
+        if( iTelID >= 0 ) cout << "Pointing telescope " << iTelID+1 << endl;
         cout << "\tPrecessing target ( " << getTargetName() << " ) from J2000 to MJD " << iMJD << endl;
         cout << "\tJ2000   \t\t RA=" << setprecision( 6 ) << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
 
@@ -270,7 +270,7 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, unsigned int
     {
         double i_decDiff = 0.;
 	double i_RADiff = 0.;
-	VSkyCoordinatesUtilities::getWobbleOffsets( iNorth, iEast, fTargetDec*TMath::RadToDeg(), fTargetRA*TMath::RadToDeg(), i_decDiff, i_RADiff );
+	VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( iNorth, iEast, fTargetDec*TMath::RadToDeg(), fTargetRA*TMath::RadToDeg(), i_decDiff, i_RADiff );
 	if( i_RADiff < -180. ) i_RADiff += 360.;
 
 	fTelRA  = fTargetRA + i_RADiff/TMath::RadToDeg();
@@ -291,8 +291,15 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, unsigned int
     cout << "---------------------------------------------------------------------------------------------------------" << endl;
 }
 
+/*
+
+   initial star catalogue and set FOV in catalogue
+
+   expect J2000 coordinates
+
+*/
 bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD, double xmin, double xmax, double ymin, double ymax, 
-                                         double iRASkyMapCentre, double iDecSkyMapCentre )
+                                         double iRASkyMapCentre_J2000, double iDecSkyMapCentre_J2000 )
 {
     if( !fStarCatalogue )
     {
@@ -312,7 +319,7 @@ bool VSkyCoordinates::initStarCatalogue( string iCatalogueName, double iMJD, dou
             cout << "exiting..." << endl;
             return false;
         }
-        fStarCatalogue->setFOV( iRASkyMapCentre, iDecSkyMapCentre, i_x, i_y, true );
+        fStarCatalogue->setFOV( iRASkyMapCentre_J2000, iDecSkyMapCentre_J2000, i_x, i_y, true );
     }
 
     return true;

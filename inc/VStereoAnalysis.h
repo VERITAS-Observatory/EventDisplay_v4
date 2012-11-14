@@ -49,50 +49,45 @@ class VStereoAnalysis
         TH2D  *getAlphaNorm();
         TH2D  *getAlphaNormUC();
         double getDeadTimeFraction();
+        double getEffectiveExposure( int i_run ) { return ( fRunExposure.find( i_run ) != fRunExposure.end() ? fRunExposure[i_run] : 0.); }
         TH1D  *getEnergyHistogram();
         TList *getEnergyHistograms();
+        TList *getHisList();
         double getMeanAzimuth() { return fMeanAzimuth; }
         double getMeanElevation() { return fMeanElevation; }
+        double getMJD( int i_run ) { return ( fRunMJD.find( i_run ) != fRunMJD.end() ? fRunMJD[i_run] : 0. ); }
+        TList *getParameterHistograms();
         double getRawRate();                      //! return number of entries in rate histograms
-        TH1D  *getTheta2();
-        TList *getHisList();
         vector< double > getRateCounts();
         vector< double > getRateTime();
         vector< double > getRateTimeIntervall();
-        TList *getParameterHistograms();
+        map< int, double > getRunMJD() const { return fRunMJD; }
+        map< int, double > getRunDuration() const { return fRunDuration; }
         TList *getSkyHistograms( bool bUC );
-        double getWobbleNorth() { return fWobbleNorth; }
-        double getWobbleWest() { return fWobbleWest; }
+        TH2D*  getStereoSkyMap();
+        TH2D*  getStereoSkyMapUC();
+        TH1D  *getTheta2();
+        double getWobbleNorth();
+        double getWobbleWest();
         TTree* getTreeWithSelectedEvents() { return fTreeSelectedEvents; }
         void   scaleAlpha( double inorm, TH2D *hon, TH2D *h_ON, TH2D *h_OFF, bool buc, int incounter);
         void   setAlphaOff( TH2D *ih, bool bUncorrelated );
         void   setAlphaOff( TH2D *ih, TH2D *ihUC );
         void   setCuts( sRunPara iL, int irun );
         void   setNoSkyPlots( bool iS ) { fNoSkyPlots = iS; }
+        void   setRunMJD( map< int, double > iRunMJD ) { fRunMJD = iRunMJD; }
         void   setRunTimes();
         string setRunTimes( CData *iData );
         bool   terminate();
-        void   useScaledCuts( bool ib ) { fScaledCuts = ib; }
         void   writeDebugHistograms();
         void   writeHistograms( bool bOn );
 
-        TH2D* getStereoSkyMap();
-        TH2D* getStereoSkyMapUC();
-
-        map< int, double > getRunMJD() const { return fRunMJD; }
-        double getMJD( int i_run ) { return ( fRunMJD.find( i_run ) != fRunMJD.end() ? fRunMJD[i_run] : 0. ); }
-        map< int, double > getRunDuration() const { return fRunDuration; }
-        double getEffectiveExposure( int i_run ) { return ( fRunExposure.find( i_run ) != fRunExposure.end() ? fRunExposure[i_run] : 0.); }
-
-        void setRunMJD( map< int, double > iRunMJD ) { fRunMJD = iRunMJD; }
 
     private:
 
         bool fDebug;
 
         bool bTotalAnalysisOnly;
-
-        bool bSimulate;
 
         bool fIsOn;
         bool fNoSkyPlots;                         //! do full sky plots (if false, analysed source region only)
@@ -178,7 +173,6 @@ class VStereoAnalysis
 	double fTreeSelescted_frogsTelGoodnessBkg2;
 	double fTreeSelescted_frogsTelGoodnessBkg3;
 
-
         double fTotCount;
 
 	map < int, double > f_t_in_s_min;
@@ -187,12 +181,6 @@ class VStereoAnalysis
         double fMeanElevation;
         double fNMeanElevation;
 
-        double fWobbleNorth;
-        double fWobbleWest;
-
-        bool fScaledCuts;                         //!< if true, used mean scaled cuts, otherwise mean cuts
-
-        int  getDataRunNumber() const;            // Check for existence of fDataRun and try to retrieve run number from first entry of the tree
         CData *fDataRun;
 	TTree *fDataRunTree;
 	TTree *fDataFrogsTree;
@@ -227,7 +215,9 @@ class VStereoAnalysis
 	void reset_TreeWithSelectedEvents();
 
 // derotation and J2000
-        void getDerotatedCoordinates( VSkyCoordinates* iAstro, double i_UTC, double x, double y, double &x_derot, double &y_derot );
+        void getDerotatedCoordinates( unsigned int, double i_UTC, double x, double y, double &x_derot, double &y_derot );
+
+        int  getDataRunNumber() const;            // Check for existence of fDataRun and try to retrieve run number from first entry of the tree
 
 // Returning frogs value for 
 	double getXcore()
@@ -262,7 +252,6 @@ class VStereoAnalysis
 	  else
 	    return fDataRun->Yoff;
 	}
-
 
 };
 #endif

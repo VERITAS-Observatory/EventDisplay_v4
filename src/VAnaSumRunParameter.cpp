@@ -26,8 +26,6 @@ sRunPara::sRunPara()
 
     fPairOffset = 0.;
 
-    fRaOffset = 0.;                               // [deg]
-    fDecOffset = 0.;                              // [deg]
     fWobbleNorth = 0.;                            // [deg]
     fWobbleWest = 0.;                             // [deg]
     fWobbleNorthMod = 0.;                         // [deg]
@@ -485,13 +483,6 @@ int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bo
             is_stream >> temp;
             i_sT.fRunOff = atoi(temp.c_str());
 
-// target
-            if( fVersion < 4 )
-            {
-                is_stream >> temp;
-                i_sT.fTarget = temp;
-            }
-
 // short list, only read run numbers and target name
             if( bShortList )
             {
@@ -509,23 +500,6 @@ int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bo
 	    {
                is_stream >> temp;
 	       i_sT.fPairOffset = atof(temp.c_str() );
-            }
-// wobble offsets
-// (run list contains offset in wobble east)
-            if( fVersion < 3 )
-            {
-                is_stream >> temp;
-                i_sT.fWobbleWest =  -1.*atof(temp.c_str());
-                i_sT.fWobbleWestMod = i_sT.fWobbleWest;
-                is_stream >> temp;
-                i_sT.fWobbleNorth = -1.* atof(temp.c_str());
-                i_sT.fWobbleNorthMod = i_sT.fWobbleNorth;
-            }
-// number of telescopes
-            if( fVersion < 4 )
-            {
-                is_stream >> temp;
-                i_sT.fNTel = (unsigned int)atoi( temp.c_str() );
             }
 // cut selector (now in cut file)
             is_stream >> temp;
@@ -675,7 +649,8 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         cout << endl;
         cout << "\t " << fRunList[i].fTarget << ", wobble: (N" << fRunList[i].fWobbleNorth << ", W" << fRunList[i].fWobbleWest << ")";
         cout << ", stereo maps centred at (ra,dec) (" << fSkyMapCentreRAJ2000 << ", " << fSkyMapCentreDecJ2000 << ")";
-        cout << ", target shift: (N" << fRunList[i].fTargetShiftNorth << ", W" << fRunList[i].fTargetShiftWest << ")" << " RA/DECJ2000 [" << fRunList[i].fTargetShiftRAJ2000 << ", " << fRunList[i].fTargetShiftDecJ2000 << "]" <<  endl;
+        cout << ", target shift: (N" << fRunList[i].fTargetShiftNorth << ", W" << fRunList[i].fTargetShiftWest << ")";
+	cout << " RA/DECJ2000 [" << fRunList[i].fTargetShiftRAJ2000 << ", " << fRunList[i].fTargetShiftDecJ2000 << "]" <<  endl;
         if( fExcludeFromBackground_North.size() > 0 && fExcludeFromBackground_West.size() > 0 && fExcludeFromBackground_Radius.size() > 0 )
         {
             cout << "\t region excluded from background estimation: " << endl;
@@ -807,8 +782,6 @@ void VAnaSumRunParameter::reset( sRunPara it )
     it.fRunOff = 0;
     it.fTarget = "target";
     it.fPairOffset = 0.;
-    it.fRaOffset = 0.;
-    it.fDecOffset = 0.;
     it.fWobbleNorth = 0.;
     it.fWobbleWest = 0.;
     it.fWobbleNorthMod = 0.;
@@ -1051,8 +1024,6 @@ void VAnaSumRunParameter::getWobbleOffsets( string fDatadir )
 
         if( i_tree->GetBranch("WobbleN") && i_tree->GetBranch("WobbleE") )
         {
-// internally anasum works with inverted wobble offsets
-//	fRunList[i].fWobbleNorth = -1.* i_tree->GetBranch("WobbleN")->GetLeaf("WobbleN")->GetValue();
             fRunList[i].fWobbleNorth = i_tree->GetBranch("WobbleN")->GetLeaf("WobbleN")->GetValue();
             fRunList[i].fWobbleWest = -1.*i_tree->GetBranch("WobbleE")->GetLeaf("WobbleE")->GetValue();
             fRunList[i].fWobbleNorthMod = i_tree->GetBranch("WobbleN")->GetLeaf("WobbleN")->GetValue();

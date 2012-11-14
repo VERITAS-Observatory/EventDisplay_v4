@@ -108,10 +108,10 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , d
   double i_raDiff = 0.;
 
   if (x>0)
-    VSkyCoordinatesUtilities::getWobbleOffsets( y, -1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+    VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y, -1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
 
   if (x<0)
-    VSkyCoordinatesUtilities::getWobbleOffsets( y, 1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+    VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y, 1.*x, fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
 
   cout << "i_raDiff " << i_raDiff << " i_decDiff " << i_decDiff << endl;
   double ra = fSkyMapCentreRAJ2000+i_raDiff;
@@ -130,9 +130,9 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , d
       yerr = -1*yerr;
 
     if(x>0)
-      VSkyCoordinatesUtilities::getWobbleOffsets( y+yerr, -1.*(x+xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+      VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y+yerr, -1.*(x+xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
     if(x<0)
-      VSkyCoordinatesUtilities::getWobbleOffsets( y+yerr, (x-xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
+      VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( y+yerr, (x-xerr), fSkyMapCentreDecJ2000, fSkyMapCentreRAJ2000, i_decDiff, i_raDiff );
 
     ra_err  =  abs(fSkyMapCentreRAJ2000+i_raDiff - ra);
     dec_err =  fSkyMapCentreDecJ2000+i_decDiff - dec;  
@@ -1204,7 +1204,7 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas *c, string iCatal
                 {
 
                     cout << "Object in FOV: ";
-                    cout << "#" << i << " (ra,dec) " << s.getStarRA2000( i ) << " " << s.getStarDec2000( i );
+                    cout << "#" << i << " (ra,dec)_J2000 " << s.getStarRA2000( i ) << " " << s.getStarDec2000( i );
                     cout << " name=" << s.getStarName( i ) << " mag=" << s.getStarBrightness( i, iBand );
                     cout << ", significance " << h->GetBinContent( h->GetXaxis()->FindBin( x ), h->GetYaxis()->FindBin( y ) );
                     cout << ", (x,y) " << x << " " << y;

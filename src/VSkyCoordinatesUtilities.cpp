@@ -42,7 +42,7 @@ void VSkyCoordinatesUtilities::rotate( const double theta_rad, double& x, double
 
     based on wobble.cpp from SFegan
 */
-void VSkyCoordinatesUtilities::getWobbleOffsets( double iNorth, double iEast, double idec, double ira, double &idiffdec, double &idiffra )
+void VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( double iNorth, double iEast, double idec, double ira, double &idiffdec, double &idiffra )
 {
     idec /= TMath::RadToDeg();
     ira  /= TMath::RadToDeg();
@@ -69,19 +69,38 @@ void VSkyCoordinatesUtilities::getWobbleOffsets( double iNorth, double iEast, do
 }
 
 /*
-   [rad]
+
+   starting (iMJD_start) and ending epoch (iMJD_end)
+
+   [rad] or [deg] (depending on iUnitIsDeg)
+
 */
-double VSkyCoordinatesUtilities::precessTarget( double iMJD, double &ra, double &dec )
+double VSkyCoordinatesUtilities::precessTarget( double iMJD_end, double &ra_rad, double &dec_rad, double iMJD_start, bool iUnitIsDeg )
 {
+    if( iUnitIsDeg ) 
+    {
+       ra_rad *= TMath::DegToRad();
+       dec_rad *= TMath::DegToRad();
+    }
+
     int  oy, om, od, j, ny, nd;
-    double ofd,ofy;
-    slaDjcl (iMJD, &oy, &om, &od, &ofd, &j);
-    slaClyd (oy, om, od, &ny, &nd, &j);
-    ofy=ny+nd/365.25;
+    double ofd,ofy_start,ofy_end;
+    slaDjcl(iMJD_end, &oy, &om, &od, &ofd, &j);
+    slaClyd(oy, om, od, &ny, &nd, &j);
+    ofy_end=ny+nd/365.25;
+    slaDjcl(iMJD_start, &oy, &om, &od, &ofd, &j);
+    slaClyd(oy, om, od, &ny, &nd, &j);
+    ofy_start=ny+nd/365.25;
 
-    slaPreces("FK5",2000.0, ofy, &ra, &dec);
+    slaPreces("FK5",ofy_start, ofy_end, &ra_rad, &dec_rad);
 
-    return ofy;
+    if( iUnitIsDeg ) 
+    {
+       ra_rad *= TMath::RadToDeg();
+       dec_rad *= TMath::RadToDeg();
+    }
+
+    return ofy_end;
 }
 
 
@@ -190,7 +209,11 @@ double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az )
     return slaDranrm( az/TMath::RadToDeg()) * TMath::RadToDeg();
 }
 
+/*
 
+   return values in [deg]
+
+*/
 double VSkyCoordinatesUtilities::getTargetShiftWest( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg )
 {
     double sep  = slaDsep(  iTargetRA_deg*TMath::DegToRad(), iTargetDec_deg*TMath::DegToRad(), ira_deg*TMath::DegToRad(), idec_deg*TMath::DegToRad() );
@@ -214,4 +237,29 @@ double VSkyCoordinatesUtilities::getTargetShiftNorth( double iTargetRA_deg, doub
     if( TMath::Abs( iShift ) < 1.e-8 ) iShift = 0.;
 
     return iShift;
+}
+
+/*
+   
+   convert x,y in derotated coordinates of current epoch (iMJD) into x,y in J2000
+
+*/
+void VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( double iMJD, double i_RA_J2000_deg, double i_DEC_J2000_deg, double &x, double &y )
+{
+    double i_ra = i_RA_J2000_deg * TMath::DegToRad();
+    double i_dec = i_DEC_J2000_deg * TMath::DegToRad();
+    precessTarget( iMJD, i_ra, i_dec);
+
+// calculate wobble offset in ra/dec for current epoch
+    double i_decDiff = 0.;
+    double i_raDiff = 0.;
+    getWobbleOffset_in_RADec( y, -x, i_dec*TMath::RadToDeg(), i_ra*TMath::RadToDeg(), i_decDiff, i_raDiff );
+    if( i_raDiff < -180. ) i_raDiff += 360.;
+    double i_decWobble = i_dec*TMath::RadToDeg() + i_decDiff;
+    double i_raWobble  = i_ra*TMath::RadToDeg()  + i_raDiff;
+
+// correct for precession (from current epoch to J2000=MJD51544)
+    precessTarget( 51544., i_raWobble, i_decWobble, iMJD, true );
+    x = getTargetShiftWest( i_RA_J2000_deg, i_DEC_J2000_deg, i_raWobble, i_decWobble ) * -1.;
+    y = getTargetShiftNorth(  i_RA_J2000_deg, i_DEC_J2000_deg, i_raWobble, i_decWobble ); 
 }

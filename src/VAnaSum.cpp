@@ -945,21 +945,39 @@ void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp
     else fRunSummary->MJDOn = 0.;                 //Could make this the mean MJD of all ON runs included in the summed analysis
     if( offrun != -1 ) fRunSummary->MJDOff = fStereoOff->getMJD( offrun );
     else fRunSummary->MJDOff = 0.;
-    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() ) fRunSummary->fTargetRA = fRunPara->fMapRunList[onrun].fTargetRA;
+    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
+    {
+       fRunSummary->fTargetRA = fRunPara->fMapRunList[onrun].fTargetRA;
+    }
     else              fRunSummary->fTargetRA = 0.;
-    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() ) fRunSummary->fTargetDec = fRunPara->fMapRunList[onrun].fTargetDec;
+    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
+    {
+       fRunSummary->fTargetDec = fRunPara->fMapRunList[onrun].fTargetDec;
+    }
     else              fRunSummary->fTargetDec = 0.;
-    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() ) fRunSummary->fTargetRAJ2000 = fRunPara->fMapRunList[onrun].fTargetRAJ2000;
+    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
+    {
+        fRunSummary->fTargetRAJ2000 = fRunPara->fMapRunList[onrun].fTargetRAJ2000;
+    }
     else              fRunSummary->fTargetRAJ2000 = 0.;
-    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() ) fRunSummary->fTargetDecJ2000 = fRunPara->fMapRunList[onrun].fTargetDecJ2000;
+    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() ) 
+    {
+       fRunSummary->fTargetDecJ2000 = fRunPara->fMapRunList[onrun].fTargetDecJ2000;
+    }
     else              fRunSummary->fTargetDecJ2000 = 0.;
     fRunSummary->fSkyMapCentreRAJ2000 = fRunPara->fSkyMapCentreRAJ2000;
     fRunSummary->fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
     fRunSummary->fTargetShiftRAJ2000 = fRunPara->fTargetShiftRAJ2000;
     fRunSummary->fTargetShiftDecJ2000 = fRunPara->fTargetShiftDecJ2000;
-    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() ) fRunSummary->fTargetShiftWest = fRunPara->fMapRunList[onrun].fTargetShiftWest;
+    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
+    {
+       fRunSummary->fTargetShiftWest = fRunPara->fMapRunList[onrun].fTargetShiftWest;
+    }
     else fRunSummary->fTargetShiftWest = 0.;
-    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() ) fRunSummary->fTargetShiftNorth = fRunPara->fMapRunList[onrun].fTargetShiftNorth;
+    if( onrun != -1 && fRunPara->fMapRunList.find( onrun ) != fRunPara->fMapRunList.end() )
+    {
+       fRunSummary->fTargetShiftNorth = fRunPara->fMapRunList[onrun].fTargetShiftNorth;
+    }
     else fRunSummary->fTargetShiftNorth = 0.;
     if( onrun != -1 ) fRunSummary->fWobbleNorth = fStereoOn->getWobbleNorth();
     else              fRunSummary->fWobbleNorth = 0.;

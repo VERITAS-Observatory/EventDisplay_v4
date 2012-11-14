@@ -80,10 +80,10 @@ class VSkyCoordinates
         double getWobbleNorth() { return fWobbleNorth; }
         double getWobbleEast() { return fWobbleEast; }
 	bool   initStarCatalogue( string iCatalogueName, double iMJD, double xmin, double xmax, double ymin, double ymax,
-	                                                 double iRASkyMapCentre, double iDecSkyMapCentre );
+	                                                 double iRASkyMapCentreJ2000, double iDecSkyMapCentreJ2000 );
         bool   isPrecessed() { return fPrecessed; }
         bool   isSet() { return fSet; }
-        void   precessTarget ( int iMJD, unsigned int iTelID );
+        void   precessTarget ( int iMJD, int iTelID = -1 );
         void   rotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double & i_xout, double & i_yout);
         void   setMC() { fMC = true; }
 	void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
