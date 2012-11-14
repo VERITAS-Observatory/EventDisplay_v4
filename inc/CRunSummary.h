@@ -200,7 +200,7 @@ void CRunSummary::Init(TTree *tree)
     fChain->SetBranchAddress("SkyMapCentreRAJ2000", &SkyMapCentreRAJ2000 );
     fChain->SetBranchAddress("SkyMapCentreDecJ2000", &SkyMapCentreDecJ2000 );
     fChain->SetBranchAddress("TargetShiftRAJ2000", &TargetShiftRAJ2000 );
-    fChain->SetBranchAddress("TargetShiftDecJ2000", &TargetShiftRAJ2000 );
+    fChain->SetBranchAddress("TargetShiftDecJ2000", &TargetShiftDecJ2000 );
     fChain->SetBranchAddress("TargetShiftWest", &TargetShiftWest );
     fChain->SetBranchAddress("TargetShiftNorth", &TargetShiftNorth );
     fChain->SetBranchAddress("WobbleNorth",&WobbleNorth);
