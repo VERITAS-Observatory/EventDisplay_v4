@@ -1015,7 +1015,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		   corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
                 }
 // low gain channel have different time -> use tzero (donnot do this for DST sims)
-                if( ( getHiLo()[i_channelHitID] || getTraceMax()[i_channelHitID] > getRunParameter()->fSumWindowStartAtT0Min ) && getRunParameter()->fsourcetype != 7 )
+                if( ( getHiLo()[i_channelHitID] 
+		  || getTraceMax()[i_channelHitID] > getRunParameter()->fSumWindowStartAtT0Min )
+		  && getRunParameter()->fsourcetype != 7 )
                 {
 // get new tzero for sumwindow starting at corrfirst to the end of the window
 		    float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
@@ -1055,7 +1057,12 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 setSums( i_channelHitID, fTraceHandler->getTraceSum(corrfirst, corrlast, fRaw ) );
                 if( getFillPulseSum() ) getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
 // calculate sum for second summation window
-                setSums2( i_channelHitID, fTraceHandler->getTraceSum(corrfirst, corrfirst+(int)getSumWindow_2(), fRaw ) );
+		if( getRunParameter()->fFixWindowStart_sumwindow2 )
+		{
+		   corrfirst = (int)(getSumFirst() + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+		   setSums2( i_channelHitID, fTraceHandler->getTraceSum( (int)getSumFirst(), (int)getSumFirst()+(int)getSumWindow_2(), fRaw ) );
+		}
+		setSums2( i_channelHitID, fTraceHandler->getTraceSum(corrfirst, corrfirst+(int)getSumWindow_2(), fRaw ) );
             }
         }
         catch(...)

@@ -605,6 +605,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fDoublePass = true;
         }
+	else if( iTemp.find( "fixwindow2" ) < iTemp.size() )
+	{
+	    fRunPara->fFixWindowStart_sumwindow2 = (bool)(atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() ) );
+        }
         else if( iTemp.find( "nodoublepass" ) < iTemp.size() )
         {
             fRunPara->fDoublePass = false;
@@ -896,7 +900,7 @@ void VReadRunParameter::test_and_adjustParams()
         if( i_DBinfo.isGood() )
         {
             fRunPara->fTargetName = i_DBinfo.getTargetName();
-// (J2000)
+// DB coordinates are in J2000
             fRunPara->fTargetDec = i_DBinfo.getTargetDec();
             fRunPara->fTargetRA = i_DBinfo.getTargetRA();
             fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();

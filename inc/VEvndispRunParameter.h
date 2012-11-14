@@ -134,10 +134,11 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	string      fFADCChargeUnit;              // FADC charge unit (DC or PE)
 	vector< unsigned int > fTraceIntegrationMethod;   // trace integration method
 	vector< unsigned int > fTraceIntegrationMethod_pass1;   // trace integration method for pass 1 (doublepass only)
-        vector<int> fsumfirst;                    // parameter for window summation start
+        vector<int> fsumfirst;                    // parameter for window summation start (window 1)
         vector<int> fsumwindow_1;                 // parameter for window summation (window 1)
         vector<int> fsumwindow_2;                 // parameter for window summation (window 2)
 	vector<int> fsumwindow_pass1;             // parameter for window summation (double pass - pass 1)
+	bool   fFixWindowStart_sumwindow2;        // fixed window start for summation window 2
         bool   fFixWindowStart;                   // fix the location of the window (do not move depending on t0)
         bool   fDoublePass;                       // double pass image cleaning (default: off )
 	bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
@@ -238,6 +239,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,117);
+        ClassDef(VEvndispRunParameter,118);
 };
 #endif

@@ -130,6 +130,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fLogLikelihood_Ntubes_min.push_back( 0 );
     fImageAnalysisFUIFactor = 2.;
     fFixWindowStart = false;
+    fFixWindowStart_sumwindow2 = true;
     fDoublePass = true;
     fDynamicIntegrationWindow = true;
     frecoverImagePixelNearDeadPixel = true;
@@ -373,6 +374,7 @@ void VEvndispRunParameter::print( int iEv )
         else cout << "no double pass cleaning";
         cout << endl;
         if( fFixWindowStart )        cout << "using fixed window start" << endl;
+	if( fFixWindowStart_sumwindow2 ) cout << "using fixed window start for summation window 2" << endl;
 	if( fMC_FADCTraceStart > 0 ) cout << "MC trace start: " << fMC_FADCTraceStart  << endl;
         if( ftracefit > -1. )        cout << "trace fitting: " << ftracefit << " with " << ftracefitfunction << endl;
         if( fSmoothDead )            cout << "smoothing dead pixels" << endl;

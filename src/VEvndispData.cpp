@@ -670,6 +670,10 @@ unsigned int VEvndispData::getLargestSumWindow( unsigned int iTelID )
    return iSW;
 }
 
+/*
+   make sure that summation window is not larger than readout window
+
+*/
 unsigned int VEvndispData::checkSummationWindow( unsigned int iTelID, unsigned int iSumWindow )
 {
     if( iSumWindow <= getNSamples( iTelID ) ) return iSumWindow;
