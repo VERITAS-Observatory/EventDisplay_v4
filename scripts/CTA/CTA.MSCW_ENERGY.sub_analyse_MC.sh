@@ -70,8 +70,9 @@ fi
 # output directory for error/output from batch system
 # in case you submit a lot of scripts: QLOG=/dev/null
 DATE=`date +"%y%m%d"`
-QLOG=$CTA_USER_LOG_DIR/$DATE/ANALYSETABLES/
-mkdir -p $QLOG
+# QLOG=$CTA_USER_LOG_DIR/$DATE/ANALYSETABLES/
+# mkdir -p $QLOG
+QLOG=/dev/null
 
 # output directory for shell scripts
 SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/"

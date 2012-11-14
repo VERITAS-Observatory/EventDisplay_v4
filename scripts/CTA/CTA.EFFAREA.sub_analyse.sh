@@ -415,10 +415,16 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
-#      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ] 
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ] || [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ] 
       then
         echo "* IGNOREFRACTIONOFEVENTS 0.5" >> $MSCF
+      fi
+      if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
+      then
+        if [ $DSET != "v_leeds" ]
+	then
+	   echo "* IGNOREFRACTIONOFEVENTS 0.5" >> $MSCF
+        fi
       fi
       echo "* CUTFILE $iCFIL" >> $MSCF
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
@@ -462,4 +468,3 @@ do
 done
 
 exit
-

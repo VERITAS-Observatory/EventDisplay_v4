@@ -77,7 +77,7 @@ then
       VPART=( "gamma_onSource" "electron_onSource" "proton_onSource" )
    fi
 else
-   if [ $DSET = "cta-ultra3" ]
+   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ]
    then
       VPART=( "gamma_onSource" "gamma_cone10" )
    else
