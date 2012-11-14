@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# script run eventdisplay with a queue system
+# script run eventdisplay analysis for VTS data 
 #
 # Author: Gernot Maier
 #
@@ -13,7 +13,7 @@ then
    echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [calibration (default=1)]" 
    echo
    echo "  [calibration]"
-   echo "          1     pedestal & average tzero calculation"
+   echo "          1     pedestal & average tzero calculation (default)"
    echo "          2     pedestal calculation only"
    echo "          3     average tzero calculation only"
    echo
