@@ -261,6 +261,9 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
     return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, iEMin, iEMax, iResponseMatrix, e_gamma, bDebug );
 }
 
+/*
+
+*/
 double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 						     unsigned int iEMinBin, unsigned int iEMaxBin,
