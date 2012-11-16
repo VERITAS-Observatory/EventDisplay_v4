@@ -85,6 +85,7 @@ class VDataMCComparision
    vector<TH1D* > hlos;
    vector<TH1D* > hloss;
    vector<TH1D* > hsize;
+   vector<TH1D* > hsize2;
    vector<TH1D* > hmax1;
    vector<TH1D* > hmax2;
    vector<TH1D* > hmax3;

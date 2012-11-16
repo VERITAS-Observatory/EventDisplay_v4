@@ -286,6 +286,13 @@ void VDataMCComparision::defineHistograms()
       hTel.push_back( hsize.back() );
       hisList->Add( hsize.back() );
 
+      sprintf( hname, "hsize2_%d_%s", i, fName.c_str() );
+      hsize2.push_back( new TH1D( hname, "", 80, 2., 5.0) );
+      hsize2.back()->SetXTitle( "log_{10} size2 [d.c.]" );
+      hsize2.back()->Sumw2();
+      hTel.push_back( hsize2.back() );
+      hisList->Add( hsize2.back() );
+
       sprintf( hname, "hmax1_%d_%s", i, fName.c_str() );
       hmax1.push_back( new TH1D( hname, "", 80, 1., 4.0) );
       hmax1.back()->SetXTitle( "log_{10} size_{max1} [d.c.]" );
@@ -469,6 +476,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 // quality cuts
    double fCoreMax_QC = 350.;       // cut on core distance
    int    fNImages_min = 3;         // minimum number of images per event
+   fNImages_min = 2;
 // stereo cuts
    double theta2_cut = 0.035;
 //   if( fNTel > 2 ) theta2_cut = 0.025;
@@ -479,6 +487,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
    double msw_min = -1.2;
    double msl_max = 0.5;
    double msl_min = -1.2; 
+   double size2ndmax_min = 0.;
 
 // single telescope cuts
     int    ntubes_min = 4;
@@ -535,7 +544,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
    else if( fSingleTelescopeCuts == -2 ) cout << "NO CUTS (quality cuts only)" << endl;
    else if( fSingleTelescopeCuts == -3 )
    {
-       cout << " Theta2 cut only (<" << theta2_cut << " deg2)" << endl;
+       cout << " Theta2 cut (<" << theta2_cut << " deg2),  ";
+       cout << " Size2ndMax cut (<" << size2ndmax_min << ")" << endl;
    }
    else
    {
@@ -587,7 +597,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
       if( fData->NImages < fNImages_min ) continue;
 
 // apply az cut to MC (to choose similar AZ range as in Crab runs)
-// (STD)     if( fInput == 0 && ( fData->MCaz < 100.  || fData->MCaz > 140. ) ) continue;
+     if( fInput == 0 && ( fData->MCaz < 105.  || fData->MCaz > 230. ) ) continue;
 
 /////////////////////////////////////////////////
 // quality cuts
@@ -630,6 +640,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
       if( fSingleTelescopeCuts < -1 )
       {
          if( theta2 <= theta2_min || theta2 > theta2_cut ) continue;
+	 if( fData->SizeSecondMax < size2ndmax_min ) continue;
       }
 
 /////////////////////////////////////////////////////////
@@ -722,6 +733,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	       if( fData->nlowgain[j] > 0 ) hnlowgain[j]->Fill( (double)fData->nlowgain[j], weight );
 	       hdist[j]->Fill( fData->dist[j], weight );
 	       if( fData->size[j] > 0. ) hsize[j]->Fill( log10( fData->size[j] ), weight );
+	       if( fData->size[j] > 0. ) hsize2[j]->Fill( log10( fData->size2[j] ), weight );
 	       if( fData->max1[j] > 0. ) hmax1[j]->Fill( log10( fData->max1[j] ), weight );
 	       if( fData->max2[j] > 0. ) hmax2[j]->Fill( log10( fData->max2[j] ), weight );
 	       if( fData->max3[j] > 0. ) hmax3[j]->Fill( log10( fData->max3[j] ), weight );
