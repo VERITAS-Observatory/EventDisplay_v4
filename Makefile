@@ -800,9 +800,28 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 ./obj/combineEffectiveAreas.o:	./src/combineEffectiveAreas.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-combineEffectiveAreas:	./obj/combineEffectiveAreas.o  \
-			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o
+combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
+			 ./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+			 ./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+			 ./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+			 ./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
+			 ./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+			 ./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+			 ./obj/VRunList.o ./obj/VRunList_Dict.o ./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+			 ./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+			 ./obj/VInstrumentResponseFunction.o ./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+			 ./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
+			 ./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+			 ./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o ./obj/Ctelconfig.o \
+			 ./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
+			 ./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+			 ./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			 ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			 ./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
+			 ./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
+			 ./obj/VASlalib.o \
+			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o 
+
 			
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
