@@ -1184,13 +1184,13 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
    hname.push_back( "length" );
    hname.push_back( "dist" );
    hname.push_back( "size" );
+   hname.push_back( "size2" );
    hname.push_back( "nlowgain" );
    hname.push_back( "los" );
    hname.push_back( "asym" );
    hname.push_back( "cen_x" );
    hname.push_back( "cen_y" );
    hname.push_back( "ntubes" );
-   hname.push_back( "max3" );
    hname.push_back( "mscwt" );
    hname.push_back( "msclt" );
    hname.push_back( "loss" );
@@ -1275,7 +1275,7 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
 	 g->SetGridx( 0 );
 	 g->SetGridy( 0 );
          if( iPlot != "REL" &&
-	    ( hname[j] == "size" || hname[j] == "max3" || hname[j] == "max1" || hname[j] == "ntubes" || hname[j] == "nlowgain" || hname[j] == "loss" )
+	    ( hname[j] == "size" ||  hname[j] == "size2" || hname[j] == "max1" || hname[j] == "ntubes" || hname[j] == "nlowgain" || hname[j] == "loss" )
 	     && hsims->GetEntries() > 0 && hdiff->GetEntries() > 0 ) g->SetLogy( 1 );
       }
       else
@@ -1337,7 +1337,7 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
       if( hname[j] == "ntubes" ) { xAxis_min = 0.; xAxis_max = 80.; }
       if( hname[j] == "ntubesBNI" ) { xAxis_min = 0.; xAxis_max = 40.; }
       if( hname[j] == "nlowgain" ) { xAxis_min = 0.; xAxis_max = 25.; }
-      if( hname[j] == "size" ) { xAxis_min = 2.5; xAxis_max = 4.6; }
+     if( hname[j] == "size" ) { xAxis_min = 2.0; xAxis_max = 5.0; }
       if( hname[j] == "max1" ) { xAxis_min = 1.5; xAxis_max = 4.0; }
       if( hname[j] == "loss" ) { xAxis_min = 0.; xAxis_max = 0.5; }
       if( hname[j] == "cen_y" ) reflectSims( hsims );
