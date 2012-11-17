@@ -1192,6 +1192,9 @@ $(vtspara):
 	mkdir -p $(vtspara)/DetectorGeometry
 	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg $(vtspara)/DetectorGeometry
 	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_veritasBC4_090723_Autumn2007-4.1.5_PIX.cfg $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_Upgrade_20121108_v420.txt $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_veritasBC4N_090916_Autumn2009-4.1.5_PIX.cfg $(vtspara)/DetectorGeometry
 	mkdir -p $(vtspara)/NOISE
 	cp -LR $(VERITAS_EVNDISP_ANA_DIR)/NOISE/*.grisu $(vtspara)/NOISE
 	mkdir -p $(vtspara)/ParameterFiles
@@ -1212,7 +1215,8 @@ $(vtspara):
 	mkdir -p $(vtspara)/EffectiveAreas
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/EffectiveAreas/effArea-d20120909-cut* $(vtspara)/EffectiveAreas/
 	mkdir -p $(vtspara)/Tables
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20120924_GrIsuApr12* $(vtspara)/Tables/
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20121116_GrIsuNov12_ATM21_V6_ID0* $(vtspara)/Tables/
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20121026_GrIsuApr12_ATM21_V5_ID0* $(vtspara)/Tables/
 
 ###############################################################################################################################
 # print environment and compilation parameters

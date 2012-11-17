@@ -1032,8 +1032,24 @@ void VReadRunParameter::test_and_adjustParams()
 // set default camera configurations
     if( !fusercamera )
     {
-       if( fRunPara->frunnumber > 46642 ) fRunPara->fcamera[0] = "veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg";  // new array
-       else                               fRunPara->fcamera[0] = "veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg";   // old array
+// configuration from Sept 2009 to July 2012
+// (after the T1 move)
+       if( fRunPara->frunnumber > 46642 && fRunPara->frunnumber < 63409 ) 
+       {
+           fRunPara->fcamera[0] = "veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg";
+       }
+// configuration until August 2009
+// (before the T1 move)
+       else if( fRunPara->frunnumber <= 46642 )
+       {
+          fRunPara->fcamera[0] = "veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg";
+       }
+// configuration from Sep 2012
+// PRELI: this is a file with upgraded pixel positions
+       else
+       {
+          fRunPara->fcamera[0] = "EVN_Upgrade_20121108_v420.txt";
+       }
     }
 
 // set camera file name to dstfile for dst reading
