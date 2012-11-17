@@ -263,7 +263,7 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
    {
       for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
       {
-	 cout << i << "\tMJD " << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
+	 cout << i << fixed << setprecision( 4 ) << "\tMJD " << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
 	 cout << " (" << fLightCurveData[i]->getMJD() << " +- " << fLightCurveData[i]->getMJDError() << ")";
 	 if( fPhase_Period_days > 0. )
 	 {
@@ -293,7 +293,7 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
       for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
       {
 	 cout << "Light-curve point: ";
-         cout << "  "    << setprecision( 2 ) << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
+         cout << "  "    << fixed << setprecision( 2 ) << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
 	 if( fPhase_Period_days > 0. )
 	 {
 	     double iMJD_mean = fLightCurveData[i]->getMJD();
@@ -307,10 +307,14 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
 
 }
 
-void VLightCurveUtilities::setPhaseFoldingValues( double iZeroPhase_MJD, double iPhase_Days, bool bPlotPhase )
+void VLightCurveUtilities::setPhaseFoldingValues( double iZeroPhase_MJD, double iPhase_Days, 
+                                                  double iPhaseError_low_Days, double iPhaseError_up_Days,
+						  bool bPlotPhase )
 {
    fPhase_MJD0 = iZeroPhase_MJD;
    fPhase_Period_days = iPhase_Days;
+   fPhaseError_low_fPhase_Period_days = iPhaseError_low_Days;
+   fPhaseError_up_fPhase_Period_days = iPhaseError_up_Days;
    fPhasePlotting = bPlotPhase;
 
    updatePhaseFoldingValues();
@@ -318,11 +322,35 @@ void VLightCurveUtilities::setPhaseFoldingValues( double iZeroPhase_MJD, double 
 
 double VLightCurveUtilities::getPhase( double iMJD )
 {
-   iMJD = ( iMJD - fPhase_MJD0 ) / fPhase_Period_days;
-   iMJD =   iMJD - TMath::Floor( iMJD );
-   if( !fPhasePlotting ) iMJD  *= fPhase_Period_days;
+   if( fPhase_Period_days > 0. )
+   {
+      iMJD = ( iMJD - fPhase_MJD0 ) / fPhase_Period_days;
+      iMJD =   iMJD - TMath::Floor( iMJD );
+      if( !fPhasePlotting ) iMJD  *= fPhase_Period_days;
+   }
+   else iMJD = -99.;
 
    return iMJD;
+}
+
+/*
+   calculate errors on orbital phase
+*/
+double VLightCurveUtilities::getPhaseError( double iMJD )
+{
+   double iError = sqrt(fPhaseError_up_fPhase_Period_days*fPhaseError_up_fPhase_Period_days
+                      + fPhaseError_low_fPhase_Period_days*fPhaseError_low_fPhase_Period_days);
+
+   double iP = 0.;
+
+   if( fPhase_Period_days > 0. )
+   {
+      iP  = ( iMJD - fPhase_MJD0 )*( iMJD - fPhase_MJD0 )/fPhase_Period_days/fPhase_Period_days/fPhase_Period_days/fPhase_Period_days;
+      iP *= iError*iError;
+   }
+   else return -99.;
+
+   return sqrt( iP );
 }
 
 double VLightCurveUtilities::getFlux_Mean()

@@ -36,6 +36,8 @@ class VLightCurveUtilities
 // phases
    double   fPhase_MJD0;
    double   fPhase_Period_days;
+   double   fPhaseError_low_fPhase_Period_days;
+   double   fPhaseError_up_fPhase_Period_days;
    bool     fPhasePlotting;
 
    public:
@@ -53,6 +55,7 @@ class VLightCurveUtilities
     double getFluxError_Mean();
     double getMeanObservationInterval();
     double getPhase( double iMJD );
+    double getPhaseError( double iMJD );
     bool   getXRTTimeSettings() { return fXRTTimeSettings; }
     bool   isZombie() { return fIsZombie; }
     void   printLightCurve( bool bFullDetail = true );
@@ -62,7 +65,8 @@ class VLightCurveUtilities
     bool   readASCIIFile( string iFile, double iMJDMin = -99., double iMJDMax = -99., double iFluxMultiplier = 1. );
     void   resetLightCurveData();
     void   setASCIIFormSecondColumnIsObservingInterval( bool iB = true ) { fASCIIFormSecondColumnIsObservingInterval = iB; }
-    void   setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days = 99., bool bPlotPhase = true );
+    void   setPhaseFoldingValues( double iZeroPhase_MJD = -99., double iPhase_Days = 99., 
+                                  double iPhaseError_low_Days = 0., double iPhaseError_up_Days = 0., bool bPlotPhase = true );
     void   setXRTTimeSettings( bool iB = true, double iMJDMissionTimeStart = 54857.09977457897 ) { fXRTTimeSettings = iB; fXRTMissionTimeStart = iMJDMissionTimeStart; }
     bool   updatePhaseFoldingValues();
     bool   writeASCIIFile( string iFile );

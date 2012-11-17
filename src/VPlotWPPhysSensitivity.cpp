@@ -233,8 +233,9 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
     {
        fIRF->addInstrumentResponseData( fSensitivityFile[i], 20., fIRFCameraOffset_deg[i], 0, 2.4, 200, "A_MC", 
                                         fPlottingColor[i], fPlottingLineStyle[i], 21, 0.5 );
-       fIRF->addInstrumentResponseData( fSensitivityFile[i], 20., fIRFCameraOffset_deg[i], 0, 2.4, 200, "A_REC", 
-                                        fPlottingColor[i], fPlottingLineStyle[i]+1, 21, 0.5 );
+// do not plot effective areas vs reconstructed energy
+//       fIRF->addInstrumentResponseData( fSensitivityFile[i], 20., fIRFCameraOffset_deg[i], 0, 2.4, 200, "A_REC", 
+//                                        fPlottingColor[i], fPlottingLineStyle[i]+1, 21, 0.5 );
     }
 
     char hname[2000];

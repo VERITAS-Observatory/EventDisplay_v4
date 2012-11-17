@@ -290,6 +290,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        plot_nullHistogram( fCanvasLightCurve, hLightCurve, false, true, 1.2, fPlottingMJDMin, fPlottingMJDMax );
 
     }
+// canvas exists - get histogram in canvas
     else
     {
        fCanvasLightCurve = iCanvasLightCurve;
@@ -309,7 +310,6 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 // flux and upper flux plotting
 
     fLightCurveGraph = new TGraphAsymmErrors( 0 );
-    setGraphPlottingStyle( (TGraph*)fLightCurveGraph );
 
 // loop over all measured values
     unsigned int z = 0;
@@ -376,6 +376,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
     }
     if( fLightCurveGraph->GetN() > 0 )
     {
+       setGraphPlottingStyle( (TGraph*)fLightCurveGraph );
        if( iPlotConfidenceInterval < 0 ) fLightCurveGraph->Draw( iPlottingOption.c_str() );
        else
        {
