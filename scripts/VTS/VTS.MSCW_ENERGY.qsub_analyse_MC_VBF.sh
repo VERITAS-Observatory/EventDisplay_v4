@@ -26,13 +26,13 @@ source ./setObservatory.tcsh VTS
 # hardwired values
 ###############################################
 # date of analysis
-set DAT="d20120909"
+set DAT="d20121114_PIX"
 # output files are written to this directory
 set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
 # directory with MC eventdisplay files
 set SDIR="analysisApr12_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
 # full path to MC eventdisplay files 
-set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*.root"
+set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*[0-9].root"
 # mscw_energy command line options
 set MOPT="-noNoTrigger -nomctree -shorttree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 set MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
@@ -57,6 +57,7 @@ mkdir -p $ODIR
 # run MSCW
 ###############################################
 cd $EVNDISPSYS/bin/
+rm -f $ODIR/$OFIL.log
 ./mscw_energy $MOPT -inputfile "$XDIR" -outputfile $DDIR/$OFIL.root -noise=$NOISE > $ODIR/$OFIL.log
 
 ###############################################

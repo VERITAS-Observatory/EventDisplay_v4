@@ -46,7 +46,8 @@ set TTA="1234"
 # dead channel definitions
 set DEAD="EVNDISP.validchannels.dat"
 # camera geometry
-set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
+# set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
+set CFG="EVN_Upgrade_20121108_v420.txt"
 ##############################################################################################
 
 #####################################################

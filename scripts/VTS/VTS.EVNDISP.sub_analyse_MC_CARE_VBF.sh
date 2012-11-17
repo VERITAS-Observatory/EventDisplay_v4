@@ -39,20 +39,22 @@ NOISE=$6
 # in- and output directories for simulation 
 # run scripts are written to this directory
 ###############################################################################################################
+DSET="care_optics_Nov10"
+DSET="care_Nov12"
 if [ $PART = "1" ]
 then
-   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/care_optics_Nov10/ATM$ATMO/"
-   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/care_optics_Nov10/gamma_"$ZEW"deg_750m/wobble_$WOB/"
+   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/ATM$ATMO/"
+   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/$DSET/gamma_"$ZEW"deg_750m/wobble_$WOB/"
 fi 
 if [ $PART = "2" ]
 then
-   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/care_optics_Nov10/ATM$ATMO/"
-   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/care_optics_Nov10/electron_"$ZEW"deg_750m/wobble_$WOB/"
+   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/ATM$ATMO/"
+   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/$DSET/electron_"$ZEW"deg_750m/wobble_$WOB/"
 fi
 if [ $PART = "14" ]
 then
-   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/care_optics_Nov10/ATM$ATMO/"
-   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/care_optics_Nov10/proton_"$ZEW"deg_750m/wobble_$WOB/"
+   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/ATM$ATMO/"
+   ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/$DSET/proton_"$ZEW"deg_750m/wobble_$WOB/"
 fi
 echo $DDIR
 
@@ -119,7 +121,6 @@ echo "LOG AND DATA FILES: $ODIR"
 
 # submit the job
 echo $FDIR/$OSCRIPT.sh
-# qsub -V -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
-qsub -V -l os="sl*" -l h_cpu=00:29:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+qsub -V -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
 exit

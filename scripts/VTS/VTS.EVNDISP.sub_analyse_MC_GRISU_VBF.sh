@@ -34,6 +34,8 @@ ATMO=$4
 # wobble offsets
 WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
 WWOF=( 050 000 025 075 100 125 150 175 200 )
+WOFF=( 0.5 )
+WWOF=( 050 )
 NWOFF=${#WOFF[@]}
 # NOISE levels
 NOISE=( 200 250 075 100 150 325 425 550 750 1000 )
@@ -55,9 +57,11 @@ do
 # target directory for simulation output files
 # run scripts are written to this directory
 ###############################################################################################################
+     DSET="grisu"
+     DSET="grisu_UP20121113"
      if [ $PART = "1" ]
      then
-	 DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/grisu/ATM$ATMO/"
+	 DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/ATM$ATMO/"
 	 ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$ZEW"deg_750m/wobble_$WOB/"
      fi 
      if [ $PART = "14" ]

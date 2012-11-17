@@ -22,14 +22,16 @@ source $EVNDISPSYS/setObservatory.sh VERITAS
 # this is where the executable can be found
 cd $EVNDISPSYS/bin
 
+DSET="analysisApr12_d20121114_PIX"
+
 # directory with input file
-DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/analysisApr12_d20120909_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
+DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/"$DSET"_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
 
 # remove existing log and table file
 rm -f $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.root
-rm -f $LOGDIR/$TFIL-NOISE$NOISEY-$IZE-${WOFF[$W]}.log
+rm -f $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.log
 
 # make the tables
-$EVNDISPSYS/bin/mscw_energy -filltables=1 -inputfile "$DDIR" -tablefile $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.root -ze=$IZE -arrayrecid=$RECID -woff=$WOFF -noise=$NOISEY > $LOGDIR/$TFIL-NOISE$NOISEY-$IZE-${WOFF[$W]}.log
+$EVNDISPSYS/bin/mscw_energy -filltables=1 -inputfile "$DDIR" -tablefile $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.root -ze=$IZE -arrayrecid=$RECID -woff=$WOFF -noise=$NOISEY > $ODDIR/$TFIL-NOISE$NOISEY-$IZE-$WOFF.log
 
 exit

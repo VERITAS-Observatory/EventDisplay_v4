@@ -10,7 +10,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] || [ ! -n "$4" ]
 then
    echo
-   echo "VTS.MSCW_ENERGY.sub_make_tables.sh <table file> <recid> <atmo ID=21/22> <array=V4/V5>"
+   echo "VTS.MSCW_ENERGY.sub_make_tables.sh <table file> <recid> <atmo ID=21/22> <array=V4/V5/V6>"
    echo
    echo " < recid: array rec id according to array_analysis_cuts.txt"
    echo
@@ -39,6 +39,7 @@ IZE=( 20 30 35 )
 NZE=${#IZE[@]}
 # wobble off bins
 WOFF=( 0.00 0.25 0.5 0.75 1.00 1.25 1.50 1.75 2.00 )
+WOFF=( 0.5 )
 # WOFF=( 0.5 )
 NWOF=${#WOFF[@]}
 # noise levels
@@ -48,7 +49,12 @@ INOI=( 075 100 150 200 250  325  425  550  750 1000 )
 # determined from mean pedvar of simulations
 # (cannot be determined on the fly due to floating point uncertainty)
 # from sumwindow=6
-TNOI=( 336 382 457 524 579 659 749 850 986 1138 )
+if [ $ARRAY = "V5" ]
+then
+   TNOI=( 336 382 457 524 579 659 749 850 986 1138 )
+else
+   TNOI=( 331 384 469 542 600 684 773 875 1002 1178 )
+fi
 # from sumwindow=7
 # TNOI=( 375 430 515 585 650 740 840 950 1105 1280 )
 # from sumwindow=12
