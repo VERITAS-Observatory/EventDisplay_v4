@@ -284,7 +284,7 @@ void trigger_plots( char *ffile = "stereo_compare.root" )
    if( !hNImages_SIMS || !hNImages_DIFF || !hImgSel_SIMS || !hImgSel_DIFF ) return;
 
    setHistogramAtt( hNImages_SIMS, 2, 3, 1, 20, 1 );
-   setHistogramAtt( hNImages_DIFF, 1, 3, 1, 21, 1 );
+   setHistogramAtt( hNImages_DIFF, 1, 3, 1, 25, 1 );
    if( hNImages_SIMS->GetEntries() > 0 ) hNImages_SIMS->Scale( s_sims );
    if( hNImages_DIFF->GetEntries() > 0 ) hNImages_DIFF->Scale( s_diff );
 
@@ -296,7 +296,7 @@ void trigger_plots( char *ffile = "stereo_compare.root" )
    hNImages_DIFF->Draw( "same" );
 
    setHistogramAtt( hImgSel_SIMS, 2, 3, 1, 20, 1 );
-   setHistogramAtt( hImgSel_DIFF, 1, 3, 1, 21, 1 );
+   setHistogramAtt( hImgSel_DIFF, 1, 3, 1, 25, 1 );
    if( hImgSel_SIMS->GetEntries() > 0 ) hImgSel_SIMS->Scale( s_sims );
    if( hImgSel_DIFF->GetEntries() > 0 ) hImgSel_DIFF->Scale( s_diff );
 
@@ -402,28 +402,28 @@ void msc_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
    TCanvas *c_MSCW = new TCanvas( hname, htitle, 100, 10, 900, 600 );
    c_MSCW->SetGridx( 0 );
    c_MSCW->SetGridy( 0 );
-   c_MSCW->Divide( 2, 2 );
+   c_MSCW->Divide( 3, 2 );
 
    TH2D *hmscwerec_sims = (TH2D*)fDir->Get( "hMSCWErec_SIMS" );
    TH2D *hmscwerec_diff = (TH2D*)fDir->Get( "hMSCWErec_DIFF" );
 
    if( !hmscwerec_sims || !hmscwerec_diff ) return;
 
-   for( int i = 2; i <= hmscwerec_sims->GetXaxis()->GetNbins() - 1; i++ )
+   for( int i = 1; i <= hmscwerec_sims->GetXaxis()->GetNbins(); i++ )
    {
       sprintf( hname, "hMSCWErec_SIMS_%d", i );
       TH1D *hSims = hmscwerec_sims->ProjectionY( hname, i, i );
-      setHistogramAtt( hSims, 2, 3, 1, 20, 1 );
+      setHistogramAtt( hSims, 2, 1, 1, 20, 1 );
       sprintf( hname, "hMSCWErec_DIFF_%d", i );
       TH1D *hDiff = hmscwerec_diff->ProjectionY( hname, i, i );
-      setHistogramAtt( hDiff, 1, 3, 1, 21, 1 );
+      setHistogramAtt( hDiff, 1, 1, 1, 21, 1 );
       if( hSims->GetEntries() > 0 ) hSims->Scale( s_sims );
       if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
 
       hSims->SetAxisRange( -1.5, 2.5 );
-      hSims->SetMaximum( hSims->GetMaximum() * 1.5 );
+      hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
 
-      c_MSCW->cd( i-1 );
+      c_MSCW->cd( i );
       hSims->Draw();
       hDiff->Draw( "same" );
 
@@ -431,9 +431,15 @@ void msc_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
       lmscw->SetLineStyle( 2 );
       lmscw->Draw();
 
-      sprintf( hname, "%.1f < log_{10} E < %.1f", hmscwerec_sims->GetXaxis()->GetBinLowEdge( i ),  hmscwerec_sims->GetXaxis()->GetBinUpEdge( i ) );
-      TLatex *iT = new TLatex( 0.5, 0.9*hSims->GetMaximum(), hname );
+      sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", hmscwerec_sims->GetXaxis()->GetBinLowEdge( i ),  hmscwerec_sims->GetXaxis()->GetBinUpEdge( i ) );
+      TLatex *iT = new TLatex( -0.5, 0.9*hSims->GetMaximum(), hname );
       iT->Draw();
+      sprintf( hname, "mean(MC): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS() );
+      TLatex *iM = new TLatex( -0.5, 0.82*hSims->GetMaximum(), hname );
+      iM->Draw();
+      sprintf( hname, "mean(data): %.2f#pm %.2f", hDiff->GetMean(), hDiff->GetRMS() );
+      TLatex *iD = new TLatex( -0.5, 0.74*hSims->GetMaximum(), hname );
+      iD->Draw();
    }
 
 // MSCL
@@ -443,28 +449,28 @@ void msc_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
    TCanvas *c_MSCL = new TCanvas( hname, htitle, 200, 100, 900, 600 );
    c_MSCL->SetGridx( 0 );
    c_MSCL->SetGridy( 0 );
-   c_MSCL->Divide( 2, 2 );
+   c_MSCL->Divide( 3, 2 );
 
    TH2D *hMSCLerec_sims = (TH2D*)fDir->Get( "hMSCLErec_SIMS" );
    TH2D *hMSCLerec_diff = (TH2D*)fDir->Get( "hMSCLErec_DIFF" );
 
    if( !hMSCLerec_sims || !hMSCLerec_diff ) return;
 
-   for( int i = 2; i <= hMSCLerec_sims->GetXaxis()->GetNbins() - 1; i++ )
+   for( int i = 1; i <= hMSCLerec_sims->GetXaxis()->GetNbins(); i++ )
    {
       sprintf( hname, "hMSCLErec_SIMS_%d", i );
       TH1D *hSims = hMSCLerec_sims->ProjectionY( hname, i, i );
-      setHistogramAtt( hSims, 2, 3, 1, 20, 1 );
+      setHistogramAtt( hSims, 2, 1, 1, 20, 1 );
       sprintf( hname, "hMSCLErec_DIFF_%d", i );
       TH1D *hDiff = hMSCLerec_diff->ProjectionY( hname, i, i );
-      setHistogramAtt( hDiff, 1, 3, 1, 21, 1 );
+      setHistogramAtt( hDiff, 1, 1, 1, 21, 1 );
       if( hSims->GetEntries() > 0 ) hSims->Scale( s_sims );
       if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
 
       hSims->SetAxisRange( -1.5, 2.5 );
-      hSims->SetMaximum( hSims->GetMaximum() * 1.5 );
+      hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
 
-      c_MSCL->cd( i-1 );
+      c_MSCL->cd( i );
       hSims->Draw();
       hDiff->Draw( "same" );
 
@@ -473,10 +479,15 @@ void msc_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
       lMSCL->Draw();
 
       sprintf( hname, "%.1f < log_{10} E < %.1f", hMSCLerec_sims->GetXaxis()->GetBinLowEdge( i ),  hMSCLerec_sims->GetXaxis()->GetBinUpEdge( i ) );
-      TLatex *iT = new TLatex( 0.5, 0.9*hSims->GetMaximum(), hname );
+      TLatex *iT = new TLatex( -0.5, 0.9*hSims->GetMaximum(), hname );
       iT->Draw();
+      sprintf( hname, "mean(MC): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS() );
+      TLatex *iM = new TLatex( -0.5, 0.82*hSims->GetMaximum(), hname );
+      iM->Draw();
+      sprintf( hname, "mean(data): %.2f#pm %.2f", hDiff->GetMean(), hDiff->GetRMS() );
+      TLatex *iD = new TLatex( -0.5, 0.74*hSims->GetMaximum(), hname );
+      iD->Draw();
    }
-
 
 }
 
@@ -557,20 +568,20 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
 //
  
     ht2_sims = (TH1D*)fDir->Get( "htheta2_SIMS" );
-    if( bPoster ) setHistogramAtt( ht2_sims, 2, 3, 2, 20, 1 );
-    else          setHistogramAtt( ht2_sims, 2, 3, 1, 20, 1 );
+    if( bPoster ) setHistogramAtt( ht2_sims, 2, 1, 2, 20, 1 );
+    else          setHistogramAtt( ht2_sims, 2, 1, 1, 20, 1 );
     ht2_sims->SetYTitle( "number of shower [a.u.]" );
 
     ht2_diff =  (TH1D*)fDir->Get( "htheta2_DIFF" );
     if( bPoster ) setHistogramAtt( ht2_diff, 1, 3, 2, 25, 1 );
-    else setHistogramAtt( ht2_diff, 1, 3, 1, 25, 1 );
+    else setHistogramAtt( ht2_diff, 1, 1, 1, 25, 1 );
 
     ht2_on = (TH1D*)fDir->Get( "htheta2_ON" );
-    setHistogramAtt( ht2_on, 3, 3, 1, 20, 1 );
+    setHistogramAtt( ht2_on, 3, 1, 1, 20, 1 );
     ht2_on->SetYTitle( "number of shower [a.u.]" );
 
     ht2_off = (TH1D*)fDir->Get( "htheta2_OFF" );
-    setHistogramAtt( ht2_off, 4, 3, 1, 21, 1 );
+    setHistogramAtt( ht2_off, 4, 1, 1, 21, 1 );
 
     ht2_sims->SetAxisRange( 0., 0.05 );
     ht2_on->SetAxisRange( 0., 0.2 );
@@ -680,19 +691,19 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
 
    hmscw_sims = (TH1D*)fDir->Get( "hMSCW_SIMS" );
    if( bPoster ) setHistogramAtt( hmscw_sims, 2, 3, 2, 20, 1 );
-   else          setHistogramAtt( hmscw_sims, 2, 3, 1, 20, 1 );
+   else          setHistogramAtt( hmscw_sims, 2, 1, 1, 20, 1 );
    hmscw_sims->SetYTitle( "number of shower [a.u.]" );
    
    hmscw_diff = (TH1D*)fDir->Get( "hMSCW_DIFF" );
    if( bPoster ) setHistogramAtt( hmscw_diff, 1, 3, 2, 25, 1 );
-   else          setHistogramAtt( hmscw_diff, 1, 3, 1, 25, 1 );
+   else          setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 1 );
 
    hmscw_on = (TH1D*)fDir->Get( "hMSCW_ON" );
-   setHistogramAtt( hmscw_on, 3, 3, 1, 20, 1 );
+   setHistogramAtt( hmscw_on, 3, 1, 1, 20, 1 );
    hmscw_on->SetYTitle( "number of shower [a.u.]" );
 
    hmscw_off = (TH1D*)fDir->Get( "hMSCW_OFF" );
-   setHistogramAtt( hmscw_off, 4, 3, 1, 21, 1 );
+   setHistogramAtt( hmscw_off, 4, 1, 1, 21, 1 );
 
    hmscw_sims->SetAxisRange( -1., 1. );
    getScaling( fDir, s_sims, s_diff, "MSCW", 2, -0.5, 0.5 );
@@ -1256,10 +1267,10 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
 // rebin most histograms
       if( hname[j] != "ntubes" && hname[j] != "nlowgain" )
       {
-	 hsims->Rebin( 4 );
-         hdiff->Rebin( 4 );
-	 hon->Rebin( 4 );
-	 hoff->Rebin( 4 );
+	 hsims->Rebin( 2 );
+         hdiff->Rebin( 2 );
+	 hon->Rebin( 2 );
+	 hoff->Rebin( 2 );
       }
 // relative histograms
       if( hsims && hdiff )
@@ -1312,13 +1323,13 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
           iL->SetHeader( hname[j].c_str() );
       }
 
-      setHistogramAtt( hsims, 2, 3, 1, 20, 1 );
+      setHistogramAtt( hsims, 2, 0.5, 1, 20, 1 );
       if( bPoster ) setHistogramAtt( hsims, 2, 3, 2, 20, 1 );
-      setHistogramAtt( hdiff, 1, 3, 1, 21, 1 );
+      setHistogramAtt( hdiff, 1, 0.5, 1, 21, 1 );
       if( bPoster ) setHistogramAtt( hdiff, 1, 3, 2, 21, 1 );
-      setHistogramAtt( hon, 3, 3, 1, 20, 1 );
+      setHistogramAtt( hon, 3, 1, 1, 20, 1 );
       if( bPoster ) setHistogramAtt( hon, 2, 3, 2, 20, 1 );
-      setHistogramAtt( hoff, 4, 3, 1, 21, 1 );
+      setHistogramAtt( hoff, 4, 1, 1, 21, 1 );
       if( bPoster ) setHistogramAtt( hoff, 1, 3, 2, 21, 1 );
       setHistogramAtt( hrel, 1, 1, 1, 21, 1 );
       if( bPoster ) setHistogramAtt( hrel, 1, 3, 2, 21, 1 );
