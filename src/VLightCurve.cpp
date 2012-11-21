@@ -243,7 +243,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 	  sprintf( htitle, "%s, T_{0}=%.1f, period=%.1f days", fName.c_str(), fPhase_MJD0, fPhase_Period_days );
        }
 
-       fCanvasLightCurve = new TCanvas( hname, htitle, 10, 10, 600, 400 );
+       fCanvasLightCurve = new TCanvas( hname, htitle, 10, 10, getPlottingCanvasX(), getPlottingCanvasY() );
        fCanvasLightCurve->SetGridx( 0 );
        fCanvasLightCurve->SetGridy( 0 );
 

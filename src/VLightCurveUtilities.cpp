@@ -507,3 +507,57 @@ bool VLightCurveUtilities::writeASCIIFile( string iFile, TF1 *f1, unsigned int i
       cout << "VLightCurveUtilities::writeASCIIFile: total number of data points: " << fLightCurveData.size() << endl;
       return writeASCIIFile( iFile );
 }
+
+/*
+   
+   calculate variability index using a Chi2 criterion as described 
+   in section 4.5 in ApJS 188, 405, 2010 (1st FERMI LAT catalogue paper)
+
+   Note: impcomplete implementation. Low-significance points are not handled properly
+
+*/
+double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors *g, double iSystematicFraction )
+{
+   if( !g ) return 0;
+
+   vector< double > F;
+   vector< double > sigmaF;
+   vector< double > w;
+   double w_sum = 0.;
+   double w_F = 0.;
+
+// fill vectors and calculate weights
+   double x = 0.;
+   double y = 0.;
+   for( int i = 0; i < g->GetN(); i++ )
+   {
+      g->GetPoint( i, x, y );
+      F.push_back( y );
+      sigmaF.push_back( g->GetErrorY( i ) );
+
+      if( sigmaF.back() > 0. )
+      {
+         w.push_back( 1./( sigmaF.back()*sigmaF.back() + (iSystematicFraction*F.back())*(iSystematicFraction*F.back()) ) );
+	 w_sum += w.back();
+	 w_F += F.back() * w.back();
+      }
+      else
+      {
+         w.push_back( 0. );
+      }
+   }
+
+// mean weighted flux
+   double F_mean = 0.;
+   if( w_sum > 0. ) F_mean = w_F / w_sum;
+
+// calculate variability index
+   double V = 0.;
+   for( unsigned int j = 0; j < F.size(); j++ )
+   {
+      V += w[j] * ( F[j] - F_mean ) * ( F[j] - F_mean );
+   }
+
+   return V;
+}
+      

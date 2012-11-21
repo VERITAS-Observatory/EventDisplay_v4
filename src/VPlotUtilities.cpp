@@ -9,6 +9,7 @@
 
 VPlotUtilities::VPlotUtilities()
 {
+    setCanvasSize();
     setPlottingStyle();
     setColorAxisPalette();
     setColorAxisDataVector_minmax();

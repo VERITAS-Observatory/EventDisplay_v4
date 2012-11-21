@@ -6,6 +6,7 @@
 #include "VLightCurveData.h"
 
 #include "TF1.h"
+#include "TGraphAsymmErrors.h"
 #include "TRandom.h"
 
 #include <iostream>
@@ -56,6 +57,7 @@ class VLightCurveUtilities
     double getMeanObservationInterval();
     double getPhase( double iMJD );
     double getPhaseError( double iMJD );
+    double getVariabilityIndex( TGraphAsymmErrors *g, double iSystematicFraction = 0. );
     bool   getXRTTimeSettings() { return fXRTTimeSettings; }
     bool   isZombie() { return fIsZombie; }
     void   printLightCurve( bool bFullDetail = true );

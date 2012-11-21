@@ -17,6 +17,7 @@
 
 #include "TCanvas.h"
 #include "TGraph.h"
+#include "TGraphAsymmErrors.h"
 #include "TH1F.h"
 #include "TLegend.h"
 
@@ -378,7 +379,6 @@ inline double interpolate( double w1, double ze1, double w2, double ze2, double 
 
      return 0.;
   }
-
 
 }
 #endif

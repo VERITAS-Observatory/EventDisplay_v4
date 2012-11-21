@@ -52,6 +52,8 @@ class VPlotUtilities
 {
     protected:
 
+	int    fPlottingCanvasX;
+	int    fPlottingCanvasY;
         int    fPlottingColor;
         int    fPlottingMarkerStyle;
         double fPlottingMarkerSize;
@@ -77,6 +79,8 @@ class VPlotUtilities
 
         TGaxis* getColorAxisAxis( double x1 = 0.9, double x2 = 0.93, double y1 = 0.7, double y2 = 0.95, string AxisTitle = "", Int_t ndiv = 10, string iOption = "+L" );
 	VPlottingAxisData* getPlottingAxis( string iName );
+	int    getPlottingCanvasX() { return fPlottingCanvasX; }
+	int    getPlottingCanvasY() { return fPlottingCanvasY; }
 	int    getPlottingColor() { return fPlottingColor; }
 	int    getPlottingMarkerStyle() { return fPlottingMarkerStyle; }
 	double getPlottingMarkerSize() { return fPlottingMarkerSize; }
@@ -85,6 +89,7 @@ class VPlotUtilities
 	int    getPlottingFillStyle() { return fPlottingFillStyle; }
         int    getColorAxisColor( double iV );
 	unsigned int listPlottingAxis();
+	void   setCanvasSize( double x = 600, double y = 400 ) { fPlottingCanvasX = x; fPlottingCanvasY = y; }
         void   setColorAxisDataVector_minmax( double imin = 0., double imax = 0. );
         void   setColorAxisPalette( int palette = 1, int ncolors = 100 );
 	void   setArrowPlottingStyle( TArrow *iArr );
@@ -106,6 +111,6 @@ class VPlotUtilities
 	void   setBlackAndWhitePalette();
 	TH2D*  removeOuterRing( TH2D *h, double r, double ivalue );
 
-        ClassDef(VPlotUtilities,7);
+        ClassDef(VPlotUtilities,8);
 };
 #endif
