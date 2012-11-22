@@ -116,7 +116,7 @@ void VDataMCComparision::defineHistograms()
    if( bBckData ) vmax = 20.;
    else           vmax = 10.;
    sprintf( hname, "hMSCW_%s", fName.c_str() );
-   hMSCW = new TH1D( hname, "", 100, -5., vmax );
+   hMSCW = new TH1D( hname, "", 500, -5., vmax );
    hMSCW->SetXTitle( "mean scaled width [deg]" );
    hMSCW->Sumw2();
    hisList->Add( hMSCW );
@@ -124,7 +124,7 @@ void VDataMCComparision::defineHistograms()
    if( bBckData ) vmax = 20.;
    else           vmax = 10.;
    sprintf( hname, "hMSCL_%s", fName.c_str() ); 
-   hMSCL = new TH1D( hname, "", 100, -5., vmax );
+   hMSCL = new TH1D( hname, "", 500, -5., vmax );
    hMSCL->SetXTitle( "mean scaled length [deg]" );
    hMSCL->Sumw2();
    hisList->Add( hMSCL );
@@ -132,7 +132,7 @@ void VDataMCComparision::defineHistograms()
    if( bBckData ) vmax = 20.;
    else           vmax = 10.;
    sprintf( hname, "hMSCWErec_%s", fName.c_str() );
-   hMSCWErec = new TH2D( hname, "",  6, -1., 1., 100, -5., vmax );
+   hMSCWErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
    hMSCWErec->SetYTitle( "mean scaled width [deg]" );
    hMSCWErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
    hMSCWErec->Sumw2();
@@ -141,7 +141,7 @@ void VDataMCComparision::defineHistograms()
    if( bBckData ) vmax = 20.;
    else           vmax = 10.;
    sprintf( hname, "hMSCLErec_%s", fName.c_str() );
-   hMSCLErec = new TH2D( hname, "",  6, -1., 1., 100, -5., vmax );
+   hMSCLErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
    hMSCLErec->SetYTitle( "mean scaled length [deg]" );
    hMSCLErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
    hMSCLErec->Sumw2();
