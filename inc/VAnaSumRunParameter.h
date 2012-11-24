@@ -206,6 +206,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         void printStereoParameter( unsigned int icounter );
         void printStereoParameter( int irun );
         int  readRunParameter( string i_filename );
+	bool setSkyMapCentreJ2000( unsigned int i, double ra, double dec );
         bool setTargetRADecJ2000( unsigned int i, double ra, double dec );
         bool setTargetRADec( unsigned int i, double ra, double dec );
         bool setTargetShifts( unsigned int i, double west, double north, double ra, double dec );

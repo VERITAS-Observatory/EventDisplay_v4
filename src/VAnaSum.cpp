@@ -575,7 +575,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
     doLightCurves( idir, i_norm_alpha, fStereoOn, fStereoOff );
 
 // fill run summary tree
-    fillRunSummary( onrun, offrun, iexp_on, iexp_off, i_nevts_on, i_nevts_off, i_norm_alpha, i_sig, i_rate, i_rateOFF, fstereo_onoff   );
+    fillRunSummary( onrun, offrun, iexp_on, iexp_off, i_nevts_on, i_nevts_off, i_norm_alpha, i_sig, i_rate, i_rateOFF, fstereo_onoff );
 
 /////////////////////////////////////////////////////////
 // finalize and write everything to disk
@@ -934,7 +934,9 @@ void VAnaSum::copyDirectory( TDirectory *source )
    - one entry for combined analysis
 
 */
-void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off, double i_nevts_on, double i_nevts_off, double i_norm_alpha, double i_sig, double i_rate, double i_rateOFF, VOnOff *fstereo_onoff )
+void VAnaSum::fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off, 
+                              double i_nevts_on, double i_nevts_off, double i_norm_alpha,
+			      double i_sig, double i_rate, double i_rateOFF, VOnOff *fstereo_onoff )
 {
     if( !fRunSummary ) return;
 

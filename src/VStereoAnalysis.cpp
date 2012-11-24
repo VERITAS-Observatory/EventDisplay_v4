@@ -1128,7 +1128,7 @@ void VStereoAnalysis::defineAstroSource()
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000 + i_decDiff;
       	}
 // from runparameter file: set the sky map centre in J2000 (probably the usual/default case)
-      	if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000  ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreDecJ2000 ) )
+      	else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000  ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreDecJ2000 ) )
       	{
       		fRunPara->fRunList[i].fSkyMapCentreRAJ2000 = fRunPara->fSkyMapCentreRAJ2000;
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
@@ -1139,6 +1139,14 @@ void VStereoAnalysis::defineAstroSource()
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreWest ) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreWest = 0.;
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreNorth) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreNorth = 0.;
       	}
+// if not set in runparameter file: set to target direction
+	else
+	{
+	   fRunPara->fRunList[i].fSkyMapCentreRAJ2000 = fRunPara->fRunList[i].fTargetRAJ2000;
+	   fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000;
+	   fRunPara->fSkyMapCentreRAJ2000 = fRunPara->fRunList[i].fSkyMapCentreRAJ2000;
+	   fRunPara->fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fSkyMapCentreDecJ2000;
+        }
 
 /////////////////////////////////////////////////////////
 // from runparameter file: set and get target shifts
@@ -1207,18 +1215,27 @@ void VStereoAnalysis::defineAstroSource()
 	VSkyCoordinatesUtilities::precessTarget( 51544., i_raWobble, i_decWobble, iMJD, true );
 	double i_WobbleJ2000_West = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
 										  i_raWobble, i_decWobble ) * -1.;
+	if( TMath::Abs( i_WobbleJ2000_West ) < 1.e-4 ) i_WobbleJ2000_West = 0.;
 	double i_WobbleJ2000_North = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
 										    i_raWobble, i_decWobble ); 
+	if( TMath::Abs( i_WobbleJ2000_North ) < 1.e-4 ) i_WobbleJ2000_North = 0.;
 // modify wobble offsets for centering of sky maps
       	fRunPara->fRunList[i].fWobbleNorthMod = i_WobbleJ2000_North - fRunPara->fRunList[i].fSkyMapCentreNorth;
       	fRunPara->fRunList[i].fWobbleWestMod  = i_WobbleJ2000_West  - fRunPara->fRunList[i].fSkyMapCentreWest;
+
+// fill run parameter values
+        fRunPara->setTargetRADecJ2000( i, fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000 );
+// TODO TODO target shift not calculated yet
+	fRunPara->setTargetShifts( i, fRunPara->fRunList[i].fTargetShiftWest, fRunPara->fRunList[i].fTargetShiftNorth,
+	                              fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+        fRunPara->setSkyMapCentreJ2000( i, fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
 
 ///////////////////////////////////////////////////////////////////
 // some printout
       	if( fIsOn )
       	{
       		cout << "\tWobble offsets (currE): N: " << fRunPara->fRunList[i].fWobbleNorth << " W: " << fRunPara->fRunList[i].fWobbleWest;
-		cout << ",  RA " << i_raDiff << ", " << i_decDiff << endl;
+		cout << ",  RA " << i_raDiff << ", Dec " << i_decDiff << endl;
       		cout << "\tWobble offsets (J2000): N: " << i_WobbleJ2000_North << " W: " << i_WobbleJ2000_West << endl;
       		cout << "\tSky maps centred at (ra,dec (J2000)) (" << fRunPara->fRunList[i].fSkyMapCentreRAJ2000 << ", " << fRunPara->fRunList[i].fSkyMapCentreDecJ2000 << ")";
 		cout << "\tTelescopes pointing to: (ra,dec (J2000)) (" << i_raWobble << ", " << i_decWobble << ")" << endl;

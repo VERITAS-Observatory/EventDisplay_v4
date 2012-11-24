@@ -158,19 +158,15 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
     is.open(i_filename.c_str(),ifstream::in);
     if(!is)
     {
-        const char *evn_dir = gSystem->Getenv( "EVNDISPSYS" );
-        if( evn_dir )
-        {
-           string itemp = evn_dir;
-           itemp += "/" + i_filename;
-           is.open(itemp.c_str(),ifstream::in);
-	   if(!is)
-	   {
-		cout << "no file found to read run parameters: " << i_filename << endl;
-		exit( 0 );
-           }
-           i_filename = itemp;
-       }
+	string itemp = getDirectory_EVNDISPParameterFiles();
+	itemp += "/" + i_filename;
+	is.open(itemp.c_str(),ifstream::in);
+	if(!is)
+	{
+	     cout << "no file found to read run parameters: " << itemp << endl;
+	     exit( 0 );
+	}
+	i_filename = itemp;
     }
     cout << "Reading anasum parameters from " << i_filename << " :" << endl;
     cout << endl;
@@ -650,7 +646,7 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         cout << "\t " << fRunList[i].fTarget << ", wobble: (N" << fRunList[i].fWobbleNorth << ", W" << fRunList[i].fWobbleWest << ")";
         cout << ", stereo maps centred at (ra,dec) (" << fSkyMapCentreRAJ2000 << ", " << fSkyMapCentreDecJ2000 << ")";
         cout << ", target shift: (N" << fRunList[i].fTargetShiftNorth << ", W" << fRunList[i].fTargetShiftWest << ")";
-	cout << " RA/DECJ2000 [" << fRunList[i].fTargetShiftRAJ2000 << ", " << fRunList[i].fTargetShiftDecJ2000 << "]" <<  endl;
+	cout << " (RA/DEC)_J2000 [" << fRunList[i].fTargetShiftRAJ2000 << ", " << fRunList[i].fTargetShiftDecJ2000 << "]" <<  endl;
         if( fExcludeFromBackground_North.size() > 0 && fExcludeFromBackground_West.size() > 0 && fExcludeFromBackground_Radius.size() > 0 )
         {
             cout << "\t region excluded from background estimation: " << endl;
@@ -872,6 +868,22 @@ bool VAnaSumRunParameter::setTargetShifts( unsigned int i, double west, double n
         return true;
     }
     return false;
+}
+
+bool VAnaSumRunParameter::setSkyMapCentreJ2000( unsigned int i, double ra, double dec )
+{
+   if( i < fRunList.size() )
+   {
+      fRunList[i].fSkyMapCentreRAJ2000  = ra;
+      fRunList[i].fSkyMapCentreDecJ2000 = dec;
+      if( fMapRunList.find( fRunList[i].fRunOn ) != fMapRunList.end() )
+      {
+	 fMapRunList[fRunList[i].fRunOn].fSkyMapCentreRAJ2000  = ra;
+	 fMapRunList[fRunList[i].fRunOn].fSkyMapCentreDecJ2000 = dec;
+      }
+      return true;
+   }
+   return false;
 }
 
 
