@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -19,10 +20,12 @@ using namespace std;
 
 namespace VUtilities
 {
+   unsigned int count_number_of_textblocks( string );
    string lowerCase(string& s);
    string upperCase(string& s);
    string removeSpaces( string );
    string remove_leading_spaces( string );
+   string trim_spaces( string, string whitespace = " \t" );
 
    template<class Seq> void purge( Seq& c );
 

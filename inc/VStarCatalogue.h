@@ -15,6 +15,7 @@
 
 #include "VASlalib.h"
 #include "VGlobalRunParameter.h"
+#include "VStar.h"
 #include "VUtilities.h"
 
 #include <fstream>
@@ -27,52 +28,21 @@
 
 using namespace std;
 
-struct sStar
-{
-    unsigned int fStarID;
-    string fStarName;
-    double fDec2000;
-    double fRA2000;
-    double fDecCurrentEpoch;
-    double fRACurrentEpoch;
-    double fRunGalLong1958;
-    double fRunGalLat1958;
-    double fBrightness_V;
-    double fBrightness_B;
-    double fMajorDiameter;                        // this is either the source diameter or the possitional error
-    double fMinorDiameter;
-    double fPositionAngle;
-    double fMajorDiameter_68;
-    double fMinorDiameter_68;
-    double fPositionAngle_68;
-    double fSignificance;
-    double fSpectralIndex;
-    double fSpectralIndexError;
-    vector< double > fFluxEnergyMin;
-    vector< double > fFluxEnergyMax;
-    vector< double > fFlux;
-    vector< double > fFluxError;
-    bool   fVariability;
-    vector< string > fOtherNames;
-    string fType;
-    vector< string > fAssociations;
-    int fQualityFlag;
-};
-
-class VStarCatalogue : public TObject, public VGlobalRunParameter 
+class VStarCatalogue : public TObject, public VGlobalRunParameter
 {
     private:
         bool   fDebug;
 
         string fCatalogue;
-        unsigned fCatalogueVersion;
+        unsigned int fCatalogueVersion;
 
-        vector< sStar > fStars;
-        vector< sStar > fStarsinFOV;
+        vector< VStar* > fStars;
+        vector< VStar* > fStarsinFOV;
 
         bool readCatalogue();
-        sStar readCommaSeparatedLine_Fermi( string, int );
-        sStar readCommaSeparatedLine_Fermi_Catalogue( string, int );
+        VStar* readCommaSeparatedLine_Fermi( string, int, VStar* );
+        VStar* readCommaSeparatedLine_Fermi_Catalogue( string, int, VStar* );
+        bool   readVERITASsourcesfromDB( string );
 
     public:
 
@@ -83,6 +53,7 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 
 //    void          getStar( unsigned int ID, double &dec, double &ra, double &brightness );
         unsigned int  getNStar() { return fStars.size(); }
+	VStar*        getStar( unsigned int ID );
         double        getStarBrightness( unsigned int ID, string iBand = "B" );
         string        getStarCatalogueName() { return fCatalogue; }
         unsigned int  getStarID( unsigned int ID );
@@ -102,17 +73,18 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
         vector< string > getStarOtherNames( unsigned int ID );
 	string        getStarType( unsigned int ID );
 	vector< string > getStarAssociations( unsigned int ID );
-        vector< sStar > getListOfStars() { return fStars; }
-        vector< sStar > getListOfStarsinFOV() { return fStarsinFOV; }
+        vector< VStar* > getListOfStars() { return fStars; }
+        vector< VStar* > getListOfStarsinFOV() { return fStarsinFOV; }
         void          printCatalogue( unsigned int i_nRows = 0, double iMinBrightness = 999999., string iBand = "B" );
         void          printStarsInFOV();
         void          printStarsInFOV( double iMinBrightness, string iBand = "B" );
         void          purge();
-        bool          readVERITASsources( string );
         unsigned int  setFOV( double ra_deg, double dec_deg, double FOV_x, double FOV_y, bool bJ2000 = true );
         unsigned int  setFOV( string ra_hour, string dec, double FOV_x, double FOV_y, bool bJ2000 = true );
         bool          writeCatalogueToRootFile( string iRootFile );
 
-        ClassDef(VStarCatalogue,3);
+	bool          checkTextBlocks( string iL, unsigned int iV );
+
+        ClassDef(VStarCatalogue,5);
 };
 #endif

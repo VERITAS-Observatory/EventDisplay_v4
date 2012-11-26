@@ -1271,64 +1271,66 @@ void VStereoAnalysis::defineAstroSource()
 // (all in J2000)
       	if( fIsOn )
       	{
-      		fAstro.back()->initStarCatalogue( fRunPara->fStarCatalogue, iMJD, fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, 
-						  fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax, 
-						  fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
-		VStarCatalogue *iStarCatalogue = fAstro.back()->getStarCatalogue();
-		if( !iStarCatalogue )
-		{
-		   cout << "VStereoAnalysis::defineAstroSource() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
-		   cout << "exiting..." << endl;
-		   exit( -1 );
-                }
+	    fAstro.back()->initStarCatalogue( fRunPara->fStarCatalogue, iMJD, fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, 
+					      fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax, 
+					      fRunPara->fRunList[i].fSkyMapCentreRAJ2000, fRunPara->fRunList[i].fSkyMapCentreDecJ2000 );
+	    VStarCatalogue *iStarCatalogue = fAstro.back()->getStarCatalogue();
+	    if( !iStarCatalogue )
+	    {
+	       cout << "VStereoAnalysis::defineAstroSource() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
+	       cout << "exiting..." << endl;
+    	       exit( -1 );
+	    }
 // remove double entries
-      		iStarCatalogue->purge();
-      		if( iStarCatalogue->getListOfStarsinFOV().size() > 0 )
-      		{
-      			cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
-      			cout << fRunPara->fStarExlusionRadius << " deg) in field of view (J2000): " << endl;
-      			cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
-      			double i_brightness = 100.;
-      			for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
-      			{
-      				if( fRunPara->fStarBand == "V" )      i_brightness = iStarCatalogue->getListOfStarsinFOV()[i].fBrightness_V;
-      				else if( fRunPara->fStarBand == "B" ) i_brightness = iStarCatalogue->getListOfStarsinFOV()[i].fBrightness_B;
+	    iStarCatalogue->purge();
+	    if( iStarCatalogue->getListOfStarsinFOV().size() > 0 )
+	    {
+		 cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
+		 cout << fRunPara->fStarExlusionRadius << " deg) in field of view (J2000): " << endl;
+		 cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
+		 double i_brightness = 100.;
+		 for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
+		 {
+		    if( !iStarCatalogue->getListOfStarsinFOV()[i] ) continue;
 
-      				if( i_brightness < fRunPara->fStarMinBrightness )
-      				{
-				     cout << "\t\t" << iStarCatalogue->getListOfStarsinFOV()[i].fStarID << "\t";
-				     cout << iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 << "\t";
-				     cout << iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 << "\t";
-				     cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
-				     cout << endl;
+		    if( fRunPara->fStarBand == "V" )      i_brightness = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
+		    else if( fRunPara->fStarBand == "B" ) i_brightness = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
+
+		    if( i_brightness < fRunPara->fStarMinBrightness )
+		    {
+			 cout << "\t\t" << iStarCatalogue->getListOfStarsinFOV()[i]->fStarID << "\t";
+			 cout << iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000 << "\t";
+			 cout << iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000 << "\t";
+			 cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
+			 cout << endl;
 // add this to set of exclusion regions
-				     if( fRunPara->fStarExlusionRadius > 0. )
-				     {
-// check if this region is already excluded
-				       bool b_isExcluded = false;
-				       for( unsigned int e = 0; e < fRunPara->fExcludeFromBackground_StarID.size(); e++ )
-				       {
-					    if( fRunPara->fExcludeFromBackground_StarID[e] >= 0
-					     && fRunPara->fExcludeFromBackground_StarID[e] == (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID )
-					    {
-					       b_isExcluded = true;
-					    }
-				       }
-				       if( !b_isExcluded )
-				       {
-					    fRunPara->fExcludeFromBackground_RAJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fRA2000 );
-					    fRunPara->fExcludeFromBackground_DecJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i].fDec2000 );
-					    fRunPara->fExcludeFromBackground_Radius.push_back( fRunPara->fStarExlusionRadius );
-					    fRunPara->fExcludeFromBackground_North.push_back( 0. );
-					    fRunPara->fExcludeFromBackground_West.push_back( 0. );
-					    fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i].fStarID );
-				       }
-				  }
-			     }
-      			}
-      		}
-      		iStarCatalogue->purge();
-      	}
+			 if( fRunPara->fStarExlusionRadius > 0. )
+			 {
+// check if this region is already excluded (avoid dublications)
+			   bool b_isExcluded = false;
+			   for( unsigned int e = 0; e < fRunPara->fExcludeFromBackground_StarID.size(); e++ )
+			   {
+				if( fRunPara->fExcludeFromBackground_StarID[e] >= 0
+				 && fRunPara->fExcludeFromBackground_StarID[e] == (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID )
+				{
+				   b_isExcluded = true;
+				}
+			   }
+			   if( !b_isExcluded )
+			   {
+				fRunPara->fExcludeFromBackground_RAJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000 );
+				fRunPara->fExcludeFromBackground_DecJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000 );
+				fRunPara->fExcludeFromBackground_Radius.push_back( fRunPara->fStarExlusionRadius );
+				fRunPara->fExcludeFromBackground_North.push_back( 0. );
+				fRunPara->fExcludeFromBackground_West.push_back( 0. );
+				fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID );
+			   }
+		      }
+		 }
+	    }
+	  }
+	  iStarCatalogue->purge();
+     }
 // doesn't work if different sources are analyzed with RA <> 360 deg
 /////////////////////////////////////////////////////////
 // set and get the regions to exclude

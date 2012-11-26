@@ -302,6 +302,7 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VSkyCoordinates.o \
 		./obj/VTargets.o \
 		./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
+		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VTrackingCorrections.o \
 		./obj/CorrectionParameters.o \
 		./obj/Angle.o \
@@ -466,6 +467,7 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter_Dict.o ./obj/VTargets.o ./obj/VASlalib.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
@@ -497,6 +499,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
 		./obj/VEnergySpectrum.o ./obj/VEnergySpectrum_Dict.o \
 		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+		./obj/VStar.o ./obj/VStar_Dict.o \
 		./obj/VASlalib.o ./obj/VASlalib_Dict.o \
 		./obj/Ctelconfig.o \
 		./obj/VSkyCoordinatesUtilities.o ./obj/VSkyCoordinatesUtilities_Dict.o \
@@ -665,6 +668,7 @@ COMPAREDATAMCOBJ=	./obj/VTargets.o \
 			./obj/VSkyCoordinates.o \
 			./obj/VSkyCoordinatesUtilities.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+		   	./obj/VStar.o ./obj/VStar_Dict.o \
 			./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VUtilities.o \
@@ -906,6 +910,7 @@ VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 
 VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 				./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+				./obj/VStar.o ./obj/VStar_Dict.o \
 				./obj/VExposure.o ./obj/VExposure_Dict.o \
 				./obj/VASlalib.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -922,6 +927,7 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 
 VTS.getLaserRunFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+			./obj/VStar.o ./obj/VStar_Dict.o \
 			./obj/VDBRunInfo.o \
 			./obj/VASlalib.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
@@ -939,6 +945,7 @@ VTS.getLaserRunFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 
 VTS.getRunListFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+			./obj/VStar.o ./obj/VStar_Dict.o \
 			./obj/VExposure.o ./obj/VExposure_Dict.o \
 			./obj/VASlalib.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \

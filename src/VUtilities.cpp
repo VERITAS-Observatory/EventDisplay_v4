@@ -123,6 +123,23 @@ string VUtilities::remove_leading_spaces( string stringIn )
 
 /*
 
+   remove leading and trailing spaces
+
+*/
+string VUtilities::trim_spaces( string str, string whitespace )
+{
+   const size_t strBegin = str.find_first_not_of(whitespace);
+   if (strBegin == std::string::npos) return ""; // no content
+
+   const size_t strEnd = str.find_last_not_of(whitespace);
+   const size_t strRange = strEnd - strBegin + 1;
+
+   return str.substr(strBegin, strRange);
+}
+
+
+/*
+
    search and replace a certain letter in a string
 
 */
@@ -172,4 +189,18 @@ double VUtilities::line_point_distance (double x1, double y1, double z1, double 
     return sqrt(a/b);
 }
 
+unsigned int VUtilities::count_number_of_textblocks( string str )
+{
+   str = trim_spaces( str );
 
+   unsigned int z = 0;
+   string iTemp;
+   istringstream is_stream( str );
+   while( !is_stream.eof() )
+   {
+      is_stream >> iTemp;
+      z++;
+   }
+
+   return z;
+}
