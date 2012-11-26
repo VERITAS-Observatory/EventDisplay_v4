@@ -89,7 +89,7 @@ class VPlotUtilities
 	int    getPlottingFillStyle() { return fPlottingFillStyle; }
         int    getColorAxisColor( double iV );
 	unsigned int listPlottingAxis();
-	void   setCanvasSize( double x = 600, double y = 400 ) { fPlottingCanvasX = x; fPlottingCanvasY = y; }
+	void   setCanvasSize( int x = 600, int y = 400 ) { fPlottingCanvasX = x; fPlottingCanvasY = y; }
         void   setColorAxisDataVector_minmax( double imin = 0., double imax = 0. );
         void   setColorAxisPalette( int palette = 1, int ncolors = 100 );
 	void   setArrowPlottingStyle( TArrow *iArr );
@@ -111,6 +111,6 @@ class VPlotUtilities
 	void   setBlackAndWhitePalette();
 	TH2D*  removeOuterRing( TH2D *h, double r, double ivalue );
 
-        ClassDef(VPlotUtilities,8);
+        ClassDef(VPlotUtilities,9);
 };
 #endif
