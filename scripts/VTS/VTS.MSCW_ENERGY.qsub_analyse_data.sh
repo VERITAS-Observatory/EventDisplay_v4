@@ -25,9 +25,7 @@ mkdir -p $ODIR
 chmod -R g+w $ODIR
 
 # output log files are written to this directory
-set LDIR=$DDIR/RecID$RECID/
-mkdir -p $LDIR
-
+set LDIR=$ODIR
 
 #################################
 # run analysis
