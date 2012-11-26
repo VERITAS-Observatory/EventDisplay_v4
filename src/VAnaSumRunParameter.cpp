@@ -119,7 +119,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
     fEnergyEffectiveAreaSmoothingThreshold = -1.;
 
 // star catalogue
-    fStarCatalogue = "../eventdisplay/astro/BrightStarCatalogue.txt";
+    fStarCatalogue = "Hipparcos_MAG8_1997.dat";
 // minimum brightness of stars
     fStarMinBrightness = 6.;
     fStarBand = "B";

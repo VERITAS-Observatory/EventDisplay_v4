@@ -114,7 +114,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    TCanvas*        plot_radec( int sPlot = 0, double rmax = -3., double zmin = -5., double zmax = -1000.,
                                double xcenter = 0., double ycenter = 0.,
 			       bool bSlices = false, double fSliceXmin = -0.1, double fSliceXmax = 0.1, bool bProjX = true );
-   vector<sSource> plot_catalogue( TCanvas *c, string iCatalogue = "BrightStarCatalogue.txt",
+   vector<sSource> plot_catalogue( TCanvas *c, string iCatalogue = "Hipparcos_MAG8_1997.dat",
                                    double iMaxBrightness = 6.5, string iBand = "B", double iStarRadius = 0.15,
 				   int iColor = 1, int iLineStyle = 1, string hSkyMapName = "hmap_stereo_sig_REFLECTED",
 				   double iTextAngle = 45., int iMarkerStyle = 5 ); 

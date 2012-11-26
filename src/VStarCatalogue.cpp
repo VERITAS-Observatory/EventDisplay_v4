@@ -14,7 +14,7 @@ VStarCatalogue::VStarCatalogue()
 {
     fDebug = false;
 
-    fCatalogue = "BrightStarCatalogue.txt";
+    fCatalogue = "Hipparcos_MAG8_1997.dat";
     fCatalogueVersion = 0;
 }
 

@@ -68,7 +68,7 @@ void VPlotAnasumHistograms::help()
     cout << "   plot 1D distribution of signifcances in sky maps" << endl << endl;
     cout << "plot_radec( int sPlot = 0, double rmax = -3., double zmin = -5., double zmax = -1000., double xcenter = 0., double ycenter = 0., bool bDrawSource = true, bool bSlices = false, double fSliceXmin = -0.1, double fSliceXmax = 0.1, bool bProjX = true )" << endl;
     cout << "   plot skymap" << endl << endl;
-    cout << "plot_catalogue( TCanvas *c, string iCatalogue = Catalogues/BrightStarCatalogue.txt, double iMaxBrightness = 6.5, string iBand = B, int iColor = 1, int iLineStyle = 1, string hSkyMapName = hmap_stereo_sig_REFLECTED, double iTextAngle = 45., int iMarkerStyle = 5 )"<< endl;
+    cout << "plot_catalogue( TCanvas *c, string iCatalogue = \"Hipparcos_MAG8_1997.dat\", double iMaxBrightness = 6.5, string iBand = B, int iColor = 1, int iLineStyle = 1, string hSkyMapName = hmap_stereo_sig_REFLECTED, double iTextAngle = 45., int iMarkerStyle = 5 )"<< endl;
     cout << "   plot the stars from a given magnitude and catalogue on top of the skymap" << endl << endl;
     cout << "plot_RBM_ring(double r, double iA, double t2, double iN)" << endl;
     cout << "   plot the ring background" << endl << endl;
