@@ -123,7 +123,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
    fMJD_Data_min = iMJDMin;
    fMJD_Data_max = iMJDMax;
 
-   fFluxCalculation.calculateIntegralFlux( fEnergy_min_TeV, true );
+   fFluxCalculation.calculateIntegralFlux( fEnergy_min_TeV );
 
    fRunList  = fFluxCalculation.getRunList();
    fNon      = fFluxCalculation.getNOn( -1 );
@@ -140,7 +140,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
 
    if( fEnergy_max_TeV > 0. )
    {
-      fFluxCalculation.calculateIntegralFlux( fEnergy_max_TeV, true );
+      fFluxCalculation.calculateIntegralFlux( fEnergy_max_TeV );
       double iFlux = 0.;
       double iFluxE = 0.;
       double iFluxUL = 0.;

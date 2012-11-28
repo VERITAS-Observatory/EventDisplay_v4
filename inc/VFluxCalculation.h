@@ -147,7 +147,7 @@ class VFluxCalculation : public TObject
         void   closeFiles();
         double getFluxInCrabUnits( double iF, double iE, double iGamma = 2.49 );
         double getFluxInErgs( double iF, double iE );
-        void   getIntegralEffectiveArea( bool bAMC = true );
+        void   getIntegralEffectiveArea();
         void   getNumberOfEventsAboveEnergy( double iMinEnergy );
 	double integrateEffectiveAreaInterval( double x0, double x1, double x2, double ieff_mean );
         bool   openDataFile( string ifile );
@@ -163,7 +163,7 @@ class VFluxCalculation : public TObject
         VFluxCalculation( vector< string > ifile, unsigned int iTot, int iRunMin = 0, int iRunMax = 100000, double iMJDMin = -99., double iMJDMax = -99. );
        ~VFluxCalculation();
 
-        void          calculateIntegralFlux( double iMinEnergy_TeV, bool bAMC = true );
+        void          calculateIntegralFlux( double iMinEnergy_TeV );
 	TCanvas*      getFluxesVSMJDCanvas() { return fCanvasFluxesVSMJD; }
         TGraphErrors* plotFluxesVSMJD( char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false );
 	TGraphErrors* plotFluxesInBINs( int run = -1, char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false );
@@ -205,6 +205,6 @@ class VFluxCalculation : public TObject
         void          setTimeBinnedAnalysis( bool iB = true ) { fTimebinned = iB; }
         void          writeResults( char *ifile );
 
-        ClassDef(VFluxCalculation,9);
+        ClassDef(VFluxCalculation,10);
 };
 #endif

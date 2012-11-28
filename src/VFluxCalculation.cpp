@@ -369,11 +369,9 @@ double VFluxCalculation::integrateEffectiveAreaInterval( double x0, double x1, d
 
     < A (E) > = INT_{E}^{INF} A(E) (E/E_0)^{-fAlpha} dE
 
-    \param bAMC = true:  use effective areas vs true energy
-    \param bAMC = false: use effective areas vs reconstructed energy
 
 */
-void VFluxCalculation::getIntegralEffectiveArea( bool bAMC )
+void VFluxCalculation::getIntegralEffectiveArea()
 {
     if( fDebug )
     {
@@ -411,23 +409,25 @@ void VFluxCalculation::getIntegralEffectiveArea( bool bAMC )
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // graphs with mean effective areas (mean for given run; filled in anasum)
 /////////////////////////////////////////////////////////////////////////////////////////////////
-            if( bAMC ) sprintf( hname, "gMeanEffectiveAreaEMC" );
-            else       sprintf( hname, "gMeanEffectiveAreaErec" );
-            TGraphAsymmErrors *g = (TGraphAsymmErrors*)gDirectory->Get( hname );
+            TGraphAsymmErrors *g = (TGraphAsymmErrors*)gDirectory->Get( "gMeanEffectiveArea" );
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // found graph with effective areas
             if( !g )
             {
 // try go get off graph
-                if( bAMC ) sprintf( hname, "gMeanEffectiveAreaEMC_off" );
-                else       sprintf( hname, "gMeanEffectiveAreaErec_off" );
-                g = (TGraphAsymmErrors*)gDirectory->Get( hname );
+                g = (TGraphAsymmErrors*)gDirectory->Get( "gMeanEffectiveArea_off" );
                 if( !g )
                 {
-                    cout << "error: effective area graph not found" << endl;
-                    cout << "continue..." << endl;
-                    fRunEffArea[i] = 0.;
-                    continue;
+// backwards compatibility to files prodcued with v35x
+                    g = (TGraphAsymmErrors*)gDirectory->Get( "gMeanEffectiveAreaEMC" );
+		    if( !g ) g = (TGraphAsymmErrors*)gDirectory->Get( "gMeanEffectiveAreaEMC_off" );
+		    if( !g )
+		    {
+		       cout << "error: effective area graph not found" << endl;
+		       cout << "continue..." << endl;
+		       fRunEffArea[i] = 0.;
+		       continue;
+                    }
                 }
             }
 
@@ -470,16 +470,12 @@ void VFluxCalculation::getIntegralEffectiveArea( bool bAMC )
 	       vector < double > i_IntraEffArea;
 
 // read effective area graphs for time binned intra run light curves
-	       if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC" );
-	       else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec" );
-	       TGraph2DErrors *g_time = (TGraph2DErrors*)gDirectory->Get( hname );
+	       TGraph2DErrors *g_time = (TGraph2DErrors*)gDirectory->Get( "gTimeBinnedMeanEffectiveArea" );
 // find 2D graph with time dependent effective areas
 	       if( !g_time )
 	       {
 // if not try go get off graph
-		   if( bAMC ) sprintf( hname, "gTimeBinnedMeanEffectiveAreaEMC_off" );
-		   else       sprintf( hname, "gTimeBinnedMeanEffectiveAreaErec_off" );
-		   g_time = (TGraph2DErrors*)gDirectory->Get( hname );
+		   g_time = (TGraph2DErrors*)gDirectory->Get( "gTimeBinnedMeanEffectiveArea_off" );
 		   if( !g_time )
 		   {
 		       cout << "error: 2D effective area graph not found" << endl;
@@ -1286,7 +1282,7 @@ void VFluxCalculation::getFlux( int irun, double& iFlux, double& iFluxE, double&
    use spectral weighted effective areas from getIntegralEffectiveArea()
 
 */
-void VFluxCalculation::calculateIntegralFlux( double iMinEnergy, bool bAMC )
+void VFluxCalculation::calculateIntegralFlux( double iMinEnergy )
 {
     fMinEnergy = iMinEnergy;
 
@@ -1297,7 +1293,7 @@ void VFluxCalculation::calculateIntegralFlux( double iMinEnergy, bool bAMC )
     calculateSignificancesAndUpperLimits();
 
 // calculate integrated spectral weighted effective areas
-    getIntegralEffectiveArea( bAMC );
+    getIntegralEffectiveArea();
 
 // calculate fluxes and upper flux limits
     calculateFluxes();
