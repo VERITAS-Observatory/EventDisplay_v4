@@ -955,6 +955,11 @@ void VReadRunParameter::test_and_adjustParams()
             exit( 0 );
         }
     }
+// muon runs need long tree
+    if( fRunPara->fmuonmode )
+    {
+       fRunPara->fShortTree = false;
+    }
 
 /////////////////////////////////////////////////////////////////
 // check if sourcefile is given
