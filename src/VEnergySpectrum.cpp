@@ -214,6 +214,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
                   }
                }
 	       cout << "WARNING: effective areas not found as expected; reading apparently v35X file" << endl;
+	       cout << "\t --- this version is not completely backwards compatible to v35X --- " << endl;
             }
         }
 
