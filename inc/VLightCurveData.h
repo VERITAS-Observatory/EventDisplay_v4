@@ -54,6 +54,7 @@ class VLightCurveData : public TObject
    double fRunFluxCI_up_1sigma;
    double fRunFluxCI_lo_3sigma;
    double fRunFluxCI_up_3sigma;
+   string fFluxState;
 
 
    VLightCurveData( string iName = "lightcurvedata" );
@@ -74,7 +75,7 @@ class VLightCurveData : public TObject
    void   setFluxError( double iL = 0. );
    void   setMJDInterval( double iMJD_min, double iMJD_max ) { fMJD_min = iMJD_min; fMJD_max = iMJD_max; }
 
-   ClassDef( VLightCurveData, 4 );
+   ClassDef( VLightCurveData, 5 );
 };
 
 class VLightCurveDataLessThan

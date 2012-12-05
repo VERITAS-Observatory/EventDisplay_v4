@@ -76,6 +76,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
    double iTemp1 = 0.;
    double iTemp2 = 0.;
    double iTemp3 = 0.;
+   string iTemp4 = "";
 
    string is_line;
 
@@ -112,7 +113,6 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 	  fLightCurveData.back()->fMJD_Data_min = iTemp1;
 	  if( iTemp2 > 0. && iTemp2 > iTemp1 ) fLightCurveData.back()->fMJD_Data_max = iTemp2;
 	  else                                 fLightCurveData.back()->fMJD_Data_max = iTemp1;
-// TODO: check this
 	  fLightCurveData.back()->setMJDInterval( fLightCurveData.back()->fMJD_Data_min, fLightCurveData.back()->fMJD_Data_max );
        }
 
@@ -138,11 +138,14 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
        iTemp2 *= iFluxMultiplier;
        iTemp3 *= iFluxMultiplier;
 
+       if( !is_stream.eof() ) is_stream >> iTemp4;
+
        if( iTemp2 > 0. && iTemp3 > 0. )
        {
           fLightCurveData.back()->fFlux = iTemp1;
           fLightCurveData.back()->fFluxErrorDown = iTemp3;
           fLightCurveData.back()->fFluxErrorUp   = iTemp2;
+	  fLightCurveData.back()->fFluxState = iTemp4;
        }
 // error < 0 -> upper flux limit
        else if( iTemp1 > 0. && iTemp2 < 0. )
@@ -150,6 +153,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
           fLightCurveData.back()->fUpperFluxLimit = iTemp1;
           fLightCurveData.back()->fFlux = -99.;
           fLightCurveData.back()->setFluxError( -99. );
+	  fLightCurveData.back()->fFluxState = iTemp4;
        }
 
    }

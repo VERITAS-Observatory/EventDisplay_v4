@@ -38,6 +38,7 @@ VLightCurveData::VLightCurveData( string iName )
    fRunFluxCI_up_1sigma = 0.;
    fRunFluxCI_lo_3sigma = 0.;
    fRunFluxCI_up_3sigma = 0.;
+   fFluxState = "";
 }
 
 VLightCurveData::VLightCurveData( const VLightCurveData& p )
@@ -73,6 +74,7 @@ VLightCurveData::VLightCurveData( const VLightCurveData& p )
    fRunFluxCI_up_1sigma = p.fRunFluxCI_up_1sigma; 
    fRunFluxCI_lo_3sigma = p.fRunFluxCI_lo_3sigma;
    fRunFluxCI_up_3sigma = p.fRunFluxCI_up_3sigma;
+   fFluxState = p.fFluxState;
 
 }
 

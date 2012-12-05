@@ -1,8 +1,6 @@
 /*! \class VSpectralEnergyDistribution
     \brief calculate spectral energy distribution
 
-    Revision $Id: VSpectralEnergyDistribution.cpp,v 1.1.2.16.2.3.4.1.4.1.4.1 2011/01/07 10:45:36 gmaier Exp $
-
     (example code)
 
     // create new instance with name "WComae"
@@ -63,7 +61,7 @@ void VSpectralEnergyDistribution::setTimeRange( double iMJDmin, double iMJDmax )
 /*
   read TeV data from an ascii file
 
-  use VEnergySpectrum::printDifferentFluxes( true ); to get this data from your anasum output
+  use VEnergySpectrum::printDifferentialFluxes( true ); to get this data from your anasum output
 
 */
 bool VSpectralEnergyDistribution::readTeVEvndispData( string name, string ifile, bool bPrint, int imarker, int icolor )
@@ -670,7 +668,9 @@ i.  file with wavelengths and zero-points for photometric bands (e.g. $OBS_EVNDI
 ii. file with galactic extinction correction (for dereddening)
 
 */
-TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string ifile, string iband, bool bPrint, int imarker, int icolor, bool bAverage, double iPlotMagnitudeMultiplier, bool bCorrection, string icorfile )
+TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string ifile, string iband, 
+                                                            bool bPrint, int imarker, int icolor, bool bAverage, 
+							    double iPlotMagnitudeMultiplier, bool bCorrection, string icorfile )
 {
 // set up the data structure
     sPhotonFlux i_pF_temp;
@@ -1053,17 +1053,17 @@ TCanvas* VSpectralEnergyDistribution::plot( TCanvas *c, int bLegend, int canvas_
         cSP->SetGridx( 0 );
         cSP->SetGridy( 0 );
         cSP->SetLogy( 1 );
-        if( canvas_x == 400 ) cSP->SetLeftMargin( 0.15 );
+        if( canvas_x <= 600 ) cSP->SetLeftMargin( 0.15 );
         cSP->Draw();
 
         sprintf( hname, "h_%s", fName.c_str() );
         TH1D *hnull = new TH1D( hname, "", 100, log10( fPlotting_EnergyRange_min_Hz ), log10( fPlotting_EnergyRange_max_Hz ) );
         hnull->SetStats( 0 );
         hnull->SetXTitle( "log_{10} #nu [Hz]" );
-        hnull->SetYTitle( "#nu F_{#nu} [erg s^{-1} cm^{-2}]" );
+	hnull->SetYTitle( "#nu F_{#nu} [erg s^{-1} cm^{-2}]" );
         hnull->SetMinimum( fPlotting_FluxRange_min );
         hnull->SetMaximum( fPlotting_FluxRange_max );
-        if( canvas_x == 400 ) hnull->GetYaxis()->SetTitleOffset( 1.6 );
+        if( canvas_x <= 600 ) hnull->GetYaxis()->SetTitleOffset( 1.6 );
         hnull->Draw();
     }
     TLegend *iL = 0;

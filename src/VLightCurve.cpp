@@ -19,6 +19,7 @@ VLightCurve::VLightCurve()
 
    fLightCurveGraph = 0;
    fCanvasLightCurve = 0;
+   fCanvasPhaseDistribution = 0;
    fMCRandomizedPhaseogram = 0;
    fMCRandomizedPhaseogramProf = 0;
 
@@ -763,4 +764,70 @@ bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError
    setPhaseFoldingValues( fPhase_MJD0, iPhase_Period_days_backup, fPhasePlotting );
 
    return true;
+}
+
+/*
+   
+   plot phase distribution for different flux states
+
+*/
+TCanvas* VLightCurve::plotPhaseDistribution( TCanvas* iCanvasPhaseDist, string iCanvasName, string iFluxState, int iColor )
+{
+    char hname[800];
+    char htitle[800];
+
+    cout << "plotPhaseDistribution" << endl;
+
+    TH1D *hPhaseDist = 0;
+
+    if( !iCanvasPhaseDist )
+    {
+       sprintf( hname, "%s", iCanvasName.c_str() );
+       if( fName.size() > 0 ) sprintf( htitle, "phase distribution: %s", fName.c_str() );
+       else                   sprintf( htitle, "phase distribution" );
+
+       fCanvasPhaseDistribution = new TCanvas( hname, htitle, 10, 10, 400, 400 );
+       fCanvasPhaseDistribution->SetGridx( 0 );
+       fCanvasPhaseDistribution->SetGridy( 0 );
+       fCanvasPhaseDistribution->Draw();
+    }
+
+// histograms
+    sprintf( hname, "hPhaseDist_%d_%d_%d_%s", (int)fPhase_MJD0, (int)fPhase_Period_days, (int)fPhasePlotting, iFluxState.c_str() );
+    hPhaseDist = new TH1D( hname, "", 50, 0., 1. );
+    hPhaseDist->SetStats( 0 );
+    hPhaseDist->GetXaxis()->CenterTitle( true );
+    hPhaseDist->SetXTitle( "orbital phase" );
+    hPhaseDist->SetLineColor( iColor );
+
+// fill histogram    
+    for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+    {
+       if( fLightCurveData[i] )
+       {
+           if( iFluxState.size() == 0 || fLightCurveData[i]->fFluxState == iFluxState )
+	   {
+	       hPhaseDist->Fill( fLightCurveData[i]->getPhase() );
+           }
+        }
+    }
+
+    if( !iCanvasPhaseDist )
+    {
+       iCanvasPhaseDist = fCanvasPhaseDistribution;
+
+       iCanvasPhaseDist->cd();
+
+       hPhaseDist->Draw();
+    }
+    else
+    {
+       fCanvasPhaseDistribution = iCanvasPhaseDist;
+
+       iCanvasPhaseDist->cd();
+
+       hPhaseDist->Draw( "same" );
+    }
+
+    return fCanvasPhaseDistribution;
 }
