@@ -57,7 +57,7 @@ VImageAnalyzer::~VImageAnalyzer()
  */
 void VImageAnalyzer::doAnalysis()
 {
-    if( fDebug ) cout << "VImageAnalyzer::doAnalysis() for telescope " << getTelID() << endl;
+    if( fDebug ) cout << "VImageAnalyzer::doAnalysis() for telescope " << getTelID()+1 << endl;
     setDebugLevel( 0 );
 
     getAnalysisTelescopeEventStatus()[getTelID()] = 0;
@@ -643,7 +643,8 @@ void VImageAnalyzer::printTrace( int iChannel )
         }
         catch(...)
         {
-            cout << "VImageAnalyzer::printTrace(), index out of range (fReader->getHitID) " << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
+            cout << "VImageAnalyzer::printTrace(), index out of range (fReader->getHitID) ";
+	    cout << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
             continue;
         }
     }
