@@ -326,6 +326,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fExcludeFromBackground_DecJ2000.push_back( -99. );
                 fExcludeFromBackground_RAJ2000.push_back( 0. );
                 fExcludeFromBackground_StarID.push_back( -1 );
+		fExcludeFromBackground_StarName.push_back( "" );
             }
 
             else if( temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
@@ -340,6 +341,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fExcludeFromBackground_North.push_back( 0. );
                 fExcludeFromBackground_West.push_back( 0. );
                 fExcludeFromBackground_StarID.push_back( -1 );
+		fExcludeFromBackground_StarName.push_back( "" );
             }
 
             else if( temp == "REGIONTOEXCLUDE_RADECJ2000_HOUR" )
@@ -366,6 +368,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fExcludeFromBackground_North.push_back( 0. );
                 fExcludeFromBackground_West.push_back( 0. );
                 fExcludeFromBackground_StarID.push_back( -1 );
+		fExcludeFromBackground_StarName.push_back( "" );
             }
 
             else if( temp == "ENERGYBINSIZE" ) fEnergySpectrumBinSize = atof( temp2.c_str() );
@@ -653,7 +656,10 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
             for( unsigned int l = 0; l < fExcludeFromBackground_North.size(); l++ )
             {
                 cout << "\t       ";
-                cout << (l+1) << ":region to exclude: (N " << fExcludeFromBackground_North[l] << ", W " << fExcludeFromBackground_West[l] << ", R " << fExcludeFromBackground_Radius[l] << ", ID " << fExcludeFromBackground_StarID[l];
+                cout << (l+1) << ":region to exclude: (N " << fExcludeFromBackground_North[l];
+		cout <<                             ", W " << fExcludeFromBackground_West[l];
+		cout << ", R " << fExcludeFromBackground_Radius[l] << ", ID " << fExcludeFromBackground_StarID[l];
+		if( fExcludeFromBackground_StarName[l].size() > 0 ) cout << " (" << fExcludeFromBackground_StarName[l] << ")";
                 if( l <= fExcludeFromBackground_North.size() - 1 ) cout << " )"<< endl;;
             }
         }

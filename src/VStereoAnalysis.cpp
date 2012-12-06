@@ -1302,6 +1302,7 @@ void VStereoAnalysis::defineAstroSource()
 			 cout << iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000 << "\t";
 			 cout << iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000 << "\t";
 			 cout << i_brightness << " (" << fRunPara->fStarBand << " band)";
+			 cout << "    " << iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
 			 cout << endl;
 // add this to set of exclusion regions
 			 if( fRunPara->fStarExlusionRadius > 0. )
@@ -1324,6 +1325,7 @@ void VStereoAnalysis::defineAstroSource()
 				fRunPara->fExcludeFromBackground_North.push_back( 0. );
 				fRunPara->fExcludeFromBackground_West.push_back( 0. );
 				fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID );
+				fRunPara->fExcludeFromBackground_StarName.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fStarName );
 			   }
 		      }
 		 }
