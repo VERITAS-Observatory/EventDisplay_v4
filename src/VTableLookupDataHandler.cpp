@@ -494,7 +494,6 @@ bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain *c )
    }
    TChainElement *chEl = 0;
    TIter next( fileElements );
-   unsigned int z = 0;
    while( (chEl = (TChainElement*)next()) )
    {
      TFile *ifInput = new TFile( chEl->GetTitle() );

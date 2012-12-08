@@ -52,6 +52,8 @@ class VStar : public TObject
 
     double getDistance( VStar* iStar1, VStar *iStar2 = 0 );
     void   printStar();
+
+    ClassDef(VStar,1);
 };
 
 
