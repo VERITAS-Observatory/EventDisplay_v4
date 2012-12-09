@@ -6,6 +6,7 @@
 
 #include "TArrow.h"
 #include "TCanvas.h"
+#include "TF1.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TGraphErrors.h"
@@ -20,6 +21,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "VDifferentialFlux.h"
 
 using namespace std;
 
@@ -101,6 +104,10 @@ class VSpectralEnergyDistribution
 	double   getGalacticExtinctionCorrection( string iband );
         double   getFluxfromMagnitude( double magnitude, string band, string system = "CIT" );
         TGraph* plotModel( TCanvas *c, string ifile, int icolor = 1, int ilinestyle = 1, int ilinewidth = 2, bool isJyHz = false );
+	TF1* plotPowerLaw( TCanvas *c, string iName, double iEMin_TeV, double iEMax_TeV, 
+	                   double iNorm, double iGamma, double iNormEnergy = 1.,
+			   bool bPlotButterfly = false, double iNormError = 0., double iGammaError = 0.,
+			   int iLineColor = 1, int iLineStyle = 1 );
         void printASCII();
         bool readPhotoMetricBands( string ifile = "$OBS_EVNDISP_ANA_DIR/AstroData/Multiwavelengthdata/photometricBands.dat", bool iPrint = true );
 	bool readGalacticExtinction( string ifile, bool iPrint = true );

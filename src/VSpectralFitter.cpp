@@ -30,6 +30,9 @@ VSpectralFitter::VSpectralFitter( string fitname )
 
     (note the fit options)
 
+    print out covariance matrix and correlation coefficient (for dim=2)
+
+
 */
 TF1* VSpectralFitter::fit( TGraph *g, string fitname )
 {
@@ -47,11 +50,37 @@ TF1* VSpectralFitter::fit( TGraph *g, string fitname )
     g->Fit( fFitFunction, "0MNER" );
 
     TVirtualFitter *fitter = TVirtualFitter::GetFitter();
+// covariance matrix
     if( fitter )
     {
        int nPars = fitter->GetNumberFreeParameters();
        TMatrixD* COV = new TMatrixD( nPars, nPars, fitter->GetCovarianceMatrix() );
-       if( COV ) fFitFunction_CovarianceMatrix = COV->GetMatrixArray();
+       if( COV ) 
+       {
+          fFitFunction_CovarianceMatrix = COV->GetMatrixArray();
+	  cout << "Fitter: " << endl;
+	  cout << "\tCovariance matrix ";
+          cout << "(nxn=" << fitter->GetNumberTotalParameters() << "x" << fitter->GetNumberTotalParameters() << "): " << endl;
+	  for( int i = 0; i < fitter->GetNumberTotalParameters(); i++ )
+	  {
+	     for( int j = 0; j < fitter->GetNumberTotalParameters(); j++ )
+	     {
+		cout << "\t" << fitter->GetCovarianceMatrixElement( i, j );
+             }
+	     cout << endl;
+	 }  
+// calculate correlation coefficient
+	 if( fitter->GetNumberTotalParameters() == 2 )
+	 {
+	     if( fitter->GetCovarianceMatrixElement( 0, 0 ) > 0. && fitter->GetCovarianceMatrixElement( 1, 1 ) > 0. )
+	     {
+		double rho = TMath::Abs( fitter->GetCovarianceMatrixElement( 0, 1 ) );
+		rho /= sqrt( fitter->GetCovarianceMatrixElement( 0, 0 )*fitter->GetCovarianceMatrixElement( 1, 1 ) );
+
+                cout << "\tCorrelation coefficient: " << rho << endl;
+              }
+         }
+       }
     }
 
     updateFitFunction_lin();
@@ -201,7 +230,7 @@ double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnerg
 
 /*
 
-   get integral flux from fit function
+   get integral flux error from fit function
 
    iMinEnergy_TeV: threshold for integral flux in TeV (lin axis)
 

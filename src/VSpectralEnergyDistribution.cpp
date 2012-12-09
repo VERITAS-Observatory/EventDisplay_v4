@@ -1248,3 +1248,74 @@ TGraph* VSpectralEnergyDistribution::plotModel( TCanvas *c, string ifile, int ic
 
     return g;
 }
+
+/*!
+  
+   plot a power law function on top of the current canvas
+
+   (differential flux in photons / m^2 / s / TeV)
+
+*/
+TF1* VSpectralEnergyDistribution::plotPowerLaw( TCanvas *c, string iName, double iEMin_TeV, double iEMax_TeV, 
+                                                double iNorm, double iGamma, double iNormEnergy_TeV, 
+						bool bPlotButterfly, double iNormError, double iGammaError,
+						int iLineColor, int iLineStyle )
+{
+   if( !c ) return 0;
+   c->cd();
+
+   VDifferentialFlux i_c;
+
+   TF1 *f = new TF1( iName.c_str(), 
+                     "[0] * TMath::H() * 1.e7 * TMath::Power( 4.14e-27 * TMath::Power( 10., x )/[2], [1] ) * TMath::Power( 10., x )",
+                     log10( i_c.convertEnergy_TeV_to_Hz( iEMin_TeV ) ),
+                     log10( i_c.convertEnergy_TeV_to_Hz( iEMax_TeV ) ) );
+   f->SetParameter( 0, iNorm );
+   f->SetParameter( 1, -1.*iGamma + 1. );
+   f->SetParameter( 2, iNormEnergy_TeV );
+   f->SetLineColor( iLineColor );
+   f->SetLineStyle( iLineStyle );
+
+// plot power law only
+   if( !bPlotButterfly )
+   {
+      f->Draw( "same" );
+   }
+// plot a butterfly taking the error on flux normalization and index into account
+// NOTE: assume that both are uncorrelated; 
+//       if correlated: do not use, error will be underestimated
+//       
+   else
+   {
+      TGraphErrors *g = new TGraphErrors( 1 );
+      g->SetLineColor( iLineColor );
+      g->SetFillColor( iLineColor );
+      for( int i = 0; i < 10; i++ )
+      {
+          double e = TMath::Power( 10., log10(iEMin_TeV) + i * ( log10( iEMax_TeV) - log10( iEMin_TeV ) ) / 10. );
+	  e = i_c.convertEnergy_TeV_to_Hz( e );
+
+	  double fl = f->Eval( log10( e ) );
+
+	  double c1 = TMath::H() * 1.e7 * TMath::Power( 4.14e-27 * e/iNormEnergy_TeV, -1.*iGamma + 1. ) * e;
+	  double c2 = 4.14e-27 * e/iNormEnergy_TeV;
+
+	  double er = 0.;
+
+	  er += c1*c1 * iNormError * iNormError;
+	  er += (iNorm * TMath::H() * 1.e7 * e * log(c2) * TMath::Power( c2, -1.*iGamma + 1. ))
+	       *(iNorm * TMath::H() * 1.e7 * e * log(c2) * TMath::Power( c2, -1.*iGamma + 1. ))
+	       * iGammaError * iGammaError; 
+
+          er = sqrt( er );
+
+          g->SetPoint( i, log10( e ), fl );
+	  g->SetPointError( i, 0., er );
+       } 
+
+       g->Draw( "3" );
+       g->Print();
+   }
+
+   return f;
+}
