@@ -58,15 +58,16 @@ int main( int argc, char *argv[] )
     if( flux->IsZombie() ) return 1;
     flux->setDebug( fDebug); 
     flux->setSignificanceParameters( -5., -5. );
-    flux->calculateIntegralFlux( fMinEnergy, false); 
+    //flux->calculateIntegralFlux( fMinEnergy, false);      //old version
+    flux->calculateIntegralFlux( fMinEnergy); 
     //flux->printResults();
  //calculate upper limits for all runs even when significance >= 3
     VFluxCalculation *fluxUL = new VFluxCalculation( ifile);
     if( fluxUL->IsZombie() ) return 1;
     fluxUL->setDebug( fDebug);
     fluxUL->setSignificanceParameters( 99999, 999999 );
-    fluxUL->calculateIntegralFlux( fMinEnergy, false);
-
+    //fluxUL->calculateIntegralFlux( fMinEnergy, false);      //old version
+    fluxUL->calculateIntegralFlux( fMinEnergy);
 // read run list
     VAnalysisUtilities a;
     a.openFile( fDataFile, -1, true, fDebug );
