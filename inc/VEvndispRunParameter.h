@@ -98,6 +98,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 // calibration (pedestals, gains, etc.)
 	bool   fcalibrationrun;                   // true if this is a pedestal/gain/toff calculation run
         string fcalibrationfile;                  // file with file names for calibration
+	bool freadCalibfromDB;                     // if true, calibration information are read in VOFFLINE DB
+	int freadCalibfromDB_versionquery;         // require a given version of calibration
+	bool freadCalibfromDB_save_file;           // calibration information read from the DB are stored in VGlobalRunParameter::getDirectory_EVNDISPCalibrationData() +/Tel_?
 	string fLowGainCalibrationFile;           // file with file name for low-gain calibration 
 	int fNCalibrationEvents;                  // events to be used for calibration 
         vector< int > fGainFileNumber;
@@ -239,6 +242,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,118);
+        ClassDef(VEvndispRunParameter,119); //(increase this number)
 };
 #endif

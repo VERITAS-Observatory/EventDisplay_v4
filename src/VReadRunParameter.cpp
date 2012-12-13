@@ -186,7 +186,32 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
                 i++;
             }
             else  fRunPara->fcalibrationfile = "";
+	   
         }
+	else if(iTemp.find( "readcalibdb" ) < iTemp.size())
+	{
+	    fRunPara->freadCalibfromDB = true;
+	    
+	    if(iTemp2.size() > 0 ){
+		fRunPara->freadCalibfromDB_versionquery = atoi(iTemp2.c_str());
+	    }else{
+		fRunPara->freadCalibfromDB_versionquery = -111;
+	    }
+
+	}
+	else if(iTemp.find( "readandsavecalibdb" ) < iTemp.size())
+	{
+	    fRunPara->freadCalibfromDB_save_file = true;
+
+	    fRunPara->freadCalibfromDB = true;
+	    
+	    if(iTemp2.size() > 0 ){
+		fRunPara->freadCalibfromDB_versionquery = atoi(iTemp2.c_str());
+	    }else{
+		fRunPara->freadCalibfromDB_versionquery = -111;
+	    }
+ 
+	}
 	else if( iTemp.find( "ignoredstgains" ) < iTemp.size() )
 	{
 	   fRunPara->fIgnoreDSTGains = true;

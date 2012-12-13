@@ -5,6 +5,7 @@
 
 #include <VImageBaseAnalyzer.h>
 #include <VPedestalCalculator.h>
+#include <VDB_CalibrationInfo.h>
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -86,6 +87,8 @@ class VCalibrator : public VImageBaseAnalyzer
         void writePeds( bool iLowGain, VPedestalCalculator *iP );
         void writeTOffsets( bool iLowGain = false  );
 	void writeAverageTZeros( bool iLowGain = false  );
+
+	void readfromVOFFLINE_DB(int gain_or_toff, string &iFile);
 
     public:
         VCalibrator();

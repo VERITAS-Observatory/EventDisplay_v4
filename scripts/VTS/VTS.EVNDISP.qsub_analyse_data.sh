@@ -51,6 +51,15 @@ set OPT=" "
 # use new pixel positions
 # set OPT="-camera=EVN_Upgrade_20121108_v420.txt"
 
+#read gain and toff from VOFFLINE DB
+# set OPT = "-readCalibDB"
+#read gain and toff from VOFFLINE DB requiring a special version of analysis 
+# set OPT = "-readCalibDB version_number"
+# warning this version must already exist in the DB
+#read gain and toff from VOFFLINE DB and save the result of the reading in the directory where the calib file should be (it won't erase what is already there)
+#  set OPT = "-readandsavecalibdb"
+
+
 # run eventdisplay
 rm -f $LDIR/$RUN.log
 ./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $ODIR/$RUN.root $OPT > $LDIR/$RUN.log

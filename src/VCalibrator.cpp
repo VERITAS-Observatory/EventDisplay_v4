@@ -1358,6 +1358,42 @@ string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix )
    return iFileStr.str();
 }
 
+
+void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile){
+
+    int LOW_GAIN = 0;
+    if(gain_or_toff != 1 && gain_or_toff != 2){
+	std::cout<<"ERROR VCalibrator::readfromVOFFLINE_DB: gain_or_toff must be 1 or 2"<<std::endl;
+	return;
+    }
+    
+    iFile+="_DB";
+    if(getRunParameter()->freadCalibfromDB_versionquery > 0){
+	iFile+="_version";
+	char cversion[10];
+	sprintf( cversion, "%d",getRunParameter()->freadCalibfromDB_versionquery);
+	string sversion = cversion;
+	iFile+= sversion;
+    }  
+    // to avoid double file
+    time_t rawtime;
+    struct tm * timeinfo;
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    char today_now[1000]  ;
+    sprintf( today_now, "_%04d%02d%02d_%02dh%02dm%02ds",1900+timeinfo->tm_year,1+timeinfo->tm_mon,timeinfo->tm_mday,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec);
+    string NOW = today_now; 
+    iFile+=NOW;
+    
+    // fill the 
+    TString DB_server = getRunParameter()->getDBServer();
+    VDB_CalibrationInfo *fDB_calibinfo = new VDB_CalibrationInfo(getRunParameter()->fGainFileNumber[getTelID()],getTelID()+1,iFile,gain_or_toff,getRunParameter()->freadCalibfromDB_versionquery,LOW_GAIN,DB_server);
+    fDB_calibinfo->readVOFFLINE();
+    
+    return;   
+}
+
+
 /*!
 
  */
@@ -1373,9 +1409,14 @@ void VCalibrator::readGains( bool iLowGain )
     string iFile = fGainFileNameC[getTelID()];
     if( iLowGain ) iFile = fLowGainGainFileNameC[getTelID()];
 
+
 // don't read gains for runmode = 2
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
     {
+	if(!iLowGain && getRunParameter()->freadCalibfromDB){
+	   readfromVOFFLINE_DB(1,iFile);
+	}
+
         bool use_default=false;
         cout << "Telescope " << getTelID()+1 << ":";
         cout << " reading relative gains";
@@ -1432,6 +1473,16 @@ void VCalibrator::readGains( bool iLowGain )
 
 // apply additional gain corrections
     getGains() /= getRunParameter()->fGainCorrection[getTelID()];
+
+
+    if(getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file){
+	char rm_calib_info_file[800];
+	sprintf(rm_calib_info_file,"rm -rf  %s",iFile.c_str());
+	system(rm_calib_info_file);
+    }else if(getRunParameter()->freadCalibfromDB && getRunParameter()->freadCalibfromDB_save_file){
+	std::cout<<"calibration information are stored in  "<<iFile<<std::endl;
+    }
+
 
 }
 
@@ -1522,6 +1573,13 @@ void VCalibrator::readTOffsets( bool iLowGain )
 
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
     {
+     
+	if(!iLowGain && getRunParameter()->freadCalibfromDB){
+	    readfromVOFFLINE_DB(2,iFile);
+	}
+
+
+	
         bool use_default=false;
         cout << "Telescope " << getTelID()+1 << ":";
         cout << " reading time offsets";
@@ -1569,6 +1627,18 @@ void VCalibrator::readTOffsets( bool iLowGain )
         setTOffsets( 0., iLowGain );
         setTOffsetvars( 0.1, iLowGain );
     }
+
+
+    if(getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file){
+	char rm_calib_info_file[800];
+	sprintf(rm_calib_info_file,"rm -rf  %s",iFile.c_str());
+	system(rm_calib_info_file);
+    }else if(getRunParameter()->freadCalibfromDB && getRunParameter()->freadCalibfromDB_save_file){
+	std::cout<<"calibration information are stored in  "<<iFile<<std::endl;
+    }
+
+
+
 }
 
 

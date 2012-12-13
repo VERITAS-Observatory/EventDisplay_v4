@@ -85,7 +85,12 @@ VEvndispRunParameter::VEvndispRunParameter()
 
     fCameraCoordinateTransformX = 1.;
     fCameraCoordinateTransformY = 1.;
-    
+    //calibration read from DB
+    freadCalibfromDB = false;         
+    freadCalibfromDB_versionquery = -1000;  
+    freadCalibfromDB_save_file = false;
+
+  
 // pointing parameters
     fTargetName = "NONAME";
     fTargetDec = -999.;

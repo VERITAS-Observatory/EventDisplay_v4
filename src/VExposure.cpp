@@ -1813,6 +1813,8 @@ void VExposure::downloadRunList()
 
 }
 
+
+
 void VExposure::getLaserList()
 {
 
@@ -2032,6 +2034,35 @@ void VExposure::readLaserRunListFromFile( string runlist )
   inputfile.close();
 
 }
+
+void VExposure::readLaserRunDateListFromFile( string runlist )
+{
+
+  ifstream inputfile;
+  inputfile.open(runlist.c_str());
+
+  if( !inputfile )
+  {
+    cout << "ERROR: Input LASER runlist not found: " << runlist << endl;
+    exit(-1);
+  }
+
+  int run =-1;
+  int date_run =-1;
+
+  while(1)
+  {
+      inputfile>> run >> date_run ;
+      if (!inputfile.good()) break;
+      fLaserDownload.push_back( run );
+      fLaserDownloadDate.push_back(date_run );
+  }
+  
+  inputfile.close();
+  
+}
+
+
 void VExposure::setRunNumber( unsigned int number )
 {
 

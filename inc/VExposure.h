@@ -183,6 +183,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 	void getLaserList();
 	unsigned int  getLaserDate( unsigned int iRunNumber );
         void readRunListFromFile( string runlist );
+	void readLaserRunDateListFromFile( string runlist );
         void readLaserRunListFromFile( string runlist );
 	void downloadRunList();
 	void readRunCommentsFromDB();

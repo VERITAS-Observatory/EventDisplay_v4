@@ -254,13 +254,14 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VDisplayBirdsEye.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VDisplay.o ./obj/VDisplay_Dict.o \
-        	./obj/VCommonTypes.o \
+		./obj/VCommonTypes.o \
 		./obj/VCameraRead.o \
 		./obj/VDetectorGeometry.o \
 		./obj/VDetectorTree.o \
- 	        ./obj/VImageParameterCalculation.o \
+	        ./obj/VImageParameterCalculation.o \
 		./obj/VImageBaseAnalyzer.o \
 		./obj/VImageCleaning.o \
+		./obj/VDB_CalibrationInfo.o\
 		./obj/VCalibrator.o \
                 ./obj/VImageAnalyzer.o \
 		./obj/VArrayAnalyzer.o \
@@ -288,15 +289,15 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VPedestalCalculator.o \
 		./obj/VDeadChannelFinder.o \
 		./obj/VSpecialChannel.o \
-        	./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VReadRunParameter.o \
 		./obj/VEventLoop.o \
 		./obj/VEvndispData.o \
 		./obj/VDBRunInfo.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
-        	./obj/VUtilities.o \
-         	./obj/VASlalib.o \
+		./obj/VUtilities.o \
+		./obj/VASlalib.o \
 		./obj/VPointing.o \
 	 	./obj/VPointingDB.o \
 		./obj/VSkyCoordinates.o \
@@ -344,9 +345,9 @@ else
 	@echo "LINKING evndisp with VBF support"
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(VBFLIBS) $(OutPutOpt) ./bin/$@
 endif
- 
 
-     
+
+
 	@echo "$@ done"
 
 ########################################################
@@ -723,7 +724,7 @@ WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VStatistics_Dict.o \
 			./obj/VUtilities.o 
- 
+
 ./obj/writeCTAWPPhysSensitivityFiles.o: 	./src/writeCTAWPPhysSensitivityFiles.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -797,6 +798,25 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 					./obj/Ctelconfig.o ./obj/Cshowerpars.o ./obj/Ctpars.o 
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
+########################################################
+# updateDBlaserRUN
+########################################################
+UPDATEDBLASERRUN=	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+			./obj/VExposure.o ./obj/VExposure_Dict.o \
+			./obj/VASlalib.o \
+			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/VUtilities.o \
+			./obj/VDB_CalibrationInfo.o \
+			./obj/updateDBlaserRUN.o
+
+./obj/updateDBlaserRUN.o: ./src/updateDBlaserRUN.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+#updateDBlaserRUN: ./obj/updateDBlaserRUN.o
+updateDBlaserRUN: $(UPDATEDBLASERRUN)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "Done updateDBlaserRUN"
 
 ########################################################
 # combineEffectiveAreas
@@ -826,7 +846,7 @@ combineEffectiveAreas:	 ./obj/combineEffectiveAreas.o  \
 			 ./obj/VASlalib.o \
 			 ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o 
 
-			
+
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
