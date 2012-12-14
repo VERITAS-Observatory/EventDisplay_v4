@@ -412,7 +412,7 @@ void VCalibrator::writeAverageTZeros( bool iLowGain )
         unsigned int t = getTeltoAna()[tel];
         setTelID( t );
 
-        if( tel >= fTZeroOutFile.size() || !fTZeroOutFile[t] )
+        if( tel >= fTZeroOutFile.size() || !fTZeroOutFile[tel] )
         {
             cout << "VCalibrator::writeAverageTZeros() error writing average tzeros for telescope " << t+1 << endl;
 	    cout << "   (tel " << tel << ", " << fTZeroOutFile.size() << ")" << endl;
