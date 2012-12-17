@@ -33,6 +33,18 @@ int main(int argc, char *argv[] )
     TStopwatch fStopWatch;
     fStopWatch.Start();
 
+// print version only
+    if( argc == 2 )
+    {
+       string fCommandLine = argv[1];
+       if( fCommandLine == "-v" || fCommandLine == "--version" )
+       {
+          VGlobalRunParameter fRunPara;
+	  cout << fRunPara.getEVNDISP_VERSION() << endl;
+	  exit( 0 );
+       }
+    }
+
 // read the command line parameters
     VReadRunParameter *fReadRunParameter = new VReadRunParameter();
     if( !fReadRunParameter->readCommandline( argc, argv ) ) exit( -1 );
