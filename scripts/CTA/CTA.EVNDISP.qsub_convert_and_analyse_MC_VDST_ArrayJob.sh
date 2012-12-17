@@ -25,9 +25,27 @@ OPT="-shorttree -l2setspecialchannels nofile"
 
 # hard wired!!
 # DESY 3700m
-IFIL="$IFIL/proton_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simtel.gz"
+# IFIL="$IFIL/proton_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simtel.gz"
+# 2000m
+if [ $PART == "proton" ]
+then
+   IFIL="$IFIL/proton_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simhess.gz"
+fi
+# cta-ultra onSource
+if [ $PART == "gamma_onSource" ]
+then
+  IFIL="$IFIL/gamma_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simhess.gz"
+fi
 # cta-ultra3 gamma_cone10
-#IFIL="$IFIL/gamma_20deg_90deg_run"$IRUN"___cta-ultra3_desert_cone10.simhess.gz"
+if [ $PART == "gamma_cone10" ]
+then
+  IFIL="$IFIL/gamma_20deg_90deg_run"$IRUN"___cta-ultra3_desert_cone10.simhess.gz"
+fi
+# cta-ultra3 electron 
+if [ $PART == "electron" ]
+then
+  IFIL="$IFIL/electron_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simhess.gz"
+fi
 # cp simtelarray.gz file to TMPDIR
 echo "$IFIL"
 cp -v -f $IFIL $TMPDIR"/"
