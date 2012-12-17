@@ -34,6 +34,11 @@ distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(distdir).VTS.runparameter
 #############################
+# check compiler
+GCCVERSION=$(shell gcc -dumpversion)
+GCCMACHINE=$(shell gcc -dumpmachine)
+#############################
+#############################
 # check root version number
 #############################
 ROOTVERSION=$(shell root-config --version)
@@ -1248,10 +1253,12 @@ $(vtspara):
 ###############################################################################################################################
 # print environment and compilation parameters
 ###############################################################################################################################
-config:
+configuration:
 	@echo ""
 	@echo "CONFIGURATION TEST FOR $(package) version $(version)"
 	@echo "======================================================"
+	@echo ""
+	@echo "gcc $(GCCVERSION) on $(GCCMACHINE)"
 	@echo ""
 	@echo "using root version $(ROOTVERSION)"
 	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL)"
