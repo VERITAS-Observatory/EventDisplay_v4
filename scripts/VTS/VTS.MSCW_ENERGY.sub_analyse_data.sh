@@ -7,9 +7,12 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ]  && [ ! -n "$3" ]
 then
-   echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run>"
+   echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run> [ID]"
    echo
    echo "   <table file>  table file name (without .root)"
+   echo
+   echo "   [ID]          reconstruction ID (default=0)"
+   echo
    exit
 fi
 
@@ -19,6 +22,10 @@ TFIL=$1
 EFIL=$2
 BLIST=$3
 ID=0
+if [ -n "$4" ]
+then
+  ID=$4
+fi
 
 # checking the path for binary
 if [ -z $EVNDISPSYS ]
