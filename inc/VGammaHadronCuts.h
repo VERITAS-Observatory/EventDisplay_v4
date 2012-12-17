@@ -291,11 +291,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   setEnergyCuts( double imin, double imax ) { fCut_Erec_min = imin; fCut_Erec_max = imax; }
 	bool   setIRFGraph( TGraphErrors *g );
         void   setNTel( unsigned int itel,  double iX = 0., double iY = 0. ) { fNTel = itel; fArrayCentre_X = iX; fArrayCentre_Y = iY; }
-        void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
+//        void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
         void   setTheta2Cut( double it2 ) { fCut_Theta2_max = it2; }
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,33);
+        ClassDef(VGammaHadronCuts,34);
 };
 #endif

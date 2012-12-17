@@ -359,7 +359,8 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 fCut_MeanImageDistance_max=(atof(temp.c_str()));
             }
-            else if( iCutVariable == "corearea" )
+// NOT USED AND THEREFORE DISABLED
+/*            else if( iCutVariable == "corearea" )
             {
                 is_stream >> temp;
                 fCut_CoreDistanceToArrayCentreX_min = (atof(temp.c_str()));
@@ -374,7 +375,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                     is_stream >> temp;
                     fCut_CoreDistanceEdgeSize = atof( temp.c_str() );
                 }
-            }
+            } */
             else if( iCutVariable == "mscw" || iCutVariable == "arraymscw" )
             {
                 is_stream >> temp;
@@ -813,11 +814,11 @@ void VGammaHadronCuts::printCutSummary()
     cout << "SizeSecondMax: " << fCut_SizeSecondMax_min << " < SizeSecondMax < " << fCut_SizeSecondMax_max;
     cout << ", " << fCut_Emmission_min << " < Emission height < " << fCut_Emmission_max;
     cout << endl;
-    cout << "Fiducial area (shower core): [" << fCut_CoreDistanceToArrayCentreX_min - fCut_CoreDistanceEdgeSize << ",";
+/*    cout << "Fiducial area (shower core): [" << fCut_CoreDistanceToArrayCentreX_min - fCut_CoreDistanceEdgeSize << ",";
     cout << fCut_CoreDistanceToArrayCentreX_max + fCut_CoreDistanceEdgeSize;
     cout << "," << fCut_CoreDistanceToArrayCentreY_min - fCut_CoreDistanceEdgeSize << ",";
-    cout << fCut_CoreDistanceToArrayCentreY_max + fCut_CoreDistanceEdgeSize << "] m";
-    cout << ", " << fCut_NImages_min << " <= Ntel <= " << fCut_NImages_max;
+    cout << fCut_CoreDistanceToArrayCentreY_max + fCut_CoreDistanceEdgeSize << "] m"; */
+    cout << "NImage cut: " << fCut_NImages_min << " <= Ntel <= " << fCut_NImages_max;
     cout << endl;
     if( bMCCuts )
     {
@@ -1671,6 +1672,9 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 
 
 /*!
+
+  NOTE: THIS IS NOTE USED
+
   check if core is inside a certain area relative to centre of array (ground, not shower coordinates)
 
   fCut_CoreDistanceToArrayCentreY_min && fCut_CoreDistanceToArrayCentreY_max == 0: cut area is circle with radius fCut_CoreDistanceToArrayCentreX_max
@@ -1709,7 +1713,7 @@ bool VGammaHadronCuts::applyShowerCoreCuts( bool iMC )
     return true;
 }
 
-
+/* DISABLED DO NOT USE
 void VGammaHadronCuts::setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge )
 {
     fCut_CoreDistanceToArrayCentreX_min = xmin;
@@ -1720,6 +1724,7 @@ void VGammaHadronCuts::setShowerCoreCuts( double xmin, double xmax, double ymin,
     cout << "setting shower core cuts: " << fCut_CoreDistanceToArrayCentreX_min << "\t" << fCut_CoreDistanceToArrayCentreX_max;
     cout << "\t" << fCut_CoreDistanceToArrayCentreY_min << "\t" << fCut_CoreDistanceToArrayCentreY_max << "\t" << fCut_CoreDistanceEdgeSize << endl;
 }
+*/
 
 /*
    apply cut on event direction (theta2 cut)
