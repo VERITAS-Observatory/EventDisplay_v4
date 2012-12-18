@@ -400,6 +400,8 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 		./obj/VAnaSumRunParameter.o \
+		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		 ./obj/VUtilities.o 
 
 
