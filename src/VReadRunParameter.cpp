@@ -1066,7 +1066,7 @@ void VReadRunParameter::test_and_adjustParams()
 // (after the T1 move)
        if( fRunPara->frunnumber > 46642 && fRunPara->frunnumber < 63409 ) 
        {
-           fRunPara->fcamera[0] = "veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg";
+           fRunPara->fcamera[0] = "EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt";
        }
 // configuration until August 2009
 // (before the T1 move)
@@ -1078,7 +1078,7 @@ void VReadRunParameter::test_and_adjustParams()
 // PRELI: this is a file with upgraded pixel positions
        else
        {
-          fRunPara->fcamera[0] = "EVN_Upgrade_20121108_v420.txt";
+          fRunPara->fcamera[0] = "EVN_V6_Upgrade_20121127_v420.txt";
        }
     }
 

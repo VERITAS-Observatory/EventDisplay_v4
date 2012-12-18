@@ -738,9 +738,12 @@ void VCameraRead::convertMMtoDeg()
 void VCameraRead::stretchAndMoveCamera()
 {
     if( fDebug ) cout << "VCameraRead::stretchAndMoveCamera" << endl;
+
+    cout << "camera plate scaled by";
 // stretch
     for( unsigned int i = 0; i < fNTel; i++ )
     {
+        cout << " T" << i+1 << ": " << fCameraScaleFactor[i];
         for( unsigned int j = 0; j < fXTube[i].size(); j++ )
         {
             fXTube[i][j] *= fCameraScaleFactor[i];
@@ -749,6 +752,7 @@ void VCameraRead::stretchAndMoveCamera()
             fYTube[i][j] += fCameraCentreOffset[i];
         }
     }
+    cout << endl;
 }
 
 
