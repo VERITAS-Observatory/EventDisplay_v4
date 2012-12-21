@@ -48,6 +48,7 @@ if( $ARRAY == "V5" ) then
    if( $PART == "1" ) then
       set IFIL=Nov10_na_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set IFIL=Apr12_na_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      set IFIL=gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM21_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47570
       set NRUN=1
@@ -64,7 +65,8 @@ if( $ARRAY == "V5" ) then
       set NRUN=1
       set SRUN=47570
    endif
-   set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
+#   set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
+   set CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
 # noise file
    set NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
    echo "NOISE FILE " $NOISEFILE
@@ -74,6 +76,7 @@ if( $ARRAY == "V6" ) then
    if( $PART == "1" ) then
       set IFIL=UPG_V0_"$ZEW"deg_"$WOG"
       set IFIL=gamma_Nov12_grisu_Upgrade_8Nov2012_ATM21_newArray_"$ZEW"deg_"$WOG"
+      set IFIL=gamma_V6_Upgrade_20121127_v420_ATM21_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=65000
       set NRUN=1
@@ -90,8 +93,8 @@ if( $ARRAY == "V6" ) then
       set NRUN=1
       set SRUN=47570
    endif
-   set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
-   set CFG="EVN_Upgrade_20121108_v420.txt"
+#   set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
+   set CFG="EVN_V6_Upgrade_20121127_v420.txt"
 # noise file (V6!)
    set NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE"_20120827_v420.grisu
    echo "NOISE FILE " $NOISEFILE
@@ -160,7 +163,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysisApr12_d20121114_PIX_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20121218_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################

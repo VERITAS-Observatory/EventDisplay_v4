@@ -34,12 +34,10 @@ FSCRIPT="VTS.MSCW_ENERGY.qsub_make_tables"
 #################################################################
 # zenith angle bins
 IZE=( 00 20 30 35 40 45 50 55 60 65 ) 
-IZE=( 20 30 35 )
 # IZE=( 00 20 30 35 40 )
 NZE=${#IZE[@]}
 # wobble off bins
 WOFF=( 0.00 0.25 0.5 0.75 1.00 1.25 1.50 1.75 2.00 )
-WOFF=( 0.5 )
 # WOFF=( 0.5 )
 NWOF=${#WOFF[@]}
 # noise levels

@@ -2,7 +2,6 @@
 #####################################
 # analyze data files with eventdisplay
 #
-#  Revision $Id: evndisp.analyse,v 1.14.22.1.4.2.4.1.2.1.4.1.2.2.2.2.2.3 2010/11/15 11:50:33 gmaier Exp $
 #
 # Author: Gernot Maier
 #
@@ -12,7 +11,7 @@
 ## HARDCODED VAVLUES
 #####################################
 # run options (will be overwritten in DST mode)
-OPT="-nevents=2000"
+# OPT="-nevents=2000"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################
@@ -21,7 +20,7 @@ OPT="-nevents=2000"
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ "$1" = "-h" ]
 then
    echo
-   echo "VTS.EVNDISP.analyse <telescope number> <sourcefile> [runnumber] [DST=0/1] [TARGET] [WOBBLENORTH] [WOBBLEEAST] [RAOFFSET]"
+   echo "VTS.EVNDISP.analyse <telescope number> <sourcefile> [runnumber] [DST=0/1]"
    echo
    echo "analyse a data file and write results to file runnumber.root"
    echo
@@ -31,24 +30,17 @@ then
    echo "                            (default telescope combination is 1234 (euqivalent to -1))"
    echo "    <sourcefile>            VERITAS data file (vbf or cvbf file)"
    echo 
-   echo "optional parameters (no database connection):"
+   echo "optional parameters (not needed for default analysis)"
    echo    
-   echo "    [runnumber]             runnumber"
+   echo "    [runnumber]             runnumber (default is the run number extracted from the vbf file)"
    echo "    [DST]                   output format is DST (default OFF=0)"
-   echo "    [TARGET]                targets are for example: Crab, Mrk421, 1es2344, lsi+61303"
-   echo "                            (for more do evndisp -printtargets)" 
-   echo "    [WOBBLENORTH]           wobble offsets north (e.g.0.5) or south (e.g. -0.5) in [deg]"
-   echo "    [WOBBLEEAST]            wobble offsets east (e.g.0.5) or west (e.g. -0.5) in [deg]"
-   echo "    [raoffset]              right ascension offset for off run (e.g. 7.5 for off run 30 min later)"
    echo
    echo "examples:"
    echo 
-   echo "    VTS.EVNDISP.analyse -1 d20070206/33709.cvbf"
+   echo "    VTS.EVNDISP.analyse -1 $VERITAS_DATA_DIR/data/d20070206/33709.cvbf"
    echo
-   echo "    VTS.EVNDISP.analyse 123 d20070206/33709.cvbf 33709 CRAB 0.5 0."
-   echo
-   echo "    VTS.EVNDISP.analyse 123 d20061225/33126.cvbf 33126 CRAB 0. 0. 7.5"
-   echo "    (this is a CRAB off run)"
+   echo "    VTS.EVNDISP.analyse 124 $VERITAS_DATA_DIR/data/d20070206/33709.cvbf 33709 "
+   echo "             (for a 3-telescope run with T1, T2 and T4)"
    echo
    echo "----------------------------------------------------------------------------------------"
    exit
@@ -89,28 +81,8 @@ then
   OPT="$OPT -runnumber=$3"
 fi
 
-# set target (optional)
-if [ -n "$5" ]
-then
-  OPT="$OPT -target $5"
-fi
-# set wobble north (optional)
-if [ -n "$6" ]
-then
-  OPT="$OPT -wobblenorth=$6"
-fi
-
-# set wobble east (optional)
-if [ -n "$7" ]
-then
-  OPT="$OPT -wobbleeast=$7"
-fi
-
-# set right ascension offset
-if [ -n "$8" ]
-then
-  OPT="$OPT -raoffset=$8"
-fi
+# use by default relative gains and toffsets from database
+OPT="-readCalibDB $OPT"
 
 #########################
 # NOW START EVENTDISPLAY
