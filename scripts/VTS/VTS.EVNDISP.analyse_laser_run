@@ -2,33 +2,32 @@
 #
 # analyze a laser/flasher run (calculate pedestals, calculate gains)
 #
-# Revision $Id: evndisp.analyse_laser_run,v 1.9.2.1.16.3.2.3.6.1.2.3.2.1.4.1.2.1.2.2.2.3 2010/11/11 10:11:42 gmaier Exp $
 #
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ "$1" = "-h" ]
+if [ ! -n "$1" ] || [ "$1" = "-h" ]
 then
    echo
-   echo "VTS.EVNDISP.analyse_laser_run <telescope number> <sourcefile> [lasermin] [high/lowgain] [runnumber]"
+   echo "VTS.EVNDISP.analyse_laser_run <runnumber> [telescope number] [lasermin] [high/lowgain]"
    echo
    echo "analyse a laser/flasher file and calculate gains and time offsets"
    echo
    echo "required parameters:"
    echo 
-   echo "    <telescope number>      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
-   echo "                            (default telescope combination is 1234)"
-   echo "    <sourcefile>            VERITAS data file (vbf or cvbf file)"
+   echo "    <runnumber>             runnumber"
    echo 
-   echo "optional parameters: (in case of missing DB connection)"
-   echo "    [runnumber]             runnumber"
+   echo "optional parameters:"
+   echo
+   echo "    [telescope number]      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
+   echo "                            (default telescope combination is 1234)"
    echo "    [high/lowgain=0/1]      calculate gains for high or low gain channels (default: 0) EXPERT USER ONLY"
    echo "    [lasermin]              minimum image size to identify an event as laser event"
    echo "                            (50000 is a good value, but check in display)"
    echo 
    echo "example:"
    echo
-   echo "    VTS.EVNDISP.analyse_laser_run 123 d20070218/33912.cvbf"
+   echo "    VTS.EVNDISP.analyse_laser_run 33912"
    echo
    echo "----------------------------------------------------------------------------------------"
    exit
@@ -39,16 +38,25 @@ fi
 #######################################
 OPT="-calibrationsumwindow=18 -calibrationsumfirst=2 -reconstructionparameter EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
+
+# number of telescopes to analyse
+TELTOANA="1234"
+if [ -n "$2" ]
+then
+  TELTOANA=$2
+fi
+
 # source (VBF) file
 # check first if source file exists
-if [ ! -e $2 ]
+SF=`find $VERITAS_DATA_DIR/data -name "$1.cvbf"`
+if [ ${#SF} = 0 ]
 then
    echo
-   echo "ERROR: VERITAS source file not found: $2"
+   echo "ERROR: VERITAS source (VBF laser/flasher) file not found: $SF"
    echo
    exit
 fi
-OPT="-sourcefile $2 $OPT"
+OPT="-runnumber=$1 $OPT"
 
 # laser minimum charge
 if [ -n "$3" ]
@@ -71,30 +79,24 @@ else
   OPT="$OPT -runmode=2"
 fi
 
-# run number
-if [ -n "$5" ]
-then
-  OPT="$OPT -runnumber=$3"
-fi
-
 #############################################################################################################
 # calculate pedestals (for high gain only)
 #############################################################################################################
 if [ ! -n "$4" ] || [ $4 != "1" ]
 then
    echo "calculate pedestals, Telescope $1"
-   $EVNDISPSYS/scripts/VTS/VTS.EVNDISP.analyse_pedestal_events $1 $2 $5
+   $EVNDISPSYS/scripts/VTS/VTS.EVNDISP.analyse_pedestal_events $1 $TELTOANA
 fi
 
 #############################################################################################################
 # calculate gains and toffsets
 #############################################################################################################
 # loop over all telescopes (loop NTel times over vbf file)
-if [ $1 = "-1" ]
+if [ $TELTOANA = "-1" ]
 then
   TELC="1234"
 else
-  TELC="$1"
+  TELC="$TELTOANA"
 fi
 
 NT=${#TELC}

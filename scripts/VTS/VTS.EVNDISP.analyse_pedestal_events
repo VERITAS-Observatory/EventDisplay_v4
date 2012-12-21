@@ -8,68 +8,65 @@
 #
 #####################################
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ "$1" = "-h" ]
+if [ ! -n "$1" ] || [ "$1" = "-h" ]
 then
    echo
-   echo "VTS.EVNDISP.analyse_pedestal_events <telescope number> <sourcefile> [runnumber] [lowgain]"
+   echo "VTS.EVNDISP.analyse_pedestal_events <runnumber> [telescope number] [lowgain]"
    echo
    echo "calculate pedestals from a data file (for high and low gain)"
    echo
    echo "required parameters:"
    echo 
-   echo "    <telescope number>      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
-   echo "                            (default telescope combination is 1234)"
-   echo "    <sourcefile>            VERITAS data file (vbf or cvbf file)"
+   echo "    <runnumber>             runnumber"
    echo 
    echo "optional parameters: "
+   echo 
+   echo "    [telescope number]      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
+   echo "                            (default telescope combination is 1234)"
    echo
-   echo "    [runnumber]             runnumber"
    echo "    [lowgain=1]             low gain pedestal calculation (expert user only!)"
    echo
    echo "example:"
    echo
-   echo "    VTS.EVNDISP.analyse_pedestal_events 123 d20070206/33709.cvbf"
+   echo "    VTS.EVNDISP.analyse_pedestal_events 1234 33709"
    echo
    echo "----------------------------------------------------------------------------------------"
    exit
 fi
 
 # run options
-OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
-if [ -n "$4" ] && [ $4 = "1" ]
-then
-   OPT="-calibrationsumwindow=20 -calibrationsumfirst=100 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
-fi
 
 # number of telescopes to analyse
-if [ $1 != "-1" ]
+TELTOANA="1234"
+if [ -n "$2" ]
 then
-  OPT="$OPT -teltoana=$1"
+  TELTOANA=$2
+fi
+
+OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
+if [ -n "$3" ] && [ $4 = "1" ]
+then
+   OPT="-calibrationsumwindow=20 -calibrationsumfirst=100 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
 fi
 
 # source file
 
 # first check if source file exists
-if [ ! -e $2 ]
+SF=`find $VERITAS_DATA_DIR/data -name "$1.cvbf"`
+if [ ${#SF} = 0 ]
 then
    echo
-   echo "ERROR: VERITAS source file not found: $2"
+   echo "ERROR: VERITAS source (VBF) file not found: $SF"
    echo
    exit
 fi
-OPT="-sourcefile $2 $OPT"
 
-if [ -n "$3" ]
-then
-  OPT="$OPT -runnumber=$3"
-fi
-
+OPT="-runnumber=$1 $OPT"
 
 #########################
 # NOW START EVENTDISPLAY
 #########################
 echo "$EVNDISPSYS/bin/evndisp $OPT"
 $EVNDISPSYS/bin/evndisp $OPT
-
 
 exit

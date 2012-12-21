@@ -17,29 +17,29 @@
 #####################################
 
 # print help
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ "$1" = "-h" ]
+if [ ! -n "$1" ] || [ "$1" = "-h" ]
 then
    echo
-   echo "VTS.EVNDISP.analyse <telescope number> <sourcefile> [runnumber] [DST=0/1]"
+   echo "VTS.EVNDISP.analyse <runnumber> [telescope number] [DST=0/1]"
    echo
    echo "analyse a data file and write results to file runnumber.root"
    echo
    echo "required parameters:"
    echo 
-   echo "    <telescope number>      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
-   echo "                            (default telescope combination is 1234 (euqivalent to -1))"
-   echo "    <sourcefile>            VERITAS data file (vbf or cvbf file)"
+   echo "    <runnumber>             runnumber "
    echo 
    echo "optional parameters (not needed for default analysis)"
+   echo
+   echo "    [telescope number]      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
+   echo "                            (default telescope combination is 1234 (euqivalent to -1))"
    echo    
-   echo "    [runnumber]             runnumber (default is the run number extracted from the vbf file)"
    echo "    [DST]                   output format is DST (default OFF=0)"
    echo
    echo "examples:"
    echo 
-   echo "    VTS.EVNDISP.analyse -1 $VERITAS_DATA_DIR/data/d20070206/33709.cvbf"
+   echo "    VTS.EVNDISP.analyse 33709"
    echo
-   echo "    VTS.EVNDISP.analyse 124 $VERITAS_DATA_DIR/data/d20070206/33709.cvbf 33709 "
+   echo "    VTS.EVNDISP.analyse 33709 124"
    echo "             (for a 3-telescope run with T1, T2 and T4)"
    echo
    echo "----------------------------------------------------------------------------------------"
@@ -49,37 +49,34 @@ fi
 ########################################################################################################
 # overwrite option in DST mode
 # dst production
-if [ -n "$4" ] && [ $1 != "0" ]
+if [ -n "$3" ] 
 then
    OPT="-imagethresh=0 -borderthresh=0 -runmode=4"
 # output file
-   OPT="$OPT -dstfile $EVNDISPDATA/eventdisplay_output/$3.dst.root"
+   OPT="$OPT -dstfile $EVNDISPDATA/eventdisplay_output/$1.dst.root"
 fi
 ########################################################################################################
 
 # telescope combination
-if [ $1 != "-1" ]
+TELTOANA="1234"
+if [ -n "$2" ]
 then
-  OPT="$OPT -teltoana=$1"
+  OPT="$OPT -teltoana=$2"
 fi
 
 # source (VBF) file
 
 # check first if source file exists
-if [ ! -e $2 ]
+SF=`find $VERITAS_DATA_DIR/data -name "$1.cvbf"`
+if [ ${#SF} = 0 ]
 then
    echo
-   echo "ERROR: VERITAS source file not found: $2"
+   echo "ERROR: VERITAS source (VBF) file not found: $SF"
    echo
    exit
 fi
-OPT="-sourcefile $2 $OPT"
 
-# set runnnumber (optional)
-if [ -n "$3" ]
-then
-  OPT="$OPT -runnumber=$3"
-fi
+OPT="$OPT -runnumber=$1"
 
 # use by default relative gains and toffsets from database
 OPT="-readCalibDB $OPT"

@@ -6,26 +6,25 @@
 #
 #####################################
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ "$1" = "-h" ]
+if [ ! -n "$1" ] || [ "$1" = "-h" ]
 then
    echo
-   echo "VTS.EVNDISP.analyse_tzeros <telescope number> <sourcefile> [runnumber]"
+   echo "VTS.EVNDISP.analyse_tzeros <runnumber> [telescope number]"
    echo
    echo "calculate mean tzeros from a data file"
    echo
    echo "required parameters:"
    echo 
-   echo "    <telescope number>      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
-   echo "                            (default telescope combination is 1234)"
-   echo "    <sourcefile>            VERITAS data file (vbf or cvbf file)"
+   echo "    <runnumber>             runnumber"
    echo 
    echo "optional parameters: "
    echo
-   echo "    [runnumber]             runnumber"
+   echo "    [telescope number]      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
+   echo "                            (default telescope combination is 1234)"
    echo
    echo "example:"
    echo
-   echo "    VTS.EVNDISP.analyse_tzeros 1234 d20070206/33709.cvbf"
+   echo "    ./VTS.EVNDISP.analyse_tzeros 33709"
    echo
    echo "----------------------------------------------------------------------------------------"
    exit
@@ -35,27 +34,25 @@ fi
 OPT="-runmode=7"
 
 # number of telescopes to analyse
-if [ $1 != "-1" ]
+TELTOANA="1234"
+if [ -n "$2" ]
 then
-  OPT="$OPT -teltoana=$1"
+  OPT="$OPT -teltoana=$2"
 fi
 
 # source file
 
 # first check if source file exists
-if [ ! -e $2 ]
+SF=`find $VERITAS_DATA_DIR/data -name "$1.cvbf"`
+if [ ${#SF} = 0 ]
 then
    echo
-   echo "ERROR: VERITAS source file not found: $2"
+   echo "ERROR: VERITAS source (VBF) file not found: $SF"
    echo
    exit
 fi
-OPT="-sourcefile $2 $OPT"
 
-if [ -n "$3" ]
-then
-  OPT="$OPT -runnumber=$3"
-fi
+OPT="$OPT -runnumber=$1 "
 
 
 #########################

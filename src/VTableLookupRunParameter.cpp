@@ -29,7 +29,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     fMinRequiredShowerPerBin = 5.;
     bNoNoTrigger = true;
     fUseSelectedImagesOnly = true;
-    bWriteReconstructedEventsOnly = -1;
+    bWriteReconstructedEventsOnly = 1;
     bShortTree = false;
     bWriteMCPars = true;
     rec_method = 0;
