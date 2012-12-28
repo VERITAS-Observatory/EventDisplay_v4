@@ -928,12 +928,26 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 	else                     sprintf( TmpTimeFormat, "%%H^{h}%%M^{m}" );
 
         TF1 *IncValues = 0;
+	int iRA_hrs = 0.;
+	int iRA_min = 0.;
+	int iRA_sec = 0.;
         if ( fPlotUseHours == true )
         {
+// convert angle to hours/min/seconds
+            char *iSign;
+	    int ihmsf[4];
+	    slaDr2tf( 4, -1.*Xmax*TMath::DegToRad(), iSign, ihmsf );
+	    iRA_hrs = ihmsf[0];
+	    iRA_min = ihmsf[1];
+	    iRA_sec = ihmsf[2];
+	    double iRA_frac = 0.;
+	    if( ihmsf[3] > 0 ) iRA_frac = 1./(double)ihmsf[3];
+
 // convert to seconds
             Xmin *= 86400.0/360.0;
             Xmax *= 86400.0/360.0;
-            IncValues = new TF1("IncValues", "-x", -Xmin, -Xmax);
+// TMP            IncValues = new TF1("IncValues", "-x", -Xmin, -Xmax);
+            IncValues = new TF1("IncValues", "-x", iRA_frac, Xmax - Xmin + iRA_frac );
         }
         else
         {
@@ -955,8 +969,9 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
         if ( fPlotUseHours == true )
         {
 // set time offsets to midnight
-            TDatime da(2000,01,01,fPlotZeroHours,00,00);
-            raLowerAxis->SetTimeOffset(da.Convert(), "GMT" );
+//            TDatime da(2000,01,01,fPlotZeroHours,00,00);
+            TDatime da(2000,01,01,iRA_hrs, iRA_min, iRA_sec );
+            raLowerAxis->SetTimeOffset( da.Convert(), "local" );
             raLowerAxis->SetTimeFormat(TmpTimeFormat);
             raLowerAxis->SetOption("t");
             raLowerAxis->SetNdivisions(5);
