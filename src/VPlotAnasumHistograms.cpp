@@ -928,13 +928,13 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 	else                     sprintf( TmpTimeFormat, "%%H^{h}%%M^{m}" );
 
         TF1 *IncValues = 0;
-	int iRA_hrs = 0.;
-	int iRA_min = 0.;
-	int iRA_sec = 0.;
+	int iRA_hrs = 0;
+	int iRA_min = 0;
+	int iRA_sec = 0;
         if ( fPlotUseHours == true )
         {
 // convert angle to hours/min/seconds
-            char *iSign;
+            char iSign[10];
 	    int ihmsf[4];
 	    slaDr2tf( 4, -1.*Xmax*TMath::DegToRad(), iSign, ihmsf );
 	    iRA_hrs = ihmsf[0];
