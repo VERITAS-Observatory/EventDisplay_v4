@@ -907,7 +907,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 
     if( fDebug >= 2 )
     {
-        cout << "total events " << setprecision(8) << i_non << " " << i_noff;
+        cout << "total events " << fixed << setprecision(8) << i_non << " " << i_noff;
 	cout << " " << fTotalNormalisationFactor << " " << i_non - fTotalNormalisationFactor * i_noff << endl;
     }
 }
@@ -1465,6 +1465,7 @@ void VEnergySpectrum::setOriginalBinner(TH1 *h)
    {
         cout << "nRebinner: new lower bin edges [TeV]: " << TMath::Power(10,nRebinner->GetBinLowEdge(i)) << endl;
    }
+   cout << "nRebinner: number of bins: " << Nbins << endl;
 }
 
 /*

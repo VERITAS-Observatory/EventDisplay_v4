@@ -818,6 +818,9 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
                     break;
                 }
             }
+// (GM) TODO check if it is really necessary to have the 
+//           zenith angles hardwired -> are they offset
+//           by the wobble offset?
             if( !i_ze_F )
             {
                 for( unsigned int w = 0; w < fMCZe.size(); w++ )

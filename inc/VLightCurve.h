@@ -102,7 +102,8 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );
    TCanvas* plotPhaseDistribution( TCanvas* iCanvasPhaseDist = 0, string iCanvasName = "cPD", string iFluxState = "", int iColor = 1 );
    void     setPlottingParameter( double iPlottingMJDMin, double iPlottingMJDMax );
-   void     setSignificanceParameters( double iThresholdSignificance = -9999., double iMinEvents = -9999., double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
+   void     setSignificanceParameters( double iThresholdSignificance = -9999., double iMinEvents = -9999., 
+                                       double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
    void     setLightCurveAxis( double iYmin = -9.e10, double iYmax = -9.e10, string iAxisTitle = "tevRate" );
    void     setName( string iName ) { fName = iName; }
    void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
