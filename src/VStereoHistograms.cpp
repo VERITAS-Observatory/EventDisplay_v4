@@ -87,7 +87,7 @@ void VStereoHistograms::defineHistograms()
 // limits of energy histograms
 // log energy axis
     double i_emin = -2.;
-    double i_emax =  2.;
+    double i_emax =  2.2;
     int    i_ebin = int( (i_emax - i_emin) / fBinSizeEnergy + 0.5);
 // linear energy axis
     double i_Linemin = 0.05;
