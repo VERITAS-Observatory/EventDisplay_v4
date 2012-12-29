@@ -62,8 +62,6 @@ sRunPara::sRunPara()
 // RING BACKGROUND MODEL
     fRM_RingRadius = 0.;                          // ring radius [deg]
     fRM_RingWidth = 0.;                           // ring width [deg]
-    fRM_RingWidthUC = 0.;                         // ring width for uncorrelated sky maps [deg]
-    fRM_offdist = -1.;                            // minimum distance of background events from source region [deg]
 
 // REFLECTED REGION MODEL
     fRE_distanceSourceOff = 0.2;                  // minimal distance of off source regions in number of background regions from the source region
@@ -80,6 +78,10 @@ sRunPara::sRunPara()
     fTE_mscl_min = 0.;
     fTE_mscl_max = 0.;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 
 
 VAnaSumRunParameter::VAnaSumRunParameter()
@@ -118,6 +120,21 @@ VAnaSumRunParameter::VAnaSumRunParameter()
     fEnergyEffectiveAreaSmoothingIterations = -1;
     fEnergyEffectiveAreaSmoothingThreshold = -1.;
 
+// background model
+    fTMPL_fBackgroundModel = 0;
+    fTMPL_RM_RingRadius = 0.;
+    fTMPL_RM_RingWidth = 0.;
+    fTMPL_RE_distanceSourceOff = 0.;
+    fTMPL_RE_nMinoffsource = 0;
+    fTMPL_RE_nMaxoffsource = 0;
+
+// cut, effective areas and acceptance files
+    fTMPL_SourceRadius = 0.;
+    fTMPL_maxradius = 0.;
+    fTMPL_CutFile = "";
+    fTMPL_AcceptanceFile = "";
+    fTMPL_EffectiveAreaFile = "";
+
 // star catalogue
     fStarCatalogue = "Hipparcos_MAG8_1997.dat";
 // minimum brightness of stars
@@ -150,10 +167,13 @@ int VAnaSumRunParameter::returnWithError( string iL, string iM, string iC )
     return 0;
 }
 
+/*
 
+    read run parameters from an ascii file
+
+*/
 int VAnaSumRunParameter::readRunParameter( string i_filename )
 {
-//  if( i_filename.size() == 0 ) return 1;
     ifstream is;
     is.open(i_filename.c_str(),ifstream::in);
     if(!is)
@@ -211,6 +231,46 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 }
 		is_test.close();
             }
+	    else if( temp == "GAMMAHADRONCUT" )
+	    {
+	       fTMPL_CutFile = temp2;
+            }
+	    else if( temp == "RADIALACCEPTANCEFILE" )
+	    {
+	       fTMPL_AcceptanceFile = temp2;
+	    } 
+	    else if( temp == "EFFECTIVEAREAFILE" )
+	    {
+	       fTMPL_EffectiveAreaFile = temp2;
+            }
+	    else if( temp == "REFLECTEDREGION" )
+	    {
+	       fTMPL_fBackgroundModel = eREFLECTEDREGION;
+	       fTMPL_RE_distanceSourceOff = atof( temp2.c_str() );
+	       if( !is_stream.eof() )
+	       {
+	          is_stream >> temp2;
+	          fTMPL_RE_nMinoffsource = atoi( temp2.c_str() );
+               }
+	       else returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REFLECTEDREGION dist noff_min noff_max" );
+	       if( !is_stream.eof() )
+	       {
+	          is_stream >> temp2;
+	          fTMPL_RE_nMaxoffsource = atoi( temp2.c_str() );
+               }
+	       else returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REFLECTEDREGION dist noff_min noff_max" );
+	    }
+	    else if( temp == "RINGBACKGROUND" )
+	    {
+	       fTMPL_fBackgroundModel = eRINGMODEL;
+	       fTMPL_RM_RingRadius = atof( temp2.c_str() );
+	       if( !is_stream.eof() )
+	       {
+	          is_stream >> temp2;
+	          fTMPL_RM_RingWidth = atof( temp2.c_str() );
+               }
+	       else returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* RINGBACKGROUND ring_radius ring_area" );
+            }
             else if( temp == "SKYMAPBINSIZE" ) fSkyMapBinSize = atof( temp2.c_str() );
             else if( temp == "SKYMAPBINSIZEUC") fSkyMapBinSizeUC = atof( temp2.c_str() );
             else if( temp == "SKYMAPSIZEX" )
@@ -244,7 +304,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "SKYMAPCENTRE_XY" )
             {
-                if( checkNumberOfArguments( is_line ) != 4 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_XY x y" );
+                if( checkNumberOfArguments( is_line ) != 4 ) 
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_XY x y" );
+                }
 
                 fSkyMapCentreWest = -1.*atof( temp2.c_str() );
                 is_stream >> temp2;
@@ -252,15 +315,22 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "SKYMAPCENTRE_RADECJ2000_DEG" )
             {
-                if( checkNumberOfArguments( is_line ) != 4 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_RADECJ2000_DEG (RA(deg) DEC(deg)" );
+                if( checkNumberOfArguments( is_line ) != 4 )
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, 
+		                           "* SKYMAPCENTRE_RADECJ2000_DEG (RA(deg) DEC(deg)" );
+                }
                 fSkyMapCentreRAJ2000 = atof( temp2.c_str() );
                 is_stream >> temp2;
                 fSkyMapCentreDecJ2000 = atof( temp2.c_str() );
             }
             else if( temp == "SKYMAPCENTRE_RADECJ2000_HOUR" )
             {
-                if( checkNumberOfArguments( is_line ) != 8 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* SKYMAPCENTRE_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
-
+                if( checkNumberOfArguments( is_line ) != 8 ) 
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, 
+		                           "* SKYMAPCENTRE_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
+                }
                 double d_tt = 0.;
                 d_tt += atof( temp2.c_str() );
                 is_stream >> temp2;
@@ -424,6 +494,29 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
         }
     }
+    if( fTMPL_CutFile.size() > 0 )
+    {
+	 fTMPL_SourceRadius = readSourceRadius( fTMPL_CutFile );
+	 if( fTMPL_SourceRadius <= 0. )
+	 {
+	     cout << "error in reading run parameters: ";
+	     cout << "invalid source radius " << fTMPL_SourceRadius << endl;
+	     exit( -1 );
+	 }
+	 fTMPL_RM_RingWidth = getRingWidth( TMath::Pi()*fTMPL_SourceRadius, fTMPL_RM_RingRadius, fTMPL_RM_RingWidth );
+	 fTMPL_maxradius = readMaximumDistance( fTMPL_CutFile );
+	 if( fTMPL_maxradius <  0. )
+	 {
+	     cout << "error in reading run parameters: ";
+	     cout << "invalid maximum distance " << fTMPL_maxradius << endl;
+	     exit( -1 );
+	  }
+    }
+    else 
+    {
+       fTMPL_SourceRadius = 0.1;
+       fTMPL_maxradius = 2.0;
+    }
 // prelimary: require same extension in x and y
     if( fabs( fSkyMapSizeXmax - fSkyMapSizeYmax ) > 1.e-3 ) return returnWithError( "VAnaSumRunParameter::readRunParameter: x and y extension of the sky map should be the same (preliminary)", "" );
     is.close();
@@ -435,15 +528,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
     return 1;
 }
 
-
-int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bool bTotalAnalysisOnly )
+int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataDir, bool bTotalAnalysisOnly )
 {
     int i_nline = 0;
     ifstream is;
-    is.open(i_listfilename.c_str(),ifstream::in);
+    is.open( i_listfilename.c_str(),ifstream::in );
     if(!is)
     {
-	cout << " VAnaSumRunParameter::loadFileList error: file with list of runs not found : " << i_listfilename << endl;
+	cout << " VAnaSumRunParameter::loadShortFileList error: file with list of runs not found : " << i_listfilename << endl;
 	cout << "exiting..." << endl;
         exit( -1 );
     }
@@ -452,7 +544,105 @@ int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bo
     sRunPara i_sT;
     reset( i_sT );
 
-    cout << "Reading run list from " << i_listfilename << endl;
+    cout << "Reading short run list from " << i_listfilename << endl;
+
+    while( getline( is, is_line ) )
+    {
+        if(  is_line.size() > 0 )
+        {
+            istringstream is_stream( is_line );
+            is_stream >> temp;
+	    cout << "RUN NUMBER " << temp << endl;
+	    i_sT.fRunOn = atoi(temp.c_str());
+	    i_sT.fRunOff = atoi(temp.c_str());
+// open mscw file and read out telescope participating in analysis
+            temp = iDataDir + "/" + temp + ".mscw.root";
+            TFile iF( temp.c_str(), "READ" );
+	    if( iF.IsZombie() )
+	    {
+	        cout << "VAnaSumRunParameter::loadShortFileList: error, data file not found: ";
+		cout << temp << endl;
+		exit( -1 );
+            }
+	    VEvndispRunParameter *iPar = (VEvndispRunParameter*)iF.Get( "runparameterV2" );
+	    if( !iPar )
+	    {
+	        cout << "VAnaSumRunParameter::loadShortFileList: error, no run parameters found in: ";
+		cout << temp << endl;
+		exit( -1 );
+            }
+	    char hTelToAna[200];
+	    for( unsigned int i = 0; i < iPar->fTelToAnalyze.size(); i++ )
+	    {
+	      if( i == 0 ) sprintf( hTelToAna, "%d", iPar->fTelToAnalyze[i]+1 );
+	      else         sprintf( hTelToAna, "%s%d", hTelToAna, iPar->fTelToAnalyze[i]+1 );
+            }
+	    iF.Close();
+	    i_sT.fTelToAna = hTelToAna;
+	    i_sT.fCutFile = fTMPL_CutFile;
+	    i_sT.fSourceRadius = fTMPL_SourceRadius;
+	    i_sT.fBackgroundModel = fTMPL_fBackgroundModel;
+	    i_sT.fmaxradius = fTMPL_maxradius;
+	    i_sT.fEffectiveAreaFile = fTMPL_EffectiveAreaFile;
+	    if( i_sT.fTelToAna == "1234" ) i_sT.fEffectiveAreaFile += ".root";
+	    else                           i_sT.fEffectiveAreaFile += "_T" + i_sT.fTelToAna + ".root";
+	    i_sT.fAcceptanceFile = fTMPL_AcceptanceFile;
+	    if( i_sT.fTelToAna == "1234" ) i_sT.fAcceptanceFile += ".root";
+	    else                           i_sT.fAcceptanceFile += "_T" + i_sT.fTelToAna + ".root";
+	    if( i_sT.fBackgroundModel == eRINGMODEL )
+	    {
+	       i_sT.fRM_RingRadius = fTMPL_RM_RingRadius;
+	       i_sT.fRM_RingWidth  = fTMPL_RM_RingWidth;
+            }
+	    else if( i_sT.fBackgroundModel == eREFLECTEDREGION )
+	    {
+	       i_sT.fRE_distanceSourceOff = fTMPL_RE_distanceSourceOff;
+	       i_sT.fRE_nMinoffsource = fTMPL_RE_nMinoffsource;
+	       i_sT.fRE_nMaxoffsource = fTMPL_RE_nMaxoffsource;
+            }
+	    else
+	    {
+	       cout << "VAnaSumRunParameter error: ";
+	       cout << " unknown background model " << i_sT.fBackgroundModel << endl;
+	       cout << "\t or" << endl;
+	       cout << "VAnaSumRunParameter warning: ";
+	       cout << " short runlist not implemented yet for this background model " << i_sT.fBackgroundModel << endl;
+            }
+
+// fill the runlist vector
+            fRunList.push_back( i_sT );
+// fill the runlist map
+            fMapRunList[i_sT.fRunOn] = fRunList.back();
+            ++i_nline;
+
+        }
+    }
+
+    return i_nline;
+}
+
+/*
+
+   read (old style) long run list
+
+*/
+int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList, bool bTotalAnalysisOnly )
+{
+    int i_nline = 0;
+    ifstream is;
+    is.open(i_listfilename.c_str(),ifstream::in);
+    if(!is)
+    {
+	cout << " VAnaSumRunParameter::loadLongFileList error: file with list of runs not found : " << i_listfilename << endl;
+	cout << "exiting..." << endl;
+        exit( -1 );
+    }
+    string is_line;
+    string temp;
+    sRunPara i_sT;
+    reset( i_sT );
+
+    cout << "Reading long run list from (S" << bShortList << ", TA" << bTotalAnalysisOnly << "): " << i_listfilename << endl;
 
     while( getline( is, is_line ) )
     {
@@ -500,7 +690,7 @@ int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bo
                is_stream >> temp;
 	       i_sT.fPairOffset = atof(temp.c_str() );
             }
-// cut selector (now in cut file)
+// cut selector (now in cut file, therefore ignored)
             is_stream >> temp;
 // cut file
             is_stream >> temp;
@@ -518,7 +708,27 @@ int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bo
             }
 // background model
             is_stream >> temp;
-            i_sT.fBackgroundModel = atoi(temp.c_str());
+	    if( temp == "RE" )
+	    {
+	       i_sT.fBackgroundModel = eREFLECTEDREGION;
+            }
+	    else if( temp == "RB" )
+	    {
+	       i_sT.fBackgroundModel = eRINGMODEL;
+            }
+	    else if( temp == "OO" )
+	    {
+	       i_sT.fBackgroundModel = eONOFF;
+            }
+	    else if( temp == "FOV" )
+	    {
+	       i_sT.fBackgroundModel = eFOV;
+            }
+	    else if( temp == "TML" )
+	    {
+	       i_sT.fBackgroundModel = eTEMPLATE;
+            }
+            else i_sT.fBackgroundModel = atoi(temp.c_str());
             checkNumberOfArguments( i_sT.fBackgroundModel, narg, i_listfilename, is_line, fVersion, bShortList );
 // maximum distance for events from camera center
 // (read maximum distance from cut file)
@@ -555,13 +765,6 @@ int VAnaSumRunParameter::loadFileList(string i_listfilename, bool bShortList, bo
                 i_sT.fRM_RingRadius = atof(temp.c_str());
                 is_stream >> temp;
                 i_sT.fRM_RingWidth  = getRingWidth( TMath::Pi()*i_sT.fSourceRadius, i_sT.fRM_RingRadius, atof(temp.c_str()) );
-// ring width for uncorrelated plots
-                i_sT.fRM_RingWidthUC = getRingWidth( TMath::Pi()*i_sT.fSourceRadius, i_sT.fRM_RingRadius, atof(temp.c_str()) );
-                if( fVersion < 5 )
-                {
-                    is_stream >> temp;
-                    i_sT.fRM_offdist    = atof(temp.c_str());
-                }
                 is_stream >> temp;
                 i_sT.fAcceptanceFile = temp;
             }
@@ -686,11 +889,10 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
             cout << "RING BACKROUND MODEL" << endl;
             cout << "\t theta2 cut: " << fRunList[i].fSourceRadius << " deg2" << endl;
             cout << "\t ring radius: " << fRunList[i].fRM_RingRadius << " deg" << endl;
-            cout << "\t ring width: " << fRunList[i].fRM_RingWidth << " deg (" << fRunList[i].fRM_RingWidthUC << " deg for uncorrelated maps)" << endl;
+            cout << "\t ring width: " << fRunList[i].fRM_RingWidth << " deg" << endl;
             cout << "\t area ratio source region to ring: " << 2*fRunList[i].fRM_RingRadius*fRunList[i].fRM_RingWidth/fRunList[i].fSourceRadius << endl;
             cout << "\t acceptance file: " << fRunList[i].fAcceptanceFile<< endl;
             cout << "\t maximum distance to camera center: " << fRunList[i].fmaxradius << " deg" << endl;
-            if( fVersion < 5 ) cout << "\t minimum distance of background events from source region : " << fRunList[i].fRM_offdist << endl;
         }
         else if( fRunList[i].fBackgroundModel == eREFLECTEDREGION )
         {
@@ -802,8 +1004,6 @@ void VAnaSumRunParameter::reset( sRunPara it )
 
     it.fRM_RingRadius = 0.;
     it.fRM_RingWidth = 0.;
-    it.fRM_RingWidthUC = 0.;
-    it.fRM_offdist = -1.;                         // observe: this parameter is obsolete since runlist version 5
     it.fAcceptanceFile = "";
 
     it.fRE_distanceSourceOff = 0.;

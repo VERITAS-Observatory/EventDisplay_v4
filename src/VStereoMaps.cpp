@@ -415,7 +415,6 @@ void VStereoMaps::RM_getAlpha( bool iIsOn )
     }
 
     double iRingWidth = fRunList.fRM_RingWidth;
-    if( bUncorrelatedSkyMaps ) iRingWidth = fRunList.fRM_RingWidthUC;
 
 // calculate ring radii
 // outer ring radius is fRM_RingRadius+fRM_RingWidth/2.
@@ -1126,7 +1125,6 @@ bool VStereoMaps::fill_RingBackgroundModel( double x, double y, double ze, doubl
 // inner ring radius is fRM_RingRadius-fRM_RingWidth/2.
 
     double iRingWidth = fRunList.fRM_RingWidth;
-    if( bUncorrelatedSkyMaps ) iRingWidth = fRunList.fRM_RingWidthUC;
     double i_rU = fRunList.fRM_RingRadius + iRingWidth/2.;
     double i_rL = fRunList.fRM_RingRadius - iRingWidth/2.;
 
@@ -1566,7 +1564,8 @@ bool VStereoMaps::defineAcceptance()
 
     fAcceptance->setRegionToExcludeAcceptance( vXTOEXCLUDE_CameraCoordinates, vYTOEXCLUDE_CameraCoordinates, vRTOEXCLUDE );
 
-    fAcceptance->setSource( fRunList.fWobbleWestMod+fTargetShiftWest, fRunList.fWobbleNorthMod+fTargetShiftNorth, sqrt(fRunList.fSourceRadius), fRunList.fRM_offdist, fRunList.fmaxradius );
+    fAcceptance->setSource( fRunList.fWobbleWestMod+fTargetShiftWest, fRunList.fWobbleNorthMod+fTargetShiftNorth, 
+                            sqrt(fRunList.fSourceRadius), -1., fRunList.fmaxradius );
 
     return true;
 }

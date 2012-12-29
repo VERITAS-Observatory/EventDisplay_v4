@@ -62,19 +62,15 @@ class sRunPara
         double fTargetShiftRAJ2000;               // [deg]
         double fTargetShiftDecJ2000;              // [deg]
 
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_North;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_West;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_DecJ2000;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_RAJ2000;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_Radius;
+        vector< double > fExcludeFromBackground_North;    //[deg]
+        vector< double > fExcludeFromBackground_West;     //[deg]
+        vector< double > fExcludeFromBackground_DecJ2000; //[deg]
+        vector< double > fExcludeFromBackground_RAJ2000;  //[deg]
+        vector< double > fExcludeFromBackground_Radius;   //[deg]
         vector< int >    fExcludeFromBackground_StarID;
 
         unsigned int fNTel;                       // number of telescopes
+	string   fTelToAna;
         unsigned int fMaxTelID;
         vector< unsigned int > fTelToAnalyze;
 
@@ -97,8 +93,6 @@ class sRunPara
 // RING BACKGROUND MODEL
         double fRM_RingRadius;                    // ring radius [deg]
         double fRM_RingWidth;                     // ring width [deg]
-        double fRM_RingWidthUC;                   // ring widht for uncorrelated sky maps [deg]
-        double fRM_offdist;                       // minimum distance of background events from source region [deg]
 
 // REFLECTED REGION MODEL
         double fRE_distanceSourceOff;             // minimal distance of off source regions in number of background regions from the source region
@@ -156,16 +150,11 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fSkyMapCentreRAJ2000;              // [deg]
         double fSkyMapCentreDecJ2000;             // [deg]
 
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_North;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_West;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_DecJ2000;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_RAJ2000;
-                                                  //[deg]
-        vector< double > fExcludeFromBackground_Radius;
+        vector< double > fExcludeFromBackground_North;    //[deg]
+        vector< double > fExcludeFromBackground_West;     //[deg]
+        vector< double > fExcludeFromBackground_DecJ2000; //[deg]
+        vector< double > fExcludeFromBackground_RAJ2000;  //[deg]
+        vector< double > fExcludeFromBackground_Radius;   //[deg]
         vector< int >    fExcludeFromBackground_StarID;
 	vector< string > fExcludeFromBackground_StarName;
 
@@ -176,7 +165,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fEnergyFitMin;                     // in log10 [TeV]
         double fEnergyFitMax;                     // in log10 [TeV]
         int    fEffectiveAreaVsEnergyMC;
-        int fEnergyEffectiveAreaSmoothingIterations;
+        int    fEnergyEffectiveAreaSmoothingIterations;
         double fEnergyEffectiveAreaSmoothingThreshold;
         vector< double > fMCZe;                   // zenith angle intervall for Monte Carlo
 	int fFrogs;
@@ -189,6 +178,26 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 // map with all run parameters (sorted after onrun)
         map< int, sRunPara > fMapRunList;
 
+// background model
+        int    fTMPL_fBackgroundModel;
+
+// RING BACKGROUND MODEL
+        double fTMPL_RM_RingRadius;                  // ring radius [deg]
+        double fTMPL_RM_RingWidth;                   // ring width [deg]
+
+// REFLECTED REGION MODEL
+        double fTMPL_RE_distanceSourceOff;          // minimal distance of off source regions in number of background regions from the source region
+        int    fTMPL_RE_nMinoffsource;              // minmum number of off source regions (default 3)
+	int    fTMPL_RE_nMaxoffsource;              // maximum number of off source regions (default 7)
+
+// analysis TMPL file
+	string fTMPL_CutFile;
+	double fTMPL_SourceRadius;
+	double fTMPL_maxradius;
+	string fTMPL_AcceptanceFile;
+	string fTMPL_EffectiveAreaFile;
+
+// star exclusion regions
         string fStarCatalogue;
         double fStarMinBrightness;
         string fStarBand;
@@ -199,11 +208,12 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         VAnaSumRunParameter();
         ~VAnaSumRunParameter() {}
         unsigned int getMaxNumberofTelescopes();
-        int getInputFileVersionNumber() { return fVersion; }
+        int  getInputFileVersionNumber() { return fVersion; }
         void getEventdisplayRunParameter( string );
         void getWobbleOffsets( string );
-        int getRunListVersion() { return fVersion; }
-        int loadFileList(string i_listfilename, bool bShortList = false, bool bTotalAnalysisOnly = false );
+        int  getRunListVersion() { return fVersion; }
+        int  loadLongFileList( string i_listfilename, bool bShortList = false, bool bTotalAnalysisOnly = false );
+        int  loadShortFileList( string i_listfilename, string iDataDir, bool bTotalAnalysisOnly = false );
         void printStereoParameter( unsigned int icounter );
         void printStereoParameter( int irun );
         int  readRunParameter( string i_filename );

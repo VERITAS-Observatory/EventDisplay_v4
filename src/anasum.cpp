@@ -22,6 +22,7 @@ int parseOptions(int argc, char *argv[]);
 
 // input run list
 string listfilename = "";
+string listShortfilename = "";
 // output file with all anasum results
 string outfile="output.ansum.root";
 // run types:
@@ -49,9 +50,9 @@ bool testCommandlineArguments()
 	 return false;
     }
 // require a runlist file
-    if( listfilename.size() < 1 )
+    if( listfilename.size() < 1 && listShortfilename.size() < 1 )
     {
-        cout << "error: missing required command line argument --runlist (-l)" << endl;
+        cout << "error: missing required command line argument --runlist (-l) or --shortlist (-s)" << endl;
         return false;
     }
 // require data directory
@@ -77,7 +78,7 @@ int main(int argc, char *argv[] )
 
 // initialize analysis
     VAnaSum *anasum = new VAnaSum( datadir, analysisType );
-    anasum->initialize( listfilename, singletel-1, runType, outfile, fRandomSeed, fRunParameterfile);
+    anasum->initialize( listfilename, listShortfilename, singletel-1, runType, outfile, fRandomSeed, fRunParameterfile);
     cout << endl;
 
 // mono analysis (GM: DOES NOT WORK ANYMORE)
@@ -112,6 +113,7 @@ int parseOptions(int argc, char *argv[])
         {
             {"help", no_argument, 0, 'h'},
             {"runlist", required_argument, 0, 'l'},
+            {"shortlist", required_argument, 0, 'k'},
             {"analysisType", required_argument, 0, 'm'},
             {"outfile", required_argument, 0, 'o'},
             {"datadir", required_argument, 0, 'd'},
@@ -122,7 +124,7 @@ int parseOptions(int argc, char *argv[])
             {0,0,0,0}
         };
         int option_index=0;
-        int c=getopt_long(argc, argv, "h:l:m:o:d:s:r:i:u:f:g", long_options, &option_index);
+        int c=getopt_long(argc, argv, "h:l:k:m:o:d:s:r:i:u:f:g", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
         switch(c)
@@ -163,6 +165,9 @@ int parseOptions(int argc, char *argv[])
                 break;
             case 'l':
                 listfilename=optarg;
+                break;
+            case 'k':
+                listShortfilename=optarg;
                 break;
             case 'r':
                 fRandomSeed = atoi( optarg );

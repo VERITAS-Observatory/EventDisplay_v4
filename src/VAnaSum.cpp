@@ -39,7 +39,8 @@ VAnaSum::VAnaSum(string i_datadir, unsigned int iAnalysisType )
    NOTE: mono analysis might not work anymore
 
 */
-void VAnaSum::initialize(string i_listfilename, int i_singletel, unsigned int iRunType, string i_outfile, int iRandomSeed, string iRunParameterfile )
+void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename, int i_singletel,
+                          unsigned int iRunType, string i_outfile, int iRandomSeed, string iRunParameterfile )
 {
     char i_temp[2000];
     char i_title[200];
@@ -67,17 +68,30 @@ void VAnaSum::initialize(string i_listfilename, int i_singletel, unsigned int iR
         cout << "...exiting" << endl;
         exit( -1 );
     }
-    int i_npair = fRunPara->loadFileList(i_listfilename, false, (fAnalysisRunMode == 1) );
+    int i_npair = 0;
+    if( i_LongListFilename.size() > 0 ) i_npair = fRunPara->loadLongFileList( i_LongListFilename, false, (fAnalysisRunMode == 1) );
+    else                                i_npair = fRunPara->loadShortFileList( i_ShortListFilename, fDatadir, (fAnalysisRunMode == 1) );
     if( i_npair == 0 )
     {
-        cout << "Error: no files found in runlist" << endl;
+        cout << "VAnaSum error: no files found in runlist" << endl;
         cout << "...exiting" << endl;
         exit( -1 );
     }
     cout << "Random seed for stereo maps: " << iRandomSeed << endl;
     cout << endl;
-    cout << "File with list of runs: " << i_listfilename;
-    cout << " (file format version " << fRunPara->getInputFileVersionNumber() << ", " << i_npair << " runs found in list)" << endl;
+    cout << "File with list of runs ";
+    if( i_LongListFilename.size() > 0 )
+    {
+       cout << " (long version): " << i_LongListFilename;
+       cout << " (file format version " << fRunPara->getInputFileVersionNumber() << ", " << i_npair << " runs found in list)" << endl;
+    }
+    else
+    {
+       cout << " (short version): " << i_ShortListFilename;
+       cout << " (" << i_npair << " runs found in list)";
+       cout << endl;
+    }
+       
     if( fAnalysisRunMode != 1 )
     {
         if( fRunPara->getInputFileVersionNumber() > 3 ) fRunPara->getEventdisplayRunParameter( fDatadir );

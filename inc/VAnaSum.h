@@ -49,7 +49,8 @@ class VAnaSum
 
         void doMonoAnalysis( bool iFull );
         void doStereoAnalysis( bool iSkyPlots );
-        void initialize(string i_listfilename, int i_singletel, unsigned int iRunType, string i_outfile, int iRandomSeed, string fRunParameterfile );
+        void initialize(string i_longlistfilename, string i_shortlistfilename, int i_singletel, unsigned int iRunType,
+	                string i_outfile, int iRandomSeed, string fRunParameterfile );
         void terminate();
 
     private:
@@ -58,11 +59,13 @@ class VAnaSum
         void doLightCurves( TDirectory *iDir, double ialpha, VStereoAnalysis *ion, VStereoAnalysis *ioff );
         void doMonoAnalysis( int irunon, int irunoff, double iexp_on, double i_exp_off, vector<TDirectory *> idir );
         void doStereoAnalysis( int icounter, int irunon, int irunoff, TDirectory *idir );
-        void fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off, double i_nevts_on, double i_nevts_off, double i_norm_alpha, double i_sig, double i_rate, double i_rateOFF, VOnOff *fstereo_onoff );
+        void fillRunSummary( int onrun, int offrun, double iexp_on, double iexp_off, 
+	                     double i_nevts_on, double i_nevts_off, double i_norm_alpha, 
+			     double i_sig, double i_rate, double i_rateOFF, VOnOff *fstereo_onoff );
         double getAzRange( int i_run, string i_treename, double &azmin, double &azmax );
         double getNoiseLevel( int i_run, double iNoiseLevel );
-        void makeEnergySpectrum( int ionrun, TList*, double );
-	void make2DEnergySpectrum( int ionrun, TList* l);
+        void  makeEnergySpectrum( int ionrun, TList*, double );
+	void  make2DEnergySpectrum( int ionrun, TList* l);
 
         bool bTotalAnalysisOnly;
         bool bUpdateAnalysis;
