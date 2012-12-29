@@ -606,7 +606,7 @@ void VImageBaseAnalyzer::gainCorrect()
 */
 void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 {
-    if( fDebug ) cout << "VImageBaseAnalyzer::findDeadChans( bool iLowGain )" << endl;
+    if( fDebug ) cout << "VImageBaseAnalyzer::findDeadChans( bool iLowGain ) T" << getTelID()+1 << endl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // do not set anything dead for PE-mode
@@ -648,15 +648,20 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 // get mean and rms of pedvar
     double i_meanPedVar = 0.;
     double i_meanPedVarRMS = 0.;
-    if( usePedestalsInTimeSlices( iLowGain ) )
+    getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
+// (GM 20121227) not clear why this difference was made
+//      -> problem when looking at grisu sims and
+//         individual telescopes
+/*    if( usePedestalsInTimeSlices( iLowGain ) )
     {
-        getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
+       getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
     }
     else
     {
-        i_meanPedVar = getmeanPedvars( iLowGain, getSumWindow() );
-        i_meanPedVarRMS = getmeanRMSPedvars( iLowGain, getSumWindow() );
-    }
+       i_meanPedVar = getmeanPedvars( iLowGain, getSumWindow() );
+       i_meanPedVarRMS = getmeanRMSPedvars( iLowGain, getSumWindow() );
+    } 
+*/
 
     for ( unsigned int i = 0; i < getNChannels(); i++ )
     {
@@ -759,6 +764,10 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     {
        if( getDead( iLowGain )[i] )
        {
+	  if( fDebug )
+	  {
+	     cout << "\t dead channel " << i << "\t" << getDead( iLowGain )[i] << endl;
+          }
           n_dead++;
        }
     }

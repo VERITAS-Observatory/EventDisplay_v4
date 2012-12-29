@@ -266,7 +266,12 @@ unsigned int VDeadChannelFinder::testPedestalVariationsMaxOut( unsigned int icha
 // test if pedvars is an outlier
     if( iPedVar > imeanPed + fDEAD_peddev_max * irmsPed )
     {
-        if( fDebug ) cout << "testPedestalVariationsMaxOut (4): " << ichannel << " " << fDEAD_peddev_max << " " << imeanPed + fDEAD_peddev_max * irmsPed << " " << imeanPed << " " << irmsPed << " " << iPedVar << endl;
+        if( fDebug )
+	{
+	   cout << "testPedestalVariationsMaxOut (4): " << ichannel << " " << fDEAD_peddev_max;
+	   cout << " " << imeanPed + fDEAD_peddev_max * irmsPed << " " << imeanPed << " ";
+	   cout << irmsPed << " " << iPedVar << endl;
+        }
         return 4;
     }
 
