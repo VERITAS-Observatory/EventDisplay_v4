@@ -45,7 +45,7 @@ int main( int argc, char *argv[] )
     parseOptions(argc, argv);
 
 // read file list from run list file
-    fRunPara->loadFileList(listfilename, true );
+    fRunPara->loadLongFileList(listfilename, true );
     if( fRunPara->getRunListVersion() < 4 )
     {
         cout << "require run list >= 4" << endl;
