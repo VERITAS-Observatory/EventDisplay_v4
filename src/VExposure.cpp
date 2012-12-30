@@ -1705,6 +1705,97 @@ void VExposure::printListOfRuns()
 
 }
 
+void VExposure::outputAnasumRunlist( string cutlevel, string background )
+{
+
+  string cutFile;
+  string backgroundmodel;
+  string effectiveAreaFile;
+  string modelParam;
+  string radialAcceptenceFile;
+
+  string Epoch;
+
+// loop over all runs 
+  for( unsigned int j = 0; j < fRunRA.size(); j++ )
+  {
+
+       cutFile = "ANASUM.GammaHadron.d20120909-cut-";
+       effectiveAreaFile = "effArea-d20120909-cut-";
+       radialAcceptenceFile = "radialAcceptance-d20120909-cut-";
+       Epoch = "";
+
+       if( fRun[j] < 49000 )                         Epoch += "V4";
+       else if( fRun[j] > 49000 && fRun[j] < 69000 ) Epoch += "V5";
+       else if( fRun[j] > 69000 ) 		     Epoch += "V6";
+
+       if(cutlevel=="soft")             cutFile += "N2-Point-005CU-Soft.dat";
+       else if(cutlevel=="moderate")    cutFile += "N3-Point-005CU-Moderate.dat";
+       else if(cutlevel=="hard")        cutFile += "N3-Point-005CU-Hard.dat";
+
+       if(background=="ring")           backgroundmodel = " 1 ";
+       else if(background=="reflected") backgroundmodel = " 2 ";
+       else if(background=="onoff")     backgroundmodel = " 0 ";
+
+       if(fRunConfigMask[j]==15)        effectiveAreaFile = effectiveAreaFile;
+       else if(fRunConfigMask[j]==7)    effectiveAreaFile = effectiveAreaFile;
+       else if(fRunConfigMask[j]==11)   effectiveAreaFile = effectiveAreaFile;
+       else if(fRunConfigMask[j]==13)   effectiveAreaFile = effectiveAreaFile;
+       else if(fRunConfigMask[j]==14)   effectiveAreaFile = effectiveAreaFile;
+       else 				effectiveAreaFile = "eff_2Tel";
+
+       if(cutlevel=="soft")             effectiveAreaFile += "N2-Point-005CU-Soft-";
+       else if(cutlevel=="moderate")    effectiveAreaFile += "N3-Point-005CU-Moderate-";
+       else if(cutlevel=="hard")        effectiveAreaFile += "N3-Point-005CU-Hard-";
+
+       effectiveAreaFile += Epoch;
+       effectiveAreaFile += "-d20121218.root";
+
+       if(background=="ring")      modelParam = " 0.5 10. ";
+       else if(background=="reflected") modelParam = " 0.5 1 10 ";
+
+       if(fRunConfigMask[j]==15)      radialAcceptenceFile = radialAcceptenceFile;
+       else if(fRunConfigMask[j]==7)  radialAcceptenceFile = radialAcceptenceFile;
+       else if(fRunConfigMask[j]==11) radialAcceptenceFile = radialAcceptenceFile;
+       else if(fRunConfigMask[j]==13) radialAcceptenceFile = radialAcceptenceFile;
+       else if(fRunConfigMask[j]==14) radialAcceptenceFile = radialAcceptenceFile;
+       else 			      radialAcceptenceFile = "rad_2Tel";
+
+       if(cutlevel=="soft")             radialAcceptenceFile += "N2-Point-005CU-Soft-";
+       else if(cutlevel=="moderate")    radialAcceptenceFile += "N3-Point-005CU-Moderate-";
+       else if(cutlevel=="hard")        radialAcceptenceFile += "N3-Point-005CU-Hard-";
+
+       radialAcceptenceFile += Epoch;
+       radialAcceptenceFile += "-d20121203.root";
+
+
+// total time on object (new array configuration only)
+      if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
+      {
+
+         if(fStatus[j]=="good_run") cout << "* ";
+         cout << fRun[j] << " ";
+         cout << fRun[j] << " ";
+         cout << " 0 ";
+
+         cout << cutFile.c_str() << " ";
+
+         cout << backgroundmodel.c_str() << " ";
+
+         cout << effectiveAreaFile.c_str() << " ";
+
+         cout << modelParam.c_str() << " ";
+
+         cout << radialAcceptenceFile.c_str() << endl;
+       
+
+      }
+
+  }
+
+
+}
+
 void VExposure::downloadRunList()
 {
 

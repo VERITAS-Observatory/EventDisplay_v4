@@ -1,9 +1,8 @@
 /*! file VTS.getRunListFromDB read exposure from DB
 
     (VERITAS only)
-
-
     \author Gareth Hughes
+
 */
 
 #include "VGlobalRunParameter.h"
@@ -22,6 +21,8 @@ string runlist="";
 string startdate="2000-01-01";
 string enddate="2050-01-01";
 string sourcename="Crab";
+string background="";
+string cutlevel="";
 double elevation=0.;
 double duration=0.;
 int laserruns=0;
@@ -64,12 +65,16 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       a.downloadRunList();
 
+      if( background != "" && cutlevel != "" )
+        a.outputAnasumRunlist( cutlevel, background );
+
       return 0;
 
     }
 
    if( runlist != "" )
     {
+
 
       a.readRunListFromFile(runlist);
       a.readFromDBList();
@@ -82,6 +87,10 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
 
+      if( background != "" && cutlevel != "" )
+        a.outputAnasumRunlist( cutlevel, background );
+
+
       return 0;
 
     } else if( laserlist != "" )
@@ -90,6 +99,9 @@ int main( int argc, char *argv[] )
       a.readLaserRunListFromFile(laserlist);
       a.setSelectLaser( laserruns );
       if( getRuns == 1 ) a.downloadRunList();
+
+      if( background != "" && cutlevel != "" )
+        a.outputAnasumRunlist( cutlevel, background );
 
       return 0;
 
@@ -111,9 +123,13 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
 
+      if( background != "" && cutlevel != "" )
+        a.outputAnasumRunlist( cutlevel, background );
+
       return 0;
 
     }
+
 
     return 0;
 
@@ -142,7 +158,7 @@ void parseOptions(int argc, char *argv[])
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:k:c:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
@@ -206,6 +222,12 @@ void parseOptions(int argc, char *argv[])
                 break;
             case 'r':
                 runnumber=atoi(optarg);
+                break;
+            case 'k':
+                background=optarg;
+                break;
+            case 'c':
+                cutlevel=optarg;
                 break;
             case '?':
                 break;
