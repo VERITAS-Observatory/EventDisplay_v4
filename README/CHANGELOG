@@ -1,0 +1,345 @@
+Change log for v400 (last updated: 2013-01-02)
+===============================================
+
+
+
+Changes from v35x to v400
+=========================
+
+Note: the list below tries to summarize the most important changes
+      between v35x and v400. It is not complete and it doesn't give
+      a weight to the changes according to their significance.
+
+general
+    general cleanup and removal of many obsolete functions
+    removed a lot of code duplication
+    added and clarified comments
+    in many places clearer function and variable naming
+    simpler structuring of the code
+    much simpler usage for general user (hopefully...)
+
+documentation
+    added README directory with up-to-date READMEs
+    started a tex-based manual (doc directory)
+
+environmental variables
+    changed and improved handling of environmental variables
+    (can easily change between between CTA and VERITAS settings (or any other observatory))
+
+Changes in evndisplay
+=====================
+
+* EVNDISP (VTS) pointing classes
+    Use directly pointing directions from database or pointing monitor 
+           (v35x: differences of DB values to expected pointing direction were treated as pointing errors)
+           This improves slightly the results (many values are functions of ze, az).
+           Allow now the consistent analysis of runs taken orbit mode (but: for a complete analysis of orbit mode runs changes in anasum are necessary)
+    New setup of pointing classes: VPointing, VSkyCoordinates, VSkyCoordinatesUtilities
+    Major cleanup of the pointing code
+
+* EVNDISP (VTS, CTA) pedestals calculation
+   fixed bug regarding reading of pedestal events using -teltoana=2 (or anything different then 1) for grisudet sims
+
+* EVNDISP (VTS) zero-suppression cuts
+    fixed handling of reading of number of samples per event to allow the analysis of zero-suppressed runs (tested with run 58914)
+    write number of zero suppressed channels to output trees; 
+    updated display to plot zero suppressed channels correctly
+    
+* EVNDISP (VTS) QADC mode
+   adjusted raw data reader to work with VERITAS QADC mode (e.g. run 62728, 62988)
+        
+* EVNDISP (VTS): low-gain calibration
+    fixed calculation of low-gain pedestals
+    added a new calibration file (calibrationlist.LowGain.dat) with validity ranges for low-gain runs
+    added small class to combine results from two low-gain flasher runs (VPedestalLowGain)
+    added low-gain calibration files (lped) to calibration directory for most recent years
+    fixed handling of low-gain multiplier in code (now strictly dependent on summation window)
+    added parameter to low-gain calibration file (calibrationlist.LowGain.dat) to give a mean low-gain multiplier per telescope 
+    (key word LOWGAINMULTIPLIER, can be given for a certain run range)
+    
+* EVNDISP (VTS, CTA-FADC Mode): tzero calibration
+   added a new TZERO calibration mode (runmode=7) to calculate average tzero for each pixel. 
+      This is used for event where no pixels survived the first pass in doublepass
+      Added this additional pass to all scripts
+      test show significant improvement at low energies in gamma reconstruction
+    
+* EVNDISP (VTS, CTA-FADC Mode): summation windows
+    introduced three summation windows: 
+       i) short window for best sensitivity (used as well in second pass of doublepass): returned with getSumWindow() or getSumWindow_1()
+       ii) long window to minimize systematics in energy reconstruction (used for size2 calculation): returned with getSumWindow_2()
+       iii) summation window for first pass in double pass method: returned with getSumWindow_Pass1()
+    Major cleanup in the code. Removed all 'small' variables for double pass second windows
+    fixed summation window settings for short readout windows (do not allow to have longer calibration windows then the readout window is)
+       
+* EVNDISP (VTS, CTA-FADC Mode):  trace handler, charge integration and energy reconstruction
+    calculation of integrated charge (sum) per image simultaneously for two summation windows 
+        (long: size2 and short: size in tpars tree)   
+       The long window is used in the lookup table code for reconstruction of energies. 
+    Allow now to add easily new charge integration method (and some have been added)
+    Allow telescope-type dependent selection of trace integration parameters
+    Added sliding window integration method (not default).
+    Added calculation of weighted mean pulse time.
+    Cleanup and optimization of trace handler.
+    Fixed bug in overflow of saturated low-gain traces for GrISU simulation using external noise files
+    Fixed settings of long summation window for pixels on low gain (go back to old style by using command line option -fixwindow2=0)
+
+* EVNDISP (VTS, CTA-FADC Mode): DST
+    fixed and improved analysis using DST files
+    added FADC traces to DST files (note: large impact on file sizes)
+
+* EVNDISP (VTS, CTA) command line parameters moved to a new parameter file
+    trace integration and cleaning parameters are moved to a parameter file 
+    (see example file EVNDISP.reconstruction.runparameter)
+    
+* EVNDISP (VTS, CTA): global run parameters
+    moved all VERITAS dependent parameters (e.g. database location, UCLA archive) into external parameter files (EVNDISP.global.runparameter)
+        added observatory to this file (height, latitude, longitude)
+    
+* EVNDISP (VTS, CTA): image cleaning
+    several different cleaning methods are available:
+    TWOLEVELCLEANING: classical cleaning
+    TIMECLUSTERCLEANING and TIMENEXTNEIGHBOUR (both work in progress, expert use only!)
+          Allow now different cleaning parameters and method per telescope type.
+        All image cleaning parameters are now handled by a class (VImageCleaningRunParameter)
+
+* EVNDISP (VTS, CTA): image parameter calculation
+    added minimum number of tube fit for log-likelihood reconstruction
+    changed default loss value for  log-likelihood reconstruction from 0 to 10% (LL does not perform very well for small images)
+    added lossAndDead image parameter (fraction of size at the edge of FOV + as neighbour of dead pixels) 
+    optimized fitting (use now only pixel values from image + surrounding ring; was: whole camera)
+    cleanup and simplification of function calls in image parameter calculation
+    
+* EVNDISP (VTS, CTA): quality cuts for stereo reconstruction
+    removed all size cuts, use only one for all cuts. Default values are ntubes>=3, size > 100 and loss < 0.5
+
+* EVNDISP (VTS, CTA): output file: image parameter trees
+    added counting of saturated channels; old nsat is now called nlowgain
+    added size2 for image size for long integration window
+    removed max[0-2] and index_of_max[0-2] from short trees (saves on file size)
+
+* EVNDISP (VTS, CTA): core reconstruction
+    fixed problem with parallel images in 2-image events (gave previously NAN for core positions)
+
+* EVNDISP (VTS, CTA):  direction reconstruction
+    default method is now the reconstruction of shower and core direction by mean value of intersection value of pairs of intersecting image lines 
+    (Hofmann et al 1999, Method 1 (HEGRA method))
+    weight depend on image size, elongation of images (width/length), angular separation between image axis
+    This method is more robust to ill reconstruction image lines (weighting takes care of this)
+    Direction reconstruction is independent of grisu methods.
+
+* EVNDISP (VTS, CTA): modified disp angular reconstruction
+    added a modified disp angular reconstruction method (work in progress, expert use only)
+    
+* EVNDISP (VTS): reading run info from DB
+    Added second try for connection with DB server (connection fails sometimes when many jobs are started simultaneously). 
+    Wait 10 s for second try.
+    
+* EVNDISP (VTS, CTA): display
+    optimization work to handle more telescopes
+    minor fixes to handle events without FADC traces (DSTs)
+    fixed annoying color problems in camera plotter
+    
+FROGS
+======
+
+* added FROGS analysis routines
+    (this should not affect any standard analysis)
+
+mscw_energy (lookup tables)
+=======================
+
+* MSCW_ENERGY (VTS, CTA) lookup table file
+    change table handling to reduce file size (new lookup tables are a factor of 7 smaller than old ones)
+    all information is now in a single table tree
+    remove unfilled bins from lookup tables and reduce histograms  (this is done in the merging of lookup tables in combineLookupTables) 
+    default reconstruction ID is now '0' (note that no other reconstruction IDs are needed for the standard analysis)
+    significant update on table writer and reader; simplification and performance improvements
+    bug fixes: (sum of log values is not the same as log of the sum...)
+    fixed inconsistent selection of methods for array variable filling
+    use selected images from eventdisplay stage for mean scaled and energy reconstruction (before: used all with decent values)
+    added plotter for lookup tables
+    added additional checks that evndisplay input files are in healthy state 
+        (can be important for MC files, where the MC histograms are the last objects written to the evndisp file)
+    
+    
+effective area and instrument response function calculation
+==============================================
+
+*  EFFECTIVE AREA CALCULATION (VTS) merging of effective area files
+    fixed several small bugs to handling missing root files
+    
+*  EFFECTIVE AREA CALCULATION (VTS, CTA), IRFs
+    completely rewrote IRF calculation
+    added energy resolution a la CTA
+    
+* EFFECTIVE AREA CALCULATION (VTS, CTA)
+    filling MC histograms of thrown events now already at eventdisplay 
+    (no necessity to copy trees with MC parameters through the lookup table code, saves orders of magnitudes (!) in disk space)
+    major cleanup
+    factors of 10-20 performance increase due to different optimization
+    added counting of multiple CORSIKA events
+    added histogram with unweighted (no spectral weights) events after cuts
+    added time dependent effective area code
+    improved plotting of effective areas and angular/energy resolution
+    added cut on maximum distance of reconstructed shower core to next telescope ("telcoredistance")
+    changed order in filling of debug histograms (to keep better track of effect of cuts)
+    
+* EFFECTIVE AREA CALCULATION (VTS, CTA): spectral weighting
+    fixed important cuts important for MC with energy spectra unequal to -2
+    optimization
+    
+gamma-hadron separation
+=====================
+
+* CUTS (VTS, CTA): size cut
+    SizeSecondMax replaces now all size cuts in the analysis
+    (no size cut in stereo reconstruction in eventdisplay)
+
+*  CUTS (VTS, CTA): direction cuts
+    cleaned up direction cut section and added parameter to choose the correct one (fDirectionCutSelector)
+    implemented energy dependent theta2 cut  (for Monte Carlo only)
+    
+* CUTS (VTS, CTA):  TMVA based gamma-hadron separation
+    added TMVA based gamma-hadron separation (several classes)
+    additions to anasum cuts and effective areas to handle this
+    added training code and scripts
+    (this is 90% tested, still expert use only)
+
+* CUTS (CTA):  telescope type dependent image multiplicity cuts
+  allow for example to require at least 2 LSTs, 3 MSTs and 5 SSTs
+
+* CUTS (VTS, CTA):  gamma/hadron statistics
+    added class to keep track of different gamma/hadron cuts
+    
+radial acceptance curve calculation
+============================
+
+* RADACCEPTANCE (VTS): I/O
+    made code more robust against missing input files
+    write cuts to acceptance files (to keep track of them)
+    
+ANASUM (all VTS)
+===============
+
+* ANASUM: energy reconstruction method (lookup tables)
+   changed default energy reconstruction method to 1 (tables with lg size on X-axis)
+   method 1 shows inconsistencies at low energies (no strict proportionality between size and energy) and event losses at high energies
+   Note that the plan is to replace the lookup table based energy reconstruction method by something more sophisticated (NN or BDT)
+
+* ANASUM: spectral energy and flux calculation
+    propagated bug fixes from v354 and 355 (first and last bin in spectral energy distribution)
+    fixed Rolke upper limit calculation for alpha != 1
+    Usage of Li & Ma significance calculation equation 5 in spectral classes.
+    The default is now the Rolke method, which should work better as well for the small event numbers we often have.
+    Rolke is as well the default for the upper limit calculation
+    fixed error calculation to be Poissonian
+    Added Rolke based flux calculation (no negative fluxes) (optional)
+    added time dependent filling of effective area histograms: allows higher precision for intra-run light curves
+    added more functions to spectral fitter (curved and broken power laws)
+    
+* ANASUM: phase cuts
+    allow cuts on phase (e.g. for pulsars or binaries)
+    general cleanup
+    
+* ANASUM: astro classes
+    removed (VAstroSource) and replaced by VSkyCoordinates (code was partly duplicated)
+    VTargets is made obsolete in most cases, only kept for backwards compatibility
+    added VSkyCoordinatesUtilities for most used simple functions
+    
+* ANASUM: sky map and histogram plotting
+    general cleanup
+    critical bug fixes related to calculation of distance for current epoch and J2000 coordinates
+    (all coordinates away from the sky-map centre were calculated incorrectly)
+    fixed long-standing bug in RA axis plotting (was time-zone dependent)
+    
+sensitivity calculations
+==================
+
+* SENS (VTS, CTA): differential and integral sensitivity calculator
+    expanded and cross-checked extensively the sensitivity calculation
+    implemented sensitivity requirements from CTA
+    added errors
+    added many debug features and tests
+
+* SENS (VTS, CTA): CTA WP Phys files
+    added writer for CTA WP Phys files
+    added plotter for CTA WP Phys files
+    
+tools
+====
+
+* (VTS): Crab rate calculator from MC 
+    several bug fixes and additions to take new effective area format into account
+
+* (VTS) data base tools
+    fixed seg fault in reading of run comments in VRunStats
+    
+* (VTS): light curve tools
+    added new tools to make, plot and analyze light curves (VHE and XRT) -> see Manual
+    phase dependent light curves, 
+    ZDCF analysis 
+    Lomb Scargle analysis
+    added different consistency tests for ZDCF and LS
+    
+* (VTS) balloon data analysis
+    fixed macro and script to download and analyse balloon data
+
+scripts
+=====
+
+* (VTS, CTA): script for batch cluster
+    updated and improved scripts to run a large data set on a batch cluster
+    
+comparison of data and MC
+======================
+
+* (VTS) compareDatawithMC  (former stereoCompare)
+   compare MC simulations of gamma rays with excess events from data: removed obsolete code;
+   updated pointing classes
+   added MVA variables
+   improved and added new plotting routines
+
+downloading data from UCLA
+=======================
+   
+* (VTS) VTS.getRunListFromDB
+   significantly improved run list generator using the VTS data base
+   replaces old perl scripts
+
+    
+Class renaming
+==============  
+    
+getEffectiveArea.cpp -> makeEffectiveArea.cpp 
+VRunParameterV2 -> VEvndispRunParameter 
+cEffArea -> CEffArea 
+cEffFit -> CEffFit 
+ctRunSummary -> CRunSummary 
+cData -> CData 
+c_VDST.cpp -> CTA.convert_hessio_to_VDST.cpp 
+VAnaUtils  -> VSkyCoordinatesUtilities / VUtilities / VAnalysisUtilities 
+(VSkyCoordinatesUtilities for all rotations/timing functions; 
+VUtilities all small but useful functions; 
+VAnalysisUtilities as before for anasum related functions)
+VDataHandler -> VTableLookupDataHandler 
+VTableLookRunparameter -> VTableLookupRunparameter 
+VParameters -> VImageParameter 
+VImageCalculation -> VImageParameterCalculation 
+VAnalyzer -> VImageAnalyzer 
+VBaseAnalyzer -> VImageBaseAnalyzer / VImageCleaning 
+VAnalyzerData -> VImageAnalyzerData 
+VAnalyzerHisto -> VImageAnalyzerHistograms 
+VData -> VEvndispData 
+VAnaCuts -> VGammaHadronCuts 
+VPlotBirdsEye -> VDisplayBirdsEye 
+makeOptimizeBoxCuts -> makeOptimizeBoxCutsbyParameterSpaceSearch 
+mscw -> VTableCalculator 
+energy -> VTableEnergyCalculator 
+getCrabRate -> VTS.calculateCrabRateFromMC.cpp 
+getExposureFromDB -> VTS.calculateExposureFromDB.cpp 
+getPhases calculateBinaryPhases -> VEnergy VEffectiveAreaCalculator
+moved parts of VSkyCoordinates to VPointing
+VStereoCompare->VDataMCComparision
+stereocompare -> compareDatawithMC
+VEnergyCorrection ->  VEmissionHeightCalculator
+    
