@@ -33,6 +33,9 @@ Parameters Required:
 		Minimum Duration [seconds]
 	-z	<Angle>
 		Minimum Zenith Angle [degrees]
+	-a	<Anasum Filename>
+		Output Anasum file runlist
+		No star is added to the beginning of the line unless RUN is marked "good_run" by DQM
 
 Optional Flags:
 	-g	Get/Download Runs
