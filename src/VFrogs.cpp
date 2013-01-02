@@ -114,9 +114,8 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     frogsYPStart     = getShowerParameters()->fShowerYcore_SC[frogsRecID];
     frogsXPED        = getShowerParameters()->fShowerXcore[frogsRecID];
     frogsYPED        = getShowerParameters()->fShowerYcore[frogsRecID];
-    frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //TEMP GH
-    //frogsXSStart     = getShowerParameters()->fShower_Xoffset[frogsRecID];
-    frogsYSStart     = -1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
+    frogsXSStart     =      getShowerParameters()->fShower_Xoffset[frogsRecID];
+    frogsYSStart     = -1.0*getShowerParameters()->fShower_Yoffset[frogsRecID];
 
     getFrogParameters()->frogsEventID = getFrogsEventID();
     getFrogParameters()->frogsGSLConStat = getFrogsGSLConStat();
@@ -156,10 +155,6 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     getFrogParameters()->frogsTelGoodnessBkg2 = getFrogsTelGoodnessBkg(2);
     getFrogParameters()->frogsTelGoodnessBkg3 = getFrogsTelGoodnessBkg(3);
 
-//    cout << "Out: " << getFrogsXS() << " " << getFrogsYS() << " " << getFrogsXP() << " " << getFrogsYP() << " " << pow(10.,(double)getFrogsEnergy()) << endl;
-
-//    cout << endl;
-//    cout << endl;
 
     getFrogParameters()->getTree()->Fill();
 
@@ -432,11 +427,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
     rtn.scope[tel].yfield = 
       transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 1 );
 
-//    rtn.scope[tel].xfield = getImageParameters()->Tel_x_SC;
-//    rtn.scope[tel].yfield = getImageParameters()->Tel_y_SC;
-
-    //printf("FROGS Tel Position: %d %f %f\n",tel+1,rtn.scope[tel].xfield,rtn.scope[tel].yfield);
- 
     if(FROGSDEBUG)
       printf("TelSC %d | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f \n",tel,
 	     fData->getShowerParameters()->fShowerZe[frogsRecID],
@@ -478,7 +468,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       rtn.scope[tel].exnoise[pix]=extra_noise;
       //Pixel dead or alive
       rtn.scope[tel].pixinuse[pix]=FROGS_OK;
-      if(fData->getDead()[pix]!=0)
+      if(fData->getDead()[pix]!=0 || fData->getZeroSuppressed()[pix] )
         rtn.scope[tel].pixinuse[pix]=FROGS_NOTOK;
       //Increment the number of live pixels
       if(rtn.scope[tel].pixinuse[pix]==FROGS_OK) rtn.scope[tel].nb_live_pix++;
@@ -527,10 +517,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   else
    rtn.startpt.log10e = FROGS_BAD_NUMBER;
 //MC  rtn.startpt.log10e = log10(fData->getShowerParameters()->MCenergy); //inEnergy from MC 
-
-//  cout << "MC " << 1.0*fData->getShowerParameters()->MCTel_Xoff << " " << -1.0*fData->getShowerParameters()->MCTel_Yoff << " " << fData->getShowerParameters()->MCxcore_SC << " " << 1.0*fData->getShowerParameters()->MCycore_SC << " " << fData->getShowerParameters()->MCenergy << endl;
-//  cout << "ED " << 1.0*fData->getShowerParameters()->fShower_Xoffset[frogsRecID] << " " << -1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID] << " " << fData->getShowerParameters()->fShowerXcore_SC[frogsRecID] << " " << 1.0*fData->getShowerParameters()->fShowerYcore_SC[frogsRecID] << " " << inEnergy << endl;
-//  cout << endl;
 
   //Decides if the event is worth analysing. 
   rtn.worthy_event=FROGS_OK;

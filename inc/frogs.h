@@ -49,7 +49,7 @@
 #define FROGS_NUMBER_OF_SIGMA 10.0      /*Number of standard deviations to be 
 				    explored around a signal. 15 is 
 				    certainly too large*/
-#define FROGS_INTERP_ORDER 1    /*Interpolation order should be 
+#define FROGS_INTERP_ORDER 2    /*Interpolation order should be 
 				  set to 1 (linear) or 2 (quadratic)*/
 #define FROGS_NBEVENT_GDNS_CALIBR 0 /*Number of events used to build a goodness 
 				  calibration file. Must be set to a positive 
