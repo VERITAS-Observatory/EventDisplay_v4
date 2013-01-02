@@ -222,6 +222,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         bool setTargetRADec( unsigned int i, double ra, double dec );
         bool setTargetShifts( unsigned int i, double west, double north, double ra, double dec );
         bool writeListOfExcludedSkyRegions();
+        bool getListOfExcludedSkyRegions( TFile *f );
 
 };
 #endif

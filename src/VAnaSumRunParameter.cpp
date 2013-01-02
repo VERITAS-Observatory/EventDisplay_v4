@@ -1305,3 +1305,32 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 
     return true;
 }
+bool VAnaSumRunParameter::getListOfExcludedSkyRegions(TFile *f)
+{
+    TTree *tEx = ((TTree*)f->Get("total_1/stereo/tExcludedRegions"));
+
+    float x;
+    float y;
+    float r;
+    int id;
+    tEx->SetBranchAddress( "x", &x);
+    tEx->SetBranchAddress( "y", &y);
+    tEx->SetBranchAddress( "r", &r);
+    tEx->SetBranchAddress( "star_id", &id);
+
+    for ( unsigned int i = 0; i < tEx->GetEntries(); i++ )
+    {
+
+        tEx->GetEntry(i);
+        fExcludeFromBackground_West.push_back(x);
+        fExcludeFromBackground_North.push_back(y);
+        fExcludeFromBackground_Radius.push_back(r);
+        fExcludeFromBackground_StarID.push_back(id);
+        
+    }
+
+
+    delete tEx;
+
+    return true;
+}
