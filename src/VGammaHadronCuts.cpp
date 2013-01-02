@@ -1233,10 +1233,33 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
       cout << "VGammaHadronCuts::applyFrogsCut event " << i << endl;
    }
 
-   if (fData->frogsGoodnessImg > frogsGoodnessImgCut )
-      return false;
+    int NTELCUT;
+    double SGCuts;
+
+// 1 % Crab
+
+    if( fData->frogsEnergy > -99. && fData->frogsEnergy < -0.6 ) SGCuts = 0.65;
+    if( fData->frogsEnergy > -0.6 && fData->frogsEnergy < -0.4 ) SGCuts = 1.00;
+    if( fData->frogsEnergy > -0.4 && fData->frogsEnergy < -0.2 ) SGCuts = 1.70;
+    if( fData->frogsEnergy > -0.2 && fData->frogsEnergy <  0.0 ) SGCuts = 2.50;
+    if( fData->frogsEnergy >  0.0 && fData->frogsEnergy <  99. ) SGCuts = 500.;
+
+    if( fData->frogsEnergy > -99. && fData->frogsEnergy < -0.6 ) NTELCUT = 2;
+    if( fData->frogsEnergy > -0.6 && fData->frogsEnergy < -0.4 ) NTELCUT = 2;
+    if( fData->frogsEnergy > -0.4 && fData->frogsEnergy < -0.2 ) NTELCUT = 2;
+    if( fData->frogsEnergy > -0.2 && fData->frogsEnergy <  0.0 ) NTELCUT = 1;
+    if( fData->frogsEnergy >  0.0 && fData->frogsEnergy <  99. ) NTELCUT = 0;
+
+    int NTEL=0;
+    if( fData->frogsTelGoodnessImg0 > -10. && fData->frogsTelGoodnessImg0 < SGCuts ) NTEL++;
+    if( fData->frogsTelGoodnessImg1 > -10. && fData->frogsTelGoodnessImg1 < SGCuts ) NTEL++;
+    if( fData->frogsTelGoodnessImg2 > -10. && fData->frogsTelGoodnessImg2 < SGCuts ) NTEL++;
+    if( fData->frogsTelGoodnessImg3 > -10. && fData->frogsTelGoodnessImg3 < SGCuts ) NTEL++;
+
+    if( NTEL <= NTELCUT ) return false;
 
    return true;
+
 }
 
 /*
@@ -1389,10 +1412,6 @@ bool VGammaHadronCuts::applyStereoShapeCuts()
 // emission height cuts
     if( fData->EmissionHeight > 0. && fData->EmissionHeight > fCut_Emmission_max ) return false;
     if( fData->EmissionHeight > 0. && fData->EmissionHeight < fCut_Emmission_min ) return false;
-
-/// temp temp temp GH
-//    if(fData->frogsGoodnessImg >   0.7 ) return false;
-//    if(fData->frogsGoodnessImg < -10.0 ) return false;
 
     return true;
 }
