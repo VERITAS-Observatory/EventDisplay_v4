@@ -21,8 +21,8 @@ string runlist="";
 string startdate="2000-01-01";
 string enddate="2050-01-01";
 string sourcename="Crab";
-string background="";
-string cutlevel="";
+bool bANASUM = false;
+string fAnasumFile = "";
 double elevation=0.;
 double duration=0.;
 int laserruns=0;
@@ -65,8 +65,8 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       a.downloadRunList();
 
-      if( background != "" && cutlevel != "" )
-        a.outputAnasumRunlist( cutlevel, background );
+      if( bANASUM )
+        a.outputAnasumRunlist(fAnasumFile);
 
       return 0;
 
@@ -87,8 +87,8 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
 
-      if( background != "" && cutlevel != "" )
-        a.outputAnasumRunlist( cutlevel, background );
+      if( bANASUM )
+        a.outputAnasumRunlist(fAnasumFile);
 
 
       return 0;
@@ -100,8 +100,8 @@ int main( int argc, char *argv[] )
       a.setSelectLaser( laserruns );
       if( getRuns == 1 ) a.downloadRunList();
 
-      if( background != "" && cutlevel != "" )
-        a.outputAnasumRunlist( cutlevel, background );
+      if( bANASUM )
+        a.outputAnasumRunlist(fAnasumFile);
 
       return 0;
 
@@ -123,8 +123,8 @@ int main( int argc, char *argv[] )
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
 
-      if( background != "" && cutlevel != "" )
-        a.outputAnasumRunlist( cutlevel, background );
+      if( bANASUM )
+        a.outputAnasumRunlist(fAnasumFile);
 
       return 0;
 
@@ -158,7 +158,7 @@ void parseOptions(int argc, char *argv[])
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:k:c:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
@@ -223,11 +223,9 @@ void parseOptions(int argc, char *argv[])
             case 'r':
                 runnumber=atoi(optarg);
                 break;
-            case 'k':
-                background=optarg;
-                break;
-            case 'c':
-                cutlevel=optarg;
+            case 'a':
+                bANASUM=true;
+                fAnasumFile=optarg;
                 break;
             case '?':
                 break;

@@ -165,7 +165,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 	void printListOfRuns( string iCatalogue, double iR = 2.5, double iMinDuration = 600., string iTeVCatalogue = "", double r_min = 0.1, string iEventListFile= "" );
         void printListOfRuns( double il, double ib, double iR = 2.5, double iMinDuration = 600., string iDQMfileList = "", string ofile = "", unsigned int iVerbose = 0 );
         void printListOfRuns();
-	void outputAnasumRunlist( string cutlevel, string background );
+	void outputAnasumRunlist( string fAnasumFile );
 	void printTexTable();
         bool readAcceptanceCurveFromFile( string iAcc, double iAcceptance_MaxDistance = 1.e9 );
         bool readRootFile( string iname = "2006_2008.root", double iMinMJD = -99., double iMaxMJD = -99. );
