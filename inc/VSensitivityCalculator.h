@@ -188,6 +188,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         bool       checkDataSet( unsigned int iD, string iName );
         bool       checkUnits( string iUnit );
 	bool       fillSensitivityHistogramfromGraph( TGraph* g, TH1F *h, double iScale );
+	bool       fillSensitivityHistogramfromMap( map< int, double > m, TH1F *h );
         TGraph*           getCrabSpectrum( bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
         vector< TGraph* > getCrabSpectrum( vector< double > i_fCrabFlux, bool bIntegralSpectrum,  string bUnit = "CU", bool bReset = true );
 
@@ -228,8 +229,9 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 	bool     fillSensitivityHistograms( TH1F* iSensitivity = 0, TH1F* iBGRate = 0, TH1F* iBGRateSqDeg = 0, 
 	                                    TH1F* iProtonRate = 0,  TH1F* iElectronRate = 0 );
+        bool     fillSensitivityLimitsHistograms( vector<TH1F*>& h );
 	bool     getDebug() { return fDebug; }
-        double   getSensitivity( unsigned int iD, double energy = -1., bool iFillStatistics = true );
+        double   getSensitivity( unsigned int iD, double energy = -1., unsigned int iFillStatistics = 0 );
 	TGraphAsymmErrors*  getSensitivityGraph() { return gSensitivityvsEnergy; }
         unsigned int  listDataSets();
         void     listUnits();
@@ -282,6 +284,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,15);
+        ClassDef(VSensitivityCalculator,16);
 };
 #endif

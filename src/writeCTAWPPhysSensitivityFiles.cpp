@@ -15,7 +15,8 @@ int main( int argc, char *argv[] )
     if( argc != 8 )
     {
         cout << endl;
-	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory> <outputfile> <observatory (CTA/V5/V6)> <offset=0/1> <recid>" << endl;
+	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory>";
+	cout << " <outputfile> <observatory (CTA/V5/V6)> <offset=0/1> <recid>" << endl;
 	cout << endl;
 	exit( 0 );
     }

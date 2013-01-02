@@ -132,7 +132,7 @@ void VSensitivityCalculator::reset()
 
    return sensitivity as fraction of data set used
 */
-double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, bool iFillStatistics )
+double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, unsigned int iFillStatistics )
 {
     if( !checkDataSet( iD, "getSensitivity" ) ) return 0.;
 
@@ -160,8 +160,17 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, b
     }
 
     bool bSuccess = false;
+// minimum number of background events
+    if( iFillStatistics == 4 )
+    {
+	if( fData[iD].fBackground * fData[iD].fAlpha > 0. )
+	{
+	   return -1.;
+	}
+// TMP
+	else return 0.01;
+     }
 
-    int i_energy = (int)(energy*1.e3);
     for( unsigned int n = fSourceStrength.size()-1; n > 0; n-- )
     {
         f = fSourceStrength[n];
@@ -170,38 +179,53 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, b
 	                                   t * fData[iD].fBackground, fData[iD].fAlpha, fLiAndMaEqu );
 
 // keep statistics to show where the limitations are
-	if( energy > 0. && n == 1 && iFillStatistics )
+	if( energy > -99. && n > 0 && iFillStatistics > 0 )
 	{
 // significance limited
-	   if( s < fSignificance_min ) 
+	   if( iFillStatistics == 1 )
 	   {
-	      fSignificanceLimited[i_energy] = s;
+	      if( s >= fSignificance_min ) 
+	      {
+		 f = fSourceStrength[n];
+		 bSuccess = true;
+		 break;
+              }
+	      else continue;
            }
 // limited in minimum number of signal events
-	   if( t * f * n_diff < fEvents_min )
+	   if( iFillStatistics == 2 )
 	   {
-	      fMinEventsLimited[i_energy] = t * f * n_diff;
+	      if( t * f * n_diff >= fEvents_min )
+	      {
+		 f = fSourceStrength[n];
+		 bSuccess = true;
+		 break;
+              }
+	      else continue;
            }
 // limited in systematic error
-	   if( n_diff / (fData[iD].fBackground * fData[iD].fAlpha) <= fMinBackgroundRateRatio_min )
+	   if( iFillStatistics == 3 )
 	   {
-	      fMinBackgroundEventsLimited[i_energy] = t * fData[iD].fBackground;
-           }
-// minimum number of background events
-           if( fData[iD].fBackground * fData[iD].fAlpha <= 1.e-30 )
-	   {
-	      fMinNoBackground[i_energy] = fData[iD].fBackground * fData[iD].fAlpha;
+	      if( f * n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min )
+	      {
+		 f = fSourceStrength[n];
+		 bSuccess = true;
+		 break;
+              }
+	      else continue;
            }
 	}
 
-// require a certain significance and a minimum number of events
+// require a certain significance 
         if(    s >= fSignificance_min 
+// require a minimum number of events
 	    && t * f * n_diff >= fEvents_min
 // require background events 
 // (removes most sensitivity values at large energies, but otherwise transition zone
 //  between signal and background limited zone not well defined)
 	    && fData[iD].fBackground * fData[iD].fAlpha > 0.
-	    && n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min 
+// require the signal to be larger than a certain fraction of background
+	    && f * n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min 
 	  )
         {
             if( n > 0 )
@@ -556,7 +580,9 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
     if( !gSensitivityvsEnergy ) return cSensitivity;
 
 // plot everything
-    setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, fPlottingMarkerStyle, fPlottingMarkerSize, fPlottingFillStyle, fPlottingLineStyle );
+    setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth, 
+                                                 fPlottingMarkerStyle, fPlottingMarkerSize, 
+						 fPlottingFillStyle, fPlottingLineStyle );
 
     gSensitivityvsEnergy->Draw( "l5" );
 
@@ -680,7 +706,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	     if( iN_off < 1. ) iN_off = 0.;
 	     unsigned int iD = addDataSet( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
 	                                   iN_off / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
-             iX.Fill( getSensitivity( iD, -1., false ) );
+             iX.Fill( getSensitivity( iD, -100., 0 ) );
 	}
 	s = iX.GetMean();
 	s_error_L = s - iX.GetRMS();
@@ -697,9 +723,22 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	{
 	   s*= -1.;
         }
+// weighted energy of this bin
+	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
+// (int) of energy for maps
+        int energy_intX3 = (int)(energy*1.e3);
+// get sensitivity limititations
+	unsigned int iD = addDataSet( non / fDifferentialFlux[i].ObsTime * 60.,
+				      noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
+	fSignificanceLimited[energy_intX3]        = getSensitivity( iD, energy, 1 );
+	fMinEventsLimited[energy_intX3]           = getSensitivity( iD, energy, 2 );
+	fMinBackgroundEventsLimited[energy_intX3] = getSensitivity( iD, energy, 3 );
+	fMinNoBackground[energy_intX3]            = getSensitivity( iD, energy, 4 );
 
 // fill sensitivity graphs
-	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
+        double f1 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_lowEdge ) );
+        double f2 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_upEdge ) ); 
+
         if(    i_fFunCrabFlux != 0 && s > 0.
 	    && fDifferentialFlux[i].Energy > iEnergyMin_TeV_lin && fDifferentialFlux[i].Energy < iEnergyMax_TeV_lin )
         {
@@ -722,8 +761,6 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // differential sensitivity
             else
             {
-                double f1 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_lowEdge ) );
-                double f2 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_upEdge ) ); 
                 if( bUnit == "PFLUX" )
                 {
                     gSensitivityvsEnergy->SetPoint( z, energy, ( f1 - f2 ) * s / fDifferentialFlux[i].dE );
@@ -752,6 +789,25 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         {
 	    cout << "ENERGY DISCARDED: " << fDifferentialFlux[i].Energy << "\t" << iEnergyMin_TeV_lin << "\t" << iEnergyMax_TeV_lin;
 	    cout << "\t" << s << endl;
+        }
+// sensitivity limitiations
+// (TMP differential sensitivity only)
+	if( dE_Log10 > 0. )
+	{
+	     if( bUnit == "ENERGY" )
+	     {
+		 fSignificanceLimited[energy_intX3]        *= i_fFunCrabFlux->Eval( energy );
+		 fMinEventsLimited[energy_intX3]           *= i_fFunCrabFlux->Eval( energy );
+		 fMinBackgroundEventsLimited[energy_intX3] *= i_fFunCrabFlux->Eval( energy );
+		 fMinNoBackground[energy_intX3]            *= i_fFunCrabFlux->Eval( energy );
+	     }
+             else if( bUnit == "PFLUX" )
+	     {
+		 fSignificanceLimited[energy_intX3]        *= ( f1 - f2 ) / fDifferentialFlux[i].dE;
+		 fMinEventsLimited[energy_intX3]           *= ( f1 - f2 ) / fDifferentialFlux[i].dE;
+		 fMinBackgroundEventsLimited[energy_intX3] *= ( f1 - f2 ) / fDifferentialFlux[i].dE;
+		 fMinNoBackground[energy_intX3]            *= ( f1 - f2 ) / fDifferentialFlux[i].dE;
+	     }
         }
 // print some debugging information
 //	if( fDebug )
@@ -2425,8 +2481,10 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
       if(  hnull ) iYValue = 0.5 * hnull->GetMaximum();
    }
 
-   cout << "plotSensitivityLimitations: " << fMinEventsLimited.size() << "\t";
-   cout << fSignificanceLimited.size() << "\t" << fMinBackgroundEventsLimited.size() << endl;
+   cout << "plotSensitivityLimitations: ";
+   cout << fMinEventsLimited.size() << "\t";
+   cout << fSignificanceLimited.size() << "\t" << fMinBackgroundEventsLimited.size();
+   cout << "\t" << fMinNoBackground.size() << endl;
 
 // minimum number of events
    if( fMinEventsLimited.size() > 0 )
@@ -2436,20 +2494,20 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
       for( itx = fMinEventsLimited.begin(); itx != fMinEventsLimited.end(); itx++ )
       {
 	 double energy = (double((*itx).first))/1.e3;
-	 if( energy > 0. )
+	 if( (*itx).second > 0. )
 	 {
             TGraphErrors *g = new TGraphErrors( 1 );
-	    energy = log10( energy );
-	    g->SetPoint( 0, energy, iYValue );
+	    g->SetPoint( 0, energy, (*itx).second );
 	    g->SetPointError( 0, 0.5*fEnergy_dE_log10, 0. );
 	    g->SetLineColor( 2 );
 	    g->SetLineWidth( 3 );
 	    g->Draw( "LZ" );
-	    cout << "MinEvents (>=" << fEvents_min << "): " << "\t" << energy << "\t" << (*itx).second << endl;
+	    cout << fixed << "MinEvents (>=" << fEvents_min << "): ";
+	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
          }
       }
    }
-// background events limited
+// background event ratio limited
    if( fMinBackgroundEventsLimited.size() > 0 )
    {
       cout << "Background rate ratio limited: green" << endl;
@@ -2458,15 +2516,15 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
       {
          TGraphErrors *g = new TGraphErrors( 1 );
 	 double energy = (double((*itx).first))/1.e3;
-	 if( energy > 0. )
+	 if( (*itx).second > 0. )
 	 {
-	    energy = log10( energy );
-	    g->SetPoint( 0, energy, iYValue * 1.1 );
+	    g->SetPoint( 0, energy, (*itx).second );
 	    g->SetPointError( 0, 0.5*fEnergy_dE_log10, 0. );
 	    g->SetLineColor( 3 );
 	    g->SetLineWidth( 3 );
 	    g->Draw( "ZL" );
-	    cout << "Background rate ratio (>" << fMinBackgroundRateRatio_min << "): " << "\t" << energy << "\t" << (*itx).second << endl;
+	    cout << fixed << "Background rate ratio (>" << fMinBackgroundRateRatio_min << "): ";
+	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
          }
       }
    }
@@ -2479,15 +2537,36 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
       {
          TGraphErrors *g = new TGraphErrors( 1 );
 	 double energy = (double((*itx).first))/1.e3;
-	 if( energy > 0. )
+	 if( (*itx).second > 0. )
 	 {
-	    energy = log10( energy );
-	    g->SetPoint( 0, energy, iYValue * 0.9 );
+	    g->SetPoint( 0, energy, (*itx).second );
 	    g->SetPointError( 0, 0.5*fEnergy_dE_log10, 0. );
 	    g->SetLineColor( 4 );
 	    g->SetLineWidth( 3 );
 	    g->Draw( "LZ" );
-	    cout << "Significance: (>" << fSignificance_min << " ): " << "\t" << energy << "\t" << (*itx).second << endl;
+	    cout << fixed << "Significance: (>" << fSignificance_min << " ): ";
+	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
+         }
+      }
+   }
+// no background events
+   if( fMinNoBackground.size() > 0 )
+   {
+      cout << "No background events limited: purple" << endl;
+      map< int, double >::const_iterator itx;
+      for( itx = fMinNoBackground.begin(); itx != fMinNoBackground.end(); itx++ )
+      {
+         TGraphErrors *g = new TGraphErrors( 1 );
+	 double energy = (double((*itx).first))/1.e3;
+	 if( (*itx).second > 0. )
+	 {
+	    g->SetPoint( 0, energy, (*itx).second );
+	    g->SetPointError( 0, 0.5*fEnergy_dE_log10, 0. );
+	    g->SetLineColor( 6 );
+	    g->SetLineWidth( 3 );
+	    g->Draw( "LZ" );
+	    cout << fixed << "MinNoBackground: (>" << 0 << " ): ";
+	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
          }
       }
    }
@@ -2506,7 +2585,7 @@ bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, 
 }
 
 bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F* iBGRate, TH1F* iBGRateSqDeg,
-                                                        TH1F* iProtonRate,  TH1F* iElectronRate)
+                                                        TH1F* iProtonRate,  TH1F* iElectronRate )
 {
     double x = 0.;
     double y = 0.;
@@ -2622,6 +2701,46 @@ bool VSensitivityCalculator::fillSensitivityHistogramfromGraph( TGraph* g, TH1F 
    return true;
 }
 
+bool VSensitivityCalculator::fillSensitivityHistogramfromMap( map< int, double > m, TH1F *h )
+{
+   if( !h || m.size() == 0 ) return false;
+
+   double x = 0.;
+   double y = 0.;
+   map< int, double >::const_iterator itx;
+   for( itx = m.begin(); itx != m.end(); itx++ )
+   {
+      x = (double((*itx).first))/1.e3;
+      y = ((*itx).second);
+      if( y > 0. )
+      {
+         h->SetBinContent( h->FindBin( x ), y );
+      }
+   }
+
+   return true;
+}
+
+/*
+
+   fill histograms with sensitivity limits
+   (for CTA-style root files
+
+   0 = significance
+   1 = signal number
+   2 = background ratio
+   3 = no off events
+
+*/
+bool VSensitivityCalculator::fillSensitivityLimitsHistograms( vector<TH1F*>& h )
+{
+
+   fillSensitivityHistogramfromMap( fSignificanceLimited, h[0] );
+   fillSensitivityHistogramfromMap( fMinEventsLimited, h[1] );
+   fillSensitivityHistogramfromMap( fMinBackgroundEventsLimited, h[2] );
+   fillSensitivityHistogramfromMap( fMinNoBackground, h[3] );
+   return false;
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

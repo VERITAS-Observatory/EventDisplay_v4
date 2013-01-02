@@ -93,7 +93,7 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 
 // energy axis (min and max in TeV)
     fPD.fPlotting_energy_min_TeV = 0.01;
-    fPD.fPlotting_energy_max_TeV = 150.00;
+    fPD.fPlotting_energy_max_TeV = 250.00;
     if( iObservatory == "VTS" || iObservatory == "VERITAS" )
     {
        fPD.fPlotting_energy_min_TeV = 0.06;
@@ -333,7 +333,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
        sprintf( hname, "plotDebug_%d", bIntegral );
        b.setPlotDebug( hname );
 // energy range to be plotted
-       b.setEnergyRange_Lin( 0.01, 150. );
+       b.setEnergyRange_Lin( 0.01, 250. );
 // significance parameters
        b.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
 // set colors different in case data is plotted

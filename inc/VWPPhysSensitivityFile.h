@@ -46,9 +46,12 @@ class VWPPhysSensitivityFile
 
     vector< TH1* > hisList;
     vector< TH1* > hisListToDisk;
+    vector< TH1* > hisListToDiskDebug;
 
     TH1F* fSensitivity;
+    vector< TH1F* > fSensitivityLimits;
     TH1F* fSensitivityCU;
+    vector< TH1F* > fSensitivityCULimits;
     TH1F* fBGRate;
     TH1F* fBGRateSqDeg;
     TH1F* fProtRate;

@@ -39,7 +39,6 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fEbias = 0;
 
     fOffsetCounter = 9999;
-
 }
 
 
@@ -50,6 +49,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
 {
 
    char hname[200];
+   char htitle[200];
    fOffsetCounter = iOffsetCounter;
 
 // sensitivity and background rates
@@ -70,6 +70,40 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    fSensitivityCU->Print();
    hisList.push_back( fSensitivityCU );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fSensitivityCU );
+
+// sensitivity limits
+   if( fOffsetCounter == 9999 ) 
+   {
+      sprintf( hname, "DiffSens_Significance" );
+      fSensitivityLimits.push_back( new TH1F( hname, "Diff. Sens. (significance limit)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
+      sprintf( hname, "DiffSens_EventNumber" );
+      fSensitivityLimits.push_back( new TH1F( hname, "Diff. Sens. (event number limit)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
+      sprintf( hname, "DiffSens_SystematicsCuts" );
+      fSensitivityLimits.push_back( new TH1F( hname, "Diff. Sens. (systematics limit)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
+      sprintf( hname, "DiffSens_OffEvents" );
+      fSensitivityLimits.push_back( new TH1F( hname, "Diff. Sens. (off number limit)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
+
+      for( unsigned int i = 0; i < fSensitivityLimits.size(); i++ )
+      {
+	 fSensitivityLimits[i]->SetXTitle( "log_{10} (E/TeV)" );
+	 fSensitivityLimits[i]->SetYTitle( "E^{2} dF/dE [erg cm^{-2} s^{-1}]" );
+	 fSensitivityLimits[i]->Print();
+	 hisList.push_back( fSensitivityLimits[i] );
+	 hisListToDiskDebug.push_back( fSensitivityLimits[i] );
+      }
+
+      for( unsigned int i = 0; i < fSensitivityLimits.size(); i++ )
+      {
+	 sprintf( hname, "%s_CU", fSensitivityLimits[i]->GetName() );
+	 sprintf( htitle, "%s (CU)", fSensitivityLimits[i]->GetTitle() );
+	 fSensitivityCULimits.push_back( new TH1F( hname, htitle, iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
+	 fSensitivityCULimits[i]->SetXTitle( "log_{10} (E/TeV)" );
+	 fSensitivityCULimits[i]->SetYTitle( "E^{2} dF/dE [erg cm^{-2} s^{-1}]" );
+	 fSensitivityCULimits[i]->Print();
+	 hisList.push_back( fSensitivityCULimits[i] );
+	 hisListToDiskDebug.push_back( fSensitivityCULimits[i] );
+      }
+   }
 
    sprintf( hname, "BGRate" );
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
@@ -476,9 +510,11 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     }
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
+    i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
 
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
     i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
+    i_SensCU.fillSensitivityLimitsHistograms( fSensitivityCULimits );
 
     return true;
 }
@@ -515,6 +551,20 @@ bool VWPPhysSensitivityFile::terminate()
 	    hisListToDisk[i]->Write();
 	 }
       }
+// debug histograms
+      TDirectory *iD = fOutFile->mkdir( "debug", "additional debug histograms" );
+      if( iD && iD->cd() )
+      {
+         for( unsigned int i = 0; i < hisListToDiskDebug.size(); i++ )
+	 {
+	    if( hisListToDiskDebug[i] )
+	    {
+	       cout << "\t" << hisListToDiskDebug[i]->GetName() << endl;
+	       hisListToDiskDebug[i]->Write();
+            }
+         }
+      }
+          
       fOutFile->Close();
    }
    return true;
