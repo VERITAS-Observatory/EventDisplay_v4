@@ -663,6 +663,10 @@ bool VEventLoop::loop( int iEvents )
     bool iEventStatus = true;
     fNumberofIncompleteEvents = 0;
     fNumberofGoodEvents = 0;
+
+// Skip to start eventnumber
+    if( fRunPar->fFirstEvent > 0 ) gotoEvent( fRunPar->fFirstEvent );
+
     while( ( i < iEvents || iEvents < 0 ) && iEventStatus )
     {
         iEventStatus = nextEvent();

@@ -520,6 +520,12 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	{
 	   fRunPara->fNCalibrationEvents  = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }	   
+// first event number (skip to this point)
+        else if( iTemp.rfind( "firstevent" ) < iTemp.size() )
+        {
+            fRunPara->fFirstEvent = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+            if( fRunPara->fFirstEvent < 0 ) fRunPara->fFirstEvent = -10000;
+        }
 // source type
         else if( iTemp.find( "type" ) < iTemp.size() )
         {

@@ -60,6 +60,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool   fRunIsZeroSuppressed;              // run is zero suppressed
         string fsourcefile;                       // name of data file
         int    fnevents;                          // total number of events to be analyzed
+        int    fFirstEvent;                      // skip up till this event 
 
 // output parameters
         bool   ffillhistos;                       // fill some analysis histograms
@@ -242,6 +243,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,119); //(increase this number)
+        ClassDef(VEvndispRunParameter,120); //(increase this number)
 };
 #endif

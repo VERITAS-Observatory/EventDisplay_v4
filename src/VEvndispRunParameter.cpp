@@ -54,6 +54,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fsimu_noiselevel   = 250;
     fsimu_pedestalfile_DefaultPed = 20.;
     fnevents = -10000;
+    fFirstEvent = -10000;
     fIsMC = 0;
     fIgnoreCFGversions = false;
     fPrintAnalysisProgress = 25000;
