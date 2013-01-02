@@ -32,7 +32,7 @@ endif
 # average tzero calculation
 if( $CALIB == "1" || $CALIB == "3" ) then
     rm -f $LDIR/$RUN.tzero.log
-    ./evndisp -runnumber=$RUN -runmode=7  > $LDIR/$RUN.tzero.log
+    ./evndisp -runnumber=$RUN -runmode=7 -readCalibDB > $LDIR/$RUN.tzero.log
 endif
 
 set OPT=" "
