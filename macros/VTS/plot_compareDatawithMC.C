@@ -706,7 +706,8 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
    setHistogramAtt( hmscw_off, 4, 1, 1, 21, 1 );
 
    hmscw_sims->SetAxisRange( -1., 1. );
-   getScaling( fDir, s_sims, s_diff, "MSCW", 2, -0.5, 0.5 );
+//   getScaling( fDir, s_sims, s_diff, "MSCW", 2, -0.5, 0.5 );
+   getScaling( fDir, s_sims, s_diff, "MSCW", 1, -0.5, 0.5 );
    if( hmscw_sims->GetEntries() > 0 ) hmscw_sims->Scale( s_sims );
    if( hmscw_diff->GetEntries() > 0 ) hmscw_diff->Scale( s_diff );
 
@@ -765,7 +766,7 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
 
    hmscl_sims->SetAxisRange( -1., 1. );
    hmscl_on->SetAxisRange( -2., 10. );
-   getScaling( fDir, s_sims, s_diff, "MSCL", 2 );
+   getScaling( fDir, s_sims, s_diff, "MSCL", 1 );
    if( hmscl_sims->GetEntries() > 0 ) hmscl_sims->Scale( s_sims );
    if( hmscl_diff->GetEntries() > 0 ) hmscl_diff->Scale( s_diff );
 
