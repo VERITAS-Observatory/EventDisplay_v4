@@ -1224,11 +1224,9 @@ $(vtspara):
 	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/calibrationlist.dat $(vtspara)/Calibration/
 	cp -r $(VERITAS_EVNDISP_ANA_DIR)/Calibration/calibrationlist.LowGain.dat $(vtspara)/Calibration/
 	mkdir -p $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg $(vtspara)/DetectorGeometry
 	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_veritasBC4_090723_Autumn2007-4.1.5_PIX.cfg $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_Upgrade_20121108_v420.txt $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_veritasBC4N_090916_Autumn2009-4.1.5_PIX.cfg $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_ANA_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(vtspara)/DetectorGeometry
 	mkdir -p $(vtspara)/NOISE
 	cp -LR $(VERITAS_EVNDISP_ANA_DIR)/NOISE/*.grisu $(vtspara)/NOISE
 	mkdir -p $(vtspara)/ParameterFiles
@@ -1245,12 +1243,11 @@ $(vtspara):
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/ParameterFiles/COMPAREMC.runparameter $(vtspara)/ParameterFiles
 	mkdir -p $(vtspara)/RadialAcceptances
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/radialAcceptance-d20120322-cut-N3-Point-005CU-Moderate-d20120412.* $(vtspara)/RadialAcceptances/
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/RadialAcceptances/radialAcceptance-d20120909-* $(vtspara)/RadialAcceptances/
 	mkdir -p $(vtspara)/EffectiveAreas
 	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/EffectiveAreas/effArea-d20120909-cut* $(vtspara)/EffectiveAreas/
 	mkdir -p $(vtspara)/Tables
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20121116_GrIsuNov12_ATM21_V6_ID0* $(vtspara)/Tables/
-	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20121026_GrIsuApr12_ATM21_V5_ID0* $(vtspara)/Tables/
+	cp -Lr $(VERITAS_EVNDISP_ANA_DIR)/Tables/table_d20121218* $(vtspara)/Tables/
 
 ###############################################################################################################################
 # print environment and compilation parameters
