@@ -153,7 +153,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         bool      isZombie() { return bZombie; }
         void      printDifferentialFluxes( bool bSED = false );
         TCanvas*  plot( TCanvas *c = 0 );
-	TCanvas*  plotCrabNebulaSpectrum( double iPlottingMultiplierIndex = 0., double i_FitStart_TevLin = 0.1, double i_FitStop_TeVLin = 20., double i_EnergyBinningLog10 = 0.1 );
+	TCanvas*  plotCrabNebulaSpectrum( double iPlottingMultiplierIndex = 0., double i_FitStart_TevLin = 0.3,
+	                                  double i_FitStop_TeVLin = 20., double i_EnergyBinningLog10 = 0.1 );
         TCanvas*  plotCountingHistograms( TCanvas *c = 0 );
         void      plotEventNumbers( Double_t ts = 0.02 );
         void      plotFitValues();
