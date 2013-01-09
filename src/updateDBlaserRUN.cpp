@@ -1197,20 +1197,26 @@ void read_laserRUN_fromVERITAS_DB(vector< unsigned int > &VERITAS_DB_LaserRunNum
 	    if(db_row->GetField( 1 )){
 		VERITAS_DB_LaserConfigMask.push_back( atoi( db_row->GetField( 1 ) ) );
 	    }else{
-		std::cout<<"WARNING: no config Mask in VERITAS DB"<<std::endl;
+		std::cout<<"WARNING: no config Mask in VERITAS DB for run "<<atoi( db_row->GetField( 0 ) )<<std::endl;
 		VERITAS_DB_LaserConfigMask.push_back(-1);
 	    }
 	    if(db_row->GetField( 2 )){
 		VERITAS_DB_LaserExclTel.push_back( atoi( db_row->GetField( 2 ) ) );
 	    }else{
-		std::cout<<"WARNING: no exclud Tel  in VERITAS DB"<<std::endl;
+		std::cout<<"WARNING: no exclud Tel  in VERITAS DB for run "<<atoi( db_row->GetField( 0 ) )<<std::endl;
 		VERITAS_DB_LaserExclTel.push_back(-1);
 	    }
 	    if(db_row->GetField( 3 )){
 		VERITAS_DB_LaserDate.push_back( get_date_from_tblRun_Info_data_start_time( db_row->GetField( 3 ) ) );
 	    }else{
-		std::cout<<"WARNING: no data start date in VERITAS DB"<<std::endl;		
-		VERITAS_DB_LaserDate.push_back( -1);
+		std::cout<<"WARNING: no data start date in VERITAS DB for run "<<atoi( db_row->GetField( 0 ) )<<std::endl;		
+		std::cout<<"using db_start_time instead"<<std::endl;
+		if(db_row->GetField( 4 )){
+			    VERITAS_DB_LaserDate.push_back( get_date_from_tblRun_Info_data_start_time( db_row->GetField( 4 ) ) );
+		}else{
+		  std::cout<<"WARNING: no db start date in VERITAS DB for run "<<atoi( db_row->GetField( 0 ) )<<std::endl;		
+		    VERITAS_DB_LaserDate.push_back( -1);
+		    }
 	    }
 	}
     }
@@ -1231,7 +1237,7 @@ string WriteQuery_to_getLaserRun_fromVERITAS_DB(){
 
     char c_query[flong_char_query];// has to be long if we ask for a long run list in VDBSourceInfo
 
-    sprintf( c_query, "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE  grp_cmt.group_type = 'laser' AND grp_cmt.group_id = grp.group_id AND grp.run_id = Info.run_id AND (Info.run_type = 'laser' OR Info.run_type = 'flasher') ORDER BY grp_cmt.excluded_telescopes ) AS big_table GROUP BY run_id;");
+    sprintf( c_query, "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time , big_table.db_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time,Info.db_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE  grp_cmt.group_type = 'laser' AND grp_cmt.group_id = grp.group_id AND grp.run_id = Info.run_id AND (Info.run_type = 'laser' OR Info.run_type = 'flasher') ORDER BY grp_cmt.excluded_telescopes ) AS big_table GROUP BY run_id;");
 
 // if laser run belong to two different laser group with two different excluded_telescope, the smaller excluded_telescope is taken into account (so that the VOFFLINE DB is filled with for the maximum number of telescopes)
 //SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes big_table.data_start_time FROM 

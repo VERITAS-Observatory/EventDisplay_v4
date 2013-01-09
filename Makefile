@@ -809,6 +809,7 @@ trainTMVAforAngularReconstruction:	./obj/trainTMVAforAngularReconstruction.o \
 # updateDBlaserRUN
 ########################################################
 UPDATEDBLASERRUN=	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
+			./obj/VStar.o ./obj/VStar_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VExposure.o ./obj/VExposure_Dict.o \
 			./obj/VASlalib.o \
