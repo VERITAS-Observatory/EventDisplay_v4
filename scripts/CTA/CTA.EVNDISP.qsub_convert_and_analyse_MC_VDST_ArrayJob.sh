@@ -8,8 +8,8 @@
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.sh CTA
 
-IFIL=SIMTELDIR
-IRUN=$SGE_TASK_ID
+ILIST=SIMTELLIST
+ILINE=$SGE_TASK_ID
 PART=PAAART
 SUBA="ARRAY"
 KEEP=KEEEEEEP
@@ -23,30 +23,8 @@ FIELD=$SUBA
 # eventdisplay optimization
 OPT="-shorttree -l2setspecialchannels nofile"
 
-# hard wired!!
-# DESY 3700m
-# IFIL="$IFIL/proton_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simtel.gz"
-# 2000m
-if [ $PART == "proton" ]
-then
-   IFIL="$IFIL/proton_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simhess.gz"
-fi
-# cta-ultra onSource
-if [ $PART == "gamma_onSource" ]
-then
-  IFIL="$IFIL/gamma_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simhess.gz"
-fi
-# cta-ultra3 gamma_cone10
-if [ $PART == "gamma_cone10" ]
-then
-  IFIL="$IFIL/gamma_20deg_90deg_run"$IRUN"___cta-ultra3_desert_cone10.simhess.gz"
-fi
-# cta-ultra3 electron 
-if [ $PART == "electron" ]
-then
-  IFIL="$IFIL/electron_20deg_90deg_run"$IRUN"___cta-ultra3_desert.simhess.gz"
-fi
-# cp simtelarray.gz file to TMPDIR
+# set timtelarray file and cp simtelarray.gz file to TMPDIR
+IFIL=`head -n $ILINE $ILIST | tail -n 1`
 echo "$IFIL"
 cp -v -f $IFIL $TMPDIR"/"
 

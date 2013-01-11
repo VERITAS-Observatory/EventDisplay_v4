@@ -9,7 +9,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
    echo
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST.sh <sub array list> <directory with simtelarray files> <from-to (runnumbers)> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter]"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo
@@ -38,20 +38,19 @@ ARRAYCUTS="EVNDISP.reconstruction.runparameter"
 ############################################################################
 
 ARRAY=$1
-BLIST=$2
-RUNFROMTO=$3
-PART=$4
+RUNLIST=$2
+PART=$3
+DSET=$4
 KEEP=0
-if [ -n "$6" ]
+if [ -n "$5" ]
 then
-   KEEP=$6
+   KEEP=$5
 fi
 FLL="0"
-if [ -n "$7" ]
+if [ -n "$6" ]
 then
-  FLL="$7"
+  FLL="$6"
 fi
-DSET=$5
 
 # checking the path for binary
 if [ -z $EVNDISPSYS ]
@@ -60,13 +59,23 @@ then
     exit
 fi
 
+# get run list and number of runs
+if [ ! -e $RUNLIST ]
+then
+  echo "list of simtelarray files not found: $RUNLIST"
+  exit
+fi
+NRUN=`wc -l $RUNLIST | awk '{print $1}'`
+RUNFROMTO="1-$NRUN"
+
+   
+
 #########################################
 # output directory for error/output from batch system
 # in case you submit a lot of scripts: QLOG=/dev/null
 DATE=`date +"%y%m%d"`
 
 # output directory for shell scripts
-SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/"
 SHELLDIR=$CTA_USER_DATA_DIR"/queueShellDir/"
 mkdir -p $SHELLDIR
 
@@ -77,11 +86,11 @@ FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob"
 #   mkdir -p $QLOG
 QLOG="/dev/null"
 
-echo "submitting $BLIST $RUNFROMTO ($LDIR)"
+echo "submitting $RUNFROMTO"
 
-FNAM="$SHELLDIR/EA-$DSET-$PART-$ARRAY-$FLL"
+FNAM="$SHELLDIR/EA-$DSET-$PART-$FLL"
 
-sed -e "s|SIMTELDIR|$BLIST|" $FSCRIPT.sh > $FNAM-1.sh
+sed -e "s|SIMTELLIST|$RUNLIST|" $FSCRIPT.sh > $FNAM-1.sh
 sed -e "s|PAAART|$PART|" $FNAM-1.sh > $FNAM-2.sh
 rm -f $FNAM-1.sh
 LIST=`awk '{printf "%s ",$0} END {print ""}' $ARRAY`
@@ -99,7 +108,7 @@ rm -f $FNAM-7.sh
 chmod u+x $FNAM.sh
 echo $FNAM.sh
 
- qsub -t $RUNFROMTO:1 -P cta_high -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+qsub -t $RUNFROMTO:1  -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 #  qsub -t $RUNFROMTO:1 -l h_cpu=46:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 # qsub -t $RUNFROMTO:1 -l h_cpu=0:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 

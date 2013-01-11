@@ -45,8 +45,6 @@ RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 echo $NIMAGESMIN $ANADIR $EREC $DDIR
 # parameters from command line
 RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
-RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20120927"
-RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.d20121013"
 RXPAR=`basename $RPAR.runparameter runparameter`
 OFIL="BDT"
 CONE="FALSE"

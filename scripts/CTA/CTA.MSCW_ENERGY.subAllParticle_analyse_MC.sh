@@ -57,13 +57,9 @@ do
 	    echo "v_leeds $k$l"
 	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k$l
          done
-#      elif [ $4 = "DESY3700m" ]
       elif [ $4 = "ISDC3700m" ]
       then
-	 for (( l = 0; l < 10; l++ ))
-	 do
-	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 1$k$l
-         done
+	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 11$k
       else
 	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k
       fi
