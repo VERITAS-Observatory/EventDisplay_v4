@@ -710,6 +710,7 @@ WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 			./obj/VASlalib.o \
 			./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
+			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
 			./obj/VSensitivityCalculator.o ./obj/VSensitivityCalculator_Dict.o \
 			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
@@ -730,7 +731,8 @@ WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VStatistics_Dict.o \
-			./obj/VUtilities.o 
+			./obj/VUtilities.o \
+			./obj/Ctelconfig.o
 
 ./obj/writeCTAWPPhysSensitivityFiles.o: 	./src/writeCTAWPPhysSensitivityFiles.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -1008,6 +1010,7 @@ calculateBinaryPhases:	./obj/CData.o \
 
 VTS.next_day:	./obj/VFITS.o \
 		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+		./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
