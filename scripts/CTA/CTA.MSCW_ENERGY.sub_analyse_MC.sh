@@ -18,7 +18,7 @@ then
    echo "  <particle>      gamma_onSource / gamma_cone10 / electron / proton / helium"
    echo "  <data set>      e.g. ultra, ISDC3700m, ..."
    echo "  <script input parameter file>  file with directories, etc.; see example in"
-   echo "                             $CTA_EVNDISP_ANA_DIR/ParameterFiles/scriptsInput.runparameter"
+   echo "                             $CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.runparameter"
    echo
    echo "optional (for a huge amount of MC files):"
    echo "  [wildcard]     used in the < CTA.MSCW_ENERGY.subParallel_analyse_MC.sh > script"

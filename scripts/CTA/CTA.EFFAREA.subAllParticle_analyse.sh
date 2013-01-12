@@ -33,7 +33,7 @@ then
 fi
 
 SUBAR=$1
-CDIR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/"
+CDIR="$CTA_EVNDISP_AUX_DIR/ParameterFiles/"
 CFIL=$2
 ANAPAR=$3
 ODIR=$4

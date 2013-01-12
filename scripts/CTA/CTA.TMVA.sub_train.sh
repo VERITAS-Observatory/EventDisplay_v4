@@ -23,7 +23,7 @@ then
    echo
    echo "   note 3: adjust h_cpu depending on your MVA method"
    echo
-   echo "   note 4: default TMVA parameter file is $CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT.runparameter"
+   echo "   note 4: default TMVA parameter file is $CTA_EVNDISP_AUX_DIR/ParameterFiles/TMVA.BDT.runparameter"
    echo
    exit
 fi
@@ -44,7 +44,7 @@ DDIR=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
 RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 echo $NIMAGESMIN $ANADIR $EREC $DDIR
 # parameters from command line
-RPAR="$CTA_EVNDISP_ANA_DIR/ParameterFiles/TMVA.BDT"
+RPAR="$CTA_EVNDISP_AUX_DIR/ParameterFiles/TMVA.BDT"
 RXPAR=`basename $RPAR.runparameter runparameter`
 OFIL="BDT"
 CONE="FALSE"

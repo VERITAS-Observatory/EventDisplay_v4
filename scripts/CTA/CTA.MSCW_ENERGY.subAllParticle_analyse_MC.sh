@@ -23,7 +23,7 @@ then
    echo "  <recid>         reconstruction ID"
    echo "  <data set>      e.g. ultra, ISDC3700m, ..."
    echo "  <script input parameter file>  file with directories, etc.; see example in"
-   echo "                             $CTA_EVNDISP_ANA_DIR/ParameterFiles/scriptsInput.runparameter"
+   echo "                             $CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.runparameter"
    echo ""
    exit
 fi

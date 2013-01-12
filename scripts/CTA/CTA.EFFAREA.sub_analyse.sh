@@ -33,7 +33,7 @@ then
    echo
    echo "<scripts parameter file>"
    echo "     file with analysis parameter"
-   echo "     see e.g. CTA_EVNDISP_ANA_DIR/ParameterFiles/scriptsInput.runparameter"
+   echo "     see e.g. CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.runparameter"
    echo 
    echo "<outputsubdirectory>"
    echo "     directory with all result and log files (full path)"
