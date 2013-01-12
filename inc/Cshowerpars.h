@@ -77,6 +77,7 @@ class Cshowerpars
         ULong64_t       LTrig;
                                                   //[NTrig]
         UShort_t        Trig_list[VDST_MAXTELESCOPES];
+        UShort_t        Trig_type[VDST_MAXTELESCOPES];
         UInt_t          NMethods;
                                                   //[NMethods]
         UShort_t        MethodID[VDST_MAXRECMETHODS];
@@ -150,6 +151,7 @@ class Cshowerpars
         TBranch        *b_NTrig;                  //!
         TBranch        *b_LTrig;                  //!
         TBranch        *b_Trig_list;              //!
+        TBranch        *b_Trig_type;              //!
         TBranch        *b_NMethods;               //!
         TBranch        *b_MethodID;               //!
         TBranch        *b_NImages;                //!
@@ -320,6 +322,11 @@ void Cshowerpars::Init(TTree *tree)
     else
     {
         for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ ) Trig_list[i] = 0;
+    }
+    if( fChain->GetBranchStatus( "Trig_type" ) ) fChain->SetBranchAddress("Trig_type", Trig_type, &b_Trig_type );
+    else
+    {
+       for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ ) Trig_type[i] = 0;
     }
     fChain->SetBranchAddress("NMethods", &NMethods );
     if( !bShort ) fChain->SetBranchAddress("MethodID", MethodID );

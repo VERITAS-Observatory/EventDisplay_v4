@@ -57,6 +57,7 @@ class VCameraRead : public VGlobalRunParameter
         unsigned int fPixelType;                  //!< pixel type: 1 = circle, 2 = hex, 3 = square
         vector< unsigned int > fCNChannels;       //!< number of channels
         vector< unsigned int > fCNSamples;        //!< number of FADC samples
+	vector< float > fSample_time_slice;       //!< length of time slice
 // 2D camera data
         vector< vector<float> > fXTube;           //!< x-position of tube in [deg] (in camera coordinates)
         vector< vector<float> > fYTube;           //!< y-position of tube in [deg] (in camera coordiantes)
@@ -165,6 +166,8 @@ class VCameraRead : public VGlobalRunParameter
         {
             return fCNSamples[fTelID];
         }
+	float                getLengthOfSampleTimeSlice( unsigned int iTelID ) { if( iTelID < fSample_time_slice.size() ) return fSample_time_slice[iTelID]; 
+	                                                                                                                   else return 0; }
         unsigned int         getNumTelescopes()   //!< get number of telescopes
         {
             return fNTel;
@@ -278,6 +281,7 @@ class VCameraRead : public VGlobalRunParameter
 	bool                 readDetectorGeometryFromDB( string iDBStartTime, bool iReadRotationsFromDB = true );
         bool                 readGrisucfg( string iFile, unsigned int fNTel );
         void                 setConfigDir( string iDir ) { fConfigDir = iDir; }
+	bool                 setLengthOfSampleTimeSlice( unsigned int iTelID, float iSample_time_slice );
 	void                 setTelID_matrix( map< unsigned int, unsigned int > m ) { fTelIDGrisu = m; }
         bool                 setLowGainMultiplier( unsigned int iTel, double ival );
         bool                 setLowGainThreshold( unsigned int iTel, unsigned int ival );

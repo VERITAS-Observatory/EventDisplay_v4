@@ -70,6 +70,7 @@ void VImageParameterCalculation::calcTimingParameters()
     int nclean=0;
     for( unsigned int i = 0; i < fData->getTZeros().size(); i++ )
     {
+// use only image and border and no hilo channels (timing is different)
         if( (fData->getImage()[i] || fData->getBorder()[i]) && fData->getTZeros()[i]>0. && !fData->getHiLo()[i] )
         {
             double xi = getDetectorGeo()->getX()[i];
@@ -90,10 +91,12 @@ void VImageParameterCalculation::calcTimingParameters()
             er[nclean]=0;                         // error on rpos (deg)
             t[nclean]=fData->getTZeros()[i];
 
+// (GM) TODO adapt to CTA (currently all values have some errors)
 //  timing resolution from variable laser pulse studies (run 751)
             et[nclean]=13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i];
 // make that the timing resolution is not too small (important for MC)
             if( et[nclean] < 5.e-2 ) et[nclean] = 0.3;
+// GM TEMP	    cout << "XXX " << fData->getTelID()+1 << "\t" << nclean << "\t" << i << "\t" << fData->getSums()[i] << "\t" << 13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i] << "\t" << et[nclean] << endl;
 // min/max/mean times
             if( fData->getTZeros()[i]  < fParGeo->tmin ) fParGeo->tmin = fData->getTZeros()[i];
             if( fData->getTZeros()[i]  > fParGeo->tmax ) fParGeo->tmax = fData->getTZeros()[i];

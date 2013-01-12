@@ -92,6 +92,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
     fTreeSC->Branch( "NTrig", &fNTrig, "NTrig/i" );
     fTreeSC->Branch( "LTrig", &fLTrig, "LTrig/l" );
     fTreeSC->Branch( "Trig_list", fTrig_list, "Trig_list[NTrig]/s" );
+    fTreeSC->Branch( "Trig_type", fTrig_type, "Trig_type[NTrig]/s" );
 // reconstructed shower parameters
 
 // number of different methods
@@ -267,6 +268,7 @@ void VShowerParameters::reset( unsigned int iNTel )
     {
         for( unsigned int i = 0; i < fNMethods; i++ ) fTelIDImageSelected_list[i][j] = 0;
         fTrig_list[j] = 0;
+	fTrig_type[j] = 0;
         fTelElevation[j] = 0.;
         fTelAzimuth[j] = 0.;
         fTelElevationVBF[j] = 0.;

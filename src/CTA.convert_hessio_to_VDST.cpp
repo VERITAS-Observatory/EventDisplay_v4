@@ -348,6 +348,15 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	 {
 	    fData->fDSTLTrig_list[i_ntel_trig] = hsdata->event.central.teltrg_list[t];
 	    fData->fDSTLTtime[i_ntel_trig] = hsdata->event.central.teltrg_time[t];
+// read L2 trigger type
+#ifdef CTA_PROD2
+// PROD2: bit1: majority
+//        bit2: analog sum
+//        bit3: digital sum
+	    fData->fDSTL2TrigType[i_ntel_trig] = (unsigned short int)hsdata->event.central.teltrg_type_mask[t];
+#else
+            fData->fDSTL2TrigType[i_ntel_trig] = 0;
+#endif
 	 }
          i_ntel_trig++;
       }
@@ -638,6 +647,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    unsigned int nPixel = 0;
    unsigned int nPixel_active = 0;
    unsigned int nSamples = 0;
+   float Sample_time_slice = 0.;
    unsigned int nGains;
    float fHiLoScale = 0.;
    int   fHiLoThreshold = 0;
@@ -682,6 +692,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    fTreeDet->Branch( "NPixel", &nPixel, "NPixel/i" );
    fTreeDet->Branch( "NPixel_active", &nPixel_active, "NPixel_active/i" );
    fTreeDet->Branch( "NSamples", &nSamples, "NSamples/i" );
+   fTreeDet->Branch( "Sample_time_slice", &Sample_time_slice, "Sample_time_slice/F" );
    fTreeDet->Branch( "NGains", &nGains, "NGains/i" );
    fTreeDet->Branch( "HiLoScale", &fHiLoScale, "HiLoScale/F" );
    fTreeDet->Branch( "HiLoThreshold", &fHiLoThreshold, "HiLoThreshold/I" );
@@ -719,13 +730,18 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	fFocalLength = hsdata->camera_set[itel].flen;
 	fCameraScaleFactor = 1.;
 	fCameraCentreOffset = 0.;
-	fCameraRotation = 0.;
+#ifdef CTA_PROD2
+	fCameraRotation = -1.*hsdata->camera_set[itel].cam_rot * TMath::RadToDeg();  // TEMP: check orientation 
+#else
+        fCameraRotation = 0.;
+#endif
 	fNMirrors = hsdata->camera_set[itel].num_mirrors;
 	fMirrorArea = hsdata->camera_set[itel].mirror_area;
 
 	nPixel = hsdata->camera_set[itel].num_pixels;
 	nDisabled = hsdata->pixel_disabled[itel].num_HV_disabled;
 	nSamples = hsdata->event.teldata[itel].raw->num_samples;
+	Sample_time_slice = hsdata->pixel_set[itel].time_slice;
 	nGains = hsdata->event.teldata[itel].raw->num_gains;
 	fHiLoScale = hsdata->event.teldata[itel].raw->scale_hg8;
 	fHiLoThreshold = hsdata->event.teldata[itel].raw->threshold;
@@ -742,22 +758,25 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	       fYTubeMM[p] = hsdata->camera_set[itel].ypix[p]*1.e3;
 // use as size the radius of the active area of the tube
 	       fRTubeMM[p] = sqrt( hsdata->camera_set[itel].area[p]/TMath::Pi() ) * 1.e3;
-	       if( p == 0 ) pix_size = atan2((double)hsdata->camera_set[itel].size[p], (double)fFocalLength ) * 45. / atan( 1. );
+	       if( p == 0 ) pix_size = atan2((double)hsdata->camera_set[itel].size[p], (double)fFocalLength ) * TMath::RadToDeg();
 
    // mm -> deg
-	       fXTubeDeg[p] = atan2( (double)fXTubeMM[p]/1000., (double)fFocalLength ) * 45. / atan( 1. );
-	       fYTubeDeg[p] = atan2( (double)fYTubeMM[p]/1000., (double)fFocalLength ) * 45. / atan( 1. );
-               fRTubeDeg[p] = atan2( (double)fRTubeMM[p]/1000., (double)fFocalLength ) * 45. / atan( 1. );
+	       fXTubeDeg[p] = atan2( (double)fXTubeMM[p]/1000., (double)fFocalLength ) * TMath::RadToDeg();
+	       fYTubeDeg[p] = atan2( (double)fYTubeMM[p]/1000., (double)fFocalLength ) * TMath::RadToDeg();
+               fRTubeDeg[p] = atan2( (double)fRTubeMM[p]/1000., (double)fFocalLength ) * TMath::RadToDeg();
 
 	       fTubeDisabled[p] = hsdata->pixel_disabled[itel].HV_disabled[p];
 
-	       float x2 = (TMath::Abs(fXTubeDeg[p])-fRTubeDeg[p])*(TMath::Abs(fXTubeDeg[p])-fRTubeDeg[p]);
-	       float y2 = (TMath::Abs(fYTubeDeg[p])-fRTubeDeg[p])*(TMath::Abs(fYTubeDeg[p])-fRTubeDeg[p]);
-	       if( sqrt( x2 + y2 ) > maxPix_dist ) maxPix_dist = sqrt( x2 + y2 ) * 2.;
+	       float x2 = fXTubeDeg[p]*fXTubeDeg[p];
+	       float y2 = fYTubeDeg[p]*fYTubeDeg[p];
+	       if( sqrt( x2 + y2 ) > maxPix_dist ) 
+	       {
+	           maxPix_dist = sqrt( x2 + y2 ) * 2.;
+               }
 // disable pixels which are too far out
 	       if( telescope_list.size() != 0 && TMath::Abs( telescope_list[fTelID] ) > 1.e-2 )
 	       {
-		  if( x2 + y2 > telescope_list[fTelID]*telescope_list[fTelID]*0.5*0.5 )
+		  if( sqrt( x2 + y2 ) - fRTubeDeg[p] > telescope_list[fTelID]*0.5 )
 		  {
 		     fTubeDisabled[p] = 2;
 		     nDisabled++;
@@ -785,6 +804,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	    fTelescope_type += 100000000;
         }
 // Schwarzschild-Couder: check number of mirrors
+// (assumption is that SC telescope has 2 mirrors only)
 	else if( fNMirrors == fSC_number_of_mirrors )
 	{
 	   fTelescope_type += 200000000;

@@ -65,6 +65,7 @@ class VShowerParameters
         ULong64_t fLTrig;                         //!< local trigger vector, bit coded
                                                   //!< list of telescopes with local triggers (length of array is fNTrig)
         unsigned short int fTrig_list[VDST_MAXTELESCOPES];
+	unsigned short int fTrig_type[VDST_MAXTELESCOPES];
 // reconstruction parameters
         unsigned int fNumImages;                  //!< total number of images
 // C. Duke 19Oct06

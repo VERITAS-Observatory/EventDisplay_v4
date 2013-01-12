@@ -83,6 +83,7 @@ class VDSTTree
         short int    fDSTRawMax[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         float        fDSTLTtime[VDST_MAXTELESCOPES];
         float        fDSTLDTtime[VDST_MAXTELESCOPES];
+	unsigned short int fDSTL2TrigType[VDST_MAXTELESCOPES];
         unsigned short int fDSTHiLo[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTN255[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTnL1trig[VDST_MAXTELESCOPES];
@@ -165,6 +166,7 @@ class VDSTTree
         bool         getDSTLocalTrigger( int iTelID );
         float        getDSTLocalTriggerTime( int iTelID );
         float        getDSTLocalDelayedTriggerTime( int iTelID );
+	unsigned short int getDSTL2TriggerType( int iTelID );
 
         double       getDSTSums( int iChannelID );
         double       getDSTSums( int iTelID, int iChannelID );

@@ -427,11 +427,6 @@ void VDisplay::makeMoviePicture()
     if( fMoviePictNumber % fEventLoop->getNTel() == 0 || fCameraDisplay != C_TIMING )
     {
         sprintf( i_Temp, "_%.5d.gif", fMoviePictNumber );
-/*     if (fMoviePictNumber<10){
-       sprintf( i_Temp, "_0%d.gif", fMoviePictNumber );
-     } else {
-       sprintf( i_Temp, "_%d.gif", fMoviePictNumber );
-     } */
         suffix = i_Temp;
 // no printout Info in <TCanvas::Print>: ....
         gErrorIgnoreLevel = 1;
@@ -729,6 +724,16 @@ void VDisplay::drawFADC( bool iFit )
     fHisFADC->Reset();
     char histitle[200];
     fHisFADC->SetLineColor( 9 );
+    if( TMath::Abs( fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) 
+                  - TMath::Floor( fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) ) ) < 1.e-3 )
+    {
+       sprintf( histitle, "sample number [%dns]", (int)fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) );
+    }
+    else 
+    {
+       sprintf( histitle, "sample number [%.1fns]", fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) );
+    }
+    fHisFADC->GetXaxis()->SetTitle( histitle );
 
     TH1D *iTraceFits;
     iTraceFits = 0;
@@ -1280,7 +1285,6 @@ void VDisplay::setFADCText()
 // sum / pedvar
     double i_var = 0.;
     if( fEventLoop->getRunParameter()->fsourcetype != 6 &&
-        fEventLoop->getRunParameter()->fsourcetype != 7 &&
 	iChannel < fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
     {
         unsigned int iSumWindow = fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel];
@@ -1288,7 +1292,11 @@ void VDisplay::setFADCText()
         {
             if( iChannel < fEventLoop->getAnalyzer()->getPedvars( iSumWindow, true ).size() )
             {
-                if( fEventLoop->getAnalyzer()->getPedvars(fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel], fEventLoop->getHiLo()[iChannel])[iChannel]  > 0. ) i_var = fEventLoop->getAnalyzer()->getSums()[iChannel]/fEventLoop->getAnalyzer()->getPedvars(fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel], fEventLoop->getHiLo()[iChannel])[iChannel];
+               if( fEventLoop->getAnalyzer()->getPedvars(fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel], fEventLoop->getHiLo()[iChannel])[iChannel]  > 0. )
+	       {
+	           i_var = fEventLoop->getAnalyzer()->getSums()[iChannel]
+		         / fEventLoop->getAnalyzer()->getPedvars(fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel], fEventLoop->getHiLo()[iChannel])[iChannel];
+               }
             }
         }
     }
@@ -1547,7 +1555,11 @@ void VDisplay::drawCalibrationHistos()
     fCanvasCal->Update();
 }
 
+/*
 
+   draw histograms into the corresponding tab
+
+*/
 void VDisplay::drawPixelHistos()
 {
 
@@ -1564,7 +1576,6 @@ void VDisplay::drawPixelHistos()
     if( !drawImageBorderTZero() ) iP->Clear();
 
     fCanvasPixelHisto->Update();
-
 }
 
 
@@ -1699,6 +1710,7 @@ bool VDisplay::drawImageBorderCharge()
 
 
 /*!
+
     This draws the timing gradient graphs in the tgrad tab
 
 */
@@ -1717,32 +1729,48 @@ bool VDisplay::drawTgradGraphs()
 
     double y_min = 0.;
     double y_max = 20.;
+    y_min = 1.e5;
+    y_max = -1.e5;
     double x = 0.;
     double y = 0.;
+    double yE = 0.;
     for( int i = 0; i < xgraph->GetN(); i++ )
     {
         xgraph->GetPoint( i, x, y );
-        if( y > y_max ) y_max = y;
-        if( y < y_min ) y_min = y;
+	yE = xgraph->GetErrorY( i );
+        if( y+yE > y_max ) y_max = y+yE;
+        if( y-yE < y_min ) y_min = y-yE;
     }
     double y_add = 0.2*(y_max-y_min);
     y_min -= y_add;
     y_max += y_add;
 
-    TH2F *h1=new TH2F("h1","",0, -0.5*fEventLoop->getData()->getDetectorGeometry()->getFieldofView()[fTelescope]-0.1, 0.5*fEventLoop->getData()->getDetectorGeometry()->getFieldofView()[fTelescope]+0.1, 0, y_min, y_max );
+    TH2F *h1=new TH2F("h1","",0, -0.5*fEventLoop->getData()->getDetectorGeometry()->getFieldofView()[fTelescope]-0.1, 
+                                  0.5*fEventLoop->getData()->getDetectorGeometry()->getFieldofView()[fTelescope]+0.1, 0, 
+				  y_min, y_max );
     h1->SetStats(0);
     h1->SetTitle("");
-    h1->GetXaxis()->SetTitle("PMT position on long axis (degrees)");
+    h1->GetXaxis()->SetTitle("PMT position on long axis [degrees]");
     h1->GetXaxis()->SetTitleSize(0.06);
     h1->GetXaxis()->SetLabelSize(0.05);
-    h1->GetXaxis()->SetTitleOffset(0.7);
+    h1->GetXaxis()->SetTitleOffset(0.8);
 
-    h1->GetYaxis()->SetTitle("Rising Edge Time (samples)");
+    char histitle[200];
+    if( TMath::Abs( fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) 
+                  - TMath::Floor( fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) ) ) < 1.e-3 )
+    {
+       sprintf( histitle, "rising edge time [samples (%dns)]", (int)fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) );
+    }
+    else 
+    {
+       sprintf( histitle, "rising edge time [samples (%.1fns)]", fEventLoop->getDetectorGeo()->getLengthOfSampleTimeSlice( fTelescope ) );
+    }
+    h1->GetYaxis()->SetTitle( histitle );
     h1->GetYaxis()->SetTitleSize(0.06);
     h1->GetYaxis()->SetLabelSize(0.05);
     h1->GetYaxis()->SetTitleOffset(0.7);
 
-    h1->GetXaxis()->SetTitle("PMT position on long axis (degrees)");
+    h1->GetXaxis()->SetTitle("PMT position on long axis [degrees]");
     h1->DrawCopy();
     if (xgraph && xgraph->GetN()>1)
     {
@@ -1751,29 +1779,6 @@ bool VDisplay::drawTgradGraphs()
         xgraph->SetMarkerStyle(20);
         xgraph->Draw("P");
     }
-// short axis and r histograms are not filled anyway
-/*  fCanvasPixelHisto->cd(2);
-  TGraphErrors* ygraph = fEventLoop->getData()->getYGraph();
-  TGraphErrors* rgraph = fEventLoop->getData()->getRGraph();
-  h1->GetXaxis()->SetTitle("PMT position on short axis (degrees)");
-  h1->DrawCopy();
-  if (ygraph && xgraph->GetN()>1) {
-    ygraph->SetMarkerSize(0.8);
-    ygraph->SetMarkerColor(4);
-    ygraph->SetMarkerStyle(20);
-    ygraph->Draw("P");
-  }
-fCanvasPixelHisto->cd(3);
-h1->GetXaxis()->SetTitle("PMT position on radial axis (degrees)");
-h1->DrawCopy();
-if (rgraph && rgraph->GetN()>1) {
-rgraph->SetMarkerSize(0.8);
-rgraph->SetMarkerColor(4);
-rgraph->SetMarkerStyle(20);
-rgraph->Draw("P");
-} */
-
-//  if (!(xgraph||ygraph||rgraph)) fCanvasPixelHisto->Clear();
 
     delete h1;
 

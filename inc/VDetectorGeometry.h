@@ -1,4 +1,4 @@
-//! VDetectorGeometry  geometry of all cameras and telescope arrangement
+//! VDetectorGeometry  geometry of all cameras and telescope arrangement (note: most parameters are in VCameraRead)
 
 #ifndef VDETECTORGEOMETRY_H
 #define VDETECTORGEOMETRY_H
@@ -13,7 +13,6 @@ using namespace std;
 class VDetectorGeometry : public VCameraRead
 {
     private:
-// camera geometry
         vector< unsigned int > fNSamples;
         vector< unsigned int > fNChannels;
         vector< bool >         fSampleWarning;
@@ -21,7 +20,8 @@ class VDetectorGeometry : public VCameraRead
     public:
         VDetectorGeometry() {}
         VDetectorGeometry( unsigned int iNTel, bool iDebug = false );
-        VDetectorGeometry( unsigned int iNTel, vector< string > iCamera, string iDir, bool iDebug = false, float iCoordinateTransformerX = 1., float iCoordinateTransformerY = 1., int iSourceType = 3 );
+        VDetectorGeometry( unsigned int iNTel, vector< string > iCamera, string iDir, bool iDebug = false, 
+	                   float iCoordinateTransformerX = 1., float iCoordinateTransformerY = 1., int iSourceType = 3 );
         ~VDetectorGeometry() {}
         vector< unsigned int > getNChannels() { return fNChannels; }
         unsigned int   getNChannels( unsigned int iTelID ) { if( iTelID < fNChannels.size() ) return fNChannels[iTelID]; else return 0; }

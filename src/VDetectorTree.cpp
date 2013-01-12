@@ -46,6 +46,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
     float fCameraRotation = 0.;
     unsigned int nPixel = 0;
     unsigned int nSamples = 0;
+    float Sample_time_slice = 0.;
     unsigned int nGains = 2;
     float fHiLoScale = 0.;
     int   fHiLoThreshold = 0;
@@ -80,6 +81,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
         fTreeDet->Branch( "CameraRotation", &fCameraRotation, "CameraRotation/F" );
         fTreeDet->Branch( "NPixel", &nPixel, "NPixel/i" );
         fTreeDet->Branch( "NSamples", &nSamples, "NSamples/i" );
+	fTreeDet->Branch( "Sample_time_slice", &Sample_time_slice, "Sample_time_slice/F" );
 	fTreeDet->Branch( "NGains", &nGains, "NGains/i" );
 	fTreeDet->Branch( "HiLoScale", &fHiLoScale, "HiLoScale/F" );
 	fTreeDet->Branch( "HiLoThreshold", &fHiLoThreshold, "HiLoThreshold/I" );
@@ -123,6 +125,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
             fTelType = iDet->getTelType()[i];
             nPixel = iDet->getNChannels( i );
             nSamples = iDet->getNSamples( i );
+	    Sample_time_slice = iDet->getLengthOfSampleTimeSlice(i);
 	    fHiLoScale = iDet->getLowGainMultiplier()[i];
 	    fHiLoThreshold = iDet->getLowGainThreshold()[i];
 	    fHiLoOffset = 0.;
@@ -160,6 +163,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
     float fFOV= 0.;
     unsigned int nPixel = 0;
     unsigned int nSamples = 0;
+    float Sample_time_slice = 0.;
     unsigned int nGains = 0;
     float fHiLoScale = 0.;
     int   fHiLoThreshold = 0;
@@ -191,6 +195,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
     iTree->SetBranchAddress( "CameraRotation", &fCameraRotation );
     iTree->SetBranchAddress( "NPixel", &nPixel );
     iTree->SetBranchAddress( "NSamples", &nSamples );
+    if( iTree->GetBranchStatus( "Sample_time_slice" ) ) iTree->SetBranchAddress( "Sample_time_slice", &Sample_time_slice );
     if( iTree->GetBranchStatus( "NGains" ) ) iTree->SetBranchAddress( "NGains", &nGains );
     if( iTree->GetBranchStatus( "HiLoScale" ) ) iTree->SetBranchAddress( "HiLoScale", &fHiLoScale );
     if( iTree->GetBranchStatus( "HiLoThreshold" ) ) iTree->SetBranchAddress( "HiLoThreshold", &fHiLoThreshold );
@@ -237,6 +242,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
 
         iDet->getNChannels()[i] = nPixel;
 	iDet->setNSamples( i, nSamples, true );
+	iDet->setLengthOfSampleTimeSlice( i, Sample_time_slice );
 	iDet->setLowGainMultiplier( i, fHiLoScale );
 	iDet->setLowGainThreshold( i, (unsigned int)fHiLoThreshold );
 

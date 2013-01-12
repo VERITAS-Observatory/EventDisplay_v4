@@ -205,10 +205,11 @@ class VVirtualDataReader
         {
             return 0;
         }
-        virtual std::vector< bool >&        getLocalTrigger() { return f; }
+        virtual std::vector< bool >&       getLocalTrigger() { return f; }
         virtual bool                       hasLocalTrigger( unsigned int iTel ) { return false; }
         virtual float                      getLocalTriggerTime( unsigned int iTel ) { return -999.; }
         virtual float                      getLocalDelayedTriggerTime( unsigned int iTel ) { return -999.; }
+	virtual unsigned short int         getLocalTriggerType( unsigned int iTel ) { return 0; }
 
 // DST returns
         virtual std::valarray< double >&     getSums( unsigned int iNChannel = 99999 ) { return v; }

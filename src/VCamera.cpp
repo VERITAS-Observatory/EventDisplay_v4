@@ -623,7 +623,10 @@ void VCamera::drawEventText()
 // no GPS times for MC
     if( fData->getReader()->isMC() )
     {
-        sprintf( iText, "Run: %d Event: %d  Type: %d (%d)", fData->getRunNumber(), int( fData->getReader()->getEventNumber() ), int( fData->getReader()->getNewEventType()), int( fData->getReader()->getATEventType()) );
+        sprintf( iText, "Run: %d Event: %d  Type: %d (%d) Trig: %d", fData->getRunNumber(), int( fData->getReader()->getEventNumber() ), 
+	                                                    int( fData->getReader()->getNewEventType()), 
+							    int( fData->getReader()->getATEventType()),
+							    int( fData->getReader()->getLocalTriggerType( fData->getReader()->getTelescopeID() ) ) );
     }
 #ifndef NOVBF
 // GPS times are expected only for VBF data files

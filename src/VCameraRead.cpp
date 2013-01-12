@@ -110,6 +110,7 @@ bool VCameraRead::initialize( unsigned int i_Ntel, unsigned int i_Nchannel )
     {
         fCNChannels[i] = i_Nchannel;
         fCNSamples[i] = 128;                       // actual sample size is set later in VImageBaseAnalyzer (from reader)
+	fSample_time_slice[i] = 2.;
     }
     resetCamVectors();
     return true;
@@ -125,6 +126,7 @@ bool VCameraRead::initialize( unsigned int i_Ntel, vector< unsigned int > i_Ncha
     {
         fCNChannels[i] = i_Nchannel[i];
         fCNSamples[i] = 128;                       // actual sample size is set later in VImageBaseAnalyzer (from reader)
+	fSample_time_slice[i] = 2.;
     }
     resetCamVectors( false );
     return true;
@@ -351,7 +353,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
 // IMPORTANT: IGNORING SAMPLE SETTINGS FROM CFG FILE HERE!!!! (GM)
             i_stream >> fCNSamples[0];
 	    if( fsourcetype != 1 && fsourcetype != 5 ) fCNSamples[0] = 128;
-            for( unsigned int i = 0; i < fNTel; i++ )  fCNSamples[i] = fCNSamples[0];
+            for( unsigned int i = 1; i < fNTel; i++ )  fCNSamples[i] = fCNSamples[0];
 //////////////////////////////////////////////
 // hi/lo gains
             if( fGrIsuVersion >= 411 )
@@ -366,6 +368,14 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
                     fLowGainIsSet = true;
                 }
             }
+        }
+// length of a time slice
+        else if( iline.find( "SIMUL" ) < iline.size() )
+	{
+	   i_stream >> i_char;
+	   i_stream >> i_char;
+	   i_stream >> fSample_time_slice[0];
+	   for( unsigned int i = 1; i < fNTel; i++ ) fSample_time_slice[i] = fSample_time_slice[0];
         }
 // low gain multiplier (not a grisu line)
         else if( iline.find( "LOWMULT" ) < iline.size() )
@@ -762,11 +772,12 @@ void VCameraRead::stretchAndMoveCamera()
 void VCameraRead::rotateCamera()
 {
     if( fDebug ) cout << "VCameraRead::rotateCamera " << endl;
-    double degrad = 45. / atan( 1. );
 
+    cout << "camera rotation (in deg) of ";
     for( unsigned int i = 0; i < fNTel; i++ )
     {
-        double iR = fCameraRotation[i] / degrad;
+       cout << " T" << i+1 << ": "  << fCameraRotation[i];
+        double iR = fCameraRotation[i] * TMath::DegToRad();
 	if( i < fXTube.size() && i < fYTube.size() && i < fRotXTube.size() && i < fRotYTube.size() )
 	{
 	   for( unsigned int j = 0; j < fXTube[i].size(); j++ )
@@ -793,6 +804,7 @@ void VCameraRead::rotateCamera()
 	   exit( -1 );
         }
     }
+    cout << endl;
 }
 
 
@@ -817,6 +829,7 @@ void VCameraRead::resetTelVectors()
     fTelRad.assign( fNTel, 7. );
     fCNChannels.assign( fNTel, 0 );
     fCNSamples.assign( fNTel, 128 );               // actual sample size is set later in VImageBaseAnalyzer
+    fSample_time_slice.assign( fNTel, 2. );
     fMirFocalLength.assign( fNTel, 12. );
     fNMirrors.assign( fNTel, 0 );
     fMirrorArea.assign( fNTel, 0. );
@@ -1076,4 +1089,14 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
     rotateCamera();
     if( fDebug ) cout << "rotateCamera() Finished" << endl;
     return true;
+}
+
+bool VCameraRead::setLengthOfSampleTimeSlice( unsigned int iTelID, float iSample_time_slice )
+{
+   if( iTelID < fSample_time_slice.size() )
+   {
+       fSample_time_slice[iTelID] = iSample_time_slice;
+       return true;
+   }
+   return false;
 }

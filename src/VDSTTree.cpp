@@ -101,8 +101,9 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
     fDST_tree->Branch( "ltrig_list", fDSTLTrig_list, "ltrig_list[ntrig]/i" );
     if( fMC )
     {
-        fDST_tree->Branch( "LTtime", fDSTLTtime, "LTtime[ntrig]" );
-        if( iFullTree ) fDST_tree->Branch( "LDTtime", fDSTLDTtime, "LDTtime[ntrig]" );
+        fDST_tree->Branch( "LTtime", fDSTLTtime, "LTtime[ntrig]/F" );
+        if( iFullTree ) fDST_tree->Branch( "LDTtime", fDSTLDTtime, "LDTtime[ntrig]/F" );
+	fDST_tree->Branch( "L2TrigType", fDSTL2TrigType, "L2TrigType[ntrig]/s" );
     }
 // following arrays are filed only for all telescopes with data
     fDST_tree->Branch( "ntel_data", &fDSTntel_data, "ntel_data/i" );
@@ -216,6 +217,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
         fDSTLTrig_list[i] = 0;
         fDSTnL1trig[i] = 0;
         fDSTLTtime[i] = 0.;
+	fDSTL2TrigType[i] = 0;
     }
 // return if previous event changed trigger variables only
     if( iTriggerReset ) return;
@@ -336,6 +338,7 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     {
         fDST_tree->SetBranchAddress( "LTtime", fDSTLTtime );
         if( fFullTree ) fDST_tree->SetBranchAddress( "LDTtime", fDSTLDTtime );
+	fDST_tree->SetBranchAddress( "L2TrigType", fDSTL2TrigType );
     }
     fDST_tree->SetBranchAddress( "ntel_data", &fDSTntel_data );
     fDST_tree->SetBranchAddress( "tel_data", fDSTtel_data );
@@ -585,6 +588,13 @@ float VDSTTree::getDSTLocalTriggerTime( int iTelID )
     return fDSTLTtime[iTel];
 }
 
+unsigned short int VDSTTree::getDSTL2TriggerType( int iTelID )
+{
+    int iTel = hasLocalTrigger( iTelID );
+    if( iTel < 0 ) return 0;
+
+    return fDSTL2TrigType[iTel];
+}
 
 float VDSTTree::getDSTLocalDelayedTriggerTime( int iTelID )
 {

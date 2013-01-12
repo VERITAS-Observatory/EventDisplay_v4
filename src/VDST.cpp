@@ -297,6 +297,7 @@ void VDST::fill()
         {
             fDSTLTtime[i] = (float)getReader()->getLocalTriggerTime(i);
             fDSTLDTtime[i] = (float)getReader()->getLocalDelayedTriggerTime(i);
+	    fDSTL2TrigType[i] = (int)getReader()->getLocalTriggerType(i);
         }
     }
 // only write events with more than NN ntubes to disk (for one telescope only)

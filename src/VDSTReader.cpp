@@ -95,6 +95,7 @@ bool VDSTReader::init()
 	fNumSamples.push_back( 0 );
         fTelElevation.push_back( 0. );
         fDSTvltrig.push_back( false );
+	fDSTl2trig_type.push_back( 0 );
         fLTtime.push_back( 0. );
         fLDTtime.push_back( 0. );
 // FADC Trace
@@ -175,6 +176,7 @@ bool VDSTReader::getNextEvent()
         {
             fLTtime[i] = fDSTTree->getDSTLocalTriggerTime( i );
             fLDTtime[i] = fDSTTree->getDSTLocalDelayedTriggerTime( i );
+	    fDSTl2trig_type[i] = fDSTTree->getDSTL2TriggerType( i );
         }
     }
 // get FADC trace

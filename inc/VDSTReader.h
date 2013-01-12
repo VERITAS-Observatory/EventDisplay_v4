@@ -56,6 +56,7 @@ class VDSTReader : public VVirtualDataReader
         vector< vector< vector< uint16_t > > > fFADCTrace;
 
         vector< bool > fDSTvltrig;
+	vector< unsigned short int > fDSTl2trig_type;
 
         bool init();                              //!< open source file and init tree
 
@@ -83,6 +84,7 @@ class VDSTReader : public VVirtualDataReader
         uint32_t                    getHitID( uint32_t );
         bool                        getHiLo(uint32_t i) { if( i < fHiLo[fTelID].size() ) return fHiLo[fTelID][i]; else return 0; }
         vector< bool >&             getLocalTrigger() { return fDSTvltrig; }
+	unsigned short int          getLocalTriggerType( unsigned int iTelID ) { if( iTelID < fDSTl2trig_type.size() ) return fDSTl2trig_type[iTelID]; else return 0; }
         vector< float >             getLocalTriggerTime() { return fLTtime; }
         vector< float >             getLocalDelayedTriggerTime() { return fLDTtime; }
         uint16_t                    getMaxChannels() { return fNChannel[fTelID]; }

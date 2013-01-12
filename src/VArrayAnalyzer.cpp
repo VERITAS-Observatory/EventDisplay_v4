@@ -245,6 +245,7 @@ void VArrayAnalyzer::initEvent()
             if( fReader->getLocalTrigger()[getTeltoAna()[i]] )
             {
                 getShowerParameters()->fTrig_list[ztrig] = getTeltoAna()[i];
+		getShowerParameters()->fTrig_type[ztrig] = fReader->getLocalTriggerType(i);
                 ztrig++;
             }
         }
