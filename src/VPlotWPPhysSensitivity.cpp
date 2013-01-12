@@ -301,7 +301,7 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown )
 
 bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit )
 {
-   string iCrabFile = "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
+   string iCrabFile = "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
    unsigned int iCrabID = 6;
 
    TCanvas *cSens = 0;

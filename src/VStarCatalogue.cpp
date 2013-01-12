@@ -166,10 +166,11 @@ bool VStarCatalogue::readCatalogue()
     if( !is )
     {
 // try ENVDISPDATA
-        const char *data_dir = gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" );
-	if( data_dir )
+	string itemp = "";
+	if(      gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" ) ) itemp = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
+	else if( gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" ) ) itemp = gSystem->Getenv( "VERITAS_EVNDISP_ANA_DIR" );
+	if( itemp.size() > 0 )
 	{
-	   string itemp = data_dir;
 	   fCatalogue   = itemp + "/AstroData/Catalogues/" + fCatalogue;
 	   is.open( fCatalogue.c_str(), ifstream::in );
         }
