@@ -492,7 +492,8 @@ void VFluxCalculation::getIntegralEffectiveArea()
 	       double InterEffArea=0.;
 
 // Time of first bin
-	       double Time=Zaxis[0];
+	       double Time=0.;
+	       if( Zaxis ) Time = Zaxis[0];
 
 // loop over all points in effective area histogram
 	       for( int b = 1; b < g_time->GetN(); b++ )
