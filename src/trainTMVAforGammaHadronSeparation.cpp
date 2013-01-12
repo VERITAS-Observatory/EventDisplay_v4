@@ -34,11 +34,11 @@ using namespace std;
    0-N: value is constant (array identifier)
 
 */
-bool checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariable, bool iSignal )
+double checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariable, bool iSignal, bool iSplitBlock )
 {
    char hname[2000];
    TH1D *h = 0;
-   cout << "checking";
+   cout << "initializing TMVA variables: checking";
    if( iSignal ) cout << " signal";
    else          cout << " background";
    cout << " variable " << iVariable << " for consistency " << endl;
@@ -64,15 +64,20 @@ bool checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariable,
 // fill a histogram with the variable to be checked
 	 sprintf( hname, "hXX_%d", i );
          h = new TH1D( hname, "", 100, -1.e5, 1.e5 );
-	 iTreeVector[i]->Project( h->GetName(), iVariable.c_str(), iCut );
+	 Long64_t iNEntriesBlock = 0;
+	 if( iSplitBlock ) iNEntriesBlock = iTreeVector[i]->GetEntries() / 2;
+	 else              iNEntriesBlock = iTreeVector[i]->GetEntries();
+	 iTreeVector[i]->Project( h->GetName(), iVariable.c_str(), iCut, "", iNEntriesBlock );
 	 if( h )
 	 {
 	    if( h->GetRMS() > 1.e-5 )
 	    {
 	       cout << "\t variable " << iVariable << " ok, RMS: " << h->GetRMS() << ", tree: " << i;
-	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax() << endl;
+	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax();
+	       cout << ", entries " << h->GetEntries();
+	       cout << endl;
 	       h->Delete();
-	       return false;
+	       return -9999.;
 	    }
 	 }
       }
@@ -85,13 +90,17 @@ bool checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariable,
    if( h ) cout << " (mean " << h->GetMean() << ", RMS " << h->GetRMS() << ", entries " << h->GetEntries() << ")";
    cout << ", checked " << iTreeVector.size() << " trees";
    cout << endl;
+   double i_mean = -9999.;
+   if( h ) i_mean = h->GetMean();
    if( h ) h->Delete();
 
-   return true;
+   return i_mean;
 }
 
 /*!
-     run the optimization
+
+     train the MVA
+
 */
 bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 {
@@ -136,6 +145,14 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
       return false;
    }
 
+// check split mode
+   bool iSplitBlock = false;
+   if( iRun->fPrepareTrainingOptions.find( "SplitMode=Block" ) != string::npos )
+   {
+      cout << "train: use option SplitMode=Block" << endl;
+      iSplitBlock = true;
+   }
+
    for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
    {
       if( iRun->fTrainingVariable[i].find( "NImages_Ttype" ) != string::npos )
@@ -144,9 +161,18 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 	 {
 	    ostringstream iTemp;
 	    iTemp << iRun->fTrainingVariable[i] << "[" << j << "]";
-// check if the training variable is constant
-	    if( !checkIfVariableIsConstant( iRun, iCut, iTemp.str(), true ) 
-	     || !checkIfVariableIsConstant( iRun, iCut, iTemp.str(), false ) )
+	    ostringstream iTempCut;
+// require at least 2 image per telescope type
+	    iTempCut << iTemp.str() << ">1";
+	    TCut iCutCC = iTempCut.str().c_str();
+	    double iSignalMean = checkIfVariableIsConstant( iRun, iCut&&iCutCC, iTemp.str(), true, iSplitBlock );
+	    double iBckMean    = checkIfVariableIsConstant( iRun, iCut&&iCutCC, iTemp.str(), false, iSplitBlock );
+// check if the training variable is constant 
+// (checkIfVariableIsConstant returns -9999 if RMS of variable is >0)
+	    cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
+	    if( ( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6 
+	     || TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
+	     && iSignalMean !=0 && iBckMean != 0 )
 	    {
 	       factory->AddVariable( iTemp.str().c_str(), iRun->fTrainingVariableType[i] );
             }
@@ -156,8 +182,11 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
       else
       {
 // check if the training variable is constant
-	 if( !checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), true )  
-	  || !checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), false ) )
+	 double iSignalMean = checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
+	 double iBckMean    = checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
+	 cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
+	 if( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6 
+	  || TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
 	 {
 	   factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
 	 }
@@ -262,7 +291,7 @@ int main( int argc, char *argv[] )
    VTMVARunData *fData = new VTMVARunData();
    fData->fName = "OO";
 
-// read run parameters
+// read run parameters from configuration file
    if( !fData->readConfigurationFile( argv[1] ) )
    {
       cout << "error opening run parameter file (";

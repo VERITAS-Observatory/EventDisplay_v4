@@ -60,12 +60,18 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
    defineHistograms();
 }
 
+/*
+
+   needed only for the calculation of MVA value (not a default)
+
+*/
 void VDataMCComparision::initialGammaHadronCuts()
 {
    fCuts = new VGammaHadronCuts();
    fCuts->initialize();
    fCuts->resetCutValues();
-   if( !fCuts->readCuts( "$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.GammaHadron.TMVA.BDT.T2Fixed.dat" ) )
+// HARDWIRED CUT FILE
+   if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.GammaHadron.TMVA.BDT.T2Fixed.dat" ) )
    {
       cout << "exiting..." << endl;
       exit( -1 );
