@@ -1,5 +1,8 @@
 /* \file writeCTAWPPhysSensitivityFiles write CTA WP Phys sensitivity files
 
+   simple root files with histograms for sensitivities, effective areas,
+   angular and energy resolution, migration matrix, etc.
+
 */
 
 #include "VWPPhysSensitivityFile.h"
@@ -57,8 +60,9 @@ int main( int argc, char *argv[] )
     iData->setCosmicRaySpectrum( "$CTA_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 2 );
 
 // on source histograms
+// initialize histogram with the standard binning used in the CTA WP Phys group
     iData->initializeHistograms( 20, -1.8, 2.2, 500, -1.8, 2.2, 400, -2.3, 2.7, 9999 );
-    if( !iData->fillHistograms1D( fDataDirectory ) )
+    if( !iData->fillHistograms1D( fDataDirectory, true ) )
     {
        cout << "error filling on source histograms" << endl;
     }  
@@ -67,14 +71,14 @@ int main( int argc, char *argv[] )
     for( unsigned int i = 0; i < iWobbleMin.size(); i++ )
     {
        cout << "WOBBLE " << i << "\t" << iWobbleMin[i] << "\t" << iWobbleMax[i] << endl;
+// initialize histogram with the standard binning used in the CTA WP Phys group
        iData->initializeHistograms( 20, -1.8, 2.2, 500, -1.8, 2.2, 400, -2.3, 2.7, i );
-       if( !iData->fillHistograms1D( fDataDirectory ) )
+       if( !iData->fillHistograms1D( fDataDirectory, false ) )
        {
 	  exit( -1 );
        }
     }
     if( iWobbleMin.size() > 0 ) iData->fillHistograms2D( iWobbleMin, iWobbleMax );
 
-// 
     iData->terminate();
 }

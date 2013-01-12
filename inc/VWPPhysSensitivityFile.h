@@ -69,7 +69,7 @@ class VWPPhysSensitivityFile
     VWPPhysSensitivityFile();
    ~VWPPhysSensitivityFile() {}
 
-    bool fillHistograms1D( string iDataDirectory );
+    bool fillHistograms1D( string iDataDirectory, bool iFill1D = true );
     bool fillHistograms2D( vector< double > iWobble_min, vector< double > iWobble_max );
     bool initializeHistograms( int iEnergyXaxisNbins = 20, double iEnergyXaxis_min = -1.8, double iEnergyXaxis_max = 2.2,
                                int iEnergyTrue2DXaxisNbins = 500, double iEnergyTrue2DXaxis_min = -1.8, double iEnergyTrue2DXaxis_max = 2.2,

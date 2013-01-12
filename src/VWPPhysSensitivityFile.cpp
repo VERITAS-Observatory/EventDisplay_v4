@@ -1,5 +1,9 @@
 /* \file VWPPhysSensitivityFile
 
+    class to calculate sensitivities from effective area file,
+    fill histogram and return them in order to write them into
+    a simple root file
+
 */
 
 #include "VWPPhysSensitivityFile.h"
@@ -87,6 +91,8 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
       {
 	 fSensitivityLimits[i]->SetXTitle( "log_{10} (E/TeV)" );
 	 fSensitivityLimits[i]->SetYTitle( "E^{2} dF/dE [erg cm^{-2} s^{-1}]" );
+	 fSensitivityLimits[i]->SetLineColor( i+2 );
+	 fSensitivityLimits[i]->SetMarkerColor( i+2 );
 	 fSensitivityLimits[i]->Print();
 	 hisList.push_back( fSensitivityLimits[i] );
 	 hisListToDiskDebug.push_back( fSensitivityLimits[i] );
@@ -311,7 +317,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 }
 
 
-bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
+bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill1D )
 {
    char hname[2000];
 ////////////////////////////////////////////////////////////////////////
@@ -510,11 +516,11 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory )
     }
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
-    i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
+    if( iFill1D ) i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
 
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
     i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
-    i_SensCU.fillSensitivityLimitsHistograms( fSensitivityCULimits );
+    if( iFill1D ) i_SensCU.fillSensitivityLimitsHistograms( fSensitivityCULimits );
 
     return true;
 }

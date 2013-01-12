@@ -209,7 +209,10 @@ void VTMVARunData::print()
     cout << endl;
     cout << "prepare traing options: " << fPrepareTrainingOptions << endl;
     cout << "energy bin(s) (" << fEnergyCutData.size() << "): ";
-    for( unsigned int i = 0; i < fEnergyCutData.size(); i++ ) cout << fEnergyCutData[i]->fEnergyCut_Log10TeV_min << " - " << fEnergyCutData[i]->fEnergyCut_Log10TeV_max;
+    for( unsigned int i = 0; i < fEnergyCutData.size(); i++ )
+    {
+       cout << "[" << fEnergyCutData[i]->fEnergyCut_Log10TeV_min << ", " << fEnergyCutData[i]->fEnergyCut_Log10TeV_max << "]";
+    }
     cout << endl;
 // all bins should use same energy reconstruction method
     if( fEnergyCutData.size() > 0 && fEnergyCutData[0] )
