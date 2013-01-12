@@ -1,7 +1,24 @@
-Change log for v400 (last updated: 2013-01-02)
+Change log for v400 (last updated: 2013-01-12)
 ===============================================
 
+* 20130112 (GM) fixed naming confusion of aux directories: always called CTA_EVNDISP_AUX_DIR or VERITAS_EVNDISP_AUX_DIR 
+                                                           (no more VERITAS_EVNDISP_ANA_DIR)
 
+* 20130112 (GM) CTA Prod2: updated for reading of prod2 sims: updated converter, 
+                                                              added trigger types to dst tree and showerpars tree; 
+							      added sampling rate to telconfig tree; 
+							      smaller updates in display to print more information on the screen
+
+* 20130112 (GM) CTA sensitivity files: fixed bug in filling the sensitivity limitation histograms
+                                       for off-source data
+
+* 20130112 (GM) VTS next day analysis: fixed access to null pointer in VFluxCalculation
+                                       added missing objects to target in Makefile
+
+* 20130111 (GM) CTA scripts: changed usage of CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.sh
+                        (use again runlist instead of a range of runs)
+
+* 20130104 release of v400; trunk is now v401
 
 Changes from v35x to v400
 =========================
