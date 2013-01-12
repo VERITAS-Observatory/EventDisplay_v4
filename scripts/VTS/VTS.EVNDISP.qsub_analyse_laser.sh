@@ -11,7 +11,7 @@ echo $RUN
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
-# output data files are written to $VERITAS_EVNDISP_ANA_DIR/Calibration/Tel_XXX/
+# output data files are written to $VERITAS_EVNDISP_AUX_DIR/Calibration/Tel_XXX/
 # output log files are written to this directory
 set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-LASER/"
 mkdir -p $LDIR

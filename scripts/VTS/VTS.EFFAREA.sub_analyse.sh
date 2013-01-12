@@ -90,7 +90,7 @@ do
 # directory for parameter and cut files
 	 FFIR="$IFIL-$REID-${IZE[$i]}-${WOFF[$k]}-${INOI[$j]}"
 # cp cut files to temp directory
-         cp $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/$CUTS.dat $LOGDIR/$FFIR-$CUTS.dat
+         cp $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/$CUTS.dat $LOGDIR/$FFIR-$CUTS.dat
 # create parameter file
 	 rm -f $LOGDIR/$FFIR.dat
 	 touch $LOGDIR/$FFIR.dat
