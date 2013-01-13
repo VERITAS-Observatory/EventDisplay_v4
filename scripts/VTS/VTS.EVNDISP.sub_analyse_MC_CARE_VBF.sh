@@ -30,7 +30,7 @@ ARRAY=$2
 ACUT=$3
 PART=$4
 RUN=$5
-ATMO="06"
+ATMO="21"
 WOB="0.5"
 WOG="050"
 NOISE=$6
@@ -40,7 +40,7 @@ NOISE=$6
 # run scripts are written to this directory
 ###############################################################################################################
 DSET="care_optics_Nov10"
-DSET="care_Nov12"
+DSET="care_Dec12"
 if [ $PART = "1" ]
 then
    DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/ATM$ATMO/"

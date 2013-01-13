@@ -27,7 +27,7 @@ source $EVNDISPSYS/setObservatory.tcsh VERITAS
 if( $ARRAY == "V4" ) then
    if( $PART == "1" ) then
       set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
-      set IFIL=Apr12_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+#       set IFIL=Apr12_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47460
       set NRUN=1
@@ -38,7 +38,7 @@ if( $ARRAY == "V4" ) then
       set SRUN=47460
       set NRUN=3
    endif
-   set CFG="veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg"
+   set CFG="EVN_V4_Autumn2007_20130110.txt"
 # noise file
    set NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
    echo "NOISE FILE " $NOISEFILE
@@ -75,8 +75,13 @@ endif
 if( $ARRAY == "V6" ) then
    if( $PART == "1" ) then
       set IFIL=UPG_V0_"$ZEW"deg_"$WOG"
-      set IFIL=gamma_Nov12_grisu_Upgrade_8Nov2012_ATM21_newArray_"$ZEW"deg_"$WOG"
-      set IFIL=gamma_V6_Upgrade_20121127_v420_ATM21_"$ZEW"deg_"$WOG"
+      set IFIL=gamma_V6_Upgrade_20121127_v420_"$ATMO"_"$ZEW"deg_"$WOG"
+      if( $ATMO == "21-redHV" ) then
+         set IFIL=gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_"$ZEW"deg_"$WOG"
+      endif
+      if( $ATMO == "21-UV" ) then
+         set IFIL=gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_"$ZEW"deg_"$WOG"
+      endif
       set RUN=( "wobb" )
       set SRUN=65000
       set NRUN=1

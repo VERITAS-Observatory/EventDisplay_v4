@@ -27,6 +27,7 @@ source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 if( $PART == "1" ) then
    set IFIL=gamma_"$ZEW"deg_"$WOG"wobble_noise"$NOISE"MHz___
+   set IFIL=gamma_"$ZEW"deg_750m_"$WOB"wob_"$NOISE"mhz_up_ATM21_part
 endif
 if( $PART == "2" ) then
    set IFIL=electron_"$ZEW"deg_noise"$NOISE"MHz___
@@ -59,32 +60,32 @@ mkdir -p $DDIR
 ##############################################################################################
 # unzip vbf file to local scratch directory
 ##############################################################################################
-set VFIL=$IFIL"$RUN".vbf
-echo "SOURCEFILE $FDIR/$IFIL"$RUN".vbf.gz"
+set VFIL=$IFIL"$RUN".cvbf
+echo "SOURCEFILE $FDIR/$IFIL"$RUN".cvbf.gz"
 if (! -e $DDIR/$VFIL ) then
- if ( -e $FDIR/$IFIL"$RUN".vbf.gz ) then
-    echo "copying $FDIR/$IFIL"$RUN".vbf.gz to $DDIR"
-    cp -f $FDIR/$IFIL"$RUN".vbf.gz $DDIR/
-    echo " (vbf file copied)"
-    gunzip -f -v $DDIR/$IFIL"$RUN".vbf.gz
- else if( -e $FDIR/$IFIL"$RUN".vbf.bz2 ) then
-    echo "copying $FDIR/$IFIL"$RUN".vbf.bz2 to $DDIR"
-    cp -f $FDIR/$IFIL"$RUN".vbf.bz2 $DDIR/
-    echo " (vbf file copied)"
-    bunzip2 -f -v $DDIR/$IFIL"$RUN".vbf.bz2
+ if ( -e $FDIR/$IFIL"$RUN".cvbf.gz ) then
+    echo "copying $FDIR/$IFIL"$RUN".cvbf.gz to $DDIR"
+    cp -f $FDIR/$IFIL"$RUN".cvbf.gz $DDIR/
+    echo " (cvbf file copied)"
+    gunzip -f -v $DDIR/$IFIL"$RUN".cvbf.gz
+ else if( -e $FDIR/$IFIL"$RUN".cvbf.bz2 ) then
+    echo "copying $FDIR/$IFIL"$RUN".cvbf.bz2 to $DDIR"
+    cp -f $FDIR/$IFIL"$RUN".cvbf.bz2 $DDIR/
+    echo " (cvbf file copied)"
+    bunzip2 -f -v $DDIR/$IFIL"$RUN".cvbf.bz2
  endif
 endif
-set XFIL=$DDIR/$IFIL"$RUN".vbf
+set XFIL=$DDIR/$IFIL"$RUN".cvbf
 if (! -e $XFIL ) then
   echo "no source file found: $XFIL"
-  echo "$FDIR/$IFIL"$RUN".vbf*"
+  echo "$FDIR/$IFIL"$RUN".cvbf*"
   exit
 endif
 
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20121026_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20121218_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################

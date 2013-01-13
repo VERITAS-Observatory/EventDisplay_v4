@@ -34,8 +34,8 @@ set SDIR="analysis_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
 # full path to MC eventdisplay files 
 set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*[0-9].root"
 # mscw_energy command line options
-set MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 set MOPT="-noNoTrigger -nomctree -shorttree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
+set MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 if( $FTRE == "TRUE" ) then
   set ODIR="$ODIR"G
   set MOPT="-noNoTrigger -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"

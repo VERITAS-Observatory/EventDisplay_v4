@@ -31,7 +31,7 @@ then
 fi
 
 # run options
-OPT="-runmode=7"
+OPT="-runmode=7 -readcalibdb"
 
 # number of telescopes to analyse
 TELTOANA="1234"
