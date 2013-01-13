@@ -781,7 +781,9 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         cout << "channels on telescope " << getTelID()+1 << " exceeds 30: " << n_dead << endl;
 
 // do not allow to run eventdisplay with all channels dead in the low channels one of the telescopes
-        if( iLowGain && getNDead( iLowGain ) == getNChannels() )
+// (GM) why low-gain channels?? Why not all?
+//        if( iLowGain && getNDead( iLowGain ) == getNChannels() )
+        if( getNDead( iLowGain ) == getNChannels() )
         {
             cout << "Error: Number of dead channel is comparable to total number of channels" << endl;
             cout << "Exiting..." << endl;
