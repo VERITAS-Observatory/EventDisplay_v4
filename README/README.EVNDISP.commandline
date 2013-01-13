@@ -27,6 +27,7 @@ General:
 	 -useDBinfo				 get run info (target, wobble offsets, etc.) from database
 						 (attention, this might overwrite some of the given command line parameters, default: on, switch of with -donotusedbinfo )
 	 -nevents=NEVENTS 			 loop over NEVENTS events in display=0 mode (<0 = no limit) (default=-10000)
+	 -firstevent=EVENTNUMBER                 start analysis at event EVENTNUMBER (default=-10000)
 	 -reconstructionparameter FILENAME 	 file with reconstruction parameters (e.g., array analysis cuts)
 
 Output:
