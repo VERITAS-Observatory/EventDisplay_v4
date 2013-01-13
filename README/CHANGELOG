@@ -1,5 +1,13 @@
-Change log for v400 (last updated: 2013-01-12)
-===============================================
+Change log for v400
+====================
+
+* 20130114 (GM) added -readcalibDB to VTS.EVNDISP.analyse_tzeros (toffs need for correct tzero calculation)
+
+* 20130114 (GM) always stop running now when there are NChannel dead channels
+
+* 20130114 (GM) reading evndisp calibration data from DB: make sure that output directory exists
+
+* 20130114 (GM) added missing files to Makefile for target dist
 
 * 20130112 (GM) fixed naming confusion of aux directories: always called CTA_EVNDISP_AUX_DIR or VERITAS_EVNDISP_AUX_DIR 
                                                            (no more VERITAS_EVNDISP_ANA_DIR)
@@ -18,7 +26,7 @@ Change log for v400 (last updated: 2013-01-12)
 * 20130111 (GM) CTA scripts: changed usage of CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.sh
                         (use again runlist instead of a range of runs)
 
-* 20130104 release of v400; trunk is now v401
+******* 20130104 release of v400; trunk is now v401 *******
 
 Changes from v35x to v400
 =========================
