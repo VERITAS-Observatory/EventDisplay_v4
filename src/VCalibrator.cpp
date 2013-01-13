@@ -1359,23 +1359,25 @@ string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix )
 }
 
 
-void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile){
-
+void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile)
+{
     int LOW_GAIN = 0;
-    if(gain_or_toff != 1 && gain_or_toff != 2){
-	std::cout<<"ERROR VCalibrator::readfromVOFFLINE_DB: gain_or_toff must be 1 or 2"<<std::endl;
+    if(gain_or_toff != 1 && gain_or_toff != 2)
+    {
+	std::cout<<"ERROR VCalibrator::readfromVOFFLINE_DB: gain_or_toff must be 1 or 2" << std::endl;
 	return;
     }
     
     iFile+="_DB";
-    if(getRunParameter()->freadCalibfromDB_versionquery > 0){
+    if(getRunParameter()->freadCalibfromDB_versionquery > 0)
+    {
 	iFile+="_version";
 	char cversion[10];
 	sprintf( cversion, "%d",getRunParameter()->freadCalibfromDB_versionquery);
 	string sversion = cversion;
 	iFile+= sversion;
     }  
-    // to avoid double file
+// to avoid double file
     time_t rawtime;
     struct tm * timeinfo;
     time ( &rawtime );
@@ -1385,7 +1387,7 @@ void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile){
     string NOW = today_now; 
     iFile+=NOW;
     
-    // fill the 
+// fill the 
     TString DB_server = getRunParameter()->getDBServer();
     VDB_CalibrationInfo *fDB_calibinfo = new VDB_CalibrationInfo(getRunParameter()->fGainFileNumber[getTelID()],getTelID()+1,iFile,gain_or_toff,getRunParameter()->freadCalibfromDB_versionquery,LOW_GAIN,DB_server);
     fDB_calibinfo->readVOFFLINE();
@@ -1413,7 +1415,8 @@ void VCalibrator::readGains( bool iLowGain )
 // don't read gains for runmode = 2
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
     {
-	if(!iLowGain && getRunParameter()->freadCalibfromDB){
+	if(!iLowGain && getRunParameter()->freadCalibfromDB)
+	{
 	   readfromVOFFLINE_DB(1,iFile);
 	}
 
@@ -1475,11 +1478,14 @@ void VCalibrator::readGains( bool iLowGain )
     getGains() /= getRunParameter()->fGainCorrection[getTelID()];
 
 
-    if(getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file){
+    if( getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file)
+    {
 	char rm_calib_info_file[800];
 	sprintf(rm_calib_info_file,"rm -rf  %s",iFile.c_str());
 	system(rm_calib_info_file);
-    }else if(getRunParameter()->freadCalibfromDB && getRunParameter()->freadCalibfromDB_save_file){
+    }
+    else if( getRunParameter()->freadCalibfromDB && getRunParameter()->freadCalibfromDB_save_file )
+    {
 	std::cout<<"calibration information are stored in  "<<iFile<<std::endl;
     }
 

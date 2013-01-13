@@ -8,6 +8,7 @@
 #include <TSQLResult.h>
 #include <TSQLRow.h>
 #include <TSQLServer.h>
+#include <TSystem.h>
 
 #include <bitset>
 #include <iostream>

@@ -204,8 +204,8 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file(){
 //-- put the result in a FILE
 //-- public
 //---------------------------------------------
-void VDB_CalibrationInfo::readVOFFLINE(){
-
+void VDB_CalibrationInfo::readVOFFLINE()
+{
     std::cout<<"Reading calibration information from VOFFLINE DB"<<std::endl;
 
    if(!fread_flag){
@@ -225,16 +225,22 @@ void VDB_CalibrationInfo::readVOFFLINE(){
    Read_the_DB(Vchannel,Vmean,Vvar);
    
    //-- write the result of the reading in a FILE
-   if(Vchannel.size()>0){
+   if(Vchannel.size()>0)
+   {
        //std::cout<<"VDB_CalibrationInfo::readVOFFLINE Vchannel.size()>0"<<std::endl;
        //std::cout<<"fFile_to_write "<<fFile_to_write<<std::endl;
+// make sure that directory exists
+       gSystem->mkdir( gSystem->DirName( fFile_to_write.Data() ), true );
        FILE * file_output;
        file_output = fopen (fFile_to_write.Data(),"w");
-       for(unsigned int i = 0 ; i< Vchannel.size(); i++){
+       for(unsigned int i = 0 ; i< Vchannel.size(); i++)
+       {
 	   fprintf(file_output, "%3d %.4f %.4f  \n",(int) Vchannel[i],Vmean[i],Vvar[i]);    
        }
        fclose(file_output);
-   }else{
+   }
+   else
+   {
        std::cout<<"ERROR  VDB_CalibrationInfo::readVOFFLINE Vchannel.size()<1"<<std::endl;
    }
    
@@ -359,7 +365,7 @@ void VDB_CalibrationInfo::Read_the_DB(vector < double > &Vchannel,vector < doubl
 
 	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
     }
-
+// HARDWIRED TOTAL NUMBER OF CHANNELS
        if(Vchannel.size()<499){
 	   cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" has "<<Vchannel.size()<<" channel filled in the DB. Should be 499"<<std::endl;
        }
