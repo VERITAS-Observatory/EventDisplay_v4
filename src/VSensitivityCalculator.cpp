@@ -1992,9 +1992,9 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	    if( c->e0[n] < iMCPara->energy_min_log || c->e0[n] > iMCPara->energy_max_log ) continue;
 // require more than one event per pair of bins 
 // (effective areas are usually in finer bins than differential sensitivity)
-	    if( c->hEcutUW &&
+	    if( ( c->hEcutUW &&
 		c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) ) + 
-		c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) + 1 ) > 1.
+		c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) + 1 ) > 1. )
 	     || !c->hEcutUW )
 	    {
 	       iMCPara->energy.push_back( c->e0[n] );

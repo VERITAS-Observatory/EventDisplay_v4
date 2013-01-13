@@ -1657,7 +1657,7 @@ void VExposure::printListOfRuns()
   {
 
     int k = 0;
-    double wordtemp;
+    double wordtemp = 0.;
 
     cout << endl;
     cout << "Time Masks For Eventdisplay:" << endl;
