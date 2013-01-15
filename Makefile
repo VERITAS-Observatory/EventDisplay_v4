@@ -1213,8 +1213,9 @@ $(vtspara):
 	rm -rf $(vtspara).tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(vtspara)
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(vtspara)
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(vtspara)
+	mkdir -p $(vtspara)/AstroData
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(vtspara)/AstroData
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(vtspara)/AstroData
 	mkdir -p $(vtspara)/Calibration/Tel_1
 	mkdir -p $(vtspara)/Calibration/Tel_2
 	mkdir -p $(vtspara)/Calibration/Tel_3
