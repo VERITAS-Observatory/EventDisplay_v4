@@ -225,10 +225,11 @@ using namespace std;
 
 bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata )
 {
+// values from CORSIKA
    f->shower_prog_id = hsdata->mc_run_header.shower_prog_id;
    f->shower_prog_vers = hsdata->mc_run_header.shower_prog_vers;
    f->detector_prog_id = hsdata->mc_run_header.detector_prog_id;
-   f->detector_prog_vers = hsdata->mc_run_header.detector_prog_vers;
+   f->detector_prog_vers = (unsigned int)hsdata->mc_run_header.detector_prog_vers;
 // TODO: add simulation dates from shower and detector simulation
 // (need a compiler flag for backwards compatibility)
    f->obsheight = hsdata->mc_run_header.obsheight;
@@ -1523,7 +1524,11 @@ int main(int argc, char **argv)
     TTree *i_detTree = DST_fill_detectorTree( hsdata, fTelescope_list, fApplyCameraScaling );
     if( i_detTree ) i_detTree->Write();
 // writing Monte Carlo header
-    if( fMC_header ) fMC_header->Write();
+    if( fMC_header )
+    {
+       fMC_header->Write();
+       fMC_header->print();
+    }
 // writing calibration data
     TTree *i_calibTree = DST_fillCalibrationTree( hsdata, fTelescope_list );
     if( i_calibTree ) i_calibTree->Write();

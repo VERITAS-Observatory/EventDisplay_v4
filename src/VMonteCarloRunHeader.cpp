@@ -77,8 +77,8 @@ void VMonteCarloRunHeader::print()
     cout << endl;
     cout << "Monte Carlo run header" << endl;
     cout << "======================" << endl;
-    cout << "code version: " << shower_prog_id << " (" << shower_prog_vers << "), ";
-    cout << detector_prog_id << " (" << detector_prog_vers << "), ";
+    cout << "code version: shower prog " << shower_prog_id << " (" << shower_prog_vers << "), ";
+    cout << "detector prog " << detector_prog_id << " (" << detector_prog_vers << "), ";
     cout << converter_prog_vers << endl;
     cout << "date: " << shower_date << "\t" << detector_date << endl;
     cout << "number of showers: " << num_showers << " (each shower used " << num_use << " times)" << endl;
