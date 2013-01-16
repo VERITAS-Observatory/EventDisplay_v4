@@ -1,12 +1,11 @@
 /*! \class VImageCleaning
 
+     collection of different image cleaning methods
+
  */
 
 #include "VImageCleaning.h"
-#include "TopoTrigger.h"
-#ifndef VIMAGENNCLEANING_H
-#include "NNImageCleaningServiceFunc.h"
-#endif
+
 VImageCleaning::VImageCleaning( VEvndispData *iData )
 {
     fData = iData;
@@ -124,7 +123,11 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
 // trigger vector are image/border tubes
     if( fData->getReader() )
     {
-       if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 || fData->getReader()->getDataFormatNum() == 6 ) fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
+       if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 
+        || fData->getReader()->getDataFormatNum() == 6 ) 
+	{
+	    fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
+        }
     }
 // (end of preli)
 

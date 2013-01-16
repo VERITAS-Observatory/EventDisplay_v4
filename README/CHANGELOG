@@ -1,6 +1,8 @@
 Change log for v400
 ====================
 
+* 20130115 (GM) VTS runparameter tar file target in Makefile: fixed bug in setting directories correctly
+
 * 20130114 (GM) added -readcalibDB to VTS.EVNDISP.analyse_tzeros (toffs need for correct tzero calculation)
 
 * 20130114 (GM) always stop running now when there are NChannel dead channels

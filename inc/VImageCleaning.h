@@ -5,6 +5,9 @@
 
 #include <VEvndispData.h>
 
+#include "TopoTrigger.h"
+#include "NNImageCleaningServiceFunc.h"
+
 using namespace std;
 
 class VImageCleaning
@@ -52,7 +55,7 @@ class VImageCleaning
         int   LocMin(int n, float *ptr, float &min);
         int   LocMax(int n, float *ptr, float &max);
 
-        // main functions
+// main functions
         bool  BoundarySearch(int type, float thresh, TF1* fProbCurve, float refdT, int refvalidity, int idx);
         int   NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreCut);
         int   NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, float PreCut);
@@ -60,7 +63,6 @@ class VImageCleaning
         void  cleanNNImageFixed();
         void  cleanNNImagePedvars();
         bool  InitNNImageCleaning();
-
 
 // MS
         void cleanTriggerFixed( double hithresh, double lothresh );

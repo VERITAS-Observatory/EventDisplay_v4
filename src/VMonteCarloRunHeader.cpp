@@ -1,11 +1,8 @@
 /*! \file VMonteCarloRunHeader.cpp
     \brief MC parameter class
 
-    Observe that there is a almost similar class called VCORSIKARunheader.h (WHERE??????)
-
     use same parameters and parameter definition as sim_telarray
 
-    $Revision $Id: VMonteCarloRunHeader.cpp,v 1.1.2.4.4.1 2011/02/14 12:45:29 gmaier Exp $
 */
 
 #include "VMonteCarloRunHeader.h"
