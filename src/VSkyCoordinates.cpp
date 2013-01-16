@@ -1,7 +1,6 @@
 /*! \class VSkyCoordinates
-    \brief get telescope pointing direction
+    \brief handle telescope pointing direction and target positions
 
-    Revision $Id: VSkyCoordinates.cpp,v 1.19.2.1.4.14.12.2.6.2.2.6.10.1.2.1 2010/11/09 14:38:06 gmaier Exp $
 
     \author
        Gernot Maier
@@ -18,6 +17,11 @@ VSkyCoordinates::VSkyCoordinates()
 }
 
 
+VSkyCoordinates::~VSkyCoordinates()
+{
+    if( fStarCatalogue ) delete fStarCatalogue;
+}
+
 void VSkyCoordinates::setObservatory( double iLongitude, double iLatitude )
 {
     fObsLatitude  = iLatitude * TMath::DegToRad();
@@ -33,10 +37,12 @@ void VSkyCoordinates::reset()
 
     fTelDec = 0.;
     fTelRA  = 0.;
-    fTelDec_deg = 0.;
-    fTelRA_deg  = 0.;
+    fTelDecJ2000 = 0.;
+    fTelRAJ2000  = 0.;
     fTargetDec = 0.;
     fTargetRA  = 0.;
+    fTargetDecJ2000 = 0.;
+    fTargetRAJ2000  = 0.;
     fTelAzimuth = 0.;
     fTelElevation = 0.;
     fTelAzimuthCalculated = 0.;
@@ -58,50 +64,69 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
         cout << "---------------------------------------------------------------------------------------------------------" << endl;
         if( iTelID >= 0 ) cout << "Pointing telescope " << iTelID+1 << endl;
         cout << "\tPrecessing target ( " << getTargetName() << " ) from J2000 to MJD " << iMJD << endl;
+// TEMP
         cout << "\tJ2000   \t\t RA=" << setprecision( 6 ) << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
-
+// ENDTEMP
+        cout << "\tJ2000   \t\t RA=" << setprecision( 6 ) << fTargetRAJ2000*TMath::RadToDeg() << " dec=" << fTargetDecJ2000*TMath::RadToDeg() << endl;
+// precess target coordinates
         double ofy = VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
 	cout << "\tMJD " << iMJD << " (" << setprecision( 6 ) << ofy << ")";
 	cout << "\t RA=" << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
+// precess telescope coordinates
         VSkyCoordinatesUtilities::precessTarget( iMJD, fTelRA, fTelDec);
 
-        fTelRA_deg  = fTelRA * TMath::RadToDeg();
-        fTelDec_deg = fTelDec * TMath::RadToDeg();
         fPrecessed = true;
     }
 }
 
 
 /*!
+
+    set target coordinates in J2000
+
     \param iDec  [deg]
     \param iRA   [deg]
 */
-bool VSkyCoordinates::setTarget( double iDec, double iRA )
+bool VSkyCoordinates::setTargetJ2000( double iDec, double iRA )
 {
+    fTargetDecJ2000 = iDec/TMath::RadToDeg();
+    fTargetRAJ2000  = iRA/TMath::RadToDeg();
+
+// unprecessed -> precess later in the analysis
     fTargetDec = iDec/TMath::RadToDeg();
     fTargetRA  = iRA/TMath::RadToDeg();
+
+    fTelDecJ2000 = iDec/TMath::RadToDeg();
+    fTelRAJ2000  = iRA/TMath::RadToDeg();
+// unprecessed -> precess later in the analysis
     fTelDec = iDec/TMath::RadToDeg();
     fTelRA  = iRA/TMath::RadToDeg();
-    fTelRA_deg = iRA;
-    fTelDec_deg = iDec;
 
     fSet = true;
 
     return true;
 }
 
+/*
+
+    this shouldn't be used (or only if you know what you do)
+
+*/
 bool VSkyCoordinates::setTarget( string iTargetName )
 {
     VTargets iTarget;
     if( iTarget.selectTargetbyName( iTargetName ) )
     {
         fTargetName = iTargetName;
+
+        fTargetDecJ2000 = iTarget.getTargetDecJ2000();
+        fTargetRAJ2000  = iTarget.getTargetRAJ2000();
         fTargetDec = iTarget.getTargetDecJ2000();
         fTargetRA  = iTarget.getTargetRAJ2000();
         fTelRA = fTargetRA;
         fTelDec = fTargetDec;
-        fTelRA_deg = fTelRA * TMath::RadToDeg();
-        fTelDec_deg = fTelDec * TMath::RadToDeg();
+        fTelRAJ2000 = fTargetRA;
+        fTelDecJ2000 = fTargetDec;
         fSet = true;
     }
     else
@@ -160,11 +185,15 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
     slaDe2h( ha, fTargetDec, fObsLatitude, &fTargetAzimuth, &fTargetElevation );
     fTargetAzimuth   *= TMath::RadToDeg();
     fTargetElevation *= TMath::RadToDeg();
-
 }
 
+/*
 
+    calculate right ascension / declination 
 
+    all angles (in/out) in [deg]
+
+*/
 void VSkyCoordinates::getEquatorialCoordinates( int MJD, double time, double az, double ze, double &dec, double &ra )
 {
     if( fMC )
@@ -192,12 +221,29 @@ void VSkyCoordinates::getEquatorialCoordinates( int MJD, double time, double az,
     ra  *= TMath::RadToDeg();
 }
 
+/*
+ 
+   add an offset in ra/dec 
+
+   this should happen before precession is applied
+
+*/
 bool VSkyCoordinates::setPointingOffset( double i_raOff, double i_decOff )
 {
+    if( isPrecessed() )
+    {
+        fTelRA = -9999.;
+	fTelDec = -9999.;
+	fTelRAJ2000 = -9999.;
+	fTelDecJ2000 = -9999.;
+	return false;
+    }
+
     fTelRA      = fTargetRA + i_raOff/TMath::RadToDeg();
     fTelDec     = fTargetDec + i_decOff/TMath::RadToDeg();
-    fTelRA_deg  = fTelRA * TMath::RadToDeg();
-    fTelDec_deg = fTelDec * TMath::RadToDeg();
+
+    fTelRAJ2000      = fTargetRAJ2000 + i_raOff/TMath::RadToDeg();
+    fTelDecJ2000     = fTargetDecJ2000 + i_decOff/TMath::RadToDeg();
 
     return true;
 }
@@ -238,7 +284,6 @@ double VSkyCoordinates::getDerotationAngle(double i_UTC)
     return -slaPa(getHourAngle(i_UTC),fTelDec,fObsLatitude);
 }
 
-
 void VSkyCoordinates::derotateCoords( double i_UTC, double i_xin, double i_yin, double & i_xout, double & i_yout)
 {
     double i_theta=getDerotationAngle(i_UTC);
@@ -261,7 +306,7 @@ void VSkyCoordinates::rotateCoords( int i_mjd, double i_seconds, double i_xin, d
  *  should be called after precession, etc.
  *
  */
-void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, unsigned int iTelID )
+void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, unsigned int iTelID, int iMJD )
 {
     fWobbleNorth = iNorth;
     fWobbleEast = iEast;
@@ -279,6 +324,11 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, unsigned int
         cout << "\tWobble mode, telescope " << iTelID+1 << " pointing to (ra,dec) = (" << fTelRA*TMath::RadToDeg() << ", " << fTelDec*TMath::RadToDeg() << ")";
         cout << ", (delta ra, delta dec) = (" << i_RADiff << ", " << i_decDiff << ")";
         cout << endl;
+	
+// set J2000 telescope coordinates
+        fTelRAJ2000 = fTelRA;
+	fTelDecJ2000 = fTelDec;
+	VSkyCoordinatesUtilities::precessTarget( 51544., fTelRAJ2000, fTelDecJ2000, iMJD );
 
         fWobbleSet = true;
     }
@@ -286,8 +336,6 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, unsigned int
     {
         cout << "VSkyCoordinates::setWobbleOffset warning, wobble offsets already set" << endl;
     }
-    fTelRA_deg = fTelRA * TMath::RadToDeg();
-    fTelDec_deg = fTelDec * TMath::RadToDeg();
     cout << "---------------------------------------------------------------------------------------------------------" << endl;
 }
 

@@ -373,12 +373,12 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fTargetDec = atof(iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-// target ra
+// target ra [J2000]
         else if( iTemp.rfind( "rightascension" ) < iTemp.size() )
         {
             fRunPara->fTargetRA = atof(iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-// target declination offset
+// target declination offset [J2000]
         else if( iTemp.rfind( "decoffset" ) < iTemp.size() )
         {
             fRunPara->fTargetDecOffset = atof(iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );

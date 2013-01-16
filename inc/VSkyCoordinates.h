@@ -30,10 +30,12 @@ class VSkyCoordinates
         double fTime;
         double fTelDec;                           //!< [rad] //! declination of pointing direction
         double fTelRA;                            //!< [rad] //! right ascension of pointing direction
-        float  fTelDec_deg;                       //!< [deg] //! declination of pointing direction
-        float  fTelRA_deg;                        //!< [deg] //! right ascension of pointing direction
+        double fTelDecJ2000;                     //!< [rad] //! declination of pointing direction (J2000)
+        double fTelRAJ2000;                      //!< [rad] //! right ascension of pointing direction (J2000)
         double fTargetDec;                        //!< [rad] //! declination of target
         double fTargetRA;                         //!< [rad] //! right ascension of target
+        double fTargetDecJ2000;                        //!< [rad] //! declination of target (J2000)
+        double fTargetRAJ2000;                         //!< [rad] //! right ascension of target (J2000)
         string fTargetName;
         double fTargetElevation;                  //!< [deg]
         double fTargetAzimuth;                    //!< [deg]
@@ -55,7 +57,7 @@ class VSkyCoordinates
     public:
 
         VSkyCoordinates();
-       ~VSkyCoordinates() {}
+       ~VSkyCoordinates();
 
         double adjustAzimuthToRange( double );
         void   derotateCoords( double i_UTC, double i_xin, double i_yin, double & i_xout, double & i_yout);
@@ -68,6 +70,8 @@ class VSkyCoordinates
         void   getDerotatedShowerDirection( double ze, double az, float &y, float &x, double rze, double raz );
         double getTargetDec() { return fTargetDec * 180./TMath::Pi(); }
         double getTargetRA() { return fTargetRA * 180./TMath::Pi(); }
+        double getTargetDecJ2000() { return fTargetDecJ2000 * 180./TMath::Pi(); }
+        double getTargetRAJ2000() { return fTargetRAJ2000 * 180./TMath::Pi(); }
         double getTargetElevation() { return fTargetElevation; }
         double getTargetAzimuth()   { return fTargetAzimuth; }
         double getTelAzimuth()      { return fTelAzimuth; }
@@ -89,13 +93,13 @@ class VSkyCoordinates
 	void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
         bool   setPointingOffset( double i_raOff, double i_decOff );
         bool   setTarget( string iTargetName );
-        bool   setTarget( double iDec, double iRA );
+        bool   setTargetJ2000( double iDec_deg, double iRA_deg );
         void   setTargetName( string iTargetName ) { fTargetName = iTargetName; }
 	void   setTelDec_deg( double iTelDec_deg ) { fTelDec = iTelDec_deg * TMath::DegToRad(); }
 	void   setTelRA_deg( double iTelRA_deg )   { fTelRA  = iTelRA_deg  * TMath::DegToRad(); }
         void   setTelAzimuth( double iTelAz )      { fTelAzimuth = iTelAz; }           //!< set telescope azimuth (e.g.for MC)
         void   setTelElevation( double iTelEl )    { fTelElevation = iTelEl; }         //!< set telescope elevation (e.g. for MC)
-        void   setWobbleOffset( double iWobbleNorth, double iWobbleEast, unsigned int iTelID );
+        void   setWobbleOffset( double iWobbleNorth, double iWobbleEast, unsigned int iTelID, int iMJD );
         void   updatePointing( int MJD, double time );
 };
 #endif

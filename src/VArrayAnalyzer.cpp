@@ -140,8 +140,8 @@ void VArrayAnalyzer::doAnalysis()
 //////////////////////////////////////////////////////////////////////////////////////////////
     }
 
-// calculate RA and dec
-// (these are current epoch values when precessTarget() was called earlier (default))
+// calculate RA and dec of shower direction
+// (these are current epoch values)
     for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
     {
 // test for successfull reconstruction (zenith angle > 0.)
@@ -200,14 +200,15 @@ void VArrayAnalyzer::initEvent()
        cout << "VArrayAnalyzer::initEvent() warning: no event times" << endl;
     }
 
-// fix pointing with time from majority vote
+// set telescope pointing for data (again) and fill pointing tree
     if( !fReader->isMC() )
     {
         for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
         {
-	    if( getTeltoAna()[i]  < getPointing().size() && getPointing()[getTeltoAna()[i]] )
+	    if( getTeltoAna()[i] < getPointing().size() && getPointing()[getTeltoAna()[i]] )
 	    {
-	       getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time, true, true );
+	       getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time, 
+	                                                        getRunParameter()->fDBTracking, true );
             }
         }
     }

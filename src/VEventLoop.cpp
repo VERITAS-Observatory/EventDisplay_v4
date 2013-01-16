@@ -389,15 +389,16 @@ bool VEventLoop::initEventLoop( string iFileName )
 	       else if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
 	       {
 		   fPointing.back()->setTargetName( fRunPar->fTargetName );
-		   fPointing.back()->setTarget( fRunPar->fTargetDec, fRunPar->fTargetRA );
+		   fPointing.back()->setTargetJ2000( fRunPar->fTargetDec, fRunPar->fTargetRA );
 	       }
 	   }
-// add any offsets to the pointing
+// add any offsets to the pointing [J2000]
 	   fPointing.back()->setPointingOffset( fRunPar->fTargetRAOffset, fRunPar->fTargetDecOffset );
 // set pointing error
 	   if( fRunPar->fDBTracking )
 	   {
-	     fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory, fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM );
+	     fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory, 
+	                                          fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM );
            }
 	   else
 	   {
@@ -413,8 +414,8 @@ bool VEventLoop::initEventLoop( string iFileName )
 // (J2000)
     if( getTeltoAna()[0] < fPointing.size() && fPointing[getTeltoAna()[0]] )
     {
-        getRunParameter()->fTargetDec = fPointing[getTeltoAna()[0]]->getTargetDec();
-        getRunParameter()->fTargetRA  = fPointing[getTeltoAna()[0]]->getTargetRA();
+        getRunParameter()->fTargetDec = fPointing[getTeltoAna()[0]]->getTargetDecJ2000();
+        getRunParameter()->fTargetRA  = fPointing[getTeltoAna()[0]]->getTargetRAJ2000();
     }
 
     return true;

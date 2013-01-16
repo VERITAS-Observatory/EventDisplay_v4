@@ -62,9 +62,12 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 
     fTreeSC->Branch( "TelElevation", fTelElevation, "TelElevation[NTel]/F" );
     fTreeSC->Branch( "TelAzimuth", fTelAzimuth, "TelAzimuth[NTel]/F" );
-    fTreeSC->Branch( "TelDec", fTelDec, "TelDec[NTel]/F" );
-    fTreeSC->Branch( "TelRA", fTelRA, "TelRA[NTel]/F" );
-    if( fShortTree < 1 )
+    if( !iMC )
+    {
+       fTreeSC->Branch( "TelDec", fTelDec, "TelDec[NTel]/F" );
+       fTreeSC->Branch( "TelRA", fTelRA, "TelRA[NTel]/F" );
+    }
+    if( fShortTree < 1 && !iMC )
     {
         fTreeSC->Branch( "TelElevationVBF", fTelElevationVBF, "TelElevationVBF[NTel]/F" );
         fTreeSC->Branch( "TelAzimuthVBF", fTelAzimuthVBF, "TelAzimuthVBF[NTel]/F" );
@@ -93,6 +96,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
     fTreeSC->Branch( "LTrig", &fLTrig, "LTrig/l" );
     fTreeSC->Branch( "Trig_list", fTrig_list, "Trig_list[NTrig]/s" );
     fTreeSC->Branch( "Trig_type", fTrig_type, "Trig_type[NTrig]/s" );
+///////////////////////////////////
 // reconstructed shower parameters
 
 // number of different methods
@@ -132,10 +136,13 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
     {
         sprintf( i_des, "stds[NMethods]/F" );
         fTreeSC->Branch( "stds", fShower_stdS, i_des );
-        sprintf( i_des, "dec[NMethods]/F" );
-        fTreeSC->Branch( "dec", fDec, i_des );
-        sprintf( i_des, "ra[NMethods]/F" );
-        fTreeSC->Branch( "ra", fRA, i_des );
+    }
+    if( !iMC )
+    {
+       sprintf( i_des, "dec[NMethods]/F" );
+       fTreeSC->Branch( "dec", fDec, i_des );
+       sprintf( i_des, "ra[NMethods]/F" );
+       fTreeSC->Branch( "ra", fRA, i_des );
     }
 ///////////////////////////////////////////////////////////////
 // (debug only)
