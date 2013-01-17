@@ -627,7 +627,10 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    if( !hsdata ) return 0;
 
 // HARDCODED: all large telescopes are parabolic
-   double fParabolic_mirrorArea = 400.;
+//            all telescopes with a mirror area larger than this value are
+//            considered to be parabolic (in m^2)
+   double fParabolic_mirrorArea = 380.;
+// HARDCODED: all telescopes with 2 mirrors only are SC telescopes
    int    fSC_number_of_mirrors = 2;
    cout << "\t Info:" << endl;
    cout << "\t assume that all telescopes with mirror area larger than " << fParabolic_mirrorArea;
@@ -761,7 +764,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	       fRTubeMM[p] = sqrt( hsdata->camera_set[itel].area[p]/TMath::Pi() ) * 1.e3;
 	       if( p == 0 ) pix_size = atan2((double)hsdata->camera_set[itel].size[p], (double)fFocalLength ) * TMath::RadToDeg();
 
-   // mm -> deg
+// mm -> deg
 	       fXTubeDeg[p] = atan2( (double)fXTubeMM[p]/1000., (double)fFocalLength ) * TMath::RadToDeg();
 	       fYTubeDeg[p] = atan2( (double)fYTubeMM[p]/1000., (double)fFocalLength ) * TMath::RadToDeg();
                fRTubeDeg[p] = atan2( (double)fRTubeMM[p]/1000., (double)fFocalLength ) * TMath::RadToDeg();
@@ -770,7 +773,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 
 	       float x2 = fXTubeDeg[p]*fXTubeDeg[p];
 	       float y2 = fYTubeDeg[p]*fYTubeDeg[p];
-	       if( sqrt( x2 + y2 ) > maxPix_dist ) 
+	       if( sqrt( x2 + y2 ) * 2. > maxPix_dist ) 
 	       {
 	           maxPix_dist = sqrt( x2 + y2 ) * 2.;
                }
@@ -794,7 +797,11 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	{
 	   fFOV = maxPix_dist;
         }
-	else  fFOV = telescope_list[fTelID];
+	else
+	{
+	   fFOV = telescope_list[fTelID];
+        }
+
 
 	fTelescope_type  = TMath::Nint(pix_size*100.);
 	fTelescope_type += TMath::Nint(fFOV*10.)*100;
