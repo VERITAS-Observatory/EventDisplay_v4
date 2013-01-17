@@ -623,6 +623,28 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                }
                continue;
             }
+	    else if( iTemp == "CORRELATIONCLEANINGPARAMETER" && fRunPara )
+	    {
+	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
+	       {
+		  if( t_temp < 0 || getTelescopeType_counter( fTel_type_V[i] ) == t_temp )
+		  {
+		     if( i < fRunPara->fImageCleaningParameters.size() )
+		     {
+		        fRunPara->fImageCleaningParameters[i]->fCorrelationCleanBoardThresh = atof( iTemp2.c_str() );
+                     }
+		     if( iTemp3.size() > 0 && i < fRunPara->fImageCleaningParameters.size() )
+		     {
+		        fRunPara->fImageCleaningParameters[i]->fCorrelationCleanCorrelThresh = atof( iTemp3.c_str() );
+                     }
+		     if( iTemp4.size() > 0 && i < fRunPara->fImageCleaningParameters.size() )
+		     {
+		        fRunPara->fImageCleaningParameters[i]->fCorrelationCleanNpixThresh = atoi( iTemp4.c_str() );
+                     }
+                  }
+                }
+		continue;
+	    }
 	    else if( iTemp == "LLEDGEFIT" && fRunPara )
 	    {
 	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )

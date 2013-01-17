@@ -1,15 +1,11 @@
 /*! \class VImageParameterCalculation
     \brief calculation of the Hillas image parameters
 
-    \todo delete fParGeo before setParameters(...) ??
-
     dead channels for low gains and LL
-
-    Revision $Id: VImageParameterCalculation.cpp,v 1.28.2.1.2.1.2.4.4.1.4.2.2.3.4.3.4.1.2.3.2.1.4.10.2.5 2010/10/26 00:06:15 gmaier Exp $
 
     \author
        Jamie Holder
-Gernot Maier
+       Gernot Maier
 */
 
 #include <VImageParameterCalculation.h>

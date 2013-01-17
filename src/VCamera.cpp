@@ -1,10 +1,6 @@
 /*! \class VCamera
     \brief camera plotting routines
 
-    \todo  printing in eps/ps -> ana ellipse should be transparent
-
-    Revision $Id: VCamera.cpp,v 1.54.2.4.4.2.10.8.2.4.4.1.4.5.2.5.6.10.2.8.2.1.2.1.2.1 2011/04/21 10:03:37 gmaier Exp $
-
     \author Gernot Maier
 */
 
@@ -49,7 +45,6 @@ VCamera::VCamera( unsigned int iTel, VEvndispData *iData )
     fndivz   = gStyle->GetNumberContours();
 
     fCurrentTimeSlice = -1;
-
 }
 
 
@@ -141,6 +136,10 @@ void VCamera::setUpCamera()
         fTextTubeNumber.back()->SetTextSize( 0.0175 );
         fTextTubeNumber.back()->SetUniqueID( 200000 + i );
         fTextTubeNumber.back()->SetTextColor( 2 );
+// tube markers
+        fgraphMarker.push_back( new TMarker() );
+	fgraphMarker.back()->SetMarkerStyle( 5 );
+	fgraphMarker.back()->SetUniqueID( 200000 + i );
     }
 // size of camera
 // (from edge of outermost pixels)
@@ -389,6 +388,22 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 		 iZeroSupp->Draw();
 	      }
 	   }
+        }
+// draw pixel recovered by the correlation image cleaning
+        if( fData->getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
+	{
+	    for( unsigned int i = 0; i < fgraphMarker.size(); i++ )
+	    {
+	       if( i < fData->getBorderCorrelationCoefficient().size() &&  fData->getBorderCorrelationCoefficient()[i] > 1.e-2 )
+	       {
+		  if( fgraphMarker[i] )
+		  {
+		     fgraphMarker[i]->SetX( fgraphTubesEntry[i]->GetX1() );
+		     fgraphMarker[i]->SetY( fgraphTubesEntry[i]->GetY1() );
+		     fgraphMarker[i]->Draw();
+		  }
+               }
+            }
         }
 // draw tube/channel numbers
         if( fPrintChannel != 0 && fPrintChannel < 3 && !fBoolAllinOne )

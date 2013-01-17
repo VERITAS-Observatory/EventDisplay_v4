@@ -42,7 +42,6 @@ void VImageCleaning::printDataError( string iFunctionName )
 void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double brightthresh )
 {
     if( !fData ) printDataError( "VImageCleaning::cleanImageFixed" );
-    // calculates the valarray of tubes to be included in the parameterization
 
     fData->setImage( false );
     fData->setBorder( false );
@@ -72,7 +71,11 @@ void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double br
 
 // (preli) set the trigger vector in MC case (preli)
 // trigger vector are image/border tubes
-    if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 || fData->getReader()->getDataFormatNum() == 6 ) fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
+    if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 
+     || fData->getReader()->getDataFormatNum() == 6 ) 
+     {
+         fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
+     }
 // (end of preli)
     if( fData->getRunParameter()->frecoverImagePixelNearDeadPixel ) recoverImagePixelNearDeadPixel();
     if( fData->getRunParameter()->fFillImageBorderNeighbours ) fillImageBorderNeighbours();
@@ -91,7 +94,6 @@ void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double br
 void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double brightthresh )
 {
     if( fData->getDebugFlag() ) cout << "VImageCleaning::cleanImagePedvars " << fData->getTelID() << endl;
-// calculates the vector of tubes to be included in the parameterization
 
     fData->setImage( false );
     fData->setBorder( false );
@@ -129,9 +131,9 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
     if( fData->getReader() )
     {
        if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 
-        || fData->getReader()->getDataFormatNum() == 6 ) 
+        || fData->getReader()->getDataFormatNum() == 6 )
 	{
-	    fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
+	   fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
         }
     }
 // (end of preli)
@@ -139,6 +141,8 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
     recoverImagePixelNearDeadPixel();
     fillImageBorderNeighbours();
 }
+
+
 //*****************************************************************************************************
 // NN image cleaning (Maxim)
 //
@@ -1454,3 +1458,260 @@ void VImageCleaning::resetImageChannel( unsigned int i_channel )
     if( i_channel < fData->getImage().size() ) fData->setImageUser( i_channel, 0 );
 }
 
+
+/* 
+   trace correlation cleaning
+
+   AMc
+*/
+double getTraceCorrelationValue(double Amean, double Bmean,
+				double Avar, double Bvar,
+				vector < double > vA, vector < double > vB)
+{
+  if( Avar == 0. || Bvar == 0. ) return 0.;
+  double N = 0;
+
+  for( unsigned int i = 0; i < vA.size() && i < vB.size() ; i++ )
+  {
+     N = N + (vA[i] - Amean)*(vB[i] - Bmean);
+  }
+  
+  return N/TMath::Sqrt(Avar*Bvar);
+}
+
+double getTraceMean(vector < double > vA)
+{
+  if( vA.size() == 0 ) return 0.;
+
+  double N = 0;
+  for( unsigned int i = 0; i < vA.size(); i++ ) N = N + vA[i];
+
+  return N/double(vA.size());
+}
+
+double getTraceVar(vector < double > vA, double Am)
+{
+  double N = 0;
+  for(unsigned int i = 0; i < vA.size(); i++) N = N + (vA[i] - Am)*(vA[i] - Am);
+  
+  return N;
+}
+  
+/*
+   trace correlation cleaning
+
+   AMc
+*/
+void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double corrThresh, double pixThresh )
+{
+  
+//  bool printout = false;
+//  TCanvas *c1a = 0;
+//  TGraph *g1 = 0;
+//  TGraph *ga = 0;
+
+  fData->setBorderCorrelationCoefficient( 0. );
+
+  vector < vector < double > > vImageTraces( fData->getDetectorGeo()->getNChannels(fData->getTelID()),vector<double>((int)fData->getNSamples(),0) );
+ 
+  unsigned int nhits = fData->getReader()->getNumChannelsHit();
+  for(unsigned int i = 0; i < nhits; i++ )
+  {
+      unsigned int i_channelHitID = 0;
+      try
+      {
+	  i_channelHitID = fData->getReader()->getHitID(i);
+	  if( i_channelHitID < fData->getHiLo().size() && !fData->getDead(fData->getHiLo()[i_channelHitID])[i_channelHitID] )
+          {
+
+	      fData->getTraceHandler()->setTrace( fData->getReader(), fData->getNSamples(),fData->getPeds(fData->getHiLo()[i_channelHitID])[i_channelHitID], 
+				                  fData->getPedrms(fData->getHiLo()[i_channelHitID])[i_channelHitID], i_channelHitID, i,
+				                  fData->getLowGainMultiplier( true )[i_channelHitID]*fData->getHiLo()[i_channelHitID] );
+
+	      vImageTraces[i_channelHitID] = fData->getTraceHandler()->getTrace();
+	  }
+      }
+      catch(...)
+      {
+	  if( fData->getDebugLevel() == 0 )
+          {
+                cout << "VImageCleaning::cleanImageTraceCorrelate, index out of range (fReader->getHitID) ";
+		cout << i << "(Telescope " << fData->getTelID()+1 << ", event " << fData->getReader()->getEventNumber() << ")" << endl;
+                fData->setDebugLevel( 0 );
+          }
+          continue;
+      }
+
+  }
+
+//cout << "Correation outside" << endl;
+  if( vImageTraces.size() > 0 )
+  {
+ //cout << "Correation inside" << endl;
+//      char cname[200];
+//      sprintf(cname,"Evt_%d_%d.pdf",int(fData->getEventNumber()),int(fData->getTelID()));
+      
+/*      if(printout)
+	{
+	  c1a = new TCanvas(cname,cname,2500,1500);
+	  c1a->Divide(5,3);
+	  g1 = new TGraph(fData->getNSamples());
+	  ga = new TGraph(fData->getNSamples());
+	} */
+
+      vector < double > avepulse(fData->getNSamples(),0);
+      vector < unsigned int > ImagePixelList;
+      vector < unsigned int > NearbyPixelList;
+      double AvePulseMean = 0;
+      double AvePulseVar = 0;
+      int nimage = 0;
+      unsigned int k = 0;
+//      int cindex = 1;
+     
+      //cout << int(fData->getEventNumber()) << " " << int(fData->getTelID()) << " " << fData->getImageTrace().size() << " ";
+      
+      for(unsigned int i = 0; i < vImageTraces.size(); i++)
+      {
+	  if( fData->getImage()[i] || fData->getBorder()[i])
+	  {
+	      nimage++;
+	      ImagePixelList.push_back(i);
+	      //cout << i << " ";
+	      for(unsigned int j = 0; j < fData->getNSamples(); j++)
+	      {
+		avepulse[j] = avepulse[j] + vImageTraces[i][j];
+              }
+	  }
+      }
+      //cout << endl;
+	 
+      if( nimage > 1 )
+      {
+	  for(unsigned int j = 0; j < fData->getNSamples(); j++)
+	  {
+	      avepulse[j] = avepulse[j]/double(nimage);
+	      AvePulseMean = AvePulseMean + avepulse[j];
+
+/*	      if(printout)
+		ga->SetPoint(j,j,-avepulse[j]); */
+	  }
+	  AvePulseMean = AvePulseMean/double(fData->getNSamples());
+	  
+	  for(unsigned int j = 0; j < fData->getNSamples(); j++)
+	  {
+	    AvePulseVar = AvePulseVar + (avepulse[j] - AvePulseMean)*(avepulse[j] - AvePulseMean);
+          }
+      }
+
+      if(nimage > 3 && nimage < pixThresh)
+      	{
+/*	  if(printout)
+	    {
+	      c1a->cd(cindex);
+	      //cout << "Correation inside inside" << endl;
+	      sprintf(cname,"Evt_%d_T%d_Ncha_%d",int(fData->getEventNumber()),int(fData->getTelID()),nimage);
+	      ga->SetTitle(cname);
+	      ga->SetLineColor(kRed);
+	      ga->SetFillColor(kRed);
+	      ga->DrawClone("ABL");
+	      g1->SetLineColor(kBlack);
+	      g1->SetFillColor(kBlack);
+	      cindex++;
+	    } */
+
+//Build a list of pixels near the image pixels
+//Loop over image/border pixels
+	  for( unsigned int o = 0; o < ImagePixelList.size(); o++ )
+	  {
+	      unsigned int i = ImagePixelList[o];
+//Get the neighbours of this image pixel
+	      for(unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
+	      {
+//Check if it is already included in the neighbour list
+		  bool have = false;
+		  k = fData->getDetectorGeo()->getNeighbours()[i][j];
+		  for(unsigned int p = 0; p < NearbyPixelList.size(); p++)
+		  {
+		      if(NearbyPixelList[p] == k)
+		      {
+			  have = true;
+			  break;
+		      }
+		  }
+//Check if it is already included in the image pixel list
+		  for( unsigned int p = 0; p < ImagePixelList.size(); p++ )
+		  {
+		     if(ImagePixelList[p] == k)
+		     {
+			  have = true;
+			  break;
+		     }
+		  }
+//Add to neighbour list if necessary
+		  if( !have ) NearbyPixelList.push_back( k );
+		}
+	    }
+	
+	  
+	  for(unsigned int i = 0; i < NearbyPixelList.size(); i++)
+	  {
+	      k =  NearbyPixelList[i];
+
+	      double tMean = getTraceMean(vImageTraces[k]);
+	      double tVar = getTraceVar(vImageTraces[k],tMean);
+
+	      double corv = getTraceCorrelationValue(AvePulseMean,tMean,AvePulseVar,tVar,avepulse,vImageTraces[k]);
+	      double sn = fData->getSums()[k]/fData->getPedvars(fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k];
+
+/*	      if(printout)
+		{
+		  for(unsigned int j = 0; j < fData->getNSamples(); j++)
+		    {
+		      g1->SetPoint(j,j,-vImageTraces[k][j]);
+		    }
+
+		  sprintf(cname,"Evt_%d_cha_%d_SN_%2.1f_SSC_%1.2f",int(fData->getEventNumber()),k,sn,corv);
+		  g1->SetName(cname);
+		  g1->SetTitle(cname);
+		  g1->SetLineColor(kBlack);
+		  g1->SetFillColor(kBlack);
+		} */
+// require that correlation coefficient and signal/noise is above certain thresholds
+	      if( corv > corrThresh && sn > sigNoiseThresh )
+	      {
+		  fData->setBorder(k, true );
+		  fData->setBorderCorrelationCoefficient( k, corv );
+
+/*		  if(printout)
+		    {
+		      g1->SetLineColor(kGreen+2);
+		      g1->SetFillColor(kGreen+2);
+		    } */
+	      }
+	    
+
+/*	      if(printout)
+		{
+		  if(cindex <=15)
+		    {
+		      c1a->cd(cindex);
+		      g1->DrawClone("ABL");
+		      cindex++;
+		    }
+		} */
+	    }
+ 
+/*	  if(printout)
+	    {
+	      c1a->Update();
+	      sprintf(cname,"/data3/mccann/ED/ED400/AveTrance/EVNDISP/trunk/Evt_%05d_%d.pdf",int(fData->getEventNumber()),int(fData->getTelID()));
+	      c1a->Print(cname);
+	    } */
+      }
+      recoverImagePixelNearDeadPixel();
+      fillImageBorderNeighbours();
+    }
+  
+  //fData->clearImageTraceVector();
+
+}

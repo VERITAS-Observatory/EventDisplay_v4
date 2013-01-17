@@ -67,5 +67,8 @@ class VImageCleaning
         void addImageChannel( unsigned int iChannel );                      // add this pixel to image
         void removeImageChannel( unsigned int iChannel );                   // remove this pixel from image
         void resetImageChannel( unsigned int iChannel );                    // reset this pixel to standard value
+
+// trace correlation cleaning (AMc)
+	void cleanImageTraceCorrelate( double sumThresh, double corrThresh, double pixThresh);
 };
 #endif

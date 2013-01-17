@@ -46,6 +46,7 @@ class VCamera
         TLatex *fTextEventPlotPaper;
         vector<TEllipse*> fgraphTubes;            //!< graphical representation of tubes
         vector<TEllipse*> fgraphTubesEntry;       //!< graphical representation of tubes entry
+	vector<TMarker*> fgraphMarker;            //!< a marker to be plot on top of the tubes
         TEllipse *fCameraOuterEdge;
         TEllipse *fCameraFOV;
         bool fShowPhotoDiode;
