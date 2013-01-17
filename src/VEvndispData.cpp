@@ -739,6 +739,7 @@ VDetectorGeometry* VEvndispData::fDetectorGeo = 0;
 VDetectorTree* VEvndispData::fDetectorTree = 0;
 
 // pointing
+VArrayPointing* VEvndispData::fArrayPointing = 0;
 vector<VPointing*> VEvndispData::fPointing;
 bool VEvndispData::fNoTelescopePointing = false;
 
