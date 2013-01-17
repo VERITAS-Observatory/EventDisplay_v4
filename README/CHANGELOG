@@ -1,5 +1,31 @@
-Change log for v400
-====================
+Change log eventdisplay analysis package
+========================================
+
+* 20130117 (GM) fixed FOV calculation in converter for CTA simulations
+
+* 20130117 (AMc, GM) correlation cleaning added
+                     improve small image reconstruction by searching for 
+		     border pixels with correlated traces
+                     new keyword CORRELATIONCLEANINGPARAMETER in runparameter file
+		     updated camera display to show additional pixels
+
+* 20130117 (GM) cleanup of pointing classes in evntdisp
+                     introduced new class VArrayPointing to take care of all
+		     reference directions
+		     clearer variable naming to distinguish between current
+		     epoch variables and J2000 values
+		     more information saved into pointing trees
+
+* 20130116 (GM) reading of calibration data (gains and toffs) from VOFFLINE DB:
+                removed writing of temporary file into calibration directories
+
+* 20130116 (GM) variable renaming for consistent treatment of ra/dec in evndisp and mscw_energy
+                added them to showerpars tree
+
+* 20130116 (GM) cleanup of unneeded variables in VArrayAnalyzer; moved some general functions into
+                VSkyCoordinatesUtilities
+
+******* version change: trunk is now v4.10 *******
 
 * 20130115 (GM) VTS runparameter tar file target in Makefile: fixed bug in setting directories correctly
 
@@ -28,7 +54,7 @@ Change log for v400
 * 20130111 (GM) CTA scripts: changed usage of CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.sh
                         (use again runlist instead of a range of runs)
 
-******* 20130104 release of v400; trunk is now v401 *******
+******* 20130104 release of v4.00; trunk is now v4.01 *******
 
 Changes from v35x to v400
 =========================
