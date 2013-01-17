@@ -105,6 +105,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
 	 fSensitivityCULimits.push_back( new TH1F( hname, htitle, iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
 	 fSensitivityCULimits[i]->SetXTitle( "log_{10} (E/TeV)" );
 	 fSensitivityCULimits[i]->SetYTitle( "E^{2} dF/dE [erg cm^{-2} s^{-1}]" );
+	 fSensitivityCULimits[i]->SetMarkerColor( i+2 );
 	 fSensitivityCULimits[i]->Print();
 	 hisList.push_back( fSensitivityCULimits[i] );
 	 hisListToDiskDebug.push_back( fSensitivityCULimits[i] );
