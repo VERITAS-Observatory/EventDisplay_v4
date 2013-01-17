@@ -51,7 +51,6 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    string fAnasumDataFile;    //! name of input anasum file
    int    fRunNumber;         //! -1 all runs (run number for plotting can be set later)
    bool   fDebug;
-   bool   fPoster;
    string fPlotMode;
 
    bool   fPlotCorrelated;    //! plot correlated sky plots
@@ -130,10 +129,9 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    void            setPlottingDrawPSF( bool iB = true ) { fPlotDrawPSF = iB; }
    void            setPlottingUseHours( bool iB = true, int iZeroHours = 0 ) { fPlotUseHours = iB; fPlotZeroHours = iZeroHours; }
    void            setDebugInfo( bool iB = false ) { fDebug = iB; }               // more debug output to screen
-   void            setPlottingPosterQuality( bool iB = false ) { fPoster = iB; }  // TODO, this doesnt not change anything now
    bool            setRunNumber( int iRun );                                      // select run for plotting
 
-   ClassDef(VPlotAnasumHistograms,6);
+   ClassDef(VPlotAnasumHistograms,7);
 };
 
 #endif

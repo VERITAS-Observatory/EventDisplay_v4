@@ -3,12 +3,8 @@
 
      Fit function is VFitTraceHandler_tracefunction()
 
-    \todo
-       - sum window should be adjusted according to the pulse width,
-         this requires a lot of changes in VAnalyser, VGrIsuReader and
-         storage of pedestal variances in VCalibrationData
-- make it faster (just now, it's a factor 90 slower than simple
-trace summing)
+     Some work should be invested to make it faster:
+     (just now, it's a factor 90 slower than simple trace summing)
 */
 
 #include "VFitTraceHandler.h"

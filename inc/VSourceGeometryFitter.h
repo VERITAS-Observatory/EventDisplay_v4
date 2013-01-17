@@ -1,5 +1,4 @@
 //! VSourceGeometryFitter analyse source geometry (position and extension)
-// Revision $Id: VSourceGeometryFitter.h,v 1.1.2.3 2011/03/28 03:45:10 ealiu Exp $
 
 #ifndef VSourceGeometryFitter_H
 #define VSourceGeometryFitter_H

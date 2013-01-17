@@ -1093,7 +1093,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 
     determine length of integration window depending on pulse size of first integration pass
 
-    TODOTODOTODO  not implemented yet TODOTODOTODOTODO
+    NOT IMPLEMENTED YET
+
+    (function returns unchanged summations windows)
 
 */
 unsigned int VImageBaseAnalyzer::getDynamicSummationWindow( unsigned int i_channelHitID )

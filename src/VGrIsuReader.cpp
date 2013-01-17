@@ -8,13 +8,7 @@
 
        - fillBackgroundfromTraceLibrary should be checked
 
-    \todo
-- check window sizes
-- hit and trig vectors (all channels in grisu file??)
-
-Revision $Id: VGrIsuReader.cpp,v 1.46.2.1.2.1.2.13.10.1.2.4.4.1.2.1.2.11.2.4.2.2.2.7.2.1.2.1.2.2.2.2.2.1 2011/04/21 10:03:37 gmaier Exp $
-
-\author Gernot Maier
+    \author Gernot Maier
 */
 
 #include <VGrIsuReader.h>

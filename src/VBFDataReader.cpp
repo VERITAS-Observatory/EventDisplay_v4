@@ -269,7 +269,7 @@ uint16_t VBFDataReader::getATGPSYear()
     }
     else
     {
-// fudge for a period where GPS is off by a year (VERITAS) (TODO)
+// horrible fudge for a period where GPS is off by a year (VERITAS)
         if( at->getRunNumber() > 33242 && at->getRunNumber() < 33254 ) return at->getGPSYear()+1;
         return at->getGPSYear();
     }

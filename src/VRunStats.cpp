@@ -1,7 +1,7 @@
 /*! \file VRunStats
     \brief get run and DQM data from DB
 
-    todo:
+    Missing:
   
      * add remaining fields from tblRun_Info (run_type, observing_mode, etc.)
      * add mean HV values

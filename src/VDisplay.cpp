@@ -170,8 +170,6 @@ VDisplay::~VDisplay()
 /*!
    \param priCanvas  point to canvas to be printed
 
-   \todo
-      restore fillstyles in image ellipses  after printing of eps/ps
 */
 void VDisplay::printCanvas( TPad *priCanvas )
 {
@@ -1369,8 +1367,6 @@ void VDisplay::setFADCText()
 
 /*!
     display basic run infos at 'information' tab
-
-    \todo connection to VRunParameter
 
 */
 void VDisplay::setInfoText()

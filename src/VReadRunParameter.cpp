@@ -1,21 +1,16 @@
 /*! \class VReadRunParameter
+    \brief read command line parameters and do some tests for consistency
 
   evndisp -help gives an overview of all parameters
 
   \attention
   camera type (<> run 592) hard coded in adjustParams() (this is valid for the Prototype)
 
-  \todo
-   - tests, if run parameters make sense
-   - reading a configuration file (for more than one telescope...)
+   \date
+   16/08/2004
 
-\date
-16/08/2004
-
-Revision $Id: VReadRunParameter.cpp,v 1.56.2.5.2.2.2.12.10.10.2.10.4.7.2.3.2.10.2.6.4.3.2.11.2.19.2.13.2.5 2011/04/06 11:57:57 gmaier Exp $
-
-\author
-Gernot Maier
+   \author
+   Gernot Maier
 
 */
 
