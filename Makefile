@@ -308,6 +308,7 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VPointing.o \
 	 	./obj/VPointingDB.o \
 		./obj/VSkyCoordinates.o \
+		./obj/VArrayPointing.o \
 		./obj/VTargets.o \
 		./obj/VStarCatalogue.o  ./obj/VStarCatalogue_Dict.o \
 		./obj/VStar.o ./obj/VStar_Dict.o \
