@@ -204,9 +204,9 @@ void VSkyCoordinatesUtilities::getRotatedShowerDirection( double ze, double az, 
 }
 
 
-double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az )
+double VSkyCoordinatesUtilities::adjustAzimuthToRange( double az_deg )
 {
-    return slaDranrm( az/TMath::RadToDeg()) * TMath::RadToDeg();
+    return slaDranrm( az_deg*TMath::DegToRad()) * TMath::RadToDeg();
 }
 
 /*
@@ -263,3 +263,26 @@ void VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( double iMJ
     x = getTargetShiftWest( i_RA_J2000_deg, i_DEC_J2000_deg, i_raWobble, i_decWobble ) * -1.;
     y = getTargetShiftNorth(  i_RA_J2000_deg, i_DEC_J2000_deg, i_raWobble, i_decWobble ); 
 }
+
+
+/*!
+  calculate angular distance between two directions
+
+  input: all angles in radiant
+  output: angular distance in degree
+
+*/
+double VSkyCoordinatesUtilities::angularDistance( double Az, double Ze, double Traz, double Trze )
+{
+    double value;
+
+    value  = sin( Ze ) * sin( Trze ) * cos( ( Az - Traz ) );
+    value += cos( Ze ) * cos( Trze );
+// limited accuracy results sometimes in values slightly larger than 1
+    if( value > 1. ) value = 1.;
+    value = acos( value );
+    value *= TMath::RadToDeg();
+
+    return value;
+}
+

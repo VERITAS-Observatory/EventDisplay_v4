@@ -1359,26 +1359,6 @@ void VTableLookupDataHandler::calcDistances( int nimages )
 
 
 
-/*!
-  calculate angular distance between two directions
-
-  input: all angles in radiant
-  output: angular distance in degree
-
-*/
-double VTableLookupDataHandler::angDist( double Az, double Ze, double Traz, double Trze )
-{
-    double value;
-
-    value  = sin( Ze ) * sin( Trze ) * cos( ( Az - Traz ) );
-    value += cos( Ze ) * cos( Trze );
-    value = acos( value );
-    value *= 45. / atan( 1. );
-
-    return value;
-}
-
-
 void VTableLookupDataHandler::resetImageParameters()
 {
     for( unsigned int i = 0; i < fNTel; i++ )

@@ -151,7 +151,6 @@ class VTableLookupDataHandler
 // dead time handler
         VDeadTime *fDeadTime;
 
-        double angDist( double Az, double Ze, double Traz, double Trze );
         void   calcDistances( int );                //!< calculate distances between telescopes and shower core
         void   calcEmissionHeights();
         double calculateMeanNoiseLevel( bool bCurrentNoiseLevel = false );
