@@ -93,6 +93,8 @@ class VImageAnalyzerData
 	vector<double> fClusterCeny;              //!< HP: cenY of the cluster
  	int fncluster_cleaned;                    //!< HP: number of clusters
  	int fncluster_uncleaned;                  //!< HP: number of clusters before cluster rejection
+// correlation cleaning
+        vector<double> fCorrelationCoefficient;  // correlation coefficient
 // time since run start
         double fTimeSinceRunStart;                //!< time since run start
         double fTimeRunStart;                     //!< time of first event in run

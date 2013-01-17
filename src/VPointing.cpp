@@ -1,8 +1,6 @@
 /*! \class VPointing
     \brief get telescope pointing direction
 
-    Revision $Id: VPointing.cpp,v 1.19.2.1.4.14.12.2.6.2.2.6.10.1.2.1 2010/11/09 14:38:06 gmaier Exp $
-
     \author
        Gernot Maier
 */
@@ -211,6 +209,10 @@ void VPointing::initializePointingTree()
     fPointingTree->Branch( "Time", &fTime, "Time/D" );
     fPointingTree->Branch( "TargetAzimuth", &fTargetAzimuth, "TargetAzimuth/D" );
     fPointingTree->Branch( "TargetElevation", &fTargetElevation, "TargetElevation/D" );
+    fPointingTree->Branch( "TargetRAJ2000", &fTargetRAJ2000, "TargetRAJ2000/D" );
+    fPointingTree->Branch( "TargetDecJ2000", &fTargetDecJ2000, "TargetDecJ2000/D" );
+    fPointingTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
+    fPointingTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
     fPointingTree->Branch( "TelAzimuth", &fTelAzimuth, "TelAzimuth/D" );
     fPointingTree->Branch( "TelElevation", &fTelElevation, "TelElevation/D" );
     fPointingTree->Branch( "PointingType", &fPointingType, "fPointingType/i" );
@@ -221,36 +223,15 @@ void VPointing::initializePointingTree()
     fPointingTree->Branch( "PointingErrorX", &fPointingErrorX, "PointingErrorX/F" );
     fPointingTree->Branch( "PointingErrorY", &fPointingErrorY, "PointingErrorY/F" );
     fPointingTree->Branch( "EventStatus", &fEventStatus, "EventStatus/i" );
+    fPointingTree->Branch( "TelRAJ2000", &fTelRAJ2000, "TelRAJ2000/D" );
+    fPointingTree->Branch( "TelDecJ2000", &fTelDecJ2000, "TelDecJ2000/D" );
+    fPointingTree->Branch( "TelRA", &fTelRA, "TelRA/D" );
+    fPointingTree->Branch( "TelDec", &fTelDec, "TelDec/D" );
 }
 
 void VPointing::fillPointingTree()
 {
     if( fPointingTree ) fPointingTree->Fill();
-}
-
-
-/*
-
-   return pointing error given by user
-
-*/
-float VPointing::getPointingErrorX()
-{
-    if( fPointingType == 1 ) return fPointingErrorX;
-
-    return 0.;
-}
-
-/*
-
-   return pointing error given by user
-
-*/
-float VPointing::getPointingErrorY()
-{
-    if( fPointingType == 1 ) return fPointingErrorY;
-
-    return 0.;
 }
 
 /*

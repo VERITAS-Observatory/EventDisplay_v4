@@ -1,11 +1,13 @@
 /*! \class VArrayAnalyzer
 
-     VArrayAnalyzer class for analyzing VERITAS data (full array analysis)
+     VArrayAnalyzer class for shower direction and core reconstruction
+
+     different analysis methods are provided
+
+     this class is also taking care of filling the showerpars tree correctly
 
     \author
       Gernot Maier
-
-      Revision $Id: VArrayAnalyzer.cpp,v 1.73.2.9.4.12.4.1.4.6.2.3.4.3.2.1.2.10.2.10.2.4.2.1.2.12.2.22.2.3.2.5.2.1 2011/04/21 10:03:36 gmaier Exp $
 */
 
 #include "VArrayAnalyzer.h"
@@ -29,7 +31,6 @@ VArrayAnalyzer::VArrayAnalyzer()
         cout << "\t adjust fMaxNbrTel in VShowerParameters" << endl;
         exit( -1 );
     }
-
 }
 
 
@@ -81,9 +82,9 @@ void VArrayAnalyzer::doAnalysis()
        }
     }
 
-// added C.Duke 21dec06
-// move source location info into ShowerParameter class
-    if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
+// assume in the following that all telescopes are pointing into the same direction
+// (within pointing errors)
+/* XXX   if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
     {
        getShowerParameters()->fTargetElevation = getPointing()[getTeltoAna()[0]]->getTargetElevation();
        getShowerParameters()->fTargetAzimuth   = getPointing()[getTeltoAna()[0]]->getTargetAzimuth();
@@ -91,6 +92,15 @@ void VArrayAnalyzer::doAnalysis()
        getShowerParameters()->fTargetRA        = getPointing()[getTeltoAna()[0]]->getTargetRA();
        getShowerParameters()->fWobbleNorth     = getPointing()[getTeltoAna()[0]]->getWobbleNorth();
        getShowerParameters()->fWobbleEast      = getPointing()[getTeltoAna()[0]]->getWobbleEast();
+    } XXX */
+    if( getArrayPointing() )
+    {
+       getShowerParameters()->fTargetElevation = getArrayPointing()->getTargetElevation();
+       getShowerParameters()->fTargetAzimuth   = getArrayPointing()->getTargetAzimuth();
+       getShowerParameters()->fTargetDec       = getArrayPointing()->getTargetDec();
+       getShowerParameters()->fTargetRA        = getArrayPointing()->getTargetRA();
+       getShowerParameters()->fWobbleNorth     = getArrayPointing()->getWobbleNorth();
+       getShowerParameters()->fWobbleEast      = getArrayPointing()->getWobbleEast();
     }
     else
     {
@@ -109,6 +119,7 @@ void VArrayAnalyzer::doAnalysis()
 	{
 	   getShowerParameters()->fTelElevation[i] = getPointing()[i]->getTelElevation();
 	   getShowerParameters()->fTelAzimuth[i]   = getPointing()[i]->getTelAzimuth();
+// dec/ra of current epoch
 	   getShowerParameters()->fTelDec[i]       = getPointing()[i]->getTelDec();
 	   getShowerParameters()->fTelRA[i]        = getPointing()[i]->getTelRA();
         }
@@ -123,6 +134,7 @@ void VArrayAnalyzer::doAnalysis()
         checkPointing();
     }
 
+////////////////////////////////////////////////////////
 // do array analysis only if there is an array trigger
     if( getReader()->hasArrayTrigger() )
     {
@@ -140,14 +152,14 @@ void VArrayAnalyzer::doAnalysis()
 //////////////////////////////////////////////////////////////////////////////////////////////
     }
 
+//////////////////////////////////////////////////////////////////////////////////////////////
 // calculate RA and dec of shower direction
 // (these are current epoch values)
     for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
     {
 // test for successfull reconstruction (zenith angle > 0.)
         if( getShowerParameters()->fShowerZe[i] < 0. ) continue;
-// y-axis flip in calculation of yoff
-        if( i < getPointing().size() && getPointing()[i] )
+/* XXX        if( i < getPointing().size() && getPointing()[i] )
 	{
 	   getShowerParameters()->fDec[i] = getPointing()[getTeltoAna()[0]]->getTelDec() + getShowerParameters()->fShower_YoffsetDeRot[i];
 	   if( cos(getShowerParameters()->fDec[i]/TMath::RadToDeg()) != 0. )
@@ -155,7 +167,16 @@ void VArrayAnalyzer::doAnalysis()
 	       getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA() 
 	                                     + getShowerParameters()->fShower_XoffsetDeRot[i]/cos(getShowerParameters()->fDec[i]/TMath::RadToDeg() );
 	   }
-	   else getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA();
+	   else getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA(); XXXXX */
+        if( getArrayPointing() )
+	{
+	   getShowerParameters()->fDec[i] = getArrayPointing()->getTelDec() + getShowerParameters()->fShower_YoffsetDeRot[i];
+	   if( cos(getShowerParameters()->fDec[i]/TMath::RadToDeg()) != 0. )
+	   {
+	       getShowerParameters()->fRA[i] = getArrayPointing()->getTelRA() 
+	                                     + getShowerParameters()->fShower_XoffsetDeRot[i]/cos(getShowerParameters()->fDec[i]/TMath::RadToDeg() );
+	   }
+	   else getShowerParameters()->fRA[i] = getArrayPointing()->getTelRA();
 	}
 	else
 	{
@@ -164,6 +185,8 @@ void VArrayAnalyzer::doAnalysis()
         }
     }
     getShowerParameters()->eventStatus = getAnalysisArrayEventStatus();
+
+//////////////////////////////////////////////////////////////////////////////////////////////
 // fill shower parameter tree with results
     getShowerParameters()->getTree()->Fill();
 
@@ -200,17 +223,76 @@ void VArrayAnalyzer::initEvent()
        cout << "VArrayAnalyzer::initEvent() warning: no event times" << endl;
     }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// get the telescope pointing
+//////////////////////////////////////////////////////////////////////////////////////////////
+// MC readers
+// source file is Grisu MC, MC DST, or MC Pe
+    if( fReader->isMC() )
+    {
+        getArrayPointing()->setMC();
+// TEMP: set here the reference pointing
+// calculate mean el and az from all telescopes (should probably be the same for all)
+        double i_el = 0.;
+	double i_az = 0.;
+	double i_n = 0.;
+	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
+	{
+	    if( getTeltoAna()[i] < fReader->getTelElevation().size() && getTeltoAna()[i] < fReader->getTelAzimuth().size() ) 
+	    {
+	       i_el += fReader->getTelElevation()[getTeltoAna()[i]];
+	       i_az += fReader->getTelAzimuth()[getTeltoAna()[i]];
+	       i_n++;
+            }
+	    if( i_n > 0. )
+	    {
+	       getArrayPointing()->setTelElevation( i_el / i_n );
+	       getArrayPointing()->setTelAzimuth( i_az / i_n );
+            }
+        }
+	if( i_n < 1.e-2 )
+	{
+	   getArrayPointing()->setTelElevation( 0. );
+           getArrayPointing()->setTelAzimuth( 0. );
+        }
+    }
+// set pointing direction from command line
+    else if( getRunParameter()->felevation > 0. && getRunParameter()->fazimuth > 0. )
+    {
+        getArrayPointing()->setTelElevation( getRunParameter()->felevation );
+        getArrayPointing()->setTelAzimuth( getRunParameter()->fazimuth );
+    }
+// set pointing direction with target
+// target is set via command line, getPointing() is initiated in run/VEventLoop::initEventLoop()
+    else
+    {
+        if( getArrayPointing()->isSet() && getArrayPointing()->getTargetName() != "laser" )
+        {
+// this calculates telescope elevation and azimuth from telescope pointing in ra and dec
+	    getArrayPointing()->updatePointing( getImageParameters()->MJD, getImageParameters()->time );
+            if (!getArrayPointing()->isPrecessed())
+            {
+                getArrayPointing()->precessTarget( getImageParameters()->MJD, -1 );
+// set wobble offsets
+                getArrayPointing()->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, -1, getImageParameters()->MJD );
+                getArrayPointing()->updatePointing( getImageParameters()->MJD, getImageParameters()->time );
+            }
+        }
+    }
+    getArrayPointing()->fillPointingTree();
+
 // set telescope pointing for data (again) and fill pointing tree
     if( !fReader->isMC() )
     {
-        for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
-        {
-	    if( getTeltoAna()[i] < getPointing().size() && getPointing()[getTeltoAna()[i]] )
-	    {
-	       getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time, 
-	                                                        getRunParameter()->fDBTracking, true );
-            }
-        }
+      for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
+      {
+	 if( getTeltoAna()[i] < getPointing().size() && getPointing()[getTeltoAna()[i]] )
+	 {
+	    getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time, 
+	    getRunParameter()->fDBTracking, true );
+	 }
+      }
     }
 /////////////////////////////////////////////////////////////////////
 
@@ -291,8 +373,15 @@ void VArrayAnalyzer::initAnalysis()
 		cout << " and reconstruction method " << getEvndispReconstructionParameter()->fMethodID[i] << endl;
 	        fDispAnalyzer.push_back( new VDispAnalyzer() );
 		fDispAnalyzer.back()->setTelescopeTypeList( getDetectorGeometry()->getTelType_list() );
-//                if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fDispFileName[i], "DISPTABLE" ) ) exit( -1 );
-		if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
+// initialize disp method
+                if( getEvndispReconstructionParameter()->fTMVAFileName[i].size() > 0 )
+		{
+		    if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fTMVAFileName[i], "TMVABDT" ) ) exit( -1 );
+                }
+		else if( getEvndispReconstructionParameter()->fDispFileName[i].size() > 0 )
+		{
+                    if( !fDispAnalyzer.back()->initialize( getEvndispReconstructionParameter()->fDispFileName[i], "DISPTABLE" ) ) exit( -1 );
+                }
             }
             else fDispAnalyzer.push_back( 0 );
         }
@@ -357,7 +446,7 @@ void VArrayAnalyzer::terminate()
     if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
     {
 // write pointing mismatch
-        if( !getNoPointing() && getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]]->getTargetName() != "laser" && !fReader->isMC() )
+        if( !getNoPointing() && getArrayPointing() && getArrayPointing()->getTargetName() != "laser" && !fReader->isMC() )
         {
             cout << endl;
             cout << "Pointing check results (using VBF data):" << endl;
@@ -437,6 +526,7 @@ void VArrayAnalyzer::terminate()
             }
         }
         if( getEvndispReconstructionParameter() ) getEvndispReconstructionParameter()->Write();
+	if( getArrayPointing() ) getArrayPointing()->terminate();
 	if( fOutputfile ) fOutputfile->Flush();
         cout << "---------------------------------------------------------------------------------------------------------" << endl;
     }
@@ -748,13 +838,22 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
 // calculate direction cosinii
 // taking telescope plane as reference plane. This is not exactly correct for method 0
 // taking pointing direction of first telescope in teltoana vector
-    if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
+/* XXX    if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
     {
        i_xcos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() )
               * sin( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
        if( fabs( i_xcos ) < 1.e-7 ) i_xcos = 0.;
        i_ycos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() )
               * cos( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
+       if( fabs( i_ycos ) < 1.e-7 ) i_ycos = 0.;
+    } XXX */
+    if( getArrayPointing() )
+    {
+       i_xcos = sin((90.-getArrayPointing()->getTelElevation())/ TMath::RadToDeg() )
+              * sin( (getArrayPointing()->getTelAzimuth()-180.)/TMath::RadToDeg() );
+       if( fabs( i_xcos ) < 1.e-7 ) i_xcos = 0.;
+       i_ycos = sin((90.-getArrayPointing()->getTelElevation())/ TMath::RadToDeg() )
+              * cos( (getArrayPointing()->getTelAzimuth()-180.)/TMath::RadToDeg() );
        if( fabs( i_ycos ) < 1.e-7 ) i_ycos = 0.;
     }
     else
@@ -776,32 +875,6 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
     if( fabs( igz ) > 1.e3 ) return false;
 
     return true;
-}
-
-
-void VArrayAnalyzer::getNumImages()
-{
-    getShowerParameters()->fNumImages = 0;
-    for( unsigned int i = 0; i < getNTel(); i++ )
-    {
-        setTelID( i );
-        if( getImageParameters( getRunParameter()->fImageLL )->ntubes > 0 ) getShowerParameters()->fNumImages++;
-    }
-}
-
-
-double VArrayAnalyzer::angDist( double Az, double Ze, double Traz, double Trze )
-{
-    double value;
-
-    value  = sin( Ze ) * sin( Trze ) * cos( ( Az - Traz ) );
-    value += cos( Ze ) * cos( Trze );
-// limited accuracy results sometimes in values slightly larger than 1
-    if( value > 1. ) value = 1.;
-    value = acos( value );
-    value *= 45. / atan( 1. );
-
-    return value;
 }
 
 
@@ -834,7 +907,7 @@ void VArrayAnalyzer::checkPointing()
 	    getShowerParameters()->fTelAzimuthVBF[i]   = getReader()->getArrayTrigger()->getAzimuth( ivbf );
 	    if( i < getPointing().size() && getPointing()[i] )
 	    {
-	       iPointingDiff = (float)angDist( getPointing()[i]->getTelAzimuth()/TMath::RadToDeg(), 
+	       iPointingDiff = (float)VSkyCoordinatesUtilities::angularDistance( getPointing()[i]->getTelAzimuth()/TMath::RadToDeg(), 
 	                                       (90.-getPointing()[i]->getTelElevation())/TMath::RadToDeg(),
 					       getReader()->getArrayTrigger()->getAzimuth( ivbf )/TMath::RadToDeg(),
 					       (90. - getReader()->getArrayTrigger()->getAltitude( ivbf ))/TMath::RadToDeg() );
@@ -907,14 +980,6 @@ float VArrayAnalyzer::recalculateImagePhi( double iDeltaX, double iDeltaY )
     return i_phi;
 }
 
-
-/*!
-    Normalize angle into range 0-2 pi
-*/
-float VArrayAnalyzer::adjustAzimuthToRange( float az )
-{
-    return slaDranrm( az/TMath::RadToDeg()) * TMath::RadToDeg();
-}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -999,7 +1064,12 @@ int VArrayAnalyzer::rcs_method_3( unsigned int iMethod )
             iangdiff = sin( fabs(atan(m[jj])-atan(m[ii])) );
 
 // discard all pairs with almost parallel lines
-            if( fabs( iangdiff ) < 0.2 ) continue; // TODO this should not be hardcoded
+	    float i_diff =  fabs(atan(m[0])-atan(m[1]));
+	    if( i_diff < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() ||
+	        fabs(180./TMath::RadToDeg()-i_diff) < fEvndispReconstructionParameter->fAxesAngles_min[iMethod]/TMath::RadToDeg() )
+            {
+	        continue;
+            }
 
             iweight  = 1./(1./w[ii] + 1./w[jj]);
             iweight *= 1./(l[ii] + l[jj]);
@@ -1208,15 +1278,15 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
 
     double ze = 0.;
     double az = 0.;
-    if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
+    if( getArrayPointing() )
     {
-       getPointing()[getTeltoAna()[0]]->getRotatedShowerDirection( -1.*getShowerParameters()->fShower_Yoffset[iMethod], 
+       getArrayPointing()->getRotatedShowerDirection( -1.*getShowerParameters()->fShower_Yoffset[iMethod], 
                                                                    -1.*getShowerParameters()->fShower_Xoffset[iMethod], ze, az );
     }
     if( isnan( ze ) ) ze = -99999.;
     if( isnan( az ) ) az = -99999.;
     getShowerParameters()->fShowerZe[iMethod] = ze;
-    getShowerParameters()->fShowerAz[iMethod] = adjustAzimuthToRange( az );
+    getShowerParameters()->fShowerAz[iMethod] = VSkyCoordinatesUtilities::adjustAzimuthToRange( az );
     getShowerParameters()->fShower_stdS[iMethod] = stds;
 
 // calculate derotated shower directions
@@ -1225,14 +1295,11 @@ bool VArrayAnalyzer::fillShowerDirection( unsigned int iMethod, float xs, float 
         double iUTC = 0.;
         double xrot = 0.;
 	double yrot = 0.;
-	if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
+	if( getArrayPointing() )
 	{
 	   iUTC = VSkyCoordinatesUtilities::getUTC( getShowerParameters()->MJD, getShowerParameters()->time );
-	   if( getTelID() < getPointing().size() && getPointing()[getTelID()] )
-	   {
-	      getPointing()[getTelID()]->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod], 
-                                                           -1.*getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
-           }
+	   getArrayPointing()->derotateCoords( iUTC, getShowerParameters()->fShower_Xoffset[iMethod], 
+						 -1.*getShowerParameters()->fShower_Yoffset[iMethod], xrot, yrot );
         }	   
 
         getShowerParameters()->fShower_XoffsetDeRot[iMethod] = xrot;
@@ -1534,9 +1601,9 @@ bool VArrayAnalyzer::fillSimulationEvent()
 int VArrayAnalyzer::rcs_method_8( unsigned int iMethod )
 {
     double cosze = 0.;
-    if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
+    if( getArrayPointing() )
     {
-       cosze = cos( (90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/TMath::RadToDeg() );
+       cosze = cos( (90.-getArrayPointing()->getTelElevation())/TMath::RadToDeg() );
     }
 // weight calculation according to Beilicke 2010
     double weight = 0.;

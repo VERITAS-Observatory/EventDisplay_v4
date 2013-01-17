@@ -453,8 +453,8 @@ bool VImageAnalyzer::initEvent()
 //!Initialize this event
     getImageParameters()->fTelID = getTelID();
 
-    getImageParameters()->time = getEventTime();
     getImageParameters()->MJD  = getEventMJD();
+    getImageParameters()->time = getEventTime();
 
 // get time since run start
     if( getAnaData()->fTimeSinceRunStart < 0. )
@@ -497,33 +497,33 @@ bool VImageAnalyzer::initEvent()
 // source file is Grisu MC, MC DST, or MC Pe
     if( fReader->isMC() )
     {
-        fPointing[getTelID()]->setMC();
-        if( getTelID() < fReader->getTelElevation().size() ) fPointing[getTelID()]->setTelElevation( fReader->getTelElevation()[getTelID()] );
-        else                                                 fPointing[getTelID()]->setTelElevation( 0. );
-        if( getTelID() < fReader->getTelAzimuth().size()   ) fPointing[getTelID()]->setTelAzimuth( fReader->getTelAzimuth()[getTelID()] );
-        else                                                 fPointing[getTelID()]->setTelAzimuth( 0. );
+        getPointing()[getTelID()]->setMC();
+        if( getTelID() < fReader->getTelElevation().size() ) getPointing()[getTelID()]->setTelElevation( fReader->getTelElevation()[getTelID()] );
+        else                                                 getPointing()[getTelID()]->setTelElevation( 0. );
+        if( getTelID() < fReader->getTelAzimuth().size()   ) getPointing()[getTelID()]->setTelAzimuth( fReader->getTelAzimuth()[getTelID()] );
+        else                                                 getPointing()[getTelID()]->setTelAzimuth( 0. );
     }
 // set pointing direction from command line
     else if( getRunParameter()->felevation > 0. && getRunParameter()->fazimuth > 0. )
     {
-        fPointing[getTelID()]->setTelElevation( getRunParameter()->felevation );
-        fPointing[getTelID()]->setTelAzimuth( getRunParameter()->fazimuth );
+        getPointing()[getTelID()]->setTelElevation( getRunParameter()->felevation );
+        getPointing()[getTelID()]->setTelAzimuth( getRunParameter()->fazimuth );
     }
 // set pointing direction with target
-// target is set via command line, fPointing is initiated in run/VEventLoop::initEventLoop()
+// target is set via command line, getPointing() is initiated in run/VEventLoop::initEventLoop()
     else
     {
         bool iSet = true;
-        if( fPointing[getTelID()]->isSet() && fPointing[getTelID()]->getTargetName() != "laser" )
+        if( getPointing()[getTelID()]->isSet() && getPointing()[getTelID()]->getTargetName() != "laser" )
         {
 // this calculates telescope elevation and azimuth from telescope pointing in ra and dec
-            fPointing[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time, getRunParameter()->fDBTracking, false );
-            if (!fPointing[getTelID()]->isPrecessed())
+            getPointing()[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time, getRunParameter()->fDBTracking );
+            if (!getPointing()[getTelID()]->isPrecessed())
             {
-                fPointing[getTelID()]->precessTarget( getImageParameters()->MJD, getTelID() );
+                getPointing()[getTelID()]->precessTarget( getImageParameters()->MJD, getTelID() );
 // set wobble offsets
-                fPointing[getTelID()]->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, getTelID(), getImageParameters()->MJD );
-                fPointing[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time );
+                getPointing()[getTelID()]->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, getTelID(), getImageParameters()->MJD );
+                getPointing()[getTelID()]->setTelPointing( getImageParameters()->MJD, getImageParameters()->time );
             }
         }
         else
@@ -537,8 +537,8 @@ bool VImageAnalyzer::initEvent()
                 cout << "VImageAnalyzer::initEvent(): no telescope pointing" << endl;
                 setNoPointing( true );
             }
-            fPointing[getTelID()]->setTelElevation( 0. );
-            fPointing[getTelID()]->setTelAzimuth( 0. );
+            getPointing()[getTelID()]->setTelElevation( 0. );
+            getPointing()[getTelID()]->setTelAzimuth( 0. );
         }
     }
 
@@ -764,6 +764,14 @@ void VImageAnalyzer::imageCleaning()
 	  fVImageCleaning->cleanImagePedvars(getImageThresh(),getBorderThresh(),getBrightNonImageThresh() );
       }
       gainCorrect();
+   }
+
+//AMc trace correlation cleaning
+   if( getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
+   {
+       fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter()->fCorrelationCleanBoardThresh,
+                                                  getImageCleaningParameter()->fCorrelationCleanCorrelThresh,
+						  getImageCleaningParameter()->fCorrelationCleanNpixThresh );
    }
 }
 

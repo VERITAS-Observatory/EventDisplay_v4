@@ -45,7 +45,7 @@ class VPointing : public VSkyCoordinates
         VPointingDB *fPointingDB;
         TTree *fPointingTree;
 
-        void fillPointingTree();
+// private functions
         void initializePointingTree();
         bool updatePointingfromDB( int, double );
 
@@ -54,8 +54,9 @@ class VPointing : public VSkyCoordinates
         VPointing( unsigned int itelID );
        ~VPointing() {}
 
-	float        getPointingErrorX();
-	float        getPointingErrorY();
+        void         fillPointingTree();
+	float        getPointingErrorX() { return fPointingErrorX; }
+	float        getPointingErrorY() { return fPointingErrorY; }
 	unsigned int getPointingType() { return fPointingType; }
         void         getPointingFromDB( int irun, string iTCorrections, string iVPMDirectory, bool iVPMDB, bool iUncalibratedVPM );
 	unsigned int getTelID() { return fTelID; }

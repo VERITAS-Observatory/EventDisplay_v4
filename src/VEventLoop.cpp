@@ -1,12 +1,6 @@
 /*!  \class VEventLoop
   \brief  main event loop, steering of analysis and event display
 
-  \todo   nextEvent() cuts should be applied as well to VImageAnalyzer tree
-  \todo   copy fRunPar from readrunparameter to VEvndispData class
-  \todo   initEventLoop() -> delete fCalibrationData and fAnalyzerData before making new one
-
-   Revision $Id: VEventLoop.cpp,v 1.78.2.6.2.2.2.9.10.9.2.5.4.6.2.1.2.6.2.7.2.3.2.7.2.7.2.12.2.8.2.2.2.1 2011/04/21 10:03:38 gmaier Exp $
-
   \author Gernot Maier
 */
 
@@ -352,11 +346,49 @@ bool VEventLoop::initEventLoop( string iFileName )
     printRunInfos();
 
 ////////////////////////////////////////////////////////////////////////////////
-// set pointing
+// set array pointing (values valid for all telescope)
 ////////////////////////////////////////////////////////////////////////////////
     cout << endl;
     cout << "----------------------" << endl;
     cout << "Initialize pointing..." << endl;
+    fArrayPointing = new VArrayPointing();
+    fArrayPointing->setObservatory( fRunPar->getObservatory_Longitude_deg(), fRunPar->getObservatory_Latitude_deg() );
+///////////////////////////////////////////////////////////////////////////////////////////
+// Monte Carlo file
+    if( fRunPar->fIsMC != 0 ) fArrayPointing->setMC();
+///////////////////////////////////////////////////////////////////////////////////////////
+// data
+    else
+    {
+///////////////////////////////////////////////////////////////////////////////////////////
+// set target by name (this means target coordinates must be hard wired into VTargets.cpp)
+// (this should not be used in any serious analysis!!)
+///////////////////////////////////////////////////////////////////////////////////////////
+    if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
+    {
+	cout << "A " << fRunPar->fTargetName << "\t" << fRunPar->fTargetDec << endl;
+	if( !fArrayPointing->setTarget( fRunPar->fTargetName ) )
+	{
+	      cout << endl;
+	      cout << "...exiting" << endl;
+	      exit( 0 );
+	}
+     }
+///////////////////////////////////////////////////////////////////////////////////////////
+// set target coordinates from command line or from DB
+///////////////////////////////////////////////////////////////////////////////////////////
+    else if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
+    {
+       fArrayPointing->setTargetName( fRunPar->fTargetName );
+       fArrayPointing->setTargetJ2000( fRunPar->fTargetDec, fRunPar->fTargetRA );
+    }
+    }
+// add any offsets to the pointing [J2000]
+    fArrayPointing->setPointingOffset( fRunPar->fTargetRAOffset, fRunPar->fTargetDecOffset );
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// set pointing for all telescopes
+///////////////////////////////////////////////////////////////////////////////////////////
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         if( isTeltoAna( i ) )
@@ -410,12 +442,12 @@ bool VEventLoop::initEventLoop( string iFileName )
 	   fPointing.push_back( 0 );
         }
     }
-// set coordinates in run parameter (get direction of first telescope)
+// set coordinates in run parameter
 // (J2000)
-    if( getTeltoAna()[0] < fPointing.size() && fPointing[getTeltoAna()[0]] )
+    if( getArrayPointing() )
     {
-        getRunParameter()->fTargetDec = fPointing[getTeltoAna()[0]]->getTargetDecJ2000();
-        getRunParameter()->fTargetRA  = fPointing[getTeltoAna()[0]]->getTargetRAJ2000();
+        getRunParameter()->fTargetDec = getArrayPointing()->getTargetDecJ2000();
+        getRunParameter()->fTargetRA  = getArrayPointing()->getTargetRAJ2000();
     }
 
     return true;

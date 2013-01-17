@@ -24,6 +24,7 @@
 #include <VFrogParameters.h>
 //#include <VFrogImageData.h>
 #include <VPointing.h>
+#include <VArrayPointing.h>
 #include <VTraceHandler.h>
 
 #include "TDirectory.h"
@@ -57,6 +58,7 @@ class VEvndispData
         static unsigned int fTelID;               //!< telescope number of current telescope
         static vector< unsigned int > fTeltoAna;  //!< analyze only this subset of telescopes (this is dynamic and can change from event to event)
 // telescope pointing (one per telescope)
+        static VArrayPointing* fArrayPointing;
         static vector< VPointing* > fPointing;
 // no pointing information
         static bool fNoTelescopePointing;
@@ -161,6 +163,7 @@ class VEvndispData
         VCalibrationData*   getCalibrationData( unsigned int iTel ) { if( iTel < fCalData.size() ) return fCalData[iTel]; else return 0; }
         vector<int>&        getChannelStatus() { return fCalData[fTelID]->fChannelStatus; }
         bool                getCalibrated() { return fCalibrated[fTelID]; }
+	vector<double>&     getBorderCorrelationCoefficient() { return fAnaData[fTelID]->fCorrelationCoefficient; }
         VEvndispData*              getData() { return this; }
         vector<unsigned int>&       getDead( bool iLowGain = false ) { if( !iLowGain ) return fAnaData[fTelID]->fDead; else return fAnaData[fTelID]->fLowGainDead; }
         vector<unsigned int>&       getMasked() { return fAnaData[fTelID]->fMasked; }
@@ -327,6 +330,7 @@ class VEvndispData
         TGraphErrors*       getXGraph() { return fXGraph[fTelID]; }
         TGraphErrors*       getYGraph() { return fYGraph[fTelID]; }
         TGraphErrors*       getRGraph() { return fRGraph[fTelID]; }
+	VArrayPointing*     getArrayPointing() { return fArrayPointing; }
         vector< VPointing* > getPointing() { return fPointing; }
 	vector<bool>&       getZeroSuppressed() { return fAnaData[fTelID]->fZeroSuppressed; }
         void                incrementNumberofIncompleteEvents() { fNumberofIncompleteEvents++; }
@@ -343,6 +347,8 @@ class VEvndispData
         void                setAnaData() { fAnaData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getReader()->getMaxChannels(), (getTraceFit()>-1.), getDebugFlag(), getRunParameter()->fMCNdeadSeed, getNSamples(), getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, getRunParameter()->fpulsetiming_width_index ); }
         void                setBorder( bool iBo ) {  fAnaData[fTelID]->fBorder.assign( fDetectorGeo->getNChannels( fTelID ), iBo ); }
         void                setBorder( unsigned int iChannel, bool iBo ) { fAnaData[fTelID]->fBorder[iChannel] = iBo; }
+	void                setBorderCorrelationCoefficient( double iC ) { fAnaData[fTelID]->fCorrelationCoefficient.assign( fDetectorGeo->getNChannels( fTelID ), iC ); }
+	void                setBorderCorrelationCoefficient( unsigned int iChannel, double iC ) { fAnaData[fTelID]->fCorrelationCoefficient[iChannel] = iC; }
         void                setBorderThresh( double ithresh ) { if( getImageCleaningParameter() ) getImageCleaningParameter()->fborderthresh = ithresh; }
         void                setBrightNonImageThresh( double ithresh ) { if( getImageCleaningParameter() ) getImageCleaningParameter()->fbrightnonimagetresh = ithresh; }
         void                setCalData() { fCalData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getDebugFlag() ); }

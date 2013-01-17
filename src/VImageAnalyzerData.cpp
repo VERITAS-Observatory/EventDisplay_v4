@@ -102,6 +102,8 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fncluster_cleaned = 0; //HP
     fncluster_uncleaned = 0; //HP
 
+    fCorrelationCoefficient.resize( iChannels, false );
+
 // fit value results
     if( iTraceFit )
     {
