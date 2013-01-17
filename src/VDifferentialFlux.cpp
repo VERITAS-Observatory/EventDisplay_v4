@@ -139,12 +139,14 @@ double VDifferentialFlux::convertPhotonFlux_to_Ergs( double e, double f, bool bL
 
    calculate nuFnu from an integral flux point
 
+   energy in eV
+
    assume power laws dN/dE = c * E^{gamma}
 
    return value in [erg/cm2/s]
 
 */
-double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2 )
+double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2, double e3 )
 {
    if( e1 >= e2 )
    {
@@ -165,17 +167,10 @@ double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2 )
 
 // calculate nuFu
    double nF = 0.;
-/*   if( gamma != -2. ) 
-   {
-       nF = c / (gamma+2.) * ( TMath::Power( e2, gamma+2. ) - TMath::Power( e1, gamma+2. ) );
-   }
-   else
-   {
-       nF = c * ( log( e2 ) - log( e1 ) );
-   } */
+   if( e3 > 0. ) nF = c * TMath::Power( e3, gamma+2. );
 // Following A.Tramacere (Fermi Saas Fee analysis session; 2010)
 // http://www.isdc.unige.ch/sf2010/fermi
-   nF = c * TMath::Power( sqrt( e1*e2), gamma+2. );
+   else nF = c * TMath::Power( sqrt( e1*e2), gamma+2. );
 
 // from eV to ergs
    nF *= TMath::Qe();

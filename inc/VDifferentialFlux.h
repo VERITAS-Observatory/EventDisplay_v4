@@ -53,7 +53,7 @@ class VDifferentialFlux : public TObject
         double convertEnergy_keV_to_Hz( double energy_keV );
         double convertEnergy_TeV_to_Hz( double energy_TeV );
         double convertPhotonFlux_to_Ergs( double energy_TeV, double flux_photons_per_cm2_s, bool bLin = true );
-	double nuFnu( double F, double gamma, double e1, double e2 );
+	double nuFnu( double F, double gamma, double e1, double e2, double e3 = -9999. );
 
         ClassDef(VDifferentialFlux,6);
 };
