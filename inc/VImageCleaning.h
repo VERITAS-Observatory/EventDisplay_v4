@@ -5,9 +5,6 @@
 
 #include <VEvndispData.h>
 
-#include "TopoTrigger.h"
-#include "NNImageCleaningServiceFunc.h"
-
 using namespace std;
 
 class VImageCleaning

@@ -5,6 +5,11 @@
  */
 
 #include "VImageCleaning.h"
+#include "TopoTrigger.h"
+#ifndef VIMAGENNCLEANING_H
+#include "NNImageCleaningServiceFunc.h"
+#define VIMAGENNCLEANING_H
+#endif
 
 VImageCleaning::VImageCleaning( VEvndispData *iData )
 {
