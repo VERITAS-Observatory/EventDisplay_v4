@@ -16,7 +16,7 @@
 ACUT="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 ACUT="EVNDISP.reconstruction.runparameter"
 # run options
-OPT="-display=1 -teltoana=$TEL -reconstructionparameter $ACUT -vbfnsamples"
+OPT="-display=1 -teltoana=$TEL -reconstructionparameter $ACUT -vbfnsamples -readCalibDB"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################
