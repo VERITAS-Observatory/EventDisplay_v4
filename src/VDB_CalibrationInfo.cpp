@@ -212,6 +212,9 @@ void VDB_CalibrationInfo::readVOFFLINE()
 	std::cout<<"ERROR: wrong constructor"<<std::endl;
 	std::cout<<"use: VDB_CalibrationInfo::VDB_CalibrationInfo(int laserrun ,int tel ,string name_out_file,int gain_or_toff,int VOFFLINE_version_query,TString DBserver)"<<std::endl;
 	std::cout<<"if you want to call VDB_CalibrationInfo::readVOFFLINE()"<<std::endl;
+	Vchannel.clear();
+	Vmean.clear();
+	Vvar.clear();
 	return;
      }
 
@@ -219,13 +222,10 @@ void VDB_CalibrationInfo::readVOFFLINE()
    Create_query_read(); 
    
    //-- read the DB and put the result in the vector
-   vector < double > Vchannel;
-   vector < double > Vmean;
-   vector < double > Vvar;   
-   Read_the_DB(Vchannel,Vmean,Vvar);
+   Read_the_DB();
    
    //-- write the result of the reading in a FILE
-   if(Vchannel.size()>0)
+   if(Vchannel.size()>0 && fFile_to_write.Length() > 0 )
    {
        //std::cout<<"VDB_CalibrationInfo::readVOFFLINE Vchannel.size()>0"<<std::endl;
        //std::cout<<"fFile_to_write "<<fFile_to_write<<std::endl;
@@ -239,7 +239,7 @@ void VDB_CalibrationInfo::readVOFFLINE()
        }
        fclose(file_output);
    }
-   else
+   else if( Vchannel.size() == 0 )
    {
        std::cout<<"ERROR  VDB_CalibrationInfo::readVOFFLINE Vchannel.size()<1"<<std::endl;
    }
@@ -324,8 +324,8 @@ bool VDB_CalibrationInfo::test_file_format(TString file_to_be_copied){
 //-- fill the given vector with the result of the reading
 //-- private
 //---------------------------------------------------------------------------
-void VDB_CalibrationInfo::Read_the_DB(vector < double > &Vchannel,vector < double > &Vmean,vector < double > &Vvar){
-
+void VDB_CalibrationInfo::Read_the_DB()
+{
     Vchannel.clear();
     Vmean.clear();
     Vvar.clear();
@@ -336,14 +336,14 @@ void VDB_CalibrationInfo::Read_the_DB(vector < double > &Vchannel,vector < doubl
     TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
     if( !f_db )
     {
-	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(vector < double > Vchannel,vector < double > Vmean,vector < double > Vvar): failed to connect to database server" << endl;
+	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to connect to database server" << endl;
 	cout << "\t server: " <<  fServer << endl;
 	return;
     }
     //---- do the query and check
     TSQLResult *db_res = f_db->Query( fquery_read.c_str() );
     if( !db_res ){
-	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(vector < double > Vchannel,vector < double > Vmean,vector < double > Vvar): failed to get something from the query "<<endl;
+	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to get something from the query "<<endl;
 	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
 	return;
     }
@@ -351,12 +351,12 @@ void VDB_CalibrationInfo::Read_the_DB(vector < double > &Vchannel,vector < doubl
        if( db_res->GetRowCount() > 0 ){
 	   while( TSQLRow *db_row = db_res->Next() ){
 	       if( !db_row ){
-		   cout << "WARNING VDB_CalibrationInfo::Read_the_DB(vector < double > Vchannel,vector < double > Vmean,vector < double > Vvar): failed reading a row from DB "<<endl;
+		   cout << "WARNING VDB_CalibrationInfo::Read_the_DB(): failed reading a row from DB "<<endl;
 		   cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
 		   return;
 	       }
 
-	       Vchannel.push_back( atoi( db_row->GetField( 0 ) )) ;
+	       Vchannel.push_back( (unsigned int)atoi( db_row->GetField( 0 ) )) ;
 	       Vmean.push_back( atof( db_row->GetField( 1 ) )) ;
 	       Vvar.push_back( atof( db_row->GetField( 2 ) ) );
 	   }

@@ -1359,7 +1359,7 @@ string VCalibrator::getCalibrationFileName( int iTel, int irun, string iSuffix )
 }
 
 
-void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile)
+void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile, vector< unsigned int >& Vchannel, vector< double >& Vmean, vector< double >& Vrms )
 {
     int LOW_GAIN = 0;
     if(gain_or_toff != 1 && gain_or_toff != 2)
@@ -1387,10 +1387,16 @@ void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile)
     string NOW = today_now; 
     iFile+=NOW;
     
-// fill the 
+// fill the data into vectors
+    if( !getRunParameter()->freadCalibfromDB_save_file ) iFile = "";
+
     TString DB_server = getRunParameter()->getDBServer();
-    VDB_CalibrationInfo *fDB_calibinfo = new VDB_CalibrationInfo(getRunParameter()->fGainFileNumber[getTelID()],getTelID()+1,iFile,gain_or_toff,getRunParameter()->freadCalibfromDB_versionquery,LOW_GAIN,DB_server);
-    fDB_calibinfo->readVOFFLINE();
+    VDB_CalibrationInfo fDB_calibinfo( getRunParameter()->fGainFileNumber[getTelID()], getTelID()+1, iFile,
+                                       gain_or_toff, getRunParameter()->freadCalibfromDB_versionquery, LOW_GAIN,DB_server );
+    fDB_calibinfo.readVOFFLINE();
+    Vmean = fDB_calibinfo.getVectorMean();
+    Vrms = fDB_calibinfo.getVectorVariance();
+    Vchannel = fDB_calibinfo.getVectorChannelList();
     
     return;   
 }
@@ -1415,56 +1421,78 @@ void VCalibrator::readGains( bool iLowGain )
 // don't read gains for runmode = 2
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
     {
-	if(!iLowGain && getRunParameter()->freadCalibfromDB)
-	{
-	   readfromVOFFLINE_DB(1,iFile);
-	}
-
+        setGains( 1.0, iLowGain );
+        setGainvars( 1.0, iLowGain );
         bool use_default=false;
+	vector< unsigned int > VchannelList;
+	vector < double > Vmean;
+	vector < double > Vvar;
         cout << "Telescope " << getTelID()+1 << ":";
         cout << " reading relative gains";
         if( iLowGain ) cout << " for low gain channels ";
         else           cout << " for high gain channels ";
         cout << "from: " << endl;
         cout << "Telescope " << getTelID()+1 << ": ";
-	cout << iFile << endl;
+// read gain from DB
+	if(!iLowGain && getRunParameter()->freadCalibfromDB)
+	{
+	   cout << "VOFFLINE DB" << endl;
+	   readfromVOFFLINE_DB( 1, iFile, VchannelList, Vmean, Vvar );
+	}
+// read gains from external file
+        else
+	{
+	   cout << iFile << endl;
 
-        ifstream infile;
-        infile.open( iFile.c_str(), ifstream::in );
-        if (!infile)
-        {
-            cout << "VCalibrator::readGains() warning: Input file " << iFile << " cannot be opened.\n" ;
-            cout << "VCalibrator::readGains() info: all gains set to 1.0\n" ;
-            use_default=true;
-	    if( getRunParameter()->fDBRunType == "flasher" || getRunParameter()->fDBRunType == "laser" ) setGains_DefaultValue( true, iLowGain );
-	    else                                                                                         setGains_DefaultValue( false, iLowGain );
-        }
+	   ifstream infile;
+	   infile.open( iFile.c_str(), ifstream::in );
+	   if (!infile)
+	   {
+	       cout << "VCalibrator::readGains() warning: Input file " << iFile << " cannot be opened.\n" ;
+	       cout << "VCalibrator::readGains() info: all gains set to 1.0\n" ;
+	       use_default=true;
+	       if( getRunParameter()->fDBRunType == "flasher" || getRunParameter()->fDBRunType == "laser" ) setGains_DefaultValue( true, iLowGain );
+	       else                                                                                         setGains_DefaultValue( false, iLowGain );
+	   }
 
-        char buffer[100];
-        setGains( 1.0, iLowGain );
-        setGainvars( 1.0, iLowGain );
-        if (!use_default)
-        {
-            while (!infile.eof() )
-            {
-                infile.getline(buffer,100);
-                unsigned int ch;
-                float mean,rms;
-                sscanf(buffer,"%d %f %f",&ch,&mean,&rms);
-                if ( ch < getGains().size() )
-                {
-                    setGains( ch, mean, iLowGain );
-                    if( mean > 0. )
-                    {
-                        getGainDist( iLowGain )->Fill( mean );
-                        getGainVarsDist( iLowGain )->Fill( rms );
-                    }
-                    setGainvars( ch, rms, iLowGain );
+	   char buffer[100];
+	   setGains( 1.0, iLowGain );
+	   setGainvars( 1.0, iLowGain );
+	   if (!use_default)
+	   {
+	       while (!infile.eof() )
+	       {
+		   infile.getline(buffer,100);
+		   unsigned int ch;
+		   float mean,rms;
+		   sscanf(buffer,"%d %f %f",&ch,&mean,&rms);
+                   VchannelList.push_back( ch );
+		   Vmean.push_back( mean );
+		   Vvar.push_back( rms );
                 }
-                else
-                {
-                    cout << "VCalibrator::readGains(): channel out of range: " << ch << "\t" << getGains().size() << endl;
-                }
+            }
+         }
+	 if( !use_default )
+	 {
+	     if( VchannelList.size() == Vmean.size() && VchannelList.size() == Vvar.size() )
+	     {
+                for( unsigned int i = 0; i < VchannelList.size(); i++ )
+		{
+		   if ( VchannelList[i] < getGains().size() )
+		   {
+		       setGains( VchannelList[i], Vmean[i], iLowGain );
+		       if( Vmean[i] > 0. )
+		       {
+			   getGainDist( iLowGain )->Fill( Vmean[i] );
+			   getGainVarsDist( iLowGain )->Fill( Vvar[i] );
+		       }
+		       setGainvars( VchannelList[i], Vvar[i], iLowGain );
+		   }
+		   else
+		   {
+		       cout << "VCalibrator::readGains(): channel out of range: " << VchannelList[i] << "\t" << getGains().size() << endl;
+		   }
+	       }
             }
         }
     }
@@ -1579,52 +1607,75 @@ void VCalibrator::readTOffsets( bool iLowGain )
 
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
     {
+	vector< unsigned int > VchannelList;
+	vector < double > Vmean;
+	vector < double > Vvar;
+        bool use_default = false;
      
-	if(!iLowGain && getRunParameter()->freadCalibfromDB){
-	    readfromVOFFLINE_DB(2,iFile);
-	}
-
-
-	
-        bool use_default=false;
         cout << "Telescope " << getTelID()+1 << ":";
         cout << " reading time offsets";
         if( iLowGain ) cout << " for low gain channels ";
         else           cout << " for high gain channels ";
         cout << "from: " << endl;
         cout << "Telescope " << getTelID()+1 << ": ";
-	cout << iFile << endl;
+// read toffs from DB
+	if(!iLowGain && getRunParameter()->freadCalibfromDB)
+	{
+	   cout << "VOFFLINE DB" << endl;
+           readfromVOFFLINE_DB(2,iFile, VchannelList, Vmean, Vvar);
+	}
+// read toffs from external file
+        else
+	{
+	   cout << iFile << endl;
 
-        ifstream infile;
-        infile.open( iFile.c_str(), ifstream::in );
-        if( !infile )
-        {
-            cout << "VCalibrator::readTOffsets() warning: input file " << iFile << " cannot be opened.\n" ;
-            cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0.\n" ;
-            use_default=true;
-        }
+	   ifstream infile;
+	   infile.open( iFile.c_str(), ifstream::in );
+	   if( !infile )
+	   {
+	       cout << "VCalibrator::readTOffsets() warning: input file " << iFile << " cannot be opened.\n" ;
+	       cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0.\n" ;
+	       use_default=true;
+	   }
 
-        char buffer[100];
-        setTOffsets( 0., iLowGain );
-        setTOffsetvars( 5., iLowGain );
-        if (!use_default)
-        {
-            while (!infile.eof() )
-            {
-                infile.getline (buffer,100);
-                unsigned int ch;
-                float mean,rms;
-                sscanf(buffer,"%d %f %f",&ch,&mean,&rms);
-                if (ch< getTOffsets().size())
-                {
-                    setTOffsets( ch, mean, iLowGain );
-                    if( mean != 0. )
-                    {
-                        getToffsetDist( iLowGain )->Fill( mean );
-                        getToffsetVarsDist( iLowGain )->Fill( rms );
-                    }
+	   char buffer[100];
+	   setTOffsets( 0., iLowGain );
+	   setTOffsetvars( 5., iLowGain );
+	   if (!use_default)
+	   {
+	       while (!infile.eof() )
+	       {
+		   infile.getline (buffer,100);
+		   unsigned int ch;
+		   float mean,rms;
+		   sscanf(buffer,"%d %f %f",&ch,&mean,&rms);
+                   VchannelList.push_back( ch );
+		   Vmean.push_back( mean );
+		   Vvar.push_back( rms );
                 }
-                if( ch < getTOffsetvars( iLowGain ).size()) setTOffsetvars( ch, rms, iLowGain );
+            }
+         }
+	 if( !use_default )
+	 {
+	     if( VchannelList.size() == Vmean.size() && VchannelList.size() == Vvar.size() )
+	     {
+                for( unsigned int i = 0; i < VchannelList.size(); i++ )
+		{
+		   if ( VchannelList[i] < getTOffsets().size() )
+		   {
+		       setTOffsets( VchannelList[i], Vmean[i], iLowGain );
+		       if( Vmean[i] != 0. )
+		       {
+			   getToffsetDist( iLowGain )->Fill( Vmean[i] );
+			   getToffsetVarsDist( iLowGain )->Fill( Vvar[i] );
+		       }
+		       if( VchannelList[i] < getTOffsetvars( iLowGain ).size() ) setTOffsetvars( VchannelList[i], Vvar[i], iLowGain );
+		   }
+		   else
+		   {
+		       cout << "VCalibrator::readTOffsets(): channel out of range: " << VchannelList[i] << "\t" << getTOffsets().size() << endl;
+		   }
+                }
             }
         }
     }
@@ -1634,12 +1685,15 @@ void VCalibrator::readTOffsets( bool iLowGain )
         setTOffsetvars( 0.1, iLowGain );
     }
 
-
-    if(getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file){
+// check if toffs are saved to disk
+    if(getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file)
+    {
 	char rm_calib_info_file[800];
 	sprintf(rm_calib_info_file,"rm -rf  %s",iFile.c_str());
 	system(rm_calib_info_file);
-    }else if(getRunParameter()->freadCalibfromDB && getRunParameter()->freadCalibfromDB_save_file){
+    }
+    else if(getRunParameter()->freadCalibfromDB && getRunParameter()->freadCalibfromDB_save_file)
+    {
 	std::cout<<"calibration information are stored in  "<<iFile<<std::endl;
     }
 

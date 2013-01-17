@@ -71,6 +71,7 @@ class VCalibrator : public VImageBaseAnalyzer
 	string getCalibrationFileName( int iTel, int irun, string iSuffix );
         void readCalibrationData( bool iPeds, bool iGains );
         bool readCalibrationData( string iSourceFile );
+	void readfromVOFFLINE_DB(int gain_or_toff, string &iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
         void readGains( bool iLowGain = false );
         bool readLowGainMultiplier( int iSumWindow );
         bool readPeds( string iFile, bool, unsigned int );
@@ -88,7 +89,6 @@ class VCalibrator : public VImageBaseAnalyzer
         void writeTOffsets( bool iLowGain = false  );
 	void writeAverageTZeros( bool iLowGain = false  );
 
-	void readfromVOFFLINE_DB(int gain_or_toff, string &iFile);
 
     public:
         VCalibrator();
