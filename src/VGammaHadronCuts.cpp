@@ -538,7 +538,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 fCut_Erec_max = atof(temp.c_str());
             }
-            else if( iCutVariable == "arrayemission" )
+            else if( iCutVariable == "arrayemission" || iCutVariable == "emissionheight" )
             {
                 is_stream >> temp;
                 fCut_Emmission_min = atof(temp.c_str());
