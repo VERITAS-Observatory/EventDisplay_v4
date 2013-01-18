@@ -276,10 +276,10 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     if( fEventCounter == 0 ) fTotalTime0 = time;
     fTotalTime = time - fTotalTime0;
 
-    if( !bShort )
-    {
-        LTrig = (ULong64_t)fshowerpars->LTrig;
+    if( !bShort ) LTrig = (ULong64_t)fshowerpars->LTrig;
 
+    if( !fIsMC )
+    {
         for( unsigned int i = 0; i < fNTel; i++ )
         {
             fTelElevation[i] = fshowerpars->TelElevation[i];
@@ -287,16 +287,13 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
             fTelDec[i] = fshowerpars->TelDec[i];
             fTelRA[i] = fshowerpars->TelRA[i];
         }
-        if( !fShortTree )
-        {
-            MJD = fshowerpars->MJD;
-            fTargetElev = fshowerpars->TargetElev;
-            fTargetAz = fshowerpars->TargetAzim;
-            fTargetDec = fshowerpars->TargetDec;
-            fTargetRA = fshowerpars->TargetRA;
-            fWobbleN = fshowerpars->WobbleN;
-            fWobbleE = fshowerpars->WobbleE;
-        }
+	if( !fShortTree ) MJD = fshowerpars->MJD;
+	fTargetElev = fshowerpars->TargetElev;
+	fTargetAz = fshowerpars->TargetAzim;
+	fTargetDec = fshowerpars->TargetDec;
+	fTargetRA = fshowerpars->TargetRA;
+	fWobbleN = fshowerpars->WobbleN;
+	fWobbleE = fshowerpars->WobbleE;
     }
 
     fNTrig = fshowerpars->NTrig;

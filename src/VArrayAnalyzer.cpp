@@ -82,17 +82,7 @@ void VArrayAnalyzer::doAnalysis()
        }
     }
 
-// assume in the following that all telescopes are pointing into the same direction
-// (within pointing errors)
-/* XXX   if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
-    {
-       getShowerParameters()->fTargetElevation = getPointing()[getTeltoAna()[0]]->getTargetElevation();
-       getShowerParameters()->fTargetAzimuth   = getPointing()[getTeltoAna()[0]]->getTargetAzimuth();
-       getShowerParameters()->fTargetDec       = getPointing()[getTeltoAna()[0]]->getTargetDec();
-       getShowerParameters()->fTargetRA        = getPointing()[getTeltoAna()[0]]->getTargetRA();
-       getShowerParameters()->fWobbleNorth     = getPointing()[getTeltoAna()[0]]->getWobbleNorth();
-       getShowerParameters()->fWobbleEast      = getPointing()[getTeltoAna()[0]]->getWobbleEast();
-    } XXX */
+// get reference pointing
     if( getArrayPointing() )
     {
        getShowerParameters()->fTargetElevation = getArrayPointing()->getTargetElevation();
@@ -159,15 +149,6 @@ void VArrayAnalyzer::doAnalysis()
     {
 // test for successfull reconstruction (zenith angle > 0.)
         if( getShowerParameters()->fShowerZe[i] < 0. ) continue;
-/* XXX        if( i < getPointing().size() && getPointing()[i] )
-	{
-	   getShowerParameters()->fDec[i] = getPointing()[getTeltoAna()[0]]->getTelDec() + getShowerParameters()->fShower_YoffsetDeRot[i];
-	   if( cos(getShowerParameters()->fDec[i]/TMath::RadToDeg()) != 0. )
-	   {
-	       getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA() 
-	                                     + getShowerParameters()->fShower_XoffsetDeRot[i]/cos(getShowerParameters()->fDec[i]/TMath::RadToDeg() );
-	   }
-	   else getShowerParameters()->fRA[i] = getPointing()[getTeltoAna()[0]]->getTelRA(); XXXXX */
         if( getArrayPointing() )
 	{
 	   getShowerParameters()->fDec[i] = getArrayPointing()->getTelDec() + getShowerParameters()->fShower_YoffsetDeRot[i];
@@ -290,7 +271,7 @@ void VArrayAnalyzer::initEvent()
 	 if( getTeltoAna()[i] < getPointing().size() && getPointing()[getTeltoAna()[i]] )
 	 {
 	    getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time, 
-	    getRunParameter()->fDBTracking, true );
+	                                                     getRunParameter()->fDBTracking, true );
 	 }
       }
     }
@@ -838,15 +819,6 @@ bool VArrayAnalyzer::fillShowerCore( unsigned int iMeth, float ximp, float yimp 
 // calculate direction cosinii
 // taking telescope plane as reference plane. This is not exactly correct for method 0
 // taking pointing direction of first telescope in teltoana vector
-/* XXX    if( getTeltoAna()[0] < getPointing().size() && getPointing()[getTeltoAna()[0]] )
-    {
-       i_xcos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() )
-              * sin( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
-       if( fabs( i_xcos ) < 1.e-7 ) i_xcos = 0.;
-       i_ycos = sin((90.-getPointing()[getTeltoAna()[0]]->getTelElevation())/ TMath::RadToDeg() )
-              * cos( (getPointing()[getTeltoAna()[0]]->getTelAzimuth()-180.)/TMath::RadToDeg() );
-       if( fabs( i_ycos ) < 1.e-7 ) i_ycos = 0.;
-    } XXX */
     if( getArrayPointing() )
     {
        i_xcos = sin((90.-getArrayPointing()->getTelElevation())/ TMath::RadToDeg() )

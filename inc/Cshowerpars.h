@@ -280,20 +280,20 @@ void Cshowerpars::Init(TTree *tree)
     else          traceFit = 0;
     fChain->SetBranchAddress("TelElevation",TelElevation);
     fChain->SetBranchAddress("TelAzimuth",TelAzimuth);
-    if( !bShort )
+    if( !bMC )
     {
-        fChain->SetBranchAddress("TelElevationVBF",TelElevationVBF);
-        fChain->SetBranchAddress("TelAzimuthVBF",TelAzimuthVBF);
-        fChain->SetBranchAddress("TelPointingMismatch",TelPointingMismatch);
-        fChain->SetBranchAddress("TelDec", TelDec );
-        fChain->SetBranchAddress("TelRA", TelRA );
-        fChain->SetBranchAddress("Tel_x_SC",Tel_x_SC);
-        fChain->SetBranchAddress("Tel_y_SC",Tel_y_SC);
-        fChain->SetBranchAddress("Tel_z_SC",Tel_z_SC);
-        fChain->SetBranchAddress("TargetElev", &TargetElev );
-        fChain->SetBranchAddress("TargetAzim", &TargetAzim );
-        fChain->SetBranchAddress("TargetDec", &TargetDec );
-        fChain->SetBranchAddress("TargetRA", &TargetRA );
+       fChain->SetBranchAddress("TelElevationVBF",TelElevationVBF);
+       fChain->SetBranchAddress("TelAzimuthVBF",TelAzimuthVBF);
+       fChain->SetBranchAddress("TelPointingMismatch",TelPointingMismatch);
+       fChain->SetBranchAddress("TelDec", TelDec );
+       fChain->SetBranchAddress("TelRA", TelRA );
+       fChain->SetBranchAddress("Tel_x_SC",Tel_x_SC);
+       fChain->SetBranchAddress("Tel_y_SC",Tel_y_SC);
+       fChain->SetBranchAddress("Tel_z_SC",Tel_z_SC);
+       fChain->SetBranchAddress("TargetElev", &TargetElev );
+       fChain->SetBranchAddress("TargetAzim", &TargetAzim );
+       fChain->SetBranchAddress("TargetDec", &TargetDec );
+       fChain->SetBranchAddress("TargetRA", &TargetRA );
     }
     else
     {
