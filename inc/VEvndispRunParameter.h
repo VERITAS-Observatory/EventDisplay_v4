@@ -145,6 +145,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	bool   fFixWindowStart_sumwindow2;        // fixed window start for summation window 2
         bool   fFixWindowStart;                   // fix the location of the window (do not move depending on t0)
         bool   fDoublePass;                       // double pass image cleaning (default: off )
+	bool   fDoublePassErrorWeighting2005;     // use error weighting from 2004 or today
 	bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
         vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
                                                   // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
@@ -243,6 +244,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,120); //(increase this number)
+        ClassDef(VEvndispRunParameter,121); //(increase this number)
 };
 #endif

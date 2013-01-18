@@ -631,6 +631,14 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fDoublePass = true;
         }
+	else if( iTemp.find( "dp2005" ) < iTemp.size() && !(iTemp.find( "nodp2005" ) < iTemp.size()) )
+	{
+	    fRunPara->fDoublePassErrorWeighting2005 = true;
+        }
+	else if( iTemp.find( "nodp2005" ) < iTemp.size() )
+	{
+	    fRunPara->fDoublePassErrorWeighting2005 = false;
+        }
 	else if( iTemp.find( "fixwindow2" ) < iTemp.size() )
 	{
 	    fRunPara->fFixWindowStart_sumwindow2 = (bool)(atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() ) );

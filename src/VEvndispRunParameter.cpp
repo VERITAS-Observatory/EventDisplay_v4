@@ -138,6 +138,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fFixWindowStart = false;
     fFixWindowStart_sumwindow2 = true;
     fDoublePass = true;
+    fDoublePassErrorWeighting2005 = true;
     fDynamicIntegrationWindow = true;
     frecoverImagePixelNearDeadPixel = true;
     fFillImageBorderNeighbours = true;
@@ -373,6 +374,9 @@ void VEvndispRunParameter::print( int iEv )
         {
 	    cout << "double pass cleaning ";
 	    if( fDynamicIntegrationWindow ) cout << " (dynamical integration window) ";
+	    cout << " (errors: ";
+	    if( fDoublePassErrorWeighting2005 ) cout << "2005) ";
+	    else                                cout << "2013) ";
             cout << " (low gain window shift: ";
             for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ ) cout << fTraceWindowShift[i] << ", ";
             cout << ")";

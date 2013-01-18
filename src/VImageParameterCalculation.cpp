@@ -75,24 +75,33 @@ void VImageParameterCalculation::calcTimingParameters()
             double xpmt= xi - fParGeo->cen_x;
             double ypmt= yi - fParGeo->cen_y;
 //position along the major axis of the image
-            xpos[nclean]=xpmt*fParGeo->cosphi+
-                ypmt*fParGeo->sinphi;
+            xpos[nclean]=xpmt*fParGeo->cosphi+ypmt*fParGeo->sinphi;
             ex[nclean]=0;                         // error on xpos (deg)
 //position along the minor axis of the image
-            ypos[nclean]=ypmt*fParGeo->cosphi-
-                xpmt*fParGeo->sinphi;
+            ypos[nclean]=ypmt*fParGeo->cosphi-xpmt*fParGeo->sinphi;
             ey[nclean]=0;                         // error on ypos (deg)
 //radial position from camera centre
             rpos[nclean]=sqrt(yi*yi + xi*xi );
             er[nclean]=0;                         // error on rpos (deg)
             t[nclean]=fData->getTZeros()[i];
 
-// (GM) TODO adapt to CTA (currently all values have some errors)
+// (GM) (before 20130115)
+            if( fData->getRunParameter()->fDoublePassErrorWeighting2005 )
+	    {
 //  timing resolution from variable laser pulse studies (run 751)
-            et[nclean]=13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i];
+                 et[nclean]=13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i];
 // make that the timing resolution is not too small (important for MC)
-            if( et[nclean] < 5.e-2 ) et[nclean] = 0.3;
-// GM TEMP	    cout << "XXX " << fData->getTelID()+1 << "\t" << nclean << "\t" << i << "\t" << fData->getSums()[i] << "\t" << 13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i] << "\t" << et[nclean] << endl;
+                 if( et[nclean] < 5.e-2 ) et[nclean] = 0.3;
+            }
+	    else
+	    {
+// use 1./sums as error for fitting (rescale errors later)
+	       if( fData->getSums()[i] > 0. )
+	       {
+		   et[nclean] = 1./fData->getSums()[i];
+	       }
+	       else et[nclean] = 0.3;
+            }
 // min/max/mean times
             if( fData->getTZeros()[i]  < fParGeo->tmin ) fParGeo->tmin = fData->getTZeros()[i];
             if( fData->getTZeros()[i]  > fParGeo->tmax ) fParGeo->tmax = fData->getTZeros()[i];
@@ -117,6 +126,20 @@ void VImageParameterCalculation::calcTimingParameters()
             }
             xgraph->Fit("pol1","Q");
             TF1 *xline=xgraph->GetFunction("pol1");
+
+	    if( !fData->getRunParameter()->fDoublePassErrorWeighting2005 ) 
+	    {
+// rescale errors to Chi2/NDF = 1. and redo the dit
+// (note that ex[] are all 0 -> normal chi2 fit)
+	       double i_scale = 1.;
+	       if( xline->GetNDF() > 0. ) i_scale = xline->GetChisquare() / xline->GetNDF();
+	       for (int i=0;i<nclean;i++)
+	       {
+		  xgraph->SetPointError(i,ex[i],et[i]*sqrt(i_scale));
+	       } 
+	       xgraph->Fit("pol1","Q");
+	       xline=xgraph->GetFunction("pol1");
+            }
 
             fParGeo->tint_y=-999.;
             fParGeo->tgrad_y=-999.;
