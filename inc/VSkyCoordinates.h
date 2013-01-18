@@ -94,8 +94,8 @@ class VSkyCoordinates
         bool   setTarget( string iTargetName );
         bool   setTargetJ2000( double iDec_deg, double iRA_deg );
         void   setTargetName( string iTargetName ) { fTargetName = iTargetName; }
-	void   setTelDec_deg( double iTelDec_deg ) { fTelDec = iTelDec_deg*TMath::RadToDeg(); }
-	void   setTelRA_deg( double iTelRA_deg )   { fTelRA  = iTelRA_deg*TMath::RadToDeg(); }
+	void   setTelDec_deg( double iTelDec_deg ) { fTelDec = iTelDec_deg*TMath::DegToRad(); }
+	void   setTelRA_deg( double iTelRA_deg )   { fTelRA  = iTelRA_deg*TMath::DegToRad(); }
         void   setTelAzimuth( double iTelAz )      { fTelAzimuth = iTelAz; }           //!< set telescope azimuth (e.g.for MC)
         void   setTelElevation( double iTelEl )    { fTelElevation = iTelEl; }         //!< set telescope elevation (e.g. for MC)
         void   setWobbleOffset( double iWobbleNorth, double iWobbleEast, int iTelID, int iMJD );
