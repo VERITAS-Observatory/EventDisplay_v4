@@ -53,7 +53,7 @@ LISTAD=`basename $ODIR`
 echo "LISTAD $LISTAD"
 
 # get list of runs
-NRUNS=`cat $TLIST | wc -l `
+NRUNS=`cat $TLIST | grep -v "VERSION" | wc -l `
 echo "total number of runs to analyse: $NRUNS"
 
 # loop over all runs
