@@ -1262,6 +1262,7 @@ void VStereoAnalysis::defineAstroSource()
 // precess target to current epoch
 	VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec);
 // setting telescope coordinates (in current epoch)
+// (ignore pointing errors here (very small impact))
 	fAstro.back()->setTelDec_deg( i_dec * TMath::RadToDeg() + i_decDiff );
 	fAstro.back()->setTelRA_deg( i_ra * TMath::RadToDeg() + i_raDiff + i_off * TMath::RadToDeg() );
 // set observatory position

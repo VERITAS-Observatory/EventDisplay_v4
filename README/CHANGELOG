@@ -1,6 +1,12 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130118 (GM) added new error calculation for double pass time gradient fit
+                (switch on with -nodb2005)
+
+* 20130118 (GM) introduced clearer cut variable for emission height cut
+                allowed names are now: emissionheight and arrayemission
+
 * 20130117 (GM) fixed FOV calculation in converter for CTA simulations
 
 * 20130117 (AMc, GM) correlation cleaning added
