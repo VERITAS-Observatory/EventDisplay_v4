@@ -1729,9 +1729,9 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
        fconfig = "";
        freplace = "REPLACE_";
 
-       if( fRun[j] < 49000 )                         fepoch += "V4_";
-       else if( fRun[j] > 49000 && fRun[j] < 69000 ) fepoch += "V5_";
-       else if( fRun[j] > 69000 ) 		     fepoch += "V6_";
+       if( fRun[j] < 46642 )                         fepoch += "V4_";
+       else if( fRun[j] > 46641 && fRun[j] < 63373 ) fepoch += "V5_";
+       else if( fRun[j] > 63372 ) 		     fepoch += "V6_";
 
        if(fRunConfigMask[j]==15)        fconfig = "1234";
        else if(fRunConfigMask[j]==7)    fconfig = "123";
