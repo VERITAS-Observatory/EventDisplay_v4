@@ -374,7 +374,7 @@ void VEvndispRunParameter::print( int iEv )
         {
 	    cout << "double pass cleaning ";
 	    if( fDynamicIntegrationWindow ) cout << " (dynamical integration window) ";
-	    cout << " (errors: ";
+	    cout << " (uncertainties: ";
 	    if( fDoublePassErrorWeighting2005 ) cout << "2005) ";
 	    else                                cout << "2013) ";
             cout << " (low gain window shift: ";
