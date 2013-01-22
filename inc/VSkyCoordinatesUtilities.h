@@ -21,7 +21,7 @@ namespace VSkyCoordinatesUtilities
 {
    double addToMeanAzimuth( double iMean, double iAz );                   // mean azimuth calculation
    double adjustAzimuthToRange( double );
-   double angularDistance( double Az1_rad, double Ze1_rad, double Az2_rad, double Ze1_rad );
+   double angularDistance( double Az1_rad, double Ze1_rad, double Az2_rad, double Ze2_rad );
    void   convert_derotatedCoordinates_to_J2000( double iMJD, double i_RA_J2000_deg, double i_DEC_J2000_deg, double &x, double &y );
    void   getDifferenceInCameraCoordinates( double tel_ze, double tel_az, double shower_ze,  double shower_az, float &x, float &y, float &z );
    double getMJD( int i_year, int i_month, int i_day );
