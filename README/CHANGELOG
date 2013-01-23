@@ -1,6 +1,8 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130123 (GM) fixed memory leak for tzero calculation in VCalibration
+
 * 20130118 (GM) added new error calculation for double pass time gradient fit
                 (switch on with -nodb2005)
 
@@ -15,7 +17,7 @@ Change log eventdisplay analysis package
                      new keyword CORRELATIONCLEANINGPARAMETER in runparameter file
 		     updated camera display to show additional pixels
 
-* 20130117 (GM) cleanup of pointing classes in evntdisp
+* 20130117 (GM) cleanup of pointing classes in evndisp
                      introduced new class VArrayPointing to take care of all
 		     reference directions
 		     clearer variable naming to distinguish between current
