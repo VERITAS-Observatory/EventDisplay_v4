@@ -177,9 +177,10 @@ HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_PROD2
 endif
 ########################################################
-# profiler
+# profiler (gperftools)
 ########################################################
-#GLIBS        += -lprofiler
+#GLIBS        += -L/afs/ifh.de/group/cta/scratch/maierg/software/lib/lib/ -ltcmalloc
+#CXXFLAGS     += -fno-omit-frame-pointer
 
 ########################################################
 # paths
@@ -351,7 +352,7 @@ ifeq ($(VBFFLAG),-DNOVBF)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 else
 	@echo "LINKING evndisp with VBF support"
-	$(LD) $(LDFLAGS) $^ $(GLIBS) $(VBFLIBS) $(OutPutOpt) ./bin/$@
+	$(LD) $(LDFLAGS) $^ $(VBFLIBS) $(GLIBS) $(OutPutOpt) ./bin/$@
 endif
 
 
