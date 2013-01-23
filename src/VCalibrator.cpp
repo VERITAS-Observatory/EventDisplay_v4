@@ -420,7 +420,7 @@ void VCalibrator::writeAverageTZeros( bool iLowGain )
         }
         cout << "\t writing average tzeros to ";
 	cout << fTZeroOutFile[tel]->GetName() << endl;
-	cout << "\t calculated from " << fNumberTZeroEvents[t] << " event" << endl;
+	cout << "\t calculated from " << fNumberTZeroEvents[t] << " event" << endl; 
 
         fTZeroOutFile[tel]->cd();
 	if( t < htzero.size() )
@@ -431,8 +431,9 @@ void VCalibrator::writeAverageTZeros( bool iLowGain )
            }
 	   TTree *i_tree = fillCalibrationSummaryTree( t, "TZero", htzero[t] );
 	   if( i_tree ) i_tree->Write();
-        }
-    }
+        } 
+	fTZeroOutFile[tel]->Close();
+    } 
 }
 
 

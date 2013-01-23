@@ -459,12 +459,14 @@ void VEventLoop::initializeAnalyzers()
     if( fDebug ) cout << "VEventLoop::initializeAnalyzers()" << endl;
 
 // initialize the analyzers
-    if( fAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
+    if( fAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW
+                  && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
     {
         fAnalyzer->initializeDataReader();
         fAnalyzer->initOutput();
     }
-    if( fArrayAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
+    if( fArrayAnalyzer && fRunMode != R_PED && fRunMode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW 
+                       && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
     {
        fArrayAnalyzer->initializeDataReader();
        fArrayAnalyzer->initOutput();
