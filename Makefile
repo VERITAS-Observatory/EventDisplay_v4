@@ -194,27 +194,7 @@ VPATH = src:inc
 # libraries: ./lib directory
 ########################################################
 
-
-all:	evndisp \
-        printRunParameter \
-	mscw_energy \
-	anasum makeDISPTables \
-	combineDISPTables \
-	printDISPTables \
-	combineLookupTables \
-	makeEffectiveArea \
-	trainTMVAforGammaHadronSeparation \
-	trainTMVAforGammaHadronSeparation_TrainingFile \
-	VTS.calculateCrabRateFromMC \
-	VTS.calculateExposureFromDB \
-	slib \
-	makeRadialAcceptance \
-	calculateBinaryPhases \
-	VTS.calculateCrabRateFromMC \
-	VTS.calculateExposureFromDB \
-	CTA.convert_hessio_to_VDST
-
-VTS:	evndisp \
+all VTS:	evndisp \
         printRunParameter \
 	mscw_energy \
 	anasum makeDISPTables \
@@ -1307,4 +1287,4 @@ clean:
 	-rm -f ./obj/*.o ./obj/*_Dict.cpp ./obj/*_Dict.h 
 ###############################################################################################################################
 
-.PHONY: all clean install FORCEDISTDIR dist TESTHESSIO TESTFITS config
+.PHONY: all clean install FORCEDISTDIR dist TESTHESSIO TESTFITS configuration
