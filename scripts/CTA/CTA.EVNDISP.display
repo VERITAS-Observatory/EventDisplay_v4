@@ -13,9 +13,11 @@
 # evndisp reconstruction runparamter
 #ACUT="EVNDISP.reconstruction.runparameter.d20120317.trigsim"
 ACUT="EVNDISP.reconstruction.runparameter"
+ACUT="EVNDISP.prod2.reconstruction.runparameter"
 # run options
 # OPT="-display=1 -useFixedThresholds -reconstructionparameter $ACUT -traceanalysis=0"
 OPT="-highres -display=1 -ignoredstgains -reconstructionparameter $ACUT"
+OPT="-display=1 -ignoredstgains -reconstructionparameter $ACUT"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################
@@ -52,6 +54,8 @@ then
     echo "no EVNDISPSYS env variable defined"
     exit
 fi
+# make sure the CTA variables are set
+source $EVNDISPSYS/setObservatory.sh CTA
 
 # telescope to analyze
 if [ $1 != "-1" ]
@@ -80,6 +84,7 @@ fi
 #########################
 
 echo "$EVNDISPSYS/bin/evndisp $OPT"
-$EVNDISPSYS/bin/evndisp $OPT 
+# $EVNDISPSYS/bin/evndisp $OPT 
+ /afs/ifh.de/group/cta/scratch/maierg/EVNDISP/EVNDISP-400.DEV/trunk/bin/evndisp $OPT 
 
 exit
