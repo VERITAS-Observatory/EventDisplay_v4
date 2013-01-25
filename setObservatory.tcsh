@@ -63,7 +63,11 @@ endif
 if( $OBSERVATORY == "CTA" ) then
   echo "setting observatory to CTA"
 
-  setenv OBS_EVNDISP_ANA_DIR $CTA_EVNDISP_ANA_DIR
+  if ( ! ($?CTA_EVNDISP_AUX_DIR) ) then
+     setenv OBS_EVNDISP_ANA_DIR $CTA_EVNDISP_ANA_DIR
+  else
+     setenv OBS_EVNDISP_ANA_DIR $CTA_EVNDISP_AUX_DIR
+  endif
   setenv OBS_DATA_DIR $CTA_DATA_DIR
   setenv OBS_USER_DATA_DIR $CTA_USER_DATA_DIR
   setenv OBS_USER_LOG_DIR $CTA_USER_LOG_DIR
