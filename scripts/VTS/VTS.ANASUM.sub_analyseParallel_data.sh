@@ -53,11 +53,12 @@ LISTAD=`basename $ODIR`
 echo "LISTAD $LISTAD"
 
 # get list of runs
+NLINES=`cat $TLIST |  wc -l `
 NRUNS=`cat $TLIST | grep -v "VERSION" | wc -l `
 echo "total number of runs to analyse: $NRUNS"
 
 # loop over all runs
-for ((i=1; i <= $NRUNS; i++))
+for ((i=1; i <= $NLINES; i++))
 do
     LIN=`head -n $i $TLIST | tail -n 1`
     RUN=`head -n $i $TLIST | tail -n 1 | awk '{print $2}'`
