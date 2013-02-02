@@ -2585,7 +2585,8 @@ bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, 
 }
 
 bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F* iBGRate, TH1F* iBGRateSqDeg,
-                                                        TH1F* iProtonRate,  TH1F* iElectronRate )
+                                                        TH1F* iProtonRate,  TH1F* iElectronRate,
+							bool iHighEnergyFilling )
 {
     double x = 0.;
     double y = 0.;
@@ -2593,6 +2594,8 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
     {
        fillSensitivityHistogramfromGraph( gSensitivityvsEnergy, iSensitivity, 1. );
     }
+// make sure the high-energy filling only is done when sensitivities are filled
+    else iHighEnergyFilling = false;
     if( iBGRate && gBGRate )
     {
        fillSensitivityHistogramfromGraph( gBGRate, iBGRate, 1./60. );
@@ -2623,6 +2626,39 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
        fillSensitivityHistogramfromGraph( gElectronRate, iElectronRate, 1./60. );
     }
 
+// go again over the high energy part of the sensitivity curve and check conditions for sensitivity:
+// is signal number critera fullfilled early enough so that it can be used?
+    if( iHighEnergyFilling )
+    {
+       double x = 0.;
+       double y = 0.;
+       int i_x = 0;
+       bool iFillBins = false;
+       map< int, double >::const_iterator itx;
+       for( itx = fMinEventsLimited.begin(); itx != fMinEventsLimited.end(); itx++ )
+       {
+           x = (double((*itx).first))/1.e3;
+	   y = ((*itx).second);
+	   i_x = iSensitivity->FindBin( x );
+           if( x > 0. && iSensitivity->GetBinContent( i_x ) > 0. )
+	   {
+	       if( iSensitivity->GetBinError( i_x ) == 0. 
+	        || iSensitivity->GetBinError( i_x ) / iSensitivity->GetBinContent( i_x ) < 0.25 )
+	       {
+		  if( TMath::Abs( iSensitivity->GetBinContent( i_x ) - iSensitivity->GetBinError( i_x ) - y ) / y < 0.10 )
+		  {
+		      iFillBins = true;
+                  }
+               }
+           }
+	   if( iFillBins )
+	   {
+	      iSensitivity->SetBinContent( i_x, y );
+	      cout << "Filling HE (signal counts): " << x << "\t" << y << "\t" << i_x << endl;
+           }
+       }
+
+    }
     return true;
 }
 

@@ -1,6 +1,13 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130202 (GM) added smarter handling of signal-limited regions of
+                sensitivity curves
+
+* 20130202 (GM) added pedvar calculation for prod2 CTA events
+
+* 20130202 (GM) fixed reading of effective areas for certain CTA WP Phys files
+
 * 20130202 (GM) fixed bug in dead-time calculation, which affects only very
                 short runs (few minutes)
 

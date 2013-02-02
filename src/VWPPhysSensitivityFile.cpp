@@ -516,8 +516,9 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
                               i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron, -10., 10., "CU" );
     }
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
-    i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
+    i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate, true );
     if( iFill1D ) i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
+    i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
 
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
     i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );

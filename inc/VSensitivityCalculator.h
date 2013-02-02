@@ -228,7 +228,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double   calculateObservationTimevsFlux( unsigned int iD );
 	bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 	bool     fillSensitivityHistograms( TH1F* iSensitivity = 0, TH1F* iBGRate = 0, TH1F* iBGRateSqDeg = 0, 
-	                                    TH1F* iProtonRate = 0,  TH1F* iElectronRate = 0 );
+	                                    TH1F* iProtonRate = 0,  TH1F* iElectronRate = 0, bool iHE = false );
         bool     fillSensitivityLimitsHistograms( vector<TH1F*>& h );
 	bool     getDebug() { return fDebug; }
         double   getSensitivity( unsigned int iD, double energy = -1., unsigned int iFillStatistics = 0 );

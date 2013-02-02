@@ -1,7 +1,9 @@
 /* \file writeCTAWPPhysSensitivityFiles write CTA WP Phys sensitivity files
 
-   simple root files with histograms for sensitivities, effective areas,
+   write a simple root files with histograms for sensitivities, effective areas,
    angular and energy resolution, migration matrix, etc.
+
+   follow here CTA WP Phys standards 
 
 */
 
@@ -39,12 +41,12 @@ int main( int argc, char *argv[] )
     if( fWriteOffsetFiles )
     {
        iWobbleMin.push_back( 0.0 ); iWobbleMax.push_back( 1. );
-       iWobbleMin.push_back( 1.0 ); iWobbleMax.push_back( 2.0 );
-       iWobbleMin.push_back( 2.0 ); iWobbleMax.push_back( 3.0 );
+       iWobbleMin.push_back( 1.0 ); iWobbleMax.push_back( 2.0 ); 
+       iWobbleMin.push_back( 2.0 ); iWobbleMax.push_back( 3.0 ); 
        iWobbleMin.push_back( 3.0 ); iWobbleMax.push_back( 3.5 );
        iWobbleMin.push_back( 3.5 ); iWobbleMax.push_back( 4.0 );
        iWobbleMin.push_back( 4.0 ); iWobbleMax.push_back( 4.5 );
-       iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 ); 
+       iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 );  
 //       iWobbleMin.push_back( 5.0 ); iWobbleMax.push_back( 5.5 ); 
 //       iWobbleMin.push_back( 5.5 ); iWobbleMax.push_back( 6.0 );
     }
@@ -65,7 +67,7 @@ int main( int argc, char *argv[] )
     if( !iData->fillHistograms1D( fDataDirectory, true ) )
     {
        cout << "error filling on source histograms" << endl;
-    }  
+    }   
 
 // off source histograms
     for( unsigned int i = 0; i < iWobbleMin.size(); i++ )
