@@ -87,10 +87,10 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     tpars->Branch( "meanPedvar_Image", &fmeanPedvar_Image, "meanPedvar_Image/F" );
     tpars->Branch("cen_x", &cen_x, "cen_x/F");
     tpars->Branch("cen_y", &cen_y, "cen_y/F");
-    tpars->Branch("cen_x_trig", &cen_x_trig, "cen_x_trig/F");
-    tpars->Branch("cen_y_trig", &cen_y_trig, "cen_y_trig/F");
     if( fShortTree < 1 )
     {
+       tpars->Branch("cen_x_trig", &cen_x_trig, "cen_x_trig/F");
+       tpars->Branch("cen_y_trig", &cen_y_trig, "cen_y_trig/F");
        tpars->Branch("cen_x2_trig", &cen_x2_trig, "cen_x2_trig/F");
        tpars->Branch("cen_y2_trig", &cen_y2_trig, "cen_y2_trig/F");
     }

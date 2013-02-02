@@ -330,7 +330,7 @@ void VImageAnalyzer::terminate()
         TTree *iT = makeDeadChannelTree();
         if( iT ) iT->Write();
 // write histograms
-        getAnaHistos()->terminate( fOutputfile );
+        if( !isMC() ) getAnaHistos()->terminate( fOutputfile );
 // write calibration summaries
         if( getRunParameter()->fsourcetype != 7 ) getCalibrationData()->terminate( getDead( false ), getDead( true ) );
 // write pointing data from db to disk (if available)
