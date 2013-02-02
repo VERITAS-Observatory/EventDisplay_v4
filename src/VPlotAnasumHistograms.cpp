@@ -577,7 +577,6 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
 
     sprintf(hname, "htheta2_diff");
     htheta2_diff = (TH1D*)getHistogram( hname, fRunNumber, "stereoParameterHistograms" );
-    setHistogramPlottingStyle( htheta2_diff, 1, 2, 1, 1, irbin, 1001 );
     sprintf(hname, "htheta2_on");
     htheta2_on = (TH1D*)getHistogram( hname, fRunNumber, "stereoParameterHistograms" );
     setHistogramPlottingStyle( htheta2_on, 1, 2, 1, 1, irbin, 0 );
@@ -613,17 +612,7 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
        htheta2_off->Draw( "hist e" );
        htheta2_on->Draw( "hist e same" );
               
-       c_t2->cd(2);
-       htheta2_diff->SetFillColor( 8 );
-       htheta2_diff->SetXTitle( "#Theta^{2} [deg^{2}]" );
-       htheta2_diff->SetTitle( "" );
-       sprintf( hname, "Number of events / %.3f deg^{2}", htheta2_diff->GetXaxis()->GetBinWidth( 2 ) );
-       htheta2_diff->SetYTitle( hname );
-       htheta2_diff->GetYaxis()->SetTitleOffset( 1.4 );
-       htheta2_diff->SetAxisRange( t2min, t2max );
-       htheta2_diff->Draw( "hist e" );
-
-       // get 68% containment radius (up to theta2 = 0.15deg2)
+// get 68% containment radius (up to theta2 = 0.05deg2)
        double nt2 = 0.;
        for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.05 ); i++ ) nt2 += htheta2_diff->GetBinContent( i );
        double nt2_68 = 0.;
@@ -632,13 +621,25 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
 	 for( int i = 1; i < htheta2_diff->GetXaxis()->FindBin( 0.05 ); i++ )
 	 {
 	   nt2_68 += htheta2_diff->GetBinContent( i );
-	   if( nt2_68/nt2 > 0.39 )
+	   if( nt2_68/nt2 > 0.68 )
 	   {
-	     cout << "Theta2 containment radius (68%): " << htheta2_diff->GetXaxis()->GetBinLowEdge( i ) << " deg2" << endl;
+	     cout << "Theta2 containment radius (68%, binning dependend): " << htheta2_diff->GetXaxis()->GetBinLowEdge( i ) << " deg2" << endl;
 	     break;
 	   }
          }
        }
+
+       c_t2->cd(2);
+       htheta2_diff->SetFillColor( 8 );
+       htheta2_diff->SetXTitle( "#Theta^{2} [deg^{2}]" );
+       htheta2_diff->SetTitle( "" );
+       sprintf( hname, "Number of events / %.3f deg^{2}", htheta2_diff->GetXaxis()->GetBinWidth( 2 ) );
+       htheta2_diff->SetYTitle( hname );
+       htheta2_diff->GetYaxis()->SetTitleOffset( 1.4 );
+       setHistogramPlottingStyle( htheta2_diff, 1, 2, 1, 1, irbin, 1001 );
+       htheta2_diff->SetAxisRange( t2min, t2max );
+       htheta2_diff->Draw( "hist e" );
+
        
        if( fDebug )
        {
