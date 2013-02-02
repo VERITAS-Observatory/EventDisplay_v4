@@ -1214,7 +1214,7 @@ $(vtspara):
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.dat $(vtspara)/Calibration/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGain.dat $(vtspara)/Calibration/
 	mkdir -p $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Autumn2007_20130110.txt $(vtspara)/DetectorGeometry
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(vtspara)/DetectorGeometry
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(vtspara)/DetectorGeometry
 	mkdir -p $(vtspara)/NOISE

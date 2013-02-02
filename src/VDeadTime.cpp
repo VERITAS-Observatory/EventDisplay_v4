@@ -147,7 +147,9 @@ double VDeadTime::calculateDeadTime()
         ix = hTimeDiff->GetBinCenter( jbin );
     } */
 // go left in delta t histogram from 0.01, first 0 bin defines dead time
-    for( int i = hTimeDiff->FindBin( 0.01 ); i > 2; i-- )
+// (fails for very short runs)
+//    for( int i = hTimeDiff->FindBin( 0.01 ); i > 2; i-- )
+    for( int i = hTimeDiff->FindBin( hTimeDiff->GetMean() ); i > 2; i-- )
     {
 // require  at least three zero bins
         if( hTimeDiff->GetBinContent( i ) == 0 && hTimeDiff->GetBinContent( i - 1 ) == 0 && hTimeDiff->GetBinContent( i - 2 ) == 0 )
