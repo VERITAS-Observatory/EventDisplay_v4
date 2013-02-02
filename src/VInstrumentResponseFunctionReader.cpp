@@ -173,7 +173,11 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     if( !h ) 
     {
        h = get_CTA_IRF_Histograms( "harea_gamma", fWoff );
-       bLinX = true;
+       if( h ) bLinX = true;
+       else
+       {
+          h = get_CTA_IRF_Histograms( "EffectiveArea", fWoff );
+       }
     }
     if( h )
     {

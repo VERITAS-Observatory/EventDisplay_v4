@@ -155,7 +155,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
 
        if( !g )
        {
-          cout << "VPlotInstrumentResponseFunction::plotEffectiveArea() warning: no graph found for data set " << i << endl;
+          cout << "VPlotInstrumentResponseFunction::plotEffectiveArea() warning: no graph (" << fData[i]->fA_MC << ")";
+	  cout << " found for data set " << i << endl;
           continue;
        }
 
