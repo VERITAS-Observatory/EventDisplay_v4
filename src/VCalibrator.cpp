@@ -372,7 +372,7 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 
 	cout << "calculate average tzeros with summation window " << fRunPar->fCalibrationSumWindow;
 	cout << " (start at " << fRunPar->fCalibrationSumFirst << ")" << endl;
-	cout << "     (require at least " << fRunPar->fCalibrationIntSumMin << " per channel/event [dc])" << endl;
+	cout << "     (require at least " << fRunPar->fCalibrationIntSumMin << " [dc] per channel/event)" << endl;
 
         setCalibrated();
     }
@@ -2443,7 +2443,18 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        {
            for( unsigned int p = 0; p < nPixel; p++ )
 	   {
-	       getPedvars( false )[p] = fPedvar_high[p];
+// for CTA DSTs, take different pedestal calculation into account
+               if( fReader && fReader->getMonteCarloHeader() && fReader->getMonteCarloHeader()->detector_prog_id == 1 )
+	       {
+	          for( unsigned int s = 1; s < getPedvars(false).size(); s++ )
+		  {
+		     getPedvars( false, s )[p] = fPedvar_high[p] * (double)getNSamples();
+                  }
+               }
+	       else
+	       {
+		  getPedvars( false )[p] = fPedvar_high[p];
+               }
 	       if( getPedvarsDist() ) getPedvarsDist()->Fill( fPed_high[p] );
            }
        }
