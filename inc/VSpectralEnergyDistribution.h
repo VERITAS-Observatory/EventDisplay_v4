@@ -94,6 +94,8 @@ class VSpectralEnergyDistribution
         double fPlotting_FluxRange_min;
         double fPlotting_FluxRange_max;
 
+	TCanvas* plotCanvas( int canvas_x = 600, int canvas_y = 600 );
+
     public:
 
         VSpectralEnergyDistribution( string name = "SED" );
@@ -104,7 +106,7 @@ class VSpectralEnergyDistribution
 	double   getGalacticExtinctionCorrection( string iband );
         double   getFluxfromMagnitude( double magnitude, string band, string system = "CIT" );
         TGraph* plotModel( TCanvas *c, string ifile, int icolor = 1, int ilinestyle = 1, int ilinewidth = 2, bool isJyHz = false );
-	TF1* plotPowerLaw( TCanvas *c, string iName, double iEMin_TeV, double iEMax_TeV, 
+	TCanvas* plotPowerLaw( TCanvas *c, string iName, double iEMin_TeV, double iEMax_TeV, 
 	                   double iNorm, double iGamma, double iNormEnergy = 1.,
 			   bool bPlotButterfly = false, double iNormError = 0., double iGammaError = 0.,
 			   int iLineColor = 1, int iLineStyle = 1 );

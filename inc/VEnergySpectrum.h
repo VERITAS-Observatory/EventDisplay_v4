@@ -38,6 +38,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 
         bool  bZombie;                            //! status of files
         bool  bCombineRuns;                       //! rerun combine runs
+	bool  bAsciiDataFile;
 
         int  fTotalRun;                           // total number of runs found and used
 
@@ -104,6 +105,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void   addHistogram( TH1*h1, TH1* h2, double iEThreshold, bool bLinearX );
         void   divideEnergySpectrumbydE( TH1* h, bool blin = false );
 	int    getRebinningGrouping( TH1* h, double iNewBinWidth );
+	bool   openAsciiFile( string iFile );
         void   rebinEnergySpectrum( TH1D* h, double iER, bool bLin = false );
         void   multiplyEnergySpectrumbydE( TH1* h, bool blin = false );
 	TH1*   setVariableBinning(TH1 *a);
@@ -129,6 +131,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 	double fTotalObservationTimeDeadTimeCorrected;
         double fTotalNormalisationFactor;
 
+// initialize all variables
+        void               initializeRunVariables();
 // fill and plot energy spectrum graph
         TGraphAsymmErrors* plot_energySpectrum();
 
@@ -136,7 +140,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 /////////////////////////////////////////////////////////////////////
     public:
 
-        VEnergySpectrum( string ifile, string iname = "E", int irun = -1  );
+        VEnergySpectrum( string ifile, string iname = "E", int irun = -1, bool iSourceTypeIsAscii = false );
         ~VEnergySpectrum() {}
 
 	double    calculateIntegralFluxFromFitFunction( double iMinEnergy_TeV, double iMaxEnergy_TeV = 1.e6 );

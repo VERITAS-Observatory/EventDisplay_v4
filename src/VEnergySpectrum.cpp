@@ -11,25 +11,45 @@
 
 #include "VEnergySpectrum.h"
 
-VEnergySpectrum::VEnergySpectrum( string ifile, string iname, int irun  )
+VEnergySpectrum::VEnergySpectrum( string iFile, string iname, int irun, bool iSourceTypeIsAscii  )
 {
     fDebug = 0;
+    bAsciiDataFile = iSourceTypeIsAscii;
+
+    fDataSetName = iname;
+    fTotalRun = irun;
+
+    initializeRunVariables();
+
+// open anasum file 
+    if( !bAsciiDataFile )
+    {
+       if( !openFile( iFile, fTotalRun ) )
+       {
+	   bZombie = true;
+	   return;
+       }
+    }
+    else
+    {
+       if( !openAsciiFile( iFile ) )
+       {
+	   bZombie = true;
+	   return;
+       }
+    }
+}
+
+
+void VEnergySpectrum::initializeRunVariables()
+{
 
     nRebinner = 0;
     bUseRebinner = false;
 
     bCombineRuns = false;
 
-    fDataSetName = iname;
-    fTotalRun = irun;
-
     bZombie = false;
-// open anasum file 
-    if( !openFile( ifile, fTotalRun ) )
-    {
-        bZombie = true;
-        return;
-    }
 
     hErec = 0;
     hErecCountsOn = 0;
@@ -118,6 +138,64 @@ bool VEnergySpectrum::combineRuns()
 {
     vector< int > i_temp;
     return combineRuns( i_temp );
+}
+
+/*
+
+   read differential flux point from an ascii file
+
+*/
+
+bool VEnergySpectrum::openAsciiFile( string iFile )
+{
+// assume that upper and lower errors are given
+    fErrorCalculationMethod = "UPDOWN";
+
+// open ascii file
+    ifstream is;
+    is.open( iFile.c_str(), ifstream::in );
+    if( !is )
+    {
+        cout << "VEnergySpectrum::openAsciiFile:: error reading data from " << iFile << endl;
+        return false;
+    }
+    string is_line;
+    while(  getline( is, is_line ) )
+    {
+        if(  is_line.size() <= 0 ) continue;
+// comment
+        if( is_line.substr( 0, 1 ) == "*" ) continue;
+
+// new data vector
+        VDifferentialFlux i_flux;
+
+        istringstream is_stream( is_line );
+
+	is_stream >> i_flux.Energy;
+	i_flux.EnergyWeightedMean = i_flux.Energy;
+	is_stream >> i_flux.DifferentialFlux;
+	is_stream >> i_flux.DifferentialFluxError_low;
+	if( i_flux.DifferentialFluxError_low > 0. ) i_flux.DifferentialFluxError_low = i_flux.DifferentialFlux - i_flux.DifferentialFluxError_low;
+	is_stream >> i_flux.DifferentialFluxError_up;
+	if( i_flux.DifferentialFluxError_up > 0. ) i_flux.DifferentialFluxError_up = i_flux.DifferentialFluxError_up - i_flux.DifferentialFlux;
+
+	if( i_flux.DifferentialFluxError_low > 0. && i_flux.DifferentialFluxError_low > 0. )
+	{
+	   i_flux.DifferentialFluxError = sqrt( i_flux.DifferentialFluxError_low*i_flux.DifferentialFluxError_low
+					      + i_flux.DifferentialFluxError_up*i_flux.DifferentialFluxError_up );
+        }
+	else
+	{
+	   i_flux.DifferentialFluxError = -99.;
+        } 
+
+// add this bin to data vector
+	fDifferentialFlux.push_back( i_flux );
+
+    }
+    is.close();
+
+    return true;
 }
 
 /*
@@ -632,6 +710,7 @@ void VEnergySpectrum::rebinEnergySpectrum( TH1D* h, double iER, bool bLinearX )
 */
 void VEnergySpectrum::calculateDifferentialFluxes()
 {
+    if( bAsciiDataFile ) return;
     if( !hErec || isZombie() ) return;
     if( fDebug == 1 ) cout << "VEnergySpectrum::calculateDifferentialFluxes() " << hErec->GetNbinsX() << endl;
 
@@ -1010,7 +1089,7 @@ TGraphAsymmErrors* VEnergySpectrum::plot_energySpectrum()
                 TArrow *fUL = new TArrow( i_energy, i_flux, i_energy, i_flux*0.25, 0.03, "|-|>" );
                 fUL->SetLineColor( fPlottingColor );
                 fUL->SetFillColor( fPlottingColor );
-                fUL->SetLineWidth( 2 );
+                fUL->SetLineWidth( 1 );
                 fUL->Draw();
             }
         }
@@ -1029,7 +1108,7 @@ TGraphAsymmErrors* VEnergySpectrum::plot_energySpectrum()
 
 /*
 
-   fill graph with differential flux points (ignoring points which will be upper limits
+   fill graph with differential flux points (ignoring points which will be upper limits)
 
 */
 TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
@@ -1060,7 +1139,7 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
            gEnergySpectrum->SetPointEYhigh( z, fDifferentialFlux[i].DifferentialFluxError * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
 	   gEnergySpectrum->SetPointEYlow( z, fDifferentialFlux[i].DifferentialFluxError * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
         }
-	else if( fErrorCalculationMethod == "Rolke" )
+	else if( fErrorCalculationMethod == "Rolke" || fErrorCalculationMethod == "UPDOWN" )
 	{
 	   gEnergySpectrum->SetPointEYhigh( z, fDifferentialFlux[i].DifferentialFluxError_up * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
 	   gEnergySpectrum->SetPointEYlow( z, fDifferentialFlux[i].DifferentialFluxError_low * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );

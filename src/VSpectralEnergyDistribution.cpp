@@ -1035,6 +1035,30 @@ double VSpectralEnergyDistribution::getFluxfromMagnitude( double magnitude, stri
     return f_vu;
 }
 
+TCanvas* VSpectralEnergyDistribution::plotCanvas( int canvas_x, int canvas_y )
+{
+    char hname[800];
+    sprintf( hname, "c_%s", fName.c_str() );
+
+    TCanvas* cSP = new TCanvas( hname, fName.c_str(), 10, 10, canvas_x, canvas_y );
+    cSP->SetGridx( 0 );
+    cSP->SetGridy( 0 );
+    cSP->SetLogy( 1 );
+    if( canvas_x <= 600 ) cSP->SetLeftMargin( 0.15 );
+    cSP->Draw();
+
+    sprintf( hname, "h_%s", fName.c_str() );
+    TH1D *hnull = new TH1D( hname, "", 100, log10( fPlotting_EnergyRange_min_Hz ), log10( fPlotting_EnergyRange_max_Hz ) );
+    hnull->SetStats( 0 );
+    hnull->SetXTitle( "log_{10} #nu [Hz]" );
+    hnull->SetYTitle( "#nu F_{#nu} [erg s^{-1} cm^{-2}]" );
+    hnull->SetMinimum( fPlotting_FluxRange_min );
+    hnull->SetMaximum( fPlotting_FluxRange_max );
+    if( canvas_x <= 600 ) hnull->GetYaxis()->SetTitleOffset( 1.6 );
+    hnull->Draw();
+
+    return cSP;
+}
 
 /*
     plot all data into one SED
@@ -1044,27 +1068,11 @@ double VSpectralEnergyDistribution::getFluxfromMagnitude( double magnitude, stri
 */
 TCanvas* VSpectralEnergyDistribution::plot( TCanvas *c, int bLegend, int canvas_x, int canvas_y, bool bPlotErrorX, bool bPlotName )
 {
-    char hname[800];
-    sprintf( hname, "c_%s", fName.c_str() );
+
     TCanvas *cSP = c;
     if( cSP == 0 )
     {
-        cSP = new TCanvas( hname, fName.c_str(), 10, 10, canvas_x, canvas_y );
-        cSP->SetGridx( 0 );
-        cSP->SetGridy( 0 );
-        cSP->SetLogy( 1 );
-        if( canvas_x <= 600 ) cSP->SetLeftMargin( 0.15 );
-        cSP->Draw();
-
-        sprintf( hname, "h_%s", fName.c_str() );
-        TH1D *hnull = new TH1D( hname, "", 100, log10( fPlotting_EnergyRange_min_Hz ), log10( fPlotting_EnergyRange_max_Hz ) );
-        hnull->SetStats( 0 );
-        hnull->SetXTitle( "log_{10} #nu [Hz]" );
-	hnull->SetYTitle( "#nu F_{#nu} [erg s^{-1} cm^{-2}]" );
-        hnull->SetMinimum( fPlotting_FluxRange_min );
-        hnull->SetMaximum( fPlotting_FluxRange_max );
-        if( canvas_x <= 600 ) hnull->GetYaxis()->SetTitleOffset( 1.6 );
-        hnull->Draw();
+        cSP = plotCanvas( canvas_x, canvas_y );
     }
     TLegend *iL = 0;
     if( bLegend == 1 ) iL = new TLegend( 0.75, 0.75, 0.95, 0.95 );
@@ -1256,13 +1264,17 @@ TGraph* VSpectralEnergyDistribution::plotModel( TCanvas *c, string ifile, int ic
    (differential flux in photons / m^2 / s / TeV)
 
 */
-TF1* VSpectralEnergyDistribution::plotPowerLaw( TCanvas *c, string iName, double iEMin_TeV, double iEMax_TeV, 
+TCanvas* VSpectralEnergyDistribution::plotPowerLaw( TCanvas *c, string iName, double iEMin_TeV, double iEMax_TeV, 
                                                 double iNorm, double iGamma, double iNormEnergy_TeV, 
 						bool bPlotButterfly, double iNormError, double iGammaError,
 						int iLineColor, int iLineStyle )
 {
-   if( !c ) return 0;
-   c->cd();
+   TCanvas *cSP = c;
+   if( cSP == 0 )
+   {
+      cSP = plotCanvas();   
+   }
+   cSP->cd();
 
    VDifferentialFlux i_c;
 
@@ -1317,5 +1329,5 @@ TF1* VSpectralEnergyDistribution::plotPowerLaw( TCanvas *c, string iName, double
        g->Print();
    }
 
-   return f;
+   return cSP;
 }
