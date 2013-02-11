@@ -810,7 +810,7 @@ int VEventLoop::analyzeEvent()
     int i_cutTemp = 0;
 
 // short cut for dst writing
-    if( fRunMode == R_DST )
+    if( fRunMode == R_DST && fDST )
     {
         fDST->fill();
         return 1;
