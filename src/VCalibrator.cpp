@@ -378,7 +378,7 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
     }
     fillHiLo();
 
-    findDeadChans( iLowGain );
+    findDeadChans( iLowGain, (fNumberTZeroEvents[fTelID] == 0) );
 
 // calculate sums and tzeros
     calcSums(   fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst+fRunPar->fCalibrationSumWindow, false );
@@ -403,6 +403,7 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 	  }
       }
     }
+
 }
 
 void VCalibrator::writeAverageTZeros( bool iLowGain )

@@ -172,8 +172,8 @@ bool VGlobalRunParameter::setDirectories()
     if( raw_dir )
     {
        fVBFRawDataDirectory = raw_dir;
-// test if data directory exists
-       if( !gSystem->AccessPathName( (fVBFRawDataDirectory + "/data/").c_str() ) ) fVBFRawDataDirectory += "/data/";
+// test if data directory exists 
+//       if( !gSystem->AccessPathName( (fVBFRawDataDirectory + "/data/").c_str() ) ) fVBFRawDataDirectory += "/data/";
 
     }
     else

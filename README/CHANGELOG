@@ -1,6 +1,14 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130209 (GM) fixed printing of warnings of dead channels for tzero calculation
+                run
+
+* 20130209 (GM) allow VTS data to be in $VERITAS_DATA_DIR/dJJMMDD
+                (old default still allowed: $VERITAS_DATA_DIR/data/dJJMMDD)
+
+* 20130202 (GM) stopped writing unnecessary histograms to outputfile for MC
+
 * 20130202 (GM) added smarter handling of signal-limited regions of
                 sensitivity curves
 

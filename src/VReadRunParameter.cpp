@@ -951,6 +951,10 @@ void VReadRunParameter::test_and_adjustParams()
 	       if( fRunPara->getDirectory_VBFRawData().size() > 0 )
 	       {
 		  sprintf( iname, "%s/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
+		  if( gSystem->AccessPathName( iname ) )
+		  {
+		     sprintf( iname, "%s/data/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
+                  }
 	       }
 	       else
 	       {
