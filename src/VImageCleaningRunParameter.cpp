@@ -40,7 +40,7 @@ void VImageCleaningRunParameter::print()
     cout << "\t cleaning method \t \t" << getImageCleaningMethod() << " (" << getImageCleaningMethodIndex() << ")" << endl;
     cout << "\t image/border\t" << fimagethresh << "/" << fborderthresh;
     if( fUseFixedThresholds ) cout << " (fixed cleaning thresholds)" << endl;
-    else                      cout << " (signal-to-noise cleaning thesholds)" << endl;
+    else                      cout << " (signal-to-noise cleaning thresholds)" << endl;
     if( getImageCleaningMethodIndex() == 1 ) 
     {
 	cout << "\t Tpixel/Tcluster/nMin/nLoops \t" << ftimecutpixel << "/" << ftimecutcluster 
