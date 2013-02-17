@@ -237,7 +237,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 	   if( i < fReader->getMaxChannels() )
 	   {
 	       i_channelHitID = fReader->getHitID(i);
-	       if( !getZeroSuppressed()[i_channelHitID] )
+	       if( i_channelHitID < getZeroSuppressed().size() && !getZeroSuppressed()[i_channelHitID] )
 	       {
 		  fReader->selectHitChan((uint32_t)i);
 		  if( i_channelHitID < getPeds().size() )
