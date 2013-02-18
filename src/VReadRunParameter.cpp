@@ -145,6 +145,11 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
                 i++;
             }
         }
+// for pedestal calculation: write results into a single root file
+        else if( iTemp.find( "singlepedestalrootfile" ) < iTemp.size() )
+        {
+	    fRunPara->fPedestalSingleRootFile = (bool)atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }
 // user name
         else if( iTemp.find( "user" ) < iTemp.size() )
         {
@@ -249,15 +254,20 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fdstminntubes = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-// calculate pedestal variations on a short time scale for tracking tests
+// calculate pedestal variations on a short time scale 
         else if( iTemp.find( "pedestalsintimeslices" ) < iTemp.size() && !(iTemp.find( "pedestalsintimeslicessumwindow" ) < iTemp.size() ) 
 	    && !(iTemp.find( "pedestalsintimeslicessumfirst" ) < iTemp.size() )
 	    && !( iTemp.find( "usepedestalsintimeslices" ) < iTemp.size() )
-	    && !(iTemp.find( "usepedestalsintimesliceslowgain" ) < iTemp.size() ) )
+	    && !(iTemp.find( "usepedestalsintimesliceslowgain" ) < iTemp.size() ) 
+	    && !(iTemp.find( "nopedestalsintimeslices" ) < iTemp.size() ) )
         {
             fRunPara->fPedestalsInTimeSlices = true;
             fRunPara->fUsePedestalsInTimeSlices = true;
             fRunPara->fLowGainUsePedestalsInTimeSlices = true;
+        }
+	else if( iTemp.find( "nopedestalsintimeslices" ) < iTemp.size() )
+	{
+	    fRunPara->fPedestalsInTimeSlices = false;
         }
         else if( iTemp.find( "usepedestalsintimeslices" ) < iTemp.size() && !(iTemp.find( "usepedestalsintimesliceslowgain" ) < iTemp.size() ) )
         {

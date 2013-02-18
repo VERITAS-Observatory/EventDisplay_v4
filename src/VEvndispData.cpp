@@ -36,7 +36,7 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
     {
         if( getRunParameter()->fdisplaymode )
         {
-            cout << "Error: maximum number of telescopes allowed: " << ib.size() << endl;
+            cout << "Error: maximum number of telescopes allowed in display mode: " << ib.size() << endl;
             cout << "exiting..." << endl;
             exit( 0 );
         }
@@ -58,7 +58,7 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
     vector< int > itemp;
     itemp.assign( fNTel+1, 0 );
     fTriggeredTel.assign( fNTel, itemp );
-    fTriggeredTelN.assign( fNTel+1, 0 );
+    fTriggeredTelN.assign( getTeltoAna().size()+1, 0 );
 
 // analysis event status
     fAnalysisArrayEventStatus = 0;
@@ -375,20 +375,24 @@ void VEvndispData::endOfRunInfo()
     cout << endl;
     cout << "Event statistics:" << endl;
     cout << "-----------------" << endl;
-    cout << "\t Multiplicity:  | ";
-    for( unsigned int i = 0; i < fTriggeredTel[0].size(); i++ ) cout << i << "\t";
-    cout << endl;
-    cout << "\t ----------------------------------------------" << endl;
-    for( unsigned int i = 0; i < fTriggeredTel.size(); i++ )
+// print this only for a small number of telescopes
+    if( fTriggeredTel.size() < 10 )
     {
-        cout << "\t Telescope   " << i+1 << ": | ";
-        for( unsigned int j = 0; j < fTriggeredTel[i].size(); j++ )
-        {
-            cout << fTriggeredTel[i][j] << "\t";
-        }
-        cout << endl;
+       cout << "\t Multiplicity:  | ";
+       for( unsigned int i = 0; i < fTriggeredTel[0].size(); i++ ) cout << i << "\t";
+       cout << endl;
+       cout << "\t ----------------------------------------------" << endl;
+       for( unsigned int i = 0; i < fTriggeredTel.size(); i++ )
+       {
+	   cout << "\t Telescope   " << i+1 << ": | ";
+	   for( unsigned int j = 0; j < fTriggeredTel[i].size(); j++ )
+	   {
+	       cout << fTriggeredTel[i][j] << "\t";
+	   }
+	   cout << endl;
+       }
+       cout << endl;
     }
-    cout << endl;
     for( unsigned int i = 0; i < fTriggeredTelN.size(); i++ )
     {
         cout << "\t number of " << i << "-fold events: " << fTriggeredTelN[i] << endl;
@@ -722,6 +726,19 @@ bool VEvndispData::setAverageTZerovars( unsigned int iChannel, double iTZero, bo
     }
     return true;
 }
+
+ULong64_t VEvndispData::getTelType( unsigned int iTelID )
+{
+    if( getDetectorGeometry() )
+    {
+        if( iTelID < getDetectorGeometry()->getTelType().size() )
+	{
+	    return getDetectorGeometry()->getTelType()[iTelID];
+        }
+    }
+    return 99999;
+}
+
 
 bool VEvndispData::fDebug = false;
 int VEvndispData::fDebugLevel = 0;

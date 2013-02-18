@@ -20,6 +20,8 @@ VCalibrator::VCalibrator()
     opftoff = 0;
 
     fCalibrationfileVersion = 1;
+
+    fPedSingleOutFile = 0;
 }
 
 
@@ -32,81 +34,111 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 {
     if( getDebugFlag() ) cout << "void VCalibrator::calculatePedestals()" << endl;
 
-    string ioutfile;
-    char ic[800];
-// init histograms etc (only done before first event)
-    if( fReader->getMaxChannels() && hped_vec.size() == 0 )
+// get telescope type
+    ULong64_t iTelType = 0;
+    if( getTelID() < getDetectorGeometry()->getTelType().size() ) iTelType = getDetectorGeometry()->getTelType()[getTelID()];
+    else
     {
-// create histograms and  root output file for all telescopes
-        if( hped_vec.size() == 0 )
-        {
-// create histogram, one for each telescope, channel and sumwindow
-// loop over all telescopes
-            int telID = 0;
-            for( unsigned int t = 0; t < getNTel(); t++ )
-            {
-                telID = t+1;
-                vector< vector<TH1F* > > iped_vec;
+        cout << "VCalibrator::calculatePedestals: error: invalid telescope type : ";
+	cout << getTelID() << "\t" << getDetectorGeometry()->getTelType().size() << endl;
+	exit( -1 );
+    }
+//////////////////////////////////////////////////////////////////////////////
+// first call (first event?): define histograms and output files for pedestals
+    if( !getCalibrated() )
+    {
+       string ioutfile;
+       char ic[800];
+       if( getDebugFlag() )
+       {
+          cout << "\t void VCalibrator::calculatePedestals(): creating histograms and files:";
+	  cout << " tel " << getTelID()+1 << ", type " << iTelType << endl;
+       }
+// init histograms etc (only done before first event)
+       if( fReader->getMaxChannels() )
+       {
+//          if( hped_vec.find( iTelType ) == hped_vec.end() && ! )
+	  {
 // loop over all sumwindows
-                for( int i = 0; i < getRunParameter()->fCalibrationSumWindow; i++ )
-                {
-                    vector<TH1F* > ihped;
+	     for( unsigned int i = 0; i < hped_vec[iTelType].size(); i++ )
+	     {
 // loop over all channels
-                    for( unsigned int j = 0; j < getNChannels(); j++ )
-                    {
-                        char pedkey[100];
-                        sprintf(pedkey,"hped_%d_%d_%d",t,i+1,j);
-                        double min=0.;
-                        double max=50.*((double)i+1.);
-                        sprintf( ic, "ped distribution (tel %d, channel %d, sumwindow %d)", telID, j, i+1 );
-                        ihped.push_back( new TH1F(pedkey, ic,(int)(max-min),min,max) );
-                    }
-                    iped_vec.push_back( ihped );
-                }
-                hped_vec.push_back( iped_vec );
-            }
+		 for( unsigned int j = 0; j < hped_vec[iTelType][i].size(); j++ )
+		 {
+		     if( !hped_vec[iTelType][i][j] )
+		     {
+			char pedkey[100];
+			sprintf(pedkey, "hped_%d_%d_%d", (int)iTelType, i+1, j );
+			double min=0.;
+			double max=200.*((double)i+1.);
+			sprintf( ic, "ped distribution (tel type %d, channel %d, sumwindow %d)", (int)iTelType, j, i+1 );
+			hped_vec[iTelType][i][j] = new TH1F(pedkey, ic,(int)((max-min)/4.),min,max);
+		     }
+		 }
+	      }
+	   }
+       }
+/////////////////////////////////////////////////////////////////////////////
 // root output file = pedfilename.root
-            for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
-            {
-		unsigned int i = getTeltoAna()[tel];
-                if( !iLowGain ) ioutfile = fPedFileNameC[i] + ".root";
-                else            ioutfile = fLowGainPedFileNameC[i] + ".root";
+       if( !iLowGain ) ioutfile = fPedFileNameC[getTelID()] + ".root";
+       else            ioutfile = fLowGainPedFileNameC[getTelID()] + ".root";
 
-                fPedOutFile.push_back( new TFile( ioutfile.c_str(), "RECREATE") );
-                if( fPedOutFile.back()->IsZombie() )
-                {
-                    cout << "VCalibrator::calculatePedestal error in creating pedestal file: ";
-                    cout << ioutfile << endl;
-                    exit( -1 );
-                }
-            }
-        }
-        setCalibrated();
+       if( getRunParameter()->fPedestalSingleRootFile )
+       {
+	   if( !fPedSingleOutFile ) fPedSingleOutFile = new TFile( ioutfile.c_str(), "RECREATE");
+       }
+       else if( getTelID() <  getDetectorGeometry()->getTelType().size() 
+             && fPedOutFile.find( iTelType ) != fPedOutFile.end() )
+       {
+	   fPedOutFile[iTelType] = new TFile( ioutfile.c_str(), "RECREATE");
+	   if( fPedOutFile[iTelType]->IsZombie() )
+	   {
+	      cout << "VCalibrator::calculatePedestal error in creating pedestal file: ";
+	      cout << ioutfile << endl;
+	      exit( -1 );
+	   }
+       }
+       else
+       {
+	   cout << "VCalibrator::calculatePedestal error in creating pedestal file" << endl;
+	   cout << " (no single or array of output files defined)" << endl;
+	   exit( -1 );
+       }
+       setCalibrated();
     }
     resetAnaData();
 
     fillHiLo();
 
 // calculate pedestals for current telescope
-    fNumberPedestalEvents[fTelID]++;
+    fNumberPedestalEvents[iTelType]++;
 // loop over all sumwindows
-    for( unsigned int i = 0; i < hped_vec[fTelID].size(); i++ )
+    for( unsigned int i = 0; i < hped_vec[iTelType].size(); i++ )
     {
         calcSums( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst+(i+1), true, iLowGain );
 // loop over all channels
-        for(unsigned int j=0;j<hped_vec[fTelID][i].size();j++)
+        for(unsigned int j = 0; j < hped_vec[iTelType][i].size(); j++ )
         {
 // exclude low gain channels from pedestal calculation
-            if( iLowGain && !getHiLo()[j] ) continue;
-            else if( !iLowGain && getHiLo()[j] ) continue;
+            if( j < getHiLo().size() )
+	    {
+	       if( iLowGain && !getHiLo()[j] ) continue;
+	       else if( !iLowGain && getHiLo()[j] ) continue;
+            }
 // calculate pedestals only for channels with valid hitbit
 //   important if trying to generate pedestals for zero supressed
 //   runs without injected pedestal events
-            if( fRunPar->fRunIsZeroSuppressed )
-            {
-                if( fReader->getChannelHitIndex(j).first ) hped_vec[fTelID][i][j]->Fill( getSums()[j] );
+	    if( j < getSums().size() )
+	    {
+	       if( fRunPar->fRunIsZeroSuppressed )
+	       {
+		   if( fReader->getChannelHitIndex(j).first ) hped_vec[iTelType][i][j]->Fill( getSums()[j] );
+	       }
+	       else
+	       {
+		  hped_vec[iTelType][i][j]->Fill( getSums()[j] );
+	       }
             }
-            else hped_vec[fTelID][i][j]->Fill( getSums()[j] );
         }
     }
 }
@@ -117,96 +149,153 @@ void VCalibrator::writePeds( bool iLowGain )
     writePeds( iLowGain, 0 );
 }
 
+/*
 
-void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalculator )
+   write pedestals to disk
+
+   this might be an ascii file and/or a root file
+
+*/
+void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalculator, bool iWriteAsciiFile )
 {
     if( getDebugFlag() ) cout << "void VCalibrator::writePeds()" << endl;
-    if( fPedOutFile.size() < 1 || !fPedOutFile[0] )
-    {
-        cout << "void VCalibrator::writePeds() error: no output file defined" << endl;
-        cout << "probably no events for pedestal calculation available" << endl;
-        return;
-    }
+
     string ioutfile;
-// loop over all telescopes
+// boolean to keep track which files have been written
+// (this is historically a mess)
+   map< ULong64_t, bool > iFileWritten;
+   for( unsigned int i = 0; i < getDetectorGeometry()->getTelType_list().size(); i++ ) 
+   {
+      iFileWritten[getDetectorGeometry()->getTelType_list()[i]] = false;
+   }
+
+/////////////////////////////////////////////////////////////////
+// loop over all telescopes 
     for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
     {
         unsigned int t = getTeltoAna()[tel];
+	ULong64_t telType = getDetectorGeometry()->getTelType()[t];
+
 // make one pedestal file per telescope
         if( !iLowGain ) ioutfile = fPedFileNameC[t];
         else            ioutfile = fLowGainPedFileNameC[t];
-        ofstream os( ioutfile.c_str() );
-        if( !os )
-        {
-            cout << "VCalibrator::writePeds(): ERROR, unable to write pedestals to " << ioutfile << " (" << iLowGain << ")" << endl;
-            exit( 0 );
-        }
-        cout << "Telescope " << t+1 << endl;
-        cout << "\t total number of pedestal events: " << fNumberPedestalEvents[t] << endl;
-        cout << "\t writing ";
-        if( iLowGain ) cout << " low ";
-	else           cout << " high ";
-	cout << " gain pedestals to " << endl;
-        cout << "\t\t" << ioutfile << endl;
-        cout << "\t\t" << fPedOutFile[tel]->GetName() << endl;
+	if( !iFileWritten[telType] )
+	{
+	   cout << "Telescope (type) " << telType << endl;
+	   cout << "\t total number of pedestal events: " << fNumberPedestalEvents[telType] << endl;
+	   cout << "\t writing ";
+	   if( iLowGain ) cout << " low ";
+	   else           cout << " high ";
+	   cout << " gain pedestals to " << endl;
+	   if( iWriteAsciiFile ) cout << "\t\t" << ioutfile << endl;
+	   if( getPedestalRootFile( telType ) )
+	   {
+	      cout << "\t\t" << getPedestalRootFile( telType )->GetName() << endl;
+	   }
+////////////////////////////////////////////////////////////
+// write pedestal and pedestal variances to an ascii file
+	   if( iWriteAsciiFile )
+	   {
 // loop over all channels
-        for(unsigned int i=0;i<hped_vec[t][0].size();i++)
-        {
+	      ofstream os( ioutfile.c_str() );
+	      if( !os )
+	      {
+		  cout << "VCalibrator::writePeds(): ERROR, unable to write pedestals to " << ioutfile << " (" << iLowGain << ")" << endl;
+		  exit( -1 );
+	      }
+	      for(unsigned int i=0;i<hped_vec[telType][0].size();i++)
+	      {
 // get pedestal and pedestal variances from pedestal histograms
-            os << t << " " << i << " ";
-	    os << hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow << " ";
+		  os << t << " " << i << " ";
+		  os << hped_vec[telType][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow << " ";
 // loop over all window sizes
-            for(unsigned int j=0;j<hped_vec[t].size();j++)
-            {
-                os << hped_vec[t][j][i]->GetRMS() << " ";
-            }
-            os << endl;
-        }
-        os.close();
-// write histograms to file
-        if( !fPedOutFile[tel] || !fPedOutFile[tel]->cd() )
-        {
-            cout << "VCalibrator::writePeds(): error accessing pedestal output file " << t << endl;
-            cout << "...exiting" << endl;
-            exit( 0 );
-        }
-        if( usePedestalsInTimeSlices( iLowGain ) ) fillPedestalsInTimeSlices( tel, iPedestalCalculator );
+		  for(unsigned int j=0;j<hped_vec[telType].size();j++)
+		  {
+		      os << hped_vec[telType][j][i]->GetRMS() << " ";
+		  }
+		  os << endl;
+	      }
+	      os.close();
+	   }
+   ///////////////////////////////////////////////////////////////////////
+   // write histograms to file
+	   if( !getPedestalRootFile( telType ) || !getPedestalRootFile( telType )->cd() )
+	   {
+	       cout << "VCalibrator::writePeds(): error accessing pedestal output file for telescope type " << telType << endl;
+	       cout << "...exiting" << endl;
+	       exit( -1 );
+	   }
+           fillPedestalTree( tel, iPedestalCalculator );
 // write 1D histograms
-        TDirectory *i_dist = fPedOutFile[tel]->mkdir( "distributions" );
-        if( i_dist->cd() )
-        {
-            i_dist->cd();
-            for(unsigned int i=0;i<hped_vec[t].size();i++)
-            {
-                for(unsigned int j=0;j<hped_vec[t][i].size();j++)
-                {
-                    if( hped_vec[t][i][j] )
-                    {
-                        hped_vec[t][i][j]->Write();
-                    }
-                }
-            }
+	   std::ostringstream iSname;
+	   iSname << "distributions_" << telType;
+	   TDirectory *i_dist = getPedestalRootFile(telType)->mkdir( iSname.str().c_str() );
+	   if( i_dist->cd() )
+	   {
+	       i_dist->cd();
+	       for(unsigned int i=0;i<hped_vec[telType].size();i++)
+	       {
+		   for(unsigned int j=0;j<hped_vec[telType][i].size();j++)
+		   {
+		       if( hped_vec[telType][i][j] )
+		       {
+			   hped_vec[telType][i][j]->Write();
+		       }
+		   }
+	       }
+	   }
+	   iFileWritten[telType] = true;
         }
-        fPedOutFile[tel]->Close();
     }                                             // end loop over all telescopes
+    cout << "Close all files " << endl;
+// DO NOT CLOSE THE TFILE
+// (directory structure is extremely inefficent in root 
+// proportional to the square of number of directories)
+// close all files
+/*    map< ULong64_t, TFile* >::iterator iPedOutFile_iter;
+    for( iPedOutFile_iter = fPedOutFile.begin(); iPedOutFile_iter != fPedOutFile.end(); iPedOutFile_iter++ )
+    {
+       cout << "\t closing " << iPedOutFile_iter->second->GetName() << endl;
+       if( iPedOutFile_iter->second && iPedOutFile_iter->second->IsOpen() )  iPedOutFile_iter->second->Close();
+    }
+    cout << "all files closed " << endl; 
+    if( fPedSingleOutFile && fPedSingleOutFile->IsOpen() ) fPedSingleOutFile->Close(); */
+    if( getDebugFlag() ) cout << "void VCalibrator::writePeds() END" << endl;
 }
 
+TFile* VCalibrator::getPedestalRootFile( ULong64_t iT )
+{
+   if( fRunPar->fPedestalSingleRootFile ) return fPedSingleOutFile;
 
-bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculator *iP )
+   if( fPedOutFile.find( iT ) != fPedOutFile.end() ) return fPedOutFile[iT];
+
+   return 0;
+}
+
+/*
+
+    fill results full pedestal calculation into a root tree
+
+*/
+bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator *iPedestalInTimeSlices )
 {
     unsigned int t = 0;
     if( tel < getTeltoAna().size() ) t = getTeltoAna()[tel];
     else                             return false;
 
-    if( t >= hped_vec.size() || tel >= getTeltoAna().size() )
+// get telescope type
+    ULong64_t iTelType = 0;
+    if( t < getDetectorGeometry()->getTelType().size() ) iTelType = getDetectorGeometry()->getTelType()[t];
+    else
     {
-        cout << "VCalibrator::fillPedestalsInTimeSlices warning, telescope number out of range " << t << "\t" << hped_vec.size() << endl;
-        return false;
+        cout << "VCalibrator::fillPedestalTree: error: invalid telescope type : ";
+	cout << t << "\t" << getDetectorGeometry()->getTelType().size() << endl;
+	return false;
     }
-    if( !iP )
+    if( hped_vec.find( iTelType ) == hped_vec.end() )
     {
-       cout << "VCalibrator::fillPedestalsInTimeSlices error: no pedestal calculator given" << endl;
-       return false;
+        cout << "VCalibrator::fillPedestalTree warning, telescope number out of range " << t << "\t" << hped_vec.size() << endl;
+        return false;
     }
 
     char iname[800];
@@ -227,9 +316,12 @@ bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculat
 // pedestals in time slices
     const Int_t nSlices = 500;
     UInt_t TSnSlices = 0;
-    if( iP && t < iP->v_MJD.size() ) TSnSlices = iP->v_MJD[t].size();
+    if( iPedestalInTimeSlices && t < iPedestalInTimeSlices->v_MJD.size() )
+    {
+       TSnSlices = iPedestalInTimeSlices->v_MJD[t].size();
 
-    cout << "\t number of time slices for pedestals in telescope " << t+1 << ": " << TSnSlices << endl;
+       cout << "\t number of time slices for pedestals in telescope " << t+1 << ": " << TSnSlices << endl;
+    }
 
     UInt_t TSMJD[nSlices];
     Double_t TStime[nSlices];
@@ -244,72 +336,85 @@ bool VCalibrator::fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculat
     }
     vector< Float_t* > TSpedvar;
 
-    sprintf( iname, "tPeds_%d", t+1 );
-    sprintf( ititle, "pedestals, telescope %d", t+1 );
-    TTree *iPedTree = new TTree( iname, ititle );
+    std::ostringstream iSname;
+    iSname << "tPeds_" << iTelType;
+    std::ostringstream iStitle;
+    iStitle << "pedestals, telescope type " << iTelType;
+    TTree *iPedTree = new TTree( iSname.str().c_str(), iStitle.str().c_str() );
     iPedTree->Branch( "channel", &ichannel, "channel/i" );
     iPedTree->Branch( "nsumwindows", &insumw, "nsumwindow/i" );
     iPedTree->Branch( "sumwindow", isumw, "sumwindow[nsumwindow]/F" );
     iPedTree->Branch( "pedmean", &iped, "pedmean/F" );
     iPedTree->Branch( "pedvars", ipedv, "pedvars[nsumwindow]/F" );
     iPedTree->Branch( "nevents", &inevents, "nevents/i" );
-    iPedTree->Branch( "TSnSlices", &TSnSlices, "TSnSlices/i" );
-    iPedTree->Branch( "TSMJD", TSMJD, "TSMJD[TSnSlices]/i" );
-    iPedTree->Branch( "TStime", TStime, "TStime[TSnSlices]/D" );
-    iPedTree->Branch( "TSnevents", TSnevents, "TSnevents[TSnSlices]/i" );
-    iPedTree->Branch( "TSpedmean", TSpedmean, "TSpedmean[TSnSlices]/F" );
-
-    for( unsigned int i = 0; i < hped_vec[t].size(); i++ )
+// fill this part only if time dependent pedestals are calculated
+    if( iPedestalInTimeSlices )
     {
-        TSpedvar.push_back( new Float_t[nSlices] );
-        sprintf( iname, "TSpedvar_sw%d[TSnSlices]/F", i+1 );
-        sprintf( ititle, "TSpedvar_sw%d", i+1 );
-        iPedTree->Branch( ititle, TSpedvar[i], iname );
+       iPedTree->Branch( "TSnSlices", &TSnSlices, "TSnSlices/i" );
+       iPedTree->Branch( "TSMJD", TSMJD, "TSMJD[TSnSlices]/i" );
+       iPedTree->Branch( "TStime", TStime, "TStime[TSnSlices]/D" );
+       iPedTree->Branch( "TSnevents", TSnevents, "TSnevents[TSnSlices]/i" );
+       iPedTree->Branch( "TSpedmean", TSpedmean, "TSpedmean[TSnSlices]/F" );
+       for( unsigned int i = 0; i < hped_vec[iTelType].size(); i++ )
+       {
+	   TSpedvar.push_back( new Float_t[nSlices] );
+	   sprintf( iname, "TSpedvar_sw%d[TSnSlices]/F", i+1 );
+	   sprintf( ititle, "TSpedvar_sw%d", i+1 );
+	   iPedTree->Branch( ititle, TSpedvar[i], iname );
+       }
     }
 
+////////////////////////////////////////////////////////////////////////////////
+// tree filling
+
 // loop over all channels
-    for( unsigned int i=0; i < hped_vec[t][0].size(); i++ )
+    for( unsigned int i=0; i < hped_vec[iTelType][0].size(); i++ )
     {
         ichannel = (Int_t)i;
 // get pedestal and pedestal variances from pedestal histograms
-        if( fRunPar->fCalibrationSumWindow > 0 ) iped = hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow;
+        if( fRunPar->fCalibrationSumWindow > 0 )
+	{
+	   iped = hped_vec[iTelType][fRunPar->fCalibrationSumWindow-1][i]->GetMean()/(double)fRunPar->fCalibrationSumWindow;
+        }
         else                               iped = 0.;
-        inevents = (Int_t)hped_vec[t][fRunPar->fCalibrationSumWindow-1][i]->GetEntries();
+        inevents = (Int_t)hped_vec[iTelType][fRunPar->fCalibrationSumWindow-1][i]->GetEntries();
 // loop over all window sizes
-
-        insumw = (UInt_t)hped_vec[t].size();
-        for(unsigned int j=0;j<hped_vec[t].size();j++)
+        insumw = (UInt_t)hped_vec[iTelType].size();
+        for(unsigned int j=0;j<hped_vec[iTelType].size();j++)
         {
             isumw[j] = (Float_t)j+1;
-            ipedv[j] = hped_vec[t][j][i]->GetRMS();
+            ipedv[j] = hped_vec[iTelType][j][i]->GetRMS();
         }
-// pedestals in time slices
+// time dependent pedestals
+        if( iPedestalInTimeSlices )
+	{
 // loop over all time slices
-        TSnSlices = (UInt_t)iP->v_MJD[tel].size();
-        for( unsigned int ts = 0; ts < iP->v_MJD[tel].size(); ts++ )
-        {
-            TSMJD[ts] = iP->v_MJD[tel][ts];
-            TStime[ts] = iP->v_time[tel][ts];
-            if( i < iP->v_ped[tel][ts].size() && iP->v_ped[tel][ts][i].size() > 0 )
-            {
-                unsigned int iSW_mean = iP->v_ped[tel][ts][i].size()-1;
-                if( iSW_mean > (unsigned int)getRunParameter()->fCalibrationSumWindow && getRunParameter()->fCalibrationSumWindow > 0 )
-		{
-		   iSW_mean = getRunParameter()->fCalibrationSumWindow - 1;
-                }
-                TSnevents[ts] = (UInt_t)iP->v_pedEntries[tel][ts][i][iSW_mean];
-                TSpedmean[ts] = iP->v_ped[tel][ts][i][iSW_mean];
+	   TSnSlices = (UInt_t)iPedestalInTimeSlices->v_MJD[tel].size();
+	   for( unsigned int ts = 0; ts < iPedestalInTimeSlices->v_MJD[tel].size(); ts++ )
+	   {
+	       TSMJD[ts] = iPedestalInTimeSlices->v_MJD[tel][ts];
+	       TStime[ts] = iPedestalInTimeSlices->v_time[tel][ts];
+	       if( i < iPedestalInTimeSlices->v_ped[tel][ts].size() && iPedestalInTimeSlices->v_ped[tel][ts][i].size() > 0 )
+	       {
+		   unsigned int iSW_mean = iPedestalInTimeSlices->v_ped[tel][ts][i].size()-1;
+		   if( iSW_mean > (unsigned int)getRunParameter()->fCalibrationSumWindow && getRunParameter()->fCalibrationSumWindow > 0 )
+		   {
+		      iSW_mean = getRunParameter()->fCalibrationSumWindow - 1;
+		   }
+		   TSnevents[ts] = (UInt_t)iPedestalInTimeSlices->v_pedEntries[tel][ts][i][iSW_mean];
+		   TSpedmean[ts] = iPedestalInTimeSlices->v_ped[tel][ts][i][iSW_mean];
 // check summation windows
-                unsigned int iSW_temp = iP->v_pedvar[tel][ts][i].size();
-                if( iSW_temp > TSpedvar.size() ) iSW_temp = TSpedvar.size();
-                for( unsigned int w = 0; w < iSW_temp; w++ )
-                {
-                    TSpedvar[w][ts] = iP->v_pedvar[tel][ts][i][w];
-                }
-            }
-        }
+		   unsigned int iSW_temp = iPedestalInTimeSlices->v_pedvar[tel][ts][i].size();
+		   if( iSW_temp > TSpedvar.size() ) iSW_temp = TSpedvar.size();
+		   for( unsigned int w = 0; w < iSW_temp; w++ )
+		   {
+		       TSpedvar[w][ts] = iPedestalInTimeSlices->v_pedvar[tel][ts][i][w];
+		   }
+	       }
+	   }
+	}
 
-        iPedTree->Fill();
+	iPedTree->Fill();
     }
 
     iPedTree->Write();
@@ -806,7 +911,7 @@ void VCalibrator::terminate( VPedestalCalculator* iP )
 {
     if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
     {
-       writePeds( fRunPar->frunmode == 6, iP );
+       writePeds( fRunPar->frunmode == 6, iP, !fRunPar->fPedestalSingleRootFile );
     }
     else if( fRunPar->frunmode == 2 || fRunPar->frunmode == 5 )
     {
@@ -1725,12 +1830,32 @@ void VCalibrator::initialize()
 	fCalData.back()->setSumWindows( getSumWindow( i ) );
 // PRELI: low gain multiplier does not depend on summation window (yet)
 	fCalData.back()->setLowGainMultiplierFixedSummationWindow( getSumWindow_2() );
-        fNumberPedestalEvents.push_back( 0 );
         fNumberGainEvents.push_back( 0 );
 	fNumberTZeroEvents.push_back( 0 );
 
         fCalData.back()->initialize( getNChannels(), getNSamples(), usePedestalsInTimeSlices( false ), usePedestalsInTimeSlices( true ), getDebugFlag() );
         if( fReader->getDataFormat() == "grisu" ) fCalData.back()->setReader( fReader );
+   }
+// define histograms and output files for pedestal calculation
+   vector<ULong64_t> i_TelTypeList = getDetectorGeometry()->getTelType_list();
+   if( fRunPar->frunmode == 1 )
+   {
+      for( unsigned int t = 0; t < i_TelTypeList.size(); t++ )
+      {
+           cout << "VCalibrator::initialize: setting ped histos and files for telescope type " << i_TelTypeList[t] << endl;
+	   fPedSingleOutFile = 0;
+	   if( !getRunParameter()->fPedestalSingleRootFile ) fPedOutFile[i_TelTypeList[t]] = 0;
+	   vector< vector<TH1F* > > iped_vec;
+	   for( int i = 0; i < getRunParameter()->fCalibrationSumWindow; i++ )
+	   {
+	        vector<TH1F* > ihped;
+		for( unsigned int j = 0; j < getNChannels(); j++ ) ihped.push_back( 0 );
+		iped_vec.push_back( ihped );
+           }
+	   hped_vec[i_TelTypeList[t]] = iped_vec;
+// number of pedestal events
+           fNumberPedestalEvents[i_TelTypeList[t]] = 0;
+        }
     }
 
 ////////////////////////////////////////////////////////////////
@@ -1751,12 +1876,11 @@ void VCalibrator::initialize()
             readGains( true );
         }
 // read peds from DST file (for DST MC source file)
-	if( fRunPar->fsourcetype == 7 || fRunPar->fsourcetype == 4 ) readCalibrationData( fRunPar->fsourcefile );
+	if( fRunPar->frunmode !=1 && (fRunPar->fsourcetype == 7 || fRunPar->fsourcetype == 4) ) readCalibrationData( fRunPar->fsourcefile );
     }
 
 // initialize dead  channel finder
     initializeDeadChannelFinder();
-
 }
 
 void VCalibrator::setCalibrationFileNames()
@@ -2371,21 +2495,34 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 
    int fTelID = 0;
    unsigned int nPixel = 0;
+   unsigned int fnum_sumwindow = 1;
+   unsigned int fsumwindow[VDST_MAXSUMWINDOW];
    float fPed_high[VDST_MAXCHANNELS];
-   float fPedvar_high[VDST_MAXCHANNELS];
+   float fPedvar_high[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
    float fPed_low[VDST_MAXCHANNELS];
-   float fPedvar_low[VDST_MAXCHANNELS];
+   float fPedvar_low[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
    float fConv_high[VDST_MAXCHANNELS];
    float fConv_low[VDST_MAXCHANNELS];
+   float ftzero[VDST_MAXCHANNELS];
+
+   for( unsigned int i = 0; i < VDST_MAXCHANNELS; i++ )
+   {
+      ftzero[i] = -99.;
+   }
 
    t->SetBranchAddress( "TelID", &fTelID );
    t->SetBranchAddress( "NPixel", &nPixel );
+   t->SetBranchAddress( "num_sumwindow", &fnum_sumwindow );
+   t->SetBranchAddress( "sumwindow", fsumwindow );
    t->SetBranchAddress( "ped_high", fPed_high );
    t->SetBranchAddress( "pedvar_high", fPedvar_high );
    t->SetBranchAddress( "ped_low", fPed_low );
    t->SetBranchAddress( "pedvar_low", fPedvar_low );
    t->SetBranchAddress( "conv_high", fConv_high );
    t->SetBranchAddress( "conv_low", fConv_low );
+   if( t->GetBranch( "tzero" ) ) t->SetBranchAddress( "tzero", ftzero );
+
+      
 
 // reset histograms with pedestal distributions
    if( getPedvarsDist() )        getPedvarsDist()->Reset();
@@ -2408,7 +2545,7 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 // no calibration data available for this telescope
        if( nPixel == 0 ) continue;
 
-// peds
+// pedestals
        if( nPixel == getPeds( false ).size() )
        {
            for( unsigned int p = 0; p < nPixel; p++ )
@@ -2444,19 +2581,17 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        {
            for( unsigned int p = 0; p < nPixel; p++ )
 	   {
-// for CTA DSTs, take different pedestal calculation into account
-               if( fReader && fReader->getMonteCarloHeader() && fReader->getMonteCarloHeader()->detector_prog_id == 1 )
+	       for( unsigned int s = 0; s < fnum_sumwindow; s++ )
 	       {
-	          for( unsigned int s = 1; s < getPedvars(false).size(); s++ )
-		  {
-		     getPedvars( false, s )[p] = fPedvar_high[p] * (double)getNSamples();
-                  }
+	           if( fsumwindow[s] < getPedvars(false).size() )
+		   {
+                        getPedvars( false, fsumwindow[s] ) = fPedvar_high[p][s];
+			if( fsumwindow[s] == getSumWindow() && getPedvarsDist() ) 
+			{
+			   getPedvarsDist()->Fill( fPedvar_high[p][s] );
+                        }
+                   }
                }
-	       else
-	       {
-		  getPedvars( false )[p] = fPedvar_high[p];
-               }
-	       if( getPedvarsDist() ) getPedvarsDist()->Fill( fPed_high[p] );
            }
        }
        else
@@ -2470,8 +2605,17 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        {
            for( unsigned int p = 0; p < nPixel; p++ ) 
 	   {
-	      getPedvars( true )[p] = fPedvar_low[p];
-	      if( getPedvarsLowGainDist() ) getPedvarsLowGainDist()->Fill( fPed_low[p] );
+	       for( unsigned int s = 0; s < fnum_sumwindow; s++ )
+	       {
+	           if( fsumwindow[s] < getPedvars(true).size() )
+		   {
+                        getPedvars( true, fsumwindow[s] ) = fPedvar_low[p][s];
+			if( fsumwindow[s] == getSumWindow() && getPedvarsDist( true ) ) 
+			{
+			   getPedvarsDist( true )->Fill( fPedvar_low[p][s] );
+                        }
+                   }
+               }
            }
        }
        else
@@ -2528,6 +2672,23 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 	  cout << nPixel << "\t" << getGains( true ).size();
 	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
+// tzeros
+       if( nPixel == getAverageTZeros( false ).size() )
+       {
+	  double i_mean = 0.;
+	  double i_nn = 0.;
+          for( unsigned int p = 0; p < nPixel; p++ )
+	  {
+	     getAverageTZeros( false )[p] = ftzero[p];
+	     if( getAverageTZeros( false )[p] > -98. )
+	     {
+	        i_mean += getAverageTZeros( false )[p];
+		i_nn++;
+		setAverageTZero( p, ftzero[p], false );
+             }
+          }
+	  if( i_nn > 0. ) setMeanAverageTZero( i_mean / i_nn, false );
+       }
    }
 
    iF.Close();
@@ -2565,6 +2726,32 @@ unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( vector< int > iE, 
 	    iTot += iE[tel];
 	    iN++;
 	 }
+      }
+      if( iN > 0 ) return iTot/iN;
+   }
+
+   return 0;
+}
+
+unsigned int VCalibrator::getNumberOfEventsUsedInCalibration( map< ULong64_t, int > iE, int iTelID )
+{
+   ULong64_t iTelType = 0;
+   if( iTelID < (int)getDetectorGeometry()->getTelType().size() ) iTelType  = getDetectorGeometry()->getTelType()[iTelID];
+   else return 0;
+
+   if( iTelID > 0 && iE.find( iTelType ) != iE.end() )
+   {
+      return iE[iTelID];
+   }
+   else
+   {
+      int iTot = 0;
+      int iN = 0;
+      map< ULong64_t, int >::iterator iN_iter;
+      for( iN_iter = iE.begin(); iN_iter != iE.end(); iN_iter++ )
+      {
+	 iTot += iN_iter->second;
+	 iN++;
       }
       if( iN > 0 ) return iTot/iN;
    }

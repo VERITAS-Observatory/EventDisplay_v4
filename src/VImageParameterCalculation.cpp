@@ -129,7 +129,7 @@ void VImageParameterCalculation::calcTimingParameters()
 
 	    if( !fData->getRunParameter()->fDoublePassErrorWeighting2005 ) 
 	    {
-// rescale errors to Chi2/NDF = 1. and redo the dit
+// rescale errors to Chi2/NDF = 1. and redo the fit
 // (note that ex[] are all 0 -> normal chi2 fit)
 	       double i_scale = 1.;
 	       if( xline->GetNDF() > 0. ) i_scale = xline->GetChisquare() / xline->GetNDF();

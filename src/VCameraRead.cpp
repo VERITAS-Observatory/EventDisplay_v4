@@ -50,7 +50,7 @@ bool VCameraRead::setTelID( unsigned int iTel )
     else
     {
         fTelID = 0;
-        cout << " VCameraRead::setTelID() error: telescope ID out of range: " << iTel << "\t" << fTelID << "\t" << fNTel << endl;
+        cout << " VCameraRead::setTelID() error: telescope ID out of range: requested " << iTel << ", current " << fTelID << ", ntel: " << fNTel << endl;
 //      cout << "                                setting ID to zero" << endl;
         cout << "   ...exiting" << endl;
         exit( -1 );

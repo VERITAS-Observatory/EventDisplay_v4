@@ -358,23 +358,50 @@ bool VDST::writeCalibrationData()
 // (same code as in c_VDST)
     int fTelID = 0;
     unsigned int nPixel = 0;
+// integration window
+    unsigned int fnum_sumwindow = 1;
+    unsigned int fsumwindow[VDST_MAXSUMWINDOW];
     float fPed_high[VDST_MAXCHANNELS];
-    float fPedvar_high[VDST_MAXCHANNELS];
+    float fPedvar_high[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
     float fPed_low[VDST_MAXCHANNELS];
-    float fPedvar_low[VDST_MAXCHANNELS];
+    float fPedvar_low[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
     float fConv_high[VDST_MAXCHANNELS];
     float fConv_low[VDST_MAXCHANNELS];
+    float fTZero[VDST_MAXCHANNELS];
+
+    for( unsigned int i = 0; i < VDST_MAXCHANNELS; i++ )
+    {
+      fPed_high[i] = 0.;
+      fPed_low[i] = 0.;
+      fConv_high[i] = 0.;
+      fConv_low[i] = 0.;
+      fTZero[i] = -999.;
+      for( unsigned int j = 0; j < VDST_MAXSUMWINDOW; j++ )
+      {
+         fPedvar_high[i][j] = 0;
+	 fPedvar_low[i][j] = 0;
+      }
+    }
 
     TTree *t = new TTree( "calibration", "calibration data" );
 
+    char hname[200];
     t->Branch( "TelID", &fTelID, "TelID/I" );
     t->Branch( "NPixel", &nPixel, "NPixel/i" );
+    t->Branch( "num_sumwindow", &fnum_sumwindow, "num_sumwindow/i" );
+    t->Branch( "sumwindow", fsumwindow, "sumwindow[num_sumwindow]/i" );
     t->Branch( "ped_high", fPed_high, "ped_high[NPixel]/F" );
-    t->Branch( "pedvar_high", fPedvar_high, "pedvar_high[NPixel]/F" );
+    sprintf( hname, "pedvar_high[NPixel][%d]/F", VDST_MAXSUMWINDOW );
+    t->Branch( "pedvar_high", fPedvar_high, hname );
     t->Branch( "ped_low", fPed_low, "ped_low[NPixel]/F" );
-    t->Branch( "pedvar_low", fPedvar_low, "pedvar_low[NPixel]/F" );
+    sprintf( hname, "pedvar_low[NPixel][%d]/F", VDST_MAXSUMWINDOW );
+    t->Branch( "pedvar_low", fPedvar_low, hname );
     t->Branch( "conv_high", fConv_high, "conv_high[NPixel]/F" );
     t->Branch( "conv_low", fConv_low, "conv_low[NPixel]/F" );
+    t->Branch( "tzero", fTZero, "tzero[NPixel]/F" );
+
+    fnum_sumwindow = getRunParameter()->fCalibrationSumWindow;
+    for( unsigned int i = 0; i < (unsigned int)getRunParameter()->fCalibrationSumWindow; i++ ) fsumwindow[i] = i+1;
 
     for( unsigned int itel = 0; itel <  getNTel(); itel++ )
     {
@@ -391,11 +418,16 @@ bool VDST::writeCalibrationData()
         for( unsigned int p = 0; p < nPixel; p++ )
         {
            fPed_high[p] = getPeds()[p];
-	   fPedvar_high[p] = getPedvars()[p];
+
+	   for( unsigned int i = 0; i < (unsigned int)getRunParameter()->fCalibrationSumWindow; i++ )
+	   {
+	      fPedvar_high[p][i] = getPedvars( i+1 )[p];
+	      fPedvar_low[p][i] = getPedvars( i+1, true )[p];
+           }
            fPed_low[p] = getPeds( true )[p];
-	   fPedvar_low[p] = getPedvars( true )[p];
            fConv_high[p] = 1.;
            fConv_low[p] = 1.;
+	   fTZero[p] = getAverageTZeros()[p];
         }
 
         t->Fill();
