@@ -30,7 +30,7 @@ COPT="-f 1 -c $PEDFILE"
 OPT="-shorttree -l2setspecialchannels nofile -writenoMCTree -reconstructionparameter $ACUT"
 
 # set timtelarray file and cp simtelarray.gz file to TMPDIR
-if [ !-e $ILIST ]
+if [ ! -e $ILIST ]
 then
    echo "ERROR: list of simulation files does not exist: $ILIST"
    exit
