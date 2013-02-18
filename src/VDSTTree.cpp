@@ -47,6 +47,16 @@ VDSTTree::VDSTTree()
     fDSTTel_xoff = 0;
     fDSTTel_yoff = 0;
 
+    fDSTMeanPulseTimingMinLightLevel = 50.;
+    for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    {
+       for( unsigned int j = 0; j < VDST_MAXCHANNELS; j++ )
+       {
+          fDSTMeanPulseTiming[i][j] = 0.;
+          fDSTMeanPulseTiming_N[i][j] = 0.;
+       }
+    }
+
 }
 
 
@@ -659,4 +669,24 @@ int VDSTTree::setTelCounter( int iTelID )
     fTelescopeCounter_temp = hasData( iTelID );
 
     return fTelescopeCounter_temp;
+}
+
+void VDSTTree::fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime )
+{
+   if( iTelID < VDST_MAXTELESCOPES && iChannelID < VDST_MAXCHANNELS )
+   {
+      fDSTMeanPulseTiming[iTelID][iChannelID] += iTime;
+      fDSTMeanPulseTiming_N[iTelID][iChannelID]++;
+   }
+}
+
+double VDSTTree::getDSTMeanPulseTiming(  unsigned int iTelID, unsigned int iChannelID )
+{
+   if( iTelID < VDST_MAXTELESCOPES && iChannelID < VDST_MAXCHANNELS )
+   {
+      if( fDSTMeanPulseTiming_N[iTelID][iChannelID] > 0. ) return fDSTMeanPulseTiming[iTelID][iChannelID] / fDSTMeanPulseTiming_N[iTelID][iChannelID];
+      else                                                 return -9999.;
+   }
+
+   return 0.;
 }
