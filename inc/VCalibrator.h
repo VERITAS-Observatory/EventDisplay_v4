@@ -15,6 +15,7 @@
 #include "TTree.h"
 
 #include <fstream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -26,13 +27,13 @@ class VCalibrator : public VImageBaseAnalyzer
     private:
         int fCalibrationfileVersion;
 
-        vector<int> fNumberPedestalEvents;        //!< number of events used in pedestal analysis
+        map< ULong64_t, int > fNumberPedestalEvents;        //!< number of events used in pedestal analysis
         vector<int> fNumberGainEvents;            //!< number of events used in gain and toffset analysis
 	vector<int> fNumberTZeroEvents;
 
-        vector< TFile* > fPedOutFile;
-                                                  //<! one histogram per telescope/channel/sumwindow
-        vector< vector< vector<TH1F* > > > hped_vec;
+	TFile *fPedSingleOutFile;
+        map< ULong64_t, TFile* > fPedOutFile;
+        map< ULong64_t, vector< vector<TH1F* > > > hped_vec;  //<! one histogram per telescope/channel/sumwindow
         TFile *opfgain;
         TFile *opftoff;
         vector<TH1F* > hgain;
@@ -63,10 +64,12 @@ class VCalibrator : public VImageBaseAnalyzer
 	vector< string > fLowGainTZeroFileNameC;
 
 	TTree *fillCalibrationSummaryTree( unsigned int itel, string iName, vector<TH1F* > h );
-        bool   fillPedestalsInTimeSlices( unsigned int tel, VPedestalCalculator *iP );
+        bool   fillPedestalTree( unsigned int tel, VPedestalCalculator *iP );
         void getCalibrationRunNumbers();
 	int  getCalibrationRunNumbers_fromCalibFile();
 	unsigned int getNumberOfEventsUsedInCalibration( vector< int > iE, int iTelID );
+	unsigned int getNumberOfEventsUsedInCalibration( map< ULong64_t, int > iE, int iTelID );
+	TFile* getPedestalRootFile( ULong64_t iTel );
 	int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
 	string getCalibrationFileName( int iTel, int irun, string iSuffix );
         void readCalibrationData( bool iPeds, bool iGains );
@@ -85,7 +88,7 @@ class VCalibrator : public VImageBaseAnalyzer
 
         void writeGains( bool iLowGain = false );
         void writePeds( bool iLowGain = false );
-        void writePeds( bool iLowGain, VPedestalCalculator *iP );
+        void writePeds( bool iLowGain, VPedestalCalculator *iP, bool iWriteAsciiFile = true );
         void writeTOffsets( bool iLowGain = false  );
 	void writeAverageTZeros( bool iLowGain = false  );
 

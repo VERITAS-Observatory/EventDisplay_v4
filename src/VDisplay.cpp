@@ -1483,22 +1483,27 @@ void VDisplay::drawCalibrationHistos()
     {
         if( fSelectedChan >= 200000 )
         {
-            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope] );
-            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope], true );
+            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope],
+	                                                              false, fEventLoop->getTelType( fTelescope ) );
+            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope], 
+	                                                               true, fEventLoop->getTelType( fTelescope ) );
         }
         else
         {
             ihis = fEventLoop->getCalData( fTelescope )->getPedDist();
             ihis2  = fEventLoop->getCalData( fTelescope )->getPedDist( true );
         }
+	if( ihis ) ihis->SetAxisRange( 0., 250. );
     }
 // pedvar distributions
     else if( E_cameraIdent( fCameraDisplay ) == C_PEDVAR  || E_cameraIdent( fCameraDisplay ) == C_PEDVARLOW ) 
     {
         if( fSelectedChan >= 200000 )
         {
-            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope] );
-            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope], true );
+            ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope],
+	                                                              false, fEventLoop->getTelType( fTelescope ) );
+            ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope],
+	                                                              true, fEventLoop->getTelType( fTelescope ) );
         }
         else
         {

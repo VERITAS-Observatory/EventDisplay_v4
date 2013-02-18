@@ -45,7 +45,7 @@ class VCalibrationData
 
 	unsigned int setSummationWindow( unsigned int iSumWindow );
 
-	TH1F* getHistogram( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize,  VCalibrationData::E_PEDTYPE );
+	TH1F* getHistogram( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize,  VCalibrationData::E_PEDTYPE, ULong64_t iTelType = 99999 );
 	TH1F* getHistoDist( int iType, bool iDist );
 
     public:
@@ -129,7 +129,7 @@ class VCalibrationData
        ~VCalibrationData() {}
 
         TH1F* getHistoGain( unsigned int iTel, unsigned int iChannel, bool iLowGain = false );
-        TH1F* getHistoPed( unsigned int iTel, unsigned int iChannel, unsigned int iWindowsize, bool iLowGain = false );
+        TH1F* getHistoPed( unsigned int iTel, unsigned int iChannel, unsigned int iWindowsize, bool iLowGain = false, ULong64_t iTelType = 99999 );
         TH1F* getHistoToff( unsigned int iTel, unsigned int iChannel, bool iLowGain = false );
         TH1F* getHistoAverageTzero( unsigned int iTel, unsigned int iChannel, bool iLowGain = false );
 

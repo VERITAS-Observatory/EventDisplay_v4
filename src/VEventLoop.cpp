@@ -340,7 +340,8 @@ bool VEventLoop::initEventLoop( string iFileName )
     initializeAnalyzers();
     if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
     {
-	 fPedestalCalculator->initialize( (fRunMode == R_PED),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice, fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumWindow );
+	 fPedestalCalculator->initialize( (fRunMode == R_PED),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice, 
+	                                  fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumWindow );
     }
 // print run informations
     printRunInfos();
@@ -794,7 +795,7 @@ bool VEventLoop::nextEvent()
 
 
 /*!
-     check run mode and call the anlyzers
+     check run mode and call the analyzers
 */
 int VEventLoop::analyzeEvent()
 {
@@ -925,7 +926,14 @@ int VEventLoop::analyzeEvent()
                 }
                 else
                 {
-                    if( !fReader->wasLossyCompressed() ) fCalibrator->calculatePedestals();
+                    if( !fReader->wasLossyCompressed() )
+		    {
+// for DSTs, require a local trigger
+                        if( fReader->hasLocalTrigger( getTelID()) )
+			{
+			   fCalibrator->calculatePedestals();
+                        }
+                    }
                 }
                 break;
 /////////////////

@@ -144,7 +144,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     valarray< valarray< double > > itemp_pedvars;
     itemp_pedvars.resize( nSamples+1, itemp_ped );
 
-// (time dependant pedestal vectors are initialzed in VCalibrator)
+// (time dependent pedestal vectors are initialzed in VCalibrator)
 
 // high gain channels
     fPeds.resize( i_channel, 20. );
@@ -187,15 +187,30 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     fLowGainMultiplierError.resize( nSamples+1, itemp_ped );
     fLowGainMultiplier_Mean.resize( nSamples+1, 1. );
     fLowGainMultiplier_RMS.resize( nSamples+1, 0. );
+
+    if( iDebug ) cout << "END VCalibrationData::initialize " << endl;
 }
 
-TH1F* VCalibrationData::getHistogram( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize, VCalibrationData::E_PEDTYPE iType )
+TH1F* VCalibrationData::getHistogram( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize, VCalibrationData::E_PEDTYPE iType, ULong64_t iTelType )
 {
     char iHName[200];
+    std::ostringstream iSname;
     
     if( iType == C_PED || iType == C_PEDLOW )
     {
        sprintf( iHName, "distributions/hped_%d_%d_%d", iTel, iWindowSize, iChannel );
+       if( iType < (int)fFile.size() && fFile[iType] )
+       {
+	 if( !fFile[iType]->Get( iHName ) )
+	 {
+	   sprintf( iHName, "distributions_%d/hped_%d_%d_%d", iTel+1, iTel, iWindowSize, iChannel );
+         }
+	 if( !fFile[iType]->Get( iHName ) && iTelType != 99999 )
+	 {
+	   iSname << "distributions_" << iTelType << "/hped_" << iTelType << "_" << iWindowSize << "_" << iChannel;
+	   sprintf( iHName, "%s", iSname.str().c_str() );
+         }
+       }
     }
     else if( iType == C_TOFF || iType == C_TOFFLOW )
     {
@@ -218,16 +233,16 @@ TH1F* VCalibrationData::getHistogram( unsigned int iTel, unsigned int iChannel, 
 }
 
 
-TH1F* VCalibrationData::getHistoPed( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize, bool iLowGain )
+TH1F* VCalibrationData::getHistoPed( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize, bool iLowGain, ULong64_t iTelType )
 {
     if( fReader && fPedFromPLine )
     {
         if( fReader->getDataFormat() == "grisu" ) return fReader->getPedHisto( iTel, iChannel );
         else return 0;
     }
-    if( iLowGain ) return getHistogram( iTel, iChannel, iWindowSize, C_PEDLOW );
+    if( iLowGain ) return getHistogram( iTel, iChannel, iWindowSize, C_PEDLOW, iTelType );
 
-    return getHistogram( iTel, iChannel, iWindowSize, C_PED );
+    return getHistogram( iTel, iChannel, iWindowSize, C_PED, iTelType );
 }
 
 

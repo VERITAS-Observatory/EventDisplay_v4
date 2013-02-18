@@ -289,6 +289,7 @@ class VEvndispData
         unsigned int        getTelID() { return fTelID; }
         unsigned int        getTeltoAnaID() { return getTeltoAnaID( fTelID ); }
         unsigned int        getTeltoAnaID( unsigned int iTelID );
+	ULong64_t           getTelType( unsigned int iTelID );
         vector< unsigned int>& getTeltoAna() { return fTeltoAna; }
         double              getTimeSinceRunStart() { return fAnaData[fTelID]->fTimeSinceRunStart; }
 	double              getMeanAverageTZero( bool iLowGain = false ) { return fCalData[fTelID]->getAverageTZero( iLowGain ); }

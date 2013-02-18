@@ -13,6 +13,7 @@ VPedestalCalculator::VPedestalCalculator()
 {
     fDebug = getDebugFlag();
 
+// default parameters (can be adjusted later in initialize()
     fLengthofTimeSlice = 180.;                     // in [s]
     fSumWindow = 24;
     fNPixel = 500;
@@ -51,7 +52,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
         getRunParameter()->fPedestalsInTimeSlices = false;
         return false;
     }
-// test if summation window is not too big
+// test if summation window is not to big
     if( (unsigned int)fSumWindow > VDST_MAXSUMWINDOW )
     {
         cout << "=================================" << endl;

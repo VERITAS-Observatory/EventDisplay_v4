@@ -99,9 +99,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 // calibration (pedestals, gains, etc.)
 	bool   fcalibrationrun;                   // true if this is a pedestal/gain/toff calculation run
         string fcalibrationfile;                  // file with file names for calibration
-	bool freadCalibfromDB;                     // if true, calibration information are read in VOFFLINE DB
-	int freadCalibfromDB_versionquery;         // require a given version of calibration
-	bool freadCalibfromDB_save_file;           // calibration information read from the DB are stored in VGlobalRunParameter::getDirectory_EVNDISPCalibrationData() +/Tel_?
+	bool freadCalibfromDB;                    // if true, calibration information are read in VOFFLINE DB
+	int freadCalibfromDB_versionquery;        // require a given version of calibration
+	bool freadCalibfromDB_save_file;          // calibration information read from the DB are stored in VGlobalRunParameter::getDirectory_EVNDISPCalibrationData() +/Tel_?
 	string fLowGainCalibrationFile;           // file with file name for low-gain calibration 
 	int fNCalibrationEvents;                  // events to be used for calibration 
         vector< int > fGainFileNumber;
@@ -125,8 +125,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool   fLowGainPeds;                      // calculate pedestals from low gain channels only
         bool   fUsePedestalsInTimeSlices;         // use pedestal in time slices for image calculation (high gain)
         bool   fLowGainUsePedestalsInTimeSlices;  // use pedestals in time slices for image calculation (low gain)
-        bool   fPedestalsInTimeSlices;            // calculate pedestal variations for tracking tests
+        bool   fPedestalsInTimeSlices;            // calculating time pedendent pedestals
         double fPedestalsLengthOfTimeSlice;       // length of a time slice for pedestal calculations (tracking test)
+	bool   fPedestalSingleRootFile;           // write pedestal trees and histograms into a single root file
         int    fCalibrationSumWindow;             // sumwindow for all calibration calculation
         int    fCalibrationSumFirst;              // starting point all calibration calculation
 	float  fCalibrationIntSumMin;             // minimum integrated charge in a channel and event to be taken into account in gain or tzero calibration runs
@@ -244,6 +245,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,121); //(increase this number)
+        ClassDef(VEvndispRunParameter,122); //(increase this number)
 };
 #endif

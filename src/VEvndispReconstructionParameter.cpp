@@ -490,6 +490,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	    if( !is_stream.eof() ) is_stream >> iTemp5;
 	    else                   iTemp5 = "";
 
+//////////////////////////////////////////////////////////////////////////////////////////////
 // fadc trace analysis
             if( iTemp == "FADCANALYSIS" && fRunPara )
 	    {
@@ -502,6 +503,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                }
 	       continue;
             }
+// double pass options
 	    else if( iTemp == "FADCDOUBLEPASS" && fRunPara )
 	    {
 	       if( iTemp2.size() > 0 ) fRunPara->fDoublePass = atoi( iTemp2.c_str() );
@@ -524,6 +526,11 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			if( i < fRunPara->fTraceIntegrationMethod_pass1.size() ) fRunPara->fTraceIntegrationMethod_pass1[i] = (unsigned int)atoi( iTemp4.c_str() );
 		     }
 		  }
+               }
+// set double pass error option
+	       if( iTemp5.size() > 0 )
+	       {
+	            fRunPara->fDoublePassErrorWeighting2005 = !(bool)atoi( iTemp5.c_str() );
                }
 	       continue;
             }

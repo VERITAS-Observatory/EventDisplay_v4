@@ -61,7 +61,7 @@ void VImageBaseAnalyzer::calcSums(int iFirst, int iLast, bool iMakingPeds, bool 
     if( getDebugFlag() ) cout << "VImageBaseAnalyzer::calcSums() " << iFirst << "\t" << iLast << endl;
 
 // for DST source file, ignore everything and just get the sums and tzeros
-    if( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 )
+    if( getRunParameter()->frunmode != 1 && ( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 ) )
     {
         setSums( fReader->getSums() );
         return;
@@ -100,13 +100,14 @@ void VImageBaseAnalyzer::calcSums(int iFirst, int iLast, bool iMakingPeds, bool 
                 if( iMakingPeds )
 		{
 		   fTraceHandler->setTrace( fReader, getNSamples(), getPeds(getHiLo()[i_channelHitID] )[i_channelHitID], 
-		                                     getPedrms(getHiLo()[i_channelHitID])[i_channelHitID], i_channelHitID, i, 0. );
+		                                     getPedrms(getHiLo()[i_channelHitID])[i_channelHitID],
+						     i_channelHitID, i, 0. );
                 }
                 else
 		{
-		    fTraceHandler->setTrace( fReader, getNSamples(),getPeds(getHiLo()[i_channelHitID] )[i_channelHitID],
-		                                                    getPedrms(getHiLo()[i_channelHitID])[i_channelHitID],
-								    i_channelHitID, i, getLowGainMultiplier()[i_channelHitID]*getHiLo()[i_channelHitID] );
+		   fTraceHandler->setTrace( fReader, getNSamples(), getPeds(getHiLo()[i_channelHitID] )[i_channelHitID],
+		                                     getPedrms(getHiLo()[i_channelHitID])[i_channelHitID],
+						     i_channelHitID, i, getLowGainMultiplier()[i_channelHitID]*getHiLo()[i_channelHitID] );
                 }
 // make sure that trace integration is set (important for pedestal calculations in QADC runs)
                 if( getTraceIntegrationMethod() != 0 ) fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );

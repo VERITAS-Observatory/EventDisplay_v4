@@ -53,6 +53,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fsimu_pedestalfile = "";
     fsimu_noiselevel   = 250;
     fsimu_pedestalfile_DefaultPed = 20.;
+    fPedestalSingleRootFile = false;
     fnevents = -10000;
     fFirstEvent = -10000;
     fIsMC = 0;
@@ -344,14 +345,19 @@ void VEvndispRunParameter::print( int iEv )
     if( fLowGainCalibrationFile.size() > 0 )  cout << "calibration file (low gain): " << fLowGainCalibrationFile << endl;
     else if( frunmode != 2 && frunmode != 5 && !fIsMC ) cout << "reading laser/flasher run numbers from database" << endl;
     if( frunmode == 2 ) cout << "lasermin: " << fLaserSumMin << endl;
-    if( ( fsourcetype == 1 || fsourcetype == 2 || fsourcetype == 5 ) && fsimu_pedestalfile.size() > 0 )
+    if( frunmode == 1 )
     {
-        cout << "calculate pedestals from " << fsimu_pedestalfile;
-        cout << " with noise level " << fsimu_noiselevel;
-        cout << " (default ped: " << fsimu_pedestalfile_DefaultPed << ")" << endl;
+       if( ( fsourcetype == 1 || fsourcetype == 2 || fsourcetype == 5 ) && fsimu_pedestalfile.size() > 0 )
+       {
+	   cout << "calculate pedestals from " << fsimu_pedestalfile;
+	   cout << " with noise level " << fsimu_noiselevel;
+	   cout << " (default ped: " << fsimu_pedestalfile_DefaultPed << ")" << endl;
+       }
+       else if( fsourcetype == 1 ) cout << "calculate pedestals from " << fsourcefile << endl;
+       if( fPedestalsInTimeSlices ) cout << "calculating time dependent pedestals" << endl;
+       else                         cout << "no time dependent pedestals" << endl;
+       if( fUsePedEvents ) cout << "using pedestal events for pedestal calculation" << endl;
     }
-    else if( fsourcetype == 1 ) cout << "calculate pedestals from " << fsourcefile << endl;
-    if( frunmode == 1 && fUsePedEvents ) cout << "using pedestal events for pedestal calculation" << endl;
     if( frunmode == 6 )  cout << "using low gain events only for pedestal calculation" << endl;
     cout << endl;
 

@@ -1,16 +1,24 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130218 (GM) cleanup of pedvars and pedestal calculation. 
+                Note: loop now over all telescope types (was: telescopes);
+		this shouldn't change anything for VTS
+
+* 20130218 (GM) added handling of pedestal variances in CTA converter
+
+* 20130217 (GM) fixed memory fault in VImageBaseAnalyzer::FADCStopCorrect()
+
 * 20130209 (GM) fixed printing of warnings of dead channels for tzero calculation
                 run
 
 * 20130209 (GM) allow VTS data to be in $VERITAS_DATA_DIR/dJJMMDD
                 (old default still allowed: $VERITAS_DATA_DIR/data/dJJMMDD)
 
-* 20130202 (GM) stopped writing unnecessary histograms to outputfile for MC
+* 20130202 (GM) stopped writing of unnecessary histograms to outputfile for MC
 
 * 20130202 (GM) added smarter handling of signal-limited regions of
-                sensitivity curves
+                sensitivity curves (mainly CTA)
 
 * 20130202 (GM) added pedvar calculation for prod2 CTA events
 

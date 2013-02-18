@@ -112,6 +112,11 @@ class VDSTTree
         float fDSTTraceWidth[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 //!< trace norm
         float fDSTTraceNorm[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+
+// mean pulse timing
+        float fDSTMeanPulseTiming[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+        float fDSTMeanPulseTiming_N[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
+	float fDSTMeanPulseTimingMinLightLevel;
 //////////////////////////////////////////////////////////////////////////////////////
 // MC parameters
         unsigned short int fDSTprimary;
@@ -222,6 +227,10 @@ class VDSTTree
         {
             return fDSTTel_yoff;
         }
+
+	void         fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime );
+	double       getDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID );
+	double       getDSTMeanPulseTimingMinLightLevel() { return fDSTMeanPulseTimingMinLightLevel; }
 
         int          hasLocalTrigger( int iTelID );
         int          hasData( int iTelID );
