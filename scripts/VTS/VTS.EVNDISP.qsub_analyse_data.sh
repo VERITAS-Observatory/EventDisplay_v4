@@ -11,14 +11,15 @@ set CALIB=PEEED
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 # output data files are written to this directory
-set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-d20121218/"
+set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-d20130215/"
 mkdir -p $ODIR
 # output log files are written to this directory
-set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-d20121218/"
+set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-d20130215/"
 mkdir -p $LDIR
 
 # eventdisplay reconstruction parameter
 set ACUTS="EVNDISP.reconstruction.runparameter"
+# set ACUTS="EVNDISP.reconstruction.CORR.runparameter"
 
 #########################################
 # directory with executable
@@ -43,15 +44,16 @@ set OPT=" "
 # pointing from pointing monitor (text file)
 #set OPT="$OPT -pointingmonitortxt /raid/pevray/maierg/veritas/VPM/results/"
 # pointing from pointing monitor (DB)
-#set OPT="$OPT -usedbvpm "
+# set OPT="$OPT -usedbvpm "
 # OFF data run
 #set OPT="$OPT -raoffset=6.25"
 # use calib.dat
 # set OPT="$OPT -calibrationfile calib.dat"
-# use new pixel positions
+# double passed correction
+#set OPT="$OPT -nodp2005"
 
 #read gain and toff from VOFFLINE DB
-set OPT = "-readCalibDB"
+set OPT="$OPT -readCalibDB "
 #read gain and toff from VOFFLINE DB requiring a special version of analysis 
 # set OPT = "-readCalibDB version_number"
 # warning this version must already exist in the DB

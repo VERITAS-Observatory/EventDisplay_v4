@@ -75,7 +75,7 @@ endif
 if( $ARRAY == "V6" ) then
    if( $PART == "1" ) then
       set IFIL=UPG_V0_"$ZEW"deg_"$WOG"
-      set IFIL=gamma_V6_Upgrade_20121127_v420_"$ATMO"_"$ZEW"deg_"$WOG"
+      set IFIL=gamma_V6_Upgrade_20121127_v420_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       if( $ATMO == "21-redHV" ) then
          set IFIL=gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_"$ZEW"deg_"$WOG"
       endif
@@ -168,7 +168,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20121218_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20130122_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"-v410/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -196,7 +196,7 @@ $EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=
 ##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$SRUN  -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$RRR.log
+$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$RRR.log
 ##############################################################################################
 
 # remove temporary vbf file
