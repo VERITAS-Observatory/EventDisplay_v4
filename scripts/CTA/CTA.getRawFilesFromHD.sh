@@ -12,7 +12,7 @@ then
    exit
 fi
 
-PWD=
+PWD=""
 if [ -z "$PWD" ]
 then
    echo "error: please add manually the password"
@@ -27,7 +27,13 @@ fi
 FILEL=`cat $1`
 for i in $FILEL
 do
-    wget --user=CTAraw --password=$PWD -O $2/$i http://www.mpi-hd.mpg.de/personalhomes/bernlohr/cta-raw/cta-prod2/$i
+    if [ -e $2/$i ] && [ -s $2/$i ]
+    then
+       echo "FILE EXISTS: $2/$i"
+    else
+       rm -f $2/$i
+       wget --user=CTAraw --password=$PWD -O $2/$i http://www.mpi-hd.mpg.de/personalhomes/bernlohr/cta-raw/cta-prod2/$i
+    fi
 done
 
 exit

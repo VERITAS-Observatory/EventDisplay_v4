@@ -11,6 +11,8 @@ then
    echo
    echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter]"
    echo
+   echo "CTA PROD2 ANALYSIS"
+   echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo
    echo "  <particle>                gamma_onSource , gamma_diffuse, proton , electron (helium, ...)"
@@ -34,7 +36,7 @@ fi
 
 ############################################################################
 # RUN PARAMETERS
-ARRAYCUTS="EVNDISP.reconstruction.runparameter"
+ARRAYCUTS="EVNDISP.prod2.reconstruction.runparameter"
 ############################################################################
 
 ARRAY=$1
@@ -80,11 +82,11 @@ SHELLDIR=$CTA_USER_DATA_DIR"/queueShellDir/"
 mkdir -p $SHELLDIR
 
 # skeleton script
-FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob"
+FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
 
-#   QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP/
-#   mkdir -p $QLOG
-QLOG="/dev/null"
+QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP/
+   mkdir -p $QLOG
+# QLOG="/dev/null"
 
 echo "submitting $RUNFROMTO"
 
@@ -108,9 +110,7 @@ rm -f $FNAM-7.sh
 chmod u+x $FNAM.sh
 echo $FNAM.sh
 
-qsub -t $RUNFROMTO:1  -l h_cpu=11:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
-#  qsub -t $RUNFROMTO:1 -l h_cpu=46:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
-# qsub -t $RUNFROMTO:1 -l h_cpu=0:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+qsub -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 
 echo "writing shell script to $FNAM.sh"
 echo "writing queue log and error files to $QLOG"

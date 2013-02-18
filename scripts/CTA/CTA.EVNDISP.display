@@ -84,7 +84,6 @@ fi
 #########################
 
 echo "$EVNDISPSYS/bin/evndisp $OPT"
-# $EVNDISPSYS/bin/evndisp $OPT 
- /afs/ifh.de/group/cta/scratch/maierg/EVNDISP/EVNDISP-400.DEV/trunk/bin/evndisp $OPT 
+$EVNDISPSYS/bin/evndisp $OPT 
 
 exit
