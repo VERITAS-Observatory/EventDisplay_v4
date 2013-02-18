@@ -713,7 +713,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 				   this_bin = (int)(j+fCalData[getTeltoAnaID()]->fFADCStopOffsets[i]+1);
 				   if (this_bin > 0 && this_bin <= hpulse[i]->GetNbinsX())
 				   {
-				       this_content = fReader->getSample_double( chanID, this_bin, (this_bin==0) ) -  getPeds( iLowGain )[i];
+				       this_content = fReader->getSample_double( chanID, this_bin, (this_bin==0) ) - getPeds( iLowGain )[i];
 				       if( getRunParameter()->fwriteLaserPulseN > 0 ) i_pulse->SetBinContent(this_bin,this_content);
 				       hpulse[i]->Fill( this_bin, this_content );
 // time corrected pulse
@@ -2522,8 +2522,6 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
    t->SetBranchAddress( "conv_low", fConv_low );
    if( t->GetBranch( "tzero" ) ) t->SetBranchAddress( "tzero", ftzero );
 
-      
-
 // reset histograms with pedestal distributions
    if( getPedvarsDist() )        getPedvarsDist()->Reset();
    if( getPedDist() )            getPedDist()->Reset();
@@ -2541,6 +2539,8 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        t->GetEntry( i );
 
        setTelID( i );
+
+
 
 // no calibration data available for this telescope
        if( nPixel == 0 ) continue;

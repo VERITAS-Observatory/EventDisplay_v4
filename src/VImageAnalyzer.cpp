@@ -87,7 +87,10 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // don't do analysis if init event failed or if there was no array trigger
-    if( !bInit || !getReader()->hasArrayTrigger() )
+    bool bTrigger = getReader()->hasArrayTrigger();
+// for DSTs, require additionally a local trigger
+    if( getRunParameter()->fsourcetype == 7 ) bTrigger = getReader()->hasArrayTrigger() && getReader()->hasLocalTrigger( getTelID());
+    if( !bInit || !bTrigger )
     {
         fillOutputTree();
         setSums( 0. );

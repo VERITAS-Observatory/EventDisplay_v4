@@ -551,7 +551,6 @@ valarray<double>& VCalibrationData::getPeds( bool iLowGain, double iTime )
 
 valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW, double iTime )
 {
-
 //////////////////////////////////////////////////////////
 // pedvars in time slices
 //////////////////////////////////////////////////////////

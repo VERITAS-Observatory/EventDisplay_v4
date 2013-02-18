@@ -60,8 +60,8 @@ unsigned int fGlobalMaxNumberofSamples = 0;
 unsigned int fGlobalNTelPreviousEvent = 0;
 // set if this event does not pass the minimum number of telescope condition
 bool fGlobalTriggerReset = false;
-// vector with telescope types (length of vector is total number of telescopes)
-vector< ULong64_t > fTelescopeType;
+// map with telescope types (length of vector is total number of telescopes)
+map< int, ULong64_t > fTelescopeType;
 ///////////////////////////////////////////////////////
 
 /*!
@@ -649,6 +649,7 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
        }
    }
 
+// loop over all telescopes and fill calibration trees
    for( int itel = 0; itel <  hsdata->run_header.ntel; itel++ )
    {
      fTelID = hsdata->tel_moni[itel].tel_id;
@@ -662,7 +663,7 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
 	  exit( -1 );
        }
 // fill pedestals from external root file
-       if( iPedFile && itel < (int)fTelescopeType.size() )
+       if( iPedFile && fTelescopeType.find( itel ) != fTelescopeType.end() )
        {
           std::ostringstream iSname;
 	  iSname << "tPeds_" << fTelescopeType[itel];
@@ -976,7 +977,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	      }
            }
 	}
-	fTelescopeType.push_back( fTelescope_type );
+	fTelescopeType[itel] = fTelescope_type;
 
         fTreeDet->Fill();
      }
