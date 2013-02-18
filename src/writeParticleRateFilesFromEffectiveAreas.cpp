@@ -27,8 +27,8 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
                               unsigned int iCrabSpec_ID = 6, char *iParticleNumberFile = "particleNumbers.tmp.root",
 			      string iObservatory = "CTA" )
 {
-    string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
-    string iESpecDataFile_CosmicRays = "$" + iObservatory + "_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
+    string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
+    string iESpecDataFile_CosmicRays = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
 
     if( iMC_Gamma && iMC_Proton )
     {
