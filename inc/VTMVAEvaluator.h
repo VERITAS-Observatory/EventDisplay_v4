@@ -56,6 +56,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    string                  fParticleNumberFileName;          // particle numbers are read from this file
    double                  fOptmizationSourceStrengthCrabUnits; 
+   double                  fOptmizationFixedSignalEfficiencyMinEnergy;
+   double                  fOptmizationFixedSignalEfficiencyAboveMinEnergy;
    double                  fOptmizationMinBackGroundEvents;
    double                  fOptimizationBackgroundAlpha;
    double                  fOptimizationObservingTime_h;
@@ -139,6 +141,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 	    fOptmizationMinBackGroundEvents = iMinBackgroundEvents; 
 	    fOptimizationBackgroundAlpha = iBackgroundAlpha;
 	    fOptimizationObservingTime_h = iObservationTime_h; }
+   void   setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiencyMinEnergy = 1.e99, double iOptmizationFixedSignalEfficiencyAboveMinEnergy = 1. );
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
    void   setPlotEfficiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iE = -99. );
@@ -148,7 +151,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 10 );
+   ClassDef(VTMVAEvaluator, 11 );
 };
 
 #endif

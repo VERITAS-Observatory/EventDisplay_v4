@@ -274,7 +274,6 @@ void VGlobalRunParameter::printGlobalRunParameter()
    if( fEVNDISPCalibrationDataDirectory.size() > 0 ) cout << "Calibration data: " << fEVNDISPCalibrationDataDirectory << endl;
    if( fEVNDISPOutputDirectory.size() > 0 )  cout << "EVNDISP output: " << fEVNDISPOutputDirectory << endl;
    cout << endl;
-
 }
 
 

@@ -48,6 +48,7 @@ void VTMVAEvaluator::reset()
    setParticleNumberFile();
    setPlotEfficiencyPlotsPerEnergy();
    setSensitivityOptimizationParameters();
+   setSensitivityOptimizationFixedSignalEfficiency();
    setTMVAMethod();
 // default: don't expect that the theta2 cut is performed here   
    setTMVAThetaCutVariable( false );
@@ -988,7 +989,8 @@ void VTMVAEvaluator::printSignalEfficiency()
    {
       if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() )
       {
-         cout << "E [" << showpoint << setprecision( 3 ) << fEnergyCut_Log10TeV_min[i] << "," << fEnergyCut_Log10TeV_max[i] << "] TeV :\t ";
+         cout << "E [" << showpoint << setprecision( 3 ) << fEnergyCut_Log10TeV_min[i] << "," << fEnergyCut_Log10TeV_max[i] << "] TeV";
+	 cout << " (bin " << i << "):\t ";
       }
       cout << fSignalEfficiency[i];
       if( i < fBackgroundEfficiency.size() && fBackgroundEfficiency[i] > 0. )
@@ -999,7 +1001,7 @@ void VTMVAEvaluator::printSignalEfficiency()
       {
          cout << "\t MVACut: " << fTMVACutValue[i];
       }
-      if( i < fTMVAOptimumCutValueFound.size() )
+      if( i < fTMVAOptimumCutValueFound.size() && fOptmizationSourceStrengthCrabUnits > 0. && fParticleNumberFileName.size() > 0 )
       { 
          if( fTMVAOptimumCutValueFound[i] ) cout << " (optimum reached)";
 	 else                               cout << " (no optimum reached)";
@@ -1046,17 +1048,22 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 //////////////////////////////////////////////////////
 // get mean energy of the considered bins
    double iMeanEnergy_TeV = -99.;
+   double iSpectralWeightedMeanEnergy_TeV = -99.;
    if( iEnergyBin < fEnergyCut_Log10TeV_min.size() && iEnergyBin < fEnergyCut_Log10TeV_max.size() )
    {
       iMeanEnergy_TeV = 0.5*( TMath::Power( 10., fEnergyCut_Log10TeV_min[iEnergyBin] ) + TMath::Power( 10., fEnergyCut_Log10TeV_max[iEnergyBin] ));
       iMeanEnergy_TeV = TMath::Log10( iMeanEnergy_TeV ); // log10 energy
+// get spectral weighed mean
+      iSpectralWeightedMeanEnergy_TeV = VMathsandFunctions::getMeanEnergyInBin( 2, fEnergyCut_Log10TeV_min[iEnergyBin],
+                                                                                   fEnergyCut_Log10TeV_max[iEnergyBin],
+										   fSpectralIndexForEnergyWeighting );
 // make sure that energy is not lower or higher then minimum/maximum bins in graphs
       double x = 0.;
       double y = 0.;
       i_on->GetPoint( 0, x, y );
-      if( iMeanEnergy_TeV < x ) iMeanEnergy_TeV = TMath::Log10( TMath::Power( 10., x ) * 1.2 );
+      if( iSpectralWeightedMeanEnergy_TeV < x ) iSpectralWeightedMeanEnergy_TeV = TMath::Log10( TMath::Power( 10., x ) * 1.2 );
       i_on->GetPoint( i_on->GetN()-1, x, y );
-      if( iMeanEnergy_TeV > x ) iMeanEnergy_TeV = TMath::Log10( TMath::Power( 10., x ) * 0.8 );
+      if( iSpectralWeightedMeanEnergy_TeV > x ) iSpectralWeightedMeanEnergy_TeV = TMath::Log10( TMath::Power( 10., x ) * 0.8 );
    }
    else
    {
@@ -1072,22 +1079,24 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    double Ndif = 0.;
 
 // Note that observation time is irrelevant for the determination of the optimal MVA cut value
-   Non = i_on->Eval( iMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
-   Nof = i_of->Eval( iMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
+   Non = i_on->Eval( iSpectralWeightedMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
+   Nof = i_of->Eval( iSpectralWeightedMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
    if( Nof < 0. ) Nof = 0.;
    Ndif= Non - Nof;
 
    cout << "VTVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
    cout << " non = " << Non;
    cout << " noff = " << Nof;
-   cout << " ndif = " << Ndif << " (" << Ndif*fOptmizationSourceStrengthCrabUnits << ")";
-   cout << " (energy bin " << iEnergyBin << "," << TMath::Power( 10., iMeanEnergy_TeV ) << " [TeV] )";
+   cout << " ndif = " << Ndif << " (" << Ndif*fOptmizationSourceStrengthCrabUnits << ")" << endl;
+   cout << "VTVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
+   cout << " (energy bin " << iEnergyBin << "," << TMath::Power( 10., iMeanEnergy_TeV ) << " [TeV],";
+   cout << " weighted mean energy " << TMath::Power( 10., iSpectralWeightedMeanEnergy_TeV ) << " [TeV] )";
    cout << endl;
 // apply source strength
    Ndif *= fOptmizationSourceStrengthCrabUnits;
        
-//////////////////////////////////////////////////////
-// get signal and background efficiency histograms
+/////////////////////////////////////////////////////////////////
+// get signal and background efficiency histograms from TMVA files
 
    TFile iTMVAFile( iTMVARootFile.c_str() );
    if( iTMVAFile.IsZombie() )
@@ -1097,6 +1106,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       cout << " (energy bin " << iEnergyBin << ")" << endl;
       return false;
    }
+// the following naming might have to be adjusted for other methods than BDTs or Boxcuts
    char hname[800];
    if( fTMVAMethodName == "BOXCUTS" )
    {
@@ -1170,9 +1180,11 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       }
    }
    
-   cout << "TMVA Evaluator optimization: ";
+   cout << "VTVMAEvaluator::getOptimalSignalEfficiency() optimization parameters: ";
    cout << fOptmizationSourceStrengthCrabUnits << " CU signal source; ";
-   cout << "at least " << fOptmizationMinBackGroundEvents << " background events required";
+   cout << "fix signal efficiency to " << fOptmizationFixedSignalEfficiencyAboveMinEnergy;
+   cout << " above energy bin " << fOptmizationFixedSignalEfficiencyMinEnergy << endl;
+//   cout << "at least " << fOptimzationMinSignalEvents << "/" << fOptmizationMinBackGroundEvents << " signal/background events required";
    cout << " (alpha: " << fOptimizationBackgroundAlpha << ")" << endl;
 
 //////////////////////////////////////////////////////
@@ -1267,6 +1279,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 // make sure that signal efficency is > 0 (and 1 for the case that there is no maximum found)
       if( i_Signal_to_sqrtNoise_atMaximum < 1.e-3 )
       {
+         cout << "VTMVAEvaluator::optimizeSensitivity: signal/sqrt(bck) too small at maximum, try previous bin" << endl;
 // first try: take previous bin:
          if( iEnergyBin > 0 )
 	 {
@@ -1283,6 +1296,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       } 
    }
 // check if value if really at the optimum or if information is missing from background efficiency curve
+// (check if maximum was find in the last bin or if next bin content is zero)
    if( ( effB->FindBin( i_xmax ) + 1  < effB->GetNbinsX() && effB->GetBinContent( effB->FindBin( i_xmax ) + 1 ) < 1.e-10 )
       || ( effB->FindBin( i_xmax ) == effB->GetNbinsX() ) )
    {
@@ -1298,8 +1312,35 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    {
       if( iEnergyBin < fTMVAOptimumCutValueFound.size() ) fTMVAOptimumCutValueFound[iEnergyBin] = true;
    }
-   cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum is ";
-   cout << i_SignalEfficiency_AtMaximum << " with a significance of " << i_Signal_to_sqrtNoise_atMaximum << endl;
+// fix signal efficiency above a certain energy
+   if( fEnergyCut_Log10TeV_min[iEnergyBin] >= fOptmizationFixedSignalEfficiencyMinEnergy )
+   {
+       if( fOptmizationFixedSignalEfficiencyAboveMinEnergy > 0.99 )
+       {
+	  i_TMVACutValue_AtMaximum         = effS->GetBinCenter( effS->GetNbinsX()-1 );
+	  i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effS->GetNbinsX()-1 );
+       }
+       else
+       {
+	  for( int i = 1; i < effS->GetNbinsX(); i++ )
+	  {
+	     if( effS->GetBinContent( i ) < fOptmizationFixedSignalEfficiencyAboveMinEnergy )
+	     {
+		i_TMVACutValue_AtMaximum         = effS->GetBinCenter( i );
+		i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( i );
+		break;
+	     }
+	  }
+       }
+       i_SignalEfficiency_AtMaximum     = fOptmizationFixedSignalEfficiencyAboveMinEnergy;
+       cout << "VTMVAEvaluator::optimizeSensitivity: setting signal efficiency to " << fOptmizationFixedSignalEfficiencyAboveMinEnergy;
+       cout << " (energy > " << fOptmizationFixedSignalEfficiencyMinEnergy << " TeV)" << endl;
+   } 
+   else
+   {
+      cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum is ";
+      cout << i_SignalEfficiency_AtMaximum << " with a significance of " << i_Signal_to_sqrtNoise_atMaximum << endl;
+   }
 
    if( iEnergyBin < fSignalEfficiency.size() )     fSignalEfficiency[iEnergyBin]     = i_SignalEfficiency_AtMaximum;
    if( iEnergyBin < fBackgroundEfficiency.size() ) fBackgroundEfficiency[iEnergyBin] = i_BackgroundEfficiency_AtMaximum;
@@ -1439,4 +1480,11 @@ void VTMVAEvaluator::setTMVAMethod( string iMethodName, unsigned int iMethodCoun
    if( fTMVAMethodName == "BOXCUTS" ) fTMVAMethodName_BOXCUTS = true;
    fTMVAMethodCounter = iMethodCounter;
 }
+
+void VTMVAEvaluator::setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiencyMinEnergy, double iOptmizationFixedSignalEfficiencyAboveMinEnergy )
+{
+   fOptmizationFixedSignalEfficiencyMinEnergy = iOptmizationFixedSignalEfficiencyMinEnergy;
+   fOptmizationFixedSignalEfficiencyAboveMinEnergy = iOptmizationFixedSignalEfficiencyAboveMinEnergy;
+}
+    
    

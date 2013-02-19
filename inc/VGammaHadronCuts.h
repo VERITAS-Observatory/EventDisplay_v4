@@ -120,6 +120,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
 	double          fTMVAOptimizeSignalEfficiencyObservationTime_h;
+	double          fTMVAFixedSignalEfficiencyMinEnergy;
+	double          fTMVAFixedSignalEfficiencyAboveMinEnergy;
 	TGraph*         fTMVABoxCut_Theta2_max;                
 	double          fTMVA_EvaluationResult;
 
@@ -296,6 +298,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,34);
+        ClassDef(VGammaHadronCuts,36);
 };
 #endif
