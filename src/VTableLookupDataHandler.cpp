@@ -231,7 +231,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 
 // calculate distances
         calcDistances( fNImages );
-        if( fNImages > 1 ) if( !bShort ) calcEmissionHeights();
+        if( fNImages > 1 ) calcEmissionHeights();
 
         setEventWeightfromMCSpectrum();
     }
@@ -278,12 +278,16 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
 
     if( !bShort ) LTrig = (ULong64_t)fshowerpars->LTrig;
 
+    for( unsigned int i = 0; i < fNTel; i++ )
+    {
+       fTelElevation[i] = fshowerpars->TelElevation[i];
+       fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
+    }
+
     if( !fIsMC )
     {
         for( unsigned int i = 0; i < fNTel; i++ )
         {
-            fTelElevation[i] = fshowerpars->TelElevation[i];
-            fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
             fTelDec[i] = fshowerpars->TelDec[i];
             fTelRA[i] = fshowerpars->TelRA[i];
         }
