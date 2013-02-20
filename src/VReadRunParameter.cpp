@@ -1095,7 +1095,7 @@ void VReadRunParameter::test_and_adjustParams()
 // (before the T1 move)
        else if( fRunPara->frunnumber <= 46642 )
        {
-          fRunPara->fcamera[0] = "veritasBC4_090723_Autumn2007-4.1.5_EVNDISP.cfg";
+          fRunPara->fcamera[0] = "EVN_V4_Autumn2007_20130110.txt";
        }
 // configuration from Sep 2012
 // PRELI: this is a file with upgraded pixel positions

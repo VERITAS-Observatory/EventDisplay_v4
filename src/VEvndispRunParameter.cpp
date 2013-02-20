@@ -62,7 +62,7 @@ VEvndispRunParameter::VEvndispRunParameter()
 
 // geometry/calibration parameters
     fNTelescopes = 4;                             // there is always at least one telescope
-    fcamera.push_back( "veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg" );
+    fcamera.push_back( "EVN_V4_Autumn2007_20130110.txt" );
     fCalibrationDataType = 1;  // should be 0 for e.g. CTA DSTs
     fcalibrationfile = "";
     fLowGainCalibrationFile = "calibrationlist.LowGain.dat";
