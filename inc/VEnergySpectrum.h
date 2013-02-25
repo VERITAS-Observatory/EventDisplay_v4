@@ -198,6 +198,9 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 	void setPlottingUpperLimits( bool iPlot = true ) { fPlottingUpperLimits = iPlot; }
         void setPlottingYaxis( double iMin = 1.e-14, double iMax = 1.e-8 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
-        ClassDef(VEnergySpectrum,9);
+
+	TF1* getSpectralFitFunction() { return fSpectralFitter->getSpectralFitFunction(); }  // Added this function to help automize spectral fitting
+
+        ClassDef(VEnergySpectrum, 10);
 };
 #endif
