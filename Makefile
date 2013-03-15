@@ -1035,10 +1035,9 @@ CTA.convert_hessio_to_VDST:	./obj/VDSTTree.o \
 				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/CTA.convert_hessio_to_VDST.o
-	   $(LD) $(LDFLAGS) $(GLIBS) $(SOEXEFLAGS) \
-	   $(filter %.o,$^) \
-	   -L$(HESSIOSYS)/lib -lhessio -lm  \
-	   -o bin/CTA.convert_hessio_to_VDST
+	$(LD) $(LDFLAGS) $^ $(GLIBS) -L$(HESSIOSYS)/lib -lhessio \
+	$(OutPutOpt) ./bin/$@
+	@echo "$@ done"
 
 TESTHESSIO:
 ifeq ($(HESSIO),FALSE)
