@@ -1166,6 +1166,7 @@ $(ctapara):
 	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/TeV_data $(ctapara)/AstroData
 	mkdir -p $(ctapara)/DetectorGeometry
 	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod1* $(ctapara)/DetectorGeometry/
+	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod2* $(ctapara)/DetectorGeometry/
 	mkdir -p $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.GammaHadron.QC.* $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVAFixedSignal.* $(ctapara)/ParameterFiles
