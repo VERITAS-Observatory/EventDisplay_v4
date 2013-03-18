@@ -83,6 +83,23 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       if( fDebug ) cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: event status > 0: " << iImageParameter->eventStatus << endl;
    }
 
+// L2 trigger type (mainly for CTA prod2)
+   if( fL2TriggerType[iMeth][iTelType] != 9999 )
+   {
+      bitset< 8 > i_L2TrigType( iImageParameter->fTrig_type );
+      if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
+      {
+	 iArrayCut = false;
+	 if( fDebug )
+	 {
+	    cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut (meth " << iMeth << "): L2 trigger type ";
+	    cout << iImageParameter->fTrig_type << ", " << i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] );
+	    cout << " (" << fL2TriggerType[iMeth][iTelType] << ")" << endl;
+         }
+      }
+   }
+
+
 // image size
    if( iImageParameter->size < fSize_min[iMeth][iTelType] || iImageParameter->size <= 0. )
    {
@@ -269,6 +286,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     vector< int > i_t;
     vector< double > i_d;
     vector< bool > i_b;
+    vector< unsigned int > i_u;
 
     fRecordCounter.push_back( iRecordID );
 // standard array reconstruction method is '0'
@@ -337,6 +355,8 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     i_d.clear();
     for( unsigned int i = 0; i < fNTel_type; i++ ) i_d.push_back( -1.e10 );
     fFui_min.push_back( i_d );
+    for( unsigned int i = 0; i < fNTel_type; i++ ) i_u.push_back( 9999 );
+    fL2TriggerType.push_back( i_u );
 }
 
 
@@ -372,6 +392,9 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
         cout << "\t\t use image in reconstruction:\t\t\t\t\t ";
         for( unsigned int i = 0; i < fLocalUseImage[m].size(); i++ ) cout << fLocalUseImage[m][i] << "\t";
         cout << endl;
+	cout << "\t\t L2 trigger type: \t\t\t\t\t\t ";
+	for( unsigned int i = 0; i < fL2TriggerType[m].size(); i++ ) cout << fL2TriggerType[m][i] << "\t";
+	cout << endl;
         cout << "\t\t minimum number of pixels per image:\t\t\t\t ";
         for( unsigned int i = 0; i < fLocalNtubes_min[m].size(); i++ ) cout << fLocalNtubes_min[m][i] << "\t";
         cout << endl;
@@ -753,6 +776,12 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fSize_min[m_temp].size(); i++ ) fSize_min[m_temp][i] = atof( iTemp2.c_str() );
                 else for( unsigned int i = 0; i < v_temp.size(); i++ ) fSize_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
+            }
+// trigger type (used e.g. in CTA prod2)
+	    else if( iTemp == "L2TRIGGERTYPE" )
+	    {
+                if( t_temp < 0 ) for( unsigned int i = 0; i < fL2TriggerType[m_temp].size(); i++ ) fL2TriggerType[m_temp][i] = (unsigned int)(atoi( iTemp2.c_str() ));
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fL2TriggerType[m_temp][v_temp[i]] = (unsigned int)(atoi( iTemp2.c_str()));
             }
             else if( iTemp == "MAXSIZE" )
             {

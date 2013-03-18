@@ -38,6 +38,7 @@ class VImageParameter
         short int fLocalTrigger;                  //!< 1 of this telescope had a local trigger
  	int fncluster_cleaned;                    //!< HP: number of clusters after image cleaning 
  	int fncluster_uncleaned;                  //!< HP: number of clusters after image cleaning 
+	unsigned short int fTrig_type;            //  trigger type (e.g. in CTA prod2)
 
 // telescope position in shower parameter
         double Tel_x_SC;                          //!< telescope position in shower coordinates

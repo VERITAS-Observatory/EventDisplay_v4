@@ -228,6 +228,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     MCTel_Xoff = 0.;
     MCTel_Yoff = 0.;
 //image parameters
+    fTrig_type = 0;
     f_d = 0.;
     f_s = 0.;
     f_sdevxy = 0.;

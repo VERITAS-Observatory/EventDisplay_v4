@@ -11,6 +11,7 @@
 #include <TNamed.h>
 #include <TSystem.h>
 
+#include <bitset>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -62,6 +63,7 @@ class VEvndispReconstructionParameter : public TNamed
         vector< vector< double > > fLoss_max;
         vector< vector< double > > fFui_min;
         vector< vector< double > > fWidthLength_max;
+	vector< vector< unsigned int > > fL2TriggerType;
 
         vector< bool > fUseEventdisplayPointing;
 // C. Duke: 20oct06  added vector to store select image results
@@ -89,6 +91,6 @@ class VEvndispReconstructionParameter : public TNamed
         unsigned int read_arrayAnalysisCuts( string ifile );
 	void   setDebug( bool iD = false ) { fDebug = iD; }
 
-        ClassDef(VEvndispReconstructionParameter,13);
+        ClassDef(VEvndispReconstructionParameter,14);
 };
 #endif

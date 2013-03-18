@@ -477,6 +477,7 @@ bool VImageAnalyzer::initEvent()
     getImageParameters()->runNumber = getRunNumber();
     getImageParameters()->eventType = (unsigned short int)getReader()->getNewEventType();
 
+    getImageParameters()->fTrig_type = fReader->getLocalTriggerType( getTelID() );
     if( fReader->isGrisuMC() ) setNTrigger();
 
 // fill high/low gain vector

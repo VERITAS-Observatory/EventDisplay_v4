@@ -571,7 +571,7 @@ void VArrayAnalyzer::transformTelescopePosition( int iTel, float i_ze, float i_a
 
      results stored in boolean vector with length of number of telescopes
 
-     \par iMeth shower reconstruction method number
+     parameter: iMeth shower reconstruction method number
 */
 void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 {
