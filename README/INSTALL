@@ -39,16 +39,14 @@ Linking
 -------
 
 ROOTSYS :   ROOT installation; add $ROOTSYS/lib to $LD_LIBRARY_PATH and $ROOTSYS/bin to $PATH 
-            (at DESY: /afs/ifh.de/group/cta/cta/software/root/root_v5.28.00d)
+            (root should be compile with minuit2, mysql, xml)
 
 HESSIOSYS : HESSIO libraries (for CTA analysis only); add $HESSIOSYS/lib to $LD_LIBRARY_PATH (not needed for VERITAS analysis)
-            (at DESY: /afs/ifh.de/group/cta/MC_Production/V03-20100319/MC_ultra/hessioxxx/)
 
 VBSYS :     VBF libraries (for VERITAS analysis only); add $VBFSYS/bin to $PATH and $VBFSYS/lib to $LD_LIBRARY_PATH
             (VBF is not needed for CTA analysis)
 
 FITSSYS :   FITS libraries (optional)
-            (at DESY located at /afs/ifh.de/group/cta/VERITAS/software/FITS/cfitsio/ )
 
 Analysis
 --------
