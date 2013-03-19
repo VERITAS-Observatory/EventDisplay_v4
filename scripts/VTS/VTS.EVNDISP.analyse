@@ -20,7 +20,7 @@
 if [ ! -n "$1" ] || [ "$1" = "-h" ]
 then
    echo
-   echo "VTS.EVNDISP.analyse <runnumber> [telescope number] [DST=0/1]"
+   echo "VTS.EVNDISP.analyse <runnumber> [telescope number] [laser calib from DB] [DST=0/1]"
    echo
    echo "analyse a data file and write results to file runnumber.root"
    echo
@@ -33,6 +33,8 @@ then
    echo "    [telescope number]      use 1 for telescope 1, 13 for telescope 1 and 3 only, etc."
    echo "                            (default telescope combination is 1234 (euqivalent to -1))"
    echo    
+   echo "    [read laser calibration from DB]  use 0 to switch of (default is on)" 
+   echo
    echo "    [DST]                   output format is DST (default OFF=0)"
    echo
    echo "examples:"
@@ -49,7 +51,7 @@ fi
 ########################################################################################################
 # overwrite option in DST mode
 # dst production
-if [ -n "$3" ] 
+if [ -n "$4" ] 
 then
    OPT="-imagethresh=0 -borderthresh=0 -runmode=4"
 # output file
@@ -62,6 +64,16 @@ TELTOANA="1234"
 if [ -n "$2" ]
 then
   OPT="$OPT -teltoana=$2"
+fi
+
+# laser calibration from DB
+LASERCALIB="-readCalibDB"
+if [ -n "$3" ]
+then
+   if [ $3 = "0" ]
+   then
+      LASERCALIB=""
+   fi
 fi
 
 # source (VBF) file
@@ -79,7 +91,7 @@ fi
 OPT="$OPT -runnumber=$1"
 
 # use by default relative gains and toffsets from database
-OPT="-readCalibDB $OPT"
+OPT="$LASERCALIB $OPT"
 
 #########################
 # NOW START EVENTDISPLAY
