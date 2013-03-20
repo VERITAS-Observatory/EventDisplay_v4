@@ -280,7 +280,7 @@ void Cshowerpars::Init(TTree *tree)
     else          traceFit = 0;
     fChain->SetBranchAddress("TelElevation",TelElevation);
     fChain->SetBranchAddress("TelAzimuth",TelAzimuth);
-    if( !bMC )
+    if( !bMC && !bShort )
     {
        fChain->SetBranchAddress("TelElevationVBF",TelElevationVBF);
        fChain->SetBranchAddress("TelAzimuthVBF",TelAzimuthVBF);

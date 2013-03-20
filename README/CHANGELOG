@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130320 (GM) small bug fix to remove ROOT warnings reading showerpars trees
+
+* 20130319 (GM) added  possibility to switch of DB calibration in VTS.EVNDISP.analyse
+
 * 20130218 (GM) cleanup of pedvars and pedestal calculation. 
                 Note: loop now over all telescope types (was: telescopes);
 		this shouldn't change anything for VTS
