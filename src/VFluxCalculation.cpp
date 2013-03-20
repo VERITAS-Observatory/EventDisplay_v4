@@ -1860,8 +1860,8 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char *iTex, double iMJDOff
                 iFluxDayError[p->first] = sqrt( iFluxDayError[p->first] / p->second / p->second );
 
 // fluxes in 1/[cm2 s ]
-                gFluxMJDDay->SetPoint( z, p->first - iMJDOffset, iFluxDay[p->first] * fluxMult / 1.e4 );
-                gFluxMJDDay->SetPointError( z, 0., iFluxDayError[p->first] * fluxMult / 1.e4 );
+                gFluxMJDDay->SetPoint( z, p->first - iMJDOffset, iFluxDay[p->first] * fluxMult );
+                gFluxMJDDay->SetPointError( z, 0., iFluxDayError[p->first] * fluxMult );
                 z++;
             }
             else gFluxMJDDay->RemovePoint( z );
