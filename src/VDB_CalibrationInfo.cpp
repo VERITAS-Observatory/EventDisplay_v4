@@ -204,7 +204,7 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file(){
 //-- put the result in a FILE
 //-- public
 //---------------------------------------------
-void VDB_CalibrationInfo::readVOFFLINE()
+bool VDB_CalibrationInfo::readVOFFLINE()
 {
     std::cout<<"Reading calibration information from VOFFLINE DB"<<std::endl;
 
@@ -215,37 +215,45 @@ void VDB_CalibrationInfo::readVOFFLINE()
 	Vchannel.clear();
 	Vmean.clear();
 	Vvar.clear();
-	return;
+	return false;
      }
 
    //-- Create the query to read the DB
    Create_query_read(); 
    
    //-- read the DB and put the result in the vector
-   Read_the_DB();
+   if(Read_the_DB()){
    
-   //-- write the result of the reading in a FILE
-   if(Vchannel.size()>0 && fFile_to_write.Length() > 0 )
-   {
-       //std::cout<<"VDB_CalibrationInfo::readVOFFLINE Vchannel.size()>0"<<std::endl;
-       //std::cout<<"fFile_to_write "<<fFile_to_write<<std::endl;
-// make sure that directory exists
-       gSystem->mkdir( gSystem->DirName( fFile_to_write.Data() ), true );
-       FILE * file_output;
-       file_output = fopen (fFile_to_write.Data(),"w");
-       for(unsigned int i = 0 ; i< Vchannel.size(); i++)
+       //-- write the result of the reading in a FILE
+       if(Vchannel.size()>0 && fFile_to_write.Length() > 0 )
        {
-	   fprintf(file_output, "%3d %.4f %.4f  \n",(int) Vchannel[i],Vmean[i],Vvar[i]);    
+
+           // make sure that directory exists
+	   gSystem->mkdir( gSystem->DirName( fFile_to_write.Data() ), true );
+	   FILE * file_output;
+	   file_output = fopen (fFile_to_write.Data(),"w");
+	   for(unsigned int i = 0 ; i< Vchannel.size(); i++)
+	   {
+	       fprintf(file_output, "%3d %.4f %.4f  \n",(int) Vchannel[i],Vmean[i],Vvar[i]);    
+	   }
+	   fclose(file_output);
+	   return true;
        }
-       fclose(file_output);
-   }
-   else if( Vchannel.size() == 0 )
-   {
-       std::cout<<"ERROR  VDB_CalibrationInfo::readVOFFLINE Vchannel.size()<1"<<std::endl;
+       else if( Vchannel.size() == 0 )
+       {
+	   std::cout<<"ERROR  VDB_CalibrationInfo::readVOFFLINE Vchannel.size()<1"<<std::endl;
+	   
+	   return false;
+       }
+       return true;
+       
+   }else{
+       
+       std::cout<<"ERROR reading went wrong "<<std::endl;
+       return false;
+       
    }
    
-   return;
-
 }
 
 
@@ -323,8 +331,9 @@ bool VDB_CalibrationInfo::test_file_format(TString file_to_be_copied){
 //-- go read the DB with fquery_read
 //-- fill the given vector with the result of the reading
 //-- private
+//
 //---------------------------------------------------------------------------
-void VDB_CalibrationInfo::Read_the_DB()
+bool VDB_CalibrationInfo::Read_the_DB()
 {
     Vchannel.clear();
     Vmean.clear();
@@ -338,43 +347,50 @@ void VDB_CalibrationInfo::Read_the_DB()
     {
 	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to connect to database server" << endl;
 	cout << "\t server: " <<  fServer << endl;
-	return;
+	return false;
     }
     //---- do the query and check
     TSQLResult *db_res = f_db->Query( fquery_read.c_str() );
     if( !db_res ){
 	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to get something from the query "<<endl;
 	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
-	return;
+	f_db->Close();
+	return false;
     }
     //---- read the query
-       if( db_res->GetRowCount() > 0 ){
-	   while( TSQLRow *db_row = db_res->Next() ){
-	       if( !db_row ){
-		   cout << "WARNING VDB_CalibrationInfo::Read_the_DB(): failed reading a row from DB "<<endl;
-		   cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
-		   return;
-	       }
-
-	       Vchannel.push_back( (unsigned int)atoi( db_row->GetField( 0 ) )) ;
-	       Vmean.push_back( atof( db_row->GetField( 1 ) )) ;
-	       Vvar.push_back( atof( db_row->GetField( 2 ) ) );
-	   }
+    if( db_res->GetRowCount() > 0 ){
+	while( TSQLRow *db_row = db_res->Next() ){
+	    if( !db_row ){
+		cout << "WARNING VDB_CalibrationInfo::Read_the_DB(): failed reading a row from DB "<<endl;
+		cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
+		f_db->Close();
+		return false;
+	    }
+	    
+	    Vchannel.push_back( (unsigned int)atoi( db_row->GetField( 0 ) )) ;
+	    Vmean.push_back( atof( db_row->GetField( 1 ) )) ;
+	    Vvar.push_back( atof( db_row->GetField( 2 ) ) );
+	}
     }
     else{
-
+	
 	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
+	f_db->Close();
+	return false;
+	
     }
 // HARDWIRED TOTAL NUMBER OF CHANNELS
-       if(Vchannel.size()<499){
-	   cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" has "<<Vchannel.size()<<" channel filled in the DB. Should be 499"<<std::endl;
-       }
-
+    if(Vchannel.size()<499){
+	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" has "<<Vchannel.size()<<" channel filled in the DB. Should be 499"<<std::endl;
+	f_db->Close();
+	return false;
+    }
+    
     //-- close the DB
     f_db->Close();
     
-
-    return;
+    
+    return true;
 }
 //---------------------------------------------------------------------------
 //-- VDB_CalibrationInfo::Create_query_read()

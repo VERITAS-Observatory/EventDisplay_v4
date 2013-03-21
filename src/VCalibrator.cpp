@@ -1500,12 +1500,23 @@ void VCalibrator::readfromVOFFLINE_DB(int gain_or_toff,string &iFile, vector< un
     TString DB_server = getRunParameter()->getDBServer();
     VDB_CalibrationInfo fDB_calibinfo( getRunParameter()->fGainFileNumber[getTelID()], getTelID()+1, iFile,
                                        gain_or_toff, getRunParameter()->freadCalibfromDB_versionquery, LOW_GAIN,DB_server );
-    fDB_calibinfo.readVOFFLINE();
+
+
+    //--- reading the VOFFLINE DB (if something goes wrong in the reading the analysis is interrupted)
+    if(fDB_calibinfo.readVOFFLINE()){
     Vmean = fDB_calibinfo.getVectorMean();
     Vrms = fDB_calibinfo.getVectorVariance();
     Vchannel = fDB_calibinfo.getVectorChannelList();
-    
     return;   
+    }else{
+
+	std::cout<<"ERROR: calibration information could not be read from the VOFFLine DB "<<std::endl;
+	std::cout<<"exiting..."<<std::endl;
+	std::cout<<"            please launch EVNDISP without the option: readcalibdb, if you want to be independent from the VOFFLINE DB"<<std::endl;
+	exit(-1);
+    }
+
+
 }
 
 
@@ -1523,6 +1534,8 @@ void VCalibrator::readGains( bool iLowGain )
 
     string iFile = fGainFileNameC[getTelID()];
     if( iLowGain ) iFile = fLowGainGainFileNameC[getTelID()];
+
+
 
 
 // don't read gains for runmode = 2
@@ -1556,10 +1569,25 @@ void VCalibrator::readGains( bool iLowGain )
 	   if (!infile)
 	   {
 	       cout << "VCalibrator::readGains() warning: Input file " << iFile << " cannot be opened.\n" ;
-	       cout << "VCalibrator::readGains() info: all gains set to 1.0\n" ;
 	       use_default=true;
-	       if( getRunParameter()->fDBRunType == "flasher" || getRunParameter()->fDBRunType == "laser" ) setGains_DefaultValue( true, iLowGain );
-	       else                                                                                         setGains_DefaultValue( false, iLowGain );
+	       if( getRunParameter()->fDBRunType == "flasher" || getRunParameter()->fDBRunType == "laser" ){
+		   cout << "VCalibrator::readGains() info: all gains set to 1.0\n" ;
+		   setGains_DefaultValue( true, iLowGain );
+	       }
+	       else{
+		   if(!getRunParameter()->fNoCalibNoPb){
+		       std::cout<<"Error: No gain information available "<<std::endl;
+		       std::cout<<"exiting... "<<std::endl;
+		       std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all gains will be set to 1) "<<std::endl;
+		       exit(-1);
+		       
+		   }
+		   setGains_DefaultValue( false, iLowGain );
+		   cout << "VCalibrator::readGains() info: all gains set to 1.0\n" ;
+	       }
+
+
+
 	   }
 
 	   char buffer[100];
@@ -1603,10 +1631,17 @@ void VCalibrator::readGains( bool iLowGain )
             }
         }
     }
-    else
+    else if(getRunParameter()->fNoCalibNoPb)
     {
+	std::cout<<"VCalibrator::readGains() info: Gains are set to 1, Gains are not tested to find dead channels "<<std::endl; 
         setGains( 1., iLowGain );
         setGainvars( 1., iLowGain );
+    }
+    else{
+	std::cout<<"Error: No gain information available "<<std::endl;
+	std::cout<<"exiting... "<<std::endl;
+	std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all gains will be set to 1) "<<std::endl;
+	exit(-1);
     }
 
 // apply additional gain corrections
@@ -1712,8 +1747,10 @@ void VCalibrator::readTOffsets( bool iLowGain )
     string iFile = fToffFileNameC[getTelID()];
     if( iLowGain ) iFile = fLowGainToffFileNameC[getTelID()];
 
+   
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
     {
+
 	vector< unsigned int > VchannelList;
 	vector < double > Vmean;
 	vector < double > Vvar;
@@ -1741,8 +1778,27 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	   if( !infile )
 	   {
 	       cout << "VCalibrator::readTOffsets() warning: input file " << iFile << " cannot be opened.\n" ;
-	       cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0.\n" ;
-	       use_default=true;
+
+	       if( getRunParameter()->fDBRunType == "flasher" || getRunParameter()->fDBRunType == "laser" ){
+		   cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0.\n" ;
+		   use_default=true;
+	       }
+	       else
+	       {
+		   if(!getRunParameter()->fNoCalibNoPb){
+		       std::cout<<"Error: No toff information available "<<std::endl;
+		       std::cout<<"exiting... "<<std::endl;
+		       std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all TOffsets will be set to 0) "<<std::endl;
+		       exit(-1);
+		       
+		   }
+		   
+		   cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0.\n" ;
+		   use_default=true;
+	       }
+	       
+
+	       
 	   }
 
 	   char buffer[100];
@@ -1762,36 +1818,50 @@ void VCalibrator::readTOffsets( bool iLowGain )
                 }
             }
          }
-	 if( !use_default )
-	 {
-	     if( VchannelList.size() == Vmean.size() && VchannelList.size() == Vvar.size() )
-	     {
+
+	if( !use_default )
+	{
+	    if( VchannelList.size() == Vmean.size() && VchannelList.size() == Vvar.size() )
+	    {
                 for( unsigned int i = 0; i < VchannelList.size(); i++ )
 		{
-		   if ( VchannelList[i] < getTOffsets().size() )
-		   {
-		       setTOffsets( VchannelList[i], Vmean[i], iLowGain );
-		       if( Vmean[i] != 0. )
-		       {
-			   getToffsetDist( iLowGain )->Fill( Vmean[i] );
-			   getToffsetVarsDist( iLowGain )->Fill( Vvar[i] );
-		       }
-		       if( VchannelList[i] < getTOffsetvars( iLowGain ).size() ) setTOffsetvars( VchannelList[i], Vvar[i], iLowGain );
-		   }
-		   else
-		   {
-		       cout << "VCalibrator::readTOffsets(): channel out of range: " << VchannelList[i] << "\t" << getTOffsets().size() << endl;
-		   }
+		    if ( VchannelList[i] < getTOffsets().size() )
+		    {
+			setTOffsets( VchannelList[i], Vmean[i], iLowGain );
+			if( Vmean[i] != 0. )
+			{
+			    getToffsetDist( iLowGain )->Fill( Vmean[i] );
+			    getToffsetVarsDist( iLowGain )->Fill( Vvar[i] );
+			}
+			if( VchannelList[i] < getTOffsetvars( iLowGain ).size() ) setTOffsetvars( VchannelList[i], Vvar[i], iLowGain );
+		    }
+		    else
+		    {
+			cout << "VCalibrator::readTOffsets(): channel out of range: " << VchannelList[i] << "\t" << getTOffsets().size() << endl;
+		    }
                 }
             }
         }
     }
+    else if(getRunParameter()->fNoCalibNoPb || iLowGain)
+    {
+	if(iLowGain) std::cout<<"Low Gain "<<std::endl;
+	std::cout<<"VCalibrator::readTOffsets() info: TOffsets are set to 0"<<std::endl; 
+	if(!iLowGain) std::cout<<"VCalibrator::readTOffsets() info: TOffsets are not tested to find dead channels "<<std::endl;
+	setTOffsets( 0., iLowGain );
+	setTOffsetvars( 0.1, iLowGain );
+    }
     else
     {
-        setTOffsets( 0., iLowGain );
-        setTOffsetvars( 0.1, iLowGain );
+	
+	std::cout<<"Error: No toff information available "<<std::endl;
+	std::cout<<"exiting... "<<std::endl;
+	std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all TOffsets will be set to 0)"<<std::endl;
+	exit(-1);
+	
     }
-
+    
+    
 // check if toffs are saved to disk
     if(getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file)
     {

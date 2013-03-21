@@ -49,7 +49,7 @@ protected:
 
 //------------------- reading function
     void Create_query_read(); 
-    void Read_the_DB();
+    bool Read_the_DB();
 
 // data vectors
     vector < unsigned int > Vchannel;
@@ -71,7 +71,7 @@ public:
 
     //-- constructor to then call read
     VDB_CalibrationInfo(int laserrun ,int tel ,string name_out_file,int gain_or_toff,int VOFFLINE_version_query,int LOW_GAIN,TString DBserver);
-    void readVOFFLINE();
+    bool readVOFFLINE();
     vector< unsigned int > getVectorChannelList() { return Vchannel; }
     vector< double > getVectorMean() { return Vmean; }
     vector< double > getVectorVariance() { return Vvar; }

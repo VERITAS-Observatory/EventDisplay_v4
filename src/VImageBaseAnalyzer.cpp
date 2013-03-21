@@ -708,13 +708,13 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 // gain/toff/low gain values are not time dependent
         if( iFirst )
         {
-            if( (!iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0) || (iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
+            if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0) || (iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
             {
                 setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )->testGains( i, getGains( iLowGain )[i] ), iLowGain );
                 setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )->testGainVariations( i, getGainvars( iLowGain && getLowGainGains() )[i] ), iLowGain );
                 setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i] , getGains_DefaultValue( iLowGain )[i] ), iLowGain );
             }
-            if( (!iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0) || (iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
+            if( (!getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0) || (iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
             {
                 setDead( i, getDeadChannelFinder( iLowGain && getLowGainTOff() )->testTimeOffsets( i, getTOffsets( iLowGain )[i] ), iLowGain );
             }
@@ -767,11 +767,14 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
        {
 	  if( fDebug )
 	  {
-	     cout << "\t dead channel " << i << "\t" << getDead( iLowGain )[i] << endl;
+	      cout << "\t dead channel " << i << "\t" << getDead( iLowGain )[i] << endl;
           }
           n_dead++;
        }
     }
+
+    if( fDebug ) printDeadChannels(iLowGain);
+
     setNDead( n_dead, iLowGain );
 
     if( iFirst && getNDead( iLowGain ) > 30 )

@@ -102,6 +102,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	bool freadCalibfromDB;                    // if true, calibration information are read in VOFFLINE DB
 	int freadCalibfromDB_versionquery;        // require a given version of calibration
 	bool freadCalibfromDB_save_file;          // calibration information read from the DB are stored in VGlobalRunParameter::getDirectory_EVNDISPCalibrationData() +/Tel_?
+	bool fNoCalibNoPb;                        // if true, when no information for gain and toff can be found, the analysis is done filling thenm with 1 and 0 respectively (in VCalibrator) 
 	string fLowGainCalibrationFile;           // file with file name for low-gain calibration 
 	int fNCalibrationEvents;                  // events to be used for calibration 
         vector< int > fGainFileNumber;

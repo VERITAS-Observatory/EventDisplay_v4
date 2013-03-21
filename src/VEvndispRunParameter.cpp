@@ -91,7 +91,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     freadCalibfromDB = false;         
     freadCalibfromDB_versionquery = -1000;  
     freadCalibfromDB_save_file = false;
-
+    fNoCalibNoPb = false;
   
 // pointing parameters
     fTargetName = "NONAME";
