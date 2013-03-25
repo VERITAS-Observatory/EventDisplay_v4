@@ -60,8 +60,14 @@ do
       elif [ $4 = "ISDC3700m" ]
       then
 	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 11$k
+      elif [ $4 = "prod2-Aar" ] || [ $4 = "prod2-Aar-North" ] || [ $4 = "prod2-Aar-South" ]
+      then
+         for (( l = 0; l < 10; l++ ))
+	 do
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 10$k$l
+         done
       else
-	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k
+	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 10$k
       fi
    done
 done
