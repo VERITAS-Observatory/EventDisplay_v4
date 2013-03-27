@@ -29,6 +29,9 @@ NAME=$6
 IZE=( 00 20 30 35 40 45 50 55 60 65 )
 INOI=( 075 100 150 200 250 325 425 550 750 1000 )
 WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+IZE=( 00 20 30 35 )
+INOI=( 075 100 150 200 250 325 )
+WOFF=( 0.5 )
 ############################################################################################
 # run scripts and output is written into this directory
 DATE=`date +"%y%m%d"`
@@ -68,7 +71,7 @@ do
 	 let "l = $i + 1"
 
 ############################################################################################
-# hard wired file and directory names
+# MC files and directory names
 ############################################################################################
 # data file to be analyzed
 	 TFIL=gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana"$ARRAY"_NOISE${INOI[$j]}_1.root
@@ -76,14 +79,6 @@ do
 	 if [ ! -e $FFIL ]
 	 then
 	    echo "INPUT FILE NOT FOUND: $FFIL"
-# ttt	    exit
-         fi
-# data file with MC data and parameters
-	 XFIL="$FDIR"/gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana1234_NOISE250_1.root
-	 if [ ! -e $XFIL ]
-	 then
-	    echo "INPUT FILE (MC) NOT FOUND: "$FDIR"/$XFIL.root"
-# ttt	    exit
          fi
 ###########################################################################################
 ###########################################################################################
