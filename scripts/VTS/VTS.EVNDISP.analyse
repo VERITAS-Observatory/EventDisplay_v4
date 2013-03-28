@@ -102,6 +102,8 @@ then
     echo "no EVNDISPSYS env variable defined"
     exit
 fi
+# set correct environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
 
 echo "$EVNDISPSYS/bin/evndisp $OPT"
 $EVNDISPSYS/bin/evndisp $OPT
