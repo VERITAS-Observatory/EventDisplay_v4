@@ -161,6 +161,8 @@ bool VPlotWPPhysSensitivity::initialize()
 		  {
 		     if( fAnalysis[i] != "DESY" ) sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
 	             else  sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t] );
+	       if( fAnalysis[i].find( "3700m" ) != string::npos  ) sprintf( hname, "%s (3700m, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
+	       else                         sprintf( hname, "%s (2000m, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
                   }
 		  else
 		  {
