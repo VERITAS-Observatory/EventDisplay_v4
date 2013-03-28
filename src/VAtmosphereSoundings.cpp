@@ -50,20 +50,27 @@ VAtmosphereSoundings::VAtmosphereSoundings( string iRootFile )
 
     setPlottingPeriod();
 
+    if( !readSoundingsFromRootFile( iRootFile ) ) return;
+}
+
+bool VAtmosphereSoundings::readSoundingsFromRootFile( string iRootFile )
+{
     fDataFile = new TFile( iRootFile.c_str() );
     if( fDataFile->IsZombie() )
     {
         cout << "VAtmosphereSoundings::VAtmosphereSoundings( string ) error: data file not found: " << iRootFile << endl;
-	return;
+	return false;
     }
     fDataTree = (TTree*)fDataFile->Get( "tSoundings" );
     if( !fDataTree )
     {
        cout << "VAtmosphereSoundings::VAtmosphereSoundings( string ) error: data tree not found in " << iRootFile << endl;
-       return;
+       return false;
     }
 
     readRootFile();
+
+    return true;
 }
 
 /*
@@ -344,13 +351,18 @@ void VAtmosphereSoundings::fillIndexofRefraction()
    }
 }
 
-bool VAtmosphereSoundings::add_CORSIKA_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
+/*
+
+    read a CORSIKA atmosphere from a text file (atmprof files)
+
+*/
+bool VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
 {
     ifstream is;
     is.open( iFile.c_str() );
     if( !is )
     {
-       cout << "VAtmosphereSoundings::add_CORSIKA_Atmosphere: error opening CORSIKA atmospheric file " << iFile << endl;
+       cout << "VAtmosphereSoundings::read_CORSIKA_Atmosphere: error opening CORSIKA atmospheric file " << iFile << endl;
        return false;
     }
 
@@ -409,18 +421,18 @@ bool VAtmosphereSoundings::add_CORSIKA_Atmosphere( string iFile, string iName, i
     return true;
 }
 
-/*!
+/*
+
     read MODTRAN tp6 files
 
-
 */
-bool VAtmosphereSoundings::add_MODTRAN_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
+bool VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
 {
     ifstream is;
     is.open( iFile.c_str() );
     if( !is )
     {
-       cout << "VAtmosphereSoundings::add_MODTRAN_Atmosphere: error opening MODTRAN tp6 file" << iFile << endl;
+       cout << "VAtmosphereSoundings::read_MODTRAN_Atmosphere: error opening MODTRAN tp6 file" << iFile << endl;
        return false;
     }
 // for now: only tp6 files can be read

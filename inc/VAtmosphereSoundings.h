@@ -138,7 +138,8 @@ class VAtmosphereSoundings
     double getWaterVaporDensity( double T, double RH );
     double getWaterVaporMassDensity( double ATEMP );
     TCanvas* plotCORSIKA( TCanvas *c, int iPlotID, vector< VAtmosphereSoundingData* > iData, double iHeightMin = 0., double iHeightMax = 120. );
-    void   plotProfiles( unsigned int iYearStart, unsigned int iMonthStart, unsigned int iYearStop, unsigned int iMonthStop, bool b2D = false, string iPlotOption = "", bool bSames = false );
+    void   plotProfiles( unsigned int iYearStart, unsigned int iMonthStart, unsigned int iYearStop, unsigned int iMonthStop, bool b2D = false,
+                         string iPlotOption = "", bool bSames = false );
     bool   readPlottingPeriodsFromTextFile( string );
     bool   readRootFile();
 
@@ -147,8 +148,6 @@ class VAtmosphereSoundings
     VAtmosphereSoundings();
     VAtmosphereSoundings( string iRootFile );
    ~VAtmosphereSoundings() {}
-    bool     add_CORSIKA_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
-    bool     add_MODTRAN_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
     bool     add_user_Atmosphere( unsigned int iIndexCORSIKAMODTRAN, double iHeightMaxData, string iName = "" );
     bool     readSoundingsFromTextFile( string iFileList );
     double   getAmosphericVaporPressure( double T );
@@ -156,28 +155,48 @@ class VAtmosphereSoundings
     void     list_datasets();
     void     list_datasets_CORSIKAMODTRAN();
 
-    TCanvas* plotCORSIKA_Density_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 0, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
-    TCanvas* plotCORSIKA_DewPoint_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 5, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
-    TCanvas* plotCORSIKA_IndexofRefraction_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 1, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
-    TCanvas* plotCORSIKA_Ozone_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 3, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); } 
-    TCanvas* plotCORSIKA_Pressure_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 6, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
-    TCanvas* plotCORSIKA_RelativeHumidity_vs_Heigth( TCanvas *c, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 4, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
-    TCanvas* plotCORSIKA_Temperature_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 2, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
-    TCanvas* plotCORSIKA_Thickness_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 7, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
+    TCanvas* plotCORSIKA_Density_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 0, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
+    TCanvas* plotCORSIKA_DewPoint_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. )
+                                          { return plotCORSIKA( c, 5, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
+    TCanvas* plotCORSIKA_IndexofRefraction_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. )
+                                          { return plotCORSIKA( c, 1, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
+    TCanvas* plotCORSIKA_Ozone_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. )
+                                          { return plotCORSIKA( c, 3, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); } 
+    TCanvas* plotCORSIKA_Pressure_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 6, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
+    TCanvas* plotCORSIKA_RelativeHumidity_vs_Heigth( TCanvas *c, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 4, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
+    TCanvas* plotCORSIKA_Temperature_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 2, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
+    TCanvas* plotCORSIKA_Thickness_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. )
+                                          { return plotCORSIKA( c, 7, fDataCORSIKAMODTRAN, iHeightMin, iHeightMax ); }
 
-    TCanvas* plotUserAtmosphere_Density_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 0, fDataUserProfile, iHeightMin, iHeightMax ); }
-    TCanvas* plotUserAtmosphere_DewPoint_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 5, fDataUserProfile, iHeightMin, iHeightMax ); }
-    TCanvas* plotUserAtmosphere_IndexofRefraction_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 1, fDataUserProfile, iHeightMin, iHeightMax ); }
-    TCanvas* plotUserAtmosphere_Ozone_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 3, fDataUserProfile, iHeightMin, iHeightMax ); }
-    TCanvas* plotUserAtmosphere_Pressure_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 6, fDataUserProfile, iHeightMin, iHeightMax ); }
-    TCanvas* plotUserAtmosphere_RelativeHumidity_vs_Heigth( TCanvas *c, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 4, fDataUserProfile, iHeightMin, iHeightMax ); }
-    TCanvas* plotUserAtmosphere_Temperature_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 2, fDataUserProfile, iHeightMin, iHeightMax ); }
-    TCanvas* plotUserAtmosphere_Thickness_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) { return plotCORSIKA( c, 7, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_Density_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 0, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_DewPoint_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 5, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_IndexofRefraction_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 1, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_Ozone_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. )
+                                          { return plotCORSIKA( c, 3, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_Pressure_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 6, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_RelativeHumidity_vs_Heigth( TCanvas *c, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 4, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_Temperature_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 2, fDataUserProfile, iHeightMin, iHeightMax ); }
+    TCanvas* plotUserAtmosphere_Thickness_vs_Heigth( TCanvas *c = 0, double iHeightMin = 0., double iHeightMax = 120. ) 
+                                          { return plotCORSIKA( c, 7, fDataUserProfile, iHeightMin, iHeightMax ); }
 
     void     plot2DProfiles( unsigned int iYearStart = 1980, unsigned int iMonthStart = 1, unsigned int iYearStop = 2020, unsigned int iMonthStop = 12 );
-    void     plotAverages( unsigned int iYearStart = 1980, unsigned int iMonthStart = 1, unsigned int iYearStop = 2020, unsigned int iMonthStop = 12, string iPlotOption = "", bool iSames = false );
+    void     plotAverages( unsigned int iYearStart = 1980, unsigned int iMonthStart = 1, unsigned int iYearStop = 2020, unsigned int iMonthStop = 12,
+                           string iPlotOption = "", bool iSames = false );
     void     plotAttributes_ColorChange( bool iB = true ) { fBoolColorChange = iB; }
     void     plotAttributes_PlotLegend( bool iB = true ) { fPlottingLegendDraw = iB; }
+    bool     read_CORSIKA_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
+    bool     read_MODTRAN_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
+    bool     readSoundingsFromRootFile( string iRootFile );
     void     setGeographicPosition( double iLatitude = 31.675, double iObsHeight_km = 1.27 ) { fObservatoryLatitude = iLatitude; fObservatoryHeight_km = iObsHeight_km; }
     void     setPlottingPeriod( string iPeriod = "monthly" );
     void     setPlottingRangeHeight( double iHeightMin = 0., double iHeightMax = 30. ) { fPlottingHeight_min = iHeightMin; fPlottingHeight_max = iHeightMax; } // in [km]
