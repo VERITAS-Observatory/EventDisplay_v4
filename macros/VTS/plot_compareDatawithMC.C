@@ -393,7 +393,7 @@ void msc_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
 // get the scaling between simulations and data
    double s_sims = 1.;
    double s_diff = 1.;
-   getScaling( fDir, s_sims, s_diff, "MSCW", 1 );
+   getScaling( fDir, s_sims, s_diff, "MSCW", 2 );
 
    char hname[600];
    char htitle[600];
@@ -413,10 +413,10 @@ void msc_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
    {
       sprintf( hname, "hMSCWErec_SIMS_%d", i );
       TH1D *hSims = hmscwerec_sims->ProjectionY( hname, i, i );
-      setHistogramAtt( hSims, 2, 1, 1, 20, 1 );
+      setHistogramAtt( hSims, 2, 1, 1, 20, 2 );
       sprintf( hname, "hMSCWErec_DIFF_%d", i );
       TH1D *hDiff = hmscwerec_diff->ProjectionY( hname, i, i );
-      setHistogramAtt( hDiff, 1, 1, 1, 21, 1 );
+      setHistogramAtt( hDiff, 1, 1, 1, 21, 2 );
       if( hSims->GetEntries() > 0 ) hSims->Scale( s_sims );
       if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
 
@@ -690,13 +690,13 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
 //
 
    hmscw_sims = (TH1D*)fDir->Get( "hMSCW_SIMS" );
-   if( bPoster ) setHistogramAtt( hmscw_sims, 2, 3, 2, 20, 1 );
-   else          setHistogramAtt( hmscw_sims, 2, 1, 1, 20, 1 );
+   if( bPoster ) setHistogramAtt( hmscw_sims, 2, 1, 1, 20, 2 );
+   else          setHistogramAtt( hmscw_sims, 2, 1, 1, 20, 2 );
    hmscw_sims->SetYTitle( "number of shower [a.u.]" );
    
    hmscw_diff = (TH1D*)fDir->Get( "hMSCW_DIFF" );
-   if( bPoster ) setHistogramAtt( hmscw_diff, 1, 3, 2, 25, 1 );
-   else          setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 1 );
+   if( bPoster ) setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 2 );
+   else          setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 2 );
 
    hmscw_on = (TH1D*)fDir->Get( "hMSCW_ON" );
    setHistogramAtt( hmscw_on, 3, 1, 1, 20, 1 );
@@ -706,8 +706,8 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
    setHistogramAtt( hmscw_off, 4, 1, 1, 21, 1 );
 
    hmscw_sims->SetAxisRange( -1., 1. );
-//   getScaling( fDir, s_sims, s_diff, "MSCW", 2, -0.5, 0.5 );
-   getScaling( fDir, s_sims, s_diff, "MSCW", 1, -0.5, 0.5 );
+   getScaling( fDir, s_sims, s_diff, "MSCW", 2, -0.5, 0.5 );
+//   getScaling( fDir, s_sims, s_diff, "MSCW", 1, -0.5, 0.5 );
    if( hmscw_sims->GetEntries() > 0 ) hmscw_sims->Scale( s_sims );
    if( hmscw_diff->GetEntries() > 0 ) hmscw_diff->Scale( s_diff );
 
@@ -749,7 +749,7 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
 
    hmscl_sims = (TH1D*)fDir->Get( "hMSCL_SIMS" );
    if( bPoster ) setHistogramAtt( hmscl_sims, 2, 3, 2, 21, 1 );
-   else          setHistogramAtt( hmscl_sims, 2, 3, 1, 21, 1 );
+   else          setHistogramAtt( hmscl_sims, 2, 3, 1, 21, 2 );
    hmscl_sims->SetYTitle( "number of shower [a.u.]" );
 
    hmscl_on = (TH1D*)fDir->Get( "hMSCL_ON" );
@@ -760,13 +760,13 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
    
    hmscl_diff = (TH1D*)fDir->Get( "hMSCL_DIFF" );
    if( bPoster ) setHistogramAtt( hmscl_diff, 1, 3, 2, 25, 1 );
-   else          setHistogramAtt( hmscl_diff, 1, 3, 1, 25, 1 );
+   else          setHistogramAtt( hmscl_diff, 1, 3, 1, 25, 2 );
    hmscl_diff->SetLineWidth( 3 );
    hmscl_diff->SetStats( 0 );
 
    hmscl_sims->SetAxisRange( -1., 1. );
    hmscl_on->SetAxisRange( -2., 10. );
-   getScaling( fDir, s_sims, s_diff, "MSCL", 1 );
+   getScaling( fDir, s_sims, s_diff, "MSCL", 1, -0.75, 0.75 );
    if( hmscl_sims->GetEntries() > 0 ) hmscl_sims->Scale( s_sims );
    if( hmscl_diff->GetEntries() > 0 ) hmscl_diff->Scale( s_diff );
 
