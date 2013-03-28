@@ -875,7 +875,7 @@ void VReadRunParameter::test_and_adjustParams()
 // settings for pedestal and gain calculations
     if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 7 )
     { 
-        fRunPara->fcalibrationfile = "";
+        if( fRunPara->frunmode != 7 ) fRunPara->fcalibrationfile = "";
         fRunPara->fDBTracking = false;
 //        fRunPara->fuseDB = false;
 	fRunPara->fcalibrationrun = true;
