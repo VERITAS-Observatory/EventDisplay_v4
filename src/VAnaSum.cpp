@@ -159,7 +159,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	   TFile iAnasumInputFile( i_temp );
 	   if( iAnasumInputFile.IsZombie() )
 	   {
-	       cout << "VAnasum::initialize error opening anasum file for run  " << fRunPara->fRunList[j].fRunOn;
+	       cout << "VAnasum::initialize error opening anasum file for run  " << fRunPara->fRunList[j].fRunOn << ": " << endl;
 	       cout << iAnasumInputFile.GetName() << endl;
 	       cout << "exiting..." << endl;
 	       exit( -1 );

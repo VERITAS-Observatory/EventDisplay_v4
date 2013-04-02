@@ -1437,6 +1437,9 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, in
     iR->SetLineColor( 2 );
     iR->SetLineWidth( 2 );
     iR->Draw();
+    TMarker *iRM = new TMarker( x, y, 5 );
+    iRM->Draw();
+
 
 // region around camera center
     TEllipse *iLC = new TEllipse( x-x_n, y-y_n, r, r );

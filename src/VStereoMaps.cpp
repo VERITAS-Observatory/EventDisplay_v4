@@ -298,12 +298,12 @@ void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, do
         {
             i_xbin = hmap_stereo->GetXaxis()->GetBinCenter(i+1);
             i_ybin = hmap_stereo->GetYaxis()->GetBinCenter(j+1);
-// test if this coordinates are in source area
+// test if this position is inside maximum accepted distance from camera center
             if( sqrt( (i_xbin+fRunList.fWobbleWestMod)*(i_xbin+fRunList.fWobbleWestMod) +
 	              (i_ybin+fRunList.fWobbleNorthMod)*(i_ybin+fRunList.fWobbleNorthMod) ) > fRunList.fmaxradius ) continue;
 
 // get filling factor (fraction of bin in theta2 circle)
-	    if( fRunList.fNBoxSmooth > 0. )
+	    if( fRunList.fNBoxSmooth > 0 )
 	    {
 	       double p = 0.;
 	       for( unsigned int f = 0; f < fRunList.fNBoxSmooth; f++ )
@@ -576,7 +576,7 @@ void VStereoMaps::RE_getAlpha( bool iIsOn )
     }
 }
 
-bool VStereoMaps::fill_ReflectedRegionModel(  double x, double y, int irun, bool i_isGamma )
+bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool i_isGamma )
 {
 // at the beginning of each run, set up off regions
     if( irun != fInitRun )
@@ -647,10 +647,15 @@ bool VStereoMaps::fill_ReflectedRegionModel(  double x, double y, int irun, bool
             {
                 i_ry1 = hmap_stereo->GetYaxis()->GetBinLowEdge( j );
 
-                i_cx = fRandom->Uniform( i_rx1, i_rx1+f_RE_binXW );
-                i_cy = fRandom->Uniform( i_ry1, i_ry1+f_RE_binYW );
+// (GM - 20130327) introduces artifacts into the sky maps
+//                 reason: bins are [x_low,x_up[, TRandom::Uniform(x1,x2) is ]x1,x2]
+//                i_cx = fRandom->Uniform( i_rx1, i_rx1+f_RE_binXW );
+//                i_cy = fRandom->Uniform( i_ry1, i_ry1+f_RE_binYW );
 
-// check if event is in same ring as this bin (all off regions are in a ring around the camera center)
+                i_cx =  hmap_stereo->GetXaxis()->GetBinCenter( i );
+                i_cy =  hmap_stereo->GetYaxis()->GetBinCenter( j );
+
+// check if event is in the same ring as this bin (all off regions are in a ring around the camera center)
                 i_binDist = sqrt( i_cx*i_cx + i_cy*i_cy );
 
                 if( i_evDist > i_binDist + fRE_roffTemp ) continue;
@@ -755,8 +760,6 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 // (this tree is written to the output root file in the directory run_XXX/stereo/debug)
     if( !bUncorrelatedSkyMaps )
     {
-// (GM) tree should be deleted by hAuxHisList->Delete();
-// (GM)  if( hRE_regions ) delete hRE_regions;
         hRE_regions = new TTree( "tRE", "reflected regions" );
         hRE_regions->Branch( "x", &x, "x/D" );
         hRE_regions->Branch( "y", &y, "y/D" );

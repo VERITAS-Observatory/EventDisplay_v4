@@ -29,6 +29,7 @@ namespace VSkyCoordinatesUtilities
    double getTargetShiftWest( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg );
    double getTargetShiftNorth( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg );
    double getUTC(int i_mjd, double i_seconds);
+   void   getWobbledDirection( double iNorth, double iEast, double idec, double ira, double &dec_W, double &ra_W );
    void   getWobbleOffset_in_RADec( double iNorth, double iEast, double idec, double ira, double &idiffdec, double &idiffra );
    double precessTarget( double iMJD_end, double &ra_rad, double &dec_rad, double iMJD_start = 51544., bool bUnitIsDegrees = false );     // default start is J2000
    void   rotate( const double theta_rad, double& x, double& y);

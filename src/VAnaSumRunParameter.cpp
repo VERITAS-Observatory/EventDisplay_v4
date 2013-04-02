@@ -54,7 +54,9 @@ sRunPara::sRunPara()
 
     fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not avaible
 
-    fNBoxSmooth = 100;
+// (GM) changed to 0 (20130327)
+//    fNBoxSmooth = 100;
+    fNBoxSmooth = 0;
 
 // ON/OFF MODEL
     fOO_alpha = 0.;
@@ -349,7 +351,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "TARGETXYSHIFT" )
             {
-                if( checkNumberOfArguments( is_line ) != 4 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETXYSHIFT x y" );
+                if( checkNumberOfArguments( is_line ) != 4 )
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETXYSHIFT x y" );
+                }
 
                 fTargetShiftWest = -1.*atof( temp2.c_str() );
                 is_stream >> temp2;
@@ -357,7 +362,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "TARGETPOSITION_RADECJ2000_DEG" )
             {
-                if( checkNumberOfArguments( is_line ) != 4 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETPOSITION_RADECJ2000_DEG (RA(deg) DEC(deg)" );
+                if( checkNumberOfArguments( is_line ) != 4 )
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETPOSITION_RADECJ2000_DEG (RA(deg) DEC(deg)" );
+                }
 
                 fTargetShiftRAJ2000 = atof( temp2.c_str() );
                 is_stream >> temp2;
@@ -365,7 +373,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else if( temp == "TARGETPOSITION_RADECJ2000_HOUR" )
             {
-                if( checkNumberOfArguments( is_line ) != 8 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETPOSITION_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
+                if( checkNumberOfArguments( is_line ) != 8 )
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* TARGETPOSITION_RADECJ2000_HOUR RA(Hour Min Sec)  DEC(Deg Min Sec)" );
+                }
 
                 double d_tt = 0.;
                 d_tt += atof( temp2.c_str() );
@@ -386,7 +397,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 
             else if( temp == "REGIONTOEXCLUDE" )
             {
-                if( checkNumberOfArguments( is_line ) != 5 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius(deg))" );
+                if( checkNumberOfArguments( is_line ) != 5 )
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius(deg))" );
+                }
 
                 fExcludeFromBackground_West.push_back(-1.* (double)atof( temp2.c_str() ));
                 is_stream >> temp2;
@@ -401,7 +415,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 
             else if( temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
             {
-                if( checkNumberOfArguments( is_line ) != 5 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius(deg))" );
+                if( checkNumberOfArguments( is_line ) != 5 )
+		{
+		  return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius(deg))" );
+                }
 
                 fExcludeFromBackground_RAJ2000.push_back((double) atof( temp2.c_str()));
                 is_stream >> temp2;
@@ -416,7 +433,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 
             else if( temp == "REGIONTOEXCLUDE_RADECJ2000_HOUR" )
             {
-                if( checkNumberOfArguments( is_line ) != 9 ) return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius(deg))" );
+                if( checkNumberOfArguments( is_line ) != 9 )
+		{
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius(deg))" );
+                }
 
                 double d_tt = 0.;
                 d_tt += (double)atof( temp2.c_str() );
@@ -849,8 +869,9 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         cout << "  (run " << i+1 << " out of " << fRunList.size() << ")";
         if( fRunList[i].fEventDisplayVersion.size() > 0 ) cout << ", eventdisplay version " << fRunList[i].fEventDisplayVersion;
         cout << endl;
-        cout << "\t " << fRunList[i].fTarget << ", wobble: (N" << fRunList[i].fWobbleNorth << ", W" << fRunList[i].fWobbleWest << ")";
-        cout << ", stereo maps centred at (ra,dec) (" << fSkyMapCentreRAJ2000 << ", " << fSkyMapCentreDecJ2000 << ")";
+        cout << "\t Object: " << fRunList[i].fTarget << endl;
+	cout << "\t Wobble: (N" << fRunList[i].fWobbleNorth << ", W" << fRunList[i].fWobbleWest << ")";
+        cout << ", sky maps centred at (ra,dec) (" << fSkyMapCentreRAJ2000 << ", " << fSkyMapCentreDecJ2000 << ")";
         cout << ", target shift: (N" << fRunList[i].fTargetShiftNorth << ", W" << fRunList[i].fTargetShiftWest << ")";
 	cout << " (RA/DEC)_J2000 [" << fRunList[i].fTargetShiftRAJ2000 << ", " << fRunList[i].fTargetShiftDecJ2000 << "]" <<  endl;
         if( fExcludeFromBackground_North.size() > 0 && fExcludeFromBackground_West.size() > 0 && fExcludeFromBackground_Radius.size() > 0 )
@@ -999,7 +1020,9 @@ void VAnaSumRunParameter::reset( sRunPara it )
 
     it.fAcceptanceFile = "";
 
-    it.fNBoxSmooth = 100;
+// (GM) changed to 0 (20130327)
+//    it.fNBoxSmooth = 100;
+    it.fNBoxSmooth = 0;
     it.fOO_alpha = 0.;
 
     it.fRM_RingRadius = 0.;
@@ -1126,7 +1149,7 @@ bool VAnaSumRunParameter::setTargetRADecJ2000( unsigned int i, double ra, double
 }
 
 
-bool VAnaSumRunParameter::setTargetRADec( unsigned int i, double ra, double dec )
+bool VAnaSumRunParameter::setTargetRADec_currentEpoch( unsigned int i, double ra, double dec )
 {
     if( i < fRunList.size() )
     {
@@ -1187,7 +1210,8 @@ void VAnaSumRunParameter::getEventdisplayRunParameter( string fDatadir )
         fRunList[i].fMaxTelID += 1;
     }
 //////////////////////////////////////////////////////////////////////////////
-// off runs
+// off runs 
+// (called only for on/off observation mode (or when run_on != run_off)
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
         if( fRunList[i].fRunOn != fRunList[i].fRunOff )

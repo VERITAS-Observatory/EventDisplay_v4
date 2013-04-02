@@ -397,7 +397,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	     nentries_run++;
 
 // UTC time
-	     i_UTC = VSkyCoordinatesUtilities::getUTC( fDataRun->MJD,fDataRun->Time );
+	     i_UTC = VSkyCoordinatesUtilities::getUTC( fDataRun->MJD, fDataRun->Time );
 
 // phase cuts - this is also a time cut that adds to the previously initialized mask
 	     if( !fCuts->applyPhaseCut(i) ) 
@@ -810,7 +810,7 @@ void VStereoAnalysis::scaleAlpha( double inorm,  TH2D *halpha_on, TH2D *h_ON, TH
       	}
       }
 //////////////////////////////////////////////////////////////////////
-// everything except FOV model
+// all other background models except FOV model
 //////////////////////////////////////////////////////////////////////
       else
       {
@@ -873,11 +873,12 @@ double VStereoAnalysis::combineHistograms()
 
       iDir->cd();
 
+// loop over all runs (= all available histograms)
       for( unsigned h = 0; h < n_histo; h++ )
       {
       	fDirTotRun[h]->cd();
 // read in tree with selected events
-      	if( fDirTotRun[h]->Get( "data_on" ) ) iTreeList->Add( fDirTotRun[h]->Get( "data_on" ) );
+      	if( fDirTotRun[h]->Get( "data_on" ) )       iTreeList->Add( fDirTotRun[h]->Get( "data_on" ) );
       	else if( fDirTotRun[h]->Get( "data_off" ) ) iTreeList->Add( fDirTotRun[h]->Get( "data_off" ) );
 // read in sky plots from disk
       	fHisto[h]->readSkyPlots();
@@ -892,7 +893,8 @@ double VStereoAnalysis::combineHistograms()
       			if( fHisto[h]->hmap_alpha_offUC && fHisto[h]->hmap_alpha_offUC->GetBinContent( i, j ) > 0. )
       			{
       			     fHistoTot->hmap_stereoUC->SetBinContent( i, j, fHisto[h]->hmap_stereoUC->GetBinContent( i, j ) + fHistoTot->hmap_stereoUC->GetBinContent( i, j ) );
-      			     fHistoTot->hmap_alphaUC->SetBinContent( i, j, 1./fHisto[h]->hmap_alphaUC->GetBinContent( i, j )*fHisto[h]->hmap_stereoUC->GetBinContent( i, j ) + fHistoTot->hmap_alphaUC->GetBinContent( i, j ) );
+      			     fHistoTot->hmap_alphaUC->SetBinContent( i, j, 1./fHisto[h]->hmap_alphaUC->GetBinContent( i, j )*fHisto[h]->hmap_stereoUC->GetBinContent( i, j )
+			                                                    + fHistoTot->hmap_alphaUC->GetBinContent( i, j ) );
       			}
       		}
       	}
@@ -907,7 +909,8 @@ double VStereoAnalysis::combineHistograms()
       			if( fHisto[h]->hmap_alpha_off && fHisto[h]->hmap_alpha_off->GetBinContent( i, j ) > 0. )
       			{
       			     fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
-      			     fHistoTot->hmap_alpha->SetBinContent( i, j, 1./fHisto[h]->hmap_alpha->GetBinContent( i, j )*fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_alpha->GetBinContent( i, j ) );
+      			     fHistoTot->hmap_alpha->SetBinContent( i, j, 1./fHisto[h]->hmap_alpha->GetBinContent( i, j )*fHisto[h]->hmap_stereo->GetBinContent( i, j )
+			                                                  + fHistoTot->hmap_alpha->GetBinContent( i, j ) );
       			}
       		}
       	}
@@ -1127,17 +1130,21 @@ void VStereoAnalysis::defineAstroSource()
       		fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fRunList[i].fTargetRAJ2000 + i_raDiff;
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000 + i_decDiff;
       	}
-// from runparameter file: set the sky map centre in J2000 (probably the usual/default case)
+// from runparameter file: set the sky map centre in J2000 
+// (this is in almost all analysis the usual/default case)
       	else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000  ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreDecJ2000 ) )
       	{
       		fRunPara->fRunList[i].fSkyMapCentreRAJ2000 = fRunPara->fSkyMapCentreRAJ2000;
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
-      		fRunPara->fRunList[i].fSkyMapCentreWest  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-		                                                                                         fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
-      		fRunPara->fRunList[i].fSkyMapCentreNorth = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-		                                                                                          fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
+      		fRunPara->fRunList[i].fSkyMapCentreWest =
+		          VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+		                                                        fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 ) * -1.;
+      		fRunPara->fRunList[i].fSkyMapCentreNorth =
+		         VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+		                                                        fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreWest ) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreWest = 0.;
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreNorth) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreNorth = 0.;
+
       	}
 // if not set in runparameter file: set to target direction
 	else
@@ -1156,7 +1163,7 @@ void VStereoAnalysis::defineAstroSource()
       	{
       	     if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
       	     {
-      		  fRunPara->fRunList[i].fTargetShiftWest  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+      		  fRunPara->fRunList[i].fTargetShiftWest = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
 		                                                                                          fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
       		  fRunPara->fRunList[i].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
 		                                                                                               fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
@@ -1178,26 +1185,31 @@ void VStereoAnalysis::defineAstroSource()
       	                                   fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
       	}
 /////////////////////////////////////////////////////////
-// precess target coordinates
+// precess target coordinates from J2000 to current epoch
+// (direction of telescope pointing)
       	double i_dec = fRunPara->fRunList[i].fTargetDecJ2000 * TMath::DegToRad();
       	double i_ra  = fRunPara->fRunList[i].fTargetRAJ2000 * TMath::DegToRad();
-      	double iMJD = 0.;
-      	if( fIsOn ) iMJD = (double)fRunPara->fRunList[i].fMJDOn;
-      	else        iMJD = (double)fRunPara->fRunList[i].fMJDOff;
+      	double iMJD = (double)fRunPara->fRunList[i].fMJDOn;
+	if( !fIsOn ) iMJD = (double)fRunPara->fRunList[i].fMJDOff;
 // (i_dec and i_ra are in current epoch coordinates in the following, not J2000)
       	VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec);
 
+// print some information on targeting/pointing to screen
       	if( fIsOn )
       	{
       		cout << "Run " << fRunPara->fRunList[i].fRunOn <<" ---------------------------"<< endl;
 // set target coordinates into run parameter list
-      		fRunPara->setTargetRADec( i, i_ra*TMath::RadToDeg(), i_dec*TMath::RadToDeg() );
+      		fRunPara->setTargetRADec_currentEpoch( i, i_ra*TMath::RadToDeg(), i_dec*TMath::RadToDeg() );
 // print target info to screen
       		cout << "\tTarget: " << fRunPara->fRunList[i].fTarget << " (ra,dec)=(";
       		cout << fRunPara->fRunList[i].fTargetRA << ", " << fRunPara->fRunList[i].fTargetDec << ")";
       		cout << " (precessed, MJD=" << iMJD << "), ";
       		cout << "(ra,dec (J2000)) = (" << fRunPara->fRunList[i].fTargetRAJ2000 << ", " << fRunPara->fRunList[i].fTargetDecJ2000 << ")";
-      		cout << ", pair offset [min]: " << fRunPara->fRunList[i].fPairOffset  << endl;
+      		if( TMath::Abs( fRunPara->fRunList[i].fPairOffset ) > 1.e-2 )
+		{
+		   cout << ", pair offset [min]: " << fRunPara->fRunList[i].fPairOffset;
+                }
+		cout << endl;
       	}
 /////////////////////////////////////
 // calculate wobble offsets in J2000
@@ -1249,10 +1261,13 @@ void VStereoAnalysis::defineAstroSource()
       		cout << endl;
       	}
 
+//////////////////////////////////
+// ON/OFF observation mode
 // define offset for off run (usually 30. min, specified in runlist file)
 // offset is as well defined for on run if on and off runnumber are the same
       	double i_off = 0.;
       	if( !fIsOn || fRunPara->fRunList[i].fRunOn == fRunPara->fRunList[i].fRunOff ) i_off = fRunPara->fRunList[i].fPairOffset/60./24.*360./TMath::RadToDeg();
+//////////////////////////////////
 
 // =============================================================
 // define source and tracking class
@@ -1262,10 +1277,14 @@ void VStereoAnalysis::defineAstroSource()
 	i_ra  = fRunPara->fRunList[i].fTargetRAJ2000 * TMath::DegToRad();
 // precess target to current epoch
 	VSkyCoordinatesUtilities::precessTarget( iMJD, i_ra, i_dec);
+	double idec_T = 0.;
+	double ira_T = 0.;
+	VSkyCoordinatesUtilities::getWobbledDirection( fRunPara->fRunList[i].fWobbleNorth, fRunPara->fRunList[i].fWobbleWest, 
+						       i_dec*TMath::RadToDeg(), i_ra*TMath::RadToDeg(), idec_T, ira_T );
 // setting telescope coordinates (in current epoch)
 // (ignore pointing errors here (very small impact))
-	fAstro.back()->setTelDec_deg( i_dec * TMath::RadToDeg() + i_decDiff );
-	fAstro.back()->setTelRA_deg( i_ra * TMath::RadToDeg() + i_raDiff + i_off * TMath::RadToDeg() );
+	fAstro.back()->setTelDec_deg( idec_T );
+	fAstro.back()->setTelRA_deg( ira_T );
 // set observatory position
       	fAstro.back()->setObservatory( fRunPara->getObservatory_Longitude_deg(), fRunPara->getObservatory_Latitude_deg() );
 // =============================================================
@@ -1725,7 +1744,7 @@ void VStereoAnalysis::getDerotatedCoordinates( unsigned int icounter,  double i_
 
     VSkyCoordinatesUtilities::convert_derotatedCoordinates_to_J2000( i_UTC, fRunPara->fRunList[icounter].fTargetRAJ2000, 
                                                                             fRunPara->fRunList[icounter].fTargetDecJ2000,
-									    x_derot, y_derot ); 
+									    x_derot, y_derot );  
 }
 
 double VStereoAnalysis::getWobbleNorth()
