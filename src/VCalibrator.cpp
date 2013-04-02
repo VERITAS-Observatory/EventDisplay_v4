@@ -941,7 +941,7 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
 // read high gain gains
         if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 )
         {
-            readGains( false );
+             readGains( false );
 // read low gain gains
             if( fLowGainGainFileNameC[getTeltoAna()[i]].size() > 0 )
             {
@@ -949,7 +949,7 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
                 setLowGainGains();
             }
 // set low gain gains equal to high gain gains
-            else getGains( true ) = getGains( false );
+            else  getGains( true ) = getGains( false );
         }
 
 // read average tzeros
@@ -989,14 +989,14 @@ void VCalibrator::readCalibrationData( bool iPeds, bool iGains )
         if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 )
         {
 // read high gain channel time offsets
-            readTOffsets( false );
+             readTOffsets( false );
 // read low gain channel time offsets
             if( fLowGainToffFileNameC.size() > 0 )
             {
                 readTOffsets( true );
-                setLowGainTOff();
+                 setLowGainTOff();
             }
-            else  getTOffsets( true ) = getTOffsets( false );
+            else   getTOffsets( true ) = getTOffsets( false );
         }
 
 // read pixel status
@@ -1631,7 +1631,7 @@ void VCalibrator::readGains( bool iLowGain )
             }
         }
     }
-    else if(getRunParameter()->fNoCalibNoPb)
+    else if(getRunParameter()->fNoCalibNoPb || getRunParameter()->fIsMC )
     {
 	std::cout<<"VCalibrator::readGains() info: Gains are set to 1, Gains are not tested to find dead channels "<<std::endl; 
         setGains( 1., iLowGain );
@@ -1843,7 +1843,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
             }
         }
     }
-    else if(getRunParameter()->fNoCalibNoPb || iLowGain)
+    else if(getRunParameter()->fNoCalibNoPb || iLowGain || getRunParameter()->fIsMC )
     {
 	if(iLowGain) std::cout<<"Low Gain "<<std::endl;
 	std::cout<<"VCalibrator::readTOffsets() info: TOffsets are set to 0"<<std::endl; 
