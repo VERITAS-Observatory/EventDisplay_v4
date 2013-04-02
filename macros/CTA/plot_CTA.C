@@ -42,7 +42,7 @@ vector< string > getListofArrrays( string iArrayFile )
      plots
 
 */
-TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450. )
+TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450., bool prod2 = false )
 {
     TFile *f1 = new TFile( ifile );
     if( f1->IsZombie() ) return 0;
@@ -76,31 +76,38 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 2 );
     telconfig->SetMarkerSize( 1.5 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TelType==141305009", "same" );
+    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==141305009", "same" );
+    else         telconfig->Draw("TelY:TelX", "TelType==138704810", "same" );
 
 // standard MSTs (2)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 1 );
     telconfig->SetMarkerSize( 1.0 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TelType==10007818", "same" );
+    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==10007818", "same" );
+    else         telconfig->Draw("TelY:TelX", "TelType==10408418", "same" );
 
+    if( !prod2 )
+    {
 // large pixel MSTs (4)
-    telconfig->SetMarkerStyle( 20 );
-    telconfig->SetMarkerColor( 6 );
-    telconfig->SetMarkerSize( 1.0 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TelType==10009725", "same" );
+       telconfig->SetMarkerStyle( 20 );
+       telconfig->SetMarkerColor( 6 );
+       telconfig->SetMarkerSize( 1.0 * iMarkerMult );
+       telconfig->Draw("TelY:TelX", "TelType==10009725", "same" );
+    }
 
 // standard SSTs (3)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 3 );
     telconfig->SetMarkerSize( 0.7 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TelType==3709725", "same" );
+    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==3709725", "same" );
+    else         telconfig->Draw("TelY:TelX", "TelType==3709425", "same" );
 
-// 7m telescopes (5)
+// 7m telescopes (5, prod1) or SCT (prod2)
     telconfig->SetMarkerStyle( 20 );
     telconfig->SetMarkerColor( 4 );
     telconfig->SetMarkerSize( 0.7 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "TelType==7309930", "same" );
+    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==7309930", "same" );
+    else         telconfig->Draw("TelY:TelX", "TelType==201509515", "same" );
 
     if( iname )
     {
