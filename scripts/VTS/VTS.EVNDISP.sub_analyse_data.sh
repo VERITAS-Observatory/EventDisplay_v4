@@ -10,7 +10,7 @@ then
    echo
    echo "EVNDISP data analysis: submit jobs from a simple run list"
    echo
-   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [calibration (default=1)]" 
+   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [calibration (default=1)] [VPM (default=0)]" 
    echo
    echo "  [calibration]"
    echo "          1     pedestal & average tzero calculation (default)"
@@ -33,6 +33,11 @@ PED=1
 if [ -n "$2" ]
 then
   PED=$2
+fi
+VPM=0
+if [ -n "$3" ]
+then
+  VPM=$3
 fi
 
 # checking the path for binary
@@ -67,13 +72,15 @@ do
    FNAM="$SHELLDIR/EVN.data-$AFIL"
 
    sed -e "s|RRRRR|$AFIL|" $FSCRIPT.sh > $FNAM-1.sh
-   sed -e "s|PEEED|$PED|" $FNAM-1.sh > $FNAM.sh
+   sed -e "s|PEEED|$PED|" $FNAM-1.sh > $FNAM-2.sh
    rm -f $FNAM-1.sh
+   sed -e "s|VVPM|$VPM|" $FNAM-2.sh > $FNAM.sh
+   rm -f $FNAM-2.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -js 200 -V -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+   qsub -V -l h_cpu=11:29:00 -l os="sl*" -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 exit

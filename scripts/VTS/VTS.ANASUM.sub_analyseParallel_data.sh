@@ -15,7 +15,7 @@ then
    echo "   <output directory>    anasum output files are written to this directory"
    echo
    echo "   <run parameter file>  anasum run parameter file"
-   echo "                         (example can be found in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.dat"
+   echo "                         (example can be found in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.dat)"
    echo
    exit
 fi

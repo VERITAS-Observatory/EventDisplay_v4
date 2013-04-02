@@ -6,15 +6,20 @@
 #
 set RUN=RRRRR
 set CALIB=PEEED
+set VPM=VVPM
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 # output data files are written to this directory
-set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-d20130320_rDB/"
-mkdir -p $ODIR
+set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-d20130318/"
 # output log files are written to this directory
-set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-d20130320_rDB/"
+set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-d20130318/"
+if( $VPM == "1" ) then
+   set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-d20130318-VPM/"
+   set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-d20130318-VPM/"
+endif
+mkdir -p $ODIR
 mkdir -p $LDIR
 
 # eventdisplay reconstruction parameter
@@ -61,7 +66,9 @@ endif
 # pointing from pointing monitor (text file)
 #set OPT="$OPT -pointingmonitortxt /raid/pevray/maierg/veritas/VPM/results/"
 # pointing from pointing monitor (DB)
-# set OPT="$OPT -usedbvpm "
+if( $VPM == "1" ) then
+   set OPT="$OPT -usedbvpm "
+endif
 # OFF data run
 #set OPT="$OPT -raoffset=6.25"
 # use calib.dat
