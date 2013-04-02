@@ -1,6 +1,14 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130402 (GM) bug fix in sky maps for reflected region background model: fixed bug in bin
+                assignment which showed up as rings in the maps
+
+* 20130402 (GM) added VPM option to evndisp run scripts (VTS only)
+
+* 20130325 (GM) reduced maximum number of telescope to 100 to fit into available memory 
+                resources
+
 * 20130220 (GM) fixed wrong m^2 to cm^2 conversion in plotDailyFluxes in VFluxCalculation
 
 * 20130320 (GM) small bug fix to remove ROOT warnings reading showerpars trees

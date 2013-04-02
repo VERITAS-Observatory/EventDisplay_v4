@@ -597,7 +597,6 @@ unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
 // choose energy reconstruction method
       if(      fEnergyReconstructionMethod[i] == 0 && fData->Erec  > 0. ) iErec = log10( fData->Erec );
       else if( fEnergyReconstructionMethod[i] == 1 && fData->ErecS > 0. ) iErec = log10( fData->ErecS );
-      else if( fEnergyReconstructionMethod[i] == 2 && fData->ErecS > 0. ) iErec = log10( fData->ErecS );
       else iErec = -1.e99;
 
 // mean energy of this energy bin (possibly spectral weighted)
