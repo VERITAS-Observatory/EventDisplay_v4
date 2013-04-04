@@ -781,6 +781,9 @@ vector< unsigned int > VEvndispData::fAnalysisTelescopeEventStatus;
 
 vector< vector< int > > VEvndispData::fTriggeredTel;
 vector< int > VEvndispData::fTriggeredTelN;
+int VEvndispData::fArrayEventMJD = 0;
+int VEvndispData::fArrayPreviousEventMJD = 0;
+double VEvndispData::fArrayEventTime = 0.;
 vector< int > VEvndispData::fEventMJD;
 vector< double > VEvndispData::fEventTime;
 

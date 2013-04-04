@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130403 (GM) bug fix for rare cases when all GPS clocks do not show consistent values
+                ensure continuity in MJD from event to event (e.g. see runs 52271-52273)
+
 * 20130402 (GM) bug fix in sky maps for reflected region background model: fixed bug in bin
                 assignment which showed up as rings in the maps
 

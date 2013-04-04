@@ -193,7 +193,7 @@ void VArrayAnalyzer::initEvent()
     getShowerParameters()->fNTelescopes = getNTel();
 
 // get event times
-    if( getTeltoAna().size() > 0 && getTeltoAna()[0] < getEventTimeVector().size() ) getShowerParameters()->time = getEventTimeVector()[getTeltoAna()[0]];
+/*    if( getTeltoAna().size() > 0 && getTeltoAna()[0] < getEventTimeVector().size() ) getShowerParameters()->time = getEventTimeVector()[getTeltoAna()[0]];
     else
     {
        cout << "VArrayAnalyzer::initEvent() warning: no event times" << endl;
@@ -202,7 +202,9 @@ void VArrayAnalyzer::initEvent()
     else
     {
        cout << "VArrayAnalyzer::initEvent() warning: no event times" << endl;
-    }
+    } */
+    getShowerParameters()->time = getEventTime();
+    getShowerParameters()->MJD  = getEventMJD();
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -455,6 +457,7 @@ void VArrayAnalyzer::terminate()
         cout << getShowerParameters()->getTree()->GetEntries();
         cout << " entries) to : " << fOutputfile->GetName() << endl;
         getShowerParameters()->getTree()->Write();
+///////////////////////////////////////////////////////////////
 // MC tree and histograms
         if( isMC() )
         {
@@ -469,13 +472,14 @@ void VArrayAnalyzer::terminate()
 		       if( getRunParameter()->fwriteMCtree ) i_tMC = (TTree*)getReader()->getMCTree()->CloneTree( -1, "fast" );
 		       if( i_tMC ) i_tMC->SetName( "MCpars" );
                     }
-                    else                                  i_tMC = (TTree*)getReader()->getMCTree();
+                    else                                     i_tMC = (TTree*)getReader()->getMCTree();
                 }
             }
             else
             {
                 if( getMCParameters()->getTree() ) i_tMC = getMCParameters()->getTree();
             }
+// MC tree is not written by default to output file (takes a while)
 	    if( getRunParameter()->fwriteMCtree && i_tMC )
 	    {
 		 cout << "writing MC tree " << endl;
@@ -485,8 +489,11 @@ void VArrayAnalyzer::terminate()
             }
 	    if( getRunParameter()->fFillMCHistos && i_tMC )
 	    {
+////////////////////////////////////////////////////////////
+// filling of MC histograms -> needed for effective area calculations
 	        cout << "filling MC histograms" << endl;
 		VEffectiveAreaCalculatorMCHistograms iMC_histos;
+// set energy range for spectral weighting
 		if( getReader()->getMonteCarloHeader() )
 		{
 		   iMC_histos.setMonteCarloEnergyRange( getReader()->getMonteCarloHeader()->E_range[0], getReader()->getMonteCarloHeader()->E_range[1],
@@ -504,6 +511,8 @@ void VArrayAnalyzer::terminate()
 		iMC_histos.fill( i_ze, i_tMC, true );
 		iMC_histos.print();
 		iMC_histos.Write();
+// END: filling of MC histograms
+////////////////////////////////////////////////////////////
             }
         }
         if( getEvndispReconstructionParameter() ) getEvndispReconstructionParameter()->Write();

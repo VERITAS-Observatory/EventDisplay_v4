@@ -334,9 +334,6 @@ else
 	@echo "LINKING evndisp with VBF support"
 	$(LD) $(LDFLAGS) $^ $(VBFLIBS) $(GLIBS) $(OutPutOpt) ./bin/$@
 endif
-
-
-
 	@echo "$@ done"
 
 ########################################################

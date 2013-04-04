@@ -81,8 +81,11 @@ class VEvndispData
                                                   //!< event number of telescope event
         static vector< unsigned int > fTelescopeEventNumber;
         static unsigned int fEventType;           //!< current event type
-        static vector< int > fEventMJD;           //!< MJD of current event
-        static vector< double > fEventTime;       //!< time of current event
+	static int fArrayEventMJD;                //!< MJD of current event
+	static int fArrayPreviousEventMJD;        //!< MJD of previous event
+	static double fArrayEventTime;            //!< time of current event
+        static vector< int > fEventMJD;           //!< MJD of current event (per telescope)
+        static vector< double > fEventTime;       //!< time of current event (per telescope)
 
         static vector< vector< int > > fTriggeredTel;
         static vector< int > fTriggeredTelN;
@@ -177,11 +180,13 @@ class VEvndispData
         VDetectorGeometry*  getDetectorGeo() const { return fDetectorGeo; }
         VDetectorGeometry*  getDetectorGeometry() const { return fDetectorGeo; }
         TTree*              getDetectorTree();
-        int                 getEventMJD() { return fEventMJD[fTelID]; }
+//        int                 getEventMJD() { return fEventMJD[fTelID]; }
+        int                 getEventMJD() { return fArrayEventMJD; }
         vector< int >&      getEventMJDVector() { return fEventMJD; }
         unsigned int        getEventNumber() { return fEventNumber; }
         string              getEventDisplayVersion() { return getRunParameter()->getEVNDISP_VERSION(); }
-        double              getEventTime() { return fEventTime[fTelID]; }
+//        double              getEventTime() { return fEventTime[fTelID]; }
+        double              getEventTime() { return fArrayEventTime; }
         vector< double >&   getEventTimeVector() { return fEventTime; }
         unsigned int        getEventType() { return fEventType; }
         unsigned long int   getExpectedEventStatus() { return fExpectedEventStatus; }

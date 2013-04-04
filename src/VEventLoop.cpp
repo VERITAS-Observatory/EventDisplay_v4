@@ -1293,7 +1293,11 @@ void VEventLoop::setEventTimeFromReader()
     fGPS.decode( fReader->getGPS0(), fReader->getGPS1(), fReader->getGPS2(), fReader->getGPS3(), fReader->getGPS4() );
 
 // time is given in seconds per day
-    if( getTelID() < fEventTime.size() ) fEventTime[getTelID()] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
+    if( getTelID() < fEventTime.size() )
+    {
+       fEventTime[getTelID()] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
+       fArrayEventTime = fEventTime[getTelID()];
+    }
 
 //  fGPS.getDays() gives day in year, so I calculate the MJD for
 //  1st January of this year, then add fGPS.getDays()-1.
@@ -1307,7 +1311,11 @@ void VEventLoop::setEventTimeFromReader()
     if( getTelID() == 2 && dMJD==54101) dMJD += 100;
 
 // set MJD
-    if( getTelID() < fEventTime.size() ) fEventMJD[getTelID()] = (int)dMJD;
+    if( getTelID() < fEventTime.size() )
+    {
+       fEventMJD[getTelID()] = (int)dMJD;
+       fArrayEventMJD = (int)dMJD;
+    }
 
 ///////////////// /////////////////////////////////// /////////////////
 // test if all times are the same, apply majority rule otherwise
@@ -1343,6 +1351,7 @@ void VEventLoop::setEventTimeFromReader()
         if( fReader->isGrisuMC() && dMJD == 51543 ) dMJD = 54383;
         i_MJD[getTeltoAna()[i]] = dMJD;
     }
+///// Time in [s] of the day /////
 // count equal times
     for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
     {
@@ -1367,7 +1376,9 @@ void VEventLoop::setEventTimeFromReader()
     if( fabs( i_telescope_time[z_max] - fEventTime[getTelID()] ) > i_max_time_diff )
     {
         fEventTime[getTelID()] = i_telescope_time[z_max];
+	fArrayEventTime = i_telescope_time[z_max];
     }
+//// MJD ////    
 // check if all MJDs are the same (use same routines as for time)
     for( unsigned int i = 0; i < getTeltoAna().size(); i++ ) i_telescope_timeN[getTeltoAna()[i]] = 0;
     for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
@@ -1393,7 +1404,22 @@ void VEventLoop::setEventTimeFromReader()
     if( fabs( i_MJD[z_max] - fEventMJD[getTelID()] ) > i_max_time_diff )
     {
         fEventMJD[getTelID()] = (int)i_MJD[z_max];
+	fArrayEventMJD = fEventMJD[getTelID()];
     }
+// check if MJD of current event is different from the value of the previous event
+// this is only ok if we are close to midnight
+    if( fArrayPreviousEventMJD > 0 && fArrayPreviousEventMJD != fArrayEventMJD && fArrayEventTime < 86400.-30. )
+    {
+       cout << "VEventLoop::setEventTimeFromReader: warning,";
+       cout << " sudden jump in MJD between previous and current event";
+       cout << " (Telescope " << getTelID()+1 << ", eventnumber " << getEventNumber() << "): " << endl;
+       cout << "\t current event: MJD " << fArrayEventMJD << ", Time " << fArrayEventTime << endl;
+       cout << "\t previous event: MJD " << fArrayPreviousEventMJD << endl;
+       cout << "\t using MJD of previous event" << endl;
+       fEventMJD[getTelID()] = fArrayPreviousEventMJD;
+       fArrayEventMJD = fArrayPreviousEventMJD;
+    }
+    fArrayPreviousEventMJD = fArrayEventMJD;
 /////////////////////////////////////////////////////////////////////
 // check telescope position of T1
     if( getTelID() == 0 && bCheckTelescopePositions && !isMC() ) checkTelescopePositions( fEventMJD[getTelID()] );

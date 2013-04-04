@@ -1141,6 +1141,8 @@ void VEffectiveAreaCalculator::reset()
 
     fSpectralIndex = 2.0;
 
+// Important: changing this means probably that the values used in
+// VEffectiveAreaCalculatorMCHistograms have to be changed as well
     fEnergyAxis_minimum_defaultValue = -2.;
     fEnergyAxis_maximum_defaultValue = 4.;
 
@@ -1231,6 +1233,11 @@ double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
    return iSolAngleNorm;
 }
 
+/*
+
+   read spectra of MC events from mscw file (filled in eventdisplay)
+
+*/
 bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms *iMC_histo )
 {
 // get solid angle normalization
