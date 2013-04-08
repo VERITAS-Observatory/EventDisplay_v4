@@ -1504,12 +1504,6 @@ double getTraceVar(vector < double > vA, double Am)
 */
 void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double corrThresh, double pixThresh )
 {
-  
-//  bool printout = false;
-//  TCanvas *c1a = 0;
-//  TGraph *g1 = 0;
-//  TGraph *ga = 0;
-
   fData->setBorderCorrelationCoefficient( 0. );
 
   vector < vector < double > > vImageTraces( fData->getDetectorGeo()->getNChannels(fData->getTelID()),vector<double>((int)fData->getNSamples(),0) );
@@ -1544,21 +1538,8 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 
   }
 
-//cout << "Correation outside" << endl;
   if( vImageTraces.size() > 0 )
   {
- //cout << "Correation inside" << endl;
-//      char cname[200];
-//      sprintf(cname,"Evt_%d_%d.pdf",int(fData->getEventNumber()),int(fData->getTelID()));
-      
-/*      if(printout)
-	{
-	  c1a = new TCanvas(cname,cname,2500,1500);
-	  c1a->Divide(5,3);
-	  g1 = new TGraph(fData->getNSamples());
-	  ga = new TGraph(fData->getNSamples());
-	} */
-
       vector < double > avepulse(fData->getNSamples(),0);
       vector < unsigned int > ImagePixelList;
       vector < unsigned int > NearbyPixelList;
@@ -1566,9 +1547,6 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
       double AvePulseVar = 0;
       int nimage = 0;
       unsigned int k = 0;
-//      int cindex = 1;
-     
-      //cout << int(fData->getEventNumber()) << " " << int(fData->getTelID()) << " " << fData->getImageTrace().size() << " ";
       
       for(unsigned int i = 0; i < vImageTraces.size(); i++)
       {
@@ -1576,14 +1554,12 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 	  {
 	      nimage++;
 	      ImagePixelList.push_back(i);
-	      //cout << i << " ";
 	      for(unsigned int j = 0; j < fData->getNSamples(); j++)
 	      {
 		avepulse[j] = avepulse[j] + vImageTraces[i][j];
               }
 	  }
       }
-      //cout << endl;
 	 
       if( nimage > 1 )
       {
@@ -1604,21 +1580,7 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
       }
 
       if(nimage > 3 && nimage < pixThresh)
-      	{
-/*	  if(printout)
-	    {
-	      c1a->cd(cindex);
-	      //cout << "Correation inside inside" << endl;
-	      sprintf(cname,"Evt_%d_T%d_Ncha_%d",int(fData->getEventNumber()),int(fData->getTelID()),nimage);
-	      ga->SetTitle(cname);
-	      ga->SetLineColor(kRed);
-	      ga->SetFillColor(kRed);
-	      ga->DrawClone("ABL");
-	      g1->SetLineColor(kBlack);
-	      g1->SetFillColor(kBlack);
-	      cindex++;
-	    } */
-
+      {
 //Build a list of pixels near the image pixels
 //Loop over image/border pixels
 	  for( unsigned int o = 0; o < ImagePixelList.size(); o++ )
@@ -1663,55 +1625,16 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 	      double corv = getTraceCorrelationValue(AvePulseMean,tMean,AvePulseVar,tVar,avepulse,vImageTraces[k]);
 	      double sn = fData->getSums()[k]/fData->getPedvars(fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k];
 
-/*	      if(printout)
-		{
-		  for(unsigned int j = 0; j < fData->getNSamples(); j++)
-		    {
-		      g1->SetPoint(j,j,-vImageTraces[k][j]);
-		    }
-
-		  sprintf(cname,"Evt_%d_cha_%d_SN_%2.1f_SSC_%1.2f",int(fData->getEventNumber()),k,sn,corv);
-		  g1->SetName(cname);
-		  g1->SetTitle(cname);
-		  g1->SetLineColor(kBlack);
-		  g1->SetFillColor(kBlack);
-		} */
 // require that correlation coefficient and signal/noise is above certain thresholds
 	      if( corv > corrThresh && sn > sigNoiseThresh )
 	      {
 		  fData->setBorder(k, true );
 		  fData->setBorderCorrelationCoefficient( k, corv );
-
-/*		  if(printout)
-		    {
-		      g1->SetLineColor(kGreen+2);
-		      g1->SetFillColor(kGreen+2);
-		    } */
 	      }
 	    
-
-/*	      if(printout)
-		{
-		  if(cindex <=15)
-		    {
-		      c1a->cd(cindex);
-		      g1->DrawClone("ABL");
-		      cindex++;
-		    }
-		} */
 	    }
- 
-/*	  if(printout)
-	    {
-	      c1a->Update();
-	      sprintf(cname,"/data3/mccann/ED/ED400/AveTrance/EVNDISP/trunk/Evt_%05d_%d.pdf",int(fData->getEventNumber()),int(fData->getTelID()));
-	      c1a->Print(cname);
-	    } */
       }
       recoverImagePixelNearDeadPixel();
       fillImageBorderNeighbours();
     }
-  
-  //fData->clearImageTraceVector();
-
 }
