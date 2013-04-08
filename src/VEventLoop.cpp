@@ -1408,7 +1408,7 @@ void VEventLoop::setEventTimeFromReader()
     }
 // check if MJD of current event is different from the value of the previous event
 // this is only ok if we are close to midnight
-    if( fArrayPreviousEventMJD > 0 && fArrayPreviousEventMJD != fArrayEventMJD && fArrayEventTime < 86400.-30. )
+    if( !isMC() && fArrayPreviousEventMJD > 0 && fArrayPreviousEventMJD != fArrayEventMJD && fArrayEventTime < 86400.-30. )
     {
        cout << "VEventLoop::setEventTimeFromReader: warning,";
        cout << " sudden jump in MJD between previous and current event";

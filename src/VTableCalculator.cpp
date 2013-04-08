@@ -540,9 +540,9 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
         {
 // Occasionally one energy is significantly off and distorts the mean.
 // therefore: get rid of N sigma outliers
-// use robust statistics (median and mean absolute error
+// use robust statistics (median and mean absolute error)
 // Note: applied only to larger events > 4 telescopes
-            double median = VStatistics::getMedian( energy_tel );
+            double median = TMath::Median( energy_tel.size(), &energy_tel[0] );
 	    double meanAbsoluteError = VStatistics::getMeanAbsoluteError( energy_tel );
 	    weight = 0.;
 	    for( unsigned int j = 0; j < energy_tel.size(); j++ )

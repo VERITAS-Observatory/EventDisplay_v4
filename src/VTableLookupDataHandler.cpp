@@ -1550,6 +1550,7 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftgrad_x[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftchisq_x[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fR[i] = 0.;
+    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fR_telType[i] = 0.;
 //    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fMCR[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftmscw[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftmscl[i] = 0.;
