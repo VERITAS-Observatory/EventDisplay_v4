@@ -1567,9 +1567,6 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 	  {
 	      avepulse[j] = avepulse[j]/double(nimage);
 	      AvePulseMean = AvePulseMean + avepulse[j];
-
-/*	      if(printout)
-		ga->SetPoint(j,j,-avepulse[j]); */
 	  }
 	  AvePulseMean = AvePulseMean/double(fData->getNSamples());
 	  
@@ -1619,20 +1616,24 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 	  {
 	      k =  NearbyPixelList[i];
 
-	      double tMean = getTraceMean(vImageTraces[k]);
-	      double tVar = getTraceVar(vImageTraces[k],tMean);
+	      if( fData->getPedvars(fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k] > 0.) 
+	      {
+		 double tMean = getTraceMean(vImageTraces[k]);
+		 double tVar = getTraceVar(vImageTraces[k],tMean);
 
-	      double corv = getTraceCorrelationValue(AvePulseMean,tMean,AvePulseVar,tVar,avepulse,vImageTraces[k]);
-	      double sn = fData->getSums()[k]/fData->getPedvars(fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k];
+
+		 double corv = getTraceCorrelationValue(AvePulseMean,tMean,AvePulseVar,tVar,avepulse,vImageTraces[k]);
+		 double sn = fData->getSums()[k]/fData->getPedvars(fData->getCurrentSumWindow()[k], fData->getHiLo()[k])[k];
 
 // require that correlation coefficient and signal/noise is above certain thresholds
-	      if( corv > corrThresh && sn > sigNoiseThresh )
-	      {
-		  fData->setBorder(k, true );
-		  fData->setBorderCorrelationCoefficient( k, corv );
-	      }
+		 if( corv > corrThresh && sn > sigNoiseThresh )
+		 {
+		     fData->setBorder(k, true );
+		     fData->setBorderCorrelationCoefficient( k, corv );
+		 }
 	    
 	    }
+         }
       }
       recoverImagePixelNearDeadPixel();
       fillImageBorderNeighbours();
