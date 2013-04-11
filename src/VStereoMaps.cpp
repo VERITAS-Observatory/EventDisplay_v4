@@ -723,6 +723,10 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
     if( bUncorrelatedSkyMaps ) cout << " (uncorrelated plots)";
     cout << endl;
 
+// DEFAULT: choose random offset regions
+    bool bRemoveOffRegionsRandomly = true;
+//    bRemoveOffRegionsRandomly = false;
+
 //  control histograms and delete the one from the previous runs
     initialize_ReflectedRegionHistograms();
 
@@ -797,8 +801,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 // empty vector
     vector< double > i_Dempty;
 
-// get source extension, source distance, and dec/ra offsets for for this run
-// source extension and radius of off region
+// source extension (equal to radius of off regions)
     fRE_roffTemp = sqrt(fRunList.fSourceRadius);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -810,21 +813,11 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// set number of bins to be covered
     int i_nbinsX_min = 0;
     int i_nbinsX = hmap_stereo->GetNbinsX();
     int i_nbinsY_min = 0;
     int i_nbinsY = hmap_stereo->GetNbinsY();
-//
-// set up 2D vector of off source parameters ([n_x][n_y])
-    fRE_off.clear();
-    vector< sRE_REGIONS > i_x_off;
-    for( int j = 0; j <= i_nbinsY; j++ )
-    {
-        i_x_off.push_back( i_off );
-        i_x_off.back().noff = 0;
-    }
-    for( int i = 0; i <= i_nbinsX; i++ ) fRE_off.push_back( i_x_off );
-
 // check if full sky analysis is required
     if( fNoSkyPlots )
     {
@@ -837,7 +830,18 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
         i_nbinsY     = y_bin_wobble;
     }
 
-    double ids = 0.;                              // distance of bin to camera center
+// set up 2D vector of off source parameters ([n_x][n_y])
+    fRE_off.clear();
+    vector< sRE_REGIONS > i_x_off;
+    for( int j = 0; j <= i_nbinsY; j++ )
+    {
+        i_x_off.push_back( i_off );
+        i_x_off.back().noff = 0;
+    }
+    for( int i = 0; i <= i_nbinsX; i++ ) fRE_off.push_back( i_x_off );
+
+// distance of bin to camera center
+    double ids = 0.;  
 
 // vectors with off source positions
     vector< double > r_off;
@@ -849,12 +853,23 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
     vector< double > y_offTemp;
 
 // calculate maximum number of off source regions possible
-    int n_max_RE = (int)(TMath::Pi() / (asin( fRE_roffTemp / fRunList.fmaxradius ) ) );
+// (maximum number of off source regions at the edge of the camera)
+    int n_max_RE = 0;
+    if(  fRunList.fmaxradius > 0. )
+    {
+       n_max_RE = (int)(TMath::Pi() / (asin( fRE_roffTemp / fRunList.fmaxradius ) ) );
+    }
+    else
+    {
+       cout << "VStereoMaps::initialize_ReflectedRegionModel() warning: max camera radius is zero: ";
+       cout << fRunList.fmaxradius << endl;
+       return false;
+    }
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
-// loop over all bins in stereo maps
+// loop over all bins in the stereo maps
 //////////////////////////////////////////////////////////////////////////////////////
     for( int i = i_nbinsX_min; i <= i_nbinsX; i++ )
     {
@@ -922,7 +937,6 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                             y_t = ids * sin( phi_i );
 
 // check if off source region is not included in this off position (require to be at least 1.5*times theta2 circle away)
-// (GM) BUG FIX: added fRE_distanceSourceOff (was fRM_offdist)
                             if( (x_t-x)*(x_t-x)+(y_t-y)*(y_t-y) > (2.+fRunList.fRE_distanceSourceOff)*(2.+fRunList.fRE_distanceSourceOff)*fRunList.fSourceRadius )
                             {
 // check if real source region is not included in this off position
@@ -930,8 +944,13 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                                 bool bExclude = false;
                                 for( unsigned int ex = 0; ex < vXTOEXCLUDE.size(); ex++ )
                                 {
-// vX... and vY... are relative to sky map centre
-                                    if( (x_t+vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod)*(x_t+vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod) + (y_t+vYTOEXCLUDE[ex]-fRunList.fWobbleNorthMod)*(y_t+vYTOEXCLUDE[ex]-fRunList.fWobbleNorthMod) < (vRTOEXCLUDE[ex]+fRE_roffTemp)*(vRTOEXCLUDE[ex]+fRE_roffTemp) ) bExclude = true;
+// vX... and vY... are relative to sky map centre in rotated camera coordinates
+                                    if( (x_t+vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod)*(x_t+vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod)
+				      + (y_t+vYTOEXCLUDE[ex]-fRunList.fWobbleNorthMod)*(y_t+vYTOEXCLUDE[ex]-fRunList.fWobbleNorthMod)
+				      < (vRTOEXCLUDE[ex]+fRE_roffTemp)*(vRTOEXCLUDE[ex]+fRE_roffTemp) )
+				      {
+				         bExclude = true;
+                                      }
                                 }
                                 if( bExclude ) continue;
 
@@ -954,17 +973,48 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                     n_r = (int)x_off.size();
 
 // check maximum number of sources, if too many, remove some (randomly choosen)
-                    if( n_r > fRunList.fRE_nMaxoffsource )
-                    {
-                        unsigned int remo_iter = 0;
-                        while( (int)r_off.size() > fRunList.fRE_nMaxoffsource )
-                        {
-                            remo_iter = (unsigned int)fRandom->Integer( (int)r_off.size() );
-                            r_off.erase( r_off.begin() + remo_iter );
-                            x_off.erase( x_off.begin() + remo_iter );
-                            y_off.erase( y_off.begin() + remo_iter );
+// (default)
+                    if( bRemoveOffRegionsRandomly )
+		    {
+		       if( n_r > fRunList.fRE_nMaxoffsource )
+		       {
+			   unsigned int remo_iter = 0;
+			   while( (int)r_off.size() > fRunList.fRE_nMaxoffsource )
+			   {
+			       remo_iter = (unsigned int)fRandom->Integer( (int)r_off.size() );
+			       r_off.erase( r_off.begin() + remo_iter );
+			       x_off.erase( x_off.begin() + remo_iter );
+			       y_off.erase( y_off.begin() + remo_iter );
+			   }
                         }
                     }
+// remove those regions which are furthest away
+// (this is not default - debugging only)
+                    else
+		    {
+			double i_dist = 0.;
+		        while( (int)r_off.size() > fRunList.fRE_nMaxoffsource )
+			{
+			   double i_max = 0.;
+			   unsigned int i_maxtt = 99999; 
+			   unsigned int tt = 0;
+			   for( tt = 0; tt < r_off.size(); tt++ )
+			   {
+			      i_dist = sqrt( (x_off[tt]-x)*(x_off[tt]-x) + (y_off[tt]-y)*(y_off[tt]-y) );
+			      if( i_dist > i_max )
+			      {
+			         i_max = i_dist;
+				 i_maxtt = tt;
+                              }
+                           }
+			   if( i_maxtt != 99999 && i_maxtt < r_off.size() )
+			   {
+			      r_off.erase( r_off.begin() + i_maxtt );
+			      x_off.erase( x_off.begin() + i_maxtt );
+			      y_off.erase( y_off.begin() + i_maxtt );
+                           }
+			}
+		    }
 
 // number of off source regions
                     n_r = (int)x_off.size();

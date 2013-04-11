@@ -1019,7 +1019,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	            fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 	            fStats->updateCutCounter( VGammaHadronCutsStatistics::eLTrig );
                 }
-             return false;
+		return false;
             }
         }
         else 
