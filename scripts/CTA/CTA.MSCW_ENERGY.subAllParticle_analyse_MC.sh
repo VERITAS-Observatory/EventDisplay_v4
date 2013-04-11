@@ -38,7 +38,8 @@ elif [ $4 = "DESY3700m" ]
 then
    VPART=( "proton" )
 else
-   VPART=( "gamma_onSource" "electron" "proton" )
+   VPART=( "gamma_onSource" "electron" "proton" "proton" )
+   VNUM=( "30" "15" "20" "21" )
 fi
 NPART=${#VPART[@]}
 
@@ -47,6 +48,7 @@ NPART=${#VPART[@]}
 for ((m = 0; m < $NPART; m++ ))
 do
    PART=${VPART[$m]}
+   NUMM=${VNUM[$m]}
 
    for (( k = 1; k < 10; k++ ))
    do
@@ -60,12 +62,9 @@ do
       elif [ $4 = "ISDC3700m" ]
       then
 	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 11$k
-      elif [ $4 = "prod2-Aar" ] || [ $4 = "prod2-Aar-North" ] || [ $4 = "prod2-Aar-South" ]
+      elif [ $4 = "prod2-Aar" ] || [ $4 = "prod2-Aar-North" ] || [ $4 = "prod2-Aar-South" ] || [ $4 = "prod2-Aar-South-CC" ]
       then
-         for (( l = 0; l < 10; l++ ))
-	 do
-	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 10$k$l
-         done
+	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $NUMM$k
       else
 	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 10$k
       fi

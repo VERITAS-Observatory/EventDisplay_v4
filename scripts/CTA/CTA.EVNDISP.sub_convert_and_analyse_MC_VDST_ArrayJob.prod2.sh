@@ -84,9 +84,9 @@ mkdir -p $SHELLDIR
 # skeleton script
 FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
 
-QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP/
-   mkdir -p $QLOG
-# QLOG="/dev/null"
+QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART/
+mkdir -p $QLOG
+QLOG="/dev/null"
 
 echo "submitting $RUNFROMTO"
 

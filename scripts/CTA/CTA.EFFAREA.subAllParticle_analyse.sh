@@ -73,10 +73,6 @@ then
    elif [ $DSET = "VTS" ]
    then
      VPART=( "gamma_onSource" "proton" )
-   elif [ $DSET = "prod2-Aar" ] || [ $DSET = "prod2-Aar-North" ] || [ $DSET = "prod2-Aar-South" ]
-   then
-      VPART=( "gamma_onSource" "proton_onSource" )
-      VPART=( "proton_onSource" )
    else
       VPART=( "gamma_onSource" "electron_onSource" "proton_onSource" )
    fi

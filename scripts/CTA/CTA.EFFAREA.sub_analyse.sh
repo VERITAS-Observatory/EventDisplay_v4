@@ -300,9 +300,6 @@ do
 # create cut file
       iCBFILE=`basename $CFIL`      
       iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
-#      mkdir -p /tmp/EVNDISP/effArea/
-#      cd /tmp/EVNDISP/effArea/
-#      iCFIL=/tmp/EVNDISP/effArea/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
       if [ ! -e $CFIL ]
       then
         echo "ERROR: cut file does not exist:"
@@ -335,12 +332,7 @@ do
       rm -f $iCFIL-f
       sed -e "s|TMVACUTDIR|$TMVACUT|" $iCFIL-g > $iCFIL-h
       rm -f $iCFIL-g
-#      if [ $DSET = "v_leeds" ]
-#      then
-#	 sed -e "s|DATASET|cta-ultra3|" $iCFIL-h > $iCFIL-i
-#      else
-	 sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
-#      fi
+      sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
 # angular resolution file
       rm -f $iCFIL-h
       if [ $PART = "gamma_onSource" ] 
@@ -364,7 +356,6 @@ do
       sed -e "s|PARTICLENUMBERFILE|$PNF|" $iCFIL-j > $iCFIL-k
       rm -f $iCFIL-j
       mv -f $iCFIL-k $iCFIL
-      mv $iCFIL $ODIR/
       iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
       cd $EVNDISPSYS/scripts/CTA/
       echo $iCFIL

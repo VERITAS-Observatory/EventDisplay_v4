@@ -70,8 +70,11 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 # EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 )
 # EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 2.50 )
 # extended 2013/02/11
-EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 1.35 )
-EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 1.60 2.50 )
+#EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 1.35 )
+#EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 1.60 2.50 )
+# extended 2013/03/21
+EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 1.00 1.25 )
+EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 1.25 1.50 2.50 )
 NENE=${#EMIN[@]}
 #####################################
 # 
@@ -175,7 +178,7 @@ do
 #################################
 # submit job to queue
 # medium queue: BDT 
-	 qsub -V -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
+	 qsub -js 200 -V -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
 # long queue: needed for box cut optimization
 #         qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
      done
