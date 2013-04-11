@@ -49,12 +49,16 @@ class VRadialAcceptance
         VAnaSumRunParameter *fRunPar;
 
         TList *hList;
+	TList *hListNormalizeHistograms;
         TH1D *hscale;
 // acceptance curves as mean over all runs
         vector< double > fZe;                      //!< ze bins (upper limit of zenith angle bin)
         vector< TH1D* >  hAccZe;                   //!< zenith angle dependent acceptance curves
         vector< TF1* >   fAccZe;                   //!< zenith angle dependent acceptance curves
         vector< TH1D* >  hAccZeFit;                //!< zenith angle dependent acceptance curves
+	vector< double > fAzMin;                   //!< az bins (limits)
+	vector< double > fAzMax;                   //!< az bins (limits)
+	vector< TH1D* >  hAccAz;                   //!< azimuth angle dependent acceptance curves
         unsigned int     fAccZeFitMinBin;          //!< range (in bins) for normalisation of acceptance curves
         unsigned int     fAccZeFitMaxBin;
 

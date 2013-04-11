@@ -81,6 +81,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     reset();
 
     hList = new TList();
+    hListNormalizeHistograms = new TList();
 
     fCuts = icuts;
     fRunPar = irunpar;
@@ -109,7 +110,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     double ize = 0.;
     for( unsigned int i = 0; i < fZe.size(); i++ )
     {
-        cout << "zenith angle intervall: ";
+        cout << "zenith angle interval: ";
         if( i == 0 ) cout << 0;
         else         cout << fZe[i-1];
         cout << " - " << fZe[i] << endl;
@@ -123,6 +124,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
         hAccZe.back()->SetLineWidth( 2 );
         hAccZe.back()->Sumw2();
         hList->Add( hAccZe.back() );
+	hListNormalizeHistograms->Add( hAccZe.back() );
 
         sprintf( hname, "fAccZe_%d", i );
         fAccZe.push_back( new TF1( hname, VRadialAcceptance_fit_acceptance_function, 0., 2.5, 5 ) );
@@ -150,6 +152,31 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     hXYAccTot->SetYTitle( "y_{off} [deg]" );
     hList->Add( hXYAccTot );
 
+// azimuth angle
+    fAzMin.clear();
+    fAzMax.clear();
+    fAzMin.push_back( 135.0 );       fAzMax.push_back( -165.0 );
+    fAzMin.push_back( 150.0 );       fAzMax.push_back( -150.0 );
+    fAzMin.push_back( -180. );       fAzMax.push_back( -120. );
+    for( int i = 0; i < 13; i++ )
+    {
+	 fAzMin.push_back( fAzMin.back() + 22.5 );
+	 fAzMax.push_back( fAzMax.back() + 22.5 );
+    }
+    for( unsigned int i = 0; i < fAzMin.size(); i++ )
+    {
+        sprintf( hname, "hAccAz_%d", i );
+        sprintf( htitle, "%.0f < az < %.0f", fAzMin[i], fAzMax[i] );
+        hAccAz.push_back( new TH1D( hname, htitle, nxybin, 0., xymax ) );
+        hAccAz.back()->SetXTitle( "distance to camera center [deg]" );
+        hAccAz.back()->SetYTitle( "relative rate" );
+        hAccAz.back()->SetMarkerSize( 2 );
+        hAccAz.back()->SetLineWidth( 2 );
+        hAccAz.back()->Sumw2();
+        hList->Add( hAccAz.back() );
+	hListNormalizeHistograms->Add( hAccAz.back() );
+    }
+
 // run dependent acceptance curves
     for( unsigned int i = 0; i < fRunPar->fRunList.size(); i++ )
     {
@@ -162,6 +189,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
         hAccRun.back()->SetLineWidth( 2 );
         hAccRun.back()->Sumw2();
         hList->Add( hAccRun.back() );
+	hListNormalizeHistograms->Add( hAccRun.back() );
     }
 
 }
@@ -182,6 +210,7 @@ void VRadialAcceptance::reset()
     fRunPar = 0;
     fCuts = 0;
     hList = 0;
+    hListNormalizeHistograms = 0;
 
     fXs = 0.;
     fYs = 0.;
@@ -319,6 +348,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
     if( fCuts ) fCuts->printCutSummary();
 
     double idist = 0;
+    double i_az = 0.;
     int i_entries_after_cuts = 0;
 
 ////////////////////////////////////////////////////////
@@ -340,6 +370,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
 // now fill histograms
             i_entries_after_cuts++;
 
+            hXYAccTot->Fill( iData->Xoff, iData->Yoff );
 // fill zenith angle dependent histograms
             for( unsigned int j = 0; j < fZe.size(); j++ )
             {
@@ -350,7 +381,16 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
                     break;
                 }
             }
-            hXYAccTot->Fill( iData->Xoff, iData->Yoff );
+// fill azimuth angle dependend histograms
+            i_az = atan2( iData->Yoff, iData->Xoff )*TMath::RadToDeg();
+	    for( unsigned int j = 0; j < fAzMin.size(); j++ )
+	    {
+	       if( i_az > fAzMin[j] && i_az < fAzMax[j] )
+	       {
+	          hAccAz[j]->Fill( idist );
+		  break;
+               }
+            }
 // fill run dependent histograms
             for( unsigned int j = 0; j < fRunPar->fRunList.size(); j++ )
             {
@@ -382,6 +422,25 @@ bool VRadialAcceptance::terminate( string ofile )
     else
     {
         double i_normBin = (double)(fAccZeFitMaxBin - fAccZeFitMinBin );
+// scale histograms
+        TIter next( hListNormalizeHistograms );
+	while( TH1D *h = (TH1D*)next() )
+	{
+	    scaleArea( h );
+            isc = 0.;
+            i_normBin = 0.;
+            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ )
+            {
+                if( h->GetBinError( j ) > 0. )
+                {
+                    isc +=  h->GetBinContent( j )/(h->GetBinError( j ) * h->GetBinError( j ));
+                    i_normBin += 1./h->GetBinError( j )/h->GetBinError( j );
+                }
+            }
+            if( i_normBin > 0. ) isc /= i_normBin;
+            if( isc > 0 ) h->Scale( 1./isc );
+	}
+/*
 // zenith angle histograms
         for( unsigned int i = 0; i < hAccZe.size(); i++ )
         {
@@ -413,6 +472,7 @@ bool VRadialAcceptance::terminate( string ofile )
 	    if( i_normBin > 0. ) isc /= i_normBin;
             if( isc > 0 ) hAccRun[i]->Scale( 1./isc );
         }
+*/
     }
 
 // analyze ze histograms
