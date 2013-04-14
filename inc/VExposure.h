@@ -96,6 +96,8 @@ class VExposure : public TObject, public VGlobalRunParameter
         vector< double > fRunGalLat1958;
         vector< double > fRunTelElevation;
         vector< double > fRunTelAzimuth;
+        vector< double > fWobbleN;
+        vector< double > fWobbleE;
         vector< int >    fRunDate;
 	vector< vector < unsigned int > > fRunLaserList;
 	vector< unsigned int > fDateLaserList;
@@ -187,6 +189,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 	void readLaserRunDateListFromFile( string runlist );
         void readLaserRunListFromFile( string runlist );
 	void downloadRunList();
+	void checkRunList();
 	void readRunCommentsFromDB();
 	void setRunNumber( unsigned int number );
 	void setLaserNumber(unsigned int number );

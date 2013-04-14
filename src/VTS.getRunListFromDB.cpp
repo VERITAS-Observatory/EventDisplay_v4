@@ -22,6 +22,7 @@ string startdate="2000-01-01";
 string enddate="2050-01-01";
 string sourcename="Crab";
 bool bANASUM = false;
+bool bCHECKDISK = false;
 string fAnasumFile = "";
 double elevation=0.;
 double duration=0.;
@@ -86,6 +87,7 @@ int main( int argc, char *argv[] )
       if( laserruns == 1 ) a.getLaserList();
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
+      if( bCHECKDISK ) a.checkRunList();
 
       if( bANASUM )
         a.outputAnasumRunlist(fAnasumFile);
@@ -99,6 +101,7 @@ int main( int argc, char *argv[] )
       a.readLaserRunListFromFile(laserlist);
       a.setSelectLaser( laserruns );
       if( getRuns == 1 ) a.downloadRunList();
+      if( bCHECKDISK ) a.checkRunList();
 
       if( bANASUM )
         a.outputAnasumRunlist(fAnasumFile);
@@ -122,6 +125,7 @@ int main( int argc, char *argv[] )
       if( laserruns == 1 ) a.getLaserList();
       a.printListOfRuns();
       if( getRuns == 1 ) a.downloadRunList();
+      if( bCHECKDISK ) a.checkRunList();
 
       if( bANASUM )
         a.outputAnasumRunlist(fAnasumFile);
@@ -158,7 +162,7 @@ void parseOptions(int argc, char *argv[])
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:c", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
@@ -226,6 +230,9 @@ void parseOptions(int argc, char *argv[])
             case 'a':
                 bANASUM=true;
                 fAnasumFile=optarg;
+                break;
+             case 'c':
+                bCHECKDISK=true;
                 break;
             case '?':
                 break;

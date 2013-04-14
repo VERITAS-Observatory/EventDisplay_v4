@@ -302,6 +302,45 @@ bool VExposure::readFromDB()
 //       itemp = db_row->GetField( 2 );
         fRunStatus.push_back( "" );
 
+// Wobble Stuff
+    double fWobbleNorth = -9999.;
+    double fWobbleEast = -9999.;
+
+    float dist = 0.;
+    if( db_row->GetField( 17 ) ) dist = atof( db_row->GetField( 17 ) );
+    float angl = 0.;
+    if( db_row->GetField( 18 ) ) angl = atof( db_row->GetField( 18 ) );
+    if( fabs( angl ) < 0.1  )
+    {
+        fWobbleNorth = dist;
+        fWobbleEast = 0.;
+    }
+    else if( fabs( angl - 90. ) < 0.1 )
+    {
+        fWobbleNorth = 0.;
+        fWobbleEast = dist;
+    }
+    else if( fabs( angl - 180. ) < 0.1 )
+    {
+        fWobbleNorth = -1.*dist;
+        fWobbleEast = 0.;
+    }
+    else if( fabs( angl - 270. ) < 0.1 )
+    {
+        fWobbleNorth = 0.;
+        fWobbleEast = -1.*dist;
+    }
+    if( itemp  == "50308" )
+    {
+       fWobbleNorth = 0.;
+       fWobbleEast = -0.5;
+    }
+
+    fWobbleN.push_back(fWobbleNorth);
+    fWobbleE.push_back(fWobbleEast);
+
+
+
 //////
 // get local coordinates
 
@@ -339,7 +378,7 @@ bool VExposure::readFromDBList()
     TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
     if( !f_db )
     {
-        cout << "error connecting to db" << endl;
+        cout << "error connecting to db 2 " << iTempS << endl;
         return false;
     }
     cout << "reading from " << iTempS << endl;
@@ -416,6 +455,45 @@ bool VExposure::readFromDBList()
       fRunoffsetRA.push_back( atof( db_row->GetField( 15 ) ) * 180./TMath::Pi() );
       fRunoffsetDec.push_back( atof( db_row->GetField( 16 ) ) * 180./TMath::Pi() );
       fRunConfigMask.push_back( atoi( db_row->GetField( 10 ) ) );
+
+//////
+// Wobble Stuff
+
+    double fWobbleNorth = -9999.;
+    double fWobbleEast = -9999.;
+
+    float dist = 0.;
+    if( db_row->GetField( 17 ) ) dist = atof( db_row->GetField( 17 ) );
+    float angl = 0.;
+    if( db_row->GetField( 18 ) ) angl = atof( db_row->GetField( 18 ) );
+    if( fabs( angl ) < 0.1  )
+    {
+        fWobbleNorth = dist;
+        fWobbleEast = 0.;
+    }
+    else if( fabs( angl - 90. ) < 0.1 )
+    {
+        fWobbleNorth = 0.;
+        fWobbleEast = dist;
+    }
+    else if( fabs( angl - 180. ) < 0.1 )
+    {
+        fWobbleNorth = -1.*dist;
+        fWobbleEast = 0.;
+    }
+    else if( fabs( angl - 270. ) < 0.1 )
+    {
+        fWobbleNorth = 0.;
+        fWobbleEast = -1.*dist;
+    }
+    if( fRunDownloadList[i] == 50308 )
+    {
+       fWobbleNorth = 0.;
+       fWobbleEast = -0.5;
+    }
+
+    fWobbleN.push_back(fWobbleNorth);
+    fWobbleE.push_back(fWobbleEast);
 
 //////
 // get galactic coordinates
@@ -1579,7 +1657,8 @@ void VExposure::printListOfRuns()
         cout << "\tRUN " << fRun[j];
         cout << "\t" << fRunSourceID[j];
         cout << "\tMJD " << fRunStartMJD[j];
-        cout <<  "\tDate: " << fRunDate[j];
+        cout << "\tDate: " << fRunDate[j];
+        cout << "\tWobble:(N,E) (" << fWobbleN[j] << "," << fWobbleE[j] << ")";
         cout << "\tCONFIGMASK " << fRunConfigMask[j];
         cout << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
         cout << "\tDuration[s] " << fRunDuration[j];
@@ -1767,6 +1846,38 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
   cout << endl;
 
   fclose(anasumFile);
+
+}
+
+void VExposure::checkRunList()
+{
+
+  char filename[800];
+  char filepath[800];
+
+  char *ENVIR_VAR;
+
+  ENVIR_VAR = getenv ("VERITAS_DATA_DIR");
+
+  cout << "Checking Runs: " << endl;
+
+  for( unsigned int i = 0 ; i < fRunDownload.size(); i++ )
+  {
+
+    sprintf(filename,"%s/data/d%d/%d.cvbf",ENVIR_VAR,fRunDownloadDate[i],fRunDownload[i]);
+    sprintf(filepath,"%s/data/d%d/",ENVIR_VAR,fRunDownloadDate[i]);
+
+    ifstream datafile(filename);
+    if( datafile.is_open() ) 
+      cout << filename << "\tOn Disk" << endl;
+    else 
+    {
+      cout << filename << "\tNeeds Downloading" << endl;
+    }
+
+  }
+
+  cout << endl;
 
 }
 
