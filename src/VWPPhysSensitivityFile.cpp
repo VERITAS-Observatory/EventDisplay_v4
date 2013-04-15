@@ -104,7 +104,8 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
 	 sprintf( htitle, "%s (CU)", fSensitivityLimits[i]->GetTitle() );
 	 fSensitivityCULimits.push_back( new TH1F( hname, htitle, iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max ) );
 	 fSensitivityCULimits[i]->SetXTitle( "log_{10} (E/TeV)" );
-	 fSensitivityCULimits[i]->SetYTitle( "E^{2} dF/dE [erg cm^{-2} s^{-1}]" );
+	 fSensitivityCULimits[i]->SetYTitle( "Differential Flux Sensitivity [C.U.]" );
+	 fSensitivityCULimits[i]->SetLineColor( i+2 );
 	 fSensitivityCULimits[i]->SetMarkerColor( i+2 );
 	 fSensitivityCULimits[i]->Print();
 	 hisList.push_back( fSensitivityCULimits[i] );
@@ -421,6 +422,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
     int i_noise_electron = 250;
     double i_woff_electron = 0.;  
 
+// VTS only
     if( fSubArray == "V5" )
     {
        i_Azbin_gamma = 16;
@@ -453,6 +455,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
        i_noise_electron = i_noise_gamma;
        i_woff_electron = 0.;
     }
+// (END VTS only)
 
     cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << fSubArray << endl; 
 //////////////////////////////////////////////////////////////////////////
@@ -515,13 +518,13 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
        i_SensCU.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20.,
                               i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron, -10., 10., "CU" );
     }
+    bool iHighEnergyFilling = false;
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
-    i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate, true );
+    i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate, iHighEnergyFilling );
     if( iFill1D ) i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
-    i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
 
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
-    i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fElecRate );
+    i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fElecRate, iHighEnergyFilling );
     if( iFill1D ) i_SensCU.fillSensitivityLimitsHistograms( fSensitivityCULimits );
 
     return true;
@@ -530,7 +533,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 bool VWPPhysSensitivityFile::initializeOutputFile( string iOutputFile )
 {
    char hname[200];
-   sprintf( hname, "%s.%s.%.1fh.root", iOutputFile.c_str(), fSubArray.c_str(), fObservingTime_h );
+   sprintf( hname, "%s.%s.%ds.root", iOutputFile.c_str(), fSubArray.c_str(), int(fObservingTime_h*3600.) );
    string iFileName = hname;
 // define output file
    fOutFile = new TFile( iFileName.c_str(), "RECREATE" );

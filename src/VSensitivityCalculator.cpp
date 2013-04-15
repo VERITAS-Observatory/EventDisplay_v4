@@ -84,6 +84,8 @@ void VSensitivityCalculator::reset()
 // Li & Ma formula for significance calculation (use 17, 5 or 9)
     fLiAndMaEqu = 17;
 
+    fSetEvents_minCutOnly = false;
+
 // source strength values (in Crab units)
 // units: fraction of source strenght
     fSourceStrength_min = 0.003;
@@ -128,7 +130,7 @@ void VSensitivityCalculator::reset()
    iSignificance    = required significance  [sigma]
    iMinEvents       = minimum number of events required
 
-   energy           = energy on linear scale [TeV]
+   energy           = energy on linear scale [TeV] (for debug output only)
 
    return sensitivity as fraction of data set used
 */
@@ -178,81 +180,73 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
         s = VStatistics::calcSignificance( t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha), 
 	                                   t * fData[iD].fBackground, fData[iD].fAlpha, fLiAndMaEqu );
 
-// keep statistics to show where the limitations are
-	if( energy > -99. && n > 0 && iFillStatistics > 0 )
-	{
-// significance limited
-	   if( iFillStatistics == 1 )
-	   {
-	      if( s >= fSignificance_min ) 
-	      {
-		 f = fSourceStrength[n];
-		 bSuccess = true;
-		 break;
-              }
-	      else continue;
-           }
-// limited in minimum number of signal events
-	   if( iFillStatistics == 2 )
-	   {
-	      if( t * f * n_diff >= fEvents_min )
-	      {
-		 f = fSourceStrength[n];
-		 bSuccess = true;
-		 break;
-              }
-	      else continue;
-           }
-// limited in systematic error
-	   if( iFillStatistics == 3 )
-	   {
-	      if( f * n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min )
-	      {
-		 f = fSourceStrength[n];
-		 bSuccess = true;
-		 break;
-              }
-	      else continue;
-           }
-	}
-
+//////////////////////////////////////////////////////////////////////////
+// check if this set of observations passes the significance criteria
+//////////////////////////////////////////////////////////////////////////
 // require a certain significance 
-        if(    s >= fSignificance_min 
+         bool bPassed_MinimumSignificance = (s >= fSignificance_min);
 // require a minimum number of events
-	    && t * f * n_diff >= fEvents_min
+	 bool bPassed_MinimumSignalEvents = ( t * f * n_diff >= fEvents_min );
 // require background events 
 // (removes most sensitivity values at large energies, but otherwise transition zone
 //  between signal and background limited zone not well defined)
-	    && fData[iD].fBackground * fData[iD].fAlpha > 0.
+// NOTE: this cut depends on your MC statistics, not on the sensitivty of your observatory
+	 bool bPasses_MinimumNumberofBackGroundEvents = (fData[iD].fBackground * fData[iD].fAlpha > 0. );
 // require the signal to be larger than a certain fraction of background
-	    && f * n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min 
-	  )
-        {
-            if( n > 0 )
-            {
-                f = fSourceStrength[n];
-                bSuccess = true;
-		if( fDebug && energy > 0. )
-		{
-		    cout << "\t n: " << n-1 << "\t f " << f;
-		    cout << "\t significance: " << s;
-		    cout << "\t min events: " << t * f * fData[iD].fSignal;
-		    cout << "\t ndiff: " << t * ( f * n_diff );
-		    cout << "\t non: " << t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha);
-		    cout << "\t noff: " << t * fData[iD].fBackground;
-		    cout << "\t alpha: " << fData[iD].fAlpha;
-		    cout << "\t t: " << t;
-		    cout << endl;
-		    cout << "\t" << fData[iD].fBackground * fData[iD].fAlpha;
-		    cout << "\t" << ( f * n_diff ) / (fData[iD].fBackground * fData[iD].fAlpha) * 100. << endl;
-                }
-            }
+	 bool bPasses_MinimumSystematicCut = false;
+	 if( fData[iD].fBackground * fData[iD].fAlpha > 0. )
+	 {
+	    bPasses_MinimumSystematicCut = ( f * n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min  );
+         }
+
+// PRELI: allow calculation of sensitivity in event limited region
+         if( bPasses_MinimumNumberofBackGroundEvents ) fSetEvents_minCutOnly = false;
+	 if( fSetEvents_minCutOnly )
+	 {
+	    bPasses_MinimumNumberofBackGroundEvents = true;
+	    bPasses_MinimumSystematicCut = true;
+	    bPassed_MinimumSignificance = true;
+         }
+
+// sensitivity limitation histograms
+	if(  ( iFillStatistics == 1 && bPassed_MinimumSignificance ) 
+	  || ( iFillStatistics == 2 && bPassed_MinimumSignalEvents )
+	  || ( iFillStatistics == 3 && bPasses_MinimumSystematicCut ) )
+	{
+	      f = fSourceStrength[n];
+	      bSuccess = true;
+	      break;
+	}
+	else if( iFillStatistics > 0 ) continue;
+
+// standard sensitivity calculation
+       if( bPassed_MinimumSignificance && bPassed_MinimumSignalEvents 
+        && bPasses_MinimumSystematicCut && bPasses_MinimumNumberofBackGroundEvents )
+       {
+	     f = fSourceStrength[n];
+	     bSuccess = true;
             break;
-        }
+       }
+       if( fDebug && bSuccess && energy > 0. )
+       {
+	   cout << "\t" << iFillStatistics;
+	   cout << "\t n: " << n-1 << "\t f " << f;
+	   cout << "\t significance: " << s;
+	   cout << "\t min events: " << t * f * fData[iD].fSignal;
+	   cout << "\t ndiff: " << t * ( f * n_diff );
+	   cout << "\t non: " << t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha);
+	   cout << "\t noff: " << t * fData[iD].fBackground;
+	   cout << "\t alpha: " << fData[iD].fAlpha;
+	   cout << "\t t: " << t;
+	   cout << endl;
+	   cout << "\t" << fData[iD].fBackground * fData[iD].fAlpha;
+	   cout << "\t" << ( f * n_diff ) / (fData[iD].fBackground * fData[iD].fAlpha) * 100. << endl;
+       }
     }
 
     if( !bSuccess ) return -1.;
 
+// return flux value in CU that passed significance criteria
     return f;
 }
 
@@ -329,7 +323,9 @@ unsigned int VSensitivityCalculator::addDataSet( double iGammaRayRate, double iB
 
 
 /*!
+
     fSourceStrength will be sorted in reverse order
+
 */
 void VSensitivityCalculator::setSourceStrengthRange_CU( double iMin, double iMax, double iStep, bool iLog )
 {
@@ -647,7 +643,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
     cout << "evaluating differential flux vector" << endl;
 
 // this is the range of fluxes which will be searched
-    setSourceStrengthRange_CU( -4., 0., 4./1000., true );
+    setSourceStrengthRange_CU( -5., 10., 4./1000., true );
 
     double non = 0;
     double non_error = 0.;
@@ -660,6 +656,10 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // create sensitivity vs energy graph
     gSensitivityvsEnergy = new TGraphAsymmErrors( 1 );
     gSensitivityvsEnergy->SetTitle( "" );
+
+// often no background simulations (off events) available at high energies
+// don't really need it, since fEvents_min is the important one
+    fSetEvents_minCutOnly = true;
 
 /////////////////////////////////////////////////////////////////
 // loop over all on and off counts and calculate sensitivity
@@ -697,20 +697,39 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // observe that the signal rate is defined differently for list_sensitivity() etc...
 // get fraction of Crab flux for XX sigma etc...
 // perform a toy MC to calculate errors (1000 times)
-        TH1F iX( "iX", "", 1000, 0., 10. );
+        TH1F iX( "iX", "", 100000, 0., 100. );
 	for( unsigned int q = 0; q < 1000; q++ )
 	{
-	     double iN_on = gRandom->Gaus( non, non_error );
-	     if( iN_on < 1. ) iN_on = 0.;
+	     double iN_on  = gRandom->Gaus( non, non_error );
 	     double iN_off = gRandom->Gaus( noff, noff_error );
-	     if( iN_off < 1. ) iN_off = 0.;
 	     unsigned int iD = addDataSet( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
 	                                   iN_off / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
-             iX.Fill( getSensitivity( iD, -100., 0 ) );
+	     double i_s = getSensitivity( iD, -100., 0 );
+	     if( i_s > 0. ) iX.Fill( i_s );
 	}
-	s = iX.GetMean();
-	s_error_L = s - iX.GetRMS();
-	s_error_U = s + iX.GetRMS();
+	unsigned int iD = addDataSet( non / fDifferentialFlux[i].ObsTime * 60.,
+				      noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
+// take mean of distribution (distribution is assymmetric, not sure if this would be correct)
+//	s = iX.GetMean();
+//	s = getSensitivity( iD, -100., 0 );
+//	s_error_L = s - iX.GetRMS();
+//	s_error_U = s + iX.GetRMS();
+        if( iX.GetEntries() > 0 && iX.GetRMS() > 0. )
+	{
+	   double i_a[] = { 0.16, 0.5, 0.84 };
+	   double i_b[] = { 0.0,  0.0, 0.0  };
+	   iX.GetQuantiles( 3, i_b, i_a );
+	   s = i_b[1];
+	   s_error_L = i_b[0];
+	   s_error_U = i_b[2];
+	   cout << "Quantiles " << z << "\t" << i_b[1] << "\t" << i_b[0] << "\t" << i_b[2] << "\t" << iX.GetEntries() << endl;
+        }
+	else
+	{
+	   s = getSensitivity( iD, -100., 0 );
+	   s_error_L = s - iX.GetRMS();
+	   s_error_U = s + iX.GetRMS();
+        }
 
 // Preliminary: catch cases were lower sensitivity cannnot be calculated
 	if( s_error_L < 0. )
@@ -719,17 +738,15 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	   s_error_U = s;
         }
 // remove low-energy points with 0 noff events
-	if( dE_Log10 > 0. && i < (int)fDifferentialFlux.size()-2 && noff == 0. && fDifferentialFlux[i+1].NOff > 0. )
+/* XX	if( dE_Log10 > 0. && i < (int)fDifferentialFlux.size()-2 && noff == 0. && fDifferentialFlux[i+1].NOff > 0. )
 	{
 	   s*= -1.;
-        }
+        } XX */
 // weighted energy of this bin
 	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
 // (int) of energy for maps
         int energy_intX3 = (int)(energy*1.e3);
 // get sensitivity limititations
-	unsigned int iD = addDataSet( non / fDifferentialFlux[i].ObsTime * 60.,
-				      noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
 	fSignificanceLimited[energy_intX3]        = getSensitivity( iD, energy, 1 );
 	fMinEventsLimited[energy_intX3]           = getSensitivity( iD, energy, 2 );
 	fMinBackgroundEventsLimited[energy_intX3] = getSensitivity( iD, energy, 3 );
@@ -787,8 +804,14 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         }
         else
         {
-	    cout << "ENERGY DISCARDED: " << fDifferentialFlux[i].Energy << "\t" << iEnergyMin_TeV_lin << "\t" << iEnergyMax_TeV_lin;
-	    cout << "\t" << s << endl;
+	    cout << "ENERGY DISCARDED: " << fDifferentialFlux[i].Energy << " [TeV], [" << iEnergyMin_TeV_lin;
+	    cout << ", " << iEnergyMax_TeV_lin << "]";
+	    cout << ", Sens " << s << " + " << s_error_U << " - " << s_error_L;
+	    cout << ", FunCrab: " << i_fFunCrabFlux << endl;
+	    cout << "\t significance: " << fSignificanceLimited[energy_intX3] << endl;
+	    cout << "\t events: " << fMinEventsLimited[energy_intX3] << endl;
+	    cout << "\t systematics: " << fMinBackgroundEventsLimited[energy_intX3] << endl;
+	    cout << "\t no background: " << fMinNoBackground[energy_intX3] << endl;
         }
 // sensitivity limitiations
 // (TMP differential sensitivity only)
@@ -832,6 +855,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 		 cout << ", " << TMath::Abs( s - s_error_L ) * i_fFunCrabFlux->Eval( energy ) << ")";
                  cout << " [erg cm^-2s^-1]";
              }
+	     cout << " (" << fSetEvents_minCutOnly << ")";
              cout << endl;
         }
     }
@@ -2584,6 +2608,11 @@ bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, 
     return true;
 }
 
+/*
+ 
+   fill sensitivity histograms for CTA WP Phys IRF files
+
+*/
 bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F* iBGRate, TH1F* iBGRateSqDeg,
                                                         TH1F* iProtonRate,  TH1F* iElectronRate,
 							bool iHighEnergyFilling )
@@ -2651,7 +2680,8 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
                   }
                }
            }
-	   if( iFillBins )
+// fill (don't allow negative sensitivity)
+	   if( iFillBins && y > 0. )
 	   {
 	      iSensitivity->SetBinContent( i_x, y );
 	      cout << "Filling HE (signal counts): " << x << "\t" << y << "\t" << i_x << endl;
@@ -2711,6 +2741,11 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas *c, bool bPl
    return c;
 }
 
+/*
+
+   fill sensitivity histogram in CTA WP Phys IRF file style from the sensitivity graphs
+
+*/
 bool VSensitivityCalculator::fillSensitivityHistogramfromGraph( TGraph* g, TH1F *h, double iScale )
 {
    if( !h || !g ) return false;
@@ -2771,10 +2806,13 @@ bool VSensitivityCalculator::fillSensitivityHistogramfromMap( map< int, double >
 bool VSensitivityCalculator::fillSensitivityLimitsHistograms( vector<TH1F*>& h )
 {
 
-   fillSensitivityHistogramfromMap( fSignificanceLimited, h[0] );
-   fillSensitivityHistogramfromMap( fMinEventsLimited, h[1] );
-   fillSensitivityHistogramfromMap( fMinBackgroundEventsLimited, h[2] );
-   fillSensitivityHistogramfromMap( fMinNoBackground, h[3] );
+   if( h.size() >= 4 )
+   {
+      fillSensitivityHistogramfromMap( fSignificanceLimited, h[0] );
+      fillSensitivityHistogramfromMap( fMinEventsLimited, h[1] );
+      fillSensitivityHistogramfromMap( fMinBackgroundEventsLimited, h[2] );
+      fillSensitivityHistogramfromMap( fMinNoBackground, h[3] );
+   }
    return false;
 }
 

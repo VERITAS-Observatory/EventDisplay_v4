@@ -75,6 +75,7 @@ class VAnalysisUtilities : public TNamed
         TObject* getHistogram( string, int, string );
 	TChain*  getTreeWithSelectedEvents(string iFile, bool iOn);
 	double   getNormalisationFactor(int iRun=-1);
+	vector< int > getRunListVector();
 	vector< VRunList >& getRunList() { return fRunList; }
         double   getRunList_MJD_min() { return fRunList_MJD_min; }
         double   getRunList_MJD_max() { return fRunList_MJD_max; }
@@ -99,6 +100,6 @@ class VAnalysisUtilities : public TNamed
 	void     setRunListCutPhaseRange( double iPhaseMin = -1., double iPhaseMax = -1. );
 	void     setRunListCutPhaseRangeVector( vector< double > iPhaseMinV, vector< double > iPhaseMaxV );
 
-        ClassDef(VAnalysisUtilities,11);
+        ClassDef(VAnalysisUtilities,12);
 };
 #endif

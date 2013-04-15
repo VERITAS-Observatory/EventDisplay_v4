@@ -446,3 +446,22 @@ void VAnalysisUtilities::setRunListCutPhaseRangeVector( vector< double > iPhaseM
    fRunListCut_Phase_min = iPhaseMinV;
    fRunListCut_Phase_max = iPhaseMaxV;
 }
+
+vector< int > VAnalysisUtilities::getRunListVector()
+{
+   vector< int > r;
+
+   CRunSummary *c = getRunSummaryTree( 1 );
+   int nentries = c->fChain->GetEntries();
+
+   for( int i = 0; i < nentries; i++ )
+    {
+        c->GetEntry( i );
+
+	if( c->runOn > 0 )
+	{
+	   r.push_back( c->runOn );
+        }
+   }
+   return r;
+}

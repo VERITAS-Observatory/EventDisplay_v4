@@ -1574,7 +1574,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
 
     if( !cFMJD )
     {
-        fCanvasFluxesVSMJD = new TCanvas( "fCanvasFluxesVSMJD", "fluxes vs MJD", 10, 10, 600, 400 );
+        fCanvasFluxesVSMJD = new TCanvas( "fCanvasFluxesVSMJD", "fluxes vs MJD", 10, 10, 1100, 700 );
         fCanvasFluxesVSMJD->SetGridx( 0 );
         fCanvasFluxesVSMJD->SetGridy( 0 );
         fCanvasFluxesVSMJD->Draw();

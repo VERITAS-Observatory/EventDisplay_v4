@@ -134,6 +134,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	double       fBackgroundEvents_min;
 	double       fMinBackgroundRateRatio_min;
 	double       fAlpha;
+	bool         fSetEvents_minCutOnly;
 
 	map< int, double > fSignificanceLimited;             // sensitivity is significance limited at this energy (linear) [GeV] !!!
 	map< int, double > fMinEventsLimited;                // sensitivity is limited by minimum number of events at this energy [GeV] !!!
