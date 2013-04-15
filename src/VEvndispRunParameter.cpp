@@ -312,18 +312,21 @@ void VEvndispRunParameter::print( int iEv )
     if( fTargetDec > -99 ) cout << "\t Target: ( J2000 dec=" << fTargetDec << ", ra=" << fTargetRA << ")" << endl;
     cout << "\t offsets (ra,dec): " <<  fTargetRAOffset << ", " << fTargetDecOffset << endl;
     cout << "\t wobble (north,east): " << fWobbleNorth << ", " << fWobbleEast << endl;
-    cout << "\t pointing corrections (x,y): ";
-    if( !fDBTracking )
+    if( fTelToAnalyze.size() < 20 )
     {
-        for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
-        {
-            cout << "\t T" << fTelToAnalyze[i]+1 << ": " << fPointingErrorX[fTelToAnalyze[i]] << ", " << fPointingErrorY[fTelToAnalyze[i]];
-        }
-	cout << endl;
-    }
-    else
-    {
-        cout << " use database" << endl;
+       cout << "\t pointing corrections (x,y): ";
+       if( !fDBTracking )
+       {
+	   for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
+	   {
+	       cout << "\t T" << fTelToAnalyze[i]+1 << ": " << fPointingErrorX[fTelToAnalyze[i]] << ", " << fPointingErrorY[fTelToAnalyze[i]];
+	   }
+	   cout << endl;
+       }
+       else
+       {
+	   cout << " use database" << endl;
+       }
     }
     if( fDBCameraRotationMeasurements ) cout << "using camera rotation values from DB" << endl;
     cout << endl;
