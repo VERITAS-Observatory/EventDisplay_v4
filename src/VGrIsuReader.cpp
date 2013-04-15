@@ -262,7 +262,7 @@ void VGrIsuReader::resetEvent()
      For GrIsu files without pedestal lines (tag "P"), default values for the pedestal and its
      variation are taken (fdefaultPed, fdefaultPedvars)
 */
-void VGrIsuReader::readPeds()
+void VGrIsuReader::readPeds( unsigned int iDummy )
 {
     if( fDebug ) cout << "VGrIsuReader::readPeds()" << endl;
 
@@ -454,14 +454,9 @@ void VGrIsuReader::readPedsfromPlines()
                 is_stream >> is_Temp;             // telescope number
 //	    if( i_telID != (unsigned int)(atoi( is_Temp.c_str() ) - fTelNumberOffset) ) continue;
                 i_telID = atoi( is_Temp.c_str() ) - fTelNumberOffset;
-                if( i_telID >= fNTel || i_telID < 0 ) continue;
+                if( i_telID >= fNTel ) continue;
                 is_stream >> is_Temp;             // channel number
                 i_channel = (uint32_t)(atoi( is_Temp.c_str() ) - fTelNumberOffset);
-                if( i_channel < 0 )
-                {
-                    cout << "VGrIsuReader::readPeds(): error, channel number < 0: " << i_channel << endl;
-                    exit( -1 );
-                }
                 if( i_channel > fMaxChannels[i_telID] ) continue;
                 fhPeds[i_telID][i_channel]->Reset();
                 is_stream >> is_Temp;
@@ -783,7 +778,7 @@ bool VGrIsuReader::getNextShowerEvent()
 // telescope ID
             is >> i_telID;
             i_telID -= fTelNumberOffset;
-            if( i_telID >= fNTel || i_telID < 0 )
+            if( i_telID >= fNTel )
             {
 //	    cout << "VGrIsuReader::getNextEvent(): error in telescope number: " << endl;
 //	    cout << i_telID << "\t" << fNTel << endl;
@@ -795,7 +790,7 @@ bool VGrIsuReader::getNextShowerEvent()
             is >> iRecord;
             iRecord -= fTelNumberOffset;
             i_channel = (uint32_t)iRecord;
-            if( i_channel < 0 || i_channel > fMaxChannels[i_telID] )
+            if( i_channel > fMaxChannels[i_telID] )
             {
                 cout << "VGrIsuReader::getNextEvent(): error in channel numbers " << i_channel << " " << iRecord << " " << fTelNumberOffset << " " << " (event " << fEventNumber << ")" << endl;
 // this means something bad happened to the grisu file

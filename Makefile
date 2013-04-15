@@ -209,8 +209,6 @@ all VTS:	evndisp \
 	combineEffectiveAreas \
 	makeRadialAcceptance \
 	calculateBinaryPhases \
-	VTS.calculateCrabRateFromMC \
-	VTS.calculateExposureFromDB \
 	compareDatawithMC \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB
@@ -242,7 +240,6 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VDisplayBirdsEye.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 		./obj/VDisplay.o ./obj/VDisplay_Dict.o \
-		./obj/VCommonTypes.o \
 		./obj/VCameraRead.o \
 		./obj/VDetectorGeometry.o \
 		./obj/VDetectorTree.o \

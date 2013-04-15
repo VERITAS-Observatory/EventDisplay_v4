@@ -24,7 +24,7 @@ using namespace std;
 
 
 void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Electron = 0,
-                              unsigned int iCrabSpec_ID = 6, char *iParticleNumberFile = "particleNumbers.tmp.root",
+                              unsigned int iCrabSpec_ID = 6, string iParticleNumberFile = "particleNumbers.tmp.root",
 			      string iObservatory = "CTA" )
 {
     string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";

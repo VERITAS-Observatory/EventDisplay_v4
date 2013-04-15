@@ -148,7 +148,7 @@ class VEvndispData
         void                endOfRunInfo();       //!< print some statistics at end of run
         bool                get_reconstruction_parameters( string ifile );
 // getters apply always to current telescope (fTelID) if telID is not a function argument
-        VImageAnalyzerData*      getAnaData( unsigned int iTel ) { if( iTel < fAnaData.size() ) return fAnaData[iTel]; }
+        VImageAnalyzerData*      getAnaData( unsigned int iTel ) { if( iTel < fAnaData.size() ) return fAnaData[iTel]; else return 0; }
         VImageAnalyzerData*      getAnaData() { return fAnaData[fTelID]; }
         vector< TDirectory* > getAnaDirectories() { return fAnaDir; }
         VImageAnalyzerHistograms*     getAnaHistos() { return fAnaData[fTelID]->fAnaHistos; }
@@ -369,7 +369,7 @@ class VEvndispData
         void                setDeadChannelText();
         void                setFADCStopOffsets( double iOffset ) { fCalData[fTelID]->fFADCStopOffsets = iOffset; }
         void                setFADCStopOffsets( unsigned int iChannel, double iOffset ) { fCalData[fTelID]->fFADCStopOffsets[iChannel] = iOffset; }
-        void                setGains( double iGain, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fGains = iGain; else fCalData[fTelID]->fLowGainGains; }
+        void                setGains( double iGain, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fGains = iGain; else fCalData[fTelID]->fLowGainGains = iGain; }
         void                setGains( unsigned int iChannel, double iGain, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fGains[iChannel] = iGain; else fCalData[fTelID]->fLowGainGains[iChannel] = iGain; }
 	void                setGains_DefaultValue( bool iV, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fGains_DefaultSetting = iV; else fCalData[fTelID]->fLowGainGains_DefaultSetting = iV; }
         void                setGainvars( unsigned int iChannel, double iGainvar, bool iLowGain = false ) { if( !iLowGain ) fCalData[fTelID]->fGainvars[iChannel] = iGainvar; else fCalData[fTelID]->fLowGainGainvars[iChannel] = iGainvar; }

@@ -146,7 +146,7 @@ class VGrIsuReader : public VVirtualDataReader
         void initVectors();                       //!< initialize the data vectors
         bool openTraceLibrary();                  //!< open root file for background trace library
         bool readCamera( int iTel );              //!< read trigger and analysis pixel from camera file
-        void readPeds();
+        void readPeds( unsigned int i = 0 );
         void readPedsfromLibrary( unsigned int iTel );
         void readPedsfromPlines();
         bool readPixelMix( int iTel );

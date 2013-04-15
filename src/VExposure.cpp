@@ -2077,7 +2077,7 @@ TSQLServer* VExposure::connectToSQLServer( string iDBserver )
        {
            cout << "VDBRunInfo: failed to connect to database server" << endl;
            cout << "\t server: " <<  iDBserver << endl;
-           return false;
+           return 0;
        }
    }
    return f_db;

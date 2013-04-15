@@ -165,7 +165,7 @@ CRunSummary *VAnalysisUtilities::getRunSummaryTree( int iTot )
     if( !t )
     {
         cout << "Error: no tRunSummary tree found in " << fAnasumDataFile->GetName() << endl;
-        return false;
+        return 0;
     }
     CRunSummary *c = new CRunSummary( t );
 

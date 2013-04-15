@@ -1,6 +1,8 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130416 (GM) fixes so that code compiles with clang++
+
 * 20130415 (GM) added a new script to run anasum with a simple run list
 
 * 20130415 (GM) cleaned up sensitivity calculations at high energies (and low MC statistics)

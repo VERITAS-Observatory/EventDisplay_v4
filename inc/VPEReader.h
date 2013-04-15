@@ -156,12 +156,12 @@ class VPEReader : public VVirtualDataReader
         unsigned int getNTelLocalTrigger() { return fNLocalTrigger; }
         uint32_t     getRunNumber() { return fPE_runnumber; }
         vector< uint8_t >   getSamplesVec() { return fDummySample; }
-        valarray< double >& getSums() { return fSums[fTelID]; }
+        valarray< double >& getSums( unsigned int iNChannel = 99999 ) { return fSums[fTelID]; }
         string    getSourceFileName() { return fSourceFileName; }
         vector< double >  getTelAzimuth();
         vector< double >  getTelElevation();
         unsigned int getTelescopeID() { return fTelID; }
-	vector< valarray< double > >& getTracePulseTiming() { return fTracePulseTiming[fTelID]; }
+	vector< valarray< double > >& getTracePulseTiming( unsigned int iNChannel = 99999 ) { return fTracePulseTiming[fTelID]; }
         bool      hasArrayTrigger() { return fArrayTrigger; }
 	bool      hasFADCTrace() { return false; }
         bool      hasLocalTrigger( unsigned int iTel ) { if( iTel < fLocalTrigger.size() ) return fLocalTrigger[iTel]; else return false; }
