@@ -12,8 +12,10 @@ then
    echo
    echo "   <run list>     simple run list "
    echo 
-   echo "   <cut set>      cut sets predifined and hardwired in the script:"
-   echo "                  soft, moderate"
+   echo "   <cut set/background model>"
+   echo "                  cut sets predifined and hardwired in the script:"
+   echo "                         soft, moderate"
+   echo "                  background model: RE, RB"
    echo 
    echo "   <run parameter file>  anasum run parameter file"
    echo "                         (example can be found in $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.dat)"
@@ -40,14 +42,29 @@ RUNP=$5
 # cut definitions
 if [[ "$CUTS" == *soft* ]]
 then
+   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
+   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
    CUTFILE="ANASUM.GammaHadron.d20120909-cut-N2-Point-005CU-Soft.dat"
    EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
    RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218_T123.root"
+   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-T123-d20121218.root"
 elif [[ $CUTS = *moderate* ]]
 then
+#   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Moderate.dat"
+#   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+#   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
    CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Moderate.dat"
    EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
    RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218_T123.root"
+   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T123-d20121218.root"
+elif [[ $CUTS = *hard* ]]
+then
+  CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Hard.dat"
+  EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+  RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
 else
    echo "error: unknown cut definition: $CUTS"
    echo "    allowed are *soft*, *moderate*"
