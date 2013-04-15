@@ -127,8 +127,14 @@ bool VPlotWPPhysSensitivity::initialize()
 	    if( fCameraOffset_deg.size() == 0 )
 	    {
 	       fSensitivityFile.push_back( iTemp.str() );
-	       if( fAnalysis[i] != "DESY" ) sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
-	       else                         sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t] );
+	       if( fAnalysis[i] != "DESY" ) 
+	       {
+	           sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
+               }
+	       else
+	       {
+	           sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t] );
+               }
 // check that sensitivity file exists
                TFile iF( fSensitivityFile.back().c_str() );
 	       if( !iF.IsZombie() ) fLegend.push_back( hname );
@@ -159,16 +165,47 @@ bool VPlotWPPhysSensitivity::initialize()
 		  fSensitivityFile.push_back( iTemp.str() );
 		  if( fCameraOffset_deg.size() == 1 )
 		  {
-		     if( fAnalysis[i] != "DESY" ) sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
-	             else  sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t] );
-	       if( fAnalysis[i].find( "3700m" ) != string::npos  ) sprintf( hname, "%s (3700m, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
-	       else                         sprintf( hname, "%s (2000m, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
-                  }
+		     if( fAnalysis[i] != "DESY" )
+		     {
+		         sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t] );
+                     }
+	             else
+		     {
+		         sprintf( hname, "%s (%s, %.1f h)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t] );
+                     }
+		     if( fAnalysis[i].find( "3700m" ) != string::npos )
+		     {
+			 sprintf( hname, "%s (3700m, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
+		     }
+		     else
+		     {
+		         if( fAnalysis[i].find( "Aar" ) != string::npos )
+			 {
+		            sprintf( hname, "%s (1640m, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
+                         }
+			 else if( fAnalysis[i].find( "Leoncito" ) != string::npos )
+			 {
+		            sprintf( hname, "%s (2600, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
+                         }
+			 else
+			 {
+			    sprintf( hname, "%s (2000m, %.1f h)", fSubArray[a].c_str(), fObservationTime_H[t] );
+                         }
+                     }
+		  }
 		  else
 		  {
-	             if( fAnalysis[i] != "DESY" ) sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), fAnalysis[i].c_str(), fObservationTime_H[t], fCameraOffset_deg[c] );
-	             else  sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), "DESY.ultra3.2000m", fObservationTime_H[t], fCameraOffset_deg[c] );
-                  }
+		     if( fAnalysis[i] != "DESY" )
+		     {
+			sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), fAnalysis[i].c_str(), 
+								     fObservationTime_H[t], fCameraOffset_deg[c] );
+		     }
+		     else
+		     {
+			sprintf( hname, "%s (%s, %.1f h, %.1f deg)", fSubArray[a].c_str(), "DESY.ultra3.2000m",
+								     fObservationTime_H[t], fCameraOffset_deg[c] );
+		     }
+		  }
 		  TFile iF( fSensitivityFile.back().c_str() );
 		  if( !iF.IsZombie() ) fLegend.push_back( hname );
 		  else                 fLegend.push_back( "" );
