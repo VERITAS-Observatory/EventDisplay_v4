@@ -194,7 +194,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
 // following CTA WP Phys binning convention
     sprintf( hname, "hEmcCutCTA" );
-    hEmcCutCTA = new TH2D( hname, htitle, 500, -1.8, 2.2, 400, -2.3, 2.7 );
+    hEmcCutCTA = new TH2D( hname, htitle, 500, -2.3, 2.7, 500, -2.3, 2.7 );
     hEmcCutCTA->SetYTitle( "energy_{MC} [TeV]" );
     hEmcCutCTA->SetXTitle( "energy_{rec} [TeV]" );
     hisTreeList->Add( hEmcCutCTA );
