@@ -158,12 +158,6 @@ class VStereoAnalysis
 	int   fTreeSelescted_frogsNpixImg;
 	double fTreeSelescted_frogsGoodnessBkg;
 	int   fTreeSelescted_frogsNpixBkg;
-	double fTreeSelescted_frogsXPStart;
-	double fTreeSelescted_frogsYPStart;
-	double fTreeSelescted_frogsXPED;
-	double fTreeSelescted_frogsYPED;
-	double fTreeSelescted_frogsXSStart;
-	double fTreeSelescted_frogsYSStart;
 	double fTreeSelescted_frogsTelGoodnessImg0;
 	double fTreeSelescted_frogsTelGoodnessImg1;
 	double fTreeSelescted_frogsTelGoodnessImg2;
