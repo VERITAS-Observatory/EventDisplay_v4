@@ -680,6 +680,19 @@ compareDatawithMC:	$(COMPAREDATAMCOBJ)
 	@echo "$@ done"
 
 ########################################################
+# printBinaryOrbitalPhase
+########################################################
+PRINTBINARYOBJ=		./obj/VASlalib.o ./obj/printBinaryOrbitalPhase.o
+
+./obj/printBinaryOrbitalPhase.o:	./src/printBinaryOrbitalPhase.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+printBinaryOrbitalPhase:	$(PRINTBINARYOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+
+########################################################
 # writeCTAWPPhysSensitivityFiles 
 ########################################################
 WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
