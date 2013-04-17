@@ -39,6 +39,8 @@ Parameters Required:
 
 Optional Flags:
 	-g	Get/Download Runs
+		or
+	-c	Checks to see if run(s) is(are) on disk
 	-x	Find Laser Runs - these will be downloaded too
 	-t	Output ED style Time Mask
 	-v	Verbose - Output lots of DB information
