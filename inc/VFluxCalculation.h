@@ -165,7 +165,7 @@ class VFluxCalculation : public TObject
 
         void          calculateIntegralFlux( double iMinEnergy_TeV );
 	TCanvas*      getFluxesVSMJDCanvas() { return fCanvasFluxesVSMJD; }
-        TGraphErrors* plotFluxesVSMJD( char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false );
+        TGraphErrors* plotFluxesVSMJD( char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false, double iMinMJD = -1., double iMaxMJD = -1. );
 	TGraphErrors* plotFluxesInBINs( int run = -1, char *iTex = 0, double iMJDOffset = 0., TCanvas *c = 0, int iMarkerColor = 1, int iMarkerStyle = 8, bool bDrawAxis = false );
         TGraphErrors* plotFluxesVSMJDDaily( char *iTex = 0, double iMJDOffset = 0. );
         TGraphErrors* plotFluxesVSElevation( bool iDraw = true );
@@ -205,6 +205,6 @@ class VFluxCalculation : public TObject
         void          setTimeBinnedAnalysis( bool iB = true ) { fTimebinned = iB; }
         void          writeResults( char *ifile );
 
-        ClassDef(VFluxCalculation,10);
+        ClassDef(VFluxCalculation,11);
 };
 #endif

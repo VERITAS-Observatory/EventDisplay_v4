@@ -1565,7 +1565,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw )
 }
 
 
-TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, TCanvas *cFMJD, int iMarkerColor, int iMarkerStyle, bool bDrawAxis )
+TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, TCanvas *cFMJD, int iMarkerColor, int iMarkerStyle, bool bDrawAxis, double iMinMJD, double iMaxMJD )
 {
     char hname[500];
 
@@ -1582,14 +1582,15 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
 	cFMJD = fCanvasFluxesVSMJD;
     }
     else fCanvasFluxesVSMJD = cFMJD;
+    fCanvasFluxesVSMJD->Clear();
     fCanvasFluxesVSMJD->cd();
 
-    TGraphErrors *gFluxMJD = new TGraphErrors( (int)fRunMJD.size() - 1 );
+    TGraphErrors *gFluxMJD = new TGraphErrors( 1 );
     gFluxMJD->SetTitle( "" );
     gFluxMJD->SetMarkerStyle( iMarkerStyle );
     gFluxMJD->SetMarkerColor( iMarkerColor );
     gFluxMJD->SetLineColor( iMarkerColor );
-    gFluxMJD->SetMarkerSize( 2 );
+    gFluxMJD->SetMarkerSize( 1.5 );
     gFluxMJD->SetLineWidth( 2 );
 
     vector< int > iV_Run;
@@ -1597,25 +1598,32 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
     vector< double > iV_FluxE;
 
     double iMeanFlux = 0.;
+    double iMinFlux = 1.e90;
 
-    
-    
     int z = 0;
     for( unsigned int i = 0; i < fRunMJD.size(); i++ )
     {
         if( fRunMJD[i] > 10 )
         {
+	    if( iMinMJD > 0 && fRunMJD[i] < iMinMJD ) continue;
+	    if( iMaxMJD > 0 && fRunMJD[i] > iMaxMJD ) continue;
+
             gFluxMJD->SetPoint( z, fRunMJD[i] - iMJDOffset, fRunFlux[i] );
             gFluxMJD->SetPointError( z, fRunTOn[i]/86400./2., fRunFluxE[i] );
             z++;
             iV_Run.push_back( (int)fRunList[i] );
             iV_Flux.push_back( fRunFlux[i] );
             iV_FluxE.push_back( fRunFluxE[i] );
+	    if( fRunFlux[i]-fRunFluxE[i] < iMinFlux ) iMinFlux = fRunFlux[i]-fRunFluxE[i];
         }
         else iMeanFlux = fRunFlux[i];
     }
 
-    if( bDrawAxis ) gFluxMJD->Draw( "ap" );
+    if( bDrawAxis ) 
+    {
+       gFluxMJD->Draw( "ap" );
+       if( iMinFlux > 0. ) gFluxMJD->GetHistogram()->SetMinimum( 0. );
+    }
     else            gFluxMJD->Draw( "p" );
     if ( iMJDOffset > 0 ) sprintf( hname, "MJD - %d", (int)iMJDOffset );
     else                  sprintf( hname, "MJD" );
@@ -1624,9 +1632,13 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
     else                  sprintf( hname, "F(E>%.1f TeV) [cm^{-2}s^{-1}]", fMinEnergy );
     gFluxMJD->GetHistogram()->SetYTitle( hname );
 
-    TLine *iL2 = new TLine( gFluxMJD->GetHistogram()->GetXaxis()->GetXmin(), 0., gFluxMJD->GetHistogram()->GetXaxis()->GetXmax(), 0. );
-    iL2->SetLineStyle( 2 );
-    iL2->Draw();
+    if( iMinFlux < 0. )
+    {
+       TLine *iL2 = new TLine( gFluxMJD->GetHistogram()->GetXaxis()->GetXmin(), 0., 
+			       gFluxMJD->GetHistogram()->GetXaxis()->GetXmax(), 0. );
+       iL2->SetLineStyle( 2 );
+       iL2->Draw();
+    }
 
     if( iTex )
     {
