@@ -46,10 +46,23 @@ TF1* VSpectralFitter::fit( TGraph *g, string fitname )
 // define fit function
     defineFitFunction();
 
-// fit
-    g->Fit( fFitFunction, "0MNER" );
+// gets the current default fitter
+    TVirtualFitter *fitter = TVirtualFitter::GetFitter(); 
 
-    TVirtualFitter *fitter = TVirtualFitter::GetFitter();
+    if(fSpectralFitFunction == 2)  // i.e. for the broken power law
+      {
+// Change the tolerance of the EDM, and loosen the convergence condition, since BPL has more free parameters 
+        fitter->SetPrecision( 1E-1 ); // Note the EDM is 0.001 * 1E-2 * (some constant), otherwise there is problem with convergence
+	cout << "Setting default tolerance EDM to ~ 1.E-4" << endl;
+        cout << "Coder's WARNING: Use this with care, and check the output of the fitter and the Error Matrix is not from MINOS" << endl;
+      }
+
+// fit
+    if(fSpectralFitFunction == 2)  // i.e. for the broken power law
+      g->Fit( fFitFunction, "0MNREV" ); // more verbose
+    else
+      g->Fit( fFitFunction, "0MNER" );
+
 // covariance matrix
     if( fitter )
     {
@@ -88,6 +101,7 @@ TF1* VSpectralFitter::fit( TGraph *g, string fitname )
     return fFitFunction;
 }
 
+
 /*
 
    define fit function
@@ -122,21 +136,30 @@ bool VSpectralFitter::defineFitFunction()
     else if( fSpectralFitFunction == 1 )
     {
         cout << "Fitfunction: power law with exponential cutoff" << endl;
-        sprintf( hname, "[0] * TMath::Power( TMath::Power( 10, x ) / %f, [1] ) * TMath::Exp( -1. * TMath::Power( 10, x ) / [3] )", fSpectralFitFluxNormalisationEnergy );
+        sprintf( hname, "[0] * TMath::Power( TMath::Power( 10, x ) / %f, [1] ) * TMath::Exp( -1. * TMath::Power( 10, x ) / [2] )", fSpectralFitFluxNormalisationEnergy );
         fFitFunction = new TF1( fFitName.c_str(), hname, log10( fSpectralFitEnergy_min ), log10( fSpectralFitEnergy_max ) );
         fFitFunction->SetParameter( 0, 1.e-7 );
         fFitFunction->SetParameter( 1, -2. );
         fFitFunction->SetParameter( 2, 10. );
-        sprintf( hname, "[0] * TMath::Power( x  / %f, [1] ) * TMath::Exp( -1. * x / [3] )", fSpectralFitFluxNormalisationEnergy );
+        sprintf( hname, "[0] * TMath::Power( x  / %f, [1] ) * TMath::Exp( -1. * x / [2] )", fSpectralFitFluxNormalisationEnergy );
 	fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
     }
 // broken power law fit
     else if( fSpectralFitFunction == 2 )
     {
-        cout << "broken power law fit NOT YET IMPLEMENTED (feel free to do this)" << endl;
-        fFitFunction = 0;
-	fFitFunction_lin = 0;
-        return false;
+        cout << "Fitfunction: broken power law" << endl;
+	sprintf( hname, "((TMath::Power( 10, x )<[3]) * [0] * TMath::Power( TMath::Power( 10, x ) / [3], [1] )) + ((TMath::Power( 10, x )>=[3]) * [0] * TMath::Power( TMath::Power( 10, x ) / [3], [2] ))");
+        fFitFunction = new TF1( fFitName.c_str(), hname, log10( fSpectralFitEnergy_min ), log10( fSpectralFitEnergy_max ) );
+        fFitFunction->SetParameter( 0, 2.e-10 );
+        fFitFunction->SetParameter( 1, -1.5 );
+        fFitFunction->SetParameter( 2, -3.0 );
+        fFitFunction->SetParameter( 3, 0.7 );
+	//fFitFunction->SetParLimits( 1, -10., 10. );
+	//fFitFunction->SetParLimits( 2, -10., 10. );
+	//fFitFunction->SetParLimits( 3, 0.05, 100. );
+// linear axis
+	sprintf( hname, "((x<[3]) * [0] * TMath::Power( x/ [3], [1] )) + ((x>=[3]) * [0] * TMath::Power( x/ [3], [2] ))");
+	fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
     }
 //curved power law fit
     else if( fSpectralFitFunction == 3 )
