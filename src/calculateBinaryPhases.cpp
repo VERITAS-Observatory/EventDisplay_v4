@@ -29,6 +29,7 @@ int main( int argc, char *argv[] )
     cout << "calculateBinaryPhases " << VGlobalRunParameter::getEVNDISP_VERSION() << endl << endl;
     cout << "calculate orbital phase of a binary and save it in a tree called phase" << endl;
     cout << endl;
+    cout << "(Note: missing documentation)" << endl;
 
 
 // binary analysis : calculates the orbital phase in a binary system, file extension will be "orb"

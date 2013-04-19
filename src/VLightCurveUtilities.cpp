@@ -197,10 +197,16 @@ void VLightCurveUtilities::printLightCurveLaTexTableRow( double iSigmaMinFluxLim
 // flux (with error) or upper flux limit)
       if( iSigmaMinFluxLimits != 1 ) cout << fixed;
       else                           cout << scientific;
-      if( fLightCurveData[i]->getFluxError() > 0. && fLightCurveData[i]->fSignificance > iSigmaMinFluxLimits )
+      if( fLightCurveData[i]->getFluxError() > 0. && fLightCurveData[i]->fSignificance > iSigmaMinFluxLimits && iSigmaMinFluxLimits > -1.e3 )
       {
          cout << setprecision(1) << fLightCurveData[i]->fFlux*iFluxMultiplicator << " $\\pm$ ";
 	 cout << fLightCurveData[i]->getFluxError()*iFluxMultiplicator;
+      }
+      else if( iSigmaMinFluxLimits < -1.e3 )
+      {
+         cout << setprecision(1) << fLightCurveData[i]->fFlux*iFluxMultiplicator << " $\\pm$ ";
+	 cout << fLightCurveData[i]->getFluxError()*iFluxMultiplicator;
+         cout << " $(< " << fLightCurveData[i]->fUpperFluxLimit*iFluxMultiplicator << ")";
       }
       else
       {

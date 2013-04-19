@@ -1866,6 +1866,13 @@ void VSensitivityCalculator::setMonteCarloParameters( unsigned int iParticleID,
        cout << "\t ignoring input" << endl;
        return;
     }
+    if( iGammaEffectiveAreaFile.size() == 0 )
+    {
+       cout << "VSensitivityCalculator::setMCParameters: effective area not set for particle with ID " << iParticleID << endl;
+       cout << "\t ignoring input" << endl;
+       return;
+    }
+
 // create a new MC data object
     VSensitivityCalculatorDataResponseFunctions *f = new VSensitivityCalculatorDataResponseFunctions();;
     fMC_Data[iParticleID] = f;

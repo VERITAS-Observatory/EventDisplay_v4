@@ -168,6 +168,8 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
        }
        else
        {
+	  fPD.fPlotting_flux_min = 0.001;
+	  fPD.fPlotting_flux_max = 1.;
 	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
 	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
        }
@@ -224,9 +226,11 @@ void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
 void plotDifferentialSensitivity( string iFluxUnit = "ENERGY",
                                   char *ifile1 = 0, char *ifile2 = 0,
 				  char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
-				  unsigned int iCrabSpec_ID = 5, string iObservatory = "CTA" )
+				  unsigned int iCrabSpec_ID = 5, string iObservatory = "CTA",
+				  double iObservingTime_h = 50. )
 {
-     plotSensitivity( ifile1, ifile2, false, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory );
+     plotSensitivity( ifile1, ifile2, false, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, 
+                      iCrabSpec_ID, iObservatory, iObservingTime_h );
 }
 
 
@@ -250,7 +254,8 @@ void plotDifferentialSensitivity( string iFluxUnit = "ENERGY",
 ////////////////////////////////////////////////////////////////////////////////////
 void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIntegral,
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
-		      string iFluxUnit, unsigned int iCrabSpec_ID, string iObservatory )
+		      string iFluxUnit, unsigned int iCrabSpec_ID, string iObservatory,
+		      double iObservingTime_h = 50. )
 {
 
 // get values for plotting
@@ -285,7 +290,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 // lots of debug output
     a.setDebug( false );
 
-    a.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
+    a.setSignificanceParameter( 5., 10., iObservingTime_h, 0.05, 0.2 );
 
 //////////////////////////////////////////////////////////////////
 // plot sensitivity canvas
@@ -335,7 +340,7 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 // energy range to be plotted
        b.setEnergyRange_Lin( 0.01, 250. );
 // significance parameters
-       b.setSignificanceParameter( 5., 10., 50., 0.05, 0.2 );
+       b.setSignificanceParameter( 5., 10., iObservingTime_h, 0.05, 0.2 );
 // set colors different in case data is plotted
        if( iData_anasumFile1 ) b.setPlottingStyle( 4, 1, 2, 20, 2., 3002 );
 
