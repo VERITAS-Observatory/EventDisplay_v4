@@ -1,6 +1,13 @@
 /*! \class VDeadTime
     \brief dead time calculator
 
+
+        if( fReader->getArrayTrigger() && fReader->getArrayTrigger()->hasTenMHzClockArray() )
+	{
+	   cout << "DEAD TIME 0 " << fReader->getArrayTrigger()->getTenMHzClockArray()[0] << endl;
+	   cout << "DEAD TIME 1 " << fReader->getArrayTrigger()->getTenMHzClockArray()[1] << endl;
+        }
+
     \author  Gernot Maier
 
     Revision $Id: VDeadTime.cpp,v 1.4.2.1.22.2.14.1 2010/03/08 07:45:08 gmaier Exp $

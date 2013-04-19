@@ -129,6 +129,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 // source file
         else if( iTemp.find( "sourcefi" ) < iTemp.size() )
         {
+	    checkSecondArgument( iTemp1, iTemp2, true );
             if( iTemp2.size() > 0 )
             {
                 fRunPara->fsourcefile = iTemp2;
@@ -139,6 +140,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 // pedestal file for grisu simulations
         else if( iTemp.find( "pedestalfile" ) < iTemp.size() )
         {
+	    checkSecondArgument( iTemp1, iTemp2, true );
             if( iTemp2.size() > 0 )
             {
                 fRunPara->fsimu_pedestalfile = iTemp2;
@@ -162,6 +164,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 // file with dead channel definition
         else if( iTemp.find( "deadchannelfile" ) < iTemp.size() )
         {
+	    checkSecondArgument( iTemp1, iTemp2, true ); 
             if( iTemp2.size() > 0 )
             {
                 fRunPara->fDeadChannelFile = iTemp2;
@@ -180,6 +183,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 // calibration file
         else if( iTemp.find( "calibrationfi" ) < iTemp.size() && !(iTemp.find( "lowgain" ) < iTemp.size() )  )
         {
+	    checkSecondArgument( iTemp1, iTemp2, true );
             if( iTemp2.size() > 0 )
             {
                 fRunPara->fcalibrationfile = iTemp2;
@@ -233,6 +237,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         }
         else if( iTemp.find( "arraycuts" ) < iTemp.size() || iTemp.find( "recopara" ) < iTemp.size() || iTemp.find( "reconstructionparameter" ) < iTemp.size() )
         {
+	    checkSecondArgument( iTemp1, iTemp2, true );
             if( iTemp2.size() > 0 )
             {
                 fRunPara->freconstructionparameterfile = iTemp2;
@@ -1476,4 +1481,19 @@ void VReadRunParameter::printStartMessage()
     cout << "\t|     \t\t SVN " << fRunPara->getSVN_VERSION() << "            |" << endl;
     cout << "\t|                                                 | " << endl;
     cout << "\t---------------------------------------------------" << endl;
+}
+
+bool VReadRunParameter::checkSecondArgument( string iPara1, string iPara2, bool iExitIfFails )
+{
+   if( iPara2.size() > 0 && iPara2.substr( 0, 1 ) == "-" || iPara2.size() == 0 )
+   {
+      if( iExitIfFails )
+      {
+          cout << "command line parameter <" << iPara1 << "> requires second argument" << endl;
+	  exit( -1 );
+      }
+      else return false;
+   }
+
+   return true;
 }

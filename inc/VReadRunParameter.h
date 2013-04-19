@@ -40,6 +40,7 @@ class VReadRunParameter
                                                   //!< prel pointing error
         map< unsigned int, double > f_pointingErrorY;
 
+	bool checkSecondArgument(std::string, std::string, bool);
         void isCompiledWithDB();
         bool getRunParametersFromDST();
         void setDirectories();
