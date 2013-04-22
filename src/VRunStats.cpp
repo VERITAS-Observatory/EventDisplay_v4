@@ -276,9 +276,9 @@ bool VRunStats::readFromDB()
 
     if( !readDBCameraStatus( f_db ) ) return false;
 
-    if( !readDBFIRInfo( f_db ) ) return false;
+    if( !readDBFIRInfo( f_db ) ) return false; 
 
-    if( !readDBAnalysisComments() ) return false;
+    if( !readDBAnalysisComments() ) return false; 
 
     if( !readDBRunInfo( f_db ) ) return false; 
 
@@ -671,15 +671,20 @@ bool VRunStats::readDBRunInfo( TSQLServer *f_db )
 
         if( !db_row ) break;
 
+	cout << "ROW " << i << endl;
+	if( db_row->GetField( 0 ) ) cout << "\t RRRR " << db_row->GetField( 0 ) << endl;
+
 // all fields should be defined
         if( !db_row->GetField( 19 ) ) continue;
         itemp = db_row->GetField( 19 );
 // don't use laser or charge injection runs
         if( itemp == "NOSOURCE" ) continue;
 // check if this run is an observing run
+        if( !db_row->GetField( 1 ) ) continue;
         itemp = db_row->GetField( 1 );
         if( itemp != "observing" ) continue;
 // don't use aborted runs
+        if( !db_row->GetField( 3 ) ) continue;
         itemp = db_row->GetField( 3 );
         if( itemp == "aborted" ) continue;
 // don't use runs which are started only
@@ -752,7 +757,10 @@ bool VRunStats::readDBRunInfo( TSQLServer *f_db )
         if( fDebug ) cout << "RUN " << itemp << " " << flush;
         i_RunData->runNumber = atoi( itemp.c_str() );
 
+        cout << "Filling run " << i_RunData->runNumber << endl;
+
 // get camera status
+	cout << "\t camera " << endl;
         for( unsigned int k = cs_start; k < fCameraStatus.size(); k++ )
 	{
 	   if( !fCameraStatus[k] ) continue;
@@ -766,6 +774,7 @@ bool VRunStats::readDBRunInfo( TSQLServer *f_db )
        
 
 // get FIR data
+	cout << "\t FIR " << endl;
         for( unsigned int k = k_start; k < fFIRData.size(); k++ )
 	{
 	   if( !fFIRData[k] ) continue;
@@ -778,6 +787,7 @@ bool VRunStats::readDBRunInfo( TSQLServer *f_db )
         }
 
 // get weather info
+	cout << "\t weather " << endl;
         for( unsigned int j = j_start; j < fWeatherData.size(); j++ )
         {
             if( !fWeatherData[j] ) continue;
@@ -788,6 +798,7 @@ bool VRunStats::readDBRunInfo( TSQLServer *f_db )
                 j_start = j;
             }
         }
+	cout << "\t\t end weather" << endl;
 
         if( fDebug ) cout << endl;
     }
