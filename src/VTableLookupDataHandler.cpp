@@ -223,7 +223,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 // dead time calculation
         if( !fIsMC && getEventNumber() != 999999 ) fDeadTime->fillDeadTime( time );
 
-// return false for non-valid (maybe not reconstrcuted?) event
+// return false for non-valid (maybe not reconstructed?) event
         if( !iNE ) return true;
 
         if( !fIsMC ) ftheta2 = (fXoff*fXoff+fYoff*fYoff);
@@ -519,17 +519,24 @@ bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain *c )
 bool VTableLookupDataHandler::setInputFile( string iInput )
 {
     finputfile = iInput;
-    cout << "opening file(s) " << iInput << endl;
+// need to find suffix .root: add it if it doesn't exist
+    if( finputfile.find( ".root" ) == string::npos )
+    {
+        cout << "TableLookupDataHandler::setInputFile: adding .root suffix to file name" << endl;
+	finputfile += ".root";
+    }
+
+    cout << "opening file(s) " << finputfile << endl;
 
 //////////////////////////////////////////////////////////////////////////////////////
 // get telescope configuration
 // get it from the telescope configuration tree (if avaible), else assume two telescope setup
     fTtelconfig = new TChain( "telconfig" );
-    int iNFil = fTtelconfig->Add( iInput.c_str(), 0 );
+    int iNFil = fTtelconfig->Add( finputfile.c_str(), 0 );
     if( iNFil == 0 )
     {
         cout << "error: no file(s) in chain" << endl;
-        exit( 0 );
+        exit( -1 );
     }
     cout << iNFil << " file(s) in chain " << endl;
     if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
@@ -570,7 +577,7 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     {
        cout << "VTableLookupDataHandler::setInputFile error: no telescope configurations found " << endl;
        cout << "...exiting" << endl;
-       exit( 0 );
+       exit( -1 );
     }
        
 // print everything to the screen
@@ -657,7 +664,7 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     bool bShort = false;
 // get shower parameter tree
     fTshowerpars = new TChain( "showerpars" );
-    fTshowerpars->Add( iInput.c_str() );
+    fTshowerpars->Add( finputfile.c_str() );
     if( !fTshowerpars )
     {
         cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2)" << endl;
@@ -708,7 +715,7 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         sprintf( iName, "tpars" );
-        sprintf( iDir, "%s/Tel_%d/tpars", iInput.c_str(), i+1 );
+        sprintf( iDir, "%s/Tel_%d/tpars", finputfile.c_str(), i+1 );
         iT = new TChain( iName );
         iT->Add( iDir );
         if( !iT )
@@ -749,13 +756,13 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
 	{
 	   if( fDebug > 1 ) cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope " << i+1 << endl;
 	   sprintf( iName, "calib_%d", i+1 );
-	   sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", iInput.c_str(), i+1, i+1 );
+	   sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile.c_str(), i+1, i+1 );
 	   TChain iPedVars( iName );
 	   if( !iPedVars.Add( iDir ) )
 	   {
 	       cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
 	       cout << "exiting..." << endl;
-	       exit( 0 );
+	       exit( -1 );
 	   }
 	   gErrorIgnoreLevel = 5000;
 	   double pedvar = 0.;

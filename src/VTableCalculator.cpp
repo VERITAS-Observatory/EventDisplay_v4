@@ -365,7 +365,7 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
             if( r[tel] >= 0. && s[tel] > 0. )
             {
 // remove images with width/length 0, invalid energies
-                if( w[tel] < 1.e-3 ) continue;
+                if( w[tel] < 1.e-5 ) continue;
 // check limits (to avoid under/overflows)
                 if( log10( s[tel] ) > hMedian->GetXaxis()->GetXmax() ) continue;
                 if( log10( s[tel] ) < hMedian->GetXaxis()->GetXmin() ) continue;

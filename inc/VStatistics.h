@@ -280,7 +280,7 @@ inline double interpolate( double w1, double ze1, double w2, double ze2, double 
     }
 
 // one of the values is not valid:
-// return valid value only when f1/f2 > 0.5 (this value is almost randomly chosen)
+// return valid value only when f1 or f2 > iLimitforInterPolation
     if( w1 > iMinValidValue && w2 < iMinValidValue )
     {
         if( f1 > iLimitforInterpolation ) return w1;
