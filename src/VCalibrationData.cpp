@@ -12,7 +12,8 @@
 
 VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedfile, string iGainfile, string iTofffile,
                                     string iPedLowGainfile, string iGainLowGainfile, string iToffLowGainfile,
-				    string iLowGainMultfile, string iTzerofile, string iTzeroLowGainfile )
+				    string iLowGainMultfile, string iTzerofile, string iTzeroLowGainfile,
+				    string iObservatory )
 {
     fUsePedestalsInTimeSlices = true;
     fLowGainUsePedestalsInTimeSlices = true;
@@ -64,10 +65,12 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
        sprintf( hname_var, "h%s_var_%d", fHistoName[i].c_str(), iTel+1 );
        if( i == C_PED || i == C_PEDLOW )
        {
-          fHisto_mean.push_back( new TH1F( hname, "", 200, 0., 50. ) );
+	  if( iObservatory == "CTA" ) fHisto_mean.push_back( new TH1F( hname, "", 800, 0., 200. ) );
+          else                        fHisto_mean.push_back( new TH1F( hname, "", 200, 0., 50. ) );
 	  fHisto_mean.back()->SetXTitle( "mean pedestal [dc]" );
-	  fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 50. ) );
-	  fHisto_variance.back()->SetXTitle( "mean pedestal [dc]" );
+	  if( iObservatory == "CTA" ) fHisto_variance.push_back( new TH1F( hname_var, "", 800, 0., 200. ) );
+	  else                        fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 50. ) );
+	  fHisto_variance.back()->SetXTitle( "pedestal variance [dc]" );
        }
        else if( i == C_TOFF || i == C_TOFFLOW )
        {

@@ -287,7 +287,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 break;
             case C_PEDVAR:
             {
-	        if( fData->getRunParameter()->fsourcetype != 7 )
+	        if( fData->getRunParameter()->fsourcetype != 7 || fData->getReader()->hasFADCTrace() )
 		{
 		   valarray< double > i_pedvars( 0., fData->getPedvars().size() );
 		   for( unsigned int ii = 0; ii < i_pedvars.size(); ii++ ) i_pedvars[ii] = fData->getPedvars( fData->getCurrentSumWindow()[ii] )[ii];

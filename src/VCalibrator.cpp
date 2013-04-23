@@ -1896,7 +1896,8 @@ void VCalibrator::initialize()
 
 	fCalData.push_back( new VCalibrationData( i, fRunPar->getDirectory_EVNDISPCalibrationData(), 
 	                                          fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i],
-						  "", "", "", fTZeroFileNameC[i], fLowGainTZeroFileNameC[i] ));
+						  "", "", "", fTZeroFileNameC[i], fLowGainTZeroFileNameC[i],
+						  getRunParameter()->getObservatory() ) );
 	fCalData.back()->setSumWindows( getSumWindow( i ) );
 // PRELI: low gain multiplier does not depend on summation window (yet)
 	fCalData.back()->setLowGainMultiplierFixedSummationWindow( getSumWindow_2() );
@@ -2549,10 +2550,19 @@ bool VCalibrator::readLowGainMultiplier( int iSumWindow )
 */
 bool VCalibrator::readCalibrationData( string iDSTfile )
 {
+   if( iDSTfile.size() == 0 )
+   {
+      cout << "VCalibrator::readCalibrationData: no DST file given" << endl;
+      cout << "exiting..." << endl;
+      exit( -1 );
+   }
+   cout << "XXXXXXXXXX " << iDSTfile << endl;
+
    TFile iF( iDSTfile.c_str() );
    if( iF.IsZombie() )
    {
       cout << "VCalibrator::readCalibrationData error while opening DST tree in " << iDSTfile << endl;
+      cout << "exiting..." << endl;
       exit( -1 );
    }
    TTree *t = (TTree*)iF.Get( "calibration" );
@@ -2568,9 +2578,11 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
    unsigned int fnum_sumwindow = 1;
    unsigned int fsumwindow[VDST_MAXSUMWINDOW];
    float fPed_high[VDST_MAXCHANNELS];
-   float fPedvar_high[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+//   float fPedvar_high2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+   float *fPedvar_high = new float[VDST_MAXCHANNELS*VDST_MAXSUMWINDOW];
    float fPed_low[VDST_MAXCHANNELS];
-   float fPedvar_low[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+//   float fPedvar_low2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+   float *fPedvar_low = new float[VDST_MAXCHANNELS*VDST_MAXSUMWINDOW];
    float fConv_high[VDST_MAXCHANNELS];
    float fConv_low[VDST_MAXCHANNELS];
    float ftzero[VDST_MAXCHANNELS];
@@ -2585,6 +2597,19 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
    t->SetBranchAddress( "num_sumwindow", &fnum_sumwindow );
    t->SetBranchAddress( "sumwindow", fsumwindow );
    t->SetBranchAddress( "ped_high", fPed_high );
+// check if this is a old or new style pedvar tree
+   bool iPedVarTreeTypeNew = true;
+   if( t->GetLeaf( "pedvar_high" ) )
+   {
+       string i_temp = (string)t->GetLeaf( "pedvar_high" )->GetTitle();
+       if( i_temp.find_first_of( "[" ) == i_temp.find_last_of( "[" ) ) iPedVarTreeTypeNew = true;
+       else                                                            iPedVarTreeTypeNew = false;
+   }
+   if( !iPedVarTreeTypeNew )
+   {
+       cout << "VCalibrator::readCalibrationData: old style DST file: warning: pedvars will not be set correctly" << endl;
+       cout << "   (you might be able to proceed if you don't do FADC trace analysis and use the pedvars for the image cleaning" << endl;
+   }
    t->SetBranchAddress( "pedvar_high", fPedvar_high );
    t->SetBranchAddress( "ped_low", fPed_low );
    t->SetBranchAddress( "pedvar_low", fPedvar_low );
@@ -2609,8 +2634,6 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        t->GetEntry( i );
 
        setTelID( i );
-
-
 
 // no calibration data available for this telescope
        if( nPixel == 0 ) continue;
@@ -2651,14 +2674,14 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        {
            for( unsigned int p = 0; p < nPixel; p++ )
 	   {
-	       for( unsigned int s = 0; s < fnum_sumwindow; s++ )
-	       {
-	           if( fsumwindow[s] < getPedvars(false).size() )
-		   {
-                        getPedvars( false, fsumwindow[s] ) = fPedvar_high[p][s];
+	       if( p < getPedvars(false).size() )
+	       {	
+		  for( unsigned int s = 0; s < fnum_sumwindow; s++ )
+		  {
+                        if( iPedVarTreeTypeNew ) getPedvars( false, fsumwindow[s] )[p] = fPedvar_high[p*VDST_MAXSUMWINDOW+s];
 			if( fsumwindow[s] == getSumWindow() && getPedvarsDist() ) 
 			{
-			   getPedvarsDist()->Fill( fPedvar_high[p][s] );
+			   if( iPedVarTreeTypeNew ) getPedvarsDist()->Fill( fPedvar_high[p*VDST_MAXSUMWINDOW+s] );
                         }
                    }
                }
@@ -2675,14 +2698,14 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
        {
            for( unsigned int p = 0; p < nPixel; p++ ) 
 	   {
-	       for( unsigned int s = 0; s < fnum_sumwindow; s++ )
+	       if( p < getPedvars(true).size() )
 	       {
-	           if( fsumwindow[s] < getPedvars(true).size() )
-		   {
-                        getPedvars( true, fsumwindow[s] ) = fPedvar_low[p][s];
+		  for( unsigned int s = 0; s < fnum_sumwindow; s++ )
+		  {
+                        if( iPedVarTreeTypeNew ) getPedvars( true, fsumwindow[s] )[p] = fPedvar_low[p*VDST_MAXSUMWINDOW+s];
 			if( fsumwindow[s] == getSumWindow() && getPedvarsDist( true ) ) 
 			{
-			   getPedvarsDist( true )->Fill( fPedvar_low[p][s] );
+			   if( iPedVarTreeTypeNew ) getPedvarsDist( true )->Fill( fPedvar_low[p*VDST_MAXSUMWINDOW+s] );
                         }
                    }
                }
@@ -2760,6 +2783,9 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
 	  if( i_nn > 0. ) setMeanAverageTZero( i_mean / i_nn, false );
        }
    }
+
+   delete [] fPedvar_high;
+   delete [] fPedvar_low;
 
    iF.Close();
    return true;

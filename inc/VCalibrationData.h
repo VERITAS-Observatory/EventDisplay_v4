@@ -126,7 +126,8 @@ class VCalibrationData
         VCalibrationData( unsigned int iTel, string iDir, string iPedfile, string iGainfile, string iTofffile, 
 	                                                   string iPedLowGainfile, string iGainLowGainFile = "", 
 							   string iToffLowGainFile = "", string iLowGainMultFile = "",
-							   string iTzerofile = "", string iTzeroLowfile = "" );
+							   string iTzerofile = "", string iTzeroLowfile = "",
+							   string iObservatory = "VTS" );
        ~VCalibrationData() {}
 
         TH1F* getHistoGain( unsigned int iTel, unsigned int iChannel, bool iLowGain = false );

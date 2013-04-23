@@ -317,6 +317,17 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    float i_maxDynamicRange = 1.e99;
    if( iDynRange > 0 ) i_maxDynamicRange = TMath::Power( 2., (float)iDynRange ) *0.95;
 
+// ntel doesn't change from event to event, but needed by VDST
+   fData->fDSTntel = (unsigned short int)hsdata->run_header.ntel;
+   if( telescope_list.size() == 0 )
+   {
+      for( unsigned int i = 0; i < fData->fDSTntel; i++ )
+      {
+         telescope_list[i+1] = 0.;
+      }
+   }
+   fData->fDSTntel = telescope_list.size();
+
 // reset all arrays
    fData->resetDataVectors( 99999, fData->fDSTntel, fGlobalNTelPreviousEvent,
                             fGlobalMaxNumberofPixels,                            
@@ -330,18 +341,6 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    fData->fDSTrunnumber = hsdata->run_header.run;
    fData->fDSTeventtype = 0;
    fData->fDSTgpsyear = 2010;
-
-// ntel doesn't change from event to event, but needed by VDST
-   fData->fDSTntel = (unsigned short int)hsdata->run_header.ntel;
-   if( telescope_list.size() == 0 )
-   {
-      for( unsigned int i = 0; i < fData->fDSTntel; i++ )
-      {
-         telescope_list[i+1] = 0.;
-      }
-   }
-   fData->fDSTntel = telescope_list.size();
-
 
 ////////////////////////////////////////////////
 // trigger data
@@ -586,19 +585,20 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
    else                      cout << " (using data from simtelrarray file)";
    cout << endl;
 
+   int fTelID = 0;
+
 // save current directory
    TDirectory *i_curDir = gDirectory;
 
-   int fTelID = 0;
 // number of pixels
    unsigned int nPixel = 0;
 // integration window
    unsigned int fnum_sumwindow = 1;
    unsigned int fsumwindow[VDST_MAXSUMWINDOW];
    float fPed_high[VDST_MAXCHANNELS];
-   float fPedvar_high[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+   float *fPedvar_high = new float[VDST_MAXCHANNELS*VDST_MAXSUMWINDOW];
    float fPed_low[VDST_MAXCHANNELS];
-   float fPedvar_low[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+   float *fPedvar_low = new float[VDST_MAXCHANNELS*VDST_MAXSUMWINDOW];
    float fConv_high[VDST_MAXCHANNELS];
    float fConv_low[VDST_MAXCHANNELS];
    float fTZero[VDST_MAXCHANNELS];
@@ -611,8 +611,8 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
       fTZero[i] = -999.;
       for( unsigned int j = 0; j < VDST_MAXSUMWINDOW; j++ )
       {
-         fPedvar_high[i][j] = 0;
-	 fPedvar_low[i][j] = 0;
+         fPedvar_high[i*VDST_MAXSUMWINDOW+j] = 0.;
+	 fPedvar_low[i*VDST_MAXSUMWINDOW+j]  = 0.;
       }
    }
 // the following variables are needed for reading of external pedestal files
@@ -628,16 +628,16 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
    t->Branch( "num_sumwindow", &fnum_sumwindow, "num_sumwindow/i" );
    t->Branch( "sumwindow", fsumwindow, "sumwindow[num_sumwindow]/i" );
    t->Branch( "ped_high", fPed_high, "ped_high[NPixel]/F" );
-   sprintf( hname, "pedvar_high[NPixel][%d]/F", VDST_MAXSUMWINDOW );
-   t->Branch( "pedvar_high", fPedvar_high, hname );
+   sprintf( hname, "pedvar_high[%d]/F", VDST_MAXCHANNELS*VDST_MAXSUMWINDOW );
+   t->Branch( "pedvar_high", fPedvar_high, hname, VDST_MAXCHANNELS*VDST_MAXSUMWINDOW*4 );
    t->Branch( "ped_low", fPed_low, "ped_low[NPixel]/F" );
-   sprintf( hname, "pedvar_low[NPixel][%d]/F", VDST_MAXSUMWINDOW );
-   t->Branch( "pedvar_low", fPedvar_low, hname );
+   sprintf( hname, "pedvar_low[%d]/F", VDST_MAXCHANNELS*VDST_MAXSUMWINDOW );
+   t->Branch( "pedvar_low", fPedvar_low, hname, VDST_MAXCHANNELS*VDST_MAXSUMWINDOW*4 );
    t->Branch( "conv_high", fConv_high, "conv_high[NPixel]/F" );
    t->Branch( "conv_low", fConv_low, "conv_low[NPixel]/F" );
-   t->Branch( "tzero", fTZero, "tzero[NPixel]/F" );
+   t->Branch( "tzero", fTZero, "tzero[NPixel]/F" ); 
 
-// open file with pedestals
+// open external file with pedestals
    TFile *iPedFile = 0;
    if( ipedfile.size() > 0 )
    {
@@ -700,8 +700,8 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
 	      }
 	      for( unsigned int w = 0; w < fnum_sumwindow; w++ )
 	      {
-	         fPedvar_high[p][w] = iT_pedvars[w];
-		 fPedvar_low[p][w] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
+	         fPedvar_high[p*VDST_MAXSUMWINDOW+w] = iT_pedvars[w];
+		 fPedvar_low[p*VDST_MAXSUMWINDOW+w] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
               }
 	      fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
 	      fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
@@ -737,8 +737,8 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
              fsumwindow[0] = (unsigned int)hsdata->tel_moni[itel].num_ped_slices;
 	     for( unsigned int w = 0; w < fnum_sumwindow; w++ )
 	     {
-		fPedvar_high[p][w] = hsdata->tel_moni[itel].noise[HI_GAIN][p];
-		fPedvar_low[p][w] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
+		fPedvar_high[p*VDST_MAXSUMWINDOW+w] = hsdata->tel_moni[itel].noise[HI_GAIN][p];
+		fPedvar_low[p*VDST_MAXSUMWINDOW+w] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
              }
 	     fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
 	     fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
@@ -756,6 +756,8 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
        t->Fill();
      }
    }
+   delete [] fPedvar_high;
+   delete [] fPedvar_low;
 
    return t;
 }
