@@ -971,6 +971,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
         {
 // set time offsets to midnight
 //            TDatime da(2000,01,01,fPlotZeroHours,00,00);
+	    iRA_hrs += fPlotZeroHours;
             TDatime da(2000,01,01,iRA_hrs, iRA_min, iRA_sec );
             raLowerAxis->SetTimeOffset( da.Convert(), "local" );
             raLowerAxis->SetTimeFormat(TmpTimeFormat);
