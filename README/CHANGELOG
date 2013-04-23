@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130422 (GM) bug fix: stack overflow in CTA converter; needed to redo the calibration tree structure; 
+                         (new DST files are not backwards compatible!)
+
 * 20130419 (GM) added additional checks for command line consistency
 
 * 20130416 (GM) fixes so that code compiles with clang++

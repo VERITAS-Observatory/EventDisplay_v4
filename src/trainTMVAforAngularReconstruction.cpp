@@ -238,8 +238,9 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 
        cout << "\t found tree " << iTreeName.str() << ", entries: " << i_showerpars.fChain->GetEntries() << ", ";
        cout << i_tpars.fChain->GetEntries() << endl;
+       int nentries = i_showerpars.fChain->GetEntries();
 
-       for( int n = 0; n < i_showerpars.fChain->GetEntries(); n++ )
+       for( int n = 0; n < nentries; n++ )
        {
           i_showerpars.GetEntry( n );
 	  i_tpars.GetEntry( n );

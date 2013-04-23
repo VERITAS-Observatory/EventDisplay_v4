@@ -2556,7 +2556,6 @@ bool VCalibrator::readCalibrationData( string iDSTfile )
       cout << "exiting..." << endl;
       exit( -1 );
    }
-   cout << "XXXXXXXXXX " << iDSTfile << endl;
 
    TFile iF( iDSTfile.c_str() );
    if( iF.IsZombie() )
