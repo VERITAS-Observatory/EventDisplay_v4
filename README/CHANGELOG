@@ -1,6 +1,14 @@
 Change log eventdisplay analysis package
 ========================================
 
+*************************************************************
+******* 20130424 release of v4.10; trunk is now v4.30 *******
+*************************************************************
+
+* 20130424 (GM) adaption to run with root 5.34.06 (changes in VGammaHadronCutsStatistics.h)
+
+* 20130424 (GM) VTS: VPM is now default
+
 * 20130422 (GM) bug fix: stack overflow in CTA converter; needed to redo the calibration tree structure; 
                          (new DST files are not backwards compatible!)
 
@@ -123,7 +131,9 @@ Change log eventdisplay analysis package
 * 20130111 (GM) CTA scripts: changed usage of CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.sh
                         (use again runlist instead of a range of runs)
 
+*************************************************************
 ******* 20130104 release of v4.00; trunk is now v4.01 *******
+*************************************************************
 
 Changes from v35x to v400
 =========================
