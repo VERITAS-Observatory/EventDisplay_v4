@@ -19,10 +19,10 @@ class VGammaHadronCutsStatistics : public TNamed
 
    TTree *fData;              //!
 
-   bitset< 32 >           fCut_bitset;
-   unsigned long int      fCut_bitset_ulong;
-   vector< string >       fCutName;
-   vector< unsigned int > fCutCounter;
+   bitset< 32 >           fCut_bitset;  //!
+   unsigned long int      fCut_bitset_ulong;  //!
+   vector< string >       fCutName;  //!
+   vector< unsigned int > fCutCounter;  //!
 
    public:
 
