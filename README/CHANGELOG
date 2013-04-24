@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130424 (GM) bug fix: calculation of Galactic coordinates in VStarCatalogue was using current epoch
+                         ra/dec (should use J2000 values)
+
 *************************************************************
 ******* 20130424 release of v4.10; trunk is now v4.20 *******
 *************************************************************

@@ -43,12 +43,13 @@ bool VStarCatalogue::init( double iMJD, string iCatalogue )
     {
         dec = fStars[i]->fDec2000 * TMath::Pi() / 180.;
         ra =  fStars[i]->fRA2000 * TMath::Pi() / 180.;
-        slaPreces("FK5",2000.0, ofy, &ra, &dec );
-        fStars[i]->fDecCurrentEpoch = dec * 180. / TMath::Pi();
-        fStars[i]->fRACurrentEpoch = ra * 180. / TMath::Pi();
 // calculate galac coordinates
         slaEqgal( ra, dec, &i_l, &i_b );
         fStars[i]->fRunGalLong1958 = i_l * 180. / TMath::Pi();
+        slaPreces("FK5",2000.0, ofy, &ra, &dec );
+// calculate ra/dec for current epoch	
+        fStars[i]->fDecCurrentEpoch = dec * 180. / TMath::Pi();
+        fStars[i]->fRACurrentEpoch = ra * 180. / TMath::Pi();
         fStars[i]->fRunGalLat1958  = i_b * 180. / TMath::Pi();
     }
     return true;
