@@ -29,7 +29,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 4.00
+version = 4.20
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(distdir).VTS.runparameter
@@ -168,7 +168,7 @@ ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
 # 2010 PROD1 production
-#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 PROD1 production for Leeds
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_ULTRA
 # 2011 PROD1 SC 
@@ -1226,9 +1226,10 @@ $(vtspara):
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(vtspara)/DetectorGeometry
 	mkdir -p $(vtspara)/NOISE
 	cp -LR $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(vtspara)/NOISE
+	mkdir -p $(vtspara)/GammaHadronCutFiles
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.d20120909-cut-N* $(vtspara)/GammaHadronCutFiles
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.dat $(vtspara)/GammaHadronCutFiles
 	mkdir -p $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.GammaHadron.d20120909-cut-N* $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.GammaHadron.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runlist $(vtspara)/ParameterFiles
