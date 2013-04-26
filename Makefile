@@ -1142,7 +1142,6 @@ $(distdir):	FORCEDISTDIR
 	mkdir -p $(distdir)/scripts/VTS
 	mkdir -p $(distdir)/scripts/CTA
 	cp -r scripts/CTA/*.sh $(distdir)/scripts/CTA
-	cp -r scripts/CTA/subArray.list $(distdir)/scripts/CTA
 	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
 	cp -r -u scripts/VTS/VTS.EVNDISP* $(distdir)/scripts/VTS
 
