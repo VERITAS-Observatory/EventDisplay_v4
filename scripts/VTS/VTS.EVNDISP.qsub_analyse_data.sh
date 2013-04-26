@@ -8,23 +8,25 @@ set RUN=RRRRR
 set CALIB=PEEED
 set VPM=VVPM
 
+set DATE="d20130426"
+
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 # output data files are written to this directory
-set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-d20130318/"
+set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-$DATE/"
 # output log files are written to this directory
-set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-d20130318/"
+set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-$DATE/"
 if( $VPM == "1" ) then
-   set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-d20130318-VPM/"
-   set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-d20130318-VPM/"
+   set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-$DATE-VPM/"
+   set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-$DATE-VPM/"
 endif
 mkdir -p $ODIR
 mkdir -p $LDIR
 
 # eventdisplay reconstruction parameter
 set ACUTS="EVNDISP.reconstruction.runparameter"
-# set ACUTS="EVNDISP.reconstruction.CORR.runparameter"
+#set ACUTS="EVNDISP.reconstruction.CORR.runparameter"
 
 #########################################
 # directory with executable
