@@ -67,7 +67,6 @@ void VOnOff::createHistograms( TList *ion, TList *il )
         if( itemp == "TH1D" )            il->Add( new TH1D( *((TH1D*)hon) ) );
         else if( itemp == "TH2D" )       il->Add( new TH2D( *((TH2D*)hon) ) );
         else if( itemp == "TProfile" )   il->Add( new TProfile( *((TProfile*)hon) ) );
-        else if( itemp == "TProfile2D" ) il->Add( new TProfile2D( *((TProfile2D*)hon) ) );
         else
         {
             cout << "VOnOff::createHistograms: error, unknown class name " << hon->GetName() << "\t" << itemp << endl;
@@ -187,7 +186,7 @@ void VOnOff::doOnOffforSkyHistograms( TList *ionlist, TList *iofflist, double i_
                 }
             }
         }
-        else if( itemp != "TProfile2D" && itemp != "TH1D" )
+        else if( itemp != "TH1D" )
         {
             cout << "VOnOff::doOnOffforSkyHistograms: error, unknown histogram type " << hTemp->GetName() << "\t" << itemp << endl;
         }
