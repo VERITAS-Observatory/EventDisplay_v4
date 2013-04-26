@@ -14,6 +14,8 @@ VPlotInstrumentResponseFunction::VPlotInstrumentResponseFunction()
    fName = "EA";
 
    fTF1_fitResolution = 0;
+   gLastPlottedGraph = 0;
+
    setResolutionFitting();
    setCanvasSize();
 
@@ -1002,6 +1004,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
           if( fFunction_fitResolution.size() > 0 ) fitResolution( g );
           z++;
        }
+       gLastPlottedGraph = g;
     }
 
     return iResolutionPlottingCanvas;

@@ -515,18 +515,23 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
     }
 ////////////////////////////////////////////////////////////
 // create alpha histogram for significance calculations
-    fStereoOff->scaleAlpha( i_norm, fStereoOn->getAlpha(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), false, icounter);
-    fStereoOff->scaleAlpha( i_norm, fStereoOn->getAlphaUC(),fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(), true, icounter);
+    fStereoOff->scaleAlpha( i_norm, fStereoOn->getAlpha(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
+                                    fStereoOn->getMeanSignalBackgroundAreaRatio(), false, icounter);
+    fStereoOff->scaleAlpha( i_norm, fStereoOn->getAlphaUC(), fStereoOn->getStereoSkyMap(), fStereoOff->getStereoSkyMap(),
+                                    fStereoOn->getMeanSignalBackgroundAreaRatioUC(), true, icounter);
 
 ////////////////////////////////////////////////////////////
 // calulate significance in central bin (source bin)
 
 // number of on events
-    double i_nevts_on = fStereoOn->getStereoSkyMap()->GetBinContent( fStereoOn->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ), fStereoOn->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+    double i_nevts_on = fStereoOn->getStereoSkyMap()->GetBinContent( fStereoOn->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
+                                                                    fStereoOn->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 // number of off events
-    double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ), fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+    double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ), 
+                                                                      fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 // normalization
-    double i_norm_alpha = i_norm * fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ), fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+    double i_norm_alpha = i_norm * fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ), 
+                                                                             fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 
     double i_sig = VStatistics::calcSignificance(i_nevts_on, i_nevts_off, i_norm_alpha );
     double i_rate = 0.;

@@ -55,6 +55,8 @@ class VStereoAnalysis
         TList *getHisList();
         double getMeanAzimuth() { return fMeanAzimuth; }
         double getMeanElevation() { return fMeanElevation; }
+	TH1D*  getMeanSignalBackgroundAreaRatio();
+	TH1D* getMeanSignalBackgroundAreaRatioUC();
         double getMJD( int i_run ) { return ( fRunMJD.find( i_run ) != fRunMJD.end() ? fRunMJD[i_run] : 0. ); }
         TList *getParameterHistograms();
         double getRawRate();                      //! return number of entries in rate histograms
@@ -70,8 +72,7 @@ class VStereoAnalysis
         double getWobbleNorth();
         double getWobbleWest();
         TTree* getTreeWithSelectedEvents() { return fTreeSelectedEvents; }
-        void   scaleAlpha( double inorm, TH2D *hon, TH2D *h_ON, TH2D *h_OFF, bool buc, int incounter);
-        void   setAlphaOff( TH2D *ih, bool bUncorrelated );
+        void   scaleAlpha( double inorm, TH2D *hon, TH2D *h_ON, TH2D *h_OFF, TH1D* hMSR, bool buc, int incounter );
         void   setAlphaOff( TH2D *ih, TH2D *ihUC );
         void   setCuts( sRunPara iL, int irun );
         void   setNoSkyPlots( bool iS ) { fNoSkyPlots = iS; }

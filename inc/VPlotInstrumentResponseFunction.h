@@ -39,6 +39,9 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     double fXmax_fitResolution;
     TF1*   fTF1_fitResolution;
 
+// last plotted graph
+    TGraphErrors *gLastPlottedGraph;
+
 // canvas size
     int    fCanvasSize_X;
     int    fCanvasSize_Y;
@@ -63,6 +66,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 					    int iMarkerStyle = -99, float iMarkerSize = -99. );
     bool         checkDataSetID( unsigned int iDataSetID );
     bool         fitResolution( TGraphErrors *g  );
+    TGraphErrors* getLastPlottedGraph() { return gLastPlottedGraph; }
     unsigned int getNumberOfDataSets() { return fData.size(); }
     unsigned int getNumberOfGoodDataSets();
     TH1D*        getTheta2Histogram( unsigned int iDataSetID = 0, double i_Energy_TeV_lin = 1. );

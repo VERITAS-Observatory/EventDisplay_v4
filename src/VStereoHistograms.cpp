@@ -218,6 +218,15 @@ void VStereoHistograms::defineHistograms()
     if( hListSkyMaps ) hListSkyMaps->Add( hmap_alphaNorm );
     hListNameofSkyMaps.push_back( i_key );
 
+    sprintf(i_key,"hmap_MeanSignalBackgroundAreaRatio_%s", fHisSuffix.c_str());
+    sprintf( i_name, "mean signal to background ratio (%s)", fHisSuffix.c_str());
+    hmap_MeanSignalBackgroundAreaRatio = new TH1D( i_key, i_name, 500, 0., 1. );
+    hmap_MeanSignalBackgroundAreaRatio->SetXTitle( "mean signal to background ratio" );
+    hisList->Add( hmap_MeanSignalBackgroundAreaRatio );
+    if( hListSkyMaps ) hListSkyMaps->Add( hmap_MeanSignalBackgroundAreaRatio );
+    hListNameofSkyMaps.push_back( i_key );
+
+
 //! setup the sky map histogram
     sprintf(i_key,"hmap_stereoUC_%s", fHisSuffix.c_str());
     sprintf( i_name, "Stereo Sky Map, uncorrelated (%s)", fHisSuffix.c_str());
@@ -237,6 +246,14 @@ void VStereoHistograms::defineHistograms()
     hmap_alphaUC->SetYTitle("Y-position on Sky (#circ)");
     hisList->Add( hmap_alphaUC );
     hListSkyMapsUC->Add( hmap_alphaUC );
+    hListNameofSkyMaps.push_back( i_key );
+
+    sprintf(i_key,"hmap_MeanSignalBackgroundAreaRatioUC_%s", fHisSuffix.c_str());
+    sprintf( i_name, "mean signal to background ratio, uncorrelated (%s)", fHisSuffix.c_str());
+    hmap_MeanSignalBackgroundAreaRatioUC = new TH1D( i_key, i_name, 500, 0., 1. );
+    hmap_MeanSignalBackgroundAreaRatioUC->SetXTitle( "mean signal to background ratio" );
+    hisList->Add( hmap_MeanSignalBackgroundAreaRatioUC );
+    if( hListSkyMaps ) hListSkyMaps->Add( hmap_MeanSignalBackgroundAreaRatioUC );
     hListNameofSkyMaps.push_back( i_key );
 
     sprintf(i_key,"hmap_alphaNormUC_%s", fHisSuffix.c_str());

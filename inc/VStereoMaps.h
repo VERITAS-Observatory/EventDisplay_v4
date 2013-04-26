@@ -28,8 +28,12 @@ struct sRE_REGIONS
 class VStereoMaps
 {
     private:
+
         sRunPara fRunList;
         CData *fData;
+
+// theta2 cut (might be energy dependent)
+        double fTheta2Cut_Max;
 
         double fTargetShiftWest;
         double fTargetShiftNorth;
@@ -50,7 +54,7 @@ class VStereoMaps
 
         TH2D *hmap_stereo;
         TH2D *hmap_alpha;
-        TH2D *hmap_ratio;
+        TH1D *hmap_ratio;
         int fSourcePositionBinX;
         int fSourcePositionBinY;
 
@@ -58,7 +62,7 @@ class VStereoMaps
 
         int fInitRun;
 
-        void makeTwoDStereo_BoxSmooth( double, double, double, double );
+        void makeTwoDStereo_BoxSmooth( double, double, double, double, double );
 
 // theta2 calculation
         unsigned int fTheta2_length;
@@ -127,7 +131,8 @@ class VStereoMaps
        ~VStereoMaps() {}
 
         void              calculateTheta2( bool, double, double );
-        bool              fill( bool is_on, double x_sky, double y_sky, double ze, double erec, int irun, bool ishapecuts );
+        bool              fill( bool is_on, double x_sky, double y_sky, double theta2CutMax, double ze,
+	                                    double erec, int irun, bool ishapecuts );
         void              finalize( bool iIsOn , double OnOff_Alpha = 1.0);
         VRadialAcceptance*      getAcceptance() { return fAcceptance; }
         unsigned int      getTheta2_length() { return fTheta2_length; }
@@ -137,7 +142,7 @@ class VStereoMaps
         vector< double >& getTheta2_All() { return fTheta2_All;}
         TList*            getAux_hisList() { return hAuxHisList; }
         void              setData( CData *c ) { fData = c; }
-        void              setHistograms( TH2D*, TH2D* );
+        void              setHistograms( TH2D*, TH2D*, TH1D* );
         void              setNoSkyPlots( bool iS ) { fNoSkyPlots = iS; }
         void              setRunList( sRunPara iL );
         void              setTargetShift( double iW, double iN );

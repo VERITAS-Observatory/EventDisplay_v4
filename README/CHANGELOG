@@ -1,6 +1,15 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130415 (GM) major new feature: energy dependent theta2 cut.
+                Works and tested for reflected region and ring background model
+		Input parameters are a graph of theta2 vs energy, a scale factor to this curve,
+		and a min and max theta2 cut value (all given in gamma/hadron cut files)
+
+* 20130425 (GM) change in organisation of IRF/parameter files: gamma/hadron cuts files are now in
+                $VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles or
+		$CTA_EVNDISP_AUX_DIR/GammaHadronCutFiles
+
 * 20130424 (GM) bug fix: calculation of Galactic coordinates in VStarCatalogue was using current epoch
                          ra/dec (should use J2000 values)
 

@@ -71,7 +71,7 @@ void VDataMCComparision::initialGammaHadronCuts()
    fCuts->initialize();
    fCuts->resetCutValues();
 // HARDWIRED CUT FILE
-   if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.GammaHadron.TMVA.BDT.T2Fixed.dat" ) )
+   if( !fCuts->readCuts( "$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/ANASUM.GammaHadron.TMVA.BDT.T2Fixed.dat" ) )
    {
       cout << "exiting..." << endl;
       exit( -1 );

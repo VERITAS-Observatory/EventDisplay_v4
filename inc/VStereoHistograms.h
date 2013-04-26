@@ -9,6 +9,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TProfile.h"
+#include "TProfile2D.h"
 #include "TKey.h"
 #include "TList.h"
 #include "TTree.h"
@@ -74,6 +75,10 @@ class VStereoHistograms
         TH1D* hemissC2;                           //!< mean emission height Chi2
         TH1D* herecChi2;                          //!< chi2 from energy reconstruction
 
+// ratio of signal to background area (from energy dependent theta2 cut)
+	TH1D* hmap_MeanSignalBackgroundAreaRatio; //!< signal to background area ratio 
+	TH1D* hmap_MeanSignalBackgroundAreaRatioUC; //!< signal to background area ratio 
+
 // random forest histograms
         TH1D* hrf;                                //!< random forest classifier
 
@@ -83,7 +88,7 @@ class VStereoHistograms
         TH1D* herecRaw;                           //!< reconstructed differential energy spectrum
 	TH2D* herecRaw2DtimeBinned;
         TH1D* herec;                              //!< reconstructed differential energy spectrum, weighted by effective area
-	//time-dependent differential energy spectrum
+//time-dependent differential energy spectrum
 	TH2D* herec2DtimeBinned;
         TH2D* herecWeights;                       //!< weights vs.  reconstructed energy
         TProfile *herecEffectiveArea;             //!< effective area vs reconstructed energy
@@ -97,13 +102,13 @@ class VStereoHistograms
         TH2D* hLinerecWeights;                    //!< weights vs.  reconstructed energy
         TProfile *hLinerecEffectiveArea;          //!< effective area vs reconstructed energy
 
-// sky maps (correlated)
+// sky maps (uncorrelated)
         TH2D* hmap_stereoUC;                      //!< Sky map (correlated bins)
         TH2D* hmap_alphaUC;                       //!< Background normalisation map (correlated bins)
         TH2D* hmap_alpha_offUC;                   //!< Background normalisation map, off map for on run (correlated bins)
         TH2D* hmap_alphaNormUC;                   //!< Background normalisation map  (correlated bins)
 
-// sky maps (uncorrelated)
+// sky maps (correlated)
         TH2D* hxyoff_stereo;                      //!< xyoff map on camera
         TH2D* hmap_stereo;                        //!< Sky map (correlated bins)
         TH2D* hmap_alpha;                         //!< Background normalisation map (correlated bins)
@@ -116,7 +121,8 @@ class VStereoHistograms
         TH1D* hrate_10sec;                        //!< Event Rate Histogram (10 second bins)
         TH1D* hrate_1min;                         //!< Event Rate Histogram (1 minute bins)
 
-        VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, double iTimeBinSize, double iTimeMin, double iTimeMax,  bool ion );
+        VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, 
+	                   double iTimeBinSize, double iTimeMin, double iTimeMax,  bool ion );
         void defineHistograms();
         void deleteParameterHistograms();
         void deleteSkyPlots();

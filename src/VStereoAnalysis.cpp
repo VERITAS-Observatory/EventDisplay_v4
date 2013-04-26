@@ -4,7 +4,6 @@
   Jamie Holder 
   Gernot Maier
 
-  Revision $Id: VStereoAnalysis.cpp,v 1.47.2.9.4.9.10.2.2.5.4.3.2.10.2.14.2.1.4.1.2.8.2.7.2.3.2.4 2011/03/31 14:50:58 gmaier Exp $
 */
 
 #include "VStereoAnalysis.h"
@@ -328,14 +327,15 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
    fMap->setRegionToExclude(fRunPara->fExcludeFromBackground_West, fRunPara->fExcludeFromBackground_North,fRunPara->fExcludeFromBackground_Radius );
    fMap->setNoSkyPlots( fNoSkyPlots );
    fMap->setRunList( fRunPara->fRunList[fHisCounter] );
-   fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, fHisto[fHisCounter]->hmap_alpha );
+   fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, fHisto[fHisCounter]->hmap_alpha, 
+                        fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
 
    fMapUC->setData( fDataRun );
    fMapUC->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
    fMapUC->setRegionToExclude(fRunPara->fExcludeFromBackground_West, fRunPara->fExcludeFromBackground_North,fRunPara->fExcludeFromBackground_Radius );
    fMapUC->setNoSkyPlots( fNoSkyPlots );
    fMapUC->setRunList( fRunPara->fRunList[fHisCounter] );
-   fMapUC->setHistograms( fHisto[fHisCounter]->hmap_stereoUC, fHisto[fHisCounter]->hmap_alphaUC );
+   fMapUC->setHistograms( fHisto[fHisCounter]->hmap_stereoUC, fHisto[fHisCounter]->hmap_alphaUC, 0 );
 
 // initialize gamma/hadron cuts
    fCuts->setDataTree( fDataRun );
@@ -386,7 +386,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
    int nentries_run = 0;
 
 /////////////////////////////////////////////////////////////////////
-// loop over all entries in the data tree
+// loop over all entries/events in the data tree
    for( int i = 0; i < nentries; i++ )
    {
       	fDataRun->GetEntry( i );
@@ -461,11 +461,13 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
              getDerotatedCoordinates( icounter, i_UTC, getXoff(), fEVDVersionSign * getYoff(),  i_xderot, i_yderot );
 
 // gamma/hadron cuts
-	     bIsGamma = fCuts->isGamma( i,false, fIsOn);
+	     bIsGamma = fCuts->isGamma( i, false, fIsOn );
 
 // fill on/offstereo maps
-	     bDirectionCuts = fMap->fill(   fIsOn, i_xderot, i_yderot, fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
-	     bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
+	     bDirectionCuts = fMap->fill(   fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
+	                                    fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
+	     bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ), 
+	                                    fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
 
 // following histograms (theta2, mscw, mscl, core position, etc.)  assume source at given target position
 
@@ -603,6 +605,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
       	    }
       	 }
       }
+// END: loop over all entries/events in the data tree
+/////////////////////////////////////////////////////////////////////
 
       fEnergy.setTimeBin(iEffAreaTimeBin[i_t_bins]-i_time_intervall/2-f_t_in_s_min[irun]);
       fEnergy.setTimeBinnedMeanEffectiveArea();
@@ -614,6 +618,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
       fRateTime[fHisCounter] = iRateTime;
       fRateTimeIntervall[fHisCounter] = iRateTimeIntervall;
 
+// finalize sky maps
       fMap->finalize( fIsOn, fCuts->getProbabilityCutAlpha(fIsOn) );
       fMapUC->finalize( fIsOn, fCuts->getProbabilityCutAlpha(fIsOn) );
 
@@ -716,13 +721,17 @@ void VStereoAnalysis::writeDebugHistograms()
       iDir->cd();
 }
 
+/*
 
-void VStereoAnalysis::scaleAlpha( double inorm,  TH2D *halpha_on, TH2D *h_ON, TH2D *h_OFF, bool bUC, int icounter)
+    this should only be called for OFF stereo analysis
+
+*/
+void VStereoAnalysis::scaleAlpha( double inorm, TH2D *halpha_on, TH2D *h_ON, TH2D *h_OFF, TH1D* h_alpha_ratio, bool bUC, int icounter)
 {
-
       TH2D *halpha_off = 0;
       TH2D *hmap_stereo_off = 0;
       TH2D *hmap_alphaNorm = 0;
+// uncorrelated maps
       if( bUC )
       {
       	if( fHisCounter < 0 ) halpha_off = fHistoTot->hmap_alphaUC;
@@ -732,6 +741,7 @@ void VStereoAnalysis::scaleAlpha( double inorm,  TH2D *halpha_on, TH2D *h_ON, TH
       	if( fHisCounter < 0 ) hmap_stereo_off = fHistoTot->hmap_stereoUC;
       	else                  hmap_stereo_off = fHisto[fHisCounter]->hmap_stereoUC;
       }
+// correlated maps
       else
       {
       	if( fHisCounter < 0 ) halpha_off = fHistoTot->hmap_alpha;
@@ -804,7 +814,10 @@ void VStereoAnalysis::scaleAlpha( double inorm,  TH2D *halpha_on, TH2D *h_ON, TH
       	{
 	    for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
 	    {
-		if( halpha_off->GetBinContent( i, j ) > 0. ) hmap_alphaNorm->SetBinContent( i, j, (halpha_on->GetBinContent( i, j)/halpha_off->GetBinContent( i, j )) );
+		if( halpha_off->GetBinContent( i, j ) > 0. )
+		{
+		   hmap_alphaNorm->SetBinContent( i, j, (halpha_on->GetBinContent( i, j)/halpha_off->GetBinContent( i, j )) );
+                }
       		else hmap_alphaNorm->SetBinContent( i, j, 0. );
 	    }
       	}
@@ -817,6 +830,7 @@ void VStereoAnalysis::scaleAlpha( double inorm,  TH2D *halpha_on, TH2D *h_ON, TH
 // individual runs
       	if( fHisCounter > -1 )
       	{
+	  double iSignalBackgroundRatio = 1.;
 // normalize alpha (essentially 1./alpha_off)
 	  for( int i = 1; i <= halpha_off->GetNbinsX(); i++ )
 	  {
@@ -824,13 +838,24 @@ void VStereoAnalysis::scaleAlpha( double inorm,  TH2D *halpha_on, TH2D *h_ON, TH
 	       {
 		    if( halpha_off->GetBinContent( i, j ) > 0. )
 		    {
-			 hmap_alphaNorm->SetBinContent( i, j, halpha_on->GetBinContent( i, j)/halpha_off->GetBinContent( i, j ) );
+		         if( h_alpha_ratio && h_alpha_ratio->GetMean() > 0. ) 
+			 {
+			    iSignalBackgroundRatio = h_alpha_ratio->GetMean();
+                         }
+			 else
+			 {
+			    iSignalBackgroundRatio = 1.;
+                         }
+// this one is used for the sky maps
+			 hmap_alphaNorm->SetBinContent( i, j, iSignalBackgroundRatio * halpha_on->GetBinContent( i, j)/halpha_off->GetBinContent( i, j ) ); 
+// keep alpha off for debugging
 			 if( halpha_on->GetBinContent( i, j ) > 0. )
 			 {
-			     halpha_off->SetBinContent( i, j, halpha_off->GetBinContent( i, j)/halpha_on->GetBinContent( i, j ) );
+			     halpha_off->SetBinContent( i, j, halpha_off->GetBinContent( i, j)/(iSignalBackgroundRatio*halpha_on->GetBinContent( i, j )) );
 			 }
 			 else halpha_off->SetBinContent( i, j, 0. );
-			 halpha_on->SetBinContent( i, j, 1. );
+// alpha on is only set if all off histos are set
+		         halpha_on->SetBinContent( i, j, iSignalBackgroundRatio );
 		    }
 		    else hmap_alphaNorm->SetBinContent( i, j, 0. );
 	       }
@@ -961,6 +986,20 @@ double VStereoAnalysis::combineHistograms()
       return fTotCount;
 }
 
+TH1D* VStereoAnalysis::getMeanSignalBackgroundAreaRatio()
+{
+     if( fHisCounter < 0 ) return fHistoTot->hmap_MeanSignalBackgroundAreaRatio;
+
+     return fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio;
+}
+
+TH1D* VStereoAnalysis::getMeanSignalBackgroundAreaRatioUC()
+{
+     if( fHisCounter < 0 ) return fHistoTot->hmap_MeanSignalBackgroundAreaRatioUC;
+
+     return fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatioUC;
+}
+
 
 TH2D* VStereoAnalysis::getAlpha()
 {
@@ -1066,16 +1105,10 @@ double VStereoAnalysis::getDeadTimeFraction()
 }
 
 
-void VStereoAnalysis::setAlphaOff( TH2D *ih, bool iuc )
-{
-      fHisto[fHisCounter]->setAlphaOff( ih, iuc );
-}
-
-
 void VStereoAnalysis::setAlphaOff( TH2D *ih, TH2D *ihUC )
 {
-      fHisto[fHisCounter]->setAlphaOff( ih, false );
-      fHisto[fHisCounter]->setAlphaOff( ihUC, true );
+    fHisto[fHisCounter]->setAlphaOff( ih, false );
+    fHisto[fHisCounter]->setAlphaOff( ihUC, true );
 }
 
 

@@ -488,7 +488,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
     {
        t->GetEntry( j );
 
-       if( fDebug ) cout << "VInstrumentResponseFunctionReader::getDataFromFile (angular resolution): reading event " << j << endl;
+       if( fDebug ) cout << "VInstrumentResponseFunctionReader::getDataFromFile (resolution data): reading event " << j << endl;
 
 // check that there is data for this tree entry
        if( !c ) continue;
@@ -497,19 +497,19 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
        if( t->GetEntries() > 1 )
        {
 // azimuth
-	   if( fDebug ) cout << "IRF AZ: " << j << "\t" << c->fAz_bin << "\t" << fAzbin << endl;
+	   if( fDebug ) cout << "IRF AZ: " << j << ", found: " << c->fAz_bin << ", searched for: " << fAzbin << endl;
 	   if( c->fAz_bin != fAzbin ) continue;
 // spectral index
-           if( fDebug ) cout << "IRF Index: " << j << "\t" << c->fSpectralIndex << "\t" << fIndex << endl;
+           if( fDebug ) cout << "IRF Index: " << j << ", found: " << c->fSpectralIndex << ", searched for: " << fIndex << endl;
 	   if( TMath::Abs( c->fSpectralIndex - fIndex ) > 0.05 ) continue;
 // wobble offset
-           if( fDebug ) cout << "IRF Woff: " << j << "\t" << c->fWobble << "\t" << fWoff << endl;
+           if( fDebug ) cout << "IRF Woff: " << j << ", found: " << c->fWobble << ", searched for: " << fWoff << endl;
 	   if( TMath::Abs( c->fWobble - fWoff ) > 0.05 ) continue;
 // noise level
-	   if( fDebug ) cout << "IRF Noise: " << j << "\t" << c->fNoise << "\t" << fNoise << endl;
+	   if( fDebug ) cout << "IRF Noise: " << j << ", found: " << c->fNoise << ", searched for: " << fNoise << endl;
 	   if( c->fNoise != fNoise ) continue;
 // zenith angle
-	   if( fDebug ) cout << "IRF Ze: " << j << "\t" << c->fZe << "\t" << fZe << endl;
+	   if( fDebug ) cout << "IRF Ze: " << j << ", found: " << c->fZe << ", searched for: " << fZe << endl;
 	   if( TMath::Abs( c->fZe - fZe ) > 3. ) continue; 
        }
        if( c && c->fResolutionGraph.size() > 0 )
