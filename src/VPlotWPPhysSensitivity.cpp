@@ -60,7 +60,8 @@ bool VPlotWPPhysSensitivity::initialize()
 	    ostringstream iTemp;
 	    if( fAnalysis[i].find( "DESY" ) != string::npos )
 	    {
-	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
+//	       sprintf( hname, "%.1fh", fObservationTime_H[t] );
+	       sprintf( hname, "%ds", (int)(fObservationTime_H[t]*3600.) );
 	       iTemp << "data/DESY/" << fAnalysis[i] << "." << fSubArray[a] << "." << hname << ".root";
 	    }
 	    else if( fAnalysis[i] == "VTS" )
