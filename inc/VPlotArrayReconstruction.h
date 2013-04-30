@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "VGlobalRunParameter.h"
 #include "VPlotUtilities.h"
 
 using namespace std;
@@ -39,22 +40,22 @@ class VPlotArrayReconstruction : public VPlotUtilities, public TObject
 
         TTree *ftcors;
 
-        unsigned short int fnimages[100];
+        unsigned short int fnimages[VDST_MAXTELESCOPES];
         vector< bool > fImgSel;
         float fMCEnergy;
-        float fchi2[100];
+        float fchi2[VDST_MAXTELESCOPES];
         float fMCxcore;
         float fMCycore;
-        float fxcore[100];
-        float fycore[100];
+        float fxcore[VDST_MAXTELESCOPES];
+        float fycore[VDST_MAXTELESCOPES];
         float fMCaz;
         float fMCze;
-        float fze[100];
-        float faz[100];
+        float fze[VDST_MAXTELESCOPES];
+        float faz[VDST_MAXTELESCOPES];
         float fMCxoff;
         float fMCyoff;
-        float fxoff[100];
-        float fyoff[100];
+        float fxoff[VDST_MAXTELESCOPES];
+        float fyoff[VDST_MAXTELESCOPES];
         vector< bool > fltrig;
         vector< float > fsize;
         vector< float > fcen_x;
@@ -119,6 +120,6 @@ class VPlotArrayReconstruction : public VPlotUtilities, public TObject
         void setPlotTelescopeScale( double iScale = 2.) { fPlotTelescopeScale = iScale; }
         void setSizeCut( double iS = 400 ) { fSizeCut = iS; }
 
-        ClassDef(VPlotArrayReconstruction,1);
+        ClassDef(VPlotArrayReconstruction,2);
 };
 #endif
