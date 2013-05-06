@@ -30,6 +30,7 @@
 
 using namespace std;
 
+
 // one tree per telescope type
 map< ULong64_t, TTree* > fMapOfTrainingTree;
 
@@ -98,13 +99,14 @@ bool trainTMVA( string iOutputDir, string iOutputName )
        factory->AddVariable( "width", 'F' );
        factory->AddVariable( "length", 'F' );
        factory->AddVariable( "size", 'F' );
-       factory->AddVariable( "asym", 'F' );
+//       factory->AddVariable( "asym", 'F' );
+       factory->AddVariable( "loss", 'F' );
 // add pedvar only if different from 0 (for CTA: always zero)
 /*       if( isRMSZero( fMapOfTrainingTree_iter->second, "meanPedvar_Image" ) > 1.e-2 )
        {
           factory->AddVariable( "meanPedvar_Image", 'F' );
        } */
-       factory->AddVariable( "tgrad_x", 'F' );
+       factory->AddVariable( "tgrad_x*tgrad_x", 'F' );
 
        factory->AddTarget( "disp", 'F' );
 //       factory->AddTarget( "dispPhi", 'F' );
@@ -120,7 +122,10 @@ bool trainTMVA( string iOutputDir, string iOutputName )
        ostringstream iMVAName;
        iMVAName << "BDT_" << fMapOfTrainingTree_iter->first;
        cout << iMVAName.str() << endl;
-       factory->BookMethod( TMVA::Types::kBDT, iMVAName.str().c_str(), "" );
+
+      const char *htitle =iMVAName.str().c_str();
+                    
+       factory->BookMethod( TMVA::Types::kBDT, htitle , "" );
 
        factory->TrainAllMethodsForRegression();
 
