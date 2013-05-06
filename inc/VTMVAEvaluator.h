@@ -13,6 +13,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -48,6 +49,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    vector< unsigned int >  fEnergyReconstructionMethod;
    vector< TString >       fTMVAMethodTag;
    vector< double >        fSignalEfficiency;                // from user or best signal/sqrt(noise)
+   map< unsigned int, double > fSignalEfficiencyMap;             // from user: energy dependent signal efficiency
    vector< double >        fBackgroundEfficiency;            // from best signal/sqrt(noise)
    double                  fSignalEfficiencyNoVec;
    vector< double >        fTMVACutValue;
@@ -105,6 +107,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    double           getTMVACutValueFromSignalEfficiency( double iSignalEfficiency, unsigned int iBin, string iWeightFileName );
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
+   double           getSignalEfficiency( unsigned int iEbin, double iE_min, double iE_max );
    vector< string > getTrainingVariables( string iFile, vector< bool >& iSpectator  );
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 
                                                   TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
@@ -123,7 +126,11 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    TGraph* getBoxCut_Theta_Graph();
    TGraph* getBoxCut_Theta2_Graph();
    vector< double > getBoxCut_Theta2() { return fBoxCutValue_theta2; }
-   unsigned int getSpectralWeightedEnergyBin();
+   unsigned int     getSpectralWeightedEnergyBin();
+   vector< double > getBackgroundEfficiency() { return fBackgroundEfficiency; }
+   vector< bool >   getOptimumCutValueFound() { return fTMVAOptimumCutValueFound; }
+   vector< double > getSignalEfficiency() { return fSignalEfficiency; }
+   vector< double > getTMVACutValue() { return fTMVACutValue; }
    bool   getTMVAThetaCutVariable() { return fTMVAThetaCutVariableSet; }
    double getTMVA_EvaluationResult() { return fTMVA_EvaluationResult; }
    bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
@@ -144,14 +151,15 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiencyMinEnergy = 1.e99, double iOptmizationFixedSignalEfficiencyAboveMinEnergy = 1. );
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
    void   setPlotEfficiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
-   void   setSignalEfficiency( double iE = -99. );
+   void   setSignalEfficiency( double iSignalEfficiency = -99. );
+   void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
    void   setTMVACutValue( double iE = -99. );
    void   setTMVAErrorFraction( double iTMVAErrorFraction_min = 0.2 ) { fTMVAErrorFraction_min = iTMVAErrorFraction_min; }
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 11 );
+   ClassDef(VTMVAEvaluator, 12 );
 };
 
 #endif

@@ -131,6 +131,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    fBoxCutValue_Name.clear();
    fEnergyCut_Log10TeV_min.clear();
    fEnergyCut_Log10TeV_max.clear();
+   fSignalEfficiency.clear();
    vector< unsigned int > iFileNumber;
 
 // number of energy bins
@@ -199,6 +200,11 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
        fEnergyCut_Log10TeV_min.push_back( iEnergyData->fEnergyCut_Log10TeV_min );
        fEnergyCut_Log10TeV_max.push_back( iEnergyData->fEnergyCut_Log10TeV_max );
        fEnergyReconstructionMethod.push_back( iEnergyData->fEnergyReconstructionMethod );
+// get requested signal efficiency for this energy bin
+       fSignalEfficiency.push_back( getSignalEfficiency( iWeightFileIndex_min+i, 
+                                                         iEnergyData->fEnergyCut_Log10TeV_min, 
+							 iEnergyData->fEnergyCut_Log10TeV_max ) );
+       fBackgroundEfficiency.push_back( -99. );
        sprintf( hname, "MVA%d", i );
        fTMVAMethodTag.push_back( hname );
        iF.Close();
@@ -533,10 +539,13 @@ bool VTMVAEvaluator::evaluate()
 	    fTMVA_EvaluationResult = (double)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiency[iEnergybin] );
             return (bool)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiency[iEnergybin] );
          }
-	 else if( fSignalEfficiencyNoVec > 0. )
+	 else
 	 {
-	    fTMVA_EvaluationResult = (double)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiencyNoVec );
-	    return (bool)fTMVAReader[iEnergybin]->EvaluateMVA( fTMVAMethodTag[iEnergybin], fSignalEfficiencyNoVec );
+	     cout << "VTMVAEvaluator::evaluate: error: energy bin out of range: " << endl;
+	     cout << "\t " << iEnergybin << "\t" << fSignalEfficiency.size() << endl;
+	     if( iEnergybin < fSignalEfficiency.size() ) cout << "\t signal efficiency: " << fSignalEfficiency[iEnergybin] << endl;
+	     cout << "exiting..." << endl;
+	     exit( -1 );
          }
       }
 // all but box cuts (e.g. BDT, NN, etc)
@@ -961,14 +970,19 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
 
 }
 
-void VTMVAEvaluator::setSignalEfficiency( double iE )
+void VTMVAEvaluator::setSignalEfficiency( double iSignalEfficiency )
 {
-   for( unsigned int i = 0; i < fSignalEfficiency.size(); i++ )
-   {
-       fSignalEfficiency[i] = iE;
-   }
+   fSignalEfficiencyMap[9999] = iSignalEfficiency;
 
-   fSignalEfficiencyNoVec = iE;
+   fSignalEfficiencyNoVec = iSignalEfficiency;
+}
+
+void VTMVAEvaluator::setSignalEfficiency( map< unsigned int, double > iSignalEfficiencyMap )
+{
+   fSignalEfficiencyMap = iSignalEfficiencyMap;
+
+// set to value >0: indicates that signal efficiency had been set from outsite
+   fSignalEfficiencyNoVec = 1.;
 }
 
 void VTMVAEvaluator::setTMVACutValue( double iE )
@@ -1484,6 +1498,33 @@ void VTMVAEvaluator::setSensitivityOptimizationFixedSignalEfficiency( double iOp
 {
    fOptmizationFixedSignalEfficiencyMinEnergy = iOptmizationFixedSignalEfficiencyMinEnergy;
    fOptmizationFixedSignalEfficiencyAboveMinEnergy = iOptmizationFixedSignalEfficiencyAboveMinEnergy;
+}
+
+double VTMVAEvaluator::getSignalEfficiency( unsigned int iEnergyBin, double iE_min_log10, double iE_max_log10 )
+{
+   if( fSignalEfficiencyMap.size() == 0 ) return fSignalEfficiencyNoVec;
+
+   map< unsigned int, double >::iterator iIter;
+
+   for( iIter = fSignalEfficiencyMap.begin(); iIter != fSignalEfficiencyMap.end(); iIter++ )
+   {
+// signal efficiency does not depend on energy
+       if( iIter->first > 9998 ) return iIter->second;
+
+// energy dependent signal efficiency
+       if( iIter->first == iEnergyBin )
+       {
+	  cout << "VTMVAEvaluator::getSignalEfficiency: E [" << iE_min_log10 << ", " << iE_max_log10 << "], bin ";
+	  cout << iEnergyBin << ": ";
+	  cout << iIter->first << "\t" << iIter->second << endl;
+          return iIter->second;
+       }
+   }
+
+   cout << "VTMVAEvaluator::getSignalEfficiency: warning, couldn't find a signal efficiency for energy bin ";
+   cout << iEnergyBin << ", E=[ " << iE_min_log10 << ", " << iE_max_log10 << "] " << endl;
+
+   return -1.;
 }
     
    

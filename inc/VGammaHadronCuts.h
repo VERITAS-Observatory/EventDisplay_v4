@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -115,7 +116,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	string          fTMVAWeightFile;
 	unsigned int    fTMVAWeightFileIndex_min;
 	unsigned int    fTMVAWeightFileIndex_max;
-	double          fTMVASignalEfficiency;
+	map< unsigned int, double > fTMVASignalEfficiency;
 	double          fTMVAProbabilityThreshold;
 	string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
@@ -282,6 +283,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   printCutSummary();
         void   printCutStatistics() { if( fStats ) fStats->printCutStatistics(); }
 	void   printDirectionCuts();
+	void   printSignalEfficiency();
         bool   readCuts(string i_cutfilename, int iPrint = 1 );
         void   resetCutValues();
 	void   resetCutStatistics();
@@ -298,6 +300,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,36);
+        ClassDef(VGammaHadronCuts,37);
 };
 #endif

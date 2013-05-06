@@ -1394,7 +1394,8 @@ void VReadRunParameter::isCompiledWithDB()
 
 /*!
 
-   open DST file and read run number and number of telescopes
+   open DST file and read run parameters
+
 */
 bool VReadRunParameter::getRunParametersFromDST()
 {
@@ -1405,6 +1406,7 @@ bool VReadRunParameter::getRunParametersFromDST()
     }
     if( fDebug ) cout << "VReadRunParameter::getRunParametersFromDST() " << endl;
 
+    cout << "reading run parameters from dst file" << endl;
 // open dst file
     TFile iF( fRunPara->fsourcefile.c_str() );
     if( iF.IsZombie() )
@@ -1425,7 +1427,6 @@ bool VReadRunParameter::getRunParametersFromDST()
     }
     fRunPara->fuseDB = false;
     fRunPara->fDBTracking = false;
-//    fRunPara->fDoublePass = false;
     VEvndispRunParameter *iV = (VEvndispRunParameter*)iF.Get( "runparameterDST" );
     if( !iV) iV = (VEvndispRunParameter*)iF.Get( "runparameterV2" );
     if( iV )

@@ -89,7 +89,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAWeightFileIndex_min = 0;
     fTMVAWeightFileIndex_max = 0;
     fTMVAWeightFile = "";
-    fTMVASignalEfficiency = -99.;
+    fTMVASignalEfficiency.clear();
 // Note: for TMVA is this not the probability threshold but the MVA cut value
     fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
@@ -589,7 +589,12 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
 	    else if( iCutVariable == "TMVACUTS" )
 	    {
-               if( !is_stream.eof() ) is_stream >> fTMVASignalEfficiency;
+               if( !is_stream.eof() )
+	       {
+		  double iT = 0.;
+	          is_stream >> iT;
+		  if( iT > 0. ) fTMVASignalEfficiency[9999] = iT;
+               }
 // probability threshold not important for box cuts
 // Note: for TMVA is this not the probability threshold but the MVA cut value
                if( !is_stream.eof() ) is_stream >> fTMVAProbabilityThreshold;
@@ -598,6 +603,14 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyMinEnergy;
 	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyAboveMinEnergy;
+            }
+	    else if( iCutVariable == "TMVASignalEfficiency" )
+	    {
+	       unsigned int iE = 0;
+	       double iS = 0.;
+	       if( !is_stream.eof() ) is_stream >> iE;
+	       if( !is_stream.eof() ) is_stream >> iS;
+	       fTMVASignalEfficiency[iE] = iS;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
             }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -808,8 +821,8 @@ void VGammaHadronCuts::printCutSummary()
 	}
 	else
 	{
-           cout << "signal efficiency: " << fTMVASignalEfficiency;
-	   cout << ", probability threshold/MVA cut: " << fTMVAProbabilityThreshold << endl;
+           printSignalEfficiency();
+	   cout << "probability threshold/MVA cut: " << fTMVAProbabilityThreshold << endl;
         }
     }
 // other cut parameters
@@ -1216,7 +1229,7 @@ bool VGammaHadronCuts::applyTMVACut( int i )
    if( fDebug )
    {
       cout << "VGammaHadronCuts::applyTMVACut event " << i;
-      cout << ", signal efficiency " << fTMVASignalEfficiency;
+      cout << ", signal efficiency " << fTMVASignalEfficiency.size();
       cout << ", probability threshold/MVA cut " << fTMVAProbabilityThreshold;
       cout << " (" << fTMVAEvaluator << ")";
       cout << endl;
@@ -1490,7 +1503,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
        fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
     }
 // set a constant signal efficiency
-    else if( fTMVASignalEfficiency > 0. )
+    else if( fTMVASignalEfficiency.size() > 0 )
     {
        fTMVAEvaluator->setSignalEfficiency( fTMVASignalEfficiency );
     }
@@ -1502,7 +1515,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     else
     {
        cout << "VGammaHadronCuts::initTMVAEvaluator error: unclear TMVA cut settings" << endl;
-       cout << "\t fTMVASignalEfficiency: " << fTMVASignalEfficiency << endl;
+       cout << "\t fTMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
        cout << "\t fTMVAProbabilityThreshold: " << fTMVAProbabilityThreshold << endl;
        cout << "exiting... " << endl;
        exit( -1 );
@@ -2092,6 +2105,22 @@ void VGammaHadronCuts::terminate()
    }   
 
    Write();
+}
+
+void VGammaHadronCuts::printSignalEfficiency()
+{
+   if( fTMVASignalEfficiency.size() == 0 )
+   {
+       cout << "no signal efficiency set" << endl;
+       return;
+   }
+
+   map< unsigned int, double >::iterator iIter;
+   for( iIter = fTMVASignalEfficiency.begin(); iIter != fTMVASignalEfficiency.end(); iIter++ )
+   {
+      cout << "signal efficiency for energy bin " << iIter->first << ": ";
+      cout << iIter->second << endl;
+   }
 }
 
 
