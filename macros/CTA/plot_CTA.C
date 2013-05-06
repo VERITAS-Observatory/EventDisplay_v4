@@ -26,6 +26,32 @@ vector< string > getListofArrrays( string iArrayFile )
    return SubArray;
 }
 
+/*
+ 
+   plot a single telescope
+
+*/
+
+void drawTelescope( double x, double y, string iText, double iMarkerMult, int iMarkerColor )
+{
+    TGraph *iG = new TGraph( 1 );
+    iG->SetMarkerStyle( 20 );
+    iG->SetMarkerSize( 1.5 * iMarkerMult );
+    iG->SetMarkerColor( iMarkerColor );
+
+    iG->SetPoint( 0, x, y );
+
+    iG->Draw( "p" );
+
+    if( iText.size() > 0 )
+    {
+       TText *iT = new TText( x, y, iText.c_str() );
+       iT->SetTextSize( 0.014 );
+       iT->Draw();
+    }
+}
+
+
 
 /*
      plot array layout
@@ -42,7 +68,7 @@ vector< string > getListofArrrays( string iArrayFile )
      plots
 
 */
-TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450., bool prod2 = false )
+TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450., bool drawTelescopeNumbers = true )
 {
     TFile *f1 = new TFile( ifile );
     if( f1->IsZombie() ) return 0;
@@ -67,48 +93,48 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
 
     hnull->Draw();
 
-    telconfig->SetMarkerStyle( 20 );
-    telconfig->SetMarkerColor( 5 );
-    telconfig->SetMarkerSize( 0.5 * iMarkerMult );
-    telconfig->Draw("TelY:TelX", "", "same" );
+    float iTelX = 0.;
+    float iTelY = 0.;
+    ULong64_t iTelType = 0;
+    int iTelID = 0;
+    unsigned int iTelIDHA = 0;
+
+    t->SetBranchAddress( "TelID", &iTelID );
+    t->SetBranchAddress( "TelType", &iTelType );
+    t->SetBranchAddress( "TelID_hyperArray", &iTelIDHA );
+    t->SetBranchAddress( "TelX", &iTelX );
+    t->SetBranchAddress( "TelY", &iTelY );
+
+    int iMarkerColor = 0;
+    char hname[200];
+
+    for( int i = 0; i < t->GetEntries(); i++ )
+    {
+       t->GetEntry( i );
 
 // LSTs (1)
-    telconfig->SetMarkerStyle( 20 );
-    telconfig->SetMarkerColor( 2 );
-    telconfig->SetMarkerSize( 1.5 * iMarkerMult );
-    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==141305009", "same" );
-    else         telconfig->Draw("TelY:TelX", "TelType==138704810", "same" );
-
+       if( iTelType == 138704810 || iTelType == 141305009 || iTelType == 141305109 ) iMarkerColor = 2;
 // standard MSTs (2)
-    telconfig->SetMarkerStyle( 20 );
-    telconfig->SetMarkerColor( 1 );
-    telconfig->SetMarkerSize( 1.0 * iMarkerMult );
-    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==10007818", "same" );
-    else         telconfig->Draw("TelY:TelX", "TelType==10408418", "same" );
-
-    if( !prod2 )
-    {
+       else if( iTelType == 10007818 || iTelType == 10408418 || iTelType == 10008118 ) iMarkerColor = 1;
 // large pixel MSTs (4)
-       telconfig->SetMarkerStyle( 20 );
-       telconfig->SetMarkerColor( 6 );
-       telconfig->SetMarkerSize( 1.0 * iMarkerMult );
-       telconfig->Draw("TelY:TelX", "TelType==10009725", "same" );
-    }
-
+       else if( iTelType == 10009725 )  iMarkerColor = 6;
 // standard SSTs (3)
-    telconfig->SetMarkerStyle( 20 );
-    telconfig->SetMarkerColor( 3 );
-    telconfig->SetMarkerSize( 0.7 * iMarkerMult );
-    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==3709725", "same" );
-    else         telconfig->Draw("TelY:TelX", "TelType==3709425", "same" );
-
+       else if( iTelType == 3709725 || iTelType == 3709425 || iTelType == 3710125 ) iMarkerColor = 3;
 // 7m telescopes (5, prod1) or SCT (prod2)
-    telconfig->SetMarkerStyle( 20 );
-    telconfig->SetMarkerColor( 4 );
-    telconfig->SetMarkerSize( 0.7 * iMarkerMult );
-    if( !prod2 ) telconfig->Draw("TelY:TelX", "TelType==7309930", "same" );
-    else         telconfig->Draw("TelY:TelX", "TelType==201509515", "same" );
+       else if( iTelType == 7309930  || iTelType == 201509515 ) iMarkerColor = 4;
+       else
+       {
+          cout << "unknown telescope type: " << iTelType << endl;
+	  continue;
+       }
 
+       if( drawTelescopeNumbers ) sprintf( hname, "%d, %d", iTelID, iTelIDHA );
+       else                       sprintf( hname, "" );
+       drawTelescope( iTelX, iTelY, hname, iMarkerMult, iMarkerColor );
+
+
+    }
+// draw array name
     if( iname )
     {
        TText *it = new TText( -1.*0.9*xmax, 0.75*ymax, iname );
