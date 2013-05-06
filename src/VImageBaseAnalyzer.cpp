@@ -650,19 +650,6 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     double i_meanPedVar = 0.;
     double i_meanPedVarRMS = 0.;
     getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
-// (GM 20121227) not clear why this difference was made
-//      -> problem when looking at grisu sims and
-//         individual telescopes
-/*    if( usePedestalsInTimeSlices( iLowGain ) )
-    {
-       getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
-    }
-    else
-    {
-       i_meanPedVar = getmeanPedvars( iLowGain, getSumWindow() );
-       i_meanPedVarRMS = getmeanRMSPedvars( iLowGain, getSumWindow() );
-    } 
-*/
 
     for ( unsigned int i = 0; i < getNChannels(); i++ )
     {

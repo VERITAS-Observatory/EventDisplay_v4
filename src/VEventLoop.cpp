@@ -24,6 +24,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
        cout << "VEventLoop::VEventLoop error: no telescopes defined" << endl;
        exit( -1 );
     }
+    if( fNTel >= 10 ) fRunPar->fPrintSmallArray = false;
 
 // data readers
     fReader = 0;                                  // this pointer is used in the program for accesing any data source (raw or MC)

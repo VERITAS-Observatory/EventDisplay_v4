@@ -32,26 +32,34 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
 // fExpectedEventStatus is used in VDisplay -> don't allow to display more than 8*sizeof(size_t) telescope (64?)
 //
     bitset<8*sizeof(size_t)> ib;
-    if( iT.size() > ib.size() )
+    for( unsigned int i = 0; i < iT.size(); i++ )
     {
-        if( getRunParameter()->fdisplaymode )
+        if( iT[i] > ib.size() )
         {
-            cout << "Error: maximum number of telescopes allowed in display mode: " << ib.size() << endl;
-            cout << "exiting..." << endl;
-            exit( 0 );
+	   if( getRunParameter()->fdisplaymode )
+	   {
+	       cout << "Error: maximum telescopes ID allowed in display mode: " << ib.size();
+	       cout << " (try to set " << iT[i] << ")" << endl;
+	       if( getNTel() >= ib.size() ) fExpectedEventStatus = 0;
+	       else
+	       {
+		  cout << "exiting..." << endl;
+		  exit( 0 );
+               }
+	   }
+	   else
+	   {
+	       cout << "Warning: telescope ID larger then " << ib.size() << ": " << iT[i] << endl;
+	       cout << "(some of the variable will be in overflow (LTrig, ImgSel))" << endl;
+	   } 
+	   fExpectedEventStatus = 0;
         }
-        else
-        {
-            cout << "Warning: number of telescope larger then " << ib.size() << endl;
-            cout << "(some of the variable will be in overflow (LTrig, ImgSel))" << endl;
+	else
+	{
+	   ib.set( iT[i], 1 );
         }
-        fExpectedEventStatus = 0;
-    }
-    else
-    {
-        for( unsigned int i = 0; i < iT.size(); i++ ) if( i < ib.size() ) ib.set( iT[i], 1 );
-        fExpectedEventStatus = (unsigned long int) ib.to_ulong();
-    }
+    } 
+    if( fExpectedEventStatus != 0 ) fExpectedEventStatus = (unsigned long int) ib.to_ulong();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // init event counting statistics
@@ -775,7 +783,7 @@ vector< unsigned int > VEvndispData::fTelescopeEventNumber;
 unsigned int VEvndispData::fEventType = 0;
 unsigned int VEvndispData::fNumberofGoodEvents = 0;
 unsigned int VEvndispData::fNumberofIncompleteEvents = 0;
-unsigned long int VEvndispData::fExpectedEventStatus = 0;
+unsigned long int VEvndispData::fExpectedEventStatus = 99;
 unsigned int VEvndispData::fAnalysisArrayEventStatus = 0;
 vector< unsigned int > VEvndispData::fAnalysisTelescopeEventStatus;
 

@@ -85,7 +85,11 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 
        if( getRunParameter()->fPedestalSingleRootFile )
        {
-	   if( !fPedSingleOutFile ) fPedSingleOutFile = new TFile( ioutfile.c_str(), "RECREATE");
+	   if( !fPedSingleOutFile ) 
+	   {
+	      fPedSingleOutFile = new TFile( ioutfile.c_str(), "RECREATE");
+	      cout << "opened a single pedestal file for all telescope types: " << fPedSingleOutFile->GetName() << endl;
+           }
        }
        else if( getTelID() <  getDetectorGeometry()->getTelType().size() 
              && fPedOutFile.find( iTelType ) != fPedOutFile.end() )
@@ -1631,13 +1635,17 @@ void VCalibrator::readGains( bool iLowGain )
             }
         }
     }
-    else if(getRunParameter()->fNoCalibNoPb || getRunParameter()->fIsMC )
+    else if( getRunParameter()->fNoCalibNoPb || getRunParameter()->fIsMC ) 
     {
-	std::cout<<"VCalibrator::readGains() info: Gains are set to 1, Gains are not tested to find dead channels "<<std::endl; 
+	if( getRunParameter()->fPrintSmallArray )
+	{
+	   std::cout << "VCalibrator::readGains() info: Gains are set to 1, Gains are not tested to find dead channels "<< std::endl; 
+        }
         setGains( 1., iLowGain );
         setGainvars( 1., iLowGain );
     }
-    else{
+    else
+    {
 	std::cout<<"Error: No gain information available "<<std::endl;
 	std::cout<<"exiting... "<<std::endl;
 	std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all gains will be set to 1) "<<std::endl;

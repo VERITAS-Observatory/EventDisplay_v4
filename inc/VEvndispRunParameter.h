@@ -68,6 +68,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 
 // debugging
         bool  fDebug;                             // print debug output
+	bool  fPrintSmallArray;                   // some printout for small arrays only
         unsigned int fPrintAnalysisProgress;      // print a line each time this number of events have been processed
 
 // array/telescope geometry parameters
@@ -246,6 +247,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,122); //(increase this number)
+        ClassDef(VEvndispRunParameter,123); //(increase this number)
 };
 #endif

@@ -33,6 +33,7 @@ VEvndispRunParameter::VEvndispRunParameter()
 
 // debug parameters
     fDebug = false;
+    fPrintSmallArray = true;
 
 // run parameters
 #ifdef RUNWITHDB
@@ -261,6 +262,9 @@ void VEvndispRunParameter::print( int iEv )
 {
     if( fDebug ) cout << "VEvndispRunParameter::printParams()" << endl;
 
+// print less to screen for some variables for large arrays
+    if( fTelToAnalyze.size() >= 10 ) fPrintSmallArray = false;
+
     cout << endl;
     if( iEv == 1 )
     {
@@ -364,7 +368,7 @@ void VEvndispRunParameter::print( int iEv )
     if( frunmode == 6 )  cout << "using low gain events only for pedestal calculation" << endl;
     cout << endl;
 
-    if( fCalibrationDataType == 0 ) cout << "no calibration data available" << endl;
+    if( fCalibrationDataType == 0 ) cout << "no calibration data available or calibration data is read from DST file" << endl;
     cout << "signal charge unit is " << fFADCChargeUnit << endl;
 
     if( frunmode == 0 || frunmode == 4 )
@@ -386,9 +390,12 @@ void VEvndispRunParameter::print( int iEv )
 	    cout << " (uncertainties: ";
 	    if( fDoublePassErrorWeighting2005 ) cout << "2005) ";
 	    else                                cout << "2013) ";
-            cout << " (low gain window shift: ";
-            for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ ) cout << fTraceWindowShift[i] << ", ";
-            cout << ")";
+	    if( fPrintSmallArray )
+	    {
+	       cout << " (low gain window shift: ";
+	       for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ ) cout << fTraceWindowShift[i] << ", ";
+	       cout << ")";
+            }
         }
         else cout << "no double pass cleaning";
         cout << endl;
