@@ -1452,7 +1452,7 @@ void VFluxCalculation::plotFluxesVSPedvars()
     TGraphErrors *gFluxPedvars = new TGraphErrors( (int)fRunMJD.size() - 1 );
     gFluxPedvars->SetTitle( "" );
     gFluxPedvars->SetMarkerStyle( 20 );
-    gFluxPedvars->SetMarkerSize( 2 );
+    gFluxPedvars->SetMarkerSize( 1.5 );
     gFluxPedvars->SetLineWidth( 2 );
 
     int z = 0;
@@ -1518,7 +1518,7 @@ void VFluxCalculation::plotFluxesVSWobbleOffset()
 }
 
 
-TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw )
+TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConstantValueLine )
 {
     TCanvas *cCanvas_FElevation = 0;
     if( iDraw ) 
@@ -1532,7 +1532,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw )
     gFluxElevation = new TGraphErrors( (int)fRunMJD.size() - 1 );
     gFluxElevation->SetTitle( "" );
     gFluxElevation->SetMarkerStyle( 20 );
-    gFluxElevation->SetMarkerSize( 2 );
+    gFluxElevation->SetMarkerSize( 1.5 );
     gFluxElevation->SetLineWidth( 2 );
 
     int z = 0;
@@ -1550,7 +1550,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw )
     char hname[200];
     if( iDraw )
     {
-       gFluxElevation->Draw( "p" );
+       gFluxElevation->Draw( "ap" );
        gFluxElevation->GetHistogram()->SetXTitle( "elevation [deg]" );
        if( fMinEnergy < 1. ) sprintf( hname, "F(E>%d GeV) [cm^{-2}s^{-1}]", (int)(fMinEnergy*1.e3) );
        else                  sprintf( hname, "F(E>%.1f TeV) [cm^{-2}s^{-1}]", fMinEnergy );
@@ -1559,6 +1559,14 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw )
        TLine *iL2 = new TLine( gFluxElevation->GetHistogram()->GetXaxis()->GetXmin(), 0., gFluxElevation->GetHistogram()->GetXaxis()->GetXmax(), 0. );
        iL2->SetLineStyle( 2 );
        iL2->Draw();
+
+       if( iConstantValueLine > 0. )
+       {
+           TLine *iL3 = new TLine( gFluxElevation->GetHistogram()->GetXaxis()->GetXmin(), iConstantValueLine,
+	                           gFluxElevation->GetHistogram()->GetXaxis()->GetXmax(), iConstantValueLine );
+           iL3->SetLineStyle( 2 );
+	   iL3->Draw();
+       }
     }
 
     return gFluxElevation;
