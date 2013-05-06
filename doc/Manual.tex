@@ -208,6 +208,27 @@ Detailed description of these files can be found in the corresponding chapters o
 
 \section{Calibration}
 
+\subsection{Pedestal calibration}
+
+\subsubsection{Calculating pedestal and pedestal variations for CTA}
+
+These are the steps calculate pedestals and pedestal variations for prod-2 CTA simulations:
+
+\begin{itemize}
+\item produce a simtel\_array file with NSB events only (as described here: ??)
+\item convert the sim\_telarray file with {\it CTA.convert\_hessio\_to\_VDST} to a dst.root file
+\end{itemize}
+
+\begin{lstlisting}
+
+./bin/evndisp -sourcefile LeoncitoLongTraces.dst.root -runmode=1 \\
+-singlepedestalrootfile=1   -donotusepeds -usePedestalsInTimeSlices=0 \\ 
+-calibrationsumwindow=30 -calibrationsumfirst=0 -ignoredstgains \\ 
+-reconstructionparameter EVNDISP.prod2-noDoublepass.reconstruction.runparameter \\
+-nevents=20 -nopedestalsintimeslices 
+
+\end{lstlisting}
+
 \subsection{Low gain calibration}
 
 {\bf\color{red}VERITAS only}
@@ -268,6 +289,8 @@ RUNS 55975 and 55978 (128 samples)
 \end{lstlisting}
 
 \subsubsection{Low-gain multiplicator}
+
+
 
 \section{Image analysis}
 
@@ -335,10 +358,10 @@ selector & \\
 \multicolumn{2}{@{}l@{}}{ID2} \\
      0 & apply gamma/hadron cuts on parameters in given data tree \\
      1 & apply gamma/hadron cuts on probabilities given by a friend to the data tree (e.g. random forest analysis) \\
-     2 & same as 2 \\
+     2 & same as 1 \\
      3 & apply cuts on probabilities given by a friend to the data tree already at the level of the event quality level (e.g. of use for analysis of certain binary phases only) \\
      4 & TMVA gamma/hadron separation \\
-     
+     5 & apply FROGS based gamma/hadron separation \\
 \midrule
 \multicolumn{2}{@{}l@{}}{ID1} \\
 

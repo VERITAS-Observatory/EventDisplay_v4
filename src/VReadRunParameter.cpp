@@ -1485,7 +1485,7 @@ void VReadRunParameter::printStartMessage()
 
 bool VReadRunParameter::checkSecondArgument( string iPara1, string iPara2, bool iExitIfFails )
 {
-   if( iPara2.size() > 0 && iPara2.substr( 0, 1 ) == "-" || iPara2.size() == 0 )
+   if( ( iPara2.size() > 0 && iPara2.substr( 0, 1 ) == "-" ) || iPara2.size() == 0 )
    {
       if( iExitIfFails )
       {

@@ -1,8 +1,9 @@
-//! VPlotWPPhysSensitivity
+//! VPlotWPPhysSensitivity plot CTA style sensitivities
 
 #ifndef VPlotWPPhysSensitivity_H
 #define VPlotWPPhysSensitivity_H
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -17,27 +18,28 @@
 #include "VPlotUtilities.h"
 #include "VSensitivityCalculator.h"
 
-class VWPPhysMinimumRequirements
+class VPlotWPPhysSensitivityData
 {
-    public:
+   public:
 
-    string fName;
-    double fEnergyRange_TeV_Min;
-    double fEnergyRange_TeV_Max;
-    double fEnergyThreshold_TeV;
-    vector< double > fEnergyResolution_Energy_TeV_Min;
-    vector< double > fEnergyResolution_Energy_TeV_Max;
-    vector< double > fEnergyResolution;
-    vector< double > fAngularResolution_Energy_TeV_Min;
-    vector< double > fAngularResolution_Energy_TeV_Max;
-    vector< double > fAngularResolution_deg;
-    vector< double > fDifferentalSensitivity_Energy_TeV;
-    vector< double > fDifferentalSensitivity_erg_s_m2;
+   string fAnalysis;
+   string fSensitivityFileName; 
+   bool   fFileExists;
+   double fObservationTime_s;
+   string fSubArray;
+   double fCameraOffset_deg;
 
-    VWPPhysMinimumRequirements( string iName );
-   ~VWPPhysMinimumRequirements() {}
-    bool readWPPhysMinimumRequirements( string iFile );
+   int    fPlottingColor;
+   int    fPlottingLineStyle;
+   int    fPlottingFillStyle;
+   string fLegend;
+
+   VPlotWPPhysSensitivityData();
+  ~VPlotWPPhysSensitivityData() {}
+   void   print();
 };
+
+//-----------------------------------------------------------------------
 
 class VPlotWPPhysSensitivity : public VPlotUtilities
 {
@@ -45,35 +47,12 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 
    VPlotInstrumentResponseFunction *fIRF;
 
-   vector< string > fAnalysis;
-   vector< int >    fAnalysisColor;
-   vector< int >    fAnalysisLineStyle;
-   vector< int >    fAnalysisFillStyle;
-
-   vector< double > fObservationTime_H;
-   vector< int >    fObservationTimeColor;
-   vector< int >    fObservationTimeLineStyle;
-   vector< int >    fObservationTimeFillStyle;
-
-   vector< string > fSubArray;
-   vector< int >    fSubArrayColor;
-   vector< int >    fSubArrayLineStyle;
-   vector< int >    fSubArrayFillStyle;
-
-   vector< double > fCameraOffset_deg;
-   vector< int >    fCameraOffsetColor;
-   vector< int >    fCameraOffsetLineStyle;
-   vector< int >    fCameraOffsetFillStyle;
-
-   vector< string > fSensitivityFile;   // 
-   vector< double > fIRFCameraOffset_deg;
-   vector< int >    fPlottingColor;
-   vector< int >    fPlottingLineStyle;
-   vector< int >    fPlottingFillStyle;
-   vector< string > fLegend;
+   vector< VPlotWPPhysSensitivityData* > fData;
 
    double fMinEnergy_TeV;
    double fMaxEnergy_TeV;
+   string fCrabSpectraFile;
+   unsigned int fCrabSpectraID;
 
    bool    plotLegend( TCanvas *c = 0, bool iLeft = false );
 
@@ -82,15 +61,20 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    VPlotWPPhysSensitivity();
   ~VPlotWPPhysSensitivity() {}
 
-   void addAnalysis( string iAnalysis, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );           // NOTE: hardwired analysis file names
-   void addCameraOffset( double iCameraOffset_deg = 0., int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
-   void addObservationTime( double iObsTime, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
-   void addSensitivityFile( string iSensitivityFile, string iLegend, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
-   void addSubArray( string iArray, int iColor = -1, int iLineStyle = -1, int iFillStyle = -1 );
-   bool initialize();
+   bool addDataSet( VPlotWPPhysSensitivityData* iData, bool iInit = true );
+   bool addDataSet( string iAnalysis, string iSubArray = "E", double iObservationTime_s = 180000., double iOffset_deg = 0.0,
+                    string iLegend = "", int iColor = 1, int iLineStyle = 1, int iFillStyle = 3001 );
+   bool addDataSets( string iDataSettxtFile );
+   vector< string > getListOfArrays();
+   bool initialize( VPlotWPPhysSensitivityData* );
    bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10, string iUnit = "ENERGY"  );
-   void setEnergyRange_Lin_TeV( double iMinEnergy_TeV = 0.01, double iMaxEnergy_TeV = 50. ) { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
+   void reset();
+   void setCrabSpectraFile( string iFile = "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat",
+                            unsigned int iSpectraID = 6 )
+                            { fCrabSpectraFile = iFile; fCrabSpectraID = iSpectraID; }
+   void setEnergyRange_Lin_TeV( double iMinEnergy_TeV = 0.01, double iMaxEnergy_TeV = 200. ) 
+                                { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
 
 };
 

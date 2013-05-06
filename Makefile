@@ -540,6 +540,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o  \
 		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o \
+		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
