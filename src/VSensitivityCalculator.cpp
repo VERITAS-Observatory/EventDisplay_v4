@@ -1406,6 +1406,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 }
 
 /*
+
     calculate differential or integral flux from gamma and proton effective areas
 
 */

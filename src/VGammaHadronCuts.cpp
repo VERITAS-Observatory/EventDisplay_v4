@@ -90,10 +90,12 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAWeightFileIndex_max = 0;
     fTMVAWeightFile = "";
     fTMVASignalEfficiency.clear();
+    fTMVA_MVACut.clear();
 // Note: for TMVA is this not the probability threshold but the MVA cut value
     fTMVAProbabilityThreshold = -99.;
     fTMVAOptimizeSignalEfficiencyParticleNumberFile = "";
-    fTMVAOptimizeSignalEfficiencySourceStrengthCU = -99.;
+    fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
+    fTMVAOptimizeSignalEfficiencySignalEvents_Min = 10.;
     fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
     fTMVAFixedSignalEfficiencyMinEnergy = 1.e99;
     fTMVAFixedSignalEfficiencyAboveMinEnergy = 1.;
@@ -589,16 +591,8 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
             }
 	    else if( iCutVariable == "TMVACUTS" )
 	    {
-               if( !is_stream.eof() )
-	       {
-		  double iT = 0.;
-	          is_stream >> iT;
-		  if( iT > 0. ) fTMVASignalEfficiency[9999] = iT;
-               }
-// probability threshold not important for box cuts
-// Note: for TMVA is this not the probability threshold but the MVA cut value
-               if( !is_stream.eof() ) is_stream >> fTMVAProbabilityThreshold;
-	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySourceStrengthCU;
+	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySignificance_Min;
+	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyObservationTime_h;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyMinEnergy;
@@ -611,6 +605,14 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 	       if( !is_stream.eof() ) is_stream >> iE;
 	       if( !is_stream.eof() ) is_stream >> iS;
 	       fTMVASignalEfficiency[iE] = iS;
+            }
+	    else if( iCutVariable == "TMVA_MVACut" )
+	    {
+	       unsigned int iE = 0;
+	       double iS = 0.;
+	       if( !is_stream.eof() ) is_stream >> iE;
+	       if( !is_stream.eof() ) is_stream >> iS;
+	       fTMVA_MVACut[iE] = iS;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
             }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -811,10 +813,12 @@ void VGammaHadronCuts::printCutSummary()
         cout << "TMVA gamma/hadron separation with MVA method " << fTMVA_MVAMethod;
 	cout << endl;
         cout << "weight files: " << fTMVAWeightFile << " (" << fTMVAWeightFileIndex_min << "," << fTMVAWeightFileIndex_max << ")" << endl;
-	if( fTMVAOptimizeSignalEfficiencySourceStrengthCU > 0. && fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
+	if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
 	{
-	   cout << "using optimal signal efficiency for " << fTMVAOptimizeSignalEfficiencySourceStrengthCU << " Crab source ";
-	   cout << " and " << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
+	   cout << "using optimal signal efficiency with a requirement of ";
+	   cout << fTMVAOptimizeSignalEfficiencySignificance_Min << " sigma and at least ";
+	   cout << fTMVAOptimizeSignalEfficiencySignalEvents_Min << " signal events in ";
+	   cout << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
 	   cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
 	   cout << "\t fixed signal efficiency above energy  " << fTMVAFixedSignalEfficiencyMinEnergy;
 	   cout << " (fixed to " << fTMVAFixedSignalEfficiencyAboveMinEnergy << ")" << endl;
@@ -822,7 +826,7 @@ void VGammaHadronCuts::printCutSummary()
 	else
 	{
            printSignalEfficiency();
-	   cout << "probability threshold/MVA cut: " << fTMVAProbabilityThreshold << endl;
+	   printTMVA_MVACut();
         }
     }
 // other cut parameters
@@ -1230,7 +1234,7 @@ bool VGammaHadronCuts::applyTMVACut( int i )
    {
       cout << "VGammaHadronCuts::applyTMVACut event " << i;
       cout << ", signal efficiency " << fTMVASignalEfficiency.size();
-      cout << ", probability threshold/MVA cut " << fTMVAProbabilityThreshold;
+      cout << ", probability threshold/MVA cut " << fTMVA_MVACut.size();
       cout << " (" << fTMVAEvaluator << ")";
       cout << endl;
    }
@@ -1495,11 +1499,14 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     fTMVAEvaluator = new VTMVAEvaluator();
     fTMVAEvaluator->setDebug( fDebug );
 // set parameters for optimal MVA cut value search
-    if( fTMVAOptimizeSignalEfficiencySourceStrengthCU > 0. && fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
+    if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
-       fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySourceStrengthCU, 1.e-10, 0.2,
-                                                             fTMVAOptimizeSignalEfficiencyObservationTime_h );
-       fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMinEnergy, fTMVAFixedSignalEfficiencyAboveMinEnergy );
+       fTMVAEvaluator->setSensitivityOptimizationParameters( fTMVAOptimizeSignalEfficiencySignificance_Min,
+                                                             fTMVAOptimizeSignalEfficiencySignalEvents_Min,
+                                                             fTMVAOptimizeSignalEfficiencyObservationTime_h,
+							     1./5. );
+       fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMinEnergy, 
+                                                                        fTMVAFixedSignalEfficiencyAboveMinEnergy );
        fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
     }
 // set a constant signal efficiency
@@ -1508,15 +1515,15 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
        fTMVAEvaluator->setSignalEfficiency( fTMVASignalEfficiency );
     }
 // set a fixed probability threshold or (for TMVA) a fixed MVA cut value
-    else if( fTMVAProbabilityThreshold > -99. )
+    else if( fTMVA_MVACut.size() > 0 )
     {
-       fTMVAEvaluator->setTMVACutValue( fTMVAProbabilityThreshold );
+       fTMVAEvaluator->setTMVACutValue( fTMVA_MVACut );
     }
     else
     {
        cout << "VGammaHadronCuts::initTMVAEvaluator error: unclear TMVA cut settings" << endl;
        cout << "\t fTMVASignalEfficiency: " << fTMVASignalEfficiency.size() << endl;
-       cout << "\t fTMVAProbabilityThreshold: " << fTMVAProbabilityThreshold << endl;
+       cout << "\t fTMVAProbabilityThreshold: " << fTMVA_MVACut.size() << endl;
        cout << "exiting... " << endl;
        exit( -1 );
     }
@@ -2119,6 +2126,22 @@ void VGammaHadronCuts::printSignalEfficiency()
    for( iIter = fTMVASignalEfficiency.begin(); iIter != fTMVASignalEfficiency.end(); iIter++ )
    {
       cout << "signal efficiency for energy bin " << iIter->first << ": ";
+      cout << iIter->second << endl;
+   }
+}
+
+void VGammaHadronCuts::printTMVA_MVACut()
+{
+   if( fTMVA_MVACut.size() == 0 )
+   {
+       cout << "no MVA cut set" << endl;
+       return;
+   }
+
+   map< unsigned int, double >::iterator iIter;
+   for( iIter = fTMVA_MVACut.begin(); iIter != fTMVA_MVACut.end(); iIter++ )
+   {
+      cout << "MVA cut for energy bin " << iIter->first << ": ";
       cout << iIter->second << endl;
    }
 }

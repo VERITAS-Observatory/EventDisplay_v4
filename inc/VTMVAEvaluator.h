@@ -53,13 +53,16 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    vector< double >        fBackgroundEfficiency;            // from best signal/sqrt(noise)
    double                  fSignalEfficiencyNoVec;
    vector< double >        fTMVACutValue;
+   map< unsigned int, double > fTMVACutValueMap;
    double                  fTMVACutValueNoVec;
    vector< bool >          fTMVAOptimumCutValueFound;
+   vector< double >        fSourceStrengthAtOptimum_CU;
 
    string                  fParticleNumberFileName;          // particle numbers are read from this file
-   double                  fOptmizationSourceStrengthCrabUnits; 
+   double                  fOptmizationSourceSignificance;
    double                  fOptmizationFixedSignalEfficiencyMinEnergy;
    double                  fOptmizationFixedSignalEfficiencyAboveMinEnergy;
+   double                  fOptmizationMinSignalEvents;
    double                  fOptmizationMinBackGroundEvents;
    double                  fOptimizationBackgroundAlpha;
    double                  fOptimizationObservingTime_h;
@@ -105,9 +108,15 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    bool     bPlotEfficiencyPlotsPerEnergy;
 
-   double           getTMVACutValueFromSignalEfficiency( double iSignalEfficiency, unsigned int iBin, string iWeightFileName );
+   TH1F*            getEfficiencyHistogram( string iName, TFile *iF );
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
    double           getSignalEfficiency( unsigned int iEbin, double iE_min, double iE_max );
+   double           getTMVACutValue( unsigned int iEnergyBin, double iE_min_log10, double iE_max_log10 );
+   bool             getValuesFromEfficiencyHistograms( double& iMVACut, double& iSignalEfficiency, double& iBackgroundEfficiency,
+                                                       unsigned int iBin, string iWeightFileName );
+   double           getValueFromMap( map< unsigned int, double > iDataMap, double iDefaultData,
+                                     unsigned int iEnergyBin,
+				     double iE_min_log10, double iE_max_log10, string iVariable );
    vector< string > getTrainingVariables( string iFile, vector< bool >& iSpectator  );
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 
                                                   TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
@@ -138,16 +147,19 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool   isBoxCuts() { return fTMVAMethodName_BOXCUTS; }
    bool   IsZombie() { return fIsZombie; }
    void   plotBoxCuts();
-   void   plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4 );
+   void   plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
    void   printSignalEfficiency();
+   void   printSourceStrength_CU();
    void   setDebug( bool iB = false ) { fDebug = iB; }
    void   setIgnoreTheta2Cut( bool iB = false ) { fTMVAIgnoreTheta2Cut = iB; }
-   void   setSensitivityOptimizationParameters( double iSourceStrength = 0.01, double iMinBackgroundEvents = 0., double iBackgroundAlpha = 1./5.,
-                                                double iObservationTime_h = 50. )
-          { fOptmizationSourceStrengthCrabUnits = iSourceStrength; 
+   void   setSensitivityOptimizationParameters( double iSignificance = 5., double iMinEvents = 10., double iObservationTime_h = 50.,
+				                double iMinBackgroundRateRatio = 1./5, double iMinBackgroundEvents = 0. )
+          { fOptmizationSourceSignificance = iSignificance;
+	    fOptmizationMinSignalEvents = iMinEvents;
 	    fOptmizationMinBackGroundEvents = iMinBackgroundEvents; 
-	    fOptimizationBackgroundAlpha = iBackgroundAlpha;
+	    fOptimizationBackgroundAlpha = iMinBackgroundRateRatio;
 	    fOptimizationObservingTime_h = iObservationTime_h; }
+
    void   setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiencyMinEnergy = 1.e99, double iOptmizationFixedSignalEfficiencyAboveMinEnergy = 1. );
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
    void   setPlotEfficiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
@@ -155,11 +167,12 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
    void   setTMVACutValue( double iE = -99. );
+   void   setTMVACutValue( map< unsigned int, double > iMVA );
    void   setTMVAErrorFraction( double iTMVAErrorFraction_min = 0.2 ) { fTMVAErrorFraction_min = iTMVAErrorFraction_min; }
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 12 );
+   ClassDef(VTMVAEvaluator, 14 );
 };
 
 #endif

@@ -117,9 +117,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	unsigned int    fTMVAWeightFileIndex_min;
 	unsigned int    fTMVAWeightFileIndex_max;
 	map< unsigned int, double > fTMVASignalEfficiency;
+	map< unsigned int, double > fTMVA_MVACut;
 	double          fTMVAProbabilityThreshold;
 	string          fTMVAOptimizeSignalEfficiencyParticleNumberFile;
-	double          fTMVAOptimizeSignalEfficiencySourceStrengthCU;
+	double          fTMVAOptimizeSignalEfficiencySignificance_Min;
+	double          fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 	double          fTMVAOptimizeSignalEfficiencyObservationTime_h;
 	double          fTMVAFixedSignalEfficiencyMinEnergy;
 	double          fTMVAFixedSignalEfficiencyAboveMinEnergy;
@@ -284,6 +286,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         void   printCutStatistics() { if( fStats ) fStats->printCutStatistics(); }
 	void   printDirectionCuts();
 	void   printSignalEfficiency();
+	void   printTMVA_MVACut();
         bool   readCuts(string i_cutfilename, int iPrint = 1 );
         void   resetCutValues();
 	void   resetCutStatistics();
@@ -300,6 +303,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,37);
+        ClassDef(VGammaHadronCuts,38);
 };
 #endif

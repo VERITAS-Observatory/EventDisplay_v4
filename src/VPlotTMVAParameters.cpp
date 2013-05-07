@@ -1,5 +1,16 @@
 /*  \class VPlotTMVAParameters
 
+    plot signal and background efficiency, and MVA cut variable for different
+    subarrays from TMVA output files
+
+    Example:
+
+    .L lib/libVAnaSum.so 
+    VPlotTMVAParameters a;
+    a.setSubArrays( "scripts/CTA/subArray.prod1-red.list");
+    a.setDirectories( "$CTA_USER_DATA_DIR/analysis/AnalysisData/cta-ultra3/EffectiveArea-ID2-d20130415/QualityCuts001CU/" );
+    a.initializeWeightFiles( "$CTA_USER_DATA_DIR/analysis/AnalysisData/cta-ultra3/", "TMVA/BDT-ID2-d20130415-0.0/BDT_", 0, 8 );
+
 */
 
 #include "VPlotTMVAParameters.h"
@@ -9,13 +20,15 @@ VPlotTMVAParameters::VPlotTMVAParameters()
     fDataDirectory = "";
 }
 
-void VPlotTMVAParameters::plot()
+void VPlotTMVAParameters::plot( bool iPrint )
 {
    char hname[2000];
    char htitle[2000];
 
    for( unsigned int i = 0; i < hSignalEfficiency.size(); i++ )
    {
+
+// signal and background efficiency
        sprintf( hname, "cTMVA_S_BC_%d", i );
        sprintf( htitle, "signal/background efficiency distribution (energy bin %d)", i );
        TCanvas *c = new TCanvas( hname, htitle, 100+i*20, 100+i*20, 400, 400 );
@@ -31,8 +44,33 @@ void VPlotTMVAParameters::plot()
        if( i < hBackgroundEfficiency.size() && hBackgroundEfficiency[i] && hBackgroundEfficiency[i]->GetEntries() > 0 )
        {
           hBackgroundEfficiency[i]->Draw( "same" );
-	  cout << "Background efficiency in energy bin " << i << ": ";
+	  cout << "\t Background efficiency in energy bin " << i << ": ";
 	  cout << hBackgroundEfficiency[i]->GetMean() << " +- " << hBackgroundEfficiency[i]->GetRMS() << endl;
+       }
+       if( iPrint )
+       {
+          sprintf( hname, "efficiency-%d.eps", i );
+	  c->Print( hname );
+       }
+
+
+// MVA cut variable
+       sprintf( hname, "cTMVA_MVA_%d", i );
+       sprintf( htitle, "MVA cut variable(energy bin %d)", i );
+       TCanvas *d = new TCanvas( hname, htitle, 600+i*20, 100+i*20, 400, 400 );
+       d->SetGridx( 0 );
+       d->SetGridy( 0 );
+
+       if( i < hMVA.size() )
+       {
+          hMVA[i]->Draw();
+	  cout << "\t MVA cut in energy bin " << i << ": ";
+	  cout << hMVA[i]->GetMean() << " +- " << hMVA[i]->GetRMS() << endl;
+       }
+       if( iPrint )
+       {
+          sprintf( hname, "mva-%d.eps", i );
+	  d->Print( hname );
        }
    }
 }
@@ -41,7 +79,11 @@ bool VPlotTMVAParameters::initializeHistograms( unsigned int iWeightFileIndex_mi
 {
    char hname[2000];
 
-   for( unsigned int i = iWeightFileIndex_min; i < iWeightFileIndex_max; i++ )
+   hSignalEfficiency.clear();
+   hBackgroundEfficiency.clear();
+   hMVA.clear();
+
+   for( unsigned int i = iWeightFileIndex_min; i <= iWeightFileIndex_max; i++ )
    {
        sprintf( hname, "hSignalEfficiency_%d", i );
        hSignalEfficiency.push_back( new TH1D( hname, "", 100, 0., 1. ) );
@@ -53,6 +95,12 @@ bool VPlotTMVAParameters::initializeHistograms( unsigned int iWeightFileIndex_mi
        hBackgroundEfficiency.back()->SetXTitle( "efficiency" );
        hBackgroundEfficiency.back()->SetLineWidth( 2 );
        hBackgroundEfficiency.back()->SetLineColor( 2 );
+
+       sprintf( hname, "hMVA_%d", i );
+       hMVA.push_back( new TH1D( hname, "", 100, -1., 1. ) );
+       hMVA.back()->SetXTitle( "MVA variable" );
+       hMVA.back()->SetLineWidth( 2 );
+       hMVA.back()->SetLineColor( 4 );
    }
 
    return true;
@@ -88,6 +136,10 @@ void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVA
 	      if( j < a.getBackgroundEfficiency().size() && j < hBackgroundEfficiency.size() && hBackgroundEfficiency[j] )
 	      {
 	          hBackgroundEfficiency[j]->Fill( a.getBackgroundEfficiency()[j] );
+              }
+	      if( j < a.getTMVACutValue().size() && j < hMVA.size() && hMVA[j] )
+	      {
+	          hMVA[j]->Fill( a.getTMVACutValue()[j] );
               }
            }
         }

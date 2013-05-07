@@ -54,6 +54,7 @@ void VTMVAEvaluator::reset()
    setTMVAThetaCutVariable( false );
    setTMVAErrorFraction();
    fTMVA_EvaluationResult = -99.;
+   fTMVACutValueNoVec = -99.;
 }
 
 /*
@@ -132,6 +133,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    fEnergyCut_Log10TeV_min.clear();
    fEnergyCut_Log10TeV_max.clear();
    fSignalEfficiency.clear();
+   fSourceStrengthAtOptimum_CU.clear();
    vector< unsigned int > iFileNumber;
 
 // number of energy bins
@@ -205,6 +207,11 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
                                                          iEnergyData->fEnergyCut_Log10TeV_min, 
 							 iEnergyData->fEnergyCut_Log10TeV_max ) );
        fBackgroundEfficiency.push_back( -99. );
+       fTMVACutValue.push_back( getTMVACutValue( iWeightFileIndex_min+i,
+						 iEnergyData->fEnergyCut_Log10TeV_min, 
+						 iEnergyData->fEnergyCut_Log10TeV_max ) );
+       fTMVAOptimumCutValueFound.push_back( false );
+       fSourceStrengthAtOptimum_CU.push_back( 0. );
        sprintf( hname, "MVA%d", i );
        fTMVAMethodTag.push_back( hname );
        iF.Close();
@@ -233,25 +240,26 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 
       fTMVAReader.push_back( new TMVA::Reader() );
 
-// make sure that signal efficiency is set correctly
-      if( z >= fSignalEfficiency.size() )
+//////////////////////////////////////////
+// set TMVA cut value 
+// (optimization later)
+
+// fixed signal efficiency
+      if( fTMVACutValueNoVec < -1. && fSignalEfficiencyNoVec > 0. )
       {
-          fSignalEfficiency.push_back( fSignalEfficiencyNoVec );
-	  fBackgroundEfficiency.push_back( -99. );
+	 fTMVACutValue[i] = -99.;
+	 double iB = -99.;
+         getValuesFromEfficiencyHistograms( fTMVACutValue[i], fSignalEfficiency[i], iB, i, iWeightFileName );
       }
-// make sure that MVA cut value is set correctly
-      if( z >= fTMVACutValue.size() )
+// fixed TMVA cut value
+      else if( fTMVACutValueNoVec > -1. )
       {
-	 if( fTMVACutValueNoVec < 0. && fSignalEfficiencyNoVec > 0. )
-	 {
-	     fTMVACutValue.push_back( getTMVACutValueFromSignalEfficiency( fSignalEfficiency.back(), i, iWeightFileName ) );
-         }
-	 else
-	 {
-	    fTMVACutValue.push_back( fTMVACutValueNoVec );
-         }
+	 double iB = -99.;
+	 fSignalEfficiency[i] = -99.;
+         getValuesFromEfficiencyHistograms( fTMVACutValue[i], fSignalEfficiency[i], iB, i, iWeightFileName );
       }
-      if( z >= fTMVAOptimumCutValueFound.size() ) fTMVAOptimumCutValueFound.push_back( false );
+      fTMVAOptimumCutValueFound[i] = false;
+
 
 // weight file for this energy bin
       sprintf( hname, "MVA%d", i );
@@ -360,7 +368,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // get optimal signal efficiency (from maximum signal/noise ratio)
 /////////////////////////////////////////////////////////
 
-      if( fOptmizationSourceStrengthCrabUnits > 0. && fParticleNumberFileName.size() > 0 )
+      if( fParticleNumberFileName.size() > 0 )
       {
 	  ostringstream iFullFileNameRoot;
           iFullFileNameRoot << iWeightFileName << iWeightFileIndex_min+i << ".root";
@@ -434,55 +442,111 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    return true;
 }
 
+TH1F *VTMVAEvaluator::getEfficiencyHistogram( string iName, TFile *iF )
+{
+   if( !iF ) return 0;
+
+   char hname[800];
+// the following naming might have to be adjusted for other methods than BDTs or Boxcuts
+   if( fTMVAMethodName == "BOXCUTS" )
+   {
+      sprintf( hname, "Method_Cuts/%s_%d/MVA_%s_%d_%s", fTMVAMethodName.c_str(), 
+							fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter,
+						        iName.c_str() );
+   }
+   else
+   {
+      sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_%s", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), 
+						      fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter,
+						      iName.c_str() );
+   }
+
+// read signal efficiency histogram
+    TH1F *eff = (TH1F*)iF->Get( hname );
+    if( !eff )
+    {
+        sprintf( hname, "Method_%s/%d/MVA_%d_%s", fTMVAMethodName.c_str(), fTMVAMethodCounter, fTMVAMethodCounter,
+	                                          iName.c_str() );
+	eff = (TH1F*)iF->Get( hname );
+    }
+    if( !eff )
+    {
+        cout << "VTMVAEvaluator::getEfficiencyHistogram() error finding efficiency histogram " << iName;
+	cout << " from " << iF->GetName() << endl;
+	return 0;
+    }
+    return eff;
+}
+
 /* 
 
-   get TMVA cut value for a given signal efficiency
+   get TMVA cut values 
+   (e.g. signal efficiency for a given MVA cut or
+         MVA cut for a given signal efficiency
 
 */
-double VTMVAEvaluator::getTMVACutValueFromSignalEfficiency( double iSignalEfficiency, unsigned int iBin, string iWeightFileName )
+
+bool VTMVAEvaluator::getValuesFromEfficiencyHistograms( double& iMVACut, double& iSignalEfficiency, double& iBackgroundEfficiency,
+                                                       unsigned int iBin, string iWeightFileName )
 {
-    if( iWeightFileName.size() == 0 ) return -99.;
+// make sure that default values are set
+    if( iMVACut > -1. )                   iSignalEfficiency = iBackgroundEfficiency = -99.;
+    else if( iSignalEfficiency > 0. )     iMVACut = iBackgroundEfficiency = -99.;
+    else if( iBackgroundEfficiency > 0. ) iMVACut = iSignalEfficiency = -99.;
+    
+// check file name for consistency
+    if( iWeightFileName.size() == 0 ) return false;
 
     ostringstream iFullFileName;
     iFullFileName << iWeightFileName << iBin  << ".root";
     TFile iTMVAFile( iFullFileName.str().c_str() );
     if( iTMVAFile.IsZombie() )
     {
-       cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency() error reading TMVA root file: " << iFullFileName.str() << endl;
-       return -9999.;
+       cout << "VTMVAEvaluator::getValuesFromEfficiencyHistograms() error reading TMVA root file: " << iFullFileName.str() << endl;
+       return false;
     }
-    char hname[800];
-    sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(),
-                                                      fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
-// read signal efficiency histogram
-    TH1F *effS = (TH1F*)iTMVAFile.Get( hname );
-    if( !effS )
-    {
-        sprintf( hname, "Method_%s/%d/MVA_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodCounter, fTMVAMethodCounter );
-	effS = (TH1F*)iTMVAFile.Get( hname );
-    }
-    if( !effS )
-    {
-        cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency() error finding signal efficiency from " << iFullFileName.str() << endl;
-	return -9999.;
-    }
-    cout << "VTMVAEvaluator::getTMVACutValueFromSignalEfficiency: evaluating " << iTMVAFile.GetName() << endl;
-    cout << "\t method: " << hname << endl;
+    TH1F *effS = getEfficiencyHistogram( "effS", &iTMVAFile );
+    TH1F *effB = getEfficiencyHistogram( "effB", &iTMVAFile );
+    if( !effS || !effB ) return false;
 
+    cout << "VTMVAEvaluator::getValuesFromEfficiencyHistograms: evaluating " << iTMVAFile.GetName() << endl;
+
+// get MVA cut for a given signal efficiency
+    if( iSignalEfficiency > 0. )
+    {
+       iMVACut = effS->GetBinCenter( effS->FindLastBinAbove( iSignalEfficiency ) );
+       iBackgroundEfficiency = effB->GetBinContent( effB->GetXaxis()->FindBin( iMVACut ) );
+
+       cout << "TMVA CUT VALUE FOR SIGNAL EFFICIENCY " << iSignalEfficiency << ": " << iMVACut;
+       cout << " (bin " << effS->FindLastBinAbove( iSignalEfficiency ) << ")" << endl;
+    }
 // get signal efficiency from histogram
-    double iT = effS->GetBinCenter( effS->FindLastBinAbove( iSignalEfficiency ) );
+    else if( iMVACut > -1. )
+    {
+       iSignalEfficiency = effS->GetBinContent( effS->GetXaxis()->FindBin( iMVACut ) );
+       iBackgroundEfficiency = effB->GetBinContent( effB->GetXaxis()->FindBin( iMVACut ) );
 
-    cout << "TMVA CUT VALUE FOR SIGNAL EFFICIENCY " << iSignalEfficiency << ": " << iT;
-    cout << " (bin " << effS->FindLastBinAbove( iSignalEfficiency ) << ")" << endl;
+       cout << "Signal efficiency for TMVA cut value " << iMVACut << ": " << iSignalEfficiency;
+       cout << " (bin " << effS->GetXaxis()->FindBin( iMVACut ) << ")" << endl;
+    }
+// get MVA cut for a given background efficiency
+    else if( iBackgroundEfficiency > 0. )
+    {
+       iMVACut = effB->GetBinCenter( effB->FindLastBinAbove( iBackgroundEfficiency ) );
+       iSignalEfficiency = effS->GetBinContent( effS->GetXaxis()->FindBin( iMVACut ) );
+
+       cout << "TMVA CUT VALUE FOR SIGNAL EFFICIENCY " << iBackgroundEfficiency << ": " << iMVACut;
+       cout << " (bin " << effB->FindLastBinAbove( iBackgroundEfficiency ) << ")" << endl;
+    } 
 
     iTMVAFile.Close();
 
-    return iT;
+    return true;
 }
 
 /*!
 
-    evaluate this event and return a probability
+    evaluate this event and return passed/not passed
 
 */
 
@@ -525,6 +589,7 @@ bool VTMVAEvaluator::evaluate()
 
    if( iEnergybin < fTMVAReader.size() && fTMVAReader[iEnergybin] )
    {
+// box cuts
       if( isBoxCuts() )
       {
 	 if( iEnergybin < fSignalEfficiency.size() && fSignalEfficiency[iEnergybin] > 0. )
@@ -842,7 +907,7 @@ void VTMVAEvaluator::plotBoxCuts()
      }
 }
 
-void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYmin )
+void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYmin, double iMVA_min, double iMVA_max )
 {
    if( fSignalEfficiency.size() == 0 )
    {
@@ -864,8 +929,14 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
 
 // fill graphs
    TGraphAsymmErrors *igSignal = new TGraphAsymmErrors( 1 );
+   TGraphAsymmErrors *igSignalOpt = new TGraphAsymmErrors( 1 );
    TGraphAsymmErrors *igBck = 0;
-   if( fBackgroundEfficiency.size() > 0 ) igBck = new TGraphAsymmErrors( 1 );
+   TGraphAsymmErrors *igBckOpt = 0;
+   if( fBackgroundEfficiency.size() > 0 )
+   {
+      igBck = new TGraphAsymmErrors( 1 );
+      igBckOpt = new TGraphAsymmErrors( 1 );
+   }
    TGraphAsymmErrors *igCVa = 0;
    TGraphAsymmErrors *igCVaOpt = 0;
    if( fTMVACutValue.size() > 0 )
@@ -876,41 +947,54 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
    unsigned int z_opt = 0;
    unsigned int z_noOpt = 0;
 
-   bool bNullEntry = false;
    double iMinBck = 1.;
 
    for( unsigned int i = 0; i < fSignalEfficiency.size(); i++ )
    {
-      double iEnergy = log10( 0.5*( TMath::Power( 10., fEnergyCut_Log10TeV_min[i] ) + TMath::Power( 10., fEnergyCut_Log10TeV_max[i] ) ) );
-      igSignal->SetPoint( i, iEnergy, fSignalEfficiency[i] );
-      igSignal->SetPointEXlow( i, iEnergy - fEnergyCut_Log10TeV_min[i] );
-      igSignal->SetPointEXhigh( i, fEnergyCut_Log10TeV_max[i] - iEnergy );
-      if( igBck && i < fBackgroundEfficiency.size() )
+      double iEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
+                                                                          fSpectralIndexForEnergyWeighting );
+      if( i < fTMVAOptimumCutValueFound.size() && i < fTMVACutValue.size()
+       && fSignalEfficiency[i] > 0. && fBackgroundEfficiency[i] > 0. )
       {
-         igBck->SetPoint( i, iEnergy, fBackgroundEfficiency[i] );
-	 igBck->SetPointEXlow( i, iEnergy - fEnergyCut_Log10TeV_min[i] );
-	 igBck->SetPointEXhigh( i, fEnergyCut_Log10TeV_max[i] - iEnergy );
+          if( fTMVAOptimumCutValueFound[i] )
+	  {
+	      igSignal->SetPoint( z_opt, iEnergy, fSignalEfficiency[i] );
+	      igSignal->SetPointEXlow( z_opt, iEnergy - fEnergyCut_Log10TeV_min[i] );
+	      igSignal->SetPointEXhigh( z_opt, fEnergyCut_Log10TeV_max[i] - iEnergy );
+	      if( igBck && i < fBackgroundEfficiency.size() )
+	      {
+	         igBck->SetPoint( z_opt, iEnergy, fBackgroundEfficiency[i] );
+	         igBck->SetPointEXlow( z_opt, iEnergy - fEnergyCut_Log10TeV_min[i] );
+	         igBck->SetPointEXhigh( z_opt, fEnergyCut_Log10TeV_max[i] - iEnergy );
+	      }
+	      if( igCVa )
+	      {
+		  igCVa->SetPoint( z_opt, iEnergy, fTMVACutValue[i] );
+		  igCVa->SetPointEXlow( z_opt, iEnergy - fEnergyCut_Log10TeV_min[i] );
+		  igCVa->SetPointEXhigh( z_opt, fEnergyCut_Log10TeV_max[i] - iEnergy );
+              }
+	      z_opt++;
+           }
+	   else if( fTMVACutValue[i] > -90. )
+	   {
+	      igSignalOpt->SetPoint( z_noOpt, iEnergy, fSignalEfficiency[i] );
+	      igSignalOpt->SetPointEXlow( z_noOpt, iEnergy - fEnergyCut_Log10TeV_min[i] );
+	      igSignalOpt->SetPointEXhigh( z_noOpt, fEnergyCut_Log10TeV_max[i] - iEnergy );
+	      if( igBckOpt && i < fBackgroundEfficiency.size() )
+	      {
+	         igBckOpt->SetPoint( z_noOpt, iEnergy, fBackgroundEfficiency[i] );
+	         igBckOpt->SetPointEXlow( z_noOpt, iEnergy - fEnergyCut_Log10TeV_min[i] );
+	         igBckOpt->SetPointEXhigh( z_noOpt, fEnergyCut_Log10TeV_max[i] - iEnergy );
+	      }
+	      if( igCVaOpt && i < fTMVACutValue.size() )
+	      {
+		 igCVaOpt->SetPoint( z_noOpt, iEnergy, fTMVACutValue[i] );
+		 igCVaOpt->SetPointEXlow( z_noOpt, iEnergy - fEnergyCut_Log10TeV_min[i] );
+		 igCVaOpt->SetPointEXhigh( z_noOpt, fEnergyCut_Log10TeV_max[i] - iEnergy );
+              }
+	      z_noOpt++;
+	   }
       }
-      if( igCVa && igCVaOpt && i < fTMVACutValue.size() && i < fTMVAOptimumCutValueFound.size() )
-      {
-	 if( fTMVAOptimumCutValueFound[i] )
-	 {
-	    igCVa->SetPoint( z_noOpt, iEnergy, fTMVACutValue[i] );
-	    igCVa->SetPointEXlow( z_noOpt, iEnergy - fEnergyCut_Log10TeV_min[i] );
-	    igCVa->SetPointEXhigh( z_noOpt, fEnergyCut_Log10TeV_max[i] - iEnergy );
-	    z_noOpt++;
-         }
-	 else
-	 {
-	    igCVaOpt->SetPoint( z_opt, iEnergy, fTMVACutValue[i] );
-	    igCVaOpt->SetPointEXlow( z_opt, iEnergy - fEnergyCut_Log10TeV_min[i] );
-	    igCVaOpt->SetPointEXhigh( z_opt, fEnergyCut_Log10TeV_max[i] - iEnergy );
-	    z_opt++;
-         }
-      }
-
-      if( fSignalEfficiency[i] <= 0. || fBackgroundEfficiency[i] <= 0. ) bNullEntry = true;
-
       if( fBackgroundEfficiency[i] < iMinBck ) iMinBck = fBackgroundEfficiency[i];
    }
 
@@ -919,8 +1003,8 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
    iCanvas->SetGridx( 0 );
    iCanvas->SetGridy( 0 );
    iCanvas->SetLeftMargin( 0.13 );
-   if( !bNullEntry && iLogY ) iCanvas->SetLogy();
-   else if( !iLogY )          iCanvas->SetLogy( 0 );
+   if( iLogY ) iCanvas->SetLogy();
+   else        iCanvas->SetLogy( 0 );
    iCanvas->Draw();
 
    TH1D *hnull = new TH1D( "hnullcSignalAndBackgroundEfficiencies", "", 100, fEnergyCut_Log10TeV_min[0], fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
@@ -932,10 +1016,14 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
    plot_nullHistogram( iCanvas, hnull, false, false, 1.5, fEnergyCut_Log10TeV_min[0], fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
 
    setGraphPlottingStyle( igSignal, 1, 1., 20 );
+   setGraphPlottingStyle( igSignalOpt, 1, 1., 24 );
    if( igBck ) setGraphPlottingStyle( igBck, 2, 1., 21 );
+   if( igBckOpt > 0 ) setGraphPlottingStyle( igBckOpt, 2, 1., 25 );
 
    igSignal->Draw( "pl" );
+   if( z_noOpt > 0 ) igSignalOpt->Draw( "pl" );
    if( igBck ) igBck->Draw( "pl" );
+   if( igBckOpt && z_noOpt > 0 ) igBckOpt->Draw( "pl" );
 
 // plot MVA cut value
    if( igCVa )
@@ -948,20 +1036,14 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
       hnull->SetStats( 0 );
       hnull->SetXTitle( "energy [TeV]" );
       hnull->SetYTitle( "MVA cut variable" );
-      double iMinMax = 1.e99;
-      for( unsigned int i = 0; i < fTMVACutValue.size(); i++ ) if( fTMVACutValue[i] < iMinMax ) iMinMax = fTMVACutValue[i];
-      if( iMinMax > 0. ) iMinMax *= 0.5;
-      else               iMinMax *= 1.5;
-      hnull->SetMinimum( iMinMax );
-      for( unsigned int i = 0; i < fTMVACutValue.size(); i++ ) if( fTMVACutValue[i] > iMinMax ) iMinMax = fTMVACutValue[i];
-      if( iMinMax > 0. ) iMinMax *= 1.5;
-      else               iMinMax *= 0.5;
-      hnull->SetMaximum( iMinMax );
-      plot_nullHistogram( iCanvas, hnull, false, false, 1.3, fEnergyCut_Log10TeV_min[0], fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
+      hnull->SetMinimum( iMVA_min );
+      hnull->SetMaximum( iMVA_max );
+      plot_nullHistogram( iCanvas, hnull, false, false, 1.3, fEnergyCut_Log10TeV_min[0], 
+                          fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] );
 
       setGraphPlottingStyle( igCVa, 1, 1., 20 );
       igCVa->Draw( "p" );
-      if( igCVaOpt && z_opt > 0 )
+      if( igCVaOpt && z_noOpt > 0 )
       {
 	 setGraphPlottingStyle( igCVaOpt, 1, 1., 24 );
 	 igCVaOpt->Draw( "p" );
@@ -985,16 +1067,31 @@ void VTMVAEvaluator::setSignalEfficiency( map< unsigned int, double > iSignalEff
    fSignalEfficiencyNoVec = 1.;
 }
 
+void VTMVAEvaluator::setTMVACutValue( map< unsigned int, double > iMVA )
+{
+   fTMVACutValueMap = iMVA;
+
+   fTMVACutValueNoVec = 1.;
+}
+
 void VTMVAEvaluator::setTMVACutValue( double iE )
 {
-   for( unsigned int i = 0; i < fTMVACutValue.size(); i++ )
-   {
-       fTMVACutValue[i] = iE;
-   }
-
    fTMVACutValueNoVec = iE;
 }
 
+void VTMVAEvaluator::printSourceStrength_CU()
+{
+   for( unsigned int i = 0; i < fSourceStrengthAtOptimum_CU.size(); i++ )
+   {
+      if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() )
+      {
+         cout << "E [" << showpoint << setprecision( 3 ) << fEnergyCut_Log10TeV_min[i] << "," << fEnergyCut_Log10TeV_max[i] << "] TeV";
+	 cout << " (bin " << i << "):\t ";
+      }
+      cout << fSourceStrengthAtOptimum_CU[i] << " CU " << endl;
+   }
+}
+       
 void VTMVAEvaluator::printSignalEfficiency()
 {
    cout << "VTMVAEvaluator: energy dependent signal (background) efficiency: " << endl;
@@ -1014,7 +1111,7 @@ void VTMVAEvaluator::printSignalEfficiency()
       {
          cout << "\t MVACut: " << fTMVACutValue[i];
       }
-      if( i < fTMVAOptimumCutValueFound.size() && fOptmizationSourceStrengthCrabUnits > 0. && fParticleNumberFileName.size() > 0 )
+      if( i < fTMVAOptimumCutValueFound.size() && fParticleNumberFileName.size() > 0 )
       { 
          if( fTMVAOptimumCutValueFound[i] ) cout << " (optimum reached)";
 	 else                               cout << " (no optimum reached)";
@@ -1046,7 +1143,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
        return false;
    }
    cout << "TVMAEvaluator::getOptimalSignalEfficiency reading: " << fParticleNumberFileName << endl;
-// get the NOn and Noff graphs (signal + background)
+// get the NOn (signal + background) and NOff (background) graphs
    TGraph *i_on = (TGraph*)iPN.Get( "gNOn" );
    if( !i_on ) i_on = (TGraph*)iPN.Get( "gSignalRate" );
    TGraph *i_of = (TGraph*)iPN.Get( "gNOff" );
@@ -1064,7 +1161,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    double iSpectralWeightedMeanEnergy_TeV = -99.;
    if( iEnergyBin < fEnergyCut_Log10TeV_min.size() && iEnergyBin < fEnergyCut_Log10TeV_max.size() )
    {
-      iMeanEnergy_TeV = 0.5*( TMath::Power( 10., fEnergyCut_Log10TeV_min[iEnergyBin] ) + TMath::Power( 10., fEnergyCut_Log10TeV_max[iEnergyBin] ));
+      iMeanEnergy_TeV = 0.5*( TMath::Power( 10., fEnergyCut_Log10TeV_min[iEnergyBin] )
+                            + TMath::Power( 10., fEnergyCut_Log10TeV_max[iEnergyBin] ));
       iMeanEnergy_TeV = TMath::Log10( iMeanEnergy_TeV ); // log10 energy
 // get spectral weighed mean
       iSpectralWeightedMeanEnergy_TeV = VMathsandFunctions::getMeanEnergyInBin( 2, fEnergyCut_Log10TeV_min[iEnergyBin],
@@ -1100,13 +1198,11 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    cout << "VTVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
    cout << " non = " << Non;
    cout << " noff = " << Nof;
-   cout << " ndif = " << Ndif << " (" << Ndif*fOptmizationSourceStrengthCrabUnits << ")" << endl;
+   cout << " ndif = " << Ndif << " (" << Ndif << ")" << endl;
    cout << "VTVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
    cout << " (energy bin " << iEnergyBin << "," << TMath::Power( 10., iMeanEnergy_TeV ) << " [TeV],";
    cout << " weighted mean energy " << TMath::Power( 10., iSpectralWeightedMeanEnergy_TeV ) << " [TeV] )";
    cout << endl;
-// apply source strength
-   Ndif *= fOptmizationSourceStrengthCrabUnits;
        
 /////////////////////////////////////////////////////////////////
 // get signal and background efficiency histograms from TMVA files
@@ -1119,49 +1215,18 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       cout << " (energy bin " << iEnergyBin << ")" << endl;
       return false;
    }
-// the following naming might have to be adjusted for other methods than BDTs or Boxcuts
-   char hname[800];
-   if( fTMVAMethodName == "BOXCUTS" )
-   {
-      sprintf( hname, "Method_Cuts/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), 
-							  fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
-   }
-   else
-   {
-      sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), 
-							fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
-   }
-   TH1F *effS = (TH1F*)iTMVAFile.Get( hname );
-   if( !effS )
-   {
-      sprintf( hname, "Method_%s/%d/MVA_%d_effS", fTMVAMethodName.c_str(), fTMVAMethodCounter, fTMVAMethodCounter );
-      effS = (TH1F*)iTMVAFile.Get( hname );
-   }
-   if( fTMVAMethodName == "BOXCUTS" )
-   {
-      sprintf( hname, "Method_Cuts/%s_%d/MVA_%s_%d_effB", fTMVAMethodName.c_str(), 
-							  fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
-   }
-   else
-   {
-      sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_effB", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), 
-							fTMVAMethodCounter, fTMVAMethodName.c_str(), fTMVAMethodCounter );
-   }
-   TH1F *effB = (TH1F*)iTMVAFile.Get( hname );
-   if( !effB )
-   {
-      sprintf( hname, "Method_%s/%d/MVA_%d_effB", fTMVAMethodName.c_str(), fTMVAMethodCounter , fTMVAMethodCounter );
-      effB = (TH1F*)iTMVAFile.Get( hname );
-   }
+// get efficiency histograms
+   TH1F *effS = getEfficiencyHistogram( "effS", &iTMVAFile );
+   TH1F *effB = getEfficiencyHistogram( "effB", &iTMVAFile );
    if( !effS || !effB )
    {
       cout << "VTVMAEvaluator::getOptimalSignalEfficiency error:" << endl;
       cout << " cannot find signal and/or background efficiency histogram(s)" << endl;
       cout << effS << "\t" << effB << endl;
-      cout << hname << endl;
       return false;
    }
 // evaluate errors on determination of box cut efficiency and remove bins with large errors
+   char hname[800];
    if( fTMVAMethodName != "BOXCUTS" )
    {
       sprintf( hname, "Method_%s/%s_%d/MVA_%s_%d_B", fTMVAMethodName.c_str(), fTMVAMethodName.c_str(), 
@@ -1194,137 +1259,213 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    }
    
    cout << "VTVMAEvaluator::getOptimalSignalEfficiency() optimization parameters: ";
-   cout << fOptmizationSourceStrengthCrabUnits << " CU signal source; ";
    cout << "fix signal efficiency to " << fOptmizationFixedSignalEfficiencyAboveMinEnergy;
    cout << " above energy bin " << fOptmizationFixedSignalEfficiencyMinEnergy << endl;
-//   cout << "at least " << fOptimzationMinSignalEvents << "/" << fOptmizationMinBackGroundEvents << " signal/background events required";
    cout << " (alpha: " << fOptimizationBackgroundAlpha << ")" << endl;
 
-//////////////////////////////////////////////////////
-// now loop over signal and background efficiency levels
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
    double i_SignalEfficiency_AtMaximum = -99.;
    double i_TMVACutValue_AtMaximum = -99.;
    double i_BackgroundEfficiency_AtMaximum = -99.;
    double i_Signal_to_sqrtNoise = 0.;
    double i_Signal_to_sqrtNoise_atMaximum = 0.;
-
-   TGraph *iGSignal_to_sqrtNoise = new TGraph( 1 );
-   TGraph *iGSignalEvents        = new TGraph( 1 );
-   TGraph *iGBackgroundEvents    = new TGraph( 1 );
-
-   int z = 0;
-   int z_SB = 0;
-   for( int i = 1; i < effS->GetNbinsX(); i++ )
-   {
-      if( effB->GetBinContent( i ) > 0. && Nof > 0. )
-      {
-	 if( fOptimizationBackgroundAlpha > 0. )
-	 {
-	    i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
-								   effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
-								   fOptimizationBackgroundAlpha );
-         }
-	 else i_Signal_to_sqrtNoise = 0.;
-	 if( fDebug )
-	 {
-	    cout << "___________________________________________________________" << endl;
-	    cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t";
-	    cout << Nof << "\t" << effB->GetBinContent( i ) << "\t";
-	    cout << Ndif << endl;
-	    cout << "\t" << effS->GetBinContent( i ) * Ndif * fOptmizationSourceStrengthCrabUnits;
-	    cout << "\t" << effS->GetBinContent( i ) * Ndif * fOptmizationSourceStrengthCrabUnits + effB->GetBinContent( i ) * Nof;
-	    cout << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof << "\t" << effB->GetBinContent( i ) * Nof << endl;
-         }
-	 if( effS->GetBinCenter( i ) > 0. && effS->GetBinContent( i ) * Ndif > 0. )
-	 {
-	    iGSignalEvents->SetPoint( z_SB, effS->GetBinCenter( i ),  effS->GetBinContent( i ) * Ndif );
-	    iGBackgroundEvents->SetPoint( z_SB, effS->GetBinCenter( i ), effB->GetBinContent( i ) * Nof );
-	    z_SB++;
-         }
-// check that a minimum number of off events is available
-         if( effB->GetBinContent( i ) * Nof < fOptmizationMinBackGroundEvents )
-	 {
-	    if( fDebug ) 
-	    {
-	       cout << "\t number of background events lower than ";
-	       cout << fOptmizationMinBackGroundEvents << ": setting signal/sqrt(noise) to 0; bin " << i << endl;
-            }
-	    i_Signal_to_sqrtNoise = 0.;
-         }
-	 if( iGSignal_to_sqrtNoise && i_Signal_to_sqrtNoise > 1.e-2 )
-	 {
-	    iGSignal_to_sqrtNoise->SetPoint( z, effS->GetBinCenter( i ), i_Signal_to_sqrtNoise );
-	    if( fDebug ) cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << endl;
-	    z++;
-         }
-	 if( fDebug )
-	 {
-	    cout << "\t z " << z << "\t" << i_Signal_to_sqrtNoise << endl;
-	    cout << "___________________________________________________________" << endl;
-         }
-      }
-   }
-// fill a histogram from these values and smooth it
+   double i_SourceStrength_atMaximum = 0.;
+   TGraph *iGSignal_to_sqrtNoise = 0;
+   TGraph *iGSignalEvents        = 0;
+   TGraph *iGBackgroundEvents    = 0;
    TGraph *iGSignal_to_sqrtNoise_Smooth = 0;
-   double i_xmax = -99.;
-   if( iGSignal_to_sqrtNoise )
+
+// loop over different source strenghts (in Crab Units)
+   unsigned int iSourceStrengthStepSizeN = (unsigned int)((log10( 30. ) - log10( 0.001 )) / 0.005);
+   for( unsigned int s = 0; s < iSourceStrengthStepSizeN; s++ )
    {
-      TGraphSmooth *iGSmooth = new TGraphSmooth("s");
-      iGSignal_to_sqrtNoise_Smooth = iGSmooth->SmoothKern( iGSignal_to_sqrtNoise, "normal", 0.05, 100 );
-// get maximum values
-      double x = 0.;
-      double y = 0.;
-      double i_ymax = -99.;
-      for( int i = 0; i < iGSignal_to_sqrtNoise_Smooth->GetN(); i++ )
+       double iSourceStrength = log10( 0.001 ) + s * 0.005;
+       iSourceStrength = TMath::Power( 10., iSourceStrength );
+
+// source events
+       Ndif = (Non - Nof) * iSourceStrength;
+
+// first quick pass to see if there is a change of reaching the required fOptmizationSourceSignificance
+      bool bPassed = false;
+      for( int i = 1; i < effS->GetNbinsX(); i++ )
       {
-         iGSignal_to_sqrtNoise_Smooth->GetPoint( i, x, y );
-	 if( y > i_ymax )
+	 if( effB->GetBinContent( i ) > 0. && Nof > 0. )
 	 {
-	    i_ymax = y;
-	    i_xmax = x;
-         }
+	    if( fOptimizationBackgroundAlpha > 0. )
+	    {
+	       i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
+								      effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
+								      fOptimizationBackgroundAlpha );
+// check significance criteria
+	       if( i_Signal_to_sqrtNoise > fOptmizationSourceSignificance )
+	       {
+	           bPassed = true;
+		   break;
+               }
+	    }
+	    else break;
+          }
       }
-      i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->FindBin( i_xmax ) );
-      i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effB->FindBin( i_xmax ) );
-      i_TMVACutValue_AtMaximum         = i_xmax;
-      i_Signal_to_sqrtNoise_atMaximum  = i_ymax;
-          
-// make sure that signal efficency is > 0 (and 1 for the case that there is no maximum found)
-      if( i_Signal_to_sqrtNoise_atMaximum < 1.e-3 )
+      if( !bPassed ) continue;
+
+//////////////////////////////////////////////////////
+// now loop over signal and background efficiency levels
+      i_SignalEfficiency_AtMaximum = -99.;
+      i_TMVACutValue_AtMaximum = -99.;
+      i_BackgroundEfficiency_AtMaximum = -99.;
+      i_Signal_to_sqrtNoise = 0.;
+      i_Signal_to_sqrtNoise_atMaximum = 0.;
+      i_SourceStrength_atMaximum = 0.;
+
+      iGSignal_to_sqrtNoise = new TGraph( 1 );
+      iGSignalEvents        = new TGraph( 1 );
+      iGBackgroundEvents    = new TGraph( 1 );
+
+      int z = 0;
+      int z_SB = 0;
+      for( int i = 1; i < effS->GetNbinsX(); i++ )
       {
-         cout << "VTMVAEvaluator::optimizeSensitivity: signal/sqrt(bck) too small at maximum, try previous bin" << endl;
+	 if( effB->GetBinContent( i ) > 0. && Nof > 0. )
+	 {
+	    if( fOptimizationBackgroundAlpha > 0. )
+	    {
+	       i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
+								      effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
+								      fOptimizationBackgroundAlpha );
+	    }
+	    else i_Signal_to_sqrtNoise = 0.;
+	    if( fDebug )
+	    {
+	       cout << "___________________________________________________________" << endl;
+	       cout << i << "\t" << Non << "\t" << effS->GetBinContent( i )  << "\t";
+	       cout << Nof << "\t" << effB->GetBinContent( i ) << "\t";
+	       cout << Ndif << endl;
+	       cout << "\t" << effS->GetBinContent( i ) * Ndif;
+	       cout << "\t" << effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof;
+	       cout << "\t" << effS->GetBinContent( i ) * Non + effB->GetBinContent( i ) * Nof;
+	       cout << "\t" << effB->GetBinContent( i ) * Nof << endl;
+	    }
+	    if( effS->GetBinContent( i ) * Ndif > 0. )
+	    {
+	       iGSignalEvents->SetPoint( z_SB, effS->GetBinCenter( i ),  effS->GetBinContent( i ) * Ndif );
+	       iGBackgroundEvents->SetPoint( z_SB, effS->GetBinCenter( i ), effB->GetBinContent( i ) * Nof );
+	       z_SB++;
+	    }
+// check that a minimum number of off events is available
+	    if( effB->GetBinContent( i ) * Nof < fOptmizationMinBackGroundEvents )
+	    {
+	       if( fDebug ) 
+	       {
+		  cout << "\t number of background events lower than ";
+		  cout << fOptmizationMinBackGroundEvents << ": setting signal/sqrt(noise) to 0; bin " << i << endl;
+	       }
+	       i_Signal_to_sqrtNoise = 0.;
+	    }
+	    if( iGSignal_to_sqrtNoise && i_Signal_to_sqrtNoise > 1.e-2 )
+	    {
+	       iGSignal_to_sqrtNoise->SetPoint( z, effS->GetBinCenter( i ), i_Signal_to_sqrtNoise );
+	       if( fDebug ) cout << "\t SET " << z << "\t" << effS->GetBinCenter( i ) << "\t" << i_Signal_to_sqrtNoise << endl;
+	       z++;
+	    }
+	    if( fDebug )
+	    {
+	       cout << "\t z " << z << "\t" << i_Signal_to_sqrtNoise << endl;
+	       cout << "___________________________________________________________" << endl;
+	    }
+	 }
+      }
+// fill a histogram from these values and smooth it
+      double i_xmax = -99.;
+      if( iGSignal_to_sqrtNoise )
+      {
+	 TGraphSmooth *iGSmooth = new TGraphSmooth("s");
+	 iGSignal_to_sqrtNoise_Smooth = iGSmooth->SmoothKern( iGSignal_to_sqrtNoise, "normal", 0.05, 100 );
+// get maximum values
+	 double x = 0.;
+	 double y = 0.;
+	 double i_ymax = -99.;
+	 for( int i = 0; i < iGSignal_to_sqrtNoise_Smooth->GetN(); i++ )
+	 {
+	    iGSignal_to_sqrtNoise_Smooth->GetPoint( i, x, y );
+	    if( y > i_ymax )
+	    {
+	       i_ymax = y;
+	       i_xmax = x;
+	    }
+	 }
+	 i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->FindBin( i_xmax ) );
+	 i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effB->FindBin( i_xmax ) );
+	 i_TMVACutValue_AtMaximum         = i_xmax;
+	 i_Signal_to_sqrtNoise_atMaximum  = i_ymax;
+	 i_SourceStrength_atMaximum       = iSourceStrength;
+
+// make sure that signal efficency is > 0 (and 1 for the case that there is no maximum found)
+	 if( i_Signal_to_sqrtNoise_atMaximum < 1.e-9 )
+	 {
+	    cout << "VTMVAEvaluator::optimizeSensitivity: signal/sqrt(bck) too small at maximum, try previous bin" << endl;
 // first try: take previous bin:
-         if( iEnergyBin > 0 )
-	 {
-	    i_SignalEfficiency_AtMaximum     = fSignalEfficiency[iEnergyBin-1];
-	    i_TMVACutValue_AtMaximum         = fTMVACutValue[iEnergyBin-1];
-	    i_BackgroundEfficiency_AtMaximum = fBackgroundEfficiency[iEnergyBin-1];
-         }
-	 else
-	 {
-	    i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->GetMaximumBin() );
-	    i_TMVACutValue_AtMaximum         = effS->GetBinCenter( effS->GetMaximumBin() );
-	    i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effS->GetMaximumBin() );
-         }
-      } 
-   }
+	    if( iEnergyBin > 0 )
+	    {
+	       i_SignalEfficiency_AtMaximum     = fSignalEfficiency[iEnergyBin-1];
+	       i_TMVACutValue_AtMaximum         = fTMVACutValue[iEnergyBin-1];
+	       i_BackgroundEfficiency_AtMaximum = fBackgroundEfficiency[iEnergyBin-1];
+	    }
+	    else
+	    {
+	       i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->GetMaximumBin() );
+	       i_TMVACutValue_AtMaximum         = effS->GetBinCenter( effS->GetMaximumBin() );
+	       i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effS->GetMaximumBin() );
+	    }
+	 } 
+      }
 // check if value if really at the optimum or if information is missing from background efficiency curve
 // (check if maximum was find in the last bin or if next bin content is zero)
-   if( ( effB->FindBin( i_xmax ) + 1  < effB->GetNbinsX() && effB->GetBinContent( effB->FindBin( i_xmax ) + 1 ) < 1.e-10 )
-      || ( effB->FindBin( i_xmax ) == effB->GetNbinsX() ) )
-   {
-       cout << "VTMVAEvaluator::optimizeSensitivity: no optimum found" << endl;
-       cout << "\t sampling of background cut efficiency not sufficient" << endl;
-       if( effB->FindBin( i_xmax ) + 1  < effB->GetNbinsX() )
+      if( ( effB->FindBin( i_xmax ) + 1  < effB->GetNbinsX() && effB->GetBinContent( effB->FindBin( i_xmax ) + 1 ) < 1.e-10 )
+	 || ( effB->FindBin( i_xmax ) == effB->GetNbinsX() ) )
+      {
+          if( fDebug )
+	  {
+	     cout << "VTMVAEvaluator::optimizeSensitivity: no optimum found" << endl;
+	     cout << "\t sampling of background cut efficiency not sufficient" << endl;
+	     if( effB->FindBin( i_xmax ) + 1  < effB->GetNbinsX() )
+	     {
+		cout << "\t bin " << effB->FindBin( i_xmax ) << "\t" << " bin content ";
+		cout << effB->GetBinContent( effB->FindBin( i_xmax ) + 1 ) << endl;
+	     }
+          }
+	  if( iEnergyBin < fTMVAOptimumCutValueFound.size() ) fTMVAOptimumCutValueFound[iEnergyBin] = false;
+      }
+      else
+      {
+	 if( iEnergyBin < fTMVAOptimumCutValueFound.size() ) fTMVAOptimumCutValueFound[iEnergyBin] = true;
+      }
+
+// check detection criteria
+      if(  i_Signal_to_sqrtNoise_atMaximum > fOptmizationSourceSignificance
+        && Ndif < fOptmizationMinSignalEvents ) 
+	{
+	    cout << "\t passed significance but not signal events criterium";
+	    cout << " (" << iSourceStrength << " CU): ";
+	    cout << "sig " << i_Signal_to_sqrtNoise_atMaximum;
+	    cout << ", Ndif " << Ndif << endl;
+        }
+      if(  i_Signal_to_sqrtNoise_atMaximum > fOptmizationSourceSignificance
+        && Ndif > fOptmizationMinSignalEvents ) break;
+
+       if( s != iSourceStrengthStepSizeN - 1 )
        {
-	  cout << "\t bin " << effB->FindBin( i_xmax ) << "\t" << " bin content " << effB->GetBinContent( effB->FindBin( i_xmax ) + 1 ) << endl;
+	  if( iGSignal_to_sqrtNoise ) delete iGSignal_to_sqrtNoise;
+	  if( iGSignalEvents ) delete iGSignalEvents;
+	  if( iGBackgroundEvents ) delete iGBackgroundEvents;
+	  if( iGSignal_to_sqrtNoise_Smooth ) delete iGSignal_to_sqrtNoise_Smooth;
        }
-       if( iEnergyBin < fTMVAOptimumCutValueFound.size() ) fTMVAOptimumCutValueFound[iEnergyBin] = false;
-   }
-   else
-   {
-      if( iEnergyBin < fTMVAOptimumCutValueFound.size() ) fTMVAOptimumCutValueFound[iEnergyBin] = true;
-   }
+   } // loop over source strength
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 // fix signal efficiency above a certain energy
    if( fEnergyCut_Log10TeV_min[iEnergyBin] >= fOptmizationFixedSignalEfficiencyMinEnergy )
    {
@@ -1351,14 +1492,21 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    } 
    else
    {
-      cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum is ";
+      cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum (";
+      cout << i_SourceStrength_atMaximum << " CU) is ";
       cout << i_SignalEfficiency_AtMaximum << " with a significance of " << i_Signal_to_sqrtNoise_atMaximum << endl;
+      cout << "\t MVA parameter: " << i_TMVACutValue_AtMaximum;
+      cout << ", background efficiency: " << i_BackgroundEfficiency_AtMaximum << endl;
    }
+////////////////////////////////////////////////////////////////
 
+// fill results into data vectors
    if( iEnergyBin < fSignalEfficiency.size() )     fSignalEfficiency[iEnergyBin]     = i_SignalEfficiency_AtMaximum;
    if( iEnergyBin < fBackgroundEfficiency.size() ) fBackgroundEfficiency[iEnergyBin] = i_BackgroundEfficiency_AtMaximum;
    if( iEnergyBin < fTMVACutValue.size() )         fTMVACutValue[iEnergyBin]         = i_TMVACutValue_AtMaximum;
+   if( iEnergyBin < fSourceStrengthAtOptimum_CU.size() ) fSourceStrengthAtOptimum_CU[iEnergyBin] = i_SourceStrength_atMaximum;
 
+// plot optimziation procedure and event numbers
    if( bPlotEfficiencyPlotsPerEnergy )
    {
       plotEfficiencyPlotsPerEnergy( iEnergyBin, iGSignal_to_sqrtNoise, iGSignal_to_sqrtNoise_Smooth,
@@ -1459,13 +1607,31 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
       iCanvas->SetGridx( 0 );
       iCanvas->SetGridy( 0 );
 
-      iGBackgroundEvents->SetTitle( "" );
-      setGraphPlottingStyle( iGBackgroundEvents, 1, 1., 20 );
+      sprintf( hname, "hBC_%d", iBin );
+      TH1D *hnull = new TH1D( hname, "", 100, -1., 1. );
+      hnull->SetXTitle( "cut value" );
+      hnull->SetYTitle( "number of events" );
+      hnull->SetMinimum( 1.e-3 );
+      double x = 0.;
+      double y = 0.;
+      double y_max = 0.;
+      for( int i = 0; i < iGBackgroundEvents->GetN(); i++ )
+      {
+          iGBackgroundEvents->GetPoint( i, x, y );
+	  if( y > y_max ) y_max = y;
+      }
+      for( int i = 0; i < iGSignalEvents->GetN(); i++ )
+      {
+          iGSignalEvents->GetPoint( i, x, y );
+	  if( y > y_max ) y_max = y;
+      }
+      hnull->SetMaximum( y_max * 1.5 );
+      hnull->SetStats( 0 );
+      hnull->GetYaxis()->SetTitleOffset( 1.5 );
+      hnull->DrawCopy();
 
-      iGBackgroundEvents->Draw( "apl" );
-      iGBackgroundEvents->GetHistogram()->GetYaxis()->SetTitleOffset( 1.5 );
-      iGBackgroundEvents->GetHistogram()->SetXTitle( "cut value" );
-      iGBackgroundEvents->GetHistogram()->SetYTitle( "number of events" );
+      setGraphPlottingStyle( iGBackgroundEvents, 1, 1., 20 );
+      iGBackgroundEvents->Draw( "pl" );
 
       if( iGSignalEvents ) 
       {
@@ -1475,12 +1641,12 @@ void VTMVAEvaluator::plotEfficiencyPlotsPerEnergy( unsigned int iBin, TGraph* iG
 
       if( iBin < fTMVACutValue.size() )
       {
-         TLine *iL = new TLine( fTMVACutValue[iBin], iGBackgroundEvents->GetHistogram()->GetMinimum(),
-	                        fTMVACutValue[iBin], iGBackgroundEvents->GetHistogram()->GetMaximum() );
+         TLine *iL = new TLine( fTMVACutValue[iBin], hnull->GetMinimum(),
+	                        fTMVACutValue[iBin], hnull->GetMaximum() );
 	 iL->SetLineStyle( 2 );
 	 iL->Draw();
-         TLine *iLMinBack = new TLine( iGBackgroundEvents->GetHistogram()->GetXaxis()->GetXmin(), fOptmizationMinBackGroundEvents,
-	                               iGBackgroundEvents->GetHistogram()->GetXaxis()->GetXmax(), fOptmizationMinBackGroundEvents );
+         TLine *iLMinBack = new TLine( hnull->GetXaxis()->GetXmin(), fOptmizationMinBackGroundEvents,
+	                               hnull->GetXaxis()->GetXmax(), fOptmizationMinBackGroundEvents );
 	 iLMinBack->SetLineStyle( 2 );
 	 iLMinBack->Draw();
       }
@@ -1494,37 +1660,51 @@ void VTMVAEvaluator::setTMVAMethod( string iMethodName, unsigned int iMethodCoun
    fTMVAMethodCounter = iMethodCounter;
 }
 
-void VTMVAEvaluator::setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiencyMinEnergy, double iOptmizationFixedSignalEfficiencyAboveMinEnergy )
+void VTMVAEvaluator::setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiencyMinEnergy,
+                                                                      double iOptmizationFixedSignalEfficiencyAboveMinEnergy )
 {
    fOptmizationFixedSignalEfficiencyMinEnergy = iOptmizationFixedSignalEfficiencyMinEnergy;
    fOptmizationFixedSignalEfficiencyAboveMinEnergy = iOptmizationFixedSignalEfficiencyAboveMinEnergy;
 }
 
-double VTMVAEvaluator::getSignalEfficiency( unsigned int iEnergyBin, double iE_min_log10, double iE_max_log10 )
+double VTMVAEvaluator::getValueFromMap( map< unsigned int, double > iDataMap, double iDefaultData,
+                                        unsigned int iEnergyBin, 
+                                        double iE_min_log10, double iE_max_log10, string iVariable )
 {
-   if( fSignalEfficiencyMap.size() == 0 ) return fSignalEfficiencyNoVec;
+   if( iDataMap.size() == 0 ) return iDefaultData;
 
    map< unsigned int, double >::iterator iIter;
 
-   for( iIter = fSignalEfficiencyMap.begin(); iIter != fSignalEfficiencyMap.end(); iIter++ )
+   for( iIter = iDataMap.begin(); iIter != iDataMap.end(); iIter++ )
    {
-// signal efficiency does not depend on energy
+// data does not depend on energy
        if( iIter->first > 9998 ) return iIter->second;
 
-// energy dependent signal efficiency
+// data signal efficiency
        if( iIter->first == iEnergyBin )
        {
-	  cout << "VTMVAEvaluator::getSignalEfficiency: E [" << iE_min_log10 << ", " << iE_max_log10 << "], bin ";
+	  cout << "VTMVAEvaluator::getValueFromMap (" << iVariable << "): ";
+	  cout << "E [" << iE_min_log10 << ", " << iE_max_log10 << "], bin ";
 	  cout << iEnergyBin << ": ";
 	  cout << iIter->first << "\t" << iIter->second << endl;
           return iIter->second;
        }
    }
 
-   cout << "VTMVAEvaluator::getSignalEfficiency: warning, couldn't find a signal efficiency for energy bin ";
+   cout << "VTMVAEvaluator::getSignalEfficiency: warning, couldn't find a data value (" << iVariable << ") for energy bin ";
    cout << iEnergyBin << ", E=[ " << iE_min_log10 << ", " << iE_max_log10 << "] " << endl;
 
    return -1.;
+}
+
+double VTMVAEvaluator::getSignalEfficiency( unsigned int iEnergyBin, double iE_min_log10, double iE_max_log10 )
+{
+   return getValueFromMap( fSignalEfficiencyMap, fSignalEfficiencyNoVec, iEnergyBin, iE_min_log10, iE_max_log10, "SignalEfficiency" );
+}
+
+double VTMVAEvaluator::getTMVACutValue( unsigned int iEnergyBin, double iE_min_log10, double iE_max_log10 )
+{
+   return getValueFromMap( fTMVACutValueMap, fTMVACutValueNoVec, iEnergyBin, iE_min_log10, iE_max_log10, "MVA_CUT" );
 }
     
    
