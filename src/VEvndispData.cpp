@@ -34,7 +34,7 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
     bitset<8*sizeof(size_t)> ib;
     for( unsigned int i = 0; i < iT.size(); i++ )
     {
-        if( iT[i] > ib.size() )
+        if( iT[i] >= ib.size() )
         {
 	   if( getRunParameter()->fdisplaymode )
 	   {
@@ -50,7 +50,7 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
 	   else
 	   {
 	       cout << "Warning: telescope ID larger then " << ib.size() << ": " << iT[i] << endl;
-	       cout << "(some of the variable will be in overflow (LTrig, ImgSel))" << endl;
+	       cout << "(some of the variable will be in overflow (LTrig, ImgSel), no impact on analysis results)" << endl;
 	   } 
 	   fExpectedEventStatus = 0;
         }
