@@ -24,7 +24,7 @@ using namespace std;
 
 
 void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Electron = 0,
-                              unsigned int iCrabSpec_ID = 6, string iParticleNumberFile = "particleNumbers.tmp.root",
+                              unsigned int iCrabSpec_ID = 5, string iParticleNumberFile = "particleNumbers.tmp.root",
 			      string iObservatory = "CTA" )
 {
     string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
@@ -129,11 +129,11 @@ int main( int argc, char *argv[] )
       if( iMC_Electron.size() > 0 )
       {
 	 sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron.c_str(), SubArray.c_str(), iRecID, 0 );
-	 writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+	 writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
       }
       else
       {
-	  writeParticleNumberFile( iGamma, iProton, 0, 6, iParticleNumberFile );
+	  writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
       }
    }
 
@@ -148,11 +148,11 @@ int main( int argc, char *argv[] )
       if( iMC_Electron.size() > 0 )
       {
 	 sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron.c_str(), SubArray.c_str(), iRecID, j );
-	 writeParticleNumberFile( iGamma, iProton, iElectron, 6, iParticleNumberFile );
+	 writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
       }
       else
       {
-	 writeParticleNumberFile( iGamma, iProton, 0, 6, iParticleNumberFile );
+	 writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
       }
    }
 }
