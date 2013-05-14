@@ -35,12 +35,34 @@
 
 using namespace std;
 
+// data class for VTMVAEvaluator
+// (this data is propagated into VGammaHadronCuts)
+class VTMVAEvaluatorResults : public TNamed
+{
+   public:
+
+    vector< double >        fEnergyCut_Log10TeV_min;
+    vector< double >        fEnergyCut_Log10TeV_max;
+    vector< double >        fSignalEfficiency;                // from user or best signal/sqrt(noise)
+    vector< double >        fBackgroundEfficiency;            // from best signal/sqrt(noise)
+    vector< double >        fTMVACutValue;
+    vector< bool >          fTMVAOptimumCutValueFound;
+    vector< double >        fSourceStrengthAtOptimum_CU;
+
+    VTMVAEvaluatorResults() {}
+   ~VTMVAEvaluatorResults() {}
+
+   ClassDef(VTMVAEvaluatorResults, 1 );
+};
+
 class VTMVAEvaluator : public TNamed, public VPlotUtilities
 {
    private:
 
    bool     fDebug;
    bool     fIsZombie;
+
+   VTMVAEvaluatorResults*  fTMVAEvaluatorResults;
 
    CData*   fData;
    vector< TMVA::Reader* > fTMVAReader;
@@ -110,6 +132,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 
    TH1F*            getEfficiencyHistogram( string iName, TFile *iF );
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
+   void             fillTMVAEvaluatorResults();
    double           getSignalEfficiency( unsigned int iEbin, double iE_min, double iE_max );
    double           getTMVACutValue( unsigned int iEnergyBin, double iE_min_log10, double iE_max_log10 );
    bool             getValuesFromEfficiencyHistograms( double& iMVACut, double& iSignalEfficiency, double& iBackgroundEfficiency,
@@ -135,11 +158,12 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    TGraph* getBoxCut_Theta_Graph();
    TGraph* getBoxCut_Theta2_Graph();
    vector< double > getBoxCut_Theta2() { return fBoxCutValue_theta2; }
-   unsigned int     getSpectralWeightedEnergyBin();
    vector< double > getBackgroundEfficiency() { return fBackgroundEfficiency; }
    vector< bool >   getOptimumCutValueFound() { return fTMVAOptimumCutValueFound; }
    vector< double > getSignalEfficiency() { return fSignalEfficiency; }
+   unsigned int     getSpectralWeightedEnergyBin();
    vector< double > getTMVACutValue() { return fTMVACutValue; }
+   VTMVAEvaluatorResults* getTMVAEvaluatorResults() { return fTMVAEvaluatorResults; }
    bool   getTMVAThetaCutVariable() { return fTMVAThetaCutVariableSet; }
    double getTMVA_EvaluationResult() { return fTMVA_EvaluationResult; }
    bool   initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
@@ -148,6 +172,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool   IsZombie() { return fIsZombie; }
    void   plotBoxCuts();
    void   plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
+   void   printSensitivityOptimizationParameters();
    void   printSignalEfficiency();
    void   printSourceStrength_CU();
    void   setDebug( bool iB = false ) { fDebug = iB; }
@@ -172,7 +197,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 14 );
+   ClassDef(VTMVAEvaluator, 16 );
 };
 
 #endif

@@ -30,7 +30,9 @@ class VWPPhysSensitivityFile
     string       fDataFile_gamma_onSource;
     string       fDataFile_gamma_cone10;
     string       fDataFile_proton;
+    string       fDataFile_proton_onSource;
     string       fDataFile_electron;
+    string       fDataFile_electron_onSource;
 
     string       fSubArray;
     string       fObservatory;

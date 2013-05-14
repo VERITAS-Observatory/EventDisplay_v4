@@ -111,7 +111,9 @@ int main( int argc, char *argv[] )
    string iMC_Gamma_onSource = "gamma_onSource";
    string iMC_Gamma_cone10 = "gamma_cone10";
    string iMC_Proton = "proton"; 
+   string iMC_Proton_onSource = "proton_onSource"; 
    string iMC_Electron = "electron";
+   string iMC_Electron_onSource = "electron_onSource";
    
    char iGamma[800];
    char iProton[800];
@@ -125,10 +127,10 @@ int main( int argc, char *argv[] )
    {
       sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
       sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-      sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton.c_str(), SubArray.c_str(), iRecID, 0 );
-      if( iMC_Electron.size() > 0 )
+      sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
+      if( iMC_Electron_onSource.size() > 0 )
       {
-	 sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron.c_str(), SubArray.c_str(), iRecID, 0 );
+	 sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
 	 writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
       }
       else

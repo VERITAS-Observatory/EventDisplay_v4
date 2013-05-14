@@ -101,6 +101,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAFixedSignalEfficiencyAboveMinEnergy = 1.;
     fTMVABoxCut_Theta2_max = 0;
     fTMVA_EvaluationResult = -99.;
+    fTMVAEvaluatorResults = 0;
 
 // energy dependent theta2 cut
     fFileNameAngRes = "";
@@ -363,23 +364,6 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                 is_stream >> temp;
                 fCut_MeanImageDistance_max=(atof(temp.c_str()));
             }
-// NOT USED AND THEREFORE DISABLED
-/*            else if( iCutVariable == "corearea" )
-            {
-                is_stream >> temp;
-                fCut_CoreDistanceToArrayCentreX_min = (atof(temp.c_str()));
-                is_stream >> temp;
-                fCut_CoreDistanceToArrayCentreX_max = (atof(temp.c_str()));
-                is_stream >> temp;
-                fCut_CoreDistanceToArrayCentreY_min = (atof(temp.c_str()));
-                is_stream >> temp;
-                fCut_CoreDistanceToArrayCentreY_max = (atof(temp.c_str()));
-                if( !is_stream.eof() )
-                {
-                    is_stream >> temp;
-                    fCut_CoreDistanceEdgeSize = atof( temp.c_str() );
-                }
-            } */
             else if( iCutVariable == "mscw" || iCutVariable == "arraymscw" )
             {
                 is_stream >> temp;
@@ -640,6 +624,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 		    {
 		       fFileNameAngRes = gSystem->ExpandPathName( iFileNameAngRes.c_str() );
                     }
+		    else fFileNameAngRes = iFileNameAngRes;
                  }
                  if( !is_stream.eof() )
                  {
@@ -1535,6 +1520,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
        cout << "exiting... " << endl;
        exit( -1 );
     }
+    fTMVAEvaluatorResults = fTMVAEvaluator->getTMVAEvaluatorResults();
     fTMVAEvaluator->printSignalEfficiency();
 
     if( fDirectionCutSelector == 3 ) fTMVAEvaluator->setIgnoreTheta2Cut( false );
@@ -2031,8 +2017,8 @@ bool VGammaHadronCuts::setIRFGraph( TGraphErrors *g )
    fIRFAngRes->SetName( "IRFAngRes" );
 
 // print results
-//   cout << "replaced IRF graph for direction cut" << endl;
-//   printDirectionCuts();
+   cout << "replaced IRF graph for direction cut" << endl;
+   printDirectionCuts();
 
    return true;
  }
@@ -2110,6 +2096,14 @@ void VGammaHadronCuts::terminate()
       fStats->terminate();
       fStats->getDataTree()->Write();
    }   
+   if( fTMVAEvaluatorResults )
+   {
+      fTMVAEvaluatorResults->Write();
+   }
+   else
+   {
+      cout << "NO TMVAEVALUATOR RESULTS " << endl;
+   }
 
    Write();
 }

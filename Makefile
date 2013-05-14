@@ -752,6 +752,8 @@ WRITECTAPHYSOBJ=	./obj/writeParticleRateFilesFromEffectiveAreas.o \
 			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 			./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+			./obj/VInstrumentResponseFunctionRunParameter.o ./obj/VInstrumentResponseFunctionRunParameter_Dict.o \
+			./obj/Ctelconfig.o  \
 			./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
 			./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
 			./obj/VRunList.o ./obj/VRunList_Dict.o \

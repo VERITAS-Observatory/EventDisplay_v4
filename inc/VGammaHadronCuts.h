@@ -110,6 +110,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         unsigned int fProbabilityCut_ProbID;          // array element to be used from fProbabilityCut_SelectionCut[]
         double fProbabilityCut_SelectionCut[VANACUTS_PROBSELECTIONCUTS_MAX];    // selection cut
 
+//////////////////////////
 // TMVA evaluator
         VTMVAEvaluator *fTMVAEvaluator;                             //!
 	string          fTMVA_MVAMethod;
@@ -127,6 +128,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	double          fTMVAFixedSignalEfficiencyAboveMinEnergy;
 	TGraph*         fTMVABoxCut_Theta2_max;                
 	double          fTMVA_EvaluationResult;
+	VTMVAEvaluatorResults *fTMVAEvaluatorResults;
+// TMVA results read from the
 
 // orbital phase analysis
 	TFile *fPhaseCut_File;                                      //!
@@ -278,6 +281,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	TGraph* getTheta2Cut_TMVA_max()  { return fTMVABoxCut_Theta2_max; }
 	TGraph* getTheta2Cut_IRF_Max() { return fIRFAngRes; }
 	double getTMVA_EvaluationResult() { return fTMVA_EvaluationResult; }
+	VTMVAEvaluatorResults* getTMVAEvaluatorResults() { return fTMVAEvaluatorResults; }
         void   initialize();
         bool   isGamma( int i = 0, bool bCount = false, bool fIsOn = true);
         bool   isMCCuts() { return bMCCuts; }
@@ -303,6 +307,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,38);
+        ClassDef(VGammaHadronCuts,40);
 };
 #endif

@@ -69,6 +69,8 @@ VSensitivityCalculator::VSensitivityCalculator()
     fEnergySpectrumfromLiterature = 0;
     fEnergySpectrumfromLiterature_ID = 0;
 
+    fTMVAEvaluatorResults = 0;
+
     hnull = 0;
 
     reset();
@@ -114,6 +116,7 @@ void VSensitivityCalculator::reset()
     setObservationTimeRange();
     setSignificanceParameter();
     setBackgroundMissingParticleFraction();
+    setRequireCutsToBeOptimized();
 
     fGraphObsvsTime.clear();
     fData.clear();
@@ -221,10 +224,11 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 
 // standard sensitivity calculation
        if( bPassed_MinimumSignificance && bPassed_MinimumSignalEvents 
-        && bPasses_MinimumSystematicCut && bPasses_MinimumNumberofBackGroundEvents )
+        && bPasses_MinimumSystematicCut )
+//	&& bPasses_MinimumNumberofBackGroundEvents )
        {
-	     f = fSourceStrength[n];
-	     bSuccess = true;
+	    f = fSourceStrength[n];
+	    bSuccess = true;
             break;
        }
        if( fDebug && bSuccess && energy > 0. )
@@ -722,7 +726,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	   s = i_b[1];
 	   s_error_L = i_b[0];
 	   s_error_U = i_b[2];
-	   cout << "Quantiles " << z << "\t" << i_b[1] << "\t" << i_b[0] << "\t" << i_b[2] << "\t" << iX.GetEntries() << endl;
+	   cout << "\t Quantiles " << z << "\t" << i_b[1] << "\t" << i_b[0] << "\t" << i_b[2] << "\t" << iX.GetEntries() << endl;
         }
 	else
 	{
@@ -737,11 +741,6 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	   s_error_L = s;
 	   s_error_U = s;
         }
-// remove low-energy points with 0 noff events
-/* XX	if( dE_Log10 > 0. && i < (int)fDifferentialFlux.size()-2 && noff == 0. && fDifferentialFlux[i+1].NOff > 0. )
-	{
-	   s*= -1.;
-        } XX */
 // weighted energy of this bin
 	double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
 // (int) of energy for maps
@@ -757,7 +756,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         double f2 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_upEdge ) ); 
 
         if(    i_fFunCrabFlux != 0 && s > 0.
-	    && fDifferentialFlux[i].Energy > iEnergyMin_TeV_lin && fDifferentialFlux[i].Energy < iEnergyMax_TeV_lin )
+	    && fDifferentialFlux[i].Energy > iEnergyMin_TeV_lin && fDifferentialFlux[i].Energy < iEnergyMax_TeV_lin 
+	    && checkCutOptimization( fDifferentialFlux[i].Energy ) )
         {
 // integral sensitivity
             if( dE_Log10 < 0. )
@@ -843,7 +843,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	     cout << endl;
 	     cout << "\t NON: " << non << " (+-" << non_error << ")";
 	     cout << "\t NOFF: " << noff << " (+-" << noff_error << ")";
-	     cout << "\t NDIFF: " << non-alpha*noff  << "\t";
+	     cout << "\t NDIFF: " << non-alpha*noff  << ", alpha=" << alpha << "\t";
 	     cout << fDifferentialFlux[i].ObsTime << " [s]\t" << scientific;
 	     cout << endl;
 	     cout << "\t FLUX: " << s << " (" << s_error_L << "," << s_error_U << ") [CU],  ";
@@ -1727,7 +1727,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
        {
           if( i < (*v_flux_NOff_iter).second.size() )
 	  {
-// require that at least some proton events
+// require at least some proton events
 	     if( i < v_flux_NOff[14].size() && v_flux_NOff[14][i] > 0. )
 	     {
 		v_flux[i].NOn  += (*v_flux_NOff_iter).second[i];
@@ -1754,7 +1754,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
 // calculate mean alpha
 
-// scale by alpha (preliminary)
+// scale by alpha 
    double alpha = 0.;
    double zz = 0;
    for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
@@ -2206,6 +2206,14 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	  iMCPara->gTheta2Cuts_vsEnergylgTeV->SetPoint( i, e, itheta2 );
        }
     }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// read sucess of TMVA cut optimization from gamma/hadron cuts
+    fTMVAEvaluatorResults = (VTMVAEvaluatorResults*)fEff.Get( "TMVAEvaluatorResults" );
+    if( fTMVAEvaluatorResults )
+    {
+       cout << "read TMVAEvaluatorResults from effective area file (";
+       cout << fTMVAEvaluatorResults->fTMVAOptimumCutValueFound.size() << " bins)" << endl;
+    }
 
     return true;
 }
@@ -2454,8 +2462,10 @@ void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlu
 	    return;
         }
 	gSignalRate->SetName( "gSignalRate" );
+	gSignalRate->SetTitle( "signal+background rate (1/min)" );
 	gSignalRate->Write();
 	gBGRate->SetName( "gBGRate" );
+	gBGRate->SetTitle( "background rate (1/min)" );
 	gBGRate->Write();
 
 	iF.Close();
@@ -2635,6 +2645,7 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
     else iHighEnergyFilling = false;
     if( iBGRate && gBGRate )
     {
+// rate histogram are filled in 1/s, graphs are in 1/min
        fillSensitivityHistogramfromGraph( gBGRate, iBGRate, 1./60. );
     }
     if( iBGRateSqDeg && fMC_Data.find( 1 ) != fMC_Data.end() && fMC_Data[1]->gTheta2Cuts_vsEnergylgTeV && gBGRate )
@@ -2820,6 +2831,39 @@ bool VSensitivityCalculator::fillSensitivityLimitsHistograms( vector<TH1F*>& h )
       fillSensitivityHistogramfromMap( fMinEventsLimited, h[1] );
       fillSensitivityHistogramfromMap( fMinBackgroundEventsLimited, h[2] );
       fillSensitivityHistogramfromMap( fMinNoBackground, h[3] );
+   }
+   return false;
+}
+
+bool VSensitivityCalculator::checkCutOptimization( double iEnergy )
+{
+   if( !fRequireCutsToBeOptimized ) return true;
+
+   if( fTMVAEvaluatorResults )
+   {
+      if( iEnergy > 0. ) iEnergy = log10( iEnergy );
+      else               return false;
+      for( unsigned int i = 0; i < fTMVAEvaluatorResults->fEnergyCut_Log10TeV_min.size(); i++ )
+      {
+          if( i >= fTMVAEvaluatorResults->fEnergyCut_Log10TeV_max.size() ) return false;
+
+          if( iEnergy > fTMVAEvaluatorResults->fEnergyCut_Log10TeV_min[i] 
+	   && iEnergy < fTMVAEvaluatorResults->fEnergyCut_Log10TeV_max[i] )
+	  {
+	     if( i < fTMVAEvaluatorResults->fTMVAOptimumCutValueFound.size() )
+	     {
+	        if( fTMVAEvaluatorResults->fTMVAOptimumCutValueFound[i] ) return true;
+		else
+		{
+		   cout << "VSensitivityCalculator::checkCutOptimization: ignore energy bin ";
+		   cout << "[" << fTMVAEvaluatorResults->fEnergyCut_Log10TeV_min[i] << ", ";
+		   cout << fTMVAEvaluatorResults->fEnergyCut_Log10TeV_max[i] << "] (";
+		   cout << iEnergy << "): cuts not optimized " << endl;
+		   return false;
+                }
+             }
+          }
+       }
    }
    return false;
 }

@@ -17,6 +17,7 @@
 #include "VMonteCarloRateCalculator.h"
 #include "VMonteCarloRunHeader.h"
 #include "VStatistics.h"
+#include "VTMVAEvaluator.h"
 
 #include "TCanvas.h"
 #include "TF1.h"
@@ -120,6 +121,10 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	VEnergySpectrumfromLiterature *fEnergySpectrumfromLiterature;
 	unsigned int fEnergySpectrumfromLiterature_ID;
 	vector< TGraph* > fCrabFlux_SourceStrength;
+	
+// TMVA cut optimization results
+        VTMVAEvaluatorResults *fTMVAEvaluatorResults;
+	bool   fRequireCutsToBeOptimized;
 
 // observing time
         double fObservationTime_h;                  // [h]
@@ -186,6 +191,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	vector< double > fPlottingCrabFlux_CU;
 
 // private functions
+	bool       checkCutOptimization( double iEnergy );
         bool       checkDataSet( unsigned int iD, string iName );
         bool       checkUnits( string iUnit );
 	bool       fillSensitivityHistogramfromGraph( TGraph* g, TH1F *h, double iScale );
@@ -278,6 +284,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 					  int az = 0, double woff = 0.5, int noise = 150, double index = 2.5,
 					  double iEnergy_min_lin = -10., double iEnergy_max_lin = 10., string bUnit = "CU" );
         void     setObservationTimeRange( double iObs_min = 0.5e-3, double iObs_max = 5.e4, int iObs_steps = 1000 );    // hours
+	void     setRequireCutsToBeOptimized( bool iB = true ) { fRequireCutsToBeOptimized = iB; }
         void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50.,
 	                                   double iMinBackgroundRateRatio = 0.05, double alpha = 0.2 );
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );

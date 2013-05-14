@@ -284,13 +284,13 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
     if( c.Add( ifilename.c_str() ) ) iFile = c.GetFile();
     if( !iFile )
     {
-        cout << "error reading simulation file " << ifilename << endl;
+        cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error reading simulation file: " << ifilename << endl;
         return false;
     }
     VTableLookupRunParameter *fR = (VTableLookupRunParameter*)iFile->Get( "TLRunParameter" );
     if( !fR )
     {
-        cout << "error: cannot find tablelookup run parameters in " << ifilename << endl;
+        cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error: cannot find tablelookup run parameters in " << ifilename << endl;
         return false;
     }
     fze = fR->ze;

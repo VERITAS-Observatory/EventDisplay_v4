@@ -4,6 +4,8 @@
     fill histogram and return them in order to write them into
     a simple root file
 
+    NOTE: quit a few hardwired values (file names, offset angles)
+
 */
 
 #include "VWPPhysSensitivityFile.h"
@@ -19,7 +21,9 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fDataFile_gamma_onSource = "";
     fDataFile_gamma_cone10 = "";
     fDataFile_proton = "";
+    fDataFile_proton_onSource = "";
     fDataFile_electron = "";
+    fDataFile_electron_onSource = "";
 
     fOutFile = 0;
 
@@ -347,7 +351,11 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 // CTA data 
    if( isVTS() == 0 )
    {
-      if( !i_IRF.fillData( hname ) ) return false;
+      if( !i_IRF.fillData( hname ) )
+      {
+	 cout << "VWPPhysSensitivityFile::fillHistograms1D error filling data from " << hname << endl;
+         return false;
+      }
    }
 // VERITAS data
    else
@@ -422,6 +430,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
     int i_noise_electron = 250;
     double i_woff_electron = 0.;  
 
+//////////////////////////////////////////////////////////////
 // VTS only
     if( fSubArray == "V5" )
     {
@@ -456,11 +465,18 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
        i_woff_electron = 0.;
     }
 // (END VTS only)
+//////////////////////////////////////////////////////////////
 
     cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << fSubArray << endl; 
 //////////////////////////////////////////////////////////////////////////
 // effective area files
-    if( fOffsetCounter < 9999 ) sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone10.c_str(), fOffsetCounter );
+////////////////////////
+// gamma offset
+    if( fOffsetCounter < 9999 )
+    {
+        sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone10.c_str(), fOffsetCounter );
+    }
+// gamma on source
     else
     {
       if( isVTS() == 0 )
@@ -473,24 +489,30 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
       }
     }
     string iMC_Gamma    = hname;
+// proton on source
     if( fOffsetCounter == 9999 )
     {
        if( isVTS() == 0 )
        {
-	  sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_proton.c_str() );
+	  sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_proton_onSource.c_str() );
        }
        else
        {
 	  sprintf( hname, "%s/%s.root", iDataDirectory.c_str(), fDataFile_proton.c_str() );
        }
     }	  
-    else sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_proton.c_str(), fOffsetCounter );
+// proton offset
+    else
+    {
+       sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_proton.c_str(), fOffsetCounter );
+    }
     string iMC_Proton   = hname;
+// electron on source
     if( fOffsetCounter == 9999 )
     {
-       if( isVTS() == 0 && fDataFile_electron.size() > 0 )
+       if( isVTS() == 0 && fDataFile_electron_onSource.size() > 0 )
        {
-          sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_electron.c_str() );
+          sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_electron_onSource.c_str() );
        }
        else if( fDataFile_electron.size() > 0 )
        {
@@ -498,8 +520,15 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
        }
        else sprintf( hname, "NOFILE" );
     }
-    else                         sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_electron.c_str(), fOffsetCounter );
+// electron offset
+    else
+    {
+        sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_electron.c_str(), fOffsetCounter );
+    }
     string iMC_Electron = hname;
+
+// initialize sensitivity calculator
+
 // gammas
     i_Sens.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma, -10., 10., "ENERGY" );
@@ -518,6 +547,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
        i_SensCU.setMonteCarloParameters( 2, fCosmicRaySpectrumFile, fElectronSpectrumID, iMC_Electron, 20.,
                               i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron, -10., 10., "CU" );
     }
+// fill sensitivity histograms
     bool iHighEnergyFilling = false;
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate, iHighEnergyFilling );
@@ -585,6 +615,7 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
 {
     fSubArray = iA;
 
+// set data files for CTA
     if( isVTS() == 0 )
     {
 // change here for ID change
@@ -593,10 +624,13 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
        fDataFile_gamma_onSource = "gamma_onSource." + fSubArray + "_ID" + hname + ".eff-";
        fDataFile_gamma_cone10 = "gamma_cone10." + fSubArray + "_ID" + hname + ".eff-";
        fDataFile_proton = "proton." + fSubArray + "_ID" + hname + ".eff-";
+       fDataFile_proton_onSource = "proton_onSource." + fSubArray + "_ID" + hname + ".eff-";
        fDataFile_electron = "electron." + fSubArray + "_ID" + hname + ".eff-";
+       fDataFile_electron_onSource = "electron_onSource." + fSubArray + "_ID" + hname + ".eff-";
        if( fSubArray != "V5" && fSubArray != "V6" ) fDataFile_electron = "electron." + fSubArray + "_ID" + hname + ".eff-";
        else                                         fDataFile_electron = "";
     }
+// set data files for VERITAS (epoch V5)
     else if( isVTS() == 5 )
     {
        fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE130_ID30_SW07.eff";
@@ -604,6 +638,7 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
        fDataFile_proton = "proton_20deg_050deg_NOISE130_ID30_SW07.eff";
        fDataFile_electron = "electron_20deg_050deg_NOISE130_ID30_SW07.eff";
     }
+// set data files for VERITAS (epoch V6)
     else if( isVTS() == 6 )
     {
        fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE200_ID30_SW05.eff";
@@ -613,6 +648,13 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
     } 
 }
 
+/*
+
+   check if current data set is a VERITAS data set
+
+   return epoch number
+
+*/
 unsigned int VWPPhysSensitivityFile::isVTS() 
 {
     if( fObservatory == "V4" ) return 4;
