@@ -2,7 +2,6 @@
 #
 # script to write particle rate files
 #
-#
 # Author: Gernot Maier
 #
 #######################################################################

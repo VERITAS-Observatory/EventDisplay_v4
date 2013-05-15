@@ -1,8 +1,6 @@
 #$ -S /bin/tcsh
 #
-# Running effective for CTA
-#
-# Revision $Id$
+# Analysing effective areas (CTA)
 #
 # Author: Gernot Maier
 #

@@ -19,6 +19,9 @@ then
    echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo " input data and output directories for tables are fixed in CTA.MSCW_ENERGY.qsub_make_tables.sh"
+   echo
+   echo " tables create for different wobble offsets can be combined with CTA.MSCW_ENERGY.combine_tables.sh"
+   echo
    exit
 fi
 
@@ -44,7 +47,7 @@ then
    OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
    OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
    OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
-   DSUF="gamma_cone10/1"
+   DSUF="gamma_cone10/[1-9]"
 else
    OFFMIN=( "-1.e10" )
    OFFMAX=( "1.e10" )
@@ -126,7 +129,7 @@ do
       chmod u+x $FNAM.sh
 
 # submit the job
-      qsub -l os="sl*" -l h_cpu=11:45:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -l os="sl*" -l h_cpu=41:45:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 

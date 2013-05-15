@@ -16,9 +16,11 @@ then
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file"
    echo "     (suffix must be .gamma/.CRbck ; this will be added by this script)"
+   echo "     examples can be found in $CTA_EVNDISP_AUX_DIR/GammaHadronCutFiles"
    echo 
    echo "<analysis parameter file>"
    echo "     file with analysis parameter"
+   echo "     examples can be found in $CTA_EVNDISP_AUX_DIR/ParameterFiles/"
    echo
    echo "<output subdirectory>"
    echo "    sub-directory name (not the full path) for effective areas files"
@@ -26,7 +28,8 @@ then
    echo " <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo "[filling mode]"
-   echo "effective area filling mode (use 2 to calculate angular resolution only)"
+   echo "     effective area filling mode (use 2 to calculate angular resolution only)"
+   echo "     (no value for default IRF calculation)"
    echo
    echo ""
    exit
@@ -37,8 +40,8 @@ CDIR="$CTA_EVNDISP_AUX_DIR/GammaHadronCutFiles/"
 CFIL=$2
 ANAPAR=$3
 ODIR=$4
-GMOD=0
 DSET=$5
+GMOD=0
 if [ -n "$6" ]
 then
   GMOD=$6
@@ -51,25 +54,22 @@ then
   exit
 fi
 echo "reading analysis parameter from $ANAPAR"
+# get output file directory
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
 ODIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/$4/"
 mkdir -v -p $ODIR
-# reconstruction ID
+# get reconstruction ID
 RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 
 #arrays
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
 
-# particle types
+# set particle types (analysis dependent)
 if [ $GMOD = "0" ]
 then
-   if [ $DSET = "cta-ultra3" ]
+   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]]
    then
-      VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
-#      VPART=( "gamma_onSource" "electron_onSource" "proton_onSource" )
-   elif [ $DSET = "v_leeds" ]
-   then
-      VPART=( "gamma_onSource" "gamma_cone10" "electron"  "proton" )
+      VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "electron_onSource" "proton_onSource" )
    elif [ $DSET = "VTS" ]
    then
      VPART=( "gamma_onSource" "proton" )
@@ -77,7 +77,7 @@ then
       VPART=( "gamma_onSource" "electron_onSource" "proton_onSource" )
    fi
 else
-   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ]
+   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]]
    then
       VPART=( "gamma_onSource" "gamma_cone10" )
    else
@@ -98,8 +98,9 @@ do
    for ((m = 0; m < $NPART; m++ ))
    do
       PART=${VPART[$m]}
-      echo "MC PARTICLE $PART"
+      echo "    MC PARTICLE TYPE $PART"
 
+# prepare cut file
       CCUT=$ODIR/$CFIL.$PART.$ARRAY.dat
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then

@@ -1,8 +1,6 @@
 #!/bin/bash
 #
-# script to write particle rate files
-#
-# Revision $Id$
+# script to write particle rate files for CTA
 #
 # Author: Gernot Maier
 #
@@ -12,8 +10,14 @@ if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
    echo 
    echo "./CTA.ParticleRateWriter.sub.sh <sub array list> <directory with effective areas> <offset=onSource/cone10> <recid> "
+   echo 
+   echo "  write particles files needed for TMVA cut optimization"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
+   echo
+   echo "  <directory with effective areas>  (full) path to effective areas"
+   echo
+   echo "  <recid>                   reconstruction ID from mscw stage" 
    echo ""
    exit
 fi
