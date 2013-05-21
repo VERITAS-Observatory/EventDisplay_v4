@@ -113,6 +113,7 @@ cd $EVNDISPSYS/scripts/VTS/
 # telescopes
 set TTA="1234"
 #set TTA="234"
+# set ACUT="EVNDISP.reconstruction.CORR.runparameter"
 set ACUT="EVNDISP.reconstruction.runparameter"
 # dead channel definitions
 set DEAD="EVNDISP.validchannels.dat"
@@ -168,7 +169,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20130122_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"-v410/
+set ODIR=$YDIR/analysis_d20130406_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################

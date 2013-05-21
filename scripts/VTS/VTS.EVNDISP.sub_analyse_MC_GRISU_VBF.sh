@@ -32,10 +32,10 @@ ATMO=$4
 # define arrays in wobble offset and noise level
 ################################################
 # wobble offsets
-WOFF=( 0.5 )
-WWOF=( 050 )
 WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
 WWOF=( 050 000 025 075 100 125 150 175 200 )
+#WOFF=( 0.5 )
+#WWOF=( 050 )
 NWOFF=${#WOFF[@]}
 # NOISE levels
 NOISE=( 200 250 075 100 150 325 425 550 750 1000 )
@@ -62,6 +62,8 @@ do
      then
 	 DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/ATM$ATMO/"
 	 ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$ZEW"deg_750m/wobble_$WOB/"
+	 ODIR="/lustre/fs9/group/cta/users/maierg/VERITAS/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$ZEW"deg_750m/wobble_$WOB/"
+	 mkdir -p $ODIR
      fi 
      if [ $PART = "14" ]
      then
@@ -131,7 +133,7 @@ do
     chmod u+x $FDIR/$OSCRIPT.sh
 
 # submit the job
-   qsub -l os="sl*" -V -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+   qsub -l os="sl*" -V -l h_cpu=41:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
   done
 
