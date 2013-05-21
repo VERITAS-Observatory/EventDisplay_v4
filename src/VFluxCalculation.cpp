@@ -595,7 +595,7 @@ void VFluxCalculation::printResults()
         cout << endl;
         if( fRunUFL[i] < 0. )
         {
-            printf( "\t Differential flux normalisation at %.f TeV [cm^-2 s^-1 TeV^-1]: %.2e +- %.2e ", fE0, fRunFluxConstant[i], fRunFluxConstantE[i] );
+            printf( "\t Differential flux normalisation at %.2f TeV [cm^-2 s^-1 TeV^-1]: %.2e +- %.2e ", fE0, fRunFluxConstant[i], fRunFluxConstantE[i] );
             cout << endl;
             printf( "\t Flux F(E > %.3f TeV) [cm^-2 s^-1]: %.3e +- %.3e ", fMinEnergy, fRunFlux[i], fRunFluxE[i] );
             cout << endl;
@@ -610,7 +610,7 @@ void VFluxCalculation::printResults()
         {
             printf( "\t Upper limit on events: %.1f", fRunUFL[i] );
             cout << endl;
-            printf( "\t Differential flux normalisation at %.f TeV [cm^-2 s^-1 TeV^-1]: %.2e", fE0, fRunFluxConstant[i] );
+            printf( "\t Differential flux normalisation at %.2f TeV [cm^-2 s^-1 TeV^-1]: %.2e", fE0, fRunFluxConstant[i] );
             cout << endl;
             printf( "\t Upper Flux Limit F(E > %.3f TeV, %.2f ) [cm^-2 s^-1]: %.2e", fMinEnergy, fUpperLimit, fRunFlux[i] );
             cout << endl;

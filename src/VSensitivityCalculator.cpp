@@ -224,8 +224,8 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 
 // standard sensitivity calculation
        if( bPassed_MinimumSignificance && bPassed_MinimumSignalEvents 
-        && bPasses_MinimumSystematicCut )
-//	&& bPasses_MinimumNumberofBackGroundEvents )
+        && bPasses_MinimumSystematicCut 
+	&& bPasses_MinimumNumberofBackGroundEvents )
        {
 	    f = fSourceStrength[n];
 	    bSuccess = true;

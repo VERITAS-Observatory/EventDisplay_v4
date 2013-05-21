@@ -162,6 +162,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    fEffAreaMC = new TH1F( hname, "Effective Area in true energy", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fEffAreaMC->SetXTitle( "log_{10} (E_{MC}/TeV)" );
    fEffAreaMC->SetYTitle( "effective area [m^{2}]" );
+   fEffAreaMC->SetLineColor( 2 );
    hisList.push_back( fEffAreaMC );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fEffAreaMC );
 

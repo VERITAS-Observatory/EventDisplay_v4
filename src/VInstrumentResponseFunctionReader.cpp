@@ -755,6 +755,7 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
 	      {
 	          g->SetPoint( z, x0, y1/y0 );
 
+// note: standard error propagation not correct in this case
 		  e = y1_U*y1_U/y0/y0 + y1*y1/y0/y0/y0/y0 * y0_U*y0_U;
 		  g->SetPointEYhigh( z, sqrt( e ) );
 // (Preli)

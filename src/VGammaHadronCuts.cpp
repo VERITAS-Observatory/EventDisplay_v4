@@ -97,8 +97,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAOptimizeSignalEfficiencySignificance_Min = 5.;
     fTMVAOptimizeSignalEfficiencySignalEvents_Min = 10.;
     fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
-    fTMVAFixedSignalEfficiencyMinEnergy = 1.e99;
-    fTMVAFixedSignalEfficiencyAboveMinEnergy = 1.;
+    fTMVAFixedSignalEfficiencyMax = 1.;
     fTMVABoxCut_Theta2_max = 0;
     fTMVA_EvaluationResult = -99.;
     fTMVAEvaluatorResults = 0;
@@ -579,8 +578,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyObservationTime_h;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
-	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyMinEnergy;
-	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyAboveMinEnergy;
+	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyMax;
             }
 	    else if( iCutVariable == "TMVASignalEfficiency" )
 	    {
@@ -805,8 +803,7 @@ void VGammaHadronCuts::printCutSummary()
 	   cout << fTMVAOptimizeSignalEfficiencySignalEvents_Min << " signal events in ";
 	   cout << fTMVAOptimizeSignalEfficiencyObservationTime_h << " h observing time" << endl;
 	   cout << "reading particle counts from " << fTMVAOptimizeSignalEfficiencyParticleNumberFile << endl;
-	   cout << "\t fixed signal efficiency above energy  " << fTMVAFixedSignalEfficiencyMinEnergy;
-	   cout << " (fixed to " << fTMVAFixedSignalEfficiencyAboveMinEnergy << ")" << endl;
+	   cout << "   (max signal efficiency: " << fTMVAFixedSignalEfficiencyMax << ")" << endl;
 	}
 	else
 	{
@@ -1490,8 +1487,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
                                                              fTMVAOptimizeSignalEfficiencySignalEvents_Min,
                                                              fTMVAOptimizeSignalEfficiencyObservationTime_h,
 							     1./5. );
-       fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMinEnergy, 
-                                                                        fTMVAFixedSignalEfficiencyAboveMinEnergy );
+       fTMVAEvaluator->setSensitivityOptimizationFixedSignalEfficiency( fTMVAFixedSignalEfficiencyMax );
        fTMVAEvaluator->setParticleNumberFile( fTMVAOptimizeSignalEfficiencyParticleNumberFile );
     }
 // set a constant signal efficiency

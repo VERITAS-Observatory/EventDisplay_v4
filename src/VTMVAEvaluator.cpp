@@ -683,8 +683,9 @@ bool VTMVAEvaluator::evaluate()
 unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
 {
    unsigned int iEnergyBin = 0;
-   double       i_Diff_Energy = 1.30;           // difference between energy of current event and mean bin energy
+   double       i_Diff_Energy = 1.e10;           // difference between energy of current event and mean bin energy
    double       iMeanEnergy = 0.;
+   double       iMeanEnergy_min = 1.e10;
 
 // find energy bin
    double iErec = 0.;
@@ -696,14 +697,15 @@ unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
       else iErec = -1.e99;
 
 // mean energy of this energy bin (possibly spectral weighted)
-      iMeanEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
-                                                                       fSpectralIndexForEnergyWeighting );
+      iMeanEnergy = VMathsandFunctions::getMeanEnergyInBin( 2, fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
+							    fSpectralIndexForEnergyWeighting );
 
 // check which energy bin is closest
       if( TMath::Abs( iMeanEnergy - iErec ) < i_Diff_Energy ) 
       {
          i_Diff_Energy = TMath::Abs( iMeanEnergy - iErec );
 	 iEnergyBin = i;
+	 iMeanEnergy_min = iMeanEnergy;
       }
    }
    if( fDebug )
@@ -711,7 +713,9 @@ unsigned int VTMVAEvaluator::getSpectralWeightedEnergyBin()
       cout << "VTMVAEvaluator::getSpectralWeightedEnergyBin() ";
       cout << "energy bin: " << iEnergyBin;
       cout << " [" << fEnergyCut_Log10TeV_min[iEnergyBin] << ", " << fEnergyCut_Log10TeV_max[iEnergyBin];
-      cout << "], log10 energy " << iErec;
+      cout << "], mean energy " << iMeanEnergy_min;
+      cout << ", log10 energy " << iErec << "\t" << i_Diff_Energy ;
+      cout << "\t" << fSpectralIndexForEnergyWeighting;
       cout << endl;
    }
 
@@ -1307,8 +1311,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    }
    
    cout << "VTVMAEvaluator::getOptimalSignalEfficiency() optimization parameters: ";
-   cout << "fix signal efficiency to " << fOptmizationFixedSignalEfficiencyAboveMinEnergy;
-   cout << " above energy bin " << fOptmizationFixedSignalEfficiencyMinEnergy << endl;
+   cout << "maximum signal efficiency is " << fOptmizationFixedSignalEfficiency << endl;
    cout << " (alpha: " << fOptimizationBackgroundAlpha << ")" << endl;
 
 //////////////////////////////////////////////////////////////////////////
@@ -1528,10 +1531,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
-// fix signal efficiency above a certain energy (optional)
-   if( fEnergyCut_Log10TeV_min[iEnergyBin] >= fOptmizationFixedSignalEfficiencyMinEnergy )
+// check if signal efficiency is above allowed value
+   if( i_SignalEfficiency_AtMaximum > fOptmizationFixedSignalEfficiency )
    {
-       if( fOptmizationFixedSignalEfficiencyAboveMinEnergy > 0.99 )
+       if( fOptmizationFixedSignalEfficiency > 0.99 )
        {
 	  i_TMVACutValue_AtMaximum         = effS->GetBinCenter( effS->GetNbinsX()-1 );
 	  i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effS->GetNbinsX()-1 );
@@ -1540,7 +1543,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
        {
 	  for( int i = 1; i < effS->GetNbinsX(); i++ )
 	  {
-	     if( effS->GetBinContent( i ) < fOptmizationFixedSignalEfficiencyAboveMinEnergy )
+	     if( effS->GetBinContent( i ) < fOptmizationFixedSignalEfficiency )
 	     {
 		i_TMVACutValue_AtMaximum         = effS->GetBinCenter( i );
 		i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( i );
@@ -1548,18 +1551,18 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	     }
 	  }
        }
-       i_SignalEfficiency_AtMaximum     = fOptmizationFixedSignalEfficiencyAboveMinEnergy;
-       cout << "VTMVAEvaluator::optimizeSensitivity: setting signal efficiency to " << fOptmizationFixedSignalEfficiencyAboveMinEnergy;
-       cout << " (energy > " << fOptmizationFixedSignalEfficiencyMinEnergy << " TeV)" << endl;
+       i_SignalEfficiency_AtMaximum = fOptmizationFixedSignalEfficiency;
+       cout << "VTMVAEvaluator::optimizeSensitivity: setting signal efficiency to ";
+       cout << fOptmizationFixedSignalEfficiency << endl;
    } 
    else
    {
       cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum (";
       cout << i_SourceStrength_atMaximum << " CU) is ";
       cout << i_SignalEfficiency_AtMaximum << " with a significance of " << i_Signal_to_sqrtNoise_atMaximum << endl;
-      cout << "\t MVA parameter: " << i_TMVACutValue_AtMaximum;
-      cout << ", background efficiency: " << i_BackgroundEfficiency_AtMaximum << endl;
    }
+   cout << "\t MVA parameter: " << i_TMVACutValue_AtMaximum;
+   cout << ", background efficiency: " << i_BackgroundEfficiency_AtMaximum << endl;
 ////////////////////////////////////////////////////////////////
 
 // fill results into data vectors
@@ -1722,11 +1725,9 @@ void VTMVAEvaluator::setTMVAMethod( string iMethodName, unsigned int iMethodCoun
    fTMVAMethodCounter = iMethodCounter;
 }
 
-void VTMVAEvaluator::setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiencyMinEnergy,
-                                                                      double iOptmizationFixedSignalEfficiencyAboveMinEnergy )
+void VTMVAEvaluator::setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiency )
 {
-   fOptmizationFixedSignalEfficiencyMinEnergy = iOptmizationFixedSignalEfficiencyMinEnergy;
-   fOptmizationFixedSignalEfficiencyAboveMinEnergy = iOptmizationFixedSignalEfficiencyAboveMinEnergy;
+   fOptmizationFixedSignalEfficiency = iOptmizationFixedSignalEfficiency;
 }
 
 double VTMVAEvaluator::getValueFromMap( map< unsigned int, double > iDataMap, double iDefaultData,
