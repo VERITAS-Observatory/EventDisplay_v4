@@ -1,12 +1,11 @@
 #!/bin/sh
 #
-# make effective areas for CTA
+# calculate effective areas and instrument response functions for CTA
 #
-#
-# Revision $Id$
 #
 # Author: Gernot Maier
 #
+##############################################################################
 
 
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ] || [ ! -n "$7" ]
@@ -15,21 +14,22 @@ then
    echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode]"
    echo "================================================================================"
    echo
-   echo "make effective areas for CTA"
+   echo "calculate effective areas and instrument response functions for CTA"
    echo 
-   echo "(note: shape cuts hardwired)"
    echo
    echo "<subarray>"
    echo "     subarray for analysis (e.g. array E)"
    echo
    echo "<recid>"
-   echo "     reconstruction ID from array reconstruction"
+   echo "     reconstruction ID from array reconstruction (mscw stage)"
    echo
    echo "<particle>"
+   echo "     allowed particle types are:"
    echo "     gamma_onSource / gamma_cone10 / electron / electron_onSource / proton / proton_onSource / helium "
    echo
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file (full path and file name)"
+   echo "     (examples can be found in $CTA_EVNDISP_AUX_DIR/GammaHadronCutFiles)"
    echo
    echo "<scripts parameter file>"
    echo "     file with analysis parameter"
@@ -42,6 +42,7 @@ then
    echo
    echo "[filling mode]"
    echo "     effective area filling mode (use 2 to calculate angular resolution only)"
+   echo "     (optional, for default full calculation no option is needed)"
    echo
    exit
 fi
@@ -69,15 +70,17 @@ ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
 TMVACUT=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
-if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "EREC" ] || [ -z "TMVACUT" ] || [ -z "EFFAREADIR" ]
+OBSTIME=`grep OBSERVINGTIME_H $ANAPAR | awk {'print $2'}`
+if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "$EREC" ] || [ -z "$TMVACUT" ] || [ -z "$EFFAREADIR" ] || [ -z "$OBSTIME" ]
 then
   echo "error: analysis parameter file not correct: $ANAPAR" 
   echo " one variable missing"
-  echo $NIMAGESMIN $ANADIR $EREC $TMVACUT $EFFAREADIR
+  echo $NIMAGESMIN $ANADIR $EREC $TMVACUT $EFFAREADIR $OBSTIME
   exit
 fi
-echo $NIMAGESMIN $ANADIR $EREC $TMVACUT $EFFAREADIR
-# parameters from command line
+echo "Input parameters read from $ANAPAR"
+echo $NIMAGESMIN $ANADIR $EREC $TMVACUT $EFFAREADIR $OBSTIME
+# parameters from the command line
 ARRAY=$1
 RECID=$2
 PART=$3
@@ -91,7 +94,7 @@ then
 fi
 
 # check particle type
-if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ] && [ $PART != "gamma_onSourceDISP" ]
+if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
 then
    echo "unknown particle type: " $PART
    exit
@@ -142,28 +145,6 @@ then
    OFFMEA=( "0.0" )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
-#   THETA2MAX=( 0.008 )
-#   THETA2MAX=( 0.04 )
-# using TMVA or angular resolution
-   THETA2MAX=( -1. )
-   ISOTROPY="0"
-   AZBINS="0"
-   TELTYPECUTS="1"
-   DIRECTIONCUT="2"
-fi
-# on source gamma rays
-if [ $PART = "gamma_onSourceDISP" ]
-then
-   MSCFILE=$DDIR/gamma_onSourceDISP."$ARRAY"_ID"$RECID"*.mscw.root
-   EFFFILE=$DDIR/EffectiveAreas/
-   OFIL=gamma_onSourceDISP."$ARRAY"_ID"$RECID".eff
-   OFFMIN=( 0. )
-   OFFMAX=( 100000. )
-   OFFMEA=( "0.0" )
-# NOTE: this is theta2
-   THETA2MIN=( -1. )
-#   THETA2MAX=( 0.008 )
-#   THETA2MAX=( 0.04 )
 # using TMVA or angular resolution
    THETA2MAX=( -1. )
    ISOTROPY="0"
@@ -180,8 +161,6 @@ then
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
    OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
    OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
-# PRELIMINARY! use on axis TMVA for all off axis gamma/hadron separation
-#   OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
 # NOTE: this is theta2
    THETA2MIN=( -1. )
    THETA2MAX=( -1. )
@@ -194,19 +173,17 @@ if [ $PART = "electron" ] || [ $PART = "electron_onSource" ]
 then
    MSCFILE=$DDIR/electron."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
-   OFIL=electron."$ARRAY"_ID"$RECID".eff
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
 # NOTE: this is theta and not theta2
    if [ $PART = "electron" ]
    then
+      OFIL=electron."$ARRAY"_ID"$RECID".eff
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0  )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
-#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25  )
-      OFFMEA=( 0.0 1.5 2.5 3.25 3.75 4.25 4.75 5.25  )
-# use on axis TMVA for all off axis gamma/hadron separation
-#      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
+      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25  )
    else
+      OFIL=electron_onSource."$ARRAY"_ID"$RECID".eff
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
       OFFMEA=( 0.0 )
@@ -230,13 +207,12 @@ then
 # NOTE: this is theta and not theta2
    if [ $PART = "proton" ] 
    then
+      OFIL=proton."$ARRAY"_ID"$RECID".eff
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
-#      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
-      OFFMEA=( 0.0 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
-# use on axis TMVA for all off axis gamma/hadron separation
-#      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
+      OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
    else
+      OFIL=proton_onSource."$ARRAY"_ID"$RECID".eff
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
       OFFMEA=( 0.0 )
@@ -259,8 +235,6 @@ then
       THETA2MIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
       THETA2MAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
       OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
-# use on axis TMVA for all off axis gamma/hadron separation
-#      OFFMEA=( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )
    else
       THETA2MIN=( 0. )
       THETA2MAX=( 1. )
@@ -323,7 +297,7 @@ do
       rm -f $iCFIL-e
       sed -e "s|MINIMAGES|$NIMAGESMIN|" $iCFIL-e1 > $iCFIL-f
       rm -f $iCFIL-e1
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] 
       then
          sed -e "s|WOBBLEOFFSET|${OFFMEA[$i]}|" $iCFIL-f > $iCFIL-g
       else
@@ -355,7 +329,10 @@ do
       fi
       sed -e "s|PARTICLENUMBERFILE|$PNF|" $iCFIL-j > $iCFIL-k
       rm -f $iCFIL-j
-      mv -f $iCFIL-k $iCFIL
+# observing time (for cut optimization)
+      sed -e "s|OBSERVINGTIME_H|$OBSTIME|" $iCFIL-k > $iCFIL-l
+# finalize cut file
+      mv -f $iCFIL-l $iCFIL
       iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
       cd $EVNDISPSYS/scripts/CTA/
       echo $iCFIL
@@ -371,7 +348,7 @@ do
 # filling mode
 ###############################################################################
 # fill IRFs and effective areas
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then
 # filling mode 0: fill and use angular resolution for energy dependent theta2 cuts
 	 echo "* FILLINGMODE $GFILLING" >> $MSCF
@@ -402,16 +379,18 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 3.0 0.1" >> $MSCF
       fi
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ] 
+# first half of data set is not used (as these events are used for the TMVA training)
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then
         echo "* IGNOREFRACTIONOFEVENTS 0.5" >> $MSCF
       fi
       if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
       then
+# first half of data set is not used (as these events are used for the TMVA training)
         if [ $DSET != "v_leeds" ]
 	then
 	   echo "* IGNOREFRACTIONOFEVENTS 0.5" >> $MSCF
@@ -421,7 +400,7 @@ do
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
 
 # output file
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] || [ $PART = "gamma_onSourceDISP" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
       then
          OFIX=$ODIR/$OFIL-$i
       else
@@ -451,9 +430,9 @@ do
 # submit the job
      if [ $GFILLING = "2" ]
      then
-	qsub -js 200 -l os="sl*" -l h_cpu=0:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub -l os="sl*" -l h_cpu=0:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      else
-	qsub -js 200 -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      fi
    done
 done
