@@ -1,6 +1,8 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130522 (GM) added tests for completeness while reading line in calibration lines
+
 * 20130522 (GM) Error calculation for effective areas: added Clopper Pearson algorithm
                 (normal approximation is still the default)
 

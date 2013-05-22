@@ -157,7 +157,7 @@ bool VPlotWPPhysSensitivity::initialize( VPlotWPPhysSensitivityData* iData )
    iData->fSensitivityFileName = iTemp.str();
 
 // set legend (don't overwrite existing legend)
-   if( iData->fLegend.size() == 0 )
+   if( iData->fLegend == "DEFAULT" )
    {
       sprintf( hname, "%s (%s, %.1f h, %.1f deg)", iData->fSubArray.c_str(), iData->fAnalysis.c_str(), 
 						   iData->fObservationTime_s/3600., iData->fCameraOffset_deg  );
@@ -289,21 +289,32 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown )
    double x = 0.2+0.35;
    double y = 0.65;
    if( iDown ) y -= 0.5;
-   TLegend *iL = new TLegend( x, y, x+0.30, y+0.22 );
+   double y_yp = y+0.22;
+   if( fData.size() == 2 )
+   {
+      y_yp -= 0.1;
+   }
+   TLegend *iL = new TLegend( x, y, x+0.30, y_yp );
    iL->SetFillColor( 0 );
 
    for( unsigned int i = 0; i < fData.size(); i++ )
    {
-      if( fData[i]->fFileExists )
+      if( fData[i]->fFileExists && fData[i]->fLegend.size() > 0 )
       {
 	 TGraph *g = new TGraph( 1 );
 	 g->SetLineColor( fData[i]->fPlottingColor );
 	 g->SetLineStyle( fData[i]->fPlottingLineStyle );
+	 g->SetFillStyle( fData[i]->fPlottingFillStyle );
+	 g->SetFillColor( fData[i]->fPlottingColor );
+	 g->SetMarkerColor( fData[i]->fPlottingColor );
 	 g->SetMarkerStyle( 1 );
-	 if( fData[i]->fLegend.size() > 0 ) iL->AddEntry( g, fData[i]->fLegend.c_str(), "l" );
+	 if( fData[i]->fLegend.size() > 0 )
+	 {
+	   iL->AddEntry( g, fData[i]->fLegend.c_str(), "lF" );
+         }
       }
    }
-   iL->Draw();
+   if( iL->GetNRows() > 0 ) iL->Draw();
    return true; 
 }
 
@@ -336,7 +347,13 @@ bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile )
       if( !is_stream.eof() ) is_stream >> i_temp.fPlottingFillStyle;
       else                   i_temp.fPlottingFillStyle = 3001;
       if( !is_stream.eof() ) is_stream >> i_temp.fLegend;
-      else                   i_temp.fLegend = "";
+      else
+      {
+         char hname[200];
+	 if( i_temp.fObservationTime_s < 1800. ) sprintf( hname, "%s (%ds)", i_temp.fSubArray.c_str(), (int)i_temp.fObservationTime_s );
+	 else                                    sprintf( hname, "%s (%.1fh)", i_temp.fSubArray.c_str(), i_temp.fObservationTime_s / 3600. );
+         i_temp.fLegend = hname;
+      }
 
       addDataSet( &i_temp, true );
 

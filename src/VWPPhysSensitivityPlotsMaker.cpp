@@ -5,17 +5,9 @@
      Example (executed on the root commane line):
 
      WPPhysSensitivityPlotsMaker a;
-     a.setListOfArrays( "subArray.E.list" );
      a.compareDataSets("DataSets.list");
 
-     with 
-
-     subArray.list:
-
-     E
-     I
-
-     and 
+     with
 
      DataSets.list
 
@@ -42,6 +34,7 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
     cout << " [deg]" << endl;
 
     setOffAxisAngle( iOffAxisValue );
+    setEnergyRange_Lin_TeV();
     setObservingTime();
     setAxisUnits();
     setPrintingOptions();
@@ -86,6 +79,7 @@ bool VWPPhysSensitivityPlotsMaker::readList( string iFileTxt, vector< string >& 
 void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile )
 {
    VPlotWPPhysSensitivity a;
+   a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
    a.addDataSets( iDataSetFile );
    a.plotIRF( fPrintingOptions );
    a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
@@ -113,6 +107,7 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iSubArray, string iDa
     for( unsigned int i = 0; i < fListOfArrays.size(); i++ )
     {
        VPlotWPPhysSensitivity a;
+       a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
        for( unsigned int j = 0; j < fListofDataSets.size(); j++ )
        {
 	  a.addDataSet( fListofDataSets[j], fListOfArrays[i], fObservingTime_s, 0.0, "", j+1, 1 );
@@ -136,11 +131,12 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
        fListofDataSets.clear();
        fListofDataSets.push_back( iDataSet );
     }
-    cout << "Compare " << fListOfArrays.size() << " arrays in " << fListofDataSets.size() << " data set" << endl;
+    cout << "Compare " << fListOfArrays.size() << " array(s) in " << fListofDataSets.size() << " data set(s)" << endl;
 
     for( unsigned int i = 0; i < fListOfArrays.size(); i++ )
     {
        VPlotWPPhysSensitivity a;
+       a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
        for( unsigned int k = 0; k < fOffAxisAngle.size(); k++ )
        {
 	  for( unsigned int j = 0; j < fListofDataSets.size(); j++ )

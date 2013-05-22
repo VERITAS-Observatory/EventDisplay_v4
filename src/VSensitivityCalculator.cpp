@@ -95,6 +95,9 @@ void VSensitivityCalculator::reset()
     fSourceStrength_step = 0.005;
     setSourceStrengthVector_CU();
 // values of Crab fluxes to be plotted as lines into the sensitivity vs energy graph (in Crab Units)
+    fPlottingCrabFlux_CU.push_back( 1.e3 );
+    fPlottingCrabFlux_CU.push_back( 1.e2 );
+    fPlottingCrabFlux_CU.push_back( 1.e1 );
     fPlottingCrabFlux_CU.push_back( 1.e0 );
     fPlottingCrabFlux_CU.push_back( 1.e-1 );
     fPlottingCrabFlux_CU.push_back( 1.e-2 );
@@ -193,7 +196,7 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 // require background events 
 // (removes most sensitivity values at large energies, but otherwise transition zone
 //  between signal and background limited zone not well defined)
-// NOTE: this cut depends on your MC statistics, not on the sensitivty of your observatory
+// NOTE: this cut depends on your MC statistics, not on the sensitivity of your observatory
 	 bool bPasses_MinimumNumberofBackGroundEvents = (fData[iD].fBackground * fData[iD].fAlpha > 0. );
 // require the signal to be larger than a certain fraction of background
 	 bool bPasses_MinimumSystematicCut = false;
@@ -958,13 +961,17 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 
 	    if( bUnit != "CU" )
 	    {
-		if( fPlottingCrabFlux_CU[i]*100. >=1. )         sprintf( htitle, "%d%% Crab", (int)(fPlottingCrabFlux_CU[i]*100) );
+		if( fPlottingCrabFlux_CU[i] > 1. )              sprintf( htitle, "%d Crab", (int)(fPlottingCrabFlux_CU[i]) );
+		else if( fPlottingCrabFlux_CU[i]*100. >=1. )    sprintf( htitle, "%d%% Crab", (int)(fPlottingCrabFlux_CU[i]*100) );
 		else if( fPlottingCrabFlux_CU[i]*100. > 0.09 )  sprintf( htitle, "%.1f%% Crab", fPlottingCrabFlux_CU[i]*100 );
 		else if( fPlottingCrabFlux_CU[i]*100. > 0.009 ) sprintf( htitle, "%.2f%% Crab", fPlottingCrabFlux_CU[i]*100 );
 		double e = 1. - 0.3 * (double)i;
-		TText *iT = new TText( e, i_fFunCrabFlux[i]->Eval( e ) * 1.1, htitle );
-		iT->SetTextSize( 0.3 * iT->GetTextSize() );
-		iT->Draw();
+		if( hnull && i_fFunCrabFlux[i]->Eval( e ) * 1.1 < hnull->GetMaximum() )
+		{
+		   TText *iT = new TText( e, i_fFunCrabFlux[i]->Eval( e ) * 1.1, htitle );
+		   iT->SetTextSize( 0.3 * iT->GetTextSize() );
+		   iT->Draw();
+                }
 	    }
          }
      }
