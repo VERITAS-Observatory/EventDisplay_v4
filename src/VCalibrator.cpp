@@ -2253,21 +2253,21 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
             is_stream >> iPed;
 
 // get gain file number
-            is_stream >> iGain;
+            if( !is_stream.eof() ) is_stream >> iGain;
 
 // get toff file number
-            is_stream >> iToff;
+            if( !is_stream.eof() ) is_stream >> iToff;
 
 // get pixel status number
-            is_stream >> iPix;
+            if( !is_stream.eof() ) is_stream >> iPix;
 
 // get pad file number
-            is_stream >> iPad;
+            if( !is_stream.eof() ) is_stream >> iPad;
 
 // get low gain pedestal file number
             if( fCalibrationfileVersion > 1 )
             {
-                is_stream >> iLowGainPeds;
+                if( !is_stream.eof() ) is_stream >> iLowGainPeds;
                 if( bReset )
                 {
                     getRunParameter()->fPedLowGainFileNumber.clear();
@@ -2280,14 +2280,14 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 // low gain gains and time offsets
             if( fCalibrationfileVersion > 3 )
             {
-                is_stream >> iLowGainGains;
-                is_stream >> iLowGainToff;
+                if( !is_stream.eof() ) is_stream >> iLowGainGains;
+                if( !is_stream.eof() ) is_stream >> iLowGainToff;
             }
 
 // get low gain multiplier file name
             if( fCalibrationfileVersion > 2 )
             {
-                is_stream >> iLowGainMultiplier;
+                if( !is_stream.eof() ) is_stream >> iLowGainMultiplier;
             }
 
 // iTel < 0: valid for all telescopes
