@@ -9,6 +9,7 @@
 #include "VAnaSumRunParameter.h"
 #include "VASlalib.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
+#include "TEfficiency.h"
 #include "VInstrumentResponseFunctionRunParameter.h"
 #include "VStatistics.h"
 #include "VSpectralWeight.h"
@@ -175,6 +176,7 @@ class VEffectiveAreaCalculator
 
         bool bEffectiveAreasareFunctions;
         bool bEffectiveAreasareHistograms;
+	bool fClopperPearson;                    // statistic option for error calculation
 
 // mean values from getEffectiveAreas
         double fEffectiveAreas_meanZe;
@@ -229,14 +231,15 @@ class VEffectiveAreaCalculator
         void initializeHistograms( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex );
         void resetHistograms( unsigned int iZe );
         void resetHistogramsVectors( unsigned int iZe );
-     	void setTelescopeTypeCuts( bool iB = true ) { fTelescopeTypeCutsSet = iB; }
-        bool setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
-        void setNoiseLevel( int iN, double iP );
-        void setWobbleOffset( double x, double y );
+        void setAzimuthCut( int iAzBin, double iAzMin, double iAzMax );
         void setEffectiveArea( int iMC ) { fEffectiveAreaVsEnergyMC = iMC; }
         void setIgnoreEnergyReconstructionCuts( bool iB = false ) { fIgnoreEnergyReconstruction = iB; }
         void setIsotropicArrivalDirections( bool iB = false ) { fIsotropicArrivalDirections = iB; }
-        void setAzimuthCut( int iAzBin, double iAzMin, double iAzMax );
+        bool setMonteCarloEnergyRange( double iMin, double iMax, double iMCIndex = 2. );
+        void setNoiseLevel( int iN, double iP );
+	void setStatisticsOption( bool iClopperPearson = false ) { fClopperPearson = iClopperPearson; }
+     	void setTelescopeTypeCuts( bool iB = true ) { fTelescopeTypeCutsSet = iB; }
+        void setWobbleOffset( double x, double y );
 	void resetTimeBin();
 	void setTimeBin(double time);
 };

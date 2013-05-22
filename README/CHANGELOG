@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130522 (GM) Error calculation for effective areas: added Clopper Pearson algorithm
+                (normal approximation is still the default)
+
 * 20130521 (GM) improved algorithm to find optimal cuts as function of sensitivity
                 requirements and observing time
 

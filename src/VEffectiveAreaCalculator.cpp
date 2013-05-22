@@ -1181,6 +1181,8 @@ void VEffectiveAreaCalculator::reset()
     bEffectiveAreasareFunctions = false;
     bEffectiveAreasareHistograms = false;
 
+    setStatisticsOption();
+
     fEffArea = 0;
     ze = 0.;
     nbins = 60;
@@ -2194,24 +2196,44 @@ bool VEffectiveAreaCalculator::binomialDivide( TGraphAsymmErrors *g, TH1D *hrec,
     double pj = 0.;
     double pr = 0.;
     double pm = 0.;
-    double sj = 0.;
+    double sj_low = 0.;
+    double sj_up = 0.;
 
     for( int b = 1; b <= hmc->GetNbinsX(); b++ )
     {
         if( hmc->GetBinContent( b ) > 0 && hrec->GetBinContent( b ) > 0 )
         {
             pj = hrec->GetBinContent( b ) / hmc->GetBinContent( b );
-            pr = hrec->GetBinError( b );
-            pm = hmc->GetBinError( b );
-            if( pj != 1. )
+// error calculation for effective areas
+//    choose method with setStatisticsOption()
+//  this far from being straightforward!
+//  none of the methods works consistently, therefore the simplest (normal) solution
+//  is used.
+//  note: approach is only correct for unweighted histograms
+//
+// error calculation assuming normal distributions
+            if( !fClopperPearson )
 	    {
-	       sj = TMath::Abs( ( ( 1.-2.*pj)*pr*pr + pj*pj*pm*pm)/(hmc->GetBinContent( b )*hmc->GetBinContent( b )) );
+	       pr = hrec->GetBinError( b );
+	       pm = hmc->GetBinError( b );
+	       if( pj != 1. )
+	       {
+		  sj_low = TMath::Abs( ( ( 1.-2.*pj)*pr*pr + pj*pj*pm*pm)/(hmc->GetBinContent( b )*hmc->GetBinContent( b )) );
+	       }
+	       else sj_low = 0.;
+	       sj_low = sqrt( sj_low );
+	       sj_up  = sj_low;
             }
-            else           sj = 0.;
-            sj = sqrt( sj );
+// Clopper-Pearson error calculation
+            else
+	    {
+	       sj_low = pj - TEfficiency::ClopperPearson( (int)hmc->GetBinContent( b ), (int)hrec->GetBinContent( b ), 0.6827, false );
+	       sj_up  = TEfficiency::ClopperPearson( (int)hmc->GetBinContent( b ), (int)hrec->GetBinContent( b ), 0.6827, true ) - pj;
+            }
 
+// fill effective area graphs
             g->SetPoint( z, hmc->GetBinCenter( b ), pj );
-            g->SetPointError( z, 0., 0., sj, sj );
+            g->SetPointError( z, 0., 0., sj_low, sj_up );
             z++;
         }
     }
