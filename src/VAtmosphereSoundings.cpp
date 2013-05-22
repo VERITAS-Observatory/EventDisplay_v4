@@ -1119,6 +1119,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
       hProfileAll[k]->SetMarkerStyle( 7 );
    }
 
+// loop over all data sets and plot them
    for( unsigned int i = 0; i < fData.size(); i++ )
    {
       unsigned int iID = getHistogramIdentifier( i );
@@ -1139,6 +1140,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 	       {
 	          int iColor = hMonthly[k].size();
 		  if( iColor > 9 ) iColor++;
+		  if( iColor > 50 ) iColor = iColor % 50;
 		  hMonthly[k][iID]->SetMarkerColor( iColor );
 		  hMonthly[k][iID]->SetLineColor( iColor );
 	          hMonthly[k][iID]->SetMarkerStyle( 20 );
@@ -1153,7 +1155,8 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
             }
 	 }
 // check time range
-         if( fData[i]->Year * 100 + fData[i]->Month >= (int)(iYearStart*100+iMonthStart) && fData[i]->Year*100 + fData[i]->Month <= (int)(iYearStop*100 + iMonthStop ) )
+         if( fData[i]->Year * 100 + fData[i]->Month >= (int)(iYearStart*100+iMonthStart) 
+	  && fData[i]->Year*100 + fData[i]->Month <= (int)(iYearStop*100 + iMonthStop ) )
 	 {
 	    if( k == 0 )
 	    {
@@ -1330,33 +1333,33 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 // add CORSIKA and user defined atmosphere plots
       if( k == 0 )
       {
-         plotCORSIKA_Temperature_vs_Heigth( cTemp );
-	 plotUserAtmosphere_Temperature_vs_Heigth( cTemp );
+         plotCORSIKA_Temperature_vs_Height( cTemp );
+	 plotUserAtmosphere_Temperature_vs_Height( cTemp );
       }
       else if( k == 1 )
       {
-         plotCORSIKA_DewPoint_vs_Heigth( cTemp );
-	 plotUserAtmosphere_DewPoint_vs_Heigth( cTemp );
+         plotCORSIKA_DewPoint_vs_Height( cTemp );
+	 plotUserAtmosphere_DewPoint_vs_Height( cTemp );
       }
       else if( k == 2 )
       {
-         plotCORSIKA_Pressure_vs_Heigth( cTemp );
-	 plotUserAtmosphere_Pressure_vs_Heigth( cTemp );
+         plotCORSIKA_Pressure_vs_Height( cTemp );
+	 plotUserAtmosphere_Pressure_vs_Height( cTemp );
       }
       else if( k == 3 )
       {
-         plotCORSIKA_Density_vs_Heigth( cTemp );
-	 plotUserAtmosphere_Density_vs_Heigth( cTemp );
+         plotCORSIKA_Density_vs_Height( cTemp );
+	 plotUserAtmosphere_Density_vs_Height( cTemp );
       }
       else if( k == 4 )
       {
-         plotCORSIKA_RelativeHumidity_vs_Heigth( cTemp );
-	 plotUserAtmosphere_RelativeHumidity_vs_Heigth( cTemp );
+         plotCORSIKA_RelativeHumidity_vs_Height( cTemp );
+	 plotUserAtmosphere_RelativeHumidity_vs_Height( cTemp );
       }
       else if( k == 5 )
       {
-         plotCORSIKA_Thickness_vs_Heigth( cTemp );
-	 plotUserAtmosphere_Thickness_vs_Heigth( cTemp );
+         plotCORSIKA_Thickness_vs_Height( cTemp );
+	 plotUserAtmosphere_Thickness_vs_Height( cTemp );
       }
 
       if( fPlottingLegendDraw && fPlottingLegend[k] ) fPlottingLegend[k]->Draw();
@@ -1420,7 +1423,8 @@ bool VAtmosphereSoundings::readRootFile()
    return true;
 }
 
-TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas *c, int iPlotID, vector< VAtmosphereSoundingData* > iData, double iHeightMin, double iHeightMax )
+TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas *c, int iPlotID, vector< VAtmosphereSoundingData* > iData,
+                                            double iHeightMin, double iHeightMax )
 {
     char hname[800];
 
@@ -1507,9 +1511,11 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas *c, int iPlotID, vector< VAt
 
 
 //////////////////////////////////////////////////////
+    bool bNewCanvas = true;
     if( c ) 
     {
        c->cd();
+       bNewCanvas = false;
     }
     else
     {
@@ -1610,7 +1616,12 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas *c, int iPlotID, vector< VAt
        }
        if( g.back()->GetN() > 1 )
        {
-          g.back()->Draw( "l" );
+          if( bNewCanvas )
+	  {
+	     g.back()->Draw( "al" );
+	     bNewCanvas = false;
+          }
+	  else             g.back()->Draw( "l" );
 	  iL->AddEntry( g.back(), iData[i]->Name.c_str(), "pl" );
        }
     }

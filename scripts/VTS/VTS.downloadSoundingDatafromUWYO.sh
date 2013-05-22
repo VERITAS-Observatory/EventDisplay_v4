@@ -4,10 +4,6 @@
 #
 #    combine the monthly data into one file and create a list of files (in this case just the total file): 
 #
-#    cat sounding_2010* > all_2010.dat
-#    ls all_2010.dat > list_2010.dat
-#
-#
 # Author Gernot Maier
 #
 
