@@ -1179,6 +1179,39 @@ int main(int argc, char **argv)
    if ( verbose && !quiet )
       showhistory = 1;
 
+   /* Now go over rest of the command line */
+   while ( argc > 1 || input_fname != NULL )
+   {
+    if ( interrupted )
+      break;
+    if ( argc > 1 )
+    {
+      if ( argv[1][0] == '-' && argv[1][1] != '\0' )
+         syntax(program);
+      else
+      {
+	 input_fname = argv[1];
+	 argc--;
+	 argv++;
+      }
+    }
+    if ( strcmp(input_fname ,"-") == 0 )
+      iobuf->input_file = stdin;
+    else if ( (iobuf->input_file = fileopen(input_fname,READ_BINARY)) == NULL )
+    {
+      perror(input_fname);
+      cout << "Cannot open input file." << endl;
+      cout << "exiting..." << endl;
+      exit( -1 );
+    }
+
+    fflush(stdout);
+    fprintf(stderr,"%s\n",input_fname);
+    string f_inputfilename= "";
+    if( input_fname ) f_inputfilename = input_fname;
+    printf("\nInput file '%s' has been opened.\n",input_fname);
+    input_fname = NULL;
+
 ///////////////////////////////////////////////////////////////////
    cout << endl << "NOTE: FIXED TIMING LEVELS!!" << endl << endl;
 ///////////////////////////////////////////////////////////////////
@@ -1212,37 +1245,6 @@ int main(int argc, char **argv)
    VMonteCarloRunHeader *fMC_header = new VMonteCarloRunHeader();
    fMC_header->SetName( "MC_runheader" );
     
-   /* Now go over rest of the command line */
-   while ( argc > 1 || input_fname != NULL )
-   {
-    if ( interrupted )
-      break;
-    if ( argc > 1 )
-    {
-      if ( argv[1][0] == '-' && argv[1][1] != '\0' )
-         syntax(program);
-      else
-      {
-	 input_fname = argv[1];
-	 argc--;
-	 argv++;
-      }
-    }
-    if ( strcmp(input_fname ,"-") == 0 )
-      iobuf->input_file = stdin;
-    else if ( (iobuf->input_file = fileopen(input_fname,READ_BINARY)) == NULL )
-    {
-      perror(input_fname);
-      cout << "Cannot open input file." << endl;
-      break;
-    }
-
-    fflush(stdout);
-    fprintf(stderr,"%s\n",input_fname);
-    string f_inputfilename= "";
-    if( input_fname ) f_inputfilename = input_fname;
-    printf("\nInput file '%s' has been opened.\n",input_fname);
-    input_fname = NULL;
 
     for (;;) /* Loop over all data in the input file */
     {

@@ -466,21 +466,20 @@ void VEvndispRunParameter::print( int iEv )
 	    cout << "\t LL edge fit: \t\t\tloss > " << fLogLikelihoodLoss_min[i] << "\t ntubes > " << fLogLikelihood_Ntubes_min[i] << endl;	    
 
 	    // calibration
-	    if( TMath::Abs( fGainCorrection[fTelToAnalyze[i]] ) - 1. > 1.e-2 )
+	    if( fTelToAnalyze[i] < fGainCorrection.size() && TMath::Abs( fGainCorrection[fTelToAnalyze[i]] ) - 1. > 1.e-2 )
 	    {
 		cout << "\t additional gain correction: " << fGainCorrection[fTelToAnalyze[i]];
 	    }
-// 	    cout << endl;
             cout << "\t pedestal file: " << fPedFileNumber[i];
-            if( fPedLowGainFileNumber[i] > 0 ) cout << ", low gain pedestal file: " << fPedLowGainFileNumber[i];
-            cout << ", gain file: " << fGainFileNumber[i];
-            if( fGainLowGainFileNumber[i] > 0 ) cout << ", low gain gain file: " << fGainLowGainFileNumber[i];
+            if( i < fPedLowGainFileNumber.size() && fPedLowGainFileNumber[i] > 0 ) cout << ", low gain pedestal file: " << fPedLowGainFileNumber[i];
+            if( i < fGainFileNumber.size() ) cout << ", gain file: " << fGainFileNumber[i];
+            if( i < fGainLowGainFileNumber.size() && fGainLowGainFileNumber[i] > 0 ) cout << ", low gain gain file: " << fGainLowGainFileNumber[i];
             if( i < fGainCorrection.size() && TMath::Abs( fGainCorrection[i] - 1. ) > 0.001 ) cout << " (gain correction: " << fGainCorrection[i]  << ")";
-            cout << ", toff file: " << fTOffFileNumber[i];
-            if( fTOffLowGainFileNumber[i] > 0 ) cout << ", low gain toff file: " << fTOffLowGainFileNumber[i];
-            cout << ", pixel file: " << fPixFileNumber[i];
-	    cout << ", tzero file: " << fTZeroFileNumber[i];
-	    if( fTZeroLowGainFileNumber[i] > 0 ) cout << ", low gain tzero file: " << fTZeroLowGainFileNumber[i];
+            if( i < fTOffFileNumber.size() ) cout << ", toff file: " << fTOffFileNumber[i];
+            if( i < fTOffLowGainFileNumber.size() && fTOffLowGainFileNumber[i] > 0 ) cout << ", low gain toff file: " << fTOffLowGainFileNumber[i];
+            if( i < fPixFileNumber.size() ) cout << ", pixel file: " << fPixFileNumber[i];
+	    if( i < fTZeroFileNumber.size() ) cout << ", tzero file: " << fTZeroFileNumber[i];
+	    if( i < fTZeroLowGainFileNumber.size() && fTZeroLowGainFileNumber[i] > 0 ) cout << ", low gain tzero file: " << fTZeroLowGainFileNumber[i];
 	    cout << endl;
         }
     }

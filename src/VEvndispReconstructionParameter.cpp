@@ -374,7 +374,8 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
         cout << "\t set number: " << m << ", array reconstruction method: " << fMethodID[m];
         if( fUseEventdisplayPointing[m] ) cout << ", use eventdisplay pointing (no pointing correction from DB or pointing monitor)";
         cout << endl;
-        cout << "\t\t minimum number of images: " << fNImages_min[m] << ", minimum angle between image axes [deg]: " << fAxesAngles_min[m] << endl;
+        cout << "\t\t minimum number of images: " << fNImages_min[m] << endl;
+	cout << "\t\t minimum angle between image axes [deg]: " << fAxesAngles_min[m] << endl;
         if( fMLPFileName[m].size() > 0 ) cout << "\t\t MLP file: " << fMLPFileName[m] << endl;
 	if( fTMVAFileName[m].size() > 0 ) cout << "\t\t TMVA (BDT) file: " << fTMVAFileName[m] << endl;
         if( fDispFileName[m].size() > 0 ) cout << "\t\t DISP table: " << fDispFileName[m] << endl;
@@ -392,9 +393,12 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
         cout << "\t\t use image in reconstruction:\t\t\t\t\t ";
         for( unsigned int i = 0; i < fLocalUseImage[m].size(); i++ ) cout << fLocalUseImage[m][i] << "\t";
         cout << endl;
-	cout << "\t\t L2 trigger type: \t\t\t\t\t\t ";
-	for( unsigned int i = 0; i < fL2TriggerType[m].size(); i++ ) cout << fL2TriggerType[m][i] << "\t";
-	cout << endl;
+	if( m < fL2TriggerType.size() )
+	{
+	   cout << "\t\t L2 trigger type: \t\t\t\t\t\t ";
+	   for( unsigned int i = 0; i < fL2TriggerType[m].size(); i++ ) cout << fL2TriggerType[m][i] << "\t";
+	   cout << endl;
+        }
         cout << "\t\t minimum number of pixels per image:\t\t\t\t ";
         for( unsigned int i = 0; i < fLocalNtubes_min[m].size(); i++ ) cout << fLocalNtubes_min[m][i] << "\t";
         cout << endl;
