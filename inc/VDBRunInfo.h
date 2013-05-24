@@ -54,6 +54,7 @@ class VDBRunInfo
 	TSQLServer*            connectToSQLServer( string iDBserver );
 	vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
         void                   readRunInfoFromDB( string );
+        void                   readRunDQM( string );
 
     public:
 

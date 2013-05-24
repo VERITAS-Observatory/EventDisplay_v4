@@ -35,9 +35,56 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel )
     fDuration = 0;
 
     readRunInfoFromDB( iDBserver );
+    readRunDQM( iDBserver );
     getLaserRun( iDBserver, fRunNumber, iNTel );
 }
 
+void VDBRunInfo::readRunDQM( string iDBserver )
+{
+
+
+    stringstream iTempS;
+    iTempS << iDBserver << "/VOFFLINE";
+    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
+
+    char c_query[1000];
+
+    sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRunNumber );
+
+    TSQLResult *db_res = f_db->Query( c_query );
+    if( !db_res ) return;
+
+    TSQLRow *db_row = db_res->Next();
+    if( !db_row )
+    {
+       cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << fRunNumber << endl;
+    } else
+    {
+
+      if( db_row->GetField( 4 ) ) fConfigMask = (unsigned int)(atoi( db_row->GetField( 4 ) ) ); 
+      else fConfigMask = 0;
+      if( fConfigMask == 1 ) fTelToAna = 123;
+      else if( fConfigMask == 2 ) fTelToAna = 124;
+      else if( fConfigMask == 3 ) fTelToAna = 12;
+      else if( fConfigMask == 4 ) fTelToAna = 134;
+      else if( fConfigMask == 5 ) fTelToAna = 13;
+      else if( fConfigMask == 6 ) fTelToAna = 14;
+      else if( fConfigMask == 7 ) fTelToAna = 1;
+      else if( fConfigMask == 8 ) fTelToAna = 234;
+      else if( fConfigMask == 9 ) fTelToAna = 23;
+      else if( fConfigMask == 10 ) fTelToAna = 24;
+      else if( fConfigMask == 11 ) fTelToAna = 2;
+      else if( fConfigMask == 12 ) fTelToAna = 34;
+      else if( fConfigMask == 13 ) fTelToAna = 3;
+      else if( fConfigMask == 14 ) fTelToAna = 4;
+      else if( fConfigMask == 15 ) fTelToAna = 0;
+
+    }
+
+    f_db->Close();
+
+    return;
+}
 
 void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 {
