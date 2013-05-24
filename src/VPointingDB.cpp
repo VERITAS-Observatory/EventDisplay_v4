@@ -457,32 +457,66 @@ bool VPointingDB::readPointingCalibratedVPMFromDB()
   sprintf( cflag_query, "SELECT vpm_config_mask FROM tblRun_Analysis_Comments WHERE run_id = %d", fRunNumber ); 
   TSQLResult *db_flag = f_dbOFFLINE->Query( cflag_query );
   if( !db_flag ) {
-    cout<<"VPointingDB: missing VPM quality flag"<<endl;
+    cout<<"VPointingDB: error, missing VPM quality flag"<<endl;
+    if( f_dbOFFLINE ) f_dbOFFLINE->Close();
     return false;
   }
   TSQLRow *flag_row = db_flag->Next();
   if( !flag_row || !flag_row->GetField(0) )
   {
      cout << "VPointingDB: error while reading VPM quality flag" << endl;
+     if( f_dbOFFLINE ) f_dbOFFLINE->Close();
      return false;
   }
   int maskVPM = atoi( flag_row->GetField(0) );
 
   if( getTelID() == 0 ) {    // T1 bad  
-    if( maskVPM == 0 || maskVPM == 2 || maskVPM == 4 || maskVPM == 8 ) return false;
-    if( maskVPM == 6 || maskVPM == 10 || maskVPM == 12 || maskVPM == 14 ) return false;
+    if( maskVPM == 0 || maskVPM == 2 || maskVPM == 4 || maskVPM == 8 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
+    if( maskVPM == 6 || maskVPM == 10 || maskVPM == 12 || maskVPM == 14 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
   }
   if( getTelID() == 1 ) {    // T2 bad
-    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 4 || maskVPM == 8 ) return false;
-    if( maskVPM == 5 || maskVPM == 9 || maskVPM == 12 || maskVPM == 13 ) return false;
+    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 4 || maskVPM == 8 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
+    if( maskVPM == 5 || maskVPM == 9 || maskVPM == 12 || maskVPM == 13 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
   }
   if( getTelID() == 2 ) {    // T3 bad    
-    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 8 ) return false;
-    if( maskVPM == 3 || maskVPM == 9 || maskVPM == 10 || maskVPM == 11 ) return false;
+    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 8 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
+    if( maskVPM == 3 || maskVPM == 9 || maskVPM == 10 || maskVPM == 11 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
   }
   if( getTelID() == 3 ) {    // T4 bad    
-    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 4 ) return false;
-    if( maskVPM == 3 || maskVPM == 5 || maskVPM == 6 || maskVPM == 7 ) return false;
+    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 4 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
+    if( maskVPM == 3 || maskVPM == 5 || maskVPM == 6 || maskVPM == 7 )
+    {
+       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+       return false;
+    }
   }
 
   // loop over all db entries
