@@ -35,6 +35,7 @@ namespace VMathsandFunctions
    double getMeanEnergyInBin( unsigned int iMethod, double e_min_log10, double e_max_log10, double iSpectralIndex );
    double getBaryCentricMeanEnergy( double e_min_log10, double e_max_log10, double iSpectralIndex );
    double getMeanEnergy( double e_min_log10, double e_max_log10 );
+   double getRatioError( double x1, double x2, double ex1, double ex2 );   // x1 / x2
    double getSpectralWeightedMeanEnergy( double e_min_log10, double e_max_log10, double iSpectralIndex );
 }
 

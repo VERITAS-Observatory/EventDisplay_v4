@@ -294,7 +294,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 // try to read CTA file
        if( !getDataFromCTAFile() )
        {
-	  cout << "Error: effective area tree not found" << endl;
+	  cout << "Error: effective area histogram not found in CTA-style file" << endl;
 	  return false;
        }
        else return true;

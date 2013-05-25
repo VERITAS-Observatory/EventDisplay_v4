@@ -10,10 +10,14 @@
 #include <vector>
 
 #include "TCanvas.h"
+#include "TGraphAsymmErrors.h"
 #include "TH1D.h"
 #include "TH1F.h"
 #include "TLegend.h"
+#include "TLine.h"
 
+#include "VHistogramUtilities.h"
+#include "VMathsandFunctions.h"
 #include "VPlotInstrumentResponseFunction.h"
 #include "VPlotUtilities.h"
 #include "VSensitivityCalculator.h"
@@ -54,6 +58,12 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    string fCrabSpectraFile;
    unsigned int fCrabSpectraID;
 
+// projected sensitvity plots
+   vector< double > fProjectionEnergy_logTeV;
+   vector< TGraphAsymmErrors* > fProjectionSensitivityvsCameraOffset;
+
+   void    fillProjectedSensitivityPlot( unsigned int i, VSensitivityCalculator *iS );
+   void    initialProjectedSensitivityPlots();
    bool    plotLegend( TCanvas *c = 0, bool iLeft = false );
 
    public:
@@ -68,6 +78,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    vector< string > getListOfArrays();
    bool initialize( VPlotWPPhysSensitivityData* );
    bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
+   TCanvas* plotProjectedSensitivities( TCanvas* );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10, string iUnit = "ENERGY"  );
    void reset();
    void setCrabSpectraFile( string iFile = "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat",

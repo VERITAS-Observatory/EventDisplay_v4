@@ -323,3 +323,23 @@ TH1F* VHistogramUtilities::get_CTA_IRF_Histograms( string iHistogramName, double
 
     return h;
 }
+
+int VHistogramUtilities::findBinInGraph( TGraph *g, double x )
+{
+   if( !g ) return -1;
+
+   double i_x = 0.;
+   double i_x_low = 0.;
+   double i_x_high = 0.;
+   double i_y = 0.;
+   for( int i = 0; i < g->GetN(); i++ )
+   {
+       g->GetPoint( i, i_x, i_y );
+       i_x_low = g->GetErrorXlow( i );
+       i_x_high = g->GetErrorXhigh( i );
+
+       if( x > i_x - i_x_low && x <= i_x + i_x_high ) return i;
+   }
+
+   return -1;
+}

@@ -43,7 +43,7 @@ bool VPlotWPPhysSensitivity::addDataSet( VPlotWPPhysSensitivityData* iData, bool
     {
        fData.back()->fSensitivityFileName = iData->fSensitivityFileName;
     }
-
+// check if file exists
     TFile iF( fData.back()->fSensitivityFileName.c_str() );
     if( !iF.IsZombie() ) fData.back()->fFileExists = true;
     else                 fData.back()->fFileExists = false;
@@ -91,6 +91,11 @@ bool VPlotWPPhysSensitivity::initialize( VPlotWPPhysSensitivityData* iData )
    {
       sprintf( hname, "%ds", (int)(iData->fObservationTime_s) );
       iTemp << "data/DESY/" << iData->fAnalysis << "." << iData->fSubArray << "." << hname << ".root";
+   }
+   else if( iData->fAnalysis.find( "DIV" ) != string::npos )
+   {
+      sprintf( hname, "%ds", (int)(iData->fObservationTime_s) );
+      iTemp << "data/DIV/" << iData->fAnalysis << "." << iData->fSubArray << "." << hname << ".root";
    }
    else if( iData->fAnalysis == "VTS" )
    {
@@ -231,6 +236,140 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
     return true;
 }
 
+void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
+{
+// (hard coded energies here...)
+   fProjectionEnergy_logTeV.push_back( log10( 10.001 ) );
+   fProjectionEnergy_logTeV.push_back( log10( 1. ) );
+//   fProjectionEnergy_logTeV.push_back( log10( 0.25 ) );
+   fProjectionEnergy_logTeV.push_back( log10( 0.08 ) );
+ 
+   char hname[200];
+   for( unsigned int i = 0; i < fProjectionEnergy_logTeV.size(); i++ )
+   {
+       fProjectionSensitivityvsCameraOffset.push_back( new TGraphAsymmErrors( ) );
+       sprintf( hname, "fProjectionSensitivityvsCameraOffset_%d", i );
+       fProjectionSensitivityvsCameraOffset.back()->SetName( hname );
+       fProjectionSensitivityvsCameraOffset.back()->SetTitle( "" );
+
+       setGraphPlottingStyle( fProjectionSensitivityvsCameraOffset.back(), i+1, 1., 20, 1.5 );
+   }
+}
+
+
+void VPlotWPPhysSensitivity::fillProjectedSensitivityPlot( unsigned int iDataSet, VSensitivityCalculator *a )
+{
+   if( !a ) return;
+   if( iDataSet >= fData.size() ) return;
+
+   TGraphAsymmErrors *g = a->getSensitivityGraph();
+   if( a )
+   {
+       VHistogramUtilities h;
+       for( unsigned int i = 0; i < fProjectionEnergy_logTeV.size(); i++ )
+       {
+          if( i < fProjectionSensitivityvsCameraOffset.size() && fProjectionSensitivityvsCameraOffset[i] )
+	  {
+	      int z = fProjectionSensitivityvsCameraOffset[i]->GetN();
+              int iBin = h.findBinInGraph( g, fProjectionEnergy_logTeV[i] );
+	      if( iBin >= 0 )
+	      {
+// check that this is not below or above the highest bin
+		  double x = 0.;
+		  double y = 0.;
+		  g->GetPoint( iBin, x, y );
+                  double x_low = x - g->GetErrorXlow( iBin );
+                  double x_high = x + g->GetErrorXhigh( iBin );
+		  if( fProjectionEnergy_logTeV[i] >= x_low && fProjectionEnergy_logTeV[i] < x_high )
+		  {
+		     fProjectionSensitivityvsCameraOffset[i]->SetPoint( z, fData[iDataSet]->fCameraOffset_deg,
+		                                                           g->Eval( fProjectionEnergy_logTeV[i] ) );
+		     fProjectionSensitivityvsCameraOffset[i]->SetPointEYhigh( z, g->GetErrorYhigh( iBin ) );
+		     fProjectionSensitivityvsCameraOffset[i]->SetPointEYlow( z, g->GetErrorYlow( iBin ) );
+                  }
+              }
+          }
+       }
+   }
+}
+
+TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c )
+{
+    TCanvas *cC = 0;
+    if( c ) cC = c;
+    else
+    {
+        cC = new TCanvas( "cCProjection", "projected off axis sensitivities", 800, 100, 400, 400 );
+	cC->SetGridx( 0 );
+	cC->SetGridy( 0 );
+	cC->SetLeftMargin( 0.13 );
+	cC->Draw();
+	TH1D *hnull = new TH1D( "hnull", "", 10, 0., 5.2 );
+	hnull->SetStats( 0 );
+	hnull->SetXTitle( "distance to camera center [deg]" );
+	hnull->SetYTitle( "relative acceptance" );
+	hnull->SetMinimum( 0. );
+	hnull->SetMaximum( 1.3 );
+	hnull->Draw();
+        TLine *iLi = new TLine( hnull->GetXaxis()->GetXmin(), 1., hnull->GetXaxis()->GetXmax(), 1. );
+	iLi->Draw();
+    }
+    cC->cd();
+
+    TLegend *iL = new TLegend( 0.15, 0.15, 0.4, 0.4 );
+    char hname[200];
+
+    unsigned int z = 0;
+    for( unsigned int i = 0; i < fProjectionEnergy_logTeV.size(); i++ )
+    {
+        cout << "Plotting projected sensitivity for energy " << fProjectionEnergy_logTeV[i] << endl;
+	if( i < fProjectionSensitivityvsCameraOffset.size() && fProjectionSensitivityvsCameraOffset[i] )
+	{
+// normalize graphs to average of first two points
+	    if( fProjectionSensitivityvsCameraOffset[i]->GetN() > 2 )
+	    {
+		double x = 0.;
+		double y = 0.;
+	        double y_norm = 0.;
+		fProjectionSensitivityvsCameraOffset[i]->GetPoint( 0, x, y );
+		fProjectionSensitivityvsCameraOffset[i]->GetPoint( 1, x, y_norm );
+		y_norm = 0.5*( y + y_norm );
+		double y_normE_low = sqrt( fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 0 )
+		                          *fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 0 )
+					 + fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 1 )
+					 * fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 1 ) );
+		double y_normE_high = sqrt( fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 0 )
+		                          *fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 0 )
+					 + fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 1 )
+					 * fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 1 ) );
+
+	        for( int p = 0; p < fProjectionSensitivityvsCameraOffset[i]->GetN(); p++ )
+	        {
+		    fProjectionSensitivityvsCameraOffset[i]->GetPoint( p, x, y );
+		    if( y > 0. ) fProjectionSensitivityvsCameraOffset[i]->SetPoint( p, x, y_norm / y );
+		    else         fProjectionSensitivityvsCameraOffset[i]->SetPoint( p, x, 0. );
+		    fProjectionSensitivityvsCameraOffset[i]->SetPointEYhigh( p, 
+		             VMathsandFunctions::getRatioError( y_norm, y, y_normE_high,
+			                                                   fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( p ) ) );
+		    fProjectionSensitivityvsCameraOffset[i]->SetPointEYlow( p, 
+		             VMathsandFunctions::getRatioError( y_norm, y, y_normE_low,
+			                                                   fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( p ) ) ); 
+		}
+            }
+            
+	    fProjectionSensitivityvsCameraOffset[i]->Print();
+	    fProjectionSensitivityvsCameraOffset[i]->Draw( "pl" );
+	    sprintf( hname, "%.2f TeV", TMath::Power( 10., fProjectionEnergy_logTeV[i] ) );
+	    iL->AddEntry( fProjectionSensitivityvsCameraOffset[i], hname, "lp" );
+            z++;
+        }
+    }
+    iL->Draw();
+
+    return cC;
+}
+
+
 /*
 
     plot sensitivities and data rates for different data sets
@@ -240,6 +379,8 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 {
    TCanvas *cSens = 0;
    TCanvas *cBck = 0;
+
+   initialProjectedSensitivityPlots();
 
 // loop over all data sets
    for( unsigned int i = 0; i < fData.size(); i++ )
@@ -256,7 +397,9 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
       if( i == 0 ) c_temp = a->plotSignalBackgroundRates( cBck, true, 2.e-7, 1. );   // plot also protons and electrons
       else         c_temp = a->plotSignalBackgroundRates( cBck, false, 2.e-7, 1. );
       if( c_temp ) cBck = c_temp;
+      fillProjectedSensitivityPlot( i, a );
    }
+// print results
    if( cSens )
    {
       plotLegend( cSens, false );

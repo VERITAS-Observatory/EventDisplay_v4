@@ -22,12 +22,13 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
 {
 
     vector< double > iOffAxisValue;
-    iOffAxisValue.push_back( 0.1 );
-    iOffAxisValue.push_back( 1.2 );
-    iOffAxisValue.push_back( 2.4 );
-    iOffAxisValue.push_back( 3.1 );
-    iOffAxisValue.push_back( 3.6 );
-    iOffAxisValue.push_back( 4.1 );
+    iOffAxisValue.push_back( 0.5 );
+    iOffAxisValue.push_back( 1.5 );
+    iOffAxisValue.push_back( 2.5 );
+    iOffAxisValue.push_back( 3.25 );
+    iOffAxisValue.push_back( 3.75 );
+    iOffAxisValue.push_back( 4.25 );
+    iOffAxisValue.push_back( 4.75 );
 
     cout << "VWPPhysSensitivityPlotsMaker: hardwired offsets from camera center: ";
     for( unsigned int i = 0; i < iOffAxisValue.size(); i++ ) cout << iOffAxisValue[i] << ", ";
@@ -133,6 +134,7 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
     }
     cout << "Compare " << fListOfArrays.size() << " array(s) in " << fListofDataSets.size() << " data set(s)" << endl;
 
+    TCanvas *c = 0;
     for( unsigned int i = 0; i < fListOfArrays.size(); i++ )
     {
        VPlotWPPhysSensitivity a;
@@ -148,6 +150,9 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
        if( fPrintingOptions.size() > 0 ) iP += fPrintingOptions + "-" + fListOfArrays[i];
        a.plotIRF( iP );
        a.plotSensitivity( iP, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
+
+       cout << "AAA " << i << "\t" << c << endl;
+       c = a.plotProjectedSensitivities( c );
     }
 }
 
