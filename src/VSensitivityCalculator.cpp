@@ -183,8 +183,12 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
     {
         f = fSourceStrength[n];
 
+// default significance calculation
         s = VStatistics::calcSignificance( t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha), 
 	                                   t * fData[iD].fBackground, fData[iD].fAlpha, fLiAndMaEqu );
+// significance calculation for Crab flares (don't use!)
+//        s = VStatistics::calcSignificance( t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha + n_diff), 
+//	                                   t * ( fData[iD].fBackground + n_diff / fData[iD].fAlpha ), fData[iD].fAlpha, fLiAndMaEqu );
 
 //////////////////////////////////////////////////////////////////////////
 // check if this set of observations passes the significance criteria

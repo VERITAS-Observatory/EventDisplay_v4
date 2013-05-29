@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130524 (GM) Bug fix: close open DB connection in VPM quality control part in
+                         case the run failes the quality control
+
 * 20130522 (GM) added tests for completeness while reading line in calibration lines
 
 * 20130522 (GM) Error calculation for effective areas: added Clopper Pearson algorithm
