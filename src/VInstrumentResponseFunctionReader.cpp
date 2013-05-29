@@ -210,6 +210,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     h = 0;
     gEnergyBias_Mean = new TGraphErrors( 1 );
     h = (TH1F*)get_CTA_IRF_Histograms( "Ebias", fWoff );
+    if( !h ) h = (TH1F*)get_CTA_IRF_Histograms_from2D( "EestOverEtrue", -1. );
     if( h )
     {
        get_Graph_from_Histogram( h, gEnergyBias_Mean, true, -100. );

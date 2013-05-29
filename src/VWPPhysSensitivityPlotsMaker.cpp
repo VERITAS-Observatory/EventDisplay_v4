@@ -82,7 +82,7 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile )
    VPlotWPPhysSensitivity a;
    a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
    a.addDataSets( iDataSetFile );
-   a.plotIRF( fPrintingOptions );
+   a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3 );
    a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
 }
 
@@ -151,7 +151,6 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
        a.plotIRF( iP );
        a.plotSensitivity( iP, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
 
-       cout << "AAA " << i << "\t" << c << endl;
        c = a.plotProjectedSensitivities( c );
     }
 }

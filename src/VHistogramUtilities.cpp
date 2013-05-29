@@ -223,7 +223,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
     return h1D;
 }
 
-bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphErrors *g, bool bIgnoreErrors, double iMinBinContent )
+bool VHistogramUtilities::get_Graph_from_Histogram( TH1 *h, TGraphErrors *g, bool bIgnoreErrors, double iMinBinContent )
 {
     if( !h || !g ) return false;
 
@@ -241,8 +241,7 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphErrors *g, bo
     return true;
 }
 
-
-bool VHistogramUtilities::get_Graph_from_Histogram( TH1F *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis, double iCutUnrealisticErrors )
+bool VHistogramUtilities::get_Graph_from_Histogram( TH1 *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis, double iCutUnrealisticErrors )
 {
     if( !h || !g ) return false;
 
@@ -322,6 +321,34 @@ TH1F* VHistogramUtilities::get_CTA_IRF_Histograms( string iHistogramName, double
     }
 
     return h;
+}
+
+/*
+
+   get histograms from CTA WP Phys sensitivity files
+
+   2D version: return profile 
+
+*/ 
+
+TH1F* VHistogramUtilities::get_CTA_IRF_Histograms_from2D( string iHistogramName, double iSummand )
+{
+
+   TH2F *h2D = (TH2F*)gDirectory->Get( iHistogramName.c_str() );
+   if( h2D )
+   {
+      TH1F *h = (TH1F*)h2D->ProfileX();
+      if( h && iSummand != 0. )
+      {
+         for( int i = 1; i <= h->GetNbinsX(); i++ )
+	 {
+	    h->SetBinContent( i, h->GetBinContent( i ) + iSummand );
+         }
+	 return h;
+      }
+   }
+
+   return 0;
 }
 
 int VHistogramUtilities::findBinInGraph( TGraph *g, double x )
