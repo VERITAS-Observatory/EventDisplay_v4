@@ -8,7 +8,7 @@
 #
 #######################################################################
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ] && [ ! -n "$5" ]
+if [ $# -ne 7 ]
 then
    echo 
    echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name> <offset=0/1> <recid> <data set>"
@@ -91,7 +91,7 @@ do
 
    mv $ODIR/$FSCRIPT-$ARRAY-8.sh $ODIR/$FSCRIPT-$ARRAY.sh
 
-   qsub -V -js 20 -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $ODIR -e $ODIR "$ODIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $ODIR -e $ODIR "$ODIR/$FSCRIPT-$ARRAY.sh"
 
 done
 
