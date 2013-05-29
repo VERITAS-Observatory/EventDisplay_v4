@@ -4,6 +4,7 @@
 #
 # Author: Gernot Maier
 #
+##########################################################################################################
 
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ]
 then
@@ -57,6 +58,9 @@ NWOBBLE=${#WOBBLE[@]}
 ##############################################
 FDIR=$VERITAS_USER_LOG_DIR"/queueMSCW/"
 mkdir -p $FDIR
+# directory for run log files
+LDIR=$DIR
+LDIR=/dev/null
 
 ##############################################
 # loop over all ze/noise/wobble offsets
@@ -76,32 +80,23 @@ do
       FNAM="$FSCRIPT-$ANAC-$RECID-$IZE-$NNOI-$WOFF-$PART"
       echo $FDIR/$FNAM
 
-      sed -e "s|TABLEFILE|$TFIL|" $FSCRIPT.sh > $FDIR/$FSCRIPT-1.sh
-      sed -e "s/TELESCOPES/$ANAC/" $FDIR/$FSCRIPT-1.sh > $FDIR/$FSCRIPT-2.sh
-      rm -f $FDIR/$FSCRIPT-1.sh
-      sed -e "s/IZENITH/$IZE/" $FDIR/$FSCRIPT-2.sh > $FDIR/$FSCRIPT-2a.sh
-      rm -f $FDIR/$FSCRIPT-2.sh
-      sed -e "s/NNNNOISE/$NNOI/" $FDIR/$FSCRIPT-2a.sh > $FDIR/$FSCRIPT-2b.sh
-      rm -f $FDIR/$FSCRIPT-2a.sh
-      sed -e "s/ATMOOOS/$ATMO/" $FDIR/$FSCRIPT-2b.sh > $FDIR/$FSCRIPT-2c.sh
-      rm -f $FDIR/$FSCRIPT-2b.sh
-      sed -e "s/FUUUUUL/$FTRE/" $FDIR/$FSCRIPT-2c.sh > $FDIR/$FSCRIPT-2f.sh
-      rm -f $FDIR/$FSCRIPT-2c.sh
-      sed -e "s/WWWOBB/$WOFF/" $FDIR/$FSCRIPT-2f.sh > $FDIR/$FSCRIPT-3.sh
-      rm -f $FDIR/$FSCRIPT-2f.sh
-      sed -e "s/PAAAAART/$PART/" $FDIR/$FSCRIPT-3.sh > $FDIR/$FSCRIPT-3a.sh
-      rm -f $FDIR/$FSCRIPT-3.sh
-      sed -e "s/RUUUUNNN/$RUNN/" $FDIR/$FSCRIPT-3a.sh > $FDIR/$FSCRIPT-3b.sh
-      rm -f $FDIR/$FSCRIPT-3a.sh
-      sed -e "s/ARRRRAY/$ARRAY/" $FDIR/$FSCRIPT-3b.sh > $FDIR/$FSCRIPT-3c.sh
-      rm -f $FDIR/$FSCRIPT-3b.sh
-      sed -e "s/RECONSTRUCTIONID/$RECID/" $FDIR/$FSCRIPT-3c.sh > $FDIR/$FNAM.sh
+# pass command line options to submission script
+      sed -e "s|TABLEFILE|$TFIL|" \
+          -e "s/TELESCOPES/$ANAC/" \
+	  -e "s/IZENITH/$IZE/" \
+	  -e "s/NNNNOISE/$NNOI/" \
+	  -e "s/ATMOOOS/$ATMO/" \
+	  -e "s/FUUUUUL/$FTRE/" \
+	  -e "s/WWWOBB/$WOFF/" \
+	  -e "s/PAAAAART/$PART/" \
+	  -e "s/RUUUUNNN/$RUNN/" \
+	  -e "s/ARRRRAY/$ARRAY/" \
+	  -e "s/RECONSTRUCTIONID/$RECID/" $FSCRIPT.sh > $FDIR/$FNAM.sh
+
       rm -f $FDIR/$FSCRIPT-3c.sh
 
-      chmod u+x $FDIR/$FNAM.sh
-
 # submit the job
-      qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $FDIR -e $FDIR $FDIR/$FNAM.sh
+      qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $LDIR -e $LDIR $FDIR/$FNAM.sh
      done
    done
 done
