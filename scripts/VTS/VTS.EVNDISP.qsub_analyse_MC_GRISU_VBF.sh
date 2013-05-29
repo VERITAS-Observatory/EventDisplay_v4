@@ -48,7 +48,7 @@ if( $ARRAY == "V5" ) then
    if( $PART == "1" ) then
       set IFIL=Nov10_na_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set IFIL=Apr12_na_ATM"$ATMO"_"$ZEW"deg_"$WOG"
-      set IFIL=gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM21_"$ZEW"deg_"$WOG"
+      set IFIL=gamma_V5_Oct2012_newArrayConfig_20121027_v420_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47570
       set NRUN=1
