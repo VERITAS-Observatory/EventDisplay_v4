@@ -18,8 +18,7 @@ KEEP=KEEEEEEP
 ACUT=ARC
 DSET=DATASET
 LOGF=FLL
-PEDFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
-PEDFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
+PEDFILE=PPPP
 
 # set array
 FIELD=$SUBA

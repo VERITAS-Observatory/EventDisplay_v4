@@ -70,8 +70,6 @@ fi
 NRUN=`wc -l $RUNLIST | awk '{print $1}'`
 RUNFROMTO="1-$NRUN"
 
-   
-
 #########################################
 # output directory for error/output from batch system
 # in case you submit a lot of scripts: QLOG=/dev/null
@@ -84,9 +82,27 @@ mkdir -p $SHELLDIR
 # skeleton script
 FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
 
+# log files
 QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART/
 mkdir -p $QLOG
 QLOG="/dev/null"
+
+# pedestals
+echo $DSET
+if [[ $DSET == *Leoncito* ]]
+then
+   echo "Leoncito"
+   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
+elif [[ $DSET == *Aar* ]]
+then
+   echo "Aar"
+   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
+else
+   echo "error: data set not known (not Leoncito or Aar)"
+   echo "       (no ped files available)"
+   exit
+fi
+
 
 echo "submitting $RUNFROMTO"
 
@@ -104,8 +120,10 @@ sed -e "s|ARC|$ARRAYCUTS|" $FNAM-4.sh > $FNAM-5.sh
 rm -f $FNAM-4.sh
 sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-7.sh
 rm -f $FNAM-5.sh
-sed -e "s|FLL|$FLL|" $FNAM-7.sh > $FNAM.sh
+sed -e "s|FLL|$FLL|" $FNAM-7.sh > $FNAM-8.sh
 rm -f $FNAM-7.sh
+sed -e "s|PPPP|$PEDFIL|" $FNAM-8.sh > $FNAM.sh
+rm -f $FNAM-8.sh
 
 chmod u+x $FNAM.sh
 echo $FNAM.sh
