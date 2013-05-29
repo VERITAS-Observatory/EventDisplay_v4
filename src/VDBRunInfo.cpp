@@ -19,6 +19,8 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel )
     fWobbleNorth = 0.;
     fWobbleEast = 0.;
     fConfigMask = 0;
+    fConfigMaskDQM = 0;
+    fConfigMaskNew = 0;
     fTelToAna = 1234;
     fRunType = "";
     fObservingMode = "";
@@ -48,11 +50,13 @@ void VDBRunInfo::readRunDQM( string iDBserver )
     TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
 
     char c_query[1000];
-
     sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRunNumber );
 
     TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res ) return;
+    if( !db_res ) {
+      f_db->Close();
+      return;
+    }
 
     TSQLRow *db_row = db_res->Next();
     if( !db_row )
@@ -61,29 +65,52 @@ void VDBRunInfo::readRunDQM( string iDBserver )
     } else
     {
 
-      if( db_row->GetField( 4 ) ) fConfigMask = (unsigned int)(atoi( db_row->GetField( 4 ) ) ); 
-      else fConfigMask = 0;
-      if( fConfigMask == 1 ) fTelToAna = 123;
-      else if( fConfigMask == 2 ) fTelToAna = 124;
-      else if( fConfigMask == 3 ) fTelToAna = 12;
-      else if( fConfigMask == 4 ) fTelToAna = 134;
-      else if( fConfigMask == 5 ) fTelToAna = 13;
-      else if( fConfigMask == 6 ) fTelToAna = 14;
-      else if( fConfigMask == 7 ) fTelToAna = 1;
-      else if( fConfigMask == 8 ) fTelToAna = 234;
-      else if( fConfigMask == 9 ) fTelToAna = 23;
-      else if( fConfigMask == 10 ) fTelToAna = 24;
-      else if( fConfigMask == 11 ) fTelToAna = 2;
-      else if( fConfigMask == 12 ) fTelToAna = 34;
-      else if( fConfigMask == 13 ) fTelToAna = 3;
-      else if( fConfigMask == 14 ) fTelToAna = 4;
-      else if( fConfigMask == 15 ) fTelToAna = 0;
+      if( db_row->GetField( 4 ) ) 
+      {
+        fConfigMaskDQM = (unsigned int)(atoi( db_row->GetField( 4 ) ) ); 
+      }
+      else 
+      {
+        fConfigMaskDQM = 0;
+        f_db->Close();
+        return;
+      }
 
-    }
+      bitset<4> bitConfig(getConfigMask());
+      bitset<4> bitDQM(fConfigMaskDQM);
+      bitset<4> bitNewConfig = bitConfig & bitDQM;
 
-    f_db->Close();
+      for( int i = 0; i < (int)bitNewConfig.size(); i++ )
+        if( bitNewConfig.test(i) ) 
+          fConfigMaskNew += (unsigned int)pow(2.,i);
 
-    return;
+// Bit mask is flipped for DQM database compared to below.
+// Telescopes go 1 2 3 4
+// Therefore 0100 is mask 4 and telescope combination 134
+      if( fConfigMaskNew == 0 ) fTelToAna       = 1234;
+      else if( fConfigMaskNew == 1 ) fTelToAna  = 123;
+      else if( fConfigMaskNew == 2 ) fTelToAna  = 124;
+      else if( fConfigMaskNew == 3 ) fTelToAna  = 12;
+      else if( fConfigMaskNew == 4 ) fTelToAna  = 134;
+      else if( fConfigMaskNew == 5 ) fTelToAna  = 13;
+      else if( fConfigMaskNew == 6 ) fTelToAna  = 14;
+      else if( fConfigMaskNew == 7 ) fTelToAna  = 1;
+      else if( fConfigMaskNew == 8 ) fTelToAna  = 234;
+      else if( fConfigMaskNew == 9 ) fTelToAna  = 23;
+      else if( fConfigMaskNew == 10 ) fTelToAna = 24;
+      else if( fConfigMaskNew == 11 ) fTelToAna = 2;
+      else if( fConfigMaskNew == 12 ) fTelToAna = 34;
+      else if( fConfigMaskNew == 13 ) fTelToAna = 3;
+      else if( fConfigMaskNew == 14 ) fTelToAna = 4;
+      else if( fConfigMaskNew == 15 ) fTelToAna = 0;
+
+      fConfigMask = fConfigMaskNew;
+
+   }
+
+   f_db->Close();
+   return;
+
 }
 
 void VDBRunInfo::readRunInfoFromDB( string iDBserver )
