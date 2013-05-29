@@ -12,6 +12,24 @@ ClassImp(VPlotAnasumHistograms)
   
 */
 
+VPlotAnasumHistograms::VPlotAnasumHistograms()
+{
+   fDebug = false;
+   fAnasumDataFile = "";
+   fRunNumber = -1;
+   fPlotMode = "colz";
+
+   setPlottingCorrelatedHistograms();
+   setPlottingUseHours();
+   setPlottingDrawPSF();
+
+   fSkyMapCentreDecJ2000 = -9999.;
+   fSkyMapCentreRAJ2000  = -9999.;
+   fTargetShiftWest   = -9999.;
+   fTargetShiftNorth  = -9999.;
+
+}
+
 
 VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
 {
@@ -25,9 +43,19 @@ VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
    setPlottingUseHours();
    setPlottingDrawPSF();
 
+   fSkyMapCentreDecJ2000 = -9999.;
+   fSkyMapCentreRAJ2000  = -9999.;
+   fTargetShiftWest   = -9999.;
+   fTargetShiftNorth  = -9999.;
+
+   if( !openDataFile( ifile, ion ) ) return;
+}
+
+bool VPlotAnasumHistograms::openDataFile( string ifile, int ion )
+{
    if( !openFile( ifile, fRunNumber, 1) )
    {
-      return;
+      return false;
    }
 
    fSkyMapCentreDecJ2000 = getSkyMapCentreDecJ2000();
@@ -36,6 +64,8 @@ VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
    fTargetShiftNorth  = getTargetShiftNorth();
 
    readRunList();
+
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

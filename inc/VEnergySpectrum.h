@@ -140,6 +140,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 /////////////////////////////////////////////////////////////////////
     public:
 
+	VEnergySpectrum();
         VEnergySpectrum( string ifile, string iname = "E", int irun = -1, bool iSourceTypeIsAscii = false );
         ~VEnergySpectrum() {}
 
@@ -152,9 +153,12 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TH1D*     getEnergyCountingOnHistogram() { return hErecCountsOn; }
         TH1D*     getEnergyCountingOffHistogram() { return hErecCountsOff; }
         TGraphAsymmErrors* getEnergySpectrumGraph();
-        TH1D *getTotalTimeHistogram( bool iDeadtimeCorrected = false ) { if( iDeadtimeCorrected ) return hErecTotalTimeDeadTimeCorrected; else return hErecTotalTime; }
+        TH1D *getTotalTimeHistogram( bool iDeadtimeCorrected = false )
+	           { if( iDeadtimeCorrected ) return hErecTotalTimeDeadTimeCorrected; else return hErecTotalTime; }
+	TF1*      getSpectralFitFunction() { if( fSpectralFitter ) return fSpectralFitter->getSpectralFitFunction(); else return 0; } 
         double    getTotalNormalisationFactor() { return fTotalNormalisationFactor; }
         bool      isZombie() { return bZombie; }
+	bool      openDataFile( string iFile, int irun = -1, bool iSourceTypeIsAscii = false );
         void      printDifferentialFluxes( bool bSED = false );
         TCanvas*  plot( TCanvas *c = 0 );
 	TCanvas*  plotCrabNebulaSpectrum( double iPlottingMultiplierIndex = 0., double i_FitStart_TevLin = 0.3,
@@ -177,8 +181,10 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setEnergyThreshold( double a ) { fEnergyThresholdFixedValue = a; }
         void setEnergyThreshold( string a ) { fEnergyThresholdFileName = a; }
         void setEnergyThresholdDefinition( unsigned int iDef = 2, double iSys = 0.1, double iMaxEff = 0.1 )
-	                                 { fAnalysisEnergyThresholdDefinition = iDef; fAnalysisMaxEnergySystematic = iSys; fAnalysisMaxEffectiveAreaFraction = iMaxEff; }
-        void setSignificanceParameters( double iSig = 2., double iMinOnEvents = 3., double iUpperLimit = 0.95, int iLiAndMa = 17, int iULAlgo = 0 );
+	                                 { fAnalysisEnergyThresholdDefinition = iDef; fAnalysisMaxEnergySystematic = iSys;
+					   fAnalysisMaxEffectiveAreaFraction = iMaxEff; }
+        void setSignificanceParameters( double iSig = 2., double iMinOnEvents = 3., double iUpperLimit = 0.95, 
+	                                int iLiAndMa = 17, int iULAlgo = 0 );
 
         TF1* fitEnergySpectrum( string iname = "fit", bool bDraw = true );
         void setSpectralFitFunction( int iD  = 0 ) { fSpectralFitFunction = iD; }
@@ -189,7 +195,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setSpectralFitPlottingStyle( int iColor = 1, int iStyle = 1, float iWidth = 2. );
 
         TCanvas* getPlottingCanvas() { return fPlottingCanvas; }
-        void setPlottingEnergyRangeLinear( double Emin_TeV = 0.05, double Emax_TeV = 20. ) { fPlottingMinEnergy = Emin_TeV; fPlottingMaxEnergy = Emax_TeV; }
+        void setPlottingEnergyRangeLinear( double Emin_TeV = 0.05, double Emax_TeV = 20. ) 
+	                                   { fPlottingMinEnergy = Emin_TeV; fPlottingMaxEnergy = Emax_TeV; }
         void setPlottingEnergyRangeLog( double xmin = -1.2, double xmax = 1.3 ) 
 	      { fPlottingMinEnergy = TMath::Power( 10., xmin ); fPlottingMaxEnergy = TMath::Power( 10., xmax ); }
         void setPlottingLogEnergyAxis( bool iB = true ) { fPlottingLogEnergyAxis = iB; }
@@ -199,8 +206,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setPlottingYaxis( double iMin = 1.e-14, double iMax = 1.e-8 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
 
-	TF1* getSpectralFitFunction() { return fSpectralFitter->getSpectralFitFunction(); }  // Added this function to help automize spectral fitting
-
-        ClassDef(VEnergySpectrum, 10);
+        ClassDef(VEnergySpectrum, 11);
 };
 #endif

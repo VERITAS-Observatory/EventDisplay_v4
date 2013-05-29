@@ -1,17 +1,24 @@
 /*! class VEnergySpectrum
     \brief analyse and plot spectral energy distributions
 
-    TODO: optimize rebinner
 
-    i)  keep lowest possible threshold after rebinning
-    ii) find optimal binning depending on number of events
-
-    Revision $Id: VEnergySpectrum.cpp,v 1.1.2.18.2.1.4.1.2.2.2.8.4.3 2011/04/11 16:09:05 gmaier Exp $
 */
 
 #include "VEnergySpectrum.h"
 
-VEnergySpectrum::VEnergySpectrum( string iFile, string iname, int irun, bool iSourceTypeIsAscii  )
+VEnergySpectrum::VEnergySpectrum()
+{
+    fDebug = 0;
+
+    bAsciiDataFile = false;
+
+    fDataSetName = "E";
+    fTotalRun = -1;
+
+    initializeRunVariables();
+}
+
+VEnergySpectrum::VEnergySpectrum( string iFile, string iname, int irun, bool iSourceTypeIsAscii )
 {
     fDebug = 0;
     bAsciiDataFile = iSourceTypeIsAscii;
@@ -21,13 +28,21 @@ VEnergySpectrum::VEnergySpectrum( string iFile, string iname, int irun, bool iSo
 
     initializeRunVariables();
 
+    openDataFile( iFile, fTotalRun, bAsciiDataFile );
+}
+
+bool VEnergySpectrum::openDataFile( string iFile, int irun, bool iSourceTypeIsAscii )
+{
+    fTotalRun = irun;
+    bAsciiDataFile = iSourceTypeIsAscii;
+
 // open anasum file 
     if( !bAsciiDataFile )
     {
        if( !openFile( iFile, fTotalRun ) )
        {
 	   bZombie = true;
-	   return;
+	   return false;
        }
     }
     else
@@ -35,9 +50,10 @@ VEnergySpectrum::VEnergySpectrum( string iFile, string iname, int irun, bool iSo
        if( !openAsciiFile( iFile ) )
        {
 	   bZombie = true;
-	   return;
+	   return false;
        }
     }
+    return true;
 }
 
 
