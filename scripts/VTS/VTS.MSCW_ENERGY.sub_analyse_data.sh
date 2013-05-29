@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-# script to analyse data files with lookup tables
+# script to analyse VTS data files with lookup tables
 #
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] && [ ! -n "$2" ]  && [ ! -n "$3" ]
+if [ $# -ne 3 ]
 then
    echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run> [ID]"
    echo
@@ -44,6 +44,7 @@ FILES=`cat $BLIST`
 DATE=`date +"%y%m%d"`
 QLOG=$VERITAS_USER_LOG_DIR/$DATE/
 mkdir -p $QLOG
+QLOG=/dev/null/
 
 # output directory for shell scripts
 SHELLDIR=$VERITAS_USER_LOG_DIR"/queueShellDir/"
