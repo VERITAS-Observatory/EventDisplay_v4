@@ -34,7 +34,6 @@ FSCRIPT="VTS.MSCW_ENERGY.qsub_make_tables"
 #################################################################
 # zenith angle bins
 IZE=( 00 20 30 35 40 45 50 55 60 65 ) 
-# IZE=( 00 20 30 35 40 )
 NZE=${#IZE[@]}
 # wobble off bins
 WOFF=( 0.00 0.25 0.5 0.75 1.00 1.25 1.50 1.75 2.00 )
@@ -46,7 +45,7 @@ INOI=( 075 100 150 200 250  325  425  550  750 1000 )
 # determined from mean pedvar of simulations
 # (cannot be determined on the fly due to floating point uncertainty)
 # from sumwindow=6
-if [ $ARRAY = "V5" ]
+if [ $ARRAY = "V5" ] || [ $ARRAY = "V4" ]
 then
    TNOI=( 336 382 457 524 579 659 749 850 986 1138 )
 else

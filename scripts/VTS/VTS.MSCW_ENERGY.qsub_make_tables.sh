@@ -22,7 +22,7 @@ source $EVNDISPSYS/setObservatory.sh VERITAS
 # this is where the executable can be found
 cd $EVNDISPSYS/bin
 
-DSET="analysis_d20121218"
+DSET="analysis_d20130406"
 
 # directory with input file
 DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/"$DSET"_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
