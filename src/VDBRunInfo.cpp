@@ -76,34 +76,40 @@ void VDBRunInfo::readRunDQM( string iDBserver )
         return;
       }
 
+// Check if the mask is 0
+      if( fConfigMaskDQM == 0 )
+      {
+        fConfigMaskDQM = 0;
+        f_db->Close();
+        return;
+      }
+
       bitset<4> bitConfig(getConfigMask());
       bitset<4> bitDQM(fConfigMaskDQM);
-      bitset<4> bitNewConfig = bitConfig & bitDQM;
+      bitset<4> bitNDQM = ~bitDQM;
+      bitset<4> bitNewConfig = bitConfig & bitNDQM;
 
       for( int i = 0; i < (int)bitNewConfig.size(); i++ )
         if( bitNewConfig.test(i) ) 
           fConfigMaskNew += (unsigned int)pow(2.,i);
 
-// Bit mask is flipped for DQM database compared to below.
-// Telescopes go 1 2 3 4
-// Therefore 0100 is mask 4 and telescope combination 134
-      if( fConfigMaskNew == 0 ) fTelToAna       = 1234;
-      else if( fConfigMaskNew == 1 ) fTelToAna  = 123;
-      else if( fConfigMaskNew == 2 ) fTelToAna  = 124;
-      else if( fConfigMaskNew == 3 ) fTelToAna  = 12;
-      else if( fConfigMaskNew == 4 ) fTelToAna  = 134;
-      else if( fConfigMaskNew == 5 ) fTelToAna  = 13;
-      else if( fConfigMaskNew == 6 ) fTelToAna  = 14;
-      else if( fConfigMaskNew == 7 ) fTelToAna  = 1;
-      else if( fConfigMaskNew == 8 ) fTelToAna  = 234;
-      else if( fConfigMaskNew == 9 ) fTelToAna  = 23;
-      else if( fConfigMaskNew == 10 ) fTelToAna = 24;
-      else if( fConfigMaskNew == 11 ) fTelToAna = 2;
-      else if( fConfigMaskNew == 12 ) fTelToAna = 34;
-      else if( fConfigMaskNew == 13 ) fTelToAna = 3;
-      else if( fConfigMaskNew == 14 ) fTelToAna = 4;
-      else if( fConfigMaskNew == 15 ) fTelToAna = 0;
-
+// Note mask is different to below
+      if( fConfigMaskNew == 1 )       fTelToAna = 4;
+      else if( fConfigMaskNew == 2 )  fTelToAna = 3;
+      else if( fConfigMaskNew == 3 )  fTelToAna = 34;
+      else if( fConfigMaskNew == 4 )  fTelToAna = 2;
+      else if( fConfigMaskNew == 5 )  fTelToAna = 24;
+      else if( fConfigMaskNew == 6 )  fTelToAna = 23;
+      else if( fConfigMaskNew == 7 )  fTelToAna = 234;
+      else if( fConfigMaskNew == 8 )  fTelToAna = 1;
+      else if( fConfigMaskNew == 9 )  fTelToAna = 14;
+      else if( fConfigMaskNew == 10 ) fTelToAna = 13;
+      else if( fConfigMaskNew == 11 ) fTelToAna = 134;
+      else if( fConfigMaskNew == 12 ) fTelToAna = 12;
+      else if( fConfigMaskNew == 13 ) fTelToAna = 124;
+      else if( fConfigMaskNew == 14 ) fTelToAna = 123;
+      else if( fConfigMaskNew == 15 ) fTelToAna = 1234;
+  
       fConfigMask = fConfigMaskNew;
 
    }
