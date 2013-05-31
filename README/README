@@ -5,7 +5,7 @@ original developers: Gernot Maier and Jamie Holder
 Overview
 --------
 
-eventdisplay is a complete package for VERITAS and CTA analysis (whatever 'complete' means...)
+eventdisplay is a complete package for VERITAS and CTA analysis.
 
 The package consists of several analysis steps and tools:
 
@@ -25,6 +25,9 @@ README.CTA      description of a typical CTA analysis
 README.VTS      description of a typical VERITAS analysis
 AUTHORS		author description
 
+A brief description of the analysis methods can be found on the following webpage:
+https://znwiki3.ifh.de/CTA/Eventdisplay%20Software
+
 Description and command line options for the different software parts:
 
 README.EVNDISP
@@ -36,7 +39,6 @@ README.SCRIPTS
 README.MACROS
 
 The EVNDISP manual for VERITAS users: http://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual
-
 
 Contact information:
 --------------------

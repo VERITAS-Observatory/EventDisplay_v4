@@ -4,7 +4,9 @@ EVENTDISPLAY - IACT event analysis and display - INSTALLATION
 Prerequisites
 =============
 
-(0.1) ROOT must be installed (version >= 5.28)
+(0.1) ROOT must be installed 
+      Recommend versions >= 5.32
+     (basic analysis should work with version >= 5.28)
 
 VERITAS analysis
 ----------------
@@ -18,12 +20,15 @@ VERITAS analysis
 
    > cvs co -P -d VBF software/common/VBF
 
-(1.2) bbftp is needed to download files (see http://doc.in2p3.fr/bbftp/)
+(1.2) bbftp is needed to download data files from the VERITAs archive (see http://doc.in2p3.fr/bbftp/)
 
 CTA analysis
 ------------
 
-(2.0) HESSIO libraries 
+(2.0) HESSIO libraries needed for the analysis of CTA Monte Carlo can be found here:
+   http://www.mpi-hd.mpg.de/hfm/CTA/internal/MC/Software/
+
+   (note: this side is password protected, usual CTA details)
 
 Optional
 --------
@@ -31,35 +36,39 @@ Optional
 (3.0) for all FITS related output, cfitsio is needed (see http://heasarc.gsfc.nasa.gov/fitsio/)
 
 (3.1) GSL libraries
+      http://www.gnu.org/software/gsl/
 
 Environmental Variables
 =======================
 
-Linking
--------
+Compiling and linking
+---------------------
 
 ROOTSYS :   ROOT installation; add $ROOTSYS/lib to $LD_LIBRARY_PATH and $ROOTSYS/bin to $PATH 
-            (root should be compile with minuit2, mysql, xml)
+            (root should be compiled with minuit2, mysql, xml)
 
 HESSIOSYS : HESSIO libraries (for CTA analysis only); add $HESSIOSYS/lib to $LD_LIBRARY_PATH (not needed for VERITAS analysis)
+            note: make sure to use the same compiler flags as used in the simulations, see Makefile)
 
 VBSYS :     VBF libraries (for VERITAS analysis only); add $VBFSYS/bin to $PATH and $VBFSYS/lib to $LD_LIBRARY_PATH
             (VBF is not needed for CTA analysis)
 
-FITSSYS :   FITS libraries (optional)
+FITSSYS :   FITS libraries (optional, not needed in most cases)
 
 Analysis
 --------
 
-EVNDISPSYS : EVNDISP directory (most scripts expect binaries in $EVNDISPSYS/bin and libraries in $EVNDISPSYS/lib) 
+EVNDISPSYS : EVNDISP directory (scripts expect binaries in $EVNDISPSYS/bin and libraries in $EVNDISPSYS/lib) 
+
 (EVNDISPDATA : directory with all auxilary data like calibration files, lookup tables, effective areas, etc)-- covered by OBS_EVNDISP_ANA_DIR
 
 Data directories
 ----------------
 (different auxiliary data files are needed for the analysis (e.g. calibration files, detector geometry, etc))
 
-The following setup are for an environment where several users for example are analysis the same raw data (would be in $VERITAS_DATA_DIR), 
-but having their analysis results written to their own directories ($VERITAS_USER_DATA_DIR). 
+The following setup are for an environment where several users for example are analysis the same raw data
+(would be in $VERITAS_DATA_DIR, or $CTA_DATA_DIR)), but having their analysis results written to their own
+directories ($VERITAS_USER_DATA_DIR). 
 Note that e.g. $VERITAS_DATA_DIR and $VERITAS_USER_DATA_DIR can point to the same directory.
 
 For CTA analysis, the following directories are needed:
@@ -113,6 +122,7 @@ Makefile targets
 all	make all executables and libraries
 clean
 install
-dist	produce a tar file for code distribution. Name: EVNDISP-{VERSION}.tar.gz
 CTA	make all CTA relevant binaries/libraries
 VTS	make all VERITAS relevant binaries/libraries
+
+dist	produce a tar file for code distribution. Name: EVNDISP-{VERSION}.tar.gz (mainly for developers)

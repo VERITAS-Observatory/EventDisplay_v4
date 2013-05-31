@@ -109,6 +109,10 @@
 EVNDISP is work-in-progress and the documentation is not in the state it is supposed to be. 
 Apart from the information in this manual, other sources for help are:
 
+A brief description of the analysis methods can be found on the following webpage:
+
+\url{https://znwiki3.ifh.de/CTA/Eventdisplay\%20Software}
+
 \subsection*{README files}
 
 \begin{description}
@@ -121,16 +125,16 @@ Apart from the information in this manual, other sources for help are:
 \noindent Description and command line options for the different software parts:
 
 \begin{description}
-\item[README.EVNDISP:]
-\item[README.MSCW\_ENERGY:]
-\item[README.ANASUM:]
-\item[README.EFFECTIVEAREA:]
-\item[README.ANALYSISLIBRARY:]
-\item[README.SCRIPTS:]
-\item[README.MACROS:]
+\item[README.EVNDISP]
+\item[README.MSCW\_ENERGY]
+\item[README.ANASUM]
+\item[README.EFFECTIVEAREA]
+\item[README.ANALYSISLIBRARY]
+\item[README.SCRIPTS]
+\item[README.MACROS]
 \end{description}
 
-\subsection*{WIKI pages}
+\subsection*{WIKI pages for VERITAS users}
 
 The EVNDISP manual for VERITAS users: 
 
@@ -140,23 +144,25 @@ The EVNDISP manual for VERITAS users:
 
 \chapter{Introduction}
 
-\noindent eventdisplay is a complete package for VERITAS and CTA analysis (whatever 'complete' means...)
+\noindent eventdisplay is a complete package for VERITAS and CTA analysis.
 The package consists of several analysis steps and tools:
 
 \begin{enumerate}
 \item evndisp (calibrate and parametrize images, event reconstruction, stereo analysis)
-\item mscw\_energy (use lookup tables to produce msw, msl, and energies)
+\item evndisp (camera display for data and MC)
+\item mscw\_energy (use lookup tables to produce mean scaled width and lengths, and energies)
 \item anasum (produce maps and calculate analysis results)
-\item shared library tools and macros  (produce the energy spectrum and integral fluxes, plot maps, plot sensitivities, etc.) 
+\item shared library tools and macros  (e.g. produce the energy spectrum and integral fluxes, plot maps, plot sensitivities, etc.) 
 \item makeEffectiveArea (calculate effective areas)
-\item trainTMVAforGammaHadronSeparation (tools to train MVA and optimize cuts)
+\item trainTMVAforGammaHadronSeparation (tools to train MVA and optimize gamma/hadron separation cuts)
+\item different tools to produce sensitivity file for CTA MC and Physics groups
 \item ...
 \end{enumerate}
 
 This is a very incomplete manual, started in September 2011. Please help updating it.
 
 The original developers are Gernot Maier (DESY) and Jamie Holder (University of Delaware). 
-A large number of people contributed, among others: ..
+A large number of people contributed, see README/AUTHORS for a list.
 
 % #############################################
 %
@@ -167,7 +173,9 @@ A large number of people contributed, among others: ..
 \chapter{Installation and auxiliary data files}
 \label{SECTION.ENVIRON}
 
-The installation, compilation, and needed or useful environmental variables are described in detail in the file {\it README/INSTALL} in the EVNDISP source code.
+The installation, compilation, and needed or useful environmental variables are described in detail in the file {\it README/INSTALL} in the EVNDISP source code directory.
+It is strongly recommended to follow this scheme, as it simplifies the execution of the analysis significantly.
+
 
 \section{Auxiliary data files}
 \label{SECTION.AUXFILE}
@@ -196,6 +204,10 @@ The subarray files for prod1 can be found in {\it \$OBS\_EVNDISP\_ANA\_DIR/Detec
 
 Detailed description of these files can be found in the corresponding chapters of the different analysis stages.
 
+\subsection{Gamma/hadron separation parameters}
+
+Parameter files describing the details of the gamma/hadron separation can be found here:  {\it \$OBS\_EVNDISP\_ANA\_DIR/GammaHadronCutFiles}
+
 % #############################################
 %
 % ############ Trace integration and image analysis  ###
@@ -205,6 +217,65 @@ Detailed description of these files can be found in the corresponding chapters o
 \chapter{eventdisplay - calibration, image analysis and stereo reconstruction}
 
 \section{Trace integration}
+
+Several different trace integration methods are available. All settings should be in 
+
+{\it \$OBS\_EVNDISP\_AUX/ParameterFiles/EVNDISP.reconstruction.runparameter}.
+
+For trace analysis of CTA MC events, the converter {\it CTA.convert\_hessio\_to\_VDST} should be executed with the option '-f 1'.
+
+Trace integration is done always twice: first with a short summation window to achieve optimal sensitivity, second a wider window to minimize the systematic errors:
+
+\begin{lstlisting}
+ trace integration window <window 1> <window 2>
+* -1 FADCSUMMATIONWINDOW 6 18
+  trace integration start (for window 1) <sample> 
+  [optional: shift of window start for double pass]
+* -1 FADCSUMMATIONSTART 2 -1
+\end{lstlisting}
+
+Note that here and in the following, a '-1' in the first column means that the corresponding values are applicable for all telescopes. Otherwise, values can be set individually for each telescope type.
+  
+\subsection{Fixed window}
+
+\begin{lstlisting}
+ select trace integration method
+* -1 FADCANALYSIS 1
+ double pass method <doublepass (on=1, off=0)> 
+    <integration window length for pass 1>
+   <integration method for pass 1 (0/1)>
+* -1 FADCDOUBLEPASS 0
+\end{lstlisting}
+
+\subsection{Doublepass method}
+
+To select the double pass method, the following settings are applicable:
+
+\begin{lstlisting}
+ select trace integration method
+* -1 FADCANALYSIS 1
+ double pass method <doublepass (on=1, off=0)> 
+   <integration window length for pass 1>
+   <integration method for pass 1 (0/1)>
+* -1 FADCDOUBLEPASS 1 12 0
+\end{lstlisting}
+  
+
+\subsection{Sliding window method}
+
+The sliding window selects the maximum charge for the given integration window length.
+
+\begin{lstlisting}
+ select trace integration method
+* -1 FADCANALYSIS 1
+\end{lstlisting}
+
+\subsection{No trace integration}
+
+\begin{lstlisting}
+ select trace integration method
+* -1 FADCANALYSIS 0
+\end{lstlisting}
 
 \section{Calibration}
 
@@ -228,6 +299,8 @@ These are the steps calculate pedestals and pedestal variations for prod-2 CTA s
 -nevents=20 -nopedestalsintimeslices 
 
 \end{lstlisting}
+
+The pedestal file is then used in the analysis via the settings in converter {\it CTA.convert\_hessio\_to\_VDST}: '-c pedfile.root'
 
 \subsection{Low gain calibration}
 
@@ -300,6 +373,20 @@ The status of the covariance matrix is returned and saved to the image parameter
 No fitting has been applied to images with $Fitstat=-1$ 
 
 \section{Image cleaning}
+
+There are different methods available for image cleaning.  All settings should be in 
+
+{\it \$OBS\_EVNDISP\_AUX/ParameterFiles/EVNDISP.reconstruction.runparameter}.
+
+\subsection{Signal-to-noise cleaning}
+
+This is the default cleaning method for VERITAS analysis.
+
+\subsection{Fixed threshold cleaning}
+
+\subsection{Time cluster cleaning}
+
+\subsection{Time next-neighbor cleaning}
 
 \chapter{Displaying events}
 
@@ -491,7 +578,7 @@ SIMULATIONFILE\_MCHISTO  & 1  & & & data file with thrown events. This can be ei
 \section{General concept}
 
 We assume in the following that CTA simulations are produced and available in the {\it hessio} format. 
-Eventdisplay does not depend on {\it hessio} and the reading of any future CTA data format can easily be implemented.
+Eventdisplay does not depend on {\it hessio} and the reading of any future CTA data format could easily be implemented.
 
 To use Eventdisplay for CTA analyses, the {\it simtel.gz} files have first to be converted into ROOT format (called in the following DST format) using the converter tool described below. 
 The analysis then proceed in several steps.
@@ -513,6 +600,9 @@ The following list shows the exectuables and macros needed to produce CTA sensit
 
 \item[makeEffectiveArea]
         calculate effective areas and instrument response functions (e.g. angular and energy resolution; migration matrix, etc)
+
+\item[writeParticleRateFilesFromEffectiveAreas]
+        calculate event number spectra from gamma or background effective areas. This is used in the cut optimization 
 
 \item[sensitivity.C]
         ROOT macro to calculate signal and background events after pre-cuts and to plot sensitivity curves
@@ -543,7 +633,7 @@ with a field of view of 8 degrees (the FOV is reduced with respect to the simula
 \end{lstlisting}
 
 Subarray files for most of the arrays used in the CTA sensitivities studies are part of the analysis file package 
-(see \ref{SECTION.AUXFILE}). The subarray files for prod1 can be found in 
+(see \ref{SECTION.AUXFILE}). The subarray files for prod1 and prod2 can be found in 
 
 {\it \$OBS\_EVNDISP\_ANA\_DIR/DetectorGeometry/*.lis}.
 
@@ -876,29 +966,30 @@ rates after quality cuts, and finally, the optimal MVA cut value.
 Note that the effective area calculation includes the determination of all instrument response functions (i.e. angular and energy resolution, migration matrix, etc).
 
 \begin{lstlisting}
-CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> \
- <analysis parameter file> <outputsubdirectory> <data set> [filling mode]
-================================================================================
+CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> 
+<scripts input parameter file> <outputsubdirectory> <data set> [filling mode]
+===========================================================
 
-make effective areas for CTA
+calculate effective areas and instrument response functions for CTA
 
-(note: shape cuts hardwired)
 
 <subarray>
      subarray for analysis (e.g. array E)
 
 <recid>
-     reconstruction ID from array reconstruction
+     reconstruction ID from array reconstruction (mscw stage)
 
 <particle>
-     gamma_onSource / gamma_cone10 / electron / 
-     electron_onSource / proton / proton_onSource / helium 
+     allowed particle types are:
+     gamma_onSource / gamma_cone10 / electron / electron_onSource / proton / proton_onSource / helium 
 
 <cutfile template>
      template for gamma/hadron cut file (full path and file name)
+     (examples can be found in /Users/maierg/Experiments/VERITAS/Data/AnalysisData-VTS-v400//GammaHadronCutFiles)
 
-<analysis parameter file>
+<scripts parameter file>
      file with analysis parameter
+     see e.g. CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.runparameter
 
 <outputsubdirectory>
      directory with all result and log files (full path)
@@ -907,13 +998,15 @@ make effective areas for CTA
 
 [filling mode]
      effective area filling mode (use 2 to calculate angular resolution only)
+     (optional, for default full calculation no option is needed)
+
 \end{lstlisting}
 
 Use {\it  ./CTA.EFFAREA.subAllParticle\_analyse.sh} to submit the jobs for all particle types.
 
 \subsubsection{Directory structure for effective area calculation}
 
-Note that the division into one directory per subarray configuration is not used here anymore.
+The steps of calculating effective areas and optimizing cuts depend on the following directory structure:
 
 \begin{itemize}
 \item Results from angular resolution calculation: \\
@@ -987,7 +1080,24 @@ To plot the effective areas vs energy, follow the instructions described here in
 
 \subsubsection{Calculation of number of signal and background events}
 
-To calculate the number of signal and background events:
+To calculate the number of signal and background events, which is needed to find the optimal cuts:
+
+\begin{lstlisting}
+./CTA.ParticleRateWriter.sub.sh <sub array list> <directory with effective areas> 
+                               <offset=onSource/cone10> <recid> 
+
+  write particles files needed for TMVA cut optimization
+
+  <sub array list>          text file with list of subarray IDs
+
+  <directory with effective areas>  (full) path to effective areas
+
+  <recid>                   reconstruction ID from mscw stage
+\end{lstlisting}
+
+This script is using the binary {\it bin/writeParticleRateFilesFromEffectiveAreas}.
+
+Alternatively, this can be done with the following commands by hand:
 
 \begin{lstlisting}
 % cd $CTA_USER_DATA_DIR/analysis/EffectiveArea/<DataSet>/QualityCuts
@@ -1088,7 +1198,8 @@ These values can be found in {\texttt inc/VGlobalRunParameter}, for example:
 #define VDST_MAXTIMINGLEVELS 10    
 \end{lstlisting}
 
-\noindent {\bf NOTE: } These numbers determine the memory requirements of {\it evndisp} and {\it CTA.convert\_hessio\_to\_VDST}.
+\noindent {\bf NOTE: } These numbers determine the memory requirements of {\it evndisp} and 
+{\it CTA.convert\_hessio\_to\_VDST}.
 
 \noindent {\bf NOTE: } {\it evndisp} must be compiled with the same settings as the writing program.
 
@@ -1096,6 +1207,7 @@ These values can be found in {\texttt inc/VGlobalRunParameter}, for example:
 
 \chapter{Detector Setup}
 
+Detector setup is written into a ROOT tree name {\it telconfig}, which is written to the {\it eventdisplay} and {\it mscw\_energy} output files.
 
 \section{Telescope types}
 

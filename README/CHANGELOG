@@ -1,6 +1,8 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130530 (GM) work on documentation
+
 * 20130524 (GM) Bug fix: close open DB connection in VPM quality control part in
                          case the run failes the quality control
 
