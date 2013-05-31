@@ -37,7 +37,7 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel )
     fDuration = 0;
 
     readRunInfoFromDB( iDBserver );
-    readRunDQM( iDBserver );
+//    readRunDQM( iDBserver );
     getLaserRun( iDBserver, fRunNumber, iNTel );
 }
 
