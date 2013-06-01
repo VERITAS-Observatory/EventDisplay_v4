@@ -158,7 +158,7 @@ bool VEnergySpectrum::combineRuns()
 
 /*
 
-   read differential flux point from an ascii file
+   read differential flux points from an ascii file
 
 */
 
@@ -394,7 +394,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
             else           hname = "hEffArea";
             hEffArea = (TH1D*)i_hErec->Clone( hname.c_str() );
             rebinEnergySpectrum( hErec, fAnalysisEnergyBinning, bLinearX );
-            hEffArea->Reset();
+            if( hEffArea ) hEffArea->Reset();
         }
         if( fDebug == 1 && i_hErec ) cout << "VEnergySpectrum::combineRuns histogram entries: " << i_hErec->GetEntries() << endl;
 
@@ -571,6 +571,11 @@ void VEnergySpectrum::addValueToHistogram( TH1* h, double iTObs, double iEThresh
     }
 }
 
+/*
+
+   add values from a graph to a histgoram (evaluated at each bin)
+
+*/
 void VEnergySpectrum::addValueToHistogram( TH1* h, TGraph* g, double iTObs, double iEThreshold, bool bLinearX )
 {
     if( fDebug == 1 ) cout << "VEnergySpectrum::addValueToHistogram " << h << " " << iEThreshold << " " << bLinearX << endl;
@@ -584,9 +589,9 @@ void VEnergySpectrum::addValueToHistogram( TH1* h, TGraph* g, double iTObs, doub
     VDifferentialFlux i_flux;
     for( int i = 1; i <= h->GetNbinsX(); i++ )
     {
-        double x = VMathsandFunctions::getMeanEnergyInBin( fEnergyInBinDefinition, h->GetXaxis()->GetBinLowEdge( i ), h->GetXaxis()->GetBinUpEdge( i ),
-	   					           fPlottingSpectralWeightForBinCenter );
-        if( x < 1.e-90 ) continue;
+        double x = VMathsandFunctions::getMeanEnergyInBin( fEnergyInBinDefinition, h->GetXaxis()->GetBinLowEdge( i ), 
+	                                                   h->GetXaxis()->GetBinUpEdge( i ), fPlottingSpectralWeightForBinCenter );
+        if( x < -1.e90 ) continue;
 
 	if( g->Eval( x ) > 0. )
 	{
@@ -777,8 +782,8 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 	   cout << "\thOff " << hErecCountsOff->GetBinCenter( i ) << "\t" << hErecCountsOff->GetBinContent( i );
 	   cout << "\t" << i_noff << endl;
         }
-
-// remove point outside wanted energy bin
+/////////////////////////////////////////////////
+// remove points outside wanted energy bin
 // (lower limit)
         if( fAnalysisMinEnergy > 0. && hErec->GetXaxis()->GetBinLowEdge( i ) <= log10( fAnalysisMinEnergy ) )
         {
@@ -807,7 +812,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
             }
             continue;
         }
-
+/////////////////////////////////////////////////
 // remove points with no counts at all
         if( hErecCountsOn->GetBinContent( i ) < 0. || hErecCountsOff->GetBinContent( i ) < 0. )
         {
@@ -822,6 +827,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
             continue;
         }
 
+/////////////////////////////////////////////////
 // remove points with no normalisation factor
         if( fTotalNormalisationFactor <= 0. )
         {
@@ -835,7 +841,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
             }
             continue;
         }
-
+/////////////////////////////////////////////////
 // new data vector
         VDifferentialFlux i_flux;
 
@@ -856,8 +862,8 @@ void VEnergySpectrum::calculateDifferentialFluxes()
             i_flux.Energy_upEdge  = hErec->GetXaxis()->GetBinUpEdge( i );
         }
 // adjust energy (e.g. to spectral weighted bin value)
-        double x = VMathsandFunctions::getMeanEnergyInBin( fEnergyInBinDefinition, hErec->GetXaxis()->GetBinLowEdge( i ), hErec->GetXaxis()->GetBinUpEdge( i ),
-	   					           fPlottingSpectralWeightForBinCenter );
+        double x = VMathsandFunctions::getMeanEnergyInBin( fEnergyInBinDefinition, hErec->GetXaxis()->GetBinLowEdge( i ), 
+	                                                   hErec->GetXaxis()->GetBinUpEdge( i ), fPlottingSpectralWeightForBinCenter );
 	if( fEnergyInBinDefinition > 90 )
 	{
 	   cout << "VEnergySpectrum::calculateDifferentialFluxes() invalid fEnergyInBinDefinition: " << fEnergyInBinDefinition << endl;
@@ -935,7 +941,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 	    i_flux.DifferentialFlux  = i_ndiff;
 	    i_flux.DifferentialFlux /= i_flux.dE;
 	    i_flux.DifferentialFlux /= i_flux.ObsTime;
-	    if( hEffArea->GetBinContent( hEffArea->FindBin( log10(i_flux.Energy) ) ) > 0. )
+	    if( hEffArea && hEffArea->GetBinContent( hEffArea->FindBin( log10(i_flux.Energy) ) ) > 0. )
             {
 	       i_flux.DifferentialFlux /= (hEffArea->GetBinContent( hEffArea->FindBin( log10(i_flux.Energy) ) )*1.e4);
             }
