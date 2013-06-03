@@ -1,5 +1,5 @@
 /*! \file combineEffectiveAreas.cpp
-    \brief combine effective areas
+    \brief combine effective areas calculated for a one combination of ze,az,woff... into a single large file
 
 
     \author Gernot Maier
@@ -13,22 +13,32 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <string>
 
 #include <VGlobalRunParameter.h>
 
 using namespace std;
 
 
-void merge( char *ifile, char *outputfile, bool bFull = false )
+void merge( string ifile, char *outputfile, bool bFull = false )
 {
-    char hname[400];
+    char hname[2000];
 
     TChain f( "fEffArea" );
-    sprintf( hname, "%s.root", ifile );
-    f.Add( hname );
-    f.ls();
+    if( ifile.find( ".root" ) != string::npos ) sprintf( hname, "%s", ifile.c_str() );
+    else                                        sprintf( hname, "%s.root", ifile.c_str() );
+    int i_nMerged = f.Add( hname );
+    if( i_nMerged == 0 )
+    {
+       cout << "error: no files found to merge: " << endl;
+       cout << "\t" << hname << endl;
+       cout << "exiting.." << endl;
+       exit( -1 );
+    }
     sprintf( hname, "%s.root", outputfile );
-    cout << "merge to " << hname << endl;
+    cout << "merging " << i_nMerged << " files to " << hname << endl;
+
+// set branches to be included in merged files
     if( !bFull )
     {
         f.SetBranchStatus( "*", 0 );
@@ -86,7 +96,15 @@ void merge( char *ifile, char *outputfile, bool bFull = false )
     }
     fO->Close();
 
-    sprintf( hname, "cat %s*.log > %s.log", ifile, outputfile );
+// merge all log files
+    if( ifile.find( ".root" ) != string::npos )
+    {
+       sprintf( hname, "cat %s*.log > %s.log", ifile.substr( ifile.size()-5, ifile.size() ).c_str(), outputfile );
+    }
+    else
+    {
+       sprintf( hname, "cat %s*.log > %s.log", ifile.c_str(), outputfile );
+    }
     system( hname );
 }
 
@@ -102,14 +120,19 @@ int main( int argc, char *argv[] )
        exit( 0 );
    }
    cout << endl;
-   cout << "combineEffectiveAreas (v" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+   cout << "combineEffectiveAreas (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+   cout << "------------------------------------" << endl;
    cout << endl;
 
    merge( argv[1], argv[2], (bool)atoi(argv[3]) );
 
 }
 
+/*
 
+   the following function is not used
+
+*/
 void mergeSelectedEvents( char *ifile, char *outfile, double ze = -1, int az = -1, double Woff = -1, int noise = -1, double index = -1. )
 {
     char hname[400];
