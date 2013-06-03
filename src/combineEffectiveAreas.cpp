@@ -76,6 +76,7 @@ void merge( string ifile, char *outputfile, bool bFull = false )
         f.SetBranchStatus( "hEsysMCRelative", 1 );
     }
     f.Merge( hname );
+    cout << "done.." << endl;
 
 // get one example of hEmc
 // (this is needed later to get the binning right)
@@ -105,7 +106,9 @@ void merge( string ifile, char *outputfile, bool bFull = false )
     {
        sprintf( hname, "cat %s*.log > %s.log", ifile.c_str(), outputfile );
     }
+    cout << "merge log files into " << hname << endl;
     system( hname );
+    cout << "done..";
 }
 
 int main( int argc, char *argv[] )
@@ -125,6 +128,8 @@ int main( int argc, char *argv[] )
    cout << endl;
 
    merge( argv[1], argv[2], (bool)atoi(argv[3]) );
+
+   cout << endl << "end combineEffectiveAreas" << endl;
 
 }
 

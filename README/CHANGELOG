@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130603 (GM) added scripts to combine effective areas on a batch system
+                improved error tolerance to user input of binary
+
 * 20130530 (GM) work on documentation
 
 * 20130524 (GM) Bug fix: close open DB connection in VPM quality control part in
