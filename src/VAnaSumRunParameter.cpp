@@ -641,6 +641,43 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
     return i_nline;
 }
 
+int VAnaSumRunParameter::loadSimpleFileList( string i_listfilename )
+{
+    int i_nline = 0;
+    ifstream is;
+    is.open(i_listfilename.c_str(),ifstream::in);
+    if(!is)
+    {
+	cout << " VAnaSumRunParameter:::loadSimpleFileList error: file with list of runs not found : " << i_listfilename << endl;
+	cout << "exiting..." << endl;
+        exit( -1 );
+    }
+    string is_line;
+    string temp;
+    sRunPara i_sT;
+    reset( i_sT );
+
+    cout << "Reading simple run list from: " << i_listfilename << endl;
+
+    while( getline( is, is_line ) )
+    {
+        if(  is_line.size() > 0 )
+        {
+            istringstream is_stream( is_line );
+            is_stream >> temp;
+// read run list
+            i_sT.fRunOn = atoi(temp.c_str());
+            i_sT.fRunOff = atoi(temp.c_str());
+// fill the runlist vector
+            fRunList.push_back( i_sT );
+// fill the runlist map
+	    fMapRunList[i_sT.fRunOn] = fRunList.back();
+	    ++i_nline;
+         }
+    }
+    return i_nline;
+}
+
 /*
 
    read (old style) long run list

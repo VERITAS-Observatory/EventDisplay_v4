@@ -10,12 +10,19 @@ VPlotRadialAcceptance::VPlotRadialAcceptance( string iFile )
    fDebug = false;
 
    setName( "radial acceptance" );
+
+   setAxisRange();
+
+   fAcceptanceFile = 0;
+   fAcceptanceHisto = 0;
+   fAcceptanceHistoFit = 0;
+   fAcceptanceFunction = 0;
    
-   if( iFile.size() > 0 ) readAcceptanceFile( iFile, 0 );
+   if( iFile.size() > 0 ) openAcceptanceFile( iFile, 0 );
 }
 
 
-bool VPlotRadialAcceptance::readAcceptanceFile( string iFile, unsigned int iZeBin )
+bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBin )
 {
 // open acceptance file
    fAcceptanceFile = new TFile( iFile.c_str() );
@@ -59,7 +66,7 @@ bool VPlotRadialAcceptance::readAcceptanceFile( string iFile, unsigned int iZeBi
 
 /*
 
-    plot all acceptance curves
+    plot acceptance curves
 
 */
 TCanvas* VPlotRadialAcceptance::plot( TCanvas *cX )
@@ -92,9 +99,9 @@ TCanvas* VPlotRadialAcceptance::plot( TCanvas *cX )
 
     if( fAcceptanceHisto )
     {
-       fAcceptanceHisto->SetMinimum( 0.0 );
-       fAcceptanceHisto->SetMaximum( 1.5 );
-       fAcceptanceHisto->SetAxisRange( 0., 3.5 );
+       fAcceptanceHisto->SetMinimum( fAxis_y_min );
+       fAcceptanceHisto->SetMaximum( fAxis_y_max );
+       fAcceptanceHisto->SetAxisRange( fAxis_x_min, fAxis_x_max );
        fAcceptanceHisto->SetTitle( "" );
        setHistogramPlottingStyle( fAcceptanceHisto, getPlottingColor(), 1., 1.5, 20 );
        if( bPlotSame ) fAcceptanceHisto->Draw( "e same" );
@@ -105,11 +112,11 @@ TCanvas* VPlotRadialAcceptance::plot( TCanvas *cX )
 //    {
 //       fAcceptanceHisto->Draw( "e same" );
 //    }
-    if( fAcceptanceHistoFit ) 
+/*    if( fAcceptanceHistoFit ) 
     {
        setHistogramPlottingStyle( fAcceptanceHistoFit, getPlottingColor(), 1., 1.5, 20 );
        fAcceptanceHistoFit->Draw( "same" );
-    }
+    } */
     if( fAcceptanceFunction )
     {
        setFunctionPlottingStyle( fAcceptanceFunction, getPlottingColor() );
@@ -124,7 +131,7 @@ TCanvas* VPlotRadialAcceptance::plot( TCanvas *cX )
     plot residuals between fit function and measured histogram
 
 */
-TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas *cX, double i_res_min, double i_res_max )
+TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas *cX, double i_res_min, double i_res_max, bool iPlotChi2 )
 {
     if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
     {
@@ -156,11 +163,40 @@ TCanvas* VPlotRadialAcceptance::plotResiduals( TCanvas *cX, double i_res_min, do
 	  hRes->SetTitle( "" );
 	  hRes->SetMinimum( i_res_min );
 	  hRes->SetMaximum( i_res_max );
+	  hRes->SetAxisRange( fAxis_x_min, fAxis_x_max );
 	  hRes->Draw();
-	  TLine *iL = new TLine( hRes->GetXaxis()->GetXmin(), 0., hRes->GetXaxis()->GetXmax(), 0. );
+	  TLine *iL = new TLine( hRes->GetXaxis()->GetXmin(), 0., fAxis_x_max, 0. );
 	  iL->Draw();
+
+	  if( iPlotChi2 )
+	  {
+	     double sum2 = 0.;
+	     int n = 0;
+	     for( int i = 1; i <= fAcceptanceHisto->GetNbinsX(); i++ )
+	     {
+	        if( fAcceptanceHisto->GetBinContent( i ) > 0. && fAcceptanceHisto->GetBinError( i ) > 0. )
+		{
+		   sum2 += ( fAcceptanceHisto->GetBinContent( i ) - fAcceptanceFunction->Eval( fAcceptanceHisto->GetBinCenter( i ) ) ) 
+		         * ( fAcceptanceHisto->GetBinContent( i ) - fAcceptanceFunction->Eval( fAcceptanceHisto->GetBinCenter( i ) ) )
+			 / fAcceptanceHisto->GetBinError( i ) / fAcceptanceHisto->GetBinError( i );
+		   n++;
+		}
+             }
+	     sprintf( hname, "Fit Chi2/N: %.2f/%d", sum2, n );
+	     TText *iT = new TText( 0.5*fAxis_x_max, 0.7*i_res_max, hname );
+	     iT->Draw();
+          }
        }
     }
 
     return cX;
 }
+
+void VPlotRadialAcceptance::setAxisRange( double x_min, double x_max, double y_min, double y_max )
+{
+   fAxis_x_min = x_min;
+   fAxis_x_max = x_max;
+   fAxis_y_min = y_min;
+   fAxis_y_max = y_max;
+}
+

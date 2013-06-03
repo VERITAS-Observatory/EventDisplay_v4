@@ -212,6 +212,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         void getEventdisplayRunParameter( string );
         void getWobbleOffsets( string );
         int  getRunListVersion() { return fVersion; }
+	int  loadSimpleFileList( string i_listfilename );
         int  loadLongFileList( string i_listfilename, bool bShortList = false, bool bTotalAnalysisOnly = false );
         int  loadShortFileList( string i_listfilename, string iDataDir, bool bTotalAnalysisOnly = false );
         void printStereoParameter( unsigned int icounter );

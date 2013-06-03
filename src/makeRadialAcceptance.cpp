@@ -27,7 +27,9 @@
 using namespace std;
 
 int parseOptions(int argc, char *argv[]);
-string listfilename, cutfilename;
+string listfilename = "";
+string cutfilename = "";
+string simpleListFileName = "";
 string outfile = "acceptance.root";
 unsigned int ntel = 4;
 string datadir = "../eventdisplay/output";
@@ -45,14 +47,24 @@ int main( int argc, char *argv[] )
     parseOptions(argc, argv);
 
 // read file list from run list file
-    fRunPara->loadLongFileList(listfilename, true );
-    if( fRunPara->getRunListVersion() < 4 )
+    if( listfilename.size() > 0 )
     {
-        cout << "require run list >= 4" << endl;
-        cout << "...exiting" << endl;
-        exit( 0 );
+       fRunPara->loadLongFileList( listfilename, true );
+       if( fRunPara->getRunListVersion() < 4 )
+       {
+	   cout << "require run list >= 4" << endl;
+	   cout << "...exiting" << endl;
+	   exit( 0 );
+       }
+       fRunPara->getEventdisplayRunParameter( datadir );
     }
-    fRunPara->getEventdisplayRunParameter( datadir );
+    else if( simpleListFileName.size() > 0 ) fRunPara->loadSimpleFileList( simpleListFileName );
+    else
+    {
+        cout << "error reading run list" << endl;
+	cout << "exiting..";
+	exit( -1 );
+    }
 
 // read gamma/hadron cuts from cut file
     VGammaHadronCuts* fCuts = new VGammaHadronCuts();
@@ -125,6 +137,7 @@ int parseOptions(int argc, char *argv[])
         {
             {"help", no_argument, 0, 'h'},
             {"runlist", required_argument, 0, 'l'},
+            {"srunlist", required_argument, 0, 's'},
             {"cutfile", required_argument, 0, 'c'},
             {"outfile", required_argument, 0, 'o'},
             {"ntel", required_argument, 0, 'n'},
@@ -132,7 +145,7 @@ int parseOptions(int argc, char *argv[])
             {0,0,0,0}
         };
         int option_index=0;
-        int c=getopt_long(argc, argv, "ht:l:o:d:n:c:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ht:s:l:o:d:n:c:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
         switch(c)
@@ -148,9 +161,10 @@ int parseOptions(int argc, char *argv[])
             case 'h':
                 cout << endl;
                 cout << "Options are:" << endl;
-                cout << "-l --runlist [run list file name, runlist on/off like]" << endl;
+                cout << "-l --runlist [anasum-style run list file name, runlist on/off like]" << endl;
+                cout << "-s --srunlist [simple run list file name]" << endl;
                 cout << "-c --cutfile [cut file name]" << endl;
-                cout << "-d --datadir [directory for input ROOT files]" << endl;
+                cout << "-d --datadir [directory for input mscw root files]" << endl;
                 cout << "-n --ntel [number of telescopes, default=4]" << endl;
                 cout << "-o --outfile [output ROOT file name]" << endl;
                 cout << endl;
@@ -168,6 +182,10 @@ int parseOptions(int argc, char *argv[])
             case 'l':
                 cout << "Run List File Name is " << optarg << endl;
                 listfilename=optarg;
+                break;
+            case 's':
+                cout << "Simple List File Name is " << optarg << endl;
+                simpleListFileName=optarg;
                 break;
             case 'n':
                 ntel=(unsigned int)atoi(optarg);

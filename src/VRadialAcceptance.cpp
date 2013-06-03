@@ -4,8 +4,6 @@
  *
  *    \author
  *    Gernot Maier 
- *
- *  Revision $Id: VRadialAcceptance.cpp,v 1.15.2.5.4.2.10.1.2.1.4.1.2.2.2.3.8.4.2.4.2.2.2.1 2011/03/31 14:50:58 gmaier Exp $
  */
 
 #include "VRadialAcceptance.h"
@@ -72,7 +70,7 @@ VRadialAcceptance::VRadialAcceptance( string ifile )
 
 /*!
  *  ******************************************************************
- *          making acceptance curves
+ *          calculating acceptance curves
  *  ******************************************************************
  *   this constructor is called for determination of radial acceptance curves with getAcceptance
  */
@@ -84,6 +82,15 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     hListNormalizeHistograms = new TList();
 
     fCuts = icuts;
+    if( !fCuts )
+    {
+       cout << "VRadialAcceptance error: no gamma/hadron separation cuts defined" << endl;
+       cout << "exiting..";
+       exit( -1 );
+    }
+// maximum distance to camera center for which events are taken into account:
+    fCut_CameraFiducialSize_max = fCuts->fCut_CameraFiducialSize_max;
+
     fRunPar = irunpar;
 
 // upper limit for zenith angle interal (18 == [0,18.])
@@ -127,7 +134,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 	hListNormalizeHistograms->Add( hAccZe.back() );
 
         sprintf( hname, "fAccZe_%d", i );
-        fAccZe.push_back( new TF1( hname, VRadialAcceptance_fit_acceptance_function, 0., 2.5, 5 ) );
+        fAccZe.push_back( new TF1( hname, VRadialAcceptance_fit_acceptance_function, 0., fCut_CameraFiducialSize_max, 5 ) );
         fAccZe.back()->SetNpx( 1000 );
         fAccZe.back()->SetParameter( 0, -0.3 );
         fAccZe.back()->SetParameter( 1, -0.6 );
@@ -216,7 +223,8 @@ void VRadialAcceptance::reset()
     fYs = 0.;
     fRs = 0.;
     fDs = 0.;
-    fMs = 5.;
+    fMaxDistanceAllowed = 5.;
+    fCut_CameraFiducialSize_max = fMaxDistanceAllowed;
 
     hscale = 0;
     hXYAccTot = 0;
@@ -225,6 +233,8 @@ void VRadialAcceptance::reset()
     fXE.clear();
     fYE.clear();
     fRE.clear();
+
+    setEnergyReconstructionMethod();
 }
 
 
@@ -238,7 +248,7 @@ double VRadialAcceptance::getAcceptance( double x, double y, double erec, double
 
     if( fAcceptanceFunctionDefined )
     {
-	 if( idist > 2.5 ) iacc = 0.;
+	 if( idist > fAccZe[0]->GetXmax() ) iacc = 0.;
 	 else iacc = fAccZe[0]->Eval( idist );
 	 if( iacc > 1. ) iacc = 1.;
 	 if( iacc < 0. ) iacc = 0.;
@@ -268,7 +278,7 @@ double VRadialAcceptance::getCorrectionFactor( double x, double y, double erec )
  */
 bool VRadialAcceptance::isExcluded( double x, double y )
 {
-    if( (x*x + y*y) > fMs * fMs ) return true;
+    if( (x*x + y*y) > fMaxDistanceAllowed * fMaxDistanceAllowed ) return true;
 
     return false;
 }
@@ -286,7 +296,7 @@ bool VRadialAcceptance::isExcluded( double x, double y )
 bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
 {
 // event outside fiducial area
-    if( x*x + y*y > fMs * fMs ) return true;
+    if( x*x + y*y > fMaxDistanceAllowed * fMaxDistanceAllowed ) return true;
 
 // source region (source radius + safety (fDS))
     if( fDs >= 0. && ( (x-fXs)*(x-fXs)+(y-fYs)*(y-fYs)) < ((fRs+fDs)*(fRs+fDs)) ) return true;
@@ -310,14 +320,18 @@ bool VRadialAcceptance::isExcludedfromSource( double x, double y )
     return false;
 }
 
+/*
 
+   set the position of the potential gamma-ray source in camera coordinates
+
+*/
 void VRadialAcceptance::setSource( double x, double y, double r, double idist, double imaxdist )
 {
     fXs = x;
     fYs = y;
     fRs = r;
     fDs = idist;
-    fMs = imaxdist;
+    fMaxDistanceAllowed = imaxdist;
 }
 
 void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r)
@@ -361,23 +375,27 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
         if( i == 0 and iData->isMC() ) cout << "\t (analysing MC data)" << endl;
 
 // apply some basic quality cuts
-        if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( 0, false, i , true) )
+        if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, false, i , true) )
         {
 // gamma/hadron cuts
-            if( !fCuts->isGamma( 0, false ) ) continue;
+            if( !fCuts->isGamma( i, false ) ) continue;
+// energy quality cuts not filled for maps
 // 	 if( !fCuts->applyEnergyReconstructionQualityCuts() ) continue;
 
 // now fill histograms
             i_entries_after_cuts++;
 
+	    idist = sqrt( iData->Xoff*iData->Xoff + iData->Yoff*iData->Yoff );
+
+// fill 2D distribution of events
             hXYAccTot->Fill( iData->Xoff, iData->Yoff );
+
 // fill zenith angle dependent histograms
             for( unsigned int j = 0; j < fZe.size(); j++ )
             {
                 if( iData->Ze < fZe[j] )
                 {
-                    idist = sqrt( iData->Xoff*iData->Xoff + iData->Yoff*iData->Yoff );
-                    if( idist > 0 ) hAccZe[j]->Fill( idist );
+                    if( idist > 0. ) hAccZe[j]->Fill( idist );
                     break;
                 }
             }
@@ -387,7 +405,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
 	    {
 	       if( i_az > fAzMin[j] && i_az < fAzMax[j] )
 	       {
-	          hAccAz[j]->Fill( idist );
+	          if( idist > 0. ) hAccAz[j]->Fill( idist );
 		  break;
                }
             }
@@ -396,8 +414,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
             {
                 if( iData->runNumber == fRunPar->fRunList[j].fRunOff )
                 {
-                    idist = sqrt( iData->Xoff*iData->Xoff + iData->Yoff*iData->Yoff );
-                    if( idist > 0 ) hAccRun[j]->Fill( idist );
+                    if( idist > 0. ) hAccRun[j]->Fill( idist );
                     break;
                 }
             }
@@ -482,8 +499,7 @@ bool VRadialAcceptance::terminate( string ofile )
     {
         for( int j = 1; j < hAccZeFit[i]->GetNbinsX(); j++ )
         {
-            if( j < 0 ) hAccZeFit[i]->SetBinContent( j, 1. );
-            else        hAccZeFit[i]->SetBinContent( j, hAccZe[i]->GetBinContent( j )) ;
+            hAccZeFit[i]->SetBinContent( j, hAccZe[i]->GetBinContent( j )) ;
         }
     }
 
@@ -497,7 +513,7 @@ bool VRadialAcceptance::terminate( string ofile )
         for( int j = 1; j < hAccZeFit[i]->GetNbinsX(); j++ )
         {
             i_eval = fAccZe[i]->Eval( hAccZeFit[i]->GetBinCenter( j ) );
-            if( hAccZeFit[i]->GetBinCenter( j ) > 3.5 ) i_eval = 0.;
+            if( hAccZeFit[i]->GetBinCenter( j ) > fAccZe[i]->GetXmax() ) i_eval = 0.;
             else if( hAccZeFit[i]->GetBinCenter( j ) < fAccZe[i]->GetMaximumX() ) i_eval = 1.;
             else if( i_eval < 0. )  i_eval = 0.;
             else if( i_eval >= 1. ) i_eval = 1.;

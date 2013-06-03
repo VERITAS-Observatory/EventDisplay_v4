@@ -24,7 +24,6 @@
  *
  *
  *
- *  Revision $Id: VStereoMaps.cpp,v 1.29.2.2.4.4.12.2.4.2.2.3.2.3.8.3.2.6.2.1 2011/01/03 10:57:32 gmaier Exp $
  */
 
 #include "VStereoMaps.h"

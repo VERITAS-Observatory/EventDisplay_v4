@@ -37,7 +37,10 @@ class VRadialAcceptance
         double fYs;
         double fRs;
         double fDs;
-        double fMs;
+        double fMaxDistanceAllowed;
+	double fCut_CameraFiducialSize_max;
+
+	unsigned int fEnergyReconstructionMethod;
 
 // regions excluded from background
         vector<double> fXE;
@@ -92,6 +95,7 @@ class VRadialAcceptance
         bool   isExcluded( double, double );                                            //!< region excluded from analysis
         bool   isExcludedfromBackground( double, double );                              //!< region excluded from background analysis
         bool   isExcludedfromSource( double, double );                                  //!< region excluded from source analyis
+	void   setEnergyReconstructionMethod( unsigned int iEMethod = 0 ) { fEnergyReconstructionMethod = iEMethod; }
         void   setSource( double x, double y, double r, double idist, double imaxdist = 5. ); //!< set source position, radius, and minimal distance between source and background
         void   setRegionToExcludeAcceptance( vector<double> x, vector<double> y, vector<double> r ); //set the region to be exclude in the analysis
         bool   terminate( string ofile );
