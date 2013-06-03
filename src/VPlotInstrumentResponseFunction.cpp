@@ -526,7 +526,7 @@ TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )
     return iEnergyResolutionPlottingCanvas;
 }
 
-void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double iYMax )
+void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double iYMax, int iRebin )
 {
     char hname[200];
     char htitle[200];
@@ -576,8 +576,16 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
        }
        else
        {
-	  if( fData[i]->hEcutUW )     fData[i]->hEcutUW->Draw( "same" );
-// XX	  if( fData[i]->hEcut_recUW ) fData[i]->hEcut_recUW->Draw( "same" );
+	  if( fData[i]->hEcutUW )   
+	  {
+	     if( iRebin > 1 ) fData[i]->hEcutUW->Rebin( iRebin );
+	     fData[i]->hEcutUW->Draw( "same" );
+          }
+	  if( fData[i]->hEcut_recUW )
+	  {
+	     if( iRebin > 1 ) fData[i]->hEcut_recUW->Rebin( iRebin );
+	     fData[i]->hEcut_recUW->Draw( "same" );
+          }
        }
     }
 // XX    iEnergySpectraPlottingCanvas->SetLogy( 1 );
@@ -585,6 +593,7 @@ void VPlotInstrumentResponseFunction::plotEnergySpectra( bool iWeighted, double 
     {
        if( fData[0]->hCutEfficiency[i] )
        {
+	  if( iRebin > 1 ) fData[0]->hCutEfficiency[i]->Rebin( iRebin );
           fData[0]->hCutEfficiency[i]->Draw( "same" );
           cout << i+1 << "\t" << fData[0]->hCutEfficiency[i]->GetName();
           cout << " (color: " << fData[0]->hCutEfficiency[i]->GetMarkerColor();
