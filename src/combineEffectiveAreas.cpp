@@ -71,7 +71,7 @@ void merge( string ifile, char *outputfile, bool bFull = false )
 //        f.SetBranchStatus( "Prob_seff_L", 1 );
 //        f.SetBranchStatus( "Prob_seff_U", 1 );
 // needed for compatibility to v3.30
-        f.SetBranchStatus( "hEmc", 1 );
+//        f.SetBranchStatus( "hEmc", 1 );
 // needed for systematic error calculation
         f.SetBranchStatus( "hEsysMCRelative", 1 );
     }
