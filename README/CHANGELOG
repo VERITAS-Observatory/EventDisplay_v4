@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130604 (GM) significant update: added dead time calculation with scalars
+                (dead time is now calculated every 20s, time depencendy is 
+		 taken into account in the spectral reconstruction)
+
 * 20130603 (GM) removed hard wired values of maximum allowed distance for acceptance evaulation
                 added simple run list reading; improved plotting of radial acceptances
 

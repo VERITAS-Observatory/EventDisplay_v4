@@ -1099,7 +1099,18 @@ double VStereoAnalysis::getDeadTimeFraction()
 
       if( fHisCounter < 0 ) return 0.;
 
-      if( fHisCounter < (int)fDeadTime.size() ) return fDeadTime[fHisCounter]->getDeadTimeFraction();
+      if( fHisCounter < (int)fDeadTime.size() )
+      {
+// dead time depending on time mask
+         if( fTimeMask && fTimeMask->getMask().size() > 0 )
+	 {
+	    cout << "TIME MASK DEAD TIME FRACTION " << fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask().size() );
+	    cout << " (" << fDeadTime[fHisCounter]->getDeadTimeFraction() << ")" << endl;
+	    return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask().size() );
+         }
+	 cout << "NON TIME MASK DEAD TIME FRACTION " << fDeadTime[fHisCounter]->getDeadTimeFraction() << endl;
+         return fDeadTime[fHisCounter]->getDeadTimeFraction();
+      }
 
       return 0.;
 }

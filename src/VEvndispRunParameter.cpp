@@ -60,6 +60,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     fIsMC = 0;
     fIgnoreCFGversions = false;
     fPrintAnalysisProgress = 25000;
+    fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
 
 // geometry/calibration parameters
     fNTelescopes = 4;                             // there is always at least one telescope

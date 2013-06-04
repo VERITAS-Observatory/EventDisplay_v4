@@ -3,9 +3,6 @@
 
   reads evndisp output trees, fill results from mscw and energy reconstruction
 
-  HARDWIRED: maximum core distance is 1000 m
-
-  Revision $Id: VTableLookupDataHandler.cpp,v 1.38.2.14.4.7.10.3.2.16.4.7.2.5.2.3.2.2.4.6.2.8.2.22.2.4.2.3 2011/03/25 13:11:32 gmaier Exp $
 
   \author Gernot Maier
 */
@@ -311,7 +308,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     }
     fNImages = fshowerpars->NImages[fMethod];
     fchi2 = fshowerpars->Chi2[fMethod];
-// (GM) 
     if( !isReconstructed() )
     {
        if( fDebug > 1 ) cout << "\t NO RECONSTRUCTION " << fEventCounter << endl;
@@ -387,9 +383,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     {
         bool fReadTPars = false;
 	if( i < ftpars.size() && ftpars[i] ) fReadTPars = true;
-// (GM) not clear 	
-//	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 && fTLRunParameter->bWriteReconstructedEventsOnly == fMethod) 
-//	  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fTLRunParameter->readwrite == 'W'   )
 	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
 	  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fTLRunParameter->readwrite == 'W'   )
 	{
@@ -414,7 +407,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
             fwidth[i] = ftpars[i]->width;
             flength[i] = ftpars[i]->length;
 
-//AMC 09102009
             if( fsize[i] > SizeSecondMax_temp)
             {
                 if( fsize[i] > SizeFirstMax_temp)
@@ -427,7 +419,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
                     SizeSecondMax_temp = fsize[i];
                 }
             }
-//AMC 09102009
 
             if( !bShort )
             {
@@ -472,7 +463,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     fmeanPedvar_Image = calculateMeanNoiseLevel( true );
     if( !bShort && fNTrig >= 2 && i_nimage.to_ulong() > 0 && getNTel() < 10 ) hImagePattern->Fill( ((double)i_nimage.to_ulong()) );
 
-                                                  //AMC 09102009
     if(SizeSecondMax_temp > 0) fSizeSecondMax = SizeSecondMax_temp;
 
     fEventCounter++;
@@ -1042,7 +1032,6 @@ bool VTableLookupDataHandler::readRunParameter()
 {
 
 // get run parameter (only if a single inputfile is read)
-//   if( fEventDisplayFileFormat > 1 && finputfile.size() > 0 && finputfile.find( "*" ) >= finputfile.size() && finputfile.find( "[" ) >= finputfile.size() )
     if( fEventDisplayFileFormat > 1 )
     {
 // get list of files in chain
@@ -1073,22 +1062,6 @@ bool VTableLookupDataHandler::readRunParameter()
     }
 
     return true;
-}
-
-
-double VTableLookupDataHandler::getDeadTimeFraction()
-{
-    if( fDeadTime && !fIsMC )
-    {
-        fDeadTime->calculateDeadTime();
-        fDeadTimeFraction = fDeadTime->getDeadTimeFraction();
-    }
-    else if( fIsMC )
-    {
-        fDeadTimeFraction = 0.;
-    }
-
-    return fDeadTimeFraction;
 }
 
 void VTableLookupDataHandler::printCutStatistics()
@@ -1167,13 +1140,10 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
 	   cout << "\t writing MC debug histograms" << endl;
 	   hisList->Write();
         }
-        if( fDeadTime )
-        {
-            fDeadTime->calculateDeadTime();
-            fDeadTime->printDeadTime();
-            fDeadTimeFraction = fDeadTime->getDeadTimeFraction();
-            fDeadTime->writeHistograms();
-        }
+// see if there is a dead time object on file, if not: write the one filled here
+// (note: at this stage, the scalars cannot be used and the dead time might be
+//         underestimated)
+        if( !fIsMC ) writeDeadTimeHistograms(); 
 
 	if( fIsMC )
 	{
@@ -1188,6 +1158,29 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
     }
 
     return true;
+}
+
+void VTableLookupDataHandler::writeDeadTimeHistograms()
+{
+// use chain to get list of files
+    TChain iTel( "telconfig" );
+    int iNFil = iTel.Add( finputfile.c_str() );
+
+    if( iNFil > 0 )
+    {
+       TFile *f = iTel.GetFile();
+       if( f )
+       {
+	    TDirectoryFile *iDeadtimeDirectory = (TDirectoryFile*)f->Get( "deadTimeHistograms" );
+	    if( iDeadtimeDirectory )
+	    {
+	        fDeadTime->readHistograms( iDeadtimeDirectory );
+            }
+            fDeadTime->calculateDeadTime();
+            fDeadTime->printDeadTime();
+            fDeadTime->writeHistograms();
+       }
+    }
 }
 
 void VTableLookupDataHandler::copy_telconfig()
@@ -1588,8 +1581,6 @@ void VTableLookupDataHandler::resetAll()
 
     fTotalTime = 0.;
     fTotalTime0 = 0.;
-
-    fDeadTimeFraction = 0.;
 
     fMC_distance_to_cameracenter_min = 0.;
     fMC_distance_to_cameracenter_max = 1.e10;

@@ -1369,6 +1369,7 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 bool VAnaSumRunParameter::getListOfExcludedSkyRegions(TFile *f)
 {
     TTree *tEx = ((TTree*)f->Get("total_1/stereo/tExcludedRegions"));
+    if( !tEx ) return false;
 
     float x;
     float y;

@@ -76,8 +76,6 @@ class VTableLookupDataHandler
         double fMCMaxEnergy;
         double fSpectralIndex;
 
-        double fDeadTimeFraction;
-
         double degrad;
         double raddeg;
 
@@ -166,6 +164,7 @@ class VTableLookupDataHandler
         void   resetImageParameters( unsigned int i );
         void   setEventWeightfromMCSpectrum();
         void   setSelectRandom( double iX, int iS );
+	void   writeDeadTimeHistograms();
 
     public:
 
@@ -303,7 +302,6 @@ class VTableLookupDataHandler
         void fillMChistograms();
         void fillTables( bool ib ) { fwrite = ib; }
         int getArrayReconstructionMethod() { return fMethod; }
-        double  getDeadTimeFraction();
         double* getDistance() { return fdist; }
 	double* getDistance( ULong64_t iTelType );
         double* getDistanceToCore() { return fR; }

@@ -1,16 +1,12 @@
 /*! \class VDeadTime
     \brief dead time calculator
 
+    two methods are applied:
 
-        if( fReader->getArrayTrigger() && fReader->getArrayTrigger()->hasTenMHzClockArray() )
-	{
-	   cout << "DEAD TIME 0 " << fReader->getArrayTrigger()->getTenMHzClockArray()[0] << endl;
-	   cout << "DEAD TIME 1 " << fReader->getArrayTrigger()->getTenMHzClockArray()[1] << endl;
-        }
+    i)  using the distribution of time differences
+    ii) using the ten MHz clock and busy counter (scaler)
 
     \author  Gernot Maier
-
-    Revision $Id: VDeadTime.cpp,v 1.4.2.1.22.2.14.1 2010/03/08 07:45:08 gmaier Exp $
 */
 
 #include "VDeadTime.h"
@@ -32,6 +28,15 @@ VDeadTime::VDeadTime( bool iIsOn )
     hFTimeDiff = 0;
     hgDeadTime = 0;
     hNEventTime = 0;
+
+// scalar
+    hScalarClock = 0;
+    hScalarBusy = 0;
+    hScalarDeadTimeFraction = 0;
+
+    fScalarDeadTimeFrac = 0.;
+    fScalarDeadTimeChi2 = 0.;
+
     hisList = 0;
     reset();
 }
@@ -45,15 +50,24 @@ void VDeadTime::reset()
     if( hTimeDiff ) hTimeDiff->Reset();
     if( hTimeDiffLog ) hTimeDiffLog->Reset();
     if( hTimeDiff2D ) hTimeDiff2D->Reset();
+    if( hScalarClock ) hScalarClock->Reset();
+    if( hScalarBusy ) hScalarBusy->Reset();
+    if( hScalarDeadTimeFraction ) hScalarDeadTimeFraction->Reset();
+
+    fScalarClockLastEvent = 0;
+    fScalarBusyLastEvent = 0;
+    fFirstScalarEvent = true;
+    fScalarTimeOfFirstEvent = 0;
 }
 
 
-void VDeadTime::defineHistograms()
+void VDeadTime::defineHistograms( float iRunDuration )
 {
     hisList = new TList();
 
     char hname[200];
 
+// histograms for calculating dead vs 
     if( bIsOn ) sprintf( hname, "hTimeDiff_on" );
     else        sprintf( hname, "hTimeDiff_off" );
     hTimeDiff = new TH1D( hname, "time difference between events (lin)", 50000, 0., 0.2 );
@@ -106,10 +120,93 @@ void VDeadTime::defineHistograms()
     hFTimeDiff->SetLineColor( 2 );
     hisList->Add( hFTimeDiff );
 
+// scalar related histograms
+    if( iRunDuration > 0. )
+    {
+       if( bIsOn ) sprintf( hname, "hScalarClock_on" );
+       else        sprintf( hname, "hScalarClock_off" );
+       hScalarClock = new TH1D( hname, "scalar clock", int((iRunDuration*1.1)/10.), 0., iRunDuration*1.1 );
+       hScalarClock->Sumw2();
+       hScalarClock->SetXTitle( "event time [s]" );
+       hScalarClock->SetYTitle( "10MHz counts" );
+       hisList->Add( hScalarClock );
+
+       if( bIsOn ) sprintf( hname, "hScalarBusy_on" );
+       else        sprintf( hname, "hScalarBusy_off" );
+       hScalarBusy = new TH1D( hname, "scalar busy counter", int((iRunDuration*1.1)/10.), 0., iRunDuration*1.1 );
+       hScalarBusy->SetXTitle( "event time [s]" );
+       hScalarBusy->SetYTitle( "10MHz counts (busy)" );
+       hScalarBusy->SetLineColor( 2 );
+       hScalarBusy->SetMarkerColor( 2 );
+       hScalarBusy->Sumw2();
+       hisList->Add( hScalarBusy );
+
+       if( bIsOn ) sprintf( hname, "hScalarDeadTimeFraction_on" );
+       else        sprintf( hname, "hScalarDeadTimeFraction_off" );
+       hScalarDeadTimeFraction = new TH1D( hname, "scalar dead time fraction", int((iRunDuration*1.1)/10.), 0., iRunDuration*1.1 );
+       hScalarDeadTimeFraction->SetXTitle( "event time [s]" );
+       hScalarDeadTimeFraction->SetYTitle( "dead time fraction" );
+       hScalarDeadTimeFraction->Sumw2();
+       hisList->Add( hScalarDeadTimeFraction );
+    } 
+
+}
+
+double VDeadTime::fillDeadTime( double time, unsigned int *tenMHzClock )
+{
+   double iDiff = fillTimeDifferenceHistograms( time );
+
+   if( tenMHzClock ) fillTenMHzClockArray( time, tenMHzClock );
+
+   return iDiff;
+}
+
+void VDeadTime::fillTenMHzClockArray( double time, unsigned int *tenMHzClock )
+{
+   if( !tenMHzClock ) return;
+// check if this is the first scalar event
+   if( fFirstScalarEvent )
+   {
+      fFirstScalarEvent = false;
+      fScalarClockLastEvent = tenMHzClock[0];
+      fScalarBusyLastEvent  = tenMHzClock[1];
+      fScalarTimeOfFirstEvent = time;
+      return;
+   }
+
+// check time bins and reset variables if needed
+   int nbin = hScalarClock->FindBin( time - fScalarTimeOfFirstEvent );
+
+// fill scalar clock
+   if( tenMHzClock[0] > fScalarClockLastEvent )
+   {
+       hScalarClock->SetBinContent( nbin, hScalarClock->GetBinContent( nbin ) + double(tenMHzClock[0] - fScalarClockLastEvent) );
+   }
+   else
+   {
+       hScalarClock->SetBinContent( nbin, hScalarClock->GetBinContent( nbin )
+                                         + TMath::Power( 2., 32. ) - 1. - fScalarClockLastEvent
+					 +  double(tenMHzClock[0]) );
+   }
+// fill busy clock
+   if( tenMHzClock[1] > fScalarBusyLastEvent )
+   {
+       hScalarBusy->SetBinContent( nbin, hScalarBusy->GetBinContent( nbin ) + double(tenMHzClock[1] - fScalarBusyLastEvent ) );
+   }
+   else
+   {
+       hScalarBusy->SetBinContent( nbin, hScalarBusy->GetBinContent( nbin )
+                                         + TMath::Power( 2., 32. ) - 1. - fScalarBusyLastEvent
+					 +  double(tenMHzClock[1]) );
+   }
+
+   fScalarClockLastEvent = tenMHzClock[0];
+   fScalarBusyLastEvent  = tenMHzClock[1];
+
 }
 
 
-double VDeadTime::fillDeadTime( double time )
+double VDeadTime::fillTimeDifferenceHistograms( double time )
 {
     double tdiff = time - ft0;
 
@@ -133,6 +230,66 @@ double VDeadTime::fillDeadTime( double time )
 
 double VDeadTime::calculateDeadTime()
 {
+    fScalarDeadTimeFrac = calculateDeadTimeFromScalars();
+
+    fDeadTimeFrac = calculateDeadTimeFromTimeDifferences();
+
+    if( fScalarDeadTimeFrac > 0. ) return fScalarDeadTimeFrac;
+
+    return fDeadTimeFrac;
+}
+
+double VDeadTime::calculateDeadTimeFromScalars()
+{
+   if( !hScalarClock || !hScalarBusy || !hScalarDeadTimeFraction )
+   {
+      return 0.;
+   }
+
+   double iClock = 0.;
+   double iBusy = 0.;
+   double iChi2 = 0.;
+   double iNDF = 0.;
+// calculate mean dead time fraction and errors on dead time histogram
+   for( int i = 1; i <= hScalarClock->GetNbinsX(); i++ )
+   {
+      iClock += hScalarClock->GetBinContent( i );
+      iBusy +=  hScalarBusy->GetBinContent( i );
+
+      if( hScalarClock->GetBinContent( i ) > 0. ) hScalarClock->SetBinError( i, sqrt( hScalarClock->GetBinContent( i ) ) );
+      if( hScalarBusy->GetBinContent( i ) > 0. )  hScalarBusy->SetBinError( i, sqrt( hScalarBusy->GetBinContent( i ) ) );
+
+   }
+
+// calculate time dependent dead time
+   hScalarDeadTimeFraction->Divide( hScalarBusy, hScalarClock );
+
+// calculate chi2
+   if( iClock > 0. )
+   {
+      for( int i = 1; i <= hScalarDeadTimeFraction->GetNbinsX(); i++ )
+      {
+	  if( hScalarDeadTimeFraction->GetBinError( i ) > 0. )
+	  {
+	     iChi2 += (hScalarDeadTimeFraction->GetBinContent( i ) - iBusy / iClock)*(hScalarDeadTimeFraction->GetBinContent( i ) - iBusy / iClock)
+		      / hScalarDeadTimeFraction->GetBinError( i ) / hScalarDeadTimeFraction->GetBinError( i );
+	     iNDF++;
+          }
+      }
+   }
+   if( iNDF > 0. ) fScalarDeadTimeChi2 = iChi2 / iNDF;
+   else            fScalarDeadTimeChi2 = 0.;
+
+
+   if( iClock > 0. ) return iBusy / iClock;
+
+   return 0.;
+}
+
+double VDeadTime::calculateDeadTimeFromTimeDifferences()
+{
+///////////////////////////////////////////////////
+// dead time calculation from time differences
     if( !hTimeDiff || !hFTimeDiff ) return 0.;
     if( hTimeDiff->GetEntries() <= 0. ) return 0.;
 
@@ -145,17 +302,8 @@ double VDeadTime::calculateDeadTime()
     double ix = hTimeDiff->GetBinCenter( 1 );
     double nmiss = 0.;
 
-// this method doesn't work with spikes at small delta t
-/*
-    while( (hFTimeDiff->Eval( ix ) - hTimeDiff->GetBinContent( jbin ))/hFTimeDiff->Eval( ix ) > 0.5 )
-    {
-        nmiss += hFTimeDiff->Eval( ix ) - hTimeDiff->GetBinContent( jbin );
-        jbin++;
-        ix = hTimeDiff->GetBinCenter( jbin );
-    } */
 // go left in delta t histogram from 0.01, first 0 bin defines dead time
 // (fails for very short runs)
-//    for( int i = hTimeDiff->FindBin( 0.01 ); i > 2; i-- )
     for( int i = hTimeDiff->FindBin( hTimeDiff->GetMean() ); i > 2; i-- )
     {
 // require  at least three zero bins
@@ -204,15 +352,20 @@ double VDeadTime::calculateDeadTime()
     }
     hgDeadTime->Set( i_np );
 
-    return fDeadTimeMS;
+    return fDeadTimeFrac;
 }
 
 
 void VDeadTime::printDeadTime()
 {
-    cout << "\t dead time [ms] " << fDeadTimeMS << ", fraction of missing events: " << fDeadTimeFrac * 100.;
+    cout << "\t Tdiff: dead time [ms] " << fDeadTimeMS << ", fraction of missing events: " << fDeadTimeFrac * 100.;
     cout << "% (" << fDeadTimeMiss << ", ";
     if( hTimeDiff ) cout << hTimeDiff->GetEntries() << ")" << endl;
+    if( hScalarClock && hScalarClock->GetEntries() > 0 )
+    {
+        cout << "\t Scalar: dead time (fraction of missing events): " << fScalarDeadTimeFrac * 100. << "%";
+	cout << " (Chi2 = " << fScalarDeadTimeChi2 << ")" << endl;
+    }
 }
 
 
@@ -221,6 +374,47 @@ TList* VDeadTime::getDeadTimeHistograms()
     if( hisList ) return hisList;
 
     return 0;
+}
+
+
+/*
+
+   read time dependent dead time fraction
+
+   double iT_run_s: time into the run
+*/
+double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff )
+{
+   if( iT_run_s < 0. || iTimeDiff ) return fDeadTimeFrac;
+
+   if( hScalarDeadTimeFraction )
+   {
+      int nbin = hScalarDeadTimeFraction->FindBin( iT_run_s );
+      if( nbin > 0 && nbin <= hScalarDeadTimeFraction->GetNbinsX() );
+      {
+          return hScalarDeadTimeFraction->GetBinContent( nbin );
+      }
+   }
+   return fDeadTimeFrac;
+}
+
+/*
+
+   get mean dead time fraction assuming that each mask entry corresponds to 1 s
+
+*/
+double VDeadTime::getDeadTimeFraction( vector< bool > iMask )
+{
+   double iN = 0.;
+   double iD = 0.;
+   for( unsigned int i = 0; i < iMask.size(); i++ )
+   {
+      iD += getDeadTimeFraction( (double)i + 0.5 );
+      iN++;
+   }
+   if( iN > 0. ) return iD / iN;
+
+   return 0.;
 }
 
 
@@ -261,6 +455,8 @@ bool VDeadTime::readHistograms( TDirectoryFile *iDir )
 
     cout << "\t reading dead time histograms from file " << iDir->GetPath() << endl;
 
+// time difference histograms
+
     hTimeDiff = (TH1D*)iDir->Get( "hTimeDiff_on" );
     if( !bIsOn ) hTimeDiff->SetName( "hTimeDiff_off" );
     hisList->Add( hTimeDiff );
@@ -280,5 +476,17 @@ bool VDeadTime::readHistograms( TDirectoryFile *iDir )
     if( !bIsOn ) hFTimeDiff->SetName( "hFTimeDiff_off" );
     hisList->Add( hFTimeDiff );
 
+// scalar histograms
+    hScalarClock = (TH1D*)iDir->Get( "hScalarClock_on" );
+    if( !bIsOn ) hScalarClock = (TH1D*)iDir->Get( "hScalarClock_off" );
+    hisList->Add( hScalarClock );
+    hScalarBusy = (TH1D*)iDir->Get( "hScalarBusy_on" );
+    if( !bIsOn ) hScalarBusy = (TH1D*)iDir->Get( "hScalarBusy_off" );
+    hisList->Add( hScalarBusy );
+    hScalarDeadTimeFraction = (TH1D*)iDir->Get( "hScalarDeadTimeFraction_on" );
+    if( !bIsOn ) hScalarDeadTimeFraction = (TH1D*)iDir->Get( "hScalarDeadTimeFraction_off" );
+    hisList->Add( hScalarDeadTimeFraction );
+
     return true;
 }
+

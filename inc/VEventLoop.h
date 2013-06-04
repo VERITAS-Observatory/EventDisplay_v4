@@ -14,6 +14,7 @@
 #include <VArrayAnalyzer.h>
 #include <VCalibrator.h>
 #include <VEvndispData.h>
+#include <VDeadTime.h>
 #include <VDST.h>
 #ifndef NOVBF
 #include <VGPSDecoder.h>
@@ -48,6 +49,7 @@ class VEventLoop : public VEvndispData
 #ifndef NOGSL
         VFrogs *fFrogs;                           //!< Frogs Analyzer
 #endif
+	VDeadTime *fDeadTime;                     //!< dead time calculator
         string fFileGains;                        //!< file with gains
 
         E_runmode fRunMode;                       //!< run mode (analysis, pedestal calculation, gain/toffset calculation)
@@ -79,6 +81,7 @@ class VEventLoop : public VEvndispData
         void     terminate( int );
 
     public:
+
         VEventLoop( VEvndispRunParameter* );
         virtual ~VEventLoop();                    //!< destructor
         VImageAnalyzer*  getAnalyzer() { return fAnalyzer; }

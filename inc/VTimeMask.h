@@ -96,6 +96,7 @@ class VTimeMask
         {
             return mask.size();
         }
+	vector< Bool_t > getMask() const { return mask; }
         UInt_t      getEffectiveDuration() const; // Number of open seconds in the mask
         UInt_t      getEventsTotal() const;       // Total of all events checked against mask
         UInt_t      getAcceptedTotal() const;     // Total of events allowed to pass the mask

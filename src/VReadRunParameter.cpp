@@ -963,6 +963,7 @@ void VReadRunParameter::test_and_adjustParams()
 	    fRunPara->fDBRunType = i_DBinfo.getRunType();
 	    fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
 	    fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
+	    fRunPara->fRunDuration = (float)i_DBinfo.getDuration();
             if( fTelToAna == 0 ) fTelToAna = i_DBinfo.getTelToAna();
 // get source file from run number (if run number is given and no sourcefile)
 	    if( fRunPara->fsourcefile.size() < 1 )

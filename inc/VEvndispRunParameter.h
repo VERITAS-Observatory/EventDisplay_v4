@@ -62,6 +62,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         int    fnevents;                          // total number of events to be analyzed
         int    fFirstEvent;                      // skip up till this event 
 
+	float  fRunDuration;                      // duration of runs in [s]
+
 // output parameters
         bool   ffillhistos;                       // fill some analysis histograms
         string foutputfileName;                   // file name for analysis output (root file), -1 = no output
@@ -247,6 +249,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,123); //(increase this number)
+        ClassDef(VEvndispRunParameter,124); //(increase this number)
 };
 #endif

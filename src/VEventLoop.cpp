@@ -93,6 +93,10 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
 // create array analyzer
     fArrayAnalyzer = new VArrayAnalyzer();
 
+// create dead time calculator
+    fDeadTime = new VDeadTime();
+    fDeadTime->defineHistograms( fRunPar->fRunDuration );
+
 #ifndef NOGSL
 // Frogs Stuff
     fFrogs = new VFrogs();
@@ -530,7 +534,9 @@ void VEventLoop::initializeAnalyzers()
 
 
 /*!
-     clean up and call analysis outputfile writer
+
+     clean up and write all data to disk
+
 */
 void VEventLoop::shutdown()
 {
@@ -545,7 +551,9 @@ void VEventLoop::shutdown()
         {
             fOutputfile->cd();
         }
-        else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW && fRunMode != R_GTO && fRunMode != R_GTOLOW && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
+        else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW 
+	      && fRunMode != R_GTO && fRunMode != R_GTOLOW 
+	      && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
         {
             cout << "VEventLoop::shutdown: Error accessing output file" << endl;
         }
@@ -564,12 +572,31 @@ void VEventLoop::shutdown()
                 if( fDebug ) cout << "\t writing detector tree: " << getDetectorTree()->GetName() << endl;
                 getDetectorTree()->Write();
             }
-// write array analysis results
+// write pedestal variation calculations to output file
+            if( ( fRunPar->frunmode == R_ANA ) && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
+            {
+                fPedestalCalculator->terminate();
+            }
+// calculate and write deadtime calculation to disk
+            if( fDeadTime )
+	    {
+	       fDeadTime->calculateDeadTime();
+	       fDeadTime->printDeadTime();
+	       fDeadTime->writeHistograms();
+            }
+// write MC run header to output file
+	    if( getReader()->getMonteCarloHeader() )
+	    {
+	       fOutputfile->cd();
+	       getReader()->getMonteCarloHeader()->print();
+	       getReader()->getMonteCarloHeader()->Write();
+	    }
+// write array analysis results to output file
             if( fArrayAnalyzer ) fArrayAnalyzer->terminate();
 #ifndef NOGSL
             if( fRunPar->ffrogsmode ) fFrogs->terminate();
 #endif
-// write analysis results for each telescope
+// write analysis results for each telescope to output file
             if( fAnalyzer )
             {
                 for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
@@ -578,18 +605,7 @@ void VEventLoop::shutdown()
                     fAnalyzer->terminate();
                 }
             }
-// write pedestal variation calculations to output file
-            if( ( fRunPar->frunmode == R_ANA ) && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
-            {
-                fPedestalCalculator->terminate();
-            }
-	    if( getReader()->getMonteCarloHeader() )
-	    {
-	       fOutputfile->cd();
-	       getReader()->getMonteCarloHeader()->print();
-	       getReader()->getMonteCarloHeader()->Write();
-	    }
-// close output file here (!! CLOSE !!)
+// close output file here (!! CLOSE OUTPUT FILE FOREVER !!)
             fAnalyzer->shutdown();
         }
 // write calibration/analysis results for each telescope
@@ -1016,6 +1032,20 @@ int VEventLoop::analyzeEvent()
 #endif 
        }
     }
+
+/////////////////////////////////////////////////////////////////////////
+// dead time calculation
+   if( !isMC() )
+   {
+      if( fReader->getArrayTrigger() && fReader->getArrayTrigger()->hasTenMHzClockArray() )
+      {
+	 fDeadTime->fillDeadTime(  getEventTime(), fReader->getArrayTrigger()->getTenMHzClockArray() );
+      }
+      else
+      {
+         fDeadTime->fillDeadTime( getEventTime(), 0 );
+      }
+   }
 
 /////////////////////////////////////////////////////////////////////////
 // calculate pedestals in time slices
