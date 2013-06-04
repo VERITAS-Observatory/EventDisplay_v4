@@ -26,8 +26,9 @@ source $EVNDISPSYS/setObservatory.tcsh VERITAS
 ###################### V4 #################################################
 if( $ARRAY == "V4" ) then
    if( $PART == "1" ) then
-      set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+#      set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
 #       set IFIL=Apr12_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      set IFIL=Oct2012_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47460
       set NRUN=1
