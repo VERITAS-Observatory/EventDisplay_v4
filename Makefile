@@ -274,6 +274,7 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/VPedestalCalculator.o \
 		./obj/VDeadChannelFinder.o \
 		./obj/VSpecialChannel.o \
+		./obj/VDeadTime.o \
 		./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VReadRunParameter.o \
