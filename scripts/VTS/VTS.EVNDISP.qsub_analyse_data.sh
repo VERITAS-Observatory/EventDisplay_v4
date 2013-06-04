@@ -8,7 +8,7 @@ set RUN=RRRRR
 set CALIB=PEEED
 set VPM=VVPM
 
-set DATE="d20130426"
+set DATE="d20130524"
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
@@ -21,6 +21,7 @@ if( $VPM == "1" ) then
    set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400-$DATE-VPM/"
    set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400-$DATE-VPM/"
 endif
+
 mkdir -p $ODIR
 mkdir -p $LDIR
 
@@ -73,8 +74,8 @@ if( $VPM == "1" ) then
 endif
 # OFF data run
 #set OPT="$OPT -raoffset=6.25"
-# use calib.dat
-# set OPT="$OPT -calibrationfile calib.dat"
+# use text file for calibration information
+# set OPT="$OPT -calibrationfile calibrationlist.dat"
 # double passed correction
 #set OPT="$OPT -nodp2005"
 

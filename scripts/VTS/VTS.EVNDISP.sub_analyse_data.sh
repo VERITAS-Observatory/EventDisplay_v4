@@ -58,8 +58,9 @@ QLOG=$VERITAS_USER_LOG_DIR/$DATE/
 mkdir -p $QLOG
 
 # output directory for shell scripts
-SHELLDIR=$VERITAS_USER_LOG_DIR"/queueShellDir/"
-mkdir -p $SHELLDIR
+SCRDIR=$VERITAS_USER_LOG_DIR"/queueShelldir/"
+mkdir -p $SCRDIR
+echo $SCRDIR
 
 # skeleton script
 FSCRIPT="VTS.EVNDISP.qsub_analyse_data"
@@ -69,13 +70,11 @@ FSCRIPT="VTS.EVNDISP.qsub_analyse_data"
 for AFIL in $FILES
 do
    echo "now running $AFIL"
-   FNAM="$SHELLDIR/EVN.data-$AFIL"
+   FNAM="$SCRDIR/EVN.data-$AFIL"
 
-   sed -e "s|RRRRR|$AFIL|" $FSCRIPT.sh > $FNAM-1.sh
-   sed -e "s|PEEED|$PED|" $FNAM-1.sh > $FNAM-2.sh
-   rm -f $FNAM-1.sh
-   sed -e "s|VVPM|$VPM|" $FNAM-2.sh > $FNAM.sh
-   rm -f $FNAM-2.sh
+   sed -e "s|RRRRR|$AFIL|" \
+       -e "s|PEEED|$PED|" \
+       -e "s|VVPM|$VPM|" $FSCRIPT.sh > $FNAM.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh

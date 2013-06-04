@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# submitt effective area analysis
+# submit effective area analysis
 #
 # (output need to be combined afterwards)
 #
