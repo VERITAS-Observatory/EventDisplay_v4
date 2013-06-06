@@ -5,7 +5,7 @@
 # Author: Gernot Maier
 #
 
-if [ $# -ne 3 ]
+if [ $# -ne 4 ]
 then
    echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run> [ID]"
    echo
@@ -71,7 +71,7 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -l h_cpu=00:29:00 -l h_vmem=2000M -l tmpdir_size=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+   qsub -S /bin/tcsh -l h_cpu=00:29:00 -l h_vmem=2000M -l tmpdir_size=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 done
 
 exit
