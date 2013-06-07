@@ -18,14 +18,14 @@ VHistogramUtilities::VHistogramUtilities()
     input:
 
     string iname :  histogram name for return histogram
-    TH1D *h :       input 1D histogram
+    TH1 *h :       input 1D histogram
     TF1 *f :        input 1D function
 
     return:
 
     TH1D* :         residual
 */
-TH1D* VHistogramUtilities::get_ResidualHistogram_from_TF1( string iname, TH1D *h, TF1 *f )
+TH1D* VHistogramUtilities::get_ResidualHistogram_from_TF1( string iname, TH1 *h, TF1 *f )
 {
     if( iname.size() == 0 ) return 0;
     if( !h || !f ) return 0;
@@ -369,4 +369,34 @@ int VHistogramUtilities::findBinInGraph( TGraph *g, double x )
    }
 
    return -1;
+}
+
+TH1* VHistogramUtilities::normalizeTH1( TH1 *h, bool iIntegral )
+{
+   if( !h ) return 0;
+
+   double iSum = 0.;
+   double iN = 0.;
+
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
+   {
+       iSum += h->GetBinContent( i );
+       iN++;
+   }
+
+   double f = 1.;
+   if( iSum > 0. )
+   {
+      if( iIntegral ) f =  1. / iSum;
+      else            f = iN / iSum;
+   }
+   cout << "F " << f << endl;
+
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
+   {
+      h->SetBinContent( i, h->GetBinContent( i ) * f );
+      h->SetBinError( i, h->GetBinError( i ) * f * f );
+   }
+
+   return h;
 }

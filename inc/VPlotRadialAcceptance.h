@@ -7,12 +7,13 @@
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TFile.h"
-#include "TH1D.h"
+#include "TH1F.h"
 #include "TLine.h"
 #include "TText.h"
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "VHistogramUtilities.h"
 #include "VPlotUtilities.h"
@@ -29,9 +30,15 @@ class VPlotRadialAcceptance : public VPlotUtilities
    string fName;
 
    TFile* fAcceptanceFile;
-   TH1D*  fAcceptanceHisto;
-   TH1D*  fAcceptanceHistoFit;
+   TH1F*  fAcceptanceHisto;
+   TH1F*  fAcceptanceHistoFit;
    TF1*   fAcceptanceFunction;
+   vector< TH1F* > fAcceptanceAzHisto;
+   vector< TF1* >  fAcceptanceAzFitFunction;
+   vector< TH1F* > fAcceptanceAzHistoDeRot;
+   vector< TF1* >  fAcceptanceAzFitFunctionDeRot;
+   TH1F*  hAzDist;
+   TH1F*  hAzDistDeRot;
 
    double fAxis_x_min;
    double fAxis_x_max;
@@ -44,13 +51,15 @@ class VPlotRadialAcceptance : public VPlotUtilities
   ~VPlotRadialAcceptance() {}
 
    TF1*  getAcceptanceFunction() { return fAcceptanceFunction; }
-   TH1D* getAcceptanceHisto()    { return fAcceptanceHisto;    }
-   TH1D* getAcceptanceHistoFit() { return fAcceptanceHistoFit; }
+   TH1F* getAcceptanceHisto()    { return fAcceptanceHisto;    }
+   TH1F* getAcceptanceHistoFit() { return fAcceptanceHistoFit; }
 
-   TCanvas* plot( TCanvas *cX = 0 );
+   TCanvas* plotRadialAcceptance( TCanvas *cX = 0 );
+   TCanvas* plotAzDependentRadialAcceptances( TCanvas *cX = 0, int iIterator = 4, bool iDeRot = false );
+   TCanvas* plotAzDistributions( TCanvas *cX = 0 );
    TCanvas* plotResiduals( TCanvas *cX = 0, double i_res_min = -0.5, double i_res_max = 0.5, bool iDrawChi2 = true );
    bool     openAcceptanceFile( string iFile, unsigned int iZeBin = 0 );
-   void     setAxisRange( double x_min = 0., double x_max = 3.5, double y_min = 0., double y_max = 1.5 );
+   void     setAxisRange( double x_min = 0., double x_max = 2.5, double y_min = 0., double y_max = 1.5 );
    void     setName( string iName ) { fName = iName; }
    
   ClassDef( VPlotRadialAcceptance, 1 );

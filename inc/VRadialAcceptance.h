@@ -11,8 +11,8 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "TGraph.h"
-#include "TH1D.h"
-#include "TH2D.h"
+#include "TH1F.h"
+#include "TH2F.h"
 #include "TKey.h"
 #include "TList.h"
 
@@ -53,24 +53,28 @@ class VRadialAcceptance
 
         TList *hList;
 	TList *hListNormalizeHistograms;
-        TH1D *hscale;
+	TList *hListFitHistograms;
+        TH1F *hscale;
+	TH1F *hAzDist;
+	TH1F *hAzDistDeRot;
 // acceptance curves as mean over all runs
         vector< double > fZe;                      //!< ze bins (upper limit of zenith angle bin)
-        vector< TH1D* >  hAccZe;                   //!< zenith angle dependent acceptance curves
+        vector< TH1F* >  hAccZe;                   //!< zenith angle dependent acceptance curves
         vector< TF1* >   fAccZe;                   //!< zenith angle dependent acceptance curves
-        vector< TH1D* >  hAccZeFit;                //!< zenith angle dependent acceptance curves
 	vector< double > fAzMin;                   //!< az bins (limits)
 	vector< double > fAzMax;                   //!< az bins (limits)
-	vector< TH1D* >  hAccAz;                   //!< azimuth angle dependent acceptance curves
+	vector< TH1F* >  hAccAz;                   //!< azimuth angle dependent acceptance curves (azimuth angle in camera coordinates)
+	vector< TH1F* >  hAccAzDerot;              //!< azimuth angle dependent acceptance curves (azimuth angle in derotated camera coordinates)
         unsigned int     fAccZeFitMinBin;          //!< range (in bins) for normalisation of acceptance curves
         unsigned int     fAccZeFitMaxBin;
 
 // acceptance vs yoff vs xoff, azimuth angle dependent
-        TH2D *hXYAccTot;
-        vector< TH2D* > hXYAcc;
+        TH2F *hXYAccTot;
+        TH2F *hXYAccTotDeRot;
+        vector< TH2F* > hXYAccRun;
 
 // acceptance curves run wise, but mean over all zenith angles
-        vector< TH1D* > hAccRun;                  //!< run dependent acceptance curves
+        vector< TH1F* > hAccRun;                  //!< run dependent acceptance curves
 
 // number of raw files used to calculate acceptance
         double fNumberOfRawFiles;
@@ -78,7 +82,7 @@ class VRadialAcceptance
 // get acceptance curves from a file
         TFile *fAccFile;
 
-        void scaleArea( TH1D* );
+        void scaleArea( TH1F* );
         void reset();
 
     public:

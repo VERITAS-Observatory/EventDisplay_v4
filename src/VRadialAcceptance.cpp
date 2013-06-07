@@ -69,10 +69,12 @@ VRadialAcceptance::VRadialAcceptance( string ifile )
 
 
 /*!
+
  *  ******************************************************************
  *          calculating acceptance curves
  *  ******************************************************************
- *   this constructor is called for determination of radial acceptance curves with getAcceptance
+ *   this constructor is called for determination of radial acceptance curves with makeAcceptance
+
  */
 VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParameter *irunpar )
 {
@@ -80,6 +82,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 
     hList = new TList();
     hListNormalizeHistograms = new TList();
+    hListFitHistograms = new TList();
 
     fCuts = icuts;
     if( !fCuts )
@@ -104,13 +107,20 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     int nxybin = 50;
 
 // range used to normalise acceptance histograms
-    fAccZeFitMinBin = 1;
+    fAccZeFitMinBin = 2;
     fAccZeFitMaxBin = 5;
 
-    hscale = new TH1D( "hscale", "", nxybin, 0., xymax );
+    hscale = new TH1F( "hscale", "", nxybin, 0., xymax );
     for( int i = 1; i < nxybin; i++ ) hscale->SetBinContent( i, TMath::Pi()*xymax*xymax/((double)(nxybin*nxybin))*(2*i-1));
     for( int i = 1; i < nxybin; i++ ) hscale->SetBinError( i, 0. );
     hList->Add( hscale );
+
+    hAzDist = new TH1F( "hAzDist", "", nxybin, -180., 180. );
+    hAzDist->SetXTitle( "azimuth (camera coordinates) [deg]" );
+    hList->Add( hAzDist );
+    hAzDistDeRot = new TH1F( "hAzDistDeRot", "", nxybin, -180., 180. );
+    hAzDistDeRot->SetXTitle( "azimuth (derotated camera coordinates) [deg]" );
+    hList->Add( hAzDistDeRot );
 
     char hname[200];
     char htitle[200];
@@ -124,7 +134,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 
         sprintf( hname, "hAccZe_%d", i );
         sprintf( htitle, "%.0f < el < %.0f", 90.-fZe[i], 90.-ize );
-        hAccZe.push_back( new TH1D( hname, htitle, nxybin, 0., xymax ) );
+        hAccZe.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
         hAccZe.back()->SetXTitle( "distance to camera center [deg]" );
         hAccZe.back()->SetYTitle( "relative rate" );
         hAccZe.back()->SetMarkerSize( 2 );
@@ -132,34 +142,23 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
         hAccZe.back()->Sumw2();
         hList->Add( hAccZe.back() );
 	hListNormalizeHistograms->Add( hAccZe.back() );
-
-        sprintf( hname, "fAccZe_%d", i );
-        fAccZe.push_back( new TF1( hname, VRadialAcceptance_fit_acceptance_function, 0., fCut_CameraFiducialSize_max, 5 ) );
-        fAccZe.back()->SetNpx( 1000 );
-        fAccZe.back()->SetParameter( 0, -0.3 );
-        fAccZe.back()->SetParameter( 1, -0.6 );
-        fAccZe.back()->SetParameter( 2, +0.6 );
-        fAccZe.back()->SetParameter( 3, -0.2 );
-        fAccZe.back()->SetParameter( 4, 0.2 );
-        fAccZe.back()->SetParLimits( 4, 0., 0.5 );
-        hList->Add( fAccZe.back() );
-
-        sprintf( hname, "hAccZeFit_%d", i );
-        sprintf( htitle, "%.0f < el < %.0f",  90.-fZe[i], 90.-ize );
-        hAccZeFit.push_back( new TH1D( hname, htitle, nxybin, 0., xymax ) );
-        hAccZeFit.back()->SetXTitle( "distance to camera center [deg]" );
-        hAccZeFit.back()->SetYTitle( "relative rate" );
-        hAccZeFit.back()->SetLineWidth( 1 );
-        hList->Add( hAccZeFit.back() );
+	hListFitHistograms->Add( hAccZe.back() );
 
         ize = fZe[i];
     }
-    hXYAccTot = new TH2D( "hXYaccTot", "",  40, -2., 2., 40, -2., 2. );
+// 2D histogram (not normalized)
+    hXYAccTot = new TH2F( "hXYaccTot", "",  40, -2., 2., 40, -2., 2. );
     hXYAccTot->SetXTitle( "x_{off} [deg]" );
     hXYAccTot->SetYTitle( "y_{off} [deg]" );
+    hXYAccTot->Sumw2();
     hList->Add( hXYAccTot );
+    hXYAccTotDeRot = new TH2F( "hXYAccTotDeRot", "",  40, -2., 2., 40, -2., 2. );
+    hXYAccTotDeRot->SetXTitle( "x_{off,derot} [deg]" );
+    hXYAccTotDeRot->SetYTitle( "y_{off,derot} [deg]" );
+    hXYAccTotDeRot->Sumw2();
+    hList->Add( hXYAccTotDeRot );
 
-// azimuth angle
+// azimuth dependent radial acceptance histograms
     fAzMin.clear();
     fAzMax.clear();
     fAzMin.push_back( 135.0 );       fAzMax.push_back( -165.0 );
@@ -172,9 +171,10 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     }
     for( unsigned int i = 0; i < fAzMin.size(); i++ )
     {
+// camera coordinates
         sprintf( hname, "hAccAz_%d", i );
         sprintf( htitle, "%.0f < az < %.0f", fAzMin[i], fAzMax[i] );
-        hAccAz.push_back( new TH1D( hname, htitle, nxybin, 0., xymax ) );
+        hAccAz.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
         hAccAz.back()->SetXTitle( "distance to camera center [deg]" );
         hAccAz.back()->SetYTitle( "relative rate" );
         hAccAz.back()->SetMarkerSize( 2 );
@@ -182,6 +182,19 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
         hAccAz.back()->Sumw2();
         hList->Add( hAccAz.back() );
 	hListNormalizeHistograms->Add( hAccAz.back() );
+	hListFitHistograms->Add( hAccAz.back() );
+// derotated camera coordinates
+        sprintf( hname, "hAccAzDerot_%d", i );
+        sprintf( htitle, "%.0f < az < %.0f (derot)", fAzMin[i], fAzMax[i] );
+        hAccAzDerot.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
+        hAccAzDerot.back()->SetXTitle( "distance to camera center [deg]" );
+        hAccAzDerot.back()->SetYTitle( "relative rate" );
+        hAccAzDerot.back()->SetMarkerSize( 2 );
+        hAccAzDerot.back()->SetLineWidth( 2 );
+        hAccAzDerot.back()->Sumw2();
+        hList->Add( hAccAzDerot.back() );
+	hListNormalizeHistograms->Add( hAccAzDerot.back() );
+	hListFitHistograms->Add( hAccAzDerot.back() );
     }
 
 // run dependent acceptance curves
@@ -189,7 +202,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     {
         sprintf( hname, "hAccRun_%d", fRunPar->fRunList[i].fRunOff );
         sprintf( htitle, "run %d", fRunPar->fRunList[i].fRunOff );
-        hAccRun.push_back( new TH1D( hname, htitle, nxybin, 0., xymax ) );
+        hAccRun.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
         hAccRun.back()->SetXTitle( "distance to camera center [deg]" );
         hAccRun.back()->SetYTitle( "relative rate" );
         hAccRun.back()->SetMarkerSize( 2 );
@@ -197,6 +210,13 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
         hAccRun.back()->Sumw2();
         hList->Add( hAccRun.back() );
 	hListNormalizeHistograms->Add( hAccRun.back() );
+
+        sprintf( hname, "hXYAccRun_%d", fRunPar->fRunList[i].fRunOff );
+        sprintf( htitle, "run %d", fRunPar->fRunList[i].fRunOff );
+	hXYAccRun.push_back( new TH2F( hname, htitle, 40, -2., 2., 40, -2., 2. ) );
+	hXYAccRun.back()->SetXTitle( "x_{off} [deg]" );
+	hXYAccRun.back()->SetYTitle( "y_{off} [deg]" );
+	hList->Add( hXYAccRun.back() );
     }
 
 }
@@ -218,6 +238,7 @@ void VRadialAcceptance::reset()
     fCuts = 0;
     hList = 0;
     hListNormalizeHistograms = 0;
+    hListFitHistograms = 0;
 
     fXs = 0.;
     fYs = 0.;
@@ -227,7 +248,10 @@ void VRadialAcceptance::reset()
     fCut_CameraFiducialSize_max = fMaxDistanceAllowed;
 
     hscale = 0;
+    hAzDist = 0;
+    hAzDistDeRot = 0;
     hXYAccTot = 0;
+    hXYAccTotDeRot = 0;
     fAccFile = 0;
 
     fXE.clear();
@@ -239,14 +263,19 @@ void VRadialAcceptance::reset()
 
 
 /*!
- *   get radial acceptance
+
+    get radial acceptance
+
+    (ignore here any zenith angle acceptance)
+
+    note: x,y are in derotated coordinates
  */
 double VRadialAcceptance::getAcceptance( double x, double y, double erec, double ze )
 {
     double idist = sqrt( x*x + y*y );
     double iacc = 1.;
 
-    if( fAcceptanceFunctionDefined )
+    if( fAcceptanceFunctionDefined && fAccZe.size() > 0 )
     {
 	 if( idist > fAccZe[0]->GetXmax() ) iacc = 0.;
 	 else iacc = fAccZe[0]->Eval( idist );
@@ -346,7 +375,11 @@ void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<d
     }
 }
 
+/*
 
+    apply gamma/hadron cuts and fill radial acceptance histograms
+
+*/
 bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
 {
     if( !iData )
@@ -389,6 +422,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
 
 // fill 2D distribution of events
             hXYAccTot->Fill( iData->Xoff, iData->Yoff );
+	    hXYAccTotDeRot->Fill( iData->Xoff_derot, iData->Yoff_derot );
 
 // fill zenith angle dependent histograms
             for( unsigned int j = 0; j < fZe.size(); j++ )
@@ -399,22 +433,54 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
                     break;
                 }
             }
-// fill azimuth angle dependend histograms
+// fill azimuth angle dependend histograms (camera coordinates)
             i_az = atan2( iData->Yoff, iData->Xoff )*TMath::RadToDeg();
+	    hAzDist->Fill( i_az );
+
 	    for( unsigned int j = 0; j < fAzMin.size(); j++ )
 	    {
-	       if( i_az > fAzMin[j] && i_az < fAzMax[j] )
+	       bool bFill = false;
+	       if( i_az > fAzMin[j] && i_az < fAzMax[j] ) bFill = true;
+	       else
 	       {
-	          if( idist > 0. ) hAccAz[j]->Fill( idist );
-		  break;
+		  if( fAzMin[j] > fAzMax[j] )
+		  {
+		     if( i_az < fAzMin[j] && i_az > fAzMax[j] ) bFill = false;
+		     else bFill = true;
+		  }
                }
+	       if( bFill && idist > 0. )
+	       {
+		  hAccAz[j]->Fill( idist );
+	       } 
+            }
+// fill azimuth angle dependend histograms (derotated camera coordinates)
+            i_az = atan2( iData->Yoff_derot, iData->Xoff_derot )*TMath::RadToDeg();
+	    hAzDistDeRot->Fill( i_az );
+	    for( unsigned int j = 0; j < fAzMin.size(); j++ )
+	    {
+	       bool bFill = false;
+	       if( i_az > fAzMin[j] && i_az < fAzMax[j] ) bFill = true;
+	       else
+	       {
+		  if( fAzMin[j] > fAzMax[j] )
+		  {
+		     if( i_az < fAzMin[j] && i_az > fAzMax[j] ) bFill = false;
+		     else bFill = true;
+		  }
+               }
+	       if( bFill &&  idist > 0. )
+	       {
+	          hAccAzDerot[j]->Fill( idist );
+               } 
             }
 // fill run dependent histograms
             for( unsigned int j = 0; j < fRunPar->fRunList.size(); j++ )
             {
                 if( iData->runNumber == fRunPar->fRunList[j].fRunOff )
                 {
-                    if( idist > 0. ) hAccRun[j]->Fill( idist );
+                    if( idist > 0. && j < hAccRun.size() ) hAccRun[j]->Fill( idist );
+		    if( j < hXYAccRun.size() ) hXYAccRun[j]->Fill( iData->Xoff, iData->Yoff );
                     break;
                 }
             }
@@ -426,22 +492,28 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
     return true;
 }
 
+/*
 
+    called for making radial acceptances
+
+*/
 bool VRadialAcceptance::terminate( string ofile )
 {
-// scale everything by area of ring
+/////////////////////////////////////
+// normalize radial acceptance histograms
 // scale everything to mean value of first three bins
-    double isc = 0.;
     if( fAccZeFitMinBin == fAccZeFitMaxBin )
     {
         cout << "Error: normalisation range for acceptance curves not well defined: " << fAccZeFitMinBin << "\t" << fAccZeFitMaxBin << endl;
     }
     else
     {
+        double isc = 0.;
         double i_normBin = (double)(fAccZeFitMaxBin - fAccZeFitMinBin );
-// scale histograms
+	cout << "VRadialAcceptance::terminate: scaling histograms to bins " << fAccZeFitMinBin << " to " << fAccZeFitMaxBin << endl;
+// scale all histograms in hListNormalizeHistograms
         TIter next( hListNormalizeHistograms );
-	while( TH1D *h = (TH1D*)next() )
+	while( TH1F *h = (TH1F*)next() )
 	{
 	    scaleArea( h );
             isc = 0.;
@@ -457,69 +529,56 @@ bool VRadialAcceptance::terminate( string ofile )
             if( i_normBin > 0. ) isc /= i_normBin;
             if( isc > 0 ) h->Scale( 1./isc );
 	}
-/*
-// zenith angle histograms
-        for( unsigned int i = 0; i < hAccZe.size(); i++ )
-        {
-            scaleArea( hAccZe[i] );
-            isc = 0.;
-            i_normBin = 0.;
-            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ )
-            {
-                if( hAccZe[i]->GetBinError( j ) > 0. )
-                {
-                    isc +=  hAccZe[i]->GetBinContent( j )/(hAccZe[i]->GetBinError( j ) * hAccZe[i]->GetBinError( j ));
-                    i_normBin += 1./hAccZe[i]->GetBinError( j )/hAccZe[i]->GetBinError( j );
-                }
-            }
-            if( i_normBin > 0. ) isc /= i_normBin;
-            if( isc > 0 ) hAccZe[i]->Scale( 1./isc );
-        }
-// run wise histograms
-        for( unsigned int i = 0; i < hAccRun.size(); i++ )
-        {
-            isc = 0.;
-	    i_normBin = 0.;
-            scaleArea( hAccRun[i] );
-            for( unsigned int j = fAccZeFitMinBin; j < fAccZeFitMaxBin; j++ )
-	    {
-	       isc +=  hAccRun[i]->GetBinContent( j )/(hAccRun[i]->GetBinError( j ) * hAccRun[i]->GetBinError( j ));
-	       i_normBin += 1./hAccRun[i]->GetBinError( j )/hAccRun[i]->GetBinError( j );
-            }
-	    if( i_normBin > 0. ) isc /= i_normBin;
-            if( isc > 0 ) hAccRun[i]->Scale( 1./isc );
-        }
-*/
     }
 
-// analyze ze histograms
+/////////////////////////////////////
+// analyze and fit histograms
+    string i_hname;
+    TIter next( hListFitHistograms );
+    while( TH1F *h = (TH1F*)next() )
+    {
+// fit function
+        i_hname = h->GetName();
+	i_hname.replace( 0, 1, "f" );
+	TF1 *ffit = new TF1( i_hname.c_str(), VRadialAcceptance_fit_acceptance_function, 0., fCut_CameraFiducialSize_max, 5 );
+        ffit->SetNpx( 1000 );
+        ffit->SetParameter( 0, -0.3 );
+        ffit->SetParameter( 1, -0.6 );
+        ffit->SetParameter( 2, +0.6 );
+        ffit->SetParameter( 3, -0.2 );
+        ffit->SetParameter( 4, 0.2 );
+        ffit->SetParLimits( 4, 0., 0.5 );
+        hList->Add( ffit );
+// fit histogram
+        i_hname = h->GetName();
+	i_hname += "Fit";
+	TH1F *hfit = new TH1F( i_hname.c_str(), h->GetTitle(), h->GetNbinsX(), h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax() );
+	hfit->SetXTitle( h->GetXaxis()->GetTitle() );
+	hfit->SetYTitle( h->GetYaxis()->GetTitle() );
+        hList->Add( hfit );
 
 // fill the fitting histogram
-    for( unsigned int i = 0; i < hAccZe.size(); i++ )
-    {
-        for( int j = 1; j < hAccZeFit[i]->GetNbinsX(); j++ )
-        {
-            hAccZeFit[i]->SetBinContent( j, hAccZe[i]->GetBinContent( j )) ;
-        }
-    }
+	for( int j = 1; j < hfit->GetNbinsX(); j++ )
+	{
+	    hfit->SetBinContent( j, h->GetBinContent( j )) ;
+	}
 
 // fit the data and fill histograms
-    cout << "fitting acceptance curves ..." << endl << endl;
-    double i_eval = 0.;
-    for( unsigned int i = 0; i < hAccZe.size(); i++ )
-    {
-        hAccZeFit[i]->Fit( fAccZe[i], "0REM" );
-        hAccZeFit[i]->SetBins( 1000, 0., 5. );
-        for( int j = 1; j < hAccZeFit[i]->GetNbinsX(); j++ )
-        {
-            i_eval = fAccZe[i]->Eval( hAccZeFit[i]->GetBinCenter( j ) );
-            if( hAccZeFit[i]->GetBinCenter( j ) > fAccZe[i]->GetXmax() ) i_eval = 0.;
-            else if( hAccZeFit[i]->GetBinCenter( j ) < fAccZe[i]->GetMaximumX() ) i_eval = 1.;
+       cout << "fitting acceptance curves (" << h->GetName() << ") ..." << endl << endl;
+       double i_eval = 0.;
+       hfit->Fit( ffit, "0REM" );
+       hfit->SetBins( 1000, 0., 5. );
+// replace bin content by values from the fit function (set max to 1 and min to 0)
+       for( int j = 1; j < hfit->GetNbinsX(); j++ )
+       {
+            i_eval = ffit->Eval( hfit->GetBinCenter( j ) );
+            if( hfit->GetBinCenter( j ) > ffit->GetXmax() ) i_eval = 0.;
+            else if( hfit->GetBinCenter( j ) < ffit->GetMaximumX() ) i_eval = 1.;
             else if( i_eval < 0. )  i_eval = 0.;
             else if( i_eval >= 1. ) i_eval = 1.;
 
-            hAccZeFit[i]->SetBinContent( j, i_eval );
-        }
+            hfit->SetBinContent( j, i_eval );
+       }
     }
     cout << "-----------------------------------------" << endl << endl;
 
@@ -554,7 +613,7 @@ bool VRadialAcceptance::terminate( string ofile )
 }
 
 
-void VRadialAcceptance::scaleArea( TH1D *h )
+void VRadialAcceptance::scaleArea( TH1F *h )
 {
     double iA = 0.;
 

@@ -40,14 +40,16 @@ class VHistogramUtilities
                                               bool bLinXaxis = false, double iCutUnrealisticErrors = -1. );
    TGraphErrors*    get_Profile_from_TH2D( TH2D *iH, TGraphErrors*g = 0, string iM = "median", int i_rebin = 2, 
                                            double iXaxisValue = -10., double iMinusValue = 0. );
-   static TH1D*     get_ResidualHistogram_from_TF1( string iname = "", TH1D *h = 0, TF1 *f = 0 );
+   static TH1D*     get_ResidualHistogram_from_TF1( string iname = "", TH1 *h = 0, TF1 *f = 0 );
 
    TH1F*            get_CTA_IRF_Histograms( string iHistogramName, double iCameraOffset );
    TH1F*            get_CTA_IRF_Histograms_from2D( string iHistogramName,  double iSummand = 0. );
 
+   static TH1*      normalizeTH1( TH1* h, bool iIntegral );
+
    void             setDebug( bool iB = true ) { fDebug = iB; }
 
-   ClassDefNV( VHistogramUtilities, 4 );
+   ClassDefNV( VHistogramUtilities, 5 );
 };
 
 #endif

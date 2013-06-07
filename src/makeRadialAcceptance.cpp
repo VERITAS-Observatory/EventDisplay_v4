@@ -123,6 +123,7 @@ int main( int argc, char *argv[] )
 
 // write acceptance files to disk
     facc->terminate( outfile );
+    cout << "exiting.." << endl;
 }
 
 

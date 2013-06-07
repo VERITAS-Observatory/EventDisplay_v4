@@ -1,6 +1,11 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130607 (GM) added az dependence to radial acceptance calculation
+                improved plotting of radial acceptances
+
+* 20130604 (GM) added scripts to run radial acceptances on a batch system
+
 * 20130604 (GM) significant update: added dead time calculation with scalars
                 (dead time is now calculated every 20s, time depencendy is 
 		 taken into account in the spectral reconstruction)

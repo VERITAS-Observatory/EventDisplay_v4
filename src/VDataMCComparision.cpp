@@ -617,14 +617,17 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 
       theta2 = fData->theta2;
 // get correct theta2 for wobble runs
+// (off data)
       if( fInput == 2 )
       {
 	  theta2 = (fData->Yoff_derot-fWobbleNorth)*(fData->Yoff_derot-fWobbleNorth) + (fData->Xoff_derot-fWobbleEast)*(fData->Xoff_derot-fWobbleEast);
       }
+// MC data
       else if( fInput == 0 )
       {
          theta2 = (fData->Yoff-fData->MCyoff)*(fData->Yoff-fData->MCyoff) + (fData->Xoff-fData->MCxoff)*(fData->Xoff-fData->MCxoff);
       }
+// on data
       else
       {
 	  theta2 = (fData->Yoff_derot+fWobbleNorth)*(fData->Yoff_derot+fWobbleNorth) + (fData->Xoff_derot+fWobbleEast)*(fData->Xoff_derot+fWobbleEast);
