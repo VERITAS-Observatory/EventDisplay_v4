@@ -203,20 +203,24 @@ bool VExposure::readFromDB()
 
         if( !db_row ) break;
 
-//////
 // all fields should be defined (check if field #19 is there)
         if( !db_row->GetField( 19 ) ) continue;
         itemp = db_row->GetField( 19 );
 // don't use laser or charge injection runs
         if( itemp == "NOSOURCE" ) continue;
 
-//////
-// check if this run is an observing run
         if( !db_row->GetField( 1 ) ) continue;
         itemp = db_row->GetField( 1 );
-        if( itemp != "observing" ) continue;
+// check if this run is an observing run
+        if( fObservingMode == "Normal" )
+          if( itemp != "observing" ) continue;
+        else
+// check if this run is an observing/redHV/UVFilter run
+        if( fObservingMode == "Special" )
+          if ( itemp != "observing" || itemp != "obsFilter" || itemp != "obsLowHV" )  continue;
 
-//////
+        fRunObsMode.push_back( itemp );
+
 // get run status
         if( !db_row->GetField( 3 ) ) continue;
         itemp = db_row->GetField( 3 );
@@ -1654,7 +1658,10 @@ void VExposure::printListOfRuns()
     if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
     {
 
-        cout << "\tRUN " << fRun[j];
+	if( fObservingMode == "Special" )
+          cout << "\tRUN " << fRun[j] << "(" << fRunObsMode[j] << ") ";
+        else
+          cout << "\tRUN " << fRun[j];
         cout << "\t" << fRunSourceID[j];
         cout << "\tMJD " << fRunStartMJD[j];
         cout << "\tDate: " << fRunDate[j];
@@ -2245,6 +2252,7 @@ void VExposure::setRunNumber( unsigned int number )
  fRunDownloadList.push_back( number );
 
 }
+
 void VExposure::setLaserNumber( unsigned int number )
 {
 
@@ -2252,4 +2260,15 @@ void VExposure::setLaserNumber( unsigned int number )
   fLaserDownloadDate.push_back( getLaserDate(number) );
 
 }
+
+void VExposure::setObservingMode( bool bObsMode )
+{
+
+  if( bObsMode )
+    fObservingMode = "Special";
+  else
+    fObservingMode = "Normal";
+
+}
+
 

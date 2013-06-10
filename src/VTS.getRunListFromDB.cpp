@@ -23,6 +23,7 @@ string enddate="2050-01-01";
 string sourcename="Crab";
 bool bANASUM = false;
 bool bCHECKDISK = false;
+bool bOBSMODE = false;
 string fAnasumFile = "";
 double elevation=0.;
 double duration=0.;
@@ -43,6 +44,12 @@ int main( int argc, char *argv[] )
       cout << "Error: Cannot use -m and -l at the same time." << endl;
       return 0;
     }
+
+    if( bOBSMODE )
+      a.setObservingMode(true);
+    else
+      a.setObservingMode(false);
+
 
     if( runnumber != 0 ) 
     {
@@ -162,7 +169,7 @@ void parseOptions(int argc, char *argv[])
         };
 
         int option_index=0;
-        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:c", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ho:l:m:b:e:s:z:d:xgtvr:a:cf", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
 
@@ -233,6 +240,9 @@ void parseOptions(int argc, char *argv[])
                 break;
              case 'c':
                 bCHECKDISK=true;
+                break;
+              case 'f':
+                bOBSMODE=true;
                 break;
             case '?':
                 break;

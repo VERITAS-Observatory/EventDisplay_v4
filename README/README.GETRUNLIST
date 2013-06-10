@@ -20,8 +20,6 @@ Parameters Required:
 		DO NOT use with -l: Use -l <runlist> followed by -x
 	-r	<Run Number>
 		Download this run number
-	-f	<Laser Run Number>
-		Download this laser run number
 	-s	<Source String>
 		Download Runs for given source name e.g. Crab
 		Wild Cards are allowed using % eg: 'TeVJ2032%'
@@ -43,6 +41,7 @@ Optional Flags:
 	-c	Checks to see if run(s) is(are) on disk
 	-x	Find Laser Runs - these will be downloaded too
 	-t	Output ED style Time Mask
+	-f	Also display/download UV Filter and Reduced HV Runs
 	-v	Verbose - Output lots of DB information
 
 Note: Using Laser Option extends run time.

@@ -53,6 +53,9 @@ class VExposure : public TObject, public VGlobalRunParameter
 	bool bPrintVerbose;
         bool bPrintTimeMask;
 
+// Type of observing mode 
+        string fObservingMode;
+
 // Minimium Duration
 	double fMinDuration;
 
@@ -88,6 +91,7 @@ class VExposure : public TObject, public VGlobalRunParameter
         vector< double > fRunStopMJD;
         vector< double > fRunDuration;
         vector< string > fRunSourceID;
+        vector< string > fRunObsMode;
         vector< double > fRunRA;
         vector< double > fRunDec;
         vector< double > fRunoffsetRA;
@@ -193,6 +197,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 	void readRunCommentsFromDB();
 	void setRunNumber( unsigned int number );
 	void setLaserNumber(unsigned int number );
+	void setObservingMode( bool bObs );
 
         vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
 	TSQLServer* connectToSQLServer( string iServer );
