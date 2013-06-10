@@ -497,7 +497,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
     if( fIn.IsZombie() )
     {
         cout << "Error opening file with effective areas: " << iInputFile << endl;
-        exit( 0 );
+        exit( -1 );
     }
     cout << "\t reading effective areas from " << fIn.GetName() << endl;
 

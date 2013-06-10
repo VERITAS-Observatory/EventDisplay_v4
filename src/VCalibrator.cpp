@@ -517,6 +517,13 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 
 void VCalibrator::writeAverageTZeros( bool iLowGain )
 {
+    if( getDebugFlag() )
+    {
+       cout << "VCalibrator::writeAverageTZeros() (";
+       if( iLowGain ) cout << "low gain)" << endl;
+       else           cout << "high gain)" << endl;
+    }
+
     for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
     {
         unsigned int t = getTeltoAna()[tel];
@@ -1340,7 +1347,7 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
    return true;
 }
 
-bool VCalibrator::readPeds_from_grisufile( string i_pedfile, bool iLowGain, unsigned int i_SumWindow )
+bool VCalibrator::readPeds_from_grisufile( bool iLowGain, unsigned int i_SumWindow )
 {
    cout << "Telescope " << getTelID()+1 << ": reading peds from 'P' lines (sumwindow " << i_SumWindow;
    if( iLowGain ) cout << ", low gain)";
@@ -1411,7 +1418,7 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
 ////////////////////////////////////////////////////////////////
    else if( fReader->getDataFormat() == "grisu" || (getRunParameter()->fsourcetype == 2 && getRunParameter()->fsimu_pedestalfile.size() > 0 ) )
    {
-      readPeds_from_grisufile( i_pedfile, iLowGain, i_SumWindow );
+      readPeds_from_grisufile( iLowGain, i_SumWindow );
    } 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -1674,8 +1681,9 @@ bool VCalibrator::readAverageTZeros( bool iLowGain )
 {
   if( fDebug ) cout << "VCalibrator::readAverageTZeros (low gain " << iLowGain << ")" << endl;
 
-  string iFile = fTZeroFileNameC[getTelID()];
-  if( iLowGain ) iFile = fLowGainTZeroFileNameC[getTelID()];
+  string iFile;
+  if( getTelID() < fTZeroFileNameC.size() ) iFile = fTZeroFileNameC[getTelID()];
+  if( iLowGain && getTelID() < fLowGainTZeroFileNameC.size() ) iFile = fLowGainTZeroFileNameC[getTelID()];
   iFile += ".root";
 
   setAverageTZero( 0., iLowGain );
@@ -1912,7 +1920,11 @@ void VCalibrator::initialize()
         fNumberGainEvents.push_back( 0 );
 	fNumberTZeroEvents.push_back( 0 );
 
-        fCalData.back()->initialize( getNChannels(), getNSamples(), usePedestalsInTimeSlices( false ), usePedestalsInTimeSlices( true ), getDebugFlag() );
+        fCalData.back()->initialize( getNChannels(), getNSamples(), usePedestalsInTimeSlices( false ), usePedestalsInTimeSlices( true ),
+                                     (fReader->getDataFormat() == "grisu" 
+				     || (getRunParameter()->fsourcetype == 2 && getRunParameter()->fsimu_pedestalfile.size() > 0 ) ),
+				     getRunParameter()->freadCalibfromDB,
+	                             getDebugFlag() );
         if( fReader->getDataFormat() == "grisu" ) fCalData.back()->setReader( fReader );
    }
 // define histograms and output files for pedestal calculation

@@ -1455,7 +1455,7 @@ void VArrayAnalyzer::prepareforCoreReconstruction( unsigned int iMethodIndex, fl
 */
 int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp  )
 {
-    if( fDebug ) cout << "VArrayAnalyzer::rcs_method_5/6/7 " << iMethod << endl;
+    if( fDebug ) cout << "VArrayAnalyzer::rcs_method_5/6/7 " << iMethod << ", DISP " << iDisp << endl;
 
 // number of images included in the fit
     int num_images = 0;

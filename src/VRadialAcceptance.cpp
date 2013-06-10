@@ -380,7 +380,7 @@ void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<d
     apply gamma/hadron cuts and fill radial acceptance histograms
 
 */
-bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
+bool VRadialAcceptance::fillAcceptanceFromData( CData *iData, int entries )
 {
     if( !iData )
     {
@@ -389,6 +389,7 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData )
     }
 
     int nentries = iData->fChain->GetEntries();
+    if( entries > 0 ) nentries = entries;
 
     cout << "filling acceptance curves with " << nentries << " events (before cuts)" << endl;
 

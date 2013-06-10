@@ -220,7 +220,7 @@ class VVirtualDataReader
 	virtual std::vector< valarray< double > >& getTracePulseTiming( unsigned int iNChannel = 99999 ) { return vv; }
         virtual std::vector< unsigned int >& getDead() { return vUI; }
 
-	virtual void setPerformFADCAnalysis( bool iB ) { ; }
+	virtual void setPerformFADCAnalysis( bool iB ) { iB = false; }
 
 };
 #endif

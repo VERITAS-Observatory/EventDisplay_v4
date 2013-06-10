@@ -60,10 +60,10 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 
     public:
 
-        VMultipleGrIsuReader( unsigned int nFiles, string iSelection, vector< unsigned int > iteltoana, bool iDebug );
+        VMultipleGrIsuReader( unsigned int nFiles, vector< unsigned int > iteltoana, bool iDebug );
         ~VMultipleGrIsuReader() {}
 
-        bool                        init( VDetectorGeometry*, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, bool itovbf, int iseed, string iExPedFile = "", bool iSingleExternalPedFile = true, double iDefaultPed = 20. );
+        bool                        init( VDetectorGeometry*, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, int iseed, string iExPedFile = "", bool iSingleExternalPedFile = true, double iDefaultPed = 20. );
 
         string                      getDataFormat();
         unsigned int                getDataFormatNum() { return 1; }

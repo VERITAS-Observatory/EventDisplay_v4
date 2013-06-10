@@ -154,7 +154,7 @@ class VGrIsuReader : public VVirtualDataReader
 
     public:
         VGrIsuReader( VDetectorGeometry*, unsigned int iNTel, string iExPedFile, vector< int > i_sumwindow, bool iDebug, int iseed, double ifadcscale = 1. );
-        VGrIsuReader( VDetectorGeometry*, unsigned int iNTel, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, bool itovbf, bool iDebug, int iseed, string iExPedFile = "", bool iIgnoreCFGFiles = false );
+        VGrIsuReader( VDetectorGeometry*, unsigned int iNTel, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, bool iDebug, int iseed, string iExPedFile = "", bool iIgnoreCFGFiles = false );
         ~VGrIsuReader();
         string                      getDataFormat() { return fDataFormat; }
         unsigned int                getDataFormatNum() { return 1; }

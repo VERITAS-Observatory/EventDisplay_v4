@@ -264,6 +264,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   applyTelTypeTest( bool bCount = false );
         TF1*   getAngularResolutionFunction() { return fF1AngRes; }
         double getAngularResolutionAbsoluteMinimum() { return fAngRes_AbsoluteMinimum; }
+        double getAngularResolutionAbsoluteMaximum() { return fAngRes_AbsoluteMaximum; }
         double getAngularResolutionScaleFactor() { return fAngRes_ScalingFactor; }
         double getArrayCentre_X() { return fArrayCentre_X; }
         double getArrayCentre_Y() { return fArrayCentre_Y; }
@@ -276,6 +277,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         double getProbabilityCut_Selector( unsigned int iID = 0 ) { if( iID < fProbabilityCut_NSelectors ) return fProbabilityCut_SelectionCut[iID]; else return -1; }
         double getProbabilityCutAlpha(bool fIsOn);
         double getTheta2Cut_min( double e = 0.1 ) { if( e > 0. ) return fCut_Theta2_min; else return 0.; }
+	double getTheta2Cut_max() { return fCut_Theta2_max; }
         double getTheta2Cut_max( double e );                           // get theta2 max cut (might be energy dependent)    [TeV] energy (linear)
 	TGraph* getTheta2Cut_TMVA_max()  { return fTMVABoxCut_Theta2_max; }
 	TGraph* getTheta2Cut_IRF_Max() { return fIRFAngRes; }
@@ -306,6 +308,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,41);
+        ClassDef(VGammaHadronCuts,42);
 };
 #endif

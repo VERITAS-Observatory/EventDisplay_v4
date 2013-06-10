@@ -665,7 +665,7 @@ void VImageCleaning::cleanImagePedvarsWithTiming( double hithresh, double lothre
 
 void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, double brightthresh, double timeCutPixel, double timeCutCluster, int minNumPixel, int loop_max, bool isFixed )
 {
-    if( fData->getDebugFlag() ) cout << "VImageCleaning::cleanImageWithTiming " << fData->getTelID() << endl;
+    if( fData->getDebugFlag() ) cout << "VImageCleaning::cleanImageWithTiming " << fData->getTelID() << "\t" << brightthresh << endl;
 
     // check if time gradient was already calculated
     if( fData->getImageParameters()->tgrad_x == 0 && fData->getImageParameters()->tint_x == 0 )
@@ -1326,6 +1326,10 @@ void VImageCleaning::recoverImagePixelNearDeadPixel()
 //
 void VImageCleaning::cleanTriggerFixed( double hithresh, double lothresh )
 {
+   if( fData->getDebugFlag() ) 
+   {
+       cout << "VImageCleaning::cleanTriggerFixed() " << hithresh << "\t" << lothresh << endl;
+   }
 // MS: produce a trigger-level cleaned image. The logic here is that one might want to require
 // only patches of 3 nearest neighbors to constitute a valid center pixel.
     fData->setTrigger( false );

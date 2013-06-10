@@ -33,6 +33,7 @@ string simpleListFileName = "";
 string outfile = "acceptance.root";
 unsigned int ntel = 4;
 string datadir = "../eventdisplay/output";
+int entries = -1;
 
 int main( int argc, char *argv[] )
 {
@@ -95,7 +96,7 @@ int main( int argc, char *argv[] )
         }
 // get data tree
         TTree *c = (TTree*)fTest.Get( "data" );
-        CData *d = new CData( c, false );
+        CData *d = new CData( c, false, 5, true );
 
 // Check number of telescopes in run
         VEvndispRunParameter *iParV2 = (VEvndispRunParameter*)fTest.Get( "runparameterV2" );
@@ -116,7 +117,7 @@ int main( int argc, char *argv[] )
         fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
 
 // fill acceptance curves
-        facc->fillAcceptanceFromData( d );
+        facc->fillAcceptanceFromData( d, entries );
 
         fTest.Close();
     }
@@ -142,11 +143,12 @@ int parseOptions(int argc, char *argv[])
             {"cutfile", required_argument, 0, 'c'},
             {"outfile", required_argument, 0, 'o'},
             {"ntel", required_argument, 0, 'n'},
+            {"entries", required_argument, 0, 'n'},
             {"datadir", required_argument, 0, 'd'},
             {0,0,0,0}
         };
         int option_index=0;
-        int c=getopt_long(argc, argv, "ht:s:l:o:d:n:c:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ht:s:l:e:o:d:n:c:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
         switch(c)
@@ -168,6 +170,7 @@ int parseOptions(int argc, char *argv[])
                 cout << "-d --datadir [directory for input mscw root files]" << endl;
                 cout << "-n --ntel [number of telescopes, default=4]" << endl;
                 cout << "-o --outfile [output ROOT file name]" << endl;
+		cout << "-e --entries [number of entries]" << endl;
                 cout << endl;
 
                 exit(0);
@@ -194,6 +197,9 @@ int parseOptions(int argc, char *argv[])
             case 'c':
                 cutfilename=optarg;
                 cout << "Cut File Name is " << cutfilename << endl;
+                break;
+            case 'e':
+                entries=(int)atoi(optarg);
                 break;
             case '?':
                 break;

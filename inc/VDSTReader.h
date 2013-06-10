@@ -61,7 +61,7 @@ class VDSTReader : public VVirtualDataReader
         bool init();                              //!< open source file and init tree
 
     public:
-        VDSTReader( string isourcefile, bool iMC, int iNTel, int iNChannel, bool iDebug );
+        VDSTReader( string isourcefile, bool iMC, int iNTel, bool iDebug );
         ~VDSTReader() {}
 	bool isZeroSuppressed( unsigned int iChannel );
         std::pair< bool, uint32_t > getChannelHitIndex( uint32_t i_channel );

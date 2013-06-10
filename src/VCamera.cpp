@@ -949,45 +949,6 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
 }
 
 
-/*!
-    different tubes values are represented by size of circles
-*/
-void VCamera::setPMTColorRadius( valarray<double> v_value, unsigned int iColor, unsigned int iFillColor, unsigned int iFillStyle )
-{
-    if( fDebug ) cout << "VCamera::setPMTColorRadius" << endl;
-    v_value = rescaleSums( v_value, true );
-    for( unsigned int i = 0; i < v_value.size(); i++ )
-    {
-        if( !fData->getDead()[i] )
-        {
-            fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1()*abs(v_value[i]) * fmaxRad );
-            fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2()*abs(v_value[i]) * fmaxRad );
-            fgraphTubesEntry[i]->SetLineColor( iColor );
-            fgraphTubesEntry[i]->SetFillColor( iColor );
-            fgraphTubesEntry[i]->SetFillStyle( iFillStyle );
-        }
-        else if( !fBoolAllinOne )
-        {
-            fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad );
-            fgraphTubesEntry[i]->SetR2( fgraphTubes[i]->GetR2() * fmaxRad );
-            fgraphTubesEntry[i]->SetLineColor( fColorDead );
-            fgraphTubesEntry[i]->SetFillColor( fColorDead );
-            fgraphTubesEntry[i]->SetFillStyle( fFillStyleDead );
-            if( fData->getImageUser()[i] == -1 ) fgraphTubesEntry[i]->SetFillColor( fColorImageUser );
-        }
-        for( unsigned int l = 0; l < fData->getFADCstopTrig().size(); l++ )
-        {
-            if( i == fData->getFADCstopTrig()[l] )
-            {
-                fgraphTubesEntry[i]->SetLineColor( fColorFADCTrig );
-                fgraphTubesEntry[i]->SetFillColor( fColorFADCTrig );
-                fgraphTubesEntry[i]->SetFillStyle( fFillStyleFADCTrig );
-                break;
-            }
-        }
-    }
-}
-
 
 /*!
    PMT are filled according to values in vector of bool

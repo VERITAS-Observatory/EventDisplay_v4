@@ -55,6 +55,5 @@ class VReadRunParameter
 	void printStartMessage();
                                                   //!< read in all run parameters from command line
         bool readCommandline( int argc, char *arg[] );
-        bool readConfigFile( string i_cFile );    //!< read run parameters from configuration file
 };
 #endif

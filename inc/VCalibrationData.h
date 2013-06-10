@@ -146,7 +146,9 @@ class VCalibrationData
         TH1F* getGainVarsDist( bool iHiLo = false ) { if( iHiLo ) return getHistoDist( C_GAIN, false ); else return getHistoDist( C_GAINLOW, false ); }
         TH1F* getLowGainMultiplierDistribution() { return getHistoDist( C_LOWGAIN, true ); }
 
-        void initialize( unsigned int iChannel, unsigned int nSamples = 24, bool iTimeSlices = true, bool iLowGainTimeSlices = false, bool iDebug = false );
+        void initialize( unsigned int iChannel, unsigned int nSamples = 24, bool iTimeSlices = true,
+	                 bool iLowGainTimeSlices = false, bool iPedsFromPLine = false, bool iReadCalibDB = false,
+			 bool iDebug = false );
 
 	valarray< double >& getLowGainMultiplier( unsigned int iSumWindow = 9999 );
 	valarray< double >& getLowGainMultiplierError( unsigned int iSumWindow = 9999 );
@@ -176,7 +178,7 @@ class VCalibrationData
         bool     setLowGainMultiplier( double iV, unsigned int iChannel, unsigned int iSumWindow );
 	bool     setMeanLowGainMultiplier( double g, unsigned int iSumWindow = 9999 );
 	bool     setRMSLowGainMultiplier( double g, unsigned int iSumWindow = 9999 );
-        void     setPeds( unsigned int iChannel, double iPed, bool iLowGain = false, double iTime = -99. );
+        void     setPeds( unsigned int iChannel, double iPed, bool iLowGain = false );
         void     setReader( VVirtualDataReader* f ) { fReader = f; }
 	void     setSumWindows( unsigned int isw ) { fSumWindow = isw; }
         bool     terminate( vector< unsigned int > a, vector< unsigned int > b, bool iDST = false );

@@ -758,7 +758,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
             else                      i_sT.fSourceRadius = 0.1;
             if( i_sT.fSourceRadius <= 0. )
             {
-                cout << "error in run list: " << endl;
+                cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
                 cout << is_line << endl;
                 cout << "invalid source radius " << i_sT.fSourceRadius << endl;
                 exit( -1 );
@@ -800,7 +800,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
                 else                      i_sT.fmaxradius = 2.0;
                 if( i_sT.fmaxradius < 0. )
                 {
-                    cout << "error in run list: " << endl;
+                    cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
                     cout << is_line << endl;
                     cout << "invalid maximum distance " << i_sT.fmaxradius << endl;
                     exit( -1 );
@@ -1095,7 +1095,11 @@ double VAnaSumRunParameter::readSourceRadius( string ifile )
     iC.setNTel( 1 );  // irrelevant - but suppresses some warnings
     if( !iC.readCuts( ifile, 0 ) ) return -1;;
 
-    return iC.fCut_Theta2_max;
+    if( iC.getTheta2Cut_max() < 0. && iC.getDirectionCutSelector() == 2 )
+    {
+       return iC.getAngularResolutionAbsoluteMaximum();
+    }
+    return iC.getTheta2Cut_max();
 }
 
 

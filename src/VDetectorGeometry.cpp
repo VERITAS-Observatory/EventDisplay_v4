@@ -64,7 +64,7 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
 VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, bool iDebug )
 {
     fDebug = iDebug;
-    if( fDebug ) cout << "VDetectorGeometry::VDetectorGeometry" << endl;
+    if( fDebug ) cout << "VDetectorGeometry::VDetectorGeometry (ntel=" << iNTel << ")" << endl;
 }
 
 

@@ -32,7 +32,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
 {
     tpars = new TTree( iName.c_str(), iTitle.c_str() );
     tpars->SetMaxTreeSize(1000*Long64_t(2000000000));
-    tpars->SetAutoSave(15000000);                 // autosave when 15 Mbytes written
+    tpars->SetAutoSave(150000000);                 // autosave when 150 Mbytes written
 
     if( fShortTree < 1 )
     {

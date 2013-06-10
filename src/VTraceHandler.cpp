@@ -490,6 +490,7 @@ double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw )
 */
 double VTraceHandler::getQuickMaximumSum( int iIntegrationWindow, bool fRaw )
 {
+    fRaw = false;
     int n=fpTrace.size();
     int saturflag=0;
     int max = 0;

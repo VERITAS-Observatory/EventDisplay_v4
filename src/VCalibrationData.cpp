@@ -109,10 +109,12 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 }
 
 
-void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples, bool iUsePedestalsInTimeSlices, bool iLowGainUsePedestalsInTimeSlices, bool iDebug )
+void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples, bool iUsePedestalsInTimeSlices,
+                                   bool iLowGainUsePedestalsInTimeSlices, bool iPedsFromPLine, bool iReadCalibDB, bool iDebug )
 {
     if( iDebug ) cout << "VCalibrationData::initialize " << i_channel << "\t" << fTelID << endl;
 
+    fPedFromPLine = iPedsFromPLine;
     fUsePedestalsInTimeSlices = iUsePedestalsInTimeSlices;
     fLowGainUsePedestalsInTimeSlices = iLowGainUsePedestalsInTimeSlices;
 
@@ -125,20 +127,28 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
        if( fHisto_variance[i] ) fHisto_variance[i]->Reset();
     }
 
-    gErrorIgnoreLevel = 50000;
-    char c_name[800];
+    char c_name[2000];
     for( unsigned int i = 0; i < fFileName.size(); i++ )
     {
-       if( fFileName[i].size() > 0 )
+       if( fFileName[i].size() > 0 && !fPedFromPLine )
        {
-	  sprintf( c_name, "%s.root", fFileName[i].c_str() );
-	  fFile[i] = new TFile( c_name, "READ" );
-	  if( fFile[i]->IsZombie() ) fFile[i] = 0;
+	  if( fFileName[i].find( "gain" ) != string::npos && iReadCalibDB ) 
+	  {
+	     fFile[i] = 0;
+          }
+	  else if( fFileName[i].find( "toff" ) != string::npos && iReadCalibDB )
+	  {
+	     fFile[i] = 0;
+          }
+	  else
+	  {
+	     sprintf( c_name, "%s.root", fFileName[i].c_str() );
+	     fFile[i] = new TFile( c_name, "READ" );
+	     if( fFile[i]->IsZombie() ) fFile[i] = 0;
+	  }
        }
        else fFile[i] = 0;
     }
-
-    gErrorIgnoreLevel = 0;
 
     fFADCStopOffsets.resize( i_channel, 0. );
     fChannelStatus.resize( i_channel, 1 );
@@ -357,32 +367,32 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 	  igainMult[i] = 0.;
 	  igainMultE[i] = 0.;
        }
-       TTree fCalibrationTree( hname, htitle );
-       fCalibrationTree.Branch( "pix", &ipix, "pix/I" );
-       fCalibrationTree.Branch( "ped", &iped, "ped/D" );
-       fCalibrationTree.Branch( "state", &istat, "state/I" );
-       fCalibrationTree.Branch( "stateLow", &istatLow, "stateLow/I" );
-       fCalibrationTree.Branch( "sumwindow", &sumwindow, "sumwindow/i" );
-       fCalibrationTree.Branch( "pedvar", &ipedvar, "pedvar/D" );
-       fCalibrationTree.Branch( "nsumwindows", &nsumwindows, "nsumwindows/i" );
-       fCalibrationTree.Branch( "pedvarV", pedvarV, "pedvarV[nsumwindows]/D" );
-       fCalibrationTree.Branch( "gain", &igain, "gain/D" );
-       fCalibrationTree.Branch( "gainvar", &igainvar, "gainvar/D" );
-       fCalibrationTree.Branch( "toff", &itoff, "toff/D" );
-       fCalibrationTree.Branch( "toffvar", &itoffvar, "toffvar/D" );
-       fCalibrationTree.Branch( "tzero", &itzero, "tzero/D" );
-       fCalibrationTree.Branch( "tzerovar", &itzerovar, "tzerovar/D" );
-       fCalibrationTree.Branch( "pedLowGain", &ipedlowgain, "pedLowGain/D" );
-       fCalibrationTree.Branch( "pedvarLowGain", &ipedvarlowgain, "pedvarLowGain/D" );
-       fCalibrationTree.Branch( "pedvarVLowGain", pedvarLowGainV, "pedvarVLowGain[nsumwindows]/D" );
-       fCalibrationTree.Branch( "gainLowGain", &igainlowgain, "gainLowGain/D" );
-       fCalibrationTree.Branch( "gainvarLowGain", &igainvarlowgain, "gainvarLowGain/D" );
-       fCalibrationTree.Branch( "toffLowGain", &itofflowgain, "toffLowGain/D" );
-       fCalibrationTree.Branch( "toffvarLowGain", &itoffvarlowgain, "toffvarLowGain/D" );
-       fCalibrationTree.Branch( "tzeroLowGain", &itzerolowgain, "tzeroLowGain/D" );
-       fCalibrationTree.Branch( "tzerovarLowGain", &itzerovarlowgain, "tzerovarLowGain/D" );
-       fCalibrationTree.Branch( "gainMult", igainMult, "gainMult[nsumwindows]/D" );
-       fCalibrationTree.Branch( "gainMultE", igainMultE, "gainMultE[nsumwindows]/D" );
+       TTree *fCalibrationTree = new TTree( hname, htitle );
+       fCalibrationTree->Branch( "pix", &ipix, "pix/I" );
+       fCalibrationTree->Branch( "ped", &iped, "ped/D" );
+       fCalibrationTree->Branch( "state", &istat, "state/I" );
+       fCalibrationTree->Branch( "stateLow", &istatLow, "stateLow/I" );
+       fCalibrationTree->Branch( "sumwindow", &sumwindow, "sumwindow/i" );
+       fCalibrationTree->Branch( "pedvar", &ipedvar, "pedvar/D" );
+       fCalibrationTree->Branch( "nsumwindows", &nsumwindows, "nsumwindows/i" );
+       fCalibrationTree->Branch( "pedvarV", pedvarV, "pedvarV[nsumwindows]/D" );
+       fCalibrationTree->Branch( "gain", &igain, "gain/D" );
+       fCalibrationTree->Branch( "gainvar", &igainvar, "gainvar/D" );
+       fCalibrationTree->Branch( "toff", &itoff, "toff/D" );
+       fCalibrationTree->Branch( "toffvar", &itoffvar, "toffvar/D" );
+       fCalibrationTree->Branch( "tzero", &itzero, "tzero/D" );
+       fCalibrationTree->Branch( "tzerovar", &itzerovar, "tzerovar/D" );
+       fCalibrationTree->Branch( "pedLowGain", &ipedlowgain, "pedLowGain/D" );
+       fCalibrationTree->Branch( "pedvarLowGain", &ipedvarlowgain, "pedvarLowGain/D" );
+       fCalibrationTree->Branch( "pedvarVLowGain", pedvarLowGainV, "pedvarVLowGain[nsumwindows]/D" );
+       fCalibrationTree->Branch( "gainLowGain", &igainlowgain, "gainLowGain/D" );
+       fCalibrationTree->Branch( "gainvarLowGain", &igainvarlowgain, "gainvarLowGain/D" );
+       fCalibrationTree->Branch( "toffLowGain", &itofflowgain, "toffLowGain/D" );
+       fCalibrationTree->Branch( "toffvarLowGain", &itoffvarlowgain, "toffvarLowGain/D" );
+       fCalibrationTree->Branch( "tzeroLowGain", &itzerolowgain, "tzeroLowGain/D" );
+       fCalibrationTree->Branch( "tzerovarLowGain", &itzerovarlowgain, "tzerovarLowGain/D" );
+       fCalibrationTree->Branch( "gainMult", igainMult, "gainMult[nsumwindows]/D" );
+       fCalibrationTree->Branch( "gainMultE", igainMultE, "gainMultE[nsumwindows]/D" );
 
        if( fPeds.size() == fPedrms.size() && fPeds.size() == fGains.size() && fPeds.size() == fGainvars.size()
         && fPeds.size() == fTOffsets.size() && fPeds.size() == fTOffsetvars.size() && fPeds.size() == fLowGainPeds.size() )
@@ -390,52 +400,64 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 	   for( unsigned int i = 0; i < fPeds.size(); i++ )
 	   {
 	       ipix = (int)i;
-	       iped = fPeds[i];
+	       if( i < fPeds.size() ) iped = fPeds[i];
 	       if( i < iDead.size() ) istat = iDead[i];
 	       if( i < iDeadLow.size() ) istatLow = iDeadLow[i];
 	       sumwindow = fSumWindow;
 	       if( sumwindow < fVPedvars.size() ) ipedvar = fVPedvars[sumwindow][i];
-	       else                                    ipedvar = 0.;
+	       else                               ipedvar = 0.;
 
 	       nsumwindows = fVPedvars.size();
 	       if( nsumwindows < iMAXSUMWINDOWS )
 	       {
 		   for( unsigned int s = 0; s < fVPedvars.size(); s++ ) pedvarV[s] = fVPedvars[s][i];
 	       }  
-	       igain = fGains[i];
-	       fGains_DefaultSetting[i] = false;
-	       igainvar = fGainvars[i];
-	       itoff = fTOffsets[i];
-	       itoffvar = fTOffsetvars[i];
-	       itzero = fAverageTzero[i];
-	       itzerovar = fAverageTzerovars[i];
-	       ipedlowgain = fLowGainPeds[i]; 
-	       if( sumwindow < fVLowGainPedvars.size() )      ipedvarlowgain = fVLowGainPedvars[sumwindow][i];
-	       else                                           ipedvarlowgain = 0.;
+	       if( i < fGains.size() ) igain = fGains[i];
+	       if( i < fGains_DefaultSetting.size() ) fGains_DefaultSetting[i] = false;
+	       if( i < fGainvars.size() ) igainvar = fGainvars[i];
+	       if( i < fTOffsets.size() ) itoff = fTOffsets[i];
+	       if( i < fTOffsetvars.size() ) itoffvar = fTOffsetvars[i];
+	       if( i < fAverageTzero.size() ) itzero = fAverageTzero[i];
+	       if( i < fAverageTzerovars.size() ) itzerovar = fAverageTzerovars[i];
+	       if( i < fLowGainPeds.size() ) ipedlowgain = fLowGainPeds[i]; 
+	       if( sumwindow < fVLowGainPedvars.size() && i < fVLowGainPedvars[sumwindow].size() )
+	       {
+	           ipedvarlowgain = fVLowGainPedvars[sumwindow][i];
+               }
+	       else ipedvarlowgain = 0.;
 	       if( nsumwindows < iMAXSUMWINDOWS )
 	       {
-		   for( unsigned int s = 0; s < fVLowGainPedvars.size(); s++ ) pedvarLowGainV[s] = fVLowGainPedvars[s][i];
+		   for( unsigned int s = 0; s < fVLowGainPedvars.size(); s++ )
+		   {
+		      if( i < fVLowGainPedvars[s].size() ) pedvarLowGainV[s] = fVLowGainPedvars[s][i];
+                   }
 	       } 
 	       if( nsumwindows < iMAXSUMWINDOWS )
 	       {
 	          for( unsigned int s = 0; s < fLowGainMultiplier.size(); s++ )
 		  {
-		     if( i < fLowGainMultiplier[s].size() )      igainMult[s]  = fLowGainMultiplier[s][i];
-	             if( i < fLowGainMultiplierError[s].size() ) igainMultE[s] = fLowGainMultiplierError[s][i];
+		     if( i < fLowGainMultiplier[s].size() )
+		     {
+		        if( i < fLowGainMultiplier[s].size() ) igainMult[s]  = fLowGainMultiplier[s][i];
+                     }
+	             if( i < fLowGainMultiplierError[s].size() )
+		     {
+		        if( i < fLowGainMultiplierError[s].size() ) igainMultE[s] = fLowGainMultiplierError[s][i];
+                     }
                   }
                }
-	       igainlowgain = fLowGainGains[i];
-	       fLowGainGains_DefaultSetting[i] = false;
-	       igainvarlowgain = fLowGainGainvars[i];
-	       itofflowgain = fLowGainTOffsets[i];
-	       itoffvarlowgain = fLowGainTOffsetvars[i];  
-	       itzerolowgain = fLowGainAverageTzero[i];
-	       itzerovarlowgain = fLowGainAverageTzerovars[i];
+	       if( i < fLowGainGains.size() ) igainlowgain = fLowGainGains[i];
+	       if( i < fLowGainGains_DefaultSetting.size() ) fLowGainGains_DefaultSetting[i] = false;
+	       if( i < fLowGainGainvars.size() ) igainvarlowgain = fLowGainGainvars[i];
+	       if( i < fLowGainTOffsets.size() ) itofflowgain = fLowGainTOffsets[i];
+	       if( i < fLowGainTOffsetvars.size() ) itoffvarlowgain = fLowGainTOffsetvars[i];  
+	       if( i < fLowGainAverageTzero.size() ) itzerolowgain = fLowGainAverageTzero[i];
+	       if( i < fLowGainAverageTzerovars.size() ) itzerovarlowgain = fLowGainAverageTzerovars[i];
 
-               fCalibrationTree.Fill();
+               fCalibrationTree->Fill();
            }
        }
-       fCalibrationTree.Write();
+       fCalibrationTree->Write();
 // do not write histograms -> same information as in fCalibrationTree
 //       hisList->Write();
     }
@@ -615,7 +637,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 }
 
 
-void VCalibrationData::setPeds( unsigned int iChannel, double iPed, bool iLowGain, double iTime )
+void VCalibrationData::setPeds( unsigned int iChannel, double iPed, bool iLowGain )
 {
     if( iLowGain && iChannel < fLowGainPeds.size() ) fLowGainPeds[iChannel] = iPed;
 

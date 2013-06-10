@@ -326,18 +326,18 @@ void VImageAnalyzer::terminate()
     {
         fOutputfile->cd();
         fAnaDir[fTelID]->cd();
-// write main output trees
-        if( getImageParameters()->getTree() ) getImageParameters()->getTree()->Write();
-        if( fRunPar->fImageLL ) getImageParametersLogL()->getTree()->Write();
+// write calibration summaries
+        if( getRunParameter()->fsourcetype != 7 ) getCalibrationData()->terminate( getDead( false ), getDead( true ) );
 // write dead channel tree
         TTree *iT = makeDeadChannelTree();
         if( iT ) iT->Write();
 // write histograms
         if( !isMC() ) getAnaHistos()->terminate( fOutputfile );
-// write calibration summaries
-        if( getRunParameter()->fsourcetype != 7 ) getCalibrationData()->terminate( getDead( false ), getDead( true ) );
 // write pointing data from db to disk (if available)
         if( getTelID() < getPointing().size() && getPointing()[getTelID()] ) getPointing()[getTelID()]->terminate( isMC() );
+// write main output trees
+        if( getImageParameters()->getTree() ) getImageParameters()->getTree()->Write();
+        if( fRunPar->fImageLL ) getImageParametersLogL()->getTree()->Write();
     }
 
     if( fRunPar->ftracefit >= 0. )
@@ -346,6 +346,7 @@ void VImageAnalyzer::terminate()
         fAnaDir[fTelID]->cd();
         if( fOutputfile ) getFitTraceHandler()->terminate();
     }
+    fOutputfile->cd();
 }
 
 

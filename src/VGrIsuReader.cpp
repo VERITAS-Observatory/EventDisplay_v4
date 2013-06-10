@@ -77,7 +77,7 @@ VGrIsuReader::VGrIsuReader( VDetectorGeometry *iDetGeo, unsigned int intel, stri
 }
 
 
-VGrIsuReader::VGrIsuReader( VDetectorGeometry *iDetGeo, unsigned int intel, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, bool bToVBF, bool iDebug, int igrisuseed, string iExtPed, bool iIgnoreCFGFiles )
+VGrIsuReader::VGrIsuReader( VDetectorGeometry *iDetGeo, unsigned int intel, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, bool iDebug, int igrisuseed, string iExtPed, bool iIgnoreCFGFiles )
 {
     fDebug = iDebug;
     if( fDebug ) cout << "VGrIsuReader::VGrIsuReader" << endl;
@@ -264,7 +264,7 @@ void VGrIsuReader::resetEvent()
 */
 void VGrIsuReader::readPeds( unsigned int iDummy )
 {
-    if( fDebug ) cout << "VGrIsuReader::readPeds()" << endl;
+    if( fDebug ) cout << "VGrIsuReader::readPeds() " << iDummy << endl;
 
     char hname[200];
 
@@ -1425,6 +1425,7 @@ uint8_t VGrIsuReader::getSample( unsigned channel,unsigned sample, bool iNewNois
         return fSamplesVec[fTelescopeID][channel][sample];
     }
 
+    iNewNoiseTrace = false;
     return 0;
 }
 

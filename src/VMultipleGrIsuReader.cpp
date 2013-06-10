@@ -8,7 +8,7 @@
 
 #include "VMultipleGrIsuReader.h"
 
-VMultipleGrIsuReader::VMultipleGrIsuReader( unsigned int nFiles, string iSelection, vector< unsigned int > iTelToAna, bool iDebug )
+VMultipleGrIsuReader::VMultipleGrIsuReader( unsigned int nFiles, vector< unsigned int > iTelToAna, bool iDebug )
 {
     fDebug = iDebug;
 
@@ -31,7 +31,7 @@ VMultipleGrIsuReader::VMultipleGrIsuReader( unsigned int nFiles, string iSelecti
 }
 
 
-bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, bool itovbf, int iseed, string iExPedFile, bool iSingleExternalPedFile, double iDefaultPed )
+bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vector< int > i_sumwindow, int i_telnumberoffset, int i_sampleoffset, double ifadcscale, int iseed, string iExPedFile, bool iSingleExternalPedFile, double iDefaultPed )
 {
     char hname[2000];
     bool iB = true;
@@ -78,11 +78,11 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
         {
             if( !iSingleExternalPedFile )
             {
-                fReader.push_back( new VGrIsuReader( iD, 1, fSourceFileName[i], i_sumwindow, i_telnumberoffset, i_sampleoffset, ifadcscale, itovbf, fDebug, iseed, iExPedFile ) );
+                fReader.push_back( new VGrIsuReader( iD, 1, fSourceFileName[i], i_sumwindow, i_telnumberoffset, i_sampleoffset, ifadcscale, fDebug, iseed, iExPedFile ) );
             }
             else
             {
-                fReader.push_back( new VGrIsuReader( iD, 1, fSourceFileName[i], i_sumwindow, i_telnumberoffset, i_sampleoffset, ifadcscale, itovbf, fDebug, iseed, "" ) );
+                fReader.push_back( new VGrIsuReader( iD, 1, fSourceFileName[i], i_sumwindow, i_telnumberoffset, i_sampleoffset, ifadcscale, fDebug, iseed, "" ) );
 // fill random pedestals for all the readers
                 fillRandomPeds( fReader.back(), iseed*3 );
             }

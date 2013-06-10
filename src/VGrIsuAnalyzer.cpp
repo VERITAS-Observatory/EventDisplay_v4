@@ -382,6 +382,7 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x,vector<float> y, vector<
     vector< float > xcore;
     vector< float > ycore;
     vector< float > weight;
+    num_images = x.size();
 
 // get intersections for all possible two-telescope combinations
     for( unsigned int i = 0; i < x.size(); i++ )

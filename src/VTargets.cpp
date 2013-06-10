@@ -138,6 +138,7 @@ bool VTargets::selectTargetbyCode( string iTargetCode )
 
 bool VTargets::readTargets( string iTargetFile )
 {
+    iTargetFile = "";
     return true;
 }
 

@@ -1317,12 +1317,6 @@ void VReadRunParameter::printHelp()
 }
 
 
-bool VReadRunParameter::readConfigFile( string iCfile )
-{
-    return false;
-}
-
-
 void VReadRunParameter::setDirectories()
 {
     char i_text[600];

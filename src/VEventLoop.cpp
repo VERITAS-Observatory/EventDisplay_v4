@@ -281,7 +281,7 @@ bool VEventLoop::initEventLoop( string iFileName )
     {
 	 if( fGrIsuReader != 0 ) delete fGrIsuReader;
 	 fGrIsuReader = new VGrIsuReader( getDetectorGeo(), getDetectorGeo()->getNumTelescopes(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
-	                                  fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, false, fDebug, fRunPar->fgrisuseed, 
+	                                  fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, fDebug, fRunPar->fgrisuseed, 
 					  fRunPar->fsimu_pedestalfile, fRunPar->fIgnoreCFGversions );
 	 fGrIsuReader->setTraceFile( fRunPar->ftracefile );
     }
@@ -291,9 +291,9 @@ bool VEventLoop::initEventLoop( string iFileName )
     else if( fRunPar->fsourcetype == 5 )
     {
 	 if( fMultipleGrIsuReader != 0 ) delete fMultipleGrIsuReader;
-	 fMultipleGrIsuReader = new VMultipleGrIsuReader( fNTel, "", fRunPar->fTelToAnalyze, fDebug );
+	 fMultipleGrIsuReader = new VMultipleGrIsuReader( fNTel, fRunPar->fTelToAnalyze, fDebug );
 	 fMultipleGrIsuReader->init( getDetectorGeo(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
-	                             fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, false, 
+	                             fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, 
 				     fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile, true, fRunPar->fsimu_pedestalfile_DefaultPed );
 	 fMultipleGrIsuReader->setTraceFile( fRunPar->ftracefile );
     }
@@ -302,7 +302,7 @@ bool VEventLoop::initEventLoop( string iFileName )
     else if( fRunPar->fsourcetype == 4 || fRunPar->fsourcetype == 7 )
     {
 	 if( fDSTReader != 0 ) delete fDSTReader;
-	 fDSTReader = new VDSTReader( fRunPar->fsourcefile, fRunPar->fIsMC, fRunPar->fNTelescopes, getNChannels(), fDebug );
+	 fDSTReader = new VDSTReader( fRunPar->fsourcefile, fRunPar->fIsMC, fRunPar->fNTelescopes, fDebug );
 	 if( fDSTReader->isMC() && fRunPar->fIsMC == 0 ) fRunPar->fIsMC = 1;
 	 for( unsigned int i = 0; i <  fRunPar->fTelToAnalyze.size(); i++ )
 	 {

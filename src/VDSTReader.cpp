@@ -2,15 +2,13 @@
 
      reading class for DST sources files
 
-     Revision $Id: VDSTReader.cpp,v 1.6.8.1.30.8.2.1 2010/11/24 15:16:07 gmaier Exp $
-
      \author
        Gernot Maier
 */
 
 #include <VDSTReader.h>
 
-VDSTReader::VDSTReader(  string isourcefile, bool iMC, int iNTel, int iNChannel, bool iDebug )
+VDSTReader::VDSTReader( string isourcefile, bool iMC, int iNTel, bool iDebug )
 {
     fDebug = iDebug;
     if( fDebug ) cout << "VDSTReader::VDSTReader" << endl;
@@ -235,7 +233,10 @@ void VDSTReader::setTrigger( vector<bool> iImage, vector<bool> iBorder )
 }
 */
     double x = 0.;
-    x = 5.;
+    if( iImage.size() != iBorder.size() )
+    {
+       x = 5.;
+    }
 }
 
 VMonteCarloRunHeader* VDSTReader::getMonteCarloHeader()

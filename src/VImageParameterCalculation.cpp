@@ -1516,6 +1516,10 @@ void get_LL_imageParameter_2DGauss( Int_t &npar, Double_t *gin, Double_t &f, Dou
     double LL = 0.;
     double sum = 0.;
 
+    npar = 6;
+    gin = 0;
+    iflag = 0;
+
     double x = 0.;
     double y = 0.;
     double n = 0.;                                // measured sum in channel i

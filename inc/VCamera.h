@@ -134,7 +134,6 @@ class VCamera
                                                   //!< fill fgraphTubesEntry values
         void           setPMTColorOnOff( const vector<bool>&, int iColor, int iFillPos, int iFillNeg );
                                                   //!< fill fgraphTubesEntry values
-        void           setPMTColorRadius( valarray<double>, unsigned int iColor, unsigned int iFillColor, unsigned int iFillStyle );
         void           setPMTColorScheme( vector<unsigned int>, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool iDrawDead, bool iLowGain = false );
         void           setPMTColorScheme( valarray<unsigned int>, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool iDrawDead, bool iLowGain = false );
         void           setPMTColorScheme( valarray<double>, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale );

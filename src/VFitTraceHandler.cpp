@@ -462,6 +462,9 @@ double VFitTraceHandler::getTraceWidth( int fFirst, int fLast, double fPed )
     iMax = fPed + 0.5*(iMax-fPed);
     iMax *= -1.;
 
+    fFirst = 0;
+    fLast  = 0;
+
     return ( fF1Trace->GetX( iMax, fTraceMaxX, (double)fMaxSamples) - fF1Trace->GetX( iMax, 0., fTraceMaxX));
 }
 

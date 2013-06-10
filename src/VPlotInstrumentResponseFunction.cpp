@@ -1,5 +1,7 @@
 /*! \file  VPlotInstrumentResponseFunction.cpp
-    \brief effective area plotter
+    \brief effective area and IRF plotter
+
+    to get last resolution graph: getLastPlottedGraph()
 
     \author
     Gernot Maier

@@ -92,7 +92,7 @@ class VRadialAcceptance
         VRadialAcceptance( string ifile );                                              //!< use acceptance curve from this file
        ~VRadialAcceptance();
 
-        bool   fillAcceptanceFromData( CData *c );
+        bool   fillAcceptanceFromData( CData *c, int entries );
         double getAcceptance( double x, double y, double erec = 0., double ze = 0. );   //!< return radial acceptance
         double getCorrectionFactor( double x, double y, double erec );                  //!< return correction factor (1/radial acceptance)
         double getNumberofRawFiles() { return fNumberOfRawFiles; }

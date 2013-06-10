@@ -67,6 +67,6 @@ class VBFDataReader : public VBaseRawDataReader
 	uint16_t          getNumSamples();
         bool              hasArrayTrigger();
         bool              hasLocalTrigger( unsigned int iTel );
-	void              setPerformFADCAnalysis( bool iB ) { ; }
+	void              setPerformFADCAnalysis( bool iB ) { iB = false; }
 };
 #endif

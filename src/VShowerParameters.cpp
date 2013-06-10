@@ -6,8 +6,6 @@
     some variables are the same for each event (data format, source file, etc.),
     not really necessary to store them in this tree (but convenient)
 
-    Revision $Id: VShowerParameters.cpp,v 1.28.2.1.18.2.4.1.2.1.2.4.8.1.2.5.2.1.2.1 2011/02/11 22:58:51 gmaier Exp $
-
     \author Gernot Maier
 */
 
@@ -49,7 +47,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
     char i_des[600];
     fTreeSC = new TTree( iName.c_str(), iTitle.c_str() );
     fTreeSC->SetMaxTreeSize(1000*Long64_t(2000000000));
-    fTreeSC->SetAutoSave(100000000);              // autosave when 100 Mbytes written
+    fTreeSC->SetAutoSave(1024*1024);              // autosave when 100 Mbytes written
 
     fTreeSC->Branch("runNumber", &runNumber, "runNumber/I" );
     fTreeSC->Branch("eventNumber",  &eventNumber,  "eventNumber/I");

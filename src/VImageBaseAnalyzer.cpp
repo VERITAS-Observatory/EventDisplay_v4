@@ -205,10 +205,6 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 
 // do the FADC stop correction only if all channels are set
     if( getFADCstopTrig().size() == 0 ) return;
-    for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
-    {
-       if( getFADCstopTrig()[t] < 0 ) return;
-    }
     unsigned int i_channelHitID = 0;
     setFADCStopOffsets( 0. );
 
@@ -216,7 +212,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
     unsigned int iPedFADCTrigChan = 1000000;
     for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
     {
-       if( getFADCstopTrig()[t] >= 0 && getFADCstopTrig()[t] < getNChannels() ) iPedFADCTrigChan = getFADCstopTrig()[t];
+       if( getFADCstopTrig()[t] < getNChannels() ) iPedFADCTrigChan = getFADCstopTrig()[t];
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -224,9 +220,6 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 
     for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
     {
-// no FADC stop trig L2 channel set
-       if( getFADCstopTrig()[t] < 0 ) continue;
-
 //  calculate TZero for first crate trigger signal
        pair< bool, uint32_t > i_hitIndexPair = fReader->getChannelHitIndex( (unsigned int)getFADCstopTrig()[t] );
        if( !i_hitIndexPair.first ) continue;

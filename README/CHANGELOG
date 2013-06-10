@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130610 (GM) many small changes to get less warnings while compiling
+                (part of the search for a possible memory leak)
+
 * 20130607 (GM) added az dependence to radial acceptance calculation
                 improved plotting of radial acceptances
 
