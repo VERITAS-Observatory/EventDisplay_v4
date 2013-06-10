@@ -22,6 +22,7 @@ set ODIR=ODOD
 # combine effective areas
 $EVNDISPSYS/bin/combineEffectiveAreas "$DDIR" $TMPDIR/$OFIL false
 
+mkdir -p $ODIR
 mv -f $TMPDIR/$OFIL* $ODIR/
 
 exit
