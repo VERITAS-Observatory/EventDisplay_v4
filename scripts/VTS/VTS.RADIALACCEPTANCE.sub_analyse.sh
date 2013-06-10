@@ -63,7 +63,7 @@ do
 
 # input and output names
         DDIR=$1/RecID$I/
-	OFIL=$3-d20130411-cut-$C-V-T$T
+	OFIL=$3-d20130411-cut-$C-$V-T$T
 
 	echo "$DDIR"
 	echo "$OFIL"
