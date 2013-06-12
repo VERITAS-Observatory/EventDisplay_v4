@@ -37,6 +37,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
 
     bCheckTelescopePositions = true;
     fBoolPrintSample.assign( fNTel, true );
+    fGPSClockWarnings.assign( fNTel, 0 );
 
     fAnalyzeMode = true;
     fRunMode = (E_runmode)fRunPar->frunmode;
@@ -637,7 +638,7 @@ void VEventLoop::shutdown()
        }
        else
        {
-           cout << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
+           cout << endl << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
        }
 // FROGS finishing here
 #ifndef NOGSL
@@ -733,7 +734,14 @@ bool VEventLoop::loop( int iEvents )
             iEventStatus = true;
         }
         else fNumberofGoodEvents++;
-        if( i == 0 ) cout << endl << "\t starting analysis " << endl;
+        if( i == 0 )
+	{
+	     cout << endl;
+	     cout << "##########################################" << endl;
+	     cout << "########  starting analysis  ############# " << endl;
+	     cout << "##########################################" << endl;
+	     cout << endl;
+        }
         else if ( fRunPar->fPrintAnalysisProgress > 0 && i % fRunPar->fPrintAnalysisProgress == 0 ) cout << "\t now at event " << i << endl;
         i++;
     }
@@ -833,6 +841,8 @@ int VEventLoop::analyzeEvent()
         fDST->fill();
         return 1;
     }
+// set event time from data reader
+    setEventTimeFromReader();
 
 ////////////////////////////////////
 // analyze all requested telescopes
@@ -840,6 +850,10 @@ int VEventLoop::analyzeEvent()
     for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
     {
         setTelID( fRunPar->fTelToAnalyze[i] );
+
+/////////////////////////////////////////////////////////////////////
+// check telescope position of T1
+       if( getTelID() == 0 && bCheckTelescopePositions && !isMC() ) checkTelescopePositions( fEventMJD[getTelID()] );
 
 // check number of samples
 	if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isDST_MC() )
@@ -900,8 +914,6 @@ int VEventLoop::analyzeEvent()
             fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 2;
         } 
-// get event time
-        setEventTimeFromReader();
 
         switch( fRunMode )
         {
@@ -1296,6 +1308,12 @@ void VEventLoop::terminate( int iAna )
             cout << "\t Telescope " << getTeltoAna()[t]+1 << ": " << fReader->getNIncompleteEvents()[getTeltoAna()[t]] << endl;
         }
     }
+    cout << "Number of events with GPS warnings/errors: " << endl;
+    for( unsigned int i = 0; i < fGPSClockWarnings.size(); i++ )
+    {
+       cout << "\t Telescope " << getTeltoAna()[i]+1 << ": " << fGPSClockWarnings[i] << endl;
+    }
+
     cout << endl << "Analyzed " << iAna << " events" << endl;
 }
 
@@ -1319,35 +1337,6 @@ void VEventLoop::setEventTimeFromReader()
     unsigned int iCurrentTelID = getTelID();
 
     VGPSDecoder fGPS;
-
-// decode the GPS time
-    fGPS.decode( fReader->getGPS0(), fReader->getGPS1(), fReader->getGPS2(), fReader->getGPS3(), fReader->getGPS4() );
-
-// time is given in seconds per day
-    if( getTelID() < fEventTime.size() )
-    {
-       fEventTime[getTelID()] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
-       fArrayEventTime = fEventTime[getTelID()];
-    }
-
-//  fGPS.getDays() gives day in year, so I calculate the MJD for
-//  1st January of this year, then add fGPS.getDays()-1.
-    int j = 0;
-    double dMJD = 0;
-    int iGPSYear = fReader->getATGPSYear()+2000;
-    slaCldj(iGPSYear, 1, 1, &dMJD, &j);
-    dMJD += fGPS.getDays() - 1.;
-
-// horrible fudge to deal with broken T3 clock (for MJD=54101 only)
-    if( getTelID() == 2 && dMJD==54101) dMJD += 100;
-
-// set MJD
-    if( getTelID() < fEventTime.size() )
-    {
-       fEventMJD[getTelID()] = (int)dMJD;
-       fArrayEventMJD = (int)dMJD;
-    }
-
 ///////////////// /////////////////////////////////// /////////////////
 // test if all times are the same, apply majority rule otherwise
 ///////////////// /////////////////////////////////// /////////////////
@@ -1370,18 +1359,62 @@ void VEventLoop::setEventTimeFromReader()
         getReader()->setTelescopeID( getTeltoAna()[i] );
 
         fGPS.decode(fReader->getGPS0(), fReader->getGPS1(), fReader->getGPS2(), fReader->getGPS3(), fReader->getGPS4());
+// check status of GPS clock
+        if( fGPS.getStatus() != 0 )
+	{
+	    if( i < fGPSClockWarnings.size() ) fGPSClockWarnings[i]++;
+	    if( fGPSClockWarnings[i] < 30 && fDebug )
+	    {
 
+		 cout << " VEventLoop::setEventTimeFromReader: warning, event with GPS error status in telescope " << getTeltoAna()[i]+1 << endl;
+		 cout << "\t error status " << fGPS.getStatus();
+		 if( fGPS.getStatus()&0x0001 )
+		 {
+		     cout << " (unlocked from GPS time source)" << endl;
+		 }
+		 else if( fGPS.getStatus()&0x0002 )
+		 {
+		     cout << " (offset in time with respect to UTC)" << endl;
+                 }
+		 else if( fGPS.getStatus()&0x0004 )
+		 {
+		     cout << " (large frequency offset)" << endl;
+                 }
+            }
+	    else if( fGPSClockWarnings[i] == 30 )
+	    {
+	       cout << " VEventLoop::setEventTimeFromReader: warning more then 30 warnings on the GPS error status" << endl;
+	       cout << " (Telescope " << getTeltoAna()[i]+1 << ")" << endl;
+            }
+        }
+
+// time is given in seconds per day
+        if( getTelID() < fEventTime.size() )
+        {
+	  fEventTime[getTelID()] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
+	  fArrayEventTime = fEventTime[getTelID()];
+        }
         i_telescope_time[getTeltoAna()[i]] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
         i_telescope_timeN[getTeltoAna()[i]] = 0;
 //! fGPS.getDays() gives day in year, so I calculate the MJD for
 //! 1st January of this year, then add fGPS.getDays()-1.
-        int  j;
-        double dMJD;
-        slaCldj (fReader->getATGPSYear()+2000, 1, 1, &dMJD, &j);
+        int  j = 0;
+        double dMJD = 0.;
+        slaCldj( fReader->getATGPSYear()+2000, 1, 1, &dMJD, &j );
         dMJD += fGPS.getDays() - 1.;
         if( fReader->isGrisuMC() && dMJD == 51543 ) dMJD = 54383;
+// horrible fudge to deal with broken T3 clock (for MJD=54101 only)
+        if( getTelID() == 2 && dMJD==54101) dMJD += 100;
         i_MJD[getTeltoAna()[i]] = dMJD;
+// set MJD
+	if( getTelID() < fEventMJD.size() )
+	{
+	   fEventMJD[getTelID()] = (int)dMJD;
+	   fArrayEventMJD = (int)dMJD;
+	}
     }
+
+
 ///// Time in [s] of the day /////
 // count equal times
     for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
@@ -1449,11 +1482,9 @@ void VEventLoop::setEventTimeFromReader()
        cout << "\t using MJD of previous event" << endl;
        fEventMJD[getTelID()] = fArrayPreviousEventMJD;
        fArrayEventMJD = fArrayPreviousEventMJD;
+       cout << "\t GPS clock status: " << fGPS.getStatus() << endl;
     }
     fArrayPreviousEventMJD = fArrayEventMJD;
-/////////////////////////////////////////////////////////////////////
-// check telescope position of T1
-    if( getTelID() == 0 && bCheckTelescopePositions && !isMC() ) checkTelescopePositions( fEventMJD[getTelID()] );
 /////////////////////////////////////////////////////////////////////
 // end of time fixes
 /////////////////////////////////////////////////////////////////////

@@ -119,14 +119,7 @@ void VDST::fill()
 	   }
 	   else fDSTLTrig_list[i] = 0;
 // pointing
-           if( getEventMJDVector().size() < i && getEventTimeVector().size() < i )
-	   {
-	       getPointing()[i]->setTelPointing( getEventMJDVector()[i], getEventTimeVector()[i] );
-           }
-	   else
-	   {
-	       getPointing()[i]->setTelPointing( 0, 0. );
-           }
+           getPointing()[i]->setTelPointing( getEventMJD(), getEventTime() );
 	   if( i < fReader->getTelAzimuth().size()  ) fDSTpointAzimuth[i]   = fReader->getTelAzimuth()[i];
 	   else if( i < getPointing().size() && getPointing()[i] ) fDSTpointAzimuth[i]   = getPointing()[i]->getTelAzimuth();
 	   if( i < fReader->getTelElevation().size() ) fDSTpointElevation[i] = fReader->getTelElevation()[i];

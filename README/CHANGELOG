@@ -1,6 +1,8 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130612 (GM) added GPS clock status readout
+
 * 20130610 (GM) many small changes to get less warnings while compiling
                 (part of the search for a possible memory leak)
 

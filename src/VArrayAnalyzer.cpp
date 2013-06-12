@@ -192,17 +192,6 @@ void VArrayAnalyzer::initEvent()
     getShowerParameters()->fsourcetype = fReader->getDataFormatNum();
     getShowerParameters()->fNTelescopes = getNTel();
 
-// get event times
-/*    if( getTeltoAna().size() > 0 && getTeltoAna()[0] < getEventTimeVector().size() ) getShowerParameters()->time = getEventTimeVector()[getTeltoAna()[0]];
-    else
-    {
-       cout << "VArrayAnalyzer::initEvent() warning: no event times" << endl;
-    }
-    if( getTeltoAna().size() > 0 && getTeltoAna()[0] < getEventMJDVector().size() ) getShowerParameters()->MJD  = getEventMJDVector()[getTeltoAna()[0]];
-    else
-    {
-       cout << "VArrayAnalyzer::initEvent() warning: no event times" << endl;
-    } */
     getShowerParameters()->time = getEventTime();
     getShowerParameters()->MJD  = getEventMJD();
 

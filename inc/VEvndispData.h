@@ -180,12 +180,10 @@ class VEvndispData
         VDetectorGeometry*  getDetectorGeo() const { return fDetectorGeo; }
         VDetectorGeometry*  getDetectorGeometry() const { return fDetectorGeo; }
         TTree*              getDetectorTree();
-//        int                 getEventMJD() { return fEventMJD[fTelID]; }
         int                 getEventMJD() { return fArrayEventMJD; }
         vector< int >&      getEventMJDVector() { return fEventMJD; }
         unsigned int        getEventNumber() { return fEventNumber; }
         string              getEventDisplayVersion() { return getRunParameter()->getEVNDISP_VERSION(); }
-//        double              getEventTime() { return fEventTime[fTelID]; }
         double              getEventTime() { return fArrayEventTime; }
         vector< double >&   getEventTimeVector() { return fEventTime; }
         unsigned int        getEventType() { return fEventType; }

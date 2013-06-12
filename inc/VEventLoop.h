@@ -66,6 +66,7 @@ class VEventLoop : public VEvndispData
         bool fChangedCut;                         //!< check if any cut is applied
 
         int fBoolSumWindowChangeWarning;
+	vector< unsigned int > fGPSClockWarnings;
 
         bool fNextEventStatus;                    //!< for stopping event loop from display
 	bool fEndCalibrationRunNow;               //!< for stopping event loop for calibration
