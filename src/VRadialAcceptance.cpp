@@ -115,12 +115,12 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     for( int i = 1; i < nxybin; i++ ) hscale->SetBinError( i, 0. );
     hList->Add( hscale );
 
-    hAzDist = new TH1F( "hAzDist", "", nxybin, -180., 180. );
-    hAzDist->SetXTitle( "azimuth (camera coordinates) [deg]" );
-    hList->Add( hAzDist );
-    hAzDistDeRot = new TH1F( "hAzDistDeRot", "", nxybin, -180., 180. );
-    hAzDistDeRot->SetXTitle( "azimuth (derotated camera coordinates) [deg]" );
-    hList->Add( hAzDistDeRot );
+    hPhiDist = new TH1F( "hPhiDist", "", nxybin, -180., 180. );
+    hPhiDist->SetXTitle( "azimuth (camera coordinates) [deg]" );
+    hList->Add( hPhiDist );
+    hPhiDistDeRot = new TH1F( "hPhiDistDeRot", "", nxybin, -180., 180. );
+    hPhiDistDeRot->SetXTitle( "azimuth (derotated camera coordinates) [deg]" );
+    hList->Add( hPhiDistDeRot );
 
     char hname[200];
     char htitle[200];
@@ -159,42 +159,42 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     hList->Add( hXYAccTotDeRot );
 
 // azimuth dependent radial acceptance histograms
-    fAzMin.clear();
-    fAzMax.clear();
-    fAzMin.push_back( 135.0 );       fAzMax.push_back( -165.0 );
-    fAzMin.push_back( 150.0 );       fAzMax.push_back( -150.0 );
-    fAzMin.push_back( -180. );       fAzMax.push_back( -120. );
+    fPhiMin.clear();
+    fPhiMax.clear();
+    fPhiMin.push_back( 135.0 );       fPhiMax.push_back( -165.0 );
+    fPhiMin.push_back( 150.0 );       fPhiMax.push_back( -150.0 );
+    fPhiMin.push_back( -180. );       fPhiMax.push_back( -120. );
     for( int i = 0; i < 13; i++ )
     {
-	 fAzMin.push_back( fAzMin.back() + 22.5 );
-	 fAzMax.push_back( fAzMax.back() + 22.5 );
+	 fPhiMin.push_back( fPhiMin.back() + 22.5 );
+	 fPhiMax.push_back( fPhiMax.back() + 22.5 );
     }
-    for( unsigned int i = 0; i < fAzMin.size(); i++ )
+    for( unsigned int i = 0; i < fPhiMin.size(); i++ )
     {
 // camera coordinates
-        sprintf( hname, "hAccAz_%d", i );
-        sprintf( htitle, "%.0f < az < %.0f", fAzMin[i], fAzMax[i] );
-        hAccAz.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
-        hAccAz.back()->SetXTitle( "distance to camera center [deg]" );
-        hAccAz.back()->SetYTitle( "relative rate" );
-        hAccAz.back()->SetMarkerSize( 2 );
-        hAccAz.back()->SetLineWidth( 2 );
-        hAccAz.back()->Sumw2();
-        hList->Add( hAccAz.back() );
-	hListNormalizeHistograms->Add( hAccAz.back() );
-	hListFitHistograms->Add( hAccAz.back() );
+        sprintf( hname, "hAccPhi_%d", i );
+        sprintf( htitle, "%.0f < Phi < %.0f", fPhiMin[i], fPhiMax[i] );
+        hAccPhi.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
+        hAccPhi.back()->SetXTitle( "distance to camera center [deg]" );
+        hAccPhi.back()->SetYTitle( "relative rate" );
+        hAccPhi.back()->SetMarkerSize( 2 );
+        hAccPhi.back()->SetLineWidth( 2 );
+        hAccPhi.back()->Sumw2();
+        hList->Add( hAccPhi.back() );
+	hListNormalizeHistograms->Add( hAccPhi.back() );
+	hListFitHistograms->Add( hAccPhi.back() );
 // derotated camera coordinates
-        sprintf( hname, "hAccAzDerot_%d", i );
-        sprintf( htitle, "%.0f < az < %.0f (derot)", fAzMin[i], fAzMax[i] );
-        hAccAzDerot.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
-        hAccAzDerot.back()->SetXTitle( "distance to camera center [deg]" );
-        hAccAzDerot.back()->SetYTitle( "relative rate" );
-        hAccAzDerot.back()->SetMarkerSize( 2 );
-        hAccAzDerot.back()->SetLineWidth( 2 );
-        hAccAzDerot.back()->Sumw2();
-        hList->Add( hAccAzDerot.back() );
-	hListNormalizeHistograms->Add( hAccAzDerot.back() );
-	hListFitHistograms->Add( hAccAzDerot.back() );
+        sprintf( hname, "hAccPhiDerot_%d", i );
+        sprintf( htitle, "%.0f < Phi < %.0f (derot)", fPhiMin[i], fPhiMax[i] );
+        hAccPhiDerot.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
+        hAccPhiDerot.back()->SetXTitle( "distance to camera center [deg]" );
+        hAccPhiDerot.back()->SetYTitle( "relative rate" );
+        hAccPhiDerot.back()->SetMarkerSize( 2 );
+        hAccPhiDerot.back()->SetLineWidth( 2 );
+        hAccPhiDerot.back()->Sumw2();
+        hList->Add( hAccPhiDerot.back() );
+	hListNormalizeHistograms->Add( hAccPhiDerot.back() );
+	hListFitHistograms->Add( hAccPhiDerot.back() );
     }
 
 // run dependent acceptance curves
@@ -248,8 +248,8 @@ void VRadialAcceptance::reset()
     fCut_CameraFiducialSize_max = fMaxDistanceAllowed;
 
     hscale = 0;
-    hAzDist = 0;
-    hAzDistDeRot = 0;
+    hPhiDist = 0;
+    hPhiDistDeRot = 0;
     hXYAccTot = 0;
     hXYAccTotDeRot = 0;
     fAccFile = 0;
@@ -259,6 +259,7 @@ void VRadialAcceptance::reset()
     fRE.clear();
 
     setEnergyReconstructionMethod();
+    setAzCut();
 }
 
 
@@ -380,117 +381,109 @@ void VRadialAcceptance::setRegionToExcludeAcceptance( vector<double> x, vector<d
     apply gamma/hadron cuts and fill radial acceptance histograms
 
 */
-bool VRadialAcceptance::fillAcceptanceFromData( CData *iData, int entries )
+int VRadialAcceptance::fillAcceptanceFromData( CData *iData, int entry )
 {
     if( !iData )
     {
         cout << "VRadialAcceptance::fillAcceptanceFromData: no data tree defined" << endl;
-        return false;
+        return -1;
     }
-
-    int nentries = iData->fChain->GetEntries();
-    if( entries > 0 ) nentries = entries;
-
-    cout << "filling acceptance curves with " << nentries << " events (before cuts)" << endl;
-
-    if( fCuts ) fCuts->printCutSummary();
 
     double idist = 0;
-    double i_az = 0.;
-    int i_entries_after_cuts = 0;
-
-////////////////////////////////////////////////////////
-// loop over input data tree
-    cout << "start analyses..." << endl;
-    for( int i = 0; i < nentries; i++ )
-    {
-        iData->GetEntry( i );
-
-        if( i == 0 and iData->isMC() ) cout << "\t (analysing MC data)" << endl;
+    double i_Phi = 0.;
+    bool bPassed = false;
 
 // apply some basic quality cuts
-        if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, false, i , true) )
-        {
+     if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, false, entry, true) )
+     {
 // gamma/hadron cuts
-            if( !fCuts->isGamma( i, false ) ) continue;
-// energy quality cuts not filled for maps
-// 	 if( !fCuts->applyEnergyReconstructionQualityCuts() ) continue;
+	 if( !fCuts->isGamma( entry, false ) ) return 0;
 
-// now fill histograms
-            i_entries_after_cuts++;
+// az cut
+	 bool bFill = false;
+         if( fAzCut_min < fAzCut_max )
+	 {
+	    if( iData->Az > fAzCut_min && iData->Az <= fAzCut_max ) bFill = true;
+         }
+	 else 
+	 {
+	    if( iData->Az < fAzCut_max || iData->Az > fAzCut_min ) bFill = true;
+         } 
+	 if( !bFill ) return 0;
+// no more cuts after this statement
+	 bPassed = true;
 
-	    idist = sqrt( iData->Xoff*iData->Xoff + iData->Yoff*iData->Yoff );
+	 idist = sqrt( iData->Xoff*iData->Xoff + iData->Yoff*iData->Yoff );
 
 // fill 2D distribution of events
-            hXYAccTot->Fill( iData->Xoff, iData->Yoff );
-	    hXYAccTotDeRot->Fill( iData->Xoff_derot, iData->Yoff_derot );
+	 hXYAccTot->Fill( iData->Xoff, iData->Yoff );
+	 hXYAccTotDeRot->Fill( iData->Xoff_derot, iData->Yoff_derot );
 
 // fill zenith angle dependent histograms
-            for( unsigned int j = 0; j < fZe.size(); j++ )
-            {
-                if( iData->Ze < fZe[j] )
-                {
-                    if( idist > 0. ) hAccZe[j]->Fill( idist );
-                    break;
-                }
-            }
+	 for( unsigned int j = 0; j < fZe.size(); j++ )
+	 {
+	     if( iData->Ze < fZe[j] )
+	     {
+		 if( idist > 0. ) hAccZe[j]->Fill( idist );
+		 break;
+	     }
+	 }
 // fill azimuth angle dependend histograms (camera coordinates)
-            i_az = atan2( iData->Yoff, iData->Xoff )*TMath::RadToDeg();
-	    hAzDist->Fill( i_az );
+	 i_Phi = atan2( iData->Yoff, iData->Xoff )*TMath::RadToDeg();
+	 hPhiDist->Fill( i_Phi );
 
-	    for( unsigned int j = 0; j < fAzMin.size(); j++ )
+	 for( unsigned int j = 0; j < fPhiMin.size(); j++ )
+	 {
+	    bFill = false;
+	    if( i_Phi > fPhiMin[j] && i_Phi < fPhiMax[j] ) bFill = true;
+	    else
 	    {
-	       bool bFill = false;
-	       if( i_az > fAzMin[j] && i_az < fAzMax[j] ) bFill = true;
-	       else
+	       if( fPhiMin[j] > fPhiMax[j] )
 	       {
-		  if( fAzMin[j] > fAzMax[j] )
-		  {
-		     if( i_az < fAzMin[j] && i_az > fAzMax[j] ) bFill = false;
-		     else bFill = true;
-		  }
-               }
-	       if( bFill && idist > 0. )
-	       {
-		  hAccAz[j]->Fill( idist );
-	       } 
-            }
+		  if( i_Phi < fPhiMin[j] && i_Phi > fPhiMax[j] ) bFill = false;
+		  else bFill = true;
+	       }
+	    }
+	    if( bFill && idist > 0. )
+	    {
+	       hAccPhi[j]->Fill( idist );
+	    } 
+	 }
 // fill azimuth angle dependend histograms (derotated camera coordinates)
-            i_az = atan2( iData->Yoff_derot, iData->Xoff_derot )*TMath::RadToDeg();
-	    hAzDistDeRot->Fill( i_az );
-	    for( unsigned int j = 0; j < fAzMin.size(); j++ )
+	 i_Phi = atan2( iData->Yoff_derot, iData->Xoff_derot )*TMath::RadToDeg();
+	 hPhiDistDeRot->Fill( i_Phi );
+	 for( unsigned int j = 0; j < fPhiMin.size(); j++ )
+	 {
+	    bool bFill = false;
+	    if( i_Phi > fPhiMin[j] && i_Phi < fPhiMax[j] ) bFill = true;
+	    else
 	    {
-	       bool bFill = false;
-	       if( i_az > fAzMin[j] && i_az < fAzMax[j] ) bFill = true;
-	       else
+	       if( fPhiMin[j] > fPhiMax[j] )
 	       {
-		  if( fAzMin[j] > fAzMax[j] )
-		  {
-		     if( i_az < fAzMin[j] && i_az > fAzMax[j] ) bFill = false;
-		     else bFill = true;
-		  }
-               }
-	       if( bFill &&  idist > 0. )
-	       {
-	          hAccAzDerot[j]->Fill( idist );
-               } 
-            }
+		  if( i_Phi < fPhiMin[j] && i_Phi > fPhiMax[j] ) bFill = false;
+		  else bFill = true;
+	       }
+	    }
+	    if( bFill &&  idist > 0. )
+	    {
+	       hAccPhiDerot[j]->Fill( idist );
+	    } 
+	 }
 // fill run dependent histograms
-            for( unsigned int j = 0; j < fRunPar->fRunList.size(); j++ )
-            {
-                if( iData->runNumber == fRunPar->fRunList[j].fRunOff )
-                {
-                    if( idist > 0. && j < hAccRun.size() ) hAccRun[j]->Fill( idist );
-		    if( j < hXYAccRun.size() ) hXYAccRun[j]->Fill( iData->Xoff, iData->Yoff );
-                    break;
-                }
-            }
-        }
-    }
-    cout << "total number of entries after cuts: " << i_entries_after_cuts << endl;
-    cout << endl << endl;
+	 for( unsigned int j = 0; j < fRunPar->fRunList.size(); j++ )
+	 {
+	     if( iData->runNumber == fRunPar->fRunList[j].fRunOff )
+	     {
+		 if( idist > 0. && j < hAccRun.size() ) hAccRun[j]->Fill( idist );
+		 if( j < hXYAccRun.size() ) hXYAccRun[j]->Fill( iData->Xoff, iData->Yoff );
+		 break;
+	     }
+	 }
+     }
 
-    return true;
+     if( bPassed ) return 1;
+
+    return 0;
 }
 
 /*
@@ -498,8 +491,13 @@ bool VRadialAcceptance::fillAcceptanceFromData( CData *iData, int entries )
     called for making radial acceptances
 
 */
-bool VRadialAcceptance::terminate( string ofile )
+bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 {
+    if( !iDirectory->cd() )
+    {
+       cout << "VRadialAcceptance::terminate() error accessing directory  " << iDirectory->GetName() << endl;
+       exit( -1 );
+    }
 /////////////////////////////////////
 // normalize radial acceptance histograms
 // scale everything to mean value of first three bins
@@ -590,14 +588,7 @@ bool VRadialAcceptance::terminate( string ofile )
         cout << "\t" << hAccZe[i]->GetName() << "\t" << hAccZe[i]->GetEntries() << endl;
     }
 
-// write everything to disk
-    TFile *fo = new TFile( ofile.c_str(), "RECREATE" );
-    if( fo->IsZombie() )
-    {
-        cout << "VRadialAcceptance::fillAcceptanceFromData error opening output file " << ofile << endl;
-        return false;
-    }
-    cout << endl << "writing acceptance curves to " << ofile << endl;
+    cout << endl << "writing acceptance curves to " << iDirectory->GetName() << endl;
 
     hList->Write();
 
@@ -607,8 +598,6 @@ bool VRadialAcceptance::terminate( string ofile )
        fCuts->SetName( "GammaHadronCuts" );
        fCuts->Write();
     }
-
-    fo->Close();
 
     return true;
 }

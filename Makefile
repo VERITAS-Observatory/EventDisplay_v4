@@ -368,6 +368,9 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VSkyCoordinatesUtilities.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VASlalib.o \
+		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \

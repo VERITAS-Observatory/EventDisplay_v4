@@ -74,15 +74,57 @@ int main( int argc, char *argv[] )
     {
         cout << "error reading cut file: " << cutfilename << endl;
         cout << "exiting..." << endl;
-        exit( 0 );
+        exit( -1 );
     }
 
    cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
 
+   char ifile[1800];
+
+// create output file
+    TFile *fo = new TFile( outfile.c_str(), "RECREATE" );
+    if( fo->IsZombie() )
+    {
+        cout << "makeRadialAcceptances: error opening output file " << outfile << endl;
+        return false;
+    }
+    cout << endl << "writing acceptance curves to " << fo->GetName() << endl;
+    TDirectory *facc_dir = (TDirectory*)fo;
+
 // create acceptance object
     VRadialAcceptance *facc = new VRadialAcceptance( fCuts, fRunPara );
+// az dependent measurement
+    vector< VRadialAcceptance* > facc_az;
+    vector< string > fDirName;
+    vector< string > fDirTitle;
+    vector< TDirectory* > facc_az_dir;
+    vector< double > iAz_min;
+    vector< double > iAz_max;
 
-    char ifile[1800];
+    iAz_min.push_back( 337.5 );  iAz_max.push_back( 22.5 );
+    for( unsigned int i = 1; i < 8; i++ )
+    {
+        iAz_min.push_back( -22.5 + 45. * (double)i );
+	iAz_max.push_back(  22.5 + 45. * (double)i );
+    }
+    for( unsigned int i = 0; i < iAz_min.size(); i++ )
+    {
+	if( facc_dir ) facc_dir->cd();
+	sprintf( ifile, "az_%d", i );
+	fDirName.push_back( ifile );
+	sprintf( ifile, "AZ dependend radial acceptance, %.2f < az < %.2f", iAz_min[i], iAz_max[i] );
+	fDirTitle.push_back( ifile );
+	facc_az_dir.push_back( fo->mkdir( fDirName.back().c_str(), fDirTitle.back().c_str() ) );
+	if( facc_az_dir.back() )
+	{
+	   facc_az_dir.back()->cd();
+	   facc_az.push_back( new VRadialAcceptance( fCuts, fRunPara ) );
+	   facc_az.back()->setAzCut( iAz_min[i], iAz_max[i] );
+	   cout << "initializing AZ dependend radial acceptance class for ";
+	   cout << iAz_min[i] << " < az <= " <<   iAz_max[i] << endl;
+        }
+    }
+
     for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
     {
         sprintf( ifile, "%s/%d.mscw.root", datadir.c_str(), fRunPara->fRunList[i].fRunOff );
@@ -116,14 +158,57 @@ int main( int argc, char *argv[] )
 // set gamma/hadron cuts
         fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
 
+	if( !d )
+        {
+	   cout << "makeRadialAcceptance: no data tree defined: run " << fRunPara->fRunList[i].fRunOff << endl;
+	   return false;
+        }
 // fill acceptance curves
-        facc->fillAcceptanceFromData( d, entries );
+        int nentries = d->fChain->GetEntries();
+        if( entries > 0 ) nentries = entries;
+
+        cout << "filling acceptance curves with " << nentries << " events (before cuts)" << endl;
+
+        if( fCuts ) fCuts->printCutSummary();
+
+	int neventStats = 0;
+	int i_entries_after_cuts = 0;
+
+	for( int n = 0; n < nentries; n++ )
+	{
+	   d->GetEntry( n );
+
+	   if( n == 0 and d->isMC() ) cout << "\t (analysing MC data)" << endl;
+
+	   neventStats = facc->fillAcceptanceFromData( d, n );
+
+	   for( unsigned int a = 0; a < facc_az.size(); a++ )
+	   {
+	      if( facc_az[a] ) facc_az[a]->fillAcceptanceFromData( d, n );
+           }
+
+	   if( neventStats < 0 )
+	   {
+	      break;
+           }
+	   i_entries_after_cuts += neventStats;
+	}   
+        cout << "total number of entries after cuts: " << i_entries_after_cuts << endl;
+        cout << endl << endl;
 
         fTest.Close();
     }
 
 // write acceptance files to disk
-    facc->terminate( outfile );
+    
+    facc->terminate( facc_dir );
+    for( unsigned int a = 0; a < facc_az_dir.size(); a++ )
+    {
+       if( facc_az[a] ) facc_az[a]->terminate( facc_az_dir[a] );
+    }
+
+    fo->Close();
+
     cout << "exiting.." << endl;
 }
 

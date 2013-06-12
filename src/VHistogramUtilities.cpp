@@ -390,12 +390,11 @@ TH1* VHistogramUtilities::normalizeTH1( TH1 *h, bool iIntegral )
       if( iIntegral ) f =  1. / iSum;
       else            f = iN / iSum;
    }
-   cout << "F " << f << endl;
 
    for( int i = 1; i <= h->GetNbinsX(); i++ )
    {
+      h->SetBinError( i, h->GetBinError( i ) * f );
       h->SetBinContent( i, h->GetBinContent( i ) * f );
-      h->SetBinError( i, h->GetBinError( i ) * f * f );
    }
 
    return h;

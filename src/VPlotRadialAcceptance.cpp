@@ -5,7 +5,7 @@
 
 #include "VPlotRadialAcceptance.h"
 
-VPlotRadialAcceptance::VPlotRadialAcceptance( string iFile )
+VPlotRadialAcceptance::VPlotRadialAcceptance( string iFile, int iAz )
 {
    fDebug = false;
 
@@ -17,14 +17,14 @@ VPlotRadialAcceptance::VPlotRadialAcceptance( string iFile )
    fAcceptanceHisto = 0;
    fAcceptanceHistoFit = 0;
    fAcceptanceFunction = 0;
-   hAzDist = 0;
-   hAzDistDeRot = 0;
+   hPhiDist = 0;
+   hPhiDistDeRot = 0;
    
-   if( iFile.size() > 0 ) openAcceptanceFile( iFile, 0 );
+   if( iFile.size() > 0 ) openAcceptanceFile( iFile, 0, iAz );
 }
 
 
-bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBin )
+bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBin, int iAzBin )
 {
 // open acceptance file
    fAcceptanceFile = new TFile( iFile.c_str() );
@@ -35,9 +35,19 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
        return false;
    }
    char hname[200];
+   if( iAzBin >= 0 )
+   {
+      sprintf( hname, "az_%d", iAzBin );
+      if( !fAcceptanceFile->cd( hname ) )
+      {
+         cout << "VPlotRadialAcceptance::openAcceptanceFile error, directory for the following az bin not found: " << iAzBin << endl;
+	 return false;
+      }
+   }
+   cout << "reading acceptance histograms from " << gDirectory->GetName() << endl;
 // read acceptance histogram from file
    sprintf( hname, "hAccZe_%d", iZeBin );
-   fAcceptanceHisto = (TH1F*)fAcceptanceFile->Get( hname );
+   fAcceptanceHisto = (TH1F*)gDirectory->Get( hname );
    if( !fAcceptanceHisto )
    {
        cout << "VPlotRadialAcceptance::addAcceptanceFile: error finding acceptance histogram" << endl;
@@ -45,40 +55,40 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
        return false;
    }
 // read AZ dependent acceptance histograms from file and fit functions from file
-   fAcceptanceAzHisto.clear();
-   fAcceptanceAzFitFunction.clear();
-   fAcceptanceAzHistoDeRot.clear();
-   fAcceptanceAzFitFunctionDeRot.clear();
+   fAcceptancePhiHisto.clear();
+   fAcceptancePhiFitFunction.clear();
+   fAcceptancePhiHistoDeRot.clear();
+   fAcceptancePhiFitFunctionDeRot.clear();
    for( int i = 0; i < 16; i++ )
    {
-      sprintf( hname, "hAccAz_%d", i );
-      fAcceptanceAzHisto.push_back( (TH1F*)fAcceptanceFile->Get( hname ) );
-      if( !fAcceptanceAzHisto.back() )
+      sprintf( hname, "hAccPhi_%d", i );
+      fAcceptancePhiHisto.push_back( (TH1F*)gDirectory->Get( hname ) );
+      if( !fAcceptancePhiHisto.back() )
       {
 	  cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance histogram " << hname << endl;
       }
-      sprintf( hname, "fAccAz_%d", i );
-      fAcceptanceAzFitFunction.push_back( (TF1*)fAcceptanceFile->Get( hname ) );
-      if( !fAcceptanceAzFitFunction.back() )
+      sprintf( hname, "fAccPhi_%d", i );
+      fAcceptancePhiFitFunction.push_back( (TF1*)gDirectory->Get( hname ) );
+      if( !fAcceptancePhiFitFunction.back() )
       {
 	  cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance fit function " << hname << endl;
       }
-      sprintf( hname, "hAccAzDerot_%d", i );
-      fAcceptanceAzHistoDeRot.push_back( (TH1F*)fAcceptanceFile->Get( hname ) );
-      if( !fAcceptanceAzHistoDeRot.back() )
+      sprintf( hname, "hAccPhiDerot_%d", i );
+      fAcceptancePhiHistoDeRot.push_back( (TH1F*)gDirectory->Get( hname ) );
+      if( !fAcceptancePhiHistoDeRot.back() )
       {
 	  cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance histogram " << hname << endl;
       }
-      sprintf( hname, "fAccAzDerot_%d", i );
-      fAcceptanceAzFitFunctionDeRot.push_back( (TF1*)fAcceptanceFile->Get( hname ) );
-      if( !fAcceptanceAzFitFunctionDeRot.back() )
+      sprintf( hname, "fAccPhiDerot_%d", i );
+      fAcceptancePhiFitFunctionDeRot.push_back( (TF1*)gDirectory->Get( hname ) );
+      if( !fAcceptancePhiFitFunctionDeRot.back() )
       {
 	  cout << "VPlotRadialAcceptance::addAcceptanceFile warning: could not find acceptance fit function " << hname << endl;
       }
    }
 // read acceptance fit function from file
    sprintf( hname, "fAccZe_%d", iZeBin );
-   fAcceptanceFunction = (TF1*)fAcceptanceFile->Get( hname );
+   fAcceptanceFunction = (TF1*)gDirectory->Get( hname );
    if( !fAcceptanceFunction )
    {
        cout << "VPlotRadialAcceptance::addAcceptanceFile: error finding acceptance fit function" << endl;
@@ -87,7 +97,7 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
    }
 // read acceptance histogram (fit values) from file
    sprintf( hname, "hAccZe_%dFit", iZeBin );
-   fAcceptanceHistoFit = (TH1F*)fAcceptanceFile->Get( hname );
+   fAcceptanceHistoFit = (TH1F*)gDirectory->Get( hname );
    if( !fAcceptanceHistoFit )
    {
        cout << "VPlotRadialAcceptance::addAcceptanceFile: error finding acceptance histogram (fitted)" << endl;
@@ -95,8 +105,10 @@ bool VPlotRadialAcceptance::openAcceptanceFile( string iFile, unsigned int iZeBi
        return false;
    }
 // read AZ distributions
-   hAzDist = (TH1F*)fAcceptanceFile->Get( "hAzDist" );
-   hAzDistDeRot = (TH1F*)fAcceptanceFile->Get( "hAzDistDeRot" );
+   hPhiDist = (TH1F*)gDirectory->Get( "hPhiDist" );
+   if( hPhiDist ) hPhiDist->Rebin( 5 );
+   hPhiDistDeRot = (TH1F*)gDirectory->Get( "hPhiDistDeRot" );
+   if( hPhiDistDeRot ) hPhiDistDeRot->Rebin( 5 );
 
    return true;
 }
@@ -229,11 +241,11 @@ void VPlotRadialAcceptance::setAxisRange( double x_min, double x_max, double y_m
 }
 
 
-TCanvas* VPlotRadialAcceptance::plotAzDependentRadialAcceptances( TCanvas *cX, int iIterator, bool iDeRot )
+TCanvas* VPlotRadialAcceptance::plotPhiDependentRadialAcceptances( TCanvas *cX, int iIterator, bool iDeRot )
 {
     if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
     {
-       cout << "VPlotRadialAcceptance::plotAzDependentRadialAcceptances() error: data missing";
+       cout << "VPlotRadialAcceptance::plotPhiDependentRadialAcceptances() error: data missing";
        return 0;
     }
 
@@ -247,10 +259,10 @@ TCanvas* VPlotRadialAcceptance::plotAzDependentRadialAcceptances( TCanvas *cX, i
     else
     {
        char hname[2000];
-       sprintf( hname, "cAcceptanceAZ_%s_%d", VUtilities::removeSpaces( fName ).c_str(), (int)iDeRot );
+       sprintf( hname, "cAcceptancePhi_%s_%d", VUtilities::removeSpaces( fName ).c_str(), (int)iDeRot );
        string iTitle = fName;
-       if( iDeRot ) fName += "(az dependent, derotated)";
-       else         fName += "(az dependent)";
+       if( iDeRot ) fName += "(Phi dependent, derotated)";
+       else         fName += "(Phi dependent)";
        cX = new TCanvas( hname, fName.c_str(), 60, 610, 600, 600 );
        cX->SetGridx( 0 );
        cX->SetGridy( 0 );
@@ -260,13 +272,13 @@ TCanvas* VPlotRadialAcceptance::plotAzDependentRadialAcceptances( TCanvas *cX, i
     vector< TF1* > iF1;
     if( !iDeRot )
     {
-       iHisto = fAcceptanceAzHisto;
-       iF1    = fAcceptanceAzFitFunction;
+       iHisto = fAcceptancePhiHisto;
+       iF1    = fAcceptancePhiFitFunction;
     }
     else
     {
-       iHisto = fAcceptanceAzHistoDeRot;
-       iF1    = fAcceptanceAzFitFunctionDeRot;
+       iHisto = fAcceptancePhiHistoDeRot;
+       iF1    = fAcceptancePhiFitFunctionDeRot;
     }
 
 // plot all histograms and plot them
@@ -275,7 +287,7 @@ TCanvas* VPlotRadialAcceptance::plotAzDependentRadialAcceptances( TCanvas *cX, i
     {
        if( i < iHisto.size() && iHisto[i] )
        {
-	  cout << "Az: " << iHisto[i]->GetTitle() << "\t color " << i_color << endl;
+	  cout << "Phi: " << iHisto[i]->GetTitle() << "\t color " << i_color << endl;
 	  iHisto[i]->SetMinimum( fAxis_y_min );
 	  iHisto[i]->SetMaximum( fAxis_y_max );
 	  iHisto[i]->SetAxisRange( fAxis_x_min, fAxis_x_max );
@@ -304,11 +316,11 @@ TCanvas* VPlotRadialAcceptance::plotAzDependentRadialAcceptances( TCanvas *cX, i
     return cX;
 }
 
-TCanvas*  VPlotRadialAcceptance::plotAzDistributions( TCanvas *cX )
+TCanvas*  VPlotRadialAcceptance::plotPhiDistributions( TCanvas *cX, int iColor )
 {
     if( !fAcceptanceFile || fAcceptanceFile->IsZombie() )
     {
-       cout << "VPlotRadialAcceptance::plotAzDistributions() error: data missing";
+       cout << "VPlotRadialAcceptance::plotPhiDistributions() error: data missing";
        return 0;
     }
 
@@ -322,29 +334,31 @@ TCanvas*  VPlotRadialAcceptance::plotAzDistributions( TCanvas *cX )
     else
     {
        char hname[2000];
-       sprintf( hname, "cAzDistribution%s", VUtilities::removeSpaces( fName ).c_str() );
+       sprintf( hname, "cPhiDistribution%s", VUtilities::removeSpaces( fName ).c_str() );
        string iTitle = fName;
-       fName += ", az distribution";
+       fName += ", Phi distribution";
        cX = new TCanvas( hname, fName.c_str(), 60, 610, 600, 600 );
        cX->SetGridx( 0 );
        cX->SetGridy( 0 );
     }
 
-    if( hAzDist )
+    if( hPhiDist )
     {
-	setHistogramPlottingStyle( hAzDist, 1 );
-	hAzDist = (TH1F*)VHistogramUtilities::normalizeTH1( (TH1*)hAzDist, false );
-	hAzDist->GetXaxis()->SetTitle( "azimuth (camera) [deg]" );
-	hAzDist->SetMinimum( 0 );
-        hAzDist->Draw( "he" );
+	setHistogramPlottingStyle( hPhiDist, iColor );
+	hPhiDist->SetLineWidth( 2 );
+	hPhiDist = (TH1F*)VHistogramUtilities::normalizeTH1( (TH1*)hPhiDist, false );
+	hPhiDist->GetXaxis()->SetTitle( "azimuth (camera) [deg]" );
+	hPhiDist->SetMinimum( 0 );
+        if( bPlotSame ) hPhiDist->Draw( "he same" );
+	else            hPhiDist->Draw( "he" );
 
-        if( hAzDistDeRot )
+/*        if( hPhiDistDeRot )
 	{
-	   hAzDistDeRot = (TH1F*)VHistogramUtilities::normalizeTH1( (TH1*)hAzDistDeRot, false );
-	   setHistogramPlottingStyle( hAzDistDeRot, 2 );
-	   hAzDistDeRot->Draw( "he same" );
-        }
-	TLine *iL = new TLine( hAzDist->GetXaxis()->GetXmin(), 1., hAzDist->GetXaxis()->GetXmax(), 1. );
+	   hPhiDistDeRot = (TH1F*)VHistogramUtilities::normalizeTH1( (TH1*)hPhiDistDeRot, false );
+	   setHistogramPlottingStyle( hPhiDistDeRot, 2 );
+	   hPhiDistDeRot->Draw( "he same" );
+        } */
+	TLine *iL = new TLine( hPhiDist->GetXaxis()->GetXmin(), 1., hPhiDist->GetXaxis()->GetXmax(), 1. );
 	iL->SetLineStyle( 2 );
 	iL->Draw();
     }

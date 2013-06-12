@@ -33,12 +33,12 @@ class VPlotRadialAcceptance : public VPlotUtilities
    TH1F*  fAcceptanceHisto;
    TH1F*  fAcceptanceHistoFit;
    TF1*   fAcceptanceFunction;
-   vector< TH1F* > fAcceptanceAzHisto;
-   vector< TF1* >  fAcceptanceAzFitFunction;
-   vector< TH1F* > fAcceptanceAzHistoDeRot;
-   vector< TF1* >  fAcceptanceAzFitFunctionDeRot;
-   TH1F*  hAzDist;
-   TH1F*  hAzDistDeRot;
+   vector< TH1F* > fAcceptancePhiHisto;
+   vector< TF1* >  fAcceptancePhiFitFunction;
+   vector< TH1F* > fAcceptancePhiHistoDeRot;
+   vector< TF1* >  fAcceptancePhiFitFunctionDeRot;
+   TH1F*  hPhiDist;
+   TH1F*  hPhiDistDeRot;
 
    double fAxis_x_min;
    double fAxis_x_max;
@@ -47,7 +47,7 @@ class VPlotRadialAcceptance : public VPlotUtilities
 
    public:
 
-   VPlotRadialAcceptance( string iFile = "" );
+   VPlotRadialAcceptance( string iFile = "", int iAzBin = -1 );
   ~VPlotRadialAcceptance() {}
 
    TF1*  getAcceptanceFunction() { return fAcceptanceFunction; }
@@ -55,10 +55,10 @@ class VPlotRadialAcceptance : public VPlotUtilities
    TH1F* getAcceptanceHistoFit() { return fAcceptanceHistoFit; }
 
    TCanvas* plotRadialAcceptance( TCanvas *cX = 0 );
-   TCanvas* plotAzDependentRadialAcceptances( TCanvas *cX = 0, int iIterator = 4, bool iDeRot = false );
-   TCanvas* plotAzDistributions( TCanvas *cX = 0 );
+   TCanvas* plotPhiDependentRadialAcceptances( TCanvas *cX = 0, int iIterator = 4, bool iDeRot = false );
+   TCanvas* plotPhiDistributions( TCanvas *cX = 0, int iColor = 1 );
    TCanvas* plotResiduals( TCanvas *cX = 0, double i_res_min = -0.5, double i_res_max = 0.5, bool iDrawChi2 = true );
-   bool     openAcceptanceFile( string iFile, unsigned int iZeBin = 0 );
+   bool     openAcceptanceFile( string iFile, unsigned int iZeBin = 0, int iAzBin = -1 );
    void     setAxisRange( double x_min = 0., double x_max = 2.5, double y_min = 0., double y_max = 1.5 );
    void     setName( string iName ) { fName = iName; }
    
