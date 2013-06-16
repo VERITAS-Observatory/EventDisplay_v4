@@ -48,6 +48,7 @@ VDifferentialFlux::VDifferentialFlux()
 */
 void VDifferentialFlux::print( bool bSED )
 {
+
     if( !bSED )
     {
         cout << "E: " << setprecision( 2 ) << setw( 4 ) << Energy << " [TeV]";
@@ -61,6 +62,44 @@ void VDifferentialFlux::print( bool bSED )
 	cout << setprecision( 2 ) << " (alpha=" << NOff_alpha << ")";
         cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tSign.: " << Significance << " sigma";
         cout << setw( 7 ) << fixed << setprecision( 1 ) << "\tObs.Time: " << ObsTime << "[s]";
+        cout << endl;
+    }
+    else
+    {
+        if( Energy_Hz > 0. )
+        {
+            cout << scientific;
+            cout << setprecision( 8 ) << MJD_min << "\t" << MJD_max << "\t";
+            cout << setprecision( 3 ) << Energy_Hz << "\t";
+            cout << DifferentialFlux_vFv << "\t";
+            cout << DifferentialFluxError_vFv;
+            cout << endl;
+        }
+    }
+}
+
+
+/*
+    print all data but without texts, so that the output can be copied 
+    for printing externally. e.g. in gnuplot
+
+    bSED = true: print vF_v fluxes to be used in VSpectralEnergyDistribution
+*/
+void VDifferentialFlux::printClean( bool bSED )
+{
+    if( !bSED )
+    {
+        cout <<  setprecision( 5 ) << setw( 7 ) << Energy ;
+	cout << "    " << Energy_lowEdge << "    " << Energy_upEdge ;
+        cout << "    " << dE ;
+        if( DifferentialFluxError > 0. ) cout << scientific << setprecision( 3 ) <<  "\t " << DifferentialFlux << "   " << DifferentialFluxError;
+        else                             cout << scientific << setprecision( 3 ) << "\t " << DifferentialFlux <<  "   0.0  ";
+        cout << "   ";
+        cout << setw( 7 ) << fixed << setprecision( 1 ) << "\t " << NOn << " " << NOn_error;
+        cout << setw( 7 ) << fixed << setprecision( 1 ) << "   " << NOff << " " << NOff_error;
+	cout << setprecision( 2 ) << "     " << NOff_alpha ;
+        cout << setw( 7 ) << fixed << setprecision( 1 ) << "    " << Significance ;
+        cout << setw( 7 ) << fixed << setprecision( 1 ) << "    " << ObsTime ;
         cout << endl;
     }
     else

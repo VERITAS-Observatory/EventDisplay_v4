@@ -3,6 +3,8 @@
 #ifndef VFLUXCALCULATION_H
 #define VFLUXCALCULATION_H
 
+# define MAX_SAFE_MC_ENERGY 300.0
+
 #include "TCanvas.h"
 #include "TDirectory.h"
 #include "TFile.h"
@@ -122,7 +124,7 @@ class VFluxCalculation : public TObject
 // spectral parameters (assuming power law)
         double fMinEnergy;                        //!< calculate flux limit above this energy [TeV]
         double fMaxEnergy;                        //!< maximum energy to be taken into account [TeV]
-        double fE0;                               //!< calculate flux at this energy [TeV]
+        double fE0;                               //!< calculate flux normalization at this energy [TeV]
         double fAlpha;                            //!< assumed spectral index
 
 
@@ -199,12 +201,12 @@ class VFluxCalculation : public TObject
         void          printDebugSummary();
         bool          readRXTE( string ifile );
         void          setDebug( bool iB ) { fDebug = iB; }
-        void          setSpectralParameters( double iMinEnergy_TeV = 0., double E0 = 1., double alpha = -2.5 );
+        void          setSpectralParameters( double iMinEnergy_TeV = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy_TeV = MAX_SAFE_MC_ENERGY );
         void          setSignificanceParameters( double iThresholdSignificance = 3., double iMinEvents = 5, 
 	                                         double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
         void          setTimeBinnedAnalysis( bool iB = true ) { fTimebinned = iB; }
         void          writeResults( char *ifile );
 
-        ClassDef(VFluxCalculation,12);
+        ClassDef(VFluxCalculation,13); // BB changed to 13 on 6 Jun 2013, on the branched version
 };
 #endif

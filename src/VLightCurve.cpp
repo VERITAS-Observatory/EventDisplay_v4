@@ -406,9 +406,10 @@ void VLightCurve::setSignificanceParameters( double iSig, double iMinEvents, dou
 }
 
 
-void VLightCurve::setSpectralParameters( double iMinEnergy, double  E0, double alpha )
+void VLightCurve::setSpectralParameters( double iMinEnergy, double  E0, double alpha, double iMaxEnergy )
 {
     fMinEnergy = iMinEnergy;
+    fMaxEnergy = iMaxEnergy;
     fE0 = E0;
     fAlpha = alpha;
 }

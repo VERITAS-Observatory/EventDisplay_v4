@@ -43,7 +43,8 @@ int makeEnergySpectrum(char * anasumrootfile,
 		       double EminFit = 0.1, double EmaxFit = 50.,// min and max energies for the fit
 		       double Earea_fraction_threshold = 0.1,     // definine threshold as the energy where A_eff falls a fraction of the maximum A_Eff
 		       double minSigmaPerBin = 1.5, double minEvtsPerBin = 5.0, // which bins to plot, according to the minimum sigma and excess-events per bin
-		       double TimeBinLength_days = 1., double minSigmaLC = 2.0) // Params of light curve
+		       double TimeBinLength_days = 1., double minSigmaLC = 2.0, double EmaxLC = 300., // Params of light curve
+		       double MJDmin= -1., double MJDmax=-1.)
 {  
   double fitNormalization=-1.1, fitGamma = -1., intFlux=-1.1, intFlux2=-1.1, intFluxErr=-1.1, intFluxUL=-1.1;
   
@@ -82,7 +83,7 @@ int makeEnergySpectrum(char * anasumrootfile,
 
   TCanvas *c2 = e->plot();
   // Plot bins and event details
-  e->plotEventNumbers();
+  //e->plotEventNumbers();
 
   e->printEnergyBins();
 
@@ -151,25 +152,33 @@ int makeEnergySpectrum(char * anasumrootfile,
       ++i;
     }
   */
-
+  
   // Calculate Integral Fluxes
-  f->setSpectralParameters( EminFit, Enorm, gamma);
+  f->setSpectralParameters(Ethr, Enorm, fitGamma, EmaxLC);
   f->setTimeBinnedAnalysis(true);
+      //setSignificanceParameters( double iThresholdSignificance = 3., double iMinEvents = 5, 
+      //double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
+  f->setSignificanceParameters( minSigmaLC ); 
   f->calculateIntegralFlux(Ethr);
   f->printResults();
-  //f->plotFluxesVSMJD(); 
-  f->plotFluxesVSMJDDaily(); 
+  //f->plotFluxesVSMJD();         // run wise bins
+  //f->plotFluxesVSMJDDaily();  // daily bins
+  f->plotFluxesInBINs();    // smallest bins
 
   f->getFlux(-1, intFlux, intFluxErr, intFluxUL);
-  
   if(intFluxUL==-99.)
     fprintf(stderr, " Integral flux = %.3e +- %.3e\n", intFlux, intFluxErr);  
+  f->writeResults("out_VFluxCalculation_results.root");
+  
 
+  std::cout << "\nOutput from VLightCurve follows" << std::endl;
   VLightCurve *iLightCurve = new VLightCurve();
-  iLightCurve->initializeTeVLightCurve( anasumrootfile, TimeBinLength_days );  // e.g. TimeBineLength_days=1 for daily binning
-  iLightCurve->setSignificanceParameters( minSigmaLC ); // plot ULs for poins with <2 sigma significance
-  iLightCurve->fill( Ethr ); // calculate fluxes and upper flux limits for energies >0.2 GeV
-  iLightCurve->plotLightCurve();   // plot the light curve
+  iLightCurve->initializeTeVLightCurve( anasumrootfile, TimeBinLength_days, MJDmin, MJDmax );  // e.g. TimeBineLength_days=1 for daily binning
+  iLightCurve->setSpectralParameters( Ethr, Enorm, fitGamma, EmaxLC);
+  iLightCurve->setSignificanceParameters( minSigmaLC );                        // plot ULs for poins with <2 sigma significance
+  iLightCurve->fill( Ethr, EmaxLC);            // calculate fluxes and upper flux limits for energies >0.2 GeV
+  //iLightCurve->plotLightCurve();        // plot the light curve
+  //iLightCurve->printResults();
   //
 
   std::cout << "\nCoder's WARNING: If BPL is used - check the output of the fitter and note the Error Matrix is not from MINOS" << endl;

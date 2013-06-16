@@ -1021,7 +1021,12 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 */
 void VEnergySpectrum::printDifferentialFluxes( bool bSED )
 {
-    for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ ) fDifferentialFlux[i].print( bSED );
+  //for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ ) fDifferentialFlux[i].print( bSED );
+  cout << "\n#----------------------------------------------------------------------------------------------------------------------------#" << endl;
+  cout << "# <E>         E_min       E_max    dE         (dN/dE & Err or UL & 0.0)     NOn  Err      NOff  Err      alpha      sign     T "  << endl;
+  cout << "# TeV          TeV        TeV      TeV              1/cm^2/s/TeV                                                    sigma    s " << endl; 
+  for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ ) fDifferentialFlux[i].printClean( bSED );
+  cout << "#------------------------------------------------------------------------------------------------------------------------------#" << endl;
 }
 
 /*
@@ -1286,31 +1291,47 @@ void VEnergySpectrum::plotFitValues()
 // curvature index
     double i_curvatureV;
     double i_curvatureE;
-
-
- if (fSpectralFitFunction==0)
-    { // 1) simple power law 
-      sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE );
-    }
+// break energy and second slope for a BPL fit
+    double i_breakenergyV;
+    double i_breakenergyE;
+    double i_index2V;
+    double i_index2E;    
+    
+    if (fSpectralFitFunction==0)
+      { // 1) simple power law 
+	sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE );
+      }
     else if (fSpectralFitFunction==1)
-    {
-      // get energy cutoff
-      i_ecutoffV = fEnergy->GetParameter( 2 );
-      i_ecutoffE = fEnergy->GetParError( 2 );
-
-      // 2) power law with exponential cutoff
-      sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f}e^{E/(%.2f#pm%.2f)} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_ecutoffV, i_ecutoffE );
-    }
+      {
+	// get energy cutoff
+	i_ecutoffV = fEnergy->GetParameter( 2 );
+	i_ecutoffE = fEnergy->GetParError( 2 );
+	
+	// 2) power law with exponential cutoff
+	sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f}e^{E/(%.2f#pm%.2f)} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_ecutoffV, i_ecutoffE );
+      }
+    else if (fSpectralFitFunction==2)
+      {
+	// get break energy and second index 
+	i_breakenergyV = fEnergy->GetParameter( 3 );
+	i_breakenergyE = fEnergy->GetParError( 3 );
+	i_index2V = fEnergy->GetParameter( 2 );
+	i_index2E = fEnergy->GetParError( 2 );
+	
+	// 3) broken power law
+	sprintf( hname, "#splitline{(%.2f#pm%.2f)#times 10^{%d} (E/(%.2f#pm%0.02f) TeV)^{#Gamma}[cm^{-2}s^{-1}TeV^{-1}];}{   E<%0.2f, #Gamma = %0.2f#pm%0.2f else #Gamma = %0.2f#pm%0.2f}", i_manV, i_manE, i_expV, i_breakenergyV, i_breakenergyE, i_breakenergyV, i_indexV, i_indexE, i_index2V, i_index2E);
+      } 
     else if (fSpectralFitFunction==3)
-    {
-      // get curvature index
-      i_curvatureV = fEnergy->GetParameter( 2 );
-      i_curvatureE = fEnergy->GetParError( 2 );
-
-      // 3) curved power law
-      sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f + (%.2f#pm%.2f)E} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_curvatureV, i_curvatureE );
-    }
-
+      {
+	// get curvature index
+	i_curvatureV = fEnergy->GetParameter( 2 );
+	i_curvatureE = fEnergy->GetParError( 2 );
+	
+	// 4) curved power law
+	sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f + (%.2f#pm%.2f)E} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_curvatureV, i_curvatureE );
+      }
+    
+    
     tL2->SetNDC( 1 );
     tL2->SetTextSize( 0.030 );
     tL2->DrawLatex( 0.18, 0.19, hname );

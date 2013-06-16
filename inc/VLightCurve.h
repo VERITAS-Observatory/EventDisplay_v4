@@ -106,9 +106,9 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
                                        double iUpperLimit = 0.99, int iUpperlimitMethod = 0, int iLiMaEqu = 17 );
    void     setLightCurveAxis( double iYmin = -9.e10, double iYmax = -9.e10, string iAxisTitle = "tevRate" );
    void     setName( string iName ) { fName = iName; }
-   void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5 );
+   void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy = MAX_SAFE_MC_ENERGY );
 
-   ClassDef( VLightCurve, 7 );
+   ClassDef( VLightCurve, 8 ); // BB changed to 8 on 6 Jun 2013, on the branched version
 };
 
 #endif
