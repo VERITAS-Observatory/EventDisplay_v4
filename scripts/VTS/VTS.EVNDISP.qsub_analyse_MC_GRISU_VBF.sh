@@ -29,6 +29,7 @@ if( $ARRAY == "V4" ) then
 #      set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
 #       set IFIL=Apr12_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set IFIL=Oct2012_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      set IFIL=gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM22_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47460
       set NRUN=1
@@ -40,6 +41,7 @@ if( $ARRAY == "V4" ) then
       set NRUN=3
    endif
    set CFG="EVN_V4_Autumn2007_20130110.txt"
+   set CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
 # noise file
    set NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
    echo "NOISE FILE " $NOISEFILE

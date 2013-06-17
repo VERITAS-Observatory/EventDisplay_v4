@@ -42,24 +42,33 @@ RUNP=$5
 # cut definitions
 if [[ "$CUTS" == *super* ]]
 then
-   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft.dat"
-   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft-MaxErec.dat"
-   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-CC-d20121424.root"
-   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
-   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+#   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft.dat"
+#   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft-MaxErec.dat"
+#   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-CC-d20121424.root"
+#   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+#   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-SuperSoft.dat"
+   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-ATM21-EPOCHSETTING-T1234-d20130521.root"
+   RADACC="radialAcceptance-d20130411-cut-N2-Point-005CU-Soft-EPOCHSETTING-T1234.root"
 elif [[ "$CUTS" == *soft* ]]
 then
 #   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
-   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N2-Point-005CU-Soft.dat"
-   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
-   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+#   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N2-Point-005CU-Soft.dat"
+#   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+#   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
+   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
+   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Soft-ATM21-EPOCHSETTING-T1234-d20130521.root"
+   RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-EPOCHSETTING-T1234.root"
 elif [[ $CUTS = *moderate* ]]
 then
 #   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218_T123.root"
 #   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T123-d20121218.root"
-   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Moderate.dat"
-   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
-   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+#   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Moderate.dat"
+#   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+#   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Moderate.dat"
+   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-ATM21-EPOCHSETTING-T1234-d20130521.root"
+   RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 # UV Filter
 #   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-V6-ATM21-UV-d20121218.root"
 #   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
@@ -68,6 +77,12 @@ then
   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Hard.dat"
   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+# energy dependent theta2 cut
+elif [[ $CUTS = *VT2* ]]
+then
+  CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-VariableTheta2-Moderate.dat"
+  EFFAREA="eff-N3-VT2-moderate-21-V6-0-0-20-0.5-200.root"
+  RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 else
    echo "error: unknown cut definition: $CUTS"
    echo "    allowed are *soft*, *moderate*"
@@ -124,6 +139,9 @@ do
    if [ $R -lt 46642 ]
    then
      EPOCH="V4"
+# PRELI only one effective area available for V4
+     EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+     RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
    elif [ $R -gt 63408 ]
    then
      EPOCH="V6"

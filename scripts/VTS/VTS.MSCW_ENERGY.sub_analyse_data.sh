@@ -5,7 +5,7 @@
 # Author: Gernot Maier
 #
 
-if [ $# -ne 4 ]
+if [ $# -ne 3 ]
 then
    echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run> [ID]"
    echo
