@@ -1309,7 +1309,7 @@ void VEventLoop::terminate( int iAna )
         }
     }
     cout << "Number of events with GPS faults (status bit set): " << endl;
-    for( unsigned int i = 0; i < fGPSClockWarnings.size(); i++ )
+    for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
     {
        cout << "\t Telescope " << getTeltoAna()[i]+1 << ": " << fGPSClockWarnings[i] << endl;
     }
