@@ -89,7 +89,7 @@ void VDBRunInfo::readRunDQM( string iDBserver )
       bitset<4> bitNDQM;
 
       for( int i = 0; i < (int)bitDQM.size(); i++ )
-        bitNDQM.set((int)bitDQM.size()-i-1) = bitDQM.test(i);
+        bitNDQM.set((int)bitDQM.size()-i-1, bitDQM.test(i));
 
       bitNDQM = ~bitNDQM;
       bitset<4> bitNewConfig = bitConfig & bitNDQM;
