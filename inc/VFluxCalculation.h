@@ -179,6 +179,8 @@ class VFluxCalculation : public TObject
 	void          getFluxConfidenceInterval( int irun, double& iFlux_low, double& iFlux_up, bool b1Sigma = true );
         vector< double > getFlux() { return fRunFlux; }
         vector< double > getFluxError() { return fRunFluxE; }
+        vector< double > getFluxConstant() { return fRunFluxConstant; }
+        vector< double > getFluxConstantError() { return fRunFluxConstantE; }	
         vector< double > getMJD() { return fRunMJD; }
         double           getMJD( int iRun );
         vector< double > getRunList() { return fRunList; }
