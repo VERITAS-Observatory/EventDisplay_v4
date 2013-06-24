@@ -58,7 +58,7 @@ QLOG=$VERITAS_USER_LOG_DIR/$DATE/
 mkdir -p $QLOG
 
 # output directory for shell scripts
-SCRDIR=$VERITAS_USER_LOG_DIR"/queueShelldir/"
+SCRDIR=$VERITAS_USER_LOG_DIR"/queueShellDir/"
 mkdir -p $SCRDIR
 echo $SCRDIR
 
