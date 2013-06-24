@@ -30,7 +30,7 @@ fi
 # loop over all files/cases
 for V in $4
 do
-   for C in N2-Point-005CU-Soft N3-Point-005CU-Hard N3-Point-005CU-Moderate N3-Point-005CU-Soft
+   for C in N2-Point-005CU-Soft N3-Point-005CU-Hard N3-Point-005CU-Moderate N3-Point-005CU-Soft N2-Point-005CU-SuperSoft
    do
      for I in $5
      do
