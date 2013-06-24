@@ -1311,7 +1311,9 @@ void VEventLoop::terminate( int iAna )
     cout << "Number of events with GPS faults (status bit set): " << endl;
     for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
     {
-       cout << "\t Telescope " << getTeltoAna()[i]+1 << ": " << fGPSClockWarnings[i] << endl;
+       cout << "\t Telescope " << getTeltoAna()[i]+1 << ": ";
+       if( i < fGPSClockWarnings.size() ) cout << fGPSClockWarnings[i];
+       cout << endl;
     }
 
     cout << endl << "Analyzed " << iAna << " events" << endl;
@@ -1366,7 +1368,7 @@ void VEventLoop::setEventTimeFromReader()
 	    if( fGPSClockWarnings[i] < 30 && fDebug )
 	    {
 
-		 cout << " VEventLoop::setEventTimeFromReader: warning, event with GPS error status in telescope " << getTeltoAna()[i]+1 << endl;
+		 cout << " VEventLoop::setEventTimeFromReader: info, event with GPS error status in telescope " << getTeltoAna()[i]+1 << endl;
 		 cout << "\t error status " << fGPS.getStatus();
 		 if( fGPS.getStatus()&0x0001 )
 		 {
@@ -1383,7 +1385,7 @@ void VEventLoop::setEventTimeFromReader()
             }
 	    else if( fGPSClockWarnings[i] == 30 )
 	    {
-	       cout << " VEventLoop::setEventTimeFromReader: warning more then 30 warnings on the GPS error status" << endl;
+	       cout << " VEventLoop::setEventTimeFromReader: info, more than 30 events with GPS status set" << endl;
 	       cout << " (Telescope " << getTeltoAna()[i]+1 << ")" << endl;
             }
         }
