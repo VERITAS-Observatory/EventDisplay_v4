@@ -108,7 +108,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
    void     setName( string iName ) { fName = iName; }
    void     setSpectralParameters( double iMinEnergy = 0., double E0 = 1., double alpha = -2.5, double iMaxEnergy = MAX_SAFE_MC_ENERGY );
 
-   ClassDef( VLightCurve, 8 ); // BB changed to 8 on 6 Jun 2013, on the branched version
+   ClassDef( VLightCurve, 8 );
 };
 
 #endif
