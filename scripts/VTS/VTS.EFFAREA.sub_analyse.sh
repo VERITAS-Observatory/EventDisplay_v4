@@ -117,7 +117,7 @@ echo "
 	 chmod u+x $FNAM.sh
 	 echo $FNAM.sh
 # submit job
-         qsub -js 200 -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $LDIR -e $LDIR "$FNAM.sh"
+         qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $LDIR -e $LDIR "$FNAM.sh"
 
 	 echo "writing run parameter file to $LOGDIR/$FFIR.dat"
 	 echo "writing analysis parameter files to $FNAM.sh"
