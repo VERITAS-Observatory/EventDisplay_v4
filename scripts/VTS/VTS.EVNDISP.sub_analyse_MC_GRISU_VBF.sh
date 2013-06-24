@@ -34,13 +34,23 @@ ATMO=$4
 # wobble offsets
 WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
 WWOF=( 050 000 025 075 100 125 150 175 200 )
-#WOFF=( 0.5 )
-#WWOF=( 050 )
 NWOFF=${#WOFF[@]}
 # NOISE levels
 NOISE=( 200 250 075 100 150 325 425 550 750 1000 )
 NNOIS=${#NOISE[@]}
 
+NFIL="1"
+if [ $PART = "14" ]
+then
+   NFIL="28"
+fi
+NRUN=65000
+################################################
+# loop over files of same type
+################################################
+for (( f = 0; f <= $NFIL; f++ ))
+do
+   echo "FILE $f"
 ################################################
 # loop over all wobble offsets and noise level
 ################################################
@@ -48,10 +58,12 @@ for (( k = 0; k < $NWOFF; k++ ))
 do
    WOB=${WOFF[$k]}
    WOG=${WWOF[$k]}
+   echo "WOF $k $WOB $WOB"
 
    for (( n = 0; n < $NNOIS; n++ ))
    do
      NOIS=${NOISE[$n]}
+     echo "NOISE $n $NOIS"
 
 ###############################################################################################################
 # target directory for simulation output files
@@ -68,7 +80,9 @@ do
      if [ $PART = "14" ]
      then
 	 DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/vbf/"
-	 ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/proton_"$ZEW"deg_750m/wobble_$WOB/"
+	 DDIR=/lustre/fs5/group/cta/VERITAS/simulations/"$ARRAY"_FLWO/grisu/ATM21/proton_1000mScat_"$ARRAY"_Oct2012_PrePostUpgradeCompare_20130423_V420_ATM21_20deg_050wob
+	 ODIR="/lustre/fs9/group/cta/users/maierg/VERITAS/analysis/EVDv400/"$ARRAY"_FLWO/proton_"$ZEW"deg_750m/wobble_$WOB/"
+	 NFIL=28
      fi
      if [ $PART = "402" ]
      then
@@ -94,10 +108,18 @@ do
 #   fi
 
    CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_GRISU_VBF"
-   OSCRIPT="qsub_evndisp_MC_VBF-$ZEW-$WOB-$NOIS-$ATMO"
+   OSCRIPT="qsub_evndisp_MC_VBF-$ZEW-$WOB-$NOIS-$ATMO-$f"
+
+# file number (useful for protons only)
+    sed -e "s/NFINFIL/$f/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-a.sh
+
+# run number
+    sed -e "s/RUNRUNRUN/$NRUN/" $FDIR/$OSCRIPT-a.sh > $FDIR/$OSCRIPT-aa.sh
+    rm -f $FDIR/$OSCRIPT-a.sh
 
 # set zenith angle
-    sed -e "s/123456789/$ZEW/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-b.sh
+    sed -e "s/123456789/$ZEW/"  $FDIR/$OSCRIPT-aa.sh > $FDIR/$OSCRIPT-b.sh
+    rm -f $FDIR/$OSCRIPT-aa.sh
 
 # add data directory
     sed -e "s|DATADIR|$DDIR|" $FDIR/$OSCRIPT-b.sh > $FDIR/$OSCRIPT-c.sh
@@ -137,6 +159,9 @@ do
 
   done
 
+done
+
+    let "NRUN = $NRUN + 1"
 done
 
 exit
