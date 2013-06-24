@@ -17,12 +17,11 @@ set DDIR="DDDD"
 set OFIL=OOOO
 # output directory
 set ODIR=ODOD
+#
+mkdir -p $ODIR
 
 ###################################################################
 # combine effective areas
-$EVNDISPSYS/bin/combineEffectiveAreas "$DDIR" $TMPDIR/$OFIL false
-
-mkdir -p $ODIR
-mv -f $TMPDIR/$OFIL* $ODIR/
+$EVNDISPSYS/bin/combineEffectiveAreas "$DDIR" $ODIR/$OFIL false >& $ODIR/$OFIL.combine.log 
 
 exit
