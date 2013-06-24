@@ -5,7 +5,7 @@
 # Author: Gernot Maier
 #
 
-if [ $# -ne 3 ]
+if [ $# -ne 3 ] && [ $# -ne 4 ]
 then
    echo "VTS.MSCW_ENERGY.sub_analyse_data.sh <table file> <directory of evndisp files> <list of run> [ID]"
    echo
@@ -44,7 +44,7 @@ FILES=`cat $BLIST`
 DATE=`date +"%y%m%d"`
 QLOG=$VERITAS_USER_LOG_DIR/$DATE/
 mkdir -p $QLOG
-QLOG="/dev/null"
+#QLOG="/dev/null"
 
 # output directory for shell scripts
 SHELLDIR=$VERITAS_USER_LOG_DIR"/queueShellDir/"
