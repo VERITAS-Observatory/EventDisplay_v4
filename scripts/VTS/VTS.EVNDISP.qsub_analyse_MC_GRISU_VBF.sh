@@ -16,6 +16,8 @@ set FDIR=DATADIR
 set YDIR=OUTDIR
 set PART=IDIDID
 set ATMO=AAAAAAAA
+set SFIXRUN=RUNRUNRUN
+set SFILN=NFINFIL
 ##############################################################################################
 # input files
 # (observe that these might need some adjustments)
@@ -58,9 +60,10 @@ if( $ARRAY == "V5" ) then
    endif
    if( $PART == "14" ) then
       set IFIL=proton_"$ZEW"deg_w"$WOB"_
-      set RUN=( 900 )
+      set IFIL="PrePostUpgradeCompare_20130423.NC$SFILN.vbf.bz2"
+      set RUN=( $SFILN )
       set NRUN=1
-      set SRUN=47570
+      set SRUN=$SFIXRUN
    endif
    if( $PART == "402" ) then
       set IFIL=helium_"$ZEW"deg_w"$WOB"_
@@ -85,15 +88,19 @@ if( $ARRAY == "V6" ) then
       if( $ATMO == "21-UV" ) then
          set IFIL=gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_"$ZEW"deg_"$WOG"
       endif
+      if( $ATMO == "21-SNR" ) then
+         set IFIL=gamma_V6_201304_SN2013ak_v420_ATM21_"$ZEW"deg_"$WOG"
+      endif
       set RUN=( "wobb" )
       set SRUN=65000
       set NRUN=1
    endif
    if( $PART == "14" ) then
       set IFIL=proton_"$ZEW"deg_w"$WOB"_
-      set RUN=( 900 )
+      set IFIL="PrePostUpgradeCompare_20130423.NC"
+      set RUN=( $SFILN )
       set NRUN=1
-      set SRUN=47570
+      set SRUN=$SFIXRUN
    endif
    if( $PART == "402" ) then
       set IFIL=helium_"$ZEW"deg_w"$WOB"_
@@ -101,7 +108,6 @@ if( $ARRAY == "V6" ) then
       set NRUN=1
       set SRUN=47570
    endif
-#   set CFG="veritasBC4N_090916_Autumn2009-4.1.5_EVNDISP.cfg"
    set CFG="EVN_V6_Upgrade_20121127_v420.txt"
 # noise file (V6!)
    set NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE"_20120827_v420.grisu
