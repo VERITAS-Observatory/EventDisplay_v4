@@ -1094,28 +1094,35 @@ void VReadRunParameter::test_and_adjustParams()
         }
     }
 
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 // set default camera configurations
     if( !fusercamera )
     {
-// configuration from Sept 2009 to July 2012
+////////////////////////////////////////////
+// configuration from Sept 2009 to July 2012: V5
 // (after the T1 move)
        if( fRunPara->frunnumber > 46642 && fRunPara->frunnumber < 63409 ) 
        {
            fRunPara->fcamera[0] = "EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt";
        }
-// configuration until August 2009
+////////////////////////////////////////////
+// configuration until August 2009: V4
 // (before the T1 move)
        else if( fRunPara->frunnumber <= 46642 )
        {
-          fRunPara->fcamera[0] = "EVN_V4_Autumn2007_20130110.txt";
+          fRunPara->fcamera[0] = "EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt";
        }
-// configuration from Sep 2012
-// PRELI: this is a file with upgraded pixel positions
+////////////////////////////////////////////
+// configuration from Sep 2012: V6
+// (after the PMT and camera upgrade
        else
        {
           fRunPara->fcamera[0] = "EVN_V6_Upgrade_20121127_v420.txt";
        }
     }
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 
 // set camera file name to dstfile for dst reading
     if( fRunPara->fsourcetype == 4 || fRunPara->fsourcetype == 7 )
