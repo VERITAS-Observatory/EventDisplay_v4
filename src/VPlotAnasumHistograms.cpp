@@ -262,7 +262,7 @@ void VPlotAnasumHistograms::plot_mscPlots( int irebin, double xmin, double xmax,
         c_mscw->Divide( 2, 1 );
 
         c_mscw->cd( 1 );
-        hmscw_on->SetAxisRange( -2., 10. );
+        hmscw_on->SetAxisRange( xmin, xmax );
         hmscw_on->SetTitle( "" );
 
         hmscw_on->Draw( "hist e");
@@ -1362,7 +1362,13 @@ void VPlotAnasumHistograms::plot_RBM_ring( double r, double iA, double t2, doubl
 void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, int iColor )
 {
     char itemp[200];
-    sprintf( itemp, "run_%d/stereo/debug/", fRunNumber );
+    if( fRunNumber >= 0 ) sprintf( itemp, "run_%d/stereo/debug/", fRunNumber );
+    else
+    {
+        cout << "plotting of reflected regions only possible for a particular run" << endl;
+	cout << "specify with VPlotAnasumHistograms::setRunNumber( int iRun )" << endl;
+	return;
+    }
 
     TFile *f1 = 0;
 
