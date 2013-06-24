@@ -328,7 +328,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 
 /////////////
 // plot fluxes or confidence intervals
-       if( fLightCurveData[i] && fLightCurveData[i]->getFluxError() >= 0. )
+       if( fLightCurveData[i] && fLightCurveData[i]->getFluxError() > 0. )
        {
 	  if( iPlotConfidenceInterval < 0 )
 	  {
@@ -362,8 +362,9 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 // plot upper flux limits
        else if( fLightCurveData[i]->fUpperFluxLimit > 0. )
        {
-           TArrow *fUL = new TArrow( iMJD_mean, fLightCurveData[i]->fUpperFluxLimit, iMJD_mean, 
-	                             fLightCurveData[i]->fUpperFluxLimit - 0.05*hLightCurve->GetMaximum(), 0.01, "|-|>" );
+	   double UL = fLightCurveData[i]->fUpperFluxLimit;
+	   cout << UL << endl;
+           TArrow *fUL = new TArrow( iMJD_mean, UL, iMJD_mean, UL - 0.05*hLightCurve->GetMaximum(), 0.01, "|-|>" );
 	   setArrowPlottingStyle( fUL );
 	   fUL->Draw(); 
        }

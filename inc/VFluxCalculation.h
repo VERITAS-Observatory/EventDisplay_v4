@@ -209,6 +209,6 @@ class VFluxCalculation : public TObject
         void          setTimeBinnedAnalysis( bool iB = true ) { fTimebinned = iB; }
         void          writeResults( char *ifile );
 
-        ClassDef(VFluxCalculation,13); // BB changed to 13 on 6 Jun 2013, on the branched version
+        ClassDef(VFluxCalculation,13);
 };
 #endif

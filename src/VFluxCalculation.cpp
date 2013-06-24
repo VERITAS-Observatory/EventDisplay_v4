@@ -1202,6 +1202,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
         cout << "using upper flux calculation after ";
         if( fUpperLimitMethod == 0 ) cout << "Helene";
         else if( fUpperLimitMethod == 3 ) cout << "Feldman & Cousins";
+        else if( fUpperLimitMethod == 4 ) cout << "Rolke et al";
         cout << ", " << fUpperLimit * 100. << "\% upper limit" << endl;
         cout << "threshold significance is " << fThresholdSignificance << " sigma or less than " << fMinEvents << " events" << endl;
         cout << endl;
