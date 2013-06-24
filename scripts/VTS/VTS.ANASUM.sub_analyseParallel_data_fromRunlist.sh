@@ -8,7 +8,7 @@
 if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] 
 then
    echo
-   echo "VTS.ANASUM.sub_analyseParallel_data.sh <run list> <data directory with mscw files> <cut set> <output directory for anasum products> <run parameter file>"
+   echo "VTS.ANASUM.sub_analyseParallel_data.sh <run list> <data directory with mscw files> <run parameter file> <output directory for anasum products> <cut set/background model>"
    echo
    echo "   <run list>     simple run list "
    echo 
@@ -34,13 +34,23 @@ fi
 
 RLIST=$1
 DDIR=$2
-CUTS=$3
+RUNP=$3
 ODIR=$4
-RUNP=$5
+CUTS=$5
+ATMO="ATM21"
+if [[ "$CUTS" == *22* ]]
+then
+  ATMO="ATM22"
+fi
 
 #########################################
 # cut definitions
-if [[ "$CUTS" == *super* ]]
+if [[ "$CUTS" == *GRB* ]]
+then
+   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-SuperSoft.dat"
+   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-$ATMO-V6-T1234-d20130521.root"
+   RADACC="radialAcceptance-d20130411-cut-N2-Point-005CU-SuperSoft-V6-T1234.root"
+elif [[ "$CUTS" == *super* ]]
 then
 #   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft.dat"
 #   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft-MaxErec.dat"
@@ -48,8 +58,8 @@ then
 #   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
 #   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
    CUTFILE="ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-SuperSoft.dat"
-   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-ATM21-EPOCHSETTING-T1234-d20130521.root"
-   RADACC="radialAcceptance-d20130411-cut-N2-Point-005CU-Soft-EPOCHSETTING-T1234.root"
+   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-$ATMO-V6-T1234-d20130521.root"
+   RADACC="radialAcceptance-d20130411-cut-N2-Point-005CU-SuperSoft-V6-T1234.root"
 elif [[ "$CUTS" == *soft* ]]
 then
 #   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
@@ -57,7 +67,7 @@ then
 #   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
 #   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
    CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
-   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Soft-ATM21-EPOCHSETTING-T1234-d20130521.root"
+   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20130521.root"
    RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-EPOCHSETTING-T1234.root"
 elif [[ $CUTS = *moderate* ]]
 then
@@ -67,10 +77,10 @@ then
 #   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
 #   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
    CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Moderate.dat"
-   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-ATM21-EPOCHSETTING-T1234-d20130521.root"
+   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20130521.root"
    RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 # UV Filter
-#   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-V6-ATM21-UV-d20121218.root"
+#   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-V6-$ATMO-UV-d20121218.root"
 #   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
 elif [[ $CUTS = *hard* ]]
 then
@@ -82,7 +92,7 @@ elif [[ $CUTS = *VT2* ]]
 then
   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-VariableTheta2-Moderate.dat"
   EFFAREA="eff-N3-VT2-moderate-21-V6-0-0-20-0.5-200.root"
-  RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
+  RADACC="radialAcceptance-d20130411-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 else
    echo "error: unknown cut definition: $CUTS"
    echo "    allowed are *soft*, *moderate*"
@@ -96,6 +106,7 @@ if [[ "$CUTS" == *RE* ]]
 then
    BM="RE"
    BMPARA="0.1 1 20"
+   BMPARA="0.1 3 4"
 elif [[ "$CUTS" == *RB* ]]
 then
    BM="RB"
@@ -133,15 +144,16 @@ echo "anasum run list: $ODIR/$LLIST"
 RUNS=`cat $RLIST`
 echo $RUNS
 
+#########################################
+# loop over all runs
+#########################################
 for R in $RUNS
 do
-# get epoch 
+#########################################
+# set correct epoch (V4, V5, V6)
    if [ $R -lt 46642 ]
    then
      EPOCH="V4"
-# PRELI only one effective area available for V4
-     EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
-     RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
    elif [ $R -gt 63408 ]
    then
      EPOCH="V6"
