@@ -6,7 +6,7 @@
 #
 #
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]  && [ ! -n "$4" ]  && [ ! -n "$5" ]
+if [ $# -ne 5 ]
 then
    echo
    echo "CTA.MSCW_ENERGY.combine_tables.sh <combined table file name> <subarray list> <input table file name> <output directory> <data set> "
