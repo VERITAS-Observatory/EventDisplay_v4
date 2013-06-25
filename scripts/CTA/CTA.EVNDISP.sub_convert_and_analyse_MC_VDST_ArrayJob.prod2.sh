@@ -89,16 +89,16 @@ QLOG="/dev/null"
 
 # pedestals
 echo $DSET
-if [[ $DSET == *Leoncito* ]]
+if [[ $DSET == *Leoncito* ]] || [[ $DSET == *SAC* ]]
 then
-   echo "Leoncito"
+   echo "Leoncito / SAC"
    PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
 elif [[ $DSET == *Aar* ]]
 then
    echo "Aar"
    PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
 else
-   echo "error: data set not known (not Leoncito or Aar)"
+   echo "error: data set not known (not Leoncito, SAC or Aar)"
    echo "       (no ped files available)"
    exit
 fi
@@ -128,7 +128,7 @@ rm -f $FNAM-8.sh
 chmod u+x $FNAM.sh
 echo $FNAM.sh
 
-qsub -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+qsub  -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 
 echo "writing shell script to $FNAM.sh"
 echo "writing queue log and error files to $QLOG"
