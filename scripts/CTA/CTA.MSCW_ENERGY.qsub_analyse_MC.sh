@@ -1,6 +1,6 @@
 #$ -S /bin/tcsh
 #
-# script to analyse MC files with lookup tables
+# script to analyse CTA MC files with lookup tables
 #
 # Author: Gernot Maier
 #
@@ -12,7 +12,6 @@ set TFIL=TTTTFIL
 set ARRAY=ARRAYYY
 set DSET=DATASET
 set ADIR=AAAAADIR
-# set ADIR="Analysis-ID$RECID-d20121012"
 
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh CTA

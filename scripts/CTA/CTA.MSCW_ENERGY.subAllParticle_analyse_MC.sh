@@ -42,9 +42,24 @@ then
 elif [ $4 = "ISDC3700m" ]
 then
    VPART=( "gamma_onSource" "electron" "proton" "proton" "proton" )
-else
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "proton" )
-   VNUM=( "30" "" "15" "20" "21" )
+# prod2 analysis
+elif [ $4 = "prod2-Aar-North" ]
+then
+   VPART=( "gamma_onSource" "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   VNUM=( "10" "30" "" "15" "" )
+elif [ $4 = "prod2-Aar-South" ]
+then
+   VPART=(  "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VNUM=( "10" "301" "302" "303" "20" "21" "24" "15" "" )
+elif [ $4 = "prod2-Leoncito-North" ] || [ $4 = "prod2-Leoncito-South" ]
+then
+   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+elif [ $4 = "prod2-G-Leoncito-North" ] || [ $4 = "prod2-G-Leoncito-South" ]
+then
+   VPART=( "proton" )
+elif [ $4 = "prod2-SAC-North" ] || [ $4 = "prod2-SAC-South" ]
+then
+   VPART=( "gamma_onSource" "electron" "proton" )
 fi
 NPART=${#VPART[@]}
 
@@ -55,7 +70,7 @@ do
    PART=${VPART[$m]}
    NUMM=${VNUM[$m]}
 
-   for (( k = 1; k < 10; k++ ))
+   for (( k = 0; k < 10; k++ ))
    do
       if [ $4 = "v_leeds" ]
       then
@@ -67,9 +82,32 @@ do
       elif [ $4 = "ISDC3700m" ]
       then
 	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 1$k
-      elif [ $4 = "prod2-Aar" ] || [ $4 = "prod2-Aar-North" ] || [ $4 = "prod2-Aar-South" ] 
+# prod2 Aar-North and Aar-South
+      elif [ $4 = "prod2-Aar-North" ] || [ $4 = "prod2-Aar-South" ]
       then
-	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $NUMM$k
+         if [ $PART = "electron" ]
+	 then
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k
+         elif [ $PART = "proton" ]
+	 then
+	    for (( l = 20; l <= 26; l++ ))
+	    do
+	       ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $l$k
+	    done
+         else
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $NUMM$k
+         fi
+# prod2 Leoncito
+      elif [ $4 = "prod2-Leoncito-North" ] || [ $4 = "prod2-Leoncito-South" ]
+      then
+	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k
+# prod2 Leoncito Grid	 
+      elif [ $4 = "prod2-G-Leoncito-North" ] || [ $4 = "prod2-G-Leoncito-South" ]
+      then
+	 for (( l = 30; l <= 45; l++ ))
+	 do
+	    ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $l$k
+	 done
       else
 	 ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TAB $RECID $ARRAY $PART $4 $5 $k
       fi
