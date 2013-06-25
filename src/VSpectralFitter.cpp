@@ -213,9 +213,11 @@ void VSpectralFitter::print()
         cout << "Results for power law fit: " << endl;
         cout << "--------------------------" << endl;
         cout << "dN/dE = I x (E/" << fSpectralFitFluxNormalisationEnergy << " TeV)^{-Gamma}" << endl;
-        cout << "I = " << scientific << fFitFunction->GetParameter( 0 ) << " +- " << fFitFunction->GetParError( 0 ) << " cm^-2s^-1TeV^-1" << endl;
-        cout << "Gamma = " << fixed << fFitFunction->GetParameter( 1 ) << " +- " << fFitFunction->GetParError( 1 ) << endl;
-        cout << "Chi2 " << fFitFunction->GetChisquare();
+        cout << "I = " << scientific << setprecision( 2 ) << fFitFunction->GetParameter( 0 );
+	cout << " +- " << fFitFunction->GetParError( 0 ) << " cm^-2s^-1TeV^-1" << endl;
+        cout << "Gamma = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 1 ); 
+	cout << " +- " << fFitFunction->GetParError( 1 ) << endl;
+        cout << "Chi2 " << setprecision( 2 ) << fFitFunction->GetChisquare();
         cout << ", N = " << fFitFunction->GetNDF();
         if( fFitFunction->GetNDF() > 0. ) cout << " (Chi2/N=" << fFitFunction->GetChisquare()/fFitFunction->GetNDF() << ")" << endl;
         cout << endl;

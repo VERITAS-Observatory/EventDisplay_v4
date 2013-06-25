@@ -711,7 +711,7 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
     rSource:     minimum distance to sky plot centre of bins to be taken into account (exclude the source region)
     xmin, xmax:  plotting range (significances)
 */
-void VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas *cCanvas )
+TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas *cCanvas )
 {
     default_settings();
 
@@ -733,11 +733,11 @@ void VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double 
 
 // get 1D histograms
     TH1D *hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
-    setHistogramPlottingStyle( hsig_1D, 1, 2, 1 );
+    setHistogramPlottingStyle( hsig_1D, 1, 2, 1, 1, 1, 0 );
     if( hsig_1D ) hsig_1D->SetStats( 1 );
 
     TH1D *hsig_1DAll  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, 0., false, hmap_stereo_on );
-    setHistogramPlottingStyle( hsig_1DAll, 2, 2, 2 );
+    setHistogramPlottingStyle( hsig_1DAll, 2, 2, 2, 1, 1, 0 );
     if( hsig_1DAll ) hsig_1DAll->SetStats( 0 );
 
     gStyle->SetOptFit( 1111 );
@@ -809,7 +809,7 @@ void VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double 
         }
     }
 
-    // return c_sig1D;
+    return c_sig1D;
 }
 
 
