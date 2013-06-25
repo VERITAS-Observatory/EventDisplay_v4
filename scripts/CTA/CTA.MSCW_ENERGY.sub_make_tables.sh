@@ -7,7 +7,7 @@
 #
 #
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ]  || [ ! -n "$5" ]
+if [ $# -ne 5 ]
 then
    echo
    echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone10> <data set>"
