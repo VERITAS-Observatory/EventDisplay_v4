@@ -15,6 +15,7 @@ then
 fi
 
 SUBAR=$1
+ANADIR=$2
 
 ###############################################################
 # loop over all arrays
@@ -23,13 +24,17 @@ for ARRAY in $VARRAY
 do
    echo "STARTING ARRAY $ARRAY"
 
-   SDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$3/$ARRAY/$2/"
-   ODIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$4/$ARRAY/$2/"
+   SDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$3/$ARRAY/$ANADIR/"
+   ODIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$4/$ARRAY/$ANADIR/"
+
+# make sure that upper directory exists
+   mkdir -p $ODIR
 
    echo $SDIR
    echo $ODIR
-   ln -f -s $SDIR/gamma* $ODIR/
-   ln -f -s $SDIR/elec* $ODIR/
+#   ln -f -s $SDIR/gamma* $ODIR/
+#   ln -f -s $SDIR/elec* $ODIR/
+   ln -f -s $SDIR/prot* $ODIR/
 done
 
 exit
