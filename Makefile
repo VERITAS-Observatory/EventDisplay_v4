@@ -1,23 +1,28 @@
 ##########################################################################
 # Makefile for eventdisplay analysis package
+##########################################################################
+#
+#  for VERITAS: make VTS
+#
+#  for CTA:     make CTA
 #
 #  shell variables needed:
 #    ROOTSYS (pointing to root installation)
 #
-#  for reading of VBF files
+#  for reading of VBF files (optional, VERITAS only)
 #    VBFSYS  (pointing to VBF installation)
 #    or
 #   vbfConfig exists
 #
-#  for using GSL libraries 
+#  for using GSL libraries (optional)
 #    GSLSYS  (pointing to GSL installation)
 #    or
 #    gsl-config exists
 #
-#  for using FITS
+#  for using FITS (optional)
 #    FITSSYS (pointing to FITS installation)
 #
-#  for using HESSIO
+#  for using HESSIO (optional, CTA only)
 #    HESSIOSYS (pointing to HESSIO installation)
 #
 # Gernot Maier 
@@ -29,7 +34,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 4.20
+version = 4.21
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(distdir).VTS.runparameter
@@ -1133,6 +1138,7 @@ $(distdir):	FORCEDISTDIR
 	cp README/README* $(distdir)/README
 	cp README/INSTALL $(distdir)/README
 	cp README/AUTHORS $(distdir)/README
+	cp README/CHANGELOG $(distdir)/README
 	mkdir -p $(distdir)/doc
 	cp doc/Manual.tex $(distdir)/doc
 	cp doc/Manual_Title.tex $(distdir)/doc
@@ -1150,6 +1156,8 @@ $(distdir):	FORCEDISTDIR
 	mkdir -p $(distdir)/scripts/VTS
 	mkdir -p $(distdir)/scripts/CTA
 	cp -r scripts/CTA/*.sh $(distdir)/scripts/CTA
+	cp -r scripts/CTA/*.list $(distdir)/scripts/CTA
+	cp -r -u scripts/CTA/CTA.EVNDISP* $(distdir)/scripts/CTA
 	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
 	cp -r -u scripts/VTS/VTS.EVNDISP* $(distdir)/scripts/VTS
 
@@ -1167,7 +1175,7 @@ FORCEDISTDIR:
 CTA.runfiles:	$(ctapara).tar.gz
 
 $(ctapara).tar.gz:	$(ctapara)
-	find $(ctapara) -type f -print | cpio -o -H ustar > $(ctapara).tar
+	find $(ctapara) \( -type f -o -type d \) -print | cpio -o -H ustar > $(ctapara).tar
 	gzip $(ctapara).tar
 	rm -rf $(ctapara)
 
@@ -1179,17 +1187,16 @@ $(ctapara):
 	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/Catalogues $(ctapara)/AstroData
 	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/TeV_data $(ctapara)/AstroData
 	mkdir -p $(ctapara)/DetectorGeometry
-	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod1* $(ctapara)/DetectorGeometry/
-	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod2* $(ctapara)/DetectorGeometry/
+	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod1* $(ctapara)/DetectorGeometry
+	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod2* $(ctapara)/DetectorGeometry
+	mkdir -p $(ctapara)/GammaHadronCutFiles
+	cp -Lr $(CTA_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANA* $(ctapara)/GammaHadronCutFiles
 	mkdir -p $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.GammaHadron.QC.* $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVAFixedSignal.* $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.GammaHadron.TMVA.* $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
-	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/scriptsInput.runparameter $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/scriptsInput.prod*.runparameter $(ctapara)/ParameterFiles
 	mkdir -p $(ctapara)/RadialAcceptances/
 	mkdir -p $(ctapara)/Calibration/
 	mkdir -p $(ctapara)/EffectiveAreas/
@@ -1197,6 +1204,7 @@ $(ctapara):
 
 #########################################
 # VTS
+#
 
 VTS.runfiles:	$(vtspara).tar.gz
 
