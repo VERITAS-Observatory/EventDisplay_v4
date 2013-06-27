@@ -7,6 +7,7 @@
 #include <VPedestalCalculator.h>
 #include <VDB_CalibrationInfo.h>
 
+#include "TClonesArray.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TLeaf.h"
@@ -35,6 +36,7 @@ class VCalibrator : public VImageBaseAnalyzer
 	TFile *fPedSingleOutFile;
         map< ULong64_t, TFile* > fPedOutFile;
         map< ULong64_t, vector< vector<TH1F* > > > hped_vec;  //<! one histogram per telescope/channel/sumwindow
+	map< ULong64_t, TClonesArray* > fPedestalsHistoClonesArray;
         TFile *opfgain;
         TFile *opftoff;
         vector<TH1F* > hgain;
@@ -73,8 +75,8 @@ class VCalibrator : public VImageBaseAnalyzer
 	TFile* getPedestalRootFile( ULong64_t iTel );
 	int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
 	string getCalibrationFileName( int iTel, int irun, string iSuffix );
-        void readCalibrationData( bool iPeds, bool iGains );
-        bool readCalibrationData( string iSourceFile );
+        void readCalibrationData();
+        bool readCalibrationDatafromDSTFiles( string iSourceFile );
 	void readfromVOFFLINE_DB(int gain_or_toff, string &iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
         void readGains( bool iLowGain = false );
         bool readLowGainMultiplier( int iSumWindow );

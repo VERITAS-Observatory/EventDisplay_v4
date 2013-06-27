@@ -1385,7 +1385,7 @@ void VEventLoop::setEventTimeFromReader()
             }
 	    else if( fGPSClockWarnings[i] == 30 )
 	    {
-	       cout << " VEventLoop::setEventTimeFromReader: info, more than 30 events with GPS status set" << endl;
+	       cout << " VEventLoop::setEventTimeFromReader: info, more than 30 events with GPS status set";
 	       cout << " (Telescope " << getTeltoAna()[i]+1 << ")" << endl;
             }
         }

@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130627 (GM) optimize writing of pedestals histograms at the end
+                of the pedestal calculation routines (Bug 127)
+
 * 20130612 (GM) added GPS clock status readout
 
 * 20130610 (GM) many small changes to get less warnings while compiling
