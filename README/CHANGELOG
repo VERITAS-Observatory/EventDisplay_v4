@@ -111,7 +111,7 @@ Change log eventdisplay analysis package
 * 20130202 (GM) fixed bug in dead-time calculation, which affects only very
                 short runs (few minutes)
 
-* 20130128 (GM) removed file size of eventdisplay output file (for MC)
+* 20130128 (GM) reduced file size of eventdisplay output file (for MC)
                 don't write fdiagno tree to disk (anyway empty)
 		optimize tpars variables
 

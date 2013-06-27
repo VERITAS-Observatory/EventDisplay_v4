@@ -57,6 +57,7 @@ void VMonteCarloRunHeader::reset()
    corsika_wlen_max = 0.;
    corsika_low_E_detail = 0;
    corsika_high_E_detail = 0;
+   detector_Simulator="NOSET";
 }
 
 bool VMonteCarloRunHeader::VOLUMEDET_set()

@@ -313,7 +313,7 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
 
     fDST_vlist_of_telescopes.clear();
     unsigned int iNChannels = 0;
-    int fTelID;
+    int fTelID = 0;
     fDST_conf->SetBranchAddress( "NPixel", &iNChannels );
     fDST_conf->SetBranchAddress( "TelID", &fTelID );
     fDSTntel = (unsigned int)fDST_conf->GetEntries();

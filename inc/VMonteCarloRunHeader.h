@@ -1,5 +1,4 @@
 //! VMonteCarloRunHeader MC parameters 
-// Revision $Id: VMonteCarloRunHeader.h,v 1.1.2.3 2010/10/26 00:00:38 gmaier Exp $
 
 #ifndef VMonteCarloRunHeader_H
 #define VMonteCarloRunHeader_H
@@ -63,6 +62,6 @@ class VMonteCarloRunHeader : public TNamed
    void   reset();
    bool   VOLUMEDET_set();
 
-   ClassDef(VMonteCarloRunHeader,3);
+   ClassDef(VMonteCarloRunHeader,4);
 };
 #endif
