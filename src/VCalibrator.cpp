@@ -280,8 +280,11 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator *iPedestalCalcul
     map< ULong64_t, TFile* >::iterator iPedOutFile_iter;
     for( iPedOutFile_iter = fPedOutFile.begin(); iPedOutFile_iter != fPedOutFile.end(); iPedOutFile_iter++ )
     {
-       cout << "\t closing " << iPedOutFile_iter->second->GetName() << endl;
-       if( iPedOutFile_iter->second && iPedOutFile_iter->second->IsOpen() )  iPedOutFile_iter->second->Close();
+       if( iPedOutFile_iter->second && iPedOutFile_iter->second->IsOpen() ) 
+       {
+          cout << "\t closing " << iPedOutFile_iter->second->GetName() << endl;
+          iPedOutFile_iter->second->Close();
+        }
     }
     
     cout << "all files closed " << endl; 
