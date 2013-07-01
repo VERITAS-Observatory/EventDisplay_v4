@@ -146,6 +146,7 @@ VEvndispRunParameter::VEvndispRunParameter()
     frecoverImagePixelNearDeadPixel = true;
     fFillImageBorderNeighbours = true;
     fTraceWindowShift.push_back( -1 );
+    fTraceWindowShift_DoublePassSmallImages.push_back( 0 );
     fTraceIntegrationMethod.push_back( 1 );
     fTraceIntegrationMethod_pass1.push_back( 1 );
     fDBSumWindowMaxTimedifference.push_back( 10. );
@@ -451,6 +452,7 @@ void VEvndispRunParameter::print( int iEv )
 		cout << endl;
 		cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
 		cout << "\t (shifted by " << fTraceWindowShift[i] << " samples";
+		cout << " [" << fTraceWindowShift_DoublePassSmallImages[i] << "]";
 		if( fDoublePass ) cout << ", max T0 threshold " << fSumWindowStartAtT0Min << " d.c.)" << endl;
 		else              cout << ")" << endl;
 		cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];

@@ -3,10 +3,8 @@
 
     output is after pedestal substraction, gain and toffset correction
 
-    Revision $Id: VDSTTree.cpp,v 1.1.2.17.2.1.2.1 2011/02/11 22:58:51 gmaier Exp $
 
-    \author
-Gernot Maier
+    \author Gernot Maier
 */
 
 #include <VDSTTree.h>
@@ -268,32 +266,31 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 	fDSTtel_data[i] = 0;
 	fDSTTelescopeZeroSupression[i] = 0;
 	fDSTnumSamples[i] = 0;
-        for( unsigned int j = 0; j < iMaxNChannels; j++ )
-        {
-            if( iCH == 0 ) fDSTChan[i][j] = j;
-            else           fDSTChan[i][j] = iCH;
-	    fDSTRecord[i][j] = 1;                    // expect by default that all pixels are there
-            fDSTsums[i][j] = 0.;
-            fDSTdead[i][j] = 0;
-	    fDSTZeroSuppressed[i][j] = 0;
-            fDSTsumwindow[i][j] = 0;
-	    fDSTsumfirst[i][j] = 0;
-            fDSTHiLo[i][j] = 0;
-            fDSTMax[i][j] = 0;
-            fDSTL1trig[i][j] = 0;
-	    for( unsigned int t = 0; t < iMaxNTimingLevels; t++ )
-	    {
-	       fDSTpulsetiming[i][t][j] = 0.;
-            }
-	    if( fReadWriteFADC )
-	    {
-	       for( unsigned int t = 0; t < iMaxNSamples; t++ )
-	       {
-		  fDSTtrace[i][t][j] = 0;
-	       }
-            }
-        }
-        for( unsigned int t = 0; t < iMaxNTimingLevels; t++ ) fDSTpulsetiminglevels[i][t] = 0.;
+    }
+
+    for( unsigned int i = 0; i < iMaxPrevNTel; i++ )
+    {
+       for( unsigned int j = 0; j < iMaxNChannels; j++ )
+       {
+	   if(  iCH != 0 ) fDSTChan[i][j] = iCH;
+	   else            fDSTChan[i][j] = j;
+       }
+    } 
+
+    std::fill( &fDSTRecord[0][0], &fDSTRecord[0][0]+VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 1 );
+    memset( fDSTdead, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTdead[0][0] ) );
+    memset( fDSTZeroSuppressed, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTZeroSuppressed[0][0] ) );
+    memset( fDSTsumwindow, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTsumwindow[0][0] ) );
+    memset( fDSTsumfirst, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTsumfirst[0][0] ) );
+    memset( fDSTHiLo, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTHiLo[0][0] ) );
+    memset( fDSTMax, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTMax[0][0] ) );
+    memset( fDSTL1trig, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTL1trig[0][0] ) );
+    std::fill( &fDSTsums[0][0], &fDSTsums[0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 0. );
+    std::fill( &fDSTpulsetiming[0][0][0], &fDSTpulsetiming[0][0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS*VDST_MAXTIMINGLEVELS, 0. );
+    std::fill( &fDSTpulsetiminglevels[0][0], &fDSTpulsetiminglevels[0][0] + VDST_MAXTELESCOPES*VDST_MAXTIMINGLEVELS, 0. ); 
+    if( fReadWriteFADC )
+    {
+       memset( fDSTtrace, 0, VDST_MAXTELESCOPES*VDST_MAXSUMWINDOW*VDST_MAXCHANNELS*sizeof( fDSTtrace[0][0][0] ));
     }
 }
 
@@ -689,4 +686,24 @@ double VDSTTree::getDSTMeanPulseTiming(  unsigned int iTelID, unsigned int iChan
    }
 
    return 0.;
+}
+
+double VDSTTree::getDSTMeanPulseTimingPerTelescope( unsigned int iTelID, unsigned int nPixel )
+{
+   if( iTelID < VDST_MAXTELESCOPES && nPixel < VDST_MAXCHANNELS )
+   {
+      double i_m = 0.;
+      double i_n = 0.;
+      for( unsigned int i = 0; i < nPixel; i++ )
+      {
+          if( fDSTMeanPulseTiming[iTelID][i] > 0. && fDSTMeanPulseTiming_N[iTelID][i] > 0. )
+	  {
+	      i_m += fDSTMeanPulseTiming[iTelID][i] / fDSTMeanPulseTiming_N[iTelID][i];
+	      i_n++;
+          }
+      }
+      if( i_n > 0. ) return i_m / i_n;
+      else           return -9999.;
+   }
+   return -9999.;
 }

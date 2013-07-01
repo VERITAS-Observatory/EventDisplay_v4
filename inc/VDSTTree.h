@@ -5,6 +5,7 @@
 #include "TMath.h"
 #include "TTree.h"
 
+#include <algorithm>
 #include <bitset>
 #include <fstream>
 #include <iostream>
@@ -229,6 +230,7 @@ class VDSTTree
         }
 
 	void         fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime );
+	double       getDSTMeanPulseTimingPerTelescope( unsigned int iTelID, unsigned int iNPixel );
 	double       getDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID );
 	double       getDSTMeanPulseTimingMinLightLevel() { return fDSTMeanPulseTimingMinLightLevel; }
 

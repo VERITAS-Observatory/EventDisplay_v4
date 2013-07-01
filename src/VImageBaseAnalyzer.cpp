@@ -1006,8 +1006,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		{
 // take average tzero per telescope and pixel
 //		   corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
-// take average tzero per telescope
-		   corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+// take average tzero per telescope (more stable than previous statement)
+		   corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID]
+		                   - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift_DoublePassSmallImages());
                 }
 // low gain channel have different time -> use tzero (donnot do this for DST sims)
                 if( ( getHiLo()[i_channelHitID] 
@@ -1030,8 +1031,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                     else                          isw += corrfirst;
 // take average tzero per telescope and pixel
 // 		     corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
-// take average tzero per telescope
-	    	    corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+// take average tzero per telescope (more stable than previous statement)
+	    	    corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID]
+		                    - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift_DoublePassSmallImages() );
                     setCurrentSummationWindow( i_channelHitID, corrfirst, isw );
                 }
 // integration start is at beyond last sample: set to last sample

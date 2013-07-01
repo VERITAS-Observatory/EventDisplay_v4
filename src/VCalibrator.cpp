@@ -1947,6 +1947,7 @@ void VCalibrator::initialize()
                                      ||  getRunParameter()->frunmode == 1 || getRunParameter()->frunmode == 6
 				     || (getRunParameter()->fsourcetype == 2 && getRunParameter()->fsimu_pedestalfile.size() > 0 ) ),
 				     getRunParameter()->freadCalibfromDB,
+				     isDST_MC(),
 	                             getDebugFlag() );
         if( fReader->getDataFormat() == "grisu" ) fCalData.back()->setReader( fReader );
    }

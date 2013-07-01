@@ -592,6 +592,13 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 		     {
 			 if( i < fRunPara->fTraceWindowShift.size() ) fRunPara->fTraceWindowShift[i] = atoi( iTemp3.c_str() );
 		     }
+		     if( iTemp4.size() > 0 )
+		     {
+		         if( i < fRunPara->fTraceWindowShift_DoublePassSmallImages.size() )
+			 {
+			    fRunPara->fTraceWindowShift_DoublePassSmallImages[i] = atoi( iTemp4.c_str() );
+                         }
+                     }
 		  }
                }
 	       continue;

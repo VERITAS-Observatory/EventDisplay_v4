@@ -283,6 +283,7 @@ class VEvndispData
 	unsigned int        getSumWindow_Pass1( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_pass1.size() ) return checkSummationWindow( iTelID, fRunPar->fsumwindow_pass1[iTelID] ); else return 0; }
         valarray< unsigned int >& getCurrentSumWindow() { return fAnaData[fTelID]->fCurrentSummationWindow; }
         int                 getSumWindowShift() { return fRunPar->fTraceWindowShift[fTelID]; }
+	int                 getSumWindowShift_DoublePassSmallImages() { return fRunPar->fTraceWindowShift_DoublePassSmallImages[fTelID]; }
         double              getDBSumWindowMaxTimedifference() { return fRunPar->fDBSumWindowMaxTimedifference[fTelID]; }
         valarray<unsigned int>& getTCorrectedSumFirst() { return fAnaData[fTelID]->fTCorrectedSumFirst; }
         valarray<unsigned int>& getTCorrectedSumLast() { return fAnaData[fTelID]->fTCorrectedSumLast; }

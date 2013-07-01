@@ -1,33 +1,21 @@
-/** @file CTA.convert_hessio_to_VDST
- *  @short a program to convert sim_telarray files (hessio) to EVNDISP DST format
+/** CTA.convert_hessio_to_VDST
+ *  short a program to convert sim_telarray files (hessio) to EVNDISP DST format
  *
  *
- *  
- *  As a skeleton for programs reading H.E.S.S. data in eventio format,
- *  this program reads the whole range of hessio item types into a
- *  single tree of data structures but normally does nothing with the data.
+ *  Author of skeleton (as part of the hessio distribution):  Konrad Bernloehr
  *
- *  It can be instructed, though, to create nice camera images similar to
- *  those generated in sim_hessarray.
- *
- *
-@verbatim
-Syntax: CTA.convert_hessio_to_VDST [ options ] [ - | input_fname ... ]
-Options:
-   --max-events n  (Skip remaining data after so many triggered events.)
-@endverbatim
- *
- *  @author  Konrad Bernloehr
- *  Modified by Gernot Maier (DESY) (EVNDISPLAY related code)
- *
- *  Revision $Id: CTA.convert_hessio_to_VDST.cc,v 1.1.2.1.2.2.2.2 2011/02/11 22:51:03 gmaier Exp $
+ *  Author of modifications for eventdisplay: Gernot Maier (DESY)
  */
 
 
-#include "io_basic.h"     /* This file includes others as required. */
+#include "initial.h"
+#include "io_basic.h" 
 #include "history.h"
 #include "io_hess.h"
 #include "fileopen.h"
+#ifdef CTA_PROD2_TRGMASK
+#include "io_trgmask.h"
+#endif
 
 #include <bitset>
 #include <iostream>
@@ -62,6 +50,10 @@ unsigned int fGlobalNTelPreviousEvent = 0;
 bool fGlobalTriggerReset = false;
 // map with telescope types (length of vector is total number of telescopes)
 map< int, ULong64_t > fTelescopeType;
+#ifdef CTA_PROD2_TRGMASK
+// trigger mask hash set
+struct trgmask_hash_set *fTriggerMask_hash_set = 0;
+#endif
 ///////////////////////////////////////////////////////
 
 /*!
@@ -221,6 +213,7 @@ static void syntax (char *program)
    printf("   -o dst filename  (name of dst output file)\n" );
    printf("   -f on=1/off=0    (write FADC samples to DST file;default=0)\n" );
    printf("   -c pedfile.root  (file with pedestals and pedestal variances)\n");
+   printf("   -c triggmask.file.gz (file with trigger mask (corrections for Spring 2013 prod2 production)\n");
    printf("   -r on=1/off=0    (apply camera plate scaling for DC telescopes; default=1)\n" );
    printf("   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );      
 
@@ -228,6 +221,70 @@ static void syntax (char *program)
 }
 
 using namespace std;
+
+/*
+
+    read trigger mask from on external file
+
+    this is the correction for the Spring 2013 prod2 production with wrong trigger settings
+
+*/
+bool read_trigger_mask( string trg_mask_file )
+{
+#ifdef CTA_PROD2_TRGMASK
+   struct trgmask_set *tms = (trgmask_set*)calloc(1,sizeof(struct trgmask_set));
+   fTriggerMask_hash_set = (trgmask_hash_set*)calloc(1,sizeof(struct trgmask_hash_set));
+
+   IO_BUFFER *iobuf = allocate_io_buffer(1000000L);
+   if ( iobuf == NULL )
+   {
+      cout << "read_trigger_mask(): error, cannot allocate I/O buffer" << endl;
+      exit( 1 );
+   }
+   iobuf->max_length = 200000000L;
+
+   IO_ITEM_HEADER item_header;
+   iobuf->input_file = fileopen( trg_mask_file.c_str(), "r" );
+   if ( iobuf->input_file != NULL )
+   {
+      cout << endl << "reading trigger masks from " << trg_mask_file << endl;
+      unsigned int z = 0;
+      for( ;; )
+      {
+	 if( find_io_block(iobuf,&item_header) != 0 ) break;
+
+	 printf("Found I/O block of type %ld\n",item_header.type);
+
+	 if( read_io_block(iobuf,&item_header) != 0 ) break;
+
+	 read_trgmask( iobuf, tms );
+
+	 trgmask_fill_hashed( tms, fTriggerMask_hash_set );
+
+/*	 for( unsigned int i=0; i<tms->num_entries; i++ )
+	 {
+	    cout << i << "\t" << tms->mask[i].event << "\t" << tms->mask[i].tel_id << "\t" << tms->mask[i].trg_mask << endl;
+	 } */
+	 z++;
+       }
+       if( z > 1 )
+       {
+          cout << "read_trigger_mask(): error, more than one iobuf - code cannot handle this yet" << endl;
+	  exit( 1 );
+       }
+       fileclose(iobuf->input_file);
+   }
+   else
+   {
+      cout << "read_trigger_mask(): error, cannot open trigger mask file: " << endl;
+      cout << "\t" << trg_mask_file << endl;
+      return false;
+   }
+
+#endif
+   return true;
+}
+
 
 bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata )
 {
@@ -361,13 +418,28 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	    fData->fDSTLTtime[i_ntel_trig] = hsdata->event.central.teltrg_time[t];
 // read L2 trigger type
 // (filled for >= prod2 only)
-#ifdef CTA_PROD2
 // PROD2: bit1: majority
 //        bit2: analog sum
 //        bit3: digital sum
+#ifdef CTA_PROD2
 	    fData->fDSTL2TrigType[i_ntel_trig] = (unsigned short int)hsdata->event.central.teltrg_type_mask[t];
 #else
             fData->fDSTL2TrigType[i_ntel_trig] = 0;
+#endif
+// trigger corrects (from log files - needed for Spring 2013 prod2 files)
+#ifdef CTA_PROD2_TRGMASK
+            if( fTriggerMask_hash_set )
+	    {
+	       struct trgmask_entry *h_te = find_trgmask( fTriggerMask_hash_set, hsdata->mc_event.event, hsdata->event.central.teltrg_list[t] );
+	       if( h_te )
+	       {
+	          fData->fDSTL2TrigType[i_ntel_trig] = (unsigned short int)h_te->trg_mask;
+               }
+	       else
+	       {
+	          fData->fDSTL2TrigType[i_ntel_trig] = 0;
+               }
+	    }
 #endif
 	 }
          i_ntel_trig++;
@@ -509,7 +581,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 		      if( getTimingLevelIndex(t) == 1 && fData->fDSTsums[i_ntel_data][p] > fData->getDSTMeanPulseTimingMinLightLevel()
 		                                      && hsdata->event.teldata[telID].pixtm->timval[p][t] > 1.e-1 )
 		      {
-		         fData->fillDSTMeanPulseTiming( i_ntel_data, p, hsdata->event.teldata[telID].pixtm->timval[p][t] );
+		         fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->timval[p][t] );
                       }
                    }
                 }
@@ -574,7 +646,11 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 }
 
 /* 
-   fill pedestals, etc into a tree
+
+   fill calibration tree
+   
+       e.g. pedestals, tzeros, gains, etc.
+
 */
 TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, float > telescope_list, string ipedfile )
 {
@@ -649,10 +725,12 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
        }
    }
 
+////////////////////////////////////////////////////////
 // loop over all telescopes and fill calibration trees
-   for( int itel = 0; itel <  hsdata->run_header.ntel; itel++ )
+   for( int itel = 0; itel < hsdata->run_header.ntel; itel++ )
    {
      fTelID = hsdata->tel_moni[itel].tel_id;
+// select telescopes for this analysis
      if( telescope_list.size() == 0 || telescope_list.find( fTelID ) != telescope_list.end() )
      {
        nPixel = (unsigned int)hsdata->tel_moni[itel].num_pixels;
@@ -772,10 +850,10 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    double fParabolic_mirrorArea = 380.;
 // HARDCODED: all telescopes with 2 mirrors only are SC telescopes
    int    fSC_number_of_mirrors = 2;
-   cout << "\t Info:" << endl;
-   cout << "\t assume that all telescopes with mirror area larger than " << fParabolic_mirrorArea;
+   cout << "Info:" << endl;
+   cout << " assume that all telescopes with mirror area larger than " << fParabolic_mirrorArea;
    cout << " m^2 are of parabolic type" << endl;
-   cout << "\t assume that all telescopes with " << fSC_number_of_mirrors;
+   cout << " assume that all telescopes with " << fSC_number_of_mirrors;
    cout << " mirrors are Schwarzschild-Couder telescopes" << endl;
 
 // define tree
@@ -1023,6 +1101,7 @@ int main(int argc, char **argv)
    string config_file = "";             // file with list of telescopes
    string dst_file = "dst.root";        // output dst file
    string ped_file = "";                // file with pedestal and pedestal variances
+   string trg_mask_file = "";           // file with trigger information
    bool   fWriteFADC = false;           // fill FADC traces into converter
    unsigned int fDynamicRange = 0;      // dynamic range (for decision of high/low gain)
    bool   fApplyCameraScaling = true;   // apply camera plate scaling according for DC telescopes
@@ -1134,6 +1213,13 @@ int main(int argc, char **argv)
 	 argv += 2;
 	 continue;
       }
+      else if (strcmp(argv[1],"-t") == 0 )
+      {
+         trg_mask_file = argv[2];
+	 argc -= 2;
+	 argv += 2;
+	 continue;
+      }
       else if( strcmp(argv[1],"-c") == 0 )
       {
          ped_file = argv[2];
@@ -1213,9 +1299,10 @@ int main(int argc, char **argv)
     input_fname = NULL;
 
 ///////////////////////////////////////////////////////////////////
-   cout << endl << "NOTE: FIXED TIMING LEVELS!!" << endl << endl;
+   cout << endl << "NOTE: FIXED TIMING LEVELS READ FROM HESSIO FILE" << endl << endl;
+
 ///////////////////////////////////////////////////////////////////
-// open DST file
+// open DST file 
    TFile *fDSTfile = new TFile( dst_file.c_str(), "RECREATE" );
    if( fDSTfile->IsZombie() )
    {
@@ -1245,8 +1332,16 @@ int main(int argc, char **argv)
    VMonteCarloRunHeader *fMC_header = new VMonteCarloRunHeader();
    fMC_header->SetName( "MC_runheader" );
     
+/////////////////////////////////////////////
+// read in trigger mask
+   if( trg_mask_file.size() > 0 )
+   {
+       read_trigger_mask( trg_mask_file );
+   }
 
-    for (;;) /* Loop over all data in the input file */
+/////////////////////////////////////////////
+// Loop over all data in the input data file
+    for (;;)
     {
       if ( interrupted )
          break;
@@ -1724,6 +1819,8 @@ int main(int argc, char **argv)
 
    fStopWatch.Stop();
    fStopWatch.Print();
+
+   cout << "MC events written to DST file: " << dst_file << endl;
 
    cout << "exit..." << endl;
 

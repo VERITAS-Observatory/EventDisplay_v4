@@ -153,6 +153,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	bool   fDoublePassErrorWeighting2005;     // use error weighting from 2004 or today
 	bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
         vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
+        vector< int >    fTraceWindowShift_DoublePassSmallImages;   // shift the summation window by value (in doublepass: low gain channels only, default: 0 ): failed DB events only
                                                   // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
         vector< double > fDBSumWindowMaxTimedifference;
         double fSumWindowStartAtT0Min;            // for pulses with peaks larger than this values, start summation window at t0 + fTraceWindowShift (doublepass only)
@@ -249,6 +250,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,124); //(increase this number)
+        ClassDef(VEvndispRunParameter,125); //(increase this number)
 };
 #endif

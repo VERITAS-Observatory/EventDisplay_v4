@@ -1,9 +1,5 @@
 /*! \class VCalibrationData
-     \brief all data concerning the calibration is stored here
-
-     \date 19/08/04
-
-     Revision $Id: VCalibrationData.cpp,v 1.14.8.2.10.4.2.7.4.9.2.2.2.2.4.4.2.2.2.5.2.5.2.4.2.3 2011/02/11 22:58:50 gmaier Exp $
+     \brief all calibration data is stored here
 
      \author Gernot Maier
 */
@@ -110,7 +106,8 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 
 
 void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples, bool iUsePedestalsInTimeSlices,
-                                   bool iLowGainUsePedestalsInTimeSlices, bool iPedsFromPLine, bool iReadCalibDB, bool iDebug )
+                                   bool iLowGainUsePedestalsInTimeSlices, bool iPedsFromPLine, bool iReadCalibDB, 
+				   bool i_isDSTMC, bool iDebug )
 {
     if( iDebug ) cout << "VCalibrationData::initialize " << i_channel << "\t" << fTelID << endl;
 
@@ -130,7 +127,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     char c_name[2000];
     for( unsigned int i = 0; i < fFileName.size(); i++ )
     {
-       if( fFileName[i].size() > 0 && !fPedFromPLine )
+       if( fFileName[i].size() > 0 && !fPedFromPLine && !i_isDSTMC )
        {
 	  if( fFileName[i].find( "gain" ) != string::npos && iReadCalibDB ) 
 	  {
