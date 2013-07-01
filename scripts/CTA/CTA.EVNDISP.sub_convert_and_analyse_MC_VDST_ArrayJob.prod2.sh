@@ -9,7 +9,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
    echo
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [TRIGGER MASK DIRECTORY]"
    echo
    echo "CTA PROD2 ANALYSIS"
    echo
@@ -22,6 +22,8 @@ then
    echo "NOTE: HARDWIRED FILE NAMES IN QSUB SCRIPTS !!"
    echo ""
    echo "  [keep DST.root files]  keep and copy converted simtel files (DST files) to output directory (default off=0)"
+   echo ""
+   echo "  [TRIGGER MASK DIRECTORY] directory with trigger mask file (naming!)"
    echo ""
    echo " output will be written to: CTA_USER_DATA_DIR/analysis/<subarray>/<particle>/ "
    echo ""
@@ -52,6 +54,11 @@ FLL="0"
 if [ -n "$6" ]
 then
   FLL="$6"
+fi
+TRGMASKDIR="FALSE"
+if [ -n $7 ]
+then
+  TRGMASKDIR="$7"
 fi
 
 # checking the path for binary
@@ -122,8 +129,10 @@ sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-7.sh
 rm -f $FNAM-5.sh
 sed -e "s|FLL|$FLL|" $FNAM-7.sh > $FNAM-8.sh
 rm -f $FNAM-7.sh
-sed -e "s|PPPP|$PEDFIL|" $FNAM-8.sh > $FNAM.sh
+sed -e "s|PPPP|$PEDFIL|" $FNAM-8.sh > $FNAM-9.sh
 rm -f $FNAM-8.sh
+sed -e "s|TRIGGGG|$TRGMASKDIR|" $FNAM-9.sh > $FNAM.sh
+rm -f $FNAM-9.sh
 
 chmod u+x $FNAM.sh
 echo $FNAM.sh

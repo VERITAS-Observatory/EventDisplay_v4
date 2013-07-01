@@ -19,6 +19,7 @@ ACUT=ARC
 DSET=DATASET
 LOGF=FLL
 PEDFILE=PPPP
+TRGMASKDIR=TRIGGGG
 
 # set array
 FIELD=$SUBA
@@ -50,13 +51,28 @@ fi
 OFIL=`basename $IFIL .gz`
 echo "OUTPUT FILE $OFIL"
 
-#loop over all arrays
+####################################################################
+# loop over all arrays
 for N in $FIELD
 do
    echo "RUNNING  $N"
 # output data files are written to this directory
    ODIR=$CTA_USER_DATA_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART"/"
    mkdir -p $ODIR
+
+#####################################
+# trigmask file (optional)
+  if [ $TRGMASKDIR != "FALSE" ]
+  then
+      FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
+      TRIGF=`find $TRGMASKDIR -name $FFIL*`
+      if [ -e $TRIGF ]
+      then
+         COPT="$COPT -t $TRIGF"
+      else
+         echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL
+      fi
+  fi
 
 ####################################################################
 # execute converter
@@ -77,11 +93,13 @@ do
    cp -v -f $TMPDIR/*.root $ODIR
 done
 
+####################################################################
 # tar the log files
 cd $TMPDIR
 tar -czvf $OFIL.tar.gz *.log
-mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$LOGF
-mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$LOGF/
+DATE=`date +"%y%m%d"`
+mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF
+mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/
 
 exit
 
