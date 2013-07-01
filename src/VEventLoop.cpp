@@ -248,12 +248,12 @@ bool VEventLoop::initEventLoop( string iFileName )
 		   {
 		      cout << "VEventLoop warning: could not find number of samples in the first 1000 events" << endl;
                    }
-		   if( i_counter > 9999 ) break;
+		   if( i_counter > 99999 ) break;
                 } 
-		if( getNSamples() == 0 || i_counter > 9999 ) 
+		if( getNSamples() == 0 || i_counter > 99999 ) 
 		{
 		   cout << "VEventLoop::initEventLoop error: could not find any telescope events to determine sample length" << endl;
-		   cout << "exciting..." << endl;
+		   cout << "exiting..." << endl;
 		   exit( -1 );
                 }
 ///////////////////////////////////////////////////////////////
@@ -879,7 +879,7 @@ int VEventLoop::analyzeEvent()
         if( getNSamples() == 0 && fRunPar->fsourcetype != 7 )
 	{
 	   cout << "VEventLoop::analyzeEvent() error: retrieved sample length of zero" << endl;
-	   cout << "exciting..." << endl;
+	   cout << "exiting..." << endl;
 	   exit( -1 );
         }
 

@@ -1,8 +1,6 @@
 /*! \file mscw_energy.cpp
     \brief calculate mean scaled width and length,  energy with lookup tables
 
-    Revision $Id: mscw_energy.cpp,v 1.35.2.14.4.6.2.1.2.1.4.1.2.8.4.2.2.2.12.2 2010/09/01 12:20:23 gmaier Exp $
-
     \author
      Gernot Maier
      Henrik Krawczynski (mscw+energy routine)
@@ -72,7 +70,7 @@ int main( int argc, char *argv[] )
     if( !fTLook->initialize( fTLRunParameter ) )
     {
        cout << "error creating lookup tables: no run parameters";
-       cout << "exciting..." << endl;
+       cout << "exiting..." << endl;
        exit( -1 );
     }
 
