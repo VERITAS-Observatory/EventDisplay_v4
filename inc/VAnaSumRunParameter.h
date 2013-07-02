@@ -168,6 +168,9 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         int    fEnergyEffectiveAreaSmoothingIterations;
         double fEnergyEffectiveAreaSmoothingThreshold;
         vector< double > fMCZe;                   // zenith angle intervall for Monte Carlo
+		
+		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
+		
 	int fFrogs;
 
 // default pedestal variations

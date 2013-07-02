@@ -36,6 +36,8 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 
       fTreeSelectedEvents = 0;
 
+	fTreeWithAllGamma = 0 ; // WRITEALLGAMMATOTREE
+
       fRunPara = irunpara;
 
 // calculating run start, end and duration (verifies data trees)
@@ -343,6 +345,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // tree with selected events
    init_TreeWithSelectedEvents( irun, fIsOn );
 
+	if ( fIsOn && fRunPara->fWriteAllGammaToTree ) // WRITEALLGAMMATOTREE
+	{
+		init_TreeWithAllGamma( irun );
+	}
+
 // spectral energy reconstruction (effective areas, etc.)
 // effective area class
    VEffectiveAreaCalculator fEnergy( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, iAzMin, iAzMax, iPedVar,
@@ -520,6 +527,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		fill_TreeWithSelectedEvents( fDataRun );
       	     }
 
+		if ( fIsOn && bIsGamma && fRunPara->fWriteAllGammaToTree ) // WRITEALLGAMMATOTREE
+		{
+            fill_TreeWithAllGamma( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign);
+		}
+		
 /////////////////////////////////////////////////////////
 // histograms after all cuts ( shape and direction cuts )
 //
@@ -699,6 +711,11 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 	     fHisto[fHisCounter]->writeObjects( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, "EffectiveAreas", gTimeBinnedMeanEffectiveArea );
       	}
       	if( fTreeSelectedEvents ) fTreeSelectedEvents->AutoSave();
+		
+		if ( fTreeWithAllGamma && fIsOn && fRunPara->fWriteAllGammaToTree ) // WRITEALLGAMMATOTREE
+		{
+			fTreeWithAllGamma->Write() ; // or maybe ->AutoSave() ?
+		}
       }
 }
 
@@ -1807,3 +1824,152 @@ double VStereoAnalysis::getWobbleWest()
    
    return 0.;
 }
+
+bool VStereoAnalysis::init_TreeWithAllGamma( int irun ) // WRITEALLGAMMATOTREE
+{
+
+    cout << endl;
+    cout << " :: init_TreeWithAllGamma( " << irun << " )" << endl;
+    cout << endl;
+
+    if( fTreeWithAllGamma ) delete fTreeWithAllGamma;
+    if( !fRunPara ) return false;
+
+    char hname[200];
+    char htitle[200];
+    sprintf( hname, "TreeWithAllGamma" );
+    sprintf( htitle, "all gamma events with X,Y and Time for run %d", irun );
+
+    fTreeWithAllGamma = new TTree( hname, htitle );
+
+    fTreeWithAllGamma->Branch( "runNumber",   &fTreeAll_runNumber,   "runNumber/I"   );
+    fTreeWithAllGamma->Branch( "eventNumber", &fTreeAll_eventNumber, "eventNumber/I" );
+    fTreeWithAllGamma->Branch( "timeOfDay",   &fTreeAll_Time,        "timeOfDay/D"   );
+    fTreeWithAllGamma->Branch( "dayMJD",      &fTreeAll_MJD,         "dayMJD/I"      );
+    fTreeWithAllGamma->Branch( "WobbleNorth", &fTreeAll_WobbleNorth, "WobbleNorth/D" );
+    fTreeWithAllGamma->Branch( "WobbleWest",  &fTreeAll_WobbleWest,  "WobbleWest/D"  );
+    fTreeWithAllGamma->Branch( "Energy",      &fTreeAll_Energy,      "Energy/D"      );
+    fTreeWithAllGamma->Branch( "EnergyError", &fTreeAll_EnergyError, "EnergyError/D" );
+    fTreeWithAllGamma->Branch( "XGroundCore", &fTreeAll_XGroundCore, "XGroundCore/D" );
+    fTreeWithAllGamma->Branch( "YGroundCore", &fTreeAll_YGroundCore, "YGroundCore/D" );
+    fTreeWithAllGamma->Branch( "Xderot",      &fTreeAll_Xderot,      "Xderot/D"      );
+    fTreeWithAllGamma->Branch( "Yderot",      &fTreeAll_Yderot,      "Yderot/D"      );
+    fTreeWithAllGamma->Branch( "NImages",     &fTreeAll_NImages,     "NImages/I"     );
+    fTreeWithAllGamma->Branch( "ImgSel",      &fTreeAll_ImgSel,      "ImgSel/I"      );
+    fTreeWithAllGamma->Branch( "MSCW",        &fTreeAll_MSCW,        "MSCW/D"        );
+    fTreeWithAllGamma->Branch( "MSCL",        &fTreeAll_MSCL,        "MSCL/D"        );
+    fTreeWithAllGamma->Branch( "MWR",         &fTreeAll_MWR,         "MWR/D"         );
+    fTreeWithAllGamma->Branch( "MLR",         &fTreeAll_MLR,         "MLR/D"         );
+
+    cout << endl;
+
+    cout << " :: init_TreeWithAllGamma()" << endl;
+    cout << endl;
+    return true;
+}
+
+void VStereoAnalysis::reset_TreeWithAllGamma() // WRITEALLGAMMATOTREE
+{
+    cout << endl;
+    cout << " :: reset_TreeWithAllGamma()" << endl;
+    fTreeAll_runNumber = 0;
+    fTreeAll_eventNumber = 0;
+    fTreeAll_Time = 0.;
+    fTreeAll_MJD  = 0;
+    fTreeAll_Xoff = 0.;
+    fTreeAll_Yoff = 0.;
+    fTreeAll_Xderot = 0.;
+    fTreeAll_Yderot = 0.;
+    fTreeAll_WobbleNorth = 0.;
+    fTreeAll_WobbleWest = 0.;
+    fTreeAll_TargetRA = 0.;
+    fTreeAll_TargetDEC = 0.;
+    fTreeAll_RA = 0.;
+    fTreeAll_DEC = 0.;
+    fTreeAll_Energy = 0.;
+    fTreeAll_EnergyError = 0. ;
+    fTreeAll_XGroundCore = 0. ;
+    fTreeAll_YGroundCore = 0. ;
+    fTreeAll_NImages = 0 ;
+    fTreeAll_ImgSel  = 0 ;
+    fTreeAll_MSCW = 0. ;
+    fTreeAll_MSCL = 0. ;
+    fTreeAll_MWR = 0. ;
+    fTreeAll_MLR = 0. ;
+
+    fTreeAll_TargetRA  = 0.0; 
+    fTreeAll_TargetDEC = 0.0; 
+
+    // True Gamma Point-Of-Origin (deg)
+    fTreeAll_RA  = 0.0 ; // fTreeAll_Xderot + fTreeAll_WobbleWest  + fTreeAll_TargetRA  ; // ?
+    fTreeAll_DEC = 0.0 ; // fTreeAll_Yderot + fTreeAll_WobbleNorth + fTreeAll_TargetDEC ; // ?
+
+    cout << " :: reset_TreeWithAllGamma()" << endl;
+    cout << endl;
+}
+
+void VStereoAnalysis::fill_TreeWithAllGamma( CData *c ,double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) // WRITEALLGAMMATOTREE
+{
+	//cout << endl;
+	//cout << " -- fill_TreeWithAllGamma()" << endl;
+	if( !c ) return;
+
+	fTreeAll_runNumber   = c->runNumber;    // Run Number
+	fTreeAll_eventNumber = c->eventNumber;  // Event Number
+	fTreeAll_Time        = c->Time;         // Time of day (seconds) of gamma ray event
+	fTreeAll_MJD         = c->MJD;          // Day of epoch (days)
+	fTreeAll_Xoff        = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
+	fTreeAll_Yoff        = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
+	fTreeAll_Xderot      = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
+	fTreeAll_Yderot      = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
+	fTreeAll_WobbleNorth = c->WobbleN;      // Telescope Wobble North (degrees, parallel to DEC axis)
+	fTreeAll_WobbleWest  = c->WobbleE;      // Telescope Wobble West  (degrees, parallel to RA axis)
+	fTreeAll_Energy      = c->Erec;         // Reconstructed Gamma Energy (TeV)
+	fTreeAll_EnergyError = c->EChi2;        // Error on Energy (TeV, Gaussian, 1 standard deviation)
+	fTreeAll_XGroundCore = c->Xcore;        // Gamma Ray Core-Ground intersection location (north?)
+	fTreeAll_YGroundCore = c->Ycore;        // Gamma Ray Core-Ground intersection location (east?)
+	fTreeAll_NImages     = c->NImages;      // Number of images used in reconstruction?
+	fTreeAll_ImgSel      = c->ImgSel;       // 4-bit binary code describing which telescopes had images
+	fTreeAll_MSCW        = c->MSCW ;
+	fTreeAll_MSCL        = c->MSCL ;
+	fTreeAll_MWR         = c->MWR ;
+	fTreeAll_MLR         = c->MLR ;
+
+
+    //getDerotatedCoordinates( icounter, i_UTC, getXoff(), fEVDVersionSign * getYoff(),  i_xderot, i_yderot );
+
+   // Observation Target RA and DEC (deg)
+   fTreeAll_TargetRA  = 0.0; //fRunPara->fRunList[0].fTargetRAJ2000  + fRunPara->fRunList[0].fRaOffset  ;
+   fTreeAll_TargetDEC = 0.0; //fRunPara->fRunList[0].fTargetDecJ2000 + fRunPara->fRunList[0].fDecOffset ;
+
+   // True Gamma Point-Of-Origin (deg)
+   fTreeAll_RA  = 0.0 ; // fTreeAll_Xderot + fTreeAll_WobbleWest  + fTreeAll_TargetRA ;
+   fTreeAll_DEC = 0.0 ; // fTreeAll_Yderot + fTreeAll_WobbleNorth + fTreeAll_TargetDEC ;
+
+   //cout << " --   runNumber:   " << fTreeAll_runNumber   << endl;
+   //cout << " --   eventNumber: " << fTreeAll_eventNumber << endl;
+   //cout << " --   MJD:         " << fTreeAll_MJD         << endl;
+   //cout << " --   Time:        " << fTreeAll_Time        << endl;
+   //cout << " --   Xderot:      " << fTreeAll_Xderot      << endl;
+   //cout << " --   Yderot:      " << fTreeAll_Yderot      << endl;
+   //cout << " --   WobbleNorth  " << fTreeAll_WobbleNorth << endl;
+   //cout << " --   WobbleWest   " << fTreeAll_WobbleWest  << endl;
+   //cout << " --   TargetRA:    " << fTreeAll_TargetRA    << endl;
+   //cout << " --   TargetDEC:   " << fTreeAll_TargetDEC   << endl;
+   //cout << " --   RA:          " << fTreeAll_RA          << endl;
+   //cout << " --   DEC:         " << fTreeAll_DEC         << endl;
+   //cout << " --   Energy:      " << fTreeAll_Energy      << endl;
+   //cout << " --   EnergyError: " << fTreeAll_EnergyError << endl;
+   //cout << " --   c->Xcore:    " << fTreeAll_XGroundCore << endl;
+   //cout << " --   c->Ycore:    " << fTreeAll_YGroundCore << endl;
+   //cout << " --   c->NImages:  " << fTreeAll_NImages     << endl;
+   //cout << " --   c->ImgSel:   " << fTreeAll_ImgSel      << endl;
+   //cout << " --" << endl;
+
+   if ( fTreeWithAllGamma )
+   {
+      fTreeWithAllGamma->Fill();
+   }
+
+}
+

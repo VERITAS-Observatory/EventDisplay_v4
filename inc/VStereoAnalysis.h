@@ -135,6 +135,32 @@ class VStereoAnalysis
 	double fTreeSelected_EChi2S;
 	float fTreeSelected_EmissionHeight;
 	float fTreeSelected_EmissionHeightChi2;
+	
+	TTree * fTreeWithAllGamma; // WRITEALLGAMMATOTREE 
+    int    fTreeAll_runNumber;
+    int    fTreeAll_eventNumber;
+    double fTreeAll_Time;
+    int    fTreeAll_MJD;
+    double fTreeAll_Xoff;
+    double fTreeAll_Yoff;
+    double fTreeAll_Xderot;
+    double fTreeAll_Yderot;
+    double fTreeAll_WobbleNorth;
+    double fTreeAll_WobbleWest;
+    double fTreeAll_TargetRA;
+    double fTreeAll_TargetDEC;
+    double fTreeAll_RA;
+    double fTreeAll_DEC;
+    double fTreeAll_Energy;
+    double fTreeAll_EnergyError;
+    double fTreeAll_XGroundCore;
+    double fTreeAll_YGroundCore;
+    int    fTreeAll_NImages;
+    int    fTreeAll_ImgSel;
+    double fTreeAll_MSCW;
+    double fTreeAll_MSCL;
+    double fTreeAll_MWR;
+    double fTreeAll_MLR;
 
 	double fTreeSelected_MVA;
 
@@ -208,6 +234,10 @@ class VStereoAnalysis
 	void fill_TreeWithSelectedEvents( CData* );
 	bool init_TreeWithSelectedEvents( int, bool );
 	void reset_TreeWithSelectedEvents();
+		
+	void fill_TreeWithAllGamma( CData *c ,double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) ; // WRITEALLGAMMATOTREE
+	bool init_TreeWithAllGamma( int irun ) ; // WRITEALLGAMMATOTREE
+	void reset_TreeWithAllGamma() ; // WRITEALLGAMMATOTREE
 
 // derotation and J2000
         void getDerotatedCoordinates( unsigned int, double i_UTC, double x, double y, double &x_derot, double &y_derot );
