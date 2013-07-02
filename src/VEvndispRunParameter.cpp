@@ -197,9 +197,10 @@ VEvndispRunParameter::VEvndispRunParameter()
 
 // muon parameters
     fmuonmode = false;
-    ffrogsmscwfile = "";
+    fhoughmuonmode = false;
 
 // Frogs parameters
+    ffrogsmscwfile = "";
     ffrogsmode = false;
     ffrogsRecID = -1;
 
@@ -409,6 +410,8 @@ void VEvndispRunParameter::print( int iEv )
         if( ftracefit > -1. )        cout << "trace fitting: " << ftracefit << " with " << ftracefitfunction << endl;
         if( fSmoothDead )            cout << "smoothing dead pixels" << endl;
         if( fmuonmode )              cout << "muon ring analysis: " << fmuonmode << endl;
+        if( fhoughmuonmode )         cout << "Hough transform muon ring analysis: " << fhoughmuonmode << endl;
+
         if( fImageLL != 0 )
 	{
 	                             cout << "loglikelihood fitting of images: " << fImageLL;

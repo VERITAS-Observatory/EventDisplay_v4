@@ -60,15 +60,15 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool   fRunIsZeroSuppressed;              // run is zero suppressed
         string fsourcefile;                       // name of data file
         int    fnevents;                          // total number of events to be analyzed
-        int    fFirstEvent;                      // skip up till this event 
+        int    fFirstEvent;                       // skip up till this event 
 		
-		bool fprintdeadpixelinfo ; 			// DEADCHAN if true, will print list of dead pixels
-											// at end of run to evndisp.log
+        bool fprintdeadpixelinfo ; 		 // DEADCHAN if true, will print list of dead pixels
+					         // at end of run to evndisp.log
 		
-		bool fForceLLImageFit ; 			// FORCELL if true, will use log-likelihood image fitting 
-											// on all images, irregardless of if they are near the 
-											// edge of the camera or not.  Set in
-											// EVNDISP.reconstruction.runparameter
+        bool fForceLLImageFit ; 		 // FORCELL if true, will use log-likelihood image fitting 
+						 // on all images, irregardless of if they are near the 
+						 // edge of the camera or not.  Set in
+						 // EVNDISP.reconstruction.runparameter
 
 	float  fRunDuration;                      // duration of runs in [s]
 
@@ -225,6 +225,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 
 // muon parameters
         bool fmuonmode;                           // search for complete muon rings, Martin
+ // Hough transform muon parameters
+        bool fhoughmuonmode;                      // Use hough transform muon analysis
 
 // Frogs parameters
         bool ffrogsmode;                          // for Frogs template Analysis, GH
@@ -258,6 +260,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,125); //(increase this number)
+        ClassDef(VEvndispRunParameter,126); //(increase this number)
 };
 #endif

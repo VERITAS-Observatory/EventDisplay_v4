@@ -21,6 +21,7 @@ VImageParameterCalculation::VImageParameterCalculation( unsigned int iShortTree,
     fboolCalcGeo = false;
     fboolCalcTiming = false;
     fDetectorGeometry = 0;
+    fHoughTransform = 0;
 
 }
 
@@ -490,6 +491,7 @@ void VImageParameterCalculation::muonPixelDistribution()
     int q[8] = {0};
     double rp, phi, xi, yi, x0, y0, radius, rsigma;
 
+    //Get previously determined muon parameters
     x0 = fParGeo->muonX0;
     y0 = fParGeo->muonY0;
     radius = fParGeo->muonRadius;
@@ -537,6 +539,97 @@ void VImageParameterCalculation::muonPixelDistribution()
         pass = 1;
 
     fParGeo->muonValid = pass;
+
+}
+
+
+//Hough transform class instantiation
+void VImageParameterCalculation::houghInitialization() {
+
+fHoughTransform = new VHoughTransform( getDetectorGeo() );
+
+}
+
+
+//Placeholder for Hough transform based parametrization algorithm
+void VImageParameterCalculation::houghMuonRingFinder() {
+
+
+
+
+
+
+
+}
+
+
+//Placeholder for Hough transform based size calculator
+void VImageParameterCalculation::houghSizeInMuonRing() {
+
+
+
+
+
+
+
+
+
+}
+
+
+//Hough transform muon identification algorithm.
+//Sets fParGeo->houghMuonValid to 1 if the Hough tansform based muon ID technique find a muon, sets fParGeo->houghMuonValid to 0 otherwise.
+void VImageParameterCalculation::houghMuonPixelDistribution() {
+
+	//Show method if debug mode is run.
+	if( fDebug ) cout << "VImageParameterCalculation::houghMuonPixelDistribution" << endl;
+
+		//Look for data
+		if( fData->getSums().size()==0)
+	    {
+
+	    	fParGeo->houghMuonValid = 0;
+	        return;
+
+	    }
+
+	    //Look for detector geometry
+		if( !getDetectorGeo() )
+	    {
+
+	    	cout << "VImageParameterCalculation::houghMuonPixelDistribution error: detector geometry not defined" << endl;
+	        exit( 0 );
+
+	    }
+
+	    //Initial hit pixel cut.
+	    //Run the analysis if the number of image or border pixels exceeds 1.
+
+	    int iNpix = 0;
+
+	    // Loop over the pixels and calculate the hit pixel count.
+	    for( unsigned int i=0; i<fData->getSums().size(); i++ )
+	    {
+	    	//If the pixel is an image or border pixel.
+	    	if( fData->getImage()[i] || fData->getBorder()[i] )
+	    		//Increment hit pixel count
+	    		iNpix++;
+
+	    }
+
+	    //If there is more than one hit pixel, run the Hough transform muon identification code, otherwise set parameters to 0 and exit
+	    if (iNpix > 1)
+	    fHoughTransform->analysis( fData, fParGeo );//Pass pointers to the data and tree parameters to the Hough transform analysis method and perform analysis.
+	    else {
+
+	    	fParGeo->houghMuonValid = 0;
+	    	fParGeo->houghAP = 0.;
+	    	fParGeo->houghTD = 0.;
+	    	fParGeo->houghNpix = 0;
+	    	fParGeo->houghCN = 0.;
+	    	fParGeo->houghContained = 0.;
+
+	    }
 
 }
 

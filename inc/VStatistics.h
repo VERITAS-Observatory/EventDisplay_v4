@@ -1,10 +1,8 @@
-/*! LiAndMa
-    \brief collection of useful analysis functions for significance and upper limit calculations
+/*!  \brief collection of useful analysis functions for significance and upper limit calculations
     \author
       Jamie Holder
       Gernot Maier
 
-      Revision $Id: VStatistics.h,v 1.1.2.2.8.1.2.1 2010/03/08 07:49:52 gmaier Exp $
 */
 
 #ifndef LIANDMA_C

@@ -158,6 +158,19 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
         tpars->Branch("muonValid", &muonValid, "muonValid/I" );
     }
 
+//muon parameters (Hough transform)
+    if( fShortTree < 1 )
+    {
+
+    	tpars->Branch("houghAP", &houghAP, "houghAP/D" );
+    	tpars->Branch("houghTD", &houghTD, "houghTD/D" );
+    	tpars->Branch("houghNpix", &houghNpix, "houghNpix/I" );
+    	tpars->Branch("houghCN", &houghCN, "houghCN/D" );
+    	tpars->Branch("houghContained", &houghContained, "houghContained/D" );
+    	tpars->Branch("houghMuonValid", &houghMuonValid, "houghMuonValid/I" );
+
+    }
+
 // log likelihood fit errors/results
 
     if( fShortTree < 1 ) tpars->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
@@ -327,6 +340,14 @@ void VImageParameter::reset( unsigned int resetLevel )
     muonRSigma = 0.;
     muonSize = 0.;
     muonValid = 0;
+
+// Hough transform muon parameters
+    houghAP = 0.;
+    houghTD = 0.;
+    houghNpix = 0;
+    houghCN = 0.;
+    houghContained = 0.;
+    houghMuonValid = 0;
 
 }
 

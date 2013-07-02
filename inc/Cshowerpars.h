@@ -280,13 +280,25 @@ void Cshowerpars::Init(TTree *tree)
     else          traceFit = 0;
     fChain->SetBranchAddress("TelElevation",TelElevation);
     fChain->SetBranchAddress("TelAzimuth",TelAzimuth);
+
+    if( !bMC )
+    {
+       fChain->SetBranchAddress("TelDec", TelDec );
+       fChain->SetBranchAddress("TelRA", TelRA );
+    }
+    else
+    {
+        for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+        {
+            TelDec[i] = 0.;
+            TelRA[i] = 0;
+        }
+    }
     if( !bMC && !bShort )
     {
        fChain->SetBranchAddress("TelElevationVBF",TelElevationVBF);
        fChain->SetBranchAddress("TelAzimuthVBF",TelAzimuthVBF);
        fChain->SetBranchAddress("TelPointingMismatch",TelPointingMismatch);
-       fChain->SetBranchAddress("TelDec", TelDec );
-       fChain->SetBranchAddress("TelRA", TelRA );
        fChain->SetBranchAddress("Tel_x_SC",Tel_x_SC);
        fChain->SetBranchAddress("Tel_y_SC",Tel_y_SC);
        fChain->SetBranchAddress("Tel_z_SC",Tel_z_SC);
@@ -302,8 +314,6 @@ void Cshowerpars::Init(TTree *tree)
             TelElevationVBF[i] = 0.;
             TelAzimuthVBF[i] = 0.;
             TelPointingMismatch[i] = 0.;
-            TelDec[i] = 0.;
-            TelRA[i] = 0;
             Tel_x_SC[i] = 0.;
             Tel_y_SC[i] = 0.;
             Tel_z_SC[i] = 0.;
@@ -448,13 +458,21 @@ Bool_t Cshowerpars::Notify()
     b_traceFit = fChain->GetBranch("traceFit");
     b_TelElevation = fChain->GetBranch("TelElevation");
     b_TelAzimuth = fChain->GetBranch("TelAzimuth");
+    if( !bMC )
+    {
+        b_TelDec = fChain->GetBranch("TelDec");
+        b_TelRA = fChain->GetBranch("TelRA");
+    }
+    else
+    {
+        b_TelDec = 0;
+        b_TelRA = 0;
+    }
     if( !bShort )
     {
         b_TelElevationVBF = fChain->GetBranch("TelElevationVBF");
         b_TelAzimuthVBF = fChain->GetBranch("TelAzimuthVBF");
         b_TelPointingMismatch = fChain->GetBranch("TelPointingMismatch");
-        b_TelDec = fChain->GetBranch("TelDec");
-        b_TelRA = fChain->GetBranch("TelRA");
         b_Tel_x_SC = fChain->GetBranch("Tel_x_SC");
         b_Tel_y_SC = fChain->GetBranch("Tel_y_SC");
         b_Tel_z_SC = fChain->GetBranch("Tel_z_SC");
@@ -468,8 +486,6 @@ Bool_t Cshowerpars::Notify()
         b_TelElevationVBF = 0;
         b_TelAzimuthVBF = 0;
         b_TelPointingMismatch = 0;
-        b_TelDec = 0;
-        b_TelRA = 0;
         b_Tel_x_SC = 0;
         b_Tel_y_SC = 0;
         b_Tel_z_SC = 0;

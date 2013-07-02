@@ -1024,7 +1024,7 @@ void VReadRunParameter::test_and_adjustParams()
         }
     }
 // muon runs need long tree
-    if( fRunPara->fmuonmode )
+    if( fRunPara->fmuonmode || fRunPara->fhoughmuonmode )
     {
        fRunPara->fShortTree = false;
     }

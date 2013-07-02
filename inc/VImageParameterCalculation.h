@@ -9,8 +9,9 @@
 #include <vector>
 
 #include <VDetectorGeometry.h>
-#include <VImageParameter.h>
 #include <VEvndispData.h>
+#include <VHoughTransform.h>
+#include <VImageParameter.h>
 
 #include "TError.h"
 #include "TMath.h"
@@ -51,6 +52,9 @@ class VImageParameterCalculation : public TObject
         double getFractionOfImageBorderPixelUnderImage( double, double, double, double, double, double );
         double redang( double angle, double maxI );  //!< reduce angle to intervall [0.,maxI]
 
+// Hough transform
+        VHoughTransform *fHoughTransform;
+
     public:
 
         VImageParameterCalculation( unsigned int iShortTree = 0, VEvndispData *iData = 0 );
@@ -59,6 +63,13 @@ class VImageParameterCalculation : public TObject
         void muonRingFinder();                                                                 //!< fit a single ring to the image to look for muons
         void sizeInMuonRing();                                                                 //! calculate the brightness of the muon ring
         void muonPixelDistribution();                                                          //!< determine the distribution of pixels in the image
+
+//Hough transform
+        void houghInitialization(); 				//Initialize the Hough transform class
+        void houghMuonRingFinder();                 //!< fit a single ring to the image to look for muons
+        void houghSizeInMuonRing();                 //! calculate the brightness of the muon ring
+        void houghMuonPixelDistribution();          //!< determine the distribution of pixels in the image
+
         void calcTriggerParameters( vector<bool> fTrigger );                                   //!< MS: calculate trigger-level image parameters
         void calcParameters();                                                                 //!< calculate image parameters (geo.)
         void calcTimingParameters();

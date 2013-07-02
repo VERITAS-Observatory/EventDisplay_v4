@@ -171,6 +171,11 @@ void VImageAnalyzer::doAnalysis()
     if( fRunPar->fmuonmode && !fRunPar->fDoublePass ) muonRingAnalysis();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//Hough transform muon ring analysis
+    if( fRunPar->fhoughmuonmode && !fRunPar->fDoublePass ) houghMuonRingAnalysis();
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // second pass of image calculation with using time gradient to adjust sum window
     if( fRunPar->fDoublePass && fReader->hasFADCTrace() && getRunParameter()->doFADCAnalysis() )
@@ -193,6 +198,13 @@ void VImageAnalyzer::doAnalysis()
 ///////////////////////////////////////////////////////////////////////////////////////////
 // muon ring analysis (second pass)
         if( fRunPar->fmuonmode ) muonRingAnalysis();
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//Hough transform muon ring analysis (second pass)
+
+        if( fRunPar->fhoughmuonmode ) houghMuonRingAnalysis();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // smoothing of dead or disabled pixels (second part)
@@ -786,3 +798,28 @@ void VImageAnalyzer::muonRingAnalysis()
     fVImageParameterCalculation->muonPixelDistribution();
     fVImageParameterCalculation->sizeInMuonRing();
 }
+
+void VImageAnalyzer::houghMuonRingAnalysis()
+{
+
+	//Martins muon parametrization algorithm
+	fVImageParameterCalculation->muonRingFinder();
+
+	//Hough transform based muon parametrization algorithm invoked here
+	//fVImageParameterCalculation->houghMuonRingFinder();
+
+	//Martins muon finder
+	fVImageParameterCalculation->muonPixelDistribution();
+
+	//Hough transform muon ID technique
+	fVImageParameterCalculation->houghMuonPixelDistribution();
+
+	//Hough transform based size calculation algorithm
+	//fVImageParameterCalculation->houghSizeInMuonRing();
+
+	//Martins size calculation algorithm
+	fVImageParameterCalculation->sizeInMuonRing();
+
+}
+
+

@@ -86,6 +86,14 @@ class VImageParameter
         float muonSize;                           //!< total amount of light in muon ring
         int   muonValid;                          //!< 0/1 depending on wether it satisfies criteria
 
+// Hough transform muon parameters
+        double 	houghAP; 						  //!< AP parameter
+        double 	houghTD; 					      //!< TD parameter
+        int 	houghNpix; 						  //!< Number of hit pixels
+        double 	houghCN; 						  //!< C/N parameter
+        double 	houghContained; 			  //!< Distance from the center of the ring to the center of the camera plus the ring radius in mm
+        int 	houghMuonValid;					  //!< 0/1 depending on whether it satisfies the Hough transform muon ID criteria
+
 // signal section
         unsigned short int ntubes;                //!< number of tubes in the picture
         unsigned short int trig_tubes;            //!< MS: number of tubes selected in the trigger algorithm

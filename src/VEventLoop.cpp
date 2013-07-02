@@ -1147,11 +1147,13 @@ int VEventLoop::checkCuts()
         TTree i_tree( "i_tree", "" );
         float cen_x, cen_y, length, width, size, azwidth, alpha, los, miss, phi, cosphi, sinphi, dist, asymmetry;
         float muonSize, muonRadius, muonRSigma;   // muon Martin
+        double houghAP, houghTD, houghCN, houghContained; //muon Hough
         short int fLocalTrigger;
         float MCenergy;
         unsigned short int ntubes, bad, nlowgain, nsat;
         int muonValid;
 	unsigned short int eventType;
+        int houghMuonValid, houghNpix; //Hough
 
 	i_tree.Branch( "eventType", &eventType, "eventType/s" );
         i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
@@ -1174,10 +1176,16 @@ int VEventLoop::checkCuts()
         i_tree.Branch( "bad", &bad, "bad/s" );
         i_tree.Branch( "MCenergy", &MCenergy, "MCenergy/F" );
         i_tree.Branch( "fLocalTrigger", &fLocalTrigger, "fLocalTrigger/S" );
-        i_tree.Branch( "muonRadius", &muonRadius, "muonRadius/F" );
-        i_tree.Branch( "muonRSigma", &muonRSigma, "muonRSigma/F" );
-        i_tree.Branch( "muonSize", &muonSize, "muonSize/F" );
-        i_tree.Branch( "muonValid", &muonValid, "muonValid/I" );
+        if( i_tree.GetBranchStatus( "muonRadius" ) ) i_tree.Branch( "muonRadius", &muonRadius, "muonRadius/F" );
+        if( i_tree.GetBranchStatus( "muonRSigma" ) ) i_tree.Branch( "muonRSigma", &muonRSigma, "muonRSigma/F" );
+        if( i_tree.GetBranchStatus( "muonSize" ) ) i_tree.Branch( "muonSize", &muonSize, "muonSize/F" );
+        if( i_tree.GetBranchStatus( "muonValid" ) ) i_tree.Branch( "muonValid", &muonValid, "muonValid/I" );
+        if( i_tree.GetBranchStatus( "houghMuonValid" ) ) i_tree.Branch( "houghMuonValid", &houghMuonValid, "houghMuonValid/I" );
+        if( i_tree.GetBranchStatus( "houghAP" ) ) i_tree.Branch( "houghAP", &houghAP, "houghAP/D" );
+        if( i_tree.GetBranchStatus( "houghTD" ) ) i_tree.Branch( "houghTD", &houghTD, "houghTD/D" );
+        if( i_tree.GetBranchStatus( "houghNpix" ) ) i_tree.Branch( "houghNpix", &houghNpix, "houghNpix/I" );
+        if( i_tree.GetBranchStatus( "houghCN" ) ) i_tree.Branch( "houghCN", &houghCN, "houghCN/D" );
+        if( i_tree.GetBranchStatus( "houghContained" ) ) i_tree.Branch( "houghContained", &houghContained, "houghContained/D" );
 
 	eventType = fAnalyzer->getImageParameters()->eventType;
         cen_x = fAnalyzer->getImageParameters()->cen_x;
@@ -1203,6 +1211,12 @@ int VEventLoop::checkCuts()
         muonRadius = fAnalyzer->getImageParameters()->muonRadius;
         muonRSigma = fAnalyzer->getImageParameters()->muonRSigma;
         muonValid = fAnalyzer->getImageParameters()->muonValid;
+        houghMuonValid = fAnalyzer->getImageParameters()->houghMuonValid;
+        houghAP = fAnalyzer->getImageParameters()->houghAP;
+        houghTD = fAnalyzer->getImageParameters()->houghTD;
+        houghNpix = fAnalyzer->getImageParameters()->houghNpix;
+        houghCN = fAnalyzer->getImageParameters()->houghCN;
+        houghContained = fAnalyzer->getImageParameters()->houghContained;
 
         i_tree.Fill();
         i_cut = int(i_tree.Draw( "alpha", fStringCut[getTelID()].c_str(), "goff" ));

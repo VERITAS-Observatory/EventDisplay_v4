@@ -46,6 +46,7 @@ class VImageAnalyzer : public VImageBaseAnalyzer
 	void imageCleaning();                     //!< image cleaning
         bool initEvent();                         //! reset image calculation for next event
 	void muonRingAnalysis();                  //! muon ring analysis
+	void houghMuonRingAnalysis();                  //! hough transform muon ring analysis
         void printTrace( int i_channel );         //!< print trace information for one channel (debugging)
         void setAnaDir( unsigned int iTel );      //!< set directories in root output file
         void setNTrigger();
