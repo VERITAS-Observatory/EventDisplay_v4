@@ -63,6 +63,10 @@ class VDataMCComparision
    TH1D *hMSCL;
    TH2D *hMSCWErec;
    TH2D *hMSCLErec;
+   TH1D *hMWR;//AMc
+   TH1D *hMLR;//AMc
+   TH2D *hMWRErec;//AMc
+   TH2D *hMLRErec;//AMc
    TH1D *hXcore;
    TH1D *hYcore;
    TH2D *hXYcore;
