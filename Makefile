@@ -300,7 +300,8 @@ EVNOBJECTS =	./obj/VVirtualDataReader.o \
 		./obj/CorrectionParameters.o \
 		./obj/Angle.o \
 		./obj/PointingMonitor.o \
-		./obj/VSkyCoordinatesUtilities.o
+		./obj/VSkyCoordinatesUtilities.o \
+		./obj/VHoughTransform.o
 
 FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
