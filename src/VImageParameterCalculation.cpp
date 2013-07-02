@@ -1382,6 +1382,17 @@ vector<bool> VImageParameterCalculation::calcLL()
 
     fParLL->ntubes = fParGeo->ntubes;
     fParLL->bad = fParGeo->bad;
+	
+	// For showing which events are calculated via the LL method,
+	// uncomment this line, then run event display twice,
+	// first:  $ evndisp -runnumber=54550 -display=1
+	// second: $ evndisp -runnumber=54550 -display=1 -reconstructionparameter EVNDISP.reconstruction.FORCELL.runparameter
+	// where EVNDISP.reconstruction.FORCELL.runparameter has the extra line:
+	// * -1 FORCELL 1
+	// Then, this printf will print which events have their
+	// image parameters calculated with the log-likelihood method
+	// 
+    //printf( "  FORCELL event %2d telescope %d (cen_x,cen_y) %6.4f %6.4f \n", fData->getEventNumber(), fData->getTelID()+1, fParLL->cen_x, fParLL->cen_y) ; 
 
     return fLLEst;
 }

@@ -701,6 +701,25 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                }
 	       continue;
 	    }
+		
+		// FORCELL
+		// Set in EVNDISP.reconstruction.runparameter , for example:
+		// * -1 FORCELL 1
+		// if set to 1, the imagefitting will use log-likelihood image fitting for all
+		// images, regardless of whether the image is on the edge or not.
+		// This will ignore the options specified by 'LLEDGEFIT'
+		// If option is set to 0 or is not present, will behave normally
+		// (i.e. LL image fit on edges, hillas ellipse in middle of camera)
+		else if ( iTemp == "FORCELL" && fRunPara )
+		{
+			if ( atoi( iTemp2.c_str() ) == 1 ) fRunPara->fForceLLImageFit = true ;
+			else fRunPara->fForceLLImageFit = false ;
+			cout << endl;
+			cout << "FORCELL set to " << fRunPara->fForceLLImageFit << endl;
+			cout << endl;
+			continue;
+		}
+		
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////

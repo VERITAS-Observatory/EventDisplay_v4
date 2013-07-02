@@ -221,8 +221,8 @@ void VImageAnalyzer::doAnalysis()
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // do a log likelihood image fitting on events on the camera edge only
-        if( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()] 
-	&& getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()] )
+		if ( getImageParameters()->ntubes > fRunPar->fLogLikelihood_Ntubes_min[getTelID()] 
+		&& ( fRunPar->fForceLLImageFit || (getImageParameters()->loss > fRunPar->fLogLikelihoodLoss_min[getTelID()]) ) ) // FORCELL
         {
             fVImageParameterCalculation->setParametersLogL( getImageParameters() );
             setLLEst( fVImageParameterCalculation->calcLL() );

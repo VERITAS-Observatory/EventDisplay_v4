@@ -61,9 +61,14 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         string fsourcefile;                       // name of data file
         int    fnevents;                          // total number of events to be analyzed
         int    fFirstEvent;                      // skip up till this event 
-
-		//
-		bool fprintdeadpixelinfo ; 			// DEADCHAN if true, will print list of dead pixels at end of run to evndisp.log
+		
+		bool fprintdeadpixelinfo ; 			// DEADCHAN if true, will print list of dead pixels
+											// at end of run to evndisp.log
+		
+		bool fForceLLImageFit ; 			// FORCELL if true, will use log-likelihood image fitting 
+											// on all images, irregardless of if they are near the 
+											// edge of the camera or not.  Set in
+											// EVNDISP.reconstruction.runparameter
 
 	float  fRunDuration;                      // duration of runs in [s]
 
