@@ -542,6 +542,14 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             fRunPara->fFirstEvent = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
             if( fRunPara->fFirstEvent < 0 ) fRunPara->fFirstEvent = -10000;
         }
+		
+		// check if the user wants to print the list of dead pixels for this run
+        else if( iTemp.rfind( "printdeadpixelinfo" ) < iTemp.size() ) // DEADCHAN
+        {
+			fRunPara->fprintdeadpixelinfo = true ;
+        }
+		
+		
 // source type
         else if( iTemp.find( "type" ) < iTemp.size() )
         {

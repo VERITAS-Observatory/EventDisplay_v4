@@ -61,6 +61,8 @@ VEvndispRunParameter::VEvndispRunParameter()
     fIgnoreCFGversions = false;
     fPrintAnalysisProgress = 25000;
     fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
+	
+	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 
 // geometry/calibration parameters
     fNTelescopes = 4;                             // there is always at least one telescope

@@ -347,6 +347,7 @@ class VEvndispData
 	bool                isDST_MC() { if( isMC() && (fRunPar->fsourcetype == 4 || fRunPar->fsourcetype == 7) ) return true; else return false; }
 	bool                isTeltoAna( unsigned int iTel );
         void                printDeadChannels( bool iLowGain = false );
+		void                printDeadChannelList();  // DEADCHAN print list of dead channels, 1 line per channel/gain/telescope
         void                resetAnaData();
         void                setAnalysisArrayEventStatus( unsigned int i ) { fAnalysisArrayEventStatus = i; }
         void                setAnaData() { fAnaData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getReader()->getMaxChannels(), (getTraceFit()>-1.), getDebugFlag(), getRunParameter()->fMCNdeadSeed, getNSamples(), getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, getRunParameter()->fpulsetiming_width_index ); }

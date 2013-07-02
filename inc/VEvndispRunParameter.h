@@ -62,6 +62,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         int    fnevents;                          // total number of events to be analyzed
         int    fFirstEvent;                      // skip up till this event 
 
+		//
+		bool fprintdeadpixelinfo ; 			// DEADCHAN if true, will print list of dead pixels at end of run to evndisp.log
+
 	float  fRunDuration;                      // duration of runs in [s]
 
 // output parameters

@@ -544,6 +544,15 @@ void VEventLoop::shutdown()
     if( fDebug ) cout << "VEventLoop::shutdown()" << endl;
     endOfRunInfo();
     cout << endl << "-----------------------------------------------" << endl;
+	
+	// if we have the proper settings,
+	// print the dead pixel information
+	if ( fRunPar->frunmode == R_ANA && fRunPar->fprintdeadpixelinfo ) // DEADCHAN
+	{
+		cout << endl;
+		printDeadChannelList();
+	}
+	
 // (GM): write a root file even if no event was analyzed
 //    if( fEventNumber >= 0 )
     {

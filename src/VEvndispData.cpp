@@ -439,6 +439,62 @@ void VEvndispData::printDeadChannels( bool iLowGain )
     cout << "==================================" << endl;
 }
 
+// Prints list of disabled channels, along with their gain and host telescope,
+// and the reasons they were disabled, in an easily grep-able format.
+// The list is only produced when the evndisp option -printdeadpixelinfo is used.
+// To see the results, cd to where your *.evndisp.log files are, and do:
+// $ grep DEADCHAN <runnumber>.evndisp.log
+// Tel: Telescope number, 1-4
+// Gain: 0=Low Gain, 1=High Gain
+// Chan: Channel Number (not Pixel Number)
+void VEvndispData::printDeadChannelList() // DEADCHAN
+{
+
+	unsigned int Telescope ;
+	bool GainVec[2] ;
+	GainVec[0]=true;
+	GainVec[1]=false;
+	bool iLowGain;
+	unsigned int Gain ;
+	
+    cout << "==================================" << endl;
+    cout << "Dead Channel Listing" << endl;
+	// loop over gains
+	for ( unsigned int kGain = 0 ; kGain < 2 ; kGain++ )
+	{
+		iLowGain = GainVec[kGain] ;
+		if ( iLowGain)  Gain = 0 ;
+		else 			Gain = 1 ;
+		
+		// loop over telescopes
+		for ( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
+		{
+			setTelID( getTeltoAna()[jTel] ) ;	
+			Telescope = getTelID()+1 ;
+			unsigned int idead = 0 ;
+			
+			// loop over dead channels
+			for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
+			{
+				if( getDead( iLowGain )[i] > 0 )
+				{
+					bitset<8*sizeof(uint32_t)> i_dead = getDead( iLowGain )[i];
+					//cout << "\t " << i << "\t";
+					printf( "   DEADCHAN Tel %d Gain %d Chan %d ", Telescope, Gain, i ) ;
+					for( unsigned j = 0; j < i_dead.size(); j++ )
+					{
+						if( i_dead.test( j ) && j < fDeadChannelText.size() ) cout << " - " << fDeadChannelText[j] ;
+					}
+					cout << endl;
+					if( !i_dead.test( 9 ) ) idead++;
+				}
+			}
+		}
+	}
+    cout << "==================================" << endl;
+	
+}
+
 
 VImageParameter* VEvndispData::getImageParameters( int iselect )
 {
