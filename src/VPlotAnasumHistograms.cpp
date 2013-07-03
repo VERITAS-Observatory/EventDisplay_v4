@@ -1327,15 +1327,15 @@ void VPlotAnasumHistograms::plot_RBM_ring( double r, double iA, double t2, doubl
 
 // inner ring
     TEllipse *ringI = new TEllipse( 0., 0., r-rw );
-    ringI->SetFillStyle( 4000 );
+    ringI->SetFillStyle( 0 );
 
 // outer ring
     TEllipse *ringO = new TEllipse( 0., 0., r+rw );
-    ringO->SetFillStyle( 4000 );
+    ringO->SetFillStyle( 0 );
 
 // draw exclusion region
     TEllipse *ringE = new TEllipse( 0., 0., iN );
-    ringE->SetFillStyle( 4000 );
+    ringE->SetFillStyle( 0 );
     ringE->SetLineStyle( 2 );
     ringE->SetLineColor( 2 );
 
@@ -1343,7 +1343,7 @@ void VPlotAnasumHistograms::plot_RBM_ring( double r, double iA, double t2, doubl
     TEllipse *ringT2 = new TEllipse( 0., 0., TMath::Sqrt( t2 ) );
     ringT2->SetLineStyle( 3 );
     ringT2->SetLineColor( 2 );
-    ringT2->SetFillStyle( 4000 );
+    ringT2->SetFillStyle( 0 );
 
     ringI->Draw();
     ringO->Draw();
@@ -1480,7 +1480,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, in
 
 // region around camera center
     TEllipse *iLC = new TEllipse( x-x_n, y-y_n, r, r );
-    iLC->SetFillStyle( 4000 );
+    iLC->SetFillStyle( 0 );
     iLC->SetLineStyle( 2 );
     iLC->Draw();
     cout << "\t x_r \t y_r \t r_r" << endl;
@@ -1488,14 +1488,14 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, in
     {
         cout << "\t" << n << "\t" << x_r[n] << "\t" << y_r[n] << "\t" << r_r[n] << endl;
         TEllipse *iL = new TEllipse( x_r[n], y_r[n], r_r[n], r_r[n] );
-        iL->SetFillStyle( 4000 );
+        iL->SetFillStyle( 0 );
         iL->SetLineWidth( 2 );
         iL->SetLineColor( iColor );
         iL->Draw();
     }
 // real source region
     TEllipse *iRR = new TEllipse( 0., 0., r, r );
-    iRR->SetFillStyle( 4000 );
+    iRR->SetFillStyle( 0 );
     iRR->SetLineWidth( 2 );
     iRR->SetLineColor( 3 );
     iRR->Draw();
@@ -1509,7 +1509,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, in
     for( int e = 0; e < n_ex; e++ )
     {
         TEllipse *iEx = new TEllipse( x_ex[e], y_ex[e], r_ex[e], r_ex[e] );
-        iEx->SetFillStyle( 4000 );
+        iEx->SetFillStyle( 0 );
         iEx->SetLineStyle( 3 );
         iEx->SetLineWidth( 2 );
         iEx->SetLineColor( 6 );
@@ -1520,7 +1520,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, in
 	{
 	   double rr = sqrt( x_ex[e]*x_ex[e] + y_ex[e]*y_ex[e] );
 	   TEllipse *iRRR = new TEllipse( 0., 0., rr, rr );
-	   iRRR->SetFillStyle( 4000 );
+	   iRRR->SetFillStyle( 0 );
 	   iRRR->Draw();
         }
     }
@@ -1569,7 +1569,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c )
     {
         t->GetEntry( i );
         TEllipse *e = new TEllipse( x, -1.*y, r );
-        e->SetFillStyle( 4000 );
+        e->SetFillStyle( 0 );
         e->SetLineColor( 6 );
         e->Draw();
     }
