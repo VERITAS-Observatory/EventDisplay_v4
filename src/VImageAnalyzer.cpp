@@ -802,22 +802,22 @@ void VImageAnalyzer::muonRingAnalysis()
 void VImageAnalyzer::houghMuonRingAnalysis()
 {
 
-	//Martins muon parametrization algorithm
+// Iterative fit muon analysis
 	fVImageParameterCalculation->muonRingFinder();
 
-	//Hough transform based muon parametrization algorithm invoked here
+//Hough transform based muon parametrization algorithm invoked here
 	//fVImageParameterCalculation->houghMuonRingFinder();
 
-	//Martins muon finder
+// Iterative fit muon analysis
 	fVImageParameterCalculation->muonPixelDistribution();
 
-	//Hough transform muon ID technique
+//Hough transform muon ID technique
 	fVImageParameterCalculation->houghMuonPixelDistribution();
 
-	//Hough transform based size calculation algorithm
+//Hough transform based size calculation algorithm
 	//fVImageParameterCalculation->houghSizeInMuonRing();
 
-	//Martins size calculation algorithm
+// Iterative fit muon analysis
 	fVImageParameterCalculation->sizeInMuonRing();
 
 }

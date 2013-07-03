@@ -147,7 +147,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
         tpars->Branch("tchisq_x",&tchisq_x, "tchisq_x/F");
     }
 
-//muon parameters  Martin
+// muon parameters (Iterative fit muon analysis)
     if( fShortTree < 1 )
     {
         tpars->Branch("muonX0", &muonX0, "muonX0/F" );
@@ -158,7 +158,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
         tpars->Branch("muonValid", &muonValid, "muonValid/I" );
     }
 
-//muon parameters (Hough transform)
+// muon parameters (Hough transform)
     if( fShortTree < 1 )
     {
 
@@ -333,7 +333,7 @@ void VImageParameter::reset( unsigned int resetLevel )
     signal = 0.;
     dsignal = 0.;
 
-// Martin's muon parameter
+// Iterative fit muon analysis
     muonX0 = 0.;
     muonY0 = 0.;
     muonRadius = 0.;

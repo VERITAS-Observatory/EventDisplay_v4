@@ -1146,8 +1146,8 @@ int VEventLoop::checkCuts()
     {
         TTree i_tree( "i_tree", "" );
         float cen_x, cen_y, length, width, size, azwidth, alpha, los, miss, phi, cosphi, sinphi, dist, asymmetry;
-        float muonSize, muonRadius, muonRSigma;   // muon Martin
-        double houghAP, houghTD, houghCN, houghContained; //muon Hough
+        float muonSize, muonRadius, muonRSigma;   // muon (Iterative fit muon analysis)
+        double houghAP, houghTD, houghCN, houghContained; //muon (Hough)
         short int fLocalTrigger;
         float MCenergy;
         unsigned short int ntubes, bad, nlowgain, nsat;
