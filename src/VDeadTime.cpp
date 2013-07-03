@@ -459,33 +459,33 @@ bool VDeadTime::readHistograms( TDirectoryFile *iDir )
 
     hTimeDiff = (TH1D*)iDir->Get( "hTimeDiff_on" );
     if( !bIsOn ) hTimeDiff->SetName( "hTimeDiff_off" );
-    hisList->Add( hTimeDiff );
+    if( hTimeDiff ) hisList->Add( hTimeDiff );
     hTimeDiffLog = (TH1D*)iDir->Get( "hTimeDiffLog_on" );
     if( !bIsOn ) hTimeDiffLog->SetName( "hTimeDiffLog_off" );
-    hisList->Add( hTimeDiffLog );
+    if( hTimeDiffLog ) hisList->Add( hTimeDiffLog );
     hTimeDiff2D = (TH2D*)iDir->Get( "hTimeDiff2D_on" );
     if( !bIsOn ) hTimeDiff2D->SetName( "hTimeDiff2D_off" );
-    hisList->Add( hTimeDiff2D );
+    if( hTimeDiff2D ) hisList->Add( hTimeDiff2D );
     hgDeadTime = (TGraphErrors*)iDir->Get( "hgDeadTime_on" );
     if( !bIsOn ) hgDeadTime->SetName( "hgDeadTime_off" );
-    hisList->Add( hgDeadTime );
+    if( hgDeadTime ) hisList->Add( hgDeadTime );
     hNEventTime = (TH1D*)iDir->Get( "hNEventTime_on" );
     if( !bIsOn ) hNEventTime->SetName( "hNEventTime_off" );
-    hisList->Add( hNEventTime );
+    if( hNEventTime ) hisList->Add( hNEventTime );
     hFTimeDiff = (TF1*)iDir->Get( "hFTimeDiff_on" );
     if( !bIsOn ) hFTimeDiff->SetName( "hFTimeDiff_off" );
-    hisList->Add( hFTimeDiff );
+    if( hFTimeDiff ) hisList->Add( hFTimeDiff );
 
 // scalar histograms
     hScalarClock = (TH1D*)iDir->Get( "hScalarClock_on" );
     if( !bIsOn ) hScalarClock = (TH1D*)iDir->Get( "hScalarClock_off" );
-    hisList->Add( hScalarClock );
+    if( hScalarClock ) hisList->Add( hScalarClock );
     hScalarBusy = (TH1D*)iDir->Get( "hScalarBusy_on" );
     if( !bIsOn ) hScalarBusy = (TH1D*)iDir->Get( "hScalarBusy_off" );
-    hisList->Add( hScalarBusy );
+    if( hScalarBusy ) hisList->Add( hScalarBusy );
     hScalarDeadTimeFraction = (TH1D*)iDir->Get( "hScalarDeadTimeFraction_on" );
     if( !bIsOn ) hScalarDeadTimeFraction = (TH1D*)iDir->Get( "hScalarDeadTimeFraction_off" );
-    hisList->Add( hScalarDeadTimeFraction );
+    if( hScalarDeadTimeFraction ) hisList->Add( hScalarDeadTimeFraction );
 
     return true;
 }

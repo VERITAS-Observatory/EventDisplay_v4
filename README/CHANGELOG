@@ -1,6 +1,27 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130703 (GM) added additional checks in reading dead time histograms 
+                before adding them to the TList in VDeadTime (Bug 128)
+
+* 20130702 (AMc) some additions to the MC/data comparison
+                 (MWR, MLR, etc)
+
+* 20130702 (JT) implementation of the Hough muon analysis
+                (integration by GM)
+
+* 20130701 (GM) some optimizations to CTA converter
+                (mainly in resetting vectors in VDSTTree)
+		x3 improvement in speed
+
+* 20130701 (GM) added reading of trigger mask files to CTA converter
+                (allows correction of wrong trigger mask settings in 
+		 Spring 2013 prod2 simulations)
+
+* 20130701 (GM) fixed significant bug in tzero_mean settings in CTA converter
+                (mix up of telescope ID and telescope number): 
+		high impact on small event reconstruction for prod2
+
 * 20130627 (GM) optimize writing of pedestals histograms at the end
                 of the pedestal calculation routines (Bug 127)
 
