@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130703 (GM) fixed bug in relating the correct telescope number to 
+                the simtel telescope ID  (CTA/ASTRI)
+
 * 20130703 (GM) added additional checks in reading dead time histograms 
                 before adding them to the TList in VDeadTime (Bug 128)
 

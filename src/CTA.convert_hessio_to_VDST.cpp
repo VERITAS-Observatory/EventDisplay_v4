@@ -50,6 +50,8 @@ unsigned int fGlobalNTelPreviousEvent = 0;
 bool fGlobalTriggerReset = false;
 // map with telescope types (length of vector is total number of telescopes)
 map< int, ULong64_t > fTelescopeType;
+// map wit simtel telescope IDs (ID, counter)
+map< unsigned int, unsigned int > fTelescopeSimTelList;
 #ifdef CTA_PROD2_TRGMASK
 // trigger mask hash set
 struct trgmask_hash_set *fTriggerMask_hash_set = 0;
@@ -480,11 +482,23 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
       {
          fData->fDSTtel_data[i_ntel_data] = (unsigned int)hsdata->event.central.teldata_list[i];
 	 unsigned int telID = fData->fDSTtel_data[i_ntel_data] - 1;
+	 if( fTelescopeSimTelList.find( telID+1 ) != fTelescopeSimTelList.end() )
+	 {
+	     telID = fTelescopeSimTelList[telID+1];
+         }
+	 else
+	 {
+	     cout << "Error in DST_fillEvent: unkown telescope " << endl;
+	     cout << "\t telescope ID: " << telID+1 << endl;
+	     cout << "\t telescope # in list: " << i << endl;
+	     cout << "\t total number of telescopes: " << hsdata->event.num_tel << endl;
+	     cout << "\t number of telescopes in this list: " << hsdata->event.central.num_teldata << endl;
+	     exit( 0 );
+         }
 // newer hessio versions need this statement for whatever reason
 #if CTA_SC>1
 	 if( hsdata->event.teldata[telID].known == 0 ) continue;
 #endif
-
 ////////////////////////////////////////////////
 // get pixel (QADC) data
          fData->fDSTTelescopeZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
@@ -1425,6 +1439,8 @@ int main(int argc, char **argv)
             {
                tel_id = hsdata->run_header.tel_id[itel];
                hsdata->camera_set[itel].tel_id = tel_id;
+	       fTelescopeSimTelList[tel_id] = itel;
+	       cout << "Telescope ID " << tel_id << " is telescope # " << itel << endl;
                hsdata->camera_org[itel].tel_id = tel_id;
                hsdata->pixel_set[itel].tel_id = tel_id;
                hsdata->pixel_disabled[itel].tel_id = tel_id;
