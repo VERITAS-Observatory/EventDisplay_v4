@@ -45,8 +45,8 @@ class VDBRunInfo
         double fWobbleNorth;
         double fWobbleEast;
         unsigned int fConfigMask;
-        unsigned int fConfigMaskDQM;
-        unsigned int fConfigMaskNew;
+        //unsigned int fConfigMaskDQM;
+        //unsigned int fConfigMaskNew;
         unsigned int fTelToAna;
         string fRunType;
         string fObservingMode;
@@ -56,8 +56,9 @@ class VDBRunInfo
 
 	TSQLServer*            connectToSQLServer( string iDBserver );
 	vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
-        void                   readRunInfoFromDB( string );
-        void                   readRunDQM( string );
+        void                   readRunInfoFromDB( string iDBserver);
+	unsigned int           readRunDQM( string iDBserver, int run_number , unsigned int config_mask);
+        void                   readRunDQM( string iDBserver);
 
     public:
 

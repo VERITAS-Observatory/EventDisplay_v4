@@ -19,8 +19,8 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel )
     fWobbleNorth = 0.;
     fWobbleEast = 0.;
     fConfigMask = 0;
-    fConfigMaskDQM = 0;
-    fConfigMaskNew = 0;
+    //fConfigMaskDQM = 0;
+    //fConfigMaskNew = 0;
     fTelToAna = 1234;
     fRunType = "";
     fObservingMode = "";
@@ -44,50 +44,78 @@ VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel )
 void VDBRunInfo::readRunDQM( string iDBserver )
 {
 
+    int config_mask_new = readRunDQM( iDBserver, fRunNumber,getConfigMask() );
+    fConfigMask = config_mask_new;
+    if( fConfigMask == 1 ) fTelToAna = 1;
+    else if( fConfigMask == 2 ) fTelToAna = 2;
+    else if( fConfigMask == 3 ) fTelToAna = 12;
+    else if( fConfigMask == 4 ) fTelToAna = 3;
+    else if( fConfigMask == 5 ) fTelToAna = 13;
+    else if( fConfigMask == 6 ) fTelToAna = 23;
+    else if( fConfigMask == 7 ) fTelToAna = 123;
+    else if( fConfigMask == 8 ) fTelToAna = 4;
+    else if( fConfigMask == 9 ) fTelToAna = 14;
+    else if( fConfigMask == 10 ) fTelToAna = 24;
+    else if( fConfigMask == 11 ) fTelToAna = 124;
+    else if( fConfigMask == 12 ) fTelToAna = 34;
+    else if( fConfigMask == 13 ) fTelToAna = 134;
+    else if( fConfigMask == 14 ) fTelToAna = 234;
+    else if( fConfigMask == 15 ) fTelToAna = 1234;
+
+   return;
+
+}
+
+unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned int config_mask)
+{
+
+    unsigned int ConfigMaskDQM = 0;
+    unsigned int ConfigMaskNew = 0;
 
     stringstream iTempS;
     iTempS << iDBserver << "/VOFFLINE";
     TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
 
     char c_query[1000];
-    sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRunNumber );
+    sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", run_number );
 
     TSQLResult *db_res = f_db->Query( c_query );
     if( !db_res ) {
       f_db->Close();
-      return;
+      return config_mask;
     }
 
     TSQLRow *db_row = db_res->Next();
     if( !db_row )
     {
-       cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << fRunNumber << endl;
+       cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << run_number << endl;
     } else
     {
 
       if( db_row->GetField( 4 ) ) 
       {
-        fConfigMaskDQM = (unsigned int)(atoi( db_row->GetField( 4 ) ) ); 
+        ConfigMaskDQM = (unsigned int)(atoi( db_row->GetField( 4 ) ) ); 
       }
       else 
       {
-        fConfigMaskDQM = 0;
         f_db->Close();
-        return;
+        return config_mask;
       }
 
 // Check if the mask is 0
-      if( fConfigMaskDQM == 0 )
+      if( ConfigMaskDQM == 0 )
       {
-        fConfigMaskDQM = 0;
-        f_db->Close();
-        return;
+	  f_db->Close();
+	  return config_mask;
       }
 
-      bitset<4> bitConfig(getConfigMask());
-      bitset<4> bitDQM(fConfigMaskDQM);
+      f_db->Close();
+      
+      
+      bitset<4> bitConfig(config_mask);
+      bitset<4> bitDQM(ConfigMaskDQM);
       bitset<4> bitNDQM;
-
+      
       for( int i = 0; i < (int)bitDQM.size(); i++ )
         bitNDQM.set((int)bitDQM.size()-i-1, bitDQM.test(i));
 
@@ -96,30 +124,14 @@ void VDBRunInfo::readRunDQM( string iDBserver )
 
       for( int i = 0; i < (int)bitNewConfig.size(); i++ )
         if( bitNewConfig.test(i) ) 
-          fConfigMaskNew += (unsigned int)pow(2.,i);
+          ConfigMaskNew += (unsigned int)pow(2.,i);
 
-      if( fConfigMaskNew == 1 ) fTelToAna = 1;
-      else if( fConfigMaskNew == 2 ) fTelToAna = 2;
-      else if( fConfigMaskNew == 3 ) fTelToAna = 12;
-      else if( fConfigMaskNew == 4 ) fTelToAna = 3;
-      else if( fConfigMaskNew == 5 ) fTelToAna = 13;
-      else if( fConfigMaskNew == 6 ) fTelToAna = 23;
-      else if( fConfigMaskNew == 7 ) fTelToAna = 123;
-      else if( fConfigMaskNew == 8 ) fTelToAna = 4;
-      else if( fConfigMaskNew == 9 ) fTelToAna = 14;
-      else if( fConfigMaskNew == 10 ) fTelToAna = 24;
-      else if( fConfigMaskNew == 11 ) fTelToAna = 124;
-      else if( fConfigMaskNew == 12 ) fTelToAna = 34;
-      else if( fConfigMaskNew == 13 ) fTelToAna = 134;
-      else if( fConfigMaskNew == 14 ) fTelToAna = 234;
-      else if( fConfigMaskNew == 15 ) fTelToAna = 1234;
 
-      fConfigMask = fConfigMaskNew;
+      config_mask = ConfigMaskNew;
 
    }
 
-   f_db->Close();
-   return;
+   return config_mask;
 
 }
 
@@ -353,7 +365,9 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
     }
     char c_query[1000];
 
-    sprintf( c_query, "SELECT info.run_id, grp_cmt.excluded_telescopes FROM tblRun_Info AS info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt, (SELECT group_id FROM tblRun_Group WHERE run_id=%d) AS run_grp WHERE grp_cmt.group_id = run_grp.group_id AND grp_cmt.group_type='laser' AND grp_cmt.group_id=grp.group_id AND grp.run_id=info.run_id AND (info.run_type='flasher' OR info.run_type='laser')", iRunNumber );
+    sprintf( c_query, "SELECT info.run_id, grp_cmt.excluded_telescopes, info.config_mask FROM tblRun_Info AS info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt, (SELECT group_id FROM tblRun_Group WHERE run_id=%d) AS run_grp WHERE grp_cmt.group_id = run_grp.group_id AND grp_cmt.group_type='laser' AND grp_cmt.group_id=grp.group_id AND grp.run_id=info.run_id AND (info.run_type='flasher' OR info.run_type='laser')", iRunNumber );
+
+    std::cout<<"query "<< c_query<<std::endl;
 
     TSQLResult *db_res = f_db->Query( c_query );
     if( !db_res )
@@ -362,7 +376,9 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
         return fLaserRunID;
     }
     vector< unsigned int > iLaserList;
+    vector< unsigned int > iLaserConfigMask;
     vector< unsigned int > iLaserExclude;
+
     if( db_res->GetRowCount() > 0 )
     {
        while( TSQLRow *db_row = db_res->Next() )
@@ -375,6 +391,7 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
 	  }
 	  iLaserList.push_back( atoi( db_row->GetField( 0 ) ) );
 	  iLaserExclude.push_back( atoi( db_row->GetField( 1 ) ) );
+	  iLaserConfigMask.push_back( atoi( db_row->GetField( 2 ) ) );
        }
 
     }
@@ -388,10 +405,16 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
     for( unsigned int t = 0; t < iNTel; t++ )
     {
 // check if this run is excluded from group
+// also check if telescope is within the config mask (taking DQM cuts into account)
        for( unsigned int i = 0; i < iLaserList.size(); i++ )
        {
           bitset< 8 > ibit( iLaserExclude[i] ); 
-          if( !ibit.test( t ) ) fLaserRunID[t] = iLaserList[i];
+	  unsigned int config_mask = readRunDQM(iDBserver,iLaserList[i],iLaserConfigMask[i]);
+	  bitset< 8 > ibit_mask( config_mask ); 
+          if( !ibit.test( t ) && ibit_mask.test( t )){
+	      fLaserRunID[t] = iLaserList[i];
+	  }
+
        }
     }
 
