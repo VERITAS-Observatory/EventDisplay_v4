@@ -116,7 +116,7 @@ namespace VStatistics
 
         double ulim = 0.;
 
-        if( sigma > 0. ) ulim = TMath::ErfInverse( 1. - ( (1.-CL) * TMath::Erfc( -1. * nDiff / sigma / sqrt( 2. ) ) ) ) * sigma * sqrt( 2. ) + nDiff;
+        if( sigma > 0. ) ulim = TMath::ErfcInverse(  (1.-CL) * TMath::Erfc( -1. * nDiff / sigma / sqrt( 2. ) ) ) * sigma * sqrt( 2. ) + nDiff;
 
         return ulim;
     }
