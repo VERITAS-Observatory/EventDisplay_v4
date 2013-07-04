@@ -197,8 +197,9 @@ double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2, d
    double c = 0.;
    if( gamma != -1. ) 
    {
-       c = F * (gamma+1.) / ( TMath::Power( e2, gamma+1. ) - TMath::Power( e1, gamma+1. ) );
+       c = F * (gamma+1.) * TMath::Power( e3, gamma ) / ( TMath::Power( e2, gamma+1. ) - TMath::Power( e1, gamma+1. ) );
    }
+// (not correct)
    else
    {
        c = F * ( log( e2 ) - log( e1 ) );
@@ -206,10 +207,10 @@ double VDifferentialFlux::nuFnu( double F, double gamma, double e1, double e2, d
 
 // calculate nuFu
    double nF = 0.;
-   if( e3 > 0. ) nF = c * TMath::Power( e3, gamma+2. );
+   if( e3 > 0. ) nF = c * TMath::Power( e3/e3, gamma ) * e3 * e3;
 // Following A.Tramacere (Fermi Saas Fee analysis session; 2010)
 // http://www.isdc.unige.ch/sf2010/fermi
-   else nF = c * TMath::Power( sqrt( e1*e2), gamma+2. );
+   else nF = c * TMath::Power( sqrt( e1*e2)/e3, gamma+2. );
 
 // from eV to ergs
    nF *= TMath::Qe();
