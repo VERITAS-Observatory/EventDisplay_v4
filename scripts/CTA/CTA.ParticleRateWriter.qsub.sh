@@ -18,7 +18,7 @@ source $EVNDISPSYS/setObservatory.tcsh CTA
 
 cd $DXDIR
 
-set LLOG=$DXDIR/ParticleNumbers.$AXRRAY.log
+set LLOG=$DXDIR/ParticleNumbers.$AXRRAY.$RECID.$OXFFSET.log
 rm -f $LLOG
 
 cd $EVNDISPSYS/

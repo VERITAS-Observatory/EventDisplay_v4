@@ -39,7 +39,7 @@ fi
 
 # log files
 DATE=`date +"%y%m%d"`
-FDIR=$CTA_USER_LOG_DIR/queueWPPhysWriter/$DATE
+FDIR=$CTA_USER_LOG_DIR/$DATE/WPPHYSWRITER/
 mkdir -p $FDIR
 echo "log directory: " $FDIR
 
@@ -91,7 +91,7 @@ do
 
    mv $ODIR/$FSCRIPT-$ARRAY-8.sh $ODIR/$FSCRIPT-$ARRAY.sh
 
-   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $ODIR -e $ODIR "$ODIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$ODIR/$FSCRIPT-$ARRAY.sh"
 
 done
 
