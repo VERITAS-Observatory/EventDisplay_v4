@@ -2127,23 +2127,23 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
     if( !bFound ) cout << "\t no effective area found!" << endl;
 // (end of treatment of effective areas)
 
-// copy response matrix
-    if( c->hResponseMatrix )
+// copy response matrix for energy reconstruction
+    if( c->hResponseMatrixQC )
     {
        char hname[1000];
-       sprintf( hname, "%s_%s_%d_%d_%d", c->hResponseMatrix->GetName(), iMCPara->fName.c_str(), 
+       sprintf( hname, "%s_%s_%d_%d_%d", c->hResponseMatrixQC->GetName(), iMCPara->fName.c_str(), 
                                          (int)(iMCPara->woff*1000), iMCPara->az, (int)(iMCPara->index*100) );
        iMCPara->hResponseMatrix->SetName( hname );
-       iMCPara->hResponseMatrix->SetTitle( c->hResponseMatrix->GetTitle() );
-       iMCPara->hResponseMatrix->SetBins( c->hResponseMatrix->GetNbinsX(), 
-                                          c->hResponseMatrix->GetXaxis()->GetXmin(), c->hResponseMatrix->GetXaxis()->GetXmax(),
-				 	  c->hResponseMatrix->GetNbinsY(),
-                                          c->hResponseMatrix->GetYaxis()->GetXmin(), c->hResponseMatrix->GetYaxis()->GetXmax() );
-       for( int i = 0; i <= c->hResponseMatrix->GetNbinsX(); i++ )
+       iMCPara->hResponseMatrix->SetTitle( c->hResponseMatrixQC->GetTitle() );
+       iMCPara->hResponseMatrix->SetBins( c->hResponseMatrixQC->GetNbinsX(), 
+                                          c->hResponseMatrixQC->GetXaxis()->GetXmin(), c->hResponseMatrixQC->GetXaxis()->GetXmax(),
+				 	  c->hResponseMatrixQC->GetNbinsY(),
+                                          c->hResponseMatrixQC->GetYaxis()->GetXmin(), c->hResponseMatrixQC->GetYaxis()->GetXmax() );
+       for( int i = 0; i <= c->hResponseMatrixQC->GetNbinsX(); i++ )
        {
-	  for( int j = 0; j <= c->hResponseMatrix->GetNbinsY(); j++ )
+	  for( int j = 0; j <= c->hResponseMatrixQC->GetNbinsY(); j++ )
 	  {
-	     iMCPara->hResponseMatrix->SetBinContent( i, j, c->hResponseMatrix->GetBinContent( i, j ) );
+	     iMCPara->hResponseMatrix->SetBinContent( i, j, c->hResponseMatrixQC->GetBinContent( i, j ) );
           }
        }
     }

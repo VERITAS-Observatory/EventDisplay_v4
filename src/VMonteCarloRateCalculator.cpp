@@ -1,10 +1,6 @@
 /*! \class VMonteCarloRateCalculator
     \brief calculate rates from Monte Carlo
 
-    Revision $Id: VMonteCarloRateCalculator.cpp,v 1.1.2.2.6.2.2.3.2.6 2010/08/30 15:27:39 gmaier Exp $
-
-    TODO: merge different getMonteCarloRate() functions
-
     \author Gernot Maier
 */
 

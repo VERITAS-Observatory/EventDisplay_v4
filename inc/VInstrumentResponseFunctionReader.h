@@ -80,6 +80,8 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 // energy reconstruction matrix
     TH2D *hERecMatrix;
     TH2D *hERecMatrixCoarse;
+    TH2D *hERecMatrixQC;
+    TH2D *hERecMatrixCoarseQC;
 // e_rec/e_mc
     TH2D *hEsysMCRelative2D;
     TProfile *hEsysMCRelative;
@@ -127,7 +129,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 5 );
+    ClassDef( VInstrumentResponseFunctionReader, 6 );
 };
 
 

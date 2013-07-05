@@ -411,6 +411,8 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 // get energy reconstruction matrix
        hERecMatrix = (TH2D*)c->hEmcCutCTA;
        hERecMatrixCoarse = (TH2D*)c->hResponseMatrix;
+       hERecMatrixQC = (TH2D*)c->hResponseMatrixFineQC;
+       hERecMatrixCoarseQC = (TH2D*)c->hResponseMatrixQC;
 // get error in energy reconstruction
        hEsys = (TH2D*)c->hEsys2D;
 // erec/emc

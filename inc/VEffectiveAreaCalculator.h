@@ -116,7 +116,9 @@ class VEffectiveAreaCalculator
         vector< vector< TH2D* > > hVEsysMCRelative2D;
         vector< vector< TH2D* > > hVEsys2D;
         vector< vector< TH2D* > > hVResponseMatrix;
+        vector< vector< TH2D* > > hVResponseMatrixQC;
         vector< vector< TH2D* > > hVEmcCutCTA;
+	vector< vector< TH2D* > > hVResponseMatrixFineQC;
 
         TList *hisTreeList;
         TH1D* hEmc;
@@ -138,7 +140,9 @@ class VEffectiveAreaCalculator
         TH2D* hEsysMCRelative2D;
         TH2D* hEsys2D;
         TH2D* hEmcCutCTA;
+	TH2D* hResponseMatrixFineQC;
 	TH2D* hResponseMatrix;
+	TH2D* hResponseMatrixQC;
 	vector< TH1D* > hEcutSub;                //! events after individual cuts
 
         int fEffectiveAreaVsEnergyMC;            // 0 = vs MC energy, 1 = vs rec energy (approx. method), 2 = vs rec energy (default)

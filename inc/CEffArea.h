@@ -69,6 +69,8 @@ class CEffArea : public TObject
         TH2D            *hEsys2D;
         TH2D            *hEmcCutCTA;
 	TH2D            *hResponseMatrix;
+	TH2D            *hResponseMatrixFineQC;
+	TH2D            *hResponseMatrixQC;
 	TH1D            *hhEcutTrigger;
 	TH1D            *hhEcutFiducialArea;
 	TH1D            *hhEcutStereoQuality;
@@ -124,6 +126,8 @@ class CEffArea : public TObject
         TBranch        *b_hEsys2D;                //!
         TBranch        *b_hEmcCutCTA;                //!
         TBranch        *b_hResponseMatrix;                //!
+        TBranch        *b_hResponseMatrixQC;                //!
+        TBranch        *b_hResponseMatrixFineQC;                //!
 	TBranch        *b_hhEcutTrigger;   //!
 	TBranch        *b_hhEcutFiducialArea;   //!
 	TBranch        *b_hhEcutStereoQuality;   //!
@@ -230,6 +234,8 @@ void CEffArea::Init(TTree *tree)
     hEsys2D = 0;
     hEmcCutCTA = 0;
     hResponseMatrix = 0;
+    hResponseMatrixQC = 0;
+    hResponseMatrixFineQC = 0;
    hhEcutTrigger = 0;
    hhEcutFiducialArea = 0;
    hhEcutStereoQuality = 0;
@@ -318,6 +324,16 @@ void CEffArea::Init(TTree *tree)
         fChain->SetBranchAddress("hEsys2D", &hEsys2D, &b_hEsys2D);
         fChain->SetBranchAddress("hEmcCutCTA", &hEmcCutCTA, &b_hEmcCutCTA);
         fChain->SetBranchAddress("hResponseMatrix", &hResponseMatrix, &b_hResponseMatrix );
+	if( fChain->GetBranchStatus("hResponseMatrixQC" ) )
+	{
+	   fChain->SetBranchAddress("hResponseMatrixQC", &hResponseMatrixQC, &b_hResponseMatrixQC );
+        }
+	else hResponseMatrixQC = 0;
+	if( fChain->GetBranchStatus("hResponseMatrixFineQC" ) )
+	{
+	   fChain->SetBranchAddress("hResponseMatrixFineQC", &hResponseMatrixFineQC, &b_hResponseMatrixFineQC );
+        }
+	else hResponseMatrixFineQC = 0;
     }
     else
     {
@@ -340,6 +356,8 @@ void CEffArea::Init(TTree *tree)
         hEsys2D = 0;
         hEmcCutCTA = 0;
 	hResponseMatrix = 0;
+	hResponseMatrixQC = 0;
+	hResponseMatrixFineQC = 0;
     }
     if( fChain->GetBranchStatus( "hEcutLin" ) )  fChain->SetBranchAddress("hEcutLin", &hEcutLin, &b_hEcutLin);
     else                                         hEcutLin = 0;

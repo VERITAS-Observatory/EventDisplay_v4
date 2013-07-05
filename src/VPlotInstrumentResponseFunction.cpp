@@ -294,62 +294,62 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigne
     }
 }
 
-void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned int iDataSetID, bool bFineBinning )
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned int iDataSetID, bool bFineBinning, bool bQualityCuts )
 {
     if( !checkDataSetID( iDataSetID ) ) return;
 
     char hname[200];
     char htitle[200];
 
-    sprintf( hname, "cEA_Ematrix_%d_%d", iDataSetID, bFineBinning );
+    sprintf( hname, "cEA_Ematrix_%d_%d_%d", iDataSetID, bFineBinning, bQualityCuts );
     sprintf( htitle, "energy reconstruction matrix (%d)", iDataSetID );
     if( bFineBinning ) sprintf( htitle, "%s (fine binning)", htitle );
+    if( bQualityCuts ) sprintf( htitle, "%s, QC", htitle );
     TCanvas *iEnergyReconstructionMatrixCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
     iEnergyReconstructionMatrixCanvas->SetGridx( 0 );
     iEnergyReconstructionMatrixCanvas->SetGridy( 0 );
     iEnergyReconstructionMatrixCanvas->SetLeftMargin( 0.11 );
     iEnergyReconstructionMatrixCanvas->SetRightMargin( 0.13 );
 
-    if( bFineBinning && fData[iDataSetID]->hERecMatrix )
+    TH2D *i_hRecMatrix = 0;
+
+    if( bFineBinning && !bQualityCuts && fData[iDataSetID]->hERecMatrix )
     {
-       fData[iDataSetID]->hERecMatrix->SetTitle( "" );
-       fData[iDataSetID]->hERecMatrix->GetYaxis()->SetTitleOffset( 1.2 );
-       fData[iDataSetID]->hERecMatrix->SetStats( 0 );
-       if( fData[iDataSetID]->hERecMatrix->GetEntries() > 0. ) iEnergyReconstructionMatrixCanvas->SetLogz( 1 );
-       fData[iDataSetID]->hERecMatrix->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-       fData[iDataSetID]->hERecMatrix->SetYTitle( "log_{10} energy_{MC} [TeV]" );
-       fData[iDataSetID]->hERecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "X" );
-       fData[iDataSetID]->hERecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "Y" );
-       fData[iDataSetID]->hERecMatrix->Draw( "colz" );
+       i_hRecMatrix = fData[iDataSetID]->hERecMatrix;
+    }
+    else if( !bFineBinning && !bQualityCuts && fData[iDataSetID]->hERecMatrixCoarse )
+    {
+       i_hRecMatrix = fData[iDataSetID]->hERecMatrixCoarse;
+    }
+    else if( bFineBinning && bQualityCuts && fData[iDataSetID]->hERecMatrixQC )
+    {
+       i_hRecMatrix = fData[iDataSetID]->hERecMatrixQC;
+    }
+    else if( !bFineBinning && bQualityCuts && fData[iDataSetID]->hERecMatrixCoarseQC )
+    {
+       i_hRecMatrix = fData[iDataSetID]->hERecMatrixCoarseQC;
+    }
+    if( !i_hRecMatrix ) return;
+
+    i_hRecMatrix->SetTitle( "" );
+    i_hRecMatrix->GetYaxis()->SetTitleOffset( 1.2 );
+    i_hRecMatrix->SetStats( 0 );
+    if( i_hRecMatrix->GetEntries() > 0. ) iEnergyReconstructionMatrixCanvas->SetLogz( 1 );
+    i_hRecMatrix->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+    i_hRecMatrix->SetYTitle( "log_{10} energy_{MC} [TeV]" );
+    i_hRecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
+			        log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "X" );
+    i_hRecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
+			        log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "Y" );
+    i_hRecMatrix->Draw( "colz" );
 
 // diagonal
-       TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ),
-                              log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
-			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 
-			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
-       iL->SetLineStyle( 2 );
-       iL->Draw();
-    }
-    else if( fData[iDataSetID]->hERecMatrixCoarse )
-    {
-       fData[iDataSetID]->hERecMatrixCoarse->SetTitle( "" );
-       fData[iDataSetID]->hERecMatrixCoarse->GetYaxis()->SetTitleOffset( 1.2 );
-       fData[iDataSetID]->hERecMatrixCoarse->SetStats( 0 );
-       if( fData[iDataSetID]->hERecMatrixCoarse->GetEntries() > 0. ) iEnergyReconstructionMatrixCanvas->SetLogz( 1 );
-       fData[iDataSetID]->hERecMatrixCoarse->SetXTitle( "log_{10} energy_{rec} [TeV]" );
-       fData[iDataSetID]->hERecMatrixCoarse->SetYTitle( "log_{10} energy_{MC} [TeV]" );
-       fData[iDataSetID]->hERecMatrixCoarse->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "X" );
-       fData[iDataSetID]->hERecMatrixCoarse->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "Y" );
-       fData[iDataSetID]->hERecMatrixCoarse->Draw( "colz" );
-
-// diagonal
-       TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ),
-                              log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
-			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 
-			      log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
-       iL->SetLineStyle( 2 );
-       iL->Draw();
-    }
+    TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ),
+			   log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
+			   log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), 
+			   log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
+    iL->SetLineStyle( 2 );
+    iL->Draw();
 }
 
 

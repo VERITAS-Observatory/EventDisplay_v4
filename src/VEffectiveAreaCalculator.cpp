@@ -192,12 +192,25 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hResponseMatrix->SetXTitle( "energy_{rec} [TeV]" );
     hisTreeList->Add( hResponseMatrix );
 
+    sprintf( hname, "hResponseMatrixQC" );
+    hResponseMatrixQC = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 
+                                               nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+    hResponseMatrixQC->SetYTitle( "energy_{MC} [TeV]" );
+    hResponseMatrixQC->SetXTitle( "energy_{rec} [TeV]" );
+    hisTreeList->Add( hResponseMatrixQC );
+
 // following CTA WP Phys binning convention
     sprintf( hname, "hEmcCutCTA" );
     hEmcCutCTA = new TH2D( hname, htitle, 500, -2.3, 2.7, 500, -2.3, 2.7 );
     hEmcCutCTA->SetYTitle( "energy_{MC} [TeV]" );
     hEmcCutCTA->SetXTitle( "energy_{rec} [TeV]" );
     hisTreeList->Add( hEmcCutCTA );
+
+    sprintf( hname, "hResponseMatrixFineQC" );
+    hResponseMatrixFineQC = new TH2D( hname, htitle, 500, -2.3, 2.7, 500, -2.3, 2.7 );
+    hResponseMatrixFineQC->SetYTitle( "energy_{MC} [TeV]" );
+    hResponseMatrixFineQC->SetXTitle( "energy_{rec} [TeV]" );
+    hisTreeList->Add( hResponseMatrixFineQC );
 
 // individual cuts
     vector< string > iCutName;
@@ -417,11 +430,29 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
         iT_TH2D.clear();
         for( unsigned int j = 0; j < fVMinAz.size(); j++ )
         {
+            sprintf( hname, "hVResponseMatrixFineQC_%d_%d", i, j );
+            if( hResponseMatrixFineQC ) iT_TH2D.push_back( (TH2D*)hResponseMatrixFineQC->Clone( hname ) );
+            else          iT_TH2D.push_back( 0 );
+        }
+        hVResponseMatrixFineQC.push_back( iT_TH2D );
+
+        iT_TH2D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
             sprintf( hname, "hVResponseMatrix_%d_%d", i, j );
             if( hResponseMatrix ) iT_TH2D.push_back( (TH2D*)hResponseMatrix->Clone( hname ) );
             else                  iT_TH2D.push_back( 0 );
         }
         hVResponseMatrix.push_back( iT_TH2D );
+
+        iT_TH2D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
+            sprintf( hname, "hVResponseMatrixQC_%d_%d", i, j );
+            if( hResponseMatrixQC ) iT_TH2D.push_back( (TH2D*)hResponseMatrixQC->Clone( hname ) );
+            else                  iT_TH2D.push_back( 0 );
+        }
+        hVResponseMatrixQC.push_back( iT_TH2D );
     }
 }
 
@@ -1175,7 +1206,9 @@ void VEffectiveAreaCalculator::reset()
     hEsysMCRelative2D = 0;
     hEsys2D = 0;
     hResponseMatrix = 0;
+    hResponseMatrixQC = 0;
     hEmcCutCTA = 0;
+    hResponseMatrixFineQC= 0;
     fEffArea = 0;
     hisTreeList = 0;
     bEffectiveAreasareFunctions = false;
@@ -1438,6 +1471,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
          }
          hEcutSub[3]->Fill( eMC, 1. );
 
+
 //////////////////////////////////////
 // apply direction cut
 //    
@@ -1462,15 +1496,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             if( !fCuts->applyEnergyReconstructionQualityCuts( iMethod, true ) ) continue;
          }
          hEcutSub[5]->Fill( eMC, 1. );
-//////////////////////////////////////
-// apply gamma hadron cuts
-         if( bDebugCuts )
-	 {
-	    cout << "#3 CUT ISGAMMA " << fCuts->isGamma(i) << endl;
-         }
-         if( !fCuts->isGamma( i, true ) ) continue;
-         hEcutSub[6]->Fill( eMC, 1. );
-	 
+
 // skip event if no energy has been reconstructed
 // get energy according to which reconstruction method
          if( iMethod == 0 && d->Erec > 0. )
@@ -1483,31 +1509,51 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
              eRec = log10( d->ErecS );
              eRecLin = d->ErecS;
          }
-	 else if( iMethod == 2 && d->ErecS > 0. )
-	 {
-	    eRec = log10( d->ErecS );
-	    eRecLin = d->ErecS;
-// *** PRELIMINARY ***
-// quick fix for energies above 1 TeV: 
-//   use at high energies method 0, at low energies method 1 (with smooth transition)
-	    if( eRec > -1. )
-	    {
-	       if( d->Erec > 0. )
-	       {
-	          double i_fr = 0.5*TMath::TanH( 10.*(eRec-0.) )+0.5;
-		  eRec = i_fr * log10(d->Erec) + (1.-i_fr) * log10(d->ErecS);
-		  eRecLin = TMath::Power( 10., eRec );
-               }
-	       else continue;
-	    }
-// *** END PRELIMINARY ***
-         }
          else if( fIgnoreEnergyReconstruction )
          {
              eRec = log10( d->MCe0 );
              eRecLin = d->MCe0;
          }
 	 else continue;
+
+///////////////////////////////////////////
+// fill response matrix after quality cuts
+
+// loop over all az bins
+         for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
+         {
+// check at what azimuth bin we are
+             if( fZe[ize] > 3. )
+             {
+// confine MC az to -180., 180.
+        	 if( d->MCaz > 180. ) d->MCaz -= 360.;
+// expect bin like [135,-135]
+        	 if( fVMinAz[i_az] > fVMaxAz[i_az] )
+        	 {
+        	     if( d->MCaz < fVMinAz[i_az] && d->MCaz > fVMaxAz[i_az] ) continue;
+        	 }
+// expect bin like [-135,-45.]
+        	 else
+        	 {
+        	     if( d->MCaz < fVMinAz[i_az] || d->MCaz > fVMaxAz[i_az] ) continue;
+        	 }
+             }
+// loop over all spectral index
+             for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
+             {
+               if( hVResponseMatrixQC[s][i_az] )   hVResponseMatrixQC[s][i_az]->Fill( eRec, eMC );
+               if( hVResponseMatrixFineQC[s][i_az] )   hVResponseMatrixFineQC[s][i_az]->Fill( eRec, eMC );
+             }
+         }
+
+//////////////////////////////////////
+// apply gamma hadron cuts
+         if( bDebugCuts )
+	 {
+	    cout << "#3 CUT ISGAMMA " << fCuts->isGamma(i) << endl;
+         }
+         if( !fCuts->isGamma( i, true ) ) continue;
+         hEcutSub[6]->Fill( eMC, 1. );
 
 // unique event counter
 // (make sure that map doesn't get too big)
@@ -1626,6 +1672,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             }
 	    normalizeResponseMatrix( hVResponseMatrix[s][i_az] );
 	    applyResponseMatrix( hVResponseMatrix[s][i_az], gEffAreaProb );
+	    normalizeResponseMatrix( hVResponseMatrixQC[s][i_az] );
 
             for( int i = 0; i < 1000; i++ )
             {
@@ -1699,7 +1746,9 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             copyHistograms( hEsysMCRelative2D, hVEsysMCRelative2D[s][i_az], true );
             copyHistograms( hEsys2D, hVEsys2D[s][i_az], true );
             copyHistograms( hEmcCutCTA, hVEmcCutCTA[s][i_az], true );
+	    copyHistograms( hResponseMatrixFineQC, hVResponseMatrixFineQC[s][i_az], true );
             copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
+            copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true );
 
             fEffArea->Fill();
         }
@@ -1955,7 +2004,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 			       cout << " " << i_noise_bins[n] <<  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]].size();
                             }
                             cout << endl;
-                            return 0.;
+                            return -1.;
                         }
 ////////////////////////////////////////////////////////
                     }
@@ -1970,7 +2019,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                     cout << "VEffectiveAreaCalculator::getEffectiveAreasFromHistograms error: noise index out of range: " << i_ze_bins[i] << " " << fEff_Noise.size();
                     if( i_ze_bins[i] < fEff_Noise.size() ) cout << " " << i_woff_bins[w] << " " << fEff_Noise[i_ze_bins[i]].size() << endl;
                     cout << endl;
-                    return 0.;
+                    return -1.;
                 }
             }
             i_ze_eff_temp[i] = interpolate_effectiveArea( woff, 
@@ -1983,12 +2032,12 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
         {
             cout << "VEffectiveAreaCalculator::getEffectiveAreasFromHistograms error: woff index out of range: ";
 	    cout << i_ze_bins[i] << " " << fEff_WobbleOffsets.size() << endl;
-            return 0.;
+            return -1.;
         }
     }
     i_eff_temp = interpolate_effectiveArea( ze, fZe[i_ze_bins[0]], fZe[i_ze_bins[1]], i_ze_eff_temp[0], i_ze_eff_temp[1], true );
 
-    if( fEff_E0.size() == 0 ) return 1.;
+    if( fEff_E0.size() == 0 ) return -1.;
 
 // mean effective area calculation
     if( bAddtoMeanEffectiveArea && fVMeanEffectiveArea.size() == i_eff_temp.size() )
@@ -2033,16 +2082,12 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 ///////////////////////////////////
 // linear interpolate between energies
 ///////////////////////////////////
-    if( fEff_E0[ie0_up] != fEff_E0[ie0_low] )
-    {
-        i_eff_e  = ( fEff_E0[ie0_up] - lerec )  /  ( fEff_E0[ie0_up] - fEff_E0[ie0_low] ) * i_eff_temp[ie0_low];
-        i_eff_e += ( lerec - fEff_E0[ie0_low] ) /  ( fEff_E0[ie0_up] - fEff_E0[ie0_low] ) * i_eff_temp[ie0_up];
-    }
-    else i_eff_e = 0.5*( i_eff_temp[ie0_low] + i_eff_temp[ie0_up] );
+
+    i_eff_e = VStatistics::interpolate( i_eff_temp[ie0_low], fEff_E0[ie0_low], i_eff_temp[ie0_up], fEff_E0[ie0_up], lerec, false );
 
     if( i_eff_e > 0. ) return 1./i_eff_e;
 
-    return 1.;
+    return -1.;
 }
 
 // reset the sum of effective areas
@@ -2134,9 +2179,17 @@ void VEffectiveAreaCalculator::resetHistograms( unsigned int ize )
     sprintf( htitle, "migration matrix (fine binning, %.1f deg)", fZe[ize] );
     hEmcCutCTA->SetTitle( htitle );
 
+    hResponseMatrixFineQC->Reset();
+    sprintf( htitle, "migration matrix, after quality cuts (fine binning, %.1f deg)", fZe[ize] );
+    hResponseMatrixFineQC->SetTitle( htitle );
+
     hResponseMatrix->Reset();
     sprintf( htitle, "migration matrix (%.1f deg)", fZe[ize] );
     hResponseMatrix->SetTitle( htitle );
+
+    hResponseMatrixQC->Reset();
+    sprintf( htitle, "migration matrix, after quality cuts (%.1f deg)", fZe[ize] );
+    hResponseMatrixQC->SetTitle( htitle );
 
     hEmcSWeight->Reset();
     sprintf( htitle, "spectral weights (%.1f deg)", fZe[ize] );
@@ -2343,13 +2396,13 @@ TGraphAsymmErrors* VEffectiveAreaCalculator::getMeanEffectiveArea()
     if( gMeanEffectiveArea && fNMeanEffectiveArea > 0 )
     {
 	gMeanEffectiveArea->Set( 0 );
-        int z = 0;
+	int z = 0;
         for( unsigned int i = 0; i < fVMeanEffectiveArea.size(); i++ )
         {
             if( fVMeanEffectiveArea[i] > 0. )
             {
                 gMeanEffectiveArea->SetPoint( z, fEff_E0[i], fVMeanEffectiveArea[i] / fNMeanEffectiveArea );
-                z++;
+		z++;
             }
         }
         return gMeanEffectiveArea;
@@ -2510,6 +2563,13 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
         for( unsigned int j = 0; j < hVResponseMatrix[i].size(); j++ )
         {
             if( hVResponseMatrix[i][j] ) hVResponseMatrix[i][j]->Reset();
+        }
+    }
+    for( unsigned int i = 0; i < hVResponseMatrixQC.size(); i++ )
+    {
+        for( unsigned int j = 0; j < hVResponseMatrixQC[i].size(); j++ )
+        {
+            if( hVResponseMatrixQC[i][j] ) hVResponseMatrixQC[i][j]->Reset();
         }
     }
 }

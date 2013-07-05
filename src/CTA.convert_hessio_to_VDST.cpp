@@ -426,7 +426,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 #ifdef CTA_PROD2
 	    fData->fDSTL2TrigType[i_ntel_trig] = (unsigned short int)hsdata->event.central.teltrg_type_mask[t];
 #else
-            fData->fDSTL2TrigType[i_ntel_trig] = 0;
+            fData->fDSTL2TrigType[i_ntel_trig] = 99;
 #endif
 // trigger corrects (from log files - needed for Spring 2013 prod2 files)
 #ifdef CTA_PROD2_TRGMASK
@@ -439,7 +439,8 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
                }
 	       else
 	       {
-	          fData->fDSTL2TrigType[i_ntel_trig] = 0;
+		  cout << "No trigger mask event found: event " << hsdata->mc_event.event << ", telescope " << hsdata->event.central.teltrg_list[t] << endl;
+	          fData->fDSTL2TrigType[i_ntel_trig] = 99;
                }
 	    }
 #endif
