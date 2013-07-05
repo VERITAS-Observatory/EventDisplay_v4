@@ -38,7 +38,7 @@ fi
 
 # log files
 DATE=`date +"%y%m%d"`
-FDIR=$CTA_USER_LOG_DIR/queueParticleRateWriter/$DATE
+FDIR=$CTA_USER_LOG_DIR/$DATE/PARTICLERATEWRITER/
 mkdir -p $FDIR
 echo "log directory: " $FDIR
 
@@ -75,7 +75,7 @@ do
 
    mv $ODIR/$FSCRIPT-$ARRAY-5.sh $ODIR/$FSCRIPT-$ARRAY.sh
 
-   qsub -V -js 20 -l os="sl*"  -l h_cpu=0:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $ODIR -e $ODIR "$ODIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$ODIR/$FSCRIPT-$ARRAY.sh"
 
 done
 
