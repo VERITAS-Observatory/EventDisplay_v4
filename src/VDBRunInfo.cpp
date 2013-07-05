@@ -109,7 +109,6 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 	  return config_mask;
       }
 
-      f_db->Close();
       
       
       bitset<4> bitConfig(config_mask);
@@ -131,6 +130,8 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 
    }
 
+   f_db->Close();
+   
    return config_mask;
 
 }
