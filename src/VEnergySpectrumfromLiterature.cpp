@@ -427,7 +427,9 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 }
 
 /*
+
    energy on linear scale [TeV]
+   
 */
 bool VEnergySpectrumfromLiterature::prepare_integration( unsigned int iID, double iEmin, double iEmax )
 {
@@ -435,6 +437,9 @@ bool VEnergySpectrumfromLiterature::prepare_integration( unsigned int iID, doubl
     if( !fIntegral_TF1 ) return false;
 
     fIntegral_TF1->CalcGaussLegendreSamplingPoints( 1000, fIntegral_x, fIntegral_y, 1.e-15 );
+
+// save that this function has already been integrated
+    fIntegral_ID = iID;
 
     return true;
 }
