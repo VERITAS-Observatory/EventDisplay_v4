@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# script to analyse MC files with lookup tables
+# script to analyse CTA MC files with lookup tables
 #
 # Author: Gernot Maier
 #

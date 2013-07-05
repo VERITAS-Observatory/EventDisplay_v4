@@ -45,21 +45,25 @@ then
 # prod2 analysis
 elif [ $4 = "prod2-Aar-North" ]
 then
-   VPART=( "gamma_onSource" "gamma_onSource" "gamma_cone10" "electron" "proton" )
-   VNUM=( "10" "30" "" "15" "" )
+   VPART=( "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VNUM=( "10" "30" "40" "41" "15" "" )
 elif [ $4 = "prod2-Aar-South" ]
 then
-   VPART=(  "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "gamma_cone10" "electron" "proton" )
-   VNUM=( "10" "301" "302" "303" "20" "21" "24" "15" "" )
-elif [ $4 = "prod2-Leoncito-North" ] || [ $4 = "prod2-Leoncito-South" ]
+   VPART=(  "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VNUM=( "10" "301" "302" "303" "20" "23" "40" "15" "" )
+elif [ $4 = "prod2-Leoncito-North" ]
+then
+   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+elif [ $4 = "prod2-Leoncito-South" ]
 then
    VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 elif [ $4 = "prod2-G-Leoncito-North" ] || [ $4 = "prod2-G-Leoncito-South" ]
 then
    VPART=( "proton" )
-elif [ $4 = "prod2-SAC-North" ] || [ $4 = "prod2-SAC-South" ]
+elif [ $4 = "prod2-SAC084-North" ]
 then
-   VPART=( "gamma_onSource" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VNUM=( "" "1" "2" "" "" )
 fi
 NPART=${#VPART[@]}
 

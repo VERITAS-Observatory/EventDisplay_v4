@@ -90,8 +90,8 @@ mkdir -p $SHELLDIR
 FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
 
 # log files
-QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART/
-mkdir -p $QLOG
+QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
+#mkdir -p $QLOG
 QLOG="/dev/null"
 
 # pedestals
@@ -113,7 +113,7 @@ fi
 
 echo "submitting $RUNFROMTO"
 
-FNAM="$SHELLDIR/EA-$DSET-$PART-$FLL"
+FNAM="$SHELLDIR/EV-$DSET-$PART-$FLL"
 
 sed -e "s|SIMTELLIST|$RUNLIST|" $FSCRIPT.sh > $FNAM-1.sh
 sed -e "s|PAAART|$PART|" $FNAM-1.sh > $FNAM-2.sh
@@ -137,7 +137,8 @@ rm -f $FNAM-9.sh
 chmod u+x $FNAM.sh
 echo $FNAM.sh
 
-qsub  -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+qsub -P cta_high -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+# qsub -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 
 echo "writing shell script to $FNAM.sh"
 echo "writing queue log and error files to $QLOG"

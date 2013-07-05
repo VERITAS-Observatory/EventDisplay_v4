@@ -37,9 +37,14 @@ then
    exit
 fi
 
+echo "getting line $ILINE from list"
+echo "list: $ILIST"
 IFIL=`head -n $ILINE $ILIST | tail -n 1`
-echo "$IFIL"
+echo "DATA FILE $IFIL"
 cp -v -f $IFIL $TMPDIR"/"
+# log file directory
+DATE=`date +"%y%m%d"`
+mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF
 
 if [ ! -e $IFIL ]
 then
@@ -47,32 +52,54 @@ then
    exit
 fi
 
+#####################################
 # output file
 OFIL=`basename $IFIL .gz`
 echo "OUTPUT FILE $OFIL"
+
+#####################################
+# trigmask file (optional)
+if [ $TRGMASKDIR != "FALSE" ]
+then
+   if [[ $DSET == *Leoncito* ]] || [[ $DSET == *Aar* ]]
+   then
+      FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
+      echo "FIL $FFIL"
+   elif [[ $DSET == *SAC* ]]
+   then
+      if [[ $PART == "gamma_cone10" ]]
+      then
+	FFIL=`basename $TMPDIR/$OFIL.gz ___cta-prod2_desert-SACx0.84_cone10.simtel.gz`
+      else
+	FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
+      fi
+   fi
+   TRIGF=`find $TRGMASKDIR -name $FFIL*trgmask*`
+   if [ -n "$TRIGF" ] && [ -e "$TRIGF" ]
+   then
+      COPT="$COPT -t $TRIGF"
+      echo "CONVERTER OPTIONS: $COPT"
+   else
+      echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL
+      echo "search directory: $TRGMASKDIR"
+      echo "search string: $FFIL"
+      echo "found: $TRIGF"
+      echo "error, cannot analyse this file..."
+      touch $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/$OFIL.error.trg.log
+      exit;
+   fi
+fi
 
 ####################################################################
 # loop over all arrays
 for N in $FIELD
 do
-   echo "RUNNING  $N"
+# remove spaces
+   N=`echo $N | tr -d ' '`
+   echo "RUNNING _"$N"_"
 # output data files are written to this directory
    ODIR=$CTA_USER_DATA_DIR"/analysis/AnalysisData/"$DSET"/"$N"/"$PART"/"
    mkdir -p $ODIR
-
-#####################################
-# trigmask file (optional)
-  if [ $TRGMASKDIR != "FALSE" ]
-  then
-      FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
-      TRIGF=`find $TRGMASKDIR -name $FFIL*`
-      if [ -e $TRIGF ]
-      then
-         COPT="$COPT -t $TRIGF"
-      else
-         echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL
-      fi
-  fi
 
 ####################################################################
 # execute converter
@@ -97,8 +124,6 @@ done
 # tar the log files
 cd $TMPDIR
 tar -czvf $OFIL.tar.gz *.log
-DATE=`date +"%y%m%d"`
-mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF
 mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/
 
 exit

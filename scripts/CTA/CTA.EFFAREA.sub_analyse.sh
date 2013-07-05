@@ -118,10 +118,10 @@ DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
-# QDIR=$CTA_USER_LOG_DIR"/$DATE/EFFAREA/"
-# echo $QDIR
-# mkdir -p $QDIR
-QDIR="/dev/null"
+QDIR=$CTA_USER_LOG_DIR"/$DATE/EFFAREA/"
+echo $QDIR
+mkdir -p $QDIR
+#QDIR="/dev/null"
 echo "output data directory"
 echo $ODIR
 mkdir -p $ODIR
@@ -331,6 +331,7 @@ do
       rm -f $iCFIL-j
 # observing time (for cut optimization)
       sed -e "s|OBSERVINGTIME_H|$OBSTIME|" $iCFIL-k > $iCFIL-l
+      rm -f $iCFIL-k
 # finalize cut file
       mv -f $iCFIL-l $iCFIL
       iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
@@ -430,7 +431,7 @@ do
 # submit the job
      if [ $GFILLING = "2" ]
      then
-	qsub -l os="sl*" -l h_cpu=0:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub -l os="sl*" -l h_cpu=5:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      else
 	qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      fi
