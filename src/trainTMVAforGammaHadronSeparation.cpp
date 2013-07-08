@@ -28,6 +28,8 @@ using namespace std;
 /*
    check if a training variable is constant
 
+   (constant variables are removed from set of training variables)
+
    return values:
 
    -1:  value is variable
@@ -153,6 +155,8 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
       iSplitBlock = true;
    }
 
+// loop over all trainingvariables and add them to TMVA
+// (test first if variable is constant)
    for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
    {
       if( iRun->fTrainingVariable[i].find( "NImages_Ttype" ) != string::npos )
@@ -176,7 +180,11 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 	    {
 	       factory->AddVariable( iTemp.str().c_str(), iRun->fTrainingVariableType[i] );
             }
-	    else cout << "warning: removed constant variable " << iTemp.str() << " from training" << endl;
+	    else
+	    {
+	       cout << "warning: removed constant variable " << iTemp.str() << " from training (added to spectators)" << endl;
+	       factory->AddSpectator( iTemp.str().c_str() );
+            }
 	 }
       }
       else
@@ -190,7 +198,11 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 	 {
 	   factory->AddVariable( iRun->fTrainingVariable[i].c_str(), iRun->fTrainingVariableType[i] );
 	 }
-	 else cout << "warning: removed constant variable " << iRun->fTrainingVariable[i] << " from training" << endl;
+	 else
+	 {
+	    cout << "warning: removed constant variable " << iRun->fTrainingVariable[i] << " from training (added to spectators)" << endl;
+	    factory->AddSpectator( iRun->fTrainingVariable[i].c_str() );
+         }
       }
    }
 // adding spectator variables
@@ -198,11 +210,6 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
    {
       factory->AddSpectator( iRun->fSpectatorVariable[i].c_str() );
    }
-
-// weight expression
-//   factory->SetWeightExpression( "InputWeight" );
-
-
 
 //////////////////////////////////////////
 // prepare training events
@@ -277,7 +284,10 @@ int main( int argc, char *argv[] )
     if( argc != 2 )
     {
 	cout << endl;
-        cout << "trainTMVAforGammaHadronSeparation <configuration file>" << endl;
+        cout << "./trainTMVAforGammaHadronSeparation <configuration file>" << endl;
+	cout << endl;
+	cout << "  (an example for a configuration file can be found in " << endl;
+	cout << "   $CTA_EVNDISP_AUX_DIR/ParameterFiles/TMVA.BDT.runparameter )" << endl;
 	cout << endl;
         exit( 0 );
     }
@@ -287,10 +297,12 @@ int main( int argc, char *argv[] )
     cout << "=================================" << endl;
     cout << endl;
 
+//////////////////////////////////////
 // data object
    VTMVARunData *fData = new VTMVARunData();
    fData->fName = "OO";
 
+//////////////////////////////////////
 // read run parameters from configuration file
    if( !fData->readConfigurationFile( argv[1] ) )
    {
@@ -301,6 +313,7 @@ int main( int argc, char *argv[] )
    }
    fData->print();
 
+//////////////////////////////////////
 // read and prepare data files
     if( !fData->openDataFiles() )
     {
@@ -308,7 +321,9 @@ int main( int argc, char *argv[] )
        exit( -1 );
     }
 
+//////////////////////////////////////
 // optimize cuts
+// (one optimization per energy bin
     cout << "Total number of energy bins: " << fData->fEnergyCutData.size() << endl;
     cout << "================================" << endl << endl;
     for( unsigned int i = 0; i < fData->fEnergyCutData.size(); i++ )
