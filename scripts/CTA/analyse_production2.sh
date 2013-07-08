@@ -13,26 +13,17 @@ then
 fi
 RUN="$1"
 
-#SITE=( "prod2-Aar-North" "prod2-Aar-South" "prod2-Leoncito-North" "prod2-Leoncito-South" "prod2-SAC084-North" "prod2-SAC084-South"  )
-#SITE=( "prod2-Aar-South" "prod2-Leoncito-North" ) 
-#SITE=( "prod2-Aar-North" "prod2-Aar-South" "prod2-Leoncito-North" "prod2-Leoncito-South" )
-#SITE=( "prod2-Aar-North" "prod2-Aar-South" )
-#SITE=( "prod2-Leoncito-North" "prod2-Leoncito-South" )
-#SITE=( "prod2-Aar-North" "prod2-Aar-South" )
 
-#SITE=( "prod2-G-Leoncito-North" )
-#SITE=( "prod2-Aar-North" )
-#SITE=( "prod2-Aar-North" "prod2-Leoncito-North" ) 
-#SITE=( "prod2-SAC084-North" )
-#SITE=( "prod2-Aar-South" "prod2-Aar-South" "prod2-SAC084-South" )
-#SITE=( "prod2-Leoncito-North" ) 
-#SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" )
-
-SITE=( "prod2-Aar-North" "prod2-SAC084-North" )
+SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-SAC100-North" "prod2-Aar-South" "prod2-Leoncito-South" "prod2-SAC084-South" "prod2-SAC100-South" "prod2-Aar-NS" "prod2-Leoncito-NS" "prod2-SAC084-NS" "prod2-SAC100-NS" )
+SITE=( "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-NS" )
+SITE=( "prod2-SAC084-North" "prod2-SAC084-South" "prod2-SAC100-North" "prod2-SAC100-South" "prod2-Aar-South" )
 
 PARTICLE=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 
+RECID="1 2 3"
 RECID="0"
+
+ARRAY="subArray.prod2red.list"
 ARRAY="subArray.2a.list"
 DATE="d20130702"
 
@@ -84,6 +75,7 @@ do
        elif [[ $RUN == "COMBINETABLE" ]]
        then
 	   ./CTA.MSCW_ENERGY.combine_tables.sh tables_CTA-$S-ID$ID-$DATE $ARRAY tables_CTA-$S-ID$ID-$DATE $CTA_USER_DATA_DIR/analysis/AnalysisData/$S/Tables/ $S
+	   mv -v -i $CTA_USER_DATA_DIR/analysis/AnalysisData/Tables/tables_CTA-$S-ID$ID-$DATE*.root $CTA_EVNDISP_AUX_DIR/Tables/
 # analyse with lookup tables
        elif [[ $RUN == "ANATABLES" ]]
        then
@@ -96,7 +88,7 @@ do
 	     TABLE="tables_CTA-prod2-Leoncito-South-ID$ID-$DATE"
 	  fi
 	  echo $TABLE
-	  ./CTA.MSCW_ENERGY.subAllParticle_analyse_MC.sh $TABLE $ID $ARRAY $S $PARA
+	  ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TABLE $ID $ARRAY $S $PARA
 # train BDTs   
        elif [[ $RUN == "TRAIN" ]]
        then
@@ -122,6 +114,8 @@ do
        elif [[ $RUN == "PHYS" ]]
        then
 	 ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.$DATE 50. DESY.$DATE.ID$ID.$S 1 $ID $S
+	 ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.$DATE 5. DESY.$DATE.ID$ID.$S 1 $ID $S
+	 ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.$DATE 0.5 DESY.$DATE.ID$ID.$S 1 $ID $S
 # unknown run set
        elif [[ $RUN != "EVNDISP" ]]
        then

@@ -6,7 +6,7 @@
 # Author: Gernot Maier
 #
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] 
+if [ $# -ne 4 ]
 then
    echo
    echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone10> <data set> <analysis parameter file>"

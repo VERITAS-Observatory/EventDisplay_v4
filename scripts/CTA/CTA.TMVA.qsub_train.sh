@@ -15,9 +15,4 @@ source $EVNDISPSYS/setObservatory.tcsh CTA
 rm -f $RPARA.log
 $EVNDISPSYS/bin/trainTMVAforGammaHadronSeparation $RPARA.runparameter > $RPARA.log
 
-# mv weight file into the right place
-# mv -f $WFILE"_0".class.C $WFILE.class.C
-# mv -f $WFILE"_0".weights.xml $WFILE.weights.xml
-
 exit
-

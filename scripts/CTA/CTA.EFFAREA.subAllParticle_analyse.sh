@@ -2,10 +2,12 @@
 #
 # submit jobs for effective area calculation
 #
+# particle names and directories fixed by CTA setup
+#
 #
 
 
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$4" ] && [ ! -n "$4" ]
+if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
    echo ""
    echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <analysis parameter file> <output subdirectory> <data set> [filling mode]"
