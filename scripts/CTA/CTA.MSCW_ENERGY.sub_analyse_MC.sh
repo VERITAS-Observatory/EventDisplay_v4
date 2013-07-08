@@ -6,10 +6,10 @@
 #
 
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
+if [ $# -ne 5 ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <particle> <data set> <script input parameter file> [wildcard] "
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <script input parameter file>"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
@@ -31,19 +31,12 @@ fi
 TABLE=$1
 RECID=$2
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $3`
-
-PART=$4
-METH="LL"
-WC=""
-DSET="$5"
-if [ -n "$7" ]
-then
-   WC=$7
-fi
+DSET="$4"
+FILEN=250
 
 #######################################
 # read values from parameter file
-ANAPAR=$6
+ANAPAR=$5
 if [ ! -e $ANAPAR ]
 then
   echo "error: analysis parameter file not found: $ANAPAR" 
@@ -75,8 +68,18 @@ DATE=`date +"%y%m%d"`
 QLOG=/dev/null
 
 # output directory for shell scripts
-SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/"
+SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/MSCW"
 mkdir -p $SHELLDIR
+
+###########################
+# particle
+if [ $DSET = "prod2-G-Leoncito-North" ] || [ $DSET = "prod2-G-Leoncito-South" ]
+then
+   VPART=( "proton" )
+else
+   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+fi
+NPART=${#VPART[@]}
 
 #########################################
 #loop over all arrays
@@ -85,54 +88,64 @@ for SUBAR in $VARRAY
 do
    echo "STARTING ARRAY $SUBAR"
 
+# output directory
+   ODIR=$CTA_USER_DATA_DIR"/analysis/AnalysisData/"$DSET"/"$SUBAR"/$ANADIR/"
+   mkdir -p $ODIR
+
 #########################################
-# input files
-   IFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/$WC"
+# loop over all particle types
+   for ((m = 0; m < $NPART; m++ ))
+   do
+      PART=${VPART[$m]}
 
-# check if input files exist
-#   IFILN=`\ls -1 $IFIL*.root | wc -l`
-#   if [ $IFILN -eq 0 ]
-#   then
-#     echo "No input files in $IFIL"
-#     echo "exiting..."
-#     exit
-#   fi
-#   echo "FOUND $IFILN input files in $IFIL"
+#########################################
+# input files lists
 
-
+      TMPLIST=$SHELLDIR/MSCW.tmplist.list
+      rm -f $TMPLIST
+      echo $TMPLIST
+      ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/*.root > $TMPLIST
+      echo "total number of files for particle type $PART : "
+      NTMPLIST=`wc -l $TMPLIST | awk '{print $1}'`
+      echo $NTMPLIST
+# loop over all input files, start a job when $FILEN files are found
+      for ((l = $FILEN; l < $NTMPLIST; l+=$FILEN ))
+      do
 # output file name for mscw_energy
-   TFIL=$PART$NC"."$SUBAR"_ID"$RECID".mscw"
-   if [ ${#WC} -gt 0 ]
-   then 
-      TFIL=$PART$NC"."$SUBAR"_ID"$RECID"-$WC.mscw"
-   fi
+	TFIL=$PART$NC"."$SUBAR"_ID"$RECID"-"$DSET"-$l.mscw"
+# input file list
+	IFIL=$ODIR/$TFIL.list
+	rm -f $IFIL
+	let "TMPL = $NTMPLIST - $l"
+	if [[ "$TMPL" -lt "$FILEN" ]]
+	then
+	   FILEN=$TMPL
+        fi
+	echo $l $TMPL $FILEN
+	head -n $l $TMPLIST | tail -n $FILEN > $IFIL
 
 # skeleton script
-   FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
+	 FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
 
-   FNAM="$SHELLDIR/MSCW.ana-$DSET-ID$RECID-$PART-array$SUBAR"
+	 FNAM="$SHELLDIR/MSCW.ana-$DSET-ID$RECID-$PART-array$SUBAR"
 
-   sed -e "s|TABLEFILE|$TABLE|" $FSCRIPT.sh > $FNAM-1.sh
-   sed -e "s|IIIIFIL|$IFIL|" $FNAM-1.sh > $FNAM-2.sh
-   rm -f $FNAM-1.sh
-   sed -e "s|TTTTFIL|$TFIL|" $FNAM-2.sh > $FNAM-3.sh
-   rm -f $FNAM-2.sh
-   sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-3.sh > $FNAM-4.sh
-   rm -f $FNAM-3.sh
-   sed -e "s|ARRAYYY|$SUBAR|" $FNAM-4.sh > $FNAM-5.sh
-   rm -f $FNAM-4.sh
-   sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-6.sh
-   rm -f $FNAM-5.sh
-   sed -e "s|AAAAADIR|$ANADIR|" $FNAM-6.sh > $FNAM.sh
-   rm -f $FNAM-6.sh
+	 sed -e "s|TABLEFILE|$TABLE|" \
+	     -e "s|IIIIFIL|$IFIL|" \
+	     -e "s|TTTTFIL|$TFIL|" \
+	     -e "s|RECONSTRUCTIONID|$RECID|" \
+	     -e "s|ARRAYYY|$SUBAR|" \
+	     -e "s|DATASET|$DSET|" \
+	     -e "s|AAAAADIR|$ANADIR|" $FSCRIPT.sh > $FNAM.sh 
 
-   chmod u+x $FNAM.sh
-   echo $FNAM.sh
+	 chmod u+x $FNAM.sh
+	 echo $FNAM.sh
 
 # submit the job
-   qsub -l h_cpu=41:29:00 -l os="sl*" -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
-   echo "run script written to $FNAM.sh"
-   echo "queue log and error files written to $QLOG"
+	 qsub -l h_cpu=41:29:00 -l os="sl*" -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+	 echo "run script written to $FNAM.sh"
+	 echo "queue log and error files written to $QLOG"
+     done
+   done
 done
 
 exit
