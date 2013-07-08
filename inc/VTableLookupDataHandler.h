@@ -1,5 +1,4 @@
 //! VTableLookupDataHandler data class for mscw and energy reconstruction
-// Revision $Id: VTableLookupDataHandler.h,v 1.24.2.12.4.4.10.2.2.7.4.3.2.3.2.2.2.1.4.2.2.6.2.15.2.1 2010/12/19 17:02:49 gmaier Exp $
 
 #ifndef VTableLookupDataHandler_H
 #define VTableLookupDataHandler_H
@@ -44,8 +43,7 @@ class VTableLookupDataHandler
 	VTableLookupRunParameter *fTLRunParameter;  //! lookup parameters
 
         int fNMethods;                            //!< number of direction and core reconstruction methods in evndisp
-        string finputfile;                        //!< input file name
-        TFile *fInFile;                           //!< point to input file (not used!)
+        vector< string > finputfile;                        //!< input file name
         string foutputfile;                       //!< output file name
         TFile *fOutFile;                          //!< point to output file
         bool   fwrite;                            //!< true for table filling
@@ -368,7 +366,7 @@ class VTableLookupDataHandler
         }
         void setEnergy( double iE, double iES ) { fenergy = iE; fenergyS = iES; }
         void setEnergyT( int i, double iET, double iETS ) { fE[i] = iET; fES[i] = iETS; }
-        bool setInputFile( string );              //!< set input file (name + isMC)
+        bool setInputFile( vector< string > );              //!< set input file
         void setMCMinEnergy( double iB ) { fMCMinEnergy = iB; }
         void setMCMaxEnergy( double iB ) { fMCMaxEnergy = iB; }
         void setMCSpectralIndex( double iB ) { fMCSpectralIndex = iB; }

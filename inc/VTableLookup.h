@@ -1,5 +1,4 @@
 //! VTableLookup calculation of mean scaled variables and energies using MC filled tables
-// Revision $Id: VTableLookup.h,v 1.20.2.10.4.2.12.8.4.3.2.1.2.3.6.1.2.1.2.8.4.2 2011/03/29 12:33:57 gmaier Exp $
 
 #ifndef VTABLELOOKUP
 #define VTABLELOOKUP
@@ -22,6 +21,7 @@
 #include <math.h>
 #include <set>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -125,7 +125,7 @@ class VTableLookup
         bool   initialize( VTableLookupRunParameter* );
         void   loop();                              // loop over all events
         void   readNoiseLevel( bool bWriteToRunPara = true ); // read noise level from pedvar histograms of data files
-        bool   setInputFiles( string iInputFiles ); // set input files from evndisp
+        bool   setInputFiles( vector< string > iInputFiles ); // set input files from evndisp
         void   setEnergyCorrection( bool iEcorr ) { bEcorr = iEcorr; }   // apply energy correction for shower maximum
         void   setMCTableFiles( string, string, string ); // set MC table file names (reading tables)
         void   setMCTableFiles( string, double, int, int, string, string, bool ); // set MC table file names (writing tables)

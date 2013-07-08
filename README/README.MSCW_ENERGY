@@ -14,6 +14,8 @@ command line parameters:
 general parameters: 
 	 -arrayrecid=0/1/... 	 choose evendisplay array reconstruction record (default 0)
 	 -inputfile FILE 	 evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
+	 -inputfilelist FILELIST list of evndisp root file as input (wildcards possible use, -inputfile "YOUR_DATA_DIRECTORY/*.root")
+	 			 (simple text file)
 
 [CTA]    -pe                     input data is in pe's (not in [dc])
 

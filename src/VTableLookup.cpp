@@ -1,8 +1,6 @@
 /*! \class VTableLookup
     \brief calculation of mean scaled variables and energies using MC filled tables
 
-    Revision $Id: VTableLookup.cpp,v 1.30.2.12.4.12.10.2.2.14.4.4.2.7.2.6.2.1.4.2.2.7.2.18.2.4.2.4 2011/03/29 12:33:57 gmaier Exp $
-
     uses Henric's Mscw and Energy classes (modified)
 
     \author
@@ -1010,9 +1008,16 @@ void VTableLookup::setSpectralIndex( double iS )
 
 
 
-bool VTableLookup::setInputFiles( string iInputFiles )
+bool VTableLookup::setInputFiles( vector< string > iInputFiles )
 {
-    if( fDebug ) cout << "VTableLookup::setInputFiles " << iInputFiles << endl;
+    if( fDebug ) 
+    {
+       cout << "VTableLookup::setInputFiles " << iInputFiles.size() << endl;
+       for( unsigned int i = 0; i < iInputFiles.size(); i++ )
+       {
+          cout << "\t" << iInputFiles[i] << endl;
+       }
+    }
     bool bMC = fData->setInputFile( iInputFiles );
     fNTel = fData->getNTel();
 
@@ -1257,7 +1262,15 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
     if( fTLRunParameter->readwrite == 'W' )
     {
         char ihname[900];
-        sprintf( ihname, "lookup table file (array recid = %d, source files: %s)", fTLRunParameter->rec_method, fTLRunParameter->inputfile.c_str() );
+	if( fTLRunParameter->inputfile.size() > 0 )
+	{
+	   sprintf( ihname, "lookup table file (array recid = %d, source files: %s)", fTLRunParameter->rec_method, fTLRunParameter->inputfile[0].c_str() );
+        }
+	else
+	{
+	   sprintf( ihname, "lookup table file (array recid = %d)", fTLRunParameter->rec_method );
+        }
+	  
         string iTitle = ihname;
         setMCTableFiles( fTLRunParameter->tablefile, fTLRunParameter->ze, fTLRunParameter->fWobbleOffset, fTLRunParameter->fNoiseLevel, "tb", ihname, fTLRunParameter->fWrite1DHistograms );
 

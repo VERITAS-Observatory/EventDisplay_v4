@@ -3,7 +3,7 @@
 
     \author
      Gernot Maier
-     Henrik Krawczynski (mscw+energy routine)
+     basic routines: Henrik Krawczynski (mscw+energy routine)
 */
 
 #include "VTableCalculator.h"
@@ -51,12 +51,11 @@ int main( int argc, char *argv[] )
     cout << "mscw_energy (" << fTLRunParameter->getEVNDISP_VERSION() << ")" << endl;
     cout << "=======================" << endl;
     cout << endl;
-
-    if( !fTLRunParameter->fillParameters( argc, argv ) ) exit( 0 );
-
     cout << "calculation of mean scaled width and length, and energy with lookup tables" << endl;
     cout << "--------------------------------------------------------------------------" << endl;
     cout << endl;
+
+    if( !fTLRunParameter->fillParameters( argc, argv ) ) exit( 0 );
 
     if( fTLRunParameter->printpara.size() > 0 )
     {

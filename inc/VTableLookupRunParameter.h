@@ -1,5 +1,4 @@
 //! VTableLookupRunParameter parameter storage class
-// Revision $Id: VTableLookupRunParameter.h,v 1.1.2.2.4.1.4.2.6.1.2.5.2.7.2.1 2010/11/18 10:33:51 gmaier Exp $
 
 #ifndef VTABLELOOKUPRUNPARAMTER_H
 #define VTABLELOOKUPRUNPARAMTER_H
@@ -9,6 +8,7 @@
 #include <TSystem.h>
 
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -19,11 +19,15 @@ using namespace std;
 
 class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 {
+    private:
+
+       bool fillInputFile_fromList( string iList );
+
     public:
 
 	unsigned int fDebug;              // 0 = off, 1 = default debug level, 2 = detailed
 
-        string inputfile;
+        vector< string > inputfile;
         string outputfile;
         string tablefile;
         double ze;
@@ -82,6 +86,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef(VTableLookupRunParameter,17);
+        ClassDef(VTableLookupRunParameter,18);
 };
 #endif

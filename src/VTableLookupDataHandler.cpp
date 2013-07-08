@@ -3,7 +3,6 @@
 
   reads evndisp output trees, fill results from mscw and energy reconstruction
 
-
   \author Gernot Maier
 */
 
@@ -29,7 +28,6 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
     fNTel = 0;
     fNTelComb = 0;
     fTtelconfig = 0;
-    finputfile = "";
     foutputfile = "";
     fEmissionHeightCalculator = new VEmissionHeightCalculator();
 
@@ -506,29 +504,36 @@ bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain *c )
    return false;
 }
 
-bool VTableLookupDataHandler::setInputFile( string iInput )
+bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 {
     finputfile = iInput;
 // need to find suffix .root: add it if it doesn't exist
-    if( finputfile.find( ".root" ) == string::npos )
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
     {
-        cout << "TableLookupDataHandler::setInputFile: adding .root suffix to file name" << endl;
-	finputfile += ".root";
+       if( finputfile[i].find( ".root" ) == string::npos )
+       {
+	   cout << "TableLookupDataHandler::setInputFile: adding .root suffix to file name" << endl;
+	   finputfile[i] += ".root";
+       }
+       cout << "opening file(s) " << finputfile[i] << endl;
     }
-
-    cout << "opening file(s) " << finputfile << endl;
 
 //////////////////////////////////////////////////////////////////////////////////////
 // get telescope configuration
 // get it from the telescope configuration tree (if avaible), else assume two telescope setup
     fTtelconfig = new TChain( "telconfig" );
-    int iNFil = fTtelconfig->Add( finputfile.c_str(), 0 );
-    if( iNFil == 0 )
+    int iNFil_sum = 0;
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
     {
-        cout << "error: no file(s) in chain" << endl;
-        exit( -1 );
+       int iNFil = fTtelconfig->Add( finputfile[i].c_str(), 0 );
+       if( iNFil == 0 )
+       {
+	   cout << "error: no file(s) in chain" << endl;
+	   exit( -1 );
+       }
+       iNFil_sum += iNFil;
     }
-    cout << iNFil << " file(s) in chain " << endl;
+    cout << iNFil_sum << " file(s) in chain " << endl;
     if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
     {
        cout << "VTableLookupDataHandler::setInputFile() error: some file are not properly closed" << endl;
@@ -654,7 +659,10 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     bool bShort = false;
 // get shower parameter tree
     fTshowerpars = new TChain( "showerpars" );
-    fTshowerpars->Add( finputfile.c_str() );
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
+    {
+       fTshowerpars->Add( finputfile[i].c_str() );
+    }
     if( !fTshowerpars )
     {
         cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2)" << endl;
@@ -705,9 +713,12 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         sprintf( iName, "tpars" );
-        sprintf( iDir, "%s/Tel_%d/tpars", finputfile.c_str(), i+1 );
         iT = new TChain( iName );
-        iT->Add( iDir );
+	for( unsigned int f = 0; f < finputfile.size(); f++ )
+	{
+	   sprintf( iDir, "%s/Tel_%d/tpars", finputfile[f].c_str(), i+1 );
+	   iT->Add( iDir );
+        }
         if( !iT )
         {
             cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (3)" << endl;
@@ -746,14 +757,17 @@ bool VTableLookupDataHandler::setInputFile( string iInput )
 	{
 	   if( fDebug > 1 ) cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope " << i+1 << endl;
 	   sprintf( iName, "calib_%d", i+1 );
-	   sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile.c_str(), i+1, i+1 );
 	   TChain iPedVars( iName );
-	   if( !iPedVars.Add( iDir ) )
+	   for( unsigned int f = 0; f < finputfile.size(); f++ )
 	   {
-	       cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
-	       cout << "exiting..." << endl;
-	       exit( -1 );
-	   }
+	      sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile[f].c_str(), i+1, i+1 );
+	      if( !iPedVars.Add( iDir ) )
+	      {
+		  cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
+		  cout << "exiting..." << endl;
+		  exit( -1 );
+	      }
+           }
 	   gErrorIgnoreLevel = 5000;
 	   double pedvar = 0.;
 	   double mpedvar = 0.;
@@ -819,10 +833,14 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         exit( -1 );
     }
 
-    if( foutputfile == finputfile && iOption == "recreate" )
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
     {
-        cout << "VTableLookupDataHandler::setOutputFile error: can't overwrite inputfile" << endl;
-        exit( -1 );
+       if( foutputfile == finputfile[i] && iOption == "recreate" )
+       {
+	   cout << "VTableLookupDataHandler::setOutputFile error: can't overwrite inputfile" << endl;
+	   cout << "\t" << finputfile[i] << endl;
+	   exit( -1 );
+       }
     }
 
 // open output file
@@ -1162,9 +1180,21 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
 
 void VTableLookupDataHandler::writeDeadTimeHistograms()
 {
+    if( finputfile.size() > 1 )
+    {
+       cout << "VTableLookupDataHandler::writeDeadTimeHistograms() error: ";
+       cout << "analysis of several files at once not allowed " << endl;
+       cout << "(dead times will be wrong)" << endl;
+       exit( -1 );
+    }
+
 // use chain to get list of files
     TChain iTel( "telconfig" );
-    int iNFil = iTel.Add( finputfile.c_str() );
+    int iNFil = 0;
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
+    {
+       iNFil += iTel.Add( finputfile[i].c_str() );
+    }
 
     if( iNFil > 0 )
     {
@@ -1186,7 +1216,11 @@ void VTableLookupDataHandler::writeDeadTimeHistograms()
 void VTableLookupDataHandler::copy_telconfig()
 {
     TChain iMC( "telconfig" );
-    int iNFil = iMC.Add( finputfile.c_str() );
+    int iNFil = 0;
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
+    {
+        iNFil += iMC.Add( finputfile[i].c_str() );
+    }
 
     if( iNFil > 0 )
     {
@@ -1215,7 +1249,11 @@ bool VTableLookupDataHandler::copyMCRunheader()
 {
 // use chain to get list of files
     TChain iTel( "telconfig" );
-    int iNFil = iTel.Add( finputfile.c_str() );
+    int iNFil = 0;
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
+    {
+       iNFil += iTel.Add( finputfile[i].c_str() );
+    }
 
     if( iNFil > 0 )
     {
@@ -1238,7 +1276,11 @@ bool VTableLookupDataHandler::copyMCRunheader()
 void VTableLookupDataHandler::copyMCTree()
 {
     TChain iMC( "MCpars" );
-    int iNFil = iMC.Add( finputfile.c_str() );
+    int iNFil = 0;
+    for( unsigned int i = 0; i < finputfile.size(); i++ )
+    {
+       iNFil += iMC.Add( finputfile[i].c_str() );
+    }
 
     if( iNFil > 0 && iMC.GetEntries() > 0 )
     {

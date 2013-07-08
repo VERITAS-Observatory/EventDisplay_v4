@@ -15,7 +15,6 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 {
     fDebug = 0;
 
-    inputfile = "";
     outputfile = "";
     tablefile = "";
     ze = 0.;
@@ -88,14 +87,23 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
             printHelp();
             return false;
         }
-        if( iTemp.find( "-input" ) < iTemp.size() || iTemp.find( "-sourcefile" ) < iTemp.size() )
+        if( ( iTemp.find( "-input" ) < iTemp.size() || iTemp.find( "-sourcefile" ) < iTemp.size() ) 
+	   && !( iTemp.find( "-inputfilelist" ) < iTemp.size() ) )
         {
             if( iTemp2.size() > 0 )
             {
-                inputfile = iTemp2;
+		inputfile.push_back( iTemp2 );
                 i++;
             }
         }
+	else if( iTemp.find( "-inputfilelist" ) < iTemp.size() )
+	{
+            if( iTemp2.size() > 0 )
+            {
+	       fillInputFile_fromList( iTemp2 );
+	       i++;
+            }
+	}
         else if( iTemp.find( "-mctable" ) < iTemp.size() )
         {
             cout << "THIS COMMAND LINE OPTION IS OBSOLET !!" << endl;
@@ -313,16 +321,16 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
         return false;
     }
 
-// set output file name
-    if( outputfile.size() == 0 )
+// set output file name (mainly for VTS analysis with a single inputfile)
+    if( outputfile.size() == 0 && inputfile.size() == 1 )
     {
-        if( inputfile.find( "*" ) < inputfile.size() )
+        if( inputfile[0].find( "*" ) < inputfile[0].size() )
         {
             outputfile = "mscw.root";
         }
         else
         {
-            outputfile = inputfile.substr( 0, inputfile.rfind( "." ) );
+            outputfile = inputfile[0].substr( 0, inputfile[0].rfind( "." ) );
             outputfile += ".mscw.root";
         }
     }
@@ -354,7 +362,11 @@ void VTableLookupRunParameter::print( int iP )
     cout << endl;
     cout << "evndisp reconstruction parameter ID: " << rec_method << endl;
     cout << endl;
-    cout << "input file(s): " << inputfile;
+    cout << "input file(s): ";
+    for( unsigned int i = 0; i < inputfile.size(); i++ )
+    {
+       cout << "\t" << inputfile[i] << endl;
+    }
     if( isMC ) cout << " (input data is MC)";
     if( fPE ) cout << " (input data is PE)";
     cout << endl;
@@ -416,3 +428,30 @@ void VTableLookupRunParameter::print( int iP )
     }
 }
 
+bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
+{
+   ifstream is;
+   is.open( iList.c_str(), ifstream::in );
+   if( !is )
+   {
+      cout << "VTableLookupRunParameter::fillInputFile_fromList() error reading list of input files: " << endl;
+      cout << iList << endl;
+      cout << "exiting..." << endl;
+      exit( -1 );
+   }
+   cout << "VTableLookupRunParameter::fillInputFile_fromList() reading input file list: " << endl;
+   cout << iList << endl;
+   string iLine;
+   while( getline( is, iLine ) )
+   {
+      if( iLine.size() > 0 )
+      {
+         inputfile.push_back( iLine );
+      }
+   }
+   is.close();
+
+   cout << "total number of input files " << inputfile.size() << endl;
+
+   return true;
+}
