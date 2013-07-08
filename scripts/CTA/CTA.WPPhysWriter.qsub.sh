@@ -1,6 +1,6 @@
 #$ -S /bin/tcsh
 #
-# script to write WP Phys Files
+# script to write CTA WP Phys Files
 #
 #
 # Author: Gernot Maier

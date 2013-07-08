@@ -1,8 +1,6 @@
 #!/bin/bash
 #
-# script to write WP Phys Files
-#
-# Revision $Id$
+# script to write CTA WP Phys Files
 #
 # Author: Gernot Maier
 #
@@ -58,40 +56,40 @@ do
    mkdir -p $ODIR
    echo "WP Phys file written to $OXUTNAME"
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-1.sh
-   cp $FSCRIPT.sh $ODIR/$FSCRIPT-$ARRAY-1.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-1.sh
+   cp $FSCRIPT.sh $FDIR/$FSCRIPT-$ARRAY-1.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-2.sh
-   sed -e "s|ARRAY|$ARRAY|" $ODIR/$FSCRIPT-$ARRAY-1.sh > $ODIR/$FSCRIPT-$ARRAY-2.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-1.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-2.sh
+   sed -e "s|ARRAY|$ARRAY|" $FDIR/$FSCRIPT-$ARRAY-1.sh > $FDIR/$FSCRIPT-$ARRAY-2.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-1.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-3.sh
-   sed -e "s|DDIR|$DDIR|" $ODIR/$FSCRIPT-$ARRAY-2.sh > $ODIR/$FSCRIPT-$ARRAY-3.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-2.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-3.sh
+   sed -e "s|DDIR|$DDIR|" $FDIR/$FSCRIPT-$ARRAY-2.sh > $FDIR/$FSCRIPT-$ARRAY-3.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-2.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-4.sh
-   sed -e "s|OBSTIME|$OBSTIME|" $ODIR/$FSCRIPT-$ARRAY-3.sh > $ODIR/$FSCRIPT-$ARRAY-4.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-3.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-4.sh
+   sed -e "s|OBSTIME|$OBSTIME|" $FDIR/$FSCRIPT-$ARRAY-3.sh > $FDIR/$FSCRIPT-$ARRAY-4.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-3.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-5.sh
-   sed -e "s|OUTNAME|$OXUTNAME|" $ODIR/$FSCRIPT-$ARRAY-4.sh > $ODIR/$FSCRIPT-$ARRAY-5.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-4.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-5.sh
+   sed -e "s|OUTNAME|$OXUTNAME|" $FDIR/$FSCRIPT-$ARRAY-4.sh > $FDIR/$FSCRIPT-$ARRAY-5.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-4.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-6.sh
-   sed -e "s|OFFSET|$OFFSET|" $ODIR/$FSCRIPT-$ARRAY-5.sh > $ODIR/$FSCRIPT-$ARRAY-6.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-5.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-6.sh
+   sed -e "s|OFFSET|$OFFSET|" $FDIR/$FSCRIPT-$ARRAY-5.sh > $FDIR/$FSCRIPT-$ARRAY-6.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-5.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-7.sh
-   sed -e "s|ODIR|$ODIR|" $ODIR/$FSCRIPT-$ARRAY-6.sh > $ODIR/$FSCRIPT-$ARRAY-7.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-6.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-7.sh
+   sed -e "s|ODIR|$ODIR|" $FDIR/$FSCRIPT-$ARRAY-6.sh > $FDIR/$FSCRIPT-$ARRAY-7.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-6.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-8.sh
-   sed -e "s|RRRR|$RECID|" $ODIR/$FSCRIPT-$ARRAY-7.sh > $ODIR/$FSCRIPT-$ARRAY-8.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-7.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-8.sh
+   sed -e "s|RRRR|$RECID|" $FDIR/$FSCRIPT-$ARRAY-7.sh > $FDIR/$FSCRIPT-$ARRAY-8.sh
+   rm -f $FDIR/$FSCRIPT-$ARRAY-7.sh
 
-   mv $ODIR/$FSCRIPT-$ARRAY-8.sh $ODIR/$FSCRIPT-$ARRAY.sh
+   mv $FDIR/$FSCRIPT-$ARRAY-8.sh $FDIR/$FSCRIPT-$ARRAY.sh
 
-   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$ODIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
 
 done
 
