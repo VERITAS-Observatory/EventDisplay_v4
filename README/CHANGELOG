@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130708 (GM) optimization rate and sensitivity calculations (mainly CTA)
+
+* 20130704 (GM) added migration matrix for QC cuts only (CTA)
+
 * 20130703 (GM) fixed bug in relating the correct telescope number to 
                 the simtel telescope ID  (CTA/ASTRI)
 

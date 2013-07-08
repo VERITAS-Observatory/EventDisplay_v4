@@ -129,12 +129,9 @@ void VSensitivityCalculator::reset()
     fEnergy_dE_log10 = 0.25;
 }
 
-
 /*
-   iD = dat set ID
+   iD = data set ID
    iObservationTime = total observation time [h]
-   iSignificance    = required significance  [sigma]
-   iMinEvents       = minimum number of events required
 
    energy           = energy on linear scale [TeV] (for debug output only)
 
@@ -144,6 +141,20 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 {
     if( !checkDataSet( iD, "getSensitivity" ) ) return 0.;
 
+   return getSensitivity( fData[iD].fSignal, fData[iD].fBackground, fData[iD].fAlpha, energy, iFillStatistics );
+}
+
+
+/*
+   iD = data set ID
+   iObservationTime = total observation time [h]
+
+   energy           = energy on linear scale [TeV] (for debug output only)
+
+   return sensitivity as fraction of data set used
+*/
+double VSensitivityCalculator::getSensitivity( double iSignal, double iBackground, double iAlpha, double energy, unsigned int iFillStatistics )
+{
     double f = 0.;
     double s = 0.;
     double t = fObservationTime_h * 60.;            // h -> min
@@ -153,16 +164,16 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 // (observe that this is different from the standard definition used in addDataSet() (which are rates, etc))
 
 // calculate signal (non - alpha * noff) rate
-    double n_diff = fData[iD].fSignal - fData[iD].fBackground * fData[iD].fAlpha;
+    double n_diff = iSignal - iBackground * iAlpha;
 
     if( fDebug && energy > 0. )
     {
-        cout << "getSensitivity " << iD << " energy: " << energy << "\t obstime: " << fObservationTime_h;
+        cout << "getSensitivity energy: " << energy << "\t obstime: " << fObservationTime_h;
 	cout << "\t sig > " << fSignificance_min << "\t events >= " << fEvents_min;
 	cout << "\t min ratio of signal to background events > " << fMinBackgroundRateRatio_min << endl;
-        cout << "\t signal+background rate: " << fData[iD].fSignal;
-	cout << "\t background events: " << fData[iD].fBackground;
-	cout << "\t background rate: " <<  fData[iD].fBackground*fData[iD].fAlpha << "\t alpha: " << fData[iD].fAlpha << endl;
+        cout << "\t signal+background rate: " << iSignal;
+	cout << "\t background events: " << iBackground;
+	cout << "\t background rate: " <<  iBackground*iAlpha << "\t alpha: " << iAlpha << endl;
 	cout << "\t signal rate: " << n_diff;
 	cout << "\t nsourcestrengths " << fSourceStrength.size() << endl;
     }
@@ -171,7 +182,7 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 // minimum number of background events
     if( iFillStatistics == 4 )
     {
-	if( fData[iD].fBackground * fData[iD].fAlpha > 0. )
+	if( iBackground * iAlpha > 0. )
 	{
 	   return -1.;
 	}
@@ -179,16 +190,33 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 	else return 0.01;
      }
 
-    for( unsigned int n = fSourceStrength.size()-1; n > 0; n-- )
+    unsigned i_nMax = fSourceStrength.size()-1;
+// Loop optimization
+// calculate start for iFillStatistics == 0
+    if( iFillStatistics == 0 )
+    {
+       for( unsigned int n = i_nMax; n > 0; n-- )
+       {
+           if( fSourceStrength[n] * t * n_diff >= fEvents_min )
+	   {
+	      i_nMax = n;
+	      break;
+            }
+        }
+    }
+        
+/////////////////////////////////////////////////////////////////////////////////
+// loop over the source strength vector and check different sensitivity criteria
+    for( unsigned int n = i_nMax; n > 0; n-- )
     {
         f = fSourceStrength[n];
 
 // default significance calculation
-        s = VStatistics::calcSignificance( t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha), 
-	                                   t * fData[iD].fBackground, fData[iD].fAlpha, fLiAndMaEqu );
+        s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha), 
+	                                   t * iBackground, iAlpha, fLiAndMaEqu );
 // significance calculation for Crab flares (don't use!)
-//        s = VStatistics::calcSignificance( t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha + n_diff), 
-//	                                   t * ( fData[iD].fBackground + n_diff / fData[iD].fAlpha ), fData[iD].fAlpha, fLiAndMaEqu );
+//        s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha + n_diff), 
+//	                                   t * ( iBackground + n_diff / iAlpha ), iAlpha, fLiAndMaEqu );
 
 //////////////////////////////////////////////////////////////////////////
 // check if this set of observations passes the significance criteria
@@ -201,12 +229,12 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 // (removes most sensitivity values at large energies, but otherwise transition zone
 //  between signal and background limited zone not well defined)
 // NOTE: this cut depends on your MC statistics, not on the sensitivity of your observatory
-	 bool bPasses_MinimumNumberofBackGroundEvents = (fData[iD].fBackground * fData[iD].fAlpha > 0. );
+	 bool bPasses_MinimumNumberofBackGroundEvents = (iBackground * iAlpha > 0. );
 // require the signal to be larger than a certain fraction of background
 	 bool bPasses_MinimumSystematicCut = false;
-	 if( fData[iD].fBackground * fData[iD].fAlpha > 0. )
+	 if( iBackground * iAlpha > 0. )
 	 {
-	    bPasses_MinimumSystematicCut = ( f * n_diff / (fData[iD].fBackground * fData[iD].fAlpha) >= fMinBackgroundRateRatio_min  );
+	    bPasses_MinimumSystematicCut = ( f * n_diff / (iBackground * iAlpha) >= fMinBackgroundRateRatio_min  );
          }
 
 // PRELI: allow calculation of sensitivity in event limited region
@@ -219,15 +247,18 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
          }
 
 // sensitivity limitation histograms
-	if(  ( iFillStatistics == 1 && bPassed_MinimumSignificance ) 
-	  || ( iFillStatistics == 2 && bPassed_MinimumSignalEvents )
-	  || ( iFillStatistics == 3 && bPasses_MinimumSystematicCut ) )
+        if( iFillStatistics != 0 )
 	{
-	      f = fSourceStrength[n];
-	      bSuccess = true;
-	      break;
-	}
-	else if( iFillStatistics > 0 ) continue;
+	   if(  ( iFillStatistics == 1 && bPassed_MinimumSignificance ) 
+	     || ( iFillStatistics == 2 && bPassed_MinimumSignalEvents )
+	     || ( iFillStatistics == 3 && bPasses_MinimumSystematicCut ) )
+	   {
+		 f = fSourceStrength[n];
+		 bSuccess = true;
+		 break;
+	   }
+	   continue;
+        }
 
 // standard sensitivity calculation
        if( bPassed_MinimumSignificance && bPassed_MinimumSignalEvents 
@@ -243,15 +274,15 @@ double VSensitivityCalculator::getSensitivity( unsigned int iD, double energy, u
 	   cout << "\t" << iFillStatistics;
 	   cout << "\t n: " << n-1 << "\t f " << f;
 	   cout << "\t significance: " << s;
-	   cout << "\t min events: " << t * f * fData[iD].fSignal;
+	   cout << "\t min events: " << t * f * iSignal;
 	   cout << "\t ndiff: " << t * ( f * n_diff );
-	   cout << "\t non: " << t * ( f * n_diff + fData[iD].fBackground * fData[iD].fAlpha);
-	   cout << "\t noff: " << t * fData[iD].fBackground;
-	   cout << "\t alpha: " << fData[iD].fAlpha;
+	   cout << "\t non: " << t * ( f * n_diff + iBackground * iAlpha);
+	   cout << "\t noff: " << t * iBackground;
+	   cout << "\t alpha: " << iAlpha;
 	   cout << "\t t: " << t;
 	   cout << endl;
-	   cout << "\t" << fData[iD].fBackground * fData[iD].fAlpha;
-	   cout << "\t" << ( f * n_diff ) / (fData[iD].fBackground * fData[iD].fAlpha) * 100. << endl;
+	   cout << "\t" << iBackground * iAlpha;
+	   cout << "\t" << ( f * n_diff ) / (iBackground * iAlpha) * 100. << endl;
        }
     }
 
@@ -707,19 +738,16 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 
 // observe that the signal rate is defined differently for list_sensitivity() etc...
 // get fraction of Crab flux for XX sigma etc...
-// perform a toy MC to calculate errors (1000 times)
+// perform a toy MC to calculate errors (100 times)
         TH1F iX( "iX", "", 100000, 0., 100. );
-	for( unsigned int q = 0; q < 1000; q++ )
+	for( unsigned int q = 0; q < 100; q++ )
 	{
 	     double iN_on  = gRandom->Gaus( non, non_error );
 	     double iN_off = gRandom->Gaus( noff, noff_error );
-	     unsigned int iD = addDataSet( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
-	                                   iN_off / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
-	     double i_s = getSensitivity( iD, -100., 0 );
+	     double i_s = getSensitivity( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
+	                                  iN_off / fDifferentialFlux[i].ObsTime * 60., alpha , -100., 0 );
 	     if( i_s > 0. ) iX.Fill( i_s );
 	}
-	unsigned int iD = addDataSet( non / fDifferentialFlux[i].ObsTime * 60.,
-				      noff / fDifferentialFlux[i].ObsTime * 60., alpha, "" ); 
 // take mean of distribution (distribution is assymmetric, not sure if this would be correct)
 //	s = iX.GetMean();
 //	s = getSensitivity( iD, -100., 0 );
@@ -737,7 +765,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         }
 	else
 	{
-	   s = getSensitivity( iD, -100., 0 );
+	   s = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
+	                       noff / fDifferentialFlux[i].ObsTime * 60., alpha, -100., 0 );
 	   s_error_L = s - iX.GetRMS();
 	   s_error_U = s + iX.GetRMS();
         }
@@ -753,10 +782,14 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // (int) of energy for maps
         int energy_intX3 = (int)(energy*1.e3);
 // get sensitivity limititations
-	fSignificanceLimited[energy_intX3]        = getSensitivity( iD, energy, 1 );
-	fMinEventsLimited[energy_intX3]           = getSensitivity( iD, energy, 2 );
-	fMinBackgroundEventsLimited[energy_intX3] = getSensitivity( iD, energy, 3 );
-	fMinNoBackground[energy_intX3]            = getSensitivity( iD, energy, 4 );
+	fSignificanceLimited[energy_intX3]        = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60., 
+	                                                            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 1 );
+	fMinEventsLimited[energy_intX3]           = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
+	                                                            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 2 );
+	fMinBackgroundEventsLimited[energy_intX3] = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
+	                                                            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 3 );
+	fMinNoBackground[energy_intX3]            = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
+	                                                            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 4 );
 
 // fill sensitivity graphs
         double f1 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_lowEdge ) );
@@ -1645,12 +1678,13 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 // get gamma rate [1/min] for a certain ze, az, noise, wobble offset
 // for integral sensitivity set energy bins according to effective areas
     if( fDebug ) cout << "Calculate rates for gamma rays" << endl;
+    VMonteCarloRateCalculator iMCR;
     for( unsigned int i = 0; i < v_flux.size(); i++ )
     {
         v_flux[i].NOn       = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab, 
-	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, false );
+	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, false, &iMCR );
 	v_flux[i].NOn_error = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab,
-	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, true );
+	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, true, &iMCR );
     }
 
 
@@ -1681,6 +1715,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
            v_flux_NOff_error[(*i_MCData_iterator).first].push_back( 0. );
        }
 
+       VMonteCarloRateCalculator iMCR;
 // loop over all energy bins
        for( unsigned int i = 0; i < v_flux.size(); i++ )
        {
@@ -1688,12 +1723,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea,
-								   (*i_MCData_iterator).second->hResponseMatrix );
+								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR );
             v_flux_NOff_error[(*i_MCData_iterator).first][i] =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin,
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea_error,
-								   (*i_MCData_iterator).second->hResponseMatrix );
+								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR );
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // take care of space angle and theta2 cut normalisation
@@ -1937,32 +1972,32 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
                                                    VEnergySpectrumfromLiterature i_Espec, 
 						   VSensitivityCalculatorDataResponseFunctions iMCPara,
 						   TH2D *hResponseMatrix,
-						   bool iRateError )
+						   bool iRateError, VMonteCarloRateCalculator *iMCR )
 {
-    VMonteCarloRateCalculator iMCR;
+    if( !iMCR ) return 0.;
 
 // return error on rate (from error on effective area, which is derived from MC statistics)
     if( iRateError )
     {
-       return iMCR.getMonteCarloRate( iMCPara.energy, iMCPara.effArea_error, &i_Espec, iMCPara.fSpectralParameterID,
-                                      iE_low_bin, iE_up_bin, hResponseMatrix, getDebug() );
+       return iMCR->getMonteCarloRate( iMCPara.energy, iMCPara.effArea_error, &i_Espec, iMCPara.fSpectralParameterID,
+                                       iE_low_bin, iE_up_bin, hResponseMatrix, getDebug() );
     }  
 
 // return rate calculated from MC effective areas
-    return iMCR.getMonteCarloRate( iMCPara.energy, iMCPara.effArea, &i_Espec, iMCPara.fSpectralParameterID,
-                                   iE_low_bin, iE_up_bin, hResponseMatrix, getDebug() );
+    return iMCR->getMonteCarloRate( iMCPara.energy, iMCPara.effArea, &i_Espec, iMCPara.fSpectralParameterID,
+                                    iE_low_bin, iE_up_bin, hResponseMatrix, getDebug() );
 }
 
 double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsigned int iE_up_bin, 
                                                    VEnergySpectrumfromLiterature i_Espec, unsigned int e_lit_ID,
 						   vector< double > e_gamma, vector< double > e, vector< double > eff,
-						   TH2D *hResponseMatrix )
+						   TH2D *hResponseMatrix, VMonteCarloRateCalculator *iMCR )
 {
-    VMonteCarloRateCalculator iMCR;
+    if( !iMCR ) return 0.;
 
 // return rate calculated from MC effective areas
-    return iMCR.getMonteCarloRate( e, eff, &i_Espec, e_lit_ID,
-                                   iE_low_bin, iE_up_bin, -1., -1., hResponseMatrix, e_gamma, getDebug() );
+    return iMCR->getMonteCarloRate( e, eff, &i_Espec, e_lit_ID,
+                                    iE_low_bin, iE_up_bin, -1., -1., hResponseMatrix, e_gamma, getDebug() );
 }
 
 

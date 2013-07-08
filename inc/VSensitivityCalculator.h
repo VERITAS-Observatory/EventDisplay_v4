@@ -211,10 +211,11 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara, double dE_Log10 );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
-				       TH2D *iResponseMatrix = 0, bool iRateError = false );
+				       TH2D *iResponseMatrix = 0, bool iRateError = false, VMonteCarloRateCalculator* iMCRate = 0 );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, unsigned int e_lit_ID,
-				       vector< double > e_gamma, vector< double > e, vector< double > eff, TH2D *iResponseMatrix = 0 );
+				       vector< double > e_gamma, vector< double > e, vector< double > eff, TH2D *iResponseMatrix = 0,
+				       VMonteCarloRateCalculator *iMCR = 0 );
 
 	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit = "ENERGY" );
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
@@ -239,6 +240,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         bool     fillSensitivityLimitsHistograms( vector<TH1F*>& h );
 	bool     getDebug() { return fDebug; }
         double   getSensitivity( unsigned int iD, double energy = -1., unsigned int iFillStatistics = 0 );
+	double   getSensitivity( double iSignal, double iBackground, double iAlpha, double energy = -1., unsigned int iFillStatistics = 0 );
 	TGraphAsymmErrors*  getSensitivityGraph() { return gSensitivityvsEnergy; }
         unsigned int  listDataSets();
         void     listUnits();
