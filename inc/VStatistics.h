@@ -127,14 +127,7 @@ namespace VStatistics
         double c = par[0];                        //!< on source counts
         double b = par[1]*par[2];                 //!< off source counts * ratio
 
-        double mean = c-b;
-        double g = 0.;
-                                                  //!< Helene (6) Gaussian aprox.
-        if( par[4] == 2 )      g = TMath::Exp(-((a-mean)*(a-mean))/(2.*(c+b)));
-                                                  //!< Helene(2)
-        else if( par[4] == 1 ) g = TMath::Exp(-(a+b))*TMath::Power((a+b),c);
-
-        return g;
+        return TMath::Poisson( c, a+b );
     }
 
     inline Double_t funcf(Double_t *x, Double_t *par)
@@ -147,7 +140,7 @@ namespace VStatistics
         double b=par[1]*par[2];                   //<! Background Events * ratio
         double alpha=par[3];                      //<! Confidence Level
 
-        double big= 10.*sqrt(b+c) +fabs(c-b);     //! 10 sigma noise
+        double big= 10.*sqrt(b+c) + fabs(c-b) + 10.;     //! 10 sigma noise
         TF1 g("myfuncg",funcg,0.0,big,5);
         g.SetParameters(par);
         n1=g.Integral(0.,big,par,eps);
@@ -157,12 +150,11 @@ namespace VStatistics
             p = 0.;
         }
 
-        double f   = alpha - p;
-        return f;
+        return alpha - p;
     }
 
 /*
-    calculate upper limit using Helene or Feldman & Cousins
+    calculate upper limit using Helene, Feldman & Cousins, Rolke et al
 
     iMethod == 0: Helene
     iMethod == 1: Helene eq 2
@@ -178,9 +170,9 @@ namespace VStatistics
     inline double calcUpperLimit( double nOn, double nOff, double ratio, double CL, int iMethod = 0 )
     {
 // Helene taking ratio into account
-        if( iMethod == 0 ) return Helene( nOn, nOff, ratio, CL );
-// Helene, equ (2) or Helene equ (6, Gaussian approximation)
-        else if( iMethod == 1 || iMethod == 2 )
+        if( iMethod == 0 || iMethod == 2 ) return Helene( nOn, nOff, ratio, CL );
+// Helene, equ (2) 
+        else if( iMethod == 1 )
         {
             double mypars[5];
             mypars[0]=nOn;
@@ -194,14 +186,19 @@ namespace VStatistics
 
             TF1 f( "myfuncf", funcf, 0.0, 100000, 5);
             f.SetParameters( mypars );
-            return f.GetX( 0.0 ,0.0, 100000 );
+            return f.GetX( 0.0 ,0.0, 100000, 1.e-10, 1000 );
         }
 // Feldman & Cousins
         else if( iMethod == 3 )
         {
             TFeldmanCousins i_FeldmanCousins( CL );
             if( nOn > 20 || ratio * nOff > 20 ) i_FeldmanCousins.SetMuMax( 100. );
-            if( nOn > 60 || ratio * nOff > 60 ) i_FeldmanCousins.SetMuMax( 100. );
+            if( nOn > 60 || ratio * nOff > 60 ) i_FeldmanCousins.SetMuMax( 1000. );
+	    if( nOn > 1000 ) 
+	    {
+	       cout << "VStatistics::calcUpperLimit() warning: Feldman Cousins maximum values set to 1000" << endl;
+	       cout << "  --> results are not valid" << endl;
+            }
             if( nOn > 40 ) i_FeldmanCousins.SetMuStep( 0.5 );
             return i_FeldmanCousins.CalculateUpperLimit( nOn, ratio * nOff );
         }
