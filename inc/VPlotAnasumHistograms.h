@@ -92,7 +92,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    void convert_derotated_RADECJ2000( double x=0, double y=0, double xerr=0, double yerr=0 );
 
    void drawPSF( TCanvas *c = 0, string iFile = 0, TH2D *h2 = 0, float iPSF = 0.1 );
-   void fit_energy(double minE = -0.5, double maxE = 0.5 );
+//   void fit_energy(double minE = -0.5, double maxE = 0.5 );
    bool openDataFile( string ifile, int ion = -1 );
 
    void help();                                                       // this will print all available functions
@@ -118,7 +118,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
                                double xcenter = 0., double ycenter = 0.,
 			       bool bSlices = false, double fSliceXmin = -0.1, double fSliceXmax = 0.1, bool bProjX = true );
    vector<sSource> plot_catalogue( TCanvas *c, string iCatalogue = "Hipparcos_MAG8_1997.dat",
-                                   double iMaxBrightness = 6.5, string iBand = "B", double iStarRadius = 0.15,
+                                   double iMaxBrightness = 8.0, string iBand = "B", double iStarRadius = 0.30,
 				   int iColor = 1, int iLineStyle = 1, string hSkyMapName = "hmap_stereo_sig_REFLECTED",
 				   double iTextAngle = 45., int iMarkerStyle = 5 ); 
    void            plot_RBM_ring(double r, double iA, double t2, double iN);
@@ -134,7 +134,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    void            setDebugInfo( bool iB = false ) { fDebug = iB; }               // more debug output to screen
    bool            setRunNumber( int iRun );                                      // select run for plotting
 
-   ClassDef(VPlotAnasumHistograms,9);
+   ClassDef(VPlotAnasumHistograms,10);
 };
 
 #endif

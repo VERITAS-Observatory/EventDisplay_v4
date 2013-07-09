@@ -2209,6 +2209,10 @@ void VPlotAnasumHistograms::plot_theta2Correction()
 }
 
 
+/*
+
+    GM: obsolete, use VEnergySpectrum
+
 
 void VPlotAnasumHistograms::fit_energy(double minE, double maxE)
 {
@@ -2244,7 +2248,7 @@ void VPlotAnasumHistograms::fit_energy(double minE, double maxE)
     cout << endl;
 
     h->Draw();
-}
+} */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /*
