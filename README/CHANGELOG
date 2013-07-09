@@ -6,6 +6,9 @@ Change log eventdisplay analysis package
 * 20130709 (GM) added migration matrix interpolation for cosmic rays
                 (mainly for CTA sensitivity calculations)
 
+* 20130708 (GM) added input file list to mscw_energy
+                (additional option, can be used with wildcards)
+
 * 20130708 (GM) optimization rate and sensitivity calculations (mainly CTA)
 
 * 20130704 (GM) added migration matrix for QC cuts only (CTA)
