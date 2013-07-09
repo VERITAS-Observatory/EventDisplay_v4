@@ -23,8 +23,10 @@ bool VTrackingCorrections::readTrackingCorrectionsFromDB( string iSQLDate )
 {
     cout << "Reading T-point tracking corrections from VERITAS database for telescope " << fTelID+1 << " at " << iSQLDate << endl;
     string iTemp = getDBServer() + "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTemp.c_str(), "readonly", "" );
-    if( !f_db )
+
+    //std::cout<<"VTrackingCorrections::readTrackingCorrectionsFromDB "<<std::endl;
+    VDB_Connection my_connection( iTemp.c_str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "VTrackingCorrections: failed to connect to database server" << endl;
         fStatus = false;
@@ -33,15 +35,17 @@ bool VTrackingCorrections::readTrackingCorrectionsFromDB( string iSQLDate )
     char c_query[1000];
 
     sprintf( c_query, "select * from tblPositioner_Telescope%d_Corrections where db_start_time <= \"%s\" ", fTelID, iSQLDate.c_str() );
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res )
+
+    if(!my_connection.make_query(c_query))
     {
 	cout << "VTrackingCorrections: failed to find correct tables" << endl;
 	cout << "\t" << c_query << endl;
-        f_db->Close();
         fStatus = false;
         return false;
     }
+    TSQLResult *db_res = my_connection.Get_QueryResult();
+
+
     int fNRows = db_res->GetRowCount();
 
     TSQLRow *db_row = 0;
@@ -84,7 +88,6 @@ bool VTrackingCorrections::readTrackingCorrectionsFromDB( string iSQLDate )
         correctionParameters->az_neg_vff_s = atof( db_row->GetField( 21 ) );
         correctionParameters->az_neg_vff_t = atof( db_row->GetField( 22 ) );
     }
-    f_db->Close();
 
     return true;
 }

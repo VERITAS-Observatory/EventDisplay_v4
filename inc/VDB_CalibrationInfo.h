@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include "VDB_Connection.h"
+
 using namespace std;
 
 class VDB_CalibrationInfo

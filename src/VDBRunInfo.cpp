@@ -74,16 +74,19 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 
     stringstream iTempS;
     iTempS << iDBserver << "/VOFFLINE";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
-
     char c_query[1000];
     sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", run_number );
 
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res ) {
-      f_db->Close();
-      return config_mask;
+    //std::cout<<"VDBRunInfo::readRunDQM "<<std::endl;
+    VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ;
+    if( !my_connection.Get_Connection_Status()){
+	return config_mask;
     }
+    if(!my_connection.make_query(c_query) ){
+	return config_mask;
+    }
+    TSQLResult *db_res = my_connection.Get_QueryResult();
+
 
     TSQLRow *db_row = db_res->Next();
     if( !db_row )
@@ -98,14 +101,12 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
       }
       else 
       {
-        f_db->Close();
         return config_mask;
       }
 
 // Check if the mask is 0
       if( ConfigMaskDQM == 0 )
       {
-	  f_db->Close();
 	  return config_mask;
       }
 
@@ -130,7 +131,7 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 
    }
 
-   f_db->Close();
+
    
    return config_mask;
 
@@ -140,18 +141,21 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 {
     stringstream iTempS;
     iTempS << iDBserver << "/VERITAS";
-    TSQLServer *f_db = connectToSQLServer( iTempS.str() );
-    if( !f_db ) return;
-
     char c_query[1000];
     sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunNumber );
 
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res )
-    {
-        fDBStatus = false;
-        return;
+    //std::cout<<"VDBRunInfo::readRunInfoFromDB "<<std::endl;
+    VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() ){
+	fDBStatus = false;
+	return;
     }
+    if(!my_connection.make_query(c_query) ){
+      	fDBStatus = false;
+	return;
+    }  
+    TSQLResult *db_res = my_connection.Get_QueryResult();
+
 
     TSQLRow *db_row = db_res->Next();
     if( !db_row )
@@ -296,12 +300,12 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 
 // get source coordinates
     sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", fTargetName.c_str() );
-    db_res = f_db->Query( c_query );
-    if( !db_res )
-    {
-        fDBStatus = false;
-        return;
-    }
+    if(!my_connection.make_query(c_query) ){
+      	fDBStatus = false;
+	return;
+    }  
+    db_res = my_connection.Get_QueryResult();
+
     db_row = db_res->Next();
     if( !db_row )
     {
@@ -313,7 +317,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
         fTargetDec = atof( db_row->GetField( 2 ) ) * 180./TMath::Pi();
         fTargetRA = atof( db_row->GetField( 1 ) ) * 180./TMath::Pi();
     }
-    f_db->Close();
+
 
     fDBStatus = true;
     return;
@@ -335,47 +339,27 @@ void VDBRunInfo::print()
     cout << endl;
 }
 
-TSQLServer* VDBRunInfo::connectToSQLServer( string iDBserver )
-{
-   TSQLServer *f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
-// if not successfull: sleep for 10 s and try again
-   if( !f_db )
-   {
-      cout << "VDBRunInfo: info: failed to connect to database server, sleep for 10 and try again..." << endl;
-      gSystem->Sleep( 10000 );
-      f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
-       if( !f_db )
-       {
-	   cout << "VDBRunInfo: failed to connect to database server" << endl;
-	   cout << "\t server: " <<  iDBserver << endl;
-	   fDBStatus = false;
-	   return 0;
-       }
-   }
-   return f_db;
-}
 
 vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel )
 {
     stringstream iTempS;
     iTempS << iDBserver << "/VERITAS";
-    TSQLServer *f_db = connectToSQLServer( iTempS.str() );
-    if( !f_db )
-    {
-        return fLaserRunID;
-    }
     char c_query[1000];
-
+    
     sprintf( c_query, "SELECT info.run_id, grp_cmt.excluded_telescopes, info.config_mask FROM tblRun_Info AS info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt, (SELECT group_id FROM tblRun_Group WHERE run_id=%d) AS run_grp WHERE grp_cmt.group_id = run_grp.group_id AND grp_cmt.group_type='laser' AND grp_cmt.group_id=grp.group_id AND grp.run_id=info.run_id AND (info.run_type='flasher' OR info.run_type='laser')", iRunNumber );
 
-    std::cout<<"query "<< c_query<<std::endl;
-
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res )
-    {
-        fDBStatus = false;
-        return fLaserRunID;
+    //std::cout<<"VDBRunInfo::getLaserRun "<<std::endl;
+    VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() ){
+	fDBStatus = false;
+	return fLaserRunID;
     }
+    if(!my_connection.make_query(c_query) ){
+      	fDBStatus = false;
+	return fLaserRunID;
+    }  
+    TSQLResult *db_res = my_connection.Get_QueryResult();
+  
     vector< unsigned int > iLaserList;
     vector< unsigned int > iLaserConfigMask;
     vector< unsigned int > iLaserExclude;
@@ -400,7 +384,6 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
     {
        cout << "WARNING: VDBRunInfo::getLaserRun() no laser run found for telescope " << iNTel << " and run " << iRunNumber << endl;
     }
-    f_db->Close();
 
     fLaserRunID.assign( iNTel, 0 );
     for( unsigned int t = 0; t < iNTel; t++ )

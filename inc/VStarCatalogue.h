@@ -17,6 +17,7 @@
 #include "VGlobalRunParameter.h"
 #include "VStar.h"
 #include "VUtilities.h"
+#include "VDB_Connection.h"
 
 #include <fstream>
 #include <iostream>

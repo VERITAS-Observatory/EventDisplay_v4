@@ -177,22 +177,19 @@ void VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file(){
     std::cout<<"You are in the process of WRITING in VOFFLINE Data Base "<<std::endl;
     std::cout<<"in order to complete the process: "<<std::endl;
     string the_password = please_give_the_password();
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readwrite",  the_password.c_str());
-    if( !f_db ){
-        cout << "ERROR write_inVOFFLINE_DB_from_file: failed to connect to database server" << endl;
-        cout << "\t server: " <<  fServer << endl;
+
+    //std::cout<<"VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file "<<std::endl;
+    VDB_Connection my_connection( iTempS.c_str(), "readwrite", the_password.c_str() ) ; 
+    if( !my_connection.Get_Connection_Status()){
         return;
     }
-
     string query = WriteQuery_to_write_in_DB();
     std::cout<<"query "<<query <<std::endl;
 
     //---- do the query and check
-    TSQLResult *db_res = f_db->Query( query.c_str() );
-    if( !db_res ){
+    if(!my_connection.make_query(query.c_str()) ){
 	cout << "WARNING VDB_CalibrationInfo::write_inVOFFLINE_DB_from_file: failed to get something from the query "<<endl;
 	return;
-    
     }
 
     return;
@@ -342,28 +339,28 @@ bool VDB_CalibrationInfo::Read_the_DB()
      //---- open the DB and check
     stringstream iTempS;
     iTempS << fServer << "/VOFFLINE";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
-    if( !f_db )
-    {
+
+    //std::cout<<"VDB_CalibrationInfo::Read_the_DB "<<std::endl;
+    VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status()){
 	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to connect to database server" << endl;
 	cout << "\t server: " <<  fServer << endl;
-	return false;
+        return false;
     }
     //---- do the query and check
-    TSQLResult *db_res = f_db->Query( fquery_read.c_str() );
-    if( !db_res ){
+    if(!my_connection.make_query(fquery_read.c_str()) ){
 	cout << "ERROR VDB_CalibrationInfo::Read_the_DB(): failed to get something from the query "<<endl;
 	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
-	f_db->Close();
 	return false;
     }
+    TSQLResult *db_res = my_connection.Get_QueryResult();
+
     //---- read the query
     if( db_res->GetRowCount() > 0 ){
 	while( TSQLRow *db_row = db_res->Next() ){
 	    if( !db_row ){
 		cout << "WARNING VDB_CalibrationInfo::Read_the_DB(): failed reading a row from DB "<<endl;
 		cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
-		f_db->Close();
 		return false;
 	    }
 	    
@@ -375,19 +372,16 @@ bool VDB_CalibrationInfo::Read_the_DB()
     else{
 	
 	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" is not in the VOFFLINE DB (yet?)"<<std::endl;
-	f_db->Close();
 	return false;
 	
     }
 // HARDWIRED TOTAL NUMBER OF CHANNELS
     if(Vchannel.size()<499){
 	cout << "ERROR laser run  "<<fcurrent_run<<" tel "<<fcurrent_tel<<" has "<<Vchannel.size()<<" channel filled in the DB. Should be 499"<<std::endl;
-	f_db->Close();
 	return false;
     }
     
-    //-- close the DB
-    f_db->Close();
+
     
     
     return true;

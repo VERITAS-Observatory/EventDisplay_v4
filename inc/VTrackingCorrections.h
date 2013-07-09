@@ -15,6 +15,7 @@
 
 #include "CorrectionParameters.h"
 #include "VGlobalRunParameter.h"
+#include "VDB_Connection.h"
 
 using namespace std;
 using namespace SEphem;

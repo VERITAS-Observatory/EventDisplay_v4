@@ -8,6 +8,7 @@
 #include "VASlalib.h"
 #include "VGlobalRunParameter.h"
 #include "VTrackingCorrections.h"
+#include "VDB_Connection.h" 
 
 #include <TMath.h>
 #include <TSQLResult.h>
@@ -74,8 +75,8 @@ class VPointingDB : public VGlobalRunParameter
 
         int fNWarnings;
 
-        TSQLServer *f_db;
-        TSQLServer *f_dbOFFLINE;
+
+	VDB_Connection* fmy_connection;
 
         VTrackingCorrections *fTrackingCorrections;
         string fTPointCorrectionDate;
@@ -89,10 +90,21 @@ class VPointingDB : public VGlobalRunParameter
 	bool readPointingUncalibratedVPMFromDB();
         bool readPointingFromVPMTextFile( string );
 
+	void delete_myconnection(){
+	    if(fmy_connection){
+	    delete fmy_connection;
+	    fmy_connection =0;
+	    }
+	}
+
     public:
 
         VPointingDB( unsigned int iTelID, unsigned int iRun );
-        ~VPointingDB() { if( f_db ) f_db->Close();}
+        ~VPointingDB() { 
+	    delete_myconnection();
+	}
+
+
         bool   isGood() { return fStatus; }
         unsigned int getEventStatus() { return fEventStatus; }
         string getSourceNameDB() { return fDBSourceName; }

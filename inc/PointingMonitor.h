@@ -11,6 +11,7 @@
 #define POINTINGMONITOR_H
 
 #include "VGlobalRunParameter.h"
+#include "VDB_Connection.h" 
 
 #include <stdint.h>
 #include <vector>

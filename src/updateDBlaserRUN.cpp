@@ -32,6 +32,7 @@
 #include "VExposure.h"
 
 #include "VDB_CalibrationInfo.h"
+#include "VDB_Connection.h" // lucie
 
 using namespace std;
 
@@ -162,6 +163,7 @@ TString get_downloaded_laser_path(unsigned int RunNumber,unsigned int Date);
 //==============================================================================================================
 // FUNCTION DEFINITION
 //==============================================================================================================
+
 
 //------------------------------------
 //-- main 
@@ -307,9 +309,17 @@ TString get_new_laser_run_list(){
     std::cout<<"Checking wich laser/flasher run are missing from VOFFLINE DB "<<std::endl;
     for(unsigned int i_run = 0 ; i_run < VERITAS_DB_LaserRunNumber.size(); i_run++ ){
 	unsigned long mask_missing_tel = Check_telmissing_from_VOFFDB(VERITAS_DB_LaserRunNumber[i_run],VERITAS_DB_LaserConfigMask[i_run],VERITAS_DB_LaserExclTel[i_run],VOFFLINE_DB_LaserRunNumber_Tel);
+
+	if(VERITAS_DB_LaserRunNumber[i_run] == 53139){
+	    printf ("** %d %2d %2d %2lu %d \n",VERITAS_DB_LaserRunNumber[i_run],VERITAS_DB_LaserConfigMask[i_run], VERITAS_DB_LaserExclTel[i_run],mask_missing_tel,VERITAS_DB_LaserDate[i_run]);
+
+	}
+
 	if( mask_missing_tel > 0){
 	    std::cout<<" "<<std::endl;		    //--- fill the NEW_laser_list_File with: run mask exclu_tel mask_with_missing_tel_from_VOFFLINE_DB
+	    printf ("*** %d %2d %2d %2lu %d \n",VERITAS_DB_LaserRunNumber[i_run],VERITAS_DB_LaserConfigMask[i_run], VERITAS_DB_LaserExclTel[i_run],mask_missing_tel,VERITAS_DB_LaserDate[i_run]);
 	    fprintf (NEW_laser_list_File, "%d %2d %2d %2lu %d \n",VERITAS_DB_LaserRunNumber[i_run],VERITAS_DB_LaserConfigMask[i_run], VERITAS_DB_LaserExclTel[i_run],mask_missing_tel,VERITAS_DB_LaserDate[i_run]);
+	    std::cout<<" "<<std::endl;		    //--- fill the NEW_laser_list_File with: run mask exclu_tel mask_with_missing_tel_from_VOFFLINE_DB
 	    if(fdownload_new_laser_run){fprintf (NEW_laser_list_File_for_download, "%d %d \n",VERITAS_DB_LaserRunNumber[i_run],VERITAS_DB_LaserDate[i_run]);}
        	}
     }
@@ -1108,8 +1118,9 @@ void read_laserRUN_fromVOFFLINE_DB(vector < vector < unsigned int > > &VOFFLINE_
     //---- open the DB and check
     string iTempS;
     iTempS =  fServer + "/VOFFLINE";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-    if( !f_db ){
+    //TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
+    VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ; // lucie: DO NOT create a pointer. this way the connection is automatically closed when getting out of the function 
+    if( !my_connection.Get_Connection_Status() ){
         cout << "ERROR read_laserRUN_fromVOFFLINE_DB: failed to connect to database server" << endl;
         cout << "\t server: " <<  fServer << endl;
 	VOFFLINE_DB_LaserRunNumber_Telnum.push_back(i_VOFFLINE_DB_LaserRunNumber_Tel);
@@ -1118,14 +1129,14 @@ void read_laserRUN_fromVOFFLINE_DB(vector < vector < unsigned int > > &VOFFLINE_
         return;
     }
     //---- do the query and check
-    TSQLResult *db_res = f_db->Query( query.c_str() );
-    if( !db_res ){
+    if( !my_connection.make_query(query.c_str()) ){
 	cout << "WARNING read_laserRUN_fromVOFFLINE_DB: failed to get something from the query "<<endl;
        	VOFFLINE_DB_LaserRunNumber_Telnum.push_back(i_VOFFLINE_DB_LaserRunNumber_Tel);
 	VOFFLINE_DB_LaserDate_Telnum.push_back(i_VOFFLINE_DB_Laserdate_Tel);
 	VOFFLINE_DB_LaserVersion_Telnum.push_back(i_VOFFLINE_DB_Laserversion_Tel);
 	return;
     }
+    TSQLResult *db_res = my_connection.Get_QueryResult();
     //---- read the query
     if( db_res->GetRowCount() > 0 ){
 	while( TSQLRow *db_row = db_res->Next() ){
@@ -1151,7 +1162,7 @@ void read_laserRUN_fromVOFFLINE_DB(vector < vector < unsigned int > > &VOFFLINE_
 
     }
     //-- close the DB
-    f_db->Close();
+    //f_db->Close(); // lucie
 
     VOFFLINE_DB_LaserRunNumber_Telnum.push_back(i_VOFFLINE_DB_LaserRunNumber_Tel);
     VOFFLINE_DB_LaserDate_Telnum.push_back(i_VOFFLINE_DB_Laserdate_Tel);
@@ -1169,18 +1180,21 @@ void read_laserRUN_fromVERITAS_DB(vector< unsigned int > &VERITAS_DB_LaserRunNum
 
     //---- open the DB and check
     string iTempS;
-    iTempS =  fServer + "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-    if( !f_db ){
+    iTempS =  fServer;
+    iTempS+= "/VERITAS";
+    //TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
+    VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ; // lucie: DO NOT create a pointer. this way the connection is automatically closed when getting out of the function 
+    if( !my_connection.Get_Connection_Status() ){
+	//if( !f_db ){
         cout << "ERROR read_laserRUN_fromVERITAS_DB: failed to connect to database server" << endl;
         cout << "\t server: " <<  fServer << endl;
         return;
     }
     //---- do the query and check
-    TSQLResult *db_res = f_db->Query( query.c_str() );
-    if( !db_res ){
+    if( !my_connection.make_query(query.c_str()) ){
         return;
     }
+    TSQLResult *db_res = my_connection.Get_QueryResult();
     //---- read the query
     if( db_res->GetRowCount() > 0 ){
 	while( TSQLRow *db_row = db_res->Next() ){
@@ -1224,8 +1238,10 @@ void read_laserRUN_fromVERITAS_DB(vector< unsigned int > &VERITAS_DB_LaserRunNum
 	cout << "WARNING read_laserRUN_fromVERITAS_DB:  no laser run found "<< endl;
     }
     //-- close the DB
-    f_db->Close();
-    
+    //f_db->Close(); // lucie (closing automatically with the automatic deletion of my_connection)
+  
+    std::cout<<"************************************************************ "<<VERITAS_DB_LaserExclTel.size()<<" size vect excluded tel"<<std::endl;
+  
     return;
 
 }
@@ -1237,7 +1253,8 @@ string WriteQuery_to_getLaserRun_fromVERITAS_DB(){
 
     char c_query[flong_char_query];// has to be long if we ask for a long run list in VDBSourceInfo
 
-    sprintf( c_query, "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time , big_table.db_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time,Info.db_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE  grp_cmt.group_type = 'laser' AND grp_cmt.group_id = grp.group_id AND grp.run_id = Info.run_id AND (Info.run_type = 'laser' OR Info.run_type = 'flasher') ORDER BY grp_cmt.excluded_telescopes ) AS big_table GROUP BY run_id;");
+    //sprintf( c_query, "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time , big_table.db_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time,Info.db_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE  grp_cmt.group_type = 'laser' AND grp_cmt.group_id = grp.group_id AND grp.run_id = Info.run_id AND (Info.run_type = 'laser' OR Info.run_type = 'flasher') ORDER BY grp_cmt.excluded_telescopes ) AS big_table GROUP BY run_id;");
+       sprintf( c_query, "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time , big_table.db_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time,Info.db_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE  grp_cmt.group_type = 'laser' AND grp_cmt.group_id = grp.group_id AND grp.run_id = Info.run_id AND (Info.run_type = 'laser' OR Info.run_type = 'flasher') ORDER BY grp_cmt.excluded_telescopes ) AS big_table GROUP BY run_id,excluded_telescopes ;");
 
 // if laser run belong to two different laser group with two different excluded_telescope, the smaller excluded_telescope is taken into account (so that the VOFFLINE DB is filled with for the maximum number of telescopes)
 //SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes big_table.data_start_time FROM 

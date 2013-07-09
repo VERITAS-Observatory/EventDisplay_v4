@@ -7,6 +7,7 @@
 #include "VASlamac.h"
 #include "VASlalib.h"
 #include "VGlobalRunParameter.h"
+#include "VDB_Connection.h"
 
 #include <TFile.h>
 #include <TMath.h>

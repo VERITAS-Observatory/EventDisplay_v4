@@ -1035,18 +1035,21 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
     {
        stringstream iTempS;
        iTempS << getDBServer() << "/VOFFLINE";
-       TSQLServer *i_DB = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
-       if( !i_DB )
-       {
-	   cout << "VDBRunInfo: failed to connect to database server" << endl;
-	   cout << "\t server: " <<  iTempS.str() << endl;
-	   return false;
-       }
        char c_query[800];
        sprintf( c_query, "select telescope_id, version, pmt_rotation from tblPointing_Monitor_Camera_Parameters where start_date <= \"%s\" AND end_date > \"%s\" ", iDBStartTime.substr( 0, 10 ).c_str(), iDBStartTime.substr( 0, 10 ).c_str() );
 
-       TSQLResult *db_res = i_DB->Query( c_query );
-       if( !db_res ) return false;
+       //std::cout<<"VCameraRead::readDetectorGeometryFromDB "<<std::endl;
+       VDB_Connection my_connection(iTempS.str().c_str() , "readonly", "" ) ; 
+       if( !my_connection.Get_Connection_Status()){
+	   cout << "VCameraRead: failed to connect to database server" << endl;
+	   cout << "\t server: " <<  iTempS.str() << endl;
+	   return false;
+       }
+       if(!my_connection.make_query(c_query) ){
+	   return false;
+       }
+       TSQLResult *db_res = my_connection.Get_QueryResult();
+
 
        int iNRows = db_res->GetRowCount();
        vector< int > iVersion( fCameraRotation.size(), -99 );
@@ -1078,7 +1081,7 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
               }
            }
        }
-       i_DB->Close();
+//       i_DB->Close();
     }
 
     cout << "\t (rotations from DB [deg]: ";

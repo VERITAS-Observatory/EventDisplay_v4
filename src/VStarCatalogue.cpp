@@ -65,16 +65,21 @@ bool VStarCatalogue::readVERITASsourcesfromDB( string iofile )
 
     stringstream iTempS;
     iTempS << getDBServer() << "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
-    if( !f_db )
+
+    //std::cout<<"VStarCatalogue::readVERITASsourcesfromDB "<<std::endl;
+    VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "VStarCatalogue: failed to connect to database server" << endl;
         return false;
     }
 
     sprintf( c_query, "select * from tblObserving_Sources " );
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res ) return false;
+  
+
+    if( !my_connection.make_query(c_query) ) return false;
+    TSQLResult *db_res = my_connection.Get_QueryResult();
+
 
     int fNRows = db_res->GetRowCount();
 
@@ -117,7 +122,9 @@ bool VStarCatalogue::readVERITASsourcesfromDB( string iofile )
             zID++;
         }
     }
-    if( f_db ) f_db->Close();
+
+    if(my_connection.Get_Connection_Status()) my_connection.Close_Connection(); // just so it get close as soon as possible. Before the end of the function.
+
 
 // write sources into a text file
     if( iofile.size() > 0 )

@@ -41,8 +41,7 @@ VPointingDB::VPointingDB( unsigned int iTelID, unsigned int irun )
     fCounter = 0;
     fDBNrows = 0;
 
-    f_db = 0;
-    f_dbOFFLINE = 0;
+    fmy_connection = 0;
 
     fNWarnings = 0;
 
@@ -67,13 +66,18 @@ bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bo
 
     string iTempS  = getDBServer();
     iTempS        += "/VERITAS";
-    f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-    if( !f_db )
+
+    //std::cout<<"VPointingDB::initialize "<<std::endl;
+    fmy_connection = new VDB_Connection( iTempS.c_str(), "readonly", "" ) ; 
+    //std::cout<<"fmy_connection->Get_Connection_Status() "<<fmy_connection->Get_Connection_Status() <<std::endl;
+
+    if( !fmy_connection->Get_Connection_Status() )
     {
         cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
         fStatus = false;
 	exit( -1 );
     }
+
     fStatus = getDBRunInfo();
 // read pointing from VPM text file
     if( iVPMDirectory.size() > 0 )
@@ -107,8 +111,8 @@ bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bo
 
 // Close the connection immediately after all the reading is complete
 // this is important - open connections to the DB cause DB replication problems.
-    if( f_db ) f_db->Close();                                                  
-    
+    delete_myconnection();
+
     return fStatus;
 }
 
@@ -262,8 +266,9 @@ bool VPointingDB::updatePointing( int iMJD, double iTime )
 
 bool VPointingDB::terminate()
 {
-    if( f_db ) f_db->Close();
-    if( f_dbOFFLINE ) f_dbOFFLINE->Close();
+
+    //std::cout<<"VPointingDB::terminate "<<std::endl;
+    delete_myconnection();
     return true;
 }
 
@@ -298,21 +303,23 @@ void VPointingDB::getDBMJDTime( string itemp, int &MJD, double &Time, bool bStri
 
 bool VPointingDB::getDBRunInfo()
 {
-    if( !f_db ) return false;
+
+    if(!fmy_connection->Get_Connection_Status()) return false;
 
     char c_query[1000];
 
     sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunNumber );
-
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res )
+    
+    if( !fmy_connection->make_query(c_query) ) 
     {
         fStatus = false;
         return false;
     }
 
+    TSQLResult *db_res = fmy_connection->Get_QueryResult();
+    
     TSQLRow *db_row = db_res->Next();
-
+    
     string itemp = db_row->GetField( 6 );
     getDBMJDTime( itemp, fMJDRunStart, fTimeRunStart, true );
     itemp = db_row->GetField( 7 );
@@ -430,129 +437,123 @@ bool VPointingDB::readPointingFromVPMTextFile( string iDirectory )
 */
 bool VPointingDB::readPointingCalibratedVPMFromDB()
 {
-  double startMJD = fMJDRunStart + ( fTimeRunStart / 86400.);
-  double stopMJD = fMJDRunStopp + ( fTimeRunStopp / 86400.);
-
-  // mysql query //
-  char c_query[1000];
-  sprintf( c_query, "SELECT mjd,ra,decl FROM tblPointing_Monitor_Telescope%d_Calibrated_Pointing WHERE mjd<=%.13f AND mjd>=%.13f", getTelID(), stopMJD, startMJD );  
-
-  // use VOFFLINE database for calibrated VPM //
-  string iTempS  = getDBServer();
-  iTempS += "/VOFFLINE";
-  f_dbOFFLINE = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-  if( !f_dbOFFLINE ) {
-    cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
-    return false; 
-  }
-  
-  TSQLResult *db_res = f_dbOFFLINE->Query( c_query );
-  if( !db_res ) return false;
-  int fNRows = db_res->GetRowCount();
-  cout << "Reading calibrated pointing monitor (VPM) data from database for telescope " << getTelID()+1;
-  cout << ": found " << fNRows << " rows in database" << endl;
-
-// get VPM quality flag from database 
-  char cflag_query[1000];
-  sprintf( cflag_query, "SELECT vpm_config_mask FROM tblRun_Analysis_Comments WHERE run_id = %d", fRunNumber ); 
-  TSQLResult *db_flag = f_dbOFFLINE->Query( cflag_query );
-  if( !db_flag ) {
-    cout<<"VPointingDB: error, missing VPM quality flag"<<endl;
-    if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-    return false;
-  }
-  TSQLRow *flag_row = db_flag->Next();
-  if( !flag_row || !flag_row->GetField(0) )
-  {
-     cout << "VPointingDB: error while reading VPM quality flag" << endl;
-     if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-     return false;
-  }
-  int maskVPM = atoi( flag_row->GetField(0) );
-
-  if( getTelID() == 0 ) {    // T1 bad  
-    if( maskVPM == 0 || maskVPM == 2 || maskVPM == 4 || maskVPM == 8 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-    if( maskVPM == 6 || maskVPM == 10 || maskVPM == 12 || maskVPM == 14 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-  }
-  if( getTelID() == 1 ) {    // T2 bad
-    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 4 || maskVPM == 8 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-    if( maskVPM == 5 || maskVPM == 9 || maskVPM == 12 || maskVPM == 13 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-  }
-  if( getTelID() == 2 ) {    // T3 bad    
-    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 8 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-    if( maskVPM == 3 || maskVPM == 9 || maskVPM == 10 || maskVPM == 11 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-  }
-  if( getTelID() == 3 ) {    // T4 bad    
-    if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 4 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-    if( maskVPM == 3 || maskVPM == 5 || maskVPM == 6 || maskVPM == 7 )
-    {
-       if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-       return false;
-    }
-  }
-
-  // loop over all db entries
-  string itemp;
-  double iMJD;
-  double iITime = 0.;
-  double az = 0.;
-  double ze = 0.;
-  double iRA = 0.;
-  double iDec = 0.;
-  
-  for( int j = 0; j < fNRows; j++ ) {
-    TSQLRow *db_row = db_res->Next();
-    if( !db_row ) continue;
-
-    iMJD = atof( db_row->GetField( 0 ) );
-    iITime = modf( iMJD, &iMJD );
-    fDBMJD.push_back( (unsigned int)iMJD );
-    fDBTime.push_back( iITime * 86400. );
-    fDBTelElevationRaw.push_back( 0. );
-    fDBTelAzimuthRaw.push_back( 0. );
+    double startMJD = fMJDRunStart + ( fTimeRunStart / 86400.);
+    double stopMJD = fMJDRunStopp + ( fTimeRunStopp / 86400.);
     
-    iRA = atof( db_row->GetField( 1 ) );
-    iDec = atof( db_row->GetField( 2 ) );
-    getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec*degrad, iRA*degrad, az, ze );
-    fDBTelElevation.push_back( 90. - ze );
-    fDBTelAzimuth.push_back( az );
-    fDBTelExpectedElevation.push_back( 0. );
-    fDBTelExpectedAzimuth.push_back( 0. );
-  }
+    // mysql query //
+    char c_query[1000];
+    sprintf( c_query, "SELECT mjd,ra,decl FROM tblPointing_Monitor_Telescope%d_Calibrated_Pointing WHERE mjd<=%.13f AND mjd>=%.13f", getTelID(), stopMJD, startMJD );  
+    
+    // use VOFFLINE database for calibrated VPM //
+    string iTempS  = getDBServer();
+    iTempS += "/VOFFLINE";
 
-  fDBNrows = fDBMJD.size();
-
-  if( f_dbOFFLINE ) f_dbOFFLINE->Close();
-
-  return true; 
+    //std::cout<<"VPointingDB::readPointingCalibratedVPMFromDB "<<std::endl;
+    VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() )
+    {
+	cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
+	return false; 
+    }
+    
+    if( !my_connection.make_query(c_query) ) return false;
+    TSQLResult *db_res = my_connection.Get_QueryResult();
+    
+    int fNRows = db_res->GetRowCount();
+    cout << "Reading calibrated pointing monitor (VPM) data from database for telescope " << getTelID()+1;
+    cout << ": found " << fNRows << " rows in database" << endl;
+    
+    // get VPM quality flag from database 
+    char cflag_query[1000];
+    sprintf( cflag_query, "SELECT vpm_config_mask FROM tblRun_Analysis_Comments WHERE run_id = %d", fRunNumber ); 
+    if( !my_connection.make_query(cflag_query) ){
+	cout<<"VPointingDB: error, missing VPM quality flag"<<endl;
+	return false;
+    }
+    TSQLResult *db_flag = my_connection.Get_QueryResult();
+    
+    
+    TSQLRow *flag_row = db_flag->Next();
+    if( !flag_row || !flag_row->GetField(0) )
+    {
+	cout << "VPointingDB: error while reading VPM quality flag" << endl;
+	return false;
+    }
+    int maskVPM = atoi( flag_row->GetField(0) );
+    
+    if( getTelID() == 0 ) {    // T1 bad  
+	if( maskVPM == 0 || maskVPM == 2 || maskVPM == 4 || maskVPM == 8 )
+	{
+	    return false;
+	}
+	if( maskVPM == 6 || maskVPM == 10 || maskVPM == 12 || maskVPM == 14 )
+	{
+	    return false;
+	}
+    }
+    if( getTelID() == 1 ) {    // T2 bad
+	if( maskVPM == 0 || maskVPM == 1 || maskVPM == 4 || maskVPM == 8 )
+	{
+	    return false;
+	}
+	if( maskVPM == 5 || maskVPM == 9 || maskVPM == 12 || maskVPM == 13 )
+	{
+	    return false;
+	}
+    }
+    if( getTelID() == 2 ) {    // T3 bad    
+	if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 8 )
+	{
+	    return false;
+	}
+	if( maskVPM == 3 || maskVPM == 9 || maskVPM == 10 || maskVPM == 11 )
+	{
+	    return false;
+    }
+    }
+    if( getTelID() == 3 ) {    // T4 bad    
+	if( maskVPM == 0 || maskVPM == 1 || maskVPM == 2 || maskVPM == 4 )
+	{
+	    return false;
+	}
+	if( maskVPM == 3 || maskVPM == 5 || maskVPM == 6 || maskVPM == 7 )
+	{
+	    return false;
+	}
+    }
+    
+    // loop over all db entries
+    string itemp;
+    double iMJD;
+    double iITime = 0.;
+    double az = 0.;
+    double ze = 0.;
+    double iRA = 0.;
+    double iDec = 0.;
+    
+    for( int j = 0; j < fNRows; j++ ) {
+	TSQLRow *db_row = db_res->Next();
+	if( !db_row ) continue;
+	
+	iMJD = atof( db_row->GetField( 0 ) );
+	iITime = modf( iMJD, &iMJD );
+	fDBMJD.push_back( (unsigned int)iMJD );
+	fDBTime.push_back( iITime * 86400. );
+	fDBTelElevationRaw.push_back( 0. );
+	fDBTelAzimuthRaw.push_back( 0. );
+	
+	iRA = atof( db_row->GetField( 1 ) );
+	iDec = atof( db_row->GetField( 2 ) );
+	getHorizonCoordinates( fDBMJD.back(), fDBTime.back(), iDec*degrad, iRA*degrad, az, ze );
+	fDBTelElevation.push_back( 90. - ze );
+	fDBTelAzimuth.push_back( az );
+	fDBTelExpectedElevation.push_back( 0. );
+	fDBTelExpectedAzimuth.push_back( 0. );
+    }
+    
+    fDBNrows = fDBMJD.size();
+        
+    return true; 
 }
 
 /*
@@ -700,6 +701,9 @@ bool VPointingDB::readPointingUncalibratedVPMFromDB()
 
 bool VPointingDB::readPointingFromDB()
 {
+
+    if(!fmy_connection->Get_Connection_Status()) return false;
+
     char iDate1[200];
     char iDate2[200];
 
@@ -723,8 +727,9 @@ bool VPointingDB::readPointingFromDB()
     char c_query[1000];
     sprintf( c_query, "SELECT timestamp, elevation_raw, azimuth_raw, elevation_meas, azimuth_meas, elevation_target, azimuth_target FROM tblPositioner_Telescope%d_Status WHERE timestamp >= %s AND timestamp <= %s", getTelID(), iDate1, iDate2 );
 
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res ) return false;
+    if( !fmy_connection->make_query(c_query) ) return false;
+    TSQLResult *db_res = fmy_connection->Get_QueryResult();
+
 
     int fNRows = db_res->GetRowCount();
 
@@ -773,18 +778,22 @@ bool VPointingDB::readPointingFromDB()
 
 void VPointingDB::getDBSourceCoordinates( string iSource, float &iEVNTargetDec, float &iEVNTargetRA )
 {
-    if( !f_db ) return;
+    if(!fmy_connection->Get_Connection_Status()) return;
 
     char c_query[1000];
 
     sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", iSource.c_str() );
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res ) return;
+
+    if( !fmy_connection->make_query(c_query) );
+    TSQLResult *db_res = fmy_connection->Get_QueryResult();
+
+
 
     TSQLRow *db_row = db_res->Next();
 
     iEVNTargetDec = atof( db_row->GetField( 2 ) ) * 180./TMath::Pi();
     iEVNTargetRA = atof( db_row->GetField( 1 ) ) * 180./TMath::Pi();
+    return;
 }
 
 

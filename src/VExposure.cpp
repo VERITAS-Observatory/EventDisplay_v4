@@ -129,68 +129,57 @@ unsigned int VExposure::getLaserDate( unsigned int iRunNumber )
 
     string iTempS;
     iTempS = getDBServer() + "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-    if( !f_db )
-    {
+
+    //std::cout<<"VExposure::getLaserDate "<<std::endl;
+    VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
+    if(!my_connection.Get_Connection_Status()){
         cout << "error connecting to db" << endl;
         return -1;
     }
-
     char c_query[1000];
-
     sprintf( c_query, "select * from tblRun_Info where run_id = %d", iRunNumber );
-
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res )
-    {
-        return -1;
+    if(!my_connection.make_query(c_query) ){
+	return -1;
     }
-
+    TSQLResult *db_res = my_connection.Get_QueryResult();
     string itemp;
-
     TSQLRow *db_row = db_res->Next();
-
     if( !db_row ) return -1;
-
 // get date
-    if( db_row->GetField( 6 ) )
-    {
+    if( db_row->GetField( 6 ) ){
         string iTemp = db_row->GetField( 6 );
         if( iTemp.size() > 8 )
             fDataStartTime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
     }
-
     return fDataStartTime;
-
 }
 
 bool VExposure::readFromDB()
 {
     string iTempS;
     iTempS = getDBServer() + "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-    if( !f_db )
+
+    //std::cout<<"VExposure::readFromDB() "<<std::endl;
+    VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
+   if( !my_connection.Get_Connection_Status() )
     {
         cout << "error connecting to db" << endl;
         return false;
     }
     cout << "reading from " << iTempS << endl;
-
     char c_query[1000];
 
     if( !fMakeRunList )
       sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate.c_str(), fStopDate.c_str() );
     else
       sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\" and source_id like convert( _utf8 \'%s\' using latin1)", fStartDate.c_str(), fStopDate.c_str(), fTargetSourceName.c_str() );
-
     cout << c_query << endl;
 
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res )
-    {
+    if( !my_connection.make_query(c_query) ){
 	cout << "Returning false!" << endl;
         return false;
     }
+    TSQLResult *db_res = my_connection.Get_QueryResult();
 
     int fNRows = db_res->GetRowCount();
 
@@ -250,7 +239,7 @@ bool VExposure::readFromDB()
         double iRa = 0.;
         double iDec = 0.;
         itemp = db_row->GetField( 19 );
-        if( !getDBSourceCoordinates( f_db, itemp, iDec, iRa ) )
+        if( !getDBSourceCoordinates( my_connection.Get_ConnectionResult(), itemp, iDec, iRa ) )
         {
             cout << "No coordinates available: " << db_row->GetField( 0 ) << " " << itemp << endl;
             continue;
@@ -368,7 +357,6 @@ bool VExposure::readFromDB()
 
         if( fDebug ) cout << endl;
     }
-    if( f_db ) f_db->Close();
 
     cout << "total number of runs in runlist: " << fRunStatus.size() << endl;
 
@@ -379,9 +367,10 @@ bool VExposure::readFromDBList()
 {
     string iTempS;
     iTempS = getDBServer() + "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-    if( !f_db )
-    {
+
+    //std::cout<<"VExposure::readFromDBList "<<std::endl;
+    VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ;
+    if( !my_connection.Get_Connection_Status() ){
         cout << "error connecting to db 2 " << iTempS << endl;
         return false;
     }
@@ -394,11 +383,10 @@ bool VExposure::readFromDBList()
 
       sprintf( c_query, "select * from tblRun_Info where run_id=%d", fRunDownloadList[i] );
 
-      TSQLResult *db_res = f_db->Query( c_query );
-      if( !db_res )
-      {
+      if(!my_connection.make_query(c_query) ){
           return false;
       }
+      TSQLResult *db_res =  my_connection.Get_QueryResult();
 
       string itemp;
 
@@ -446,7 +434,7 @@ bool VExposure::readFromDBList()
       double iRa = 0.;
       double iDec = 0.;
       itemp = db_row->GetField( 19 );
-      if( !getDBSourceCoordinates( f_db, itemp, iDec, iRa ) )
+      if( !getDBSourceCoordinates( my_connection.Get_ConnectionResult(), itemp, iDec, iRa ) )
       {
           cout << "No coordinates available: " << db_row->GetField( 0 ) << " " << itemp << endl;
           continue;
@@ -566,7 +554,7 @@ bool VExposure::readFromDBList()
 
     }
 
-    if( f_db ) f_db->Close();
+
     cout << "total number of runs in runlist: " << fRunStatus.size() << endl;
 
     return true;
@@ -2013,26 +2001,29 @@ void VExposure::getLaserList()
 
 }
 
+// lucie: This function is an old copy (no read of DQM mask) of the function with the same name in VDBRunInfo
+// when used should be replaced by VDBRunInfo one.
+// This function should disappear
 vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel )
 {
 
     string iTempS;
     iTempS = getDBServer() + "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.c_str(), "readonly", "" );
-    if( !f_db )
-    {
-        return fLaserRunID;
-    }
     char c_query[1000];
 
     sprintf( c_query, "SELECT info.run_id, grp_cmt.excluded_telescopes FROM tblRun_Info AS info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt, (SELECT group_id FROM tblRun_Group WHERE run_id=%d) AS run_grp WHERE grp_cmt.group_id = run_grp.group_id AND grp_cmt.group_type='laser' AND grp_cmt.group_id=grp.group_id AND grp.run_id=info.run_id AND (info.run_type='flasher' OR info.run_type='laser')", iRunNumber );
 
-    TSQLResult *db_res = f_db->Query( c_query );
-    if( !db_res )
-    {
-//        fDBStatus = false;
-        return fLaserRunID;
+    //std::cout<<"VExposure::getLaserRun "<<std::endl;
+    VDB_Connection my_connection( iTempS.c_str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() ){	
+	return fLaserRunID;
     }
+    if(!my_connection.make_query(c_query) ){
+	return fLaserRunID;
+    }  
+     TSQLResult *db_res = my_connection.Get_QueryResult();
+
+
     vector< unsigned int > iLaserList;
     vector< unsigned int > iLaserExclude;
     if( db_res->GetRowCount() > 0 )
@@ -2054,7 +2045,7 @@ vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iR
     {
        cout << "WARNING: VDBRunInfo::getLaserRun() no laser run found for telescope " << iNTel << " and run " << iRunNumber << endl;
     }
-    f_db->Close();
+
 
 
     fLaserRunID.assign( iNTel, 0 );
@@ -2071,24 +2062,6 @@ vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iR
     return fLaserRunID;
 }
 
-TSQLServer* VExposure::connectToSQLServer( string iDBserver )
-{
-   TSQLServer *f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
-// if not successfull: sleep for 10 s and try again
-   if( !f_db )
-   {
-      cout << "VDBRunInfo: info: failed to connect to database server, sleep for 10 and try again..." << endl;
-      gSystem->Sleep( 10000 );
-      f_db = TSQLServer::Connect( iDBserver.c_str(), "readonly", "" );
-       if( !f_db )
-       {
-           cout << "VDBRunInfo: failed to connect to database server" << endl;
-           cout << "\t server: " <<  iDBserver << endl;
-           return 0;
-       }
-   }
-   return f_db;
-}
 
 void VExposure::setMakeRunList( bool iSet )
 {
@@ -2126,24 +2099,26 @@ void VExposure::readRunCommentsFromDB()
 
     stringstream iTempS;
     iTempS << getDBServer() << "/VOFFLINE";
-    TSQLServer *f_db = TSQLServer::Connect( iTempS.str().c_str(), "readonly", "" );
 
-    if( !f_db ) return;
+    //std::cout<<"VExposure::readRunCommentsFromDB "<<std::endl;
+    VDB_Connection my_connection( iTempS.str().c_str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() )return;	
     char c_query[1000];
+
     
     for( unsigned int i = 0; i < fRun.size(); i++ )
     {
 
       sprintf( c_query, "SELECT * from tblRun_Analysis_Comments where run_id=%d", fRun[i] );
 
-    
-      TSQLResult *db_res = f_db->Query( c_query );
-      if( !db_res ) return;
+      if( !my_connection.make_query(c_query) )return;    
+      TSQLResult *db_res = my_connection.Get_QueryResult();
+
     
       TSQLRow *db_row = db_res->Next();
       if( !db_row )
       {
-           if( fRun[i] > 46905 ) cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << fRun[i] << endl;
+           if( fRun[i] > 46905 ) cout << "VDBExposure:Comments: failed reading a row from DB for run " << fRun[i] << endl;
 	   fDataCat.push_back( " " );
 	   fStatus.push_back( " " );
 	   fStatReason.push_back( " " );
@@ -2180,8 +2155,6 @@ void VExposure::readRunCommentsFromDB()
       }
 
     } 
-
-    f_db->Close();
 
     return;
 }

@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Function definitions for Pointing Monitor interactions with the database [ VDB v4.1.0 (Jan 2010), adapted for TSQLServer by Jeff Grube (Oct 2010) ]
+ * \brief Function definitions for Pointing Monitor interactions with the database [ VDB v4.1.0 (Jan 2010), adapted for TSQLServer Jeff Grube (Oct 2010) ]
  *
  * some adaption for eventdisplay by G.Maier
  *
@@ -87,14 +87,16 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
       strbuf << " limit " << limit;
 
    string fDBserver = getDBServer() + "VOFFLINE";
-   TSQLServer *f_db = TSQLServer::Connect( fDBserver.c_str(), "readonly", "" );
-   if( !f_db )
-     {
+   //std::cout<<"PointingMonitor::getCameraParametersList "<<std::endl;
+   VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ; 
+   if( !my_connection.Get_Connection_Status()){
        cout << "PointingMonitor: failed to connect to database server" << endl;
-       //// bool fStatus = false; // JG
        return parametersVec; // JG
-     }
-   TSQLResult *db_res = f_db->Query( strbuf.str().c_str() );
+   }
+   if(!my_connection.make_query( strbuf.str().c_str() )){
+       return parametersVec; 
+   }
+   TSQLResult *db_res = my_connection.Get_QueryResult(); 
 
    int fNRows = db_res->GetRowCount();
 
@@ -118,7 +120,6 @@ vector<pointingmonitor::CameraParameters> PointingMonitor::getCameraParametersLi
       parameters.referencePixelX =   atof( db_row->GetField(16) );
       parameters.referencePixelY =   atof( db_row->GetField(17) );
      }
-   if( f_db ) f_db->Close();   
 
    return parametersVec;
 }
@@ -155,14 +156,16 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
       strbuf << " limit " << limit;
 
    string fDBserver = getDBServer() + "VOFFLINE";
-   TSQLServer *f_db = TSQLServer::Connect( fDBserver.c_str(), "readonly", "" );
-   if( !f_db )
-     {
+   //std::cout<<"PointingMonitor::getCalibrationParametersList "<<std::endl;
+   VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ; 
+   if( !my_connection.Get_Connection_Status()){
        cout << "PointingMonitor: failed to connect to database server" << endl;
-       /// bool fStatus = false; // JG
        return parametersVec; // JG
-     }
-   TSQLResult *db_res = f_db->Query( strbuf.str().c_str() );
+   }
+   if(!my_connection.make_query( strbuf.str().c_str() )){
+       return parametersVec; 
+   }
+   TSQLResult *db_res = my_connection.Get_QueryResult(); 
 
    int fNRows = db_res->GetRowCount();
 
@@ -196,7 +199,6 @@ vector<pointingmonitor::CalibrationParameters> PointingMonitor::getCalibrationPa
      parameters.l2 =        atof( db_row->GetField(18));
      parameters.l3 =        atof( db_row->GetField(19));
    }
-   if( f_db ) f_db->Close();   
 
    return parametersVec;
 }
@@ -227,14 +229,16 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
    strbuf << " where mjd<=" << stopmjd << " and mjd>=" << startmjd;
 
    string fDBserver = getDBServer() + "VOFFLINE";
-   TSQLServer *f_db = TSQLServer::Connect( fDBserver.c_str(), "readonly", "" );
-   if( !f_db )
-     {
+   //std::cout<<"PointingMonitor::getUncalibratedPointing "<<std::endl;
+   VDB_Connection my_connection( fDBserver.c_str(), "readonly", "" ) ;
+   if( !my_connection.Get_Connection_Status()){
        cout << "PointingMonitor: failed to connect to database server" << endl;
-       /// bool fStatus = false; // JG
        return pointingVec; // JG
-     }
-   TSQLResult *db_res = f_db->Query( strbuf.str().c_str() );
+   }
+   if(!my_connection.make_query( strbuf.str().c_str() )){
+       return  pointingVec; // JG
+   }
+   TSQLResult *db_res = my_connection.Get_QueryResult(); 
 
    int fNRows = db_res->GetRowCount();
 
@@ -254,7 +258,6 @@ vector<pointingmonitor::UncalibratedPointing> PointingMonitor::getUncalibratedPo
      pointing.elevation = atof( db_row->GetField(4) );
      pointing.ledPosY =   atof( db_row->GetField(5) );
    }
-   if( f_db ) f_db->Close();   
 
    return pointingVec;
 }

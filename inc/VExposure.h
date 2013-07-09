@@ -10,6 +10,7 @@
 #include "VStarCatalogue.h"
 #include "VGlobalRunParameter.h"
 #include "VUtilities.h"
+#include "VDB_Connection.h"
 
 #include <fstream>
 #include <iostream>
@@ -200,7 +201,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 	void setObservingMode( bool bObs );
 
         vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
-	TSQLServer* connectToSQLServer( string iServer );
+//	TSQLServer* connectToSQLServer( string iServer );
 
         void addCatalogue( string, int iMarker = 5, int iColor = 1, double iAngle = 45. );
         void listCatalogues();

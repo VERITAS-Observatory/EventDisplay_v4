@@ -201,16 +201,18 @@ void VRunStats::setTimeRange( string iStart, string iStop )
 bool VRunStats::readDBAnalysisComments()
 {
    string itemp = getDBServer() + "/VOFFLINE";
-   TSQLServer *f_db = TSQLServer::Connect( itemp.c_str(), "readonly", "" );
-   if( !f_db ) return false;
+
+   //std::cout<<"VRunStats::readDBAnalysisComments "<<std::endl;
+   VDB_Connection my_connection( itemp.c_str(), "readonly", "" ) ; 
+   if( !my_connection.Get_Connection_Status() ) return false;
 
    char c_query[1000];
-
    sprintf( c_query, "select * from tblRun_Analysis_Comments where run_id >= %d and run_id <= %d", fMin_run_id, fMax_run_id );
    cout << c_query << endl;
 
-   TSQLResult *db_res = f_db->Query( c_query );
-   if( !db_res ) return false;
+   if( !my_connection.make_query(c_query) ) return false;
+   TSQLResult *db_res = my_connection.Get_QueryResult();
+
 
    for( unsigned int i = 0; i < 5; i++ ) cout << i << "\t" << db_res->GetFieldName( i ) << endl;
 
@@ -247,7 +249,7 @@ bool VRunStats::readDBAnalysisComments()
 
       fAnalysisComments.back()->comment = db_row->GetField( 4 );
    }
-   f_db->Close();
+
    return true;
 }
 
@@ -255,12 +257,17 @@ bool VRunStats::readDBAnalysisComments()
 bool VRunStats::readFromDB()
 {
     string itemp = getDBServer() + "/VERITAS";
-    TSQLServer *f_db = TSQLServer::Connect( itemp.c_str(), "readonly", "" );
-    if( !f_db )
+
+    //std::cout<<"VRunStats::readFromDB "<<std::endl;
+    VDB_Connection my_connection( itemp.c_str(), "readonly", "" ) ; 
+    if( !my_connection.Get_Connection_Status() )
     {
         cout << "error connecting to db" << endl;
         return false;
     }
+
+    TSQLServer *f_db = my_connection.Get_ConnectionResult();
+
     if( !readDBRun_IDs( f_db ) ) return false;
 
     if( !readDBSourceInfo( f_db ) ) return false;
@@ -282,11 +289,7 @@ bool VRunStats::readFromDB()
 
     if( !readDBRunInfo( f_db ) ) return false; 
 
-    if( f_db )
-    {
-        cout << "closing DB connection" << endl;
-        f_db->Close();
-    }
+
 
     return true;
 }
