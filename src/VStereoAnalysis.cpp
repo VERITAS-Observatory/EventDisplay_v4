@@ -1,9 +1,9 @@
 /*! \class VStereoAnalysis
-  \brief class for producing histograms from parameterized stereo VERITAS data
-  \author
-  Jamie Holder 
-  Gernot Maier
+    \brief class for producing histograms from parameterized stereo VERITAS data
 
+    \author
+     Jamie Holder 
+     Gernot Maier
 */
 
 #include "VStereoAnalysis.h"
@@ -43,7 +43,6 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 // calculating run start, end and duration (verifies data trees)
       if( !bTotalAnalysisOnly ) setRunTimes();
 
-// TIMEEFF GM: what happens if this element does not exist?
       double f_t_tot_min= f_t_in_s_min[fIsOn ? fRunPara->fRunList[0].fRunOn : fRunPara->fRunList[0].fRunOff];
       double f_t_tot_max= f_t_in_s_max[fIsOn ? fRunPara->fRunList[fRunPara->fRunList.size()-1].fRunOn : fRunPara->fRunList[fRunPara->fRunList.size()-1].fRunOff];
 
@@ -542,57 +541,52 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		fHisto[fHisCounter]->hImagePatternAfterCuts->Fill( fDataRun->ImgSel );
 // make core plots
 		fHisto[fHisCounter]->hcore->Fill(getXcore(),getYcore());
+// ################################## 
+// spectral energy reconstruction
 // apply energy reconstruction cuts
 	        if( fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod ) )
 	        {
-// raw energies
-		    fHisto[fHisCounter]->herecCounts->Fill( log10( iErec ) );
-		    fHisto[fHisCounter]->herecCounts2DtimeBinned->Fill( log10( iErec ), ((double)fDataRun->Time - f_t_in_s_min[irun]));
-		    fHisto[fHisCounter]->hLinerecCounts->Fill( iErec );
-		    fHisto[fHisCounter]->hLinerecCounts2DtimeBinned->Fill( iErec , ((double)fDataRun->Time - f_t_in_s_min[irun]));
-		    fHisto[fHisCounter]->herecRaw->Fill( log10( iErec ) );
-		    fHisto[fHisCounter]->herecRaw2DtimeBinned->Fill( log10( iErec ), ((double)fDataRun->Time - f_t_in_s_min[irun]));
-		    fHisto[fHisCounter]->hLinerecRaw->Fill( iErec );
-		    fHisto[fHisCounter]->hLinerecRaw2DtimeBinned->Fill( iErec , ((double)fDataRun->Time - f_t_in_s_min[irun]));
-
-// write the Effective Area to disk for each Time BIN
-// Therefore if ((double)fDataRun->Time crosses the binning limit, start new EffectiveArea in Time BIN - reset and get Mean
-		    oldtime = newtime;
-		    newtime = ((double)fDataRun->Time);
-      					 
-		    for( int bini=1; bini<i_t_bins+1; bini++)
-		    {
-		       if( oldtime < iEffAreaTimeBin[bini])
-		       {
-			  if( newtime >= iEffAreaTimeBin[bini])
-			  {
-// get mean effective area in Time BIN
-			      fEnergy.setTimeBin(iEffAreaTimeBin[bini]-i_time_intervall/2-f_t_in_s_min[irun]);
-			      fEnergy.setTimeBinnedMeanEffectiveArea();
-			      fEnergy.resetTimeBin();
-			   }
-		        }
-   		    }
-// get 1 / effective area
+// require valid effective area valid for this event
 // effective areas depend on ze, wobble offset, pedestal variation, etc
 		    if( fDataRun->meanPedvar_Image > 0. ) iPedVar_temp = fDataRun->meanPedvar_Image;
 		    else                                  iPedVar_temp = iPedVar;
 
+// get 1 / effective area
 		    iEnergyWeighting = fEnergy.getEffectiveArea( iErec, fDataRun->Ze, 
 								 iDirectionOffset, iPedVar_temp, 
 								 fRunPara->fEnergyReconstructionSpectralIndex, true, 
 								 fRunPara->fEffectiveAreaVsEnergyMC );
-// fill energy histograms
-		    fHisto[fHisCounter]->herec->Fill( log10( iErec ), iEnergyWeighting );
-		    fHisto[fHisCounter]->hLinerec->Fill( iErec, iEnergyWeighting );
-		    fHisto[fHisCounter]->hLinerec2DtimeBinned->Fill( iErec, ((double)fDataRun->Time - f_t_in_s_min[irun]), iEnergyWeighting );
-		    fHisto[fHisCounter]->herec2DtimeBinned->Fill( log10( iErec ), ((double)fDataRun->Time - f_t_in_s_min[irun]), iEnergyWeighting);
+// fill energy histograms: require a valid effective area value
 		    if( iEnergyWeighting > 0. )
 		    {
-			 fHisto[fHisCounter]->herecWeights->Fill( log10( iErec ), log10( 1./iEnergyWeighting ) );
-			 fHisto[fHisCounter]->hLinerecWeights->Fill( iErec, log10( 1./iEnergyWeighting ) );
-			 fHisto[fHisCounter]->herecEffectiveArea->Fill( log10( iErec ), 1./iEnergyWeighting );
-			 fHisto[fHisCounter]->hLinerecEffectiveArea->Fill( iErec, 1./iEnergyWeighting );
+// energy histogram (counts per bin)
+		       fHisto[fHisCounter]->herecCounts->Fill( log10( iErec ) );
+		       fHisto[fHisCounter]->herecCounts2DtimeBinned->Fill( log10( iErec ), ((double)fDataRun->Time - f_t_in_s_min[irun]));
+		       fHisto[fHisCounter]->hLinerecCounts->Fill( iErec );
+		       fHisto[fHisCounter]->hLinerecCounts2DtimeBinned->Fill( iErec , ((double)fDataRun->Time - f_t_in_s_min[irun]));
+
+// write the Effective Area to disk for each Time BIN
+// Therefore if ((double)fDataRun->Time crosses the binning limit, start new EffectiveArea in Time BIN - reset and get Mean
+		       oldtime = newtime;
+		       newtime = ((double)fDataRun->Time);
+					    
+		       for( int bini=1; bini<i_t_bins+1; bini++)
+		       {
+			  if( oldtime < iEffAreaTimeBin[bini])
+			  {
+			     if( newtime >= iEffAreaTimeBin[bini])
+			     {
+// get mean effective area in Time BIN
+				 fEnergy.setTimeBin(iEffAreaTimeBin[bini]-i_time_intervall/2-f_t_in_s_min[irun]);
+				 fEnergy.setTimeBinnedMeanEffectiveArea();
+				 fEnergy.resetTimeBin();
+			      }
+			   }
+		       }
+		       fHisto[fHisCounter]->herecWeights->Fill( log10( iErec ), log10( 1./iEnergyWeighting ) );
+		       fHisto[fHisCounter]->hLinerecWeights->Fill( iErec, log10( 1./iEnergyWeighting ) );
+		       fHisto[fHisCounter]->herecEffectiveArea->Fill( log10( iErec ), 1./iEnergyWeighting );
+		       fHisto[fHisCounter]->hLinerecEffectiveArea->Fill( iErec, 1./iEnergyWeighting );
       		    }
       	       }
 // mean azimuth and elevation (telescope orientation)
@@ -1405,6 +1399,8 @@ void VStereoAnalysis::defineAstroSource()
 				fRunPara->fExcludeFromBackground_West.push_back( 0. );
 				fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID );
 				fRunPara->fExcludeFromBackground_StarName.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fStarName );
+				fRunPara->fExcludeFromBackground_StarBrightness_V.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V );
+				fRunPara->fExcludeFromBackground_StarBrightness_B.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B );
 			   }
 		      }
 		 }
@@ -1493,20 +1489,6 @@ vector< double > VStereoAnalysis::getRateTimeIntervall()
 // this shouldn't happen
       vector< double > f;
       return f;
-}
-
-
-/*!
-
-   needed in VRunSummary for spectral fit
-
-*/
-TH1D* VStereoAnalysis::getEnergyHistogram()
-{
-      if( fHisCounter < 0 ) return fHistoTot->herec;
-      else if( fHisCounter < (int)fHisto.size() )  return fHisto[fHisCounter]->herec;
-
-      return 0;
 }
 
 

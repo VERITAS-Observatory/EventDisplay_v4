@@ -415,6 +415,8 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fExcludeFromBackground_RAJ2000.push_back( 0. );
                 fExcludeFromBackground_StarID.push_back( -1 );
 		fExcludeFromBackground_StarName.push_back( "" );
+		fExcludeFromBackground_StarBrightness_V.push_back( 99. );
+		fExcludeFromBackground_StarBrightness_B.push_back( 99. );
             }
 
             else if( temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
@@ -433,6 +435,8 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fExcludeFromBackground_West.push_back( 0. );
                 fExcludeFromBackground_StarID.push_back( -1 );
 		fExcludeFromBackground_StarName.push_back( "" );
+		fExcludeFromBackground_StarBrightness_V.push_back( 99. );
+		fExcludeFromBackground_StarBrightness_B.push_back( 99. );
             }
 
             else if( temp == "REGIONTOEXCLUDE_RADECJ2000_HOUR" )
@@ -463,6 +467,8 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fExcludeFromBackground_West.push_back( 0. );
                 fExcludeFromBackground_StarID.push_back( -1 );
 		fExcludeFromBackground_StarName.push_back( "" );
+		fExcludeFromBackground_StarBrightness_V.push_back( 99. );
+		fExcludeFromBackground_StarBrightness_B.push_back( 99. );
             }
 
             else if( temp == "ENERGYBINSIZE" ) fEnergySpectrumBinSize = atof( temp2.c_str() );
@@ -947,7 +953,10 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
                 cout << (l+1) << ":region to exclude: (N " << fExcludeFromBackground_North[l];
 		cout <<                             ", W " << fExcludeFromBackground_West[l];
 		cout << ", R " << fExcludeFromBackground_Radius[l] << ", ID " << fExcludeFromBackground_StarID[l];
-		if( fExcludeFromBackground_StarName[l].size() > 0 ) cout << " (" << fExcludeFromBackground_StarName[l] << ")";
+		if( fExcludeFromBackground_StarName[l].size() > 0 )
+		{
+		   cout << " (" << fExcludeFromBackground_StarName[l] << ")";
+                }
                 if( l <= fExcludeFromBackground_North.size() - 1 ) cout << " )"<< endl;;
             }
         }
@@ -1377,10 +1386,14 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
     float x = 0.;
     float y = 0.;
     float r = 0.;
+    float decJ2000 = 0.;
+    float raJ2000 = 0.;
     int id = 0;
     tEx.Branch( "x", &x, "x/F" );
     tEx.Branch( "y", &y, "y/F" );
     tEx.Branch( "r", &r, "r/F" );
+    tEx.Branch( "decj2000", &decJ2000, "decJ2000/F" );
+    tEx.Branch( "raj2000", &decJ2000, "raJ2000/F" );
     tEx.Branch( "star_id", &id, "star_id/I" );
 
     for( unsigned int i = 0; i < fExcludeFromBackground_North.size(); i++ )
@@ -1388,6 +1401,8 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
         x = fExcludeFromBackground_West[i];
         y = fExcludeFromBackground_North[i];
         r = fExcludeFromBackground_Radius[i];
+	decJ2000 = fExcludeFromBackground_DecJ2000[i];
+	raJ2000 = fExcludeFromBackground_RAJ2000[i];
         id = fExcludeFromBackground_StarID[i];
 
         tEx.Fill();

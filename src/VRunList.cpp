@@ -42,7 +42,7 @@ void VRunList::reset()
 void VRunList::print()
 {
     cout << "Run: " << runnumber;
-    cout << setprecision( 6 ) << " (MJD " << MJD << ")";
+    cout << setprecision( 3 ) << " (MJD " << MJD << ")";
     cout << " tOn [min]: " << setprecision(2) << fixed << tOn/60.;
     cout << " (dead time " << setprecision(2) << (1.-deadTimeFraction)*100. << "%) ";
     cout << " Non/NOff: " << setw( 8 ) << fixed << NOn << "/" << NOff;

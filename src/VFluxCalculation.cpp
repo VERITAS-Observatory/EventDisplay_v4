@@ -983,8 +983,7 @@ void VFluxCalculation::setSpectralParameters( double iMinEnergy_TeV, double  E0,
     fE0 = E0;
     fAlpha = alpha;
 
-    //if(iMaxEnergy_TeV < MAX_SAFE_MC_ENERGY)
-    cout << " Setting maximum energy for flux calculation to " << fMaxEnergy << "[TeV]" << endl;
+    cout << " Setting maximum energy for flux calculation to " << fMaxEnergy << " [TeV]" << endl;
 }
 
 /*

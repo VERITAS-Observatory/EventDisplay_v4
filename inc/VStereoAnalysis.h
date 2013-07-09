@@ -50,7 +50,6 @@ class VStereoAnalysis
         TH2D  *getAlphaNormUC();
         double getDeadTimeFraction();
         double getEffectiveExposure( int i_run ) { return ( fRunExposure.find( i_run ) != fRunExposure.end() ? fRunExposure[i_run] : 0.); }
-        TH1D  *getEnergyHistogram();
         TList *getEnergyHistograms();
         TList *getHisList();
         double getMeanAzimuth() { return fMeanAzimuth; }

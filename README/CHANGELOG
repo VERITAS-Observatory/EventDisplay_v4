@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130709 (GM) major cleanup of spectral energy reconstruction
+                removed a lot of obsolete code 
+
+* 20130709 (HF) 'fixed several inconsistencies in UL calculation in Helene method
 
 * 20130709 (GM) cleanup of effective areas code
 

@@ -8,6 +8,7 @@
 #include "VDifferentialFlux.h"
 #include "VEnergySpectrumfromLiterature.h"
 #include "VEnergyThreshold.h"
+#include "VHistogramUtilities.h"
 #include "VMathsandFunctions.h"
 #include "VPlotUtilities.h"
 #include "VSpectralFitter.h"
@@ -53,8 +54,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         bool   fAnalysisHistogramAddingUseLowEdge;
         bool   bEnergyAxisLinear;
 
-                                                  // 0 = max in diff spectrum, 1 = XX % systematic in energy reconstruction, 2 = fraction of maximum effective area
-        unsigned int fAnalysisEnergyThresholdDefinition;
+        unsigned int fAnalysisEnergyThresholdDefinition; // 0 = no energy threshold, 1 = XX % systematic in energy reconstruction, 
+	                                                 // 2 = fraction of maximum effective area, 3 = user defined
         double fAnalysisMaxEnergySystematic;      // maximum allowed systematic error in energy reconstruction
         double fAnalysisMaxEffectiveAreaFraction; // energy threshold is defined as fraction of maximum effective area
 
@@ -112,7 +113,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 	void   setOriginalBinner(TH1 *a);
 
 // histograms
-        TH1D *hErec;
         TH1D *hErecCountsOn;
         TH1D *hErecCountsOff;
         TH1D *hErecTotalTime;
@@ -149,7 +149,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         bool      combineRuns();
         bool      combineRuns( vector< int > iRunList, bool blin = false );
         vector< VDifferentialFlux > getDifferentialFlux() { return fDifferentialFlux; }
-        TH1D*     getEnergyHistogram() { return hErec; }
         TH1D*     getEnergyCountingOnHistogram() { return hErecCountsOn; }
         TH1D*     getEnergyCountingOffHistogram() { return hErecCountsOff; }
         TGraphAsymmErrors* getEnergySpectrumGraph();
@@ -166,6 +165,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         TCanvas*  plotCountingHistograms( TCanvas *c = 0 );
         void      plotEventNumbers( Double_t ts = 0.02 );
         void      plotFitValues();
+	TCanvas*  plotMeanEffectiveArea( TCanvas *c = 0 );
         TCanvas*  plotResiduals( TCanvas *c = 0 );
         TCanvas*  plotLifeTimevsEnergy( TCanvas *c = 0 );
 
@@ -206,6 +206,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         void setPlottingYaxis( double iMin = 1.e-14, double iMax = 1.e-8 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
 
-        ClassDef(VEnergySpectrum, 11);
+        ClassDef(VEnergySpectrum, 13);
 };
 #endif

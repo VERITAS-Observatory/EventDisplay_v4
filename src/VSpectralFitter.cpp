@@ -66,7 +66,8 @@ TF1* VSpectralFitter::fit( TGraph *g, string fitname )
 // covariance matrix
     if( fitter )
     {
-       int nPars = fitter->GetNumberFreeParameters();
+       cout << "IGNORING FITTER" << endl;
+/*       int nPars = fitter->GetNumberFreeParameters();
        TMatrixD* COV = new TMatrixD( nPars, nPars, fitter->GetCovarianceMatrix() );
        if( COV ) 
        {
@@ -93,7 +94,7 @@ TF1* VSpectralFitter::fit( TGraph *g, string fitname )
                 cout << "\tCorrelation coefficient: " << rho << endl;
               }
          }
-       }
+       } */
     }
 
     updateFitFunction_lin();

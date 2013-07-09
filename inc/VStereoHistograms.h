@@ -85,20 +85,12 @@ class VStereoHistograms
 // energy histograms (logarithmic energy axis)
         TH1D* herecCounts;                        //!< reconstructed energy
 	TH2D* herecCounts2DtimeBinned;            //!< reconstructed energy (2D)
-        TH1D* herecRaw;                           //!< reconstructed differential energy spectrum
-	TH2D* herecRaw2DtimeBinned;
-        TH1D* herec;                              //!< reconstructed differential energy spectrum, weighted by effective area
 //time-dependent differential energy spectrum
-	TH2D* herec2DtimeBinned;
         TH2D* herecWeights;                       //!< weights vs.  reconstructed energy
         TProfile *herecEffectiveArea;             //!< effective area vs reconstructed energy
 // energy histograms (linear energy axis)
         TH1D* hLinerecCounts;                     //!< reconstructed energy
 	TH2D* hLinerecCounts2DtimeBinned;  
-        TH1D* hLinerecRaw;                        //!< reconstructed differential energy spectrum
-	TH2D* hLinerecRaw2DtimeBinned;
-        TH1D* hLinerec;                           //!< reconstructed differential energy spectrum, weighted by effective area
-	TH2D* hLinerec2DtimeBinned;               // >time-dependent 
         TH2D* hLinerecWeights;                    //!< weights vs.  reconstructed energy
         TProfile *hLinerecEffectiveArea;          //!< effective area vs reconstructed energy
 

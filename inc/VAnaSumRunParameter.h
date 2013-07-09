@@ -157,6 +157,8 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         vector< double > fExcludeFromBackground_Radius;   //[deg]
         vector< int >    fExcludeFromBackground_StarID;
 	vector< string > fExcludeFromBackground_StarName;
+	vector< double > fExcludeFromBackground_StarBrightness_V;
+	vector< double > fExcludeFromBackground_StarBrightness_B;
 
 // energy reconstruction
         double fEnergyReconstructionSpectralIndex;

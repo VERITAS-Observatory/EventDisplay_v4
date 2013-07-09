@@ -69,7 +69,7 @@ int main(int argc, char *argv[] )
 {
     cout << endl << "VERITAS Analysis Summary (University of Delaware & DESY) ";
     cout << " (version " << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
-    cout <<         "=====================================================================" << endl;
+    cout <<         "==========================================================================" << endl;
     cout << endl;
 
     parseOptions(argc, argv);
