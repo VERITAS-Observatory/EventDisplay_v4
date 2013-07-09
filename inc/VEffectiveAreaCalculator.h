@@ -10,6 +10,7 @@
 #include "VASlalib.h"
 #include "VEffectiveAreaCalculatorMCHistograms.h"
 #include "TEfficiency.h"
+#include "VHistogramUtilities.h"
 #include "VInstrumentResponseFunctionRunParameter.h"
 #include "VStatistics.h"
 #include "VSpectralWeight.h"
@@ -116,6 +117,7 @@ class VEffectiveAreaCalculator
         vector< vector< TH2D* > > hVEsysMCRelative2D;
         vector< vector< TH2D* > > hVEsys2D;
         vector< vector< TH2D* > > hVResponseMatrix;
+        vector< vector< TProfile* > > hVResponseMatrixProfile;
         vector< vector< TH2D* > > hVResponseMatrixQC;
         vector< vector< TH2D* > > hVEmcCutCTA;
 	vector< vector< TH2D* > > hVResponseMatrixFineQC;
@@ -130,8 +132,6 @@ class VEffectiveAreaCalculator
         TH1D* hEcutRecUW;
         TGraphAsymmErrors* gEffAreaMC;
         TGraphAsymmErrors* gEffAreaRec;
-        TGraphAsymmErrors* gEffAreaProb;
-        TGraphAsymmErrors* gRecProb;
         TProfile* hEmcSWeight;
         TProfile* hEsysRec;
         TProfile* hEsysMC;
@@ -142,6 +142,7 @@ class VEffectiveAreaCalculator
         TH2D* hEmcCutCTA;
 	TH2D* hResponseMatrixFineQC;
 	TH2D* hResponseMatrix;
+	TProfile* hResponseMatrixProfile;
 	TH2D* hResponseMatrixQC;
 	vector< TH1D* > hEcutSub;                //! events after individual cuts
 
@@ -168,11 +169,6 @@ class VEffectiveAreaCalculator
         double Rec_eff[1000];
         double Rec_seff_L[1000];
         double Rec_seff_U[1000];
-        int Prob_nbins;
-        double Prob_e0[1000];
-        double Prob_eff[1000];
-        double Prob_seff_L[1000];
-        double Prob_seff_U[1000];
 
 // effective area smoothing
         int fSmoothIter;
@@ -208,7 +204,6 @@ class VEffectiveAreaCalculator
         bool   initializeEffectiveAreasFromHistograms( TTree *, TH1D*, double azmin, double azmax, double ispectralindex, double ipedvar );
         vector< double > interpolate_effectiveArea( double iV, double iVLower, double iVupper,
 	                                            vector< double > iEL, vector< double > iEU, bool iCos = true );
-	bool   normalizeResponseMatrix( TH2* );
         void   reset();
         void   smoothEffectiveAreas( map< unsigned int, vector< double > > );
 

@@ -44,11 +44,6 @@ class CEffArea : public TObject
         Double_t        Rec_eff[1000];            //[nbins]
         Double_t        Rec_seff_L[1000];         //[nbins]
         Double_t        Rec_seff_U[1000];         //[nbins]
-        Int_t           Prob_nbins;
-        Double_t        Prob_e0[1000];             //[nbins]
-        Double_t        Prob_eff[1000];            //[nbins]
-        Double_t        Prob_seff_L[1000];         //[nbins]
-        Double_t        Prob_seff_U[1000];         //[nbins]
         TH1D            *hEmc;
         TH1D            *hEcut;
         TH1D            *hEcutUW;
@@ -58,8 +53,6 @@ class CEffArea : public TObject
         TH1D            *hEcutRecUW;
         TGraphAsymmErrors *gEffAreaMC;
         TGraphAsymmErrors *gEffAreaRec;
-        TGraphAsymmErrors *gEffAreaProb;
-        TGraphAsymmErrors *gRecProb;
         TProfile        *hEmcSWeight;
         TProfile        *hEsysRec;
         TProfile        *hEsysMC;
@@ -69,6 +62,7 @@ class CEffArea : public TObject
         TH2D            *hEsys2D;
         TH2D            *hEmcCutCTA;
 	TH2D            *hResponseMatrix;
+	TProfile        *hResponseMatrixProfile;
 	TH2D            *hResponseMatrixFineQC;
 	TH2D            *hResponseMatrixQC;
 	TH1D            *hhEcutTrigger;
@@ -101,11 +95,6 @@ class CEffArea : public TObject
         TBranch        *b_Rec_eff;                //!
         TBranch        *b_Rec_seff_L;             //!
         TBranch        *b_Rec_seff_U;             //!
-        TBranch        *b_Prob_nbins;              //!
-        TBranch        *b_Prob_e0;                 //!
-        TBranch        *b_Prob_eff;                //!
-        TBranch        *b_Prob_seff_L;             //!
-        TBranch        *b_Prob_seff_U;             //!
         TBranch        *b_hEmc;                   //!
         TBranch        *b_hEcut;                  //!
         TBranch        *b_hEcutUW;                  //!
@@ -115,8 +104,6 @@ class CEffArea : public TObject
         TBranch        *b_hEcutRecUW;               //!
         TBranch        *b_gEffAreaMC;             //!
         TBranch        *b_gEffAreaRec;            //!
-        TBranch        *b_gEffAreaProb;            //!
-        TBranch        *b_gRecProb;               //!
         TBranch        *b_hEmcSWeight;            //!
         TBranch        *b_hEsysRec;               //!
         TBranch        *b_hEsysMC;                //!
@@ -126,6 +113,7 @@ class CEffArea : public TObject
         TBranch        *b_hEsys2D;                //!
         TBranch        *b_hEmcCutCTA;                //!
         TBranch        *b_hResponseMatrix;                //!
+        TBranch        *b_hResponseMatrixProfile;                //!
         TBranch        *b_hResponseMatrixQC;                //!
         TBranch        *b_hResponseMatrixFineQC;                //!
 	TBranch        *b_hhEcutTrigger;   //!
@@ -223,8 +211,6 @@ void CEffArea::Init(TTree *tree)
     hEcutRecUW = 0;
     gEffAreaMC = 0;
     gEffAreaRec = 0;
-    gEffAreaProb = 0;
-    gRecProb = 0;
     hEmcSWeight = 0;
     hEsysRec = 0;
     hEsysMC = 0;
@@ -234,6 +220,7 @@ void CEffArea::Init(TTree *tree)
     hEsys2D = 0;
     hEmcCutCTA = 0;
     hResponseMatrix = 0;
+    hResponseMatrixProfile = 0;
     hResponseMatrixQC = 0;
     hResponseMatrixFineQC = 0;
    hhEcutTrigger = 0;
@@ -284,25 +271,6 @@ void CEffArea::Init(TTree *tree)
     fChain->SetBranchAddress("Rec_nbins", &Rec_nbins, &b_Rec_nbins);
     fChain->SetBranchAddress("Rec_e0", Rec_e0, &b_Rec_e0);
     fChain->SetBranchAddress("Rec_eff", Rec_eff, &b_Rec_eff);
-    if(  fChain->GetBranchStatus( "Prob_nbins" ) )
-    {
-       fChain->SetBranchAddress("Prob_nbins", &Prob_nbins, &b_Prob_nbins);
-       fChain->SetBranchAddress("Prob_e0", Prob_e0, &b_Prob_e0);
-       fChain->SetBranchAddress("Prob_eff", Prob_eff, &b_Prob_eff);
-       fChain->SetBranchAddress("Prob_seff_L", Prob_seff_L, &b_Prob_seff_L);
-       fChain->SetBranchAddress("Prob_seff_U", Prob_seff_U, &b_Prob_seff_U);
-    }
-    else
-    {
-       Prob_nbins = 0;
-       for( int i = 0; i < 1000; i++ )
-       {
-          Prob_e0[i] = 0.;
-	  Prob_eff[i] = 0.;
-	  Prob_seff_L[i] = 0.;
-	  Prob_seff_U[i] = 0.;
-       }
-    }
     if( fChain->GetBranchStatus( "hEmc" ) ) fChain->SetBranchAddress("hEmc", &hEmc, &b_hEmc);
     else                                    hEmc = 0;
     if( fChain->GetBranchStatus("hEcut") )
@@ -316,8 +284,6 @@ void CEffArea::Init(TTree *tree)
 	else hEcutRecUW = 0;
         fChain->SetBranchAddress("gEffAreaMC", &gEffAreaMC, &b_gEffAreaMC);
         fChain->SetBranchAddress("gEffAreaRec", &gEffAreaRec, &b_gEffAreaRec);
-        fChain->SetBranchAddress("gEffAreaProb", &gEffAreaProb, &b_gEffAreaProb);
-        fChain->SetBranchAddress("gRecProb", &gRecProb, &b_gRecProb);
         fChain->SetBranchAddress("hEmcSWeight", &hEmcSWeight, &b_hEmcSWeight);
         fChain->SetBranchAddress("hEsysRec", &hEsysRec, &b_hEsysRec);
         fChain->SetBranchAddress("hEsysMC", &hEsysMC, &b_hEsysMC);
@@ -329,6 +295,11 @@ void CEffArea::Init(TTree *tree)
 	   fChain->SetBranchAddress("hResponseMatrixQC", &hResponseMatrixQC, &b_hResponseMatrixQC );
         }
 	else hResponseMatrixQC = 0;
+	if( fChain->GetBranchStatus("hResponseMatrixProfile" ) )
+	{
+	   fChain->SetBranchAddress("hResponseMatrixProfile", &hResponseMatrixProfile, &b_hResponseMatrixProfile );
+        }
+	else hResponseMatrixProfile = 0;
 	if( fChain->GetBranchStatus("hResponseMatrixFineQC" ) )
 	{
 	   fChain->SetBranchAddress("hResponseMatrixFineQC", &hResponseMatrixFineQC, &b_hResponseMatrixFineQC );
@@ -345,8 +316,6 @@ void CEffArea::Init(TTree *tree)
         hEcutRecUW = 0;
         gEffAreaMC = 0;
         gEffAreaRec = 0;
-        gEffAreaProb = 0;
-        gRecProb = 0;
         hEmcSWeight = 0;
         hEsysRec = 0;
         hEsysMC = 0;
@@ -356,6 +325,7 @@ void CEffArea::Init(TTree *tree)
         hEsys2D = 0;
         hEmcCutCTA = 0;
 	hResponseMatrix = 0;
+	hResponseMatrixProfile = 0;
 	hResponseMatrixQC = 0;
 	hResponseMatrixFineQC = 0;
     }

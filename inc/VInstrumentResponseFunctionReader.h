@@ -66,11 +66,9 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 // effective areas
     TGraphAsymmErrors *gEffArea_MC;
     TGraphAsymmErrors *gEffArea_Rec;
-    TGraphAsymmErrors *gEffArea_Prob;
 // effective area ratios
     TGraphAsymmErrors *gEffArea_MC_Ratio;
     TGraphAsymmErrors *gEffArea_Rec_Ratio;
-    TGraphAsymmErrors *gEffArea_Prob_Ratio;
 // energy spectra
     TH1D *hEmc;
     TH1D *hEcut;
@@ -79,6 +77,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TH1D *hEcut_recUW;
 // energy reconstruction matrix
     TH2D *hERecMatrix;
+    TProfile *hERecMatrixProfile;
     TH2D *hERecMatrixCoarse;
     TH2D *hERecMatrixQC;
     TH2D *hERecMatrixCoarseQC;
@@ -129,7 +128,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 6 );
+    ClassDef( VInstrumentResponseFunctionReader, 7 );
 };
 
 

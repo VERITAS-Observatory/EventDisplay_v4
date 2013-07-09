@@ -1,5 +1,4 @@
 //! VSensitivityCalculator
-// Revision $Id: VSensitivityCalculator.h,v 1.1.2.2.4.2.2.6.2.14.4.2 2011/02/14 16:22:18 gmaier Exp $
 
 #ifndef VSensitivityCalculator_H
 #define VSensitivityCalculator_H
@@ -14,6 +13,7 @@
 #include "VGammaHadronCuts.h"
 #include "VEnergySpectrum.h"
 #include "VEnergySpectrumfromLiterature.h"
+#include "VHistogramUtilities.h"
 #include "VMonteCarloRateCalculator.h"
 #include "VMonteCarloRunHeader.h"
 #include "VStatistics.h"

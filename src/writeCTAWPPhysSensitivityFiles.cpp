@@ -81,4 +81,5 @@ int main( int argc, char *argv[] )
     if( iWobbleMin.size() > 0 ) iData->fillHistograms2D( iWobbleMin, iWobbleMax );
 
     iData->terminate();
+    cout << "end of calculating sensitivities" << endl;
 }

@@ -203,7 +203,7 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 	      break;
             }
         }
-    }
+    } 
         
 /////////////////////////////////////////////////////////////////////////////////
 // loop over the source strength vector and check different sensitivity criteria
@@ -2163,25 +2163,35 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 // (end of treatment of effective areas)
 
 // copy response matrix for energy reconstruction
-    if( c->hResponseMatrixQC )
+    if( c->hResponseMatrix )
     {
        char hname[1000];
-       sprintf( hname, "%s_%s_%d_%d_%d", c->hResponseMatrixQC->GetName(), iMCPara->fName.c_str(), 
+       sprintf( hname, "%s_%s_%d_%d_%d", c->hResponseMatrix->GetName(), iMCPara->fName.c_str(), 
                                          (int)(iMCPara->woff*1000), iMCPara->az, (int)(iMCPara->index*100) );
        iMCPara->hResponseMatrix->SetName( hname );
-       iMCPara->hResponseMatrix->SetTitle( c->hResponseMatrixQC->GetTitle() );
-       iMCPara->hResponseMatrix->SetBins( c->hResponseMatrixQC->GetNbinsX(), 
-                                          c->hResponseMatrixQC->GetXaxis()->GetXmin(), c->hResponseMatrixQC->GetXaxis()->GetXmax(),
-				 	  c->hResponseMatrixQC->GetNbinsY(),
-                                          c->hResponseMatrixQC->GetYaxis()->GetXmin(), c->hResponseMatrixQC->GetYaxis()->GetXmax() );
-       for( int i = 0; i <= c->hResponseMatrixQC->GetNbinsX(); i++ )
+       iMCPara->hResponseMatrix->SetTitle( c->hResponseMatrix->GetTitle() );
+       iMCPara->hResponseMatrix->SetBins( c->hResponseMatrix->GetNbinsX(), 
+                                          c->hResponseMatrix->GetXaxis()->GetXmin(), c->hResponseMatrix->GetXaxis()->GetXmax(),
+				 	  c->hResponseMatrix->GetNbinsY(),
+                                          c->hResponseMatrix->GetYaxis()->GetXmin(), c->hResponseMatrix->GetYaxis()->GetXmax() );
+       TH2D *i_hResponse = c->hResponseMatrix;
+// for cosmic rays: interpolate response matrix
+       if( iMCPara->fParticleID != 1 && iMCPara->fParticleID != 2 ) 
        {
-	  for( int j = 0; j <= c->hResponseMatrixQC->GetNbinsY(); j++ )
-	  {
-	     iMCPara->hResponseMatrix->SetBinContent( i, j, c->hResponseMatrixQC->GetBinContent( i, j ) );
-          }
+	  cout << "\t interpolating response matrix for particle type " << iMCPara->fParticleID << endl;
+          i_hResponse = (TH2D*)VHistogramUtilities::interpolateResponseMatrix( c->hResponseMatrix );
        }
-    }
+       if( i_hResponse )
+       {
+	  for( int i = 0; i <= i_hResponse->GetNbinsX(); i++ )
+	  {
+	     for( int j = 0; j <= i_hResponse->GetNbinsY(); j++ )
+	     {
+		iMCPara->hResponseMatrix->SetBinContent( i, j, i_hResponse->GetBinContent( i, j ) );
+	     }
+	  }
+       }
+   }
 
 //////////////////////////////////////////////////////////////////////////////////////
 // read MC parameters in case run header is available

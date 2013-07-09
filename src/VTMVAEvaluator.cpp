@@ -104,10 +104,13 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
 }
 
 /*
+
     initialize TMVA readers
+
 */
 bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max )
 {
+//////////////////////////////
 // sanity checks
    if( iWeightFileName.size() == 0 )
    {
@@ -124,6 +127,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    }
    char hname[800];
 
+//////////////////////////////
 // reset all vectors
    fBoxCutValue_theta2.clear();
    fBoxCutValue_min.clear();
@@ -135,13 +139,14 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    fSourceStrengthAtOptimum_CU.clear();
    vector< unsigned int > iFileNumber;
 
+//////////////////////////////
 // number of energy bins
    unsigned int iNbin = iWeightFileIndex_max - iWeightFileIndex_min + 1;
 
    cout << "VTMVAEvaluator::initializeWeightFiles: reading energies from TMVA root files " << endl; 
 
-//////////////////////////////////////////////////////////////////////////////////////
-// read energy binning from root files and check that all neccessary object are in the file
+/////////////////////////////////////////////////////////////////////////////////////////////
+// read energy binning from root files and check that all neccessary objects are in the file
    unsigned int iMinMissingBin = 0;
    for( unsigned int i = 0; i < iNbin; i++ )
    {
@@ -258,7 +263,6 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
          getValuesFromEfficiencyHistograms( fTMVACutValue[b], fSignalEfficiency[b], iB, iFileNumber[b], iWeightFileName );
       }
       fTMVAOptimumCutValueFound[b] = false;
-
 
 // weight file for this energy bin
       sprintf( hname, "MVA%d", iFileNumber[b] );
@@ -425,8 +429,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
       z++;
    }
 
-
-// sanity check
+// sanity checks
    if( fTMVAReader.size() != fEnergyCut_Log10TeV_min.size() ||
        fTMVAReader.size() != fEnergyCut_Log10TeV_max.size() ||
        fTMVAReader.size() != fEnergyReconstructionMethod.size() )
@@ -1560,6 +1563,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       cout << "VTMVAEvaluator::optimizeSensitivity: signal efficiency at maximum (";
       cout << i_SourceStrength_atMaximum << " CU) is ";
       cout << i_SignalEfficiency_AtMaximum << " with a significance of " << i_Signal_to_sqrtNoise_atMaximum << endl;
+      cout << "\t Ndiff = " << Ndif << endl;
    }
    cout << "\t MVA parameter: " << i_TMVACutValue_AtMaximum;
    cout << ", background efficiency: " << i_BackgroundEfficiency_AtMaximum << endl;

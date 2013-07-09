@@ -64,12 +64,6 @@ void merge( string ifile, char *outputfile, bool bFull = false )
 // errors not needed for standard analysis
 //        f.SetBranchStatus( "Rec_seff_L", 1 );
 //        f.SetBranchStatus( "Rec_seff_U", 1 );
-// PROB effective areas not needed for standard analysis
-//        f.SetBranchStatus( "Prob_nbins", 1 );
-//        f.SetBranchStatus( "Prob_e0", 1 );
-//        f.SetBranchStatus( "Prob_eff", 1 );
-//        f.SetBranchStatus( "Prob_seff_L", 1 );
-//        f.SetBranchStatus( "Prob_seff_U", 1 );
 // needed for compatibility to v3.30
 //        f.SetBranchStatus( "hEmc", 1 );
 // needed for systematic error calculation

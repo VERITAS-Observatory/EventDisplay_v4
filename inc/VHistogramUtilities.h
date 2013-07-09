@@ -13,6 +13,7 @@
 #include "TH2D.h"
 #include "TMath.h"
 #include "TProfile.h"
+#include "TRandom.h"
 
 #include <iostream>
 #include <string>
@@ -47,9 +48,12 @@ class VHistogramUtilities
 
    static TH1*      normalizeTH1( TH1* h, bool iIntegral );
 
+   static TH2*      interpolateResponseMatrix( TH2*, string iNewHistoName = "" );
+   static bool      normalizeTH2D_y( TH2* h );
+
    void             setDebug( bool iB = true ) { fDebug = iB; }
 
-   ClassDefNV( VHistogramUtilities, 5 );
+   ClassDefNV( VHistogramUtilities, 6 );
 };
 
 #endif

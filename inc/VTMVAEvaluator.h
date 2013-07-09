@@ -71,7 +71,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    vector< unsigned int >  fEnergyReconstructionMethod;
    vector< TString >       fTMVAMethodTag;
    vector< double >        fSignalEfficiency;                // from user or best signal/sqrt(noise)
-   map< unsigned int, double > fSignalEfficiencyMap;             // from user: energy dependent signal efficiency
+   map< unsigned int, double > fSignalEfficiencyMap;         // from user: energy dependent signal efficiency
    vector< double >        fBackgroundEfficiency;            // from best signal/sqrt(noise)
    double                  fSignalEfficiencyNoVec;
    vector< double >        fTMVACutValue;

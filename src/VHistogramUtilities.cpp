@@ -127,6 +127,110 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D *iP, TGraphErrors
     return g;
 }
 
+/*
+
+    interpolate a response matrix
+
+    This is used in the CTA sensitivity estimations, where the response matrixes calculated from
+    proton simulation are often not well defined
+
+*/
+
+TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, string iNewHistoName )
+{
+  if( !hResponseMatrix ) return 0;
+
+// clone input histogram
+  char hname[600];
+  if( iNewHistoName.size() == 0 ) sprintf( hname, "%s_IRM", hResponseMatrix->GetName() );
+  else                            sprintf( hname, "%s", iNewHistoName.c_str() );
+  TH2 *iHInter = (TH2*)hResponseMatrix->Clone( hname );
+
+// calculate median energy for each y-bin (true energy axis)
+  double xq[] = { 0.16, 0.50, 0.84 };
+  double yq[] = { 0.0,  0.0, 0.0  };
+  TH1D hOff( "hMeanOffset", "", 100, -2., 2. );
+  vector< int > iYBinToInterpolate;
+  int iyBinFirstToInterpolate = -1;
+  for( int i = 1; i <= hResponseMatrix->GetNbinsY(); i++ )
+  {
+      TH1F *h = (TH1F*)hResponseMatrix->ProjectionX( "p_y", i, i );
+      if( h )
+      {
+	 if( h->GetEntries() > 0 )
+	 {
+	    h->GetQuantiles( 3, yq, xq );
+         }
+// count number of filled bins
+	 unsigned int i_filled = 0;
+	 for( int j = 1; j <= h->GetNbinsX(); j++ )
+	 {
+	    if( h->GetBinContent( j ) > 0 ) i_filled++;
+	 }
+	 if( i_filled <= 3 )
+	 {
+	    if( h->GetEntries() > 0 ) hOff.Fill( yq[1] - hResponseMatrix->GetYaxis()->GetBinCenter( i ) );   
+	    iYBinToInterpolate.push_back( i );
+	 }
+	 else
+	 {
+	    if( iyBinFirstToInterpolate < 0 && i > 1 ) iyBinFirstToInterpolate = i;
+         }
+      }
+  }
+  hOff.GetQuantiles( 3, yq, xq );
+//////////////////////////////////
+// interpolate the missing bins
+  double y = 0;
+  double x = 0.;
+// rms shouldn't be larger than bin width
+  double rms = yq[2]-yq[1];
+  if( rms > iHInter->GetXaxis()->GetBinWidth( 1 ) ) rms = iHInter->GetXaxis()->GetBinWidth( 1 );
+  for( unsigned int i = 0; i < iYBinToInterpolate.size(); i++ )
+  {
+// don't interpolate the smallest energies
+     if( iYBinToInterpolate[i] <= iyBinFirstToInterpolate ) continue;
+// fill a normal distribution at the median position
+     y = iHInter->GetYaxis()->GetBinCenter( iYBinToInterpolate[i] );
+     for( unsigned int j = 0; j < 100; j++ )
+     {
+         x = gRandom->Gaus( y + yq[1], rms );
+         iHInter->Fill( x, y );
+     }
+  }
+  normalizeTH2D_y( iHInter );
+
+  return iHInter;
+}
+
+/*
+   
+   normalize a matrix in each y-row
+
+*/
+bool VHistogramUtilities::normalizeTH2D_y( TH2* h )
+{
+   if( !h ) return false;
+
+   double i_sum = 0.;
+   for( int i = 1; i <= h->GetNbinsY(); i++ )
+   {
+      i_sum = 0.;
+      for( int j = 1; j <= h->GetNbinsX(); j++ )
+      {
+          i_sum += h->GetBinContent( j, i );
+      }
+      if( i_sum > 0. )
+      {
+	 for( int j = 1; j <= h->GetNbinsX(); j++ )
+	 {
+	     h->SetBinContent( j, i, h->GetBinContent( j, i ) / i_sum );
+         }
+      }
+   }
+   return true;
+}
+
 TH1D* VHistogramUtilities::get_Cumulative_Histogram(  TH1D* iH_in, bool iNormalize, bool iLeft_to_right )
 {
    if( !iH_in ) return 0;

@@ -151,10 +151,6 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
        TGraphAsymmErrors *g = 0;
 
        if( fData[i]->fA_MC == "A_MC" ) g = fData[i]->gEffArea_MC;
-       else if( fData[i]->fA_MC == "A_PROB" )
-       {
-          g = fData[i]->gEffArea_Prob;
-       }
        else                            g = fData[i]->gEffArea_Rec;
 
        if( !g )
@@ -294,15 +290,15 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionLogBias2D( unsigne
     }
 }
 
-void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned int iDataSetID, bool bFineBinning, bool bQualityCuts )
+void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned int iDataSetID, bool bFineBinning, bool bQualityCuts, bool bInterPol, bool bPlotMedian )
 {
     if( !checkDataSetID( iDataSetID ) ) return;
 
     char hname[200];
     char htitle[200];
 
-    sprintf( hname, "cEA_Ematrix_%d_%d_%d", iDataSetID, bFineBinning, bQualityCuts );
-    sprintf( htitle, "energy reconstruction matrix (%d)", iDataSetID );
+    sprintf( hname, "cEA_Ematrix_%d_%d_%d_%d", iDataSetID, bFineBinning, bQualityCuts, bInterPol );
+    sprintf( htitle, "energy reconstruction matrix (%d,%d)", iDataSetID, bInterPol );
     if( bFineBinning ) sprintf( htitle, "%s (fine binning)", htitle );
     if( bQualityCuts ) sprintf( htitle, "%s, QC", htitle );
     TCanvas *iEnergyReconstructionMatrixCanvas = new TCanvas( hname, htitle, 610, 10, fCanvasSize_X, fCanvasSize_Y );
@@ -341,8 +337,13 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 			        log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "X" );
     i_hRecMatrix->SetAxisRange( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
 			        log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ), "Y" );
-    i_hRecMatrix->Draw( "colz" );
-
+    i_hRecMatrix->SetMaximum( 1.5 );
+    if( !bInterPol ) i_hRecMatrix->Draw( "colz" );
+    else
+    {
+        TH2D *i_InterPol = (TH2D*)VHistogramUtilities::interpolateResponseMatrix( i_hRecMatrix );
+	if( i_InterPol ) i_InterPol->Draw( "colz" );
+    }
 // diagonal
     TLine *iL = new TLine( log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ),
 			   log10( getPlottingAxis( "energy_Lin" ) ->fMinValue ), 
@@ -350,6 +351,61 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 			   log10( getPlottingAxis( "energy_Lin" ) ->fMaxValue ) );
     iL->SetLineStyle( 2 );
     iL->Draw();
+
+    if( !bPlotMedian ) return;
+
+// plot median
+    double xq[3];
+    double yq[] = { 0.0,  0.0, 0.0  };
+    TGraphAsymmErrors *gReco = new TGraphAsymmErrors( 1 );
+    TH1D hOff( "hMeanOffset", "", 100, -2., 2. );
+    int zReco = 0;
+    for( int i = 1; i <= i_hRecMatrix->GetNbinsY(); i++ )
+    {
+	TH1F *h = (TH1F*)i_hRecMatrix->ProjectionX( "p_y", i, i );
+	if( h && h->GetEntries() > 0 )
+	{
+	   xq[0] = 0.16;
+	   xq[1] = 0.50;
+	   xq[2] = 0.84;
+	   h->GetQuantiles( 3, yq, xq );
+// count number of filled bins
+	   unsigned int i_filled = 0;
+	   for( int j = 1; j <= h->GetNbinsX(); j++ )
+	   {
+	      if( h->GetBinContent( j ) > 0 ) i_filled++;
+	   }
+	   if( i_filled <= 3 )
+	   {
+	      hOff.Fill( yq[1] - i_hRecMatrix->GetYaxis()->GetBinCenter( i ) );   
+	      gReco->SetPoint( zReco, 0., i_hRecMatrix->GetYaxis()->GetBinCenter( i ) );
+	   }
+	   else
+	   {
+	      gReco->SetPoint( zReco, yq[1], i_hRecMatrix->GetYaxis()->GetBinCenter( i ) );
+	      gReco->SetPointError( zReco, yq[1]-yq[0], yq[2]-yq[1], 0., 0. );
+	   }
+	   zReco++;
+	}
+    }
+// fill missing points
+    double x = 0;
+    double y = 0;
+    hOff.GetQuantiles( 3, yq, xq );
+    for( int i = 0; i < gReco->GetN(); i++ )
+    {
+	 gReco->GetPoint( i, x, y );
+	 if( TMath::Abs( x ) < 1.e-7 )
+	 {
+	    gReco->SetPoint( i, y + yq[1], y );
+	    gReco->SetPointError( i, yq[2]-yq[1], yq[2]-yq[1], 0., 0. );
+	 }
+    }
+    gReco->SetLineColor( 4 );
+    gReco->SetMarkerColor( 4 );
+    gReco->SetMarkerStyle( 28 );
+    gReco->Draw( "pl" );
+
 }
 
 
@@ -465,11 +521,6 @@ void VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iData
        {
           fData[i]->calculateEffectiveAreaRatios( fData[iDataSetID]->gEffArea_MC );
           g = fData[i]->gEffArea_MC_Ratio;
-       }
-       else if( fData[i]->fA_MC == "A_PROB" )
-       {
-          fData[i]->calculateEffectiveAreaRatios( fData[iDataSetID]->gEffArea_Prob );
-          g = fData[i]->gEffArea_Prob_Ratio;
        }
        else
        {
