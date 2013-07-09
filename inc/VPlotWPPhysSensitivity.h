@@ -79,7 +79,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    bool initialize( VPlotWPPhysSensitivityData* );
    bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    TCanvas* plotProjectedSensitivities( TCanvas* );
-   bool plotSensitivity( string iPrint = "", double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10, string iUnit = "ENERGY"  );
+   bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
    void reset();
    void setCrabSpectraFile( string iFile = "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat",
                             unsigned int iSpectraID = 6 )

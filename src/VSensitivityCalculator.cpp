@@ -542,6 +542,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 	      i_GraphCrabFlux->GetPoint( p, xx, yy );
 	      fCrabFlux_SourceStrength.back()->SetPoint( p, xx, yy * i_fCrabFlux[i] );
         }
+	fCrabFlux_SourceStrength.back()->SetLineStyle( 9 );
     } 
     if( fDebug ) cout << "VSensitivityCalculator::getCrabSpectrum " << fCrabFlux_SourceStrength.size() << endl;
 
@@ -1328,6 +1329,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( f.IsZombie() )
     {
        cout << "VSensitivityCalculate::getSensitivityGraphFromWPPhysFile(): error: CTA-MC file not found" << endl;
+       cout << fMCCTA_File << endl;
        return 0;
     }
     cout << "reading CTA-MC file: " << fMCCTA_File << endl;

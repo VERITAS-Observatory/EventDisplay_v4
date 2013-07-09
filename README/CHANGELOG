@@ -1,6 +1,7 @@
 Change log eventdisplay analysis package
 ========================================
 
+
 * 20130709 (GM) cleanup of effective areas code
 
 * 20130709 (GM) added migration matrix interpolation for cosmic rays
@@ -36,6 +37,9 @@ Change log eventdisplay analysis package
 * 20130701 (GM) fixed significant bug in tzero_mean settings in CTA converter
                 (mix up of telescope ID and telescope number): 
 		high impact on small event reconstruction for prod2
+
+* 20130701 (GM) increased maximum number of allowed events for search
+                of sample size (elog 694)
 
 * 20130627 (GM) optimize writing of pedestals histograms at the end
                 of the pedestal calculation routines (Bug 127)

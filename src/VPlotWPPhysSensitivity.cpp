@@ -139,13 +139,15 @@ bool VPlotWPPhysSensitivity::initialize( VPlotWPPhysSensitivityData* iData )
       iTemp << "data/IFAE_May2012/Subarray" << iData->fSubArray;
       iTemp << "_IFAE_" << hname << "hours_20120510_offaxis.root";
    }
-   else if( iData->fAnalysis == "Subarray" )
+   else if( iData->fAnalysis.substr( 0, 8 )  == "Subarray" )
    {
       if( iData->fObservationTime_s/3600. > 1. ) sprintf( hname, "%d", (int)(iData->fObservationTime_s/3600.) );
       else                                       sprintf( hname, "%.1f", iData->fObservationTime_s/3600. );
 // IFAE May 2013
-      iTemp << "data/IFAE_May2013/Subarray" << iData->fSubArray;
-      iTemp << "_IFAE_" << hname << "hours_20130527.root";
+//      iTemp << "data/IFAE_May2013/Subarray" << iData->fSubArray;
+// July 2013
+      iTemp << "data/IFAE_July2013/" << iData->fAnalysis;
+      iTemp << "_IFAE_" << hname << "hours_20130630.root";
    }
    else if( iData->fAnalysis == "HD_KB" || iData->fAnalysis == "MPIK" )
    {

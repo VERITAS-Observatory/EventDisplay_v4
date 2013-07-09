@@ -42,7 +42,7 @@ class VWPPhysSensitivityPlotsMaker
     void compareDataSets( string iSubArray, string iDataSet );
     void compareOffAxisSensitivities( string iSubArray = "", string iDataSet = "" );
     void resetVectors();
-    void setAxisUnits( double iMinSensitivity = 1.e-14, double iMaxSensitivity = 2.e-10, string iUnit = "ENERGY"  );
+    void setAxisUnits( double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
     void setEnergyRange_Lin_TeV( double iMinEnergy_TeV = 0.01, double iMaxEnergy_TeV = 200. )
                                 { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
     bool setListOfArrays( string iSubArrayFileTxt );
