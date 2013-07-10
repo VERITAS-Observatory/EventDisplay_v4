@@ -65,6 +65,8 @@ vector< string > VTMVAEvaluator::getTrainingVariables( string iXMLFile, vector< 
 {
    vector< string > iVar;
 
+   cout << "reading list of variables from TMVA XML file: " << iXMLFile << endl;
+
 // open TMVA XML file 
 // NOTE: extreme dependendence on the structure of the TMVA XML file
    ifstream is;
@@ -197,29 +199,39 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	     continue;
           }
        }
-       iFileNumber.push_back( i );
        if( !iEnergyData )
        {
 	  cout << "VTMVAEvaluator::initializeWeightFiles: warning: problem while reading energies from TMVA root file ";
 	  cout << iFullFileName.str() << endl;
+	  iFileNumber.push_back( i );
 	  fIsZombie = true;
 	  return false;
        }
-       fEnergyCut_Log10TeV_min.push_back( iEnergyData->fEnergyCut_Log10TeV_min );
-       fEnergyCut_Log10TeV_max.push_back( iEnergyData->fEnergyCut_Log10TeV_max );
-       fEnergyReconstructionMethod.push_back( iEnergyData->fEnergyReconstructionMethod );
+// initialize one value per energy bin
+       double e = iEnergyData->fEnergyCut_Log10TeV_min;
+       double iStep = 0.25;
+       cout << "NEW ENERGY BIN " << iEnergyData->fEnergyCut_Log10TeV_min << "\t" << iEnergyData->fEnergyCut_Log10TeV_max << endl;
+       do
+       {
+          cout << "\t" << e << "\t" << iFileNumber.size() << endl;
+	  iFileNumber.push_back( i );
+	  fEnergyCut_Log10TeV_min.push_back( e );
+	  fEnergyCut_Log10TeV_max.push_back( e + iStep );
+	  fEnergyReconstructionMethod.push_back( iEnergyData->fEnergyReconstructionMethod );
 // get requested signal efficiency for this energy bin
-       fSignalEfficiency.push_back( getSignalEfficiency( iWeightFileIndex_min+i, 
-                                                         iEnergyData->fEnergyCut_Log10TeV_min, 
-							 iEnergyData->fEnergyCut_Log10TeV_max ) );
-       fBackgroundEfficiency.push_back( -99. );
-       fTMVACutValue.push_back( getTMVACutValue( iWeightFileIndex_min+i,
-						 iEnergyData->fEnergyCut_Log10TeV_min, 
-						 iEnergyData->fEnergyCut_Log10TeV_max ) );
-       fTMVAOptimumCutValueFound.push_back( false );
-       fSourceStrengthAtOptimum_CU.push_back( 0. );
-       sprintf( hname, "MVA%d", i );
-       fTMVAMethodTag.push_back( hname );
+	  fSignalEfficiency.push_back( getSignalEfficiency( iWeightFileIndex_min+i, 
+							    iEnergyData->fEnergyCut_Log10TeV_min, 
+							    iEnergyData->fEnergyCut_Log10TeV_max ) );
+	  fBackgroundEfficiency.push_back( -99. );
+	  fTMVACutValue.push_back( getTMVACutValue( iWeightFileIndex_min+i,
+						    iEnergyData->fEnergyCut_Log10TeV_min, 
+						    iEnergyData->fEnergyCut_Log10TeV_max ) );
+	  fTMVAOptimumCutValueFound.push_back( false );
+	  fSourceStrengthAtOptimum_CU.push_back( 0. );
+	  sprintf( hname, "MVA%d", i );
+	  fTMVAMethodTag.push_back( hname );
+	  e += iStep;
+       } while( e < iEnergyData->fEnergyCut_Log10TeV_max );
        iF.Close();
    }
    if( iFileNumber.size() == 0 )
@@ -232,7 +244,8 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
    {
       cout << "\t" << i << "\t" << fEnergyCut_Log10TeV_min[i] << "\t" << fEnergyCut_Log10TeV_max[i];
-      cout << "\t(energy reconstruction method " << fEnergyReconstructionMethod[i] << ")" << endl;
+      cout << "\t(energy reconstruction method " << fEnergyReconstructionMethod[i];
+      cout << ", file number " << iFileNumber[i] << ")"<< endl;
    }
    cout << endl;
 
@@ -252,15 +265,15 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
       if( fTMVACutValueNoVec < -1. && fSignalEfficiencyNoVec > 0. )
       {
 	 fTMVACutValue[b] = -99.;
-	 double iB = -99.;
-         getValuesFromEfficiencyHistograms( fTMVACutValue[b], fSignalEfficiency[b], iB, iFileNumber[b], iWeightFileName );
+	 double iDummy = -99.;
+         getValuesFromEfficiencyHistograms( fTMVACutValue[b], fSignalEfficiency[b], iDummy, iFileNumber[b], iWeightFileName );
       }
 // fixed TMVA cut value
       else if( fTMVACutValueNoVec > -1. )
       {
-	 double iB = -99.;
+	 double iDummy = -99.;
 	 fSignalEfficiency[b] = -99.;
-         getValuesFromEfficiencyHistograms( fTMVACutValue[b], fSignalEfficiency[b], iB, iFileNumber[b], iWeightFileName );
+         getValuesFromEfficiencyHistograms( fTMVACutValue[b], fSignalEfficiency[b], iDummy, iFileNumber[b], iWeightFileName );
       }
       fTMVAOptimumCutValueFound[b] = false;
 
@@ -278,19 +291,19 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 // note that the following list of variables must be the same as during training
       for( unsigned int t = 0; t < iTrainingVariables.size(); t++ )
       {
-         if( iTrainingVariables[t] == "MSCW" ) 
+         if( iTrainingVariables[t] == "MSCW" && !iVariableIsASpectator[t] ) 
 	 {
 	     fTMVAReader.back()->AddVariable( "MSCW", &fMSCW );
          }
-         else if( iTrainingVariables[t] == "MSCL" )
+         else if( iTrainingVariables[t] == "MSCL" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "MSCL", &fMSCL );
          }
-	 else if( iTrainingVariables[t] == "EmissionHeight" )
+	 else if( iTrainingVariables[t] == "EmissionHeight" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "EmissionHeight", &fEmissionHeight );
          }
-	 else if( iTrainingVariables[t] == "log10(EmissionHeightChi2)" )
+	 else if( iTrainingVariables[t] == "log10(EmissionHeightChi2)" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "log10(EmissionHeightChi2)", &fEmissionHeightChi2_log10 );
          }
@@ -298,53 +311,53 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	 {
 	    fTMVAReader.back()->AddVariable( "NImages", &fNImages );
          }
-	 else if( iTrainingVariables[t] == "dE" ) 
+	 else if( iTrainingVariables[t] == "dE" && !iVariableIsASpectator[t] ) 
 	 {
 	    fTMVAReader.back()->AddVariable( "dE", &fdE );
          }
-	 else if( iTrainingVariables[t] == "EChi2" )
+	 else if( iTrainingVariables[t] == "EChi2" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "EChi2", &fEChi2 );
          }
-	 else if( iTrainingVariables[t] == "log10(EChi2)" ) 
+	 else if( iTrainingVariables[t] == "log10(EChi2)" && !iVariableIsASpectator[t] ) 
 	 {
 	    fTMVAReader.back()->AddVariable( "log10(EChi2)", &fEChi2_log10 );
          }
-	 else if( iTrainingVariables[t] == "dES" ) 
+	 else if( iTrainingVariables[t] == "dES" && !iVariableIsASpectator[t] ) 
 	 {
 	    fTMVAReader.back()->AddVariable( "dES", &fdES );
          }
-	 else if( iTrainingVariables[t] == "log10(SizeSecondMax)" ) 
+	 else if( iTrainingVariables[t] == "log10(SizeSecondMax)" && !iVariableIsASpectator[t] ) 
 	 {
 	    fTMVAReader.back()->AddVariable( "log10(SizeSecondMax)", &fSizeSecondMax_log10 );
          }
-	 else if( iTrainingVariables[t] == "EChi2S" )
+	 else if( iTrainingVariables[t] == "EChi2S" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "EChi2S", &fEChi2S );
          }
-	 else if( iTrainingVariables[t] == "log10(EChi2S)" )   
+	 else if( iTrainingVariables[t] == "log10(EChi2S)" && !iVariableIsASpectator[t] )   
 	 {
 	    fTMVAReader.back()->AddVariable( "log10(EChi2S)", &fEChi2S_log10 );
          }
-	 else if( iTrainingVariables[t] == "(Xoff*Xoff+Yoff*Yoff)" ) 
+	 else if( iTrainingVariables[t] == "(Xoff*Xoff+Yoff*Yoff)" && !iVariableIsASpectator[t] ) 
 	 {
 	    fTMVAReader.back()->AddVariable( "(Xoff*Xoff+Yoff*Yoff)", &fTheta2 ); 
 	    setTMVAThetaCutVariable( true );
          }
-	 else if( iTrainingVariables[t] == "sqrt(Xcore*Xcore+Ycore*Ycore)" )
+	 else if( iTrainingVariables[t] == "sqrt(Xcore*Xcore+Ycore*Ycore)" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "sqrt(Xcore*Xcore+Ycore*Ycore)", &fCoreDist );
          }
 // Note: assume not more then 3 different telescope types
-	 else if( iTrainingVariables[t] == "NImages_Ttype[0]" )
+	 else if( iTrainingVariables[t] == "NImages_Ttype[0]" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "NImages_Ttype[0]", &fImages_Ttype[0] );
          }
-	 else if( iTrainingVariables[t] == "NImages_Ttype[1]" )
+	 else if( iTrainingVariables[t] == "NImages_Ttype[1]" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "NImages_Ttype[1]", &fImages_Ttype[1] );
          }
-	 else if( iTrainingVariables[t] == "NImages_Ttype[2]" )
+	 else if( iTrainingVariables[t] == "NImages_Ttype[2]" && !iVariableIsASpectator[t] )
 	 {
 	    fTMVAReader.back()->AddVariable( "NImages_Ttype[2]", &fImages_Ttype[2] );
          }
@@ -353,7 +366,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	    fTMVAReader.back()->AddSpectator( iTrainingVariables[t].c_str(), &fDummy );
          }
       }
-      cout << "Following variables have been found and are used for TMVA separation: " << endl;
+      cout << "Following " << iTrainingVariables.size() << " variables have been found and are used for TMVA separation: " << endl;
       for( unsigned int t = 0; t < iTrainingVariables.size(); t++ ) 
       {
 	 cout << "\t" << iTrainingVariables[t];
@@ -434,7 +447,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
        fTMVAReader.size() != fEnergyCut_Log10TeV_max.size() ||
        fTMVAReader.size() != fEnergyReconstructionMethod.size() )
    {
-      cout << "VTMVAEvaluator::initializeWeightFiles: error while initilizing TMVA reader (energy vector sizes) ";
+      cout << "VTMVAEvaluator::initializeWeightFiles: error while initializing TMVA reader (energy vector sizes) ";
       cout << fTMVAReader.size() << "\t" << fEnergyCut_Log10TeV_min.size() << "\t";
       cout << fEnergyCut_Log10TeV_max.size() << "\t" << fEnergyReconstructionMethod.size() << endl;
    }
@@ -614,6 +627,7 @@ bool VTMVAEvaluator::evaluate()
 
    if( iEnergybin < fTMVAReader.size() && fTMVAReader[iEnergybin] )
    {
+////////////////////////////
 // box cuts
       if( isBoxCuts() )
       {
@@ -638,6 +652,7 @@ bool VTMVAEvaluator::evaluate()
 	     exit( -1 );
          }
       }
+////////////////////////////
 // all but box cuts (e.g. BDT, NN, etc)
       else
       {
