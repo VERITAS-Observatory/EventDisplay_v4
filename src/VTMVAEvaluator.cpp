@@ -48,6 +48,7 @@ void VTMVAEvaluator::reset()
    setPlotEfficiencyPlotsPerEnergy();
    setSensitivityOptimizationParameters();
    setSensitivityOptimizationFixedSignalEfficiency();
+   setTMVAOptimizationEnergyStepSize();
    setTMVAMethod();
 // default: don't expect that the theta2 cut is performed here   
    setTMVAThetaCutVariable( false );
@@ -209,14 +210,11 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
        }
 // initialize one value per energy bin
        double e = iEnergyData->fEnergyCut_Log10TeV_min;
-       double iStep = 0.25;
-       cout << "NEW ENERGY BIN " << iEnergyData->fEnergyCut_Log10TeV_min << "\t" << iEnergyData->fEnergyCut_Log10TeV_max << endl;
        do
        {
-          cout << "\t" << e << "\t" << iFileNumber.size() << endl;
 	  iFileNumber.push_back( i );
 	  fEnergyCut_Log10TeV_min.push_back( e );
-	  fEnergyCut_Log10TeV_max.push_back( e + iStep );
+	  fEnergyCut_Log10TeV_max.push_back( e + fTMVAOptimizationStepsize );
 	  fEnergyReconstructionMethod.push_back( iEnergyData->fEnergyReconstructionMethod );
 // get requested signal efficiency for this energy bin
 	  fSignalEfficiency.push_back( getSignalEfficiency( iWeightFileIndex_min+i, 
@@ -230,7 +228,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	  fSourceStrengthAtOptimum_CU.push_back( 0. );
 	  sprintf( hname, "MVA%d", i );
 	  fTMVAMethodTag.push_back( hname );
-	  e += iStep;
+	  e += fTMVAOptimizationStepsize;
        } while( e < iEnergyData->fEnergyCut_Log10TeV_max );
        iF.Close();
    }

@@ -87,6 +87,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    double                  fOptmizationMinBackGroundEvents;
    double                  fOptimizationBackgroundAlpha;
    double                  fOptimizationObservingTime_h;
+   double                  fTMVAOptimizationStepsize;
 
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
    bool     fTMVAThetaCutVariableSet;       // check if TMVA provides a theta2 cut variable
@@ -190,13 +191,14 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setSignalEfficiency( double iSignalEfficiency = -99. );
    void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
+   void   setTMVAOptimizationEnergyStepSize( double iStep = 0.25 ) { fTMVAOptimizationStepsize = iStep; }
    void   setTMVACutValue( double iE = -99. );
    void   setTMVACutValue( map< unsigned int, double > iMVA );
    void   setTMVAErrorFraction( double iTMVAErrorFraction_min = 0.2 ) { fTMVAErrorFraction_min = iTMVAErrorFraction_min; }
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 17 );
+   ClassDef(VTMVAEvaluator, 18 );
 };
 
 #endif
