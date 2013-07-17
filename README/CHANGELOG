@@ -1,6 +1,7 @@
 Change log eventdisplay analysis package
 ========================================
 
+
 * 20130717 (GM) optimized lookup tables filling
                 (20% decrease in running time)
 
@@ -15,6 +16,9 @@ Change log eventdisplay analysis package
 
 * 20130709 (GM) major cleanup of spectral energy reconstruction
                 removed a lot of obsolete code 
+
+* 20130709 (LG) Connection to the DB is now done via the new class VDB_Connection
+                (more robust)
 
 * 20130709 (HF) 'fixed several inconsistencies in UL calculation in Helene method
 

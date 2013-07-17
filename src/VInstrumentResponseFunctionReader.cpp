@@ -160,7 +160,10 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     if( !h ) 
     {
        h = get_CTA_IRF_Histograms( "harea_gamma", fWoff );
-       if( !h ) return false;
+       if( !h ) 
+       {
+          return false;
+       }
        bLinX = true;
     }
     gEffArea_Rec = new TGraphAsymmErrors( 1 );

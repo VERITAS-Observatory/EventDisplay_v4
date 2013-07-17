@@ -379,6 +379,63 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c )
     return cC;
 }
 
+bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, double ymax, unsigned int iRelativeDataSetID )
+{
+    char hname[200];
+    char htitle[200];
+    sprintf( hname, "cSensRatio_%d", iRelativeDataSetID );
+    sprintf( htitle, "ratio of sensitivities (relative to %d)", iRelativeDataSetID );
+    TCanvas *cSensRatio = new TCanvas( hname, htitle, 200, 200, 900, 600 );
+    cSensRatio->SetGridy( 0 );
+    cSensRatio->SetGridx( 0 );
+
+    sprintf( hname, "hSensRatio_%d", iRelativeDataSetID );
+    TH1D *hNull = new TH1D( hname, "", 10, log10( fMinEnergy_TeV ), log10( fMaxEnergy_TeV ) );
+    hNull->SetStats( 0 );
+    hNull->SetXTitle( "log_{10} energy [TeV]" );
+    hNull->SetYTitle( "Sensitivity ratio" );
+    hNull->SetMinimum( ymin );
+    hNull->SetMaximum( ymax );
+    hNull->Draw( "" );
+    hNull->Draw( "AH" );
+
+    plot_nullHistogram( cSensRatio, hNull, true , false, 1.2, fMinEnergy_TeV, fMaxEnergy_TeV );
+
+    TLine *iL = new TLine( log10( fMinEnergy_TeV ), 1., log10( fMaxEnergy_TeV ), 1. );
+    iL->SetLineStyle( 2 );
+    iL->SetLineWidth( 3 );
+    iL->Draw();
+
+    if( fData.size() > 0 && fData[0]->gSensitivity )
+    {
+       for( unsigned int i = 1; i < fData.size(); i++ )
+       {
+          TGraphAsymmErrors* g = new TGraphAsymmErrors();
+	  VHistogramUtilities::divide( g, fData[i]->gSensitivity, fData[0]->gSensitivity );
+	  if( g->GetN() > 0 )
+	  {
+	     setGraphPlottingStyle( g, fData[i]->gSensitivity->GetMarkerColor() );
+	     g->Draw( "p" );
+          }
+       }
+    }
+    if( cSensRatio )
+    {
+      plotLegend( cSensRatio, false, true );
+// print results
+      if( iPrint.size() > 0 )
+      {
+	  char hname[2000];
+	  sprintf( hname, "%s-SensitivityRatio.eps", iPrint.c_str() );
+	  if( cSensRatio ) cSensRatio->Print( hname );
+      }
+    }
+
+
+    return true;
+}
+
+
 
 /*
 
@@ -408,6 +465,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
       else         c_temp = a->plotSignalBackgroundRates( cBck, false, 2.e-7, 1. );
       if( c_temp ) cBck = c_temp;
       fillProjectedSensitivityPlot( i, a );
+      fData[i]->gSensitivity = (TGraphAsymmErrors*)a->getSensitivityGraph();
    }
 // print results
    if( cSens )
@@ -434,12 +492,13 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
    return true;
 }
 
-bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown )
+bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown, bool iLeft )
 {
    if( !c ) return false;
    c->cd();
 
    double x = 0.2+0.35;
+   if( iLeft ) x = 0.15;
    double y = 0.65;
    if( iDown ) y -= 0.5;
    double y_yp = y+0.22;
@@ -487,7 +546,12 @@ bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile )
    {
       VPlotWPPhysSensitivityData i_temp;
       istringstream is_stream( is_line );
-      if( !is_stream.eof() ) is_stream >> i_temp.fAnalysis;
+      if( !is_stream.eof() )
+      { 
+         is_stream >> i_temp.fAnalysis;
+// ignore lines with '#' in the beginning
+	 if( i_temp.fAnalysis == "#" ) continue;
+      }
       if( !is_stream.eof() ) is_stream >> i_temp.fSubArray;
       if( !is_stream.eof() ) is_stream >> i_temp.fObservationTime_s;
       else                   i_temp.fObservationTime_s = 50.*3600.;
@@ -545,6 +609,8 @@ VPlotWPPhysSensitivityData::VPlotWPPhysSensitivityData()
    fPlottingLineStyle = 1;
    fPlottingFillStyle = 3001;
    fLegend = "";
+
+   gSensitivity = 0;
 }
 
 /*

@@ -38,6 +38,8 @@ class VPlotWPPhysSensitivityData
    int    fPlottingFillStyle;
    string fLegend;
 
+   TGraphAsymmErrors *gSensitivity;
+
    VPlotWPPhysSensitivityData();
   ~VPlotWPPhysSensitivityData() {}
    void   print();
@@ -64,7 +66,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 
    void    fillProjectedSensitivityPlot( unsigned int i, VSensitivityCalculator *iS );
    void    initialProjectedSensitivityPlots();
-   bool    plotLegend( TCanvas *c = 0, bool iLeft = false );
+   bool    plotLegend( TCanvas *c = 0, bool iDown = false, bool iLeft = false );
 
    public:
 
@@ -80,6 +82,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    TCanvas* plotProjectedSensitivities( TCanvas* );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
+   bool plotSensitivityRatio( string iPrint, double ymin = 0.1, double ymax = 2., unsigned int iRelativeDataSetID = 0 );
    void reset();
    void setCrabSpectraFile( string iFile = "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat",
                             unsigned int iSpectraID = 6 )

@@ -503,3 +503,39 @@ TH1* VHistogramUtilities::normalizeTH1( TH1 *h, bool iIntegral )
 
    return h;
 }
+
+bool VHistogramUtilities::divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, double epsilon )
+{
+   if( !g || !g1 || !g2 ) return false;
+
+   double x1 = 0.;
+   double y1 = 0.;
+   double x2 = 0.;
+   double y2 = 0.;
+
+   int z = 0;
+   for( int i = 0; i < g1->GetN(); i++ )
+   {
+       g1->GetPoint( i, x1, y1 );
+
+       for( int j = 0; j < g2->GetN(); j++ )
+       {
+           g2->GetPoint( j, x2, y2 );
+
+	   if( TMath::Abs( x1 - x2 ) < epsilon && y1 != 0. && y2 != 0. )
+	   {
+	       double y = y2 / y1;
+	       g->SetPoint( z, x1, y );
+
+	       double iErr1 = 1./y1 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) );
+	       double iErr2 = 1./y2 * 0.5 * ( g2->GetErrorYhigh( j ) + g2->GetErrorYlow( j ) );
+	       double yErr = y * sqrt( iErr1*iErr1 + iErr2*iErr2 );
+	       g->SetPointError( z, g1->GetErrorXlow( i ), g1->GetErrorXhigh( i ), yErr, yErr );
+	       z++;
+	       break;
+	   }
+       }
+   }
+
+   return true;
+}

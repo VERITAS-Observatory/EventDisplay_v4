@@ -623,7 +623,8 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
                                                  fPlottingMarkerStyle, fPlottingMarkerSize, 
 						 fPlottingFillStyle, fPlottingLineStyle );
 
-    gSensitivityvsEnergy->Draw( "l5" );
+//    gSensitivityvsEnergy->Draw( "l5" );
+    gSensitivityvsEnergy->Draw( "lp" );
 
     cSensitivity->Update();
 

@@ -84,6 +84,7 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile )
    a.addDataSets( iDataSetFile );
    a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3 );
    a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
+   a.plotSensitivityRatio( fPrintingOptions, 0.01, 2.1 );
 }
 
 /*

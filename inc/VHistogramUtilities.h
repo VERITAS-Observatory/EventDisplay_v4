@@ -33,6 +33,7 @@ class VHistogramUtilities
     VHistogramUtilities();
    ~VHistogramUtilities() {}
 
+   static bool      divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, double epsilon = 1.e-3 );
    int              findBinInGraph( TGraph *g, double x );
    TH1D*            get_Bin_Distribution( TH2D *h, int ion, double rmax, double rSource, bool iDiff, TH2D *hTest );
    TH1D*            get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right );
