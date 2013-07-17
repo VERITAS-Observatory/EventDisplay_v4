@@ -78,6 +78,9 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 # removed too small HE bin (2013/05/07)
 EMIN=( -2.50 -2.00 -1.50 -1.00 -0.50 0.00 0.50 1.25 )
 EMAX=( -1.50 -1.25 -0.75 -0.25  0.25 0.75 1.50 2.50 )
+# one TMVA per energy bin
+#EMIN=( -2.05 -1.85 -1.65 -1.45 -1.25 -1.05 -0.85 -0.65 -0.45 -0.25 -0.05 0.15 0.35 0.55 0.75 0.95 1.15 1.35 1.55 1.75 )
+#EMAX=( -1.35 -1.15 -0.95 -0.75 -0.55 -0.35 -0.15  0.05  0.25  0.45  0.65 0.85 1.05 1.25 1.45 1.65 1.85 2.05 2.25 2.45 )
 NENE=${#EMIN[@]}
 #####################################
 # 
@@ -106,10 +109,12 @@ fi
 
 # log files
 DATE=`date +"%y%m%d"`
-#QDIR=$CTA_USER_LOG_DIR/$DATE/TMVATRAINING/
-#mkdir -p $QDIR
+LDIR=$CTA_USER_LOG_DIR/$DATE/TMVATRAINING/
+mkdir -p $LDIR
 QDIR="/dev/null"
-echo "log directory: " $QDIR
+QDIR=$LDIR
+echo "log directory: " $LDIR
+echo "queue log directory: " $QDIR
 
 # script name template
 FSCRIPT="CTA.TMVA.qsub_train"
@@ -169,7 +174,7 @@ do
          fi
 
 # run script
-	 FNAM=$ODIR/$FSCRIPT.$ARRAY"_$i"
+	 FNAM=$LDIR/$FSCRIPT.$DSET.$ARRAY.$2."_$i"
 
 	 sed -e "s|RUNPARA|$RFIL|" $FSCRIPT.sh > $FNAM-1.sh
 	 sed -e "s|OFIL|$ODIR/$OFIL"_$i"|" $FNAM-1.sh > $FNAM.sh
@@ -180,10 +185,7 @@ do
 
 #################################
 # submit job to queue
-# medium queue: BDT 
-	 qsub -js 200 -V -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
-# long queue: needed for box cut optimization
-#         qsub -V -l h_cpu=38:00:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
+	 qsub -V -l os="sl*" -l h_cpu=41:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
      done
   done
 done

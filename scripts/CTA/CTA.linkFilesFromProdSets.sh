@@ -34,7 +34,7 @@ do
    echo $ODIR
 #   ln -f -s $SDIR/gamma* $ODIR/
 #   ln -f -s $SDIR/elec* $ODIR/
-   ln -f -s $SDIR/prot* $ODIR/
+   ln -s $SDIR/*.root $ODIR/
 done
 
 exit

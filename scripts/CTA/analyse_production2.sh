@@ -14,24 +14,54 @@ fi
 RUN="$1"
 
 
-SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-SAC100-North" "prod2-Aar-South" "prod2-Leoncito-South" "prod2-SAC084-South" "prod2-SAC100-South" "prod2-Aar-NS" "prod2-Leoncito-NS" "prod2-SAC084-NS" "prod2-SAC100-NS" )
-SITE=( "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-NS" )
-SITE=( "prod2-SAC084-North" "prod2-SAC084-South" "prod2-SAC100-North" "prod2-SAC100-South" "prod2-Aar-South" )
+#####################################
+# output directory for script parameter files
+PDIR="$CTA_USER_LOG_DIR/tempRunParameterDir/"
+mkdir -p $PDIR
 
+#####################################
+# sites
+# for evndisp and MSCW analysis
+SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-Aar-South" "prod2-Leoncito-South" "prod2-SAC084-South" "prod2-G-Leoncito-North" "prod2-G-Leoncito-South" "prod2-SAC100-North" "prod2-SAC100-South" )
+# for all other analysis
+SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-Aar-South" "prod2-Leoncito-South" "prod2-SAC084-South" "prod2-SAC100-North" "prod2-SAC100-South" )
+SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-Aar-South" "prod2-SAC084-South" "prod2-SAC100-North" "prod2-SAC100-South" )
+SITE=( "prod2-Leoncito-South" )
+
+#####################################
+# particle types
 PARTICLE=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 
-RECID="1 2 3"
+#####################################
+# reconstruction IDs
 RECID="0"
+RECID="0 1 2 3"
 
-ARRAY="subArray.prod2red.list"
+#####################################
+# energy reconstruction
+EREC="1"
+
+#####################################
+# observing time [h]
+OBSTIME="50"
+
+#####################################
+# sub array lists
 ARRAY="subArray.2a.list"
-DATE="d20130702"
+ARRAY="subArray.prod2red.list"
+
+#####################################
+# analysis dates
+DATE="d20130711"
+TDATE="d20130702"
 
 NSITE=${#SITE[@]}
 for (( m = 0; m < $NSITE ; m++ ))
 do
    S=${SITE[$m]}
 
+   echo
+   echo "======================================================================================"
    echo "SITE: $S"
    echo "RUN: $RUN"
 
@@ -64,28 +94,40 @@ do
 # loop over all reconstruction IDs
     for ID in $RECID
     do
-       PARA="$CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.prod2.ID$ID.runparameter"
-       EFFDIR="/lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/$S/EffectiveArea-ID$ID-$DATE/"
+# set run parameter file
+       PARA="$PDIR/scriptsInput.prod2.Erec$EREC.ID$ID.$S.runparameter"
+       rm -f $PARA
+       touch $PARA
+       echo "WRITING PARAMETERFILE $PARA"
+       EFFDIR="EffectiveArea-"$OBSTIME"h-Erec$EREC-ID$ID-$DATE"
+       echo "MSCWSUBDIRECTORY Analysis-ID$ID-$DATE" >> $PARA
+       echo "TMVASUBDIR BDT-Erec$EREC-ID$ID-$DATE" >> $PARA
+       echo "EFFAREASUBDIR $EFFDIR" >> $PARA
+       echo "RECID $ID" >> $PARA
+       echo "ENERGYRECONSTRUCTIONMETHOD $EREC" >> $PARA
+       echo "NIMAGESMIN 2" >> $PARA
+       echo "OBSERVINGTIME_H $OBSTIME" >> $PARA
+       EFFDIR="/lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/$S/$EFFDIR/"
 # make tables
        if [[ $RUN == "MAKETABLES" ]]
        then
-	  ./CTA.MSCW_ENERGY.sub_make_tables.sh tables_CTA-$S-ID$ID-$DATE $ID $ARRAY onSource $S
-	  ./CTA.MSCW_ENERGY.sub_make_tables.sh tables_CTA-$S-ID$ID-$DATE $ID $ARRAY cone10 $S
+	  ./CTA.MSCW_ENERGY.sub_make_tables.sh tables_CTA-$S-ID$ID-$TDATE $ID $ARRAY onSource $S
+	  ./CTA.MSCW_ENERGY.sub_make_tables.sh tables_CTA-$S-ID$ID-$TDATE $ID $ARRAY cone10 $S
 # combine tables
        elif [[ $RUN == "COMBINETABLE" ]]
        then
-	   ./CTA.MSCW_ENERGY.combine_tables.sh tables_CTA-$S-ID$ID-$DATE $ARRAY tables_CTA-$S-ID$ID-$DATE $CTA_USER_DATA_DIR/analysis/AnalysisData/$S/Tables/ $S
-	   mv -v -i $CTA_USER_DATA_DIR/analysis/AnalysisData/Tables/tables_CTA-$S-ID$ID-$DATE*.root $CTA_EVNDISP_AUX_DIR/Tables/
+	   ./CTA.MSCW_ENERGY.combine_tables.sh tables_CTA-$S-ID$ID-$TDATE $ARRAY tables_CTA-$S-ID$ID-$DATE $CTA_USER_DATA_DIR/analysis/AnalysisData/$S/Tables/ $S
+	   mv -v -i $CTA_USER_DATA_DIR/analysis/AnalysisData/Tables/tables_CTA-$S-ID$ID-$TDATE*.root $CTA_EVNDISP_AUX_DIR/Tables/
 # analyse with lookup tables
        elif [[ $RUN == "ANATABLES" ]]
        then
-	  TABLE="tables_CTA-$S-ID$ID-$DATE"
+	  TABLE="tables_CTA-$S-ID$ID-$TDATE"
 	  if [[ $S == "prod2-G-Leoncito-North" ]]
 	  then
-	     TABLE="tables_CTA-prod2-Leoncito-North-ID$ID-$DATE"
+	     TABLE="tables_CTA-prod2-Leoncito-North-ID$ID-$TDATE"
 	  elif [[ $S == "prod2-G-Leoncito-South" ]]
 	  then
-	     TABLE="tables_CTA-prod2-Leoncito-South-ID$ID-$DATE"
+	     TABLE="tables_CTA-prod2-Leoncito-South-ID$ID-$TDATE"
 	  fi
 	  echo $TABLE
 	  ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TABLE $ID $ARRAY $S $PARA
@@ -113,9 +155,7 @@ do
 # CTA WP Phys files
        elif [[ $RUN == "PHYS" ]]
        then
-	 ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.$DATE 50. DESY.$DATE.ID$ID.$S 1 $ID $S
-	 ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.$DATE 5. DESY.$DATE.ID$ID.$S 1 $ID $S
-	 ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.$DATE 0.5 DESY.$DATE.ID$ID.$S 1 $ID $S
+	 ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.$DATE $OBSTIME DESY.$DATE.Erec$EREC.ID$ID.$S 0 $ID $S
 # unknown run set
        elif [[ $RUN != "EVNDISP" ]]
        then
@@ -123,4 +163,6 @@ do
 	   exit
        fi
    done
+   echo 
+   echo
 done
