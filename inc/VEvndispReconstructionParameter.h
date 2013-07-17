@@ -80,7 +80,8 @@ class VEvndispReconstructionParameter : public TNamed
         VEvndispReconstructionParameter( vector< ULong64_t > itel_type, VEvndispRunParameter* iRunPara );
         ~VEvndispReconstructionParameter() {}
 
-	bool   applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, VImageParameter* iImageParameter );
+	bool   applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, 
+	                               VImageParameter* iImageParameter, unsigned short int iLocalTriggerType );
         int    getTelescopeType_counter( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea_and_PixelSize( ULong64_t t );
@@ -91,6 +92,6 @@ class VEvndispReconstructionParameter : public TNamed
         unsigned int read_arrayAnalysisCuts( string ifile );
 	void   setDebug( bool iD = false ) { fDebug = iD; }
 
-        ClassDef(VEvndispReconstructionParameter,14);
+        ClassDef(VEvndispReconstructionParameter,15);
 };
 #endif

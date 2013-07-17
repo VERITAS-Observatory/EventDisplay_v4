@@ -599,7 +599,9 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 	   continue;
         }
 // apply array analysis cuts
-        getShowerParameters()->fTelIDImageSelected[iMeth].back() = fEvndispReconstructionParameter->applyArrayAnalysisCuts( iMeth, t, iTelType, getImageParameters( getRunParameter()->fImageLL ) );
+        getShowerParameters()->fTelIDImageSelected[iMeth].back() = fEvndispReconstructionParameter->applyArrayAnalysisCuts( iMeth, t, iTelType,
+	                                                                                                                    getImageParameters( getRunParameter()->fImageLL ),
+															    getReader()->getLocalTriggerType( t ) );
 
 ///////////////////////////
 
@@ -613,7 +615,6 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
             getShowerParameters()->fShowerNumImages[iMeth]++;
         }
 
-// C. Duke 19Oct06  bitmapped list of images
         bitset<8*sizeof(unsigned long)> i_nimage;
         if( fNTel < i_nimage.size() )
         {

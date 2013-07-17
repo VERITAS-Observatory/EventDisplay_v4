@@ -1,8 +1,6 @@
 /*! \class VImageAnalyzer
   \brief class for analyzing VERITAS data
 
-  Revision $Id: VImageAnalyzer.cpp,v 1.90.2.6.4.11.10.10.2.10.4.8.2.3.2.3.2.5.2.1.2.5.2.9.2.7.2.3.2.1.2.1 2011/04/21 10:03:36 gmaier Exp $
-
   \author
   Jamie Holder
   Gernot Maier
@@ -83,14 +81,14 @@ void VImageAnalyzer::doAnalysis()
         findDeadChans( false, false );
         findDeadChans( true, false );
     }
-    bool bInit = initEvent();
+    initEvent();
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // don't do analysis if init event failed or if there was no array trigger
     bool bTrigger = getReader()->hasArrayTrigger();
 // for DSTs, require additionally a local trigger
     if( getRunParameter()->fsourcetype == 7 ) bTrigger = getReader()->hasArrayTrigger() && getReader()->hasLocalTrigger( getTelID());
-    if( !bInit || !bTrigger )
+    if( !bTrigger )
     {
         fillOutputTree();
         setSums( 0. );
@@ -101,8 +99,6 @@ void VImageAnalyzer::doAnalysis()
         setImageBorderNeighbour( false );
         setHiLo( false );
 	setZeroSuppressed( false );
-        getImageParameters()->reset();
-        if( fRunPar->fImageLL ) getImageParameters( fRunPar->fImageLL )->reset();
         return;
     }
     if( getDebugFlag() ) cout << "VAnalysis:doAnalysis array trigger: " << getReader()->hasArrayTrigger() << endl;
@@ -253,7 +249,10 @@ void VImageAnalyzer::doAnalysis()
             fVImageParameterCalculation->setParametersLogL( getImageParametersLogL() );
             setLLEst( fVImageParameterCalculation->calcLL() );
         }
-        else getImageParameters( fRunPar->fImageLL )->reset();
+        else
+	{
+	   getImageParameters( fRunPar->fImageLL )->reset();
+        }
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////

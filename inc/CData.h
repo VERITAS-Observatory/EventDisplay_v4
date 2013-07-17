@@ -46,12 +46,6 @@ class CData
         Double_t        TelAzimuth[VDST_MAXTELESCOPES];
         Double_t        TelDec[VDST_MAXTELESCOPES];
         Double_t        TelRA[VDST_MAXTELESCOPES];
-        Double_t        TargetElev;
-        Double_t        TargetAz;
-        Double_t        TargetDec;
-        Double_t        TargetRA;
-        Double_t        WobbleN;
-        Double_t        WobbleE;
 // MC parameters
         Int_t           MCprimary;
         Double_t        MCe0;
@@ -183,12 +177,6 @@ class CData
         TBranch        *b_TelAzimuth;             //!
         TBranch        *b_TelDec;                 //!
         TBranch        *b_TelRA;                  //!
-        TBranch        *b_TargetElev;             //!
-        TBranch        *b_TargetAz;               //!
-        TBranch        *b_TargetDec;              //!
-        TBranch        *b_TargetRA;               //!
-        TBranch        *b_WobbleN;                //!
-        TBranch        *b_WobbleE;                //!
 // MC parameter
 	TBranch        *b_MCprimary;
         TBranch        *b_MCe0;                   //!
@@ -432,12 +420,6 @@ void CData::Init(TTree *tree)
     {
         fChain->SetBranchAddress("TelDec",TelDec);
         fChain->SetBranchAddress("TelRA",TelRA);
-        fChain->SetBranchAddress("TargetElev",&TargetElev);
-        fChain->SetBranchAddress("TargetAz",&TargetAz);
-        fChain->SetBranchAddress("TargetDec",&TargetDec);
-        fChain->SetBranchAddress("TargetRA",&TargetRA);
-        fChain->SetBranchAddress("WobbleN",&WobbleN);
-        fChain->SetBranchAddress("WobbleE",&WobbleE);
     }
     else
     {
@@ -446,12 +428,6 @@ void CData::Init(TTree *tree)
             TelDec[i] = 0.;
             TelRA[i] = 0.;
         }
-        TargetElev = 0.;
-        TargetAz = 0.;
-        TargetDec = 0.;
-        TargetRA = 0.;
-        WobbleN = 0.;
-        WobbleE = 0.;
     }
 
 // MC tree
@@ -753,12 +729,6 @@ Bool_t CData::Notify()
     b_TelAzimuth = fChain->GetBranch("TelAzimuth");
     b_TelDec = fChain->GetBranch("TelDec");
     b_TelRA = fChain->GetBranch("TelRA");
-    b_TargetElev = fChain->GetBranch("TargetElev");
-    b_TargetAz = fChain->GetBranch("TargetAz");
-    b_TargetDec = fChain->GetBranch("TargetDec");
-    b_TargetRA = fChain->GetBranch("TargetRA");
-    b_WobbleN = fChain->GetBranch("WobbleN");
-    b_WobbleE = fChain->GetBranch("WobbleE");
 
     if( fMC )
     {

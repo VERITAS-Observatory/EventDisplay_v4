@@ -3,8 +3,6 @@
 
     variables called VARNAME_SC are in shower coordinates
 
-    Revision $Id: VImageParameter.cpp,v 1.22.2.2.4.2.4.1.4.2.2.2.4.3.2.1.2.1.6.1.2.8.2.3.4.1 2011/03/29 12:52:05 gmaier Exp $
-
     \author
       Jamie Holder
       Gernot Maier

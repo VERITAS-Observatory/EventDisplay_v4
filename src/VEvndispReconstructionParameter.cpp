@@ -49,7 +49,8 @@ void VEvndispReconstructionParameter::reset()
 /*
      apply array analysis cuts for this set of image parameters
 */
-bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, VImageParameter* iImageParameter )
+bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, 
+                                                              VImageParameter* iImageParameter, unsigned short int iLocalTriggerType )
 {
 // sanity checks
    if( iMeth >= fNMethods )
@@ -86,15 +87,17 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 // L2 trigger type (mainly for CTA prod2)
    if( fL2TriggerType[iMeth][iTelType] != 9999 )
    {
-      bitset< 8 > i_L2TrigType( iImageParameter->fTrig_type );
+      bitset< 8 > i_L2TrigType( iLocalTriggerType );
       if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
       {
 	 iArrayCut = false;
+
 	 if( fDebug )
 	 {
-	    cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut (meth " << iMeth << "): L2 trigger type ";
-	    cout << iImageParameter->fTrig_type << ", " << i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] );
-	    cout << " (" << fL2TriggerType[iMeth][iTelType] << ")" << endl;
+	    cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut Tel " << iTel+1 << ", type " << iTelType;
+	    cout << " (meth " << iMeth << "): L2 trigger type ";
+	    cout << iLocalTriggerType << " (" << iImageParameter->fTrig_type << ")  test: " << i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] );
+	    cout << " (require " << fL2TriggerType[iMeth][iTelType] << ")" << endl;
          }
       }
    }
