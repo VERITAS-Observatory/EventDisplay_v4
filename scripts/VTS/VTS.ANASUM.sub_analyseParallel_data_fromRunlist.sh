@@ -45,37 +45,18 @@ fi
 
 #########################################
 # cut definitions
-if [[ "$CUTS" == *GRB* ]]
+if [[ "$CUTS" == *super* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-SuperSoft.dat"
-   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-$ATMO-V6-T1234-d20130521.root"
-   RADACC="radialAcceptance-d20130411-cut-N2-Point-005CU-SuperSoft-V6-T1234.root"
-elif [[ "$CUTS" == *super* ]]
-then
-#   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft.dat"
-#   CUTFILE="ANASUM.GammaHadron.d20130202-cut-N2-Point-005CU-SuperSoft-MaxErec.dat"
-#   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-CC-d20121424.root"
-#   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
-#   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
-   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-SuperSoft.dat"
-   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-$ATMO-V6-T1234-d20130521.root"
-   RADACC="radialAcceptance-d20130411-cut-N2-Point-005CU-SuperSoft-V6-T1234.root"
+   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-$ATMO-EPOCHSETTING-T1234-d20130521.root"
+   RADACC="radialAcceptance-d20130411-d20130411-cut-N2-Point-005CU-SuperSoft-EPOCHSETTING-T1234.root"
 elif [[ "$CUTS" == *soft* ]]
 then
-#   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
-#   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N2-Point-005CU-Soft.dat"
-#   EFFAREA="effArea-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
-#   RADACC="radialAcceptance-d20120909-cut-N2-Point-005CU-Soft-EPOCHSETTING-d20121218.root"
    CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
    EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20130521.root"
    RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-EPOCHSETTING-T1234.root"
 elif [[ $CUTS = *moderate* ]]
 then
-#   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218_T123.root"
-#   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T123-d20121218.root"
-#   CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Moderate.dat"
-#   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
-#   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
    CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Moderate.dat"
    EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20130521.root"
    RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
