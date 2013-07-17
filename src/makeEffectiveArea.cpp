@@ -1,14 +1,11 @@
 /*! \file  makeEffectiveArea
- *  \brief get effective area from simulations
- *
- *   fill effective areas calculated from gamma-ray simulations for different zenith angles
+ *  \brief get effective area and calculate instrument response functions from simulations
  *
  *   input is a file list of mscw_energy output file from gamma-ray simulations
  *
  * \author
  *   Gernot Maier
  *
- *  Revision $Id: makeEffectiveArea.cpp,v 1.10.2.10.4.9.10.3.2.12.4.1.2.6.2.2.6.1.2.5.2.16.2.1.2.14 2011/04/08 13:57:28 gmaier Exp $
  */
 
 #include "TChain.h"

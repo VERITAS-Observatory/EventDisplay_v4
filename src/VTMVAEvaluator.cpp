@@ -138,6 +138,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
    fBoxCutValue_Name.clear();
    fEnergyCut_Log10TeV_min.clear();
    fEnergyCut_Log10TeV_max.clear();
+   fSpectralWeightedMeanEnergy_Log10TeV.clear();
    fSignalEfficiency.clear();
    fSourceStrengthAtOptimum_CU.clear();
    vector< unsigned int > iFileNumber;
@@ -215,6 +216,10 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
 	  iFileNumber.push_back( i );
 	  fEnergyCut_Log10TeV_min.push_back( e );
 	  fEnergyCut_Log10TeV_max.push_back( e + fTMVAOptimizationStepsize );
+          fSpectralWeightedMeanEnergy_Log10TeV.push_back( 
+	            VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min.back(), 
+		                                                       fEnergyCut_Log10TeV_max.back(), 
+								       fSpectralIndexForEnergyWeighting ) );
 	  fEnergyReconstructionMethod.push_back( iEnergyData->fEnergyReconstructionMethod );
 // get requested signal efficiency for this energy bin
 	  fSignalEfficiency.push_back( getSignalEfficiency( iWeightFileIndex_min+i, 
@@ -470,6 +475,7 @@ void VTMVAEvaluator::fillTMVAEvaluatorResults()
    {
        fTMVAEvaluatorResults->fEnergyCut_Log10TeV_min = fEnergyCut_Log10TeV_min;
        fTMVAEvaluatorResults->fEnergyCut_Log10TeV_max = fEnergyCut_Log10TeV_max;
+       fTMVAEvaluatorResults->fSpectralWeightedMeanEnergy_Log10TeV = fSpectralWeightedMeanEnergy_Log10TeV;
        fTMVAEvaluatorResults->fSignalEfficiency = fSignalEfficiency;
        fTMVAEvaluatorResults->fBackgroundEfficiency = fBackgroundEfficiency;
        fTMVAEvaluatorResults->fTMVAOptimumCutValueFound = fTMVAOptimumCutValueFound;
@@ -1244,6 +1250,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
       }
       i_on->GetPoint( i_on->GetN()-1, x, y );
       if( iSpectralWeightedMeanEnergy_TeV > x ) iSpectralWeightedMeanEnergy_TeV = TMath::Log10( TMath::Power( 10., x ) * 0.8 );
+      fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] = iSpectralWeightedMeanEnergy_TeV;
    }
    else
    {
@@ -1258,8 +1265,8 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    double Nof = 0.;
    double Ndif = 0.;
 
-   Non = i_on->Eval( iSpectralWeightedMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
-   Nof = i_of->Eval( iSpectralWeightedMeanEnergy_TeV ) * fOptimizationObservingTime_h * 60.;
+   Non = i_on->Eval( fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] ) * fOptimizationObservingTime_h * 60.;
+   Nof = i_of->Eval( fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] ) * fOptimizationObservingTime_h * 60.;
    if( Nof < 0. ) Nof = 0.;
    Ndif= Non - Nof;
 
@@ -1269,7 +1276,7 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    cout << " ndif = " << Ndif << " (1 CU)" << endl;
    cout << "VTVMAEvaluator::getOptimalSignalEfficiency event numbers: ";
    cout << " (energy bin " << iEnergyBin << ", " << TMath::Power( 10., iMeanEnergy_TeV ) << " [TeV],";
-   cout << " weighted mean energy " << TMath::Power( 10., iSpectralWeightedMeanEnergy_TeV ) << " [TeV] )";
+   cout << " weighted mean energy " << TMath::Power( 10., fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] ) << " [TeV] )";
    cout << endl;
        
 /////////////////////////////////////////////////////////////////
@@ -1582,11 +1589,21 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    cout << ", background efficiency: " << i_BackgroundEfficiency_AtMaximum << endl;
 ////////////////////////////////////////////////////////////////
 
+// get mean energy for this bin
+   double iMeanEnergyAfterCuts = getMeanEnergyAfterCut( &iTMVAFile, i_TMVACutValue_AtMaximum, fEnergyCut_Log10TeV_min[iEnergyBin],
+                                                        fEnergyCut_Log10TeV_max[iEnergyBin],
+                                                        fTMVAMethodName, fEnergyReconstructionMethod[iEnergyBin] );
+   cout << "Mean energy after cuts [TeV]: " << iMeanEnergyAfterCuts << endl;
+
 // fill results into data vectors
    if( iEnergyBin < fSignalEfficiency.size() )     fSignalEfficiency[iEnergyBin]     = i_SignalEfficiency_AtMaximum;
    if( iEnergyBin < fBackgroundEfficiency.size() ) fBackgroundEfficiency[iEnergyBin] = i_BackgroundEfficiency_AtMaximum;
    if( iEnergyBin < fTMVACutValue.size() )         fTMVACutValue[iEnergyBin]         = i_TMVACutValue_AtMaximum;
    if( iEnergyBin < fSourceStrengthAtOptimum_CU.size() ) fSourceStrengthAtOptimum_CU[iEnergyBin] = i_SourceStrength_atMaximum;
+   if( iEnergyBin < fSpectralWeightedMeanEnergy_Log10TeV.size() && iMeanEnergyAfterCuts > 0. ) 
+   {
+      fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] = log10( iMeanEnergyAfterCuts );
+   }
 
 // plot optimziation procedure and event numbers
    if( bPlotEfficiencyPlotsPerEnergy )
@@ -1797,3 +1814,42 @@ void VTMVAEvaluator::printSensitivityOptimizationParameters()
      cout << "\t" << fOptmizationMinSignalEvents << " minimum number of on events" << endl;
      cout << "\t" << fOptimizationBackgroundAlpha << " signal to background area ratio" << endl;
 }    
+
+double VTMVAEvaluator::getMeanEnergyAfterCut( TFile *f, double iCut, double iEmin, double iEmax,
+                                              string iMethodName, unsigned int iEnergyReconstructionMethod )
+{
+   if( !f ) return -99.;
+   iEmin = TMath::Power( 10., iEmin );
+   iEmax = TMath::Power( 10., iEmax );
+   TTree *t = (TTree*)f->Get( "TrainTree" );
+   if( !t )
+   {
+       cout << "VTMVAEvaluator::getMeanEnergyAfterCut(): test tree not found in " << f->GetName() << endl;
+       return -99.;
+   }
+   float iErec = 0.;
+   float iMVA = 0.;
+   int classID;
+   if( iEnergyReconstructionMethod == 0 )      t->SetBranchAddress( "Erec", &iErec );
+   else if( iEnergyReconstructionMethod == 1 ) t->SetBranchAddress( "ErecS", &iErec );                                      
+   ostringstream iCutName;
+   iCutName << iMethodName << "_0";
+   t->SetBranchAddress( iCutName.str().c_str(), &iMVA );
+   t->SetBranchAddress( "classID", &classID );
+
+   float n = 0.;
+   float m = 0.;
+   for( int i = 0; i < t->GetEntries(); i++ )
+   {
+       t->GetEntry( i );
+
+       if( classID == 0 && iErec > 0. && iErec > iEmin && iErec < iEmax && iMVA > iCut )
+       {
+          m += iErec;
+	  n++;
+       }
+    }
+    if( n > 0. ) return m/n;
+
+    return -99.;
+}

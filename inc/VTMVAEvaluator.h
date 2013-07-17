@@ -43,6 +43,7 @@ class VTMVAEvaluatorResults : public TNamed
 
     vector< double >        fEnergyCut_Log10TeV_min;
     vector< double >        fEnergyCut_Log10TeV_max;
+    vector< double >        fSpectralWeightedMeanEnergy_Log10TeV;
     vector< double >        fSignalEfficiency;                // from user or best signal/sqrt(noise)
     vector< double >        fBackgroundEfficiency;            // from best signal/sqrt(noise)
     vector< double >        fTMVACutValue;
@@ -52,7 +53,7 @@ class VTMVAEvaluatorResults : public TNamed
     VTMVAEvaluatorResults() {}
    ~VTMVAEvaluatorResults() {}
 
-   ClassDef(VTMVAEvaluatorResults, 1 );
+   ClassDef(VTMVAEvaluatorResults, 2 );
 };
 
 class VTMVAEvaluator : public TNamed, public VPlotUtilities
@@ -68,6 +69,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    vector< TMVA::Reader* > fTMVAReader;
    vector< double >        fEnergyCut_Log10TeV_min;
    vector< double >        fEnergyCut_Log10TeV_max;
+   vector< double >        fSpectralWeightedMeanEnergy_Log10TeV;
    vector< unsigned int >  fEnergyReconstructionMethod;
    vector< TString >       fTMVAMethodTag;
    vector< double >        fSignalEfficiency;                // from user or best signal/sqrt(noise)
@@ -131,6 +133,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool     bPlotEfficiencyPlotsPerEnergy;
 
    TH1F*            getEfficiencyHistogram( string iName, TFile *iF );
+   double           getMeanEnergyAfterCut( TFile *f, double iCut, double iEmin, double iEmax, string iMethodName, unsigned int iEnergyReconstructionMethod );
    bool             optimizeSensitivity( unsigned int i, string iTMVARootFile );
    void             fillTMVAEvaluatorResults();
    double           getSignalEfficiency( unsigned int iEbin, double iE_min, double iE_max );

@@ -3,8 +3,6 @@
  *
  *  \author
  *  Gernot Maier
- *
- *  Revision $Id: VEffectiveAreaCalculator.cpp,v 1.23.2.14.4.9.10.1.2.11.4.1.2.15.2.11.6.2.2.11.2.18.2.1.2.7 2011/03/31 14:50:58 gmaier Exp $
  */
 
 #include "VEffectiveAreaCalculator.h"
