@@ -12,7 +12,7 @@ then
    echo
    echo "  example: "
    echo "           ./VTS.EFFAREA.sub_combineEffectiveAreas.sh $VERITAS_DATA_DIR/analysis/EVDv400/EffectiveAreas/130601/ eff-N3-moderate \ "
-   echo "                        $VERITAS_USER_DATA_DIR/temp/effArea-d20130411-cut-N3-Point-005CU-Moderate \"V5 V6\" \"21 22\" \"0 1 2 3\" "
+   echo "                        $VERITAS_USER_DATA_DIR/temp/effArea-d20130411-cut-N3-Point-005CU-Moderate \"V5 V6\" \"21 22\" \"0 1 2 3 4\" "
    echo
    exit
 fi
@@ -58,6 +58,7 @@ do
 
 # input and output names
 	DDIR=$1/$2-$A-$V/$2-$A-$V-$I*
+	DDIR=$1/$2-$A-$V/*
 
 	OFIL=`basename $3`
 	OFIL="$OFIL-ATM$A-$V-T$T-d20130521"
