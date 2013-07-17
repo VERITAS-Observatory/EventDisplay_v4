@@ -1,6 +1,13 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130717 (GM) added new trigger type for CTA prod2:
+                require simply a minimum number of pe's
+		(default is 30)
+
+* 20130717 (GM) fixed bug in array analysis cuts for trigger types
+                (affects CTA prod2 simulations only)
+
 * 20130709 (GM) major cleanup of spectral energy reconstruction
                 removed a lot of obsolete code 
 

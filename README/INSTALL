@@ -5,8 +5,7 @@ Prerequisites
 =============
 
 (0.1) ROOT must be installed 
-      Recommend versions >= 5.32
-     (basic analysis should work with version >= 5.28)
+      version >= 5.32
 
 VERITAS analysis
 ----------------

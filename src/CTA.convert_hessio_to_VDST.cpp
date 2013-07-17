@@ -56,6 +56,8 @@ map< unsigned int, unsigned int > fTelescopeSimTelList;
 // trigger mask hash set
 struct trgmask_hash_set *fTriggerMask_hash_set = 0;
 #endif
+// minimum number of photo electrons needed for trigger type 4
+int fMinNumber_pe_per_telescope = 30;
 ///////////////////////////////////////////////////////
 
 /*!
@@ -444,6 +446,11 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
                }
 	    }
 #endif
+// add an additional trigger on minimum number of pe
+            if( hsdata->mc_event.mc_pe_list[t].npe > fMinNumber_pe_per_telescope && fData->fDSTL2TrigType[i_ntel_trig] != 99 )
+	    {
+	        fData->fDSTL2TrigType[i_ntel_trig] += 8;
+            }
 	 }
          i_ntel_trig++;
       }
@@ -1329,6 +1336,7 @@ int main(int argc, char **argv)
    else             cout << "No FADC output" << endl;
    if( fDynamicRange > 0 ) cout << "Assume " << fDynamicRange << " bit dynamic range" << endl;
    if( fApplyCameraScaling ) cout << "Apply camera plate scaling for DC (intermediate) telescopes" << endl;
+   if( fMinNumber_pe_per_telescope > 0 ) cout << "Add trigger type #4 for events with >" << fMinNumber_pe_per_telescope << " pe per telescope" << endl;
 
 // new DST tree
    VDSTTree *fDST = new VDSTTree();
