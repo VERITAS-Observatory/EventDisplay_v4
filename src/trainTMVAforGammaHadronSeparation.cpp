@@ -202,14 +202,14 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 	 {
 	    cout << "warning: removed constant variable " << iRun->fTrainingVariable[i] << " from training (added to spectators)" << endl;
 	    factory->AddSpectator( iRun->fTrainingVariable[i].c_str() );
-         }
+         } 
       }
    }
 // adding spectator variables
    for( unsigned int i = 0; i < iRun->fSpectatorVariable.size(); i++ )
    {
       factory->AddSpectator( iRun->fSpectatorVariable[i].c_str() );
-   }
+   } 
 
 //////////////////////////////////////////
 // prepare training events
@@ -272,6 +272,8 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
    factory->TestAllMethods();
 
    factory->EvaluateAllMethods();
+
+   factory->Delete();
 
    return true;
 }
