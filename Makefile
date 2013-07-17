@@ -173,13 +173,13 @@ ifneq ($(HESSIO),FALSE)
 HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 #CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_MAX
 # 2010 PROD1 production
- CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
+# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_ULTRA
 # 2011 PROD1 production for Leeds
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_ULTRA
 # 2011 PROD1 SC 
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 # 2013 PROD2
-#CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_PROD2
+CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_PROD2 -DCTA_PROD2_TRGMASK
 endif
 ########################################################
 # profiler (gperftools)
@@ -219,7 +219,7 @@ all VTS:	evndisp \
 	VTS.getLaserRunFromDB
 
 CTA:	evndisp \
-#        CTA.convert_hessio_to_VDST \
+        CTA.convert_hessio_to_VDST \
         printRunParameter \
 	mscw_energy \
 	combineLookupTables \
@@ -1064,6 +1064,7 @@ CTA.convert_hessio_to_VDST:	./obj/VDSTTree.o \
 				./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 				./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+				$(HESSIOSYS)/out/io_trgmask.o \
 				./obj/CTA.convert_hessio_to_VDST.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) -L$(HESSIOSYS)/lib -lhessio \
 	$(OutPutOpt) ./bin/$@
