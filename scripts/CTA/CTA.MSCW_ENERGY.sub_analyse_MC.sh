@@ -32,7 +32,6 @@ TABLE=$1
 RECID=$2
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $3`
 DSET="$4"
-FILEN=250
 
 #######################################
 # read values from parameter file
@@ -68,7 +67,7 @@ DATE=`date +"%y%m%d"`
 QLOG=/dev/null
 
 # output directory for shell scripts
-SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/MSCW"
+SHELLDIR=$CTA_USER_LOG_DIR/$DATE"/MSCWANA/"
 mkdir -p $SHELLDIR
 
 ###########################
@@ -98,13 +97,19 @@ do
    do
       PART=${VPART[$m]}
 
+      FILEN=500
+      if [ $PART = "proton" ]
+      then
+	 FILEN=1500
+      fi
+
 #########################################
 # input files lists
 
       TMPLIST=$SHELLDIR/MSCW.tmplist.list
       rm -f $TMPLIST
       echo $TMPLIST
-      ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/*.root > $TMPLIST
+      find $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/ -name "*[0-9].root" > $TMPLIST
       echo "total number of files for particle type $PART : "
       NTMPLIST=`wc -l $TMPLIST | awk '{print $1}'`
       echo $NTMPLIST
