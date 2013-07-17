@@ -375,7 +375,7 @@ void VPlotInstrumentResponseFunction::plotEnergyReconstructionMatrix( unsigned i
 	   {
 	      if( h->GetBinContent( j ) > 0 ) i_filled++;
 	   }
-	   if( i_filled <= 3 )
+	   if( i_filled <= 5 )
 	   {
 	      hOff.Fill( yq[1] - i_hRecMatrix->GetYaxis()->GetBinCenter( i ) );   
 	      gReco->SetPoint( zReco, 0., i_hRecMatrix->GetYaxis()->GetBinCenter( i ) );
