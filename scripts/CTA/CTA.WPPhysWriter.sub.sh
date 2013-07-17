@@ -51,45 +51,24 @@ for ARRAY in $VARRAY
 do
    echo "STARTING ARRAY $ARRAY"
 
-   ODIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/WPPhys/
+
+   ODIR=$CTA_USER_DATA_DIR/analysis/WPPhys/
    OXUTNAME=$ODIR/$OUTNAME
    mkdir -p $ODIR
    echo "WP Phys file written to $OXUTNAME"
 
-   rm -f $FDIR/$FSCRIPT-$ARRAY-1.sh
-   cp $FSCRIPT.sh $FDIR/$FSCRIPT-$ARRAY-1.sh
+   FNAM=$FDIR/$FSCRIPT-$ARRAY-$DSET-$OBSTIME.sh
+   cp -f $FSCRIPT.sh $FNAM
 
-   rm -f $FDIR/$FSCRIPT-$ARRAY-2.sh
-   sed -e "s|ARRAY|$ARRAY|" $FDIR/$FSCRIPT-$ARRAY-1.sh > $FDIR/$FSCRIPT-$ARRAY-2.sh
-   rm -f $FDIR/$FSCRIPT-$ARRAY-1.sh
+   sed -i -e "s|ARRAY|$ARRAY|" \
+       -e "s|DDIR|$DDIR|" \
+       -e "s|OBSTIME|$OBSTIME|" \
+       -e "s|OUTNAME|$OXUTNAME|" \
+       -e "s|OFFSET|$OFFSET|" \
+       -e "s|ODIR|$ODIR|" \
+       -e "s|RRRR|$RECID|" $FNAM
 
-   rm -f $FDIR/$FSCRIPT-$ARRAY-3.sh
-   sed -e "s|DDIR|$DDIR|" $FDIR/$FSCRIPT-$ARRAY-2.sh > $FDIR/$FSCRIPT-$ARRAY-3.sh
-   rm -f $FDIR/$FSCRIPT-$ARRAY-2.sh
-
-   rm -f $FDIR/$FSCRIPT-$ARRAY-4.sh
-   sed -e "s|OBSTIME|$OBSTIME|" $FDIR/$FSCRIPT-$ARRAY-3.sh > $FDIR/$FSCRIPT-$ARRAY-4.sh
-   rm -f $FDIR/$FSCRIPT-$ARRAY-3.sh
-
-   rm -f $FDIR/$FSCRIPT-$ARRAY-5.sh
-   sed -e "s|OUTNAME|$OXUTNAME|" $FDIR/$FSCRIPT-$ARRAY-4.sh > $FDIR/$FSCRIPT-$ARRAY-5.sh
-   rm -f $FDIR/$FSCRIPT-$ARRAY-4.sh
-
-   rm -f $FDIR/$FSCRIPT-$ARRAY-6.sh
-   sed -e "s|OFFSET|$OFFSET|" $FDIR/$FSCRIPT-$ARRAY-5.sh > $FDIR/$FSCRIPT-$ARRAY-6.sh
-   rm -f $FDIR/$FSCRIPT-$ARRAY-5.sh
-
-   rm -f $FDIR/$FSCRIPT-$ARRAY-7.sh
-   sed -e "s|ODIR|$ODIR|" $FDIR/$FSCRIPT-$ARRAY-6.sh > $FDIR/$FSCRIPT-$ARRAY-7.sh
-   rm -f $FDIR/$FSCRIPT-$ARRAY-6.sh
-
-   rm -f $FDIR/$FSCRIPT-$ARRAY-8.sh
-   sed -e "s|RRRR|$RECID|" $FDIR/$FSCRIPT-$ARRAY-7.sh > $FDIR/$FSCRIPT-$ARRAY-8.sh
-   rm -f $FDIR/$FSCRIPT-$ARRAY-7.sh
-
-   mv $FDIR/$FSCRIPT-$ARRAY-8.sh $FDIR/$FSCRIPT-$ARRAY.sh
-
-   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FNAM"
 
 done
 
