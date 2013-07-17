@@ -1,6 +1,11 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130717 (GM) optimized lookup tables filling
+                (20% decrease in running time)
+
+* 20130717 (GM) removed obsoled TEL_.. variables from mscw tree
+
 * 20130717 (GM) added new trigger type for CTA prod2:
                 require simply a minimum number of pe's
 		(default is 30)
