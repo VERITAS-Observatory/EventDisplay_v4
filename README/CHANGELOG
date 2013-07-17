@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130717 (GM) added two new command line parameters to overwrite
+                wobble directions read from the VTS DB:
+		-overwriteDB_wobblenorth=FLOAT
+		-overwriteDB_wobbleeast=FLOAT
 
 * 20130717 (GM) optimized lookup tables filling
                 (20% decrease in running time)

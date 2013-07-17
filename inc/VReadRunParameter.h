@@ -35,10 +35,10 @@ class VReadRunParameter
         unsigned int fTelToAna;
         string       fTelToAnaString;
 
-                                                  //!< prel pointing error
         map< unsigned int, double > f_pointingErrorX;
-                                                  //!< prel pointing error
         map< unsigned int, double > f_pointingErrorY;
+	double       fWobbleNorth_overwriteDB;
+	double       fWobbleEast_overwriteDB;
 
 	bool checkSecondArgument(std::string, std::string, bool);
         void isCompiledWithDB();

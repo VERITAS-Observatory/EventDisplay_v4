@@ -25,7 +25,8 @@ General:
 	              				 7=DST (MC) file
 	 -runnumber=INT 			 set runnumber (default: get run number from sourcefile name)
 	 -useDBinfo				 get run info (target, wobble offsets, etc.) from database
-						 (attention, this might overwrite some of the given command line parameters, default: on, switch of with -donotusedbinfo )
+						 (attention, this might overwrite some of the given command line parameters, 
+						 default: on, switch of with -donotusedbinfo )
 	 -nevents=NEVENTS 			 loop over NEVENTS events in display=0 mode (<0 = no limit) (default=-10000)
 	 -firstevent=EVENTNUMBER                 start analysis at event EVENTNUMBER (default=-10000)
 	 -reconstructionparameter FILENAME 	 file with reconstruction parameters (e.g., array analysis cuts)
@@ -35,14 +36,16 @@ Output:
 	 -output FILE.root 			 file with analysis results (FILE=-1 means no output) (default=RUNNUMBER.root)
 	 -writeallMC 				 write all events to showerpars and tpars trees (default: off)
 	 -writenoMCTree 			 do not write MC event tree to output file (default: 1)
-	 -printdeadpixelinfo         print list of the telescope, gain, and channel number of all disabled channels to <runnumber>.evndisp.log
-								 each line will contain the word DEADCHAN for easy grep-ability, and the reason(s) the channel was disabled
+	 -printdeadpixelinfo         		 print list of the telescope, gain, and channel number of all disabled 
+	                                         channels to <runnumber>.evndisp.log 
+						 each line will contain the word DEADCHAN for easy grep-ability, 
+						 and the reason(s) the channel was disabled
 
 Detector definition:
 --------------------
 	 -ntelescopes=INT 			 number of telescopes (any integer, default 4)
-	 -teltoana=INT 				 analyze only these telescopes
-						 (Telescope 1=1,..., Telescopes 2 and 3 = 23, Telescopes 1,2,4 = 124, or 1,2,10,25; default 1234, )
+	 -teltoana=INT 				 analyze only these telescopes (default 1234)
+						 (Telescope 1=1,..., Telescopes 2 and 3 = 23, Telescopes 1,2,4 = 124, or 1,2,10,25)
 	 -camera=CAMERA 			 set detector geometry file (default=veritasBC4_080117_Autumn2007-4.1.2_EVNDISP.cfg)
 	 -vbfnsamples 				 use number of FADC samples from VBF file (default=0)
 
@@ -50,14 +53,15 @@ Calibration:
 ------------
 	 -readcalibdb                            read relative gains and time offsets from offline DB
 	 -calibrationfile FILENAME 		 file with names of pedestal/gain/toffset/pixel status files (assume path $EVNDATA/calibration/)
-	 -lowgaincalibrationfile FILENAME 	 file with names for pedestals and high/low gain multiplier files (assume path $EVNDATA/calibration/)
+	 -lowgaincalibrationfile FILENAME 	 file with names for pedestals and high/low gain multiplier files 
+	                                         (assume path $EVNDATA/calibration/)
 	 -gaincorrection=FLOAT 			 apply correction to gains (default=1)
 	 -usepeds 				 use only true pedestal events (event type=2; use -donotusepeds to switch it off)
 	 -lasermin=INT 				 minimal total charge sum for a event to be a laser event (default=50000)
 	 -l2setspecialchannels FILENAME 	 set special channels for l2 feed into FADC crates (default=specialChannel.dat)
 	 -l2timecorrect=0/1 			 apply FADC stop time corrections based on L2 pulses (default=true)
-	 -Pedestalsumwindow=INT 	 length of sum window for pedestal variations (default=20)
-	 -Pedestalssumfirst=INT 	 start of sum window for pedestal variations (default=0)
+	 -Pedestalsumwindow=INT 	         length of sum window for pedestal variations (default=20)
+	 -Pedestalssumfirst=INT 	         start of sum window for pedestal variations (default=0)
 	 -usePedestalsInTimeSlices=0/1 		 use time dependent pedestals (high gain channels) (default = on(1))
 	 -usePedestalsInTimeSlicesLowGain=0/1 	 use time dependent pedestals (low gain channels) (default = off(0))
 	 -PedestalsInTimeSlices 		 calculate pedestals on short time scale (default=false)
@@ -74,9 +78,12 @@ Pointing:
 	 -rightascension=RA 			 target is at this right ascension (J2000)
 	 -decoffset=DEC 			 offset added to target declination (degrees)
 	 -raoffset=RA 				 offset added to target right ascension (degrees - e.g. +/- 7.5 for 30 minutes OFF source)
-	 -wobblenorth=FLOAT 			 wobble offset NORTH (degrees)
-	 -wobbleeast=FLOAT 			 wobble offset EAST (degrees)
-	 -checkpointing=FLOAT 			 abort of difference between calculated pointing direction and vbf pointing direction is larger than this value
+	 -wobblenorth=FLOAT 			 wobble offset NORTH (degrees) (this does not overwrite the DB value)
+	 -wobbleeast=FLOAT 			 wobble offset EAST (degrees) (this does not overwrite the DB value)
+	 -overwriteDB_wobblenorth=FLOAT 	 wobble offset NORTH (degrees) (this does overwrite the DB value)
+	 -overwriteDB_wobbleeast=FLOAT		 wobble offset EAST (degrees) (this does overwrite the DB value)
+	 -checkpointing=FLOAT 			 abort of difference between calculated pointing direction and vbf pointing direction 
+	 				  	 is larger than this value
 						 ([deg], default=999 deg)
 	 -pointingErrorX=INT:FLOAT 		 take pointing error in array reconstruction into account
 						 (camera x-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorX=1:0.05)
@@ -85,15 +92,18 @@ Pointing:
 						 (camera y-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorY=1:0.05)
 						 (NOTE: experts only; option disables reading of pointing values from the DB)
 	 -useDBtracking 			 use database to calculate pointing errors (default: on, switch off with -usenodbtracking )
-	 -useTCorrectionfrom SQL-DATE 		 use pointing calculated with T-point correction valid for this data (default: not applied, example: -useTCorrectionfrom "2007-10-10"
-	 -pointingmonitortxt DIRECTORY 		 find pointing monitor text files in this directory (default: not applied, expect filename as pointing_VPM.37195.t1.dat)
+	 -useTCorrectionfrom SQL-DATE 		 use pointing calculated with T-point correction valid for this data
+	                                         (default: not applied, example: -useTCorrectionfrom "2007-10-10"
+	 -pointingmonitortxt DIRECTORY 		 find pointing monitor text files in this directory 
+	                                         (default: not applied, expect filename as pointing_VPM.37195.t1.dat)
 	 -usedbvpm 				 use calibrated pointing monitor data from DB (usenodbvpm to switch it off)
 	 -dstfile FILENAME 			 name of dst output file (root file, default: dstfile.root)
 	 -dstallpixel=INT 			 write data from all pixels to dst files (0: write image/border pixel only; default: 1)
 
 FADC pulse integration:
 -----------------------
-	 -tracefit=FLOAT 			 fit FADC traces (-1.=off(default),0=fit all PMTs, >0: fit PMTs with peak value > tracefit x pedestal rms
+	 -tracefit=FLOAT 			 fit FADC traces  (experimental!)
+	                                         (-1.=off(default),0=fit all PMTs, >0: fit PMTs with peak value > tracefit x pedestal rms
 	 -fitfunction=FIFU 			 fit function to fit FADC traces (ev or grisu)
 	 -MC_FADCTraceStart=INT 		 MC FADC trace start (observe: nsamples+MC_FADCTraceStart<n_simulated_samples; default=0)
 
@@ -110,12 +120,15 @@ Parallaxwidth calculation
 						 -1 = no trigger-map parameters calculated
 						 0  = cleaned CFD hits, requiring center pixels to have at least PWcleanNeighbors
 						 1  = cleaned CFD hits, center + nearest neighbor pixels are accepted in the map
-						 2  = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors
-						 3  = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, requiring PWcleanNeighbors nearest neighbors,
+						 2  = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, 
+						      requiring PWcleanNeighbors nearest neighbors
+						 3  = simulations: FADC signals integrated and cleaned with fixed PWcleanThreshold, 
+						      requiring PWcleanNeighbors nearest neighbors,
 				                 nearest-neighbor pixels are also accepted in the trigger map
 	 -PWcleanNeighbors=0/1/2/3...		 sets the number of neighbors required for a pixel to survive cleaning, default = 2
 	 -PWcleanThreshold=FLOAT 		 software cleaning threshold to use for method 3, default = 26
-	 -PWlimit=0...INT, 			 limits the number of pixels PER trigger-sector transmitted to the moment-generating function. Setting of 0 transmits all pixels. Default: 0
+	 -PWlimit=0...INT, 			 limits the number of pixels PER trigger-sector transmitted to the moment-generating 
+	                                         function. Setting of 0 transmits all pixels. Default: 0
 
 Display options:
 ----------------
@@ -152,7 +165,7 @@ Others:
 	 -user USERNAME 			 username
 
 
-for installation see file INSTALL
+For installation see file INSTALL
 
-please report any problems and bugs to Gernot Maier or Jamie Holder
+Please report any problems and bugs to Gernot Maier or Jamie Holder
 

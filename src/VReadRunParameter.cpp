@@ -3,15 +3,8 @@
 
   evndisp -help gives an overview of all parameters
 
-  \attention
-  camera type (<> run 592) hard coded in adjustParams() (this is valid for the Prototype)
-
-   \date
-   16/08/2004
-
    \author
    Gernot Maier
-
 */
 
 #include <VReadRunParameter.h>
@@ -30,6 +23,9 @@ VReadRunParameter::VReadRunParameter()
     fTelToAnaString = "";
 
     fPrintOutputFile = false;
+
+    fWobbleNorth_overwriteDB = -9999.;
+    fWobbleEast_overwriteDB  = -9999.;
 }
 
 
@@ -414,15 +410,26 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
             else  fRunPara->fTargetName = "";
         }
+// these two command line settings might be overwritten by values read from the data base
 // wobble offset NORTH
-        else if( iTemp.rfind( "wobblenorth" ) < iTemp.size() )
+        else if( iTemp.rfind( "wobblenorth" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_wobblenorth" ) < iTemp.size() ) )
         {
             fRunPara->fWobbleNorth = atof(iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
 // wobble offset EAST
-        else if( iTemp.rfind( "wobbleeast" ) < iTemp.size() )
+        else if( iTemp.rfind( "wobbleeast" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_wobbleneast" ) < iTemp.size() ) )
         {
             fRunPara->fWobbleEast = atof(iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }
+// these two command line settings are never overwritten by values read from the data base
+        else if( iTemp.rfind( "overwritedb_wobblenorth" ) < iTemp.size() )
+        {
+            fWobbleNorth_overwriteDB = atof(iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }
+// wobble offset EAST
+        else if( iTemp.rfind( "overwritedb_wobbleneast" ) < iTemp.size() )
+        {
+            fWobbleEast_overwriteDB = atof(iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
 // pointing check
         else if( iTemp.rfind( "checkpointing" ) < iTemp.size() )
@@ -802,8 +809,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 
 
 /*!
-   \attention
-      using different cameras for prototype data for runs < 592 and > 592 as default (no user camera)
+
+     test command line parameters given, compare them is requreseted with the DB results
+     fill values for all telescopes
+
 */
 void VReadRunParameter::test_and_adjustParams()
 {
@@ -966,8 +975,28 @@ void VReadRunParameter::test_and_adjustParams()
 // DB coordinates are in J2000
             fRunPara->fTargetDec = i_DBinfo.getTargetDec();
             fRunPara->fTargetRA = i_DBinfo.getTargetRA();
-            fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();
-            fRunPara->fWobbleEast = i_DBinfo.getWobbleEast();
+	    if( fWobbleNorth_overwriteDB < -9998. )
+	    {
+	       fRunPara->fWobbleNorth = i_DBinfo.getWobbleNorth();
+            }
+	    else
+	    {
+	       fRunPara->fWobbleNorth = fWobbleNorth_overwriteDB;
+	       cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble north (";
+	       cout << i_DBinfo.getWobbleNorth() << " deg)";
+	       cout << "with command line value: " << fWobbleNorth_overwriteDB << " deg" << endl;
+            }
+	    if( fWobbleEast_overwriteDB < -9998. )
+	    {
+	       fRunPara->fWobbleEast = i_DBinfo.getWobbleEast();
+            }
+	    else
+	    {
+	       fRunPara->fWobbleEast = fWobbleEast_overwriteDB;
+	       cout << "VReadRunParameter::test_and_adjustParams() info: overwriting DB wobble east (";
+	       cout << i_DBinfo.getWobbleEast() << " deg)";
+	       cout << "with command line value: " << fWobbleEast_overwriteDB << " deg" << endl;
+            }
 	    fRunPara->fDBRunType = i_DBinfo.getRunType();
 	    fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
 	    fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
