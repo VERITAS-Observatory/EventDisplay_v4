@@ -286,12 +286,6 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
             fTelRA[i] = fshowerpars->TelRA[i];
         }
 	if( !fShortTree ) MJD = fshowerpars->MJD;
-	fTargetElev = fshowerpars->TargetElev;
-	fTargetAz = fshowerpars->TargetAzim;
-	fTargetDec = fshowerpars->TargetDec;
-	fTargetRA = fshowerpars->TargetRA;
-	fWobbleN = fshowerpars->WobbleN;
-	fWobbleE = fshowerpars->WobbleE;
     }
 
     fNTrig = fshowerpars->NTrig;
