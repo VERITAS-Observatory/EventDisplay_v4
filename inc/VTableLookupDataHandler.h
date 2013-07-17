@@ -74,9 +74,6 @@ class VTableLookupDataHandler
         double fMCMaxEnergy;
         double fSpectralIndex;
 
-        double degrad;
-        double raddeg;
-
         vector< double > fNoiseLevel;
         vector< double > fCurrentNoiseLevel;
 

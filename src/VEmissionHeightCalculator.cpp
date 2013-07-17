@@ -1,8 +1,6 @@
 /*! \class VEmissionHeightCalculator
     \brief  get systematic error in energy reconstruction and calculate mean height of maximum emission
 
-    Revision $Id: VEmissionHeightCalculator.cpp,v 1.1.2.1.36.3.2.1.2.1 2011/03/25 13:11:32 gmaier Exp $
-
     \author Gernot Maier
 */
 

@@ -52,8 +52,6 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 
     fEventWeight = 1.;
 
-    degrad = 45. / atan( 1. );
-    raddeg = 1./degrad;
 /////////////////////////////////////////////////////////////////////////////////////
 // weighting of energy spectrum
 // MC input spectrum
@@ -226,7 +224,8 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 
 // calculate distances
         calcDistances( fNImages );
-        if( fNImages > 1 ) calcEmissionHeights();
+// calculate emission height (not for writing of tables)
+        if( fNImages > 1 && !fwrite ) calcEmissionHeights();
 
         setEventWeightfromMCSpectrum();
     }
@@ -375,8 +374,8 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     bitset<8*sizeof(unsigned long)> i_nimage;     // for imagepattern
     i_nimage.reset();
 
-    Double_t SizeFirstMax_temp = -1000.;           //AMC 04022009
-    Double_t SizeSecondMax_temp = -100.;           //AMC 04022009
+    Double_t SizeFirstMax_temp = -1000.;
+    Double_t SizeSecondMax_temp = -100.;
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         bool fReadTPars = false;
@@ -1032,8 +1031,6 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     fOTree->Branch( "EmissionHeightChi2", &fEmissionHeightChi2, iTT );
     sprintf( iTT, "NTelPairs/i" );
     fOTree->Branch( "NTelPairs", &fNTelPairs, iTT );
-
-                                                  //AMC 09102009
     fOTree->Branch( "SizeSecondMax",&fSizeSecondMax,"SizeSecondMax/D");
 
     sprintf( iTT, "fEmissionHeightT[NTelPairs]/F" );

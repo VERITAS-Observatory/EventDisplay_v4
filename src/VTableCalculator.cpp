@@ -1,7 +1,6 @@
 /*! \file VTableCalculator.cpp
     \brief  general lookup table class (e.g. mscw, mscl, energy)
 
-    Revision $Id$
 
 */
 
@@ -45,7 +44,6 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
 }
 
 
-/* CREATOR */
 VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDirectory *iDir, bool iEnergy, string iInterpolate, bool iPE, bool iUseMedianEnergy )
 {
     setDebug();
@@ -221,7 +219,6 @@ void VTableCalculator::setConstants( bool iPE )
 }
 
 
-/* Total Destruction! */
 void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
 {
     if( iOut != 0 ) fOutDir = iOut;
