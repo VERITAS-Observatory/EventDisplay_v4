@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+# simple script to download raw files from the GRID
+#
+# (you have to add the password manually)
+#
+
+if [ ! -n "$1" ] || [ ! -n "$2" ]
+then
+   echo "CTA.getRawFilesFromGRID.sh <run list> <target directory>"
+   echo
+   exit
+fi
+
+if [ -e $2 ]
+then
+   mkdir -p $2
+fi
+
+# dcache client
+export DCACHE_CLIENT_ACTIVE=1
+
+# loop over all files in the list
+FILEL=`cat $1`
+for i in $FILEL
+do
+    OFIL=`basename $i`
+    if [ -e $2/$OFIL ] && [ -s $2/$OFIL ]
+    then
+       echo "FILE EXISTS: $2/$OFIL"
+    else
+       rm -f $2/$OFIL
+# first check if it is stored locally on the dcache
+       DC="/acs/grid/cta/$i"
+       if [ -e $DC ]
+       then
+          echo "STORED LOCALLY"
+       else
+          echo "COPY FROM GRID"
+          lcg-cp -v lfn:/grid$i file:$2/$OFIL
+       fi
+    fi
+done
+
+exit
