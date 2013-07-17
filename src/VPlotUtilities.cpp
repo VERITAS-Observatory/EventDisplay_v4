@@ -206,7 +206,7 @@ void VPlotUtilities::default_settings()
     gStyle->SetPadGridX( 0 );
     gStyle->SetPadGridY( 0 );
     gROOT->SetStyle("Plain");
-    gStyle->SetPalette( 53 );
+    gStyle->SetPalette( 56 );
 }
 
 

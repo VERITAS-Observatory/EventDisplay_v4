@@ -91,7 +91,7 @@ class VPlotUtilities
 	unsigned int listPlottingAxis();
 	void   setCanvasSize( int x = 600, int y = 400 ) { fPlottingCanvasX = x; fPlottingCanvasY = y; }
         void   setColorAxisDataVector_minmax( double imin = 0., double imax = 0. );
-        void   setColorAxisPalette( int palette = 53, int ncolors = 100 );
+        void   setColorAxisPalette( int palette = 55, int ncolors = 100 );
 	void   setArrowPlottingStyle( TArrow *iArr );
 	void   setFunctionPlottingStyle( TF1 *iF );
 	void   setFunctionPlottingStyle( TF1 *iF, int icolor, double iwidth = 1., double isize = 1., int imarker = 1, int iFillStyle = 1 );
