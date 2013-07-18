@@ -123,7 +123,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 				   double iTextAngle = 45., int iMarkerStyle = 5 ); 
    void            plot_RBM_ring(double r, double iA, double t2, double iN);
    void            plot_reflectedRegions(TCanvas *iC, int i, int j, int iColor=5);
-   void            plot_excludedRegions(TCanvas *c);
+   void            plot_excludedRegions( TCanvas *c, int iLineColor = 6 );
    void            plot_zetaTau();
    TH1D*           plot_triggerpattern( int ntel = 3, bool bPlot = true );
    void            plot_qfactors( char *varexp, char *selection, char *hisname, int ibin, double xmin, double xmax, char *xtitle = 0, double iSourceStrength = 1. );

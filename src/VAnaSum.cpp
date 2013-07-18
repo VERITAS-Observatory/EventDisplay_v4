@@ -185,7 +185,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	   iDir = fOPfile->GetDirectory( i_temp );
 	   fStereoRunDir.push_back( iDir );
 
-// GH get list of excluded regions
+// get list of excluded regions
            if( j==0 )
              fRunPara->getListOfExcludedSkyRegions( &iAnasumInputFile );
 

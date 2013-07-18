@@ -3,12 +3,11 @@
  * \author
  *   Gernot Maier
  *
- *  Revision $Id: VAnaSumRunParameter.cpp,v 1.1.2.5.4.4.10.1.2.3.4.3.2.4.2.5.2.1.6.3.2.4.2.4 2011/01/05 14:01:24 gmaier Exp $
- */
+*/
 
 #include "VAnaSumRunParameter.h"
 
-sRunPara::sRunPara()
+VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 {
     fEventDisplayVersion = "";
 
@@ -594,7 +593,7 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
     }
     string is_line;
     string temp;
-    sRunPara i_sT;
+    VAnaSumRunParameterDataClass i_sT;
     reset( i_sT );
 
     cout << "Reading short run list from " << i_listfilename << endl;
@@ -687,7 +686,7 @@ int VAnaSumRunParameter::loadSimpleFileList( string i_listfilename )
     }
     string is_line;
     string temp;
-    sRunPara i_sT;
+    VAnaSumRunParameterDataClass i_sT;
     reset( i_sT );
 
     cout << "Reading simple run list from: " << i_listfilename << endl;
@@ -729,7 +728,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
     }
     string is_line;
     string temp;
-    sRunPara i_sT;
+    VAnaSumRunParameterDataClass i_sT;
     reset( i_sT );
 
     cout << "Reading long run list from (S" << bShortList << ", TA" << bTotalAnalysisOnly << "): " << i_listfilename << endl;
@@ -1074,7 +1073,7 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
 }
 
 
-void VAnaSumRunParameter::reset( sRunPara it )
+void VAnaSumRunParameter::reset( VAnaSumRunParameterDataClass it )
 {
     it.fRunOn = 0;
     it.fRunOff = 0;
@@ -1093,8 +1092,6 @@ void VAnaSumRunParameter::reset( sRunPara it )
 
     it.fAcceptanceFile = "";
 
-// (GM) changed to 0 (20130327)
-//    it.fNBoxSmooth = 100;
     it.fNBoxSmooth = 0;
     it.fOO_alpha = 0.;
 
@@ -1389,12 +1386,16 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
     float decJ2000 = 0.;
     float raJ2000 = 0.;
     int id = 0;
+    float iStarBrightness_V = 0;
+    float iStarBrightness_B = 0;
     tEx.Branch( "x", &x, "x/F" );
     tEx.Branch( "y", &y, "y/F" );
     tEx.Branch( "r", &r, "r/F" );
     tEx.Branch( "decj2000", &decJ2000, "decJ2000/F" );
     tEx.Branch( "raj2000", &decJ2000, "raJ2000/F" );
     tEx.Branch( "star_id", &id, "star_id/I" );
+    tEx.Branch( "Vmag", &iStarBrightness_V, "Vmag/F" );
+    tEx.Branch( "Bmag", &iStarBrightness_B, "Bmag/F" );
 
     for( unsigned int i = 0; i < fExcludeFromBackground_North.size(); i++ )
     {
@@ -1404,6 +1405,8 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 	decJ2000 = fExcludeFromBackground_DecJ2000[i];
 	raJ2000 = fExcludeFromBackground_RAJ2000[i];
         id = fExcludeFromBackground_StarID[i];
+	iStarBrightness_V = fExcludeFromBackground_StarBrightness_V[i];
+	iStarBrightness_B = fExcludeFromBackground_StarBrightness_B[i];
 
         tEx.Fill();
     }
@@ -1412,31 +1415,37 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
 
     return true;
 }
-bool VAnaSumRunParameter::getListOfExcludedSkyRegions(TFile *f)
+
+bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile *f )
 {
+    if( !f ) return false;
+
     TTree *tEx = ((TTree*)f->Get("total_1/stereo/tExcludedRegions"));
     if( !tEx ) return false;
 
-    float x;
-    float y;
-    float r;
-    int id;
+    float x = 0.;
+    float y = 0.;
+    float r = 0.;
+    int id = 0;
+    float iV = 0.;
+    float iB = 0.;
     tEx->SetBranchAddress( "x", &x);
     tEx->SetBranchAddress( "y", &y);
     tEx->SetBranchAddress( "r", &r);
     tEx->SetBranchAddress( "star_id", &id);
+    if( tEx->GetBranch( "Vmag" ) ) tEx->SetBranchAddress( "Vmag", &iV );
+    if( tEx->GetBranch( "Bmag" ) ) tEx->SetBranchAddress( "Bmag", &iB );
 
     for ( unsigned int i = 0; i < tEx->GetEntries(); i++ )
     {
-
         tEx->GetEntry(i);
         fExcludeFromBackground_West.push_back(x);
         fExcludeFromBackground_North.push_back(y);
         fExcludeFromBackground_Radius.push_back(r);
         fExcludeFromBackground_StarID.push_back(id);
-        
+	fExcludeFromBackground_StarBrightness_V.push_back( iV );
+	fExcludeFromBackground_StarBrightness_B.push_back( iB );
     }
-
 
     delete tEx;
 

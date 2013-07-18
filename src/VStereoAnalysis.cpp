@@ -1441,7 +1441,7 @@ void VStereoAnalysis::defineAstroSource()
 /////////////////////////////////////////////////////////
 
 
-void VStereoAnalysis::setCuts( sRunPara iL, int irun )
+void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 {
        
       if( iL.fCutFile != "" )
@@ -1828,8 +1828,6 @@ bool VStereoAnalysis::init_TreeWithAllGamma( int irun ) // WRITEALLGAMMATOTREE
     fTreeWithAllGamma->Branch( "eventNumber", &fTreeAll_eventNumber, "eventNumber/I" );
     fTreeWithAllGamma->Branch( "timeOfDay",   &fTreeAll_Time,        "timeOfDay/D"   );
     fTreeWithAllGamma->Branch( "dayMJD",      &fTreeAll_MJD,         "dayMJD/I"      );
-    fTreeWithAllGamma->Branch( "WobbleNorth", &fTreeAll_WobbleNorth, "WobbleNorth/D" );
-    fTreeWithAllGamma->Branch( "WobbleWest",  &fTreeAll_WobbleWest,  "WobbleWest/D"  );
     fTreeWithAllGamma->Branch( "Energy",      &fTreeAll_Energy,      "Energy/D"      );
     fTreeWithAllGamma->Branch( "EnergyError", &fTreeAll_EnergyError, "EnergyError/D" );
     fTreeWithAllGamma->Branch( "XGroundCore", &fTreeAll_XGroundCore, "XGroundCore/D" );
@@ -1862,8 +1860,6 @@ void VStereoAnalysis::reset_TreeWithAllGamma() // WRITEALLGAMMATOTREE
     fTreeAll_Yoff = 0.;
     fTreeAll_Xderot = 0.;
     fTreeAll_Yderot = 0.;
-    fTreeAll_WobbleNorth = 0.;
-    fTreeAll_WobbleWest = 0.;
     fTreeAll_TargetRA = 0.;
     fTreeAll_TargetDEC = 0.;
     fTreeAll_RA = 0.;
@@ -1904,8 +1900,6 @@ void VStereoAnalysis::fill_TreeWithAllGamma( CData *c ,double i_xderot, double i
 	fTreeAll_Yoff        = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
 	fTreeAll_Xderot      = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
 	fTreeAll_Yderot      = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
-	fTreeAll_WobbleNorth = c->WobbleN;      // Telescope Wobble North (degrees, parallel to DEC axis)
-	fTreeAll_WobbleWest  = c->WobbleE;      // Telescope Wobble West  (degrees, parallel to RA axis)
 	fTreeAll_Energy      = c->Erec;         // Reconstructed Gamma Energy (TeV)
 	fTreeAll_EnergyError = c->EChi2;        // Error on Energy (TeV, Gaussian, 1 standard deviation)
 	fTreeAll_XGroundCore = c->Xcore;        // Gamma Ray Core-Ground intersection location (north?)

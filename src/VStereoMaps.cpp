@@ -96,7 +96,7 @@ void VStereoMaps::setHistograms( TH2D* i_map_stereo, TH2D* i_map_alpha, TH1D* i_
 }
 
 
-void VStereoMaps::setRunList( sRunPara iL )
+void VStereoMaps::setRunList( VAnaSumRunParameterDataClass iL )
 {
     fRunList = iL;
     fRunList.fWobbleNorthMod *= -1.;

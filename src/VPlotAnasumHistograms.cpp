@@ -1,6 +1,7 @@
 /*! class VPlotAnasumHistograms
 
-    fPlotMode: add setter
+    plotting class for anasum analysis results
+
 
 */
 
@@ -11,7 +12,6 @@ ClassImp(VPlotAnasumHistograms)
 
   
 */
-
 VPlotAnasumHistograms::VPlotAnasumHistograms()
 {
    fDebug = false;
@@ -1535,7 +1535,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, in
  *  observe: this function should be used together with plot_radec
  *
  */
-void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c )
+void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c, int iLineColor )
 {
     if( c ) c->cd();
     char itemp[200];
@@ -1558,9 +1558,9 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c )
         cout << "tree with excluded regions not found" << endl;
         return;
     }
-    float x;
-    float y;
-    float r;
+    float x = 0.;
+    float y = 0.;
+    float r = 0.;
     t->SetBranchAddress( "x", &x );
     t->SetBranchAddress( "y", &y );
     t->SetBranchAddress( "r", &r );
@@ -1570,7 +1570,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c )
         t->GetEntry( i );
         TEllipse *e = new TEllipse( x, -1.*y, r );
         e->SetFillStyle( 0 );
-        e->SetLineColor( 6 );
+        e->SetLineColor( iLineColor );
         e->Draw();
     }
     if( f1 ) f1->Close();

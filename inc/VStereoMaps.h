@@ -1,5 +1,4 @@
 //! VStereoMaps   model the background
-//  Revision $Id: VStereoMaps.h,v 1.12.2.1.4.2.16.1.2.2.2.1.8.1.2.3 2010/08/03 20:37:25 amccann Exp $
 
 #ifndef VStereoMaps_H
 #define VStereoMaps_H
@@ -29,7 +28,7 @@ class VStereoMaps
 {
     private:
 
-        sRunPara fRunList;
+        VAnaSumRunParameterDataClass fRunList;
         CData *fData;
 
 // theta2 cut (might be energy dependent)
@@ -144,7 +143,7 @@ class VStereoMaps
         void              setData( CData *c ) { fData = c; }
         void              setHistograms( TH2D*, TH2D*, TH1D* );
         void              setNoSkyPlots( bool iS ) { fNoSkyPlots = iS; }
-        void              setRunList( sRunPara iL );
+        void              setRunList( VAnaSumRunParameterDataClass iL );
         void              setTargetShift( double iW, double iN );
         void              setRegionToExclude( vector<double> iX, vector<double> iY, vector<double> iR );
 };

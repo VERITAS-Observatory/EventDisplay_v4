@@ -1,5 +1,4 @@
 //! VPlotUtilities some utilities to plot stuff
-// Revision $Id: VPlotUtilities.h,v 1.1.2.5.2.1.8.4.4.6 2011/02/19 10:46:24 gmaier Exp $
 
 #ifndef VPlotUtilities_H
 #define VPlotUtilities_H

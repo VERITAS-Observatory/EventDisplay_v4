@@ -101,7 +101,7 @@ class VRunSummary
         VRunSummary();
         ~VRunSummary() {}
         void fill();
-        bool fill( string, string, vector< sRunPara > );
+        bool fill( string, string, vector< VAnaSumRunParameterDataClass > );
         void print();
         void write();
 };

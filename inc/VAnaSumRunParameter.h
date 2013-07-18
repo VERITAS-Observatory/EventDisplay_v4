@@ -1,5 +1,4 @@
 //! VAnaSumRunParameter  storage class for run parameter
-//  Revision $Id: VAnaSumRunParameter.h,v 1.1.2.3.4.4.12.2.4.2.2.2.2.4.2.1.6.2.2.3.2.1 2010/12/16 10:20:47 gmaier Exp $
 
 #ifndef VANASUMRUNPARAMETER_H
 #define VANASUMRUNPARAMETER_H
@@ -25,7 +24,7 @@ using namespace std;
 
 enum e_background { eONOFF, eRINGMODEL, eREFLECTEDREGION, eFOV, eTEMPLATE };
 
-class sRunPara
+class VAnaSumRunParameterDataClass
 {
 
     public:
@@ -109,8 +108,8 @@ class sRunPara
         double fTE_mscl_min;
         double fTE_mscl_max;
 
-        sRunPara();
-       ~sRunPara() {}
+        VAnaSumRunParameterDataClass();
+       ~VAnaSumRunParameterDataClass() {}
 };
 
 class VAnaSumRunParameter : public VGlobalRunParameter
@@ -125,7 +124,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double readMaximumDistance( string );
         double readSourceRadius( string iCutFile );
         int  returnWithError( string iL, string iM, string iC = "" );
-        void reset( sRunPara );
+        void reset( VAnaSumRunParameterDataClass );
         void setMCZenith();
 
     public:
@@ -179,9 +178,9 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fDefaultPedVar;
 
 // vector with all run parameters
-        vector< sRunPara > fRunList;
+        vector< VAnaSumRunParameterDataClass > fRunList;
 // map with all run parameters (sorted after onrun)
-        map< int, sRunPara > fMapRunList;
+        map< int, VAnaSumRunParameterDataClass > fMapRunList;
 
 // background model
         int    fTMPL_fBackgroundModel;
@@ -211,7 +210,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         string fTimeMaskFile;
 
         VAnaSumRunParameter();
-        ~VAnaSumRunParameter() {}
+       ~VAnaSumRunParameter() {}
         unsigned int getMaxNumberofTelescopes();
         int  getInputFileVersionNumber() { return fVersion; }
         void getEventdisplayRunParameter( string );

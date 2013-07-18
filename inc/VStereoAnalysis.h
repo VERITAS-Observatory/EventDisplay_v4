@@ -1,5 +1,4 @@
 //! VStereoAnalysis    class for producing one dimensional histograms from parameterized VERITAS data.
-//  Revision $Id: VStereoAnalysis.h,v 1.20.2.3.4.2.12.2.4.1.2.1.2.4.8.2.2.3 2010/04/01 08:34:15 gmaier Exp $
 
 #ifndef VStereoAnalysis_H
 #define VStereoAnalysis_H
@@ -73,7 +72,7 @@ class VStereoAnalysis
         TTree* getTreeWithSelectedEvents() { return fTreeSelectedEvents; }
         void   scaleAlpha( double inorm, TH2D *hon, TH2D *h_ON, TH2D *h_OFF, TH1D* hMSR, bool buc, int incounter );
         void   setAlphaOff( TH2D *ih, TH2D *ihUC );
-        void   setCuts( sRunPara iL, int irun );
+        void   setCuts( VAnaSumRunParameterDataClass iL, int irun );
         void   setNoSkyPlots( bool iS ) { fNoSkyPlots = iS; }
         void   setRunMJD( map< int, double > iRunMJD ) { fRunMJD = iRunMJD; }
         void   setRunTimes();
@@ -144,8 +143,6 @@ class VStereoAnalysis
     double fTreeAll_Yoff;
     double fTreeAll_Xderot;
     double fTreeAll_Yderot;
-    double fTreeAll_WobbleNorth;
-    double fTreeAll_WobbleWest;
     double fTreeAll_TargetRA;
     double fTreeAll_TargetDEC;
     double fTreeAll_RA;

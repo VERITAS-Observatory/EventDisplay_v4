@@ -201,7 +201,7 @@ void VRunSummary::print()
    called for summary runs only
 
 */
-bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_directory, vector< sRunPara > iRunList )
+bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_directory, vector< VAnaSumRunParameterDataClass > iRunList )
 {
 
 // current directory
