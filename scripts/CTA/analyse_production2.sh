@@ -79,6 +79,9 @@ do
    elif [[ $S == *SAC084* ]]
    then
       TRG="/lustre/fs13/group/cta/prod2/SAC084/"
+   elif [[ $S == *SAC100* ]]
+   then
+      TRG="/lustre/fs13/group/cta/prod2/SAC100/"
    fi
 
 # eventdisplay
