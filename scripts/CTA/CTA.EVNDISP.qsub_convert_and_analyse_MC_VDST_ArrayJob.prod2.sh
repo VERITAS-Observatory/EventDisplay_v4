@@ -67,7 +67,7 @@ then
       echo "FIL $FFIL"
    elif [[ $DSET == *SAC* ]]
    then
-      if [[ $PART == "gamma_cone10" ]]
+      if [[ $PART == "gamma_cone10" ]] && [[  $DSET == *SAC084* ]]
       then
 	FFIL=`basename $TMPDIR/$OFIL.gz ___cta-prod2_desert-SACx0.84_cone10.simtel.gz`
       else
@@ -80,13 +80,15 @@ then
       COPT="$COPT -t $TRIGF"
       echo "CONVERTER OPTIONS: $COPT"
    else
-      echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL
-      echo "search directory: $TRGMASKDIR"
-      echo "search string: $FFIL"
-      echo "found: $TRIGF"
-      echo "error, cannot analyse this file..."
-      touch $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/$OFIL.error.trg.log
-      exit;
+      ELOG="$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/$OFIL.error.trg.log"
+      rm -f $ELOG
+      touch $ELOG
+      echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL >> $ELOG
+      echo "search directory: $TRGMASKDIR" >> $ELOG
+      echo "search string: $FFIL" >> $ELOG
+      echo "found: $TRIGF" >> $ELOG
+      echo "error, cannot analyse this file..." >> $ELOG
+      exit
    fi
 fi
 
@@ -127,4 +129,3 @@ tar -czvf $OFIL.tar.gz *.log
 mv -v -f $OFIL.tar.gz $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/
 
 exit
-

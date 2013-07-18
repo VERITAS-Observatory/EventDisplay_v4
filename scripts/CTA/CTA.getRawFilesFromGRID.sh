@@ -34,7 +34,8 @@ do
        DC="/acs/grid/cta/$i"
        if [ -e $DC ]
        then
-          echo "STORED LOCALLY"
+          echo "STORED LOCALLY: $i"
+	  dccp $DC $2/$OFIL
        else
           echo "COPY FROM GRID"
           lcg-cp -v lfn:/grid$i file:$2/$OFIL

@@ -9,6 +9,9 @@
 if [ $# -ne 1 ]
 then
    echo "./prod2.sh <run mode>"
+   echo
+   echo "  possible run modes are EVNDISP MAKETABLES COMBINETABLE ANATABLES TRAIN ANGRES QC PARTFIL CUTS PHYS "
+   echo
    exit
 fi
 RUN="$1"
@@ -26,7 +29,8 @@ SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-Aar-
 # for all other analysis
 SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-Aar-South" "prod2-Leoncito-South" "prod2-SAC084-South" "prod2-SAC100-North" "prod2-SAC100-South" )
 SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-Aar-South" "prod2-SAC084-South" "prod2-SAC100-North" "prod2-SAC100-South" )
-SITE=( "prod2-Leoncito-South" )
+SITE=( "prod2-Aar-North" "prod2-Leoncito-North" "prod2-SAC084-North" "prod2-SAC100-North" )
+SITE=( "prod2-SAC084-South" "prod2-SAC100-South" "prod2-Aar-South" "prod2-Leoncito-South" )
 
 #####################################
 # particle types
@@ -34,11 +38,12 @@ PARTICLE=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
 
 #####################################
 # reconstruction IDs
-RECID="0"
-RECID="0 1 2 3"
+RECID="0 1 2 3 4"
+RECID="0 1"
 
 #####################################
 # energy reconstruction
+# (default is method 1)
 EREC="1"
 
 #####################################
@@ -47,13 +52,13 @@ OBSTIME="50"
 
 #####################################
 # sub array lists
-ARRAY="subArray.2a.list"
 ARRAY="subArray.prod2red.list"
+ARRAY="subArray.2a.list"
 
 #####################################
 # analysis dates
-DATE="d20130711"
-TDATE="d20130702"
+DATE="d20130717"
+TDATE="d20130717"
 
 NSITE=${#SITE[@]}
 for (( m = 0; m < $NSITE ; m++ ))
