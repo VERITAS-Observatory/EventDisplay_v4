@@ -1250,11 +1250,12 @@ $(vtspara):
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Autumn2007_20130110.txt $(vtspara)/DetectorGeometry
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(vtspara)/DetectorGeometry
 	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt $(vtspara)/DetectorGeometry
 	mkdir -p $(vtspara)/NOISE
 	cp -LR $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(vtspara)/NOISE
 	mkdir -p $(vtspara)/GammaHadronCutFiles
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.d20120909-cut-N* $(vtspara)/GammaHadronCutFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.dat $(vtspara)/GammaHadronCutFiles
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.d20130411* $(vtspara)/GammaHadronCutFiles
 	mkdir -p $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
@@ -1267,11 +1268,11 @@ $(vtspara):
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(vtspara)/ParameterFiles
 	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/COMPAREMC.runparameter $(vtspara)/ParameterFiles
 	mkdir -p $(vtspara)/RadialAcceptances
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-d20120909-* $(vtspara)/RadialAcceptances/
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-d20130411-* $(vtspara)/RadialAcceptances/
 	mkdir -p $(vtspara)/EffectiveAreas
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-d20120909-cut* $(vtspara)/EffectiveAreas/
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-d20130411-cut* $(vtspara)/EffectiveAreas/
 	mkdir -p $(vtspara)/Tables
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_d20121218* $(vtspara)/Tables/
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_d20130521* $(vtspara)/Tables/
 
 ###############################################################################################################################
 # print environment and compilation parameters
