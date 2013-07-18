@@ -1,5 +1,4 @@
 //! VTableCalculator calculation of mean and mean scaled variables
-// Revision $Id$
 
 #ifndef VTableCalculator_H
 #define VTableCalculator_H
@@ -29,7 +28,7 @@ class VTableCalculator
 // creator: reads or writes table
 // mode can be 'r' or 'w'
         VTableCalculator( int intel = 0 , bool iEnergy = false, bool iPE = false );
-        VTableCalculator( string fpara, string hname, char m, TDirectory *iDir, bool iEnergy, string iInterpolate = "", bool iPE = false, bool iUseMedianEnergy = true );
+        VTableCalculator( string fpara, string hname, char m, TDirectory *iDir, bool iEnergy, bool iPE = false, int iUseMedianEnergy = 1 );
 
 // Destructor
         ~VTableCalculator() {}
@@ -72,11 +71,12 @@ class VTableCalculator
 	string fHName_Add;
 
         bool fEnergy;                             //!< true if tables are used for energy calculation
-	bool fUseMedianEnergy;
+	int  fUseMedianEnergy;
 
         vector< vector< TH1F* > > Oh;
         TProfile2D *hMean;
         TH2F* hMedian;
+        TH2F* hMPV;
         string hMedianName;
         TH2F* hSigma;
         TH2F* hNevents;
@@ -94,6 +94,7 @@ class VTableCalculator
 
 	bool   create1DHistogram( int i, int j );
         double getWeightMeanBinContent( TH2F*, int, int, double, double );
+	void   fillMPV( TH2F*, int, int, TH1F*, double, double );
 	double interpolate( TH2F* h, double x, double y, bool iError );
         bool   readHistograms();
 	void   setBinning();

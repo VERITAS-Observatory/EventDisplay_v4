@@ -15,13 +15,14 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
     if( intel == 0 ) return;
 
     fEnergy = iEnergy;
-    fUseMedianEnergy = false;
+    fUseMedianEnergy = 0;
 
     for( int i = 0; i < intel; i++ )
     {
         hVMedian.push_back( 0 );
     }
     hMedian = 0;
+    hMPV = 0;
     hSigma = 0;
     hMean = 0;
     hNevents = 0;
@@ -44,7 +45,7 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
 }
 
 
-VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDirectory *iDir, bool iEnergy, string iInterpolate, bool iPE, bool iUseMedianEnergy )
+VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDirectory *iDir, bool iEnergy, bool iPE, int iUseMedianEnergy )
 {
     setDebug();
 
@@ -120,6 +121,15 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         if( !fEnergy ) sprintf( htitle, "%s (mean) [deg]", fpara.c_str() );
         else           sprintf( htitle, "%s (mean) [TeV]", fpara.c_str() );
         hMean->SetZTitle( htitle );
+// most probable of variable
+        sprintf( hname, "%s_mpv_%s", fpara.c_str(), hname_add.c_str() );
+        sprintf( htitle, "%s vs. dist. vs. log10 size (mpv)", fpara.c_str() );
+        hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
+        hMPV->SetXTitle( "log_{10} size" );
+        hMPV->SetYTitle( "distance [m]" );
+        if( !fEnergy ) sprintf( htitle, "%s (mpv) [deg]", fpara.c_str() );
+        else           sprintf( htitle, "%s (mpv) [TeV]", fpara.c_str() );
+        hMPV->SetZTitle( htitle );
 // number of events
         sprintf( hname, "%s_nevents_%s", fpara.c_str(), hname_add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (# of events)", fpara.c_str() );
@@ -142,16 +152,20 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
     {
         fReadHistogramsFromFile = false;
 
-	if( fUseMedianEnergy )
+	if( fUseMedianEnergy == 1)
 	{
 	   sprintf( hname, "%s_median_%s", fpara.c_str(), hname_add.c_str() );
-	   hMedianName = hname;
         }
+	else if( fUseMedianEnergy == 2 )
+	{
+	   if( fEnergy ) sprintf( hname, "%s_mpv_%s", fpara.c_str(), hname_add.c_str() );
+	   else          sprintf( hname, "%s_median_%s", fpara.c_str(), hname_add.c_str() );
+	}
 	else
 	{
 	   sprintf( hname, "%s_mean_%s", fpara.c_str(), hname_add.c_str() );
-	   hMedianName = hname;
         }
+	hMedianName = hname;
     }
 
 }
@@ -242,6 +256,7 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
         }
 
 /* EVALUATION OF HISTOGRAMS */
+	cout << "\t msc tables: evaluating " << fName << " histograms ";
 
         float med = 0.;
 	float sigma = 0.;
@@ -276,14 +291,19 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
                 if( Oh[i][j]->GetEntries() > 5 ) hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
 		else if( fEnergy )
 		{
-		    hMean->SetBinContent( i+1, j+1, 0. );
+		   hMean->SetBinContent( i+1, j+1, 0. );
+                }
+		if( fEnergy )
+		{
+		   fillMPV( hMPV, i+1, j+1, Oh[i][j], med, sigma );
+		   hMPV->SetBinError( i+1, j+1, sigma );
                 }
 
                 id=i*1000+j;
                 sprintf( hisname , "h%d",id);
                 sprintf( histitle, "h%d",id);
 // write 1D histograms to file
-                if( fOutDir && fWrite1DHistograms )
+                if( fOutDir && fWrite1DHistograms && Oh[i][j]->GetEntries() > 0 )
                 {
                     fOutDir->cd();
                     iDir1D->cd();
@@ -294,12 +314,13 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
 // write 2D histograms to file
         if( fOutDir )
         {
-            cout << "\t msc tables: evaluating " << fName << " histograms ";
             fOutDir->cd();
             if( xtitle && hMedian )   hMedian->SetTitle( xtitle );
+            if( xtitle && hMPV )      hMPV->SetTitle( xtitle );
             if( hNevents && hMedian ) hMedian->SetEntries( hNevents->GetEntries() );
             if( hNevents && hSigma )  hSigma->SetEntries( hNevents->GetEntries() );
             if( hMedian )  hMedian->Write();
+            if( hMPV )     hMPV->Write();
             if( hSigma )   hSigma->Write();
             if( hMean )    hMean->Write();
             if( hNevents ) hNevents->Write();
@@ -752,3 +773,53 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
 
    return v;
 }
+
+/*
+
+     search most probable value of energy distribution for a give size/radius bin
+
+     (these distributions are at low energies often very skewed)
+
+*/
+void VTableCalculator::fillMPV( TH2F *h, int i, int j, TH1F *h1D, double iMedianValue, double iSigmaValue )
+{
+   if( !h || !h1D ) return;
+
+// only fit well filled histograms -> otherwise will median
+   if( h1D->GetEntries() <= 50 || iMedianValue <= 0. ) 
+   {
+       h->SetBinContent( i, j, iMedianValue );
+       return;
+   }
+// don't do anything if difference between mean and median is <15%
+   if( iMedianValue > 0. && TMath::Abs( (iMedianValue-h1D->GetMean())/iMedianValue ) < 0.15 )
+   {
+      h->SetBinContent( i, j, iMedianValue );
+      return;
+   }
+
+/////////////////////////////////////////
+// try a Landau fit
+   TF1 iLandau( "iLandau", "TMath::Landau(x,[0],[1],0)*[2]", iMedianValue/3., iMedianValue*3. );
+   iLandau.SetParameters( iMedianValue, iSigmaValue, h1D->GetEntries() );
+// do not allow the most probably to more than x3 off the median
+   iLandau.SetParLimits( 0, iMedianValue/3., iMedianValue*3. ); 
+   h1D->Fit( &iLandau, "QMNR" );
+// require >10% fit probability to use Landau most probable value
+   if( TMath::Prob( iLandau.GetChisquare(), iLandau.GetNDF() ) > 0.1
+    && iLandau.GetParameter( 0 ) > 0. && iMedianValue / iLandau.GetParameter( 0 ) < 2.5 )
+   {
+      h->SetBinContent( i, j, iLandau.GetParameter( 0 ) );
+
+      cout << "\t\t Landau interpolation for energy tables: " << i << "\t" << j << "\t";
+      cout << TMath::Prob( iLandau.GetChisquare(), iLandau.GetNDF() ) << ", median " << iMedianValue << ", fit: " << iLandau.GetParameter( 0 ) << "\t" << iLandau.GetParameter( 1 );
+      cout << "\t" << iMedianValue / iLandau.GetParameter( 0 );
+      cout << "\t" << iLandau.GetParameter( 0 ) /  iLandau.GetParameter( 1 ) << endl;
+   }
+   else
+   {
+     h->SetBinContent( i, j, iMedianValue ); 
+   }
+
+}
+

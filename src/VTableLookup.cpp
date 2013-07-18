@@ -120,7 +120,8 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
     }
     if( fLookupTableFile->TestBit(TFile::kRecovered) )
     {
-        cout << "VTableLookup::setMCTableFiles problems with file " << itablefile << endl;
+        cout << "VTableLookup::setMCTableFiles problems with file (TFile::kRecovered, " << fLookupTableFile->TestBit(TFile::kRecovered) << "): " << endl;
+	cout << itablefile << endl;
         cout << "exiting..." << endl;
         exit( 0 );
     }
@@ -205,10 +206,10 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
             fDirEnergySR = gDirectory->mkdir( "energySR" );
 
 // mean scaled width and length
-            i_mscw.push_back( new VTableCalculator( "width", isuff.c_str(), freadwrite, fDirMSCW, false, "", fTLRunParameter->fPE ) );
+            i_mscw.push_back( new VTableCalculator( "width", isuff.c_str(), freadwrite, fDirMSCW, false, fTLRunParameter->fPE ) );
             i_mscw.back()->setWrite1DHistograms( fWrite1DHistograms );
 	    i_mscw.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
-            i_mscl.push_back( new VTableCalculator( "length", isuff.c_str(), freadwrite, fDirMSCL, false, "", fTLRunParameter->fPE ) );
+            i_mscl.push_back( new VTableCalculator( "length", isuff.c_str(), freadwrite, fDirMSCL, false, fTLRunParameter->fPE ) );
             i_mscl.back()->setWrite1DHistograms( fWrite1DHistograms );
 	    i_mscl.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
 // energy reconstruction
@@ -216,7 +217,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, int
             i_energy.back()->setCutValues( fTLRunParameter->fminsize, fTLRunParameter->fmaxlocaldistance, fTLRunParameter->fmaxdist );
 	    i_energy.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
             i_energy.back()->setWrite1DHistograms( fWrite1DHistograms );
-            i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, fDirEnergySR, true, "", fTLRunParameter->fPE, fTLRunParameter->fUseMedianEnergy ) );
+            i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, fDirEnergySR, true, fTLRunParameter->fPE, fTLRunParameter->fUseMedianEnergy ) );
             i_energySR.back()->setWrite1DHistograms( fWrite1DHistograms );
 	    i_energySR.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
         }
@@ -389,7 +390,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 // get energy directory (size vs radius method)
                         iDirTel->cd( iDNameTel[t].c_str() );
                         iDir = (TDirectory*)gDirectory->Get( "energySR" );
-                        i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, iDir, true ) );
+                        i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, iDir, true, fTLRunParameter->fPE, fTLRunParameter->fUseMedianEnergy  ) );
                     }                             // telescopes
                     ii_mscw.push_back( i_mscw );
                     ii_mscl.push_back( i_mscl );

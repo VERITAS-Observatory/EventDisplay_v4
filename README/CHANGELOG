@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130718 (GM) added mpv determination in lookup table filling
+                (important for low-energy bins with asymmetric 
+		 distribution in energy)
+
 * 20130717 (GM) added two new command line parameters to overwrite
                 wobble directions read from the VTS DB:
 		-overwriteDB_wobblenorth=FLOAT

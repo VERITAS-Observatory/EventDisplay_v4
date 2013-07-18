@@ -1,8 +1,6 @@
 /*! \file combineLookupTables
     \brief combine different lookup tablefiles into one tablefile
 
-    Revision $Id$
-
     \author
     Gernot Maier
 */
@@ -178,12 +176,14 @@ void copyDirectory( TDirectory *source, const char *hx )
             TObject *obj = key->ReadObj();
 	    string iName = obj->GetName();
 	    TH2F *hNew = 0;
-	    if( iName.find( "median" ) != string::npos 
-	       || iName.find( "Median" ) != string::npos )
+// copy only median and mpv histogram
+	    if(   iName.find( "median" ) != string::npos 
+	       || iName.find( "Median" ) != string::npos
+	       || iName.find( "mpv" ) != string::npos
+	      )
 	    {
 	       hNew = reduceHistogramSize( (TH2F*)obj );
 	       adir->cd();
-//	       obj->Write();
 	       if( hNew )
 	       {
 		  hNew->SetName( obj->GetName() );
@@ -198,6 +198,11 @@ void copyDirectory( TDirectory *source, const char *hx )
     savdir->cd();
 }
 
+/*
+
+   reduce size of histogram by removing all irrelevant bins (empty bins)
+
+*/
 TH2F* reduceHistogramSize( TH2F *h )
 {
    if( !h ) return 0;

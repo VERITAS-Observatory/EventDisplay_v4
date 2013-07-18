@@ -32,7 +32,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         string tablefile;
         double ze;
         bool isMC;
-        bool fUseMedianEnergy;
+        int fUseMedianEnergy;
         bool fPE;                          // input size type is 'pe' (not [dc])
         int fInterpolate;
         string fInterpolateString;
@@ -86,6 +86,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef(VTableLookupRunParameter,18);
+        ClassDef(VTableLookupRunParameter,19);
 };
 #endif

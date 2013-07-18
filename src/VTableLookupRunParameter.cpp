@@ -1,8 +1,6 @@
 /*! \class VTableLookupRunParameter
     \brief parameter storage class
 
-    Revision $Id: VTableLookupRunParameter.cpp,v 1.1.2.6.4.2.2.4.2.1.6.1.2.6.2.12.2.3 2010/11/18 10:33:51 gmaier Exp $
-
     \author
     Gernot Maier
 */
@@ -20,7 +18,7 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     ze = 0.;
     isMC = false;
     fInterpolate = 0;
-    fUseMedianEnergy = true;
+    fUseMedianEnergy = 1;
     fPE = false;
     fInterpolateString = "";
     readwrite = 'R';
@@ -130,7 +128,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
         }
         else if( iTemp.find( "useMedian" ) < iTemp.size() )
         {
-            fUseMedianEnergy = (bool)atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+            fUseMedianEnergy = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
         else if( iTemp.find( "noise" ) < iTemp.size() )
         {
@@ -398,7 +396,8 @@ void VTableLookupRunParameter::print( int iP )
     {
 	cout << "minimum number of showers required per bin: " << fMinRequiredShowerPerBin << endl;
     }
-    if( fUseMedianEnergy ) cout << "use median of energy distributions" << endl;
+    if( fUseMedianEnergy == 1 ) cout << "use median of energy distributions" << endl;
+    else if( fUseMedianEnergy == 2 ) cout << "use median+mpv of energy distributions" << endl;
     else                   cout << "use mean of energy distributions" << endl;
     if( fInterpolate > 0 )
     {
