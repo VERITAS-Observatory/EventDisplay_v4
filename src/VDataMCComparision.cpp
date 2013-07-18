@@ -651,14 +651,37 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
     {
       fData->GetEntry( i );
 
-      // define astro object (each time a new run starts)
+// define astro object (each time a new run starts)
       if( iOldRun != fData->runNumber && fWobbleFromDataTree )
 	{
-	  fWobbleNorth = fData->WobbleN;
-	  fWobbleEast = fData->WobbleE;
+
+	  TFile *iCurrentFile = iC->GetFile();
+	  if( iCurrentFile )
+	  {
+	     VEvndispRunParameter* iRunPar = (VEvndispRunParameter*)iCurrentFile->Get( "runparameterV2" );
+	     if( iRunPar )
+	     {
+		fWobbleNorth = iRunPar->fWobbleNorth;
+		fWobbleEast  = iRunPar->fWobbleEast;
+             }
+             else
+	     {
+	        cout << "VDataMCComparision::fillHistograms: error reading runparameter for run ";
+		cout << fData->runNumber << endl;
+		cout << "exiting..." << endl;
+		exit( 0 );
+             }
+          }
+	  else
+	  {
+	     cout << "VDataMCComparision::fillHistograms: error reading file for wobbles ";
+	     cout << iCurrentFile->GetName() << endl;
+	     cout << "exiting..." << endl;
+	     exit( 0 );
+	  }
 
 	  cout << "\t now at run " << fData->runNumber << " (" << fData->eventNumber << "):";
-	  cout << " N " << fData->WobbleN << ", E " << fData->WobbleE << endl;
+	  cout << " N " << fWobbleNorth << ", E " << fWobbleEast << endl;
 
 	  iOldRun = fData->runNumber;
 	}
