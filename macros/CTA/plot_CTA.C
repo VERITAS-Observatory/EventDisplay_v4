@@ -108,20 +108,41 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
     int iMarkerColor = 0;
     char hname[200];
 
+    unsigned int iLST = 0;
+    unsigned int iMST = 0;
+    unsigned int iDCSST = 0;
+    unsigned int iSCSST = 0;
+
     for( int i = 0; i < t->GetEntries(); i++ )
     {
        t->GetEntry( i );
 
 // LSTs (1)
-       if( iTelType == 138704810 || iTelType == 141305009 || iTelType == 141305109 ) iMarkerColor = 2;
+       if( iTelType == 138704810 || iTelType == 141305009 || iTelType == 141305109 )
+       {
+          iMarkerColor = 2;
+	  iLST++;
+       }
 // standard MSTs (2)
-       else if( iTelType == 10007818 || iTelType == 10408418 || iTelType == 10008118 ) iMarkerColor = 1;
+       else if( iTelType == 10007818 || iTelType == 10408418 || iTelType == 10008118 )
+       {
+          iMarkerColor = 1;
+	  iMST++;
+       }
 // large pixel MSTs (4)
        else if( iTelType == 10009725 )  iMarkerColor = 6;
 // standard SSTs (3)
-       else if( iTelType == 3709725 || iTelType == 3709425 || iTelType == 3710125 ) iMarkerColor = 3;
+       else if( iTelType == 3709725 || iTelType == 3709425 || iTelType == 3710125 )
+       {
+          iMarkerColor = 3;
+	  iDCSST++;
+       }
 // 7m telescopes (5, prod1) or SCT (prod2)
-       else if( iTelType == 7309930  || iTelType == 201509515 ) iMarkerColor = 4;
+       else if( iTelType == 7309930  || iTelType == 201509515 )
+       {
+          iMarkerColor = 4;
+	  iSCSST++;
+       }
        else
        {
           cout << "unknown telescope type: " << iTelType << endl;
@@ -134,6 +155,10 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
 
 
     }
+    cout << "# of LSTs: " << iLST << endl;
+    cout << "# of MSTs: " << iMST << endl;
+    cout << "# of DCSSTs: " << iDCSST << endl;
+    cout << "# of SCSSTs: " << iSCSST << endl;
 // draw array name
     if( iname )
     {
