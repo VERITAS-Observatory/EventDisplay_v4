@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 21030719 (GM) ignore now exclusion regions while filling
+                significance distributions from sky maps
+
 * 20130718 (GM) added mpv determination in lookup table filling
                 (important for low-energy bins with asymmetric 
 		 distribution in energy)

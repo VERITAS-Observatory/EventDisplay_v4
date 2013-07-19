@@ -731,23 +731,55 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     else                  sprintf( hname, "hmap_stereo_on" );
     hmap_stereo_on = (TH2D*)getHistogram( hname, fRunNumber, "skyHistograms" );
 
+// get exclusion regions
+    TTree *t = (TTree*)getHistogram( "tExcludedRegions", -1, "" );
+    if( !t )
+    {
+        cout << "tree with excluded regions not found" << endl;
+        return 0;
+    }
+    float x = 0.;
+    float y = 0.;
+    float r = 0.;
+    t->SetBranchAddress( "x", &x );
+    t->SetBranchAddress( "y", &y );
+    t->SetBranchAddress( "r", &r );
+
+    const int iN = t->GetEntries();
+    float *v_x = new float[iN];
+    float *v_y = new float[iN];
+    float *v_r = new float[iN];
+    cout << "Found " << iN << " exclusion regions" << endl;
+
+    for( int i = 0; i < iN; i++ )
+    {
+        t->GetEntry( i );
+	v_x[i] = x;
+	v_y[i] = y;
+	v_r[i] = r;
+    }
+
 // get 1D histograms
     TH1D *hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
-    setHistogramPlottingStyle( hsig_1D, 1, 2, 1, 1, 1, 0 );
-    if( hsig_1D ) hsig_1D->SetStats( 1 );
+    setHistogramPlottingStyle( hsig_1D, 4, 2, 1, 1, 1, 0 );
+    if( hsig_1D ) hsig_1D->SetStats( 0 );
 
     TH1D *hsig_1DAll  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, 0., false, hmap_stereo_on );
     setHistogramPlottingStyle( hsig_1DAll, 2, 2, 2, 1, 1, 0 );
     if( hsig_1DAll ) hsig_1DAll->SetStats( 0 );
+    
+    TH1D *hsig_1DExcluded = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r );
+    setHistogramPlottingStyle( hsig_1DExcluded, 1, 2, 2, 1, 1, 0 );
+    if( hsig_1DExcluded ) hsig_1DExcluded->SetStats( 1 );
 
     gStyle->SetOptFit( 1111 );
 
 // significance
     TCanvas *c_sig1D = 0;
-    if( hsig_1D && hsig_1DAll )
+    if( hsig_1D && hsig_1DAll && hsig_1DExcluded )
     {
-        hsig_1D->SetXTitle( "significance" );
-        hsig_1D->SetYTitle( "# of entries" );
+        hsig_1DExcluded->SetXTitle( "significance" );
+        hsig_1DExcluded->SetYTitle( "# of entries" );
 	if( !cCanvas )
 	{
 	   if( fPlotCorrelated )
@@ -762,20 +794,21 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	   }
 	   c_sig1D = new TCanvas( hname, htitle, 10, 10, 400, 400 );
 	   c_sig1D->Draw();
-	   if( hsig_1D->GetEntries() > 0 ) c_sig1D->SetLogy( 1 );
+	   if( hsig_1DExcluded->GetEntries() > 0 ) c_sig1D->SetLogy( 1 );
         }
 	else
 	{
-	   if( hsig_1D->GetEntries() > 0 ) cCanvas->SetLogy( 1 );
+	   if( hsig_1DExcluded->GetEntries() > 0 ) cCanvas->SetLogy( 1 );
 	   cCanvas->cd();
         }
 
-        hsig_1D->Draw( "e hist" );
-        hsig_1D->Fit( "gaus" );
-        if( hsig_1D->GetFunction( "gaus" ) ) hsig_1D->GetFunction( "gaus" )->SetLineColor( 8 ); 
-        hsig_1D->Draw( "e hist same" );
+        hsig_1DExcluded->Draw( "e hist" );
+        hsig_1DExcluded->Fit( "gaus" );
+        if( hsig_1DExcluded->GetFunction( "gaus" ) ) hsig_1DExcluded->GetFunction( "gaus" )->SetLineColor( 8 ); 
+        hsig_1DExcluded->Draw( "e hist same" );
 
         hsig_1DAll->Draw("e hist same" );
+	hsig_1D->Draw("e hist same" );
 
 // difference plot
 	if( !cCanvas )

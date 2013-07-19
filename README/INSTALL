@@ -6,6 +6,8 @@ Prerequisites
 
 (0.1) ROOT must be installed 
       version >= 5.32
+      Compiling options should be 
+       ./configure --enable-minuit2 --enable-mysql --enable-tmva
 
 VERITAS analysis
 ----------------

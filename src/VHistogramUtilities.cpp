@@ -267,7 +267,8 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram(  TH1D* iH_in, bool iNormali
 }
 
 
-TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, double rSource, bool iDiff, TH2D *hTest )
+TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, double rSource, bool iDiff, TH2D *hTest,
+                                                 int iExcN, float *iExcX, float *iExcY, float *iExcR )
 {
     if( !h ) return 0;
 
@@ -295,7 +296,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
 
     char hname[200];
     if( iDiff ) sprintf( hname, "hdiff1D_%d_%f", ion, rSource );
-    else        sprintf( hname, "hsig1D_%d_%f", ion, rSource );
+    else        sprintf( hname, "hsig1D_%d_%f_%d", ion, rSource, iExcN );
 
     TH1D *h1D;
     if( gDirectory->Get( hname ) )
@@ -320,6 +321,17 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
             double y_r = h->GetYaxis()->GetBinCenter( j );
             if( TMath::Sqrt( x_r*x_r + y_r*y_r ) > rmax ) continue;
 
+// exclusion regions
+	    bool iBBreak = false;
+            for( int e = 0; e < iExcN; e++ )
+	    {
+	       if( (x_r-iExcX[e])*(x_r-iExcX[e])+(y_r-iExcY[e])*(y_r-iExcY[e]) < iExcR[e]*iExcR[e] ) 
+	       {
+	          iBBreak = true;
+		  continue;
+               }
+	    }
+	    if( iBBreak ) continue;
 // exclude source bins
             if( TMath::Sqrt( x_r*x_r + y_r*y_r ) > rSource ) h1D->Fill( h->GetBinContent( i, j ) );
         }
