@@ -194,7 +194,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setSignalEfficiency( double iSignalEfficiency = -99. );
    void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
-   void   setTMVAOptimizationEnergyStepSize( double iStep = 0.25 ) { fTMVAOptimizationStepsize = iStep; }
+   void   setTMVAOptimizationEnergyStepSize( double iStep = 0.20 ) { fTMVAOptimizationStepsize = iStep; }
    void   setTMVACutValue( double iE = -99. );
    void   setTMVACutValue( map< unsigned int, double > iMVA );
    void   setTMVAErrorFraction( double iTMVAErrorFraction_min = 0.2 ) { fTMVAErrorFraction_min = iTMVAErrorFraction_min; }

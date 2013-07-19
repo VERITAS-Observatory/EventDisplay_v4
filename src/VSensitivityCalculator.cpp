@@ -1610,7 +1610,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
         double iBinEnergyMin = fMC_Data[1]->effArea_Emin;
 	if( fDebug ) cout << "VSensitivityCalculator::getDifferentialFluxVectorfromMC: minimum energy: " << iBinEnergyMin << endl;
 // get minimum energy bin
-        while( fMC_Data[1]->energy.size() > 0 && iBinEnergyMin - (fMC_Data[1]->energy[0] - iBinSize/2.) < -1.e-4 )
+/*        while( fMC_Data[1]->energy.size() > 0 && iBinEnergyMin - (fMC_Data[1]->energy[0] - iBinSize/2.) < -1.e-4 )
         {
             iBinEnergyMin += dE_Log10;
         }
@@ -1618,7 +1618,9 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	{
 	   cout << "VSensitivityCalculator::getDifferentialFluxVectorfromMC: minimum energy (after adjustment to energy binning): ";
 	   cout << iBinEnergyMin << endl;
-        }
+        } */
+// use first bin low edge of gamma-ray effective area
+        if( fMC_Data[1]->energy_lowEdge.size() > 0 ) iBinEnergyMin = fMC_Data[1]->energy_lowEdge[0];
 // now fill vector with energies and energy bins
         while( iBinEnergyMin < fMC_Data[1]->effArea_Emax )
         {
@@ -2066,11 +2068,11 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
         cout << "\t found effective area " << i << " with " << c->nbins << " bins" << endl;
         bFound = true;
 
+/////////////////////////////////////////////////////////
 // fill effective areas vs reconstructed energy (log10!)
         for( int n = 0; n < c->nbins; n++ )
         {
 // fill effective areas vs MC energy
-	    if( c->e0[n] < iMCPara->energy_min_log || c->e0[n] > iMCPara->energy_max_log ) continue;
 // require more than one event per pair of bins 
 // (effective areas are usually in finer bins than differential sensitivity)
 	    if( ( c->hEcutUW &&
@@ -2078,6 +2080,11 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) + 1 ) > 1. )
 	     || !c->hEcutUW )
 	    {
+// check energy range
+//	       if( c->e0[n] < iMCPara->energy_min_log || c->e0[n] > iMCPara->energy_max_log ) continue;
+	       if( c->hEmc->GetBinLowEdge( c->hEmc->FindBin( c->e0[n] ) ) < iMCPara->energy_min_log ) continue;
+	       if( c->hEmc->GetBinLowEdge( c->hEmc->FindBin( c->e0[n] ) ) + c->hEmc->GetBinWidth( c->hEmc->FindBin( c->e0[n] ) ) > iMCPara->energy_max_log ) continue;
+// fill energy values
 	       iMCPara->energy.push_back( c->e0[n] );
 	       if( c->hEmc )
 	       {
@@ -2105,6 +2112,11 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	    cout << " emin: " << iMCPara->effArea_Emin;
 	    cout << " emax: " << iMCPara->effArea_Emax;
 	    cout << endl;
+        }
+	else
+	{
+	    cout << "\t no global binning for effective areas found" << endl;
+	    iMCPara->effArea_Emin = 0.;
         }
         break;
     }

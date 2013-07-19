@@ -54,14 +54,16 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
 
 // gammas
        b.setMonteCarloParameters( 1, iESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
-                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
+                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma,
+				  -1.9 );
 // protons
        b.setMonteCarloParameters( 14, iESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
-                                  i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
+                                  i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton,
+				  -1.9 );
 // electrons (spectral index?)
        if( iMC_Electron )
        {
-          b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 2, iMC_Electron, 20., 0, 0.0, 250, 3.0 );
+          b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 2, iMC_Electron, 20., 0, 0.0, 250, 3.0, -1.9 );
        }
 // calculate differential fluxes for 5 bins per decade (0.2)
        b.calculateParticleNumberGraphs_MC( 0.2 );

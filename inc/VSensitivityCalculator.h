@@ -273,7 +273,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	void     setPlotCrabFluxLineValues( vector< double > iF ) { fPlottingCrabFlux_CU = iF; }
         void     setPlotDebug( string iName ) { fPlotDebugName = iName; }
         bool     setCurrentDataSet( unsigned int iD );
-        void     setEnergyRange_Log( double iLMin = -1.5, double iLMax = 1.5 );
+        void     setEnergyRange_Log( double iLMin = -1.9, double iLMax = 2.1 );
         void     setEnergyRange_Lin( double iLMin = 0.03, double iLMax = 30. );
 	bool     setEnergySpectrumfromLiterature( string iFile, unsigned int iID = 1 );
 	void     setEnergySpectrumfromLiterature_ID( unsigned int iID ) { fEnergySpectrumfromLiterature_ID = iID; }
@@ -284,7 +284,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setMonteCarloParameters( unsigned int iParticleID, string iSpectralParameterFile, unsigned int iSpectralParameterID,
 	                                  string iGammaEffectiveAreaFile, double ze = 20., 
 					  int az = 0, double woff = 0.5, int noise = 150, double index = 2.5,
-					  double iEnergy_min_lin = -10., double iEnergy_max_lin = 10., string bUnit = "CU" );
+					  double iEnergy_min_log = -10., double iEnergy_max_log = 10., string bUnit = "CU" );
         void     setObservationTimeRange( double iObs_min = 0.5e-3, double iObs_max = 5.e4, int iObs_steps = 1000 );    // hours
 	void     setRequireCutsToBeOptimized( bool iB = true ) { fRequireCutsToBeOptimized = iB; }
         void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50.,
