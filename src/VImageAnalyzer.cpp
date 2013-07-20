@@ -41,6 +41,8 @@ VImageAnalyzer::VImageAnalyzer()
         fRGraph.push_back( new TGraphErrors(1) );
     }
 
+//If -hough is specified on the command line, run the hough transform initialization method in fVImageParameterCalculation
+    if (fRunPar->fhoughmuonmode) fVImageParameterCalculation->houghInitialization();
 }
 
 

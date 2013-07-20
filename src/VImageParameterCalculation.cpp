@@ -544,20 +544,17 @@ void VImageParameterCalculation::muonPixelDistribution()
 
 
 //Hough transform class instantiation
-void VImageParameterCalculation::houghInitialization() {
+void VImageParameterCalculation::houghInitialization()
+{
 
-fHoughTransform = new VHoughTransform( getDetectorGeo() );
+   fHoughTransform = new VHoughTransform( getDetectorGeo() );
 
 }
 
 
 //Placeholder for Hough transform based parametrization algorithm
-void VImageParameterCalculation::houghMuonRingFinder() {
-
-
-
-
-
+void VImageParameterCalculation::houghMuonRingFinder()
+{
 
 
 }

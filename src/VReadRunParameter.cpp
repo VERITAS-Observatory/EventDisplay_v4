@@ -102,6 +102,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fmuonmode = 1;
         }
+	else if( iTemp.find( "hough" ) < iTemp.size() )
+        {
+	    fRunPara->fhoughmuonmode = 1;
+	}
 // Frogs mode
         else if( iTemp.find( "frogs" ) < iTemp.size() )
         {
