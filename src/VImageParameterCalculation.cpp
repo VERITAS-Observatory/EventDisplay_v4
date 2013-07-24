@@ -413,7 +413,7 @@ void VImageParameterCalculation::sizeInMuonRing()
 {
   if( fDebug ) cout << "VImageParameterCalculation::sizeInMuonRing" << endl;
   if( !fData ) return;
-  if( fParGeo->muonValid == 0 )
+  if( fParGeo->muonValid == 0 && fParGeo->houghMuonValid == 0)
       {
       fParGeo->muonSize = 0.0;      
       return;
