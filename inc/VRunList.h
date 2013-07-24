@@ -34,6 +34,7 @@ class VRunList : public TObject
         VRunList();
         ~VRunList() {}
         void print();
+	void print( bool csv );
         void reset();
 
         ClassDef (VRunList, 4 );

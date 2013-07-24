@@ -55,4 +55,22 @@ void VRunList::print()
     if( phase > 0. ) cout << " phase: " << phase;
     cout << endl;
 }
+
+void VRunList::print( bool csv )
+{
+  if( csv ) {
+    cout << runnumber << ", " << setprecision( 6 ) << MJD;
+    cout << ", " << setprecision(2) << fixed << (1.-deadTimeFraction)*100.;
+    cout << ", " << fixed << NOn << ", " << NOff;
+    cout << setprecision(3) << ", " << alpha << ", ";
+    if( elevationOn > 0. ) cout << elevationOn;
+    else                   cout << elevationOff;
+    cout << ", " << pedvarsOn;
+    if( energyThreshold > 0. ) cout << "," << energyThreshold*1.e3;
+    if( phase > 0. ) cout << ", " << phase;
+    cout << endl;
+  }
+  else
+    print();
+
 #endif

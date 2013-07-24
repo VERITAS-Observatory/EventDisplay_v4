@@ -90,6 +90,7 @@ class VAnalysisUtilities : public TNamed
         bool     openFile( string ifile, int irun = -1, bool iStereo = true, bool iPrint = true );
 	void     printEnergyThresholds();
 	void     printRunList();
+	void     printRunList( bool csv );
         bool     readRunList();
         bool     readRunList( vector< int > irunlist, int iTot = 1 );
         void     setDebug( unsigned int iDebug = true ) { fDebug = iDebug; }

@@ -417,6 +417,20 @@ void VAnalysisUtilities::printRunList()
    }
 }
 
+void VAnalysisUtilities::printRunList( bool csv )
+{
+  if( csv )
+    for( unsigned int i = 0; i < getRunList().size(); i++ )
+      {
+        getRunList()[i].print( csv );
+      }
+  else
+    for( unsigned int i = 0; i < getRunList().size(); i++ )
+      {
+        getRunList()[i].print();
+      }
+}
+
 void VAnalysisUtilities::setRunListCutMJDRange( double iMJDMin, double iMJDMax )
 {
    fRunListCut_MJD_min.clear();
