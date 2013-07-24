@@ -72,5 +72,5 @@ void VRunList::print( bool csv )
   }
   else
     print();
-
+}
 #endif
