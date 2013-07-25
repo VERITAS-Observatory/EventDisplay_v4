@@ -67,6 +67,12 @@ void VEnergySpectrumfromLiterature::setFunctions()
     a.Description = "power law with exponential cut off (+cut-off strength)";
     a.NumParameters = 5;
     fEnergyFun.push_back( a );
+
+// power law with exponential cut off (Gaussian factor)
+    a.Name = "PLEC_GF";
+    a.Description = "power law with exponential cut off (Gaussian factor)";
+    a.NumParameters = 6;
+    fEnergyFun.push_back( a );
 }
 
 bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile )
@@ -383,7 +389,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 // broken power law (e.g. A&A 457, 899 (2006))
 	  else if( fData[iID].Type == 3 )
 	  {
-	      sprintf( hname, "[1]*TMath::Power( %s / %f, [2] ) ", h_energy, fData[iID].Parameter[0] );
+	      sprintf( hname, "[1]*TMath::Power( %s / [0], [2] ) ", h_energy );
 	      sprintf( hname, "%s * TMath::Power( 1. + TMath::Power( %s / [0], 1./[4] ), [4]*([3]-[2]) )", hname, h_energy );
 	  }
 // broken power law (2)
@@ -397,6 +403,12 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 	  {
 	      sprintf( h_exponent, "TMath::Exp( -1.* TMath::Power( %s  / [1], [3] ) )", h_energy );
 	      sprintf( hname, "[0] * TMath::Power( %s / %f, [2] ) * %s", h_energy, fData[iID].Parameter[0], h_exponent );
+	  }
+// power law with exponential cut off (Gaussian factor)
+	  else if( fData[iID].Type == 6 )
+	  {
+	      sprintf( hname, "[0]*TMath::Power( %s / %f, [4] ) ", h_energy, fData[iID].Parameter[0] );
+	      sprintf( hname, "%s * (1.+[1]*(exp(TMath::Gaus(log10(%s),[2], [3] ))-1.))", hname, h_energy ); 
 	  }
         
         }
@@ -547,6 +559,22 @@ void VEnergySpectrumfromLiterature::listValues( unsigned int i )
 	 sprintf( hname, ", Gamma = (%.3f +- %.3f)", fData[i].Parameter[3], fData[i].ParError[3] );
 	 cout << hname;
     }
+    else if( fData[i].Type == 6 && fData[i].Parameter.size() == 6 && fData[i].ParError.size() == 6 )
+    {
+         sprintf( hname, "\t(power law with exponential cut off (Gaussian factor): dN/dE = I x (E/%.2f)^(Gamma_1) / ( 1 + f * ( e^-(Gauss( log(E/%.2f), Mean, Sigma ) ) -1 ) )", fData[i].Parameter[0], fData[i].Parameter[0] );
+	 cout << hname << endl;
+      cout << "\t";
+      sprintf( hname, "I = (%.3e +- %.3e) cm^-2 s^-1 TeV^-1", fData[i].Parameter[1], fData[i].ParError[1] );
+      cout << hname;
+      sprintf( hname, ", Gamma = (%.3f +- %.3f)", fData[i].Parameter[5], fData[i].ParError[5] );
+      cout << hname << endl;
+      sprintf( hname, "\t Mean = (%.3f +- %.3f)", fData[i].Parameter[3], fData[i].ParError[3] );
+      cout << hname;
+      sprintf( hname, ", Sigma = (%.3f +- %.3f)", fData[i].Parameter[4], fData[i].ParError[4] );
+      cout << hname;
+      sprintf( hname, ", f = (%.3f +- %.3f)", fData[i].Parameter[2], fData[i].ParError[2] );
+      cout << hname;
+    }
     cout << endl;
     cout << "\t " << fData[i].EnergyRange_min << " < E [TeV] < " << fData[i].EnergyRange_max << endl;
     if( fData[i].FluxV_energy.size() > 0 )
@@ -567,7 +595,7 @@ void VEnergySpectrumfromLiterature::listValues( unsigned int i )
 }
 
 
-TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas *c )
+TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas *c, bool iLogY )
 {
     TF1 *f = getEnergySpectrum( iID, true );
     if( !f ) return 0;
@@ -599,8 +627,8 @@ TCanvas* VEnergySpectrumfromLiterature::plot( unsigned int iID, TCanvas *c )
         }
         hNull->GetYaxis()->SetTitleOffset( 1.6 );
 
-        plot_nullHistogram( c, hNull, fPlottingLogEnergyAxis, true, hNull->GetYaxis()->GetTitleOffset(), fPlottingMinEnergy, fPlottingMaxEnergy );
-        c->SetLogy( 1 );
+        plot_nullHistogram( c, hNull, fPlottingLogEnergyAxis, iLogY, hNull->GetYaxis()->GetTitleOffset(), fPlottingMinEnergy, fPlottingMaxEnergy );
+        c->SetLogy( iLogY );
     }
     else c->cd();
 

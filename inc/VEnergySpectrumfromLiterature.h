@@ -92,16 +92,17 @@ class VEnergySpectrumfromLiterature : public VPlotUtilities
 
         void listValues();
         void listValues( unsigned int iID );
-        TCanvas* plot( unsigned int iID = 0, TCanvas *c = 0 );
+        TCanvas* plot( unsigned int iID = 0, TCanvas *c = 0, bool iPlotY = true );
         TCanvas* plot( string iselection, TCanvas *c = 0  );
         bool readValuesFromFile( string ifile = "$OBS_EVNDISP_ANA_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues.dat" );
 
         void setPlottingLogEnergyAxis( bool iB = true ) { fPlottingLogEnergyAxis = iB; }
         void setPlottingMultiplierIndex( float iS = 0. ) { fPlottingMultiplierIndex = iS; }
         void setPlottingEnergyRangeLinear( float xmin = 0.03, float xmax = 100. ) { fPlottingMinEnergy = xmin; fPlottingMaxEnergy = xmax; }
-        void setPlottingEnergyRangeLog( float xmin = -1.5, float xmax = 2. ) { fPlottingMinEnergy = TMath::Power( 10., xmin ); fPlottingMaxEnergy = TMath::Power( 10., xmax ); }
+        void setPlottingEnergyRangeLog( float xmin = -1.5, float xmax = 2. ) { fPlottingMinEnergy = TMath::Power( 10., xmin ); 
+	                                                                       fPlottingMaxEnergy = TMath::Power( 10., xmax ); }
         void setPlottingYaxis( float iMin = 1.e-17, float iMax = 1.e-7 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
-        ClassDef(VEnergySpectrumfromLiterature,3);
+        ClassDef(VEnergySpectrumfromLiterature,4);
 };
 #endif
