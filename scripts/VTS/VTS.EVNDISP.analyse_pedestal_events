@@ -44,7 +44,7 @@ then
 fi
 
 OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
-if [ -n "$3" ] && [ $4 = "1" ]
+if [ $3 = "1" ]
 then
    OPT="-calibrationsumwindow=20 -calibrationsumfirst=100 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
 fi
