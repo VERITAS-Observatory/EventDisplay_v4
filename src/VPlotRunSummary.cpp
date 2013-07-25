@@ -1,7 +1,6 @@
 /*! \class VPlotRunSummary
     \brief different plot routines (rates vs. elevation etc)
 
-    Revision $Id: VPlotRunSummary.cpp,v 1.1.2.7.8.3.2.5.4.3 2011/02/14 08:09:14 gmaier Exp $
 
     \author
     Gernot Maier

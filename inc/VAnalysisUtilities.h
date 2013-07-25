@@ -1,5 +1,4 @@
 //! VAnalysisUtilities
-// Revision $Id: VAnalysisUtilities.h,v 1.1.2.7.8.2.2.10.2.3.2.3 2011/04/08 13:48:13 gmaier Exp $
 #ifndef VAnalysisUtilities_H
 #define VAnalysisUtilities_H
 

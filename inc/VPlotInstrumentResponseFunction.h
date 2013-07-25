@@ -1,5 +1,4 @@
 //! VPlotInstrumentResponseFunction effective area plotter
-// Revision $Id: VPlotInstrumentResponseFunction.h,v 1.1.2.8 2011/03/28 07:05:52 gmaier Exp $
 
 #ifndef VPlotInstrumentResponseFunction_H
 #define VPlotInstrumentResponseFunction_H

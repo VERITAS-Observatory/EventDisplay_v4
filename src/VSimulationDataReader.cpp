@@ -3,7 +3,6 @@
 
     workaround to get simulation data from vbf file format
 
-    Revision $Id: VSimulationDataReader.cpp,v 1.1.2.2.2.1 2011/02/14 13:13:28 gmaier Exp $
 
     \author
       Gernot Maier

@@ -1,6 +1,5 @@
 /*! \class VPlotUtilities
 
-    Revision $Id: VPlotUtilities.cpp,v 1.1.2.5.2.1.8.4.4.6 2011/02/07 11:03:30 gmaier Exp $
 
     \author Gernot Maier
 */

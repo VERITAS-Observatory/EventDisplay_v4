@@ -1,5 +1,4 @@
 //! VEnergySpectrumfromLiterature provide spectra from literature
-// Revision $Id: VEnergySpectrumfromLiterature.h,v 1.1.2.7.6.1.4.5.2.1 2011/01/05 09:46:14 gmaier Exp $
 
 #ifndef VEnergySpectrumfromLiterature_H
 #define VEnergySpectrumfromLiterature_H

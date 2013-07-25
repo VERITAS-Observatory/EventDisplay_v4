@@ -4,7 +4,6 @@
 // from TTree data/MSWC and energy lookup results
 // found on file: 31391.mscw.root
 //////////////////////////////////////////////////////////
-//  Revision $Id: CData.h,v 1.1.8.1.10.1.2.1.4.1.2.1.2.7.8.5.2.6 2010/09/24 10:59:50 gmaier Exp $
 
 #ifndef CData_h
 #define CData_h

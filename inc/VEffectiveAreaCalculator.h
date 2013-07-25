@@ -1,5 +1,4 @@
 //!< VEffectiveAreaCalculator calculate effective areas and energy spectra
-//  Revision $Id: VEffectiveAreaCalculator.h,v 1.18.2.12.4.3.12.5.4.1.2.7.2.4.8.3.2.7.4.3 2011/03/31 14:50:58 gmaier Exp $
 
 #ifndef VEffectiveAreaCalculator_H
 #define VEffectiveAreaCalculator_H

@@ -4,7 +4,6 @@
  *  \author
  *  Gernot Maier
  *
- *  Revision $Id: VStereoHistograms.cpp,v 1.25.2.2.16.1.2.2.4.1.2.2.2.1.8.1.2.2.2.1 2010/10/30 03:46:19 gmaier Exp $
  */
 
 #include "VStereoHistograms.h"

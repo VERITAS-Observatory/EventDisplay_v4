@@ -1,7 +1,6 @@
 /*! \class VDetectorTree
     \brief tree with basic telescope parameters (positions, ...)
 
-    Revision $Id: VDetectorTree.cpp,v 1.2.30.1.10.12.2.1 2010/12/17 09:58:34 gmaier Exp $
 
     \author Gernot Maier
 */

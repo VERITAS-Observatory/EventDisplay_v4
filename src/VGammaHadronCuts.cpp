@@ -1,7 +1,6 @@
 /*! \class VGammaHadronCuts
   \brief class containing parameter cut definitions
 
-  Revision $Id: VGammaHadronCuts.cpp,v 1.19.2.3.4.4.4.1.8.3.4.3.2.6.2.7.2.1.4.2.2.5.2.18.2.4.2.10 2011/04/11 16:10:27 gmaier Exp $
 
   List of cut selectors:
 

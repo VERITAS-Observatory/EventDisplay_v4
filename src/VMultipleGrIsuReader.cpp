@@ -1,7 +1,6 @@
 /*! \class VMultipleGrIsuReader
     \brief read grisu simulation data from several files (one per telescope)
 
-    Revision $Id: VMultipleGrIsuReader.cpp,v 1.1.2.7.4.1.6.1 2010/03/08 07:39:56 gmaier Exp $
 
     \author Gernot Maier
 */

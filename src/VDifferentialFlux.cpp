@@ -1,7 +1,6 @@
 /*! \class VDifferentialFlux
     \brief data and converter class for differential flux values
 
-    Revision $Id: VDifferentialFlux.cpp,v 1.1.2.8.2.1.4.1.2.1.2.3.4.1 2011/02/07 16:53:29 gmaier Exp $
 
     \author Gernot Maier
 */

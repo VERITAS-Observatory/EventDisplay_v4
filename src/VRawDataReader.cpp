@@ -2,7 +2,6 @@
 
     steering class for reading raw data format
 
-    Revision $Id: VRawDataReader.cpp,v 1.14.38.1.2.1 2010/03/08 07:39:56 gmaier Exp $
 
     \author
       Gernot Maier

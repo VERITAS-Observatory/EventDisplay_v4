@@ -1,6 +1,5 @@
 //! VDisplay GUI class for event display
 //     fCanvasCharge->Connect( "ProcessedEvent(Int_t , Int_t , Int_t , TObject* )", "LCamera", this, "Print( Int_t, Int_t, Int_t, TObject* )" );
-// Revision $Id: VDisplay.h,v 1.29.20.4.2.2.10.1.6.2.2.3 2010/03/08 08:01:36 gmaier Exp $
 
 #ifndef VRDISPLAY_H
 #define VRDISPLAY_H

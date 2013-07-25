@@ -4,7 +4,6 @@
       Jamie Holder 
       Gernot Maier
 
-      Revision $Id: VMonoPlots.cpp,v 1.7.2.1.36.1.4.1 2011/02/15 16:12:13 gmaier Exp $
 */
 
 #include "VMonoPlots.h"

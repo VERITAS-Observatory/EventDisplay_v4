@@ -1,7 +1,6 @@
 /*! \class VZDCFData
     \brief  data class for ZDCF plotting
 
-    Revision $Id$
 
 */
 

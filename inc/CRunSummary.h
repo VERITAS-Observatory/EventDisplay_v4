@@ -3,7 +3,6 @@
 // Fri Sep 28 10:52:52 2007 by ROOT version 5.04/00
 // from TTree tRunSummary/anasum results
 // found on file: output.root
-// Revision $Id: CRunSummary.h,v 1.6.6.1.2.2.12.1.8.5.10.1 2010/03/08 07:45:11 gmaier Exp $
 //////////////////////////////////////////////////////////
 
 #ifndef CRunSummary_h

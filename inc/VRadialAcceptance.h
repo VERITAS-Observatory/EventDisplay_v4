@@ -1,5 +1,4 @@
 //!< VRadialAcceptance radial acceptance for a given point on the sky
-//  Revision $Id: VRadialAcceptance.h,v 1.9.2.2.4.2.12.1.4.1.2.1.2.1.10.1 2010/03/08 07:45:08 gmaier Exp $
 
 #ifndef VACCEPTANCE_H
 #define VACCEPTANCE_H

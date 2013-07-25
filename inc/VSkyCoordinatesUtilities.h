@@ -1,5 +1,4 @@
 //! VSkyCoordinatesUtilities utilities for timing and coordinate transformations
-// Revision $Id$
 
 #ifndef VSkyCoordinatesUtilities_H
 #define VSkyCoordinatesUtilities_H

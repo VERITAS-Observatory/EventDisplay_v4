@@ -1,5 +1,4 @@
 //! VMultipleGrIsuReader  read several grisu files at the same time
-// Revision $Id: VMultipleGrIsuReader.h,v 1.1.2.5.4.1.6.2 2010/03/09 15:43:27 gmaier Exp $
 
 #ifndef VMultipleGrIsuReader_H
 #define VMultipleGrIsuReader_H

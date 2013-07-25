@@ -1,5 +1,4 @@
 //! VGammaHadronCuts: class for parameter cut definitions
-//  Revision $Id: VGammaHadronCuts.h,v 1.13.2.2.4.1.12.2.6.2.2.5.6.1.2.1.2.15.4.4 2011/04/01 12:11:59 gmaier Exp $
 
 #ifndef VGammaHadronCuts_H
 #define VGammaHadronCuts_H

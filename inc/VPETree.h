@@ -1,5 +1,4 @@
 //! VPETreeReader write for pe data to root files
-// $Revision $ID$
 
 #ifndef VPETree_H
 #define VPETree_H

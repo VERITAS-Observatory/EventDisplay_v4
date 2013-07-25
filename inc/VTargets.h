@@ -1,5 +1,4 @@
 //! VTargets  data class with all astronomical targets
-//  Revision $Id: VTargets.h,v 1.3.10.1.12.1.8.2.10.1 2010/03/08 08:01:35 gmaier Exp $
 //
 //  NOTE:    THIS CLASS SHOULD NOT BE USED ANYMORE
 //

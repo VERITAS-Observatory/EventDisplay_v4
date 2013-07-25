@@ -1,5 +1,4 @@
 //! VBaseRawDataReader contains common elements of VRawDataReader and VBFDataReader
-// Revision $Id: VBaseRawDataReader.h,v 1.14.8.2.12.1.6.1.2.3.2.1.2.1.2.3.2.1.2.3 2010/10/26 00:00:38 gmaier Exp $
 
 #ifndef VBASEDATAREADER_H
 #define VBASEDATAREADER_H

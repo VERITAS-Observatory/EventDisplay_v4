@@ -1,7 +1,6 @@
 /*! \class VSpectralFitter
     \brief  fitter class for energy spectra
 
-    Revision $Id: VSpectralFitter.cpp,v 1.1.2.3.10.2 2010/03/08 07:49:52 gmaier Exp $
 
     \author Gernot Maier
 */

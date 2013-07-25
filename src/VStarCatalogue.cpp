@@ -1,7 +1,6 @@
 /*! \class VStarCatalogue
  *  \brief bright star catalogue
 
-    Revision $Id: VStarCatalogue.cpp,v 1.3.8.1.16.1.2.6.2.14.8.1.2.7.2.2.2.1 2011/04/06 11:57:56 gmaier Exp $
 
     \author Gernot Maier
 */

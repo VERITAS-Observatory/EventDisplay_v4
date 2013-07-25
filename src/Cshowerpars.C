@@ -1,4 +1,3 @@
-// Revision $Id: Cshowerpars.C,v 1.1.2.1.36.1 2010/03/08 08:00:48 gmaier Exp $
 #define Cshowerpars_cxx
 #include "Cshowerpars.h"
 #include <TH2.h>

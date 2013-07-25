@@ -1,5 +1,4 @@
 //! VTMVAEvaluator use a TMVA weight file for energy dependent gamma/hadron separation
-// Revision $Id: VTMVAEvaluator.h,v 1.1.2.3 2011/04/07 15:27:22 gmaier Exp $
 
 #ifndef  VTMVAEvaluator_H
 #define  VTMVAEvaluator_H

@@ -3,7 +3,6 @@
 
      ** PRELIMINARY **
 
-     Revision $Id: printDISPTables.cpp,v 1.1.2.1.2.1.4.1 2011/01/27 14:00:52 gmaier Exp $
 
      \author Gernot Maier
 */

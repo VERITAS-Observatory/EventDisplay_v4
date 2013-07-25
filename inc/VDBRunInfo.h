@@ -1,5 +1,4 @@
 //! VDBRunInfo get run info from DB
-// Revision $Id: VDBRunInfo.h,v 1.1.2.5.12.1.18.2.4.1 2011/04/06 11:57:57 gmaier Exp $
 
 #ifndef VDBRUNINFO_H
 #define VDBRUNINFO_H

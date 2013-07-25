@@ -1,5 +1,4 @@
 //! VDispTableAnalyzer get DISP values from tables
-// Revision $Id: VDispTableAnalyzer.h,v 1.1.2.3.2.4.4.1 2011/02/07 11:05:25 gmaier Exp $
 
 #ifndef VDispTableAnalyzer_H
 #define VDispTableAnalyzer_H

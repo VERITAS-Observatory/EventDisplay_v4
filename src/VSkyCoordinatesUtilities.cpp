@@ -1,7 +1,6 @@
 /*! \namespace VSkyCoordinatesUtilities
     \brief  utilities for timing and coordinate transformations
 
-     Revision $Id$
 */
 
 #include "VSkyCoordinatesUtilities.h"

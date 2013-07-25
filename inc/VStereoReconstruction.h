@@ -1,5 +1,4 @@
 //! VStereoReconstruction.h calculate and plot array and direction resolution
-// Revision $Id: VStereoReconstruction.h,v 1.1.2.5 2010/05/04 11:29:42 gmaier Exp $
 
 #ifndef VStereoReconstruction_h
 #define VStereoReconstruction_h

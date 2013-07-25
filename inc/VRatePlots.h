@@ -1,5 +1,4 @@
 //! VRatePlots   class for significance, rates, etc. graphs
-//  Revision $Id: VRatePlots.h,v 1.3.2.1.26.1.10.1 2010/03/08 07:45:10 gmaier Exp $
 
 #ifndef VRatePlots_H
 #define VRatePlots_H

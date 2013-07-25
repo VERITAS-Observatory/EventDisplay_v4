@@ -1,7 +1,6 @@
 /*! \class VInstrumentResponseFunctionRunParameter
     \brief run parameters for response function calculator (effective areas)
 
-    Revision $Id: VInstrumentResponseFunctionRunParameter.cpp,v 1.1.2.3 2011/04/11 16:09:05 gmaier Exp $
 
 */
 

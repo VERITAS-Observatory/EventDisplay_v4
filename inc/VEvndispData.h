@@ -1,5 +1,4 @@
 //! VEvndispData  central event data class
-// Revision $Id: VEvndispData.h,v 1.39.2.1.2.1.2.5.10.7.2.7.4.5.2.3.2.6.2.1.2.1.2.1.2.4.2.7.2.6.2.3.2.1 2011/04/21 10:03:37 gmaier Exp $
 
 #ifndef VDATA_H
 #define VDATA_H

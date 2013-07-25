@@ -2,7 +2,6 @@
 
     steering class for reading vbf data format
 
-    Revision $Id: VBFDataReader.cpp,v 1.18.8.2.20.5.2.1.4.1.2.1.2.2.4.2 2011/02/12 20:36:33 gmaier Exp $
 
     \author
       Filip Pizlo

@@ -1,8 +1,6 @@
 /*! \class VFluxCalculation
     \brief read effective area file from anasum output file, sum them up to mean effective area
 
-    Revision $Id: VFluxCalculation.cpp,v 1.1.2.10.8.2.2.3.4.2 2011/04/08 13:48:13 gmaier Exp $
-
     \author Gernot Maier
 */
 
@@ -186,7 +184,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
     }
 
     int nentries = fData->fChain->GetEntries();
-    if( fDebug )
+//    if( fDebug )
     {
        cout << "total number of runs: " << nentries;
        cout << " (" << iRunMin << ", " << iRunMax << ")" << endl;
@@ -536,10 +534,12 @@ void VFluxCalculation::getIntegralEffectiveArea()
       iTTot += fRunTOn[i];
     }
     if( iTTot > 0. ) fRunEffArea[fRunList.size()-1] /= iTTot;
-    else             fRunEffArea[fRunList.size()-1] = 0.;
+    else if( fRunList.size() > 0 ) fRunEffArea[fRunList.size()-1] = 0.;
     if( fDebug )
     {
-        cout << "Total, t_obs " << iTTot / 60. << " [min], < A > " << fRunEffArea[fRunList.size()-1] << " [m^2]" << endl;
+        cout << "Total, t_obs " << iTTot / 60. << " [min], < A > ";
+	if( fRunList.size() > 0 ) cout << fRunEffArea[fRunList.size()-1] << " [m^2]" << endl;
+	else                      cout << " (run list zero size)" << endl;
         cout << endl;
     }
 }

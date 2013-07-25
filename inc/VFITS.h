@@ -1,5 +1,4 @@
 //! VFITS read anasum file and write sky plots into FITS format
-// Revision $Id: VFITS.h,v 1.1.2.3.8.2.2.1.2.1.2.1 2011/04/08 13:48:13 gmaier Exp $
 
 #ifndef VFITS_H
 #define VFITS_H

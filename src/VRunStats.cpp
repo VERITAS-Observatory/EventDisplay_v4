@@ -6,7 +6,6 @@
      * add remaining fields from tblRun_Info (run_type, observing_mode, etc.)
      * add mean HV values
 
-    Revision $Id: VRunStats.cpp,v 1.1.2.1.10.11 2010/04/20 11:52:49 gmaier Exp $
 
     \author Gernot Maier
 */

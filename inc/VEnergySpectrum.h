@@ -1,5 +1,4 @@
 //! VEnergySpectrum analyse and plot energy spectra
-// Revision $Id: VEnergySpectrum.h,v 1.1.2.13.2.1.4.1.4.4.4.2 2011/04/11 16:09:05 gmaier Exp $
 
 #ifndef VEnergySpectrum_h
 #define VEnergySpectrum_h

@@ -1,7 +1,6 @@
 /*! \class VPedestalCalculator
     \brief pedestal calculation in time slices
 
-    Revision $Id: VPedestalCalculator.cpp,v 1.5.2.1.4.3.10.1.2.1.4.4.2.1.2.1.8.1.2.4.2.1.8.1 2011/04/21 10:03:37 gmaier Exp $
 
     \author Gernot Maier
 

@@ -8,7 +8,6 @@
  * \author
  *   Ester Aliu 
  *
- *   Revision $Id$
  */
 
 #include "VOrbitalPhase.h"

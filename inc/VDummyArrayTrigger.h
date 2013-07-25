@@ -1,5 +1,4 @@
 //! VDummyArrayTrigger dummy replacement for VArrayTrigger (for compilation without vbf)
-// Revision $Id: VDummyArrayTrigger.h,v 1.1.2.1 2011/04/21 10:03:37 gmaier Exp $
 
 #ifndef VDummyArrayTrigger_H
 #define VDummyArrayTrigger_H

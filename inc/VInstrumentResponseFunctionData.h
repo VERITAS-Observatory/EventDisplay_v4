@@ -1,5 +1,4 @@
 //! VInstrumentResponseFunctionData data class for response functions (e.g. angular resolution)
-// Revision $Id: VInstrumentResponseFunctionData.h,v 1.1.2.5 2011/02/07 11:03:29 gmaier Exp $
 
 #ifndef VInstrumentResponseFunctionData_H
 #define VInstrumentResponseFunctionData_H

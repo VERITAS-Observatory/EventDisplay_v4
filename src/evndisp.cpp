@@ -3,7 +3,6 @@
 
    event analysis and display
 
-   Revision $Id: evndisp.cpp,v 1.26.2.5.4.8.2.1.2.3.6.7.4.2.4.3.2.2.6.1.2.2 2010/03/08 07:39:49 gmaier Exp $
 
    \author( Gernot Maier, Jamie Holder)
 */

@@ -1,7 +1,6 @@
 /*! \file VStereoReconstruction.cpp
     \brief calculate and plot array reconstruction quality
 
-    Revision $Id: VStereoReconstruction.cpp,v 1.1.2.6 2010/06/02 15:14:56 gmaier Exp $
 
     \author Gernot Maier
 */

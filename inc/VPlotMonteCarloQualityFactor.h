@@ -1,5 +1,4 @@
 //! VPlotMonteCarloQualityFactor fill and plot quality factors for MC
-// Revision $Id: VPlotMonteCarloQualityFactor.h,v 1.1.2.2 2010/09/27 12:14:08 gmaier Exp $
 
 #ifndef VPlotMonteCarloQualityFactor_H
 #define VPlotMonteCarloQualityFactor_H

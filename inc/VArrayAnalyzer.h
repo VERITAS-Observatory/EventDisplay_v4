@@ -1,5 +1,4 @@
 //! VArrayAnalyzer class for analyzing VERITAS data (full array analysis)
-// Revision $Id: VArrayAnalyzer.h,v 1.18.2.2.4.3.10.1.10.1.2.3.2.2.2.1.2.5.2.3.4.1.2.2 2011/04/21 10:44:43 gmaier Exp $
 #ifndef VARRAYANALYZER_H
 #define VARRAYANALYZER_H
 

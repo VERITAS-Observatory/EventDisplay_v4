@@ -1,7 +1,6 @@
 /* \class VTablesToRead
    \brief service class for lookup tables
 
-   Revision $Id: VTablesToRead.cpp,v 1.1.2.1.14.2 2010/09/21 10:20:32 gmaier Exp $
 
    \author
    Gernot Maier

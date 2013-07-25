@@ -4,7 +4,6 @@
  *  \author
  *  Gernot Maier
  *
- *  Revision $Id: VOnOff.cpp,v 1.26.2.2.26.1.10.2 2010/05/27 08:44:52 gmaier Exp $
  */
 
 #include "VOnOff.h"

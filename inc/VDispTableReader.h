@@ -1,5 +1,4 @@
 //! VDispTableReader reading disp tables for angular reconstruction
-// Revision $Id: VDispTableReader.h,v 1.1.2.6.2.5.4.1 2011/01/27 14:00:53 gmaier Exp $
 
 #ifndef VDispTableReader_H
 #define VDispTableReader_H

@@ -1,5 +1,4 @@
 //!VOrbitalPhase calculation of the orbital phase
-// Revision $Id: VOrbitalPhase.h,v 1.1.2.2 2011/03/16 16:53:51 ealiu Exp $
 
 #ifndef VORBITALPHASE
 #define VORBITALPHASE

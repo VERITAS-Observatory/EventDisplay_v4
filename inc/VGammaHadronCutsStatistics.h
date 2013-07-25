@@ -1,5 +1,4 @@
 //! VGammaHadronCutsStatistics keep track of efficiency of different cuts
-// Revision $Id$
 
 #ifndef VGammaHadronCutsStatistics_H
 #define VGammaHadronCutsStatistics_H

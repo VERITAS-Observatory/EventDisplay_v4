@@ -3,7 +3,6 @@
     \class VEnergyThreshold
     \brief determine energy thresholds
 
-    Revision $Id: VEnergyThreshold.cpp,v 1.1.2.12.10.2 2010/07/21 15:02:36 gmaier Exp $
 
     This class can be used in three ways:
 

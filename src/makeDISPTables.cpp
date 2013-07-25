@@ -1,7 +1,6 @@
 /*! \file  makeDISPTables.cpp
     \brief generate tables for angular reconstruction (disp method)
 
-    Revision $Id: makeDISPTables.cpp,v 1.1.2.6.2.8.4.2 2011/02/07 11:05:24 gmaier Exp $
 
     stereo reconstruction with disp method, see Hofmann et al (1999) paper
 

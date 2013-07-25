@@ -1,5 +1,4 @@
 //! VMonoPlots
-//  Revision $Id: VMonoPlots.h,v 1.4.2.1.4.1.30.1 2010/03/08 07:45:09 gmaier Exp $
 
 #ifndef VMONOPLOTS_H
 #define VMONOPLOTS_H

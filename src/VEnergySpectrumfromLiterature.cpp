@@ -1,7 +1,6 @@
 /*! \class VEnergySpectrumfromLiterature
     \brief provide spectra from literature
 
-    Revision $Id: VEnergySpectrumfromLiterature.cpp,v 1.1.2.8.6.2.4.8.2.1.2.1 2011/01/07 10:45:36 gmaier Exp $
 
     \author Gernot Maier
 */

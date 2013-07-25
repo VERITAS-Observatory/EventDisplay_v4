@@ -1,7 +1,6 @@
 /*! \class VTableEnergyCalculator
     \brief fill or lookup energy tables
 
-    Revision $Id$
 
     \author Henrik Krawczynski (WashU), Gernot Maier 
 

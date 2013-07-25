@@ -1,5 +1,4 @@
 //! VFitEffectiveArea  effective area fitting
-// Revision $Id: VFitEffectiveArea.h,v 1.1.2.1.36.1 2010/03/08 07:45:09 gmaier Exp $
 
 #ifndef VFITEFFECTIVEAREA_H
 #define VFITEFFECTIVEAREA_H

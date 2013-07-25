@@ -1,5 +1,4 @@
 //! VStarCatalogue star catalogue
-// Revision $Id: VStarCatalogue.h,v 1.1.8.1.18.4.2.8.8.1.2.4.2.1 2010/12/23 15:47:18 gmaier Exp $
 
 #ifndef VSTARCATALOGUE_H
 #define VSTARCATALOGUE_H

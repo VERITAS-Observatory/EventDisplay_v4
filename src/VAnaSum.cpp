@@ -5,7 +5,6 @@
       Jamie Holder 
       Gernot Maier
 
-      Revision $Id: VAnaSum.cpp,v 1.47.2.10.4.3.10.1.2.2.4.2.2.2.2.7.8.6.2.4 2010/05/27 08:44:52 gmaier Exp $
 */
 
 #include "VAnaSum.h"

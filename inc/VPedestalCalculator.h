@@ -1,5 +1,4 @@
 //! VPedestalCalculator pedestal calculation in time slices
-// Revision $Id: VPedestalCalculator.h,v 1.1.26.3.14.3.10.1 2011/04/21 10:03:37 gmaier Exp $
 
 #ifndef VPEDESTALCALCULATOR_H
 #define VPEDESTALCALCULATOR_H

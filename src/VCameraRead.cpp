@@ -5,7 +5,6 @@
 
     observe that for EVNDISP version > 3 only .cfg are supported
 
-Revision $Id: VCameraRead.cpp,v 1.18.2.1.4.2.4.1.4.3.10.7.2.8.2.1.2.1.4.7.2.2.2.2 2011/04/06 11:57:56 gmaier Exp $
 
 \author Gernot Maier
 */

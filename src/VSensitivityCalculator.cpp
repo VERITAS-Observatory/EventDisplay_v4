@@ -52,7 +52,6 @@ a.setMonteCarloParameters(14, "../data/TeV_data/EnergySpectrum_literatureValues_
 // plot integral sensitivity
 a.plotIntegralSensitivityvsEnergyFromCrabSpectrum( 0, "MC" );
 
-Revision $Id: VSensitivityCalculator.cpp,v 1.1.2.3.4.2.2.13.2.22.4.5 2011/02/15 16:12:56 gmaier Exp $
 
 \author Gernot Maier
 */

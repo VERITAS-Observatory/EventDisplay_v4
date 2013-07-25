@@ -1,5 +1,4 @@
 //! VEvndispDataReader  wrapper classe for data reading
-// Revision $Id: VVirtualDataReader.h,v 1.29.2.1.4.4.12.2.6.1.2.1.2.2.2.1.2.2.4.4.2.2.8.1 2011/04/21 10:03:38 gmaier Exp $
 
 #ifndef VVIRTUALDATAREADER_H
 #define VVIRTUALDATAREADER_H

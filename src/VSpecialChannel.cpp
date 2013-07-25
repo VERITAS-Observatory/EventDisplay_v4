@@ -1,7 +1,6 @@
 /*! \class VSpecialChannel
     \brief read and administrate list of special channels (e.g. L2 channels)
 
-    Revision $Id: VSpecialChannel.cpp,v 1.1.2.5 2010/12/22 23:08:03 gmaier Exp $
 
     \author 
     Gernot Maier

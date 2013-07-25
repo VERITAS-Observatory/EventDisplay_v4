@@ -1,5 +1,4 @@
 //! VSpectralEnergyDistribution
-// Revision $Id: VSpectralEnergyDistribution.h,v 1.1.2.12.2.2.8.1.4.1 2011/01/07 10:45:36 gmaier Exp $
 
 #ifndef VSpectralEnergyDistribution_H
 #define VSpectralEnergyDistribution_H

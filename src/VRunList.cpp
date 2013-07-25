@@ -1,7 +1,6 @@
 /*! \class VRunList
     \brief data class
 
-    Revision $Id: VRunList.cpp,v 1.1.2.8.10.2.2.2 2010/12/06 11:43:34 gmaier Exp $
 
     \author Gernot Maier
 */

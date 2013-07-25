@@ -1,5 +1,4 @@
 //! VZDCFData data class for ZDCF plotting
-// Revision $Id$
 
 #ifndef VZDCFData_H
 #define VZDCFData_H

@@ -1,5 +1,4 @@
 //! VDispAnalyzer wrapper class for all modified disp analysis
-// Revision $Id: VDispAnalyzer.h,v 1.1.2.3.2.4.4.1 2011/02/07 11:05:25 gmaier Exp $
 
 #ifndef VDispAnalyzer_H
 #define VDispAnalyzer_H

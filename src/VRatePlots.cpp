@@ -4,7 +4,6 @@
  *  \author
  *    Gernot Maier
  *
- *   Revision $Id: VRatePlots.cpp,v 1.6.2.1.26.1.10.1 2010/03/08 07:45:09 gmaier Exp $
  */
 
 #include "VRatePlots.h"

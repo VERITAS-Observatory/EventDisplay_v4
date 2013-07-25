@@ -4,7 +4,6 @@
 
     all telescope positions, images, etc. are in shower coordinates
 
-    Revision $Id: VDisplayBirdsEye.cpp,v 1.31.2.6.4.2.10.1.2.3.8.4.2.5.8.5.4.1 2011/03/29 12:51:20 gmaier Exp $
 
     \date 24/08/04
 

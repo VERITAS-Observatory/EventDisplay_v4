@@ -1,4 +1,3 @@
-// Revision $Id: Ctpars.C,v 1.1.2.1.30.1 2010/03/08 08:00:48 gmaier Exp $
 #define Ctpars_cxx
 #include "Ctpars.h"
 #include <TH2.h>

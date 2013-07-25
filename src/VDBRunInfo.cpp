@@ -1,7 +1,6 @@
 /*! \class VDBRunInfo
     \brief get run info from DB
 
-    Revision $Id: VDBRunInfo.cpp,v 1.1.2.5.12.2.4.1.4.3.10.3.2.1.2.1 2011/04/06 11:57:57 gmaier Exp $
 
     \author Gernot Maier
 */

@@ -1,7 +1,6 @@
 /*!  \class VNoiseFileReader
      \brief read noise traces from a file
 
-     Revision $Id: VNoiseFileReader.cpp,v 1.1.2.3.6.4.4.1 2010/03/08 07:39:56 gmaier Exp $
 
      \author Gernot Maier
 

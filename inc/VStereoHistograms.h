@@ -1,5 +1,4 @@
 //! VStereoHistograms holds all stereo histograms
-//  Revision $Id: VStereoHistograms.h,v 1.19.2.1.18.1.6.1.2.1.10.1 2010/03/08 07:45:10 gmaier Exp $
 
 #ifndef VSTEREOHISTOGRAMS_H
 #define VSTEREOHISTOGRAMS_H

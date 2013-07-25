@@ -1,7 +1,6 @@
 /*! \file VDispTableAnalyzer
     \brief get DISP values from tables
 
-    Revision $Id: VDispTableAnalyzer.cpp,v 1.1.2.4.2.5.4.1 2011/02/07 11:05:25 gmaier Exp $
 
     \author Gernot Maier
 */

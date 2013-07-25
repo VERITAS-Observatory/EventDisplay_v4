@@ -3,7 +3,6 @@
 
     output is after pedestal substraction, gain and toffset correction
 
-    Revision $Id: VDST.cpp,v 1.16.2.1.4.7.4.1.6.4.2.5.8.1.10.9.2.5.2.1 2011/04/06 11:57:56 gmaier Exp $
 
     \author
 Gernot Maier

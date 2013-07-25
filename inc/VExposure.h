@@ -1,5 +1,4 @@
 //! VExosure calculate VERITAS exposure
-// Revision $Id: VExposure.h,v 1.1.2.2.2.1.2.1.6.4.4.1 2011/03/16 15:48:18 gmaier Exp $
 
 #ifndef VEXPOSURE_H
 #define VEXPOSURE_H

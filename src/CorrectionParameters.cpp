@@ -13,7 +13,6 @@
  * Original Author: Stephen Fegan
  * $Author: gmaier $
  * $Date: 2010/03/08 07:39:54 $
- * $Revision: 1.1.2.1.30.1 $
  * $Tag$
  *
  **/

@@ -1,5 +1,4 @@
 //! VPlotEvndispReconstructionParameter plot eventdisplay reconstruction parameters depending on telescopes
-// Revision $Id$
 
 #ifndef VPlotEvndispReconstructionParameter_H
 #define VPlotEvndispReconstructionParameter_H

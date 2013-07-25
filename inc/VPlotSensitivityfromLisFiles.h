@@ -1,5 +1,4 @@
 //! VPlotSensitivityfromLisFiles plot sensitivity parameters from lis files
-// Revision $Id: VPlotSensitivityfromLisFiles.h,v 1.1.2.2 2010/08/31 08:31:41 gmaier Exp $
 
 #ifndef VPlotSensitivityfromLisFiles_H
 #define VPlotSensitivityfromLisFiles_H

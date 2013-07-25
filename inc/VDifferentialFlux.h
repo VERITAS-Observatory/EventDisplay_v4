@@ -1,5 +1,4 @@
 //! VDifferentialFlux data and converter class for differential flux values
-// Revision $Id: VDifferentialFlux.h,v 1.1.2.4.2.1.4.1.2.1.2.3 2010/08/27 09:55:19 gmaier Exp $
 
 #ifndef VDifferentialFlux_H
 #define VDifferentialFlux_H

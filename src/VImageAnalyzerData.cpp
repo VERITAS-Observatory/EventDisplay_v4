@@ -3,7 +3,6 @@
 
    \date 19/08/04
 
-   Revision $Id: VImageAnalyzerData.cpp,v 1.12.2.1.4.2.10.3.2.3.4.3.4.1.4.1.4.3.2.1.2.4.2.1 2011/01/19 16:12:36 gmaier Exp $
 
    \author Gernot Maier
 */

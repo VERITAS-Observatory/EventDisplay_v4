@@ -1,5 +1,4 @@
 //! VPlotArrayReconstruction plot core and direction reconstruction in sky or camera view
-// Revision $Id: VPlotArrayReconstruction.h,v 1.1.2.4.10.2 2010/05/04 07:32:01 gmaier Exp $
 
 #ifndef VPlotArrayReconstruction_H
 #define VPlotArrayReconstruction_H

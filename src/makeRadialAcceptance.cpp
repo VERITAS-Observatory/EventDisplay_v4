@@ -8,7 +8,6 @@
  * \author
  *   Gernot Maier 
  *
- *   Revision $Id: makeRadialAcceptance.cpp,v 1.5.2.3.18.5.8.2.10.2.2.1 2010/12/20 11:06:11 gmaier Exp $
  */
 
 #include "CData.h"

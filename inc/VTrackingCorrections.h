@@ -1,5 +1,4 @@
 //! VTrackingCorections read tracking corrections from DB and apply corrections to pointing
-// Revision $Id: VTrackingCorrections.h,v 1.1.2.1.12.1.16.1.2.1 2010/03/08 08:01:35 gmaier Exp $
 
 #ifndef VTRACKINGCORRECTIONS_H
 #define VTRACKINGCORRECTIONS_H

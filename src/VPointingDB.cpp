@@ -1,7 +1,6 @@
 /*! \class VPointingDB
     \brief read pointing data from the database
 
-    Revision $Id: VPointingDB.cpp,v 1.1.2.10.12.4.6.1.2.3.10.2.2.1.2.1 2011/04/06 11:57:56 gmaier Exp $
 
     \author
     Gernot Maier

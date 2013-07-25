@@ -34,7 +34,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 4.21
+version = 4.22
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(distdir).VTS.runparameter
@@ -106,7 +106,7 @@ endif
 ########################################################################################################################
 # compiler and linker general values
 CXX           = g++ 
-CXXFLAGS      = -O3 -g -Wall  -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
+CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
 LD            = g++ 
@@ -115,7 +115,7 @@ INCLUDEFLAGS  = -I. -I./inc/
 
 # linux depending flags
 ifeq ($(ARCH),Linux)
-LDFLAGS       = -O
+LDFLAGS       = -O 
 SOFLAGS       = -shared
 endif
 # Apple OS X flags

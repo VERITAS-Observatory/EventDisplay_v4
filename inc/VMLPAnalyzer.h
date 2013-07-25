@@ -1,5 +1,4 @@
 //! VMLPAnalyzer MLP based disp method
-// Revision $Id: VMLPAnalyzer.h,v 1.1.2.3.4.1.2.1 2010/03/08 08:01:33 gmaier Exp $
 
 #ifndef VMLPAnalyzer_H
 #define VMLPAnalyzer_H

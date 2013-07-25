@@ -1,7 +1,6 @@
 /*! \class VDetectorGeometry
     \brief description of telescopes, camera and FADC system
 
-   Revision $Id: VDetectorGeometry.cpp,v 1.13.32.3.2.1.4.1.2.3.2.2.2.2 2011/03/17 11:04:19 gmaier Exp $
 
     \author  Gernot Maier
 */

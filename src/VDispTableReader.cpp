@@ -1,7 +1,6 @@
 /*! \file VDispTableReaderReader.cpp
     \brief read tables for angular reconstruction with disp method
 
-    Revision $Id: VDispTableReader.cpp,v 1.1.2.6.2.7.4.2 2011/02/07 11:05:25 gmaier Exp $
 
     \author Gernot Maier
 

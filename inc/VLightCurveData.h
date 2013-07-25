@@ -1,5 +1,4 @@
 //! VLightCurveData  data class for light curve calculations
-// Revision $Id: VLightCurveData.h,v 1.1.2.2 2011/06/16 14:53:04 gmaier Exp $
 
 #ifndef VLightCurveData_H
 #define VLightCurveData_H

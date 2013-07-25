@@ -1,5 +1,4 @@
 //! VTableEnergyCalculator fill or lookup energy tables
-// Revision $Id: energy.h,v 1.9.2.5.4.1.12.8.4.1.2.2.2.1.2.1.4.1.4.4.2.1 2010/11/18 10:33:52 gmaier Exp $
 #ifndef VTableEnergyCalculator_H
 #define VTableEnergyCalculator_H
 

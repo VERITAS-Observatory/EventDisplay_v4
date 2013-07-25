@@ -1,7 +1,6 @@
 /*! \file combineDISPTables.cpp
     \brief merge different DISP tables into one file
 
-    Revision $Id: combineDISPTables.cpp,v 1.1.2.1.4.1 2011/02/07 11:05:24 gmaier Exp $
 
     \author Gernot Maier
 */

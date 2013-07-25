@@ -1,7 +1,6 @@
 /*! \CLASS veFFECTIVEaREAcALCULATORmchISTOGRAMS
     \brief filling, reading, writing of MC histograms for effective area calculation
 
-    Revision $Id: VEffectiveAreaCalculatorMCHistograms.cpp,v 1.1.2.4.4.2 2011/03/31 14:51:25 gmaier Exp $
 
     \author
     Gernot Maier

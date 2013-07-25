@@ -1,5 +1,4 @@
 //! VRunList data class
-// Revision $Id: VRunList.h,v 1.1.2.7.8.1.2.2.2.1 2010/11/15 10:34:06 gmaier Exp $
 
 #ifndef VRUNLIST_H
 #define VRUNLIST_H

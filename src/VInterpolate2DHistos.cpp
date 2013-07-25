@@ -1,7 +1,6 @@
 /*! \class VInterpolate2DHistos
  *  \brief interpolate empty bins in 2D histograms
  *
- *  Revision $Id: VInterpolate2DHistos.cpp,v 1.1.2.1.18.1.6.1.12.1 2010/03/08 07:41:44 gmaier Exp $
  *
  *  \author Gernot Maier
  *

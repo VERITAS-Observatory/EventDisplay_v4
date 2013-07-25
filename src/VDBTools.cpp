@@ -1,7 +1,6 @@
 /*! \class VDBTools
     \brief routines to access different tables of the DB
 
-    Revision $Id: VDBTools.cpp,v 1.1.2.1 2011/03/16 15:48:18 gmaier Exp $
 
 */
 

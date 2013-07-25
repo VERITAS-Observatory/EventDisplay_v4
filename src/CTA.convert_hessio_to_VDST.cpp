@@ -1813,7 +1813,7 @@ int main(int argc, char **argv)
     if( i_calibTree ) i_calibTree->Write();
 ///////////////////////////////////////////////////
 // writing run parameters to dst file
-    VEvndispRunParameter *fRunPara = new VEvndispRunParameter();
+    VEvndispRunParameter *fRunPara = new VEvndispRunParameter( false );
     fRunPara->SetName( "runparameterDST" );
     fRunPara->setSystemParameters();
     fRunPara->fEventDisplayUser = "CTA-DST";

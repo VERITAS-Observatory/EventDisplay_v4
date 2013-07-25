@@ -1,5 +1,4 @@
 //! VEmissionHeightCalculator calculate emission height (and possibly get systematic error in energy reconstruction)
-// Revision $Id: VEmissionHeightCalculator.h,v 1.1.2.1.4.1.12.1.18.1.4.1 2011/03/25 13:11:32 gmaier Exp $
 
 #ifndef VEmissionHeightCalculator_H
 #define VEmissionHeightCalculator_H

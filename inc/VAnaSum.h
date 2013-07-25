@@ -1,5 +1,4 @@
 //! VAnaSum    class for producing an analysis summary from parameterized veritas data.
-//  Revision $Id: VAnaSum.h,v 1.16.2.5.2.1.2.2.12.1.4.1.2.1.2.2.8.1.2.1 2010/03/08 07:45:08 gmaier Exp $
 
 #ifndef VANASUM_H
 #define VANASUM_H

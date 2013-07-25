@@ -8,7 +8,6 @@
 //   adjusted to mscw_energy
 //
 //
-//  Revision $Id: Ctpars.h,v 1.1.2.1.10.1.2.1.4.2.10.1.2.1.2.4 2010/09/29 10:09:54 gmaier Exp $
 //
 //
 //   DO NOT OVERWRITE !!!!

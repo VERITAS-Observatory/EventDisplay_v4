@@ -1,4 +1,3 @@
-// Revision $Id: CData.C,v 1.1.8.1.30.1 2010/03/08 08:00:49 gmaier Exp $
 #define CData_cxx
 #include "CData.h"
 #include <TH2.h>

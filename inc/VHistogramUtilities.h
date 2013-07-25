@@ -1,5 +1,4 @@
 //! VHistogramUtilities.h  utility class to manipulate histograms
-// Revision $Id: VHistogramUtilities.h,v 1.1.2.3 2011/02/18 21:01:30 gmaier Exp $
 
 #ifndef VHistogramUtilities_H
 #define VHistogramUtilities_H

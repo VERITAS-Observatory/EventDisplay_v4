@@ -1,7 +1,6 @@
 /*! \class VMathsandFunctions
     \brief collects math utilities and external function to be used by TF1/TF2/etc
 
-    Revision $Id: VMathsandFunctions.cpp,v 1.1.2.2 2011/01/21 16:05:11 gmaier Exp $
 */
 
 #include "VMathsandFunctions.h"

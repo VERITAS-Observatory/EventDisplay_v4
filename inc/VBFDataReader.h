@@ -1,5 +1,4 @@
 //! VBFDataReader steering class specifically for reading VBF data
-// Revision $Id: VBFDataReader.h,v 1.10.36.1.4.1.4.2 2011/02/12 20:36:33 gmaier Exp $
 
 #ifndef VBFDATAREADER_H
 #define VBFDATAREADER_H

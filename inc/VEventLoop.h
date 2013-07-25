@@ -1,5 +1,4 @@
 //! VEventLoop main event loop
-// Revision $Id: VEventLoop.h,v 1.19.6.1.2.1.10.3.6.1.4.1.2.1.4.1.2.1.2.2.2.1.8.1 2011/04/21 10:03:38 gmaier Exp $
 
 #ifndef VEVENTLOOP_H
 #define VEVENTLOOP_H

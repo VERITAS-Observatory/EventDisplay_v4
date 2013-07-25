@@ -1,5 +1,4 @@
 //! VPointing get pointing direction of telescope
-// Revision $Id: VPointing.h,v 1.10.8.6.12.2.6.1.2.3.10.1.2.1 2010/11/09 14:38:06 gmaier Exp $
 
 #ifndef VPointing_H
 #define VPointing_H

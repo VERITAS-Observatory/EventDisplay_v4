@@ -1,5 +1,4 @@
 //! VSpecialChannel read and administrate list of special channels (e.g. L2 channels)
-// Revision $Id: VSpecialChannel.h,v 1.1.2.4 2010/12/06 11:42:19 gmaier Exp $
 
 #ifndef VSpecialChannel_H
 #define VSpecialChannel_H

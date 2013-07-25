@@ -1,5 +1,4 @@
 //! VSpectralFitter fitter class for energy spectra (fit functions are predifined)
-// Revision $Id: VSpectralFitter.h,v 1.1.2.3.10.1 2010/03/08 07:49:52 gmaier Exp $
 
 #ifndef VSpectralFitter_H
 #define VSpectralFitter_H

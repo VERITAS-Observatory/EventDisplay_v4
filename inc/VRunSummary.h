@@ -1,5 +1,4 @@
 //! VRunSummary  class for rate/significance results from each run
-//  Revision $Id: VRunSummary.h,v 1.9.2.1.18.1.4.1.4.2.8.1.2.1 2010/03/08 07:45:10 gmaier Exp $
 
 #ifndef VRUNSUMMARY_H
 #define VRUNSUMMARY_H

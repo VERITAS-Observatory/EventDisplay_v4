@@ -1,7 +1,6 @@
 /*!   \file makeOptimizeBoxCutsbyParameterSpaceSearch
       \brief simple cut optimization, step through the parameter space and record significances for different source strengths
 
-      Revision $Id: makeOptimizeBoxCuts.cpp,v 1.1.2.3.10.3 2010/09/24 06:57:44 gmaier Exp $
 
       cut range and source strengths are hard coded
 

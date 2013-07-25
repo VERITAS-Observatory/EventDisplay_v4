@@ -1,5 +1,4 @@
 //! VTMVARunData run parameter data class for TMVA optimization
-// Revision $Id: VTMVARunData.h,v 1.1.2.5 2011/04/11 16:09:05 gmaier Exp $
 
 #ifndef VTMVARunData_H
 #define VTMVARunData_H

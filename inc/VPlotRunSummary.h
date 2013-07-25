@@ -1,5 +1,4 @@
 //! VPlotRunSummary different plot routines (rates vs. elevation etc)
-//  Revision $Id: VPlotRunSummary.h,v 1.1.2.5.8.3.2.4 2010/09/13 08:38:56 gmaier Exp $
 
 #ifndef VPlotRunSummary_H
 #define VPlotRunSummary_H

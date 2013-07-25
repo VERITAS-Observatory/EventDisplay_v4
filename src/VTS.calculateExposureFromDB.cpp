@@ -2,7 +2,6 @@
 
     (VERITAS only)
 
-    Revision $Id$
 
     \author Gernot Maier
 */

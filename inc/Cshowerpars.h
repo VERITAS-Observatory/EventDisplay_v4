@@ -10,7 +10,6 @@
 //
 //   DO NOT OVERWRITE BY DOING SIMPLY A showerpars->MakeClass !!!!
 //
-//   Revision $Id: Cshowerpars.h,v 1.1.2.2.16.1.2.1.4.1.4.1.10.3 2010/03/08 08:00:48 gmaier Exp $
 //
 //
 //   (GM)

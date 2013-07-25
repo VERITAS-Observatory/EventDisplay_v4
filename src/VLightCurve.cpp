@@ -1,7 +1,6 @@
 /*! \class VLightCurve
     \brief light curves
 
-    Revision $Id: VLightCurve.cpp,v 1.1.2.2 2011/06/16 14:53:04 gmaier Exp $
 
 */
 

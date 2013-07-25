@@ -1,5 +1,4 @@
 //! VInterpolate2DHistos interpolate empty bins in 2D histograms
-//  Revision $Id: VInterpolate2DHistos.h,v 1.1.2.1.4.1.12.1.6.1.12.1 2010/03/08 08:00:49 gmaier Exp $
 
 #ifndef VINTERPOLATE2DHISTOS_H
 #define VINTERPOLATE2DHISTOS_H

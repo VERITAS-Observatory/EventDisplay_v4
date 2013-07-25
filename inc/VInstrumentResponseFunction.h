@@ -1,5 +1,4 @@
 //! VInstrumentResponseFunction calculate response function (e.g. angular resolution)
-// Revision $Id: VInstrumentResponseFunction.h,v 1.1.2.6 2011/04/01 12:10:31 gmaier Exp $
 
 #ifndef VInstrumentResponseFunction_H
 #define VInstrumentResponseFunction_H

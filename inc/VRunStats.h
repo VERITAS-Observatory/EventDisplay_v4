@@ -1,5 +1,4 @@
 //! VRunStats get basic run data from DB
-// Revision $Id: VRunStats.h,v 1.1.2.1.10.8 2010/04/20 11:17:16 gmaier Exp $
 
 #ifndef VRUNSTATS_H
 #define VRUNSTATS_H

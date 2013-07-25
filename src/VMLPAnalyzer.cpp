@@ -1,7 +1,6 @@
 /*! \class VMLPAnalyzer
     \brief MLP based disp method
 
-    Revision $Id: VMLPAnalyzer.cpp,v 1.1.2.3.4.1.2.1 2010/03/08 07:39:52 gmaier Exp $
 
     \author Gernot Maier
 */

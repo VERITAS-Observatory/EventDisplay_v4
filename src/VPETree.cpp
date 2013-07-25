@@ -1,7 +1,6 @@
 /*! \class VPETree
     \brief reader class for the pe trees
 
-    Revision $Id: VPETree.cpp,v 1.1.2.2.8.1 2010/03/08 07:39:56 gmaier Exp $
 
     \author Gernot Maier
 */

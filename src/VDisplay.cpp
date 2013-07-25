@@ -5,7 +5,6 @@
   \bug nextEvent with selection: bad expression in selection -> this event is skipped
   \bug reading of gain filename, seg fault if directory = calibration/gain
 
-  Revision $Id: VDisplay.cpp,v 1.74.2.3.2.1.2.7.10.11.2.7.4.3.2.2.2.3.2.1.2.1.2.2.2.6.2.10.2.4.2.2 2011/01/25 16:09:23 gmaier Exp $
 
   \author Gernot Maier
 */

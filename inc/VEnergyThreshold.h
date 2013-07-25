@@ -1,5 +1,4 @@
 //! VEnergyThreshold  class to determine energy threshold
-// Revision $Id: VEnergyThreshold.h,v 1.1.2.8.2.1.8.1 2010/03/08 07:49:50 gmaier Exp $
 
 #ifndef VEnergyThreshold_H
 #define VEnergyThreshold_H

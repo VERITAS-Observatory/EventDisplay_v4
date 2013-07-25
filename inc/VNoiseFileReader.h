@@ -1,5 +1,4 @@
 //! VNoiseFileReader read noise traces from a file
-// Revision $Id: VNoiseFileReader.h,v 1.1.2.2.6.4.4.1 2010/03/08 08:01:37 gmaier Exp $
 
 #ifndef VNoiseFileReader_H
 #define VNoiseFileReader_H

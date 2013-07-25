@@ -1,5 +1,4 @@
 //! VDispTable fill and read tables for angular reconstruction with disp method
-// Revision $Id: VDispTable.h,v 1.1.2.3.2.3 2010/10/01 14:48:54 gmaier Exp $
 
 #ifndef VDispTable_H
 #define VDispTable_H

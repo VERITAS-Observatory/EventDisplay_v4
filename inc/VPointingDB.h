@@ -1,5 +1,4 @@
 //! VPointingDB get pointing from DB
-// Revision $Id: VPointingDB.h,v 1.1.2.6.12.1.8.2.8.1.2.1.2.1.2.1 2011/04/06 11:57:56 gmaier Exp $
 
 #ifndef VPOINTINGDB_H
 #define VPOINTINGDB_H

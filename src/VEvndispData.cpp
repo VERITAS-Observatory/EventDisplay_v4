@@ -5,7 +5,6 @@
 
      fReader is not static! Call of VEvndispData::initializeDataReader() necessary  in constructors of all inherit classes
 
-   Revision $Id: VEvndispData.cpp,v 1.34.6.1.2.1.10.1.2.4.4.2.2.4.2.5.2.6.4.1.2.4.2.11.2.5.2.6.2.1 2011/04/21 10:03:36 gmaier Exp $
 
    \author
      Gernot Maier

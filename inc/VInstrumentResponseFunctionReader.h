@@ -1,5 +1,4 @@
 //! VInstrumentResponseFunctionReader data class for reading response functions (effective area, angular resolution, etc )
-// Revision $Id: VInstrumentResponseFunctionReader.h,v 1.1.2.4 2011/02/03 12:49:09 gmaier Exp $
 
 #ifndef VInstrumentResponseFunctionReader_H
 #define VInstrumentResponseFunctionReader_H

@@ -1,5 +1,4 @@
 // VSpectralWeight calculate energy dependent spectral weight
-// Revision $ID$
 
 #ifndef VSpectralWeight_H
 #define VSpectralWeight_H

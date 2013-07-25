@@ -705,7 +705,8 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
 
 ///////////////////////////////////////////////////////////////////////////////
 /*
-    plot 1D significance distribution
+    plot 1D significance distribution for all bins, all but an user-given exclusion region and
+    all but the exclusion regions used in the analysis
 
     rmax:        maximum distance to sky plot centre of bins to be taken into account
     rSource:     minimum distance to sky plot centre of bins to be taken into account (exclude the source region)
@@ -718,6 +719,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     char hname[200];
     char htitle[200];
 
+/////////////////////////
 // get histograms
     TH2D *hmap_stereo_sig = 0;
     TH2D *hmap_stereo_on = 0;
@@ -731,6 +733,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     else                  sprintf( hname, "hmap_stereo_on" );
     hmap_stereo_on = (TH2D*)getHistogram( hname, fRunNumber, "skyHistograms" );
 
+/////////////////////////
 // get exclusion regions
     TTree *t = (TTree*)getHistogram( "tExcludedRegions", -1, "" );
     if( !t )
@@ -759,7 +762,8 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	v_r[i] = r;
     }
 
-// get 1D histograms
+/////////////////////////
+// get 1D significance distributions
     TH1D *hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
     setHistogramPlottingStyle( hsig_1D, 4, 2, 1, 1, 1, 0 );
     if( hsig_1D ) hsig_1D->SetStats( 0 );
@@ -772,13 +776,24 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     setHistogramPlottingStyle( hsig_1DExcluded, 1, 2, 2, 1, 1, 0 );
     if( hsig_1DExcluded ) hsig_1DExcluded->SetStats( 1 );
 
+    gStyle->SetOptStat( "mr" );
     gStyle->SetOptFit( 1111 );
 
-// significance
+/////////////////////////
+// fit function is a normal distribution with mean 0 and width 1
+    TF1 *fND = new TF1( "fND", "gaus(0)", -5., 5. );
+    fND->FixParameter( 1, 0. );
+    fND->FixParameter( 2, 1. );
+    fND->SetLineColor( 8 ); 
+    fND->SetLineWidth( 2 );
+    fND->SetLineStyle( 6 );
+
+/////////////////////////
+// plotting of significance distributions
     TCanvas *c_sig1D = 0;
     if( hsig_1D && hsig_1DAll && hsig_1DExcluded )
     {
-        hsig_1DExcluded->SetXTitle( "significance" );
+        hsig_1DExcluded->SetXTitle( "significance #sigma" );
         hsig_1DExcluded->SetYTitle( "# of entries" );
 	if( !cCanvas )
 	{
@@ -792,7 +807,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	       sprintf( hname, "c_sig1D_%d", fRunNumber );
 	       sprintf( htitle, "significance distribution (1D) run %d (correlated plots)", fRunNumber );
 	   }
-	   c_sig1D = new TCanvas( hname, htitle, 10, 10, 400, 400 );
+	   c_sig1D = new TCanvas( hname, htitle, 450, 10, 400, 400 );
 	   c_sig1D->Draw();
 	   if( hsig_1DExcluded->GetEntries() > 0 ) c_sig1D->SetLogy( 1 );
         }
@@ -802,14 +817,16 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	   cCanvas->cd();
         }
 
+// fit
         hsig_1DExcluded->Draw( "e hist" );
-        hsig_1DExcluded->Fit( "gaus" );
-        if( hsig_1DExcluded->GetFunction( "gaus" ) ) hsig_1DExcluded->GetFunction( "gaus" )->SetLineColor( 8 ); 
+        hsig_1DExcluded->Fit( fND );
+	   
         hsig_1DExcluded->Draw( "e hist same" );
 
         hsig_1DAll->Draw("e hist same" );
 	hsig_1D->Draw("e hist same" );
 
+/////////////////////////
 // difference plot
 	if( !cCanvas )
 	{
@@ -824,19 +841,23 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	       sprintf( htitle, "difference distribution (1D) run %d (correlated plots)", fRunNumber );
 	   }
 
-	   TCanvas *c_diff1D = new TCanvas( hname, htitle, 450, 10, 400, 400 );
+	   TCanvas *c_diff1D = new TCanvas( hname, htitle, 900, 10, 400, 400 );
 	   c_diff1D->Draw();
 	
-	   VFun_gauss *ffun_gauss = new VFun_gauss(); 
-	   TF1 *fG = new TF1( "fG", ffun_gauss, -6., 6., 1, "VFun_gauss" );
-	   hsig_1DAll->Fit( "fG", "0" );
-
-	   sprintf( hname, "%s_cl", hsig_1D->GetName() );
-	   TH1D *hDiff = (TH1D*)hsig_1DAll->Clone( hname );
-	   for( int i = 1; i < hsig_1DAll->GetNbinsX(); i++ )
+	   sprintf( hname, "%s_cl", hsig_1DExcluded->GetName() );
+	   TH1D *hDiff = (TH1D*)hsig_1DExcluded->Clone( hname );
+	   hDiff->SetStats( 0 );
+	   for( int i = 1; i < hsig_1DExcluded->GetNbinsX(); i++ )
 	   {
-	       hDiff->SetBinContent( i, hsig_1DAll->GetBinContent(i) / fG->Eval( hsig_1DAll->GetXaxis()->GetBinCenter( i ) ) );
+	       if( hsig_1DExcluded->GetBinContent(i) > 0. && fND->Eval( hsig_1DExcluded->GetXaxis()->GetBinCenter( i ) ) > 0. )
+	       {
+		  hDiff->SetBinContent( i, hsig_1DExcluded->GetBinContent(i) / fND->Eval( hsig_1DExcluded->GetXaxis()->GetBinCenter( i ) ) );
+		  hDiff->SetBinError( i, 0. );
+               }
 	   }
+	   if( hDiff->GetEntries() > 0 ) c_diff1D->SetLogy( 1 );
+	   hDiff->SetXTitle( "significance #sigma" );
+	   hDiff->SetYTitle( "ratio (measured to background expected)" );
 	   hDiff->GetXaxis()->SetRangeUser( xmin, xmax );
 	   hDiff->Draw( "e hist" ); 
         }

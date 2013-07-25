@@ -1,5 +1,4 @@
 //! VZDCF (plotting) functions for Z-transformed Discrete Correlation Function algorithm (ZDCF)
-// Revision $Id$
 
 #ifndef VZDCF_H
 #define VZDCF_H

@@ -1,5 +1,4 @@
 //! VEvndispReconstructionParameter event cuts for array analysis
-// Revision $Id: VEvndispReconstructionParameter.h,v 1.5.2.1.4.1.4.1.4.2.10.1.4.1.4.4.2.7.4.2 2011/04/11 07:56:26 prokoph Exp $
 
 #ifndef VARRAYANALYSISCUTS_H
 #define VARRAYANALYSISCUTS_H

@@ -3,7 +3,6 @@
 
     hardcoded latitude/longitude of VERITAS
 
-    Revision $Id: VExposure.cpp,v 1.1.2.3.2.2.2.1.4.1.2.5.4.2 2011/04/06 11:16:55 gmaier Exp $
 
     \author Gernot Maier
 */

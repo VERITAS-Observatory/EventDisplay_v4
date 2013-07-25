@@ -1,5 +1,4 @@
 //!  VEffectiveAreaCalculatorMCHistograms filling, reading, writing of MC histograms for effective area calculation
-// Revision $Id: VEffectiveAreaCalculatorMCHistograms.h,v 1.1.2.2.4.2 2011/02/03 12:49:08 gmaier Exp $
 
 #ifndef VEffectiveAreaCalculatorMCHistograms_H
 #define VEffectiveAreaCalculatorMCHistograms_H

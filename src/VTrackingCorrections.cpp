@@ -3,7 +3,6 @@
 
     use code from Steve Fegan to apply tracking corrections (thanks!)
 
-    Revision $Id: VTrackingCorrections.cpp,v 1.1.2.2.12.2.18.1 2010/03/08 07:39:53 gmaier Exp $
 
     \author Gernot Maier
 */

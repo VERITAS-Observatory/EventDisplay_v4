@@ -1,5 +1,4 @@
 //! VOnOff
-//  Revision $Id: VOnOff.h,v 1.16.8.2.28.1.2.2 2010/05/27 08:44:52 gmaier Exp $
 
 #ifndef VONOFF_H
 #define VONOFF_H

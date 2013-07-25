@@ -1,5 +1,4 @@
 //! VSkyCoordinates get pointing direction of telescope
-// Revision $Id: VSkyCoordinates.h,v 1.10.8.6.12.2.6.1.2.3.10.1.2.1 2010/11/09 14:38:06 gmaier Exp $
 
 #ifndef VSKYCOORDINATES_H
 #define VSKYCOORDINATES_H

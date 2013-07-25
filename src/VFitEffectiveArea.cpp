@@ -1,7 +1,6 @@
 /*! \class VFitEffectiveArea
     \brief effective area fitting
 
-    Revision $Id: VFitEffectiveArea.cpp,v 1.1.2.1.36.1 2010/03/08 07:45:09 gmaier Exp $
 
     \author Gernot Maier
 */

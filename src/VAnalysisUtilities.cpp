@@ -1,7 +1,6 @@
 /*! \class VAnalysisUtilities
     \brief basic utilities
 
-    Revision $Id: VAnalysisUtilities.cpp,v 1.1.2.11.8.3.2.7.2.3.2.3 2011/04/08 13:48:13 gmaier Exp $
 */
 
 #include "VAnalysisUtilities.h"

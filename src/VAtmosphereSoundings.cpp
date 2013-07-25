@@ -1,6 +1,5 @@
 /*! \brief VAtmosphereSoundings read and analyse sounding data
 
-   Revision $Id: VAtmosphereSoundings.cpp,v 1.1.2.10 2010/10/01 09:17:01 gmaier Exp $
 
 //////////////////////////////////////////////////////////////////////////////////////
 

@@ -2,7 +2,6 @@
 
     contains common elements for VRawDataReader and VBFDataReader
 
-    Revision $Id: VBaseRawDataReader.cpp,v 1.16.8.2.12.2.8.5.2.1.4.6.2.1.2.2.2.2.2.2 2011/02/12 20:36:33 gmaier Exp $
 
     \author
       Gernot Maier

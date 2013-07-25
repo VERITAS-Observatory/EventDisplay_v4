@@ -1,7 +1,6 @@
 /*! \file printRunParameter
     \brief print run parameters from mscw or eventdisplay file to screen
 
-    Revision $Id: printRunParameter.cpp,v 1.1.2.2.4.1.12.2.14.1.4.2.2.1.2.3 2011/02/14 12:45:28 gmaier Exp $
 
     \author Gernot Maier
 */

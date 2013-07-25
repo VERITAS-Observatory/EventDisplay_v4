@@ -1,5 +1,4 @@
 //! VFluxCalculation calculate fluxes and upper flux limits
-// Revision $Id: VFluxCalculation.h,v 1.1.2.6.8.1.2.1.4.3 2011/04/08 13:48:13 gmaier Exp $
 #ifndef VFLUXCALCULATION_H
 #define VFLUXCALCULATION_H
 

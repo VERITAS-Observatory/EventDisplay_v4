@@ -1,5 +1,4 @@
 //! VMCParameters.h MC data storage class
-// Revision $Id: VMCParameters.h,v 1.1.2.1.2.1.2.1 2010/03/08 08:01:33 gmaier Exp $
 
 #ifndef VMCParameters_H
 #define VMCParameters_H

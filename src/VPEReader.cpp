@@ -2,7 +2,6 @@
 
      reading class for pe files
 
-     Revision $Id: VPEReader.cpp,v 1.1.2.10.4.2.4.1.2.1 2010/12/10 08:29:13 gmaier Exp $
 
      \author
        Gernot Maier

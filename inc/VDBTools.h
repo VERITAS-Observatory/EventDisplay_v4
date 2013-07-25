@@ -1,5 +1,4 @@
 //! VDBTools VERITAS DB tools
-// Revision $Id: VDBTools.h,v 1.1.2.1 2011/03/16 15:48:18 gmaier Exp $
 
 #ifndef VDBTools_H
 #define VDBTools_h

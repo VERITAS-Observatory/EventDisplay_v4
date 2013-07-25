@@ -1,5 +1,4 @@
 //! VMathsandFunctions collects math utilities and external function to be used by TF1/TF2/etc
-// Revision $Id: VMathsandFunctions.h,v 1.1.2.1 2011/01/21 10:10:57 gmaier Exp $
 
 #ifndef VMathsandFunctions_h
 #define VMathsandFunctions_h

@@ -1,7 +1,6 @@
 /*! \class VOrbitalPhase
     \brief calculation of the orbital phase
 
-    Revision $Id: VOrbitalPhase.cpp,v 1.1.2.2 2011/03/16 16:54:24 ealiu Exp $
 
     \author
      Gernot Maier

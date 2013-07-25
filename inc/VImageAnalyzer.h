@@ -1,5 +1,4 @@
 //! VImageAnalyzer    class for analyzing VERITAS data (single telescope analysis)
-// Revision $Id: VImageAnalyzer.h,v 1.30.8.2.12.1.4.2.10.1.4.2 2010/03/08 08:01:32 gmaier Exp $
 #ifndef VImageAnalyzer_H
 #define VImageAnalyzer_H
 
