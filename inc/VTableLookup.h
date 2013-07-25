@@ -38,8 +38,6 @@ class VTableLookup
 
         VTableLookupRunParameter *fTLRunParameter;
 
-        int fevent;
-
         int fNTel;
 
         vector< int > fTelComb;
@@ -108,12 +106,14 @@ class VTableLookup
         void calculateMSFromTables( VTablesToRead *s, double esys );
         void configureTelescopeVector();
         bool cut( bool bWrite = false );  // apply cuts on successfull reconstruction to input data
+	void fillLookupTable();
         int  getAzBin( double az );
         void getIndexBoundary( unsigned int *ib, unsigned int *il, vector< double >& iV, double x );
         vector< string > getSortedListOfDirectories( TDirectory* );
         void getTables( unsigned int inoise, unsigned int ize, unsigned int iwoff, unsigned int iaz, unsigned int tel, VTablesToRead *s );
+	unsigned int getWobbleBin( double w );
         void interpolate( VTablesToRead *s1, double w1, VTablesToRead *s2, double w2, VTablesToRead *s, double w, bool iCos = false );
-        bool isGamma();
+	void readLookupTable();
 	bool sanityCheckLookupTableFile( bool iPrint = false);       
 
     public:

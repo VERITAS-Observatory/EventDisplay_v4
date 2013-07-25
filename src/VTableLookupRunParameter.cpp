@@ -228,6 +228,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
 	       fMC_distance_to_cameracenter_min = 0.;
             }
         }
+	else if( iTemp.find( "-CTAoffAxisBins" ) < iTemp.size() )
+	{
+	   setCTA_MC_offaxisBins();
+        }
         else if( iTemp.find( "-minsize" ) < iTemp.size() )
         {
             fminsize = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
@@ -360,6 +364,8 @@ void VTableLookupRunParameter::print( int iP )
     cout << endl;
     cout << "evndisp reconstruction parameter ID: " << rec_method << endl;
     cout << endl;
+    printCTA_MC_offaxisBins();
+    cout << endl;
     cout << "input file(s): ";
     for( unsigned int i = 0; i < inputfile.size(); i++ )
     {
@@ -368,8 +374,11 @@ void VTableLookupRunParameter::print( int iP )
     if( isMC ) cout << " (input data is MC)";
     if( fPE ) cout << " (input data is PE)";
     cout << endl;
-    if( readwrite != 'W' && readwrite != 'w' ) cout << "output file: " << outputfile << endl;
-    if( bWriteReconstructedEventsOnly >=0  ) cout << "(writing reconstructed events only (" << bWriteReconstructedEventsOnly << "))" << endl;
+    if( readwrite != 'W' && readwrite != 'w' )
+    {
+       cout << "output file: " << outputfile << endl;
+       if( bWriteReconstructedEventsOnly >=0  ) cout << "writing reconstructed events only (" << bWriteReconstructedEventsOnly << ")" << endl;
+    }
     if( readwrite == 'W' || readwrite == 'w' )
     {
         cout << "filling lookup tables for: ";
@@ -381,10 +390,6 @@ void VTableLookupRunParameter::print( int iP )
 	cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <" << fMC_distance_to_cameracenter_max << " [deg]" << endl;
     }
     if( iP == 2 ) cout << "zenith angle " << ze << " [deg], wobble offset " << fWobbleOffset/100. << " [deg], noise level " << fNoiseLevel << endl;
-//    cout << "cuts: " << endl;
-//    cout << "\t maximum impact parameter distance [m]: " << fmaxdist << endl;
-//    cout << "\t minimum size per telescope: " << fminsize << endl;
-//    cout << "\t maximum local distance of image [deg]: " << fmaxlocaldistance << endl;
     if( fSelectRandom > 0. ) cout << "random event selection: " << fSelectRandom << ", seed:" << fSelectRandomSeed << endl;
     if( fUseSelectedImagesOnly ) cout << "use evndisp image selection" << endl;
     else                         cout << "use all images" << endl;
@@ -453,4 +458,29 @@ bool VTableLookupRunParameter::fillInputFile_fromList( string iList )
    cout << "total number of input files " << inputfile.size() << endl;
 
    return true;
+}
+
+void VTableLookupRunParameter::setCTA_MC_offaxisBins()
+{
+    fCTA_MC_offaxisBin_min.clear();
+    fCTA_MC_offaxisBin_max.clear();
+
+    fCTA_MC_offaxisBin_min.push_back( 0.0 ); fCTA_MC_offaxisBin_max.push_back( 1.0 );
+    fCTA_MC_offaxisBin_min.push_back( 1.0 ); fCTA_MC_offaxisBin_max.push_back( 2.0 );
+    fCTA_MC_offaxisBin_min.push_back( 2.0 ); fCTA_MC_offaxisBin_max.push_back( 3.0 );
+    fCTA_MC_offaxisBin_min.push_back( 3.0 ); fCTA_MC_offaxisBin_max.push_back( 3.5 );
+    fCTA_MC_offaxisBin_min.push_back( 3.5 ); fCTA_MC_offaxisBin_max.push_back( 4.0 );
+    fCTA_MC_offaxisBin_min.push_back( 4.0 ); fCTA_MC_offaxisBin_max.push_back( 4.5 );
+    fCTA_MC_offaxisBin_min.push_back( 4.5 ); fCTA_MC_offaxisBin_max.push_back( 5.0 );
+    fCTA_MC_offaxisBin_min.push_back( 5.0 ); fCTA_MC_offaxisBin_max.push_back( 5.5 );
+    fCTA_MC_offaxisBin_min.push_back( 5.5 ); fCTA_MC_offaxisBin_max.push_back( 6.0 ); 
+}
+
+void VTableLookupRunParameter::printCTA_MC_offaxisBins()
+{
+    cout << "setting the following off-axis bins for CTA analysis: " << endl;
+    for( unsigned int i = 0; i < fCTA_MC_offaxisBin_min.size(); i++ )
+    {
+       cout << "   bin " << i << "\t min " << fCTA_MC_offaxisBin_min[i] << " deg, max " << fCTA_MC_offaxisBin_max[i] << " deg" << endl;
+    }
 }

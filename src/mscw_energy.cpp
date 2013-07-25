@@ -37,6 +37,7 @@ void printParametersFromFile( string ff )
     exit( 0 );
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
 int main( int argc, char *argv[] )
 {
@@ -76,6 +77,7 @@ int main( int argc, char *argv[] )
     cout << endl << "loop over all events (in total " << fTLook->getNEntries() << ")" << endl;
     if( fTLook->getMaxTotalTime() < 1.e8 ) cout << "\t maximum run time [s]: " << fTLook->getMaxTotalTime() << endl;
 
+// loop over all events
     fTLook->loop();
 
     cout << "... end of loop" << endl;
@@ -83,6 +85,6 @@ int main( int argc, char *argv[] )
     fStopWatch.Stop();
     fStopWatch.Print();
 
+// write tables to disk
     fTLook->terminate();
-
 }

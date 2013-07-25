@@ -22,6 +22,8 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
     private:
 
        bool fillInputFile_fromList( string iList );
+       void printCTA_MC_offaxisBins();
+       void setCTA_MC_offaxisBins();
 
     public:
 
@@ -68,6 +70,8 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         int fSelectRandomSeed;
 	double fMC_distance_to_cameracenter_min;
 	double fMC_distance_to_cameracenter_max;
+	vector< double > fCTA_MC_offaxisBin_min;
+	vector< double > fCTA_MC_offaxisBin_max;
 
         int fNentries;
         double fMaxRunTime;
@@ -86,6 +90,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef(VTableLookupRunParameter,19);
+        ClassDef(VTableLookupRunParameter,20);
 };
 #endif
