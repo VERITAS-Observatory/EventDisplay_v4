@@ -1,5 +1,4 @@
 //! VTablesToRead service class for lookup tables
-// Revision $Id: VTablesToRead.h,v 1.1.2.1.2.1.12.2 2010/09/21 10:20:32 gmaier Exp $
 
 #ifndef VTABLEREAD_H
 #define VTABLEREAD_H

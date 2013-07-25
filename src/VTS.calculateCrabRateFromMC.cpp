@@ -81,6 +81,7 @@ int main( int argc, char *argv[] )
 // Crab Nebula Spectra
     vector< unsigned int > fID;
     fID.push_back( 1 );                           // Whipple
+    fID.push_back( 5 );                           // HEGRA
 /*    fID.push_back( 2 );                           // H.E.S.S.
     fID.push_back( 5 );                           // HEGRA
     fID.push_back( 6 );                           // MAGIC */

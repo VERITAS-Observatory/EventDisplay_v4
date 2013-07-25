@@ -1195,7 +1195,6 @@ $(ctapara):
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(ctapara)
 	mkdir -p $(ctapara)/AstroData
-	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/Catalogues $(ctapara)/AstroData
 	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/TeV_data $(ctapara)/AstroData
 	mkdir -p $(ctapara)/DetectorGeometry
 	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod1* $(ctapara)/DetectorGeometry
@@ -1205,6 +1204,7 @@ $(ctapara):
 	mkdir -p $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(ctapara)/ParameterFiles
+	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.prod*.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BDT.runparameter $(ctapara)/ParameterFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/ParameterFiles/scriptsInput.prod*.runparameter $(ctapara)/ParameterFiles

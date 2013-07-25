@@ -1,11 +1,6 @@
 /*! \class VEvndispRunParameter
   \brief input parameter storage class
 
-  \date
-  28/04/2004
-
-  Revision $Id: VEvndispRunParameter.cpp,v 1.1.2.9.10.11.2.7.4.2.4.8.2.5.4.5.2.7.2.8.2.12.2.7 2011/04/06 11:57:57 gmaier Exp $
-
   \author
   Gernot Maier
 */

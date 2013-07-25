@@ -1,5 +1,4 @@
 //! VGlobalRunParameter global definitions for eventdisplay package
-// Revision $Id$
 
 #ifndef VGlobalRunParameter_H
 #define VGlobalRunParameter_H
