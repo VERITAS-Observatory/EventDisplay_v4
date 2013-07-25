@@ -82,7 +82,6 @@ class VTableEnergyCalculator
         bool fWrite1DHistograms;
         bool fReadHistogramsFromFile;
 
-        double fLog10;
 	string fHName_add;
 
         string fInterpolationString;

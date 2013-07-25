@@ -13,8 +13,6 @@ VTableEnergyCalculator::VTableEnergyCalculator( int intel )
     setConstants();
     fDebug = 0;
 
-    fLog10 = 1./log( 10. );
-
     if( intel == 0 ) return;
 
     for( int i = 0; i < intel; i++ )
@@ -46,8 +44,6 @@ VTableEnergyCalculator::VTableEnergyCalculator(const char* hname_add,char m, TDi
     fHName_add = hname_add;
 
     fWrite1DHistograms = true;
-
-    fLog10 = 1./log( 10. );
 
     fInterPolWidth = 1;
     fInterPolIter = 3;
@@ -156,12 +152,16 @@ VTableEnergyCalculator::VTableEnergyCalculator(const char* hname_add,char m, TDi
 void VTableEnergyCalculator::setConstants()
 {
 // energy axis: range from 1 GeV to 1000 TeV
-   eNumEne = 120;
+/*   eNumEne = 120;
    eE0Min  = 0.001;
-   eE0Max  = 1000;
+   eE0Max  = 1000; */
+// energy axis: range from 10 GeV to 316 TeV
+   eNumEne = 90;
+   eE0Min  = 0.01;
+   eE0Max  = log10( 2.5 );
 
-// core axis: 120 x 15m = 1.8 km
-   eNumDist   = 120;
+// core axis: 100 x 15m = 1.5 km
+   eNumDist   = 100;
    edist_delta = 15;
 
 // size bins (log10 axis)
@@ -545,7 +545,7 @@ void VTableEnergyCalculator::get_logEnergy( double logSize, int ir, double &med,
         {
             double rest  = (logSize-s1)/delta;
             med   =  (1.-rest)*e1 + rest*e2;
-            sigma = ( (1.-rest)*w1 + rest*w2) * fLog10;          // observe this has the unit size
+            sigma = ( (1.-rest)*w1 + rest*w2) / log( 10. );          // observe this has the unit size
         }
         else
         {

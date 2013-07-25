@@ -226,7 +226,7 @@ void VTableCalculator::setConstants( bool iPE )
        amp_offset = 1.0;
        amp_delta = 0.15;
 
-       NumDist = 100;
+       NumDist = 75;
        dist_delta = 20.;
        HistBins = 500;
     }
