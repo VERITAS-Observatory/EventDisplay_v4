@@ -5,28 +5,31 @@
 
 #include "VGlobalRunParameter.h"
 
-VGlobalRunParameter::VGlobalRunParameter()
+VGlobalRunParameter::VGlobalRunParameter( bool bSetGlobalParameter )
 {
 // read global parameters
-   if( !bReadRunParameter )
+   if( bSetGlobalParameter )
    {
+      if( !bReadRunParameter )
+      {
 // set directories
-      setDirectories();
-      if( !readRunparameterFile( getDirectory_EVNDISPParameterFiles() + "EVNDISP.global.runparameter" ) ) 
-      {
-         cout << "VGlobalRunParameter: error while reading parameter file with global run parameters" << endl;
-	 cout << endl;
-	 cout << "Note: several parameter files are needed to run the eventdisplay analysis" << endl;
-	 cout << "      they are provided in form of a tar ball and are observatory dependent (CTA or VERITAS)" << endl;
-	 cout << "The file not found is EVNDISP.global.runparameter" << endl;
-	 cout << endl;
-	 cout << "Parameter files are expected to be in the following directory: " << endl;
-	 cout << getDirectory_EVNDISPParameterFiles() << endl;
-	 exit( -1 );
-      }
-      else
-      {
-         bReadRunParameter = true;
+	 setDirectories();
+	 if( !readRunparameterFile( getDirectory_EVNDISPParameterFiles() + "EVNDISP.global.runparameter" ) ) 
+	 {
+	    cout << "VGlobalRunParameter: error while reading parameter file with global run parameters" << endl;
+	    cout << endl;
+	    cout << "Note: several parameter files are needed to run the eventdisplay analysis" << endl;
+	    cout << "      they are provided in form of a tar ball and are observatory dependent (CTA or VERITAS)" << endl;
+	    cout << "The file not found is EVNDISP.global.runparameter" << endl;
+	    cout << endl;
+	    cout << "Parameter files are expected to be in the following directory: " << endl;
+	    cout << getDirectory_EVNDISPParameterFiles() << endl;
+	    exit( -1 );
+	 }
+	 else
+	 {
+	    bReadRunParameter = true;
+	 }
       }
    }
 }
@@ -284,7 +287,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
 string VGlobalRunParameter::fObservatory = "Whipple";
 bool VGlobalRunParameter::bReadRunParameter = false;
 unsigned int VGlobalRunParameter::fEVNDISP_TREE_VERSION = 9;
-string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.21";
+string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.22";
 string VGlobalRunParameter::fEVNDISP_SVNREVISION = "$Revision$";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fRawDataServer = "";

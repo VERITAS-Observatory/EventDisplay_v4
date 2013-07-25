@@ -9,7 +9,7 @@
 
 ClassImp(VEvndispRunParameter)
 
-VEvndispRunParameter::VEvndispRunParameter()
+VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobalRunParameter( bSetGlobalParameter )
 {
     SetName( "runparameterV2" );
     SetTitle( getEVNDISP_VERSION().c_str() );

@@ -60,7 +60,7 @@ class VGlobalRunParameter
    static string       fEVNDISP_VERSION;                             // EVNDISPLAY VERSION
    static string       fEVNDISP_SVNREVISION;                         // SVN REVISION
 
-   VGlobalRunParameter();
+   VGlobalRunParameter( bool bSetGlobalParameter = true );
    virtual ~VGlobalRunParameter();
 
    string       getDBServer() const             { return fDBServer; }
@@ -89,7 +89,7 @@ class VGlobalRunParameter
    bool         setDirectory_EVNDISPCalibrationData( string iDir );
    bool         update( TChain *ic );
 
-   ClassDef(VGlobalRunParameter,6);
+   ClassDef(VGlobalRunParameter,7);
 };
 
 #endif
