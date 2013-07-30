@@ -26,7 +26,7 @@ rm -f $ODIR/$TFIL.log
 ###############################################
 # mscw_energy command line options
 ###############################################
-set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly -shorttree"
+set MOPT="-pe -arrayrecid=$RECID -noNoTrigger -writeReconstructedEventsOnly -shorttree -useMedian=2"
 
 # analyse MC file
 $EVNDISPSYS/bin/mscw_energy $MOPT -tablefile $TABFIL-$ARRAY.root -inputfilelist $IFIL -outputfile $ODIR/$TFIL.root >& $ODIR/$TFIL.log
