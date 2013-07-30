@@ -57,7 +57,7 @@ int main( int argc, char *argv[] )
 // Crab spectrum from HEGRA (CTA default)
     iData->setCrabSpectrum( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
 // CR spectra (protons + electrons)
-    iData->setCosmicRaySpectrum( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 2 );
+    iData->setCosmicRaySpectrum( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 8 );
 
 // on source histograms
 // initialize histogram with the standard binning used in the CTA WP Phys group

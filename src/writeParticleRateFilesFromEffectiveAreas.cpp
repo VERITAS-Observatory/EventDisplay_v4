@@ -63,7 +63,7 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
 // electrons (spectral index?)
        if( iMC_Electron )
        {
-          b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 2, iMC_Electron, 20., 0, 0.0, 250, 3.0, -1.9 );
+          b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 8, iMC_Electron, 20., 0, 0.0, 250, 3.0, -1.9 );
        }
 // calculate differential fluxes for 5 bins per decade (0.2)
        b.calculateParticleNumberGraphs_MC( 0.2 );
@@ -127,8 +127,7 @@ int main( int argc, char *argv[] )
 // on-axis rates
    if( iMC_Gamma_onSource.size() > 0 )
    {
-//      sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
-      sprintf( iParticleNumberFile, "ParticleNumbers.%s.00.root", SubArray.c_str() );
+      sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
       sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
       sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
       if( iMC_Electron_onSource.size() > 0 )
@@ -146,8 +145,7 @@ int main( int argc, char *argv[] )
    for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
    {
 
-//      sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.%d.root", iDataDir.c_str(), SubArray.c_str(), j );
-      sprintf( iParticleNumberFile, "ParticleNumbers.%s.%d.root", SubArray.c_str(), j );
+      sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.%d.root", iDataDir.c_str(), SubArray.c_str(), j );
       sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_cone10.c_str(), SubArray.c_str(), iRecID, j );
       sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton.c_str(), SubArray.c_str(), iRecID, j );
 
