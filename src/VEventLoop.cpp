@@ -1331,12 +1331,15 @@ void VEventLoop::terminate( int iAna )
             cout << "\t Telescope " << getTeltoAna()[t]+1 << ": " << fReader->getNIncompleteEvents()[getTeltoAna()[t]] << endl;
         }
     }
-    cout << "Number of events with GPS faults (status bit set): " << endl;
-    for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
+    if( !isMC() )
     {
-       cout << "\t Telescope " << getTeltoAna()[i]+1 << ": ";
-       if( i < fGPSClockWarnings.size() ) cout << fGPSClockWarnings[i];
-       cout << endl;
+       cout << "Number of events with GPS faults (status bit set): " << endl;
+       for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
+       {
+	  cout << "\t Telescope " << getTeltoAna()[i]+1 << ": ";
+	  if( i < fGPSClockWarnings.size() ) cout << fGPSClockWarnings[i];
+	  cout << endl;
+       }
     }
 
     cout << endl << "Analyzed " << iAna << " events" << endl;
