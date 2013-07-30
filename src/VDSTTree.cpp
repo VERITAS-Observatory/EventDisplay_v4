@@ -635,8 +635,9 @@ map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
         {
             istringstream is_stream( iLine );
             is_stream >> iT1;
-            is_stream >> iT2;
-            fDST_list_of_telescopes[atoi(iT1.c_str())] = atof( iT2.c_str() );
+	    if( !is_stream.eof() ) is_stream >> iT2; 
+	    else                   iT2 = "1.5";
+	    fDST_list_of_telescopes[atoi(iT1.c_str())] = atof( iT2.c_str() );
         }
     }
     is.close();
