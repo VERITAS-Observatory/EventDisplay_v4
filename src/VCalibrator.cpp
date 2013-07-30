@@ -1956,7 +1956,7 @@ void VCalibrator::initialize()
    }
 // define histograms and output files for pedestal calculation
    vector<ULong64_t> i_TelTypeList = getDetectorGeometry()->getTelType_list();
-   if( fRunPar->frunmode == 1 )
+   if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
    {
       for( unsigned int t = 0; t < i_TelTypeList.size(); t++ )
       {
