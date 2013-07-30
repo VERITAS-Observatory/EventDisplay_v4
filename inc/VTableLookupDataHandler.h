@@ -152,7 +152,7 @@ class VTableLookupDataHandler
 	bool   copyMCRunheader();
         void   copyMCTree();
 	void   copy_telconfig();
-        bool   fillNextEvent( bool bShort );
+        int    fillNextEvent( bool bShort );
 	void   printCutStatistics();
         bool   randomSelected();
         void   resetImageParameters();

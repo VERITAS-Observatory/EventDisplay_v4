@@ -204,7 +204,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
         }
         fEventWeight = 1.;
 
-        bool iNE = true;
+        int iNE = 1;
         if( fEventDisplayFileFormat >= 2 )  iNE = fillNextEvent( bShort );
         else
         {
@@ -213,11 +213,12 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
             cout << "...exiting" << endl;
             exit( -1 );
         }
+	if( iNE == -1 ) return false;
 // dead time calculation
         if( !fIsMC && getEventNumber() != 999999 ) fDeadTime->fillDeadTime( time );
 
 // return false for non-valid (maybe not reconstructed?) event
-        if( !iNE ) return true;
+        if( iNE == 0 ) return true;
 
         if( !fIsMC ) ftheta2 = (fXoff*fXoff+fYoff*fYoff);
         else         ftheta2 = (fXoff-fMCxoff)*(fXoff-fMCxoff) + (fYoff-fMCyoff)*(fYoff-fMCyoff);
@@ -236,9 +237,12 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
     return true;
 }
 
-bool VTableLookupDataHandler::fillNextEvent( bool bShort )
+int VTableLookupDataHandler::fillNextEvent( bool bShort )
 {
-    fshowerpars->GetEntry( fEventCounter );
+    if( !fshowerpars->GetEntry( fEventCounter ) )
+    {
+       return -1;
+    }
 
 // fill MC parameters
     if( fIsMC )
@@ -305,7 +309,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
        fEventStatus = false;
        fEventCounter++;
        fNStats_Chi2Cut++;
-       return false;
+       return 0;
     }  
 
     fZe = fshowerpars->Ze[fMethod];
@@ -319,7 +323,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fEventCounter++;
 	fEventStatus = false;
 	if( fDebug > 1 ) cout << "\t RECONSTRUCTED CORE NAN" << endl;
-	return false;
+	return 0;
     }
     fXoff = fshowerpars->Xoff[fMethod];
     fYoff = fshowerpars->Yoff[fMethod];
@@ -359,7 +363,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
             fEventCounter++;
 	    fEventStatus = false;
 	    if( fDebug > 1 ) cout << "\t CUT FAILED" << endl;
-            return false;
+            return 0;
         }
 	else fEventStatus = true;
     }
@@ -375,7 +379,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
         bool fReadTPars = false;
 	if( i < ftpars.size() && ftpars[i] ) fReadTPars = true;
 	if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
-	  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fTLRunParameter->readwrite == 'W'   )
+	  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
 	{
 	   if( fImgSel_list[i] ) fReadTPars = true;
 	   else                  fReadTPars = false;
@@ -457,7 +461,7 @@ bool VTableLookupDataHandler::fillNextEvent( bool bShort )
     if(SizeSecondMax_temp > 0) fSizeSecondMax = SizeSecondMax_temp;
 
     fEventCounter++;
-    return true;
+    return 1;
 }
 
 bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain *c )
@@ -508,7 +512,8 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	   cout << "TableLookupDataHandler::setInputFile: adding .root suffix to file name" << endl;
 	   finputfile[i] += ".root";
        }
-       cout << "opening file(s) " << finputfile[i] << endl;
+       cout << "opening file(s): " << endl;
+       cout << finputfile[i] << endl;
     }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -518,7 +523,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     int iNFil_sum = 0;
     for( unsigned int i = 0; i < finputfile.size(); i++ )
     {
-       int iNFil = fTtelconfig->Add( finputfile[i].c_str(), 0 );
+       int iNFil = fTtelconfig->Add( finputfile[i].c_str() );
        if( iNFil == 0 )
        {
 	   cout << "error: no file(s) in chain" << endl;
@@ -527,11 +532,15 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
        iNFil_sum += iNFil;
     }
     cout << iNFil_sum << " file(s) in chain " << endl;
-    if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
+// don't check each file for CTA sims -> this is very inefficent and it takes a long time
+    if( !fTLRunParameter->fPE && fTLRunParameter->readwrite != 'W' )
     {
-       cout << "VTableLookupDataHandler::setInputFile() error: some file are not properly closed" << endl;
-       cout << "exit..." << endl;
-       exit( -1 );
+       if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
+       {
+	  cout << "VTableLookupDataHandler::setInputFile() error: some file are not properly closed" << endl;
+	  cout << "exit..." << endl;
+	  exit( -1 );
+       } 
     }
 
     fList_of_Tel_type.clear();
@@ -682,7 +691,8 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     }
 // update runparameters
     fTLRunParameter->update( fTshowerpars );
-    if( fNEntries == 0 || fNEntries >=fTshowerpars->GetEntries() ) fNEntries = fTshowerpars->GetEntries();
+// don't set maximum number of entries anymore (not needed, and it takes a long time)
+//    if( fNEntries == 0 || fNEntries >=fTshowerpars->GetEntries() ) fNEntries = fTshowerpars->GetEntries();
 // get file format version of eventdisplay (tree version)
     if( fTLRunParameter )
     {

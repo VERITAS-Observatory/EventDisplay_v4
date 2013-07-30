@@ -811,10 +811,14 @@ void VTableCalculator::fillMPV( TH2F *h, int i, int j, TH1F *h1D, double iMedian
    {
       h->SetBinContent( i, j, iLandau.GetParameter( 0 ) );
 
-      cout << "\t\t Landau interpolation for energy tables: " << i << "\t" << j << "\t";
-      cout << TMath::Prob( iLandau.GetChisquare(), iLandau.GetNDF() ) << ", median " << iMedianValue << ", fit: " << iLandau.GetParameter( 0 ) << "\t" << iLandau.GetParameter( 1 );
-      cout << "\t" << iMedianValue / iLandau.GetParameter( 0 );
-      cout << "\t" << iLandau.GetParameter( 0 ) /  iLandau.GetParameter( 1 ) << endl;
+      if( fDebug )
+      {
+	 cout << "\t\t Landau interpolation for energy tables: " << i << "\t" << j << "\t";
+	 cout << TMath::Prob( iLandau.GetChisquare(), iLandau.GetNDF() ) << ", median " << iMedianValue;
+	 cout << ", fit: " << iLandau.GetParameter( 0 ) << "\t" << iLandau.GetParameter( 1 );
+	 cout << "\t" << iMedianValue / iLandau.GetParameter( 0 );
+	 cout << "\t" << iLandau.GetParameter( 0 ) /  iLandau.GetParameter( 1 ) << endl;
+      }
    }
    else
    {

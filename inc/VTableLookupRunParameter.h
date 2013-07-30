@@ -3,6 +3,7 @@
 #ifndef VTABLELOOKUPRUNPARAMTER_H
 #define VTABLELOOKUPRUNPARAMTER_H
 
+#include <TChain.h>
 #include <TMath.h>
 #include <TNamed.h>
 #include <TSystem.h>

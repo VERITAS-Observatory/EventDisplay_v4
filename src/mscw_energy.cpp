@@ -13,6 +13,7 @@
 #include "VTableLookupRunParameter.h"
 #include "VTableLookup.h"
 
+#include <TChain.h>
 #include <TStopwatch.h>
 
 #include <iostream>
@@ -74,7 +75,9 @@ int main( int argc, char *argv[] )
        exit( -1 );
     }
 
-    cout << endl << "loop over all events (in total " << fTLook->getNEntries() << ")" << endl;
+    cout << endl << "loop over all events ";
+    if( fTLook->getNEntries() != TChain::kBigNumber ) cout << "(in total " << fTLook->getNEntries() << ")";
+    cout << endl;
     if( fTLook->getMaxTotalTime() < 1.e8 ) cout << "\t maximum run time [s]: " << fTLook->getMaxTotalTime() << endl;
 
 // loop over all events
