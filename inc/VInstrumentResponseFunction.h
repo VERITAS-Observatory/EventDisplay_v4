@@ -37,6 +37,8 @@ class VInstrumentResponseFunction
    TTree    *fDataProduct;
    VInstrumentResponseFunctionData* fIRFData_Tree;
 
+   unsigned int fEnergyReconstructionMethod;
+
 // histograms and data
    vector< vector< VInstrumentResponseFunctionData* > > fIRFData;
 

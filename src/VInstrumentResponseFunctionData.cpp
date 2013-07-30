@@ -359,6 +359,7 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 
    if( !bPlotResolution_vs_reconstructedEnergy ) iErec_lin = fData->MCe0;
 
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // fill histograms
 

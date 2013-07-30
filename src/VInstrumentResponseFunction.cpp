@@ -15,6 +15,7 @@ VInstrumentResponseFunction::VInstrumentResponseFunction()
 
    fData = 0;
    fAnaCuts = 0;
+   fEnergyReconstructionMethod = 0;
 
    fSpectralWeight = new VSpectralWeight();
 
@@ -30,6 +31,7 @@ void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRu
        cout << "VInstrumentResponseFunction::setRunParameter error: no run parameter given" << endl;
        return;
     }
+    fEnergyReconstructionMethod = iRunPara->fEnergyReconstructionMethod;
     setEnergyReconstructionMethod( iRunPara->fEnergyReconstructionMethod );
     setMonteCarloEnergyRange( iRunPara->fMCEnergy_min, iRunPara->fMCEnergy_max, TMath::Abs( iRunPara->fMCEnergy_index ) );
 
@@ -80,6 +82,7 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 
 	     i_irf.back()->setData( iZe, (int)j, fVMinAz[j], fVMaxAz[j], iNoise, iPedvars, fVSpectralIndex[i], iXoff, iYoff );
 	     i_irf.back()->setHistogrambinning();
+	     i_irf.back()->setEnergyReconstructionMethod( fEnergyReconstructionMethod );
        }
        fIRFData.push_back( i_irf );
    }
@@ -238,7 +241,10 @@ void VInstrumentResponseFunction::setEnergyReconstructionMethod( unsigned int iM
    {
       for( unsigned int j = 0; j < fIRFData[i].size(); j++ )
       {
-          if( fIRFData[i][j] ) fIRFData[i][j]->setEnergyReconstructionMethod( iMethod );
+          if( fIRFData[i][j] )
+	  {
+	     fIRFData[i][j]->setEnergyReconstructionMethod( iMethod );
+          }
       }
    }
 }

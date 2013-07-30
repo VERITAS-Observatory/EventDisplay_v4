@@ -593,7 +593,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D *iP, dou
     return;
 }
 
-void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D *iP, int i_rebin, double iMinEnergy )
+void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D *iP, double iMinEnergy )
 {
     if( !iP )
     {
@@ -612,16 +612,12 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TH2D *iP, int i
     int zz = 0;
     for( int b = 1; b <= iP->GetNbinsX(); b++ )
     {
-        TH1D *h = iP->ProjectionY( "p_x", b, b+1 );
-        if( h && h->GetEntries() > 3. )
+        TH1D *h = iP->ProjectionY( "p_x", b, b );
+        if( h && h->GetEntries() > 10. )
         {
             if( iP->GetXaxis()->GetBinCenter( b ) < iMinEnergy ) continue;
 	    gEnergyResolution->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), h->GetRMS() );
-	    if( h->GetEntries() > 1. )
-	    {
-		 gEnergyResolution->SetPointError( zz, 0., h->GetRMS()/sqrt(h->GetEntries()-1. ) );
-	    }
-	    else                            gEnergyResolution->SetPointError( zz, 0., 0. );
+	    gEnergyResolution->SetPointError( zz, 0., h->GetRMS()/sqrt(h->GetEntries()-1. ) );
             zz++;
         }
     }

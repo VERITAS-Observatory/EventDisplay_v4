@@ -87,10 +87,10 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
     void   setData( double iZe = -99., int iAz_bin = -99, double iAz_min = -99., double iAz_max = -99., int iNoise = -99, double iPedvars = -99., double iIndex = -99., double iXoff = -99., double iYoff = -99. );
     void   setEnergyReconstructionMethod( unsigned int iMethod = 0 ) { fEnergyReconstructionMethod = iMethod; }
     void   setPlottingStyle( int icolor, double iwidth = 1., int imarker = 20, double isize = 1., int iFillStyle = 0, int iLineStyle = 1 );
-    void   setHistogrambinning( int iN = 20, double iMin = -2., double iMax = 2. ) { fHistogrambinningEnergy_TeV_Log = iN; fHistogrambinningEnergy_Min_Tev_Log = iMin; fHistogrambinningEnergy_Max_Tev_Log = iMax; }
+    void   setHistogrambinning( int iN = 20, double iMin = -1.9, double iMax = 2.1 ) { fHistogrambinningEnergy_TeV_Log = iN; fHistogrambinningEnergy_Min_Tev_Log = iMin; fHistogrambinningEnergy_Max_Tev_Log = iMax; }
     bool   terminate( double iContainmentProbability, double iContainmentProbabilityError );
 
-    ClassDef(VInstrumentResponseFunctionData,5);
+    ClassDef(VInstrumentResponseFunctionData,6);
 };
 
 #endif
