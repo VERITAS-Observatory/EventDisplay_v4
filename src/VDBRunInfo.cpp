@@ -90,7 +90,7 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
     TSQLRow *db_row = db_res->Next();
     if( !db_row )
     {
-       cout << "VDBRunInfo:Comments: failed reading a row from DB for run " << run_number << endl;
+       cout << "VDBRunInfo:readRunDQM:Info no row in VOFFLINE DB for run " << run_number << endl;
     } else
     {
 
