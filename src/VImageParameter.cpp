@@ -291,20 +291,10 @@ void VImageParameter::reset( unsigned int resetLevel )
 
 // timing parameters
     tint_x = 0.;
-    tint_y = 0.;
-    tint_r = 0.;
     tgrad_x = 0.;
-    tgrad_y = 0.;
-    tgrad_r = 0.;
     tint_dx = 0.;
-    tint_dy = 0.;
-    tint_dr = 0.;
     tgrad_dx = 0.;
-    tgrad_dy = 0.;
-    tgrad_dr = 0.;
     tchisq_x = 0.;
-    tchisq_y = 0.;
-    tchisq_r = 0.;
     tmin = 999.;
     tmax = 0.;
     tmean = 0.;

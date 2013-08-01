@@ -134,6 +134,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fImageLL=0;
     fLogLikelihoodLoss_min.push_back( 1.e3 );
     fLogLikelihood_Ntubes_min.push_back( 0 );
+    fForceLLImageFit = false;
     fImageAnalysisFUIFactor = 2.;
     fFixWindowStart = false;
     fFixWindowStart_sumwindow2 = true;

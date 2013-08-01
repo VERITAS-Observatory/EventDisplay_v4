@@ -53,18 +53,24 @@ void VImageParameterCalculation::initMinuit( int iVmode )
     fLLFitter->SetFCN( get_LL_imageParameter_2DGauss );
 }
 
+/*
 
+   calculate timing parameters
+   (time gradient along long axis of image)
+
+*/
 void VImageParameterCalculation::calcTimingParameters()
 {
     if( fDebug ) cout << "VImageParameterCalculation::calcTimingParameters" << endl;
-// calculate timing parameters
     if (!fboolCalcGeo) return;
     if(fData->getTZeros().size()==0)return;
 
-    unsigned int num=fData->getTZeros().size();
-    double xpos[num], ypos[num], rpos[num], t[num];
-    double ex[num], ey[num], er[num], et[num];
-    int nclean=0;
+    vector< double > xpos;
+    vector< double > t;
+    vector< double > et;
+    vector< bool > usePoint;
+    double i_xmin = 1.e99;
+    double i_xmax = -1.e99;
     for( unsigned int i = 0; i < fData->getTZeros().size(); i++ )
     {
 // use only image and border and no hilo channels (timing is different)
@@ -73,57 +79,86 @@ void VImageParameterCalculation::calcTimingParameters()
             double xi = getDetectorGeo()->getX()[i];
             double yi = getDetectorGeo()->getY()[i];
 // loop over image tubes
-            double xpmt= xi - fParGeo->cen_x;
-            double ypmt= yi - fParGeo->cen_y;
-//position along the major axis of the image
-            xpos[nclean]=xpmt*fParGeo->cosphi+ypmt*fParGeo->sinphi;
-            ex[nclean]=0;                         // error on xpos (deg)
-//position along the minor axis of the image
-            ypos[nclean]=ypmt*fParGeo->cosphi-xpmt*fParGeo->sinphi;
-            ey[nclean]=0;                         // error on ypos (deg)
-//radial position from camera centre
-            rpos[nclean]=sqrt(yi*yi + xi*xi );
-            er[nclean]=0;                         // error on rpos (deg)
-            t[nclean]=fData->getTZeros()[i];
-
+            double xpmt = xi - fParGeo->cen_x;
+            double ypmt = yi - fParGeo->cen_y;
+// position along the major axis of the image (relative to centroid position)
+            xpos.push_back( xpmt*fParGeo->cosphi+ypmt*fParGeo->sinphi );
+	    if( xpos.back() > i_xmax ) i_xmax =  xpos.back();
+	    if( xpos.back() < i_xmin ) i_xmin =  xpos.back();
+// timing parameter
+	    t.push_back( fData->getTZeros()[i] );
+// timing error
+	    et.push_back( 0. );
 // (GM) (before 20130115)
             if( fData->getRunParameter()->fDoublePassErrorWeighting2005 )
 	    {
 //  timing resolution from variable laser pulse studies (run 751)
-                 et[nclean]=13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i];
+                 et.back() = 13.0*exp(-0.035*(fData->getSums()[i]+30.))+fData->getTOffsetvars()[i];
 // make that the timing resolution is not too small (important for MC)
-                 if( et[nclean] < 5.e-2 ) et[nclean] = 0.3;
+                 if( et.back() < 5.e-2 ) et.back() = 0.3;
             }
 	    else
 	    {
 // use 1./sums as error for fitting (rescale errors later)
 	       if( fData->getSums()[i] > 0. )
 	       {
-		   et[nclean] = 1./fData->getSums()[i];
+		   et.back() = 1./fData->getSums()[i];
 	       }
-	       else et[nclean] = 0.3;
+	       else et.back() = 0.3;
             }
+// use this point
+            usePoint.push_back( true );
 // min/max/mean times
             if( fData->getTZeros()[i]  < fParGeo->tmin ) fParGeo->tmin = fData->getTZeros()[i];
             if( fData->getTZeros()[i]  > fParGeo->tmax ) fParGeo->tmax = fData->getTZeros()[i];
             fParGeo->tmean += fData->getTZeros()[i];
-
-            nclean+=1;
         }
     }
+
+///////////////////////////////////////////////////
+// find and remove outliers
+    if( xpos.size() > 9 && i_xmin < i_xmax )
+    {
+        TH1F h( "houtlier", "", 100, i_xmin, i_xmax );
+	for( unsigned int i = 0; i < xpos.size(); i++ ) h.Fill( xpos[i] );
+	double i_a[] = { 0.25, 0.75 };
+	double i_b[] = { 0.00, 0.00 };
+	h.GetQuantiles( 2, i_b, i_a );
+	double iqr = i_b[1] - i_b[0];
+	double i_limin_min = i_b[0] - 1.5 * iqr;
+	double i_limin_max = i_b[1] + 1.5 * iqr;
+	for( unsigned int i = 0; i < xpos.size(); i++ ) 
+	{
+	   if( xpos[i] < i_limin_min )
+	   {
+	      usePoint[i] = false;
+           }
+	   else if( xpos[i] > i_limin_max )
+	   {
+	      usePoint[i] = false;
+           }
+        }
+   }
 
     TGraphErrors *xgraph = fData->getXGraph();
     if( xgraph )
     {
+	int nclean = 0;
+	for( unsigned int i = 0; i < usePoint.size(); i++ ) if( usePoint[i] ) nclean++;
         xgraph->Set( nclean );
 
         if( nclean > 2 )
         {
 // Fill the graphs for long (x) short(y) and radial (r) axis
-            for (int i=0;i<nclean;i++)
+	    int z = 0;
+            for( unsigned int i = 0; i < xpos.size(); i++ )
             {
-                xgraph->SetPoint(i,xpos[i],t[i]);
-                xgraph->SetPointError(i,ex[i],et[i]);
+		if( usePoint[i] )
+		{
+		   xgraph->SetPoint( z, xpos[i], t[i]);
+		   xgraph->SetPointError( z, 0., et[i]);
+		   z++;
+                }
             }
             xgraph->Fit("pol1","Q");
             TF1 *xline=xgraph->GetFunction("pol1");
@@ -134,51 +169,37 @@ void VImageParameterCalculation::calcTimingParameters()
 // (note that ex[] are all 0 -> normal chi2 fit)
 	       double i_scale = 1.;
 	       if( xline->GetNDF() > 0. ) i_scale = xline->GetChisquare() / xline->GetNDF();
-	       for (int i=0;i<nclean;i++)
+	       z = 0;
+	       for( unsigned int i = 0; i < xpos.size(); i++ )
 	       {
-		  xgraph->SetPointError(i,ex[i],et[i]*sqrt(i_scale));
+		  if( usePoint[i] )
+		  {
+		     xgraph->SetPointError( z, 0., et[i]*sqrt(i_scale) );
+		     z++;
+                  }
 	       } 
 	       xgraph->Fit("pol1","Q");
 	       xline=xgraph->GetFunction("pol1");
             }
 
-            fParGeo->tint_y=-999.;
-            fParGeo->tgrad_y=-999.;
-            fParGeo->tint_dy=-999.;
-            fParGeo->tgrad_dy=-999.;
-            fParGeo->tchisq_y=-999.;
-
+// fill fit results
             fParGeo->tint_x=xline->GetParameter(0);
             fParGeo->tgrad_x=xline->GetParameter(1);
             fParGeo->tint_dx=xline->GetParError(0);
             fParGeo->tgrad_dx=xline->GetParError(1);
             fParGeo->tchisq_x=xline->GetChisquare();
-            fParGeo->tmean = fParGeo->tmean / nclean;
-            fParGeo->tint_r=-999.;
-            fParGeo->tgrad_r=-999.;
-            fParGeo->tint_dr=-999.;
-            fParGeo->tgrad_dr=-999.;
-            fParGeo->tchisq_r=-999.;
+            if( nclean > 0. ) fParGeo->tmean = fParGeo->tmean / nclean;
+	    else              fParGeo->tmean = -9999.;
             fData->setXGraph(xgraph);
         }
     }
     else
     {
         fParGeo->tint_x=-999.;
-        fParGeo->tint_y=-999.;
-        fParGeo->tint_r=-999.;
         fParGeo->tgrad_x=-999.;
-        fParGeo->tgrad_y=-999.;
-        fParGeo->tgrad_r=-999.;
         fParGeo->tint_dx=-999.;
-        fParGeo->tint_dy=-999.;
-        fParGeo->tint_dr=-999.;
         fParGeo->tgrad_dx=-999.;
-        fParGeo->tgrad_dy=-999.;
-        fParGeo->tgrad_dr=-999.;
         fParGeo->tchisq_x=-999.;
-        fParGeo->tchisq_y=-999.;
-        fParGeo->tchisq_r=-999.;
         fParGeo->tmin = -999.;
         fParGeo->tmax = -999.;
         fParGeo->tmean = -999.;
@@ -1126,22 +1147,21 @@ void VImageParameterCalculation::calcParameters()
     If estimated signal is above image/border threshold, VEvndispData::getSums()[pixelID] is set to
     this value and the fLLEst[pixelID] is set true.
     A new value for the size is calculated.
-This is the old size from the geometrical calculation  plus the estimated signals from the
-dead pixels.
+    This is the old size from the geometrical calculation  plus the estimated signals from the
+    dead pixels.
 
-Fit has problems with images where all pixels are in one line (not really a 2D Gauss).
-For all failed fits, the signals in the dead channels are estimated by averaging over all
-neighbour pixels.
+    Fit has problems with images where all pixels are in one line (not really a 2D Gauss).
+    For all failed fits, the signals in the dead channels are estimated by averaging over all
+    neighbour pixels.
 
-\attention
+   \attention
 
-Check always in the analysis the status of the fit (FitStat).
-Values lower than 3 (approximate or no error matrix) should be excluded from the analysis.
-In this case there is a large probablitity that the parameters are wrong.
+    Check always in the analysis the status of the fit (FitStat).
+    Values lower than 3 (approximate or no error matrix) should be excluded from the analysis.
+    In this case there is a large probablitity that the parameters are wrong.
 
-(GM)
 */
-vector<bool> VImageParameterCalculation::calcLL()
+vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 {
     if( !fData )
     {
@@ -1174,6 +1194,7 @@ vector<bool> VImageParameterCalculation::calcLL()
     double fdistXmax = -1.e99;
     double fdistYmin =  1.e99;
     double fdistYmax = -1.e99;
+    double i_sumMax = -1.e99;
     for( unsigned int j = 0; j < fData->getSums().size(); j++ )
     {
 // ignore dead channels
@@ -1192,8 +1213,13 @@ vector<bool> VImageParameterCalculation::calcLL()
             fll_X.push_back( xi );
             fll_Y.push_back( yi );
 
-	    if( fData->getImage()[j] || fData->getBorder()[j]) fll_Sums.push_back( fData->getSums()[j] );
+	    if( fData->getImage()[j] || fData->getBorder()[j])
+	    {
+	        if( iUseSums2 ) fll_Sums.push_back( fData->getSums()[j] );
+		else            fll_Sums.push_back( fData->getSums2()[j] ); 
+            }
 	    else                                               fll_Sums.push_back( 0. );
+	    if( fll_Sums.back() > i_sumMax ) i_sumMax = fll_Sums.back();
         }
     }
     if( fLLDebug )
@@ -1216,7 +1242,7 @@ vector<bool> VImageParameterCalculation::calcLL()
     double dcen_y = 0.;
     double sigmaY = 0.;
     double dsigmaY = 0.;
-    double signal = 0.;
+    double signal = i_sumMax;
     double dsignal = 0.;
 
     sigmaX = fParGeo->sigmaX;
@@ -1299,6 +1325,7 @@ vector<bool> VImageParameterCalculation::calcLL()
 // estimate shower size
 // integrate over all bins to get fitted size
     float  iSize = fParGeo->size;
+    if( iUseSums2 ) iSize = fParGeo->size2;
     if( fParLL->Fitstat > 2 )
     {
 // assume that all pixel are of the same size
@@ -1348,7 +1375,8 @@ vector<bool> VImageParameterCalculation::calcLL()
         cen_x  = fParGeo->cen_x;
         cen_y  = fParGeo->cen_y;
         phi    = fParGeo->phi;
-        iSize  = fParGeo->size;
+        if( iUseSums2 ) iSize  = fParGeo->size2;
+	else            iSize  = fParGeo->size;
     }
     double cosphi = cos( phi );
     double sinphi = sin( phi );
@@ -1438,7 +1466,8 @@ vector<bool> VImageParameterCalculation::calcLL()
     fParLL->cen_y = cen_y;
     fParLL->length = length;
     fParLL->width = width;
-    fParLL->size = iSize;
+    if( iUseSums2 ) fParLL->size2 = iSize;
+    else            fParLL->size = iSize;
     fParLL->dist = dist;
     fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! to tired for calculation
     fParLL->alpha = alpha * 45. / atan( 1.);
@@ -1646,9 +1675,10 @@ void get_LL_imageParameter_2DGauss( Int_t &npar, Double_t *gin, Double_t &f, Dou
                 sum += -2. * par[0] * ( x - par[1] ) / par[2] * ( y - par[3] ) / par[4];
                 sum  = rho_s * exp( sum * rho_1 );
 
+
 // assume Poisson fluctuations (neglecting background noise)
-                if( n != 0. && sum != 0. ) LL += n * log(sum) - sum - n * log(n) + n;
-                else                       LL += -1. * sum;
+                if( n > 0. && sum > 0. ) LL += n * log(sum) - sum - n * log(n) + n;
+                else                     LL += -1. * sum;
 // Gauss with background noise
 //             iVar = sum+pedvars*pedvars;
 //             iVar = sum;

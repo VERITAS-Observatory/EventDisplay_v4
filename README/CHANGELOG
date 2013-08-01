@@ -1,6 +1,15 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130801 (GM) important bug fix in size2 calculation
+                (was not calculated correctly for LL interpolation for
+		 events with loss > 0)
+		 fixes in LL fit
+		 added outlier search for time gradient calculation
+
+* 20130725 (GM) small bug fix to allow calculation of low-gain
+                pedestals (VTS only)
+
 * 21030719 (GM) ignore now exclusion regions while filling
                 significance distributions from sky maps
 

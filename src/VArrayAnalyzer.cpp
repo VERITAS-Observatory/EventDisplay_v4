@@ -1317,7 +1317,8 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
     ze.clear();
     az.clear();
 
-/* fill the x, y, w, and m arrays for the fit */
+///////////////////////////////////////////////
+// fill the x, y, w, and m arrays for the fit 
     for ( unsigned int tel = 0; tel < getNTel(); tel++ )
     {
         setTelID( tel );
@@ -1357,6 +1358,7 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
             i_phi = recalculateImagePhi( iPointingErrorX, iPointingErrorY );
             if( cos( i_phi ) != 0. ) m.push_back( sin( i_phi ) / cos( i_phi ) );
             else                     m.push_back( 1.e9 );
+
             phi.push_back( i_phi );
             sinphi.push_back( sin( i_phi ) );
             cosphi.push_back( cos( i_phi ) );

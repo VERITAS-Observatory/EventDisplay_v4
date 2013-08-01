@@ -111,20 +111,10 @@ class VImageParameter
 
 // timing parameters
         float tgrad_x;                            //!< Timing gradient in X-direction
-        float tgrad_y;                            //!< Timing gradient in Y-direction
-        float tgrad_r;                            //!< Radial timing gradient
         float tint_x;                             //!< Timing intercept for X-direction
-        float tint_y;                             //!< Timing intercept for Y-direction
-        float tint_r;                             //!< Timing intercept for radial direction
         float tgrad_dx;                           //!< error in timing gradient in X-direction
-        float tgrad_dy;                           //!< error in timing gradient in Y-direction
-        float tgrad_dr;                           //!< error in radial timing gradient
         float tint_dx;                            //!< error in timing intercept for X-direction
-        float tint_dy;                            //!< error in timing intercept for Y-direction
-        float tint_dr;                            //!< error in timing intercept for radial direction
         float tchisq_x;                           //!< Chisquare of timing fit in X
-        float tchisq_y;                           //!< Chisquare of timing fit in Y
-        float tchisq_r;                           //!< Chisquare of timing fit in R
         float tmin;                               //!< time minimum for image/border pixels
         float tmax;                               //!< time maximum for image/border pixels
         float tmean;                              //!< mean time of image/border pixels

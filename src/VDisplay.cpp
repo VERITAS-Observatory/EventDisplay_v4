@@ -1729,6 +1729,8 @@ bool VDisplay::drawTgradGraphs()
 
     double y_min = 0.;
     double y_max = 20.;
+    double x_min =  1.e10;
+    double x_max = -1.e10;
     y_min = 1.e5;
     y_max = -1.e5;
     double x = 0.;
@@ -1740,14 +1742,23 @@ bool VDisplay::drawTgradGraphs()
 	yE = xgraph->GetErrorY( i );
         if( y+yE > y_max ) y_max = y+yE;
         if( y-yE < y_min ) y_min = y-yE;
+	if( x > x_max ) x_max = x;
+	if( x < x_min ) x_min = x;
     }
     double y_add = 0.2*(y_max-y_min);
     y_min -= y_add;
     y_max += y_add;
 
-    TH2F *h1=new TH2F("h1","",0, -0.5*fEventLoop->getData()->getDetectorGeometry()->getFieldofView()[fTelescope]-0.1, 
-                                  0.5*fEventLoop->getData()->getDetectorGeometry()->getFieldofView()[fTelescope]+0.1, 0, 
-				  y_min, y_max );
+    if( TMath::Abs( y_min - y_max ) < 1.e-2 ) 
+    {
+       y_min = -0.5;
+       y_max = 0.5;
+    }  
+
+    x_max += 1.2;
+    x_min -= 1.2;
+
+    TH2F *h1 = new TH2F("h1","",0, x_min, x_max, 0, y_min, y_max );
     h1->SetStats(0);
     h1->SetTitle("");
     h1->GetXaxis()->SetTitle("PMT position on long axis [degrees]");
@@ -1770,7 +1781,7 @@ bool VDisplay::drawTgradGraphs()
     h1->GetYaxis()->SetLabelSize(0.05);
     h1->GetYaxis()->SetTitleOffset(0.7);
 
-    h1->GetXaxis()->SetTitle("PMT position on long axis [degrees]");
+    h1->GetXaxis()->SetTitle("PMT position on long axis [deg]");
     h1->DrawCopy();
     if (xgraph && xgraph->GetN()>1)
     {
