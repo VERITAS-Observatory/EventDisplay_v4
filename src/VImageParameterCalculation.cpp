@@ -1215,8 +1215,8 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 
 	    if( fData->getImage()[j] || fData->getBorder()[j])
 	    {
-	        if( iUseSums2 ) fll_Sums.push_back( fData->getSums()[j] );
-		else            fll_Sums.push_back( fData->getSums2()[j] ); 
+	        if( iUseSums2 ) fll_Sums.push_back( fData->getSums2()[j] );
+		else            fll_Sums.push_back( fData->getSums()[j] ); 
             }
 	    else                                               fll_Sums.push_back( 0. );
 	    if( fll_Sums.back() > i_sumMax ) i_sumMax = fll_Sums.back();
