@@ -92,6 +92,7 @@ class VPlotUtilities
         void   setColorAxisDataVector_minmax( double imin = 0., double imax = 0. );
         void   setColorAxisPalette( int palette = 55, int ncolors = 100 );
 	void   setArrowPlottingStyle( TArrow *iArr );
+	void   setArrowPlottingStyle( TArrow *iArr, int icolor, double iwidth = 1., int iLineStyle = 1 );
 	void   setFunctionPlottingStyle( TF1 *iF );
 	void   setFunctionPlottingStyle( TF1 *iF, int icolor, double iwidth = 1., double isize = 1., int imarker = 1, int iFillStyle = 1 );
         void   setHistogramPlottingStyle( TH1* his );
@@ -110,6 +111,6 @@ class VPlotUtilities
 	void   setBlackAndWhitePalette();
 	TH2D*  removeOuterRing( TH2D *h, double r, double ivalue );
 
-        ClassDef(VPlotUtilities,11);
+        ClassDef(VPlotUtilities,12);
 };
 #endif

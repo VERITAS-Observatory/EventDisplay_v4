@@ -29,6 +29,9 @@ class VWPPhysSensitivityPlotsMaker
 
     string fPrintingOptions;
 
+    int   fPlotCTARequirements;
+    bool  fPlotCTARequirementGoals; 
+
     bool  getListOfDataSets( string iiDataSetFileTxt );
     bool  getListOfArrays( string iSubArrayFileTxt );
     bool  readList( string iFileTxt, vector< string >& iList );
@@ -49,6 +52,8 @@ class VWPPhysSensitivityPlotsMaker
     bool setListOfDataSets( string iDataSetFileTxt );
     void setObservingTime( double i_s = 180000. ) { fObservingTime_s = i_s; }
     void setPrintingOptions( string iPrint = "" ) { fPrintingOptions = iPrint; }
+    void setPlotRequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false ) { fPlotCTARequirements = fPlotCTARequirements;
+                                                                                              fPlotCTARequirementGoals = iPlotRequirementGoals; }
     void setOffAxisAngle( vector< double > iA ) { fOffAxisAngle = iA; }
     bool writeTexFileBody( string iTexFile, string iTexFileTitle = "" );
 };

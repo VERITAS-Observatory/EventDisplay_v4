@@ -18,6 +18,7 @@
 
 #include "VHistogramUtilities.h"
 #include "VMathsandFunctions.h"
+#include "VPlotCTARequirements.h"
 #include "VPlotInstrumentResponseFunction.h"
 #include "VPlotUtilities.h"
 #include "VSensitivityCalculator.h"
@@ -60,6 +61,10 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    string fCrabSpectraFile;
    unsigned int fCrabSpectraID;
 
+   int fPlotCTARequirementsID;
+   bool fPlotCTARequirementGoals;
+   VPlotCTARequirements *fPlotCTARequirements;
+
 // projected sensitvity plots
    vector< double > fProjectionEnergy_logTeV;
    vector< TGraphAsymmErrors* > fProjectionSensitivityvsCameraOffset;
@@ -90,6 +95,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    void setEnergyRange_Lin_TeV( double iMinEnergy_TeV = 0.01, double iMaxEnergy_TeV = 200. ) 
                                 { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
 
+   bool setPlotCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false );
 };
 
 #endif

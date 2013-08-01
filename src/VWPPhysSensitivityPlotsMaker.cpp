@@ -39,6 +39,7 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
     setObservingTime();
     setAxisUnits();
     setPrintingOptions();
+    setPlotRequirements();
 }
 
 bool VWPPhysSensitivityPlotsMaker::setListOfArrays( string iSubArrayFileTxt )
@@ -80,6 +81,7 @@ bool VWPPhysSensitivityPlotsMaker::readList( string iFileTxt, vector< string >& 
 void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile )
 {
    VPlotWPPhysSensitivity a;
+   a.setPlotCTARequirements( fPlotCTARequirements, fPlotCTARequirementGoals );
    a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
    a.addDataSets( iDataSetFile );
    a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3 );

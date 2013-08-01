@@ -1,6 +1,11 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130801 (GM) remove dead time calculation for MC
+
+* 20130801 (GM) added class for plotting of CTA sensitivity requirements
+                small improvements in sensitivity plotting
+
 * 20130801 (GM) important bug fix in size2 calculation
                 (was not calculated correctly for LL interpolation for
 		 events with loss > 0)

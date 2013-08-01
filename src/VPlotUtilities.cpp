@@ -165,11 +165,22 @@ void VPlotUtilities::setHistogramPlottingStyle( TH2D* his, double iminF)
 
 }
 
+void VPlotUtilities::setArrowPlottingStyle( TArrow *a, int icolor, double iwidth, int iLineStyle )
+{
+   if( !a ) return;
+   
+   a->SetLineColor( icolor );
+   a->SetLineWidth( (Width_t)iwidth );
+   a->SetLineStyle( (Style_t)iLineStyle );
+   a->SetFillColor( icolor );
+}
+
+
 void VPlotUtilities::setArrowPlottingStyle( TArrow *a )
 {
    if( !a ) return;
    
-   a->SetLineColor( fPlottingColor);
+   a->SetLineColor( fPlottingColor );
    a->SetLineWidth( (Width_t)fPlottingLineWidth );
    a->SetLineStyle( (Style_t)fPlottingLineStyle );
    a->SetFillColor( fPlottingColor );

@@ -9,6 +9,8 @@ VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
    fIRF = 0;
    setEnergyRange_Lin_TeV();
    setCrabSpectraFile();
+   fPlotCTARequirements = 0;
+   setPlotCTARequirements();
 }
 
 void VPlotWPPhysSensitivity::reset()
@@ -207,6 +209,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
     }
 
     char hname[2000];
+////////////////////////////
 // effective areas
     TCanvas *c = fIRF->plotEffectiveArea();
     plotLegend( c, true );
@@ -215,6 +218,12 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
        sprintf( hname, "%s-EffArea.eps", iPrint.c_str() );
        if( c ) c->Print( hname );
     }
+    if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+    {
+// effective area requirements are all goals
+       fPlotCTARequirements->plotRequirement_EffectiveArea( c, true );
+    }
+////////////////////////////
 // angular resolution (68%)
     c = fIRF->plotAngularResolution();
     plotLegend( c, false );
@@ -223,9 +232,14 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
        sprintf( hname, "%s-AngRes.eps", iPrint.c_str() );
        if( c ) c->Print( hname );
     }
+    if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+    {
+       fPlotCTARequirements->plotRequirement_AngularResolution( c, fPlotCTARequirementGoals );
+    }
 // angular resolution (80%)
     c = fIRF->plotAngularResolution( "energy", "80" );
     plotLegend( c, false );
+////////////////////////////
 // energy resolution
     c = fIRF->plotEnergyResolution( iEnergyResolutionMax );
     plotLegend( c, false );
@@ -233,6 +247,10 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
     {
        sprintf( hname, "%s-ERes.eps", iPrint.c_str() );
        if( c ) c->Print( hname );
+    }
+    if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+    {
+       fPlotCTARequirements->plotRequirement_EnergyResolution( c, fPlotCTARequirementGoals );
     }
 // energy bias
     c = fIRF->plotEnergyReconstructionBias( "mean", -0.5, 0.5 );
@@ -466,6 +484,10 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
       if( c_temp ) cBck = c_temp;
       fillProjectedSensitivityPlot( i, a );
       fData[i]->gSensitivity = (TGraphAsymmErrors*)a->getSensitivityGraph();
+       if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
+       {
+	  fPlotCTARequirements->plotRequirement_DifferentialSensitivity50h( cSens, fPlotCTARequirementGoals );
+       }
    }
 // print results
    if( cSens )
@@ -590,6 +612,19 @@ vector< string > VPlotWPPhysSensitivity::getListOfArrays()
    }
    return iT;
 }
+
+bool VPlotWPPhysSensitivity::setPlotCTARequirements( int iRequirementID, bool iPlotRequirementGoals )
+{
+   fPlotCTARequirementGoals = iPlotRequirementGoals;
+   fPlotCTARequirementsID = iRequirementID;
+   if( fPlotCTARequirementsID >= 0 )
+   {
+      fPlotCTARequirements = new VPlotCTARequirements();
+      return fPlotCTARequirements->setRequirement( fPlotCTARequirementsID );
+   }
+
+   return false;
+}
    
 
 // ====================================================================================
@@ -624,3 +659,4 @@ void VPlotWPPhysSensitivityData::print()
    cout << fSubArray << ", offset " << fCameraOffset_deg <<  " deg" << endl;
    cout << "\t (color " << fPlottingColor << ", line " << fPlottingLineStyle << ")" << endl;
 }
+

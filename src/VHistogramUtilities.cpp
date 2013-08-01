@@ -272,7 +272,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
 {
     if( !h ) return 0;
 
-// no distance cut for rmax < 6
+// no distance cut for rmax < 0
     if( rmax < 0. ) rmax = 1.e6;
 
 // get binning
