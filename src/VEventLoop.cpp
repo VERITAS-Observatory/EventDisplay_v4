@@ -588,7 +588,7 @@ void VEventLoop::shutdown()
                 fPedestalCalculator->terminate();
             }
 // calculate and write deadtime calculation to disk
-            if( fDeadTime )
+            if( fDeadTime && !isMC() )
 	    {
 	       fDeadTime->calculateDeadTime();
 	       fDeadTime->printDeadTime();
