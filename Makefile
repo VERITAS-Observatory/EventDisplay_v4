@@ -555,7 +555,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o \
 		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
-		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o
+		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
+		./obj/VPlotCTARequirements.o ./obj/VPlotCTARequirements_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
