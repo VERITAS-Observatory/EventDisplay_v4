@@ -174,9 +174,9 @@ double VUtilities::line_point_distance (double x1, double y1, double z1, double 
     double alt = 90. - ze;
     az = 180. - az;
 
-    double cx = -1.*cos(alt*(TMath::Pi()/180.))*cos(az*(TMath::Pi()/180.));
-    double cy = -1.*cos(alt*(TMath::Pi()/180.))*sin(az*(TMath::Pi()/180.));
-    double cz = sin(alt*(TMath::Pi()/180.));
+    double cx = -1.*cos(alt*TMath::DegToRad())*cos(az*TMath::DegToRad());
+    double cy = -1.*cos(alt*TMath::DegToRad())*sin(az*TMath::DegToRad());
+    double cz = sin(alt*TMath::DegToRad());
 
     double a1 = (y-y1)*cz - (z-z1)*cy;
     double a2 = (z-z1)*cx - (x-x1)*cz;

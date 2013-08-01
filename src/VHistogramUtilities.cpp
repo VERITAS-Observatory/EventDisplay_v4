@@ -551,3 +551,70 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, T
 
    return true;
 }
+
+
+/*
+
+   reduce size of histogram by removing all irrelevant bins (empty bins)
+
+*/
+TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2 *h, string inewHistogramName )
+{
+   if( !h ) return 0;
+
+   int nBinX_min = 99999;
+   int nBinX_max = -1;
+   int nBinY_min = 99999;
+   int nBinY_max = -1;
+
+// get minima and maxima
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
+   {
+      for( int j = 1; j <= h->GetNbinsY(); j++ )
+      {
+         if( h->GetBinContent( i, j ) > 0. )
+	 {
+	    if( i < nBinX_min ) nBinX_min = i;
+	    if( j < nBinY_min ) nBinY_min = j;
+	    if( i > nBinX_max ) nBinX_max = i;
+	    if( j > nBinY_max ) nBinY_max = j;
+         }
+      }
+   }
+   if( nBinX_max < 0 )
+   {
+      nBinX_min = 1;
+      nBinX_max = h->GetNbinsX();
+      nBinY_min = 1;
+      nBinY_max = h->GetNbinsY();
+   }
+   nBinY_min = 1;
+// create new histogram with reduced binning
+   float xmin = h->GetXaxis()->GetBinLowEdge( 1 );
+   if( nBinX_min > 0 ) xmin = h->GetXaxis()->GetBinLowEdge( nBinX_min );
+   float xmax = h->GetXaxis()->GetBinLowEdge( 1 ) +  h->GetXaxis()->GetBinWidth( 1 );
+   if( nBinX_max > 0 ) xmax = h->GetXaxis()->GetBinLowEdge( nBinX_max ) + h->GetXaxis()->GetBinWidth( nBinX_max );
+   float ymin = h->GetYaxis()->GetBinLowEdge( 1 );
+   float ymax = h->GetYaxis()->GetBinLowEdge( 1 ) +  h->GetYaxis()->GetBinWidth( 1 );
+   if( ymax > 0 ) ymax = h->GetYaxis()->GetBinLowEdge( nBinY_max ) + h->GetYaxis()->GetBinWidth( nBinY_max ); 	
+
+   TH2F *hNew = new TH2F( inewHistogramName.c_str(), h->GetTitle(), nBinX_max - nBinX_min + 1, xmin, xmax, nBinY_max, ymin, ymax );
+   hNew->SetXTitle( h->GetXaxis()->GetTitle() );
+   hNew->SetYTitle( h->GetYaxis()->GetTitle() );
+   hNew->SetZTitle( h->GetZaxis()->GetTitle() );
+   hNew->Sumw2();
+
+   for( int i = nBinX_min; i <= nBinX_max; i++ )
+   {
+       for( int j = nBinY_min; j <= nBinY_max; j++ )
+       {
+          if( h->GetBinContent( i, j ) > 0. )
+	  {
+	     hNew->SetBinContent( i - nBinX_min+1, j - nBinY_min+1, h->GetBinContent( i, j ) );
+	     hNew->SetBinError( i - nBinX_min+1, j - nBinY_min+1, h->GetBinError( i, j ) );
+          }
+       }
+   }
+
+   return hNew;
+}
