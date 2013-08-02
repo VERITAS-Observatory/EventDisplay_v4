@@ -63,6 +63,8 @@ class VImageParameter
         float width;                              //!< width of ellipse
         float size;                               //!< total signal
         float size2;                              //!< total signal (second summation window)
+	float sizeLL;                             //!< total signal; LL method
+	float size2LL;                             //!< total signal (second summation window); LL method
         float dist;                               //!< distance to centroid
         float azwidth;                            //!< used by certain analysis techniques
         float alpha;                              //!< Alpha angle (-Pi/2..Pi/2)

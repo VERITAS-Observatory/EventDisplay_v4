@@ -930,6 +930,8 @@ void VImageParameterCalculation::calcParameters()
 
         fParGeo->size=sumsig;
         fParGeo->size2=sumsig_2;
+        fParGeo->sizeLL=-1.;
+        fParGeo->size2LL=-1.;
         fParGeo->cen_x=xmean;
         fParGeo->cen_y=ymean;
         fParGeo->dist=dist;
@@ -1051,7 +1053,7 @@ void VImageParameterCalculation::calcParameters()
         const double sinalpha = (dist>ZeroTolerence) ? miss/dist : 0;
 //  if(sinalpha>1.0)sinalpha=1.0; // Floating point sanity check
 
-        const double alpha=fabs(45./atan(1.) * asin(sinalpha));
+        const double alpha=fabs( TMath::RadToDeg() * asin(sinalpha));
 
         fParGeo->alpha=alpha;
 
@@ -1127,9 +1129,6 @@ void VImageParameterCalculation::calcParameters()
 
         fParGeo->phi = atan2( fParGeo->sinphi, fParGeo->cosphi );
     }
-
-//  cout << time << " ";
-//  printf(" %f %f %f %f %f %f %f %d \n",fParGeo->cen_x,fParGeo->cen_y,fParGeo->dist,fParGeo->length,fParGeo->width,fParGeo->alpha,fParGeo->size,fParGeo->ntubes);
 
     fboolCalcGeo = true;
 
@@ -1466,11 +1465,13 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     fParLL->cen_y = cen_y;
     fParLL->length = length;
     fParLL->width = width;
-    if( iUseSums2 ) fParLL->size2 = iSize;
-    else            fParLL->size = iSize;
+    if( iUseSums2 ) fParLL->size2 = fParGeo->size2;
+    else            fParLL->size =  fParGeo->size;
+    if( iUseSums2 ) fParLL->size2LL = iSize;
+    else            fParLL->sizeLL = iSize;
     fParLL->dist = dist;
     fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! to tired for calculation
-    fParLL->alpha = alpha * 45. / atan( 1.);
+    fParLL->alpha = alpha * TMath::RadToDeg();
     fParLL->los = los;
     fParLL->miss = miss;
     fParLL->phi = phi;
@@ -1484,7 +1485,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     fParLL->ddist = ddist;
     fParLL->dmiss = dmiss;
     fParLL->dphi = dphi;
-    fParLL->dalpha = dalpha * 45. / atan( 1. );
+    fParLL->dalpha = dalpha * TMath::RadToDeg();
     fParLL->dazwidth = 0.;
 // all the fit parameters
     fParLL->Fitmin = amin;
