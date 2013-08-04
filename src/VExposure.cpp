@@ -1,9 +1,6 @@
 /*! \class VExposure
     \brief calculate VERITAS exposure
 
-    hardcoded latitude/longitude of VERITAS
-
-
     \author Gernot Maier
 */
 
@@ -13,19 +10,14 @@ ClassImp(VExposure)
 
 VExposure::VExposure( int nBinsL, int nBinsB )
 {
-
     fDebug = false;
     fMakeRunList = false;
 
     bPrintVerbose = false;
     bPrintTimeMask = false;
 
-// VERITAS values
-    fObsLongitude = 110.952 * atan(1.)/45;
-    fObsLatitude =   31.675 * atan(1.)/45.;
-
-    fStartDate = "2007-09-01";
-    fStopDate =  "2009-12-31";
+    fStartDate_SQL = "2007-09-01";
+    fStopDate_SQL =  "2009-12-31";
 
     fAcceptance = 0;
 
@@ -38,12 +30,12 @@ VExposure::VExposure( int nBinsL, int nBinsB )
     double iBMin = -90.;
     double iBMax = 90.;
 
-    fMapGal2D = new TH2D( "fMapGal2D", "", nBinsL, -180., 180., nBinsB, iBMin, iBMax );
+    fMapGal2D = new TH2D( "fMapGal2D", "", nBinsL*2, -180., 180., nBinsB*2, iBMin, iBMax );
     fMapGal2D->SetStats( 0 );
     fMapGal2D->SetXTitle( "Galactic longitude [deg]" );
     fMapGal2D->SetYTitle( "Galactic latitude [deg]" );
 
-    fRadAccMapGal2D = new TH2D( "fRadAccMapGal2D", "", nBinsL, -180., 180., nBinsB, iBMin, iBMax );
+    fRadAccMapGal2D = new TH2D( "fRadAccMapGal2D", "", nBinsL*2, -180., 180., nBinsB*2, iBMin, iBMax );
     fRadAccMapGal2D->SetStats( 0 );
     fRadAccMapGal2D->SetXTitle( "Galactic longitude [deg]" );
     fRadAccMapGal2D->SetYTitle( "Galactic latitude [deg]" );
@@ -58,6 +50,7 @@ VExposure::VExposure( int nBinsL, int nBinsB )
     fRadAccMapGal2D_aitoff->SetXTitle( "Galactic longitude [deg]" );
     fRadAccMapGal2D_aitoff->SetYTitle( "Galactic latitude [deg]" );
 
+    fPlotVTSObjects = false;
 }
 
 
@@ -84,9 +77,8 @@ void VExposure::setSelectLaser( int iSelectLaser )
 
 void VExposure::setTimeRange( string iStart, string iStop )
 {
-
-    fStartDate = iStart;
-    fStopDate  = iStop;
+    fStartDate_SQL = iStart;
+    fStopDate_SQL  = iStop;
 }
 
 void VExposure::setSourceName( string sourceName )
@@ -108,7 +100,7 @@ bool VExposure::setPlannedObservation(vector<double> ra, vector<double> dec, vec
 {
   
   for (int unsigned i=0; i<ra.size(); i++)
-    {
+  {
       double i_b=0;
       double i_l=0;
 
@@ -118,7 +110,7 @@ bool VExposure::setPlannedObservation(vector<double> ra, vector<double> dec, vec
       fRunDuration.push_back( t[i] );
       if (fDebug) cout << " " << ra[i] << " " << dec[i] << " ";
       if (fDebug) cout << " " << fRunGalLong1958.back() << " " << fRunGalLat1958.back() << " " << flush;
-    }
+  }
 
   return true;
 }
@@ -169,9 +161,9 @@ bool VExposure::readFromDB()
     char c_query[1000];
 
     if( !fMakeRunList )
-      sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate.c_str(), fStopDate.c_str() );
+      sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\"", fStartDate_SQL.c_str(), fStopDate_SQL.c_str() );
     else
-      sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\" and source_id like convert( _utf8 \'%s\' using latin1)", fStartDate.c_str(), fStopDate.c_str(), fTargetSourceName.c_str() );
+      sprintf( c_query, "select * from tblRun_Info where db_start_time >= \"%s.000000\"  and db_start_time < \"%s.160000\" and source_id like convert( _utf8 \'%s\' using latin1)", fStartDate_SQL.c_str(), fStopDate_SQL.c_str(), fTargetSourceName.c_str() );
     cout << c_query << endl;
 
     if( !my_connection.make_query(c_query) ){
@@ -331,8 +323,6 @@ bool VExposure::readFromDB()
     fWobbleN.push_back(fWobbleNorth);
     fWobbleE.push_back(fWobbleEast);
 
-
-
 //////
 // get local coordinates
 
@@ -342,11 +332,11 @@ bool VExposure::readFromDB()
 // get Greenwich sideral time
         iSid = slaGmsta( (double)iMJD, (iTime1+iTime2)/2./86400. );
 // calculate local sideral time
-        iSid = iSid - fObsLongitude;
+        iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg()*TMath::DegToRad();
 // calculate hour angle
         ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
 // get horizontal coordinates
-        slaDe2h( ha, iDec / 180. * TMath::Pi(), fObsLatitude, &az, &el );
+        slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
 // fill vectors
         fRunTelElevation.push_back( el * 180. / TMath::Pi() );
         fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
@@ -537,11 +527,11 @@ bool VExposure::readFromDBList()
 // get Greenwich sideral time
       iSid = slaGmsta( (double)iMJD, (iTime1+iTime2)/2./86400. );
 // calculate local sideral time
-      iSid = iSid - fObsLongitude;
+      iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg()*TMath::DegToRad();
 // calculate hour angle
       ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
 // get horizontal coordinates
-      slaDe2h( ha, iDec / 180. * TMath::Pi(), fObsLatitude, &az, &el );
+      slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
 // fill vectors
       fRunTelElevation.push_back( el * 180. / TMath::Pi() );
       fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
@@ -628,12 +618,12 @@ bool VExposure::readRootFile( string iRFile, double iMinMJD, double iMaxMJD )
 	if( iMaxMJD > 0. && iRunStartMJD > iMaxMJD ) continue;
 
         fRun.push_back( iRun );
-        fRunSourceID.push_back( iSourceID );
         fRunConfigMask.push_back( iConfigMask );
         fRunStartMJD.push_back( iRunStartMJD );
         fRunStopMJD.push_back( iRunStoppMJD );
         fRunDuration.push_back( iRunDuration );
         i_tot += iRunDuration;
+        fRunSourceID.push_back( iSourceID );
         fRunRA.push_back( iRunRA );
         fRunDec.push_back( iRunDec );
         fRunoffsetRA.push_back( iRunRAoffset );
@@ -643,6 +633,7 @@ bool VExposure::readRootFile( string iRFile, double iMinMJD, double iMaxMJD )
         fRunGalLat1958.push_back( b );
         fRunTelElevation.push_back( el );
         fRunTelAzimuth.push_back( az );
+
     }
 
     f.Close();
@@ -678,7 +669,7 @@ bool VExposure::writeRootFile( string iOfile )
     cout << "writing data to " << f.GetName() << endl;
 
     char hname[2000];
-    sprintf( hname, "DB entries, %s to %s", fStartDate.c_str(), fStopDate.c_str() );
+    sprintf( hname, "DB entries, %s to %s", fStartDate_SQL.c_str(), fStopDate_SQL.c_str() );
     TTree t( "fRunTable", hname );
     t.Branch( "runNumber", &iRun, "runNumber/I" );
     t.Branch( "sourceID", &iRunSourceID, "sourceID/C" );
@@ -736,6 +727,8 @@ void VExposure::fillExposureMap()
 
     double r_dist = 0.;
 
+//////////////////////////////////////////////////////////////////////
+// loop over all runs and fill the map
     for( unsigned int i = 0; i < fRunGalLong1958.size(); i++ )
     {
         double l = fRunGalLong1958[i];
@@ -754,7 +747,10 @@ void VExposure::fillExposureMap()
 
 // calculate extension in longitude
             int i_r_l = 1;
-            if( cos(b_pos*TMath::Pi()/180.) > 0. ) i_r_l = (int)(fMaximumIntegrationRadius/cos(b_pos*TMath::Pi()/180.)/fMapGal2D->GetXaxis()->GetBinWidth( 2 )+0.5);
+            if( cos(b_pos*TMath::Pi()/180.) > 0. )
+	    {
+	        i_r_l = (int)(fMaximumIntegrationRadius/cos(b_pos*TMath::Pi()/180.)/fMapGal2D->GetXaxis()->GetBinWidth( 2 )+0.5);
+            }
             else                                   i_r_l = 0;
             int i_l_start = i_l - i_r_l;
             if( i_l_start < 1 ) i_l_start = 1;
@@ -765,7 +761,8 @@ void VExposure::fillExposureMap()
             {
                 double l_pos = fMapGal2D->GetXaxis()->GetBinCenter( l );
 
-                r_dist = slaDsep( l_pos*TMath::Pi()/180., b_pos*TMath::Pi()/180., fRunGalLong1958[i]*TMath::Pi()/180., fRunGalLat1958[i]*TMath::Pi()/180. ) * 180./TMath::Pi();
+                r_dist = slaDsep( l_pos*TMath::Pi()/180., b_pos*TMath::Pi()/180., fRunGalLong1958[i]*TMath::Pi()/180.,
+		                                                                  fRunGalLat1958[i]*TMath::Pi()/180. ) * 180./TMath::Pi();
                 if( r_dist < fMaximumIntegrationRadius && fRunDuration[i] > 0. )
                 {
 // galactic longitudes are from 180. to -180.
@@ -850,7 +847,8 @@ void VExposure::plot_HESSSkySurvey( TCanvas *c )
 }
 
 
-TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2D *h, double ibmin, double ibmax, double ilmin, double ilmax, bool bAitoff )
+TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2 *h, 
+                                    double ibmin, double ibmax, double ilmin, double ilmax, bool bAitoff )
 {
     if( !h ) return 0;
 
@@ -907,9 +905,11 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
     {
         if( fCatalogue[t].size() > 0 )
 	{
-	   analyseCatalogue( fCatalogue[t], ibmin, ibmax, ilmin, ilmax, h, bAitoff, fCatalogueMarkerStyle[t], fCatalogueMarkerColor[t], fCatalogueTextAngle[t] );
+	   analyseCatalogue( fCatalogue[t], ibmin, ibmax, ilmin, ilmax, h, bAitoff, fCatalogueMarkerStyle[t], fCatalogueMarkerColor[t], 
+	                     fCatalogueTextAngle[t] );
         }
     }
+    if( fPlotVTSObjects ) plotVTSObjects( bAitoff, ibmin, ibmax, ilmin, ilmax, 5, 1., 45., h );
 
 // draw aitoff coordinate system
     if( bAitoff ) drawAitoffCoordinateSystem();
@@ -968,8 +968,36 @@ void VExposure::drawAitoffCoordinateSystem()
     for( int j = 0; j < NL; ++j ) longitudes[j]->Draw("l");
 }
 
+void VExposure::plotVTSObjects( bool bAitoff, double ibmin, double ibmax, double ilmin, double ilmax,
+                                int iMarkerStyle, int iMarkerColor, double iTextAngle, TH2 *h )
+{
+    double l = 0.;
+    double b = 0.;
+    double ra = 0.;
+    double dec = 0.;
+    string l_name = "";
 
-void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax, double ilmin, double ilmax, TH2D *h, bool bAitoff, int iMarkerStyle, int iMarkerColor, double iTextAngle )
+    set< string > iObjects;
+    for( unsigned int i = 0; i < fRunSourceID.size(); i++ )
+    {
+       if( iObjects.find( fRunSourceID[i] ) == iObjects.end() )
+       {
+	  iObjects.insert( fRunSourceID[i] );
+
+          ra  = fRunRA[i];
+	  dec = fRunDec[i];
+          slaEqgal( ra / 180. * TMath::Pi(), dec / 180. * TMath::Pi(), &l, &b );
+
+	  plotObject( l * TMath::RadToDeg(), b * TMath::RadToDeg(), fRunSourceID[i], 0.,
+		      ibmin, ibmax, ilmin, ilmax, h,
+		      bAitoff, iMarkerStyle, iMarkerColor, iTextAngle );
+       }
+    }
+}
+
+
+void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax, double ilmin, double ilmax, TH2 *h,
+                                  bool bAitoff, int iMarkerStyle, int iMarkerColor, double iTextAngle )
 {
     VStarCatalogue *s = new VStarCatalogue();
     s->init( 54626., iCatalogue );
@@ -979,8 +1007,6 @@ void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax,
     double b = 0.;
     string l_name = "";
 
-    double ib_range = ibmax - ibmin;
-    double il_range = ilmax - ilmin;
 
     cout << "total number of objects in catalogue: " << s->getNStar() << endl;
     for( unsigned int i = 0; i < s->getNStar(); i++ )
@@ -992,93 +1018,104 @@ void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax,
         if( iCatalogue == "VERITASDB" && l_name.substr( 0, 2 ) == "SS" ) continue;
         if( iCatalogue == "VERITASDB" && l_name.substr( 0, 3 ) == "GRB" ) continue;
 
-        if( l > 180. ) l -= 360.;
-        if( l > ilmin && l < ilmax && b > ibmin && b < ibmax )
-        {
-// aitoff projections?
-            double ab = b;
-            double al = -1.*l;
-            if( bAitoff ) aitoff2xy( l, b, al, ab );
-// extended?
-            if( s->getStarMajorDiameter(i) > 0. && fPlotExtendedSources )
-            {
-                TEllipse *m = new TEllipse( al, ab, s->getStarMajorDiameter(i), s->getStarMajorDiameter(i) );
-                m->SetFillStyle( 0 );
-                m->SetLineColor( iMarkerColor );
-                m->Draw();
-            }
-            else
-            {
-                TMarker *m = new TMarker( al, ab, 5 );
-                m->SetMarkerColor( iMarkerColor );
-                m->SetMarkerStyle( iMarkerStyle );
-		m->SetMarkerSize( 2 );
-                m->Draw();
-            }
+	plotObject( l, b, l_name, s->getStarMajorDiameter(i), ibmin, ibmax, ilmin, ilmax, h,
+	            bAitoff, iMarkerStyle, iMarkerColor, iTextAngle );
+     }
+}
 
-            if( h )
-            {
-                if( bAitoff ) aitoff2xy( l, b, al, ab );
-                else
-                {
-                    al = -1.*l;
-                    ab = b;
-                }
-                int il = h->GetXaxis()->FindBin( al );
-                int ib = h->GetYaxis()->FindBin( ab );
-                if( h->GetBinContent( il, ib ) > 0. )
-                {
-                    cout << h->GetBinContent( il, ib )*60.;
-                    cout << "  [min] exposure on object " << l_name;
-                    cout << "(l,b)=(" << l << ", " << b << ")\t";
-                    cout << endl;
-                }
-                if( fPlotSourceNames )
-                {
-		    if( bAitoff )
-		    {
-		       al = al+il_range*0.01 * ( cos( iTextAngle*TMath::DegToRad() ) + sin( iTextAngle*TMath::DegToRad() ) );
-		       ab = ab+ib_range*0.01 * ( -1.*sin( iTextAngle*TMath::DegToRad() ) + cos( iTextAngle*TMath::DegToRad() ) );
-		    }
-		    else
-		    {
-		       al = -1.*l+il_range*0.01 * ( cos( iTextAngle*TMath::DegToRad() ) + sin( iTextAngle*TMath::DegToRad() ) );
-		       ab = b+ib_range*0.01 * ( -1.*sin( iTextAngle*TMath::DegToRad() ) + cos( iTextAngle*TMath::DegToRad() ) );
-                    }
-                    TText *t = new TText( al, ab, l_name.c_str() );
-                    t->SetTextColor( iMarkerColor );
-                    t->SetTextSize( t->GetTextSize()*0.3 );
-                    t->SetTextAngle( iTextAngle );
-                    t->Draw();
-                }
-            }
-        }
-    }
+void VExposure::plotObject( double l, double b, string l_name, double iExtension,
+                            double ibmin, double ibmax, double ilmin, double ilmax, TH2 *h,
+			    bool bAitoff, int iMarkerStyle, int iMarkerColor, double iTextAngle )
+{
+    double ib_range = ibmax - ibmin;
+    double il_range = ilmax - ilmin;
+
+    if( l > 180. ) l -= 360.;
+    if( l > ilmin && l < ilmax && b > ibmin && b < ibmax )
+    {
+// aitoff projections?
+      double ab = b;
+      double al = -1.*l;
+      if( bAitoff ) aitoff2xy( l, b, al, ab );
+// extended?
+      if( iExtension > 0. && fPlotExtendedSources )
+      {
+	  TEllipse *m = new TEllipse( al, ab, iExtension, iExtension );
+	  m->SetFillStyle( 0 );
+	  m->SetLineColor( iMarkerColor );
+	  m->Draw();
+      }
+      else
+      {
+	  TMarker *m = new TMarker( al, ab, 5 );
+	  m->SetMarkerColor( iMarkerColor );
+	  m->SetMarkerStyle( iMarkerStyle );
+	  m->SetMarkerSize( 2 );
+	  m->Draw();
+      }
+
+      if( h )
+      {
+	  if( bAitoff ) aitoff2xy( l, b, al, ab );
+	  else
+	  {
+	      al = -1.*l;
+	      ab = b;
+	  }
+	  int il = h->GetXaxis()->FindBin( al );
+	  int ib = h->GetYaxis()->FindBin( ab );
+	  if( h->GetBinContent( il, ib ) > 0. )
+	  {
+	      cout << h->GetBinContent( il, ib )*60.;
+	      cout << "  [min] exposure on object " << l_name;
+	      cout << "(l,b)=(" << l << ", " << b << ")\t";
+	      cout << endl;
+	  }
+	  if( fPlotSourceNames )
+	  {
+	      if( bAitoff )
+	      {
+		 al = al+il_range*0.01 * ( cos( iTextAngle*TMath::DegToRad() ) + sin( iTextAngle*TMath::DegToRad() ) );
+		 ab = ab+ib_range*0.01 * ( -1.*sin( iTextAngle*TMath::DegToRad() ) + cos( iTextAngle*TMath::DegToRad() ) );
+	      }
+	      else
+	      {
+		 al = -1.*l+il_range*0.01 * ( cos( iTextAngle*TMath::DegToRad() ) + sin( iTextAngle*TMath::DegToRad() ) );
+		 ab = b+ib_range*0.01 * ( -1.*sin( iTextAngle*TMath::DegToRad() ) + cos( iTextAngle*TMath::DegToRad() ) );
+	      }
+	      TText *t = new TText( al, ab, l_name.c_str() );
+	      t->SetTextColor( iMarkerColor );
+	      t->SetTextSize( t->GetTextSize()*0.3 );
+	      t->SetTextAngle( iTextAngle );
+	      t->Draw();
+	  }
+      }
+   }
 }
 
 
 void VExposure::getDBMJDTime( string itemp, int &MJD, double &Time, bool bStrip )
 {
-    if( itemp.size() < 16 )
-    {
-        MJD = 0;
-        Time = 0.;
-        return;
-    }
-    if( bStrip )
-    {
-        itemp.replace( itemp.find( "-" ), 1, "" );
-        itemp.replace( itemp.find( "-" ), 1, "" );
-        itemp.replace( itemp.find( " " ), 1, "" );
-        itemp.replace( itemp.find( ":" ), 1, "" );
-        itemp.replace( itemp.find( ":" ), 1, "" );
-    }
-    int y, m, d, h, min, s, ms, l;
-    double gMJD;
+ if( itemp.size() < 16 )
+ {
+     MJD = 0;
+     Time = 0.;
+     return;
+ }
+ if( bStrip )
+ {
+     itemp.replace( itemp.find( "-" ), 1, "" );
+     itemp.replace( itemp.find( "-" ), 1, "" );
+     itemp.replace( itemp.find( " " ), 1, "" );
+     itemp.replace( itemp.find( ":" ), 1, "" );
+     itemp.replace( itemp.find( ":" ), 1, "" );
+ }
+ int y, m, d, h, min, s, ms, l;
+ double gMJD;
 // get y, m, d
-    y = atoi( itemp.substr( 0, 4 ).c_str() );
-    m = atoi( itemp.substr( 4, 2 ).c_str() );
-    d = atoi( itemp.substr( 6, 2 ).c_str() );
+ y = atoi( itemp.substr( 0, 4 ).c_str() );
+ m = atoi( itemp.substr( 4, 2 ).c_str() );
+ d = atoi( itemp.substr( 6, 2 ).c_str() );
     h = atoi( itemp.substr( 8, 2 ).c_str() );
     min = atoi( itemp.substr( 10, 2 ).c_str() );
     s = atoi( itemp.substr( 12, 2 ).c_str() );
@@ -1420,6 +1457,14 @@ void VExposure::printTexTable()
 
 }
 
+void VExposure::printShortRunList()
+{
+   for( unsigned int i = 0; i < fRunSourceID.size(); i++ )
+   {
+       cout << fRunSourceID[i] << "\t" << fRunDuration[i] << "\t" << fRun[i] << endl;
+   }
+}
+
 
 void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDuration, string iDQMfileList, string ofile, unsigned int iVerbose )
 {
@@ -1637,18 +1682,16 @@ void VExposure::printListOfRuns()
   double Total_Time = 0;
   vector< int > tcut;
 
+//////////////////////////////////
 // loop over all runs 
   for( unsigned int j = 0; j < fRunRA.size(); j++ )
   {
-
 // total time on object (new array configuration only)
     if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
     {
 
-	if( fObservingMode == "Special" )
-          cout << "\tRUN " << fRun[j] << "(" << fRunObsMode[j] << ") ";
-        else
-          cout << "\tRUN " << fRun[j];
+	if( fObservingMode == "Special" ) cout << "\tRUN " << fRun[j] << "(" << fRunObsMode[j] << ") ";
+        else                              cout << "\tRUN " << fRun[j];
         cout << "\t" << fRunSourceID[j];
         cout << "\tMJD " << fRunStartMJD[j];
         cout << "\tDate: " << fRunDate[j];
@@ -1659,7 +1702,7 @@ void VExposure::printListOfRuns()
         cout << "\t(El,Az) " << fRunTelElevation[j] << " " << fRunTelAzimuth[j];
 	if( bPrintVerbose )
         {
-          cout << "\t Catagory: " << fDataCat[j];
+          cout << "\t Category: " << fDataCat[j];
           cout << "\t Status: " << fStatus[j];
           cout << "\t Reason: " << fStatReason[j];
           cout << "\t Telescope Mask: " << fTelCutMask[j];

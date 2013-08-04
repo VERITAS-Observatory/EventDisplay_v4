@@ -45,7 +45,6 @@ class VExposure : public TObject, public VGlobalRunParameter
 
         bool   fDebug;
 
-
 	bool fMakeRunList;
 	int fSelectLaser;
         int fDataStartTime; // Start Date
@@ -66,12 +65,8 @@ class VExposure : public TObject, public VGlobalRunParameter
 	string fTargetSourceName;
 
 // date range
-        string fStartDate;
-        string fStopDate;
-
-// observatory position
-        double fObsLatitude;
-        double fObsLongitude;
+        string fStartDate_SQL;
+        string fStopDate_SQL;
 
 // acceptance curves
         TF1 *fAcceptance;
@@ -131,6 +126,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 
         vector< TCanvas* > fPlottingCanvas;
 
+	bool   fPlotVTSObjects;
         vector< string > fCatalogue;
         vector< int >    fCatalogueMarkerColor;
         vector< int >    fCatalogueMarkerStyle;
@@ -148,10 +144,15 @@ class VExposure : public TObject, public VGlobalRunParameter
         bool   getDBSourceCoordinates( TSQLServer *f_db, string iSource, double &iEVNTargetDec, double &iEVNTargetRA );
         void   analyseCatalogue( string iCatalogue = "../../eventdisplay/astro/tevcat.dat",
 	                         double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
-				 TH2D *h = 0, bool bAitoff = false, int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45.  );
-        TCanvas* plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2D *h,
+				 TH2 *h = 0, bool bAitoff = false, int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45.  );
+        void   plotObject( double l, double b, string iname, double iextension,
+	                   double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
+			    TH2 *h = 0, bool bAitoff = false, int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45.  );
+        TCanvas* plot2DGalactic( string iName, string iTitle, int ix, int iy, int iwx, int iwy, TH2 *h,
 	                         double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
-				 bool bAitoff = false );
+				 bool bAitoff = false );	
+        void plotVTSObjects( bool bAitoff= false, double ibmin = -90., double ibmax = 90., double ilmin = -180., double ilmax = 180.,
+	                     int iMarkerStyle = 5, int iMarkerColor = 1, double iTextAngle = 45., TH2 *h = 0 );
         void set_plot_style();
         void resetDataVectors();
     public:
@@ -168,9 +169,12 @@ class VExposure : public TObject, public VGlobalRunParameter
         TCanvas *plot( double ilmin = -180., double ilmax = 180., double ibmin = -90., double ibmax = 90., unsigned int iReturnCanvas = 0 );
         void     plot_HESSSkySurvey( TCanvas *c );
         void plotTimeDifferencesbetweenRuns();
-	void printListOfRuns( string iCatalogue, double iR = 2.5, double iMinDuration = 600., string iTeVCatalogue = "", double r_min = 0.1, string iEventListFile= "" );
-        void printListOfRuns( double il, double ib, double iR = 2.5, double iMinDuration = 600., string iDQMfileList = "", string ofile = "", unsigned int iVerbose = 0 );
+	void printListOfRuns( string iCatalogue, double iR = 2.5, double iMinDuration = 600., string iTeVCatalogue = "", 
+	                      double r_min = 0.1, string iEventListFile= "" );
+        void printListOfRuns( double il, double ib, double iR = 2.5, double iMinDuration = 600., string iDQMfileList = "", 
+	                      string ofile = "", unsigned int iVerbose = 0 );
         void printListOfRuns();
+	void printShortRunList();
 	void outputAnasumRunlist( string fAnasumFile );
 	void printTexTable();
         bool readAcceptanceCurveFromFile( string iAcc, double iAcceptance_MaxDistance = 1.e9 );
@@ -198,14 +202,15 @@ class VExposure : public TObject, public VGlobalRunParameter
 	void setRunNumber( unsigned int number );
 	void setLaserNumber(unsigned int number );
 	void setObservingMode( bool bObs );
+	void setPlotVTSObjects( bool iVTS = true ) { fPlotVTSObjects = iVTS; }
 
         vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
 //	TSQLServer* connectToSQLServer( string iServer );
 
-        void addCatalogue( string, int iMarker = 5, int iColor = 1, double iAngle = 45. );
+        void addCatalogue( string, int iMarker = 5, int iColor = 50, double iAngle = 45. );
         void listCatalogues();
         bool removeCataloge( unsigned int iB );
 
-        ClassDef(VExposure,6);
+        ClassDef(VExposure,7);
 };
 #endif
