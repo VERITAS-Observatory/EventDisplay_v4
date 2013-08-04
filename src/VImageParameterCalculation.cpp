@@ -1328,23 +1328,28 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     if( fParLL->Fitstat > 2 )
     {
 // assume that all pixel are of the same size
-        double cen_x_recentered = 0.;
-        double cen_y_recentered = 0.;
-        if( fData->getDetectorGeo()->getTubeRadius().size() > 0 && fData->getDetectorGeo()->getTubeRadius()[0] > 0. )
-        {
-            cen_x_recentered = cen_x - fData->getDetectorGeo()->getTubeRadius()[0]*2.*(int)(cen_x/fData->getDetectorGeo()->getTubeRadius()[0]/2. );
-            cen_y_recentered = cen_y - fData->getDetectorGeo()->getTubeRadius()[0]*2.*(int)(cen_y/fData->getDetectorGeo()->getTubeRadius()[0]/2. );
-        }
-        if( fLLDebug ) cout << "FLLFITTER RECENTERED " << cen_x_recentered << "\t" << cen_y_recentered << endl;
+	unsigned int iCentreTube = fData->getDetectorGeo()->getCameraCentreTubeIndex();
+	if( iCentreTube < 9999 )
+	{
+	   double cen_x_recentered = 0.;
+	   double cen_y_recentered = 0.;
+	   if( fData->getDetectorGeo()->getTubeRadius().size() > iCentreTube && fData->getDetectorGeo()->getTubeRadius()[iCentreTube] > 0. )
+	   {
+                cen_x_recentered = cen_x - fData->getDetectorGeo()->getTubeRadius()[iCentreTube]*2.
+		                  *(int)(cen_x/fData->getDetectorGeo()->getTubeRadius()[iCentreTube]/2. );
+                cen_y_recentered = cen_y - fData->getDetectorGeo()->getTubeRadius()[iCentreTube]*2.
+		                  *(int)(cen_y/fData->getDetectorGeo()->getTubeRadius()[iCentreTube]/2. );
+	   }
+	   if( fLLDebug ) cout << "FLLFITTER RECENTERED " << cen_x_recentered << "\t" << cen_y_recentered << endl;
 ////////////////////////////////////////////////////////////////////
 // calculate new size from fit function (not from measured charges!)
-        iSize = 0.;
-        for( unsigned int i = 0; i < fData->getSums().size(); i++ )
-        {
-            iSize +=  getFitValue( i, rho, cen_x_recentered, sigmaX, cen_y_recentered, sigmaY, signal );
+	   iSize = 0.;
+	   for( unsigned int i = 0; i < fData->getSums().size(); i++ )
+	   {
+	       iSize +=  getFitValue( i, rho, cen_x_recentered, sigmaX, cen_y_recentered, sigmaY, signal );
+	   }
         }
     }
-
 // calculate phi, length, width
     sigmaX = fabs( sigmaX );
     sigmaY = fabs( sigmaY );
@@ -1465,10 +1470,10 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     fParLL->cen_y = cen_y;
     fParLL->length = length;
     fParLL->width = width;
-    if( iUseSums2 ) fParLL->size2 = fParGeo->size2;
-    else            fParLL->size =  fParGeo->size;
-    if( iUseSums2 ) fParLL->size2LL = iSize;
-    else            fParLL->sizeLL = iSize;
+    if( iUseSums2 ) fParLL->size2LL = fParGeo->size2;
+    else            fParLL->sizeLL =  fParGeo->size;
+    if( iUseSums2 ) fParLL->size2 = iSize;
+    else            fParLL->size = iSize;
     fParLL->dist = dist;
     fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! to tired for calculation
     fParLL->alpha = alpha * TMath::RadToDeg();
