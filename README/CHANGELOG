@@ -1,6 +1,13 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130802 (GM) improvements in VExposure plotting (VTS) only
+
+* 20130802 (GM) improvements on the display (mainly birdseye and 'all-in-one' plot)
+
+* 20130802 (GM) corrected any-trigger condition for CTA prod2
+                (failed before)
+
 * 20130801 (GM) remove dead time calculation for MC
 
 * 20130801 (GM) added class for plotting of CTA sensitivity requirements

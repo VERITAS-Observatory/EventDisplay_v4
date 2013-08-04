@@ -7,12 +7,19 @@
 #  for CTA:     make CTA
 #
 #  shell variables needed:
-#    ROOTSYS (pointing to root installation)
+#    ROOTSYS (pointing to your root installation)
+#
+#  Libraries needed either for CTA or VTS:
 #
 #  for reading of VBF files (optional, VERITAS only)
 #    VBFSYS  (pointing to VBF installation)
 #    or
 #   vbfConfig exists
+#
+#  for reading of sim_telarray (HESSIO) files (optional, CTA only)
+#    HESSIOSYS (pointing to HESSIO installation)
+#
+#  Optional libraries:
 #
 #  for using GSL libraries (optional)
 #    GSLSYS  (pointing to GSL installation)
@@ -21,9 +28,6 @@
 #
 #  for using FITS (optional)
 #    FITSSYS (pointing to FITS installation)
-#
-#  for using HESSIO (optional, CTA only)
-#    HESSIOSYS (pointing to HESSIO installation)
 #
 # Gernot Maier 
 ##########################################################################
