@@ -46,9 +46,8 @@ fi
 OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
 if [ -n "$3" ] && [ $3 -eq "1" ]
 then
-   OPT="-calibrationsumwindow=20 -calibrationsumfirst=100 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
+   OPT="-calibrationsumwindow=20 -calibrationsumfirst=40 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
 fi
-echo "A"
 
 # source file
 
