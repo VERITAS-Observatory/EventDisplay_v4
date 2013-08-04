@@ -96,11 +96,11 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     tpars->Branch("width", &width, "width/F");
     tpars->Branch("size", &size, "size/F");
     tpars->Branch("size2", &size2, "size2/F");
-    tpars->Branch("sizeLL", &sizeLL, "sizeLL/F");
-    tpars->Branch("size2LL", &size2LL, "size2LL/F");
     tpars->Branch("loss", &loss, "loss/F" );
     if( fShortTree < 1 )
     {
+       tpars->Branch("sizeLL", &sizeLL, "sizeLL/F");
+       tpars->Branch("size2LL", &size2LL, "size2LL/F");
        tpars->Branch("lossAndDead", &lossAndDead, "lossAndDead/F" );
        tpars->Branch("fui", &fui, "fui/F" );
        tpars->Branch("fracLow", &fracLow, "fracLow/F" );

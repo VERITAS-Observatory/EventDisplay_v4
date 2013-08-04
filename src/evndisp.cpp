@@ -1,7 +1,7 @@
 /*! \file evndisp.cpp
     \brief eventdisplay
 
-   event analysis and display
+    event analysis and display
 
 
    \author( Gernot Maier, Jamie Holder)

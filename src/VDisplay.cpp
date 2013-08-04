@@ -380,6 +380,7 @@ void VDisplay::updateCamera( Int_t i )
         for( unsigned int t = 0; t < fTelescopesToShow.size(); t++ )
         {
             fEventLoop->getAnalyzer()->setTelID( fTelescopesToShow[t] );
+	    if( t == 0 ) fCamera[fTelescopesToShow[t]]->setFirstTelescopeToDraw();
             if( fEventLoop->getAnalyzer()->getImageParameters() )
             {
 // draw one camera into the camera canvas
@@ -2625,12 +2626,6 @@ void VDisplay::subprocessComboBox( Long_t parm1 )
     {
         for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ ) fTelescopesToShow.push_back( fEventLoop->getTeltoAna()[i] );
         fBoolDrawAllinOne = true;
-// color scheme not possible for all in one
-        if( fMenuOpt->IsEntryChecked( M_OPT_COL_SCHE ) ) fBool_M_OPT_COL_SCHE_Checked = true;
-        fMenuOpt->UnCheckEntry( M_OPT_COL_SCHE );
-	if( fMenuOpt->IsEntryChecked( M_OPT_BW_SCHE ) ) fBool_M_OPT_BW_SCHE_Checked = true;  
-        fMenuOpt->UnCheckEntry( M_OPT_BW_SCHE );
-        setColorScheme();
     }
 // draw all telescope in pads distributed according to their position in the field
     else if( fComboTelescopeN->GetSelected() == -2 )

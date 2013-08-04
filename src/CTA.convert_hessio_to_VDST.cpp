@@ -425,6 +425,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 // PROD2: bit1: majority
 //        bit2: analog sum
 //        bit3: digital sum
+//        bit4: pe trigger (set with fMinNumber_pe_per_telescope)
 #ifdef CTA_PROD2
 	    fData->fDSTL2TrigType[i_ntel_trig] = (unsigned short int)hsdata->event.central.teltrg_type_mask[t];
 #else
@@ -441,7 +442,8 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
                }
 	       else
 	       {
-		  cout << "No trigger mask event found: event " << hsdata->mc_event.event << ", telescope " << hsdata->event.central.teltrg_list[t] << endl;
+		  cout << "No trigger mask event found: event " << hsdata->mc_event.event;
+		  cout << ", telescope " << hsdata->event.central.teltrg_list[t] << endl;
 	          fData->fDSTL2TrigType[i_ntel_trig] = 99;
                }
 	    }

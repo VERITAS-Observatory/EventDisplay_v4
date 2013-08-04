@@ -45,6 +45,8 @@ VCamera::VCamera( unsigned int iTel, VEvndispData *iData )
     fndivz   = gStyle->GetNumberContours();
 
     fCurrentTimeSlice = -1;
+    
+    fFirstTelescopeToDraw = false;
 }
 
 
@@ -77,6 +79,8 @@ void VCamera::setUpCamera()
     if( fPlotPaper ) fFillStyleFADCTrig = 0;
     fFillStylePos = 1001;
     fFillStyleNeg = 4000;
+    fTelescopeEllipseColor = 1;
+
 
 // get maximum distance of tubes from centre, rescale to canvas NDC
     fdist_edge = 0.;
@@ -86,7 +90,8 @@ void VCamera::setUpCamera()
         {
             fdist_edge = fData->getDetectorGeo()->getOuterEdgeDistance( i );
         }
-    }
+    } 
+    fmax_dist_edge = fData->getDetectorGeo()->getMaximumFOV_deg();
 
 // array with pmt data (rescaled data)
     fPMTData.resize( int(fData->getDetectorGeo()->getNumChannels()), 0. );
@@ -108,7 +113,13 @@ void VCamera::setUpCamera()
         x = convertX( fData->getDetectorGeo()->getX()[i] );
         y = convertY( fData->getDetectorGeo()->getY()[i] );
         r = convertScale( fData->getDetectorGeo()->getTubeRadius()[i] );
-        if( sqrt( fData->getDetectorGeo()->getX()[i]*fData->getDetectorGeo()->getX()[i] + fData->getDetectorGeo()->getY()[i]*fData->getDetectorGeo()->getY()[i] ) > iMaxDist ) iMaxDist = sqrt( fData->getDetectorGeo()->getX()[i]*fData->getDetectorGeo()->getX()[i] + fData->getDetectorGeo()->getY()[i]*fData->getDetectorGeo()->getY()[i] ) + fData->getDetectorGeo()->getTubeRadius()[i];
+        if( sqrt( fData->getDetectorGeo()->getX()[i]*fData->getDetectorGeo()->getX()[i] 
+	        + fData->getDetectorGeo()->getY()[i]*fData->getDetectorGeo()->getY()[i] ) > iMaxDist )
+	{
+	   iMaxDist = sqrt( fData->getDetectorGeo()->getX()[i]*fData->getDetectorGeo()->getX()[i] 
+	                  + fData->getDetectorGeo()->getY()[i]*fData->getDetectorGeo()->getY()[i] )
+			  + fData->getDetectorGeo()->getTubeRadius()[i];
+        }
 // PMTs (outer shell)
         fgraphTubes.push_back(  new TEllipse( x, y, r, r ) );
         fgraphTubes.back()->SetFillColor( fColorEmpty );
@@ -349,13 +360,11 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 setPMTColorScheme( fData->getLowGainMultiplier(), false, 100., 0., "multiplier", false );
                 break;
             case C_TRIGGER_EVNDISP:
-                                                  // MS
                 setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
                 break;
 	    case C_TEMPLATE:
                 if( fData->getRunParameter()->ffrogsmode==1 )
 		{
-		  //setPMTColorScheme( log10(fData->getTemplateMu()), false,  -1.0*fData->getTemplateMuMin(), log10(1.1*fData->getTemplateMuMax()), "photons [p.e.]", false );
                   setPMTColorScheme( fData->getTemplateMu(), false,  -1.0, 1.1*fData->getTemplateMuMax(), "photons [p.e.]", false );
 		}
                 break;
@@ -365,17 +374,33 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 // draw the tubes
         if( !fBoolAllinOne )
         {
-            for( unsigned int i = 0; i < fgraphTubes.size(); i++ )
-            {
-                if( fgraphTubes[i]->GetR1() > 0. ) fgraphTubes[i]->Draw();
-            }
-        }
-        else if( fCameraOuterEdge ) fCameraOuterEdge->Draw();
-        if( fCameraFOV ) fCameraFOV->Draw();
+           for( unsigned int i = 0; i < fgraphTubes.size(); i++ )
+           {
+               if( fgraphTubes[i]->GetR1() > 0. ) fgraphTubes[i]->Draw();
+           }
 // draw the tube entries
-        for( unsigned int i = 0; i < fgraphTubesEntry.size(); i++ )
-        {
-            if( fgraphTubes[i]->GetR1() > 0. ) fgraphTubesEntry[i]->Draw();
+	   for( unsigned int i = 0; i < fgraphTubesEntry.size(); i++ )
+	   {
+	       if( fgraphTubes[i]->GetR1() > 0. ) fgraphTubesEntry[i]->Draw();
+	   } 
+        }
+        else 
+	{
+	   if( fCameraOuterEdge && fFirstTelescopeToDraw ) fCameraOuterEdge->Draw();
+        }
+        if( fCameraFOV && fFirstTelescopeToDraw )
+	{
+	    if( fBoolAllinOne ) 
+	    {
+	       fCameraFOV->SetR1( convertScale( fData->getDetectorGeo()->getMaximumFOV_deg() ) );
+	       fCameraFOV->SetR2( convertScale( fData->getDetectorGeo()->getMaximumFOV_deg() ) );
+            }
+	    else 
+	    {
+	       fCameraFOV->SetR1( fData->getDetectorGeo()->getFieldofView()[getTelescopeNumber()]/2. );
+	       fCameraFOV->SetR2( fData->getDetectorGeo()->getFieldofView()[getTelescopeNumber()]/2. );
+            }
+	    fCameraFOV->Draw();
         }
 // mark zero suppressed channels
         if( !fBoolAllinOne )
@@ -390,7 +415,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 	   }
         }
 // draw pixel recovered by the correlation image cleaning
-        if( fData->getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
+        if( !fBoolAllinOne && fData->getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
 	{
 	    for( unsigned int i = 0; i < fgraphMarker.size(); i++ )
 	    {
@@ -412,7 +437,8 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             {
                 if( fgraphTubes[i]->GetR1() > 0. && fPrintChannel == 1 )
                 {
-                    fTextChannelNumber[i]->DrawTextNDC( fTextChannelNumber[i]->GetX(), fTextChannelNumber[i]->GetY(), fTextChannelNumber[i]->GetTitle() );
+                    fTextChannelNumber[i]->DrawTextNDC( fTextChannelNumber[i]->GetX(), 
+		                                        fTextChannelNumber[i]->GetY(), fTextChannelNumber[i]->GetTitle() );
                 }
                 else if( fgraphTubes[i]->GetR1() > 0. && fPrintChannel == 2 )
                 {
@@ -449,9 +475,11 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
         }
 // draw the ellipse from image parameters
 // don't draw anything for hit/timing/ped mean/ped var/gains/toffsets
-        if( fData->getRunParameter()->fmuonmode==0  && (fcameraModus == C_CHARGE || fcameraModus == C_TRIGGER || fcameraModus == C_TZERO ) ) drawAnaResults();
-// is this a muon analysis? Martin
-        if( fData->getRunParameter()->fmuonmode==1  && (fcameraModus == C_CHARGE || fcameraModus == C_TRIGGER || fcameraModus == C_TZERO ) ) drawMuonResults();
+        if( fData->getRunParameter()->fmuonmode==0  
+	&& (fcameraModus == C_CHARGE || fcameraModus == C_TRIGGER || fcameraModus == C_TZERO ) ) drawAnaResults();
+// is this a muon analysis?
+        if( fData->getRunParameter()->fmuonmode==1 
+	 && (fcameraModus == C_CHARGE || fcameraModus == C_TRIGGER || fcameraModus == C_TZERO ) ) drawMuonResults();
 
 // draw bottom line with results from image calculation
         drawEventText();
@@ -461,6 +489,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
     fEventCounter++;
     fCanvas->SetEditable( false );
     if( fTubeSelected >= 0 ) showSelectedChannel( fTubeSelected, true );
+    fFirstTelescopeToDraw = false;
 }
 
 
@@ -797,6 +826,8 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
 void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool i_DrawDead, bool iLowGain )
 {
     if( fDebug ) cout << "VCamera::setPMTColorScheme" << endl;
+// do not draw PMTs for allinone mode
+    if( fBoolAllinOne ) return;
 // set up the color scheme
 // this is some kind of a mess, but it works like that:
 // - get maximum/minum values in v_value (or take it from input parameters zmin/zmax)
@@ -1053,21 +1084,35 @@ void VCamera::drawMuonResults()
 
 
 /*
+
      draw results of image parameterisation
 
 */
 void VCamera::drawAnaResults()
 {
+    unsigned int iMethod = 0;
+    if( fData->getRunParameter()->fPlotAllInOneMethod < fData->getShowerParameters()->fNMethods  )
+    {
+       iMethod = fData->getRunParameter()->fPlotAllInOneMethod;
+    }
 // don't plot the ellipse and image line if the image was not used in the array reconstruction
 // (applies for 'all in one' only
-    if( fBoolAllinOne && fData->getShowerParameters()->fTelIDImageSelected.size() > 0 && fData->getTelID() < fData->getShowerParameters()->fTelIDImageSelected[0].size() )
+    if( fBoolAllinOne && fData->getTelID() < fData->getShowerParameters()->fTelIDImageSelected[iMethod].size() )
     {
-        if( !fData->getShowerParameters()->fTelIDImageSelected[0][fData->getTelID()] ) return;
+        if( !fData->getShowerParameters()->fTelIDImageSelected[iMethod][fData->getTelID()] ) return;
     }
 
-// all colors > 10 are greyish/brown. Start at 1 again
-    int iTelescopeColor = (fTelescope%10 + 1);
-    if( iTelescopeColor == 0 ) iTelescopeColor += 1;
+    if( fBoolAllinOne )
+    {
+       fTelescopeEllipseColor = 0;
+       for( unsigned int i = 0; i < fData->getShowerParameters()->fTelIDImageSelected[iMethod].size(); i++ )
+       {
+	  if( fData->getShowerParameters()->fTelIDImageSelected[iMethod][i] ) fTelescopeEllipseColor++;
+          if( fData->getTelID() == i ) break;
+       }
+       if( fTelescopeEllipseColor >= 10 ) fTelescopeEllipseColor++;
+    }
+    else fTelescopeEllipseColor = 1;
 
     if( fData->getImageParameters()->ntubes > 0 && fData->getRunParameter()->fTargetName != "laser" && !fData->getRunParameter()->fPlotRaw )
     {
@@ -1080,8 +1125,7 @@ void VCamera::drawAnaResults()
         fAnaEllipse->SetTheta( fData->getImageParameters()->phi * 180. / TMath::Pi() );
         if( fBoolAllinOne )
 	{
-	   if( fData->getNTel() < 10 )fAnaEllipse->SetLineColor( iTelescopeColor );
-	   else                       fAnaEllipse->SetLineColor( 13 );
+	    fAnaEllipse->SetLineColor( fTelescopeEllipseColor );
         }
         else
         {
@@ -1096,8 +1140,7 @@ void VCamera::drawAnaResults()
         fAnaEllipse1->SetTheta( fData->getImageParameters()->phi * 180. / TMath::Pi() );
         if( fBoolAllinOne )
 	{
-	   if( fData->getNTel() < 10 ) fAnaEllipse1->SetLineColor( iTelescopeColor );
-	   else                        fAnaEllipse1->SetLineColor( 13 );
+	   fAnaEllipse1->SetLineColor( fTelescopeEllipseColor );
         }
         else
         {
@@ -1106,6 +1149,18 @@ void VCamera::drawAnaResults()
         }
         fAnaEllipse1->SetLineStyle( 2 );
         fAnaEllipse1->Draw();
+// draw telescope numbers
+        if( fBoolAllinOne )
+	{
+	     char hname[50];
+	     sprintf( hname, "T%d", fData->getTelID()+1 );
+	     TText *iT = new TText( convertX( fData->getImageParameters()->cen_x ), convertY( fData->getImageParameters()->cen_y ),
+				    hname );
+	     iT->SetTextFont( 42 );
+	     iT->SetTextColor( fTelescopeEllipseColor );
+	     iT->SetTextSize( 0.4 * iT->GetTextSize() );
+	     iT->Draw();
+	}
 // draw the analysis ellipse after loglikelihood recovering of dead channels
         if( fData->getRunParameter()->fImageLL )
         {
@@ -1117,7 +1172,7 @@ void VCamera::drawAnaResults()
 // draw different line style if fit didn't worked well
             if( fData->getImageParametersLogL()->Fitstat < 3 ) fAnaEllipseLL->SetLineStyle( 2 );
             else                                               fAnaEllipseLL->SetLineStyle( 1 );
-            if( fBoolAllinOne ) fAnaEllipseLL->SetLineColor( iTelescopeColor );
+            if( fBoolAllinOne ) fAnaEllipseLL->SetLineColor( fTelescopeEllipseColor );
             else                fAnaEllipseLL->SetLineColor( 5 );
             fAnaEllipseLL->Draw();
         }
@@ -1142,10 +1197,14 @@ void VCamera::drawAnaResults()
                 i_scale1 = 30.;
                 i_scale2 = 30.;
             }
-            double i_x1 = convertX( fData->getImageParameters()->cen_x )+i_scale1*fAnaEllipse->GetR1()*cos( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
-            double i_x2 = convertX( fData->getImageParameters()->cen_x )-i_scale2*fAnaEllipse->GetR1()*cos( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
-            double i_y1 = convertY( fData->getImageParameters()->cen_y )+i_scale1*fAnaEllipse->GetR1()*sin( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
-            double i_y2 = convertY( fData->getImageParameters()->cen_y )-i_scale2*fAnaEllipse->GetR1()*sin( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
+            double i_x1 = convertX( fData->getImageParameters()->cen_x )
+	                           +i_scale1*fAnaEllipse->GetR1()*cos( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
+            double i_x2 = convertX( fData->getImageParameters()->cen_x )
+	                           -i_scale2*fAnaEllipse->GetR1()*cos( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
+            double i_y1 = convertY( fData->getImageParameters()->cen_y )
+	                           +i_scale1*fAnaEllipse->GetR1()*sin( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
+            double i_y2 = convertY( fData->getImageParameters()->cen_y )
+	                           -i_scale2*fAnaEllipse->GetR1()*sin( fAnaEllipse->GetTheta() * TMath::Pi() / 180. );
 
             fEllipseLine->SetX1( i_x1 );
             fEllipseLine->SetY1( i_y1 );
@@ -1153,8 +1212,7 @@ void VCamera::drawAnaResults()
             fEllipseLine->SetY2( i_y2 );
             if( fBoolAllinOne )
 	    {
-	       if( fData->getNTel() < 10 ) fEllipseLine->SetLineColor( iTelescopeColor );
-	       else                        fEllipseLine->SetLineColor( 13 );
+	       fEllipseLine->SetLineColor( fTelescopeEllipseColor );
             }
             else                fEllipseLine->SetLineColor( 1 );
             if( !fBoolAllinOne ) fEllipseLine->SetLineStyle( 1 );
@@ -1164,39 +1222,41 @@ void VCamera::drawAnaResults()
 // draw image centroids
             if( !fBoolAllinOne )
             {
-                fAnaShowerCentroid = new TMarker( convertX( fData->getImageParameters()->cen_x ), convertY( fData->getImageParameters()->cen_y ), 3 );
+                fAnaShowerCentroid = new TMarker( convertX( fData->getImageParameters()->cen_x ), 
+		                                  convertY( fData->getImageParameters()->cen_y ), 3 );
                 fAnaShowerCentroid->Draw();
             }
 // draw reconstructed shower direction
-            if( fData->getRunParameter()->fPlotAllInOneMethod < fData->getShowerParameters()->fNMethods  )
-            {
-                unsigned int iMethod = fData->getRunParameter()->fPlotAllInOneMethod;
 // require successfull reconstruction
-                if( fData->getShowerParameters()->fShower_Chi2[iMethod] >= 0 )
-                {
-                    if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
-                    {
-                        fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[iMethod]), convertY( -1.*fData->getShowerParameters()->fShower_Yoffset[iMethod]), 29 );
-                    }
-                    else
-                    {
-                        fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[iMethod]), convertY(fData->getShowerParameters()->fShower_Yoffset[iMethod]), 29 );
-                    }
-                    fAnaShowerDir->SetMarkerColor( 6 );
-                    fAnaShowerDir->SetMarkerSize( 2. );
-                    fAnaShowerDir->SetMarkerStyle( 29 );
-                    fAnaShowerDir->Draw();
+	    if( fData->getShowerParameters()->fShower_Chi2[iMethod] >= 0 )
+	    {
+		 if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
+		 {
+		     fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[iMethod]), 
+						  convertY( -1.*fData->getShowerParameters()->fShower_Yoffset[iMethod]), 29 );
+		 }
+		 else
+		 {
+		     fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[iMethod]), 
+						  convertY(fData->getShowerParameters()->fShower_Yoffset[iMethod]), 29 );
+		 }
+		 fAnaShowerDir->SetMarkerColor( 6 );
+		 fAnaShowerDir->SetMarkerSize( 2. );
+		 fAnaShowerDir->SetMarkerStyle( 29 );
+		 fAnaShowerDir->Draw();
 // draw markers from disp methods
-                    if( fBoolAllinOne && iMethod < fData->getShowerParameters()->fShower_Xoff_DISP.size() )
-                    {
+		 if( fBoolAllinOne && iMethod < fData->getShowerParameters()->fShower_Xoff_DISP.size() )
+		 {
 // first draw marker for std method (ID0)
                         if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
                         {
-                            fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[0]), convertY( -1.*fData->getShowerParameters()->fShower_Yoffset[0]), 29 );
+                            fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[0]), 
+			                                 convertY( -1.*fData->getShowerParameters()->fShower_Yoffset[0]), 29 );
                         }
                         else
                         {
-                            fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[0]), convertY(fData->getShowerParameters()->fShower_Yoffset[0]), 29 );
+                            fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoffset[0]), 
+			                                 convertY(fData->getShowerParameters()->fShower_Yoffset[0]), 29 );
                         }
                         fAnaShowerDir->SetMarkerColor( 6 );
                         fAnaShowerDir->SetMarkerSize( 2. );
@@ -1216,7 +1276,8 @@ void VCamera::drawAnaResults()
                         {
                             if( fData->getShowerParameters()->fShower_Xoff_DISP[iMethod][d] > -90. )
                             {
-                                fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoff_DISP[iMethod][d]), convertY( fData->getShowerParameters()->fShower_Yoff_DISP[iMethod][d] ), 29 );
+                                fAnaShowerDir = new TMarker( convertX(fData->getShowerParameters()->fShower_Xoff_DISP[iMethod][d]), 
+				                             convertY( fData->getShowerParameters()->fShower_Yoff_DISP[iMethod][d] ), 29 );
                                 if( fBoolAllinOne ) fAnaShowerDir->SetMarkerColor( d+1 );
 				else
 				{
@@ -1231,29 +1292,30 @@ void VCamera::drawAnaResults()
                     }
                 }
 // draw MC shower direction
-                if( fData->getReader()->isMC() )
-                {
-                    if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
-                    {
-                        fMCShowerDir  = new TMarker( convertX(fData->getShowerParameters()->MCTel_Xoff), convertY( -1.*fData->getShowerParameters()->MCTel_Yoff ), 29 );
-                    }
-                    else
-                    {
-                        fMCShowerDir  = new TMarker( convertX(fData->getShowerParameters()->MCTel_Xoff), convertY( fData->getShowerParameters()->MCTel_Yoff ), 29 );
-                    }
-                    fMCShowerDir->SetMarkerColor( 1 );
-                    fMCShowerDir->SetMarkerSize( 2. );
-                    fMCShowerDir->Draw();
-                }
+	     if( fData->getReader()->isMC() )
+	     {
+		 if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
+		 {
+		     fMCShowerDir  = new TMarker( convertX(fData->getShowerParameters()->MCTel_Xoff), 
+						  convertY( -1.*fData->getShowerParameters()->MCTel_Yoff ), 29 );
+		 }
+		 else
+		 {
+		     fMCShowerDir  = new TMarker( convertX(fData->getShowerParameters()->MCTel_Xoff), 
+						  convertY( fData->getShowerParameters()->MCTel_Yoff ), 29 );
+		 }
+		 fMCShowerDir->SetMarkerColor( 1 );
+		 fMCShowerDir->SetMarkerSize( 2. );
+		 fMCShowerDir->Draw();
+	     }
 // camera center
-                fCameraCentreDir = new TMarker( convertX( 0. ), convertY( 0. ), 5 );
-                fCameraCentreDir->Draw();
+	     fCameraCentreDir = new TMarker( convertX( 0. ), convertY( 0. ), 5 );
+	     fCameraCentreDir->Draw();
 // draw 0.5 deg circle
-                fCameraCentreEllipse = new TEllipse( convertX( 0. ), convertY( 0. ), convertScale( 0.5 ), convertScale( 0.5 ) );
-                fCameraCentreEllipse->SetLineStyle( 3 );
-                fCameraCentreEllipse->SetFillStyle( 0 );
-                fCameraCentreEllipse->Draw();
-            }
+	     fCameraCentreEllipse = new TEllipse( convertX( 0. ), convertY( 0. ), convertScale( 0.5 ), convertScale( 0.5 ) );
+	     fCameraCentreEllipse->SetLineStyle( 3 );
+	     fCameraCentreEllipse->SetFillStyle( 0 );
+	     fCameraCentreEllipse->Draw();
         }
     }
     else
@@ -1474,20 +1536,26 @@ void VCamera::getMinMax( valarray<double>& i_val, double& imin, double& imax )
 
 double VCamera::convertX( double i_x )
 {
-    if( fdist_edge == 0. ) return 0.;
-    return (i_x / fdist_edge * fmaxPlot + 0.5);
+    double iDist_edge = fdist_edge;
+    if( fBoolAllinOne ) iDist_edge = fmax_dist_edge * 0.9;
+    if( iDist_edge == 0. ) return 0.;
+    return (i_x / iDist_edge * fmaxPlot + 0.5);
 }
 
 
 double VCamera::convertY( double i_y )
 {
-    if( fdist_edge == 0. ) return 0.;
-    return ( i_y / fdist_edge * fmaxPlot + 0.5);
+    double iDist_edge = fdist_edge;
+    if( fBoolAllinOne ) iDist_edge = fmax_dist_edge * 0.9;
+    if( iDist_edge == 0. ) return 0.;
+    return ( i_y / iDist_edge * fmaxPlot + 0.5);
 }
 
 
 double VCamera::convertScale( double i_s )
 {
-    if( fdist_edge == 0. ) return 0.;
-    return (i_s / fdist_edge * fmaxPlot);
+    double iDist_edge = fdist_edge;
+    if( fBoolAllinOne ) iDist_edge = fmax_dist_edge * 0.9;
+    if( iDist_edge == 0. ) return 0.;
+    return (i_s / iDist_edge * fmaxPlot);
 }

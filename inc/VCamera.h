@@ -65,6 +65,7 @@ class VCamera
         double fmaxRad;                           //!< relativ maximum of radius for inner ellipses (1=maximum = radius of fgraphTubes)
         double fScaleMax;
         double fdist_edge;                        //!< maximum distance from canvas center to edge of camera
+	double fmax_dist_edge;
         unsigned int fEventCounter;               //!< event number
         int fTubeSelected;                        //!< number of mouse pointer selected channel (-1=nothing selected)
 
@@ -92,6 +93,9 @@ class VCamera
         int fndivz;                               //!< number of contours in current color style
 
         valarray<bool> fDeadChan;                 //!< vector with dead channels
+
+	bool fFirstTelescopeToDraw;
+	int  fTelescopeEllipseColor;
 
 // color definitions
         unsigned int fColorEmpty;
@@ -165,6 +169,7 @@ class VCamera
         void showSelectedChannel( int, bool );    //!< plot selected channel bold
         void setCanvas( TPad *iCanvas );          //!< set canvas for current camera display modus
         void setCurrentTimeSlice( int iS ) { fCurrentTimeSlice = iS; }
+	void setFirstTelescopeToDraw() { fFirstTelescopeToDraw = true; }
         void setFixScale( bool iB )               //!< set a fix scale for color plots
         {
             bFixScale = iB;

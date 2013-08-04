@@ -75,6 +75,7 @@ class VCameraRead : public VGlobalRunParameter
                                                   //!< neighbour identifier
         vector< vector< vector<int> > > fNeighbour;
         unsigned int fMaxNeighbour;               //!< maximal number of neighbours
+	vector< unsigned int > fCameraCentreTubeIndex;            //!< vector index of centre tube
 // pattern trigger
         int fNPatches;                            //!< number of trigger patches
         vector< vector<int> > fPatch;             //!< pattern trigger patches
@@ -115,6 +116,8 @@ class VCameraRead : public VGlobalRunParameter
         {
             return fAnaTube[iTel];
         }
+	unsigned int getCameraCentreTubeIndex() { if( fTelID < fCameraCentreTubeIndex.size() ) return fCameraCentreTubeIndex[fTelID]; 
+	                                              else return 9999; }
         string               getCameraName()      //!< get camera name
         {
             return fCameraName[fTelID];
@@ -143,6 +146,7 @@ class VCameraRead : public VGlobalRunParameter
             return fMix;
         }
         unsigned int         getMaxNeighbour()  { return fMaxNeighbour; }
+	float                getMaximumFOV_deg();
         vector<vector<int> >& getNeighbours()     //!< neighbour identifier
         {
             return fNeighbour[fTelID];
@@ -281,6 +285,7 @@ class VCameraRead : public VGlobalRunParameter
                                                   //!< read telescope geometry from grisu cfg file
 	bool                 readDetectorGeometryFromDB( string iDBStartTime, bool iReadRotationsFromDB = true );
         bool                 readGrisucfg( string iFile, unsigned int fNTel );
+	void                 setCameraCentreTubeIndex();
         void                 setConfigDir( string iDir ) { fConfigDir = iDir; }
 	bool                 setLengthOfSampleTimeSlice( unsigned int iTelID, float iSample_time_slice );
 	void                 setTelID_matrix( map< unsigned int, unsigned int > m ) { fTelIDGrisu = m; }

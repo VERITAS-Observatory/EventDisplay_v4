@@ -123,10 +123,10 @@ void VDisplayBirdsEye::drawEventText()
     if( fData->getReader()->isMC() )
     {
         sprintf( iText, "MC: E=%.2f, Ze=%.0f, Az=%.0f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->MCenergy, fData->getShowerParameters()->MCze, fData->getShowerParameters()->MCaz, fData->getShowerParameters()->MCTel_Xoff, fData->getShowerParameters()->MCTel_Yoff, fData->getShowerParameters()->MCxcore, fData->getShowerParameters()->MCycore );
-        fTextRec.push_back( new TText( 0.02, 0.08, iText ) );
+        fTextRec.push_back( new TText( 0.02, 0.12, iText ) );
     }
 // shower reconstruction text
-    sprintf( iText, "NIm: %u (ID%d)", fData->getShowerParameters()->fShowerNumImages[iM], iM );
+    sprintf( iText, "%u tel in stereo analysis (ID%d):", fData->getShowerParameters()->fShowerNumImages[iM], iM );
     for( unsigned int i = 0; i < fData->getNTel(); i++ )
     {
        if( fData->getShowerParameters()->fTelIDImageSelected_list[iM][i] )
@@ -134,9 +134,16 @@ void VDisplayBirdsEye::drawEventText()
 	  sprintf( iText, "%s %d", iText, (int)(i+1) );
        }
     }
-    fTextRec.push_back( new TText( 0.02, 0.05, iText ) );
+    fTextRec.push_back( new TText( 0.02, 0.09, iText ) );
+    sprintf( iText, "%u tel triggered: ", fData->getShowerParameters()->fNTrig );
+    for( unsigned int i = 0; i < fData->getShowerParameters()->fNTrig; i++ )
+    {
+       sprintf( iText, "%s %d", iText, fData->getShowerParameters()->fTrig_list[i]+1 );
+    }
+    fTextRec.push_back( new TText( 0.02, 0.06, iText ) );
+
     sprintf( iText, "Ze=%.1f, Az=%.1f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->fShowerZe[iM], fData->getShowerParameters()->fShowerAz[iM], fData->getShowerParameters()->fShower_Xoffset[iM], fData->getShowerParameters()->fShower_Yoffset[iM], fData->getShowerParameters()->fShowerXcore[iM], fData->getShowerParameters()->fShowerYcore[iM] );
-    fTextRec.push_back( new TText( 0.02, 0.02, iText ) );
+    fTextRec.push_back( new TText( 0.02, 0.03, iText ) );
 
     for( unsigned int i = 0; i < fTextRec.size(); i++ )
     {
@@ -210,6 +217,13 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
 	} 
 // telescope identifier (T1,T2,etc.); draw only if less than 10 telescopes
 	if( fData->getTeltoAna().size() < 10 ) fTextTel[i]->Draw();
+	else
+	{
+	   if( fData->getReader()->hasLocalTrigger( fData->getTeltoAna()[i] ) )
+	   {
+	      fTextTel[i]->Draw();
+           }
+        }
     }
 // plot shower axis
     if( i_tel_with_images )
@@ -304,29 +318,52 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
    for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
    {
 // image lines
-        if( fData->getShowerParameters()->fTelIDImageSelected[iM].size() > 0 && fData->getShowerParameters()->fTelIDImageSelected[iM][fData->getTeltoAna()[i]] )
+        if( fData->getShowerParameters()->fTelIDImageSelected[iM].size() > 0 
+	 && fData->getShowerParameters()->fTelIDImageSelected[iM][fData->getTeltoAna()[i]] )
         {
 // image line coordinates in ground coordinates
-// image lines connects center of camera with centroids
+// image lines connects the reconstructed shower position with the centroid position
 // (assuming telescopes are pointing into shower direction)
             double i_y = -1.*fData->getShowerParameters()->fShower_Yoffset[iM];
             double i_x = -1.*fData->getShowerParameters()->fShower_Xoffset[iM];
             if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 ) i_y *= -1.;
 
-            double i_cen_x =  (fParameters[i]->cen_x+i_x);
-            double i_cen_y =  (fParameters[i]->cen_y+i_y);
+	    if( i_y < 99998. && i_x < 99998. )
+	    {
+	       double i_cen_x =  (fParameters[i]->cen_x+i_x);
+	       double i_cen_y =  (fParameters[i]->cen_y+i_y);
 
-            i_x1 = convertX(fTelPosX[i]+2.*fFieldX*cos(atan2(fMCSign*i_cen_y,i_cen_x)));
-            i_y1 = convertY(fTelPosY[i]+2.*fFieldY*sin(atan2(fMCSign*i_cen_y,i_cen_x)));
-            i_x2 = convertX(fTelPosX[i]-2.*fFieldX*cos(atan2(fMCSign*i_cen_y,i_cen_x)));
-            i_y2 = convertY(fTelPosY[i]-2.*fFieldY*sin(atan2(fMCSign*i_cen_y,i_cen_x)));
+	       i_x1 = convertX(fTelPosX[i]+2.*fFieldX*cos(atan2(fMCSign*i_cen_y,i_cen_x)));
+	       i_y1 = convertY(fTelPosY[i]+2.*fFieldY*sin(atan2(fMCSign*i_cen_y,i_cen_x)));
+	       i_x2 = convertX(fTelPosX[i]-2.*fFieldX*cos(atan2(fMCSign*i_cen_y,i_cen_x)));
+	       i_y2 = convertY(fTelPosY[i]-2.*fFieldY*sin(atan2(fMCSign*i_cen_y,i_cen_x)));
+
+	       double xC = convertX(fData->getShowerParameters()->MCxcore_SC);
+	       double yC = convertY(fData->getShowerParameters()->MCycore_SC);
+	       if( fData->getShowerParameters()->fShowerXcore_SC[iM] > -99998. )
+	       {
+	          xC = convertX(fData->getShowerParameters()->fShowerXcore_SC[iM]);
+	          yC = convertY(fData->getShowerParameters()->fShowerYcore_SC[iM]);
+               }
+
+	       if( (i_x1-xC)*(i_x1-xC) + (i_y1-yC)*(i_y1-yC) > (i_x2-xC)*(i_x2-xC) + (i_y2-yC)*(i_y2-yC) )
+	       {
+		  i_x1 = convertX(fTelPosX[i]);
+		  i_y1 = convertY(fTelPosY[i]);
+	       }
+	       else
+	       {
+		  i_x2 = convertX(fTelPosX[i]);
+		  i_y2 = convertY(fTelPosY[i]);
+               }
 
 // set image line coordinates
-            fLiImage[i]->SetX1( i_x1 );
-            fLiImage[i]->SetX2( i_x2 );
-            fLiImage[i]->SetY1( i_y1 );
-            fLiImage[i]->SetY2( i_y2 );
-            fLiImage[i]->Draw();
+	       fLiImage[i]->SetX1( i_x1 );
+	       fLiImage[i]->SetX2( i_x2 );
+	       fLiImage[i]->SetY1( i_y1 );
+	       fLiImage[i]->SetY2( i_y2 );
+	       fLiImage[i]->Draw();
+            }
 
         }
         else
@@ -444,15 +481,21 @@ void VDisplayBirdsEye::setGeometry()
 // get image parameters
         fParameters.push_back( fData->getImageParameters( fData->getRunParameter()->fImageLL ) );
 // set telescope label
-        sprintf( i_text, "T %d", fData->getTeltoAna()[i]+1 );
+        if( fData->getTeltoAna().size() < 10 ) sprintf( i_text, "T%d", fData->getTeltoAna()[i]+1 );
+	else                                   sprintf( i_text, "T%d", fData->getTeltoAna()[i]+1 );
         fTextTel.push_back( new TText( convertX( fTelPosX[i]) + 0.02, convertY( fTelPosY[i] ), i_text ) );
         fTextTel.back()->SetTextFont( 42 );
-	fTextTel.back()->SetTextSize( 0.5 * fTextTel.back()->GetTextSize() );
+	if( fData->getTeltoAna().size() < 10 ) fTextTel.back()->SetTextSize( 0.5 * fTextTel.back()->GetTextSize() );
+	else
+	{
+             fTextTel.back()->SetTextSize( 0.4 * fTextTel.back()->GetTextSize() );
+             fTextTel.back()->SetTextAngle( 45. );
+	}
 	fTextTel.back()->SetTextColor( 13 );
 // set line representing the main image shower axis
         fLiImage.push_back( new TLine( 0., 0., 1., 1. ) );
-        fLiImage.back()->SetLineStyle( 2 );
+        fLiImage.back()->SetLineStyle( 3 );
         fLiImage.back()->SetLineWidth( 1 );
-	fLiImage.back()->SetLineColor( 1 );
+	fLiImage.back()->SetLineColor( 50 );
     }
 }

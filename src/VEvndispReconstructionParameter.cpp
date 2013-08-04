@@ -88,17 +88,26 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
    if( fL2TriggerType[iMeth][iTelType] != 9999 )
    {
       bitset< 8 > i_L2TrigType( iLocalTriggerType );
-      if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
+//    trigger type 0: any trigger condition      
+      if( fL2TriggerType[iMeth][iTelType] == 0 && iLocalTriggerType == 0 )
       {
 	 iArrayCut = false;
-
-	 if( fDebug )
+      }
+// all other trigger types
+      else if( fL2TriggerType[iMeth][iTelType] != 0 )
+      {
+	 if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
 	 {
-	    cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut Tel " << iTel+1 << ", type " << iTelType;
-	    cout << " (meth " << iMeth << "): L2 trigger type ";
-	    cout << iLocalTriggerType << " (" << iImageParameter->fTrig_type << ")  test: " << i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] );
-	    cout << " (require " << fL2TriggerType[iMeth][iTelType] << ")" << endl;
+	    iArrayCut = false;
          }
+      }
+      if( !iArrayCut && fDebug )
+      {
+	 cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut Tel " << iTel+1 << ", type " << iTelType;
+	 cout << " (meth " << iMeth << "): L2 trigger type ";
+	 cout << iLocalTriggerType << " (" << iImageParameter->fTrig_type;
+	 cout << ")  test: " << i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] );
+	 cout << " (require " << fL2TriggerType[iMeth][iTelType] << ")" << endl;
       }
    }
 

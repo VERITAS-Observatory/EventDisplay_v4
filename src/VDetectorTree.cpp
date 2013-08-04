@@ -271,6 +271,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
 
     iDet->stretchAndMoveCamera();
     iDet->rotateCamera();
+    iDet->setCameraCentreTubeIndex();
 
     iDet->makeNeighbourList();
 

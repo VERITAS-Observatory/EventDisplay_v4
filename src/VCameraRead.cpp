@@ -548,12 +548,55 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
 // clean neighbour lists
     cleanNeighbourList();
 
+// set camera centre tube index
+    setCameraCentreTubeIndex();
+
     if( fDebug ) cout << "END: VCameraRead::readGrisucfg " << iFile << endl;
 
     return true;
 }
 
+void VCameraRead::setCameraCentreTubeIndex()
+{
+    fCameraCentreTubeIndex.clear();
+    for( unsigned int i = 0; i < fNTel; i++ )
+    {
+	if( i < fXTube.size() && i < fYTube.size() && i < fRotXTube.size() && i < fRotYTube.size() )
+	{
+	   double iCentreDistance = 1.e99;
+	   unsigned int iCentreTube = 0;
+	   for( unsigned int j = 0; j < fXTube[i].size(); j++ )
+	   {
+	       if( sqrt( fXTube[i][j]*fXTube[i][j] + fXTube[i][j]*fXTube[i][j] ) < iCentreDistance )
+	       {
+	           iCentreDistance = sqrt( fXTube[i][j]*fXTube[i][j] + fXTube[i][j]*fXTube[i][j] );
+		   iCentreTube = j;
+               }
+            }
+            fCameraCentreTubeIndex.push_back( iCentreTube );
+        }
+	else fCameraCentreTubeIndex.push_back( 999999 );
+    }
+}
 
+float VCameraRead::getMaximumFOV_deg()
+{
+    float i_degEdge = 0.;
+    float iDist = 0.;
+    for( unsigned int i = 0; i < fNTel; i++ )
+    {
+       if( i < fXTube.size() && i < fYTube.size() && i < fRTube.size() )
+       {
+	   for( unsigned int j = 0; j < fXTube[i].size(); j++ )
+	   {
+	      iDist = sqrt( fXTube[i][j] * fXTube[i][j] + fYTube[i][j] * fYTube[i][j] ) + fRTube[i][j];
+	      if( iDist > i_degEdge ) i_degEdge = iDist;
+           }
+        }
+    }
+    return i_degEdge;
+}
+   
 void VCameraRead::cleanNeighbourList()
 {
     for( unsigned int i = 0; i < fNeighbour.size(); i++ )
