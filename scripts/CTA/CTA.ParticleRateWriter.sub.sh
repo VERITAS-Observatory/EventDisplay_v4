@@ -54,28 +54,15 @@ for ARRAY in $VARRAY
 do
    echo "STARTING ARRAY $ARRAY"
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-1.sh
-   cp $FSCRIPT.sh $ODIR/$FSCRIPT-$ARRAY-1.sh
+   rm -f $ODIR/$FSCRIPT-$ARRAY.sh
+   cp $FSCRIPT.sh $FDIR/$FSCRIPT-$ARRAY.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-2.sh
-   sed -e "s|ARRAY|$ARRAY|" $ODIR/$FSCRIPT-$ARRAY-1.sh > $ODIR/$FSCRIPT-$ARRAY-2.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-1.sh
+   sed -i -e "s|ARRAY|$ARRAY|" \
+          -e "s|DDIR|$DDIR|" \
+          -e "s|RRRR|$RECID|" \
+          -e "s|OFFSET|$OFFSET|" $FDIR/$FSCRIPT-$ARRAY.sh
 
-   rm -f $ODIR/$FSCRIPT-$ARRAY-3.sh
-   sed -e "s|DDIR|$DDIR|" $ODIR/$FSCRIPT-$ARRAY-2.sh > $ODIR/$FSCRIPT-$ARRAY-3.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-2.sh
-
-   rm -f $ODIR/$FSCRIPT-$ARRAY-4.sh
-   sed -e "s|RRRR|$RECID|" $ODIR/$FSCRIPT-$ARRAY-3.sh > $ODIR/$FSCRIPT-$ARRAY-4.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-3.sh
-
-   rm -f $ODIR/$FSCRIPT-$ARRAY-5.sh
-   sed -e "s|OFFSET|$OFFSET|" $ODIR/$FSCRIPT-$ARRAY-4.sh > $ODIR/$FSCRIPT-$ARRAY-5.sh
-   rm -f $ODIR/$FSCRIPT-$ARRAY-4.sh
-
-   mv $ODIR/$FSCRIPT-$ARRAY-5.sh $ODIR/$FSCRIPT-$ARRAY.sh
-
-   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$ODIR/$FSCRIPT-$ARRAY.sh"
+   qsub -js 2000 -P cta_high -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
 
 done
 

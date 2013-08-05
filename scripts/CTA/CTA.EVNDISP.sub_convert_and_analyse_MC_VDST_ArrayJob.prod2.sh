@@ -103,7 +103,9 @@ then
 elif [[ $DSET == *Aar* ]]
 then
    echo "Aar"
-   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
+# use always Leoncito peds - should be exactly the same
+#   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
+   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
 else
    echo "error: data set not known (not Leoncito, SAC or Aar)"
    echo "       (no ped files available)"
