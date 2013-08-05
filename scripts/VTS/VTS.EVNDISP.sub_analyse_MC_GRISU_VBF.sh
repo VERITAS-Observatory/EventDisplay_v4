@@ -93,7 +93,8 @@ do
 ##################################################################
 # making run scripts
 ##################################################################
-   FDIR=$VERITAS_USER_LOG_DIR"/queueShellDir/"
+   DATE=`date +"%y%m%d"`
+   FDIR=$VERITAS_USER_LOG_DIR"/"$DATE/EVNDISP.ANAMCVBF
    if [ ! -d $FDIR ]
    then
      mkdir -p $FDIR
@@ -101,11 +102,6 @@ do
    QLOGDIR=$FDIR
    echo "DATA DIR: $ODIR"
    echo "SHELL AND LOG DIR $QLOGDIR"
-
-#   if [   ]
-#   then
-#     QLOGDIR="/dev/null"
-#   fi
 
    CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_GRISU_VBF"
    OSCRIPT="qsub_evndisp_MC_VBF-$ZEW-$WOB-$NOIS-$ATMO-$f"
