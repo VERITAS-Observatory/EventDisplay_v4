@@ -813,8 +813,13 @@ TCanvas* VExposure::plot( double ilmin, double ilmax, double ibmin, double ibmax
     fPlottingCanvas.clear();
     fPlottingCanvas.push_back( plot2DGalactic( "cGal", "Exposure", 10, 10, 600, 400, fMapGal2D, ibmin, ibmax, ilmin, ilmax, false ) );
     fPlottingCanvas.push_back( plot2DGalactic( "cGal_aitoff", "Exposure (aitoff)", 10, 450, 600, 400, fMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true ) );
-    fPlottingCanvas.push_back( plot2DGalactic( "cAccGal", "Acceptance corrected exposure", 650, 10, 600, 400, fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false ) );
-    fPlottingCanvas.push_back( plot2DGalactic( "cAccGal_aitoff", "Acceptance corrected exposure (aitoff)", 650, 450, 600, 400, fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true ) );
+    if( fAcceptance )
+    {
+       fPlottingCanvas.push_back( plot2DGalactic( "cAccGal", "Acceptance corrected exposure", 650, 10, 600, 400,
+                                                  fRadAccMapGal2D, ibmin, ibmax, ilmin, ilmax, false ) );
+       fPlottingCanvas.push_back( plot2DGalactic( "cAccGal_aitoff", "Acceptance corrected exposure (aitoff)", 650, 450, 600, 400,
+                                                  fRadAccMapGal2D_aitoff, ibmin, ibmax, ilmin, ilmax, true ) );
+    }
 
     if( iReturnCanvas < fPlottingCanvas.size() ) return fPlottingCanvas[iReturnCanvas];
 
@@ -909,7 +914,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 	                     fCatalogueTextAngle[t] );
         }
     }
-    if( fPlotVTSObjects ) plotVTSObjects( bAitoff, ibmin, ibmax, ilmin, ilmax, 5, 1., 45., h );
+    if( fPlotVTSObjects ) plotVTSObjects( bAitoff, ibmin, ibmax, ilmin, ilmax, 5, 1, 45., h );
 
 // draw aitoff coordinate system
     if( bAitoff ) drawAitoffCoordinateSystem();
