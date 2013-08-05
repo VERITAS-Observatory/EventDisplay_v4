@@ -177,7 +177,7 @@ TCanvas* plot_array( char *ifile, char *iname = 0, double iMarkerMult = 1., doub
     (read telconfig trees from evndisp output files)
 
 */
-void plot_allArrayLayouts( string iArrayListFile, string iFileName, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450. )
+void plot_allArrayLayouts( string iArrayListFile, string iFileName, double iMarkerMult = 1., double xmax = 1450., double ymax = 1450., string iDataSet = "prod2-Aar-North" )
 {
    vector< string > iVArray = getListofArrrays( iArrayListFile );
 
@@ -185,7 +185,8 @@ void plot_allArrayLayouts( string iArrayListFile, string iFileName, double iMark
 
    for( unsigned int i = 0; i < iVArray.size(); i++ )
    {
-      sprintf( hname, "$CTA_USER_DATA_DIR/analysis/AnalysisData/cta-ultra3/%s/gamma_onSource/%s", iVArray[i].c_str(), iFileName.c_str() );
+      sprintf( hname, "$CTA_USER_DATA_DIR/analysis/AnalysisData/%s/%s/gamma_onSource/%s", iDataSet.c_str(), iVArray[i].c_str(), iFileName.c_str() );
+      cout << hname << endl;
 
       TCanvas *cC = plot_array( hname, iVArray[i].c_str(), iMarkerMult, xmax, ymax );
       if( cC )
