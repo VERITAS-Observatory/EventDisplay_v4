@@ -26,6 +26,7 @@ chmod -R g+w $ODIR
 
 # output log files are written to this directory
 set LDIR=$ODIR
+rm -f $LDIR/$BFIL.mscw.log
 
 #################################
 # run analysis

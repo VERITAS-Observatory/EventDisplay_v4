@@ -16,7 +16,6 @@ set WOFF=WWWOBB
 set PART=PAAAAART
 set RUNN=RUUUUNNN
 set ATMOS=ATMOOOS
-set FTRE=FUUUUUL
 set ARRAY=ARRRRAY
 
 cd $EVNDISPSYS/
@@ -26,22 +25,21 @@ source ./setObservatory.tcsh VTS
 # hardwired values
 ###############################################
 # date of analysis
-set DAT="d20130521"
+set DAT="d20130804"
+
 # output files are written to this directory
 set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
 set ODIR=/lustre/fs9/group/cta/users/maierg/VERITAS/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
-set DAT="d20130406"
 # directory with MC eventdisplay files
 set SDIR="analysis_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
 # full path to MC eventdisplay files 
 set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*[0-9].root"
+#############
 # mscw_energy command line options
-set MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
+# long output file (with all telescope-wise image variables
+# set MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
+# short output file
 set MOPT="-noNoTrigger -nomctree -shorttree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
-if( $FTRE == "TRUE" ) then
-  set ODIR="$ODIR"G
-  set MOPT="-noNoTrigger -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
-endif
 
 ###############################################
 # temporary directories

@@ -61,13 +61,13 @@ NNOI=${#INOI[@]}
 
 DATE=`date +"%y%m%d"`
 
-QLOG=$VERITAS_USER_LOG_DIR"/queueShellDir/"$DATE/
+QLOG=$VERITAS_USER_LOG_DIR"/"$DATE/MSCW.MAKETABLES/
 if [ ! -d $QLOG ]
 then
   mkdir -p $QLOG
 fi
 echo "SHELLS AND LOG FILES: $QLOG"
-LOGDIR=$VERITAS_USER_LOG_DIR"/analysis/EVDv400/Tables/"$DATE/
+LOGDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/Tables/"$DATE/
 if [ ! -d $LOGDIR ]
 then
   mkdir -p $LOGDIR
@@ -99,35 +99,25 @@ do
 	 echo "   DATA DIR WITH TABLES $ODDIR"
 
 	 FNAM="$QLOG/MK-TBL.$DATE.MC-$ATMO-$ANAC-$RECID-${INOI[$i]}-${IZE[$N]}-${WOFF[$W]}-$ARRAY"
+	 rm -f $FNAM.sh
 
-	 sed -e "s|TABLEFILE|$TFIL|" $FSCRIPT.sh > $FNAM-2.sh
-	 sed -e "s|TELESCOPES|$ANAC|" $FNAM-2.sh > $FNAM-3.sh
-	 rm -f $FNAM-2.sh
-	 sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-3.sh > $FNAM-4.sh
-	 rm -f $FNAM-3.sh
-	 sed -e "s|NOISEI|${INOI[$i]}|" $FNAM-4.sh > $FNAM-5.sh
-	 rm -f $FNAM-4.sh
-	 sed -e "s|AAAAA|$ARRAY|" $FNAM-5.sh > $FNAM-7.sh 
-	 rm -f $FNAM-5.sh
-	 sed -e "s|BBBBBBB|$ATMO|" $FNAM-7.sh > $FNAM-8.sh 
-	 rm -f $FNAM-7.sh
-	 sed -e "s|NOISET|${TNOI[$i]}|" $FNAM-8.sh > $FNAM-10.sh
-	 rm -f $FNAM-8.sh
-	 sed -e "s|THEDATE|$DATE|" $FNAM-10.sh > $FNAM-11.sh
-	 rm -f $FNAM-10.sh
-	 sed -e "s|CCCCCC|$LOGDIR|" $FNAM-11.sh > $FNAM-12.sh
-	 rm -f $FNAM-11.sh
-	 sed -e "s|DDDDDD|$ODDIR|" $FNAM-12.sh > $FNAM-13.sh
-	 rm -f $FNAM-12.sh
-	 sed -e "s|ZENITH|${IZE[$N]}|" $FNAM-13.sh > $FNAM-14.sh
-	 rm -f $FNAM-13.sh
-	 sed -e "s|WOBBLEOFFSET|${WOFF[$W]}|" $FNAM-14.sh > $FNAM.sh
-	 rm -f $FNAM-14.sh
+	 sed -e "s|TABLEFILE|$TFIL|" \
+	     -e   "s|TELESCOPES|$ANAC|" \
+	     -e "s|RECONSTRUCTIONID|$RECID|" \
+	     -e "s|NOISEI|${INOI[$i]}|" \
+	     -e "s|AAAAA|$ARRAY|" \
+	     -e "s|BBBBBBB|$ATMO|" \
+	     -e "s|NOISET|${TNOI[$i]}|" \
+	     -e "s|THEDATE|$DATE|" \
+	     -e "s|CCCCCC|$LOGDIR|" \
+	     -e "s|DDDDDD|$ODDIR|" \
+	     -e "s|ZENITH|${IZE[$N]}|" \
+	     -e "s|WOBBLEOFFSET|${WOFF[$W]}|" $FSCRIPT.sh > $FNAM.sh
 
 	 chmod u+x $FNAM.sh
 
 # submit job
-	qsub -V -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=20000M -l tmpdir_size=1G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+	qsub -V -l os="sl*" -l h_cpu=10:29:00 -l h_vmem=20000M -l tmpdir_size=1G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
         let "W = $W + 1"
      done

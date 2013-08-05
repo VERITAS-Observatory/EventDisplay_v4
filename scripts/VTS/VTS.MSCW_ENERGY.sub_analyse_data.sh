@@ -40,15 +40,9 @@ FILES=`cat $BLIST`
 
 #########################################
 # output directory for error/output from batch system
-# in case you submit a lot of scripts: QLOG=/dev/null
 DATE=`date +"%y%m%d"`
-QLOG=$VERITAS_USER_LOG_DIR/$DATE/
+QLOG=$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANADATA
 mkdir -p $QLOG
-#QLOG="/dev/null"
-
-# output directory for shell scripts
-SHELLDIR=$VERITAS_USER_LOG_DIR"/queueShellDir/"
-mkdir -p $SHELLDIR
 
 # skeleton script
 FSCRIPT="VTS.MSCW_ENERGY.qsub_analyse_data"
@@ -60,13 +54,12 @@ do
    BFIL=$EFIL/$AFIL.root
    echo "now analysing $BFIL (ID=$ID)"
 
-   FNAM="$SHELLDIR/MSCW.data-ID$ID-$AFIL"
+   FNAM="$QLOG/MSCW.data-ID$ID-$AFIL"
+   rm -f $FNAM.sh
 
-   sed -e "s|TABLEFILE|$TFIL|" $FSCRIPT.sh > $FNAM-1.sh
-   sed -e "s|RECONSTRUCTIONID|$ID|" $FNAM-1.sh > $FNAM-2.sh
-   rm -f $FNAM-1.sh
-   sed -e "s|EVNDFIL|$BFIL|" $FNAM-2.sh > $FNAM.sh
-   rm -f $FNAM-2.sh
+   sed -e "s|TABLEFILE|$TFIL|" \
+       -e "s|RECONSTRUCTIONID|$ID|" \
+       -e "s|EVNDFIL|$BFIL|" $FSCRIPT.sh > $FNAM.sh
 
    chmod u+x $FNAM.sh
    echo $FNAM.sh

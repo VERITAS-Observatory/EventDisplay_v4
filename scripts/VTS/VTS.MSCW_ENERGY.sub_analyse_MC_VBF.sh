@@ -24,7 +24,6 @@ TFIL=$1
 ANAC="1234"
 RECID=$2
 ATMO=$3
-FTRE="FALSE"
 ARRAY=$4
 PART="gamma"
 RUNN="1"
@@ -43,10 +42,6 @@ ZE=( 20 00 30 35 40 45 50 55 60 65 )
 NZE=${#ZE[@]}
 # noise levels
 NOISE=( 075 100 150 200 250 325 425 550 750 1000 )
-if [ $FTRE = "TRUE" ]
-then
-   NOISE=( 250 )
-fi
 NNOISE=${#NOISE[@]}
 # wobble offsets
 WOBBLE=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
@@ -56,10 +51,10 @@ NWOBBLE=${#WOBBLE[@]}
 ##############################################
 # directory for run scripts
 ##############################################
-FDIR=$VERITAS_USER_LOG_DIR"/queueMSCW/"
+DATE=`date +"%y%m%d"`
+FDIR=$VERITAS_USER_LOG_DIR"/"$DATE/MSCW.ANATABLES/
 mkdir -p $FDIR
 # directory for run log files
-LDIR=$DIR
 LDIR=/dev/null
 
 ##############################################
@@ -86,14 +81,11 @@ do
 	  -e "s/IZENITH/$IZE/" \
 	  -e "s/NNNNOISE/$NNOI/" \
 	  -e "s/ATMOOOS/$ATMO/" \
-	  -e "s/FUUUUUL/$FTRE/" \
 	  -e "s/WWWOBB/$WOFF/" \
 	  -e "s/PAAAAART/$PART/" \
 	  -e "s/RUUUUNNN/$RUNN/" \
 	  -e "s/ARRRRAY/$ARRAY/" \
 	  -e "s/RECONSTRUCTIONID/$RECID/" $FSCRIPT.sh > $FDIR/$FNAM.sh
-
-      rm -f $FDIR/$FSCRIPT-3c.sh
 
 # submit the job
       qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $LDIR -e $LDIR $FDIR/$FNAM.sh
