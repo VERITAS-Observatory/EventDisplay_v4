@@ -1,7 +1,7 @@
 #ifndef VIMAGENNCLEANING_H
 #define VIMAGENNCLEANING_H
 
-#include "GeometryCam.h"
+//#include "GeometryCam.h"
 #include "TGraph.h"
 #include <TString.h>
 TGraph* gIPR;

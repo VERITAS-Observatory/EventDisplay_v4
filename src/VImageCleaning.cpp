@@ -181,7 +181,8 @@ int VImageCleaning::LocMin(int n, float *ptr, float &min) //ptr[i]>0
 
 bool VImageCleaning::InitNNImageCleaning()
 {
-    TString refIPR=Form("/afs/ifh.de/user/s/shayduk/lustre7/NSBdata/Stat/IPRcharge/IPRTelType1NSBscale%2.1fFWHM2.6E3.root",1.0);
+// GM 2013/08/05 disabled: removed copyright protected code
+/*    TString refIPR=Form("/afs/ifh.de/user/s/shayduk/lustre7/NSBdata/Stat/IPRcharge/IPRTelType1NSBscale%2.1fFWHM2.6E3.root",1.0);
     float fFakeImageProb=0.5E-3; // 0.2%  for LST ->less for MST, SST
     float SimTime=100.;//ns
     float fMinRate=fFakeImageProb/( SimTime*1E-9 *float(3) );//ns
@@ -197,12 +198,14 @@ bool VImageCleaning::InitNNImageCleaning()
 
     fProbCurve2nn->SetParameter(0,2*fMinRate);
     SetCameraTypes();
-    InitNeighbours();
+    InitNeighbours(); */
     return true;
 }
 
 bool VImageCleaning::BoundarySearch(int type, float thresh, TF1* fProbCurve, float refdT, int refvalidity, int idx)
 {
+// GM 2013/08/05 disabled: removed copyright protected code
+    return false;
     //idx - should be next neigbour of core!!!
     //skip core pix
     if((VALIDITYBUF[idx]>1.9&&VALIDITYBUF[idx]<5.1) ) return false;
@@ -211,7 +214,7 @@ bool VImageCleaning::BoundarySearch(int type, float thresh, TF1* fProbCurve, flo
     bool iffound=false;
     unsigned int     nnmax = 0;
     int neighbor[7];
-    GetNeighbors(type,neighbor,idx);
+// GM 2013/08/05   GetNeighbors(type,neighbor,idx);
     for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
     Int_t n=0;
     float time=0.;
@@ -253,7 +256,9 @@ bool VImageCleaning::BoundarySearch(int type, float thresh, TF1* fProbCurve, flo
 
 int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreCut) // if Nfold =3 it will search for 2nn+1, including sparse groups (with the empty pix in between)
 {
-    int NN=(int)fProbCurve->GetParameter(1);//"Nfold"
+// GM 2013/08/05 disabled: removed copyright protected code
+    return 0;
+/*    int NN=(int)fProbCurve->GetParameter(1);//"Nfold"
 
     Float_t nn2;
     Float_t nn3;
@@ -293,7 +298,7 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
             //if(VALIDITYBUF[PixNum2]<2.9) {VALIDITYBUF[PixNum2]=2;cout<<"charges:"<<charges[0]<<":"<<dT<<":"<<charges[1]<<" mincharge:"<<mincharge<<endl;}
             if(NN==2) break;
             // Boundary search (sparse group 2+1)
-            //*************************
+            / *************************
             if(VALIDITYBUF[PixNum2]==2&&NN==3)
             {
                 bool iffound=false;
@@ -315,7 +320,7 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
                 }
             }
             if(NN==3) break;
-            //*************************
+            / *************************
 
             if(NSBpix>2)
             {
@@ -404,11 +409,14 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
     if(NN==2) ngroups=int(nn2+0.5);
     if(NN==3) ngroups=int(nn3+0.5);
     if(NN==4) ngroups=int(nn4+0.5);
-    return ngroups;
+    return ngroups; */
 }
 
 int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, float PreCut)
 {
+// GM 2013/08/05 disabled: removed copyright protected code
+    return 0;
+/*
     Int_t NN2=0;
     Int_t NN3=0;
     Int_t NN4=0;
@@ -471,11 +479,14 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, flo
     }
     if(NN3>2) {return NN3/3;}
     if(NN3<3) {return 0;}
-    return NN3/3;
+    return NN3/3; */
 }
 
 float VImageCleaning::ImageCleaningCharge(int type, float NSBscale, int& ngroups)
 {
+// GM 2013/08/05 disabled: removed copyright protected code
+   return 1.;
+/*
     int numpix=fNumPixels[type];
     float PreThresh[5]={2.0,3.2,3.1, 4.7,1.3};
     ngroups=0;
@@ -488,12 +499,12 @@ float VImageCleaning::ImageCleaningCharge(int type, float NSBscale, int& ngroups
         if(INTENSITY[p]>PreThresh[4]*sqrt(NSBscale)/sqrt(0.6)) { VALIDITY[p]=1; VALIDITYBUF[p]=1;  }
         else               { VALIDITY[p]=-1; VALIDITYBUF[p]=-1;}
     }
-    //*************** Image Cleaning ******************************************************************************************
+    / *************** Image Cleaning ******************************************************************************************
     //ngroups=NNGroupSearchProbCurve(type,fProbCurve2nn, PreThresh[3]*sqrt(NSBscale)/sqrt(0.6)); for(int p=0;p<numpix;p++){if(VALIDITYBUF[p]==2) VALIDITY[p]=2; }
     //ngroups+=NNGroupSearchProbCurve(type,fProbCurve2plus1, PreThresh[1]*sqrt(NSBscale)/sqrt(0.6)); for(int p=0;p<numpix;p++){if(VALIDITYBUF[p]==3 ||VALIDITYBOUND[p]==3) VALIDITY[p]=3; }
     ngroups=NNGroupSearchProbCurveRelaxed(type,fProbCurve3nnrel, PreThresh[2]*sqrt(NSBscale)/sqrt(0.6)); for(int p=0;p<numpix;p++){if(VALIDITYBUF[p]==5) VALIDITY[p]=5; }
     //ngroups+=NNGroupSearchProbCurve(type,fProbCurve4nn, PreThresh[0]*sqrt(NSBscale)/sqrt(0.6)); for(int p=0;p<numpix;p++){if(VALIDITYBUF[p]==4) VALIDITY[p]=4; }
-    //*********************************************************************
+    / *********************************************************************
     // Boundary
     float TIMESReSearch[numpix];
     for(int p=0;p<numpix;p++){TIMESReSearch[p]=0.;}
@@ -569,7 +580,7 @@ float VImageCleaning::ImageCleaningCharge(int type, float NSBscale, int& ngroups
 
     for(int p=0;p<numpix;p++){ if(VALIDITY[p]>1.9) {SIZE+=INTENSITY[p]; imageflag++;}}
     if(imageflag==0) SIZE=-1;
-    return SIZE;
+    return SIZE; */
 }
 // main function
 void VImageCleaning::cleanNNImageFixed()
