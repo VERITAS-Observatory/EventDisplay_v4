@@ -1886,7 +1886,7 @@ void VDisplay::defineGui()
     fHorizontalEvent->AddFrame( fButtonAutorun, fL6 );
     fLabelGoto  = new TGLabel( fHorizontalEvent, "goto event: " );
     fHorizontalEvent->AddFrame( fLabelGoto, fL6 );
-    fNEntryGoto = new TGNumberEntry( fHorizontalEvent, 1, 7, B_NGOTO, (TGNumberFormat::EStyle) 0 );
+    fNEntryGoto = new TGNumberEntry( fHorizontalEvent, 1, 10, B_NGOTO, (TGNumberFormat::EStyle) 0 );
     fNEntryGoto->SetLimits( TGNumberFormat::kNELLimitMin, 0 );
     fNEntryGoto->Associate( this );
     fHorizontalEvent->AddFrame( fNEntryGoto, fL4 );
