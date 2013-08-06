@@ -1499,7 +1499,6 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
        else                 fParLL->size = iSize;
        fParLL->size2 = fParGeo->size2;
     }
-    cout << fParLL->size2 << "\t" << fParLL->size << "\t" << iSize << "\t" << fParGeo->size2 << "\t" << fParGeo->size << endl;
     fParLL->dist = dist;
     fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! to tired for calculation
     fParLL->alpha = alpha * TMath::RadToDeg();

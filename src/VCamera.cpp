@@ -97,7 +97,6 @@ void VCamera::setUpCamera()
         }
     } 
     fmax_dist_edge = fData->getDetectorGeo()->getMaximumFOV_deg();
-    cout << "FOV PLOT " << fTelescope+1 << "\t" <<  fdist_edgeX << "\t" << fdist_edgeY << "\t" << fmax_dist_edge << endl;
 
 // array with pmt data (rescaled data)
     fPMTData.resize( int(fData->getDetectorGeo()->getNumChannels()), 0. );
