@@ -93,20 +93,6 @@ VTableEnergyCalculator::VTableEnergyCalculator(const char* hname_add,char m, TDi
         hMedian->SetXTitle( "log_{10} energy [TeV]" );
         hMedian->SetYTitle( "distance to shower core [m]" );
         hMedian->SetZTitle( "log_{10} size (median)" );
-// sigma
-        sprintf( hname, "hSigma_energy_%s", hname_add );
-        sprintf( htitle, "energy vs. distance vs. log10 size (sigma), %s", hname_add );
-        hSigma = new TH2F( hname, htitle, eNumEne, log10(eE0Min),log10(eE0Max),eNumDist, 0., eNumDist*edist_delta);
-        hSigma->SetXTitle( "log_{10} energy [TeV]" );
-        hSigma->SetYTitle( "distance to shower core [m]" );
-        hSigma->SetZTitle( "log_{10} size (sigma)" );
-// number of events
-        sprintf( hname, "hNevents_energy_%s", hname_add );
-        sprintf( htitle, "energy vs. distance vs. # events, %s", hname_add );
-        hNevents = new TH2F( hname, htitle, eNumEne, log10(eE0Min),log10(eE0Max),eNumDist, 0., eNumDist*edist_delta);
-        hNevents->SetXTitle( "log_{10} energy [TeV]" );
-        hNevents->SetYTitle( "distance to shower core [m]" );
-        hNevents->SetZTitle( "# of events" );
 
         sprintf( hname, "hMean_energy_%s", hname_add );
         sprintf( htitle, "energy vs. distance vs. log10 size (mean), %s", hname_add );
@@ -158,7 +144,7 @@ void VTableEnergyCalculator::setConstants()
 // energy axis: range from 10 GeV to 316 TeV
    eNumEne = 90;
    eE0Min  = 0.01;
-   eE0Max  = log10( 2.5 );
+   eE0Max  = TMath::Power( 10., 2.5 );
 
 // core axis: 100 x 15m = 1.5 km
    eNumDist   = 100;
@@ -176,7 +162,6 @@ void VTableEnergyCalculator::initialize()
 // minimum event size per telescope
     fMinSize = 0.;
     fMaxDistance = 999999.;
-    fMaxLocalDistance = 999999.;
 }
 
 
@@ -191,96 +176,93 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
         else                   cout << "\t (using mean of size distributions)";
         cout << endl;
         TDirectory *iDir1D = 0;
-// make output directory for 1D histograms
+
+// number of events
         if( fOutDir )
-        {
-            iDir1D = fOutDir->mkdir( "histos1D" );
+	{
+	   fOutDir->cd();
+
+	   char htitle[800];
+	   char hname[800];
+	   sprintf( hname, "hNevents_energy_%s", fHName_add.c_str() );
+	   sprintf( htitle, "energy vs. distance vs. # events, %s", fHName_add.c_str() );
+	   hNevents = new TH2F( hname, htitle, eNumEne, log10(eE0Min),log10(eE0Max),eNumDist, 0., eNumDist*edist_delta);
+	   hNevents->SetXTitle( "log_{10} energy [TeV]" );
+	   hNevents->SetYTitle( "distance to shower core [m]" );
+	   hNevents->SetZTitle( "# of events" );
+
+// sigma
+	   sprintf( hname, "hSigma_energy_%s", fHName_add.c_str() );
+	   sprintf( htitle, "energy vs. distance vs. log10 size (sigma), %s", fHName_add.c_str() );
+	   hSigma = new TH2F( hname, htitle, eNumEne, log10(eE0Min),log10(eE0Max),eNumDist, 0., eNumDist*edist_delta);
+	   hSigma->SetXTitle( "log_{10} energy [TeV]" );
+	   hSigma->SetYTitle( "distance to shower core [m]" );
+	   hSigma->SetZTitle( "log_{10} size (sigma)" );
+
+// make output directory for 1D histograms
+           iDir1D = fOutDir->mkdir( "histos1D" );
         }
 
 /* EVALUATION OF HISTOGRAMS */
 
-        int i = 0;
-	int j = 0;
-	int k = 0;
-	int id = 0;
-        float sum1 = 0.;
-	float sum2 = 0.;
-	float delta = 0.;
 	float med = 0.;
 	float sigma = 0.;
-        int i1 = 0;
-	int i2 = 0;
-	int i3 = 0;
 
-        char hisname[100];
-        char histitle[100];
+	double i_a[] = { 0.16, 0.5, 0.84 };
+	double i_b[] = { 0.0,  0.0, 0.0  };
 
-        for (i=0;i<eNumEne;i++)
+        for( int i = 0;i<eNumEne; i++ )
         {
-            for (j=0;j<eNumDist;j++)
+            for( int j=0;j<eNumDist;j++)
             {
-                sum1=0.;
-                for (k=2;k<eHistBins;k++)
-                {
-                    if( Oh[i][j] ) sum1 += Oh[i][j]->GetBinContent(k);
-                }
+		if( !Oh[i][j] ) continue;
 
-// require at least 5 showers per bin (not for energies above 10 TeV)
-                if (sum1 > fMinShowerPerBin )
-                {
-                    sum2=0.;
-                    i1=i2=i3=0;
-
-                    for (k=2;k<eHistBins-2;k++)
-                    {
-                        if( Oh[i][j] ) sum2 += Oh[i][j]->GetBinContent(k);
-                        if (sum2<0.16*sum1) i1=k;
-                        if (sum2<0.50*sum1) i2=k;
-                        if (sum2<0.84*sum1) i3=k;
-                    }
-                    delta = (exhigh-exlow)/(float)eHistBins;
-
-// the best estimate for the true median value lies in between the
-// bin centers of the i2'th and i2+1'th bin -
-// that points happens to be at i2+1 * delta.
-                    if( fUseMedianEnergy )  med   = exlow+(i2+1)*delta;
-                    else if( Oh[i][j] )     med   = Oh[i][j]->GetMean();
-
-                    sigma = (i3-i1)*delta;
+		if( Oh[i][j]->GetEntries() > fMinShowerPerBin )
+		{
+		   Oh[i][j]->GetQuantiles( 3, i_b, i_a );
+		   med   = i_b[1];
+		   sigma = i_b[2] - i_b[0];
                 }
                 else
                 {
-                    med  =0.;
-                    sigma=0.;
+                    med   = 0.;
+                    sigma = 0.;
                 }
-
                 hMedian->SetBinContent( i+1, j+1, med );
 		hMedian->SetBinError( i+1, j+1, sigma );
                 hSigma->SetBinContent( i+1, j+1, sigma );
                 if( Oh[i][j] ) hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
 
-                id=10000+i*100+j;
-                sprintf( hisname , "h%d",id);
-                sprintf( histitle, "h%d",id);
                 if( fOutDir && fWrite1DHistograms )
                 {
                     fOutDir->cd();
                     iDir1D->cd();
                     if( Oh[i][j] ) Oh[i][j]->Write();
                 }
+		if( Oh[i][j] ) delete Oh[i][j];
             }
         }
-        if( fOutDir )
+        if( fOutDir && hNevents && hNevents->GetEntries() > 0 )
         {
             fOutDir->cd();
-            if( xtitle ) hMedian->SetTitle( xtitle );
-            if( hNevents && hMedian ) hMedian->SetEntries( hNevents->GetEntries() );
-            if( hNevents && hSigma )  hSigma->SetEntries( hNevents->GetEntries() );
-            if( hMedian )  hMedian->Write();
-            if( hSigma )   hSigma->Write();
+            if( hMedian && xtitle )
+	    {
+	       hMedian->SetTitle( xtitle );
+	       hMedian->SetEntries( hNevents->GetEntries() );
+	       hMedian->Write();
+            }
+            if( hSigma )
+	    {
+	       hSigma->SetEntries( hNevents->GetEntries() );
+	       hSigma->Write();
+            }
             if( hNevents ) hNevents->Write();
             if( hMean )    hMean->Write();
         }
+	if( hNevents ) delete hNevents;
+	if( hMedian )  delete hMedian;
+	if( hSigma )   delete hSigma;
+	if( hMean )    delete hMean;
     }
 }
 
@@ -295,7 +277,7 @@ void VTableEnergyCalculator::terminate( TDirectory *iOutDir, char *xtitle )
                         esys: correction added to estimated energy (correction of systematic error in energy reconstruction)
 
 */
-double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, double *dist, double *et,double &chi2, double &dE, double esys )
+double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, double *et,double &chi2, double &dE, double esys )
 {
     int tel = 0;
 
@@ -310,7 +292,7 @@ double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, do
     {
         for( tel = 0; tel < ntel; tel++ )
         {
-            if( e != 0. && s[tel] > fMinSize && r[tel] >= 0. && r[tel] < fMaxDistance && dist[tel] < fMaxLocalDistance )
+            if( e != 0. && s[tel] > fMinSize && r[tel] >= 0. && r[tel] < fMaxDistance )
             {
 	        ie = hMean->GetXaxis()->FindBin( log10( e ) ) - 1;
 // if energy is smaller than lower limit of energy range: fill into first bin
@@ -369,8 +351,6 @@ double VTableEnergyCalculator::calc(int ntel, double e, double *r, double *s, do
 		   cout << "\t VTableEnergyCalculator::calc(): passed size and distance cut for telescope " ;
 		   cout << tel << "\t( size " << s[tel] << ", distance " << r[tel] << "m )" << endl;
                 }
-// local distance cut
-                if( dist[tel] < fMaxLocalDistance )
                 {
                     if( fDebug ) cout << "\t\t VTableEnergyCalculator::calc(): passed maximum local distance cut for telescope " << tel << endl;
 
@@ -620,12 +600,11 @@ void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double &
 }
 
 
-void VTableEnergyCalculator::setCutValues( double iSize, double iLocalDist, double iDist )
+void VTableEnergyCalculator::setCutValues( double iSize, double iDist )
 {
     fMinSize = iSize;
     if( fMinSize < 0. ) fMinSize = 0.;
     fMaxDistance = iDist;
-    fMaxLocalDistance = iLocalDist;
 }
 
 
@@ -667,7 +646,8 @@ bool VTableEnergyCalculator::readHistograms()
         fReadHistogramsFromFile = true;
 
 // interpolate or smooth 2D histograms
-        if( fInterpolationString.size() > 0 )
+// (switched of for efficiency reasons
+/*        if( fInterpolationString.size() > 0 )
         {
             VInterpolate2DHistos iInter;
             if( fInterpolationString == "simple" )
@@ -678,15 +658,15 @@ bool VTableEnergyCalculator::readHistograms()
             {
                 hMedian = iInter.doGaussianInterpolation( hMedian, "interpol", hNevents, 1, 1. );
             }
-        }
+        } */
 
     }
     if( !hMedian )
     {
-        cout << "energy: table histograms not found in " << gDirectory->GetName() << endl;
-	cout << "\t" << gDirectory->GetPath() << endl;
-	cout << "\t" << hMedian << endl;
-        exit( -1 );
+        cout << "\t energy tables info: table histograms not found in " << gDirectory->GetName();
+	if( fOutDir ) cout << ", " << fOutDir->GetPath();
+	cout << endl;
+//        exit( -1 );
     }
 
     return true;

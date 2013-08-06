@@ -239,7 +239,7 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
        iTreeName << "Tel_" << i+1 << "/tpars";
        TChain i_tparsTree( iTreeName.str().c_str() );
        i_tparsTree.Add( iInputFile.c_str(), 0 );
-       Ctpars i_tpars( &i_tparsTree, true, 6, true );
+       Ctpars i_tpars( &i_tparsTree, true, 6, 1 );
 
        cout << "\t found tree " << iTreeName.str() << ", entries: " << i_showerpars.fChain->GetEntries() << ", ";
        cout << i_tpars.fChain->GetEntries() << endl;

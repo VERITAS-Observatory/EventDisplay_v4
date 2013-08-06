@@ -244,55 +244,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
        return -1;
     }
 
-// fill MC parameters
-    if( fIsMC )
-    {
-        fMCEnergy = fshowerpars->MCe0;
-        fMCaz = fshowerpars->MCaz;
-        fMCze = fshowerpars->MCze;
-        fMCxcore = fshowerpars->MCxcore;
-        fMCycore = fshowerpars->MCycore;
-        fMCxoff = fshowerpars->MCxoff;
-        fMCyoff = fshowerpars->MCyoff;
-        if( !bShort && !fShortTree )
-        {
-            fMCxcore_SC = fshowerpars->MCxcore_SC;
-            fMCycore_SC = fshowerpars->MCycore_SC;
-            fMCxcos = fshowerpars->MCxcos;
-            fMCycos = fshowerpars->MCycos;
-        }
-    }
-    runNumber = fshowerpars->runNumber;
-    eventNumber = fshowerpars->eventNumber;
-    if( fDebug > 1 )
-    {
-       cout << "===============================================================================" << endl;
-       cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
-       cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod] << endl;
-    }
-    time = fshowerpars->Time;
-    if( fEventCounter == 0 ) fTotalTime0 = time;
-    fTotalTime = time - fTotalTime0;
-
-    if( !bShort ) LTrig = (ULong64_t)fshowerpars->LTrig;
-
-    for( unsigned int i = 0; i < fNTel; i++ )
-    {
-       fTelElevation[i] = fshowerpars->TelElevation[i];
-       fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
-    }
-
-    if( !fIsMC )
-    {
-        for( unsigned int i = 0; i < fNTel; i++ )
-        {
-            fTelDec[i] = fshowerpars->TelDec[i];
-            fTelRA[i] = fshowerpars->TelRA[i];
-        }
-	if( !fShortTree ) MJD = fshowerpars->MJD;
-    }
-
-    fNTrig = fshowerpars->NTrig;
+////////////////////////////////////////////////////
+// read first all entries needed for run modes (filling and reading)
     fNMethods = fshowerpars->NMethods;
     if( fMethod >= fNMethods )
     {
@@ -303,6 +256,70 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     }
     fNImages = fshowerpars->NImages[fMethod];
     fchi2 = fshowerpars->Chi2[fMethod];
+// for table filling: check as soon as possible if the event is useful
+    if( fwrite && !isReconstructed() )
+    {
+       fEventStatus = false;
+       fEventCounter++;
+       fNStats_Chi2Cut++;
+       return 0;
+    }  
+// fill MC parameters
+    if( fIsMC )
+    {
+        fMCEnergy = fshowerpars->MCe0;
+        fMCaz = fshowerpars->MCaz;
+        fMCze = fshowerpars->MCze;
+        fMCxcore = fshowerpars->MCxcore;
+        fMCycore = fshowerpars->MCycore;
+        fMCxoff = fshowerpars->MCxoff;
+        fMCyoff = fshowerpars->MCyoff;
+        if( !bShort && !fShortTree && !fwrite )
+        {
+            fMCxcore_SC = fshowerpars->MCxcore_SC;
+            fMCycore_SC = fshowerpars->MCycore_SC;
+            fMCxcos = fshowerpars->MCxcos;
+            fMCycos = fshowerpars->MCycos;
+        }
+    }
+// the following variables are not set in table filling mode
+    if( !fwrite )
+    {
+       runNumber = fshowerpars->runNumber;
+       eventNumber = fshowerpars->eventNumber;
+       if( fDebug > 1 )
+       {
+	  cout << "===============================================================================" << endl;
+	  cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
+	  cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod] << endl;
+       }
+       time = fshowerpars->Time;
+       if( fEventCounter == 0 ) fTotalTime0 = time;
+       fTotalTime = time - fTotalTime0;
+
+       for( unsigned int i = 0; i < fNTel; i++ )
+       {
+	  fTelElevation[i] = fshowerpars->TelElevation[i];
+	  fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
+       }
+       if( !fIsMC )
+       {
+	   for( unsigned int i = 0; i < fNTel; i++ )
+	   {
+	       fTelDec[i] = fshowerpars->TelDec[i];
+	       fTelRA[i] = fshowerpars->TelRA[i];
+	   }
+	   if( !fShortTree ) MJD = fshowerpars->MJD;
+       }
+       fNTrig = fshowerpars->NTrig;
+
+       if( !bShort )
+       {
+          LTrig = (ULong64_t)fshowerpars->LTrig;
+       }
+    }
+
+// test here reconstructed and stop if necessary
     if( !isReconstructed() )
     {
        if( fDebug > 1 ) cout << "\t NO RECONSTRUCTION " << fEventCounter << endl;
@@ -590,7 +607,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     cout << "list of telescope types (" << fList_of_Tel_type.size() << "): ";
     for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin(); fList_of_Tel_type_iterator != fList_of_Tel_type.end(); fList_of_Tel_type_iterator++ )
     {
-       cout << "  " << fList_of_Tel_type_iterator->first << " (" << fList_of_Tel_type_iterator->second << ")";
+       cout << "  " << fList_of_Tel_type_iterator->first << " (" << fList_of_Tel_type_iterator->second << " telescopes)";
     }
     cout << endl;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -658,7 +675,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 
     char iName[100];
     char iDir[1000];
-    bool bShort = false;
+    unsigned int bShort = false;
 // get shower parameter tree
     fTshowerpars = new TChain( "showerpars" );
     for( unsigned int i = 0; i < finputfile.size(); i++ )
@@ -697,12 +714,12 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     if( fTLRunParameter )
     {
        fEventDisplayFileFormat = fTLRunParameter->getEVNDISP_TREE_VERSION();
-       bShort                  = fTLRunParameter->getEVNDISP_TREE_isShort( fTshowerpars->GetTree() );
+       bShort                  = (unsigned int)fTLRunParameter->getEVNDISP_TREE_isShort( fTshowerpars->GetTree() );
     }
 // check file format
     if( fEventDisplayFileFormat >= 2 )
     {
-        if( bShort ) cout << "input data is of eventdisplay short tree output format" << endl;
+        if( bShort ) cout << "input data is of eventdisplay short tree output format (" << bShort << ")" << endl;
         fshowerpars = new Cshowerpars( fTshowerpars, fIsMC, fEventDisplayFileFormat, bShort );
         fIsMC = fshowerpars->isMC();
     }
@@ -710,6 +727,8 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     {
         fEventDisplayFileFormat = 1;
     }
+// for table filling: minimizing reading of trees
+    if( fwrite ) bShort = 2;
 
 // get individual image parameter trees
     TChain *iT;
@@ -1265,7 +1284,7 @@ bool VTableLookupDataHandler::copyMCRunheader()
 	  {
 	     fOutFile->cd();
 	     f->Get( "MC_runheader" )->Write();
-	     cout << "MC run header found and copied" << endl;
+	     cout << "\t MC run header found and copied" << endl;
           }
 	  if( f->Get( "MCpars" ) ) return true;
        }
@@ -1328,7 +1347,7 @@ void VTableLookupDataHandler::copyMCHistograms()
         }
 	if( iMC_his && fOutFile )
 	{ 
-	   cout << "writing MC histograms" << endl;
+	   cout << "\t writing MC histograms" << endl;
 	   iMC_his->print();
 	   fOutFile->cd();
 	   iMC_his->Write();
@@ -1386,18 +1405,27 @@ void VTableLookupDataHandler::reset()
 */
 void VTableLookupDataHandler::calcDistances( int nimages )
 {
-    for( unsigned int tel = 0; tel < fNTel; tel++ )
-    {
-        fR[tel] = -99.;
-    }
 // check for successfull reconstruction
-    if( nimages < 2 || fZe < 0 ) return;
-    if( fYcore < -9998. || fYcore < -9998. ) return;
-
-// reconstructed shower core distance
-    for( unsigned int tel = 0; tel < fNTel; tel++ )
+    if( nimages > 1 && fZe >=0. && fYcore >  -9998. && fYcore > -9998. )
     {
-        fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+       for( unsigned int tel = 0; tel < fNTel; tel++ )
+       {
+	   if( fImgSel_list[tel] )
+	   {
+	      fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+	   }
+	   else
+	   {
+	      fR[tel] = -99.;
+	   }
+       }
+    }
+    else
+    {
+       for( unsigned int tel = 0; tel < fNTel; tel++ )
+       {
+	   fR[tel] = -99.;
+       }
     }
 }
 
@@ -1422,8 +1450,10 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
     floss[i] = 0.;
     fwidth[i] = 0.;
     flength[i] = 0.;
-    fntubes[i] = 0;
     fmeanPedvar_ImageT[i] = 0.;
+    if( fwrite ) return;
+
+    fntubes[i] = 0;
     fnsat[i] = 0;
     fnlowgain[i] = 0;
     falpha[i] = 0.;
@@ -1446,6 +1476,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 bool VTableLookupDataHandler::isReconstructed()
 {
     if( fchi2 < 0 ) return false;
+    if( fNImages < 2 ) return false;
 
     return true;
 }
@@ -1654,12 +1685,6 @@ bool VTableLookupDataHandler::cut( bool bWrite )
        return false;
     }
 
-// require successfull reconstruction
-    if( fchi2 < 0. ) 
-    {
-       fNStats_Chi2Cut++;
-       return false;
-    }
 // number of reconstructed events
     fNStats_Rec++;
 

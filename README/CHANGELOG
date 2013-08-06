@@ -1,6 +1,11 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130806 (GM) major changes and improvements for lookup tables
+                improved weighted for energy reconstruction
+		better efficiency for table filling for CTA
+		reduced output file size
+
 * 20130802 (GM) improvements in VExposure plotting (VTS) only
 
 * 20130802 (GM) improvements on the display (mainly birdseye and 'all-in-one' plot)

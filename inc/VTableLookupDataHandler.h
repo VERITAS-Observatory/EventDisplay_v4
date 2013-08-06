@@ -316,7 +316,7 @@ class VTableLookupDataHandler
         double *getLength() { return flength; }
 	double *getLength( ULong64_t iTelType );
 	map<ULong64_t, unsigned int > getList_of_Tel_type() { return fList_of_Tel_type; }
-        unsigned int getNTel_type( ULong64_t t ) { if( fList_of_Tel_type.find(t) != fList_of_Tel_type.end() ) return fList_of_Tel_type[t]; else return 0; }
+        unsigned int getNTel_type( ULong64_t t ) { if( fList_of_Tel_type.find(t) != fList_of_Tel_type.end() ) return fList_of_Tel_type[t]; else return 99999; }
         unsigned int getMaxNbrTel() const { return VDST_MAXTELESCOPES; }
         int* getNtubes() { return fntubes; }
         double* getMSCWtel() { return ftmscw; }

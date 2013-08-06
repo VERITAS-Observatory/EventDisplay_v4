@@ -39,14 +39,15 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     fTableFillingCut_CoreError_max = 1.e6;
     fTableFillingCut_NImages_min = 2;
     fTableFillingCut_WobbleCut_max = 15.;
-    fmaxlocaldistance = 99.;
-    fmaxdist = 50000.;
     fminsize = 0.;
+    fmaxdist = 50000.;
     fSelectRandom = -1.;
     fSelectRandomSeed = 17;
     fMSCWSizecorrection = 1.;
     fMSCLSizecorrection = 1.;
     fEnergySizecorrection = 1.;
+
+    fLimitEnergyReconstruction = false;
 
     fMC_distance_to_cameracenter_min =  0.;
     fMC_distance_to_cameracenter_max =  1.e10;
@@ -163,6 +164,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
                 i++;
             }
         }
+	else if( iTemp.find( "-limitEnergyReconstruction" ) < iTemp.size() )
+	{
+	   fLimitEnergyReconstruction = true;
+        }
         else if( iTemp.find( "-interpolate" ) < iTemp.size() )
         {
             fInterpolate = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
@@ -195,10 +200,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
         {
             fSelectRandomSeed = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-        else if( iTemp.find( "-maxdist" ) < iTemp.size() && !(iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size()) )
-        {
-            fmaxdist = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
-        }
         else if( iTemp.find( "-maxCoreError" ) < iTemp.size() )
         {
             fTableFillingCut_CoreError_max = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
@@ -211,10 +212,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
         {
             fSpectralIndex = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
-        else if( iTemp.find( "-maxlocaldist" ) < iTemp.size() )
-        {
-            fmaxlocaldistance = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
-        }
+	else if( iTemp.find( "-maxdist" ) < iTemp.size() && !(iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size()) )
+	{
+	    fmaxdist = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+	}
 	else if( iTemp.find( "-maxdistancetocameracenter" ) < iTemp.size() )
 	{
 	    fMC_distance_to_cameracenter_max  = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
@@ -393,6 +394,7 @@ void VTableLookupRunParameter::print( int iP )
     if( fSelectRandom > 0. ) cout << "random event selection: " << fSelectRandom << ", seed:" << fSelectRandomSeed << endl;
     if( fUseSelectedImagesOnly ) cout << "use evndisp image selection" << endl;
     else                         cout << "use all images" << endl;
+    if( fLimitEnergyReconstruction ) cout << "limited energy tables" << endl;
     if( !(readwrite == 'W' || readwrite == 'w' ) || iP == 2 )
     {
         if( esysfile.size() > 0 ) cout << "correct for systematic errors with " << esysfile << endl;
@@ -406,9 +408,10 @@ void VTableLookupRunParameter::print( int iP )
     else                   cout << "use mean of energy distributions" << endl;
     if( fInterpolate > 0 )
     {
-        if( fInterpolate == 1 ) fInterpolateString = "simple";
+        cout << "WARNING: interpolation switched off for efficiency reasons" << endl;
+/*        if( fInterpolate == 1 ) fInterpolateString = "simple";
         else if( fInterpolate == 2 ) fInterpolateString = "gaussian";
-        cout << "interpolate lookup tables: " << fInterpolateString << endl;
+        cout << "interpolate lookup tables: " << fInterpolateString << endl; */
     }
     if( TMath::Abs( fMSCWSizecorrection -1. ) > 1.e-2 )    cout << "size correction for mscw tables: " << fMSCWSizecorrection << endl;
     if( TMath::Abs( fMSCLSizecorrection -1. ) > 1.e-2 )    cout << "size correction for mscl tables: " << fMSCLSizecorrection << endl;
@@ -478,6 +481,8 @@ void VTableLookupRunParameter::setCTA_MC_offaxisBins()
 
 void VTableLookupRunParameter::printCTA_MC_offaxisBins()
 {
+    if( fCTA_MC_offaxisBin_min.size() == 0 ) return;
+
     cout << "setting the following off-axis bins for CTA analysis: " << endl;
     for( unsigned int i = 0; i < fCTA_MC_offaxisBin_min.size(); i++ )
     {

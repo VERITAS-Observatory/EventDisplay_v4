@@ -11,7 +11,6 @@
 #include "TProfile2D.h"
 
 #include "VGlobalRunParameter.h"
-#include "VInterpolate2DHistos.h"
 
 #include <cmath>
 #include <fstream>
@@ -34,17 +33,16 @@ class VTableEnergyCalculator
         ~VTableEnergyCalculator() {}
 
 // Fill Histos and Compute Energy
-        double calc(int ntel, double e, double *r, double *s,double *dist,double *et,double &chi2, double &dE, double eys );
+        double calc(int ntel, double e, double *r, double *s, double *et,double &chi2, double &dE, double eys );
         TH2F* getHistoMedian();
         TH2F* getHistoSigma();
         const char* getInputTable() { if( fOutDir ) return fOutDir->GetName(); else return "not defined"; }
         TDirectory* getOutputDirectory() { return fOutDir; }
         double getMinSizePerTelescope() { return fMinSize; }
         double getMaxDistanceFromTelescope() { return fMaxDistance; }
-        double getMaxLocalDistanceFromTelescope() { return fMaxLocalDistance; }
         void setVHistograms( vector< TH2F* >& hM );
         void setMinSizePerTelescope( double iS ) { fMinSize = iS; }
-        void setCutValues( double iSize, double iLocalDist, double iDist );
+        void setCutValues( double iSize, double iDist );
 	void setMinRequiredShowerPerBin( float iM = 5. ) { fMinShowerPerBin = iM; }
         void setInterpolationConstants( int, int );
         void setOutputDirectory( TDirectory *iDir ) { fOutDir = iDir; }

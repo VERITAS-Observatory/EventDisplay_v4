@@ -30,7 +30,7 @@ class Ctpars
 {
     public :
         bool            bMC;
-        bool            bShort;
+        unsigned int    bShort;
         int             fVersion;
         TTree          *fChain;                   //!pointer to the analyzed TTree or TChain
         Int_t           fCurrent;                 //!current Tree number in a TChain
@@ -151,17 +151,9 @@ class Ctpars
         Double_t        tgrad_y;
         Double_t        tgrad_r;
         Double_t        tint_x;
-        Double_t        tint_y;
-        Double_t        tint_r;
         Double_t        tgrad_dx;
-        Double_t        tgrad_dy;
-        Double_t        tgrad_dr;
         Double_t        tint_dx;
-        Double_t        tint_dy;
-        Double_t        tint_dr;
         Double_t        tchisq_x;
-        Double_t        tchisq_y;
-        Double_t        tchisq_r;
         Double_t        tmin;
         Double_t        tmax;
         Double_t        tmean;
@@ -224,22 +216,14 @@ class Ctpars
         TBranch        *b_tgrad_y;                //!
         TBranch        *b_tgrad_r;                //!
         TBranch        *b_tint_x;                 //!
-        TBranch        *b_tint_y;                 //!
-        TBranch        *b_tint_r;                 //!
         TBranch        *b_tgrad_dx;               //!
-        TBranch        *b_tgrad_dy;               //!
-        TBranch        *b_tgrad_dr;               //!
         TBranch        *b_tint_dx;                //!
-        TBranch        *b_tint_dy;                //!
-        TBranch        *b_tint_dr;                //!
         TBranch        *b_tchisq_x;               //!
-        TBranch        *b_tchisq_y;               //!
-        TBranch        *b_tchisq_r;               //!
         TBranch        *b_tmin;                   //!
         TBranch        *b_tmax;                   //!
         TBranch        *b_tmean;                  //!
 
-        Ctpars(TTree *tree = 0, bool iMC = false, int iVersion = 2, bool iShort = false );
+        Ctpars(TTree *tree = 0, bool iMC = false, int iVersion = 2, unsigned int iShort = false );
         virtual ~Ctpars();
         virtual Int_t    Cut(Long64_t entry);
         virtual Int_t    GetEntry(Long64_t entry);
@@ -249,19 +233,29 @@ class Ctpars
         virtual Bool_t   Notify();
         virtual void     Show(Long64_t entry = -1);
         bool             isMC() { return bMC; }
-        bool             isShort() { return bShort; }
+        unsigned int     isShort() { return bShort; }
 };
 #endif
 
 #ifdef Ctpars_cxx
 
-Ctpars::Ctpars(TTree *tree, bool iMC, int iVersion, bool iShort )
+/*
+
+    optimziation of tree reading:
+     
+    bShort = 0:  read all branches
+    bShort = 1:  read limited number of branches needed for lookup table analysis
+    bShort = 2:  read limited number of branched needed for lookup table filling
+
+*/
+Ctpars::Ctpars(TTree *tree, bool iMC, int iVersion, unsigned int iShort )
 {
     if( !tree ) return;
 
     bMC = iMC;
     bShort = iShort;
     fVersion = iVersion;
+    tree->SetCacheSize(10000000);
 
     Init(tree);
 }
@@ -308,135 +302,156 @@ void Ctpars::Init(TTree *tree)
     fCurrent = -1;
     fChain->SetMakeClass(1);
 
-    if( fChain->GetBranchStatus( "eventNumber" ) ) fChain->SetBranchAddress("eventNumber", &eventNumber );
-    else                                           eventNumber = 0;
-    if( fVersion > 3 && fChain->GetBranchStatus( "meanPed_Image" ) ) fChain->SetBranchAddress("meanPed_Image", &meanPed_Image );
-    else               meanPed_Image = 0;
-    if( fVersion > 3 ) fChain->SetBranchAddress("meanPedvar_Image", &meanPedvar_Image );
-    else               meanPedvar_Image = 0;
-    fChain->SetBranchAddress("cen_x",&cen_x);
-    fChain->SetBranchAddress("cen_y",&cen_y);
-    fChain->SetBranchAddress("length",&length);
-    fChain->SetBranchAddress("width",&width);
-    fChain->SetBranchAddress("size",&size);
-    size = 0;
-    if( fChain->GetBranchStatus( "size2" ) ) fChain->SetBranchAddress("size2",&size2);
-    else                                     fChain->SetBranchAddress("size",&size2);
-    if( fVersion > 2 ) fChain->SetBranchAddress("loss",&loss);
-    else               loss = 0.;
-    if( fVersion > 6 && fChain->GetBranchStatus( "fui" ) ) fChain->SetBranchAddress("fui", &fui);
-    else               fui = 0.;
-    fChain->SetBranchAddress("dist",&dist);
-    fChain->SetBranchAddress("ntubes",&ntubes);
-    if( !bShort )
+/////////////////////////////////////////////////
+//    bShort = 2:  read limited number of branched needed for lookup table filling
+    if( bShort <= 2 )
     {
-        fChain->SetBranchAddress("alpha",&alpha);
-        fChain->SetBranchAddress("los",&los);
-        fChain->SetBranchAddress("phi",&phi);
+       if( fVersion > 3 && fChain->GetBranchStatus( "meanPedvar_Image" ) ) fChain->SetBranchAddress("meanPedvar_Image", &meanPedvar_Image );
+       else               meanPedvar_Image = 0;
+       fChain->SetBranchAddress("length",&length);
+       fChain->SetBranchAddress("width",&width);
+       if( fChain->GetBranchStatus( "size2" ) ) fChain->SetBranchAddress("size2",&size2);
+       else                                     fChain->SetBranchAddress("size",&size2);
+       size = 0.;
     }
-    else
+//    bShort = 1:  read limited number of branches needed for lookup table analysis
+    if( bShort <= 1 )
     {
-        alpha = 0.;
-        los = 0.;
-        phi = 0.;
-    }
-    fChain->SetBranchAddress("cosphi",&cosphi);
-    fChain->SetBranchAddress("sinphi",&sinphi);
-    if( fChain->GetBranchStatus( "ntubesBNI" ) ) fChain->SetBranchAddress("ntubesBNI", &ntubesBNI );
-    else ntubesBNI = 0;
-    fChain->SetBranchAddress("nsat",&nsat);
-    if( fChain->GetBranchStatus("nlowgain" ) ) fChain->SetBranchAddress("nlowgain",&nlowgain);
-    else nlowgain = 0;
-    if( !bShort )
-    {
-       fChain->SetBranchAddress("max",max);
-       fChain->SetBranchAddress("index_of_max",index_of_max);
-    }
-    else
-    {
+       if( fChain->GetBranchStatus( "eventNumber" ) ) fChain->SetBranchAddress("eventNumber", &eventNumber );
+       else                                           eventNumber = 0;
+       if( fVersion > 3 && fChain->GetBranchStatus( "meanPed_Image" ) ) fChain->SetBranchAddress("meanPed_Image", &meanPed_Image );
+       else               meanPed_Image = 0;
+       fChain->SetBranchAddress("cen_x",&cen_x);
+       fChain->SetBranchAddress("cen_y",&cen_y);
+       fChain->SetBranchAddress("size",&size);
+       if( fVersion > 2 ) fChain->SetBranchAddress("loss",&loss);
+       else               loss = 0.;
+       if( fVersion > 6 && fChain->GetBranchStatus( "fui" ) ) fChain->SetBranchAddress("fui", &fui);
+       else               fui = 0.;
+       fChain->SetBranchAddress("dist",&dist);
+       fChain->SetBranchAddress("ntubes",&ntubes);
+       fChain->SetBranchAddress("cosphi",&cosphi);
+       fChain->SetBranchAddress("sinphi",&sinphi);
+       if( fChain->GetBranchStatus( "ntubesBNI" ) ) fChain->SetBranchAddress("ntubesBNI", &ntubesBNI );
+       else ntubesBNI = 0;
+       fChain->SetBranchAddress("nsat",&nsat);
+       if( fChain->GetBranchStatus("nlowgain" ) ) fChain->SetBranchAddress("nlowgain",&nlowgain);
+       else nlowgain = 0;
+       fChain->SetBranchAddress("asymmetry",&asymmetry);
+       fChain->SetBranchAddress("tgrad_x",&tgrad_x);
+// reset variables which are not read out
+       alpha = 0.;
+       los = 0.;
+       phi = 0.;
        max[0] = 0.;
        max[1] = 0.;
        max[2] = 0.;
        index_of_max[0] = 0;
        index_of_max[1] = 0;
        index_of_max[2] = 0;
+       tchisq_x = 0.;
     }
-    fChain->SetBranchAddress("asymmetry",&asymmetry);
-    fChain->SetBranchAddress("tgrad_x",&tgrad_x);
-    if( !bShort )
+// bShort == 0: read all branches
+    if( bShort == 0 )
     {
-        fChain->SetBranchAddress("tchisq_x",&tchisq_x);
-    }
-    else
-    {
-        tchisq_x = 0.;
+       fChain->SetBranchAddress("alpha",&alpha);
+       fChain->SetBranchAddress("los",&los);
+       fChain->SetBranchAddress("phi",&phi);
+       fChain->SetBranchAddress("max",max);
+       fChain->SetBranchAddress("index_of_max",index_of_max);
+       fChain->SetBranchAddress("tchisq_x",&tchisq_x);
     }
     Notify();
 }
 
-
+/*
+    Get branch pointers
+*/
 Bool_t Ctpars::Notify()
 {
 
-// Get branch pointers
-    b_eventNumber = fChain->GetBranch("eventNumber" );
-    if( fVersion > 2 ) b_meanPed_Image = fChain->GetBranch("meanPed_Image" );
-    else               b_meanPed_Image = 0;
-    if( fVersion > 2 ) b_meanPedvar_Image = fChain->GetBranch("meanPedvar_Image" );
-    else               b_meanPedvar_Image = 0;
-    b_cen_x = fChain->GetBranch("cen_x");
-    b_cen_y = fChain->GetBranch("cen_y");
-    b_length = fChain->GetBranch("length");
-    b_width = fChain->GetBranch("width");
-    b_size = fChain->GetBranch("size");
-    if( fChain->GetBranchStatus( "size2" ) ) b_size2 = fChain->GetBranch("size2");
-    else                                     b_size2 = fChain->GetBranch("size");
-    if( fVersion > 2 ) b_loss = fChain->GetBranch("loss");
-    else               b_loss = 0;
-    if( fVersion > 6 ) b_fui = fChain->GetBranch("fui" );
-    else               b_fui = 0;
-    b_dist = fChain->GetBranch("dist");
-    b_ntubes = fChain->GetBranch("ntubes");
-    if( !bShort )
+    b_eventNumber = 0;
+    b_meanPed_Image = 0;
+    b_meanPedvar_Image = 0;
+    b_length = 0;
+    b_width = 0;
+    b_size = 0;
+    b_size2 = 0;
+    b_cen_x = 0;
+    b_cen_y = 0;
+    b_loss = 0;
+    b_alpha = 0;
+    b_los = 0;
+    b_phi = 0;
+    b_cosphi = 0;
+    b_sinphi = 0;
+    b_ntubesBNI = 0;
+    b_nlowgain = 0;
+    b_loss = 0;
+    b_fui = 0;
+    b_max = 0;
+    b_index_of_max = 0;
+    b_tchisq_x = 0;
+
+// get branch pointers
+    if( bShort <= 2 )
     {
-        b_alpha = fChain->GetBranch("alpha");
-        b_los = fChain->GetBranch("los");
-        b_phi = fChain->GetBranch("phi");
-        b_cosphi = fChain->GetBranch("cosphi");
-        b_sinphi = fChain->GetBranch("sinphi");
+       if( fVersion > 3 && fChain->GetBranchStatus( "meanPedvar_Image" ) )
+       {
+	  b_meanPedvar_Image = fChain->GetBranch("meanPedvar_Image" );
+	  fChain->AddBranchToCache( b_meanPedvar_Image );
+       }	
+       b_length = fChain->GetBranch("length");
+       fChain->AddBranchToCache( b_length );
+       b_width = fChain->GetBranch("width");
+       fChain->AddBranchToCache( b_width );
+       if( fChain->GetBranchStatus( "size2" ) ) b_size2 = fChain->GetBranch("size2");
+       else                                     b_size2 = fChain->GetBranch("size");
+       fChain->AddBranchToCache( b_size2 );
     }
-    else
+    if( bShort <= 1 )
     {
-        b_alpha = 0;
-        b_los = 0;
-        b_phi = 0;
-        b_cosphi = 0;
-        b_sinphi = 0;
+       if( fChain->GetBranchStatus( "eventNumber" ) ) b_eventNumber = fChain->GetBranch("eventNumber" );
+       if( fVersion > 3 && fChain->GetBranchStatus( "meanPed_Image" ) ) b_meanPed_Image = fChain->GetBranch("meanPed_Image" );
+       b_cen_x = fChain->GetBranch("cen_x");
+       fChain->AddBranchToCache( b_cen_x );
+       b_cen_y = fChain->GetBranch("cen_y");
+       fChain->AddBranchToCache( b_cen_y );
+       b_size = fChain->GetBranch("size");
+       fChain->AddBranchToCache( b_size );
+       if( fVersion > 2 )
+       {
+	   b_loss = fChain->GetBranch("loss");
+	   fChain->AddBranchToCache( b_loss );
+       }
+       if( fVersion > 6 && fChain->GetBranchStatus( "fui" ) ) b_fui = fChain->GetBranch("fui" );
+       b_dist = fChain->GetBranch("dist");
+       fChain->AddBranchToCache( b_dist );
+       b_ntubes = fChain->GetBranch("ntubes");
+       fChain->AddBranchToCache( b_ntubes );
+       if( fChain->GetBranchStatus( "ntubesBNI" ) ) b_ntubesBNI = fChain->GetBranch("ntubesBNI" );
+       b_nsat = fChain->GetBranch("nsat");
+       fChain->AddBranchToCache( b_nsat );
+       if( fChain->GetBranchStatus( "nlowgain" ) )
+       {
+	  b_nlowgain = fChain->GetBranch("nlowgain");
+	  fChain->AddBranchToCache( b_nlowgain );
+       }
+       b_asymmetry = fChain->GetBranch("asymmetry");
+       fChain->AddBranchToCache( b_asymmetry );
+       b_tgrad_x = fChain->GetBranch("tgrad_x");
+       fChain->AddBranchToCache( b_tgrad_x );
     }
-    if( fChain->GetBranchStatus( "ntubesBNI" ) ) b_ntubesBNI = fChain->GetBranch("ntubesBNI" );
-    else b_ntubesBNI = 0;
-    b_nsat = fChain->GetBranch("nsat");
-    if( fChain->GetBranchStatus( "nlowgain" ) ) b_nlowgain = fChain->GetBranch("nlowgain");
-    else b_nlowgain = 0;
-    if( !bShort )
+    if( bShort == 0 )
     {
+       b_alpha = fChain->GetBranch("alpha");
+       b_los = fChain->GetBranch("los");
+       b_phi = fChain->GetBranch("phi");
+       b_cosphi = fChain->GetBranch("cosphi");
+       b_sinphi = fChain->GetBranch("sinphi");
        b_max = fChain->GetBranch("max");
        b_index_of_max = fChain->GetBranch("index_of_max");
-    }
-    else
-    {
-       b_max = 0;
-       b_index_of_max = 0;
-    }
-    b_asymmetry = fChain->GetBranch("asymmetry");
-    b_tgrad_x = fChain->GetBranch("tgrad_x");
-    if( !bShort )
-    {
-        b_tchisq_x = fChain->GetBranch("tchisq_x");
-    }
-    else
-    {
-        b_tchisq_x = 0;
+       b_tchisq_x = fChain->GetBranch("tchisq_x");
     }
 
     return kTRUE;

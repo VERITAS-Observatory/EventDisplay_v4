@@ -11,7 +11,7 @@
 #include "TProfile2D.h"
 
 #include "VGlobalRunParameter.h"
-#include "VInterpolate2DHistos.h"
+#include "VHistogramUtilities.h"
 #include "VStatistics.h"
 
 #include <cmath>
@@ -36,7 +36,6 @@ class VTableCalculator
         double calc(int ntel, double *r, double *s, double *w, double *mt, double &chi2, double &dE, double *st = 0 );
         const char* getInputTable() { if( fOutDir ) return fOutDir->GetName(); else return "not defined"; }
         TH2F* getHistoMedian();
-        TH2F* getHistoSigma();
         TDirectory *getOutputDirectory() { return fOutDir; }
         void setCalculateEnergies() { fEnergy = true; }
         void setCalculateEnergies( bool iB ) { fEnergy = iB; }
@@ -75,10 +74,7 @@ class VTableCalculator
         vector< vector< TH1F* > > Oh;
         TProfile2D *hMean;
         TH2F* hMedian;
-        TH2F* hMPV;
         string hMedianName;
-        TH2F* hSigma;
-        TH2F* hNevents;
         vector< TH2F* > hVMedian;
 
 // histogram interpolation
@@ -90,6 +86,7 @@ class VTableCalculator
         bool fReadHistogramsFromFile;
 
         char    Omode;
+	bool    fwrite;
 
 	bool   create1DHistogram( int i, int j );
         double getWeightMeanBinContent( TH2F*, int, int, double, double );

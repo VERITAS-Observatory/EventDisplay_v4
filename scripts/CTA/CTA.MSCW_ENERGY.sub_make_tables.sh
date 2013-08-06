@@ -44,15 +44,21 @@ DSET=$5
 #########################################
 if [ $CONE == "TRUE" ]
 then
-   OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
-   OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
-   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+#   OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
+#   OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
+#   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
+   OFFMIN=( "-1.e10" )
+   OFFMAX=( "1.e10" )
+   OFFMEA=( 0.0 )
+   CTAOFF="-CTAoffAxisBins"
    DSUF="gamma_cone10/[1-9]"
 else
    OFFMIN=( "-1.e10" )
    OFFMAX=( "1.e10" )
    OFFMEA=( 0.0 )
+   CTAOFF=""
    DSUF="gamma_onSource/[1-9]"
+   TFIL="$TFIL-onAxis"
 fi
 NOFF=${#OFFMIN[@]}
 
@@ -78,7 +84,7 @@ QLOG=$CTA_USER_LOG_DIR/$DATE/MAKETABLES/
 mkdir -p $QLOG
 
 # output directory for shell scripts
-SHELLDIR=$CTA_USER_LOG_DIR"/queueShellDir/"
+SHELLDIR=$CTA_USER_LOG_DIR/$DATE/MAKETABLES/
 mkdir -p $SHELLDIR
 
 # skeleton script
@@ -108,28 +114,23 @@ do
       MEANDIST=${OFFMEA[$M]}
 
 # run scripts
-      FNAM="$SHELLDIR/MSCW.table-$TAFIL-W$MEANDIST-$ARRAY"
+      FNAM="$SHELLDIR/YMSCW.table-$TAFIL-W$MEANDIST-$ARRAY"
+      cp $FSCRIPT.sh $FNAM.sh
 
-      sed -e "s|TABLEFILE|$TAFIL|" $FSCRIPT.sh > $FNAM-1.sh
-      sed -e "s|RECONSTRUCTIONID|$RECID|" $FNAM-1.sh > $FNAM-2.sh
-      rm -f $FNAM-1.sh
-      sed -e "s|WOMIIIIIN|$MINDIST|" $FNAM-2.sh > $FNAM-3.sh
-      rm -f $FNAM-2.sh
-      sed -e "s|WOMEEEEAN|$MEANDIST|" $FNAM-3.sh > $FNAM-4.sh
-      rm -f $FNAM-3.sh
-      sed -e "s|ARRRRRRR|$ARRAY|" $FNAM-4.sh > $FNAM-5.sh
-      rm -f $FNAM-4.sh
-      sed -e "s|WOMAXXXXX|$MAXDIST|" $FNAM-5.sh > $FNAM-6.sh
-      rm -f $FNAM-5.sh
-      sed -e "s|DATADIRECT|$DDIR|" $FNAM-6.sh > $FNAM-7.sh
-      rm -f $FNAM-6.sh
-      sed -e "s|DATASET|$DSET|" $FNAM-7.sh > $FNAM.sh
-      rm -f $FNAM-7.sh
+      sed -i -e "s|TABLEFILE|$TAFIL|" \
+             -e "s|RECONSTRUCTIONID|$RECID|" \
+             -e "s|WOMIIIIIN|$MINDIST|" \
+             -e "s|WOMEEEEAN|$MEANDIST|" \
+             -e "s|ARRRRRRR|$ARRAY|" \
+             -e "s|WOMAXXXXX|$MAXDIST|" \
+             -e "s|DATADIRECT|$DDIR|" \
+             -e "s|DATASET|$DSET|" \
+	     -e "s|CTAOFF|$CTAOFF|" $FNAM.sh
 
       chmod u+x $FNAM.sh
 
 # submit the job
-      qsub -l os="sl*" -l h_cpu=47:45:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -P cta_high -l os="sl*" -l h_cpu=47:45:00 -l h_vmem=16000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 

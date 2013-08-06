@@ -41,6 +41,8 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         string fInterpolateString;
         char readwrite;
 
+	bool  fLimitEnergyReconstruction;
+
 	float fMinRequiredShowerPerBin;    // minimum number of showers required per table bin
 
 	bool  fUseSelectedImagesOnly;
@@ -64,7 +66,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 	unsigned int fTableFillingCut_NImages_min;
 	double       fTableFillingCut_CoreError_max;
 	double       fTableFillingCut_WobbleCut_max;
-        double fmaxlocaldistance;
         double fmaxdist;
         double fminsize;
         double fSelectRandom;
@@ -91,6 +92,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef(VTableLookupRunParameter,20);
+        ClassDef(VTableLookupRunParameter,21);
 };
 #endif

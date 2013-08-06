@@ -273,7 +273,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
             cout << "VDispTable::fillTable error finding tree tpars for telescope " << i+1 << endl;
             continue;
         }
-        Ctpars *c = new Ctpars( t, true, 6, true );
+        Ctpars *c = new Ctpars( t, true, 6, 1 );
         if( !c ) continue;
 
         if( m->fChain->GetEntries() != c->fChain->GetEntries() )
@@ -344,7 +344,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
             cout << "VDispTable::fillTable error finding tree tpars for telescope " << i+1 << endl;
             continue;
         }
-        Ctpars *c = new Ctpars( t, true, 6, true );
+        Ctpars *c = new Ctpars( t, true, 6, 1 );
         if( !c ) continue;
 
         if( m->fChain->GetEntries() != c->fChain->GetEntries() )

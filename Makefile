@@ -351,7 +351,7 @@ endif
 MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
 		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
-		./obj/VEmissionHeightCalculator.o ./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
+		./obj/VEmissionHeightCalculator.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
@@ -362,6 +362,7 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
 		./obj/mscw_energy.o
 ./obj/mscw_energy.o:	./src/mscw_energy.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -796,10 +797,11 @@ writeParticleRateFilesFromEffectiveAreas:	$(WRITECTAPHYSOBJ)
 ########################################################
 # combineLookupTables
 ########################################################
-./obj/combineLookupTables.o:	./src/combineLookupTables.cpp
+./obj/combineLookupTables.o:	./src/combineLookupTables.cpp 
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o
+combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1202,7 +1204,7 @@ $(ctapara):
 	mkdir -p $(ctapara)/AstroData
 	cp -r $(CTA_EVNDISP_AUX_DIR)/AstroData/TeV_data $(ctapara)/AstroData
 	mkdir -p $(ctapara)/DetectorGeometry
-	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod1* $(ctapara)/DetectorGeometry
+	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/prod1 $(ctapara)/DetectorGeometry
 	cp -r $(CTA_EVNDISP_AUX_DIR)/DetectorGeometry/CTA.prod2* $(ctapara)/DetectorGeometry
 	mkdir -p $(ctapara)/GammaHadronCutFiles
 	cp -Lr $(CTA_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANA* $(ctapara)/GammaHadronCutFiles

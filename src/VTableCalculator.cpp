@@ -22,18 +22,17 @@ VTableCalculator::VTableCalculator( int intel, bool iEnergy, bool iPE )
         hVMedian.push_back( 0 );
     }
     hMedian = 0;
-    hMPV = 0;
-    hSigma = 0;
     hMean = 0;
-    hNevents = 0;
 
     Omode = 'r';
+    fwrite = false;
+    if ((Omode=='w')||(Omode=='W')) fwrite = true;
 
     fInterPolWidth = 1;
     fInterPolIter = 3;
 
-    fBinning1DXlow = 0.;
-    fBinning1DXhigh = 1.;
+    fBinning1DXlow = 1.e-5;
+    fBinning1DXhigh = 1.+1.e-5;
     if( fEnergy )
     {
         fBinning1DXlow =  1.;
@@ -77,6 +76,8 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         exit( -1 );
     }
     Omode  = m;
+    fwrite = false;
+    if ((Omode=='w')||(Omode=='W')) fwrite = true;
 
     int i = 0;
     int j = 0;
@@ -84,7 +85,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // table writing
-    if ((Omode=='w')||(Omode=='W'))
+    if( fwrite )
     {
         if( !fOutDir->IsWritable() )
         {
@@ -95,7 +96,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 /* HSTOGRAM BOOKING */
         char htitle[1000];
 // median of variable
-        sprintf( hname, "%s_median_%s", fpara.c_str(), hname_add.c_str() );
+        sprintf( hname, "%s_median_%s", fpara.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (median)", fpara.c_str() );
         hMedian = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
         hMedian->SetXTitle( "log_{10} size" );
@@ -103,17 +104,8 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         if( !fEnergy ) sprintf( htitle, "%s (median) [deg]", fpara.c_str() );
         else           sprintf( htitle, "%s (median) [TeV]", fpara.c_str() );
         hMedian->SetZTitle( htitle );
-// sigma of median (16-84% (2sigma for Gauss))
-        sprintf( hname, "%s_sigma_%s", fpara.c_str(), hname_add.c_str() );
-        sprintf( htitle, "%s vs. dist. vs. log10 size (sigma)", fpara.c_str() );
-        hSigma = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
-        hSigma->SetXTitle( "log_{10} size" );
-        hSigma->SetYTitle( "distance [m]" );
-        if( !fEnergy ) sprintf( htitle, "%s (2xsigma) [deg]", fpara.c_str() );
-        else           sprintf( htitle, "%s (2xsigma) [TeV]", fpara.c_str() );
-        hSigma->SetZTitle( htitle );
 // mean and rms
-        sprintf( hname, "%s_mean_%s", fpara.c_str(), hname_add.c_str() );
+        sprintf( hname, "%s_mean_%s", fpara.c_str(), fHName_Add.c_str() );
         sprintf( htitle, "%s vs. dist. vs. log10 size (mean)", fpara.c_str() );
         hMean = new TProfile2D( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist, fBinning1DXlow, fBinning1DXhigh );
         hMean->SetXTitle( "log_{10} size" );
@@ -121,22 +113,6 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         if( !fEnergy ) sprintf( htitle, "%s (mean) [deg]", fpara.c_str() );
         else           sprintf( htitle, "%s (mean) [TeV]", fpara.c_str() );
         hMean->SetZTitle( htitle );
-// most probable of variable
-        sprintf( hname, "%s_mpv_%s", fpara.c_str(), hname_add.c_str() );
-        sprintf( htitle, "%s vs. dist. vs. log10 size (mpv)", fpara.c_str() );
-        hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
-        hMPV->SetXTitle( "log_{10} size" );
-        hMPV->SetYTitle( "distance [m]" );
-        if( !fEnergy ) sprintf( htitle, "%s (mpv) [deg]", fpara.c_str() );
-        else           sprintf( htitle, "%s (mpv) [TeV]", fpara.c_str() );
-        hMPV->SetZTitle( htitle );
-// number of events
-        sprintf( hname, "%s_nevents_%s", fpara.c_str(), hname_add.c_str() );
-        sprintf( htitle, "%s vs. dist. vs. log10 size (# of events)", fpara.c_str() );
-        hNevents = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
-        hNevents->SetXTitle( "log_{10} size" );
-        hNevents->SetYTitle( "distance [m]" );
-        hNevents->SetZTitle( "# of events/bin" );
 // 1d histograms for variable distribution
         for (i=0;i<NumSize;i++)
         {
@@ -154,16 +130,16 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 
 	if( fUseMedianEnergy == 1)
 	{
-	   sprintf( hname, "%s_median_%s", fpara.c_str(), hname_add.c_str() );
+	   sprintf( hname, "%s_median_%s", fpara.c_str(), fHName_Add.c_str() );
         }
 	else if( fUseMedianEnergy == 2 )
 	{
-	   if( fEnergy ) sprintf( hname, "%s_mpv_%s", fpara.c_str(), hname_add.c_str() );
-	   else          sprintf( hname, "%s_median_%s", fpara.c_str(), hname_add.c_str() );
+	   if( fEnergy ) sprintf( hname, "%s_mpv_%s", fpara.c_str(), fHName_Add.c_str() );
+	   else          sprintf( hname, "%s_median_%s", fpara.c_str(), fHName_Add.c_str() );
 	}
 	else
 	{
-	   sprintf( hname, "%s_mean_%s", fpara.c_str(), hname_add.c_str() );
+	   sprintf( hname, "%s_mean_%s", fpara.c_str(), fHName_Add.c_str() );
         }
 	hMedianName = hname;
     }
@@ -198,6 +174,7 @@ bool VTableCalculator::create1DHistogram( int i, int j )
         double id2 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 ) + hMedian->GetYaxis()->GetBinWidth( j+1 );
         sprintf( histitle, "%.2f < log10 size < %.2f, %.1f < r < %.1f (%s)", is1, is2, id1, id2, fHName_Add.c_str() );
 	Oh[i][j] = new TH1F(hisname,histitle,HistBins,fBinning1DXlow,fBinning1DXhigh);
+	Oh[i][j]->SetXTitle( fName.c_str() );
    }
    else
    {
@@ -246,7 +223,7 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
 /////////////////////////////////////////////////////////////////////////////////////////////
 // table writing
 /////////////////////////////////////////////////////////////////////////////////////////////
-    if( Omode=='w' || Omode=='W' )
+    if( fwrite )
     {
         TDirectory *iDir1D = 0;
 // make output directory for 1D histograms
@@ -255,7 +232,38 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
             iDir1D = fOutDir->mkdir( "histos1D" );
         }
 
-/* EVALUATION OF HISTOGRAMS */
+///////////////////////////////////
+// 2D histograms
+// number of events
+        char hname[1000];
+        char htitle[1000];
+        sprintf( hname, "%s_nevents_%s", fName.c_str(), fHName_Add.c_str() );
+        sprintf( htitle, "%s vs. dist. vs. log10 size (# of events)", fName.c_str() );
+        TH2F *hNevents = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
+        hNevents->SetXTitle( "log_{10} size" );
+        hNevents->SetYTitle( "distance [m]" );
+        hNevents->SetZTitle( "# of events/bin" );
+// most probable of variable
+        sprintf( hname, "%s_mpv_%s", fName.c_str(), fHName_Add.c_str() );
+        sprintf( htitle, "%s vs. dist. vs. log10 size (mpv)", fName.c_str() );
+        TH2F *hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
+        hMPV->SetXTitle( "log_{10} size" );
+        hMPV->SetYTitle( "distance [m]" );
+        if( !fEnergy ) sprintf( htitle, "%s (mpv) [deg]", fName.c_str() );
+        else           sprintf( htitle, "%s (mpv) [TeV]", fName.c_str() );
+        hMPV->SetZTitle( htitle );
+// sigma of median (16-84% (2sigma for Gauss))
+        sprintf( hname, "%s_sigma_%s", fName.c_str(), fHName_Add.c_str() );
+        sprintf( htitle, "%s vs. dist. vs. log10 size (sigma)", fName.c_str() );
+        TH2F *hSigma = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset+NumSize*amp_delta, NumDist, 0., dist_delta*NumDist );
+        hSigma->SetXTitle( "log_{10} size" );
+        hSigma->SetYTitle( "distance [m]" );
+        if( !fEnergy ) sprintf( htitle, "%s (2xsigma) [deg]", fName.c_str() );
+        else           sprintf( htitle, "%s (2xsigma) [TeV]", fName.c_str() );
+        hSigma->SetZTitle( htitle );
+
+///////////////////////////////////
+// EVALUATION OF HISTOGRAMS 
 	cout << "\t msc tables: evaluating " << fName << " histograms ";
 
         float med = 0.;
@@ -268,6 +276,7 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
 	double i_a[] = { 0.16, 0.5, 0.84 };
 	double i_b[] = { 0.0,  0.0, 0.0  };
 
+// loop over all size bin and distance bins
         for( int i = 0; i < NumSize; i++ )
         {
             for( int j = 0; j < NumDist; j++ )
@@ -309,26 +318,84 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
                     iDir1D->cd();
                     Oh[i][j]->Write();
                 }
+		delete Oh[i][j];
             }
         }
 // write 2D histograms to file
-        if( fOutDir )
+        if( fOutDir && hNevents->GetEntries() > 0 )
         {
             fOutDir->cd();
             if( xtitle && hMedian )   hMedian->SetTitle( xtitle );
             if( xtitle && hMPV )      hMPV->SetTitle( xtitle );
             if( hNevents && hMedian ) hMedian->SetEntries( hNevents->GetEntries() );
             if( hNevents && hSigma )  hSigma->SetEntries( hNevents->GetEntries() );
-            if( hMedian )  hMedian->Write();
-            if( hMPV )     hMPV->Write();
-            if( hSigma )   hSigma->Write();
-            if( hMean )    hMean->Write();
-            if( hNevents ) hNevents->Write();
-            if( hMedian ) cout << "(" << hMedian->GetEntries() << " entries)";
+// reduce size of the 2D histograms
+            TH2F *h = 0;
+	    string n = hMedian->GetName();
+	    h = VHistogramUtilities::reduce2DHistogramSize( hMedian, n + "_new" );
+	    if( h && hMedian )
+	    {
+               cout << "(" << hMedian->GetEntries() << " entries)";
+	       delete hMedian;
+	       if( h ) 
+	       {
+		  h->SetName( n.c_str() );
+	          h->Write();
+               }
+	       delete h;
+            }
+	    n = hMPV->GetName();
+	    h = VHistogramUtilities::reduce2DHistogramSize( hMPV, n + "_new" );
+	    if( h && hMPV )
+	    {
+	       delete hMPV;
+	       if( h )
+	       {
+		  h->SetName( n.c_str() );
+	          h->Write();
+               }
+	       delete h;
+            }
+	    n = hSigma->GetName();
+	    h = VHistogramUtilities::reduce2DHistogramSize( hSigma, n + "_new" );
+	    if( h && hSigma )
+	    {
+	       delete hSigma;
+	       if( h )
+	       {
+		  h->SetName( n.c_str() );
+	          h->Write();
+               }
+	       delete h;
+            }
+	    n = hMean->GetName();
+	    h = VHistogramUtilities::reduce2DHistogramSize( hMean, n + "_new" );
+	    if( h && hMean )
+	    {
+	       delete hMean;
+	       if( h )
+	       {
+		  h->SetName( n.c_str() );
+	          h->Write();
+               }
+	       delete h;
+            }
+	    n = hNevents->GetName();
+	    h = VHistogramUtilities::reduce2DHistogramSize( hNevents, n + "_new" );
+	    if( h && hNevents )
+	    {
+	       delete hNevents;
+	       if( h )
+	       {
+		  h->SetName( n.c_str() );
+	          h->Write();
+               }
+	       delete h;
+            }
             cout << endl;
         }
+	else cout << "(no entries)" << endl;
     }
-
 }
 
 
@@ -373,59 +440,51 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // therefore: ntel = number of telescopes of same type 
 // (fill one mscw table for each telescope type)
 ///////////////////////////////////////////////////////////////////////////////////////
-    if( Omode=='w' || Omode=='W' )
+    if( fwrite )
     {
+        int i_Oh_size = (int)Oh.size();
 // don't allow zero or negative weights
         if( chi2 <= 0. ) return -99.;
 // loop over all telescopes
+        double i_logs = 0.;
         for( tel = 0; tel < ntel; tel++ )
         {
-            if( r[tel] >= 0. && s[tel] > 0. )
+            if( s[tel] > 0. && r[tel] >= 0. && w[tel] > fBinning1DXlow && w[tel] < fBinning1DXhigh )
             {
-// remove images with width/length 0, invalid energies
-                if( w[tel] < 1.e-5 ) continue;
 // check limits (to avoid under/overflows)
-                if( log10( s[tel] ) > hMedian->GetXaxis()->GetXmax() ) continue;
-                if( log10( s[tel] ) < hMedian->GetXaxis()->GetXmin() ) continue;
 		if( r[tel] > hMedian->GetYaxis()->GetXmax() ) continue;
-		if( r[tel] < hMedian->GetYaxis()->GetXmin() ) continue;
+                i_logs = log10( s[tel] );
+                if( i_logs > hMedian->GetXaxis()->GetXmax() ) continue;
+
 
 // calculate log energy (translate from TeV to GeV)
-		int is = hMedian->GetXaxis()->FindBin( log10( s[tel] ) ) - 1;
+		int is = hMedian->GetXaxis()->FindBin( i_logs ) - 1;
 		int ir = hMedian->GetYaxis()->FindBin( r[tel] ) - 1;
 // reject showers in the first size bin
-                if( ir >= 0 && is >= 0 && is < (int)Oh.size() && ir < (int)Oh[is].size() )
+                if( ir >= 0 && is >= 0 && is < i_Oh_size && ir < (int)Oh[is].size() )
                 {
 		    if( !Oh[is][ir] )
 		    {
 		       if( !create1DHistogram( is, ir ) ) continue;
                     }
-// check limits (to avoid under/overflows)
-                    if( w[tel] < Oh[is][ir]->GetXaxis()->GetXmin() || w[tel] > Oh[is][ir]->GetXaxis()->GetXmax() ) continue;
 // fill width/length/energy into a 1D and 2D histogram
 // (chi2 is here an external weight (from e.g. spectral weighting))
                     Oh[is][ir]->Fill( w[tel], chi2 );
-                    hMean->Fill( log10(s[tel]), r[tel], w[tel] * chi2 );
-                }
-		else
-		{
-		   cout << "VTableCalculator::calc(): warning index out of range: ";
-		   cout << is << "\t" << ir << "\t";
-		   cout << Oh.size() << "\t";
-		   if( is >= 0 && is < (int)Oh.size() ) cout << Oh[is].size();
-		   cout << endl;
+                    hMean->Fill( i_logs, r[tel], w[tel] * chi2 );
                 }
             }
         }
         return -99.;
     }
-////////////////////////////
-    else
-    {
+/////////////////////////////////////////////////////////
+// END OF writing/filling lookup tables
+/////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 // read table
 // compute mean or mean scaled width/length value
 //
+    else
+    {
 
 // tables are accessed for the first time: get the from the file
         if( !fReadHistogramsFromFile )
@@ -531,7 +590,11 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                         {
 // store energy per telescope
 			    energy_tel.push_back( med );
-			    sigma2_tel.push_back( 1./(sigma*sigma) );
+// use relative error as weighting (otherwise: significant bias towards lower energies
+			    sigma2_tel.push_back( med/(sigma*sigma) );
+// add addional weight for events inside or outside the light pool
+			    if( r[tel] < 140. ) sigma2_tel.back() = sigma2_tel.back()*100.;
+			    else                sigma2_tel.back() = sigma2_tel.back()*100.*exp( -1.*(r[tel]-140.)/50.);
                         }
 			else
 			{
@@ -699,27 +762,16 @@ TH2F* VTableCalculator::getHistoMedian()
 }
 
 
-TH2F* VTableCalculator::getHistoSigma()
-{
-    if( !fReadHistogramsFromFile ) fReadHistogramsFromFile = readHistograms();
-
-    return hSigma;
-}
-
-
 bool VTableCalculator::readHistograms()
 {
     if( fOutDir )
     {
         hMedian = (TH2F*)fOutDir->Get( hMedianName.c_str() );
 
-        return true;
+        if( hMedian ) return true;
+	else          return false;
     }
-    if( !hMedian )
-    {
-        cout << "VTableCalculator error: table histograms not found in " << fOutDir->GetPath() << endl;
-        exit( -1 );
-    }
+    hMedian = 0;
     return false;
 }
 
