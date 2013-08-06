@@ -64,7 +64,8 @@ class VCamera
         double fmaxPlot;                          //!< relative size of camera (0.5 = full canvas)
         double fmaxRad;                           //!< relativ maximum of radius for inner ellipses (1=maximum = radius of fgraphTubes)
         double fScaleMax;
-        double fdist_edge;                        //!< maximum distance from canvas center to edge of camera
+        double fdist_edgeX;                        //!< maximum distance from canvas center to edge of camera
+        double fdist_edgeY;                        //!< maximum distance from canvas center to edge of camera
 	double fmax_dist_edge;
         unsigned int fEventCounter;               //!< event number
         int fTubeSelected;                        //!< number of mouse pointer selected channel (-1=nothing selected)
@@ -121,9 +122,8 @@ class VCamera
         bool fAnaVis;                             //!< for pedestrians....
         bool fPlotPaper;                          //!< nicer plot for papers, no small text, no dead channels
 
-        double         convertX( double );        //!< convert from camera to canvas coordinates
-        double         convertY( double );        //!< convert from camera to canvas coordinates
-        double         convertScale( double );    //!< convert from camera to canvas coordinates
+        double         convertX( double x, double iOffSet = 0.5 );        //!< convert from camera to canvas coordinates
+        double         convertY( double y, double iOffSet = 0.5 );        //!< convert from camera to canvas coordinates
         void           drawMuonResults();         //!< draw muon analysis results Martin
         void           drawAnaResults();          //!< draw analysis results in form of ellipse
         void           drawEventText();           //!< draw basic event info and analysis results

@@ -83,21 +83,27 @@ void VCamera::setUpCamera()
 
 
 // get maximum distance of tubes from centre, rescale to canvas NDC
-    fdist_edge = 0.;
+    fdist_edgeX = 0.;
+    fdist_edgeY = 0.;
     for( unsigned int i = 0; i < fData->getDetectorGeo()->getNumChannels(); i++ )
     {
-        if( fData->getDetectorGeo()->getOuterEdgeDistance( i ) > fdist_edge )
-        {
-            fdist_edge = fData->getDetectorGeo()->getOuterEdgeDistance( i );
+        if( TMath::Abs( fData->getDetectorGeo()->getX()[i] ) +fData->getDetectorGeo()->getTubeRadius()[i] > fdist_edgeX ) 
+	{
+	   fdist_edgeX = TMath::Abs( fData->getDetectorGeo()->getX()[i] )+fData->getDetectorGeo()->getTubeRadius()[i];
+        }
+        if( TMath::Abs( fData->getDetectorGeo()->getY()[i] ) +fData->getDetectorGeo()->getTubeRadius()[i] > fdist_edgeY ) 
+	{
+	   fdist_edgeY = TMath::Abs( fData->getDetectorGeo()->getY()[i] )+fData->getDetectorGeo()->getTubeRadius()[i];
         }
     } 
     fmax_dist_edge = fData->getDetectorGeo()->getMaximumFOV_deg();
+    cout << "FOV PLOT " << fTelescope+1 << "\t" <<  fdist_edgeX << "\t" << fdist_edgeY << "\t" << fmax_dist_edge << endl;
 
 // array with pmt data (rescaled data)
     fPMTData.resize( int(fData->getDetectorGeo()->getNumChannels()), 0. );
 
 // rescale to canvas NDC, shift coordinate system by 0.5
-    double x,y,r;
+    double x,y,rx, ry;
     char c_number[100];
 /*! Attention:
     there are maybe more channels defined in the camera layout than there
@@ -112,7 +118,8 @@ void VCamera::setUpCamera()
 // calculate new coordinates in canvas system (shifted by 0.5 to center of canvas)
         x = convertX( fData->getDetectorGeo()->getX()[i] );
         y = convertY( fData->getDetectorGeo()->getY()[i] );
-        r = convertScale( fData->getDetectorGeo()->getTubeRadius()[i] );
+        rx = convertX( fData->getDetectorGeo()->getTubeRadius()[i], 0. );
+        ry = convertY( fData->getDetectorGeo()->getTubeRadius()[i], 0. );
         if( sqrt( fData->getDetectorGeo()->getX()[i]*fData->getDetectorGeo()->getX()[i] 
 	        + fData->getDetectorGeo()->getY()[i]*fData->getDetectorGeo()->getY()[i] ) > iMaxDist )
 	{
@@ -121,13 +128,13 @@ void VCamera::setUpCamera()
 			  + fData->getDetectorGeo()->getTubeRadius()[i];
         }
 // PMTs (outer shell)
-        fgraphTubes.push_back(  new TEllipse( x, y, r, r ) );
+        fgraphTubes.push_back(  new TEllipse( x, y, rx, ry ) );
         fgraphTubes.back()->SetFillColor( fColorEmpty );
         fgraphTubes.back()->SetFillStyle( 4000 );
         fgraphTubes.back()->SetUniqueID( 200000 + i );
         fgraphTubes.back()->SetLineColor( 15 );
 // PMT values
-        fgraphTubesEntry.push_back( new TEllipse( x, y, r * fmaxRad * 0.5, r * fmaxRad * 0.5 ) );
+        fgraphTubesEntry.push_back( new TEllipse( x, y, rx * fmaxRad * 0.5, ry * fmaxRad * 0.5 ) );
         fgraphTubesEntry.back()->SetLineColor( 10 );
         fgraphTubesEntry.back()->SetFillColor( 10 );
         fgraphTubesEntry.back()->SetFillStyle( 4000 );
@@ -154,11 +161,12 @@ void VCamera::setUpCamera()
     }
 // size of camera
 // (from edge of outermost pixels)
-    fCameraOuterEdge = new TEllipse( convertX( 0. ), convertY( 0. ), convertScale( iMaxDist ) );
+    fCameraOuterEdge = new TEllipse( convertX( 0. ), convertY( 0. ), convertX( iMaxDist, 0. ), convertY( iMaxDist, 0. ) );
     fCameraOuterEdge->SetLineWidth( 2 );
     fCameraOuterEdge->SetFillStyle( 0 );
 // (from FOV entry in detector geometry)
-    fCameraFOV = new TEllipse( convertX( 0. ), convertY( 0. ), convertScale( fData->getDetectorGeo()->getFieldofView()[getTelescopeNumber()]/2. ) );
+    fCameraFOV = new TEllipse( convertX( 0. ), convertY( 0. ), convertX( fData->getDetectorGeo()->getFieldofView()[getTelescopeNumber()]/2., 0. ),
+                                                               convertY( fData->getDetectorGeo()->getFieldofView()[getTelescopeNumber()]/2., 0. ) );
     fCameraFOV->SetLineWidth( 2 );
     fCameraFOV->SetLineColor( 14 );
     fCameraFOV->SetLineStyle( 2 );
@@ -238,14 +246,14 @@ void VCamera::setUpCamera()
     fTextEventPlotPaper->SetTextFont( 42 );
     fTextEventPlotPaper->SetTextSize( i_TextSize * 2 );
 // camera scale axis (left+top)
-    fCameraXaxis = new TGaxis( convertX( -1.* fdist_edge ) , 0.97, convertX( fdist_edge ), 0.97, -1.*fdist_edge, fdist_edge, 510, "+L" );
+    fCameraXaxis = new TGaxis( convertX( -1.* fdist_edgeX ) , 0.97, convertX( fdist_edgeX ), 0.97, -1.*fdist_edgeX, fdist_edgeX, 510, "+L" );
     fCameraXaxis->SetLabelSize( 0.02 );
     fCameraXaxis->SetLineColor(42);
     fCameraXaxis->SetLabelColor(42);
-    fCameraYaxis = new TGaxis( 0.96, convertY( -1. * fdist_edge ) , 0.96, convertY( fdist_edge ), -1. * fdist_edge, fdist_edge, 510, "+L" );
+    fCameraYaxis = new TGaxis( 0.96, convertY( -1. * fdist_edgeY ) , 0.96, convertY( fdist_edgeY ), -1. * fdist_edgeY, fdist_edgeY, 510, "+L" );
     fCameraYaxis->SetLabelSize( 0.02 );
-    fCameraYaxis->SetLineColor(42);
-    fCameraYaxis->SetLabelColor(42);
+    fCameraYaxis->SetLineColor(43);
+    fCameraYaxis->SetLabelColor(43);
 // theta2 circles for all in one
     for( int t = 0; t < 2*(int)iMaxDist; t++ ) fTheta2Circle.push_back( new TEllipse( 0., 0., t*0.5 ) );
 }
@@ -392,8 +400,8 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 	{
 	    if( fBoolAllinOne ) 
 	    {
-	       fCameraFOV->SetR1( convertScale( fData->getDetectorGeo()->getMaximumFOV_deg() ) );
-	       fCameraFOV->SetR2( convertScale( fData->getDetectorGeo()->getMaximumFOV_deg() ) );
+	       fCameraFOV->SetR1( convertX( fData->getDetectorGeo()->getMaximumFOV_deg(), 0. ) );
+	       fCameraFOV->SetR2( convertY( fData->getDetectorGeo()->getMaximumFOV_deg(), 0. ) );
             }
 	    else 
 	    {
@@ -461,8 +469,8 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 fTheta2Circle[t]->SetLineColor( 9 );
                 fTheta2Circle[t]->SetX1( convertX(0.) );
                 fTheta2Circle[t]->SetY1( convertY(0.) );
-                fTheta2Circle[t]->SetR1( convertScale(0.5*(t+1)) );
-                fTheta2Circle[t]->SetR2( convertScale(0.5*(t+1)) );
+                fTheta2Circle[t]->SetR1( convertX(0.5*(t+1), 0.) );
+                fTheta2Circle[t]->SetR2( convertY(0.5*(t+1), 0.) );
                 fTheta2Circle[t]->SetFillStyle( 4000 );
                 fTheta2Circle[t]->Draw();
             }
@@ -1056,26 +1064,26 @@ void VCamera::drawMuonResults()
 // transform to local pad coordinates
         fAnaEllipse->SetX1( convertX( fData->getImageParameters()->muonX0 ) );
         fAnaEllipse->SetY1( convertY( fData->getImageParameters()->muonY0 ) );
-        fAnaEllipse->SetR1( convertScale( fData->getImageParameters()->muonRadius ) );
-        fAnaEllipse->SetR2( convertScale( fData->getImageParameters()->muonRadius ) );
+        fAnaEllipse->SetR1( convertX( fData->getImageParameters()->muonRadius, 0. ) );
+        fAnaEllipse->SetR2( convertY( fData->getImageParameters()->muonRadius, 0. ) );
         fAnaEllipse->SetTheta( 0 );
         fAnaEllipse->Draw();
 
         fAnaEllipse1->SetX1( convertX( fData->getImageParameters()->muonX0 ) );
         fAnaEllipse1->SetY1( convertY( fData->getImageParameters()->muonY0 ) );
-        fAnaEllipse1->SetR1( convertScale( fData->getImageParameters()->muonRadius -
-            fData->getImageParameters()->muonRSigma    ) );
-        fAnaEllipse1->SetR2( convertScale( fData->getImageParameters()->muonRadius -
-            fData->getImageParameters()->muonRSigma    ) );
+        fAnaEllipse1->SetR1( convertX( fData->getImageParameters()->muonRadius -
+            fData->getImageParameters()->muonRSigma, 0.    ) );
+        fAnaEllipse1->SetR2( convertY( fData->getImageParameters()->muonRadius -
+            fData->getImageParameters()->muonRSigma, 0.    ) );
         fAnaEllipse1->SetTheta( 0 );
         fAnaEllipse1->Draw();
 
         fAnaEllipse2->SetX1( convertX( fData->getImageParameters()->muonX0 ) );
         fAnaEllipse2->SetY1( convertY( fData->getImageParameters()->muonY0 ) );
-        fAnaEllipse2->SetR1( convertScale( fData->getImageParameters()->muonRadius +
-            fData->getImageParameters()->muonRSigma    ) );
-        fAnaEllipse2->SetR2( convertScale( fData->getImageParameters()->muonRadius +
-            fData->getImageParameters()->muonRSigma    ) );
+        fAnaEllipse2->SetR1( convertX( fData->getImageParameters()->muonRadius +
+            fData->getImageParameters()->muonRSigma, 0.    ) );
+        fAnaEllipse2->SetR2( convertY( fData->getImageParameters()->muonRadius +
+            fData->getImageParameters()->muonRSigma, 0.    ) );
         fAnaEllipse2->SetTheta( 0 );
         fAnaEllipse2->Draw();
 
@@ -1120,8 +1128,8 @@ void VCamera::drawAnaResults()
 // transform to local pad coordinates
         fAnaEllipse->SetX1( convertX( fData->getImageParameters()->cen_x ) );
         fAnaEllipse->SetY1( convertY( fData->getImageParameters()->cen_y ) );
-        fAnaEllipse->SetR1( convertScale( fData->getImageParameters()->length ) );
-        fAnaEllipse->SetR2( convertScale( fData->getImageParameters()->width ) );
+        fAnaEllipse->SetR1( convertX( fData->getImageParameters()->length, 0. ) );
+        fAnaEllipse->SetR2( convertY( fData->getImageParameters()->width, 0. ) );
         fAnaEllipse->SetTheta( fData->getImageParameters()->phi * 180. / TMath::Pi() );
         if( fBoolAllinOne )
 	{
@@ -1135,8 +1143,8 @@ void VCamera::drawAnaResults()
         fAnaEllipse->Draw();
         fAnaEllipse1->SetX1( convertX( fData->getImageParameters()->cen_x ) );
         fAnaEllipse1->SetY1( convertY( fData->getImageParameters()->cen_y ) );
-        fAnaEllipse1->SetR1( convertScale( 2.*fData->getImageParameters()->length ) );
-        fAnaEllipse1->SetR2( convertScale( 2.*fData->getImageParameters()->width ) );
+        fAnaEllipse1->SetR1( convertX( 2.*fData->getImageParameters()->length, 0. ) );
+        fAnaEllipse1->SetR2( convertY( 2.*fData->getImageParameters()->width, 0. ) );
         fAnaEllipse1->SetTheta( fData->getImageParameters()->phi * 180. / TMath::Pi() );
         if( fBoolAllinOne )
 	{
@@ -1166,8 +1174,8 @@ void VCamera::drawAnaResults()
         {
             fAnaEllipseLL->SetX1( convertX( fData->getImageParametersLogL()->cen_x ) );
             fAnaEllipseLL->SetY1( convertY( fData->getImageParametersLogL()->cen_y ) );
-            fAnaEllipseLL->SetR1( convertScale( fData->getImageParametersLogL()->length ) );
-            fAnaEllipseLL->SetR2( convertScale( fData->getImageParametersLogL()->width ) );
+            fAnaEllipseLL->SetR1( convertX( fData->getImageParametersLogL()->length, 0. ) );
+            fAnaEllipseLL->SetR2( convertY( fData->getImageParametersLogL()->width, 0. ) );
             fAnaEllipseLL->SetTheta( fData->getImageParametersLogL()->phi * 180. / TMath::Pi() );
 // draw different line style if fit didn't worked well
             if( fData->getImageParametersLogL()->Fitstat < 3 ) fAnaEllipseLL->SetLineStyle( 2 );
@@ -1312,7 +1320,7 @@ void VCamera::drawAnaResults()
 	     fCameraCentreDir = new TMarker( convertX( 0. ), convertY( 0. ), 5 );
 	     fCameraCentreDir->Draw();
 // draw 0.5 deg circle
-	     fCameraCentreEllipse = new TEllipse( convertX( 0. ), convertY( 0. ), convertScale( 0.5 ), convertScale( 0.5 ) );
+	     fCameraCentreEllipse = new TEllipse( convertX( 0. ), convertY( 0. ), convertX( 0.5, 0. ), convertY( 0.5, 0. ) );
 	     fCameraCentreEllipse->SetLineStyle( 3 );
 	     fCameraCentreEllipse->SetFillStyle( 0 );
 	     fCameraCentreEllipse->Draw();
@@ -1534,28 +1542,21 @@ void VCamera::getMinMax( valarray<double>& i_val, double& imin, double& imax )
 }
 
 
-double VCamera::convertX( double i_x )
+double VCamera::convertX( double i_x, double i_off )
 {
-    double iDist_edge = fdist_edge;
+    double iDist_edge = fdist_edgeX;
     if( fBoolAllinOne ) iDist_edge = fmax_dist_edge * 0.9;
     if( iDist_edge == 0. ) return 0.;
-    return (i_x / iDist_edge * fmaxPlot + 0.5);
+    return (i_x / iDist_edge * fmaxPlot + i_off );
 }
 
 
-double VCamera::convertY( double i_y )
+double VCamera::convertY( double i_y, double i_off )
 {
-    double iDist_edge = fdist_edge;
+    double iDist_edge = fdist_edgeY;
     if( fBoolAllinOne ) iDist_edge = fmax_dist_edge * 0.9;
     if( iDist_edge == 0. ) return 0.;
-    return ( i_y / iDist_edge * fmaxPlot + 0.5);
+    return ( i_y / iDist_edge * fmaxPlot + i_off);
 }
 
 
-double VCamera::convertScale( double i_s )
-{
-    double iDist_edge = fdist_edge;
-    if( fBoolAllinOne ) iDist_edge = fmax_dist_edge * 0.9;
-    if( iDist_edge == 0. ) return 0.;
-    return (i_s / iDist_edge * fmaxPlot);
-}

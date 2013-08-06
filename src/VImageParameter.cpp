@@ -173,7 +173,7 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
 
 // log likelihood fit errors/results
 
-    if( fShortTree < 1 ) tpars->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
+    tpars->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
     if( iLL )
     {
                                                   // number of dead tube values estimated by fit

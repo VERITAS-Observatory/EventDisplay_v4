@@ -1217,7 +1217,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	        if( iUseSums2 ) fll_Sums.push_back( fData->getSums2()[j] );
 		else            fll_Sums.push_back( fData->getSums()[j] ); 
             }
-	    else                                               fll_Sums.push_back( 0. );
+	    else                                               fll_Sums.push_back( 0.1 );
 	    if( fll_Sums.back() > i_sumMax ) i_sumMax = fll_Sums.back();
         }
     }
@@ -1323,14 +1323,29 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 
 // estimate shower size
 // integrate over all bins to get fitted size
+    bool   iWidthResetted = false;
     float  iSize = fParGeo->size;
     if( iUseSums2 ) iSize = fParGeo->size2;
-    if( fParLL->Fitstat > 2 )
+    if( fParLL->Fitstat > 0 )
     {
 // assume that all pixel are of the same size
 	unsigned int iCentreTube = fData->getDetectorGeo()->getCameraCentreTubeIndex();
 	if( iCentreTube < 9999 )
 	{
+// make sure that width is not close to zero (can happen when all pixels are on a line)
+	   if( fData->getDetectorGeo()->getTubeRadius().size() > iCentreTube && fData->getDetectorGeo()->getTubeRadius()[iCentreTube] > 0. )
+	   {
+	      if( sigmaX < fData->getDetectorGeo()->getTubeRadius()[iCentreTube]*0.1 )
+	      {
+		 sigmaX = fData->getDetectorGeo()->getTubeRadius()[iCentreTube]*0.1;
+		 iWidthResetted = true;
+	      }
+	      if( sigmaY < fData->getDetectorGeo()->getTubeRadius()[iCentreTube]*0.1 )
+	      {
+		 sigmaY = fData->getDetectorGeo()->getTubeRadius()[iCentreTube]*0.1;
+		 iWidthResetted = true;
+	      }
+           }
 	   double cen_x_recentered = 0.;
 	   double cen_y_recentered = 0.;
 	   if( fData->getDetectorGeo()->getTubeRadius().size() > iCentreTube && fData->getDetectorGeo()->getTubeRadius()[iCentreTube] > 0. )
@@ -1470,10 +1485,21 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     fParLL->cen_y = cen_y;
     fParLL->length = length;
     fParLL->width = width;
-    if( iUseSums2 ) fParLL->size2LL = fParGeo->size2;
-    else            fParLL->sizeLL =  fParGeo->size;
-    if( iUseSums2 ) fParLL->size2 = iSize;
-    else            fParLL->size = iSize;
+    fParLL->size2LL = fParGeo->size2;
+    fParLL->sizeLL =  fParGeo->size;
+    if( iUseSums2 )
+    {
+       if( iWidthResetted ) fParLL->size2 = fParGeo->size2;
+       else                 fParLL->size2 = iSize;
+       fParLL->size = fParGeo->size;
+    }
+    else
+    {
+       if( iWidthResetted ) fParLL->size = fParGeo->size;
+       else                 fParLL->size = iSize;
+       fParLL->size2 = fParGeo->size2;
+    }
+    cout << fParLL->size2 << "\t" << fParLL->size << "\t" << iSize << "\t" << fParGeo->size2 << "\t" << fParGeo->size << endl;
     fParLL->dist = dist;
     fParLL->azwidth = -1.;                        // !!!!!!!!!!!!!! to tired for calculation
     fParLL->alpha = alpha * TMath::RadToDeg();
@@ -1680,7 +1706,6 @@ void get_LL_imageParameter_2DGauss( Int_t &npar, Double_t *gin, Double_t &f, Dou
                 sum += ( y - par[3] ) * ( y - par[3] ) / par[4] / par[4];
                 sum += -2. * par[0] * ( x - par[1] ) / par[2] * ( y - par[3] ) / par[4];
                 sum  = rho_s * exp( sum * rho_1 );
-
 
 // assume Poisson fluctuations (neglecting background noise)
                 if( n > 0. && sum > 0. ) LL += n * log(sum) - sum - n * log(n) + n;

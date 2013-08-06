@@ -1004,13 +1004,13 @@ bool VCameraRead::makeNeighbourList()
 
 float VCameraRead::getOuterEdgeDistance( unsigned int i )
 {
-    if( i > fXTube[fTelID].size()-1 )
+    if( i > getX().size()-1 )
     {
-        cout << "VCameraRead::getOuterEdgeDistance(): channel index out of range, " << i << "\t" << fXTube[fTelID].size() << endl;
+        cout << "VCameraRead::getOuterEdgeDistance(): channel index out of range, " << i << "\t" << getX().size() << endl;
         return 0.;
     }
 
-    double iDist = sqrt( fXTube[fTelID][i] * fXTube[fTelID][i] + fYTube[fTelID][i] * fYTube[fTelID][i] );
+    double iDist = sqrt( getX()[i] * getX()[i] + getY()[i] * getY()[i] );
     iDist += fRTube[fTelID][i];
 
     return iDist;
