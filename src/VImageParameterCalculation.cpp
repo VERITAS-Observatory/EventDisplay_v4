@@ -1592,7 +1592,8 @@ double VImageParameterCalculation::redang( double iangle, double iMax )
 
     For a perfect image this is 1, for many cosmic rays this is < 1
 */
-double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( double cen_x, double cen_y, double width, double length, double cosphi, double sinphi )
+double VImageParameterCalculation::getFractionOfImageBorderPixelUnderImage( double cen_x, double cen_y, double width, double length, 
+                                                                            double cosphi, double sinphi )
 {
     float i_ImageCoverFactor = 2.;
     if( fData ) i_ImageCoverFactor = fData->getRunParameter()->fImageAnalysisFUIFactor;

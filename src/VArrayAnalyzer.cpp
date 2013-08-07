@@ -1364,7 +1364,8 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
             cosphi.push_back( cos( i_phi ) );
             if(  getImageParameters( getRunParameter()->fImageLL )->length > 0. )
             {
-                l.push_back( getImageParameters( getRunParameter()->fImageLL )->width / getImageParameters( getRunParameter()->fImageLL )->length );
+                l.push_back( getImageParameters( getRunParameter()->fImageLL )->width /
+		             getImageParameters( getRunParameter()->fImageLL )->length );
             }
             else
             {
@@ -1409,6 +1410,7 @@ void VArrayAnalyzer::prepareforCoreReconstruction( unsigned int iMethodIndex, fl
     x.clear(); y.clear(); m.clear(); w.clear();
     float i_cen_x = 0.;
     float i_cen_y = 0.;
+    float i_weight = 0.;
     for ( unsigned int tel = 0; tel < getNTel(); tel++ )
     {
         setTelID( tel );
@@ -1416,7 +1418,10 @@ void VArrayAnalyzer::prepareforCoreReconstruction( unsigned int iMethodIndex, fl
         {
             x.push_back( xtelnew[tel] );          /* telescope locations */
             y.push_back( ytelnew[tel] );
-            w.push_back( getImageParameters( getRunParameter()->fImageLL )->size );
+	    i_weight  = getImageParameters( getRunParameter()->fImageLL )->size;
+	    i_weight *= ( 1. - getImageParameters( getRunParameter()->fImageLL )->width /
+	                     getImageParameters( getRunParameter()->fImageLL )->length );
+            w.push_back( i_weight * i_weight );
             i_cen_x = getImageParameters( getRunParameter()->fImageLL )->cen_x - xs;
             i_cen_y = getImageParameters( getRunParameter()->fImageLL )->cen_y - ys;
 ///////////////////////////////

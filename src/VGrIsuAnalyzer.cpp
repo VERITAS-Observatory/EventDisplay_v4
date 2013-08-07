@@ -191,7 +191,8 @@ void VGrIsuAnalyzer::mtxmlt(float a[3][3], float b[3], float c[3])
 /**/
 //:Reconst:rcs_perpendicular_fit
 /***************** rcs_perpendicular_fit *********************************/
-int VGrIsuAnalyzer::rcs_perpendicular_fit(vector<float> x, vector<float> y, vector<float> w, vector<float> m, unsigned int num_images, float *sx, float *sy, float *std)
+int VGrIsuAnalyzer::rcs_perpendicular_fit(vector<float> x, vector<float> y, vector<float> w, vector<float> m,
+                                          unsigned int num_images, float *sx, float *sy, float *std)
 /*
 RETURN= 0 if no faults
 ARGUMENT=x[10]     = x coor of point on line
