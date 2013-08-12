@@ -114,6 +114,7 @@ void VGammaHadronCutsStatistics::printCutStatistics()
    {
       cout << "\t\t" << fCutName[i] << "\t";
       if( i < fCutCounter.size() ) cout << fCutCounter[i] << endl;
+      else                         cout << "no cut defined" << endl;
    }
    cout << endl;
 }

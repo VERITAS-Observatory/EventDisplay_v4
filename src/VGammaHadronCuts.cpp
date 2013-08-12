@@ -699,7 +699,11 @@ void VGammaHadronCuts::printDirectionCuts()
     else if( fIRFAngRes || fDirectionCutSelector == 2 )
     {
         cout << "Direction cut from IRF graph " << endl;
-	if( fIRFAngRes ) fIRFAngRes->Print();
+	if( fIRFAngRes )
+	{
+	   cout << "Number of points: " << fIRFAngRes->GetN() << endl;
+	   fIRFAngRes->Print();
+        }
 	else if( getAngularResolutionContainmentRadius() > 0. )
 	{
 	   cout << " (calculated from same file, containment probability " << ((double)getAngularResolutionContainmentRadius())/100. << ")" << endl; 
