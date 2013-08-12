@@ -1,6 +1,12 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130812 (GM) minor bug fix in calculation of angular resolution
+                (energy reconstruction method was not taken into account)
+
+* 20130812 (GM) changed definition of dE in lookup tables:
+                now mean relative uncertainty to median value          
+
 * 20130806 (GM) major changes and improvements for lookup tables
                 improved weighted for energy reconstruction
 		better efficiency for table filling for CTA

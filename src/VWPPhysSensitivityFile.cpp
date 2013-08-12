@@ -367,6 +367,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 // fill angular resolution histograms
    i_IRF.fillResolutionHistogram( fAngRes68, "68", "t_angular_resolution" );
    i_IRF.fillResolutionHistogram( fAngRes80, "80", "t_angular_resolution" );
+// fill energy resolution histograms
    i_IRF.fillResolutionHistogram( fEres, "68", "t_energy_resolution" );
 // fill energy bias histograms
    i_IRF.fillBiasHistograms( fEbias, "mean" );

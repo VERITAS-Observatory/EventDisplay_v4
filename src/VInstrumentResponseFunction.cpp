@@ -129,7 +129,7 @@ bool VInstrumentResponseFunction::fill()
 	 if( !fAnaCuts->applyInsideFiducialAreaCut( true ) ) continue;
 
 // apply reconstruction quality cuts
-	 if( !fAnaCuts->applyStereoQualityCuts( 0, true, i , true) ) continue;
+	 if( !fAnaCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, true, i , true) ) continue;
 
 // apply telescope type cut
 //	 if( fAnaCuts->applyTelTypeTest( true ) ) continue;
@@ -137,6 +137,7 @@ bool VInstrumentResponseFunction::fill()
 // apply gamma/hadron cuts
 //    
 	 if( !fAnaCuts->isGamma( i, true ) ) continue;
+
 
 //////////////////////////////////////
 // loop over all az bins
@@ -178,6 +179,7 @@ bool VInstrumentResponseFunction::fill()
             }
         }
     }
+    fAnaCuts->printCutStatistics();
 
 // fill resolution graphs
    cout << "VInstrumentResponseFunction::terminate ";
