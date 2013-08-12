@@ -85,6 +85,7 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D *iP, TGraphErrors
 	       g->SetPoint( zz, iP->GetXaxis()->GetBinCenter( b ), i_b[1] - iMinusValue );
 	       g->SetPointError( zz, 0., (i_b[0]+i_b[2])/2./TMath::Sqrt( h->GetEntries() ) );
 	       zz++;
+	       delete h;
 	   }
        }
     }
