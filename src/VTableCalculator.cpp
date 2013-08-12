@@ -509,6 +509,7 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // energy per telescope
         vector< double > energy_tel;
         vector< double > sigma2_tel;
+	vector< double > sigma_tel;
 
 // reset everything
         for( tel = 0; tel < ntel; tel++ )
@@ -590,6 +591,8 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                         {
 // store energy per telescope
 			    energy_tel.push_back( med );
+// store expected relative error
+			    sigma_tel.push_back( sigma / med );
 // use relative error as weighting (otherwise: significant bias towards lower energies
 			    sigma2_tel.push_back( med/(sigma*sigma) );
 // add addional weight for events inside or outside the light pool
@@ -640,7 +643,6 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
             if( energy_tel.size() > 1 )
             {
                 chi2 = 0.;
-		dE   = 0.;
                 double z1 = 0;
                 for( unsigned int j = 0; j < energy_tel.size(); j++ )
                 {
@@ -652,7 +654,17 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                 }
                 if( z1 > 1 ) chi2 /= (z1-1.);
                 else         chi2  = -99.;
-                dE = sqrt( 1./weight );
+		dE   = 0.;
+		z1 = 0.;
+		for( unsigned int j = 0; j < sigma_tel.size(); j++ )
+		{
+		    dE += sigma_tel[j];
+		    z1++;
+                }
+		if( z1 > 0. ) dE = dE / z1;
+		else          dE = 0.;
+// changed 2013/08/10
+//                dE = sqrt( 1./weight );
             }
             else
 	    {
