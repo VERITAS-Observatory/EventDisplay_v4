@@ -509,6 +509,7 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 // energy per telescope
         vector< double > energy_tel;
         vector< double > sigma2_tel;
+        vector< double > sigma2_tel_noRadiusWeigth;
 	vector< double > sigma_tel;
 
 // reset everything
@@ -595,6 +596,7 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 			    sigma_tel.push_back( sigma / med );
 // use relative error as weighting (otherwise: significant bias towards lower energies
 			    sigma2_tel.push_back( med/(sigma*sigma) );
+			    sigma2_tel_noRadiusWeigth.push_back( 1./(sigma*sigma) );
 // add addional weight for events inside or outside the light pool
 			    if( r[tel] < 140. ) sigma2_tel.back() = sigma2_tel.back()*100.;
 			    else                sigma2_tel.back() = sigma2_tel.back()*100.*exp( -1.*(r[tel]-140.)/50.);
@@ -646,9 +648,9 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
                 double z1 = 0;
                 for( unsigned int j = 0; j < energy_tel.size(); j++ )
                 {
-                    if( sigma2_tel[j] != 0. )
+                    if( sigma2_tel_noRadiusWeigth[j] != 0. )
                     {
-                        chi2 += ( value - energy_tel[j] ) * ( value - energy_tel[j] ) * sigma2_tel[j];
+                        chi2 += ( value - energy_tel[j] ) * ( value - energy_tel[j] ) * sigma2_tel_noRadiusWeigth[j];
 			z1++;
                     }
                 }
