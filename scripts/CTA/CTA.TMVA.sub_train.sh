@@ -171,9 +171,11 @@ do
 	 then
 	    sed -i 's|ENERGYVARIABLE|Erec|' $RFIL.runparameter
 	    sed -i 's|ENERGYCHI2VARIABLE|EChi2|g' $RFIL.runparameter
+	    sed -i 's|ENERGYDEVARIABLE|dE|g' $RFIL.runparameter
          else
 	    sed -i 's|ENERGYVARIABLE|ErecS|' $RFIL.runparameter
 	    sed -i 's|ENERGYCHI2VARIABLE|EChi2S|g' $RFIL.runparameter
+	    sed -i 's|ENERGYDEVARIABLE|dES|g' $RFIL.runparameter
          fi
 
 # run script
