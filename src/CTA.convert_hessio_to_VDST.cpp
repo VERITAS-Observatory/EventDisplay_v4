@@ -217,7 +217,7 @@ static void syntax (char *program)
    printf("   -o dst filename  (name of dst output file)\n" );
    printf("   -f on=1/off=0    (write FADC samples to DST file;default=0)\n" );
    printf("   -c pedfile.root  (file with pedestals and pedestal variances)\n");
-   printf("   -c triggmask.file.gz (file with trigger mask (corrections for Spring 2013 prod2 production)\n");
+   printf("   -t triggmask.file.gz (file with trigger mask (corrections for Spring 2013 prod2 production)\n");
    printf("   -r on=1/off=0    (apply camera plate scaling for DC telescopes; default=1)\n" );
    printf("   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );      
 
