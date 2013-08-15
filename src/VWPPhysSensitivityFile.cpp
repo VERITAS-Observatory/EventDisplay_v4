@@ -19,7 +19,7 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fObservatory = "CTA";
 
     fDataFile_gamma_onSource = "";
-    fDataFile_gamma_cone10 = "";
+    fDataFile_gamma_cone = "";
     fDataFile_proton = "";
     fDataFile_proton_onSource = "";
     fDataFile_electron = "";
@@ -332,7 +332,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
    VInstrumentResponseFunctionReader i_IRF;
    if( fOffsetCounter < 9999 )
    {
-      sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone10.c_str(), fOffsetCounter );
+      sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone.c_str(), fOffsetCounter );
    }
    else
    {
@@ -476,7 +476,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 // gamma offset
     if( fOffsetCounter < 9999 )
     {
-        sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone10.c_str(), fOffsetCounter );
+        sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone.c_str(), fOffsetCounter );
     }
 // gamma on source
     else
@@ -624,7 +624,7 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
        char hname[200];
        sprintf( hname, "%d", iRecID );
        fDataFile_gamma_onSource = "gamma_onSource." + fSubArray + "_ID" + hname + ".eff-";
-       fDataFile_gamma_cone10 = "gamma_cone10." + fSubArray + "_ID" + hname + ".eff-";
+       fDataFile_gamma_cone = "gamma_cone." + fSubArray + "_ID" + hname + ".eff-";
        fDataFile_proton = "proton." + fSubArray + "_ID" + hname + ".eff-";
        fDataFile_proton_onSource = "proton_onSource." + fSubArray + "_ID" + hname + ".eff-";
        fDataFile_electron = "electron." + fSubArray + "_ID" + hname + ".eff-";
@@ -636,7 +636,7 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
     else if( isVTS() == 5 )
     {
        fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE130_ID30_SW07.eff";
-       fDataFile_gamma_cone10 = "";
+       fDataFile_gamma_cone = "";
        fDataFile_proton = "proton_20deg_050deg_NOISE130_ID30_SW07.eff";
        fDataFile_electron = "electron_20deg_050deg_NOISE130_ID30_SW07.eff";
     }
@@ -644,7 +644,7 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
     else if( isVTS() == 6 )
     {
        fDataFile_gamma_onSource = "gamma_20deg_050deg_NOISE200_ID30_SW05.eff";
-       fDataFile_gamma_cone10 = "";
+       fDataFile_gamma_cone = "";
        fDataFile_proton = "proton_20deg_050deg_NOISE200_ID30_SW05.eff";
        fDataFile_electron = "electron_20deg_050deg_NOISE200_ID30_SW05.eff";
     } 

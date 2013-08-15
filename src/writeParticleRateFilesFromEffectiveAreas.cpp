@@ -84,7 +84,7 @@ int main( int argc, char *argv[] )
    if( argc != 5 )
    {
       cout << endl;
-      cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone10> <reconstruction ID> <directory with effective areas> " << endl;
+      cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone> <reconstruction ID> <directory with effective areas> " << endl;
       cout << endl;
       exit( 0 );
    }
@@ -102,16 +102,16 @@ int main( int argc, char *argv[] )
 // hardwired total number of off source bins
    int iOffSetCounter = -1;
    if( iOnSource == "onSource" )    iOffSetCounter = 0;
-   else if( iOnSource == "cone10" ) iOffSetCounter = 8;
+   else if( iOnSource == "cone" ) iOffSetCounter = 8;
    else
    {
-        cout << "invalid off source descriptor; should be: onSource or cone10" << endl;
+        cout << "invalid off source descriptor; should be: onSource or cone" << endl;
 	exit( -1 );
    }
 
 // effective area file names
    string iMC_Gamma_onSource = "gamma_onSource";
-   string iMC_Gamma_cone10 = "gamma_cone10";
+   string iMC_Gamma_cone = "gamma_cone";
    string iMC_Proton = "proton"; 
    string iMC_Proton_onSource = "proton_onSource"; 
    string iMC_Electron = "electron";
@@ -146,7 +146,7 @@ int main( int argc, char *argv[] )
    {
 
       sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.%d.root", iDataDir.c_str(), SubArray.c_str(), j );
-      sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_cone10.c_str(), SubArray.c_str(), iRecID, j );
+      sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
       sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton.c_str(), SubArray.c_str(), iRecID, j );
 
       if( iMC_Electron.size() > 0 )

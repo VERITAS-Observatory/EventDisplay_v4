@@ -28,7 +28,7 @@ class VWPPhysSensitivityFile
 
     TFile*       fOutFile;
     string       fDataFile_gamma_onSource;
-    string       fDataFile_gamma_cone10;
+    string       fDataFile_gamma_cone;
     string       fDataFile_proton;
     string       fDataFile_proton_onSource;
     string       fDataFile_electron;
