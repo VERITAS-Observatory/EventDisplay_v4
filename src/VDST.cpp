@@ -210,7 +210,7 @@ void VDST::fill()
 // fill values for this event, this telescope and this pixel if:
 //    i) this is a valid laser event
 //           or
-//   ii) fRunPar->fdstwriteallpixel is set to tro
+//   ii) fRunPar->fdstwriteallpixel is set to true
 //           or
 //  iii) this is a border or image pixel
             if( isTeltoAna( i ) && ( (!fBLaser || (i_total > fRunPar->fLaserSumMin) ) && ( fRunPar->fdstwriteallpixel || getBorder()[j] || getImage()[j] ) ) )
@@ -239,8 +239,7 @@ void VDST::fill()
                 }
                 else
                 {
-                    fDSTsums[i][j] = (float)getSums()[j];
-                                                  // ignore dead low gain channels
+                    fDSTsums[i][j] = (float)getSums()[j]; // ignore dead low gain channels
                     fDSTdead[i][j] = (unsigned int)getDead()[j];
                     fDSTsumwindow[i][j] = getCurrentSumWindow()[j];
                     fDSTsumfirst[i][j] = getTCorrectedSumFirst()[j];
