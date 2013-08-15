@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# script run eventdisplay with a queue system
+# script to make DST files from a raw data file
 #
 # Author: Gernot Maier
 #

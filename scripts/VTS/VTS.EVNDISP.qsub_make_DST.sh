@@ -14,7 +14,7 @@ source $EVNDISPSYS/setObservatory.tcsh VERITAS
 set ODIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400_DST/"
 mkdir -p $ODIR
 # output log files are written to this directory
-set LDIR=$VERITAS_USER_LOG_DIR"/analysis/EVD400_DST/"
+set LDIR=$VERITAS_USER_DATA_DIR"/analysis/EVD400_DST/"
 mkdir -p $LDIR
 
 # eventdisplay reconstruction parameter
@@ -46,7 +46,7 @@ set OPT=" "
 
 # run eventdisplay
 rm -f $LDIR/$RUN.log
-./evndisp -runnumber=$RUN -runmode=4 -reconstructionparameter $ACUTS -dstfile $TMPDIR/$RUN.DST.root $OPT > $LDIR/$RUN.DST.log
+./evndisp -runnumber=$RUN -runmode=4 -readcalibDB -reconstructionparameter $ACUTS -dstfile $TMPDIR/$RUN.DST.root $OPT > $LDIR/$RUN.DST.log
 
 mv -v -f $TMPDIR/$RUN.DST.root $ODIR/$RUN.DST.root
 
