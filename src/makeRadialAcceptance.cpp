@@ -1,9 +1,7 @@
 /*! \file  makeRadialAcceptance
- *  \brief calculate acceptance from data
+ *  \brief calculate radial acceptance from data
  *
  *   use off events which pass all gamma/hadron separation cuts
- *
- *   requires runlist version 4 or later
  *
  * \author
  *   Gernot Maier 
@@ -69,12 +67,23 @@ int main( int argc, char *argv[] )
 // read gamma/hadron cuts from cut file
     VGammaHadronCuts* fCuts = new VGammaHadronCuts();
     fCuts->setNTel( ntel );
-    if( !fCuts->readCuts(cutfilename) )
+    if( cutfilename.size() > 0 )
     {
-        cout << "error reading cut file: " << cutfilename << endl;
-        cout << "exiting..." << endl;
-        exit( -1 );
-    }
+       if( !fCuts->readCuts(cutfilename) )
+       {
+	   cout << "error reading cut file: " << cutfilename << endl;
+	   cout << "exiting..." << endl;
+	   exit( -1 );
+       }
+   }
+   else
+   {
+       cout << "error: no gamma/hadron cut file given" << endl;
+       cout << "(command line option -c)" << endl;
+       cout << "exiting..." << endl;
+       exit( -1 );
+   }
+   
 
    cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
 
@@ -162,7 +171,7 @@ int main( int argc, char *argv[] )
 	   cout << "makeRadialAcceptance: no data tree defined: run " << fRunPara->fRunList[i].fRunOff << endl;
 	   return false;
         }
-// fill acceptance curves
+// data trees and cuts
         int nentries = d->fChain->GetEntries();
         if( entries > 0 ) nentries = entries;
 
@@ -173,6 +182,7 @@ int main( int argc, char *argv[] )
 	int neventStats = 0;
 	int i_entries_after_cuts = 0;
 
+// loop over all entries in data trees and fill acceptance curves
 	for( int n = 0; n < nentries; n++ )
 	{
 	   d->GetEntry( n );
