@@ -2074,6 +2074,13 @@ void VCalibrator::getCalibrationRunNumbers()
        if( iLowGainCaliLines > 0 ) setCalibrationFileNames();
     }
 
+    int iLowGainMultLines = 0;
+    if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
+    {
+      iLowGainMultLines = readLowGainCalibrationValues_fromCalibFile( "FILELOWGAINMULTIPLIER" );
+      if( iLowGainMultLines > 0 ) setCalibrationFileNames();
+    } 
+
 // take pedestals from grisu output file ('P'-lines), gains=1, and toff = 0.
     if( iCaliLines == 0 &&  (fReader->getDataFormat() == "grisu" || getRunParameter()->fsimu_pedestalfile.size() > 0 )  )
     {
@@ -2188,6 +2195,8 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 // check run number range
                if( getRunNumber() >= iRunMin && getRunNumber() <= iRunMax )
 	       {
+
+
 	          if( iVariable == "LOWGAINPED" )
 		  {
 		     cout << "reading low-gain parameters for run range " << iRunMin << ", " << iRunMax << endl;
@@ -2209,6 +2218,12 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 			   {
 			      cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile() warning: ";
 			      cout << " low-gain multiplier need to be set for each telescope " << endl;
+			      cout << "(ignored this entry)" << endl;
+                           }
+			   else if( iVariable == "FILELOWGAINMULTIPLIER" && atof( iLowGainPeds.c_str() ) > 0. )
+			   {
+			      cout << "VCalibrator::readLowGainMultiplier() warning: ";
+			      cout << " low-gain multiplier file needed for each telescope " << endl;
 			      cout << "(ignored this entry)" << endl;
                            }
                         }
@@ -2238,6 +2253,11 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 			  getLowGainMultiplierError( iSumWindow )[j] = 0.;
 			  getCalData()->getLowGainMultiplierDistribution()->Fill( getLowGainMultiplier()[j] );
                        }
+		       fBlockTel[iTel] = true;
+                    }
+		    else if( iVariable == "FILELOWGAINMULTIPLIER" && atof( iLowGainPeds.c_str() ) > 0. )
+		    {
+		       getRunParameter()->fLowGainMultiplierFileNumber[iTel] = atoi( iLowGainPeds.c_str() );
 		       fBlockTel[iTel] = true;
                     }
                   }
@@ -2492,15 +2512,21 @@ bool VCalibrator::readLowGainMultiplier( int iSumWindow )
 {
 // read low gain multipliers from a root file 
 // (read for one summation only)
+
+    if( iSumWindow == 16 ) iSumWindow = 18;
+
     if( fLowGainMultiplierNameC[getTelID()].size() > 0 )
     {
         cout << "Telescope " << getTelID()+1 << ": ";
         cout << "reading low gain multiplier for summation window " << iSumWindow;
         cout << " from ";
         cout << "Telescope " << getTelID()+1 << ": ";
-	cout << fLowGainMultiplierNameC[getTelID()] << endl;
+	cout << fLowGainMultiplierNameC[getTelID()] << ".root" << endl;
 
-        TFile i_f( fLowGainMultiplierNameC[getTelID()].c_str() );
+        string fLowGainFileName =  fLowGainMultiplierNameC[getTelID()].c_str();
+        fLowGainFileName += ".root";
+
+        TFile i_f( fLowGainFileName.c_str() );
         if( i_f.IsZombie() )
         {
             cout << "VCalibrator::readLowGainMultiplier error: unable to open file " << i_f.GetName() << endl;
@@ -2508,7 +2534,7 @@ bool VCalibrator::readLowGainMultiplier( int iSumWindow )
             exit( -1 );
         }
 	char ic[1000];
-        sprintf( ic, "lowgainMultiplier_%d_%d", getTelID()+1, iSumWindow );
+        sprintf( ic, "lowGainMultiplier_%d_%d", getTelID()+1, iSumWindow );
         TTree *t = (TTree*)gDirectory->Get( ic );
         if( !t )
         {
@@ -2518,12 +2544,14 @@ bool VCalibrator::readLowGainMultiplier( int iSumWindow )
 	    cout << "\t exiting..." << endl;
 	    exit( -1 );
         }
-        unsigned int chanID = 0;
+        //unsigned int chanID = 0;
+        int chanID = 0;
         double gainMult = 0.;
         double gainMultE = 0.;
         t->SetBranchAddress( "chanID", &chanID );
         t->SetBranchAddress( "gainMult", &gainMult );
         t->SetBranchAddress( "gainMultE", &gainMultE );
+
 
 // calculate mean low gain multiplier; this value is used if there is no calibration value
         double iMeanLG = 0.;
@@ -2536,7 +2564,7 @@ bool VCalibrator::readLowGainMultiplier( int iSumWindow )
 // skip channels with no error in gain multiplier
             if( gainMultE < 1.e-7 ) continue;
 
-            if( chanID < getNChannels() )
+            if( chanID < (int)getNChannels() )
             {
                 iMeanLG += gainMult;
                 iMeanLG2 += gainMult * gainMult;
@@ -2553,7 +2581,7 @@ bool VCalibrator::readLowGainMultiplier( int iSumWindow )
         {
             t->GetEntry( i );
 
-            if( chanID < getNChannels() )
+            if( chanID < (int)getNChannels() )
             {
                 if( gainMultE > 1.e-7 )
                 {
