@@ -462,6 +462,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
                 fmaxindex3[i] = ftpars[i]->index_of_max[2];
                 ftgrad_x[i] = ftpars[i]->tgrad_x;
                 ftchisq_x[i] = ftpars[i]->tchisq_x;
+		fFitstat[i] = ftpars[i]->Fitstat;
             }
         }
         else
@@ -1002,6 +1003,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
         fOTree->Branch( "tgrad_x", ftgrad_x, iTT );
         sprintf( iTT, "tchisq_x[%d]/D", fNTel );
         fOTree->Branch( "tchisq_x", ftchisq_x, iTT );
+        sprintf( iTT, "Fitstat[%d]/I", fNTel );
+        fOTree->Branch( "Fitstat", fFitstat, iTT );
     }
 
     sprintf( iTT, "R[%d]/D", fNTel );
@@ -1471,6 +1474,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
     fmaxindex3[i] = 0;
     ftgrad_x[i] = 0.;
     ftchisq_x[i] = 0.;
+    fFitstat[i] = 0;
 }
 
 bool VTableLookupDataHandler::isReconstructed()
@@ -1622,6 +1626,7 @@ void VTableLookupDataHandler::resetAll()
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fcosphi[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fsinphi[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftgrad_x[i] = 0.;
+    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fFitstat[i] = 0;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) ftchisq_x[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fR[i] = 0.;
     for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fR_telType[i] = 0.;

@@ -99,6 +99,7 @@ class Ctpars
         Float_t         muonRSigma;
         Float_t         muonSize;
         Int_t           muonValid;
+	Int_t           Fitstat;
 #else
         Int_t           telID;
         Int_t           runNumber;
@@ -157,6 +158,7 @@ class Ctpars
         Double_t        tmin;
         Double_t        tmax;
         Double_t        tmean;
+	Int_t           Fitstat;
 #endif
 
 // List of branches
@@ -222,6 +224,7 @@ class Ctpars
         TBranch        *b_tmin;                   //!
         TBranch        *b_tmax;                   //!
         TBranch        *b_tmean;                  //!
+        TBranch        *b_Fitstat;                  //!
 
         Ctpars(TTree *tree = 0, bool iMC = false, int iVersion = 2, unsigned int iShort = false );
         virtual ~Ctpars();
@@ -339,6 +342,7 @@ void Ctpars::Init(TTree *tree)
        else nlowgain = 0;
        fChain->SetBranchAddress("asymmetry",&asymmetry);
        fChain->SetBranchAddress("tgrad_x",&tgrad_x);
+       fChain->SetBranchAddress("Fitstat", &Fitstat);
 // reset variables which are not read out
        alpha = 0.;
        los = 0.;
@@ -392,6 +396,7 @@ Bool_t Ctpars::Notify()
     b_max = 0;
     b_index_of_max = 0;
     b_tchisq_x = 0;
+    b_Fitstat = 0;
 
 // get branch pointers
     if( bShort <= 2 )
@@ -441,6 +446,8 @@ Bool_t Ctpars::Notify()
        fChain->AddBranchToCache( b_asymmetry );
        b_tgrad_x = fChain->GetBranch("tgrad_x");
        fChain->AddBranchToCache( b_tgrad_x );
+       b_Fitstat = fChain->GetBranch("Fitstat");
+       fChain->AddBranchToCache( b_Fitstat );
     }
     if( bShort == 0 )
     {

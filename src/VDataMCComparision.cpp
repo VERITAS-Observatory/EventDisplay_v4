@@ -615,7 +615,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
   else if( fSingleTelescopeCuts == -3 )
     {
       cout << " Theta2 cut (<" << theta2_cut << " deg2),  ";
-      cout << " Size2ndMax cut (<" << size2ndmax_min << ")" << endl;
+      cout << " Size2ndMax cut (>" << size2ndmax_min << ")" << endl;
     }
   else
     {
@@ -644,11 +644,11 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
   // VGammaHadronCuts is needed for calulate of MVA values
   if( fCalculateMVAValues ) initialGammaHadronCuts();
 
-  ////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////
-  // now loop over all events
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+// now loop over all events
   for( int i = 0; i < nentries; i++ )
-    {
+  {
       fData->GetEntry( i );
 
 // define astro object (each time a new run starts)
@@ -692,14 +692,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
       // apply az cut to MC (to choose similar AZ range as in Crab runs)
       if( fInput == 0 && ( fData->MCaz < 105.  || fData->MCaz > 230. ) ) continue;
 
-      /////////////////////////////////////////////////
-      // quality cuts
-      if( fData->EChi2 < 0 ) continue;
+/////////////////////////////////////////////////
+// quality cuts
+      if( fData->EChi2S < 0 ) continue;
       if( fData->MSCW < -50. ) continue;
       if( fData->MSCL < -50. ) continue;
       if( sqrt( fData->Xcore*fData->Xcore + fData->Ycore*fData->Ycore ) > fCoreMax_QC ) continue;
 
-      // AZ cut to check azimuth dependence of core distance distributions
+// AZ cut to check azimuth dependence of core distance distributions
       if( fAzRange && (fData->Az < fAzMin || fData->Az > fAzMax ) ) continue; 
 
       theta2 = fData->theta2;
@@ -768,26 +768,26 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
       if( fSingleTelescopeCuts != -1 || (theta2 >= theta2_min && theta2 < theta2_cut &&  fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 	{
 	  hMSCW->Fill( fData->MSCW, weight );
-	  if( fData->Erec > 0. ) hMSCWErec->Fill( log10( fData->Erec ), fData->MSCW, weight );
+	  if( fData->ErecS > 0. ) hMSCWErec->Fill( log10( fData->ErecS ), fData->MSCW, weight );
 	  for( int j = 0; j < fNTel; j++ ) if( fData->MSCWT[j] > 0. ) hmscwt[j]->Fill( fData->width[j] / fData->MSCWT[j], weight );
 
 	  //AMc 
 	  hMWR->Fill( fData->MWR, weight );
-	  if( fData->Erec > 0. ) hMWRErec->Fill( log10( fData->Erec ), fData->MWR, weight );
+	  if( fData->ErecS > 0. ) hMWRErec->Fill( log10( fData->ErecS ), fData->MWR, weight );
 
 	}
       if( fSingleTelescopeCuts != -1 || (theta2 >= theta2_min && theta2 < theta2_cut  &&  fData->MSCW < msw_max && fData->MSCW > msw_min ) )
 	{
 	  hMSCL->Fill( fData->MSCL, weight );
 	  for( int j = 0; j < fNTel; j++ ) if( fData->MSCLT[j] > 0. ) hmsclt[j]->Fill( fData->length[j] / fData->MSCLT[j], weight );
-	  if( fData->Erec > 0. ) hMSCLErec->Fill( log10( fData->Erec ), fData->MSCL, weight );
+	  if( fData->ErecS > 0. ) hMSCLErec->Fill( log10( fData->ErecS ), fData->MSCL, weight );
 	  if( fData->EmissionHeight > 0. ) hEmissionHeight->Fill( fData->EmissionHeight, weight );
 	  hNimages->Fill( fData->NImages, weight );
 	  hImgSel->Fill( fData->ImgSel, weight );
 
 	  //AMc
 	  hMLR->Fill( fData->MLR, weight );
-	  if( fData->Erec > 0. ) hMLRErec->Fill( log10( fData->Erec ), fData->MLR, weight );
+	  if( fData->ErecS > 0. ) hMLRErec->Fill( log10( fData->ErecS ), fData->MLR, weight );
 
 	  if( fCuts )
 	    {
@@ -797,17 +797,17 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	    }
 	}
        
-      ////////////////////////////////////////////////////////////////////////////////////////////////
-      // stereo parameters
+////////////////////////////////////////////////////////////////////////////////////////////////
+// stereo parameters
       if( fSingleTelescopeCuts != -1 ||
           ( theta2 >= theta2_min && theta2 < theta2_cut  && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 	{
 	  hXcore->Fill( fData->Xcore, weight );
 	  if( fInput == 0 )
 	    {
-	      hYcore->Fill( fData->Ycore , weight );
-	      hXYcore->Fill( fData->Xcore, fData->Ycore, weight );
-	      hAzYcore->Fill( fData->Az, fData->Ycore , weight );
+	      hYcore->Fill( -1.*fData->Ycore , weight );
+	      hXYcore->Fill( fData->Xcore, -1.*fData->Ycore, weight );
+	      hAzYcore->Fill( fData->Az, -1.*fData->Ycore , weight );
 	    }
 	  else
 	    {
@@ -817,8 +817,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	    }
 
 
-	  ///////////////////////////////////////////////////////////////
-	  // core position relative to each telescope
+///////////////////////////////////////////////////////////////
+// core position relative to each telescope
 	  for( int j = 0; j < fNTel; j++ )
 	    {
 	      if( fData->ntubes[j] > ntubes_min )
@@ -829,17 +829,20 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		}
 	    }
 
-	  ///////////////////////////////////////////////////////////////
-	  // single telescope distributions
-	  for( int j = 0; j < fNTel; j++ )
-	    {
+///////////////////////////////////////////////////////////////
+// single telescope distributions
+//  (loop over all images
+          for( int t = 0; t < fData->NImages; t++ )
+	  {
+	      int j = fData->ImgSel_list[t];
+
 	      if( fData->ntubes[j] > ntubes_min )
-		{
+	      {
 		  hntubes[j]->Fill( fData->ntubes[j], weight );
 		  if( fData->nlowgain[j] > 0 ) hnlowgain[j]->Fill( (double)fData->nlowgain[j], weight );
 		  hdist[j]->Fill( fData->dist[j], weight );
 		  if( fData->size[j] > 0. ) hsize[j]->Fill( log10( fData->size[j] ), weight );
-		  if( fData->size[j] > 0. ) hsize2[j]->Fill( log10( fData->size2[j] ), weight );
+		  if( fData->size2[j] > 0. ) hsize2[j]->Fill( log10( fData->size2[j] ), weight );
 		  if( fData->max1[j] > 0. ) hmax1[j]->Fill( log10( fData->max1[j] ), weight );
 		  if( fData->max2[j] > 0. ) hmax2[j]->Fill( log10( fData->max2[j] ), weight );
 		  if( fData->max3[j] > 0. ) hmax3[j]->Fill( log10( fData->max3[j] ), weight );
@@ -850,22 +853,22 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		  hloss[j]->Fill( fData->loss[j], weight );
 		  hasym[j]->Fill( fData->asym[j], weight );
 		  if( fInput == 0 )
-		    {
+		  {
 		      hcen_x[j]->Fill( fData->cen_x[j], weight );
 		      hcen_y[j]->Fill( -1.*fData->cen_y[j], weight );
-		    }
+		  }
 		  else
-		    {
+		  {
 		      hcen_x[j]->Fill( fData->cen_x[j], weight );
 		      hcen_y[j]->Fill( fData->cen_y[j], weight );
-		    }
+		  }
 		  hcen_xy[j]->Fill( fData->cen_x[j], fData->cen_y[j], weight );
 		  htgrad_x[j]->Fill( fData->tgrad_x[j], weight );
 		  hr[j]->Fill( fData->R[j], weight );
-		}
-	    }
-	}
-    }
+	      }
+	 }
+     }
+  }
   return true;
 }
 

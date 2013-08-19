@@ -246,6 +246,7 @@ class VTableLookupDataHandler
         double ftgrad_x  [VDST_MAXTELESCOPES];
         double ftchisq_x [VDST_MAXTELESCOPES];
         double fweight   [VDST_MAXTELESCOPES];    //!< always 1.
+	int    fFitstat  [VDST_MAXTELESCOPES];
 // {-1}
         double fR        [VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core
 	double fR_telType[VDST_MAXTELESCOPES];    //!< distance from each telescope to reconstructed shower core (depending on tel type)

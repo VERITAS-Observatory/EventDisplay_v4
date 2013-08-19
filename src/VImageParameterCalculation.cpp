@@ -1217,7 +1217,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	        if( iUseSums2 ) fll_Sums.push_back( fData->getSums2()[j] );
 		else            fll_Sums.push_back( fData->getSums()[j] ); 
             }
-	    else                                               fll_Sums.push_back( 0.1 );
+	    else                fll_Sums.push_back( 0.1 );
 	    if( fll_Sums.back() > i_sumMax ) i_sumMax = fll_Sums.back();
         }
     }
@@ -1417,16 +1417,13 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     double dsigmaXY2;
     dsigmaXY2  = dsxxy2 * drho * drho;
     dsigmaXY2 += rho*rho * sigmaX*sigmaX *sigmaY*sigmaY*sigmaY*sigmaY / dsxxy2 * dsigmaX*dsigmaX;
-                                                  // o.k.
     dsigmaXY2 += rho*rho * sigmaX*sigmaX *sigmaX*sigmaX*sigmaY*sigmaY / dsxxy2 * dsigmaY*dsigmaY;
 
     double dd2;
-                                                  // o.k.
     dd2 = 4.*sigmaY*sigmaY * dsigmaY*dsigmaY + 4.*sigmaX*sigmaX * dsigmaX*dsigmaX;
 
     double dz2;
     dz2  = d*d / (d*d + 4.*sigmaXY*sigmaXY ) * dd2;
-                                                  // o.k.
     dz2 += 16.*sigmaXY*sigmaXY / (d*d + 4.*sigmaXY*sigmaXY ) * dsigmaXY2;
 
     double dlength;
@@ -1434,7 +1431,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     dlength += 4.*sigmaY*sigmaY * dsigmaY*dsigmaY;
     dlength += 1./2. * dz2;
     dlength *= 1./8. / (sigmaX*sigmaX + sigmaY*sigmaY + z );
-    if( dlength > 0. ) dlength = sqrt( dlength ); // o.k.
+    if( dlength > 0. ) dlength = sqrt( dlength ); 
     else               dlength = 0.;
 
     double dwidth;
@@ -1442,7 +1439,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     dwidth += 4.*sigmaY*sigmaY * dsigmaY*dsigmaY;
     dwidth += dz2;
     dwidth *= 1./8. / (sigmaX*sigmaX + sigmaY*sigmaY - z );
-    if( dwidth > 0. ) dwidth  = sqrt( dwidth );   // o.k.
+    if( dwidth > 0. ) dwidth  = sqrt( dwidth ); 
     else              dwidth = 0.;
 
     double dphi;
@@ -1450,29 +1447,26 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     else
     {
         dphi  = 4.* dsxxy2 / dsx_y2 / dsx_y2 * drho * drho;
-                                                  // o.k.
         dphi += (2.*rho*sigmaY*dsx_y2-4.*rho*sigmaY*sigmaX*sigmaX)*(2.*rho*sigmaY*dsx_y2-4.*rho*sigmaY*sigmaX*sigmaX)/dsx_y2/dsx_y2/dsx_y2/dsx_y2*dsigmaX*dsigmaX;
-                                                  // o.k.
         dphi += (2.*rho*sigmaX*dsx_y2+4.*rho*sigmaY*sigmaY*sigmaX)*(2.*rho*sigmaX*dsx_y2+4.*rho*sigmaY*sigmaY*sigmaX)/dsx_y2/dsx_y2/dsx_y2/dsx_y2*dsigmaY*dsigmaY;
         dphi *= 1. / ( 1. + 2.*rho*sigmaX*sigmaY/dsx_y2 * 2.*rho*sigmaX*sigmaY/dsx_y2 );
         dphi *= 1. / ( 1. + 2.*rho*sigmaX*sigmaY/dsx_y2 * 2.*rho*sigmaX*sigmaY/dsx_y2 );
         dphi  = sqrt( dphi );
-        dphi  = redang( dphi, M_PI/2. );          // o.k.
+        dphi  = redang( dphi, M_PI/2. );
     }
 
     double ddist = 0.;
     if( dist != 0. ) ddist = cen_x*cen_x /dist/dist * dcen_x*dcen_x + cen_y*cen_y /dist/dist * dcen_y*dcen_y;
-    ddist = sqrt( ddist );                        // o.k.
+    ddist = sqrt( ddist );             
     double dmiss = 0.;
     dmiss  = cosphi*cosphi * dcen_x*dcen_x + sinphi*sinphi * dcen_y*dcen_y;
     dmiss += dphi*dphi*( sinphi*sinphi * cen_x*cen_x + cosphi*cosphi * cen_y*cen_y );
-    dmiss = sqrt( dmiss );                        // o.k.
+    dmiss = sqrt( dmiss );            
 
     double dalpha = 0.;
     if( dist != 0. )
     {
         dalpha  = dmiss*dmiss / dist/dist + miss*miss / dist/dist/dist/dist * ddist*dist;
-                                                  // o.k.
         dalpha *= 1. / sqrt( 1. - miss*miss / dist/dist );
     }
     else dalpha = 0.;
@@ -1533,17 +1527,6 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     fParLL->ntubes = fParGeo->ntubes;
     fParLL->bad = fParGeo->bad;
 	
-	// For showing which events are calculated via the LL method,
-	// uncomment this line, then run event display twice,
-	// first:  $ evndisp -runnumber=54550 -display=1
-	// second: $ evndisp -runnumber=54550 -display=1 -reconstructionparameter EVNDISP.reconstruction.FORCELL.runparameter
-	// where EVNDISP.reconstruction.FORCELL.runparameter has the extra line:
-	// * -1 FORCELL 1
-	// Then, this printf will print which events have their
-	// image parameters calculated with the log-likelihood method
-	// 
-    //printf( "  FORCELL event %2d telescope %d (cen_x,cen_y) %6.4f %6.4f \n", fData->getEventNumber(), fData->getTelID()+1, fParLL->cen_x, fParLL->cen_y) ; 
-
     return fLLEst;
 }
 

@@ -36,7 +36,7 @@ void help()
   cout << "shower parameter distributions:  stereo_parameter(  char *ffile = \"stereo_compare.root\", bool bPoster = false )  " << endl << endl;
   cout << "mscw/mscl energy dependent:      msc_plots( char *ffile = \"stereo_compare.root\", bool bPoster = false )  " << endl << endl;
   cout << "mwr/mlr energy dependent:        mwr_plots( char *ffile = \"stereo_compare.root\", bool bPoster = false )  " << endl << endl;
-  cout << "trigger plots:                   trigger_plots( char *ffile = \"stereo_compare.root\" ) " << endl << endl;
+  cout << "multiplicity plots:              multiplicity_plots( char *ffile = \"stereo_compare.root\" ) " << endl << endl;
   cout << "emission height:                 emission_height( char *ffile = \"stereo_compare.root\" )" << endl << endl;
   cout << "core plots:                      core_plots( char *ffile = \"stereo_compare.root\" )" << endl;
   cout << "core distance plots:             distance_plots( char *ffile = \"stereo_compare.root\", int fNTel, bool bPoster = false )" << endl << endl;
@@ -109,7 +109,7 @@ void getScaling( TH1D *h_sims, TH1D *h_diff, double &s_sims, double &s_diff,
 ////////////////////////////////////
 // scale to same contents (integral)
   if( bContents == 1 )
-    {
+  {
       int i_min = 1;
       int i_max = h_sims->GetNbinsX();
       if( xmin > -9998 ) i_min = h_sims->GetXaxis()->FindBin( xmin );
@@ -132,7 +132,7 @@ void getScaling( TH1D *h_sims, TH1D *h_diff, double &s_sims, double &s_diff,
       s_diff = 1.;
       cout << " Bin Content:  data:" << z << "\t sims:" << s_sims << endl;
       if( s_sims > 0. ) s_sims = z/s_sims;
-    }
+  }
 //////////////////////////////////
 // scale to same maximum
   else if( bContents == 2 )
@@ -140,8 +140,8 @@ void getScaling( TH1D *h_sims, TH1D *h_diff, double &s_sims, double &s_diff,
       s_sims = h_sims->GetMaximum();
       z      = h_diff->GetMaximum();
       cout << h_sims->GetName() << " Maximum : data:" << z << "\t sims: " << s_sims << endl;
-      if( s_sims > 0. ) s_sims = z / s_sims;
-      s_diff = 1.;
+      if( s_sims > 0. ) s_sims = z / s_sims; 
+      s_diff = 1.; 
   } 
 //////////////////////////////////
 // scale to peak (three bins around maximum)
@@ -287,7 +287,7 @@ void plotRelativePlots( char *i_CanvasName, char *i_CanvasTitle, TH1D *h1, TH1D 
   iL->Draw();
 }
 
-void trigger_plots( char *ffile = "stereo_compare.root" )
+void multiplicity_plots( char *ffile = "stereo_compare.root" )
 {
   gStyle->SetPadGridX( 0 );
   gStyle->SetPadGridY( 0 );
@@ -295,19 +295,28 @@ void trigger_plots( char *ffile = "stereo_compare.root" )
 
   TDirectory *fDir = openFile( ffile );
 
-  // get the scaling between simulations and data
+// get the scaling between simulations and data
   double s_sims = 1.;
   double s_diff = 1.;
   getScaling( fDir, s_sims, s_diff, "MSCW", 1 );
 
   char hname[600];
   char htitle[600];
+
+// canvases
   sprintf( hname, "cTrigger_%s", ffile );
-  sprintf( htitle, "trigger plots (%s)", ffile );
+  sprintf( htitle, "multiplicity plots (%s)", ffile );
   TCanvas *cTrigger = new TCanvas( hname, htitle, 10, 10, 800, 400 );
   cTrigger->SetGridx( 0 ); 
   cTrigger->SetGridy( 0 ); 
   cTrigger->Divide( 2, 1 );
+
+  sprintf( hname, "cTriggerRel_%s", ffile );
+  sprintf( htitle, "multiplicity plots (relative dist., %s)", ffile );
+  TCanvas *cTriggerRel = new TCanvas( hname, htitle, 410, 10, 800, 400 );
+  cTriggerRel->SetGridx( 0 ); 
+  cTriggerRel->SetGridy( 0 ); 
+  cTriggerRel->Divide( 2, 1 );
 
   TH1D *hNImages_SIMS = (TH1D*)fDir->Get( "hNimages_SIMS" );
   TH1D *hNImages_DIFF = (TH1D*)fDir->Get( "hNimages_DIFF" );
@@ -317,7 +326,7 @@ void trigger_plots( char *ffile = "stereo_compare.root" )
   if( !hNImages_SIMS || !hNImages_DIFF || !hImgSel_SIMS || !hImgSel_DIFF ) return;
 
   setHistogramAtt( hNImages_SIMS, 2, 3, 1, 20, 1 );
-  setHistogramAtt( hNImages_DIFF, 1, 3, 1, 25, 1 );
+  setHistogramAtt( hNImages_DIFF, 1, 3, 1, 21, 1 );
   if( hNImages_SIMS->GetEntries() > 0 ) hNImages_SIMS->Scale( s_sims );
   if( hNImages_DIFF->GetEntries() > 0 ) hNImages_DIFF->Scale( s_diff );
 
@@ -326,10 +335,11 @@ void trigger_plots( char *ffile = "stereo_compare.root" )
   gPad->SetGridy( 0 );
   hNImages_SIMS->SetMaximum( hNImages_SIMS->GetMaximum() * 1.2 );
   hNImages_SIMS->Draw();
+  hNImages_SIMS->SetYTitle( "number of showers [a.u.]" );
   hNImages_DIFF->Draw( "same" );
 
   setHistogramAtt( hImgSel_SIMS, 2, 3, 1, 20, 1 );
-  setHistogramAtt( hImgSel_DIFF, 1, 3, 1, 25, 1 );
+  setHistogramAtt( hImgSel_DIFF, 1, 3, 1, 21, 1 );
   if( hImgSel_SIMS->GetEntries() > 0 ) hImgSel_SIMS->Scale( s_sims );
   if( hImgSel_DIFF->GetEntries() > 0 ) hImgSel_DIFF->Scale( s_diff );
 
@@ -338,7 +348,36 @@ void trigger_plots( char *ffile = "stereo_compare.root" )
   gPad->SetGridy( 0 );
   hImgSel_SIMS->SetMaximum( hImgSel_SIMS->GetMaximum() * 1.2 );
   hImgSel_SIMS->Draw();
+  hImgSel_SIMS->SetYTitle( "number of showers [a.u.]" );
   hImgSel_DIFF->Draw( "same" );
+
+// relative plots
+  cTriggerRel->cd(1);
+  sprintf( hname, "%s_RE", hNImages_SIMS->GetName() );
+  TH1D *hNImages_Rel = (TH1D*)hNImages_SIMS->Clone( hname );
+  hNImages_Rel->Divide( hNImages_DIFF );
+  hNImages_Rel->SetYTitle( "sims/data" );
+  hNImages_Rel->SetMinimum( 0.3 );
+  hNImages_Rel->SetMaximum( 3.0 );
+  setHistogramAtt( hNImages_Rel, 1, 1, 1, 21, 1 );
+  hNImages_Rel->Draw();
+  TLine *iLNI = new TLine( hNImages_Rel->GetXaxis()->GetXmin(), 1., hNImages_Rel->GetXaxis()->GetXmax(), 1. );
+  iLNI->SetLineStyle( 2 );
+  iLNI->Draw();
+
+  cTriggerRel->cd(2);
+  sprintf( hname, "%s_RE", hImgSel_SIMS->GetName() );
+  TH1D *hImgSel_Rel = (TH1D*)hImgSel_SIMS->Clone( hname );
+  hImgSel_Rel->Divide( hImgSel_DIFF );
+  hImgSel_Rel->SetYTitle( "sims/data" );
+  hImgSel_Rel->SetMinimum( 0.3 );
+  hImgSel_Rel->SetMaximum( 3.0 );
+  setHistogramAtt( hImgSel_Rel, 1, 1, 1, 21, 1 );
+  hImgSel_Rel->Draw();
+  TLine *iLIS = new TLine( hImgSel_Rel->GetXaxis()->GetXmin(), 1., hImgSel_Rel->GetXaxis()->GetXmax(), 1. );
+  iLIS->SetLineStyle( 2 );
+  iLIS->Draw();
+
 }
 
 /*
@@ -1223,24 +1262,24 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
 // histogram names to be plotted
   vector< string > hname;
   vector< int >    f_rebin;
-  vector< bool >   f_logy;
+  vector< int >   f_logy;
   vector< double > f_x_min;
   vector< double > f_x_max;
-  hname.push_back( "width" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );
-  hname.push_back( "length" );  f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.50 );
-  hname.push_back( "dist" );    f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 2.10 );
-  hname.push_back( "size" );    f_rebin.push_back( i_rebin ); f_logy.push_back( true );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
-  hname.push_back( "size2" );   f_rebin.push_back( i_rebin ); f_logy.push_back( true );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
-  hname.push_back( "nlowgain" );f_rebin.push_back( 1 );       f_logy.push_back( true );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
-  hname.push_back( "los" );     f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
-  hname.push_back( "asym" );    f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
-  hname.push_back( "cen_x" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
-  hname.push_back( "cen_y" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
-  hname.push_back( "ntubes" );  f_rebin.push_back( 1 );       f_logy.push_back( true );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
-  hname.push_back( "mscwt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
-  hname.push_back( "msclt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
-  hname.push_back( "loss" );    f_rebin.push_back( i_rebin ); f_logy.push_back( true );   f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );
-  hname.push_back( "tgrad_x" ); f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -7.5 );  f_x_max.push_back( 7.5 );
+  hname.push_back( "width" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );
+  hname.push_back( "length" );  f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.50 );
+  hname.push_back( "dist" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 2.10 );
+  hname.push_back( "size" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
+  hname.push_back( "size2" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
+  hname.push_back( "nlowgain" );f_rebin.push_back( 1 );       f_logy.push_back( 1 );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
+  hname.push_back( "los" );     f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
+  hname.push_back( "asym" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
+  hname.push_back( "cen_x" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
+  hname.push_back( "cen_y" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
+  hname.push_back( "ntubes" );  f_rebin.push_back( 1 );       f_logy.push_back( 1 );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
+  hname.push_back( "mscwt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
+  hname.push_back( "msclt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
+  hname.push_back( "loss" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );
+  hname.push_back( "tgrad_x" ); f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( -7.5 );  f_x_max.push_back( 7.5 );
 
 // loop over all histograms and plot them
   char hn[600];
