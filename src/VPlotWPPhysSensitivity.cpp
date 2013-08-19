@@ -479,8 +479,8 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
       else if( iUnit == "CU" ) a->setFluxRange_CU( iMinSensitivity, iMaxSensitivity );
       TCanvas *c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fData[i]->fPlottingColor, iUnit, 0.2, 0.01 );
       if( c_temp ) cSens = c_temp;
-      if( i == 0 ) c_temp = a->plotSignalBackgroundRates( cBck, true, 2.e-7, 1. );   // plot also protons and electrons
-      else         c_temp = a->plotSignalBackgroundRates( cBck, false, 2.e-7, 1. );
+      if( i == 0 ) c_temp = a->plotSignalBackgroundRates( cBck, true, 2.e-7, 14. );   // plot also protons and electrons
+      else         c_temp = a->plotSignalBackgroundRates( cBck, false, 2.e-7, 14. );
       if( c_temp ) cBck = c_temp;
       fillProjectedSensitivityPlot( i, a );
       fData[i]->gSensitivity = (TGraphAsymmErrors*)a->getSensitivityGraph();
