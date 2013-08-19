@@ -5,8 +5,27 @@
  *
  */
 
+#include <iostream>
 #include <string>
 #include <vector>
+
+#include "TBox.h"
+#include "TCanvas.h"
+#include "TF1.h"
+#include "TFile.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TLatex.h"
+#include "TLegend.h"
+#include "TLine.h"
+#include "TMath.h"
+#include "TStyle.h"
+#include "TTree.h"
+
+using namespace std;
+
+void plot_energyDependentDistributions( TDirectory *fDir, string iVariable, int iRebin, double x_min, double x_max  );
+void setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker, int irebin );
 
 void help()
 {
@@ -16,7 +35,7 @@ void help()
   cout << endl;
   cout << "shower parameter distributions:  stereo_parameter(  char *ffile = \"stereo_compare.root\", bool bPoster = false )  " << endl << endl;
   cout << "mscw/mscl energy dependent:      msc_plots( char *ffile = \"stereo_compare.root\", bool bPoster = false )  " << endl << endl;
-  cout << "mwr/mlr energy dependent:        mwr_plots( char *ffile = \"stereo_compare.root\", bool bPoster = false )  " << endl << endl;//AMc
+  cout << "mwr/mlr energy dependent:        mwr_plots( char *ffile = \"stereo_compare.root\", bool bPoster = false )  " << endl << endl;
   cout << "trigger plots:                   trigger_plots( char *ffile = \"stereo_compare.root\" ) " << endl << endl;
   cout << "emission height:                 emission_height( char *ffile = \"stereo_compare.root\" )" << endl << endl;
   cout << "core plots:                      core_plots( char *ffile = \"stereo_compare.root\" )" << endl;
@@ -82,35 +101,13 @@ void plotLegend( TH1D *hsims, TH1D *hdiff, double x0 = 0.5  )
   bContents = 2:   scale to same maximum value
   bContents = 3:   scale to same maximum value
 */
-void getScaling( TDirectory *fDir, double &s_sims, double &s_diff, char *his = "MSCW", int bContents = 1, double xmin = -9999., double xmax = 9999. )
+void getScaling( TH1D *h_sims, TH1D *h_diff, double &s_sims, double &s_diff, 
+                 int bContents = 1, double xmin = -9999., double xmax = 9999. )
 {
-  if( fDir == 0 )
-    {
-      cout << "NO SCALING POSSIBLE, no file" << endl;
-      s_sims = 1.;
-      s_diff = 1.;
-      return;
-    }
-  cout << "scale on histograms " << his << ", scale to";
-  if( bContents == 1 )      cout << " histogram contents" << endl;
-  else if( bContents == 2 ) cout << " histogram maximum" << endl;
-  else if( bContents == 3 ) cout << " histogram maximum (peak)" << endl;
-
-  char hname[200];
-  sprintf( hname, "h%s_SIMS", his );
-  h_sims = (TH1D*)fDir->Get( hname );
-  sprintf( hname, "h%s_DIFF", his );
-  h_diff = (TH1D*)fDir->Get( hname );
-  if( !h_sims || !h_diff )
-    {
-      cout << "NO SCALING POSSIBLE, no histograms " << h_sims << " " << h_diff << endl;
-      s_sims = 1.;
-      s_diff = 1.;
-      return;
-    }
+  if( !h_sims || !h_diff ) return;
   double z = 0.;
-
-  // scale to same contents
+////////////////////////////////////
+// scale to same contents (integral)
   if( bContents == 1 )
     {
       int i_min = 1;
@@ -133,21 +130,23 @@ void getScaling( TDirectory *fDir, double &s_sims, double &s_diff, char *his = "
 	}
 
       s_diff = 1.;
-      cout << his << " Bin Content:  data:" << z << "\t sims:" << s_sims << endl;
+      cout << " Bin Content:  data:" << z << "\t sims:" << s_sims << endl;
       if( s_sims > 0. ) s_sims = z/s_sims;
     }
-  // scale to same maximum
+//////////////////////////////////
+// scale to same maximum
   else if( bContents == 2 )
-    {
+  {
       s_sims = h_sims->GetMaximum();
       z      = h_diff->GetMaximum();
-      cout << his << " Maximum : data:" << z << "\t sims: " << s_sims << endl;
+      cout << h_sims->GetName() << " Maximum : data:" << z << "\t sims: " << s_sims << endl;
       if( s_sims > 0. ) s_sims = z / s_sims;
       s_diff = 1.;
-    } 
-  // scale to peak
+  } 
+//////////////////////////////////
+// scale to peak (three bins around maximum)
   else if( bContents == 3 )
-    {
+  {
       int imaxbin = h_sims->GetMaximumBin();
       s_sims = h_sims->GetBinContent( imaxbin );
       if( imaxbin > 1 ) s_sims += h_sims->GetBinContent( imaxbin - 1 );
@@ -159,15 +158,48 @@ void getScaling( TDirectory *fDir, double &s_sims, double &s_diff, char *his = "
       if( imaxbin < h_diff->GetNbinsX() )  z += h_diff->GetBinContent( imaxbin + 1 );
       if( s_sims > 0. ) s_sims = z / s_sims;
       s_diff = 1.;
-    }
+  }
 
+// make sure that results are positiv
   if( s_sims < 0. )
-    {
+  {
       s_sims *= -1.;
       s_diff *= -1.;
-    }
+  }
   cout << "Scaling: SIMS " << s_sims << "\t" << z << "\t DIFF " << s_diff << endl;
 }
+
+void getScaling( TDirectory *fDir, double &s_sims, double &s_diff, string his = "MSCW", 
+                 int bContents = 1, double xmin = -9999., double xmax = 9999. )
+{
+  if( fDir == 0 )
+  {
+      cout << "NO SCALING POSSIBLE, no file" << endl;
+      s_sims = 1.;
+      s_diff = 1.;
+      return;
+  }
+  cout << "scale on histograms " << his << ", scale to";
+  if( bContents == 1 )      cout << " histogram contents" << endl;
+  else if( bContents == 2 ) cout << " histogram maximum" << endl;
+  else if( bContents == 3 ) cout << " histogram maximum (peak)" << endl;
+
+  char hname[200];
+  sprintf( hname, "h%s_SIMS", his.c_str() );
+  TH1D *h_sims = (TH1D*)fDir->Get( hname );
+  sprintf( hname, "h%s_DIFF", his.c_str() );
+  TH1D *h_diff = (TH1D*)fDir->Get( hname );
+  if( !h_sims || !h_diff )
+  {
+      cout << "NO SCALING POSSIBLE, no histograms " << h_sims << " " << h_diff << endl;
+      s_sims = 1.;
+      s_diff = 1.;
+      return;
+  }
+
+  getScaling( h_sims, h_diff, s_sims, s_diff, bContents, xmin, xmax );
+}
+
 
 void setHistogramAtt( TH2D* his, double imin )
 {
@@ -180,7 +212,7 @@ void setHistogramAtt( TH2D* his, double imin )
 
 void setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize )
 {
-  setHistogramAtt( his, icolor, iwidth, isize, 1 );
+  setHistogramAtt( his, icolor, iwidth, isize, 1, 1 );
 }
 
 void setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int irebin )
@@ -242,7 +274,7 @@ void plotRelativePlots( char *i_CanvasName, char *i_CanvasTitle, TH1D *h1, TH1D 
   sprintf( hname, "rel_%s", h1->GetName() );
   TH1D *hR = (TH1D*)h1->Clone( hname );
   setHistogramAtt( hR, 1, 3, 1, 20, 1 );
-  hR = hR->Divide( h2 );
+  hR->Divide( h2 );
   hR->SetMinimum( 0.3 );
   hR->SetMaximum( 3.0 );
   hR->GetYaxis()->SetTitle( "sims / data" );
@@ -366,8 +398,9 @@ void plot_singleCanvas( char *ffile, string iHistoName, string iCanvasTitle, str
 
   setHistogramAtt( hHistogram_SIMS, 2, 3, 1, 20, 1 );
   setHistogramAtt( hHistogram_DIFF, 1, 3, 1, 21, 1 );
+  cout << "SCALE " << s_sims << "\t" << s_diff << endl;
   if( hHistogram_SIMS->GetEntries() > 0 ) hHistogram_SIMS->Scale( s_sims );
-  if( hHistogram_DIFF->GetEntries() > 0 ) hHistogram_DIFF->Scale( s_diff );
+  if( hHistogram_DIFF->GetEntries() > 0 &&TMath::Abs( s_sims - 1. ) > 1.e-4 ) hHistogram_DIFF->Scale( s_diff );
 
   hHistogram_SIMS->SetMaximum( hHistogram_SIMS->GetMaximum() * 1.4 );
   hHistogram_SIMS->SetAxisRange( 0., iHistoXAxisMax );
@@ -383,127 +416,103 @@ void emission_height( char *ffile = "stereo_compare.root", double iEmissionHeigh
 }
 
 
-void msc_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
+/*
+
+    plot mscw and mscl energy dependent
+
+*/
+void msc_plots( char *ffile = "stereo_compare.root", int iRebin = 4 )
 {
   gStyle->SetPadGridX( 0 );
   gStyle->SetPadGridY( 0 );
   gStyle->SetPalette(1);
 
   TDirectory *fDir = openFile( ffile );
- 
-  double KSProb = 0;//AMc
-  double KSSig = 0;//AMc
 
-  // get the scaling between simulations and data
+  plot_energyDependentDistributions( fDir, "MSCW", iRebin, -1.5, 2.5 );
+  plot_energyDependentDistributions( fDir, "MSCL", iRebin, -1.5, 2.5 );
+}
+
+void plot_energyDependentDistributions( TDirectory *fDir, string iVariable, int iRebin, double x_min, double x_max )
+{
+  if( fDir == 0 ) return;
+
+  double KSProb = 0;
+  double KSSig = 0;
+  double Chi2Prob = 0.;
+  double Chi2Sig= 0.;
+
+// get the scaling between simulations and data
   double s_sims = 1.;
   double s_diff = 1.;
-  getScaling( fDir, s_sims, s_diff, "MSCW", 2 );
+//  getScaling( fDir, s_sims, s_diff, iVariable.c_str(), 2 );
 
   char hname[600];
   char htitle[600];
-  sprintf( hname, "c_MSCW_%s", ffile );
-  sprintf( htitle, "mscw (%s)", ffile );
-  TCanvas *c_MSCW = new TCanvas( hname, htitle, 100, 10, 900, 600 );
-  c_MSCW->SetGridx( 0 );
-  c_MSCW->SetGridy( 0 );
-  c_MSCW->Divide( 3, 2 );
+  sprintf( hname, "c_%s_%s", iVariable.c_str(), fDir->GetName() );
+  sprintf( htitle, "%s (%s)", iVariable.c_str(), fDir->GetName() );
+  TCanvas *c_MS = new TCanvas( hname, htitle, 100, 10, 900, 600 );
+  c_MS->SetGridx( 0 );
+  c_MS->SetGridy( 0 );
+  c_MS->Divide( 3, 2 );
 
-  TH2D *hmscwerec_sims = (TH2D*)fDir->Get( "hMSCWErec_SIMS" );
-  TH2D *hmscwerec_diff = (TH2D*)fDir->Get( "hMSCWErec_DIFF" );
+  sprintf( hname, "h%sErec_SIMS", iVariable.c_str() );
+  TH2D *h_sims = (TH2D*)fDir->Get( hname );
+  sprintf( hname, "h%sErec_DIFF", iVariable.c_str() );
+  TH2D *h_diff = (TH2D*)fDir->Get( hname );
 
-  if( !hmscwerec_sims || !hmscwerec_diff ) return;
+  if( !h_sims || !h_diff ) return;
 
-  for( int i = 1; i <= hmscwerec_sims->GetXaxis()->GetNbins(); i++ )
-    {
-      sprintf( hname, "hMSCWErec_SIMS_%d", i );
-      TH1D *hSims = hmscwerec_sims->ProjectionY( hname, i, i );
-      setHistogramAtt( hSims, 2, 1, 1, 20, 2 );
-      sprintf( hname, "hMSCWErec_DIFF_%d", i );
-      TH1D *hDiff = hmscwerec_diff->ProjectionY( hname, i, i );
-      setHistogramAtt( hDiff, 1, 1, 1, 21, 2 );
+// loop over all bins in energy
+  for( int i = 1; i <= h_sims->GetXaxis()->GetNbins(); i++ )
+  {
+      sprintf( hname, "h%sErec_SIMS_%d", iVariable.c_str(), i );
+      TH1D *hSims = h_sims->ProjectionY( hname, i, i );
+      setHistogramAtt( hSims, 2, 1, 1, 20, iRebin);
+      sprintf( hname, "h_%sErec_diff_%d", iVariable.c_str(), i );
+      TH1D *hDiff = h_diff->ProjectionY( hname, i, i );
+      setHistogramAtt( hDiff, 1, 1, 1, 21, iRebin );
+
+      getScaling( hSims, hDiff, s_sims, s_diff, 3 );
+
       if( hSims->GetEntries() > 0 ) hSims->Scale( s_sims );
       if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
 
-      hSims->SetAxisRange( -1.5, 2.5 );
+      hSims->SetAxisRange( x_min, x_max );
       hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
+      hSims->SetMinimum( 0. );
 
+// calculate matching of distributions
+      KSProb = hSims->KolmogorovTest(hDiff);
+      KSSig  = TMath::ErfInverse(1.-KSProb)*TMath::Sqrt(2.);
+      Chi2Prob = hDiff->Chi2Test( hSims, "WW");
+      Chi2Sig = TMath::ErfInverse(1.-Chi2Prob)*TMath::Sqrt(2.);
 
-      KSProb = hSims->KolmogorovTest(hDiff);//AMc
-      KSSig = TMath::ErfInverse(1-KSProb)*TMath::Sqrt(2);//AMc
-
-      c_MSCW->cd( i );
+// draw histograms
+      c_MS->cd( i );
       hSims->Draw();
       hDiff->Draw( "same" );
 
-      TLine *lmscw = new TLine( 0., hSims->GetMinimum(), 0., hSims->GetMaximum() );
-      lmscw->SetLineStyle( 2 );
-      lmscw->Draw();
+      TLine *lLine = new TLine( 0., hSims->GetMinimum(), 0., hSims->GetMaximum() );
+      lLine->SetLineStyle( 2 );
+      lLine->Draw();
 
-      sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", hmscwerec_sims->GetXaxis()->GetBinLowEdge( i ),  hmscwerec_sims->GetXaxis()->GetBinUpEdge( i ) );
-      TLatex *iT = new TLatex( -0.5, 0.9*hSims->GetMaximum(), hname );
+      sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", h_sims->GetXaxis()->GetBinLowEdge( i ),  h_sims->GetXaxis()->GetBinUpEdge( i ) );
+      TLatex *iT = new TLatex( x_min + 0.1*(x_max-x_min), 0.9*hSims->GetMaximum(), hname );
+      iT->SetTextSize( iT->GetTextSize() * 0.6 );
       iT->Draw();
-      sprintf( hname, "mean(MC): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS() );
-      TLatex *iM = new TLatex( -0.5, 0.82*hSims->GetMaximum(), hname );
+      sprintf( hname, "mean (MC): %.2f#pm %.2f, mean (data): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS(), hDiff->GetMean(), hDiff->GetRMS() );
+      TLatex *iM = new TLatex( x_min + 0.1*(x_max-x_min), 0.84*hSims->GetMaximum(), hname );
+      iM->SetTextSize( iM->GetTextSize() * 0.6 );
       iM->Draw();
-      sprintf( hname, "mean(data): %.2f#pm %.2f", hDiff->GetMean(), hDiff->GetRMS() );
-      TLatex *iD = new TLatex( -0.5, 0.74*hSims->GetMaximum(), hname );
-      iD->Draw();
-      sprintf( hname, "KS-test | P = %1.2e (%1.1f #sigma)", KSProb, KSSig );//AMc
-      TLatex *iK = new TLatex( -0.5, 0.66*hSims->GetMaximum(), hname );//AMc
-      iK->Draw();//AMc
-    }
-
-  // MSCL
-
-  sprintf( hname, "c_MSCL_%s", ffile );
-  sprintf( htitle, "MSCL (%s)", ffile );
-  TCanvas *c_MSCL = new TCanvas( hname, htitle, 200, 100, 900, 600 );
-  c_MSCL->SetGridx( 0 );
-  c_MSCL->SetGridy( 0 );
-  c_MSCL->Divide( 3, 2 );
-
-  TH2D *hMSCLerec_sims = (TH2D*)fDir->Get( "hMSCLErec_SIMS" );
-  TH2D *hMSCLerec_diff = (TH2D*)fDir->Get( "hMSCLErec_DIFF" );
-
-  if( !hMSCLerec_sims || !hMSCLerec_diff ) return;
-
-  for( int i = 1; i <= hMSCLerec_sims->GetXaxis()->GetNbins(); i++ )
-    {
-      sprintf( hname, "hMSCLErec_SIMS_%d", i );
-      TH1D *hSims = hMSCLerec_sims->ProjectionY( hname, i, i );
-      setHistogramAtt( hSims, 2, 1, 1, 20, 1 );
-      sprintf( hname, "hMSCLErec_DIFF_%d", i );
-      TH1D *hDiff = hMSCLerec_diff->ProjectionY( hname, i, i );
-      setHistogramAtt( hDiff, 1, 1, 1, 21, 1 );
-      if( hSims->GetEntries() > 0 ) hSims->Scale( s_sims );
-      if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
-
-      hSims->SetAxisRange( -1.5, 2.5 );
-      hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
-
-      KSProb = hSims->KolmogorovTest(hDiff);//AMc
-      KSSig = TMath::ErfInverse(1-KSProb)*TMath::Sqrt(2);//AMc
-
-      c_MSCL->cd( i );
-      hSims->Draw();
-      hDiff->Draw( "same" );
-
-      TLine *lMSCL = new TLine( 0., hSims->GetMinimum(), 0., hSims->GetMaximum() );
-      lMSCL->SetLineStyle( 2 );
-      lMSCL->Draw();
-
-      sprintf( hname, "%.1f < log_{10} E < %.1f", hMSCLerec_sims->GetXaxis()->GetBinLowEdge( i ),  hMSCLerec_sims->GetXaxis()->GetBinUpEdge( i ) );
-      TLatex *iT = new TLatex( -0.5, 0.9*hSims->GetMaximum(), hname );
-      iT->Draw();
-      sprintf( hname, "mean(MC): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS() );
-      TLatex *iM = new TLatex( -0.5, 0.82*hSims->GetMaximum(), hname );
-      iM->Draw();
-      sprintf( hname, "mean(data): %.2f#pm %.2f", hDiff->GetMean(), hDiff->GetRMS() );
-      TLatex *iD = new TLatex( -0.5, 0.74*hSims->GetMaximum(), hname );
-      iD->Draw();
-      sprintf( hname, "KS-test | P = %1.2e (%1.1f #sigma)", KSProb, KSSig );//AMc
-      TLatex *iK = new TLatex( -0.5, 0.66*hSims->GetMaximum(), hname );//AMc
-      iK->Draw();//AMc
+      sprintf( hname, "KS-test | P = %1.2e (%1.1f #sigma)", KSProb, KSSig );
+      TLatex *iK = new TLatex( x_min + 0.1*(x_max-x_min), 0.78*hSims->GetMaximum(), hname );
+      iK->SetTextSize( iK->GetTextSize() * 0.6 );
+      iK->Draw();
+      sprintf( hname, "Chi2 | P = %1.2e (%1.1f #sigma)", Chi2Prob, Chi2Sig );
+      TLatex *iC = new TLatex( x_min + 0.1*(x_max-x_min), 0.72*hSims->GetMaximum(), hname );
+      iC->SetTextSize( iC->GetTextSize() * 0.6 );
+      iC->Draw();
     }
 
 }
@@ -584,20 +593,20 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
   // theta2 < 0.02
   //
  
-  ht2_sims = (TH1D*)fDir->Get( "htheta2_SIMS" );
+  TH1D* ht2_sims = (TH1D*)fDir->Get( "htheta2_SIMS" );
   if( bPoster ) setHistogramAtt( ht2_sims, 2, 1, 2, 20, 1 );
   else          setHistogramAtt( ht2_sims, 2, 1, 1, 20, 1 );
   ht2_sims->SetYTitle( "number of shower [a.u.]" );
 
-  ht2_diff =  (TH1D*)fDir->Get( "htheta2_DIFF" );
+  TH1D* ht2_diff =  (TH1D*)fDir->Get( "htheta2_DIFF" );
   if( bPoster ) setHistogramAtt( ht2_diff, 1, 3, 2, 25, 1 );
   else setHistogramAtt( ht2_diff, 1, 1, 1, 25, 1 );
 
-  ht2_on = (TH1D*)fDir->Get( "htheta2_ON" );
+  TH1D* ht2_on = (TH1D*)fDir->Get( "htheta2_ON" );
   setHistogramAtt( ht2_on, 3, 1, 1, 20, 1 );
   ht2_on->SetYTitle( "number of shower [a.u.]" );
 
-  ht2_off = (TH1D*)fDir->Get( "htheta2_OFF" );
+  TH1D* ht2_off = (TH1D*)fDir->Get( "htheta2_OFF" );
   setHistogramAtt( ht2_off, 4, 1, 1, 21, 1 );
 
   ht2_sims->SetAxisRange( 0., 0.05 );
@@ -657,19 +666,19 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
   // theta2 < 0.02
   //
  
-  hlt2_sims = (TH1D*)fDir->Get( "hltheta2_SIMS" );
+  TH1D* hlt2_sims = (TH1D*)fDir->Get( "hltheta2_SIMS" );
   if( bPoster ) setHistogramAtt( hlt2_sims, 2, 3, 2, 20, 1 );
   else          setHistogramAtt( hlt2_sims, 2, 3, 1, 20, 1 );
   hlt2_sims->SetYTitle( "number of shower [a.u.]" );
 
-  hlt2_diff =  (TH1D*)fDir->Get( "hltheta2_DIFF" );
+  TH1D* hlt2_diff =  (TH1D*)fDir->Get( "hltheta2_DIFF" );
   if( bPoster ) setHistogramAtt( hlt2_diff, 1, 3, 2, 25, 1 );
   else          setHistogramAtt( hlt2_diff, 1, 3, 1, 25, 1 );
 
-  hlt2_on = (TH1D*)fDir->Get( "hltheta2_ON" );
+  TH1D* hlt2_on = (TH1D*)fDir->Get( "hltheta2_ON" );
   setHistogramAtt( hlt2_on, 3, 3, 1, 20, 1 );
 
-  hlt2_off = (TH1D*)fDir->Get( "hltheta2_OFF" );
+  TH1D* hlt2_off = (TH1D*)fDir->Get( "hltheta2_OFF" );
   setHistogramAtt( hlt2_off, 4, 3, 1, 21, 1 );
 
   getScaling( fDir, s_sims, s_diff, "ltheta2", 2 );
@@ -706,20 +715,20 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
   // MSCW
   //
 
-  hmscw_sims = (TH1D*)fDir->Get( "hMSCW_SIMS" );
+  TH1D* hmscw_sims = (TH1D*)fDir->Get( "hMSCW_SIMS" );
   if( bPoster ) setHistogramAtt( hmscw_sims, 2, 1, 1, 20, 2 );
   else          setHistogramAtt( hmscw_sims, 2, 1, 1, 20, 2 );
   hmscw_sims->SetYTitle( "number of shower [a.u.]" );
    
-  hmscw_diff = (TH1D*)fDir->Get( "hMSCW_DIFF" );
+  TH1D* hmscw_diff = (TH1D*)fDir->Get( "hMSCW_DIFF" );
   if( bPoster ) setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 2 );
   else          setHistogramAtt( hmscw_diff, 1, 1, 1, 25, 2 );
 
-  hmscw_on = (TH1D*)fDir->Get( "hMSCW_ON" );
+  TH1D* hmscw_on = (TH1D*)fDir->Get( "hMSCW_ON" );
   setHistogramAtt( hmscw_on, 3, 1, 1, 20, 1 );
   hmscw_on->SetYTitle( "number of shower [a.u.]" );
 
-  hmscw_off = (TH1D*)fDir->Get( "hMSCW_OFF" );
+  TH1D* hmscw_off = (TH1D*)fDir->Get( "hMSCW_OFF" );
   setHistogramAtt( hmscw_off, 4, 1, 1, 21, 1 );
 
   hmscw_sims->SetAxisRange( -1., 1. );
@@ -764,18 +773,18 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
   // MSCL
   //
 
-  hmscl_sims = (TH1D*)fDir->Get( "hMSCL_SIMS" );
+  TH1D* hmscl_sims = (TH1D*)fDir->Get( "hMSCL_SIMS" );
   if( bPoster ) setHistogramAtt( hmscl_sims, 2, 3, 2, 21, 1 );
   else          setHistogramAtt( hmscl_sims, 2, 3, 1, 21, 2 );
   hmscl_sims->SetYTitle( "number of shower [a.u.]" );
 
-  hmscl_on = (TH1D*)fDir->Get( "hMSCL_ON" );
+  TH1D* hmscl_on = (TH1D*)fDir->Get( "hMSCL_ON" );
   setHistogramAtt( hmscl_on, 3, 3, 1, 20, 1 );
 
-  hmscl_off = (TH1D*)fDir->Get( "hMSCL_OFF" );
+  TH1D* hmscl_off = (TH1D*)fDir->Get( "hMSCL_OFF" );
   setHistogramAtt( hmscl_off, 4, 3, 1, 21, 1 );
    
-  hmscl_diff = (TH1D*)fDir->Get( "hMSCL_DIFF" );
+  TH1D* hmscl_diff = (TH1D*)fDir->Get( "hMSCL_DIFF" );
   if( bPoster ) setHistogramAtt( hmscl_diff, 1, 3, 2, 25, 1 );
   else          setHistogramAtt( hmscl_diff, 1, 3, 1, 25, 2 );
   hmscl_diff->SetLineWidth( 3 );
@@ -817,7 +826,7 @@ void stereo_parameter(  char *ffile = "stereo_compare.root", bool bPoster = fals
     }
 }
 
-core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
+void core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
 {
   gStyle->SetPadGridX( 0 );
   gStyle->SetPadGridY( 0 );
@@ -838,17 +847,17 @@ core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
    
   // xcore
   //
-  hXcore_sims = (TH1D*)fDir->Get( "hXcore_SIMS" );
+  TH1D* hXcore_sims = (TH1D*)fDir->Get( "hXcore_SIMS" );
   setHistogramAtt( hXcore_sims, 2, 3, 1, 20, 8 );
-  hXcore_sims->SetMaximum( hXcore_sims->GetMaximum()*1.5. );
+  hXcore_sims->SetMaximum( hXcore_sims->GetMaximum()*1.5 );
 
-  hXcore_on = (TH1D*)fDir->Get( "hXcore_ON" );
+  TH1D* hXcore_on = (TH1D*)fDir->Get( "hXcore_ON" );
   setHistogramAtt( hXcore_on, 3, 3, 2, 8 );
 
-  hXcore_off = (TH1D*)fDir->Get( "hXcore_OFF" );
+  TH1D* hXcore_off = (TH1D*)fDir->Get( "hXcore_OFF" );
   setHistogramAtt( hXcore_off, 4, 3, 2, 8 );
    
-  hXcore_diff = (TH1D*)fDir->Get( "hXcore_DIFF" );
+  TH1D* hXcore_diff = (TH1D*)fDir->Get( "hXcore_DIFF" );
   setHistogramAtt( hXcore_diff, 1, 3, 1, 21, 8 );
 
   hXcore_sims->SetAxisRange( -250., 250. );
@@ -873,17 +882,17 @@ core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
   // Ycore
   //
 
-  hYcore_sims = (TH1D*)fDir->Get( "hYcore_SIMS" );
+  TH1D* hYcore_sims = (TH1D*)fDir->Get( "hYcore_SIMS" );
   setHistogramAtt( hYcore_sims, 2, 3, 1, 20, 8 );
   hYcore_sims->SetMaximum( hYcore_sims->GetMaximum()*1.5 );
 
-  hYcore_on = (TH1D*)fDir->Get( "hYcore_ON" );
+  TH1D* hYcore_on = (TH1D*)fDir->Get( "hYcore_ON" );
   setHistogramAtt( hYcore_on, 3, 3, 2, 8 );
    
-  hYcore_off = (TH1D*)fDir->Get( "hYcore_OFF" );
+  TH1D* hYcore_off = (TH1D*)fDir->Get( "hYcore_OFF" );
   setHistogramAtt( hYcore_off, 4, 3, 2, 8 );
    
-  hYcore_diff = (TH1D*)fDir->Get( "hYcore_DIFF" );
+  TH1D* hYcore_diff = (TH1D*)fDir->Get( "hYcore_DIFF" );
   setHistogramAtt( hYcore_diff, 1, 3, 1, 21, 8 );
 
   hYcore_sims->SetAxisRange( -250., 250. );
@@ -905,7 +914,7 @@ core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
   // XY plot
 
   cOCore->cd(3);
-  hXYcore_on = (TH2D*)fDir->Get( "hXYcore_ON" );
+  TH2D* hXYcore_on = (TH2D*)fDir->Get( "hXYcore_ON" );
   setHistogramAtt( hXYcore_on, 1. );
   hXYcore_on->SetXTitle( "core position X (ON) [m]" );
   hXYcore_on->SetYTitle( "core position Y (ON) [m]" );
@@ -913,7 +922,7 @@ core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
   hXYcore_on->Draw( "colz" );
 
   cOCore->cd(4);  
-  hXYcore_off = (TH2D*)fDir->Get( "hXYcore_OFF" );
+  TH2D* hXYcore_off = (TH2D*)fDir->Get( "hXYcore_OFF" );
   setHistogramAtt( hXYcore_off, 1. );
   hXYcore_off->SetXTitle( "core position X (OFF) [m]" );
   hXYcore_off->SetYTitle( "core position Y (OFF) [m]" );
@@ -921,7 +930,7 @@ core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
   hXYcore_off->Draw( "colz" );
 
   cSCore->cd(3);
-  hXYcore_diff = (TH2D*)fDir->Get( "hXYcore_DIFF" );
+  TH2D* hXYcore_diff = (TH2D*)fDir->Get( "hXYcore_DIFF" );
   setHistogramAtt( hXYcore_diff, 1. );
   hXYcore_diff->SetXTitle( "core position X (ON-OFF) [m]" );
   hXYcore_diff->SetYTitle( "core position Y (ON-OFF) [m]" );
@@ -929,7 +938,7 @@ core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
   hXYcore_diff->Draw( "colz" );
 
   cSCore->cd(4);
-  hXYcore_sims = (TH2D*)fDir->Get( "hXYcore_SIMS" );
+  TH2D* hXYcore_sims = (TH2D*)fDir->Get( "hXYcore_SIMS" );
   setHistogramAtt( hXYcore_sims, 1. );
 
   hXYcore_sims->SetXTitle( "core position X (SIMS) [m]" );
@@ -1065,8 +1074,6 @@ void distance_plots( char *ifile = "stereo_compare.root", int fNTel = 4, bool bP
   TH2D *hdistR_off[200];
 
   TH1D *hrel = 0;
-
-  char hname[200];
   for( int i = 0; i < fNTel; i++ )
     {
       // R
@@ -1121,7 +1128,7 @@ void distance_plots( char *ifile = "stereo_compare.root", int fNTel = 4, bool bP
 	{
 	  sprintf( hname, "hR_RE_%d", i );
 	  hrel = (TH1D*)hR_sims[i]->Clone( hname );
-	  hrel = hrel->Divide( hR_diff[i] );
+	  hrel->Divide( hR_diff[i] );
 	  hrel->SetYTitle( "sims/data" );
 	  hrel->SetMinimum( 0.3 );
 	  hrel->SetMaximum( 3.0 );
@@ -1190,45 +1197,52 @@ void distance_plots( char *ifile = "stereo_compare.root", int fNTel = 4, bool bP
  * plot is SIMSDIFF, ONOFF, REL
  *
  */
-void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", string iPlot = "SIMSDIFF", bool iOneCanvas = true, bool bPoster = false, int iScalingMethod = 1 , bool plotKS = false)
+void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", string iPlot = "SIMSDIFF", bool iOneCanvas = true, 
+                       bool bPoster = false, int iScalingMethod = 1, int i_rebin = 2, bool plotKS = false )
 {
+
   if( iPlot != "SIMSDIFF" && iPlot != "ONOFF" && iPlot != "REL" )
-    {
+  {
       cout << "error: unknown plotting mode (allowed are SIMSDIFF, ONOFF, REL)" << endl;
       return;
-    }
-  // open file
+  }
+// open file
   TDirectory *fDir = openFile( ifile );
 
   double KSProb = 0;
   double KSSig = 0;
   char text[1000]; 
-  // scaling factor
+// scaling factor
   double s_sims = 1.;
   double s_diff = 1.;
   char htitle[600];
   sprintf( htitle, "width_%d", telid );
   getScaling( fDir, s_sims, s_diff, htitle, iScalingMethod );
 
-  // histogram names to be plotted
+//////////////////////////////////////
+// histogram names to be plotted
   vector< string > hname;
-  hname.push_back( "width" );
-  hname.push_back( "length" );
-  hname.push_back( "dist" );
-  hname.push_back( "size" );
-  hname.push_back( "size2" );
-  hname.push_back( "nlowgain" );
-  hname.push_back( "los" );
-  hname.push_back( "asym" );
-  hname.push_back( "cen_x" );
-  hname.push_back( "cen_y" );
-  hname.push_back( "ntubes" );
-  hname.push_back( "mscwt" );
-  hname.push_back( "msclt" );
-  hname.push_back( "loss" );
-  hname.push_back( "tgrad_x" );
+  vector< int >    f_rebin;
+  vector< bool >   f_logy;
+  vector< double > f_x_min;
+  vector< double > f_x_max;
+  hname.push_back( "width" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );
+  hname.push_back( "length" );  f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.50 );
+  hname.push_back( "dist" );    f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 2.10 );
+  hname.push_back( "size" );    f_rebin.push_back( i_rebin ); f_logy.push_back( true );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
+  hname.push_back( "size2" );   f_rebin.push_back( i_rebin ); f_logy.push_back( true );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
+  hname.push_back( "nlowgain" );f_rebin.push_back( 1 );       f_logy.push_back( true );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
+  hname.push_back( "los" );     f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
+  hname.push_back( "asym" );    f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
+  hname.push_back( "cen_x" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
+  hname.push_back( "cen_y" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
+  hname.push_back( "ntubes" );  f_rebin.push_back( 1 );       f_logy.push_back( true );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
+  hname.push_back( "mscwt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
+  hname.push_back( "msclt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
+  hname.push_back( "loss" );    f_rebin.push_back( i_rebin ); f_logy.push_back( true );   f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );
+  hname.push_back( "tgrad_x" ); f_rebin.push_back( i_rebin ); f_logy.push_back( false );  f_x_min.push_back( -7.5 );  f_x_max.push_back( 7.5 );
 
-  // loop over all histograms and plot them
+// loop over all histograms and plot them
   char hn[600];
   char cn[600];
   char ct[600];
@@ -1240,20 +1254,22 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
   TH1D *hrel = 0;
    
   TCanvas *hc = 0;
+// canvas for all in one
   if( iOneCanvas )
-    {
+  {
       sprintf( cn, "image parameter comparision (telescope %d, file %s, %s)", telid, ifile, iPlot.c_str() );
       sprintf( ct, "cimage_%d_%s_%s", telid, iPlot.c_str(), ifile );
       hc = new TCanvas( ct, cn, 10, 10, 1300, 800 );
       hc->SetGridx( 0 );
       hc->SetGridy( 0 );
       hc->Divide( 5, 3 );
-    }
+  }
   TLegend *iL = 0;
-  TLatex *iT = new TLatex();
-  // loop over all histograms and plot them
+
+/////////////////////////////////////////////////
+// loop over all histograms and plot them
   for( unsigned int j = 0; j < hname.size(); j++ )
-    {
+  {
       sprintf( hn, "h%s_%d_SIMS", hname[j].c_str(), telid );
       hsims = (TH1D*)fDir->Get( hn );
       if( !hsims )
@@ -1282,36 +1298,31 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
 	  cout << "off histogram not found " << hn << endl;
 	  continue;
 	} 
-      // normalize sims histograms to data histograms
+// normalize sims histograms to data histograms
       hsims->Scale( s_sims );
       hdiff->Scale( s_diff );
-      // rebin most histograms
-      if( hname[j] != "ntubes" && hname[j] != "nlowgain" )
-	{
-	  hsims->Rebin( 2 );
-	  hdiff->Rebin( 2 );
-	  hon->Rebin( 2 );
-	  hoff->Rebin( 2 );
-	}
-      // relative histograms
+// rebin histograms
+      hsims->Rebin( f_rebin[j] );
+      hdiff->Rebin( f_rebin[j] );
+      hon->Rebin( f_rebin[j] );
+      hoff->Rebin( f_rebin[j] );
+// relative histograms
       if( hsims && hdiff )
-	{
+      {
 	  sprintf( hn, "h%s_%d_RE", hname[j].c_str(), telid );
 	  hrel = (TH1D*)hsims->Clone( hn );
-	  hrel = hrel->Divide( hdiff );
-	}
+	  hrel->Divide( hdiff );
+      }
      
       if( iOneCanvas )
-	{
-	  TPad *g = (TPad*)hc->cd( j+1 ); //AMc
+      {
+	  TPad *g = (TPad*)hc->cd( j+1 ); 
 	  g->SetGridx( 0 );
 	  g->SetGridy( 0 );
-	  if( iPlot != "REL" &&
-	      ( hname[j] == "size" ||  hname[j] == "size2" || hname[j] == "max1" || hname[j] == "ntubes" || hname[j] == "nlowgain" || hname[j] == "loss" )
-	      && hsims->GetEntries() > 0 && hdiff->GetEntries() > 0 ) g->SetLogy( 1 );
-	}
+	  if( iPlot != "REL" ) g->SetLogy( f_logy[j] );
+      }
       else
-	{
+      {
 	  sprintf( cn, "c%d%s%s", telid, iPlot.c_str(), hname[j].c_str() );
 	  sprintf( ct, "%s (telescope %d, %s)", hname[j].c_str(), telid, iPlot.c_str() );
 	  int xmax = 600;
@@ -1319,30 +1330,10 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
 	  hc = new TCanvas( cn, ct, 10, 100, xmax, 400 );
 	  hc->SetGridx( 0 );
 	  hc->SetGridy( 0 );
-	}
-      double xstart = 0.58;
-      double xstopp = 0.85;
-      if( hname[j] == "asym" || hname[j] == "cen_x" || hname[j] == "cen_y" )
-	{
-	  xstart -= 0.45;
-	  xstopp -= 0.45;
-	}
-      iL = new TLegend( xstart, 0.68, xstopp, 0.85 );
-      if( hname[j] == "nlowgain" )
-	{
-          iL->SetHeader( "low gain channels" );
-	  hdiff->SetXTitle( "low gain channels" );
-	}
-      else if( hname[j] == "ntubesBNI" )
-	{
-          iL->SetHeader( "isolated pixel" );
-	  hdiff->SetXTitle( "isolated pixel" );
-
-	}
-      else
-	{
-          iL->SetHeader( hname[j].c_str() );
-	}
+	  hc->SetLogy( f_logy[j] );
+	  hc->cd();
+      }
+      iL = new TLegend( 0.58 , 0.68, 0.85, 0.85 );
 
       setHistogramAtt( hsims, 2, 0.5, 1, 20, 1 );
       if( bPoster ) setHistogramAtt( hsims, 2, 3, 2, 20, 1 );
@@ -1352,97 +1343,91 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
       if( bPoster ) setHistogramAtt( hon, 2, 3, 2, 20, 1 );
       setHistogramAtt( hoff, 4, 1, 1, 21, 1 );
       if( bPoster ) setHistogramAtt( hoff, 1, 3, 2, 21, 1 );
-      setHistogramAtt( hrel, 1, 1, 1, 21, 1 );
+      setHistogramAtt( hrel, 9, 1, 1, 20, 1 );
       if( bPoster ) setHistogramAtt( hrel, 1, 3, 2, 21, 1 );
 
       hdiff->SetYTitle( "number of shower [a.u.]" );
+      hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
       hrel->SetYTitle( "sims/data" );
-      hrel->SetMinimum( 0.3 );
+      hrel->SetMinimum( 0.03 );
       hrel->SetMaximum( 3.0 );
 
-      //      if( hname[j] != "ntubes" && hname[j] != "nlowgain" ) hdiff->SetMaximum( hdiff->GetMaximum() * 5 );
-      if( hname[j] != "ntubes" && hname[j] != "nlowgain" ) hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
-      else                       hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
+      if( hdiff->GetXaxis()->GetXmin() > f_x_min[j] ) f_x_min[j] = hdiff->GetXaxis()->GetXmin();
+      if( hdiff->GetXaxis()->GetXmax() < f_x_max[j] ) f_x_max[j] = hdiff->GetXaxis()->GetXmax();
+      hdiff->SetAxisRange( f_x_min[j], f_x_max[j] );
+      hsims->SetAxisRange( f_x_min[j], f_x_max[j] );
+      hon->SetAxisRange( f_x_min[j], f_x_max[j] );
+      hoff->SetAxisRange( f_x_min[j], f_x_max[j] );
+      hrel->SetAxisRange( f_x_min[j], f_x_max[j] );
 
-      double xAxis_min = hdiff->GetXaxis()->GetXmin();
-      double xAxis_max = hdiff->GetXaxis()->GetXmax();
-      if( hname[j] == "ntubes" ) { xAxis_min = 0.; xAxis_max = 80.; }
-      if( hname[j] == "ntubesBNI" ) { xAxis_min = 0.; xAxis_max = 40.; }
-      if( hname[j] == "nlowgain" ) { xAxis_min = 0.; xAxis_max = 25.; }
-      if( hname[j] == "size" ) { xAxis_min = 2.0; xAxis_max = 5.0; }
-      if( hname[j] == "max1" ) { xAxis_min = 1.5; xAxis_max = 4.0; }
-      if( hname[j] == "loss" ) { xAxis_min = 0.; xAxis_max = 0.5; }
-      if( hname[j] == "cen_y" ) reflectSims( hsims );
-
-      hdiff->SetAxisRange( xAxis_min, xAxis_max );
-      hsims->SetAxisRange( xAxis_min, xAxis_max );
-      hon->SetAxisRange( xAxis_min, xAxis_max );
-      hoff->SetAxisRange( xAxis_min, xAxis_max );
-      hrel->SetAxisRange( xAxis_min, xAxis_max );
-
+////////////////////////////////////////////////
+// difference plots
       if( iPlot == "SIMSDIFF" )
-	{
-	  KSProb = hsims->KolmogorovTest(hdiff);//AMc
-	  KSSig = TMath::ErfInverse(1-KSProb)*TMath::Sqrt(2);//AMc
-
+      {
 	  hdiff->Draw( "cle" );
 	  hsims->Draw( "cle same" );
 	  sprintf( cn, "telescope %d", telid );
 	  iL->AddEntry( hdiff, cn, "pl" );
 	  sprintf( cn, "simulations" );
 	  iL->AddEntry( hsims, cn, "pl" );
-	  
-	  //Begin AMc
-	  if(KSProb != 0)
-	    sprintf( text, "%s | KS P = %1.2e (%1.1f #sigma)", hname[j].c_str(), KSProb,KSSig );
-	  else
-	    sprintf( text, "%s | KS P = %1.2e (#infty #sigma)", hname[j].c_str(), KSProb);
-	
-	  if(plotKS)
-	    cout << text << endl;
-	  
-	  iT->SetText(0.11,0.92,text);
-	  iT->SetNDC();
-	  iT->DrawClone();
-	  //End AMc
 
 	  if( !gPad->GetLogy() )
-	    {
+	  {
 	      TLine *iL0 = new TLine( hdiff->GetXaxis()->GetXmin(), 0., hdiff->GetXaxis()->GetXmax(), 0. );
 	      iL0->SetLineStyle( 2 );
 	      iL0->Draw();
-	    }
-	}
+	  }
+      }
+////////////////////////////////////////////////
+// on/off plots
       else if( iPlot == "ONOFF" )
-	{
+      {
 	  hon->Draw( "cle" );
 	  hoff->Draw( "cle same" );
 	  sprintf( cn, "on telescope %d", telid );
 	  iL->AddEntry( hon, cn, "pl" );
 	  sprintf( cn, "off telescope %d", telid );
 	  iL->AddEntry( hoff, cn, "pl" );
-	}
+      }
+////////////////////////////////////////////////
+// relative plots
       else if( iPlot == "REL" )
-	{
+      {
 	  hrel->Draw( "cle" );
-	}
+      }
       if( !bPoster && iPlot != "REL" ) iL->Draw();
 
+// line for mscwt and msclt histograms
       if( iPlot != "REL" )
-	{
+      {
 	  if( hname[j] == "mscwt" || hname[j] == "msclt" )
 	    {
 	      TLine *iLine = new TLine( 1., hdiff->GetMinimum(), 1., hdiff->GetMaximum() );
 	      iLine->SetLineStyle( 2 );
 	      iLine->Draw();
 	    }
-	}
+      }
+// line at 1 for relative plots
       else
-	{
-	  TLine *iLine = new TLine( xAxis_min, 1., xAxis_max, 1. );
+      {
+	  TLine *iLine = new TLine( f_x_min[j], 1., f_x_max[j], 1. );
 	  iLine->SetLineStyle( 2 );
 	  iLine->Draw();
-	}
+      }
+      if( iPlot == "SIMSDIFF" || iPlot == "REL" )
+      {
+// calculate probabilities of agreement
+	  KSProb = hsims->KolmogorovTest(hdiff);
+	  KSSig = TMath::ErfInverse(1-KSProb)*TMath::Sqrt(2);
+	  if(KSProb != 0) sprintf( text, "%s | KS P = %1.2e (%1.1f #sigma)", hname[j].c_str(), KSProb,KSSig );
+	  else            sprintf( text, "%s | KS P = %1.2e (#infty #sigma)", hname[j].c_str(), KSProb);
+	  if( plotKS ) cout << text << endl;
+	  
+	  TLatex *iT = new TLatex();
+	  iT->SetText(0.11,0.92,text);
+	  iT->SetNDC();
+	  iT->Draw();
+       }
     }
 }     
 
@@ -1454,7 +1439,7 @@ void fitTheta2( TH1D *h, int icolor = 1, int imarker = 20 )
 
   h->SetAxisRange( 0., 0.1 );
 
-  fTheta2=new TF1("fTheta2","[0]*([1]/2./[2]/[2]*TMath::Exp(-x/2./[2]/[2])+(1-[1])/2./[3]/[3]*TMath::Exp(-x/2./[3]/[3]))",0.,0.1);
+  TF1 *fTheta2 = new TF1("fTheta2","[0]*([1]/2./[2]/[2]*TMath::Exp(-x/2./[2]/[2])+(1-[1])/2./[3]/[3]*TMath::Exp(-x/2./[3]/[3]))",0.,0.1);
   fTheta2->SetParameter( 0, 5. );
   fTheta2->SetParameter( 1, 0.5 );
   fTheta2->SetParLimits( 1, 0., 1. );
@@ -1493,16 +1478,16 @@ void plot_msc( char *ffile = "stereo_compare.root", char *offFile = 0, char *hel
   TCanvas *cMSCLsim = 0;
 
   sprintf( hname, "h%s_SIMS", ivar.c_str() );
-  hMSC_sims = (TH1D*)fDir->Get( hname );
+  TH1D* hMSC_sims = (TH1D*)fDir->Get( hname );
   setHistogramAtt( hMSC_sims, 2, 3, 2, 24, 1 );
   hMSC_sims->SetYTitle( "number of showers [a.u.]" );
    
   sprintf( hname, "h%s_DIFF", ivar.c_str() );
-  hMSC_diff = (TH1D*)fDir->Get( hname );
+  TH1D* hMSC_diff = (TH1D*)fDir->Get( hname );
   setHistogramAtt( hMSC_diff, 1, 3, 2, 21, 1 );
 
   sprintf( hname, "h%s_OFF", ivar.c_str() );
-  hMSC_off = (TH1D*)fDir->Get( hname );
+  TH1D* hMSC_off = (TH1D*)fDir->Get( hname );
   setHistogramAtt( hMSC_off, 4, 3, 2, 21, 1 );
   hMSC_off->Rebin( 2 );
 
@@ -1596,141 +1581,26 @@ void plot_msc( char *ffile = "stereo_compare.root", char *offFile = 0, char *hel
   TLegend *iLegend = new TLegend( 0.4, 0.60, 0.85, 0.85 );
   iLegend->AddEntry( hMSC_sims, "simulations (#gamma-rays)", "pl" );
   iLegend->AddEntry( hMSC_diff, "On-Off (Crab data)", "pl" );
-  iLegend->AddEntry( hCR, "simulations (Cosmic-rays)", "l" );
-  iLegend->AddEntry( hMSC_off_ana, "data (Cosmic-rays)", "l" );
+//  iLegend->AddEntry( hCR, "simulations (Cosmic-rays)", "l" );
+//  iLegend->AddEntry( hMSC_off_ana, "data (Cosmic-rays)", "l" );
   iLegend->Draw();
 }
 
 
-//Begin AMc
-void mwr_plots( char *ffile = "stereo_compare.root", bool bPoster = false )
+/*
+
+    plot mean width plots (energy dependent)
+*/
+void mwr_plots( char *ffile = "stereo_compare.root" )
 {
   gStyle->SetPadGridX( 0 );
   gStyle->SetPadGridY( 0 );
   gStyle->SetPalette(1);
 
-  double KSProb;
-  double KSSig;
- 
-
   TDirectory *fDir = openFile( ffile );
 
-  // get the scaling between simulations and data
-  double s_sims = 1.;
-  double s_diff = 1.;
-  getScaling( fDir, s_sims, s_diff, "MWR", 2 );
+  plot_energyDependentDistributions( fDir, "MWR", 2, 0., 2.5 );
+  plot_energyDependentDistributions( fDir, "MLR", 2, 0., 2.5 );
 
-  char hname[600];
-  char htitle[600];
-  sprintf( hname, "c_MWR_%s", ffile );
-  sprintf( htitle, "Real mscw [MWR] (%s)", ffile );
-  TCanvas *c_MWR = new TCanvas( hname, htitle, 100, 10, 900, 600 );
-  c_MWR->SetGridx( 0 );
-  c_MWR->SetGridy( 0 );
-  c_MWR->Divide( 3, 2 );
-
-  TH2D *hmscwerec_sims = (TH2D*)fDir->Get( "hMWRErec_SIMS" );
-  TH2D *hmscwerec_diff = (TH2D*)fDir->Get( "hMWRErec_DIFF" );
-
-  if( !hmscwerec_sims || !hmscwerec_diff ) return;
-
-  for( int i = 1; i <= hmscwerec_sims->GetXaxis()->GetNbins(); i++ )
-    {
-      sprintf( hname, "hMWRErec_SIMS_%d", i );
-      TH1D *hSims = hmscwerec_sims->ProjectionY( hname, i, i );
-      setHistogramAtt( hSims, 2, 1, 1, 20, 2 );
-      sprintf( hname, "hMWRErec_DIFF_%d", i );
-      TH1D *hDiff = hmscwerec_diff->ProjectionY( hname, i, i );
-      setHistogramAtt( hDiff, 1, 1, 1, 21, 2 );
-      if( hSims->GetEntries() > 0 ) hSims->Scale( s_sims );
-      if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
-
-      hSims->SetAxisRange( -1.5, 2.5 );
-      hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
-
-
-      KSProb = hSims->KolmogorovTest(hDiff);
-      KSSig = TMath::ErfInverse(1-KSProb)*TMath::Sqrt(2);
-
-
-      c_MWR->cd( i );
-      hSims->Draw();
-      hDiff->Draw( "same" );
-
-      TLine *lmscw = new TLine( 0., hSims->GetMinimum(), 0., hSims->GetMaximum() );
-      lmscw->SetLineStyle( 2 );
-      lmscw->Draw();
-
-      sprintf( hname, "%.1f < log_{10} E_{rec} < %.1f", hmscwerec_sims->GetXaxis()->GetBinLowEdge( i ),  hmscwerec_sims->GetXaxis()->GetBinUpEdge( i ) );
-      TLatex *iT = new TLatex( -0.5, 0.9*hSims->GetMaximum(), hname );
-      iT->Draw();
-      sprintf( hname, "mean(MC): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS() );
-      TLatex *iM = new TLatex( -0.5, 0.82*hSims->GetMaximum(), hname );
-      iM->Draw();
-      sprintf( hname, "mean(data): %.2f#pm %.2f", hDiff->GetMean(), hDiff->GetRMS() );
-      TLatex *iD = new TLatex( -0.5, 0.74*hSims->GetMaximum(), hname );
-      iD->Draw();
-      sprintf( hname, "KS-test | P = %1.2e (%1.1f #sigma)", KSProb, KSSig );
-      TLatex *iK = new TLatex( -0.5, 0.66*hSims->GetMaximum(), hname );
-      iK->Draw();
-
-
-    }
-
-  // MLR
-
-  sprintf( hname, "c_MLR_%s", ffile );
-  sprintf( htitle, "Real mscl [MLR] (%s)", ffile );
-  TCanvas *c_MLR = new TCanvas( hname, htitle, 200, 100, 900, 600 );
-  c_MLR->SetGridx( 0 );
-  c_MLR->SetGridy( 0 );
-  c_MLR->Divide( 3, 2 );
-
-  TH2D *hMLRerec_sims = (TH2D*)fDir->Get( "hMLRErec_SIMS" );
-  TH2D *hMLRerec_diff = (TH2D*)fDir->Get( "hMLRErec_DIFF" );
-
-  if( !hMLRerec_sims || !hMLRerec_diff ) return;
-
-  for( int i = 1; i <= hMLRerec_sims->GetXaxis()->GetNbins(); i++ )
-    {
-      sprintf( hname, "hMLRErec_SIMS_%d", i );
-      TH1D *hSims = hMLRerec_sims->ProjectionY( hname, i, i );
-      setHistogramAtt( hSims, 2, 1, 1, 20, 1 );
-      sprintf( hname, "hMLRErec_DIFF_%d", i );
-      TH1D *hDiff = hMLRerec_diff->ProjectionY( hname, i, i );
-      setHistogramAtt( hDiff, 1, 1, 1, 21, 1 );
-      if( hSims->GetEntries() > 0 ) hSims->Scale( s_sims );
-      if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
-
-      hSims->SetAxisRange( -1.5, 2.5 );
-      hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
-
-      KSProb = hSims->KolmogorovTest(hDiff);
-      KSSig = TMath::ErfInverse(1-KSProb)*TMath::Sqrt(2);
-
-      c_MLR->cd( i );
-      hSims->Draw();
-      hDiff->Draw( "same" );
-
-      TLine *lMLR = new TLine( 0., hSims->GetMinimum(), 0., hSims->GetMaximum() );
-      lMLR->SetLineStyle( 2 );
-      lMLR->Draw();
-
-      sprintf( hname, "%.1f < log_{10} E < %.1f", hMLRerec_sims->GetXaxis()->GetBinLowEdge( i ),  hMLRerec_sims->GetXaxis()->GetBinUpEdge( i ) );
-      TLatex *iT = new TLatex( -0.5, 0.9*hSims->GetMaximum(), hname );
-      iT->Draw();
-      sprintf( hname, "mean(MC): %.2f#pm %.2f", hSims->GetMean(), hSims->GetRMS() );
-      TLatex *iM = new TLatex( -0.5, 0.82*hSims->GetMaximum(), hname );
-      iM->Draw();
-      sprintf( hname, "mean(data): %.2f#pm %.2f", hDiff->GetMean(), hDiff->GetRMS() );
-      TLatex *iD = new TLatex( -0.5, 0.74*hSims->GetMaximum(), hname );
-      iD->Draw();
-      sprintf( hname, "KS-test | P = %1.2e (%1.1f #sigma)", KSProb, KSSig );
-      TLatex *iK = new TLatex( -0.5, 0.66*hSims->GetMaximum(), hname );
-      iK->Draw();
-
-
-    }
-
+  return;
 }
-//End AMc
