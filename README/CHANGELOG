@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130820 (GM) added binary visibility tool (experimental status)
+                needs libnova external package
+
 * 20130819 (GM) added Fitstat variable to data tree (mscw_energy)
 
 * 20130819 (GM) data/MC comparison: single tel distribution are filled

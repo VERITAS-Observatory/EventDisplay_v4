@@ -233,6 +233,10 @@ CTA:	evndisp \
 	writeCTAWPPhysSensitivityFiles \
 	writeParticleRateFilesFromEffectiveAreas
 
+###############################################################################################################################
+# core eventdisplay package
+###############################################################################################################################
+
 
 ########################################################
 # eventdisplay
@@ -1134,6 +1138,26 @@ endif
 	@echo rootcint -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
 	@rootcint -f $(basename $@).cpp -c -p ./inc/VZDCF.h ./inc/VZDCFData.h ./inc/VZDCFLinkDef.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(basename $@).cpp
+
+###############################################################################################################################
+# code which requires the libnova package installed in $LIBNOVASYS
+# 
+# (note: experimental state)
+###############################################################################################################################
+
+./obj/binaryVisibility.o:	binaryVisibility.cpp
+	$(CXX) $(CXXFLAGS) -I. -I  $(LIBNOVASYS)/include/ -c -o $@ $<
+
+./obj/VLibNovaStar.o:	VLibNovaStar.cpp VLibNovaStar.h
+	$(CXX) $(CXXFLAGS) -I. -I  $(LIBNOVASYS)/include/ -c -o $@ $<
+
+./obj/VLibNovaSunAndMoon.o:	VLibNovaSunAndMoon.cpp VLibNovaSunAndMoon.h
+	$(CXX) $(CXXFLAGS) -I. -I  $(LIBNOVASYS)/include/ -c -o $@ $<
+
+binaryVisibility:	./obj/VLibNovaStar.o ./obj/VLibNovaSunAndMoon.o ./obj/binaryVisibility.o	
+	$(LD) $(LDFLAGS) $^ $(GLIBS) -L$(LIBNOVASYS)/lib/ -lnova $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
 
 ###############################################################################################################################
 # make a tar package with all the source files / Makefiles / scripts
