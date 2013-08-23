@@ -220,7 +220,8 @@ all VTS:	evndisp \
 	calculateBinaryPhases \
 	compareDatawithMC \
 	VTS.getRunListFromDB \
-	VTS.getLaserRunFromDB
+	VTS.getLaserRunFromDB \
+	VTS.getRun_TimeElevAzim
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -409,6 +410,44 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 makeRadialAcceptance:	$(ACCOBJECT)
+	$(LD) $(LDFLAGS) $^ $(GLIBS)  $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+##########################
+# VTS.getRun_TimeElevAzim
+##########################
+
+ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
+		./obj/VSkyCoordinates.o \
+		./obj/VSkyCoordinatesUtilities.o \
+		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+		./obj/VASlalib.o \
+		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
+		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
+		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
+		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
+		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
+		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
+		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+		./obj/VRunList.o ./obj/VRunList_Dict.o \
+		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+		./obj/VAnaSumRunParameter.o \
+		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+		./obj/VTargets.o \
+		./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+		./obj/VStar.o ./obj/VStar_Dict.o \
+		./obj/VDB_Connection.o \
+		./obj/VUtilities.o 
+
+./obj/VTS.getRun_TimeElevAzim.o: ./src/VTS.getRun_TimeElevAzim.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+VTS.getRun_TimeElevAzim: $(ACCOBJECT)
 	$(LD) $(LDFLAGS) $^ $(GLIBS)  $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 

@@ -50,6 +50,7 @@ class VSkyCoordinates
 
         double fObsLatitude;                      //!< [rad]
         double fObsLongitude;                     //!< [rad]
+		double fSupressStdoutText ;
 
         void reset();
 
@@ -99,5 +100,10 @@ class VSkyCoordinates
         void   setTelElevation( double iTelEl )    { fTelElevation = iTelEl; }         //!< set telescope elevation (e.g. for MC)
         void   setWobbleOffset( double iWobbleNorth, double iWobbleEast, int iTelID, int iMJD );
         void   updatePointing( int MJD, double time );
+		
+		// for hiding some text (so other output text shows up cleanly)
+		// if setting = true, will hid some stdout text
+		// if setting = false, class will behave normally
+		void   supressStdoutText( bool setting ) { fSupressStdoutText = setting ; }
 };
 #endif

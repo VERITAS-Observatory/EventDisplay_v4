@@ -55,23 +55,41 @@ void VSkyCoordinates::reset()
 
     fMJD = 0;
     fTime = 0.;
+	
+	fSupressStdoutText = false ;
 }
 
 void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 {
     if( !fPrecessed )
     {
-        cout << "---------------------------------------------------------------------------------------------------------" << endl;
-        if( iTelID >= 0 ) cout << "Pointing telescope " << iTelID+1 << endl;
-	else              cout << "Array pointing " << endl;
-        cout << "\tPrecessing target ( " << getTargetName() << " ) from J2000 to MJD " << iMJD << endl;
-// TEMP
-        cout << "\tJ2000   \t\t RA=" << setprecision( 6 ) << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
+		if ( !fSupressStdoutText )
+		{
+			cout << "---------------------------------------------------------------------------------------------------------" << endl;
+		}
+        if( iTelID >= 0 )
+		{
+			if ( !fSupressStdoutText )
+			{
+				cout << "Pointing telescope " << iTelID+1 << endl;
+			}
+		}
+		else              cout << "Array pointing " << endl;
+		if ( !fSupressStdoutText )
+		{
+			cout << "\tPrecessing target ( " << getTargetName() << " ) from J2000 to MJD " << iMJD << endl;
+	// TEMP
+			cout << "\tJ2000   \t\t RA=" << setprecision( 6 ) << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
+		}
 // ENDTEMP
 // precess target coordinates
         double ofy = VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
-	cout << "\tMJD " << iMJD << " (" << setprecision( 6 ) << ofy << ")";
-	cout << "\t RA=" << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
+		
+		if ( !fSupressStdoutText )
+		{
+			cout << "\tMJD " << iMJD << " (" << setprecision( 6 ) << ofy << ")";
+			cout << "\t RA=" << fTargetRA*TMath::RadToDeg() << " dec=" << fTargetDec*TMath::RadToDeg() << endl;
+		}
 // precess telescope coordinates
         VSkyCoordinatesUtilities::precessTarget( iMJD, fTelRA, fTelDec );
 
