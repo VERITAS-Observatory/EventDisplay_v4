@@ -426,6 +426,9 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 
     if( fData.size() > 0 && fData[0]->gSensitivity )
     {
+       iL->SetLineColor( fData[0]->gSensitivity->GetLineColor() );
+
+// loop over all data sets and divide it by the first
        for( unsigned int i = 1; i < fData.size(); i++ )
        {
           TGraphAsymmErrors* g = new TGraphAsymmErrors();
@@ -439,7 +442,7 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
     }
     if( cSensRatio )
     {
-      plotLegend( cSensRatio, false, true );
+      plotLegend( cSensRatio, true, false );
 // print results
       if( iPrint.size() > 0 )
       {
@@ -452,6 +455,33 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 
     return true;
 }
+
+void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( double iEmin_TeV, double iEmax_TeV )
+{
+   iEmin_TeV = log10( iEmin_TeV );
+   iEmax_TeV = log10( iEmax_TeV );
+   for( unsigned int i = 0; i < fData.size(); i++ )
+   {
+       double m = 1.;
+       if( fData[i]->gSensitivity )
+       {
+           double x = 0.;
+	   double y = 0.;
+	   for( int p = 0; p < fData[i]->gSensitivity->GetN(); p++ )
+	   {
+	       fData[i]->gSensitivity->GetPoint( p, x, y );
+	       if( iEmin_TeV < x - fData[i]->gSensitivity->GetErrorX( p )
+	        && iEmax_TeV > x + fData[i]->gSensitivity->GetErrorX( p ) )
+	       {
+	          m *= y * 1.e13;
+               }
+           }
+        }
+        cout << "Figure of merit (calculated from sensitivity) for " << fData[i]->fAnalysis << ": " << m << endl;
+    }
+}
+  
+
 
 
 
@@ -514,7 +544,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
    return true;
 }
 
-bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown, bool iLeft )
+bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown, bool iLeft, bool iAddFirst )
 {
    if( !c ) return false;
    c->cd();
@@ -522,8 +552,8 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown, bool iLeft )
    double x = 0.2+0.35;
    if( iLeft ) x = 0.15;
    double y = 0.65;
-   if( iDown ) y -= 0.5;
-   double y_yp = y+0.22;
+   if( iDown ) y -= 0.50;
+   double y_yp = y+0.18;
    if( fData.size() == 2 )
    {
       y_yp -= 0.1;
@@ -533,6 +563,7 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown, bool iLeft )
 
    for( unsigned int i = 0; i < fData.size(); i++ )
    {
+      if( i == 0 && !iAddFirst ) continue;
       if( fData[i]->fFileExists && fData[i]->fLegend.size() > 0 )
       {
 	 TGraph *g = new TGraph( 1 );

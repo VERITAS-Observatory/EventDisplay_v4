@@ -32,7 +32,7 @@ void VPlotInstrumentResponseFunction::setPlottingDefaults()
    setPlottingAxis( "nimages_Lin", "X", false, 0., 5., "number of images" );
 
    setPlottingAxis( "effarea_Lin", "Y", true, 1.0, 5.e7, "effective area [m^{2}]" );
-   setPlottingAxis( "angularesolution_Lin", "Y", false, 0., 0.25, "angular resolution [deg]" );
+   setPlottingAxis( "angularesolution_Lin", "Y", false, 0., 0.35, "angular resolution [deg]" );
    setPlottingAxis( "coreresolution_Lin", "Y", false, 0., 40.0, "core resolution [m]" );
    setPlottingAxis( "energyresolution_Lin", "Y", false, 0., 0.40, "energy resolution" );
 
