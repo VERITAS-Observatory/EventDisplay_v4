@@ -16,6 +16,7 @@
 #include "VSpectralWeight.h"
 #include "VUtilities.h"
 
+#include <bitset>
 #include <iostream>
 #include <string>
 #include <vector>

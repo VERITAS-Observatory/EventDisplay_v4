@@ -135,6 +135,8 @@ void VDisplayBirdsEye::drawEventText()
        }
     }
     fTextRec.push_back( new TText( 0.02, 0.09, iText ) );
+// triggered events
+// (any trigger condition)
     sprintf( iText, "%u tel triggered: ", fData->getShowerParameters()->fNTrig );
     for( unsigned int i = 0; i < fData->getShowerParameters()->fNTrig; i++ )
     {

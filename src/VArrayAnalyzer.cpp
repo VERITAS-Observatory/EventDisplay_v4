@@ -292,6 +292,7 @@ void VArrayAnalyzer::initEvent()
         getShowerParameters()->fLTrig = 0;
     }
 // list of telescopes with local trigger
+// (note: ntrig ignores different trigger types)
     if( fReader->getLocalTrigger().size() >= fNTel )
     {
         unsigned int ztrig = 0;

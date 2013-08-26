@@ -407,7 +407,10 @@ int VDSTTree::hasLocalTrigger( int iTelID )
 
     for( unsigned int j = 0; j < fDSTNTrig; j++ )
     {
-        if( fDST_vlist_of_telescopes[iTelID] == fDSTLTrig_list[j] ) return 1;
+        if( fDST_vlist_of_telescopes[iTelID] == fDSTLTrig_list[j] )
+	{
+	   return j;
+        }
     }
     return -1;
 }

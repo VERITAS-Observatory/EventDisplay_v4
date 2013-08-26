@@ -84,22 +84,22 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       if( fDebug ) cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: event status > 0: " << iImageParameter->eventStatus << endl;
    }
 
+////////////////////////////////////////////
 // L2 trigger type (mainly for CTA prod2)
+
+// 9999: any trigger
    if( fL2TriggerType[iMeth][iTelType] != 9999 )
    {
       bitset< 8 > i_L2TrigType( iLocalTriggerType );
-//    trigger type 0: any trigger condition      
-      if( fL2TriggerType[iMeth][iTelType] == 0 && iLocalTriggerType == 0 )
+/*      if( fL2TriggerType[iMeth][iTelType] == 0 && iLocalTriggerType == 0 )
       {
 	 iArrayCut = false;
       }
 // all other trigger types
-      else if( fL2TriggerType[iMeth][iTelType] != 0 )
+      else if( fL2TriggerType[iMeth][iTelType] != 0 ) */
+      if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
       {
-	 if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
-	 {
-	    iArrayCut = false;
-         }
+	 iArrayCut = false;
       }
       if( !iArrayCut && fDebug )
       {
