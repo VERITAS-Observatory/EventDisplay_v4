@@ -17,8 +17,7 @@
 
 #define FROGSDEBUG 0
 
-VFrogs::VFrogs()
-{
+VFrogs::VFrogs() {
 
   fFrogParameters = new VFrogParameters();
   frogsRecID = getRunParameter()->ffrogsRecID;
@@ -27,8 +26,7 @@ VFrogs::VFrogs()
 
 }
 
-VFrogs::~VFrogs()
-{
+VFrogs::~VFrogs() {
   
 }
 
@@ -114,8 +112,9 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     frogsYPStart     = getShowerParameters()->fShowerYcore_SC[frogsRecID];
     frogsXPED        = getShowerParameters()->fShowerXcore[frogsRecID];
     frogsYPED        = getShowerParameters()->fShowerYcore[frogsRecID];
-    frogsXSStart     =      getShowerParameters()->fShower_Xoffset[frogsRecID];
-    frogsYSStart     = -1.0*getShowerParameters()->fShower_Yoffset[frogsRecID];
+    frogsXSStart     = fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //TEMP GH
+    //frogsXSStart     = getShowerParameters()->fShower_Xoffset[frogsRecID];
+    frogsYSStart     = -1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
 
     getFrogParameters()->frogsEventID = getFrogsEventID();
     getFrogParameters()->frogsGSLConStat = getFrogsGSLConStat();
@@ -154,7 +153,6 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     getFrogParameters()->frogsTelGoodnessBkg1 = getFrogsTelGoodnessBkg(1);
     getFrogParameters()->frogsTelGoodnessBkg2 = getFrogsTelGoodnessBkg(2);
     getFrogParameters()->frogsTelGoodnessBkg3 = getFrogsTelGoodnessBkg(3);
-
 
     getFrogParameters()->getTree()->Fill();
 
@@ -334,25 +332,57 @@ float VFrogs::transformTelescopePosition( int iTel, float i_ze, float i_az, int 
 //================================================================
 float VFrogs::transformShowerPosition( float i_ze, float i_az, float xcore, float ycore, int axis )
 {
-// transform telescope positions from ground into shower coordinates
+  // transform coordinates from shower coord system to ground coord
+  // see also void VArrayAnalyzer::transformTelescopePosition in VArrayAnalyzer.cpp
+  // and void VGrIsuAnalyzer::tel_impact in VGrIsuAnalyzer.cpp
   float i_xrot, i_yrot, i_zrot;
   float i_xcos = 0.;
   float i_ycos = 0.;
- 
-  i_ze *= -1.;
-  i_az *= -1.;
  
   // calculate direction cosine
   i_xcos = sin(i_ze / TMath::RadToDeg() ) * sin( (i_az-180.)/TMath::RadToDeg() );
   i_ycos = sin(i_ze / TMath::RadToDeg() ) * cos( (i_az-180.)/TMath::RadToDeg() );
   
   // call to GrIsu routine
-  tel_impact( i_xcos, i_ycos, xcore, ycore, 0., &i_xrot, &i_yrot, &i_zrot, false );
+  // the parameter true/false sets the transformation matrix
+  // false: ground coordinate system -> shower coord system
+  // true: the inverse matrix is ON. shower coord -> ground coordinate
+  tel_impact( i_xcos, i_ycos, xcore, ycore, 0., &i_xrot, &i_yrot, &i_zrot, true );
   
   if( axis == 0 ) 
-    return -i_xrot;
+    return i_xrot;
   else if( axis == 1 )
-    return -i_yrot;
+    return i_yrot;
+  else
+    return FROGS_BAD_NUMBER; 
+}
+//================================================================
+//================================================================
+float VFrogs::transformPosition( float i_ze, float i_az, float x, float y, float z, int axis, bool bInv )
+{
+  // transform coordinates from shower coord system to ground coord
+  // see also void VArrayAnalyzer::transformTelescopePosition in VArrayAnalyzer.cpp
+  // and void VGrIsuAnalyzer::tel_impact in VGrIsuAnalyzer.cpp
+  float i_xrot, i_yrot, i_zrot;
+  float i_xcos = 0.;
+  float i_ycos = 0.;
+ 
+  // calculate direction cosine
+  i_xcos = sin(i_ze / TMath::RadToDeg() ) * sin( (i_az-180.)/TMath::RadToDeg() );
+  i_ycos = sin(i_ze / TMath::RadToDeg() ) * cos( (i_az-180.)/TMath::RadToDeg() );
+  
+  // call to GrIsu routine
+  // the parameter true/false sets the transformation matrix
+  // false: ground coordinate system -> shower coord system
+  // true: the inverse matrix is ON. shower coord -> ground coordinate
+  tel_impact( i_xcos, i_ycos, x, y, z, &i_xrot, &i_yrot, &i_zrot, bInv );
+  
+  if( axis == 0 ) 
+    return i_xrot;
+  else if( axis == 1 )
+    return i_yrot;
+  else if( axis == 2 )
+    return i_zrot;
   else
     return FROGS_BAD_NUMBER; 
 }
@@ -406,27 +436,35 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
      analysis packages. It returns the data necessary to the template 
      analysis in a structure that is appropriate.  */
 
-   struct frogs_imgtmplt_in rtn;
- 
-   //Tracked elevation from telescope 0
-   rtn.elevation = fData->getShowerParameters()->fTelElevation[0];
-   rtn.event_id  = eventNumber;
-
+  struct frogs_imgtmplt_in rtn;
+  
+  //Tracked elevation from telescope 0
+  rtn.elevation = fData->getShowerParameters()->fTelElevation[0];
+  rtn.azimuth   = fData->getShowerParameters()->fTelAzimuth[0];
+  rtn.event_id  = eventNumber;
+  
   //Telescopes
   rtn.ntel=fData->getNTel(); //Number of telescopes
-
+  
   rtn.scope=new struct frogs_telescope [rtn.ntel];
   rtn.nb_live_pix_total=0;//Total number or pixels in use
   for(int tel=0;tel<rtn.ntel;tel++) {
     initializeDataReader();
     setTelID(tel);
     
-    //Telescope position in the coordonate system used in the reconstruction
+    //Telescope position in the shower coordinate coordinate system used in the reconstruction
+    //rtn.scope[tel].xfield = 
+    //transformTelescopePosition( tel, 90. - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 0 );
+    //rtn.scope[tel].yfield = 
+    //transformTelescopePosition( tel, 90. - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 1 );
     rtn.scope[tel].xfield = 
-      transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 0 );
+      transformPosition( 90. - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], getDetectorGeo()->getTelXpos()[tel], getDetectorGeo()->getTelYpos()[tel], getDetectorGeo()->getTelZpos()[tel], 0, false );
     rtn.scope[tel].yfield = 
-      transformTelescopePosition( tel, 90 - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], 1 );
+      transformPosition( 90. - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], getDetectorGeo()->getTelXpos()[tel], getDetectorGeo()->getTelYpos()[tel], getDetectorGeo()->getTelZpos()[tel], 1, false );
+    rtn.scope[tel].zfield =
+      transformPosition( 90. - fData->getShowerParameters()->fTelElevation[0], fData->getShowerParameters()->fTelAzimuth[0], getDetectorGeo()->getTelXpos()[tel], getDetectorGeo()->getTelYpos()[tel], getDetectorGeo()->getTelZpos()[tel], 2, false );
 
+  
     if(FROGSDEBUG)
       printf("TelSC %d | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f | %.2f %.2f \n",tel,
 	     fData->getShowerParameters()->fShowerZe[frogsRecID],
@@ -437,8 +475,8 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
 	     getDetectorGeo()->getTelYpos()[tel],
 	     rtn.scope[tel].xfield,
 	     rtn.scope[tel].yfield,
-	     (180.0/3.1415)*atan2(rtn.scope[tel].yfield,rtn.scope[tel].xfield),
-	     (180.0/3.1415)*atan2(getDetectorGeo()->getTelYpos()[tel],getDetectorGeo()->getTelXpos()[tel]));
+	     (180.0/3.14159265)*atan2(rtn.scope[tel].yfield,rtn.scope[tel].xfield),
+	     (180.0/3.14159265)*atan2(getDetectorGeo()->getTelYpos()[tel],getDetectorGeo()->getTelXpos()[tel]));
 
     //Telescope effective collection area
     //Number of pixels 
@@ -452,7 +490,8 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
     rtn.scope[tel].exnoise= new float [rtn.scope[tel].npix];
     rtn.scope[tel].pixinuse= new int [rtn.scope[tel].npix];
     rtn.scope[tel].telpixarea= new float [rtn.scope[tel].npix];
-    float foclen=1000.0*fData->getDetectorGeo()->getFocalLength()[tel]; //Focal length in mm //modified by sv
+    rtn.scope[tel].pixradius= new float [rtn.scope[tel].npix]; //(SV)
+    float foclen= 1000.0*fData->getDetectorGeo()->getFocalLength()[tel]; //(SV) Focal length in mm
 
     //Initialize the number of live pixel in the telescope
     rtn.scope[tel].nb_live_pix=0;
@@ -468,24 +507,40 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       rtn.scope[tel].exnoise[pix]=extra_noise;
       //Pixel dead or alive
       rtn.scope[tel].pixinuse[pix]=FROGS_OK;
-      if(fData->getDead()[pix]!=0 || fData->getZeroSuppressed()[pix] )
+      //(GH) modify to remove LG pixels
+      //if(fData->getDead()[pix]!=0)
+      if(fData->getDead()[pix]!=0 || fData->getData()->getHiLo()[pix]==1 )
+	//if(fData->getDead()[pix]!=0 )//(SV)
         rtn.scope[tel].pixinuse[pix]=FROGS_NOTOK;
       //Increment the number of live pixels
       if(rtn.scope[tel].pixinuse[pix]==FROGS_OK) rtn.scope[tel].nb_live_pix++;
       //Pixel effective collecting area in square degrees
-      float tmppixarea=
-	fData->getDetectorGeo()->getTubeRadius_MM(tel)[pix]*FROGS_DEG_PER_RAD/foclen;//modified by sv
+      float tmppixarea=fData->getDetectorGeo()->getTubeRadius_MM(tel)[pix]*FROGS_DEG_PER_RAD/foclen;//(SV)
       tmppixarea=FROGS_PI*tmppixarea*tmppixarea;
       rtn.scope[tel].telpixarea[pix]=telarea*tmppixarea*cone_eff;
-
+      //Pixel radius in degree
+      rtn.scope[tel].pixradius[pix]=fData->getDetectorGeo()->getTubeRadius_MM(tel)[pix]*FROGS_DEG_PER_RAD/foclen;//(SV)
+      
       //Initialize the pixel signal and pedestal width to zero
       rtn.scope[tel].q[pix]=0;
       rtn.scope[tel].ped[pix]=0;
       //Set them to their values in p.e. if the d.c./p.e. factor is non zero
-      if(dc2pe!=0) 
-      {
-        rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
-        rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]*frogs_pedwidth_correction/dc2pe;
+      if(dc2pe!=0) {
+	//rtn.scope[tel].q[pix]=fData->getData()->getSums2()[pix]/dc2pe; 
+	rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; 
+        if( fData->getData()->getHiLo()[pix]==1 )
+        {
+	  //rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]*fData->getData()->getLowGainMultiplier()[pix]/dc2pe;
+	  rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; //(SV): getLowGainMultiplier removed 
+	  rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(true,18)[pix]*fData->getData()->getLowGainMultiplier()[pix]*frogs_pedwidth_correction/dc2pe;
+	  //rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(true,18)[pix]*frogs_pedwidth_correction/dc2pe;
+	}
+	else
+        {
+	  rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
+          //rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(false,18)[pix]*frogs_pedwidth_correction/dc2pe;
+          rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]*frogs_pedwidth_correction/dc2pe;
+        }
       }
     }
     //Total number of live pixels in the array
@@ -493,53 +548,112 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   } 
 
   //Optimization starting point todo y -> -y ??
-  rtn.startpt.xs=1.0*fData->getShowerParameters()->fShower_Xoffset[frogsRecID];
-  rtn.startpt.ys=-1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID];
+  rtn.startpt.xs=1.0*fData->getShowerParameters()->fShower_Xoffset[frogsRecID]; //(SV) starting points set to ED parameters
+  rtn.startpt.ys=-1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID]; //(SV) starting points set to ED parameters
 
-//MC  rtn.startpt.xs=1.0*fData->getShowerParameters()->MCTel_Xoff;
-//MC  rtn.startpt.ys=-1.0*fData->getShowerParameters()->MCTel_Yoff;
+  //rtn.startpt.xs=1.0*fData->getShowerParameters()->MCTel_Xoff; //(SV) starting points set to MC parameters
+  //rtn.startpt.ys=-1.0*fData->getShowerParameters()->MCTel_Yoff; //(SV) starting points set to MC parameters
 
-  rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore_SC[frogsRecID];
-  rtn.startpt.yp=1.0*fData->getShowerParameters()->fShowerYcore_SC[frogsRecID];
-//MC  rtn.startpt.xp=fData->getShowerParameters()->MCxcore_SC;
-//MC  rtn.startpt.yp=1.0*fData->getShowerParameters()->MCycore_SC;
+  rtn.startpt.xp=fData->getShowerParameters()->fShowerXcore_SC[frogsRecID]; //(SV) starting points set to ED parameters
+  rtn.startpt.yp=fData->getShowerParameters()->fShowerYcore_SC[frogsRecID]; //(SV) starting points set to ED parameters
+
+  //rtn.startpt.xp=fData->getShowerParameters()->MCxcore_SC; //(SV) starting points set to MC parameters
+  //rtn.startpt.yp=fData->getShowerParameters()->MCycore_SC; //(SV) starting points set to MC parameters
+
+  //rtn.startpt.xp=fData->getShowerParameters()->MCxcore; //(SV) starting points set to MC parameters (Ground Coord)
+  //rtn.startpt.yp=fData->getShowerParameters()->MCycore; //(SV) starting points set to MC parameters (Ground Coord)
 
   if (FROGSDEBUG) {
-    printf("ShowerSC %f %f\n",getShowerParameters()->fShowerXcore_SC[frogsRecID],getShowerParameters()->fShowerYcore_SC[frogsRecID]);
-    printf("Shower %f %f\n",getShowerParameters()->fShowerXcore[frogsRecID],getShowerParameters()->fShowerYcore[frogsRecID]);
+    cout << " eventNumber  " << eventNumber << endl;
+    cout << " ED: ShowerSC " << fData->getShowerParameters()->fShowerXcore_SC[frogsRecID] << " " << fData->getShowerParameters()->fShowerYcore_SC[frogsRecID] << endl;
+    cout << " ED: Shower   " << fData->getShowerParameters()->fShowerXcore[frogsRecID]    << " " << fData->getShowerParameters()->fShowerYcore[frogsRecID] << endl;
+    cout << " MC: ShowerSC " << fData->getShowerParameters()->MCxcore_SC                  << " " << fData->getShowerParameters()->MCycore_SC << " " << fData->getShowerParameters()->MCzcore_SC << endl;
+    cout << " MC: Shower   " << fData->getShowerParameters()->MCxcore                     << " " << fData->getShowerParameters()->MCycore    << " " << fData->getShowerParameters()->MCzcore << endl;
   }
 
-  rtn.startpt.lambda=0.3; //We use a fixed value by lack of information. 
-
-  rtn.startpt.log10e = inEnergy; //inEnergy from ED 
+  rtn.startpt.lambda=1.0; //(SV) We use a fixed value by lack of information. 
+ 
+  rtn.startpt.log10e = inEnergy; //(SV) inEnergy from ED 
   if( rtn.startpt.log10e > 0.0 )
     rtn.startpt.log10e = log10(rtn.startpt.log10e);
   else
-   rtn.startpt.log10e = FROGS_BAD_NUMBER;
-//MC  rtn.startpt.log10e = log10(fData->getShowerParameters()->MCenergy); //inEnergy from MC 
-
+    rtn.startpt.log10e = FROGS_BAD_NUMBER;
+  
+  //rtn.startpt.log10e = log10(fData->getShowerParameters()->MCenergy); //(SV) starting points set to MC parameters (inEnergy from MC)  
+  
   //Decides if the event is worth analysing. 
   rtn.worthy_event=FROGS_OK;
-  //Log(0.1)=-1; Log(0.15)=-0.824; Log(0.2)=-0.699; Log(0.25)=-0.602
-  //Log(0.3)=-0.523; Log(0.35)=-0.456; Log(0.4)=-0.398 
+  //Log(0.06)=-1.2; Log(0.1)=-1; Log(0.15)=-0.824; Log(0.2)=-0.699; Log(0.25)=-0.602
+  //Log(0.3)=-0.523; Log(0.35)=-0.456; Log(0.4)=-0.398; Log(30)=1.477 
   //Energy large enough? 
-  if(rtn.startpt.log10e<-0.699)   rtn.worthy_event=FROGS_NOTOK;
+  if(rtn.startpt.log10e<-1.20)   rtn.worthy_event=FROGS_NOTOK;
   //Energy small enough? 
-  if(rtn.startpt.log10e>1.0)   rtn.worthy_event=FROGS_NOTOK;
-  //if(rtn.startpt.log10e>1.39112)   rtn.worthy_event=FROGS_NOTOK;
-  //if(rtn.startpt.log10e>2.0)   rtn.worthy_event=FROGS_NOTOK;
+  //if(rtn.startpt.log10e>1.0)   rtn.worthy_event=FROGS_NOTOK;
+  if(rtn.startpt.log10e>1.470)   rtn.worthy_event=FROGS_NOTOK;
   //Distance of the impact point small enough? 
-  if(sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.xp)>350.0) 
+  if(sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp)>450.0)
+    //if(sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp)<160.0 || sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp)>200.0)
     rtn.worthy_event=FROGS_NOTOK;
   //Count the number of telescopes with more than 300dc in their image
   int ngoodimages=0;
-  for(int tel=0; tel<rtn.ntel;tel++)
-  {
+  for(int tel=0; tel<rtn.ntel;tel++) {
     setTelID(tel);
-    if(fData->getImageParameters()->size>300.0) ngoodimages=ngoodimages+1;
+    if(fData->getImageParameters()->size>200.0) ngoodimages=ngoodimages+1;
   }
   //Require the number of telescopes with more than 300dc to be at least 3
   if (ngoodimages<3) rtn.worthy_event=FROGS_NOTOK;
+  //Require the image to be fully contained into the camera
+  if (fData->getImageParameters()->loss>0.) rtn.worthy_event=FROGS_NOTOK;
+
+  //=======================================
+  //    (SV) diff. evolution algorithm
+  //=======================================
+  //Decides if the event is worth analysing
+  /*rtn.worthy_event=FROGS_NOTOK;
+  if(fabs(rtn.startpt.log10e-FROGS_BAD_NUMBER)<1E-8) {
+
+
+    cout << "# of good images " << ngoodimages << endl;
+
+    cout << "in VFrogs.cpp [MC] " 
+	 << "event_id " << rtn.event_id
+	 << " xs[deg] " << 1.0*fData->getShowerParameters()->MCTel_Xoff
+	 << " ys[deg] " << -1.0*fData->getShowerParameters()->MCTel_Yoff
+	 << " XP[m] " << fData->getShowerParameters()->MCxcore_SC
+	 << " YP[m] " << 1.0*fData->getShowerParameters()->MCycore_SC
+	 << " log10E[TeV] " << log10(fData->getShowerParameters()->MCenergy) 
+	 << endl;
+    
+    cout << "in VFrogs.cpp [ED] " 
+	 << "event_id " << rtn.event_id
+	 << " xs[deg] " << 1.0*fData->getShowerParameters()->fShower_Xoffset[frogsRecID]
+	 << " ys[deg] " << -1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID]
+	 << " XP[m] " << fData->getShowerParameters()->fShowerXcore_SC[frogsRecID]
+	 << " YP[m] " << 1.0*fData->getShowerParameters()->fShowerYcore_SC[frogsRecID]
+	 << " log10E[TeV] " << rtn.startpt.log10e
+	 << endl;
+
+	 cout << "worthy event " << rtn.worthy_event << " FROGS_OK " << FROGS_OK << " FROGS_NOTOK " << FROGS_NOTOK << endl;
+
+    //Distance of the impact point small enough?
+    double dummy=sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp);
+    //Count the number of telescopes with more than 300dc in their image
+    ngoodimages=0;
+    for(int tel=0; tel<rtn.ntel;tel++) {
+      setTelID(tel);
+      if(fData->getImageParameters()->size>300.0) ngoodimages=ngoodimages+1;
+    }
+    cout << " coucou diff. evol. " << ngoodimages << " " << dummy << endl;
+    //Require the number of telescopes with more than 300dc to be at least 3
+    if (ngoodimages>1 && dummy<350.0) {
+      cout << " coucou diff. evol. "<< " # good imgaes " << ngoodimages << " " << dummy << endl;
+      rtn.worthy_event=FROGS_OK;
+
+    }
+    }*/
+  //=======================================
+  //    (SV) diff. evolution algorithm
+  //=======================================
 
   return rtn;
 
