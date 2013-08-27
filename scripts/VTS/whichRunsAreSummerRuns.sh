@@ -1,0 +1,62 @@
+#!/bin/bash
+# from a run list, prints the list of runs that were taken in summer (ATM code)
+
+ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or from a pipe
+if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)
+	if ! [ $# -eq 1 ] ; then # the human didn't add any arguments, and we must tell them so
+		echo "Prints the run numbers that are summer runs."
+		echo " $ `basename $0` <file of runs>"
+		exit
+	fi
+fi
+
+# list of run_id's to read in
+RUNFILE=$1
+if [ ! -e $RUNFILE ] ; then
+	echo "File $RUNFILE could not be found in $PWD , sorry."
+	exit	
+fi
+RUNLIST=`cat $RUNFILE`
+#echo "RUNLIST:$RUNLIST"
+#echo "Files not on disk:"
+
+# mysql login info
+MYSQL="mysql -u readonly -h romulus.ucsc.edu -A"
+
+# generate list of runs to ask for ( run_id = RUNID[1] OR run_id = RUNID[2] etc)
+COUNT=0
+SUB=""
+for ARUN in $RUNLIST ; do
+	if [[ "$COUNT" -eq 0 ]] ; then
+		SUB="run_id = $ARUN"
+	else 
+		SUB="$SUB OR run_id = $ARUN"
+	fi
+	COUNT=$((COUNT+1))
+done
+#echo "SUB:"
+#echo "$SUB"
+
+# search through mysql result rows, where each row's elements
+# are assigned to RUNID and RUNDATE
+while read -r RUNID RUNDATE ; do
+	if [[ "$RUNID" =~ ^[0-9]+$ ]] ; then
+		
+		# decode the date tag
+		read YY MM DD HH MI SE <<< ${RUNDATE//[-:]/ }
+		#echo "  YEARMONTHDAY:$YY$MM$DD"
+		
+		# is the run month between May(5) and Oct(10), inclusive?
+		if [ $MM -ge 5 -a $MM -le 10 ] ; then
+			echo "$RUNID"
+		fi
+		
+	fi
+# This is where the MYSQL command is executed, with the list of requested runs
+# You have to do it this way, because using a pipe | calls the command in a
+# subshell, and that prevents variables from being saved within the 'while' loop
+# http://stackoverflow.com/questions/14585045/is-it-possible-to-avoid-pipes-when-reading-from-mysql-in-bash
+done < <($MYSQL -e "USE VERITAS ; SELECT run_id, data_start_time FROM tblRun_Info WHERE $SUB")
+
+exit
+
