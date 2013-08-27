@@ -1,5 +1,6 @@
 #!/bin/bash
 # from a run list, prints the list of runs that are winter runs
+# written by Nathan Kelley-Hoskins Aug 2013
 
 ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or from a pipe
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)

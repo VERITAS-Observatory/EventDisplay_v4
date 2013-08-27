@@ -2,6 +2,8 @@
 # from a run list, prints the list of runs that have 4 telescopes of data
 # reads info from VERITAS.tblRun_Info.config_mask
 # does not take into account any DQM information, so tread carefully
+# written by Nathan Kelley-Hoskins Aug 2013
+
 
 ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or from a pipe
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)

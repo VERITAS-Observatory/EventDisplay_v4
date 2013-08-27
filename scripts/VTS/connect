@@ -1,2 +1,3 @@
 #!/bin/bash
+# written by Nathan Kelley-Hoskins Aug 2013
 mysql -u readonly -h romulus.ucsc.edu -A
