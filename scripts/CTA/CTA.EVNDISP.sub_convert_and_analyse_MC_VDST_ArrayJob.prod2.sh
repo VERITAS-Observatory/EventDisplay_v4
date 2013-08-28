@@ -100,7 +100,7 @@ if [[ $DSET == *Leoncito* ]] || [[ $DSET == *SAC* ]]
 then
    echo "Leoncito / SAC"
    PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
-elif [[ $DSET == *Aar* ]]
+elif [[ $DSET == *Aar* ]] || [[ $DSET = *NorthSite-BB* ]] || [[ $DSET == *US* ]] || [[ $DSET == *SPM* ]] || [[ $DSET == *Tenerife* ]]
 then
    echo "Aar"
 # use always Leoncito peds - should be exactly the same
@@ -115,7 +115,7 @@ fi
 
 echo "submitting $RUNFROMTO"
 
-FNAM="$SHELLDIR/EV-$DSET-$PART-$FLL"
+FNAM="$SHELLDIR/EC-$DSET-$PART-$FLL"
 
 sed -e "s|SIMTELLIST|$RUNLIST|" $FSCRIPT.sh > $FNAM-1.sh
 sed -e "s|PAAART|$PART|" $FNAM-1.sh > $FNAM-2.sh
@@ -139,8 +139,7 @@ rm -f $FNAM-9.sh
 chmod u+x $FNAM.sh
 echo $FNAM.sh
 
-qsub -P cta_high -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
-# qsub -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+qsub -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os="sl*" -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 
 echo "writing shell script to $FNAM.sh"
 echo "writing queue log and error files to $QLOG"

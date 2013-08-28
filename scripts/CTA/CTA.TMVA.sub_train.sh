@@ -9,11 +9,11 @@
 if [ $# -ne 4 ]
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone10> <data set> <analysis parameter file>"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone> <data set> <analysis parameter file>"
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
    echo
-   echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
+   echo "  <onSource/cone>    calculate tables for on source or different wobble offsets"
    echo
    echo "  <data set>         e.g. cta-ultra3, ISDC3700, ...  "
    echo
@@ -48,7 +48,7 @@ RPAR="$CTA_EVNDISP_AUX_DIR/ParameterFiles/TMVA.BDT"
 RXPAR=`basename $RPAR.runparameter runparameter`
 OFIL="BDT"
 CONE="FALSE"
-if [ $2 == "cone10" ] || [ $2 == "cone" ]
+if [[ $2 == cone ]]
 then
   CONE="TRUE"
 fi
@@ -57,52 +57,26 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #####################################
 # energy bins
-# (default 2012/10/09)
-# EMIN=( -2.50 -1.75 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 1.50 )
-# EMAX=( -1.25 -1.00 -0.75 -0.50 -0.25  0.00  0.25 0.50 0.75 1.00 1.30 1.75 2.50 )
-# shortened 2012/10/09
-# EMIN=( -2.50 -1.75 -1.00 -0.50 0.00 0.75 )
-# EMAX=( -1.25 -0.75 -0.25  0.25 1.00 2.50 )
-# shortened 2012/10/12
-# EMIN=( -2.50 -1.25 -1.00 -0.50 0.00 0.75 )
-# EMAX=( -1.00 -0.75 -0.25  0.25 1.00 2.50 )
-# shortened 2012/10/14
-# EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 )
-# EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 2.50 )
-# extended 2013/02/11
-#EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 1.35 )
-#EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 1.60 2.50 )
-# extended 2013/03/21
-#EMIN=( -2.50 -1.75 -1.25 -1.00 -0.50 0.00 0.75 1.25 )
-#EMAX=( -1.25 -1.00 -0.75 -0.25  0.25 1.00 1.50 2.50 )
-# removed too small HE bin (2013/05/07)
-EMIN=( -2.50 -2.00 -1.50 -1.00 -0.50 0.00 0.50 1.25 )
-EMAX=( -1.50 -1.25 -0.75 -0.25  0.25 0.75 1.50 2.50 )
-# one TMVA per energy bin
-#EMIN=( -2.05 -1.85 -1.65 -1.45 -1.25 -1.05 -0.85 -0.65 -0.45 -0.25 -0.05 0.15 0.35 0.55 0.75 0.95 1.15 1.35 1.55 1.75 )
-#EMAX=( -1.35 -1.15 -0.95 -0.75 -0.55 -0.35 -0.15  0.05  0.25  0.45  0.65 0.85 1.05 1.25 1.45 1.65 1.85 2.05 2.25 2.45 )
-# adapted low-e bins
 EMIN=( -1.90 -1.90 -1.45 -1.00 -0.50 0.00 0.50 1.25 )
 EMAX=( -1.40 -1.30 -0.75 -0.25  0.25 0.75 1.50 2.50 )
 NENE=${#EMIN[@]}
 #####################################
-# 
+# offset bins 
 if [ $CONE == "TRUE" ]
 then
    OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
    OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
    OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
-   DSUF="gamma_cone10"
+   DSUF="gamma_cone"
 else
    OFFMIN=( "0.0" )
-#   OFFMAX=( "1.0" )
    OFFMAX=( "1.e10" )
    OFFMEA=( 0.0 )
    DSUF="gamma_onSource"
 fi
 NOFF=${#OFFMIN[@]}
 
-
+######################################
 # checking the path for binary
 if [ -z $EVNDISPSYS ]
 then
@@ -110,15 +84,16 @@ then
     exit
 fi
 
+######################################
 # log files
 DATE=`date +"%y%m%d"`
 LDIR=$CTA_USER_LOG_DIR/$DATE/TMVATRAINING/
 mkdir -p $LDIR
-QDIR="/dev/null"
 QDIR=$LDIR
 echo "log directory: " $LDIR
 echo "queue log directory: " $QDIR
 
+######################################
 # script name template
 FSCRIPT="CTA.TMVA.qsub_train"
 
@@ -128,15 +103,17 @@ for ARRAY in $VARRAY
 do
    echo "STARTING ARRAY $ARRAY"
 
-# signal and background files
+# signal and background files (depending on on-axis or cone data set)
    if [ $CONE == "TRUE" ]
    then
       SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
+      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID"*.root`
    else
-      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
+      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR"-onAxis"/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
+      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR"-onAxis"/proton."$ARRAY"_ID"$RECID"*.root`
    fi
-   BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID"*.root`
 
+# loop over all wobble offset
    for (( W = 0; W < $NOFF; W++ ))
    do
       ODIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/TMVA/$DDIR-${OFFMEA[$W]}
@@ -167,6 +144,7 @@ do
 	 done
 # setting the cuts correctly in the run parameter file
          sed -i "s|MINIMAGES|$NIMAGESMIN|" $RFIL.runparameter
+# setting the chosen energy variable
 	 if [ $EREC = "0" ]
 	 then
 	    sed -i 's|ENERGYVARIABLE|Erec|' $RFIL.runparameter
@@ -181,8 +159,8 @@ do
 # run script
 	 FNAM=$LDIR/$FSCRIPT.$DSET.$ARRAY.$2."_$i"
 
-	 sed -e "s|RUNPARA|$RFIL|" $FSCRIPT.sh > $FNAM-1.sh
-	 sed -e "s|OFIL|$ODIR/$OFIL"_$i"|" $FNAM-1.sh > $FNAM.sh
+	 sed -e "s|RUNPARA|$RFIL|" \
+	     -e "s|OFIL|$ODIR/$OFIL"_$i"|" $FSCRIPT.sh  > $FNAM.sh
 	 rm -f $FNAM-1.sh
 
 	 chmod u+x $FNAM.sh

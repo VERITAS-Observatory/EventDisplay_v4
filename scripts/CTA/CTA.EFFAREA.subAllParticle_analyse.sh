@@ -66,12 +66,14 @@ RECID=`grep RECID $ANAPAR | awk {'print $2'}`
 #arrays
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
 
-# set particle types (analysis dependent)
+#################################################
+# set particle types 
+# (don't expect to have cone for all data sets)
 if [ $GMOD = "0" ]
 then
    if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]]
    then
-      VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" "electron_onSource" "proton_onSource" )
+      VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" "electron_onSource" "proton_onSource" )
    elif [ $DSET = "VTS" ]
    then
      VPART=( "gamma_onSource" "proton" )
@@ -81,7 +83,7 @@ then
 else
    if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]]
    then
-      VPART=( "gamma_onSource" "gamma_cone10" )
+      VPART=( "gamma_onSource" "gamma_cone" )
    else
       VPART=( "gamma_onSource" )
    fi
@@ -102,9 +104,10 @@ do
       PART=${VPART[$m]}
       echo "    MC PARTICLE TYPE $PART"
 
+###########################################
 # prepare cut file
       CCUT=$ODIR/$CFIL.$PART.$ARRAY.dat
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
       then
         cp $CDIR/$CFIL.gamma.dat $CCUT
       fi
@@ -113,6 +116,8 @@ do
         cp $CDIR/$CFIL.CRbck.dat $CCUT
       fi
 
+###########################################
+# submit the job script
       ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ANAPAR $ODIR $DSET $GMOD
    done
 done

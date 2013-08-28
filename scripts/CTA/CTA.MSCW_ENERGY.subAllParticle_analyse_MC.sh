@@ -34,7 +34,7 @@ fi
 # prod2 analysis
 if [ $4 = "cta-ultra3" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 elif [ $4 = "v_leeds" ]
 then
    VPART=( "proton" )
@@ -50,54 +50,54 @@ then
 # Aar
 elif [ $4 = "prod2-Aar-North" ]
 then
-   VPART=( "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_onSource" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "10" "30" "40" "41" "15" "" )
 elif [ $4 = "prod2-Aar-South" ]
 then
-   VPART=( "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "10" "301" "302" "303" "20" "23" "40" "15" "" )
 elif [ $4 = "prod2-Aar-NS" ]
 then
-   VPART=( "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "10" "300" "301" "302" "303" "20" "23" "40" "41" "15" "" )
 # Leoncito
 elif [ $4 = "prod2-Leoncito-North" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 elif [ $4 = "prod2-Leoncito-South" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 elif [ $4 = "prod2-Leoncito-NS" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 elif [ $4 = "prod2-G-Leoncito-North" ] || [ $4 = "prod2-G-Leoncito-South" ]
 then
    VPART=( "proton" )
 # SAC084
 elif [ $4 = "prod2-SAC084-North" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "" "1" "2" "" "" )
 elif [ $4 = "prod2-SAC084-South" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "" "1" "2" "" "" )
 elif [ $4 = "prod2-SAC084-NS" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "" "1" "2" "" "" )
 # SAC100
 elif [ $4 = "prod2-SAC100-North" ]
 then
-   VPART=( "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_onSource" "gamma_cone" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "5" "7" "51" "59" "7" "" "" )
 elif [ $4 = "prod2-SAC100-South" ]
 then
-   VPART=( "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone10" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_onSource" "gamma_onSource" "gamma_cone" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "5" "6" "7" "5" "6" "7" "" "" )
 elif [ $4 = "prod2-SAC100-NS" ]
 then
-   VPART=( "gamma_onSource" "gamma_cone10" "gamma_cone10" "electron" "proton" )
+   VPART=( "gamma_onSource" "gamma_cone" "gamma_cone" "electron" "proton" )
    VNUM=( "" "1" "2" "" "" )
 fi
 NPART=${#VPART[@]}

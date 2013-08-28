@@ -34,7 +34,7 @@ rm -f $LDIR/$TFIL-$ARRAY.root
 
 # options for table filling
 #set MOPT="-pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -mindistancetocameracenter=$WOFFMIN -maxdistancetocameracenter=$WOFFMAX -maxCoreError=250 -minImages=2"
-set MOPT="$SETOFF -pe -limitEnergyReconstruction -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -maxCoreError=250 -minImages=2"
+set MOPT="$SETOFF -pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -maxCoreError=250 -minImages=2 -limitEnergyReconstruction -write1DHistograms"
 
 #########################################
 # fill tables

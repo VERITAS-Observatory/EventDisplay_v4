@@ -67,7 +67,7 @@ then
       echo "FIL $FFIL"
    elif [[ $DSET == *SAC* ]]
    then
-      if [[ $PART == "gamma_cone10" ]] && [[  $DSET == *SAC084* ]]
+      if [[ $PART == "gamma_cone" ]] && [[  $DSET == *SAC084* ]]
       then
 	FFIL=`basename $TMPDIR/$OFIL.gz ___cta-prod2_desert-SACx0.84_cone10.simtel.gz`
       else

@@ -25,7 +25,7 @@ then
    echo
    echo "<particle>"
    echo "     allowed particle types are:"
-   echo "     gamma_onSource / gamma_cone10 / electron / electron_onSource / proton / proton_onSource / helium "
+   echo "     gamma_onSource / gamma_cone / electron / electron_onSource / proton / proton_onSource / helium "
    echo
    echo "<cutfile template>"
    echo "     template for gamma/hadron cut file (full path and file name)"
@@ -93,8 +93,9 @@ then
   GFILLING=$8
 fi
 
+####################################
 # check particle type
-if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone10" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
+if [ $PART != "gamma_onSource" ] && [ $PART != "gamma_cone" ] && [ $PART != "proton" ] && [ $PART != "electron" ] &&  [ $PART != "electron_onSource" ] && [ $PART != "helium" ] && [ $PART != "proton_onSource" ] && [ $PART != "helium_onSource" ]
 then
    echo "unknown particle type: " $PART
    exit
@@ -114,7 +115,12 @@ QSHELLDIR=$CTA_USER_DATA_DIR"/queueShellDir"
 echo $QSHELLDIR
 mkdir -p $QSHELLDIR
 echo "data (input) directory"
-DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/
+if [ $PART = "gamma_onSource" ] || [ $PART = "electron_onSource" ] || [ $PART = "proton_onSource" ] || [ $PART == "helium_onSource" ]
+then
+  DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR-onAxis/
+else
+  DDIR=$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/
+fi
 echo $DDIR
 mkdir -p $DDIR
 echo "output log directory"
@@ -153,11 +159,11 @@ then
    DIRECTIONCUT="2"
 fi
 # isotropic gamma-rays: analyse in rings in camera distance
-if [ $PART = "gamma_cone10" ]
+if [ $PART = "gamma_cone" ]
 then
-   MSCFILE=$DDIR/gamma_cone10."$ARRAY"_ID"$RECID"*.mscw.root
+   MSCFILE=$DDIR/gamma_cone."$ARRAY"_ID"$RECID"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
-   OFIL=gamma_cone10."$ARRAY"_ID"$RECID".eff
+   OFIL=gamma_cone."$ARRAY"_ID"$RECID".eff
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
    OFFMAX=( 1. 2. 3. 3.5 4.0 4.5 5.0 5.5 )
    OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 )
@@ -297,7 +303,7 @@ do
       rm -f $iCFIL-e
       sed -e "s|MINIMAGES|$NIMAGESMIN|" $iCFIL-e1 > $iCFIL-f
       rm -f $iCFIL-e1
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ] 
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ] 
       then
          sed -e "s|WOBBLEOFFSET|${OFFMEA[$i]}|" $iCFIL-f > $iCFIL-g
       else
@@ -313,7 +319,7 @@ do
       then
 	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_onSource."$ARRAY"_ID"$RECID".eff-0.root"
       else
-	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_cone10."$ARRAY"_ID"$RECID".eff-$i.root"
+	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_cone."$ARRAY"_ID"$RECID".eff-$i.root"
       fi
       sed -e "s|ANGRESFILE|$ANGRESFILE|" $iCFIL-i > $iCFIL-j
       rm -f $iCFIL-i
@@ -321,7 +327,7 @@ do
       if [ $PART = "gamma_onSource" ] || [ $PART = "electron_onSource" ] || [ $PART = "proton_onSource" ]
       then
 	 PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".00.root"
-      elif [ $PART = "gamma_cone10" ]
+      elif [ $PART = "gamma_cone" ]
       then
 	 PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".$i.root"
       else
@@ -349,7 +355,7 @@ do
 # filling mode
 ###############################################################################
 # fill IRFs and effective areas
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
       then
 # filling mode 0: fill and use angular resolution for energy dependent theta2 cuts
 	 echo "* FILLINGMODE $GFILLING" >> $MSCF
@@ -380,12 +386,12 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 3.0 0.1" >> $MSCF
       fi
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
       fi
 # first half of data set is not used (as these events are used for the TMVA training)
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
       then
         echo "* IGNOREFRACTIONOFEVENTS 0.5" >> $MSCF
       fi
@@ -401,7 +407,7 @@ do
       echo "* SIMULATIONFILE_DATA $MSCFILE" >> $MSCF
 
 # output file
-      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone10" ]
+      if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
       then
          OFIX=$ODIR/$OFIL-$i
       else

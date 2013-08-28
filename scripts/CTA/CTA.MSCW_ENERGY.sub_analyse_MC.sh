@@ -6,16 +6,16 @@
 #
 
 
-if [ $# -ne 5 ]
+if [ $# -ne 6 ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <script input parameter file>"
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <script input parameter file> <onSource/cone>"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
    echo "  <recid>         reconstruction ID"
    echo "  <subarraylist > text file with list of subarray IDs"
-   echo "  <particle>      gamma_onSource / gamma_cone10 / electron / proton / helium"
+   echo "  <particle>      gamma_onSource / gamma_cone / electron / proton / helium"
    echo "  <data set>      e.g. ultra, ISDC3700m, ..."
    echo "  <script input parameter file>  file with directories, etc.; see example in"
    echo "                             $CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.runparameter"
@@ -32,6 +32,11 @@ TABLE=$1
 RECID=$2
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $3`
 DSET="$4"
+CONE="FALSE"
+if [[ $6 == "cone" ]]
+then
+  CONE="TRUE"
+fi
 
 #######################################
 # read values from parameter file
@@ -48,6 +53,10 @@ then
   echo "error: analysis parameter file not found: $ANAPAR" 
   echo "(no ANADIR given)"
   exit
+fi
+if [ $CONE = "FALSE" ]
+then
+   ANADIR=$ANADIR-onAxis
 fi
 
 #########################################
@@ -72,12 +81,7 @@ mkdir -p $SHELLDIR
 
 ###########################
 # particle
-if [ $DSET = "prod2-G-Leoncito-North" ] || [ $DSET = "prod2-G-Leoncito-South" ]
-then
-   VPART=( "proton" )
-else
-   VPART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
-fi
+VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 NPART=${#VPART[@]}
 
 #########################################
@@ -97,6 +101,7 @@ do
    do
       PART=${VPART[$m]}
 
+# take $FILEN files and combine them into one mscw file
       FILEN=500
       if [ $PART = "proton" ]
       then
@@ -109,30 +114,24 @@ do
       TMPLIST=$SHELLDIR/MSCW.tmplist.list
       rm -f $TMPLIST
       echo $TMPLIST
-      find $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/ -name "*[0-9].root" > $TMPLIST
+      find $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/ -name "*[0-9]*.root" > $TMPLIST
       echo "total number of files for particle type $PART : "
       NTMPLIST=`wc -l $TMPLIST | awk '{print $1}'`
-      echo $NTMPLIST
+########################################################################
 # loop over all input files, start a job when $FILEN files are found
-      for ((l = $FILEN; l < $NTMPLIST; l+=$FILEN ))
+      for ((l = 1; l < $NTMPLIST; l+=$FILEN ))
       do
 # output file name for mscw_energy
-	TFIL=$PART$NC"."$SUBAR"_ID"$RECID"-"$DSET"-$l.mscw"
+	 TFIL=$PART$NC"."$SUBAR"_ID"$RECID"-"$DSET"-$l.mscw"
 # input file list
-	IFIL=$ODIR/$TFIL.list
-	rm -f $IFIL
-	let "TMPL = $NTMPLIST - $l"
-	if [[ "$TMPL" -lt "$FILEN" ]]
-	then
-	   FILEN=$TMPL
-        fi
-	echo $l $TMPL $FILEN
-	head -n $l $TMPLIST | tail -n $FILEN > $IFIL
-
+	 IFIL=$ODIR/$TFIL.list
+	 rm -f $IFIL
+	 let "k = $l + $FILEN"
+	 sed -n "$l,$k p" $TMPLIST > $IFIL
 # skeleton script
 	 FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
 
-	 FNAM="$SHELLDIR/MSCW.ana-$DSET-ID$RECID-$PART-array$SUBAR"
+	 FNAM="$SHELLDIR/MSCW.ana-$DSET-ID$RECID-$PART-array$SUBAR-$6"
 
 	 sed -e "s|TABLEFILE|$TABLE|" \
 	     -e "s|IIIIFIL|$IFIL|" \

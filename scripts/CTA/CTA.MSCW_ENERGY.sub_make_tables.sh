@@ -10,12 +10,12 @@
 if [ $# -ne 5 ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone10> <data set>"
+   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone> <data set>"
    echo ""
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
    echo "  <subarray list>    text file with list of subarray IDs"
-   echo "  <onSource/cone10>    calculate tables for on source or different wobble offsets"
+   echo "  <onSource/cone>    calculate tables for on source or different wobble offsets"
    echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo " input data and output directories for tables are fixed in CTA.MSCW_ENERGY.qsub_make_tables.sh"
@@ -32,7 +32,7 @@ TFIL=$1
 RECID=$2
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $3`
 CONE="FALSE"
-if [ $4 == "cone10" ] || [ $4 == "cone" ]
+if [ $4 == "cone" ]
 then
   CONE="TRUE"
 fi
@@ -51,7 +51,7 @@ then
    OFFMAX=( "1.e10" )
    OFFMEA=( 0.0 )
    CTAOFF="-CTAoffAxisBins"
-   DSUF="gamma_cone10/[1-9]"
+   DSUF="gamma_cone/[1-9]"
 else
    OFFMIN=( "-1.e10" )
    OFFMAX=( "1.e10" )
@@ -91,7 +91,7 @@ mkdir -p $SHELLDIR
    FSCRIPT="CTA.MSCW_ENERGY.qsub_make_tables"
 
 #########################################
-#loop over all arrays
+# loop over all arrays
 #########################################
 for ARRAY in $VARRAY
 do
@@ -114,7 +114,8 @@ do
       MEANDIST=${OFFMEA[$M]}
 
 # run scripts
-      FNAM="$SHELLDIR/YMSCW.table-$TAFIL-W$MEANDIST-$ARRAY"
+      FNAM="$SHELLDIR/EMSCW.table-$TAFIL-W$MEANDIST-$ARRAY"
+      cp $FSCRIPT.sh $FNAM.sh
       cp $FSCRIPT.sh $FNAM.sh
 
       sed -i -e "s|TABLEFILE|$TAFIL|" \
@@ -128,9 +129,10 @@ do
 	     -e "s|CTAOFF|$CTAOFF|" $FNAM.sh
 
       chmod u+x $FNAM.sh
+      echo "shell script " $FNAM.sh
 
 # submit the job
-      qsub -P cta_high -l os="sl*" -l h_cpu=47:45:00 -l h_vmem=16000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -l os="sl*" -l h_cpu=47:45:00 -l h_vmem=16000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 

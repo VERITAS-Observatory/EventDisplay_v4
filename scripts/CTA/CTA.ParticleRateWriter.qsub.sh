@@ -10,7 +10,7 @@ set AXRRAY=ARRAY
 # directory with effective areas (and directory were files are written to)
 set DXDIR=DDIR
 set RECID=RRRR
-# should be either onSource or cone10
+# should be either onSource or cone
 set OXFFSET=OFFSET
 
 # set the right observatory (environmental variables)

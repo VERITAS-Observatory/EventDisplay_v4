@@ -26,7 +26,7 @@ fi
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #particles
-PART=( "gamma_onSource" "gamma_cone10" "electron" "proton" )
+PART=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 NPART=${#PART[@]}
 
 ############################################################################
