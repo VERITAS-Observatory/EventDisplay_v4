@@ -179,7 +179,7 @@ bool VInstrumentResponseFunction::fill()
             }
         }
     }
-    fAnaCuts->printCutStatistics();
+//    fAnaCuts->printCutStatistics();
 
 // fill resolution graphs
    cout << "VInstrumentResponseFunction::terminate ";
