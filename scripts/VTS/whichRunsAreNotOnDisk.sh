@@ -11,6 +11,17 @@ if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pi
 	fi
 fi
 
+# read database url from $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/EVNDISP.global.runparameter
+MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
+
+if [ ! -n "$MYSQLDB" ] ; then
+	echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
+	exit
+#else
+#	echo "MYSQLDB: $MYSQLDB"
+fi
+
+
 # list of run_id's to read in
 RUNFILE=$1
 if [ ! -e $RUNFILE ] ; then
@@ -20,7 +31,7 @@ fi
 RUNLIST=`cat $RUNFILE`
 
 # mysql login info
-MYSQL="mysql -u readonly -h romulus.ucsc.edu -A"
+MYSQL="mysql -u readonly -h $MYSQLDB -A"
 
 # generate list of runs to ask for ( run_id = RUNID[1] OR run_id = RUNID[2] etc)
 COUNT=0

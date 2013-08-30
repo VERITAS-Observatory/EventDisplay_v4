@@ -19,8 +19,18 @@ if [ ! -e $RUNFILE ] ; then
 fi
 RUNLIST=`cat $RUNFILE`
 
+# get database url from parameter file
+MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
+    
+if [ ! -n "$MYSQLDB" ] ; then
+    echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
+    exit
+#else
+#    echo "MYSQLDB: $MYSQLDB"
+fi  
+
 # mysql login info
-MYSQL="mysql -u readonly -h romulus.ucsc.edu -A"
+MYSQL="mysql -u readonly -h $MYSQLDB -A"
 
 # generate list of runs to ask for ( run_id = RUNID[1] OR run_id = RUNID[2] etc)
 COUNT=0

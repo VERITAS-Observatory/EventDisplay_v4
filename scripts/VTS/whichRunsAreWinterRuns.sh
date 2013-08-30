@@ -7,6 +7,8 @@ if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pi
 	if ! [ $# -eq 1 ] ; then # the human didn't add any arguments, and we must tell them so
 		echo "Prints the run numbers that are winter runs."
 		echo " $ `basename $0` <file of runs>"
+		echo "The winter status is crudely calculated as 'any run in the months of November through April, inclusive (months 11,12,1,2,3,4)'."
+		echo "Since that is not the exact way Winter is defined (the boundary between summer/winter moves each year), tread carefully when using this script."
 		exit
 	fi
 fi
@@ -21,8 +23,18 @@ RUNLIST=`cat $RUNFILE`
 #echo "RUNLIST:$RUNLIST"
 #echo "Files not on disk:"
 
+# get database url from parameter file
+MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
+    
+if [ ! -n "$MYSQLDB" ] ; then
+    echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
+    exit
+#else
+#    echo "MYSQLDB: $MYSQLDB"
+fi  
+
 # mysql login info
-MYSQL="mysql -u readonly -h romulus.ucsc.edu -A"
+MYSQL="mysql -u readonly -h $MYSQLDB -A"
 
 # generate list of runs to ask for ( run_id = RUNID[1] OR run_id = RUNID[2] etc)
 COUNT=0
