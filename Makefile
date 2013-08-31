@@ -541,6 +541,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 		./obj/VFluxCalculation.o ./obj/VFluxCalculation_Dict.o \
 		./obj/VStatistics_Dict.o \
+		./obj/VCTASensitivityRequirements.o ./obj/VCTASensitivityRequirements_Dict.o \
 		./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
 		./obj/VSpectralFitter.o ./obj/VSpectralFitter_Dict.o \
 		./obj/VEnergyThreshold.o ./obj/VEnergyThreshold_Dict.o \
@@ -604,7 +605,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
-		./obj/VPlotCTARequirements.o ./obj/VPlotCTARequirements_Dict.o
+		./obj/VCTARequirements.o ./obj/VCTARequirements_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o

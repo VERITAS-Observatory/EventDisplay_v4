@@ -43,6 +43,7 @@ class VWPPhysSensitivityPlotsMaker
 
     void compareDataSets( string iDataSetFile );
     void compareDataSets( string iSubArray, string iDataSet );
+    void compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet );
     void compareOffAxisSensitivities( string iSubArray = "", string iDataSet = "" );
     void resetVectors();
     void setAxisUnits( double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
@@ -52,7 +53,7 @@ class VWPPhysSensitivityPlotsMaker
     bool setListOfDataSets( string iDataSetFileTxt );
     void setObservingTime( double i_s = 180000. ) { fObservingTime_s = i_s; }
     void setPrintingOptions( string iPrint = "" ) { fPrintingOptions = iPrint; }
-    void setPlotRequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false ) { fPlotCTARequirements = fPlotCTARequirements;
+    void setPlotRequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false ) { fPlotCTARequirements = iRequirementID;
                                                                                               fPlotCTARequirementGoals = iPlotRequirementGoals; }
     void setOffAxisAngle( vector< double > iA ) { fOffAxisAngle = iA; }
     bool writeTexFileBody( string iTexFile, string iTexFileTitle = "" );

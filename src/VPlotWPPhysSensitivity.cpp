@@ -3,6 +3,7 @@
 */
 
 #include "VPlotWPPhysSensitivity.h"
+// #include "reqcurve.h"
 
 VPlotWPPhysSensitivity::VPlotWPPhysSensitivity()
 {
@@ -211,7 +212,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
     char hname[2000];
 ////////////////////////////
 // effective areas
-    TCanvas *c = fIRF->plotEffectiveArea();
+    TCanvas *c = fIRF->plotEffectiveArea( 2.e7 );
     plotLegend( c, true );
     if( iPrint.size() > 0 )
     {
@@ -266,14 +267,14 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 
 void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
 {
-// (hard coded energies here...)
-   fProjectionEnergy_logTeV.push_back( log10( 10.001 ) );
-   fProjectionEnergy_logTeV.push_back( log10( 1. ) );
-//   fProjectionEnergy_logTeV.push_back( log10( 0.25 ) );
-   fProjectionEnergy_logTeV.push_back( log10( 0.08 ) );
+// (hard coded energies here...not good)
+//   fProjectionEnergy_min_logTeV.push_back( log10( 10.001 ) );   fProjectionEnergy_max_logTeV.push_back( log10( 10.001 ) );
+//   fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );       fProjectionEnergy_max_logTeV.push_back( log10( 10. ) );  
+   fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );       fProjectionEnergy_max_logTeV.push_back( log10( 110. ) );  
+//   fProjectionEnergy_min_logTeV.push_back( log10( 0.08 ) );     fProjectionEnergy_max_logTeV.push_back( log10( 0.08 ) ); 
  
    char hname[200];
-   for( unsigned int i = 0; i < fProjectionEnergy_logTeV.size(); i++ )
+   for( unsigned int i = 0; i < fProjectionEnergy_min_logTeV.size(); i++ )
    {
        fProjectionSensitivityvsCameraOffset.push_back( new TGraphAsymmErrors( ) );
        sprintf( hname, "fProjectionSensitivityvsCameraOffset_%d", i );
@@ -294,34 +295,44 @@ void VPlotWPPhysSensitivity::fillProjectedSensitivityPlot( unsigned int iDataSet
    if( a )
    {
        VHistogramUtilities h;
-       for( unsigned int i = 0; i < fProjectionEnergy_logTeV.size(); i++ )
+       for( unsigned int i = 0; i < fProjectionEnergy_min_logTeV.size(); i++ )
        {
           if( i < fProjectionSensitivityvsCameraOffset.size() && fProjectionSensitivityvsCameraOffset[i] )
 	  {
 	      int z = fProjectionSensitivityvsCameraOffset[i]->GetN();
-              int iBin = h.findBinInGraph( g, fProjectionEnergy_logTeV[i] );
-	      if( iBin >= 0 )
+              int iBin_min = h.findBinInGraph( g, fProjectionEnergy_min_logTeV[i] );
+	      int iBin_max = h.findBinInGraph( g, fProjectionEnergy_max_logTeV[i] );
+	      double i_m = 0.;
+	      double i_m_lE = 0.;
+	      double i_m_hE = 0.;
+	      double i_mz = 0.;
+	      for( int b = iBin_min; b <= iBin_max; b++ )
 	      {
+		 if( b >= 0 )
+		 {
 // check that this is not below or above the highest bin
-		  double x = 0.;
-		  double y = 0.;
-		  g->GetPoint( iBin, x, y );
-                  double x_low = x - g->GetErrorXlow( iBin );
-                  double x_high = x + g->GetErrorXhigh( iBin );
-		  if( fProjectionEnergy_logTeV[i] >= x_low && fProjectionEnergy_logTeV[i] < x_high )
-		  {
-		     fProjectionSensitivityvsCameraOffset[i]->SetPoint( z, fData[iDataSet]->fCameraOffset_deg,
-		                                                           g->Eval( fProjectionEnergy_logTeV[i] ) );
-		     fProjectionSensitivityvsCameraOffset[i]->SetPointEYhigh( z, g->GetErrorYhigh( iBin ) );
-		     fProjectionSensitivityvsCameraOffset[i]->SetPointEYlow( z, g->GetErrorYlow( iBin ) );
+		     double x = 0.;
+		     double y = 0.;
+		     g->GetPoint( b, x, y );
+
+		     i_m += y;
+		     i_m_lE += g->GetErrorYlow( b )*g->GetErrorYlow( b );
+		     i_m_hE += g->GetErrorYhigh( b)*g->GetErrorYhigh( b);
+		     i_mz++;
                   }
-              }
+               }
+	       if( i_mz > 0 )
+	       {
+		  fProjectionSensitivityvsCameraOffset[i]->SetPoint( z, fData[iDataSet]->fCameraOffset_deg, i_m / i_mz );
+		  fProjectionSensitivityvsCameraOffset[i]->SetPointEYhigh( z, sqrt( i_m_hE / i_mz ) );
+		  fProjectionSensitivityvsCameraOffset[i]->SetPointEYlow( z, sqrt( i_m_lE / i_mz ) );
+               }
           }
        }
    }
 }
 
-TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c )
+TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c, double iMaxOffSet, int iColor )
 {
     TCanvas *cC = 0;
     if( c ) cC = c;
@@ -332,7 +343,7 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c )
 	cC->SetGridy( 0 );
 	cC->SetLeftMargin( 0.13 );
 	cC->Draw();
-	TH1D *hnull = new TH1D( "hnull", "", 10, 0., 5.2 );
+	TH1D *hnull = new TH1D( "hnull", "", 10, 0., iMaxOffSet + 0.5 );
 	hnull->SetStats( 0 );
 	hnull->SetXTitle( "distance to camera center [deg]" );
 	hnull->SetYTitle( "relative acceptance" );
@@ -348,9 +359,9 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c )
     char hname[200];
 
     unsigned int z = 0;
-    for( unsigned int i = 0; i < fProjectionEnergy_logTeV.size(); i++ )
+    for( unsigned int i = 0; i < fProjectionEnergy_min_logTeV.size(); i++ )
     {
-        cout << "Plotting projected sensitivity for energy " << fProjectionEnergy_logTeV[i] << endl;
+        cout << "Plotting projected sensitivity for energy " << fProjectionEnergy_min_logTeV[i] << endl;
 	if( i < fProjectionSensitivityvsCameraOffset.size() && fProjectionSensitivityvsCameraOffset[i] )
 	{
 // normalize graphs to average of first two points
@@ -359,17 +370,20 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c )
 		double x = 0.;
 		double y = 0.;
 	        double y_norm = 0.;
+		fProjectionSensitivityvsCameraOffset[i]->GetPoint( 0, x, y_norm );
 		fProjectionSensitivityvsCameraOffset[i]->GetPoint( 0, x, y );
-		fProjectionSensitivityvsCameraOffset[i]->GetPoint( 1, x, y_norm );
+//		fProjectionSensitivityvsCameraOffset[i]->GetPoint( 1, x, y );
 		y_norm = 0.5*( y + y_norm );
 		double y_normE_low = sqrt( fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 0 )
 		                          *fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 0 )
-					 + fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 1 )
-					 * fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 1 ) );
+//					 + fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 1 )
+//					 * fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( 1 )
+					 );
 		double y_normE_high = sqrt( fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 0 )
 		                          *fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 0 )
-					 + fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 1 )
-					 * fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 1 ) );
+//					 + fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 1 )
+//					 * fProjectionSensitivityvsCameraOffset[i]->GetErrorYhigh( 1 )
+					 );
 
 	        for( int p = 0; p < fProjectionSensitivityvsCameraOffset[i]->GetN(); p++ )
 	        {
@@ -384,15 +398,14 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c )
 			                                                   fProjectionSensitivityvsCameraOffset[i]->GetErrorYlow( p ) ) ); 
 		}
             }
-            
-	    fProjectionSensitivityvsCameraOffset[i]->Print();
+	    if( iColor > 0 ) setGraphPlottingStyle( fProjectionSensitivityvsCameraOffset[i], iColor, 1., 20, 1.5 );
 	    fProjectionSensitivityvsCameraOffset[i]->Draw( "pl" );
-	    sprintf( hname, "%.2f TeV", TMath::Power( 10., fProjectionEnergy_logTeV[i] ) );
+	    sprintf( hname, "%.2f TeV", TMath::Power( 10., fProjectionEnergy_min_logTeV[i] ) );
 	    iL->AddEntry( fProjectionSensitivityvsCameraOffset[i], hname, "lp" );
             z++;
         }
     }
-    iL->Draw();
+    if( iColor < 0 ) iL->Draw();
 
     return cC;
 }
@@ -463,21 +476,38 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( double iEmin_TeV, do
    for( unsigned int i = 0; i < fData.size(); i++ )
    {
        double m = 1.;
+       double dm = 0.;
+       double z = 0.;
        if( fData[i]->gSensitivity )
        {
            double x = 0.;
 	   double y = 0.;
+	   double dy = 0.;
+	   double req = 0.;
 	   for( int p = 0; p < fData[i]->gSensitivity->GetN(); p++ )
 	   {
 	       fData[i]->gSensitivity->GetPoint( p, x, y );
+	       dy = 0.5 * ( fData[i]->gSensitivity->GetErrorYlow(p)+fData[i]->gSensitivity->GetErrorYhigh(p) );
+// excluding the lower bin containing iEmin_TeV, including the bin with iEmax_TeV
 	       if( iEmin_TeV < x - fData[i]->gSensitivity->GetErrorX( p )
-	        && iEmax_TeV > x + fData[i]->gSensitivity->GetErrorX( p ) )
+	        && iEmax_TeV > x )
 	       {
-	          m *= y * 1.e13;
+		  req = VCTASensitivityRequirements::Flux_req50_E2erg_south( 0.5 *  (TMath::Power( 10., x - fData[i]->gSensitivity->GetErrorX( p ) ) + TMath::Power( 10., x + fData[i]->gSensitivity->GetErrorX( p ) ) ) );
+	          m  *= req / y;
+		  if( y > 0. ) dm += dy*dy/(req/y)/(req/y);
+		  z++;
                }
            }
         }
-        cout << "Figure of merit (calculated from sensitivity) for " << fData[i]->fAnalysis << ": " << m << endl;
+	if( z > 0 )
+	{
+	   dm = m * sqrt( dm );
+	   m = TMath::Power( m, 1./z );
+	   dm = 1./z * TMath::Power( dm, 1./z - 1. ) * dm;
+	   cout << "Figure of merit (calculated from sensitivity) for " << fData[i]->fAnalysis;
+	   cout << "( " << z << " points): " << setprecision ( 4 ) << m;
+	   cout << " +- " << dm << endl;
+        }
     }
 }
   
@@ -516,7 +546,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
       fData[i]->gSensitivity = (TGraphAsymmErrors*)a->getSensitivityGraph();
        if( fPlotCTARequirementsID >= 0 && fPlotCTARequirements )
        {
-	  fPlotCTARequirements->plotRequirement_DifferentialSensitivity50h( cSens, fPlotCTARequirementGoals );
+	  fPlotCTARequirements->plotRequirement_DifferentialSensitivity( cSens, fPlotCTARequirementGoals, iUnit );
        }
    }
 // print results
@@ -616,7 +646,10 @@ bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile )
       else                   i_temp.fPlottingLineStyle = 1;
       if( !is_stream.eof() ) is_stream >> i_temp.fPlottingFillStyle;
       else                   i_temp.fPlottingFillStyle = 3001;
-      if( !is_stream.eof() ) is_stream >> i_temp.fLegend;
+      if( !is_stream.eof() )
+      {
+         i_temp.fLegend = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
+      }
       else
       {
          char hname[200];
@@ -650,7 +683,7 @@ bool VPlotWPPhysSensitivity::setPlotCTARequirements( int iRequirementID, bool iP
    fPlotCTARequirementsID = iRequirementID;
    if( fPlotCTARequirementsID >= 0 )
    {
-      fPlotCTARequirements = new VPlotCTARequirements();
+      fPlotCTARequirements = new VCTARequirements();
       return fPlotCTARequirements->setRequirement( fPlotCTARequirementsID );
    }
 

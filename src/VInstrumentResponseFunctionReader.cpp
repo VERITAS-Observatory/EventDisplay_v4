@@ -19,7 +19,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     fAzbin = 0;
     fIndex = 0.;
     fNoise = 0;
-    fPlotOption = "pl";
+    fPlotOption = "p";
     fColor = 1;
     fLineStyle = 1;
     fMarkerStyle = 20;

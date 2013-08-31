@@ -27,8 +27,8 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
     iOffAxisValue.push_back( 2.5 );
     iOffAxisValue.push_back( 3.25 );
     iOffAxisValue.push_back( 3.75 );
-    iOffAxisValue.push_back( 4.25 );
-    iOffAxisValue.push_back( 4.75 );
+//    iOffAxisValue.push_back( 4.25 );
+//    iOffAxisValue.push_back( 4.75 );
 
     cout << "VWPPhysSensitivityPlotsMaker: hardwired offsets from camera center: ";
     for( unsigned int i = 0; i < iOffAxisValue.size(); i++ ) cout << iOffAxisValue[i] << ", ";
@@ -126,6 +126,20 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iSubArray, string iDa
 
 void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray, string iDataSet )
 {
+    vector< string > iD;
+    iD.push_back( iDataSet );
+    compareOffAxisSensitivities( iSubArray, iD );
+}
+
+/*
+
+   compare off axis sensitivities
+
+   note that some values are hardwired in plotProjectedSensitivities
+
+*/
+void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet )
+{
     if( iSubArray.size() > 0 )
     {
         fListOfArrays.clear();
@@ -134,28 +148,28 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
     if( iDataSet.size() > 0 )
     {
        fListofDataSets.clear();
-       fListofDataSets.push_back( iDataSet );
+       fListofDataSets = iDataSet;
     }
     cout << "Compare " << fListOfArrays.size() << " array(s) in " << fListofDataSets.size() << " data set(s)" << endl;
 
     TCanvas *c = 0;
-    for( unsigned int i = 0; i < fListOfArrays.size(); i++ )
+    for( unsigned int j = 0; j < fListofDataSets.size(); j++ )
     {
-       VPlotWPPhysSensitivity a;
-       a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
-       for( unsigned int k = 0; k < fOffAxisAngle.size(); k++ )
+       for( unsigned int i = 0; i < fListOfArrays.size(); i++ )
        {
-	  for( unsigned int j = 0; j < fListofDataSets.size(); j++ )
+	  VPlotWPPhysSensitivity a;
+	  a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
+	  for( unsigned int k = 0; k < fOffAxisAngle.size(); k++ )
 	  {
-	     a.addDataSet( fListofDataSets[j], fListOfArrays[i], fObservingTime_s, fOffAxisAngle[k], "", k+1, j+1 );
-          }
-       }
-       string iP = "";
-       if( fPrintingOptions.size() > 0 ) iP += fPrintingOptions + "-" + fListOfArrays[i];
-       a.plotIRF( iP );
-       a.plotSensitivity( iP, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
+		a.addDataSet( fListofDataSets[j], fListOfArrays[i], fObservingTime_s, fOffAxisAngle[k], "", k+1, j+1 );
+	  }
+	  string iP = "";
+	  if( fPrintingOptions.size() > 0 ) iP += fPrintingOptions + "-" + fListOfArrays[i];
+	  a.plotIRF( iP );
+	  a.plotSensitivity( iP, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
 
-       c = a.plotProjectedSensitivities( c );
+	  c = a.plotProjectedSensitivities( c, fOffAxisAngle.back(), j+1 );
+       }
     }
 }
 

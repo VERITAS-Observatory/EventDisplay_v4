@@ -4,6 +4,7 @@
 #define VPlotWPPhysSensitivity_H
 
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -18,7 +19,8 @@
 
 #include "VHistogramUtilities.h"
 #include "VMathsandFunctions.h"
-#include "VPlotCTARequirements.h"
+#include "VCTARequirements.h"
+#include "VCTASensitivityRequirements.h"
 #include "VPlotInstrumentResponseFunction.h"
 #include "VPlotUtilities.h"
 #include "VSensitivityCalculator.h"
@@ -63,10 +65,11 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 
    int fPlotCTARequirementsID;
    bool fPlotCTARequirementGoals;
-   VPlotCTARequirements *fPlotCTARequirements;
+   VCTARequirements *fPlotCTARequirements;
 
 // projected sensitvity plots
-   vector< double > fProjectionEnergy_logTeV;
+   vector< double > fProjectionEnergy_min_logTeV;
+   vector< double > fProjectionEnergy_max_logTeV;
    vector< TGraphAsymmErrors* > fProjectionSensitivityvsCameraOffset;
 
    void    fillProjectedSensitivityPlot( unsigned int i, VSensitivityCalculator *iS );
@@ -85,7 +88,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    vector< string > getListOfArrays();
    bool initialize( VPlotWPPhysSensitivityData* );
    bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
-   TCanvas* plotProjectedSensitivities( TCanvas* );
+   TCanvas* plotProjectedSensitivities( TCanvas*, double iMaxOffset, int iColor = -1 );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
    bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2., unsigned int iRelativeDataSetID = 0 );
    void printSensitivityFigureOfMerit( double iEmin_TeV = 0.03, double iEmax_TeV = 100. );

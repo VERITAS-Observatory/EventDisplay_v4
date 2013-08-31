@@ -1,6 +1,12 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130831 (GM) many changes in CTA scripts to allow 
+                easy comparision of north/south
+
+* 20130831 (GM) CTA requirements are added to the sensitivity
+                plotter (+FOM, etc)
+
 * 20130826 (GM) bug fix in L2 trigger type setting (was always set
                 to any trigger condition)
 
