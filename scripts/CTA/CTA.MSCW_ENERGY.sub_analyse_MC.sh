@@ -9,7 +9,7 @@
 if [ $# -ne 6 ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <script input parameter file> <onSource/cone>"
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <output directory> <onSource/cone>"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
@@ -17,8 +17,7 @@ then
    echo "  <subarraylist > text file with list of subarray IDs"
    echo "  <particle>      gamma_onSource / gamma_cone / electron / proton / helium"
    echo "  <data set>      e.g. ultra, ISDC3700m, ..."
-   echo "  <script input parameter file>  file with directories, etc.; see example in"
-   echo "                             $CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.runparameter"
+   echo "  <output directory> mscw files are written into this directory"
    echo
    echo "optional (for a huge amount of MC files):"
    echo "  [wildcard]     used in the < CTA.MSCW_ENERGY.subParallel_analyse_MC.sh > script"
@@ -37,23 +36,7 @@ if [[ $6 == "cone" ]]
 then
   CONE="TRUE"
 fi
-
-#######################################
-# read values from parameter file
-ANAPAR=$5
-if [ ! -e $ANAPAR ]
-then
-  echo "error: analysis parameter file not found: $ANAPAR" 
-  exit
-fi
-echo "reading analysis parameter from $ANAPAR"
-ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
-if [ -z "$ANADIR" ]
-then
-  echo "error: analysis parameter file not found: $ANAPAR" 
-  echo "(no ANADIR given)"
-  exit
-fi
+ANADIR=$5
 if [ $CONE = "FALSE" ]
 then
    ANADIR=$ANADIR-onAxis
@@ -80,9 +63,14 @@ SHELLDIR=$CTA_USER_LOG_DIR/$DATE"/MSCWANA/"
 mkdir -p $SHELLDIR
 
 ###########################
-# particle
+# particle types
 VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 NPART=${#VPART[@]}
+
+###########################
+# MC azimuth angles
+VAZ=( "_0deg" "_180deg" )
+NAZ=${#VAZ[@]}
 
 #########################################
 #loop over all arrays
@@ -101,53 +89,60 @@ do
    do
       PART=${VPART[$m]}
 
+#########################################
+# loop over all MC az angles
+      for ((n = 0; n < $NAZ; n++ ))
+      do
+         MCAZ=${VAZ[$n]}
+
 # take $FILEN files and combine them into one mscw file
-      FILEN=500
-      if [ $PART = "proton" ]
-      then
-	 FILEN=1500
-      fi
+	 FILEN=500
+	 if [ $PART = "proton" ]
+	 then
+	    FILEN=1500
+	 fi
 
 #########################################
 # input files lists
 
-      TMPLIST=$SHELLDIR/MSCW.tmplist.list
-      rm -f $TMPLIST
-      echo $TMPLIST
-      find $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/ -name "*[0-9]*.root" > $TMPLIST
-      echo "total number of files for particle type $PART : "
-      NTMPLIST=`wc -l $TMPLIST | awk '{print $1}'`
+	 TMPLIST=$SHELLDIR/MSCW.tmplist.list
+	 rm -f $TMPLIST
+	 echo $TMPLIST
+	 find $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$SUBAR/$PART/ -name "*[0-9]*$MCAZ.root" > $TMPLIST
+	 echo "total number of files for particle type $PART ($MCAZ) : "
+	 NTMPLIST=`wc -l $TMPLIST | awk '{print $1}'`
 ########################################################################
 # loop over all input files, start a job when $FILEN files are found
-      for ((l = 1; l < $NTMPLIST; l+=$FILEN ))
-      do
+	 for ((l = 1; l < $NTMPLIST; l+=$FILEN ))
+	 do
 # output file name for mscw_energy
-	 TFIL=$PART$NC"."$SUBAR"_ID"$RECID"-"$DSET"-$l.mscw"
+	    TFIL=$PART$NC"."$SUBAR"_ID$RECID$MCAZ-"$DSET"-$l.mscw"
 # input file list
-	 IFIL=$ODIR/$TFIL.list
-	 rm -f $IFIL
-	 let "k = $l + $FILEN"
-	 sed -n "$l,$k p" $TMPLIST > $IFIL
+	    IFIL=$ODIR/$TFIL.list
+	    rm -f $IFIL
+	    let "k = $l + $FILEN"
+	    sed -n "$l,$k p" $TMPLIST > $IFIL
 # skeleton script
-	 FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
+	    FSCRIPT="CTA.MSCW_ENERGY.qsub_analyse_MC"
 
-	 FNAM="$SHELLDIR/MSCW.ana-$DSET-ID$RECID-$PART-array$SUBAR-$6"
+	    FNAM="$SHELLDIR/MSCW.ana-$DSET-ID$RECID-$PART-array$SUBAR-$6"
 
-	 sed -e "s|TABLEFILE|$TABLE|" \
-	     -e "s|IIIIFIL|$IFIL|" \
-	     -e "s|TTTTFIL|$TFIL|" \
-	     -e "s|RECONSTRUCTIONID|$RECID|" \
-	     -e "s|ARRAYYY|$SUBAR|" \
-	     -e "s|DATASET|$DSET|" \
-	     -e "s|AAAAADIR|$ANADIR|" $FSCRIPT.sh > $FNAM.sh 
+	    sed -e "s|TABLEFILE|$TABLE|" \
+		-e "s|IIIIFIL|$IFIL|" \
+		-e "s|TTTTFIL|$TFIL|" \
+		-e "s|RECONSTRUCTIONID|$RECID|" \
+		-e "s|ARRAYYY|$SUBAR|" \
+		-e "s|DATASET|$DSET|" \
+		-e "s|AAAAADIR|$ANADIR|" $FSCRIPT.sh > $FNAM.sh 
 
-	 chmod u+x $FNAM.sh
-	 echo $FNAM.sh
+	    chmod u+x $FNAM.sh
+	    echo $FNAM.sh
 
 # submit the job
-	 qsub -l h_cpu=41:29:00 -l os="sl*" -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
-	 echo "run script written to $FNAM.sh"
-	 echo "queue log and error files written to $QLOG"
+	    qsub -l h_cpu=41:29:00 -l os="sl*" -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+	    echo "run script written to $FNAM.sh"
+	    echo "queue log and error files written to $QLOG"
+       done
      done
    done
 done

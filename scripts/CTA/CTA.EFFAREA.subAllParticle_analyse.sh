@@ -6,11 +6,10 @@
 #
 #
 
-
-if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
+if [ $# -ne 6 ] && [ $# -ne 7 ]
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <analysis parameter file> <output subdirectory> <data set> [filling mode]"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <analysis parameter file> <output subdirectory> <data set> [filling mode] [direction (e.g. _180deg)]"
    echo
    echo "<subarray list>"
    echo "     text file with list of subarray IDs"
@@ -27,11 +26,13 @@ then
    echo "<output subdirectory>"
    echo "    sub-directory name (not the full path) for effective areas files"
    echo
-   echo " <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
+   echo "<data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo "[filling mode]"
    echo "     effective area filling mode (use 2 to calculate angular resolution only)"
    echo "     (no value for default IRF calculation)"
+   echo
+   echo "[direction]        e.g. for north: \"_180deg\", for south: \"_0deg\", for all directions: no option"
    echo
    echo ""
    exit
@@ -47,6 +48,11 @@ GMOD=0
 if [ -n "$6" ]
 then
   GMOD=$6
+fi
+MCAZ=""
+if [ -n "$7" ]
+then
+  MCAZ=$7
 fi
 #######################################
 # read values from parameter file
@@ -118,7 +124,7 @@ do
 
 ###########################################
 # submit the job script
-      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ANAPAR $ODIR $DSET $GMOD
+      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ANAPAR $ODIR $DSET $GMOD $MCAZ
    done
 done
 

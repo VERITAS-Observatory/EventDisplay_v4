@@ -62,7 +62,7 @@ do
           -e "s|RRRR|$RECID|" \
           -e "s|OFFSET|$OFFSET|" $FDIR/$FSCRIPT-$ARRAY.sh
 
-   qsub -js 2000 -P cta_high -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
 
 done
 

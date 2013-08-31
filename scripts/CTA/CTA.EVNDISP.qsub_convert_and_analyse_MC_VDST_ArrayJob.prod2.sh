@@ -112,14 +112,19 @@ do
   $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root $OPT -outputdirectory $TMPDIR >& $TMPDIR/$OFIL.$N.evndisp.log
 
 ####################################################################
-# move evndisp files to data directory
+# get runnumber and azimuth
+  MCAZ=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -mcaz`
+  RUNN=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -runnumber`
+
+####################################################################
+# move dst (if required ) and evndisp files to data directory
    if [ $KEEP == "1" ]
    then
       mkdir -p $ODIR/VDST
       cp -v -f $TMPDIR/$OFIL.root $ODIR/VDST/
    fi
    rm -f -v $TMPDIR/$OFIL.root
-   cp -v -f $TMPDIR/*.root $ODIR
+   cp -v -f $TMPDIR/$RUNN.root $ODIR/$RUNN"_"$MCAZ"deg.root"
 done
 
 ####################################################################

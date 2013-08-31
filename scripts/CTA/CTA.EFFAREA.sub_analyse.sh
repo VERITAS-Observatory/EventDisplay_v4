@@ -8,10 +8,10 @@
 ##############################################################################
 
 
-if [ $# -ne 7 ] && [ $# -ne 8 ]
+if [ $# -ne 7 ] && [ $# -ne 8 ] && [ $# -ne 9 ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode] [direction (e.g. _180deg)]"
    echo "================================================================================"
    echo
    echo "calculate effective areas and instrument response functions for CTA"
@@ -38,11 +38,13 @@ then
    echo "<outputsubdirectory>"
    echo "     directory with all result and log files (full path)"
    echo
-   echo "  <data set>         e.g. cta-ultra3, ISDC3700m, ...  "
+   echo "<data set>         e.g. cta-ultra3, ISDC3700m, ...  "
    echo
    echo "[filling mode]"
    echo "     effective area filling mode (use 2 to calculate angular resolution only)"
    echo "     (optional, for default full calculation no option is needed)"
+   echo
+   echo "[direction]        e.g. for north: \"_180deg\", for south: \"_0deg\", for all directions: no option"
    echo
    exit
 fi
@@ -92,6 +94,10 @@ if [ -n "$8" ]
 then
   GFILLING=$8
 fi
+if [ -n "$9" ]
+then
+  MCAZ=$9
+fi
 
 ####################################
 # check particle type
@@ -139,11 +145,7 @@ mkdir -p $ODIR
 # on source gamma rays
 if [ $PART = "gamma_onSource" ]
 then
-   MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID"*.mscw.root
-   if [ $ARRAY = "V5" ]
-   then
-      MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID".mscw.root
-   fi
+   MSCFILE=$DDIR/gamma_onSource."$ARRAY"_ID"$RECID$MCAZ"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_onSource."$ARRAY"_ID"$RECID".eff
    OFFMIN=( 0. )
@@ -161,7 +163,7 @@ fi
 # isotropic gamma-rays: analyse in rings in camera distance
 if [ $PART = "gamma_cone" ]
 then
-   MSCFILE=$DDIR/gamma_cone."$ARRAY"_ID"$RECID"*.mscw.root
+   MSCFILE=$DDIR/gamma_cone."$ARRAY"_ID"$RECID$MCAZ"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=gamma_cone."$ARRAY"_ID"$RECID".eff
    OFFMIN=( 0. 1. 2. 3.0 3.5 4.0 4.5 5.0 )
@@ -177,7 +179,7 @@ then
 fi
 if [ $PART = "electron" ] || [ $PART = "electron_onSource" ]
 then
-   MSCFILE=$DDIR/electron."$ARRAY"_ID"$RECID"*.mscw.root
+   MSCFILE=$DDIR/electron."$ARRAY"_ID"$RECID$MCAZ"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFFMIN=( 0. )
    OFFMAX=( 100000. )
@@ -201,10 +203,10 @@ then
 fi
 if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
 then
-   MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID"*.mscw.root
+   MSCFILE=$DDIR/proton*."$ARRAY"_ID"$RECID$MCAZ"*.mscw.root
    if [ $ARRAY = "V5" ]
    then
-      MSCFILE=$DDIR/proton."$ARRAY"_ID"$RECID".mscw.root
+      MSCFILE=$DDIR/proton."$ARRAY"_ID"$RECID$MCAZ".mscw.root
    fi
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=proton."$ARRAY"_ID"$RECID".eff
@@ -230,7 +232,7 @@ then
 fi
 if [ $PART = "helium" ] || [ $PART = "helium_onSource" ]
 then
-   MSCFILE=$DDIR/helium."$ARRAY"_ID"$RECID"*.mscw.root
+   MSCFILE=$DDIR/helium."$ARRAY"_ID"$RECID$MCAZ"*.mscw.root
    EFFFILE=$DDIR/EffectiveAreas/
    OFIL=helium."$ARRAY"_ID"$RECID".eff
    OFFMIN=( 0. )

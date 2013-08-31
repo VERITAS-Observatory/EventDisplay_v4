@@ -6,16 +6,18 @@
 # Author: Gernot Maier
 #
 
-if [ $# -ne 4 ]
+if [ $# -ne 4 ] && [ $# -ne 5 ]
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone> <data set> <analysis parameter file>"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone> <data set> <analysis parameter file> [direction (e.g. _180deg)]"
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
    echo
    echo "  <onSource/cone>    calculate tables for on source or different wobble offsets"
    echo
    echo "  <data set>         e.g. cta-ultra3, ISDC3700, ...  "
+   echo 
+   echo "  <direction>        e.g. for north: \"_180deg\", for south: \"_0deg\", for all directions: no option"
    echo
    echo "   note 1: keywords ENERGYBINS and OUTPUTFILE are ignored in the runparameter file"
    echo
@@ -54,6 +56,12 @@ then
 fi
 DSET=$3
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
+
+#####################################
+if [ -n "$5" ]
+then
+  MCAZ=$5
+fi
 
 #####################################
 # energy bins
@@ -106,13 +114,15 @@ do
 # signal and background files (depending on on-axis or cone data set)
    if [ $CONE == "TRUE" ]
    then
-      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
-      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID"*.root`
+      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/$DSUF."$ARRAY"_ID"$RECID$MCAZ"*.mscw.root`
+      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR/proton."$ARRAY"_ID"$RECID$MCAZ"*.root`
    else
-      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR"-onAxis"/$DSUF."$ARRAY"_ID"$RECID"*.mscw.root`
-      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR"-onAxis"/proton."$ARRAY"_ID"$RECID"*.root`
+      SFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR"-onAxis"/$DSUF."$ARRAY"_ID"$RECID$MCAZ"*.mscw.root`
+      BFIL=`ls -1 $CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$ARRAY/$ANADIR"-onAxis"/proton."$ARRAY"_ID"$RECID$MCAZ"*.root`
    fi
 
+
+###############################################################
 # loop over all wobble offset
    for (( W = 0; W < $NOFF; W++ ))
    do
