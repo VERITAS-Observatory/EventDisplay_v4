@@ -82,6 +82,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
     VMonteCarloRunHeader *iMCRunHeader = new VMonteCarloRunHeader();
     iMCRunHeader->SetName( "MC_runheader" );
 
+    iMCRunHeader->runnumber = h->fRunNumber;
     iMCRunHeader->detector_Simulator = h->fSimulator;
     iMCRunHeader->detector_date = h->fDateOfSimsUTC;
 // CORSIKA/grisudet

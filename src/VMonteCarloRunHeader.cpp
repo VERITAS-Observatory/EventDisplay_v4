@@ -16,6 +16,7 @@ VMonteCarloRunHeader::VMonteCarloRunHeader()
 
 void VMonteCarloRunHeader::reset()
 {
+   runnumber = -1;
    shower_prog_id = 1;      ///< CORSIKA=1, ALTAI=2, KASCADE=3, MOCCA=4.
    shower_prog_vers = 0;    ///< version * 1000
    detector_prog_id = 0;    ///< sim_telarray=1, ...
@@ -69,12 +70,29 @@ bool VMonteCarloRunHeader::VOLUMEDET_set()
     return EVTH76.test( 5 );
 }
 
+void VMonteCarloRunHeader::printRunNumber()
+{
+   cout << runnumber << endl;
+}
+
+void VMonteCarloRunHeader::printMCAz( bool iLowerLimit )
+{
+   if( iLowerLimit )
+   {
+      cout <<  az_range[0]*45./atan(1.) << endl;
+      return;
+   }
+
+   cout << az_range[1]*45./atan(1.) << endl;
+}
+
 
 void VMonteCarloRunHeader::print()
 {
     cout << endl;
     cout << "Monte Carlo run header" << endl;
     cout << "======================" << endl;
+    if( runnumber >= 0 ) cout << "run nunber: " << runnumber << endl;
     cout << "code version: shower prog " << shower_prog_id << " (" << shower_prog_vers << "), ";
     cout << "detector prog " << detector_prog_id << " (" << detector_prog_vers << "), ";
     cout << converter_prog_vers << endl;

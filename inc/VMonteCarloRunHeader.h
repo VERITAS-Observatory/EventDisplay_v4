@@ -15,6 +15,7 @@ class VMonteCarloRunHeader : public TNamed
 {
    public:
 
+   long int runnumber;
    int shower_prog_id;      ///< CORSIKA=1, ALTAI=2, KASCADE=3, MOCCA=4.
    int shower_prog_vers;    ///< version * 1000
    int detector_prog_id;    ///< sim_telarray=1, grisudet=2, CARE=3
@@ -59,9 +60,11 @@ class VMonteCarloRunHeader : public TNamed
   ~VMonteCarloRunHeader() {}
    double getMeanZenithAngle_Deg();
    void   print();
+   void   printMCAz( bool iLowerLimit = true );
+   void   printRunNumber();
    void   reset();
    bool   VOLUMEDET_set();
 
-   ClassDef(VMonteCarloRunHeader,4);
+   ClassDef(VMonteCarloRunHeader,6);
 };
 #endif

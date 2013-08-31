@@ -18,27 +18,65 @@
 
 using namespace std;
 
+bool readMCParameter( TFile *fIn, string iPara )
+{
+    if( !fIn ) return false;
+
+    VMonteCarloRunHeader *fMC = 0;
+
+    fMC = (VMonteCarloRunHeader*)fIn->Get( "MC_runheader" );
+    if( !fMC ) return false;
+
+    if(      iPara == "-mcaz" )      fMC->printMCAz();
+    else if( iPara == "-runnumber" ) fMC->printRunNumber(); 
+    else return false;
+    
+    return true;
+}
+
 int main( int argc, char *argv[] )
 {
-    cout << endl;
-    cout << "printRunParameter " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
-    cout << "==========================" << endl;
-    if( argc != 2 )
+    if( argc != 2 && argc !=3 )
     {
         cout << endl;
-        cout << "usage: printRunParameter <file>" << endl;
+        cout << "printRunParameter " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
+        cout << "==========================" << endl;
+        cout << endl;
+        cout << "usage: printRunParameter <file> [opt]" << endl;
         cout << endl;
         cout << "print run parameters stored in eventdisplay or mscw_energy file" << endl;
+	cout << endl;
+	cout << "   options: " << endl;
+	cout << "      -mcaz   print MC azimuth angle" << endl;
         cout << endl;
         exit( 0 );
     }
+// command line option
+    string fOption = "";
+    if( argc == 3 )
+    {
+        fOption = argv[2];
+    }
+    if( fOption != "-mcaz" && fOption != "-runnumber" )
+    {
+       cout << endl;
+       cout << "printRunParameter " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
+       cout << "==========================" << endl;
+    }
 
+// open file
     TFile *fIn = new TFile( argv[1] );
     if( fIn->IsZombie() )
     {
         cout << "error: file not found: " << argv[1] << endl;
         cout << "exiting..." << endl;
         exit( 0 );
+    }
+
+    if( fOption.size() > 0 )  
+    {
+       readMCParameter( fIn, fOption );
+       exit( 0 );
     }
 
     VEvndispRunParameter *fPar = 0;

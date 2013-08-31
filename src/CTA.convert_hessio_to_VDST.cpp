@@ -293,6 +293,7 @@ bool read_trigger_mask( string trg_mask_file )
 bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata )
 {
 // values from CORSIKA
+   f->runnumber = hsdata->run_header.run;
    f->shower_prog_id = hsdata->mc_run_header.shower_prog_id;
    f->shower_prog_vers = hsdata->mc_run_header.shower_prog_vers;
    f->detector_prog_id = hsdata->mc_run_header.detector_prog_id;
