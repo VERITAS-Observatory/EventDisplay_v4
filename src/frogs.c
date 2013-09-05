@@ -421,7 +421,6 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	    tmplanlz->goodness_img=tmplanlz->goodness_img+pix_goodness;
 	    tmplanlz->npix_img++;
 	    tmplanlz->tel_goodnessImg[tel] += pix_goodness;
-	    
 	    /*counts the number of pixel in the image region.
 	      telnpix is used in fake goodness test*/
 	    telnpix[tel]++; 
@@ -440,7 +439,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 
     /* Finalize the telescope image and background goodness.
     The sum over all telescope goodness should equal to the whole array goodness */
-    if(d->nb_live_pix_total>tmplt->ndim+1) 
+    if(d->nb_live_pix_total>tmplt->ndim+1)
       tmplanlz->tel_goodnessImg[tel]=tmplanlz->tel_goodnessImg[tel]/sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
     else
       tmplanlz->tel_goodnessImg[tel]=FROGS_BAD_NUMBER;
@@ -467,7 +466,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
   else
     tmplanlz->goodness_bkg=FROGS_BAD_NUMBER;
   //Finilize the image goodness calculation (*** See note)
-  if(d->nb_live_pix_total>tmplt->ndim+1) 
+  if(d->nb_live_pix_total>tmplt->ndim+1)
     tmplanlz->goodness_img=tmplanlz->goodness_img/
       sqrt(2.0*(d->nb_live_pix_total-(tmplt->ndim+1)));
   //sqrt(2.0*(tmplanlz->npix_img-(tmplt->ndim+1)));
@@ -1084,11 +1083,14 @@ int frogs_likelihood(const gsl_vector *v, void *ptr, gsl_vector *f) {
 	if(mu!=FROGS_BAD_NUMBER) {
 	  double pd;
 
-          if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
+          if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL ) {
 	    pd=frogs_read_prob_array_table(dwrap->probarray,
 					   dwrap->data->scope[tel].q[pix],
 					   mu,
 					   dwrap->data->scope[tel].ped[pix]);
+	    if(pd<0.)
+	      printf(" tel %d pix %d q %f mu %f ped %f pd %f\n", tel, pix, dwrap->data->scope[tel].q[pix], mu, dwrap->data->scope[tel].ped[pix], pd);
+	  }
 	  else
 	    pd=frogs_probability_density(dwrap->data->scope[tel].q[pix],
 				         mu,
@@ -2052,6 +2054,8 @@ void frogs_fill_prob_density( struct frogs_probability_array *parray ) {
       for( int k=0; k<BIN3; k++ ) {
 	double ped = (double)k*(RANGE3-MIN3)/BIN3 + MIN3;
 	parray->prob_density_table[i][j][k] = frogs_probability_density(q, mu, ped, 0.35);
+	if(parray->prob_density_table[i][j][k]<0.)
+	  printf("q %f mu %f ped %f pd %f\n", q, mu, ped, parray->prob_density_table[i][j][k]);
       } 
     }
   }
@@ -2074,7 +2078,6 @@ double frogs_read_prob_array_table( struct frogs_probability_array *prob_array, 
   jj = BIN2*(mu-MIN2)/(RANGE2-MIN2);
   kk = BIN3*(ped-MIN3)/(RANGE3-MIN3);
   
-  
   imin = (int)ii;
   jmin = (int)jj;
   kmin = (int)kk;
@@ -2083,7 +2086,8 @@ double frogs_read_prob_array_table( struct frogs_probability_array *prob_array, 
   jmax = jmin+1;
   kmax = kmin+1;
   
-  if( imin < 0 || kmin < 0 || jmin < 0 || imax >= BIN1-1 || jmax >= BIN2-1 || kmax >= BIN3-1 )
+  //if( imin < 0 || kmin < 0 || jmin < 0 || imax >= BIN1-1 || jmax >= BIN2-1 || kmax >= BIN3-1 )
+  if( ii <= 0 || kk <= 0 || jj <= 0 || imax >= BIN1-1 || jmax >= BIN2-1 || kmax >= BIN3-1 ) //(SV)
     return frogs_probability_density(q,mu,ped,0.35);
   
   float qmin = imin*(RANGE1-MIN1)/BIN1 + MIN1;
@@ -2124,7 +2128,7 @@ double frogs_read_prob_array_table( struct frogs_probability_array *prob_array, 
   p += c5*mudel*peddel;
   p += c6*peddel*qdel;
   p += c7*qdel*mudel*peddel;
-  
+
   return p;
 }
  

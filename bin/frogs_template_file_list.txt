@@ -1,0 +1,22 @@
+0 45.0 55.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/dummyBis.tmplt
+0 55.0 65.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/dummyBis.tmplt
+0 65.0 75.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/dummyBis.tmplt
+0 75.0 90.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/frogs_r075_elev90.tmplt
+1 45.0 55.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/frogs1_r070_e30-30000_D0-500_zew40.tmplt
+1 55.0 65.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/frogs1_r070_e30-30000_D0-500_zew30.tmplt
+1 65.0 75.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/frogs1_r070_e30-30000_D0-500_zew20.tmplt
+1 75.0 90.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/frogs1_r070_e30-30000_D0-500_zew00.tmplt
+
+### DESY templates ###
+#1 55.0 65.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/gamma_r075_wBField_e30-20000_zew30_gEff1.0.tmplt
+
+
+### WITH CONVOLUTION ###
+#45.0 55.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/elev50X0.0-4.0s0.5r085.tmplt
+#55.0 65.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/elev60X0.0-4.0s0.5r085.tmplt
+#65.0 90.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/elev70X0.0-4.0s0.5r085.tmplt
+
+### WITHOUT CONVOLUTION ###
+#45.0 55.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/elev60X0.0-4.0s0.5r000_20TeV.tmplt
+#55.0 65.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/elev60X0.0-4.0s0.5r000_20TeV.tmplt
+#65.0 90.0 /lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400//Templates/elev70X0.0-4.0s0.5r000_20TeV.tmplt
