@@ -9,14 +9,12 @@ ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or fro
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)
 	if ! [ $# -eq 2 ] ; then # the human didn't add any arguments, and we must tell them so
 		echo "Prints the run numbers that are of the specific run versions runs."
-		echo "  For just V4 runs, do"
+		echo "  for just V4 runs, do"
 		echo "    $ `basename $0` 4 <file of runs>"
-		echo "  For just V5 runs, do"
+		echo "  for just V5 runs, do"
 		echo "    $ `basename $0` 5 <file of runs>"
-		echo "  To print all V5 *and* V6 runs, do"
+		echo "  to print all V5 and V6 runs, do"
 		echo "    $ `basename $0` 56 <file of runs>"
-		echo "  Can also work with pipes:"
-		echo "    $ cat runlist.dat | whichRunsAreVersion.sh 56"
 		exit
 	fi
 fi

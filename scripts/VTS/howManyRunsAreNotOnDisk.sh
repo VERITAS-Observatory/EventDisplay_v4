@@ -19,6 +19,6 @@ if [ ! -n "$LOC" ] ; then
 	exit
 fi
 
-cat $1 | whichRunsAreNotOnDisk.sh | wc -l
+cat $1 | whichRunsAreOnDisk.sh -n | wc -l
 exit
 

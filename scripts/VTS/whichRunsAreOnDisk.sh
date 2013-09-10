@@ -2,32 +2,71 @@
 # from a run list, prints the list of runs that are on disk.
 # written by Nathan Kelley-Hoskins Aug 2013
 
+NOTFLAG=false # flag for if the -n flag was used
+HELPFLAG=false # if true, print help text and exit
+#echo "INP:'`basename $0`' '$1' '$2' '$3'"
+
 ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or from a pipe
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)
-	if ! [ $# -eq 1 ] ; then # the human didn't add any arguments, and we must tell them so
-		echo "Prints the run numbers that ARE stored on disk."
-		echo " $ `basename $0` <file of runs>"
-		exit
+	if [ "$#" -eq "1" ] ; then # format is "exe <fname>"
+		RUNFILE=$1
+	elif [ "$#" -eq "2" ] ; then # format is "exe -flag <fname>"
+		if [ "$1" = "-n" ] ; then
+			NOTFLAG=true
+			RUNFILE=$2
+		else
+			echo " Error: `basename $0` doesn't understand flag $1.  Only acceptable flag is -n"
+			HELPFLAG=true
+		fi
+	else
+		echo "needs at least one argument"
+		HELPFLAG=true
+	fi
+else # it is a pipe
+	if [ "$#" -eq "0" ] ; then # format is " cat runlist.dat | exe "
+		RUNFILE=$1
+	elif [ "$#" -eq "1" ] ; then # format is " cat runlist.dat | exe -flags"
+		if [ "$1" = "-n" ] ; then
+			NOTFLAG=true
+			RUNFILE=$2
+		else
+			echo " Error: `basename $0` doesn't understand flag $1.  Only acceptable flag is -n"
+			HELPFLAG=true
+		fi
+	else
+		echo "needs at least one argument"
+		HELPFLAG=true
 	fi
 fi
 
+if $HELPFLAG ; then
+	echo
+	echo "Prints the run numbers that ARE stored on disk." ; echo
+	echo " $ `basename $0` <file of runs>" ; echo
+	echo "Or, prints the run numbers that are NOT stored on disk" ; echo
+	echo " $ `basename $0` -n <file of runs>" ; echo
+	echo " $ cat <file of runs> | `basename $0`" ; echo
+	echo " $ cat <file of runs> | `basename $0` -n" ; echo
+	exit
+fi
+	
+#echo "NOTFLAG:$NOTFLAG"
+
 # list of run_id's to read in
-RUNFILE=$1
+#RUNFILE=$1
 if [ ! -e $RUNFILE ] ; then
-	echo "File $RUNFILE could not be found in $PWD , sorry."
+	echo "File '$RUNFILE' could not be found, sorry."
 	exit	
 fi
 RUNLIST=`cat $RUNFILE`
 #echo "RUNLIST:$RUNLIST"
 #echo "Files not on disk:"
-
-MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
     
+# find the veritas db url
+MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
 if [ ! -n "$MYSQLDB" ] ; then
     echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
     exit
-#else
-#    echo "MYSQLDB: $MYSQLDB"
 fi 
 
 
@@ -62,12 +101,14 @@ while read -r RUNID RUNDATE ; do
 		
 		# test to see if the file exists
 		#echo "  Does file exist: $TARGFILE"
-		if [ -e $TARGFILE ] ; then
-			#echo "    File does not exist, need to download"
-			#echo "$RUNID $RUNDATE $TARGFILE"
-			
-			# if the cvbf file does not exist, print the run_id
-			echo "$RUNID"
+		if [ -e $TARGFILE ] ; then # file exists
+			if ! $NOTFLAG ; then # $NOTFLAG is false, and we should print the runnumber
+				echo "$RUNID"
+			fi
+		else # file does not exist
+			if $NOTFLAG ; then # $NOTFLAG is true, and we should print the runnumber
+				echo "$RUNID"
+			fi
 		fi
 	fi
 # This is where the MYSQL command is executed, with the list of requested runs
