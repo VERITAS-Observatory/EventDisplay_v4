@@ -1,6 +1,10 @@
 #!/bin/bash
 # from a run list, prints the list of runs that were taken in a specific atmosphere, summer(22) or winter(21)
 # written by Nathan Kelley-Hoskins Sept 2013
+#
+# For more information and examples, go to 
+#   https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual:_runlist_creation_and_filtering
+#
 
 CONORM="\e[0m"
 CORED='\e[1;31m'
@@ -57,12 +61,9 @@ fi
 
 # get database url from parameter file
 MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
-    
 if [ ! -n "$MYSQLDB" ] ; then
     echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
     exit
-#else
-#    echo "MYSQLDB: $MYSQLDB"
 fi 
 
 # mysql login info

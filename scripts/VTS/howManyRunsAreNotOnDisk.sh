@@ -1,5 +1,9 @@
 #!/bin/bash
 # written by Nathan Kelley-Hoskins Aug 2013
+#
+# For more information and examples, go to 
+#   https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual:_runlist_creation_and_filtering
+#
 
 ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or from a pipe
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)
@@ -11,10 +15,10 @@ if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pi
 fi
 
 # see if we can find whichRunsAreNotOnDisk.sh, which this script needs to run
-LOC=`command -v whichRunsAreNotOnDisk.sh`
+LOC=`command -v whichRunsAreOnDisk.sh`
 if [ ! -n "$LOC" ] ; then 
 	echo "Unable to run `basename $0` ..."
-	echo "\$EVNDISPSYS/scripts/VTS/whichRunsAreNotOnDisk.sh needs to be in your \$PATH in order to use this script."
+	echo "\$EVNDISPSYS/scripts/VTS/whichRunsAreOnDisk.sh needs to be in your \$PATH in order to use this script."
 	echo "exiting..."
 	exit
 fi
