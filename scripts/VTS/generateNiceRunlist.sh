@@ -3,6 +3,11 @@
 # will produce a list of runnumbers that are reasonably well-behaved.
 #
 # $ generateNiceRunlist.sh "source_id"
+#
+# For more information and examples, go to 
+#   https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual:_runlist_creation_and_filtering
+#
+
 
 NAM="$1"
 if [ ! "$NAM" ] ; then
@@ -13,7 +18,7 @@ MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' $VERITAS_EVNDISP_ANA_DIR/Paramet
 if [ ! -n "$MYSQLDB" ] ; then
     echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
     exit
-if
+fi
 
 MYSQL="mysql -u readonly -h $MYSQLDB -A"
 RUNINFOARRAY=()
