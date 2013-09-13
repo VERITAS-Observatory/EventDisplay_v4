@@ -526,6 +526,19 @@ anasum:	$(ANASUMOBJECTS)
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
+########################################################
+# hiloAnalysis
+########################################################
+
+HILOOBJECTS =	./obj/VHiLoTools.o \
+		./obj/hiloAnalysis.o
+
+./obj/hiloAnalysis.o: ./src/hiloAnalysis.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+hiloAnalysis:	$(HILOOBJECTS)
+		$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+		@echo "$@ done"
 
 ########################################################
 # shared library for root analysis
@@ -579,6 +592,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotSensitivityfromLisFiles.o ./obj/VPlotSensitivityfromLisFiles_Dict.o \
 		./obj/VPlotMonteCarloQualityFactor.o ./obj/VPlotMonteCarloQualityFactor_Dict.o \
 		./obj/VPlotAnasumHistograms.o ./obj/VPlotAnasumHistograms_Dict.o \
+		./obj/VHiLoTools.o ./obj/VHiLoTools_Dict.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
