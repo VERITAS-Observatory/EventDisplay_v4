@@ -50,13 +50,14 @@ class VHistogramUtilities
    static TH1*      normalizeTH1( TH1* h, bool iIntegral );
 
    static TH2F*     reduce2DHistogramSize( TH2 *h, string inewHistogramName );
+   static TH2D*     calculateContainmentDistance( TH2D*h, string inewHistogramName );
 
    static TH2*      interpolateResponseMatrix( TH2*, string iNewHistoName = "" );
    static bool      normalizeTH2D_y( TH2* h );
 
    void             setDebug( bool iB = true ) { fDebug = iB; }
 
-   ClassDefNV( VHistogramUtilities, 7 );
+   ClassDefNV( VHistogramUtilities, 8 );
 };
 
 #endif

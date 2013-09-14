@@ -553,6 +553,34 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, T
    return true;
 }
 
+TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D *h, string inewHistogramName )
+{
+   if( !h ) return 0;
+
+   TH2D *hNew = new TH2D( inewHistogramName.c_str(), h->GetTitle(), h->GetNbinsX(), 
+                                                     h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax(),
+						     100, 0., 1. );
+   hNew->SetXTitle( h->GetXaxis()->GetTitle() );
+   hNew->SetYTitle( "containment" );
+   hNew->SetZTitle( "angular resolution [deg]" );
+
+// loop over all energy bins
+   for( int i = 1; i < h->GetNbinsX(); i++ )
+   {
+       double iTot = 0.;
+       for( int j = 1; j < h->GetNbinsY(); j++ ) iTot += h->GetBinContent( i,j );
+       if( iTot < 1.e-12 ) continue;
+// integrate from high to low y values
+       double iSum = 0.;
+       for( int j = 1; j < h->GetNbinsY(); j++ )
+       {
+           iSum += h->GetBinContent( i,j );
+	   hNew->SetBinContent( i, hNew->GetYaxis()->FindBin( iSum/iTot), h->GetYaxis()->GetBinCenter( j ) );
+       }
+   }
+   return hNew;
+}
+
 
 /*
 
