@@ -48,11 +48,13 @@ class VTMVAEvaluatorResults : public TNamed
     vector< double >        fTMVACutValue;
     vector< bool >          fTMVAOptimumCutValueFound;
     vector< double >        fSourceStrengthAtOptimum_CU;
+    vector< double >        fAngularContainmentRadius;
+    vector< double >        fAngularContainmentFraction;
 
     VTMVAEvaluatorResults() {}
    ~VTMVAEvaluatorResults() {}
 
-   ClassDef(VTMVAEvaluatorResults, 2 );
+   ClassDef(VTMVAEvaluatorResults, 3 );
 };
 
 class VTMVAEvaluator : public TNamed, public VPlotUtilities
@@ -80,6 +82,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    double                  fTMVACutValueNoVec;
    vector< bool >          fTMVAOptimumCutValueFound;
    vector< double >        fSourceStrengthAtOptimum_CU;
+   vector< double >        fAngularContainmentRadius;
+   vector< double >        fAngularContainmentFraction;
 
    string                  fParticleNumberFileName;          // particle numbers are read from this file
    double                  fOptmizationSourceSignificance;
@@ -98,6 +102,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool     fTMVAMethodName_BOXCUTS;
    unsigned int fTMVAMethodCounter;
 
+   double   fTMVAngularContainmentRadiusMax;     // maximum angular containment radius (optimization scales relative to this value)
    double   fTMVAErrorFraction_min;             // remove bins from background efficiency curves with large errors
 
    double   fSpectralIndexForEnergyWeighting;        // used to calculate the spectral weighted mean of an energy bin
@@ -143,6 +148,10 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
                                      unsigned int iEnergyBin,
 				     double iE_min_log10, double iE_max_log10, string iVariable );
    vector< string > getTrainingVariables( string iFile, vector< bool >& iSpectator  );
+   void             getOptimalAngularContainmentRadius( double effS, double effB, double Ndif, double Nof,
+                                                        TH2D* iHAngContainment, double iEnergy_log10_TeV,
+							double &i_Signal_to_sqrtNoise, double &i_AngularContainmentRadius,
+							double &i_AngularContainmentFraction );
    void             plotEfficiencyPlotsPerEnergy( unsigned int iBin, 
                                                   TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
 						  TH1F* hEffS, TH1F* hEffB, 
@@ -156,14 +165,13 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
   ~VTMVAEvaluator() {};
 
    bool    evaluate();
-   double  getBoxCut_Theta2( double iEnergy_log10TeV );
-   TGraph* getBoxCut_Theta_Graph();
    TGraph* getBoxCut_Theta2_Graph();
    vector< double > getBoxCut_Theta2() { return fBoxCutValue_theta2; }
    vector< double > getBackgroundEfficiency() { return fBackgroundEfficiency; }
    vector< bool >   getOptimumCutValueFound() { return fTMVAOptimumCutValueFound; }
    vector< double > getSignalEfficiency() { return fSignalEfficiency; }
    unsigned int     getSpectralWeightedEnergyBin();
+   double  getOptimalTheta2Cut( double iEnergy_log10TeV );
    vector< double > getTMVACutValue() { return fTMVACutValue; }
    VTMVAEvaluatorResults* getTMVAEvaluatorResults() { return fTMVAEvaluatorResults; }
    bool   getTMVAThetaCutVariable() { return fTMVAThetaCutVariableSet; }
@@ -174,6 +182,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool   IsZombie() { return fIsZombie; }
    void   plotBoxCuts();
    void   plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
+   void   printAngularContainmentRadius();
    void   printSensitivityOptimizationParameters();
    void   printSignalEfficiency();
    void   printSourceStrength_CU();
@@ -193,6 +202,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setSignalEfficiency( double iSignalEfficiency = -99. );
    void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
+   void   setTMVAAngularContainmentRadiusMax( double iC = 0.8 ) { fTMVAngularContainmentRadiusMax = iC; }
    void   setTMVAOptimizationEnergyStepSize( double iStep = 0.20 ) { fTMVAOptimizationStepsize = iStep; }
    void   setTMVACutValue( double iE = -99. );
    void   setTMVACutValue( map< unsigned int, double > iMVA );
@@ -200,7 +210,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 18 );
+   ClassDef(VTMVAEvaluator, 19 );
 };
 
 #endif

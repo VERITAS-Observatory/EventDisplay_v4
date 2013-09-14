@@ -715,14 +715,18 @@ void VGammaHadronCuts::printDirectionCuts()
         }
     }
 // theta cut using TMVA
-    else if( fDirectionCutSelector == 3 || fDirectionCutSelector == 4 || fDirectionCutSelector == 5 )
+    else if( fDirectionCutSelector == 4 )
+    {
+       cout << "Direction cut from TMVA optimiziezer" << endl;
+    }
+    else if( fDirectionCutSelector == 3 || fDirectionCutSelector == 5 )
     {
         cout << "Direction cut from TMVA " << endl; 
 	if( fDirectionCutSelector == 3 )
 	{
 	   cout << "using TMVA evaluator (part of gamma/hadron cuts)" << endl;
         }
-	if( fDirectionCutSelector == 4 || fDirectionCutSelector == 5 )
+	if( fDirectionCutSelector == 5 )
 	{
 	   if( !fTMVAEvaluator || !fTMVAEvaluator->getTMVAThetaCutVariable() )
 	   {
@@ -1521,6 +1525,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
     }
     fTMVAEvaluatorResults = fTMVAEvaluator->getTMVAEvaluatorResults();
     fTMVAEvaluator->printSignalEfficiency();
+    fTMVAEvaluator->printAngularContainmentRadius();
 
     if( fDirectionCutSelector == 3 ) fTMVAEvaluator->setIgnoreTheta2Cut( false );
     else                             fTMVAEvaluator->setIgnoreTheta2Cut( true  );
@@ -1867,9 +1872,10 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
        {
           theta_cut_max = -1.;
        }
-       else if( fDirectionCutSelector == 4 && fTMVAEvaluator && fTMVAEvaluator->getTMVAThetaCutVariable() )
+// optimal theta2 cut
+       else if( fDirectionCutSelector == 4 && fTMVAEvaluator )
        {
-           theta_cut_max = fTMVAEvaluator->getBoxCut_Theta2( e );
+           theta_cut_max = fTMVAEvaluator->getOptimalTheta2Cut( e );
 	   if( theta_cut_max > 0. ) theta_cut_max = TMath::Sqrt( theta_cut_max );
 	   else                     theta_cut_max = 0.;
        }

@@ -1332,7 +1332,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
        cout << fMCCTA_File << endl;
        return 0;
     }
-    cout << "reading CTA-MC file: " << fMCCTA_File << endl;
+    cout << "reading CTA-MC file (unit=" << bUnit << "): " << fMCCTA_File << endl;
 // sensitivities
     if( bUnit == "ENERGY" )
     {
@@ -1362,6 +1362,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
 // proton rates
     h = 0;
     h = get_CTA_IRF_Histograms( "ProtRate", fMCCTA_cameraoffset_deg );
+    if( !h ) h = get_CTA_IRF_Histograms( "hProtRate", fMCCTA_cameraoffset_deg );
     if( h )
     {
        gProtonRate = new TGraphErrors( 1 );
@@ -1371,6 +1372,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
 // electron rates
     h = 0;
     h = get_CTA_IRF_Histograms( "ElecRate", fMCCTA_cameraoffset_deg );
+    if( !h ) h = get_CTA_IRF_Histograms( "hElecRate", fMCCTA_cameraoffset_deg );
     if( h )
     {
        gElectronRate = new TGraphErrors( 1 );

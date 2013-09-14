@@ -149,8 +149,10 @@ bool VPlotWPPhysSensitivity::initialize( VPlotWPPhysSensitivityData* iData )
 // IFAE May 2013
 //      iTemp << "data/IFAE_May2013/Subarray" << iData->fSubArray;
 // July 2013
-      iTemp << "data/IFAE_July2013/" << iData->fAnalysis;
-      iTemp << "_IFAE_" << hname << "hours_20130630.root";
+//      iTemp << "data/IFAE_July2013/" << iData->fAnalysis;
+// Sept 2013
+      iTemp << "data/IFAE_Sept2013/" << iData->fAnalysis;
+      iTemp << "_merged_IFAE_" << hname << "hours_20130901.root";
    }
    else if( iData->fAnalysis == "HD_KB" || iData->fAnalysis == "MPIK" )
    {
@@ -269,8 +271,8 @@ void VPlotWPPhysSensitivity::initialProjectedSensitivityPlots()
 {
 // (hard coded energies here...not good)
 //   fProjectionEnergy_min_logTeV.push_back( log10( 10.001 ) );   fProjectionEnergy_max_logTeV.push_back( log10( 10.001 ) );
-//   fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );       fProjectionEnergy_max_logTeV.push_back( log10( 10. ) );  
-   fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );       fProjectionEnergy_max_logTeV.push_back( log10( 110. ) );  
+   fProjectionEnergy_min_logTeV.push_back( log10( 1.0 ) );       fProjectionEnergy_max_logTeV.push_back( log10( 10. ) );  
+//   fProjectionEnergy_min_logTeV.push_back( log10( 10.0 ) );       fProjectionEnergy_max_logTeV.push_back( log10( 110. ) );  
 //   fProjectionEnergy_min_logTeV.push_back( log10( 0.08 ) );     fProjectionEnergy_max_logTeV.push_back( log10( 0.08 ) ); 
  
    char hname[200];
@@ -346,7 +348,7 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas *c, double 
 	TH1D *hnull = new TH1D( "hnull", "", 10, 0., iMaxOffSet + 0.5 );
 	hnull->SetStats( 0 );
 	hnull->SetXTitle( "distance to camera center [deg]" );
-	hnull->SetYTitle( "relative acceptance" );
+	hnull->SetYTitle( "relative sensitivity" );
 	hnull->SetMinimum( 0. );
 	hnull->SetMaximum( 1.3 );
 	hnull->Draw();
@@ -492,20 +494,20 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( double iEmin_TeV, do
 	       if( iEmin_TeV < x - fData[i]->gSensitivity->GetErrorX( p )
 	        && iEmax_TeV > x )
 	       {
-		  req = VCTASensitivityRequirements::Flux_req50_E2erg_south( 0.5 *  (TMath::Power( 10., x - fData[i]->gSensitivity->GetErrorX( p ) ) + TMath::Power( 10., x + fData[i]->gSensitivity->GetErrorX( p ) ) ) );
+		  req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
 	          m  *= req / y;
-		  if( y > 0. ) dm += dy*dy/(req/y)/(req/y);
+		  if( y > 0. ) dm += dy*dy*req*req/y/y/y/y;
 		  z++;
                }
            }
         }
 	if( z > 0 )
 	{
-	   dm = m * sqrt( dm );
 	   m = TMath::Power( m, 1./z );
-	   dm = 1./z * TMath::Power( dm, 1./z - 1. ) * dm;
+	   dm = m*sqrt( dm );
+	   dm = 1./z * TMath::Power( m, 1./z - 1. ) * dm;
 	   cout << "Figure of merit (calculated from sensitivity) for " << fData[i]->fAnalysis;
-	   cout << "( " << z << " points): " << setprecision ( 4 ) << m;
+	   cout << "(" << z << " points): " << setprecision ( 4 ) << m;
 	   cout << " +- " << dm << endl;
         }
     }
