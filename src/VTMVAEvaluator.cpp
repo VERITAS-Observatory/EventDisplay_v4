@@ -781,40 +781,37 @@ double VTMVAEvaluator::getOptimalTheta2Cut( double iEnergy_log10TeV )
 // for very small energies: return smallest value
     if( fEnergyCut_Log10TeV_min.size() > 0 && iEnergy_log10TeV < fEnergyCut_Log10TeV_min[0] )
     {
-       return fAngularContainmentRadius[0];
+       return fAngularContainmentRadius[0]*fAngularContainmentRadius[0];
     }
 
 // for very high energies: return largest value
     if( fEnergyCut_Log10TeV_min.size() > 0 && iEnergy_log10TeV > fEnergyCut_Log10TeV_max[fEnergyCut_Log10TeV_max.size()-1] )
     {
-       return fAngularContainmentRadius[fAngularContainmentRadius.size()-1];
+       return fAngularContainmentRadius[fAngularContainmentRadius.size()-1]*fAngularContainmentRadius[fAngularContainmentRadius.size()-1];
     }
 
 // find the theta2 cut for the corresponding energy
     for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
     {
-       if( iEnergy_log10TeV > fEnergyCut_Log10TeV_min[i] && iEnergy_log10TeV < fEnergyCut_Log10TeV_max[i] ) return fAngularContainmentRadius[i];
+       if( iEnergy_log10TeV > fEnergyCut_Log10TeV_min[i] && iEnergy_log10TeV < fEnergyCut_Log10TeV_max[i] ) return fAngularContainmentRadius[i]*fAngularContainmentRadius[i];
     }
 
     return 0.;
 }
 
 /*
-   return a graph with all the box theta2 cuts
+   return a graph with all the theta2 cuts
 
    (is a memory leak...)
 
 */
-TGraph* VTMVAEvaluator::getBoxCut_Theta2_Graph()
+TGraph* VTMVAEvaluator::getOptimalTheta2Cut_Graph()
 {
-// ignore when TMVA has no theta2 cut
-    if( !getTMVAThetaCutVariable() ) return 0;
-
 // check consistency
-   if( fEnergyCut_Log10TeV_min.size() != fBoxCutValue_theta2.size() )
+   if( fEnergyCut_Log10TeV_min.size() != fAngularContainmentRadius.size() )
    {
-       cout << "VTMVAEvaluator::getBoxCut_Theta2_Graph: theta2 and energy vector dimensions inconsistent: ";
-       cout << fEnergyCut_Log10TeV_min.size() << "\t" << fBoxCutValue_theta2.size() << endl;
+       cout << "VTMVAEvaluator::getOptimalTheta2Cut_Graph: theta2 and energy vector dimensions inconsistent: ";
+       cout << fEnergyCut_Log10TeV_min.size() << "\t" << fAngularContainmentRadius.size() << endl;
        return 0;
    }
 
@@ -828,7 +825,7 @@ TGraph* VTMVAEvaluator::getBoxCut_Theta2_Graph()
       iMeanEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
                                                                        fSpectralIndexForEnergyWeighting );
 
-      g->SetPoint( i, iMeanEnergy, fBoxCutValue_theta2[i] );
+      g->SetPoint( i, iMeanEnergy, fAngularContainmentRadius[i]*fAngularContainmentRadius[i] );
    }
 
    return g;

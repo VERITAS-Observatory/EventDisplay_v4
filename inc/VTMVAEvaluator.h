@@ -165,7 +165,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
   ~VTMVAEvaluator() {};
 
    bool    evaluate();
-   TGraph* getBoxCut_Theta2_Graph();
+   TGraph* getOptimalTheta2Cut_Graph();
    vector< double > getBoxCut_Theta2() { return fBoxCutValue_theta2; }
    vector< double > getBackgroundEfficiency() { return fBackgroundEfficiency; }
    vector< bool >   getOptimumCutValueFound() { return fTMVAOptimumCutValueFound; }

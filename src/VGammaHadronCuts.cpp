@@ -38,7 +38,7 @@
         (in cut file: *theta2file ... IRF)
      3: TMVA: use gamma/hadron part evaluation (no direction cuts applied in VGammaHadronCuts)
      4: TMVA: get direction cut from TMVA evaluator for each event
-     5: TMVA: get direction cut from box cut graph obtained during initialization of TMVA evaluator
+     5: TMVA: get direction cut from theta2 graph obtained during initialization of TMVA evaluator
 
   \author
   Jamie Holder, Gernot Maier
@@ -717,7 +717,7 @@ void VGammaHadronCuts::printDirectionCuts()
 // theta cut using TMVA
     else if( fDirectionCutSelector == 4 )
     {
-       cout << "Direction cut from TMVA optimiziezer" << endl;
+       cout << "Direction cut from TMVA optimizer" << endl;
     }
     else if( fDirectionCutSelector == 3 || fDirectionCutSelector == 5 )
     {
@@ -734,7 +734,7 @@ void VGammaHadronCuts::printDirectionCuts()
            }
 	   if( fDirectionCutSelector == 5 && fTMVABoxCut_Theta2_max )
 	   {
-	      cout << " found box cut graph: " << endl;
+	      cout << " found theta2 cut graph: " << endl;
 	      fTMVABoxCut_Theta2_max->Print();
 	   }
         }
@@ -1529,7 +1529,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 
     if( fDirectionCutSelector == 3 ) fTMVAEvaluator->setIgnoreTheta2Cut( false );
     else                             fTMVAEvaluator->setIgnoreTheta2Cut( true  );
-    fTMVABoxCut_Theta2_max = fTMVAEvaluator->getBoxCut_Theta2_Graph();
+    fTMVABoxCut_Theta2_max = fTMVAEvaluator->getOptimalTheta2Cut_Graph();
     if( fTMVABoxCut_Theta2_max )
     {
        cout << "VGammaHadronCuts::initTMVAEvaluator: found theta2_max graph from TMVA" << endl;
