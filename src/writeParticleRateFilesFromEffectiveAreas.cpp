@@ -10,9 +10,12 @@
 
    Output:
        * root file with signal and background rates
+       * [optional] angular resolution histograms
 
 */
 
+#include "VHistogramUtilities.h"
+#include "VInstrumentResponseFunctionReader.h"
 #include "VWPPhysSensitivityFile.h"
 
 #include <iostream>
@@ -20,6 +23,39 @@
 #include <vector>
 
 using namespace std;
+
+/*
+ 
+ calculate angular angular resolution vs containment radius vs energy
+*/
+void writeAngResHistogram( char *iMC_Gamma = 0, string iParticleNumberFile = "particleNumbers.tmp.root" )
+{
+   if( !iMC_Gamma ) return;
+
+   VInstrumentResponseFunctionReader iR;
+   iR.fillData( iMC_Gamma );
+   for( unsigned int i = 0; i < iR.fIRF_TreeNames.size(); i++ )
+   {
+       if( iR.fIRF_TreeNames[i] == "t_angular_resolution_080p" )
+       {
+	   TH2D *h = 0;
+	   if( i < iR.fIRF_Data.size() && iR.fIRF_Data[i] )
+	   {
+	       h = iR.fIRF_Data[i]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF];
+	   }
+	   TH2D *hRes = VHistogramUtilities::calculateContainmentDistance( h, "AngResCumulative" );
+	   if( hRes )
+	   {
+	      TFile hh( iParticleNumberFile.c_str(), "update" );
+	      cout << "writing angular resolution histogram to " << hh.GetName() << endl;
+	      hRes->Write();
+	      hh.Close();
+	   }
+	   break;
+       }
+  }
+}
+
 
 
 
@@ -67,6 +103,11 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
        }
 // calculate differential fluxes for 5 bins per decade (0.2)
        b.calculateParticleNumberGraphs_MC( 0.2 );
+
+
+
+       
+
     }
 }
 
@@ -81,10 +122,10 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
 */
 int main( int argc, char *argv[] )
 {
-   if( argc != 5 )
+   if( argc != 5 && argc != 6 )
    {
       cout << endl;
-      cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone> <reconstruction ID> <directory with effective areas> " << endl;
+      cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone> <reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
       cout << endl;
       exit( 0 );
    }
@@ -98,6 +139,8 @@ int main( int argc, char *argv[] )
    string iOnSource = argv[2];
    int    iRecID = atoi( argv[3] );
    string iDataDir = argv[4];
+   string iAngResDir = "";
+   if( argc == 6 ) iAngResDir = argv[5];
 
 // hardwired total number of off source bins
    int iOffSetCounter = -1;
@@ -139,6 +182,12 @@ int main( int argc, char *argv[] )
       {
 	  writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
       }
+// angular resolution histogram
+      if( iAngResDir.size() > 0 )
+      {
+         sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
+	 writeAngResHistogram( iGamma, iParticleNumberFile );
+      }
    }
 
 // off-axis rates
@@ -157,6 +206,12 @@ int main( int argc, char *argv[] )
       else
       {
 	 writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
+      }
+// angular resolution histogram
+      if( iAngResDir.size() > 0 )
+      {
+         sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
+	 writeAngResHistogram( iGamma, iParticleNumberFile );
       }
    }
 }
