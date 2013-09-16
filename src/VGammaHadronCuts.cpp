@@ -717,7 +717,7 @@ void VGammaHadronCuts::printDirectionCuts()
 // theta cut using TMVA
     else if( fDirectionCutSelector == 4 )
     {
-       cout << "Direction cut from TMVA optimizer" << endl;
+       cout << "Direction cut from TMVA angular containment optimizer" << endl;
     }
     else if( fDirectionCutSelector == 3 || fDirectionCutSelector == 5 )
     {
@@ -1875,6 +1875,7 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 // optimal theta2 cut
        else if( fDirectionCutSelector == 4 && fTMVAEvaluator )
        {
+// XXXXXXXXX check if this has been changed to used the box cut graph and eval
            theta_cut_max = fTMVAEvaluator->getOptimalTheta2Cut( e );
 	   if( theta_cut_max > 0. ) theta_cut_max = TMath::Sqrt( theta_cut_max );
 	   else                     theta_cut_max = 0.;

@@ -97,6 +97,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
    bool     fTMVAThetaCutVariableSet;       // check if TMVA provides a theta2 cut variable
    double   fTMVA_EvaluationResult;         // result from TVMA evaluator
+   bool     fTMVA_OptimizeAngularContainment; // optimize angular containment (using angular resolution vs containment histograms
 
    string   fTMVAMethodName;
    bool     fTMVAMethodName_BOXCUTS;
@@ -156,7 +157,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
                                                   TGraph* iGSignal_to_sqrtNoise, TGraph* iGSignal_to_sqrtNoise_Smooth,
 						  TH1F* hEffS, TH1F* hEffB, 
 						  double iEnergy_Log10TeV_min, double iEnergy_Log10TeV_max,
-						  TGraph* iGSignalEvents, TGraph* iGBackgroundEvents );
+						  TGraph* iGSignalEvents, TGraph* iGBackgroundEvents,
+						  TGraph* iGOpt_AngularContainmentRadius, TGraph *iGOpt_AngularContainmentFraction );
    void     reset();
 
    public:
@@ -197,6 +199,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 	    fOptimizationObservingTime_h = iObservationTime_h; }
 
    void   setSensitivityOptimizationFixedSignalEfficiency( double iOptmizationFixedSignalEfficiency = 1. );
+   void   setOptimizeAngularContainment( bool iO = true ) { fTMVA_OptimizeAngularContainment = iO; }
    void   setParticleNumberFile( string iParticleNumberFile = "" ) { fParticleNumberFileName = iParticleNumberFile; }
    void   setPlotEfficiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iSignalEfficiency = -99. );
@@ -210,7 +213,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 19 );
+   ClassDef(VTMVAEvaluator, 20 );
 };
 
 #endif
