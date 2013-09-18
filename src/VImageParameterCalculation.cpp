@@ -1262,33 +1262,73 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     fLLFitter->Release( 1 );
     fLLFitter->Release( 3 );
     fLLFitter->DefineParameter( 0, "rho", rho, step, 0., 0. );
-    if( fParGeo->sigmaX > 0. ) fLLFitter->DefineParameter( 1, "meanX", cen_x, step, cen_x - 2.*fParGeo->sigmaX, cen_x + 2.*fParGeo->sigmaX );
+    if( fParGeo->sigmaX > 0. )
+    {
+       fdistXmin = cen_x - 2.*fParGeo->sigmaX;
+       fdistXmax = cen_x + 2.*fParGeo->sigmaX;
+// make sure that this is inside the FOV (+10%)
+       if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
+       {
+          if( TMath::Abs( fdistXmin ) > 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] )
+	  {
+	      if( fdistXmin > 0 ) fdistXmin =  1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+	      else                fdistXmin = -1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+          }
+          if( TMath::Abs( fdistXmax ) > 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] )
+	  {
+	      if( fdistXmax > 0 ) fdistXmax =  1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+	      else                fdistXmax = -1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+          }
+        }
+    }
     else                       
     {
+// image centroid should not be outside of the FOV (by more than 10%)
         if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
 	{
-	   fLLFitter->DefineParameter( 1, "meanX", cen_x, step, fdistXmin, 
-	                               fdistXmax+fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] );
+	   fdistXmax = 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()]; 
         }
+// should never land here
 	else
 	{
-	   fLLFitter->DefineParameter( 1, "meanX", cen_x, step, fdistXmin, fdistXmax+10. );
+	   fdistXmax = 5.;
 	}
     }
+    fLLFitter->DefineParameter( 1, "meanX", cen_x, step, fdistXmin, fdistXmax );
     fLLFitter->DefineParameter( 2, "sigmaX", sigmaX, step, 0., 2.*fParGeo->sigmaX + 1. );
-    if( fParGeo->sigmaY > 0. ) fLLFitter->DefineParameter( 3, "meanY", cen_y, step, cen_y - 2.*fParGeo->sigmaY, cen_y + 2.*fParGeo->sigmaY );
+    if( fParGeo->sigmaY > 0. )
+    {
+       fdistYmin = cen_y - 2.*fParGeo->sigmaY;
+       fdistYmax = cen_y + 2.*fParGeo->sigmaY;
+// make sure that this is inside the FOV (+10%)
+       if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
+       {
+          if( TMath::Abs( fdistYmin ) > 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] )
+	  {
+	      if( fdistYmin > 0 ) fdistYmin =  1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+	      else                fdistYmin = -1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+          }
+          if( TMath::Abs( fdistYmax ) > 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] )
+	  {
+	      if( fdistYmax > 0 ) fdistYmax =  1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+	      else                fdistYmax = -1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
+          }
+        }
+    }
     else
     {
+// image centroid should not be outside of the FOV (by more than 10%)
         if( fData->getDetectorGeometry() &&  fData->getTelID() < fData->getDetectorGeometry()->getFieldofView().size() )
 	{
-	   fLLFitter->DefineParameter( 1, "meanY", cen_y, step, fdistYmin, 
-	                               fdistYmax+fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()] );
+	   fdistYmax = 1.1 * 0.5 * fData->getDetectorGeometry()->getFieldofView()[fData->getTelID()];
         }
 	else
 	{
-	   fLLFitter->DefineParameter( 1, "meanY", cen_y, step, fdistYmin, fdistYmax+10. );
+// should never land here
+	   fdistYmax = 5.;
 	}
     }
+    fLLFitter->DefineParameter( 3, "meanY", cen_y, step, fdistYmin, fdistYmax );
     fLLFitter->DefineParameter( 4, "sigmaY", sigmaY, step, 0., 2.*fParGeo->sigmaY + 1. );
     fLLFitter->DefineParameter( 5, "signal", signal, step, 0., 1.e6 );
 
