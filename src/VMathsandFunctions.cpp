@@ -65,7 +65,7 @@ double VMathsandFunctions::getSpectralWeightedMeanEnergy( double e_min_log10, do
        return TMath::Log10( 0.5 * (xL + xU ) );
     }
 
-// upper limit of bin should be large than lower limit
+// upper limit of bin should be larger than lower limit
     if( xU <= xL ) return e_min_log10;
 
 // calculate weighted mean

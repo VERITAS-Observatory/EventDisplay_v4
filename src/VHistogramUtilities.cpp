@@ -565,14 +565,14 @@ TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D *h, string inewHis
    hNew->SetZTitle( "angular resolution [deg]" );
 
 // loop over all energy bins
-   for( int i = 1; i < h->GetNbinsX(); i++ )
+   for( int i = 1; i <= h->GetNbinsX(); i++ )
    {
        double iTot = 0.;
        for( int j = 1; j < h->GetNbinsY(); j++ ) iTot += h->GetBinContent( i,j );
        if( iTot < 1.e-12 ) continue;
 // integrate from high to low y values
        double iSum = 0.;
-       for( int j = 1; j < h->GetNbinsY(); j++ )
+       for( int j = 1; j <= h->GetNbinsY(); j++ )
        {
            iSum += h->GetBinContent( i,j );
 	   hNew->SetBinContent( i, hNew->GetYaxis()->FindBin( iSum/iTot), h->GetYaxis()->GetBinCenter( j ) );

@@ -821,13 +821,18 @@ TGraph* VTMVAEvaluator::getOptimalTheta2Cut_Graph()
    double iMeanEnergy = 0.;
 
    TGraph *g = new TGraph( 1 );
+   unsigned int z = 0;
    for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
    {
       
       iMeanEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
                                                                        fSpectralIndexForEnergyWeighting );
 
-      g->SetPoint( i, iMeanEnergy, fAngularContainmentRadius[i]*fAngularContainmentRadius[i] );
+      if( fAngularContainmentRadius[i] > 0 )
+      {
+	 g->SetPoint( z, iMeanEnergy, fAngularContainmentRadius[i]*fAngularContainmentRadius[i] );
+	 z++;
+      }
    }
 
    return g;
@@ -1437,19 +1442,20 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	 {
 	    if( fOptimizationBackgroundAlpha > 0. )
 	    {
-	       if( iHAngContainment && fTMVA_OptimizeAngularContainment )
+/*	       if( iHAngContainment && fTMVA_OptimizeAngularContainment )
 	       {
 	           getOptimalAngularContainmentRadius( effS->GetBinContent( i ), effB->GetBinContent( i ), Ndif, Nof, 
 		                                       iHAngContainment, fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin],
 						       i_Signal_to_sqrtNoise, i_AngularContainmentRadius, i_AngularContainmentFraction );
                }
-	       else 
+	       else */
 	       {
 		  i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
 									 effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
 									 fOptimizationBackgroundAlpha );
-                  i_AngularContainmentRadius = iHAngContainment->GetBinContent( iHAngContainment->GetXaxis()->FindBin( fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] ),
-                                                                                iHAngContainment->GetYaxis()->FindBin( fTMVAngularContainmentRadiusMax ) );
+                  i_AngularContainmentRadius = iHAngContainment->GetBinContent(
+		                          iHAngContainment->GetXaxis()->FindBin( fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] ),
+                                          iHAngContainment->GetYaxis()->FindBin( fTMVAngularContainmentRadiusMax ) );
 		  i_AngularContainmentFraction = fTMVAngularContainmentRadiusMax;
                }
 	    }
@@ -1706,7 +1712,7 @@ void VTMVAEvaluator::getOptimalAngularContainmentRadius( double effS, double eff
     {
        return;
     }
-    double iEnergyBin = iHAngContainment->GetXaxis()->FindBin( iEnergy_log10_TeV );
+    int iEnergyBin = iHAngContainment->GetXaxis()->FindBin( iEnergy_log10_TeV );
     double iR_Max = iHAngContainment->GetBinContent( iEnergyBin, iHAngContainment->GetYaxis()->FindBin( fTMVAngularContainmentRadiusMax ) );
 
 // find containment radius giving maximum significance

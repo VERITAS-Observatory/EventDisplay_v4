@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 21030918 (GM) improved settings of centroid limits for LL
+                fitting procedure (VImageParameterCalculation)
+
 * 20130831 (GM) many changes in CTA scripts to allow 
                 easy comparision of north/south
 

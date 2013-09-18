@@ -575,7 +575,29 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 	    {
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySignificance_Min;
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencySignalEvents_Min;
-	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyObservationTime_h;
+	       if( !is_stream.eof() )
+	       {
+	          is_stream >> temp;
+// observing time is given as "50h", or "5m", "5s"
+		  if( temp.find( "h" ) != temp.npos )
+		  {
+		     fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.substr( 0, temp.find( "h" ) ).c_str() );
+                  }
+		  else if( temp.find( "m" ) != temp.npos )
+		  {
+		     fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.substr( 0, temp.find( "m" ) ).c_str() );
+		     fTMVAOptimizeSignalEfficiencyObservationTime_h /= 60.;
+                  }
+		  else if( temp.find( "s" ) != temp.npos )
+		  {
+		     fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.substr( 0, temp.find( "s" ) ).c_str() );
+		     fTMVAOptimizeSignalEfficiencyObservationTime_h /= 3600.;
+                  }
+		  else
+		  {
+		     fTMVAOptimizeSignalEfficiencyObservationTime_h = atof( temp.c_str() );
+                  }
+               }
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyMax;
             }
@@ -728,13 +750,8 @@ void VGammaHadronCuts::printDirectionCuts()
         }
 	if( fDirectionCutSelector == 5 )
 	{
-	   if( !fTMVAEvaluator || !fTMVAEvaluator->getTMVAThetaCutVariable() )
-	   {
-	      cout << "VGammaHadronCuts::printDirectionCuts WARNING: no theta2 cut defined in TMVA method" << endl;
-           }
 	   if( fDirectionCutSelector == 5 && fTMVABoxCut_Theta2_max )
 	   {
-	      cout << " found theta2 cut graph: " << endl;
 	      fTMVABoxCut_Theta2_max->Print();
 	   }
         }
@@ -1703,7 +1720,10 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 
    if( fNTelTypeCut.size() == 0 ) return true;
 
-   for( unsigned int i = 0; i < fNTelTypeCut.size(); i++ ) icut = ( icut || fNTelTypeCut[i]->test( fData ) );
+   for( unsigned int i = 0; i < fNTelTypeCut.size(); i++ )
+   {
+      icut = ( icut || fNTelTypeCut[i]->test( fData ) );
+   }
 
    if( bCount && !icut ) fStats->updateCutCounter( VGammaHadronCutsStatistics::eTelType );
 
@@ -1884,7 +1904,8 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 // use a graph with theta2 cuts
        else if( fDirectionCutSelector == 5 && fTMVABoxCut_Theta2_max )
        {
-	  theta_cut_max = fTMVABoxCut_Theta2_max->Eval( log10( e ) );
+//	  theta_cut_max = fTMVABoxCut_Theta2_max->Eval( log10( e ) );
+	  theta_cut_max = fTMVABoxCut_Theta2_max->Eval( e );
 // for e outside of graph range, return edge values
 	  if( fTMVABoxCut_Theta2_max->GetN() > 0 && fTMVABoxCut_Theta2_max->GetX() && fTMVABoxCut_Theta2_max->GetY() )
 	  {
@@ -2201,7 +2222,7 @@ bool VNTelTypeCut::test( CData *c )
 
 void VNTelTypeCut::print()
 {
-   cout << "\t       type cut: mintel >= " << fNTelType_min << " for types ";
+   cout << "telescope type cut: mintel >= " << fNTelType_min << " for type(s) ";
    for( unsigned int i = 0; i < fTelType_counter.size(); i++ ) cout << fTelType_counter[i] << " ";
    cout << endl;
 }
