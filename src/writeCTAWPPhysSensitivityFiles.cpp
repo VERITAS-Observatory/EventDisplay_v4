@@ -20,13 +20,33 @@ int main( int argc, char *argv[] )
     if( argc != 8 )
     {
         cout << endl;
-	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time [h]> <data directory>";
+	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory>";
 	cout << " <outputfile> <observatory (CTA/V5/V6)> <offset=0/1> <recid>" << endl;
+	cout << endl;
+	cout << "\t observing time: give unit without space, e.g. 50h, 10m, 2s" << endl;
 	cout << endl;
 	exit( 0 );
     }
     string fSubArray = argv[1];
-    double fObservingTime_h = atof( argv[2] );
+// observing time
+    double fObservingTime_h = 0.;
+    string iObstime = argv[2];
+    if( iObstime.find( "h" ) != string::npos )
+    {
+        fObservingTime_h = atof( iObstime.substr( 0, iObstime.find( "h" ) ).c_str() );
+    }
+    else if( iObstime.find( "m" ) != string::npos )
+    {
+        fObservingTime_h = atof( iObstime.substr( 0, iObstime.find( "m" ) ).c_str() ) / 60.;
+    }
+    else if( iObstime.find( "s" ) != string::npos )
+    {
+        fObservingTime_h = atof( iObstime.substr( 0, iObstime.find( "s" ) ).c_str() ) / 3600.;
+    }
+    else
+    {
+       fObservingTime_h = atof( iObstime.c_str() );
+    }
     string fDataDirectory = argv[3];
     string fOutputFile = argv[4];
     string fObservatory = argv[5];
