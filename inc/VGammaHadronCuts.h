@@ -124,6 +124,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	double          fTMVAOptimizeSignalEfficiencySignalEvents_Min;
 	double          fTMVAOptimizeSignalEfficiencyObservationTime_h;
 	double          fTMVAFixedSignalEfficiencyMax;
+	double          fTMVAFixedThetaCutMin;
 	TGraph*         fTMVABoxCut_Theta2_max;                
 	double          fTMVA_EvaluationResult;
 	VTMVAEvaluatorResults *fTMVAEvaluatorResults;
@@ -307,6 +308,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,42);
+        ClassDef(VGammaHadronCuts,43);
 };
 #endif

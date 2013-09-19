@@ -13,6 +13,12 @@ VTMVARunData::VTMVARunData()
 
    fName = "noname";
 
+   fTrainGammaHadronSeparation = false;
+   fTrainReconstructionQuality = true;
+// default
+   fTrainGammaHadronSeparation = true;
+   fTrainReconstructionQuality = false;
+
    fOutputDirectoryName = "";
    fOutputFileName = "";
 
@@ -26,6 +32,10 @@ VTMVARunData::VTMVARunData()
    fMinBackgroundEvents = 0;
 
    fNTtype = -1;
+
+//   fReconstructionQualityTarget = "TMath::Abs((ErecS-MCe0)/MCe0)";
+   fReconstructionQualityTarget = "ErecS/MCe0";
+   fReconstructionQualityTargetName = "EQuality";
 }
 
 /*!
@@ -174,9 +184,11 @@ bool VTMVARunData::openDataFiles()
 */
 void VTMVARunData::print()
 {
-    cout << "TMVA box cut configuration (" << fName << ")" << endl;
-    cout << "=================================" << endl;
+    cout << "TMVA configuration (" << fName << ")" << endl;
+    cout << "===========================" << endl;
     cout << endl;
+    if( fTrainGammaHadronSeparation ) cout << "Training gamma/hadron separation" << endl;
+    if( fTrainReconstructionQuality ) cout << "Training reconstruction quality" << endl;
     cout << "MVA Methods and options: " << endl;
     for( unsigned int i = 0; i < fMVAMethod.size(); i++ )
     {
@@ -221,8 +233,11 @@ void VTMVARunData::print()
     }
     cout << "signal data file(s): " << endl;
     for( unsigned int i = 0; i < fSignalFileName.size(); i++ ) cout << "\t" << fSignalFileName[i] << endl;
-    cout << "background data file(s): " << endl;
-    for( unsigned int i = 0; i < fBackgroundFileName.size(); i++ ) cout << "\t" << fBackgroundFileName[i] << endl;
+    if( !fTrainReconstructionQuality )
+    {
+       cout << "background data file(s): " << endl;
+       for( unsigned int i = 0; i < fBackgroundFileName.size(); i++ ) cout << "\t" << fBackgroundFileName[i] << endl;
+    }
     cout << "output file: " << fOutputFileName << " (" << fOutputDirectoryName << ")" << endl;
     cout << endl;
     cout << endl;

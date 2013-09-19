@@ -553,6 +553,24 @@ bool VHistogramUtilities::divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, T
    return true;
 }
 
+/*!
+
+    warning: not clear if '0' is a good return value for a bad value
+
+*/
+double VHistogramUtilities::interpolateTH2D( TH2 *h, double x, double y )
+{
+   if( !h ) return 0.;
+
+   if(  x >= h->GetXaxis()->GetXmin() && x <= h->GetXaxis()->GetXmax() 
+     && y >= h->GetYaxis()->GetXmin() && y <= h->GetYaxis()->GetXmax() )
+   {
+      return h->Interpolate( x, y );
+   }
+
+   return 0.;
+}
+
 TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D *h, string inewHistogramName )
 {
    if( !h ) return 0;

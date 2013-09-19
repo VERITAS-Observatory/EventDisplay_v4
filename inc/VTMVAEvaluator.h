@@ -6,6 +6,7 @@
 #include "CData.h"
 #include "VGlobalRunParameter.h"
 #include "VMathsandFunctions.h"
+#include "VHistogramUtilities.h"
 #include "VPlotUtilities.h"
 #include "VStatistics.h"
 #include "VTMVARunData.h"
@@ -54,7 +55,7 @@ class VTMVAEvaluatorResults : public TNamed
     VTMVAEvaluatorResults() {}
    ~VTMVAEvaluatorResults() {}
 
-   ClassDef(VTMVAEvaluatorResults, 3 );
+   ClassDef(VTMVAEvaluatorResults, 4 );
 };
 
 class VTMVAEvaluator : public TNamed, public VPlotUtilities
@@ -93,6 +94,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    double                  fOptimizationBackgroundAlpha;
    double                  fOptimizationObservingTime_h;
    double                  fTMVAOptimizationStepsize;
+   double                  fTMVAAngularContainmentThetaFixedMinRadius;
 
    bool     fTMVAIgnoreTheta2Cut;           // ignore theta2 cut in TMVA
    bool     fTMVAThetaCutVariableSet;       // check if TMVA provides a theta2 cut variable
@@ -205,6 +207,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setSignalEfficiency( double iSignalEfficiency = -99. );
    void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
+   void   setTMVAAngularContainmentThetaFixedMinRadius( double iR = 0. ) { fTMVAAngularContainmentThetaFixedMinRadius = iR; }
    void   setTMVAAngularContainmentRadiusMax( double iC = 0.8 ) { fTMVAngularContainmentRadiusMax = iC; }
    void   setTMVAOptimizationEnergyStepSize( double iStep = 0.20 ) { fTMVAOptimizationStepsize = iStep; }
    void   setTMVACutValue( double iE = -99. );
@@ -213,7 +216,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 20 );
+   ClassDef(VTMVAEvaluator, 21 );
 };
 
 #endif

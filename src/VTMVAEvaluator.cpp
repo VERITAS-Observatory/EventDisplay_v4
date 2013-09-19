@@ -49,6 +49,7 @@ void VTMVAEvaluator::reset()
    setSensitivityOptimizationParameters();
    setSensitivityOptimizationFixedSignalEfficiency();
    setTMVAOptimizationEnergyStepSize();
+   setTMVAAngularContainmentThetaFixedMinRadius();
    setTMVAMethod();
    setOptimizeAngularContainment();
 // default: don't expect that the theta2 cut is performed here   
@@ -795,7 +796,10 @@ double VTMVAEvaluator::getOptimalTheta2Cut( double iEnergy_log10TeV )
 // find the theta2 cut for the corresponding energy
     for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
     {
-       if( iEnergy_log10TeV > fEnergyCut_Log10TeV_min[i] && iEnergy_log10TeV < fEnergyCut_Log10TeV_max[i] ) return fAngularContainmentRadius[i]*fAngularContainmentRadius[i];
+       if( iEnergy_log10TeV > fEnergyCut_Log10TeV_min[i] && iEnergy_log10TeV < fEnergyCut_Log10TeV_max[i] )
+       {
+          return fAngularContainmentRadius[i]*fAngularContainmentRadius[i];
+       }
     }
 
     return 0.;
@@ -817,24 +821,25 @@ TGraph* VTMVAEvaluator::getOptimalTheta2Cut_Graph()
        return 0;
    }
 
-// fill the graph - energy is at the spectral weighted energy
-   double iMeanEnergy = 0.;
-
-   TGraph *g = new TGraph( 1 );
-   unsigned int z = 0;
+// sort
+   map< double, double > i_AngContaint;
    for( unsigned int i = 0; i < fEnergyCut_Log10TeV_min.size(); i++ )
    {
-      
-      iMeanEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
-                                                                       fSpectralIndexForEnergyWeighting );
-
-      if( fAngularContainmentRadius[i] > 0 )
-      {
-	 g->SetPoint( z, iMeanEnergy, fAngularContainmentRadius[i]*fAngularContainmentRadius[i] );
-	 z++;
-      }
+       if( fAngularContainmentRadius[i] > 1.e-10 )
+       {
+	  i_AngContaint[0.5 * (fEnergyCut_Log10TeV_min[i]+fEnergyCut_Log10TeV_max[i])] = fAngularContainmentRadius[i];
+       }
    }
 
+// fill the graph - energy is at the spectral weighted energy
+   TGraph *g = new TGraph( 1 );
+   unsigned int z = 0;
+   for( map<double,double>::iterator it = i_AngContaint.begin(); it != i_AngContaint.end(); ++it )
+   {
+       g->SetPoint( z, it->first, it->second );
+       z++;
+   }
+   
    return g;
 }
 
@@ -1442,20 +1447,20 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	 {
 	    if( fOptimizationBackgroundAlpha > 0. )
 	    {
-/*	       if( iHAngContainment && fTMVA_OptimizeAngularContainment )
+	       if( iHAngContainment && fTMVA_OptimizeAngularContainment )
 	       {
 	           getOptimalAngularContainmentRadius( effS->GetBinContent( i ), effB->GetBinContent( i ), Ndif, Nof, 
 		                                       iHAngContainment, fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin],
 						       i_Signal_to_sqrtNoise, i_AngularContainmentRadius, i_AngularContainmentFraction );
                }
-	       else */
+	       else
 	       {
 		  i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
 									 effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
 									 fOptimizationBackgroundAlpha );
-                  i_AngularContainmentRadius = iHAngContainment->GetBinContent(
-		                          iHAngContainment->GetXaxis()->FindBin( fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin] ),
-                                          iHAngContainment->GetYaxis()->FindBin( fTMVAngularContainmentRadiusMax ) );
+		  i_AngularContainmentRadius = VHistogramUtilities::interpolateTH2D( iHAngContainment, 
+		                                                                     fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin],
+		                                                                     fTMVAngularContainmentRadiusMax );
 		  i_AngularContainmentFraction = fTMVAngularContainmentRadiusMax;
                }
 	    }
@@ -1712,8 +1717,7 @@ void VTMVAEvaluator::getOptimalAngularContainmentRadius( double effS, double eff
     {
        return;
     }
-    int iEnergyBin = iHAngContainment->GetXaxis()->FindBin( iEnergy_log10_TeV );
-    double iR_Max = iHAngContainment->GetBinContent( iEnergyBin, iHAngContainment->GetYaxis()->FindBin( fTMVAngularContainmentRadiusMax ) );
+    double iR_Max = VHistogramUtilities::interpolateTH2D( iHAngContainment, iEnergy_log10_TeV, fTMVAngularContainmentRadiusMax );
 
 // find containment radius giving maximum significance
     double iC = 0.;
@@ -1724,13 +1728,15 @@ void VTMVAEvaluator::getOptimalAngularContainmentRadius( double effS, double eff
     for( int i = 1; i < iHAngContainment->GetNbinsY(); i++ )
     {
         iC = iHAngContainment->GetYaxis()->GetBinLowEdge( i );
-	iR = iHAngContainment->GetBinContent( iEnergyBin, i );
+        iR = VHistogramUtilities::interpolateTH2D( iHAngContainment, iEnergy_log10_TeV, iHAngContainment->GetYaxis()->GetBinLowEdge( i ) );
 
 	if( iC > fTMVAngularContainmentRadiusMax )
 	{
 	   iR = iR_Max;
 	   iC = fTMVAngularContainmentRadiusMax;
         }
+// make sure that containment cut is not getting too small
+	if( iR < fTMVAAngularContainmentThetaFixedMinRadius ) continue;
 
 // gamma point source
 	iOn  = effS * Ndif * iC / fTMVAngularContainmentRadiusMax;

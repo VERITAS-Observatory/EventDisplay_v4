@@ -51,6 +51,7 @@ class VHistogramUtilities
 
    static TH2F*     reduce2DHistogramSize( TH2 *h, string inewHistogramName );
    static TH2D*     calculateContainmentDistance( TH2D*h, string inewHistogramName );
+   static double    interpolateTH2D( TH2 *h, double x, double y );
 
    static TH2*      interpolateResponseMatrix( TH2*, string iNewHistoName = "" );
    static bool      normalizeTH2D_y( TH2* h );

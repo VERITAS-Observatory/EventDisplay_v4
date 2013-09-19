@@ -97,6 +97,7 @@ VGammaHadronCuts::VGammaHadronCuts()
     fTMVAOptimizeSignalEfficiencySignalEvents_Min = 10.;
     fTMVAOptimizeSignalEfficiencyObservationTime_h = 50.;
     fTMVAFixedSignalEfficiencyMax = 1.;
+    fTMVAFixedThetaCutMin = 0.;
     fTMVABoxCut_Theta2_max = 0;
     fTMVA_EvaluationResult = -99.;
     fTMVAEvaluatorResults = 0;
@@ -600,6 +601,7 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
                }
 	       if( !is_stream.eof() ) is_stream >> fTMVAOptimizeSignalEfficiencyParticleNumberFile;
 	       if( !is_stream.eof() ) is_stream >> fTMVAFixedSignalEfficiencyMax;
+	       if( !is_stream.eof() ) is_stream >> fTMVAFixedThetaCutMin;
             }
 	    else if( iCutVariable == "TMVASignalEfficiency" )
 	    {
@@ -1533,6 +1535,7 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
        exit( -1 );
     }
     fTMVAEvaluator->setTMVAMethod( fTMVA_MVAMethod );
+    fTMVAEvaluator->setTMVAAngularContainmentThetaFixedMinRadius( fTMVAFixedThetaCutMin );
 // read MVA weight files; set MVA cut values (e.g. find optimal values)
     if( !fTMVAEvaluator->initializeWeightFiles( iTMVAFile, iTMVAWeightFileIndex_min, iTMVAWeightFileIndex_max ) )
     {
@@ -1904,7 +1907,6 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 // use a graph with theta2 cuts
        else if( fDirectionCutSelector == 5 && fTMVABoxCut_Theta2_max )
        {
-//	  theta_cut_max = fTMVABoxCut_Theta2_max->Eval( log10( e ) );
 	  theta_cut_max = fTMVABoxCut_Theta2_max->Eval( e );
 // for e outside of graph range, return edge values
 	  if( fTMVABoxCut_Theta2_max->GetN() > 0 && fTMVABoxCut_Theta2_max->GetX() && fTMVABoxCut_Theta2_max->GetY() )
@@ -1918,8 +1920,9 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 	         theta_cut_max = fTMVABoxCut_Theta2_max->GetY()[fTMVABoxCut_Theta2_max->GetN()-1];
              }
 	  }
-	  if( theta_cut_max > 0. ) theta_cut_max = TMath::Sqrt( theta_cut_max );
-	  else                     theta_cut_max = 0.;
+	  if(  theta_cut_max < 0. )  theta_cut_max = 0.;
+// set minimum theta2 cut
+	  if( theta_cut_max < fTMVAFixedThetaCutMin ) theta_cut_max = fTMVAFixedThetaCutMin;
        }
     }
 

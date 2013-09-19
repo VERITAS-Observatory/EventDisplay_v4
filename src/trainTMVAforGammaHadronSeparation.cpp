@@ -25,6 +25,10 @@
 
 using namespace std;
 
+bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSeparation );
+bool trainGammaHadronSeparation( VTMVARunData *iRun, unsigned int iEnergyBin );
+bool trainReconstructionQuality( VTMVARunData *iRun, unsigned int iEnergyBin );
+
 /*
    check if a training variable is constant
 
@@ -104,7 +108,19 @@ double checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariabl
      train the MVA
 
 */
-bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
+
+bool trainGammaHadronSeparation( VTMVARunData *iRun, unsigned int iEnergyBin )
+{
+   return train( iRun, iEnergyBin, true );
+}
+
+bool trainReconstructionQuality( VTMVARunData *iRun, unsigned int iEnergyBin )
+{
+   return train( iRun, iEnergyBin, false );
+}
+
+
+bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSeparation )
 {
 // sanity checks
     if( !iRun ) return false;
@@ -127,15 +143,30 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin )
 // defining training class
     TMVA::Factory *factory = new TMVA::Factory( iRun->fOutputFileName.c_str(), iRun->fOutputFile[iEnergyBin], "V" );
 
+////////////////////////////
+// gamma/hadron separation
+    if( iGammaHadronSeparation )
+    {
 // adding signal and background trees
-    for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
-    {
-       factory->AddSignalTree( iRun->fSignalTree[i], iRun->fSignalWeight );
-    }
-    for( unsigned int i = 0; i < iRun->fBackgroundTree.size(); i++ )
-    {
-       factory->AddBackgroundTree( iRun->fBackgroundTree[i], iRun->fBackgroundWeight );
-    }
+       for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
+       {
+	  factory->AddSignalTree( iRun->fSignalTree[i], iRun->fSignalWeight );
+       }
+       for( unsigned int i = 0; i < iRun->fBackgroundTree.size(); i++ )
+       {
+	  factory->AddBackgroundTree( iRun->fBackgroundTree[i], iRun->fBackgroundWeight );
+       }
+   }
+////////////////////////////
+// reconstruction quality
+   else
+   {
+       for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
+       {
+	  factory->AddRegressionTree( iRun->fSignalTree[i], iRun->fSignalWeight );
+       }
+       factory->AddTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
+   }
 
 // quality cuts before filling
    TCut iCut = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
@@ -324,8 +355,8 @@ int main( int argc, char *argv[] )
     }
 
 //////////////////////////////////////
-// optimize cuts
-// (one optimization per energy bin
+// train MVA
+// (one training per energy bin)
     cout << "Total number of energy bins: " << fData->fEnergyCutData.size() << endl;
     cout << "================================" << endl << endl;
     for( unsigned int i = 0; i < fData->fEnergyCutData.size(); i++ )
@@ -336,7 +367,8 @@ int main( int argc, char *argv[] )
 	  cout << "===================================================================================" << endl;
 	  cout << endl;
        }
-       train( fData, i );
+       if( fData->fTrainGammaHadronSeparation ) trainGammaHadronSeparation( fData, i );
+       if( fData->fTrainReconstructionQuality ) trainReconstructionQuality( fData, i );
     }
 
     return 0;

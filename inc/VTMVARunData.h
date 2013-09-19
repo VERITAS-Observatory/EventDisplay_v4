@@ -36,6 +36,10 @@ class VTMVARunData : public TNamed
 
     string            fName;
 
+// run type
+    bool fTrainGammaHadronSeparation;
+    bool fTrainReconstructionQuality;
+
 // output file
     string            fOutputFileName;
     string            fOutputDirectoryName;
@@ -76,6 +80,10 @@ class VTMVARunData : public TNamed
     vector< string >  fMVAMethod;
     vector< string >  fMVAMethod_Options;
 
+// reconstruction quality target
+    string            fReconstructionQualityTarget;
+    string            fReconstructionQualityTargetName;
+
     VTMVARunData();
    ~VTMVARunData() {}
     void print();
@@ -84,7 +92,7 @@ class VTMVARunData : public TNamed
     void setDebug( bool iB = true ) { fDebug = iB; }
     void setName( string iN ) { fName = iN; }
 
-    ClassDef(VTMVARunData, 6 );
+    ClassDef(VTMVARunData, 7 );
 };
 
 #endif
