@@ -39,6 +39,8 @@ class VCTARequirements : public VPlotUtilities
    VCTARequirements();
   ~VCTARequirements() {}
 
+   double  getFOVRequirement( double E_lin_TeV );
+   void    listRequirementSets();
    void    plotRequirement_EnergyRange( TCanvas *c, bool iPlotGoalRequirements = false );
    TGraph* plotRequirement_AngularResolution( TCanvas *c, bool iPlotGoalRequirements = false );
    TGraph* plotRequirement_EffectiveArea( TCanvas *c, bool iPlotGoalRequirements = false );

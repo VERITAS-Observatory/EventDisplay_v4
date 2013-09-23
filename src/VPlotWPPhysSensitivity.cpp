@@ -142,6 +142,10 @@ bool VPlotWPPhysSensitivity::initialize( VPlotWPPhysSensitivityData* iData )
       iTemp << "data/IFAE_May2012/Subarray" << iData->fSubArray;
       iTemp << "_IFAE_" << hname << "hours_20120510_offaxis.root";
    }
+   else if( iData->fAnalysis == "Fermi" )
+   {
+      iTemp << "data/Fermi/Fermi_approx.root";
+   }
    else if( iData->fAnalysis.substr( 0, 8 )  == "Subarray" )
    {
       if( iData->fObservationTime_s/3600. > 1. ) sprintf( hname, "%d", (int)(iData->fObservationTime_s/3600.) );
@@ -490,11 +494,41 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( double iEmin_TeV, do
 	   {
 	       fData[i]->gSensitivity->GetPoint( p, x, y );
 	       dy = 0.5 * ( fData[i]->gSensitivity->GetErrorYlow(p)+fData[i]->gSensitivity->GetErrorYhigh(p) );
+//	       if( x > log10( 0.3 ) && x < log10( 7. ) ) continue;
 // excluding the lower bin containing iEmin_TeV, including the bin with iEmax_TeV
 	       if( iEmin_TeV < x - fData[i]->gSensitivity->GetErrorX( p )
 	        && iEmax_TeV > x )
 	       {
-		  req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
+// south 50h
+                  if( fPlotCTARequirementsID == 0 )
+		  {
+		     req = VCTASensitivityRequirements::Flux_req50_E2erg_south( TMath::Power( 10., x ) );
+                  }
+// south 5 h
+		  else if( fPlotCTARequirementsID == 1 )
+		  {
+		     req = VCTASensitivityRequirements::Flux_req5_E2erg_south( TMath::Power( 10., x ) );
+                  }
+// south 0.5h
+		  else if( fPlotCTARequirementsID == 2 )
+		  {
+		     req = VCTASensitivityRequirements::Flux_req05_E2erg_south( TMath::Power( 10., x ) );
+                  }
+// north 50h
+		  else if( fPlotCTARequirementsID == 3 )
+		  {
+		     req = VCTASensitivityRequirements::Flux_req50_E2erg_north( TMath::Power( 10., x ) );
+                  }
+// north 5h
+		  else if( fPlotCTARequirementsID == 4 )
+		  {
+		     req = VCTASensitivityRequirements::Flux_req5_E2erg_north( TMath::Power( 10., x ) );
+                  }
+// north 0.5h
+		  else if( fPlotCTARequirementsID == 5 )
+		  {
+		     req = VCTASensitivityRequirements::Flux_req05_E2erg_north( TMath::Power( 10., x ) );
+                  }
 	          m  *= req / y;
 		  if( y > 0. ) dm += dy*dy*req*req/y/y/y/y;
 		  z++;
@@ -507,8 +541,9 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( double iEmin_TeV, do
 	   dm = m*sqrt( dm );
 	   dm = 1./z * TMath::Power( m, 1./z - 1. ) * dm;
 	   cout << "Figure of merit (calculated from sensitivity) for " << fData[i]->fAnalysis;
-	   cout << "(" << z << " points): " << setprecision ( 4 ) << m;
-	   cout << " +- " << dm << endl;
+	   cout << "(" << z << " points), [";
+	   cout <<  TMath::Power( 10., iEmin_TeV ) << ", " << TMath::Power( 10., iEmax_TeV ) << "]: " << endl;
+	   cout << "\t FOM " << setprecision ( 4 ) << m << " +- " << dm << endl;
         }
     }
 }

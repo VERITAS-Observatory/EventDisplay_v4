@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130923 (GM) added several CTA requirements values from
+                MAN-PO/121004
+
 * 21030918 (GM) improved settings of centroid limits for LL
                 fitting procedure (VImageParameterCalculation)
 

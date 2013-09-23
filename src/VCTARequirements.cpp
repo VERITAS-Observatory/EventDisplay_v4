@@ -13,6 +13,18 @@ VCTARequirements::VCTARequirements()
    setRequirement();
 }
 
+void VCTARequirements::listRequirementSets()
+{
+   cout << "ID 0: South, 50h" << endl;
+   cout << "ID 1: South, 5h" << endl;
+   cout << "ID 2: South, 0.5h" << endl;
+   cout << "ID 3: North, 50h" << endl;
+   cout << "ID 4: North, 5h" << endl;
+   cout << "ID 5: North, 0.5h" << endl;
+   cout << endl;
+   cout << "Values based on MAN-PO/121004, version 3.001, August 5, 2013" << endl;
+}
+
 bool VCTARequirements::setRequirement( int iRequirementID )
 {
    fSetOfRequirementID = iRequirementID;
@@ -42,7 +54,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
     fGoalEnergyResolution = 0;
 
 ////////////////////////////////////////////////////////////
-// sensitivity 
+// sensitivity requirements
 
 // SOUTH 50 h
     if( fSetOfRequirementID == 0 )
@@ -72,8 +84,20 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 	                                                            TMath::Power( 10., -1.9 + 0.05 * i ) ) );
        }
    }
-// NORTH 50 h
+// SOUTH 0.5 h
    else if( fSetOfRequirementID == 2 )
+   {
+       fReqDifferentialSensitivity = new TGraph( 1 );
+       setGraphPlottingStyle( fReqDifferentialSensitivity, 2, 1., 20, 1., 0, 2 );
+       fGoalDifferentialSensitivity = 0;
+       for( int i = 0; i < 80; i++ )
+       {
+          fReqDifferentialSensitivity->SetPoint( i, -1.9 + 0.05 * i, VCTASensitivityRequirements::Flux_req05_E2erg_south( 
+	                                                            TMath::Power( 10., -1.9 + 0.05 * i ) ) );
+       }
+   }
+// NORTH 50 h
+   else if( fSetOfRequirementID == 3 )
    {
 // from JH (mail 2013/08/30)
        fReqDifferentialSensitivity = new TGraph( 1 );
@@ -89,7 +113,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
        }
    }
 // NORTH 5 h
-   else if( fSetOfRequirementID == 3 )
+   else if( fSetOfRequirementID == 4 )
    {
        fReqDifferentialSensitivity = new TGraph( 1 );
        setGraphPlottingStyle( fReqDifferentialSensitivity, 2, 1., 20, 1., 0, 2 );
@@ -97,6 +121,18 @@ bool VCTARequirements::setRequirement( int iRequirementID )
        for( int i = 0; i < 80; i++ )
        {
           fReqDifferentialSensitivity->SetPoint( i, -1.9 + 0.05 * i, VCTASensitivityRequirements::Flux_req5_E2erg_north( 
+	                                                            TMath::Power( 10., -1.9 + 0.05 * i ) ) );
+       }
+   }
+// NORTH 0.5 h
+   else if( fSetOfRequirementID == 5 )
+   {
+       fReqDifferentialSensitivity = new TGraph( 1 );
+       setGraphPlottingStyle( fReqDifferentialSensitivity, 2, 1., 20, 1., 0, 2 );
+       fGoalDifferentialSensitivity = 0;
+       for( int i = 0; i < 80; i++ )
+       {
+          fReqDifferentialSensitivity->SetPoint( i, -1.9 + 0.05 * i, VCTASensitivityRequirements::Flux_req05_E2erg_north( 
 	                                                            TMath::Power( 10., -1.9 + 0.05 * i ) ) );
        }
    }
@@ -110,7 +146,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 // effective areas
 
 // SOUTH
-   if( fSetOfRequirementID == 0 || fSetOfRequirementID == 1 )
+   if( fSetOfRequirementID == 0 || fSetOfRequirementID == 1 || fSetOfRequirementID == 2 )
    {
        fReqEnergyRange_min = 0.02;
        fReqEnergyRange_max = 300.;
@@ -125,7 +161,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
        setGraphPlottingStyle( fGoalEffectiveArea, 3 );
    }
 // NORTH
-   else if( fSetOfRequirementID == 2 || fSetOfRequirementID == 3 )
+   else if( fSetOfRequirementID == 3 || fSetOfRequirementID == 4 || fSetOfRequirementID == 5 )
    {
        fReqEnergyRange_min = 0.02;
        fReqEnergyRange_max = 20.;
@@ -245,3 +281,16 @@ void VCTARequirements::plotRequirements( TGraph *g, bool iLog, bool iLine )
    }
 }    
 
+/*
+
+    field of view requirements: A-PERF-0010, A-PERF-0020
+
+*/
+double VCTARequirements::getFOVRequirement( double iE_lin_TeV )
+{
+    if( iE_lin_TeV < 0.1 ) return 2.5;  
+
+// 0.1 - 300 TeV
+
+    return 3.;
+}
