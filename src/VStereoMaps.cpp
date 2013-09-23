@@ -1149,7 +1149,12 @@ void VStereoMaps::initialize_theta2()
 
         double i_xybinW = fabs(2*i_xmin)/(double)nxybin;
 
-        if( !fAcceptance ) fAcceptance = new VRadialAcceptance( fRunList.fAcceptanceFile );
+        if( !fAcceptance ) 
+		{
+			fAcceptance = new VRadialAcceptance( fRunList.fAcceptanceFile );
+			cout << "NKH fRunList.f2DAcceptanceMode a:" << fRunList.f2DAcceptanceMode << endl;
+			fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
+		}
 
         double x = 0.;
         double y = 0.;
@@ -1626,11 +1631,15 @@ bool VStereoMaps::defineAcceptance()
     {
         if( fAcceptance ) delete fAcceptance;
         fAcceptance = new VRadialAcceptance( fRunList.fAcceptanceFile );
+		cout << "fRunList.f2DAcceptanceMode b:" << fRunList.f2DAcceptanceMode << endl;
+		fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
     }
     else
     {
         if( fAcceptance ) delete fAcceptance;
         fAcceptance = new VRadialAcceptance();
+		cout << "NKH fRunList.f2DAcceptanceMode c:" << fRunList.f2DAcceptanceMode << endl;
+		fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
     }
     if( !fAcceptance )
     {

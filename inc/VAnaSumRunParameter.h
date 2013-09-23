@@ -107,6 +107,8 @@ class VAnaSumRunParameterDataClass
         double fTE_mscw_max;
         double fTE_mscl_min;
         double fTE_mscl_max;
+		
+		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 
         VAnaSumRunParameterDataClass();
        ~VAnaSumRunParameterDataClass() {}
@@ -171,6 +173,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         vector< double > fMCZe;                   // zenith angle intervall for Monte Carlo
 		
 		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
+		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		
 	int fFrogs;
 

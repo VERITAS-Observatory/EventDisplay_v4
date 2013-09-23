@@ -154,6 +154,10 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 // or do we only keep the ones that pass ON/OFF region cuts?
 	fWriteAllGammaToTree = false ; // WRITEALLGAMMATOTREE
 
+	// if 0, use default 1D radial acceptance
+	// if >0, use alternate 2D-dependent acceptance
+	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
+
 // set monte carlo zenith angles
     setMCZenith();
 }
@@ -533,6 +537,18 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				}
             }
 			
+			////////////////////////////////////////////
+            // Option USE2DACCEPTANCE within ANASUM.runparameter
+            // * USE2DACCEPTANCE 0
+            //     use normal radial acceptance
+            // * USE2DACCEPTANCE 1
+            //     use simple 2d acceptance model
+            else if ( temp == "USE2DACCEPTANCE" )
+            {
+                f2DAcceptanceMode = (unsigned int)atoi( temp2.c_str() ) ;
+				cout << "NKH Setting f2DAcceptanceMode = " << f2DAcceptanceMode << endl;
+            }
+			
 // Frogs Analysis
             else if( temp == "FROGSANALYSIS" )
             {
@@ -662,6 +678,7 @@ int VAnaSumRunParameter::loadShortFileList( string i_listfilename, string iDataD
             }
 
 // fill the runlist vector
+			i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
             fRunList.push_back( i_sT );
 // fill the runlist map
             fMapRunList[i_sT.fRunOn] = fRunList.back();
@@ -701,6 +718,7 @@ int VAnaSumRunParameter::loadSimpleFileList( string i_listfilename )
             i_sT.fRunOn = atoi(temp.c_str());
             i_sT.fRunOff = atoi(temp.c_str());
 // fill the runlist vector
+			i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
             fRunList.push_back( i_sT );
 // fill the runlist map
 	    fMapRunList[i_sT.fRunOn] = fRunList.back();
@@ -765,6 +783,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
             if( bShortList )
             {
 // fill the runlist vector
+				i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
                 fRunList.push_back( i_sT );
 // fill the runlist map
                 fMapRunList[i_sT.fRunOn] = fRunList.back();
@@ -905,6 +924,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
                 i_sT.fOO_alpha = 1.;
             }
 // fill the runlist vector
+			i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
             fRunList.push_back( i_sT );
 // fill the runlist map
             fMapRunList[i_sT.fRunOn] = fRunList.back();

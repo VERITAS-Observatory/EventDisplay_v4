@@ -20,6 +20,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -31,6 +32,8 @@ string outfile = "acceptance.root";
 unsigned int ntel = 4;
 string datadir = "../eventdisplay/output";
 int entries = -1;
+string histdir = "" ;
+struct stat sb ;
 
 int main( int argc, char *argv[] )
 {
@@ -99,8 +102,27 @@ int main( int argc, char *argv[] )
     cout << endl << "writing acceptance curves to " << fo->GetName() << endl;
     TDirectory *facc_dir = (TDirectory*)fo;
 
-// create acceptance object
+	// create acceptance object
     VRadialAcceptance *facc = new VRadialAcceptance( fCuts, fRunPara );
+	
+	// set facc to write extra histograms if necessary
+	//cout << "NKH histdir.size() = " << histdir.size() << " ." << endl;
+	if ( histdir.size() > 0 )
+	{
+		//cout << "NKH histdir.size() > 0 !!!" << endl;
+		if ( stat( histdir.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode) ) // then directory 'histdir' exists
+		{
+			//cout << "NKH directory exists!" << endl;
+			//facc->SetExtraHistogramMode( 1 ) ;
+			facc->SetExtraHistogramDirectory( histdir ) ;
+		}	
+		else
+		{
+			cout << "Error, directory specified by makeRadialAcceptance -w option '" << histdir << "' does not exist, exiting..." << endl;
+			return false ;
+		}
+	}
+	
 // az dependent measurement
     vector< VRadialAcceptance* > facc_az;
     vector< string > fDirName;
@@ -210,6 +232,7 @@ int main( int argc, char *argv[] )
 
 // write acceptance files to disk
     
+	facc->calculate2DBinNormalizationConstant() ;
     facc->terminate( facc_dir );
     for( unsigned int a = 0; a < facc_az_dir.size(); a++ )
     {
@@ -239,10 +262,11 @@ int parseOptions(int argc, char *argv[])
             {"ntel", required_argument, 0, 'n'},
             {"entries", required_argument, 0, 'n'},
             {"datadir", required_argument, 0, 'd'},
+			{"writehists", optional_argument, 0, 'w'},
             {0,0,0,0}
         };
         int option_index=0;
-        int c=getopt_long(argc, argv, "ht:s:l:e:o:d:n:c:", long_options, &option_index);
+        int c=getopt_long(argc, argv, "ht:s:l:e:o:d:n:c:w:", long_options, &option_index);
         if( argc == 1 ) c = 'h';
         if (c==-1) break;
         switch(c)
@@ -264,9 +288,9 @@ int parseOptions(int argc, char *argv[])
                 cout << "-d --datadir [directory for input mscw root files]" << endl;
                 cout << "-n --ntel [number of telescopes, default=4]" << endl;
                 cout << "-o --outfile [output ROOT file name]" << endl;
-		cout << "-e --entries [number of entries]" << endl;
+				cout << "-e --entries [number of entries]" << endl;
+				cout << "-w --writehists [directory]" << endl ;
                 cout << endl;
-
                 exit(0);
                 break;
             case 'd':
@@ -295,6 +319,9 @@ int parseOptions(int argc, char *argv[])
             case 'e':
                 entries=(int)atoi(optarg);
                 break;
+			case 'w':
+				histdir=optarg;
+				cout << "Extra histograms will be written to " << histdir << endl;
             case '?':
                 break;
             default:
