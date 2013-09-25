@@ -2723,12 +2723,13 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
           gBGRate->GetPoint( i, x, y );
 	  if( y > 0. )
 	  {
-	     double iT2 = fMC_Data[1]->gTheta2Cuts_vsEnergylgTeV->Eval( x );
-	     if( iT2 > 0. )
+	     double iSolidAngle = fMC_Data[1]->gSolidAngle_DirectionCut_vs_EnergylgTeV->Eval( x );
+	     if( iSolidAngle > 0. )
 	     {
-	        y /= iT2;
+		y /= iSolidAngle * TMath::DegToRad() * TMath::DegToRad();
 		iBGRateSqDeg->SetBinContent( iBGRate->FindBin( x ), y/60. );
-		iBGRateSqDeg->SetBinError( iBGRateSqDeg->FindBin( x ), 0.5*(gBGRate->GetErrorYlow(i)+gBGRate->GetErrorYhigh(i))/iT2/60. );
+		iBGRateSqDeg->SetBinError( iBGRateSqDeg->FindBin( x ), 0.5*(gBGRate->GetErrorYlow(i)+gBGRate->GetErrorYhigh(i))
+		                                                       / (iSolidAngle * TMath::DegToRad() * TMath::DegToRad()) / 60. );
              }
           }
        } 

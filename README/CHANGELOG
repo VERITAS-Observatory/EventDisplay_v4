@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130925 (GM) bug fix: background rate per sqr degree calculation in 
+                sensitivity section was wrong
+
 * 20130923 (GM) added several CTA requirements values from
                 MAN-PO/121004
 
