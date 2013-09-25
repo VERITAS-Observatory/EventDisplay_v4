@@ -391,6 +391,7 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
+		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
@@ -429,6 +430,7 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 		./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
+		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
 		./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 		./obj/VTMVARunDataEnergyCut.o ./obj/VTMVARunDataEnergyCut_Dict.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
