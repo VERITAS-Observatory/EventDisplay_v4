@@ -656,7 +656,7 @@ vector< double > VEffectiveAreaCalculator::interpolate_effectiveArea( double iV,
         i_temp.assign( iElower.size(), 0. );
         for( unsigned int i = 0; i < iElower.size(); i++ )
         {
-            i_temp[i] = VStatistics::interpolate( iElower[i], iVLower, iEupper[i], iVupper, iV, iCos, 0.5, -90. );
+            i_temp[i] = VStatistics::interpolate( iV, iVLower, iVupper, iElower[i], iEupper[i], iCos, 0.5, -90. );
         }
         return i_temp;
     }
@@ -1807,7 +1807,7 @@ double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, doubl
         }
 
 // interpolate between zenith angles (weighted by cos(ze))
-        double ieff = VStatistics::interpolate( ie_zelow, fZe[ize_low], ie_zeup,fZe[ize_up], ze, true, 0.5, -90. );
+        double ieff = VStatistics::interpolate( ze, fZe[ize_low], fZe[ize_up], ie_zelow, ie_zeup, true, 0.5, -90. );
 
 // return inverse
         if( ieff != 0. ) return 1./ieff;

@@ -169,10 +169,9 @@ void VArrayAnalyzer::doAnalysis()
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // fill shower parameter tree with results
-    getShowerParameters()->getTree()->Fill();
+    ///getShowerParameters()->getTree()->Fill(); //JG moved to VEventLoop.cpp
 
 }
-
 
 /*!
      this routine is called for each event before the event analysis
@@ -511,7 +510,6 @@ void VArrayAnalyzer::terminate()
         cout << "---------------------------------------------------------------------------------------------------------" << endl;
     }
 }
-
 
 /*!
           use GrIsu routines for the actual transformation

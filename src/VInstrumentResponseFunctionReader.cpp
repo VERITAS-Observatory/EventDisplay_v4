@@ -418,9 +418,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 //       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
        setGraphPlottingStyle( gEnergyResolution );
 // get energy bias
-       gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 0. );
+       gEnergyBias_Mean = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 1. );
        setGraphPlottingStyle( gEnergyBias_Mean );
-       gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "median", 1, -10., 0. );
+       gEnergyBias_Median = get_Profile_from_TH2D(  (TH2D*)c->hEsysMCRelativeRMS, 0, "median", 1, -10., 1. );
        setGraphPlottingStyle( gEnergyBias_Median, 1, 1., 7 );
        gEnergyLogBias_Mean = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "mean", 1, -10. );
        setGraphPlottingStyle( gEnergyLogBias_Mean, 1, 1., 7 );

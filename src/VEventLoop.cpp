@@ -1,6 +1,5 @@
 /*!  \class VEventLoop
   \brief  main event loop, steering of analysis and event display
-
   \author Gernot Maier
 */
 
@@ -102,7 +101,12 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
 // Frogs Stuff
     fFrogs = new VFrogs();
 #endif
-
+    fModel3D = new VModel3D();  //JG-NEW
+    if( fRunPar->fUseModel3D && fRunPar->fCreateLnLTable ) {
+      fModel3D->createLnLTable();
+      fRunPar->fUseModel3D = false; 
+      exit( -1 );
+    }
 // reset cut strings and variables
     resetRunOptions();
 }
@@ -1044,6 +1048,11 @@ int VEventLoop::analyzeEvent()
 #endif
        {
           fArrayAnalyzer->doAnalysis();
+	  if( fRunPar->fUseModel3D || fRunPar->fUseDisplayModel3D ) {
+	    if (fReader->hasArrayTrigger() ) fModel3D->doModel3D(); //JG
+	    else fModel3D->fillInit3D();
+	  }
+	  getShowerParameters()->getTree()->Fill(); //JG
 // GH Frogs Analysis
 #ifndef NOGSL
           if( fRunPar->ffrogsmode )

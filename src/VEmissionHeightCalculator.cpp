@@ -104,7 +104,6 @@ VEmissionHeightCalculator::~VEmissionHeightCalculator()
     if( fInputFile ) fInputFile->Close();
 }
 
-
 void VEmissionHeightCalculator::getEmissionHeight( double *cen_x, double *cen_y, double *dist, double *size, double *r, double* az, double* el )
 {
     getEnergyCorrectionOrEmissionHeight( cen_x, cen_y, dist, size, r, az, el, false );
@@ -331,11 +330,57 @@ double VEmissionHeightCalculator::getEnergyCorrectionFromFunction( double iEmiss
     if( fDebug )
     {
         cout << "\t" << ze << "\t" << ize_low << "\t" << ize_up << "\t" << fZeDouble.size() << "\t" << iEmissionHeight << "\t" << e_low << "\t" << e_up;
-        cout << "\t" << VStatistics::interpolate( e_low, fZeDouble[ize_low], e_up, fZeDouble[ize_up], ze, true, 0.5, -90. );
+        cout << "\t" << interpolate( e_low, fZeDouble[ize_low], e_up, fZeDouble[ize_up], ze, true, 0.5, -90. );
         cout << "\t" << fCorrectionCurvesXmin[ize_low] << "\t" << fCorrectionCurvesXmax[ize_low];
         cout << "\t" << fCorrectionCurvesXmin[ize_up] << "\t" << fCorrectionCurvesXmax[ize_up] << endl;
     }
-    return VStatistics::interpolate( e_low, fZeDouble[ize_low], e_up, fZeDouble[ize_up], ze, true, 0.5, -90. );
+    return interpolate( e_low, fZeDouble[ize_low], e_up, fZeDouble[ize_up], ze, true, 0.5, -90. );
+}
+
+double VEmissionHeightCalculator::interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos, double iLimitforInterpolation, double iMinValidValue )
+{
+// don't interpolate if both values are not valid
+  if( w1 < iMinValidValue && w2 < iMinValidValue ) return -99.;
+
+// same x-value, don't interpolate
+    if( fabs( ze1 - ze2 ) < 1.e-3 )
+    {
+       if( w1 < iMinValidValue )      return w2;
+       else if( w2 < iMinValidValue ) return w1;
+       return (w1+w2)/2.;
+    }
+
+// interpolate
+    double id = 0.;
+    double f1 = 0.;
+    double f2 = 0.;
+    if( iCos )
+    {
+        id = cos( ze1*TMath::DegToRad() ) - cos( ze2*TMath::DegToRad() );
+        f1 = 1. - (cos( ze1*TMath::DegToRad() ) - cos( ze*TMath::DegToRad() )) / id;
+        f2 = 1. - (cos( ze*TMath::DegToRad() ) - cos( ze2*TMath::DegToRad() )) / id;
+    }
+    else
+    {
+        id = ze1 - ze2;
+        f1 = 1. - ( ze1 - ze ) / id;
+        f2 = 1. - ( ze  - ze2 ) / id;
+    }
+
+// one of the values is not valid:
+// return valid value only when f1 or f2 > iLimitforInterPolation
+    if( w1 > iMinValidValue && w2 < iMinValidValue )
+    {
+        if( f1 > iLimitforInterpolation ) return w1;
+        else           return -99.;
+    }
+    else if( w1 < iMinValidValue && w2 > iMinValidValue )
+    {
+        if( f2 > iLimitforInterpolation ) return w2;
+        else          return -99.;
+    }
+
+    return (w1*f1+w2*f2);
 }
 
 

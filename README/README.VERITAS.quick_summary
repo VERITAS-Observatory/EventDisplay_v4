@@ -3,14 +3,12 @@ EVENTDISPLAY - IACT event analysis and display - VERITAS analysis
 
 The EVNDISP manual for VERITAS users: http://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual
 
-Note that the wiki pages below are still for version v35x. Need to be updated...
-
 Files needed for analysis
 =========================
 
 There are several files needed for analysis (calibration files, lookup tables, effective areas, etc).
 See the VERITAS wiki about information how to download them: 
-http://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual:_installation#Downloading_files_for_analysis
+http://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual:_installation
 
 Calibration
 ===========

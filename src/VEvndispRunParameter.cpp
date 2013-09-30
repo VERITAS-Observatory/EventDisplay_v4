@@ -200,6 +200,12 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     ffrogsmode = false;
     ffrogsRecID = -1;
 
+// Model3D parameters, JG
+    fUseModel3D = false; 
+    fUseDisplayModel3D = false; 
+    fCreateLnLTable = false;
+    fLnLTableFile = "";
+
 // output parameters
     ffillhistos = false;                          // obsolete
     foutputfileName = "";

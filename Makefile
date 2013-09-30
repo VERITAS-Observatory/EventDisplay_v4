@@ -242,7 +242,7 @@ CTA:	evndisp \
 ########################################################
 # eventdisplay
 ########################################################
-EVNOBJECTS =	./obj/VVirtualDataReader.o \
+EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VGrIsuReader.o \
 		./obj/VMultipleGrIsuReader.o \
 		./obj/VDSTReader.o \
@@ -317,6 +317,16 @@ FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
                 ./obj/VFrogParameters.o
 
+MODELOBJECTS =  ./obj/VMinimizer.o \
+		./obj/VModel3DFn.o \
+		./obj/VModel3DData.o \
+		./obj/VModelLnL.o \
+		./obj/VModel3D.o \
+		./obj/VEmissionHeightCalculator.o
+
+ifeq ($(ROOT_MINUIT2),yes)
+   EVNOBJECTS += $(MODELOBJECTS) 
+endif
 # add frogs objects
 ifneq ($(GSLFLAG),-DNOGSL)
    EVNOBJECTS += $(FROGSOBJECTS)

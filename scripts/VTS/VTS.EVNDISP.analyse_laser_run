@@ -38,7 +38,6 @@ fi
 #######################################
 OPT="-calibrationsumwindow=18 -calibrationsumfirst=2 -reconstructionparameter EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
-
 # number of telescopes to analyse
 TELTOANA="1234"
 if [ -n "$2" ]

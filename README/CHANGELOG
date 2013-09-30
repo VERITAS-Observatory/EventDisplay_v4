@@ -1,27 +1,6 @@
 Change log eventdisplay analysis package
 ========================================
 
-* 20130925 (GM) bug fix: background rate per sqr degree calculation in 
-                sensitivity section was wrong
-
-* 20130923 (GM) added several CTA requirements values from
-                MAN-PO/121004
-
-* 21030918 (GM) improved settings of centroid limits for LL
-                fitting procedure (VImageParameterCalculation)
-
-* 20130831 (GM) many changes in CTA scripts to allow 
-                easy comparision of north/south
-
-* 20130831 (GM) CTA requirements are added to the sensitivity
-                plotter (+FOM, etc)
-
-* 20130826 (GM) bug fix in L2 trigger type setting (was always set
-                to any trigger condition)
-
-* 20130820 (GM) added binary visibility tool (experimental status)
-                needs libnova external package
-
 * 20130819 (GM) added Fitstat variable to data tree (mscw_energy)
 
 * 20130819 (GM) data/MC comparison: single tel distribution are filled

@@ -264,7 +264,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
     plotLegend( c, false );
     if( iPrint.size() > 0 )
     {
-       sprintf( hname, "%s-EBias.eps", iPrint.c_str() );
+       sprintf( hname, "%s-EBians.eps", iPrint.c_str() );
        if( c ) c->Print( hname );
     }
 
