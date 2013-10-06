@@ -10,7 +10,7 @@ then
    echo
    echo "EVNDISP data analysis: submit jobs from a simple run list"
    echo
-   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [calibration (default=1)] [VPM (default=1)] [output file]" 
+   echo "VTS.EVNDISP.sub_analyse_data.sh <runlist> [calibration (default=1)] [VPM (default=1)] [output directory]" 
    echo
    echo "  [calibration]"
    echo "          1     pedestal & average tzero calculation (default)"
