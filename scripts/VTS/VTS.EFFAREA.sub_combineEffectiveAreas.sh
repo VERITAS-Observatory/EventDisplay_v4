@@ -59,6 +59,7 @@ do
 # input and output names
 	DDIR=$1/$2-$A-$V/$2-$A-$V-$I*
 	DDIR=$1/$2-$A-$V/*
+	DDIR=$1/*
 
 	OFIL=`basename $3`
 	OFIL="$OFIL-ATM$A-$V-T$T-d20130521"
