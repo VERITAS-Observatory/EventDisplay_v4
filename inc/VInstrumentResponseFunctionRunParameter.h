@@ -75,6 +75,9 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    double          telconfig_arraycentre_Y;
    double          telconfig_arraymax;
 
+   string          fCREnergySpectrumFile;
+   unsigned int    fCREnergySpectrumID;
+
 
    VInstrumentResponseFunctionRunParameter();
   ~VInstrumentResponseFunctionRunParameter() {}
@@ -84,7 +87,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    bool                  readRunParameterFromTextFile( string iFile );
    bool                  testRunparameters();
 
-   ClassDef( VInstrumentResponseFunctionRunParameter, 5 );
+   ClassDef( VInstrumentResponseFunctionRunParameter, 6 );
 };
 
 #endif

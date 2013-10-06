@@ -79,7 +79,7 @@ class VEnergySpectrumfromLiterature : public VPlotUtilities
     public:
 
         VEnergySpectrumfromLiterature( string ifile = "" );
-        ~VEnergySpectrumfromLiterature() {}
+       ~VEnergySpectrumfromLiterature() {}
 
         sData  getEnergySpectrumDataField(  unsigned int iID = 0 );
         TF1*   getEnergySpectrum( unsigned int iID = 0, bool bLogEnergy = true, double iEnergyMin_Lin = -99., double iEnergyMax_Lin = -99. );

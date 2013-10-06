@@ -120,6 +120,7 @@ class VEffectiveAreaCalculator
         vector< vector< TH2D* > > hVResponseMatrixQC;
         vector< vector< TH2D* > > hVEmcCutCTA;
 	vector< vector< TH2D* > > hVResponseMatrixFineQC;
+	vector< vector< TH1D* > > hVWeightedRate;
 
         TList *hisTreeList;
         TH1D* hEmc;
@@ -143,6 +144,7 @@ class VEffectiveAreaCalculator
 	TH2D* hResponseMatrix;
 	TProfile* hResponseMatrixProfile;
 	TH2D* hResponseMatrixQC;
+	TH1D* hWeightedRate;
 	vector< TH1D* > hEcutSub;                //! events after individual cuts
 
         int fEffectiveAreaVsEnergyMC;            // 0 = vs MC energy, 1 = vs rec energy (approx. method), 2 = vs rec energy (default)
@@ -192,6 +194,7 @@ class VEffectiveAreaCalculator
         void   copyProfileHistograms( TProfile*,  TProfile* );
         void   copyHistograms( TH1*,  TH1*, bool );
         double getAzMean( double azmin, double azmax );
+	double getCRWeight( double iEMC_TeV_log10 );
         bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
         void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
         double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,
