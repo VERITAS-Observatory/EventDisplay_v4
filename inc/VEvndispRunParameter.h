@@ -233,12 +233,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	string ffrogsmscwfile;			  // frogs file for getting table energy
 	int ffrogsRecID;			  // RecID or Cut_ID Frogs Uses - combine with table
 
-// Model3D
-	bool fUseModel3D;                         // use Model3D analysis, JG
-	bool fUseDisplayModel3D;                  // display Model3D generated images, JG
-	bool fCreateLnLTable;                     // create lookup table for likelihood
-        string fLnLTableFile;                     // read lookup table for likelihood from this file 
-
 // write pulse histograms to gain files
         int  fwriteLaserPulseN;                    // number of pulse histogram written to gain file
 	bool fwriteAverageLaserPulse;              // write average laser pulse to file

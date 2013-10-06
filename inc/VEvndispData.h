@@ -272,8 +272,6 @@ class VEvndispData
         valarray<double>&   getTemplateMu() { return fAnaData[fTelID]->fTemplateMu; }
         double              getTemplateMuMin() { return fAnaData[fTelID]->fTemplateMu.min(); }
         double              getTemplateMuMax() { return fAnaData[fTelID]->fTemplateMu.max(); }
-        valarray<double>&   getModel3DMu() { return fAnaData[fTelID]->fModel3DMu; } //JG
-	vector<bool>&       getModel3DClean() { return fAnaData[fTelID]->fModel3DClean; } //JG
 	unsigned int        getLargestSumWindow();
 	unsigned int        getLargestSumWindow( unsigned int iTelID );
         unsigned int        getSumWindow() { return checkSummationWindow( fTelID, fRunPar->fsumwindow_1[fTelID] ); }
@@ -441,8 +439,6 @@ class VEvndispData
         void                setSums2( unsigned int iChannel, double iSum ) { fAnaData[fTelID]->fSums2[iChannel] = iSum; }
         void                setSums2( valarray< double > iVSum ) { fAnaData[fTelID]->fSums2 = iVSum; }
         void                setTemplateMu( valarray< double > iVTemplateMu ) { fAnaData[fTelID]->fTemplateMu = iVTemplateMu; }
-	void                setModel3DMu( valarray< double > iVModel3DMu ) { fAnaData[fTelID]->fModel3DMu = iVModel3DMu; } //JG
-	void               setModel3DClean( vector<bool> iVModel3DClean ) { fAnaData[fTelID]->fModel3DClean = iVModel3DClean; } //JG
         void                setTCorrectedSumFirst( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst = iT; }
         void                setTCorrectedSumFirst( unsigned int iChannel, unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst[iChannel] = iT; }
         void                setTCorrectedSumLast( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumLast = iT; }
