@@ -141,8 +141,8 @@ void getScaling( TH1D *h_sims, TH1D *h_diff, double &s_sims, double &s_diff,
       z      = h_diff->GetMaximum();
       cout << h_sims->GetName() << " Maximum : data:" << z << "\t sims: " << s_sims << endl;
       if( s_sims > 0. ) s_sims = z / s_sims; 
-      s_diff = 1.; 
-  } 
+      s_diff = 1.;  
+  }  
 //////////////////////////////////
 // scale to peak (three bins around maximum)
   else if( bContents == 3 )
@@ -158,7 +158,7 @@ void getScaling( TH1D *h_sims, TH1D *h_diff, double &s_sims, double &s_diff,
       if( imaxbin < h_diff->GetNbinsX() )  z += h_diff->GetBinContent( imaxbin + 1 );
       if( s_sims > 0. ) s_sims = z / s_sims;
       s_diff = 1.;
-  }
+  } 
 
 // make sure that results are positiv
   if( s_sims < 0. )
@@ -224,7 +224,7 @@ void setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int im
 {
   his->SetLineColor( icolor );
   his->SetMarkerColor( icolor );
-  his->SetLineWidth( iwidth );
+  his->SetLineWidth( (Width_t)iwidth );
   his->SetMarkerSize( isize );
   if( imarker !=0 ) his->SetMarkerStyle( imarker );
   his->SetStats( 0 );
@@ -385,7 +385,7 @@ void multiplicity_plots( char *ffile = "stereo_compare.root" )
   plot three single canvases for a certain histogram
 
 */
-void plot_singleCanvas( char *ffile, string iHistoName, string iCanvasTitle, string iHistoXTitle, double iHistoXAxisMax )
+void plot_singleCanvas( char *ffile, string iHistoName, string iCanvasTitle, double iHistoXAxisMax )
 {
   gStyle->SetPadGridX( 0 );
   gStyle->SetPadGridY( 0 );
@@ -451,7 +451,7 @@ void plot_singleCanvas( char *ffile, string iHistoName, string iCanvasTitle, str
 
 void emission_height( char *ffile = "stereo_compare.root", double iEmissionHeightMax = 40. )
 {
-  plot_singleCanvas( ffile, "hEmissionHeight", "emission height", "", iEmissionHeightMax );
+  plot_singleCanvas( ffile, "hEmissionHeight", "emission height", iEmissionHeightMax );
 }
 
 
@@ -518,6 +518,7 @@ void plot_energyDependentDistributions( TDirectory *fDir, string iVariable, int 
       if( hSims->GetEntries() > 0 ) hDiff->Scale( s_diff );
 
       hSims->SetAxisRange( x_min, x_max );
+      hDiff->SetAxisRange( x_min, x_max );
       hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
       hSims->SetMinimum( 0. );
 
@@ -985,7 +986,7 @@ void core_plots( char *ifile = "stereo_compare.root", int iScaling = 1 )
   hXYcore_sims->Draw( "colz" );
 }
 
-void centroids( char *ifile = "stereo_compare.root", int fNTel = 2 )
+void centroids( char *ifile = "stereo_compare.root", int fNTel = 4 )
 {
   gStyle->SetPadGridX( 0 );
   gStyle->SetPadGridY( 0 );
@@ -1033,17 +1034,17 @@ void centroids( char *ifile = "stereo_compare.root", int fNTel = 2 )
       setHistogramAtt( hCenXY_off[i], -999. );
       setAxisTitles( hCenXY_off[i], "off", i+1 );
 
-      cOCentro->cd( iC );
+      cSCentro->cd( iC );
       hCenXY_sims[i]->Draw( "contz" );
 
-      cSCentro->cd( iC );
+      cOCentro->cd( iC );
       hCenXY_on[i]->Draw( "contz" );
 
       iC++;
-      cOCentro->cd( iC );
+      cSCentro->cd( iC );
       hCenXY_diff[i]->Draw( "contz" );
 
-      cSCentro->cd( iC );
+      cOCentro->cd( iC );
       hCenXY_off[i]->Draw( "contz" );
 
       iC++;
@@ -1161,10 +1162,9 @@ void distance_plots( char *ifile = "stereo_compare.root", int fNTel = 4, bool bP
       iCsi++;
       iCoo++;
 
-      // relative plots
-      
-      if( hR_sims[i] && hR_diff[i] )
-	{
+// relative plots
+     if( hR_sims[i] && hR_diff[i] )
+     {
 	  sprintf( hname, "hR_RE_%d", i );
 	  hrel = (TH1D*)hR_sims[i]->Clone( hname );
 	  hrel->Divide( hR_diff[i] );
@@ -1177,8 +1177,8 @@ void distance_plots( char *ifile = "stereo_compare.root", int fNTel = 4, bool bP
 	  TLine *iLine = new TLine( hrel->GetXaxis()->GetXmin(), 1., hrel->GetXaxis()->GetXmax(), 1. );
 	  iLine->SetLineStyle( 2 );
 	  iLine->Draw();
-	}
-      iCsi++;
+     }
+     iCsi++;
 
       // distR
       //
@@ -1337,6 +1337,8 @@ void single_telescope( int telid = 1, char *ifile = "stereo_compare.root", strin
 	  cout << "off histogram not found " << hn << endl;
 	  continue;
 	} 
+  sprintf( htitle, "%s_%d", hname[j].c_str(), telid );
+  getScaling( fDir, s_sims, s_diff, htitle, iScalingMethod );
 // normalize sims histograms to data histograms
       hsims->Scale( s_sims );
       hdiff->Scale( s_diff );
@@ -1514,7 +1516,6 @@ void plot_msc( char *ffile = "stereo_compare.root", char *offFile = 0, char *hel
   cMSCsim = new TCanvas( hname, hname, 450, 510, 400, 400 );
   cMSCsim->SetGridx( 0 );
   cMSCsim->SetGridy( 0 );
-  TCanvas *cMSCLsim = 0;
 
   sprintf( hname, "h%s_SIMS", ivar.c_str() );
   TH1D* hMSC_sims = (TH1D*)fDir->Get( hname );
@@ -1638,8 +1639,8 @@ void mwr_plots( char *ffile = "stereo_compare.root" )
 
   TDirectory *fDir = openFile( ffile );
 
-  plot_energyDependentDistributions( fDir, "MWR", 2, 0., 2.5 );
-  plot_energyDependentDistributions( fDir, "MLR", 2, 0., 2.5 );
+  plot_energyDependentDistributions( fDir, "MWR", 1, 0., 2.5 );
+  plot_energyDependentDistributions( fDir, "MLR", 1, 0., 2.5 );
 
   return;
 }
