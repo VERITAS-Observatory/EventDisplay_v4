@@ -40,6 +40,9 @@ then
 fi
 echo "reading analysis parameter from $ANAPAR"
 NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
+NTYPEMIN_0=`grep NTYPEMIN_0 $ANAPAR | awk {'print $2'}`
+NTYPEMIN_1=`grep NTYPEMIN_1 $ANAPAR | awk {'print $2'}`
+NTYPEMIN_2=`grep NTYPEMIN_2 $ANAPAR | awk {'print $2'}`
 ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
 DDIR=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
@@ -154,6 +157,13 @@ do
 	 done
 # setting the cuts correctly in the run parameter file
          sed -i "s|MINIMAGES|$NIMAGESMIN|" $RFIL.runparameter
+	 if [ -z $NTYPEMIN_2 ]
+	 then
+	    TYPECUT="(NImages_Ttype[0]>="$NTYPEMIN_0"\|\|NImages_Ttype[1]>="$NTYPEMIN_1")"
+         else
+	    TYPECUT="(NImages_Ttype[0]>="$NTYPEMIN_0"\|\|NImages_Ttype[1]>="$NTYPEMIN_1"\|\|NImages_Ttype[2]>="$NTYPEMIN_2")"
+         fi
+	 sed -i "s|MINIMAGETYPECUT|$TYPECUT|" $RFIL.runparameter
 # setting the chosen energy variable
 	 if [ $EREC = "0" ]
 	 then
