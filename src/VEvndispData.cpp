@@ -171,7 +171,6 @@ void VEvndispData::resetAnaData()
         fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow_1[fTelID];
 
 	fAnaData[fTelID]->fTemplateMu = 0;
-	fAnaData[fTelID]->fModel3DMu = 0; //JG
 
         if( getTraceFit() > -1. )
         {
