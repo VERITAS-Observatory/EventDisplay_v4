@@ -205,6 +205,13 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hResponseMatrixFineQC->SetXTitle( "energy_{rec} [TeV]" );
     hisTreeList->Add( hResponseMatrixFineQC );
 
+    sprintf( hname, "hWeightedRate" );
+    hWeightedRate = new TH1D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+    hWeightedRate->Sumw2();
+    hWeightedRate->SetXTitle( "energy_{rec} [TeV]" );
+    hWeightedRate->SetYTitle( "entries" );
+    hisTreeList->Add( hWeightedRate );
+
 // individual cuts
     vector< string > iCutName;
     iCutName.push_back( "hEcutTrigger" );
@@ -450,6 +457,15 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
             else                  iT_TH2D.push_back( 0 );
         }
         hVResponseMatrixQC.push_back( iT_TH2D );
+
+        iT_TH1D.clear();
+        for( unsigned int j = 0; j < fVMinAz.size(); j++ )
+        {
+            sprintf( hname, "hVWeightedRate_%d_%d", i, j );
+            if( hWeightedRate ) iT_TH1D.push_back( (TH1D*)hWeightedRate->Clone( hname ) );
+            else       iT_TH1D.push_back( 0 );
+        }
+        hVWeightedRate.push_back( iT_TH1D );
     }
 }
 
@@ -1603,6 +1619,8 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                if( hVEmcCutCTA[s][i_az] )        hVEmcCutCTA[s][i_az]->Fill( eRec, eMC );
                if( hVResponseMatrix[s][i_az] )   hVResponseMatrix[s][i_az]->Fill( eRec, eMC );
 	       if( hVResponseMatrixProfile[s][i_az] ) hVResponseMatrixProfile[s][i_az]->Fill( eRec, eMC );
+// events weighted by CR spectra
+               if( hVWeightedRate[s][i_az] )     hVWeightedRate[s][i_az]->Fill( eRec, getCRWeight( eMC ) );
              }
            }
 // don't do anything between here and the end of the loop! Never!
@@ -1712,6 +1730,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
             copyHistograms( hResponseMatrix, hVResponseMatrix[s][i_az], true );
             copyHistograms( hResponseMatrixQC, hVResponseMatrixQC[s][i_az], true );
 	    copyProfileHistograms( hResponseMatrixProfile, hVResponseMatrixProfile[s][i_az] );
+	    copyHistograms( hWeightedRate, hVWeightedRate[s][i_az], false );
 
             fEffArea->Fill();
         }
@@ -2544,6 +2563,13 @@ void VEffectiveAreaCalculator::resetHistogramsVectors( unsigned int ize )
             if( hVResponseMatrixQC[i][j] ) hVResponseMatrixQC[i][j]->Reset();
         }
     }
+    for( unsigned int i = 0; i < hVWeightedRate.size(); i++ )
+    {
+        for( unsigned int j = 0; j < hVWeightedRate[i].size(); j++ )
+        {
+            if( hVWeightedRate[i][j] ) hVWeightedRate[i][j]->Reset();
+        }
+    }
 }
 
 
@@ -2655,3 +2681,7 @@ bool VEffectiveAreaCalculator::setMonteCarloEnergyRange( double iMin, double iMa
    return false;
 }
 
+double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_log10 )
+{
+   return 1.;
+}

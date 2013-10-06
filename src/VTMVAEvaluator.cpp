@@ -1447,13 +1447,13 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	 {
 	    if( fOptimizationBackgroundAlpha > 0. )
 	    {
-	       if( iHAngContainment && fTMVA_OptimizeAngularContainment )
+/*	       if( iHAngContainment && fTMVA_OptimizeAngularContainment )
 	       {
 	           getOptimalAngularContainmentRadius( effS->GetBinContent( i ), effB->GetBinContent( i ), Ndif, Nof, 
 		                                       iHAngContainment, fSpectralWeightedMeanEnergy_Log10TeV[iEnergyBin],
 						       i_Signal_to_sqrtNoise, i_AngularContainmentRadius, i_AngularContainmentFraction );
                }
-	       else
+	       else */
 	       {
 		  i_Signal_to_sqrtNoise = VStatistics::calcSignificance( effS->GetBinContent( i ) * Ndif + effB->GetBinContent( i ) * Nof,
 									 effB->GetBinContent( i ) * Nof / fOptimizationBackgroundAlpha,
@@ -1535,7 +1535,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
 	       i_ymax = y;
 	       i_xmax = x;
 	    }
-	 }
+// stop after first maximim (makes maximum research more robust to fluctuations of the
+// background efficiency
+	    else if( y < i_ymax ) break;
+	 } 
 	 i_SignalEfficiency_AtMaximum     = effS->GetBinContent( effS->FindBin( i_xmax ) );
 	 i_BackgroundEfficiency_AtMaximum = effB->GetBinContent( effB->FindBin( i_xmax ) );
 	 i_TMVACutValue_AtMaximum         = i_xmax;

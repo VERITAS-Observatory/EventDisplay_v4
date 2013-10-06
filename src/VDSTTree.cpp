@@ -685,7 +685,10 @@ double VDSTTree::getDSTMeanPulseTiming(  unsigned int iTelID, unsigned int iChan
 {
    if( iTelID < VDST_MAXTELESCOPES && iChannelID < VDST_MAXCHANNELS )
    {
-      if( fDSTMeanPulseTiming_N[iTelID][iChannelID] > 0. ) return fDSTMeanPulseTiming[iTelID][iChannelID] / fDSTMeanPulseTiming_N[iTelID][iChannelID];
+      if( fDSTMeanPulseTiming_N[iTelID][iChannelID] > 0. )
+      {
+         return fDSTMeanPulseTiming[iTelID][iChannelID] / fDSTMeanPulseTiming_N[iTelID][iChannelID];
+      }
       else                                                 return -9999.;
    }
 

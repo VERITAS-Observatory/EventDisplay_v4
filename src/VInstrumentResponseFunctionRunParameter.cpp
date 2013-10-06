@@ -57,6 +57,9 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     telconfig_arraycentre_Y = 0.;
     telconfig_arraymax = 0.;
 
+    fCREnergySpectrumFile = "";
+    fCREnergySpectrumID = 0;
+
 }
 
 
@@ -187,6 +190,12 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
             else if( temp == "GAMMAHADRONPROBABILITYFILE" )
             {
                if( !is_stream.eof() ) is_stream >> fGammaHadronProbabilityFile;
+            }
+// name pointing to energy spectra used in event weighting
+            else if( temp == "ESPECTRUM_FOR_WEIGHTING" )
+	    {
+	       if( !is_stream.eof() ) is_stream >> fCREnergySpectrumFile;
+	       if( !is_stream.eof() ) is_stream >> fCREnergySpectrumID;
             }
         }
     }
@@ -411,6 +420,11 @@ void VInstrumentResponseFunctionRunParameter::print()
     cout << "calculate response function assuming power laws with following index (";
     cout << fNSpectralIndex << ", " << fSpectralIndexMin << ", " << fSpectralIndexStep << "): ";
     for( unsigned int i = 0; i < fSpectralIndex.size(); i++ ) cout << fSpectralIndex[i] << " ";
+    if( fCREnergySpectrumFile.size() > 0 )
+    {
+       cout << "CR energy spectrum used for weighted rate histogram: ";
+       cout << fCREnergySpectrumFile << "(ID " << fCREnergySpectrumID << ")" << endl;
+    }
     cout << endl << endl;
 
 }

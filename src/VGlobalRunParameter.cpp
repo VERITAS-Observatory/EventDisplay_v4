@@ -287,7 +287,7 @@ void VGlobalRunParameter::printGlobalRunParameter()
 string VGlobalRunParameter::fObservatory = "Whipple";
 bool VGlobalRunParameter::bReadRunParameter = false;
 unsigned int VGlobalRunParameter::fEVNDISP_TREE_VERSION = 9;
-string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.26";
+string VGlobalRunParameter::fEVNDISP_VERSION = "v.4.27";
 string VGlobalRunParameter::fEVNDISP_SVNREVISION = "$Revision$";
 string VGlobalRunParameter::fDBServer = "";
 string VGlobalRunParameter::fRawDataServer = "";
