@@ -46,7 +46,10 @@ fi
 OPT="-runmode=1 -calibrationsumwindow=20 -calibrationsumfirst=0"
 if [ -n "$3" ] && [ $3 -eq "1" ]
 then
+# low gain run with 64 samples
    OPT="-calibrationsumwindow=20 -calibrationsumfirst=40 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
+# low gain run with 128 samples
+   OPT="-calibrationsumwindow=20 -calibrationsumfirst=80 -runmode=6 -nevents=5000 -reconstructionparameter EVNDISP.reconstruction.LGCalibration.runparameter"
 fi
 
 # source file
