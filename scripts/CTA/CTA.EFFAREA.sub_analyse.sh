@@ -68,12 +68,19 @@ then
 fi
 echo "reading analysis parameter from $ANAPAR"
 NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
+NTYPEMIN_0=`grep NTYPEMIN_0 $ANAPAR | awk {'print $2'}`
+NTYPEMIN_1=`grep NTYPEMIN_1 $ANAPAR | awk {'print $2'}`
+NTYPEMIN_2=`grep NTYPEMIN_2 $ANAPAR | awk {'print $2'}`
+if [ -z "$NTYPEMIN_2" ]
+then
+   NTYPEMIN_2=0
+fi
 ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
 TMVACUT=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
 OBSTIME=`grep OBSERVINGTIME_H $ANAPAR | awk {'print $2'}`
-if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "$EREC" ] || [ -z "$TMVACUT" ] || [ -z "$EFFAREADIR" ] || [ -z "$OBSTIME" ]
+if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "$EREC" ] || [ -z "$TMVACUT" ] || [ -z "$EFFAREADIR" ] || [ -z "$OBSTIME" ] || [ -z "$NTYPEMIN_0" ] || [ -z "$NTYPEMIN_1" ] || [ -z "$NTYPEMIN_2" ]
 then
   echo "error: analysis parameter file not correct: $ANAPAR" 
   echo " one variable missing"
@@ -133,7 +140,7 @@ echo "output log directory"
 QDIR=$CTA_USER_LOG_DIR"/$DATE/EFFAREA/"
 echo $QDIR
 mkdir -p $QDIR
-#QDIR="/dev/null"
+QDIR="/dev/null"
 echo "output data directory"
 echo $ODIR
 mkdir -p $ODIR
@@ -291,40 +298,20 @@ do
       cp -f $CFIL $iCFIL
       pwd
 
-      sed -e "s|OFFMIN|$iMIN|" $iCFIL > $iCFIL-a
-      rm -f $iCFIL
-      sed -e "s|OFFMAX|$iMAX|" $iCFIL-a > $iCFIL-b
-      rm -f $iCFIL-a
-      sed -e "s|THETA2MIN|$jMIN|" $iCFIL-b > $iCFIL-c
-      rm -f $iCFIL-b
-      sed -e "s|THETA2MAX|$jMAX|" $iCFIL-c > $iCFIL-d
-      rm -f $iCFIL-c
-      sed -e "s|DIRECTIONCUT|$DIRECTIONCUT|" $iCFIL-d > $iCFIL-e
-      rm -f $iCFIL-d
-      sed -e "s|SUBARRAY|$ARRAY|" $iCFIL-e > $iCFIL-e1
-      rm -f $iCFIL-e
-      sed -e "s|MINIMAGES|$NIMAGESMIN|" $iCFIL-e1 > $iCFIL-f
-      rm -f $iCFIL-e1
+# wobble offset
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ] 
       then
-         sed -e "s|WOBBLEOFFSET|${OFFMEA[$i]}|" $iCFIL-f > $iCFIL-g
+         WOBBLEOFFSET=${OFFMEA[$i]}
       else
-         sed -e "s|WOBBLEOFFSET|${OFFMEA[$j]}|" $iCFIL-f > $iCFIL-g
+         WOBBLEOFFSET=${OFFMEA[$j]}
       fi
-      rm -f $iCFIL-f
-      sed -e "s|TMVACUTDIR|$TMVACUT|" $iCFIL-g > $iCFIL-h
-      rm -f $iCFIL-g
-      sed -e "s|DATASET|$DSET|" $iCFIL-h > $iCFIL-i
 # angular resolution file
-      rm -f $iCFIL-h
       if [ $PART = "gamma_onSource" ] 
       then
 	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_onSource."$ARRAY"_ID"$RECID".eff-0.root"
       else
 	 ANGRESFILE="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/AngularResolution/gamma_cone."$ARRAY"_ID"$RECID".eff-$i.root"
       fi
-      sed -e "s|ANGRESFILE|$ANGRESFILE|" $iCFIL-i > $iCFIL-j
-      rm -f $iCFIL-i
 # particle number file
       if [ $PART = "gamma_onSource" ] || [ $PART = "electron_onSource" ] || [ $PART = "proton_onSource" ]
       then
@@ -335,13 +322,24 @@ do
       else
 	 PNF="$CTA_USER_DATA_DIR/analysis/AnalysisData/$DSET/$EFFAREADIR/QualityCuts001CU/ParticleNumbers."$ARRAY".$j.root"
       fi
-      sed -e "s|PARTICLENUMBERFILE|$PNF|" $iCFIL-j > $iCFIL-k
-      rm -f $iCFIL-j
-# observing time (for cut optimization)
-      sed -e "s|OBSERVINGTIME_H|$OBSTIME|" $iCFIL-k > $iCFIL-l
-      rm -f $iCFIL-k
-# finalize cut file
-      mv -f $iCFIL-l $iCFIL
+      
+
+      sed -i -e "s|OFFMIN|$iMIN|" \
+             -e "s|OFFMAX|$iMAX|" \
+             -e "s|THETA2MIN|$jMIN|" \
+             -e "s|THETA2MAX|$jMAX|" \
+             -e "s|DIRECTIONCUT|$DIRECTIONCUT|" \
+             -e "s|SUBARRAY|$ARRAY|" \
+             -e "s|MINIMAGES|$NIMAGESMIN|" \
+	     -e "s|NTELTYPE0|$NTYPEMIN_0|" \
+	     -e "s|NTELTYPE1|$NTYPEMIN_1|" \
+	     -e "s|NTELTYPE2|$NTYPEMIN_2|" \
+             -e "s|WOBBLEOFFSET|$WOBBLEOFFSET|" \
+             -e "s|TMVACUTDIR|$TMVACUT|" \
+             -e "s|DATASET|$DSET|" \
+             -e "s|ANGRESFILE|$ANGRESFILE|" \
+             -e "s|PARTICLENUMBERFILE|$PNF|" \
+             -e "s|OBSERVINGTIME_H|$OBSTIME|" $iCFIL
       iCFIL=$ODIR/effectiveArea-CTA-$DSET-$PART-$i-$j.$iCBFILE
       cd $EVNDISPSYS/scripts/CTA/
       echo $iCFIL
