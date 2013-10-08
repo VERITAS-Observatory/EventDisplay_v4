@@ -92,7 +92,7 @@ void VMonteCarloRunHeader::print()
     cout << endl;
     cout << "Monte Carlo run header" << endl;
     cout << "======================" << endl;
-    if( runnumber >= 0 ) cout << "run nunber: " << runnumber << endl;
+    if( runnumber >= 0 ) cout << "run number: " << runnumber << endl;
     cout << "code version: shower prog " << shower_prog_id << " (" << shower_prog_vers << "), ";
     cout << "detector prog " << detector_prog_id << " (" << detector_prog_vers << "), ";
     cout << converter_prog_vers << endl;
