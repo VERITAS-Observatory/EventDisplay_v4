@@ -5,6 +5,7 @@
 
 #include "CData.h"
 
+#include "VAnaSumRunParameter.h"
 #include "VRadialAcceptance.h"
 
 #include "TH2D.h"
@@ -145,6 +146,6 @@ class VStereoMaps
         void              setNoSkyPlots( bool iS ) { fNoSkyPlots = iS; }
         void              setRunList( VAnaSumRunParameterDataClass iL );
         void              setTargetShift( double iW, double iN );
-        void              setRegionToExclude( vector<double> iX, vector<double> iY, vector<double> iR );
+	void              setRegionToExclude( vector< VAnaSumRunParameterListOfExclusionRegions* > iF );
 };
 #endif

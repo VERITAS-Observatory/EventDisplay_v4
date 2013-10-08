@@ -340,23 +340,22 @@ void VRadialAcceptance::reset()
     f2DAcceptanceMode = 0 ;
     f2DBinNormalizationConstant = 0 ;
 	
-	eventcount = 0 ;
+    eventcount = 0 ;
 
     fXE.clear();
     fYE.clear();
     fRE.clear();
 	
-	hXYAccImgSel.clear();
-	hXYAccNImages.clear();
-	hXYAccImgSelPreDeRot.clear();
-	hXYAccNImagesPreDeRot.clear();
+    hXYAccImgSel.clear();
+    hXYAccNImages.clear();
+    hXYAccImgSelPreDeRot.clear();
+    hXYAccNImagesPreDeRot.clear();
 
     setEnergyReconstructionMethod();
     setAzCut();
 	
-	fExtraHistogramMode = 0 ;
-	fExtraHistogramDir = "" ;
-	
+    fExtraHistogramMode = 0 ;
+    fExtraHistogramDir = "" ;
 }
 
 

@@ -325,7 +325,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // set map properties
    fMap->setData( fDataRun );
    fMap->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
-   fMap->setRegionToExclude(fRunPara->fExcludeFromBackground_West, fRunPara->fExcludeFromBackground_North,fRunPara->fExcludeFromBackground_Radius );
+   fMap->setRegionToExclude( fRunPara->fExclusionRegions );
    fMap->setNoSkyPlots( fNoSkyPlots );
    fMap->setRunList( fRunPara->fRunList[fHisCounter] );
    fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, fHisto[fHisCounter]->hmap_alpha, 
@@ -333,7 +333,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
    fMapUC->setData( fDataRun );
    fMapUC->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
-   fMapUC->setRegionToExclude(fRunPara->fExcludeFromBackground_West, fRunPara->fExcludeFromBackground_North,fRunPara->fExcludeFromBackground_Radius );
+   fMapUC->setRegionToExclude( fRunPara->fExclusionRegions );
    fMapUC->setNoSkyPlots( fNoSkyPlots );
    fMapUC->setRunList( fRunPara->fRunList[fHisCounter] );
    fMapUC->setHistograms( fHisto[fHisCounter]->hmap_stereoUC, fHisto[fHisCounter]->hmap_alphaUC, 0 );
@@ -1382,25 +1382,26 @@ void VStereoAnalysis::defineAstroSource()
 			 {
 // check if this region is already excluded (avoid dublications)
 			   bool b_isExcluded = false;
-			   for( unsigned int e = 0; e < fRunPara->fExcludeFromBackground_StarID.size(); e++ )
+			   for( unsigned int e = 0; e < fRunPara->fExclusionRegions.size(); e++ )
 			   {
-				if( fRunPara->fExcludeFromBackground_StarID[e] >= 0
-				 && fRunPara->fExcludeFromBackground_StarID[e] == (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID )
+				if( fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID >= 0
+				 && fRunPara->fExclusionRegions[e]->fExcludeFromBackground_StarID == (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID )
 				{
 				   b_isExcluded = true;
 				}
 			   }
 			   if( !b_isExcluded )
 			   {
-				fRunPara->fExcludeFromBackground_RAJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000 );
-				fRunPara->fExcludeFromBackground_DecJ2000.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000 );
-				fRunPara->fExcludeFromBackground_Radius.push_back( fRunPara->fStarExlusionRadius );
-				fRunPara->fExcludeFromBackground_North.push_back( 0. );
-				fRunPara->fExcludeFromBackground_West.push_back( 0. );
-				fRunPara->fExcludeFromBackground_StarID.push_back( (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID );
-				fRunPara->fExcludeFromBackground_StarName.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fStarName );
-				fRunPara->fExcludeFromBackground_StarBrightness_V.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V );
-				fRunPara->fExcludeFromBackground_StarBrightness_B.push_back( iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B );
+				fRunPara->fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fRA2000;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = iStarCatalogue->getListOfStarsinFOV()[i]->fDec2000;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_Radius = fRunPara->fStarExlusionRadius;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_North = 0.;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_West = 0.;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarID = (int)iStarCatalogue->getListOfStarsinFOV()[i]->fStarID;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarName = iStarCatalogue->getListOfStarsinFOV()[i]->fStarName;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_V = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_V;
+				fRunPara->fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_B = iStarCatalogue->getListOfStarsinFOV()[i]->fBrightness_B;
 			   }
 		      }
 		 }
@@ -1412,29 +1413,24 @@ void VStereoAnalysis::defineAstroSource()
 /////////////////////////////////////////////////////////
 // set and get the regions to exclude
 // (this is set relative to the sky map centre)
-      	for(unsigned int k = 0 ; k < fRunPara->fExcludeFromBackground_North.size(); k++)
+      	for( unsigned int k = 0 ; k < fRunPara->fExclusionRegions.size(); k++)
       	{
-	     if( fRunPara->fExcludeFromBackground_DecJ2000[k] > -90. )
+	     if( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 > -90. )
 	     {
-		  fRunPara->fExcludeFromBackground_West[k]  = -1.* VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000,
+		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000,
 														 fRunPara->fRunList[i].fTargetDecJ2000,
-														 fRunPara->fExcludeFromBackground_RAJ2000[k],
-														 fRunPara->fExcludeFromBackground_DecJ2000[k] ) * -1.;
-		  fRunPara->fExcludeFromBackground_North[k] = -1.* VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000,
+														 fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
+														 fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
+		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000,
 														  fRunPara->fRunList[i].fTargetDecJ2000,
-														  fRunPara->fExcludeFromBackground_RAJ2000[k],
-														  fRunPara->fExcludeFromBackground_DecJ2000[k] );
-		  fRunPara->fExcludeFromBackground_West[k]  += fRunPara->fRunList[i].fSkyMapCentreWest;
-		  fRunPara->fExcludeFromBackground_North[k] += fRunPara->fRunList[i].fSkyMapCentreNorth;
-		  if( TMath::Abs( fRunPara->fExcludeFromBackground_North[k] ) < 1.e-4 ) fRunPara->fExcludeFromBackground_North[k] = 0.;
-		  if( TMath::Abs( fRunPara->fExcludeFromBackground_West[k] ) < 1.e-4 )  fRunPara->fExcludeFromBackground_West[k]  = 0.;
+														  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
+														  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
+		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  += fRunPara->fRunList[i].fSkyMapCentreWest;
+		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North += fRunPara->fRunList[i].fSkyMapCentreNorth;
+		  if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North ) < 1.e-4 ) fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 0.;
+		  if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West ) < 1.e-4 )  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 0.;
 	     }
-	     else
-	     {
-		  fRunPara->fExcludeFromBackground_West[k]  *= 1.;
-		  fRunPara->fExcludeFromBackground_North[k] *= -1.;
-	     }
-	     fRunPara->fExcludeFromBackground_West[k]  *= -1.;
+	     fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  *= -1.;
       	}
       }
 }

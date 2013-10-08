@@ -148,7 +148,8 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // merging analysis
-// (combine several anasum files into one analysis)
+// (combine several anasum files into one analysis file)
+///////////////////////////////////////////////////////////////////////////////////////////
     if( fAnalysisRunMode == 1 )
     {
 	for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
@@ -184,9 +185,9 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	   iDir = fOPfile->GetDirectory( i_temp );
 	   fStereoRunDir.push_back( iDir );
 
-// get list of excluded regions
-           if( j==0 )
-             fRunPara->getListOfExcludedSkyRegions( &iAnasumInputFile );
+// get list of excluded regions 
+// (note: list is read only from first file)
+           if( j==0 ) fRunPara->getListOfExcludedSkyRegions( &iAnasumInputFile );
 
 // close input file
 	   iAnasumInputFile.Close();

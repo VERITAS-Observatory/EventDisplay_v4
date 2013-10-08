@@ -88,7 +88,8 @@ void VPlotAnasumHistograms::help()
     cout << "   plot theta2 histograms" << endl << endl;
     cout << "plot_skyPlots()" << endl;
     cout << "   plot on, background, and on-background count maps, plot normalisation factors" << endl << endl;
-    cout << "plot_significance(char* filename = \"output.root\", int ion = -1, bool iCorrelated = false, double rmax = -1., double zmin = -100., double zmax = -100., bool bPoster = false)" << endl;
+    cout << "plot_significance(char* filename = \"output.root\", int ion = -1, bool iCorrelated = false,";
+    cout << "double rmax = -1., double zmin = -100., double zmax = -100., bool bPoster = false)" << endl;
     cout << "plot_UncorrelatedSkyPlots()" << endl;
     cout << "   plot on, background, and on-background uncorrelated count maps, plot normalisation factors" << endl << endl;
     cout << "plot_CorrelatedSkyPlots()" << endl;
@@ -96,9 +97,11 @@ void VPlotAnasumHistograms::help()
     cout << "   plot on-background and significance maps" << endl << endl;
     cout << "plot_significanceDistributions(double rmax = 1.2, double rSource = 0.4, double xmin=-6.5, double xmax=10)" << endl;
     cout << "   plot 1D distribution of signifcances in sky maps" << endl << endl;
-    cout << "plot_radec( int sPlot = 0, double rmax = -3., double zmin = -5., double zmax = -1000., double xcenter = 0., double ycenter = 0., bool bDrawSource = true, bool bSlices = false, double fSliceXmin = -0.1, double fSliceXmax = 0.1, bool bProjX = true )" << endl;
+    cout << "plot_radec( int sPlot = 0, double rmax = -3., double zmin = -5., double zmax = -1000., double xcenter = 0.,";
+    cout << "double ycenter = 0., bool bDrawSource = true, bool bSlices = false, double fSliceXmin = -0.1, double fSliceXmax = 0.1, bool bProjX = true )" << endl;
     cout << "   plot skymap" << endl << endl;
-    cout << "plot_catalogue( TCanvas *c, string iCatalogue = \"Hipparcos_MAG8_1997.dat\", double iMaxBrightness = 6.5, string iBand = B, int iColor = 1, int iLineStyle = 1, string hSkyMapName = hmap_stereo_sig_REFLECTED, double iTextAngle = 45., int iMarkerStyle = 5 )"<< endl;
+    cout << "plot_catalogue( TCanvas *c, string iCatalogue = \"Hipparcos_MAG8_1997.dat\", double iMaxBrightness = 6.5, string iBand = B,";
+    cout << "int iColor = 1, int iLineStyle = 1, string hSkyMapName = hmap_stereo_sig_REFLECTED, double iTextAngle = 45., int iMarkerStyle = 5 )"<< endl;
     cout << "   plot the stars from a given magnitude and catalogue on top of the skymap" << endl << endl;
     cout << "plot_RBM_ring(double r, double iA, double t2, double iN)" << endl;
     cout << "   plot the ring background" << endl << endl;
@@ -757,7 +760,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     for( int i = 0; i < iN; i++ )
     {
         t->GetEntry( i );
-	v_x[i] = x;
+	v_x[i] = -1.*x;
 	v_y[i] = y;
 	v_r[i] = r;
     }
@@ -767,14 +770,17 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     TH1D *hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
     setHistogramPlottingStyle( hsig_1D, 4, 2, 1, 1, 1, 0 );
     if( hsig_1D ) hsig_1D->SetStats( 0 );
+    cout << "red:   without source region" << endl;
 
     TH1D *hsig_1DAll  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, 0., false, hmap_stereo_on );
     setHistogramPlottingStyle( hsig_1DAll, 2, 2, 2, 1, 1, 0 );
     if( hsig_1DAll ) hsig_1DAll->SetStats( 0 );
+    cout << "red:   with source region" << endl;
     
     TH1D *hsig_1DExcluded = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r );
     setHistogramPlottingStyle( hsig_1DExcluded, 1, 2, 2, 1, 1, 0 );
     if( hsig_1DExcluded ) hsig_1DExcluded->SetStats( 1 );
+    cout << "black: without source region and exclusion regions removed" << endl;
 
     gStyle->SetOptStat( "mr" );
     gStyle->SetOptFit( 1111 );
@@ -1411,7 +1417,7 @@ void VPlotAnasumHistograms::plot_RBM_ring( double r, double iA, double t2, doubl
 /*
  *   plot reflected regions from the Refl Reg Background estimation
  *   
- *   observe that this has to be used with the 
+ *   observe that this has to be used with the non-reflected histograms (not with plot_radec)
  */
 void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, int iColor )
 {
@@ -1619,10 +1625,14 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c, int iLineColor )
     t->SetBranchAddress( "y", &y );
     t->SetBranchAddress( "r", &r );
 
+    double iSign = 1.;
+    TH2D *h = (TH2D*)c->GetListOfPrimitives()->FindObject( "hmap_stereo_sig_REFLECTED" );
+    if( !h ) iSign *= -1.;
+
     for( int i = 0; i < t->GetEntries(); i++ )
     {
         t->GetEntry( i );
-        TEllipse *e = new TEllipse( x, -1.*y, r );
+        TEllipse *e = new TEllipse( iSign*x, y, r );
         e->SetFillStyle( 0 );
         e->SetLineColor( iLineColor );
         e->Draw();

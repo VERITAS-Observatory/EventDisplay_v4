@@ -24,6 +24,25 @@ using namespace std;
 
 enum e_background { eONOFF, eRINGMODEL, eREFLECTEDREGION, eFOV, eTEMPLATE };
 
+class VAnaSumRunParameterListOfExclusionRegions
+{
+   public:
+
+     double fExcludeFromBackground_North;    //[deg]
+     double fExcludeFromBackground_West;     //[deg]
+     double fExcludeFromBackground_DecJ2000; //[deg]
+     double fExcludeFromBackground_RAJ2000;  //[deg]
+     double fExcludeFromBackground_Radius;   //[deg]
+     int    fExcludeFromBackground_StarID;
+     string fExcludeFromBackground_StarName;
+     double fExcludeFromBackground_StarBrightness_V;
+     double fExcludeFromBackground_StarBrightness_B;
+
+     VAnaSumRunParameterListOfExclusionRegions();
+    ~VAnaSumRunParameterListOfExclusionRegions() {}
+};
+
+
 class VAnaSumRunParameterDataClass
 {
 
@@ -61,12 +80,7 @@ class VAnaSumRunParameterDataClass
         double fTargetShiftRAJ2000;               // [deg]
         double fTargetShiftDecJ2000;              // [deg]
 
-        vector< double > fExcludeFromBackground_North;    //[deg]
-        vector< double > fExcludeFromBackground_West;     //[deg]
-        vector< double > fExcludeFromBackground_DecJ2000; //[deg]
-        vector< double > fExcludeFromBackground_RAJ2000;  //[deg]
-        vector< double > fExcludeFromBackground_Radius;   //[deg]
-        vector< int >    fExcludeFromBackground_StarID;
+	vector< VAnaSumRunParameterListOfExclusionRegions* > fExclusionRegions;   // list of exclusion regions
 
         unsigned int fNTel;                       // number of telescopes
 	string   fTelToAna;
@@ -151,15 +165,6 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fSkyMapCentreRAJ2000;              // [deg]
         double fSkyMapCentreDecJ2000;             // [deg]
 
-        vector< double > fExcludeFromBackground_North;    //[deg]
-        vector< double > fExcludeFromBackground_West;     //[deg]
-        vector< double > fExcludeFromBackground_DecJ2000; //[deg]
-        vector< double > fExcludeFromBackground_RAJ2000;  //[deg]
-        vector< double > fExcludeFromBackground_Radius;   //[deg]
-        vector< int >    fExcludeFromBackground_StarID;
-	vector< string > fExcludeFromBackground_StarName;
-	vector< double > fExcludeFromBackground_StarBrightness_V;
-	vector< double > fExcludeFromBackground_StarBrightness_B;
 
 // energy reconstruction
         double fEnergyReconstructionSpectralIndex;
@@ -203,6 +208,8 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 	double fTMPL_maxradius;
 	string fTMPL_AcceptanceFile;
 	string fTMPL_EffectiveAreaFile;
+
+	vector< VAnaSumRunParameterListOfExclusionRegions* > fExclusionRegions;   // list of exclusion regions
 
 // star exclusion regions
         string fStarCatalogue;

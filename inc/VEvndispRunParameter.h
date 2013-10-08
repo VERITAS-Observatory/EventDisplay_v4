@@ -260,6 +260,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,129); //(increase this number)
+        ClassDef(VEvndispRunParameter,130); //(increase this number)
 };
 #endif

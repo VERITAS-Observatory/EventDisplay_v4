@@ -402,52 +402,37 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fTargetShiftDecJ2000 = d_tt;
             }
 
-            else if( temp == "REGIONTOEXCLUDE" )
+            else if( temp == "REGIONTOEXCLUDE" || temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
             {
                 if( checkNumberOfArguments( is_line ) != 5 )
 		{
-		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius(deg))" );
+		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", 
+		                           is_line, "* REGIONTOEXCLUDE (West(deg)  North(deg)  Radius(deg)) (or * REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius(deg))" );
                 }
+		fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 
-                fExcludeFromBackground_West.push_back(-1.* (double)atof( temp2.c_str() ));
-                is_stream >> temp2;
-                fExcludeFromBackground_North.push_back( -1.* (double)atof( temp2.c_str() ));
-                is_stream >> temp2;
-                fExcludeFromBackground_Radius.push_back((double)atof( temp2.c_str() ));
-                fExcludeFromBackground_DecJ2000.push_back( -99. );
-                fExcludeFromBackground_RAJ2000.push_back( 0. );
-                fExcludeFromBackground_StarID.push_back( -1 );
-		fExcludeFromBackground_StarName.push_back( "" );
-		fExcludeFromBackground_StarBrightness_V.push_back( 99. );
-		fExcludeFromBackground_StarBrightness_B.push_back( 99. );
-            }
-
-            else if( temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
-            {
-                if( checkNumberOfArguments( is_line ) != 5 )
+		if( temp == "REGIONTOEXCLUDE" )
 		{
-		  return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_DEG (RA(deg) DEC(deg) Radius(deg))" );
+		   fExclusionRegions.back()->fExcludeFromBackground_West = -1.* (double)atof( temp2.c_str() );
+		   is_stream >> temp2;
+		   fExclusionRegions.back()->fExcludeFromBackground_North = -1.* (double)atof( temp2.c_str() );
                 }
-
-                fExcludeFromBackground_RAJ2000.push_back((double) atof( temp2.c_str()));
-                is_stream >> temp2;
-                fExcludeFromBackground_DecJ2000.push_back( (double)atof( temp2.c_str() ));
-                is_stream >> temp2;
-                fExcludeFromBackground_Radius.push_back((double)atof( temp2.c_str() ));
-                fExcludeFromBackground_North.push_back( 0. );
-                fExcludeFromBackground_West.push_back( 0. );
-                fExcludeFromBackground_StarID.push_back( -1 );
-		fExcludeFromBackground_StarName.push_back( "" );
-		fExcludeFromBackground_StarBrightness_V.push_back( 99. );
-		fExcludeFromBackground_StarBrightness_B.push_back( 99. );
+		else if( temp == "REGIONTOEXCLUDE_RADECJ2000_DEG" )
+		{
+		   fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = (double)atof( temp2.c_str() );
+		   is_stream >> temp2;
+		   fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = (double)atof( temp2.c_str() );
+                }
+		is_stream >> temp2;
+                fExclusionRegions.back()->fExcludeFromBackground_Radius = (double)atof( temp2.c_str() );
             }
-
             else if( temp == "REGIONTOEXCLUDE_RADECJ2000_HOUR" )
             {
                 if( checkNumberOfArguments( is_line ) != 9 )
 		{
 		   return returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REGIONTOEXCLUDE_RADECJ2000_HOUR (RA(Hour Min Sec)  DEC(Deg Min Sec)  Radius(deg))" );
                 }
+		fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 
                 double d_tt = 0.;
                 d_tt += (double)atof( temp2.c_str() );
@@ -455,7 +440,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 d_tt += (double)atof( temp2.c_str() ) / 60.;
                 is_stream >> temp2;
                 d_tt += (double)atof( temp2.c_str() ) / 3600.;
-                fExcludeFromBackground_RAJ2000.push_back(d_tt / 24. * 360.);
+                fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = d_tt / 24. * 360.;
                 d_tt = 0.;
                 is_stream >> temp2;
                 d_tt += (double)atof( temp2.c_str() );
@@ -463,17 +448,10 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 d_tt += (double)atof( temp2.c_str() ) / 60.;
                 is_stream >> temp2;
                 d_tt += (double)atof( temp2.c_str() ) / 3600.;
-                fExcludeFromBackground_DecJ2000.push_back(d_tt);
+		fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = d_tt;
                 is_stream >> temp2;
-                fExcludeFromBackground_Radius.push_back((double)atof( temp2.c_str() ));
-                fExcludeFromBackground_North.push_back( 0. );
-                fExcludeFromBackground_West.push_back( 0. );
-                fExcludeFromBackground_StarID.push_back( -1 );
-		fExcludeFromBackground_StarName.push_back( "" );
-		fExcludeFromBackground_StarBrightness_V.push_back( 99. );
-		fExcludeFromBackground_StarBrightness_B.push_back( 99. );
+                fExclusionRegions.back()->fExcludeFromBackground_Radius = (double)atof( temp2.c_str() );
             }
-
             else if( temp == "ENERGYBINSIZE" ) fEnergySpectrumBinSize = atof( temp2.c_str() );
             else if( temp == "ENERGYMINFIT" ) fEnergyFitMin = atof( temp2.c_str() );
             else if( temp == "ENERGYMAXFIT" ) fEnergyFitMax = atof( temp2.c_str() );
@@ -963,20 +941,21 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         cout << ", sky maps centred at (ra,dec) (" << fSkyMapCentreRAJ2000 << ", " << fSkyMapCentreDecJ2000 << ")";
         cout << ", target shift: (N" << fRunList[i].fTargetShiftNorth << ", W" << fRunList[i].fTargetShiftWest << ")";
 	cout << " (RA/DEC)_J2000 [" << fRunList[i].fTargetShiftRAJ2000 << ", " << fRunList[i].fTargetShiftDecJ2000 << "]" <<  endl;
-        if( fExcludeFromBackground_North.size() > 0 && fExcludeFromBackground_West.size() > 0 && fExcludeFromBackground_Radius.size() > 0 )
+	if( fExclusionRegions.size() > 0 )
         {
             cout << "\t region excluded from background estimation: " << endl;
-            for( unsigned int l = 0; l < fExcludeFromBackground_North.size(); l++ )
+            for( unsigned int l = 0; l < fExclusionRegions.size(); l++ )
             {
+	        if( !fExclusionRegions[l] ) continue;
                 cout << "\t       ";
-                cout << (l+1) << ":region to exclude: (N " << fExcludeFromBackground_North[l];
-		cout <<                             ", W " << fExcludeFromBackground_West[l];
-		cout << ", R " << fExcludeFromBackground_Radius[l] << ", ID " << fExcludeFromBackground_StarID[l];
-		if( fExcludeFromBackground_StarName[l].size() > 0 )
+                cout << (l+1) << ":region to exclude: (N " << fExclusionRegions[l]->fExcludeFromBackground_North;
+		cout <<                             ", W " << fExclusionRegions[l]->fExcludeFromBackground_West;
+		cout << ", R " << fExclusionRegions[l]->fExcludeFromBackground_Radius << ", ID " << fExclusionRegions[l]->fExcludeFromBackground_StarID;
+		if( fExclusionRegions[l]->fExcludeFromBackground_StarName.size() > 0 )
 		{
-		   cout << " (" << fExcludeFromBackground_StarName[l] << ")";
+		   cout << " (" << fExclusionRegions[l]->fExcludeFromBackground_StarName << ")";
                 }
-                if( l <= fExcludeFromBackground_North.size() - 1 ) cout << " )"<< endl;;
+                if( l <= fExclusionRegions.size() - 1 ) cout << " )"<< endl;;
             }
         }
         cout << "\t number of telescopes: " << fRunList[i].fNTel << endl;
@@ -1417,16 +1396,16 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
     tEx.Branch( "Vmag", &iStarBrightness_V, "Vmag/F" );
     tEx.Branch( "Bmag", &iStarBrightness_B, "Bmag/F" );
 
-    for( unsigned int i = 0; i < fExcludeFromBackground_North.size(); i++ )
+    for( unsigned int i = 0; i < fExclusionRegions.size(); i++ )
     {
-        x = fExcludeFromBackground_West[i];
-        y = fExcludeFromBackground_North[i];
-        r = fExcludeFromBackground_Radius[i];
-	decJ2000 = fExcludeFromBackground_DecJ2000[i];
-	raJ2000 = fExcludeFromBackground_RAJ2000[i];
-        id = fExcludeFromBackground_StarID[i];
-	iStarBrightness_V = fExcludeFromBackground_StarBrightness_V[i];
-	iStarBrightness_B = fExcludeFromBackground_StarBrightness_B[i];
+        x = fExclusionRegions[i]->fExcludeFromBackground_West;
+        y = fExclusionRegions[i]->fExcludeFromBackground_North;
+        r = fExclusionRegions[i]->fExcludeFromBackground_Radius;
+	decJ2000 = fExclusionRegions[i]->fExcludeFromBackground_DecJ2000;
+	raJ2000 = fExclusionRegions[i]->fExcludeFromBackground_RAJ2000;
+        id = fExclusionRegions[i]->fExcludeFromBackground_StarID;
+	iStarBrightness_V = fExclusionRegions[i]->fExcludeFromBackground_StarBrightness_V;
+	iStarBrightness_B = fExclusionRegions[i]->fExcludeFromBackground_StarBrightness_B;
 
         tEx.Fill();
     }
@@ -1436,6 +1415,11 @@ bool VAnaSumRunParameter::writeListOfExcludedSkyRegions()
     return true;
 }
 
+/*
+
+    read list of exclusion regions from a anasum file
+
+*/
 bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile *f )
 {
     if( !f ) return false;
@@ -1446,6 +1430,8 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile *f )
     float x = 0.;
     float y = 0.;
     float r = 0.;
+    float decJ2000 = 0.;
+    float raJ2000 = 0.;
     int id = 0;
     float iV = 0.;
     float iB = 0.;
@@ -1453,21 +1439,43 @@ bool VAnaSumRunParameter::getListOfExcludedSkyRegions( TFile *f )
     tEx->SetBranchAddress( "y", &y);
     tEx->SetBranchAddress( "r", &r);
     tEx->SetBranchAddress( "star_id", &id);
+    if( tEx->GetBranch( "decj2000" ) ) tEx->SetBranchAddress( "decj2000", &decJ2000 );
+    if( tEx->GetBranch( "raj2000" ) ) tEx->SetBranchAddress( "raj2000", &raJ2000 );
     if( tEx->GetBranch( "Vmag" ) ) tEx->SetBranchAddress( "Vmag", &iV );
     if( tEx->GetBranch( "Bmag" ) ) tEx->SetBranchAddress( "Bmag", &iB );
 
     for ( unsigned int i = 0; i < tEx->GetEntries(); i++ )
     {
         tEx->GetEntry(i);
-        fExcludeFromBackground_West.push_back(x);
-        fExcludeFromBackground_North.push_back(y);
-        fExcludeFromBackground_Radius.push_back(r);
-        fExcludeFromBackground_StarID.push_back(id);
-	fExcludeFromBackground_StarBrightness_V.push_back( iV );
-	fExcludeFromBackground_StarBrightness_B.push_back( iB );
+	fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
+        fExclusionRegions.back()->fExcludeFromBackground_West = x;
+        fExclusionRegions.back()->fExcludeFromBackground_North = y;
+        fExclusionRegions.back()->fExcludeFromBackground_Radius = r;
+        fExclusionRegions.back()->fExcludeFromBackground_StarID = id;
+	fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = decJ2000;
+	fExclusionRegions.back()->fExcludeFromBackground_RAJ2000  = raJ2000;
+	fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_V = iV;
+	fExclusionRegions.back()->fExcludeFromBackground_StarBrightness_B = iB;
     }
 
     delete tEx;
 
     return true;
+}
+
+//==================================================================================
+// list of exclusion regions
+//==================================================================================
+
+VAnaSumRunParameterListOfExclusionRegions::VAnaSumRunParameterListOfExclusionRegions()
+{
+    fExcludeFromBackground_West  = -9999.;
+    fExcludeFromBackground_North = -9999.;
+    fExcludeFromBackground_Radius = 0.;
+    fExcludeFromBackground_StarID = -1;
+    fExcludeFromBackground_StarName = "";
+    fExcludeFromBackground_DecJ2000 = -9999.;
+    fExcludeFromBackground_RAJ2000  = -9999.;
+    fExcludeFromBackground_StarBrightness_V = -9999.;
+    fExcludeFromBackground_StarBrightness_B = -9999.;
 }
