@@ -590,7 +590,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VInstrumentResponseFunctionReader.o ./obj/VInstrumentResponseFunctionReader_Dict.o \
 		./obj/VPlotInstrumentResponseFunction.o ./obj/VPlotInstrumentResponseFunction_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
-		./obj/VAtmosphereSoundings.o ./obj/VAtmosphereSoundings_Dict.o \
+		./obj/VAtmosphereSoundings.o ./obj/VAtmosphereSoundings_Dict.o\
+		./obj/VAtmosphereSoundingData.o \
 		./obj/VPlotSensitivityfromLisFiles.o ./obj/VPlotSensitivityfromLisFiles_Dict.o \
 		./obj/VPlotMonteCarloQualityFactor.o ./obj/VPlotMonteCarloQualityFactor_Dict.o \
 		./obj/VPlotAnasumHistograms.o ./obj/VPlotAnasumHistograms_Dict.o \

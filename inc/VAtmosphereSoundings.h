@@ -4,6 +4,7 @@
 #define VAtmosphereSoundings_H
 
 #include "VASlalib.h"
+#include "VAtmosphereSoundingData.h"
 
 #include "TCanvas.h"
 #include "TFile.h"
@@ -25,39 +26,6 @@
 
 using namespace std;
 
-class VAtmosphereSoundingData
-{
-   public:
-
-    double MJD;
-    int Year;
-    int Month;
-    int Day;
-    double Hour;
-    string Name;
-    vector< double > fPressure_Pa;
-    vector< double > fHeight_m;
-    vector< double > fDensity_gcm3;
-    vector< double > fThickness_gcm2;
-    vector< double > fTemperature_K;
-    vector< double > fDewPoint_K;
-    vector< double > fRelativeHumidity;
-    vector< double > fVaporMassDensity_gm3;
-    vector< double > fMixingRatio_gkg;
-    vector< double > fWindDirection_deg;
-    vector< double > fWindSpeed_ms;
-    vector< double > fIndexofRefraction;
-    vector< double > fO2_cmkm;
-    vector< double > fO3_cmkm;
-    int PlotColor;
-    int PlotMarker;
-    int PlotLineStyle;
-    Width_t PlotLineWidth;
-
-    VAtmosphereSoundingData();
-   ~VAtmosphereSoundingData() {}
-    void setdefaultvalues( unsigned int iN );
-};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,8 +64,13 @@ class VAtmosphereSoundings
 
 // data containers
     vector< VAtmosphereSoundingData* > fData;                         // profile from soundings data
+    vector< VAtmosphereSoundingData* > fDataInterpol;
     vector< VAtmosphereSoundingData* > fDataCORSIKAMODTRAN;           // CORSIKA/MODTRAN profile
     vector< VAtmosphereSoundingData* > fDataUserProfile;              // user created profile
+    vector< VAtmosphereSoundingData* > fAverageProfile;              // user created profile, henrikes method
+
+    vector <double> fHeights;
+    vector <double> fModtranHeights;
 
 // periods to calculate average over
     map< unsigned int, string > fPlottingPeriodFiles;
@@ -205,6 +178,33 @@ class VAtmosphereSoundings
     bool     write_CORSIKA_UserProfile( unsigned int iMODTRANIndex, unsigned int atmprofmodel, string iName = "user profile" );
     bool     write_MODTRAN_UserProfile( unsigned int iIndexUserData, unsigned int defaultModel = 6, bool iWriteDewPoint = false );
     bool     writeRootFile( string iFile );
+
+    bool push_average_atmosphere( string name, vector<int> *years, vector<int> *months, vector<int> *days , vector<int> *hours  ,unsigned int nMinPoints, int nMinFlights );  
+    bool DateInRange(  VAtmosphereSoundingData * Data, vector<int> *years, vector<int> *months, vector<int> *days, vector<int> *hours ,unsigned int nMinPoints );
+    VAtmosphereSoundingData * DefaultWinterAtmosphere( string name="winter", string opt="") ;
+    VAtmosphereSoundingData * DefaultSummerAtmosphere( string name="summer", string opt="") ;
+    VAtmosphereSoundingData * MeanMonthlyAtmosphere( int month, string name, string opt, int yearMin, int yearMax);
+    VAtmosphereSoundingData * OneFlightAtmosphere( int year, int month, int day, int hour, string name, string opt);
+
+    double Interpolate( vector<double> raw, vector<double> raw_heights, vector<double> &result, string opt, double h);
+    double safe_eval( TGraph * g, double h, string opt);
+
+	VAtmosphereSoundingData * make_interpolated_atmosphere( VAtmosphereSoundingData * RawData);
+	void make_interpolated_atmospheres();
+    void setModtranHeights();
+    vector<double> getModtranHeights() {return fModtranHeights; }
+    vector<double> getHeights() { return fHeights; }
+    void setHeights( vector<double> heights ) { fHeights=heights; }
+    void setHeights( double min=0.0, double max=40000.0, double step=100.0 ) {  fHeights.clear(); for(double h=min; h<=max; h+=step) fHeights.push_back(h); } 
+
+    VAtmosphereSoundingData * getData(unsigned int i) 		{ return i>=fData.size()		? 	0	:	fData.at(i);			}
+    VAtmosphereSoundingData * getDataInterpol(unsigned int i)	{ return i>=fDataInterpol.size()	? 	0	:	fDataInterpol.at(i);		}
+    VAtmosphereSoundingData * getDataMODTRAN(unsigned int i)	{ return i>=fDataCORSIKAMODTRAN.size()	? 	0	:	fDataCORSIKAMODTRAN.at(i);	}
+    VAtmosphereSoundingData * getDataUserProfile(unsigned int i){ return i>=fDataUserProfile.size()	? 	0	:	fDataUserProfile.at(i);		}
+    VAtmosphereSoundingData * getAverageProfile(unsigned int i)	{ return i>=fAverageProfile.size()	? 	0	:	fAverageProfile.at(i);		}
+
+	bool write_2C1( unsigned int iIndexAverageData, string filename, double max_height );
+
 };
 
 #endif
