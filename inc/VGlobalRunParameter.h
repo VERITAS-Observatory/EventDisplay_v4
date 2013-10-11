@@ -79,8 +79,8 @@ class VGlobalRunParameter
    static string       getSVN_VERSION() { return fEVNDISP_SVNREVISION; }
    string       getObservatory()                { return fObservatory; }
    double       getObservatory_Height_m()       { return fObservatory_Height_m; }
-   double       getObservatory_Latitude_deg()    { return fObservatory_Latitude_deg; }
-   double       getObservatory_Longitude_deg()    { return fObservatory_Longitude_deg; }
+   static double       getObservatory_Latitude_deg()    { return fObservatory_Latitude_deg; }
+   static double       getObservatory_Longitude_deg()    { return fObservatory_Longitude_deg; }
    string       getRawDataServer() const         { return fRawDataServer; }
    void         printGlobalRunParameter();
    bool         readRunparameterFile( string iFile );

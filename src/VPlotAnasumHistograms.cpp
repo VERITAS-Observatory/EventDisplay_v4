@@ -1621,9 +1621,13 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c, int iLineColor )
     float x = 0.;
     float y = 0.;
     float r = 0.;
+    float Vmag = 0.;
+    float Bmag = 0.;
     t->SetBranchAddress( "x", &x );
     t->SetBranchAddress( "y", &y );
     t->SetBranchAddress( "r", &r );
+    t->SetBranchAddress( "Vmag", &Vmag );
+    t->SetBranchAddress( "Bmag", &Bmag );
 
     double iSign = 1.;
     TH2D *h = (TH2D*)c->GetListOfPrimitives()->FindObject( "hmap_stereo_sig_REFLECTED" );
@@ -1636,6 +1640,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c, int iLineColor )
         e->SetFillStyle( 0 );
         e->SetLineColor( iLineColor );
         e->Draw();
+	cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ")" << endl;
     }
     if( f1 ) f1->Close();
 }

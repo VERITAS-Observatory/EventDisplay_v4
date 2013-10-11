@@ -317,3 +317,23 @@ double VSkyCoordinatesUtilities::angularDistance( double Az, double Ze, double T
     return value;
 }
 
+void VSkyCoordinatesUtilities::getEquatorialCoordinates( int MJD, double time, double az_deg, double ze_deg, double &dec_deg, double &ra_deg )
+{
+    double ha = 0.;
+// transform coordinates
+    slaDh2e( az_deg/TMath::RadToDeg(), (90.-ze_deg)/TMath::RadToDeg(), VGlobalRunParameter::getObservatory_Latitude_deg(), &ha, &dec_deg );
+// convert hour angle into ra
+    double iTime = 0.;
+    double iSid = 0.;
+// convert time to fraction of a day
+    iTime = time / 86400.;
+// get Greenwich sideral time
+    iSid = slaGmsta( (double)MJD, iTime );
+// calculate local sideral time
+    iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg();
+// calculate right ascension
+    ra_deg = slaDranrm( iSid - ha );
+
+    dec_deg *= TMath::RadToDeg();
+    ra_deg  *= TMath::RadToDeg();
+}

@@ -221,7 +221,8 @@ void VSkyCoordinates::getEquatorialCoordinates( int MJD, double time, double az,
         ra  = fTelRA;
         return;
     }
-    double ha = 0.;
+    VSkyCoordinatesUtilities::getEquatorialCoordinates( MJD, time, az, ze, dec, ra );
+/*    double ha = 0.;
 // transform coordinates
     slaDh2e( az/TMath::RadToDeg(), (90.-ze)/TMath::RadToDeg(), fObsLatitude, &ha, &dec );
 // convert hour angle into ra
@@ -237,7 +238,7 @@ void VSkyCoordinates::getEquatorialCoordinates( int MJD, double time, double az,
     ra = slaDranrm( iSid - ha );
 
     dec *= TMath::RadToDeg();
-    ra  *= TMath::RadToDeg();
+    ra  *= TMath::RadToDeg(); */
 }
 
 /*
