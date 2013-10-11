@@ -139,6 +139,8 @@ Display options:
 	 -plotraw 				 fast plotting without pedestals/gains/toffsets
 	 -plotpaper 				 clean plots for talks/papers (no dead channels, no small text, ..., default=false)
 	 -plotmethod=INT 			 results of this array reconstrutions are shown in 'all in one' display (default=0)
+	 -starcatalogue Hipparcos_MAG8_1997.dat  plot stars into the display
+	 -starbrightness=float                   plot stars brighter than the given B magnitude
 
 Simulations: 
 -------------

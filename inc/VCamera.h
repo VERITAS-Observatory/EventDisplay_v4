@@ -127,6 +127,7 @@ class VCamera
         void           drawMuonResults();         //!< draw muon analysis results Martin
         void           drawAnaResults();          //!< draw analysis results in form of ellipse
         void           drawEventText();           //!< draw basic event info and analysis results
+	void           drawStarsInFOV();
                                                   //!< get maximum, exclude dead channels
         double         getMax( valarray<double>& );
                                                   //!< get minimum, exclude dead channels

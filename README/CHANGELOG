@@ -1,18 +1,33 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130911 (GM) plotting of stars in display:
+                select this option on the command line with
+		-starcatalogue 
+		(or select any other stars)
+		-starbrightness=7
+		(plot all stars with B-magnitude brighter than 7)
+
+* 20130910 (GM) bug fix in crate jitter calculation: channel 499 was 
+                excluded from calculation and always set to 0. This is
+		corrected now (although trace sum for this L2 channel
+		is still not corrected; it is needed for debugging only)
+
+* 20130910 (GM) minor version change - 4.28 - reverted changed for 3D model
+
 * 20130906 (GM) minor version change - 4.27 - reverted changed for 3D model
 
 * 20130904 (JG) merging of 3D model with main trunk - tests still pending
 
 * 20130925 (GM) bug fix: background rate per sqr degree calculation in 
-                sensitivity section was wrong
+                sensitivity section was wrong (CTA only)
 
 * 20130923 (GM) added several CTA requirements values from
                 MAN-PO/121004
 
 * 21030918 (GM) improved settings of centroid limits for LL
                 fitting procedure (VImageParameterCalculation)
+		This improves the fitting of images on the edge of the FOV
 
 * 20130831 (GM) many changes in CTA scripts to allow 
                 easy comparision of north/south
@@ -21,12 +36,14 @@ Change log eventdisplay analysis package
                 plotter (+FOM, etc)
 
 * 20130826 (GM) bug fix in L2 trigger type setting (was always set
-                to any trigger condition)
+                to any trigger condition; CTA only)
 
 * 20130820 (GM) added binary visibility tool (experimental status)
                 needs libnova external package
 
 * 20130819 (GM) added Fitstat variable to data tree (mscw_energy)
+                This variable gives feedback on the status of the LL fit
+		for images on the edge of the FOV
 
 * 20130819 (GM) data/MC comparison: single tel distribution are filled
                 from selected events only; improved plotting of comparison
@@ -50,7 +67,7 @@ Change log eventdisplay analysis package
 * 20130802 (GM) corrected any-trigger condition for CTA prod2
                 (failed before)
 
-* 20130801 (GM) remove dead time calculation for MC
+* 20130801 (GM) removed dead time calculation for MC
 
 * 20130801 (GM) added class for plotting of CTA sensitivity requirements
                 small improvements in sensitivity plotting
@@ -67,7 +84,8 @@ Change log eventdisplay analysis package
 * 21030719 (GM) ignore now exclusion regions while filling
                 significance distributions from sky maps
 
-* 20130718 (GM) added mpv determination in lookup table filling
+* 20130718 (GM) added mpv (most probably value) determination
+                in lookup table filling
                 (important for low-energy bins with asymmetric 
 		 distribution in energy)
 

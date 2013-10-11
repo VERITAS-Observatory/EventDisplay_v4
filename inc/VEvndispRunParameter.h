@@ -223,6 +223,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool fPlotPaper;                          // clean up plots for papers and talks (no dead channels, no small text, ...)
         unsigned int fPlotAllInOneMethod;         // from which method are the angular reconstruction results to taken to plot in all in one window
 
+// star catalogue
+        string fStarCatalogueName;
+	int    fMinStarBrightness_B;
+
 // muon parameters
         bool fmuonmode;                           // search for complete muon rings, Martin
  // Hough transform muon parameters
@@ -254,12 +258,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void printCTA_DST();
 
         VEvndispRunParameter( bool bSetGlobalParameter = true );
-        ~VEvndispRunParameter() {}
+       ~VEvndispRunParameter() {}
 
 	bool         doFADCAnalysis() { return fperformFADCAnalysis; }
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,130); //(increase this number)
+        ClassDef(VEvndispRunParameter,131); //(increase this number)
 };
 #endif

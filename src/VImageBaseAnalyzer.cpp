@@ -231,61 +231,60 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 	   if( i < fReader->getMaxChannels() )
 	   {
 	       i_channelHitID = fReader->getHitID(i);
-	       if( i_channelHitID < getZeroSuppressed().size() && !getZeroSuppressed()[i_channelHitID] )
+	       if( i_channelHitID < getZeroSuppressed().size() && getZeroSuppressed()[i_channelHitID] ) continue;
+	       
+	       fReader->selectHitChan((uint32_t)i);
+	       if( i_channelHitID < getPeds().size() )
 	       {
-		  fReader->selectHitChan((uint32_t)i);
-		  if( i_channelHitID < getPeds().size() )
-		  {
-		      fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
-		  }
+		   fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
+	       }
 // take pedestal from another FADC trig channel
-		  else if( iPedFADCTrigChan < getPeds().size() && !getZeroSuppressed()[iPedFADCTrigChan] )
-		  {
-		      fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[iPedFADCTrigChan], getPedrms()[iPedFADCTrigChan], i_channelHitID, i, 0. );
-		      i_channelHitID = fReader->getHitID( i );
-		  }
-		  else continue;
-		  fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
+	       else if( iPedFADCTrigChan < getPeds().size() && !getZeroSuppressed()[iPedFADCTrigChan] )
+	       {
+		   fTraceHandler->setTrace( fReader, getNSamples(),getPeds()[iPedFADCTrigChan], getPedrms()[iPedFADCTrigChan], i_channelHitID, i, 0. );
+		   i_channelHitID = fReader->getHitID( i );
+	       }
+	       else continue;
+	       fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
 // calculate t0
-		  if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
-		  {
-		      crateTZero=fTraceHandler->getPulseTiming(0,getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
-		      if( i_channelHitID < getHiLo().size() && getHiLo()[i_channelHitID] ) crateTZero = 0.;
-		  }
-		  getFADCstopTZero()[t] = crateTZero;
+	       if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
+	       {
+		   crateTZero=fTraceHandler->getPulseTiming(0,getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
+		   if( i_channelHitID < getHiLo().size() && getHiLo()[i_channelHitID] ) crateTZero = 0.;
+	       }
+	       getFADCstopTZero()[t] = crateTZero;
 // calculate offsets
-		  if( t > 0 )
-		  {
-		     if( getFADCstopTZero()[0] > 0. ) offset = getFADCstopTZero()[0] - crateTZero;
-		     else                             offset = 0.;
-		     unsigned int iC_start = 0;
-		     unsigned int iC_stop =  0;
+	       if( t > 0 )
+	       {
+		  if( getFADCstopTZero()[0] > 0. ) offset = getFADCstopTZero()[0] - crateTZero;
+		  else                             offset = 0.;
+		  unsigned int iC_start = 0;
+		  unsigned int iC_stop =  0;
 // crate 2
-		     if( t == 1 )
-		     {
-			iC_start = 130;
-			iC_stop =  250;
-		     }
+		  if( t == 1 )
+		  {
+		     iC_start = 130;
+		     iC_stop =  250;
+		  }
 // crate 3
-		     else if( t == 2 )
-		     {
-			iC_start = 250;
-			iC_stop =  380;
-		     }
+		  else if( t == 2 )
+		  {
+		     iC_start = 250;
+		     iC_stop =  380;
+		  }
 // crate 4
-		     else if( t == 3 )
-		     {
-			iC_start = 380;
-			iC_stop =  getTZeros().size();
-		     }
+		  else if( t == 3 )
+		  {
+		     iC_start = 380;
+		     iC_stop =  getTZeros().size();
+		  }
 // apply offset
-		     for( unsigned int j= iC_start; j < iC_stop; j++ )
-		     {
-			if( j != i ) setPulseTimingCorrection( j, offset );
-			getFADCStopOffsets()[j] = offset;
-		     } 
-                  }
-               } 
+		  for( unsigned int j= iC_start; j < iC_stop; j++ )
+		  {
+		     if( j != i ) setPulseTimingCorrection( j, offset );
+		     getFADCStopOffsets()[j] = offset;
+		  } 
+	       }
 	   }
        }
        catch(...)
@@ -450,9 +449,9 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
             }
             continue;
         }
-        if( i_channelHitID >= ndead_size ) continue;
+/////////////////////////////////////////////////////////////////
 // calculate tzero and sums for good channels only
-        if(!getDead(getHiLo()[i_channelHitID])[i_channelHitID])
+        if( i_channelHitID < ndead_size && !getDead(getHiLo()[i_channelHitID])[i_channelHitID])
         {
 // initialize trace handler
 	    fTraceHandler->setTrace( fReader, getNSamples(), 
@@ -522,7 +521,9 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
                 setTraceNorm( i_channelHitID, fTraceHandler->getTraceNorm() );
             }
         }
+/////////////////////////////////////////////////////////////////
 // calculate size of FADC stop channel
+// (note that this does not catch FADC stop channels in channel 499)
         else
         {
             for( unsigned int c = 0; c < getFADCstopTrig().size(); c++ )

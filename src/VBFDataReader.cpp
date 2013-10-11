@@ -69,7 +69,7 @@ bool VBFDataReader::getNextEvent()
 // check if this is a simulation header
             if( pack->hasSimulationHeader() )
 	    {
-	       printSimulationHeader( pack );
+	       printSimulationHeader( pack, false );
 	       fMonteCarloHeader = fillSimulationHeader( pack );
             }
 

@@ -19,6 +19,7 @@
 #include <VPEReader.h>
 #include <VEvndispRunParameter.h>
 #include <VFitTraceHandler.h>
+#include <VStarCatalogue.h>
 #include <VShowerParameters.h>
 #include <VFrogParameters.h>
 //#include <VFrogImageData.h>
@@ -139,6 +140,9 @@ class VEvndispData
 
 // names of dead channels
         static vector< string > fDeadChannelText;
+
+// star catalogue
+        static VStarCatalogue *fStarCatalogue;
 
     public:
         VEvndispData();
@@ -274,6 +278,7 @@ class VEvndispData
         double              getTemplateMuMax() { return fAnaData[fTelID]->fTemplateMu.max(); }
 	unsigned int        getLargestSumWindow();
 	unsigned int        getLargestSumWindow( unsigned int iTelID );
+        VStarCatalogue*     getStarCatalogue() { return fStarCatalogue; }
         unsigned int        getSumWindow() { return checkSummationWindow( fTelID, fRunPar->fsumwindow_1[fTelID] ); }
         unsigned int        getSumWindow_2() { return checkSummationWindow( fTelID, fRunPar->fsumwindow_2[fTelID] ); }
 	unsigned int        getSumWindow_Pass1() { return checkSummationWindow( fTelID, fRunPar->fsumwindow_pass1[fTelID] ); }
@@ -342,6 +347,7 @@ class VEvndispData
                                                   //!< set pointer to data reader
         bool                initializeDataReader();
         bool                initializeDeadChannelFinder();
+	bool                initializeStarCatalogue( int iMJD, double iTime );
         bool                isMC() { return getReader()->isMC(); }
 	bool                isDST_MC() { if( isMC() && (fRunPar->fsourcetype == 4 || fRunPar->fsourcetype == 7) ) return true; else return false; }
 	bool                isTeltoAna( unsigned int iTel );

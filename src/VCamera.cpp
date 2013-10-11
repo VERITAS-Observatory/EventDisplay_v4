@@ -491,6 +491,9 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 // draw bottom line with results from image calculation
         drawEventText();
 
+// draw stars in field of view
+        drawStarsInFOV();
+
     }
 //   fCanvas->Update();
     fEventCounter++;
@@ -1556,6 +1559,64 @@ double VCamera::convertY( double i_y, double i_off )
     if( fBoolAllinOne ) iDist_edge = fmax_dist_edge * 0.9;
     if( iDist_edge == 0. ) return 0.;
     return ( i_y / iDist_edge * fmaxPlot + i_off);
+}
+
+/*
+
+   draw a marker for each star in the FOV
+
+*/
+void VCamera::drawStarsInFOV()
+{
+// check if star catalogue is available
+   if( !fData->getStarCatalogue() ) return;
+
+// get pointing of telescope
+   float iTel_dec = 0.;
+   float iTel_ra  = 0.;
+   if( fTelescope < fData->getPointing().size() )
+   {
+      iTel_dec = fData->getPointing()[fTelescope]->getTelDec() * TMath::RadToDeg();
+      iTel_ra  = fData->getPointing()[fTelescope]->getTelRA() * TMath::RadToDeg();
+   }
+   else
+   {
+      iTel_dec = fData->getArrayPointing()->getTelDec() * TMath::RadToDeg();
+      iTel_ra  = fData->getArrayPointing()->getTelRA() * TMath::RadToDeg();
+   }
+   double iScale = 1.;
+   if( fTelescope < fData->getDetectorGeometry()->getCameraScaleFactor().size() )
+   {
+      iScale = fData->getDetectorGeometry()->getCameraScaleFactor()[fTelescope];
+   }
+
+   vector< VStar* > iStar = fData->getStarCatalogue()->getListOfStarsinFOV();
+
+// draw a marker for each star
+   double x_rot = 0.;
+   double y_rot = 0.;
+   char hname[200];
+   for( unsigned int i = 0; i < iStar.size(); i++ )
+   {
+       if( iStar[i] && iStar[i]->fBrightness_B < fData->getRunParameter()->fMinStarBrightness_B )
+       {
+	  double y = -1. * ( iStar[i]->fDecCurrentEpoch - iTel_dec);
+	  double x = 0.;
+	  if( cos( iTel_dec * TMath::DegToRad() ) != 0. ) x = -1. * ( iStar[i]->fRACurrentEpoch - iTel_ra) / cos( iTel_dec * TMath::DegToRad() );
+	  fData->getArrayPointing()->derotateCoords( fData->getEventMJD(), fData->getEventTime(), x, y, x_rot, y_rot );
+
+	  TMarker *iM = new TMarker( convertX( -1.*x_rot*iScale), convertY( y_rot*iScale), 5 );
+	  iM->SetMarkerColor( 2 );
+	  iM->Draw();
+          sprintf( hname, "BMAG %.1f", iStar[i]->fBrightness_B );
+	  TText *iT = new TText( convertX( -1.*x_rot ), convertY( y_rot ), hname );
+	  iT->SetTextAngle( 45. );
+	  iT->SetTextSize( 0.0175 );
+	  iT->SetTextColor( 2 );
+	  iT->Draw();
+       }
+   }
+
 }
 
 

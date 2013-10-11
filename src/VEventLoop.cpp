@@ -373,7 +373,6 @@ bool VEventLoop::initEventLoop( string iFileName )
 ///////////////////////////////////////////////////////////////////////////////////////////
     if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
     {
-	cout << "A " << fRunPar->fTargetName << "\t" << fRunPar->fTargetDec << endl;
 	if( !fArrayPointing->setTarget( fRunPar->fTargetName ) )
 	{
 	      cout << endl;

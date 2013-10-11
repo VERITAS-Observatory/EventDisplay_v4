@@ -802,6 +802,25 @@ ULong64_t VEvndispData::getTelType( unsigned int iTelID )
     return 99999;
 }
 
+bool VEvndispData::initializeStarCatalogue( int iMJD, double iTime )
+{
+    if( getRunParameter()->fStarCatalogueName.size() > 0 )
+    {
+       double i_MJD = (double)iMJD + iTime / 86400.;
+       fStarCatalogue = new VStarCatalogue();
+       if( !fStarCatalogue->init( i_MJD, getRunParameter()->fStarCatalogueName ) ) return false;
+       double iMaxFOV = 0.;
+       for( unsigned int i = 0; i < getDetectorGeometry()->getFieldofView().size(); i++ )
+       {
+           if( getDetectorGeometry()->getFieldofView()[i] > iMaxFOV ) iMaxFOV = getDetectorGeometry()->getFieldofView()[i];
+       }
+       iMaxFOV *= 1.5;
+       fStarCatalogue->setFOV( getArrayPointing()->getTelRA()*TMath::RadToDeg(), getArrayPointing()->getTelDec()*TMath::RadToDeg(), 
+                               iMaxFOV/2., iMaxFOV/2., false );
+    }
+    return true;
+}
+
 
 bool VEvndispData::fDebug = false;
 int VEvndispData::fDebugLevel = 0;
@@ -882,3 +901,6 @@ vector< string > VEvndispData::fDeadChannelText;
 
 //  default pedestals for plotraw option
 valarray<double> VEvndispData::fPlotRawPedestals;
+
+// star catalogues
+VStarCatalogue* VEvndispData::fStarCatalogue = 0;

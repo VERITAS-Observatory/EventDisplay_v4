@@ -320,6 +320,8 @@ void VArrayAnalyzer::initAnalysis()
     fMeanPointingMismatch.assign( getNTel(), 0. );
     fNMeanPointingMismatch.assign( getNTel(), 0. );
 
+    initializeStarCatalogue( getEventMJD(), getEventTime() );
+
 // loop over all methods and read in necessary MLPs, TMVAs, tables, etc....
     for( unsigned int i = 0; i < getShowerParameters()->fNMethods; i++ )
     {

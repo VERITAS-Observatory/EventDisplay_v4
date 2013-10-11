@@ -255,6 +255,19 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
             else    fRunPara->fdstfile = "dstfile.root";
         }
+// star catalogue
+        else if( iTemp.find( "starcatalogue" ) < iTemp.size() )
+        {
+	    if( iTemp2.size() > 0 )
+	    {
+	       fRunPara->fStarCatalogueName = iTemp2;
+	       i++;
+            }
+        }
+	else if( iTemp.find( "starbrightness" ) < iTemp.size() )
+	{
+	    fRunPara->fMinStarBrightness_B = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        }
 // write all pixel to dst file
         else if( iTemp.find( "dstallpixel" ) < iTemp.size() )
         {

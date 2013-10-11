@@ -59,6 +59,7 @@ class VSkyCoordinates
         VSkyCoordinates();
        ~VSkyCoordinates();
 
+        void   derotateCoords( int MJD, double time, double i_xin, double i_yin, double & i_xout, double & i_yout);
         void   derotateCoords( double i_UTC, double i_xin, double i_yin, double & i_xout, double & i_yout);
         double getDerotationAngle(double i_UTC);
         void   getEquatorialCoordinates( int MJD, double time, double az, double ze, double &dec, double &ra );
@@ -75,8 +76,8 @@ class VSkyCoordinates
         double getTargetAzimuth()   { return fTargetAzimuth; }
         double getTelAzimuth()      { return fTelAzimuth; }
         double getTelElevation()    { return fTelElevation; }
-        double getTelDec() { return fTelDec*TMath::DegToRad(); }
-        double getTelRA() { return fTelRA*TMath::DegToRad(); }
+        double getTelDec() { return fTelDec; }
+        double getTelRA() { return fTelRA; }
         double getTelLatitude() { return fObsLatitude*TMath::RadToDeg(); }
         double getTelLongitude() { return fObsLongitude*TMath::RadToDeg(); }
 	VStarCatalogue* getStarCatalogue() { return fStarCatalogue; }

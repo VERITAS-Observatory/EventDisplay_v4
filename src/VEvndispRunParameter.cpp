@@ -103,7 +103,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fWobbleNorth = 0.;
     fWobbleEast = 0.;
     fCheckPointing = 999.;
-
 #ifdef RUNWITHDB
     fDBTracking = true;
     fDBCameraRotationMeasurements = true;
@@ -119,6 +118,9 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fPMTextFileDirectory = "";
     fPointingErrorX.push_back( 0. );
     fPointingErrorY.push_back( 0. );
+// star catalogue
+    fStarCatalogueName = "";
+    fMinStarBrightness_B = 7;
 
     fGainCorrection.push_back( 1. );
 
@@ -295,9 +297,9 @@ void VEvndispRunParameter::print( int iEv )
     cout << "File: " << fsourcefile << " (sourcetype " << fsourcetype;
     cout << ")" << endl;
     cout << "===========" << endl;
-    cout << fEventDisplayDate << endl;
+    cout << fEventDisplayDate;
     if( fIsMC) cout << ", MC";
-    if( fEventDisplayUser.size() > 0 ) cout << "User: " << fEventDisplayUser << " ";
+    if( fEventDisplayUser.size() > 0 ) cout << ", User: " << fEventDisplayUser << " ";
     cout << "Host: " << fEventDisplayHost << endl;
     if( fEventDisplayBuildNode.size() > 0 ) cout << fEventDisplayBuildNode << endl;
     if( fEventDisplayBuildArch.size() > 0 ) cout << fEventDisplayBuildArch << "\t";
@@ -421,6 +423,11 @@ void VEvndispRunParameter::print( int iEv )
     if( fMCNdead > 0 ) cout << "Random dead channels: " << fMCNdead << " (seed " <<  fMCNdeadSeed << "), " << fMCNdeadboard << endl;
     if( fPlotPaper ) cout << " (paper plotting mode)";
     cout << endl;
+    if( fStarCatalogueName.size() > 0 )
+    {
+       cout << "reading star catalogue from: " << fStarCatalogueName << endl;
+       cout << "\t minimum brightness (B): " << fMinStarBrightness_B << endl;
+    }
 
     cout << "directories:" << endl;
     cout << "\t analysis data: " << getDirectory_EVNDISPAnaData() << endl;
