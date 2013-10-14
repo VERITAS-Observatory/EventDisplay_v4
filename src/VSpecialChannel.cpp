@@ -157,6 +157,9 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
             }
         }
         is.close();
+//////////////////////////////////////////////////////////////
+// print channels to screen 
+
 // print L2 channels
 	if( getFADCstopTrigChannelID().size() > 0 )
 	{
@@ -172,6 +175,18 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 	   cout << "setting " << fHIGHQE_gainfactor.size() << " HIGHQE gain factors: ";
 	   map< unsigned int, double >::iterator it;
 	   for( it = fHIGHQE_gainfactor.begin(); it != fHIGHQE_gainfactor.end(); it++ )
+	   {
+	      cout << (*it).first << " (" << (*it).second << ") ";
+           }
+	   cout << endl;
+        }
+// print status bit
+        if( fChannelStatus.size() > 0 )
+	{
+	   cout << "Telescope " << getTelID()+1 << ": ";
+	   cout << "setting " << fChannelStatus.size() << " status bits: ";
+	   map< unsigned int, unsigned int >::iterator it;
+	   for( it = fChannelStatus.begin(); it != fChannelStatus.end(); it++ )
 	   {
 	      cout << (*it).first << " (" << (*it).second << ") ";
            }
