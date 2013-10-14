@@ -683,7 +683,7 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
 
    cout << "filling calibration tree ";
    if( ipedfile.size() > 0 ) cout << " (using data from external ped file: " << ipedfile << ")";
-   else                      cout << " (using data from simtelrarray file)";
+   else                      cout << " (using data from simtelarray file)";
    cout << endl;
 
    int fTelID = 0;
