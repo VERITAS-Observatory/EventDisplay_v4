@@ -36,6 +36,8 @@ else
    NOISE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISEV.grisu"
 fi
 
+source $EVNDISPSYS/setObservatory.sh VERITAS
+
 SOPT="-display=1 -runnumber=$RUNN -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISEV"
 
 # default noise levels
