@@ -1,6 +1,16 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20130916 (GM) changed CTA converter so that several simtel
+                files can be read in in one pass
+		(need to increase efficiency for CTA grid analysis)
+
+* 20130912 (GM) switched off random selection of off regions
+                for reflected region model.
+                default is now: choose closest reflection region
+		to source region (due to gradients in sky maps)
+		NEEDS FURTHER TESTING
+
 * 20130911 (GM) plotting of stars in display:
                 select this option on the command line with
 		-starcatalogue 

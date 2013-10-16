@@ -59,6 +59,8 @@ void VMonteCarloRunHeader::reset()
    corsika_low_E_detail = 0;
    corsika_high_E_detail = 0;
    detector_Simulator="NOSET";
+
+   combined_runHeader = false;
 }
 
 bool VMonteCarloRunHeader::VOLUMEDET_set()
@@ -129,6 +131,10 @@ void VMonteCarloRunHeader::print()
     cout << "VOLUMEDET " << EVTH76.test( 5 ) << endl;
     cout << "CURVED " << EVTH76.test( 6 ) << endl;
     cout << "SLANT " << EVTH76.test( 8 ) << endl;
+    if( combined_runHeader )
+    {
+       cout << "(note that this is a MC run header filled from several simulation input files. Some parameters might not be correct for a heterogen mix of simulation files)" << endl;
+    }
     cout << endl << endl;
 }    
 

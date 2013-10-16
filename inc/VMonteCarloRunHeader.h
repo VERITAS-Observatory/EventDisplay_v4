@@ -55,6 +55,7 @@ class VMonteCarloRunHeader : public TNamed
    double corsika_low_high_E;    // transition energy
    /* ... + detector MC specific ... */
    string detector_Simulator;
+   bool combined_runHeader;  // incomplete run header from several simtel input files
 
    VMonteCarloRunHeader();
   ~VMonteCarloRunHeader() {}
@@ -65,6 +66,6 @@ class VMonteCarloRunHeader : public TNamed
    void   reset();
    bool   VOLUMEDET_set();
 
-   ClassDef(VMonteCarloRunHeader,6);
+   ClassDef(VMonteCarloRunHeader,7);
 };
 #endif

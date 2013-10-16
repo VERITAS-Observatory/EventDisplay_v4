@@ -265,10 +265,6 @@ bool read_trigger_mask( string trg_mask_file )
 
 	 trgmask_fill_hashed( tms, fTriggerMask_hash_set );
 
-/*	 for( unsigned int i=0; i<tms->num_entries; i++ )
-	 {
-	    cout << i << "\t" << tms->mask[i].event << "\t" << tms->mask[i].tel_id << "\t" << tms->mask[i].trg_mask << endl;
-	 } */
 	 z++;
        }
        if( z > 1 )
@@ -290,18 +286,28 @@ bool read_trigger_mask( string trg_mask_file )
 }
 
 
-bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata )
+bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata, bool iAddToFirstFile )
 {
-// values from CORSIKA
-   f->runnumber = hsdata->run_header.run;
-   f->shower_prog_id = hsdata->mc_run_header.shower_prog_id;
-   f->shower_prog_vers = hsdata->mc_run_header.shower_prog_vers;
-   f->detector_prog_id = hsdata->mc_run_header.detector_prog_id;
-   f->detector_prog_vers = (unsigned int)hsdata->mc_run_header.detector_prog_vers;
+// values from CORSIKA (from first file)
+   if( !iAddToFirstFile ) 
+   {
+      f->runnumber = hsdata->run_header.run;
+      f->shower_prog_id = hsdata->mc_run_header.shower_prog_id;
+      f->shower_prog_vers = hsdata->mc_run_header.shower_prog_vers;
+      f->detector_prog_id = hsdata->mc_run_header.detector_prog_id;
+      f->detector_prog_vers = (unsigned int)hsdata->mc_run_header.detector_prog_vers;
+      f->obsheight = hsdata->mc_run_header.obsheight;
+   }
 // TODO: add simulation dates from shower and detector simulation
 // (need a compiler flag for backwards compatibility)
-   f->obsheight = hsdata->mc_run_header.obsheight;
-   f->num_showers = hsdata->mc_run_header.num_showers;
+   if( iAddToFirstFile )
+   {
+      f->num_showers += hsdata->mc_run_header.num_showers;
+   }
+   else
+   {
+      f->num_showers = hsdata->mc_run_header.num_showers;
+   }
    f->num_use = hsdata->mc_run_header.num_use;
    f->core_pos_mode = hsdata->mc_run_header.core_pos_mode;
    f->core_range[0] = hsdata->mc_run_header.core_range[0];
@@ -313,8 +319,20 @@ bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata )
    f->diffuse = hsdata->mc_run_header.diffuse;
    f->viewcone[0] = hsdata->mc_run_header.viewcone[0];
    f->viewcone[1] = hsdata->mc_run_header.viewcone[1];
+   if( iAddToFirstFile && f->E_range[0] != hsdata->mc_run_header.E_range[0] )
+   {
+       cout << "DST_fillMCRunheader(): warning, energy range differ, " << f->E_range[0] << ", " << hsdata->mc_run_header.E_range[0] << endl;
+   }
    f->E_range[0] = hsdata->mc_run_header.E_range[0];
+   if( iAddToFirstFile && f->E_range[1] != hsdata->mc_run_header.E_range[1] )
+   {
+       cout << "DST_fillMCRunheader(): warning, energy range differ, " << f->E_range[1] << ", " << hsdata->mc_run_header.E_range[1] << endl;
+   }
    f->E_range[1] = hsdata->mc_run_header.E_range[1];
+   if( iAddToFirstFile && f->spectral_index != hsdata->mc_run_header.spectral_index )
+   {
+       cout << "DST_fillMCRunheader(): warning, energy range differ, " << f->spectral_index << ", " << hsdata->mc_run_header.spectral_index << endl;
+   }
    f->spectral_index = hsdata->mc_run_header.spectral_index;
    f->B_total = hsdata->mc_run_header.B_total;
    f->B_inclination = hsdata->mc_run_header.B_inclination;
@@ -330,6 +348,8 @@ bool DST_fillMCRunheader( VMonteCarloRunHeader *f, AllHessData *hsdata )
    f->corsika_wlen_max = hsdata->mc_run_header.corsika_wlen_max;
    f->corsika_low_E_detail = hsdata->mc_run_header.corsika_low_E_detail;
    f->corsika_high_E_detail = hsdata->mc_run_header.corsika_high_E_detail;
+
+   if( iAddToFirstFile ) f->combined_runHeader = true;
 
    return true;
 }
@@ -1091,13 +1111,11 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
   return fTreeDet;
 }
 
-/* -------------------- main program ---------------------- */
-/** 
- *  @short Main program 
- *
- *  Main program function of read_hess.c program.
- */
+/*
 
+   main program
+
+*/
 int main(int argc, char **argv)
 {
 // stop watch 
@@ -1290,7 +1308,52 @@ int main(int argc, char **argv)
    if ( verbose && !quiet )
       showhistory = 1;
 
-   /* Now go over rest of the command line */
+//////////////////////////////////////////////////////////////////
+// initialize eventdisplay dst and run header
+///////////////////////////////////////////////////////////////////
+
+  cout << endl << "NOTE: FIXED TIMING LEVELS READ FROM HESSIO FILE" << endl << endl;
+
+///////////////////////////////////////////////////////////////////
+// open DST file 
+  TFile *fDSTfile = new TFile( dst_file.c_str(), "RECREATE" );
+  if( fDSTfile->IsZombie() )
+  {
+       cout << "Error while opening DST output file: " << fDSTfile->GetName() << endl;
+       exit( -1 );
+  }
+  cout << "DST tree will be written to " << dst_file << endl;
+  if( fWriteFADC ) cout << "Writing FADC samples to DST file" << endl;
+  else             cout << "No FADC output" << endl;
+  if( fDynamicRange > 0 ) cout << "Assume " << fDynamicRange << " bit dynamic range" << endl;
+  if( fApplyCameraScaling ) cout << "Apply camera plate scaling for DC (intermediate) telescopes" << endl;
+  if( fMinNumber_pe_per_telescope > 0 ) cout << "Add trigger type #4 for events with >" << fMinNumber_pe_per_telescope << " pe per telescope" << endl;
+
+// new DST tree
+  VDSTTree *fDST = new VDSTTree();
+  fDST->setMC();
+  map< unsigned int, float > fTelescope_list = fDST->readArrayConfig( config_file );
+  if( fTelescope_list.size() < 1 )
+  {
+      cout << "error reading array configuration file" << endl;
+      exit( -1 );
+  }
+  fDST->setFADC( fWriteFADC );
+  fDST->initDSTTree( false );
+  fDST->initMCTree();
+
+// MC run header
+  VMonteCarloRunHeader *fMC_header = new VMonteCarloRunHeader();
+  fMC_header->SetName( "MC_runheader" );
+
+// long list of input file names
+  string fRunPara_InputFileName = "";
+  unsigned int fRunPara_NumInputFiles = 0;
+    
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+// Now go over rest of the command line and read input file names
    while ( argc > 1 || input_fname != NULL )
    {
     if ( interrupted )
@@ -1306,6 +1369,7 @@ int main(int argc, char **argv)
 	 argv++;
       }
     }
+
     if ( strcmp(input_fname ,"-") == 0 )
       iobuf->input_file = stdin;
     else if ( (iobuf->input_file = fileopen(input_fname,READ_BINARY)) == NULL )
@@ -1323,41 +1387,10 @@ int main(int argc, char **argv)
     printf("\nInput file '%s' has been opened.\n",input_fname);
     input_fname = NULL;
 
-///////////////////////////////////////////////////////////////////
-   cout << endl << "NOTE: FIXED TIMING LEVELS READ FROM HESSIO FILE" << endl << endl;
+    fRunPara_InputFileName += f_inputfilename;
+    fRunPara_NumInputFiles++;
+    if( fRunPara_NumInputFiles > 0 ) fRunPara_InputFileName += ", ";
 
-///////////////////////////////////////////////////////////////////
-// open DST file 
-   TFile *fDSTfile = new TFile( dst_file.c_str(), "RECREATE" );
-   if( fDSTfile->IsZombie() )
-   {
-       cout << "Error while opening DST output file: " << fDSTfile->GetName() << endl;
-       exit( -1 );
-   }
-   cout << "DST tree will be written to " << dst_file << endl;
-   if( fWriteFADC ) cout << "Writing FADC samples to DST file" << endl;
-   else             cout << "No FADC output" << endl;
-   if( fDynamicRange > 0 ) cout << "Assume " << fDynamicRange << " bit dynamic range" << endl;
-   if( fApplyCameraScaling ) cout << "Apply camera plate scaling for DC (intermediate) telescopes" << endl;
-   if( fMinNumber_pe_per_telescope > 0 ) cout << "Add trigger type #4 for events with >" << fMinNumber_pe_per_telescope << " pe per telescope" << endl;
-
-// new DST tree
-   VDSTTree *fDST = new VDSTTree();
-   fDST->setMC();
-   map< unsigned int, float > fTelescope_list = fDST->readArrayConfig( config_file );
-   if( fTelescope_list.size() < 1 )
-   {
-      cout << "error reading array configuration file" << endl;
-      exit( -1 );
-   }
-   fDST->setFADC( fWriteFADC );
-   fDST->initDSTTree( false );
-   fDST->initMCTree();
-
-// MC run header
-   VMonteCarloRunHeader *fMC_header = new VMonteCarloRunHeader();
-   fMC_header->SetName( "MC_runheader" );
-    
 /////////////////////////////////////////////
 // read in trigger mask
    if( trg_mask_file.size() > 0 )
@@ -1500,7 +1533,7 @@ int main(int argc, char **argv)
                print_hess_mcrunheader(iobuf);
 
 // fill EVNDISP DST run header
-	    DST_fillMCRunheader( fMC_header, hsdata );
+	    DST_fillMCRunheader( fMC_header, hsdata, (fRunPara_NumInputFiles>1) );
             break; 
 
          /* =================================================== */
@@ -1791,50 +1824,6 @@ int main(int argc, char **argv)
                fprintf(stderr,"Ignoring data block type %ld\n",item_header.type);
       }
     }
-    cout << "writing DST, MC and detector trees" << endl;
-    if( fDST && fDST->getDSTTree() )
-    {
-        fDST->getDSTTree()->Write();
-	cout << "\t (writing " << fDST->getDSTTree()->GetEntries() << " events)" << endl;
-    }
-    if( fDST && fDST->getMCTree()  )
-    {
-       cout << "\t (writing " << fDST->getMCTree()->GetEntries() << " MC events)" << endl;
-       fDST->getMCTree()->Write();
-    }
-// writing detector tree
-    TTree *i_detTree = DST_fill_detectorTree( hsdata, fTelescope_list, fApplyCameraScaling );
-    if( i_detTree ) i_detTree->Write();
-// writing Monte Carlo header
-    if( fMC_header )
-    {
-       fMC_header->Write();
-       fMC_header->print();
-    }
-// writing calibration data
-    TTree *i_calibTree = DST_fillCalibrationTree( fDST, hsdata, fTelescope_list, ped_file );
-    if( i_calibTree ) i_calibTree->Write();
-///////////////////////////////////////////////////
-// writing run parameters to dst file
-    VEvndispRunParameter *fRunPara = new VEvndispRunParameter( false );
-    fRunPara->SetName( "runparameterDST" );
-    fRunPara->setSystemParameters();
-    fRunPara->fEventDisplayUser = "CTA-DST";
-    fRunPara->frunnumber = fDST->getDSTRunNumber();
-    fRunPara->getObservatory() = "CTA";
-    fRunPara->fsourcetype = 7;                                  // 7 is DST - MC
-    fRunPara->fsourcefile = f_inputfilename;
-    fRunPara->fIsMC = true;
-    fRunPara->fCalibrationDataType = 0;                         // no pedvars available
-    fRunPara->fFADCChargeUnit = "PE";
-    fRunPara->fNTelescopes = fNTel_checked;
-    if( fRunPara->fNTelescopes == 0 && i_detTree ) fRunPara->fNTelescopes = (unsigned int)i_detTree->GetEntries();
-    fRunPara->fpulsetiminglevels = getPulseTimingLevels();
-    fRunPara->setPulseZeroIndex();
-    fRunPara->Write();
-///////////////////////////////////////////////////
-
-    if( fDSTfile ) fDSTfile->Close();
 
     if ( iobuf->input_file != NULL && iobuf->input_file != stdin ) fileclose(iobuf->input_file);
     iobuf->input_file = NULL;
@@ -1844,6 +1833,54 @@ int main(int argc, char **argv)
 
     if ( hsdata != NULL ) hsdata->run_header.run = 0;
    }
+// end while loop over all input files
+////////////////////////////////////////////////////
+
+   cout << "writing DST, MC and detector trees" << endl;
+   if( fDST && fDST->getDSTTree() )
+   {
+        fDST->getDSTTree()->Write();
+	cout << "\t (writing " << fDST->getDSTTree()->GetEntries() << " events)" << endl;
+   }
+   if( fDST && fDST->getMCTree()  )
+   {
+       cout << "\t (writing " << fDST->getMCTree()->GetEntries() << " MC events)" << endl;
+       fDST->getMCTree()->Write();
+   }
+// writing detector tree
+   TTree *i_detTree = DST_fill_detectorTree( hsdata, fTelescope_list, fApplyCameraScaling );
+   if( i_detTree ) i_detTree->Write();
+// writing Monte Carlo header
+   if( fMC_header )
+   {
+       fMC_header->Write();
+       fMC_header->print();
+   }
+// writing calibration data
+   TTree *i_calibTree = DST_fillCalibrationTree( fDST, hsdata, fTelescope_list, ped_file );
+   if( i_calibTree ) i_calibTree->Write();
+///////////////////////////////////////////////////
+// writing run parameters to dst file
+   VEvndispRunParameter *fRunPara = new VEvndispRunParameter( false );
+   fRunPara->SetName( "runparameterDST" );
+   fRunPara->setSystemParameters();
+   fRunPara->fEventDisplayUser = "CTA-DST";
+   fRunPara->frunnumber = fDST->getDSTRunNumber();
+   fRunPara->getObservatory() = "CTA";
+   fRunPara->fsourcetype = 7;                                  // 7 is DST - MC
+   fRunPara->fsourcefile = fRunPara_InputFileName;
+   fRunPara->fIsMC = true;
+   fRunPara->fCalibrationDataType = 0;                         // no pedvars available
+   fRunPara->fFADCChargeUnit = "PE";
+   fRunPara->fNTelescopes = fNTel_checked;
+   if( fRunPara->fNTelescopes == 0 && i_detTree ) fRunPara->fNTelescopes = (unsigned int)i_detTree->GetEntries();
+   fRunPara->fpulsetiminglevels = getPulseTimingLevels();
+   fRunPara->setPulseZeroIndex();
+   fRunPara->Write();
+///////////////////////////////////////////////////
+
+   if( fDSTfile ) fDSTfile->Close();
+
 
    fStopWatch.Stop();
    fStopWatch.Print();

@@ -646,9 +646,11 @@ map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
     is.close();
 
     map< unsigned int, float >::iterator iter;
+    unsigned int z = 0;
     for( iter = fDST_list_of_telescopes.begin(); iter != fDST_list_of_telescopes.end(); iter++ )
     {
-        cout << "\t Telescope ID " << iter->first << "  FOV " << iter->second << endl;
+        cout << "\t Telescope ID " << iter->first << "  FOV " << iter->second << " (#" << z << ")" << endl;
+	z++;
     }
 
     return fDST_list_of_telescopes;
