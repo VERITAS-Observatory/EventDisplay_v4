@@ -38,6 +38,8 @@ class VStereoMaps
         double fTargetShiftWest;
         double fTargetShiftNorth;
 
+        bool   fTMPL_RE_nMaxoffsource;
+
 // regions excluded from sky maps
         vector<double> vXTOEXCLUDE;
         vector<double> vYTOEXCLUDE;
@@ -127,7 +129,7 @@ class VStereoMaps
         TH1D *hAux_theta2Off;
         TH1D *hAux_theta2Ratio;
 
-        VStereoMaps( bool, int );
+        VStereoMaps( bool, int, bool );
        ~VStereoMaps() {}
 
         void              calculateTheta2( bool, double, double );

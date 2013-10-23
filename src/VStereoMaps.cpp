@@ -18,7 +18,7 @@
  *
  *    - definition of off source region: if more than fRE_nMaxoffsource off source
  *      region would fit into the sky plot, choose fRE_nMaxoffsource regions
- *      randomly from the available regions
+ *      randomly from the available regions (this is optional)
  *    - position of test source in bin i,j in sky map is
  *      taken randomly from this bin
  *
@@ -28,7 +28,7 @@
 
 #include "VStereoMaps.h"
 
-VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed )
+VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed, bool iTMPL_RE_nMaxoffsource ) 
 {
     fData = 0;
 
@@ -41,6 +41,8 @@ VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed )
     fRandom = new TRandom3( iRandomSeed );
 
     fAcceptance = 0;
+
+    fTMPL_RE_nMaxoffsource = iTMPL_RE_nMaxoffsource;
 
     hmap_stereo = 0;
     hmap_alpha = 0;
@@ -201,7 +203,7 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
         }
 
 // this cuts events away further than the maximum distance
-	if( fAcceptance && fAcceptance->isExcludedfromSource( x, y ) ) return false;
+        if( fAcceptance && fAcceptance->isExcludedfromSource( x, y ) ) return false;
 // fill 2D stereo Maps for all models (ON map)
         makeTwoDStereo_BoxSmooth( x-fRunList.fWobbleWestMod, y-fRunList.fWobbleNorthMod, i_weight, 
 	                          sqrt( fTheta2Cut_Max ), i_MeanSignalBackgroundAreaRatio );
@@ -771,10 +773,6 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
     if( bUncorrelatedSkyMaps ) cout << " (uncorrelated plots)";
     cout << endl;
 
-// DEFAULT: choose random offset regions
-    bool bRemoveOffRegionsRandomly = true;
-//    bRemoveOffRegionsRandomly = false;
-
 //  control histograms and delete the one from the previous runs
     initialize_ReflectedRegionHistograms();
 
@@ -837,7 +835,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
     n_ex = (int)vXTOEXCLUDE.size();
     for( unsigned int i = 0; i < vXTOEXCLUDE.size(); i++ )
     {
-        x_ex[i] = -1.*vXTOEXCLUDE[i];
+        x_ex[i] = vXTOEXCLUDE[i];
         y_ex[i] = vYTOEXCLUDE[i];
         r_ex[i] = vRTOEXCLUDE[i];
     }
@@ -992,8 +990,8 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                                 bool bExclude = false;
                                 for( unsigned int ex = 0; ex < vXTOEXCLUDE.size(); ex++ )
                                 {
-// vX... and vY... are relative to sky map centre in rotated camera coordinates
-                                    if( (x_t+vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod)*(x_t+vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod)
+// vXTOEXCLUDE and vYTOEXCLUDE are relative to sky map centre in rotated camera coordinates
+                                    if( (x_t-vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod)*(x_t-vXTOEXCLUDE[ex]-fRunList.fWobbleWestMod)
 				      + (y_t-vYTOEXCLUDE[ex]-fRunList.fWobbleNorthMod)*(y_t-vYTOEXCLUDE[ex]-fRunList.fWobbleNorthMod)
 				      < (vRTOEXCLUDE[ex]+fRE_roffTemp)*(vRTOEXCLUDE[ex]+fRE_roffTemp) )
 				      {
@@ -1022,7 +1020,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
 
 // check maximum number of sources, if too many, remove some (randomly choosen)
 // (default)
-                    if( bRemoveOffRegionsRandomly )
+                    if( fTMPL_RE_nMaxoffsource )
 		    {
 		       if( n_r > fRunList.fRE_nMaxoffsource )
 		       {
@@ -1158,7 +1156,6 @@ void VStereoMaps::initialize_theta2()
         if( !fAcceptance ) 
 	{
 	    fAcceptance = new VRadialAcceptance( fRunList.fAcceptanceFile );
-	    cout << " fRunList.f2DAcceptanceMode a:" << fRunList.f2DAcceptanceMode << endl;
 	    fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
 	}
 
@@ -1637,15 +1634,13 @@ bool VStereoMaps::defineAcceptance()
     {
         if( fAcceptance ) delete fAcceptance;
         fAcceptance = new VRadialAcceptance( fRunList.fAcceptanceFile );
-		cout << "fRunList.f2DAcceptanceMode b:" << fRunList.f2DAcceptanceMode << endl;
-		fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
+	fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
     }
     else
     {
         if( fAcceptance ) delete fAcceptance;
         fAcceptance = new VRadialAcceptance();
-		cout << "NKH fRunList.f2DAcceptanceMode c:" << fRunList.f2DAcceptanceMode << endl;
-		fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
+	fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
     }
     if( !fAcceptance )
     {
@@ -1659,7 +1654,7 @@ bool VStereoMaps::defineAcceptance()
     vYTOEXCLUDE_CameraCoordinates.clear();
     for( unsigned int i = 0; i < vXTOEXCLUDE.size(); i++ )
     {
-        vXTOEXCLUDE_CameraCoordinates.push_back( -1.*(vXTOEXCLUDE[i] - fRunList.fWobbleWestMod) );
+        vXTOEXCLUDE_CameraCoordinates.push_back( vXTOEXCLUDE[i] + fRunList.fWobbleWestMod);
         vYTOEXCLUDE_CameraCoordinates.push_back( vYTOEXCLUDE[i] + fRunList.fWobbleNorthMod);
     }
 

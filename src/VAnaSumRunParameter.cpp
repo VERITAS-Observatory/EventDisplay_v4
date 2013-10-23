@@ -128,6 +128,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
     fTMPL_RE_distanceSourceOff = 0.;
     fTMPL_RE_nMinoffsource = 0;
     fTMPL_RE_nMaxoffsource = 0;
+    fTMPL_RE_RemoveOffRegionsRandomly = false;
 
 // cut, effective areas and acceptance files
     fTMPL_SourceRadius = 0.;
@@ -269,6 +270,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                }
 	       else returnWithError( "VAnaSumRunparameter: not enough parameters: ", is_line, "* REFLECTEDREGION dist noff_min noff_max" );
 	    }
+            else if( temp == "REFLECTEDREGION_OFFREMOVAL" )
+            {
+               if( !is_stream.eof() )
+               {
+                  is_stream >> temp2;
+                  fTMPL_RE_RemoveOffRegionsRandomly = bool( atoi( temp2.c_str() ) );
+               }
+            }
 	    else if( temp == "RINGBACKGROUND" )
 	    {
 	       fTMPL_fBackgroundModel = eRINGMODEL;
@@ -988,7 +997,9 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         }
         else if( fRunList[i].fBackgroundModel == eREFLECTEDREGION )
         {
-            cout << "REFLECTED REGIONS BACKGROUND MODEL" << endl;
+            cout << "REFLECTED REGIONS BACKGROUND MODEL";
+            if( fTMPL_RE_RemoveOffRegionsRandomly ) cout << " (excess regions are removed randomly)";
+            cout << endl;
             cout << "\t theta2 cut: " << fRunList[i].fSourceRadius << " deg2" << endl;
             cout << "\t distance to source region: " << fRunList[i].fRE_distanceSourceOff << endl;
             cout << "\t minimum number of off source regions: " << fRunList[i].fRE_nMinoffsource << endl;

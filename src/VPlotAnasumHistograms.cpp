@@ -1592,7 +1592,7 @@ void VPlotAnasumHistograms::plot_reflectedRegions( TCanvas *iC, int i, int j, in
 /*
  *   plot regions excluded from background calculations
  *
- *  observe: this function should be used together with plot_radec
+ *
  *
  */
 void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c, int iLineColor )
@@ -1631,7 +1631,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c, int iLineColor )
 
     double iSign = 1.;
     TH2D *h = (TH2D*)c->GetListOfPrimitives()->FindObject( "hmap_stereo_sig_REFLECTED" );
-    if( !h ) iSign *= -1.;
+    if( h ) iSign *= -1.;
 
     for( int i = 0; i < t->GetEntries(); i++ )
     {
@@ -1640,7 +1640,7 @@ void VPlotAnasumHistograms::plot_excludedRegions( TCanvas *c, int iLineColor )
         e->SetFillStyle( 0 );
         e->SetLineColor( iLineColor );
         e->Draw();
-	cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ")" << endl;
+	cout << "#" << i << " Vmag " << Vmag << ", Bmag " << Bmag << " (" << x << ", " << y << ", " << r << ")" << endl;
     }
     if( f1 ) f1->Close();
 }

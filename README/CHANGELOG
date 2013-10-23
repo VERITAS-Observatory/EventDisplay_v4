@@ -1,6 +1,13 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131023 (GM) added new run parameter to anasum: setting of reflected
+                regions (can be random or closest)
+
+* 20131023 (GM) several consistency checks in setting of exclusion
+                regions (e.g. due to bright stars in the FOV);
+                improved readability of code by removing some signs
+
 * 20130916 (GM) changed CTA converter so that several simtel
                 files can be read in in one pass
 		(need to increase efficiency for CTA grid analysis)

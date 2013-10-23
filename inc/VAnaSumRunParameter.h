@@ -122,7 +122,7 @@ class VAnaSumRunParameterDataClass
         double fTE_mscl_min;
         double fTE_mscl_max;
 		
-		int f2DAcceptanceMode ; // USE2DACCEPTANCE
+	int f2DAcceptanceMode ; // USE2DACCEPTANCE
 
         VAnaSumRunParameterDataClass();
        ~VAnaSumRunParameterDataClass() {}
@@ -177,8 +177,8 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fEnergyEffectiveAreaSmoothingThreshold;
         vector< double > fMCZe;                   // zenith angle intervall for Monte Carlo
 		
-		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
-		int f2DAcceptanceMode ; // USE2DACCEPTANCE
+	bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
+	int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		
 	int fFrogs;
 
@@ -201,6 +201,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fTMPL_RE_distanceSourceOff;          // minimal distance of off source regions in number of background regions from the source region
         int    fTMPL_RE_nMinoffsource;              // minmum number of off source regions (default 3)
 	int    fTMPL_RE_nMaxoffsource;              // maximum number of off source regions (default 7)
+        bool   fTMPL_RE_RemoveOffRegionsRandomly;   // removal of excess off regions
 
 // analysis TMPL file
 	string fTMPL_CutFile;

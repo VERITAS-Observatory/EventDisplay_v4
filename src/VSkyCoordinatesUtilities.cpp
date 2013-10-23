@@ -39,7 +39,7 @@ void VSkyCoordinatesUtilities::rotate( const double theta_rad, double& x, double
 
     (all angles in degrees)
 
-    based on wobble.cpp from SFegan
+    based on wobble_offset() in wobble.cpp from SFegan
 */
 void VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( double iNorth, double iEast, double idec, double ira, double &idiffdec, double &idiffra )
 {
@@ -49,7 +49,7 @@ void VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( double iNorth, double i
     double x = 0.;
     double y = 0.;
     double z = 1.;
-    double theta_rad = sqrt(iNorth*iNorth + iEast*iEast ) / TMath::RadToDeg();
+    double theta_rad = sqrt( iNorth*iNorth + iEast*iEast ) * TMath::DegToRad();
     double phi_rad = -1.*atan2( iEast, iNorth );
     if( phi_rad < 0. ) phi_rad += TMath::TwoPi();
 
@@ -72,7 +72,7 @@ void VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( double iNorth, double i
 
     (all angles in degrees)
 
-    based on wobble.cpp from SFegan
+    based on wobble() in wobble.cpp from SFegan
 */
 void VSkyCoordinatesUtilities::getWobbledDirection( double iNorth, double iEast, double idec, double ira, double &dec_W, double &ra_W )
 {

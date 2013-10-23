@@ -421,7 +421,7 @@ double VRadialAcceptance::getCorrectionFactor( double x, double y, double erec )
 
 
 /*!
- *    define here region in the sky which are to be excluded in the analysis
+ *    define here region in the sky which are excluded in the analysis
  *
  *     x,y are camera coordinates (not wobble shifted)
  */
@@ -445,7 +445,7 @@ bool VRadialAcceptance::isExcluded( double x, double y )
 bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
 {
 // event outside fiducial area
-    if( x*x + y*y > fMaxDistanceAllowed * fMaxDistanceAllowed ) return true;
+    if( isExcluded( x, y ) ) return true;
 
 // source region (source radius + safety (fDS))
     if( fDs >= 0. && ( (x-fXs)*(x-fXs)+(y-fYs)*(y-fYs)) < ((fRs+fDs)*(fRs+fDs)) ) return true;
@@ -464,9 +464,7 @@ bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
  */
 bool VRadialAcceptance::isExcludedfromSource( double x, double y )
 {
-    return isExcluded( x, y );
-
-    return false;
+   return isExcluded( x, y );
 }
 
 /*
@@ -1158,7 +1156,6 @@ int VRadialAcceptance::Set2DAcceptanceMode( int mode )
     if ( mode >= 0 )
     {
         f2DAcceptanceMode = mode ;
-		cout << "NKH Set2DAcceptanceMode(" << mode << ")" << endl ;
     }
 	
 	if ( f2DAcceptanceMode > 0 )

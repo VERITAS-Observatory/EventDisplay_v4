@@ -36,7 +36,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 
       fTreeSelectedEvents = 0;
 
-	fTreeWithAllGamma = 0 ; // WRITEALLGAMMATOTREE
+      fTreeWithAllGamma = 0 ; // WRITEALLGAMMATOTREE
 
       fRunPara = irunpara;
 
@@ -105,8 +105,8 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
       fCuts->setDataDirectory( iDataDir );
 
 // define the background model
-      fMap   = new VStereoMaps( false, iRandomSeed );
-      fMapUC = new VStereoMaps( true,  iRandomSeed );
+      fMap   = new VStereoMaps( false, iRandomSeed, fRunPara->fTMPL_RE_RemoveOffRegionsRandomly );
+      fMapUC = new VStereoMaps( true,  iRandomSeed, fRunPara->fTMPL_RE_RemoveOffRegionsRandomly );
 }
 
 
@@ -1152,19 +1152,20 @@ void VStereoAnalysis::defineAstroSource()
 	 cout << "Defining targets and exclusion regions"<< endl; 
       }
 
+/////////////////////////////////////////////////////////
 // loop over all runs in runlist
       for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
       {
 /////////////////////////////////////////////////////////
 // check source coordinates
-// (this is the direction of observation)
+// (this is the target of observation)
 /////////////////////////////////////////////////////////
-      	if( fRunPara->fRunList[i].fTargetDecJ2000 < -85. )
+      	if( fRunPara->fRunList[i].fTargetDecJ2000 < -89.99 )
       	{
       		cout << "ERROR in VStereoAnalysis::defineAstroSource: invalid target " << fRunPara->fRunList[i].fTarget << endl;
       		cout << "\t run " << fRunPara->fRunList[i].fRunOn << "\t" << fRunPara->fRunList[i].fTarget;
 		cout << fRunPara->fRunList[i].fTargetDecJ2000 << "\t" << fRunPara->fRunList[i].fTargetShiftDecJ2000 << endl;
-      		exit( -1 );
+      		exit( EXIT_FAILURE );
       	}
 
 /////////////////////////////////////////////////////////
@@ -1176,17 +1177,17 @@ void VStereoAnalysis::defineAstroSource()
       		double i_decDiff =  0.;
       		double i_raDiff = 0.;
       		VSkyCoordinatesUtilities::getWobbleOffset_in_RADec( fRunPara->fRunList[i].fSkyMapCentreNorth, 
-      		                                            fRunPara->fRunList[i].fSkyMapCentreWest, 
-							    fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-							    i_decDiff, i_raDiff );
+      		                                                    fRunPara->fRunList[i].fSkyMapCentreWest, 
+							            fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
+							            i_decDiff, i_raDiff );
       		fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fRunList[i].fTargetRAJ2000 + i_raDiff;
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fRunList[i].fTargetDecJ2000 + i_decDiff;
       	}
 // from runparameter file: set the sky map centre in J2000 
 // (this is in almost all analysis the usual/default case)
-      	else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000  ) > 1.e-8 || TMath::Abs( fRunPara->fSkyMapCentreDecJ2000 ) )
+      	else if( TMath::Abs( fRunPara->fSkyMapCentreRAJ2000 ) > 1.e-8 )
       	{
-      		fRunPara->fRunList[i].fSkyMapCentreRAJ2000 = fRunPara->fSkyMapCentreRAJ2000;
+      		fRunPara->fRunList[i].fSkyMapCentreRAJ2000  = fRunPara->fSkyMapCentreRAJ2000;
       		fRunPara->fRunList[i].fSkyMapCentreDecJ2000 = fRunPara->fSkyMapCentreDecJ2000;
       		fRunPara->fRunList[i].fSkyMapCentreWest =
 		          VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
@@ -1196,7 +1197,6 @@ void VStereoAnalysis::defineAstroSource()
 		                                                        fRunPara->fSkyMapCentreRAJ2000, fRunPara->fSkyMapCentreDecJ2000 );
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreWest ) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreWest = 0.;
       		if( TMath::Abs( fRunPara->fRunList[i].fSkyMapCentreNorth) < 1.e-4 ) fRunPara->fRunList[i].fSkyMapCentreNorth = 0.;
-
       	}
 // if not set in runparameter file: set to target direction
 	else
@@ -1216,7 +1216,7 @@ void VStereoAnalysis::defineAstroSource()
       	     if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
       	     {
       		  fRunPara->fRunList[i].fTargetShiftWest = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
-		                                                                                          fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+		                                                                                         fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
       		  fRunPara->fRunList[i].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000, fRunPara->fRunList[i].fTargetDecJ2000,
 		                                                                                               fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
 
@@ -1352,14 +1352,14 @@ void VStereoAnalysis::defineAstroSource()
 	    {
 	       cout << "VStereoAnalysis::defineAstroSource() error: star catalogue not found: " << fRunPara->fStarCatalogue << endl;
 	       cout << "exiting..." << endl;
-    	       exit( -1 );
+    	       exit( EXIT_FAILURE );
 	    }
 // remove double entries
 	    iStarCatalogue->purge();
 	    if( iStarCatalogue->getListOfStarsinFOV().size() > 0 )
 	    {
 		 cout << "\tbright stars (magnitude brighter than " << fRunPara->fStarMinBrightness << ", exclusion radius ";
-		 cout << fRunPara->fStarExlusionRadius << " deg) in field of view (J2000): " << endl;
+		 cout << fRunPara->fStarExlusionRadius << " deg, " << fRunPara->fStarBand << "-band) in field of view (J2000): " << endl;
 		 cout << "\t\t ID \t RA \t Dec \t magnitude " << endl;
 		 double i_brightness = 100.;
 		 for( unsigned int i = 0; i < iStarCatalogue->getListOfStarsinFOV().size(); i++ )
@@ -1412,25 +1412,27 @@ void VStereoAnalysis::defineAstroSource()
 // doesn't work if different sources are analyzed with RA <> 360 deg
 /////////////////////////////////////////////////////////
 // set and get the regions to exclude
-// (this is set relative to the sky map centre)
+// (these are calculated relative to the sky map centre)
       	for( unsigned int k = 0 ; k < fRunPara->fExclusionRegions.size(); k++)
       	{
 	     if( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 > -90. )
 	     {
-		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fTargetRAJ2000,
-														 fRunPara->fRunList[i].fTargetDecJ2000,
+// NEWNEWNEW changed from target to sky map centre
+		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = VSkyCoordinatesUtilities::getTargetShiftWest( fRunPara->fRunList[i].fSkyMapCentreRAJ2000,
+														 fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
 														 fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
 														 fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
-		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fTargetRAJ2000,
-														  fRunPara->fRunList[i].fTargetDecJ2000,
+		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = VSkyCoordinatesUtilities::getTargetShiftNorth( fRunPara->fRunList[i].fSkyMapCentreRAJ2000,
+														  fRunPara->fRunList[i].fSkyMapCentreDecJ2000,
 														  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_RAJ2000,
 														  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_DecJ2000 );
-		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  += fRunPara->fRunList[i].fSkyMapCentreWest;
-		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North += fRunPara->fRunList[i].fSkyMapCentreNorth;
+// NEWNEWNEW
+/*		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  += fRunPara->fRunList[i].fSkyMapCentreWest;
+		  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North += fRunPara->fRunList[i].fSkyMapCentreNorth; */
 		  if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North ) < 1.e-4 ) fRunPara->fExclusionRegions[k]->fExcludeFromBackground_North = 0.;
 		  if( TMath::Abs( fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West ) < 1.e-4 )  fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  = 0.;
 	     }
-	     fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  *= -1.;
+// NEWNEWNEW	     fRunPara->fExclusionRegions[k]->fExcludeFromBackground_West  *= -1.;
       	}
       }
 }
