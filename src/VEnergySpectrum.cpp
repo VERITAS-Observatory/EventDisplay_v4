@@ -899,7 +899,6 @@ void VEnergySpectrum::calculateDifferentialFluxes()
             }
 	    else
 	    {
-	       cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " <<  log10(i_flux.Energy) << endl;
 	       continue;
             }
 // calculate asymmetric flux errors using TRolke
