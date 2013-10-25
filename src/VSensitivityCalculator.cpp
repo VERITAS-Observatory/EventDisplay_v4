@@ -442,7 +442,6 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
     if( fEnergySpectrumfromLiterature == 0 )
     {
        char hname[800];
-
        unsigned int i_CrabSpectrum_ID = 1;              // NOTE: hardwired to 1!
 
 // Whipple Crab spectrum (1989)
@@ -457,8 +456,15 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
        {
 	  sprintf( hname, "6.0e-10*TMath::Power( x/0.3, -2.31 - 0.26*log10( x/0.3 ) )" );
        }
+// HEGRA Crab spectrum
+       else if( i_CrabSpectrum_ID == 2 )
+       {
+          double i_gamma = -2.62;
+          double i_Norm =  2.83e-11;
+          sprintf( hname, "%e*TMath::Power( x, %f)", i_Norm, i_gamma );
+       }
        if( bUnit == "PFLUX" )       sprintf( hname, "%s", hname );
-       else if( bUnit == "ENERGY" ) sprintf( hname, "%s * 1.e12 * x * x * %f", hname, fConstant_Flux_To_Ergs );
+       else if( bUnit == "ENERGY" ) sprintf( hname, "%s * 1.e12 * x * x * %e", hname, fConstant_Flux_To_Ergs );
        else                         sprintf( hname, "%f", 1. );
        i_fFunCrabFlux = new TF1( "i_fFunCrabFlux" , hname, TMath::Power( 10., fEnergy_min_Log ), 10000. );
     }
@@ -491,7 +497,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
        double iE = 0.;
        double iY = 0.;
 
-       i_fFunCrabFlux->CalcGaussLegendreSamplingPoints( np, x, y, 1.e-14 );
+       i_fFunCrabFlux->CalcGaussLegendreSamplingPoints( np, x, y, 1.e-15 );
 // loop over different Crab flux
        for( int p = 0; p < i_GraphCrabFlux->GetN(); p++ )
        {
@@ -502,7 +508,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 	  if( bUnit == "ENERGY" )
 	  {
              iY *= 1.e12 * fConstant_Flux_To_Ergs * TMath::Power( 10., iE );
-	  }
+	  } 
 	  i_GraphCrabFlux->SetPoint( p, iE, iY );
        }
        delete x;
