@@ -41,6 +41,11 @@ int singletel=0;
 int fRandomSeed = 17;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+
+   count number of command line arguments
+
+*/
 bool testCommandlineArguments()
 {
 // MONO ANALYSIS PROBABLY DOES NOT WORK ANYMORE
@@ -65,6 +70,8 @@ bool testCommandlineArguments()
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char *argv[] )
 {
     cout << endl << "VERITAS Analysis Summary (University of Delaware & DESY) ";
@@ -81,7 +88,7 @@ int main(int argc, char *argv[] )
     anasum->initialize( listfilename, listShortfilename, singletel-1, runType, outfile, fRandomSeed, fRunParameterfile);
     cout << endl;
 
-// mono analysis (GM: DOES NOT WORK ANYMORE)
+// mono analysis (GM: THIS HAS NOT BEEN USED SINCE PROTOTYPE TIMES - PROBABLY DOES NOT WORK ANYMORE)
     if( analysisType == 0 || analysisType == 1 )
     {
         anasum->doMonoAnalysis( (analysisType==1) || (analysisType==5) );

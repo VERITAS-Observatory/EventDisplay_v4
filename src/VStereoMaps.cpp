@@ -18,7 +18,7 @@
  *
  *    - definition of off source region: if more than fRE_nMaxoffsource off source
  *      region would fit into the sky plot, choose fRE_nMaxoffsource regions
- *      randomly from the available regions (this is optional)
+ *      randomly from the available regions
  *    - position of test source in bin i,j in sky map is
  *      taken randomly from this bin
  *
@@ -28,7 +28,7 @@
 
 #include "VStereoMaps.h"
 
-VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed, bool iTMPL_RE_nMaxoffsource ) 
+VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed )
 {
     fData = 0;
 
@@ -42,8 +42,6 @@ VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed, bool iTMPL_RE_nMaxoffsource
 
     fAcceptance = 0;
 
-    fTMPL_RE_nMaxoffsource = iTMPL_RE_nMaxoffsource;
-
     hmap_stereo = 0;
     hmap_alpha = 0;
     hmap_ratio = 0;
@@ -55,7 +53,6 @@ VStereoMaps::VStereoMaps( bool iuc, int iRandomSeed, bool iTMPL_RE_nMaxoffsource
 
     fSourcePositionBinX = 0;
     fSourcePositionBinY = 0;
-    fTheta2Cut_Max = 0.;
 
     fTheta2_length = 0;
     fTheta2.assign( 100, 0. );
@@ -77,50 +74,36 @@ void VStereoMaps::setTargetShift( double iW, double iN )
     fTargetShiftNorth = iN;
 }
 
-void VStereoMaps::setRegionToExclude( vector< VAnaSumRunParameterListOfExclusionRegions* > iF )
+
+void VStereoMaps::setRegionToExclude( vector<double> iX, vector<double> iY, vector<double> iR )
 {
-   vXTOEXCLUDE.clear();
-   vYTOEXCLUDE.clear();
-   vRTOEXCLUDE.clear();
-   for( unsigned int i = 0; i < iF.size(); i++ )
-   {
-      if( iF[i] )
-      {
-          vXTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_West );
-	  vYTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_North );
-	  vRTOEXCLUDE.push_back( iF[i]->fExcludeFromBackground_Radius );
-      }
-  }
+    vXTOEXCLUDE = iX;
+    vYTOEXCLUDE = iY;
+    vRTOEXCLUDE = iR;
+
 }
 
-void VStereoMaps::setHistograms( TH2D* i_map_stereo, TH2D* i_map_alpha, TH1D* i_map_ratio )
+
+void VStereoMaps::setHistograms( TH2D* i_map_stereo, TH2D* i_map_alpha )
 {
 
     hmap_stereo = i_map_stereo;
     hmap_alpha = i_map_alpha;
-    hmap_ratio = i_map_ratio;
+    hmap_ratio = 0;
     fSourcePositionBinX = hmap_stereo->GetXaxis()->FindBin( fRunList.fWobbleWestMod );
     fSourcePositionBinY = hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod );
 }
 
 
-void VStereoMaps::setRunList( VAnaSumRunParameterDataClass iL )
+void VStereoMaps::setRunList( sRunPara iL )
 {
     fRunList = iL;
     fRunList.fWobbleNorthMod *= -1.;
 }
 
-/*
 
-    fill an ON or OFF event into a sky map
-
-*/
-bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut_max,
-                        double ze, double erec, int irun, bool i_isGamma )
+bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double ze, double erec, int irun, bool i_isGamma )
 {
-    fTheta2Cut_Max = theta2Cut_max;
-    if( fTheta2Cut_Max > fRunList.fSourceRadius ) fTheta2Cut_Max = fRunList.fSourceRadius;
-
     if( is_on ) return fillOn(  x_sky, y_sky, ze, erec, irun, i_isGamma );
     else        return fillOff( x_sky, y_sky, ze, erec, irun, i_isGamma );
 
@@ -128,13 +111,29 @@ bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut
 }
 
 
-/*
-
-    fill ON event into a sky map 
-
-*/
 bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, bool i_isGamma )
 {
+    double i_weight = 1.;
+
+// calculate theta2: - relative wobble position + shift in derotated sky coordinates
+    double theta2  = (x - fRunList.fWobbleWestMod  + fTargetShiftWest  )*(x - fRunList.fWobbleWestMod  + fTargetShiftWest );
+           theta2 += (y - fRunList.fWobbleNorthMod + fTargetShiftNorth )*(y - fRunList.fWobbleNorthMod + fTargetShiftNorth );
+
+    if( i_isGamma )
+    {
+
+//////////////////////////////////
+// initialisations
+        if( irun != fInitRun )
+        {
+            cout << "\t filling ON events...";
+            if( !bUncorrelatedSkyMaps ) cout << " (correlated maps)" << endl;
+            else                        cout << " (uncorrelated maps)" << endl;
+            fInitRun = irun;
+
+//////////////////////////////////
+// REFLECTED REGION MODEL
+//////////////////////////////////
     double i_weight = 1.;
     double i_MeanSignalBackgroundAreaRatio = 1.;
 
@@ -1570,98 +1569,3 @@ void VStereoMaps::FOVM_getAlpha( bool iIsOn )
         i_nbinsYstart = hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod );
         i_nbinsYstopp = hmap_stereo->GetYaxis()->FindBin( fRunList.fWobbleNorthMod );
     }
-
-    for( int i = i_nbinsXstart; i <= i_nbinsXstopp; i++ )
-    {
-        i_xLE = hmap_alpha->GetXaxis()->GetBinLowEdge( i );
-        x = fRandom->Uniform( i_xLE, i_xLE + x_w );
-
-        for( int j = i_nbinsYstart; j <= i_nbinsYstopp; j++ )
-        {
-            i_yLE = hmap_alpha->GetYaxis()->GetBinLowEdge( j );
-            y = fRandom->Uniform( i_yLE, i_yLE + y_w );
-
-// reset acceptance
-            i_acc = 0.;
-
-// check if events is in fiducial area
-            if( sqrt( x*x + y*y ) > fRunList.fmaxradius  )
-            {
-                hmap_alpha->SetBinContent( i-i_xoff, j-j_yoff, 0. );
-                continue;
-            }
-
-            cx = fRandom->Uniform( i_xLE, i_xLE + x_w );
-            cy = fRandom->Uniform( i_yLE, i_yLE + y_w );
-
-            cr = (cx-x)*(cx-x)+(cy-y)*(cy-y);
-
-// get sum of acceptance for on region
-            if( iIsOn )
-            {
-                if( fAcceptance->isExcludedfromSource( cx, cy ) ) continue;
-// check if event is in 'on' region
-                if( bUncorrelatedSkyMaps )
-                {
-// check if event is in bin
-                    i_acc += fAcceptance->getAcceptance( cx, cy );
-                }
-                else
-                {
-// check if event is inside source region
-                    if( cr < i_rS * i_rS ) i_acc += fAcceptance->getAcceptance( cx, cy );
-                }
-            }
-// get acceptance for OFF regions
-            else
-            {
-                i_acc += fAcceptance->getAcceptance( cx, cy );
-            }
-            hmap_alpha->SetBinContent( i-i_xoff, j-j_yoff, i_acc);
-
-        }
-    }
-}
-
-
-/////////////////////////////////////////////////
-
-bool VStereoMaps::defineAcceptance()
-{
-    TDirectory *iDir = gDirectory;
-// define acceptance
-    if( fRunList.fAcceptanceFile != "simu" )
-    {
-        if( fAcceptance ) delete fAcceptance;
-        fAcceptance = new VRadialAcceptance( fRunList.fAcceptanceFile );
-	fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
-    }
-    else
-    {
-        if( fAcceptance ) delete fAcceptance;
-        fAcceptance = new VRadialAcceptance();
-	fAcceptance->Set2DAcceptanceMode( fRunList.f2DAcceptanceMode ) ;
-    }
-    if( !fAcceptance )
-    {
-        cout << "VStereoMaps::defineAcceptance: ERROR, no acceptance curves found" << endl;
-        return false;
-    }
-    iDir->cd();
-
-// exclusion regions are relative to camera centre
-    vXTOEXCLUDE_CameraCoordinates.clear();
-    vYTOEXCLUDE_CameraCoordinates.clear();
-    for( unsigned int i = 0; i < vXTOEXCLUDE.size(); i++ )
-    {
-        vXTOEXCLUDE_CameraCoordinates.push_back( vXTOEXCLUDE[i] + fRunList.fWobbleWestMod);
-        vYTOEXCLUDE_CameraCoordinates.push_back( vYTOEXCLUDE[i] + fRunList.fWobbleNorthMod);
-    }
-
-    fAcceptance->setRegionToExcludeAcceptance( vXTOEXCLUDE_CameraCoordinates, vYTOEXCLUDE_CameraCoordinates, vRTOEXCLUDE );
-
-    fAcceptance->setSource( fRunList.fWobbleWestMod+fTargetShiftWest, fRunList.fWobbleNorthMod+fTargetShiftNorth, 
-                            sqrt(fRunList.fSourceRadius), -1., fRunList.fmaxradius );
-
-    return true;
-}

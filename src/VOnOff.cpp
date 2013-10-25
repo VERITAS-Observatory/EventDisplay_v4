@@ -135,7 +135,7 @@ void VOnOff::doOnOffforParameterHistograms( TList *iponlist, TList *ipofflist, d
 }
 
 
-void VOnOff::doOnOffforSkyHistograms( TList *ionlist, TList *iofflist, double i_norm, TH2D* ialpha, bool isCombined )
+void VOnOff::doOnOffforSkyHistograms( TList *ionlist, TList *iofflist, double i_norm, TH2D* ialpha )
 {
     if( fDebug ) cout << "VOnOff::doOnOff" << endl;
     string itemp;

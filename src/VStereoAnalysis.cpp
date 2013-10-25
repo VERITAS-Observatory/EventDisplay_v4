@@ -65,26 +65,18 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
       	cout << iDirRun.size() << "\t" << fRunPara->fRunList.size() << endl;
       	exit( -1 );
       }
+// define histograms and rate counters
       vector< double > i_v;
       for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
       {
       	iDirRun[i]->cd();
-      	if( fIsOn )
-      	{
-      	   fHisto.push_back( new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC, 
-	                                            fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall,
-						    f_t_in_s_min[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff],
-						    f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
-           fHisto.back()->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
-      	}
-      	else
-      	{
-	   fHisto.push_back( new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC,
-	                                            fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall,
-						    f_t_in_s_min[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff],
-						    f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn  ) );
-	   fHisto.back()->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
-      	}
+	fHisto.push_back( new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC, 
+						 fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall,
+						 f_t_in_s_min[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff],
+						 f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
+	fHisto.back()->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax, 
+	                              fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
+
 // define dead time calculators
       	fDeadTime.push_back( new VDeadTime( fIsOn ) );
 
@@ -93,12 +85,12 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
       	fRateTime.push_back( i_v );
       	fRateTimeIntervall.push_back( i_v );
 
-      }                                             //fRunList.size()
+      } 
 
 // define the time mask
       fTimeMask = new VTimeMask();
 
-//! define the cuts
+// define the cuts
       fCuts = new VGammaHadronCuts();
       fCuts->resetCutValues();
       fCuts->setDataTree( 0 );

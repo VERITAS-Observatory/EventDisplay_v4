@@ -565,7 +565,7 @@ TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCan
     if( hmap_alpha_diff ) hmap_alpha_diff->Draw( iPlotMode.data() );
 
     cSky[7]->cd();
-    plot_significanceDistributions( 1.2, 0.4, -6.5, 10., (TCanvas*)gPad );
+    plot_significanceDistributions( 2.0, 0.4, -6.5, 10., (TCanvas*)gPad );
   
     if( !c_skyAll ) return cSky[3];
     return c_skyAll;
@@ -866,6 +866,9 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 	   hDiff->SetYTitle( "ratio (measured to background expected)" );
 	   hDiff->GetXaxis()->SetRangeUser( xmin, xmax );
 	   hDiff->Draw( "e hist" ); 
+	   TLine *iLL = new TLine( xmin, 1., xmax, 1. );
+	   iLL->SetLineStyle( 2 );
+	   iLL->Draw();
         }
     }
 

@@ -152,6 +152,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 ///////////////////////////////////////////////////////////////////////////////////////////
     if( fAnalysisRunMode == 1 )
     {
+// loop over all files in run list and copy histograms
 	for( unsigned int j = 0; j < fRunPara->fRunList.size(); j++ )
 	{
 // open input file
@@ -193,7 +194,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 	   iAnasumInputFile.Close();
 	}
     }
-////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 // STANDARD ANALYSIS (analysis all individual runs; sequentiell) 
     else
     {
@@ -228,11 +229,12 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
                 fStereoRunDir.push_back( fRunDir.back()->mkdir( i_temp, i_title ) );
 		if( !fStereoRunDir.back() )
 		{
-		    cout << "VAnaSum::initialize error creating stereo run directory " << i_temp << " in output file " << fOPfile->GetName() << endl;
+		    cout << "VAnaSum::initialize error creating stereo run directory ";
+		    cout << i_temp << " in output file " << fOPfile->GetName() << endl;
 		    cout << "(run " << fRunPara->fRunList[j].fRunOn << ")" << endl;
 		    exit( -1 );
 		}
-
+// mono directories
                 if( fAnalysisType == 0 || fAnalysisType == 1 || fAnalysisType == 5 )
                 {
                     i_monoDir.clear();
@@ -345,20 +347,20 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 
         fTotalExposureOn = fRunSummary->fTotalExposureOn;
         fTotalExposureOff = fRunSummary->fTotalExposureOff;
-        fRunExposureOn = fRunSummary->f_exposureOn;
+        fRunExposureOn  = fRunSummary->f_exposureOn;
         fRunExposureOff = fRunSummary->f_exposureOff;
         fStereoOn->setRunMJD( fRunSummary->fRunMJD );
         fStereoOff->setRunMJD( fRunSummary->fRunMJD );
-        fMeanAzimuthOn = fRunSummary->fMeanAzimuthOn;
+        fMeanAzimuthOn  = fRunSummary->fMeanAzimuthOn;
         fMeanAzimuthOff = fRunSummary->fMeanAzimuthOff;
         fMeanElevationOn = fRunSummary->fMeanElevationOn;
         fMeanElevationOff = fRunSummary->fMeanElevationOff;
         fNMeanElevation = fRunSummary->fNMeanElevation;
         fMeanDeadTimeOn = fRunSummary->fMeanDeadTimeOn;
         fMeanDeadTimeOff = fRunSummary->fMeanDeadTimeOff;
-        fMeanRawRateOn = fRunSummary->fMeanRawRateOn;
+        fMeanRawRateOn  = fRunSummary->fMeanRawRateOn;
         fMeanRawRateOff = fRunSummary->fMeanRawRateOff;
-        fMeanPedVarsOn = fRunSummary->fMeanPedVarsOn;
+        fMeanPedVarsOn  = fRunSummary->fMeanPedVarsOn;
         fMeanPedVarsOff = fRunSummary->fMeanPedVarsOff;
     }
 }
@@ -381,7 +383,7 @@ void VAnaSum::doStereoAnalysis( bool iSkyPlots )
 
     if( fAnalysisRunMode != 1 )
     {
-// do stereo anlysis for each run
+// do stereo analysis for each run
         for( unsigned int i = 0; i < fRunPara->fRunList.size(); i++ )
         {
             cout << endl;
@@ -451,7 +453,11 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
     if( iexp_off < 10. ) i_norm = 1.;                      // safety net for very short runs (<10 s)
     else                 i_norm=iexp_on/iexp_off;
 
-    if( onrun != -1 && offrun != -1 ) cout << endl <<"Mean properties for this pair: ON="<< onrun <<", OFF="<< offrun <<" -----------------------------"<< endl;
+    if( onrun != -1 && offrun != -1 )
+    {
+        cout << endl << "Mean properties for this pair: ON=" << onrun;
+	cout << ", OFF=" << offrun << " -----------------------------" << endl;
+    }
     cout << "\t Exposure ON=" << iexp_on << " secs (" << iexp_on/60. << "min)";
     cout <<               "  OFF="<< iexp_off << " secs (" << iexp_off/60. << "min),";
     cout << " Normalization=" << i_norm << endl;
@@ -570,11 +576,11 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
 // correlated maps
     fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( false ), 
                                             fStereoOff->getSkyHistograms( false ), 
-					    i_norm, fStereoOff->getAlphaNorm(), (onrun == -1) );
+					    i_norm, fStereoOff->getAlphaNorm() );
 // uncorrelated maps
     fstereo_onoff->doOnOffforSkyHistograms( fStereoOn->getSkyHistograms( true ), 
                                             fStereoOff->getSkyHistograms( true ), 
-					    i_norm, fStereoOff->getAlphaNormUC(), (onrun == -1) );
+					    i_norm, fStereoOff->getAlphaNormUC() );
 
 // print out maximum in maps
     cout << "\t Maximum in CORRELATED maps: " << endl;
