@@ -111,13 +111,13 @@ Apart from the information in this manual, other sources for help are:
 
 A brief description of the analysis methods can be found on the following webpage:
 
-\url{https://znwiki3.ifh.de/CTA/Eventdisplay\%20Software}
+\url{https://wiki-zeuthen.desy.de/CTA/Eventdisplay\%20Software}
 
 \subsection*{README files}
 
 \begin{description}
 \item[INSTALL:]   information on installation the analysis package, dependencies, environmental variables
-\item[README.CTA :]  short description of a typical CTA analysis
+\item[README.CTA:]  short description of a typical CTA analysis
 \item[README.VTS:]      description of a typical VERITAS analysis
 \item[AUTHORS:]		author description
 \end{description}
@@ -220,7 +220,7 @@ Parameter files describing the details of the gamma/hadron separation can be fou
 
 Several different trace integration methods are available. All settings should be in 
 
-{\it \$OBS\_EVNDISP\_AUX/ParameterFiles/EVNDISP.reconstruction.runparameter}.
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter}.
 
 For trace analysis of CTA MC events, the converter {\it CTA.convert\_hessio\_to\_VDST} should be executed with the option '-f 1'.
 
@@ -363,30 +363,67 @@ RUNS 55975 and 55978 (128 samples)
 
 \subsubsection{Low-gain multiplicator}
 
-
-
-\section{Image analysis}
-
-\subsection{Log-likelihood fitting of images}
-
-The status of the covariance matrix is returned and saved to the image parameter tree {\it tpars} in the variable {\it Fitstat}. 
-No fitting has been applied to images with $Fitstat=-1$ 
-
 \section{Image cleaning}
 
-There are different methods available for image cleaning.  All settings should be in 
+There are different methods available for image cleaning.  All settings should be in
 
-{\it \$OBS\_EVNDISP\_AUX/ParameterFiles/EVNDISP.reconstruction.runparameter}.
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter}.
 
 \subsection{Signal-to-noise cleaning}
 
 This is the default cleaning method for VERITAS analysis.
+
+\begin{lstlisting}
+ image cleaning <method> <FIXED/VARIABLE>
+* -1 IMAGECLEANINGMETHOD TWOLEVELCLEANING VARIABLE
+ image cleaning thresholds <image> <border>
+* -1 IMAGECLEANINGTHRESHOLDS 5. 2.5
+\end{lstlisting}
+
 
 \subsection{Fixed threshold cleaning}
 
 \subsection{Time cluster cleaning}
 
 \subsection{Time next-neighbor cleaning}
+
+\section{Image analysis}
+
+\subsection{Image parameters}
+The image parameterization is based on the so-called Hillas parameters \cite{1985ICRC....3..445H}. They are derived by the zeroth order (amplitude or size), first order (center of gravity) and second order (length, width, orientation) moments of the elliptical image of the shower. In general, they are calculated using the formulas given in \cite{1997JPhG...23.1013F}.
+
+The image parameters are stored per telescope in the {\it tpars} tree of the evndisp output file. For more information see: 
+\begin{itemize}
+\item {\it inc/VImageParameter.h} - definition of the image parameters
+\item {\it src/VImageParameterCalculation.cpp} - calculation of the parameters 
+\end{itemize}
+
+\subsection{Log-likelihood fitting of images}
+
+To recover truncated images at the edge of the camera, a simple log-likelihood fitting algorithm is applied. The underlying assumption of the fitting method is that the image of a gamma-ray shower can be described by a two-dimensional normal distribution. Asymmetry is ignored to limit the number of fit parameters which are image centroid position, image width, image length and image size. Noise is estimated by assuming Poisson fluctuations. The starting values for the fit parameters are obtained from the standard image analysis. The following expression is minimized using the MIGRAD method of MINUIT \cite{MINUIT}: 
+\begin{equation}
+L = - \sum (n_i \ln S_i - S_i - n_i \ln n_i + n_i)
+\end{equation}
+where $n_i$ is the measured integrated charge for pixel $i$, and $S_i$ is the estimated charge from the fit function. 
+
+
+The settings for the log-likelyhood fitting should be in 
+
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter}.
+
+\begin{lstlisting}
+ image calculation at the edge of the camera 
+               <minimun loss value> <minimum number of pixels>
+* -1 LLEDGEFIT 0.1 2
+\end{lstlisting}
+
+The status of the covariance matrix is returned and saved to the image parameter tree {\it tpars} in the variable {\it Fitstat}. 
+No fitting has been applied to images with $Fitstat=-1$ 
+
+
+\section{Stereo analysis}
+
+
 
 \chapter{Displaying events}
 
@@ -396,7 +433,7 @@ There are example scripts for display files, see
 
 \begin{itemize}
 \item for CTA:  \$EVNDISP/scripts/CTA/CTA.EVNDISP.display
-\item for VERITAS:  \$EVNDISP/scripts/VTS.EVNDISP.display
+\item for VERITAS:  \$EVNDISP/scripts/VTS/VTS.EVNDISP.display
 \end{itemize} 
 
 Note that the display can be a bit slow for arrays with a large number of telescopes.
@@ -824,9 +861,6 @@ One ROOT and one log file for each simtel file with results from image and array
 %###########################################################################
 \subsection{Step 4: mscw\_energy}
 
-If you use standard configurations maybe some lookup tables already exist (ask Gernot or Heike where you could find them).
-If not, you have to create them from gamma-ray simulations yourself.
-
 \subsubsection{Creating lookup tables}
 
 Lookup tables are used for mean scaled with, length and energy reconstruction.
@@ -989,7 +1023,7 @@ calculate effective areas and instrument response functions for CTA
 
 <scripts parameter file>
      file with analysis parameter
-     see e.g. CTA_EVNDISP_AUX_DIR/ParameterFiles/scriptsInput.runparameter
+     see e.g. CTA_EVNDISP_ANA_DIR/ParameterFiles/scriptsInput.runparameter
 
 <outputsubdirectory>
      directory with all result and log files (full path)
@@ -1464,7 +1498,15 @@ a.plotZDCF( 0, 45., 405. );
 % #############################################
 
 \begin{thebibliography}{}
-\bibitem[Scargle(1982)]{Scargle-1982} Scargle, J. 1982, ApJ 263, 835
+\bibitem[Fegan(1997)]{1997JPhG...23.1013F}
+  Fegan, D.~J., 1997, Journal of Physics G Nuclear Physics, 23, 1013
+\bibitem[Hillas(1985)]{1985ICRC....3..445H}
+  Hillas, A.~M., 1985, in Proc 19th ICRC, La Jolla 
+\bibitem[James(1998)]{MINUIT}
+  James, F., 1998, CERN Program Library Long Writeup D506
+\bibitem[Scargle(1982)]{Scargle-1982} 
+  Scargle, J. 1982, ApJ 263, 835
+
 \end{thebibliography}
 
 \end{document}
