@@ -730,7 +730,6 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     if( fPlotCorrelated ) sprintf( hname, "hmap_stereoUC_sig" );
     else                  sprintf( hname, "hmap_stereo_sig" );
     hmap_stereo_sig = (TH2D*)getHistogram( hname, fRunNumber, "skyHistograms" );
-    setHistogramPlottingStyle( hmap_stereo_sig, 1.5 );
 
     if( fPlotCorrelated ) sprintf( hname, "hmap_stereoUC_on" );
     else                  sprintf( hname, "hmap_stereo_on" );
@@ -760,7 +759,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     for( int i = 0; i < iN; i++ )
     {
         t->GetEntry( i );
-	v_x[i] = -1.*x;
+	v_x[i] = x;
 	v_y[i] = y;
 	v_r[i] = r;
     }
@@ -781,6 +780,9 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     setHistogramPlottingStyle( hsig_1DExcluded, 1, 2, 2, 1, 1, 0 );
     if( hsig_1DExcluded ) hsig_1DExcluded->SetStats( 1 );
     cout << "black: without source region and exclusion regions removed" << endl;
+    delete v_x;
+    delete v_y;
+    delete v_r;
 
     gStyle->SetOptStat( "mr" );
     gStyle->SetOptFit( 1111 );
@@ -2008,6 +2010,13 @@ bool VPlotAnasumHistograms::setRunNumber( int iRun )
    return false;
 }
 
+/*
+
+    plot a sky map for each run in the anasum file
+
+    look at distributions of 1D width/mean for significances
+
+*/
 void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax, double zmin, double zmax, double rSource, int nentries, unsigned int nstart )
 {
 // no runs in runlist
@@ -2055,6 +2064,13 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
     hFit_width->SetYTitle( "# of runs" );
     setHistogramPlottingStyle( hFit_width, 1, 2, 1 );
 
+// Gaussian with mean = 0 and RMS = 1
+   TF1 *fG = new TF1( "fG", "gaus(0)", -5., 5. );
+   fG->FixParameter( 1, 0. );
+   fG->FixParameter( 2, 1. );
+   fG->SetLineColor( 1 );
+   fG->SetLineStyle( 2 );
+
 // loop over all runs
     unsigned int z = 0;
     for( unsigned int i = nstart; i < (unsigned int)nentries+nstart; i++ )
@@ -2085,8 +2101,12 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
         if( zmin > -90. ) h->SetMinimum( zmin );
         h->Draw( fPlotMode.c_str() );
 
+        TMarker *iMZ = new TMarker( 0., 0., 5 );
+        iMZ->SetMarkerColor( 5 );
+        iMZ->Draw();
+
         sprintf( hname, "%d", getRunList()[i].runnumber );
-        TText *iT = new TText( 0.6, 0.7, hname );
+        TText *iT = new TText( 0.7, 0.8, hname );
         iT->SetTextSize( 0.10 );
         iT->SetNDC();
         iT->Draw();
@@ -2126,23 +2146,30 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 	iL->Draw();
 	if( hsig_1D->GetEntries() > 0 )
 	{
+           hsig_1D->Fit( fG, "Q" );
 	   hsig_1D->Fit( "gaus", "Q" );
 	   hsig_1D->GetFunction( "gaus" )->SetLineColor( 8 );
+	   hsig_1D->GetFunction( "gaus" )->SetLineStyle( 2 );
+           hsig_1D->GetFunction( "gaus" )->Draw( "same" );
+           fG->Draw( "same" );
 	   cout << "RUN " << getRunList()[i].runnumber;
-	   cout << "\t" << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ) << " +- " << setprecision( 4 ) << hsig_1D->GetFunction( "gaus" )->GetParError( 1 );
-	   cout << "\t" << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 2 ) << " +- " << setprecision( 4 ) <<  hsig_1D->GetFunction( "gaus" )->GetParError( 2 );
-	   cout << "\t" << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetProb();
-	   cout << "\t" << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetChisquare()/hsig_1D->GetFunction( "gaus" )->GetNDF();
+	   cout << " ,fit results: mean " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 1 );
+           cout << " +- " << setprecision( 4 ) << hsig_1D->GetFunction( "gaus" )->GetParError( 1 );
+	   cout << ", RMS " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 2 );
+           cout << " +- " << setprecision( 4 ) <<  hsig_1D->GetFunction( "gaus" )->GetParError( 2 );
+	   cout << ", probability " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetProb();
+	   cout << ", Chi2/N " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetChisquare()/hsig_1D->GetFunction( "gaus" )->GetNDF();
 	   cout << endl; 
         }
-	TLine *iM = new TLine( hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmin(), hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmax() );
+	TLine *iM = new TLine( hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmin(), 
+                               hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmax() );
 	iM->SetLineStyle( 2 );
 	iM->SetLineColor( 3 );
 	iM->Draw();
         hsig_1D->Draw( "e hist same" );
         hsig_1DAll->Draw("e hist same" );
 
-
+// run number
         iT->Draw();
 
         gPad->Update();
@@ -2164,7 +2191,11 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
     cFit_mean->SetGridy( 0 );
     cFit_mean->Draw();
 
+    hFit_mean->SetStats( 1 );
     hFit_mean->Draw();
+    TLine *lFitMean = new TLine( 0., 0., 0., hFit_mean->GetMaximum() );
+    lFitMean->SetLineStyle( 2 );
+    lFitMean->Draw();
 
     sprintf( hname, "cFit_width_%s", iHistoName.c_str() );
     sprintf( htitle, "width value of fit (%s)", iHistoName.c_str() );
@@ -2172,8 +2203,11 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
     cFit_width->SetGridx( 0 );
     cFit_width->SetGridy( 0 );
     cFit_width->Draw();
-
+    hFit_width->SetStats( 1 );
     hFit_width->Draw();
+    TLine *lFitRMS = new TLine( 1., 0., 1., hFit_width->GetMaximum() );
+    lFitRMS->SetLineStyle( 2 );
+    lFitRMS->Draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -284,7 +284,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
     {
         for( int j = 1; j <= h->GetNbinsY(); j++ )
         {
-            if( h->GetBinContent(i,j)>-9999. &&  h->GetBinContent(i,j) < xmin ) xmin = h->GetBinContent(i,j);
+            if( h->GetBinContent(i,j) > -9999. &&  h->GetBinContent(i,j) < xmin ) xmin = h->GetBinContent(i,j);
         }
     }
     if( xmin < 0. ) xmin *= 1.5;
@@ -314,12 +314,13 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
     for( int i = 1; i <= h->GetNbinsX(); i++ )
     {
         double x_r = h->GetXaxis()->GetBinCenter( i );
-        for( int j = 1; j < h->GetNbinsY(); j++ )
+        for( int j = 1; j <= h->GetNbinsY(); j++ )
         {
 // exclude bins with no on counts
             if( hTest && hTest->GetBinContent( i, j ) == 0. ) continue;
 
             double y_r = h->GetYaxis()->GetBinCenter( j );
+// radius cut
             if( TMath::Sqrt( x_r*x_r + y_r*y_r ) > rmax ) continue;
 
 // exclusion regions
@@ -329,11 +330,11 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
 	       if( (x_r-iExcX[e])*(x_r-iExcX[e])+(y_r-iExcY[e])*(y_r-iExcY[e]) < iExcR[e]*iExcR[e] ) 
 	       {
 	          iBBreak = true;
-		  continue;
+		  break;
                }
 	    }
 	    if( iBBreak ) continue;
-// exclude source bins
+// exclude bins around center of sky map
             if( TMath::Sqrt( x_r*x_r + y_r*y_r ) > rSource ) h1D->Fill( h->GetBinContent( i, j ) );
         }
     }
