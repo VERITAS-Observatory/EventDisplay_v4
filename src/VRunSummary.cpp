@@ -178,19 +178,19 @@ void VRunSummary::print()
         cout << itemp << " min, ";
         sprintf( itemp, "%3d",(int)NOn );
         cout << "Non: " << itemp;
-        sprintf( itemp, "%5.1f", NOffNorm );
+        sprintf( itemp, "%5.2f", NOffNorm );
         cout << ", Noff: " <<  itemp;
         sprintf( itemp, "%4d", (int)NOff );
         cout << " (" << itemp << ", norm ";
-        sprintf( itemp, "%.2f", OffNorm );
+        sprintf( itemp, "%.3f", OffNorm );
         cout << itemp << ")";
         sprintf( itemp, "%5.1f", Signi );
         cout << ", " <<  itemp << " sigma";
-        sprintf( itemp, "%4.2f", Rate );
+        sprintf( itemp, "%4.3f", Rate );
         cout << ", Rates: " << itemp;
-        sprintf( itemp, "%.2f", RateE );
+        sprintf( itemp, "%.3f", RateE );
         cout << " +/- " << itemp << " gamma/min";
-        sprintf( itemp, "%.2f", RateOff );
+        sprintf( itemp, "%.3f", RateOff );
         cout << " (background: " << itemp << " events/min)" << endl;
     }
 
