@@ -365,3 +365,9 @@ void VImageParameter::fill()
     tpars->Fill();
 }
 
+
+void VImageParameter::setImageBorderPixelPosition( vector< float > iImageBorderPixelPosition_x, vector< float > iImageBorderPixelPosition_y )
+{
+   fImageBorderPixelPosition_x = iImageBorderPixelPosition_x;
+   fImageBorderPixelPosition_y = iImageBorderPixelPosition_y;
+}

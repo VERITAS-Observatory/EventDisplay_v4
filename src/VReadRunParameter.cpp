@@ -266,7 +266,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         }
 	else if( iTemp.find( "starbrightness" ) < iTemp.size() )
 	{
-	    fRunPara->fMinStarBrightness_B = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+	    fRunPara->fMinStarBrightness_B = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
 // write all pixel to dst file
         else if( iTemp.find( "dstallpixel" ) < iTemp.size() )

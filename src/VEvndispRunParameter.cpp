@@ -120,7 +120,9 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fPointingErrorY.push_back( 0. );
 // star catalogue
     fStarCatalogueName = "";
-    fMinStarBrightness_B = 7;
+    fMinStarBrightness_B = 7.;
+    fMinStarPixelDistance_deg = -1.;
+    fMinStarNTubes = 100000;
 
     fGainCorrection.push_back( 1. );
 
@@ -423,11 +425,6 @@ void VEvndispRunParameter::print( int iEv )
     if( fMCNdead > 0 ) cout << "Random dead channels: " << fMCNdead << " (seed " <<  fMCNdeadSeed << "), " << fMCNdeadboard << endl;
     if( fPlotPaper ) cout << " (paper plotting mode)";
     cout << endl;
-    if( fStarCatalogueName.size() > 0 )
-    {
-       cout << "reading star catalogue from: " << fStarCatalogueName << endl;
-       cout << "\t minimum brightness (B): " << fMinStarBrightness_B << endl;
-    }
 
     cout << "directories:" << endl;
     cout << "\t analysis data: " << getDirectory_EVNDISPAnaData() << endl;

@@ -1,6 +1,13 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131028 (GM) added functionality to remove images close to bright
+                stars from the stereo reconstruction
+                (new keyword in reconstruction runparamer file: BRIGHTSTARS)
+                to display bright stars add to the command line
+                -starcatalogue Hipparcos_MAG8_1997.dat -starbrightness=7.
+                all star related cuts are switched off by default
+
 * 20131023 (GM) added new run parameter to anasum: setting of reflected
                 regions (can be random or closest)
 

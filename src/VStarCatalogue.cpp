@@ -15,6 +15,8 @@ VStarCatalogue::VStarCatalogue()
 
     fCatalogue = "Hipparcos_MAG8_1997.dat";
     fCatalogueVersion = 0;
+
+    setTelescopePointing();
 }
 
 
@@ -912,7 +914,7 @@ unsigned int VStarCatalogue::setFOV( string ra_hour, string dec, double FOV_x, d
 /*!
     all values in [deg]
 */
-unsigned int VStarCatalogue::setFOV( double ra, double dec, double iFOV_x, double iFOV_y, bool bJ2000 )
+unsigned int VStarCatalogue::setFOV( double ra, double dec, double iFOV_x, double iFOV_y, bool bJ2000, double iBrightness, string iBand )
 {
     double degrad = 180./TMath::Pi();
 
@@ -923,6 +925,9 @@ unsigned int VStarCatalogue::setFOV( double ra, double dec, double iFOV_x, doubl
 
     for( unsigned int i = 0; i < fStars.size(); i++ )
     {
+        if( iBand == "B" && fStars[i]->fBrightness_B > iBrightness ) continue;
+        else if( iBand == "B" && fStars[i]->fBrightness_V > iBrightness ) continue;
+
         if( bJ2000 )
         {
             iRA = fStars[i]->fRA2000;
@@ -1098,6 +1103,56 @@ bool VStarCatalogue::checkTextBlocks( string iL, unsigned int iV )
       return false;
    }
 
-
    return true;
+}
+
+/*
+
+   set telescope pointing and calculate position of stars in FOV
+
+*/
+
+void VStarCatalogue::setTelescopePointing( unsigned int iTelID, double iDerotationAngle, double ra_deg, double dec_deg, double iCameraScale )
+{
+    fTel_telescopeID = iTelID;
+    fTel_deRotationAngle_deg = iDerotationAngle;
+    fTel_ra          = ra_deg;
+    fTel_dec         = dec_deg;
+    fTel_camerascale = iCameraScale;
+}
+
+/*
+
+    get angular distance between a bright star in the FOV and a x,y position in the camera
+
+*/
+double VStarCatalogue::getDistanceToClosestStar( double x_cam_deg, double y_cam_deg )
+{
+   double x_rot = 0.;
+   double y_rot = 0.;
+
+   double i_minDist = 1.e20;
+
+// loop over all stars in the FOV
+   for( unsigned int i = 0; i < fStarsinFOV.size(); i++ )
+   {
+	  double y = -1. * ( fStarsinFOV[i]->fDecCurrentEpoch - fTel_dec );
+	  double x = 0.;
+	  if( cos( fTel_dec * TMath::DegToRad() ) != 0. )
+          {
+             x = -1. * ( fStarsinFOV[i]->fRACurrentEpoch - fTel_ra) / cos( fTel_dec * TMath::DegToRad() );
+          }
+          x_rot = x;
+          y_rot = y;
+// derotation
+          VSkyCoordinatesUtilities::rotate( -1.*fTel_deRotationAngle_deg*TMath::DegToRad(), x_rot, y_rot );
+          x_rot *= -1. * fTel_camerascale;
+          y_rot *= fTel_camerascale;
+
+          double i_dist = sqrt( (x_cam_deg-x_rot)*(x_cam_deg-x_rot) + (y_cam_deg-y_rot)*(y_cam_deg-y_rot) );
+
+          if( i_dist < i_minDist ) i_minDist = i_dist;
+    }
+
+    return i_minDist;
 }

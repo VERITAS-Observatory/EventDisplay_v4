@@ -5,6 +5,7 @@
 
 #include "VEvndispRunParameter.h"
 #include "VImageParameter.h"
+#include "VStarCatalogue.h"
 #include "VUtilities.h"
 
 #include <TNamed.h>
@@ -80,7 +81,8 @@ class VEvndispReconstructionParameter : public TNamed
         ~VEvndispReconstructionParameter() {}
 
 	bool   applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, 
-	                               VImageParameter* iImageParameter, unsigned short int iLocalTriggerType );
+	                               VImageParameter* iImageParameter, unsigned short int iLocalTriggerType,
+				       VStarCatalogue *iStar = 0 );
         int    getTelescopeType_counter( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea( ULong64_t t );
 	int    getTelescopeType_counter_from_MirrorArea_and_PixelSize( ULong64_t t );
@@ -91,6 +93,6 @@ class VEvndispReconstructionParameter : public TNamed
         unsigned int read_arrayAnalysisCuts( string ifile );
 	void   setDebug( bool iD = false ) { fDebug = iD; }
 
-        ClassDef(VEvndispReconstructionParameter,15);
+        ClassDef(VEvndispReconstructionParameter,16);
 };
 #endif

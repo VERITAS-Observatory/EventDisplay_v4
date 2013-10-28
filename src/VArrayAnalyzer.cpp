@@ -204,7 +204,6 @@ void VArrayAnalyzer::initEvent()
     if( fReader->isMC() )
     {
         getArrayPointing()->setMC();
-// TEMP: set here the reference pointing
 // calculate mean el and az from all telescopes (should probably be the same for all)
         double i_el = 0.;
 	double i_az = 0.;
@@ -320,6 +319,7 @@ void VArrayAnalyzer::initAnalysis()
     fMeanPointingMismatch.assign( getNTel(), 0. );
     fNMeanPointingMismatch.assign( getNTel(), 0. );
 
+// initialize star catalogue
     initializeStarCatalogue( getEventMJD(), getEventTime() );
 
 // loop over all methods and read in necessary MLPs, TMVAs, tables, etc....
@@ -582,6 +582,8 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
     getShowerParameters()->fTelIDImageSelected_bitcode[iMeth] = 0;
     getShowerParameters()->fShowerNumImages[iMeth]= 0;
 
+//////////////////////////////////////////////////////////////////////////////////
+// loop over all telescopes and check which image is suitable for reconstruction
     for( unsigned int t = 0; t < getNTel(); t++ )
     {
         setTelID( t );
@@ -601,10 +603,14 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
 	   exit( -1 );
 	   continue;
         }
+
 // apply array analysis cuts
+        updatePointingToStarCatalogue( t );
         getShowerParameters()->fTelIDImageSelected[iMeth].back() = fEvndispReconstructionParameter->applyArrayAnalysisCuts( iMeth, t, iTelType,
 	                                                                                                                    getImageParameters( getRunParameter()->fImageLL ),
-															    getReader()->getLocalTriggerType( t ) );
+															    getReader()->getLocalTriggerType( t ),
+															    getStarCatalogue() );
+// apply cut on image distance to stars
 
 ///////////////////////////
 
@@ -647,7 +653,7 @@ void VArrayAnalyzer::calcShowerDirection_and_Core()
         if( i < getEvndispReconstructionParameter()->fMethodID.size() )
         {
             getShowerParameters()->fMethodID[i] = getEvndispReconstructionParameter()->fMethodID[i];
-// select shower images to be used to determinate of shower coordinates
+// select shower images to be used to determinate shower coordinates
             selectShowerImages( i );
 
 // call reconstruction method
@@ -1819,4 +1825,39 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
     getShowerParameters()->fShower_Chi2[iMethod] = 0.0;
 
     return 0;
+}
+
+/*
+
+   pass telescope pointing to star catalogue for calcuation of 
+   distance to bright stars
+
+*/
+bool VArrayAnalyzer::updatePointingToStarCatalogue( unsigned int iTelescope )
+{
+   if( !getStarCatalogue() ) return false;
+
+// get pointing of telescope
+   float iTel_dec = 0.;
+   float iTel_ra  = 0.;
+   if( iTelescope < getPointing().size() )
+   {
+      iTel_dec = getPointing()[iTelescope]->getTelDec() * TMath::RadToDeg();
+      iTel_ra  = getPointing()[iTelescope]->getTelRA() * TMath::RadToDeg();
+   }
+   else
+   {
+      iTel_dec = getArrayPointing()->getTelDec() * TMath::RadToDeg();
+      iTel_ra  = getArrayPointing()->getTelRA() * TMath::RadToDeg();
+   }
+   double iScale = 1.;
+   if( iTelescope < getDetectorGeometry()->getCameraScaleFactor().size() )
+   {
+      iScale = getDetectorGeometry()->getCameraScaleFactor()[iTelescope];
+   }
+
+   getStarCatalogue()->setTelescopePointing( iTelescope, getArrayPointing()->getDerotationAngle( getEventMJD(), getEventTime() ) * TMath::RadToDeg(),
+                                             iTel_ra, iTel_dec, iScale );
+
+   return true;
 }

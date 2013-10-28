@@ -137,7 +137,8 @@ class VImageParameter
         int ntfit;                                //!< number of restored tubes
         float Fitmin;
         float Fitedm;
-        int Fitstat;                              //!< status of covariance matrix (0=not calculated,1=diagonal approx., not accurate,2=full matrix, but forced to be positive definite, 3=full matrix, accurate
+        int Fitstat;                              //!< status of covariance matrix (0=not calculated,1=diagonal approx., not accurate,
+                                                  //!< 2=full matrix, but forced to be positive definite, 3=full matrix, accurate
         float ntRec;                              //!< number of fit-recovered dead channels
         float dcen_x;
         float dcen_y;
@@ -155,8 +156,11 @@ class VImageParameter
         float signal;
         float dsignal;                            //!< error in signal (normalisation parameter for fit)
 
+        vector< float > fImageBorderPixelPosition_x;              //! list of image+border pixel
+        vector< float > fImageBorderPixelPosition_y;              //! list of image+border pixel
+
         VImageParameter( unsigned int iShortTree = 0 );
-        ~VImageParameter();
+       ~VImageParameter();
         void fill();
         TTree* getTree() { return tpars; }
         bool hasImage();                          //!< succesfull image reconstruction
@@ -164,6 +168,7 @@ class VImageParameter
         bool isMC() { return fMC; }
         void printParameters();
         void reset( unsigned int resetLevel = 0 );
+        void setImageBorderPixelPosition( vector< float > iImageBorderPixelPosition_x, vector< float > iImageBorderPixelPosition_y );
         void setMC() { fMC = true; }
 };
 #endif

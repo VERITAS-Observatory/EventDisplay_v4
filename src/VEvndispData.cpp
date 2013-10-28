@@ -802,6 +802,12 @@ ULong64_t VEvndispData::getTelType( unsigned int iTelID )
     return 99999;
 }
 
+/*
+
+    called for first events
+
+    assume that MJD is not changing significantly 
+*/
 bool VEvndispData::initializeStarCatalogue( int iMJD, double iTime )
 {
     if( getRunParameter()->fStarCatalogueName.size() > 0 )
@@ -816,11 +822,13 @@ bool VEvndispData::initializeStarCatalogue( int iMJD, double iTime )
        }
        iMaxFOV *= 1.5;
        fStarCatalogue->setFOV( getArrayPointing()->getTelRA()*TMath::RadToDeg(), getArrayPointing()->getTelDec()*TMath::RadToDeg(), 
-                               iMaxFOV/2., iMaxFOV/2., false );
+                               iMaxFOV/2., iMaxFOV/2., false, getRunParameter()->fMinStarBrightness_B, "B" );
     }
     return true;
 }
 
+////////////////////////////////
+// initialize static variables
 
 bool VEvndispData::fDebug = false;
 int VEvndispData::fDebugLevel = 0;
@@ -902,5 +910,5 @@ vector< string > VEvndispData::fDeadChannelText;
 //  default pedestals for plotraw option
 valarray<double> VEvndispData::fPlotRawPedestals;
 
-// star catalogues
+// star catalogue
 VStarCatalogue* VEvndispData::fStarCatalogue = 0;

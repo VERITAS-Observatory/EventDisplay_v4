@@ -61,7 +61,8 @@ class VSkyCoordinates
 
         void   derotateCoords( int MJD, double time, double i_xin, double i_yin, double & i_xout, double & i_yout);
         void   derotateCoords( double i_UTC, double i_xin, double i_yin, double & i_xout, double & i_yout);
-        double getDerotationAngle(double i_UTC);
+        double getDerotationAngle( double i_UTC );
+        double getDerotationAngle( int MJD, double time );
         void   getEquatorialCoordinates( int MJD, double time, double az, double ze, double &dec, double &ra );
         double getHourAngle(double i_UTC);
         double getSidereal(double i_UTC);

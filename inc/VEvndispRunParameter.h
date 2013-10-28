@@ -225,7 +225,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 
 // star catalogue
         string fStarCatalogueName;
-	int    fMinStarBrightness_B;
+	float  fMinStarBrightness_B;
+        float  fMinStarPixelDistance_deg;        // closest distance of a pixel to a bright star
+        int    fMinStarNTubes;                   // closest distance analysis applies only for image smaller than this number
 
 // muon parameters
         bool fmuonmode;                           // search for complete muon rings, Martin
@@ -264,6 +266,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,131); //(increase this number)
+        ClassDef(VEvndispRunParameter,132); //(increase this number)
 };
 #endif

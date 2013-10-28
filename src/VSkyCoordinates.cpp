@@ -297,6 +297,11 @@ double VSkyCoordinates::getHourAngle(double i_UTC)
     return slaDranrm(getSidereal(i_UTC)-fTelRA);
 }
 
+double VSkyCoordinates::getDerotationAngle( int iMJD, double iTime )
+{
+   return getDerotationAngle( VSkyCoordinatesUtilities::getUTC( iMJD, iTime ) );
+}
+
 
 double VSkyCoordinates::getDerotationAngle(double i_UTC)
 {
@@ -314,7 +319,7 @@ void VSkyCoordinates::derotateCoords( double i_UTC, double i_xin, double i_yin, 
 void VSkyCoordinates::derotateCoords( int i_mjd, double i_seconds, double i_xin, double i_yin, double & i_xout, double & i_yout)
 {
     double i_UTC = VSkyCoordinatesUtilities::getUTC( i_mjd, i_seconds );
-    double i_theta=getDerotationAngle(i_UTC);
+    double i_theta = getDerotationAngle(i_UTC);
     i_xout=i_xin*cos(i_theta)+i_yin*sin(i_theta);
     i_yout=i_yin*cos(i_theta)-i_xin*sin(i_theta);
 }

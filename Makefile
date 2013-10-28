@@ -368,6 +368,12 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
 		./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 		./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+                ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+                ./obj/VStar.o ./obj/VStar_Dict.o \
+                ./obj/VUtilities.o \
+                ./obj/VASlalib.o \
+                ./obj/VSkyCoordinatesUtilities.o \
+                ./obj/VDB_Connection.o \
 		./obj/mscw_energy.o
 ./obj/mscw_energy.o:	./src/mscw_energy.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -658,6 +664,11 @@ PRINTRUNOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
 		./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+                ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+                ./obj/VStar.o ./obj/VStar_Dict.o \
+                ./obj/VASlalib.o \
+                ./obj/VSkyCoordinatesUtilities.o \
+                ./obj/VDB_Connection.o \
 		./obj/printRunParameter.o
 
 ./obj/printRunParameter.o:	./src/printRunParameter.cpp
@@ -677,6 +688,11 @@ MAKEDISPTABLESOBJ=	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.
 			./obj/Cshowerpars.o ./obj/Ctpars.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+                        ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+                        ./obj/VStar.o ./obj/VStar_Dict.o \
+                        ./obj/VASlalib.o \
+                        ./obj/VSkyCoordinatesUtilities.o \
+                        ./obj/VDB_Connection.o \
 			./obj/VUtilities.o \
 			./obj/makeDISPTables.o
 
@@ -709,6 +725,11 @@ combineDISPTables:	$(COMBINEDISPTABLESOBJ)
 PRINTDISPTABLESOBJ= 	./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 			./obj/VUtilities.o \
+                        ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+                        ./obj/VStar.o ./obj/VStar_Dict.o \
+                        ./obj/VASlalib.o \
+                        ./obj/VSkyCoordinatesUtilities.o \
+                        ./obj/VDB_Connection.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
 			./obj/VDispTable.o ./obj/VDispTableReader.o ./obj/VDispTableReader_Dict.o \
@@ -1006,6 +1027,12 @@ VTS.calculateCrabRateFromMC:	./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 				./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 				./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+                                ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+                                ./obj/VStar.o ./obj/VStar_Dict.o \
+                                ./obj/VUtilities.o \
+                                ./obj/VASlalib.o \
+                                ./obj/VSkyCoordinatesUtilities.o \
+                                ./obj/VDB_Connection.o \
 				./obj/VTS.calculateCrabRateFromMC.o
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
@@ -1023,6 +1050,9 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 				./obj/VExposure.o ./obj/VExposure_Dict.o \
 				./obj/VDB_Connection.o \
 				./obj/VASlalib.o \
+                                ./obj/VStar.o ./obj/VStar_Dict.o \
+                                ./obj/VUtilities.o \
+                                ./obj/VSkyCoordinatesUtilities.o \
 				./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 				./obj/VUtilities.o \
 				./obj/VTS.calculateExposureFromDB.o
@@ -1038,11 +1068,13 @@ VTS.calculateExposureFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 VTS.getLaserRunFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
 			./obj/VStar.o ./obj/VStar_Dict.o \
+                        ./obj/VUtilities.o \
+                        ./obj/VASlalib.o \
+                        ./obj/VSkyCoordinatesUtilities.o \
 			./obj/VDBRunInfo.o \
 			./obj/VDB_Connection.o \
 			./obj/VASlalib.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-			./obj/VUtilities.o \
 			./obj/VTS.getLaserRunFromDB.o
 
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
@@ -1060,6 +1092,10 @@ VTS.getRunListFromDB:	./obj/VDBTools.o ./obj/VDBTools_Dict.o \
 			./obj/VExposure.o ./obj/VExposure_Dict.o \
 			./obj/VDB_Connection.o \
 			./obj/VASlalib.o \
+                        ./obj/VStarCatalogue.o ./obj/VStarCatalogue_Dict.o \
+                        ./obj/VStar.o ./obj/VStar_Dict.o \
+                        ./obj/VUtilities.o \
+                        ./obj/VSkyCoordinatesUtilities.o \
 			./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VUtilities.o \
 			./obj/VTS.getRunListFromDB.o

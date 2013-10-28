@@ -14,6 +14,7 @@
 
 #include "VASlalib.h"
 #include "VGlobalRunParameter.h"
+#include "VSkyCoordinatesUtilities.h"
 #include "VStar.h"
 #include "VUtilities.h"
 #include "VDB_Connection.h"
@@ -39,6 +40,13 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
         vector< VStar* > fStars;
         vector< VStar* > fStarsinFOV;
 
+// telescope pointing 
+        unsigned int fTel_telescopeID;
+        double       fTel_deRotationAngle_deg;
+        double       fTel_ra;
+        double       fTel_dec;
+        double       fTel_camerascale;
+
         bool readCatalogue();
         VStar* readCommaSeparatedLine_Fermi( string, int, VStar* );
         VStar* readCommaSeparatedLine_Fermi_Catalogue( string, int, VStar* );
@@ -52,6 +60,7 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
         bool          init( double MJD, string iCatalogue );
 
 //    void          getStar( unsigned int ID, double &dec, double &ra, double &brightness );
+        double        getDistanceToClosestStar( double x_cam_deg, double y_cam_deg );
         unsigned int  getNStar() { return fStars.size(); }
 	VStar*        getStar( unsigned int ID );
         double        getStarBrightness( unsigned int ID, string iBand = "B" );
@@ -79,12 +88,14 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
         void          printStarsInFOV();
         void          printStarsInFOV( double iMinBrightness, string iBand = "B" );
         void          purge();
-        unsigned int  setFOV( double ra_deg, double dec_deg, double FOV_x, double FOV_y, bool bJ2000 = true );
+        unsigned int  setFOV( double ra_deg, double dec_deg, double FOV_x, double FOV_y, bool bJ2000 = true, double iBrightness = 9999., string iBand = "B" );
         unsigned int  setFOV( string ra_hour, string dec, double FOV_x, double FOV_y, bool bJ2000 = true );
+        void          setTelescopePointing( unsigned int iTelID = 0, double iDerotationAngle = 0.,
+                                            double ra_deg = -99., double dec_deg = -99., double iCameraScale = 1. );
         bool          writeCatalogueToRootFile( string iRootFile );
 
 	bool          checkTextBlocks( string iL, unsigned int iV );
 
-        ClassDef(VStarCatalogue,5);
+        ClassDef(VStarCatalogue,6);
 };
 #endif

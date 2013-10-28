@@ -11,6 +11,7 @@
 #include "VMLPAnalyzer.h"
 #include "VShowerParameters.h"
 #include "VSkyCoordinatesUtilities.h"
+#include "VStarCatalogue.h"
 
 #include <bitset>
 #include <cmath>
@@ -77,6 +78,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
         void selectShowerImages( unsigned int );  //!< select shower images to be used in determinate of shower coordinates
                                                   //!< transform telescope positions into shower coordinates
         void transformTelescopePosition( int iTel, float ize, float iaz, bool i_MC );
+        bool updatePointingToStarCatalogue( unsigned int iTelescopeID );
 
     public:
 

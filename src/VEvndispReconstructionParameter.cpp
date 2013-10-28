@@ -47,10 +47,13 @@ void VEvndispReconstructionParameter::reset()
    
 
 /*
+
      apply array analysis cuts for this set of image parameters
+
 */
 bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth, unsigned int iTel, unsigned int iTelType, 
-                                                              VImageParameter* iImageParameter, unsigned short int iLocalTriggerType )
+                                                              VImageParameter* iImageParameter, unsigned short int iLocalTriggerType,
+							      VStarCatalogue *iStarCatalogue )
 {
 // sanity checks
    if( iMeth >= fNMethods )
@@ -91,12 +94,6 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
    if( fL2TriggerType[iMeth][iTelType] != 9999 )
    {
       bitset< 8 > i_L2TrigType( iLocalTriggerType );
-/*      if( fL2TriggerType[iMeth][iTelType] == 0 && iLocalTriggerType == 0 )
-      {
-	 iArrayCut = false;
-      }
-// all other trigger types
-      else if( fL2TriggerType[iMeth][iTelType] != 0 ) */
       if( !i_L2TrigType.test( fL2TriggerType[iMeth][iTelType] ) )
       {
 	 iArrayCut = false;
@@ -111,7 +108,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
-
+////////////////////////////////////////////
 // image size
    if( iImageParameter->size < fSize_min[iMeth][iTelType] || iImageParameter->size <= 0. )
    {
@@ -123,6 +120,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
+////////////////////////////////////////////
 // number of ntubes (<=!!!)
    if( iImageParameter->ntubes <= fLocalNtubes_min[iMeth][iTelType] )
    {
@@ -134,7 +132,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
-// saturated channels
+////////////////////////////////////////////
+// number of saturated channels
    if( iImageParameter->nlowgain > fLocalNLowGain_max[iMeth][iTelType] )
    {
       iArrayCut = false;
@@ -145,6 +144,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
+////////////////////////////////////////////
 // image length
    if( iImageParameter->length < fLength_min[iMeth][iTelType] || iImageParameter->length > fLength_max[iMeth][iTelType] )
    {
@@ -155,6 +155,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 	 cout << " (" << fLength_min[iMeth][iTelType] << ", " << fLength_max[iMeth][iTelType] << ")" << endl;
       }
    }
+
+////////////////////////////////////////////
 // image width 
    if( iImageParameter->width < fWidth_min[iMeth][iTelType] || iImageParameter->width > fWidth_max[iMeth][iTelType] )
    {
@@ -166,7 +168,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
-// image distance
+////////////////////////////////////////////
+// image distance to camera centre
    if( iImageParameter->dist < fLocalDistance_min[iMeth][iTelType] || iImageParameter->dist > fLocalDistance_max[iMeth][iTelType] )
    {
       iArrayCut = false;
@@ -177,6 +180,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
+////////////////////////////////////////////
 // image alpha
    if( iImageParameter->alpha < fLocalAlpha_min[iMeth][iTelType] || iImageParameter->alpha > fLocalAlpha_max[iMeth][iTelType] )
    {
@@ -188,6 +192,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
+////////////////////////////////////////////
 // loss cut
    if( iImageParameter->loss > fLoss_max[iMeth][iTelType] )
    {
@@ -199,7 +204,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
-// cut on successfull reconstruction on the edge of the FOV
+////////////////////////////////////////////
+// cut on successfull LL reconstruction on the edge of the FOV
    if( fRunPara )
    {
       if( iTel < fRunPara->fLogLikelihoodLoss_min.size() )
@@ -233,6 +239,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
+////////////////////////////////////////////
 // width/length cut
    if( iImageParameter->length > 0. && iImageParameter->width/iImageParameter->length > fWidthLength_max[iMeth][iTelType] )
    {
@@ -244,6 +251,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
+////////////////////////////////////////////
 // image asymmetry
    if( iImageParameter->asymmetry < fAsym_min[iMeth][iTelType] || iImageParameter->asymmetry > fAsym_max[iMeth][iTelType] )
    {
@@ -255,7 +263,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
-// fui
+////////////////////////////////////////////
+// fui: fraction of image under 2D Gauss
    if( iImageParameter->fui < fFui_min[iMeth][iTelType] )
    {
       iArrayCut = false;
@@ -266,7 +275,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
-// remove image by hand
+////////////////////////////////////////////
+// user set: remove image
    if( !fLocalUseImage[iMeth][iTelType] )
    {
       iArrayCut = false;
@@ -274,6 +284,32 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       {
          cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: image removed by user selection" << endl;
       }
+   }
+
+////////////////////////////////////////////
+// remove image which is too close to a bright star
+// (use list of image and border pixels)
+   if( iStarCatalogue && fRunPara && iImageParameter->ntubes < fRunPara->fMinStarNTubes )
+   {
+       for( unsigned int i = 0; i < iImageParameter->fImageBorderPixelPosition_x.size(); i++ )
+       {
+          if( i < iImageParameter->fImageBorderPixelPosition_y.size() )
+          {
+             if( iStarCatalogue->getDistanceToClosestStar( iImageParameter->fImageBorderPixelPosition_x[i], 
+                                                           iImageParameter->fImageBorderPixelPosition_y[i] ) < fRunPara->fMinStarPixelDistance_deg )
+             {
+                iArrayCut = false;
+                if( fDebug )
+                {
+                   cout << "Telescope " << iTel+1 << endl;
+                   cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: bright star cut: ";
+                   cout << iStarCatalogue->getDistanceToClosestStar( iImageParameter->cen_x, iImageParameter->cen_y );
+                   cout << " (" << fRunPara->fMinStarPixelDistance_deg << " deg )" << endl;
+                }
+                if( !iArrayCut ) break;
+             }
+          }
+       }
    }
 
    if( fDebug ) cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: cut: " << iArrayCut << endl;
@@ -447,6 +483,16 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 		cout << i+1 << " [set number: " << m << "]" << endl;
             }
 	}
+    }
+
+    if( fRunPara && fRunPara->fStarCatalogueName.size() > 0 )
+    {
+       cout << endl;
+       cout << "reading star catalogue from: " << fRunPara->fStarCatalogueName << endl;
+       cout << "\t minimum brightness (B): " << fRunPara->fMinStarBrightness_B;
+       if( fRunPara->fMinStarPixelDistance_deg < 1.e20 ) cout << " (max pixel distance " << fRunPara->fMinStarPixelDistance_deg << " deg)";
+       if( fRunPara->fMinStarNTubes < 100000 ) cout << ", (max number of pixels: " << fRunPara->fMinStarNTubes << ")";
+       cout << endl;
     }
     cout << "------------------------------" << endl;
     cout << endl;
@@ -698,6 +744,23 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 }
 		continue;
 	    }
+            else if( iTemp == "BRIGHTSTARS" && fRunPara )
+            {
+                fRunPara->fStarCatalogueName = iTemp2;
+                if( iTemp3.size() > 0 )
+                {
+                   fRunPara->fMinStarBrightness_B = atof( iTemp3.c_str() );
+                }
+                if( iTemp4.size() > 0 )
+                {
+                   fRunPara->fMinStarPixelDistance_deg = atof( iTemp4.c_str() );
+                }
+                if( iTemp5.size() > 0 )
+                {
+                   fRunPara->fMinStarNTubes = atoi( iTemp5.c_str() );
+                }
+                continue;
+            }
 	    else if( iTemp == "LLEDGEFIT" && fRunPara )
 	    {
 	       for( unsigned int i = 0; i < fTel_type_V.size(); i++ )

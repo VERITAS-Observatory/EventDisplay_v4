@@ -785,6 +785,8 @@ void VImageParameterCalculation::calcParameters()
 // calculate image parameters
 /////////////////////////////////////////
 
+    setImageBorderPixelPosition( fParGeo );
+
 // loop over all pixels
     for( unsigned int j = 0; j < fData->getSums().size(); j++ )
     {
@@ -1515,6 +1517,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 
 // filling of VImageParameter 
 
+    setImageBorderPixelPosition( fParLL );
     fParLL->cen_x = cen_x;
     fParLL->cen_y = cen_y;
     fParLL->length = length;
@@ -1741,4 +1744,25 @@ void get_LL_imageParameter_2DGauss( Int_t &npar, Double_t *gin, Double_t &f, Dou
         }
     }
     f = -1. * LL;
+}
+
+void VImageParameterCalculation::setImageBorderPixelPosition( VImageParameter *iPar )
+{
+    if( fData && iPar )
+    {
+       vector< float > i_x;
+       vector< float > i_y;
+       for( unsigned int i = 0; i < fData->getImage().size(); i++ )
+       {
+          if( fData->getImage()[i] || fData->getBorder()[i] )
+          {
+              if( fData->getDetectorGeometry() && i < fData->getDetectorGeometry()->getX().size() && i < fData->getDetectorGeometry()->getY().size() )
+              {
+                  i_x.push_back( fData->getDetectorGeometry()->getX()[i] );
+                  i_y.push_back( fData->getDetectorGeometry()->getY()[i] );
+              }
+          }
+       }
+       iPar->setImageBorderPixelPosition( i_x, i_y );
+     }  
 }

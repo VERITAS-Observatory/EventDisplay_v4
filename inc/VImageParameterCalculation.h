@@ -51,6 +51,7 @@ class VImageParameterCalculation : public TObject
 
         double getFractionOfImageBorderPixelUnderImage( double, double, double, double, double, double );
         double redang( double angle, double maxI );  //!< reduce angle to intervall [0.,maxI]
+        void   setImageBorderPixelPosition( VImageParameter *iPar );
 
 // Hough transform
         VHoughTransform *fHoughTransform;
