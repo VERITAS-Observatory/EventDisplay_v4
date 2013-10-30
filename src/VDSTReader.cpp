@@ -79,6 +79,7 @@ bool VDSTReader::init()
         vector< bool > i_tempB( fNChannel[i], true );
         vector< bool > i_tempF( fNChannel[i], false );
         fSums.push_back( i_temp );
+	fPe.push_back( i_temp );
 	vector< valarray< double > > i_temp_VV;
 	for( unsigned int t = 0; t < VDST_MAXTIMINGLEVELS; t++ ) i_temp_VV.push_back( i_temp );
 	fTracePulseTiming.push_back( i_temp_VV );
@@ -153,6 +154,7 @@ bool VDSTReader::getNextEvent()
         for( unsigned int j = 0; j < fNChannel[i]; j++ )
         {
             fSums[i][j] = fDSTTree->getDSTSums( j );
+	    fPe[i][j] = fDSTTree->getDSTPe( j );
 	    for( unsigned int t = 0; t < fDSTTree->getDSTpulsetiminglevelsN(); t++ ) fTracePulseTiming[i][t][j] = fDSTTree->getDSTpulsetiming( j, t );
             fHiLo[i][j] = fDSTTree->getDSTHiLo( j );
             fTraceMax[i][j] = fDSTTree->getDSTMax( j );

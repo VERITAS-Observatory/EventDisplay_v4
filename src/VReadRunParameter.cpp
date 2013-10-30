@@ -838,7 +838,7 @@ void VReadRunParameter::test_and_adjustParams()
 // test if this is a DST file
     getRunParametersFromDST();
 // set pulse timing for DST case
-    if( fRunPara->frunmode == 4 )
+    if( fRunPara->frunmode == 4 && fRunPara->getObservatory().find( "VERITAS" ) == string::npos )
     {
        fRunPara->fpulsetiminglevels.clear();
        fRunPara->fpulsetiminglevels.push_back( 0.2 );

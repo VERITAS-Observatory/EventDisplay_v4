@@ -126,6 +126,8 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
     fDST_tree->Branch( "L1trig", fDSTL1trig, tname );
     sprintf( tname, "sum[ntel_data][%d]/F", VDST_MAXCHANNELS );
     fDST_tree->Branch( "sum", fDSTsums, tname );
+    sprintf( tname, "sum2[ntel_data][%d]/F", VDST_MAXCHANNELS );
+    fDST_tree->Branch( "sum2", fDSTsums2, tname );
     sprintf( tname, "dead[ntel_data][%d]/s", VDST_MAXCHANNELS );
     fDST_tree->Branch( "dead", fDSTdead, tname );
     sprintf( tname, "zerosuppressed[ntel_data][%d]/s", VDST_MAXCHANNELS );
@@ -165,6 +167,12 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
        fDST_tree->Branch( "Trace", fDSTtrace, tname );
     }
 
+//PhotoElectrons
+    if( fMC )//to be changed to something like fReadPE...
+    {	
+	sprintf( tname, "Pe[ntel_data][%d]/i", VDST_MAXCHANNELS );
+	fDST_tree->Branch( "Pe",fDSTPe, tname);	
+    }
 // photo diode data
     if( iPhotoDiode )
     {
@@ -285,7 +293,9 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
     memset( fDSTHiLo, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTHiLo[0][0] ) );
     memset( fDSTMax, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTMax[0][0] ) );
     memset( fDSTL1trig, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTL1trig[0][0] ) );
+    memset( fDSTPe, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTPe[0][0] ) );
     std::fill( &fDSTsums[0][0], &fDSTsums[0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 0. );
+    std::fill( &fDSTsums2[0][0], &fDSTsums2[0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 0. );
     std::fill( &fDSTpulsetiming[0][0][0], &fDSTpulsetiming[0][0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS*VDST_MAXTIMINGLEVELS, 0. );
     std::fill( &fDSTpulsetiminglevels[0][0], &fDSTpulsetiminglevels[0][0] + VDST_MAXTELESCOPES*VDST_MAXTIMINGLEVELS, 0. ); 
     if( fReadWriteFADC )
@@ -354,6 +364,8 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     fDST_tree->SetBranchAddress( "nL1trig", fDSTnL1trig );
     fDST_tree->SetBranchAddress( "L1trig", fDSTL1trig );
     fDST_tree->SetBranchAddress( "sum", fDSTsums );
+    if( fDST_tree->GetBranchStatus( "sum2" ) ) fDST_tree->SetBranchAddress( "sum2", fDSTsums2 );
+    else                                       fDST_tree->SetBranchAddress( "sum", fDSTsums );
     fDST_tree->SetBranchAddress( "dead", fDSTdead );
     if( fDST_tree->GetBranchStatus( "zerosuppressed" ) ) fDST_tree->SetBranchAddress( "zerosuppressed", fDSTZeroSuppressed );
     fDST_tree->SetBranchAddress( "tzero", fDSTt0 );
@@ -362,6 +374,11 @@ bool VDSTTree::initDSTTree( TTree *t, TTree *c )
     {
        fDST_tree->SetBranchAddress( "Trace", fDSTtrace );
        setFADC( true );
+    }
+    if( fDST_tree->GetBranchStatus( "Pe" ) )
+    {
+    	fDST_tree->SetBranchAddress("Pe",fDSTPe);
+	setMC( true );
     }
     if( fDST_tree->GetBranchStatus( "numSamples" ) ) fDST_tree->SetBranchAddress( "numSamples", fDSTnumSamples );
     fDST_tree->SetBranchAddress( "pulsetiminglevel", fDSTpulsetiminglevels );
@@ -428,6 +445,22 @@ double VDSTTree::getDSTSums( int iChannelID )
     else
     {
         return fDSTsums[fTelescopeCounter_temp][iChannelID];
+    }
+    return 0;
+}
+
+double VDSTTree::getDSTPe( int iTelID, int iChannelID )
+{
+    setTelCounter( iTelID );
+    return getDSTPe( iChannelID );
+}
+
+double VDSTTree::getDSTPe( int iChannelID )
+{
+    if( fTelescopeCounter_temp < 0 && iChannelID < VDST_MAXCHANNELS ) return 0.;
+    else
+    {
+        return fDSTPe[fTelescopeCounter_temp][iChannelID];
     }
     return 0;
 }

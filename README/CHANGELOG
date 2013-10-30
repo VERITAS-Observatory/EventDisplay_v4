@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131030 (GM) added 'npe' to dst trees (CTA)
+
+* 20131030 (GM) first adjustments to read files on the dCache
+
 * 20131028 (GM) added functionality to remove images close to bright
                 stars from the stereo reconstruction
                 (new keyword in reconstruction runparamer file: BRIGHTSTARS)

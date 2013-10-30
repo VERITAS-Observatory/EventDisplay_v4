@@ -72,6 +72,7 @@ class VDSTTree
 
 // adc parameters
         float        fDSTsums[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];                // integrated charge
+        float        fDSTsums2[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];                // integrated charge
         unsigned short int fDSTdead[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 	unsigned short int fDSTZeroSuppressed[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         unsigned short int fDSTsumwindow[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
@@ -99,6 +100,8 @@ class VDSTTree
         float fDSTPDMax[VDST_MAXTELESCOPES];
         float fDSTPDSum[VDST_MAXTELESCOPES];
 //////////////////////////////////////////////////////////////////////////////////////
+// photoelectrons	
+	unsigned int fDSTPe[VDST_MAXTELESCOPES][VDST_MAXCHANNELS]; // sum of Che pe in each pixel	
 // fit parameter
         float fDSTChi2[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 //!< rise time 10-90%
@@ -176,6 +179,8 @@ class VDSTTree
 
         double       getDSTSums( int iChannelID );
         double       getDSTSums( int iTelID, int iChannelID );
+	double       getDSTPe( int iChannelID );
+        double       getDSTPe( int iTelID, int iChannelID );
         double       getDSTMax( int iChannelID );
         double       getDSTMax( int iTelID, int iChannelID );
         double       getDSTRawMax( int iChannelID );

@@ -660,7 +660,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
             }
         }
 
-// calibration data (pedestals in time slices)
+// time dependent dead channels finder (pedestals in time slices)
         if( usePedestalsInTimeSlices( iLowGain ) )
         {
 // reset bits for ped settings
@@ -670,18 +670,26 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
             setDead( i, 4, iLowGain, false, true );
 
 // check values
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestals( i, getPeds( iLowGain )[i] ), iLowGain );
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestalVariations( i, getPedvars( iLowGain, getSumWindow() )[i] ), iLowGain );
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestalVariationsMinOut( i, getPedvars( iLowGain, getSumWindow() )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestalVariationsMaxOut( i, getPedvars( iLowGain, getSumWindow() )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                        ->testPedestals( i, getPeds( iLowGain )[i] ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                        ->testPedestalVariations( i, getPedvars( iLowGain, getSumWindow() )[i] ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                        ->testPedestalVariationsMinOut( i, getPedvars( iLowGain, getSumWindow() )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                         ->testPedestalVariationsMaxOut( i, getPedvars( iLowGain, getSumWindow() )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
         }
 // same data for whole run
         else if( iFirst )
         {
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestals( i, getPeds( iLowGain )[i] ), iLowGain );
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestalVariations( i, getPedvars( iLowGain )[i] ), iLowGain );
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestalVariationsMinOut( i, getPedvars( iLowGain )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
-            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )->testPedestalVariationsMaxOut( i, getPedvars( iLowGain )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                        ->testPedestals( i, getPeds( iLowGain )[i] ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                        ->testPedestalVariations( i, getPedvars( iLowGain )[i] ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                        ->testPedestalVariationsMinOut( i, getPedvars( iLowGain )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
+            setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
+                        ->testPedestalVariationsMaxOut( i, getPedvars( iLowGain )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
         }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -689,13 +697,18 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 // gain/toff/low gain values are not time dependent
         if( iFirst )
         {
-            if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0) || (iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
+            if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0)
+               || (iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
             {
-                setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )->testGains( i, getGains( iLowGain )[i] ), iLowGain );
-                setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )->testGainVariations( i, getGainvars( iLowGain && getLowGainGains() )[i] ), iLowGain );
-                setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i] , getGains_DefaultValue( iLowGain )[i] ), iLowGain );
+                setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
+                            ->testGains( i, getGains( iLowGain )[i] ), iLowGain );
+                setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
+                            ->testGainVariations( i, getGainvars( iLowGain && getLowGainGains() )[i] ), iLowGain );
+                setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
+                            ->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i] , getGains_DefaultValue( iLowGain )[i] ), iLowGain );
             }
-            if( (!getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0) || (iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
+            if( (!getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0 )
+             || (iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
             {
                 setDead( i, getDeadChannelFinder( iLowGain && getLowGainTOff() )->testTimeOffsets( i, getTOffsets( iLowGain )[i] ), iLowGain );
             }
@@ -710,7 +723,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
                 }
                 if( fRunPar->fDoublePass )
                 {
-                    if( getDeadChannelFinder( iLowGain )->testGainMultiplier( i, getLowGainMultiplier( true )[i], getMeanLowGainMultiplier( true ), getRMSLowGainMultiplier( true ) ) )
+                    if( getDeadChannelFinder( iLowGain )
+                      ->testGainMultiplier( i, getLowGainMultiplier( true )[i], getMeanLowGainMultiplier( true ), getRMSLowGainMultiplier( true ) ) )
                     {
                         getLowGainMultiplier( true )[i] = getMeanLowGainMultiplier( true );
                         getLowGainMultiplierError( true )[i] = 0.;

@@ -135,9 +135,9 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
         tpars->Branch("frac", &frac, "frac[3]/F");
         tpars->Branch("ntrig", &ntrig, "ntrig/s");
         tpars->Branch("ntrig_per_patch", &ntrig_per_patch, "ntrig_per_patch/s");
-        tpars->Branch("bad", &bad, "bad/s");
-        tpars->Branch("badLow", &badLow, "badLow/s");
     }
+    tpars->Branch("bad", &bad, "bad/s");
+    tpars->Branch("badLow", &badLow, "badLow/s");
     tpars->Branch("tgrad_x",&tgrad_x, "tgrad_x/F");
     if( fShortTree < 1 )
     {

@@ -37,6 +37,7 @@ class VDSTReader : public VVirtualDataReader
         unsigned int fSelectedHitChannel;
         vector< unsigned int > fNChannel;
         vector< valarray< double > > fSums;
+	vector< valarray< double > > fPe;
 	vector< vector< valarray< double > > > fTracePulseTiming;
         vector< vector < unsigned int > > fDead;
         vector< valarray< double > > fTraceMax;
@@ -139,6 +140,7 @@ class VDSTReader : public VVirtualDataReader
         vector< uint16_t >            getSamplesVec16Bit();
 	uint16_t                      getSample16Bit( unsigned channel, unsigned sample, bool iNewNoiseTrace = true );
         valarray< double >&           getSums( unsigned int iNChannel = 99999 ) { return fSums[fTelID]; }
+	valarray< double >&           getPe( unsigned int iNChannel = 99999 ) { return fPe[fTelID]; }
         string                        getSourceFileName() { return fSourceFileName; }
         vector< double >              getTelAzimuth() { return fTelAzimuth; }
         vector< double >              getTelElevation() { return fTelElevation; }

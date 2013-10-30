@@ -4,8 +4,7 @@
     output is after pedestal substraction, gain and toffset correction
 
 
-    \author
-Gernot Maier
+    \author Gernot Maier
 */
 
 #include <VDST.h>
@@ -180,6 +179,7 @@ void VDST::fill()
 	   if( getImageThresh() > 0. )
 	   {
 	       if( fVImageCleaning ) fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBorderThresh() );
+// NOTE: DOUBLE PASS IS NOT WORKING FOR DSTs, this call should not be here!!!!
 	       if( getRunParameter()->fDoublePass )
 	       {
 		   calcSecondTZerosSums();
@@ -216,11 +216,13 @@ void VDST::fill()
             if( isTeltoAna( i ) && ( (!fBLaser || (i_total > fRunPar->fLaserSumMin) ) && ( fRunPar->fdstwriteallpixel || getBorder()[j] || getImage()[j] ) ) )
             {
                 intubes++;
+// for laser only
                 if( fBLaser )
                 {
                     int corrfirst = TMath::Nint( getTZeros()[j] ) - 3;
 
                     fDSTsums[i][j] = (float)fTraceHandler->getTraceSum( corrfirst, corrfirst+getSumWindow(), false );
+                    fDSTsums2[i][j] = fDSTsums[i][j];
                                                   // ignore dead low gain channels
                     fDSTdead[i][j] = (unsigned int)getDead()[j];
                     fDSTsumwindow[i][j] = getCurrentSumWindow()[j];
@@ -237,9 +239,11 @@ void VDST::fill()
                     fDSTMax[i][j] = (short)i_max;
                     fDSTRawMax[i][j] = (short)(i_max + getPeds(getHiLo()[j])[j] );
                 }
+// normal data
                 else
                 {
                     fDSTsums[i][j] = (float)getSums()[j]; // ignore dead low gain channels
+                    fDSTsums2[i][j] = (float)getSums2()[j]; // ignore dead low gain channels
                     fDSTdead[i][j] = (unsigned int)getDead()[j];
                     fDSTsumwindow[i][j] = getCurrentSumWindow()[j];
                     fDSTsumfirst[i][j] = getTCorrectedSumFirst()[j];
@@ -266,6 +270,7 @@ void VDST::fill()
             else
             {
                 fDSTsums[i][j] = 0.;
+                fDSTsums2[i][j] = 0.;
                 fDSTsumwindow[i][j] = 0;
                 fDSTsumfirst[i][j] = 0;
                 fDSTChi2[i][j] = 0.;

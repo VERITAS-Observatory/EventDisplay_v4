@@ -576,7 +576,8 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 		fData->fDSTsums[i_ntel_data][p] = (float)(TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP, iLowGain ) * 100. ))/100.;
 // set low gain switch
 		fData->fDSTHiLo[i_ntel_data][p] = iLowGain;
-
+// pe count
+		fData->fDSTPe[i_ntel_data][p] = hsdata->mc_event.mc_pe_list[telID].pe_count[p];										
 // fill FADC trace
 		unsigned int iTraceIsZero = 1;
    	        if( iWriteFADC )

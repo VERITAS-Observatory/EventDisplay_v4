@@ -34,10 +34,10 @@ class VImageParameter
         double fborderthresh;                     //!< parameter for border threshold
         int fsumfirst;                            //!< parameter for window summation start
         int fsumwindow;                           //!< parameter for window summation
-        int fsumwindow_2;                      //!< parameter for window summation for energy reconstruction
+        int fsumwindow_2;                         //!< parameter for window summation for energy reconstruction
         short int fLocalTrigger;                  //!< 1 of this telescope had a local trigger
- 	int fncluster_cleaned;                    //!< HP: number of clusters after image cleaning 
- 	int fncluster_uncleaned;                  //!< HP: number of clusters after image cleaning 
+ 	int fncluster_cleaned;                    //!< number of clusters after image cleaning 
+ 	int fncluster_uncleaned;                  //!< number of clusters after image cleaning 
 	unsigned short int fTrig_type;            //  trigger type (e.g. in CTA prod2)
 
 // telescope position in shower parameter
@@ -98,7 +98,7 @@ class VImageParameter
 
 // signal section
         unsigned short int ntubes;                //!< number of tubes in the picture
-        unsigned short int trig_tubes;            //!< MS: number of tubes selected in the trigger algorithm
+        unsigned short int trig_tubes;            //!< number of tubes selected in the trigger algorithm
         unsigned short int ntubesBrightNoImage;   //!< number of tubes which are bright but not in the image
         unsigned short int ntrig;                 //!< number of tubes triggering their CFD
         unsigned short int ntrig_per_patch;       //!< number of tubes triggering their CFD per 19 pixel patch
