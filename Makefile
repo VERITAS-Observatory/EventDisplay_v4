@@ -58,6 +58,7 @@ ROOT528=$(shell expr 5.28 \>= `root-config --version | cut -f1 -d \/`)
 ROOT_MLP=$(shell root-config --has-xml)
 ROOT_MINUIT2=$(shell root-config --has-minuit2)
 ROOT_MYSQL=$(shell root-config --has-mysql)
+ROOT_DCACHE=$(shell root-config --has-dcache)
 #############################
 # VERITAS BANK FORMAT (VBF)
 #############################
@@ -68,6 +69,15 @@ ifeq ($(origin VBFSYS), undefined)
   ifeq ($(strip $(VBFTEST)),)
    VBFFLAG=-DNOVBF
   endif
+endif
+#############################
+# DCACHE
+# (necessary for CTA data analysis)
+#############################
+# check that root is compiled with dcache
+DCTEST=$(shell root-config --has-dcache)
+ifeq ($(DCTEST),yes)
+  DCACHEFLAG=-DRUNWITHDCACHE
 endif
 #############################
 # VERITAS DATABASE 
@@ -112,7 +122,7 @@ endif
 CXX           = g++ 
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(DCACHEFLAG)
 LD            = g++ 
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -145,6 +155,9 @@ GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO
 ifeq ($(ROOT_MINUIT2),yes)
    GLIBS     += -lMinuit2
 endif
+#ifeq ($(DCTEST),yes)
+#   GLIBS     += -lDCache
+#endif
 ########################################################
 # VBF
 ########################################################
@@ -1409,7 +1422,7 @@ configuration config:
 	@echo "gcc $(GCCVERSION) on $(GCCMACHINE)"
 	@echo ""
 	@echo "using root version $(ROOTVERSION)"
-	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL)"
+	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE)"
 	@echo ""
 ifeq ($(GSLFLAG),-DNOGSL)
 	@echo "evndisp without GSL libraries (frogs)"

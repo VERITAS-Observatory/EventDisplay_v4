@@ -47,7 +47,8 @@ int main( int argc, char *argv[] )
         cout << "print run parameters stored in eventdisplay or mscw_energy file" << endl;
 	cout << endl;
 	cout << "   options: " << endl;
-	cout << "      -mcaz   print MC azimuth angle" << endl;
+	cout << "      -mcaz      print MC azimuth angle" << endl;
+        cout << "      -runnumber print MC run number" << endl;
         cout << endl;
         exit( 0 );
     }
