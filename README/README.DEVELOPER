@@ -11,3 +11,8 @@ Creating your own svn branch
 ============================
 
 svn copy  https://svnsrv.desy.de/desy/EVNDISP/trunk https://svnsrv.desy.de/desy/EVNDISP/branches/my-dev-400 -m 'test of how to create a branch'
+
+Tagging
+=======
+
+svn copy https://svnsrv.desy.de/desy/EVNDISP/trunk https://svnsrv.desy.de/desy/EVNDISP/tags/my-tag -m 'tag something'
