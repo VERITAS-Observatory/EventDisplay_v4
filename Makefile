@@ -330,15 +330,6 @@ FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
                 ./obj/VFrogParameters.o
 
-MODELOBJECTS =  ./obj/VMinimizer.o \
-		./obj/VModel3DFn.o \
-		./obj/VModel3DData.o \
-		./obj/VModelLnL.o \
-		./obj/VModel3D.o \
-		./obj/VEmissionHeightCalculator.o
-
-EVNOBJECTS += $(MODELOBJECTS) 
-
 # add frogs objects
 ifneq ($(GSLFLAG),-DNOGSL)
    EVNOBJECTS += $(FROGSOBJECTS)

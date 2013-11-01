@@ -174,9 +174,8 @@ TCanvas* VZDCF::plot( TCanvas *c, bool bzdcf, double taumin, double taumax, doub
        else        hZDCF->SetYTitle(  "ZDCF / error " );
        if( ymin > -99. && ymax > -99. )
        {
-	  hZDCF->SetYTitle(  "ZDCF" );
-	  hZDCF->SetMinimum( getZDCFData_dcf_min( true, taumin, taumax ) * 1.1 );
-	  hZDCF->SetMaximum( getZDCFData_dcf_max( true, taumin, taumax ) * 1.1 );
+          hZDCF->SetMinimum( ymin );
+	  hZDCF->SetMaximum( ymax );
        }
        else if( bzdcf )
        {

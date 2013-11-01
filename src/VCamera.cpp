@@ -257,6 +257,7 @@ void VCamera::setUpCamera()
     for( int t = 0; t < 2*(int)iMaxDist; t++ ) fTheta2Circle.push_back( new TEllipse( 0., 0., t*0.5 ) );
 }
 
+
 /*!
  */
 void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
@@ -374,18 +375,6 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                   setPMTColorScheme( fData->getTemplateMu(), false,  -1.0, 1.1*fData->getTemplateMuMax(), "photons [p.e.]", false );
 		}
                 break;
-	    case C_MODEL3D:  //JG
-	        if( fData->getRunParameter()->fUseDisplayModel3D ) {
-		  double minSum = 0;
-		  double maxSum = 0;
-		  getMinMax( fData->getSums(), minSum, maxSum );
-		  //// if( fPlotColor ) setPMTColorScheme( fData->getSums(), false,  100., 0., "charge [d.c.]", true );
-		  /// setPMTColorScheme( fData->getModel3DMu(), false,  100, 0., "Model3D signal [d.c.]", false );
-		  setPMTColorScheme( fData->getModel3DMu(), false,  minSum, maxSum, "Model3D signal [d.c.]", false );
-		  setPMTColorOff( fData->getModel3DClean() );
-		}
-		break;
-
             default:
                 break;
         }
@@ -840,8 +829,9 @@ void VCamera::setPMTColorScheme( valarray<unsigned int> v_value, bool i_select, 
 */
 void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale )
 {
-  setPMTColorScheme( v_value, i_select, zmin, zmax, i_axisTitle, i_scale, false );
+    setPMTColorScheme( v_value, i_select, zmin, zmax, i_axisTitle, i_scale, false );
 }
+
 
 void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool i_DrawDead, bool iLowGain )
 {
@@ -965,9 +955,8 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
                 else           scaler = 0.10;
 //	     else           scaler = 0.03;
             }
-            if( !i_scale ) scaler = 1.; 
+            if( !i_scale ) scaler = 1.;
             w1 = v_value[i];
-
             color = int( 0.01 + ( w1 - wlmin ) * scale );
             theColor = int( ( color + 0.99 ) * float( fncolors ) / float( fndivz ) );
             fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1() * fmaxRad * scaler );
@@ -1059,18 +1048,6 @@ void VCamera::setPMTColorOnOff( const vector<bool>& v_value, int iColor, int iFi
     }
 }
 
-void VCamera::setPMTColorOff( const vector<bool>& v_value )
-{
-  for( unsigned int i = 0; i < v_value.size(); i++ ) {
-    if( i >= fgraphTubesEntry.size() ) break;
-    if( !fData->getDead()[i] ) {
-      if( ! v_value[i] ) { // draw empty circle
-	fgraphTubesEntry[i]->SetFillColor( 10 );
-	fgraphTubesEntry[i]->SetLineColor( 10 );
-      }
-    }
-  }
-}
 
 /*  draw muon ring
      double muonX0;              //!< center of muon ring X-coord
@@ -1341,13 +1318,6 @@ void VCamera::drawAnaResults()
 		 fMCShowerDir->SetMarkerSize( 2. );
 		 fMCShowerDir->Draw();
 	     }
-// JG: draw Model3D shower
-		if( fData->getRunParameter()->fUseDisplayModel3D ) {
-		  fModel3DShowerDir = new TMarker( convertX(fData->getShowerParameters()->fXoffModel3D), convertY( -1.*fData->getShowerParameters()->fYoffModel3D ), 29 );
-		  fModel3DShowerDir->SetMarkerColor( 3 );
-		  fModel3DShowerDir->SetMarkerSize( 2. );
-		  fModel3DShowerDir->Draw();
-		}
 // camera center
 	     fCameraCentreDir = new TMarker( convertX( 0. ), convertY( 0. ), 5 );
 	     fCameraCentreDir->Draw();

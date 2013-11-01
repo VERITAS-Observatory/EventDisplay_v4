@@ -12,7 +12,7 @@ then
    exit
 fi
 
-PWD=""
+PWD="1000srcs*"
 if [ -z "$PWD" ]
 then
    echo "error: please add manually the password"
@@ -25,14 +25,15 @@ then
 fi
 
 FILEL=`cat $1`
-for i in $FILEL
+for j in $FILEL
 do
+    i=`basename $j`
     if [ -e $2/$i ] && [ -s $2/$i ]
     then
        echo "FILE EXISTS: $2/$i"
     else
-       rm -f $2/$i
-       wget --user=CTAraw --password=$PWD -O $2/$i http://www.mpi-hd.mpg.de/personalhomes/bernlohr/cta-raw/cta-prod2/$i
+#       rm -f $2/$i
+       wget --user=CTAraw --password=$PWD -O $2/$i http://www.mpi-hd.mpg.de/personalhomes/bernlohr/cta-raw/cta-prod2-aar500/$i
     fi
 done
 

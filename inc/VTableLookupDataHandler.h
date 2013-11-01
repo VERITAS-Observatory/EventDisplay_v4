@@ -284,20 +284,6 @@ class VTableLookupDataHandler
         double fSizeSecondMax;                    //AMC 09102009
         double ftheta2_All[25];                   //AMC 10122009
 
-// Model3D parameters (JG)
-        bool fIsModel3D;  // data contains Model3D parameters
-	double fSmax3D;   // height of shower maximum (along the shower axis)
-	double fsigmaL3D; // longitudinal (3D-length)
-	double fsigmaT3D; // transverse (3D-width)
-	double fNc3D;     // total number of Cherenkov photons emitted by the shower 
-	double fXoffModel3D;  // model sky direction
-	double fYoffModel3D;  // model sky direction
-	double fGoodness3D;   // model goodness of fit
-	double fDepth3D;      // model: slant depth of shower maximum
-	double fRWidth3D;     // model: reduced 3D-width 
-	double fErrRWidth3D;  // model: error in reduced 3D-width 
-	bool fConverged3D;   // model: fit converged  
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         VTableLookupDataHandler( bool iWrite, VTableLookupRunParameter* iT = 0 );
