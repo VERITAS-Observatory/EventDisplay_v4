@@ -193,11 +193,14 @@ bool VExposure::readFromDB()
         itemp = db_row->GetField( 1 );
 // check if this run is an observing run
         if( fObservingMode == "Normal" )
+        {
           if( itemp != "observing" ) continue;
-        else
+        }
 // check if this run is an observing/redHV/UVFilter run
-        if( fObservingMode == "Special" )
+        else if( fObservingMode == "Special" )
+        {
           if ( itemp != "observing" || itemp != "obsFilter" || itemp != "obsLowHV" )  continue;
+        }
 
         fRunObsMode.push_back( itemp );
 
