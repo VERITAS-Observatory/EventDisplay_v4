@@ -79,19 +79,15 @@ do
        echo "run scripts written to $FSCRIPT"
        echo "temporary run list written to $TEMPLIST"
 
-       sed -e "s|FILELIST|$TEMPLIST|" VTS.ANASUM.qsub_analyse_data.sh > $FSCRIPT-1.sh
-       sed -e "s|DATADIR|$DDIR|" $FSCRIPT-1.sh > $FSCRIPT-2.sh
-       rm -f $FSCRIPT-1.sh
-       sed -e "s|OUTDIR|$ODIR|" $FSCRIPT-2.sh > $FSCRIPT-3.sh
-       rm -f $FSCRIPT-2.sh
-       sed -e "s|OUTNAM|$ONAM|" $FSCRIPT-3.sh > $FSCRIPT-4.sh
-       rm -f $FSCRIPT-3.sh
-       sed -e "s|RUNPARA|$RUNP|" $FSCRIPT-4.sh > $FSCRIPT.sh
-       rm -f $FSCRIPT-4.sh
+       sed -e "s|FILELIST|$TEMPLIST|" \
+           -e "s|DATADIR|$DDIR|" \
+           -e "s|OUTDIR|$ODIR|" \
+           -e "s|OUTNAM|$ONAM|" \
+           -e "s|RUNPARA|$RUNP|" VTS.ANASUM.qsub_analyse_data.sh > $FSCRIPT.sh
 
        chmod u+x $FSCRIPT.sh
 
-       qsub -V -l h_cpu=12:29:30 -l h_vmem=4000M -l tmpdir_size=1G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
+       qsub -l os=sl6 -V -l h_cpu=12:29:30 -l h_vmem=4000M -l tmpdir_size=1G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
 
     fi
 done 

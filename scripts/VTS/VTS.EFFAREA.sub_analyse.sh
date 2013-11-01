@@ -31,13 +31,13 @@ NAME=$6
 IZE=( 00 20 30 35 40 45 50 55 60 65 )
 INOI=( 075 100 150 200 250 325 425 550 750 1000 )
 WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-INOI=( 075 100 150 200 250 325 425 550 750 1000 )
 ############################################################################################
 # run scripts and output is written into this directory
 DATE=`date +"%y%m%d"`
 QLOG=$VERITAS_USER_LOG_DIR"/"$DATE/EFFAREA
 echo "writing queue log and error files to $QLOG"
 LDIR="/dev/null"
+# LDIR="$QLOG"
 if [ ! -d $QLOG ]
 then
   mkdir -p $QLOG
@@ -118,7 +118,7 @@ echo "
 	 chmod u+x $FNAM.sh
 	 echo $FNAM.sh
 # submit job
-         qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $LDIR -e $LDIR "$FNAM.sh"
+         qsub -l os=sl6 -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $LDIR -e $LDIR "$FNAM.sh"
 
 	 echo "writing run parameter file to $LOGDIR/$FFIR.dat"
 	 echo "writing analysis parameter files to $FNAM.sh"

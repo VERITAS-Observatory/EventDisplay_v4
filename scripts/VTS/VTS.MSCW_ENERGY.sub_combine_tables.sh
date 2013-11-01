@@ -48,8 +48,8 @@ FDIR=`pwd`
 FSCRIPT="VTS.MSCW_ENERGY.qsub_combine_tables"
 FNAM="$QLOG/CMB-TBL.$DATE.MC"
 
-sed -e "s|LLIISSTT|$FILLIST|" $FSCRIPT.sh > $FNAM-1.sh
-sed -e "s|OOFFIILLEE|$OFIL|" $FNAM-1.sh > $FNAM.sh
+sed -e "s|LLIISSTT|$FILLIST|" \
+    -e "s|OOFFIILLEE|$OFIL|" $FSCRIPT.sh > $FNAM.sh
 rm -f  $FNAM-1.sh
 
 chmod u+x $FNAM.sh

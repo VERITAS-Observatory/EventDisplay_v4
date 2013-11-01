@@ -23,7 +23,7 @@ source $EVNDISPSYS/setObservatory.sh VERITAS
 cd $EVNDISPSYS/bin
 
 # subdirectory with date where evndisp simulation files are found
-DSET="analysis_d20130804"
+DSET="analysis_d20131031"
 
 # directory with input file
 DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/"$DSET"_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"

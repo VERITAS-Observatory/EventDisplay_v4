@@ -64,7 +64,7 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -S /bin/tcsh -l h_cpu=00:29:00 -l h_vmem=2000M -l tmpdir_size=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+   qsub -S /bin/tcsh -l os=sl6 -l h_cpu=00:29:00 -l h_vmem=2000M -l tmpdir_size=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
 done
 
 exit

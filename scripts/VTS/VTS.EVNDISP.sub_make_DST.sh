@@ -10,7 +10,7 @@ then
    echo
    echo "EVNDISP DST maker: submit jobs from a simple run list"
    echo
-   echo "VTS.EVNDISP.sub_make_DST.sh <runlist> [pedestal calculation (default=1=on)] [Sumation Window]" 
+   echo "VTS.EVNDISP.sub_make_DST.sh <runlist> [pedestal calculation (default=1=on)] [Summation Window]" 
    echo
    echo "runlist should contain run numbers only"
    echo

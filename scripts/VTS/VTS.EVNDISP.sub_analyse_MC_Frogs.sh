@@ -167,7 +167,7 @@ do
     chmod u+x $FDIR/$OSCRIPT.sh
 
 # submit the job
-   qsub -l os="sl*" -V -l h_cpu=47:59:00 -l h_vmem=6000M -l tmpdir_size=100G  -t 1-10 -o $QLOGDIR -e $QLOGDIR "$FDIR/$OSCRIPT.sh"
+   qsub -l os=sl6 -V -l h_cpu=47:59:00 -l h_vmem=6000M -l tmpdir_size=100G  -t 1-10 -o $QLOGDIR -e $QLOGDIR "$FDIR/$OSCRIPT.sh"
 
   done
 

@@ -88,7 +88,7 @@ do
 	  -e "s/RECONSTRUCTIONID/$RECID/" $FSCRIPT.sh > $FDIR/$FNAM.sh
 
 # submit the job
-      qsub -l os="sl*" -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $LDIR -e $LDIR $FDIR/$FNAM.sh
+      qsub -l os=sl6 -l h_cpu=00:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -V -o $LDIR -e $LDIR $FDIR/$FNAM.sh
      done
    done
 done

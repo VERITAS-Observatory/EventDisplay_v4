@@ -47,18 +47,24 @@ fi
 # cut definitions
 if [[ "$CUTS" == *super* ]]
 then
-   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-SuperSoft.dat"
-   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-SuperSoft-$ATMO-EPOCHSETTING-T1234-d20130521.root"
-   RADACC="radialAcceptance-d20130411-d20130411-cut-N2-Point-005CU-SuperSoft-EPOCHSETTING-T1234.root"
+   CUTFILE="ANASUM.GammaHadron.d20131028-cut-N2-Point-005CU-SuperSoft.dat"
+   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20130930.root"
+   RADACC="radialAcceptance-d20131031-d20131028-cut-N2-Point-005CU-SuperSoft-V6-T1234.root"
+elif [[ "$CUTS" == *open* ]]
+then
+   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Open.dat"
+   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Open-$ATMO-EPOCHSETTING-T1234-d20130930.root"
+   RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 elif [[ "$CUTS" == *soft* ]]
 then
-   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Soft.dat"
-   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20130521.root"
-   RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-EPOCHSETTING-T1234.root"
+   CUTFILE="ANASUM.GammaHadron.d20131028-cut-N3-Point-005CU-Soft.dat"
+   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20130930.root"
+   RADACC="radialAcceptance-d20131031-d20131028-cut-N3-Point-005CU-Soft-V6-T1234.root"
 elif [[ $CUTS = *moderate* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Moderate.dat"
-   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20130521.root"
+   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20130930.root"
+#   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-ATM21-HI15-V6-T1234-d20130930.root"
    RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 # UV Filter
 #   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-V6-$ATMO-UV-d20121218.root"
@@ -86,12 +92,13 @@ fi
 if [[ "$CUTS" == *RE* ]]
 then
    BM="RE"
+   BMPARA="0.1 3 8"
    BMPARA="0.1 1 20"
-   BMPARA="0.1 3 4"
+   BMPARA="0.1 2 6"
 elif [[ "$CUTS" == *RB* ]]
 then
    BM="RB"
-   BMPARA="0.6 20"
+   BMPARA="0.7 20"
 else
    echo "error: unknown background model: $CUTS"
    echo "    allowed are: RE, RB"
@@ -135,7 +142,7 @@ do
    if [ $R -lt 46642 ]
    then
      EPOCH="V4"
-   elif [ $R -gt 63408 ]
+   elif [ $R -gt 63373 ]
    then
      EPOCH="V6"
    else

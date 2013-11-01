@@ -79,7 +79,7 @@ do
 	 chmod u+x $FNAM.sh
 	 echo $FNAM.sh
 # submit job
-         qsub -l os="sl*" -l h_cpu=5:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG -e $QLOG "$FNAM.sh"
+         qsub -l os=sl6 -l h_cpu=5:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $QLOG -e $QLOG "$FNAM.sh"
 
 	 echo "writing analysis parameter files to $FNAM.sh"
      done

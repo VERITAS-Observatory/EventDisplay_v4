@@ -25,10 +25,10 @@ source ./setObservatory.tcsh VTS
 # hardwired values
 ###############################################
 # date of analysis
-set DAT="d20130804"
+set DAT="d20131031"
 
 # output files are written to this directory
-set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
+# set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
 set ODIR=/lustre/fs9/group/cta/users/maierg/VERITAS/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
 # directory with MC eventdisplay files
 set SDIR="analysis_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
@@ -36,7 +36,7 @@ set SDIR="analysis_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
 set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*[0-9].root"
 #############
 # mscw_energy command line options
-# long output file (with all telescope-wise image variables
+# long output file (with all telescope-wise image variables)
 # set MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 # short output file
 set MOPT="-noNoTrigger -nomctree -shorttree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"

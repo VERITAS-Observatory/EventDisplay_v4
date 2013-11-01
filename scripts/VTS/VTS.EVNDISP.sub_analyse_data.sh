@@ -83,7 +83,7 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -V -l h_cpu=41:29:00 -l os="sl*" -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+   qsub -V -l h_cpu=41:29:00 -l os=sl6 -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 exit
