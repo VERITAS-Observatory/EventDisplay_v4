@@ -29,14 +29,15 @@ mkdir -p $PDIR
 SITE=( "prod2-Leoncito-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" )
 SITE=( "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
 SITE=( "prod2-Leoncito-lowE-NS" "prod2-Leoncito-NS" )
-SITE=( "prod2-US-NS" )
 SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
 SITE=( "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" )
 SITE=( "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" )
-SITE=( "prod2-SAC084-lowE-NS" )
+SITE=( "prod2-US-NS" )
+SITE=( "prod2-Aar-500m-NS" )
 
 #####################################
 # particle types
+PARTICLE=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 PARTICLE=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 
 #####################################
@@ -75,7 +76,7 @@ OBSTIME=( "50h" )
 
 #####################################
 # sub array lists
-ARRAY="subArray.2aF1.list"
+ARRAY="subArray.2a.list"
 
 #####################################
 # analysis dates
@@ -93,18 +94,20 @@ do
    echo "SITE: $S"
    echo "RUN: $RUN"
 
-   if [[ $S == *Aar* ]]
+   if [[ $S == "prod2-Aar-NS" ]]
    then
       TRG="/lustre/fs13/group/cta/prod2/Aar/simtel/trgmask/"
-   elif [[ $S == *Leoncito* ]]
+   elif [[ $S == "prod2-Leoncito-NS" ]]
    then
       TRG="/lustre/fs13/group/cta/prod2/Leoncito/simtel/trgmask/"
-   elif [[ $S == *SAC084* ]]
+   elif [[ $S == "prod2-SAC084-NS" ]]
    then
       TRG="/lustre/fs13/group/cta/prod2/SAC084/"
-   elif [[ $S == *SAC100* ]]
+   elif [[ $S == "prod2-SAC100-NS" ]]
    then
       TRG="/lustre/fs13/group/cta/prod2/SAC100/"
+   else
+      TRG=""
    fi
 
 # eventdisplay
@@ -117,12 +120,7 @@ do
 	  N=${PARTICLE[$i]}
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/$S.$N"_20deg".list
 
-	 if [[ $S == *lowE* ]] || [[ $S == "prod2-US-NS" ]]
-	 then
-	     ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i
-         else
-	     ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $TRG
-         fi
+          ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $TRG
        done
        continue
     fi

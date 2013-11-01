@@ -68,7 +68,7 @@ do
        -e "s|ODIR|$ODIR|" \
        -e "s|RRRR|$RECID|" $FNAM
 
-   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FNAM"
+   qsub -P cta_high -js 2000 -V -l os=sl6  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FNAM"
 
 done
 

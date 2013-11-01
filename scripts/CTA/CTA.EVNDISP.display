@@ -12,10 +12,11 @@
 #####################################
 # evndisp reconstruction runparamter
 ACUT="EVNDISP.prod1.reconstruction.runparameter"
+ACUT="EVNDISP.prod2-noDoublepass.reconstruction.runparameter"
 ACUT="EVNDISP.prod2.reconstruction.runparameter"
 # run options
 # OPT="-display=1 -useFixedThresholds -reconstructionparameter $ACUT -traceanalysis=0"
-OPT="-display=1 -plotmethod=0 -highres -ignoredstgains -reconstructionparameter $ACUT"
+OPT="-display=1 -plotmethod=0 -ignoredstgains -reconstructionparameter $ACUT"
 #####################################
 ## END OF HARDCODED VAVLUES
 #####################################

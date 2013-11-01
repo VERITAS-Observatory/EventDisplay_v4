@@ -70,7 +70,7 @@ do
           -e "s|ADIR|$ADIR|" \
           -e "s|OFFSET|$OFFSET|" $FDIR/$FSCRIPT-$ARRAY.sh
 
-   qsub -V -l os="sl*"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V -l os="sl6"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
 done
 
 exit

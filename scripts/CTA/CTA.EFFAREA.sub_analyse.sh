@@ -437,9 +437,9 @@ do
 # submit the job
      if [ $GFILLING = "2" ]
      then
-	qsub -l os="sl*" -l h_cpu=5:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub -l os="sl6" -l h_cpu=5:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      else
-	qsub -l os="sl*" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub -l os="sl6" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      fi
    done
 done

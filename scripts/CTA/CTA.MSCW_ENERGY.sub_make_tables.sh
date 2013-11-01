@@ -132,7 +132,7 @@ do
       echo "shell script " $FNAM.sh
 
 # submit the job
-      qsub -l os="sl*" -l h_cpu=47:45:00 -l h_vmem=16000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub -l os=sl6 -l h_cpu=47:45:00 -l h_vmem=16000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 
