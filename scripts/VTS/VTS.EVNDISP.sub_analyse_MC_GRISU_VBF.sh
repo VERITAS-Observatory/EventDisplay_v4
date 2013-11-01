@@ -107,51 +107,34 @@ do
    OSCRIPT="qsub_evndisp_MC_VBF-$ZEW-$WOB-$NOIS-$ATMO-$f"
 
 # file number (useful for protons only)
-    sed -e "s/NFINFIL/$f/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-a.sh
-
+    echo $CSCRIPT.sh
+    echo  $FDIR/$OSCRIPT.sh
 # run number
-    sed -e "s/RUNRUNRUN/$NRUN/" $FDIR/$OSCRIPT-a.sh > $FDIR/$OSCRIPT-aa.sh
-    rm -f $FDIR/$OSCRIPT-a.sh
-
 # set zenith angle
-    sed -e "s/123456789/$ZEW/"  $FDIR/$OSCRIPT-aa.sh > $FDIR/$OSCRIPT-b.sh
-    rm -f $FDIR/$OSCRIPT-aa.sh
-
 # add data directory
-    sed -e "s|DATADIR|$DDIR|" $FDIR/$OSCRIPT-b.sh > $FDIR/$OSCRIPT-c.sh
-    rm -f $FDIR/$OSCRIPT-b.sh
-
 # atmosphere
-    sed -e "s|AAAAAAAA|$ATMO|" $FDIR/$OSCRIPT-c.sh > $FDIR/$OSCRIPT-d.sh
-    rm -f $FDIR/$OSCRIPT-c.sh
-
 # add output directory
-    sed -e "s|OUTDIR|$ODIR|" $FDIR/$OSCRIPT-d.sh > $FDIR/$OSCRIPT-c.sh
-    rm -f $FDIR/$OSCRIPT-d.sh
-
 # set wobble offset
-    sed -e "s/987654321/$WOB/" $FDIR/$OSCRIPT-c.sh > $FDIR/$OSCRIPT-d.sh
-    rm -f $FDIR/$OSCRIPT-c.sh
-
 # set wobble offset for vbf file
-    sed -e "s/WOGWOG/$WOG/" $FDIR/$OSCRIPT-d.sh > $FDIR/$OSCRIPT-e.sh
-    rm -f $FDIR/$OSCRIPT-d.sh
-
 # set noise level
-    sed -e "s/NOISENOISE/$NOIS/" $FDIR/$OSCRIPT-e.sh > $FDIR/$OSCRIPT-r.sh
-    rm -f $FDIR/$OSCRIPT-e.sh
-
-# V4 or V5?
-    sed -e "s/XXXXXX/$ARRAY/" $FDIR/$OSCRIPT-r.sh > $FDIR/$OSCRIPT-t.sh
-    rm -f $FDIR/$OSCRIPT-r.sh
+# V4, V5 or V6?
 # gamma/proton
-    sed -e "s/IDIDID/$PART/"  $FDIR/$OSCRIPT-t.sh > $FDIR/$OSCRIPT.sh
-    rm -f $FDIR/$OSCRIPT-t.sh
+    sed -e "s|NFINFIL|$f|" \
+        -e "s|RUNRUNRUN|$NRUN|" \
+        -e "s|123456789|$ZEW|" \
+        -e "s|DATADIR|$DDIR|" \
+        -e "s|AAAAAAAA|$ATMO|" \
+        -e "s|OUTDIR|$ODIR|" \
+        -e "s|987654321|$WOB|" \
+        -e "s|WOGWOG|$WOG|" \
+        -e "s|NOISENOISE|$NOIS|" \
+        -e "s|XXXXXX|$ARRAY|" \
+        -e "s|IDIDID|$PART|" $CSCRIPT.sh > $FDIR/$OSCRIPT.sh
 
     chmod u+x $FDIR/$OSCRIPT.sh
 
 # submit the job
-   qsub -l os="sl*" -V -l h_cpu=41:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+   qsub -l os=sl6 -V -l h_cpu=41:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
   done
 
