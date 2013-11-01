@@ -134,6 +134,7 @@ SOFLAGS       = -shared
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
+CXXFLAGS    += -Wdeprecated-declarations
 LDFLAGS       = -bind_at_load
 DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
@@ -1428,7 +1429,7 @@ configuration config:
 	@echo "CONFIGURATION TEST FOR $(package) version $(version)"
 	@echo "======================================================"
 	@echo ""
-	@echo "gcc $(GCCVERSION) on $(GCCMACHINE)"
+	@echo "gcc $(GCCVERSION) on $(GCCMACHINE) $(ARCH)"
 	@echo ""
 	@echo "using root version $(ROOTVERSION)"
 	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE)"

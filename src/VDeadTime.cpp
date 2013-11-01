@@ -390,7 +390,7 @@ double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff )
    if( hScalarDeadTimeFraction )
    {
       int nbin = hScalarDeadTimeFraction->FindBin( iT_run_s );
-      if( nbin > 0 && nbin <= hScalarDeadTimeFraction->GetNbinsX() );
+      if( nbin > 0 && nbin <= hScalarDeadTimeFraction->GetNbinsX() )
       {
           return hScalarDeadTimeFraction->GetBinContent( nbin );
       }

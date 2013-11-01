@@ -20,7 +20,6 @@ class VDispAnalyzer
 {
     private:
 
-    bool                bDebug;
     bool                bZombie;
 
     string              fDispMethod;

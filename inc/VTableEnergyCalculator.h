@@ -86,7 +86,6 @@ class VTableEnergyCalculator
 
         double fMinSize;                          //!< minimum size per telescope to be included in the analysis
         double fMaxDistance;                      //!< maximum distance of shower core from telescope [m]
-        double fMaxLocalDistance;                 //!< maximum local distance of image from camera center [deg]
 
 // energy correction stuff
         vector< double > sstop;

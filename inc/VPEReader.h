@@ -99,8 +99,8 @@ class VPEReader : public VVirtualDataReader
         uint32_t  getHitID( uint32_t );
         bool                        getHiLo(uint32_t i) { if( i < fHiLo[fTelID].size() ) return fHiLo[fTelID][i]; else return 0; }
         vector< bool >&             getLocalTrigger() { return fLocalTrigger; }
-        vector< float >&      getLocalTriggerTime() { return fLTtime; }
-        vector< float >&      getLocalDelayedTriggerTime() { return fLDTtime; }
+	float                       getLocalTriggerTime( unsigned int iTel ) { if( iTel < fLTtime.size() ) return fLTtime[iTel]; else return -999.; }
+	float                       getLocalDelayedTriggerTime( unsigned int iTel ) { if( iTel < fLDTtime.size() ) return fLDTtime[iTel]; else return -999; }
         uint16_t  getMaxChannels() { return fNChannel[fTelID]; }
         uint16_t  getNumChannelsHit()             //!< preli
         {
