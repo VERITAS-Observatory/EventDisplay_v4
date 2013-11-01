@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131101 (JG, GM) integrated 3D Model
+                (note: severe svn hickups; integration by hand)
+
 * 20131030 (GM) added 'npe' to dst trees (CTA)
 
 * 20131030 (GM) first adjustments to read files on the dCache

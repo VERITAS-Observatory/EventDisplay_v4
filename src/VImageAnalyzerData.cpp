@@ -52,7 +52,7 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
 
 void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxChannel, bool iTraceFit, bool iDebug, 
                                      int iseed, unsigned int iSamples, unsigned int ipulsetiminglevel, 
-				     unsigned int ipulsetiming_tzero_index, unsigned int ipulsetiming_width_index )
+     unsigned int ipulsetiming_tzero_index, unsigned int ipulsetiming_width_index )
 {
     if( iDebug ) cout << "VImageAnalyzerData::initialize" << endl;
     fNChannels = iChannels;
@@ -70,6 +70,8 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fLowGainDeadRecovered.resize( iChannels, false );
     fLowGainDeadUI.resize( iChannels, 0 );
     fTemplateMu.resize( iChannels, 0. );
+    fModel3DMu.resize( iChannels, 0. ); //JG
+    fModel3DClean.resize( iChannels, false ); //JG
     fSums.resize( iChannels, 0. );
     fSums2.resize( iChannels, 0. );
     fHiLo.resize( iChannels, false );

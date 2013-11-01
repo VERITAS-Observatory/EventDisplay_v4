@@ -27,6 +27,7 @@
 #ifndef NOGSL
 #include <VFrogs.h>
 #endif
+#include <VModel3D.h>  //JG-NEW
 
 #include <iostream>
 #include <map>
@@ -48,6 +49,8 @@ class VEventLoop : public VEvndispData
 #ifndef NOGSL
         VFrogs *fFrogs;                           //!< Frogs Analyzer
 #endif
+	VModel3D *fModel3D;                     //!< Model3D, JG-NEW
+
 	VDeadTime *fDeadTime;                     //!< dead time calculator
         string fFileGains;                        //!< file with gains
 

@@ -35,27 +35,27 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
     {
         if( iT[i] >= ib.size() )
         {
-	   if( getRunParameter()->fdisplaymode )
-	   {
-	       cout << "Error: maximum telescopes ID allowed in display mode: " << ib.size();
-	       cout << " (try to set " << iT[i] << ")" << endl;
-	       if( getNTel() >= ib.size() ) fExpectedEventStatus = 0;
-	       else
-	       {
-		  cout << "exiting..." << endl;
-		  exit( 0 );
+   if( getRunParameter()->fdisplaymode )
+   {
+       cout << "Error: maximum telescopes ID allowed in display mode: " << ib.size();
+       cout << " (try to set " << iT[i] << ")" << endl;
+       if( getNTel() >= ib.size() ) fExpectedEventStatus = 0;
+       else
+       {
+  cout << "exiting..." << endl;
+  exit( 0 );
                }
-	   }
-	   else
-	   {
-	       cout << "Warning: telescope ID larger then " << ib.size() << ": " << iT[i] << endl;
-	       cout << "(some of the variable will be in overflow (LTrig, ImgSel), no impact on analysis results)" << endl;
-	   } 
-	   fExpectedEventStatus = 0;
+   }
+   else
+   {
+       cout << "Warning: telescope ID larger then " << ib.size() << ": " << iT[i] << endl;
+       cout << "(some of the variable will be in overflow (LTrig, ImgSel), no impact on analysis results)" << endl;
+   } 
+   fExpectedEventStatus = 0;
         }
-	else
-	{
-	   ib.set( iT[i], 1 );
+else
+{
+   ib.set( iT[i], 1 );
         }
     } 
     if( fExpectedEventStatus != 0 ) fExpectedEventStatus = (unsigned long int) ib.to_ulong();
@@ -170,7 +170,8 @@ void VEvndispData::resetAnaData()
         fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow_1[fTelID];
         fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow_1[fTelID];
 
-	fAnaData[fTelID]->fTemplateMu = 0;
+fAnaData[fTelID]->fTemplateMu = 0;
+fAnaData[fTelID]->fModel3DMu = 0; //JG
 
         if( getTraceFit() > -1. )
         {
@@ -198,12 +199,12 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
     if( getRunParameter()->fsourcetype != 7 && getRunParameter()->fsourcetype != 4 )
     {
         fDetectorGeo = new VDetectorGeometry( iNTel, iCamera, iDir, fDebug, 
-	                                      getRunParameter()->fCameraCoordinateTransformX, getRunParameter()->fCameraCoordinateTransformY, 
-					      getRunParameter()->fsourcetype );
+                                      getRunParameter()->fCameraCoordinateTransformX, getRunParameter()->fCameraCoordinateTransformY, 
+      getRunParameter()->fsourcetype );
 // get camera rotations from the DB
-	if( getRunParameter()->fDBCameraRotationMeasurements )
-	{
-	   fDetectorGeo->readDetectorGeometryFromDB( getRunParameter()->fDBRunStartTimeSQL, getRunParameter()->fDBCameraRotationMeasurements );
+if( getRunParameter()->fDBCameraRotationMeasurements )
+{
+   fDetectorGeo->readDetectorGeometryFromDB( getRunParameter()->fDBRunStartTimeSQL, getRunParameter()->fDBCameraRotationMeasurements );
         }
     }
 // for DST files: read detector geometry from DST file
@@ -211,7 +212,7 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
     else
     {
         fDetectorGeo = new VDetectorGeometry( iNTel, fDebug );
-	fDetectorGeo->setSourceType( getRunParameter()->fsourcetype );
+fDetectorGeo->setSourceType( getRunParameter()->fsourcetype );
         TFile iDetectorFile( getRunParameter()->fsourcefile.c_str() );
         if( iDetectorFile.IsZombie() )
         {
@@ -276,20 +277,20 @@ bool VEvndispData::get_reconstruction_parameters( string ifile )
     {
 // read array analysis cuts
         if( ifile.find( "/" ) != string::npos ) 
-	{
-	   iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( ifile );
+{
+   iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( ifile );
         }
-	else
-	{
-	   iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + ifile );
+else
+{
+   iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + ifile );
         }
         if( !iNMethods )
         {
             return false;
         }
-	if( fRunPar->frunmode != 1 && fRunPar->frunmode != 2 && fRunPar->frunmode != 5 && fRunPar->frunmode != 6 )
-	{
-	   fEvndispReconstructionParameter->print_arrayAnalysisCuts();
+if( fRunPar->frunmode != 1 && fRunPar->frunmode != 2 && fRunPar->frunmode != 5 && fRunPar->frunmode != 6 )
+{
+   fEvndispReconstructionParameter->print_arrayAnalysisCuts();
         }
         if( fShowerParameters ) fShowerParameters->setNArrayReconstructionMethods( iNMethods );
     }
@@ -312,8 +313,8 @@ void VEvndispData::dumpTreeData()
 /*    if( fDetectorTree )
     {
         cout << endl << "telescopes" << endl;
-	cout << fDetectorTree->getTree()->GetName() << endl;
-	fDetectorTree->getTree()->Print();
+cout << fDetectorTree->getTree()->GetName() << endl;
+fDetectorTree->getTree()->Print();
 
         fDetectorTree->getTree()->Scan();
         cout << endl;
@@ -328,11 +329,11 @@ void VEvndispData::dumpTreeData()
         if( getImageParameters() )
         {
             if( getImageParameters()->getTree() ) getImageParameters()->getTree()->Show( -1 );
-	    else cout << "\t no image parameter tree found..." << endl;
+    else cout << "\t no image parameter tree found..." << endl;
         }
-	else
-	{
-	   cout << "\t no image parameters found..." << endl;
+else
+{
+   cout << "\t no image parameters found..." << endl;
         }
         if( getRunParameter()->fImageLL )
         {
@@ -391,12 +392,12 @@ void VEvndispData::endOfRunInfo()
        cout << "\t ----------------------------------------------" << endl;
        for( unsigned int i = 0; i < fTriggeredTel.size(); i++ )
        {
-	   cout << "\t Telescope   " << i+1 << ": | ";
-	   for( unsigned int j = 0; j < fTriggeredTel[i].size(); j++ )
-	   {
-	       cout << fTriggeredTel[i][j] << "\t";
-	   }
-	   cout << endl;
+   cout << "\t Telescope   " << i+1 << ": | ";
+   for( unsigned int j = 0; j < fTriggeredTel[i].size(); j++ )
+   {
+       cout << fTriggeredTel[i][j] << "\t";
+   }
+   cout << endl;
        }
        cout << endl;
     }
@@ -449,49 +450,49 @@ void VEvndispData::printDeadChannels( bool iLowGain )
 void VEvndispData::printDeadChannelList() // DEADCHAN
 {
 
-	unsigned int Telescope ;
-	bool GainVec[2] ;
-	GainVec[0]=true;
-	GainVec[1]=false;
-	bool iLowGain;
-	unsigned int Gain ;
-	
+unsigned int Telescope ;
+bool GainVec[2] ;
+GainVec[0]=true;
+GainVec[1]=false;
+bool iLowGain;
+unsigned int Gain ;
+
     cout << "==================================" << endl;
     cout << "Dead Channel Listing" << endl;
-	// loop over gains
-	for ( unsigned int kGain = 0 ; kGain < 2 ; kGain++ )
-	{
-		iLowGain = GainVec[kGain] ;
-		if ( iLowGain)  Gain = 0 ;
-		else 			Gain = 1 ;
-		
-		// loop over telescopes
-		for ( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
-		{
-			setTelID( getTeltoAna()[jTel] ) ;	
-			Telescope = getTelID()+1 ;
-			unsigned int idead = 0 ;
-			
-			// loop over dead channels
-			for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
-			{
-				if( getDead( iLowGain )[i] > 0 )
-				{
-					bitset<8*sizeof(uint32_t)> i_dead = getDead( iLowGain )[i];
-					//cout << "\t " << i << "\t";
-					printf( "   DEADCHAN Tel %d Gain %d Chan %d ", Telescope, Gain, i ) ;
-					for( unsigned j = 0; j < i_dead.size(); j++ )
-					{
-						if( i_dead.test( j ) && j < fDeadChannelText.size() ) cout << " - " << fDeadChannelText[j] ;
-					}
-					cout << endl;
-					if( !i_dead.test( 9 ) ) idead++;
-				}
-			}
-		}
-	}
+// loop over gains
+for ( unsigned int kGain = 0 ; kGain < 2 ; kGain++ )
+{
+iLowGain = GainVec[kGain] ;
+if ( iLowGain)  Gain = 0 ;
+else Gain = 1 ;
+
+// loop over telescopes
+for ( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
+{
+setTelID( getTeltoAna()[jTel] ) ;
+Telescope = getTelID()+1 ;
+unsigned int idead = 0 ;
+
+// loop over dead channels
+for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
+{
+if( getDead( iLowGain )[i] > 0 )
+{
+bitset<8*sizeof(uint32_t)> i_dead = getDead( iLowGain )[i];
+//cout << "\t " << i << "\t";
+printf( "   DEADCHAN Tel %d Gain %d Chan %d ", Telescope, Gain, i ) ;
+for( unsigned j = 0; j < i_dead.size(); j++ )
+{
+if( i_dead.test( j ) && j < fDeadChannelText.size() ) cout << " - " << fDeadChannelText[j] ;
+}
+cout << endl;
+if( !i_dead.test( 9 ) ) idead++;
+}
+}
+}
+}
     cout << "==================================" << endl;
-	
+
 }
 
 
@@ -512,30 +513,30 @@ bool VEvndispData::initializeDeadChannelFinder()
         fDeadChannelDefinition_HG.push_back( new VDeadChannelFinder( getRunParameter()->frunmode, getTeltoAna()[i], false, fReader->isMC() ) );
         fDeadChannelDefinition_LG.push_back( new VDeadChannelFinder( getRunParameter()->frunmode, getTeltoAna()[i], true, fReader->isMC() ) );
         if( itelStats && getRunParameter()->fsourcetype != 6 
-	              && getRunParameter()->fsourcetype != 4
-	              && getRunParameter()->fsourcetype != 7 )
+              && getRunParameter()->fsourcetype != 4
+              && getRunParameter()->fsourcetype != 7 )
         {
-	    if( getRunParameter()->fDeadChannelFile.size() > 0 )
-	    {
+    if( getRunParameter()->fDeadChannelFile.size() > 0 )
+    {
                 fDeadChannelDefinition_HG.back()->readDeadChannelFile( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + getRunParameter()->fDeadChannelFile );
             }
             fDeadChannelDefinition_HG.back()->printDeadChannelDefinition();
-	    if( getRunParameter()->fDeadChannelFile.size() > 0 )
-	    {
-	       fDeadChannelDefinition_LG.back()->readDeadChannelFile( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + getRunParameter()->fDeadChannelFile );
+    if( getRunParameter()->fDeadChannelFile.size() > 0 )
+    {
+       fDeadChannelDefinition_LG.back()->readDeadChannelFile( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + getRunParameter()->fDeadChannelFile );
             }
             fDeadChannelDefinition_LG.back()->printDeadChannelDefinition();
         }
-	else if(  getRunParameter()->fsourcetype == 7 || getRunParameter()->fsourcetype == 4 )
-	{
-	   cout << "Reading dead channel settings from DST file for";
-	   cout << " telescope " << getTeltoAna()[i]+1 << endl;
-	}
-	else
-	{
-	   cout << "Ignoring dead channel settings for this run mode (";
-	   cout << getRunParameter()->fsourcetype << ") and ";
-	   cout << " telescope " << getTeltoAna()[i]+1 << endl;
+else if(  getRunParameter()->fsourcetype == 7 || getRunParameter()->fsourcetype == 4 )
+{
+   cout << "Reading dead channel settings from DST file for";
+   cout << " telescope " << getTeltoAna()[i]+1 << endl;
+}
+else
+{
+   cout << "Ignoring dead channel settings for this run mode (";
+   cout << getRunParameter()->fsourcetype << ") and ";
+   cout << " telescope " << getTeltoAna()[i]+1 << endl;
         }
     }
     return true;
@@ -623,7 +624,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned in
     if( fAnaData[fTelID]->fCurrentSummationWindow[iChannel] > getNSamples() )
     {
         cout << "VEvndispData::setCurrentSummationWindow (b) error: summation window too large: ";
-	cout << fTelID << "\t" << iChannel << "\t" << imin << "\t" << imax << "\t" << fAnaData[fTelID]->fCurrentSummationWindow[iChannel] << endl;
+cout << fTelID << "\t" << iChannel << "\t" << imin << "\t" << imax << "\t" << fAnaData[fTelID]->fCurrentSummationWindow[iChannel] << endl;
         fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
     }
 }
@@ -707,10 +708,10 @@ void VEvndispData::setPulseTimingCorrection( unsigned int iChannel, double iCorr
    {
       for( unsigned int i = 0; i <= getRunParameter()->fpulsetiming_tzero_index; i++ )
       {
-	  if( iChannel < getPulseTiming( true )[i].size() )
-	  {
-	     getPulseTiming( true )[i][iChannel] += iCorrection;
-	  }
+  if( iChannel < getPulseTiming( true )[i].size() )
+  {
+     getPulseTiming( true )[i][iChannel] += iCorrection;
+  }
       }
    }
 }
@@ -795,8 +796,8 @@ ULong64_t VEvndispData::getTelType( unsigned int iTelID )
     if( getDetectorGeometry() )
     {
         if( iTelID < getDetectorGeometry()->getTelType().size() )
-	{
-	    return getDetectorGeometry()->getTelType()[iTelID];
+{
+    return getDetectorGeometry()->getTelType()[iTelID];
         }
     }
     return 99999;

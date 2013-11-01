@@ -31,7 +31,7 @@ VShowerParameters::VShowerParameters( int iNTel, unsigned int iShortTree, unsign
         fTelIDImageSelected_bitcode[i]=0;
         fShower_Xoff_DISP.push_back( i_f );
         fShower_Yoff_DISP.push_back( i_f );
-	fShower_Weight_DISP.push_back( i_f );
+fShower_Weight_DISP.push_back( i_f );
     }
 }
 
@@ -180,6 +180,44 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
     sprintf( i_des, "Chi2[NMethods]/F" );
     fTreeSC->Branch( "Chi2", fShower_Chi2, i_des );
 
+//JG Model3D parameters (only written if run parameter set for model3D)
+    if( fShortTree == 99 ) {
+      fTreeSC->Branch( "Sel3D", &fSel3D, "Sel3D/F" );
+      fTreeSC->Branch( "Saz3D", &fSaz3D, "Saz3D/F" );
+      fTreeSC->Branch( "Xcore3D", &fXcore3D, "Xcore3D/F" );
+      fTreeSC->Branch( "Ycore3D", &fYcore3D, "Ycore3D/F" );
+      fTreeSC->Branch( "Smax3D", &fSmax3D, "Smax3D/F" );
+      fTreeSC->Branch( "sigmaL3D", &fsigmaL3D, "sigmaL3D/F" );
+      fTreeSC->Branch( "sigmaT3D", &fsigmaT3D, "sigmaT3D/F" );
+      fTreeSC->Branch( "Nc3D", &fNc3D, "Nc3D/F" );
+      fTreeSC->Branch( "Xoff3D", &fXoffModel3D, "Xoff3D/F" );
+      fTreeSC->Branch( "Yoff3D", &fYoffModel3D, "Yoff3D/F" );
+      fTreeSC->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/F" );
+      fTreeSC->Branch( "Depth3D", &fDepth3D, "Depth3D/F" );
+      fTreeSC->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/F" );
+      fTreeSC->Branch( "ErrRWidth3D", &fErrRWidth3D, "ErrRWidth3D/F" );
+      fTreeSC->Branch( "Converged3D", &fConverged3D, "Converged3D/b" );
+      /// debug below ///
+      fTreeSC->Branch( "StartGoodness3D", &fStartGoodness3D, "StartGoodness3D/F" );
+      fTreeSC->Branch( "StartSel3D",   &fStartSel3D,   "StartSel3D/F" );
+      fTreeSC->Branch( "StartSaz3D",   &fStartSaz3D,   "StartSaz3D/F" );
+      fTreeSC->Branch( "StartXcore3D", &fStartXcore3D, "StartXcore3D/F" );
+      fTreeSC->Branch( "StartYcore3D", &fStartYcore3D, "StartYcore3D/F" );
+      fTreeSC->Branch( "StartSmax3D",  &fStartSmax3D,  "StartSmax3D/F" );
+      fTreeSC->Branch( "StartsigmaL3D",&fStartsigmaL3D,"StartsigmaL3D/F" );
+      fTreeSC->Branch( "StartsigmaT3D",&fStartsigmaT3D,"StartsigmaT3D/F" );
+      fTreeSC->Branch( "StartNc3D",    &fStartNc3D,    "StartNc3D/F" );
+      fTreeSC->Branch( "ErrorSel3D",   &fErrorSel3D,   "ErrorSel3D/F" );
+      fTreeSC->Branch( "ErrorSaz3D",   &fErrorSaz3D,   "ErrorSaz3D/F" );
+      fTreeSC->Branch( "ErrorXcore3D", &fErrorXcore3D, "ErrorXcore3D/F" );
+      fTreeSC->Branch( "ErrorYcore3D", &fErrorYcore3D, "ErrorYcore3D/F" );
+      fTreeSC->Branch( "ErrorSmax3D",  &fErrorSmax3D,  "ErrorSmax3D/F" );
+      fTreeSC->Branch( "ErrorsigmaL3D",&fErrorsigmaL3D,"ErrorsigmaL3D/F" );
+      fTreeSC->Branch( "ErrorsigmaT3D",&fErrorsigmaT3D,"ErrorsigmaT3D/F" );
+      fTreeSC->Branch( "ErrorNc3D",    &fErrorNc3D,    "ErrorNc3D/F" );
+
+    }
+ 
 // MC parameters
     if( iMC )
     {
@@ -261,19 +299,19 @@ void VShowerParameters::reset( unsigned int iNTel )
         fShower_Chi2[i] = -1.;
         fiangdiff[i] = 0.0;
 
-	fShower_NPair = 0;
-	fShower_PairXS[i] = 0.;
-	fShower_PairYS[i] = 0.;
-	fShower_PairXD[i] = 0.;
-	fShower_PairYD[i] = 0.;
-	fShower_PairAngDiff[i] = 0.;
-	fShower_PairDispWeight[i] = 0.;
+fShower_NPair = 0;
+fShower_PairXS[i] = 0.;
+fShower_PairYS[i] = 0.;
+fShower_PairXD[i] = 0.;
+fShower_PairYD[i] = 0.;
+fShower_PairAngDiff[i] = 0.;
+fShower_PairDispWeight[i] = 0.;
     }
     for( unsigned int j = 0; j < iNTel; j++ )
     {
         for( unsigned int i = 0; i < fNMethods; i++ ) fTelIDImageSelected_list[i][j] = 0;
         fTrig_list[j] = 0;
-	fTrig_type[j] = 0;
+fTrig_type[j] = 0;
         fTelElevation[j] = 0.;
         fTelAzimuth[j] = 0.;
         fTelElevationVBF[j] = 0.;
@@ -283,9 +321,9 @@ void VShowerParameters::reset( unsigned int iNTel )
         fTelRA[j] = 0.;
         fTelPointingErrorX[j] = 0.;
         fTelPointingErrorY[j] = 0.;
-	fTel_x_SC[j] = 0.;
-	fTel_y_SC[j] = 0.;
-	fTel_z_SC[j] = 0.;
+fTel_x_SC[j] = 0.;
+fTel_y_SC[j] = 0.;
+fTel_z_SC[j] = 0.;
     }
 // MC parameters
     MCprimary = 0;
@@ -363,6 +401,6 @@ void VShowerParameters::addDISPPoint( unsigned int iTelID, unsigned int iMethod,
     {
         fShower_Xoff_DISP[iMethod][iTelID] = x;
         fShower_Yoff_DISP[iMethod][iTelID] = y;
-	fShower_Weight_DISP[iMethod][iTelID] = w;
+fShower_Weight_DISP[iMethod][iTelID] = w;
     }
 }

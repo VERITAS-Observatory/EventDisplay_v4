@@ -102,7 +102,12 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
 // Frogs Stuff
     fFrogs = new VFrogs();
 #endif
-
+    fModel3D = new VModel3D();  //JG-NEW
+    if( fRunPar->fUseModel3D && fRunPar->fCreateLnLTable ) {
+      fModel3D->createLnLTable();
+      fRunPar->fUseModel3D = false; 
+      exit( -1 );
+    }
 // reset cut strings and variables
     resetRunOptions();
 }
@@ -126,42 +131,42 @@ void VEventLoop::printRunInfos()
         setTelID( fRunPar->fTelToAnalyze[i] );
 
         cout << "Telescope " << fRunPar->fTelToAnalyze[i]+1;
-	if( i < getDetectorGeometry()->getTelType().size() ) cout << " (type " << getDetectorGeometry()->getTelType()[i] << ")";
-	cout << endl;
-	if( fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]] )
-	{
-	   cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
-	   if( fRunPar->fDoublePass ) cout << "  (doublepass, integration method pass 1: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
-	   cout << endl;
-	   cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
-	   cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples";
-	   if( fRunPar->fDoublePass ) cout << ", max T0 threshold " << fRunPar->fSumWindowStartAtT0Min << " d.c.)" << endl;
-	   else                       cout << ")" << endl;
-	   cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
-	   cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
-	   if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];
-	   cout << endl;
+if( i < getDetectorGeometry()->getTelType().size() ) cout << " (type " << getDetectorGeometry()->getTelType()[i] << ")";
+cout << endl;
+if( fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]] )
+{
+   cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
+   if( fRunPar->fDoublePass ) cout << "  (doublepass, integration method pass 1: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
+   cout << endl;
+   cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
+   cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples";
+   if( fRunPar->fDoublePass ) cout << ", max T0 threshold " << fRunPar->fSumWindowStartAtT0Min << " d.c.)" << endl;
+   else                       cout << ")" << endl;
+   cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
+   cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
+   if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];
+   cout << endl;
         }
-	else
-	{
-	   cout << "\t no trace integration" << endl;
+else
+{
+   cout << "\t no trace integration" << endl;
         }
-	getImageCleaningParameter()->print();
+getImageCleaningParameter()->print();
         if( getCalData()->getLowGainMultiplierDistribution() && getCalData()->getLowGainMultiplierDistribution()->GetEntries() > 0 )
         {
             cout << "\t low gain multiplier: \t" << setprecision( 3 ) << getCalData()->getLowGainMultiplierDistribution()->GetMean();
-	    if( getCalData()->getLowGainMultiplierDistribution()->GetRMS() > 1.e-3 )
-	    {
-	       cout << "+-" << getCalData()->getLowGainMultiplierDistribution()->GetRMS();
+    if( getCalData()->getLowGainMultiplierDistribution()->GetRMS() > 1.e-3 )
+    {
+       cout << "+-" << getCalData()->getLowGainMultiplierDistribution()->GetRMS();
             }
         }
         else cout << "\t (no low gain multiplier distributions)";
-	cout << endl;
-	if( TMath::Abs( fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]] ) - 1. > 1.e-2 )
-	{
-	   cout << "\t additional gain correction: " << fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]];
+cout << endl;
+if( TMath::Abs( fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]] ) - 1. > 1.e-2 )
+{
+   cout << "\t additional gain correction: " << fRunPar->fGainCorrection[fRunPar->fTelToAnalyze[i]];
         }
-	cout << "\t LL edge fit: \t\t loss > " << fRunPar->fLogLikelihoodLoss_min[i] << "\t ntubes > " << fRunPar->fLogLikelihood_Ntubes_min[i] << endl;
+cout << "\t LL edge fit: \t\t loss > " << fRunPar->fLogLikelihoodLoss_min[i] << "\t ntubes > " << fRunPar->fLogLikelihood_Ntubes_min[i] << endl;
     }
 }
 
@@ -222,39 +227,39 @@ bool VEventLoop::initEventLoop( string iFileName )
 // loop over several events
 // (note: MC might have no telescope event data until the first triggered event)
 // (note: zero suppressed data)
-		vector< bool > i_nSampleSet( fRunPar->fTelToAnalyze.size(), false );
-		unsigned int i_counter = 0;
-		for( ;; )
-		{
-		   i_tempReader.getNextEvent();
-		   for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
-		   {
-		     i_tempReader.setTelescopeID( fRunPar->fTelToAnalyze[i] );
+vector< bool > i_nSampleSet( fRunPar->fTelToAnalyze.size(), false );
+unsigned int i_counter = 0;
+for( ;; )
+{
+   i_tempReader.getNextEvent();
+   for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
+   {
+     i_tempReader.setTelescopeID( fRunPar->fTelToAnalyze[i] );
 // set number of samples
-		     if( i_tempReader.getNumSamples() != 0 )
-		     {
-		        setNSamples( fRunPar->fTelToAnalyze[i], i_tempReader.getNumSamples() );
-			i_nSampleSet[i] = true;
+     if( i_tempReader.getNumSamples() != 0 )
+     {
+        setNSamples( fRunPar->fTelToAnalyze[i], i_tempReader.getNumSamples() );
+i_nSampleSet[i] = true;
                      }
-		   }
-		   unsigned int z = 0;
-		   for( unsigned int i = 0; i < i_nSampleSet.size(); i++ )
-		   {
-		       if( i_nSampleSet[i] ) z++;
+   }
+   unsigned int z = 0;
+   for( unsigned int i = 0; i < i_nSampleSet.size(); i++ )
+   {
+       if( i_nSampleSet[i] ) z++;
                    }
-		   if( z == i_nSampleSet.size() ) break;
-		   i_counter++;
-		   if( i_counter == 1000 )
-		   {
-		      cout << "VEventLoop warning: could not find number of samples in the first 1000 events" << endl;
+   if( z == i_nSampleSet.size() ) break;
+   i_counter++;
+   if( i_counter == 1000 )
+   {
+      cout << "VEventLoop warning: could not find number of samples in the first 1000 events" << endl;
                    }
-		   if( i_counter > 99999 ) break;
+   if( i_counter > 99999 ) break;
                 } 
-		if( getNSamples() == 0 || i_counter > 99999 ) 
-		{
-		   cout << "VEventLoop::initEventLoop error: could not find any telescope events to determine sample length" << endl;
-		   cout << "exiting..." << endl;
-		   exit( -1 );
+if( getNSamples() == 0 || i_counter > 99999 ) 
+{
+   cout << "VEventLoop::initEventLoop error: could not find any telescope events to determine sample length" << endl;
+   cout << "exiting..." << endl;
+   exit( -1 );
                 }
 ///////////////////////////////////////////////////////////////
             }
@@ -262,7 +267,7 @@ bool VEventLoop::initEventLoop( string iFileName )
             if( fRawDataReader && fRunPar->fsourcetype == 2 && fRunPar->fsimu_pedestalfile.size() > 0 )
             {
                 fRawDataReader->initTraceNoiseGenerator( 0, fRunPar->fsimu_pedestalfile, getDetectorGeo(), fRunPar->fsumwindow_1, 
-		                                         fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile_DefaultPed, fRunPar->fGainCorrection );
+                                         fDebug, fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile_DefaultPed, fRunPar->fGainCorrection );
             }
         }
     }
@@ -280,41 +285,41 @@ bool VEventLoop::initEventLoop( string iFileName )
 // sourcefile has MC grisu format
     if( fRunPar->fsourcetype == 1 )
     {
-	 if( fGrIsuReader != 0 ) delete fGrIsuReader;
-	 fGrIsuReader = new VGrIsuReader( getDetectorGeo(), getDetectorGeo()->getNumTelescopes(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
-	                                  fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, fDebug, fRunPar->fgrisuseed, 
-					  fRunPar->fsimu_pedestalfile, fRunPar->fIgnoreCFGversions );
-	 fGrIsuReader->setTraceFile( fRunPar->ftracefile );
+ if( fGrIsuReader != 0 ) delete fGrIsuReader;
+ fGrIsuReader = new VGrIsuReader( getDetectorGeo(), getDetectorGeo()->getNumTelescopes(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
+                                  fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, fDebug, fRunPar->fgrisuseed, 
+  fRunPar->fsimu_pedestalfile, fRunPar->fIgnoreCFGversions );
+ fGrIsuReader->setTraceFile( fRunPar->ftracefile );
     }
 
 // ============================
 // source has MC grisu format (multiple files)
     else if( fRunPar->fsourcetype == 5 )
     {
-	 if( fMultipleGrIsuReader != 0 ) delete fMultipleGrIsuReader;
-	 fMultipleGrIsuReader = new VMultipleGrIsuReader( fNTel, fRunPar->fTelToAnalyze, fDebug );
-	 fMultipleGrIsuReader->init( getDetectorGeo(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
-	                             fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, 
-				     fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile, true, fRunPar->fsimu_pedestalfile_DefaultPed );
-	 fMultipleGrIsuReader->setTraceFile( fRunPar->ftracefile );
+ if( fMultipleGrIsuReader != 0 ) delete fMultipleGrIsuReader;
+ fMultipleGrIsuReader = new VMultipleGrIsuReader( fNTel, fRunPar->fTelToAnalyze, fDebug );
+ fMultipleGrIsuReader->init( getDetectorGeo(), fRunPar->fsourcefile, fRunPar->fsumwindow_1, 
+                             fRunPar->ftelescopeNOffset, fRunPar->fsampleoffset, fRunPar->fMCScale, 
+     fRunPar->fgrisuseed, fRunPar->fsimu_pedestalfile, true, fRunPar->fsimu_pedestalfile_DefaultPed );
+ fMultipleGrIsuReader->setTraceFile( fRunPar->ftracefile );
     }
 // ============================
 // sourcefile has DST format
     else if( fRunPar->fsourcetype == 4 || fRunPar->fsourcetype == 7 )
     {
-	 if( fDSTReader != 0 ) delete fDSTReader;
-	 fDSTReader = new VDSTReader( fRunPar->fsourcefile, fRunPar->fIsMC, fRunPar->fNTelescopes, fDebug );
-	 if( fDSTReader->isMC() && fRunPar->fIsMC == 0 ) fRunPar->fIsMC = 1;
-	 for( unsigned int i = 0; i <  fRunPar->fTelToAnalyze.size(); i++ )
-	 {
-	    fDSTReader->setNumSamples( fRunPar->fTelToAnalyze[i], getNSamples( fRunPar->fTelToAnalyze[i] ) );
+ if( fDSTReader != 0 ) delete fDSTReader;
+ fDSTReader = new VDSTReader( fRunPar->fsourcefile, fRunPar->fIsMC, fRunPar->fNTelescopes, fDebug );
+ if( fDSTReader->isMC() && fRunPar->fIsMC == 0 ) fRunPar->fIsMC = 1;
+ for( unsigned int i = 0; i <  fRunPar->fTelToAnalyze.size(); i++ )
+ {
+    fDSTReader->setNumSamples( fRunPar->fTelToAnalyze[i], getNSamples( fRunPar->fTelToAnalyze[i] ) );
          }
     }
 // sourcefile has PE format
     else if( fRunPar->fsourcetype == 6 )
     {
-	 if( fPEReader != 0 ) delete fPEReader;
-	 fPEReader = new VPEReader( fRunPar->fsourcefile, fRunPar->fTelToAnalyze, getDetectorGeo(), fDebug );
+ if( fPEReader != 0 ) delete fPEReader;
+ fPEReader = new VPEReader( fRunPar->fsourcefile, fRunPar->fTelToAnalyze, getDetectorGeo(), fDebug );
     }
 // ============================
 // set the data readers for all inherent classes
@@ -329,15 +334,15 @@ bool VEventLoop::initEventLoop( string iFileName )
 // set number of channels
     for( unsigned int i = 0; i <  fRunPar->fTelToAnalyze.size(); i++ )
     {
-	 setTelID( fRunPar->fTelToAnalyze[i] );
+ setTelID( fRunPar->fTelToAnalyze[i] );
 // this is to ignore the photodiode
-	 if( fReader->getMaxChannels() - getNChannels() != 1 ) setNChannels( fReader->getMaxChannels() );
+ if( fReader->getMaxChannels() - getNChannels() != 1 ) setNChannels( fReader->getMaxChannels() );
 // check telescope configuration
-	 if( fReader->getMaxChannels() == 0 )
-	 {
-	     cout << "VEventLoop::initEventLoop error: telescope " << fRunPar->fTelToAnalyze[i] << " with 0 channels" << endl;
-	     exit( -1 );
-	 }
+ if( fReader->getMaxChannels() == 0 )
+ {
+     cout << "VEventLoop::initEventLoop error: telescope " << fRunPar->fTelToAnalyze[i] << " with 0 channels" << endl;
+     exit( -1 );
+ }
     }
 
 // create calibrators, analyzers, etc. at first event
@@ -346,8 +351,8 @@ bool VEventLoop::initEventLoop( string iFileName )
     initializeAnalyzers();
     if( fPedestalCalculator && fRunPar->fPedestalsInTimeSlices )
     {
-	 fPedestalCalculator->initialize( (fRunMode == R_PED),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice, 
-	                                  fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumWindow );
+ fPedestalCalculator->initialize( (fRunMode == R_PED),  getNChannels(), fRunPar->fPedestalsLengthOfTimeSlice, 
+                                  fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumWindow );
     }
 // print run informations
     printRunInfos();
@@ -373,12 +378,12 @@ bool VEventLoop::initEventLoop( string iFileName )
 ///////////////////////////////////////////////////////////////////////////////////////////
     if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
     {
-	if( !fArrayPointing->setTarget( fRunPar->fTargetName ) )
-	{
-	      cout << endl;
-	      cout << "...exiting" << endl;
-	      exit( 0 );
-	}
+if( !fArrayPointing->setTarget( fRunPar->fTargetName ) )
+{
+      cout << endl;
+      cout << "...exiting" << endl;
+      exit( 0 );
+}
      }
 ///////////////////////////////////////////////////////////////////////////////////////////
 // set target coordinates from command line or from DB
@@ -398,54 +403,54 @@ bool VEventLoop::initEventLoop( string iFileName )
     for( unsigned int i = 0; i < getNTel(); i++ )
     {
         if( isTeltoAna( i ) )
-	{
-	   fPointing.push_back( new VPointing( i ) );
-	   fPointing.back()->setObservatory( fRunPar->getObservatory_Longitude_deg(), fRunPar->getObservatory_Latitude_deg() );
+{
+   fPointing.push_back( new VPointing( i ) );
+   fPointing.back()->setObservatory( fRunPar->getObservatory_Longitude_deg(), fRunPar->getObservatory_Latitude_deg() );
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Monte Carlo file
-	   if( fRunPar->fIsMC != 0 ) fPointing.back()->setMC();
+   if( fRunPar->fIsMC != 0 ) fPointing.back()->setMC();
 ///////////////////////////////////////////////////////////////////////////////////////////
 // data
-	   else
-	   {
+   else
+   {
 ///////////////////////////////////////////////////////////////////////////////////////////
 // set target by name (this means target coordinates must be hard wired into VTargets.cpp)
 // (this should not be used in any serious analysis!!)
 ///////////////////////////////////////////////////////////////////////////////////////////
-	       if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
-	       {
-		   if( !fPointing.back()->setTarget( fRunPar->fTargetName ) )
-		   {
-		       cout << endl;
-		       cout << "...exiting" << endl;
-		       exit( 0 );
-		   }
-	       }
+       if( fRunPar->fTargetName.size() > 0 && fRunPar->fTargetDec < -90. )
+       {
+   if( !fPointing.back()->setTarget( fRunPar->fTargetName ) )
+   {
+       cout << endl;
+       cout << "...exiting" << endl;
+       exit( 0 );
+   }
+       }
 ///////////////////////////////////////////////////////////////////////////////////////////
 // set target coordinates from command line or from DB
 ///////////////////////////////////////////////////////////////////////////////////////////
-	       else if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
-	       {
-		   fPointing.back()->setTargetName( fRunPar->fTargetName );
-		   fPointing.back()->setTargetJ2000( fRunPar->fTargetDec, fRunPar->fTargetRA );
-	       }
-	   }
+       else if( fRunPar->fTargetDec > -99. && fRunPar->fTargetRA > -99. )
+       {
+   fPointing.back()->setTargetName( fRunPar->fTargetName );
+   fPointing.back()->setTargetJ2000( fRunPar->fTargetDec, fRunPar->fTargetRA );
+       }
+   }
 // add any offsets to the pointing [J2000]
-	   fPointing.back()->setPointingOffset( fRunPar->fTargetRAOffset, fRunPar->fTargetDecOffset );
+   fPointing.back()->setPointingOffset( fRunPar->fTargetRAOffset, fRunPar->fTargetDecOffset );
 // set pointing error
-	   if( fRunPar->fDBTracking )
-	   {
-	     fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory, 
-	                                          fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM );
+   if( fRunPar->fDBTracking )
+   {
+     fPointing.back()->getPointingFromDB( fRunPar->frunnumber, fRunPar->fDBTrackingCorrections, fRunPar->fPMTextFileDirectory, 
+                                          fRunPar->fDBVPM, fRunPar->fDBUncalibratedVPM );
            }
-	   else
-	   {
-	       fPointing.back()->setPointingError( fRunPar->fPointingErrorX[i], fRunPar->fPointingErrorY[i] );
-	   }
+   else
+   {
+       fPointing.back()->setPointingError( fRunPar->fPointingErrorX[i], fRunPar->fPointingErrorY[i] );
+   }
         }
-	else
-	{
-	   fPointing.push_back( 0 );
+else
+{
+   fPointing.push_back( 0 );
         }
     }
 // set coordinates in run parameter
@@ -489,41 +494,41 @@ void VEventLoop::initializeAnalyzers()
             if( i < fAnaDir.size() && fAnaDir[i] ) fAnaDir[i]->cd();
             setTelID( i );
             fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, (fRunMode == R_PED || fRunMode == R_PEDLOW || 
-	                                                                         fRunMode == R_GTO || fRunMode == R_GTOLOW ||
-										 fRunMode == R_TZERO || fRunMode == R_TZEROLOW ) ) );
+                                                                         fRunMode == R_GTO || fRunMode == R_GTOLOW ||
+ fRunMode == R_TZERO || fRunMode == R_TZEROLOW ) ) );
             int iseed = fRunPar->fMCNdeadSeed;
             if( iseed != 0 ) iseed += i;
             fAnaData.back()->initialize( getNChannels(), getReader()->getMaxChannels(), (getTraceFit()>-1.), 
-	                                 getDebugFlag(), iseed, getNSamples(), 
-					 getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, 
-					 getRunParameter()->fpulsetiming_width_index );
+                                 getDebugFlag(), iseed, getNSamples(), 
+ getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, 
+ getRunParameter()->fpulsetiming_width_index );
             if( fRunMode == R_DST )
             {
                 fAnaData.back()->initializeMeanPulseHistograms();
                 fAnaData.back()->initializeIntegratedChargeHistograms();
             }
-	    fAnaData.back()->setTraceIntegrationMethod( getRunParameter()->fTraceIntegrationMethod[i] );
+    fAnaData.back()->setTraceIntegrationMethod( getRunParameter()->fTraceIntegrationMethod[i] );
         }
 // reading special channels for all requested telescopes
         for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
-	{
-	   if( getTeltoAna()[i] < fAnaData.size() && fAnaData[getTeltoAna()[i]] )
-	   {
-	      fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->fsetSpecialChannels, getRunParameter()->getDirectory_EVNDISPParameterFiles() );
+{
+   if( getTeltoAna()[i] < fAnaData.size() && fAnaData[getTeltoAna()[i]] )
+   {
+      fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->fsetSpecialChannels, getRunParameter()->getDirectory_EVNDISPParameterFiles() );
            }
         }
 // initialize cleaning
         for( unsigned int i = 0; i < fNTel; i++ )
-	{
-	   setTelID( i );
-	   if( getImageCleaningParameter() )
-	   {
-	      getImageCleaningParameter()->initialize();
-	   }
-	   else
-	   {
-	      cout << "VEventLoop::initializeAnalyzers() error initializing image cleaning for telescope " << getTelID()+1 << endl;
-	      exit( -1 );
+{
+   setTelID( i );
+   if( getImageCleaningParameter() )
+   {
+      getImageCleaningParameter()->initialize();
+   }
+   else
+   {
+      cout << "VEventLoop::initializeAnalyzers() error initializing image cleaning for telescope " << getTelID()+1 << endl;
+      exit( -1 );
            }
         }
     }
@@ -543,15 +548,15 @@ void VEventLoop::shutdown()
     if( fDebug ) cout << "VEventLoop::shutdown()" << endl;
     endOfRunInfo();
     cout << endl << "-----------------------------------------------" << endl;
-	
-	// if we have the proper settings,
-	// print the dead pixel information
-	if ( fRunPar->frunmode == R_ANA && fRunPar->fprintdeadpixelinfo ) // DEADCHAN
-	{
-		cout << endl;
-		printDeadChannelList();
-	}
-	
+
+// if we have the proper settings,
+// print the dead pixel information
+if ( fRunPar->frunmode == R_ANA && fRunPar->fprintdeadpixelinfo ) // DEADCHAN
+{
+cout << endl;
+printDeadChannelList();
+}
+
 // (GM): write a root file even if no event was analyzed
 //    if( fEventNumber >= 0 )
     {
@@ -561,16 +566,16 @@ void VEventLoop::shutdown()
             fOutputfile->cd();
         }
         else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW 
-	      && fRunMode != R_GTO && fRunMode != R_GTOLOW 
-	      && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
+      && fRunMode != R_GTO && fRunMode != R_GTOLOW 
+      && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
         {
             cout << "VEventLoop::shutdown: Error accessing output file" << endl;
         }
 // write run parameter to disk
         if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW
-	 && fRunPar->frunmode != R_PEDLOW && fRunPar->frunmode != R_TZERO && fRunPar->frunmode != R_TZEROLOW )
-	{
-	   fRunPar->Write();
+ && fRunPar->frunmode != R_PEDLOW && fRunPar->frunmode != R_TZERO && fRunPar->frunmode != R_TZEROLOW )
+{
+   fRunPar->Write();
         }
 // analysis or trace library mode
         if( fRunPar->frunmode == R_ANA )
@@ -588,18 +593,18 @@ void VEventLoop::shutdown()
             }
 // calculate and write deadtime calculation to disk
             if( fDeadTime && !isMC() )
-	    {
-	       fDeadTime->calculateDeadTime();
-	       fDeadTime->printDeadTime();
-	       fDeadTime->writeHistograms();
+    {
+       fDeadTime->calculateDeadTime();
+       fDeadTime->printDeadTime();
+       fDeadTime->writeHistograms();
             }
 // write MC run header to output file
-	    if( getReader()->getMonteCarloHeader() )
-	    {
-	       fOutputfile->cd();
-	       getReader()->getMonteCarloHeader()->print();
-	       getReader()->getMonteCarloHeader()->Write();
-	    }
+    if( getReader()->getMonteCarloHeader() )
+    {
+       fOutputfile->cd();
+       getReader()->getMonteCarloHeader()->print();
+       getReader()->getMonteCarloHeader()->Write();
+    }
 // write array analysis results to output file
             if( fArrayAnalyzer ) fArrayAnalyzer->terminate();
 #ifndef NOGSL
@@ -619,7 +624,7 @@ void VEventLoop::shutdown()
         }
 // write calibration/analysis results for each telescope
         else if( fRunPar->frunmode == R_PED || fRunPar->frunmode == R_GTO || fRunPar->frunmode == R_GTOLOW || fRunPar->frunmode == R_PEDLOW
-	      || fRunPar->frunmode == R_TZERO || fRunPar->frunmode == R_TZEROLOW )
+      || fRunPar->frunmode == R_TZERO || fRunPar->frunmode == R_TZEROLOW )
         {
             VPedestalCalculator *iP = 0;
             if( fRunPar->frunmode == R_PED && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
@@ -642,7 +647,7 @@ void VEventLoop::shutdown()
        TFile f( fRunPar->foutputfileName.c_str(), "READ" );
        if( f.IsZombie() )
        {
-	   cout << "Error: problem with eventdisplay output file: " << fRunPar->foutputfileName << endl;
+   cout << "Error: problem with eventdisplay output file: " << fRunPar->foutputfileName << endl;
        }
        else
        {
@@ -743,12 +748,12 @@ bool VEventLoop::loop( int iEvents )
         }
         else fNumberofGoodEvents++;
         if( i == 0 )
-	{
-	     cout << endl;
-	     cout << "##########################################" << endl;
-	     cout << "########  starting analysis  ############# " << endl;
-	     cout << "##########################################" << endl;
-	     cout << endl;
+{
+     cout << endl;
+     cout << "##########################################" << endl;
+     cout << "########  starting analysis  ############# " << endl;
+     cout << "##########################################" << endl;
+     cout << endl;
         }
         else if ( fRunPar->fPrintAnalysisProgress > 0 && i % fRunPar->fPrintAnalysisProgress == 0 ) cout << "\t now at event " << i << endl;
         i++;
@@ -791,11 +796,11 @@ bool VEventLoop::nextEvent()
             return false;
         }
         fReader->setTelescopeID( getTeltoAna()[0] );
-	if( !fReader->hasFADCTrace() ) 
-	{
-	   for( unsigned int i = 0; i < getRunParameter()->fTraceIntegrationMethod.size(); i++ )
-	   {
-	      getRunParameter()->fTraceIntegrationMethod[i] = 0;
+if( !fReader->hasFADCTrace() ) 
+{
+   for( unsigned int i = 0; i < getRunParameter()->fTraceIntegrationMethod.size(); i++ )
+   {
+      getRunParameter()->fTraceIntegrationMethod[i] = 0;
            }
         }
         fillTriggerVectors();
@@ -817,8 +822,8 @@ bool VEventLoop::nextEvent()
         if( fRunPar->fdisplaymode ) gSystem->ProcessEvents();
 // analyze event ( do this always except if searching for a specifing event number in the file)
         if( fAnalyzeMode )
-	{
-	   i_cut = analyzeEvent();
+{
+   i_cut = analyzeEvent();
         }
     } while( i_cut == 0 && fNextEventStatus );
 // user cut failed
@@ -864,40 +869,40 @@ int VEventLoop::analyzeEvent()
        if( getTelID() == 0 && bCheckTelescopePositions && !isMC() ) checkTelescopePositions( fEventMJD[getTelID()] );
 
 // check number of samples
-	if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isDST_MC() )
-	{
-	   cout << "setting sample length for telescope " << getTelID()+1 << " to " << getNSamples() << endl;
-	   fBoolPrintSample[getTelID()] = false;
+if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isDST_MC() )
+{
+   cout << "setting sample length for telescope " << getTelID()+1 << " to " << getNSamples() << endl;
+   fBoolPrintSample[getTelID()] = false;
 // make sure that calibration sum window is not too long
-	   if( fRunMode == R_PED || fRunMode == R_TZERO )
-	   {
-	      if( fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow > (int)getNSamples() )
-	      {
-	         cout << "VEventLoop::analyzeEvent: resetting calibration sum window from ";
-		 cout << fRunPar->fCalibrationSumWindow;
-		 fRunPar->fCalibrationSumWindow = getNSamples() - fRunPar->fCalibrationSumFirst;
-	         cout << " to " << fRunPar->fCalibrationSumWindow;
-		 cout << " (sum first at " << fRunPar->fCalibrationSumFirst;
-		 cout << ", min sum per channel " << fRunPar->fCalibrationIntSumMin;
-		 cout << ")" << endl;
+   if( fRunMode == R_PED || fRunMode == R_TZERO )
+   {
+      if( fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow > (int)getNSamples() )
+      {
+         cout << "VEventLoop::analyzeEvent: resetting calibration sum window from ";
+ cout << fRunPar->fCalibrationSumWindow;
+ fRunPar->fCalibrationSumWindow = getNSamples() - fRunPar->fCalibrationSumFirst;
+         cout << " to " << fRunPar->fCalibrationSumWindow;
+ cout << " (sum first at " << fRunPar->fCalibrationSumFirst;
+ cout << ", min sum per channel " << fRunPar->fCalibrationIntSumMin;
+ cout << ")" << endl;
               }
            }
         }
 // quit when number of samples if set to '0'
         if( getNSamples() == 0 && fRunPar->fsourcetype != 7 )
-	{
-	   cout << "VEventLoop::analyzeEvent() error: retrieved sample length of zero" << endl;
-	   cout << "exiting..." << endl;
-	   exit( -1 );
+{
+   cout << "VEventLoop::analyzeEvent() error: retrieved sample length of zero" << endl;
+   cout << "exiting..." << endl;
+   exit( -1 );
         }
 
 // check the requested sumwindow is not larger than the number of samples
         if( (int)getNSamples() < (int)fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] )
         {
             if( fBoolSumWindowChangeWarning < 1 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
-	    {
-	         cout << "VEventLoop::analyzeEvent: resetting summation window 1 from ";
-		 cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+    {
+         cout << "VEventLoop::analyzeEvent: resetting summation window 1 from ";
+ cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
             fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
@@ -905,9 +910,9 @@ int VEventLoop::analyzeEvent()
         if( (int)getNSamples() < (int)fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] )
         {
             if( fBoolSumWindowChangeWarning < 1 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
-	    {
-	         cout << "VEventLoop::analyzeEvent: resetting summation window 2 from ";
-		 cout << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+    {
+         cout << "VEventLoop::analyzeEvent: resetting summation window 2 from ";
+ cout << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
             fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
@@ -915,9 +920,9 @@ int VEventLoop::analyzeEvent()
         if( (int)getNSamples() < fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] )
         {
             if( fBoolSumWindowChangeWarning < 2 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
-	    {
-	       cout << "VEventLoop::analyzeEvent: resetting double pass summation window from ";
-	       cout << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+    {
+       cout << "VEventLoop::analyzeEvent: resetting double pass summation window from ";
+       cout << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
             fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 2;
@@ -932,19 +937,19 @@ int VEventLoop::analyzeEvent()
 #ifndef NOVBF
                 if( fReader->getATEventType() != VEventType::PED_TRIGGER )
 #endif
-		{
-		   if( !fRunPar->fWriteTriggerOnly || fReader->hasArrayTrigger() )
-		   {
-		      fAnalyzer->doAnalysis();
+{
+   if( !fRunPar->fWriteTriggerOnly || fReader->hasArrayTrigger() )
+   {
+      fAnalyzer->doAnalysis();
                    }
 // check user cuts
 // (single telescope cuts don't work
 // what to do:
 // determine cut result for each telescope
 // AND then with vector of cut telescopes )
-		   i_cutTemp = checkCuts();
-		   if( i_cut > 0 && !fCutTelescope ) i_cut = 1;
-		   else                              i_cut = i_cutTemp;
+   i_cutTemp = checkCuts();
+   if( i_cut > 0 && !fCutTelescope ) i_cut = 1;
+   else                              i_cut = i_cutTemp;
                 }
                 break;
 /////////////////
@@ -957,18 +962,18 @@ int VEventLoop::analyzeEvent()
 #ifndef NOVBF
                     if (fReader->getATEventType()==VEventType::PED_TRIGGER)
 #endif
-		    {
-		       fCalibrator->calculatePedestals();
+    {
+       fCalibrator->calculatePedestals();
                     }
                 }
                 else
                 {
                     if( !fReader->wasLossyCompressed() )
-		    {
+    {
 // for DSTs, require a local trigger
                         if( fReader->hasLocalTrigger( getTelID()) )
-			{
-			   fCalibrator->calculatePedestals();
+{
+   fCalibrator->calculatePedestals();
                         }
                     }
                 }
@@ -987,8 +992,8 @@ int VEventLoop::analyzeEvent()
 #ifndef NOVBF
                 if( fReader->getATEventType() != VEventType::PED_TRIGGER )
 #endif
-		{
-		    fCalibrator->calculateGainsAndTOffsets();
+{
+    fCalibrator->calculateGainsAndTOffsets();
                 }
                 break;
 /////////////////
@@ -999,8 +1004,8 @@ int VEventLoop::analyzeEvent()
 #ifndef NOVBF
                 if( fReader->getATEventType() != VEventType::PED_TRIGGER )
 #endif
-		{
-		   fCalibrator->calculateGainsAndTOffsets(true);
+{
+   fCalibrator->calculateGainsAndTOffsets(true);
                 }
                 break;
 /////////////////
@@ -1011,8 +1016,8 @@ int VEventLoop::analyzeEvent()
 #ifndef NOVBF
                 if( fReader->getATEventType() != VEventType::PED_TRIGGER &&  fReader->hasArrayTrigger() )
 #endif
-		{
-		    fCalibrator->calculateAverageTZero();
+{
+    fCalibrator->calculateAverageTZero();
                 }
                 break;
 /////////////////
@@ -1023,8 +1028,8 @@ int VEventLoop::analyzeEvent()
 #ifndef NOVBF
                 if( fReader->getATEventType() != VEventType::PED_TRIGGER )
 #endif
-		{
-		    fCalibrator->calculateAverageTZero( true );
+{
+    fCalibrator->calculateAverageTZero( true );
                 }
                 break;
 /////////////////
@@ -1043,10 +1048,16 @@ int VEventLoop::analyzeEvent()
 #endif
        {
           fArrayAnalyzer->doAnalysis();
+  if( fRunPar->fUseModel3D || fRunPar->fUseDisplayModel3D ) {
+    if (fReader->hasArrayTrigger() ) fModel3D->doModel3D(); //JG
+    else fModel3D->fillInit3D();
+  }
+  if( !fRunPar->fWriteTriggerOnly ) getShowerParameters()->getTree()->Fill(); //JG
+  else if ( fRunPar->fWriteTriggerOnly && fReader->hasArrayTrigger() ) getShowerParameters()->getTree()->Fill(); //JG
 // GH Frogs Analysis
 #ifndef NOGSL
           if( fRunPar->ffrogsmode )
-	  {
+  {
              fFrogs->doFrogsStuff(fEventNumber);
           }
 #endif 
@@ -1059,7 +1070,7 @@ int VEventLoop::analyzeEvent()
    {
       if( fReader->getArrayTrigger() && fReader->getArrayTrigger()->hasTenMHzClockArray() )
       {
-	 fDeadTime->fillDeadTime(  getEventTime(), fReader->getArrayTrigger()->getTenMHzClockArray() );
+ fDeadTime->fillDeadTime(  getEventTime(), fReader->getArrayTrigger()->getTenMHzClockArray() );
       }
       else
       {
@@ -1094,11 +1105,11 @@ int VEventLoop::analyzeEvent()
     if( fRunMode == R_PED || fRunMode == R_PEDLOW || fRunMode == R_TZERO || fRunMode == R_TZEROLOW )
     {
         if( fRunPar->fNCalibrationEvents > 0 )
-	{
+{
            if( (int)fCalibrator->getNumberOfEventsUsedInCalibration( -1, fRunMode ) > fRunPar->fNCalibrationEvents )
-	   {
-	      i_cut = -1;
-	      fEndCalibrationRunNow = true;
+   {
+      i_cut = -1;
+      fEndCalibrationRunNow = true;
            }
         }
     }
@@ -1151,10 +1162,10 @@ int VEventLoop::checkCuts()
         float MCenergy;
         unsigned short int ntubes, bad, nlowgain, nsat;
         int muonValid;
-	unsigned short int eventType;
+unsigned short int eventType;
         int houghMuonValid, houghNpix; //Hough
 
-	i_tree.Branch( "eventType", &eventType, "eventType/s" );
+i_tree.Branch( "eventType", &eventType, "eventType/s" );
         i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
         i_tree.Branch( "cen_y", &cen_y, "cen_y/F" );
         i_tree.Branch( "length", &length, "length/F" );
@@ -1186,7 +1197,7 @@ int VEventLoop::checkCuts()
         if( i_tree.GetBranchStatus( "houghCN" ) ) i_tree.Branch( "houghCN", &houghCN, "houghCN/D" );
         if( i_tree.GetBranchStatus( "houghContained" ) ) i_tree.Branch( "houghContained", &houghContained, "houghContained/D" );
 
-	eventType = fAnalyzer->getImageParameters()->eventType;
+eventType = fAnalyzer->getImageParameters()->eventType;
         cen_x = fAnalyzer->getImageParameters()->cen_x;
         cen_y = fAnalyzer->getImageParameters()->cen_y;
         length = fAnalyzer->getImageParameters()->length;
@@ -1202,7 +1213,7 @@ int VEventLoop::checkCuts()
         sinphi = fAnalyzer->getImageParameters()->sinphi;
         ntubes = fAnalyzer->getImageParameters()->ntubes;
         nsat = fAnalyzer->getImageParameters()->nsat;
-	nlowgain = fAnalyzer->getImageParameters()->nlowgain;
+nlowgain = fAnalyzer->getImageParameters()->nlowgain;
         bad = fAnalyzer->getImageParameters()->bad;
         MCenergy = fAnalyzer->getImageParameters()->MCenergy;
         fLocalTrigger = fAnalyzer->getImageParameters()->fLocalTrigger;
@@ -1335,9 +1346,9 @@ void VEventLoop::terminate( int iAna )
        cout << "Number of events with GPS faults (status bit set): " << endl;
        for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
        {
-	  cout << "\t Telescope " << getTeltoAna()[i]+1 << ": ";
-	  if( i < fGPSClockWarnings.size() ) cout << fGPSClockWarnings[i];
-	  cout << endl;
+  cout << "\t Telescope " << getTeltoAna()[i]+1 << ": ";
+  if( i < fGPSClockWarnings.size() ) cout << fGPSClockWarnings[i];
+  cout << endl;
        }
     }
 
@@ -1373,7 +1384,7 @@ void VEventLoop::setEventTimeFromReader()
     if( getNTel() > VDST_MAXTELESCOPES )
     {
         cout << " VEventLoop::setEventTimeFromReader: warning, cannot apply majority rule to times, too many telescopes: ";
-	cout << VDST_MAXTELESCOPES << " " << getNTel() << endl;
+cout << VDST_MAXTELESCOPES << " " << getNTel() << endl;
         return;
     }
     map< unsigned int, double > i_telescope_time;
@@ -1388,38 +1399,38 @@ void VEventLoop::setEventTimeFromReader()
         fGPS.decode(fReader->getGPS0(), fReader->getGPS1(), fReader->getGPS2(), fReader->getGPS3(), fReader->getGPS4());
 // check status of GPS clock
         if( fGPS.getStatus() != 0 )
-	{
-	    if( i < fGPSClockWarnings.size() ) fGPSClockWarnings[i]++;
-	    if( fGPSClockWarnings[i] < 30 && fDebug )
-	    {
+{
+    if( i < fGPSClockWarnings.size() ) fGPSClockWarnings[i]++;
+    if( fGPSClockWarnings[i] < 30 && fDebug )
+    {
 
-		 cout << " VEventLoop::setEventTimeFromReader: info, event with GPS error status in telescope " << getTeltoAna()[i]+1 << endl;
-		 cout << "\t error status " << fGPS.getStatus();
-		 if( fGPS.getStatus()&0x0001 )
-		 {
-		     cout << " (unlocked from GPS time source)" << endl;
-		 }
-		 else if( fGPS.getStatus()&0x0002 )
-		 {
-		     cout << " (offset in time with respect to UTC)" << endl;
+ cout << " VEventLoop::setEventTimeFromReader: info, event with GPS error status in telescope " << getTeltoAna()[i]+1 << endl;
+ cout << "\t error status " << fGPS.getStatus();
+ if( fGPS.getStatus()&0x0001 )
+ {
+     cout << " (unlocked from GPS time source)" << endl;
+ }
+ else if( fGPS.getStatus()&0x0002 )
+ {
+     cout << " (offset in time with respect to UTC)" << endl;
                  }
-		 else if( fGPS.getStatus()&0x0004 )
-		 {
-		     cout << " (large frequency offset)" << endl;
+ else if( fGPS.getStatus()&0x0004 )
+ {
+     cout << " (large frequency offset)" << endl;
                  }
             }
-	    else if( fGPSClockWarnings[i] == 30 )
-	    {
-	       cout << " VEventLoop::setEventTimeFromReader: info, more than 30 events with GPS status set";
-	       cout << " (Telescope " << getTeltoAna()[i]+1 << ")" << endl;
+    else if( fGPSClockWarnings[i] == 30 )
+    {
+       cout << " VEventLoop::setEventTimeFromReader: info, more than 30 events with GPS status set";
+       cout << " (Telescope " << getTeltoAna()[i]+1 << ")" << endl;
             }
         }
 
 // time is given in seconds per day
         if( getTelID() < fEventTime.size() )
         {
-	  fEventTime[getTelID()] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
-	  fArrayEventTime = fEventTime[getTelID()];
+  fEventTime[getTelID()] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
+  fArrayEventTime = fEventTime[getTelID()];
         }
         i_telescope_time[getTeltoAna()[i]] = fGPS.getHrs() *60.*60.+ fGPS.getMins()*60.+fGPS.getSecs();
         i_telescope_timeN[getTeltoAna()[i]] = 0;
@@ -1434,11 +1445,11 @@ void VEventLoop::setEventTimeFromReader()
         if( getTelID() == 2 && dMJD==54101) dMJD += 100;
         i_MJD[getTeltoAna()[i]] = dMJD;
 // set MJD
-	if( getTelID() < fEventMJD.size() )
-	{
-	   fEventMJD[getTelID()] = (int)dMJD;
-	   fArrayEventMJD = (int)dMJD;
-	}
+if( getTelID() < fEventMJD.size() )
+{
+   fEventMJD[getTelID()] = (int)dMJD;
+   fArrayEventMJD = (int)dMJD;
+}
     }
 
 
@@ -1467,7 +1478,7 @@ void VEventLoop::setEventTimeFromReader()
     if( fabs( i_telescope_time[z_max] - fEventTime[getTelID()] ) > i_max_time_diff )
     {
         fEventTime[getTelID()] = i_telescope_time[z_max];
-	fArrayEventTime = i_telescope_time[z_max];
+fArrayEventTime = i_telescope_time[z_max];
     }
 //// MJD ////    
 // check if all MJDs are the same (use same routines as for time)
@@ -1495,7 +1506,7 @@ void VEventLoop::setEventTimeFromReader()
     if( fabs( i_MJD[z_max] - fEventMJD[getTelID()] ) > i_max_time_diff )
     {
         fEventMJD[getTelID()] = (int)i_MJD[z_max];
-	fArrayEventMJD = fEventMJD[getTelID()];
+fArrayEventMJD = fEventMJD[getTelID()];
     }
 // check if MJD of current event is different from the value of the previous event
 // this is only ok if we are close to midnight

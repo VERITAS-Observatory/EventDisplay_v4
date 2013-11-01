@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 
-#include "VStatistics.h"
 #include "VUtilities.h"
 
 using namespace std;
@@ -54,6 +53,8 @@ class VEmissionHeightCalculator
         double getEnergyCorrectionOrEmissionHeight( double *cen_x, double *cen_y, double *dist, double *size, double *r, double* az, double* el, bool iEcorr );
         double getTelescopeDistanceSC( unsigned int iTel1, unsigned int iTel2, double az, double z );
         double imageDistance( double c1x, double c2x, double c1y, double c2y );
+        double interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos = false,
+               double iLimitforInterpolation = 0.5, double iMinValidValue = -90. );
 
     public:
 
