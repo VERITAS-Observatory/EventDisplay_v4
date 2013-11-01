@@ -1312,6 +1312,15 @@ void VDisplay::setFADCText()
       fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     }
 
+// Model3D Value (JG)
+
+    if( fEventLoop->getRunParameter()->fUseDisplayModel3D )
+      {
+	/// JG
+	sprintf( cTemp, "Model3D: %.2f", fEventLoop->getData()->getModel3DMu()[iChannel]);
+	fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+      }
+    
 // dead channel text
 
     fTextFADC.push_back( new TText( xL, yT, "" ) );
@@ -1916,6 +1925,7 @@ void VDisplay::defineGui()
     fComboCameraView->AddEntry( "status (low)", 22 );
     fComboCameraView->AddEntry( "trigger-evndisp", 23 );
     fComboCameraView->AddEntry( "template (frogs)", 24 );
+    fComboCameraView->AddEntry( "model3D", 25 ); //JG
     fComboCameraView->Select( 0 );
     fComboCameraView->Associate( this );
     fComboCameraView->Resize( 110, 20 );

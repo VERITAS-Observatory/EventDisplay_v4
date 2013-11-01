@@ -126,6 +126,34 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
             }
             else fRunPara->ffrogsRecID = -1;;
         }
+// Model3D, JG
+        else if( iTemp.find( "model3d" ) < iTemp.size() )
+	{
+	  fRunPara->fUseModel3D = true; 
+	  fRunPara->fShortTree = 99; //JGtest?
+	  fRunPara->fLnLTableFile = "table_LnL.root";
+        }
+        else if( iTemp.find( "plot3d" ) < iTemp.size() )
+	{
+	  fRunPara->fUseDisplayModel3D = true;
+	  fRunPara->fShortTree = 99; //JGtest?
+	  fRunPara->fLnLTableFile = "table_LnL.root";
+	  fRunPara->fdisplaymode = 1;
+        }
+        else if( iTemp.find( "lnlfile" ) < iTemp.size() )
+        {
+	  if( iTemp2.size() > 0 ) {
+	    fRunPara->fLnLTableFile = iTemp2;
+	    i++;
+	  }
+	  else fRunPara->fLnLTableFile = "table_LnL.root";
+        }
+        else if( iTemp.find( "createlnltablefile" ) < iTemp.size() )
+	{
+	  fRunPara->fUseModel3D = true; 
+	  fRunPara->fCreateLnLTable = true;
+        }
+
 // source file
         else if( iTemp.find( "sourcefi" ) < iTemp.size() )
         {
@@ -785,7 +813,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         }
         else if( iTemp.find( "shorttree" ) < iTemp.size() && !(iTemp.find( "noshorttree" ) < iTemp.size() ) )
         {
-            fRunPara->fShortTree = 1;
+	  if( ! fRunPara->fUseModel3D ) fRunPara->fShortTree = 1; //JGtest?
         }
         else if( iTemp.find( "noshorttree" ) < iTemp.size() )
         {
@@ -1378,7 +1406,6 @@ void VReadRunParameter::printHelp()
        cout << "VReadRunParameter::printHelp(): no help available (environmental variable EVNDISPSYS not set)" << endl;
     }
 }
-
 
 void VReadRunParameter::setDirectories()
 {

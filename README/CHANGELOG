@@ -1,6 +1,11 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131031 (JG, GM) added 3D Model code to evendisplay
+                merge of branch branches/Model3D
+                tag before merging for 3D model: tags/Model3D_merge20131101
+                tag before mergine for trunk: tags/EVD428-pre3D
+
 * 20131030 (GM) added 'npe' to dst trees (CTA)
 
 * 20131030 (GM) first adjustments to read files on the dCache

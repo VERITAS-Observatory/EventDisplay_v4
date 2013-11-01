@@ -302,6 +302,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        if( !hLightCurve )
        {
           cout << "VLightCurve::plot: no light curve histogram found with name " << htitle << endl;
+//	  fCanvasLightCurve->GetListOfPrimitives()->Print();
 	  return fCanvasLightCurve;
        }
     }
