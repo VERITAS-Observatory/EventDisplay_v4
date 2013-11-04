@@ -384,14 +384,14 @@ void VAtmosphereSoundings::fillIndexofRefraction()
     read a CORSIKA atmosphere from a text file (atmprof files)
 
 */
-bool VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
+int VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
 {
     ifstream is;
     is.open( iFile.c_str() );
     if( !is )
     {
        cout << "VAtmosphereSoundings::read_CORSIKA_Atmosphere: error opening CORSIKA atmospheric file " << iFile << endl;
-       return false;
+       return -1;
     }
 
     fDataCORSIKAMODTRAN.push_back( new VAtmosphereSoundingData() );
@@ -446,7 +446,7 @@ bool VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, 
 
     fillAtmosphericPressure( fDataCORSIKAMODTRAN.back() );
 
-    return true;
+    return fDataCORSIKAMODTRAN.size() -1 ;
 }
 
 /*
@@ -454,14 +454,14 @@ bool VAtmosphereSoundings::read_CORSIKA_Atmosphere( string iFile, string iName, 
     read MODTRAN tp6 files
 
 */
-bool VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
+int VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, int iColor, int iLineStyle )
 {
     ifstream is;
     is.open( iFile.c_str() );
     if( !is )
     {
        cout << "VAtmosphereSoundings::read_MODTRAN_Atmosphere: error opening MODTRAN tp6 file" << iFile << endl;
-       return false;
+       return -1;
     }
 // for now: only tp6 files can be read
     if( iFile.find( "tp6" ) >= iFile.size() ) return false;
@@ -540,7 +540,6 @@ bool VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, 
 		z++;
 		// relative humidity
 		for( unsigned int s = 0; s < 9; s++ ) is_stream >> iTemp;
-		//cout << z << "\t" <<  atof( iTemp.c_str() ) << endl;
 		fDataCORSIKAMODTRAN.back()->fRelativeHumidity.push_back( atof( iTemp.c_str() ) );
        }
 
@@ -563,7 +562,7 @@ bool VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, 
     fillAtmosphericDensity( fDataCORSIKAMODTRAN.back() );
     fillAtmosphericThickness( fDataCORSIKAMODTRAN.back() );
 
-    return true;
+    return fDataCORSIKAMODTRAN.size() -1 ;
 }
 
 void VAtmosphereSoundings::fillWaterVaporDensity()
@@ -2130,7 +2129,7 @@ double VAtmosphereSoundings::safe_eval( TGraph * g, double h, string opt) {
 }
 
 
-double VAtmosphereSoundings::Interpolate( vector<double> raw, vector<double> raw_heights, vector<double> &result, string opt="lin", double h=-1 )
+double VAtmosphereSoundings::interpolate( vector<double> raw, vector<double> raw_heights, vector<double> &result, string opt="lin", double h=-1 )
 {
 
 	TGraph * g = new TGraph( 0 );
@@ -2241,7 +2240,7 @@ bool VAtmosphereSoundings::write_CORSIKA_UserProfile( unsigned int iMODTRANIndex
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool VAtmosphereSoundings::push_average_atmosphere( string name="", vector<int> *years=0, vector<int> *months= 0, vector<int> *days = 0, vector<int> * hours = 0,unsigned int nMinPoints=20, int nMinFlights=1 ) {
+int VAtmosphereSoundings::push_average_atmosphere( string name="", vector<int> *years=0, vector<int> *months= 0, vector<int> *days = 0, vector<int> * hours = 0, vector<double> * mjds=0 ,unsigned int nMinPoints=20, int nMinFlights=1 ) {
 
 
   	VAtmosphereSoundingData * Average =  new VAtmosphereSoundingData();
@@ -2263,11 +2262,10 @@ bool VAtmosphereSoundings::push_average_atmosphere( string name="", vector<int> 
 	TProfile * averageMixingRatio = new TProfile( "averageMixingRatio", "average mixing ratio; mixing ratio [g/kg]; height [m]", heightbins.size()-1, &(heightbins[0]), 0, 1e3);
 	TProfile * averageRelativeHumidity = new TProfile( "averageRelativeHumidity", "average relative humidity; relative humidity [%]; height [m]", heightbins.size()-1, &(heightbins[0]), 0, 1e2);
 	
-	cout << fDataInterpol.size() << endl;
-
+	
 	for(unsigned int iData=0; iData<fDataInterpol.size(); iData++) {
 		VAtmosphereSoundingData * Data = fDataInterpol.at(iData);
-		if( !DateInRange( Data, years, months, days, hours , nMinPoints) ) continue;
+		if( !isDateInRange( Data, years, months, days, hours, mjds , nMinPoints) ) continue;
 		for(unsigned int iH=0; iH<fHeights.size(); iH++) {
 			averagePressure->Fill(fHeights[iH], Data->fPressure_Pa.at(iH) );
  			averageDensity->Fill(fHeights[iH], Data->fDensity_gcm3.at(iH) ); 
@@ -2316,21 +2314,36 @@ bool VAtmosphereSoundings::push_average_atmosphere( string name="", vector<int> 
 
 
 
-	return true;
+	return fAverageProfile.size() ;
 
 }
 
-bool VAtmosphereSoundings::DateInRange(  VAtmosphereSoundingData * Data, vector<int> * years, vector<int> * months, vector<int> * days, vector<int> * hours ,unsigned int nMinPoints=20 ) {
+bool VAtmosphereSoundings::isDateInRange(  VAtmosphereSoundingData * Data, vector<int> * years, vector<int> * months, vector<int> * days, vector<int> * hours, vector<double> * mjds ,unsigned int nMinPoints=20 ) {
 
 	if(Data->fHeight_m.size() < nMinPoints ) return false;
 	if(years && std::find(years->begin(), years->end(), Data->Year ) == years->end() ) return false;
 	if(months && std::find(months->begin(), months->end(), Data->Month ) == months->end() ) return false;
 	if(days && std::find(days->begin(), days->end(), Data->Day ) == days->end() ) return false;
 	if(hours && std::find(hours->begin(), hours->end(), Data->Hour ) == hours->end() ) return false;
+	if(mjds && std::find(mjds->begin(), mjds->end(), Data->MJD ) == mjds->end() ) return false;
 	return true;
 }
 
-VAtmosphereSoundingData * VAtmosphereSoundings::DefaultWinterAtmosphere( string name, string opt) {
+bool VAtmosphereSoundings::isDateInRange(  VAtmosphereSoundingData * Data, vector<double> * mjds, unsigned int nMinPoints=20 ) {
+
+	if(Data->fHeight_m.size() < nMinPoints ) return false;
+	if(mjds && std::find(mjds->begin(), mjds->end(), Data->MJD ) == mjds->end() ) return false;
+	return true;
+}
+
+bool VAtmosphereSoundings::isDateInRange(  VAtmosphereSoundingData * Data, double minMJD, double maxMJD, unsigned int nMinPoints=20 ) {
+
+	if(Data->fHeight_m.size() < nMinPoints ) return false;
+	if(Data->MJD < minMJD || Data->MJD>=maxMJD ) return false;
+	return true;
+}
+
+VAtmosphereSoundingData * VAtmosphereSoundings::makeDefaultWinterAtmosphere( string name, string opt) {
 	//do not re-make atmosphere unless forced
 	if ( opt !="redo" && opt!="force" && name!=""  ) {
 		for(unsigned int i=0; i<fAverageProfile.size(); i++) {
@@ -2344,13 +2357,13 @@ VAtmosphereSoundingData * VAtmosphereSoundings::DefaultWinterAtmosphere( string 
 	months.push_back(3);
 	months.push_back(12);
 
-	if( push_average_atmosphere(  name, 0, &months, 0, 0, 20, 5 ) ) return fAverageProfile.back();
-	cout << "VAtmosphereSoundings::DefaultWinterAtmosphere: Error: average atmosphere not pushed" << endl;
+	if( push_average_atmosphere(  name, 0, &months, 0, 0,0, 20, 5 ) ) return fAverageProfile.back();
+	cout << "VAtmosphereSoundings::makeDefaultWinterAtmosphere: Error: average atmosphere not pushed" << endl;
 	return 0;	
 	
 }
 
-VAtmosphereSoundingData * VAtmosphereSoundings::DefaultSummerAtmosphere( string name, string opt) {
+VAtmosphereSoundingData * VAtmosphereSoundings::makeDefaultSummerAtmosphere( string name, string opt) {
 	//do not re-make atmosphere unless forced
 	if ( opt !="redo" && opt!="force" && name!=""  ) {
 		for(unsigned int i=0; i<fAverageProfile.size(); i++) {
@@ -2363,13 +2376,13 @@ VAtmosphereSoundingData * VAtmosphereSoundings::DefaultSummerAtmosphere( string 
 	months.push_back(9);
 
 
-	if( push_average_atmosphere(  name, 0, &months,0, 0, 20, 5 ) )return fAverageProfile.back();
-	cout << "VAtmosphereSoundings::DefaultSummerAtmosphere: Error: average atmosphere not pushed" << endl;
+	if( push_average_atmosphere(  name, 0, &months,0, 0,0, 20, 5 ) )return fAverageProfile.back();
+	cout << "VAtmosphereSoundings::makeDefaultSummerAtmosphere: Error: average atmosphere not pushed" << endl;
 	return 0;	
 	
 }
 
-VAtmosphereSoundingData * VAtmosphereSoundings::MeanMonthlyAtmosphere( int month, string name="", string opt="use", int yearMin=1980, int yearMax=2020) {
+VAtmosphereSoundingData * VAtmosphereSoundings::makeMeanMonthlyAtmosphere( int month, string name="", string opt="use", int yearMin=1980, int yearMax=2020) {
 	//do not re-make atmosphere unless forced
 	if ( opt !="redo" && opt!="force" && name!="" ) {
 		for(unsigned int i=0; i<fAverageProfile.size(); i++) {
@@ -2384,13 +2397,13 @@ VAtmosphereSoundingData * VAtmosphereSoundings::MeanMonthlyAtmosphere( int month
 	for(int y=yearMin; y<=yearMax; y++) years.push_back(y);
 
 
-	if( push_average_atmosphere(  name, &years, &months,0,0, 20, 5 ) )return fAverageProfile.back();
-	cout << "VAtmosphereSoundings::MeanMonthlyAtmosphere: Error: average atmosphere not pushed" << endl;
+	if( push_average_atmosphere(  name, &years, &months,0,0, 0, 20, 5 ) )return fAverageProfile.back();
+	cout << "VAtmosphereSoundings::makeMeanMonthlyAtmosphere: Error: average atmosphere not pushed" << endl;
 	return 0;	
 	
 }
 
-VAtmosphereSoundingData * VAtmosphereSoundings::OneFlightAtmosphere( int year, int month, int day, int hour, string name="", string opt="use") {
+VAtmosphereSoundingData * VAtmosphereSoundings::makeOneFlightAtmosphere( int year, int month, int day, int hour, string name="", string opt="use") {
 	//do not re-make atmosphere unless forced
 	if ( opt !="redo" && opt!="force" && name!="" ) {
 		for(unsigned int i=0; i<fAverageProfile.size(); i++) {
@@ -2412,11 +2425,31 @@ VAtmosphereSoundingData * VAtmosphereSoundings::OneFlightAtmosphere( int year, i
 
 
 
-	if( push_average_atmosphere(  name, &years, &months, &days, &hours, 20, 0 ) ) return fAverageProfile.back();
-	cout << "VAtmosphereSoundings::OneFlightAtmosphere: Error: average atmosphere not pushed" << endl;
+	if( push_average_atmosphere(  name, &years, &months, &days, &hours, 0, 20, 0 ) ) return fAverageProfile.back();
+	cout << "VAtmosphereSoundings::makeOneFlightAtmosphere: Error: average atmosphere not pushed" << endl;
 	return 0;	
 	
 }
+
+VAtmosphereSoundingData * VAtmosphereSoundings::makeMeanAtmosphereMJD( double minMJD, double maxMJD, string name="", string opt="") {
+	//do not re-make atmosphere unless forced
+	if ( opt !="redo" && opt!="force" && name!="" ) {
+		for(unsigned int i=0; i<fAverageProfile.size(); i++) {
+			if(fAverageProfile[i]->Name==name) return fAverageProfile[i];
+		}
+	}
+
+	vector<double> mjds;
+	for(double i=minMJD; i<maxMJD; i+=0.5) {
+		mjds.push_back(i);
+	}
+
+	if( push_average_atmosphere(  name, 0, 0, 0, 0, &mjds, 20, 0 ) ) return fAverageProfile.back();
+	cout << "VAtmosphereSoundings::maneMeanAtmosphereMJD: Error: average atmosphere not pushed" << endl;
+	return 0;	
+
+}
+
 
 VAtmosphereSoundingData * VAtmosphereSoundings::make_interpolated_atmosphere( VAtmosphereSoundingData * RawData) {
 	VAtmosphereSoundingData * Data = new VAtmosphereSoundingData();
@@ -2430,11 +2463,11 @@ VAtmosphereSoundingData * VAtmosphereSoundings::make_interpolated_atmosphere( VA
 	Data->fHeight_m=fHeights;
 
 
-	Interpolate(RawData->fPressure_Pa,	RawData->fHeight_m,	Data->fPressure_Pa,		"log");
-	Interpolate(RawData->fTemperature_K,	RawData->fHeight_m,	Data->fTemperature_K,		"lin");
-	Interpolate(RawData->fDewPoint_K,	RawData->fHeight_m,	Data->fDewPoint_K,		"lin");
-	Interpolate(RawData->fRelativeHumidity,	RawData->fHeight_m,	Data->fRelativeHumidity,	"lin");
-	Interpolate(RawData->fMixingRatio_gkg,	RawData->fHeight_m,	Data->fMixingRatio_gkg,		"lin");
+	interpolate(RawData->fPressure_Pa,	RawData->fHeight_m,	Data->fPressure_Pa,		"log");
+	interpolate(RawData->fTemperature_K,	RawData->fHeight_m,	Data->fTemperature_K,		"lin");
+	interpolate(RawData->fDewPoint_K,	RawData->fHeight_m,	Data->fDewPoint_K,		"lin");
+	interpolate(RawData->fRelativeHumidity,	RawData->fHeight_m,	Data->fRelativeHumidity,	"lin");
+	interpolate(RawData->fMixingRatio_gkg,	RawData->fHeight_m,	Data->fMixingRatio_gkg,		"lin");
 	fillAtmosphericDensity( Data );
 	fillAtmosphericThickness( Data );
 	

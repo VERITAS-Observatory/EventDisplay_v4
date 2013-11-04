@@ -80,6 +80,8 @@ class VAtmosphereSoundingData
     TGraph * fGraphIndexHeight;
     TGraph * fGraphThicknessHeight;
 
+    void setColor( int color );
+
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////

@@ -103,6 +103,8 @@ void VAtmosphereSoundingData::makeGraphScaledDensity(  ) {
 	fGraphScaledDensityHeight->SetLineStyle(PlotLineStyle);
 	fGraphScaledDensityHeight->SetLineWidth(PlotLineWidth);	
 	fGraphScaledDensityHeight->SetTitle("Scaled density;height [km]; density*exp(h/7.739km) [g/cm^{3}]");
+	TString temp="density_" + Name;
+	fGraphScaledDensityHeight->SetName(temp.Data());
 }
 
 
@@ -121,7 +123,9 @@ void VAtmosphereSoundingData::makeGraphPressure(  ) {
 	fGraphPressureHeight->SetLineColor(PlotColor);
 	fGraphPressureHeight->SetLineStyle(PlotLineStyle);
 	fGraphPressureHeight->SetLineWidth(PlotLineWidth);
-	fGraphPressureHeight->SetTitle("Pressure;height [km]; pressure [Pa]");	
+	fGraphPressureHeight->SetTitle("Pressure;height [km]; pressure [Pa]");
+	TString temp="pressure_" + Name;
+	fGraphPressureHeight->SetName(temp.Data() );	
 }
 
 
@@ -141,7 +145,8 @@ void VAtmosphereSoundingData::makeGraphTemperature(  ) {
 	fGraphTemperatureHeight->SetLineStyle(PlotLineStyle);
 	fGraphTemperatureHeight->SetLineWidth(PlotLineWidth);
 	fGraphTemperatureHeight->SetTitle("Temperature;height [km]; temperature [K]");
-
+	TString temp="temperature_" + Name;
+	fGraphTemperatureHeight->SetName(temp.Data() );
 }
 
 
@@ -160,7 +165,9 @@ void VAtmosphereSoundingData::makeGraphHumidity(  ) {
 	fGraphHumidityHeight->SetLineColor(PlotColor);
 	fGraphHumidityHeight->SetLineStyle(PlotLineStyle);
 	fGraphHumidityHeight->SetLineWidth(PlotLineWidth);
-	fGraphHumidityHeight->SetTitle("Humidity;height [km]; rel. humidity [\%]");	
+	fGraphHumidityHeight->SetTitle("Humidity;height [km]; rel. humidity [\%]");
+	TString temp="relHum_" + Name;
+	fGraphHumidityHeight->SetName(temp.Data() );
 }
 
 void VAtmosphereSoundingData::makeGraphThickness(  ) {
@@ -179,6 +186,8 @@ void VAtmosphereSoundingData::makeGraphThickness(  ) {
 	fGraphThicknessHeight->SetLineStyle(PlotLineStyle);
 	fGraphThicknessHeight->SetLineWidth(PlotLineWidth);
 	fGraphThicknessHeight->SetTitle("Thickness;height [km]; thickness [g/cm^{2}]");	
+	TString temp="thickness_" + Name;
+	fGraphThicknessHeight->SetName(temp.Data() );
 }
 
 void VAtmosphereSoundingData::makeGraphIndex(  ) {
@@ -196,5 +205,18 @@ void VAtmosphereSoundingData::makeGraphIndex(  ) {
 	fGraphIndexHeight->SetLineColor(PlotColor);
 	fGraphIndexHeight->SetLineStyle(PlotLineStyle);
 	fGraphIndexHeight->SetLineWidth(PlotLineWidth);
-	fGraphIndexHeight->SetTitle("Index of Refraction;height [km]; index of refraction -1 ]");	
+	fGraphIndexHeight->SetTitle("Index of Refraction;height [km]; index of refraction -1 ]");
+	TString temp="n-1_" + Name;
+	fGraphIndexHeight->SetName(temp.Data() );
+}
+
+void VAtmosphereSoundingData::setColor( int color ) {
+	PlotColor=color;
+
+	if( fGraphIndexHeight ) { fGraphIndexHeight->SetLineColor(PlotColor); }
+	if( fGraphThicknessHeight ) { fGraphThicknessHeight->SetLineColor(PlotColor); }
+	if( fGraphHumidityHeight ) { fGraphHumidityHeight->SetLineColor(PlotColor); }
+	if( fGraphTemperatureHeight ) { fGraphTemperatureHeight->SetLineColor(PlotColor); }
+	if( fGraphPressureHeight ) { fGraphPressureHeight->SetLineColor(PlotColor); }
+	if( fGraphScaledDensityHeight ) { fGraphScaledDensityHeight->SetLineColor(PlotColor); }
 }

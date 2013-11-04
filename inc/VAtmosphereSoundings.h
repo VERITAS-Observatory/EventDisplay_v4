@@ -168,8 +168,8 @@ class VAtmosphereSoundings
                            string iPlotOption = "", bool iSames = false );
     void     plotAttributes_ColorChange( bool iB = true ) { fBoolColorChange = iB; }
     void     plotAttributes_PlotLegend( bool iB = true ) { fPlottingLegendDraw = iB; }
-    bool     read_CORSIKA_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
-    bool     read_MODTRAN_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
+    int     read_CORSIKA_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
+    int     read_MODTRAN_Atmosphere( string iFile, string iName = "", int iColor = 2, int iLineStyle = 1 );
     bool     readSoundingsFromRootFile( string iRootFile );
     void     setGeographicPosition( double iLatitude = 31.675, double iObsHeight_km = 1.27 ) { fObservatoryLatitude = iLatitude; fObservatoryHeight_km = iObsHeight_km; }
     void     setPlottingPeriod( string iPeriod = "monthly" );
@@ -179,14 +179,17 @@ class VAtmosphereSoundings
     bool     write_MODTRAN_UserProfile( unsigned int iIndexUserData, unsigned int defaultModel = 6, bool iWriteDewPoint = false );
     bool     writeRootFile( string iFile );
 
-    bool push_average_atmosphere( string name, vector<int> *years, vector<int> *months, vector<int> *days , vector<int> *hours  ,unsigned int nMinPoints, int nMinFlights );  
-    bool DateInRange(  VAtmosphereSoundingData * Data, vector<int> *years, vector<int> *months, vector<int> *days, vector<int> *hours ,unsigned int nMinPoints );
-    VAtmosphereSoundingData * DefaultWinterAtmosphere( string name="winter", string opt="") ;
-    VAtmosphereSoundingData * DefaultSummerAtmosphere( string name="summer", string opt="") ;
-    VAtmosphereSoundingData * MeanMonthlyAtmosphere( int month, string name, string opt, int yearMin, int yearMax);
-    VAtmosphereSoundingData * OneFlightAtmosphere( int year, int month, int day, int hour, string name, string opt);
+    int push_average_atmosphere( string name, vector<int> *years, vector<int> *months, vector<int> *days , vector<int> *hours  , vector<double> *mjds, unsigned int nMinPoints, int nMinFlights );  
+    bool isDateInRange(  VAtmosphereSoundingData * Data, vector<int> *years, vector<int> *months, vector<int> *days, vector<int> *hours, vector<double> *mjds ,unsigned int nMinPoints ); 
+    bool isDateInRange(  VAtmosphereSoundingData * Data, vector<double> *mjds, unsigned int nMinPoints );
+    bool isDateInRange(  VAtmosphereSoundingData * Data, double minMJD, double max_MJD , unsigned int nMinPoints );
+    VAtmosphereSoundingData * makeDefaultWinterAtmosphere( string name="winter", string opt="") ;
+    VAtmosphereSoundingData * makeDefaultSummerAtmosphere( string name="summer", string opt="") ;
+    VAtmosphereSoundingData * makeMeanMonthlyAtmosphere( int month, string name, string opt, int yearMin, int yearMax);
+    VAtmosphereSoundingData * makeOneFlightAtmosphere( int year, int month, int day, int hour, string name, string opt);
+    VAtmosphereSoundingData * makeMeanAtmosphereMJD( double minMJD, double maxMJD, string name, string opt);
 
-    double Interpolate( vector<double> raw, vector<double> raw_heights, vector<double> &result, string opt, double h);
+    double interpolate( vector<double> raw, vector<double> raw_heights, vector<double> &result, string opt, double h);
     double safe_eval( TGraph * g, double h, string opt);
 
 	VAtmosphereSoundingData * make_interpolated_atmosphere( VAtmosphereSoundingData * RawData);

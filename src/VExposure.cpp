@@ -1904,13 +1904,34 @@ void VExposure::checkRunList()
 
   ENVIR_VAR = getenv ("VERITAS_DATA_DIR");
 
-  cout << "Checking Runs: " << endl;
+  cout << "Checking data runs: " << endl;
 
   for( unsigned int i = 0 ; i < fRunDownload.size(); i++ )
   {
 
     sprintf(filename,"%s/data/d%d/%d.cvbf",ENVIR_VAR,fRunDownloadDate[i],fRunDownload[i]);
     sprintf(filepath,"%s/data/d%d/",ENVIR_VAR,fRunDownloadDate[i]);
+
+    ifstream datafile(filename);
+    if( datafile.is_open() ) 
+      cout << filename << "\tOn Disk" << endl;
+    else 
+    {
+      cout << filename << "\tNeeds Downloading" << endl;
+    }
+
+  }
+
+  cout << endl;
+
+
+  cout << "Checking flasher runs: " << endl;
+
+  for( unsigned int i = 0 ; i < fLaserDownload.size(); i++ )
+  {
+
+    sprintf(filename,"%s/data/d%d/%d.cvbf",ENVIR_VAR,fLaserDownloadDate[i],fLaserDownload[i]);
+    sprintf(filepath,"%s/data/d%d/",ENVIR_VAR,fLaserDownloadDate[i]);
 
     ifstream datafile(filename);
     if( datafile.is_open() ) 
@@ -1940,7 +1961,7 @@ void VExposure::downloadRunList()
 
   ENVIR_VAR = getenv ("VERITAS_DATA_DIR");
 
-  cout << "Download Runs: " << endl;
+  cout << "Download " << fRunDownload.size() << " data runs: " << endl;
 
   for( unsigned int i = 0 ; i < fRunDownload.size(); i++ )
   {
@@ -1985,7 +2006,7 @@ void VExposure::downloadRunList()
   if( fSelectLaser == 1 )
   {
 
-    cout << "Laser Files: " << endl;
+  cout << "Download " << fLaserDownload.size() << " flasher runs: " << endl;
 
     for( unsigned int i = 0 ; i < fLaserDownload.size(); i++ )
     {

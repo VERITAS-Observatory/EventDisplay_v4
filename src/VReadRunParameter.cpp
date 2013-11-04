@@ -836,7 +836,12 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         else if( iTemp.find( "pwlimit" ) < iTemp.size() )
         {
             fRunPara->fPWlimit = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
+        } 
+        else if( iTemp.rfind( "printdetectorconfig" ) < iTemp.size() )
+        {
+			fRunPara->fPrintDetectorConfig = true ;
         }
+
         else if( i > 1 )
         {
             cout << "unknown command line parameter: " << iTemp << endl;

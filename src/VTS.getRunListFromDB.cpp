@@ -104,9 +104,8 @@ int main( int argc, char *argv[] )
 
     } else if( laserlist != "" )
     {
-
       a.readLaserRunListFromFile(laserlist);
-      a.setSelectLaser( laserruns );
+      a.setSelectLaser( true );
       if( getRuns == 1 ) a.downloadRunList();
       if( bCHECKDISK ) a.checkRunList();
 

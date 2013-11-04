@@ -80,7 +80,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool  fDebug;                             // print debug output
 	bool  fPrintSmallArray;                   // some printout for small arrays only
         unsigned int fPrintAnalysisProgress;      // print a line each time this number of events have been processed
-
+	bool fPrintDetectorConfig;		  // Print full detector config file used in grisu simulations (sims only, from VBF header).
+	
 // array/telescope geometry parameters
         unsigned int fNTelescopes;                // number of telescopes
         vector<string> fcamera;                   // name of camera configuration files
@@ -272,6 +273,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,132); //(increase this number)
+        ClassDef(VEvndispRunParameter,133); //(increase this number)
 };
 #endif

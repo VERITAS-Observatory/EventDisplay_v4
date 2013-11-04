@@ -9,7 +9,7 @@
 
 #include <VBFDataReader.h>
 
-VBFDataReader::VBFDataReader( string sourcefile, int isourcetype, unsigned int iNTel, bool iDebug ):
+VBFDataReader::VBFDataReader( string sourcefile, int isourcetype, unsigned int iNTel, bool iDebug, bool iPrintDetectorConfig ):
 VBaseRawDataReader(sourcefile,isourcetype,iNTel,iDebug),
 pack(NULL),
 reader(sourcefile, false, true),
@@ -20,6 +20,7 @@ index(0)
     fArrayTrigger = false;
     fNIncompleteEvent.assign( iNTel, 0 );
     setDebug( iDebug );
+    fPrintDetectorConfig=iPrintDetectorConfig;
 }
 
 
@@ -69,7 +70,7 @@ bool VBFDataReader::getNextEvent()
 // check if this is a simulation header
             if( pack->hasSimulationHeader() )
 	    {
-	       printSimulationHeader( pack, false );
+	       printSimulationHeader( pack, fPrintDetectorConfig );
 	       fMonteCarloHeader = fillSimulationHeader( pack );
             }
 
