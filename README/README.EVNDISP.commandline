@@ -158,7 +158,8 @@ Simulations:
 	 -pedestalfile FILENAME 		 use pedestals from P lines in this pedestal file (default: Off)
 	 -pedestalnoiselevel=int 		 GrIsu noise level used for external pedestal file (default=250)
 	 -pedestalDefaultPedestal=float 	 GrIsu default pedestals used in simulations (default=15.)
-	 -printDetectorConfig			 Reproduce full detector config file used in grisu simulations (from VBF header).
+	 -printGrisuHeader=0/1/2		 0 (default)=nothing, 	1=Reproduce full grisu simulation header including detector config file (from VBF header).
+	 								2=Print config file name that was used for detector simulation, if available.
 
 Others:
 -------

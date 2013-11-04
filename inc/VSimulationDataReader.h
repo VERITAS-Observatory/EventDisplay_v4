@@ -78,7 +78,7 @@ class VSimulationDataReader
         double                     getSMC_TelPointing_Elevation() { return fTel_Elevation; }
         double                     getSMC_TelPointing_Azimuth() { return fTel_Azimuth; }
 	VMonteCarloRunHeader*      fillSimulationHeader( VPacket* packet );
-        bool                       printSimulationHeader( VPacket* packet, bool bPrintCFG = false );
+        bool                       printSimulationHeader( VPacket* packet, int bPrintCFG = 0 );
         bool                       setSimulationData( VRawEventData* iraweventData );
         bool                       setSimulationData( VPacket* packet );
 

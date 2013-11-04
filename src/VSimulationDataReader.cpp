@@ -44,7 +44,7 @@ bool VSimulationDataReader::setSimulationData( VRawEventData* iraweventData )
 /*!
     print simulation header
 */
-bool VSimulationDataReader::printSimulationHeader( VPacket* packet, bool bPrintCFG )
+bool VSimulationDataReader::printSimulationHeader( VPacket* packet, int bPrintCFG )
 {
     if( !packet ) return false;
 
@@ -64,7 +64,20 @@ bool VSimulationDataReader::printSimulationHeader( VPacket* packet, bool bPrintC
             cout << "\t\t telescope " << i+1 << ": " << h->fArray[i].fRelTelLocSouthM << "\t" << h->fArray[i].fRelTelLocEastM << "\t" << h->fArray[i].fRelTelLocUpM << endl;
         }
 // this might print the complete .cfg file
-        if( h->fSimConfigFile.size() && bPrintCFG ) cout << h->fSimConfigFile << endl;
+        if( h->fSimConfigFile.size() && bPrintCFG==1 ) cout << h->fSimConfigFile << endl;
+// find config file name. The line should look like this: "  (cfg file /path/to/file)\n"
+	if( h->fSimConfigFile.size() && bPrintCFG==2 ) {
+		size_t index_start= h->fSimConfigFile.find( "(cfg file");
+		if( index_start != string::npos ) {
+			size_t index_end=h->fSimConfigFile.find( "\n", index_start);
+			if( index_end != string::npos ) {
+				string filename=h->fSimConfigFile.substr( index_start+10, index_end-1-index_start-10);
+				if ( filename.size() ) {
+					cout << "Grisu configuration file: " << filename << endl;
+				}
+			}
+		}
+	}
         cout << "================================================================================" << endl;
     }
 

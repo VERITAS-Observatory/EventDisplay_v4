@@ -837,9 +837,9 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         {
             fRunPara->fPWlimit = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         } 
-        else if( iTemp.rfind( "printdetectorconfig" ) < iTemp.size() )
+        else if( iTemp.rfind( "printgrisuheader" ) < iTemp.size() )
         {
-			fRunPara->fPrintDetectorConfig = true ;
+			fRunPara->fPrintGrisuHeader = atoi( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
         }
 
         else if( i > 1 )

@@ -287,7 +287,12 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
     while( getline( inFileStream, iline ) )
     {
 // '*' in line
-        if( iline.substr( 0, 1 ) != "*" ) continue;
+// to be more stable, allow whitespaces (' ' and '\t' ) before '*'
+	std::size_t index=iline.find_first_not_of(" \t");
+	if( index==string::npos ) continue;	//line has only whitespace
+	if( iline[index]!='*' ) continue;	//first non-whitespace char is not '*' 
+
+//        if( iline.substr( 0, 1 ) != "*" && ) continue;
         istringstream i_stream( iline );
 // GrIsu version (4.0.0 = 400, 4.1.1 = 411)
         if( iline.find( "VERSN" ) < iline.size() )
@@ -456,9 +461,12 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
                 i_stream >> fXTubeMM[i_telID][i_chan];
                 i_stream >> fYTubeMM[i_telID][i_chan];
                 i_stream >> fRTubeMM[i_telID][i_chan];
-                i_stream >> i_char; i_stream >> i_char;
-                i_stream >> i_char; i_stream >> i_char;
-                i_stream >> i_char; i_stream >> i_char;
+                i_stream >> i_char; i_stream >> i_char;		//geom. efficiency; q.e. table number
+                i_stream >> i_char; i_stream >> i_char;		//single pe signal rel. amplitude fluctuation; signal rise time
+                i_stream >> i_char; i_stream >> i_char;		//signal fall time; RC coupling
+		if( fGrIsuVersion >= 600 ) {					// new records: 
+		   i_stream >> i_char >> i_char >> i_char >> i_char >> i_char;	//signal rise time low gain; signal fall time low gain; RC coupling low gain; pulse lookup table number high gain; pulse lookup table number low gain
+		}
                 i_stream >> fTrigTube[i_telID][i_chan];
                 i_stream >> fAnaTube[i_telID][i_chan];
                 i_stream >> fTOff[i_telID][i_chan];

@@ -9,7 +9,7 @@
 
 #include <VBFDataReader.h>
 
-VBFDataReader::VBFDataReader( string sourcefile, int isourcetype, unsigned int iNTel, bool iDebug, bool iPrintDetectorConfig ):
+VBFDataReader::VBFDataReader( string sourcefile, int isourcetype, unsigned int iNTel, bool iDebug, unsigned int iPrintDetectorConfig ):
 VBaseRawDataReader(sourcefile,isourcetype,iNTel,iDebug),
 pack(NULL),
 reader(sourcefile, false, true),

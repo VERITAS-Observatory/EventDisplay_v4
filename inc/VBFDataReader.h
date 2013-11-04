@@ -25,7 +25,8 @@ class VBFDataReader : public VBaseRawDataReader
         VArrayEvent   *ae;
         VArrayTrigger *at;
 
-        bool fArrayTrigger, fPrintDetectorConfig;
+        bool fArrayTrigger;
+	unsigned int fPrintDetectorConfig;
 
         vector< bool > ib_temp;
 
@@ -33,7 +34,7 @@ class VBFDataReader : public VBaseRawDataReader
         VBFDataReader( string,
             int isourcetype,
             unsigned int iNTel,
-            bool iDebug, bool iPrintDetectorConfig=false );
+            bool iDebug, unsigned int iPrintDetectorConfig=0 );
 
         virtual ~VBFDataReader();
 

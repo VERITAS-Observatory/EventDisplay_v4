@@ -219,7 +219,7 @@ bool VEventLoop::initEventLoop( string iFileName )
             }
             else
             {
-                fRawDataReader = new VBFDataReader( fRunPar->fsourcefile, fRunPar->fsourcetype, fRunPar->fNTelescopes, fDebug, fRunPar->fPrintDetectorConfig );
+                fRawDataReader = new VBFDataReader( fRunPar->fsourcefile, fRunPar->fsourcetype, fRunPar->fNTelescopes, fDebug, fRunPar->fPrintGrisuHeader );
 /////////////////////////////////////////////////////////////////////
 // open temporary file (do make sure that event numbering is correct)
 // get number of samples
