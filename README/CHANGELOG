@@ -1,6 +1,12 @@
 Change log eventdisplay analysis package
 ========================================
 
+*************************************************************
+******* 20131108 release of v4.30rc; trunk is now v4.30 *******
+*************************************************************
+
+* 20131108 (GM) 
+
 * 20131101 (JG, GM) integrated 3D Model
                 (note: severe svn hickups; integration by hand)
 
