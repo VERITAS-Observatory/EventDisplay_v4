@@ -551,11 +551,11 @@ void VEventLoop::shutdown()
 
 // if we have the proper settings,
 // print the dead pixel information
-if ( fRunPar->frunmode == R_ANA && fRunPar->fprintdeadpixelinfo ) // DEADCHAN
-{
-cout << endl;
-printDeadChannelList();
-}
+   if ( fRunPar->frunmode == R_ANA && fRunPar->fprintdeadpixelinfo ) // DEADCHAN
+   {
+      cout << endl;
+      printDeadChannelList();
+   }
 
 // (GM): write a root file even if no event was analyzed
 //    if( fEventNumber >= 0 )
@@ -566,8 +566,8 @@ printDeadChannelList();
             fOutputfile->cd();
         }
         else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW 
-      && fRunMode != R_GTO && fRunMode != R_GTOLOW 
-      && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
+              && fRunMode != R_GTO && fRunMode != R_GTOLOW 
+              && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )
         {
             cout << "VEventLoop::shutdown: Error accessing output file" << endl;
         }
@@ -644,10 +644,15 @@ printDeadChannelList();
     if( fRunMode == R_ANA )
     {
        if( fDebug ) cout << "VEventLoop::shutdown: final check of output file" << endl;
-       TFile f( fRunPar->foutputfileName.c_str(), "READ" );
+       TFile f( fRunPar->foutputfileName.c_str(), "UPDATE" );
+       f.Recover();
+       if( f.TestBit(TFile::kRecovered) ) 
+       {
+          cout << "Warning: output file has been recovered" << endl;
+       }
        if( f.IsZombie() )
        {
-   cout << "Error: problem with eventdisplay output file: " << fRunPar->foutputfileName << endl;
+         cout << "Error: problem with eventdisplay output file: " << fRunPar->foutputfileName << endl;
        }
        else
        {
@@ -1349,9 +1354,9 @@ void VEventLoop::terminate( int iAna )
        cout << "Number of events with GPS faults (status bit set): " << endl;
        for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
        {
-  cout << "\t Telescope " << getTeltoAna()[i]+1 << ": ";
-  if( i < fGPSClockWarnings.size() ) cout << fGPSClockWarnings[i];
-  cout << endl;
+           cout << "\t Telescope " << getTeltoAna()[i]+1 << ": ";
+           if( i < fGPSClockWarnings.size() ) cout << fGPSClockWarnings[i];
+           cout << endl;
        }
     }
 
