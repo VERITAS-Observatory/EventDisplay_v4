@@ -165,7 +165,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
             else if( temp == "FILLINGMODE" )
             {
                 if( !is_stream.eof() ) is_stream >> fFillingMode;
-                if( fFillingMode < 0 || fFillingMode > 3 )
+                if( fFillingMode > 3 )
                 {
                    cout << "readInputFileList: error: invalid filling mode " << fFillingMode << endl;
                    return false;

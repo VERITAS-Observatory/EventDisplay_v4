@@ -255,7 +255,7 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram(  TH1D* iH_in, bool iNormali
     {
        iH_out->SetBinContent( iH_in->GetNbinsX(), iH_in->GetBinContent( iH_in->GetNbinsX() ) );
 // loop over all bins
-       for( int i = iH_in->GetNbinsX(); i > i; i-- )
+       for( int i = iH_in->GetNbinsX(); i > 2; i-- )
        {
           iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i + 1 ) );
        }
