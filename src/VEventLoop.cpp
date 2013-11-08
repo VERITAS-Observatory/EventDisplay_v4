@@ -1060,7 +1060,7 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
 // GH Frogs Analysis
 #ifndef NOGSL
           if( fRunPar->ffrogsmode )
-  {
+          {
              fFrogs->doFrogsStuff(fEventNumber);
           }
 #endif 
@@ -1073,7 +1073,7 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
    {
       if( fReader->getArrayTrigger() && fReader->getArrayTrigger()->hasTenMHzClockArray() )
       {
- fDeadTime->fillDeadTime(  getEventTime(), fReader->getArrayTrigger()->getTenMHzClockArray() );
+         fDeadTime->fillDeadTime(  getEventTime(), fReader->getArrayTrigger()->getTenMHzClockArray() );
       }
       else
       {

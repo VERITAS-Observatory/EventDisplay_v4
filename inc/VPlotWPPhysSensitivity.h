@@ -67,6 +67,10 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    bool fPlotCTARequirementGoals;
    VCTARequirements *fPlotCTARequirements;
 
+// FOM variables
+   double fSensitivityFOM;
+   double fSensitivityFOM_error;
+
 // projected sensitvity plots
    vector< double > fProjectionEnergy_min_logTeV;
    vector< double > fProjectionEnergy_max_logTeV;
@@ -86,11 +90,14 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
                     string iLegend = "", int iColor = 1, int iLineStyle = 1, int iFillStyle = 3001 );
    bool addDataSets( string iDataSettxtFile );
    vector< string > getListOfArrays();
+   double getSensitivityFOM() { return fSensitivityFOM; }
+   double getSensitivityFOM_error() { return fSensitivityFOM_error; }
    bool initialize( VPlotWPPhysSensitivityData* );
    bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    TCanvas* plotProjectedSensitivities( TCanvas*, double iMaxOffset, int iColor = -1 );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
    bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2., unsigned int iRelativeDataSetID = 0 );
+   void printSensitivityFigureOfMerit( TGraphAsymmErrors *gSensitivity, double iEmin_TeV = 0.03, double iEmax_TeV = 100., string iAnalysis = "" );
    void printSensitivityFigureOfMerit( double iEmin_TeV = 0.03, double iEmax_TeV = 100. );
    void reset();
    void setCrabSpectraFile( string iFile = "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat",
@@ -100,6 +107,8 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
                                 { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
 
    bool setPlotCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false );
+   bool setCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false ) 
+                            { return setPlotCTARequirements( iRequirementID, iPlotRequirementGoals ); }
 };
 
 #endif
