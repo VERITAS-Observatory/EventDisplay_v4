@@ -167,30 +167,40 @@ void VRunSummary::print()
         }
         else
         {
-            cout << "RUN " << runOn;
+            //cout << "RUN " << runOn;
+			printf( "RUN %5d", runOn ) ;
+			
             if( runOff != runOn ) cout << " (" << runOff << ")       ";
         }
-        sprintf( itemp, " (%+.1fN,%+.1fW) ", fWobbleNorth, fWobbleWest );
+        sprintf( itemp, " (%+4.1fN,%+4.1fW) ", fWobbleNorth, fWobbleWest );
         if( fWobbleNorth != 0. || fWobbleWest != 0. ) cout << itemp;
-        if( elevationOn > 2. ) cout << " at " << (int)elevationOn << "," << (int)azimuthOn << " deg El.,Az, ";
-        else                   cout << " at " << (int)elevationOff << "," << (int)azimuthOff << " deg El.,Az, ";
-        sprintf( itemp, "%.2f", tOn/60. );
+        if( elevationOn > 2. ) 
+		{
+			//cout << " at " << (int)elevationOn << "," << (int)azimuthOn << " deg El.,Az, ";
+			printf( " at %2d,%4d deg El., Az, ", (int)elevationOn, (int)azimuthOn ) ;
+		}
+        else
+		{
+			//cout << " at " << (int)elevationOff << "," << (int)azimuthOff << " deg El.,Az, ";
+			printf( " at %2d,%4d deg El., Az, ", (int)elevationOff, (int)azimuthOff ) ;
+		}
+        sprintf( itemp, "%5.2f", tOn/60. );
         cout << itemp << " min, ";
-        sprintf( itemp, "%3d",(int)NOn );
+        sprintf( itemp, "%4d",(int)NOn );
         cout << "Non: " << itemp;
         sprintf( itemp, "%5.2f", NOffNorm );
         cout << ", Noff: " <<  itemp;
         sprintf( itemp, "%4d", (int)NOff );
         cout << " (" << itemp << ", norm ";
-        sprintf( itemp, "%.3f", OffNorm );
+        sprintf( itemp, "%5.3f", OffNorm );
         cout << itemp << ")";
         sprintf( itemp, "%5.1f", Signi );
         cout << ", " <<  itemp << " sigma";
-        sprintf( itemp, "%4.3f", Rate );
+        sprintf( itemp, "%7.3f", Rate );
         cout << ", Rates: " << itemp;
-        sprintf( itemp, "%.3f", RateE );
+        sprintf( itemp, "%7.3f", RateE );
         cout << " +/- " << itemp << " gamma/min";
-        sprintf( itemp, "%.3f", RateOff );
+        sprintf( itemp, "%7.3f", RateOff );
         cout << " (background: " << itemp << " events/min)" << endl;
     }
 
