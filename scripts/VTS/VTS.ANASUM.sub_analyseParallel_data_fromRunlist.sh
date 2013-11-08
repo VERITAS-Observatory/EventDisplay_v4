@@ -47,24 +47,23 @@ fi
 # cut definitions
 if [[ "$CUTS" == *super* ]]
 then
-   CUTFILE="ANASUM.GammaHadron.d20131028-cut-N2-Point-005CU-SuperSoft.dat"
-   EFFAREA="effArea-d20130411-cut-N2-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20130930.root"
+   CUTFILE="ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-SuperSoft.dat"
+   EFFAREA="effArea-d20131031-cut-N2-Point-005CU-SuperSoft-$ATMO-EPOCHSETTING-T1234-d20131031.root"
    RADACC="radialAcceptance-d20131031-d20131028-cut-N2-Point-005CU-SuperSoft-V6-T1234.root"
 elif [[ "$CUTS" == *open* ]]
 then
-   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Open.dat"
-   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Open-$ATMO-EPOCHSETTING-T1234-d20130930.root"
+   CUTFILE="ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open.dat"
+   EFFAREA="effArea-d20131031-cut-N2-Point-005CU-Open-$ATMO-EPOCHSETTING-T1234-d20131031.root"
    RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 elif [[ "$CUTS" == *soft* ]]
 then
-   CUTFILE="ANASUM.GammaHadron.d20131028-cut-N3-Point-005CU-Soft.dat"
-   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20130930.root"
+   CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft.dat"
+   EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20131031.root"
    RADACC="radialAcceptance-d20131031-d20131028-cut-N3-Point-005CU-Soft-V6-T1234.root"
 elif [[ $CUTS = *moderate* ]]
 then
-   CUTFILE="ANASUM.GammaHadron.d20130411-cut-N3-Point-005CU-Moderate.dat"
-   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20130930.root"
-#   EFFAREA="effArea-d20130411-cut-N3-Point-005CU-Moderate-ATM21-HI15-V6-T1234-d20130930.root"
+   CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate.dat"
+   EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20131031.root"
    RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 # UV Filter
 #   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-V6-$ATMO-UV-d20121218.root"
