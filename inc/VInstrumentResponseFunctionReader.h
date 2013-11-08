@@ -98,6 +98,8 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 // cut efficiencies 
     vector< TH1D* > hCutEfficiency;
     vector< TH1D* > hCutEfficiencyRelativePlots;
+// weight histograms
+    TH1D* hWeightedRate;
 
 // resolution graphs
     vector< string >                           fIRF_TreeNames;
@@ -127,7 +129,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 7 );
+    ClassDef( VInstrumentResponseFunctionReader, 8 );
 };
 
 

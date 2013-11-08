@@ -90,6 +90,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     void         plotEnergySpectra( bool iWeighted = true, double iYMax = -1., int iRebin = 1 );
     void         plotTheta2( double iTheta2AxisMax = 0.05, bool iCumulative = false );
     void         plotTheta2( vector< double > i_Energy_TeV_lin, double iTheta2AxisMax = 0.05, bool iCumulative = false );
+    TCanvas*     plotWeightedRate();
     bool         removeInstrumentResponseData( int iDataSetID );
     void         resetInstrumentResponseData();
     void         setCanvasSize( int iX = 600, int iY = 600 ) { fCanvasSize_X = iX; fCanvasSize_Y = iY; }

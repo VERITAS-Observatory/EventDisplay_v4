@@ -72,6 +72,7 @@ class CEffArea : public TObject
 	TH1D            *hhEcutDirection;
 	TH1D            *hhEcutGammaHadron;
 	TH1D            *hhEcutEnergyReconstruction;
+        TH1D            *hWeightedRate;
 
 // List of branches
         TBranch        *b_ze;                     //!
@@ -123,6 +124,7 @@ class CEffArea : public TObject
 	TBranch        *b_hhEcutDirection;   //!
 	TBranch        *b_hhEcutGammaHadron;   //!
 	TBranch        *b_hhEcutEnergyReconstruction;   //!
+        TBranch        *b_hWeightedRate; //!
 
         CEffArea(TTree *tree=0);
         virtual ~CEffArea();
@@ -223,13 +225,14 @@ void CEffArea::Init(TTree *tree)
     hResponseMatrixProfile = 0;
     hResponseMatrixQC = 0;
     hResponseMatrixFineQC = 0;
-   hhEcutTrigger = 0;
-   hhEcutFiducialArea = 0;
-   hhEcutStereoQuality = 0;
-   hhEcutTelType = 0;
-   hhEcutDirection = 0;
-   hhEcutGammaHadron = 0;
-   hhEcutEnergyReconstruction = 0;
+    hhEcutTrigger = 0;
+    hhEcutFiducialArea = 0;
+    hhEcutStereoQuality = 0;
+    hhEcutTelType = 0;
+    hhEcutDirection = 0;
+    hhEcutGammaHadron = 0;
+    hhEcutEnergyReconstruction = 0;
+    hWeightedRate = 0;
 // Set branch addresses and branch pointers
     if (!tree) return;
     fChain = tree;
@@ -356,6 +359,14 @@ void CEffArea::Init(TTree *tree)
        hhEcutDirection = 0;
        hhEcutGammaHadron = 0;
        hhEcutEnergyReconstruction = 0;
+    }
+    if( fChain->GetBranchStatus( "hWeightedRate" ) )
+    {
+       fChain->SetBranchAddress("hWeightedRate", &hWeightedRate, &b_hWeightedRate );
+    }
+    else
+    {
+       hWeightedRate = 0;
     }
 
     Notify();

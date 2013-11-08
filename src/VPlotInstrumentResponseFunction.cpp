@@ -172,6 +172,47 @@ TCanvas* VPlotInstrumentResponseFunction::plotEffectiveArea( double iEffAreaMax_
     return iEffectiveAreaPlottingCanvas;
 }
 
+TCanvas *VPlotInstrumentResponseFunction::plotWeightedRate()
+{
+    if( fData.size() == 0 ) return 0;
+
+    char hname[200];
+
+    sprintf( hname, "cEA_WR" );
+    TCanvas *iWeightedRatePlottingCanvas = new TCanvas( hname, "rate", 10, 10, fCanvasSize_X, fCanvasSize_Y );
+    iWeightedRatePlottingCanvas->SetGridx( 0 );
+    iWeightedRatePlottingCanvas->SetGridy( 0 );
+    iWeightedRatePlottingCanvas->SetLeftMargin( 0.15 );
+    iWeightedRatePlottingCanvas->SetRightMargin( 0.07 );
+
+    TH1D *hWeightedRate = new TH1D( "hWeightedRate","", 100, log10( getPlottingAxis( "energy_Lin" )->fMinValue ), 
+                                                             log10( getPlottingAxis( "energy_Lin" )->fMaxValue ) );
+    hWeightedRate->SetStats( 0 );
+    hWeightedRate->SetXTitle( "log_{10} energy [TeV]" );
+    hWeightedRate->SetYTitle( "rate [1/min]" );
+    if( fData.size() > 0 && fData[0]->hWeightedRate )
+    {
+       hWeightedRate->SetMaximum( fData[0]->hWeightedRate->GetMaximum()*1.5 );
+    }
+    hWeightedRate->Draw("");
+    hWeightedRate->Draw("AH");
+
+    plot_nullHistogram( iWeightedRatePlottingCanvas, hWeightedRate, getPlottingAxis( "energy_Lin" )->fLogAxis,
+			getPlottingAxis( "effarea_Lin" )->fLogAxis, 1.3,
+			getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" )->fMaxValue );
+
+    for( unsigned int i = 0; i < fData.size(); i++ )
+    {
+       if( fData[i] && fData[i]->hWeightedRate )
+       {
+          fData[i]->hWeightedRate->Draw( "same" );
+       }
+    }
+
+// return plotting canvas
+    return iWeightedRatePlottingCanvas;
+}
+
 bool VPlotInstrumentResponseFunction::checkDataSetID( unsigned int iDataSetID )
 {
     if( iDataSetID >= fData.size() )
@@ -206,7 +247,8 @@ void VPlotInstrumentResponseFunction::plotCutEfficiency( unsigned int iDataSetID
     hceff->Draw("");
     hceff->Draw("AH");
 
-    plot_nullHistogram( iCutEfficencyPlottingCanvas, hceff, getPlottingAxis( "energy_Lin" )->fLogAxis, true, hceff->GetYaxis()->GetTitleOffset(), getPlottingAxis( "energy_Lin" ) ->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
+    plot_nullHistogram( iCutEfficencyPlottingCanvas, hceff, getPlottingAxis( "energy_Lin" )->fLogAxis, true, 
+                        hceff->GetYaxis()->GetTitleOffset(), getPlottingAxis( "energy_Lin" )->fMinValue, getPlottingAxis( "energy_Lin" ) ->fMaxValue );
 
     int z = 0;
     for( unsigned int i = 0; i < fData[iDataSetID]->hCutEfficiency.size(); i++ )

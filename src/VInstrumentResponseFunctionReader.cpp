@@ -48,6 +48,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
     gEnergyLogBias_Median = 0;
     gAngularResolution = 0;
     gAngularResolution80 = 0;
+    hWeightedRate = 0;
 
     initializeIRFData();
 }
@@ -426,6 +427,8 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
        setGraphPlottingStyle( gEnergyLogBias_Mean, 1, 1., 7 );
        gEnergyLogBias_Median = get_Profile_from_TH2D( (TH2D*)c->hEsys2D, 0, "median", 1, -10. );
        setGraphPlottingStyle( gEnergyLogBias_Median ); 
+// get rate histograms
+       hWeightedRate = (TH1D*)c->hWeightedRate;
 // get cut efficiencies
        if( c->hhEcutTrigger )              hCutEfficiency.push_back( (TH1D*)c->hhEcutTrigger->Clone() );
        else                                hCutEfficiency.push_back( 0 );

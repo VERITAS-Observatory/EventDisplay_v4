@@ -205,8 +205,10 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hResponseMatrixFineQC->SetXTitle( "energy_{rec} [TeV]" );
     hisTreeList->Add( hResponseMatrixFineQC );
 
+// weighted rate
+//  (use CTA binning, 5 bins per decade)
     sprintf( hname, "hWeightedRate" );
-    hWeightedRate = new TH1D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+    hWeightedRate = new TH1D( hname, htitle, 30, -2.9, 3.1 );
     hWeightedRate->Sumw2();
     hWeightedRate->SetXTitle( "energy_{rec} [TeV]" );
     hWeightedRate->SetYTitle( "entries" );
@@ -1167,9 +1169,6 @@ VEffectiveAreaCalculator::~VEffectiveAreaCalculator()
 
 void VEffectiveAreaCalculator::reset()
 {
-    degrad = 45./ atan( 1. );
-    raddeg = 1./degrad;
-
     fNBins = 0;
     gMeanEffectiveArea = 0;
     gTimeBinnedMeanEffectiveArea = 0;
@@ -1353,7 +1352,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
     }
     else if( fScatterMode[ize] == "FLAT" )
     {
-        totarea = fAreaRadius[ize]*fAreaRadius[ize]*TMath::Pi()*cos( fZe[ize]*raddeg );
+        totarea = fAreaRadius[ize]*fAreaRadius[ize]*TMath::Pi()*cos( fZe[ize]*TMath::DegToRad() );
     }
     else
     {
@@ -1376,7 +1375,10 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
     cout << " (scatter radius " << fAreaRadius[ize] << " [m])" << endl;
     cout << "\t energy reconstruction method: " << iMethod << endl;
     if( fIsotropicArrivalDirections ) cout << "\t assuming isotropic arrival directions" << endl;
-    if( fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. ) cout << "\t ignore first " << fRunPara->fIgnoreFractionOfEvents*100. << " % of events" << endl;
+    if( fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
+    {
+       cout << "\t ignore first " << fRunPara->fIgnoreFractionOfEvents*100. << " % of events" << endl;
+    }
 
     cout << endl;
     if( fSpectralWeight ) fSpectralWeight->print();
@@ -1620,7 +1622,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                if( hVResponseMatrix[s][i_az] )   hVResponseMatrix[s][i_az]->Fill( eRec, eMC );
 	       if( hVResponseMatrixProfile[s][i_az] ) hVResponseMatrixProfile[s][i_az]->Fill( eRec, eMC );
 // events weighted by CR spectra
-               if( hVWeightedRate[s][i_az] )     hVWeightedRate[s][i_az]->Fill( eRec, getCRWeight( eMC ) );
+               if( hVWeightedRate[s][i_az] )     hVWeightedRate[s][i_az]->Fill( eRec, getCRWeight( d->MCe0 ) );
              }
            }
 // don't do anything between here and the end of the loop! Never!
@@ -1707,6 +1709,35 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
                 gEffAreaRec->SetPoint( i, x, Rec_eff[i] );
                 gEffAreaRec->SetPointEYlow( i, Rec_seff_L[i] );
                 gEffAreaRec->SetPointEYhigh( i, Rec_seff_U[i] );
+            }
+
+// scale rate histogram to get correct normalization
+// XXXX
+            if( hVWeightedRate[s][i_az] && hVEmc[s][i_az] )
+            {
+                double iA_MC = hVEmc[s][i_az]->GetEntries();
+                iA_MC = d_nentries - i_start;
+                if( totarea > 0. )
+                {
+                    iA_MC /= (totarea * 1.e4);   // CR flux 1/cm^2
+                }
+                double iw_MC_gamma = -1.*TMath::Abs( fRunPara->fMCEnergy_index )+1;
+                if( fRunPara->fMCEnergy_min != fRunPara->fMCEnergy_max )
+                {
+                   iA_MC *= iw_MC_gamma / ( TMath::Power( fRunPara->fMCEnergy_max, iw_MC_gamma ) 
+                                          - TMath::Power( fRunPara->fMCEnergy_min, iw_MC_gamma ) );
+                }
+                else iA_MC       = 0.;
+/*   cout << "Rate histos: entries " << hVEmc[s][i_az]->GetEntries() << ", " << d_nentries - i_start;
+   cout << ", iw_MC " << iw_MC_gamma << ", " << fRunPara->fMCEnergy_min << ", " << fRunPara->fMCEnergy_max << ",, " << iA_MC;
+   cout << ", w " << 1./iA_MC << endl;
+   cout << "\t" << fRunPara->fMCEnergy_min << "\t" << fRunPara->fMCEnergy_max << endl;
+   cout << "\t solid angle " << (1.-cos(fRunPara->fViewcone_max * TMath::DegToRad())) << endl;
+   cout << "\t s norm " << getMCSolidAngleNormalization() << endl; */
+                if( iA_MC > 0. )
+                {
+                   hVWeightedRate[s][i_az]->Scale( 1./iA_MC * (1.-cos(fRunPara->fViewcone_max * TMath::DegToRad()))  );
+                }
             }
 
 // copy all histograms
@@ -2680,8 +2711,26 @@ bool VEffectiveAreaCalculator::setMonteCarloEnergyRange( double iMin, double iMa
    cout << "VEffectiveAreaCalculator::setMonteCarloEnergyRange error: not spectral weighter defined" << endl;
    return false;
 }
-
-double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_log10 )
+/*
+ * weight to correct MC spectrum to CR spectrum
+ *
+ * note that this requires the MC spectrum to be a power law
+ *
+ * MC normalization is done later, in late stages of VEffectiveAreaCalculator::fill()
+ *
+ */
+double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin )
 {
-   return 1.;
+// CR spectrum ((XX Crab spectrum hardcoded)
+//    units: events / s / cm^2 (solid angle cancels) / dE
+//   double iw_Crab = 2.83e-11 * TMath::Power( iEMC_TeV_lin, -2.62 );
+   double iw_Crab  = 0.098e-4 * TMath::Power( iEMC_TeV_lin, -2.62 );
+
+// MC spectrum
+//    units: events / dE
+   double iw_MC = TMath::Power( iEMC_TeV_lin, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) );
+
+   if( iw_MC != 0. ) return iw_Crab / iw_MC;
+   
+   return 0.;
 }

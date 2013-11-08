@@ -40,8 +40,7 @@ using namespace std;
 class VEffectiveAreaCalculator
 {
     private:
-        double degrad;
-        double raddeg;
+
 	vector< vector< double > > fEffArea_time;
 	vector< double > timebins;
 
@@ -59,15 +58,15 @@ class VEffectiveAreaCalculator
         vector< double > fEff_E0;
         map< unsigned int, vector< double > > fEffArea_map;
 
-        vector< double > fEff_EsysMCRelative_EnergyAxis;
+        vector< double >                      fEff_EsysMCRelative_EnergyAxis;
         map< unsigned int, vector< double > > fEff_EsysMCRelative;
         map< unsigned int, vector< double > > fEff_EsysMCRelativeE;
-        unsigned int fNMeanEffectiveArea;
-	unsigned int fNTimeBinnedMeanEffectiveArea;
+        unsigned int     fNMeanEffectiveArea;
+	unsigned int     fNTimeBinnedMeanEffectiveArea;
         vector< double > fVMeanEffectiveArea;
 	vector< double > fVTimeBinnedMeanEffectiveArea;
         TGraphAsymmErrors *gMeanEffectiveArea;
-	TGraph2DErrors *gTimeBinnedMeanEffectiveArea;
+	TGraph2DErrors    *gTimeBinnedMeanEffectiveArea;
 
         TGraphErrors *gMeanSystematicErrorGraph;
 
@@ -78,7 +77,7 @@ class VEffectiveAreaCalculator
         vector< string > fScatterMode;
         vector< double > fXWobble;                //!< wobble offset in camera coordinates (grisudet)
         vector< double > fYWobble;                //!< wobble offset in camera coordinates (grisudet)
-        vector< int > fNoise;
+        vector< int >    fNoise;
         vector< double > fPedVar;
 
         double fEnergyAxis_minimum_defaultValue;
