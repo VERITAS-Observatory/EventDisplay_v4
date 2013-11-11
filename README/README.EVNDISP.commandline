@@ -13,6 +13,7 @@ General:
 	              				 4=write dstfile
 	              				 5=gain/toffset calculation (low gain channels)
 	              				 6=pedestal calculation (low gain channels)
+	              				 7=tzero calculation
 	 -sourcefile FILENAME 			 full path + filename
 	 -sourcetype=0-7 			 source data file format
 	              				 0=rawdata
