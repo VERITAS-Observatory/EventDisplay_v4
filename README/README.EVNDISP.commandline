@@ -6,7 +6,7 @@ Command line options:
 
 General:
 --------
-	 -runmode=0-6 				 0=analysis (default)
+	 -runmode=0-7 				 0=analysis (default)
 	              				 1=pedestal calculation (high gain channels)
 	              				 2=gain/toffset calculation (high gain channels)
 	              				 3=trace library
