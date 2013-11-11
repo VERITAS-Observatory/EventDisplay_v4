@@ -808,11 +808,11 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
                 addNewMethod( m_temp );
                 fMethodID[m_temp] = atoi( iTemp2.c_str() );
 // hardwired: allowed array reconstruction numbers
-                if( fMethodID[m_temp] != 0 && fMethodID[m_temp] != 1 && fMethodID[m_temp] != 3 && fMethodID[m_temp] != 4 
+                if( fMethodID[m_temp] != 0 && fMethodID[m_temp] != 3 && fMethodID[m_temp] != 4 
 		 && fMethodID[m_temp] != 5 && fMethodID[m_temp] != 6 && fMethodID[m_temp] != 7 && fMethodID[m_temp] != 8 && fMethodID[m_temp] != 9 )
                 {
                     cout << "VEvndispReconstructionParameter: invalid array reconstruction method: " << fMethodID[m_temp] << endl;
-                    cout << "(allowed is 0,1,3,4,5,6,7,8,9)" << endl;
+                    cout << "(allowed is 0,3,4,5,6,7,8,9)" << endl;
                     cout << "...exiting" << endl;
                     exit( 0 );
                 }
