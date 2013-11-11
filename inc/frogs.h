@@ -174,6 +174,7 @@ struct frogs_imgtmplt_out {
   float goodness_bkg;//Telescope array background goodness
   int npix_bkg; //Number of pixels in background
   int nb_iter;  //Number of iterations in the optimization
+  int nb_images; // Number of Frogs images
   int gsl_convergence_status; //Status of the GSL convergence
   int event_id; //Event identification number
 

@@ -33,6 +33,7 @@ class VFrogParameters
         int   frogsEventID;
         int   frogsGSLConStat;
         int   frogsNB_iter;
+        int   frogsNImages;
         float frogsXS;
         float frogsXSerr;
         float frogsYS;

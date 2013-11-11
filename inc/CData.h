@@ -141,6 +141,7 @@ class CData
         Int_t   frogsEventID;
         Int_t   frogsGSLConStat; 
         Int_t   frogsNB_iter;
+        Int_t   frogsNImages;
         Float_t frogsXS;
         Float_t frogsXSerr;
         Float_t frogsYS;
@@ -265,6 +266,7 @@ class CData
         TBranch *b_frogsEventID;
         TBranch *b_frogsGSLConStat;
         TBranch *b_frogsNB_iter;
+        TBranch *b_frogsNImages;
         TBranch *b_frogsXS;
         TBranch *b_frogsXSerr;
         TBranch *b_frogsYS;
@@ -854,6 +856,7 @@ Bool_t CData::Notify()
 	    fChain->SetBranchAddress("frogsEventID",&frogsEventID);
 	    fChain->SetBranchAddress("frogsGSLConStat",&frogsGSLConStat);
 	    fChain->SetBranchAddress("frogsNB_iter",&frogsNB_iter);
+	    fChain->SetBranchAddress("frogsNImages",&frogsNImages);
 	    fChain->SetBranchAddress("frogsXS",&frogsXS);
 	    fChain->SetBranchAddress("frogsXSerr",&frogsXSerr);
 	    fChain->SetBranchAddress("frogsYS",&frogsYS);

@@ -27,6 +27,7 @@ void VFrogParameters::initTree( string iName, string iTitle )
     fTreeFrog->Branch("frogsEventID", &frogsEventID, "frogsEventID/I" );
     fTreeFrog->Branch("frogsGSLConStat", &frogsGSLConStat, "frogsGSLConStat/I" );
     fTreeFrog->Branch("frogsNB_iter", &frogsNB_iter, "frogsNB_iter/I" );
+    fTreeFrog->Branch("frogsNImages", &frogsNImages, "frogsNImages/I" );
     fTreeFrog->Branch("frogsXS", &frogsXS, "frogsXS/F" );
     fTreeFrog->Branch("frogsXSerr", &frogsXSerr, "frogsXSerr/F" );
     fTreeFrog->Branch("frogsYS", &frogsYS, "frogsYS/F" );
@@ -72,6 +73,7 @@ void VFrogParameters::reset()
      frogsEventID     = 0;
      frogsGSLConStat  = 0;
      frogsNB_iter     = 0;
+     frogsNImages     = 0;
      frogsXS          = 0.0;
      frogsXSerr       = 0.0;
      frogsYS          = 0.0;

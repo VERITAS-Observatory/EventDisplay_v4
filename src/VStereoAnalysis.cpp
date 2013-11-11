@@ -1611,6 +1611,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
      fTreeSelectedEvents->Branch("frogsEventID", &fTreeSelescted_frogsEventID, "frogsEventID/I" );
      fTreeSelectedEvents->Branch("frogsGSLConStat", &fTreeSelescted_frogsGSLConStat, "frogsGSLConStat/I" );
      fTreeSelectedEvents->Branch("frogsNB_iter", &fTreeSelescted_frogsNB_iter, "frogsNB_iter/I" );
+     fTreeSelectedEvents->Branch("frogsNImages", &fTreeSelescted_frogsNImages, "frogsNImages/I" );
      fTreeSelectedEvents->Branch("frogsXS", &fTreeSelescted_frogsXS, "frogsXS/D" );
      fTreeSelectedEvents->Branch("frogsXSerr", &fTreeSelescted_frogsXSerr, "frogsXSerr/D" );
      fTreeSelectedEvents->Branch("frogsYS", &fTreeSelescted_frogsYS, "frogsYS/D" );
@@ -1671,6 +1672,7 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
       fTreeSelescted_frogsEventID = 0;
       fTreeSelescted_frogsGSLConStat = 0;
       fTreeSelescted_frogsNB_iter = 0;
+      fTreeSelescted_frogsNImages = 0;
       fTreeSelescted_frogsXS = 0.;
       fTreeSelescted_frogsXSerr = 0.;
       fTreeSelescted_frogsYS = 0.;
@@ -1732,6 +1734,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
       fTreeSelescted_frogsEventID = c->frogsEventID;
       fTreeSelescted_frogsGSLConStat = c->frogsGSLConStat;
       fTreeSelescted_frogsNB_iter = c->frogsNB_iter;
+      fTreeSelescted_frogsNImages = c->frogsNImages;
       fTreeSelescted_frogsXS = c->frogsXS;
       fTreeSelescted_frogsXSerr = c->frogsXSerr;
       fTreeSelescted_frogsYS = c->frogsYS;

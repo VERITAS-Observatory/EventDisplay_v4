@@ -458,6 +458,14 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
     if( telnpix[itel] == 0 || fabs(tmplanlz->tel_goodnessBkg[itel]) < 1E-7 )  tmplanlz->tel_goodnessBkg[itel] = FROGS_BAD_NUMBER;
   }
 
+  // GH Find Number of Images (Using above reversed)
+  tmplanlz->nb_images = 0;
+  for( int itel=0; itel<d->ntel; itel++ )
+  {
+    if( telnpix[itel] != 0 && fabs(tmplanlz->tel_goodnessImg[itel]) >= 1E-7 )  
+      tmplanlz->nb_images++;
+  }
+
   //Finilize the background goodness calculation (*** See note)
   if(d->nb_live_pix_total>tmplt->ndim+1) 
     tmplanlz->goodness_bkg=tmplanlz->goodness_bkg/

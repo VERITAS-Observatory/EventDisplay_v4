@@ -75,6 +75,7 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     frogsEventID     = output.event_id;
     frogsGSLConStat  = output.gsl_convergence_status;
     frogsNB_iter     = output.nb_iter;
+    frogsNImages     = output.nb_images;
     frogsXS          = output.cvrgpt.xs;
     frogsXSerr       = output.cvrgpterr.xs;
     frogsYS          = output.cvrgpt.ys;
@@ -119,6 +120,7 @@ void VFrogs::doFrogsStuff( int eventNumber ) {
     getFrogParameters()->frogsEventID = getFrogsEventID();
     getFrogParameters()->frogsGSLConStat = getFrogsGSLConStat();
     getFrogParameters()->frogsNB_iter = getFrogsNB_iter();
+    getFrogParameters()->frogsNImages = getFrogsNImages();
     getFrogParameters()->frogsXS = getFrogsXS();
     getFrogParameters()->frogsXSerr = getFrogsXSerr();
     getFrogParameters()->frogsYS = getFrogsYS();

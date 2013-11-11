@@ -163,6 +163,7 @@ class VStereoAnalysis
 	int   fTreeSelescted_frogsEventID;
 	int   fTreeSelescted_frogsGSLConStat;
 	int   fTreeSelescted_frogsNB_iter;
+	int   fTreeSelescted_frogsNImages;
 	double fTreeSelescted_frogsXS;
 	double fTreeSelescted_frogsXSerr;
 	double fTreeSelescted_frogsYS;

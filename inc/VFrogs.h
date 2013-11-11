@@ -43,6 +43,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
   int   getFrogsEventID() { return frogsEventID; }
   int   getFrogsGSLConStat() { return frogsGSLConStat; }
   int   getFrogsNB_iter() { return frogsNB_iter; }
+  int   getFrogsNImages() { return frogsNImages; }
   float getFrogsXS() { return frogsXS; }
   float getFrogsXSerr() { return frogsXSerr; }
   float getFrogsYS() { return frogsYS; }
@@ -99,6 +100,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
   int   frogsEventID;
   int   frogsGSLConStat; 
   int   frogsNB_iter;
+  int   frogsNImages;
   float frogsXS;
   float frogsXSerr;
   float frogsYS;
