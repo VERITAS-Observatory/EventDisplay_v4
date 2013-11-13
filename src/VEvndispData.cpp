@@ -479,8 +479,7 @@ for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
 if( getDead( iLowGain )[i] > 0 )
 {
 bitset<8*sizeof(uint32_t)> i_dead = getDead( iLowGain )[i];
-//cout << "\t " << i << "\t";
-printf( "   DEADCHAN Tel %d Gain %d Chan %d ", Telescope, Gain, i ) ;
+printf( "   DEADCHAN Tel %d, Channel %3d, %s gain: ", Telescope, i, (Gain?" low":"high")  ) ;
 for( unsigned j = 0; j < i_dead.size(); j++ )
 {
 if( i_dead.test( j ) && j < fDeadChannelText.size() ) cout << " - " << fDeadChannelText[j] ;

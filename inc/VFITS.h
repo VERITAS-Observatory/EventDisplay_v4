@@ -47,7 +47,7 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
 
         CRunSummary* ctRunSum;
         float fTarget_Exposure;
-        float fTarget_RAJ200;
+        float fTarget_RAJ2000;
         float fTarget_DecJ2000;
 
         bool printerror( int status );

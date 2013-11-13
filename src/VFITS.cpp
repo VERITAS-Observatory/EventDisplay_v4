@@ -7,10 +7,10 @@ VFITS::VFITS( string anasum_file, string fits_file, string object_name, bool iOn
     fFile_FITS   = fits_file;
     fWriteOneFile = iOneFile;
   
-    fEVDversion = "EVENTDISPLAY_3.60";
+    fEVDversion = "EVENTDISPLAY_4.30";
     fTarget_Name = object_name;
     fTarget_Exposure = 0.;
-    fTarget_RAJ200 = 0.;
+    fTarget_RAJ2000 = 0.;
     fTarget_DecJ2000 = 0.;
     ctRunSum = 0;   
     if (!readAnasumFile(iPrint)) exit (1); 
@@ -43,12 +43,12 @@ bool VFITS::readAnasumFile(bool iPrint )
    }
  
    ctRunSum = getRunSummaryTree( 1 );
-   ctRunSum->GetEntry( 1 );
-   fTarget_RAJ200 = (float)ctRunSum->SkyMapCentreRAJ2000;
+   ctRunSum->GetEntry( 0 );
+   fTarget_RAJ2000 = (float)ctRunSum->SkyMapCentreRAJ2000;
     fTarget_DecJ2000 = (float)ctRunSum->SkyMapCentreDecJ2000;
-    if( TMath::Abs( fTarget_RAJ200 ) < 1.e-5 && TMath::Abs( fTarget_DecJ2000 ) < 1.e-5 )
+    if( TMath::Abs( fTarget_RAJ2000 ) < 1.e-5 && TMath::Abs( fTarget_DecJ2000 ) < 1.e-5 )
     {
-        fTarget_RAJ200 = (float)ctRunSum->TargetRAJ2000;
+        fTarget_RAJ2000 = (float)ctRunSum->TargetRAJ2000;
         fTarget_DecJ2000 = (float)ctRunSum->TargetDecJ2000;
     }
 
@@ -66,7 +66,7 @@ bool VFITS::readAnasumFile(bool iPrint )
     if( iPrint )
     {
      //  cout << "Histogram found with " << hSkyMap->GetEntries() << " entries" << endl;
-       cout << "Pointing direction  (ra,dec): " << fTarget_RAJ200 << " " << fTarget_DecJ2000 << endl;
+       cout << "Pointing direction  (ra,dec): " << fTarget_RAJ2000 << " " << fTarget_DecJ2000 << endl;
        cout << "Exposure [s]: " << fTarget_Exposure << endl;
     }  
 
@@ -189,7 +189,7 @@ bool VFITS::writeThetaSquareDistribution(bool iPrint)
   char *colNames[10] = {(char*)"ThetaSq",(char*)"ThetaSqWidth",(char*)"ON",(char*)"OFF", (char*)"Excess", (char*)"ExcessError"};
   char *colUnits[10] = {(char*)"deg^2",(char*)"Delta deg^2",(char*)"counts",(char*)"counts",(char*)"counts",(char*)"counts"};
   char *colDataFormat[10] = {(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D",(char*)"1D"};
-  writeVecTH1DFits(vhist, "ThetaSquare ",colNames,colUnits,colDataFormat, iPrint);
+  writeVecTH1DFits(vhist, "ThetaSquare",colNames,colUnits,colDataFormat, iPrint);
   if (iPrint) cout<<" transformed rates into FITS-table"<<endl;
 
 
@@ -597,7 +597,7 @@ bool VFITS::writeFITSimageInfo(long naxis,long *naxes, TH2D *hSkyMap , string Di
     char ctype1[] = "RA---TAN"; 
     if ( fits_update_key(fptr, TSTRING, "CTYPE1", ctype1, (char*)"Axis type for dim 1 (RA)", &status))   return printerror( status );
 
-    if ( fits_update_key(fptr, TFLOAT, "CRVAL1", &fTarget_RAJ200, (char*)"Sky coord of 1st axis (deg)", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, "CRVAL1", &fTarget_RAJ2000, (char*)"Sky coord of 1st axis (deg)", &status) ) return printerror( status );
 
     float pix1_origin=naxes[0]/2; 
     if ( fits_update_key(fptr, TFLOAT, "CRPIX1", &pix1_origin, (char*)"Reference point of pixel location axis 1", &status) ) return printerror( status );
@@ -658,7 +658,7 @@ bool VFITS::writeFITSInfo( bool iPrint)
     sprintf( iTarget, "%s", fTarget_Name.c_str() );
     if ( fits_update_key(fptr, TSTRING, (char*)"OBJECT", iTarget, (char*)"Name of the object", &status) ) return printerror( status );
 
-    if ( fits_update_key(fptr, TFLOAT, (char*)"RA_OBJ", &fTarget_RAJ200, (char*)"RA (deg) of the object", &status) ) return printerror( status );
+    if ( fits_update_key(fptr, TFLOAT, (char*)"RA_OBJ", &fTarget_RAJ2000, (char*)"RA (deg) of the object", &status) ) return printerror( status );
 
     if ( fits_update_key(fptr, TFLOAT, (char*)"DEC_OBJ", &fTarget_DecJ2000, (char*)"Dec (deg) of the Object", &status) ) return printerror( status );
 
