@@ -13,6 +13,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -53,6 +54,7 @@ class VPlotCTAArrayLayout
     TCanvas* plot_array( string iArrayName = "", double xmax = 1450., double ymax = 1450., bool drawTelescopeNumbers = true );
     bool     readArrayFromRootFile( string iFile );
     void     printArrayCosts();
+    void     printTelescopeDistances( int iTelID, float iDistanceMax = 1.e99 );
     bool     setSubArray( string iSubArrayFile = "" );
 };
 
@@ -307,7 +309,8 @@ TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax
     c->SetLeftMargin( 0.13 );
     c->Draw();
 
-    TH2D *hnull = new TH2D( "hnull", "", 100, -1.*xmax, xmax, 100, -1.*ymax, ymax );
+    sprintf( hname, "hnull_%s", iname.c_str() );
+    TH2D *hnull = new TH2D( hname, "", 100, -1.*xmax, xmax, 100, -1.*ymax, ymax );
     hnull->SetStats( 0 );
     hnull->SetXTitle( "x [m]" );
     hnull->SetYTitle( "y [m]" );
@@ -346,6 +349,51 @@ TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax
     }
 
     return c;
+}
+void VPlotCTAArrayLayout::printTelescopeDistances( int iTelID, float iDistanceMax )
+{
+// check that sub array is set
+    if( fTelescopeList_subArray.size() == 0 )
+    {
+        fTelescopeList_subArray = fTelescopeList;
+    }
+
+// get telescope
+    unsigned int iTelID_sub = 99999;
+    for( unsigned int i = 0; i < fTelescopeList_subArray.size(); i++ )
+    {
+        if( fTelescopeList_subArray[i]->fTelID == iTelID ) iTelID_sub = i;
+    }
+    if( iTelID_sub >= fTelescopeList_subArray.size() )
+    {
+       cout << "telescope ID not found" << endl;
+       return;
+    }
+
+// fill list
+    multimap< float, unsigned int > iSortedListOfTelescopes;
+    for( unsigned int i = 0; i < fTelescopeList_subArray.size(); i++ )
+    {
+       if( i != iTelID_sub )
+       {
+           float d = sqrt( (fTelescopeList_subArray[i]->fTel_x - fTelescopeList_subArray[iTelID_sub]->fTel_x)
+                         * (fTelescopeList_subArray[i]->fTel_x - fTelescopeList_subArray[iTelID_sub]->fTel_x)
+                         + (fTelescopeList_subArray[i]->fTel_y - fTelescopeList_subArray[iTelID_sub]->fTel_y)
+                         * (fTelescopeList_subArray[i]->fTel_y - fTelescopeList_subArray[iTelID_sub]->fTel_y) );
+           iSortedListOfTelescopes.insert( pair< float, unsigned int >( d, i ) );
+       }
+    }
+
+// print list
+    for( multimap<float,unsigned int>::iterator it = iSortedListOfTelescopes.begin(); it != iSortedListOfTelescopes.end(); ++it )
+    {
+        if( it->second < fTelescopeList_subArray.size() && it->first < iDistanceMax )
+        {
+            cout << "..to telescope " << fTelescopeList_subArray[it->second]->fTelID;
+            cout << " (" << fTelescopeList_subArray[it->second]->fTelTypeName << "): " << it->first << "m" << endl;
+        }
+    }
+
 }
 
 vector< string > VPlotCTAArrayLayout::getListofArrrays( string iArrayFile )
