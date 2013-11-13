@@ -663,7 +663,7 @@ endif
 
 slib lsib ./lib/libVAnaSum.so:   $(SHAREDOBJS)
 	mkdir -p ./lib
-	$(LD) $(SOFLAGS) $(GLIBS) $(SHAREDOBJS) $(OutPutOpt) ./lib/libVAnaSum.so
+	$(LD) $(SOFLAGS) $(SHAREDOBJS) $(GLIBS) $(OutPutOpt) ./lib/libVAnaSum.so
 ifneq ($(ROOT_MINUIT2),yes)
 	@echo "ROOT NOT COMPILED WITH MINUIT2"
 	@echo "THEREFORE: NO SOURCE GEOMETRY FITTER AVAILABLE"
