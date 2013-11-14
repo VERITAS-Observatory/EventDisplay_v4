@@ -473,15 +473,15 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
         if( fStereoOn->getMeanElevation() > 0. )
         {
             fMeanElevationOn += fStereoOn->getMeanElevation();
-            fMeanAzimuthOn += fRunAzMeanOn[onrun];
+	    fMeanAzimuthOn += fStereoOn->getMeanAzimuth();
         }
         else if( fStereoOff->getMeanElevation() > 0 )
         {
             fMeanElevationOn += fStereoOff->getMeanElevation();
-            fMeanAzimuthOn += fRunAzMeanOff[onrun];
+            fMeanAzimuthOn += fStereoOff->getMeanAzimuth();
         }
         fMeanElevationOff += fStereoOff->getMeanElevation();
-        fMeanAzimuthOff += fRunAzMeanOff[offrun];
+	fMeanAzimuthOff += fStereoOff->getMeanAzimuth();
         fNMeanElevation++;
         if( iexp_on > 0. && iexp_off > 0. )
         {
@@ -500,7 +500,9 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
             fMeanElevationOn /= fNMeanElevation;
             fMeanElevationOff /= fNMeanElevation;
             fMeanAzimuthOn /= fNMeanElevation;
+	    if( fMeanAzimuthOn > 180. ) fMeanAzimuthOn -= 360.;
             fMeanAzimuthOff /= fNMeanElevation;
+	    if( fMeanAzimuthOff > 180. ) fMeanAzimuthOff -= 360.;
             fMeanRawRateOn /= fNMeanElevation;
             fMeanRawRateOff /= fNMeanElevation;
             fMeanPedVarsOn /= fNMeanElevation;

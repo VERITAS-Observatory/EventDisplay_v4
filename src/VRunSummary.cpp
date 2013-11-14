@@ -168,22 +168,21 @@ void VRunSummary::print()
         else
         {
             //cout << "RUN " << runOn;
-			printf( "RUN %5d", runOn ) ;
-			
+	    printf( "RUN %5d", runOn ) ;
             if( runOff != runOn ) cout << " (" << runOff << ")       ";
         }
         sprintf( itemp, " (%+4.1fN,%+4.1fW) ", fWobbleNorth, fWobbleWest );
         if( fWobbleNorth != 0. || fWobbleWest != 0. ) cout << itemp;
         if( elevationOn > 2. ) 
-		{
-			//cout << " at " << (int)elevationOn << "," << (int)azimuthOn << " deg El.,Az, ";
-			printf( " at %2d,%4d deg El., Az, ", (int)elevationOn, (int)azimuthOn ) ;
-		}
-        else
-		{
-			//cout << " at " << (int)elevationOff << "," << (int)azimuthOff << " deg El.,Az, ";
-			printf( " at %2d,%4d deg El., Az, ", (int)elevationOff, (int)azimuthOff ) ;
-		}
+	{
+	    //cout << " at " << (int)elevationOn << "," << (int)azimuthOn << " deg El.,Az, ";
+	    printf( " at %2d,%4d deg El., Az, ", (int)elevationOn, (int)azimuthOn ) ;
+	}
+	else
+	{
+	    //cout << " at " << (int)elevationOff << "," << (int)azimuthOff << " deg El.,Az, ";
+	    printf( " at %2d,%4d deg El., Az, ", (int)elevationOff, (int)azimuthOff ) ;
+	}
         sprintf( itemp, "%5.2f", tOn/60. );
         cout << itemp << " min, ";
         sprintf( itemp, "%4d",(int)NOn );
@@ -305,8 +304,8 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 		f_exposureOff[runOff] = i_runSum.tOff;
 		fMeanElevationOn += i_runSum.elevationOn;
 		fMeanElevationOff += i_runSum.elevationOff;
-		fMeanAzimuthOn += i_runSum.azimuthOn;
-		fMeanAzimuthOff += i_runSum.azimuthOff;
+		fMeanAzimuthOn  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOn,  i_runSum.azimuthOn  );
+		fMeanAzimuthOff = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuthOff, i_runSum.azimuthOff );
 		fMeanDeadTimeOn += i_runSum.DeadTimeFracOn * tOn;
 		fMeanDeadTimeOff += i_runSum.DeadTimeFracOff * tOff;
 		fMeanRawRateOn += i_runSum.RawRateOn;

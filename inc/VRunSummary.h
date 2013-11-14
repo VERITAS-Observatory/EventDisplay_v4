@@ -5,6 +5,7 @@
 
 #include "CRunSummary.h"
 #include "VAnaSumRunParameter.h"
+#include "VSkyCoordinatesUtilities.h"
 
 #include <iomanip>
 #include <iostream>
