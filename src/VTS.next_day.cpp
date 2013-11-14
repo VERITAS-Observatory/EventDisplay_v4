@@ -57,17 +57,17 @@ int main( int argc, char *argv[] )
     VFluxCalculation *flux = new VFluxCalculation( ifile);
     if( flux->IsZombie() ) return 1;
     flux->setDebug( fDebug); 
-    flux->setSignificanceParameters( -5., -5. );
-    //flux->calculateIntegralFlux( fMinEnergy, false);      //old version
+    flux->setSignificanceParameters( -99., -999999 );	//force calculation of flux (not UL), even for negative excess
     flux->calculateIntegralFlux( fMinEnergy); 
-    //flux->printResults();
+    if( fDebug) flux->printResults();
  //calculate upper limits for all runs even when significance >= 3
     VFluxCalculation *fluxUL = new VFluxCalculation( ifile);
     if( fluxUL->IsZombie() ) return 1;
     fluxUL->setDebug( fDebug);
-    fluxUL->setSignificanceParameters( 99999, 999999 );
-    //fluxUL->calculateIntegralFlux( fMinEnergy, false);      //old version
+    fluxUL->setSignificanceParameters( 99999, 999999 );//force calculation UL, even for strong excess
     fluxUL->calculateIntegralFlux( fMinEnergy);
+    if( fDebug) fluxUL->printResults();
+
 // read run list
     VAnalysisUtilities a;
     a.openFile( fDataFile, -1, true, fDebug );
@@ -90,10 +90,10 @@ int main( int argc, char *argv[] )
 		fResults <<setw(6)<<left<< "RA" ;
 		fResults <<setw(6)<<left<< "Dec" ;
 		fResults <<setw(7)<<left<< "runOn" ;
-		fResults <<setw(5)<<left<< "NOn" ;
-		fResults <<setw(5)<<left<< "NOff" ;
+		fResults <<setw(12)<<left<< "NOn" ;
+		fResults <<setw(12)<<left<< "NOff" ;
 		fResults <<setw(18)<<left<< "tOn w/o deadtime";
-		fResults <<setw(8)<<left<< "Signi" ;
+		fResults <<setw(12)<<left<< "Signi" ;
 		fResults <<setw(8)<<left<< "OffNorm" ;
 		fResults <<setw(15)<<left<< "Rate" ;
 		fResults <<setw(15)<<left<< "RateE" ;
@@ -107,17 +107,17 @@ int main( int argc, char *argv[] )
 		fResults <<setw(6)<<left<< "[deg]" ;
 		fResults <<setw(6)<<left<< "[deg]" ;
 		fResults <<setw(7)<<left<< " " ;
-		fResults <<setw(5)<<left<< " " ;
-		fResults <<setw(5)<<left<< " " ;
+		fResults <<setw(12)<<left<< " " ;
+		fResults <<setw(12)<<left<< " " ;
 		fResults <<setw(18)<<left<< "[min]";
-		fResults <<setw(8)<<left<< "[sigma]" ;
+		fResults <<setw(12)<<left<< "[sigma]" ;
 		fResults <<setw(8)<<left<< " " ;
 		fResults <<setw(15)<<left<< "[gammas/min]" ;
 		fResults <<setw(15)<<left<< "[gammas/min]" ;
-                fResults <<setw(12)<<left<< "[m^-2 s^-1]" ;
-                fResults <<setw(12)<<left<< "[m^-2 s^-1]";
+                fResults <<setw(12)<<left<< "[cm^-2 s^-1]" ;
+                fResults <<setw(12)<<left<< "[cm^-2 s^-1]";
                 fResults <<setw(14)<<left<< "[percent]";
-                fResults <<setw(12)<<left<< "[m^-2 s^-1]";
+                fResults <<setw(12)<<left<< "[cm^-2 s^-1]";
                 fResults <<setw(14)<<left<< "[percent]";
 		fResults << endl;
 	     }
@@ -135,10 +135,10 @@ int main( int argc, char *argv[] )
 		fResults <<setw(6)<<left<< c->TargetRAJ2000 ;
 		fResults <<setw(6)<<left<< c->TargetDecJ2000;
 		fResults <<setw(7)<<left<< c->runOn ;
-		fResults <<setw(5)<<left<< c->NOn ;
-		fResults <<setw(5)<<left<< c->NOff ;
+		fResults <<setw(12)<<left<< c->NOn ;
+		fResults <<setw(12)<<left<< c->NOff ;
 		fResults <<setw(18)<<left<< c->tOn/60.*(1.-c->DeadTimeFracOn) ;
-		fResults <<setw(8)<<left<< c->Signi;
+		fResults <<setw(12)<<left<< c->Signi;
 		fResults <<setw(8)<<left<< c->OffNorm ;
 		fResults <<setw(15)<<left<< c->Rate ;
 		fResults <<setw(15)<<left<< c->RateE ;
@@ -160,10 +160,10 @@ int main( int argc, char *argv[] )
 		fResults <<setw(6)<<left<< c->TargetRAJ2000 ;
 		fResults <<setw(6)<<left<< c->TargetDecJ2000 ;
                 fResults <<setw(7)<<left<< 0.0 ;
-		fResults <<setw(5)<<left<< c->NOn ;
-		fResults <<setw(5)<<left<< c->NOff ;
+		fResults <<setw(12)<<left<< c->NOn ;
+		fResults <<setw(12)<<left<< c->NOff ;
 		fResults <<setw(18)<<left<< c->tOn/60.*(1.-c->DeadTimeFracOn)  ;
-		fResults <<setw(8)<<left<< c->Signi ;
+		fResults <<setw(12)<<left<< c->Signi ;
                 fResults <<setw(8)<<left<< 0.0 ;
 		fResults <<setw(15)<<left<< c->Rate ;
 		fResults <<setw(15)<<left<< c->RateE ;
