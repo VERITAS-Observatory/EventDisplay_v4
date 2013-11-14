@@ -1,6 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 
-cd $EVNDISPSYS/trunk/bin/
-
-./VTS.getRunListFromDB $*
+$EVNDISPSYS/bin/VTS.getRunListFromDB $*
