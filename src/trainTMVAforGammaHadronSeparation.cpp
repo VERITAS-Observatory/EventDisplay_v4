@@ -79,7 +79,7 @@ double checkIfVariableIsConstant( VTMVARunData *iRun, TCut iCut, string iVariabl
 	    if( h->GetRMS() > 1.e-5 )
 	    {
 	       cout << "\t variable " << iVariable << " ok, RMS: " << h->GetRMS() << ", tree: " << i;
-	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax();
+// (confusing)	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax();
 	       cout << ", entries " << h->GetEntries();
 	       cout << endl;
 	       h->Delete();
