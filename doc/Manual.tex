@@ -380,14 +380,48 @@ This is the default cleaning method for VERITAS analysis.
 * -1 IMAGECLEANINGTHRESHOLDS 5. 2.5
 \end{lstlisting}
 
-
 \subsection{Fixed threshold cleaning}
+
+This has been the default in CTA prod1, where only integrated charges are available. The cleaning thresholds can be scaled according to the night sky background for each telescope type seperately. 
+
+\begin{lstlisting}
+ image cleaning <method> <FIXED/VARIABLE>
+* -1 IMAGECLEANINGMETHOD TWOLEVELCLEANING FIXED
+ image cleaning thresholds <image> <border>
+ image cleaning levels 10/5 * sqrt(NSB/0.1GHz)
+* -413 IMAGECLEANINGTHRESHOLDS 11.0 5.5
+* -10018 IMAGECLEANINGTHRESHOLDS 11.0 5.5
+* -37 IMAGECLEANINGTHRESHOLDS 9.2 5.0
+* -10025 IMAGECLEANINGTHRESHOLDS 16.6 8.3
+* -73 IMAGECLEANINGTHRESHOLDS 15.4 7.7
+\end{lstlisting}
 
 \subsection{Time cluster cleaning}
 
 \subsection{Time next-neighbor cleaning}
 
 \section{Image analysis}
+
+The image analysis is done, in general, for different quality cut sets. Quality cuts are applied before the array analysis (reconstruction of shower core and direction) where only one set is read in by {\it mscw\_energy}, choosen with -arrayrecid=RECID (e.g. for cut set 13: -arrayrecid=13).
+
+Each set of cuts is given in 
+
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter} 
+
+and correspond to one set of array parameters in the eventdisplay output file (showerpars tree), for example, first set of cuts to Xcore[0], Ycore[0], etc., second set to Xcore[1], Ycore[1], ...
+
+\begin{lstlisting}
+Set 0:
+
+* -1 RECMETHOD 4
+* -1 MINANGLE 10.
+* -1 MINTUBES 4
+* -1 MINSIZE 100
+* -1 MAXLOSS 0.2
+
+\end{lstlisting}
+
+The maximum number of different cut sets is 100 (can be changed in VGlobalRunParameter: variable VDST\_MAXRECMETHODS).
 
 \subsection{Image parameters}
 The image parameterization is based on the so-called Hillas parameters \cite{1985ICRC....3..445H}. They are derived by the zeroth order (amplitude or size), first order (center of gravity) and second order (length, width, orientation) moments of the elliptical image of the shower. In general, they are calculated using the formulas given in \cite{1997JPhG...23.1013F}.
@@ -423,6 +457,18 @@ No fitting has been applied to images with $Fitstat=-1$
 
 \section{Stereo analysis}
 
+Different reconstruction methods for the arrival direction and shower core exist (implemented in the class {\it VArrayAnalyzer}). The method is set in 
+
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EVNDISP.reconstruction.runparameter}. 
+
+\begin{lstlisting}
+* -1 RECMETHOD 4
+\end{lstlisting}
+
+Reconstruction method 4 is the default in VERITAS and follows in principle algorithm~1 in \cite{1999APh....12..135H}.
+
+ATTENTION: Reconstruction method should be the same during the data analysis as the one used for the Monte Carlo simulation (filling of lookup tables). 
+
 
 
 \chapter{Displaying events}
@@ -432,8 +478,8 @@ Camera images of integrated charges, timing and calibration values, image cleani
 There are example scripts for display files, see
 
 \begin{itemize}
-\item for CTA:  \$EVNDISP/scripts/CTA/CTA.EVNDISP.display
-\item for VERITAS:  \$EVNDISP/scripts/VTS/VTS.EVNDISP.display
+\item for CTA:  \$EVNDISPSYS/scripts/CTA/CTA.EVNDISP.display
+\item for VERITAS:  \$EVNDISPSYS/scripts/VTS/VTS.EVNDISP.display
 \end{itemize} 
 
 Note that the display can be a bit slow for arrays with a large number of telescopes.
@@ -442,6 +488,43 @@ Note that the display can be a bit slow for arrays with a large number of telesc
 
 \section{Energy reconstruction}
 \label{SECTION.ENERGYRECONSTRUCTION} 
+
+Different energy estimations are implemented. They are set for standard data analysis in 
+
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/ANASUM.runparameter} 
+\begin{lstlisting}
+Energy reconstruction method  <0/1> 
+(0 for s=s(r,E) or  1 for E=E(s,r) 
+* ENERGYRECONSTRUCTIONMETHOD 1
+\end{lstlisting}
+
+For Monte Carlo simulation/analysis in they are set in 
+
+{\it \$OBS\_EVNDISP\_ANA\_DIR/ParameterFiles/EFFECTIVEAREA.runparameter}
+\begin{lstlisting}
+Energy reconstruction method
+(default = 1; possible values: 0, 1 )
+* ENERGYRECONSTRUCTIONMETHOD 1
+\end{lstlisting}
+NOTE: Lookup tables are filled for each telescope type seperately. 
+
+\subsection{$E=E(s,r)$}
+This is the default in VERITAS. 
+
+The lookup tables are filled with the median and the 90\%-width ($\sigma$) values of the logarithm of the image size as a function of the primary gamma-ray energy and the impact parameter. For each telescope image, an energy estimate $E_i$ is derived by inverting the lookup table of the median, weighted by $1/\sigma_i^2$. The energy of the event $E_{\mathrm{rec}}$ is determined by averaging the energy estimates from all $N$ telescopes, weighted by one over the square of the 90\%-width value:
+\begin{equation}
+E_{\mathrm{rec}} = \frac{ \sum_{i=1}^N E_i/\sigma_i^2 }{ \sum_{i=1}^N 1/\sigma_i^2  }
+\end{equation}
+Additionally, the $\chi^2$-value of the energy estimation is derived 
+\begin{equation}
+  \chi^2 (E_{\mathrm{rec}}) = \frac{1}{N-1}\; \sum_{i=1}^N \left( \frac{E_{\mathrm{rec}} - E_i}{ \sigma_i^2} \right)
+\end{equation}
+The energy estimates of this method are labeled with $Erec$, $EChi2$, $dE$. 
+
+\subsection{$s=s(r,E)$}
+The lookup tables are filled with primary gamma-ray energy as a funtion of the median (or the 90\%-width ($\sigma$)) values of the logarithm of the image size and the impact parameter.
+
+Energy estimates of this method are labeled with $ErecS$, $EChi2S$, $dES$. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -649,7 +732,7 @@ The following list shows the exectuables and macros needed to produce CTA sensit
         
 \end{description}
 
-There are shell scripts to simplify these steps in the {\it \$EVNDISP/scripts/CTA} directory (see description in section \ref{SECTION.CTASCRIPTANALYSIS}.
+There are shell scripts to simplify these steps in the {\it \$EVNDISPSYS/scripts/CTA} directory (see description in section \ref{SECTION.CTASCRIPTANALYSIS}.
 They allow analyze a large amount of simulations files on a computing cluster\footnote{Most of these scripts work fine on the DESY batch system, they might need some adjustment for other computing environments}.
 It is easy with their help to analyze many simtel.gz files for several subarrays, offsets, cuts, and so on. 
 The scripts expect several environmental variables to be set during execution time, see section \ref{SECTION.ENVIRON} and the readme file {\it README/INSTALL} for details.
@@ -1498,6 +1581,8 @@ a.plotZDCF( 0, 45., 405. );
 % #############################################
 
 \begin{thebibliography}{}
+\bibitem[Hofmann et~al.(1999)]{1999APh....12..135H}
+  Hofmann, W. et~al., 1999, Astroparticle Physics, 12, 135
 \bibitem[Fegan(1997)]{1997JPhG...23.1013F}
   Fegan, D.~J., 1997, Journal of Physics G Nuclear Physics, 23, 1013
 \bibitem[Hillas(1985)]{1985ICRC....3..445H}
