@@ -32,7 +32,7 @@ cd $EVNDISPSYS/bin/
 # pedestal calculation
 if( $CALIB == "1" || $CALIB == "2" ) then
     rm -f $LDIR/$RUN.ped.log
-    ./evndisp -runnumber=$RUN -runmode=1  > $LDIR/$RUN.ped.log
+    ./evndisp -runnumber=$RUN -runmode=1 >& $LDIR/$RUN.ped.log
 endif
 
 #########################################
@@ -58,7 +58,7 @@ set OPT="$OPT -readCalibDB "
 # average tzero calculation
 if( $CALIB == "1" || $CALIB == "3" ) then
     rm -f $LDIR/$RUN.tzero.log
-    ./evndisp -runnumber=$RUN -runmode=7 $OPT > $LDIR/$RUN.tzero.log
+    ./evndisp -runnumber=$RUN -runmode=7 $OPT >& $LDIR/$RUN.tzero.log
 endif
 
 #########################################
@@ -82,7 +82,7 @@ endif
 #########################################
 # run eventdisplay
 rm -f $LDIR/$RUN.log
-./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $ODIR/$RUN.root $OPT > $LDIR/$RUN.log
+./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $ODIR/$RUN.root $OPT >& $LDIR/$RUN.log
 
 #########################################
 # sleep for 20 s 
