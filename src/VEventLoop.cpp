@@ -644,8 +644,8 @@ void VEventLoop::shutdown()
     if( fRunMode == R_ANA )
     {
        if( fDebug ) cout << "VEventLoop::shutdown: final check of output file" << endl;
-       TFile f( fRunPar->foutputfileName.c_str(), "UPDATE" );
-       f.Recover();
+       TFile f( fRunPar->foutputfileName.c_str() );
+//       f.Recover();
        if( f.TestBit(TFile::kRecovered) ) 
        {
           cout << "Warning: output file has been recovered" << endl;
