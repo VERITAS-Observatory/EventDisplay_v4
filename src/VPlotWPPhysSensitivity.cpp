@@ -543,8 +543,12 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors *g
 	    {
 	       req = VCTASensitivityRequirements::Flux_req05_E2erg_north( TMath::Power( 10., x ) );
 	    }
-	    m  *= req / y;
-	    if( y > 0. ) dm += dy*dy*req*req/y/y/y/y;
+	    if( y > 0 )
+	    {
+	       m  *= req / y;
+	       dm += dy*dy*req*req/y/y/y/y;
+            }
+
 	    z++;
        }
    }
