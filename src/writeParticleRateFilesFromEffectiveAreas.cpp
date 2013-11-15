@@ -103,11 +103,6 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
        }
 // calculate differential fluxes for 5 bins per decade (0.2)
        b.calculateParticleNumberGraphs_MC( 0.2 );
-
-
-
-       
-
     }
 }
 
@@ -125,7 +120,8 @@ int main( int argc, char *argv[] )
    if( argc != 5 && argc != 6 )
    {
       cout << endl;
-      cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone> <reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
+      cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone>";
+      cout <  "<reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
       cout << endl;
       exit( 0 );
    }
