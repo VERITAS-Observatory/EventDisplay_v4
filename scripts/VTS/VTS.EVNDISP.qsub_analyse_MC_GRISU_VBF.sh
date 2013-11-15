@@ -31,7 +31,6 @@ if( $ARRAY == "V4" ) then
 #      set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
 #       set IFIL=Apr12_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
       set IFIL=Oct2012_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
-      set IFIL=gamma_V4_Oct2012_SummerV4ForProcessing_20130611_v420_ATM22_"$ZEW"deg_"$WOG"
       set RUN=( "wobb" )
       set SRUN=47460
       set NRUN=1
@@ -206,8 +205,12 @@ $EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=
 ##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $ODIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$RRR.log
+$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$RRR.log
 ##############################################################################################
+
+  sleep 10s
+
+  mv -f -v $DDIR/$RRR.root $ODIR/$RRR.root
 
 # remove temporary vbf file
   rm -f -v $XFIL
