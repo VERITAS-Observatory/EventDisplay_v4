@@ -121,7 +121,7 @@ int main( int argc, char *argv[] )
    {
       cout << endl;
       cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone>";
-      cout <  "<reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
+      cout <<  "<reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
       cout << endl;
       exit( 0 );
    }
