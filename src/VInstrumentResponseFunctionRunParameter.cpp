@@ -1,7 +1,7 @@
 /*! \class VInstrumentResponseFunctionRunParameter
     \brief run parameters for response function calculator (effective areas)
 
-
+    \author Gernot Maier
 */
 
 #include "VInstrumentResponseFunctionRunParameter.h"
@@ -59,7 +59,7 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 
     fCREnergySpectrumFile = "";
     fCREnergySpectrumID = 0;
-
+    fCREnergySpectrum = 0;
 }
 
 
@@ -206,6 +206,9 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 
 // read run parameters from this file
     if( !readRunParameters( fdatafile ) ) return false;
+
+// read spectral energy parameters
+    if( !readCRSpectralParameters() ) return false;
 
 /////////////////////////////////////////////////////////////////
 // define azimuth bins
@@ -422,9 +425,41 @@ void VInstrumentResponseFunctionRunParameter::print()
     for( unsigned int i = 0; i < fSpectralIndex.size(); i++ ) cout << fSpectralIndex[i] << " ";
     if( fCREnergySpectrumFile.size() > 0 )
     {
+       cout << endl;
        cout << "CR energy spectrum used for weighted rate histogram: ";
-       cout << fCREnergySpectrumFile << "(ID " << fCREnergySpectrumID << ")" << endl;
+       cout << fCREnergySpectrumFile << "(ID" << fCREnergySpectrumID << ")" << endl;
+       if( fCREnergySpectrum ) fCREnergySpectrum->Print();
     }
     cout << endl << endl;
-
 }
+
+bool VInstrumentResponseFunctionRunParameter::readCRSpectralParameters()
+{
+    if( fCREnergySpectrumFile.size() == 0 ) return true;
+
+    VEnergySpectrumfromLiterature espec( fCREnergySpectrumFile );
+    if( espec.isZombie() ) return false;
+    if( !espec.isValidID( fCREnergySpectrumID ) ) return false;
+
+    if( espec.getEnergySpectrum( fCREnergySpectrumID ) )
+    {
+       char hname[1000];
+       sprintf( hname, "%s_C", espec.getEnergySpectrum( fCREnergySpectrumID )->GetName() );
+       fCREnergySpectrum = new TF1( hname, espec.getEnergySpectrum( fCREnergySpectrumID )->GetExpFormula(), 
+                                           espec.getEnergySpectrum( fCREnergySpectrumID )->GetXmin(), 
+                                           espec.getEnergySpectrum( fCREnergySpectrumID )->GetXmax() );
+       for( int i = 0; i < espec.getEnergySpectrum( fCREnergySpectrumID )->GetNpar(); i++ )
+       {
+           fCREnergySpectrum->SetParameter( i, espec.getEnergySpectrum( fCREnergySpectrumID )->GetParameter( i ) );
+           fCREnergySpectrum->SetParError( i, espec.getEnergySpectrum( fCREnergySpectrumID )->GetParError( i ) );
+       } 
+       fCREnergySpectrum->Print();
+    }
+    else
+    {
+       fCREnergySpectrum = 0;
+    }
+
+    return true;
+}
+

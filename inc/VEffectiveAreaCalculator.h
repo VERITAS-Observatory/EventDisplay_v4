@@ -44,6 +44,8 @@ class VEffectiveAreaCalculator
 	vector< vector< double > > fEffArea_time;
 	vector< double > timebins;
 
+        float fMC_ScatterArea;
+
         bool bNOFILE;
         TDirectory *fGDirectory;
 
@@ -193,7 +195,7 @@ class VEffectiveAreaCalculator
         void   copyProfileHistograms( TProfile*,  TProfile* );
         void   copyHistograms( TH1*,  TH1*, bool );
         double getAzMean( double azmin, double azmax );
-	double getCRWeight( double iEMC_TeV_log10 );
+	double getCRWeight( double iEMC_TeV_log10, TH1* h );
         bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
         void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
         double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,

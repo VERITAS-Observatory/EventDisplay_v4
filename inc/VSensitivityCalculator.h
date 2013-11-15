@@ -90,6 +90,7 @@ class VSensitivityCalculatorDataResponseFunctions
     vector< double > effArea;
     vector< double > effArea_error;
     TH2D *hResponseMatrix;
+    TH1D *hWeightedRate;
 
     VSensitivityCalculatorDataResponseFunctions();
    ~VSensitivityCalculatorDataResponseFunctions();
@@ -215,7 +216,10 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, unsigned int e_lit_ID,
 				       vector< double > e_gamma, vector< double > e, vector< double > eff, TH2D *iResponseMatrix = 0,
-				       VMonteCarloRateCalculator *iMCR = 0 );
+				       VMonteCarloRateCalculator *iMCR = 0, TH1D* iWeightedRate = 0 );
+        double     getMonteCarloRateFromWeightedRateHistogram( unsigned int iE_low_bin, unsigned int iE_up_bin, bool iRateError,
+                                                               vector< double > energy, TH1D *iWeightedRateHistogram );
+                                         
 
 	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit = "ENERGY" );
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
@@ -294,6 +298,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,16);
+        ClassDef(VSensitivityCalculator,17);
 };
 #endif

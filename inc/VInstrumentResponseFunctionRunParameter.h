@@ -6,6 +6,7 @@
 #include "Ctelconfig.h"
 #include "VMonteCarloRunHeader.h"
 #include "VTableLookupRunParameter.h"
+#include "VEnergySpectrumfromLiterature.h"
 
 #include <fstream>
 #include <getopt.h>
@@ -15,6 +16,7 @@
 #include <vector>
 
 #include "TChain.h"
+#include "TF1.h"
 #include "TNamed.h"
 
 using namespace std;
@@ -24,6 +26,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    private:
 
    bool            readRunParameters( string ifilename );
+   bool            readCRSpectralParameters();
 
    public:
 
@@ -77,6 +80,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
 
    string          fCREnergySpectrumFile;
    unsigned int    fCREnergySpectrumID;
+   TF1*            fCREnergySpectrum;
 
 
    VInstrumentResponseFunctionRunParameter();
@@ -87,7 +91,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    bool                  readRunParameterFromTextFile( string iFile );
    bool                  testRunparameters();
 
-   ClassDef( VInstrumentResponseFunctionRunParameter, 6 );
+   ClassDef( VInstrumentResponseFunctionRunParameter, 9 );
 };
 
 #endif

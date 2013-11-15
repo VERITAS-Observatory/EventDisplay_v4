@@ -689,7 +689,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	cout << "Error: no entries in differential flux vector" << endl;
 	return 0;
     }
-    cout << "evaluating differential flux vector" << endl;
+    cout << "evaluating differential flux vector (size " << fDifferentialFlux.size() << ")" << endl;
 
 // this is the range of fluxes which will be searched
     setSourceStrengthRange_CU( -5., 10., 4./1000., true );
@@ -1616,16 +1616,6 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 // (despite there might be reconstructed energies with lower/higher values)
         double iBinEnergyMin = fMC_Data[1]->effArea_Emin;
 	if( fDebug ) cout << "VSensitivityCalculator::getDifferentialFluxVectorfromMC: minimum energy: " << iBinEnergyMin << endl;
-// get minimum energy bin
-/*        while( fMC_Data[1]->energy.size() > 0 && iBinEnergyMin - (fMC_Data[1]->energy[0] - iBinSize/2.) < -1.e-4 )
-        {
-            iBinEnergyMin += dE_Log10;
-        }
-	if( fDebug )
-	{
-	   cout << "VSensitivityCalculator::getDifferentialFluxVectorfromMC: minimum energy (after adjustment to energy binning): ";
-	   cout << iBinEnergyMin << endl;
-        } */
 // use first bin low edge of gamma-ray effective area
         if( fMC_Data[1]->energy_lowEdge.size() > 0 ) iBinEnergyMin = fMC_Data[1]->energy_lowEdge[0];
 // now fill vector with energies and energy bins
@@ -1639,7 +1629,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
             {
                 if( TMath::Abs( fMC_Data[1]->energy[i] - iBinSize/2. - iBinEnergyMin ) < 1.e-2 )
                 {
-                    i_flux.Energy_lowEdge = fMC_Data[1]->energy[i] - iBinSize/2.;    // temporary: Energy_lowEdge should be on lin scale, here it is on log scale
+// temporary assignment: Energy_lowEdge should be on lin scale, here it is on log scale
+                    i_flux.Energy_lowEdge = fMC_Data[1]->energy[i] - iBinSize/2.;    
                     i_flux.Energy_lowEdge_bin = i;
                     i_eff_found = true;
                     break;
@@ -1674,7 +1665,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
                         cout << "\t dE: " << i_flux.dE << "\tObsTime: " << i_flux.ObsTime << " [s]";
 			cout << ", Offset: ";
 			map< unsigned int, int >::iterator iEnergyScaleOffset_iter;
-			for( iEnergyScaleOffset_iter = iEnergyScaleOffset.begin(); iEnergyScaleOffset_iter != iEnergyScaleOffset.end(); iEnergyScaleOffset_iter++ )
+			for( iEnergyScaleOffset_iter = iEnergyScaleOffset.begin(); iEnergyScaleOffset_iter != iEnergyScaleOffset.end(); 
+                             iEnergyScaleOffset_iter++ )
 			{
 			   cout << (*iEnergyScaleOffset_iter).second << "\t";
 			}
@@ -1688,6 +1680,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
 ///////////////////////////////////////////////////////////////////
 // get gamma rate [1/min] for a certain ze, az, noise, wobble offset
+///////////////////////////////////////////////////////////////////
 // for integral sensitivity set energy bins according to effective areas
     if( fDebug ) cout << "Calculate rates for gamma rays" << endl;
     VMonteCarloRateCalculator iMCR;
@@ -1735,12 +1728,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea,
-								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR );
+								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR, (*i_MCData_iterator).second->hWeightedRate );
             v_flux_NOff_error[(*i_MCData_iterator).first][i] =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin,
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea_error,
-								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR );
+								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR, (*i_MCData_iterator).second->hWeightedRate );
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // take care of space angle and theta2 cut normalisation
@@ -1977,6 +1970,43 @@ void VSensitivityCalculator::setMonteCarloParameters( unsigned int iParticleID,
 
 /*!
 
+   return rate (in [1/min]) from weighted rate histograms calculated in effective area code
+
+*/
+double VSensitivityCalculator::getMonteCarloRateFromWeightedRateHistogram( unsigned int iE_low_bin, unsigned int iE_up_bin, bool iRateError,
+                                                                           vector< double > energy, TH1D *iWeightedRateHistogram )
+{
+    if( !iWeightedRateHistogram || energy.size() == 0 ) return 0.;
+
+// find lower bin (assume identical binning in weightedratehistogram and energy vector
+    int iHis_minBin = 0;
+    if( iE_low_bin < energy.size() ) iHis_minBin = iWeightedRateHistogram->GetXaxis()->FindBin( energy[iE_low_bin] );
+    else return 0.;
+    int iHis_maxBin = 0;
+    if( iE_up_bin < energy.size() )  iHis_maxBin = iWeightedRateHistogram->GetXaxis()->FindBin( energy[iE_up_bin] );
+    else return 0.;
+
+    double iR = 0.;
+    for( int i = iHis_minBin; i <= iHis_maxBin; i++ )
+    {
+       if( !iRateError )
+       {
+          iR += iWeightedRateHistogram->GetBinContent( i );
+       }
+       else
+       {
+          iR += sqrt( iWeightedRateHistogram->GetBinError( i ) );
+       }
+    }
+    if( iRateError && iR > 0. ) return sqrt( iR );
+
+    return iR;
+}
+                                                               
+
+
+/*!
+
    calculate rate (in [1/min]) from given spectral shape and effective areas
 
 */
@@ -1986,6 +2016,10 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
 						   TH2D *hResponseMatrix,
 						   bool iRateError, VMonteCarloRateCalculator *iMCR )
 {
+// first choice: use weighted rate histograms if available
+    if( iMCPara.hWeightedRate ) return getMonteCarloRateFromWeightedRateHistogram( iE_low_bin, iE_up_bin, iRateError, iMCPara.energy, iMCPara.hWeightedRate );
+
+// otherwise use effective areas to calculate MC rates
     if( !iMCR ) return 0.;
 
 // return error on rate (from error on effective area, which is derived from MC statistics)
@@ -2003,8 +2037,12 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
 double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsigned int iE_up_bin, 
                                                    VEnergySpectrumfromLiterature i_Espec, unsigned int e_lit_ID,
 						   vector< double > e_gamma, vector< double > e, vector< double > eff,
-						   TH2D *hResponseMatrix, VMonteCarloRateCalculator *iMCR )
+						   TH2D *hResponseMatrix, VMonteCarloRateCalculator *iMCR, TH1D *iWeightedRate )
 {
+// first choice: use weighted rate histograms if available
+    if( iWeightedRate ) return getMonteCarloRateFromWeightedRateHistogram( iE_low_bin, iE_up_bin, false, e_gamma, iWeightedRate );
+
+// otherwise use effective areas to calculate MC rates
     if( !iMCR ) return 0.;
 
 // return rate calculated from MC effective areas
@@ -2212,6 +2250,22 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		iMCPara->hResponseMatrix->SetBinContent( i, j, i_hResponse->GetBinContent( i, j ) );
 	     }
 	  }
+       }
+   }
+// copy weighted rate histogram (if available)
+   if( c->hWeightedRate )
+   {
+       char hname[1000];
+       sprintf( hname, "%s_%s_%d_%d_%d", c->hWeightedRate->GetName(), iMCPara->fName.c_str(), 
+                                         (int)(iMCPara->woff*1000), iMCPara->az, (int)(iMCPara->index*100) );
+       iMCPara->hWeightedRate->SetName( hname );
+       iMCPara->hWeightedRate->SetTitle( c->hWeightedRate->GetTitle() );
+       iMCPara->hWeightedRate->SetBins( c->hWeightedRate->GetNbinsX(), 
+                                        c->hWeightedRate->GetXaxis()->GetXmin(), c->hWeightedRate->GetXaxis()->GetXmax() );
+       for( int i = 0; i <= c->hWeightedRate->GetNbinsX(); i++ )
+       {
+           iMCPara->hWeightedRate->SetBinContent( i, c->hWeightedRate->GetBinContent( i ) );
+           iMCPara->hWeightedRate->SetBinError(   i, c->hWeightedRate->GetBinError( i ) );
        }
    }
 
@@ -2978,6 +3032,7 @@ VSensitivityCalculatorDataResponseFunctions::VSensitivityCalculatorDataResponseF
     energy_min_log = 0.;
     energy_max_log = 0.;
     hResponseMatrix = 0;
+    hWeightedRate = 0;
 }
 
 VSensitivityCalculatorDataResponseFunctions::~VSensitivityCalculatorDataResponseFunctions()
@@ -3000,5 +3055,7 @@ void VSensitivityCalculatorDataResponseFunctions::initializeHistograms( string i
    char hname[1000];
    sprintf( hname, "%s_%d_%d_%d_%d_%s", fName.c_str(), fParticleID, (int)(woff*1000), az, (int)(index*100), iU.c_str() );
    hResponseMatrix = new TH2D( hname, "B", 5, 0., 1., 5, 0., 1. );
+   sprintf( hname, "%s1D_%d_%d_%d_%d_%s", fName.c_str(), fParticleID, (int)(woff*1000), az, (int)(index*100), iU.c_str() );
+   hWeightedRate = new TH1D( hname, "B", 5, 0., 1. );
 }
 

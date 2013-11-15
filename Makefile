@@ -38,7 +38,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 4.28
+version = 4.30
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(distdir).VTS.runparameter
@@ -506,6 +506,7 @@ EFFOBJECT =	./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o
 		./obj/VSkyCoordinatesUtilities.o ./obj/VUtilities.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 		./obj/VASlalib.o \
+		./obj/VEnergySpectrumfromLiterature.o ./obj/VEnergySpectrumfromLiterature_Dict.o \
 		./obj/makeEffectiveArea.o
 
 ./obj/makeEffectiveArea.o:	./src/makeEffectiveArea.cpp
@@ -907,6 +908,17 @@ writeParticleRateFilesFromEffectiveAreas:	$(WRITECTAPHYSOBJ)
 
 combineLookupTables:	./obj/combineLookupTables.o ./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
 			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
+# checkAnalysisResultFile
+########################################################
+
+./obj/checkAnalysisResultFile.o:	./src/checkAnalysisResultFile.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+checkAnalysisResultFile:	./obj/checkAnalysisResultFile.o 
 	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
@@ -1364,20 +1376,61 @@ $(ctapara):
 # VTS
 #
 
-VTS.runfiles:	$(vtspara).tar.gz
+VTS.runfiles:	$(vtscalirf).tar.gz $(vtspara).tar.gz
 
-$(vtspara).tar.gz:	$(vtspara)
-	find $(vtspara) -type f -print | cpio -o -H ustar > $(vtspara).tar
-	gzip $(vtspara).tar
-	rm -rf $(vtspara)
-
-$(vtspara):
+$(vtspara).tar.gz:	
 	rm -rf $(vtspara).tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(vtspara)
+# astrodata	
 	mkdir -p $(vtspara)/AstroData
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(vtspara)/AstroData
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(vtspara)/AstroData
+	rsync -av --exclude=".*" $(VERITAS_EVNDISP_AUX_DIR)/AstroData/Catalogues $(vtspara)/AstroData
+	rsync -av --exclude=".*"  $(VERITAS_EVNDISP_AUX_DIR)/AstroData/TeV_data $(vtspara)/AstroData
+# calibration directories
+	mkdir -p $(vtspara)/Calibration/Tel_1
+	mkdir -p $(vtspara)/Calibration/Tel_2
+	mkdir -p $(vtspara)/Calibration/Tel_3
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.dat $(vtspara)/Calibration/
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGain.dat $(vtspara)/Calibration/
+# detector geometry
+	mkdir -p $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Autumn2007_20130110.txt $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(vtspara)/DetectorGeometry
+	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt $(vtspara)/DetectorGeometry
+# NSB files
+	mkdir -p $(vtspara)/NOISE
+# gamma hadron files
+	mkdir -p $(vtspara)/GammaHadronCutFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.d20131031* $(vtspara)/GammaHadronCutFiles
+# run parameter files
+	mkdir -p $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runlist $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LGCalibration.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/COMPAREMC.runparameter $(vtspara)/ParameterFiles
+# radial acceptances, effective areas, tables
+	mkdir -p $(vtspara)/RadialAcceptances
+	mkdir -p $(vtspara)/EffectiveAreas
+	mkdir -p $(vtspara)/Tables
+	cd $(vtspara) && tar -zcvf ../$(vtspara).tar.gz . && cd ..
+	rm -rf $(vtspara)
+
+######
+# VTS calibration and IRF files
+
+$(vtscalirf).tar.gz:
+	@echo "bbb "
+	rm -rf $(vtspara).IRF.tar.gz  >/dev/null 2>&1
+	rm -rf $(distdir) >/dev/null 2>&1
+	mkdir -p $(vtspara)
 	mkdir -p $(vtspara)/Calibration/Tel_1
 	mkdir -p $(vtspara)/Calibration/Tel_2
 	mkdir -p $(vtspara)/Calibration/Tel_3
@@ -1386,40 +1439,27 @@ $(vtspara):
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/36862.lpe* $(vtspara)/Calibration/Tel_2/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/36862.lpe* $(vtspara)/Calibration/Tel_3/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/36862.lpe* $(vtspara)/Calibration/Tel_4/
-# 7-digits lped files
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_1/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_2/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_3/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_4/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.dat $(vtspara)/Calibration/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/calibrationlist.LowGain.dat $(vtspara)/Calibration/
-	mkdir -p $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Autumn2007_20130110.txt $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V6_Upgrade_20121127_v420.txt $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt $(vtspara)/DetectorGeometry
-	cp -f $(VERITAS_EVNDISP_AUX_DIR)/DetectorGeometry/EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt $(vtspara)/DetectorGeometry
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/*.lmult.root  $(vtspara)/Calibration/Tel_1/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/*.lmult.root  $(vtspara)/Calibration/Tel_2/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/*.lmult.root  $(vtspara)/Calibration/Tel_3/
+	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/*.lmult.root  $(vtspara)/Calibration/Tel_4/
+# NSB files for simulations
 	mkdir -p $(vtspara)/NOISE
-	cp -LR $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(vtspara)/NOISE
-	mkdir -p $(vtspara)/GammaHadronCutFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.d20120909-cut-N* $(vtspara)/GammaHadronCutFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/GammaHadronCutFiles/ANASUM.GammaHadron.d20130411* $(vtspara)/GammaHadronCutFiles
-	mkdir -p $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runparameter $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.timemask.dat $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/ANASUM.runlist $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.* $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/TMVA.BoxCuts.runparameter $(vtspara)/ParameterFiles
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/COMPAREMC.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(vtspara)/NOISE
+# radial acceptances, effective areas, tables
 	mkdir -p $(vtspara)/RadialAcceptances
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-d20130411-* $(vtspara)/RadialAcceptances/
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-d20131031-* $(vtspara)/RadialAcceptances/
 	mkdir -p $(vtspara)/EffectiveAreas
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-d20130411-cut* $(vtspara)/EffectiveAreas/
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-d20131031* $(vtspara)/EffectiveAreas/
 	mkdir -p $(vtspara)/Tables
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_d20130521* $(vtspara)/Tables/
+# make tar file
+	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_d20131031_GrI* $(vtspara)/Tables/
+	cd $(vtspara) && tar -zcvf ../$(vtspara).IRF.tar.gz . && cd ..
+	rm -rf $(vtspara)
 
 ###############################################################################################################################
 # print environment and compilation parameters

@@ -910,7 +910,8 @@ TCanvas* VPlotInstrumentResponseFunction::plotResolution2D( unsigned int iDataSe
                 if( j < fData[iDataSetID]->fIRF_Data.size() && fData[iDataSetID]->fIRF_Data[j] 
 		  && i_Plotting_Selector < fData[iDataSetID]->fIRF_Data[j]->fContainmentProbability.size() )
                 {
-                    sprintf( hname, "%s (%d%%)", h->GetYaxis()->GetTitle(), (int)(fData[iDataSetID]->fIRF_Data[j]->fContainmentProbability[i_Plotting_Selector]*100.) );
+                    sprintf( hname, "%s (%d%%)", h->GetYaxis()->GetTitle(),
+                             (int)(fData[iDataSetID]->fIRF_Data[j]->fContainmentProbability[i_Plotting_Selector]*100.) );
                     h->SetYTitle( hname );
                 }
                 setHistogramPlottingStyle( h, -99. );
