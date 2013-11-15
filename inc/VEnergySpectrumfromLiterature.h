@@ -86,6 +86,8 @@ class VEnergySpectrumfromLiterature : public VPlotUtilities
         TGraphAsymmErrors* getEnergySpectrumWithErrors( unsigned int iID = 0, bool bLogEnergy = true );
         TGraphErrors* getDifferentialFluxPoints( unsigned int iID = 0, bool bLogEnergy = true );
         double getIntegralFlux( double iEmin = 1., double iEmax = 1.e3,  unsigned int iID = 0 );
+        double getPowerLaw_Index( unsigned int iID = 0 );
+        double getPowerLaw_FluxConstant_at1TeV( unsigned int iID = 0 );
         TH1D*  getRandomErrorHistograms( unsigned int i ) { if( i < fRandomErrorHistograms.size() ) return fRandomErrorHistograms[i]; else return 0; }
 	bool   isValidID( unsigned int iID ) { return checkIDRange( iID ); }
         bool   isZombie() { return bIsZombie; }
@@ -103,6 +105,6 @@ class VEnergySpectrumfromLiterature : public VPlotUtilities
 	                                                                       fPlottingMaxEnergy = TMath::Power( 10., xmax ); }
         void setPlottingYaxis( float iMin = 1.e-17, float iMax = 1.e-7 ) { fPlottingYaxisMin = iMin; fPlottingYaxisMax = iMax; }
 
-        ClassDef(VEnergySpectrumfromLiterature,4);
+        ClassDef(VEnergySpectrumfromLiterature,5);
 };
 #endif

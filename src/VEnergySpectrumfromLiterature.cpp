@@ -683,3 +683,26 @@ sData VEnergySpectrumfromLiterature::getEnergySpectrumDataField( unsigned int iI
     return fData[iID];
 }
 
+/*
+ * get spectral index if the selected spectrum is a power law (otherwise return -9999)
+ */
+double VEnergySpectrumfromLiterature::getPowerLaw_Index( unsigned int iID )
+{
+   if( !checkIDRange( iID ) ) return -9999.;
+
+   if( fData[iID].Type != 0 || fData[iID].Parameter.size() != 3 ) return -9999.;
+
+   return fData[iID].Parameter[2];
+}
+
+/*
+ * get flux constant if the selected spectrum is a power law (otherwise return -9999)
+ */
+double VEnergySpectrumfromLiterature::getPowerLaw_FluxConstant_at1TeV( unsigned int iID )
+{
+   if( !checkIDRange( iID ) ) return -9999.;
+
+   if( fData[iID].Type != 0 || fData[iID].Parameter.size() != 3 || fData[iID].Parameter[0] == 0. ) return -9999.;
+
+   return (fData[iID].Parameter[1] * TMath::Power( 1./fData[iID].Parameter[0], fData[iID].Parameter[2] ) );
+}
