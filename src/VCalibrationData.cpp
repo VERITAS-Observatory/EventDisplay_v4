@@ -107,7 +107,7 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 
 void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples, bool iUsePedestalsInTimeSlices,
                                    bool iLowGainUsePedestalsInTimeSlices, bool iPedsFromPLine, bool iReadCalibDB, 
-				   bool i_isDSTMC, bool iDebug )
+				   bool i_isDSTMC, bool iDebug, int iRunMode )
 {
     if( iDebug ) cout << "VCalibrationData::initialize " << i_channel << "\t" << fTelID << endl;
 
@@ -129,6 +129,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     {
        if( fFileName[i].size() > 0 && !fPedFromPLine && !i_isDSTMC )
        {
+// readcalibDB: gains and toffs are read from the VDB
 	  if( fFileName[i].find( "gain" ) != string::npos && iReadCalibDB ) 
 	  {
 	     fFile[i] = 0;
@@ -136,6 +137,11 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	  else if( fFileName[i].find( "toff" ) != string::npos && iReadCalibDB )
 	  {
 	     fFile[i] = 0;
+          }
+// tzero calculation (file is opened later)
+          else if( fFileName[i].find( "tzero" ) != string::npos && iRunMode == 7 )
+          {
+             fFile[i] = 0;
           }
 	  else
 	  {

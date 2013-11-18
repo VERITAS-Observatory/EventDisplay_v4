@@ -1571,9 +1571,6 @@ void VCalibrator::readGains( bool iLowGain )
     string iFile = fGainFileNameC[getTelID()];
     if( iLowGain ) iFile = fLowGainGainFileNameC[getTelID()];
 
-
-
-
 // don't read gains for runmode = 2
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
     {
@@ -1951,7 +1948,7 @@ void VCalibrator::initialize()
 				     || (getRunParameter()->fsourcetype == 2 && getRunParameter()->fsimu_pedestalfile.size() > 0 ) ),
 				     getRunParameter()->freadCalibfromDB,
 				     isDST_MC(),
-	                             getDebugFlag() );
+	                             getDebugFlag(), getRunParameter()->frunmode );
         if( fReader->getDataFormat() == "grisu" ) fCalData.back()->setReader( fReader );
    }
 // define histograms and output files for pedestal calculation
