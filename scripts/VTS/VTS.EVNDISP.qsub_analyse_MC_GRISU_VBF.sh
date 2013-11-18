@@ -30,7 +30,12 @@ if( $ARRAY == "V4" ) then
    if( $PART == "1" ) then
 #      set IFIL=Nov10_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
 #       set IFIL=Apr12_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
-      set IFIL=Oct2012_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      if( $ATMO == "21" ) then
+         set IFIL=Oct2012_oa_ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      endif
+      if( $ATMO == "22" ) then
+         set IFIL=Nov10_oa__ATM"$ATMO"_"$ZEW"deg_"$WOG"
+      endif
       set RUN=( "wobb" )
       set SRUN=47460
       set NRUN=1
@@ -199,7 +204,7 @@ echo "EVNDISP log file written to $ODIR/$RRR.log"
 ##############################################################################################
 echo "CALCULATING AVERAGE TZEROS FOR RUN $SRUN"
 rm -f $ODIR/$SRUN.tzero.log
-$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$SRUN -deadchannelfile $DEAD -arraycuts $ACUT -teltoana=$TTA -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==5000 $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$SRUN.tzero.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$SRUN -deadchannelfile $DEAD -arraycuts $ACUT -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==5000 $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$SRUN.tzero.log
 
 
 ##############################################################################################
