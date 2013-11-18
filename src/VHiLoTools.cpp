@@ -476,7 +476,7 @@ int VHiLoTools::lowGainVector( TH2F *hscat, TH1F *hlin, double xpos[10], double 
 
   for( int i = 0; i < hlin->GetNbinsX()-1; i++ )
   {
-    if( abs(hlin->GetBinContent(i)) < 0.001 && hlin->GetBinContent(i+1) > 0. ) 
+    if( TMath::Abs(hlin->GetBinContent(i)) < 0.001 && hlin->GetBinContent(i+1) > 0. ) 
       vLimit.push_back( i );
   }
 

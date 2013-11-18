@@ -73,7 +73,7 @@ sRunParameter getRunParameter( string ifile )
 
     while( getline( is, is_line ) )
     {
-       if(  is_line.size() > 0 );
+       if( is_line.size() ==  0 ) continue;
        istringstream is_stream( is_line );
        is_stream >> temp;
        if( temp != "*" ) continue;
