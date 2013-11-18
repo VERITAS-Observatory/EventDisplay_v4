@@ -39,7 +39,7 @@ NZE=${#IZE[@]}
 WOFF=( 0.00 0.25 0.5 0.75 1.00 1.25 1.50 1.75 2.00 )
 NWOF=${#WOFF[@]}
 # noise levels
-INOI=( 075 100 150 200 250  325  425  550  750 1000 )
+INOI=( 075 100 150 200 250 325  425  550  750 1000 )
 # mean ped var
 # (short summation window)
 # determined from mean pedvar of simulations
@@ -98,7 +98,7 @@ do
 	 echo "   LOG DIR $LOGDIR"
 	 echo "   DATA DIR WITH TABLES $ODDIR"
 
-	 FNAM="$QLOG/MK-TBL.$DATE.MC-$ATMO-$ANAC-$RECID-${INOI[$i]}-${IZE[$N]}-${WOFF[$W]}-$ARRAY"
+	 FNAM="$QLOG/$ARRAY-MK-TBL.$DATE.MC-$ATMO-$ANAC-$RECID-${INOI[$i]}-${IZE[$N]}-${WOFF[$W]}-$ARRAY"
 	 rm -f $FNAM.sh
 
 	 sed -e "s|TABLEFILE|$TFIL|" \
@@ -117,7 +117,7 @@ do
 	 chmod u+x $FNAM.sh
 
 # submit job
-	qsub -V -l os=sl6 -l h_cpu=10:29:00 -l h_vmem=20000M -l tmpdir_size=1G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+	qsub -V -l os=sl6 -l h_cpu=3:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
         let "W = $W + 1"
      done
