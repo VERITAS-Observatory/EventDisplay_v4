@@ -19,6 +19,9 @@ mkdir -p $LDIR
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
+# temporary directory
+set DDIR=$TMPDIR/$RRRRR
+mkdir -p $DDIR
 
 #####################################
 # eventdisplay reconstruction parameter
@@ -82,10 +85,14 @@ endif
 #########################################
 # run eventdisplay
 rm -f $LDIR/$RUN.log
-./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $ODIR/$RUN.root $OPT >& $LDIR/$RUN.log
+./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $DDIR/$RUN.root $OPT >& $LDIR/$RUN.log
 
 #########################################
 # sleep for 20 s 
-sleep 20
+sleep 20s
+
+#########################################
+# mv data file from tmp dir to data dir
+mv -f -v $DDIR/$RUN.root $ODIR/$RUN.root
 
 exit
