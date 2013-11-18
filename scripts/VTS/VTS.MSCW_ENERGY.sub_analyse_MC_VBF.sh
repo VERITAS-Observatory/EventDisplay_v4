@@ -72,7 +72,7 @@ do
      do
        WOFF=${WOBBLE[$w]}
 
-      FNAM="$FSCRIPT-$ANAC-$RECID-$IZE-$NNOI-$WOFF-$PART"
+      FNAM="$ARRAY-$FSCRIPT-$ANAC-$RECID-$IZE-$NNOI-$WOFF-$PART"
       echo $FDIR/$FNAM
 
 # pass command line options to submission script
