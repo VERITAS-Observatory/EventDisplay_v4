@@ -109,7 +109,7 @@ echo "
 * SIMULATIONFILE_DATA $FFIL" > $LOGDIR/$FFIR.dat
 
 # set parameters in run script
-         FNAM="$QLOG/MK-EA.$REID.$DATE.MC"
+         FNAM="$QLOG/EA.$REID.$DATE.MC"
 
 	 sed -e "s|EFFFILE|$FFIR|" \
 	     -e "s|OOOOOOO|$ODDIR|" \
