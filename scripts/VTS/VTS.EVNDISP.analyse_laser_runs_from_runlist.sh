@@ -51,8 +51,6 @@ do
 
       echo $RUN
 
-      continue
-
       echo "checking telescope $i laser run $RUN data run $AFIL"
 
       echo "$GDIR/Tel_"$i"/$RUN.gain.root"

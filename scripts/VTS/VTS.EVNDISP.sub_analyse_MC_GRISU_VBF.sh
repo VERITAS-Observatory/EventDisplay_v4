@@ -104,7 +104,7 @@ do
    echo "SHELL AND LOG DIR $QLOGDIR"
 
    CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_GRISU_VBF"
-   OSCRIPT="qsub_evndisp_MC_VBF-$ZEW-$WOB-$NOIS-$ATMO-$f"
+   OSCRIPT="$ARRAY-qsub_evndisp_MC_VBF-$ZEW-$WOB-$NOIS-$ATMO-$f"
 
 # file number (useful for protons only)
     echo $CSCRIPT.sh
@@ -134,7 +134,7 @@ do
     chmod u+x $FDIR/$OSCRIPT.sh
 
 # submit the job
-   qsub -l os=sl6 -V -l h_cpu=41:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+    qsub -l os=sl6 -V -l h_cpu=41:29:00 -l h_vmem=6000M -l tmpdir_size=100G  -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
 
   done
 
