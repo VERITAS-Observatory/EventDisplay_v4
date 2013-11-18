@@ -1825,7 +1825,7 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
    {
       i_theta2_cut_max = getTheta2Cut_max( fData->Erec );
    }
-   else if( fEnergyReconstructionMethod == 1 || fEnergyReconstructionMethod == 2 )
+   else if( fEnergyReconstructionMethod == 1 )
    {
       i_theta2_cut_max = getTheta2Cut_max( fData->ErecS );
    }
