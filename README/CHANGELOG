@@ -1,6 +1,13 @@
 Change log eventdisplay analysis package
 ========================================
 
+*************************************************************
+******* 20131120 release of v4.30; trunk is now v4.31 *******
+*************************************************************
+
+* 20131118 (GM) updated calibration routines to remove root warnings
+                when running tzero calculation
+
 * 20131115 (GM) robust weighted rate calculation for sensitivity
                 estimation (CTA)
 
