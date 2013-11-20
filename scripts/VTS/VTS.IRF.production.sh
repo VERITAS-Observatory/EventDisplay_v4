@@ -22,7 +22,7 @@ RUN="$1"
 
 # VERITAS epoch
 ARRAY=( "V6" "V5" "V4" )
-ARRAY=( "V5" )
+ARRAY=( "V4" )
 # reconstruction IDs (=4 and 3-telescope combinations)
 ID=( "0" "1" "2" "3" "4" )
 ID=( "0" )
@@ -82,7 +82,7 @@ do
             do
                C=${CUTFIL[$c]}
                F=${CUTS[$c]}
-               D="$VERITAS_DATA_DIR/analysis/EVDv400/"$A"_FLWO/mscw_ATM"$W"_d20131031"
+               D="/lustre/fs5/group/cta/VERITAS/analysis/EVDv400/"$A"_FLWO/mscw_ATM"$W"_d20131031"
                ./VTS.EFFAREA.sub_analyse.sh $C $A"-"$F"-ATM"$W"-ID"$I $I 1234 $D
             done
          fi

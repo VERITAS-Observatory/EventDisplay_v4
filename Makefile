@@ -1430,7 +1430,7 @@ $(vtspara).tar.gz:
 
 $(vtscalirf).tar.gz:
 	@echo "bbb "
-	rm -rf $(vtspara).IRF.tar.gz  >/dev/null 2>&1
+	rm -rf $(vtspara).CAL.tar.gz  >/dev/null 2>&1
 	rm -rf $(distdir) >/dev/null 2>&1
 	mkdir -p $(vtspara)
 	mkdir -p $(vtspara)/Calibration/Tel_1
@@ -1445,22 +1445,22 @@ $(vtscalirf).tar.gz:
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_2/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_3/
 	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/[0-9][0-9][0-9][0-9][0-9][0-9][0-9].lpe* $(vtspara)/Calibration/Tel_4/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/*.lmult.root  $(vtspara)/Calibration/Tel_1/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/*.lmult.root  $(vtspara)/Calibration/Tel_2/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/*.lmult.root  $(vtspara)/Calibration/Tel_3/
-	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/*.lmult.root  $(vtspara)/Calibration/Tel_4/
+#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_1/*.lmult.root  $(vtspara)/Calibration/Tel_1/
+#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_2/*.lmult.root  $(vtspara)/Calibration/Tel_2/
+#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_3/*.lmult.root  $(vtspara)/Calibration/Tel_3/
+#	cp -r $(VERITAS_EVNDISP_AUX_DIR)/Calibration/Tel_4/*.lmult.root  $(vtspara)/Calibration/Tel_4/
 # NSB files for simulations
 	mkdir -p $(vtspara)/NOISE
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/NOISE/*.grisu $(vtspara)/NOISE
 # radial acceptances, effective areas, tables
-	mkdir -p $(vtspara)/RadialAcceptances
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-d20131031-* $(vtspara)/RadialAcceptances/
-	mkdir -p $(vtspara)/EffectiveAreas
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-d20131031* $(vtspara)/EffectiveAreas/
-	mkdir -p $(vtspara)/Tables
+#	mkdir -p $(vtspara)/RadialAcceptances
+#	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/RadialAcceptances/radialAcceptance-d20131115-* $(vtspara)/RadialAcceptances/
+#	mkdir -p $(vtspara)/EffectiveAreas
+#	cp -L $(VERITAS_EVNDISP_AUX_DIR)/EffectiveAreas/effArea-d20131031* $(vtspara)/EffectiveAreas/
+#	mkdir -p $(vtspara)/Tables
+#	cp -L $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_d20131115_GrI* $(vtspara)/Tables/
 # make tar file
-	cp -Lr $(VERITAS_EVNDISP_AUX_DIR)/Tables/table_d20131031_GrI* $(vtspara)/Tables/
-	cd $(vtspara) && tar -zcvf ../$(vtspara).IRF.tar.gz . && cd ..
+	cd $(vtspara) && tar -zcvf ../$(vtspara).CAL.tar.gz . && cd ..
 	rm -rf $(vtspara)
 
 ###############################################################################################################################
