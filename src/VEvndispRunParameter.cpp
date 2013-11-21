@@ -555,9 +555,11 @@ void VEvndispRunParameter::setSystemParameters()
 // get host name
     fEventDisplayHost = gSystem->HostName();;
 // get user name
-    if( gSystem->GetUserInfo() )
+    UserGroup_t* i_userGroup = gSystem->GetUserInfo();
+    if( i_userGroup )
     {
-       fEventDisplayUser = gSystem->GetUserInfo()->fUser;
+       fEventDisplayUser = i_userGroup->fUser;
+       delete i_userGroup;
     }
 // get system parameters
     fEventDisplayBuildCompiler = gSystem->GetBuildCompiler();
