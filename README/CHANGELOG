@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131121 (GM) added command line option to switch off npe filling
+                (CTA only)
+
 *************************************************************
 ******* 20131120 release of v4.30; trunk is now v4.31 *******
 *************************************************************

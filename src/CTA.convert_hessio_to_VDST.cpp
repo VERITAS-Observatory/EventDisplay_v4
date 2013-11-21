@@ -58,6 +58,8 @@ struct trgmask_hash_set *fTriggerMask_hash_set = 0;
 #endif
 // minimum number of photo electrons needed for trigger type 4
 int fMinNumber_pe_per_telescope = 30;
+// fill leaf with photoelectrons
+bool fFillPELeaf = false;
 ///////////////////////////////////////////////////////
 
 /*!
@@ -220,6 +222,7 @@ static void syntax (char *program)
    printf("   -t triggmask.file.gz (file with trigger mask (corrections for Spring 2013 prod2 production)\n");
    printf("   -r on=1/off=0    (apply camera plate scaling for DC telescopes; default=1)\n" );
    printf("   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );      
+   printf("   -pe              (fill leaf with photoelectrons into DST tree (default: off)\n" );
 
    exit(1);
 }
@@ -577,7 +580,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 // set low gain switch
 		fData->fDSTHiLo[i_ntel_data][p] = iLowGain;
 // pe count
-		fData->fDSTPe[i_ntel_data][p] = hsdata->mc_event.mc_pe_list[telID].pe_count[p];										
+		if( fFillPELeaf ) fData->fDSTPe[i_ntel_data][p] = hsdata->mc_event.mc_pe_list[telID].pe_count[p];										
 // fill FADC trace
 		unsigned int iTraceIsZero = 1;
    	        if( iWriteFADC )
@@ -1278,6 +1281,13 @@ int main(int argc, char **argv)
 	 argv += 2;
 	 continue;
       }
+      else if (strcmp(argv[1],"-pe") == 0 )
+      {
+         fFillPELeaf = true;
+	 argc--;
+	 argv++;
+	 continue;
+      }
       else if (strcmp(argv[1],"-r") == 0 )
       {
          fApplyCameraScaling = atoi( argv[2] );
@@ -1398,6 +1408,7 @@ int main(int argc, char **argv)
    {
        read_trigger_mask( trg_mask_file );
    }
+
 
 /////////////////////////////////////////////
 // Loop over all data in the input data file
