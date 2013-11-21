@@ -205,7 +205,7 @@ bool VPlotCTAArrayLayout::readArrayFromRootFile( string iFile )
        else if( iTelType == 10007818 || iTelType == 10408418 || iTelType == 10008118 )
        {
            fTelescopeList.back()->fTelTypeName = "12m-MST";
-           fTelescopeList.back()->fMarkerColor = 9;
+           fTelescopeList.back()->fMarkerColor = 1;
            fTelescopeList.back()->fMarkerSize = 1.5;
        }
 // large pixel MSTs (4)

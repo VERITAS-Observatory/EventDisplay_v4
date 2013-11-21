@@ -120,7 +120,7 @@ bool trainReconstructionQuality( VTMVARunData *iRun, unsigned int iEnergyBin )
 }
 
 
-bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSeparation )
+bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iTrainGammaHadronSeparation )
 {
 // sanity checks
     if( !iRun ) return false;
@@ -144,8 +144,8 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSepara
     TMVA::Factory *factory = new TMVA::Factory( iRun->fOutputFileName.c_str(), iRun->fOutputFile[iEnergyBin], "V" );
 
 ////////////////////////////
-// gamma/hadron separation
-    if( iGammaHadronSeparation )
+// train gamma/hadron separation
+    if( iTrainGammaHadronSeparation )
     {
 // adding signal and background trees
        for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
@@ -158,7 +158,7 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSepara
        }
    }
 ////////////////////////////
-// reconstruction quality
+// train reconstruction quality
    else
    {
        for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
@@ -187,7 +187,8 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSepara
    }
 
 // loop over all trainingvariables and add them to TMVA
-// (test first if variable is constant)
+// (test first if variable is constant, TMVA will stop when a variable
+//  is constant)
    for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
    {
       if( iRun->fTrainingVariable[i].find( "NImages_Ttype" ) != string::npos )
@@ -256,10 +257,12 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSepara
 
    for( unsigned int i = 0; i < iRun->fMVAMethod.size(); i++ )
    {
+//////////////////////////
 // BOOSTED DECISION TREES
        if( iRun->fMVAMethod[i] == "BDT" )
        {
-	  sprintf( htitle, "BDT_%d", iEnergyBin );
+	  if( iTrainGammaHadronSeparation ) sprintf( htitle, "BDT_%d", iEnergyBin );
+	  else                              sprintf( htitle, "BDT_RecQuality_%d", iEnergyBin );
 	  if( i < iRun->fMVAMethod_Options.size() )
 	  {
 	     factory->BookMethod( TMVA::Types::kBDT, htitle, iRun->fMVAMethod_Options[i].c_str() );
@@ -269,7 +272,9 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iGammaHadronSepara
 	     factory->BookMethod( TMVA::Types::kBDT, htitle );
           }
        }
+//////////////////////////
 // BOX CUTS
+// (note: box cuts needs additional checking, as it might be outdated)
        if( iRun->fMVAMethod[i] == "BOXCUTS" )
        {
           if( i < iRun->fMVAMethod_Options.size() )  sprintf( hname, "%s", iRun->fMVAMethod_Options[i].c_str() );
