@@ -1329,9 +1329,9 @@ $(distdir):	FORCEDISTDIR
 	mkdir -p $(distdir)/scripts/CTA
 	cp -r scripts/CTA/*.sh $(distdir)/scripts/CTA
 	cp -r scripts/CTA/*.list $(distdir)/scripts/CTA
-	cp -r -u scripts/CTA/CTA.EVNDISP* $(distdir)/scripts/CTA
+	cp -r scripts/CTA/CTA.EVNDISP* $(distdir)/scripts/CTA
 	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
-	cp -r -u scripts/VTS/VTS.EVNDISP* $(distdir)/scripts/VTS
+	cp -r scripts/VTS/VTS.EVNDISP* $(distdir)/scripts/VTS
 
 FORCEDISTDIR:
 	rm -rf $(distdir).tar.gz  >/dev/null 2>&1
