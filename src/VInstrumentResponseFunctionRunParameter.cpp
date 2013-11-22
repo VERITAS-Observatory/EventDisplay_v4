@@ -428,7 +428,6 @@ void VInstrumentResponseFunctionRunParameter::print()
        cout << endl;
        cout << "CR energy spectrum used for weighted rate histogram: ";
        cout << fCREnergySpectrumFile << "(ID" << fCREnergySpectrumID << ")" << endl;
-       if( fCREnergySpectrum ) fCREnergySpectrum->Print();
     }
     cout << endl << endl;
 }

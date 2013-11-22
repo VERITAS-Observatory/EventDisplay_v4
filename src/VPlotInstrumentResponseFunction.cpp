@@ -205,6 +205,7 @@ TCanvas *VPlotInstrumentResponseFunction::plotWeightedRate()
     {
        if( fData[i] && fData[i]->hWeightedRate )
        {
+          setHistogramPlottingStyle( fData[i]->hWeightedRate, i+1 );
           fData[i]->hWeightedRate->Draw( "same" );
        }
     }

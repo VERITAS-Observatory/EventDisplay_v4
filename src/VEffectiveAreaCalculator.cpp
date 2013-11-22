@@ -206,7 +206,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     hisTreeList->Add( hResponseMatrixFineQC );
 
 // weighted rate
-//  (use CTA binning, 5 bins per decade)
+// (use CTA binning, 5 bins per decade)
     sprintf( hname, "hWeightedRate" );
     hWeightedRate = new TH1D( hname, htitle, 30, -2.9, 3.1 );
     hWeightedRate->Sumw2();
@@ -1182,8 +1182,8 @@ void VEffectiveAreaCalculator::reset()
 
 // Important: changing this means probably that the values used in
 // VEffectiveAreaCalculatorMCHistograms have to be changed as well
-    fEnergyAxis_minimum_defaultValue = -2.;
-    fEnergyAxis_maximum_defaultValue = 4.;
+    fEnergyAxis_minimum_defaultValue = -2.0;
+    fEnergyAxis_maximum_defaultValue = 4.0;
 
     fCuts = 0;
 
@@ -1420,7 +1420,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 ///////////////////////////////////////////////////////
     Long64_t d_nentries = d->fChain->GetEntries();
     Long64_t i_start = 0;
-    if( fRunPara &&  fRunPara->fIgnoreFractionOfEvents > 0. )
+    if( fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
     {
        i_start = (Long64_t)(fRunPara->fIgnoreFractionOfEvents*d_nentries);
     }
@@ -2701,13 +2701,15 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h )
 /*   if( fRunPara->fViewcone_max > 0. )
    {
       O_cr = 2. * TMath::Pi() * (1.-cos( fRunPara->fViewcone_max * TMath::DegToRad()));
-   } */
+   }  */
 
 // normalization of MC spectrum
-   double c_mc = fRunPara->fIgnoreFractionOfEvents * h->GetEntries()
-                                 * (-1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. )
-                                    / ( TMath::Power( fRunPara->fMCEnergy_max, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. ) 
-                                      - TMath::Power( fRunPara->fMCEnergy_min, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. ) );
+   double c_ig = 1.;
+   if( fRunPara->fIgnoreFractionOfEvents > 0. ) c_ig = fRunPara->fIgnoreFractionOfEvents;
+   double c_mc = c_ig * h->GetEntries()
+               * (-1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. )
+               / ( TMath::Power( fRunPara->fMCEnergy_max, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. ) 
+                 - TMath::Power( fRunPara->fMCEnergy_min, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. ) );
 
 // number of MC events in this energy bin
    double n_mc = c_mc * TMath::Power( iEMC_TeV_lin, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) );

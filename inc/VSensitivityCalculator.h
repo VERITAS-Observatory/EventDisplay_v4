@@ -212,13 +212,14 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara, double dE_Log10 );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
-				       TH2D *iResponseMatrix = 0, bool iRateError = false, VMonteCarloRateCalculator* iMCRate = 0 );
+				       TH2D *iResponseMatrix = 0, bool iRateError = false, VMonteCarloRateCalculator* iMCRate = 0,
+                                       double i_ElowW = 0., double iE_upW = 0. );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
 	                               VEnergySpectrumfromLiterature i_Espec, unsigned int e_lit_ID,
 				       vector< double > e_gamma, vector< double > e, vector< double > eff, TH2D *iResponseMatrix = 0,
-				       VMonteCarloRateCalculator *iMCR = 0, TH1D* iWeightedRate = 0 );
-        double     getMonteCarloRateFromWeightedRateHistogram( unsigned int iE_low_bin, unsigned int iE_up_bin, bool iRateError,
-                                                               vector< double > energy, TH1D *iWeightedRateHistogram );
+				       bool iRateError = false, VMonteCarloRateCalculator *iMCR = 0, TH1D* iWeightedRate = 0,
+                                       double i_ElowW = 0., double iE_upW = 0. );
+        double     getMonteCarloRateFromWeightedRateHistogram( double iE_low, double iE_up, bool iRateError, TH1D *iWeightedRateHistogram );
                                          
 
 	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit = "ENERGY" );
@@ -298,6 +299,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,17);
+        ClassDef(VSensitivityCalculator,18);
 };
 #endif

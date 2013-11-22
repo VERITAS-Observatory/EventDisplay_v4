@@ -124,7 +124,10 @@ void VSpectralWeight::print()
    cout << "expect input (MC) energy spectra with index " << fMCSpectralIndex;
    cout << " in energy range [" << fMCMinEnergy_TeV_Lin << ", " << fMCMaxEnergy_TeV_Lin << "] TeV";
    cout << endl;
-   if( fMCMaxConeAngle_deg > 0. ) cout << "\t MC cone angle: " << fMCMaxConeAngle_deg << "[deg]";
-   if( fMCSimulatedEvents > 0. ) cout << ", # of MC events: " << fMCSimulatedEvents;
-   cout << "\t MC flux constant " << fMCFluxConstant << endl;
+   if( fMCMaxConeAngle_deg > 0. && fMCSimulatedEvents > 0. )
+   {
+      cout << "\t MC cone angle: " << fMCMaxConeAngle_deg << "[deg]";
+      cout << ", # of MC events: " << fMCSimulatedEvents;
+      cout << "\t MC flux constant " << fMCFluxConstant << endl;
+   }
 }

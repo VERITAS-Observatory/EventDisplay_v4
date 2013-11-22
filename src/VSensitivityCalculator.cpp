@@ -243,7 +243,7 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 	    bPasses_MinimumNumberofBackGroundEvents = true;
 	    bPasses_MinimumSystematicCut = true;
 	    bPassed_MinimumSignificance = true;
-         }
+         } 
 
 // sensitivity limitation histograms
         if( iFillStatistics != 0 )
@@ -768,7 +768,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	   s = i_b[1];
 	   s_error_L = i_b[0];
 	   s_error_U = i_b[2];
-	   cout << "\t Quantiles " << z << "\t" << i_b[1] << "\t" << i_b[0] << "\t" << i_b[2] << "\t" << iX.GetEntries() << endl;
+	   cout << "\t Quantiles " << i_b[1] << "\t" << i_b[1]-i_b[0] << "\t" << i_b[2]-i_b[1] << "\t" << iX.GetEntries() << endl;
+           cout << "\t Mean " << iX.GetMean() << " +- " << iX.GetRMS() << endl;
         }
 	else
 	{
@@ -1546,7 +1547,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	   {
 	      cout << "Energy scale offset (particle " << (*i_MCData_iterator).first << "): " << endl;
 	      cout << "   first bin gamma: " << fMC_Data[1]->energy[0] << endl;
-	      cout << "   first bin particle (*i_MCData_iterator).first: " << (*i_MCData_iterator).second->energy[0] << endl;
+	      cout << "   first bin particle " <<  (*i_MCData_iterator).first << ": " << (*i_MCData_iterator).second->energy[0] << endl;
 	      cout << "   bin size: " << iBinSize << endl;
 	      cout << "   offset (bin bins): " << (int)( ( fMC_Data[1]->energy[0] - (*i_MCData_iterator).second->energy[0] ) / iBinSize ) << endl;
            }
@@ -1687,9 +1688,11 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     for( unsigned int i = 0; i < v_flux.size(); i++ )
     {
         v_flux[i].NOn       = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab, 
-	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, false, &iMCR );
+	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, false, &iMCR,
+                                                  v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
 	v_flux[i].NOn_error = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab,
-	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, true, &iMCR );
+	                                        *fMC_Data[1], fMC_Data[1]->hResponseMatrix, true, &iMCR,
+                                                  v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
     }
 
 
@@ -1728,12 +1731,14 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea,
-								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR, (*i_MCData_iterator).second->hWeightedRate );
+								   (*i_MCData_iterator).second->hResponseMatrix, false, &iMCR, (*i_MCData_iterator).second->hWeightedRate,
+                                                                   v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
             v_flux_NOff_error[(*i_MCData_iterator).first][i] =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin,
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea_error,
-								   (*i_MCData_iterator).second->hResponseMatrix, &iMCR, (*i_MCData_iterator).second->hWeightedRate );
+								   (*i_MCData_iterator).second->hResponseMatrix, true, &iMCR, (*i_MCData_iterator).second->hWeightedRate,
+                                                                   v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // take care of space angle and theta2 cut normalisation
@@ -1973,18 +1978,15 @@ void VSensitivityCalculator::setMonteCarloParameters( unsigned int iParticleID,
    return rate (in [1/min]) from weighted rate histograms calculated in effective area code
 
 */
-double VSensitivityCalculator::getMonteCarloRateFromWeightedRateHistogram( unsigned int iE_low_bin, unsigned int iE_up_bin, bool iRateError,
-                                                                           vector< double > energy, TH1D *iWeightedRateHistogram )
+double VSensitivityCalculator::getMonteCarloRateFromWeightedRateHistogram( double iE_low, double iE_up, bool iRateError, TH1D *iWeightedRateHistogram )
 {
-    if( !iWeightedRateHistogram || energy.size() == 0 ) return 0.;
+    if( !iWeightedRateHistogram ) return 0.;
+    iE_low = log10( iE_low )+0.01;
+    iE_up  = log10( iE_up )-0.01;
 
 // find lower bin (assume identical binning in weightedratehistogram and energy vector
-    int iHis_minBin = 0;
-    if( iE_low_bin < energy.size() ) iHis_minBin = iWeightedRateHistogram->GetXaxis()->FindBin( energy[iE_low_bin] );
-    else return 0.;
-    int iHis_maxBin = 0;
-    if( iE_up_bin < energy.size() )  iHis_maxBin = iWeightedRateHistogram->GetXaxis()->FindBin( energy[iE_up_bin] );
-    else return 0.;
+    int iHis_minBin = iWeightedRateHistogram->GetXaxis()->FindBin( iE_low );
+    int iHis_maxBin = iWeightedRateHistogram->GetXaxis()->FindBin( iE_up );
 
     double iR = 0.;
     for( int i = iHis_minBin; i <= iHis_maxBin; i++ )
@@ -1995,7 +1997,7 @@ double VSensitivityCalculator::getMonteCarloRateFromWeightedRateHistogram( unsig
        }
        else
        {
-          iR += sqrt( iWeightedRateHistogram->GetBinError( i ) );
+          iR += iWeightedRateHistogram->GetBinError( i )*iWeightedRateHistogram->GetBinError( i );
        }
     }
     if( iRateError && iR > 0. ) return sqrt( iR );
@@ -2014,10 +2016,11 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
                                                    VEnergySpectrumfromLiterature i_Espec, 
 						   VSensitivityCalculatorDataResponseFunctions iMCPara,
 						   TH2D *hResponseMatrix,
-						   bool iRateError, VMonteCarloRateCalculator *iMCR )
+						   bool iRateError, VMonteCarloRateCalculator *iMCR,
+                                                   double iE_low, double iE_up )
 {
 // first choice: use weighted rate histograms if available
-    if( iMCPara.hWeightedRate ) return getMonteCarloRateFromWeightedRateHistogram( iE_low_bin, iE_up_bin, iRateError, iMCPara.energy, iMCPara.hWeightedRate );
+    if( iMCPara.hWeightedRate ) return getMonteCarloRateFromWeightedRateHistogram( iE_low, iE_up, iRateError, iMCPara.hWeightedRate );
 
 // otherwise use effective areas to calculate MC rates
     if( !iMCR ) return 0.;
@@ -2037,10 +2040,12 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
 double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsigned int iE_up_bin, 
                                                    VEnergySpectrumfromLiterature i_Espec, unsigned int e_lit_ID,
 						   vector< double > e_gamma, vector< double > e, vector< double > eff,
-						   TH2D *hResponseMatrix, VMonteCarloRateCalculator *iMCR, TH1D *iWeightedRate )
+						   TH2D *hResponseMatrix, bool iRateError,
+                                                   VMonteCarloRateCalculator *iMCR, TH1D *iWeightedRate,
+                                                   double iE_low, double iE_up )
 {
 // first choice: use weighted rate histograms if available
-    if( iWeightedRate ) return getMonteCarloRateFromWeightedRateHistogram( iE_low_bin, iE_up_bin, false, e_gamma, iWeightedRate );
+    if( iWeightedRate ) return getMonteCarloRateFromWeightedRateHistogram( iE_low, iE_up, iRateError, iWeightedRate );
 
 // otherwise use effective areas to calculate MC rates
     if( !iMCR ) return 0.;
@@ -2114,56 +2119,80 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
         bFound = true;
 
 /////////////////////////////////////////////////////////
-// fill effective areas vs reconstructed energy (log10!)
-        for( int n = 0; n < c->nbins; n++ )
-        {
-// fill effective areas vs MC energy
-// require more than one event per pair of bins 
-// (effective areas are usually in finer bins than differential sensitivity)
-	    if( ( c->hEcutUW &&
-		c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) ) + 
-		c->hEcutUW->GetBinContent( c->hEcutUW->FindBin( c->e0[n] ) + 1 ) > 1. )
-	     || !c->hEcutUW )
-	    {
-// check energy range
-//	       if( c->e0[n] < iMCPara->energy_min_log || c->e0[n] > iMCPara->energy_max_log ) continue;
-	       if( c->hEmc->GetBinLowEdge( c->hEmc->FindBin( c->e0[n] ) ) < iMCPara->energy_min_log ) continue;
-	       if( c->hEmc->GetBinLowEdge( c->hEmc->FindBin( c->e0[n] ) ) + c->hEmc->GetBinWidth( c->hEmc->FindBin( c->e0[n] ) ) > iMCPara->energy_max_log ) continue;
-// fill energy values
-	       iMCPara->energy.push_back( c->e0[n] );
-	       if( c->hEmc )
-	       {
-		 iMCPara->energy_lowEdge.push_back( c->hEmc->GetBinLowEdge( c->hEmc->FindBin( c->e0[n] ) ) );
-		 iMCPara->energy_upEdge.push_back( iMCPara->energy_lowEdge.back() + c->hEmc->GetBinWidth( c->hEmc->FindBin( c->e0[n] ) ) );
-	       }
-	       else
-	       {
-		 iMCPara->energy_lowEdge.push_back( -1. );
-		 iMCPara->energy_upEdge.push_back( -1. );
-	       }
+// get weighted rate histograms
+// 
+//   used for energy binning
+  
+// copy weighted rate histogram
+      if( c->hWeightedRate )
+      {
+          char hname[1000];
+          sprintf( hname, "%s_%s_%d_%d_%d", c->hWeightedRate->GetName(), iMCPara->fName.c_str(), 
+                                            (int)(iMCPara->woff*1000), iMCPara->az, (int)(iMCPara->index*100) );
+          iMCPara->hWeightedRate->SetName( hname );
+          iMCPara->hWeightedRate->SetTitle( c->hWeightedRate->GetTitle() );
+          iMCPara->hWeightedRate->SetBins( c->hWeightedRate->GetNbinsX(), 
+                                           c->hWeightedRate->GetXaxis()->GetXmin(), c->hWeightedRate->GetXaxis()->GetXmax() );
+          for( int i = 0; i <= c->hWeightedRate->GetNbinsX(); i++ )
+          {
+             iMCPara->hWeightedRate->SetBinContent( i, c->hWeightedRate->GetBinContent( i ) );
+             iMCPara->hWeightedRate->SetBinError(   i, c->hWeightedRate->GetBinError( i ) );
+          }
 
-	       iMCPara->effArea.push_back( c->eff[n] );
-	       iMCPara->effArea_error.push_back( 0.5*(c->seff_L[n]+c->seff_U[n]) );  
-	    }
-        }
+// set energy binning (note: this is fixed by hWeightedRate histogram)
+          for( int i = 1; i <= iMCPara->hWeightedRate->GetNbinsX(); i++ )
+          {
+              if( iMCPara->hWeightedRate->GetBinContent( i ) )
+              {
+                 iMCPara->energy.push_back( iMCPara->hWeightedRate->GetBinCenter( i ) );
+                 iMCPara->energy_lowEdge.push_back( iMCPara->hWeightedRate->GetBinLowEdge( i ) );
+                 iMCPara->energy_upEdge.push_back( iMCPara->hWeightedRate->GetBinLowEdge( i ) + iMCPara->hWeightedRate->GetBinWidth( i ) );
+              }
+           }
+
+/////////////////////////////////////////////////////////
+// fill effective areas vs reconstructed energy (log10!)
+
+         for( unsigned int i = 0; i < iMCPara->energy.size(); i++ )
+         {
+              int z = 0;
+              iMCPara->effArea.push_back( 0. );
+              iMCPara->effArea_error.push_back( 0. );
+              for( int n = 0; n < c->nbins; n++ )
+              {
+                  if( c->e0[n] > iMCPara->energy_lowEdge[i] && c->e0[n] < iMCPara->energy_upEdge[i] )
+                  {
+                     iMCPara->effArea.back() += c->eff[n];
+                     iMCPara->effArea_error.back() += (0.5*(c->seff_L[n]+c->seff_U[n])*0.5*(c->seff_L[n]+c->seff_U[n]));
+                     z++;
+                  }
+              }
+              if( z > 0. )
+              {
+                 iMCPara->effArea.back() /= z;
+                 iMCPara->effArea_error.back() = sqrt( iMCPara->effArea_error.back() ) / z;
+              }
+         }
 // get global energy binning
-        if( c->hEmc )
-        {
-            iMCPara->effArea_Ebins = c->hEmc->GetNbinsX();
-            iMCPara->effArea_Emin  = c->hEmc->GetXaxis()->GetXmin();
-            iMCPara->effArea_Emax  = c->hEmc->GetXaxis()->GetXmax();
-	    cout << "\t global binning for effective areas: ";
-	    cout << " nbin: " << iMCPara->effArea_Ebins;
-	    cout << " emin: " << iMCPara->effArea_Emin;
-	    cout << " emax: " << iMCPara->effArea_Emax;
-	    cout << endl;
-        }
-	else
-	{
+         iMCPara->effArea_Ebins = iMCPara->hWeightedRate->GetNbinsX();
+         iMCPara->effArea_Emin  = iMCPara->hWeightedRate->GetXaxis()->GetXmin();
+         iMCPara->effArea_Emax  = iMCPara->hWeightedRate->GetXaxis()->GetXmax();
+         cout << "\t global binning for effective areas: ";
+         cout << " nbin: " << iMCPara->effArea_Ebins;
+         cout << " emin: " << iMCPara->effArea_Emin;
+         cout << " emax: " << iMCPara->effArea_Emax;
+         cout << endl;
+         cout << "\t effective area vector size: " << iMCPara->energy.size();
+         if( iMCPara->energy.size() > 0 ) cout << " [" << iMCPara->energy[0];
+         if( iMCPara->energy.size() > 1 ) cout << "," << iMCPara->energy[iMCPara->energy.size()-1] << "]";
+         cout << endl;
+      }
+      else
+      {
 	    cout << "\t no global binning for effective areas found" << endl;
 	    iMCPara->effArea_Emin = 0.;
-        }
-        break;
+      }
+      break;
     }
 // remove single filled bins in effective areas
     bool bGoodBin = false;
@@ -2185,40 +2214,6 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	   }
        }
     }
-// adjust energy binning for differential sensitivity
-    if( dE_Log10 > 0. && iMCPara->energy_upEdge.size() > 1 )
-    {
-// make sure that high energy bin edge corresponds to a bin edge in differential sensitivity binning
-       unsigned int z = 0;
-       double iDiff =  TMath::Abs( iMCPara->energy_upEdge[iMCPara->energy_upEdge.size()-1]/dE_Log10
-                     - TMath::Nint(iMCPara->energy_upEdge[iMCPara->energy_upEdge.size()-1]/dE_Log10) );
-       unsigned int nCounter = iMCPara->energy_upEdge.size()-2;
-       while( iDiff > 1.e-3 && nCounter != 1 )
-       {
-          iDiff = TMath::Abs( iMCPara->energy_upEdge[nCounter]/dE_Log10-TMath::Nint(iMCPara->energy_upEdge[nCounter]/dE_Log10) );
-	  z++;
-	  nCounter--;
-       }
-       z = iMCPara->energy_upEdge.size() - z;
-       if( z > 0 && z < iMCPara->energy_upEdge.size()-1 )
-       {
-	  cout << "Adjusting effective areas to binning for differential sensitivity, removing " << z << " point(s) at upper edge" << endl;
-          iMCPara->energy.erase( iMCPara->energy.begin()+z, iMCPara->energy.end() );
-          iMCPara->energy_upEdge.erase( iMCPara->energy_upEdge.begin()+z, iMCPara->energy_upEdge.end() );
-          iMCPara->energy_lowEdge.erase( iMCPara->energy_lowEdge.begin()+z, iMCPara->energy_lowEdge.end() );
-          iMCPara->effArea.erase( iMCPara->effArea.begin()+z, iMCPara->effArea.end() );
-          iMCPara->effArea_error.erase( iMCPara->effArea_error.begin()+z, iMCPara->effArea_error.end() );
-       }
-       if( iMCPara->energy.size() > 0 )
-       {
-	  cout << "\t lowest energy bin (log10): " << iMCPara->energy[0];
-	  cout << "\t [" << iMCPara->energy_lowEdge[0] << ", " << iMCPara->energy_upEdge[0] << "]" << endl;
-	  cout << "\t highest energy bin (log10): " << iMCPara->energy[iMCPara->energy.size()-1] << "\t [";
-	  cout << iMCPara->energy_lowEdge[iMCPara->energy_lowEdge.size()-1] << ", ";
-	  cout << iMCPara->energy_upEdge[iMCPara->energy_upEdge.size()-1] <<  "]" << endl;
-       }
-    }
-    cout << "\t total number of bins in effective area after adjustment: " << iMCPara->energy.size() << endl;
     if( !bFound ) cout << "\t no effective area found!" << endl;
 // (end of treatment of effective areas)
 
@@ -2250,22 +2245,6 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		iMCPara->hResponseMatrix->SetBinContent( i, j, i_hResponse->GetBinContent( i, j ) );
 	     }
 	  }
-       }
-   }
-// copy weighted rate histogram (if available)
-   if( c->hWeightedRate )
-   {
-       char hname[1000];
-       sprintf( hname, "%s_%s_%d_%d_%d", c->hWeightedRate->GetName(), iMCPara->fName.c_str(), 
-                                         (int)(iMCPara->woff*1000), iMCPara->az, (int)(iMCPara->index*100) );
-       iMCPara->hWeightedRate->SetName( hname );
-       iMCPara->hWeightedRate->SetTitle( c->hWeightedRate->GetTitle() );
-       iMCPara->hWeightedRate->SetBins( c->hWeightedRate->GetNbinsX(), 
-                                        c->hWeightedRate->GetXaxis()->GetXmin(), c->hWeightedRate->GetXaxis()->GetXmax() );
-       for( int i = 0; i <= c->hWeightedRate->GetNbinsX(); i++ )
-       {
-           iMCPara->hWeightedRate->SetBinContent( i, c->hWeightedRate->GetBinContent( i ) );
-           iMCPara->hWeightedRate->SetBinError(   i, c->hWeightedRate->GetBinError( i ) );
        }
    }
 
@@ -3053,6 +3032,7 @@ double VSensitivityCalculatorDataResponseFunctions::getSolidAngle_DirectionCut( 
 void VSensitivityCalculatorDataResponseFunctions::initializeHistograms( string iU )
 {
    char hname[1000];
+// preliminary initialization
    sprintf( hname, "%s_%d_%d_%d_%d_%s", fName.c_str(), fParticleID, (int)(woff*1000), az, (int)(index*100), iU.c_str() );
    hResponseMatrix = new TH2D( hname, "B", 5, 0., 1., 5, 0., 1. );
    sprintf( hname, "%s1D_%d_%d_%d_%d_%s", fName.c_str(), fParticleID, (int)(woff*1000), az, (int)(index*100), iU.c_str() );
