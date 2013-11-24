@@ -1506,6 +1506,8 @@ bool VGammaHadronCuts::initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWe
 
     fTMVAEvaluator = new VTMVAEvaluator();
     fTMVAEvaluator->setDebug( fDebug );
+// smoothing of MVA values
+    fTMVAEvaluator->setSmoothAndInterPolateMVAValues( true );
 // set parameters for optimal MVA cut value search
     if( fTMVAOptimizeSignalEfficiencyParticleNumberFile.size() > 0. )
     {
@@ -1898,7 +1900,6 @@ double VGammaHadronCuts::getTheta2Cut_max( double e )
 // optimal theta2 cut
        else if( fDirectionCutSelector == 4 && fTMVAEvaluator )
        {
-// XXXXXXXXX check if this has been changed to used the box cut graph and eval
            theta_cut_max = fTMVAEvaluator->getOptimalTheta2Cut( e );
 	   if( theta_cut_max > 0. ) theta_cut_max = TMath::Sqrt( theta_cut_max );
 	   else                     theta_cut_max = 0.;
@@ -1995,7 +1996,7 @@ bool VGammaHadronCuts::initAngularResolutionFile()
 	 return false;
       }
 // TODO: this should go in the future
-// (currently there should be only one entry in the angular resolution tree)
+// (currently there should be only one entry in the angular resolution tree, which is the case in the CTA analysis)
       if( t->GetEntries() != 1 )
       {
          cout << "VGammaHadronCuts::initAngularResolutionFile error: invalid number of entries in instrument response function tree ";
@@ -2003,7 +2004,7 @@ bool VGammaHadronCuts::initAngularResolutionFile()
 	 cout << "   (as we do not know which tree entry to select...)" << endl;
 	 return false;
       }
-// read the tree data
+// read the tree data and clone the angular resolution graph
       VInstrumentResponseFunctionData* c = 0;
       TBranch *br = t->GetBranch( "IRF" );
       br->SetAddress( &c );

@@ -101,6 +101,8 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    double   fTMVA_EvaluationResult;         // result from TVMA evaluator
    bool     fTMVA_OptimizeAngularContainment; // optimize angular containment (using angular resolution vs containment histograms
 
+   bool     fSmoothAndInterpolateMVAValues;
+
    string   fTMVAMethodName;
    bool     fTMVAMethodName_BOXCUTS;
    unsigned int fTMVAMethodCounter;
@@ -162,6 +164,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 						  TGraph* iGSignalEvents, TGraph* iGBackgroundEvents,
 						  TGraph* iGOpt_AngularContainmentRadius, TGraph *iGOpt_AngularContainmentFraction );
    void     reset();
+   void     smoothAndInterPolateMVAValue( TH1F*, TH1F* );
 
    public:
 
@@ -185,7 +188,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    bool   isBoxCuts() { return fTMVAMethodName_BOXCUTS; }
    bool   IsZombie() { return fIsZombie; }
    void   plotBoxCuts();
-   void   plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
+   TGraphAsymmErrors* plotSignalAndBackgroundEfficiencies( bool iLogY = true, double iYmin = 1.e-4, double iMVA_min = -1., double iMVA_max = 1. );
    void   printAngularContainmentRadius();
    void   printSensitivityOptimizationParameters();
    void   printSignalEfficiency();
@@ -206,9 +209,10 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setPlotEfficiencyPlotsPerEnergy( bool iB = false ) { bPlotEfficiencyPlotsPerEnergy = iB; }
    void   setSignalEfficiency( double iSignalEfficiency = -99. );
    void   setSignalEfficiency( map< unsigned int, double > iMSignalEfficiency );
+   void   setSmoothAndInterPolateMVAValues( bool iS = true ) { fSmoothAndInterpolateMVAValues = iS; }
    void   setSpectralIndexForEnergyWeighting( double iS = -2. )  { fSpectralIndexForEnergyWeighting = iS; }
    void   setTMVAAngularContainmentThetaFixedMinRadius( double iR = 0. ) { fTMVAAngularContainmentThetaFixedMinRadius = iR; }
-   void   setTMVAAngularContainmentRadiusMax( double iC = 0.8 ) { fTMVAngularContainmentRadiusMax = iC; }
+   void   setTMVAAngularContainmentRadiusMax( double iC = 0.68 ) { fTMVAngularContainmentRadiusMax = iC; }
    void   setTMVAOptimizationEnergyStepSize( double iStep = 0.20 ) { fTMVAOptimizationStepsize = iStep; }
    void   setTMVACutValue( double iE = -99. );
    void   setTMVACutValue( map< unsigned int, double > iMVA );
@@ -216,7 +220,7 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
    void   setTMVAThetaCutVariable( bool iB = false ) { fTMVAThetaCutVariableSet = iB; }
    void   setTMVAMethod( string iMethodName = "BDT", unsigned int iMethodCounter = 0 );
 
-   ClassDef(VTMVAEvaluator, 21 );
+   ClassDef(VTMVAEvaluator, 23 );
 };
 
 #endif

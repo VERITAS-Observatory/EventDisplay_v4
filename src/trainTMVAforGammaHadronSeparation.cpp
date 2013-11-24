@@ -165,7 +165,7 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
        {
 	  factory->AddRegressionTree( iRun->fSignalTree[i], iRun->fSignalWeight );
        }
-       factory->AddTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
+       factory->AddRegressionTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
    }
 
 // quality cuts before filling
@@ -273,9 +273,24 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
           }
        }
 //////////////////////////
+// MLPs
+       else if( iRun->fMVAMethod[i] == "MLP" )
+       {
+	  if( iTrainGammaHadronSeparation ) sprintf( htitle, "MLP_%d", iEnergyBin );
+	  else                              sprintf( htitle, "MLP_RecQuality_%d", iEnergyBin );
+	  if( i < iRun->fMVAMethod_Options.size() )
+	  {
+	     factory->BookMethod( TMVA::Types::kMLP, htitle, iRun->fMVAMethod_Options[i].c_str() );
+          }
+	  else
+	  {
+	     factory->BookMethod( TMVA::Types::kMLP, htitle );
+          }
+       }
+//////////////////////////
 // BOX CUTS
 // (note: box cuts needs additional checking, as it might be outdated)
-       if( iRun->fMVAMethod[i] == "BOXCUTS" )
+       else if( iRun->fMVAMethod[i] == "BOXCUTS" )
        {
           if( i < iRun->fMVAMethod_Options.size() )  sprintf( hname, "%s", iRun->fMVAMethod_Options[i].c_str() );
 

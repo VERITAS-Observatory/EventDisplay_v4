@@ -58,6 +58,8 @@ void VTMVAEvaluator::reset()
    setTMVAAngularContainmentRadiusMax();
    fTMVA_EvaluationResult = -99.;
    fTMVACutValueNoVec = -99.;
+
+   setSmoothAndInterPolateMVAValues();
 }
 
 /*
@@ -462,6 +464,8 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName, unsigned int
       cout << fTMVAReader.size() << "\t" << fEnergyCut_Log10TeV_min.size() << "\t";
       cout << fEnergyCut_Log10TeV_max.size() << "\t" << fEnergyReconstructionMethod.size() << endl;
    }
+// smooth and interpolate
+   if( fParticleNumberFileName.size() > 0 && fSmoothAndInterpolateMVAValues ) smoothAndInterPolateMVAValue( 0, 0 );
 
 // print some info to screen
    cout << "VTMVAEvaluator: Initialized " << fTMVAReader.size() << " MVA readers " << endl;
@@ -946,24 +950,24 @@ void VTMVAEvaluator::plotBoxCuts()
      }
 }
 
-void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYmin, double iMVA_min, double iMVA_max )
+TGraphAsymmErrors* VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYmin, double iMVA_min, double iMVA_max )
 {
    if( fSignalEfficiency.size() == 0 )
    {
       cout << "TMVAEvaluator::plotSignalAndBackgroundEfficiencies error: signal efficiency vector with size 0" << endl;
-      return;
+      return 0;
    }
    if( fEnergyCut_Log10TeV_min.size() != fSignalEfficiency.size() )
    {
       cout << "TMVAEvaluator::plotSignalAndBackgroundEfficiencies error: signal efficiency of invalid size" << endl;
       cout << fEnergyCut_Log10TeV_min.size() << "\t" << fSignalEfficiency.size() << endl;
-      return;
+      return 0;
    }
    if( fEnergyCut_Log10TeV_max.size() != fSignalEfficiency.size() )
    {
       cout << "TMVAEvaluator::plotSignalAndBackgroundEfficiencies error: signal efficiency of invalid size" << endl;
       cout << fEnergyCut_Log10TeV_max.size() << "\t" << fSignalEfficiency.size() << endl;
-      return;
+      return 0;
    }
 
 // fill graphs
@@ -990,7 +994,7 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
 
    for( unsigned int i = 0; i < fSignalEfficiency.size(); i++ )
    {
-      double iEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
+     double iEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
                                                                           fSpectralIndexForEnergyWeighting );
       if( i < fTMVAOptimumCutValueFound.size() && i < fTMVACutValue.size()
        && fSignalEfficiency[i] > 0. && fBackgroundEfficiency[i] > 0. )
@@ -1089,6 +1093,7 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
       }
    }
 
+   return igCVa;
 }
 
 void VTMVAEvaluator::setSignalEfficiency( double iSignalEfficiency )
@@ -1706,6 +1711,83 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iEnergyBin, string iTMVAR
    }
 
    return true;
+}
+
+/*
+ 
+ smoothing of optimal cut value vs energy curves
+
+ missing (non-optimized) are interpolated
+
+ note: signal and background efficiencies are not updated
+
+*/
+void VTMVAEvaluator::smoothAndInterPolateMVAValue( TH1F* effS, TH1F* effB )
+{
+    if( fTMVACutValue.size() == 0 ) return;
+
+    cout << "Smooth and interpolate MVA cut values" << endl;
+
+// fill graph to be smoothed
+    TGraph *iG = new TGraph( 1 );
+    int z = 0;
+    for( unsigned int i = 0; i < fTMVACutValue.size(); i++ )
+    {
+       if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() )
+       {
+          double iEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
+                                                                              fSpectralIndexForEnergyWeighting );
+          if( i < fTMVAOptimumCutValueFound.size() && fTMVAOptimumCutValueFound[i] )
+          {
+             iG->SetPoint( z, iEnergy, fTMVACutValue[i] );
+             z++;
+          }
+       }
+    }
+// smooth graph
+    TGraph *iGout = new TGraph( 1 );
+    TGraphSmooth *iGSmooth = new TGraphSmooth("t");
+    iGout = (TGraph*)iGSmooth->SmoothKern( iG, "normal", 0.5, 100 );
+// fill smoothed and interpolated values into MVA vector 
+// set all points to 'optimized'
+    for( unsigned int i = 0; i < fTMVACutValue.size(); i++ )
+    {
+       if( i < fEnergyCut_Log10TeV_min.size() && i < fEnergyCut_Log10TeV_max.size() && i < fTMVAOptimumCutValueFound.size() )
+       {
+          double iEnergy = VMathsandFunctions::getSpectralWeightedMeanEnergy( fEnergyCut_Log10TeV_min[i], fEnergyCut_Log10TeV_max[i],
+                                                                              fSpectralIndexForEnergyWeighting );
+          cout << "\t TMVA values: unsmoothed at " << TMath::Power( 10., iEnergy ) << " TeV, \t" << fTMVACutValue[i];
+          fTMVACutValue[i] = iGout->Eval( iEnergy );
+          cout << ", smoothed " << fTMVACutValue[i];
+          if( !fTMVAOptimumCutValueFound[i] ) cout << " (interpolated non-optimal value)";
+          cout << " (" << i << ")" << endl;
+          fTMVAOptimumCutValueFound[i] = true;
+          if( effS )
+          {
+             if( i < fSignalEfficiency.size() )     fSignalEfficiency[i] = effS->GetBinContent( effS->FindBin( fTMVACutValue[i] ) );
+          }
+          if( effB )
+          {
+             if( i < fBackgroundEfficiency.size() )
+             {
+                 fBackgroundEfficiency[i] = effB->GetBinContent( effB->FindBin( fTMVACutValue[i] ) );
+// background efficiency might be zero -> fill it with first non-zero value
+                 if( fBackgroundEfficiency[i] < 1.e-8 )
+                 {
+                    int iS = effB->FindBin( fTMVACutValue[i] );
+                    for( int j = iS; j >0; j-- )
+                    {
+                        if( effB->GetBinContent( j ) > 0. )
+                        {
+                           fBackgroundEfficiency[i] = effB->GetBinContent( j );
+                           break;
+                        }
+                    }
+                }
+             }
+         }
+      }
+    }
 }
 
 void VTMVAEvaluator::getOptimalAngularContainmentRadius( double effS, double effB, double Ndif, double Nof, 
