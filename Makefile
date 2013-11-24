@@ -1378,7 +1378,8 @@ $(ctapara):
 # VTS
 #
 
-VTS.runfiles:	$(vtscalirf).tar.gz $(vtspara).tar.gz
+# VTS.runfiles:	$(vtscalirf).tar.gz $(vtspara).tar.gz
+VTS.runfiles:	$(vtspara).tar.gz
 
 $(vtspara).tar.gz:	
 	rm -rf $(vtspara).tar.gz  >/dev/null 2>&1
@@ -1413,6 +1414,7 @@ $(vtspara).tar.gz:
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EFFECTIVEAREA.runparameter $(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.global.runparameter $(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.runparameter $(vtspara)/ParameterFiles
+	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.SW18_noDoublePass.runparameter $(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.reconstruction.LGCalibration.runparameter $(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.specialchannels.dat $(vtspara)/ParameterFiles
 	cp -L $(VERITAS_EVNDISP_AUX_DIR)/ParameterFiles/EVNDISP.validchannels.dat $(vtspara)/ParameterFiles
