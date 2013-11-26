@@ -62,7 +62,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
 
     if( fTreeDet == 0 )
     {
-        fTreeDet = new TTree( "telconfig", "detector configuration" );
+        fTreeDet = new TTree( "telconfig", "detector configuration (v2)" );
 
         fTreeDet->Branch( "NTel", &fNTel, "NTel/i" );
 	fTreeDet->Branch( "TelID", &fTelID, "TelID/I" );
@@ -114,10 +114,10 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
             fTelzpos = iDet->getTelZpos()[i];
             fFocalLength = iDet->getFocalLength()[i];
 	    fFOV = iDet->getFieldofView()[i];
-	    if( i < iDet->getNMirrors().size() )   fMirrorArea = (int)iDet->getNMirrors()[i];
-	    else                                   fMirrorArea = 0;
-	    if( i < iDet->getMirrorArea().size() ) fNMirrors = (int)iDet->getMirrorArea()[i];
+	    if( i < iDet->getNMirrors().size() )   fNMirrors = (int)iDet->getNMirrors()[i];
 	    else                                   fNMirrors = 0;
+	    if( i < iDet->getMirrorArea().size() ) fMirrorArea = (int)iDet->getNMirrors()[i];
+	    else                                   fMirrorArea = 0;
             fCameraScaleFactor = iDet->getCameraScaleFactor()[i];
             fCameraCentreOffset = iDet->getCameraCentreOffset()[i];
             fCameraRotation = iDet->getCameraRotation()[i];
@@ -152,7 +152,12 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
 {
     if( !iDet || !iTree ) return false;
 
-    cout << "Filling detector tree: " << iTree->GetName() << endl;
+    cout << "Reading the detector tree: " << iTree->GetName() << endl;
+    
+// versioning due to bug in assigning mirror and nmirror variables
+    unsigned int iDetTreeVersion = 1;
+    string iN = iTree->GetTitle();
+    if( iN.find( "v2" ) != string::npos ) iDetTreeVersion = 2;
 
 // define tree
     float fFocalLength = 0.;
@@ -177,7 +182,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
     int fTubeOFF[fMaxPixel];
     for( unsigned int i = 0; i < fMaxPixel; i++ ) fTubeOFF[i] = 0;
     ULong64_t fTelType = 1;
-    int fTelID;
+    int fTelID = 0;
     int fNMirrors = 0;
     float fMirrorArea = 0.;
 
@@ -245,8 +250,18 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
 	iDet->setLowGainMultiplier( i, fHiLoScale );
 	iDet->setLowGainThreshold( i, (unsigned int)fHiLoThreshold );
 
-	iDet->getNMirrors()[i] = (unsigned int)fNMirrors;
-	iDet->getMirrorArea()[i] = fMirrorArea;
+// fudge to be able to read old files with mixup of mirror area and number of mirrors
+        if( iDetTreeVersion > 1 )
+        {
+           iDet->getNMirrors()[i] = (unsigned int)fMirrorArea;
+           iDet->getMirrorArea()[i] = (float)fNMirrors;
+        }
+        else
+        {
+           iDet->getNMirrors()[i] = (unsigned int)fNMirrors;
+           iDet->getMirrorArea()[i] = fMirrorArea;
+        }
+           
 
         for( unsigned int p = 0; p < nPixel; p++ )
         {
