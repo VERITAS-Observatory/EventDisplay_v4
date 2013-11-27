@@ -1840,15 +1840,19 @@ bool VArrayAnalyzer::updatePointingToStarCatalogue( unsigned int iTelescope )
 // get pointing of telescope
    float iTel_dec = 0.;
    float iTel_ra  = 0.;
-   if( iTelescope < getPointing().size() )
+   if( iTelescope < getPointing().size() && getPointing()[iTelescope] )
    {
       iTel_dec = getPointing()[iTelescope]->getTelDec() * TMath::RadToDeg();
       iTel_ra  = getPointing()[iTelescope]->getTelRA() * TMath::RadToDeg();
    }
-   else
+   else if( getArrayPointing() )
    {
       iTel_dec = getArrayPointing()->getTelDec() * TMath::RadToDeg();
       iTel_ra  = getArrayPointing()->getTelRA() * TMath::RadToDeg();
+   }
+   else
+   {
+       return false;
    }
    double iScale = 1.;
    if( iTelescope < getDetectorGeometry()->getCameraScaleFactor().size() )
