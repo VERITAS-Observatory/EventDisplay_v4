@@ -444,52 +444,38 @@ void VEvndispData::printDeadChannels( bool iLowGain )
 // The list is only produced when the evndisp option -printdeadpixelinfo is used.
 // To see the results, cd to where your *.evndisp.log files are, and do:
 // $ grep DEADCHAN <runnumber>.evndisp.log
-// Tel: Telescope number, 1-4
-// Gain: 0=Low Gain, 1=High Gain
 // Chan: Channel Number (not Pixel Number)
 void VEvndispData::printDeadChannelList() // DEADCHAN
 {
 
-unsigned int Telescope ;
-bool GainVec[2] ;
-GainVec[0]=true;
-GainVec[1]=false;
-bool iLowGain;
-unsigned int Gain ;
-
     cout << "==================================" << endl;
     cout << "Dead Channel Listing" << endl;
-// loop over gains
-for ( unsigned int kGain = 0 ; kGain < 2 ; kGain++ )
-{
-iLowGain = GainVec[kGain] ;
-if ( iLowGain)  Gain = 0 ;
-else Gain = 1 ;
+    // loop over gains
+    for ( unsigned int iHiLo = 0 ; iHiLo < 2 ; iHiLo++ )
+    {
+ 	// loop over telescopes
+	for ( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
+	{
+		setTelID( getTeltoAna()[jTel] ) ;
+		unsigned int ndead = 0;
 
-// loop over telescopes
-for ( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
-{
-setTelID( getTeltoAna()[jTel] ) ;
-Telescope = getTelID()+1 ;
-unsigned int idead = 0 ;
-
-// loop over dead channels
-for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
-{
-if( getDead( iLowGain )[i] > 0 )
-{
-bitset<8*sizeof(uint32_t)> i_dead = getDead( iLowGain )[i];
-printf( "   DEADCHAN Tel %d, Channel %3d, %s gain: ", Telescope, i, (Gain?" low":"high")  ) ;
-for( unsigned j = 0; j < i_dead.size(); j++ )
-{
-if( i_dead.test( j ) && j < fDeadChannelText.size() ) cout << " - " << fDeadChannelText[j] ;
-}
-cout << endl;
-if( !i_dead.test( 9 ) ) idead++;
-}
-}
-}
-}
+		// loop over dead channels
+		for( unsigned int iChan = 0; iChan < getDead( iHiLo ).size(); iChan++ )
+		{
+			if( getDead( iHiLo )[iChan] > 0 )
+			{
+				bitset<8*sizeof(uint32_t)> i_dead = getDead( iHiLo )[iChan];
+				printf( "   DEADCHAN Tel %d, Channel %3d, %s gain: ", getTelID()+1, iChan, (iHiLo?" low":"high")  ) ;
+				for( unsigned j = 0; j < i_dead.size(); j++ )
+				{
+					if( i_dead.test( j ) && j < fDeadChannelText.size() ) cout << " - " << fDeadChannelText[j] ;
+				}
+				cout << endl;
+				if( !i_dead.test( 9 ) ) ndead++;
+			}
+		}
+	}
+    }
     cout << "==================================" << endl;
 
 }
