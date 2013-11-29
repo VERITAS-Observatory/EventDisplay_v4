@@ -33,7 +33,14 @@ do
     DTEL=${AFIL:6}
     echo $AFIL $RUN $DTEL
     DFIL=`find -L $DDIR -name "$RUN.cvbf"`
-    $EVNDISPSYS/scripts/VTS/VTS.EVNDISP.analyse_laser_run $DTEL $DFIL
+
+    if [ -e $DFIL ]
+	 then
+	    $EVNDISPSYS/scripts/VTS/VTS.EVNDISP.analyse_laser_run $DTEL $DFIL
+         else
+	    echo "missing laser/flasher file $FIL"
+	    echo "please download"
+    fi
 done
 
 exit

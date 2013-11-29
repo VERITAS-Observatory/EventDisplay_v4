@@ -55,11 +55,11 @@ fi
 # source file
 
 # first check if source file exists
-SF=`find $VERITAS_DATA_DIR/data -name "$1.cvbf"`
+SF=`find -L $VERITAS_DATA_DIR/data -name "$1.cvbf"`
 if [ ${#SF} = 0 ]
 then
    echo
-   echo "ERROR: VERITAS source (VBF) file not found: $SF"
+   echo "ERROR: VERITAS source (VBF) file $1.cvbf not found in $VERITAS_DATA_DIR/data/"
    echo
    exit
 fi
