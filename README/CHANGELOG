@@ -1,6 +1,13 @@
 hange log eventdisplay analysis package
 ========================================
 
+* 20131201 (GM) spectral weighted mean is now used for the 
+                energy spectrum plotting (change index with
+		VEnergySpectrum::setPlottingSpectralWeightForBinCenter( double iIndex = -2.5 );
+
+* 20131201 (GM) significant additions to PPUT calculation and
+                sensitivity file merging (CTA)
+
 * 20131121 (GM) changed calculation of event rates in sensitivity
                 calculation - use CR spectral weighted histograms
                 (mainly for CTA)

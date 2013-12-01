@@ -88,7 +88,7 @@ void VDifferentialFlux::printClean( bool bSED )
 {
     if( !bSED )
     {
-        cout <<  setprecision( 3 ) << setw( 7 ) << Energy ;
+        cout <<  setprecision( 3 ) << setw( 7 ) << Energy;
 	cout << "    " << Energy_lowEdge << "    " << Energy_upEdge ;
         cout << "    " << dE ;
         if( DifferentialFluxError > 0. ) cout << scientific << setprecision( 3 ) <<  "\t " << DifferentialFlux << "   " << DifferentialFluxError;

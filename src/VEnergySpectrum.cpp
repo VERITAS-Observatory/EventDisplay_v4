@@ -1113,7 +1113,7 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
             gEnergySpectrum->SetMarkerStyle( fPlottingMarkerStyle );
         }
 // error on flux
-        gEnergySpectrum->SetPoint( z, log10( fDifferentialFlux[i].Energy ),
+        gEnergySpectrum->SetPoint( z, log10( fDifferentialFlux[i].EnergyWeightedMean ),
 	                              fDifferentialFlux[i].DifferentialFlux * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
 // error on differential flux 
         if( fErrorCalculationMethod == "Poisson" )
@@ -1128,6 +1128,7 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
         }
         z++;
     }
+    gEnergySpectrum->Print();
 // return graph 
     if( z > 0 ) return gEnergySpectrum;
 
