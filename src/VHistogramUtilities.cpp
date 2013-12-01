@@ -341,13 +341,16 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D *h, int ion, double rmax, 
     return h1D;
 }
 
-bool VHistogramUtilities::get_Graph_from_Histogram( TH1 *h, TGraphErrors *g, bool bIgnoreErrors, double iMinBinContent )
+bool VHistogramUtilities::get_Graph_from_Histogram( TH1 *h, TGraphErrors *g, bool bIgnoreErrors, double iMinBinContent,
+                                                     double iXmin, double iXmax )
 {
     if( !h || !g ) return false;
 
     unsigned int z = 0;
     for( int i = 1; i <= h->GetNbinsX(); i++ )
     {
+	if( h->GetXaxis()->GetBinCenter( i ) < iXmin ) continue;
+	if( h->GetXaxis()->GetBinCenter( i ) > iXmax ) continue;
         if( h->GetBinContent( i ) > iMinBinContent )
 	{
 	   g->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
@@ -359,13 +362,16 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1 *h, TGraphErrors *g, boo
     return true;
 }
 
-bool VHistogramUtilities::get_Graph_from_Histogram( TH1 *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis, double iCutUnrealisticErrors )
+bool VHistogramUtilities::get_Graph_from_Histogram( TH1 *h, TGraphAsymmErrors *g, bool bIgnoreErrors, bool bLinXaxis,
+                                                    double iCutUnrealisticErrors, double iXmin, double iXmax )
 {
     if( !h || !g ) return false;
 
     unsigned int z = 0;
     for( int i = 1; i <= h->GetNbinsX(); i++ )
     {
+	if( h->GetXaxis()->GetBinCenter( i ) < iXmin ) continue;
+	if( h->GetXaxis()->GetBinCenter( i ) > iXmax ) continue;
         if( h->GetBinContent( i ) > 0. )
 	{
 	   if( bIgnoreErrors )
@@ -516,6 +522,34 @@ TH1* VHistogramUtilities::normalizeTH1( TH1 *h, bool iIntegral )
    }
 
    return h;
+}
+
+bool VHistogramUtilities::divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, TGraph *g2, double epsilon )
+{
+   if( !g || !g1 || !g2 ) return false;
+
+   double x1 = 0.;
+   double y1 = 0.;
+
+   int z = 0;
+   for( int i = 0; i < g1->GetN(); i++ )
+   {
+       g1->GetPoint( i, x1, y1 );
+
+       double y2 = g2->Eval( x1 );
+
+       if( y1 != 0. )
+       {
+           g->SetPoint( z, x1, y2 / y1 );
+
+	   g->SetPointError( z, g1->GetErrorXlow( i ), g1->GetErrorXhigh( i ),
+			     y2 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) ) / y1 / y1,
+			     y2 * 0.5 * ( g1->GetErrorYhigh( i ) + g1->GetErrorYlow( i ) ) / y1 / y1 );
+           z++;
+       }
+   }
+
+   return true;
 }
 
 bool VHistogramUtilities::divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, double epsilon )

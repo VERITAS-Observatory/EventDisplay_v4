@@ -7,12 +7,7 @@
      WPPhysSensitivityPlotsMaker a;
      a.compareDataSets("DataSets.list");
 
-     with
-
-     DataSets.list
-
-     DESY.20130424.E1.ID2.ISDC3700m g85  180000 0. 3 1
-     DESY.20130424.E1.ID2.v_leeds   g85  180000 0. 1 1
+     with < DataSets.list > see example files
 
 */
 
@@ -42,42 +37,6 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
     setPlotRequirements();
 }
 
-bool VWPPhysSensitivityPlotsMaker::setListOfArrays( string iSubArrayFileTxt )
-{
-    return readList( iSubArrayFileTxt, fListOfArrays );
-}
-
-bool VWPPhysSensitivityPlotsMaker::setListOfDataSets( string iDataSetFileTxt )
-{
-    return readList( iDataSetFileTxt, fListofDataSets );
-}
-
-bool VWPPhysSensitivityPlotsMaker::readList( string iFileTxt, vector< string >& iList )
-{
-    iList.clear();
-
-    ifstream is;
-    is.open( iFileTxt.c_str(), ifstream::in );
-    if( !is ) return false;
-
-    string is_line;
-    while( getline( is, is_line ) ) 
-    {
-      iList.push_back( is_line );
-    }
-
-    if( iList.size() == 0 )
-    {
-        cout << "VWPPhysSensitivityPlotsMaker::readlist: no arrays given" << endl;
-	cout << "\t " << iFileTxt << endl;
-	return false;
-    }
-
-    cout << "found " << iList.size() << " entries" << endl;
-
-    return true;
-}
-
 void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile )
 {
    VPlotWPPhysSensitivity a;
@@ -86,11 +45,11 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile )
    a.addDataSets( iDataSetFile );
    a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3 );
    a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
-   a.plotSensitivityRatio( fPrintingOptions, 0.01, 2.1 );
+   a.plotSensitivityRatio( fPrintingOptions, 0.4, 3.1 ); 
 // Southern sites: 30 GeV - 100 TeV
    if( fPlotCTARequirements < 3 ) a.printSensitivityFigureOfMerit( 0.03, 100. );
 // Northern sites: 30 GeV - 20 TeV
-   else                           a.printSensitivityFigureOfMerit( 0.03, 20. );
+   else                           a.printSensitivityFigureOfMerit( 0.03, 20. ); 
 }
 
 void VWPPhysSensitivityPlotsMaker::printPlotCTARequirementsIDs()
@@ -104,40 +63,6 @@ void VWPPhysSensitivityPlotsMaker::printPlotCTARequirementsIDs()
    cout << "5 \t North, 0.5h, FOM for energy range [0.03,20]" << endl;
    cout << "(current settings is " << fPlotCTARequirements << ")" << endl;
    cout << endl;
-}
-
-/*
-
-    plot different data sets on top of each other
-
-*/
-void VWPPhysSensitivityPlotsMaker::compareDataSets( string iSubArray, string iDataSet )
-{
-    if( iSubArray.size() > 0 )
-    {
-        fListOfArrays.clear();
-	fListOfArrays.push_back( iSubArray );
-    }
-    if( iDataSet.size() > 0 )
-    {
-       fListofDataSets.clear();
-       fListofDataSets.push_back( iDataSet );
-    }
-    cout << "Compare " << fListOfArrays.size() << " arrays in " << fListofDataSets.size() << " data set" << endl;
-
-    for( unsigned int i = 0; i < fListOfArrays.size(); i++ )
-    {
-       VPlotWPPhysSensitivity a;
-       a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
-       for( unsigned int j = 0; j < fListofDataSets.size(); j++ )
-       {
-	  a.addDataSet( fListofDataSets[j], fListOfArrays[i], fObservingTime_s, 0.0, "", j+1, 1 );
-       }
-       string iP = "";
-       if( fPrintingOptions.size() > 0 ) iP = fPrintingOptions + "-" + fListOfArrays[i];
-       a.plotIRF( iP );
-       a.plotSensitivity( iP, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
-    }
 }
 
 void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray, string iDataSet )

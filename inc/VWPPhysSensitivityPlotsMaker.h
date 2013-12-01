@@ -32,17 +32,12 @@ class VWPPhysSensitivityPlotsMaker
     int   fPlotCTARequirements;
     bool  fPlotCTARequirementGoals; 
 
-    bool  getListOfDataSets( string iiDataSetFileTxt );
-    bool  getListOfArrays( string iSubArrayFileTxt );
-    bool  readList( string iFileTxt, vector< string >& iList );
-
     public:
 
     VWPPhysSensitivityPlotsMaker();
    ~VWPPhysSensitivityPlotsMaker() {}
 
     void compareDataSets( string iDataSetFile );
-    void compareDataSets( string iSubArray, string iDataSet );
     void compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet );
     void compareOffAxisSensitivities( string iSubArray = "", string iDataSet = "" );
     void printPlotCTARequirementsIDs();
@@ -50,8 +45,6 @@ class VWPPhysSensitivityPlotsMaker
     void setAxisUnits( double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
     void setEnergyRange_Lin_TeV( double iMinEnergy_TeV = 0.01, double iMaxEnergy_TeV = 200. )
                                 { fMinEnergy_TeV = iMinEnergy_TeV; fMaxEnergy_TeV = iMaxEnergy_TeV; }
-    bool setListOfArrays( string iSubArrayFileTxt );
-    bool setListOfDataSets( string iDataSetFileTxt );
     void setObservingTime( double i_s = 180000. ) { fObservingTime_s = i_s; }
     void setPrintingOptions( string iPrint = "" ) { fPrintingOptions = iPrint; }
     void setPlotRequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false ) { fPlotCTARequirements = iRequirementID;

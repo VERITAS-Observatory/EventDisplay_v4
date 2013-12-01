@@ -187,7 +187,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
        gEffArea_MC = new TGraphAsymmErrors( 1 );
        gEffArea_MC->SetName( "gEffArea_MC" );
        setGraphPlottingStyle( gEffArea_MC );
-       get_Graph_from_Histogram( h, gEffArea_MC, false, bLinX );
+       get_Graph_from_Histogram( h, gEffArea_MC, false, bLinX, -1., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max )  );
     }
     else gEffArea_MC = 0;
 
@@ -205,7 +205,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     if( !h ) h = (TH1F*)get_CTA_IRF_Histograms( "EnResol_RMS", fWoff );
     if( h )
     {
-       get_Graph_from_Histogram( h, gEnergyResolution, true );
+       get_Graph_from_Histogram( h, gEnergyResolution, true, 0., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max ) );
        setGraphPlottingStyle( gEnergyResolution );
     }
 ///////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     if( !h ) h = (TH1F*)get_CTA_IRF_Histograms_from2D( "EestOverEtrue", -1. );
     if( h )
     {
-       get_Graph_from_Histogram( h, gEnergyBias_Mean, true, -100. );
+       get_Graph_from_Histogram( h, gEnergyBias_Mean, true, -100., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max ) );
        setGraphPlottingStyle( gEnergyBias_Mean ); 
     }
 ///////////////////////////////////////////////////////////////
@@ -238,7 +238,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     }
     if( h )
     {
-       get_Graph_from_Histogram( h, gAngularResolution, true );   // ignore errors in resolution graph
+       get_Graph_from_Histogram( h, gAngularResolution, true, 0., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max ) );   // ignore errors in resolution graph
        setGraphPlottingStyle( gAngularResolution );
     }
 
@@ -259,7 +259,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
     }
     if( h )
     {
-       get_Graph_from_Histogram( h, gAngularResolution80, true );   // ignore errors in resolution graph
+       get_Graph_from_Histogram( h, gAngularResolution80, true, 0., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max ) );   // ignore errors in resolution graph
        setGraphPlottingStyle( gAngularResolution80 );
     }
     if( h )

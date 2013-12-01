@@ -167,6 +167,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 
 // plotting values
         TH1D*  hnull;
+	string fPlot_CanvasName;
 	int    fPlot_CanvasSize_x;
 	int    fPlot_CanvasSize_y;
         double fPlot_flux_PFLUX_min;
@@ -222,9 +223,8 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double     getMonteCarloRateFromWeightedRateHistogram( double iE_low, double iE_up, bool iRateError, TH1D *iWeightedRateHistogram );
                                          
 
-	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit = "ENERGY" );
+	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit, double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin );
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
-        TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
         void       plotEffectiveArea();
 	void       plotDebugPlotsBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
 						  map< unsigned int, vector< double > > i_flux_NOff,
@@ -268,6 +268,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         TCanvas* plotIntegralSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, string iAnasumCrabFile,
 	                                                          int iColor = 1, string bUnit = "CU",
 								  double iEnergyMin_TeV_lin = 0.01, double iEnergyMax_TeV_lin = 1.e6 );
+        TCanvas*   plotSensitivityvsEnergyFromCrabSpectrum( TCanvas *c, int iColor = 1, string bUnit = "CU", double dE_Log10 = 0.25 );
         void     plotSignificanceParameters( TCanvas *cSensitivity = 0 );
 	bool     printSensitivity();
         bool     removeDataSet( unsigned int iD );
@@ -275,6 +276,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	void     setBackgroundMissingParticleFraction( double iB = 0. ) { fMC_BackgroundMissingParticleFraction = iB; }
         void     setDebug( bool iDebug = true ) { fDebug = iDebug; }
 	void     setPlotCanvasSize( int x = 600, int y = 600 ) { fPlot_CanvasSize_x = x; fPlot_CanvasSize_y = y; }
+	void     setPlotCanvasName( string iN = "cSensitivity" ) { fPlot_CanvasName = iN; }
 	void     setPlotCrabFluxLineValues( vector< double > iF ) { fPlottingCrabFlux_CU = iF; }
         void     setPlotDebug( string iName ) { fPlotDebugName = iName; }
         bool     setCurrentDataSet( unsigned int iD );
@@ -292,6 +294,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 					  double iEnergy_min_log = -10., double iEnergy_max_log = 10., string bUnit = "CU" );
         void     setObservationTimeRange( double iObs_min = 0.5e-3, double iObs_max = 5.e4, int iObs_steps = 1000 );    // hours
 	void     setRequireCutsToBeOptimized( bool iB = true ) { fRequireCutsToBeOptimized = iB; }
+	void     setSensitivityGraph( TGraphAsymmErrors* g ) { gSensitivityvsEnergy = g; }
         void     setSignificanceParameter( double iSignificance = 5., double iMinEvents = 10., double iObservationTime = 50.,
 	                                   double iMinBackgroundRateRatio = 0.05, double alpha = 0.2 );
         void     setSourceStrengthRange_CU( double iMin = 0.01, double iMax = 1.5, double iStep = 0.005, bool iLog = false );
@@ -299,6 +302,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,18);
+        ClassDef(VSensitivityCalculator,19);
 };
 #endif

@@ -40,6 +40,8 @@ class VCTARequirements : public VPlotUtilities
   ~VCTARequirements() {}
 
    double  getFOVRequirement( double E_lin_TeV );
+   TGraph* getGoalDifferentialSensitivity() { return fGoalDifferentialSensitivity; }
+   TGraph* getRequiredDifferentalSensitivity() { return fReqDifferentialSensitivity; }
    void    listRequirementSets();
    void    plotRequirement_EnergyRange( TCanvas *c, bool iPlotGoalRequirements = false );
    TGraph* plotRequirement_AngularResolution( TCanvas *c, bool iPlotGoalRequirements = false );

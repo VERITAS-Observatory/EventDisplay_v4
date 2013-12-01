@@ -62,7 +62,8 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
     				            double iZe = 20., double iWoff = 0.5, int iAzBin = 0,
 					    double iIndex = 2.4, int iNoise = 200, string iA_MC = "A_MC",
 					    int iColor = -99, int iLineStyle = -99, 
-					    int iMarkerStyle = -99, float iMarkerSize = -99. );
+					    int iMarkerStyle = -99, float iMarkerSize = -99.,
+					    float iEmin_linTeV = 1.e-6, float iEmax_linTeV = 1.e6 );
     bool         checkDataSetID( unsigned int iDataSetID );
     bool         fitResolution( TGraphErrors *g  );
     TGraphErrors* getLastPlottedGraph() { return gLastPlottedGraph; }

@@ -78,22 +78,24 @@ bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, s
 bool VPlotInstrumentResponseFunction::addInstrumentResponseData( string iFile, double iZe, double iWoff,
                                                                  int iAzBin, double iIndex, int iNoise, string iA_MC,
 								 int iColor, int iLineStyle,
-								 int iMarkerStyle, float iMarkerSize )
+								 int iMarkerStyle, float iMarkerSize,
+								 float iEmin_linTeV, float iEmax_linTeV )
 {
-// read effective areas
-    VInstrumentResponseFunctionReader *iTempEffectiveArea = new VInstrumentResponseFunctionReader();
-    iTempEffectiveArea->setDebug( fDebug );
+// read IRF
+    VInstrumentResponseFunctionReader *iTempIRFReader = new VInstrumentResponseFunctionReader();
+    iTempIRFReader->setDebug( fDebug );
     if( iColor < 0 ) iColor = fData.size()+1;
     if( iLineStyle < 0 ) iLineStyle = 1;
     if( iMarkerStyle < 0 ) iMarkerStyle =  20+fData.size();
     if( iMarkerSize < 0 )  iMarkerSize  = 2.;
-    iTempEffectiveArea->setPlottingStyle( iColor, iLineStyle, 2., iMarkerStyle, iMarkerSize );
-    if( !iTempEffectiveArea->fillData( iFile, iZe, iWoff, iAzBin, iIndex, iNoise, iA_MC ) )
+    iTempIRFReader->setPlottingStyle( iColor, iLineStyle, 2., iMarkerStyle, iMarkerSize );
+    iTempIRFReader->setEnergyRange( iEmin_linTeV, iEmax_linTeV );
+    if( !iTempIRFReader->fillData( iFile, iZe, iWoff, iAzBin, iIndex, iNoise, iA_MC ) )
     {
-       cout << "VPlotInstrumentResponseFunction::addInstrumentResponseData() error filling effective area data" << endl;
+       cout << "VPlotInstrumentResponseFunction::addInstrumentResponseData() error filling effective area / IRF data" << endl;
        return false;
     }
-    fData.push_back( iTempEffectiveArea );
+    fData.push_back( iTempIRFReader );
 
     listDataSets();
 

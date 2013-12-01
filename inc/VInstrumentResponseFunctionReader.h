@@ -59,6 +59,9 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     double fIndex;
     int    fNoise;
 
+    float  fEnergyLinTeV_min;
+    float  fEnergyLinTeV_max;
+
 //////////////////////////////////
 // data
 //////////////////////////////////
@@ -128,8 +131,9 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TH2D* getMigrationMatrix() { return hERecMatrix; }
     bool isZombie() { return fIsZombie; }
     void setDebug( bool iDebug = true ) { fDebug = iDebug; }
+    void setEnergyRange( float iEmin_linTeV, float iEmax_linTeV ) { fEnergyLinTeV_min = iEmin_linTeV; fEnergyLinTeV_max = iEmax_linTeV; }
 
-    ClassDef( VInstrumentResponseFunctionReader, 8 );
+    ClassDef( VInstrumentResponseFunctionReader, 9 );
 };
 
 

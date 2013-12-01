@@ -32,14 +32,17 @@ class VHistogramUtilities
     VHistogramUtilities();
    ~VHistogramUtilities() {}
 
+   static bool      divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, TGraph *g2, double epsilon = 1.e-3 );
    static bool      divide( TGraphAsymmErrors *g, TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, double epsilon = 1.e-3 );
    int              findBinInGraph( TGraph *g, double x );
    TH1D*            get_Bin_Distribution( TH2D *h, int ion, double rmax, double rSource, bool iDiff, TH2D *hTest, 
                                           int iN = 0, float *x = 0, float *y = 0, float *r = 0 );
    TH1D*            get_Cumulative_Histogram( TH1D* iH_in, bool iNormalize, bool iLeft_to_right );
-   bool             get_Graph_from_Histogram( TH1* h, TGraphErrors* g, bool bIgnoreErrors = false, double iMinBinContent = 0. );
+   bool             get_Graph_from_Histogram( TH1* h, TGraphErrors* g, bool bIgnoreErrors = false, double iMinBinContent = 0.,
+                                              double iXmin = -1.e50, double iXmax = 1.e50 );
    bool             get_Graph_from_Histogram( TH1* h, TGraphAsymmErrors* g, bool bIgnoreErrors = false,
-                                              bool bLinXaxis = false, double iCutUnrealisticErrors = -1. );
+                                              bool bLinXaxis = false, double iCutUnrealisticErrors = -1.,
+					      double iXmin = -1.e50, double iXmax = 1.e50 );
    TGraphErrors*    get_Profile_from_TH2D( TH2D *iH, TGraphErrors*g = 0, string iM = "median", int i_rebin = 2, 
                                            double iXaxisValue = -10., double iMinusValue = 0. );
    static TH1D*     get_ResidualHistogram_from_TF1( string iname = "", TH1 *h = 0, TF1 *f = 0 );
@@ -58,7 +61,7 @@ class VHistogramUtilities
 
    void             setDebug( bool iB = true ) { fDebug = iB; }
 
-   ClassDefNV( VHistogramUtilities, 8 );
+   ClassDefNV( VHistogramUtilities, 10 );
 };
 
 #endif

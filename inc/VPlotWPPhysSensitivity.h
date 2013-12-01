@@ -24,31 +24,8 @@
 #include "VPlotInstrumentResponseFunction.h"
 #include "VPlotUtilities.h"
 #include "VSensitivityCalculator.h"
+#include "VSiteData.h"
 
-class VPlotWPPhysSensitivityData
-{
-   public:
-
-   string fAnalysis;
-   string fSensitivityFileName; 
-   bool   fFileExists;
-   double fObservationTime_s;
-   string fSubArray;
-   double fCameraOffset_deg;
-
-   int    fPlottingColor;
-   int    fPlottingLineStyle;
-   int    fPlottingFillStyle;
-   string fLegend;
-
-   TGraphAsymmErrors *gSensitivity;
-
-   VPlotWPPhysSensitivityData();
-  ~VPlotWPPhysSensitivityData() {}
-   void   print();
-};
-
-//-----------------------------------------------------------------------
 
 class VPlotWPPhysSensitivity : public VPlotUtilities
 {
@@ -56,7 +33,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 
    VPlotInstrumentResponseFunction *fIRF;
 
-   vector< VPlotWPPhysSensitivityData* > fData;
+   vector< VSiteData* > fData;
 
    double fMinEnergy_TeV;
    double fMaxEnergy_TeV;
@@ -85,18 +62,17 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    VPlotWPPhysSensitivity();
   ~VPlotWPPhysSensitivity() {}
 
-   bool addDataSet( VPlotWPPhysSensitivityData* iData, bool iInit = true );
+   bool addDataSet( VSiteData* iData );
    bool addDataSet( string iAnalysis, string iSubArray = "E", double iObservationTime_s = 180000., double iOffset_deg = 0.0,
                     string iLegend = "", int iColor = 1, int iLineStyle = 1, int iFillStyle = 3001 );
    bool addDataSets( string iDataSettxtFile );
-   vector< string > getListOfArrays();
    double getSensitivityFOM() { return fSensitivityFOM; }
    double getSensitivityFOM_error() { return fSensitivityFOM_error; }
-   bool initialize( VPlotWPPhysSensitivityData* );
+   vector< VSiteData* > getData() { return fData; }
    bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
    TCanvas* plotProjectedSensitivities( TCanvas*, double iMaxOffset, int iColor = -1 );
    bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY"  );
-   bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2., unsigned int iRelativeDataSetID = 0 );
+   bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2. );
    void printSensitivityFigureOfMerit( TGraphAsymmErrors *gSensitivity, double iEmin_TeV = 0.03, double iEmax_TeV = 100., string iAnalysis = "" );
    void printSensitivityFigureOfMerit( double iEmin_TeV = 0.03, double iEmax_TeV = 100. );
    void reset();

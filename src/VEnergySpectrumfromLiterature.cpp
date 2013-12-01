@@ -7,12 +7,12 @@
 
 #include "VEnergySpectrumfromLiterature.h"
 
-VEnergySpectrumfromLiterature::VEnergySpectrumfromLiterature( string ifile )
+VEnergySpectrumfromLiterature::VEnergySpectrumfromLiterature( string ifile, bool iprint )
 {
     bIsZombie = false;
     setFunctions();
 
-    if( ifile.size() > 0 ) readValuesFromFile( ifile );
+    if( ifile.size() > 0 ) readValuesFromFile( ifile, iprint );
 
     fIntegral_ID = 0;
     fIntegral_TF1 = 0;
@@ -75,7 +75,7 @@ void VEnergySpectrumfromLiterature::setFunctions()
     fEnergyFun.push_back( a );
 }
 
-bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile )
+bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrint )
 {
 // clear existing data
     fData.clear();
@@ -91,7 +91,7 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile )
     string is_line;
     string is_temp;
 
-    cout << "reading spectral parameters from " << ifile << endl;
+    if( iPrint ) cout << "reading spectral parameters from " << ifile << endl;
 
     sData itemp;
 

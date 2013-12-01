@@ -111,6 +111,7 @@ void VSensitivityCalculator::reset()
     gElectronRate = 0;
 
     setPlotCanvasSize();
+    setPlotCanvasName();
     setEnergyRange_Log();
     setFluxRange_PFLUX();
     setFluxRange_ENERG();
@@ -647,8 +648,10 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	cout << "VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum: error while checking units: " << bUnit << endl;
 	return 0;
     }
-    if( dE_Log10 > 0. ) cout << "differential sensitivity" << endl;
-    else                cout << "integral sensitivity" << endl;
+    cout << endl;
+    if( dE_Log10 > 0. ) cout << "calculating or reading differential sensitivity" << endl;
+    else                cout << "calculating or reading integral sensitivity" << endl;
+    cout << "==============================================" << endl;
     fEnergy_dE_log10 = dE_Log10;
 
 // get vector with integral and differential Crab-like spectra for different flux levels
@@ -675,7 +678,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 // read sensitivity directly from root file
     else if( iAnasumCrabFile == "CTA-PHYS" )
     {
-        gSensitivityvsEnergy = getSensitivityGraphFromWPPhysFile( bUnit );
+        gSensitivityvsEnergy = getSensitivityGraphFromWPPhysFile( bUnit, iEnergyMin_TeV_lin, iEnergyMax_TeV_lin );
 	if( !gSensitivityvsEnergy ) return false;
         return true;
     }
@@ -937,7 +940,7 @@ bool VSensitivityCalculator::printSensitivity()
 TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity )
 {
      char htitle[400];
-     TCanvas *iCanvas = new TCanvas( "iCanvas", "sensitivity vs energy", 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
+     TCanvas *iCanvas = new TCanvas( fPlot_CanvasName.c_str(), "sensitivity vs energy", 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
      iCanvas->SetGridx( 0 );
      iCanvas->SetGridy( 0 );
      iCanvas->SetLeftMargin( 0.15 );
@@ -1327,7 +1330,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     read integral/differential sensitivities and backround rates (total, proton, electron) from WP Phys File
 
 */
-TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( string bUnit )
+TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( string bUnit, double iEnergyMin_TeV_lin, 
+                                                                              double iEnergyMax_TeV_lin )
 {
     TGraphAsymmErrors *g = 0;
     TH1F *h = 0;
@@ -1353,7 +1357,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( h ) 
     {
        g = new TGraphAsymmErrors( 1 );
-       get_Graph_from_Histogram( h, g, false, false, 1.e3 );
+       get_Graph_from_Histogram( h, g, false, false, 1.e3, log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
        setGraphPlottingStyle( g, 1, 1, 20, 2 );
     }
 
@@ -1363,7 +1367,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( h )
     {
        gBGRate     = new TGraphAsymmErrors( 1 );
-       get_Graph_from_Histogram( h, gBGRate, true, false );
+       get_Graph_from_Histogram( h, gBGRate, true, false, -1., log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
        setGraphPlottingStyle( gBGRate, 1, 2, 20, 2 );
     }
 // proton rates
@@ -1373,7 +1377,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( h )
     {
        gProtonRate = new TGraphErrors( 1 );
-       get_Graph_from_Histogram( h, gProtonRate, true );
+       get_Graph_from_Histogram( h, gProtonRate, true, 0., log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
        setGraphPlottingStyle( gProtonRate, 1, 2, 21, 2 );
     }
 // electron rates
@@ -1383,7 +1387,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( h )
     {
        gElectronRate = new TGraphErrors( 1 );
-       get_Graph_from_Histogram( h, gElectronRate, true );
+       get_Graph_from_Histogram( h, gElectronRate, true, 0., log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
        setGraphPlottingStyle( gElectronRate, 1, 2, 22, 2 );
     }
 
@@ -2606,7 +2610,7 @@ void VSensitivityCalculator::plotDebugPlotsParticleNumbers()
 */
 bool VSensitivityCalculator::setEnergySpectrumfromLiterature( string iFile, unsigned int iID )
 {
-    fEnergySpectrumfromLiterature = new VEnergySpectrumfromLiterature( iFile );
+    fEnergySpectrumfromLiterature = new VEnergySpectrumfromLiterature( iFile, false );
     if( fEnergySpectrumfromLiterature->isZombie() ) return false;
 
     setEnergySpectrumfromLiterature_ID( iID );

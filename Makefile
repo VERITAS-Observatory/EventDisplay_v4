@@ -119,7 +119,7 @@ endif
 # compile and linker flags
 ########################################################################################################################
 # compiler and linker general values
-CXX           = g++ 
+CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
 CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(DCACHEFLAG)
@@ -267,7 +267,6 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
                 ./obj/VCamera.o \
 		./obj/VDisplayBirdsEye.o \
 		./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
-		./obj/VDisplay.o ./obj/VDisplay_Dict.o \
 		./obj/VCameraRead.o \
 		./obj/VDetectorGeometry.o \
 		./obj/VDetectorTree.o \
@@ -325,6 +324,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/Angle.o \
 		./obj/PointingMonitor.o \
 		./obj/VSkyCoordinatesUtilities.o \
+		./obj/VDisplay.o ./obj/VDisplay_Dict.o \
 		./obj/VHoughTransform.o
 
 FROGSOBJECTS =	./obj/VFrogs.o \
@@ -650,6 +650,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o  \
 		./obj/VPlotWPPhysSensitivity.o ./obj/VPlotWPPhysSensitivity_Dict.o \
+		./obj/VPlotPPUT.o ./obj/VPlotPPUT_Dict.o \
+		./obj/VSiteData.o \
 		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \

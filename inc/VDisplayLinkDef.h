@@ -1,3 +1,3 @@
 #ifdef __CINT__
-#pragma link C++ class VDisplay++;
+#pragma link C++ class VDisplay+;
 #endif
