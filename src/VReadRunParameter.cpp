@@ -1239,7 +1239,6 @@ void VReadRunParameter::test_and_adjustParams()
 	    fRunPara->fTraceWindowShift_DoublePassSmallImages.push_back( fRunPara->fTraceWindowShift_DoublePassSmallImages[0] );
 	    fRunPara->fTraceIntegrationMethod.push_back( fRunPara->fTraceIntegrationMethod[0] );
 	    fRunPara->fTraceIntegrationMethod_pass1.push_back( fRunPara->fTraceIntegrationMethod_pass1[0] );
-            fRunPara->fDBSumWindowMaxTimedifference.push_back( fRunPara->fDBSumWindowMaxTimedifference[0] );
 	    fRunPara->fLogLikelihoodLoss_min.push_back( fRunPara->fLogLikelihoodLoss_min[0] );
 	    fRunPara->fLogLikelihood_Ntubes_min.push_back( fRunPara->fLogLikelihood_Ntubes_min[0] );
         }
