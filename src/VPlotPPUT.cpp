@@ -10,6 +10,10 @@
 VPlotPPUT::VPlotPPUT()
 {
    setDebug( false );
+
+   setPPUTRange();
+   setPPUTEnergyRange();
+   setPlotAltitudeRange();
 }
 
 void VPlotPPUT::getMergedFigureOfMerits( VSiteData *iSite, float* fom, float* fom_error, string iDirectionString )
@@ -20,26 +24,23 @@ void VPlotPPUT::getMergedFigureOfMerits( VSiteData *iSite, float* fom, float* fo
 // calculate figure of merrit:
     VPlotWPPhysSensitivity b;
     b.setCTARequirements( iSite->fSiteRequirementID );
-    if( iSite->fSiteRequirementID >= 3 )
-    {
-        b.printSensitivityFigureOfMerit( iGraphSensitivity, 0.03, 20., iSite->fSiteName );
-    }
-    else
-    {
-        b.printSensitivityFigureOfMerit( iGraphSensitivity, 0.03, 100., iSite->fSiteName );
-    }
+    b.printSensitivityFigureOfMerit( iGraphSensitivity,f_pput_Energy_linTeV_min, f_pput_Energy_linTeV_max, iSite->fSiteName );
 
     *fom = b.getSensitivityFOM();
     *fom_error = b.getSensitivityFOM_error();
 }
 
+void VPlotPPUT::setPPUTRange( float pput_min, float pput_max )
+{
+   f_pput_min = pput_min;
+   f_pput_max = pput_max;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VPlotPPUT::plot( bool bSouth, string iDataList )
+void VPlotPPUT::plot( bool bSouth, string iDataList, bool bPlotPredictions )
 {
-   double plot_alt_min = 410.;
-   double plot_alt_max = 4000.;
 // linear fits are valid in these ranges
    double alt_min = 1300.;
    double alt_max = 4000.;
@@ -61,6 +62,14 @@ void VPlotPPUT::plot( bool bSouth, string iDataList )
        else         fSite.back()->fSiteRequirementID = 3;
        z_site++;
    }
+   if( bSouth && f_pput_Energy_linTeV_min < 0. )
+   {
+       setPPUTEnergyRange( 0.1, 100. );
+   }
+   else if( !bSouth && f_pput_Energy_linTeV_min < 0. )
+   {
+       setPPUTEnergyRange( 0.1, 20. );
+   }
 
    cout << "Total number of sites: " << fSite.size() << endl;
    for( unsigned int i = 0; i < fSite.size(); i++ )
@@ -72,12 +81,12 @@ void VPlotPPUT::plot( bool bSouth, string iDataList )
    TCanvas *cPPUT_height = new TCanvas( "cEH", "PPUT vs height", 10, 10, 600, 500 );
    cPPUT_height->SetGridx( 0 );
    cPPUT_height->SetGridy( 0 );
-   TH1D *hH = new TH1D( "hH", "", 100, plot_alt_min, plot_alt_max );
+   TH1D *hH = new TH1D( "hH", "", 100, f_plot_alt_min, f_plot_alt_max );
    hH->SetStats( 0 );
    hH->SetXTitle( "altitude [m]" );
    hH->SetYTitle( "PPUT" );
-   hH->SetMinimum( 0.6 );
-   hH->SetMaximum( 2.0 );
+   hH->SetMinimum( f_pput_min );
+   hH->SetMaximum( f_pput_max );
    hH->Draw();
 
    TLine *iHH = new TLine( hH->GetXaxis()->GetXmin(), 1., hH->GetXaxis()->GetXmax(), 1. );
@@ -92,8 +101,8 @@ void VPlotPPUT::plot( bool bSouth, string iDataList )
    hB->SetStats( 0 );
    hB->SetXTitle( "B_{tr} [#muT]" );
    hB->SetYTitle( "PPUT" );
-   hB->SetMinimum( 0.6 );
-   hB->SetMaximum( 2.0 );
+   hB->SetMinimum( f_pput_min );
+   hB->SetMaximum( f_pput_max );
    hB->Draw();
 
    TLine *ihB = new TLine( hB->GetXaxis()->GetXmin(), 1., hB->GetXaxis()->GetXmax(), 1. );
@@ -244,4 +253,47 @@ void VPlotPPUT::plot( bool bSouth, string iDataList )
       }
 
    }
+
+// plot predictions into the 1D plots
+   if( bPlotPredictions && cPPUT_height && cPPUT_B )
+   {
+
+      for( unsigned int i = 0; i < fSite.size(); i++ )
+      {
+	 cPPUT_height->cd();
+// fit doesn't work at very low altitude
+	 if( fSite[i]->fSite_asl < 1300. ) continue;
+	 TGraph *g_asl_N = new TGraph( 1 );
+	 g_asl_N->SetMarkerStyle( 24+i );
+	 if( 24+i == 27 ) g_asl_N->SetMarkerStyle( 32 );
+	 g_asl_N->SetMarkerColor( 2 );
+	 g_asl_N->SetPoint( 1, fSite[i]->fSite_asl, f2D->Eval( fSite[i]->fSite_asl, TMath::Abs( fSite[i]->fSite_B_N ) ) );
+	 g_asl_N->Draw( "p" );
+
+	 TGraph *g_asl_S = new TGraph( 1 );
+	 g_asl_S->SetMarkerStyle( 24+i );
+	 if( 24+i == 27 ) g_asl_S->SetMarkerStyle( 32 );
+	 g_asl_S->SetMarkerColor( 3 );
+	 g_asl_S->SetPoint( 1, fSite[i]->fSite_asl, f2D->Eval( fSite[i]->fSite_asl, TMath::Abs( fSite[i]->fSite_B_S ) ) );
+	 g_asl_S->Draw( "p" );
+
+	 cPPUT_B->cd();
+
+	 TGraph *g_B_N = new TGraph( 1 );
+	 g_B_N->SetMarkerStyle( 24+i );
+	 if( 24+i == 27 ) g_B_N->SetMarkerStyle( 32 );
+	 g_B_N->SetMarkerColor( 2 );
+	 g_B_N->SetPoint( 1, TMath::Abs( fSite[i]->fSite_B_N ), f2D->Eval( fSite[i]->fSite_asl, TMath::Abs( fSite[i]->fSite_B_N ) ) );
+	 g_B_N->Draw( "p" );
+
+	 TGraph *g_B_S = new TGraph( 1 );
+	 g_B_S->SetMarkerStyle( 24+i );
+	 if( 24+i == 27 ) g_B_S->SetMarkerStyle( 32 );
+	 g_B_S->SetMarkerColor( 3 );
+	 g_B_S->SetPoint( 1, TMath::Abs( fSite[i]->fSite_B_S ), f2D->Eval( fSite[i]->fSite_asl, TMath::Abs( fSite[i]->fSite_B_S ) ) );
+	 g_B_S->Draw( "p" );
+
+      }
+   }
+
 }
