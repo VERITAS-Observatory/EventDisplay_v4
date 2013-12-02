@@ -56,15 +56,19 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
       cout << "VPedestalLowGain::readLowGainHistograms error reading " << hname << endl;
       return fFile;
    }
-   if( !fFile->cd( "distributions" ) ) return fFile;
-
-   cout << "reading " << iFile << " (telescope ID " <<  fTelescopeID-1 << ")" << endl;
+   sprintf( hname, "distributions_%d", fTelescopeID);
+   if( !fFile->cd( hname ) && !fFile->cd("distributions") ) { 
+	cout << "VPedestalLowGain::readLowGainHistograms error reading " << fFile->GetName() << ": "<<  endl;
+	cout << "VPedestalLowGain::readLowGainHistograms could not find directory \'distributions\' nor " << hname << endl; 
+	return fFile;
+   }
+   cout << "reading " << iFile << " (telescope ID " <<  fTelescopeID << ")" << endl;
 
    for( unsigned int i = iChannel_min; i <= iChannel_max; i++ )
    {
       for( unsigned int s = fSumWindow_min; s <= fSumWindow_max; s++ )
       {
-	 sprintf( hname, "hped_%d_%d_%d", fTelescopeID-1, s, i );
+	 sprintf( hname, "hped_%d_%d_%d", fTelescopeID, s, i );
 	 TH1F* h = (TH1F*)gDirectory->Get( hname );
 	 if( h ) fHped.push_back( h );
 	 else
