@@ -1025,19 +1025,20 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		   corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID]
 		                   - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift_DoublePassSmallImages());
                 }
-// low gain channel have different time -> use tzero (donnot do this for DST sims)
-                if( ( getHiLo()[i_channelHitID] 
-		  || getTraceMax()[i_channelHitID] > getRunParameter()->fSumWindowStartAtT0Min )
-		  && getRunParameter()->fsourcetype != 7 )
+//////////////////////////////////////////////////////////////////////////////////////
+// low gain channel have different time -> use tzero (do not do this for DST sims)
+                if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
                 {
 // get new tzero for sumwindow starting at corrfirst to the end of the window
 		    float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
-                    if( corrfirst - iT0 < getDBSumWindowMaxTimedifference() )
+                    if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
                     {
                         corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
                     }
 		    if( corrfirst < 0 ) corrfirst = getSumFirst();
                 }
+//////////////////////////////////////////////////////////////////////////////////////
+// high gain channel
 // integration start might be before sample 0 -> set to sample 0
                 else if (corrfirst < 0 )
                 {

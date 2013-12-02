@@ -304,13 +304,14 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
 	   if( fLookupTableFile->IsZombie() )
 	   {
 	       cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile << endl;
-	       exit( -1 );
+	       exit( EXIT_FAILURE );
 	   }
         }
 	else
         {
 	       cout << "VTableLookup::setMCTableFiles error (reading): unable to open table file: " << itablefile << endl;
-	       exit( -1 );
+               cout << " (no $OBS_EVNDISP_ANA_DIR defined)" << endl;
+	       exit( EXIT_FAILURE );
 	}
     }
     gErrorIgnoreLevel = 0;

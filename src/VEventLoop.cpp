@@ -139,9 +139,7 @@ if( fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]] )
    if( fRunPar->fDoublePass ) cout << "  (doublepass, integration method pass 1: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
    cout << endl;
    cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
-   cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples";
-   if( fRunPar->fDoublePass ) cout << ", max T0 threshold " << fRunPar->fSumWindowStartAtT0Min << " d.c.)" << endl;
-   else                       cout << ")" << endl;
+   cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples)" << endl;
    cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
    cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
    if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];

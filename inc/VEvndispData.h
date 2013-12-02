@@ -290,7 +290,7 @@ class VEvndispData
         valarray< unsigned int >& getCurrentSumWindow() { return fAnaData[fTelID]->fCurrentSummationWindow; }
         int                 getSumWindowShift() { return fRunPar->fTraceWindowShift[fTelID]; }
 	int                 getSumWindowShift_DoublePassSmallImages() { return fRunPar->fTraceWindowShift_DoublePassSmallImages[fTelID]; }
-        double              getDBSumWindowMaxTimedifference() { return fRunPar->fDBSumWindowMaxTimedifference[fTelID]; }
+        double              getSumWindowMaxTimedifferenceToDoublePassPosition() { return fRunPar->fSumWindowMaxTimedifferenceToDoublePassPosition[fTelID]; }
         valarray<unsigned int>& getTCorrectedSumFirst() { return fAnaData[fTelID]->fTCorrectedSumFirst; }
         valarray<unsigned int>& getTCorrectedSumLast() { return fAnaData[fTelID]->fTCorrectedSumLast; }
         unsigned int        getTelescopeEventNumber( unsigned int iTelID ) { if( iTelID < fTelescopeEventNumber.size() ) return fTelescopeEventNumber[iTelID]; else return 0; }

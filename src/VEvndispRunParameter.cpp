@@ -152,8 +152,7 @@ fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to 
     fTraceWindowShift_DoublePassSmallImages.push_back( 0 );
     fTraceIntegrationMethod.push_back( 1 );
     fTraceIntegrationMethod_pass1.push_back( 1 );
-    fDBSumWindowMaxTimedifference.push_back( 10. );
-    fSumWindowStartAtT0Min = 1.e9;
+    fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( 10. );
     fSmoothDead = false;
     fUsePedEvents = true;
     fFADCChargeUnit = "DC";
@@ -464,9 +463,7 @@ if( fDoublePass ) cout << "\t (doublepass, integration method pass 1: " << fTrac
 cout << endl;
 cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
 cout << "\t (shifted by " << fTraceWindowShift[i] << " samples";
-cout << " [" << fTraceWindowShift_DoublePassSmallImages[i] << "]";
-if( fDoublePass ) cout << ", max T0 threshold " << fSumWindowStartAtT0Min << " d.c.)" << endl;
-else              cout << ")" << endl;
+cout << " [" << fTraceWindowShift_DoublePassSmallImages[i] << "])" << endl;
 cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];
 cout << "/" << fsumwindow_2[fTelToAnalyze[i]];
 if( fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fsumwindow_pass1[fTelToAnalyze[i]];
@@ -511,7 +508,7 @@ void VEvndispRunParameter::setPulseZeroIndex()
        if( TMath::Abs( fpulsetiminglevels[i] - 1. ) < 1.e-4 && fpulsetiming_max_index == 9999 )
        {
           fpulsetiming_max_index = i;
-  break;
+          break;
        }
     }
     for( unsigned int i = 0; i < fpulsetiminglevels.size(); i++ )
@@ -523,7 +520,7 @@ void VEvndispRunParameter::setPulseZeroIndex()
        else if( TMath::Abs( fpulsetiminglevels[i] - 0.5 ) < 1.e-4 && fpulsetiming_tzero_index != 9999 )
        {
           fpulsetiming_width_index = i;
-  break;
+          break;
        }
     }
 }

@@ -1,5 +1,8 @@
-hange log eventdisplay analysis package
+Change log eventdisplay analysis package
 ========================================
+
+* 20131201 (GM) removed obsolete command line parameter 
+                -tracedefinesmallpulse 
 
 * 20131201 (GM) spectral weighted mean is now used for the 
                 energy spectrum plotting (change index with
@@ -7,6 +10,15 @@ hange log eventdisplay analysis package
 
 * 20131201 (GM) significant additions to PPUT calculation and
                 sensitivity file merging (CTA)
+
+* 20131127 (GM) bug fix to prevent chrashes of non-4tel data with
+                the bright star option (bugzilla id 145)
+
+* 20131126 (GM) fixed bug in filling nmirrors and mirror area from 
+                detector tree (CTA only)
+
+* 20131124 (GM) for BDT gamma/hadron cuts: MVA vs energy curves
+                are no by default interpolatd and smoothed
 
 * 20131121 (GM) changed calculation of event rates in sensitivity
                 calculation - use CR spectral weighted histograms

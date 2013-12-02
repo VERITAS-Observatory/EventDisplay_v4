@@ -163,9 +163,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
         vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
         vector< int >    fTraceWindowShift_DoublePassSmallImages;   // shift the summation window by value (in doublepass: low gain channels only, default: 0 ): failed DB events only
-                                                  // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
-        vector< double > fDBSumWindowMaxTimedifference;
-        double fSumWindowStartAtT0Min;            // for pulses with peaks larger than this values, start summation window at t0 + fTraceWindowShift (doublepass only)
+        vector< double > fSumWindowMaxTimedifferenceToDoublePassPosition; // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
         double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
         string ftracefitfunction;                 // number of tracefit function (default=ev, others: grisu);
 	bool   fperformFADCAnalysis;              // run FADC analysis (important e.g. for CTA DST files, where sim_tel results are available as well )
@@ -273,6 +271,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,134); //(increase this number)
+        ClassDef(VEvndispRunParameter,135); //(increase this number)
 };
 #endif

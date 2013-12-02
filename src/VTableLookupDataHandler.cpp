@@ -291,9 +291,9 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
        eventNumber = fshowerpars->eventNumber;
        if( fDebug > 1 )
        {
-  cout << "===============================================================================" << endl;
-  cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
-  cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod] << endl;
+           cout << "===============================================================================" << endl;
+           cout << "SHOWERPARS EVENT " << fshowerpars->eventNumber << "\t" << fEventCounter << "\t";
+           cout << fshowerpars->NImages[fMethod] << "\t" << fshowerpars->Chi2[fMethod] << endl;
        }
        time = fshowerpars->Time;
        if( fEventCounter == 0 ) fTotalTime0 = time;
@@ -301,17 +301,17 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 
        for( unsigned int i = 0; i < fNTel; i++ )
        {
-  fTelElevation[i] = fshowerpars->TelElevation[i];
-  fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
+           fTelElevation[i] = fshowerpars->TelElevation[i];
+           fTelAzimuth[i] = fshowerpars->TelAzimuth[i];
        }
        if( !fIsMC )
        {
-   for( unsigned int i = 0; i < fNTel; i++ )
-   {
-       fTelDec[i] = fshowerpars->TelDec[i];
-       fTelRA[i] = fshowerpars->TelRA[i];
-   }
-   if( !fShortTree ) MJD = fshowerpars->MJD;
+            for( unsigned int i = 0; i < fNTel; i++ )
+            {
+                fTelDec[i] = fshowerpars->TelDec[i];
+                fTelRA[i] = fshowerpars->TelRA[i];
+            }
+            if( !fShortTree ) MJD = fshowerpars->MJD;
        }
        fNTrig = fshowerpars->NTrig;
 
@@ -338,11 +338,11 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     if( TMath::IsNaN( fXcore ) || TMath::IsNaN( fYcore ) )
     {
         fXcore =  -999999.;
-fYcore =  -999999.;
-fEventCounter++;
-fEventStatus = false;
-if( fDebug > 1 ) cout << "\t RECONSTRUCTED CORE NAN" << endl;
-return 0;
+        fYcore =  -999999.;
+        fEventCounter++;
+        fEventStatus = false;
+        if( fDebug > 1 ) cout << "\t RECONSTRUCTED CORE NAN" << endl;
+        return 0;
     }
     fXoff = fshowerpars->Xoff[fMethod];
     fYoff = fshowerpars->Yoff[fMethod];
@@ -359,7 +359,7 @@ return 0;
           fImgSel_list_short[ii] = i;
 // count the number of telescopes of this type
           NImages_Ttype[getTelType_arraycounter(i)]++;
-  ii++;
+          ii++;
        }
     }
 
@@ -380,8 +380,8 @@ return 0;
         if( !cut( true ) )
         {
             fEventCounter++;
-    fEventStatus = false;
-    if( fDebug > 1 ) cout << "\t CUT FAILED" << endl;
+            fEventStatus = false;
+            if( fDebug > 1 ) cout << "\t CUT FAILED" << endl;
             return 0;
         }
 else fEventStatus = true;
@@ -395,13 +395,13 @@ else fEventStatus = true;
     Double_t SizeSecondMax_temp = -100.;
     for( unsigned int i = 0; i < fNTel; i++ )
     {
-        bool fReadTPars = false;
-if( i < ftpars.size() && ftpars[i] ) fReadTPars = true;
-if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
-  || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
-{
-   if( fImgSel_list[i] ) fReadTPars = true;
-   else                  fReadTPars = false;
+         bool fReadTPars = false;
+         if( i < ftpars.size() && ftpars[i] ) fReadTPars = true;
+         if( (fTLRunParameter->bWriteReconstructedEventsOnly >= 0 )
+           || fTLRunParameter->bWriteReconstructedEventsOnly == -2 || fwrite )
+         {
+            if( fImgSel_list[i] ) fReadTPars = true;
+            else                  fReadTPars = false;
         }
 // read only those telescope which were part of the reconstruction
         if( fReadTPars )
