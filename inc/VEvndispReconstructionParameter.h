@@ -64,6 +64,8 @@ class VEvndispReconstructionParameter : public TNamed
         vector< vector< double > > fFui_min;
         vector< vector< double > > fWidthLength_max;
 	vector< vector< unsigned int > > fL2TriggerType;
+        vector< vector< double > > fMCEnergy_linTeV_min;
+        vector< vector< double > > fMCEnergy_linTeV_max;
 
         vector< bool > fUseEventdisplayPointing;
 // C. Duke: 20oct06  added vector to store select image results

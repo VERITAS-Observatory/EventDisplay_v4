@@ -287,6 +287,20 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
    }
 
 ////////////////////////////////////////////
+// MC only: cut on MC energy
+   if( fRunPara->isMC() 
+   && ( (iImageParameter->MCenergy < fMCEnergy_linTeV_min[iMeth][iTelType] || iImageParameter->MCenergy > fMCEnergy_linTeV_max[iMeth][iTelType] ) ) )
+   {
+      iArrayCut = false;
+      if( fDebug )
+      {
+         cout << "VEvndispReconstructionParameter::applyArrayAnalysisCut: MC energy cut:" << endl;
+         cout << iImageParameter->MCenergy << " [" << fMCEnergy_linTeV_min[iMeth][iTelType] << "," << fMCEnergy_linTeV_max[iMeth][iTelType] << "]" << endl;
+      }
+
+   }
+
+////////////////////////////////////////////
 // remove image which is too close to a bright star
 // (use list of image and border pixels)
    if( iStarCatalogue && fRunPara && iImageParameter->ntubes < fRunPara->fMinStarNTubes )
@@ -405,6 +419,12 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
     fFui_min.push_back( i_d );
     for( unsigned int i = 0; i < fNTel_type; i++ ) i_u.push_back( 9999 );
     fL2TriggerType.push_back( i_u );
+    i_d.clear();
+    for( unsigned int i = 0; i < fNTel_type; i++ ) i_d.push_back( 1.e10 );
+    fMCEnergy_linTeV_max.push_back( i_d );
+    i_d.clear();
+    for( unsigned int i = 0; i < fNTel_type; i++ ) i_d.push_back( -1.e10 );
+    fMCEnergy_linTeV_min.push_back( i_d );
 }
 
 
@@ -474,6 +494,18 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
         cout << "\t\t minimum image/border pixel fraction under image: \t\t";
         for( unsigned int i = 0; i < fFui_min[m].size(); i++ ) cout << fFui_min[m][i] << "\t";
         cout << endl;
+        if( fRunPara->isMC() )
+        {
+           cout << "\t\t cut on MC energy: \t\t\t\t\t\t ";
+           for( unsigned int i = 0; i < fMCEnergy_linTeV_min[m].size(); i++ )
+           {
+               if( i < fMCEnergy_linTeV_max[m].size() )
+               { 
+                   cout << "[" << fMCEnergy_linTeV_min[m][i] << "," << fMCEnergy_linTeV_max[m][i] <<  "]\t";
+               }
+           }
+           cout << endl;
+        }
 
 	for( unsigned int i = 0; i < fNTel_type; i++ ) 
 	{
@@ -959,6 +991,16 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
             {
                 if( t_temp < 0 ) for( unsigned int i = 0; i < fFui_min[m_temp].size(); i++ ) fFui_min[m_temp][i] = atof( iTemp2.c_str() );
                 else for( unsigned int i = 0; i < v_temp.size(); i++ ) fFui_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
+            }
+            else if( iTemp == "MCENERGYRANGE_MIN" )
+            {
+                if( t_temp < 0 ) for( unsigned int i = 0; i < fMCEnergy_linTeV_min[m_temp].size(); i++ ) fMCEnergy_linTeV_min[m_temp][i] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fMCEnergy_linTeV_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
+            }
+            else if( iTemp == "MCENERGYRANGE_MAX" )
+            {
+                if( t_temp < 0 ) for( unsigned int i = 0; i < fMCEnergy_linTeV_max[m_temp].size(); i++ ) fMCEnergy_linTeV_max[m_temp][i] = atof( iTemp2.c_str() );
+                else for( unsigned int i = 0; i < v_temp.size(); i++ ) fMCEnergy_linTeV_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
             }
             else
             {

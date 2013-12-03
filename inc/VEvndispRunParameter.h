@@ -268,9 +268,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
        ~VEvndispRunParameter() {}
 
 	bool         doFADCAnalysis() { return fperformFADCAnalysis; }
+        bool         isMC() { return fIsMC; }
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,135); //(increase this number)
+        ClassDef(VEvndispRunParameter,136); //(increase this number)
 };
 #endif
