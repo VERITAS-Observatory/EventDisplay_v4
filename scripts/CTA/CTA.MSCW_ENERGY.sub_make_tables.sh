@@ -7,10 +7,10 @@
 #
 #
 
-if [ $# -ne 5 ]
+if [ $# -lt 5 ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone> <data set>"
+   echo "CTA.MSCW_ENERGY.sub_make_tables.sh <table file name> <recid> <subarray list> <onSource/cone> <data set> [qsub options]"
    echo ""
    echo "  <table file name>  name of the table file (to be written; without .root)"
    echo "  <recid>            reconstruction ID according to EVNDISP.reconstruction.parameter"
@@ -37,6 +37,10 @@ then
   CONE="TRUE"
 fi
 DSET=$5
+if [ -n $6 ]
+then
+   QSUBOPT="$6"
+fi
 
 
 #########################################
@@ -132,7 +136,7 @@ do
       echo "shell script " $FNAM.sh
 
 # submit the job
-      qsub -l os=sl6 -l h_cpu=47:45:00 -l h_vmem=16000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+      qsub $QSUBOPT -l os=sl6 -l h_cpu=47:45:00 -l h_vmem=16000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
    done
 done
 

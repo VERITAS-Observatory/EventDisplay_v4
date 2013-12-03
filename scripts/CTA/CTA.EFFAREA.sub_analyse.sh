@@ -8,10 +8,10 @@
 ##############################################################################
 
 
-if [ $# -ne 7 ] && [ $# -ne 8 ] && [ $# -ne 9 ]
+if [ $# -lt 7 ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode] [direction (e.g. _180deg)]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode] [direction (e.g. _180deg)] [qsub options]"
    echo "================================================================================"
    echo
    echo "calculate effective areas and instrument response functions for CTA"
@@ -71,6 +71,14 @@ NIMAGESMIN=`grep NIMAGESMIN $ANAPAR | awk {'print $2'}`
 NTYPEMIN_0=`grep NTYPEMIN_0 $ANAPAR | awk {'print $2'}`
 NTYPEMIN_1=`grep NTYPEMIN_1 $ANAPAR | awk {'print $2'}`
 NTYPEMIN_2=`grep NTYPEMIN_2 $ANAPAR | awk {'print $2'}`
+if [ -z "$NTYPEMIN_0" ]
+then
+   NTYPEMIN_0=0
+fi
+if [ -z "$NTYPEMIN_1" ]
+then
+   NTYPEMIN_1=0
+fi
 if [ -z "$NTYPEMIN_2" ]
 then
    NTYPEMIN_2=0
@@ -80,7 +88,7 @@ EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
 TMVACUT=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
 OBSTIME=`grep OBSERVINGTIME_H $ANAPAR | awk {'print $2'}`
-if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "$EREC" ] || [ -z "$TMVACUT" ] || [ -z "$EFFAREADIR" ] || [ -z "$OBSTIME" ] || [ -z "$NTYPEMIN_0" ] || [ -z "$NTYPEMIN_1" ] || [ -z "$NTYPEMIN_2" ]
+if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "$EREC" ] || [ -z "$TMVACUT" ] || [ -z "$EFFAREADIR" ] || [ -z "$OBSTIME" ] || [ -z "$NTYPEMIN_0" ]
 then
   echo "error: analysis parameter file not correct: $ANAPAR" 
   echo " one variable missing"
@@ -104,6 +112,11 @@ fi
 if [ -n "$9" ]
 then
   MCAZ=$9
+fi
+QSUBOPT=""
+if [ -n "${10}" ]
+then
+   QSUBOPT="${10}"
 fi
 
 ####################################
@@ -373,22 +386,26 @@ do
       echo "* TELESCOPETYPECUTS $TELTYPECUTS" >> $MSCF
 # do fill analysis (a 1 would mean that MC histograms would be filled only)
       echo "* FILLMONTECARLOHISTOS 0" >> $MSCF
-# spectral index
+# spectral index & CR spectra
       if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.6 0.1" >> $MSCF
+         echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 0" >> $MSCF
       fi
       if [ $PART = "helium" ] 
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.6 0.1" >> $MSCF
+         echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 1" >> $MSCF
       fi
       if [ $PART = "electron" ] || [ $PART = "electron_onSource" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 3.0 0.1" >> $MSCF
+         echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 8" >> $MSCF
       fi
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
+         echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat 5" >> $MSCF
       fi
 # first half of data set is not used (as these events are used for the TMVA training)
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
@@ -437,9 +454,9 @@ do
 # submit the job
      if [ $GFILLING = "2" ]
      then
-	qsub -l os="sl6" -l h_cpu=5:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub $QSUBOPT -l os="sl6" -l h_cpu=5:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      else
-	qsub -l os="sl6" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub $QSUBOPT -l os="sl6" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      fi
    done
 done

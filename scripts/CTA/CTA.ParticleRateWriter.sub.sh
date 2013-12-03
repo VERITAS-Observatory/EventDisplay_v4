@@ -6,10 +6,10 @@
 #
 #######################################################################
 
-if [ $# -ne 4 ] && [ $# -ne 5 ]
+if [ $# -lt 4 ] 
 then
    echo 
-   echo "./CTA.ParticleRateWriter.sub.sh <sub array list> <directory with effective areas> <offset=onSource/cone> <recid> [directory with angular resolution files]"
+   echo "./CTA.ParticleRateWriter.sub.sh <sub array list> <directory with effective areas> <offset=onSource/cone> <recid> [directory with angular resolution files] [qsub options]"
    echo 
    echo "  write particles files needed for TMVA cut optimization"
    echo
@@ -32,6 +32,11 @@ ADIR=""
 if [ -n "$5" ]
 then
    ADIR=$5
+fi
+QSUBOPT=""
+if [ -n $6 ]
+then
+   QSUBOPT="$6"
 fi
 
 ############################################################################
@@ -62,15 +67,15 @@ do
    echo "STARTING ARRAY $ARRAY"
 
    rm -f $ODIR/$FSCRIPT-$ARRAY.sh
-   cp $FSCRIPT.sh $FDIR/$FSCRIPT-$ARRAY.sh
+   cp $FSCRIPT.sh $FDIR/$FSCRIPT-$ARRAY-$OFFSET.sh
 
    sed -i -e "s|ARRAY|$ARRAY|" \
           -e "s|DDIR|$DDIR|" \
           -e "s|RRRR|$RECID|" \
           -e "s|ADIR|$ADIR|" \
-          -e "s|OFFSET|$OFFSET|" $FDIR/$FSCRIPT-$ARRAY.sh
+          -e "s|OFFSET|$OFFSET|" $FDIR/$FSCRIPT-$ARRAY-$OFFSET.sh
 
-   qsub -V -l os="sl6"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY.sh"
+   qsub -V $QSUBOPT -l os="sl6"  -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FDIR/$FSCRIPT-$ARRAY-$OFFSET.sh"
 done
 
 exit

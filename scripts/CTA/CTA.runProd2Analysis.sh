@@ -2,22 +2,28 @@
 #
 # analysis submission for production 2 analysis
 #
+# this script is optimized for the DESY analysis
 #
 ##############################################
 
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
-   echo "./analyse_production2.sh <run mode>"
+   echo 
+   echo "./CTA.runProd2Analysis.sh <N/S> <run mode>"
+   echo
+   echo "  N=prod2-North, S=prod2-South"
    echo
    echo "  possible run modes are EVNDISP MAKETABLES ANATABLES TRAIN ANGRES QC PARTFIL CUTS PHYS "
    echo
    exit
 fi
-RUN="$1"
+P2="$1"
+RUN="$2"
 
 #####################################
 # qsub options
+QSUBOPT="-P cta_high -js 2000"
 QSUBOPT="-P cta_high"
 
 #####################################
@@ -26,12 +32,22 @@ PDIR="$CTA_USER_LOG_DIR/tempRunParameterDir/"
 mkdir -p $PDIR
 
 #####################################
-# sites
-# for evndisp and MSCW analysis
-
-SITE=( "prod2-LeoncitoPP-NS" )
-SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
-SITE=( "prod2-Aar-500m-NS" )
+# sites & sub array lists
+if [[ $P2 == "S" ]]
+then
+   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
+   SITE=( "prod2-Aar-500m-NS" )
+   ARRAY="subArray.2a.list"
+elif [[ $P2 == "N" ]]
+then
+   SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
+   ARRAY="subArray.2NN.list"
+   ARRAY="subArray.2NN-fullList.list"
+   ARRAY="subArray.2NN-sub.list"
+else
+   echo "error: unknown site; allowed are N or S"
+   exit
+fi
 
 #####################################
 # particle types
@@ -43,12 +59,10 @@ PARTICLE=( "gamma_onSource" )
 #
 # _180deg = south
 # _0deg = north
-MCAZ=( "" )
 MCAZ=( "_180deg" "_0deg" "" )
 
 #####################################
 # reconstruction IDs
-RECID="0 1 2 3 4"
 RECID="0"
 
 #####################################
@@ -57,13 +71,7 @@ RECID="0"
 EREC="1"
 
 #####################################
-# cut on number of images and number 
-# of images per telescope type
-NTYPEMIN=( "2" "4" "2" )
-NTYPEMIN=( "2" "4" "4" )
-NTYPEMIN=( "3" "4" "4" )
-NTYPEMIN=( "2" "2" "2" )
-NTYPEMIN=( "0" "0" "0" )
+# cut on number of images
 NIMAGESMIN="2"
 
 #####################################
@@ -73,16 +81,14 @@ OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "5h" "50h" )
 OBSTIME=( "30m" )
 
-#####################################
-# sub array lists
-ARRAY="subArray.2a.list"
 
 #####################################
-# analysis dates
+# analysis dates and table dates
 DATE="d20130830"
-TDATE="d20130830"
 TDATE="d20130812"
 
+#####################################
+# loop over all sites
 NSITE=${#SITE[@]}
 for (( m = 0; m < $NSITE ; m++ ))
 do
@@ -93,6 +99,9 @@ do
    echo "SITE: $S"
    echo "RUN: $RUN"
 
+#####################################
+# trigmask files
+# (needed only for prod2 files with trigger bug)
    if [[ $S == "prod2-Aar-NS" ]]
    then
       TRG="/lustre/fs13/group/cta/prod2/Aar/simtel/trgmask/"
@@ -109,7 +118,8 @@ do
       TRG=""
    fi
 
-# eventdisplay
+##########################################
+# run eventdisplay
     if [[ $RUN == "EVNDISP" ]]
     then
 
@@ -128,12 +138,14 @@ do
     for ID in $RECID
     do
        MSCWSUBDIRECTORY="Analysis-ID$ID-$DATE"
+##########################################
 # make tables
        if [[ $RUN == "MAKETABLES" ]]
        then
 	  ./CTA.MSCW_ENERGY.sub_make_tables.sh tables_CTA-$S-ID$ID-$TDATE $ID $ARRAY onSource $S $QSUBOPT
 	  ./CTA.MSCW_ENERGY.sub_make_tables.sh tables_CTA-$S-ID$ID-$TDATE $ID $ARRAY cone $S $QSUBOPT
 	  continue
+##########################################
 # analyse with lookup tables
        elif [[ $RUN == "ANATABLES" ]]
        then
@@ -163,10 +175,6 @@ do
 	  touch $PARA
 	  echo "WRITING PARAMETERFILE $PARA"
 	  NTYPF=NIM$NIMAGESMIN
-	  for ((t = 0; t < ${#NTYPEMIN[@]}; t++ ))
-	  do
-	     NTYPF=$NTYPF"-TYP"$t"N"${NTYPEMIN[t]}
-	  done
 	  EFFDIR="EffectiveArea-"$OOTIME"-Erec$EREC-ID$ID$AZ-$NTYPF-$DATE"
 	  echo "MSCWSUBDIRECTORY $MSCWSUBDIRECTORY" >> $PARA
 	  echo "TMVASUBDIR BDT-Erec$EREC-ID$ID$AZ-$NTYPF-$DATE" >> $PARA
@@ -174,38 +182,40 @@ do
 	  echo "RECID $ID" >> $PARA
 	  echo "ENERGYRECONSTRUCTIONMETHOD $EREC" >> $PARA
 	  echo "NIMAGESMIN $NIMAGESMIN" >> $PARA
-	  for ((t = 0; t < ${#NTYPEMIN[@]}; t++ ))
-	  do
-	     echo NTYPEMIN_$t ${NTYPEMIN[t]} >> $PARA
-          done
 	  echo "OBSERVINGTIME_H $OOTIME" >> $PARA
 	  EFFDIR="/lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/$S/$EFFDIR/"
+##########################################
 # train BDTs   
 	  if [[ $RUN == "TRAIN" ]]
 	  then
 	    echo "$AZ " 
 	     ./CTA.TMVA.sub_train.sh $ARRAY onSource $S $PARA $AZ $QSUBOPT
 	     ./CTA.TMVA.sub_train.sh $ARRAY cone $S $PARA $AZ $QSUBOPT
+##########################################
 # IRFs: angular resolution
 	  elif [[ $RUN == "ANGRES" ]]
 	  then
-            ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVAFixedSignal $PARA AngularResolution $S 2 $AZ
+            ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVAFixedSignal $PARA AngularResolution $S 2 $AZ $QSUBOPT
+##########################################
 # IRFs: effective areas after quality cuts
 	  elif [[ $RUN == "QC" ]]
 	  then
-	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.QC $PARA QualityCuts001CU $S 0 $AZ
+	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.QC $PARA QualityCuts001CU $S 0 $AZ $QSUBOPT
+##########################################
 # IRFs: particle number files
 	  elif [[ $RUN == "PARTFIL" ]]
 	  then
-	     ./CTA.ParticleRateWriter.sub.sh $ARRAY $EFFDIR/QualityCuts001CU cone $ID $EFFDIR/AngularResolution
+	     ./CTA.ParticleRateWriter.sub.sh $ARRAY $EFFDIR/QualityCuts001CU cone $ID $EFFDIR/AngularResolution $QSUBOPT
+##########################################
 # IRFs: effective areas after gamma/hadron cuts
 	  elif [[ $RUN == "CUTS" ]]
 	  then
-	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.W2.$DATE $S 0 $AZ
+	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.W2.$DATE $S 0 $AZ $QSUBOPT
+##########################################
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W2.$DATE $OOTIME DESY.$DATE.Erec$EREC.W2.ID$ID$AZ$NTYPF.$S 0 $ID $S
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W2.$DATE $OOTIME DESY.$DATE.Erec$EREC.W2.ID$ID$AZ$NTYPF.$S 0 $ID $S $QSUBOPT
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then

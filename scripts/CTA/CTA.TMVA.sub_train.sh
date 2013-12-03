@@ -6,10 +6,10 @@
 # Author: Gernot Maier
 #
 
-if [ $# -ne 4 ] && [ $# -ne 5 ]
+if [ $# -lt 4 ]
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone> <data set> <analysis parameter file> [direction (e.g. _180deg)]"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone> <data set> <analysis parameter file> [direction (e.g. _180deg)] [qsub options]"
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
    echo
@@ -64,6 +64,11 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 if [ -n "$5" ]
 then
   MCAZ=$5
+fi
+
+if [ -n $6 ]
+then
+   QSUBOPT="$6"
 fi
 
 #####################################
@@ -157,8 +162,14 @@ do
 	 done
 # setting the cuts correctly in the run parameter file
          sed -i "s|MINIMAGES|$NIMAGESMIN|" $RFIL.runparameter
-	 if [ -z $NTYPEMIN_2 ]
+         if [ -z $NTYPEMIN_0 ]
+         then
+	    TYPECUT="(NImages_Ttype[0]>=0)"
+	 elif [ -z $NTYPEMIN_1 ]
 	 then
+	    TYPECUT="(NImages_Ttype[0]>="$NTYPEMIN_0")"
+         elif [ -z $NTYPEMIN_2 ]
+         then
 	    TYPECUT="(NImages_Ttype[0]>="$NTYPEMIN_0"\|\|NImages_Ttype[1]>="$NTYPEMIN_1")"
          else
 	    TYPECUT="(NImages_Ttype[0]>="$NTYPEMIN_0"\|\|NImages_Ttype[1]>="$NTYPEMIN_1"\|\|NImages_Ttype[2]>="$NTYPEMIN_2")"
@@ -188,7 +199,7 @@ do
 
 #################################
 # submit job to queue
-	 qsub -V -l os="sl6" -l h_cpu=41:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
+	 qsub $QSUBOPT -V -l os="sl6" -l h_cpu=41:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
      done
   done
 done

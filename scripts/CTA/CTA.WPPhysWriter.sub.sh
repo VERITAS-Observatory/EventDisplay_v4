@@ -6,10 +6,10 @@
 #
 #######################################################################
 
-if [ $# -ne 7 ]
+if [ $# -lt 7 ]
 then
    echo 
-   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name> <offset=0/1> <recid> <data set>"
+   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name> <offset=0/1> <recid> <data set> [qsub options]"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
    echo ""
@@ -25,6 +25,11 @@ OUTNAME=$4
 OFFSET=$5
 RECID=$6
 DSET=$7
+QSUBOPT=""
+if [ -n $8 ]
+then
+   QSUBOPT="$8"
+fi
 
 ############################################################################
 
@@ -68,7 +73,7 @@ do
        -e "s|ODIR|$ODIR|" \
        -e "s|RRRR|$RECID|" $FNAM
 
-   qsub -P cta_high -js 2000 -V -l os=sl6  -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FNAM"
+   qsub $QSUBOPT -V -l os=sl6  -l h_cpu=0:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FNAM"
 
 done
 

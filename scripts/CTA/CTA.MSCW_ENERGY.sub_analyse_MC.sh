@@ -6,10 +6,10 @@
 #
 
 
-if [ $# -ne 6 ]
+if [ $# -lt 6 ]
 then
    echo
-   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <output directory> <onSource/cone>"
+   echo "CTA.MSCW_ENERGY.sub_analyse_MC.sh <tablefile> <recid> <subarray list> <data set> <output directory> <onSource/cone> [qsub options]"
    echo
    echo "  <tablefile>     table file name (without .root)"
    echo "                  expected file name: xxxxxx-SUBARRAY.root; SUBARRAY is added by this script"
@@ -40,6 +40,11 @@ ANADIR=$5
 if [ $CONE = "FALSE" ]
 then
    ANADIR=$ANADIR-onAxis
+fi
+QSUBOPT=""
+if [ -n $7 ]
+then
+   QSUBOPT="$7"
 fi
 
 #########################################
@@ -139,7 +144,7 @@ do
 	    echo $FNAM.sh
 
 # submit the job
-	    qsub -js 2000 -l h_cpu=41:29:00 -l os=sl6 -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
+	    qsub $QSUBOPT -l h_cpu=41:29:00 -l os=sl6 -l h_vmem=9000M -l tmpdir_size=5G  -V -j y -o $QLOG -e $QLOG "$FNAM.sh" 
 	    echo "run script written to $FNAM.sh"
 	    echo "queue log and error files written to $QLOG"
        done

@@ -2,6 +2,8 @@
 #
 # script to convert sim_tel output files and then run eventdisplay analysis
 #
+# PROD2
+#
 # Author: Gernot Maier
 #
 #######################################################################
@@ -9,7 +11,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
    echo
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [TRIGGER MASK DIRECTORY]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [TRIGGER MASK DIRECTORY] [qsub options]"
    echo
    echo "CTA PROD2 ANALYSIS"
    echo
@@ -61,6 +63,11 @@ if [ -n $7 ]
 then
   TRGMASKDIR="$7"
 fi
+QSUBOPT=""
+if [ -n $8 ]
+then
+   QSUBOPT="$8"
+fi
 
 # checking the path for binary
 if [ -z $EVNDISPSYS ]
@@ -96,23 +103,7 @@ QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
 QLOG="/dev/null"
 
 # pedestals
-echo $DSET
-if [[ $DSET == *Leoncito* ]] || [[ $DSET == *SAC* ]]
-then
-   echo "Leoncito / SAC"
-   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
-elif [[ $DSET == *Aar* ]] || [[ $DSET = *NorthSite-BB* ]] || [[ $DSET == *US* ]] || [[ $DSET == *SPM* ]] || [[ $DSET == *Tenerife* ]]
-then
-   echo "Aar"
-# use always Leoncito peds - should be exactly the same
-#   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
-   PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
-else
-   echo "error: data set not known (not Leoncito, SAC or Aar)"
-   echo "       (no ped files available)"
-   exit
-fi
-
+PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
 
 echo "submitting $RUNFROMTO"
 
@@ -140,7 +131,7 @@ rm -f $FNAM-9.sh
 chmod u+x $FNAM.sh
 echo $FNAM.sh
 
-qsub -P cta_high -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os=sl6 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+qsub $QSUBOPT -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os=sl6 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh" 
 
 echo "writing shell script to $FNAM.sh"
 echo "writing queue log and error files to $QLOG"
