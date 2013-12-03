@@ -244,7 +244,7 @@ void VDST::fill()
                 {
                     fDSTsums[i][j] = (float)getSums()[j]; // ignore dead low gain channels
                     fDSTsums2[i][j] = (float)getSums2()[j]; // ignore dead low gain channels
-                    fDSTdead[i][j] = (unsigned int)getDead()[j];
+                    fDSTdead[i][j] = (unsigned int)getDead( getHiLo()[j] )[j];		//set channel dead if it is ( dead in low gain AND in low gain ) OR (dead in high gain AND in high gain )
                     fDSTsumwindow[i][j] = getCurrentSumWindow()[j];
                     fDSTsumfirst[i][j] = getTCorrectedSumFirst()[j];
 		    if( fRunPar->fpulsetiminglevels.size() < getDSTpulsetiminglevelsN() )

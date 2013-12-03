@@ -249,15 +249,17 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 // calculate t0
 	       if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
 	       {
-		   crateTZero=fTraceHandler->getPulseTiming(0,getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
+		   crateTZero=fTraceHandler->getFADCTiming(0,getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
 		   if( i_channelHitID < getHiLo().size() && getHiLo()[i_channelHitID] ) crateTZero = 0.;
 	       }
 	       getFADCstopTZero()[t] = crateTZero;
 // calculate offsets
 	       if( t > 0 )
 	       {
-		  if( getFADCstopTZero()[0] > 0. ) offset = getFADCstopTZero()[0] - crateTZero;
-		  else                             offset = 0.;
+		  if( getFADCstopTZero()[0] > 0 &&  crateTZero> 0 ) offset=getFADCstopTZero()[0] - crateTZero;
+		  else  offset = 0.;
+
+		  if( fDebug && fabs(offset) > 5 ) cout << "VImageBaseAnalyzer::FADCStopCorrect() warning: crate jitter offset > 5 samples in Event "<< fEventNumber << ", Tel " << fTelID+1 << ", TZero[0] " << getFADCstopTZero()[0] << ", TZero["<< t << "] " << crateTZero << endl;
 		  unsigned int iC_start = 0;
 		  unsigned int iC_stop =  0;
 // crate 2
@@ -452,7 +454,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 /////////////////////////////////////////////////////////////////
 // calculate tzero and sums for good channels only
         if( i_channelHitID < ndead_size && !getDead(getHiLo()[i_channelHitID])[i_channelHitID])
-        {
+      {
 // initialize trace handler
 	    fTraceHandler->setTrace( fReader, getNSamples(), 
 				     getPeds(getHiLo()[i_channelHitID] )[i_channelHitID], getPedrms(getHiLo()[i_channelHitID])[i_channelHitID], 
@@ -1030,6 +1032,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
                 {
 // get new tzero for sumwindow starting at corrfirst to the end of the window
+    		corrfirst=0;	
 		    float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
                     if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
                     {

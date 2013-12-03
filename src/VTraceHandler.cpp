@@ -170,7 +170,7 @@ double VTraceHandler::getQuickSum(int fFirst, int fLast, bool fRaw)
     }
     if( isnan( sum ) ) sum = 0.;
     if( abs( sum ) < 1.e-10 ) sum = 0.;
-    fSum=sum;
+    fSum=sum; 
     return sum;
 }
 
@@ -209,6 +209,51 @@ double VTraceHandler::getQuickTZero(int fFirst, int fLast, int fTFirst )
     if( (before-after) > 0.0 ) tzero += (halfmax-after)/(before-after);
     else                       tzero += 0.5;
     return tzero;
+}
+
+vector<float> VTraceHandler::getFADCTiming(int fFirst, int fLast, bool debug) {
+
+	if(fLast-fFirst<=20) {// small readout window -> don't bother with extra step
+		return getPulseTiming( fFirst,fLast, fFirst, fLast );
+	}
+	int i_start = fFirst;
+	int i_stop = fLast;
+	double trace_max = 0.;
+	unsigned int n255 = 0;
+	int maxpos = 0;
+	getQuickMax( fFirst, fLast, trace_max, maxpos, n255 );
+	
+	bool have_first = false;
+	bool have_second= false;
+
+	float temp=0;
+
+	//cout << "VTraceHandler::getFADCTiming(): maxpos " << maxpos << ", trace_max " << trace_max  << endl; 
+
+	//find first bin above 50 dc & first bin after that where the trace goes down again
+	for(int i=fFirst; i<fLast && !have_second; i++) {
+		if ( !have_first && ( fpTrace[i] - fPed ) > 40 ) {
+			i_start=i;
+			have_first=true;
+			//cout << "VTraceHandler::getFADCTiming(): First " << i_start << endl;
+		}
+		if ( have_first &&  ( fpTrace[i]-fPed ) < temp )  {
+			i_stop=i;
+			have_second = true;
+			//cout << "VTraceHandler::getFADCTiming(): Stop  " << i_stop << endl;
+		}
+		temp=fpTrace[i]-fPed;
+		//cout << "VTraceHandler::getFADCTiming(): i " << i << ", Temp  " << temp << endl;
+	}
+
+	if(!have_first && debug) {
+		cout << "VTraceHandler::getFADCTiming()  Warning: coulnd't find bin with signal > 40 dc in range " << fFirst << " - " << fLast << endl;
+	}
+	i_start-=4;
+	while (i_start < fFirst ) i_start++;
+	i_stop+=4;
+	while (i_stop > fLast ) i_stop--;
+	return getPulseTiming( i_start, i_stop, i_start, i_stop );
 }
 
 /*!

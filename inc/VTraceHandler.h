@@ -66,6 +66,7 @@ class VTraceHandler
 	double getTraceAverageTime() { return fTraceAverageTime; }
 	int    getTraceIntegrationFirst() { return fSumWindowFirst; }
 	int    getTraceIntegrationLast()  { return fSumWindowLast; }
+	vector<float> getFADCTiming(int fFirst, int fLast, bool debug=false);
 // virtual functions
         virtual double getTraceWidth( int fFirst, int fLast, double fPed ) { return getQuickPulseWidth( fFirst, fLast, fPed ); }
         virtual double getTraceSum( int fFirst, int fLast, bool fRaw );
