@@ -39,7 +39,7 @@ void VPlotPPUT::setPPUTRange( float pput_min, float pput_max )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VPlotPPUT::plot( bool bSouth, string iDataList, bool bPlotPredictions )
+void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bPlotPredictions )
 {
 // linear fits are valid in these ranges
    double alt_min = 1300.;
@@ -58,17 +58,16 @@ void VPlotPPUT::plot( bool bSouth, string iDataList, bool bPlotPredictions )
 	  fSite.pop_back();
           break;
        }
-       if( bSouth ) fSite.back()->fSiteRequirementID = 0;
-       else         fSite.back()->fSiteRequirementID = 3;
+       fSite.back()->fSiteRequirementID = iSiteRequirementID;
        z_site++;
    }
-   if( bSouth && f_pput_Energy_linTeV_min < 0. )
+   if( iSiteRequirementID < 3 && f_pput_Energy_linTeV_min < 0. )
    {
-       setPPUTEnergyRange( 0.1, 100. );
+       setPPUTEnergyRange( 0.03, 100. );
    }
-   else if( !bSouth && f_pput_Energy_linTeV_min < 0. )
+   else if( f_pput_Energy_linTeV_min < 0. )
    {
-       setPPUTEnergyRange( 0.1, 20. );
+       setPPUTEnergyRange( 0.03, 20. );
    }
 
    cout << "Total number of sites: " << fSite.size() << endl;

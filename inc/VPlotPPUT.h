@@ -44,7 +44,7 @@ class VPlotPPUT
    VPlotPPUT();
   ~VPlotPPUT() {}
 
-   void plot( bool bSouth, string iDataList, bool bPlotPredictions = false );
+   void plot( unsigned int iSiteRequirementID, string iDataList, bool bPlotPredictions = false );
    void setDebug( bool iB = false ) { fDebug = iB; }
    void setPlotAltitudeRange( float alt_min = 410., float alt_max = 4000. ) { f_plot_alt_min = alt_min; f_plot_alt_max = alt_max; }
    void setPPUTEnergyRange( float pput_Energy_linTeV_min = -99., float pput_Energy_linTeV_max = -99. ) { f_pput_Energy_linTeV_min = pput_Energy_linTeV_min; 
