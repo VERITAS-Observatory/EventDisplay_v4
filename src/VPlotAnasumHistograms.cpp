@@ -1003,7 +1003,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 
         xmin = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x1 ) );
         ymin = hmap->GetYaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( y1 ) );
-        xmax = hmap->GetXaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( x2 ) );
+        xmax = hmap->GetXaxis()->GetBinLowEdge( hmap->GetXaxis()->FindBin( x2 ) );
         ymax = hmap->GetYaxis()->GetBinLowEdge( hmap->GetYaxis()->FindBin( y1 ) );
         iXRange = xmax - xmin;
 
