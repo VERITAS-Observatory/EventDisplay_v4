@@ -52,14 +52,29 @@ class VPlotCTAArrayLayout
    ~VPlotCTAArrayLayout() {}
 
     TCanvas* plot_array( string iArrayName = "", double xmax = 1450., double ymax = 1450., bool drawTelescopeNumbers = true );
+    void     plot_fromList( string iArrayFile, string iPrefix, string iDir, double xmax = 1450., double ymax = 1450.,
+                            bool drawTelescopeNumbers = true );
     bool     readArrayFromRootFile( string iFile );
     void     printArrayCosts();
+    void     printListOfTelescopes();
     void     printTelescopeDistances( int iTelID, float iDistanceMax = 1.e99 );
+    bool     printTelescopeIDs_for_differentHyperArray( string iFile );
     bool     setSubArray( string iSubArrayFile = "" );
 };
 
 VPlotCTAArrayLayout::VPlotCTAArrayLayout()
 {
+}
+
+void VPlotCTAArrayLayout::printListOfTelescopes()
+{
+   for( unsigned int i = 0; i < fTelescopeList_subArray.size(); i++ )
+   {
+      cout << "Telescope " << i << " ID: " << fTelescopeList_subArray[i]->fTelID;
+      cout << " (HA " << fTelescopeList_subArray[i]->fTelID_hyperArray << ")";
+      cout << ", type " << fTelescopeList_subArray[i]->fTelType << " (" << fTelescopeList_subArray[i]->fTelTypeName << ")";
+      cout << ", [" << fTelescopeList_subArray[i]->fTel_x << "," << fTelescopeList_subArray[i]->fTel_y << "]" << endl;
+   }
 }
 
 void VPlotCTAArrayLayout::printArrayCosts()
@@ -238,6 +253,60 @@ bool VPlotCTAArrayLayout::readArrayFromRootFile( string iFile )
     return true;
 }
 
+bool VPlotCTAArrayLayout::printTelescopeIDs_for_differentHyperArray( string iFile )
+{
+    TFile f1( iFile.c_str() );
+    if( f1.IsZombie() ) return false;
+
+    TTree *t = (TTree*)f1.Get( "telconfig");
+    if( !t ) return false;
+
+    cout << "Telconfig tree found with " << t->GetEntries() << " telescopes" << endl;
+
+    float iTelX = 0.;
+    float iTelY = 0.;
+    ULong64_t iTelType = 0;
+    int iTelID = 0;
+    unsigned int iTelIDHA = 0;
+
+    t->SetBranchAddress( "TelID", &iTelID );
+    t->SetBranchAddress( "TelType", &iTelType );
+    if( t->GetBranchStatus( "TelID_hyperArray" ) ) t->SetBranchAddress( "TelID_hyperArray", &iTelIDHA );
+    t->SetBranchAddress( "TelX", &iTelX );
+    t->SetBranchAddress( "TelY", &iTelY );
+
+    unsigned int z_tel = 0;
+    for( unsigned int i = 0; i < fTelescopeList_subArray.size(); i++ )
+    {
+       bool bFound = false;
+       if( !fTelescopeList_subArray[i] ) continue;
+
+       for( unsigned int j = 0; j < t->GetEntries(); j++ )
+       {
+	  t->GetEntry( j );
+
+	  if( TMath::Abs( iTelX - fTelescopeList_subArray[i]->fTel_x ) < 1.e-2 
+	   && TMath::Abs( iTelY - fTelescopeList_subArray[i]->fTel_y ) < 1.e-2 
+	   && iTelType == fTelescopeList_subArray[i]->fTelType )
+	   {
+	       cout << iTelID << "\t" << iTelType << endl;
+	       bFound = true;
+	       z_tel++;
+	   }
+       }
+       if( !bFound )
+       {
+          cout << "TELESCOPE NOT FOUND: ID " << iTelID << ", type " << iTelType << " at [";
+	  cout << fTelescopeList_subArray[i]->fTel_x << "," << fTelescopeList_subArray[i]->fTel_y << "]" <<  endl;
+       }
+    }
+    f1.Close();
+
+    cout << "found " << z_tel << " telescopes (should be " << fTelescopeList_subArray.size() << ")" << endl;
+
+    return true;
+}
+
 
 
 
@@ -410,6 +479,25 @@ vector< string > VPlotCTAArrayLayout::getListofArrrays( string iArrayFile )
    }
 
    return SubArray;
+}
+
+void VPlotCTAArrayLayout::plot_fromList( string iArrayFile, string iPrefix, string iDir, double xmax, double ymax, bool drawTelescopeNumbers )
+{
+   vector< string > iSubArray = getListofArrrays( iArrayFile );
+   if( iSubArray.size() == 0 ) return;
+
+   for( unsigned int i = 0; i < iSubArray.size(); i++ )
+   {
+      string iName = iDir + "/CTA.prod2" + iPrefix + "." + iSubArray[i] + ".lis";
+      cout << iName << endl;
+      if( setSubArray( iName ) )
+      {
+	 iName = iPrefix + "-" + iSubArray[i];
+         TCanvas *c = plot_array( iName, xmax, ymax, drawTelescopeNumbers );
+	 iName += ".eps";
+	 c->Print( iName.c_str() );
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////
