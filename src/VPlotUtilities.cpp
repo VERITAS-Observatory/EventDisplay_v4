@@ -223,7 +223,7 @@ void VPlotUtilities::default_settings()
 void VPlotUtilities::setColorAxisPalette( int palette, int ncolors )
 {
     gStyle->SetPalette( palette );
-    gStyle->SetNumberContours( ncolors );
+    if( ncolors > 0 ) gStyle->SetNumberContours( ncolors );
     fColorAxis_ncolor = gStyle->GetNumberOfColors();
     fColorAxis_ncont  = gStyle->GetNumberContours();
 }

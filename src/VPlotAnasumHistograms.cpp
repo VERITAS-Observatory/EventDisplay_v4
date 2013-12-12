@@ -28,6 +28,8 @@ VPlotAnasumHistograms::VPlotAnasumHistograms()
    fTargetShiftWest   = -9999.;
    fTargetShiftNorth  = -9999.;
 
+   default_settings();
+
 }
 
 
@@ -47,6 +49,8 @@ VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
    fSkyMapCentreRAJ2000  = -9999.;
    fTargetShiftWest   = -9999.;
    fTargetShiftNorth  = -9999.;
+
+   default_settings();
 
    if( !openDataFile( ifile, ion ) ) return;
 }
@@ -237,8 +241,6 @@ void VPlotAnasumHistograms::convert_derotated_RADECJ2000( double x, double y , d
 void VPlotAnasumHistograms::plot_mscPlots( int irebin, double xmin, double xmax, string mscwfile )
 {
   
-    default_settings();
-
     char hname[200];
     char htitle[200];
 
@@ -380,8 +382,6 @@ void VPlotAnasumHistograms::plot_mscPlots( int irebin, double xmin, double xmax,
  */
 void VPlotAnasumHistograms::plot_qualityHistograms( double iSourceStrength, bool bUpper, int iMethod )
 {
-    default_settings();
-
     char hname[200];
     char htitle[200];
 
@@ -451,8 +451,6 @@ void VPlotAnasumHistograms::plot_qualityHistograms( double iSourceStrength, bool
  */
 TCanvas* VPlotAnasumHistograms::plot_skyPlots( string iPlotMode, bool iSingleCanvases )
 {
-    default_settings();
-
     char hname[200];
     char htitle[200];
 
@@ -603,8 +601,6 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
     // int iPlotPSF = 0;
     double setYMax = -1.;
 
-    default_settings();
-
     char hname[200];
     char htitle[200];
 
@@ -717,8 +713,6 @@ TCanvas* VPlotAnasumHistograms::plot_theta2(double t2min, double t2max, int irbi
 */
 TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, double rSource, double xmin, double xmax, TCanvas *cCanvas )
 {
-    default_settings();
-
     char hname[200];
     char htitle[200];
 
@@ -892,8 +886,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
                                             bool bSlices, double fSliceXmin, double fSliceXmax, bool bProjX)
 {
     cout << "OBSERVE: right ascension axis might on local time settings; adjust offset hours with setPlottingUseHours( bool iB, int iZeroHours )" << endl;
-
-    default_settings();
 
 // different presentations
     fPlotMode = "A colz";
@@ -1881,8 +1873,6 @@ void VPlotAnasumHistograms::drawPSF( TCanvas *c, string iFile, TH2D *h2, float r
 */
 void VPlotAnasumHistograms::plot_deadTimes()
 {
-    default_settings();
-
     if( fRunNumber < 0 )
     {
        cout << "VPlotAnasumHistograms::plot_deadTimes(): error no run number set" << endl;
