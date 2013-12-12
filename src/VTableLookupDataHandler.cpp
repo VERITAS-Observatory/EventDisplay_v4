@@ -146,7 +146,7 @@ void VTableLookupDataHandler::fill()
     else
     {
         fOTree->Fill();
-    }
+    } 
 }
 
 
@@ -214,7 +214,7 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
             cout << "...exiting" << endl;
             exit( -1 );
         }
-if( iNE == -1 ) return false;
+        if( iNE == -1 ) return false;
 // dead time calculation
         if( !fIsMC && getEventNumber() != 999999 ) fDeadTime->fillDeadTime( time );
 
@@ -406,11 +406,11 @@ else fEventStatus = true;
 // read only those telescope which were part of the reconstruction
         if( fReadTPars )
         {
-    if( !ftpars[i] )
-    {
-       cout << "VTableLookupDataHandler::fillNextEvent error: tree tpars not found (telescope " << i+1 << ")" << endl;
-       cout << "\t(run " << runNumber << ", " << eventNumber << ")" << endl;
-       exit( -1 );
+            if( !ftpars[i] )
+            {
+                cout << "VTableLookupDataHandler::fillNextEvent error: tree tpars not found (telescope " << i+1 << ")" << endl;
+                cout << "\t(run " << runNumber << ", " << eventNumber << ")" << endl;
+                exit( -1 );
             }
             ftpars[i]->GetEntry( fEventCounter );
 
@@ -464,7 +464,7 @@ else fEventStatus = true;
                 fmaxindex3[i] = ftpars[i]->index_of_max[2];
                 ftgrad_x[i] = ftpars[i]->tgrad_x;
                 ftchisq_x[i] = ftpars[i]->tchisq_x;
-fFitstat[i] = ftpars[i]->Fitstat;
+                fFitstat[i] = ftpars[i]->Fitstat;
             }
         }
         else
@@ -521,15 +521,15 @@ bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain *c )
      TFile *ifInput = new TFile( chEl->GetTitle() );
      if( ifInput->IsZombie() )
      {
-cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: file cannot be recovered; possibly not complete" << endl;
-cout << "\t " << chEl->GetTitle() << endl;
+        cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: file cannot be recovered; possibly not complete" << endl;
+        cout << "\t " << chEl->GetTitle() << endl;
         return true;
      }
      if( ifInput->TestBit(TFile::kRecovered) )
      {
         cout << "VTableLookupDataHandler::checkIfFilesInChainAreRecovered() error: file recovered; possibly not complete" << endl;
-cout << "\t " << chEl->GetTitle() << endl;
-return true;
+        cout << "\t " << chEl->GetTitle() << endl;
+        return true;
      }
      ifInput->Close();
    }
@@ -545,8 +545,8 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     {
        if( finputfile[i].find( ".root" ) == string::npos )
        {
-   cout << "TableLookupDataHandler::setInputFile: adding .root suffix to file name" << endl;
-   finputfile[i] += ".root";
+          cout << "TableLookupDataHandler::setInputFile: adding .root suffix to file name" << endl;
+          finputfile[i] += ".root";
        }
        cout << "opening file(s): " << endl;
        cout << finputfile[i] << endl;
@@ -562,8 +562,8 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
        int iNFil = fTtelconfig->Add( finputfile[i].c_str() );
        if( iNFil == 0 )
        {
-   cout << "error: no file(s) in chain" << endl;
-   exit( -1 );
+          cout << "error: no file(s) in chain" << endl;
+          exit( -1 );
        }
        iNFil_sum += iNFil;
     }
@@ -573,9 +573,9 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     {
        if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
        {
-  cout << "VTableLookupDataHandler::setInputFile() error: some file are not properly closed" << endl;
-  cout << "exit..." << endl;
-  exit( -1 );
+           cout << "VTableLookupDataHandler::setInputFile() error: some file are not properly closed" << endl;
+           cout << "exit..." << endl;
+           exit( -1 );
        } 
     }
 
@@ -598,9 +598,9 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
             fTelX[i] = ftelconfig->TelX;
             fTelY[i] = ftelconfig->TelY;
             fTelZ[i] = ftelconfig->TelZ;
-    fFocalLength[i] = ftelconfig->FocalLength;
+            fFocalLength[i] = ftelconfig->FocalLength;
             fTel_type[i] = ftelconfig->TelType;
-    if( fList_of_Tel_type.find( ftelconfig->TelType ) != fList_of_Tel_type.end() ) fList_of_Tel_type[ftelconfig->TelType]++;
+            if( fList_of_Tel_type.find( ftelconfig->TelType ) != fList_of_Tel_type.end() ) fList_of_Tel_type[ftelconfig->TelType]++;
             else fList_of_Tel_type[ftelconfig->TelType] = 1;
         }
 // number of different telescope types
@@ -618,13 +618,14 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         cout << "\t telescope " << i+1 << "\t";
-cout << "x:" << fTelX[i] << " [m]\ty:" << fTelY[i] << " [m]\tz:" << fTelZ[i] << " [m]\t";
-cout << "type " << fTel_type[i] << " (type counter " << getTelType_arraycounter(i) << ")";
-cout << endl;
+        cout << "x:" << fTelX[i] << " [m]\ty:" << fTelY[i] << " [m]\tz:" << fTelZ[i] << " [m]\t";
+        cout << "type " << fTel_type[i] << " (type counter " << getTelType_arraycounter(i) << ")";
+        cout << endl;
     }
     cout << endl;
     cout << "list of telescope types (" << fList_of_Tel_type.size() << "): ";
-    for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin(); fList_of_Tel_type_iterator != fList_of_Tel_type.end(); fList_of_Tel_type_iterator++ )
+    for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin(); fList_of_Tel_type_iterator != fList_of_Tel_type.end(); 
+         fList_of_Tel_type_iterator++ )
     {
        cout << "  " << fList_of_Tel_type_iterator->first << " (" << fList_of_Tel_type_iterator->second << " telescopes)";
     }
@@ -764,10 +765,10 @@ cout << endl;
     {
         sprintf( iName, "tpars" );
         iT = new TChain( iName );
-for( unsigned int f = 0; f < finputfile.size(); f++ )
-{
-   sprintf( iDir, "%s/Tel_%d/tpars", finputfile[f].c_str(), i+1 );
-   iT->Add( iDir );
+        for( unsigned int f = 0; f < finputfile.size(); f++ )
+        {
+           sprintf( iDir, "%s/Tel_%d/tpars", finputfile[f].c_str(), i+1 );
+           iT->Add( iDir );
         }
         if( !iT )
         {
@@ -804,60 +805,63 @@ for( unsigned int f = 0; f < finputfile.size(); f++ )
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         if( !fTLRunParameter->fPE )
-{
-   if( fDebug > 1 ) cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope " << i+1 << endl;
-   sprintf( iName, "calib_%d", i+1 );
-   TChain iPedVars( iName );
-   for( unsigned int f = 0; f < finputfile.size(); f++ )
-   {
-      sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile[f].c_str(), i+1, i+1 );
-      if( !iPedVars.Add( iDir ) )
-      {
-  cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
-  cout << "exiting..." << endl;
-  exit( -1 );
-      }
-           }
-   gErrorIgnoreLevel = 5000;
-   double pedvar = 0.;
-   double mpedvar = 0.;
-   double npedvar = 0.;
-   double state = 0;
-   iPedVars.SetBranchAddress( "pedvar", &pedvar );
-   if( iPedVars.GetBranchStatus( "state" ) ) iPedVars.SetBranchAddress( "state", &state );
+        {
+            if( fDebug > 1 ) cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope " << i+1 << endl;
+            sprintf( iName, "calib_%d", i+1 );
+            TChain iPedVars( iName );
+            for( unsigned int f = 0; f < finputfile.size(); f++ )
+            {
+               sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile[f].c_str(), i+1, i+1 );
+               if( !iPedVars.Add( iDir ) )
+               {
+                  cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
+                  cout << "exiting..." << endl;
+                  exit( -1 );
+               }
+            }
+            gErrorIgnoreLevel = 5000;
+            double pedvar = 0.;
+            double mpedvar = 0.;
+            double npedvar = 0.;
+            double state = 0;
+            iPedVars.SetBranchAddress( "pedvar", &pedvar );
+            if( iPedVars.GetBranchStatus( "state" ) ) iPedVars.SetBranchAddress( "state", &state );
 
-   sprintf( iName, "ht_%d", i+1 );
-   TH1D h( iName, "", 1000, 0., 50. );
+            sprintf( iName, "ht_%d", i+1 );
+            TH1D h( iName, "", 1000, 0., 50. );
 
-   if( fDebug > 1 )
-   {
-       cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope ";
-       cout << i+1 << ", number of entries: " << iPedVars.GetEntries() << endl;
-           }
-   for( int n = 0; n < iPedVars.GetEntries(); n++ )
-   {
-       iPedVars.GetEntry( n );
+            if( fDebug > 1 )
+            {
+                cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope ";
+                cout << i+1 << ", number of entries: " << iPedVars.GetEntries() << endl;
+            }
+            for( int n = 0; n < iPedVars.GetEntries(); n++ )
+            {
+                iPedVars.GetEntry( n );
 
-       if( pedvar > 0. && state == 0 )
-       {
-   mpedvar += pedvar;
-   npedvar++;
-   h.Fill( pedvar );
-       }
-   }
-   double xq[1];
-   double yq[1];
-   xq[0] = 0.5;
-   yq[0] = 0.;
-   if( h.GetEntries() > 0. ) h.GetQuantiles( 1, yq, xq );
-   fNoiseLevel.push_back( yq[0] );
-   gErrorIgnoreLevel = 0;
-   if( fDebug > 1 ) cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope (results): " << i+1 << "\t" << yq[0] << endl;
-       }
+                if( pedvar > 0. && state == 0 )
+                {
+                   mpedvar += pedvar;
+                   npedvar++;
+                   h.Fill( pedvar );
+                }
+            }
+            double xq[1];
+            double yq[1];
+            xq[0] = 0.5;
+            yq[0] = 0.;
+            if( h.GetEntries() > 0. ) h.GetQuantiles( 1, yq, xq );
+            fNoiseLevel.push_back( yq[0] );
+            gErrorIgnoreLevel = 0;
+            if( fDebug > 1 )
+            {
+               cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope (results): " << i+1 << "\t" << yq[0] << endl;
+            }
+        }
 // PE format -> ignore noise level calculation
        else
        {
-   fNoiseLevel.push_back( 0. );
+         fNoiseLevel.push_back( 0. );
        }
     }
     if( fDebug ) cout << "VTableLookupDataHandler::setInputFile() END" << endl;
@@ -887,9 +891,9 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
     {
        if( foutputfile == finputfile[i] && iOption == "recreate" )
        {
-   cout << "VTableLookupDataHandler::setOutputFile error: can't overwrite inputfile" << endl;
-   cout << "\t" << finputfile[i] << endl;
-   exit( -1 );
+           cout << "VTableLookupDataHandler::setOutputFile error: can't overwrite inputfile" << endl;
+           cout << "\t" << finputfile[i] << endl;
+           exit( -1 );
        }
     }
 
@@ -1201,43 +1205,43 @@ bool VTableLookupDataHandler::terminate( TNamed *iM )
         fOTree->Write( "", TObject::kOverwrite );
 
         if( iM )
-{
-   cout << "\t writing table lookup run parameter" << endl;
-   iM->Write();
+        {
+            cout << "\t writing table lookup run parameter" << endl;
+            iM->Write();
         }
-else 
-{
-   cout << "\t no table lookup run parameter to write" << endl;
+        else 
+        {
+            cout << "\t no table lookup run parameter to write" << endl;
         }
 
         if( fTtelconfig )
-{
-   cout << "\t writing telescope configuration" << endl;
-   copy_telconfig();
+        {
+            cout << "\t writing telescope configuration" << endl;
+            copy_telconfig();
         }
-else cout << "\t no telescope configuration to write" << endl;
-fOutFile->cd();
+        else cout << "\t no telescope configuration to write" << endl;
+        fOutFile->cd();
 
         if( fIsMC )
-{
-   cout << "\t writing MC debug histograms" << endl;
-   hisList->Write();
+        {
+            cout << "\t writing MC debug histograms" << endl;
+            hisList->Write();
         }
 // see if there is a dead time object on file, if not: write the one filled here
 // (note: at this stage, the scalars cannot be used and the dead time might be
 //         underestimated)
         if( !fIsMC ) writeDeadTimeHistograms(); 
 
-if( fIsMC )
-{
-   bool iMCTree_exists = copyMCRunheader();
-   if( bWriteMCPars && iMCTree_exists ) copyMCTree();
-   copyMCHistograms();
+        if( fIsMC )
+        {
+            bool iMCTree_exists = copyMCRunheader();
+            if( bWriteMCPars && iMCTree_exists ) copyMCTree();
+            copyMCHistograms();
         }
 
         fOutFile->Close();
         cout << "...outputfile closed" << endl;
-cout << "(" << fOutFile->GetName() << ")" << endl;
+        cout << "(" << fOutFile->GetName() << ")" << endl;
     }
 
     return true;
@@ -1266,10 +1270,10 @@ void VTableLookupDataHandler::writeDeadTimeHistograms()
        TFile *f = iTel.GetFile();
        if( f )
        {
-    TDirectoryFile *iDeadtimeDirectory = (TDirectoryFile*)f->Get( "deadTimeHistograms" );
-    if( iDeadtimeDirectory )
-    {
-        fDeadTime->readHistograms( iDeadtimeDirectory );
+            TDirectoryFile *iDeadtimeDirectory = (TDirectoryFile*)f->Get( "deadTimeHistograms" );
+            if( iDeadtimeDirectory )
+            {
+                 fDeadTime->readHistograms( iDeadtimeDirectory );
             }
             fDeadTime->calculateDeadTime();
             fDeadTime->printDeadTime();
@@ -1293,11 +1297,11 @@ void VTableLookupDataHandler::copy_telconfig()
        if( f )
        {
           if( f->Get( "telconfig" ) )
-  {
-     TTree *t = (TTree*)f->Get( "telconfig" );
-     fOutFile->cd();
-     TTree *n = t->CloneTree();
-     n->Write();
+          {
+              TTree *t = (TTree*)f->Get( "telconfig" );
+              fOutFile->cd();
+              TTree *n = t->CloneTree();
+              n->Write();
           }
        }
     }
@@ -1326,12 +1330,12 @@ bool VTableLookupDataHandler::copyMCRunheader()
        if( f )
        {
           if( (VMonteCarloRunHeader*)f->Get( "MC_runheader" ) )
-  {
-     fOutFile->cd();
-     f->Get( "MC_runheader" )->Write();
-     cout << "\t MC run header found and copied" << endl;
+          {
+              fOutFile->cd();
+              f->Get( "MC_runheader" )->Write();
+              cout << "\t MC run header found and copied" << endl;
           }
-  if( f->Get( "MCpars" ) ) return true;
+          if( f->Get( "MCpars" ) ) return true;
        }
     }
     return false;
@@ -1362,42 +1366,42 @@ void VTableLookupDataHandler::copyMCHistograms()
    {
 // loop over all files and add MC histograms
         TObjArray *fileElements = fTshowerpars->GetListOfFiles();
-if( !fileElements )
-{
-   cout << "VTableLookupDataHandler::copyMCHistograms(): no list of files found" << endl;
-   return;
+        if( !fileElements )
+        {
+            cout << "VTableLookupDataHandler::copyMCHistograms(): no list of files found" << endl;
+            return;
         }
         TChainElement *chEl=0;
         TIter next(fileElements);
-unsigned int z = 0;
-while( (chEl = (TChainElement*)next()) )
-{
+        unsigned int z = 0;
+        while( (chEl = (TChainElement*)next()) )
+        {
            TFile *ifInput = new TFile( chEl->GetTitle() );
-   if( !ifInput->IsZombie() )
-   {
-      if( z == 0 )
-      {
-         iMC_his = (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" );
+           if( !ifInput->IsZombie() )
+           {
+               if( z == 0 )
+               {
+                  iMC_his = (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" );
+                       }
+               else
+               {
+                  if( iMC_his )
+                  {
+                     iMC_his->add( (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" ) );
+                  }
+                  ifInput->Close();
               }
-      else
-      {
-         if( iMC_his )
- {
-    iMC_his->add( (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" ) );
-                 }
- ifInput->Close();
-              }
-      z++;
+              z++;
            }
         }
-if( iMC_his && fOutFile )
-{ 
-   cout << "\t writing MC histograms" << endl;
-   iMC_his->print();
-   fOutFile->cd();
-   iMC_his->Write();
+        if( iMC_his && fOutFile )
+        { 
+            cout << "\t writing MC histograms" << endl;
+            iMC_his->print();
+            fOutFile->cd();
+            iMC_his->Write();
         }
-   }
+    }
 }
 
 
@@ -1455,21 +1459,21 @@ void VTableLookupDataHandler::calcDistances( int nimages )
     {
        for( unsigned int tel = 0; tel < fNTel; tel++ )
        {
-   if( fImgSel_list[tel] )
-   {
-      fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
-   }
-   else
-   {
-      fR[tel] = -99.;
-   }
+            if( fImgSel_list[tel] )
+            {
+               fR[tel] = VUtilities::line_point_distance( fYcore, -1.*fXcore, 0., fZe, fAz, fTelY[tel], -1.*fTelX[tel], fTelZ[tel] );
+            }
+            else
+            {
+               fR[tel] = -99.;
+            }
        }
     }
     else
     {
        for( unsigned int tel = 0; tel < fNTel; tel++ )
        {
-   fR[tel] = -99.;
+           fR[tel] = -99.;
        }
     }
 }
@@ -1754,9 +1758,9 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 // core error cut
         if( ((fXcore-fMCxcore)*(fXcore-fMCxcore) + (fYcore-fMCycore)*(fYcore-fMCycore) ) 
      > fTLRunParameter->fTableFillingCut_CoreError_max*fTLRunParameter->fTableFillingCut_CoreError_max )
-{
-   fNStats_CoreErrorCut++;
-   return false;
+        {
+            fNStats_CoreErrorCut++;
+            return false;
         }
     } 
 
@@ -1915,7 +1919,7 @@ double* VTableLookupDataHandler::getDistanceToCore( ULong64_t iTelType )
        if( fTel_type[i] == iTelType )
        {
           fR_telType[z] = fR[i];
-  z++;
+          z++;
        }
     }
     return fR_telType;
@@ -1928,7 +1932,7 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection, bool iSelected
        if( iSelectedImagesOnly && !fImgSel_list[i] )
        {
           fsizeCorr[i] = -99.;
-  continue;
+          continue;
        }
        if( !iSize2 ) fsizeCorr[i] = fsize[i] * iSizeCorrection;
        else          fsizeCorr[i] = fsize2[i] * iSizeCorrection;
@@ -1943,15 +1947,15 @@ double* VTableLookupDataHandler::getSize( double iSizeCorrection,  ULong64_t iTe
     {
        if( fTel_type[i] == iTelType )
        {
-  if( iSelectedImagesOnly && !fImgSel_list[i] )
-  {
-     fsize_telType[z] = -99.;
-     z++;
-     continue;
+          if( iSelectedImagesOnly && !fImgSel_list[i] )
+          {
+              fsize_telType[z] = -99.;
+              z++;
+              continue;
           }
           if( !iSize2 ) fsize_telType[z] = fsize[i] * iSizeCorrection;
           else          fsize_telType[z] = fsize2[i] * iSizeCorrection;
-  z++;
+          z++;
        }
     }
     return fsize_telType;
@@ -1965,7 +1969,7 @@ double* VTableLookupDataHandler::getWidth( ULong64_t iTelType )
        if( fTel_type[i] == iTelType )
        {
           fwidth_telType[z] = fwidth[i];
-  z++;
+          z++;
        }
     }
     return fwidth_telType;
@@ -1979,7 +1983,7 @@ double* VTableLookupDataHandler::getLength( ULong64_t iTelType )
        if( fTel_type[i] == iTelType )
        {
           flength_telType[z] = flength[i];
-  z++;
+          z++;
        }
     }
     return flength_telType;
@@ -1993,7 +1997,7 @@ double* VTableLookupDataHandler::getDistance( ULong64_t iTelType )
        if( fTel_type[i] == iTelType )
        {
           fdist_telType[z] = fdist[i];
-  z++;
+          z++;
        }
     }
     return fdist_telType;
