@@ -605,6 +605,7 @@ void VEventLoop::shutdown()
     }
 // write array analysis results to output file
             if( fArrayAnalyzer ) fArrayAnalyzer->terminate();
+	    if( fRunPar->fUseModel3D && fModel3D ) fModel3D->terminate(); //JG
 #ifndef NOGSL
             if( fRunPar->ffrogsmode ) fFrogs->terminate();
 #endif
@@ -1051,15 +1052,7 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
 #endif
        {
           fArrayAnalyzer->doAnalysis();
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// (GM) some of these lines are executed even when 3D Model is not used!
-// (GM) each event is twice in the showerpars tree
-/*  if( fRunPar->fUseModel3D || fRunPar->fUseDisplayModel3D ) {
-    if (fReader->hasArrayTrigger() ) fModel3D->doModel3D(); //JG
-    else fModel3D->fillInit3D();
-  }
-  if( !fRunPar->fWriteTriggerOnly ) getShowerParameters()->getTree()->Fill(); //JG
-  else if ( fRunPar->fWriteTriggerOnly && fReader->hasArrayTrigger() ) getShowerParameters()->getTree()->Fill(); //JG */
+	  if( fRunPar->fUseModel3D && fReader->hasArrayTrigger() ) fModel3D->doModel3D(); //JG
 // GH Frogs Analysis
 #ifndef NOGSL
           if( fRunPar->ffrogsmode )
@@ -1069,6 +1062,8 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
 #endif 
        }
     }
+
+///!getRunParameter()->fWriteTriggerOnly
 
 /////////////////////////////////////////////////////////////////////////
 // dead time calculation

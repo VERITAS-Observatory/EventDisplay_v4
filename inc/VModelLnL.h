@@ -28,8 +28,8 @@ class VModelLnL : public VMinimizerFn
 
     void pixelLnL_lookup(double s, double pixel_var, double pixel_nsb, double mu, double& lnl, double& dlnl, double& d2lnl) const; 
 
+    bool fDebug;             // print debug info 
     unsigned int  fNParam;   // number of parameters in Model3D
-
     double fSinglePEvar;     // from Matthew's CTA analysis, valid for VERITAS ??   
 
     /// TEST lookup table ///

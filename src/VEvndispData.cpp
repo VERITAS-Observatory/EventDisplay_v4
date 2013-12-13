@@ -884,6 +884,7 @@ VMCParameters* VEvndispData::fMCParameters = 0;
 VEvndispReconstructionParameter* VEvndispData::fEvndispReconstructionParameter = 0;
 VFrogParameters* VEvndispData::fFrogParameters = 0;
 //vector< VFrogImageData* > VEvndispData::fFrogData;
+VModel3DParameters* VEvndispData::fModel3DParameters = 0; //JG
 
 // timing graphs
 vector< TGraphErrors* > VEvndispData::fXGraph;

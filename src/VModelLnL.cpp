@@ -11,6 +11,7 @@ VModelLnL::VModelLnL(VModel3DData* iVModel3DData, VModel3DFn* iVModel3DFn): VMin
 {
   fSinglePEvar = 0.4*0.4; // Hard-coded for VERITAS
   fNParam = 8;  //Model3D number of parameters
+  fDebug = false;
 }
 
 VModelLnL::~VModelLnL()
@@ -48,7 +49,7 @@ void VModelLnL::val(const vector<double>& a, double& lnl, vector<double>& beta, 
     for (unsigned int i = 0; i < fNParam; i++) {
       scope_alpha[i].resize( fNParam );
       for (unsigned int j = 0; j < fNParam; j++) {
-scope_alpha[i][j] = 0.0;
+	scope_alpha[i][j] = 0.0;
       }
     }
 
@@ -60,7 +61,7 @@ scope_alpha[i][j] = 0.0;
     for (unsigned int i = 0; i < fNParam; i++) {
       beta[i] += scope_beta[i];
       for (unsigned int j = 0; j < fNParam; j++) {
-alpha[i][j] += scope_alpha[i][j];
+	alpha[i][j] += scope_alpha[i][j];
       }
     }
 
@@ -109,25 +110,27 @@ void VModelLnL::scopeLnL(unsigned int iscope, const vector<double>& a, double& l
       for(unsigned int par = 0; par < fNParam; par++) dmuda[par] *= qterm1; 
 
       ////if( mu < 1.0 ) mu = 0.;       /// Gauss   set small mu to 0
-      if( mu < 0.01 ) mu = 0.;       /// Poisson set small mu to 0
+      if( mu < 0.01 || fabs(mu-s) > 900 ) mu = 0.;       /// Poisson set small mu to 0
 
       double pix_lnl = 0;
       double dlnl = 0;
       double d2lnl = 0;
       // double pixGOF = 0; //JG Gaussian
 
+      /// if(fDebug && fabs(mu-s) > 900) cout<<"VModelLnL: T"<<iscope+1<<" ch"<<ichan;
+
       ///pixelLnLGauss(s,pixel_var,pixel_nsb,mu,pix_lnl,dlnl,d2lnl ); //JG: Gauss
       pixelLnL_lookup(s,pixel_var,pixel_nsb,mu,pix_lnl,dlnl,d2lnl); //JG: Poisson      
       /////pixelLnL(s,pixel_var,pixel_nsb,fSinglePEvar,mu,pix_lnl,dlnl,d2lnl); //JG: Poisson
 
       if(isnan(mu)) {
-cout<< "Mu NaN: T"<<iscope+1<<" ch" <<ichan<<" mu "<<mu<<" s "<<s<<" var "<<pixel_var<<" lnl "<<pix_lnl<<" dlnl "<<dlnl<<" d2lnl "<<d2lnl<<endl;
+	cout<< "Mu NaN: T"<<iscope+1<<" ch" <<ichan<<" mu "<<mu<<" s "<<s<<" var "<<pixel_var<<" lnl "<<pix_lnl<<" dlnl "<<dlnl<<" d2lnl "<<d2lnl<<endl;
 pix_lnl = 0; 
         continue;
       }
 
       if(!isfinite(pix_lnl)) {
-cout<< "LnL notfinite: T"<<iscope+1<<" ch" <<ichan<<" mu "<<mu<<" s "<<s<<" var "<<pixel_var<<" lnl "<<pix_lnl<<" dlnl "<<dlnl<<" d2lnl "<<d2lnl<<endl;
+	cout<< "LnL notfinite: T"<<iscope+1<<" ch" <<ichan<<" mu "<<mu<<" s "<<s<<" var "<<pixel_var<<" lnl "<<pix_lnl<<" dlnl "<<dlnl<<" d2lnl "<<d2lnl<<endl;
 pix_lnl = 0; 
         continue;
       }
@@ -147,10 +150,10 @@ pix_lnl = 0;
       ///////////////
 
       for (unsigned int i = 0; i < fNParam; i++) beta[i] += dmuda[i] * dlnl;
-          for(unsigned ip = 0; ip < fNParam; ip++) {
-for(unsigned jp = 0; jp < fNParam; jp++) {
-  alpha[ip][jp] += dmuda[ip] * dmuda[jp] * d2lnl;
-}
+      for(unsigned ip = 0; ip < fNParam; ip++) {
+	for(unsigned jp = 0; jp < fNParam; jp++) {
+	  alpha[ip][jp] += dmuda[ip] * dmuda[jp] * d2lnl;
+	}
       }    
 
     } //image cleaning
@@ -262,22 +265,24 @@ void VModelLnL::pixelLnL_lookup(double s, double pixel_var, double pixel_nsb, do
     return;
   }
   else if( s < m_lnl_smu->GetXaxis()->GetXmax() && log10(mu) < m_lnl_smu->GetYaxis()->GetXmax() ) {
+    if( s <= -5 ) s = -4.9;
     lnl = m_lnl_smu->Interpolate( s, log10(mu) );
     dlnl = m_dlnl_smu->Interpolate( s, log10(mu) );
     d2lnl = m_d2lnl_smu->Interpolate( s, log10(mu) );
     return;
   }
   else if( s >= m_lnl_smu->GetXaxis()->GetXmax() && log10(mu) < m_lnl_lmu->GetYaxis()->GetXmax() ) {
+    if( s <= -3 ) s = -2.9;
     lnl = m_lnl_lmu->Interpolate( log10(s), log10(mu) );
     dlnl = m_dlnl_lmu->Interpolate( log10(s), log10(mu) );
     d2lnl = m_d2lnl_lmu->Interpolate( log10(s), log10(mu) );
     return;
   }
   else {
+    if(fDebug) cout<<"VModelLnL: else s "<< s <<" mu "<< mu <<endl;
     pixelLnL(s,pixel_var,pixel_nsb,fSinglePEvar,mu,lnl,dlnl,d2lnl);
     return;
   }
- 
 }
 
 void VModelLnL::readLnLTable(string LnLTableFile)

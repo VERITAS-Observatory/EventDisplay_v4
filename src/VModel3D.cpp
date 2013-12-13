@@ -9,6 +9,7 @@
 VModel3D::VModel3D()
 {
   fData3D = new VModel3DData();
+  fModel3DParameters = new VModel3DParameters();
   fEmissionHeightCalculator = new VEmissionHeightCalculator(); 
   fModel3DFn = new VModel3DFn();
   fModelLnL = new VModelLnL( fData3D, fModel3DFn );
@@ -29,6 +30,8 @@ void VModel3D::doModel3D()
 {
   //// initialized only at first call in the analysis run ////
   if( !fInitialized3D ) {
+    initOutput(); //TEST
+    initModel3DTree(); // initialize the output tree
     vector<unsigned int> iNpix3D;
     iNpix3D.resize( fData->getNTel(), 0 );
     for (unsigned int i = 0; i < fData->getNTel(); i++) {
@@ -39,12 +42,16 @@ void VModel3D::doModel3D()
     getDetector();     // get detector configuration
     fInitialized3D = true;
   }
+  // return if triggered only events are written to output
+  ///if( !fReader->hasArrayTrigger() ) return;
+  /// if( getRunParameter()->fWriteTriggerOnly && !fReader->hasArrayTrigger() ) return;
+
   fData3D->initEventModel3D();  /// initialize event
-  writeParameters3D();
   if( fData3D->fDebug3D ) cout<<"--- event "<< fData->getShowerParameters()->eventNumber <<" ---"<<endl; 
   /// reconstruction quality check ///
   if( fData->getShowerParameters()->fShowerNumImages[0] < 2 ) {
     if( fData3D->fDebug3D ) cout<<"doModel3D: NImages < 2"<<endl;
+    writeParameters3D();
     return;
   }
   /// setup Model3D ///
@@ -54,6 +61,7 @@ void VModel3D::doModel3D()
   calcStartParameters();  // calc Model3D start parameters 
   if( ! fData3D->fGoodEvent3D ) {
     if( fData3D->fDebug3D ) cout<<"doModel3D: bad start parameters"<<endl;
+    writeParameters3D();
     return;
   }
   /// run Model3D analysis ///
@@ -61,6 +69,7 @@ void VModel3D::doModel3D()
   startModel3D();         // model with start values, proceed with fit or not
   if( ! fData3D->fGoodEvent3D ) {
     if( fData3D->fDebug3D ) cout<<"doModel3D: bad initial GOF"<<endl;
+    writeParameters3D();
     return;
   }
   doFit();
@@ -69,6 +78,34 @@ void VModel3D::doModel3D()
 }
 
 /////////////////////////////////////////////////////////////////////
+
+void VModel3D::initOutput()
+{
+  // check if root outputfile exist
+  if( fOutputfile != 0 ) return;
+
+  if( fRunPar->foutputfileName != "-1" ) {
+      printf("Model3D: attempt to create file\n");
+      char i_textTitle[300];
+      sprintf( i_textTitle, "VERSION %d", getRunParameter()->getEVNDISP_TREE_VERSION() );
+      fOutputfile = new TFile( fRunPar->foutputfileName.c_str(), "RECREATE", i_textTitle );
+    }
+}
+
+void VModel3D::initModel3DTree()
+{
+  char i_text[300];
+  char i_textTitle[300];
+  sprintf( i_text, "model3Dpars" );
+  // tree versioning numbers used in mscw_energy
+  sprintf( i_textTitle, "Model3D Parameters (VERSION %d)\n", getRunParameter()->getEVNDISP_TREE_VERSION() );
+  fModel3DParameters->initTree( i_text, i_textTitle );
+}
+
+void VModel3D::terminate()
+{
+  getModel3DParameters()->getTree()->Write();
+}
 
 void VModel3D::createLnLTable()
 {
@@ -539,45 +576,48 @@ void VModel3D::fillInit3D()
 
 void VModel3D::writeParameters3D()
 {
+  fData->getModel3DParameters()->eventNumber = fData->getShowerParameters()->eventNumber;
   /// write start parameters to file ///
-  fData->getShowerParameters()->fStartSel3D = fData3D->fStartSel3D;    
-  fData->getShowerParameters()->fStartSaz3D = fData3D->fStartSaz3D;    
-  fData->getShowerParameters()->fStartXcore3D = fData3D->fStartXcore3D;  
-  fData->getShowerParameters()->fStartYcore3D = fData3D->fStartYcore3D;  
-  fData->getShowerParameters()->fStartSmax3D = fData3D->fStartSmax3D;   
-  fData->getShowerParameters()->fStartsigmaL3D = fData3D->fStartsigmaL3D; 
-  fData->getShowerParameters()->fStartsigmaT3D = fData3D->fStartsigmaT3D; 
-  fData->getShowerParameters()->fStartNc3D = fData3D->fStartNc3D;  
+  fData->getModel3DParameters()->fStartSel3D = fData3D->fStartSel3D;    
+  fData->getModel3DParameters()->fStartSaz3D = fData3D->fStartSaz3D;    
+  fData->getModel3DParameters()->fStartXcore3D = fData3D->fStartXcore3D;  
+  fData->getModel3DParameters()->fStartYcore3D = fData3D->fStartYcore3D;  
+  fData->getModel3DParameters()->fStartSmax3D = fData3D->fStartSmax3D;   
+  fData->getModel3DParameters()->fStartsigmaL3D = fData3D->fStartsigmaL3D; 
+  fData->getModel3DParameters()->fStartsigmaT3D = fData3D->fStartsigmaT3D; 
+  fData->getModel3DParameters()->fStartNc3D = fData3D->fStartNc3D;  
   /// write best-fit parameters to file ///
-  fData->getShowerParameters()->fSel3D = fData3D->fSel3D;    
-  fData->getShowerParameters()->fSaz3D = fData3D->fSaz3D;    
-  fData->getShowerParameters()->fXcore3D = fData3D->fXcore3D;  
-  fData->getShowerParameters()->fYcore3D = fData3D->fYcore3D;  
-  fData->getShowerParameters()->fSmax3D = fData3D->fSmax3D;   
-  fData->getShowerParameters()->fsigmaL3D = fData3D->fsigmaL3D; 
-  fData->getShowerParameters()->fsigmaT3D = fData3D->fsigmaT3D; 
-  fData->getShowerParameters()->fNc3D = fData3D->fNc3D;  
+  fData->getModel3DParameters()->fSel3D = fData3D->fSel3D;    
+  fData->getModel3DParameters()->fSaz3D = fData3D->fSaz3D;    
+  fData->getModel3DParameters()->fXcore3D = fData3D->fXcore3D;  
+  fData->getModel3DParameters()->fYcore3D = fData3D->fYcore3D;  
+  fData->getModel3DParameters()->fSmax3D = fData3D->fSmax3D;   
+  fData->getModel3DParameters()->fsigmaL3D = fData3D->fsigmaL3D; 
+  fData->getModel3DParameters()->fsigmaT3D = fData3D->fsigmaT3D; 
+  fData->getModel3DParameters()->fNc3D = fData3D->fNc3D;  
   /// fit quality ///
-  fData->getShowerParameters()->fStartGoodness3D = fData3D->fStartGOF3D;
-  fData->getShowerParameters()->fGoodness3D = fData3D->fGOF3D;
-  fData->getShowerParameters()->fConverged3D = fData3D->fConverged3D;
+  fData->getModel3DParameters()->fStartGoodness3D = fData3D->fStartGOF3D;
+  fData->getModel3DParameters()->fGoodness3D = fData3D->fGOF3D;
+  fData->getModel3DParameters()->fConverged3D = fData3D->fConverged3D;
   /// slant depth and reduced width ///
-  fData->getShowerParameters()->fDepth3D = fData3D->fDepth3D;
-  fData->getShowerParameters()->fRWidth3D = fData3D->fRWidth3D;
-  fData->getShowerParameters()->fErrRWidth3D = fData3D->fErrRWidth3D;
+  fData->getModel3DParameters()->fDepth3D = fData3D->fDepth3D;
+  fData->getModel3DParameters()->fRWidth3D = fData3D->fRWidth3D;
+  fData->getModel3DParameters()->fErrRWidth3D = fData3D->fErrRWidth3D;
   /// write errors in fit parameters to file ///
-  fData->getShowerParameters()->fErrorSel3D = fData3D->fErrorSel3D;    
-  fData->getShowerParameters()->fErrorSaz3D = fData3D->fErrorSaz3D;    
-  fData->getShowerParameters()->fErrorXcore3D = fData3D->fErrorXcore3D;  
-  fData->getShowerParameters()->fErrorYcore3D = fData3D->fErrorYcore3D;  
-  fData->getShowerParameters()->fErrorSmax3D = fData3D->fErrorSmax3D;   
-  fData->getShowerParameters()->fErrorsigmaL3D = fData3D->fErrorsigmaL3D; 
-  fData->getShowerParameters()->fErrorsigmaT3D = fData3D->fErrorsigmaT3D; 
-  fData->getShowerParameters()->fErrorNc3D = fData3D->fErrorNc3D;  
+  fData->getModel3DParameters()->fErrorSel3D = fData3D->fErrorSel3D;    
+  fData->getModel3DParameters()->fErrorSaz3D = fData3D->fErrorSaz3D;    
+  fData->getModel3DParameters()->fErrorXcore3D = fData3D->fErrorXcore3D;  
+  fData->getModel3DParameters()->fErrorYcore3D = fData3D->fErrorYcore3D;  
+  fData->getModel3DParameters()->fErrorSmax3D = fData3D->fErrorSmax3D;   
+  fData->getModel3DParameters()->fErrorsigmaL3D = fData3D->fErrorsigmaL3D; 
+  fData->getModel3DParameters()->fErrorsigmaT3D = fData3D->fErrorsigmaT3D; 
+  fData->getModel3DParameters()->fErrorNc3D = fData3D->fErrorNc3D;  
   /// model direction ///
   if( fData3D->fConverged3D ) calcModelDirection();
-  fData->getShowerParameters()->fXoffModel3D = fData3D->fXoffModel3D;
-  fData->getShowerParameters()->fYoffModel3D = fData3D->fYoffModel3D;
+  fData->getModel3DParameters()->fXoffModel3D = fData3D->fXoffModel3D;
+  fData->getModel3DParameters()->fYoffModel3D = fData3D->fYoffModel3D;
+  /// write to file ///
+  fData->getModel3DParameters()->getTree()->Fill();
 }
 
 void VModel3D::calcModelDirection()
@@ -609,6 +649,6 @@ void VModel3D::calcModelDirection()
 
   fData3D->fXoffModel3D = ts[0];
   fData3D->fYoffModel3D = ts[1];
-  fData->getShowerParameters()->fXoffModel3D = fData3D->fXoffModel3D;
-  fData->getShowerParameters()->fYoffModel3D = fData3D->fYoffModel3D;
+  fData->getModel3DParameters()->fXoffModel3D = fData3D->fXoffModel3D;
+  fData->getModel3DParameters()->fYoffModel3D = fData3D->fYoffModel3D;
 }

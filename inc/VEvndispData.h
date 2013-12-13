@@ -23,6 +23,7 @@
 #include <VShowerParameters.h>
 #include <VFrogParameters.h>
 //#include <VFrogImageData.h>
+#include <VModel3DParameters.h> //JG
 #include <VPointing.h>
 #include <VArrayPointing.h>
 #include <VTraceHandler.h>
@@ -124,6 +125,7 @@ class VEvndispData
         static VShowerParameters *fShowerParameters;
         static VFrogParameters *fFrogParameters;
 //	static vector< VFrogImageData* > fFrogData;    //!< frogs Template tube information
+        static VModel3DParameters *fModel3DParameters; //JG
         static VMCParameters *fMCParameters;      //!< data class with MC parameters
 
 // timing results
@@ -270,6 +272,7 @@ class VEvndispData
         VEvndispRunParameter*    getRunParameter() { return fRunPar; }
         VShowerParameters*  getShowerParameters() { return fShowerParameters; }
         VFrogParameters*    getFrogParameters() { return fFrogParameters; }
+        VModel3DParameters* getModel3DParameters() { return fModel3DParameters; } //JG
         unsigned int        getSumFirst() { return fRunPar->fsumfirst[fTelID]; }
         valarray<double>&   getSums() { return fAnaData[fTelID]->fSums; }
         valarray<double>&   getSums2() { return fAnaData[fTelID]->fSums2; }

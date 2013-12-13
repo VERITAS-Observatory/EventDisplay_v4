@@ -130,13 +130,14 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
         else if( iTemp.find( "model3d" ) < iTemp.size() )
 	{
 	  fRunPara->fUseModel3D = true; 
-	  fRunPara->fShortTree = 99; //JGtest?
+	  //fRunPara->fShortTree = 99; //JGtest?
 	  fRunPara->fLnLTableFile = "table_LnL.root";
         }
         else if( iTemp.find( "plot3d" ) < iTemp.size() )
 	{
+	  fRunPara->fUseModel3D = true; 
 	  fRunPara->fUseDisplayModel3D = true;
-	  fRunPara->fShortTree = 99; //JGtest?
+	  //fRunPara->fShortTree = 99; //JGtest?
 	  fRunPara->fLnLTableFile = "table_LnL.root";
 	  fRunPara->fdisplaymode = 1;
         }
