@@ -235,6 +235,7 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         string fHisFADCDrawString;
         TF1 *fF1Ped;                              //!< FADC pedestal
         TGraph *fGraphFADC;                       //!< graph to indicate summation window
+        TGraph *fGraphFADC_2;                       //!< graph to indicate summation window (second summation window)
         TLine *fLineFADC;                         //!< line to indicate Tzero
         bool fBoolFADC;                           //!< draw FADC
         bool fTraceFit;

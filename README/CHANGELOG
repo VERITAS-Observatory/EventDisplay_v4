@@ -1,6 +1,11 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131214 (GM) added plotting of second summation window
+                to display
+
+* 20131213 (JG) 3D model: new parameter tree
+
 * 20131201 (GM) removed obsolete command line parameter 
                 -tracedefinesmallpulse 
 

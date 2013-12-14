@@ -1163,10 +1163,10 @@ int VEventLoop::checkCuts()
         float MCenergy;
         unsigned short int ntubes, bad, nlowgain, nsat;
         int muonValid;
-unsigned short int eventType;
+        unsigned short int eventType;
         int houghMuonValid, houghNpix; //Hough
 
-i_tree.Branch( "eventType", &eventType, "eventType/s" );
+        i_tree.Branch( "eventType", &eventType, "eventType/s" );
         i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
         i_tree.Branch( "cen_y", &cen_y, "cen_y/F" );
         i_tree.Branch( "length", &length, "length/F" );
@@ -1198,7 +1198,7 @@ i_tree.Branch( "eventType", &eventType, "eventType/s" );
         if( i_tree.GetBranchStatus( "houghCN" ) ) i_tree.Branch( "houghCN", &houghCN, "houghCN/D" );
         if( i_tree.GetBranchStatus( "houghContained" ) ) i_tree.Branch( "houghContained", &houghContained, "houghContained/D" );
 
-eventType = fAnalyzer->getImageParameters()->eventType;
+        eventType = fAnalyzer->getImageParameters()->eventType;
         cen_x = fAnalyzer->getImageParameters()->cen_x;
         cen_y = fAnalyzer->getImageParameters()->cen_y;
         length = fAnalyzer->getImageParameters()->length;
@@ -1214,7 +1214,7 @@ eventType = fAnalyzer->getImageParameters()->eventType;
         sinphi = fAnalyzer->getImageParameters()->sinphi;
         ntubes = fAnalyzer->getImageParameters()->ntubes;
         nsat = fAnalyzer->getImageParameters()->nsat;
-nlowgain = fAnalyzer->getImageParameters()->nlowgain;
+        nlowgain = fAnalyzer->getImageParameters()->nlowgain;
         bad = fAnalyzer->getImageParameters()->bad;
         MCenergy = fAnalyzer->getImageParameters()->MCenergy;
         fLocalTrigger = fAnalyzer->getImageParameters()->fLocalTrigger;

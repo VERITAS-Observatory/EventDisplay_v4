@@ -147,7 +147,8 @@ void VDisplay::bookHistos()
     fF1Ped->SetLineWidth( 2 );
     fF1Ped->SetLineStyle( 2 );
     fGraphFADC = new TGraph( 4 );
-    fGraphFADC->SetFillColor( 17 );
+    fGraphFADC->SetFillColor( 38 );
+    fGraphFADC_2 = new TGraph( 4 );
     fLineFADC = new TLine();
     fLineFADC->SetLineColor(1);
     fLineFADC->SetLineStyle(2);
@@ -719,6 +720,7 @@ void VDisplay::drawFADC( bool iFit )
         return;
     } 
 
+// from here on: draw fHisFADC (at least)
     fHisFADC->Reset();
     char histitle[200];
     fHisFADC->SetLineColor( 9 );
@@ -779,23 +781,23 @@ void VDisplay::drawFADC( bool iFit )
                     fFitTraceHandler = fEventLoop->getFitTraceHandler();
                 }
                 fFitTraceHandler->setMinuitPrint( true );
-pair< bool, uint32_t > i_hitIndexPair = fEventLoop->getReader()->getChannelHitIndex( chanID );
-fEventLoop->getReader()->selectHitChan( i_hitIndexPair.second );
-if( fEventLoop->getReader()->has16Bit() )
-{
-   fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec16Bit(),
-       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
-       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
-       chanID, 
-       fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+                pair< bool, uint32_t > i_hitIndexPair = fEventLoop->getReader()->getChannelHitIndex( chanID );
+                fEventLoop->getReader()->selectHitChan( i_hitIndexPair.second );
+                if( fEventLoop->getReader()->has16Bit() )
+                {
+                      fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec16Bit(),
+                      fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
+                      fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
+                      chanID, 
+                      fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
                 }
-else
-{
-   fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
-       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
-       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
-       chanID, 
-       fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+                else
+                {
+                      fFitTraceHandler->setTrace( fEventLoop->getReader()->getSamplesVec(),
+                      fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
+                      fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
+                      chanID, 
+                      fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
                 }
                 fFitTraceHandler->setMinuitPrint( false );
                 if( fFitTraceHandler->getFitted() )
@@ -814,13 +816,13 @@ else
 // draw everything (trace, pedestal)
         setFADCText();
         fHisFADC->SetTitle( histitle );
-if( fEventLoop->getHiLo()[fSelectedChan-200000] )
-{
-    fHisFADC->SetMaximum( -1.*0.1*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
+        if( fEventLoop->getHiLo()[fSelectedChan-200000] )
+        {
+             fHisFADC->SetMaximum( -1.*0.1*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
         }
-else   
-{
-    fHisFADC->SetMaximum( -1.*0.8*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
+        else   
+        {
+             fHisFADC->SetMaximum( -1.*0.8*fEventLoop->getPed_min( fEventLoop->getHiLo()[fSelectedChan-200000] ) );
         }
 //fHis <<FADC->SetMaximum( -1111 );
         fHisFADC->SetStats( 0 );
@@ -828,6 +830,7 @@ else
         fCanvasFADC->cd();
         fHisFADC->Draw( fHisFADCDrawString.c_str() );
     }
+////////////////////////////////////////////////////////////////////////////////////////////////
 // plot all image signals into one canvas, click beside camera and use switch in 'option' menu
     else if( fBoolDrawImageTraces && !(fSelectedChan >= 200000) )
     {
@@ -883,6 +886,7 @@ else
             }
         }
     }
+////////////////////////////////////////////////////////////////////////////////////////////////
 // plot sum signal (sum of all image pixels), click beside camera for that
     else if( !(fSelectedChan >= 200000) )
     {
@@ -917,22 +921,37 @@ else
     if( fSelectedChan >= 200000 && fSelectedChan-200000 < fEventLoop->getAnalyzer()->getTCorrectedSumFirst().size() )
     {
 // plot box which indicates integration (summation window) window
-if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() )
-{
-   fGraphFADC->SetPoint( 0, (double)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000], gPad->GetUymin() );
-   fGraphFADC->SetPoint( 1, (double)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000], gPad->GetUymax() );
-   fGraphFADC->SetPoint( 2, (double)fEventLoop->getAnalyzer()->getTCorrectedSumLast()[fSelectedChan-200000], gPad->GetUymax() );
-   fGraphFADC->SetPoint( 3, (double)fEventLoop->getAnalyzer()->getTCorrectedSumLast()[fSelectedChan-200000], gPad->GetUymin() );
-   fGraphFADC->Draw( "f" );
-        }
+       if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->doFADCAnalysis() )
+       {
+         int corrfirst = (int)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000];
+         if( fEventLoop->getRunParameter()->fFixWindowStart_sumwindow2 )
+         {
+             corrfirst = (int)(fEventLoop->getSumFirst() + fEventLoop->getTOffsets()[fSelectedChan-200000]
+                               - fEventLoop->getFADCStopOffsets()[fSelectedChan-200000]);
+         }
+// plot box for second integration window
+         fGraphFADC_2->SetPoint( 0, corrfirst, gPad->GetUymin() );
+         fGraphFADC_2->SetPoint( 1, corrfirst, gPad->GetUymax() );
+         fGraphFADC_2->SetPoint( 2, corrfirst + fEventLoop->getSumWindow_2(), gPad->GetUymax() );
+         fGraphFADC_2->SetPoint( 3, corrfirst + fEventLoop->getSumWindow_2(), gPad->GetUymin() );
+         fGraphFADC_2->SetFillColor( 41 );
+         fGraphFADC_2->SetFillStyle( 3005 );
+// plot box for first integration window
+         fGraphFADC->SetPoint( 0, (double)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000], gPad->GetUymin() );
+         fGraphFADC->SetPoint( 1, (double)fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[fSelectedChan-200000], gPad->GetUymax() );
+         fGraphFADC->SetPoint( 2, (double)fEventLoop->getAnalyzer()->getTCorrectedSumLast()[fSelectedChan-200000], gPad->GetUymax() );
+         fGraphFADC->SetPoint( 3, (double)fEventLoop->getAnalyzer()->getTCorrectedSumLast()[fSelectedChan-200000], gPad->GetUymin() );
+         fGraphFADC->Draw( "f" );
+         fGraphFADC_2->Draw( "f" );
+       }
 // Draw the line to indicate TZero
-        if( fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan-200000] > 0. )
-{
-   fLineFADC->SetX1(fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan-200000]);
-   fLineFADC->SetX2(fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan-200000]);
-   fLineFADC->SetY1(gPad->GetUymax());
-   fLineFADC->SetY2(gPad->GetUymin());
-   fLineFADC->Draw("same");
+       if( fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan-200000] > 0. )
+       {
+            fLineFADC->SetX1(fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan-200000]);
+            fLineFADC->SetX2(fEventLoop->getAnalyzer()->getRawTZeros()[fSelectedChan-200000]);
+            fLineFADC->SetY1(gPad->GetUymax());
+            fLineFADC->SetY2(gPad->GetUymin());
+            fLineFADC->Draw("same");
         }
 // trace line indicating pedestals
         fF1Ped->SetRange( fHisFADC->GetXaxis()->GetXmax(), fHisFADC->GetXaxis()->GetXmin() );
@@ -954,12 +973,12 @@ if( fEventLoop->getReader()->hasFADCTrace() && fEventLoop->getRunParameter()->do
         setFADCText();
         if( fEventLoop->getRunParameter()->fShowPhotoDiode && fSelectedChan == 2499 ) sprintf( histitle, "Photodiode (Channel 499, Telescope %d)", fTelescope+1 );
         else sprintf( histitle, "Channel #%d (Telescope %d)", fSelectedChan -200000, fTelescope+1 );
-fHisFADC->SetTitle( histitle );
-fHisFADC->SetStats( 0 );
+        fHisFADC->SetTitle( histitle );
+        fHisFADC->SetStats( 0 );
         fCanvasFADC->SetEditable( 1 );
         fCanvasFADC->cd();
-fHisFADC->Draw();
-TText *iT = new TText( 2, 0.5, "ZERO SUPPRESSED" );
+        fHisFADC->Draw();
+        TText *iT = new TText( 2, 0.5, "ZERO SUPPRESSED" );
         iT->Draw();
         fCanvasFADC->Update();
     }
