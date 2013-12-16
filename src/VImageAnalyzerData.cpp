@@ -229,7 +229,7 @@ valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
 {
 
 // return tzero from average pulse time
-   if( fTraceIntegrationMethod == 2 )
+   if( fTraceIntegrationMethod == 2 || fTraceIntegrationMethod == 3 || fTraceIntegrationMethod == 4)
    {
       return fPulseTimingAverageTime;
    }

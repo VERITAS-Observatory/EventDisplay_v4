@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131216 (MS) next-neigbour cleaning added 
+                and new signal extractors
+                (preliminary - tests ongoing)
+
 * 20131214 (GM) added plotting of second summation window
                 to display
 

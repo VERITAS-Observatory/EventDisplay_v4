@@ -38,9 +38,29 @@ class VTraceHandler
         int fDynamicRange;                        //!< dynamic range
         int fMaxThreshold;
 	unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
+	unsigned int fMaxSumSearchStart;          // start of maximum sum search within FADC readout window (need for IPR calc)
 
-	double   getQuickMaximumSum( int iIntegrationWindow, bool fRaw = false );
-	void     reset();
+	//double   getQuickMaximumSum( int iIntegrationWindow, bool fRaw = false );
+	//double   getQuickMaximumSum( unsigned int iSearchStart, int iIntegrationWindow, bool fRaw = false );
+
+
+        // Signal Extractors (Maxim)
+        float SaturLimit;
+        float fSliceRMS[10];                      // FIXME: RMS of one time slice for every telescope type
+        unsigned int oversampling;                // oversampling factor 1GHz->oversampling*1GHz
+        unsigned int WinToAverage;                // window for averaging (in overampled slices)
+        unsigned int MaxNumPulses;                // maximum number of pulses per pixel for several pulse signal extractor
+        float PoleZeroFlash;                      // pole zero cancelation after oversampled digital signal differentiation
+        float PoleZeroDragNec;                    // pole zero cancelation after oversampled digital signal differentiation
+        float ProcToAmplFlash;
+        float ProcToAmplDragNec;
+        double   getQuickMaximumSum( unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw = false );
+        double   getMaxSumAutoWindow(float AmplThresh, unsigned int iSearchStart, unsigned int iSearchEnd, int iIntegrationWindow, bool fRaw = false );
+        double   getMaxSumWithOverSampling(unsigned int iSearchStart, unsigned int iSearchEnd, unsigned int ElecConcept, int iIntegrationWindow, bool fRaw = false);
+        double   getMaximumSums(float AmplThresh, int *integwindows, float *charges, float *arrtimes, bool fRaw=false);
+
+
+        void     reset();
 
     public:
         VTraceHandler();

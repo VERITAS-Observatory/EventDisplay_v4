@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "TFile.h"
+#include "TString.h"
 #include "TSystem.h"
 #include "TTree.h"
 
@@ -43,6 +44,7 @@ class VReadRunParameter
 	bool checkSecondArgument(std::string, std::string, bool);
         void isCompiledWithDB();
         bool getRunParametersFromDST();
+        bool readTrigSimInputCard( TString card );
         void setDirectories();
 
     public:

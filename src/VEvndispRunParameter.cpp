@@ -43,6 +43,8 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
                                // 3 = rawdata in VBF, 4 = DST (data), 5 = multiple GrIsu file, 
        // 6 = PE file, 7 = DST (MC)
     fsourcefile = "";
+    fTrigSimInputcard = "";//"/lustre/fs9/group/cta/users/shayduk/EVTDISP//ParameterFiles/Evtdisp.rc";
+
     fDBRunType = "";
     fDBRunStartTimeSQL = "";
     fDBRunStoppTimeSQL = "";

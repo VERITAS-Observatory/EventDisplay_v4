@@ -13,8 +13,10 @@
 #include <TNamed.h>
 #include <TROOT.h>
 #include <TSystem.h>
+#include <TString.h>
 
 #include <iostream>
+#include <map>
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -168,6 +170,23 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         string ftracefitfunction;                 // number of tracefit function (default=ev, others: grisu);
 	bool   fperformFADCAnalysis;              // run FADC analysis (important e.g. for CTA DST files, where sim_tel results are available as well )
 
+        double fNSBscale;                                     //
+
+        float  fFADCPedestal[VDST_MAXTELESCOPES];             // fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
+        float  fFADCPedestalSig[VDST_MAXTELESCOPES];          // fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
+        float  fFlashCamFADCPedestal[VDST_MAXTELESCOPES];     // FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
+        float  fFlashCamFADCPedestalSig[VDST_MAXTELESCOPES];  // FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
+
+        float  fFADCsampleRate[VDST_MAXTELTYPES];             // FADC sample rate in GHz
+        float  fFlashCamFADCtoPhe[VDST_MAXTELTYPES];          // default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
+        float  fFlashCamFADCsampleRate[VDST_MAXTELTYPES];     // FADC sample rate in GHz
+        float  fFADCtoPhe[VDST_MAXTELTYPES];                  // default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
+        bool   fPerformFlashCamAnalysis[VDST_MAXTELTYPES];    // flag if FlashCam FADC should be taken for analysis
+        double fFWHMdata[VDST_MAXTELTYPES];                   // ns FWHM of dataline pulse
+        double fFWHMtrigger[VDST_MAXTELTYPES];                // ns FWHM of triggerline pulse (except FlashCam)
+        double fIntegWindow[VDST_MAXTELTYPES];                // ns
+        bool   ifActiveType[VDST_MAXTELTYPES];                // if telescope of this type is activated for analysis
+
 // FADC timing parameters
         vector< float > fpulsetiminglevels;       // levels at which timing of FADC pulses is calculated
 	unsigned int fpulsetiming_tzero_index;
@@ -253,6 +272,17 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         int fdstminntubes;                        // write only events with more than fdstminntubes ntubes into dst file
         bool fdstwriteallpixel;                   // write all information of all pixel into dst output files
 
+// trigsim parameters (note: different telescope IDs!)
+        map< unsigned int, int >   fTrigSim_referenceTrigger;
+	map< unsigned int, float > fTrigSim_threshold;
+        TString  fTrigSimInputcard;                      // input card for trigsim and next-neighbour image cleaning
+        TString  fTrigThreshFile;
+        TString  fNSBdatabaseFile;
+        TString  fIPR1File;
+        TString  fIPR2File;
+        TString  fIPR3File;
+        TString  fIPR4File;
+
 // Parallaxwidth
         int fPWmethod;                            // how to make the trigger-map to calculate the trigger-level image parameters
         int fPWcleanNeighbors;                    // number of neighbors required for a center pixel to survive the cleaning procedure
@@ -272,6 +302,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,136); //(increase this number)
+        ClassDef(VEvndispRunParameter,137); //(increase this number)
 };
 #endif
