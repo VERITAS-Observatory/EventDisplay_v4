@@ -460,14 +460,15 @@ bool VTMVARunData::readConfigurationFile( char *iC )
             vector< double > iEnergyCut_Log10TeV_max;
             vector< TCut > iEnergyCut;
 
-            unsigned int iEMethod;
+            double iT = 0.;
+            unsigned int iEMethod = 1;
 
-            if( !is_stream.eof() ) is_stream >> iEMethod;
+            if( !is_stream.eof() ) is_stream >> iT;
+            iEMethod = (unsigned int)TMath::Nint( iT );
 
 // read in energy bin
             while( !is_stream.eof() )
             {
-                double iT = 0.;
                 is_stream >> iT;
 		iEnergyCut_Log10TeV_min.push_back( iT );
             }
@@ -476,7 +477,8 @@ bool VTMVARunData::readConfigurationFile( char *iC )
 // check sanity
             if( iEnergyCut_Log10TeV_min.size() < 2 )
             {
-               cout << cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
+               cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
+               return false;
             }
 // fill maximum bins
             for( unsigned int i = 1; i < iEnergyCut_Log10TeV_min.size(); i++ )
@@ -524,6 +526,11 @@ bool VTMVARunData::readConfigurationFile( char *iC )
             }
          }
       }
+   }
+   if( fOutputFileName.size() == 0 )
+   {
+      cout << "VTMVARunData::readConfigurationFile error: no output file name given (use keyword OUTPUTFILE)" << endl;
+      return false;
    }
 
    return true;

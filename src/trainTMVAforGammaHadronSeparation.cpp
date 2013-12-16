@@ -124,7 +124,7 @@ bool train( VTMVARunData *iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 {
 // sanity checks
     if( !iRun ) return false;
-    if( iRun->fEnergyCutData.size() < iEnergyBin || iRun->fOutputFile.size() < iEnergyBin )
+    if( iRun->fEnergyCutData.size() <= iEnergyBin || iRun->fOutputFile.size() <= iEnergyBin )
     {
         cout << "error in train: energy bin out of range " << iEnergyBin;
 	cout << "\t" << iRun->fEnergyCutData.size() << "\t" << iRun->fOutputFile.size() << endl;
@@ -342,7 +342,7 @@ int main( int argc, char *argv[] )
 	cout << "  (an example for a configuration file can be found in " << endl;
 	cout << "   $CTA_EVNDISP_AUX_DIR/ParameterFiles/TMVA.BDT.runparameter )" << endl;
 	cout << endl;
-        exit( 0 );
+        exit( EXIT_SUCCESS );
     }
 
     cout << endl;
@@ -359,10 +359,10 @@ int main( int argc, char *argv[] )
 // read run parameters from configuration file
    if( !fData->readConfigurationFile( argv[1] ) )
    {
-      cout << "error opening run parameter file (";
+      cout << "error opening or reading run parameter file (";
       cout << argv[1];
       cout << ")" << endl;
-      exit( -1 );
+      exit( EXIT_FAILURE );
    }
    fData->print();
 
@@ -371,7 +371,7 @@ int main( int argc, char *argv[] )
     if( !fData->openDataFiles() )
     {
        cout << "error opening data files" << endl;
-       exit( -1 );
+       exit( EXIT_FAILURE );
     }
 
 //////////////////////////////////////
