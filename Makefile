@@ -103,9 +103,9 @@ endif
 #####################
 # MATHMORE in ROOT
 #####################
-ifeq ($(ROOT_MATHMORE),yes)
-  ROOT_MATHMORE_FLAG=-DWITH_MATHMORE
-endif
+#ifeq ($(ROOT_MATHMORE),yes)
+#  ROOT_MATHMORE_FLAG=-DWITH_MATHMORE
+#endif
 #####################
 # CTA HESSIO INPUT
 #####################
@@ -170,9 +170,9 @@ endif
 #endif
 
 #Check to see if ROOT has the MathMore library
-ifeq ($(ROOT_MATHMORE),yes)
-   GLIBS     += -lMathMore
-endif
+#ifeq ($(ROOT_MATHMORE),yes)
+#   GLIBS     += -lMathMore
+#endif
 
 #ifeq ($(DCTEST),yes)
 #   GLIBS     += -lDCache

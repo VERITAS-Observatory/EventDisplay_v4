@@ -626,13 +626,13 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 
 	//Calculate elliptical integral for various values of xi
 	for(int i=0; i<numSteps; i++){
-		float xi_tmp = (float)i/(float)numSteps;
 
 		ngExi[i] = 0.0;
 
 		//This requires the MathMore library.
 		//Look for GSL, maybe better to look for MathMore...
 #ifdef WITH_MATHMORE
+		float xi_tmp = (float)i/(float)numSteps;
 		ngExi[i] = ( 2.0 / TMath::Pi() ) * ( ROOT::Math::ellint_2(xi_tmp , TMath::Pi()/2.0 ) ); //Calculate elliptic integral
 #else
    // (GM) PRINT A WARNING? STOP?
