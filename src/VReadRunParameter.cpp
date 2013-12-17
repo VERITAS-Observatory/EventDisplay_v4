@@ -1510,7 +1510,7 @@ bool VReadRunParameter::getRunParametersFromDST()
     if( iF.IsZombie() )
     {
         cout << "VReadRunParameter::getRunParametersFromDST error opening DST file: " << fRunPara->fsourcefile << endl;
-        exit( -1 );
+        exit( EXIT_FAILURE );
     }
 // check if this is a MC or data DST
     if( (TTree*)iF.Get( "mc" ) )

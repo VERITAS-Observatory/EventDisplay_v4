@@ -41,9 +41,9 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     frunnumber = -1;
     fsourcetype = 3;           // 0 = rawdata, 1 = GrIsu simulation, 2 = MC in VBF format, 
                                // 3 = rawdata in VBF, 4 = DST (data), 5 = multiple GrIsu file, 
-       // 6 = PE file, 7 = DST (MC)
+                               // 6 = PE file, 7 = DST (MC)
     fsourcefile = "";
-    fTrigSimInputcard = "";//"/lustre/fs9/group/cta/users/shayduk/EVTDISP//ParameterFiles/Evtdisp.rc";
+    fTrigSimInputcard = "";
 
     fDBRunType = "";
     fDBRunStartTimeSQL = "";
@@ -60,7 +60,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fRunDuration = 60. * 3600.;        // default run duration is 1 h (reset by DBRunInfo)
     fPrintGrisuHeader=0;
 
-fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
+    fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 
 // geometry/calibration parameters
     fNTelescopes = 4;                             // there is always at least one telescope
@@ -283,15 +283,15 @@ void VEvndispRunParameter::print( int iEv )
     {
         cout << "\t ---------------------------------------------" << endl;
         if( frunmode == 0 && !fdisplaymode  )    cout << "\t       ANALYZING DATA" << endl;
-else if( frunmode == 0 && fdisplaymode ) cout << "\t       DISPLAYING DATA" << endl;
+        else if( frunmode == 0 && fdisplaymode ) cout << "\t       DISPLAYING DATA" << endl;
         else if( frunmode == 1 ) cout << "\t       CALCULATING PEDESTALS" << endl;
         else if( frunmode == 2 ) cout << "\t       CALCULATING GAINS AND TIME OFFSETS (high gain channels)" << endl;
         else if( frunmode == 3 ) cout << "\t       WRITING TRACE LIBRARY" << endl;
         else if( frunmode == 4 ) cout << "\t       WRITING DATA SUMMARY FILES" << endl;
         else if( frunmode == 5 ) cout << "\t       CALCULATING GAINS AND TIME OFFSETS (low gain channels)" << endl;
         else if( frunmode == 6 ) cout << "\t       CALCULATING PEDESTALS (low gain channels)" << endl;
-else if( frunmode == 7 ) cout << "\t       CALCULATING TZEROS (high gain channels)" << endl;
-else if( frunmode == 8 ) cout << "\t       CALCULATING TZEROS (low gain channels)" << endl;
+        else if( frunmode == 7 ) cout << "\t       CALCULATING TZEROS (high gain channels)" << endl;
+        else if( frunmode == 8 ) cout << "\t       CALCULATING TZEROS (low gain channels)" << endl;
         cout << "\t ---------------------------------------------" << endl << endl;
     }
     if( iEv == 2 )
@@ -302,7 +302,8 @@ else if( frunmode == 8 ) cout << "\t       CALCULATING TZEROS (low gain channels
 
     cout << "RUN " << frunnumber << endl;
     cout << "Observatory: " << getObservatory();
-    cout << " (lat " << getObservatory_Latitude_deg() << ", long " << getObservatory_Longitude_deg() << ", height " << getObservatory_Height_m() << "m)";
+    cout << " (lat " << getObservatory_Latitude_deg() << ", long " << getObservatory_Longitude_deg();
+    cout << ", height " << getObservatory_Height_m() << "m)";
     cout << endl;
     cout << "File: " << fsourcefile << " (sourcetype " << fsourcetype;
     cout << ")" << endl;
@@ -334,15 +335,15 @@ else if( frunmode == 8 ) cout << "\t       CALCULATING TZEROS (low gain channels
        cout << "\t pointing corrections (x,y): ";
        if( !fDBTracking )
        {
-   for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
-   {
-       cout << "\t T" << fTelToAnalyze[i]+1 << ": " << fPointingErrorX[fTelToAnalyze[i]] << ", " << fPointingErrorY[fTelToAnalyze[i]];
-   }
-   cout << endl;
+            for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
+            {
+                cout << "\t T" << fTelToAnalyze[i]+1 << ": " << fPointingErrorX[fTelToAnalyze[i]] << ", " << fPointingErrorY[fTelToAnalyze[i]];
+            }
+            cout << endl;
        }
        else
        {
-   cout << " use database" << endl;
+            cout << " use database" << endl;
        }
     }
     if( fDBCameraRotationMeasurements ) cout << "using camera rotation values from DB" << endl;
@@ -369,9 +370,9 @@ else if( frunmode == 8 ) cout << "\t       CALCULATING TZEROS (low gain channels
     {
        if( ( fsourcetype == 1 || fsourcetype == 2 || fsourcetype == 5 ) && fsimu_pedestalfile.size() > 0 )
        {
-   cout << "calculate pedestals from " << fsimu_pedestalfile;
-   cout << " with noise level " << fsimu_noiselevel;
-   cout << " (default ped: " << fsimu_pedestalfile_DefaultPed << ")" << endl;
+         cout << "calculate pedestals from " << fsimu_pedestalfile;
+         cout << " with noise level " << fsimu_noiselevel;
+         cout << " (default ped: " << fsimu_pedestalfile_DefaultPed << ")" << endl;
        }
        else if( fsourcetype == 1 ) cout << "calculate pedestals from " << fsourcefile << endl;
        if( fPedestalsInTimeSlices ) cout << "calculating time dependent pedestals" << endl;
@@ -398,30 +399,30 @@ else if( frunmode == 8 ) cout << "\t       CALCULATING TZEROS (low gain channels
         cout << "correcting FADC times for crate jitter with L2 signals: " << fL2TimeCorrect << endl;
         if( fDoublePass )
         {
-    cout << "double pass cleaning ";
-    if( fDynamicIntegrationWindow ) cout << " (dynamical integration window) ";
-    cout << " (uncertainties: ";
-    if( fDoublePassErrorWeighting2005 ) cout << "2005) ";
-    else                                cout << "2013) ";
-    if( fPrintSmallArray )
-    {
-       cout << " (low gain window shift: ";
-       for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ ) cout << fTraceWindowShift[i] << ", ";
-       cout << ")";
+            cout << "double pass cleaning ";
+            if( fDynamicIntegrationWindow ) cout << " (dynamical integration window) ";
+            cout << " (uncertainties: ";
+            if( fDoublePassErrorWeighting2005 ) cout << "2005) ";
+            else                                cout << "2013) ";
+            if( fPrintSmallArray )
+            {
+                cout << " (low gain window shift: ";
+                for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ ) cout << fTraceWindowShift[i] << ", ";
+                cout << ")";
             }
         }
         else cout << "no double pass cleaning";
         cout << endl;
         if( fFixWindowStart )        cout << "using fixed window start" << endl;
-if( fFixWindowStart_sumwindow2 ) cout << "using fixed window start for summation window 2" << endl;
-if( fMC_FADCTraceStart > 0 ) cout << "MC trace start: " << fMC_FADCTraceStart  << endl;
+        if( fFixWindowStart_sumwindow2 ) cout << "using fixed window start for summation window 2" << endl;
+        if( fMC_FADCTraceStart > 0 ) cout << "MC trace start: " << fMC_FADCTraceStart  << endl;
         if( ftracefit > -1. )        cout << "trace fitting: " << ftracefit << " with " << ftracefitfunction << endl;
         if( fSmoothDead )            cout << "smoothing dead pixels" << endl;
         if( fmuonmode )              cout << "muon ring analysis: " << fmuonmode << endl;
         if( fhoughmuonmode )         cout << "Hough transform muon ring analysis: " << fhoughmuonmode << endl;
 
         if( fImageLL != 0 )
-{
+        {
                              cout << "loglikelihood fitting of images: " << fImageLL;
                                      cout << " (using these images for the array reconstruction)";
                                      cout << endl;
@@ -448,53 +449,53 @@ if( fMC_FADCTraceStart > 0 ) cout << "MC trace start: " << fMC_FADCTraceStart  <
     {
         cout << endl;
         if( fPWmethod ==3 )
-{
-   cout << "Parallaxwidth: trigger map input type: "<< fPWmethod <<endl;
-   cout << "Parallaxwidth: number of neighbors required for cleaning: "<< fPWcleanNeighbors << endl;
-   cout << "Parallaxwidth: FADC cleaning threshold for identifying triggered pixels (for method 3): "<< fPWcleanThreshold << endl;
-}
+        {
+            cout << "Parallaxwidth: trigger map input type: "<< fPWmethod <<endl;
+            cout << "Parallaxwidth: number of neighbors required for cleaning: "<< fPWcleanNeighbors << endl;
+            cout << "Parallaxwidth: FADC cleaning threshold for identifying triggered pixels (for method 3): "<< fPWcleanThreshold << endl;
+        }
         for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
         {
-    cout << "Telescope " << fTelToAnalyze[i]+1 << endl;
+           cout << "Telescope " << fTelToAnalyze[i]+1 << endl;
 
-    // trace integration method
-     if( fTraceIntegrationMethod[fTelToAnalyze[i]] != 0 )
-    {
-cout << "\t trace integration method: \t" << fTraceIntegrationMethod[fTelToAnalyze[i]];
-if( fDoublePass ) cout << "\t (doublepass, integration method pass 1: " << fTraceIntegrationMethod_pass1[fTelToAnalyze[i]] << ")";
-cout << endl;
-cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
-cout << "\t (shifted by " << fTraceWindowShift[i] << " samples";
-cout << " [" << fTraceWindowShift_DoublePassSmallImages[i] << "])" << endl;
-cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];
-cout << "/" << fsumwindow_2[fTelToAnalyze[i]];
-if( fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fsumwindow_pass1[fTelToAnalyze[i]];
-cout << endl;
-    }
-    else
-    {
-cout << "\t no trace integration" << endl;
-    }
-    // image cleaning method and values
-    if( i < fImageCleaningParameters.size() ) fImageCleaningParameters[i]->print();
-    cout << "\t LL edge fit: \t\t\tloss > " << fLogLikelihoodLoss_min[i] << "\t ntubes > " << fLogLikelihood_Ntubes_min[i] << endl;    
+// trace integration method
+           if( fTraceIntegrationMethod[fTelToAnalyze[i]] != 0 )
+           {
+               cout << "\t trace integration method: \t" << fTraceIntegrationMethod[fTelToAnalyze[i]];
+               if( fDoublePass ) cout << "\t (doublepass, integration method pass 1: " << fTraceIntegrationMethod_pass1[fTelToAnalyze[i]] << ")";
+               cout << endl;
+               cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
+               cout << "\t (shifted by " << fTraceWindowShift[i] << " samples";
+               cout << " [" << fTraceWindowShift_DoublePassSmallImages[i] << "])" << endl;
+               cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];
+               cout << "/" << fsumwindow_2[fTelToAnalyze[i]];
+               if( fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fsumwindow_pass1[fTelToAnalyze[i]];
+               cout << endl;
+           }
+           else
+           {
+               cout << "\t no trace integration" << endl;
+           }
+// image cleaning method and values
+           if( i < fImageCleaningParameters.size() ) fImageCleaningParameters[i]->print();
+           cout << "\t LL edge fit: \t\t\tloss > " << fLogLikelihoodLoss_min[i] << "\t ntubes > " << fLogLikelihood_Ntubes_min[i] << endl;    
 
-    // calibration
-    if( fTelToAnalyze[i] < fGainCorrection.size() && TMath::Abs( fGainCorrection[fTelToAnalyze[i]] ) - 1. > 1.e-2 )
-    {
-cout << "\t additional gain correction: " << fGainCorrection[fTelToAnalyze[i]];
-    }
-            cout << "\t pedestal file: " << fPedFileNumber[i];
-            if( i < fPedLowGainFileNumber.size() && fPedLowGainFileNumber[i] > 0 ) cout << ", low gain pedestal file: " << fPedLowGainFileNumber[i];
-            if( i < fGainFileNumber.size() ) cout << ", gain file: " << fGainFileNumber[i];
-            if( i < fGainLowGainFileNumber.size() && fGainLowGainFileNumber[i] > 0 ) cout << ", low gain gain file: " << fGainLowGainFileNumber[i];
-            if( i < fGainCorrection.size() && TMath::Abs( fGainCorrection[i] - 1. ) > 0.001 ) cout << " (gain correction: " << fGainCorrection[i]  << ")";
-            if( i < fTOffFileNumber.size() ) cout << ", toff file: " << fTOffFileNumber[i];
-            if( i < fTOffLowGainFileNumber.size() && fTOffLowGainFileNumber[i] > 0 ) cout << ", low gain toff file: " << fTOffLowGainFileNumber[i];
-            if( i < fPixFileNumber.size() ) cout << ", pixel file: " << fPixFileNumber[i];
-    if( i < fTZeroFileNumber.size() ) cout << ", tzero file: " << fTZeroFileNumber[i];
-    if( i < fTZeroLowGainFileNumber.size() && fTZeroLowGainFileNumber[i] > 0 ) cout << ", low gain tzero file: " << fTZeroLowGainFileNumber[i];
-    cout << endl;
+ // calibration
+           if( fTelToAnalyze[i] < fGainCorrection.size() && TMath::Abs( fGainCorrection[fTelToAnalyze[i]] ) - 1. > 1.e-2 )
+           {
+               cout << "\t additional gain correction: " << fGainCorrection[fTelToAnalyze[i]];
+           }
+           cout << "\t pedestal file: " << fPedFileNumber[i];
+           if( i < fPedLowGainFileNumber.size() && fPedLowGainFileNumber[i] > 0 ) cout << ", low gain pedestal file: " << fPedLowGainFileNumber[i];
+           if( i < fGainFileNumber.size() ) cout << ", gain file: " << fGainFileNumber[i];
+           if( i < fGainLowGainFileNumber.size() && fGainLowGainFileNumber[i] > 0 ) cout << ", low gain gain file: " << fGainLowGainFileNumber[i];
+           if( i < fGainCorrection.size() && TMath::Abs( fGainCorrection[i] - 1. ) > 0.001 ) cout << " (gain correction: " << fGainCorrection[i]  << ")";
+           if( i < fTOffFileNumber.size() ) cout << ", toff file: " << fTOffFileNumber[i];
+           if( i < fTOffLowGainFileNumber.size() && fTOffLowGainFileNumber[i] > 0 ) cout << ", low gain toff file: " << fTOffLowGainFileNumber[i];
+           if( i < fPixFileNumber.size() ) cout << ", pixel file: " << fPixFileNumber[i];
+           if( i < fTZeroFileNumber.size() ) cout << ", tzero file: " << fTZeroFileNumber[i];
+           if( i < fTZeroLowGainFileNumber.size() && fTZeroLowGainFileNumber[i] > 0 ) cout << ", low gain tzero file: " << fTZeroLowGainFileNumber[i];
+           cout << endl;
         }
     }
 
