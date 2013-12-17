@@ -207,7 +207,6 @@ void VImageParameterCalculation::calcTimingParameters()
     fboolCalcTiming=true;
 }
 
-
 /*****************************************************************************
 muonRingFinder
 input: pointer to pixels passing cleaning
@@ -221,6 +220,8 @@ void VImageParameterCalculation::muonRingFinder()
     {
         fParGeo->muonX0 = 0.0;
         fParGeo->muonY0 = 0.0;
+        fParGeo->muonXC = 0.0;
+        fParGeo->muonYC = 0.0;
         fParGeo->muonRadius = 0.0;
         fParGeo->muonRSigma = 0.0;
         return;
@@ -277,6 +278,8 @@ void VImageParameterCalculation::muonRingFinder()
     {
         fParGeo->muonX0 = 0.0;
         fParGeo->muonY0 = 0.0;
+        fParGeo->muonXC = 0.0;
+        fParGeo->muonYC = 0.0;
         fParGeo->muonRadius = 0.0;
         fParGeo->muonRSigma = 0.0;
         return;
@@ -437,12 +440,14 @@ void VImageParameterCalculation::sizeInMuonRing()
   if( fParGeo->muonValid == 0 && fParGeo->houghMuonValid == 0)
       {
       fParGeo->muonSize = 0.0;      
+      fParGeo->muonIPCorrectedSize = 0.0;
       return;
       }
 
   if( fData->getSums().size()==0 || fParGeo->muonRadius == 0.0 )
     {
       fParGeo->muonSize = 0.0;     
+      fParGeo->muonIPCorrectedSize = 0.0;
       return;
     }
   if( !getDetectorGeo() )
@@ -455,6 +460,8 @@ void VImageParameterCalculation::sizeInMuonRing()
   double xi, yi, rp, size=0.0, x0, y0, radius, rsigma, si;
   int totalPixels = 0;
   int offPixels = 0;
+  double xc = 0.; //Centroid x coordinate
+  double yc = 0.; //Centroid y coordinate
   x0 = fParGeo->muonX0;
   y0 = fParGeo->muonY0;
   radius = fParGeo->muonRadius;
@@ -473,6 +480,11 @@ void VImageParameterCalculation::sizeInMuonRing()
 	    {
 	    si=(double)fData->getSums()[i]; // charge (dc)
 	    size += si;
+
+	    //Calculating the centroid here
+   	    xc += xi*si;
+	    yc += yi*si;
+
 	    totalPixels ++;
 	    }
 	if( fData->getDead()[i] )
@@ -483,7 +495,28 @@ void VImageParameterCalculation::sizeInMuonRing()
   if( totalPixels > 0 )
       size *= (1.*offPixels)/(1.0*totalPixels) + 1. ;
 
+  //Finish calculating the centroid by dividing by size and save.
+  fParGeo->muonXC = xc/size;
+  fParGeo->muonYC = yc/size;
+
+  //Fill size
   fParGeo->muonSize = size;
+
+  //Fill impact parameter corrected size (Check for NOGSL or for MathMore)
+
+  //Set t ozer by default. If no GSL, fill the tree with zeros
+  float correctedSize = 0.0;
+
+  	//If GSL, run the code
+#ifdef WITH_MATHMORE
+  	  correctedSize = size / this->correctSizeInMuonRing();
+#else
+   // (GM) PRINT A WARNING? STOP?
+#endif
+
+  	//Fill the tree
+    fParGeo->muonIPCorrectedSize = correctedSize;
+
 }
 
 /*****************************************************************************
@@ -563,6 +596,67 @@ void VImageParameterCalculation::muonPixelDistribution()
 
 }
 
+//Calculates impact parameter correction factor for size
+float VImageParameterCalculation::correctSizeInMuonRing()
+{
+
+	if( fDebug ) cout << "VImageParameterCalculation::correctSizeInMuonRing" << endl;
+
+	//Calculate the distance from the center of the ring to the centroid of the ring.
+	float dc = TMath::Sqrt( (fParGeo->muonX0 - fParGeo->muonXC) * (fParGeo->muonX0 - fParGeo->muonXC)
+		                  + (fParGeo->muonY0 - fParGeo->muonYC) * (fParGeo->muonY0 - fParGeo->muonYC) );
+
+	float kRatio;
+	kRatio= dc/fParGeo->muonRadius;
+
+	float exi; //Imapct parameter correction factor
+	exi = 0.0;
+
+	float xi = 0.0; //Impact parameter
+	xi = 0.0;
+
+	float kTest = 0.0;
+	kTest = 0.0;
+
+	// Initialize the elliptic integral
+	int numSteps=1000;
+	float *ngExi;
+
+	ngExi = new float[numSteps];
+
+	//Calculate elliptical integral for various values of xi
+	for(int i=0; i<numSteps; i++){
+		float xi_tmp = (float)i/(float)numSteps;
+
+		ngExi[i] = 0.0;
+
+		//This requires the MathMore library.
+		//Look for GSL, maybe better to look for MathMore...
+#ifdef WITH_MATHMORE
+		ngExi[i] = ( 2.0 / TMath::Pi() ) * ( ROOT::Math::ellint_2(xi_tmp , TMath::Pi()/2.0 ) ); //Calculate elliptic integral
+#else
+   // (GM) PRINT A WARNING? STOP?
+#endif
+
+	}//End of for loop
+
+	//Numerically solve the integral equation to calculate IP corrrection factor
+	  	  for(int i=0; i<numSteps; i++){
+
+	  		  float xi_tmp = (float)i/(float)numSteps;
+	  		  float kTest_tmp = 2.0 * ngExi[i] * kRatio / xi_tmp;
+
+	  		  if ( fabs(1.0-kTest_tmp) < fabs(1.0-kTest) ){
+	  			  exi=ngExi[i];
+	  			  xi=xi_tmp;
+	  			  kTest = kTest_tmp;
+	  		  } //End of if
+
+	  	  }//End of for loop
+
+	  	  return exi; //Return impact parameter correction factor
+
+}
 
 //Hough transform class instantiation
 void VImageParameterCalculation::houghInitialization()

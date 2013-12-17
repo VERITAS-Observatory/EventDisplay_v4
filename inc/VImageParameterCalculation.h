@@ -22,6 +22,11 @@
 #include <TGraphErrors.h>
 #include <TF1.h>
 
+//ROOT special functions. Need this for MathMore
+#ifdef WITH_MATHMORE
+#include "Math/SpecFunc.h"
+#endif
+
 using namespace std;
 
 // global functions and pointers, but how to define them nonglobal without handstands?
@@ -64,6 +69,9 @@ class VImageParameterCalculation : public TObject
         void muonRingFinder();                                                                 //!< fit a single ring to the image to look for muons
         void sizeInMuonRing();                                                                 //! calculate the brightness of the muon ring
         void muonPixelDistribution();                                                          //!< determine the distribution of pixels in the image
+
+        //Impact parameter correction factor for size
+        float correctSizeInMuonRing();
 
 //Hough transform
         void houghInitialization(); 				//Initialize the Hough transform class

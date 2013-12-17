@@ -83,10 +83,13 @@ class VImageParameter
 // muon parameters
         float muonX0;                             //!< center of muon ring X-coord
         float muonY0;                             //!< center of muon ring Y-coord
+        float muonXC;                             //!< center of muon ring X-coord of centroid
+        float muonYC;    						  //!< center of muon ring Y-coord of centroid
         float muonRadius;                         //!< radius of muon ring
         float muonRSigma;                         //!< std. dev. of radius of muon ring
         float muonSize;                           //!< total amount of light in muon ring
         int   muonValid;                          //!< 0/1 depending on wether it satisfies criteria
+        float muonIPCorrectedSize;                //!< total amount of light in muon ring corrected by impact paameter
 
 // Hough transform muon parameters
         double 	houghAP; 						  //!< AP parameter

@@ -152,10 +152,14 @@ void VImageParameter::initTree(string iName, string iTitle, bool iMC, bool iLL )
     {
         tpars->Branch("muonX0", &muonX0, "muonX0/F" );
         tpars->Branch("muonY0", &muonY0, "muonY0/F" );
+        tpars->Branch("muonXC", &muonXC, "muonXC/F" );
+        tpars->Branch("muonYC", &muonYC, "muonYC/F" );
         tpars->Branch("muonRadius", &muonRadius, "muonRadius/F" );
         tpars->Branch("muonRSigma", &muonRSigma, "muonRSigma/F" );
         tpars->Branch("muonSize", &muonSize, "muonSize/F" );
+        tpars->Branch("muonIPCorrectedSize", &muonIPCorrectedSize, "muonIPCorrectedSize/F" );
         tpars->Branch("muonValid", &muonValid, "muonValid/I" );
+
     }
 
 // muon parameters (Hough transform)
@@ -328,9 +332,12 @@ void VImageParameter::reset( unsigned int resetLevel )
 // Iterative fit muon analysis
     muonX0 = 0.;
     muonY0 = 0.;
+    muonXC = 0.;
+    muonYC = 0.;
     muonRadius = 0.;
     muonRSigma = 0.;
     muonSize = 0.;
+    muonIPCorrectedSize = 0.;
     muonValid = 0;
 
 // Hough transform muon parameters

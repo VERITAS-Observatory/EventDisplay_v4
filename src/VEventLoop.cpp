@@ -1157,7 +1157,7 @@ int VEventLoop::checkCuts()
     {
         TTree i_tree( "i_tree", "" );
         float cen_x, cen_y, length, width, size, azwidth, alpha, los, miss, phi, cosphi, sinphi, dist, asymmetry;
-        float muonSize, muonRadius, muonRSigma;   // muon (Iterative fit muon analysis)
+        float muonSize, muonRadius, muonRSigma, muonIPCorrectedSize;   // muon (Iterative fit muon analysis)
         double houghAP, houghTD, houghCN, houghContained; //muon (Hough)
         short int fLocalTrigger;
         float MCenergy;
@@ -1190,6 +1190,7 @@ int VEventLoop::checkCuts()
         if( i_tree.GetBranchStatus( "muonRadius" ) ) i_tree.Branch( "muonRadius", &muonRadius, "muonRadius/F" );
         if( i_tree.GetBranchStatus( "muonRSigma" ) ) i_tree.Branch( "muonRSigma", &muonRSigma, "muonRSigma/F" );
         if( i_tree.GetBranchStatus( "muonSize" ) ) i_tree.Branch( "muonSize", &muonSize, "muonSize/F" );
+        if( i_tree.GetBranchStatus( "muonIPCorrectedSize" ) ) i_tree.Branch( "muonIPCorrectedSize", &muonSize, "muonIPCorrectedSize/F" );
         if( i_tree.GetBranchStatus( "muonValid" ) ) i_tree.Branch( "muonValid", &muonValid, "muonValid/I" );
         if( i_tree.GetBranchStatus( "houghMuonValid" ) ) i_tree.Branch( "houghMuonValid", &houghMuonValid, "houghMuonValid/I" );
         if( i_tree.GetBranchStatus( "houghAP" ) ) i_tree.Branch( "houghAP", &houghAP, "houghAP/D" );
@@ -1219,6 +1220,7 @@ int VEventLoop::checkCuts()
         MCenergy = fAnalyzer->getImageParameters()->MCenergy;
         fLocalTrigger = fAnalyzer->getImageParameters()->fLocalTrigger;
         muonSize = fAnalyzer->getImageParameters()->muonSize;
+        muonIPCorrectedSize = fAnalyzer->getImageParameters()->muonIPCorrectedSize;
         muonRadius = fAnalyzer->getImageParameters()->muonRadius;
         muonRSigma = fAnalyzer->getImageParameters()->muonRSigma;
         muonValid = fAnalyzer->getImageParameters()->muonValid;
