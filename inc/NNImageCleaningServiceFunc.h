@@ -8,7 +8,6 @@ TGraph* gIPR;
 TGraph* gIPR2;
 TGraph* gIPR3;
 TGraph* gIPR4;
-float ChargeLimit=40.;
 TGraph* ReadIPRGraph(TString fname, TString graphname)
 {
     TFile* fptr=new TFile(fname,"READ");
