@@ -1222,8 +1222,8 @@ void VDisplay::setFADCText()
     {
        sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), integration window %d",
                 fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
-fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
-fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] );
+                fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
+                fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] );
     }
     else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
     {
@@ -1232,11 +1232,10 @@ fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     if( fEventLoop->getAnalyzer()->getSumWindow_2() > 0 )
     {
-       int iSW = fEventLoop->getAnalyzer()->getSumWindow_2();
        sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), 2nd integration window %d",
-                fEventLoop->getAnalyzer()->getPedvars( false, iSW )[iChannel],
-fEventLoop->getAnalyzer()->getPedvars( true, iSW )[iChannel],
-iSW );
+                fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] )[iChannel],
+                fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] )[iChannel],
+                fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] );
     }
     else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
     {
@@ -2637,10 +2636,10 @@ void VDisplay::subprocessComboBox( Long_t parm1 )
         setCameraPads( false );
         fBoolDrawOne = false;
         fBoolDrawAllinOne = false;
-if( fBool_M_OPT_COL_SCHE_Checked ) fMenuOpt->CheckEntry( M_OPT_COL_SCHE );
-else                               fMenuOpt->UnCheckEntry( M_OPT_COL_SCHE );
-if( fBool_M_OPT_BW_SCHE_Checked  ) fMenuOpt->CheckEntry( M_OPT_BW_SCHE );
-else                               fMenuOpt->UnCheckEntry( M_OPT_BW_SCHE );
+        if( fBool_M_OPT_COL_SCHE_Checked ) fMenuOpt->CheckEntry( M_OPT_COL_SCHE );
+        else                               fMenuOpt->UnCheckEntry( M_OPT_COL_SCHE );
+        if( fBool_M_OPT_BW_SCHE_Checked  ) fMenuOpt->CheckEntry( M_OPT_BW_SCHE );
+        else                               fMenuOpt->UnCheckEntry( M_OPT_BW_SCHE );
         setColorScheme();
 // check radio buttons for channel printings
         for( unsigned int i = 0; i < fTelescopesToShow.size(); i++ )
