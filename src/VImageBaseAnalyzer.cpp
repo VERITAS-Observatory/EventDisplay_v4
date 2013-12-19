@@ -447,7 +447,6 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
         try
         {
             i_channelHitID = fReader->getHitID(i);
-            pair< bool, uint32_t > a = fReader->getChannelHitIndex( i_channelHitID );
         }
         catch(...)
         {
@@ -1049,10 +1048,6 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // take average tzero per telescope (more stable than previous statement)
                    corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID]
                                    - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift() );
-                }
-                if( getTelID() == 4 )
-                {
-                   cout << "CHAN " << i_channelHitID << "\t" << corrfirst << "\t" << getSumWindowShift() << "\t" << getFADCStopOffsets()[i_channelHitID] << "\t" <<  getTOffsets()[i_channelHitID] << endl;
                 }
 ///////////////////
 // low gain channel have different time -> use tzero (do not do this for DST sims)
