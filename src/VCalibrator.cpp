@@ -1611,7 +1611,7 @@ void VCalibrator::readGains( bool iLowGain )
 		   if(!getRunParameter()->fNoCalibNoPb){
 		       std::cout<<"Error: No gain information available "<<std::endl;
 		       std::cout<<"exiting... "<<std::endl;
-		       std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all gains will be set to 1) "<<std::endl;
+		       std::cout<<"          please set option: -nocalibnoproblem , when launching EVNDISP if you want to continue anyway (all gains will be set to 1) "<<std::endl;
 		       exit(-1);
 		       
 		   }
@@ -1677,7 +1677,7 @@ void VCalibrator::readGains( bool iLowGain )
     {
 	std::cout<<"Error: No gain information available "<<std::endl;
 	std::cout<<"exiting... "<<std::endl;
-	std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all gains will be set to 1) "<<std::endl;
+	std::cout<<"          please set option: -nocalibnoproblem , when launching EVNDISP if you want to continue anyway (all gains will be set to 1) "<<std::endl;
 	exit(-1);
     }
 
@@ -1826,7 +1826,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 		   if(!getRunParameter()->fNoCalibNoPb){
 		       std::cout<<"Error: No toff information available "<<std::endl;
 		       std::cout<<"exiting... "<<std::endl;
-		       std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all TOffsets will be set to 0) "<<std::endl;
+		       std::cout<<"          please set option: -nocalibnoproblem , when launching EVNDISP if you want to continue anyway (all TOffsets will be set to 0) "<<std::endl;
 		       exit(-1);
 		       
 		   }
@@ -1894,7 +1894,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	
 	std::cout<<"Error: No toff information available "<<std::endl;
 	std::cout<<"exiting... "<<std::endl;
-	std::cout<<"          please set option: nocalibnoproblem, when launching EVNDISP if you want to continue anyway (all TOffsets will be set to 0)"<<std::endl;
+	std::cout<<"          please set option: -nocalibnoproblem , when launching EVNDISP if you want to continue anyway (all TOffsets will be set to 0)"<<std::endl;
 	exit(-1);
 	
     }
@@ -2845,22 +2845,41 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	  cout << nPixel << "\t" << getGains( true ).size();
 	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
+////////////////
 // tzeros
        if( nPixel == getAverageTZeros( false ).size() )
        {
 	  double i_mean = 0.;
 	  double i_nn = 0.;
+// calculate median
+          TH1D h( "hM", "", 3*(int)getNSamples(), 0., (float)getNSamples() );
+
           for( unsigned int p = 0; p < nPixel; p++ )
 	  {
 	     getAverageTZeros( false )[p] = ftzero[p];
 	     if( getAverageTZeros( false )[p] > -98. )
 	     {
-	        i_mean += getAverageTZeros( false )[p];
+	        i_mean += ftzero[p];
 		i_nn++;
 		setAverageTZero( p, ftzero[p], false );
+                h.Fill( ftzero[p] );
              }
           }
-	  if( i_nn > 0. ) setMeanAverageTZero( i_mean / i_nn, false );
+	  if( i_nn > 0. )
+          {
+             double i_a[] = { 0.5 };
+             double i_b[] = { 0.0 };
+             h.GetQuantiles( 1, i_b, i_a );
+//             setMeanAverageTZero( i_mean / i_nn, false );
+             setMeanAverageTZero( i_b[0], false );
+          }
+       }
+       else
+       {
+          cout << "bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile ) error: ";
+          cout << " index out of range (tzero, high gain): ";
+          cout << nPixel << "\t" << getAverageTZeros( false ).size();
+          cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
    }
 

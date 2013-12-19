@@ -131,21 +131,21 @@ void VEventLoop::printRunInfos()
         setTelID( fRunPar->fTelToAnalyze[i] );
 
         cout << "Telescope " << fRunPar->fTelToAnalyze[i]+1;
-if( i < getDetectorGeometry()->getTelType().size() ) cout << " (type " << getDetectorGeometry()->getTelType()[i] << ")";
-cout << endl;
-if( fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]] )
-{
-   cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
-   if( fRunPar->fDoublePass ) cout << "  (doublepass, integration method pass 1: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
-   cout << endl;
-   cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
-   cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples)" << endl;
-   cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
-   cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
-   if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];
-   cout << endl;
+        if( i < getDetectorGeometry()->getTelType().size() ) cout << " (type " << getDetectorGeometry()->getTelType()[i] << ")";
+        cout << endl;
+        if( fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]] )
+        {
+           cout << "\t trace integration method: \t" << fRunPar->fTraceIntegrationMethod[fRunPar->fTelToAnalyze[i]];
+           if( fRunPar->fDoublePass ) cout << "  (doublepass, integration method pass 1: " << fRunPar->fTraceIntegrationMethod_pass1[fRunPar->fTelToAnalyze[i]] << ")";
+           cout << endl;
+           cout << "\t start of summation window: \t" << fRunPar->fsumfirst[fRunPar->fTelToAnalyze[i]];
+           cout << "\t(shifted by " << fRunPar->fTraceWindowShift[i] << " samples)" << endl;
+           cout << "\t length of summation window: \t" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]];
+           cout << "/" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]];
+           if( fRunPar->fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]];
+           cout << endl;
         }
-else
+        else
 {
    cout << "\t no trace integration" << endl;
         }

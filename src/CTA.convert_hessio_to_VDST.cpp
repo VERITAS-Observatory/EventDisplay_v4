@@ -630,7 +630,8 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 		      if( getTimingLevelIndex(t) == 1 && fData->fDSTsums[i_ntel_data][p] > fData->getDSTMeanPulseTimingMinLightLevel()
 		                                      && hsdata->event.teldata[telID].pixtm->timval[p][t] > 1.e-1 )
 		      {
-		         fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->timval[p][t] );
+		         fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->timval[p][t], 
+                                                                  hsdata->event.teldata[telID].raw->num_samples );
                       }
                    }
                 }
@@ -727,6 +728,10 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
    float fConv_high[VDST_MAXCHANNELS];
    float fConv_low[VDST_MAXCHANNELS];
    float fTZero[VDST_MAXCHANNELS];
+   float fTZeroMean = -999.;
+   float fTZeroMedian = -999.;
+   float fTZeroRMS = -999.;
+   float fTZeroN = 0.;
    for( unsigned int i = 0; i < VDST_MAXCHANNELS; i++ )
    {
       fPed_high[i] = 0.;
@@ -761,6 +766,10 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
    t->Branch( "conv_high", fConv_high, "conv_high[NPixel]/F" );
    t->Branch( "conv_low", fConv_low, "conv_low[NPixel]/F" );
    t->Branch( "tzero", fTZero, "tzero[NPixel]/F" ); 
+   t->Branch( "tzero_mean_tel", &fTZeroMean, "tzero_mean_tel/F" ); 
+   t->Branch( "tzero_med_tel", &fTZeroMedian, "tzero_med_tel/F" ); 
+   t->Branch( "tzero_rms_tel", &fTZeroRMS, "tzero_rms_tel/F" ); 
+   t->Branch( "tzero_n_tel", &fTZeroN, "tzero_n_tel/F" ); 
 
 // open external file with pedestals
    TFile *iPedFile = 0;
@@ -838,6 +847,13 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
 		fTZero[p] = fData->getDSTMeanPulseTiming( itel, p );
               }
           }
+          if( fData )
+          {
+             fTZeroMean = fData->getDSTMeanPulseTimingPerTelescope( itel );
+             fTZeroMedian = fData->getDSTMedianPulseTimingPerTelescope( itel );
+             fTZeroRMS = fData->getDSTRMSPulseTimingPerTelescope( itel );
+             fTZeroN = fData->getDSTNEventsPulseTimingPerTelescope( itel );
+          }
 	  for( unsigned int w = 0; w < fnum_sumwindow; w++ )
 	  {
 	      fsumwindow[w] = (unsigned int)(TMath::Nint( iT_sumwindow[w] ));
@@ -878,6 +894,13 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
 	        fTZero[p] = -999.;
              }
 	  }
+          if( fData )
+          {
+             fTZeroMean = fData->getDSTMeanPulseTimingPerTelescope( itel );
+             fTZeroMedian = fData->getDSTMedianPulseTimingPerTelescope( itel );
+             fTZeroRMS = fData->getDSTRMSPulseTimingPerTelescope( itel );
+             fTZeroN = fData->getDSTNEventsPulseTimingPerTelescope( itel );
+          }
        }
 
        t->Fill();

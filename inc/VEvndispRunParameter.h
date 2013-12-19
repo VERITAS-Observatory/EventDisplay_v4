@@ -151,7 +151,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
 
 // FADC integration
-	string      fFADCChargeUnit;              // FADC charge unit (DC or PE)
+	string  fFADCChargeUnit;                  // FADC charge unit (DC or PE)
 	vector< unsigned int > fTraceIntegrationMethod;   // trace integration method
 	vector< unsigned int > fTraceIntegrationMethod_pass1;   // trace integration method for pass 1 (doublepass only)
         vector<int> fsumfirst;                    // parameter for window summation start (window 1)
@@ -164,7 +164,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	bool   fDoublePassErrorWeighting2005;     // use error weighting from 2004 or today
 	bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
         vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )
-        vector< int >    fTraceWindowShift_DoublePassSmallImages;   // shift the summation window by value (in doublepass: low gain channels only, default: 0 ): failed DB events only
+        vector< bool >   fsumfirst_start_at_T0;   // start the summation window at T0 (+shift; not for doublepass)
         vector< double > fSumWindowMaxTimedifferenceToDoublePassPosition; // maximum difference between doublepass calculated window start and t0 (in samples, default: 10 )
         double ftracefit;                         // tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerms
         string ftracefitfunction;                 // number of tracefit function (default=ev, others: grisu);

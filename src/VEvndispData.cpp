@@ -169,9 +169,10 @@ void VEvndispData::resetAnaData()
         fAnaData[fTelID]->fTCorrectedSumFirst = fRunPar->fsumfirst[fTelID];
         fAnaData[fTelID]->fTCorrectedSumLast = fRunPar->fsumfirst[fTelID] + fRunPar->fsumwindow_1[fTelID];
         fAnaData[fTelID]->fCurrentSummationWindow = fRunPar->fsumwindow_1[fTelID];
+        fAnaData[fTelID]->fCurrentSummationWindow_2 = fRunPar->fsumwindow_2[fTelID];
 
-fAnaData[fTelID]->fTemplateMu = 0;
-fAnaData[fTelID]->fModel3DMu = 0; //JG
+        fAnaData[fTelID]->fTemplateMu = 0;
+        fAnaData[fTelID]->fModel3DMu = 0; //JG
 
         if( getTraceFit() > -1. )
         {
@@ -584,7 +585,7 @@ int VEvndispData::getDebugLevel()
 }
 
 
-void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int imax )
+void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int imax, bool iSecondWindow )
 {
     unsigned int iT = 0;
     if( imax > imin ) iT = imax - imin;
@@ -592,26 +593,48 @@ void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int im
 // this should never happen
     if( iT > getNSamples() )
     {
-        cout << "VEvndispData::setCurrentSummationWindow (a) error: summation window too large: " << imin << "\t" << imax << "\t" << iT << endl;
+        cout << "VEvndispData::setCurrentSummationWindow (a) error: summation window too large ";
+        if( iSecondWindow ) cout << " (2nd window): ";
+        else                cout << ": ";
+        cout << imin << "\t" << imax << "\t" << iT << endl;
         iT = 0;
     }
-    fAnaData[fTelID]->fCurrentSummationWindow = iT;
+    if( iSecondWindow ) fAnaData[fTelID]->fCurrentSummationWindow = iT;
+    else                fAnaData[fTelID]->fCurrentSummationWindow_2 = iT;
 
 }
 
 
-void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax )
+void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax, bool iSecondWindow )
 {
-    if( imax > imin ) fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = imax - imin;
-    else              fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
+// first summation window
+    if( !iSecondWindow )
+    {
+       if( imax > imin ) fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = imax - imin;
+       else              fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
 
 // this should never happen
-    if( fAnaData[fTelID]->fCurrentSummationWindow[iChannel] > getNSamples() )
+       if( fAnaData[fTelID]->fCurrentSummationWindow[iChannel] > getNSamples() )
+       {
+           cout << "VEvndispData::setCurrentSummationWindow (b) error: summation window too large: ";
+           cout << fTelID << "\t" << iChannel << "\t" << imin << "\t" << imax << "\t" << fAnaData[fTelID]->fCurrentSummationWindow[iChannel] << endl;
+           fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
+       }
+   }
+// second summation window
+    else
     {
-        cout << "VEvndispData::setCurrentSummationWindow (b) error: summation window too large: ";
-cout << fTelID << "\t" << iChannel << "\t" << imin << "\t" << imax << "\t" << fAnaData[fTelID]->fCurrentSummationWindow[iChannel] << endl;
-        fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
-    }
+       if( imax > imin ) fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] = imax - imin;
+       else              fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] = 0;
+
+// this should never happen
+       if( fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] > getNSamples() )
+       {
+           cout << "VEvndispData::setCurrentSummationWindow (2nd window) (b) error: summation window too large: ";
+           cout << fTelID << "\t" << iChannel << "\t" << imin << "\t" << imax << "\t" << fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] << endl;
+           fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] = 0;
+       }
+   }
 }
 
 

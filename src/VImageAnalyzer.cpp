@@ -462,7 +462,8 @@ bool VImageAnalyzer::initEvent()
     setPulseTiming( 0., false );
     setTCorrectedSumFirst( getSumFirst() );
     setTCorrectedSumLast( getSumFirst() + getSumWindow() );
-    setCurrentSummationWindow( getSumWindow() );
+    setCurrentSummationWindow( getSumWindow(), false );
+    setCurrentSummationWindow( getSumWindow_2(), true );
     setImage( false );
     setBorder( false );
     setImageBorderNeighbour( false );

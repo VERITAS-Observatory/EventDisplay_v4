@@ -66,6 +66,7 @@ class VImageAnalyzerData
         valarray<unsigned int> fTCorrectedSumFirst;
         valarray<unsigned int> fTCorrectedSumLast;
         valarray<unsigned int> fCurrentSummationWindow;
+        valarray<unsigned int> fCurrentSummationWindow_2;
 // trace fitting results
         valarray<double> fRiseTime;               //!< 10-90% rise time of pulse
         valarray<double> fFallTime;               //!< 90-10% fall time of pulse

@@ -144,14 +144,14 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fForceLLImageFit = false;
     fImageAnalysisFUIFactor = 2.;
     fFixWindowStart = false;
-    fFixWindowStart_sumwindow2 = true;
+    fFixWindowStart_sumwindow2 = false;
     fDoublePass = true;
     fDoublePassErrorWeighting2005 = true;
     fDynamicIntegrationWindow = true;
     frecoverImagePixelNearDeadPixel = true;
     fFillImageBorderNeighbours = true;
     fTraceWindowShift.push_back( -1 );
-    fTraceWindowShift_DoublePassSmallImages.push_back( 0 );
+    fsumfirst_start_at_T0.push_back( false );
     fTraceIntegrationMethod.push_back( 1 );
     fTraceIntegrationMethod_pass1.push_back( 1 );
     fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( 10. );
@@ -466,7 +466,7 @@ void VEvndispRunParameter::print( int iEv )
                cout << endl;
                cout << "\t start of summation window: \t" << fsumfirst[fTelToAnalyze[i]];
                cout << "\t (shifted by " << fTraceWindowShift[i] << " samples";
-               cout << " [" << fTraceWindowShift_DoublePassSmallImages[i] << "])" << endl;
+               cout << " [T0-" << fsumfirst_start_at_T0[i] << "])" << endl;
                cout << "\t length of summation window: \t" << fsumwindow_1[fTelToAnalyze[i]];
                cout << "/" << fsumwindow_2[fTelToAnalyze[i]];
                if( fDoublePass ) cout << "\t length of first pass summation window (double pass): \t" << fsumwindow_pass1[fTelToAnalyze[i]];

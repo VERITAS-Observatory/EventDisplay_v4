@@ -1249,7 +1249,7 @@ void VReadRunParameter::test_and_adjustParams()
             fRunPara->fsumwindow_pass1.push_back( fRunPara->fsumwindow_pass1[0] );
             fRunPara->fsumfirst.push_back( fRunPara->fsumfirst[0] );
             fRunPara->fTraceWindowShift.push_back( fRunPara->fTraceWindowShift[0] );
-	    fRunPara->fTraceWindowShift_DoublePassSmallImages.push_back( fRunPara->fTraceWindowShift_DoublePassSmallImages[0] );
+	    fRunPara->fsumfirst_start_at_T0.push_back( fRunPara->fsumfirst_start_at_T0[0] );
 	    fRunPara->fTraceIntegrationMethod.push_back( fRunPara->fTraceIntegrationMethod[0] );
 	    fRunPara->fTraceIntegrationMethod_pass1.push_back( fRunPara->fTraceIntegrationMethod_pass1[0] );
 	    fRunPara->fLogLikelihoodLoss_min.push_back( fRunPara->fLogLikelihoodLoss_min[0] );
@@ -1350,7 +1350,7 @@ void VReadRunParameter::test_and_adjustParams()
     if( fRunPara->fFixWindowStart )
     {
         for( unsigned int t = 0; t < fRunPara->fTraceWindowShift.size(); t++ ) fRunPara->fTraceWindowShift[t] = 0;
-        for( unsigned int t = 0; t < fRunPara->fTraceWindowShift_DoublePassSmallImages.size(); t++ ) fRunPara->fTraceWindowShift_DoublePassSmallImages[t] = 0;
+        for( unsigned int t = 0; t < fRunPara->fsumfirst_start_at_T0.size(); t++ ) fRunPara->fsumfirst_start_at_T0[t] = false;
     }
 
 // MS: throws an error if its a simulation file and it was asked to calculate the PW parameters from the CFD hits, since CFDs don't exist in the simulation record

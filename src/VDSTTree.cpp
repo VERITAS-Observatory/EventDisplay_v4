@@ -45,9 +45,10 @@ VDSTTree::VDSTTree()
     fDSTTel_xoff = 0;
     fDSTTel_yoff = 0;
 
-    fDSTMeanPulseTimingMinLightLevel = 50.;
+    fDSTMeanPulseTimingMinLightLevel = 100.;
     for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
     {
+       fDSTMeanPulseTimingHistogram[i] = 0;
        for( unsigned int j = 0; j < VDST_MAXCHANNELS; j++ )
        {
           fDSTMeanPulseTiming[i][j] = 0.;
@@ -707,12 +708,19 @@ int VDSTTree::setTelCounter( int iTelID )
     return fTelescopeCounter_temp;
 }
 
-void VDSTTree::fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime )
+void VDSTTree::fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime, int iNSamples )
 {
    if( iTelID < VDST_MAXTELESCOPES && iChannelID < VDST_MAXCHANNELS )
    {
       fDSTMeanPulseTiming[iTelID][iChannelID] += iTime;
       fDSTMeanPulseTiming_N[iTelID][iChannelID]++;
+      if( !fDSTMeanPulseTimingHistogram[iTelID] )
+      {
+         char hname[200];
+         sprintf( hname, "hPT_%d", iTelID );
+         fDSTMeanPulseTimingHistogram[iTelID] = new TH1F( hname, "", 100*iNSamples, 0., (float)iNSamples );
+      }
+      fDSTMeanPulseTimingHistogram[iTelID]->Fill( iTime ); 
    }
 }
 
@@ -724,27 +732,65 @@ double VDSTTree::getDSTMeanPulseTiming(  unsigned int iTelID, unsigned int iChan
       {
          return fDSTMeanPulseTiming[iTelID][iChannelID] / fDSTMeanPulseTiming_N[iTelID][iChannelID];
       }
-      else                                                 return -9999.;
+      else                                                 return -9999.; 
    }
 
    return 0.;
 }
 
-double VDSTTree::getDSTMeanPulseTimingPerTelescope( unsigned int iTelID, unsigned int nPixel )
+
+double VDSTTree::getDSTMedianPulseTimingPerTelescope( unsigned int iTelID )
 {
-   if( iTelID < VDST_MAXTELESCOPES && nPixel < VDST_MAXCHANNELS )
+   if( iTelID < VDST_MAXTELESCOPES )
    {
-      double i_m = 0.;
-      double i_n = 0.;
-      for( unsigned int i = 0; i < nPixel; i++ )
+       if( fDSTMeanPulseTimingHistogram[iTelID] )
+       {
+           double i_a[] = { 0.5 };
+           double i_b[] = { 0.0 };
+           fDSTMeanPulseTimingHistogram[iTelID]->GetQuantiles( 1, i_b, i_a );
+           return i_b[0];
+       }
+       else return -9999.;
+   }
+
+   return 0.;
+} 
+
+
+double VDSTTree::getDSTMeanPulseTimingPerTelescope( unsigned int iTelID )
+{
+   if( iTelID < VDST_MAXTELESCOPES )
+   {
+      if( fDSTMeanPulseTimingHistogram[iTelID] )
       {
-          if( fDSTMeanPulseTiming[iTelID][i] > 0. && fDSTMeanPulseTiming_N[iTelID][i] > 0. )
-	  {
-	      i_m += fDSTMeanPulseTiming[iTelID][i] / fDSTMeanPulseTiming_N[iTelID][i];
-	      i_n++;
-          }
+         return fDSTMeanPulseTimingHistogram[iTelID]->GetMean();
       }
-      if( i_n > 0. ) return i_m / i_n;
+      else           return -9999.;
+   }
+   return -9999.;
+}
+
+double VDSTTree::getDSTRMSPulseTimingPerTelescope( unsigned int iTelID )
+{
+   if( iTelID < VDST_MAXTELESCOPES )
+   {
+      if( fDSTMeanPulseTimingHistogram[iTelID] )
+      {
+         return fDSTMeanPulseTimingHistogram[iTelID]->GetRMS();
+      }
+      else           return -9999.;
+   }
+   return -9999.;
+}
+
+double VDSTTree::getDSTNEventsPulseTimingPerTelescope( unsigned int iTelID )
+{
+   if( iTelID < VDST_MAXTELESCOPES )
+   {
+      if( fDSTMeanPulseTimingHistogram[iTelID] )
+      {
+         return fDSTMeanPulseTimingHistogram[iTelID]->GetEntries();
+      }
       else           return -9999.;
    }
    return -9999.;

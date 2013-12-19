@@ -2,6 +2,7 @@
 #ifndef VDSTTree_H
 #define VDSTTree_H
 
+#include "TH1F.h"
 #include "TMath.h"
 #include "TTree.h"
 
@@ -121,6 +122,7 @@ class VDSTTree
         float fDSTMeanPulseTiming[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
         float fDSTMeanPulseTiming_N[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 	float fDSTMeanPulseTimingMinLightLevel;
+        TH1F *fDSTMeanPulseTimingHistogram[VDST_MAXTELESCOPES];
 //////////////////////////////////////////////////////////////////////////////////////
 // MC parameters
         unsigned short int fDSTprimary;
@@ -234,8 +236,11 @@ class VDSTTree
             return fDSTTel_yoff;
         }
 
-	void         fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime );
-	double       getDSTMeanPulseTimingPerTelescope( unsigned int iTelID, unsigned int iNPixel );
+	void         fillDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID, double iTime, int iNSamples = 0 );
+	double       getDSTMeanPulseTimingPerTelescope( unsigned int iTelID );
+        double       getDSTMedianPulseTimingPerTelescope( unsigned int iTelID );
+        double       getDSTRMSPulseTimingPerTelescope( unsigned int iTelID );
+        double       getDSTNEventsPulseTimingPerTelescope( unsigned int iTelID );
 	double       getDSTMeanPulseTiming( unsigned int iTelID, unsigned int iChannelID );
 	double       getDSTMeanPulseTimingMinLightLevel() { return fDSTMeanPulseTimingMinLightLevel; }
 

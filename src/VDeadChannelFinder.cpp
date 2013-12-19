@@ -7,6 +7,7 @@
 VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool iLowGain, bool isMC )
 {
     fDebug = false;
+    fDebug = true;
 
     frunmode = irunmode;
     fTelID = iTelID;

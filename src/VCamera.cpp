@@ -325,7 +325,17 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 setPMTColorScheme( fData->getTOffsets(), false, -2., 2., "time offset [samples]", false );
                 break;
             case C_CALTZERO:
-                setPMTColorScheme( fData->getAverageTZeros(), false, 100., 0.,  "time (cal tzero) [samples]", false );
+                 {
+                   float i_min = 1.e5;
+                   float i_max = 0.;
+                   for( unsigned int i = 0; i < fData->getAverageTZeros().size(); i++ )
+                   {
+                       if( fData->getAverageTZeros()[i] > i_max ) i_max = fData->getAverageTZeros()[i];
+                       if( fData->getAverageTZeros()[i] > 0. && fData->getAverageTZeros()[i] < i_min ) i_min = fData->getAverageTZeros()[i];
+                       if( i_min == i_max ) i_min = i_max - 1.;
+                   }
+                   setPMTColorScheme( fData->getAverageTZeros(), true, i_min, i_max, "time [samples]", true );
+                }
                 break;
             case C_TZERO:
                 setPMTColorScheme( fData->getTZeros(), true, 100., 0., "time [samples]", true );
@@ -368,11 +378,11 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             case C_TRIGGER_EVNDISP:
                 setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
                 break;
-    case C_TEMPLATE:
+            case C_TEMPLATE:
                 if( fData->getRunParameter()->ffrogsmode==1 )
-{
+                {
                   setPMTColorScheme( fData->getTemplateMu(), false,  -1.0, 1.1*fData->getTemplateMuMax(), "photons [p.e.]", false );
-}
+                }
                 break;
     case C_MODEL3D:  //JG
         if( fData->getRunParameter()->fUseDisplayModel3D ) {

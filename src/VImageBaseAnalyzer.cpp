@@ -51,7 +51,7 @@ bool VImageBaseAnalyzer::setSpecialChannels()
 
 /*
 
-    calculate integrated charges for all pixels
+   calculate integrated charges for all pixels
 
    (to be used for calibration)
 
@@ -259,7 +259,11 @@ void VImageBaseAnalyzer::FADCStopCorrect()
                   if( getFADCstopTZero()[0] > 0 &&  crateTZero> 0 ) offset=getFADCstopTZero()[0] - crateTZero;
                   else  offset = 0.;
 
-                  if( fDebug && fabs(offset) > 5 ) cout << "VImageBaseAnalyzer::FADCStopCorrect() warning: crate jitter offset > 5 samples in Event "<< fEventNumber << ", Tel " << fTelID+1 << ", TZero[0] " << getFADCstopTZero()[0] << ", TZero["<< t << "] " << crateTZero << endl;
+                  if( fDebug && fabs(offset) > 5 )
+                  {
+                     cout << "VImageBaseAnalyzer::FADCStopCorrect() warning: crate jitter offset > 5 samples in Event ";
+                     cout << fEventNumber << ", Tel " << fTelID+1 << ", TZero[0] " << getFADCstopTZero()[0] << ", TZero["<< t << "] " << crateTZero << endl;
+                  }
                   unsigned int iC_start = 0;
                   unsigned int iC_stop =  0;
 // crate 2
@@ -361,13 +365,14 @@ void VImageBaseAnalyzer::calcTCorrectedSums(int iFirst, int iLast)
 
                 setTCorrectedSumFirst( i_channelHitID, corrfirst );
                 setTCorrectedSumLast( i_channelHitID, corrlast );
-                setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast );
+                setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );
                 setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
             }
         }
         catch(...)
         {
-            cout << "VImageBaseAnalyzer::calcTCorrectedSums(), index out of range (fReader->getHitID) " << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
+            cout << "VImageBaseAnalyzer::calcTCorrectedSums(), index out of range (fReader->getHitID) ";
+            cout << i << "(Telescope " << getTelID()+1 << ", event " << getEventNumber() << ")" << endl;
             continue;
         }
     }
@@ -419,11 +424,12 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
     setSums( 0. );
     setSums2( 0. );
 
-//////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
 // calculates the sum over a sample range, corrected for time offsets, for all channels
-//////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
     unsigned int nhits = fReader->getNumChannelsHit();
-// exclude photodiode from this
+// exclude photodiode from this (which would be channel Nchannel + 1 )
     if( nhits > getDead(false).size() ) nhits = getDead(false).size();
     unsigned int ndead_size = getDead().size();
 
@@ -432,7 +438,9 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
     int corrfirst = 0;
     int corrlast = 0;
 
+//////////////////////////////////////////////////////////////////
 // loop over all channels
+//////////////////////////////////////////////////////////////////
     for (unsigned int i=0; i<nhits; i++)
     {
         unsigned int i_channelHitID=0;
@@ -453,45 +461,50 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
         }
 /////////////////////////////////////////////////////////////////
 // calculate tzero and sums for good channels only
+/////////////////////////////////////////////////////////////////
         if( i_channelHitID < ndead_size && !getDead(getHiLo()[i_channelHitID])[i_channelHitID])
-      {
+        {
 // initialize trace handler
             fTraceHandler->setTrace( fReader, getNSamples(), 
                                      getPeds(getHiLo()[i_channelHitID] )[i_channelHitID], getPedrms(getHiLo()[i_channelHitID])[i_channelHitID], 
                                      i_channelHitID, i, getLowGainMultiplier()[i_channelHitID]*getHiLo()[i_channelHitID] );
             fTraceHandler->setTraceIntegrationmethod( iTraceIntegrationMethod );
-// integration range
-// get time offsets (from laser data)
-            int offset=0;
+
+// get time offsets (from laser/flasher calibration): make sure that trace integration starts at the same time in all channels
+            int offset = 0;
             if( !getRunParameter()->fFixWindowStart )
             {
                 if (getTOffsets()[i_channelHitID]>0) offset=(int)getTOffsets()[i_channelHitID];
                 if (getTOffsets()[i_channelHitID]<0) offset=(int)getTOffsets()[i_channelHitID]-1;
             }
-// start of summation window
-            corrfirst = iFirstSum + offset;
-            if (corrfirst < 0) corrfirst = 0;
-            if (corrfirst > (int)getNSamples()) corrfirst=(int)getNSamples();
-            setTCorrectedSumFirst( i_channelHitID, corrfirst );
-// end of summation window
-            corrlast=iLastSum+offset;
-            if (corrlast<0) corrlast=0;
-            if (corrlast>(int)getNSamples()) corrlast=(int)getNSamples();
-            setTCorrectedSumLast( i_channelHitID, corrlast );
-// set current summation window (might change from pixel to pixel and event to event
-            setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast );
+
+///////////////////////////////////////////
+// determine summation window parameters
+// start and end of summation window
+            corrfirst = getFADCTraceIntegrationPosition( iFirstSum + offset );
+            corrlast  = getFADCTraceIntegrationPosition( iLastSum + offset );
 // calculate timing parameters (raw and corrected; tzero correction happens later)
             setPulseTiming( i_channelHitID, fTraceHandler->getPulseTiming( corrfirst, corrlast, 0, getNSamples() ), true );
 // shift the summation window if necessary
             if( getSumWindowShift() != 0 && !getRunParameter()->fFixWindowStart )
             {
-                corrfirst = iFirstSum + (int)getTOffsets()[i_channelHitID] + getSumWindowShift();
-                if( corrfirst < 0 ) corrfirst = 0;
-                corrlast = corrfirst + (iLastSum - iFirstSum);
-                setTCorrectedSumFirst( i_channelHitID, corrfirst );
-                setTCorrectedSumLast( i_channelHitID, corrlast );
+                corrfirst = getFADCTraceIntegrationPosition( iFirstSum + (int)getTOffsets()[i_channelHitID] + getSumWindowShift() );
+                corrlast  = getFADCTraceIntegrationPosition( corrfirst + (iLastSum - iFirstSum) );
             }
-            setSums( i_channelHitID, fTraceHandler->getTraceSum(corrfirst, corrlast, fRaw ) );
+// use T0 as start of integraction window:
+            if( getSumWindowStart_at_T0() )
+            {
+               corrfirst = getFADCTraceIntegrationPosition( getPulseTiming()[getRunParameter()->fpulsetiming_tzero_index][i_channelHitID] + getSumWindowShift() );
+               corrlast  = getFADCTraceIntegrationPosition( corrfirst + (iLastSum - iFirstSum) );
+            }
+// set current summation window (might change from pixel to pixel and event to event
+            setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );
+
+///////////////////////////////////////////
+// integrate trace
+            setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
+
+// fill parameters characterizing the trace
             setTCorrectedSumFirst( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
             setTCorrectedSumLast( i_channelHitID, fTraceHandler->getTraceIntegrationLast() );
             setTraceAverageTime( i_channelHitID, fTraceHandler->getTraceAverageTime() );
@@ -503,14 +516,17 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
             {
                setTrace( i_channelHitID, fTraceHandler->getTrace(), getHiLo()[i_channelHitID], getPeds(getHiLo()[i_channelHitID] )[i_channelHitID] );
             }
-// the following parameters will be recalculated in the second pass
+/////////////////
+// no doublepass: fill summation windows and pass2 sum
             if( !getRunParameter()->fDoublePass )
             {
 // don't fill pulse timing in first pass of double pass (saves time)
                if( getFillPulseSum() ) getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
-               setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrfirst+(int)getSumWindow_2(), fRaw ) );
+               corrlast = getFADCTraceIntegrationPosition( corrfirst+(int)getSumWindow_2() );
+               setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
+               setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
             }
-
+//////////////////////////////////////////////////
 // get results for trace fitting
 // rise and fall time are 10/90% values
             if( getTraceFit() > -1 )
@@ -956,10 +972,11 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
             if( i_channelHitID < getHiLo().size() && !getDead(getHiLo()[i_channelHitID])[i_channelHitID] )
             {
                 if( getRunParameter()->fDynamicIntegrationWindow ) iSumWindow = getDynamicSummationWindow( i_channelHitID );
-                int corrlast = getSumFirst() + iSumWindow;
-                if( corrlast>(int)getNSamples() ) corrlast = (int)getNSamples();
-                setTCorrectedSumLast( i_channelHitID, corrlast );
-                setCurrentSummationWindow( i_channelHitID, getSumFirst(), corrlast );
+                int corrlast = getFADCTraceIntegrationPosition( getSumFirst() + iSumWindow );
+                setTCorrectedSumLast( i_channelHitID, getFADCTraceIntegrationPosition( getSumFirst() + iSumWindow ) );
+                setCurrentSummationWindow( i_channelHitID, getSumFirst(), corrlast, false );
+                setCurrentSummationWindow( i_channelHitID, getSumFirst(), 
+                                           getFADCTraceIntegrationPosition( getSumFirst() + (int)getSumWindow_2() ), true );
             }
         }
         catch(...)
@@ -988,7 +1005,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
     float xtime = 0.;
     int corrfirst = 0;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // loop over all hit channel
+///////////////////////////////////////////////////////////////////////////////////////////////////
     for(unsigned int i = 0; i < nhits; i++ )
     {
         unsigned int i_channelHitID = 0;
@@ -1004,6 +1023,11 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                                                   getLowGainMultiplier( true )[i_channelHitID]*getHiLo()[i_channelHitID] );
                 fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// calculate start of integration window (window 1 of pass 2)
+// 
+// double pass method: use time gradient along the long-axis of the image to calculate expected T0
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // position of the PMT in camera coordinates
                 xpmt = getDetectorGeo()->getX()[i_channelHitID] - getImageParameters()->cen_x;
                 ypmt = getDetectorGeo()->getY()[i_channelHitID] - getImageParameters()->cen_y;
@@ -1012,29 +1036,30 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // fit time along the major axis of the image (hardwired check!)
                 if (abs(getImageParameters()->tgrad_x)<200) xtime = getImageParameters()->tgrad_x*xpos+getImageParameters()->tint_x;
                 else xtime = getSumFirst();
-
-/////////////////////////////////////////
-// calculate start of integration window
-
 // fit times are corrected for TOffsets and FADCStopOffsets.
 // undo this to get integration window in FADC trace.
-                corrfirst = (int)(xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+                corrfirst = (int)(xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]
+                                 + getSumWindowShift() );
 // no success in start of integration window
 // (usually happens when first pass of cleaning returned no image/border pixels)
-                if( corrfirst < (int)getSumFirst() )
+                if( corrfirst < getSumFirst() )
                 {
 // take average tzero per telescope and pixel
 //                   corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
 // take average tzero per telescope (more stable than previous statement)
                    corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID]
-                                   - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift_DoublePassSmallImages());
+                                   - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift() );
                 }
-//////////////////////////////////////////////////////////////////////////////////////
+                if( getTelID() == 4 )
+                {
+                   cout << "CHAN " << i_channelHitID << "\t" << corrfirst << "\t" << getSumWindowShift() << "\t" << getFADCStopOffsets()[i_channelHitID] << "\t" <<  getTOffsets()[i_channelHitID] << endl;
+                }
+///////////////////
 // low gain channel have different time -> use tzero (do not do this for DST sims)
                 if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
                 {
 // get new tzero for sumwindow starting at corrfirst to the end of the window
-                        corrfirst=0;        
+                    corrfirst=0;        
                     float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
                     if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
                     {
@@ -1042,9 +1067,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                     }
                     if( corrfirst < 0 ) corrfirst = getSumFirst();
                 }
-//////////////////////////////////////////////////////////////////////////////////////
+////////////////////
 // high gain channel
-// integration start might be before sample 0 -> set to sample 0
+// integration start might be before sample 0 -> set to average t0
                 else if (corrfirst < 0 )
                 {
                     unsigned int isw = getDynamicSummationWindow( i_channelHitID );
@@ -1053,34 +1078,40 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // take average tzero per telescope and pixel
 //                      corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
 // take average tzero per telescope (more stable than previous statement)
-                        corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID]
-                                    - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift_DoublePassSmallImages() );
-                    setCurrentSummationWindow( i_channelHitID, corrfirst, isw );
+                    corrfirst = getFADCTraceIntegrationPosition(
+                                    getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift() );
+                    setCurrentSummationWindow( i_channelHitID, corrfirst, isw, false );
                 }
 // integration start is at beyond last sample: set to last sample
-                if (corrfirst> (int)getNSamples()) corrfirst=(int)getNSamples();
-// set start of integration window
+                corrfirst = getFADCTraceIntegrationPosition( corrfirst );
+// set start of integration window (sum window 1)
                 setTCorrectedSumFirst( i_channelHitID, corrfirst );
 
-///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 // calculate end of integration window
-                int corrlast = corrfirst + getCurrentSumWindow()[i_channelHitID];
-                if (corrlast>(int)getNSamples()) corrlast=(int)getNSamples();
+// (depends on user settings and length of readout window)
+//////////////////////////////////////////////////////////////////////////////////
+                int corrlast = getFADCTraceIntegrationPosition( corrfirst + getCurrentSumWindow()[i_channelHitID] );
                 setTCorrectedSumLast( i_channelHitID, corrlast );
 // set current summation window
-                setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast );
+                setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );
 
 ///////////////////////////////////
-// calculate pulse sum
+// calculate pulse sums
+///////////////////////////////////
+// sum for first summation window
                 setSums( i_channelHitID, fTraceHandler->getTraceSum(corrfirst, corrlast, fRaw ) );
                 if( getFillPulseSum() ) getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
-// calculate sum for second summation window
+// sum for second summation window
                 if( getRunParameter()->fFixWindowStart_sumwindow2 )
                 {
-                   corrfirst = (int)(getSumFirst() + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
-                   setSums2( i_channelHitID, fTraceHandler->getTraceSum( (int)getSumFirst(), (int)getSumFirst()+(int)getSumWindow_2(), fRaw ) );
+                   corrfirst = getFADCTraceIntegrationPosition( getSumFirst() + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID] );
+                   corrlast  = getFADCTraceIntegrationPosition( getSumFirst()+(int)getSumWindow_2() );
+                   setSums2( i_channelHitID, fTraceHandler->getTraceSum( getSumFirst(), corrlast, fRaw ) );
                 }
-                setSums2( i_channelHitID, fTraceHandler->getTraceSum(corrfirst, corrfirst+(int)getSumWindow_2(), fRaw ) );
+                corrlast = getFADCTraceIntegrationPosition( corrfirst+(int)getSumWindow_2() );
+                setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
+                setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
             }
         }
         catch(...)
@@ -1116,6 +1147,21 @@ unsigned int VImageBaseAnalyzer::getDynamicSummationWindow( unsigned int i_chann
    if( getSums()[i_channelHitID] < 0 ) return getSumWindow();
 
 // calculate integration window
+// (not implemented yet)
 
    return getSumWindow();
 }
+
+/*
+ 
+   make sure that integration window position is insided the readout window
+
+*/
+int VImageBaseAnalyzer::getFADCTraceIntegrationPosition( int iPos )
+{
+    if( iPos < 0 ) return 0;
+    if( iPos > (int)getNSamples() ) return (int)getNSamples();
+
+    return iPos;
+}
+    

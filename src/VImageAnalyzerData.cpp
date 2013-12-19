@@ -1,8 +1,6 @@
 /*! \class VImageAnalyzerData
      \brief all data concerning the channel analysis is stored in this class
 
-   \date 19/08/04
-
 
    \author Gernot Maier
 */
@@ -83,6 +81,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
     fTCorrectedSumLast.resize( iChannels,0 );
     fTCorrectedSumFirst.resize( iChannels,0 );
     fCurrentSummationWindow.resize( iChannels,0 );
+    fCurrentSummationWindow_2.resize( iChannels,0 );
     fImage.resize( iChannels, false );
     fBorder.resize( iChannels, false );
     fTrigger.resize( iChannels, false );          // MS

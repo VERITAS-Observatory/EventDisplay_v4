@@ -684,11 +684,12 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 		     }
 		     if( iTemp4.size() > 0 )
 		     {
-		         if( i < fRunPara->fTraceWindowShift_DoublePassSmallImages.size() )
+		         if( i < fRunPara->fsumfirst_start_at_T0.size() )
 			 {
-			    fRunPara->fTraceWindowShift_DoublePassSmallImages[i] = atoi( iTemp4.c_str() );
+                            if( iTemp4 == "T0" ) fRunPara->fsumfirst_start_at_T0[i] = true;
+                            else                 fRunPara->fsumfirst_start_at_T0[i] = false;
                          }
-                     }
+                     } 
 		  }
                }
 	       continue;

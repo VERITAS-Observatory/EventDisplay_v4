@@ -23,6 +23,7 @@ class VImageBaseAnalyzer : public VEvndispData
         void calcTZeros(int ,int);
         void calcTZerosSums(int, int, unsigned int );
 	unsigned int getDynamicSummationWindow( unsigned int chanID );
+        int  getFADCTraceIntegrationPosition( int iPos );
         void FADCStopCorrect();
         bool setSpecialChannels();
         void timingCorrect();

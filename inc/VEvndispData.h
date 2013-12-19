@@ -273,7 +273,7 @@ class VEvndispData
         VShowerParameters*  getShowerParameters() { return fShowerParameters; }
         VFrogParameters*    getFrogParameters() { return fFrogParameters; }
         VModel3DParameters* getModel3DParameters() { return fModel3DParameters; } //JG
-        unsigned int        getSumFirst() { return fRunPar->fsumfirst[fTelID]; }
+        int                 getSumFirst() { return fRunPar->fsumfirst[fTelID]; }
         valarray<double>&   getSums() { return fAnaData[fTelID]->fSums; }
         valarray<double>&   getSums2() { return fAnaData[fTelID]->fSums2; }
         valarray<double>&   getTemplateMu() { return fAnaData[fTelID]->fTemplateMu; }
@@ -291,8 +291,9 @@ class VEvndispData
         unsigned int        getSumWindow_2( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_2.size() ) return checkSummationWindow( iTelID, fRunPar->fsumwindow_2[iTelID] ); else return 0; }
 	unsigned int        getSumWindow_Pass1( unsigned int iTelID ) { if( iTelID < fRunPar->fsumwindow_pass1.size() ) return checkSummationWindow( iTelID, fRunPar->fsumwindow_pass1[iTelID] ); else return 0; }
         valarray< unsigned int >& getCurrentSumWindow() { return fAnaData[fTelID]->fCurrentSummationWindow; }
+        valarray< unsigned int >& getCurrentSumWindow_2() { return fAnaData[fTelID]->fCurrentSummationWindow_2; }
         int                 getSumWindowShift() { return fRunPar->fTraceWindowShift[fTelID]; }
-	int                 getSumWindowShift_DoublePassSmallImages() { return fRunPar->fTraceWindowShift_DoublePassSmallImages[fTelID]; }
+        bool                getSumWindowStart_at_T0() { return fRunPar->fsumfirst_start_at_T0[fTelID]; }
         double              getSumWindowMaxTimedifferenceToDoublePassPosition() { return fRunPar->fSumWindowMaxTimedifferenceToDoublePassPosition[fTelID]; }
         valarray<unsigned int>& getTCorrectedSumFirst() { return fAnaData[fTelID]->fTCorrectedSumFirst; }
         valarray<unsigned int>& getTCorrectedSumLast() { return fAnaData[fTelID]->fTCorrectedSumLast; }
@@ -357,7 +358,7 @@ class VEvndispData
 	bool                isDST_MC() { if( isMC() && (fRunPar->fsourcetype == 4 || fRunPar->fsourcetype == 7) ) return true; else return false; }
 	bool                isTeltoAna( unsigned int iTel );
         void                printDeadChannels( bool iLowGain = false );
-		void                printDeadChannelList();  // DEADCHAN print list of dead channels, 1 line per channel/gain/telescope
+	void                printDeadChannelList();  // DEADCHAN print list of dead channels, 1 line per channel/gain/telescope
         void                resetAnaData();
         void                setAnalysisArrayEventStatus( unsigned int i ) { fAnalysisArrayEventStatus = i; }
         void                setAnaData() { fAnaData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getReader()->getMaxChannels(), (getTraceFit()>-1.), getDebugFlag(), getRunParameter()->fMCNdeadSeed, getNSamples(), getRunParameter()->fpulsetiminglevels.size(), getRunParameter()->fpulsetiming_tzero_index, getRunParameter()->fpulsetiming_width_index ); }
@@ -370,9 +371,10 @@ class VEvndispData
         void                setCalData() { fCalData[fTelID]->initialize( fDetectorGeo->getNChannels( fTelID ), getDebugFlag() ); }
         void                setCalibrated() { if( fTelID < fCalibrated.size() ) fCalibrated[fTelID] = true; }
         void                setCalibrated( bool iCal ) { if( fTelID < fCalibrated.size() ) fCalibrated[fTelID] = iCal; }
-        void                setCurrentSummationWindow( unsigned int iw ) { fAnaData[fTelID]->fCurrentSummationWindow = iw; }
-        void                setCurrentSummationWindow( unsigned int imin, unsigned int imax );
-        void                setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax );
+        void                setCurrentSummationWindow( unsigned int iw, bool iSecondWindow ) { if( !iSecondWindow ) fAnaData[fTelID]->fCurrentSummationWindow = iw;
+                                                                                                            else    fAnaData[fTelID]->fCurrentSummationWindow_2 = iw; }
+        void                setCurrentSummationWindow( unsigned int imin, unsigned int imax, bool iSecondWindow );
+        void                setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax, bool iSecondWindow );
         void                setDead( unsigned int iDead, bool iLowGain = false ) { if( !iLowGain ) fAnaData[fTelID]->fDead.assign( fDetectorGeo->getNChannels( fTelID ), iDead ); else fAnaData[fTelID]->fLowGainDead.assign( fDetectorGeo->getNChannels( fTelID ), iDead ); }
         void                setDead( unsigned int iChannel, unsigned int iDead, bool iLowGain = false, bool iFullSet = false, bool iReset = false );
         void                setNDead( unsigned int iN, bool iLowGain = false ) { if( !iLowGain ) fAnaData[fTelID]->fNDead = iN; else fAnaData[fTelID]->fLowGainNDead = iN; }
@@ -451,7 +453,7 @@ class VEvndispData
         void                setSums2( valarray< double > iVSum ) { fAnaData[fTelID]->fSums2 = iVSum; }
         void                setTemplateMu( valarray< double > iVTemplateMu ) { fAnaData[fTelID]->fTemplateMu = iVTemplateMu; }
 	void                setModel3DMu( valarray< double > iVModel3DMu ) { fAnaData[fTelID]->fModel3DMu = iVModel3DMu; } //JG
-	void               setModel3DClean( vector<bool> iVModel3DClean ) { fAnaData[fTelID]->fModel3DClean = iVModel3DClean; } //JG
+	void                setModel3DClean( vector<bool> iVModel3DClean ) { fAnaData[fTelID]->fModel3DClean = iVModel3DClean; } //JG
         void                setTCorrectedSumFirst( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst = iT; }
         void                setTCorrectedSumFirst( unsigned int iChannel, unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst[iChannel] = iT; }
         void                setTCorrectedSumLast( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumLast = iT; }
@@ -516,7 +518,8 @@ class VEvndispData
         void                setXGraph(TGraphErrors* igraph) {fXGraph[fTelID]=igraph;}
         void                setYGraph(TGraphErrors* igraph) {fYGraph[fTelID]=igraph;}
         void                setRGraph(TGraphErrors* igraph) {fRGraph[fTelID]=igraph;}
-        bool                usePedestalsInTimeSlices( bool iLowGain = false ) { if( !iLowGain ) return getRunParameter()->fUsePedestalsInTimeSlices; else return getRunParameter()->fLowGainUsePedestalsInTimeSlices; }
+        bool                usePedestalsInTimeSlices( bool iLowGain = false ) { if( !iLowGain ) return getRunParameter()->fUsePedestalsInTimeSlices; 
+                                                                                else return getRunParameter()->fLowGainUsePedestalsInTimeSlices; }
 
         void                testDataReader();     //!< check if reader is available, set pointers
 };

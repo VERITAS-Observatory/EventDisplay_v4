@@ -997,7 +997,7 @@ double VTraceHandler::getMaximumSums(float AmplThresh, int *integwindows, float 
         arrtimes[i+1]=Times[index[i]+1];
         std::cout<<"  win:"<<integwindows[i+1]<<" charge:"<<charges[i+1]<<" arrtime:"<<arrtimes[i+1]<<std::endl;
     }
-    //*/
+    */
 
     fSum = charges[MaxChargeIndex];
     fTraceAverageTime = arrtimes[MaxChargeIndex];
@@ -1072,7 +1072,7 @@ double VTraceHandler::getQuickMaximumSum(unsigned int iSearchStart, int iIntegra
     return charge;
 }
 
-/*
+
 double VTraceHandler::getQuickMaximumSum(unsigned int iSearchStart, int iIntegrationWindow, bool fRaw )
 {
     //std::cout<<"fTraceIntegrationMethod:"<<fTraceIntegrationMethod<<"  IntWindow: "<<iIntegrationWindow<<std::endl;

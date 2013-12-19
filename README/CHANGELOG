@@ -1,6 +1,24 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131219 (GM) significant changes in window settings for
+                charge integration;
+                summation window of second pass are now always
+                start at T0+sumwindowShift (was fixed for second
+                window of second pass);
+                command line parameter -fixwindow2 is set to 0 by
+                default (was 1)
+                adding shift in summation window now to all window
+                settings (this is set in the parameter file by
+                * -1 FADCSUMMATIONSTART 2 -1
+                removed parameter fTraceWindowShift_DoublePassSmallImages
+
+
+*************************************************************
+******* 20131219 trunk if now 4.40, to indicate        ******
+*******          signifant changes                     ******
+*************************************************************
+
 * 20131217 (JT, GM) additions to Hough muon analysis
                 note that GLS/ROOT mathmore routines are needed
                 for this analysis
