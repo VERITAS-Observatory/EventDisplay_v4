@@ -31,10 +31,6 @@ class VImageAnalyzer : public VImageBaseAnalyzer
 
         bool fInit;
 
-// time since run start
-        double fTimeSinceRunStart;                //!< time since run start
-        double fTimeRunStart;                     //!< time of first event in run
-
 // temporary vectors for dead pixel smoothing
         vector< unsigned int > savedDead;
         vector< unsigned int > savedDeadLow;

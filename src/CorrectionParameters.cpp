@@ -28,10 +28,10 @@
 
 using namespace SEphem;
 
-const double CorrectionParameters::sc_lim_az_cw;
-const double CorrectionParameters::sc_lim_az_cc;
-const double CorrectionParameters::sc_inversion_tol;
-const int    CorrectionParameters::sc_inversion_it_max;
+const double CorrectionParameters::sc_lim_az_cw =     270.0 * ANGLE_RADPERDEG;
+const double CorrectionParameters::sc_lim_az_cc =    -270.0 * ANGLE_RADPERDEG;
+const double CorrectionParameters::sc_inversion_tol = 0.0001 * ANGLE_RADPERDEG;
+const int    CorrectionParameters::sc_inversion_it_max = 20;
 
 bool CorrectionParameters::
 doAzElCorrections(double& az_driveangle, double& el_driveangle,
@@ -412,6 +412,7 @@ std::string CorrectionParameters::saveFilename(unsigned scope_num)
         << std::setw(2) << std::setfill('0') << tm->tm_mday << ".dat";
     return stream.str();
 }
+
 
 
 #ifdef TESTMAIN

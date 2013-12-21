@@ -76,11 +76,16 @@ namespace SEphem
             double az_neg_vff_t;                  // Azimuth negative VFF intercept             [rad/s]
 
         private:
-            static const double sc_lim_az_cw =     270.0 * ANGLE_RADPERDEG;
+            static const double sc_lim_az_cw;
+            static const double sc_lim_az_cc;
+
+            static const double sc_inversion_tol;
+            static const int    sc_inversion_it_max;
+/*            static const double sc_lim_az_cw =     270.0 * ANGLE_RADPERDEG;
             static const double sc_lim_az_cc =    -270.0 * ANGLE_RADPERDEG;
 
             static const double sc_inversion_tol = 0.0001 * ANGLE_RADPERDEG;
-            static const int    sc_inversion_it_max = 20;
+            static const int    sc_inversion_it_max = 20; */
     };
 
 }                                                 // namespace SEphem

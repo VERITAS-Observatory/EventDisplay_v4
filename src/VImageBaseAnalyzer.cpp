@@ -951,6 +951,7 @@ TTree* VImageBaseAnalyzer::makeDeadChannelTree()
 void VImageBaseAnalyzer::calcSecondTZerosSums()
 {
     if( fDebug ) cout << "VImageBaseAnalyzer::calcSecondTZerosSums()" << endl;
+    bool fDebugTrace = false;
 
 // get number of channels
     unsigned int nhits = fReader->getNumChannelsHit();
@@ -1039,6 +1040,12 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // undo this to get integration window in FADC trace.
                 corrfirst = (int)(xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]
                                  + getSumWindowShift() );
+                if( fDebugTrace )
+		{
+		    cout << "2ndFITcorrfirst " << getTelID()+1 << ", CH " << i_channelHitID;
+		    cout << " : fit " << xtime << ", toff " << getTOffsets()[i_channelHitID];
+		    cout << ", sumwindowshift " << getSumWindowShift() << " corrfirst " << corrfirst << endl;
+		}    
 // no success in start of integration window
 // (usually happens when first pass of cleaning returned no image/border pixels)
                 if( corrfirst < getSumFirst() )
@@ -1048,6 +1055,11 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // take average tzero per telescope (more stable than previous statement)
                    corrfirst = (int)(getMeanAverageTZero()-0.5 + getTOffsets()[i_channelHitID]
                                    - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift() );
+		   if( fDebugTrace )
+		   {
+		      cout << "2ndIgnoreFit " << getTelID()+1 << ", CH " << i_channelHitID;
+		      cout << " : mean " << getMeanAverageTZero() << ", corrfirst " << corrfirst << endl;
+                   }
                 }
 ///////////////////
 // low gain channel have different time -> use tzero (do not do this for DST sims)

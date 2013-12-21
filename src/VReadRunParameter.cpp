@@ -628,12 +628,6 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	        fRunPara->fIsMC = 1;
              }
         }
-// fill some diagnostic histograms
-        else if( iTemp.find( "fill" ) < iTemp.size() )
-        {
-            cout << "Warning: Parameter -fillhistos obsolete" << endl;
-//          fRunPara->ffillhistos = true;
-        }
         else if( iTemp.find( "tracewindowshift" ) < iTemp.size() )
         {
             fRunPara->fTraceWindowShift[0] = atoi( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
@@ -642,6 +636,10 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	{
 	    fRunPara->fMC_FADCTraceStart = (unsigned int)atoi( iTemp.substr(iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
 	}
+	else if( iTemp.find( "averagetzerofiducialradius" ) < iTemp.size() )
+	{
+	    fRunPara->faverageTZeroFiducialRadius = atof( iTemp.substr(iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );
+        }
         else if( iTemp.find( "cameracoordinatetransformx" ) < iTemp.size() )
         {
             fRunPara->fCameraCoordinateTransformX = atof( iTemp.substr( iTemp.rfind( "=" )+1,iTemp.size() ).c_str() );

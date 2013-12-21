@@ -1,6 +1,18 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131220 (GM) fixed warnings and errors from clang++
+
+* 20131220 (GM) allow to print list of image and border 
+                pixels from display
+
+* 20131220 (GM) optimized calculation of mean average T0
+                for CTA DST; use now median average T0 per
+		telescope type (was: average per telescope)
+		use also only centre fraction of camera
+		(new command line parameter 
+		averagetzerofiducialradius )
+
 * 20131219 (GM) significant changes in window settings for
                 charge integration;
                 summation window of second pass are now always

@@ -13,7 +13,7 @@
 
 #include "VDisplay.h"
 
-ClassImp(VDisplay);
+// ClassImp(VDisplay);
 
 VDisplay::VDisplay() : TGMainFrame( 0, 0, 0 )
 {
@@ -99,7 +99,6 @@ VDisplay::VDisplay(const TGWindow *p, unsigned int h, unsigned int w, VEventLoop
 //  leave it like it is, because signal/slot mechanism is more powerful
 
     fTabAna->Connect( "Selected(Int_t )", "VDisplay", this, "selectAnaTab( Int_t )" );
-//  fTabCamera->Connect( "Selected(Int_t )", "VDisplay", this, "updateCamera( Int_t )" );
     fCanvasCamera->Connect( "ProcessedEvent(Int_t , Int_t , Int_t , TObject* )", "VDisplay", this, "selectChannel( Int_t, Int_t, Int_t, TObject* )" );
     fCanvasCamera->SetHighLightColor( 10 );
     fCanvasCamera->SetEditable( false );
@@ -1545,8 +1544,8 @@ if( ihis ) ihis->SetAxisRange( 0., 250. );
         {
             ihis = fEventLoop->getCalData( fTelescope )->getHistoAverageTzero( fTelescope, iChannel );
             ihis2 = fEventLoop->getCalData( fTelescope )->getHistoAverageTzero( fTelescope, iChannel, true );
-    fEventLoop->setTelID( fTelescope );
-    iMeanDistributionValue = fEventLoop->getAverageTZeros()[iChannel];
+	    fEventLoop->setTelID( fTelescope );
+	    iMeanDistributionValue = fEventLoop->getAverageTZeros()[iChannel];
         }
         else
         {
@@ -1868,6 +1867,7 @@ void VDisplay::defineGui()
     fMenuOpt->AddEntry( "fix scale", M_OPT_FIX );
     fMenuOpt->AddSeparator();
     fMenuOpt->AddEntry( "dump dead channels", M_OPT_DEAD );
+    fMenuOpt->AddEntry( "dump image/borderchannels", M_OPT_IMAGE );
     fMenuOpt->Associate(this);
     fMenuBar->AddPopup("&options", fMenuOpt, fL6 );
     AddFrame( fMenuBar, fL4 );
@@ -2359,7 +2359,10 @@ void VDisplay::subprocessMenu( Long_t parm1 )
         case M_OPT_DEAD:
             dumpDeadChannels();
             break;
-
+// dump list of image/border pixels
+       case M_OPT_IMAGE:
+            dumpImageBorderPixels();
+	    break;
     }
 }
 
@@ -2770,6 +2773,49 @@ void VDisplay::dumpDeadChannels()
             fEventLoop->setTelID( fEventLoop->getTeltoAna()[i] );
             fEventLoop->printDeadChannels();
             fEventLoop->printDeadChannels( true );
+        }
+    }
+}
+
+void VDisplay::dumpImageBorderPixels()
+{
+    if( fDebug ) cout << "VDisplay::dumpImageBorderPixels()" << endl;
+
+    if( fEventLoop )
+    {
+        for( unsigned int i = 0; i < fEventLoop->getTeltoAna().size(); i++ )
+        {
+            fEventLoop->setTelID( fEventLoop->getTeltoAna()[i] );
+
+	    map< int, unsigned int > i_ImagePixel;
+	    map< int, unsigned int >::iterator it_ImagePixel;
+	    map< int, unsigned int > i_BorderPixel;
+	    map< int, unsigned int >::iterator it_BorderPixel;
+	    for( unsigned int j = 0; j < fEventLoop->getImage().size(); j++ )
+	    {
+	       if( j >= fEventLoop->getSums().size() ) continue;
+	       if( j >= fEventLoop->getBorder().size() ) continue;
+	       if( fEventLoop->getImage()[j] ) i_ImagePixel[(int)fEventLoop->getSums()[j]] = j;
+	       if( fEventLoop->getBorder()[j] ) i_BorderPixel[(int)fEventLoop->getSums()[j]] = j;
+            }
+	    if( i_ImagePixel.size() > 0 )
+	    {
+	       cout << "Tel " << i+1 << ": image pixels ";
+	       for( it_ImagePixel = i_ImagePixel.begin(); it_ImagePixel != i_ImagePixel.end(); it_ImagePixel++ )
+	       {
+		     cout << it_ImagePixel->second << ",";
+	       }
+	       cout << endl;
+            }
+	    if( i_BorderPixel.size() > 0 )
+	    {
+	       cout << "Tel " << i+1 << ": border pixels ";
+	       for( it_BorderPixel = i_BorderPixel.begin(); it_BorderPixel != i_BorderPixel.end(); it_BorderPixel++ )
+	       {
+		     cout << it_BorderPixel->second << ",";
+	       }
+	       cout << endl;
+            }
         }
     }
 }

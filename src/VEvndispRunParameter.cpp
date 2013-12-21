@@ -82,6 +82,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fTZeroLowGainFileNumber.push_back( 0 );
     fPixFileNumber.push_back( 0 );
     fIgnoreDSTGains = false;
+    faverageTZeroFiducialRadius = 1.5;
 
     fTelToAnalyze.push_back( 0 );
 

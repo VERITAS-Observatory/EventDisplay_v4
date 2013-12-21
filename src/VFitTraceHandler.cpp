@@ -407,7 +407,7 @@ TH1D *VFitTraceHandler::getFitHis()
     for( int i = 1; i <= fH1Trace->GetNbinsX(); i++ )
     {
         ieval = fF1Trace->Eval( fH1Trace->GetBinCenter( i ) );
-        if( !finite( (double)ieval ) ) ieval = fF1Trace->Eval( fH1Trace->GetBinCenter( i - 1 ) );
+        if( !TMath::Finite( (double)ieval ) ) ieval = fF1Trace->Eval( fH1Trace->GetBinCenter( i - 1 ) );
         fH1Trace->SetBinContent( i, ieval );
     }
     return fH1Trace;

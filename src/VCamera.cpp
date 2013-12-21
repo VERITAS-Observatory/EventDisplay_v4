@@ -334,7 +334,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                        if( fData->getAverageTZeros()[i] > 0. && fData->getAverageTZeros()[i] < i_min ) i_min = fData->getAverageTZeros()[i];
                        if( i_min == i_max ) i_min = i_max - 1.;
                    }
-                   setPMTColorScheme( fData->getAverageTZeros(), true, i_min, i_max, "time [samples]", true );
+                   setPMTColorScheme( fData->getAverageTZeros(), false, i_min, i_max, "time [samples]", false );
                 }
                 break;
             case C_TZERO:

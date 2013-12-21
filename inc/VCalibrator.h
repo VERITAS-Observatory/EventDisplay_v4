@@ -50,9 +50,6 @@ class VCalibrator : public VImageBaseAnalyzer
 // one histogram per telescope and channel
 	vector< vector< TH1F* > > htzero;
 
-// all calibration data is summarized in the following trees (one tree per telescope)
-        TTree* fToffTree;
-
         vector< string > fPedFileNameC;
         vector< string > fPadFileNameC;
         vector< string > fGainFileNameC;

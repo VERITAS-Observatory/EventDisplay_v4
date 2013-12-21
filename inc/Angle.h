@@ -239,17 +239,17 @@ namespace SEphem
 
             static void rotateCartesians(const Angle& a, double& x, double& y);
 
-            static const double sc_halfPi      = 1.57079632679489661923;
-            static const double sc_Pi          = 3.14159265358979323846;
-            static const double sc_3HalfPi     = 4.71238898038468985769;
-            static const double sc_twoPi       = 6.28318530717958647692;
-            static const double sc_5HalfPi     = 7.85398163397448309615;
-            static const double sc_degPerRad   = ANGLE_DEGPERRAD;
-            static const double sc_rotPerRad   = ANGLE_ROTPERRAD;
-            static const double sc_hrsPerRad   = ANGLE_HRSPERRAD;
-            static const double sc_radPerDeg   = ANGLE_RADPERDEG;
-            static const double sc_radPerRot   = ANGLE_RADPERROT;
-            static const double sc_radPerHrs   = ANGLE_RADPERHRS;
+            static const double sc_halfPi;   
+            static const double sc_Pi;       
+            static const double sc_3HalfPi;
+            static const double sc_twoPi;
+            static const double sc_5HalfPi;
+            static const double sc_degPerRad;
+            static const double sc_rotPerRad;
+            static const double sc_hrsPerRad;
+            static const double sc_radPerDeg;
+            static const double sc_radPerRot;
+            static const double sc_radPerHrs;
 
         private:
             double m_angle;

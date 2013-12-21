@@ -1,4 +1,4 @@
-//! VModel3DParameters storage class for Frogs data
+//! VModel3DParameters storage class for 3D data
 #ifndef VMODEL3DPARAMETERS_H
 #define VMODEL3DPARAMETERS_H
 

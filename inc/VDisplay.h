@@ -67,7 +67,7 @@ class VDisplay : public TGMainFrame
         M_FILE_PRINTC,M_FILE_PRINTF,M_FILE_PRINTA,M_FILE_PRINTCA,M_FILE_PRINTB,M_FILE_PRINTTG,
         M_FILE_MOVIE,M_FILE_EXIT,M_FILE_DUMP,
         M_HISTOS_FILL,M_HISTOS_DRAW,
-        M_OPT_COL_SCHE,M_OPT_BW_SCHE,M_OPT_SING,M_OPT_FIX,M_OPT_DEAD,
+        M_OPT_COL_SCHE,M_OPT_BW_SCHE,M_OPT_SING,M_OPT_FIX,M_OPT_DEAD, M_OPT_IMAGE,
         B_AUTOSTART,B_NGOTO,B_NAUTO,B_TELN,B_NINC, B_VIEW,
         B_NTRI,B_NATRI,B_NAIMA,B_NEXT,B_NCALIB,
         B_SET,B_RESET,B_TEXTCUT,
@@ -98,9 +98,6 @@ class VDisplay : public TGMainFrame
         bool fBoolDrawAllinOne;                   //!< draw all results into one camera
 
         TGCompositeFrame *fFrameTable;            //!< main frame, containing all widgets
-        TGTableLayout *tlo;
-        TGTableLayoutHints* tloh;
-        TGLayoutHints *loh;
         TGLayoutHints *fL1;
         TGLayoutHints *fL2;
         TGLayoutHints *fL3;
@@ -109,15 +106,13 @@ class VDisplay : public TGMainFrame
         TGLayoutHints *fL6;
         TGLayoutHints *fL7;
         TGLayoutHints *fL8;
-        TGLayoutHints *fL9;
         TGStatusBar *fStatusBar;
         TGMenuBar *fMenuBar;
         TGPopupMenu *fMenuFile;
         TGPopupMenu *fMenuPrint;
-        TGPopupMenu *fMenuCalib;
         TGPopupMenu *fMenuOpt;
-bool   fBool_M_OPT_COL_SCHE_Checked;
-bool   fBool_M_OPT_BW_SCHE_Checked;
+	bool   fBool_M_OPT_COL_SCHE_Checked;
+	bool   fBool_M_OPT_BW_SCHE_Checked;
         TGCompositeFrame *fFrameControl;
         TGHorizontalFrame *fHorizontalEvent;
         TGTextButton *fButtonNext;
@@ -128,7 +123,6 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         TGTextButton *fButtonAutorun;
         TGComboBox *fComboTelescopeN;
         TGComboBox *fComboCameraView;
-        TGTab *fTabCamera;
         map< unsigned int, TPad* > fPadsCamera;
         TCanvas* fCanvasCamera;
         unsigned int fCanvasesNx;
@@ -158,12 +152,10 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         TCanvas *fCanvasBird;
 
         TGCompositeFrame *fFrameCal;
-        TGCompositeFrame *fCompCal;
         TRootEmbeddedCanvas *fEmCal;
         TCanvas *fCanvasCal;
 
         TGCompositeFrame *fFrameTgrad;
-        TGCompositeFrame *fCompTgrad;
         TRootEmbeddedCanvas *fEmTgrad;
         TCanvas *fCanvasPixelHisto;
 
@@ -184,7 +176,6 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         TGHorizontalFrame *fGroupSetFrame;
 // frame with display radio buttons
         TGButtonGroup* fGroupOptDis;
-        TGCheckButton *fChButtonColor;
         TGRadioButton *fRadioB1;
         TGRadioButton *fRadioB2;
         TGRadioButton *fRadioB3;
@@ -194,7 +185,6 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         TGRadioButton *fRadioTA;
         vector< TGRadioButton* > fRadioTel;
 
-        TGHorizontalFrame *fGroupAnaPar;
 // frame with cut optiones
         TGGroupFrame *fGroupOptCut;
         TGLabel *fLabelOptATri;
@@ -224,10 +214,7 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         TCanvas *fCanvasInfo;
         TPaveText *fPaveInfo;
 
-        TGTab *fTabInfo;
-
         E_cameraIdent fCameraDisplay;             //!< which camera display is active
-        bool fPrintChannels;                      //!< print channel numbers on camera display
         bool fBoolDrawImageTraces;                //!< draw individual image traces, not sum signal into FADC canvas
         unsigned int fSelectedChan;               //!< selected FADC channel
         E_fadcIDENT fAnaDisplay;                  //! select FADC/analysis  tab
@@ -238,7 +225,6 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         TGraph *fGraphFADC_2;                       //!< graph to indicate summation window (second summation window)
         TLine *fLineFADC;                         //!< line to indicate Tzero
         bool fBoolFADC;                           //!< draw FADC
-        bool fTraceFit;
 
         int fBWNum;                               //! Number of colours in BW palette
         int fBWPalette[50];                       //! BW (greyscale) palette
@@ -247,7 +233,6 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         string fMovieFileName;                    //!< name of gifs for camera movie + number
         unsigned int fMoviePictNumber;            //!< movie picture number
 
-        bool fNextEventStatus;                    //!< searching for next event?
         unsigned int fNumEventIncrement;          //!< increment for nextEvent()
         bool fAutoRunStatus;                      //!< true = autorunmodus is on
         unsigned int fTimingSleep;                //!< pause between each event in autorunmodus (microseconds)
@@ -266,6 +251,7 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         bool     drawImageBorderTZero();          //!< draw image border graphs
         void     drawPixelHistos();               //!< draw pixel histos
         void     dumpDeadChannels();              //!< dump dead channels to screen
+	void     dumpImageBorderPixels();         //!< pring image/border pixels
         TH1D*    fillFADC( int, TH1D* );          //!< fill FADC histogram
         void     makeMoviePicture();              //!< make a new camera movie picture
         void     plotFADCFit( int );              //!< plot FADC trace with fit function
@@ -304,6 +290,6 @@ bool   fBool_M_OPT_BW_SCHE_Checked;
         void     selectChannel( Int_t, Int_t, Int_t, TObject* );
         void     updateCamera( Int_t );           //!< update camera view with new event
 
-        ClassDef(VDisplay,1)
+//        ClassDef(VDisplay,1)
 };
 #endif                                            // VRDISPLAY_H

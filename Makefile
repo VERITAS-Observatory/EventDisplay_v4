@@ -141,7 +141,7 @@ SOFLAGS       = -shared
 endif
 # Apple OS X flags
 ifeq ($(ARCH),Darwin)
-CXXFLAGS    += -Wdeprecated-declarations
+CXXFLAGS    += -Wdeprecated-declarations -stdlib=libc++
 LDFLAGS       = -bind_at_load
 DllSuf        = dylib
 UNDEFOPT      = dynamic_lookup
@@ -342,8 +342,8 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/Angle.o \
 		./obj/PointingMonitor.o \
 		./obj/VSkyCoordinatesUtilities.o \
-		./obj/VDisplay.o ./obj/VDisplay_Dict.o \
-		./obj/VHoughTransform.o
+		./obj/VHoughTransform.o \
+		./obj/VDisplay.o  
 
 FROGSOBJECTS =	./obj/VFrogs.o \
                 ./obj/frogs.o \
@@ -358,6 +358,10 @@ MODELOBJECTS =  ./obj/VMinimizer.o \
 		./obj/VEmissionHeightCalculator.o
 
 EVNOBJECTS += $(MODELOBJECTS) 
+
+ifneq ($(ARCH),Darwin)
+EVNOBJECTS += ./obj/VDisplay_Dict.o
+endif
 
 # add frogs objects
 ifneq ($(GSLFLAG),-DNOGSL)

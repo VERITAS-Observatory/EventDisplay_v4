@@ -681,15 +681,15 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
         }
 
 // need number of saturated PMTs for laser calibration
-        int num_sat=0;
+        int n_lowgain=0;
         for( unsigned int i = 0; i < fReader->getNumChannelsHit(); i++ )
         {
             fReader->selectHitChan(i);
-            if( getHiLo()[i] != 0 && !getDead()[i] ) num_sat+=1;
+            if( getHiLo()[i] != 0 && !getDead()[i] ) n_lowgain+=1;
         }
 // don't do anything if there are not enough channels in low or high gain
-        if( !iLowGain && num_sat >  10 ) return;
-        if( iLowGain && num_sat < (int)(0.7*(double)getNChannels()) );
+        if( !iLowGain && n_lowgain >  10 ) return;
+        if( iLowGain && n_lowgain < (int)(0.7*(double)getNChannels()) ) return;
 
         int counttzero=0;
         int countsums=0;
@@ -2703,6 +2703,16 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
    if( getPedvarsLowGainDist() ) getPedvarsLowGainDist()->Reset();
    if( getPedLowGainDist() )     getPedLowGainDist()->Reset();
 
+// histogram for average tzero calculation (per telescope type)
+   vector<ULong64_t> iTelType = getDetectorGeometry()->getTelType_list();
+   vector< TH1D* > iH_averageTZero;
+   char hname[200];
+   for( unsigned int i = 0; i < iTelType.size(); i++ )
+   {
+       sprintf( hname, "iH_averageTZero_%d", i );
+       iH_averageTZero.push_back( new TH1D( hname, "", 3*(int)getNSamples(), 0., (float)getNSamples() ) );
+   }
+       
    if( getNTel() != (unsigned int)t->GetEntries() )
    {
       cout << "VCalibrator::readCalibrationDatafromDSTFiles error: mismatch in number of telescopes: " ;
@@ -2851,27 +2861,38 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
        {
 	  double i_mean = 0.;
 	  double i_nn = 0.;
-// calculate median
-          TH1D h( "hM", "", 3*(int)getNSamples(), 0., (float)getNSamples() );
-
+// get teltype counter
+          unsigned int iTelTypeC = 0;
+          for( unsigned int t = 0; t < iTelType.size(); t++ )
+	  {
+	      if( iTelType[t] == getDetectorGeometry()->getTelType()[i] )
+	      {
+	         iTelTypeC = t;
+		 break;
+              }
+          }
           for( unsigned int p = 0; p < nPixel; p++ )
 	  {
 	     getAverageTZeros( false )[p] = ftzero[p];
+// check if this pixel is inside the averateTZeroFiducialRadius
+             if( getRunParameter()->faverageTZeroFiducialRadius < 1. )
+	     {
+	        double d = getDetectorGeometry()->getOuterEdgeDistance( p );
+		if( d > 0.5 * getDetectorGeometry()->getFieldofView()[i] * getRunParameter()->faverageTZeroFiducialRadius )
+		{
+		   continue;
+                }
+             }
 	     if( getAverageTZeros( false )[p] > -98. )
 	     {
 	        i_mean += ftzero[p];
 		i_nn++;
 		setAverageTZero( p, ftzero[p], false );
-                h.Fill( ftzero[p] );
+		if( iTelTypeC < iH_averageTZero.size() && iH_averageTZero[iTelTypeC] ) 
+		{
+		   iH_averageTZero[iTelTypeC]->Fill( ftzero[p] );
+		}   
              }
-          }
-	  if( i_nn > 0. )
-          {
-             double i_a[] = { 0.5 };
-             double i_b[] = { 0.0 };
-             h.GetQuantiles( 1, i_b, i_a );
-//             setMeanAverageTZero( i_mean / i_nn, false );
-             setMeanAverageTZero( i_b[0], false );
           }
        }
        else
@@ -2885,6 +2906,38 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 
    delete [] fPedvar_high;
    delete [] fPedvar_low;
+
+// get average tzero per telescope type
+// use median, as outliers are expected
+   for(  int i = 0; i < t->GetEntries(); i++ )
+   {
+       t->GetEntry( i );
+
+       setTelID( i );
+
+// no calibration data available for this telescope
+       if( nPixel == 0 ) continue;
+// get teltype counter
+        unsigned int iTelTypeC = 0;
+        for( unsigned int t = 0; t < iTelType.size(); t++ )
+	{
+	    if( iTelType[t] == getDetectorGeometry()->getTelType()[i] )
+	    {
+	       iTelTypeC = t;
+	       break;
+	    }
+	}
+	if( iTelTypeC < iH_averageTZero.size() && iH_averageTZero[iTelTypeC] )
+        {
+	  if( iH_averageTZero[iTelTypeC]->GetEntries() > 0. )
+          {
+             double i_a[] = { 0.5 };
+             double i_b[] = { 0.0 };
+             iH_averageTZero[iTelTypeC]->GetQuantiles( 1, i_b, i_a );
+             setMeanAverageTZero( i_b[0], false );
+          }
+       }
+   }
 
    iF.Close();
    return true;

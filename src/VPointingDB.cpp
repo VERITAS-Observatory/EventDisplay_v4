@@ -783,7 +783,7 @@ void VPointingDB::getDBSourceCoordinates( string iSource, float &iEVNTargetDec, 
 
     sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", iSource.c_str() );
 
-    if( !fmy_connection->make_query(c_query) );
+    if( !fmy_connection->make_query(c_query) ) return;
     TSQLResult *db_res = fmy_connection->Get_QueryResult();
 
 

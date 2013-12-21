@@ -119,6 +119,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	bool fNoCalibNoPb;                        // if true, when no information for gain and toff can be found, the analysis is done filling thenm with 1 and 0 respectively (in VCalibrator) 
 	string fLowGainCalibrationFile;           // file with file name for low-gain calibration 
 	int fNCalibrationEvents;                  // events to be used for calibration 
+	float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
         vector< int > fGainFileNumber;
         vector< int > fTOffFileNumber;
         vector< int > fPedFileNumber;
@@ -302,6 +303,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,137); //(increase this number)
+        ClassDef(VEvndispRunParameter,138); //(increase this number)
 };
 #endif
