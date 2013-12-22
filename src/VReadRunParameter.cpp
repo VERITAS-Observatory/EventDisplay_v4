@@ -858,7 +858,7 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
     test_and_adjustParams();
 
 // read trigsim input card 
-    readTrigSimInputCard( fRunPara->fTrigSimInputcard );
+    if( fRunPara->fTrigSimInputcard.Length() > 0 ) readTrigSimInputCard( fRunPara->fTrigSimInputcard );
 
     return true;
 }
@@ -1597,8 +1597,8 @@ bool VReadRunParameter::checkSecondArgument( string iPara1, string iPara2, bool 
 
 bool VReadRunParameter::readTrigSimInputCard( TString card )
 {
-    std::cout<<"[VReadRunParameter::ReadInputCard()]: Reading NN cleaning (trigSim) input card "<<card<<std::endl;
-    if(!ifstream(card)){std::cout<<"[VReadRunParameter::ReadInputCard()]: file "<<card<<" not found...return"<<std::endl;return false;}
+    std::cout<<"[VReadRunParameter::readTrigSimInputCard()]: Reading NN cleaning (trigSim) input card "<<card<<std::endl;
+    if(!ifstream(card)){std::cout<<"[VReadRunParameter::readTrigSimInputCard()]: file "<<card<<" not found...return"<<std::endl;return false;}
     std::cout<<"*****************************************************************************************"<<std::endl;
     std::cout<<"  READ VALUES:"<<std::endl;
     std::cout<<"*****************************************************************************************"<<std::endl;

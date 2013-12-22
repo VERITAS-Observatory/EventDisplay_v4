@@ -2904,13 +2904,12 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
        }
    }
 
-   delete [] fPedvar_high;
-   delete [] fPedvar_low;
-
+////////////////////////////////////////////////////////////////////////////
 // get average tzero per telescope type
 // use median, as outliers are expected
    for(  int i = 0; i < t->GetEntries(); i++ )
    {
+       cout << t << endl;
        t->GetEntry( i );
 
        setTelID( i );
@@ -2938,6 +2937,10 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
           }
        }
    }
+
+// cleanup
+   delete [] fPedvar_high;
+   delete [] fPedvar_low;
 
    iF.Close();
    return true;

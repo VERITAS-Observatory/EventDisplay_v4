@@ -572,8 +572,8 @@ void VEventLoop::shutdown()
 // write run parameter to disk
         if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW
  && fRunPar->frunmode != R_PEDLOW && fRunPar->frunmode != R_TZERO && fRunPar->frunmode != R_TZEROLOW )
-{
-   fRunPar->Write();
+        {
+            fRunPar->Write();
         }
 // analysis or trace library mode
         if( fRunPar->frunmode == R_ANA )

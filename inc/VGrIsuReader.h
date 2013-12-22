@@ -300,7 +300,7 @@ class VGrIsuReader : public VVirtualDataReader
         void                        setDefaultPed( double iD );
 
         void                        assignGrisuPeds( unsigned int i = 0 );
-        void                        setMultiGrIsuReader( double iB = true ) { fMultiGrIsuReader = iB; }
+        void                        setMultiGrIsuReader( bool iB = true ) { fMultiGrIsuReader = iB; }
 
         bool                        wasLossyCompressed() { return false; }
 

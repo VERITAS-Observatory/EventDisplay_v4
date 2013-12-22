@@ -52,7 +52,7 @@ Detector definition:
 
 Calibration:
 ------------
-	 -readcalibdb                            read relative gains and time offsets from offline DB
+	 -readcalibdb                            read relative gains and time offsets from offline DB (switch off with -nocalibnoproblem)
 	 -calibrationfile FILENAME 		 file with names of pedestal/gain/toffset/pixel status files (assume path $EVNDATA/calibration/)
 	 -lowgaincalibrationfile FILENAME 	 file with names for pedestals and high/low gain multiplier files 
 	                                         (assume path $EVNDATA/calibration/)

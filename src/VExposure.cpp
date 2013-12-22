@@ -470,6 +470,12 @@ bool VExposure::readFromDBList()
         fWobbleNorth = 0.;
         fWobbleEast = -1.*dist;
     }
+    else if( TMath::Abs( dist ) < 1.e-2 )
+    {
+        fWobbleNorth = 0.;
+        fWobbleEast  = 0.;
+    }
+
     if( fRunDownloadList[i] == 50308 )
     {
        fWobbleNorth = 0.;
@@ -1698,15 +1704,15 @@ void VExposure::printListOfRuns()
     if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
     {
 
-	if( fObservingMode == "Special" ) cout << "\tRUN " << fRun[j] << "(" << fRunObsMode[j] << ") ";
-        else                              cout << "\tRUN " << fRun[j];
-        cout << "\t" << fRunSourceID[j];
+	if( fObservingMode == "Special" ) cout << "RUN " << fRun[j] << "(" << fRunObsMode[j] << ") ";
+        else                              cout << "RUN " << fRun[j];
+        cout << "\t" <<  fRunSourceID[j];
         cout << "\tMJD " << fRunStartMJD[j];
         cout << "\tDate: " << fRunDate[j];
         cout << "\tWobble:(N,E) (" << fWobbleN[j] << "," << fWobbleE[j] << ")";
         cout << "\tCONFIGMASK " << fRunConfigMask[j];
-        cout << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
-        cout << "\tDuration[s] " << fRunDuration[j];
+        cout << setprecision( 3 ) << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
+        cout << "\tDuration[min] " << fRunDuration[j]/60.;
         cout << "\t(El,Az) " << fRunTelElevation[j] << " " << fRunTelAzimuth[j];
 	if( bPrintVerbose )
         {
@@ -1732,7 +1738,7 @@ void VExposure::printListOfRuns()
           cout << " " << fRunLaserList[j][2];
           cout << " " << fRunLaserList[j][3];
         }
-        cout << endl;
+        cout << fixed << endl;
 
 	k++;
         Total_Time += fRunDuration[j];

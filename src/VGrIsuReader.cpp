@@ -364,7 +364,7 @@ void VGrIsuReader::readPedsfromLibrary( unsigned int iTelID )
 //       transform here to MC numbering (with fPixelConvertVecM[][])
         if( tubeNumber < fPeds[i].size() ) fPeds[i][fPixelConvertVecM[i][tubeNumber]] = iped;
         if( tubeNumber < fPedvars[i].size() ) fPedvars[i][fPixelConvertVecM[i][tubeNumber]] = ipedvar;
-        if( fSumWindow[i] != isumwindow )
+        if( TMath::Abs( fSumWindow[i] - isumwindow ) > 1.e-4 )
         {
             cout << "VGrIsuReader::readPeds() error, incompatible sum window sizes: " << isumwindow << "\t" << fSumWindow[i] << "\t" << i << endl;
             exit( -1 );
@@ -493,7 +493,7 @@ void VGrIsuReader::readPedsfromPlines()
                             {
                                 mean += i_val[j];
                             }
-                            if( mean != 0. )
+                            if( TMath::Abs( mean ) > 1.e-4 )
                             {
                                 i_valMean.push_back( mean );
                                 if( (int)w == fSumWindow[i_telID] ) fhPeds[i_telID][i_channel]->Fill( mean );

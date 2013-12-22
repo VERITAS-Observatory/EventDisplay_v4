@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20131222 (GM) fixed reading of wobble offsets for
+                zero offset pointints
+
 * 20131220 (GM) fixed warnings and errors from clang++
 
 * 20131220 (GM) allow to print list of image and border 

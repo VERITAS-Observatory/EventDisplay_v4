@@ -252,11 +252,34 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fdstminntubes = -1;
     fdstwriteallpixel = true;
 
+// NN parameters
+    fNSBscale = 0.; 
+    for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
+    {
+       fFADCPedestal[i] = -1.;
+       fFADCPedestalSig[i] = -1.;
+       fFlashCamFADCPedestal[i] = -1.;
+       fFlashCamFADCPedestalSig[i] = -1.;
+    }
+    for( unsigned int i = 0; i < VDST_MAXTELTYPES; i++ )
+    {
+       fFADCsampleRate[i] = -1.;
+       fFlashCamFADCtoPhe[i] = -1.;
+       fFlashCamFADCsampleRate[i] = -1.;
+       fFADCtoPhe[i] = -1.;
+       fPerformFlashCamAnalysis[i] = false;
+       fFWHMdata[i] = -1.;
+       fFWHMtrigger[i] = -1.;
+       fIntegWindow[i] = -1.;
+       ifActiveType[i] = false;
+    }
+
+
 // parallaxwidth  // MS
-    fPWmethod = -1;                               // MS default is to use cleaned CFD trigger map
-    fPWcleanNeighbors = 2;                        // MS: default number of neighbors required for identifying center pixels in the trigger map
-    fPWcleanThreshold = 26.0;                     // MS: default is about 5.3 dc/pe for VERITAS (5 sample integration window), i.e. cleaning of ~5 pe
-    fPWlimit = 0;                                 // MS: default is no restriction on the number of trigger pixels transmitted to moment-generating function
+    fPWmethod = -1;            // MS default is to use cleaned CFD trigger map
+    fPWcleanNeighbors = 2;     // MS: default number of neighbors required for identifying center pixels in the trigger map
+    fPWcleanThreshold = 26.0;  // MS: default is about 5.3 dc/pe for VERITAS (5 sample integration window), i.e. cleaning of ~5 pe
+    fPWlimit = 0;              // MS: default is no restriction on the number of trigger pixels transmitted to moment-generating function
 
 }
 

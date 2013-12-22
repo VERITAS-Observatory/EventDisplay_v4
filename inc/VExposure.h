@@ -12,6 +12,7 @@
 #include "VDB_Connection.h"
 
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <set>
 #include <string>
