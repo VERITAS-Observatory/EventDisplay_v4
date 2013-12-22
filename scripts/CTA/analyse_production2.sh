@@ -30,13 +30,12 @@ mkdir -p $PDIR
 # for evndisp and MSCW analysis
 
 SITE=( "prod2-LeoncitoPP-NS" )
-SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
 SITE=( "prod2-Aar-500m-NS" )
+SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
 
 #####################################
 # particle types
 PARTICLE=( "gamma_onSource" "gamma_cone" "electron" "proton" )
-PARTICLE=( "gamma_onSource" )
 
 #####################################
 # shower directions
@@ -70,8 +69,7 @@ NIMAGESMIN="2"
 # observing time [h]
 OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
-OBSTIME=( "5h" "50h" )
-OBSTIME=( "30m" )
+OBSTIME=( "5h" "50h" "30m" )
 
 #####################################
 # sub array lists
@@ -205,7 +203,7 @@ do
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W2.$DATE $OOTIME DESY.$DATE.Erec$EREC.W2.ID$ID$AZ$NTYPF.$S 0 $ID $S
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W2.$DATE $OOTIME DESY.$DATE.Erec$EREC.W2.ID$ID$AZ$NTYPF.$S 1 $ID $S
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then

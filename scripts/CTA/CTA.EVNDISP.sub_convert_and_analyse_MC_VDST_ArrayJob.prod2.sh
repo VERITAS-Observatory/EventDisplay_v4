@@ -11,7 +11,7 @@
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ]
 then
    echo
-   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [TRIGGER MASK DIRECTORY] [qsub options]"
+   echo "./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob <sub array list> <list of simtelarray files> <particle> <data set> [keep simtel.root files (default off=0)] [log file directory counter] [qsub options] [TRIGGER MASK DIRECTORY]"
    echo
    echo "CTA PROD2 ANALYSIS"
    echo
@@ -59,15 +59,17 @@ then
   FLL="$6"
 fi
 TRGMASKDIR="FALSE"
-if [ -n $7 ]
-then
-  TRGMASKDIR="$7"
-fi
-QSUBOPT=""
 if [ -n $8 ]
 then
-   QSUBOPT="$8"
+  TRGMASKDIR="$8"
 fi
+QSUBOPT=""
+if [ -n $7 ]
+then
+   QSUBOPT="$7"
+fi
+QSUBOPT=${QSUBOPT//_X_/ } 
+QSUBOPT=${QSUBOPT//_M_/-} 
 
 # checking the path for binary
 if [ -z $EVNDISPSYS ]

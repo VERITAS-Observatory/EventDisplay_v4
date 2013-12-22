@@ -23,8 +23,9 @@ RUN="$2"
 
 #####################################
 # qsub options
-QSUBOPT="-P cta_high -js 2000"
-QSUBOPT="-P cta_high"
+#   _M_ = -; _X_ = " "
+QSUBOPT="_M_P_X_cta_high"
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_2000"
 
 #####################################
 # output directory for script parameter files
@@ -36,14 +37,15 @@ mkdir -p $PDIR
 if [[ $P2 == "S" ]]
 then
    SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
-   SITE=( "prod2-Aar-500m-NS" )
+   SITE=( "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
    ARRAY="subArray.2a.list"
 elif [[ $P2 == "N" ]]
 then
+   SITE=( "prod2-US-NS" )
    SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
    ARRAY="subArray.2NN.list"
-   ARRAY="subArray.2NN-fullList.list"
    ARRAY="subArray.2NN-sub.list"
+   ARRAY="subArray.2NN-fullList.list"
 else
    echo "error: unknown site; allowed are N or S"
    exit
@@ -52,7 +54,6 @@ fi
 #####################################
 # particle types
 PARTICLE=( "gamma_onSource" "gamma_cone" "electron" "proton" )
-PARTICLE=( "gamma_onSource" )
 
 #####################################
 # shower directions
@@ -78,14 +79,16 @@ NIMAGESMIN="2"
 # observing time [h]
 OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
-OBSTIME=( "5h" "50h" )
-OBSTIME=( "30m" )
+OBSTIME=( "50h" )
+OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 
 
 #####################################
 # analysis dates and table dates
 DATE="d20130830"
 TDATE="d20130812"
+DATE="d20131205"
+TDATE="d20131205"
 
 #####################################
 # loop over all sites
@@ -129,7 +132,7 @@ do
 	  N=${PARTICLE[$i]}
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/$S.$N"_20deg".list
 
-          ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $TRG $QSUBOPT
+          ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $QSUBOPT $TRG
        done
        continue
     fi
@@ -189,18 +192,18 @@ do
 	  if [[ $RUN == "TRAIN" ]]
 	  then
 	    echo "$AZ " 
-	     ./CTA.TMVA.sub_train.sh $ARRAY onSource $S $PARA $AZ $QSUBOPT
-	     ./CTA.TMVA.sub_train.sh $ARRAY cone $S $PARA $AZ $QSUBOPT
+	     ./CTA.TMVA.sub_train.sh $ARRAY onSource $S $PARA $QSUBOPT $AZ
+	     ./CTA.TMVA.sub_train.sh $ARRAY cone $S $PARA $QSUBOPT $AZ
 ##########################################
 # IRFs: angular resolution
 	  elif [[ $RUN == "ANGRES" ]]
 	  then
-            ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVAFixedSignal $PARA AngularResolution $S 2 $AZ $QSUBOPT
+            ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVAFixedSignal $PARA AngularResolution $S 2 $QSUBOPT $AZ
 ##########################################
 # IRFs: effective areas after quality cuts
 	  elif [[ $RUN == "QC" ]]
 	  then
-	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.QC $PARA QualityCuts001CU $S 0 $AZ $QSUBOPT
+	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.QC $PARA QualityCuts001CU $S 0 $QSUBOPT $AZ
 ##########################################
 # IRFs: particle number files
 	  elif [[ $RUN == "PARTFIL" ]]
@@ -210,12 +213,12 @@ do
 # IRFs: effective areas after gamma/hadron cuts
 	  elif [[ $RUN == "CUTS" ]]
 	  then
-	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.W2.$DATE $S 0 $AZ $QSUBOPT
+	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.W3.$DATE $S 0 $QSUBOPT $AZ
 ##########################################
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W2.$DATE $OOTIME DESY.$DATE.Erec$EREC.W2.ID$ID$AZ$NTYPF.$S 0 $ID $S $QSUBOPT
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W3.$DATE $OOTIME DESY.$DATE.Erec$EREC.W3.ID$ID$AZ$NTYPF.$S 0 $ID $S $QSUBOPT
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then

@@ -9,7 +9,7 @@
 if [ $# -lt 4 ]
 then
    echo
-   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone> <data set> <analysis parameter file> [direction (e.g. _180deg)] [qsub options]"
+   echo "CTA.TMVA.sub_train.sh <subarray list> <onSource/cone> <data set> <analysis parameter file> [qsub options] [direction (e.g. _180deg)]"
    echo ""
    echo "  <subarray list>   text file with list of subarray IDs"
    echo
@@ -61,15 +61,18 @@ DSET=$3
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
 
 #####################################
-if [ -n "$5" ]
+if [ -n "$6" ]
 then
-  MCAZ=$5
+  MCAZ=$6
 fi
 
-if [ -n $6 ]
+if [ -n $5 ]
 then
-   QSUBOPT="$6"
+   QSUBOPT="$5"
 fi
+QSUBOPT=${QSUBOPT//_X_/ } 
+QSUBOPT=${QSUBOPT//_M_/-} 
+QSUBOPT=${QSUBOPT//\"/} 
 
 #####################################
 # energy bins

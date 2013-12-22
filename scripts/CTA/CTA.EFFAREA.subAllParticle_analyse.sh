@@ -9,7 +9,7 @@
 if [ $# -lt 6 ] 
 then
    echo ""
-   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <analysis parameter file> <output subdirectory> <data set> [filling mode] [direction (e.g. _180deg)] [qsub options]"
+   echo "./CTA.EFFAREA.subAllParticle_analyse.sh <subarray list> <cutfile template> <analysis parameter file> <output subdirectory> <data set> [filling mode] [qsub options] [direction (e.g. _180deg)]"
    echo
    echo "<subarray list>"
    echo "     text file with list of subarray IDs"
@@ -50,14 +50,14 @@ then
   GMOD=$6
 fi
 MCAZ=""
-if [ -n "$7" ]
+if [ -n "$8" ]
 then
-  MCAZ=$7
+  MCAZ=$8
 fi
 QSUBOPT=""
-if [ -n $8 ]
+if [ -n $7 ]
 then
-   QSUBOPT="$8"
+   QSUBOPT="$7"
 fi
 #######################################
 # read values from parameter file
@@ -129,7 +129,7 @@ do
 
 ###########################################
 # submit the job script
-      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ANAPAR $ODIR $DSET $GMOD $MCAZ $QSUBOPT
+      ./CTA.EFFAREA.sub_analyse.sh $ARRAY $RECID $PART $CCUT $ANAPAR $ODIR $DSET $GMOD \"$QSUBOPT\" $MCAZ
    done
 done
 

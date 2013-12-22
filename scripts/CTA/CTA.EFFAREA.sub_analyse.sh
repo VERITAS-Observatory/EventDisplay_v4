@@ -11,7 +11,7 @@
 if [ $# -lt 7 ]
 then
    echo
-   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode] [direction (e.g. _180deg)] [qsub options]"
+   echo "CTA.EFFAREA.sub_analyse.sh <subarray> <recid> <particle> <cutfile template> <scripts input parameter file> <outputsubdirectory> <data set> [filling mode] [qsub options] [direction (e.g. _180deg)]"
    echo "================================================================================"
    echo
    echo "calculate effective areas and instrument response functions for CTA"
@@ -109,15 +109,18 @@ if [ -n "$8" ]
 then
   GFILLING=$8
 fi
-if [ -n "$9" ]
-then
-  MCAZ=$9
-fi
-QSUBOPT=""
 if [ -n "${10}" ]
 then
-   QSUBOPT="${10}"
+  MCAZ=${10}
 fi
+QSUBOPT=""
+if [ -n "$9" ]
+then
+   QSUBOPT="$9"
+fi
+QSUBOPT=${QSUBOPT//_X_/ } 
+QSUBOPT=${QSUBOPT//_M_/-} 
+QSUBOPT=${QSUBOPT//\"/} 
 
 ####################################
 # check particle type

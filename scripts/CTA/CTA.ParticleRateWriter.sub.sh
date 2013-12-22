@@ -38,7 +38,8 @@ if [ -n $6 ]
 then
    QSUBOPT="$6"
 fi
-
+QSUBOPT=${QSUBOPT//_X_/ } 
+QSUBOPT=${QSUBOPT//_M_/-} 
 ############################################################################
 
 # checking the path for binary
