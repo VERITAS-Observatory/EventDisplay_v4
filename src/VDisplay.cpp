@@ -742,6 +742,8 @@ void VDisplay::drawFADC( bool iFit )
     fCanvasFADC->cd();
 
     fEventLoop->getAnalyzer()->setTelID( fTelescope );
+// reset max pixel number in 'show channel' number entry (might change from telescope to telescope)
+    fNEntryFADCsearch->SetLimits( TGNumberFormat::kNELLimitMinMax, 0, fEventLoop->getAnalyzer()->getImage().size() - 1 );
 // plot trace of one channel (click on channel)
     if( fSelectedChan >= 200000 && !fEventLoop->getZeroSuppressed()[fSelectedChan-200000] )
     {
@@ -1267,8 +1269,15 @@ iSW );
 //    sprintf( cTemp, "toffset %.2f (low gain channel: %.2f, FADC stop: %.2f)", fEventLoop->getAnalyzer()->getTOffsets()[iChannel], fEventLoop->getAnalyzer()->getTOffsets(true)[iChannel], fEventLoop->getAnalyzer()->getFADCStopOffsets()[iChannel]);
  //   fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // L2 FADC stop
-    sprintf( cTemp, "L2 channels FADC stop: %.2f %.2f %.2f %.2f", fEventLoop->getAnalyzer()->getFADCstopTZero()[0], fEventLoop->getAnalyzer()->getFADCstopTZero()[1], fEventLoop->getAnalyzer()->getFADCstopTZero()[2], fEventLoop->getAnalyzer()->getFADCstopTZero()[3] );
-    fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    if( !fEventLoop->isDST_MC() )
+    {
+       sprintf( cTemp, "L2 channels FADC stop: %.2f %.2f %.2f %.2f",
+                       fEventLoop->getAnalyzer()->getFADCstopTZero()[0], 
+		       fEventLoop->getAnalyzer()->getFADCstopTZero()[1], 
+		       fEventLoop->getAnalyzer()->getFADCstopTZero()[2], 
+		       fEventLoop->getAnalyzer()->getFADCstopTZero()[3] );
+       fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    }
 // low gain multiplier
     if( iChannel < fEventLoop->getAnalyzer()->getLowGainMultiplier().size() 
      && iChannel < fEventLoop->getAnalyzer()->getLowGainMultiplierError().size() )
@@ -1277,18 +1286,18 @@ iSW );
        fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     }
 // pulse sum
-    sprintf( cTemp, "pulse sum %.2f (LW: %.2f) pulse max %.2f (raw max: %.2f) pulse width: %.2f", fEventLoop->getData()->getSums()[iChannel], 
+    sprintf( cTemp, "pulse sum %.1f (2ndWi: %.1f) pulse max %.1f (raw max: %.1f) pulse width: %.1f", fEventLoop->getData()->getSums()[iChannel], 
   fEventLoop->getData()->getSums2()[iChannel],
                                                                                                   fEventLoop->getData()->getTraceMax()[iChannel], 
   fEventLoop->getData()->getTraceRawMax()[iChannel], 
   fEventLoop->getData()->getTraceWidth()[iChannel] );
-    fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+  fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // pulse tzeros
-    sprintf( cTemp, "tzero %.1f (raw tzero: %.1f, toffset correction: %.1f, FADC crate trigger: %.1f)",
-                                 fEventLoop->getTZeros()[iChannel], 
- fEventLoop->getRawTZeros()[iChannel], 
- fEventLoop->getAnalyzer()->getTOffsets()[iChannel], 
- fEventLoop->getAnalyzer()->getFADCStopOffsets()[iChannel] );
+   sprintf( cTemp, "tzero %.1f (raw tzero: %.1f, toffset correction: %.1f, FADC crate trigger: %.1f)",
+                                  fEventLoop->getTZeros()[iChannel], 
+				  fEventLoop->getRawTZeros()[iChannel], 
+				  fEventLoop->getAnalyzer()->getTOffsets()[iChannel], 
+				  fEventLoop->getAnalyzer()->getFADCStopOffsets()[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
 // pulse timing
     sprintf( cTemp, "pulse timing (raw): " );
@@ -1315,7 +1324,8 @@ iChannel < fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
             }
         }
     }
-    sprintf( cTemp, "sum/pedvar %.2f", i_var );
+    sprintf( cTemp, "pulse sum/pedestal variation (integration window %d): %.2f", 
+                     fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel], i_var );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     if( fEventLoop->getData()->getImage()[iChannel] ) fTextFADC.back()->SetTextColor( 2 );
     else if( fEventLoop->getData()->getBorder()[iChannel] ) fTextFADC.back()->SetTextColor( 8 );
@@ -1490,7 +1500,7 @@ void VDisplay::drawCalibrationHistos()
             ihis = fEventLoop->getCalData( fTelescope )->getGainDist();
             ihis2  = fEventLoop->getCalData( fTelescope )->getGainDist( true );
         }
-if( ihis ) ihis->SetAxisRange( 0., 4. );
+	if( ihis ) ihis->SetAxisRange( 0., 4. );
     }
     else if(  E_cameraIdent( fCameraDisplay ) == C_TOFF || E_cameraIdent( fCameraDisplay ) == C_TOFFLOW )
     {
@@ -1721,9 +1731,9 @@ bool VDisplay::drawImageBorderCharge()
 // draw telescope number
     char tname[200];
     sprintf( tname, "T%d", fTelescope+1 );
-    TText *iT = new TText( 0.7*hImage->GetXaxis()->GetXmax(), 0.8*hImage->GetYaxis()->GetXmax(), tname );
+    TText *iT = new TText( 0.5*hImage->GetXaxis()->GetXmax(), 0.8*hImage->GetYaxis()->GetXmax(), tname );
     iT->SetNDC();
-    iT->SetX( 0.8 );
+    iT->SetX( 0.7 );
     iT->SetY( 0.7 );
     iT->SetTextSize( 3.*iT->GetTextSize() );
     iT->Draw();

@@ -220,6 +220,11 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter )
 	 iTemp += "s.root";
 	 fSiteFileName[i] = iTemp;
      }
+     else if( fSiteFileName[i].find( "IFAE" ) != string::npos )
+     {
+         iTemp = "data/IFAE_Dec2013/" + fSiteFileName[i] + ".root";
+	 fSiteFileName[i] = iTemp;
+     }
      else if( fSiteFileName[i].find( "Fermi" ) != string::npos )
      {
          fSiteFileName[i] = "data/Fermi/Fermi_approx.root";
