@@ -483,7 +483,14 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
             corrfirst = getFADCTraceIntegrationPosition( iFirstSum + offset );
             corrlast  = getFADCTraceIntegrationPosition( iLastSum + offset );
 // calculate timing parameters (raw and corrected; tzero correction happens later)
-            setPulseTiming( i_channelHitID, fTraceHandler->getPulseTiming( corrfirst, corrlast, 0, getNSamples() ), true );
+            if( getSumWindowStart_at_T0() )
+            {
+               setPulseTiming( i_channelHitID, fTraceHandler->getPulseTiming( 0, getNSamples(), 0, getNSamples() ), true );
+            }
+            else
+            {
+               setPulseTiming( i_channelHitID, fTraceHandler->getPulseTiming( corrfirst, corrlast, 0, getNSamples() ), true );
+            }
 // shift the summation window if necessary
             if( getSumWindowShift() != 0 && !getRunParameter()->fFixWindowStart )
             {
