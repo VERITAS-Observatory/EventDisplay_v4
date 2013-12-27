@@ -63,7 +63,10 @@ bool fFillPELeaf = false;
 ///////////////////////////////////////////////////////
 
 /*!
-      hard wired timing configuration:
+      hard wired timing configuration for pulse characterization
+      (time of 100%, 20%, 50%.. of max pulse height)
+
+      Changes must also be made to getTimingLevelIndex()
 
       1     	1
       0.2	2
@@ -73,7 +76,6 @@ bool fFillPELeaf = false;
       0.2	4
       -40	5
 */
-
 vector< float > getPulseTimingLevels()
 {
    vector< float > t;
@@ -224,7 +226,7 @@ static void syntax (char *program)
    printf("   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );      
    printf("   -pe              (fill leaf with photoelectrons into DST tree (default: off)\n" );
 
-   exit(1);
+   exit( 1 );
 }
 
 using namespace std;
@@ -953,6 +955,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    float fXTubeDeg[fMaxPixel];
    float fYTubeDeg[fMaxPixel];
    float fRTubeDeg[fMaxPixel];
+   float fATubem2[fMaxPixel];
    int nDisabled= 0;
    int fTubeDisabled[fMaxPixel];
    float fMirrorArea = 0.;
@@ -968,6 +971,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
       fYTubeDeg[i] = 0.;
       fRTubeDeg[i] = 0.;
       fTubeDisabled[i] = 0;
+      fATubem2[i] = 0.;
    }
 
    TTree *fTreeDet = new TTree( "telconfig", "detector configuration" );
@@ -997,6 +1001,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
    fTreeDet->Branch( "XTubeDeg", fXTubeDeg, "XTubeDeg[NPixel]/F" );
    fTreeDet->Branch( "YTubeDeg", fYTubeDeg, "YTubeDeg[NPixel]/F" );
    fTreeDet->Branch( "RTubeDeg", fRTubeDeg, "RTubeDeg[NPixel]/F" );
+   fTreeDet->Branch( "AreaTube_m2", fATubem2, "AreaTube_m2[NPixel]/F" );
    fTreeDet->Branch( "NTubesOFF", &nDisabled, "NTubesOFF/I" );
    fTreeDet->Branch( "TubeOFF", fTubeDisabled, "TubeOFF[NPixel]/I" );
    fTreeDet->Branch( "NMirrors", &fNMirrors, "NMirrors/I" );
@@ -1053,6 +1058,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	       fYTubeMM[p] = hsdata->camera_set[itel].ypix[p]*1.e3;
 // use as size the radius of the active area of the tube
 	       fRTubeMM[p] = sqrt( hsdata->camera_set[itel].area[p]/TMath::Pi() ) * 1.e3;
+               fATubem2[p] = hsdata->camera_set[itel].area[p];
 	       if( p == 0 ) pix_size = atan2((double)hsdata->camera_set[itel].size[p], (double)fFocalLength ) * TMath::RadToDeg();
 
 // mm -> deg
@@ -1093,7 +1099,7 @@ TTree* DST_fill_detectorTree( AllHessData *hsdata, map< unsigned int, float > te
 	   fFOV = telescope_list[fTelID];
         }
 
-
+// telescope types
 	fTelescope_type  = TMath::Nint(pix_size*100.);
 	fTelescope_type += TMath::Nint(fFOV*10.)*100;
 	fTelescope_type += TMath::Nint(fMirrorArea)*100*10*100;

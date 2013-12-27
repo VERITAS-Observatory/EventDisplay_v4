@@ -2909,7 +2909,6 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 // use median, as outliers are expected
    for(  int i = 0; i < t->GetEntries(); i++ )
    {
-       cout << t << endl;
        t->GetEntry( i );
 
        setTelID( i );
