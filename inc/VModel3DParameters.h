@@ -1,4 +1,4 @@
-//! VModel3DParameters storage class for 3D data
+//! VModel3DParameters storage class for Frogs data
 #ifndef VMODEL3DPARAMETERS_H
 #define VMODEL3DPARAMETERS_H
 
@@ -38,6 +38,9 @@ class VModel3DParameters
 	float fNc3D;     // total number of Cherenkov photons emitted by the shower 
 	float fXoffModel3D;  // model sky direction
 	float fYoffModel3D;  // model sky direction
+	float fXoffDeRot3D; // model shower direction (derotated)
+	float fYoffDeRot3D; // model shower direction (derotated)
+
 	float fGoodness3D;   // model goodness of fit
 	float fDepth3D;      // model: slant depth of shower maximum
 	float fRWidth3D;     // model: reduced 3D-width 

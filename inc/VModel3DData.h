@@ -124,6 +124,8 @@ class VModel3DData
 ////// derived shower direction from model ////
   double fXoffModel3D; // model shower direction
   double fYoffModel3D; // model shower direction
+  double fXoffDeRot3D; // model shower direction (derotated)
+  double fYoffDeRot3D; // model shower direction (derotated)
 
 ////// goodness-of-fit ////
   bool fConverged3D;              // fit converged

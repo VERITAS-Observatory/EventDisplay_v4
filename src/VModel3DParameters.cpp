@@ -29,6 +29,9 @@ void VModel3DParameters::initTree( string iName, string iTitle )
   fTreeModel3D->Branch( "Nc3D", &fNc3D, "Nc3D/F" );
   fTreeModel3D->Branch( "Xoff3D", &fXoffModel3D, "Xoff3D/F" );
   fTreeModel3D->Branch( "Yoff3D", &fYoffModel3D, "Yoff3D/F" );
+  fTreeModel3D->Branch( "XoffDeRot3D", &fXoffDeRot3D, "XoffDeRot3D/F" );
+  fTreeModel3D->Branch( "YoffDeRot3D", &fYoffDeRot3D, "YoffDeRot3D/F" );
+
   fTreeModel3D->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/F" );
   fTreeModel3D->Branch( "Depth3D", &fDepth3D, "Depth3D/F" );
   fTreeModel3D->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/F" );
@@ -68,6 +71,8 @@ void VModel3DParameters::reset()
   fNc3D = 0.;     
   fXoffModel3D = 0.;  
   fYoffModel3D = 0.;  
+  fXoffDeRot3D = 0.;  
+  fYoffDeRot3D = 0.;  
   fGoodness3D = 0.;   
   fDepth3D = 0.;      
   fRWidth3D = 0.;     

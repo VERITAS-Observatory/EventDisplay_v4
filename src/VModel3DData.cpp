@@ -198,6 +198,8 @@ void VModel3DData::initModel3D( unsigned int iNTel3D, vector<unsigned int> &iNpi
   // shower direction
   fXoffModel3D = -9999;
   fYoffModel3D = -9999;
+  fXoffDeRot3D = -9999;
+  fYoffDeRot3D = -9999;
 
   // goodness of fit
   fNDF3D = 0;
@@ -292,6 +294,8 @@ void VModel3DData::initEventModel3D()
  // shower direction
   fXoffModel3D = -9999;
   fYoffModel3D = -9999;
+  fXoffDeRot3D = -9999;
+  fYoffDeRot3D = -9999;
 
   // goodness of fit
   fNDF3D = 0;

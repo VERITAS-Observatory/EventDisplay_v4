@@ -616,6 +616,8 @@ void VModel3D::writeParameters3D()
   if( fData3D->fConverged3D ) calcModelDirection();
   fData->getModel3DParameters()->fXoffModel3D = fData3D->fXoffModel3D;
   fData->getModel3DParameters()->fYoffModel3D = fData3D->fYoffModel3D;
+  fData->getModel3DParameters()->fXoffDeRot3D = fData3D->fXoffDeRot3D;
+  fData->getModel3DParameters()->fYoffDeRot3D = fData3D->fYoffDeRot3D;
   /// write to file ///
   fData->getModel3DParameters()->getTree()->Fill();
 }
@@ -649,6 +651,26 @@ void VModel3D::calcModelDirection()
 
   fData3D->fXoffModel3D = ts[0];
   fData3D->fYoffModel3D = ts[1];
-  fData->getModel3DParameters()->fXoffModel3D = fData3D->fXoffModel3D;
-  fData->getModel3DParameters()->fYoffModel3D = fData3D->fYoffModel3D;
+  //fData->getModel3DParameters()->fXoffModel3D = fData3D->fXoffModel3D;
+  //fData->getModel3DParameters()->fYoffModel3D = fData3D->fYoffModel3D;
+
+  /// derotate ///
+  if( getShowerParameters()->isMC() ) {
+    fData3D->fXoffDeRot3D = fData3D->fXoffModel3D;
+    fData3D->fYoffDeRot3D = fData3D->fYoffModel3D;
+  }
+  else {
+    double iUTC = 0.;
+    double xrot = 0.;
+    double yrot = 0.;
+    if( getArrayPointing() ) {
+      iUTC = VSkyCoordinatesUtilities::getUTC( getShowerParameters()->MJD, getShowerParameters()->time );
+      getArrayPointing()->derotateCoords( iUTC, fData3D->fXoffModel3D, -1.*fData3D->fYoffModel3D, xrot, yrot );
+    }
+    fData3D->fXoffDeRot3D = xrot;
+    fData3D->fYoffDeRot3D = -1.*yrot;
+    //fData->getModel3DParameters()->fXoffDeRot3D = fData3D->fXoffDeRot3D;
+    //fData->getModel3DParameters()->fYoffDeRot3D = fData3D->fYoffDeRot3D;
+  }
+
 }
