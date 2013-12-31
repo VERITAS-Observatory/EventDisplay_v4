@@ -122,19 +122,6 @@ class Cshowerpars
         Float_t        MCxcore_SC;
         Float_t        MCycore_SC;
         Float_t        MCzcore_SC;
-	// Model3D (JG)
-        bool            bModel3D;
-	Float_t         Smax3D;  
-	Float_t         sigmaL3D;
-	Float_t         sigmaT3D;
-	Float_t         Nc3D;    
-	Float_t         XoffModel3D;
-	Float_t         YoffModel3D;
-	Float_t         Goodness3D; 
-	Float_t         Depth3D;  
-	Float_t         RWidth3D;    
-	Float_t         ErrRWidth3D; 
-	bool            Converged3D; 
 
 // List of branches
         TBranch        *b_runNumber;              //!
@@ -198,22 +185,8 @@ class Cshowerpars
         TBranch        *b_MCxcore_SC;             //!
         TBranch        *b_MCycore_SC;             //!
         TBranch        *b_MCzcore_SC;             //!
-	// Model3D (JG)
-	TBranch        *b_Smax3D;  
-	TBranch        *b_sigmaL3D;
-	TBranch        *b_sigmaT3D;
-	TBranch        *b_Nc3D;    
-	TBranch        *b_XoffModel3D;
-	TBranch        *b_YoffModel3D;
-	TBranch        *b_Goodness3D; 
-	TBranch        *b_Depth3D; 
-	TBranch        *b_RWidth3D;
-	TBranch        *b_ErrRWidth3D;
-	TBranch        *b_Converged3D;  
 
-
-	// JG added Model3D
-        Cshowerpars(TTree *tree = 0, bool iMC = false, int iVersion = 2, bool iShort = false, bool iModel3D = false );
+	Cshowerpars(TTree *tree = 0, bool iMC = false, int iVersion = 2, bool iShort = false );
         virtual ~Cshowerpars();
         virtual Int_t    Cut(Long64_t entry);
         virtual Int_t    GetEntry(Long64_t entry);
@@ -229,8 +202,8 @@ class Cshowerpars
 #endif
 
 #ifdef Cshowerpars_cxx
-//JG: added Model3D
-Cshowerpars::Cshowerpars(TTree *tree, bool iMC, int iVersion, bool iShort, bool iModel3D )
+
+Cshowerpars::Cshowerpars(TTree *tree, bool iMC, int iVersion, bool iShort )
 {
     if( !tree ) return;
 
@@ -238,7 +211,6 @@ Cshowerpars::Cshowerpars(TTree *tree, bool iMC, int iVersion, bool iShort, bool 
     bDeRot = false;
     bShort = iShort;
     fVersion = iVersion;
-    bModel3D = iModel3D; //JG
 
     Init(tree);
 }
@@ -435,23 +407,6 @@ void Cshowerpars::Init(TTree *tree)
     }
     fChain->SetBranchAddress("Chi2",Chi2);
 
-    // Model3D parameters (JG)
-    if( bModel3D )
-    {
-       fChain->SetBranchAddress("Smax3D",&Smax3D);
-       fChain->SetBranchAddress("sigmaL3D",&sigmaL3D);
-       fChain->SetBranchAddress("sigmaT3D",&sigmaT3D);
-       fChain->SetBranchAddress("Nc3D",&Nc3D);
-       fChain->SetBranchAddress("XoffModel3D",&XoffModel3D);
-       fChain->SetBranchAddress("YoffModel3D",&YoffModel3D);
-       fChain->SetBranchAddress("Goodness3D",&Goodness3D);
-       fChain->SetBranchAddress("Depth3D",&Depth3D);
-       fChain->SetBranchAddress("RWidth3D",&RWidth3D);   
-       fChain->SetBranchAddress("ErrRWidth3D",&ErrRWidth3D); 
-       fChain->SetBranchAddress("Converged3D",&Converged3D); 
-
-    }
-
     if( bMC )
     {
 	if( fVersion > 7 ) fChain->SetBranchAddress("MCprim", &MCprim );
@@ -589,35 +544,6 @@ Bool_t Cshowerpars::Notify()
         b_Xcore_SC = 0;
         b_Ycore_SC = 0;
         b_stdp = 0;
-    }
-    // Model3D (JG)
-    if( bModel3D )
-    {
-	b_Smax3D = fChain->GetBranch("Smax3D");  
-	b_sigmaL3D = fChain->GetBranch("sigmaL3D");
-	b_sigmaT3D = fChain->GetBranch("sigmaT3D");
-	b_Nc3D = fChain->GetBranch("Nc3D");    
-	b_XoffModel3D = fChain->GetBranch("XoffModel3D");
-	b_YoffModel3D = fChain->GetBranch("YoffModel3D");
-	b_Goodness3D = fChain->GetBranch("Goodness3D"); 
-	b_Depth3D  = fChain->GetBranch("Depth3D");    
-	b_RWidth3D = fChain->GetBranch("RWidth3D"); 
-	b_ErrRWidth3D = fChain->GetBranch("ErrRWidth3D"); 
-	b_Converged3D = fChain->GetBranch("Converged3D"); 
-    }
-    else
-    {
-        b_Smax3D = 0;
-        b_sigmaL3D = 0;
-        b_sigmaT3D = 0;
-        b_Nc3D = 0;
-        b_XoffModel3D = 0;
-        b_YoffModel3D = 0;
-        b_Goodness3D = 0;
-	b_Depth3D  = 0;
-	b_RWidth3D = 0;
-	b_ErrRWidth3D = 0;
-	b_Converged3D = 0;
     }
 
     b_Chi2 = fChain->GetBranch("Chi2");

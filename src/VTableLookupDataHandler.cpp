@@ -22,6 +22,8 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
     fEventDisplayFileFormat = 2;
     fTshowerpars = 0;
     fshowerpars = 0;
+    fTmodel3Dpars = 0;
+    fmodel3Dpars = 0;
     fOTree = 0;
     fShortTree = fTLRunParameter->bShortTree;
     bWriteMCPars = fTLRunParameter->bWriteMCPars;
@@ -244,6 +246,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     {
        return -1;
     }
+    if( fIsModel3D ) fmodel3Dpars->GetEntry( fEventCounter );
 
 ////////////////////////////////////////////////////
 // read first all entries needed for run modes (filling and reading)
@@ -348,6 +351,25 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     fYoff = fshowerpars->Yoff[fMethod];
     fXoff_derot = fshowerpars->XoffDeRot[fMethod];
     fYoff_derot = fshowerpars->YoffDeRot[fMethod];
+
+// fill Model3D parameters (JG)
+    if( fIsModel3D ) 
+    {
+      fSmax3D = fmodel3Dpars->Smax3D;
+      fsigmaL3D = fmodel3Dpars->sigmaL3D;
+      fsigmaT3D = fmodel3Dpars->sigmaT3D;
+      fNc3D = fmodel3Dpars->Nc3D;
+      fXoff3D = fmodel3Dpars->Xoff3D;
+      fYoff3D = fmodel3Dpars->Yoff3D;
+      fXoffDeRot3D = fmodel3Dpars->XoffDeRot3D;
+      fYoffDeRot3D = fmodel3Dpars->YoffDeRot3D;
+      fGoodness3D = fmodel3Dpars->Goodness3D;
+      fDepth3D = fmodel3Dpars->Depth3D;
+      fRWidth3D = fmodel3Dpars->RWidth3D;
+      fErrRWidth3D = fmodel3Dpars->ErrRWidth3D;
+      fConverged3D = fmodel3Dpars->Converged3D;
+    }
+
     fImgSel = (ULong64_t)fshowerpars->ImgSel[fMethod];
     unsigned int ii = 0;
     for( unsigned int i = 0; i < getNTelTypes(); i++ ) NImages_Ttype[i] = 0;
@@ -480,22 +502,6 @@ else fEventStatus = true;
 
     if(SizeSecondMax_temp > 0) fSizeSecondMax = SizeSecondMax_temp;
 
-// fill Model3D parameters (JG)
-    if( fIsModel3D )
-    {
-      fSmax3D = fshowerpars->Smax3D;
-      fsigmaL3D = fshowerpars->sigmaL3D;
-      fsigmaT3D = fshowerpars->sigmaT3D;
-      fNc3D = fshowerpars->Nc3D;
-      fXoffModel3D = fshowerpars->XoffModel3D;
-      fYoffModel3D = fshowerpars->YoffModel3D;
-      fGoodness3D = fshowerpars->Goodness3D;
-      fDepth3D = fshowerpars->Depth3D;
-      fRWidth3D = fshowerpars->RWidth3D;
-      fErrRWidth3D = fshowerpars->ErrRWidth3D;
-      fConverged3D = fshowerpars->Converged3D;
-    }
-
     fEventCounter++;
     return 1;
 }
@@ -531,6 +537,10 @@ bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain *c )
         cout << "\t " << chEl->GetTitle() << endl;
         return true;
      }
+     // check if input data includes Model3D parameters
+     fKeyModel3D = ifInput->FindKey("model3Dpars");
+     if( fKeyModel3D != 0 ) fIsModel3D = true;
+
      ifInput->Close();
    }
 
@@ -698,9 +708,13 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     unsigned int bShort = false;
 // get shower parameter tree
     fTshowerpars = new TChain( "showerpars" );
+// get model3Dpars tree
+    if( fIsModel3D ) fTmodel3Dpars = new TChain( "model3Dpars" );
+
     for( unsigned int i = 0; i < finputfile.size(); i++ )
     {
        fTshowerpars->Add( finputfile[i].c_str() );
+       if( fIsModel3D ) fTmodel3Dpars->Add( finputfile[i].c_str() );
     }
     if( !fTshowerpars )
     {
@@ -726,15 +740,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
         fIsMC = false;
         cout << "input data is not Monte Carlo type" << endl;
     }
-// check if input data includes Model3D parameters (JG)
-    if( fTshowerpars->GetBranchStatus( "Goodness3D" ) )
-    {
-        fIsModel3D = true;
-    }
-    else
-    {
-        fIsModel3D = false;
-    }
+
 // update runparameters
     fTLRunParameter->update( fTshowerpars );
 // don't set maximum number of entries anymore (not needed, and it takes a long time)
@@ -749,7 +755,8 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     if( fEventDisplayFileFormat >= 2 )
     {
         if( bShort ) cout << "input data is of eventdisplay short tree output format (" << bShort << ")" << endl;
-        fshowerpars = new Cshowerpars( fTshowerpars, fIsMC, fEventDisplayFileFormat, bShort, fIsModel3D );
+        fshowerpars = new Cshowerpars( fTshowerpars, fIsMC, fEventDisplayFileFormat, bShort );
+	fmodel3Dpars = new Cmodel3Dpars( fTmodel3Dpars );
         fIsMC = fshowerpars->isMC();
     }
     else
@@ -1039,13 +1046,15 @@ fOTree->Branch( "MCprimary", &fMCPrimary, "MCprimary/I" );
     }
     // Model3D parameters (JG)
     if( fIsModel3D )
-    {
+      {
       fOTree->Branch( "Smax3D", &fSmax3D, "Smax3D/D" );
       fOTree->Branch( "sigmaL3D", &fsigmaL3D, "sigmaL3D/D" );
       fOTree->Branch( "sigmaT3D", &fsigmaT3D, "sigmaT3D/D" );
       fOTree->Branch( "Nc3D", &fNc3D, "Nc3D/D" );
-      fOTree->Branch( "XoffModel3D", &fXoffModel3D, "XoffModel3D/D" );
-      fOTree->Branch( "YoffModel3D", &fYoffModel3D, "YoffModel3D/D" );
+      fOTree->Branch( "Xoff3D", &fXoff3D, "Xoff3D/D" );
+      fOTree->Branch( "Yoff3D", &fYoff3D, "Yoff3D/D" );
+      fOTree->Branch( "XoffDeRot3D", &fXoffDeRot3D, "fXoffDeRot3D/D" );
+      fOTree->Branch( "YoffDeRot3D", &fYoffDeRot3D, "fYoffDeRot3D/D" );
       fOTree->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/D" );
       fOTree->Branch( "Depth3D", &fDepth3D, "Depth3D/D" );
       fOTree->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/D" );
@@ -1715,8 +1724,10 @@ void VTableLookupDataHandler::resetAll()
     fsigmaL3D = 0; 
     fsigmaT3D = 0;
     fNc3D = 0;    
-    fXoffModel3D = -9999;
-    fYoffModel3D = -9999;
+    fXoff3D = 0;
+    fYoff3D = 0;
+    fXoffDeRot3D = 0;
+    fYoffDeRot3D = 0;
     fGoodness3D = 0;
     fDepth3D = 0;
     fRWidth3D = 0;

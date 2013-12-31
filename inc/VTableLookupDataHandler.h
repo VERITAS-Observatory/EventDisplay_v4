@@ -21,8 +21,10 @@
 #include "TMath.h"
 #include "TObjArray.h"
 #include "TRandom3.h"
+#include "TKey.h" 
 
 #include "Cshowerpars.h"
+#include "Cmodel3Dpars.h"
 #include "Ctelconfig.h"
 #include "Ctpars.h"
 
@@ -81,6 +83,9 @@ class VTableLookupDataHandler
         int fEventDisplayFileFormat;
         TChain* fTshowerpars;
         Cshowerpars* fshowerpars;
+        TChain* fTmodel3Dpars;
+        Cmodel3Dpars* fmodel3Dpars;
+	TKey* fKeyModel3D;
         TChain* fTtelconfig;
         Ctelconfig* ftelconfig;
         vector< TChain* > fTtpars;
@@ -290,8 +295,10 @@ class VTableLookupDataHandler
 	double fsigmaL3D; // longitudinal (3D-length)
 	double fsigmaT3D; // transverse (3D-width)
 	double fNc3D;     // total number of Cherenkov photons emitted by the shower 
-	double fXoffModel3D;  // model sky direction
-	double fYoffModel3D;  // model sky direction
+	double fXoff3D;  // model sky direction
+	double fYoff3D;  // model sky direction
+	double fXoffDeRot3D;  // model sky direction (derotated)
+	double fYoffDeRot3D;  // model sky direction (derotated)
 	double fGoodness3D;   // model goodness of fit
 	double fDepth3D;      // model: slant depth of shower maximum
 	double fRWidth3D;     // model: reduced 3D-width 

@@ -399,7 +399,7 @@ endif
 ########################################################
 # lookup table code (mscw_energy)
 ########################################################
-MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Ctpars.o \
+MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Cmodel3Dpars.o ./obj/Ctpars.o \
                 ./obj/Ctelconfig.o ./obj/VTableLookupDataHandler.o ./obj/VTableCalculator.o \
 		./obj/VTableEnergyCalculator.o ./obj/VTableLookup.o ./obj/VTablesToRead.o \
 		./obj/VEmissionHeightCalculator.o \
@@ -668,7 +668,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VUtilities.o \
 		./obj/VPlotRadialAcceptance.o ./obj/VPlotRadialAcceptance_Dict.o \
 		./obj/VEvndispReconstructionParameter.o ./obj/VEvndispReconstructionParameter_Dict.o \
-		./obj/Cshowerpars.o \
+		./obj/Cshowerpars.o ./obj/Cmodel3Dpars.o \
 		./obj/Ctpars.o \
 		./obj/VPlotEvndispReconstructionParameter.o ./obj/VPlotEvndispReconstructionParameter_Dict.o \
 		./obj/VImageParameter.o  \
