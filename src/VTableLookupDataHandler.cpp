@@ -359,6 +359,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
       fsigmaL3D = fmodel3Dpars->sigmaL3D;
       fsigmaT3D = fmodel3Dpars->sigmaT3D;
       fNc3D = fmodel3Dpars->Nc3D;
+      fXcore3D = fmodel3Dpars->Xcore3D;
+      fYcore3D = fmodel3Dpars->Ycore3D;
       fXoff3D = fmodel3Dpars->Xoff3D;
       fYoff3D = fmodel3Dpars->Yoff3D;
       fXoffDeRot3D = fmodel3Dpars->XoffDeRot3D;
@@ -1047,19 +1049,21 @@ fOTree->Branch( "MCprimary", &fMCPrimary, "MCprimary/I" );
     // Model3D parameters (JG)
     if( fIsModel3D )
       {
-      fOTree->Branch( "Smax3D", &fSmax3D, "Smax3D/D" );
-      fOTree->Branch( "sigmaL3D", &fsigmaL3D, "sigmaL3D/D" );
-      fOTree->Branch( "sigmaT3D", &fsigmaT3D, "sigmaT3D/D" );
-      fOTree->Branch( "Nc3D", &fNc3D, "Nc3D/D" );
-      fOTree->Branch( "Xoff3D", &fXoff3D, "Xoff3D/D" );
-      fOTree->Branch( "Yoff3D", &fYoff3D, "Yoff3D/D" );
-      fOTree->Branch( "XoffDeRot3D", &fXoffDeRot3D, "fXoffDeRot3D/D" );
-      fOTree->Branch( "YoffDeRot3D", &fYoffDeRot3D, "fYoffDeRot3D/D" );
-      fOTree->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/D" );
-      fOTree->Branch( "Depth3D", &fDepth3D, "Depth3D/D" );
-      fOTree->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/D" );
-      fOTree->Branch( "ErrRWidth3D", &fErrRWidth3D, "ErrRWidth3D/D" );
-      fOTree->Branch( "Converged3D", &fConverged3D, "Converged3D/b" );
+	fOTree->Branch( "Smax3D", &fSmax3D, "Smax3D/D" );
+	fOTree->Branch( "sigmaL3D", &fsigmaL3D, "sigmaL3D/D" );
+	fOTree->Branch( "sigmaT3D", &fsigmaT3D, "sigmaT3D/D" );
+	fOTree->Branch( "Nc3D", &fNc3D, "Nc3D/D" );
+	fOTree->Branch( "Xcore3D", &fXcore3D, "Xcore3D/D" );
+	fOTree->Branch( "Ycore3D", &fYcore3D, "Ycore3D/D" );
+	fOTree->Branch( "Xoff3D", &fXoff3D, "Xoff3D/D" );
+	fOTree->Branch( "Yoff3D", &fYoff3D, "Yoff3D/D" );
+	fOTree->Branch( "XoffDeRot3D", &fXoffDeRot3D, "fXoffDeRot3D/D" );
+	fOTree->Branch( "YoffDeRot3D", &fYoffDeRot3D, "fYoffDeRot3D/D" );
+	fOTree->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/D" );
+	fOTree->Branch( "Depth3D", &fDepth3D, "Depth3D/D" );
+	fOTree->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/D" );
+	fOTree->Branch( "ErrRWidth3D", &fErrRWidth3D, "ErrRWidth3D/D" );
+	fOTree->Branch( "Converged3D", &fConverged3D, "Converged3D/b" );
     }
 
     sprintf( iTT, "R[%d]/D", fNTel );
@@ -1724,6 +1728,8 @@ void VTableLookupDataHandler::resetAll()
     fsigmaL3D = 0; 
     fsigmaT3D = 0;
     fNc3D = 0;    
+    fXcore3D = 0;
+    fYcore3D = 0;
     fXoff3D = 0;
     fYoff3D = 0;
     fXoffDeRot3D = 0;

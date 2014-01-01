@@ -155,6 +155,8 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 // or do we only keep the ones that pass ON/OFF region cuts?
 	fWriteAllGammaToTree = false ; // WRITEALLGAMMATOTREE
 
+	fModel3D = false; // MODEL3DANALYSIS
+
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
@@ -534,6 +536,15 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             {
                 f2DAcceptanceMode = (unsigned int)atoi( temp2.c_str() ) ;
 				cout << "NKH Setting f2DAcceptanceMode = " << f2DAcceptanceMode << endl;
+            }
+
+	    /// use Model3D analysis ///
+            else if( temp == "MODEL3DANALYSIS" )
+            {
+	      unsigned int tmpModel3D = (unsigned int)atoi( temp2.c_str() ) ;
+	      if ( tmpModel3D == 1 ) {
+		fModel3D = true;
+	      }
             }
 			
 // Frogs Analysis

@@ -295,6 +295,8 @@ class VTableLookupDataHandler
 	double fsigmaL3D; // longitudinal (3D-length)
 	double fsigmaT3D; // transverse (3D-width)
 	double fNc3D;     // total number of Cherenkov photons emitted by the shower 
+	double fXcore3D;  // core location
+	double fYcore3D;  // core location
 	double fXoff3D;  // model sky direction
 	double fYoff3D;  // model sky direction
 	double fXoffDeRot3D;  // model sky direction (derotated)

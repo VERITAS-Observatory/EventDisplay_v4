@@ -179,7 +179,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		
 	bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 	int f2DAcceptanceMode ; // USE2DACCEPTANCE
-		
+	bool fModel3D;
 	int fFrogs;
 
 // default pedestal variations

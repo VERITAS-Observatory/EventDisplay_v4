@@ -29,6 +29,8 @@ class Cmodel3Dpars
 	Float_t         sigmaL3D;
 	Float_t         sigmaT3D;
 	Float_t         Nc3D;    
+	Float_t         Xcore3D;
+	Float_t         Ycore3D;
 	Float_t         Xoff3D;
 	Float_t         Yoff3D;
 	Float_t         XoffDeRot3D;
@@ -46,6 +48,8 @@ class Cmodel3Dpars
 	TBranch        *b_sigmaL3D;
 	TBranch        *b_sigmaT3D;
 	TBranch        *b_Nc3D;    
+	TBranch        *b_Xcore3D;
+	TBranch        *b_Ycore3D;
 	TBranch        *b_Xoff3D;
 	TBranch        *b_Yoff3D;
 	TBranch        *b_XoffDeRot3D;
@@ -129,6 +133,8 @@ void Cmodel3Dpars::Init(TTree *tree)
     fChain->SetBranchAddress("sigmaL3D",&sigmaL3D);
     fChain->SetBranchAddress("sigmaT3D",&sigmaT3D);
     fChain->SetBranchAddress("Nc3D",&Nc3D);
+    fChain->SetBranchAddress("Xcore3D",&Xcore3D);
+    fChain->SetBranchAddress("Ycore3D",&Ycore3D);
     fChain->SetBranchAddress("Xoff3D",&Xoff3D);
     fChain->SetBranchAddress("Yoff3D",&Yoff3D);
     fChain->SetBranchAddress("XoffDeRot3D",&XoffDeRot3D);
@@ -150,6 +156,8 @@ Bool_t Cmodel3Dpars::Notify()
   b_sigmaL3D = fChain->GetBranch("sigmaL3D");
   b_sigmaT3D = fChain->GetBranch("sigmaT3D");
   b_Nc3D = fChain->GetBranch("Nc3D");    
+  b_Xcore3D = fChain->GetBranch("Xcore3D");
+  b_Ycore3D = fChain->GetBranch("Ycore3D");
   b_Xoff3D = fChain->GetBranch("Xoff3D");
   b_Yoff3D = fChain->GetBranch("Yoff3D");
   b_XoffDeRot3D = fChain->GetBranch("XoffDeRot3D");

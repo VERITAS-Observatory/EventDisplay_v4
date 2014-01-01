@@ -160,6 +160,24 @@ class VStereoAnalysis
 
 	double fTreeSelected_MVA;
 
+/// model3D parameters ///
+	double fTreeSelected_Smax3D;  
+	double fTreeSelected_sigmaL3D; 
+	double fTreeSelected_sigmaT3D; 
+	double fTreeSelected_Nc3D;     
+	double fTreeSelected_Xcore3D;  
+	double fTreeSelected_Ycore3D;  
+	double fTreeSelected_Xoff3D;  
+	double fTreeSelected_Yoff3D;  
+	double fTreeSelected_XoffDeRot3D;  
+	double fTreeSelected_YoffDeRot3D;  
+	double fTreeSelected_Goodness3D;   
+	double fTreeSelected_Depth3D;      
+	double fTreeSelected_RWidth3D;     
+	double fTreeSelected_ErrRWidth3D;  
+	bool fTreeSelected_Converged3D;   
+
+/// frogs ///
 	int   fTreeSelescted_frogsEventID;
 	int   fTreeSelescted_frogsGSLConStat;
 	int   fTreeSelescted_frogsNB_iter;
@@ -246,6 +264,8 @@ class VStereoAnalysis
         {
 	  if( fDataRun->fFrogs )
 	    return fDataRun->frogsXP;
+	  else if( fDataRun->fModel3D )
+	    return fDataRun->Xcore3D;
 	  else
 	    return fDataRun->Xcore;
 	}
@@ -254,6 +274,8 @@ class VStereoAnalysis
         {
 	  if( fDataRun->fFrogs )
 	    return fDataRun->frogsYP;
+	  else if( fDataRun->fModel3D )
+	    return fDataRun->Ycore3D;
 	  else
 	    return fDataRun->Ycore;
 	}
@@ -262,6 +284,8 @@ class VStereoAnalysis
         {
 	  if( fDataRun->fFrogs )
 	    return fDataRun->frogsXS;
+	  else if( fDataRun->fModel3D )
+	    return fDataRun->Xoff3D;
 	  else
 	    return fDataRun->Xoff;
 	}
@@ -271,6 +295,8 @@ class VStereoAnalysis
 	  if( fDataRun->fFrogs )
 // -1 sign difference for frogs ED
 	    return -1.0*fDataRun->frogsYS;
+	  else if( fDataRun->fModel3D )
+	    return fDataRun->Yoff3D;
 	  else
 	    return fDataRun->Yoff;
 	}

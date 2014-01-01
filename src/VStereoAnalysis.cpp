@@ -1606,6 +1606,26 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
    fTreeSelectedEvents->Branch( "EmissionHeight", &fTreeSelected_EmissionHeight, "EmissionHeight/F" );
    fTreeSelectedEvents->Branch( "EmissionHeightChi2", &fTreeSelected_EmissionHeightChi2, "EmissionHeightChi2/F" );
    fTreeSelectedEvents->Branch( "MVA", &fTreeSelected_MVA, "MVA/D" );
+
+   if( fRunPara->fModel3D )
+   {
+     fTreeSelectedEvents->Branch( "Smax3D", &fTreeSelected_Smax3D, "Smax3D/D" );
+     fTreeSelectedEvents->Branch( "sigmaL3D", &fTreeSelected_sigmaL3D, "sigmaL3D/D" );
+     fTreeSelectedEvents->Branch( "sigmaT3D", &fTreeSelected_sigmaT3D, "sigmaT3D/D" );
+     fTreeSelectedEvents->Branch( "Nc3D", &fTreeSelected_Nc3D, "Nc3D/D" );
+     fTreeSelectedEvents->Branch( "Xcore3D", &fTreeSelected_Xcore3D, "Xcore3D/D" );
+     fTreeSelectedEvents->Branch( "Ycore3D", &fTreeSelected_Ycore3D, "Ycore3D/D" );
+     fTreeSelectedEvents->Branch( "Xoff3D", &fTreeSelected_Xoff3D, "Xoff3D/D" );
+     fTreeSelectedEvents->Branch( "Yoff3D", &fTreeSelected_Yoff3D, "Yoff3D/D" );
+     fTreeSelectedEvents->Branch( "XoffDeRot3D", &fTreeSelected_XoffDeRot3D, "fXoffDeRot3D/D" );
+     fTreeSelectedEvents->Branch( "YoffDeRot3D", &fTreeSelected_YoffDeRot3D, "fYoffDeRot3D/D" );
+     fTreeSelectedEvents->Branch( "Goodness3D", &fTreeSelected_Goodness3D, "Goodness3D/D" );
+     fTreeSelectedEvents->Branch( "Depth3D", &fTreeSelected_Depth3D, "Depth3D/D" );
+     fTreeSelectedEvents->Branch( "RWidth3D", &fTreeSelected_RWidth3D, "RWidth3D/D" );
+     fTreeSelectedEvents->Branch( "ErrRWidth3D", &fTreeSelected_ErrRWidth3D, "ErrRWidth3D/D" );
+     fTreeSelectedEvents->Branch( "Converged3D", &fTreeSelected_Converged3D, "Converged3D/b" );
+   }
+
    if( fRunPara->fFrogs == 1 )
    {
      fTreeSelectedEvents->Branch("frogsEventID", &fTreeSelescted_frogsEventID, "frogsEventID/I" );
@@ -1669,6 +1689,23 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
 
       fTreeSelected_MVA = -99.;
 
+      /// model3D parameters ///
+      fTreeSelected_Smax3D = 0;  
+      fTreeSelected_sigmaL3D = 0; 
+      fTreeSelected_sigmaT3D = 0; 
+      fTreeSelected_Nc3D = 0;     
+      fTreeSelected_Xcore3D = 0;  
+      fTreeSelected_Ycore3D = 0;  
+      fTreeSelected_Xoff3D = 0;  
+      fTreeSelected_Yoff3D = 0;  
+      fTreeSelected_XoffDeRot3D = 0;  
+      fTreeSelected_YoffDeRot3D = 0;  
+      fTreeSelected_Goodness3D = 0;   
+      fTreeSelected_Depth3D = 0;      
+      fTreeSelected_RWidth3D = 0;     
+      fTreeSelected_ErrRWidth3D = 0;  
+      fTreeSelected_Converged3D = 0;   
+      /// frogs ///
       fTreeSelescted_frogsEventID = 0;
       fTreeSelescted_frogsGSLConStat = 0;
       fTreeSelescted_frogsNB_iter = 0;
@@ -1731,6 +1768,23 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
       if( fCuts ) fTreeSelected_MVA = fCuts->getTMVA_EvaluationResult();
       else        fTreeSelected_MVA = -99.;
 
+      /// model3D parameters ///
+      fTreeSelected_Smax3D = c->Smax3D;
+      fTreeSelected_sigmaL3D = c->sigmaL3D;
+      fTreeSelected_sigmaT3D = c->sigmaT3D; 
+      fTreeSelected_Nc3D = c->Nc3D;     
+      fTreeSelected_Xcore3D = c->Xcore3D;  
+      fTreeSelected_Ycore3D = c->Ycore3D;  
+      fTreeSelected_Xoff3D = c->Xoff3D;  
+      fTreeSelected_Yoff3D = c->Yoff3D;  
+      fTreeSelected_XoffDeRot3D = c->XoffDeRot3D;  
+      fTreeSelected_YoffDeRot3D = c->YoffDeRot3D;  
+      fTreeSelected_Goodness3D = c->Goodness3D;   
+      fTreeSelected_Depth3D = c->Depth3D;      
+      fTreeSelected_RWidth3D = c->RWidth3D;     
+      fTreeSelected_ErrRWidth3D = c->ErrRWidth3D;  
+      fTreeSelected_Converged3D = c->Converged3D;
+      /// frogs ///
       fTreeSelescted_frogsEventID = c->frogsEventID;
       fTreeSelescted_frogsGSLConStat = c->frogsGSLConStat;
       fTreeSelescted_frogsNB_iter = c->frogsNB_iter;

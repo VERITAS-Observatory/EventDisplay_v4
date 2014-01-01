@@ -30,6 +30,7 @@ class CData
 	bool            fBOOLteltype;
 	bool            fBOOLdE;
 	bool		fFrogs;
+	bool		fModel3D;
 
         bool            fShort;
         int             fVersion;
@@ -136,6 +137,23 @@ class CData
         UInt_t          NTelPairs;
                                                   //[NTelPairs]
         Float_t         EmissionHeightT[VDST_MAXTELESCOPES*VDST_MAXTELESCOPES];
+
+/// model3D parameters ///
+	Double_t         Smax3D;  
+	Double_t         sigmaL3D;
+	Double_t         sigmaT3D;
+	Double_t         Nc3D;    
+	Double_t         Xcore3D;
+	Double_t         Ycore3D;
+	Double_t         Xoff3D;
+	Double_t         Yoff3D;
+	Double_t         XoffDeRot3D;
+	Double_t         YoffDeRot3D;
+	Double_t         Goodness3D; 
+	Double_t         Depth3D;  
+	Double_t         RWidth3D;    
+	Double_t         ErrRWidth3D; 
+	bool            Converged3D; 
 
 //FROGS
         Int_t   frogsEventID;
@@ -262,6 +280,23 @@ class CData
         TBranch        *b_NTelPairs;              //!
         TBranch        *b_EmissionHeightT;        //!
 
+/// model3D parameters ///
+	TBranch        *b_Smax3D;  
+	TBranch        *b_sigmaL3D;
+	TBranch        *b_sigmaT3D;
+	TBranch        *b_Nc3D;    
+	TBranch        *b_Xcore3D;
+	TBranch        *b_Ycore3D;
+	TBranch        *b_Xoff3D;
+	TBranch        *b_Yoff3D;
+	TBranch        *b_XoffDeRot3D;
+	TBranch        *b_YoffDeRot3D;
+	TBranch        *b_Goodness3D; 
+	TBranch        *b_Depth3D; 
+	TBranch        *b_RWidth3D;
+	TBranch        *b_ErrRWidth3D;
+	TBranch        *b_Converged3D;  
+
 //FROGS
         TBranch *b_frogsEventID;
         TBranch *b_frogsGSLConStat;
@@ -320,6 +355,7 @@ CData::CData( TTree *tree, bool bMC, int iVersion, bool bShort )
     fBOOLteltype = false;
     fBOOLdE = false;
     fFrogs = false;
+    fModel3D = false;
 
     Init(tree);
 }
@@ -400,6 +436,8 @@ void CData::Init(TTree *tree)
     if( tree->GetBranchStatus( "dE" ) ) fBOOLdE = true;
 // test if frogs stuff exists
     if( tree->GetBranchStatus( "frogsEventID" ) ) fFrogs = true;
+// test if model3D goodness exists
+    if( tree->GetBranchStatus( "Goodness3D" ) ) fModel3D = true;
 
     fChain = tree;
     fCurrent = -1;
@@ -712,6 +750,26 @@ void CData::Init(TTree *tree)
         NTelPairs = 0;
         for( unsigned int i = 0; i < VDST_MAXTELESCOPES*VDST_MAXTELESCOPES; i++ ) EmissionHeightT[i] = 0.;
     }
+
+    if ( fModel3D )
+    {
+        fChain->SetBranchAddress("Smax3D",&Smax3D);
+	fChain->SetBranchAddress("sigmaL3D",&sigmaL3D);
+	fChain->SetBranchAddress("sigmaT3D",&sigmaT3D);
+	fChain->SetBranchAddress("Nc3D",&Nc3D);
+	fChain->SetBranchAddress("Xcore3D",&Xcore3D);
+	fChain->SetBranchAddress("Ycore3D",&Ycore3D);
+	fChain->SetBranchAddress("Xoff3D",&Xoff3D);
+	fChain->SetBranchAddress("Yoff3D",&Yoff3D);
+	fChain->SetBranchAddress("XoffDeRot3D",&XoffDeRot3D);
+	fChain->SetBranchAddress("YoffDeRot3D",&YoffDeRot3D);
+	fChain->SetBranchAddress("Goodness3D",&Goodness3D);
+	fChain->SetBranchAddress("Depth3D",&Depth3D);
+	fChain->SetBranchAddress("RWidth3D",&RWidth3D);   
+	fChain->SetBranchAddress("ErrRWidth3D",&ErrRWidth3D); 
+	fChain->SetBranchAddress("Converged3D",&Converged3D); 
+    }
+
     Notify();
 }
 
@@ -849,6 +907,24 @@ Bool_t CData::Notify()
         b_EmissionHeightT = 0;
     }
 
+    if ( fModel3D )
+    {
+        b_Smax3D = fChain->GetBranch("Smax3D");  
+	b_sigmaL3D = fChain->GetBranch("sigmaL3D");
+	b_sigmaT3D = fChain->GetBranch("sigmaT3D");
+	b_Nc3D = fChain->GetBranch("Nc3D");    
+	b_Xcore3D = fChain->GetBranch("Xcore3D");
+	b_Ycore3D = fChain->GetBranch("Ycore3D");
+	b_Xoff3D = fChain->GetBranch("Xoff3D");
+	b_Yoff3D = fChain->GetBranch("Yoff3D");
+	b_XoffDeRot3D = fChain->GetBranch("XoffDeRot3D");
+	b_YoffDeRot3D = fChain->GetBranch("YoffDeRot3D");
+	b_Goodness3D = fChain->GetBranch("Goodness3D"); 
+	b_Depth3D  = fChain->GetBranch("Depth3D");    
+	b_RWidth3D = fChain->GetBranch("RWidth3D"); 
+	b_ErrRWidth3D = fChain->GetBranch("ErrRWidth3D"); 
+	b_Converged3D = fChain->GetBranch("Converged3D"); 
+    }
 
     if ( fFrogs  )
     {
