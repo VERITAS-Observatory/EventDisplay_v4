@@ -76,7 +76,6 @@ class VImageCleaning
         void  FillIPR(unsigned int teltype);
         void  FillPreThresholds(TGraph* gipr, float NNthresh[5]); // defines pre-search thresholds for nn-groups (below this threshold group is not searched)
         TGraphErrors* GetIPRGraph(unsigned int teltype, float ScanWidow);
-        float CalcConvToPhe(unsigned int intwin);   // approximate conversion to phe. need for variable window extraction
         void  CalcSliceRMS();
 // MS
         void cleanTriggerFixed( double hithresh, double lothresh );

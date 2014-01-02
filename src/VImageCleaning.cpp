@@ -946,22 +946,7 @@ void VImageCleaning::FillPreThresholds(TGraph* gipr, float NNthresh[5])
         //std::cout<<"thresh:"<<NNthresh[i]<<" phe( approx. valid for Prod2 LST):"<<NNthresh[i]/33.<<std::endl;
     }
 }
-float VImageCleaning::CalcConvToPhe(unsigned int intwin) // not used yet
-{
-    int type=getTrigSimTelType(fData->getTelType(fData->getTelID()));
-    //prelim: later DAQ FWHMs should be read form MC data
-    float fFWHM=0;
-    float CntsPerPhe=25.;
-    // CTA_PROD2 settings [ns]
-    if(type==1) {fFWHM=3.16;} //LST
-    if(type==2) {fFWHM=5.5;}  //MST
-    if(type==3) {fFWHM=6.5;}  //SC-SST
-    if(type==4) {fFWHM=5.5;}  //SST
-    float fFADCSampleRate=1./float(fData->getDetectorGeo()->getLengthOfSampleTimeSlice(fData->getTelID())); //GHz
-    float FWHMperIntWin=1./fFADCSampleRate/fFWHM*float(intwin);
-    //IntWins[ttype][j]=FWHMperIntWin;
-    return 1./CntsPerPhe/FWHMperIntWin;
-}
+
 void VImageCleaning::CalcSliceRMS()  //TEMP
 {
     int type=getTrigSimTelType(fData->getTelType(fData->getTelID()));
