@@ -20,24 +20,14 @@
 #include <iostream>
 #include <vector>
 
-#define NORM 0
+#define NORM 1
 
 using namespace std;
-
-void poop( string file )
-{
-
-  TFile *f = new TFile(file.c_str());
-  f->Close();
-
-  return;
-
-}
 
 double getNorm( string ifile )
 {
 
-/*
+
 //    TTree *t = 0;
 
     TFile *fIn = new TFile( ifile.c_str() );
@@ -67,7 +57,6 @@ double getNorm( string ifile )
      }
 
      fIn->Close();
-*/
 
      return 0.;
 
@@ -132,7 +121,6 @@ int main( int argc, char *argv[] )
     TH1F *hOn_theta2 = new TH1F("htheta2","htheta2",200,0.,4.);
     TH1F *hOn_EChi2 = new TH1F("hEChi2","hEChi2",100,0.,100.);
     TH1F *hOn_EmissionHeightChi2 = new TH1F("hEmissionHeightChi2","hEmissionHeightChi2",100,0.,100.);
-    TH1F *hOn_frogsGoodnessImg = new TH1F("hfrogsGoodnessImg","hfrogsGoodnessImg",100,-2.,300.);
 
     TH1F *hOff_NImages = new TH1F("hOffNImages","hOffNImages",5,0,5);
     TH1F *hOff_MSCW = new TH1F("hOffMSCW","hOffMSCW",100,-2.,2.);
@@ -140,15 +128,9 @@ int main( int argc, char *argv[] )
     TH1F *hOff_theta2 = new TH1F("hOfftheta2","hOfftheta2",200,0.,4.);
     TH1F *hOff_EChi2 = new TH1F("hOffEChi2","hOffEChi2",100,0.,100.);
     TH1F *hOff_EmissionHeightChi2 = new TH1F("hOffEmissionHeightChi2","hOffEmissionHeightChi2",100,0.,100.);
-    TH1F *hOff_frogsGoodnessImg = new TH1F("hOfffrogsGoodnessImg","hOfffrogsGoodnessImg",100,-2.,300.);
-
 
     string fInput = argv[1];
     string fOutput = argv[2];
-
-    poop( fInput );
-
-    return 0;
 
 // get normalisation factor
     double fNorm;
@@ -165,7 +147,6 @@ int main( int argc, char *argv[] )
         exit( 0 );
     }
 
-    double frogsGoodnessImg = 0.;
     double MSCW = 0.;
     double MSCL = 0.;
     double theta2 = 0.;
@@ -178,14 +159,12 @@ int main( int argc, char *argv[] )
     tOn->SetBranchAddress( "theta2", &theta2 );
     tOn->SetBranchAddress( "EChi2", &echi2 );
     tOn->SetBranchAddress( "EmissionHeightChi2", &emissionHeight );
-    tOn->SetBranchAddress( "frogsGoodnessImg", &frogsGoodnessImg );
     tOff->SetBranchAddress( "NImages", &NImages );
     tOff->SetBranchAddress( "MSCW", &MSCW );
     tOff->SetBranchAddress( "MSCL", &MSCL );
     tOff->SetBranchAddress( "theta2", &theta2 );
     tOff->SetBranchAddress( "EChi2", &echi2 );
     tOff->SetBranchAddress( "EmissionHeightChi2", &emissionHeight );
-    tOff->SetBranchAddress( "frogsGoodnessImg", &frogsGoodnessImg );
 
 // cut values
     double mscw_step = 0.025;
@@ -194,7 +173,8 @@ int main( int argc, char *argv[] )
 //    unsigned int    mscw_max_n = 41;
 //    double mscw_max_start =  0.;
     unsigned int    mscw_max_n = 1;
-    double mscw_max_start =  0.35;
+    //    double mscw_max_start =  0.35;
+    double mscw_max_start =  5.0;
 
     double mscl_step = 0.025;
     unsigned int    mscl_min_n = 1;
@@ -202,7 +182,8 @@ int main( int argc, char *argv[] )
 //   unsigned int    mscl_max_n = 41;
 //    double mscl_max_start =  0.;
     unsigned int    mscl_max_n = 1;
-    double mscl_max_start =  0.7;
+    //    double mscl_max_start =  0.7;
+    double mscl_max_start =  5.0;
 
     double theta2_step = 0.001;
 //    unsigned int    theta2_max_n = 41;
@@ -213,17 +194,13 @@ int main( int argc, char *argv[] )
     double emm_step = 2.;
     //unsigned int    emm_max_n = 81;
     unsigned int    emm_max_n = 1;
-    double emm_max_start = 0.;
+    double emm_max_start = 1.e12;
 
     double echi2_step = 0.1;
 //    unsigned int echi2_n = 41;
 //    double echi2_max_start = -1.;
     unsigned int echi2_n = 1;
     double echi2_max_start = 1.e99;
-
-    double frog_step = 0.1;
-    unsigned int frog_n = 1;
-    double frog_max_start = -2.;
 
     vector< double > mscw_min;
     vector< double > mscw_max;
@@ -232,7 +209,6 @@ int main( int argc, char *argv[] )
     vector< double > theta2_max;
     vector< double > echi2_max;
     vector< double > emm_max;
-    vector< double > frog_max;
 
 // results
     vector< double > source;                      // source strength
@@ -277,10 +253,6 @@ int main( int argc, char *argv[] )
 			    {
 			       double iechi2_max = echi2_max_start + echi2_step * o;
 
-			      for ( unsigned int p = 0; p < frog_n; p++ )
-                              {
-				double ifrog_max = frog_max_start + frog_step * p;
-
 			        mscw_min.push_back( imscw_min );
 			        mscw_max.push_back( imscw_max );
 			        mscl_min.push_back( imscl_min );
@@ -288,8 +260,6 @@ int main( int argc, char *argv[] )
 			        theta2_max.push_back( itheta2_max );
 			        emm_max.push_back( iemm_max );
 			        echi2_max.push_back( iechi2_max );
-			        frog_max.push_back( ifrog_max );
-			      }
                             }
                         }
                     }
@@ -315,14 +285,12 @@ int main( int argc, char *argv[] )
         hOn_theta2->Fill(theta2);
         hOn_EChi2->Fill(echi2);
         hOn_EmissionHeightChi2->Fill(emissionHeight);
-        hOn_frogsGoodnessImg->Fill(frogsGoodnessImg);
-
 
         for( unsigned int c = 0; c < mscw_min.size(); c++ )
         {
 
-	    ////////////////////////////if( NImages < 2 ) continue;
-	    if( NImages < 3 ) continue;
+	    if( NImages < 2 ) continue;
+	    ///if( NImages < 3 ) continue;
 	    if( NORM )
             {
               if( MSCW < mscw_min[c] ) continue;
@@ -331,7 +299,6 @@ int main( int argc, char *argv[] )
               if( MSCL > mscl_max[c] ) continue;
 	      if( echi2 > echi2_max[c] ) continue;
             }
-	    else if( frogsGoodnessImg > frog_max[c] ) continue;
             if( theta2 > theta2_max[c] ) continue;
 //            if( emissionHeight > emm_max[c] ) continue;
 
@@ -349,14 +316,11 @@ int main( int argc, char *argv[] )
         hOff_theta2->Fill(theta2);
         hOff_EChi2->Fill(echi2);
         hOff_EmissionHeightChi2->Fill(emissionHeight);
-        hOff_frogsGoodnessImg->Fill(frogsGoodnessImg);
 
         for( unsigned int c = 0; c < mscw_min.size(); c++ )
         {
-
-
-	    //////////////////////////////if( NImages < 2 ) continue;
-	    if( NImages < 3 ) continue;
+            if( NImages < 2 ) continue;
+	    ////if( NImages < 3 ) continue;
             if( NORM )
             {
               if( MSCW < mscw_min[c] ) continue;
@@ -365,8 +329,7 @@ int main( int argc, char *argv[] )
               if( MSCL > mscl_max[c] ) continue;
 	      if( echi2 > echi2_max[c] ) continue;
             }
-	    else if( frogsGoodnessImg > frog_max[c] ) continue;
-            if( theta2 < 0 || theta2 > theta2_max[c] ) continue;
+	    //            if( theta2 < 0 || theta2 > theta2_max[c] ) continue;
 //            if( emissionHeight > emm_max[c] ) continue;
 
             noff[c]++;
@@ -376,7 +339,7 @@ int main( int argc, char *argv[] )
 
 // output tree
 
-//    TFile *fO = new TFile( fOutput.c_str(), "RECREATE" );
+    TFile *fO = new TFile( fOutput.c_str(), "RECREATE" );
 
 //    TTree *t = new TTree( "topt", "cut optimization" );
     double t_mscw_min;
@@ -386,7 +349,6 @@ int main( int argc, char *argv[] )
     double t_theta2_max;
     double t_emm_max;
     double t_echi2_max;
-    double t_frog_max;
     double t_non[nsources];
     double t_noff;
     double t_sig[nsources];
@@ -416,17 +378,15 @@ int main( int argc, char *argv[] )
         t_theta2_max = theta2_max[c];
 	t_echi2_max = echi2_max[c];
         t_emm_max = emm_max[c];
-        t_frog_max = frog_max[c];
         t_noff = noff[c];
 
         for( unsigned int s = 0; s < source.size(); s++ )
         {
 	    t_non[s] = (non[c] - noff[c]) * source[s] + noff[c];
-            if( fNorm > 0. ) t_sig[s] = VStatistics::calcSignificance( t_non[s], noff[c]/fNorm, fNorm );
+            if( fNorm > 0. ) t_sig[s] = VStatistics::calcSignificance( t_non[s], noff[c], fNorm );
 
-	    if( s==4 )
+	    if( s==0 )
 	    {
-
 		cout << "Source " << s << endl;
 		cout << "t_mscw_min " << t_mscw_min << endl;
 		cout << "t_mscw_max " << t_mscw_max << endl;
@@ -435,7 +395,6 @@ int main( int argc, char *argv[] )
 		cout << "t_theta2_max " << t_theta2_max << endl;
 		cout << "t_echi2_max " << t_echi2_max << endl;
 		cout << "t_emm_max " << t_emm_max << endl;
-		cout << "t_frog_max " << t_frog_max << endl;
 		cout << "On " << t_non[s] << endl;
 		cout << "Off " << t_noff << endl;
 		cout << "Sig " << t_sig[s] << endl;
@@ -448,37 +407,47 @@ int main( int argc, char *argv[] )
     }
 //    cout << "writing results to output file" << endl;
 
-    TCanvas *cNImages = new TCanvas("cNImages","cNImages",0,0,500,500);
-    hOn_NImages->Draw();
-    hOff_NImages->Draw("same");
-    cNImages->Update();
-    TCanvas *cMSCW = new TCanvas("cMSCW","cMSCW",0,0,500,500);
-    hOn_MSCW->Draw();
-    hOff_MSCW->Draw("same");
-    cMSCW->Update();
-    TCanvas *cMSCL = new TCanvas("cMSCL","cMSCL",0,0,500,500);
-    hOn_MSCL->Draw();
-    hOff_MSCL->Draw("same");
-    cMSCL->Update();
-    TCanvas *ctheta2 = new TCanvas("ctheta2","ctheta2",0,0,500,500);
-    hOn_theta2->Draw();
-    hOff_theta2->Draw("same");
-    ctheta2->Update();
-    TCanvas *cEChi2 = new TCanvas("cEChi2","cEChi2",0,0,500,500);
-    hOn_EChi2->Draw();
-    hOff_EChi2->Draw("same");
-    cEChi2->Update();
-    TCanvas *cEmissionHeightChi2 = new TCanvas("cEmissionHeightChi2","cEmissionHeightChi2",0,0,500,500);
-    hOn_EmissionHeightChi2->Draw();
-    hOff_EmissionHeightChi2->Draw("same");
-    cEmissionHeightChi2->Update();
-    TCanvas *cfrogsGoodnessImg = new TCanvas("cfrogsGoodnessImg","cfrogsGoodnessImg",0,0,500,500);
-    hOn_frogsGoodnessImg->Draw();
-    hOff_frogsGoodnessImg->Draw("same");
-    cfrogsGoodnessImg->Update();
+//    TCanvas *cNImages = new TCanvas("cNImages","cNImages",0,0,500,500);
+//    hOn_NImages->Draw();
+//    hOff_NImages->Draw("same");
+//    cNImages->Update();
+//    TCanvas *cMSCW = new TCanvas("cMSCW","cMSCW",0,0,500,500);
+//    hOn_MSCW->Draw();
+//    hOff_MSCW->Draw("same");
+//    cMSCW->Update();
+//    TCanvas *cMSCL = new TCanvas("cMSCL","cMSCL",0,0,500,500);
+//    hOn_MSCL->Draw();
+//    hOff_MSCL->Draw("same");
+//    cMSCL->Update();
+//    TCanvas *ctheta2 = new TCanvas("ctheta2","ctheta2",0,0,500,500);
+//    hOn_theta2->Draw();
+//    hOff_theta2->Draw("same");
+//    ctheta2->Update();
+//    TCanvas *cEChi2 = new TCanvas("cEChi2","cEChi2",0,0,500,500);
+//    hOn_EChi2->Draw();
+//    hOff_EChi2->Draw("same");
+//    cEChi2->Update();
+//    TCanvas *cEmissionHeightChi2 = new TCanvas("cEmissionHeightChi2","cEmissionHeightChi2",0,0,500,500);
+//    hOn_EmissionHeightChi2->Draw();
+//    hOff_EmissionHeightChi2->Draw("same");
+//    cEmissionHeightChi2->Update();
+
+    hOn_NImages->Write();
+    hOff_NImages->Write();
+    hOn_MSCW->Write();
+    hOff_MSCW->Write();
+    hOn_MSCL->Write();
+    hOff_MSCL->Write();
+    hOn_theta2->Write();
+    hOff_theta2->Write();
+    hOn_EChi2->Write();
+    hOff_EChi2->Write();
+    hOn_EmissionHeightChi2->Write();
+    hOff_EmissionHeightChi2->Write();
+
 
 //    t->Write();
-//    fO->Close();
+    fO->Close();
 
    return 0;
 

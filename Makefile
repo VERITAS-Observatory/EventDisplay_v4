@@ -1075,9 +1075,8 @@ trainTMVAforGammaHadronSeparation_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ)
 
 makeOptimizeBoxCutsbyParameterSpaceSearch:	./obj/CData.o \
 						./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
-						./obj/makeOptimizeBoxCutsbyParameterSpaceSearch.o \
-						./lib/libVAnaSum.so
-	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib -lVAnaSum $(OutPutOpt) ./bin/$@
+						./obj/makeOptimizeBoxCutsbyParameterSpaceSearch.o 
+	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib $(OutPutOpt) ./bin/$@
 	@echo "$@ done"
 
 ########################################################
