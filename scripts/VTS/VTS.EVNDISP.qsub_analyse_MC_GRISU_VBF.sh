@@ -90,7 +90,8 @@ if( $ARRAY == "V6" ) then
          set IFIL=gamma_V6_Upgrade_ReducedHV_20121211_v420_ATM21_"$ZEW"deg_"$WOG"
       endif
       if( $ATMO == "21-UV" ) then
-         set IFIL=gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_"$ZEW"deg_"$WOG"
+#         set IFIL=gamma_V6_Upgrade_UVfilters_20121211_v420_ATM21_"$ZEW"deg_"$WOG"
+         set IFIL=gamma_grisu_apr12_ATM21_V6_Upgrade_UVfilters_20131025_"$ZEW"deg_"$WOG"
       endif
       if( $ATMO == "21-SNR" ) then
          set IFIL=gamma_V6_201304_SN2013ak_v420_ATM21_"$ZEW"deg_"$WOG"
@@ -155,13 +156,16 @@ while ($i <= $NRUN)
     if ( -e $FDIR/$IFIL"$RRR".vbf.gz ) then
        echo "copying $FDIR/$IFIL"$RRR".vbf.gz to $DDIR"
        cp -f $FDIR/$IFIL"$RRR".vbf.gz $DDIR/
-       echo " (vbf file copied)"
+       echo " (vbf file copied, was gzipped)"
        gunzip -f -v $DDIR/$IFIL"$RRR".vbf.gz
     else if( -e $FDIR/$IFIL"$RRR".vbf.bz2 ) then
        echo "copying $FDIR/$IFIL"$RRR".vbf.bz2 to $DDIR"
        cp -f $FDIR/$IFIL"$RRR".vbf.bz2 $DDIR/
-       echo " (vbf file copied)"
+       echo " (vbf file copied, was bzipped)"
        bunzip2 -f -v $DDIR/$IFIL"$RRR".vbf.bz2
+    else if( -e $FDIR/$IFIL"$RRR".vbf ) then
+       echo "copying $VFIL to $DDIR"
+       cp -f $FDIR/$VFIL $DDIR/
     endif
   endif
   set XFIL=$DDIR/$IFIL"$RRR".vbf
@@ -182,7 +186,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20131031_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20131222_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
