@@ -28,7 +28,7 @@ FIELD=$SUBA
 COPT="-f 1 -c $PEDFILE"
 
 # eventdisplay command line parameter
-OPT="-shorttree -l2setspecialchannels nofile -writenoMCTree -reconstructionparameter $ACUT"
+OPT="-averagetzerofiducialradius=0.5 -shorttree -l2setspecialchannels nofile -writenoMCTree -reconstructionparameter $ACUT"
 
 # set timtelarray file and cp simtelarray.gz file to TMPDIR
 if [ ! -e $ILIST ]
