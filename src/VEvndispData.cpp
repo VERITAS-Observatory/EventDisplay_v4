@@ -502,27 +502,22 @@ bool VEvndispData::initializeDeadChannelFinder()
               && getRunParameter()->fsourcetype != 4
               && getRunParameter()->fsourcetype != 7 )
         {
-    if( getRunParameter()->fDeadChannelFile.size() > 0 )
-    {
+           if( getRunParameter()->fDeadChannelFile.size() > 0 )
+           {
                 fDeadChannelDefinition_HG.back()->readDeadChannelFile( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + getRunParameter()->fDeadChannelFile );
-            }
-            fDeadChannelDefinition_HG.back()->printDeadChannelDefinition();
-    if( getRunParameter()->fDeadChannelFile.size() > 0 )
-    {
-       fDeadChannelDefinition_LG.back()->readDeadChannelFile( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + getRunParameter()->fDeadChannelFile );
-            }
-            fDeadChannelDefinition_LG.back()->printDeadChannelDefinition();
-        }
-else if(  getRunParameter()->fsourcetype == 7 || getRunParameter()->fsourcetype == 4 )
-{
-   cout << "Reading dead channel settings from DST file for";
-   cout << " telescope " << getTeltoAna()[i]+1 << endl;
-}
-else
-{
-   cout << "Ignoring dead channel settings for this run mode (";
-   cout << getRunParameter()->fsourcetype << ") and ";
-   cout << " telescope " << getTeltoAna()[i]+1 << endl;
+           }
+           fDeadChannelDefinition_HG.back()->printDeadChannelDefinition();
+           if( getRunParameter()->fDeadChannelFile.size() > 0 )
+           {
+                fDeadChannelDefinition_LG.back()->readDeadChannelFile( getRunParameter()->getDirectory_EVNDISPParameterFiles() + "/" + getRunParameter()->fDeadChannelFile );
+           }
+           fDeadChannelDefinition_LG.back()->printDeadChannelDefinition();
+         }
+         else if( getRunParameter()->fsourcetype != 7 && getRunParameter()->fsourcetype != 4 )
+         {
+            cout << "Ignoring dead channel settings for this run mode (";
+            cout << getRunParameter()->fsourcetype << ") and ";
+            cout << " telescope " << getTeltoAna()[i]+1 << endl;
         }
     }
     return true;

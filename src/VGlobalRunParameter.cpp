@@ -266,16 +266,21 @@ void VGlobalRunParameter::printGlobalRunParameter()
    cout << "VERSION " << fEVNDISP_VERSION << " (tree version " << fEVNDISP_TREE_VERSION << ")";
    cout << " (SVN REVISION " << fEVNDISP_SVNREVISION << ")" << endl;
    cout << "Observatory: " << fObservatory;
-   cout << " (long " << fObservatory_Longitude_deg << " deg, lat " << fObservatory_Latitude_deg << " deg,";
-   cout << " altitude " << fObservatory_Height_m << " m)" << endl;
+   if( TMath::Abs( fObservatory_Longitude_deg ) > 1.e-5 
+   && TMath::Abs( fObservatory_Latitude_deg ) > 1.e-5 
+   && TMath::Abs( fObservatory_Height_m ) > 1.e-5 )
+   {
+      cout << " (long " << fObservatory_Longitude_deg << " deg, lat " << fObservatory_Latitude_deg << " deg,";
+      cout << " altitude " << fObservatory_Height_m << " m)";
+   }
    cout << endl;
    if( fDBServer.size() > 0 ) cout << "DB server " << fDBServer << endl;
    if( fRawDataServer.size() > 0 ) cout << "Raw data server " << fRawDataServer << endl;
    cout << "Directories: " << endl;
-   if( fEVNDISPAnaDataDirectory.size() > 0 ) cout << "EVNDISP data: " << fEVNDISPAnaDataDirectory << endl;
-   if( fVBFRawDataDirectory.size() > 0 )     cout << "VBF raw: " << fVBFRawDataDirectory << endl;
-   if( fEVNDISPCalibrationDataDirectory.size() > 0 ) cout << "Calibration data: " << fEVNDISPCalibrationDataDirectory << endl;
-   if( fEVNDISPOutputDirectory.size() > 0 )  cout << "EVNDISP output: " << fEVNDISPOutputDirectory << endl;
+   if( fEVNDISPAnaDataDirectory.size() > 0 )         cout << "    for EVNDISP data: \t\t" << fEVNDISPAnaDataDirectory << endl;
+   if( fVBFRawDataDirectory.size() > 0 )             cout << "    for VBF raw: \t\t\t" << fVBFRawDataDirectory << endl;
+   if( fEVNDISPCalibrationDataDirectory.size() > 0 ) cout << "    for Calibration data: \t" << fEVNDISPCalibrationDataDirectory << endl;
+   if( fEVNDISPOutputDirectory.size() > 0 )          cout << "    for EVNDISP output: \t\t" << fEVNDISPOutputDirectory << endl;
    cout << endl;
 }
 

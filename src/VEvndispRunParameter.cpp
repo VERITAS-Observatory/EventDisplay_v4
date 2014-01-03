@@ -187,7 +187,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     {
        for( unsigned int i = 0; i < i_fps - 1; i++ )
        {
-    fpulsetiminglevels.push_back( fpulsetiminglevels[i_fps-i-2] );
+          fpulsetiminglevels.push_back( fpulsetiminglevels[i_fps-i-2] );
        }
     }
 // get index for tzero and width
@@ -372,9 +372,12 @@ void VEvndispRunParameter::print( int iEv )
     }
     if( fDBCameraRotationMeasurements ) cout << "using camera rotation values from DB" << endl;
     cout << endl;
-    cout << endl;
     cout << "analyzing following telescope: ";
-    for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ ) cout << fTelToAnalyze[i]+1 << ", ";
+    for( unsigned int i = 0; i < fTelToAnalyze.size(); i++ )
+    {
+       cout << fTelToAnalyze[i]+1;
+       if( i != fTelToAnalyze.size()-1 ) cout << ", ";
+    }
     cout << endl;
     cout << "detector configuration file: " << fcamera[0];
     if( fIgnoreCFGversions ) cout << " (ignoring cfg version numbering)";

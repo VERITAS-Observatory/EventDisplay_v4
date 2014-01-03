@@ -834,7 +834,6 @@ void VImageCleaning::cleanNNImageFixed()
     fData->setImageBorderNeighbour( false );
     unsigned int i_nchannel = fData->getNChannels();
 
-    std::cout<<"[cleanNNImageFixed] fData->getTelType()="<<fData->getTelType(fData->getTelID())<<std::endl;
     int type=getTrigSimTelType(fData->getTelType(fData->getTelID()));
 
     float sizecheck=0;
@@ -1885,7 +1884,6 @@ void VImageCleaning::resetImageChannel( unsigned int i_channel )
 /* 
    trace correlation cleaning
 
-   AMc
 */
 double getTraceCorrelationValue(double Amean, double Bmean,
 				double Avar, double Bvar,
@@ -1923,7 +1921,6 @@ double getTraceVar(vector < double > vA, double Am)
 /*
    trace correlation cleaning
 
-   AMc
 */
 void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double corrThresh, double pixThresh )
 {

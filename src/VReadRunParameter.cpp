@@ -1502,7 +1502,7 @@ bool VReadRunParameter::getRunParametersFromDST()
     }
     if( fDebug ) cout << "VReadRunParameter::getRunParametersFromDST() " << endl;
 
-    cout << "reading run parameters from dst file" << endl;
+    cout << "reading run parameters from dst file: " << fRunPara->fsourcefile << endl;
 // open dst file
     TFile iF( fRunPara->fsourcefile.c_str() );
     if( iF.IsZombie() )
@@ -1597,13 +1597,10 @@ bool VReadRunParameter::checkSecondArgument( string iPara1, string iPara2, bool 
 
 bool VReadRunParameter::readTrigSimInputCard( TString card )
 {
-    std::cout<<"[VReadRunParameter::readTrigSimInputCard()]: Reading NN cleaning (trigSim) input card "<<card<<std::endl;
-    if(!ifstream(card)){std::cout<<"[VReadRunParameter::readTrigSimInputCard()]: file "<<card<<" not found...return"<<std::endl;return false;}
-    std::cout<<"*****************************************************************************************"<<std::endl;
-    std::cout<<"  READ VALUES:"<<std::endl;
-    std::cout<<"*****************************************************************************************"<<std::endl;
+    cout << endl;
+    std::cout<<"VReadRunParameter::readTrigSimInputCard(): Reading NN cleaning input card "<<card<<std::endl;
+    if(!ifstream(card)){std::cout<<"VReadRunParameter::readTrigSimInputCard(): file "<<card<<" not found...return"<<std::endl;return false;}
 
-    //unsigned int varID=0;
     fstream file(card.Data(),std::ios::in);
     std::string datastring;
     std::string name;
@@ -1614,30 +1611,28 @@ bool VReadRunParameter::readTrigSimInputCard( TString card )
         {
             std::stringstream ss(datastring);
             const char skipsign=datastring[0];
-            //if(strcmp (skipsign,"#")==0)
             if(skipsign!='#')
             {
                 ss>>name>>path;
                 const char* cname=&name[0];
                 const char* cpath=&path[0];
                 if(strcmp (cname,"TrigThresh:")==0    ){ fRunPara->fTrigThreshFile  = path;
-                    std::cout<<cname<<"      "<<fRunPara->fTrigThreshFile<<std::endl;}
+                    std::cout<< "\t" << cname<<"      "<<fRunPara->fTrigThreshFile<<std::endl;}
                 if(strcmp (cname,"NSBdatabase:")==0    ){ fRunPara->fNSBdatabaseFile    = path;
-                    std::cout<<cname<<"      "<<fRunPara->fNSBdatabaseFile<<std::endl;}
+                    std::cout<< "\t" << cname<<"      "<<fRunPara->fNSBdatabaseFile<<std::endl;}
                 if(strcmp (cname,"IPR1:")==0    ){ fRunPara->fIPR1File    = path;
-                    std::cout<<cname<<"      "<<fRunPara->fIPR1File<<std::endl;}
+                    std::cout<< "\t" << cname<<"      "<<fRunPara->fIPR1File<<std::endl;}
                 if(strcmp (cname,"IPR2:")==0    ){ fRunPara->fIPR2File    = path;
-                    std::cout<<cname<<"      "<<fRunPara->fIPR2File<<std::endl;}
+                    std::cout<< "\t" << cname<<"      "<<fRunPara->fIPR2File<<std::endl;}
                 if(strcmp (cname,"IPR3:")==0    ){ fRunPara->fIPR3File    = path;
-                    std::cout<<cname<<"      "<<fRunPara->fIPR3File<<std::endl;}
+                    std::cout<< "\t" << cname<<"      "<<fRunPara->fIPR3File<<std::endl;}
                 if(strcmp (cname,"IPR4:")==0    ){ fRunPara->fIPR4File    = path;
-                    std::cout<<cname<<"      "<<fRunPara->fIPR4File<<std::endl;}
+                    std::cout<< "\t" << cname<<"      "<<fRunPara->fIPR4File<<std::endl;}
                 if(strcmp (cname,"NSBscale:")==0    ){ fRunPara->fNSBscale = atof(cpath);
-                    std::cout<<cname<<"      "<<fRunPara->fNSBscale<<std::endl;}
+                    std::cout<< "\t" << cname<<"      "<<fRunPara->fNSBscale<<std::endl;}
             }
         }
     }
-    std::cout<<"*****************************************************************************************"<<std::endl;
 
     return true;
 }
