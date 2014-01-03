@@ -41,10 +41,9 @@ then
    ARRAY="subArray.2a.list"
 elif [[ $P2 == "N" ]]
 then
-   SITE=( "prod2-US-NS" )
    SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
-   ARRAY="subArray.2NN.list"
    ARRAY="subArray.2NN-sub.list"
+   ARRAY="subArray.2NN.list"
    ARRAY="subArray.2NN-fullList.list"
 else
    echo "error: unknown site; allowed are N or S"
@@ -65,6 +64,7 @@ MCAZ=( "_180deg" "_0deg" "" )
 #####################################
 # reconstruction IDs
 RECID="0"
+RECID="10"
 
 #####################################
 # energy reconstruction
@@ -77,18 +77,14 @@ NIMAGESMIN="2"
 
 #####################################
 # observing time [h]
-OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "50h" )
-OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 
 
 #####################################
 # analysis dates and table dates
-DATE="d20130830"
-TDATE="d20130812"
-DATE="d20131205"
-TDATE="d20131205"
+DATE="d20131229"
+TDATE="d20131229"
 
 #####################################
 # loop over all sites
