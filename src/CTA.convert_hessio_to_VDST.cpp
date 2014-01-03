@@ -781,7 +781,7 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
        if( iPedFile->IsZombie() )
        {
            cout << "DST_fillCalibrationTree: error while opening external pedestal file: " << ipedfile << endl;
-	   iPedFile = 0;
+           exit( EXIT_FAILURE );
        }
    }
 
@@ -1899,6 +1899,7 @@ int main(int argc, char **argv)
    }
 // writing calibration data
    TTree *i_calibTree = DST_fillCalibrationTree( fDST, hsdata, fTelescope_list, ped_file );
+   if( fDSTfile ) fDSTfile->cd();
    if( i_calibTree ) i_calibTree->Write();
 ///////////////////////////////////////////////////
 // writing run parameters to dst file
