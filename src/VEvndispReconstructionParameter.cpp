@@ -286,8 +286,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
       }
    }
 
-////////////////////////////////////////////
-// MC only: cut on MC energy
+/////////////////////////////////////////////
+// MC only: cut on MC energy (use with care!)
    if( fRunPara->isMC() 
    && ( (iImageParameter->MCenergy < fMCEnergy_linTeV_min[iMeth][iTelType] || iImageParameter->MCenergy > fMCEnergy_linTeV_max[iMeth][iTelType] ) ) )
    {

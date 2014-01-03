@@ -1711,7 +1711,7 @@ void VExposure::printListOfRuns()
         cout << "\tDate: " << fRunDate[j];
         cout << "\tWobble:(N,E) (" << fWobbleN[j] << "," << fWobbleE[j] << ")";
         cout << "\tCONFIGMASK " << fRunConfigMask[j];
-        cout << setprecision( 3 ) << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
+        cout << setprecision( 1 ) << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
         cout << "\tDuration[min] " << fRunDuration[j]/60.;
         cout << "\t(El,Az) " << fRunTelElevation[j] << " " << fRunTelAzimuth[j];
 	if( bPrintVerbose )
