@@ -108,7 +108,8 @@ fi
 DATE=`date +"%y%m%d"`
 LDIR=$CTA_USER_LOG_DIR/$DATE/TMVATRAINING/
 mkdir -p $LDIR
-QDIR=$LDIR
+# QDIR=$LDIR
+QDIR="/dev/null"
 echo "log directory: " $LDIR
 echo "queue log directory: " $QDIR
 
