@@ -37,9 +37,10 @@ do
           echo "STORED LOCALLY: $i"
 	  dccp $DC $2/$OFIL
        else
-          echo "COPY FROM GRID"
+          echo "COPY FROM GRID: $i"
           lcg-cp -v lfn:/grid$i file:$2/$OFIL
        fi
+       sleep 10
     fi
 done
 
