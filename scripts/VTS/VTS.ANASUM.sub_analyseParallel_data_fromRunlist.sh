@@ -48,23 +48,24 @@ fi
 if [[ "$CUTS" == *super* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-SuperSoft.dat"
-   EFFAREA="effArea-d20131031-cut-N2-Point-005CU-SuperSoft-$ATMO-EPOCHSETTING-T1234-d20131031.root"
-   RADACC="radialAcceptance-d20131031-d20131028-cut-N2-Point-005CU-SuperSoft-V6-T1234.root"
+   EFFAREA="effArea-d20131031-cut-N2-Point-005CU-SuperSoft-$ATMO-EPOCHSETTING-T1234-d20131115.root"
+   RADACC="radialAcceptance-d20131031-d20131028-cut-N2-Point-005CU-SuperSoft-EPOCHSETTING-T1234.root"
+   RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-EPOCHSETTING-T1234.root"
 elif [[ "$CUTS" == *open* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open.dat"
-   EFFAREA="effArea-d20131031-cut-N2-Point-005CU-Open-$ATMO-EPOCHSETTING-T1234-d20131031.root"
-   RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
+   EFFAREA="effArea-d20131031-cut-N2-Point-005CU-Open-$ATMO-EPOCHSETTING-T1234-d20131115.root"
+   RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-Open-EPOCHSETTING-T1234.root"
 elif [[ "$CUTS" == *soft* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft.dat"
-   EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20131031.root"
-   RADACC="radialAcceptance-d20131031-d20131028-cut-N3-Point-005CU-Soft-V6-T1234.root"
+   EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20131115.root"
+   RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-EPOCHSETTING-T1234.root"
 elif [[ $CUTS = *moderate* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate.dat"
-   EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20131031.root"
-   RADACC="radialAcceptance-d20130411-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
+   EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20131115.root"
+   RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 # UV Filter
 #   EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-V6-$ATMO-UV-d20121218.root"
 #   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"

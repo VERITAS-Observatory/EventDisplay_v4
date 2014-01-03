@@ -59,6 +59,7 @@ mkdir -p $ODIR
 cd $EVNDISPSYS/bin/
 rm -f $ODIR/$OFIL.log
 ./mscw_energy $MOPT -inputfile "$XDIR" -outputfile $DDIR/$OFIL.root -noise=$NOISE > $ODIR/$OFIL.log
+#./mscw_energy_200Tel $MOPT -inputfile "$XDIR" -outputfile $DDIR/$OFIL.root -noise=$NOISE > $ODIR/$OFIL.log
 
 ###############################################
 # cp results file back to data directory and clean up

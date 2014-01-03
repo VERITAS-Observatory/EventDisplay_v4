@@ -96,7 +96,7 @@ if( $ARRAY == "V6" ) then
       if( $ATMO == "21-SNR" ) then
          set IFIL=gamma_V6_201304_SN2013ak_v420_ATM21_"$ZEW"deg_"$WOG"
       endif
-      set RUN=( "wobb" )
+      set RUN=( "wobb_scaled_120" )
       set SRUN=65000
       set NRUN=1
    endif
