@@ -121,6 +121,8 @@ class VStereoAnalysis
 	double fTreeSelected_theta2;
 	double fTreeSelected_Xoff;
 	double fTreeSelected_Yoff;
+	double fTreeSelected_Xoff_derot;
+	double fTreeSelected_Yoff_derot;
 	double fTreeSelected_Xcore;
 	double fTreeSelected_Ycore;
 	double fTreeSelected_MSCW;
@@ -133,6 +135,7 @@ class VStereoAnalysis
 	double fTreeSelected_EChi2S;
 	float fTreeSelected_EmissionHeight;
 	float fTreeSelected_EmissionHeightChi2;
+	double fTreeSelected_SizeSecondMax;
 	
 	TTree * fTreeWithAllGamma; // WRITEALLGAMMATOTREE 
     int    fTreeAll_runNumber;
@@ -264,7 +267,7 @@ class VStereoAnalysis
         {
 	  if( fDataRun->fFrogs )
 	    return fDataRun->frogsXP;
-	  else if( fDataRun->fModel3D )
+	  else if( fRunPara->fModel3D && fDataRun->fModel3D )
 	    return fDataRun->Xcore3D;
 	  else
 	    return fDataRun->Xcore;
@@ -274,7 +277,7 @@ class VStereoAnalysis
         {
 	  if( fDataRun->fFrogs )
 	    return fDataRun->frogsYP;
-	  else if( fDataRun->fModel3D )
+	  else if( fRunPara->fModel3D && fDataRun->fModel3D )
 	    return fDataRun->Ycore3D;
 	  else
 	    return fDataRun->Ycore;
@@ -284,7 +287,7 @@ class VStereoAnalysis
         {
 	  if( fDataRun->fFrogs )
 	    return fDataRun->frogsXS;
-	  else if( fDataRun->fModel3D )
+	  else if( fRunPara->fModel3D && fDataRun->fModel3D )
 	    return fDataRun->Xoff3D;
 	  else
 	    return fDataRun->Xoff;
@@ -295,7 +298,7 @@ class VStereoAnalysis
 	  if( fDataRun->fFrogs )
 // -1 sign difference for frogs ED
 	    return -1.0*fDataRun->frogsYS;
-	  else if( fDataRun->fModel3D )
+	  else if( fRunPara->fModel3D && fDataRun->fModel3D )
 	    return fDataRun->Yoff3D;
 	  else
 	    return fDataRun->Yoff;

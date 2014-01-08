@@ -1593,6 +1593,8 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
    fTreeSelectedEvents->Branch( "theta2", &fTreeSelected_theta2, "theta2/D" );
    fTreeSelectedEvents->Branch( "Xoff", &fTreeSelected_Xoff, "Xoff/D" );
    fTreeSelectedEvents->Branch( "Yoff", &fTreeSelected_Yoff, "Yoff/D" );
+   fTreeSelectedEvents->Branch( "Xoff_derot", &fTreeSelected_Xoff_derot, "Xoff_derot/D" );
+   fTreeSelectedEvents->Branch( "Yoff_derot", &fTreeSelected_Yoff_derot, "Yoff_derot/D" );
    fTreeSelectedEvents->Branch( "Xcore", &fTreeSelected_Xcore, "Xcore/D" );
    fTreeSelectedEvents->Branch( "Ycore", &fTreeSelected_Ycore, "Ycore/D" );
    fTreeSelectedEvents->Branch( "MSCW", &fTreeSelected_MSCW, "MSCW/D" );
@@ -1605,6 +1607,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
    fTreeSelectedEvents->Branch( "EChi2S", &fTreeSelected_EChi2S, "EChi2S/D" );
    fTreeSelectedEvents->Branch( "EmissionHeight", &fTreeSelected_EmissionHeight, "EmissionHeight/F" );
    fTreeSelectedEvents->Branch( "EmissionHeightChi2", &fTreeSelected_EmissionHeightChi2, "EmissionHeightChi2/F" );
+   fTreeSelectedEvents->Branch( "SizeSecondMax", &fTreeSelected_SizeSecondMax, "SizeSecondMax/D" );
    fTreeSelectedEvents->Branch( "MVA", &fTreeSelected_MVA, "MVA/D" );
 
    if( fRunPara->fModel3D )
@@ -1674,6 +1677,8 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
       fTreeSelected_theta2 = 0.;
       fTreeSelected_Xoff = 0.;
       fTreeSelected_Yoff = 0.;
+      fTreeSelected_Xoff_derot = 0.;
+      fTreeSelected_Yoff_derot = 0.;
       fTreeSelected_Xcore = 0.;
       fTreeSelected_Ycore = 0.;
       fTreeSelected_MSCW = 0.;
@@ -1686,7 +1691,7 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
       fTreeSelected_EChi2S = 0.;
       fTreeSelected_EmissionHeight = 0.;
       fTreeSelected_EmissionHeightChi2 = 0.;
-
+      fTreeSelected_SizeSecondMax = 0.;
       fTreeSelected_MVA = -99.;
 
       /// model3D parameters ///
@@ -1752,6 +1757,8 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
       fTreeSelected_theta2 = c->theta2;
       fTreeSelected_Xoff = c->Xoff;
       fTreeSelected_Yoff = c->Yoff;
+      fTreeSelected_Xoff_derot = c->Xoff_derot;
+      fTreeSelected_Yoff_derot = c->Yoff_derot;
       fTreeSelected_Xcore = c->Xcore;
       fTreeSelected_Ycore = c->Ycore;
       fTreeSelected_MSCW = c->MSCW;
@@ -1764,7 +1771,7 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
       fTreeSelected_EChi2S = c->EChi2S;
       fTreeSelected_EmissionHeight = c->EmissionHeight;
       fTreeSelected_EmissionHeightChi2 = c->EmissionHeightChi2;
-
+      fTreeSelected_SizeSecondMax = c->SizeSecondMax;
       if( fCuts ) fTreeSelected_MVA = fCuts->getTMVA_EvaluationResult();
       else        fTreeSelected_MVA = -99.;
 
