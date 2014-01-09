@@ -180,7 +180,6 @@ bool VExposure::readFromDB()
     for( int j = 0; j < fNRows; j++ )
     {
         TSQLRow *db_row = db_res->Next();
-
         if( !db_row ) break;
 
 // all fields should be defined (check if field #19 is there)
@@ -199,7 +198,7 @@ bool VExposure::readFromDB()
 // check if this run is an observing/redHV/UVFilter run
         else if( fObservingMode == "Special" )
         {
-          if ( itemp != "observing" || itemp != "obsFilter" || itemp != "obsLowHV" )  continue;
+          if ( itemp != "observing" && itemp != "obsFilter" && itemp != "obsLowHV" )  continue;
         }
 
         fRunObsMode.push_back( itemp );
