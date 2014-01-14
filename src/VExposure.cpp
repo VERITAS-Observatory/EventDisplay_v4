@@ -1839,6 +1839,7 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
 
   FILE *anasumFile;
 
+  string fatmo;
   string fepoch;
   string fconfig;
   string freplace;
@@ -1853,10 +1854,26 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
 // loop over all runs 
   for( unsigned int j = 0; j < fRunRA.size(); j++ )
   {
-
        fepoch = "";
        fconfig = "";
        freplace = "REPLACE_";
+
+       // check for atmospheric conditions (dates are set to full moon periods)
+       fatmo="ATM";
+       // did not looked into such old data files yet (set to undefined atmosphere)
+       if     ( fRunDate[j] < 20071026 )                           fatmo += "XX_";
+       else if( fRunDate[j] > 20080420 && fRunDate[j] < 20081113 ) fatmo += "22_";
+       else if( fRunDate[j] > 20090509 && fRunDate[j] < 20091102 ) fatmo += "22_";
+       else if( fRunDate[j] > 20100428 && fRunDate[j] < 20101023 ) fatmo += "22_";
+       else if( fRunDate[j] > 20110418 && fRunDate[j] < 20111110 ) fatmo += "22_";
+       else if( fRunDate[j] > 20120506 && fRunDate[j] < 20121029 ) fatmo += "22_";
+    // TODO: not sure which of the two dates (still missing some data from Tucson) ???
+    // else if( fRunDate[j] > 20130425 && fRunDate[j] < 20131019 ) fatmo += "22_";
+       else if( fRunDate[j] > 20130425 && fRunDate[j] < 20131117 ) fatmo += "22_";
+       // did not looked into such new data files yet (set to undefined atmosphere)
+       else if( fRunDate[j] > 20140401 )                           fatmo += "XX_";
+       else                                                        fatmo += "21_";
+
 
        if( fRun[j] < 46642 )                         fepoch += "V4_";
        else if( fRun[j] > 46641 && fRun[j] < 63373 ) fepoch += "V5_";
@@ -1869,6 +1886,7 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
        else if(fRunConfigMask[j]==14)   fconfig = "234";
        else 				fconfig = "2Tel";
 
+       freplace += fatmo;
        freplace += fepoch;
        freplace += fconfig;
 
@@ -1891,6 +1909,13 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
 
   }
 
+
+  if( fatmo == "ATMXX_") {
+      cout << endl;
+      cout << "Warning: You are using either old or new data runs for which no transition dates have been set in VExposure::outputAnasumRunlist()" << endl;
+      cout << "         Please check radiosonde measurements to find the transition date (they should optiminally be choosen during a full moon period) ..." << endl;
+  }
+  
   cout << endl;
   cout << "ANASUM output written to: " << fAnasumFile.c_str() << endl;
   cout << endl;
