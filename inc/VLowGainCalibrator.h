@@ -44,7 +44,6 @@ class VLowGainCalibrator {
 
 	int fRun;
 
-	
 	TTree * fDsttree;	
 
 	int fChanMon_start;
@@ -52,24 +51,24 @@ class VLowGainCalibrator {
 	int fChan_start;
 	int fChan_stop;
 
-	int fNLiveMonitor_min;
-	bool fUseMedian;
-	double fSumMonitor_min;
+	int fNLiveMonitor_min;		//min number of good monitor channels to use the events
+	bool fUseMedian;		//use median or mean of monitor charges in one event
+	double fSumMonitor_min;		//min sum to be considered a monitor channel
+	double fLightLevelWidth;	//Width of light levels (in terms of sigma)
+	
 
-	double fFitPure_min;
-	double fFitNPoints_min;	
-	double fFitProb_min;
-	double fFitB_max;
+	double fFitPure_min;		//min. purity of a light level to be considered for the fit. Eg 0.8 -> 80% of events have to be in high gain/low gain.
+	double fFitNPoints_min;		//min. number of points for the fit (high/low is fitted separately)
+	double fFitProb_min;		//min. fit probability assuming chi2 distribution.
+	double fFitB_max;		//max of abs. value of b (if fitting a*x+b, not used currently).
 
 	TH1D * fMonitorChargeHist[fNTel];	
 	unsigned int fNLightLevels[fNTel];
 
 	vector<double> fLightLevelMean[fNTel];
-	vector<double> fLightLevelWidth[fNTel];
+	vector<double> fLightLevelSigma[fNTel];
 	vector<double> fLightLevelMeanError[fNTel];
-	vector<double> fLightLevelWidthError[fNTel];
-
-	bool fHaveLevels;
+	vector<double> fLightLevelSigmaError[fNTel];
 
 	vector<int> fN[fNTel][fNPix][2];	//number of entries per level, per tel, per pixel, per high/low gain.
 	
@@ -125,25 +124,24 @@ class VLowGainCalibrator {
 	~VLowGainCalibrator();
 
 	void setDebug( bool debug=true ) { fDEBUG = debug ; }  
-
-
-	void setMonitorChargeOptions( int nLive_min=100, double sum_min=-100, bool useMedian=true) ;
+	void resetLightLevels( );
+	void resetLightLevels( int tel);
+	void setMonitorChargeOptions( int nLive_min=100, double sum_min=-100, bool useMedian=true, double width=2) ;
 	void setFitOptions( int n_min=2, double pure_min=0.8, double prob_min=0.01, double b_max=2.0 );
 	bool fIsOk();
-//	double fpeaks( double *x, double *par );
   
 	bool setDST( TTree * dst );
 	void resetVectors();
 
 	bool makeMonitorChargeHists( );
-	bool findLightLevels();
 	int  checkLightLevels( int tel, bool iDraw=false );
 	bool calculateMeanCharges();
 
 	bool doTheFit( ) ;
 
 	bool terminate(  );
-	void fillLightLevels( int tel, int iPeakSignificance=2 , bool iDraw=false );
+	void findLightLevels( int tel, int iPeakSignificance=2 , bool iDraw=false );
+	bool findLightLevels(bool iDraw=false );
 	void setLowGainMultiplierUsedInDST(double lmult=6.0 ) { fLMult.assign(fNTel, lmult); } 
 
 	void setDebugChannels( vector<int> channels )		{ fDebugChannels=channels ; }
