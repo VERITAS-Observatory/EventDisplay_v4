@@ -159,7 +159,7 @@ CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/
 ########################################################
 ROOTGLIBS     = $(shell root-config --glibs)
 GLIBS         = $(ROOTGLIBS)
-GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO
+GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
 ifeq ($(ROOT_MINUIT2),yes)
    GLIBS     += -lMinuit2
 endif
@@ -678,7 +678,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotTMVAParameters.o ./obj/VPlotTMVAParameters_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
-		./obj/VCTARequirements.o ./obj/VCTARequirements_Dict.o
+		./obj/VCTARequirements.o ./obj/VCTARequirements_Dict.o \
+		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
