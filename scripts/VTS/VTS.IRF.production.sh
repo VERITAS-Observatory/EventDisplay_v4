@@ -22,21 +22,19 @@ RUN="$1"
 
 # VERITAS epoch
 ARRAY=( "V6" "V5" "V4" )
-ARRAY=( "V4" )
 # reconstruction IDs (=4 and 3-telescope combinations)
 ID=( "0" "1" "2" "3" "4" )
-ID=( "0" )
 # atmospheres
 ATM=( "21" "22" )
-ATM=( "21" )
 # table file
-TABILEFIL="table_d20131115_GrIsuDec12_"
+TFIL="table_d20131115_GrIsuDec12_"
 # cut files
 # $CUTFIL and $CUTS must be of same length
 # CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-SuperSoft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open" )
-CUTS=( "med" "soft" "supersoft" "open" )
-CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open" )
-CUTS=( "med" "soft" "open" )
+# CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open" )
+# CUTS=( "med" "soft" "open" )
+CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" )
+CUTS=( "med" )
 
 #########################
 # loop over all epochs
@@ -53,7 +51,7 @@ do
       W=${ATM[$w]}
 
 # lookup table
-      T=$TFIL$W"_ATM"$A"_ID0.root"
+      T=$TFIL"ATM"$W"_"$A"_ID0"
 ######################################
 # make tables
       if [[ $RUN == "MAKETABLES" ]]
@@ -71,7 +69,7 @@ do
 # analyse table files
          if [[ $RUN == "ANALYSETABLES" ]]
          then
-            echo "./VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh $T $I $W $A"
+            ./VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh $T $I $W $A
          fi
 ######################################
 # analyse effective areas
