@@ -91,7 +91,7 @@ class VLowGainCalibrator {
 	double fTree_m[2];
 	double fTree_mErr[2];
 	double fTree_chi2[2];
-	double fTree_ndf[2];
+	int fTree_ndf[2];
 	status fTree_status[2];
  
 
@@ -113,6 +113,9 @@ class VLowGainCalibrator {
 //	public:
 	VLowGainCalibrator(int run, int sw, bool isInnerHigh, TString dir= "./"); 
 	~VLowGainCalibrator();
+
+	void setDebug( bool debug=true ) { fDEBUG = debug ; }  
+
 
 	void setMonitorChargeOptions( int nLive_min=100, double sum_min=-100, bool useMedian=true) ;
 	void setFitOptions( int n_min=2, double pure_min=0.8, double prob_min=0.01, double b_max=2.0 );

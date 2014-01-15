@@ -61,7 +61,6 @@ VLowGainCalibrator::~VLowGainCalibrator() {
 }
 
 
-
 void VLowGainCalibrator::setMonitorChargeOptions( int nLive_min, double sum_min, bool useMedian) {
 	fNLiveMonitor_min = nLive_min;
 	fUseMedian = useMedian;
@@ -187,9 +186,9 @@ bool VLowGainCalibrator::findLightLevels() {
 */
 void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool iDraw )
 {
+  
     TH1D* ihist = fMonitorChargeHist[tel];
-cout << ihist->GetNbinsX() << " " << ihist->GetEntries() << endl;
-	TCanvas *c1 ;
+    TCanvas *c1 ;
     if(fDEBUG) iDraw=true;
     if( iDraw ) {
 	c1 = new TCanvas("c1","c1",10,10,500,400);
@@ -199,9 +198,8 @@ cout << ihist->GetNbinsX() << " " << ihist->GetEntries() << endl;
 // find peaks (there should be 7 if the flasher is ok)
     int iLightLevel = 7;
 
-cout << "hi" << endl;
     TSpectrum *s = new TSpectrum( 2*iLightLevel );
-cout << "hi" << endl;
+
     if( iDraw ) { 
 	s->Search( ihist, iPeakSignificance, "", 0.05 ); 
 	c1->cd(2);
@@ -327,6 +325,11 @@ cout << "hi" << endl;
 	    fNLightLevels[tel]=npeaks;
 	    if( fDEBUG ) cout << "#light levels in tel " << tel+1 << " : " << npeaks << endl;
 
+	    fLightLevelMean[tel].clear();
+	    fLightLevelMeanError[tel].clear();
+	    fLightLevelWidth[tel].clear();
+	    fLightLevelWidthError[tel].clear();
+
 	    for( unsigned int i=0; i<fNLightLevels[tel]; i++ )
 	    {
 		fLightLevelMean[tel].push_back( fit->GetParameter(3*i+4) );
@@ -413,7 +416,7 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 		for(int tel=0; tel<fNTel; tel++) {
 			double qmon = calcMonitorCharge(tel);
 			int level=-1;
-			for(int ilevel=0; ilevel<fNLightLevels[tel]; ilevel++) {
+			for(unsigned int ilevel=0; ilevel<fNLightLevels[tel]; ilevel++) {
 				if( qmon < fLightLevelMean[tel][ilevel] + 2*fLightLevelWidth[tel][ilevel] &&  qmon > fLightLevelMean[tel][ilevel] - 2*fLightLevelWidth[tel][ilevel] ) { 
 					level=ilevel;
 					break;
@@ -457,7 +460,6 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 
 				if( dead[tel][iChan] ) continue;
 				if( fabs( sumfirst[tel][iChan] - start[ HiLo[tel][iChan] ] ) > 2*start2[ HiLo[tel][iChan] ] ) continue; 				
-//		cout << tel << " " << iChan << " " << HiLo[tel][iChan] << " " << level << " " << sum[tel][iChan] << endl;
 
 				fN [tel][iChan][ HiLo[tel][iChan] ][level]++;
 				fY [tel][iChan][ HiLo[tel][iChan] ][level]+=sum[tel][iChan];
@@ -474,11 +476,11 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 	for(int tel=0; tel<fNTel; tel++) {
 		for(int iChan=iChan_start; iChan<iChan_stop; iChan++) {
 			for(int hilo=0; hilo<2; hilo++) {
-				for(int ilevel=0; ilevel<fNLightLevels[tel]; ilevel++) {
+				for(unsigned int ilevel=0; ilevel<fNLightLevels[tel]; ilevel++) {
 					if( fN[tel][iChan][hilo][ilevel]==0 ) continue;
 					fY[tel][iChan][hilo][ilevel] /=  fN[tel][iChan][hilo][ilevel];
-					fY2[tel][iChan][hilo][ilevel] /= fN[tel][iChan][hilo][ilevel];
-				
+					fY2[tel][iChan][hilo][ilevel] /= fN[tel][iChan][hilo][ilevel];					
+	//cout << tel+1 << " " <<iChan << " " << ilevel << " " << hilo << " " << 	fN[tel][iChan][hilo][ilevel]	<<  "\t" <<  fLightLevelMean[tel][ilevel] <<  "\t"  <<  fY[tel][iChan][hilo][ilevel] << endl;
 				}//level
 			}//hilo
 		}//chan
@@ -494,22 +496,28 @@ bool VLowGainCalibrator::doTheFit() {
 		fTree_Channel=iChan;	
 
 			for(int hilo=0; hilo<2; hilo++) {
-				TGraphErrors t(0);
-				TF1 * f = new TF1 ("f", "[0]*x+[1]", 0, 1000);
+				TString name = TString::Format("graph_t%d_c%d_%d", tel+1, iChan, hilo );
+				TGraphErrors * t = new TGraphErrors(0);
+				t->SetName( name.Data() );
+				t->SetTitle( name.Data() );
+				TF1 * f = new TF1 ("f", "[0]*x", 0, 1000);
 				int N=0;
-				for(int i=0; i<fNLightLevels[tel]; i++) {
-					if(fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] == 0 || fN[tel][iChan][hilo][i] / ( fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] ) < fFitPure_min ) continue; 
-					t.SetPoint(N, fLightLevelMean[tel][i], fY[tel][iChan][hilo][i] );
-					double eX, eY;
-					eX= fLightLevelWidth[tel][i];
-					eY=sqrt( fY2[tel][iChan][hilo][i] - fY[tel][iChan][hilo][i] * fY[tel][iChan][hilo][i] );
-					t.SetPointError(N, eX, eY );
-					N++;
+				for(unsigned int i=0; i<fNLightLevels[tel]; i++) {
+					if(fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] > 0  &&  fN[tel][iChan][hilo][i] / ( fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] ) > fFitPure_min ) { 
+						t->SetPoint(N, fLightLevelMean[tel][i], fY[tel][iChan][hilo][i] );
+						double eX, eY;
+						eX= fLightLevelWidth[tel][i];
+						eY=sqrt( fY2[tel][iChan][hilo][i] - fY[tel][iChan][hilo][i] * fY[tel][iChan][hilo][i] )/sqrt(fN[tel][iChan][hilo][i]);
+						t->SetPointError(N, eX, eY );
+						N++;
+					}
 				}// light levels
-				
+				cout << tel+1 << " " <<iChan <<  " " << hilo << " " << N << " " << t->GetN() << endl;
 				if( N < fFitNPoints_min ) {
+					if( fDEBUG ) {
+						cout << "Warning: Less than " << fFitNPoints_min << " point for Tel " << tel+1 << ", channel " << iChan  << " " << hilo << ", not fitting." << endl; 
+					}
 					fTree_status[hilo] = NO_POINTS;
-
 					fTree_m[hilo] = -1;
 					fTree_mErr[hilo] =99999;
 					fTree_chi2[hilo]= 99999;
@@ -517,23 +525,40 @@ bool VLowGainCalibrator::doTheFit() {
 					
 				}
 				else {
-					t.Fit(f);
+
+
+					t->Fit(f);
+
+					if (fDEBUG) { 
+						fOutfile[tel]->cd();
+						t->Write();
+	/*					TString name = TString::Format("graph_t%d_c%d_%d", tel+1, iChan, hilo );
+						TCanvas * c = new TCanvas(name.Data(), name.Data() );
+						t.Draw("AP");
+						f->Draw("sames");
+						c->Write();
+						c->Close();
+	*/
+							
+					}
 					
 					fTree_m[hilo] = f->GetParameter(0);
 					fTree_mErr[hilo] = f->GetParError(0);
-					double b = f->GetParameter(1);
-					double berr = f->GetParError(1);
+					//double b = f->GetParameter(1);
+					//double berr = f->GetParError(1);
 
 					fTree_chi2[hilo]= f->GetChisquare();
 					fTree_ndf[hilo]	= f->GetNDF();
+	//cout << f->GetChisquare() << " " << f->GetNDF() << " " << fTree_chi2[hilo] << " " << fTree_ndf[hilo] << endl;
 					double p = TMath::Prob(fTree_chi2[hilo], fTree_ndf[hilo]);
 
 					if( p< fFitProb_min ) fTree_status[hilo] = BAD_CHI2;
-					else if( TMath::Abs( b ) / berr  > fFitB_max ) fTree_status[hilo] = NOT_PROPORTIONAL;
+					//else if( TMath::Abs( b ) / berr  > fFitB_max ) fTree_status[hilo] = NOT_PROPORTIONAL;
 					else fTree_status[hilo] = GOOD;
 
 				}
-				delete f;
+				f->Delete();
+				t->Delete();
 			
 			}//hilo
 	
