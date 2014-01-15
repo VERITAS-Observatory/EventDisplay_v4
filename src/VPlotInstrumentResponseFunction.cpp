@@ -1262,6 +1262,13 @@ void VPlotInstrumentResponseFunction::plotTheta2( vector< double > i_Energy_TeV_
                if( h->GetMaximum() > 0. ) h->Scale( 1./h->GetMaximum() );
             }
             h->Draw( "same" );
+	    if( iCumulative )
+	    {
+	       TLine *iL = new TLine( h->GetXaxis()->GetXmin(), 1.,
+	                              iTheta2AxisMax, 1. );
+	       iL->SetLineStyle( 2 );
+	       iL->Draw();
+            }
          }
       }
     }

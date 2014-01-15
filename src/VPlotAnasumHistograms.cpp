@@ -763,7 +763,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
     TH1D *hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
     setHistogramPlottingStyle( hsig_1D, 4, 2, 1, 1, 1, 0 );
     if( hsig_1D ) hsig_1D->SetStats( 0 );
-    cout << "red:   without source region" << endl;
+    cout << "blue:   without source region" << endl;
 
     TH1D *hsig_1DAll  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, 0., false, hmap_stereo_on );
     setHistogramPlottingStyle( hsig_1DAll, 2, 2, 2, 1, 1, 0 );
@@ -2588,7 +2588,7 @@ TCanvas* VPlotAnasumHistograms::plot_significance( bool iCorrelated, double rmax
 	    sprintf( hname, "c_skySig_%s_%d", fAnasumDataFile.c_str(), fRunNumber );
             sprintf( htitle, "sky/camera map (Significance) run %d (correlated plots)", fRunNumber );
         }
-        c_skySig = new TCanvas( hname, htitle, 430, 10, 400, 400 );
+        c_skySig = new TCanvas( hname, htitle, 430, 10, 600, 600 );
         c_skySig->Draw();
         gPad->SetRightMargin( 0.12 );
 

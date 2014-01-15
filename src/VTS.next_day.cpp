@@ -38,7 +38,7 @@ int main( int argc, char *argv[] )
 
 /////////////////////////////////////////
 // read command line parameters
-    if( argc == 1 ) help();
+    if( argc < 4 ) help();
 
     string fDataFile = argv[1];
     string fOUTFile = argv[2];

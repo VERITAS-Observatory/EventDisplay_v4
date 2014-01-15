@@ -1103,7 +1103,6 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree *iE
     if( fZe.size() > 0 ) cout << fZe[fZe.size()-1];
     cout << ")" << endl;
     if( fEffectiveAreaVsEnergyMC == 0 )      cout << "\t (effective area vs MC energy)" << endl;
-    else if( fEffectiveAreaVsEnergyMC == 1 ) cout << "\t (effective area vs MC energy (approx))" << endl;
     else                                     cout << "\t (effective area vs reconstructed energy)" << endl;
 
     if( fSmoothIter > 0 )
@@ -1194,7 +1193,7 @@ void VEffectiveAreaCalculator::reset()
     fAzBin = 0;
     fMinAz = -1.e3;
     fMaxAz = 1.e3;
-    fEffectiveAreaVsEnergyMC = 2;
+    fEffectiveAreaVsEnergyMC = 1;
 
     hEmc = 0;
     hEcut = 0;

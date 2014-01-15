@@ -170,8 +170,6 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         double fEnergyReconstructionSpectralIndex;
         unsigned int fEnergyReconstructionMethod;
         double fEnergySpectrumBinSize;
-        double fEnergyFitMin;                     // in log10 [TeV]
-        double fEnergyFitMax;                     // in log10 [TeV]
         int    fEffectiveAreaVsEnergyMC;
         int    fEnergyEffectiveAreaSmoothingIterations;
         double fEnergyEffectiveAreaSmoothingThreshold;

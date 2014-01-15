@@ -114,10 +114,8 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 // parameter for energy spectra (in log E)
     fEnergyReconstructionSpectralIndex = 2.5;
     fEnergyReconstructionMethod = 0;
-    fEffectiveAreaVsEnergyMC = 2;             // default: use effective areas vs reconstructed energy (accurate method)
+    fEffectiveAreaVsEnergyMC = 1;             // default: use effective areas vs reconstructed energy (accurate method)
     fEnergySpectrumBinSize = 0.05;
-    fEnergyFitMin = -0.5;
-    fEnergyFitMax = 0.5;
     fEnergyEffectiveAreaSmoothingIterations = -1;
     fEnergyEffectiveAreaSmoothingThreshold = -1.;
 
@@ -464,17 +462,14 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
                 fExclusionRegions.back()->fExcludeFromBackground_Radius = (double)atof( temp2.c_str() );
             }
             else if( temp == "ENERGYBINSIZE" ) fEnergySpectrumBinSize = atof( temp2.c_str() );
-            else if( temp == "ENERGYMINFIT" ) fEnergyFitMin = atof( temp2.c_str() );
-            else if( temp == "ENERGYMAXFIT" ) fEnergyFitMax = atof( temp2.c_str() );
             else if( temp == "ENERGYEFFECTIVEAREAS" )
             {
                 if( temp2 == "MC" )        fEffectiveAreaVsEnergyMC = 0;
                 else if( temp2 == "REC" )  fEffectiveAreaVsEnergyMC = 1;
-		else if( temp2 == "PROB" ) fEffectiveAreaVsEnergyMC = 2;
                 else
                 {
                     cout << "Unknown parameter for ENERGYEFFECTIVEAREAS in parameter file " << i_filename << ": " << temp2 << endl;
-                    cout << "use MC, REC or PROB (default)" << endl;
+                    cout << "use MC or REC (default)" << endl;
                     return 0;
                 }
             }
@@ -554,9 +549,8 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
             }
             else
             {
-                cout << "Unknown line in parameter file " << i_filename << ": " << endl;
+                cout << "Warning: unknown line in parameter file " << i_filename << ": " << endl;
                 cout << is_line << endl;
-                return 0;
             }
         }
     }
@@ -982,11 +976,11 @@ void VAnaSumRunParameter::printStereoParameter( unsigned int i )
         cout << "\t time intervall for rate plots: " << fTimeIntervall << " s (" << fTimeIntervall/60. << " min)" << endl;
         cout << "\t effective areas from " << fRunList[i].fEffectiveAreaFile << endl;
         cout << "\t sky plot binning [deg] " << fSkyMapBinSize << "\t" << fSkyMapBinSizeUC << endl;
-        cout << "\t sky plot size [deg]: " << fSkyMapSizeXmin << " < X < " << fSkyMapSizeXmax << ", " << fSkyMapSizeYmin << " < Y < " << fSkyMapSizeYmax << endl;
-        cout << "\t energy spectra parameters (binsize, min, max) (log): " << fEnergySpectrumBinSize << "\t" << fEnergyFitMin << "\t" << fEnergyFitMax;
+        cout << "\t sky plot size [deg]: " << fSkyMapSizeXmin << " < X < " << fSkyMapSizeXmax;
+	cout << ", " << fSkyMapSizeYmin << " < Y < " << fSkyMapSizeYmax << endl;
+        cout << "\t energy spectra parameters (binsize, log10): " << fEnergySpectrumBinSize;
         if( fEffectiveAreaVsEnergyMC == 0 )      cout << " (use effective area A_MC)";
 	else if( fEffectiveAreaVsEnergyMC == 1 ) cout << " (use effective area A_REC)";
-        else                                     cout << " (use effective area A_PROB)";
         cout << ", Method " << fEnergyReconstructionMethod << endl;
 
         cout << "\t background model: ";

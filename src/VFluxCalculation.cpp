@@ -1552,7 +1552,7 @@ void VFluxCalculation::plotFluxesVSPedvars()
     TGraphErrors *gFluxPedvars = new TGraphErrors( (int)fRunMJD.size() - 1 );
     gFluxPedvars->SetTitle( "" );
     gFluxPedvars->SetMarkerStyle( 20 );
-    gFluxPedvars->SetMarkerSize( 1.5 );
+    gFluxPedvars->SetMarkerSize( 1. );
     gFluxPedvars->SetLineWidth( 2 );
 
     int z = 0;
@@ -1590,7 +1590,7 @@ void VFluxCalculation::plotFluxesVSWobbleOffset()
     TGraphErrors *gFluxWobbleOffset = new TGraphErrors( (int)fRunMJD.size() - 1 );
     gFluxWobbleOffset->SetTitle( "" );
     gFluxWobbleOffset->SetMarkerStyle( 20 );
-    gFluxWobbleOffset->SetMarkerSize( 2 );
+    gFluxWobbleOffset->SetMarkerSize( 1 );
     gFluxWobbleOffset->SetLineWidth( 2 );
 
     int z = 0;
@@ -1632,7 +1632,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSElevation( bool iDraw, double iConst
     gFluxElevation = new TGraphErrors( (int)fRunMJD.size() - 1 );
     gFluxElevation->SetTitle( "" );
     gFluxElevation->SetMarkerStyle( 20 );
-    gFluxElevation->SetMarkerSize( 1.5 );
+    gFluxElevation->SetMarkerSize( 1. );
     gFluxElevation->SetLineWidth( 2 );
 
     int z = 0;
@@ -1698,7 +1698,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJD( char *iTex, double iMJDOffset, 
     gFluxMJD->SetMarkerStyle( iMarkerStyle );
     gFluxMJD->SetMarkerColor( iMarkerColor );
     gFluxMJD->SetLineColor( iMarkerColor );
-    gFluxMJD->SetMarkerSize( 1.5 );
+    gFluxMJD->SetMarkerSize( 1. );
     gFluxMJD->SetLineWidth( 2 );
 
     vector< int > iV_Run;
@@ -1783,7 +1783,7 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char *iTex, double iM
     gFluxInBINs->SetMarkerStyle( iMarkerStyle );
     gFluxInBINs->SetMarkerColor( iMarkerColor );
     gFluxInBINs->SetLineColor( iMarkerColor );
-    gFluxInBINs->SetMarkerSize( 2 );
+    gFluxInBINs->SetMarkerSize( 1. );
     gFluxInBINs->SetLineWidth( 2 );
 
     vector< int > iV_Run;
@@ -1987,7 +1987,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char *iTex, double iMJDOff
 
     gFluxMJDDay->SetTitle( "" );
     gFluxMJDDay->SetMarkerStyle( 20 );
-    gFluxMJDDay->SetMarkerSize( 2 );
+    gFluxMJDDay->SetMarkerSize( 1 );
     gFluxMJDDay->SetLineWidth( 2 );
 
     int z = 0;
