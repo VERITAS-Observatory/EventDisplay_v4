@@ -137,7 +137,7 @@ class VLowGainCalibrator {
 
 	bool makeMonitorChargeHists( );
 	bool findLightLevels();
-	int checkLightLevels( int tel, int iPeakSignificance=2, bool iDraw=false );
+	int  checkLightLevels( int tel, bool iDraw=false );
 	bool calculateMeanCharges();
 
 	bool doTheFit( ) ;

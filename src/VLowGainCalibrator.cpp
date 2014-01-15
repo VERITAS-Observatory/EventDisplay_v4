@@ -180,15 +180,21 @@ bool VLowGainCalibrator::makeMonitorChargeHists( ) {
 }
 
 
-bool VLowGainCalibrator::findLightLevels() {
-	for(int tel=0; tel<fNTel; tel++) {
-
-		fillLightLevels( tel, 2);
-//		if(checkLightLevels(tel ) == 2) { 
-//			fillLightLevels(tel, 3);
-//		}
+bool VLowGainCalibrator::findLightLevels() 
+{
+    for(int tel=0; tel<fNTel; tel++) 
+    {
+	fillLightLevels( tel, 2 );
+	
+	// make some checks on the goodness of found light levels 
+	int test = checkLightLevels( tel );
+	if( test ==  2 ) 
+	{
+	    cout << "         Rerun the light level finder for telescope " << tel+1 << endl;
+	    fillLightLevels( tel, 3 );
 	}
-	return true;
+    }
+    return true;
 }
 
 
@@ -205,6 +211,14 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
     fLightLevelMeanError[tel].clear();
     fLightLevelWidth[tel].clear();
     fLightLevelWidthError[tel].clear();
+
+// check first that monitoring charge histogram exists
+    if( (int)fMonitorChargeHist[tel]->GetEntries() == 0 ) 
+    {
+	cout << "ERROR: Could not find histogram with monitoring charges for telescope " << tel+1 << "." << endl;
+	cout << "       Have you run VLowGainCalibrator::makeMonitorChargeHists() before?" << endl;
+	return;
+    }
 
     TCanvas *c1 = NULL;
     if(fDEBUG) iDraw=true;
@@ -274,7 +288,7 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
     TH1D *h2;
     if( rebin ) h2 = (TH1D*)ihist->Clone("h2");
     else 	h2 = (TH1D*)fMonitorChargeHist[tel]->Clone("h2"); 
-    if( !h2 ) 
+    if( (int)h2->GetEntries() == 0 ) 
     {
 	cout << "ERROR: Could not find histogram to be used for fitting the light level for tel " << tel+1  << "." << endl;
 	return;
@@ -364,12 +378,12 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
 }
 	
 
-int VLowGainCalibrator::checkLightLevels( int tel, int iPeakSignificance, bool iDraw )
+int VLowGainCalibrator::checkLightLevels( int tel, bool iDraw )
 {
 
     if( fNLightLevels[tel] == 0 )
     {
-	cout << "error: No light levels found." << endl;
+	cout << "ERROR: No light levels found for telescope " << tel+1 << "." << endl;
 	return -1;
     } 
 
