@@ -1,8 +1,8 @@
 
-Command line options:
-=====================
+evndisp command line options:
+=============================
 
-(observe: default values are good for a standard analysis)
+(observe: default values are in general good for a standard analysis)
 
 General:
 --------
@@ -35,8 +35,9 @@ General:
 Output:
 -------
 	 -output FILE.root 			 file with analysis results (FILE=-1 means no output) (default=RUNNUMBER.root)
-	 -writeallMC 				 write all events to showerpars and tpars trees (default: off)
-	 -writenoMCTree 			 do not write MC event tree to output file (default: 1)
+	 -writeallMC 				 write all events, even those without array trigger, to showerpars and
+	                                         tpars trees (MC only, default: off)
+	 -writenoMCTree 			 do not write MC event tree to output file (MC only, default: 1)
 	 -printdeadpixelinfo         		 print list of the telescope, gain, and channel number of all disabled 
 	                                         channels to <runnumber>.evndisp.log 
 						 each line will contain the word DEADCHAN for easy grep-ability, 
@@ -87,10 +88,12 @@ Pointing:
 	 				  	 is larger than this value
 						 ([deg], default=999 deg)
 	 -pointingErrorX=INT:FLOAT 		 take pointing error in array reconstruction into account
-						 (camera x-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorX=1:0.05)
+						 (camera x-direction [deg], default 0, 
+						 usage: for telescope 1 do for example: -pointingErrorX=1:0.05)
 						 (NOTE: experts only; option disables reading of pointing values from the DB)
 	 -pointingErrorY=INT:FLOAT 			 take pointing error in array reconstruction into account
-						 (camera y-direction [deg], default 0, usage: for telescope 1 do for example: -pointingErrorY=1:0.05)
+						 (camera y-direction [deg], default 0, 
+						 usage: for telescope 1 do for example: -pointingErrorY=1:0.05)
 						 (NOTE: experts only; option disables reading of pointing values from the DB)
 	 -useDBtracking 			 use database to calculate pointing errors (default: on, switch off with -usenodbtracking )
 	 -useTCorrectionfrom SQL-DATE 		 use pointing calculated with T-point correction valid for this data
@@ -159,8 +162,9 @@ Simulations:
 	 -pedestalfile FILENAME 		 use pedestals from P lines in this pedestal file (default: Off)
 	 -pedestalnoiselevel=int 		 GrIsu noise level used for external pedestal file (default=250)
 	 -pedestalDefaultPedestal=float 	 GrIsu default pedestals used in simulations (default=15.)
-	 -printGrisuHeader=0/1/2		 0 (default)=nothing, 	1=Reproduce full grisu simulation header including detector config file (from VBF header).
-	 								2=Print config file name that was used for detector simulation, if available.
+	 -printGrisuHeader=0/1/2		 0 (default)=nothing, 	
+	                                         1=Reproduce full grisu simulation header including detector config file (from VBF header).
+	 				 	 2=Print config file name that was used for detector simulation, if available.
 
 Others:
 -------

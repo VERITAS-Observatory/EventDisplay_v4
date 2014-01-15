@@ -7,7 +7,7 @@ Prerequisites
 (0.1) ROOT must be installed 
       version >= 5.32
       Compiling options should be 
-       ./configure --enable-minuit2 --enable-mysql --enable-tmva
+       ./configure --enable-minuit2 --enable-mysql
 
 VERITAS analysis
 ----------------
@@ -36,7 +36,7 @@ Optional
 
 (3.0) for all FITS related output, cfitsio is needed (see http://heasarc.gsfc.nasa.gov/fitsio/)
 
-(3.1) GSL libraries
+(3.1) GSL libraries (needed for FROGS image template method)
       http://www.gnu.org/software/gsl/
 
 Environmental Variables
@@ -55,6 +55,8 @@ VBSYS :     VBF libraries (for VERITAS analysis only); add $VBFSYS/bin to $PATH 
             (VBF is not needed for CTA analysis)
 
 FITSSYS :   FITS libraries (optional, not needed in most cases)
+
+GSLSYS :    GSL libraries (needed for FROGS image template method)
 
 Analysis
 --------
@@ -77,14 +79,12 @@ For CTA analysis, the following directories are needed:
 CTA_EVNDISP_AUX_DIR:      directory with all auxiliary data like calibration files, lookup tables, effective areas, etc
 CTA_DATA_DIR :            global data directory: containing raw data or input simulation files
 CTA_USER_DATA_DIR :       user data directory: containing output files from this analysis package (most of them in root format)
-CTA_USER_LOG_DIR :        user log file directory: containing log files from this analysis package
 
 For VERITAS analysis, the following directories are needed:
 
 VERITAS_EVNDISP_AUX_DIR:  directory with all auxiliary data like calibration files, lookup tables, effective areas, etc
 VERITAS_DATA_DIR :        directory containing the raw telescope data or input simulation files 
 VERITAS_USER_DATA_DIR :   user data directory: containing output files from this analysis package (most of them in root format)
-VERITAS_USER_LOG_DIR :    user log file directory: containing log files from this analysis package
 
 To switch settings for the different observatory (in the $EVNDISPSYS directory): 
 

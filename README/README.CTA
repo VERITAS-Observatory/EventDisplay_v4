@@ -24,8 +24,8 @@ iii) EVNDISPSYS/bin/mscw_energy
 iv)  EVNDISPSYS/bin/makeEffectiveArea
         Make effective areas
 
-v)   EVNDISPSYS/macros/plot_sensitivity.C
-        plot sensitivity curves
+v)   EVNDISPSYS/bin/writeCTAWPPhysSensitivityFiles
+        write CTA sensitivity curves
 
 (For most of the stuff there are scripts to run the analysis on the DESY batch system. Use them to simplify your life!)
 
@@ -34,7 +34,7 @@ Analysis
 
 NOTE:
 By converting a CTA.simtel.gz file into evndisp.root format you have to specify a subarray!
-EVNDISP is not able to handle the complete 275 telescopes at once!
+EVNDISP is not able to handle the complete 275 telescopes at once, the maximum is 100 telescopes.
 
 Step 1: Converter
 -----------------
@@ -83,4 +83,3 @@ $EVNDISPSYS/scripts/CTA/CTA.EFFAREA.sub_analyse.sh
 For the first time you have to use mscw files as input since MCpars has to be analysed once. 
 If you change your cuts afterwards (but not the number of input files) you can use the faster version by using
 the effective area file as input (helps a lot for protons).
-

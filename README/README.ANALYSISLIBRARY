@@ -5,4 +5,6 @@ The shared libary $EVNDISP/lib/libVAnaSum.so contains many useful classes to ana
 
 Usage: on the root command line
 
+looad .L $EVNDISP/lib/libVAnaSum.so
+
 (.... please fill this documentation .....)
