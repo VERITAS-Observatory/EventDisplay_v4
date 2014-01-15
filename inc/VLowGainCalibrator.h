@@ -47,10 +47,10 @@ class VLowGainCalibrator {
 	
 	TTree * fDsttree;	
 
-	int iChanMon_start;
-	int iChanMon_stop;
-	int iChan_start;
-	int iChan_stop;
+	int fChanMon_start;
+	int fChanMon_stop;
+	int fChan_start;
+	int fChan_stop;
 
 	int fNLiveMonitor_min;
 	bool fUseMedian;
@@ -93,7 +93,17 @@ class VLowGainCalibrator {
 	double fTree_chi2[2];
 	int fTree_ndf[2];
 	status fTree_status[2];
- 
+
+	TTree * fDebugtree[fNTel];
+	int fTree_eventNumber;
+	double fTree_QMon;
+	double fTree_QMonMean;
+	int fTree_level;
+	double fTree_Q;
+	int fTree_hilo;
+	
+	vector<double> fLMult;
+	vector<int> fDebugChannels;
 
 	bool isNewPixel( int tel, int iChan);
 
@@ -134,9 +144,13 @@ class VLowGainCalibrator {
 
 	bool terminate(  );
 	void fillLightLevels( int tel, int iPeakSignificance=2 , bool iDraw=false );
+	void setLowGainMultiplierUsedInDST(double lmult=6.0 ) { fLMult.assign(fNTel, lmult); } 
 
-
-	ClassDef(VLowGainCalibrator,2);
+	void setDebugChannels( vector<int> channels )		{ fDebugChannels=channels ; }
+	void addDebugChannel( int channel )			{ fDebugChannels.push_back(channel); }
+	void setAllDebugChannels() 				{ fDebugChannels.clear(); for(int i=fChan_start; i<fChan_stop; i++) fDebugChannels.push_back(i); }
+	bool isDebugChannel(int channel )			{ return std::find( fDebugChannels.begin(), fDebugChannels.end(), channel ) != fDebugChannels.end(); }   
+	ClassDef(VLowGainCalibrator,3);
 
 
 };

@@ -6,16 +6,16 @@ VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TStrin
 	fRun=run;
 	fWindow=sw;
 	if( isInnerHigh ) {
-		iChanMon_start=250;
-		iChanMon_stop=499;
-		iChan_start=0;
-		iChan_stop=250;
+		fChanMon_start=250;
+		fChanMon_stop=499;
+		fChan_start=0;
+		fChan_stop=250;
 	}
 	else {
-		iChanMon_start=0;
-		iChanMon_stop=250;
-		iChan_start=250;
-		iChan_stop=499;
+		fChanMon_start=0;
+		fChanMon_stop=250;
+		fChan_start=250;
+		fChan_stop=499;
 	}
 
 
@@ -38,7 +38,7 @@ VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TStrin
 	}
 
 	for(int tel=0; tel<fNTel; tel++) {
-		name.Form( "%s/Tel_%d/%d.lped.root", dir.Data(), tel+1, run);
+		name.Form( "%s/Tel_%d/%d.lmult.root", dir.Data(), tel+1, run);
 		fOutfile[tel] = new TFile( name.Data(), "recreate");
 		name.Form( "slopes_%d_%d", tel+1, sw);
 		fOuttree[tel] = new TTree( name.Data(), name.Data() );
@@ -50,7 +50,20 @@ VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TStrin
 		fOuttree[tel]->Branch("ndf", 		&fTree_ndf, 		"ndf[2]/I");
 		fOuttree[tel]->Branch("status", 	&fTree_status, 		"status[2]/I");
 
+		name.Form( "debug_%d_%d", tel+1, sw);
+		fDebugtree[tel] = new TTree( name.Data(), name.Data() );
+		fDebugtree[tel]->Branch("channel",	&fTree_Channel,		"channel/I");
+		fDebugtree[tel]->Branch("eventNumber",	&fTree_eventNumber,	"eventNumber/I");
+		fDebugtree[tel]->Branch("level",	&fTree_level,		"level/I");
+		fDebugtree[tel]->Branch("hilo"	,	&fTree_hilo,		"hilo/I");
+		fDebugtree[tel]->Branch("QMon",		&fTree_QMon,		"QMon/D");
+		fDebugtree[tel]->Branch("QMonMean",	&fTree_QMonMean,	"QMonMean/D");
+		fDebugtree[tel]->Branch("Q",		&fTree_Q,		"Q/D");
+		
+
 	}
+	setLowGainMultiplierUsedInDST();
+	
 }
 
 
@@ -102,7 +115,7 @@ double VLowGainCalibrator::calcMeanMonitorCharge(int tel, int ientry) {
 	if(ientry>-1) fDsttree->GetEntry(ientry);
 	int nLive=0;
 	double mean = 0;
-	for(int iChan=iChanMon_start; iChan<iChanMon_stop; iChan++) {
+	for(int iChan=fChanMon_start; iChan<fChanMon_stop; iChan++) {
 		if( dead[tel][iChan] || HiLo[tel][iChan] ) continue;
 		if( isNewPixel( tel, iChan) ) continue;
 		if( sum[tel][iChan] < fSumMonitor_min ) continue;		
@@ -119,7 +132,7 @@ double VLowGainCalibrator::calcMedianMonitorCharge(int tel, int ientry) {
 	if(ientry>-1) fDsttree->GetEntry(ientry);
 	int nLive=0;
 	vector<double> Qmon;
-	for(int iChan=iChanMon_start; iChan<iChanMon_stop; iChan++) {
+	for(int iChan=fChanMon_start; iChan<fChanMon_stop; iChan++) {
 		if( dead[tel][iChan] || HiLo[tel][iChan] ) continue;
 		if( isNewPixel( tel, iChan) ) continue;
 		if( sum[tel][iChan] < fSumMonitor_min ) continue;		
@@ -186,7 +199,13 @@ bool VLowGainCalibrator::findLightLevels() {
 */
 void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool iDraw )
 {
-  
+  	
+    fLightLevelMean[tel].clear();
+    fLightLevelMeanError[tel].clear();
+    fLightLevelWidth[tel].clear();
+    fLightLevelWidthError[tel].clear();
+    fNLightLevels[tel]=0;
+
     TH1D* ihist = fMonitorChargeHist[tel];
     TCanvas *c1 ;
     if(fDEBUG) iDraw=true;
@@ -246,7 +265,7 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
 	    cout << "       Set number of peaks to zero! "<< endl;
 	    cout << "       exiting... " << endl;
 	    iNfound = 0;
-	    exit(-1);
+	    return;
 	}
 	cnt++;
     }
@@ -255,7 +274,7 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
     if( !h2 ) 
     {
 	cout << "ERROR: Could not find histogram to be used for fitting the light level for tel " << tel+1  << "." << endl;
-	exit(-1);
+	return;
     }
 
     
@@ -324,11 +343,6 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
 	{
 	    fNLightLevels[tel]=npeaks;
 	    if( fDEBUG ) cout << "#light levels in tel " << tel+1 << " : " << npeaks << endl;
-
-	    fLightLevelMean[tel].clear();
-	    fLightLevelMeanError[tel].clear();
-	    fLightLevelWidth[tel].clear();
-	    fLightLevelWidthError[tel].clear();
 
 	    for( unsigned int i=0; i<fNLightLevels[tel]; i++ )
 	    {
@@ -399,7 +413,7 @@ int VLowGainCalibrator::checkLightLevels( int tel, int iPeakSignificance, bool i
 bool VLowGainCalibrator::calculateMeanCharges() {
 	//initialise vectors
 	for(int tel=0; tel<fNTel; tel++) {
-		for(int iChan=iChan_start; iChan<iChan_stop; iChan++) {
+		for(int iChan=fChan_start; iChan<fChan_stop; iChan++) {
 			for(int hilo=0; hilo<2; hilo++) {
 				fN[tel][iChan][hilo].assign( fNLightLevels[tel], 0);
 				fY[tel][iChan][hilo].assign( fNLightLevels[tel], 0);
@@ -438,7 +452,7 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 			N[0]=0;
 			N[1]=0;
 
-			for(int iChan=iChan_start; iChan<iChan_stop; iChan++) {
+			for(int iChan=fChan_start; iChan<fChan_stop; iChan++) {
 
 				if( dead[tel][iChan] ) continue;
 
@@ -456,15 +470,25 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 				start2[hilo]=sqrt( start2[hilo] - start[hilo]*start[hilo] );
 			}//hilo
 
-			for(int iChan=iChan_start; iChan<iChan_stop; iChan++) {
+			for(int iChan=fChan_start; iChan<fChan_stop; iChan++) {
 
 				if( dead[tel][iChan] ) continue;
-				if( fabs( sumfirst[tel][iChan] - start[ HiLo[tel][iChan] ] ) > 2*start2[ HiLo[tel][iChan] ] ) continue; 				
+	//todo test this			if( fabs( sumfirst[tel][iChan] - start[ HiLo[tel][iChan] ] ) > 2*start2[ HiLo[tel][iChan] ] ) continue; 				
 
 				fN [tel][iChan][ HiLo[tel][iChan] ][level]++;
-				fY [tel][iChan][ HiLo[tel][iChan] ][level]+=sum[tel][iChan];
-				fY2[tel][iChan][ HiLo[tel][iChan] ][level]+=sum[tel][iChan]*sum[tel][iChan];
+				fY [tel][iChan][ HiLo[tel][iChan] ][level]+=sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0);
+				fY2[tel][iChan][ HiLo[tel][iChan] ][level]+=TMath::Power( sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) , 2) ;
 
+				if( isDebugChannel( iChan ) ) {
+					fTree_eventNumber=eventNumber;
+					fTree_Channel=iChan;
+					fTree_level=level;
+					fTree_hilo=HiLo[tel][iChan];
+					fTree_Q=sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) ;
+					fTree_QMon=qmon;
+					fTree_QMonMean=fLightLevelMean[tel][level];
+					fDebugtree[tel]->Fill();
+				}
 			}//chan
 
 		}//tel
@@ -474,7 +498,7 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 	//now fix normalization etc.
 
 	for(int tel=0; tel<fNTel; tel++) {
-		for(int iChan=iChan_start; iChan<iChan_stop; iChan++) {
+		for(int iChan=fChan_start; iChan<fChan_stop; iChan++) {
 			for(int hilo=0; hilo<2; hilo++) {
 				for(unsigned int ilevel=0; ilevel<fNLightLevels[tel]; ilevel++) {
 					if( fN[tel][iChan][hilo][ilevel]==0 ) continue;
@@ -491,7 +515,7 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 bool VLowGainCalibrator::doTheFit() {
 
 	for(int tel=0; tel<fNTel; tel++) {
-		for(int iChan=iChan_start; iChan<iChan_stop; iChan++) {
+		for(int iChan=fChan_start; iChan<fChan_stop; iChan++) {
 
 		fTree_Channel=iChan;	
 
@@ -573,6 +597,7 @@ bool VLowGainCalibrator::terminate( ) {
 	for(int tel=0; tel<fNTel; tel++) {
 		fOutfile[tel]->cd();
 		fOuttree[tel]->Write();
+		if(fDebugtree[tel] && fDebugtree[tel]->GetEntries() > 0 ) fDebugtree[tel]->Write();
 		fOutfile[tel]->Close();
 	}
 	return true;
