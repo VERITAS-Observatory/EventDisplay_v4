@@ -199,31 +199,33 @@ bool VLowGainCalibrator::findLightLevels() {
 */
 void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool iDraw )
 {
-  	
+// reset vectors
+    fNLightLevels[tel]=0;
     fLightLevelMean[tel].clear();
     fLightLevelMeanError[tel].clear();
     fLightLevelWidth[tel].clear();
     fLightLevelWidthError[tel].clear();
-    fNLightLevels[tel]=0;
 
-    TH1D* ihist = fMonitorChargeHist[tel];
-    TCanvas *c1 ;
+    TCanvas *c1 = NULL;
     if(fDEBUG) iDraw=true;
     if( iDraw ) {
-	c1 = new TCanvas("c1","c1",10,10,500,400);
+	c1 = new TCanvas("c1","c1",10,10,800,600);
 	c1->Divide(1,2); c1->cd(1);
-	ihist->Draw();
+	fMonitorChargeHist[tel]->Draw();
     }
+
+// exclude the zero light level for finding the light levels 
+// (might be greater than zero in case the median is used)
+    fMonitorChargeHist[tel]->GetXaxis()->SetRangeUser(10,1000); 
+
 // find peaks (there should be 7 if the flasher is ok)
     int iLightLevel = 7;
-
     TSpectrum *s = new TSpectrum( 2*iLightLevel );
-
     if( iDraw ) { 
-	s->Search( ihist, iPeakSignificance, "", 0.05 ); 
+	s->Search( fMonitorChargeHist[tel], iPeakSignificance, "", 0.05 ); 
 	c1->cd(2);
     } else
-        s->Search( ihist, iPeakSignificance, "goff", 0.05 ); 
+        s->Search( fMonitorChargeHist[tel], iPeakSignificance, "goff", 0.05 ); 
 
     int iNfound = s->GetNPeaks();
     if( fDEBUG ) s->Print();
@@ -232,18 +234,18 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
 
     bool rebin = false;
     int cnt = 0;
-    TH1D *ihist2, *h2 ;
+    TH1D *ihist;
     while( iNfound > iLightLevel )
     {
-	ihist2 = (TH1D*)ihist->Clone("ihist2");
-	ihist2->Rebin( cnt+1 );
+	ihist = (TH1D*)fMonitorChargeHist[tel]->Clone("ihist2");
+	ihist->Rebin( cnt+1 );
 	
 	if( iDraw ) 
 	{
-	    ihist2->Draw();
-	    s->Search( ihist2, 2, "", 0.05 );
+	    ihist->Draw();
+	    s->Search( ihist, iPeakSignificance, "", 0.05 );
 	} else 
-	    s->Search( ihist2, 2, "goff", 0.05 );
+	    s->Search( ihist, iPeakSignificance, "goff", 0.05 );
 	
 	iNfound = s->GetNPeaks();
 	
@@ -256,10 +258,10 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
 	if( cnt == 3 )
 	{
 	    cout << endl;
-	    cout << "WARNING: Even after three rebinning attempts more then " << fNLightLevels[tel] << " light levels are found for tel " << tel+1  << "." << endl;
+	    cout << "WARNING: Even after three rebinning attempts more then " << iNfound << " light levels are found for tel " << tel+1  << "." << endl;
 	    cout << "         Please manually inspect the histogram for goodness of this calibration run." << endl << endl;
 	}
-	else if( cnt >= 10 || cnt >= (ihist->GetEntries()/ihist->GetNbinsX()) ) 
+	else if( cnt >= 10 || cnt >= (fMonitorChargeHist[tel]->GetEntries()/fMonitorChargeHist[tel]->GetNbinsX()) ) 
 	{
 	    cout << "ERROR: Too many peaks found even after " << cnt << " rebinning attempts for tel " << tel+1  << "." << endl;
 	    cout << "       Set number of peaks to zero! "<< endl;
@@ -269,8 +271,9 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
 	}
 	cnt++;
     }
-    if( rebin ) h2 = (TH1D*)ihist2->Clone("h2");
-    else 	h2 = (TH1D*)ihist->Clone("h2"); 
+    TH1D *h2;
+    if( rebin ) h2 = (TH1D*)ihist->Clone("h2");
+    else 	h2 = (TH1D*)fMonitorChargeHist[tel]->Clone("h2"); 
     if( !h2 ) 
     {
 	cout << "ERROR: Could not find histogram to be used for fitting the light level for tel " << tel+1  << "." << endl;
@@ -280,20 +283,21 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
     
 // estimate background using a linear fitting method
     TF1 *iline = new TF1("iline","pol1",0,1000);
-    ihist->Fit("iline","qn");
+    fMonitorChargeHist[tel]->Fit("iline","qn");
+    fMonitorChargeHist[tel]->GetXaxis()->UnZoom();
 
     double par[300];
-    par[0] = iline->GetParameter(0);
-    par[1] = iline->GetParameter(1);
+    par[1] = iline->GetParameter(0);
+    par[2] = iline->GetParameter(1);
 
-    if( par[0] > 10 )
+    if( par[1] > 10 )
     {
 	cout << endl;
 	cout << "WARNING: The estimated linear background seems high for tel " << tel+1  << "." << endl;
 	cout << "         Please manually inspect the histogram for goodness of this calibration run" << endl << endl;
     }
 
-// eliminate peaks with light level zero (sometimes found in the first bin) 
+// eliminate peaks with light level zero
 // and too small peaks at the background level
     int npeaks = 0;
     for( int i=0; i<iNfound; i++ )
@@ -318,7 +322,7 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
     {
 	cout << "ERROR: Found more than 7 light levels (this should not happen) " << endl
 	     << "       Please check if distinct light levels exist" << endl;
-	exit( -1 );
+	return;
     }
     else 
     {
@@ -336,7 +340,7 @@ void VLowGainCalibrator::fillLightLevels( int tel, int iPeakSignificance , bool 
 	TString iStatus( gMinuit->fCstatu );
 	if( !iStatus.CompareTo("CONVERGED") )
 	{
-	    cout << "ERROR: Fit of the peaks did not converge! " << endl;
+	    cout << "ERROR: Fit of the peaks did not converge for telescope " << tel+1 << "!" << endl;
 	    fNLightLevels[tel]=0;
 	} 
 	else 
