@@ -20,6 +20,7 @@ VPlotLookupTable::VPlotLookupTable()
    setPlottingLogEnergyAxis();
    setPlottingLogSizeAxis();
    setPlottingDistanceAxis();
+   setCanvasSize( 450, 400 );
 }
 
 void VPlotLookupTable::printLookupTables()
@@ -55,7 +56,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F *h, unsigned int iSetID, string iti
 	     fLookupTableData[iSetID]->fLookupTable.c_str(), fLookupTableData[iSetID]->fZe,
 	     fLookupTableData[iSetID]->fAz, fLookupTableData[iSetID]->fNoise, 1./100.*(double)fLookupTableData[iSetID]->fWobbleOffset );
 
-   TCanvas *cE = new TCanvas( hname, htitle, iCanvasX, 10, 450, 400 );
+   TCanvas *cE = new TCanvas( hname, htitle, iCanvasX, 10, fPlottingCanvasX, fPlottingCanvasY );
    cE->SetGridx( 0 );
    cE->SetGridy( 0 );
    cE->SetLeftMargin( 0.13 );
