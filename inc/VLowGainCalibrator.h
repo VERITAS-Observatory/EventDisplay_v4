@@ -130,9 +130,6 @@ class VLowGainCalibrator {
 	void setFitOptions( int n_min=2, double pure_min=0.8, double prob_min=0.01, double b_max=2.0 );
 	bool fIsOk();
   
-	bool setDST( TTree * dst );
-	void resetVectors();
-
 	bool makeMonitorChargeHists( );
 	int  checkLightLevels( int tel, bool iDraw=false );
 	bool calculateMeanCharges();
