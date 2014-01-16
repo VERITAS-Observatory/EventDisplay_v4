@@ -25,22 +25,32 @@ VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TStrin
 
 	TString iName=TString::Format("%s/%d.DST.root", dir.Data(), run);
 	fInfile = new TFile( iName.Data(), "read");
-	fDsttree = (TTree*)fInfile->Get("dst");
-	if(fDsttree) {
-	
-		fDsttree->SetBranchAddress("sumfirst",&sumfirst);
-		fDsttree->SetBranchAddress("sum",&sum);
-		fDsttree->SetBranchAddress("HiLo",&HiLo);
-		fDsttree->SetBranchAddress("sumwindow",&sumwindow);
-		fDsttree->SetBranchAddress("eventNumber",&eventNumber);
-		fDsttree->SetBranchAddress("dead",&dead);
+	if( !fInfile || fInfile->IsZombie() )  { 
+		cout << "ERROR: Input file " << iName << " does not exist, exiting immediately..." << endl;
+		exit( 2);
 	}
+	fDsttree = (TTree*)fInfile->Get("dst");
+	if( !fDsttree )  { 
+		cout << "ERROR: Input file " << iName << " does not contain a tree named dst, exiting immediately..." << endl;
+		exit( 2);
+	}
+	
+	fDsttree->SetBranchAddress("sumfirst",&sumfirst);
+	fDsttree->SetBranchAddress("sum",&sum);
+	fDsttree->SetBranchAddress("HiLo",&HiLo);
+	fDsttree->SetBranchAddress("sumwindow",&sumwindow);
+	fDsttree->SetBranchAddress("eventNumber",&eventNumber);
+	fDsttree->SetBranchAddress("dead",&dead);
 
 	for(int tel=0; tel<fNTel; tel++) {
 		iName.Form("%s/Tel_%d/", dir.Data(), tel+1);
 		gSystem->mkdir(iName.Data(), "r");
 		iName.Form( "%s/Tel_%d/%d.lmult.root", dir.Data(), tel+1, run);
 		fOutfile[tel] = new TFile( iName.Data(), "recreate");
+		if( !fOutfile[tel] || fOutfile[tel]->IsZombie() ) {
+			cout << "ERROR: Output file " << iName << " could not be opened, exiting immediately..." << endl;
+			exit( 2);
+		}
 		iName.Form( "slopes_%d_%d", tel+1, sw);
 		fOuttree[tel] = new TTree( iName.Data(), iName.Data() );
 
@@ -357,7 +367,14 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
         fit->SetParLimits(0, npeaks, npeaks);
 	fit->SetNpx(1000);
 
-	if( iDraw ) h2->Fit("fit");
+	if( iDraw ) { 
+		h2->Fit("fit");
+		c1->Update();
+		TString iName=TString::Format("light_t%d_%d", tel+1, fWindow);
+		c1->SetName( iName.Data() );
+		fOutfile[tel]->cd();
+		c1->Write();
+	}
 	else        h2->Fit("fit","N");
 
 	TString iStatus( gMinuit->fCstatu );
@@ -466,7 +483,6 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 					break;
 				}
 			} //levels
-			if( level<0) continue;
 			
 			//first calculate mean/sdev of start time for hi/lo channels.
 			
@@ -505,10 +521,11 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 				if( dead[tel][iChan] ) continue;
 	//todo test this			if( fabs( sumfirst[tel][iChan] - start[ HiLo[tel][iChan] ] ) > 2*start2[ HiLo[tel][iChan] ] ) continue; 				
 
-				fN [tel][iChan][ HiLo[tel][iChan] ][level]++;
-				fY [tel][iChan][ HiLo[tel][iChan] ][level]+=sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0);
-				fY2[tel][iChan][ HiLo[tel][iChan] ][level]+=TMath::Power( sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) , 2) ;
-
+				if( level > -1 ) {
+					fN [tel][iChan][ HiLo[tel][iChan] ][level]++;
+					fY [tel][iChan][ HiLo[tel][iChan] ][level]+=sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0);
+					fY2[tel][iChan][ HiLo[tel][iChan] ][level]+=TMath::Power( sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) , 2) ;
+				}
 				if( isDebugChannel( iChan ) ) {
 					fTree_eventNumber=eventNumber;
 					fTree_Channel=iChan;
@@ -516,7 +533,8 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 					fTree_hilo=HiLo[tel][iChan];
 					fTree_Q=sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) ;
 					fTree_QMon=qmon;
-					fTree_QMonMean=fLightLevelMean[tel][level];
+					if( level>-1 ) fTree_QMonMean=fLightLevelMean[tel][level];
+					else fTree_QMonMean=-1;
 					fDebugtree[tel]->Fill();
 				}
 			}//chan
@@ -549,7 +567,7 @@ bool VLowGainCalibrator::doTheFit() {
 		fTree_Channel=iChan;	
 
 			for(int hilo=0; hilo<2; hilo++) {
-				TString name = TString::Format("graph_t%d_c%d_%d", tel+1, iChan, hilo );
+				TString name = TString::Format("graph_t%d_c%d_%d_%d", tel+1, iChan, fWindow, hilo );
 				TGraphErrors * t = new TGraphErrors(0);
 				t->SetName( name.Data() );
 				t->SetTitle( name.Data() );
@@ -578,8 +596,9 @@ bool VLowGainCalibrator::doTheFit() {
 				}
 				else {
 
-
-					t->Fit(f);
+					TString opt="";
+					if(!fDEBUG) opt="Q";
+					t->Fit(f, opt.Data() );
 
 					if (fDEBUG || isDebugChannel(iChan) ) { 
 						fOutfile[tel]->cd();
