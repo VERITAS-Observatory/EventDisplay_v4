@@ -107,9 +107,9 @@ void VLowGainCalibrator::setFitOptions( int n_min, double pure_min, double prob_
 }
 
 /*
-     fit function (to be wrapped in a TF1 objct )
+     fit function (to be wrapped in a TF1 object)
      assume each light level for the monitoring charge is gaussian distributed 
-     and above a linear background (pol1 = par[1] + par[2])
+     and above a linear background (pol1 = par[1] + par[2]*x)
      par[0] is number of peaks.
 */
 Double_t fpeaks( double *x, double *par ) 
@@ -205,19 +205,36 @@ void VLowGainCalibrator::resetLightLevels( int tel) {
     fLightLevelSigmaError[tel].clear();
 }
 
-bool VLowGainCalibrator::findLightLevels(bool iDraw) 
+
+/*
+
+    main function to identify different light levels from the monitoring charge histograms
+    and perform some tests on the goodness of the light levels (loop through all telescopes)
+
+*/
+bool VLowGainCalibrator::findLightLevels( bool iDraw ) 
 {
     for(int tel=0; tel<fNTel; tel++) 
     {
 	findLightLevels( tel, 2 , iDraw);
 	
-	// make some checks on the goodness of found light levels 
 	int test = checkLightLevels( tel );
-	if( test ==  2 ) 
+	if( test == 0 ) 
 	{
-	    cout << "         Rerun the light level finder for telescope " << tel+1 << endl;
+	    cout << "       This is very likely a bad HiLo run for telescope " << tel+1 << "." << endl << endl;
+	    resetLightLevels( tel );
+	}
+	else if( test == 2 ) 
+	{
+	    cout << "         Rerun the light level finder for telescope " << tel+1 << " with higher peak significance." << endl;
 	    findLightLevels( tel, 3, iDraw);
-	    
+
+	    int finaltest = checkLightLevels( tel );
+	    if( finaltest != 1 ) 
+	    {
+		cout << "       Resetting light levels for telescope " << tel+1 << " (likely a bad HiLo run)." << endl << endl;
+		resetLightLevels( tel );
+	    }
 	}
     }
     return true;
@@ -327,7 +344,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
     {
 	cout << endl;
 	cout << "WARNING: The estimated linear background seems high for tel " << tel+1  << "." << endl;
-	cout << "         Please manually inspect the histogram for goodness of this calibration run" << endl << endl;
+	cout << "         Please manually inspect the histogram for goodness of this calibration run." << endl << endl;
     }
 
 // eliminate peaks with light level zero
@@ -353,8 +370,8 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 
     if( npeaks > iLightLevel )
     {
-	cout << "ERROR: Found more than 7 light levels (this should not happen) " << endl
-	     << "       Please check if distinct light levels exist" << endl;
+	cout << "ERROR: Found more than " << iLightLevel << " light levels (this should not happen). " << endl
+	     << "       Please check if distinct light levels exist." << endl;
 	return;
     }
     else 
@@ -378,12 +395,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 	else        h2->Fit("fit","N");
 
 	TString iStatus( gMinuit->fCstatu );
-	if( !iStatus.CompareTo("CONVERGED") )
-	{
-	    cout << "ERROR: Fit of the peaks did not converge for telescope " << tel+1 << "!" << endl;
-	    fNLightLevels[tel]=0;
-	} 
-	else 
+	if( iStatus.Contains("CONVERGED") )
 	{
 	    fNLightLevels[tel]=npeaks;
 	    if( fDEBUG ) cout << "#light levels in tel " << tel+1 << " : " << npeaks << endl;
@@ -399,18 +411,37 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 		if( fDEBUG ) cout << "sigma:  " << fLightLevelSigma[tel][i] << " +/- " << fLightLevelSigmaError[tel][i] << endl;
 	    }
 	}
+	else
+	{
+	    cout << "ERROR: Fit of the peaks did not converge for telescope " << tel+1 << "!" << endl;
+	    resetLightLevels(tel);
+	} 
     }
     delete s;
 }
 	
 
+/*
+
+   Routine to test the goodness of the found light levels
+
+     Return values include the following checks:
+     - Do light levels exist?
+       If not, return value == 0
+     - Are the peaks distinct/well seperated?
+       If not, return value == 2
+
+   If everything seems ok so far, return value should be 1.
+
+*/
 int VLowGainCalibrator::checkLightLevels( int tel, bool iDraw )
 {
 
+// check if light levels have been set
     if( fNLightLevels[tel] == 0 )
     {
-	cout << "ERROR: No light levels found for telescope " << tel+1 << "." << endl;
-	return -1;
+	cout << endl << "ERROR: No light levels found for telescope " << tel+1 << "." << endl;
+	return 0;
     } 
 
 //  check if light levels are distinct
@@ -426,7 +457,8 @@ int VLowGainCalibrator::checkLightLevels( int tel, bool iDraw )
 		else 
 		{
 		    cout << "WARNING: Found two light levels close to each other. " << endl;
-		    if(fDEBUG) cout << fLightLevelMean[tel][i] << " + " << fLightLevelWidth << "*" << fLightLevelSigma[tel][i] << " and " << fLightLevelMean[tel][k] << " - " << fLightLevelWidth << "*" << fLightLevelSigma[tel][k] << endl;
+		    if(fDEBUG) cout << fLightLevelMean[tel][i] << " + " << fLightLevelWidth << "*" << fLightLevelSigma[tel][i] 
+				    << " and " << fLightLevelMean[tel][k] << " - " << fLightLevelWidth << "*" << fLightLevelSigma[tel][k] << endl;
 		    twopeaks=true;
 		}
 	    }
@@ -436,7 +468,8 @@ int VLowGainCalibrator::checkLightLevels( int tel, bool iDraw )
 		else
 		{
 		    cout << "WARNING: Found two light levels close to each other. " << endl;
-		    if(fDEBUG) cout << fLightLevelMean[tel][i] << " + " << fLightLevelWidth << "*" << fLightLevelSigma[tel][i] << " and " << fLightLevelMean[tel][k] << " - " << fLightLevelWidth << "*" <<  fLightLevelSigma[tel][k] << endl;
+		    if(fDEBUG) cout << fLightLevelMean[tel][i] << " + " << fLightLevelWidth << "*" << fLightLevelSigma[tel][i] 
+				    << " and " << fLightLevelMean[tel][k] << " - " << fLightLevelWidth << "*" <<  fLightLevelSigma[tel][k] << endl;
 		    twopeaks=true;
 		}
 	    }
