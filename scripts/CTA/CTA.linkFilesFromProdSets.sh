@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# script to link gammas and electron files from one data set to another
+# script to link evndisp files from location to another
 #
 ########################################################################
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
      echo 
-     echo "./CTA.LinkFilesFromProdSets.sh <sub array list> <AnalysisDirectory> <Loc 1> <Loc 2> "
+     echo "./CTA.LinkFilesFromProdSets.sh <sub array list (old)> <prefix> <AnalysisDirectory> <particle>"
      echo
      echo "  <sub array list>          text file with list of subarray IDs"
      echo
@@ -20,21 +20,25 @@ ANADIR=$2
 ###############################################################
 # loop over all arrays
 VARRAY=`awk '{printf "%s ",$0} END {print ""}' $1`
+
 for ARRAY in $VARRAY
 do
-   echo "STARTING ARRAY $ARRAY"
+   ARRAYN="N.$ARRAY"
+   echo "SOURCE FIlES ARRAY $ARRAY  $ARRAYN"
 
-   SDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$3/$ARRAY/$ANADIR/"
-   ODIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$4/$ARRAY/$ANADIR/"
+   SDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$3/$ARRAYN/$4"
+   DDIR="$CTA_USER_DATA_DIR/analysis/AnalysisData/$3/$ARRAY/$4"
 
-# make sure that upper directory exists
-   mkdir -p $ODIR
+   FLIST=`ls $SDIR/*.root`
+   for F in $FLIST
+   do
+      NF=`basename $F`
+      NF=${NF//_/_G_}
 
-   echo $SDIR
-   echo $ODIR
-#   ln -f -s $SDIR/gamma* $ODIR/
-#   ln -f -s $SDIR/elec* $ODIR/
-   ln -s $SDIR/*.root $ODIR/
+      echo $NF
+      ln -s $F $CTA_USER_DATA_DIR/analysis/AnalysisData/$3/$ARRAY/$4/$NF 
+
+   done
 done
 
 exit

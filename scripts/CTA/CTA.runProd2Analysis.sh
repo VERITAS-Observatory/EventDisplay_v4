@@ -25,7 +25,7 @@ RUN="$2"
 # qsub options
 #   _M_ = -; _X_ = " "
 QSUBOPT="_M_P_X_cta_high"
-QSUBOPT="_M_P_X_cta_high_X__M_js_X_2000"
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_200"
 
 #####################################
 # output directory for script parameter files
@@ -37,13 +37,16 @@ mkdir -p $PDIR
 if [[ $P2 == "S" ]]
 then
    SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
-   SITE=( "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
+   SITE=( "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
+   SITE=( "prod2-LeoncitoPP-NS" )
+   SITE=( "prod2-Aar-500m-NS" )
+   ARRAY="subArray.2S-sub.lis"
    ARRAY="subArray.2a.list"
 elif [[ $P2 == "N" ]]
 then
    SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
-   ARRAY="subArray.2NN-sub.list"
    ARRAY="subArray.2NN.list"
+   ARRAY="subArray.2NN-sub.list"
    ARRAY="subArray.2NN-fullList.list"
 else
    echo "error: unknown site; allowed are N or S"
@@ -64,7 +67,6 @@ MCAZ=( "_180deg" "_0deg" "" )
 #####################################
 # reconstruction IDs
 RECID="0"
-RECID="10"
 
 #####################################
 # energy reconstruction
@@ -85,6 +87,8 @@ OBSTIME=( "50h" )
 # analysis dates and table dates
 DATE="d20131229"
 TDATE="d20131229"
+DATE="d20140105"
+TDATE="d20140105"
 
 #####################################
 # loop over all sites
@@ -214,7 +218,7 @@ do
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W3.$DATE $OOTIME DESY.$DATE.Erec$EREC.W3.ID$ID$AZ$NTYPF.$S 0 $ID $S $QSUBOPT
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.W3.$DATE $OOTIME DESY.$DATE.Erec$EREC.W4.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then
