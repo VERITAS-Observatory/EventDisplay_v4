@@ -44,7 +44,7 @@ do
          ARRAY=`basename $a .lis`
          ARRAY=${ARRAY:11}
 #         DDIR=$4/$ARRAY/proton_grid_131217
-         DDIR=$4/$ARRAY/gamma_onSource
+         DDIR=$4/$ARRAY/electron/
          mkdir -p $DDIR
 # check if file already exists
          if [ -n "$6" ]

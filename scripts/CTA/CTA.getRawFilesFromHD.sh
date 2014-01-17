@@ -33,7 +33,8 @@ do
        echo "FILE EXISTS: $2/$i"
     else
 #       rm -f $2/$i
-       wget --user=CTAraw --password=$PWD -O $2/$i http://www.mpi-hd.mpg.de/personalhomes/bernlohr/cta-raw/cta-prod2-aar500/$i
+#       wget --user=CTAraw --password=$PWD -O $2/$i http://www.mpi-hd.mpg.de/personalhomes/bernlohr/cta-raw/cta-prod2-aar500/$i
+       wget --user=CTAraw --password=$PWD -O $2/$i http://www.mpi-hd.mpg.de/personalhomes/bernlohr/cta-raw/cta-prod2-sac0.84/$i
     fi
 done
 
