@@ -100,16 +100,17 @@ mkdir -p $SHELLDIR
 FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
 
 # log files
-QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
+#QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
 #mkdir -p $QLOG
 QLOG="/dev/null"
 
 # pedestals
-PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
+# PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
+PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
 
 echo "submitting $RUNFROMTO"
 
-FNAM="$SHELLDIR/EC-$DSET-$PART-$FLL"
+FNAM="$SHELLDIR/EV-$DSET-$PART-$FLL"
 
 sed -e "s|SIMTELLIST|$RUNLIST|" $FSCRIPT.sh > $FNAM-1.sh
 sed -e "s|PAAART|$PART|" $FNAM-1.sh > $FNAM-2.sh
