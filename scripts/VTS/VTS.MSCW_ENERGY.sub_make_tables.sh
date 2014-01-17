@@ -12,7 +12,7 @@ then
    echo
    echo "VTS.MSCW_ENERGY.sub_make_tables.sh <table file> <recid> <atmo ID=21/22> <array=V4/V5/V6>"
    echo
-   echo " < recid: array rec id according to array_analysis_cuts.txt"
+   echo " recid: array rec id according to array_analysis_cuts.txt"
    echo
    exit
 fi

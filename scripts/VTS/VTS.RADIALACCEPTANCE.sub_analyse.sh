@@ -30,7 +30,8 @@ fi
 # loop over all files/cases
 for V in $4
 do
-   for C in N2-Point-005CU-Soft N3-Point-005CU-Hard N3-Point-005CU-Moderate N3-Point-005CU-Soft N2-Point-005CU-SuperSoft
+#   for C in N2-Point-005CU-Open N2-Point-005CU-SuperSoft N3-Point-005CU-Moderate N3-Point-005CU-Soft N3-Point-005CU-Hard
+   for C in N3-Ext-005CU-Moderate N3-Ext-005CU-Hard
    do
      for I in $5
      do
@@ -56,14 +57,14 @@ do
         fi
 
 # cut files
-        CUT=ANASUM.GammaHadron.d20130411-cut-$C.dat
+        CUT=ANASUM.GammaHadron.d20131031-cut-$C.dat
 
 # run list
         LLIST=$2-$V.dat
 
 # input and output names
         DDIR=$1/RecID$I/
-	OFIL=$3-d20130411-cut-$C-$V-T$T
+	OFIL=$3-d20131115-cut-$C-$V-T$T
 
 	echo "$DDIR"
 	echo "$OFIL"
