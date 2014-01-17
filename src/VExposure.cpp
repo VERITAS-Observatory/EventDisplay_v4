@@ -1722,7 +1722,7 @@ void VExposure::printListOfRuns()
           cout << "\t Usable: " << fUsable[j];
           cout << "\t TimeCut: " << fTimeCutMask[j];
           cout << "\t Light Level: " << fLightLevel[j];
-          cout << "\t VPM: " << fVPMcon[j];
+          if( j < fVPMcon.size() ) cout << "\t VPM: " << fVPMcon[j];
           cout << "\t Comment: " << fComment[j];
           cout << "\t Author: " << fAuthor[j];
         } else 
