@@ -679,8 +679,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
 		./obj/VCTARequirements.o ./obj/VCTARequirements_Dict.o \
-		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o \
-		./obj/VTargets.o
+		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
