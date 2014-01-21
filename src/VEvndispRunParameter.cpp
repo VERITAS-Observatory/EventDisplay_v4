@@ -392,7 +392,7 @@ void VEvndispRunParameter::print( int iEv )
     if( fcalibrationfile.size() > 0 )         cout << "calibration file: " << fcalibrationfile << endl;
     if( fLowGainCalibrationFile.size() > 0 )  cout << "calibration file (low gain): " << fLowGainCalibrationFile << endl;
     else if( frunmode != 2 && frunmode != 5 && !fIsMC ) cout << "reading laser/flasher run numbers from database" << endl;
-    if( frunmode == 2 ) cout << "lasermin: " << fLaserSumMin << endl;
+    if( frunmode == 2 ) cout << "Minimum size required for laser events (lasermin): " << fLaserSumMin << " [dc]" << endl;
     if( frunmode == 1 )
     {
        if( ( fsourcetype == 1 || fsourcetype == 2 || fsourcetype == 5 ) && fsimu_pedestalfile.size() > 0 )

@@ -278,9 +278,9 @@ void VGlobalRunParameter::printGlobalRunParameter()
    if( fRawDataServer.size() > 0 ) cout << "Raw data server " << fRawDataServer << endl;
    cout << "Directories: " << endl;
    if( fEVNDISPAnaDataDirectory.size() > 0 )         cout << "    for EVNDISP data: \t\t" << fEVNDISPAnaDataDirectory << endl;
-   if( fVBFRawDataDirectory.size() > 0 )             cout << "    for VBF raw: \t\t\t" << fVBFRawDataDirectory << endl;
+   if( fVBFRawDataDirectory.size() > 0 )             cout << "    for VBF raw: \t\t" << fVBFRawDataDirectory << endl;
    if( fEVNDISPCalibrationDataDirectory.size() > 0 ) cout << "    for Calibration data: \t" << fEVNDISPCalibrationDataDirectory << endl;
-   if( fEVNDISPOutputDirectory.size() > 0 )          cout << "    for EVNDISP output: \t\t" << fEVNDISPOutputDirectory << endl;
+   if( fEVNDISPOutputDirectory.size() > 0 )          cout << "    for EVNDISP output: \t" << fEVNDISPOutputDirectory << endl;
    cout << endl;
 }
 
