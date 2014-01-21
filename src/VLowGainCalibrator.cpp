@@ -607,7 +607,7 @@ bool VLowGainCalibrator::doTheFit() {
 				TF1 * f = new TF1 ("f", "[0]*x", 0, 1000);
 				int N=0;
 				for(unsigned int i=0; i<fNLightLevels[tel]; i++) {
-					if(fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] > 0  &&  fN[tel][iChan][hilo][i] / ( fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] ) > fFitPure_min ) { 
+					if(fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] > 0  &&  (double)fN[tel][iChan][hilo][i] / ( fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] ) > fFitPure_min ) { 
 						t->SetPoint(N, fLightLevelMean[tel][i], fY[tel][iChan][hilo][i] );
 						double eX, eY;
 						eX= fLightLevelSigma[tel][i];
