@@ -2,12 +2,13 @@
 #
 # simple script to download raw files from the GRID
 #
-# (you have to add the password manually)
 #
 
 if [ ! -n "$1" ] || [ ! -n "$2" ]
 then
    echo "CTA.getRawFilesFromGRID.sh <run list> <target directory>"
+   echo
+   echo "(checks as well if a file is locally on the dCache SE)"
    echo
    exit
 fi
