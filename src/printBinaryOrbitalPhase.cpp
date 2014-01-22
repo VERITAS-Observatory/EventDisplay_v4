@@ -8,6 +8,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <stdlib.h>
 
 #include "VASlalib.h"
 
