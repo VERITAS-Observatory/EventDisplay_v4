@@ -281,6 +281,13 @@ int main( int argc, char *argv[] )
           cout << "error: no effective area tree found" << endl;
        }
        if( fEffectiveAreaCalculator.getHistogramhEmc() ) fEffectiveAreaCalculator.getHistogramhEmc()->Write();
+
+       if( fRunPara->fgetXoff_Yoff_afterCut && fEffectiveAreaCalculator.getAcceptance_AfterCuts()){
+	   cout << "writing tree (" << fEffectiveAreaCalculator.getTree()->GetName() << ") to " << fOutputfile->GetName() << endl;
+      	   fOutputfile->cd();
+	   fEffectiveAreaCalculator.getAcceptance_AfterCuts()->Write();
+       }
+
     }
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
     {

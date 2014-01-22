@@ -35,6 +35,8 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
 
     fFillMCHistograms = false;
 
+    fgetXoff_Yoff_afterCut = false;
+
     fCoreScatterMode = "";
     fCoreScatterRadius = 0.;
 
@@ -114,6 +116,11 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
             else if( temp == "FILLMONTECARLOHISTOS" )
             {
                if( !is_stream.eof() ) is_stream >> fFillMCHistograms;
+            }
+// get Tree with Xoff and Yoff (and derot) after cut
+            else if( temp == "GETXOFFYOFFAFTERCUTS" )
+            {
+               if( !is_stream.eof() ) is_stream >> fgetXoff_Yoff_afterCut;
             }
 // energy reconstruction method 
             else if( temp == "ENERGYRECONSTRUCTIONMETHOD" )
@@ -227,6 +234,8 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
     }
 // (no az cut)
     fAzMin.push_back( -1.e3 );     fAzMax.push_back( +1.e3 );
+// WARNING: if this last rule changes (if the last bin is NOT filled ANY MORE with all simulated event regardless of their az) 
+//          then the az_bin_index must be changed in VEffectiveAreaCalculator::fill
 
 /////////////////////////////////////////////////////////////////
 // define  spectral index bins

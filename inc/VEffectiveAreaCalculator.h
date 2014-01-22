@@ -172,6 +172,17 @@ class VEffectiveAreaCalculator
         double Rec_seff_L[1000];
         double Rec_seff_U[1000];
 
+	TTree *fAcceptance_AfterCuts_tree;       //Information for all the events after cuts to construct the background map
+	double fXoff_aC;
+	double fYoff_aC;
+	double fXoff_derot_aC;
+	double fYoff_derot_aC;
+	double fErec;
+	double fEMC;
+	double fCRweight;                         // #/s/sr (the right unit for the ctools acceptance map) This normalise the map to the CR spectrum	
+                                                  // Needs option ESPECTRUM_FOR_WEIGHTING to be turned on, which only make sense for CR
+
+
 // effective area smoothing
         int fSmoothIter;
         double fSmoothThreshold;
@@ -195,7 +206,7 @@ class VEffectiveAreaCalculator
         void   copyProfileHistograms( TProfile*,  TProfile* );
         void   copyHistograms( TH1*,  TH1*, bool );
         double getAzMean( double azmin, double azmax );
-	double getCRWeight( double iEMC_TeV_log10, TH1* h );
+	double getCRWeight( double iEMC_TeV_log10, TH1* h ,bool per_second_per_sr=false);
         bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
         void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
         double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,
@@ -223,6 +234,7 @@ class VEffectiveAreaCalculator
         TH1D*     getHistogramhEmc();
         TGraphErrors* getMeanSystematicErrorHistogram();
         TTree* getTree() { return fEffArea; }
+        TTree* getAcceptance_AfterCuts() { return fAcceptance_AfterCuts_tree; }
 	double getEnergyAxis_minimum_defaultValue() { return fEnergyAxis_minimum_defaultValue; }
 	double getEnergyAxis_maximum_defaultValue() { return fEnergyAxis_maximum_defaultValue; }
         double getEffectiveArea( double erec, double ze, double iWoff, double iPedvar, double iSpectralIndex = -2.5,

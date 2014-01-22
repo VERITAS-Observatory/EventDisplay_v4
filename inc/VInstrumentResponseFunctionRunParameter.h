@@ -47,6 +47,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    double          fMCEnergy_max;
    double          fMCEnergy_index;
    bool            fFillMCHistograms;
+   bool            fgetXoff_Yoff_afterCut;
 
    string          fCoreScatterMode;
    double          fCoreScatterRadius;
@@ -91,7 +92,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    bool                  readRunParameterFromTextFile( string iFile );
    bool                  testRunparameters();
 
-   ClassDef( VInstrumentResponseFunctionRunParameter, 9 );
+   ClassDef( VInstrumentResponseFunctionRunParameter, 10 );
 };
 
 #endif
