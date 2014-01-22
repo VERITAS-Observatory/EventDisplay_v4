@@ -37,7 +37,7 @@ class VWPPhysSensitivityPlotsMaker
     VWPPhysSensitivityPlotsMaker();
    ~VWPPhysSensitivityPlotsMaker() {}
 
-    void compareDataSets( string iDataSetFile );
+    void compareDataSets( string iDataSetFile, string iDirectionString = "" );
     void compareOffAxisSensitivities( string iSubArray, vector< string > iDataSet );
     void compareOffAxisSensitivities( string iSubArray = "", string iDataSet = "" );
     void printPlotCTARequirementsIDs();

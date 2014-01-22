@@ -466,10 +466,10 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors *g
      m = TMath::Power( m, 1./z );
      dm = m*sqrt( dm );
      dm = 1./z * TMath::Power( m, 1./z - 1. ) * dm;
-     cout << "PPUT " << iAnalysis << " (calculated from sensitivity, ID" << fPlotCTARequirementsID << ", ";
+     cout << "PPUT " << iAnalysis << " (calculated from sensitivity, Req ID" << fPlotCTARequirementsID << ", ";
      cout << z << " points), energy range [";
      cout <<  TMath::Power( 10., iEmin_TeV ) << ", " << TMath::Power( 10., iEmax_TeV ) << "]: ";
-     cout << "\t PPUT = " << setprecision ( 4 ) << m << " +- " << dm << endl;
+     cout << "\t PPUT = " << std::setprecision ( 2 ) << std::fixed << m << "+-" << dm << endl;
      fSensitivityFOM = m;
      fSensitivityFOM_error = dm;
    }
@@ -617,13 +617,13 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown, bool iLeft, boo
    return true; 
 }
 
-bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile )
+bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile, string iDirectionString )
 {
    unsigned int z_site = 0;
    for( ;; )
    {
        fData.push_back( new VSiteData() );
-       if( !fData.back()->addDataSet( iDataSettxtFile, z_site ) )
+       if( !fData.back()->addDataSet( iDataSettxtFile, z_site, iDirectionString ) )
        {
 	  fData.pop_back();
           break;

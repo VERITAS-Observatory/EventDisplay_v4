@@ -36,8 +36,13 @@ class VPlotPPUT
 
    float f_plot_alt_min;
    float f_plot_alt_max;
+   float f_plot_b_min;
+   float f_plot_b_max;
+
+   string fPrintingOptions;
 
    void getMergedFigureOfMerits( VSiteData *iSite, float* fom, float* fom_error, string iDirectionString = "" );
+   void printCanvas( TCanvas *c, string iPrintName );
 
    public:
 
@@ -47,9 +52,12 @@ class VPlotPPUT
    void plot( unsigned int iSiteRequirementID, string iDataList, bool bPlotPredictions = false );
    void setDebug( bool iB = false ) { fDebug = iB; }
    void setPlotAltitudeRange( float alt_min = 410., float alt_max = 4000. ) { f_plot_alt_min = alt_min; f_plot_alt_max = alt_max; }
-   void setPPUTEnergyRange( float pput_Energy_linTeV_min = -99., float pput_Energy_linTeV_max = -99. ) { f_pput_Energy_linTeV_min = pput_Energy_linTeV_min; 
-                                                                                                         f_pput_Energy_linTeV_max = pput_Energy_linTeV_max; }
+   void setPlotBFieldRange( float b_min = 0., float b_max = 40. ) { f_plot_b_min = b_min; f_plot_b_max = b_max; }
+   void setPPUTEnergyRange( float pput_Energy_linTeV_min = -99., float pput_Energy_linTeV_max = -99. ) 
+                          { f_pput_Energy_linTeV_min = pput_Energy_linTeV_min; 
+                            f_pput_Energy_linTeV_max = pput_Energy_linTeV_max; }
    void setPPUTRange( float pput_min = 0.6, float pput_max = 2.0 );
+   void setPrintingOptions( string iPrint = "" ) { fPrintingOptions = iPrint; }
 };
 
 #endif

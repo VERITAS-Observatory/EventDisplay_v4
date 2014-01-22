@@ -152,7 +152,7 @@ bool VPlotCTAArrayLayout::setSubArray( string iSubArrayFile )
 
          for( unsigned int i = 0; i <  fTelescopeList.size(); i++ )
          {
-            if( iTelID ==  fTelescopeList[i]->fTelID )
+            if( iTelID == fTelescopeList[i]->fTelID )
             {
                fTelescopeList_subArray.push_back( fTelescopeList[i] );
             }

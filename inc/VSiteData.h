@@ -48,7 +48,7 @@ class VSiteData
 
     VSiteData();
    ~VSiteData() {}
-    bool  addDataSet( string iDataList, unsigned int iSiteCounter );
+    bool  addDataSet( string iDataList, unsigned int iSiteCounter, string iDirectionString = "" );
     bool  checkIntegrity();
     TGraphAsymmErrors* getCombinedSensitivityGraph( bool iInterpolate = false, string iDirectionString = "" );
     void  print();

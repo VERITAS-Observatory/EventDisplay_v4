@@ -65,7 +65,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    bool addDataSet( VSiteData* iData );
    bool addDataSet( string iAnalysis, string iSubArray = "E", double iObservationTime_s = 180000., double iOffset_deg = 0.0,
                     string iLegend = "", int iColor = 1, int iLineStyle = 1, int iFillStyle = 3001 );
-   bool addDataSets( string iDataSettxtFile );
+   bool addDataSets( string iDataSettxtFile, string iDirectionString );
    double getSensitivityFOM() { return fSensitivityFOM; }
    double getSensitivityFOM_error() { return fSensitivityFOM_error; }
    vector< VSiteData* > getData() { return fData; }

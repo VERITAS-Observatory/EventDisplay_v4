@@ -37,15 +37,15 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
     setPlotRequirements();
 }
 
-void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile )
+void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string iDirectionString )
 {
    VPlotWPPhysSensitivity a;
    a.setPlotCTARequirements( fPlotCTARequirements, fPlotCTARequirementGoals );
    a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
-   a.addDataSets( iDataSetFile );
+   a.addDataSets( iDataSetFile, iDirectionString );
    a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3 );
    a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
-   a.plotSensitivityRatio( fPrintingOptions, 0.4, 3.1 ); 
+   a.plotSensitivityRatio( fPrintingOptions, 0.4, 4.1 ); 
 // Southern sites: 30 GeV - 100 TeV
    if( fPlotCTARequirements < 3 ) a.printSensitivityFigureOfMerit( 0.03, 100. );
 // Northern sites: 30 GeV - 20 TeV

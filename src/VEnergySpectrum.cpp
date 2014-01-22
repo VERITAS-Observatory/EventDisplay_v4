@@ -279,8 +279,6 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
         }
 // get effective area
         TH1 *i_hEffAreaP = (TH1*)getHistogram( "herecEffectiveArea_on-", fRunList[i].runnumber, "energyHistograms" );
-/*        hname = "gMeanEffectiveArea";
-        TGraphErrors *i_gEff = (TGraphErrors*)getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" ); */
 	TGraphErrors *i_gEff = 0;
 	VHistogramUtilities i_hisUtl;
 	i_hisUtl.get_Graph_from_Histogram( i_hEffAreaP, i_gEff );
@@ -1690,7 +1688,7 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 // binning and statistics
    setEnergyBinning( i_EnergyBinningLog10 );
    setEnergyRangeLinear( 0.10, 500. );
-   setSignificanceParameters( -5., -5. );
+   setSignificanceParameters( 3., 5. );
    setPlottingMultiplierIndex( iPlottingMultiplierIndex );
 
 // plotting
@@ -1741,6 +1739,8 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
    l.setPlottingStyle( 8, 2, 2, 25 );
    l.listValues( 7 );
    l.plot( 7, c );
+
+   plot(c);
 
    return c;
 }

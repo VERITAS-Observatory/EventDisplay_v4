@@ -74,7 +74,7 @@ void VSiteData::print()
    }
 }
 
-bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter )
+bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string iDirectionString )
 {
    ifstream is;
    is.open( iDataList.c_str(), ifstream::in );
@@ -132,6 +132,11 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter )
       if( !is_stream.eof() )
       {
          is_stream >> iTemp;
+// add direction string 
+	 if( iTemp.find( "NIM" ) != string::npos && iDirectionString.size() > 0 )
+	 {
+	    iTemp.insert( iTemp.find( "NIM" ), iDirectionString );
+         }
 	 fSiteFileName.push_back( iTemp );
 	 fSiteFile_exists.push_back( false );
       }
@@ -220,7 +225,12 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter )
 	 iTemp += "s.root";
 	 fSiteFileName[i] = iTemp;
      }
-     else if( fSiteFileName[i].find( "IFAE" ) != string::npos )
+     else if( fSiteFileName[i].find( "IFAE" ) != string::npos && fSiteFileName[i].find( "20130901" ) != string::npos )
+     {
+         iTemp = "data/IFAE_Sept2013/" + fSiteFileName[i] + ".root";
+	 fSiteFileName[i] = iTemp;
+     }
+     else if( fSiteFileName[i].find( "IFAE" ) != string::npos && fSiteFileName[i].find( "19122013" ) != string::npos )
      {
          iTemp = "data/IFAE_Dec2013/" + fSiteFileName[i] + ".root";
 	 fSiteFileName[i] = iTemp;
@@ -228,6 +238,10 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter )
      else if( fSiteFileName[i].find( "Fermi" ) != string::npos )
      {
          fSiteFileName[i] = "data/Fermi/Fermi_approx.root";
+     }
+     else
+     {
+        fSiteFileName[i] += ".root";
      }
   }
 
@@ -270,7 +284,8 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 
        if( fDebug )
        {
-	  cout << "VSiteData::getCombinedSensitivityGraph: reading for site " << fSiteName << "[" << fSiteFile_Emin[f] << ", " << fSiteFile_Emax[f] << "] from file: " << endl;
+	  cout << "VSiteData::getCombinedSensitivityGraph: reading for site " << fSiteName << "[";
+	  cout << fSiteFile_Emin[f] << ", " << fSiteFile_Emax[f] << "] from file: " << endl;
 	  cout << "\t" << fSiteFileName[f].c_str() << endl;
        }
 
@@ -302,7 +317,7 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 		      iGraphSensitivity->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), 0.5*( h->GetBinContent( i-1 ) + h->GetBinContent( i+1 ) ) );
 		      iGraphSensitivity->SetPointError( z, h->GetXaxis()->GetBinWidth( i )/2., h->GetXaxis()->GetBinWidth( i )/2., 
 		                                        0.5*(h->GetBinError(i-1)+h->GetBinError(i+1)), 0.5*(h->GetBinError(i-1)+h->GetBinError(i+1)) );
-		      cout << "\t interpolate point at energy " << h->GetXaxis()->GetBinCenter( i ) << endl;
+		      cout << "\t (" << fSiteName << ") interpolate point at energy " << h->GetXaxis()->GetBinCenter( i ) << endl;
 		      z++;
 		      continue;
                    }

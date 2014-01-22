@@ -648,7 +648,14 @@ float VDSTTree::getDSTLocalDelayedTriggerTime( int iTelID )
     return fDSTLDTtime[iTel];
 }
 
+/*
 
+     reading array configuration from an ASCII file
+     (simple text file)
+
+     TelID  FOV(in [deg])
+
+*/
 map< unsigned int, float> VDSTTree::readArrayConfig( string iFile )
 {
     fDST_list_of_telescopes.clear();

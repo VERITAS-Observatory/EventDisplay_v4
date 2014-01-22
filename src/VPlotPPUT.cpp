@@ -14,6 +14,18 @@ VPlotPPUT::VPlotPPUT()
    setPPUTRange();
    setPPUTEnergyRange();
    setPlotAltitudeRange();
+   setPlotBFieldRange();
+   setPrintingOptions( "" );
+}
+
+void VPlotPPUT::printCanvas( TCanvas *c, string iPrint )
+{
+   if( !c ) return;
+   if( fPrintingOptions.size() == 0 ) return;
+
+   string iPName = fPrintingOptions + iPrint;
+
+   c->Print( iPName.c_str() );
 }
 
 void VPlotPPUT::getMergedFigureOfMerits( VSiteData *iSite, float* fom, float* fom_error, string iDirectionString )
@@ -24,6 +36,7 @@ void VPlotPPUT::getMergedFigureOfMerits( VSiteData *iSite, float* fom, float* fo
 // calculate figure of merrit:
     VPlotWPPhysSensitivity b;
     b.setCTARequirements( iSite->fSiteRequirementID );
+    cout << iSite->fSiteName << "\t" << iDirectionString << endl;
     b.printSensitivityFigureOfMerit( iGraphSensitivity,f_pput_Energy_linTeV_min, f_pput_Energy_linTeV_max, iSite->fSiteName );
 
     *fom = b.getSensitivityFOM();
@@ -88,15 +101,18 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
    hH->SetMaximum( f_pput_max );
    hH->Draw();
 
-   TLine *iHH = new TLine( hH->GetXaxis()->GetXmin(), 1., hH->GetXaxis()->GetXmax(), 1. );
-   iHH->SetLineStyle( 2 );
-   iHH->Draw();
+   if( f_pput_min < 1. )
+   {
+      TLine *iHH = new TLine( hH->GetXaxis()->GetXmin(), 1., hH->GetXaxis()->GetXmax(), 1. );
+      iHH->SetLineStyle( 2 );
+      iHH->Draw();
+   }
 
    TCanvas *cPPUT_B = new TCanvas( "cEB", "PPUT vs bfield", 510, 10, 600, 500 );
    cPPUT_B->SetGridx( 0 );
    cPPUT_B->SetGridy( 0 );
 
-   TH1D *hB = new TH1D( "hB", "", 100, b_min, b_max );
+   TH1D *hB = new TH1D( "hB", "", 100, f_plot_b_min, f_plot_b_max );
    hB->SetStats( 0 );
    hB->SetXTitle( "B_{tr} [#muT]" );
    hB->SetYTitle( "PPUT" );
@@ -104,9 +120,12 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
    hB->SetMaximum( f_pput_max );
    hB->Draw();
 
-   TLine *ihB = new TLine( hB->GetXaxis()->GetXmin(), 1., hB->GetXaxis()->GetXmax(), 1. );
-   ihB->SetLineStyle( 2 );
-   ihB->Draw();
+   if( f_pput_min < 1. )
+   {
+      TLine *ihB = new TLine( hB->GetXaxis()->GetXmin(), 1., hB->GetXaxis()->GetXmax(), 1. );
+      ihB->SetLineStyle( 2 );
+      ihB->Draw();
+   }
 
 
 ////////////////////////////////////////////////////
@@ -207,10 +226,12 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
        iSens_vs_height->Draw( "p" );
        iSens_vs_height_N->Draw( "p" );
        iSens_vs_height_S->Draw( "p" );
+       printCanvas( cPPUT_height, "-pput-vs-height.eps" );
 
        cPPUT_B->cd();
        iSens_vs_bfield_N->Draw( "p" );
        iSens_vs_bfield_S->Draw( "p" ); 
+       printCanvas( cPPUT_B, "-pput-vs-bfield.eps" );
    }
 
 //////////////////////////////
@@ -218,6 +239,7 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
    TCanvas *cB2D = new TCanvas( "cEB2D", "FOM vs altitude vs bfield", 810, 10, 600, 500 );
    iSens_vs_height_vs_bfield->SetTitle( "" );
 
+   cout << "Fitting height (par[1]) vs B-Field (par[2]) histogram." << endl;
    TF2 *f2D = new TF2( "f2D", "[0]-[1]*x-[2]*y", alt_min, alt_max, b_min, b_max );
    f2D->SetParameter( 0, 1.7 );
    f2D->SetParameter( 1, 0.000118 );
@@ -252,6 +274,7 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
       }
 
    }
+   printCanvas( cB2D, "-2D-PPUT.eps" );
 
 // plot predictions into the 1D plots
    if( bPlotPredictions && cPPUT_height && cPPUT_B )
@@ -293,6 +316,8 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 	 g_B_S->Draw( "p" );
 
       }
+      printCanvas( cPPUT_height, "-pput-vs-height-Prediction.eps" );
+      printCanvas( cPPUT_B, "-pput-vs-bfield-Prediction.eps" );
    }
 
 }
