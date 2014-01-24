@@ -263,8 +263,9 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
                 {
                     chanID = fReader->getHitID(i);
 
-                    if( chanID >= getHiLo().size() || ( iLowGain && !getHiLo()[chanID] ) ) continue;
 // don't use low gain channels
+                    if( chanID >= getHiLo().size() || ( iLowGain && !getHiLo()[chanID] ) ) continue;
+// check for dead channels
                     if( !getDead()[chanID] && chanID < fpedcal_mean[telID].size() )
                     {
                         fReader->selectHitChan(i);

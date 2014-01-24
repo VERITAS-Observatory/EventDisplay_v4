@@ -23,7 +23,7 @@
 #include <VShowerParameters.h>
 #include <VFrogParameters.h>
 //#include <VFrogImageData.h>
-#include <VModel3DParameters.h> //JG
+#include <VModel3DParameters.h> 
 #include <VPointing.h>
 #include <VArrayPointing.h>
 #include <VTraceHandler.h>
@@ -125,7 +125,7 @@ class VEvndispData
         static VShowerParameters *fShowerParameters;
         static VFrogParameters *fFrogParameters;
 //	static vector< VFrogImageData* > fFrogData;    //!< frogs Template tube information
-        static VModel3DParameters *fModel3DParameters; //JG
+        static VModel3DParameters *fModel3DParameters; 
         static VMCParameters *fMCParameters;      //!< data class with MC parameters
 
 // timing results
@@ -172,10 +172,12 @@ class VEvndispData
         vector<int>&        getChannelStatus() { return fCalData[fTelID]->fChannelStatus; }
         bool                getCalibrated() { return fCalibrated[fTelID]; }
 	vector<double>&     getBorderCorrelationCoefficient() { return fAnaData[fTelID]->fCorrelationCoefficient; }
-        VEvndispData*              getData() { return this; }
-        vector<unsigned int>&       getDead( bool iLowGain = false ) { if( !iLowGain ) return fAnaData[fTelID]->fDead; else return fAnaData[fTelID]->fLowGainDead; }
-        vector<unsigned int>&       getMasked() { return fAnaData[fTelID]->fMasked; }
-        vector<bool>&       getDeadRecovered( bool iLowGain = false ) { if( !iLowGain ) return fAnaData[fTelID]->fDeadRecovered; else return fAnaData[fTelID]->fLowGainDeadRecovered; }
+        VEvndispData*           getData() { return this; }
+        unsigned int        getDead( unsigned int iChannel, bool iLowGain );
+        vector<unsigned int>&   getDead( bool iLowGain = false ) { if( !iLowGain ) return fAnaData[fTelID]->fDead; else return fAnaData[fTelID]->fLowGainDead; }
+        vector<unsigned int>&   getMasked() { return fAnaData[fTelID]->fMasked; }
+        vector<bool>&       getDeadRecovered( bool iLowGain = false )
+                                         { if( !iLowGain ) return fAnaData[fTelID]->fDeadRecovered; else return fAnaData[fTelID]->fLowGainDeadRecovered; }
         VDeadChannelFinder* getDeadChannelFinder( bool iLowGain = false );
         unsigned int        getNDead( bool iLowGain = false ) { if( !iLowGain ) return fAnaData[fTelID]->fNDead; else return fAnaData[fTelID]->fLowGainNDead; }
         vector<unsigned int>&       getDeadUI( bool iLowGain = false ) { if( !iLowGain ) return fAnaData[fTelID]->fDeadUI; else return fAnaData[fTelID]->fLowGainDeadUI; }
@@ -272,15 +274,15 @@ class VEvndispData
         VEvndispRunParameter*    getRunParameter() { return fRunPar; }
         VShowerParameters*  getShowerParameters() { return fShowerParameters; }
         VFrogParameters*    getFrogParameters() { return fFrogParameters; }
-        VModel3DParameters* getModel3DParameters() { return fModel3DParameters; } //JG
+        VModel3DParameters* getModel3DParameters() { return fModel3DParameters; } 
         int                 getSumFirst() { return fRunPar->fsumfirst[fTelID]; }
         valarray<double>&   getSums() { return fAnaData[fTelID]->fSums; }
         valarray<double>&   getSums2() { return fAnaData[fTelID]->fSums2; }
         valarray<double>&   getTemplateMu() { return fAnaData[fTelID]->fTemplateMu; }
         double              getTemplateMuMin() { return fAnaData[fTelID]->fTemplateMu.min(); }
         double              getTemplateMuMax() { return fAnaData[fTelID]->fTemplateMu.max(); }
-        valarray<double>&   getModel3DMu() { return fAnaData[fTelID]->fModel3DMu; } //JG
-	vector<bool>&       getModel3DClean() { return fAnaData[fTelID]->fModel3DClean; } //JG
+        valarray<double>&   getModel3DMu() { return fAnaData[fTelID]->fModel3DMu; } 
+	vector<bool>&       getModel3DClean() { return fAnaData[fTelID]->fModel3DClean; } 
 	unsigned int        getLargestSumWindow();
 	unsigned int        getLargestSumWindow( unsigned int iTelID );
         VStarCatalogue*     getStarCatalogue() { return fStarCatalogue; }
@@ -375,9 +377,13 @@ class VEvndispData
                                                                                                             else    fAnaData[fTelID]->fCurrentSummationWindow_2 = iw; }
         void                setCurrentSummationWindow( unsigned int imin, unsigned int imax, bool iSecondWindow );
         void                setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax, bool iSecondWindow );
-        void                setDead( unsigned int iDead, bool iLowGain = false ) { if( !iLowGain ) fAnaData[fTelID]->fDead.assign( fDetectorGeo->getNChannels( fTelID ), iDead ); else fAnaData[fTelID]->fLowGainDead.assign( fDetectorGeo->getNChannels( fTelID ), iDead ); }
+        void                setDead( unsigned int iDead, bool iLowGain = false ) 
+                                   { if( !iLowGain ) fAnaData[fTelID]->fDead.assign( fDetectorGeo->getNChannels( fTelID ), iDead );
+                                     else            fAnaData[fTelID]->fLowGainDead.assign( fDetectorGeo->getNChannels( fTelID ), iDead ); }
         void                setDead( unsigned int iChannel, unsigned int iDead, bool iLowGain = false, bool iFullSet = false, bool iReset = false );
-        void                setNDead( unsigned int iN, bool iLowGain = false ) { if( !iLowGain ) fAnaData[fTelID]->fNDead = iN; else fAnaData[fTelID]->fLowGainNDead = iN; }
+        void                setNDead( unsigned int iN, bool iLowGain = false ) 
+                                   { if( !iLowGain ) fAnaData[fTelID]->fNDead = iN;
+                                     else            fAnaData[fTelID]->fLowGainNDead = iN; }
         void                setDeadChannelText();
         void                setFADCStopOffsets( double iOffset ) { fCalData[fTelID]->fFADCStopOffsets = iOffset; }
         void                setFADCStopOffsets( unsigned int iChannel, double iOffset ) { fCalData[fTelID]->fFADCStopOffsets[iChannel] = iOffset; }
@@ -452,8 +458,8 @@ class VEvndispData
         void                setSums2( unsigned int iChannel, double iSum ) { fAnaData[fTelID]->fSums2[iChannel] = iSum; }
         void                setSums2( valarray< double > iVSum ) { fAnaData[fTelID]->fSums2 = iVSum; }
         void                setTemplateMu( valarray< double > iVTemplateMu ) { fAnaData[fTelID]->fTemplateMu = iVTemplateMu; }
-	void                setModel3DMu( valarray< double > iVModel3DMu ) { fAnaData[fTelID]->fModel3DMu = iVModel3DMu; } //JG
-	void                setModel3DClean( vector<bool> iVModel3DClean ) { fAnaData[fTelID]->fModel3DClean = iVModel3DClean; } //JG
+	void                setModel3DMu( valarray< double > iVModel3DMu ) { fAnaData[fTelID]->fModel3DMu = iVModel3DMu; } 
+	void                setModel3DClean( vector<bool> iVModel3DClean ) { fAnaData[fTelID]->fModel3DClean = iVModel3DClean; } 
         void                setTCorrectedSumFirst( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst = iT; }
         void                setTCorrectedSumFirst( unsigned int iChannel, unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumFirst[iChannel] = iT; }
         void                setTCorrectedSumLast( unsigned int iT ) { fAnaData[fTelID]->fTCorrectedSumLast = iT; }

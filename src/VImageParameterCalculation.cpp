@@ -797,8 +797,12 @@ void VImageParameterCalculation::calcTriggerParameters( vector<bool> fTrigger )
 }
 
 
-/*!
-    see Fegan, D.J. J. Phys. G: Nucl. Part. Phys. 23 (1997) 1013-1060
+/*
+ *   calculate image parameters
+ *   (classic style)
+ *
+ *   see Fegan, D.J. J. Phys. G: Nucl. Part. Phys. 23 (1997) 1013-1060
+ *
 */
 void VImageParameterCalculation::calcParameters()
 {
@@ -1293,7 +1297,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
     for( unsigned int j = 0; j < fData->getSums().size(); j++ )
     {
 // ignore dead channels
-        if( fData->getDead()[j] ) continue;
+        if( fData->getDead( fData->getHiLo()[j] )[j] ) continue;
 // only image/border pixels are used in the fit
 	if( j < fData->getImageBorderNeighbour().size() && fData->getImageBorderNeighbour()[j] )
         {

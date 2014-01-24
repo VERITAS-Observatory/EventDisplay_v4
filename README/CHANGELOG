@@ -1,6 +1,19 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140124 (GM) implemented average tzero calculation
+                (mean arrival pulse time)
+                command line parameter:
+                e.g. -averagetzerofiducialradius=0.75
+
+* 20140124 (GM) changed low-gain dead channel classification 
+                (Eventdisplay-WG/931)
+                low-gain channels are dead now when
+                their corresponding high-gain is dead
+
+* 20140124 (GM) dead low-gain channels are now ignored
+                in LL fit (VImageParameterCalculation)
+
 * 20131222 (GM) fixed reading of wobble offsets for
                 zero offset pointints
 

@@ -53,7 +53,7 @@ void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double br
     {
         if( fData->getSums()[i] > hithresh )
         {
-            if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead(fData->getHiLo()[i])[i] )
+            if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead( i, fData->getHiLo()[i]) )
             {
                 fData->setImage( i, true );
                 for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[i].size(); j++ )
@@ -65,7 +65,7 @@ void VImageCleaning::cleanImageFixed(double hithresh, double lothresh, double br
         }
         if( fData->getSums()[i] > brightthresh )
         {
-            if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead(fData->getHiLo()[i])[i] ) fData->setBrightNonImage( i, true );
+            if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead( i, fData->getHiLo()[i] ) ) fData->setBrightNonImage( i, true );
         }
     }
 
@@ -106,7 +106,7 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
 
     for ( unsigned int i = 0; i < i_nchannel; i++)
     {
-        if (fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead(fData->getHiLo()[i])[i]) continue;
+        if (fData->getDetectorGeo()->getAnaPixel()[i] < 1 || fData->getDead( i, fData->getHiLo()[i] ) ) continue;
         i_pedvars_i = fData->getPedvars( fData->getCurrentSumWindow()[i], fData->getHiLo()[i])[i];
 
         if( fData->getSums()[i] > hithresh * i_pedvars_i )
@@ -1663,38 +1663,39 @@ void VImageCleaning::removeSmallClusters( int minPix )
   
 }
 
-
 /*
-  HP END
-*/
-
-
+ * fill a list with pixels which are neighbouring image or border pixels
+ *
+ */
 void VImageCleaning::fillImageBorderNeighbours()
 {
     fData->setImageBorderNeighbour( false );
-// assume fData->getImageBorderNeighbour() are all false
     for( unsigned int i = 0; i < fData->getNChannels(); i++)
     {
         if ( fData->getImage()[i] || fData->getBorder()[i] )
         {
 // a pixel is its own neighbour :-)
             fData->getImageBorderNeighbour()[i] = true;
-
+// loop over all neighbours
             unsigned int i_neighbour_size = fData->getDetectorGeo()->getNNeighbours()[i];
             for( unsigned int j = 0; j < i_neighbour_size; j++ )
             {
                 unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
-                if( k < fData->getImageBorderNeighbour().size() && !fData->getDead()[k] ) fData->getImageBorderNeighbour()[k] = true;
+                if( k < fData->getImageBorderNeighbour().size() && !fData->getDead()[k] )
+                {
+                   fData->getImageBorderNeighbour()[k] = true;
+                }
             }
         }
     }
 }
 
-
+/*
+ * loop again to remove isolated image pixels
+ * if neighbour is dead, check neighbours of this dead channel (see e.g. run 329 event 709)
+ */
 void VImageCleaning::recoverImagePixelNearDeadPixel()
 {
-// loop again to remove isolated image pixels
-// if neighbour is dead, check neighbours of this dead channel (see e.g. run 329 event 709)
     bool i_neigh = false;
     unsigned int i_neighbour_size = 0;
     unsigned int k = 0;
@@ -1714,7 +1715,7 @@ void VImageCleaning::recoverImagePixelNearDeadPixel()
                     i_neigh = true;
                     break;
                 }
-                else if( k < fData->getDead().size() && fData->getDead(fData->getHiLo()[k])[k] )
+                else if( k < fData->getDead().size() && fData->getDead( k, fData->getHiLo()[k] ) )
                 {
                     for( unsigned l = 0; l < i_neighbour_size; l++ )
                     {
@@ -1736,7 +1737,6 @@ void VImageCleaning::recoverImagePixelNearDeadPixel()
             else if( fData->getBorder()[i] ) fData->setBrightNonImage( i, false );
         }
     }
-
 }
 
 //

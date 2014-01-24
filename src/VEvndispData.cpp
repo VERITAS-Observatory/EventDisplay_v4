@@ -451,16 +451,16 @@ void VEvndispData::printDeadChannelList() // DEADCHAN
 
     cout << "==================================" << endl;
     cout << "Dead Channel Listing" << endl;
-    // loop over gains
+// loop over gains
     for ( unsigned int iHiLo = 0 ; iHiLo < 2 ; iHiLo++ )
     {
- 	// loop over telescopes
+// loop over telescopes
 	for ( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
 	{
 		setTelID( getTeltoAna()[jTel] ) ;
 		unsigned int ndead = 0;
 
-		// loop over dead channels
+// loop over dead channels
 		for( unsigned int iChan = 0; iChan < getDead( iHiLo ).size(); iChan++ )
 		{
 			if( getDead( iHiLo )[iChan] > 0 )
@@ -829,6 +829,24 @@ bool VEvndispData::initializeStarCatalogue( int iMJD, double iTime )
                                iMaxFOV/2., iMaxFOV/2., false, getRunParameter()->fMinStarBrightness_B, "B" );
     }
     return true;
+}
+
+/*
+ *  check if a channel is dead
+ *
+ *  for low gain channel: return != 0 if low gain is ok, but high gain is dead
+ */
+unsigned int VEvndispData::getDead( unsigned int iChannel, bool iLowGain = false )
+{
+// high gain channels:
+     if( !iLowGain ) return getDead( iLowGain )[iChannel];
+
+// for low gain channels only:
+
+// low gain is dead
+     if( getDead( iLowGain )[iChannel] ) return getDead( iLowGain )[iChannel];
+// low gain is ok, but high gain is dead
+     return getDead( false )[iChannel];
 }
 
 ////////////////////////////////

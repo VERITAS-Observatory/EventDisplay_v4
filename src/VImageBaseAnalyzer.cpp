@@ -1,11 +1,16 @@
 /*! \class VImageBaseAnalyzer
 
-    basic routines for VImageAnalyzer, VCalibrator, VDST
+    basic routines for integration, tzero calculation, double pass integration, etc
+    used by VImageAnalyzer, VCalibrator, VDST
 
  */
 
 #include "VImageBaseAnalyzer.h"
 
+/*
+ * special channels are e.g. L2 channels or channels disabled by the user
+ *
+ */
 bool VImageBaseAnalyzer::setSpecialChannels()
 {
     if( getDebugFlag() ) cout << "VImageBaseAnalyzer::setSpecialChannels " << getEventNumber() << endl;
@@ -53,7 +58,7 @@ bool VImageBaseAnalyzer::setSpecialChannels()
 
    calculate integrated charges for all pixels
 
-   (to be used for calibration)
+   (to be used for calibration only)
 
 */
 void VImageBaseAnalyzer::calcSums(int iFirst, int iLast, bool iMakingPeds, bool iLowGainOnly )
@@ -593,6 +598,7 @@ void VImageBaseAnalyzer::gainCorrect()
     for( unsigned int i = 0; i < nc; i++ )
     {
 // apply gain correction for HIGHQE channels
+// (e.g. V5 with 6 highqe pixels installed in T3)
         double iHIGHQE = getHIGHQE_gainfactor( i );
         if( iHIGHQE <= 0. ) iHIGHQE = 1.;
 // correct gains

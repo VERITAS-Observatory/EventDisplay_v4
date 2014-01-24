@@ -1699,9 +1699,17 @@ void VCalibrator::readGains( bool iLowGain )
 
 }
 
+/*
+ * read average pulse time (tzero) from root file
+ *
+ */
 bool VCalibrator::readAverageTZeros( bool iLowGain )
 {
-  if( fDebug ) cout << "VCalibrator::readAverageTZeros (low gain " << iLowGain << ")" << endl;
+  if( fDebug )
+  {
+     cout << "VCalibrator::readAverageTZeros (low gain " << iLowGain << "): ";
+     cout << fTZeroFileNameC[getTelID()] << endl;
+  }
 
   string iFile;
   if( getTelID() < fTZeroFileNameC.size() ) iFile = fTZeroFileNameC[getTelID()];
@@ -1761,15 +1769,27 @@ bool VCalibrator::readAverageTZeros( bool iLowGain )
          }
 	 if( itzero_med > 0. )
 	 {
-	    n_mean += itzero_med;
-	    n_T0++;
+            double d = getDetectorGeometry()->getOuterEdgeDistance( i );
+            if( getTelID() < getDetectorGeometry()->getFieldofView().size() &&
+                d < 0.5 * getDetectorGeometry()->getFieldofView()[getTelID()] * getRunParameter()->faverageTZeroFiducialRadius ) 
+            {
+               n_mean += itzero_med;
+               n_T0++;
+            }
          }
       }
       if( n_T0 > 0. ) n_mean /= n_T0;
       setMeanAverageTZero( n_mean, iLowGain );
       cout << "Telescope " << getTelID()+1 << ": average tzero for this telescope is ";
       if( iLowGain ) cout << "(low gain)";
-      cout << getMeanAverageTZero( iLowGain ) << endl;
+      cout << getMeanAverageTZero( iLowGain );
+      cout << " (calculated from " << n_T0 << " pixels";
+      if( getTelID() < getDetectorGeometry()->getFieldofView().size() && getRunParameter()->faverageTZeroFiducialRadius > 0. &&
+          getRunParameter()->faverageTZeroFiducialRadius < 1. )
+      {
+          cout << ", use inner " << getRunParameter()->faverageTZeroFiducialRadius*100. << "\% of camera";
+      }
+      cout << ")" << endl;
       return true;
    }
 

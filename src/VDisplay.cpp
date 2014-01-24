@@ -1560,9 +1560,10 @@ if( ihis ) ihis->SetAxisRange( 0., 250. );
         else
         {
             ihis = fEventLoop->getCalData( fTelescope )->getAverageTzerosetDist();
-            ihis2 = fEventLoop->getCalData( fTelescope )->getAverageTzerosetDist( true );
-    fEventLoop->setTelID( fTelescope );
-    iMeanDistributionValue = fEventLoop->getMeanAverageTZero();
+            ihis2 = 0;
+//            ihis2 = fEventLoop->getCalData( fTelescope )->getAverageTzerosetDist( true );
+            fEventLoop->setTelID( fTelescope );
+            iMeanDistributionValue = fEventLoop->getMeanAverageTZero();
         } 
     }
     else if( E_cameraIdent( fCameraDisplay ) == C_LOWGAIN )
@@ -1580,11 +1581,11 @@ if( ihis ) ihis->SetAxisRange( 0., 250. );
             ihis2->SetLineColor( 2 );
             ihis2->Draw( "sames" );
         }
-if( iMeanDistributionValue > -98. )
-{
-    TLine *iL = new TLine( iMeanDistributionValue, 0., iMeanDistributionValue, ihis->GetMaximum() );
-    iL->SetLineStyle( 2 );
-    iL->Draw();
+        if( iMeanDistributionValue > -98. )
+        {
+             TLine *iL = new TLine( iMeanDistributionValue, 0., iMeanDistributionValue, ihis->GetMaximum() );
+             iL->SetLineStyle( 2 );
+             iL->Draw();
         }
     }
     else       fCanvasCal->Clear();

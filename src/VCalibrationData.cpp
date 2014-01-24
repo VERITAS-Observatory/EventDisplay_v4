@@ -91,7 +91,7 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
        }
        else if( i == C_TZERO || i == C_TZEROLOW )
        {
-          fHisto_mean.push_back( new TH1F( hname, "", 200, 0., 20. ) );
+          fHisto_mean.push_back( new TH1F( hname, "", 1000, 0., 20. ) );
 	  fHisto_mean.back()->SetXTitle( "average pulse time t_{0} [sample]" );
 	  fHisto_variance.push_back( new TH1F( hname_var, "", 200, 0., 20. ) );
 	  fHisto_variance.back()->SetXTitle( "average pulse time t_{0} (variance) [sample]" );
