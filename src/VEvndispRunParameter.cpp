@@ -423,7 +423,14 @@ void VEvndispRunParameter::print( int iEv )
         cout << "pulse timing levels: ";
         for( unsigned int i = 0; i < fpulsetiminglevels.size(); i++ ) cout << fpulsetiminglevels[i] << ", ";
         cout << endl;
-        cout << "correcting FADC times for crate jitter with L2 signals: " << fL2TimeCorrect << endl;
+        if( fL2TimeCorrect )
+        {
+           cout << "Correcting FADC times for crate jitter with L2 signals" << endl;
+        }
+        else
+        {
+           cout << "No correcting FADC times for crate jitter with L2 signals" << endl;
+        }
         if( fDoublePass )
         {
             cout << "double pass cleaning ";

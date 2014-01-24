@@ -161,7 +161,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	vector<int> fsumwindow_pass1;             // parameter for window summation (double pass - pass 1)
 	bool   fFixWindowStart_sumwindow2;        // fixed window start for summation window 2
         bool   fFixWindowStart;                   // fix the location of the window (do not move depending on t0)
-        bool   fDoublePass;                       // double pass image cleaning (default: off )
+        bool   fDoublePass;                       // double pass image cleaning (default: on)
 	bool   fDoublePassErrorWeighting2005;     // use error weighting from 2004 or today
 	bool   fDynamicIntegrationWindow;         // use a dynamic integration window (doublepass only)
         vector< int >    fTraceWindowShift;       // shift the summation window by value (in doublepass: low gain channels only, default: 0 )

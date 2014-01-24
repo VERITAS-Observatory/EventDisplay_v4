@@ -921,12 +921,12 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
             fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
         }
-        if( (int)getNSamples() < fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] )
+        if( (int)getNSamples() < fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] && fRunPar->fDoublePass )
         {
             if( fBoolSumWindowChangeWarning < 2 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
-    {
-       cout << "VEventLoop::analyzeEvent: resetting double pass summation window from ";
-       cout << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
+            {
+                cout << "VEventLoop::analyzeEvent: resetting double pass summation window from ";
+                cout << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
             fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 2;
