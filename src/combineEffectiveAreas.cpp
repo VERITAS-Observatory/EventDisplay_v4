@@ -16,6 +16,7 @@
 #include <string>
 
 #include <VGlobalRunParameter.h>
+#include <VInstrumentResponseFunctionRunParameter.h>
 
 using namespace std;
 
@@ -89,6 +90,20 @@ void merge( string ifile, char *outputfile, bool bFull = false )
         hEmc->Reset();
         hEmc->Write();
     }
+// get one example of IRF-runparameters for later checks in the analysis
+// (this assumes they are the same in all merged files!)
+    TFile *ifirst = f.GetFile();
+    VInstrumentResponseFunctionRunParameter* iRunPara = (VInstrumentResponseFunctionRunParameter*)ifirst->Get("makeEffectiveArea_runparameter");
+    if( !iRunPara )
+    {
+	cout << "error copying VInstrumentResponseFunctionRunParameter to output file" << endl; 
+	cout << "could not find them in file: " << ifirst->GetName() << endl;
+	cout << "(called " << iRunPara->GetName() << ")" << endl;
+	cout << "exiting..." << endl;
+	exit( -1 );
+	return;
+    }
+    iRunPara->Write();
     fO->Close();
 
 // merge all log files
