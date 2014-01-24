@@ -1018,7 +1018,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                     n_r = (int)x_off.size();
 
 // check maximum number of sources, if too many, remove some (randomly choosen)
-// (default)
+// (this might introduce a gradient across the sky maps)
                     if( fTMPL_RE_nMaxoffsource )
 		    {
 		       if( n_r > fRunList.fRE_nMaxoffsource )
@@ -1034,7 +1034,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                         }
                     }
 // remove those regions which are furthest away
-// (this is not default - debugging only)
+// (default)
                     else
 		    {
 			double i_dist = 0.;
