@@ -20,6 +20,7 @@ DSET=DATASET
 LOGF=FLL
 PEDFILE=PPPP
 TRGMASKDIR=TRIGGGG
+PPOP=UUUU
 
 # set array
 FIELD=$SUBA
@@ -28,7 +29,7 @@ FIELD=$SUBA
 COPT="-f 1 -c $PEDFILE"
 
 # eventdisplay command line parameter
-OPT="-averagetzerofiducialradius=0.5 -shorttree -l2setspecialchannels nofile -writenoMCTree -reconstructionparameter $ACUT"
+OPT="-averagetzerofiducialradius=0.5 -shorttree -l2setspecialchannels nofile -writenoMCTree -reconstructionparameter $ACUT $PPOP"
 
 # set timtelarray file and cp simtelarray.gz file to TMPDIR
 if [ ! -e $ILIST ]
@@ -112,9 +113,11 @@ do
   $EVNDISPSYS/bin/evndisp -sourcefile $TMPDIR/$OFIL.root $OPT -outputdirectory $TMPDIR >& $TMPDIR/$OFIL.$N.evndisp.log
 
 ####################################################################
-# get runnumber and azimuth
+# get runnumber and azimuth and rename output files
   MCAZ=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -mcaz`
   RUNN=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -runnumber`
+  rm -f -v $TMPDIR/$OFIL.root
+  cp -v -f $TMPDIR/$RUNN.root $ODIR/$RUNN"_"$MCAZ"deg.root"
 
 ####################################################################
 # move dst (if required ) and evndisp files to data directory
@@ -123,8 +126,6 @@ do
       mkdir -p $ODIR/VDST
       cp -v -f $TMPDIR/$OFIL.root $ODIR/VDST/
    fi
-   rm -f -v $TMPDIR/$OFIL.root
-   cp -v -f $TMPDIR/$RUNN.root $ODIR/$RUNN"_"$MCAZ"deg.root"
 done
 
 ####################################################################

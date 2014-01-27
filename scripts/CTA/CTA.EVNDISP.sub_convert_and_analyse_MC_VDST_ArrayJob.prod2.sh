@@ -40,8 +40,14 @@ fi
 
 ############################################################################
 # RUN PARAMETERS
+# prod2 no double pass cleaning
 # ARRAYCUTS="EVNDISP.prod2-noDoublepass.reconstruction.runparameter"
+# prod2 TIMENEXTNEIGHBOUR cleaning
+# ARRAYCUTS="EVNDISP.prod2.TIMENEXTNEIGHBOUR.reconstruction.runparameter"
+# PPOPT="\"-NNcleaninginputcard /lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/TIMENEXTNEIGHBOUR/Evtdisp.rc\""
+# prod2 default file
 ARRAYCUTS="EVNDISP.prod2.reconstruction.runparameter"
+PPOPT=""
 ############################################################################
 
 ARRAY=$1
@@ -112,24 +118,18 @@ echo "submitting $RUNFROMTO"
 
 FNAM="$SHELLDIR/EV-$DSET-$PART-$FLL"
 
-sed -e "s|SIMTELLIST|$RUNLIST|" $FSCRIPT.sh > $FNAM-1.sh
-sed -e "s|PAAART|$PART|" $FNAM-1.sh > $FNAM-2.sh
-rm -f $FNAM-1.sh
 LIST=`awk '{printf "%s ",$0} END {print ""}' $ARRAY`
-sed -e "s!ARRAY!$LIST!" $FNAM-2.sh > $FNAM-3.sh
-rm -f $FNAM-2.sh
-sed -e "s|KEEEEEEP|$KEEP|" $FNAM-3.sh > $FNAM-4.sh
-rm -f $FNAM-3.sh
-sed -e "s|ARC|$ARRAYCUTS|" $FNAM-4.sh > $FNAM-5.sh
-rm -f $FNAM-4.sh
-sed -e "s|DATASET|$DSET|" $FNAM-5.sh > $FNAM-7.sh
-rm -f $FNAM-5.sh
-sed -e "s|FLL|$FLL|" $FNAM-7.sh > $FNAM-8.sh
-rm -f $FNAM-7.sh
-sed -e "s|PPPP|$PEDFIL|" $FNAM-8.sh > $FNAM-9.sh
-rm -f $FNAM-8.sh
-sed -e "s|TRIGGGG|$TRGMASKDIR|" $FNAM-9.sh > $FNAM.sh
-rm -f $FNAM-9.sh
+
+sed -e "s|SIMTELLIST|$RUNLIST|" \
+    -e "s|PAAART|$PART|" \
+    -e "s!ARRAY!$LIST!" \
+    -e "s|KEEEEEEP|$KEEP|" \
+    -e "s|ARC|$ARRAYCUTS|" \
+    -e "s|DATASET|$DSET|" \
+    -e "s|FLL|$FLL|" \
+    -e "s|PPPP|$PEDFIL|" \
+    -e "s!UUUU!$PPOPT!" \
+    -e "s|TRIGGGG|$TRGMASKDIR|" $FSCRIPT.sh > $FNAM.sh
 
 chmod u+x $FNAM.sh
 echo $FNAM.sh
