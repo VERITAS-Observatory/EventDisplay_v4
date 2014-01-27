@@ -26,17 +26,18 @@ mkdir -p $2/tmplists
 
 # loop over all files in the list
 NTMPLIST=`wc -l $1 | awk '{print $1}'`
-FILEN=999
+FILEN=499
 for ((l = 1; l < $NTMPLIST; l+=$FILEN ))
 do
 # create file lists with 1000 files each
    let "k = $l + $FILEN"
    let "z = $z + 1"
-   LLIST=$2/tmplists/tmplist.$z.list
+   LLIST=$2/tmplists/tmplist.c.$z.list
    echo $LLIST
    sed -n "$l,$k p" $1 > $LLIST
 # run glite-transfer-submit
-   ftsid=`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.$z.list`
+   ftsid=`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.c.$z.list`
+#   echo "ftsid=\`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.g.$z.list\`"
    echo "   glite ID $ftsid"
 
 # test for maximum number of jobs
