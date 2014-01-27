@@ -906,7 +906,6 @@ void VImageCleaning::cleanNNImageFixed()
         }//*/
     }
     recoverImagePixelNearDeadPixel();
-    std::cout<<"[cleanNNImageFixed] ... done"<<std::endl;
 
     //fillImageBorderNeighbours();
 }
