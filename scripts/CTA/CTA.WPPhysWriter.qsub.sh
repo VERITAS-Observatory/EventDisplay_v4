@@ -17,10 +17,10 @@ set RECID=RRRR
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.tcsh CTA
 
-rm -f $OXUTNAME-$OXBSTIME$AXRRAY-$OXFFSET.log
+rm -f $OXUTNAME.$AXRRAY.$OXBSTIME.log
 
 cd $EVNDISPSYS/
-./bin/writeCTAWPPhysSensitivityFiles $AXRRAY $OXBSTIME $DXDIR $OXUTNAME CTA $OXFFSET $RECID > $OXUTNAME-$OXBSTIME$AXRRAY-$OXFFSET.log
+./bin/writeCTAWPPhysSensitivityFiles $AXRRAY $OXBSTIME $DXDIR $OXUTNAME CTA $OXFFSET $RECID > $OXUTNAME.$AXRRAY.$OXBSTIME.log
 
 ############################################################################
 
