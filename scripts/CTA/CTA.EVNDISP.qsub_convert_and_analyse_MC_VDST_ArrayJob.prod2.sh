@@ -117,7 +117,7 @@ do
   MCAZ=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -mcaz`
   RUNN=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -runnumber`
   rm -f -v $TMPDIR/$OFIL.root
-  cp -v -f $TMPDIR/$RUNN.root $ODIR/$RUNN"_"$MCAZ"deg.root"
+  cp -v -f $TMPDIR/$RUNN.root $ODIR/$RUNN"_"$ILINE"_"$MCAZ"deg.root"
 
 ####################################################################
 # move dst (if required ) and evndisp files to data directory

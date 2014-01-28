@@ -9,9 +9,11 @@
 if [ $# -lt 7 ]
 then
    echo 
-   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time [h]> <output file name> <offset=0/1> <recid> <data set> [qsub options]"
+   echo "./CTA.WPPhysWriter.sh <sub array list> <directory with effective areas> <observation time> <output file name> <offset=0/1> <recid> <data set> [qsub options]"
    echo
    echo "  <sub array list>          text file with list of subarray IDs"
+   echo ""
+   echo " <observation time>         observation time (add unit, e.g. 5h, 5m, 5s)"
    echo ""
    echo " <output file name>         output file name (without.root)"
    echo ""
@@ -75,7 +77,7 @@ do
        -e "s|ODIR|$ODIR|" \
        -e "s|RRRR|$RECID|" $FNAM
 
-   qsub $QSUBOPT -V -l os=sl6  -l h_cpu=0:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FNAM"
+   qsub $QSUBOPT -V -l os=sl6  -l h_cpu=6:29:00 -l h_vmem=8000M -l tmpdir_size=1G -o $FDIR -e $FDIR "$FNAM"
 
 done
 
