@@ -461,7 +461,6 @@ bool VInstrumentResponseFunctionRunParameter::readCRSpectralParameters()
            fCREnergySpectrum->SetParameter( i, espec.getEnergySpectrum( fCREnergySpectrumID )->GetParameter( i ) );
            fCREnergySpectrum->SetParError( i, espec.getEnergySpectrum( fCREnergySpectrumID )->GetParError( i ) );
        } 
-       fCREnergySpectrum->Print();
     }
     else
     {

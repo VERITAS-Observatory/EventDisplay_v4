@@ -38,7 +38,9 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fBGRate = 0;
     fBGRateSqDeg = 0;
     fProtRate = 0;
+    fProtRateSqDeg = 0;
     fElecRate = 0;
+    fElecRateSqDeg = 0;
     fEffArea = 0;
     fEffArea80 = 0;
     fAngRes68 = 0;
@@ -49,7 +51,11 @@ VWPPhysSensitivityFile::VWPPhysSensitivityFile()
     fOffsetCounter = 9999;
 }
 
-
+/*
+ * initialize histograms
+ *
+ * iOffsetCounter == 9999: on source histograms
+ */
 bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double iEnergyXaxis_min, double iEnergyXaxis_max,
                                int iEnergyTrue2DXaxisNbins, double iEnergyTrue2DXaxis_min, double iEnergyTrue2DXaxis_max,
                                int iEnergyRec2DXaxisNbins, double iEnergyRec2DXaxis_min, double iEnergyRec2DXaxis_max,
@@ -79,7 +85,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    hisList.push_back( fSensitivityCU );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fSensitivityCU );
 
-// sensitivity limits
+// sensitivity limits (for on source only)
    if( fOffsetCounter == 9999 ) 
    {
       sprintf( hname, "DiffSens_Significance" );
@@ -129,7 +135,7 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
    fProtRate = new TH1F( hname, "Proton Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fProtRate->SetXTitle( "log_{10} (E/TeV)" );
-   fProtRate->SetYTitle( "background rate [1/s]" );
+   fProtRate->SetYTitle( "background proton rate [1/s]" );
    hisList.push_back( fProtRate );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fProtRate );
 
@@ -137,17 +143,33 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
    fElecRate = new TH1F( hname, "Electron Rate", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fElecRate->SetXTitle( "log_{10} (E/TeV)" );
-   fElecRate->SetYTitle( "background rate [1/s]" );
+   fElecRate->SetYTitle( "background electron rate [1/s]" );
    hisList.push_back( fElecRate );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fElecRate );
 
    sprintf( hname, "BGRatePerSqDeg" );
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
-   fBGRateSqDeg = new TH1F( hname, "Background rate per square deg", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   fBGRateSqDeg = new TH1F( hname, "Background rate per square degree", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
    fBGRateSqDeg->SetXTitle( "log_{10} (E/TeV)" );
    fBGRateSqDeg->SetYTitle( "background rate [1/s/deg^{2}]" );
    hisList.push_back( fBGRateSqDeg );
    if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fBGRateSqDeg );
+
+   sprintf( hname, "ProtRateSqDeg" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fProtRateSqDeg = new TH1F( hname, "Proton Rate per square degree", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   fProtRateSqDeg->SetXTitle( "log_{10} (E/TeV)" );
+   fProtRateSqDeg->SetYTitle( "background proton rate [1/s/deg^{2}]" );
+   hisList.push_back( fProtRateSqDeg );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fProtRateSqDeg );
+
+   sprintf( hname, "ElecRateSqDeg" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fElecRateSqDeg = new TH1F( hname, "electron Rate per square degree", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   fElecRateSqDeg->SetXTitle( "log_{10} (E/TeV)" );
+   fElecRateSqDeg->SetYTitle( "background electron rate [1/s/deg^{2}]" );
+   hisList.push_back( fElecRateSqDeg );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fElecRateSqDeg );
 
    sprintf( hname, "EffectiveArea" );
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
@@ -261,7 +283,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 	      iHisName2D = iHisName.substr( 0, iHisName.find( hname ) ) + "_offaxis";
 	      if( iHisName.find( hname ) != string::npos )
 	      {
-// firs element in loop: create new histograms
+// first element in loop: create new histograms
 		if( j == 0 )
 		{
 		   if( iClass == "TH1F" )
@@ -371,8 +393,9 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
    i_IRF.fillResolutionHistogram( fEres, "68", "t_energy_resolution" );
 // fill energy bias histograms
    i_IRF.fillBiasHistograms( fEbias, "mean" );
-// fill effective area histograms
+// fill effective area histograms (68%)
    i_IRF.fillEffectiveAreasHistograms( fEffArea, "", fEffAreaMC );
+// fill effective area histograms (80%)
    i_IRF.fillEffectiveAreasHistograms( fEffArea80, "80" );
    if( i_IRF.getMigrationMatrix() )
    {
@@ -408,7 +431,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 // set Crab Nebula spectrum
     i_Sens.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
     i_SensCU.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
-// energy range to be plotted
+// energy range 
     i_Sens.setEnergyRange_Lin( 0.01, 150. );
     i_SensCU.setEnergyRange_Lin( 0.01, 150. );
 // significance parameters
@@ -552,11 +575,11 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 // fill sensitivity histograms
     bool iHighEnergyFilling = false;
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
-    i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fElecRate, iHighEnergyFilling );
+    i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fProtRateSqDeg, fElecRate, fElecRateSqDeg, iHighEnergyFilling );
     if( iFill1D ) i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
 
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
-    i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fElecRate, iHighEnergyFilling );
+    i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fProtRateSqDeg, fElecRate, fElecRateSqDeg, iHighEnergyFilling );
     if( iFill1D ) i_SensCU.fillSensitivityLimitsHistograms( fSensitivityCULimits );
 
     return true;

@@ -53,7 +53,8 @@ void VInstrumentResponseFunction::setMonteCarloEnergyRange( double iMin, double 
 }
 
 
-bool VInstrumentResponseFunction::initialize( string iName, string iType, unsigned int iNTel, double iMCMaxCoreRadius, double iZe, int iNoise, double iPedvars, double iXoff, double iYoff )
+bool VInstrumentResponseFunction::initialize( string iName, string iType, unsigned int iNTel, double iMCMaxCoreRadius, 
+                                              double iZe, int iNoise, double iPedvars, double iXoff, double iYoff )
 {
    fName = iName;
    fType = iType;
@@ -124,7 +125,7 @@ bool VInstrumentResponseFunction::fill()
 	if( !fAnaCuts->applyMCXYoffCut( fData->MCxoff, fData->MCyoff, true ) ) continue;
 
 ////////////////////////////////
-// apply generaly quality and gamma/hadron separation cuts
+// apply general quality and gamma/hadron separation cuts
 // apply fiducial area cuts
 	 if( !fAnaCuts->applyInsideFiducialAreaCut( true ) ) continue;
 
@@ -135,9 +136,7 @@ bool VInstrumentResponseFunction::fill()
 //	 if( fAnaCuts->applyTelTypeTest( true ) ) continue;
 
 // apply gamma/hadron cuts
-//    
 	 if( !fAnaCuts->isGamma( i, true ) ) continue;
-
 
 //////////////////////////////////////
 // loop over all az bins

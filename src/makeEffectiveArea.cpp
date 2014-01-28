@@ -118,21 +118,41 @@ int main( int argc, char *argv[] )
     vector< VInstrumentResponseFunction* > f_IRF;
     vector< string > f_IRF_Name;
     vector< string > f_IRF_Type;
+    vector< float >  f_IRF_ContainmentProbability;
     string fCuts_AngularResolutionName = "";
     if( fRunPara->fFillingMode != 3 )
     {
-       f_IRF_Name.push_back( "angular_resolution" );            f_IRF_Type.push_back( "angular_resolution" );
-       if( fCuts->getAngularResolutionContainmentRadius() )
+// 68% angular resolution file
+       f_IRF_Name.push_back( "angular_resolution" );            
+       f_IRF_Type.push_back( "angular_resolution" );   
+       f_IRF_ContainmentProbability.push_back( 0.68 );
+// 80% angular resolution file
+       f_IRF_Name.push_back( "angular_resolution_080p" );
+       f_IRF_Type.push_back( "angular_resolution" );
+       f_IRF_ContainmentProbability.push_back( 0.80 );
+// use same containment radius as in gamma/hadron cuts
+       if( fCuts->getAngularResolutionContainmentRadius()
+        && TMath::Abs( (float)fCuts->getAngularResolutionContainmentRadius() - 68. ) > 1.e-5 
+        && TMath::Abs( (float)fCuts->getAngularResolutionContainmentRadius() - 80. ) > 1.e-5 )
        {
+          cout << "XXX " << TMath::Abs( fCuts->getAngularResolutionContainmentRadius() - 0.68 ) << "\t" << TMath::Abs( fCuts->getAngularResolutionContainmentRadius() - 0.80 ) << endl;
+          exit( 0 );
 	  char hname[200];
 	  sprintf( hname, "angular_resolution_0%dp", fCuts->getAngularResolutionContainmentRadius() );
 	  fCuts_AngularResolutionName = hname;
+          f_IRF_ContainmentProbability.push_back( fCuts->getAngularResolutionContainmentRadius() );
           f_IRF_Name.push_back( fCuts_AngularResolutionName );       f_IRF_Type.push_back( "angular_resolution" );
        }
        if( fRunPara->fFillingMode != 2 )
        {
-	  f_IRF_Name.push_back( "core_resolution" );               f_IRF_Type.push_back( "core_resolution" );
-	  f_IRF_Name.push_back( "energy_resolution" );             f_IRF_Type.push_back( "energy_resolution" );
+// core resolution
+	  f_IRF_Name.push_back( "core_resolution" );
+          f_IRF_Type.push_back( "core_resolution" );
+          f_IRF_ContainmentProbability.push_back( 0.68 );
+// energy resolution
+	  f_IRF_Name.push_back( "energy_resolution" ); 
+          f_IRF_Type.push_back( "energy_resolution" );
+          f_IRF_ContainmentProbability.push_back( 0.68 );
        }
     }
     for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
@@ -146,7 +166,7 @@ int main( int argc, char *argv[] )
         }
 	else
 	{
-	   f_IRF.back()->setContainmentProbability( 0.68 );
+	   f_IRF.back()->setContainmentProbability( f_IRF_ContainmentProbability[i] );
         }
         f_IRF.back()->initialize( f_IRF_Name[i], f_IRF_Type[i],
 	                          fRunPara->telconfig_ntel, fRunPara->fCoreScatterRadius,

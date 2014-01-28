@@ -1105,6 +1105,7 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
           cout << ")" << endl;
           continue;
        }
+// draw the resolution graph
        if( g )
        {
           if( fDebug ) g->Print();

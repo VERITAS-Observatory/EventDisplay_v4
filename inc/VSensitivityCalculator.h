@@ -181,9 +181,10 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         TGraphAsymmErrors *gSensitivityvsEnergy;
 	TGraphAsymmErrors *gSignalRate;
 	TGraphAsymmErrors *gBGRate;
-	TGraphAsymmErrors *gBGRateSqDeg;
-	TGraphErrors *gProtonRate;
-	TGraphErrors *gElectronRate;
+//	TGraphErrors *gProtonRate;
+//	TGraphErrors *gElectronRate;
+	TGraphAsymmErrors *gProtonRate;
+	TGraphAsymmErrors *gElectronRate;
 
 // plotting debug stuff
         vector< TCanvas * > cPlotDebug;
@@ -209,6 +210,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	void       fillBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
 						  map< unsigned int, vector< double > > i_flux_NOff,
 						  map< unsigned int, vector< double > > i_flux_NOff_error );
+        bool       fillBackroundvsSquareDegree( TGraphAsymmErrors* i_R, TH1F *i_H );
 	void       fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha );
         bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions *iMCPara, double dE_Log10 );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
@@ -241,7 +243,8 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double   calculateObservationTimevsFlux( unsigned int iD );
 	bool     calculateParticleNumberGraphs_MC( double dE_Log10 );
 	bool     fillSensitivityHistograms( TH1F* iSensitivity = 0, TH1F* iBGRate = 0, TH1F* iBGRateSqDeg = 0, 
-	                                    TH1F* iProtonRate = 0,  TH1F* iElectronRate = 0, bool iHE = false );
+	                                    TH1F* iProtonRate = 0, TH1F* iProtonRateSqDeg = 0,
+                                            TH1F* iElectronRate = 0, TH1F* iElectronRateSqDeg = 0, bool iHE = false );
         bool     fillSensitivityLimitsHistograms( vector<TH1F*>& h );
 	bool     getDebug() { return fDebug; }
         double   getSensitivity( unsigned int iD, double energy = -1., unsigned int iFillStatistics = 0 );
@@ -302,6 +305,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,19);
+        ClassDef(VSensitivityCalculator,20);
 };
 #endif

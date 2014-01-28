@@ -17,18 +17,18 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
-    if( argc != 8 )
+    if( argc != 8 && argc != 7 )
     {
         cout << endl;
 	cout << "./writeCTAWPPhysSensitivityFiles <sub array> <observing time> <data directory>";
-	cout << " <outputfile> <observatory (CTA/V5/V6)> <offset=0/1> <recid>" << endl;
+	cout << " <outputfile> <observatory (CTA/V5/V6)> <calculate offset sensitivites=0/1> [recid (default=0)]" << endl;
 	cout << endl;
 	cout << "\t observing time: give unit without space, e.g. 50h, 10m, 2s" << endl;
 	cout << endl;
 	exit( 0 );
     }
     string fSubArray = argv[1];
-// observing time
+// observing time (translate from whatever unit into h)
     double fObservingTime_h = 0.;
     string iObstime = argv[2];
     if( iObstime.find( "h" ) != string::npos )
@@ -51,9 +51,11 @@ int main( int argc, char *argv[] )
     string fOutputFile = argv[4];
     string fObservatory = argv[5];
     bool   fWriteOffsetFiles = atoi( argv[6] );
-    int    fReconstructionID = atoi( argv[7] );
+    int    fReconstructionID = 0;
+    if( argc == 8 ) fReconstructionID = atoi( argv[7] );
 
     VWPPhysSensitivityFile *iData = new VWPPhysSensitivityFile();
+    iData->setDebug( true );
     iData->setObservatory( fObservatory );
 // Note: offset binning hardwired
     vector< double > iWobbleMin;
@@ -66,7 +68,7 @@ int main( int argc, char *argv[] )
        iWobbleMin.push_back( 3.0 ); iWobbleMax.push_back( 3.5 );
        iWobbleMin.push_back( 3.5 ); iWobbleMax.push_back( 4.0 );
        iWobbleMin.push_back( 4.0 ); iWobbleMax.push_back( 4.5 );
-       iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 );  
+       iWobbleMin.push_back( 4.5 ); iWobbleMax.push_back( 5.0 );   
     }
 // sub array
     iData->setDataFiles( fSubArray, fReconstructionID );
@@ -79,6 +81,7 @@ int main( int argc, char *argv[] )
 // CR spectra (protons + electrons)
     iData->setCosmicRaySpectrum( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 8 );
 
+/////////////////////////////////////
 // on source histograms
 // initialize histogram with the standard binning used in the CTA WP Phys group
     iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, 9999 );
@@ -87,10 +90,11 @@ int main( int argc, char *argv[] )
        cout << "error filling on source histograms" << endl;
     }   
 
+/////////////////////////////////////
 // off source histograms
     for( unsigned int i = 0; i < iWobbleMin.size(); i++ )
     {
-       cout << "WOBBLE " << i << "\t" << iWobbleMin[i] << "\t" << iWobbleMax[i] << endl;
+       cout << "Camera offset: " << i << "\t" << iWobbleMin[i] << "\t" << iWobbleMax[i] << endl;
 // initialize histogram with the standard binning used in the CTA WP Phys group
        iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, i );
        if( !iData->fillHistograms1D( fDataDirectory, false ) )

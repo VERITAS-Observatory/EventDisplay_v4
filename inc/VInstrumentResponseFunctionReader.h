@@ -97,7 +97,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
     TGraphErrors *gEnergyLogBias_Median;
 // angular resolution (filled for CTA only)
     TGraphErrors *gAngularResolution;
-    TGraphErrors *gAngularResolution80;
+    TGraphErrors *gAngularResolution80;             // 80% containment radius for angular resolution
 // cut efficiencies 
     vector< TH1D* > hCutEfficiency;
     vector< TH1D* > hCutEfficiencyRelativePlots;

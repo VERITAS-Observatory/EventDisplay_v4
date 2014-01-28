@@ -57,7 +57,9 @@ class VWPPhysSensitivityFile
     TH1F* fBGRate;
     TH1F* fBGRateSqDeg;
     TH1F* fProtRate;
+    TH1F* fProtRateSqDeg;
     TH1F* fElecRate;
+    TH1F* fElecRateSqDeg;
     TH1F* fEffArea;
     TH1F* fEffAreaMC;
     TH1F* fEffArea80;

@@ -106,7 +106,6 @@ void VSensitivityCalculator::reset()
 // sensitivity graph
     gSensitivityvsEnergy = 0;
     gBGRate = 0;
-    gBGRateSqDeg = 0;
     gProtonRate = 0;
     gElectronRate = 0;
 
@@ -1376,7 +1375,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( !h ) h = get_CTA_IRF_Histograms( "hProtRate", fMCCTA_cameraoffset_deg );
     if( h )
     {
-       gProtonRate = new TGraphErrors( 1 );
+       gProtonRate = new TGraphAsymmErrors( 1 );
        get_Graph_from_Histogram( h, gProtonRate, true, 0., log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
        setGraphPlottingStyle( gProtonRate, 1, 2, 21, 2 );
     }
@@ -1386,7 +1385,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
     if( !h ) h = get_CTA_IRF_Histograms( "hElecRate", fMCCTA_cameraoffset_deg );
     if( h )
     {
-       gElectronRate = new TGraphErrors( 1 );
+       gElectronRate = new TGraphAsymmErrors( 1 );
        get_Graph_from_Histogram( h, gElectronRate, true, 0., log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
        setGraphPlottingStyle( gElectronRate, 1, 2, 22, 2 );
     }
@@ -1735,13 +1734,15 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea,
-								   (*i_MCData_iterator).second->hResponseMatrix, false, &iMCR, (*i_MCData_iterator).second->hWeightedRate,
+								   (*i_MCData_iterator).second->hResponseMatrix, false, &iMCR, 
+                                                                   (*i_MCData_iterator).second->hWeightedRate,
                                                                    v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
             v_flux_NOff_error[(*i_MCData_iterator).first][i] =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin,
                                                                    i_CR, (*i_MCData_iterator).second->fSpectralParameterID,
 								   fMC_Data[1]->energy,
 								   (*i_MCData_iterator).second->energy, (*i_MCData_iterator).second->effArea_error,
-								   (*i_MCData_iterator).second->hResponseMatrix, true, &iMCR, (*i_MCData_iterator).second->hWeightedRate,
+								   (*i_MCData_iterator).second->hResponseMatrix, true, &iMCR,
+                                                                   (*i_MCData_iterator).second->hWeightedRate,
                                                                    v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2418,8 +2419,8 @@ void VSensitivityCalculator::fillBackgroundParticleNumbers( vector< VDifferentia
 							    map< unsigned int, vector< double > > i_flux_NOff,
 							    map< unsigned int, vector< double > > i_flux_NOffError )
 {
-   gProtonRate = new TGraphErrors( 1 );
-   gElectronRate = new TGraphErrors( 1 );
+   gProtonRate   = new TGraphAsymmErrors( 1 );
+   gElectronRate = new TGraphAsymmErrors( 1 );
 
    if( i_flux_NOff.find( 14 ) != i_flux_NOff.end() && i_flux_NOffError.find( 14 ) != i_flux_NOffError.end() )
    {
@@ -2431,7 +2432,7 @@ void VSensitivityCalculator::fillBackgroundParticleNumbers( vector< VDifferentia
          }
 	 if( i < i_flux_NOffError[14].size() )
 	 {
-	    gProtonRate->SetPointError( i, 0., i_flux_NOffError[14][i] );
+	    gProtonRate->SetPointError( i, 0., 0., i_flux_NOffError[14][i], i_flux_NOffError[14][i] );
          }
       }
    }
@@ -2445,7 +2446,7 @@ void VSensitivityCalculator::fillBackgroundParticleNumbers( vector< VDifferentia
          }
 	 if( i < i_flux_NOffError[2].size() )
 	 {
-	    gElectronRate->SetPointError( i, 0., i_flux_NOffError[2][i] );
+	    gElectronRate->SetPointError( i, 0., 0., i_flux_NOffError[2][i], i_flux_NOffError[2][i] );
          }
       }
    }
@@ -2737,17 +2738,45 @@ bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, 
     return true;
 }
 
+bool VSensitivityCalculator::fillBackroundvsSquareDegree( TGraphAsymmErrors* i_R, TH1F *i_H )
+{
+   if( !i_R || !i_H ) return false;
+
+   if( fMC_Data.find( 1 ) != fMC_Data.end() && fMC_Data[1]->gTheta2Cuts_vsEnergylgTeV )
+   {
+       double x = 0.;
+       double y = 0.;
+       for( int i = 0; i < i_R->GetN(); i++ )
+       {
+          i_R->GetPoint( i, x, y );
+	  if( y > 0. )
+	  {
+	     double iSolidAngle = fMC_Data[1]->gSolidAngle_DirectionCut_vs_EnergylgTeV->Eval( x );
+	     if( iSolidAngle > 0. )
+	     {
+		y /= iSolidAngle * TMath::DegToRad() * TMath::DegToRad();
+		i_H->SetBinContent( i_H->FindBin( x ), y/60. );
+		i_H->SetBinError( i_H->FindBin( x ), 0.5*(i_R->GetErrorYlow(i)+i_R->GetErrorYhigh(i))
+		                                    / (iSolidAngle * TMath::DegToRad() * TMath::DegToRad()) / 60. );
+             }
+          }
+       } 
+   } 
+   else return false;
+
+   return true;
+}
+
 /*
  
    fill sensitivity histograms for CTA WP Phys IRF files
 
 */
 bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F* iBGRate, TH1F* iBGRateSqDeg,
-                                                        TH1F* iProtonRate,  TH1F* iElectronRate,
+                                                        TH1F* iProtonRate, TH1F* iProtonRateSqDeg,
+                                                        TH1F* iElectronRate, TH1F* iElectronRateSqDeg,
 							bool iHighEnergyFilling )
 {
-    double x = 0.;
-    double y = 0.;
     if( iSensitivity && gSensitivityvsEnergy )
     {
        fillSensitivityHistogramfromGraph( gSensitivityvsEnergy, iSensitivity, 1. );
@@ -2759,31 +2788,16 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
 // rate histogram are filled in 1/s, graphs are in 1/min
        fillSensitivityHistogramfromGraph( gBGRate, iBGRate, 1./60. );
     }
-    if( iBGRateSqDeg && fMC_Data.find( 1 ) != fMC_Data.end() && fMC_Data[1]->gTheta2Cuts_vsEnergylgTeV && gBGRate )
-    {
-       for( int i = 0; i < gBGRate->GetN(); i++ )
-       {
-          gBGRate->GetPoint( i, x, y );
-	  if( y > 0. )
-	  {
-	     double iSolidAngle = fMC_Data[1]->gSolidAngle_DirectionCut_vs_EnergylgTeV->Eval( x );
-	     if( iSolidAngle > 0. )
-	     {
-		y /= iSolidAngle * TMath::DegToRad() * TMath::DegToRad();
-		iBGRateSqDeg->SetBinContent( iBGRate->FindBin( x ), y/60. );
-		iBGRateSqDeg->SetBinError( iBGRateSqDeg->FindBin( x ), 0.5*(gBGRate->GetErrorYlow(i)+gBGRate->GetErrorYhigh(i))
-		                                                       / (iSolidAngle * TMath::DegToRad() * TMath::DegToRad()) / 60. );
-             }
-          }
-       } 
-    } 
+    fillBackroundvsSquareDegree( gBGRate, iBGRateSqDeg );
     if( iProtonRate && gProtonRate )
     {
        fillSensitivityHistogramfromGraph( gProtonRate, iProtonRate, 1./60. );
+       fillBackroundvsSquareDegree( gProtonRate, iProtonRateSqDeg );
     }
     if( iElectronRate && gElectronRate )
     {
        fillSensitivityHistogramfromGraph( gElectronRate, iElectronRate, 1./60. );
+       fillBackroundvsSquareDegree( gElectronRate, iElectronRateSqDeg );
     }
 
 // go again over the high energy part of the sensitivity curve and check conditions for sensitivity:

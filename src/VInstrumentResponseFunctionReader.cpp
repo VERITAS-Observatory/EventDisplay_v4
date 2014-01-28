@@ -773,10 +773,13 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F *hEff
 {
     if( !hEffRec ) return false;
 
+    double i_EffAreaScaleFactor = 1.;
     if( iContainmentRadius.size() > 0 )
     {
        cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms() warning: " << endl;
-       cout << "\t assuming that effective areas are calculated using a 80% containment on direction" << endl;
+       cout << "\t assuming that effective areas are calculated using a 68\% containment on direction" << endl;
+       cout << "\t (this is hard coded!!!)" << endl;
+       i_EffAreaScaleFactor = 0.80/0.68;
     }
 
     if( gEffArea_Rec )
@@ -788,7 +791,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F *hEff
 	   gEffArea_Rec->GetPoint( i, x, y );
 	   if( y > 0. )
 	   {
-	      hEffRec->SetBinContent( hEffRec->FindBin( x ), y ); 
+	      hEffRec->SetBinContent( hEffRec->FindBin( x ), y  * i_EffAreaScaleFactor ); 
 	      hEffRec->SetBinError( hEffRec->FindBin( x ), 0.5*(gEffArea_Rec->GetErrorYlow(i)+gEffArea_Rec->GetErrorYhigh(i)) );
            }	      
 	}
