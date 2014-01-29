@@ -2738,9 +2738,13 @@ bool VSensitivityCalculator::setMonteCarloParametersCTA_MC( string iCTA_MCFile, 
     return true;
 }
 
-bool VSensitivityCalculator::fillBackroundvsSquareDegree( TGraphAsymmErrors* i_R, TH1F *i_H )
+/*
+ * fill a histogram with background rate per square degree from a background rate graph
+ * 
+ */
+bool VSensitivityCalculator::fillBackroundvsSquareDegree( TGraphAsymmErrors* i_R, TH1F *iH_sqDeg )
 {
-   if( !i_R || !i_H ) return false;
+   if( !i_R || !iH_sqDeg ) return false;
 
    if( fMC_Data.find( 1 ) != fMC_Data.end() && fMC_Data[1]->gTheta2Cuts_vsEnergylgTeV )
    {
@@ -2754,9 +2758,9 @@ bool VSensitivityCalculator::fillBackroundvsSquareDegree( TGraphAsymmErrors* i_R
 	     double iSolidAngle = fMC_Data[1]->gSolidAngle_DirectionCut_vs_EnergylgTeV->Eval( x );
 	     if( iSolidAngle > 0. )
 	     {
-		y /= iSolidAngle * TMath::DegToRad() * TMath::DegToRad();
-		i_H->SetBinContent( i_H->FindBin( x ), y/60. );
-		i_H->SetBinError( i_H->FindBin( x ), 0.5*(i_R->GetErrorYlow(i)+i_R->GetErrorYhigh(i))
+		y /= iSolidAngle * TMath::RadToDeg() * TMath::RadToDeg();
+		iH_sqDeg->SetBinContent( iH_sqDeg->FindBin( x ), y/60. );
+		iH_sqDeg->SetBinError( iH_sqDeg->FindBin( x ), 0.5*(i_R->GetErrorYlow(i)+i_R->GetErrorYhigh(i))
 		                                    / (iSolidAngle * TMath::DegToRad() * TMath::DegToRad()) / 60. );
              }
           }
