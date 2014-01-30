@@ -186,7 +186,7 @@ while ($i <= $NRUN)
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysis_d20131222_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysis_d20140130_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -197,6 +197,9 @@ mkdir -p $ODIR
 set PEDOPT="-pedestalfile $NOISEFILE -pedestalseed=$RRR -pedestalDefaultPedestal=$PEDLEV -pedestalnoiselevel=$NOISE"
 
 ##### MC options #####
+# restrict average tzero calculation to inner part of the camera
+# set MCOPT="-sourcetype=2 -camera=$CFG -averagetzerofiducialradius=0.60"
+# default options
 set MCOPT="-sourcetype=2 -camera=$CFG"
 
 echo "RUNNUMBER $SRUN"
@@ -208,7 +211,7 @@ echo "EVNDISP log file written to $ODIR/$RRR.log"
 ##############################################################################################
 echo "CALCULATING AVERAGE TZEROS FOR RUN $SRUN"
 rm -f $ODIR/$SRUN.tzero.log
-$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$SRUN -deadchannelfile $DEAD -arraycuts $ACUT -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==5000 $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$SRUN.tzero.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$SRUN -deadchannelfile $DEAD -arraycuts $ACUT -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==100000 $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$SRUN.tzero.log
 
 
 ##############################################################################################
