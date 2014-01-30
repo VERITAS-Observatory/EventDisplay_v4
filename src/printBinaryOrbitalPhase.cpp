@@ -20,7 +20,7 @@ int main(  int argc, char *argv[] )
    {
       cout << "printBinaryOrbitalPhase <year> <month> <day> <MJD> <Object> [orbit] [T0]" << endl;
       cout << endl;
-      cout << "   set either year/month/day or MJD (set other values to -1" << endl;
+      cout << "   set either year/month/day or MJD (set other values to -1)" << endl;
       cout << endl;
       cout << "   print orbit for a whole year: set month and day to -1 each" << endl;
       cout << endl;

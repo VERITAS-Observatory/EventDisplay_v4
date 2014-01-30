@@ -1397,6 +1397,8 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
 
    calculate different or integral flux from CTA-MC files
 
+   (WP Phys style)
+
 */
 vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfromCTA_MC( double dE_Log10, double &iNorm )
 {
@@ -1448,17 +1450,26 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	   i_flux.EnergyWeightedMean = i_flux.Energy;
 	   i_flux.ObsTime = fObservationTime_h * 60. * 60.;
 
+// number of background events
 	   i_flux.NOff = hBck->GetBinContent( i ) * i_flux.ObsTime;
+	   i_flux.NOff_error = sqrt( i_flux.NOff );
+// number of signal events
 	   i_flux.NOn = iMCR.getMonteCarloRate( iEnergy, iEff, fEnergySpectrumfromLiterature, fEnergySpectrumfromLiterature_ID,
 	                                        i_flux.Energy_lowEdge_bin, i_flux.Energy_upEdge_bin );
            i_flux.NOn *= i_flux.ObsTime / 60.;
 	   i_flux.NOn += i_flux.NOff;
+	   i_flux.NOn_error  = sqrt( i_flux.NOn );
+// multiply off events by alpha (number of background regions)
+           i_flux.NOff /= fAlpha;
+	   i_flux.NOff_error /= fAlpha;
 
 	   a.push_back( i_flux );
        }
     }
-
     iNorm = fAlpha;
+
+// this is not necessary when count rates are read from CTA WP Phys file
+    fRequireCutsToBeOptimized = false;
 
     return a;
 }
@@ -2846,7 +2857,7 @@ TCanvas* VSensitivityCalculator::plotSignalBackgroundRates( TCanvas *c, bool bPl
    bool bNewCanvas = false;
    if( !c )
    {
-      c = new TCanvas( "cSignalBackgroundRates", "signal and background rates", 0, 0, 400, 400 );
+      c = new TCanvas( "cSignalBackgroundRates", "background rates", 0, 0, 400, 400 );
       c->SetGridx( 0 );
       c->SetGridx( 0 );
       c->SetLeftMargin( 0.15 );

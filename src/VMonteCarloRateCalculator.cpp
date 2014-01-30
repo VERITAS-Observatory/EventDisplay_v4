@@ -235,7 +235,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( int nbins, double *e, doubl
 */
 double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-						     unsigned int iEMinBin, unsigned int iEMaxBin, TH2D *iResponseMatrix, bool bDebug )
+						     unsigned int iEMinBin, unsigned int iEMaxBin, TH2 *iResponseMatrix, bool bDebug )
 {
    return getMonteCarloRate( e, eff, e_lit, e_lit_ID, iEMinBin, iEMaxBin, 0., 0., iResponseMatrix, bDebug );
 }
@@ -250,7 +250,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 						     unsigned int iEMinBin, unsigned int iEMaxBin,
-						     double iEMin, double iEMax, TH2D *iResponseMatrix, bool bDebug )
+						     double iEMin, double iEMax, TH2 *iResponseMatrix, bool bDebug )
 {
     vector< double > e_gamma;
 
@@ -263,7 +263,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector< double > eff,
                                                      VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 						     unsigned int iEMinBin, unsigned int iEMaxBin,
-						     double iEMin, double iEMax, TH2D *iResponseMatrix,
+						     double iEMin, double iEMax, TH2 *iResponseMatrix,
 						     vector< double > e_gamma, bool bDebug )
 {
     if( e.size() == 0 ) return -99;
@@ -344,7 +344,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 	         i_bflux = e_lit->getIntegralFlux( pow( 10., iResponseMatrix->GetYaxis()->GetBinLowEdge( j_Rec_Bin ) ), 
 		                                   pow( 10., iResponseMatrix->GetYaxis()->GetBinUpEdge( j_Rec_Bin ) ), e_lit_ID );
 // multiply flux by effective areas
-// (this is the number of gammas per energy bin (dN not dN/dE)
+// (this is the number of gammas per energy bin (dN not dN/dE))
 	         y1 *= i_bflux;
 // total flux
 		 iTot += y1;

@@ -48,11 +48,11 @@ class VMonteCarloRateCalculator : public VPlotUtilities
         double getMonteCarloRate( int nbins, double *e0, double *eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
 	                          double iEMinBin, double iEMaxBin, bool bDebug = false );
         double getMonteCarloRate( vector< double > e, vector< double > eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-	                          unsigned int iEMinBin, unsigned int iEMaxBin, TH2D *iResponseMatrix = 0, bool bDebug = false );
+	                          unsigned int iEMinBin, unsigned int iEMaxBin, TH2 *iResponseMatrix = 0, bool bDebug = false );
         double getMonteCarloRate( vector< double > e, vector< double > eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-	                          unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, TH2D *iResponseMatrix = 0, bool bDebug = false );
+	                          unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, TH2 *iResponseMatrix = 0, bool bDebug = false );
         double getMonteCarloRate( vector< double > e, vector< double > eff, VEnergySpectrumfromLiterature *e_lit, unsigned int e_lit_ID,
-	                          unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, TH2D *iResponseMatrix,
+	                          unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, TH2 *iResponseMatrix,
 				  vector< double > e_gamma, bool bDebug );
 
 // read rates
