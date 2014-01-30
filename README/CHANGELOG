@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140130 (GM) changed settings for PSF plotting
+                in sky maps
+
 * 20140124 (GM) implemented average tzero calculation
                 (mean arrival pulse time)
                 command line parameter:
@@ -15,7 +18,7 @@ Change log eventdisplay analysis package
                 in LL fit (VImageParameterCalculation)
 
 * 20131222 (GM) fixed reading of wobble offsets for
-                zero offset pointints
+                zero offset pointings
 
 * 20131220 (GM) fixed warnings and errors from clang++
 
@@ -41,10 +44,9 @@ Change log eventdisplay analysis package
                 * -1 FADCSUMMATIONSTART 2 -1
                 removed parameter fTraceWindowShift_DoublePassSmallImages
 
-
 *************************************************************
-******* 20131219 trunk if now 4.40, to indicate        ******
-*******          signifant changes                     ******
+******* 20131219 trunk is now 4.40, to indicate        ******
+*******          significant changes                   ******
 *************************************************************
 
 * 20131217 (JT, GM) additions to Hough muon analysis
