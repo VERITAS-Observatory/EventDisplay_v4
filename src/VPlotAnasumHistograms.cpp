@@ -21,7 +21,7 @@ VPlotAnasumHistograms::VPlotAnasumHistograms()
 
    setPlottingCorrelatedHistograms();
    setPlottingUseHours();
-   setPlottingDrawPSF();
+   setPlottingPSF_radius_deg();
 
    fSkyMapCentreDecJ2000 = -9999.;
    fSkyMapCentreRAJ2000  = -9999.;
@@ -43,7 +43,7 @@ VPlotAnasumHistograms::VPlotAnasumHistograms( string ifile, int ion )
 
    setPlottingCorrelatedHistograms();
    setPlottingUseHours();
-   setPlottingDrawPSF();
+   setPlottingPSF_radius_deg();
 
    fSkyMapCentreDecJ2000 = -9999.;
    fSkyMapCentreRAJ2000  = -9999.;
@@ -890,8 +890,11 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 // different presentations
     fPlotMode = "A colz";
 
-    //
-    if( fabs( xcenter ) > 1.e-5 || fabs( ycenter ) > 1.e-5 ) cout << "WARNING: sky map shifting preliminary. Attention on the edge of the sky map" << endl;
+//
+    if( fabs( xcenter ) > 1.e-5 || fabs( ycenter ) > 1.e-5 )
+    {
+       cout << "WARNING: sky map shifting preliminary. Attention on the edge of the sky map" << endl;
+    }
 
     char hname[200];
     char htitle[200];
@@ -957,7 +960,7 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
         else if( sPlot == 3 ) hmap->SetZTitle( "background events" );
         hmap->Draw( fPlotMode.data() );
 
-        if( fPlotDrawPSF ) drawPSF( c_skysig, "", hmap, 0.11 );   // hard-wired angular resolution!
+        if( fPlotDrawPSF > 0. ) drawPSF( c_skysig, "", hmap, fPlotDrawPSF ); 
 
 // now do the axis
         double xmin, ymin, xmax, ymax, wmin, wmax;
@@ -1034,7 +1037,6 @@ TCanvas* VPlotAnasumHistograms::plot_radec( int sPlot, double rmax, double zmin,
 // convert to seconds
             Xmin *= 86400.0/360.0;
             Xmax *= 86400.0/360.0;
-// TMP            IncValues = new TF1("IncValues", "-x", -Xmin, -Xmax);
             IncValues = new TF1("IncValues", "-x", iRA_frac, Xmax - Xmin + iRA_frac );
         }
         else
@@ -1773,8 +1775,13 @@ TH2D* VPlotAnasumHistograms::reflectXaxis( TH2D* h, char *iNewName)
     return hT;
 }
 
+/*
 
-void VPlotAnasumHistograms::drawPSF( TCanvas *c, string iFile, TH2D *h2, float rPSF )
+    draw size of PSF into a sky map
+
+    all units in [deg]
+*/
+void VPlotAnasumHistograms::drawPSF( TCanvas *c, string iFile, TH2D *h2, float rPSF_deg )
 {
     if( !c ) return;
 
@@ -1795,21 +1802,22 @@ void VPlotAnasumHistograms::drawPSF( TCanvas *c, string iFile, TH2D *h2, float r
             double x1 = -1.*h2_xrange/2. + 0.85 * h2_xrange;
             double y1 = -1.*h2_yrange/2. + 0.12 * h2_yrange;
 
-            TEllipse *ePSF = new TEllipse( x1, y1, rPSF, rPSF );
+            TEllipse *ePSF = new TEllipse( x1, y1, rPSF_deg, rPSF_deg );
             ePSF->SetLineColor( 1);
             ePSF->SetLineWidth( 1 );
 	    ePSF->SetFillStyle( 0 );
             ePSF->Draw();
 
-            TText *t = new TText( x1+rPSF*1.25, y1-rPSF/4., "PSF" );
+            TText *t = new TText( x1+rPSF_deg*1.25, y1-rPSF_deg/4., "PSF" );
 	    t->SetTextSize( 0.04 );
             t->SetTextColor( 1 );
             t->Draw();
         }
         return;
     }
-
-// TODO: not sure what happens here
+    return;
+/////////////////////////////////////////////////////////////////////////
+// GM: don't know what happens below
 
     TFile f( iFile.c_str() );
     if( f.IsZombie() ) return;

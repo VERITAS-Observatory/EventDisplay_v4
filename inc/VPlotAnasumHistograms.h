@@ -54,7 +54,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    string fPlotMode;
 
    bool   fPlotCorrelated;    //! plot correlated sky plots
-   bool   fPlotDrawPSF;       //! plot PSF on top of sky maps
+   float  fPlotDrawPSF;       //! plot PSF on top of sky maps (radius in deg)
    bool   fPlotUseHours;      //! plot hour/min/sec on sky maps axis
    int    fPlotZeroHours;     //! quick fix for hour axis (definition might depend on time zone)
 
@@ -129,12 +129,12 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    void            plot_qfactors( char *varexp, char *selection, char *hisname, int ibin, double xmin, double xmax, char *xtitle = 0, double iSourceStrength = 1. );
 
    void            setPlottingCorrelatedHistograms( bool iB = false ) { fPlotCorrelated = iB; }
-   void            setPlottingDrawPSF( bool iB = true ) { fPlotDrawPSF = iB; }
+   void            setPlottingPSF_radius_deg( float iPSF_radius_deg = -1. ) { fPlotDrawPSF = iPSF_radius_deg; }
    void            setPlottingUseHours( bool iB = true, int iZeroHours = 0 ) { fPlotUseHours = iB; fPlotZeroHours = iZeroHours; }
    void            setDebugInfo( bool iB = false ) { fDebug = iB; }               // more debug output to screen
    bool            setRunNumber( int iRun );                                      // select run for plotting
 
-   ClassDef(VPlotAnasumHistograms,10);
+   ClassDef(VPlotAnasumHistograms,11);
 };
 
 #endif
