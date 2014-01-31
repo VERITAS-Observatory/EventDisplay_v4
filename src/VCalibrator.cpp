@@ -2788,7 +2788,11 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	       {	
 		  for( unsigned int s = 0; s < fnum_sumwindow; s++ )
 		  {
-                        if( iPedVarTreeTypeNew ) getPedvars( false, fsumwindow[s] )[p] = fPedvar_high[p*VDST_MAXSUMWINDOW+s];
+                        if( iPedVarTreeTypeNew )
+                        {
+                            getPedvars( false, fsumwindow[s] )[p] = fPedvar_high[p*VDST_MAXSUMWINDOW+s];
+                            if( fsumwindow[s] == 1 ) getPedrms( false ) = fPedvar_high[p*VDST_MAXSUMWINDOW+s];
+                        }
 			if( fsumwindow[s] == getSumWindow() && getPedvarsDist() ) 
 			{
 			   if( iPedVarTreeTypeNew ) getPedvarsDist()->Fill( fPedvar_high[p*VDST_MAXSUMWINDOW+s] );
@@ -2812,7 +2816,11 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	       {
 		  for( unsigned int s = 0; s < fnum_sumwindow; s++ )
 		  {
-                        if( iPedVarTreeTypeNew ) getPedvars( true, fsumwindow[s] )[p] = fPedvar_low[p*VDST_MAXSUMWINDOW+s];
+                        if( iPedVarTreeTypeNew )
+                        {
+                           getPedvars( true, fsumwindow[s] )[p] = fPedvar_low[p*VDST_MAXSUMWINDOW+s];
+                           if( fsumwindow[s] == 1 ) getPedrms( true ) = fPedvar_low[p*VDST_MAXSUMWINDOW+s];
+                        }
 			if( fsumwindow[s] == getSumWindow() && getPedvarsDist( true ) ) 
 			{
 			   if( iPedVarTreeTypeNew ) getPedvarsDist( true )->Fill( fPedvar_low[p*VDST_MAXSUMWINDOW+s] );
