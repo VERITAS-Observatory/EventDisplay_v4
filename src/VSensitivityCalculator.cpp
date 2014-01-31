@@ -52,6 +52,13 @@ a.setMonteCarloParameters(14, "../data/TeV_data/EnergySpectrum_literatureValues_
 // plot integral sensitivity
 a.plotIntegralSensitivityvsEnergyFromCrabSpectrum( 0, "MC" );
 
+################################################################################################
+## plot differential sensitivity vs energy using CTA WP Phys files
+################################################################################################
+
+VSensitivityCalculator a;
+a.setMonteCarloParametersCTA_MC( "data/DESY/DESY.d20140105.Erec1.V2.ID0_180degNIM2.prod2-Aar-lowE-NS.S.2a.180000s.root", 0., "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
+a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( 0, "CTA-MC", 1, "ENERGY" );
 
 \author Gernot Maier
 */
