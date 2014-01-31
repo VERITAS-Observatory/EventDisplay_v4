@@ -59,7 +59,6 @@ ROOT_MLP=$(shell root-config --has-xml)
 ROOT_MINUIT2=$(shell root-config --has-minuit2)
 ROOT_MYSQL=$(shell root-config --has-mysql)
 ROOT_DCACHE=$(shell root-config --has-dcache)
-ROOT_MATHMORE=$(shell root-config --has-mathmore)
 #############################
 # VERITAS BANK FORMAT (VBF)
 #############################
@@ -101,12 +100,6 @@ ifeq ($(origin GSLSYS), undefined)
   endif
 endif
 #####################
-# MATHMORE in ROOT
-#####################
-#ifeq ($(ROOT_MATHMORE),yes)
-#  ROOT_MATHMORE_FLAG=-DWITH_MATHMORE
-#endif
-#####################
 # CTA HESSIO INPUT
 #####################
 # USE HESSIO LIBRARY
@@ -129,7 +122,7 @@ endif
 CXX           = g++
 CXXFLAGS      = -O3 -g -Wall -fPIC -fno-strict-aliasing  -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_SOURCE -D_LARGEFILE64_SOURCE
 CXXFLAGS     += -I. -I./inc/
-CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(DCACHEFLAG) $(ROOT_MATHMORE_FLAG)
+CXXFLAGS     += $(VBFFLAG) $(DBFLAG) $(GSLFLAG) $(DCACHEFLAG) 
 LD            = g++ 
 OutPutOpt     = -o
 INCLUDEFLAGS  = -I. -I./inc/
@@ -153,7 +146,7 @@ endif
 ########################################################
 ROOTCFLAGS   = $(shell root-config --auxcflags)
 CXXFLAGS     += $(ROOTCFLAGS)
-CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA
+CXXFLAGS     += -I$(shell root-config --incdir) -I$(shell root-config --incdir)/TMVA 
 ########################################################
 # root libs
 ########################################################
@@ -163,16 +156,6 @@ GLIBS        += -lMLP -lTreePlayer -lTMVA -lMinuit -lXMLIO -lSpectrum
 ifeq ($(ROOT_MINUIT2),yes)
    GLIBS     += -lMinuit2
 endif
-
-#Check to see if GSL is installed
-# ifneq ($(GSLFLAG),-DNOGSL)
-#	GLIBS     += -lMathMore
-#endif
-
-#Check to see if ROOT has the MathMore library
-#ifeq ($(ROOT_MATHMORE),yes)
-#   GLIBS     += -lMathMore
-#endif
 
 #ifeq ($(DCTEST),yes)
 #   GLIBS     += -lDCache
@@ -1533,9 +1516,9 @@ configuration config:
 	@echo "    compiled with MLP: $(ROOT_MLP), MINUIT2: $(ROOT_MINUIT2), MYSQL: $(ROOT_MYSQL), DCACHE: $(ROOT_DCACHE), MATHMORE: $(ROOT_MATHMORE)"
 	@echo ""
 ifeq ($(GSLFLAG),-DNOGSL)
-	@echo "evndisp without GSL libraries (frogs)"
+	@echo "evndisp without GSL libraries (no frogs, no Hough muon calibration)"
 else
-	@echo "evndisp with GSL libraries (frogs)"
+	@echo "evndisp with GSL libraries (frogs, Hough muon calibration)"
 endif
 ifeq ($(VBFFLAG),-DNOVBF)
 	@echo "evndisp without VBF support"

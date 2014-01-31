@@ -502,17 +502,17 @@ void VImageParameterCalculation::sizeInMuonRing()
   //Fill size
   fParGeo->muonSize = size;
 
-  //Fill impact parameter corrected size (Check for NOGSL or for MathMore)
+  //Fill impact parameter corrected size
 
-  //Set t ozer by default. If no GSL, fill the tree with zeros
+  //Impact parameter corrected size
   float correctedSize = 0.0;
 
-  	//If GSL, run the code
-#ifdef WITH_MATHMORE
+  //If GSL is installed, run the code otherwise set correctedSize to 0.0
+	#ifndef NOGSL
   	  correctedSize = size / this->correctSizeInMuonRing();
-#else
-   // (GM) PRINT A WARNING? STOP?
-#endif
+	#else
+  	  correctedSize = 0.0;
+	#endif
 
   	//Fill the tree
     fParGeo->muonIPCorrectedSize = correctedSize;
@@ -624,21 +624,19 @@ float VImageParameterCalculation::correctSizeInMuonRing()
 
 	ngExi = new float[numSteps];
 
-	//Calculate elliptical integral for various values of xi
+	//Calculate the elliptic integral for various values of xi
 	for(int i=0; i<numSteps; i++){
 
 		ngExi[i] = 0.0;
 
-		//This requires the MathMore library.
-		//Look for GSL, maybe better to look for MathMore...
-#ifdef WITH_MATHMORE
+
+		//Calculate the elliptic integral. This requires GSL.
+#ifndef NOGSL
 		float xi_tmp = (float)i/(float)numSteps;
-		ngExi[i] = ( 2.0 / TMath::Pi() ) * ( ROOT::Math::ellint_2(xi_tmp , TMath::Pi()/2.0 ) ); //Calculate elliptic integral
-#else
-   // (GM) PRINT A WARNING? STOP?
+		ngExi[i] = ( 2.0 / TMath::Pi() ) * ( gsl_sf_ellint_E( TMath::Pi()/2.0 , xi_tmp , 0  ) ); //Calculate elliptic integral
 #endif
 
-	}//End of for loop
+	}//End of elliptical integral for loop
 
 	//Numerically solve the integral equation to calculate IP corrrection factor
 	  	  for(int i=0; i<numSteps; i++){
