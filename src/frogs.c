@@ -887,7 +887,9 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
   char FROGS_TEMPLATE_LIST_PATH[500];
   EVN = getenv("EVNDISPSYS");
   //sprintf(FROGS_TEMPLATE_LIST_PATH,"%s/bin/%s",EVN,FROGS_TEMPLATE_LIST);
-  sprintf(FROGS_TEMPLATE_LIST_PATH,"/afs/ifh.de/user/s/svincent/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/frogs_template_file_list.txt");
+  //sprintf(FROGS_TEMPLATE_LIST_PATH,"/afs/ifh.de/user/s/svincent/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/frogs_template_file_list.txt");
+  sprintf(FROGS_TEMPLATE_LIST_PATH,
+	  "/lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400/ParameterFiles/EVNDISP.frogs_template_file_list.txt");
   //Open the template files list file
   FILE *fu; //file pointer
   if((fu = fopen(FROGS_TEMPLATE_LIST_PATH, "r")) == NULL ) {
