@@ -752,6 +752,7 @@ void VImageAnalyzer::imageCleaning()
 {
    if( !getImageCleaningParameter() ) return;
 
+/////////////////////////////
 // fixed threshold cleaning
    if( getImageCleaningParameter()->fUseFixedThresholds )
    {
@@ -761,16 +762,19 @@ void VImageAnalyzer::imageCleaning()
 	  fVImageCleaning->cleanImageFixedWithTiming( getImageThresh(), getBorderThresh(), getBrightNonImageThresh(), 
 						      getTimeCutPixel(), getTimeCutCluster(), getMinNumPixelsInCluster(), getNumLoops() );
       } 
+// time-next-neighbour cleaning
       else if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMENEXTNEIGHBOUR" )
       {
          fVImageCleaning->cleanNNImageFixed();
       }
+// fixed cleaning levels (classic image/border)
       else 
       {
 	  fVImageCleaning->cleanImageFixed( getImageThresh(), getBorderThresh(), getBrightNonImageThresh() );
       }
    }
-// signal/noise cleaning
+/////////////////////////////
+// signal/noise cleaning thresholds
    else 
    {
       if( getImageCleaningParameter()->getImageCleaningMethod() == "TIMECLUSTERCLEANING" )
@@ -789,7 +793,7 @@ void VImageAnalyzer::imageCleaning()
       gainCorrect();
    }
 
-//AMc trace correlation cleaning
+// trace correlation cleaning
    if( getImageCleaningParameter()->getImageCleaningMethod() == "TWOLEVELANDCORRELATION" )
    {
        fVImageCleaning->cleanImageTraceCorrelate( getImageCleaningParameter()->fCorrelationCleanBoardThresh,

@@ -655,11 +655,18 @@ void VImageCleaning::DiscardTimeOutlayers(int type)
         }
     }
 }
+
+/*
+ * time-next-neighbour cleaning (service function)
+ *
+ *
+ */
 float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroups)
 {
     unsigned int numpix=fNumPixels[type];
     float corr=1.;
-    float PreThresh[5]={2.0/corr,3.0/corr,2.8/corr, 5.2/corr,1.8/corr};
+    float PreThresh[5]={2.0/corr,3.0/corr,2.8/corr, 5.2/corr,1.8/corr};   // GMGM what is 2.0,2.0,....? Why 5 elements in array? 5 teltypes?
+// GMGM hardcoded number of telescope type, why is this not an array?
     if(type==1)FillPreThresholds(gIPR, PreThresh);
     if(type==2)FillPreThresholds(gIPR2, PreThresh);
     //if(type==3)FillPreThresholds(gIPR3, PreThresh);
@@ -671,7 +678,7 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
     ResetCombFactors(type);
     for ( unsigned int p=0;p<numpix; p++)
     {
-        if(INTENSITY[p]>PreThresh[4]*sqrt(NSBscale)/sqrt(0.6)) { VALIDITY[p]=1; VALIDITYBUF[p]=1;  }
+        if(INTENSITY[p]>PreThresh[4]*sqrt(NSBscale)/sqrt(0.6)) { VALIDITY[p]=1; VALIDITYBUF[p]=1;  } // GMGM why here and in the following sqrt(0.6)?
         else               { VALIDITY[p]=-1; VALIDITYBUF[p]=-1;}
     }
 
@@ -681,6 +688,7 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
     ngroups+=NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb3nnrelCurves->At(type), PreThresh[2]*sqrt(NSBscale)/sqrt(0.6)); for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==5) VALIDITY[p]=5; }
     ngroups+=NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]*sqrt(NSBscale)/sqrt(0.6));    for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==6) VALIDITY[p]=6; }
     //ngroups+=NNGroupSearchProbCurve(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]*sqrt(NSBscale)/sqrt(0.6));           for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==4) VALIDITY[p]=4; }
+ // GMGM don't understund PreThresh[..] index
     // *********************************************************************
     //*********************************************************************
     // Boundary
@@ -697,6 +705,7 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
     for(unsigned int iRing=0;iRing<nRings;iRing++){
         for(unsigned int idx=0; idx<numpix;idx++){
             if(VALIDITYBOUNDBUF[idx]==2) continue;
+// GMGM assume hexagon in the following? 
             if((iRing>0)&&(VALIDITYBOUNDBUF[idx]<iRing+7)&&(VALIDITYBOUNDBUF[idx]>1.9)) continue;
             unsigned int     nnmax = 0;
             int neighbor[7];
@@ -731,7 +740,7 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
     if(ngroups>0)
     {
         ScaleCombFactors(type,float(nboundsearchpix)/(numpix*1.5));
-        NNGroupSearchProbCurve(type,(TF1*)fProb2nnCurves->At(type), 0.8*PreThresh[3]*sqrt(NSBscale)/sqrt(0.6));
+        NNGroupSearchProbCurve(type,(TF1*)fProb2nnCurves->At(type), 0.8*PreThresh[3]*sqrt(NSBscale)/sqrt(0.6)); // GMGM why are thresholds scaled by 0.8 or 0.9?
         for(unsigned int p=0;p<numpix;p++){if(VALIDITY[p]>1.9) continue; if(VALIDITYBUF[p]==2) VALIDITY[p]=2; }
 
         NNGroupSearchProbCurve(type,(TF1*)fProb2plus1Curves->At(type), 0.8*PreThresh[1]*sqrt(NSBscale)/sqrt(0.6));
@@ -815,19 +824,23 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
         ngroups=0;
     }
     int imageflag=0;
-    float SIZE=0;
+    float SIZE=0.;
 
     for(unsigned int p=0;p<numpix;p++){ if(VALIDITY[p]>1.9) {SIZE+=INTENSITY[p]; imageflag++;}}
-    if(imageflag==0) SIZE=-1;
+// GMGM    if(imageflag==0) SIZE=-1;
+    if(imageflag==0) SIZE=0.;
     return SIZE; //*/
 }
 
-// main function
+/*
+ *  time-next-neighbour cleaning
+ *
+ */
 void VImageCleaning::cleanNNImageFixed()
 {
     if( !fData ) printDataError( "VImageCleaning::cleanNNImageFixed" );
     if( !kInitNNImageCleaning) printDataError( "VImageCleaning::cleanNNImageFixed image cleaning not initialized" );
-    // calculates the valarray of tubes to be included in the parameterization
+// calculates the valarray of tubes to be included in the parameterization
     fData->setImage( false );
     fData->setBorder( false );
     fData->setBrightNonImage( false );
@@ -841,15 +854,15 @@ void VImageCleaning::cleanNNImageFixed()
 
     //measure IPR
     float FADCslice=fData->getDetectorGeo()->getLengthOfSampleTimeSlice(fData->getTelID());
-    unsigned int nsamples=fData->getDetectorGeo()->getNSamples(fData->getTelID());
-    float ScanWindow=float(nsamples-30)*FADCslice; //ns
+    unsigned int nsamples=fData->getNSamples(fData->getTelID());
+    float ScanWindow=float(nsamples-30)*FADCslice; //ns                      // GMGM what is 30?
 //    CalcSliceRMS();
     if(fData->getRunParameter()->fTraceIntegrationMethod[fData->getTelID()] == 4)
     {
         FillIPR(type);
-        if(IPR[type][0]>=400000.){GetIPRGraph(type,ScanWindow);}
+        if(IPR[type][0]>=400000.){GetIPRGraph(type,ScanWindow);}           // GMGM what is 400000.?
     }
-    //prepare for image cleaning
+//prepare for image cleaning
     for ( unsigned int i=0; i < i_nchannel; i++)
     {
         INTENSITY[i]=0;
@@ -903,7 +916,7 @@ void VImageCleaning::cleanNNImageFixed()
                     if(VALIDITY[i]>6.1) fData->setBorder( i, true );
                 }
             }
-        }//*/
+        }*/
     }
     recoverImagePixelNearDeadPixel();
     fillImageBorderNeighbours();
@@ -932,7 +945,7 @@ void VImageCleaning::FillPreThresholds(TGraph* gipr, float NNthresh[5])
 {
     // assuming monotonous ipr curve (as it should be)
     float ThreshFreq[5]={8.5E6,2.4E6,3.2E6,1.0E5,1.1E7};
-    float iprres=gipr->GetXaxis()->GetXmax()-gipr->GetXaxis()->GetXmin()/float(gipr->GetN());
+//    float iprres=gipr->GetXaxis()->GetXmax()-gipr->GetXaxis()->GetXmin()/float(gipr->GetN());
     for(int i=0;i<5;i++)
     {
         for(int t=0;t<5.*gipr->GetN();t++){
