@@ -90,7 +90,6 @@ struct frogs_imgtmplt_out frogs_img_tmplt(struct frogs_imgtmplt_in *d) {
   if(d->elevation>tmplt.elevmax || d->elevation<tmplt.elevmin) {
     tmplt=frogs_read_template_elev(d->elevation);
   }
-
   //Optimize the likelihood
   rtn=frogs_likelihood_optimization(d,&tmplt,&calib,&prob_array);
 
@@ -381,11 +380,11 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	     intermediate values, i.e. mu>0 and mu<FROGS_LARGE_PE_SIGNAL
 	     (saves a factor of 2x in computing time). */
 	  if( mu > 1.e-18 && mu < FROGS_LARGE_PE_SIGNAL )
-            pd=frogs_read_prob_array_table(prob_array,d->scope[tel].q[pix],mu,d->scope[tel].ped[pix]);
+	    pd=frogs_read_prob_array_table(prob_array,d->scope[tel].q[pix],mu,d->scope[tel].ped[pix]);
 	  else
 	    pd=frogs_probability_density(d->scope[tel].q[pix],mu,
-                                               d->scope[tel].ped[pix],
-                                               d->scope[tel].exnoise[pix]);
+					 d->scope[tel].ped[pix],
+					 d->scope[tel].exnoise[pix]);
 
 	  double mean_lkhd=frogs_mean_pix_lkhd(d->scope[tel].q[pix],mu,
 					       d->scope[tel].ped[pix],
@@ -407,7 +406,8 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	  /*Decides if the pixel should be counted in the image 
 	    or background region*/
 
-	  int pix_in_img=frogs_image_or_background(tel,pix,d);
+	  //int pix_in_img=frogs_image_or_background(tel,pix,d);
+	  int pix_in_img=frogs_image_or_background(tel,pix,d,mu);//(SV)
 
 	  //If requested, we produce a display of the event
 	  if(FROGS_NBEVENT_DISPLAY>0) 
@@ -493,7 +493,8 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 }
 //================================================================
 //================================================================
-int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d){
+//int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d){
+int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d, double mu){
   /*Returns FROGS_OK if the pixel is identified to be part of the image 
     region and returns FROGS_NOTOK is the pixel is to be counted in the 
     bacground region. 
@@ -507,12 +508,16 @@ int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d){
     thesholds FROGS_HITHRESH and FROGS_LOTHRESH are expressed in units 
     of pedestal standard deviations. 
   */
-
+ 
   //If the pixel tested is not a pixel in use, returns FROGS_BAD_NUMBER
   if(d->scope[tel].pixinuse[pix]==FROGS_NOTOK) return FROGS_BAD_NUMBER;
 
   /*If the signal in the pixel is above the higher threshold, 
   the pixel is part of the image*/
+  if(mu>0.001) return FROGS_OK;
+  return FROGS_NOTOK;
+
+
   if(d->scope[tel].q[pix]>FROGS_HITHRESH*d->scope[tel].ped[pix]) 
     return FROGS_OK;
   
@@ -709,39 +714,6 @@ float frogs_goodness_correction(float goodness0,float ped,float mu) {
      goodness0 = uncorrected goodness
      ped = pedestal width */
   
-  /***** Tucson's correction ********/
-  /*if(ped<=1.0) return goodness0+0.6046;
-  if(ped>1.0 && ped<=1.5) return goodness0+0.3748;
-  if(ped>1.5 && ped<=2.0) return goodness0+0.3860;
-  if(ped>2.0 && ped<=2.5) return goodness0+0.4126;
-  if(ped>2.5 && ped<=3.0) return goodness0+0.4397;
-  return goodness0+0.5502;*/
-  /***** Tucson's correction ********/
-
-  /***** simulation correction ******/
-/*
-  float correction=0.;
-  if(mu>0.0) {
-    goodness0 = goodness0 + 1; //goodness=goodness+1
-    if(mu<=40.0)
-      correction = 0.1065*mu+1.0;
-    if(mu>40.0 && mu<=130)
-      correction = 0.0894*mu+0.998;
-    if(mu>130.0 && mu<=200)
-      correction = 0.1481*mu-9.563;
-    if(mu>200)
-      correction = 0.1286*mu-8.781;
-    goodness0 = goodness0/correction - 1;
-  }
-*/
-  /***** simulation correction ******/
-  /******* very new correction 06.12.2011 **************/
-  /*if( mu > 0.0 ) {
-    float correction=pow((mu+1.0),-0.48643);
-    return (goodness0 + 1.0)*correction - 1.0;
-    }*/
-  /******* new correction **************/
-
   return goodness0;
 
 }
@@ -913,10 +885,9 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
 
   char *EVN;
   char FROGS_TEMPLATE_LIST_PATH[500];
-
   EVN = getenv("EVNDISPSYS");
-  sprintf(FROGS_TEMPLATE_LIST_PATH,"%s/bin/%s",EVN,FROGS_TEMPLATE_LIST);
-
+  //sprintf(FROGS_TEMPLATE_LIST_PATH,"%s/bin/%s",EVN,FROGS_TEMPLATE_LIST);
+  sprintf(FROGS_TEMPLATE_LIST_PATH,"/afs/ifh.de/user/s/svincent/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/frogs_template_file_list.txt");
   //Open the template files list file
   FILE *fu; //file pointer
   if((fu = fopen(FROGS_TEMPLATE_LIST_PATH, "r")) == NULL ) {
@@ -1543,7 +1514,7 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
   //rtn=rtn*d->scope[tel].telpixarea[pix];
 
   /* (SV) The new image template is in photo-electron.*/
-  rtn=rtn;//*cone_eff;
+  //rtn=rtn;//*cone_eff;
 #endif  
 #ifndef CONVOLUTION
   /*We get the pixel radius in degree*/
@@ -2054,7 +2025,6 @@ void frogs_fill_prob_density( struct frogs_probability_array *parray ) {
     It is filled once at the beginning of the analysis. */
   
   fprintf(stderr,"\nFROGS: Filling Probability Density Table ......... ");
-  
   for( int i=0; i<BIN1; i++ ) {
     double q = ((double)i*(RANGE1-MIN1)/BIN1 + MIN1);
     for( int j=0; j<BIN2; j++ ) {
@@ -2216,15 +2186,10 @@ void frogs_differential_evolution(struct frogs_imgtmplt_in *d,
 
   fprintf(stderr,"in frogs.c, xs %f ys %f xp %f yp %f logE %f lambda %f\n",
 	  d->startpt.xs,d->startpt.ys,d->startpt.xp,d->startpt.yp,d->startpt.log10e,d->startpt.lambda);*/
+ 
+  float minbound = 0.9;
+  float maxbound = 1.1;
 
-  float minbound = 1.-1E-15;
-  float maxbound = 1.+1E-15;
-
-  if(d->startpt.log10e!=FROGS_BAD_NUMBER) {
-    minbound = 0.6;
-    maxbound = 1.4;
-  }
-  
   fa_minbound[0]=minbound*d->startpt.xs; fa_maxbound[0]=maxbound*d->startpt.xs;
   if(d->startpt.xs<0) {fa_minbound[0]=maxbound*d->startpt.xs; fa_maxbound[0]=minbound*d->startpt.xs;}
 
@@ -2237,10 +2202,13 @@ void frogs_differential_evolution(struct frogs_imgtmplt_in *d,
   fa_minbound[3]=minbound*d->startpt.yp; fa_maxbound[3]=maxbound*d->startpt.yp;
   if(d->startpt.yp<0) {fa_minbound[3]=maxbound*d->startpt.yp; fa_maxbound[3]=minbound*d->startpt.yp;}
 
-  fa_minbound[4]=tmplt->min[1]; fa_maxbound[4]=0.;
-  if(d->startpt.log10e!=FROGS_BAD_NUMBER) {
-    fa_minbound[4]=minbound*d->startpt.log10e; fa_maxbound[4]=maxbound*d->startpt.log10e;
-    if(d->startpt.log10e<0) {fa_minbound[4]=maxbound*d->startpt.log10e; fa_maxbound[4]=minbound*d->startpt.log10e;}
+  if(fabs(d->startpt.log10e-FROGS_BAD_NUMBER)<1E-8) {fa_minbound[4]=-1.2; fa_maxbound[4]=1.;} //log10(-1.2)=60GeV
+  else {
+    double e = pow(10, d->startpt.log10e);
+    double emin = e*minbound;
+    double emax = e*maxbound;
+    fa_minbound[4] = log10(emin);
+    fa_maxbound[4] = log10(emax);
   }
 
   fa_minbound[5]=minbound*d->startpt.lambda; fa_maxbound[5]=maxbound*d->startpt.lambda;
@@ -2307,7 +2275,7 @@ void frogs_differential_evolution(struct frogs_imgtmplt_in *d,
   gta_pop[0].fa_vector[3]=d->startpt.yp;
   gta_pop[0].fa_vector[4]=d->startpt.log10e;
   gta_pop[0].fa_vector[5]=d->startpt.lambda;
-  double lkhd0=FROGS_BAD_NUMBER;
+  double lkhd0=fabs(FROGS_BAD_NUMBER); //(SV) FROGS_BAD_NUMBER = -9999
   if(d->startpt.log10e!=FROGS_BAD_NUMBER) {
     gta_pop[0] = frogs_evaluate(d,tmplt,prob_array,gi_D,gta_pop[0],&gl_nfeval,&gta_pop[0],gi_NP);
     lkhd0 = gta_pop[0].fa_cost[0];

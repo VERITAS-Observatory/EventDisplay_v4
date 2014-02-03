@@ -68,9 +68,8 @@
 #define FROGS_LOG10E 4 //minus one so 5 in our case. 
 #define FROGS_LAMBDA 5
 
-//#define FROGS_HITHRESH 4.5   //Higher threshold to define the picture
 #define FROGS_HITHRESH 5.0   //Higher threshold to define the picture
-#define FROGS_LOTHRESH 2.5   //Lower threshold to define the picture. 
+#define FROGS_LOTHRESH 2.5   //Lower threshold to define the picture 
 #define FROGS_PICTRAD  0.35  //Radius defining the picture
 #define FROGS_NEIGHBORAD 0.16 //Pixels separated by less than that are neighbors
 
@@ -107,7 +106,7 @@
 
 #define RANGE3 5.
 #define BIN3   101
-#define MIN3   0.
+#define MIN3   1E-3
 
 /* Convoled or non-convoled tables */
 #define CONVOLUTION 1 //should be commented if one uses non-convoled table 
@@ -314,7 +313,8 @@ struct frogs_probability_array {
 			    double pix_goodness,double energy, double xp, double yp, double xcam, double ycam);
   int frogs_event_display(int event_id, float q,float mu,float xtel,
 			  float ytel,float xpix,float ypix,int pix_in_img);
-  int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);
+  //int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d);
+  int frogs_image_or_background(int tel,int pix,struct frogs_imgtmplt_in *d,double mu); //(SV)
   float frogs_get_overlapping_area(gsl_rng *r,float x,float y,float pixradius,
 				   float X,float Y,float dX,float dY);
   float floatwrap(float x,float min,float max);

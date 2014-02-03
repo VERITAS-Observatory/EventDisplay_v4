@@ -91,9 +91,9 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
  private:
   struct 		     frogs_imgtmplt_in frogs_convert_from_ed(int eventNumber, int adc_type, double inEnergy); 
   VEvndispData         *fData;                    //!< pointer to data class
-  VShowerParameters    *fShowerParam;
-  VEvndispRunParameter *fRunPara;                //!< data class for all run parameters
-  VVirtualDataReader   *fReader;
+  //VShowerParameters    *fShowerParam;
+  //VEvndispRunParameter *fRunPara;                //!< data class for all run parameters
+  //VVirtualDataReader   *fReader;
   
   int frogsRecID;
   

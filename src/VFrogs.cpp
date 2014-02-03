@@ -605,57 +605,39 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   //Require the number of telescopes with more than 300dc to be at least 3
   if (ngoodimages<3) rtn.worthy_event=FROGS_NOTOK;
   //Require the image to be fully contained into the camera
-  if (fData->getImageParameters()->loss>0.) rtn.worthy_event=FROGS_NOTOK;
+  //if (fData->getImageParameters()->loss>0.) rtn.worthy_event=FROGS_NOTOK;
 
+  if( rtn.worthy_event==FROGS_OK ) return rtn;
+  
+#ifdef DIFF_EVOLUTION
   //=======================================
   //    (SV) diff. evolution algorithm
   //=======================================
   //Decides if the event is worth analysing
-  /*rtn.worthy_event=FROGS_NOTOK;
+  rtn.worthy_event=FROGS_NOTOK;
   if(fabs(rtn.startpt.log10e-FROGS_BAD_NUMBER)<1E-8) {
-
-
-    cout << "# of good images " << ngoodimages << endl;
-
-    cout << "in VFrogs.cpp [MC] " 
-	 << "event_id " << rtn.event_id
-	 << " xs[deg] " << 1.0*fData->getShowerParameters()->MCTel_Xoff
-	 << " ys[deg] " << -1.0*fData->getShowerParameters()->MCTel_Yoff
-	 << " XP[m] " << fData->getShowerParameters()->MCxcore_SC
-	 << " YP[m] " << 1.0*fData->getShowerParameters()->MCycore_SC
-	 << " log10E[TeV] " << log10(fData->getShowerParameters()->MCenergy) 
-	 << endl;
     
-    cout << "in VFrogs.cpp [ED] " 
-	 << "event_id " << rtn.event_id
-	 << " xs[deg] " << 1.0*fData->getShowerParameters()->fShower_Xoffset[frogsRecID]
-	 << " ys[deg] " << -1.0*fData->getShowerParameters()->fShower_Yoffset[frogsRecID]
-	 << " XP[m] " << fData->getShowerParameters()->fShowerXcore_SC[frogsRecID]
-	 << " YP[m] " << 1.0*fData->getShowerParameters()->fShowerYcore_SC[frogsRecID]
-	 << " log10E[TeV] " << rtn.startpt.log10e
-	 << endl;
-
-	 cout << "worthy event " << rtn.worthy_event << " FROGS_OK " << FROGS_OK << " FROGS_NOTOK " << FROGS_NOTOK << endl;
-
     //Distance of the impact point small enough?
     double dummy=sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp);
+    
     //Count the number of telescopes with more than 300dc in their image
     ngoodimages=0;
     for(int tel=0; tel<rtn.ntel;tel++) {
       setTelID(tel);
       if(fData->getImageParameters()->size>300.0) ngoodimages=ngoodimages+1;
     }
-    cout << " coucou diff. evol. " << ngoodimages << " " << dummy << endl;
+    
     //Require the number of telescopes with more than 300dc to be at least 3
     if (ngoodimages>1 && dummy<350.0) {
       cout << " coucou diff. evol. "<< " # good imgaes " << ngoodimages << " " << dummy << endl;
       rtn.worthy_event=FROGS_OK;
-
+      
     }
-    }*/
+  }
   //=======================================
   //    (SV) diff. evolution algorithm
   //=======================================
+#endif //DIFF_EVOLUTION
 
   return rtn;
 
