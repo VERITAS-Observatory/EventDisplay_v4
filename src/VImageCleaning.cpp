@@ -906,8 +906,7 @@ void VImageCleaning::cleanNNImageFixed()
         }//*/
     }
     recoverImagePixelNearDeadPixel();
-
-    //fillImageBorderNeighbours();
+    fillImageBorderNeighbours();
 }
 
 int  VImageCleaning::getTrigSimTelType(unsigned int fTelType)
@@ -917,7 +916,7 @@ int  VImageCleaning::getTrigSimTelType(unsigned int fTelType)
     if(fTelType== 10408418) type=2; //MST
     if(fTelType==201509515) type=3; //SC-SST
     if(fTelType==  3709425) type=4; //DC-SST
-
+    //Prod1
     if(fTelType==141305009) type=1; //LST
     if(fTelType== 10007818) type=2; //MST
     if(fTelType==  3709725) type=3; //DC-SST
@@ -933,6 +932,7 @@ void VImageCleaning::FillPreThresholds(TGraph* gipr, float NNthresh[5])
 {
     // assuming monotonous ipr curve (as it should be)
     float ThreshFreq[5]={8.5E6,2.4E6,3.2E6,1.0E5,1.1E7};
+    float iprres=gipr->GetXaxis()->GetXmax()-gipr->GetXaxis()->GetXmin()/float(gipr->GetN());
     for(int i=0;i<5;i++)
     {
         for(int t=0;t<5.*gipr->GetN();t++){
