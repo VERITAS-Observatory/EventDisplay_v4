@@ -8,10 +8,10 @@
 MACHINE=`hostname`
 MCD=`date`
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ] || [ ! -n "$5" ] || [ ! -n "$6" ]
+if [ $# -lt 2 ]
 then
   echo
-  echo "VTS.EVNDISP.sub_analyse_MC_CARE_VBF.sh <ze> <array=V4/V5/V6> <reconstruction parameter file> <particle=1/2/14/402> <run number> <noise>"
+  echo "VTS.EVNDISP.sub_analyse_MC_CARE_VBF.sh <ze> <array=V4/V5/V6>"
   echo
   echo "  analyse VTS simulations created with CARE (VBF format)"
   echo
@@ -27,23 +27,28 @@ fi
 ################################################
 ZEW=$1
 ARRAY=$2
-ACUT=$3
-PART=$4
-RUN=$5
+RUN="1200"
 ATMO="21"
 WOB="0.5"
-WOG="050"
-NOISE=$6
+
+###############################################
+# input parameters
+################################################
+ACUT="EVNDISP.reconstruction.runparameter"
+# particle (1,2,14,402)
+PART="1"
+# NOISE levels
+NOISE=( 50 80 120 170 230 290 370 450 )
+NNOIS=${#NOISE[@]}
 
 ###############################################################################################################
 # in- and output directories for simulation 
 # run scripts are written to this directory
 ###############################################################################################################
-DSET="care_optics_Nov10"
-DSET="care_Dec12"
+DSET="care_Jan1427"
 if [ $PART = "1" ]
 then
-   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/ATM$ATMO/"
+   DDIR=$VERITAS_DATA_DIR"/simulations/"$ARRAY"_FLWO/$DSET/"
    ODIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/$DSET/gamma_"$ZEW"deg_750m/wobble_$WOB/"
 fi 
 if [ $PART = "2" ]
@@ -69,58 +74,44 @@ fi
 QLOGDIR=$FDIR
 
 CSCRIPT="VTS.EVNDISP.qsub_analyse_MC_CARE_VBF"
-OSCRIPT="$ARRAY-EV_CARE_VBF-$ZEW-$WOB-$NOIS-$ATMO"
+
+# loop over all noise level
+for (( n = 0; n < $NNOIS; n++ ))
+do
+  NOIS=${NOISE[$n]}
+  echo "NOISE $n $NOIS"
+  OSCRIPT="$ARRAY-EV_CARE_VBF-$ZEW-$WOB-$NOIS-$ATMO"
 
 # set zenith angle
-sed -e "s/123456789/$ZEW/" $CSCRIPT.sh  > $FDIR/$OSCRIPT-b.sh
-
 # add data directory
-sed -e "s|DATADIR|$DDIR|" $FDIR/$OSCRIPT-b.sh > $FDIR/$OSCRIPT-c.sh
-rm -f $FDIR/$OSCRIPT-b.sh
-
 # atmosphere
-sed -e "s|AAAAAAAA|$ATMO|" $FDIR/$OSCRIPT-c.sh > $FDIR/$OSCRIPT-f.sh
-rm -f $FDIR/$OSCRIPT-c.sh
-
 # add output directory
-sed -e "s|OUTDIR|$ODIR|" $FDIR/$OSCRIPT-f.sh > $FDIR/$OSCRIPT-c.sh
-rm -f $FDIR/$OSCRIPT-f.sh
-
 # set wobble offset
-sed -e "s/987654321/$WOB/" $FDIR/$OSCRIPT-c.sh > $FDIR/$OSCRIPT-d.sh
-rm -f $FDIR/$OSCRIPT-c.sh
-
-# set wobble offset for vbf file
-sed -e "s/WOGWOG/$WOG/" $FDIR/$OSCRIPT-d.sh > $FDIR/$OSCRIPT-e.sh
-rm -f $FDIR/$OSCRIPT-d.sh
-
 # set noise level
-sed -e "s/NOISENOISE/$NOISE/" $FDIR/$OSCRIPT-e.sh > $FDIR/$OSCRIPT-r.sh
-rm -f $FDIR/$OSCRIPT-e.sh
-
-# summation window
-sed -e "s|ACUT|$ACUT|" $FDIR/$OSCRIPT-r.sh > $FDIR/$OSCRIPT-s.sh
-rm -f $FDIR/$OSCRIPT-r.sh
-
-# V4 or V5?
-sed -e "s/XXXXXX/$ARRAY/" $FDIR/$OSCRIPT-s.sh > $FDIR/$OSCRIPT-t.sh
-rm -f $FDIR/$OSCRIPT-s.sh
-
+# array analysis acut (run parameters)
+# epoch
 # run number
-sed -e "s/UUUAAA/$RUN/" $FDIR/$OSCRIPT-t.sh > $FDIR/$OSCRIPT-u.sh
-rm -f $FDIR/$OSCRIPT-t.sh
-
 # gamma/proton/etc
-sed -e "s/IDIDID/$PART/"  $FDIR/$OSCRIPT-u.sh > $FDIR/$OSCRIPT.sh
-rm -f $FDIR/$OSCRIPT-u.sh
+    sed -e "s/123456789/$ZEW/" \
+        -e "s|DATADIR|$DDIR|" \
+        -e "s|AAAAAAAA|$ATMO|" \
+        -e "s|OUTDIR|$ODIR|" \
+        -e "s/987654321/$WOB/" \
+        -e "s/NOISENOISE/$NOIS/" \
+        -e "s|ACUT|$ACUT|" \
+        -e "s/XXXXXX/$ARRAY/" \
+        -e "s/UUUAAA/$RUN/" \
+        -e "s/IDIDID/$PART/"  $CSCRIPT.sh > $FDIR/$OSCRIPT.sh
 
-chmod u+x $FDIR/$OSCRIPT.sh
-echo "RUNSCRIPT $FDIR/$OSCRIPT.sh"
-echo "QFILES $QLOGDIR/"
-echo "LOG AND DATA FILES: $ODIR"
+# prepare and submit the job
+    chmod u+x $FDIR/$OSCRIPT.sh
+    echo "RUNSCRIPT $FDIR/$OSCRIPT.sh"
+    echo "QFILES $QLOGDIR/"
+    echo "LOG AND DATA FILES: $ODIR"
 
 # submit the job
-echo $FDIR/$OSCRIPT.sh
-qsub -V -l os="sl*" -l h_cpu=11:49:00 -l tmpdir_size=100G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+    echo $FDIR/$OSCRIPT.sh
+    qsub -V -l os=sl6 -l h_cpu=48:49:00 -l tmpdir_size=250G -l h_vmem=4G -o $QLOGDIR/ -e $QLOGDIR/ "$FDIR/$OSCRIPT.sh"
+done
 
 exit
