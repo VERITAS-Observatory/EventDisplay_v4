@@ -44,7 +44,7 @@ fi
 # ARRAYCUTS="EVNDISP.prod2-noDoublepass.reconstruction.runparameter"
 # prod2 TIMENEXTNEIGHBOUR cleaning
 # ARRAYCUTS="EVNDISP.prod2.TIMENEXTNEIGHBOUR.reconstruction.runparameter"
-# PPOPT="\"-NNcleaninginputcard /lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/TIMENEXTNEIGHBOUR/Evtdisp.rc\""
+# PPOPT="\"-ignoredstgains -NNcleaninginputcard /lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/TIMENEXTNEIGHBOUR/Evtdisp.rc\""
 # prod2 default file
 ARRAYCUTS="EVNDISP.prod2.reconstruction.runparameter"
 PPOPT=""
