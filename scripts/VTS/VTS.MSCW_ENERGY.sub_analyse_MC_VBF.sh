@@ -6,14 +6,16 @@
 #
 ##########################################################################################################
 
-if [ ! -n "$1" ] || [ ! -n "$2" ] || [ ! -n "$3" ] || [ ! -n "$4" ]
+if  [ $# -lt 5 ]
 then
    echo
-   echo "VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh <table file> <recid> <atm (21/22)> <array (V4/V5/V6) > [gamma/proton/helium]" 
+   echo "VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh <table file> <recid> <atm (21/22)> <array (V4/V5/V6)> <GRISU/CARE> [gamma/proton/helium]" 
    echo
    echo "analyse MC data (loop over zenith angles, noise levels and wobble offsets)"
    echo "<table file>       table file name (without .root and full path)"
    echo "optional: [helium/proton/helium (default=gamma)]" 
+   echo
+   echo $#
    exit
 fi
 
@@ -26,10 +28,10 @@ RECID=$2
 ATMO=$3
 ARRAY=$4
 PART="gamma"
-RUNN="1"
-if [ -n "$5" ]
+SIM=$5
+if [ -n "$6" ]
 then
-   PART=$5
+   PART=$6
 fi
 
 FSCRIPT="VTS.MSCW_ENERGY.qsub_analyse_MC_VBF"
@@ -39,12 +41,22 @@ FSCRIPT="VTS.MSCW_ENERGY.qsub_analyse_MC_VBF"
 ##############################################
 # zenith angles
 ZE=( 20 00 30 35 40 45 50 55 60 65 )
+ZE=( 20 00 30 35 )
 NZE=${#ZE[@]}
-# noise levels
-NOISE=( 075 100 150 200 250 325 425 550 750 1000 )
+# noise levels (package dependent)
+if [ $SIM = "GRISU" ]
+then
+    RUNN="1"
+    NOISE=( 075 100 150 200 250 325 425 550 750 1000 )
+# CARE
+else
+    RUNN="9"
+    NOISE=(  50  80 120 170 230 290  370  450 )
+fi
 NNOISE=${#NOISE[@]}
 # wobble offsets
 WOBBLE=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+WOBBLE=( 0.5 )
 NWOBBLE=${#WOBBLE[@]}
 
 
@@ -85,6 +97,7 @@ do
 	  -e "s/PAAAAART/$PART/" \
 	  -e "s/RUUUUNNN/$RUNN/" \
 	  -e "s/ARRRRAY/$ARRAY/" \
+          -e "s/SIMS/$SIM/" \
 	  -e "s/RECONSTRUCTIONID/$RECID/" $FSCRIPT.sh > $FDIR/$FNAM.sh
 
 # submit the job
