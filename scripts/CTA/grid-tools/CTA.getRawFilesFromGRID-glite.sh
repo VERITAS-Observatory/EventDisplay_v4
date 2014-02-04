@@ -32,19 +32,19 @@ do
 # create file lists with 1000 files each
    let "k = $l + $FILEN"
    let "z = $z + 1"
-   LLIST=$2/tmplists/tmplist.c.$z.list
+   LLIST=$2/tmplists/tmplist.d.$z.list
    echo $LLIST
    sed -n "$l,$k p" $1 > $LLIST
 # run glite-transfer-submit
-  ftsid=`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.c.$z.list`
-#   echo "ftsid=\`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.c.$z.list\`"
+  ftsid=`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.d.$z.list`
+#   echo "ftsid=\`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.d.$z.list\`"
    echo "   glite ID $ftsid"
 
 # test for maximum number of jobs
-   if [ -n "$3" ] && [ "$z" -ge "$3" ]
-   then
-      break
-   fi
+#   if [ -n "$3" ] && [ "$z" -ge "$3" ]
+#   then
+#      break
+#   fi
 done
 
 echo
