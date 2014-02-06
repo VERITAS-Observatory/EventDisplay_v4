@@ -511,8 +511,8 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       rtn.scope[tel].pixinuse[pix]=FROGS_OK;
       //(GH) modify to remove LG pixels
       //if(fData->getDead()[pix]!=0)
-      if(fData->getDead()[pix]!=0 || fData->getData()->getHiLo()[pix]==1 )
-	//if(fData->getDead()[pix]!=0 )//(SV)
+      //if(fData->getDead()[pix]!=0 || fData->getData()->getHiLo()[pix]==1 )
+      if(fData->getDead(   fData->getData()->getHiLo()[pix]  )[pix]!=0 )//(SV)
         rtn.scope[tel].pixinuse[pix]=FROGS_NOTOK;
       //Increment the number of live pixels
       if(rtn.scope[tel].pixinuse[pix]==FROGS_OK) rtn.scope[tel].nb_live_pix++;
@@ -528,20 +528,26 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
       rtn.scope[tel].ped[pix]=0;
       //Set them to their values in p.e. if the d.c./p.e. factor is non zero
       if(dc2pe!=0) {
-	//rtn.scope[tel].q[pix]=fData->getData()->getSums2()[pix]/dc2pe; 
-	rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; 
+	rtn.scope[tel].q[pix]=fData->getData()->getSums2()[pix]/dc2pe;
+	//rtn.scope[tel].ped[pix]=
+	//fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]*fData->getData()->getLowGainMultiplier()[pix]*frogs_pedwidth_correction/dc2pe;
+
+	//rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; 
         if( fData->getData()->getHiLo()[pix]==1 )
         {
 	  //rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]*fData->getData()->getLowGainMultiplier()[pix]/dc2pe;
-	  rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; //(SV): getLowGainMultiplier removed 
-	  rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(true,18)[pix]*fData->getData()->getLowGainMultiplier()[pix]*frogs_pedwidth_correction/dc2pe;
+	  //rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; //(SV): getLowGainMultiplier removed 
 	  //rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(true,18)[pix]*frogs_pedwidth_correction/dc2pe;
+	  rtn.scope[tel].ped[pix]=
+	    fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]*fData->getData()->getLowGainMultiplier()[pix]/dc2pe;
 	}
 	else
         {
-	  rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
+	  //rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe;
           //rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(false,18)[pix]*frogs_pedwidth_correction/dc2pe;
-          rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]*frogs_pedwidth_correction/dc2pe;
+          //rtn.scope[tel].ped[pix]=fData->getData()->getPedvars()[pix]*frogs_pedwidth_correction/dc2pe;
+	  rtn.scope[tel].ped[pix]=
+	    fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]/dc2pe;
         }
       }
     }
@@ -594,7 +600,6 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   if(rtn.startpt.log10e>1.470)   rtn.worthy_event=FROGS_NOTOK;
   //Distance of the impact point small enough? 
   if(sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp)>450.0)
-    //if(sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp)<160.0 || sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp)>200.0)
     rtn.worthy_event=FROGS_NOTOK;
   //Count the number of telescopes with more than 300dc in their image
   int ngoodimages=0;
@@ -611,7 +616,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
   
 #ifdef DIFF_EVOLUTION
   //=======================================
-  //    (SV) diff. evolution algorithm
+  //    diff. evolution algorithm
   //=======================================
   //Decides if the event is worth analysing
   rtn.worthy_event=FROGS_NOTOK;
@@ -620,22 +625,18 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
     //Distance of the impact point small enough?
     double dummy=sqrt(rtn.startpt.xp*rtn.startpt.xp+rtn.startpt.yp*rtn.startpt.yp);
     
-    //Count the number of telescopes with more than 300dc in their image
+    //Count the number of telescopes with more than 200dc in their image
     ngoodimages=0;
     for(int tel=0; tel<rtn.ntel;tel++) {
       setTelID(tel);
-      if(fData->getImageParameters()->size>300.0) ngoodimages=ngoodimages+1;
+      if(fData->getImageParameters()->size>200.0) ngoodimages=ngoodimages+1;
     }
     
-    //Require the number of telescopes with more than 300dc to be at least 3
-    if (ngoodimages>1 && dummy<350.0) {
-      cout << " coucou diff. evol. "<< " # good imgaes " << ngoodimages << " " << dummy << endl;
-      rtn.worthy_event=FROGS_OK;
-      
-    }
+    //Require the number of telescopes with more than 200dc to be at least 2
+    if (ngoodimages>1 && dummy<200.0) {rtn.worthy_event=FROGS_OK;}
   }
   //=======================================
-  //    (SV) diff. evolution algorithm
+  //    diff. evolution algorithm
   //=======================================
 #endif //DIFF_EVOLUTION
 

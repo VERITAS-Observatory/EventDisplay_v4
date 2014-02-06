@@ -407,7 +407,7 @@ int frogs_goodness(struct frogs_imgtmplt_out *tmplanlz,
 	    or background region*/
 
 	  //int pix_in_img=frogs_image_or_background(tel,pix,d);
-	  int pix_in_img=frogs_image_or_background(tel,pix,d,mu);//(SV)
+	  int pix_in_img=frogs_image_or_background(tel,pix,d,mu);
 
 	  //If requested, we produce a display of the event
 	  if(FROGS_NBEVENT_DISPLAY>0) 
@@ -588,7 +588,9 @@ int frogs_gdns_calibr_out(int event_id, int tel, int pix, float q,  float ped, f
   if(first_time==FROGS_OK) {
     first_time=FROGS_NOTOK;
     //Open the file
-    calib=fopen("/afs/ifh.de/user/s/svincent/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/frogs_goodness_calibration.frogs","w");
+    char* itemp=0;
+    if( getenv( "VERITAS_USER_DATA_DIR" ) ) itemp = getenv( "VERITAS_USER_DATA_DIR" );
+    calib=fopen("%s/frogs_calibration/frogs_goodness_calibration.frogs","w");
     if(calib==NULL) 
       frogs_showxerror("Failed opening the file frogs_goodness_calibration.frogs for writing");
   }
@@ -886,10 +888,12 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
   char *EVN;
   char FROGS_TEMPLATE_LIST_PATH[500];
   EVN = getenv("EVNDISPSYS");
-  //sprintf(FROGS_TEMPLATE_LIST_PATH,"%s/bin/%s",EVN,FROGS_TEMPLATE_LIST);
-  //sprintf(FROGS_TEMPLATE_LIST_PATH,"/afs/ifh.de/user/s/svincent/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk/bin/frogs_template_file_list.txt");
-  sprintf(FROGS_TEMPLATE_LIST_PATH,
-	  "/lustre/fs5/group/cta/users/svincent/VERITAS/analysis/AnalysisData-VTS-v400/ParameterFiles/EVNDISP.frogs_template_file_list.txt");
+
+  char* itemp=0;
+  if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )      itemp = getenv( "VERITAS_EVNDISP_AUX_DIR" );
+  else if( getenv( "VERITAS_EVNDISP_ANA_DIR" ) ) itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
+  sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/EVNDISP.frogs_template_file_list.txt", itemp );
+  
   //Open the template files list file
   FILE *fu; //file pointer
   if((fu = fopen(FROGS_TEMPLATE_LIST_PATH, "r")) == NULL ) {
@@ -913,10 +917,10 @@ struct frogs_imgtemplate frogs_read_template_elev(float elevation) {
       rtn.elevmin=minel;
       rtn.elevmax=maxel;
       return rtn;
-    }
+     }
 #endif
 #ifndef CONVOLUTION
-  if(flag==0 && elevation>=minel && elevation<=maxel) {
+     if(flag==0 && elevation>=minel && elevation<=maxel) {
       fclose(fu);//Closes the template filename list 
       //fprintf(stdout,"%f %f %s\n",minel,maxel,fname);
       rtn=frogs_read_template_file(fname);
@@ -979,7 +983,6 @@ frogs_read_template_file(
 			 char fname[FROGS_FILE_NAME_MAX_LENGTH]) {
   /* Read the image template data in a file whose name is received 
      as an argument.*/
-  
   FILE *fu; //file pointer  
   //open file 
   if((fu = fopen(fname, "r")) == NULL ) {
@@ -1123,7 +1126,7 @@ int frogs_likelihood_derivative(const gsl_vector *v, void *ptr, gsl_matrix *J) {
   delta.log10e=0.03;
   delta.lambda=0.2;
 
-  //(SV) set stepsize to small value -> no convergence at all
+  //Set stepsize to small value (no convergence)
   //delta.xs=1E-15; delta.ys=1E-15; delta.xp=1E-15; delta.yp=1E-15; delta.log10e=1E-15; delta.lambda=1E-15;
   
   int gsl_pix_id=0; //This counter is used as a pixel identified for gsl
@@ -1515,7 +1518,7 @@ double frogs_img_model(int pix,int tel,struct frogs_reconstruction pnt,
      pixel area. */
   //rtn=rtn*d->scope[tel].telpixarea[pix];
 
-  /* (SV) The new image template is in photo-electron.*/
+  /* The new image templates are in photo-electron.*/
   //rtn=rtn;//*cone_eff;
 #endif  
 #ifndef CONVOLUTION
@@ -1699,8 +1702,6 @@ double frogs_chertemplate_quad(float lambda,float log10e,float b,float x,
 
   int iyinf=(int)floor((fabs(y)-pixradius-tmplt->min[4])/tmplt->step[4]);
   if(iyinf<0) {iyinf=0;}
-  //fprintf(stderr,"in frogs_chertemplate_quad: x %f y %f pixradius %f\n", x, y, pixradius); //(SV)
-  //fprintf(stderr,"in frogs_chertemplate_quad: ix %d %d %d iy %d %d %d\n", ixc, ixsup, ixinf, iyc, iysup, iyinf); //(SV)
 #endif
 
   //If we get here the pixel is within the area covered by the templates
@@ -1862,8 +1863,6 @@ double frogs_chertemplate_quad(float lambda,float log10e,float b,float x,
   double mu000=frogs_quadratic_interpolation(b1,b2,b3,mu001,mu002,mu003,b);
   mu000=FROGS_NONEG(mu000);
 
-  //fprintf(stderr,"in frogs_chertemplate_quad: x %f y %f mu000 %f %f %f %f\n", x, y, mu000, tmplt->step[3], tmplt->step[4], mu000*tmplt->step[3]*tmplt->step[4]); //(SV)
-
 #ifndef CONVOLUTION
   gsl_rng_free(r);//Free the memory associated with r
 #endif
@@ -2005,7 +2004,8 @@ float frogs_get_overlapping_area(gsl_rng *r,float x,float y,float pixradius,
     //float rnd2=2.*gsl_rng_uniform (r)-1.;
     float rnd1=gsl_rng_uniform (r);
     float rnd2=gsl_rng_uniform (r);
-    if(rnd1<0||rnd1>1||rnd2<0||rnd2>1) {fprintf(stderr, " we've a problem\n"); exit(0);}
+    if(rnd1<0||rnd1>1||rnd2<0||rnd2>1) 
+      {fprintf(stderr, "frogs_get_overlapping_area: random number <0 or >1\n"); exit(0);}
       
     /*coordinates of a random point pixel (X0, Y0)*/
     //float X0=X+rnd1*dX/2.;
@@ -2016,7 +2016,6 @@ float frogs_get_overlapping_area(gsl_rng *r,float x,float y,float pixradius,
     float D=sqrt( pow(X0-x,2.)+pow(Y0-y,2.)  );
     if(D<=pixradius) nIN+=1;
   }
-  //fprintf(stderr, " pixradius=%f x=%f y=%f X=%f Y=%f dX=%f dY=%f nIn=%d\n",pixradius,x,y,X,Y,dX,dY,nIN);
   return dX*dY*nIN/nTOTAL;
 }
 
@@ -2066,8 +2065,7 @@ double frogs_read_prob_array_table( struct frogs_probability_array *prob_array, 
   jmax = jmin+1;
   kmax = kmin+1;
   
-  //if( imin < 0 || kmin < 0 || jmin < 0 || imax >= BIN1-1 || jmax >= BIN2-1 || kmax >= BIN3-1 )
-  if( ii <= 0 || kk <= 0 || jj <= 0 || imax >= BIN1-1 || jmax >= BIN2-1 || kmax >= BIN3-1 ) //(SV)
+  if( ii <= 0 || kk <= 0 || jj <= 0 || imax >= BIN1-1 || jmax >= BIN2-1 || kmax >= BIN3-1 )
     return frogs_probability_density(q,mu,ped,0.35);
   
   float qmin = imin*(RANGE1-MIN1)/BIN1 + MIN1;
@@ -2277,7 +2275,7 @@ void frogs_differential_evolution(struct frogs_imgtmplt_in *d,
   gta_pop[0].fa_vector[3]=d->startpt.yp;
   gta_pop[0].fa_vector[4]=d->startpt.log10e;
   gta_pop[0].fa_vector[5]=d->startpt.lambda;
-  double lkhd0=fabs(FROGS_BAD_NUMBER); //(SV) FROGS_BAD_NUMBER = -9999
+  double lkhd0=fabs(FROGS_BAD_NUMBER); //FROGS_BAD_NUMBER = -9999
   if(d->startpt.log10e!=FROGS_BAD_NUMBER) {
     gta_pop[0] = frogs_evaluate(d,tmplt,prob_array,gi_D,gta_pop[0],&gl_nfeval,&gta_pop[0],gi_NP);
     lkhd0 = gta_pop[0].fa_cost[0];
