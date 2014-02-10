@@ -91,7 +91,7 @@ do
                else
                    D="$VERITAS_DATA_DIR/analysis/EVDv400/"$A"_FLWO/mscw_CARE_ATM"$W"_d20140127"
                fi
-               ./VTS.EFFAREA.sub_analyse.sh $C $A"-"$F"-ATM"$W"-ID"$I $I 1234 $D
+               ./VTS.EFFAREA.sub_analyse.sh $C $A"-"$F"-ATM"$W"-ID"$I $I 1234 $D $SIMS
             done
          fi
 

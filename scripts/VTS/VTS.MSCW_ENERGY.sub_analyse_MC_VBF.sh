@@ -40,23 +40,23 @@ FSCRIPT="VTS.MSCW_ENERGY.qsub_analyse_MC_VBF"
 # ze/noise/wobble offsets
 ##############################################
 # zenith angles
-ZE=( 20 00 30 35 40 45 50 55 60 65 )
-ZE=( 20 00 30 35 )
-NZE=${#ZE[@]}
+# wobble offsets
 # noise levels (package dependent)
 if [ $SIM = "GRISU" ]
 then
     RUNN="1"
+    ZE=( 20 00 30 35 40 45 50 55 60 65 )
     NOISE=( 075 100 150 200 250 325 425 550 750 1000 )
+    WOBBLE=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
 # CARE
 else
     RUNN="9"
+    ZE=( 20 00 30 35 )
     NOISE=(  50  80 120 170 230 290  370  450 )
+    WOBBLE=( 0.5 )
 fi
 NNOISE=${#NOISE[@]}
-# wobble offsets
-WOBBLE=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-WOBBLE=( 0.5 )
+NZE=${#ZE[@]}
 NWOBBLE=${#WOBBLE[@]}
 
 

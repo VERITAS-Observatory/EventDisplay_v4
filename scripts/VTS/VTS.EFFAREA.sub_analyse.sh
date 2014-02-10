@@ -10,10 +10,10 @@
 #
 ############################################################################################
 
-if [ ! -n "$1" ] && [ ! -n "$2" ]  && [ ! -n "$3" ]  && [ ! -n "$4" ] && [ ! -n "$5" ] && [ ! -n "$6" ]
+if [ $# -lt 6 ]
 then
    echo
-   echo "VTS.EFFAREA.sub_analyse.sh <cutfile (without .dat)> <output file name (without suffix)> <reconstruction ID> <array config (e.g. 123)> <data directory>" 
+   echo "VTS.EFFAREA.sub_analyse.sh <cutfile (without .dat)> <output file name (without suffix)> <reconstruction ID> <array config (e.g. 123)> <data directory> <GRISU/CARE>" 
    echo
    echo "   Note: zenith, wobble offset, and noise range hardwired"
    echo "         data file with MC parameters is expected to be in this directory: <data directory>G"
@@ -28,9 +28,18 @@ ARRAY=$4
 FDIR="$5"
 NAME=$6
 ############################################################################################
-IZE=( 00 20 30 35 40 45 50 55 60 65 )
-INOI=( 075 100 150 200 250 325 425 550 750 1000 )
-WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+if [ $SIM = "GRISU" ]
+then
+    IZE=( 00 20 30 35 40 45 50 55 60 65 )
+    INOI=( 075 100 150 200 250 325 425 550 750 1000 )
+    WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+    NN="1"
+else
+    IZE=( 00 20 30 35 )
+    INOI=(  50  80 120 170 230 290  370  450 )
+    WOFF=( 0.5 )
+    NN="9"
+fi
 ############################################################################################
 # run scripts and output is written into this directory
 DATE=`date +"%y%m%d"`
@@ -58,7 +67,6 @@ then
 fi
 echo "writing results to $ODDIR"
 
-
 ############################################################################################
 # loop over all zenith, wobble and noise bins
 ############################################################################################
@@ -82,7 +90,7 @@ do
 # MC files and directory names
 ############################################################################################
 # data file to be analyzed
-	 TFIL=gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana"$ARRAY"_NOISE${INOI[$j]}_1.root
+	 TFIL=gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana"$ARRAY"_NOISE${INOI[$j]}_"$NN".root
          FFIL=$FDIR"/"$TFIL
 	 if [ ! -e $FFIL ]
 	 then
