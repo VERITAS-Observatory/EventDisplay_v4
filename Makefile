@@ -1364,9 +1364,11 @@ $(distdir):	FORCEDISTDIR
 	cp -r macros/VTS/*.C $(distdir)/macros/VTS
 	mkdir -p $(distdir)/scripts/VTS
 	mkdir -p $(distdir)/scripts/CTA
+	mkdir -p $(distdir)/scripts/CTA/grid-tools
 	cp -r scripts/CTA/*.sh $(distdir)/scripts/CTA
 	cp -r scripts/CTA/*.list $(distdir)/scripts/CTA
 	cp -r scripts/CTA/CTA.EVNDISP* $(distdir)/scripts/CTA
+	cp -r scripts/CTA/grid-tools/* $(distdir)/scripts/CTA/grid-tools
 	cp -r scripts/VTS/*.sh $(distdir)/scripts/VTS
 	cp -r scripts/VTS/VTS.EVNDISP* $(distdir)/scripts/VTS
 
