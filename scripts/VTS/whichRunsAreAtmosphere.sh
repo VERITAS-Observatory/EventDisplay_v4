@@ -1,10 +1,6 @@
 #!/bin/bash
 # from a run list, prints the list of runs that were taken in a specific atmosphere, summer(22) or winter(21)
 # written by Nathan Kelley-Hoskins Sept 2013
-#
-# For more information and examples, go to 
-#   https://veritas.sao.arizona.edu/wiki/index.php/Eventdisplay_Manual:_runlist_creation_and_filtering
-#
 
 CONORM="\e[0m"
 CORED='\e[1;31m'
@@ -30,6 +26,8 @@ if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pi
 		exit
 	fi
 fi
+
+function echoerr(){ echo "$@" 1>&2; } #for spitting out error text
 
 # list of run_id's to read in
 RUNFILE=$2
@@ -59,11 +57,47 @@ elif ! $WINTFLAG && ! $SUMMFLAG ; then
 	exit
 fi
 
+function IsWinter {
+    local date="$1"
+    local month=${date:4:2}
+    if  [ "$date" -gt "20071026" ] && [ "$date" -lt "20080420" ] ||
+        [ "$date" -gt "20081113" ] && [ "$date" -lt "20090509" ] ||
+        [ "$date" -gt "20091102" ] && [ "$date" -lt "20100428" ] ||
+        [ "$date" -gt "20101023" ] && [ "$date" -lt "20110418" ] ||
+        [ "$date" -gt "20111110" ] && [ "$date" -lt "20120506" ] ||
+        [ "$date" -gt "20121029" ] && [ "$date" -lt "20130425" ] ; then
+		#echo true
+		echo 1  # winter
+	elif [ "$date" -ge "20130425" -o "$date" -le "20071026" ] ; then
+        # don't have specific dates for summer/winter boundary, so we will generalize to the months
+        # may through october inclusive is 'summer'
+        if   [ "$month" -ge 5 -a "$month" -le 10 ] ; then
+            echo 2 # summer
+        # november through april inclusive is 'winter'
+        elif [ "$month" -le 4 -o "$month" -ge 11 ] ; then
+            echo 1 # winter
+        else
+            echo 3 # unassignable
+        fi
+    else
+		#echo false
+		echo 2 # summer
+    fi
+}
+
+function badAtmosphere {
+	echoerr "Error, in 'whichRunsAreAtmosphere.sh', run $2 is too new and could not have its atmosphere assigned on date $1, exiting..."
+	exit 1
+}
+
 # get database url from parameter file
 MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
+    
 if [ ! -n "$MYSQLDB" ] ; then
     echo "* DBSERVER param not found in \$VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter!"
     exit
+#else
+#    echo "MYSQLDB: $MYSQLDB"
 fi 
 
 # mysql login info
@@ -91,17 +125,32 @@ while read -r RUNID RUNDATE ; do
 		# decode the date tag
 		read YY MM DD HH MI SE <<< ${RUNDATE//[-:]/ }
 		#echo "  YEARMONTHDAY:$YY$MM$DD"
+
+        STATUSFLAG=$( IsWinter "$YY$MM$DD" )
+        
+        #if   [ "$STATUSFLAG" == "1" ] ; then
+        #    STATUSWORD="winter"
+        #elif [ "$STATUSFLAG" == "2" ] ; then
+        #    STATUSWORD="summer"
+        #elif [ "$STATUSFLAG" == "3" ] ; then
+        #    STATUSWORD="unassignable"
+        #else
+        #    STATUSWORD="errorWithSTATUSFLAG"
+        #fi
+        #echoerr "run $RUNID  - date $YY$MM$DD - status $STATUSWORD"
 		
 		# is the run month between May(5) and Oct(10), inclusive?
 		if $SUMMFLAG ; then
-			if [ $MM -ge 5 -a $MM -le 10 ] ; then
-				echo "$RUNID"
+			if   [ "$STATUSFLAG" -eq "2" ] ; then echo "$RUNID"
+			elif [ "$STATUSFLAG" -eq "3" ] ; then badAtmosphere "$YY$MM$DD" "$RUNID"
 			fi
 		elif $WINTFLAG ; then
-			if [ $MM -le 4 -o $MM -ge 11 ] ; then
-				echo "$RUNID"
+			if   [ "$STATUSFLAG" -eq "1" ] ; then echo "$RUNID"
+			elif [ "$STATUSFLAG" -eq "3" ] ; then badAtmosphere "$YY$MM$DD" "$RUNID"
 			fi
 		fi
+		
+		
 		
 	fi
 # This is where the MYSQL command is executed, with the list of requested runs
