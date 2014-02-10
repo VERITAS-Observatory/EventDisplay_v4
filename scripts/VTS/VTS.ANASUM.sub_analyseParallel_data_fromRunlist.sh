@@ -92,8 +92,6 @@ fi
 if [[ "$CUTS" == *RE* ]]
 then
    BM="RE"
-   BMPARA="0.1 3 8"
-   BMPARA="0.1 1 20"
    BMPARA="0.1 2 6"
 elif [[ "$CUTS" == *RB* ]]
 then

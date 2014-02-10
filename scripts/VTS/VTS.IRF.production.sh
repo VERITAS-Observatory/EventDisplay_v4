@@ -2,32 +2,37 @@
 #
 # IRF production script (VERITAS)
 #
-# (early version with debugging statements)
-#
 ###################################################################
 
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
-   echo "./VTS.IRF.production.sh <run mode>"
+   echo "./VTS.IRF.production.sh <run mode> <GRISU/CARE>"
    echo
    echo "  possible run modes are MAKETABLES ANALYSETABLES EFFECTIVEAREAS"
    echo
    exit
 fi
 RUN="$1"
+SIMS="$2"
 
 #####################################################################
 # FULL sets
 
 # VERITAS epoch
 ARRAY=( "V6" "V5" "V4" )
+ARRAY=( "V6" )
 # reconstruction IDs (=4 and 3-telescope combinations)
 ID=( "0" "1" "2" "3" "4" )
 # atmospheres
 ATM=( "21" "22" )
 # table file
-TFIL="table_d20131115_GrIsuDec12_"
+if [[ $SIMS == "GRISU" ]]
+then
+    TFIL="table_d20131115_GrIsuDec12_"
+else
+    TFIL="table_d20140204_CareJan1427_"
+fi
 # cut files
 # $CUTFIL and $CUTS must be of same length
 # CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-SuperSoft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open" )
@@ -56,7 +61,7 @@ do
 # make tables
       if [[ $RUN == "MAKETABLES" ]]
       then
-         echo "  ./VTS.MSCW_ENERGY.sub_make_tables.sh $T 0 $W $A"
+         echo "  ./VTS.MSCW_ENERGY.sub_make_tables.sh $T 0 $W $A $SIMS"
       fi
 
 ######################################
@@ -69,7 +74,7 @@ do
 # analyse table files
          if [[ $RUN == "ANALYSETABLES" ]]
          then
-            ./VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh $T $I $W $A
+            ./VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh $T $I $W $A $SIMS
          fi
 ######################################
 # analyse effective areas
@@ -80,7 +85,12 @@ do
             do
                C=${CUTFIL[$c]}
                F=${CUTS[$c]}
-               D="/lustre/fs5/group/cta/VERITAS/analysis/EVDv400/"$A"_FLWO/mscw_ATM"$W"_d20131031"
+               if [[ $SIMS == "GRISU" ]]
+               then
+                   D="/lustre/fs5/group/cta/VERITAS/analysis/EVDv400/"$A"_FLWO/mscw_ATM"$W"_d20131031"
+               else
+                   D="$VERITAS_DATA_DIR/analysis/EVDv400/"$A"_FLWO/mscw_CARE_ATM"$W"_d20140127"
+               fi
                ./VTS.EFFAREA.sub_analyse.sh $C $A"-"$F"-ATM"$W"-ID"$I $I 1234 $D
             done
          fi
