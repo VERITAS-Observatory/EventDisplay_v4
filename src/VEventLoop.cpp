@@ -883,22 +883,22 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
       if( fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow > (int)getNSamples() )
       {
          cout << "VEventLoop::analyzeEvent: resetting calibration sum window from ";
- cout << fRunPar->fCalibrationSumWindow;
- fRunPar->fCalibrationSumWindow = getNSamples() - fRunPar->fCalibrationSumFirst;
+         cout << fRunPar->fCalibrationSumWindow;
+         fRunPar->fCalibrationSumWindow = getNSamples() - fRunPar->fCalibrationSumFirst;
          cout << " to " << fRunPar->fCalibrationSumWindow;
- cout << " (sum first at " << fRunPar->fCalibrationSumFirst;
- cout << ", min sum per channel " << fRunPar->fCalibrationIntSumMin;
- cout << ")" << endl;
-              }
-           }
-        }
+         cout << " (sum first at " << fRunPar->fCalibrationSumFirst;
+         cout << ", min sum per channel " << fRunPar->fCalibrationIntSumMin;
+         cout << ")" << endl;
+       }
+     }
+  }
 // quit when number of samples if set to '0'
-        if( getNSamples() == 0 && fRunPar->fsourcetype != 7 )
-{
-   cout << "VEventLoop::analyzeEvent() error: retrieved sample length of zero" << endl;
-   cout << "exiting..." << endl;
-   exit( -1 );
-        }
+  if( getNSamples() == 0 && fRunPar->fsourcetype != 7 )
+  {
+     cout << "VEventLoop::analyzeEvent() error: retrieved sample length of zero" << endl;
+     cout << "exiting..." << endl;
+     exit( -1 );
+  }
 
 // check the requested sumwindow is not larger than the number of samples
         if( (int)getNSamples() < (int)fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] )

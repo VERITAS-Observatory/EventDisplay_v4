@@ -23,7 +23,7 @@ VImageCleaning::VImageCleaning( VEvndispData *iData )
        kInitNNImageCleaning = InitNNImageCleaning();
     }
     nRings        = 3;
-    CoincWinLimit = 25;
+    CoincWinLimit = 25;   // GMGM what unit is this?
 }
 
 void VImageCleaning::printDataError( string iFunctionName )
@@ -179,32 +179,42 @@ int VImageCleaning::LocMin(int n, float *ptr, float &min) //ptr[i]>0
     return xmin;
 }
 
+/*
+ *
+ * initialize time-next-neighbour cleaning
+ *
+ *
+ */
 bool VImageCleaning::InitNNImageCleaning()
 {
     TFile* fDSTfile=new TFile( fData->getRunParameter()->fsourcefile.c_str() );
-    TTree* fDST_triggerHeader=(TTree*)fDSTfile->Get( "RunHeader" );
-    if( fDST_triggerHeader)
+    if( !fDSTfile->IsZombie() )
     {
-        cout << "NNImageCleaning: TrigSim trigger HEADER tree found... " << endl;
-        int ElecHeaderDim=0; int NumOfTelTypes=0;// unsigned int fTriggerScenarioDim=0; unsigned int fTriggerScanDim=0;
-        fDST_triggerHeader->SetBranchAddress("NumberOfTelTypes",&NumOfTelTypes);
-        fDST_triggerHeader->SetBranchAddress("ElecHeaderDim",&ElecHeaderDim);  fDST_triggerHeader->GetEntry(0);
-        bool ifActiveType[NumOfTelTypes]; fDST_triggerHeader->SetBranchAddress("ActiveTypes",ifActiveType); fDST_triggerHeader->GetEntry(0);
-        if(NumOfTelTypes>VDST_MAXTELTYPES){cout<<"DSTREE: NumOfTelTypes from TrigSim tree > VDST_MAXTELTYPES, return..."<<endl; return false;}
-        for(int t=0;t<NumOfTelTypes;t++) {fData->getRunParameter()->ifActiveType[t]=ifActiveType[t];}
+// GMGM is this trigsim only?
+        TTree* fDST_triggerHeader=(TTree*)fDSTfile->Get( "RunHeader" );
+        if( fDST_triggerHeader)
+        {
+            cout << "NNImageCleaning: TrigSim trigger HEADER tree found... " << endl;
+            int ElecHeaderDim=0; int NumOfTelTypes=0;// unsigned int fTriggerScenarioDim=0; unsigned int fTriggerScanDim=0;
+            fDST_triggerHeader->SetBranchAddress("NumberOfTelTypes",&NumOfTelTypes);
+            fDST_triggerHeader->SetBranchAddress("ElecHeaderDim",&ElecHeaderDim);  fDST_triggerHeader->GetEntry(0);
+            bool ifActiveType[NumOfTelTypes]; fDST_triggerHeader->SetBranchAddress("ActiveTypes",ifActiveType); fDST_triggerHeader->GetEntry(0);
+            if(NumOfTelTypes>VDST_MAXTELTYPES){cout<<"DSTREE: NumOfTelTypes from TrigSim tree > VDST_MAXTELTYPES, return..."<<endl; return false;}
+            for(int t=0;t<NumOfTelTypes;t++) {fData->getRunParameter()->ifActiveType[t]=ifActiveType[t];}
 
-        float  fElecTypeHeader[ElecHeaderDim*NumOfTelTypes];
-        fDST_triggerHeader->SetBranchAddress("ElecTypeHeader",fElecTypeHeader);
-        fDST_triggerHeader->GetEntry(0);
-        for(int t=0;t<NumOfTelTypes;t++){
-            fData->getRunParameter()->fFWHMtrigger[t]=fElecTypeHeader[t*ElecHeaderDim+3];
-            fData->getRunParameter()->fFWHMdata[t]=fElecTypeHeader[t*ElecHeaderDim+15];
-            fData->getRunParameter()->fFADCsampleRate[t]=fElecTypeHeader[t*ElecHeaderDim+13];
-            cout<<" TelType:"<<t<<" TrigFWHM:"<<fData->getRunParameter()->fFWHMtrigger[t]<<" DataFWHM:"<<fData->getRunParameter()->fFWHMdata[t]<<
-                " SampleRate:"<<fData->getRunParameter()->fFADCsampleRate[t]<<" [phe/fadc]:"<<fData->getRunParameter()->fFADCtoPhe[t]<<endl;
+            float  fElecTypeHeader[ElecHeaderDim*NumOfTelTypes];
+            fDST_triggerHeader->SetBranchAddress("ElecTypeHeader",fElecTypeHeader);
+            fDST_triggerHeader->GetEntry(0);
+            for(int t=0;t<NumOfTelTypes;t++){
+                fData->getRunParameter()->fFWHMtrigger[t]=fElecTypeHeader[t*ElecHeaderDim+3];
+                fData->getRunParameter()->fFWHMdata[t]=fElecTypeHeader[t*ElecHeaderDim+15];
+                fData->getRunParameter()->fFADCsampleRate[t]=fElecTypeHeader[t*ElecHeaderDim+13];
+                cout<<" TelType:"<<t<<" TrigFWHM:"<<fData->getRunParameter()->fFWHMtrigger[t]<<" DataFWHM:"<<fData->getRunParameter()->fFWHMdata[t]<<
+                    " SampleRate:"<<fData->getRunParameter()->fFADCsampleRate[t]<<" [phe/fadc]:"<<fData->getRunParameter()->fFADCtoPhe[t]<<endl;
+            }
         }
+        fDSTfile->Close();
     }
-    fDSTfile->Close();
     TString refIPR, MSTrefIPR, SSTrefIPR;
     TString prefixProd2="";
 #ifdef CTA_PROD2
@@ -229,6 +239,7 @@ bool VImageCleaning::InitNNImageCleaning()
     if(fData->getRunParameter()->fPerformFlashCamAnalysis[4]) {gIPR4=ReadIPRGraph(SSTrefIPR,"IPRchargeFlash");fFADCtoPhe[4]=ReadConvFactorsHist(SSTrefIPR,"hConvFactors",2);}
     if(gIPR==NULL||gIPR2==NULL||gIPR4==NULL) {cout<<"VImageCleaning::InitNNImageCleaning() one of IPR graphs is null... return" <<endl; return false;}
 
+// GMGM what are these values?
     float fFakeImageProb=0.5E-3; // 0.2%  for LST ->less for MST, SST
     float SimTime=100.;//ns
     float fMinRate=fFakeImageProb/( SimTime*1E-9 *float(3) );//ns

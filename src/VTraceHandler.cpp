@@ -525,23 +525,27 @@ bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 
 double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw ) 
 {
+// integrate from fFirst to fLast
     if( fTraceIntegrationMethod == 1 )
     {
        fSumWindowFirst = fFirst;
        fSumWindowLast  = fLast;
        return getQuickSum( fFirst, fLast, fRaw );
     }
+// find maximum integral
     else if( fTraceIntegrationMethod == 2 )
     {
         //return getQuickMaximumSum( 0, 0.5*fpTrace.size(),fLast - fFirst, fRaw );
         return getQuickMaximumSum( 0, fpTrace.size(),fLast - fFirst, fRaw );
     }
-    else if( fTraceIntegrationMethod == 3 )  // extraction with oversampling (less time clustering (due to limited sampling) even for short windows )
+// extraction with oversampling (less time clustering (due to limited sampling) even for short window
+    else if( fTraceIntegrationMethod == 3 )  
     {
         //return getMaxSumWithOverSampling(0,0.5*fpTrace.size(),0, fLast-fFirst, fRaw);
         return getMaxSumWithOverSampling(0,fpTrace.size(),0, fLast-fFirst, fRaw);
     }
-    else if( fTraceIntegrationMethod == 4 )  // TEMP: IPR calculation from long traces for extractors 2/3
+// TEMP: IPR calculation from long traces for extractors 2/3
+    else if( fTraceIntegrationMethod == 4 ) 
     {
         return getQuickMaximumSum( 0.5*fpTrace.size(), fpTrace.size(),fLast - fFirst, fRaw );            // extractor 2
         //return getMaxSumWithOverSampling( 0.5*fpTrace.size(), fpTrace.size(),0,fLast - fFirst, fRaw );   //extractor 3
