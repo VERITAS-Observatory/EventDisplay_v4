@@ -1570,6 +1570,7 @@ void VCalibrator::readGains( bool iLowGain )
 
     string iFile = fGainFileNameC[getTelID()];
     if( iLowGain ) iFile = fLowGainGainFileNameC[getTelID()];
+    int nZero = 0;	//counts number of channels with 0 gain.
 
 // don't read gains for runmode = 2
     if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
@@ -1637,10 +1638,22 @@ void VCalibrator::readGains( bool iLowGain )
                    VchannelList.push_back( ch );
 		   Vmean.push_back( mean );
 		   Vvar.push_back( rms );
+		   if( mean==0 ) nZero++;
                 }
             }
          }
-	 if( !use_default )
+
+//this is mostly for the nextday analysis. If flasher analysis failed (all gains 0) we want to have all gains 1 instead of eventdisplay exiting with 499 dead pixels.
+//turn on with -nextdaygainhack. Not recommended for regular analysis.
+//this is a bit risky as we can miss 'bad' channels (gains won't be tested...).
+	 if( getRunParameter()->fNextDayGainHack && nZero>200 ) {
+		cout << "VCalibrator::readGains(): Warning: " << nZero << " channels in Tel " <<  getTelID()+1 << " had 0 gain. All rel. gains will be set to 1." << endl;
+	        setGains( 1., iLowGain );
+	        setGainvars( 1., iLowGain );
+
+	 }
+
+	 else if( !use_default )
 	 {
 	     if( VchannelList.size() == Vmean.size() && VchannelList.size() == Vvar.size() )
 	     {

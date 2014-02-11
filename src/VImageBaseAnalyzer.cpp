@@ -372,6 +372,7 @@ void VImageBaseAnalyzer::calcTCorrectedSums(int iFirst, int iLast)
                 setTCorrectedSumLast( i_channelHitID, corrlast );
                 setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );
                 setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
+	
             }
         }
         catch(...)
@@ -538,6 +539,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
                setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
             }
 //////////////////////////////////////////////////
+
 // get results for trace fitting
 // rise and fall time are 10/90% values
             if( getTraceFit() > -1 )
@@ -675,7 +677,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     double i_meanPedVarRMS = 0.;
     getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
 
-    for ( unsigned int i = 0; i < getNChannels(); i++ )
+     for ( unsigned int i = 0; i < getNChannels(); i++ )
     {
 // FADC stop channels (don't set any other reasons for channels to be dead)
         if( iFirst )
@@ -698,7 +700,6 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
             setDead( i, 2, iLowGain, false, true );
             setDead( i, 3, iLowGain, false, true );
             setDead( i, 4, iLowGain, false, true );
-
 // check values
             setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
                         ->testPedestals( i, getPeds( iLowGain )[i] ), iLowGain );
@@ -727,7 +728,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 // gain/toff/low gain values are not time dependent
         if( iFirst )
         {
-            if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0)
+            if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0 && !( getRunParameter()->fNextDayGainHack && getGains( iLowGain )[i]==1.0) )
                || (iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
             {
                 setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
@@ -1132,6 +1133,22 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 corrlast = getFADCTraceIntegrationPosition( corrfirst+(int)getSumWindow_2() );
                 setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) );
                 setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
+
+
+		/*if( getSums2()[i]> 50 && (
+				( getHiLo()[i] && fTraceHandler->sanityCheck(corrfirst+4, corrfirst+(int)getSumWindow_2(),5*getPedvars( getHiLo()[i], getSumWindow_2() )[i]  )==1 ) ||
+				( getHiLo()[i] && fTraceHandler->sanityCheck(corrfirst+4, corrfirst+(int)getSumWindow_2(),5*getPedvars( getHiLo()[i], getSumWindow_2() )[i]  )==2 ) ||
+				( getHiLo()[i] && fTraceHandler->sanityCheck(corrfirst+4, corrfirst+(int)getSumWindow_2(),5*getPedvars( getHiLo()[i], getSumWindow_2() )[i]  )==3 ) ||
+				(!getHiLo()[i] && fTraceHandler->sanityCheck(corrfirst+4, corrfirst+(int)getSumWindow_2(),5*getPedvars( getHiLo()[i], getSumWindow_2() )[i]  )>0 ) 
+				)
+			) {
+			cout << "Trace failed sanity check, event "<< getEventNumber() << ", Tel " << getTelID()+1 << ", channel " << i; 
+			if(getHiLo()[i] ) cout << ",  low gain" ;
+			else cout << ", high gain";
+			cout << ", reason " <<  fTraceHandler->sanityCheck(corrfirst+4, corrfirst+(int)getSumWindow_2(), 5*getPedvars( getHiLo()[i], getSumWindow_2() )[i]  ) << endl;
+		}*/ //HF
+
+
             }
         }
         catch(...)

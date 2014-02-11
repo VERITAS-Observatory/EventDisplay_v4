@@ -259,6 +259,9 @@ bool VReadRunParameter::readCommandline( int argc, char *argv[] )
 	    if(!fRunPara->freadCalibfromDB) fRunPara->fNoCalibNoPb = true; //Security needed for the step in VImageBaseAnalyzer::findDeadChans, where the Gains and TOffsets are not checked if fNoCalibNoPb = true. This should not happen when reading information from the VOFFLine DB (LG)
 
 	}
+	else if(iTemp.find( "nextdaygainhack" ) < iTemp.size() ) {
+		fRunPara->fNextDayGainHack=true;
+	}
 	else if( iTemp.find( "ignoredstgains" ) < iTemp.size() )
 	{
 	   fRunPara->fIgnoreDSTGains = true;

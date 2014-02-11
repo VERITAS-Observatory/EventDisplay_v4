@@ -117,6 +117,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	int freadCalibfromDB_versionquery;        // require a given version of calibration
 	bool freadCalibfromDB_save_file;          // calibration information read from the DB are stored in VGlobalRunParameter::getDirectory_EVNDISPCalibrationData() +/Tel_?
 	bool fNoCalibNoPb;                        // if true, when no information for gain and toff can be found, the analysis is done filling thenm with 1 and 0 respectively (in VCalibrator) 
+	bool fNextDayGainHack;			  //if true, and > 100 channels in one telescope have gain=0, all gains in that tel will be set to 1; gains won't be tested in the dead channel finder.
 	string fLowGainCalibrationFile;           // file with file name for low-gain calibration 
 	int fNCalibrationEvents;                  // events to be used for calibration 
 	float faverageTZeroFiducialRadius;        // fiducial radius for average tzero calculation (DST), in fraction of FOV
@@ -303,6 +304,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
 
-        ClassDef(VEvndispRunParameter,138); //(increase this number)
+        ClassDef(VEvndispRunParameter,139); //(increase this number)
 };
 #endif

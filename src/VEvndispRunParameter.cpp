@@ -95,6 +95,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     freadCalibfromDB_versionquery = -1000;  
     freadCalibfromDB_save_file = false;
     fNoCalibNoPb = false;
+    fNextDayGainHack = false;
   
 // pointing parameters
     fTargetName = "NONAME";
