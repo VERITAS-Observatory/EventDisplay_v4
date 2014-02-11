@@ -20,7 +20,12 @@ mkdir -p $LDIR
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 # temporary directory
-set DDIR=$TMPDIR/$RRRRR
+if $?TMPDIR then
+    set DDIR=$TMPDIR/$RRRRR
+else
+    set DDIR="$VERITAS_USER_DATA_DIR"/evndispTMPDIR
+endif
+echo "Temporary directory: " $DDIR
 mkdir -p $DDIR
 
 #####################################
