@@ -365,7 +365,7 @@ bool VExposure::readFromDBList()
         cout << "error connecting to db 2 " << iTempS << endl;
         return false;
     }
-    cout << "reading from " << iTempS << endl;
+    cout << "Using external runlist. Reading from " << iTempS << endl;
 
     char c_query[1000];
 
@@ -438,6 +438,10 @@ bool VExposure::readFromDBList()
       fRunoffsetRA.push_back( atof( db_row->GetField( 15 ) ) * 180./TMath::Pi() );
       fRunoffsetDec.push_back( atof( db_row->GetField( 16 ) ) * 180./TMath::Pi() );
       fRunConfigMask.push_back( atoi( db_row->GetField( 10 ) ) );
+ 
+//observing mode
+       itemp = db_row->GetField( 1 );
+       fRunObsMode.push_back( itemp );
 
 //////
 // Wobble Stuff
@@ -1702,15 +1706,15 @@ void VExposure::printListOfRuns()
 // total time on object (new array configuration only)
     if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
     {
-
-	if( fObservingMode == "Special" ) cout << "RUN " << fRun[j] << "(" << fRunObsMode[j] << ") ";
+	cout << fixed ;
+	if( fObservingMode == "Special" ) cout << "RUN " << fRun[j] << " (" << fRunObsMode[j] << ") ";
         else                              cout << "RUN " << fRun[j];
         cout << "\t" <<  fRunSourceID[j];
-        cout << "\tMJD " << fRunStartMJD[j];
+        cout << setprecision(4) << "\tMJD " << fRunStartMJD[j];
         cout << "\tDate: " << fRunDate[j];
-        cout << "\tWobble:(N,E) (" << fWobbleN[j] << "," << fWobbleE[j] << ")";
+        cout << setprecision(1) << "\tWobble:(N,E) (" << fWobbleN[j] << "," << fWobbleE[j] << ")";
         cout << "\tCONFIGMASK " << fRunConfigMask[j];
-        cout << setprecision( 1 ) << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
+        cout << "\t(ra,dec)=(" << fRunRA[j] << "," << fRunDec[j] << ")";
         cout << "\tDuration[min] " << fRunDuration[j]/60.;
         cout << "\t(El,Az) " << fRunTelElevation[j] << " " << fRunTelAzimuth[j];
 	if( bPrintVerbose )
@@ -1737,7 +1741,7 @@ void VExposure::printListOfRuns()
           cout << " " << fRunLaserList[j][2];
           cout << " " << fRunLaserList[j][3];
         }
-        cout << fixed << endl;
+        cout << endl;
 
 	k++;
         Total_Time += fRunDuration[j];
