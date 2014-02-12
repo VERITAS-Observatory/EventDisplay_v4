@@ -38,7 +38,7 @@ int main( int argc, char *argv[] )
 
 /////////////////////////////////////////
 // read command line parameters
-    if( argc < 4 ) help();
+    if( argc == 1 ) help();
 
     string fDataFile = argv[1];
     string fOUTFile = argv[2];
@@ -190,6 +190,7 @@ int main( int argc, char *argv[] )
     f.writeEnergySpectrum(fDebug);
     f.writeSignificanceSkyMap(fDebug);
     f.writeExcessSkyMap(fDebug);
+    f.writeNightlyFlux(fDebug);
     f.writeFITSFile(fDebug);
 
     }

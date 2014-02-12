@@ -102,6 +102,26 @@ bool VFITS::writeCumSignificance(bool iPrint)
      return true;
 }
 
+/*********************************************************************/
+/* Calculate integral flux in nightly bins and store as table in FITS file */
+/*********************************************************************/
+
+bool VFITS::writeNightlyFlux(bool iPrint)
+{
+  cout<<" Write nightly flux to fits file"<<endl;
+  VFluxCalculation flux(fFile_anasum);
+  flux.setSpectralParameters(0.2, 1.0, -2.5);
+  flux.setSignificanceParameters( -9, -9 );
+  flux.calculateIntegralFlux(0.2);
+  TGraphErrors * gFlux = flux.plotFluxesVSMJDDaily();
+
+  if (iPrint) cout<<" Calculated the integral flux "<<endl;
+  writeTGraphErrorsFits(gFlux,"NightlyFlux", "Date","F(>0.2 TeV)", "MJD", "1/[cm^2*s]", iPrint);
+  if (iPrint) cout<<" transformed nightly flux into FITS-table"<<endl;
+
+     return true;
+}
+
 /********************************************************************/
 /* Calculate 1-dim Significance Distribution and store in FITS file */
 /********************************************************************/

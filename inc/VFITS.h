@@ -30,6 +30,7 @@
 #include "VPlotUtilities.h"
 #include "VStatistics.h"
 #include "VEnergySpectrum.h" 
+#include "VFluxCalculation.h"
 
 using namespace std;
 
@@ -75,5 +76,6 @@ class VFITS : public VAnalysisUtilities, public VPlotUtilities, public VHistogra
         bool writeThetaSquareDistribution(bool iPrint= false );
         bool writeEnergySpectrum(bool iPrint = false);
         bool writeFITSFile(bool iPrint = false);
+	bool writeNightlyFlux(bool iPrint = false );
 };
 #endif
