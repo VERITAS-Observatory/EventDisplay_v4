@@ -31,6 +31,10 @@ then
     echo "no EVNDISPSYS env variable defined"
     exit
 fi
+if [ ! -f "$FLIST" ] ; then
+    echo "Error, anasum runlist '$FLIST' not found, exiting..."
+    exit 1
+fi
 
 #########################################
 # directory for run scripts
