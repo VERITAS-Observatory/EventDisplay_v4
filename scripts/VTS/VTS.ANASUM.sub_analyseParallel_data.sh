@@ -48,8 +48,9 @@ mkdir -p $ODIR
 FNAM="$LDIR/ANA.$ONAM"
 
 # temporary run list
+DATECODE=`date +%Y%m%d`
 TLIST=`basename $FLIST`
-TLIST=$LDIR/$TLIST.tmp
+TLIST="$LDIR/$DATECODE.PID$$.$TLIST.tmp"
 rm -f $TLIST
 cat $FLIST | grep "*" >> $TLIST
 
@@ -74,7 +75,7 @@ do
        ONAM="$RUN.anasum"
 
 # temporary file list
-       TEMPLIST=$LDIR/qsub_analyse_fileList_"$LISTAD"_"$RUN"
+       TEMPLIST="${LDIR}/qsub_analyse_fileList_${LISTAD}_${RUN}_${DATECODE}_PID$$"
        rm -f $TEMPLIST
        echo "$LIN" > $TEMPLIST
 
