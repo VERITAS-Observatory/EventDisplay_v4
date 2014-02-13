@@ -1,9 +1,11 @@
 /* \file writeCTAWPPhysSensitivityFiles write CTA WP Phys sensitivity files
 
-   write a simple root files with histograms for sensitivities, effective areas,
+   write a simple root file with histograms for sensitivities, effective areas,
    angular and energy resolution, migration matrix, etc.
 
-   follow here CTA WP Phys standards 
+   follow here CTA WP-Phys standards (with minor modifications)
+
+   \author Gernot Maier
 
 */
 
@@ -17,6 +19,8 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
+/////////////////////
+// input parameters
     if( argc != 8 && argc != 7 )
     {
         cout << endl;
@@ -54,6 +58,8 @@ int main( int argc, char *argv[] )
     int    fReconstructionID = 0;
     if( argc == 8 ) fReconstructionID = atoi( argv[7] );
 
+/////////////////////
+// initialization
     VWPPhysSensitivityFile *iData = new VWPPhysSensitivityFile();
     iData->setDebug( true );
     iData->setObservatory( fObservatory );
@@ -99,7 +105,7 @@ int main( int argc, char *argv[] )
        iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, i );
        if( !iData->fillHistograms1D( fDataDirectory, false ) )
        {
-	  exit( -1 );
+	  exit( EXIT_FAILURE );
        }
     }
     if( iWobbleMin.size() > 0 ) iData->fillHistograms2D( iWobbleMin, iWobbleMax );

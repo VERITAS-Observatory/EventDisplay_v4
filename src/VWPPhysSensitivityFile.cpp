@@ -243,6 +243,10 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    return true;
 }
 
+/*
+   fill historgram vs distance to camera centre (off-axis sensitivities)
+
+*/
 bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vector< double > iWobble_max )
 {
    cout << endl << endl << "=================================================================================" << endl;
@@ -293,6 +297,7 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 						nbins_woff, woff );
 		      iHis2D[iHisName2D]->SetXTitle( hisList[i]->GetXaxis()->GetTitle() );
 		      iHis2D[iHisName2D]->SetYTitle( "off-axis angle [deg]" );
+		      iHis2D[iHisName2D]->SetZTitle( hisList[i]->GetYaxis()->GetTitle() );
 		      iHis2D[iHisName2D]->SetStats( 0 );
 		      hisListToDisk.push_back( iHis2D[iHisName2D] );
                    }
@@ -431,10 +436,10 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 // set Crab Nebula spectrum
     i_Sens.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
     i_SensCU.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
-// energy range 
+// energy range (default CTA values)
     i_Sens.setEnergyRange_Lin( 0.01, 150. );
     i_SensCU.setEnergyRange_Lin( 0.01, 150. );
-// significance parameters
+// significance parameters (default CTA values)
     i_Sens.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
     i_SensCU.setSignificanceParameter( 5., 10., fObservingTime_h, 0.05, 0.2 );
 //////////////////////////////////////////////////////////////////////////
