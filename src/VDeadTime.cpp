@@ -361,11 +361,14 @@ void VDeadTime::printDeadTime()
     cout << "\t Tdiff: dead time [ms] " << fDeadTimeMS << ", fraction of missing events: " << fDeadTimeFrac * 100.;
     cout << "% (" << fDeadTimeMiss << ", ";
     if( hTimeDiff ) cout << hTimeDiff->GetEntries() << ")" << endl;
+    else            cout << ")" << endl;
     if( hScalarClock && hScalarClock->GetEntries() > 0 )
     {
         cout << "\t Scalar: dead time (fraction of missing events): " << fScalarDeadTimeFrac * 100. << "%";
 	cout << " (Chi2 = " << fScalarDeadTimeChi2 << ")" << endl;
     }
+    else if( hScalarClock ) cout << "SDDDD " << hScalarClock->GetEntries() << endl;
+    else cout << "DDDD " << endl;
 }
 
 
@@ -385,7 +388,11 @@ TList* VDeadTime::getDeadTimeHistograms()
 */
 double VDeadTime::getDeadTimeFraction( double iT_run_s, bool iTimeDiff )
 {
-   if( iT_run_s < 0. || iTimeDiff ) return fDeadTimeFrac;
+   if( iT_run_s < 0. )
+   {
+      if( iTimeDiff ) return fDeadTimeFrac;
+      else            return fScalarDeadTimeFrac;
+   }
 
    if( hScalarDeadTimeFraction )
    {
@@ -458,33 +465,24 @@ bool VDeadTime::readHistograms( TDirectoryFile *iDir )
 // time difference histograms
 
     hTimeDiff = (TH1D*)iDir->Get( "hTimeDiff_on" );
-    if( !bIsOn ) hTimeDiff->SetName( "hTimeDiff_off" );
     if( hTimeDiff ) hisList->Add( hTimeDiff );
     hTimeDiffLog = (TH1D*)iDir->Get( "hTimeDiffLog_on" );
-    if( !bIsOn ) hTimeDiffLog->SetName( "hTimeDiffLog_off" );
     if( hTimeDiffLog ) hisList->Add( hTimeDiffLog );
     hTimeDiff2D = (TH2D*)iDir->Get( "hTimeDiff2D_on" );
-    if( !bIsOn ) hTimeDiff2D->SetName( "hTimeDiff2D_off" );
     if( hTimeDiff2D ) hisList->Add( hTimeDiff2D );
     hgDeadTime = (TGraphErrors*)iDir->Get( "hgDeadTime_on" );
-    if( !bIsOn ) hgDeadTime->SetName( "hgDeadTime_off" );
     if( hgDeadTime ) hisList->Add( hgDeadTime );
     hNEventTime = (TH1D*)iDir->Get( "hNEventTime_on" );
-    if( !bIsOn ) hNEventTime->SetName( "hNEventTime_off" );
     if( hNEventTime ) hisList->Add( hNEventTime );
     hFTimeDiff = (TF1*)iDir->Get( "hFTimeDiff_on" );
-    if( !bIsOn ) hFTimeDiff->SetName( "hFTimeDiff_off" );
     if( hFTimeDiff ) hisList->Add( hFTimeDiff );
 
 // scalar histograms
     hScalarClock = (TH1D*)iDir->Get( "hScalarClock_on" );
-    if( !bIsOn ) hScalarClock = (TH1D*)iDir->Get( "hScalarClock_off" );
     if( hScalarClock ) hisList->Add( hScalarClock );
     hScalarBusy = (TH1D*)iDir->Get( "hScalarBusy_on" );
-    if( !bIsOn ) hScalarBusy = (TH1D*)iDir->Get( "hScalarBusy_off" );
     if( hScalarBusy ) hisList->Add( hScalarBusy );
     hScalarDeadTimeFraction = (TH1D*)iDir->Get( "hScalarDeadTimeFraction_on" );
-    if( !bIsOn ) hScalarDeadTimeFraction = (TH1D*)iDir->Get( "hScalarDeadTimeFraction_off" );
     if( hScalarDeadTimeFraction ) hisList->Add( hScalarDeadTimeFraction );
 
     return true;

@@ -240,8 +240,16 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 
 ////////////////////////////////////////////////
 // analyze individual run
-    if( fIsOn )  cout << endl << "Filling ON histograms for run " << irun <<" -----------------------------"<< endl;
-    else         cout << endl << "Filling OFF histograms for run " << irun <<" -----------------------------"<< endl;
+    if( fIsOn )
+    {
+        cout << endl << "------------------------------------------------------------------------" << endl;
+        cout << "Filling ON histograms for run " << irun <<" -----------------------------"<< endl;
+    }
+    else
+    {
+        cout << endl << "------------------------------------------------------------------------" << endl;
+        cout << "Filling OFF histograms for run " << irun <<" -----------------------------"<< endl;
+    }
 
 // set pointer to data tree (run wise)
     fDataRun = getDataFromFile( irun );
@@ -1107,7 +1115,7 @@ double VStereoAnalysis::getDeadTimeFraction()
 // dead time depending on time mask
          if( fTimeMask && fTimeMask->getMask().size() > 0 )
 	 {
-	    return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask().size() );
+	    return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask() );
          }
          return fDeadTime[fHisCounter]->getDeadTimeFraction();
       }
@@ -1433,14 +1441,44 @@ void VStereoAnalysis::defineAstroSource()
 
 void VStereoAnalysis::setCuts( VAnaSumRunParameterDataClass iL, int irun )
 {
-       
       if( iL.fCutFile != "" )
       {
-      	fCuts->setNTel( iL.fMaxTelID );
-      	fCuts->readCuts( iL.fCutFile );
-      	fCuts->setTheta2Cut( iL.fSourceRadius );
+// read cuts from root file
+         if( iL.fCutFile.find( ".root" ) != string::npos )
+         {
+             string iEffFile = VUtilities::testFileLocation( iL.fCutFile, "EffectiveAreas", true );
+
+             TFile *iF  = new TFile( iEffFile.c_str() );
+             if( iF->IsZombie() )
+             {
+                cout << "VStereoAnalysis::setCuts error opening file to read cuts: " << endl;
+                cout << "\t" << iEffFile << endl;
+                cout << "exiting..." << endl;
+                exit( EXIT_FAILURE );
+             }
+             VGammaHadronCuts *iC = (VGammaHadronCuts*)iF->Get( "GammaHadronCuts" );
+             if( !iC )
+             {
+                  cout << "VStereoAnalysis::setCuts error reading cuts from file: " << endl;
+                  cout << "\t" << iEffFile << endl;
+                  cout << "exciting..." << endl;
+                  exit( EXIT_FAILURE );
+             }
+             fCuts = iC;
+             iF->Close();
+         }
+// read cuts from text file
+         else
+         {
+             fCuts->setNTel( iL.fMaxTelID );
+             fCuts->readCuts( iL.fCutFile );
+             fCuts->setTheta2Cut( iL.fSourceRadius );
+         }
       }
-      else fCuts->resetCutValues();
+      else
+      {
+         fCuts->resetCutValues();
+      }
       fCuts->initializeCuts( irun );
       fCuts->printCutSummary();
 }
@@ -1534,13 +1572,13 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
       	}
       	if ( fRunPara->fFrogs == 1  )
       	{
-      	fDataFrogsTree = (TTree*)fDataFile->Get( "frogspars" );
-      	  if( !fDataFrogsTree )
-      	  {
-      		  cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
-      	  	  exit( -1 );
-      	  }
-      	  fDataRunTree->AddFriend(fDataFrogsTree);
+            fDataFrogsTree = (TTree*)fDataFile->Get( "frogspars" );
+            if( !fDataFrogsTree )
+            {
+                cout << "VStereoAnalysis::getDataFromFile() error: cannot find frogspars tree in " << iFileName << endl;
+                exit( -1 );
+            }
+            fDataRunTree->AddFriend(fDataFrogsTree);
       	}
       	c = new CData( fDataRunTree );
 

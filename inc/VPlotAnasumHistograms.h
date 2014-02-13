@@ -134,7 +134,7 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
    void            setDebugInfo( bool iB = false ) { fDebug = iB; }               // more debug output to screen
    bool            setRunNumber( int iRun );                                      // select run for plotting
 
-   ClassDef(VPlotAnasumHistograms,11);
+   ClassDef(VPlotAnasumHistograms,12);
 };
 
 #endif

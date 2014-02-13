@@ -269,7 +269,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
             fRunAzMaxOn[fRunPara->fRunList[j].fRunOn] = azmax;
 
 // get mean noise level
-            fRunPedVarsOn[fRunPara->fRunList[j].fRunOn] = getNoiseLevel( fRunPara->fRunList[j].fRunOn, fRunPara->fDefaultPedVar );
+            fRunPedVarsOn[fRunPara->fRunList[j].fRunOn] = getNoiseLevel( fRunPara->fRunList[j].fRunOn );
         }
         fTotalExposureOff = 0.;
 
@@ -286,7 +286,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
             fRunAzMaxOff[fRunPara->fRunList[j].fRunOff] = azmax;
 
 // get noise level
-            fRunPedVarsOff[fRunPara->fRunList[j].fRunOff] = getNoiseLevel( fRunPara->fRunList[j].fRunOff, fRunPara->fDefaultPedVar );
+            fRunPedVarsOff[fRunPara->fRunList[j].fRunOff] = getNoiseLevel( fRunPara->fRunList[j].fRunOff );
         }
 
 // set up mono plots
@@ -1062,7 +1062,7 @@ double VAnaSum::getAzRange(int i_run, string i_treename, double &azmin, double &
     get mean noise level for a run
 
 */
-double VAnaSum::getNoiseLevel( int i_run, double iPedVars )
+double VAnaSum::getNoiseLevel( int i_run )
 {
     char i_temp[2000];
     double ipedv = -1.;
@@ -1075,16 +1075,13 @@ double VAnaSum::getNoiseLevel( int i_run, double iPedVars )
         exit( -1 );
     }
     VTableLookupRunParameter *fR = (VTableLookupRunParameter*)i_f->Get( "TLRunParameter" );
-    if( !fR )
+    if( fR )
     {
-// old mscw file with no run parameters
-        cout << "no pedvars found in file " << i_temp << ", use " << iPedVars << endl;
-
-        ipedv = iPedVars;
+        ipedv = fR->meanpedvars;
     }
     else
     {
-        ipedv = fR->meanpedvars;
+        ipedv = -1.;
     }
     i_f->Close();
     cout << "\t mean pedestal variations in run " << i_run << ": " << ipedv << endl;

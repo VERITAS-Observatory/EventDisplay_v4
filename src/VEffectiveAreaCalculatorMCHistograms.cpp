@@ -49,7 +49,7 @@ void VEffectiveAreaCalculatorMCHistograms::setDefaultValues()
 /////////////////////////////////////////////////////////////////
 // define  spectral index bins
     fVSpectralIndex.clear();
-    for( unsigned int i = 0; i < 20; i++ ) fVSpectralIndex.push_back( 2.0 + (double)i * 0.1 );
+    for( unsigned int i = 0; i < 40; i++ ) fVSpectralIndex.push_back( 1.5 + (double)i * 0.1 );
 
 /////////////////////////////////////////////////////////////////
     fEnergyAxisBins_log10 = 60;

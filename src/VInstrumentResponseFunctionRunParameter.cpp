@@ -53,6 +53,8 @@ VInstrumentResponseFunctionRunParameter::VInstrumentResponseFunctionRunParameter
     fpedvar = 0.;
     fXoff  = 0.;
     fYoff  = 0.;
+    
+    fWobbleIsotropic = 0.; //DS
 
     telconfig_ntel = 0;
     telconfig_arraycentre_X = 0.;
@@ -204,6 +206,21 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 	       if( !is_stream.eof() ) is_stream >> fCREnergySpectrumFile;
 	       if( !is_stream.eof() ) is_stream >> fCREnergySpectrumID;
             }
+//DS manually input the zenith
+            else if( temp == "ZENITH" ) //DS
+	    {
+	      if( !is_stream.eof() ) is_stream >> fze; //DS
+            }
+//DS manually input the zenith
+            else if( temp == "NOISE" ) //DS
+	    {
+  	      if( !is_stream.eof() ) is_stream >> fnoise; //DS
+            }
+//DS manually input the wobble
+            else if( temp == "WOBBLEISOTROPIC" ) //DS
+	    {
+  	      if( !is_stream.eof() ) is_stream >> fWobbleIsotropic; //DS
+            }
         }
     }
     cout << "========================================" << endl << endl;
@@ -313,8 +330,10 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
         cout << "VInstrumentResponseFunctionRunParameter::readRunParameters() error: cannot find tablelookup run parameters in " << ifilename << endl;
         return false;
     }
-    fze = fR->ze;
-    fnoise = fR->fNoiseLevel;
+    if( !fIsotropicArrivalDirections ) { //DS
+      fze = fR->ze;
+      fnoise = fR->fNoiseLevel;
+    }
     fpedvar = fR->meanpedvars;
 
 // get wobble offset from first event in file
@@ -333,8 +352,13 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
     }
     else
     {
-       fXoff = 0.;
-       fYoff = 0.;
+       if (fWobbleIsotropic != 0.) {  //DS
+ 	 fXoff = fWobbleIsotropic; //DS
+	 fYoff = 0.;  //DS
+       } else { //DS
+	 fXoff = 0.;
+	 fYoff = 0.;
+       }
     }
 
 ////////////////////////////////////////////////

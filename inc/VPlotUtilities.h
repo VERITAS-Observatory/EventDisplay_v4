@@ -17,6 +17,7 @@
 #include "TPad.h"
 #include "TROOT.h"
 #include "TStyle.h"
+#include "TText.h"
 #include "TTree.h"
 #include "TColor.h"
 
@@ -66,6 +67,10 @@ class VPlotUtilities
         double fColorAxis_vmax;
         TGaxis* fColorAxis_axis;
 
+        string fPlotHistogramTitle;
+        double fPlotHistogramTitle_x;
+        double fPlotHistogramTitle_y;
+
 	map< string, VPlottingAxisData* > fPlottingAxisData;
 
 
@@ -75,6 +80,7 @@ class VPlotUtilities
         virtual ~VPlotUtilities();
         void default_settings();
         void plot_nullHistogram( TPad *c, TH1 *h, bool bLogX = false, bool bLogY = false, double yTitleOffset = 1., double xmin = 0., double xmax = 0. );
+        void plotHistogramTitle( TH1 *h );
 
         TGaxis* getColorAxisAxis( double x1 = 0.9, double x2 = 0.93, double y1 = 0.7, double y2 = 0.95, string AxisTitle = "", Int_t ndiv = 10, string iOption = "+L" );
 	VPlottingAxisData* getPlottingAxis( string iName );
@@ -107,10 +113,14 @@ class VPlotUtilities
 			         fPlottingMarkerStyle = iMarkerStyle;
 		    	         fPlottingMarkerSize = iMarkerSize; fPlottingFillStyle = iFillStyle; }
 	void   setPadMargins( TCanvas *c, int nPads, double lM, double rM );
+        void   setPlotHistogramTitle( string iS = "", double x = -1., double y = -1.  ) 
+                                      { fPlotHistogramTitle = iS;
+                                        fPlotHistogramTitle_x = x;
+                                        fPlotHistogramTitle_y = y; }
 	void   setTitles( TH1 *his, string iname, string ititle, string ytitle );
 	void   setBlackAndWhitePalette();
 	TH2D*  removeOuterRing( TH2D *h, double r, double ivalue );
 
-        ClassDef(VPlotUtilities,12);
+        ClassDef(VPlotUtilities,13);
 };
 #endif

@@ -137,6 +137,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         int checkNumberOfArguments( string is );
         void checkNumberOfArguments( int im, int narg, string isf, string isl, int iversion, bool ishortlist );
         double getRingWidth( double sr, double rr, double rat );
+        bool   readCutParameter( string ifile, double &iSourceRadius, double &iMaximumDistance );
         double readMaximumDistance( string );
         double readSourceRadius( string iCutFile );
         int  returnWithError( string iL, string iM, string iC = "" );
@@ -179,9 +180,6 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 	int f2DAcceptanceMode ; // USE2DACCEPTANCE
 	bool fModel3D;
 	int fFrogs;
-
-// default pedestal variations
-        double fDefaultPedVar;
 
 // vector with all run parameters
         vector< VAnaSumRunParameterDataClass > fRunList;

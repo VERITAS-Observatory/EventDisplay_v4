@@ -74,6 +74,8 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    vector< double > fAzMin;
    vector< double > fAzMax;
 
+   double          fWobbleIsotropic; //DS
+
    unsigned int    telconfig_ntel;
    double          telconfig_arraycentre_X;
    double          telconfig_arraycentre_Y;
@@ -92,7 +94,7 @@ class VInstrumentResponseFunctionRunParameter : public TNamed
    bool                  readRunParameterFromTextFile( string iFile );
    bool                  testRunparameters();
 
-   ClassDef( VInstrumentResponseFunctionRunParameter, 10 );
+   ClassDef( VInstrumentResponseFunctionRunParameter, 11 );
 };
 
 #endif

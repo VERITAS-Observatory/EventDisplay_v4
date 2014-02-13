@@ -29,7 +29,6 @@ VPlotAnasumHistograms::VPlotAnasumHistograms()
    fTargetShiftNorth  = -9999.;
 
    default_settings();
-
 }
 
 
@@ -114,20 +113,11 @@ void VPlotAnasumHistograms::help()
     cout << "plot_excludedRegions(TCanvas *c)" << endl;
     cout << "   plot excluded regions for background determination into sky plots" << endl << endl ;
 
-    //cout << "plot_rates(char* filename = ""output.root"", bool iWhipple = false)" << endl;
-    //cout << "   rate and significance vs time and run number" << endl << endl;
-    //cout << "plot_rawRates(char* filename = ""output.root"", int ion)" << endl;
-    //cout << "   raw rates vs time in run in 1s, 10s, and 1min intervalls" << endl << endl;
-    //cout << "plot_shortTermRates(int ion, char* filename)" << endl;
-    //cout << "   rates and significances during a run (set time base in anasum, default is 4min)" << endl << endl;
     cout << "plot_deadTimes()" << endl;
     cout << "   plot delta t and dead time histograms" << endl << endl;
-    //cout << "plot_runSummary( char* filename = ""output.root"")" << endl;
-    //cout << "   plot rate vs elevation, etc." << endl << endl;
     cout << "printRunList()" << endl;
     cout << "print list of runs" << endl;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -827,6 +817,7 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 
         hsig_1DAll->Draw("e hist same" );
 	hsig_1D->Draw("e hist same" );
+        plotHistogramTitle( hsig_1DExcluded );
 
 /////////////////////////
 // difference plot

@@ -217,6 +217,7 @@ void VPlotUtilities::default_settings()
     gStyle->SetPadGridY( 0 );
     gROOT->SetStyle("Plain");
     gStyle->SetPalette( 55 );
+    setPlotHistogramTitle();
 }
 
 
@@ -410,6 +411,29 @@ unsigned int VPlotUtilities::listPlottingAxis()
 
    return fPlottingAxisData.size();
 }
+
+void VPlotUtilities::plotHistogramTitle( TH1 *h )
+{
+   if( !h ) return;
+
+   if( fPlotHistogramTitle.size() > 0 )
+   {
+      TText *iT = new TText( -4., 1.e3, fPlotHistogramTitle.c_str() );
+      iT->SetNDC();
+      if( fPlotHistogramTitle_x > 0. && fPlotHistogramTitle_y > 0. ) 
+      {
+         iT->SetX( fPlotHistogramTitle_x );
+         iT->SetY( fPlotHistogramTitle_y );
+      }
+      else
+      {
+         iT->SetX( 0.2 );
+         iT->SetY( 0.8 );
+      }
+      iT->Draw();
+   }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

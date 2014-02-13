@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string>
 
+#include <VGammaHadronCuts.h>
 #include <VGlobalRunParameter.h>
 #include <VInstrumentResponseFunctionRunParameter.h>
 
@@ -34,7 +35,7 @@ void merge( string ifile, char *outputfile, bool bFull = false )
        cout << "error: no files found to merge: " << endl;
        cout << "\t" << hname << endl;
        cout << "exiting.." << endl;
-       exit( -1 );
+       exit( EXIT_FAILURE );
     }
     sprintf( hname, "%s.root", outputfile );
     cout << "merging " << i_nMerged << " files to " << hname << endl;
@@ -93,17 +94,36 @@ void merge( string ifile, char *outputfile, bool bFull = false )
 // get one example of IRF-runparameters for later checks in the analysis
 // (this assumes they are the same in all merged files!)
     TFile *ifirst = f.GetFile();
+    if( !ifirst )
+    {
+       cout << "error finding pointer to first file in chain" << endl;
+	cout << "exiting..." << endl;
+	exit( EXIT_FAILURE );
+    }
     VInstrumentResponseFunctionRunParameter* iRunPara = (VInstrumentResponseFunctionRunParameter*)ifirst->Get("makeEffectiveArea_runparameter");
     if( !iRunPara )
     {
 	cout << "error copying VInstrumentResponseFunctionRunParameter to output file" << endl; 
 	cout << "could not find them in file: " << ifirst->GetName() << endl;
-	cout << "(called " << iRunPara->GetName() << ")" << endl;
 	cout << "exiting..." << endl;
-	exit( -1 );
-	return;
+	exit( EXIT_FAILURE );
     }
     iRunPara->Write();
+// get one example of the gamma-hadron cuts
+// (this assume they are the same in all merged files!)
+    VGammaHadronCuts *iCuts = (VGammaHadronCuts*)ifirst->Get( "GammaHadronCuts" );
+    if( iCuts )
+    {
+        cout << "copying gamma/hadron cuts from first file (" << ifirst->GetName() << ") into the output file" << endl;
+        iCuts->Write();
+    }
+    else
+    {
+        cout << "error copying gamma/hadron cuts into output file" << endl;
+	cout << "could not find them in file: " << ifirst->GetName() << endl;
+	cout << "exiting..." << endl;
+	exit( EXIT_FAILURE );
+    }
     fO->Close();
 
 // merge all log files
@@ -119,6 +139,7 @@ void merge( string ifile, char *outputfile, bool bFull = false )
     system( hname );
     cout << "done..";
 }
+
 
 int main( int argc, char *argv[] )
 {
@@ -142,54 +163,3 @@ int main( int argc, char *argv[] )
 
 }
 
-/*
-
-   the following function is not used
-
-*/
-void mergeSelectedEvents( char *ifile, char *outfile, double ze = -1, int az = -1, double Woff = -1, int noise = -1, double index = -1. )
-{
-    char hname[400];
-
-    TChain f( "fEffArea" );
-    sprintf( hname, "%s*.root", ifile );
-    f.Add( hname );
-    cout << "total number of entries in input tree: " << f.GetEntries() << endl;
-
-    double fze = 0;
-    int faz = 0;
-    double fwoff = 0.;
-    int fnoise = 0;
-    double findex = 0.;
-
-    f.SetBranchAddress("ze", &fze );
-    f.SetBranchAddress("az", &faz );
-    f.SetBranchAddress("Woff", &fwoff );
-    f.SetBranchAddress("noise", &fnoise );
-    f.SetBranchAddress("index", &findex );
-
-// output file
-    sprintf( hname, "%s.root", outfile );
-    TFile *ofile = new TFile( hname, "RECREATE" );
-    TTree *o = (TTree*)f.CloneTree( 0 );
-
-    for( int i = 0; i < f.GetEntries(); i++ )
-    {
-        f.GetEntry( i );
-
-        if( ze > 0 && TMath::Abs( ze - fze ) > 0.01 ) continue;
-        if( az > 0 && az != faz ) continue;
-        if( Woff > 0.1 && TMath::Abs( Woff - fwoff ) > 0.01 ) continue;
-        if( noise > 0 && noise != fnoise ) continue;
-        if( index > 0 && TMath::Abs( index - findex ) > 0.01 ) continue;
-
-        cout << "fill " << fze << " " << faz << " " << fwoff << " " << fnoise << " " << findex << endl;
-
-        o->Fill();
-    }
-    cout << "total number of entries in output tree: " << o->GetEntries() << endl;
-
-    o->Write();
-    ofile->Close();
-
-}

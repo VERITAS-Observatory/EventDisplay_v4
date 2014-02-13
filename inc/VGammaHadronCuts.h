@@ -287,6 +287,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
         bool   isGamma( int i = 0, bool bCount = false, bool fIsOn = true);
         bool   isMCCuts() { return bMCCuts; }
         void   newEvent( bool iFillStats = true );
+        void   print() { printCutSummary(); }
         void   printCutSummary();
         void   printCutStatistics() { if( fStats ) fStats->printCutStatistics(); }
 	void   printDirectionCuts();
@@ -308,6 +309,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 	void   terminate();
 	bool   useOrbitalPhaseCuts() { return fUseOrbitalPhaseCuts; }
 
-        ClassDef(VGammaHadronCuts,43);
+        ClassDef(VGammaHadronCuts,44);
 };
 #endif

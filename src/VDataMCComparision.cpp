@@ -123,21 +123,21 @@ void VDataMCComparision::defineHistograms()
   else           vmax = 10.;
   sprintf( hname, "hMSCW_%s", fName.c_str() );
   hMSCW = new TH1D( hname, "", 500, -5., vmax );
-  hMSCW->SetXTitle( "mean scaled width [deg]" );
+  hMSCW->SetXTitle( "mean reduced scaled width [deg]" );
   hisList->Add( hMSCW );
 
   if( bBckData ) vmax = 20.;
   else           vmax = 10.;
   sprintf( hname, "hMSCL_%s", fName.c_str() ); 
   hMSCL = new TH1D( hname, "", 500, -5., vmax );
-  hMSCL->SetXTitle( "mean scaled length [deg]" );
+  hMSCL->SetXTitle( "mean reduced scaled length [deg]" );
   hisList->Add( hMSCL );
 
   if( bBckData ) vmax = 20.;
   else           vmax = 10.;
   sprintf( hname, "hMSCWErec_%s", fName.c_str() );
   hMSCWErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
-  hMSCWErec->SetYTitle( "mean scaled width [deg]" );
+  hMSCWErec->SetYTitle( "mean reduced scaled width [deg]" );
   hMSCWErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
   hisList->Add( hMSCWErec );
 
@@ -145,7 +145,7 @@ void VDataMCComparision::defineHistograms()
   else           vmax = 10.;
   sprintf( hname, "hMSCLErec_%s", fName.c_str() );
   hMSCLErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
-  hMSCLErec->SetYTitle( "mean scaled length [deg]" );
+  hMSCLErec->SetYTitle( "mean reduced scaled length [deg]" );
   hMSCLErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
   hisList->Add( hMSCLErec );
 
@@ -208,21 +208,21 @@ void VDataMCComparision::defineHistograms()
   vmax = 5.;
   sprintf( hname, "hMWR_%s", fName.c_str() );
   hMWR = new TH1D( hname, "", 100, -5., vmax );
-  hMWR->SetXTitle( "Real mean scaled width [deg]" );
+  hMWR->SetXTitle( "mean scaled width [deg]" );
   hisList->Add( hMWR );
  
   //AMc 
   vmax = 5.;
   sprintf( hname, "hMLR_%s", fName.c_str() ); 
   hMLR = new TH1D( hname, "", 100, -5., vmax );
-  hMLR->SetXTitle( "Real mean scaled length [deg]" );
+  hMLR->SetXTitle( "mean scaled length [deg]" );
   hisList->Add( hMLR );
  
   //AMc 
   vmax = 5.;
   sprintf( hname, "hMWRErec_%s", fName.c_str() );
   hMWRErec = new TH2D( hname, "",  6, -1., 1., 100, -5., vmax );
-  hMWRErec->SetYTitle( "Real mean scaled width [deg]" );
+  hMWRErec->SetYTitle( "mean scaled width [deg]" );
   hMWRErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
   hisList->Add( hMWRErec );
  
@@ -230,7 +230,7 @@ void VDataMCComparision::defineHistograms()
   vmax = 5.;
   sprintf( hname, "hMLRErec_%s", fName.c_str() );
   hMLRErec = new TH2D( hname, "",  6, -1., 1., 100, -5., vmax );
-  hMLRErec->SetYTitle( "Real mean scaled length [deg]" );
+  hMLRErec->SetYTitle( "mean scaled length [deg]" );
   hMLRErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
   hisList->Add( hMLRErec );
 
@@ -563,7 +563,9 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
   cout << "\t quality cuts: " << endl;
   cout << "\t\t maximum core distance [m]: " << fCoreMax_QC << endl;
   cout << "\t\t minimum number of images per event: " << fNImages_min << endl;
+  if( fAzRange ) cout << "\t\t azimuth cut: [" << fAzMin << ", " << fAzMax << "]" << endl;
   cout << "\t cuts: ";
+
   if( fSingleTelescopeCuts == -1 )
     {
       cout << " stereo cuts (hardwired)" << endl;

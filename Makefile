@@ -129,7 +129,7 @@ INCLUDEFLAGS  = -I. -I./inc/
 
 # linux depending flags
 ifeq ($(ARCH),Linux)
-LDFLAGS       = -O 
+LDFLAGS       = -O
 SOFLAGS       = -shared
 endif
 # Apple OS X flags
@@ -632,6 +632,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPlotSensitivityfromLisFiles.o ./obj/VPlotSensitivityfromLisFiles_Dict.o \
 		./obj/VPlotMonteCarloQualityFactor.o ./obj/VPlotMonteCarloQualityFactor_Dict.o \
 		./obj/VPlotAnasumHistograms.o ./obj/VPlotAnasumHistograms_Dict.o \
+		./obj/VPlotCompareDataWithMC.o ./obj/VPlotCompareDataWithMC_Dict.o \
 		./obj/VHiLoTools.o ./obj/VHiLoTools_Dict.o \
 		./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \

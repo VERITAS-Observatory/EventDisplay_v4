@@ -62,7 +62,7 @@ class VAnaSum
 	                     double i_nevts_on, double i_nevts_off, double i_norm_alpha, 
 			     double i_sig, double i_rate, double i_rateOFF, VOnOff *fstereo_onoff );
         double getAzRange( int i_run, string i_treename, double &azmin, double &azmax );
-        double getNoiseLevel( int i_run, double iNoiseLevel );
+        double getNoiseLevel( int i_run );
         void  makeEnergySpectrum( int ionrun, TList*, double );
 	void  make2DEnergySpectrum( int ionrun, TList* l);
 

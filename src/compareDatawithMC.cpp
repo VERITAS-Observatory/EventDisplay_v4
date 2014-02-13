@@ -1,4 +1,4 @@
-/*! \file compareDatawithMC.cc
+/*! \file compareDatawithMC.cpp
  *  \brief compare MC gamma-ray distributions with on-off distributions from data
  *         (e.g. Crab Nebula or Mrk 421 flare data)
  *
@@ -31,6 +31,8 @@ struct sInputData
    vector< double > fTelX;
    vector< double > fTelY;
    vector< double > fTelZ;
+   double fAz_deg_min;
+   double fAz_deg_max;
 };
 
 vector< sInputData > fInputData;
@@ -111,12 +113,12 @@ void readInputfile( string fInputFile )
 	     is_check >> temp;
 	     z++;
          }
-	 if( z != 6 )
+	 if( z != 8 )
 	 {
 	     cout << "error reading input file, not enough parameters in this line: " << endl << is_line << endl;
 	     cout << "require 6, found " << z << endl;
 	     cout << "...exiting" << endl;
-	     exit( 0 );
+	     exit( EXIT_FAILURE );
          }
 
 	 is_stream >> a.fType;
@@ -129,6 +131,9 @@ void readInputfile( string fInputFile )
 	 a.fWobbleEast = atof( temp.c_str() );
 	 if( a.fWobbleNorth < -98. || a.fWobbleEast < -98. ) a.fWobbleFromDataTree = true;
 	 else a.fWobbleFromDataTree = false;
+
+         if( !is_stream.eof() ) is_stream >> a.fAz_deg_min;
+         if( !is_stream.eof() ) is_stream >> a.fAz_deg_max;
 
          getTelescopePositions( a.fFileName, a.fTelX, a.fTelY, a.fTelZ, a.fNTelescopes );
 
@@ -164,7 +169,7 @@ int main( int argc, char *argv[] )
        cout << "\t output file:     results are written to this file" << endl;
        cout << "\t                  (use  plot_stereo_compare.C for to plot)" << endl;
        cout << endl;
-       cout << "Note: cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
+       cout << "Note: most cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
        cout << endl;
        exit( 0 );
    }
@@ -197,11 +202,6 @@ int main( int argc, char *argv[] )
 // output file
    TFile *fout = new TFile( fOutputfile.c_str(), "RECREATE" );
    
-// azimuth limit 
-// (2-tel data shows an asymmetry in centroid positions which is azimuth dependent)
-   double fAzMin = 0.;
-   double fAzMax = 0.;
-
 // now analyse the data
    vector< VDataMCComparision* > fStereoCompare;
    VDataMCComparision* fStereoCompareOn = 0;
@@ -212,7 +212,7 @@ int main( int argc, char *argv[] )
       cout << fInputData[i].fType << endl;
       cout << "----" << endl;
       fStereoCompare.push_back(  new VDataMCComparision( fInputData[i].fType, false, fInputData[i].fNTelescopes ) );
-      fStereoCompare.back()->setAzRange( fAzMin, fAzMax );
+      fStereoCompare.back()->setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
 // get telescope coordinates
       fStereoCompare.back()->resetTelescopeCoordinates();
       for( int t = 0; t < fInputData[i].fNTelescopes; t++ ) 

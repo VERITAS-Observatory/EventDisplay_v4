@@ -53,8 +53,8 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 
     fEffectiveAreaFile = "";                      // file with effective areas, use NOFILE if not avaible
 
-// (GM) changed to 0 (20130327)
-//    fNBoxSmooth = 100;
+
+// smoothing algorithm (don't use it if you don't know it)
     fNBoxSmooth = 0;
 
 // ON/OFF MODEL
@@ -87,7 +87,7 @@ VAnaSumRunParameterDataClass::VAnaSumRunParameterDataClass()
 
 VAnaSumRunParameter::VAnaSumRunParameter()
 {
-// default version number
+// default version number (important for reading of run parameters from root file)
     fVersion = 6;
 
 // bin size for sky maps [deg]
@@ -143,21 +143,19 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 // do not exclude regions around stars by default
     fStarExlusionRadius = -1.;
 
-// default pedestal variations
-    fDefaultPedVar = 8.;
-
 // length of time intervalls in seconds for rate plots and short term histograms
     fTimeIntervall = 4. * 60.;
 
 // should a full tree of all gamma-like events be written?
 // or do we only keep the ones that pass ON/OFF region cuts?
-	fWriteAllGammaToTree = false ; // WRITEALLGAMMATOTREE
+    fWriteAllGammaToTree = false ; // WRITEALLGAMMATOTREE
 
-	fModel3D = false; // MODEL3DANALYSIS
+    fFrogs = 0;
+    fModel3D = false; // MODEL3DANALYSIS
 
-	// if 0, use default 1D radial acceptance
-	// if >0, use alternate 2D-dependent acceptance
-	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
+// if 0, use default 1D radial acceptance
+// if >0, use alternate 2D-dependent acceptance
+    f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
 
 // set monte carlo zenith angles
     setMCZenith();
@@ -541,7 +539,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 		fModel3D = true;
 	      }
             }
-			
+////////////////////////////////////////////////////////////			
 // Frogs Analysis
             else if( temp == "FROGSANALYSIS" )
             {
@@ -775,7 +773,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
             if( bShortList )
             {
 // fill the runlist vector
-				i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
+		i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
                 fRunList.push_back( i_sT );
 // fill the runlist map
                 fMapRunList[i_sT.fRunOn] = fRunList.back();
@@ -793,18 +791,21 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
 // cut selector (now in cut file, therefore ignored)
             is_stream >> temp;
 // cut file
-            is_stream >> temp;
-            i_sT.fCutFile = temp;
+            if( fVersion < 7 )
+            {
+                is_stream >> temp;
+                i_sT.fCutFile = temp;
 // source radius (actually (source radius)^2 )
 // (read theta2 cut from cut file)
-            if( !bTotalAnalysisOnly ) i_sT.fSourceRadius = readSourceRadius( i_sT.fCutFile );
-            else                      i_sT.fSourceRadius = 0.1;
-            if( i_sT.fSourceRadius <= 0. )
-            {
-                cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
-                cout << is_line << endl;
-                cout << "invalid source radius " << i_sT.fSourceRadius << endl;
-                exit( -1 );
+                if( !bTotalAnalysisOnly ) i_sT.fSourceRadius = readSourceRadius( i_sT.fCutFile );
+                else                      i_sT.fSourceRadius = 0.1;
+                if( i_sT.fSourceRadius <= 0. )
+                {
+                    cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
+                    cout << is_line << endl;
+                    cout << "invalid source radius " << i_sT.fSourceRadius << endl;
+                    exit( -1 );
+                }
             }
 // background model
             is_stream >> temp;
@@ -837,7 +838,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
                 is_stream >> temp;
                 i_sT.fmaxradius = atof( temp.c_str() );
             }
-            else
+            else if( fVersion < 7 )
             {
                 if( !bTotalAnalysisOnly ) i_sT.fmaxradius =  readMaximumDistance( i_sT.fCutFile );
                 else                      i_sT.fmaxradius = 2.0;
@@ -852,7 +853,26 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
 // file for effective areas
             is_stream >> temp;
             i_sT.fEffectiveAreaFile = temp;
-
+// cuts are in the effective area files
+            if( fVersion >= 7 )
+            {
+                i_sT.fCutFile = temp;
+// source radius (actually (source radius)^2 )
+// (read theta2 cut from cut file)
+                if( !bTotalAnalysisOnly ) readCutParameter( i_sT.fCutFile, i_sT.fSourceRadius, i_sT.fmaxradius );
+                else
+                {
+                   i_sT.fSourceRadius = 0.1;
+                   i_sT.fmaxradius = 2.0;
+                }
+                if( i_sT.fSourceRadius <= 0. )
+                {
+                    cout << "VAnaSumRunParameter::loadLongFileList: error in run list: " << endl;
+                    cout << is_line << endl;
+                    cout << "invalid source radius " << i_sT.fSourceRadius << endl;
+                    exit( -1 );
+                }
+            }
 // background model dependend parameters
 //
 //	  if( i_sT.fBackgroundModel == eONOFF )
@@ -916,7 +936,7 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
                 i_sT.fOO_alpha = 1.;
             }
 // fill the runlist vector
-			i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
+            i_sT.f2DAcceptanceMode = f2DAcceptanceMode ; // USE2DACCEPTANCE
             fRunList.push_back( i_sT );
 // fill the runlist map
             fMapRunList[i_sT.fRunOn] = fRunList.back();
@@ -1075,10 +1095,11 @@ void VAnaSumRunParameter::checkNumberOfArguments( int im, int narg, string i_lis
     if( iversion > 3 ) n_tot -= 2;
     if( iversion > 4 && ( im == 1 || im == 3 ) ) n_tot -= 1;
     if( iversion > 5 ) n_tot -= 1;   // no more RA offset for off runs
+    if( iversion > 6 ) n_tot -= 1;   // no more cut file
 
     if( (im == -1 && narg < n_tot) || (im >=0 && narg != n_tot) )
     {
-        cout << "error: not enough parameter in " << i_listfilename << ": " << endl;
+        cout << "error: not enough/too many parameter in " << i_listfilename << ": " << endl;
         cout << is_line << endl;
         cout << "expected " << n_tot << " parameter, found " << narg << " parameters" << endl;
 	cout << "(" << im << ", " << narg << ", " << iversion << ", " << bShortList << ")" << endl;
@@ -1148,6 +1169,48 @@ double VAnaSumRunParameter::readSourceRadius( string ifile )
        return iC.getAngularResolutionAbsoluteMaximum();
     }
     return iC.getTheta2Cut_max();
+}
+
+/*
+ * read some parameters from gamma/hadron cuts (root file)
+ *
+ */
+bool VAnaSumRunParameter::readCutParameter( string ifile, double &iSourceRadius, double &iMaximumDistance )
+{
+   iSourceRadius = -1.;
+   iMaximumDistance = -1.;
+
+   string iEffFile = VUtilities::testFileLocation( ifile, "EffectiveAreas", true );
+
+   TFile *iF  = new TFile( iEffFile.c_str() );
+   if( iF->IsZombie() )
+   {
+      cout << "VAnaSumRunParameter::readSourceRadius error opening file to read direction cuts: " << endl;
+      cout << "\t" << ifile << endl;
+      cout << "exiting..." << endl;
+      exit( EXIT_FAILURE );
+   }
+   VGammaHadronCuts *iC = (VGammaHadronCuts*)iF->Get( "GammaHadronCuts" );
+   if( !iC )
+   {
+      cout << "VAnaSumRunParameter::readSourceRadius error reading direction cut from file: " << endl;
+      cout << "\t" << ifile << endl;
+      cout << "exiting..." << endl;
+      exit( EXIT_FAILURE );
+   }
+   if( iC->getTheta2Cut_max() < 0. && iC->getDirectionCutSelector() == 2 )
+   {
+       iSourceRadius = iC->getAngularResolutionAbsoluteMaximum();
+   }
+   else
+   {
+       iSourceRadius = iC->getTheta2Cut_max();
+   }
+   iMaximumDistance = iC->fCut_CameraFiducialSize_max;
+
+   if( iF ) iF->Close();
+
+   return true;
 }
 
 
