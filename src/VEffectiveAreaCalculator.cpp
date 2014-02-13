@@ -2758,11 +2758,12 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
 // number of expected CR events / min in this energy bin
    double n_cr = fMC_ScatterArea * O_cr * fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) * 1.e4 * 60.;
 
-// (ctools) for the acceptance map construction, the weight must be in #/sr/s
-   if( per_second_per_sr ) n_cr = n_cr/(fMC_ScatterArea*60);
+// (ctools) for the acceptance map construction, the weight must be in #/sr/s/TeV
+   if( per_second_per_sr ) n_cr = n_cr/60.;
 
    if( getMCSolidAngleNormalization() > 0. ) n_cr /= getMCSolidAngleNormalization();
 
+   // return #/sr/time/TeV (?)
    if( n_mc != 0. ) return n_cr / n_mc;
 
    return 0.;
