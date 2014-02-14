@@ -562,7 +562,7 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
           hDiff->Draw( "same" );
 
           float x = 0.;
-          if( iVariable.find( "MW" ) != string::npos ) x = 1.;
+          if( iVariable.find( "MW" ) != string::npos || iVariable.find( "ML" ) != string::npos ) x = 1.;
           TLine *lLine = new TLine( x, hSims->GetMinimum(), x, hSims->GetMaximum() );
           lLine->SetLineStyle( 2 );
           lLine->Draw();
@@ -1200,17 +1200,17 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
   vector< int >   f_logy;
   vector< double > f_x_min;
   vector< double > f_x_max;
-  hname.push_back( "width" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );
+  hname.push_back( "width" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.20 );
   hname.push_back( "length" );  f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 0.50 );
   hname.push_back( "dist" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 2.10 );
-  hname.push_back( "size" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
-  hname.push_back( "size2" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 2. );  f_x_max.push_back( 6.00 );
+  hname.push_back( "size" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 1.5 );  f_x_max.push_back( 6.00 );
+  hname.push_back( "size2" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 1.5 );  f_x_max.push_back( 6.50 );
   hname.push_back( "nlowgain" );f_rebin.push_back( 1 );       f_logy.push_back( 1 );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
   hname.push_back( "los" );     f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
   hname.push_back( "asym" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
   hname.push_back( "cen_x" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
   hname.push_back( "cen_y" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( -2.0 );  f_x_max.push_back( 2.0 );
-  hname.push_back( "ntubes" );  f_rebin.push_back( 1 );       f_logy.push_back( 1 );   f_x_min.push_back( 0. );  f_x_max.push_back( 40. );
+  hname.push_back( "ntubes" );  f_rebin.push_back( 1 );       f_logy.push_back( 1 );   f_x_min.push_back( 0. );  f_x_max.push_back( 60. );
   hname.push_back( "mscwt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
   hname.push_back( "msclt" );   f_rebin.push_back( i_rebin ); f_logy.push_back( 0 );  f_x_min.push_back( 0.5 );  f_x_max.push_back( 1.5 );
   hname.push_back( "loss" );    f_rebin.push_back( i_rebin ); f_logy.push_back( 1 );   f_x_min.push_back( 0. );  f_x_max.push_back( 0.25 );

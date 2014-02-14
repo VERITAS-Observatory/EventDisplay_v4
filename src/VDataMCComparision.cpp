@@ -298,13 +298,13 @@ void VDataMCComparision::defineHistograms()
       hisList->Add( hnlowgain.back() );
 
       sprintf( hname, "hsize_%d_%s", i, fName.c_str() );
-      hsize.push_back( new TH1D( hname, "", 80, 2., 5.0) );
+      hsize.push_back( new TH1D( hname, "", 100, 1., 8.0) );
       hsize.back()->SetXTitle( "log_{10} size [d.c.]" );
       hTel.push_back( hsize.back() );
       hisList->Add( hsize.back() );
 
       sprintf( hname, "hsize2_%d_%s", i, fName.c_str() );
-      hsize2.push_back( new TH1D( hname, "", 80, 2., 7.0) );
+      hsize2.push_back( new TH1D( hname, "", 100, 1., 8.0) );
       hsize2.back()->SetXTitle( "log_{10} size2 [d.c.]" );
       hTel.push_back( hsize2.back() );
       hisList->Add( hsize2.back() );

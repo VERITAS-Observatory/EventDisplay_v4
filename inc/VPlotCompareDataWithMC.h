@@ -61,10 +61,10 @@ class VPlotCompareDataWithMC
    void centroids();
    void core_plots( int iRebin = 4, int iScaling = 1 );
    void distance_plots();
-   void emission_height( double iEmissionHeightMax = 40. );
+   void emission_height( double iEmissionHeightMax = 20. );
    void msc_plots( char *offFile = 0, char *helium = 0, char *proton = 0, double xmin = -1.5, double xmax = 4., string ivar = "MSCW" );
    void msc_vs_energy_plots( int iRebin = 4, double xmin = -1.5, double xmax = 4. );
-   void mwr_vs_energy_plots( int iRebin = 1, double xmin = -1.5, double xmax = 4. );
+   void mwr_vs_energy_plots( int iRebin = 1, double xmin =  0.5, double xmax = 1.5 );
    void multiplicity_plots();
    bool openDataFile( string ifile );
    void single_telescope( int telid = -1 );
