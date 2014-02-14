@@ -750,20 +750,24 @@ TCanvas* VPlotAnasumHistograms::plot_significanceDistributions( double rmax, dou
 
 /////////////////////////
 // get 1D significance distributions
-    TH1D *hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
-    setHistogramPlottingStyle( hsig_1D, 4, 2, 1, 1, 1, 0 );
-    if( hsig_1D ) hsig_1D->SetStats( 0 );
-    cout << "blue:   without source region" << endl;
-
     TH1D *hsig_1DAll  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, 0., false, hmap_stereo_on );
     setHistogramPlottingStyle( hsig_1DAll, 2, 2, 2, 1, 1, 0 );
     if( hsig_1DAll ) hsig_1DAll->SetStats( 0 );
-    cout << "red:   with source region" << endl;
+    cout << "Plot Legend:" << endl;
+    cout << "  red  :   with source region" << endl;
+    cout << "           (use entire significance skymap)" << endl;
+    
+    TH1D *hsig_1D  = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on );
+    setHistogramPlottingStyle( hsig_1D, 4, 2, 1, 1, 1, 0 );
+    if( hsig_1D ) hsig_1D->SetStats( 0 );
+    cout << "  blue :   without source region" << endl;
+    cout << "           (use entire skymap, except the ON region)" << endl;
     
     TH1D *hsig_1DExcluded = get_Bin_Distribution( hmap_stereo_sig, fRunNumber, rmax, rSource, false, hmap_stereo_on, iN, v_x, v_y, v_r );
     setHistogramPlottingStyle( hsig_1DExcluded, 1, 2, 2, 1, 1, 0 );
     if( hsig_1DExcluded ) hsig_1DExcluded->SetStats( 1 );
-    cout << "black: without source region and exclusion regions removed" << endl;
+    cout << "  black:   without source region and exclusion regions" << endl;
+    cout << "           (use entire skymap, except the ON region and the excluded regions)" << endl;
     delete v_x;
     delete v_y;
     delete v_r;
