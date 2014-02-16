@@ -298,6 +298,7 @@ TCanvas* VPlotCompareDataWithMC::plotRelativePlots( char *i_CanvasName, char *i_
   TCanvas *cRel = new TCanvas( hname, htitle, 200, 200, 400, 400 );
   cRel->SetGridx( 0 );
   cRel->SetGridy( 0 );
+  cRel->SetLeftMargin( 0.13 );
 
   sprintf( hname, "rel_%s", h1->GetName() );
   TH1D *hR = (TH1D*)h1->Clone( hname );
@@ -415,7 +416,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
   plot three single canvases for a certain histogram
 
 */
-void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax )
+void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable )
 {
   if( !fDataFile ) return;
 
@@ -425,7 +426,7 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
 // get the scaling between simulations and data
   double s_sims = 1.;
   double s_diff = 1.;
-  getScaling( s_sims, s_diff, "MSCW", 1 );
+  getScaling( s_sims, s_diff, iScalingVariable, 1 );
 
   sprintf( hname, "c%s_%s", iHistoName.c_str(), fDataFileName.c_str() );
   sprintf( htitle, "%s (%s)", iCanvasTitle.c_str(), fDataFileName.c_str() );
@@ -458,7 +459,6 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
      cEMH->Print( hname );
   }
 
-
   TCanvas *c = plotRelativePlots( hname, htitle, hHistogram_SIMS, hHistogram_DIFF, 0., iHistoXAxisMax );
   if( c && fPrintName.size() > 0 )
   {
@@ -470,7 +470,7 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
 
 void VPlotCompareDataWithMC::emission_height( double iEmissionHeightMax )
 {
-  plot_singleCanvas( "hEmissionHeight", "emission height", iEmissionHeightMax );
+  plot_singleCanvas( "hEmissionHeight", "emission height", iEmissionHeightMax, "EmissionHeight" );
 }
 
 
@@ -505,7 +505,6 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 // get the scaling between simulations and data
   double s_sims = 1.;
   double s_diff = 1.;
-//  getScaling( s_sims, s_diff, iVariable.c_str(), 2 );
 
   char hname[600];
   char htitle[600];
@@ -1552,4 +1551,24 @@ void VPlotCompareDataWithMC::mwr_vs_energy_plots( int iRebin, double xmin, doubl
   plot_energyDependentDistributions( "MLR", iRebin, xmin, xmax, "REL"  );
 
   return;
+}
+
+/*
+ * plot everything
+ *
+ */
+
+void VPlotCompareDataWithMC::plot( string iPrintName )
+{
+   setPrintName( iPrintName );
+
+   single_telescope();
+   msc_vs_energy_plots();
+   mwr_vs_energy_plots();
+   multiplicity_plots();
+   stereo_parameter();
+   centroids();
+   core_plots();
+   distance_plots();
+   emission_height();
 }

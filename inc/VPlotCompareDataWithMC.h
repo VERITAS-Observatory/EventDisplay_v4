@@ -47,7 +47,7 @@ class VPlotCompareDataWithMC
    void   plotLegend( TH1D *hsims, TH1D *hdiff, double x0 = 0.5 );
    TCanvas* plotRelativePlots( char *i_CanvasName, char *i_CanvasTitle, TH1D *h1, TH1D *h2, double xmin, double xmax );
    void   plotRelativePlot( TH1D *h1, TH1D *h2, double xmin = -999., double xmax = -999. );
-   void   plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax );
+   void   plot_singleCanvas( string iHistoName, string iCanvasTitle, double iHistoXAxisMax, string iScalingVariable = "MSCW" );
    void   setAxisTitles( TH2D *h, string iS, int iTel );
    void   setHistogramAtt( TH1D* his, int icolor, double iwidth, double isize, int imarker = 1, int irebin = 1 );
    void   setHistogramAtt( TH2D* his, double imin );
@@ -64,9 +64,10 @@ class VPlotCompareDataWithMC
    void emission_height( double iEmissionHeightMax = 20. );
    void msc_plots( char *offFile = 0, char *helium = 0, char *proton = 0, double xmin = -1.5, double xmax = 4., string ivar = "MSCW" );
    void msc_vs_energy_plots( int iRebin = 4, double xmin = -1.5, double xmax = 4. );
-   void mwr_vs_energy_plots( int iRebin = 1, double xmin =  0.5, double xmax = 1.5 );
+   void mwr_vs_energy_plots( int iRebin = 4, double xmin =  0.5, double xmax = 1.5 );
    void multiplicity_plots();
    bool openDataFile( string ifile );
+   void plot( string iPrintName );
    void single_telescope( int telid = -1 );
    void single_telescope( int telid, string iPlot, bool iOneCanvas = true, 
                           int iScalingMethod = 1, int i_rebin = 1 );
