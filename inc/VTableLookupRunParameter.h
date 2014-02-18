@@ -74,6 +74,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 	double fMC_distance_to_cameracenter_max;
 	vector< double > fCTA_MC_offaxisBin_min;
 	vector< double > fCTA_MC_offaxisBin_max;
+	vector< double > fAddMC_spectral_index;
 
         int fNentries;
         double fMaxRunTime;
@@ -92,6 +93,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef(VTableLookupRunParameter,21);
+        ClassDef(VTableLookupRunParameter,22);
 };
 #endif

@@ -233,6 +233,10 @@ bool VTableLookupRunParameter::fillParameters( int argc, char *argv[] )
 	{
 	   setCTA_MC_offaxisBins();
         }
+	else if( iTemp.find( "-add_mc_spectral_index" ) < iTemp.size() )
+	{
+	   fAddMC_spectral_index.push_back( atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() ) );
+        }
         else if( iTemp.find( "-minsize" ) < iTemp.size() )
         {
             fminsize = atof( iTemp.substr( iTemp.rfind( "=" )+1, iTemp.size() ).c_str() );
@@ -388,7 +392,8 @@ void VTableLookupRunParameter::print( int iP )
         if( fWrite1DHistograms ) cout << "write 1D histograms to disk" << endl;
 	cout << "\t minimum telescope multiplicity: " << fTableFillingCut_NImages_min << endl;
         cout << "\t maximum allowed uncertainty in core reconstruction [m]: " << fTableFillingCut_CoreError_max << endl;
-	cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <" << fMC_distance_to_cameracenter_max << " [deg]" << endl;
+	cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <";
+	cout << fMC_distance_to_cameracenter_max << " [deg]" << endl;
     }
     if( iP == 2 ) cout << "zenith angle " << ze << " [deg], wobble offset " << fWobbleOffset/100. << " [deg], noise level " << fNoiseLevel << endl;
     if( fSelectRandom > 0. ) cout << "random event selection: " << fSelectRandom << ", seed:" << fSelectRandomSeed << endl;

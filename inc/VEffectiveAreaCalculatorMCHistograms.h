@@ -40,7 +40,7 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
    double   fEnergyAxisMin_log10;
    double   fEnergyAxisMax_log10;
 
-   bool      checkParameters( const VEffectiveAreaCalculatorMCHistograms* );
+   int      checkParameters( const VEffectiveAreaCalculatorMCHistograms* );
 
    public:
 

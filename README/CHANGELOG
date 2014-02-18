@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140218 (GM) mscw_energy: allow now to copy MC histograms 
+                for a single spectral index only (useful for CTA)
+
 * 20140213 (GM) moved and updated the data/MC comparison
                 functions; improved functionality
                 now part of the shared library

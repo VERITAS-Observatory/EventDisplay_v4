@@ -1374,6 +1374,14 @@ void VTableLookupDataHandler::copyMCTree()
 
 void VTableLookupDataHandler::copyMCHistograms()
 {
+   vector< double > i_az_min;
+   vector< double > i_az_max;
+   vector< double > i_spectral_index = fTLRunParameter->fAddMC_spectral_index;;
+   if( i_spectral_index.size() == 1 )
+   {
+       cout << "\t VTableLookupDataHandler::copyMCHistograms: reducing spectral index range to one value: ";
+       cout << i_spectral_index[0] << endl;
+   }  
    VEffectiveAreaCalculatorMCHistograms *iMC_his = 0;
    if( fTshowerpars )
    {
@@ -1388,19 +1396,29 @@ void VTableLookupDataHandler::copyMCHistograms()
         TIter next(fileElements);
         unsigned int z = 0;
         while( (chEl = (TChainElement*)next()) )
-        {
+        { 
            TFile *ifInput = new TFile( chEl->GetTitle() );
            if( !ifInput->IsZombie() )
            {
                if( z == 0 )
                {
                   iMC_his = (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" );
-                       }
+		  if( iMC_his && i_spectral_index.size() > 0 )
+		  {
+		     iMC_his->matchDataVectors( i_az_min, i_az_max, i_spectral_index );
+                  }
+               }
                else
                {
                   if( iMC_his )
                   {
-                     iMC_his->add( (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" ) );
+		     VEffectiveAreaCalculatorMCHistograms *iMC_his_temp = 
+		          (VEffectiveAreaCalculatorMCHistograms*)ifInput->Get( "MChistos" );
+		     if( iMC_his_temp && i_spectral_index.size() > 0 )
+		     {
+		        iMC_his_temp->matchDataVectors( i_az_min, i_az_max, i_spectral_index );
+			iMC_his->add( iMC_his_temp );
+                     }
                   }
                   ifInput->Close();
               }

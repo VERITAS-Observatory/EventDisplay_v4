@@ -304,9 +304,10 @@ bool VEffectiveAreaCalculatorMCHistograms::add( const VEffectiveAreaCalculatorMC
    if( !iMChis ) return false;
 
 // make sure that both instants are similar
-   if( !checkParameters( iMChis ) )
+   int i_check = checkParameters( iMChis );
+   if( i_check != 0 )
    {
-      cout << "VEffectiveAreaCalculatorMCHistograms::add() error: parameters differ" << endl;
+      cout << "VEffectiveAreaCalculatorMCHistograms::add() error: parameters differ (" << i_check << ")" << endl;
       return false;
    } 
 
@@ -330,63 +331,65 @@ bool VEffectiveAreaCalculatorMCHistograms::add( const VEffectiveAreaCalculatorMC
    return true;
 }
 
-bool VEffectiveAreaCalculatorMCHistograms::checkParameters( const VEffectiveAreaCalculatorMCHistograms* iMChis )
+int VEffectiveAreaCalculatorMCHistograms::checkParameters( const VEffectiveAreaCalculatorMCHistograms* iMChis )
 {
    if( fDebug )
    {
        cout << "VEffectiveAreaCalculatorMCHistograms::checkParameters" << endl;
    }
-   if( !iMChis ) return false;
+   if( !iMChis ) return 1;
 
-   if( iMChis->fMCCuts != fMCCuts ) return false;
-   if( TMath::Abs( iMChis->fArrayxyoff_MC_min - fArrayxyoff_MC_min ) > 1.e-3 ) return false;
-   if( TMath::Abs( iMChis->fArrayxyoff_MC_max - fArrayxyoff_MC_max ) > 1.e-3 ) return false;
-   if( TMath::Abs( iMChis->fMCEnergyRange_TeV_min - fMCEnergyRange_TeV_min ) > 1.e-3 ) return false;
-   if( TMath::Abs( iMChis->fMCEnergyRange_TeV_max - fMCEnergyRange_TeV_max ) > 1.e-3 ) return false;
-   if( TMath::Abs( iMChis->fMCSpectralIndex - fMCSpectralIndex ) > 1.e-3 ) return false;
-   if( iMChis->fVMinAz.size() != fVMinAz.size() ) return false;
-   for( unsigned int i = 0; i < iMChis->fVMinAz.size(); i++ ) if( TMath::Abs( iMChis->fVMinAz[i] - fVMinAz[i] ) > 1.e-3 ) return false;
-   if( iMChis->fVMaxAz.size() != fVMaxAz.size() ) return false;
-   for( unsigned int i = 0; i < iMChis->fVMaxAz.size(); i++ ) if( TMath::Abs( iMChis->fVMaxAz[i] - fVMaxAz[i] ) > 1.e-3 ) return false;
-   if( iMChis->fVSpectralIndex.size() != fVSpectralIndex.size() ) return false;
-   for( unsigned int i = 0; i < iMChis->fVSpectralIndex.size(); i++ ) if( TMath::Abs( iMChis->fVSpectralIndex[i] - fVSpectralIndex[i] ) > 1.e-3 ) return false;
+   if( iMChis->fMCCuts != fMCCuts ) return 2;
+   if( TMath::Abs( iMChis->fArrayxyoff_MC_min - fArrayxyoff_MC_min ) > 1.e-3 ) return 3;
+   if( TMath::Abs( iMChis->fArrayxyoff_MC_max - fArrayxyoff_MC_max ) > 1.e-3 ) return 4;
+   if( TMath::Abs( iMChis->fMCEnergyRange_TeV_min - fMCEnergyRange_TeV_min ) > 1.e-3 ) return 5;
+   if( TMath::Abs( iMChis->fMCEnergyRange_TeV_max - fMCEnergyRange_TeV_max ) > 1.e-3 ) return 6;
+   if( TMath::Abs( iMChis->fMCSpectralIndex - fMCSpectralIndex ) > 1.e-3 ) return 7;
+   if( iMChis->fVMinAz.size() != fVMinAz.size() ) return 8;
+   for( unsigned int i = 0; i < iMChis->fVMinAz.size(); i++ ) if( TMath::Abs( iMChis->fVMinAz[i] - fVMinAz[i] ) > 1.e-3 ) return 9;
+   if( iMChis->fVMaxAz.size() != fVMaxAz.size() ) return 10;
+   for( unsigned int i = 0; i < iMChis->fVMaxAz.size(); i++ ) if( TMath::Abs( iMChis->fVMaxAz[i] - fVMaxAz[i] ) > 1.e-3 ) return 11;
+   if( iMChis->fVSpectralIndex.size() != fVSpectralIndex.size() ) return 12;
+   for( unsigned int i = 0; i < iMChis->fVSpectralIndex.size(); i++ )
+   {
+      if( TMath::Abs( iMChis->fVSpectralIndex[i] - fVSpectralIndex[i] ) > 1.e-3 ) return 13;
+   }
 
-   if( iMChis->hVEmc.size() != hVEmc.size() ) return false;
+   if( iMChis->hVEmc.size() != hVEmc.size() ) return 14;
    for( unsigned int i = 0; i < hVEmc.size(); i++ )
    {
-      if( hVEmc[i].size() != iMChis->hVEmc[i].size() ) return false;
+      if( hVEmc[i].size() != iMChis->hVEmc[i].size() ) return 15;
       for( unsigned int j = 0; j < hVEmc[i].size(); j++ )
       {
 	 if( hVEmc[i][j] && iMChis->hVEmc[i][j] )
 	 {
-	    if( hVEmc[i][j]->GetNbinsX() != iMChis->hVEmc[i][j]->GetNbinsX() ) return false;
-	    if( hVEmc[i][j]->GetXaxis()->GetXmin() != iMChis->hVEmc[i][j]->GetXaxis()->GetXmin() ) return false;
-	    if( hVEmc[i][j]->GetXaxis()->GetXmax() != iMChis->hVEmc[i][j]->GetXaxis()->GetXmax() ) return false;
+	    if( hVEmc[i][j]->GetNbinsX() != iMChis->hVEmc[i][j]->GetNbinsX() ) return 16;
+	    if( hVEmc[i][j]->GetXaxis()->GetXmin() != iMChis->hVEmc[i][j]->GetXaxis()->GetXmin() ) return 17;
+	    if( hVEmc[i][j]->GetXaxis()->GetXmax() != iMChis->hVEmc[i][j]->GetXaxis()->GetXmax() ) return 18;
          }
       }
    }
 
-   if( iMChis->hVEmcSWeight.size() != hVEmcSWeight.size() ) return false;
+   if( iMChis->hVEmcSWeight.size() != hVEmcSWeight.size() ) return 19;
    for( unsigned int i = 0; i < hVEmcSWeight.size(); i++ )
    {
-      if( hVEmcSWeight[i].size() != iMChis->hVEmcSWeight[i].size() ) return false;
+      if( hVEmcSWeight[i].size() != iMChis->hVEmcSWeight[i].size() ) return 20;
       for( unsigned int j = 0; j < hVEmcSWeight[i].size(); j++ )
       {
 	 if( hVEmcSWeight[i][j] && iMChis->hVEmcSWeight[i][j] )
 	 {
-	    if( hVEmcSWeight[i][j]->GetNbinsX() != iMChis->hVEmcSWeight[i][j]->GetNbinsX() ) return false;
-	    if( hVEmcSWeight[i][j]->GetXaxis()->GetXmin() != iMChis->hVEmcSWeight[i][j]->GetXaxis()->GetXmin() ) return false;
-	    if( hVEmcSWeight[i][j]->GetXaxis()->GetXmax() != iMChis->hVEmcSWeight[i][j]->GetXaxis()->GetXmax() ) return false;
+	    if( hVEmcSWeight[i][j]->GetNbinsX() != iMChis->hVEmcSWeight[i][j]->GetNbinsX() ) return 21;
+	    if( hVEmcSWeight[i][j]->GetXaxis()->GetXmin() != iMChis->hVEmcSWeight[i][j]->GetXaxis()->GetXmin() ) return 22;
+	    if( hVEmcSWeight[i][j]->GetXaxis()->GetXmax() != iMChis->hVEmcSWeight[i][j]->GetXaxis()->GetXmax() ) return 23;
          }
       }
    }
 
-   return true;
+   return 0;
 }
 
 bool VEffectiveAreaCalculatorMCHistograms::matchDataVectors( vector< double > iAzMin, vector< double > iAzMax, vector< double > iSpectralIndex )
 {
-
     vector< double > iVSpectralIndex_new;
     vector< vector< TH1D* > > ihVEmc_new;
     vector< vector< TProfile* > > iVEmcSWeight_new;
@@ -410,9 +413,13 @@ bool VEffectiveAreaCalculatorMCHistograms::matchDataVectors( vector< double > iA
     hVEmc = ihVEmc_new;
     hVEmcSWeight = iVEmcSWeight_new;
 
+    if( iAzMin.size() == 0 ) iAzMin = fVMinAz;
+    if( iAzMax.size() == 0 ) iAzMax = fVMaxAz;
+
     if( iAzMin.size() != iAzMax.size() )
     {
-       cout << "VEffectiveAreaCalculatorMCHistograms::matchDataVectors error: mismatch in az vector size: " << iAzMin.size() << "\t" << iAzMax.size() << endl;
+       cout << "VEffectiveAreaCalculatorMCHistograms::matchDataVectors error: mismatch in az vector size: ";
+       cout << iAzMin.size() << "\t" << iAzMax.size() << endl;
        return false;
     }
 // match azimuth vector
