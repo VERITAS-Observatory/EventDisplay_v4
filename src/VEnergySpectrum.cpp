@@ -1715,7 +1715,7 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
    plotCountingHistograms();
    plotMeanEffectiveArea();
 
-   VEnergySpectrumfromLiterature l( "$EVNDISPDATA/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat" );
+   VEnergySpectrumfromLiterature l( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat" );
    l.setPlottingMultiplierIndex( iPlottingMultiplierIndex );
 
    l.setPlottingStyle( 2, 2, 2, 25 );
