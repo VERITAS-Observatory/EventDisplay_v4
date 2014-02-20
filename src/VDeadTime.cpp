@@ -416,8 +416,12 @@ double VDeadTime::getDeadTimeFraction( vector< bool > iMask )
    double iD = 0.;
    for( unsigned int i = 0; i < iMask.size(); i++ )
    {
-      iD += getDeadTimeFraction( (double)i + 0.5 );
-      iN++;
+       // only get dead time if mask is open!
+       if( iMask[i] )
+       {
+	   iD += getDeadTimeFraction( (double)i + 0.5 );
+	   iN++;
+       } 
    }
    if( iN > 0. ) return iD / iN;
 
