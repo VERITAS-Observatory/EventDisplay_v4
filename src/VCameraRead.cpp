@@ -659,7 +659,8 @@ void VCameraRead::readPixelFile( string iFile )
                 if( i_telID < fNTel  && i_chan < fCNChannels[i_telID] ) fNNeighbour[i_telID][i_chan] = i_NN;
                 if( i_NN > fMaxNeighbour )
                 {
-                    cout << "VCameraRead::readGrisucfg() error: maximal number of neighbours wrong " << (int)i_NN << "\t" << fMaxNeighbour << endl;
+                    cout << "VCameraRead::readGrisucfg() error: maximal number of neighbours wrong ";
+		    cout << (int)i_NN << "\t" << fMaxNeighbour << endl;
                     continue;
                 }
                 for( unsigned int j = 0; j < fMaxNeighbour; j++ )
@@ -948,7 +949,11 @@ void VCameraRead::resetNeighbourLists( bool bMaxN )
     }
 }
 
+/*
 
+     use positions and tupe radius to prepare a NN neighbour list
+
+*/
 bool VCameraRead::makeNeighbourList()
 {
     for( unsigned int i = 0; i < fNTel; i++ )
@@ -964,6 +969,7 @@ bool VCameraRead::makeNeighbourList()
                 if( TMath::Abs( getTubeRadius_MM( i )[j] - i_TubeRadius_0 ) > 1.e-2 )
                 {
                     cout << "VCameraRead::makeNeighbourList error: found tubes with different sizes in camera " << i+1 << endl;
+		    cout << "(algorithm works only with same size tubes)" << endl;
                     return false;
                 }
             }
@@ -975,19 +981,21 @@ bool VCameraRead::makeNeighbourList()
         {
             for( unsigned int k = 0; k < j; k++ )
             {
-                double itemp = sqrt( (getX_MM(i)[j]-getX_MM(i)[k])*(getX_MM(i)[j]-getX_MM(i)[k]) + (getY_MM(i)[j]-getY_MM(i)[k])*(getY_MM(i)[j]-getY_MM(i)[k]) );
+                double itemp = sqrt( (getX_MM(i)[j]-getX_MM(i)[k])*(getX_MM(i)[j]-getX_MM(i)[k]) 
+		                   + (getY_MM(i)[j]-getY_MM(i)[k])*(getY_MM(i)[j]-getY_MM(i)[k]) );
                 if( itemp < iTubeDistance_min ) iTubeDistance_min = itemp;
             }
         }
         iTubeDistance_min *= 0.5;
 
-// now find all tubes which less then 2*iTubeDistance_min*sqrt(2) away (should work for grid)
+// now find all tubes which less then 2*iTubeDistance_min*sqrt(2) away (should also work for grid)
 // ignore all channels with
         for( unsigned int j = 0; j < getTubeRadius_MM( i ).size(); j++ )
         {
             for( unsigned int k = 0; k < j; k++ )
             {
-                double itemp = sqrt( (getX_MM(i)[j]-getX_MM(i)[k])*(getX_MM(i)[j]-getX_MM(i)[k]) + (getY_MM(i)[j]-getY_MM(i)[k])*(getY_MM(i)[j]-getY_MM( i)[k]) );
+                double itemp = sqrt( (getX_MM(i)[j]-getX_MM(i)[k])*(getX_MM(i)[j]-getX_MM(i)[k]) 
+		                   + (getY_MM(i)[j]-getY_MM(i)[k])*(getY_MM(i)[j]-getY_MM(i)[k]) );
                 if( itemp < 2.1*sqrt(2.)*iTubeDistance_min )
                 {
                     if( getAnaPixel( i )[k] > 0 )

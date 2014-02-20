@@ -85,7 +85,7 @@ class VStereoAnalysis
     private:
 
         bool fDebug;
-
+        bool bIsGamma;
         bool bTotalAnalysisOnly;
 
         bool fIsOn;
@@ -136,6 +136,7 @@ class VStereoAnalysis
 	float fTreeSelected_EmissionHeight;
 	float fTreeSelected_EmissionHeightChi2;
 	double fTreeSelected_SizeSecondMax;
+        UInt_t fTreeSelected_IsGamma;
 	
 	TTree * fTreeWithAllGamma; // WRITEALLGAMMATOTREE 
     int    fTreeAll_runNumber;

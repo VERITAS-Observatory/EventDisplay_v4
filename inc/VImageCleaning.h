@@ -1,4 +1,4 @@
-//! VImageCleaning   basic cleaning routines (used by ...)
+//! VImageCleaning   basic cleaning routines 
 
 #ifndef VIMAGECLEANING_H
 #define VIMAGECLEANING_H

@@ -1,6 +1,16 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140219 (GM) anasum event tree: added 'isgamma' variable
+
+* 20140219 (GM) bug fix for LL fitting and failed calculation
+                of error matrix: image angle was calculated
+		incorrectly; fixed in 
+		VArrayAnalyzer::recalculatePhi()
+
+* 20140219 (GM) NN-time image cleaning: removed dependencies
+                on fixed image cleaning; update and checked
+
 * 20140218 (GM) mscw_energy: allow now to copy MC histograms 
                 for a single spectral index only (useful for CTA)
 

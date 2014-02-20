@@ -945,17 +945,23 @@ double VArrayAnalyzer::getMeanPointingMismatch( unsigned int iTel )
 */
 float VArrayAnalyzer::recalculateImagePhi( double iDeltaX, double iDeltaY )
 {
-    if( getRunParameter()->fImageLL ) return getImageParameters( getRunParameter()->fImageLL )->phi;
-
-// par geo only
     float i_phi = 0.;
-    float i_cen_x = getImageParameters( getRunParameter()->fImageLL )->cen_x + iDeltaX;
-    float i_cen_y = getImageParameters( getRunParameter()->fImageLL )->cen_y + iDeltaY;
-    float i_d = getImageParameters( getRunParameter()->fImageLL )->f_d;
-    float i_s = getImageParameters( getRunParameter()->fImageLL )->f_s;
-    float i_sdevxy  = getImageParameters( getRunParameter()->fImageLL )->f_sdevxy;
-
-    i_phi = atan2( (i_d+i_s)*i_cen_y + 2.*i_sdevxy*i_cen_x, 2.*i_sdevxy*i_cen_y - (i_d-i_s)*i_cen_x );
+// LL: fits without good error matrix
+// LL: f_d, s_s and f_sdevxy depend on the state of the error matrix
+    if( getImageParameters( getRunParameter()->fImageLL )->Fitstat == 1 )
+    {
+        i_phi = getImageParameters( getRunParameter()->fImageLL )->phi;
+    }
+// GEO and good LL fits
+    else
+    {
+       float i_cen_x = getImageParameters( getRunParameter()->fImageLL )->cen_x + iDeltaX;
+       float i_cen_y = getImageParameters( getRunParameter()->fImageLL )->cen_y + iDeltaY;
+       float i_d = getImageParameters( getRunParameter()->fImageLL )->f_d;
+       float i_s = getImageParameters( getRunParameter()->fImageLL )->f_s;
+       float i_sdevxy  = getImageParameters( getRunParameter()->fImageLL )->f_sdevxy;
+       i_phi = atan2( (i_d+i_s)*i_cen_y + 2.*i_sdevxy*i_cen_x, 2.*i_sdevxy*i_cen_y - (i_d-i_s)*i_cen_x );
+    }
 
     return i_phi;
 }
@@ -1167,6 +1173,10 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
     float b1 = 0.;
     float b2 = 0.;
 
+    double i_weight_max = 0.;
+    unsigned int i_telID_ii_max = 0;
+    unsigned int i_telID_jj_max = 0;
+
     for( unsigned int ii = 0; ii < m.size(); ii++ )
     {
         for( unsigned int jj = 1; jj < m.size(); jj++ )
@@ -1197,11 +1207,28 @@ int VArrayAnalyzer::rcs_method_4( unsigned int iMethod )
             iweight *= iangdiff;                      // weight 3: angular differences between the two image axis
 	    iweight *= iweight;                       // use squared value
 
+	    if( iweight > i_weight_max )
+	    {
+	       i_weight_max = iweight;
+	       i_telID_ii_max = telID[ii];
+	       i_telID_jj_max = telID[jj];
+            }
+
+/*  DEBUG for reconstruction
+	    cout << "PAIR " << telID[ii] << "," << telID[jj] << ": ";
+	    cout << iweight << ", " << w[ii] << ", " << w[jj] << ", S: " << 1./(1./w[ii] + 1./w[jj]);
+	    cout << ", " << l[ii] << ", " << l[jj] << ", L: " << (1.-l[ii])*(1.-l[jj]);
+	    cout << ", " << iangdiff;
+	    cout << ",I " << x[ii] << ", " << y[ii];
+	    cout << ",J " << x[jj] << ", " << y[jj];
+	    cout << ", X " << xs << " Y " << ys << endl; */
+
             ixs += xs * iweight;
             iys += ys * iweight;
             itotweight += iweight;
         }
     }
+// DEBUG    cout << "WEIGHTMAX " << i_weight_max << ", " << i_telID_ii_max << ", " << i_telID_jj_max << endl;
     if( itotweight > 0. )
     {
         xs = ixs / itotweight;
@@ -1334,7 +1361,8 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
         if( getShowerParameters()->fTelIDImageSelected[iMethodIndex][tel] )
         {
             telID.push_back( tel );
-// get pointing difference between expected pointing towards source and measured pointing (by command line, tracking program or pointing monitors)
+// get pointing difference between expected pointing towards source and measured pointing
+// (by command line, tracking program or pointing monitors)
             if( !fEvndispReconstructionParameter->fUseEventdisplayPointing[iMethodIndex] && tel < getPointing().size() && getPointing()[tel] )
             {
                 iPointingErrorX = getPointing()[tel]->getPointingErrorX();
@@ -1349,8 +1377,8 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 // get image centroids corrected for pointing errors
             i_cen_x = getImageParameters( getRunParameter()->fImageLL )->cen_x + iPointingErrorX;
             i_cen_y = getImageParameters( getRunParameter()->fImageLL )->cen_y + iPointingErrorY;
-// (GM) centroid locations in getImageParameters( getRunParameter()->fImageLL ) are in [deg]
-// (GM) (in contrary to centroids in GrIsu ([mm]))
+// centroid locations in getImageParameters( getRunParameter()->fImageLL ) are in [deg]
+// (in contrary to centroids in GrIsu ([mm]))
             if( iReconstructionMethod == 4 || iReconstructionMethod == 5 )
             {
                 x.push_back( i_cen_x );
@@ -1358,8 +1386,8 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
             }
             else
             {
-                x.push_back( tan( i_cen_x/TMath::RadToDeg() )*getDetectorGeo()->getFocalLength()[tel]*1000. );
-                y.push_back( tan( i_cen_y/TMath::RadToDeg() )*getDetectorGeo()->getFocalLength()[tel]*1000. );
+                x.push_back( tan( i_cen_x*TMath::DegToRad() )*getDetectorGeo()->getFocalLength()[tel]*1000. );
+                y.push_back( tan( i_cen_y*TMath::DegToRad() )*getDetectorGeo()->getFocalLength()[tel]*1000. );
             }
 // weight is size
             w.push_back( getImageParameters( getRunParameter()->fImageLL )->size );

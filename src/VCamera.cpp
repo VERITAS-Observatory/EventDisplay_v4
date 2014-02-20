@@ -141,16 +141,16 @@ void VCamera::setUpCamera()
 // channel numbering
         sprintf( c_number, "%d", i );
         fTextChannelNumber.push_back( new TText( fgraphTubes.back()->GetX1()-fgraphTubes.back()->GetR1()/1.4,
-            fgraphTubes.back()->GetY1()-fgraphTubes.back()->GetR2()/2., c_number ) );
+        fgraphTubes.back()->GetY1()-fgraphTubes.back()->GetR2()/2., c_number ) );
         fTextChannelNumber.back()->SetTextFont( 42 );
-        fTextChannelNumber.back()->SetTextSize( 0.0175 );
+        fTextChannelNumber.back()->SetTextSize( 0.015 );
         fTextChannelNumber.back()->SetUniqueID( 200000 + i );
 // tube numbering
         sprintf( c_number, "%d", i+1 );
         fTextTubeNumber.push_back( new TText( fgraphTubes.back()->GetX1()-fgraphTubes.back()->GetR1()/1.4,
-            fgraphTubes.back()->GetY1()-fgraphTubes.back()->GetR2()/2., c_number ) );
+        fgraphTubes.back()->GetY1()-fgraphTubes.back()->GetR2()/2., c_number ) );
         fTextTubeNumber.back()->SetTextFont( 42 );
-        fTextTubeNumber.back()->SetTextSize( 0.0175 );
+        fTextTubeNumber.back()->SetTextSize( 0.015 );
         fTextTubeNumber.back()->SetUniqueID( 200000 + i );
         fTextTubeNumber.back()->SetTextColor( 2 );
 // tube markers
@@ -206,7 +206,7 @@ fgraphMarker.back()->SetUniqueID( 200000 + i );
     fAnaEllipseLL->SetLineWidth( 2 );
     fAnaEllipseLL->SetUniqueID( 2998 );
 // event text (top left corner) + image parameter line at bottom (last entry in vector)
-    float i_TextSize = 0.025*0.8;
+    float i_TextSize = 0.025*0.7;
     float i_TextX = 0.01;
     fTextEvent.push_back( new TLatex( i_TextX, 0.97, "run/event number" ) );
     fTextEvent.push_back( new TLatex( i_TextX, 0.91, "Max. Channels" ) );
@@ -743,25 +743,25 @@ void VCamera::drawEventText()
     {
         sprintf( iText, "MLL: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,#alpha=%.2f,size=%.0f,Fitstat=%d",
                 fData->getImageParametersLogL()->cen_x,
-fData->getImageParametersLogL()->cen_y,
-fData->getImageParametersLogL()->dist,
-fData->getImageParametersLogL()->length,
-fData->getImageParametersLogL()->width,
-fData->getImageParametersLogL()->alpha,
-fData->getImageParametersLogL()->size,
-fData->getImageParametersLogL()->Fitstat );
+	fData->getImageParametersLogL()->cen_y,
+	fData->getImageParametersLogL()->dist,
+	fData->getImageParametersLogL()->length,
+	fData->getImageParametersLogL()->width,
+	fData->getImageParametersLogL()->alpha,
+	fData->getImageParametersLogL()->size,
+	fData->getImageParametersLogL()->Fitstat );
         fTextEvent[fTextEvent.size()-1]->SetTitle( iText );
         sprintf( iText, "GEO: c_x=%.2f,c_y=%.2f,dist=%.2f,length=%.3f,width=%.3f,size=%.0f/%.0f,loss=%.2f,lossDead=%.2f,fui=%.2f",
                 fData->getImageParameters()->cen_x,
-fData->getImageParameters()->cen_y,
-fData->getImageParameters()->dist,
-fData->getImageParameters()->length,
-fData->getImageParameters()->width,
-fData->getImageParameters()->size, 
-fData->getImageParameters()->size2, 
-fData->getImageParameters()->loss, 
-fData->getImageParameters()->lossAndDead,
-fData->getImageParameters()->fui );
+	fData->getImageParameters()->cen_y,
+	fData->getImageParameters()->dist,
+	fData->getImageParameters()->length,
+	fData->getImageParameters()->width,
+	fData->getImageParameters()->size, 
+	fData->getImageParameters()->size2, 
+	fData->getImageParameters()->loss, 
+	fData->getImageParameters()->lossAndDead,
+	fData->getImageParameters()->fui );
         fTextEvent[fTextEvent.size()-2]->SetTitle( iText );
     }
 

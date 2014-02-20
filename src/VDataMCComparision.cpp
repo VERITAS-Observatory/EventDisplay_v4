@@ -38,8 +38,8 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
   hMSCL = 0;
   hMSCWErec = 0;
   hMSCLErec = 0;
-  hMWR = 0;//AMc
-  hMLR = 0;//AMc
+  hMWR = 0;
+  hMLR = 0;
   hXcore = 0;
   hYcore = 0;
   hXYcore = 0;
@@ -760,7 +760,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // stereo parameters
       if( fSingleTelescopeCuts != -1 ||
-          ( theta2 >= theta2_min && theta2 < theta2_cut  && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
+          ( theta2 >= theta2_min && theta2 < theta2_cut  && fData->MSCW < msw_max 
+	 && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 	{
 	  hXcore->Fill( fData->Xcore, weight );
 	  if( fInput == 0 )

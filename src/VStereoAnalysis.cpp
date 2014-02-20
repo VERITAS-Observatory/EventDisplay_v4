@@ -283,7 +283,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 // boolean for gamma/hadron cuts
 
 // event is gamma-ray like according to VGammaHadronCuts
-   bool bIsGamma = false;
+   bIsGamma = false;
 // event direction is inside search region (e.g. reflected region)
    bool bDirectionCuts = false;
 
@@ -1647,6 +1647,7 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
    fTreeSelectedEvents->Branch( "EmissionHeightChi2", &fTreeSelected_EmissionHeightChi2, "EmissionHeightChi2/F" );
    fTreeSelectedEvents->Branch( "SizeSecondMax", &fTreeSelected_SizeSecondMax, "SizeSecondMax/D" );
    fTreeSelectedEvents->Branch( "MVA", &fTreeSelected_MVA, "MVA/D" );
+   fTreeSelectedEvents->Branch( "IsGamma", &fTreeSelected_IsGamma, "IsGamma/i" );
 
    if( fRunPara->fModel3D )
    {
@@ -1731,6 +1732,7 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
       fTreeSelected_EmissionHeightChi2 = 0.;
       fTreeSelected_SizeSecondMax = 0.;
       fTreeSelected_MVA = -99.;
+      fTreeSelected_IsGamma = 0;
 
       /// model3D parameters ///
       fTreeSelected_Smax3D = 0;  
@@ -1812,6 +1814,9 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData *c )
       fTreeSelected_SizeSecondMax = c->SizeSecondMax;
       if( fCuts ) fTreeSelected_MVA = fCuts->getTMVA_EvaluationResult();
       else        fTreeSelected_MVA = -99.;
+
+      if( bIsGamma ) fTreeSelected_IsGamma = 1;
+      else           fTreeSelected_IsGamma = 0;
 
       /// model3D parameters ///
       fTreeSelected_Smax3D = c->Smax3D;

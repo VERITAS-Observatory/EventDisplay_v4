@@ -70,12 +70,10 @@ class VCameraRead : public VGlobalRunParameter
         vector< vector<float> > fRTubeMM;         //!< tube radius in [mm]
         vector< vector<int> > fTrigTube;          //!< pixel takes part in trigger
         vector< vector<int> > fAnaTube;           //!< pixel takes part in analysis
-                                                  //!< number of neighbours
-        vector< vector< unsigned int > > fNNeighbour;
-                                                  //!< neighbour identifier
-        vector< vector< vector<int> > > fNeighbour;
+        vector< vector< unsigned int > > fNNeighbour;  //!< number of neighbours
+        vector< vector< vector<int> > > fNeighbour; //!< neighbour identifier
         unsigned int fMaxNeighbour;               //!< maximal number of neighbours
-	vector< unsigned int > fCameraCentreTubeIndex;            //!< vector index of centre tube
+	vector< unsigned int > fCameraCentreTubeIndex;  //!< vector index of centre tube
 // pattern trigger
         int fNPatches;                            //!< number of trigger patches
         vector< vector<int> > fPatch;             //!< pattern trigger patches

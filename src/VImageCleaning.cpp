@@ -245,6 +245,7 @@ bool VImageCleaning::InitNNImageCleaning()
     float fMinRate=fFakeImageProb/( SimTime*1E-9 *float(3) );//ns
 
     float CombFactor[5]={60000.*20.,950000.,130000.,12000.,2.}; //for 2400 pixels
+    const int types=5;  // GM hardwired number of telescope types
     fProb4nnCurves   =new TObjArray(types);
     fProb3nnrelCurves=new TObjArray(types);
     fProb2plus1Curves=new TObjArray(types);
@@ -264,9 +265,7 @@ bool VImageCleaning::InitNNImageCleaning()
         //fFADCtoPhe[t]=fData->getRunParameter()->fFADCtoPhe[t];
         std::cout<<"fFADCtoPhe["<<t<<"]="<<fFADCtoPhe[t]<<" ChargeMax:"<<gIPR->GetXaxis()->GetXmax()<<" ifActiveType:"<<fData->getRunParameter()->ifActiveType[t]<<std::endl;
     }
-    SetCameraTypes();
-    InitNeighbours();
-    // init IPRs
+// init IPRs
     fIPRdim=200;
     IPR=new float* [VDST_MAXTELTYPES]; for(int t=0; t<VDST_MAXTELTYPES;t++) {IPR[t]=new float[fIPRdim];}
     for(int t=0; t<VDST_MAXTELTYPES;t++)
@@ -308,21 +307,20 @@ bool VImageCleaning::BoundarySearch(int type, float thresh, TF1* fProbCurve, flo
     //skip core pix
     if((VALIDITYBUF[idx]>1.9&&VALIDITYBUF[idx]<6.1) ) return false;
 
+// check for valid pixel number
+    if( idx >= fData->getDetectorGeo()->getNeighbours().size() ) return false;
+
     float TimeForReSearch=0.;
     bool iffound=false;
-    unsigned int     nnmax = 0;
-    int neighbor[7];
-    GetNeighbors(type,neighbor,idx);
-    for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
     Int_t n=0;
     float time=0.;
 
     // reftime from core pixels
-    for(unsigned int j=1; j<=nnmax; j++){
-        const Int_t idx2 = neighbor[j];
+    for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+    {
+        const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
         Float_t t=TIMES[idx2];
         if(t>0.&&VALIDITYBUF[idx2]>1.9&&VALIDITYBUF[idx2]<5.1){time+=t; n++;}
-
     }
     // check THIS pix and ring of neighbours
     if(n>0.5){
@@ -336,8 +334,9 @@ bool VImageCleaning::BoundarySearch(int type, float thresh, TF1* fProbCurve, flo
             iffound=true;
         }
 
-        for(unsigned int j=1; j<=nnmax; j++){
-            const Int_t idx2 = neighbor[j];
+	for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+	{
+            const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
             if((TIMES[idx2]>0.&&VALIDITYBUF[idx2]>1.9&&VALIDITYBUF[idx2]<5.1)||VALIDITYBOUND[idx2]==refvalidity){continue;}
 
             float dT2=fabs(TIMES[idx2]-TimeForReSearch);
@@ -365,21 +364,18 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
     Int_t NN4=0;
 
     int NSBpix=5;
-    int numpix=fNumPixels[type];
+    int numpix=fData->getDetectorGeo()->getNumChannels();
 
     for(int PixNum=0;PixNum<numpix;PixNum++)
     {
-        unsigned int     nnmax = 0;
-        int neighbor[7];
-        GetNeighbors(type,neighbor,PixNum);
-        for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
-
         Double_t q=VALIDITY[PixNum];
         if(q<0.5 || INTENSITY[PixNum]<PreCut) continue;
 
-        for (unsigned int j=1; j<=nnmax; j++)
+	if( PixNum >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+
+        for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
         {
-            const Int_t PixNum2 = neighbor[j];
+            const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
             if(PixNum2<0) continue;
             Double_t q1=VALIDITY[PixNum2];
 
@@ -398,15 +394,14 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
             if(VALIDITYBUF[PixNum2]==2&&NN==3)
             {
                 bool iffound=false;
-                int neighbor2[7];
-                unsigned int     nnmax2 = 0;
-                GetNeighbors(type,neighbor2,PixNum2);
-                for(int m=1;m<7;m++) {if(neighbor2[m]>=0) nnmax2++;}
-                for (unsigned int k=1; k<=nnmax; k++){
-                    if(BoundarySearch(type, mincharge, fProbCurve,dT,3,neighbor[k])) iffound=true;
+		for( unsigned int k=0; k < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); k++ )
+		{
+                    if(BoundarySearch(type, mincharge, fProbCurve,dT,3,fData->getDetectorGeo()->getNeighbours()[PixNum][k] )) iffound=true;
                 }
-                for (unsigned int k=1; k<=nnmax2; k++){
-                    if(BoundarySearch(type, mincharge, fProbCurve,dT,3,neighbor2[k])) iffound=true;
+	        if( PixNum2 >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+                for( unsigned int k=0; k < fData->getDetectorGeo()->getNeighbours()[PixNum2].size(); k++ )
+		{
+                    if(BoundarySearch(type, mincharge, fProbCurve,dT,3,fData->getDetectorGeo()->getNeighbours()[PixNum2][k] )) iffound=true;
                 }
                 //cout<<"iffound:"<<iffound<<endl;
                 if(iffound)
@@ -429,9 +424,9 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
                 Int_t idxp=-1;
                 //Int_t idxq=-1;
                 Int_t nn=0;
-                for(unsigned int kk=1; kk<=nnmax; kk++)
+		for( unsigned int kk = 0; kk < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); kk++ )
                 {
-                    const Int_t k = neighbor[kk];
+                    const Int_t k = fData->getDetectorGeo()->getNeighbours()[PixNum][kk];
                     if(k<0) continue;
                     //Double_t xx=x-PixelX[type*maxpixels + k];
                     //Double_t yy=y-PixelY[type*maxpixels + k];
@@ -516,23 +511,20 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, flo
     Int_t NN4=0;
     Double_t dT=0, dt2=0, dt3=0;
 
-    int numpix=fNumPixels[type];
+    int numpix=fData->getDetectorGeo()->getNumChannels();
 
     for(int PixNum=0;PixNum<numpix;PixNum++)
     {
-        unsigned int     nnmax = 0;
         int nng3[3];
-        int neighbor[7];
-        GetNeighbors(type,neighbor,PixNum);
-        for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
 
         Double_t q=VALIDITY[PixNum];
         if(q<0.5 || INTENSITY[PixNum]<PreCut) continue;
         int NNcnt=1;
         int pix1=0, pix2=0, pix3=0, pix4=0;
-        for (unsigned int j=1; j<=nnmax; j++)
+	if( PixNum >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+        for (unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
         {
-            const Int_t PixNum2 = neighbor[j];
+            const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
             if(PixNum2<0) continue;
             Double_t q1=VALIDITY[PixNum2];
 
@@ -563,14 +555,12 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, flo
                 for(int n=0;n<3;n++){VALIDITYLOCAL[nng3[n]]=10;}
                 if(NN==3) break;
                 //4 connected pixels
-                for(int n=0;n<3;n++){
-                    int neighbor1[7];
-                    unsigned int     nnmax1 = 0;
-                    GetNeighbors(type,neighbor1,nng3[n]);
-                    for(int m=1;m<7;m++) {if(neighbor1[m]>=0) nnmax1++;}
-                    for (unsigned int jj=1; jj<=nnmax1; jj++)
+                for(int n=0;n<3;n++)
+		{
+		    if( nng3[n] >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+		    for( unsigned int jj=0; jj < fData->getDetectorGeo()->getNeighbours()[nng3[n]].size(); jj++ )
                     {
-                        const Int_t testpixnum = neighbor1[jj];
+                        const Int_t testpixnum = fData->getDetectorGeo()->getNeighbours()[nng3[n]][jj];
                         //if(testpixnum<0 || VALIDITY[testpixnum]<0.5 || VALIDITYBUF[testpixnum]==5) continue;
                         if(testpixnum<0 || VALIDITYLOCAL[testpixnum]==10) continue;
                         if(INTENSITY[testpixnum]<PreCut) continue;
@@ -614,19 +604,16 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, flo
 }
 void VImageCleaning::DiscardIsolatedPixels(int type)
 {
-    unsigned int numpix=fNumPixels[type];
+    unsigned int numpix=fData->getDetectorGeo()->getNumChannels();
 
     for(unsigned int PixNum=0;PixNum<numpix;PixNum++)
     {
         if(VALIDITY[PixNum]<1.9) continue;
-        unsigned int     nnmax = 0;
-        int neighbor[7];
-        GetNeighbors(type,neighbor,PixNum);
-        for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
         unsigned int NumOfNeighbor=0;
-        for (unsigned int j=1; j<=nnmax; j++)
+	if( PixNum >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+	for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
         {
-            const Int_t PixNum2 = neighbor[j];
+            const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
             if(PixNum2<0) continue;
             if(VALIDITY[PixNum2]>1.9) NumOfNeighbor++;
         }
@@ -635,7 +622,7 @@ void VImageCleaning::DiscardIsolatedPixels(int type)
 }
 void VImageCleaning::DiscardTimeOutlayers(int type)
 {
-    unsigned int numpix=fNumPixels[type];
+    unsigned int numpix=fData->getDetectorGeo()->getNumChannels();
     unsigned int Tcnt=0;
     float meanTw=0;
     float sigmaT=0;
@@ -674,7 +661,7 @@ void VImageCleaning::DiscardTimeOutlayers(int type)
  */
 float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroups)
 {
-    unsigned int numpix=fNumPixels[type];
+    unsigned int numpix=fData->getDetectorGeo()->getNumChannels();
     float corr=1.;
     float PreThresh[5]={2.0/corr,3.0/corr,2.8/corr, 5.2/corr,1.8/corr};   // GMGM what is 2.0,2.0,....? Why 5 elements in array? 5 teltypes?
 // GMGM hardcoded number of telescope type, why is this not an array?
@@ -718,15 +705,13 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
             if(VALIDITYBOUNDBUF[idx]==2) continue;
 // GMGM assume hexagon in the following? 
             if((iRing>0)&&(VALIDITYBOUNDBUF[idx]<iRing+7)&&(VALIDITYBOUNDBUF[idx]>1.9)) continue;
-            unsigned int     nnmax = 0;
-            int neighbor[7];
-            GetNeighbors(type,neighbor,idx);
-            for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
             float time=0.;
             float refthresh=0.;
             int n=0;
-            for(unsigned int j=1; j<=nnmax; j++){
-                const Int_t idx2 = neighbor[j];
+	    if( idx >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+	    for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+	    {
+                int idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
                 if(idx2<0||VALIDITYBOUNDBUF[idx2]<1.9) continue;
 
                 if(iRing==0){
@@ -776,15 +761,13 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
         for(UInt_t idx=0; idx<numpix;idx++){
             if((VALIDITY[idx]<5.1)&&(VALIDITY[idx]>1.9)) continue;
             if((iRing>0)&&(VALIDITY[idx]<iRing+7)&&(VALIDITY[idx]>1.9)) continue;
-            unsigned int     nnmax = 0;
-            int neighbor[7];
-            GetNeighbors(type,neighbor,idx);
-            for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
             int n=0;
             float time=0.;
 
-            for(UInt_t j=1; j<=nnmax; j++){
-                const Int_t idx2 = neighbor[j];
+	    if( idx >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+	    for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[idx].size(); j++ )
+	    {
+                const Int_t idx2 = fData->getDetectorGeo()->getNeighbours()[idx][j];
                 if(idx2<0||VALIDITYBOUNDBUF[idx2]<1.9) continue;
 
                 if(iRing==0){
@@ -906,6 +889,7 @@ void VImageCleaning::cleanNNImageFixed()
             fData->setBorder( i, false);
             if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead(fData->getHiLo()[i])[i] )
             {
+// GM check with Maxim
                 if(VALIDITY[i]>1.9&&VALIDITY[i]<6.1) {fData->setImage( i, true ); ncorepix++;}
                 if(VALIDITY[i]>6.1) fData->setBorder( i, true );
                 //if(VALIDITY[i]>1.9&&INTENSITY[i]>BorderEdge) {fData->setImage( i, true ); ncorepix++;}
@@ -1185,6 +1169,7 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 
 	    fData->setClusterID( i, c_id );
 
+	    if( i >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
 	    for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
 	      {
 		unsigned int k = fData->getDetectorGeo()->getNeighbours()[i][j];
@@ -1879,7 +1864,6 @@ void VImageCleaning::cleanTriggerFixed( double hithresh, double lothresh )
         }
 
     }
-
 }
 
 

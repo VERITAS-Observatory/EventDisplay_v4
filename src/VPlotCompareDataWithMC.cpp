@@ -101,7 +101,7 @@ void VPlotCompareDataWithMC::plotLegend( TH1D *hsims, TH1D *hdiff, double x0 )
 
   TLegend *iLegend = new TLegend( x0, 0.68, 0.85+(x0-0.5), 0.85 );
   iLegend->AddEntry( hsims, "simulations", "pl" );
-  iLegend->AddEntry( hdiff, "On-Off (Crab data)", "pl" );
+  iLegend->AddEntry( hdiff, "On-Off", "pl" );
   iLegend->Draw();
 }
 
@@ -141,7 +141,7 @@ void VPlotCompareDataWithMC::getScaling( TH1D *h_sims, TH1D *h_diff, double &s_s
 	}
 
       s_diff = 1.;
-      cout << " Bin Content:  data:" << z << "\t sims:" << s_sims << endl;
+      cout << " Bin Content:  data: " << z << "\t sims: " << s_sims << endl;
       if( s_sims > 0. ) s_sims = z/s_sims;
   }
 //////////////////////////////////
@@ -329,7 +329,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
 // get the scaling between simulations and data
   double s_sims = 1.;
   double s_diff = 1.;
-  getScaling( s_sims, s_diff, "MSCW", 1 );
+  getScaling( s_sims, s_diff, "Nimages", 1 );
 
   char hname[600];
   char htitle[600];
@@ -426,7 +426,7 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
 // get the scaling between simulations and data
   double s_sims = 1.;
   double s_diff = 1.;
-  getScaling( s_sims, s_diff, iScalingVariable, 1 );
+  getScaling( s_sims, s_diff, iScalingVariable, 1, -9999., iHistoXAxisMax );
 
   sprintf( hname, "c%s_%s", iHistoName.c_str(), fDataFileName.c_str() );
   sprintf( htitle, "%s (%s)", iCanvasTitle.c_str(), fDataFileName.c_str() );
@@ -812,10 +812,10 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 
   cSCore->cd(1);
   gPad->SetLeftMargin( 0.13 );
-  hXcore_sims->SetMaximum( hXcore_sims->GetMaximum()*1.5 );
+  hXcore_sims->SetMaximum( hXcore_sims->GetMaximum()*1.8 );
   hXcore_sims->Draw();
   hXcore_diff->Draw( "same" );
-  plotLegend( hXcore_sims, hXcore_diff, 0.13 );
+  plotLegend( hXcore_sims, hXcore_diff, 0.15 );
 
   cSCoreRel->cd(1);
   gPad->SetLeftMargin( 0.13 );
@@ -850,7 +850,7 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
   hYcore_sims->Scale( nSims );
 
   cSCore->cd(2);
-  hYcore_sims->SetMaximum( hYcore_sims->GetMaximum()*1.5 );
+  hYcore_sims->SetMaximum( hYcore_sims->GetMaximum()*1.8 );
   hYcore_sims->Draw();
   hYcore_diff->Draw( "same" );
   plotLegend( hYcore_sims, hYcore_diff, 0.13 );
@@ -1077,8 +1077,8 @@ void VPlotCompareDataWithMC::distance_plots()
 	  hrel = (TH1D*)hR_sims[i]->Clone( hname );
 	  hrel->Divide( hR_diff[i] );
 	  hrel->SetYTitle( "sims/data" );
-	  hrel->SetMinimum( 0.3 );
-	  hrel->SetMaximum( 3.0 );
+	  hrel->SetMinimum( fRelatePlotRange_min );
+	  hrel->SetMaximum( fRelatePlotRange_max );
 	  setHistogramAtt( hrel, 1, 1, 1, 21, 1 );
 	  cSDist->cd( iCsi );
           gPad->SetLeftMargin( 0.13 );
