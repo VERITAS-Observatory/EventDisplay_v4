@@ -210,9 +210,9 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
                               char *ifile1 = 0, char *ifile2 = 0,
 			      char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
-			      unsigned int iCrabSpec_ID = 6, string iObservatory = "CTA" )
+			      unsigned int iCrabSpec_ID = 6, string iObservatory = "CTA", double iObservingTime_h = 50. )
 {
-     plotSensitivity( ifile1, ifile2, true, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory );
+     plotSensitivity( ifile1, ifile2, true, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory, iObservingTime_h );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
