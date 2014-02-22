@@ -203,33 +203,28 @@ void VDataMCComparision::defineHistograms()
   hErec->SetXTitle( "log_{10} energy_{MC}" );
   hisList->Add( hErec );
 
-
-  //AMc 
   vmax = 5.;
   sprintf( hname, "hMWR_%s", fName.c_str() );
-  hMWR = new TH1D( hname, "", 100, -5., vmax );
+  hMWR = new TH1D( hname, "", 500, -5., vmax );
   hMWR->SetXTitle( "mean scaled width [deg]" );
   hisList->Add( hMWR );
- 
-  //AMc 
+
   vmax = 5.;
   sprintf( hname, "hMLR_%s", fName.c_str() ); 
-  hMLR = new TH1D( hname, "", 100, -5., vmax );
+  hMLR = new TH1D( hname, "", 500, -5., vmax );
   hMLR->SetXTitle( "mean scaled length [deg]" );
   hisList->Add( hMLR );
  
-  //AMc 
   vmax = 5.;
   sprintf( hname, "hMWRErec_%s", fName.c_str() );
-  hMWRErec = new TH2D( hname, "",  6, -1., 1., 100, -5., vmax );
+  hMWRErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
   hMWRErec->SetYTitle( "mean scaled width [deg]" );
   hMWRErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
   hisList->Add( hMWRErec );
  
-  //AMc 
   vmax = 5.;
   sprintf( hname, "hMLRErec_%s", fName.c_str() );
-  hMLRErec = new TH2D( hname, "",  6, -1., 1., 100, -5., vmax );
+  hMLRErec = new TH2D( hname, "",  6, -1., 1., 500, -5., vmax );
   hMLRErec->SetYTitle( "mean scaled length [deg]" );
   hMLRErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
   hisList->Add( hMLRErec );
@@ -432,7 +427,6 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision *on, VDataMCComp
   hAzYcore->Add( on->hAzYcore, off->hAzYcore, 1., norm );
   hYt2->Add( on->hYt2, off->hYt2, 1., norm );
  
-  //AMc Begin
   hMWR->Add( on->hMWR, off->hMWR, 1., norm );
   setEntries( hMWR );
   hMLR->Add( on->hMLR, off->hMLR, 1., norm );
@@ -445,7 +439,6 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision *on, VDataMCComp
   setEntries( hMWRErec );
   hMLRErec->Add( on->hMLRErec, off->hMLRErec, 1., norm );
   setEntries( hMLRErec );
-  //AMc End
 
   for( unsigned int j = 0; j < hR.size(); j++ ) hR[j]->Add( on->hR[j], off->hR[j], 1., norm );
   hNimages->Add( on->hNimages, off->hNimages, 1., norm );
@@ -520,6 +513,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
   double dist_min = -10.;
   double dist_max = 1.e10;
 
+// chain data files
   TChain *iC = new TChain( "data" );
   if( !iC->Add( ifile.c_str() ) )
     {
@@ -601,8 +595,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
   else if( fName == "ON" ) fInput = 1;
   else if( fName == "OFF" ) fInput = 2;
 
-  ////////////////////////////////////////////////////////////
-  // VGammaHadronCuts is needed for calulate of MVA values
+////////////////////////////////////////////////////////////
+// VGammaHadronCuts is needed for calulate of MVA values
   if( fCalculateMVAValues ) initialGammaHadronCuts();
 
 ////////////////////////////////////////////////////////////
@@ -650,9 +644,6 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 // nimage cut
       if( fData->NImages < fNImages_min ) continue;
 
-// apply az cut to MC (to choose similar AZ range as in Crab runs)
-//      if( fInput == 0 && ( fData->MCaz < 105.  || fData->MCaz > 230. ) ) continue;
-
 /////////////////////////////////////////////////
 // quality cuts
       if( fData->EChi2S < 0 ) continue;
@@ -670,17 +661,20 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 // (off data)
      if( fInput == 2 )
      {
-	  theta2 = (fData->Yoff_derot-fWobbleNorth)*(fData->Yoff_derot-fWobbleNorth) + (fData->Xoff_derot-fWobbleEast)*(fData->Xoff_derot-fWobbleEast);
+	  theta2 = (fData->Yoff_derot-fWobbleNorth)*(fData->Yoff_derot-fWobbleNorth) 
+                   + (fData->Xoff_derot-fWobbleEast)*(fData->Xoff_derot-fWobbleEast);
      }
 // MC data
      else if( fInput == 0 )
      {
-	  theta2 = (fData->Yoff-fData->MCyoff)*(fData->Yoff-fData->MCyoff) + (fData->Xoff-fData->MCxoff)*(fData->Xoff-fData->MCxoff);
+	  theta2 = (fData->Yoff-fData->MCyoff)*(fData->Yoff-fData->MCyoff) 
+                 + (fData->Xoff-fData->MCxoff)*(fData->Xoff-fData->MCxoff);
      }
 // on data
      else
      {
-	  theta2 = (fData->Yoff_derot+fWobbleNorth)*(fData->Yoff_derot+fWobbleNorth) + (fData->Xoff_derot+fWobbleEast)*(fData->Xoff_derot+fWobbleEast);
+	  theta2 = (fData->Yoff_derot+fWobbleNorth)*(fData->Yoff_derot+fWobbleNorth)
+                 + (fData->Xoff_derot+fWobbleEast)*(fData->Xoff_derot+fWobbleEast);
      }
 
 // MC energy and spectral weight is filled for simulations only
@@ -718,12 +712,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	      if( fData->alpha[fSingleTelescopeCuts-1] > alpha_max ) continue;
 	    }
 	  if( fData->dist[fSingleTelescopeCuts-1] < dist_min || fData->dist[fSingleTelescopeCuts-1] > dist_max ) continue;
-	  if( fData->size[fSingleTelescopeCuts-1] && fData->length[fSingleTelescopeCuts-1]/fData->size[fSingleTelescopeCuts-1] > los_max ) continue;
+	  if( fData->size[fSingleTelescopeCuts-1] 
+           && fData->length[fSingleTelescopeCuts-1]/fData->size[fSingleTelescopeCuts-1] > los_max ) continue;
 	  if( fData->length[fSingleTelescopeCuts-1] < length_min ||  fData->length[fSingleTelescopeCuts-1] > length_max ) continue;
 	  if( fData->width[fSingleTelescopeCuts-1] < width_min || fData->width[fSingleTelescopeCuts-1] > width_max ) continue;    
 	}
 
-      if( fSingleTelescopeCuts != -1 || (theta2 >= 0. && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL > msl_min && fData->MSCL < msl_max ) )
+      if( fSingleTelescopeCuts != -1
+       || (theta2 >= 0. && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL > msl_min && fData->MSCL < msl_max ) )
 	{
 	  htheta2->Fill( theta2, weight );
 	  hltheta2->Fill( log10(theta2), weight );
@@ -738,7 +734,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	  if( fData->ErecS > 0. ) hMWRErec->Fill( log10( fData->ErecS ), fData->MWR, weight );
 
 	}
-      if( fSingleTelescopeCuts != -1 || (theta2 >= theta2_min && theta2 < theta2_cut  &&  fData->MSCW < msw_max && fData->MSCW > msw_min ) )
+      if( fSingleTelescopeCuts != -1
+       || (theta2 >= theta2_min && theta2 < theta2_cut  &&  fData->MSCW < msw_max && fData->MSCW > msw_min ) )
 	{
 	  hMSCL->Fill( fData->MSCL, weight );
 	  for( int j = 0; j < fNTel; j++ ) if( fData->MSCLT[j] > 0. ) hmsclt[j]->Fill( fData->length[j] / fData->MSCLT[j], weight );
@@ -759,9 +756,9 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
        
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // stereo parameters
-      if( fSingleTelescopeCuts != -1 ||
-          ( theta2 >= theta2_min && theta2 < theta2_cut  && fData->MSCW < msw_max 
-	 && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
+      if( fSingleTelescopeCuts != -1 
+      || ( theta2 >= theta2_min && theta2 < theta2_cut 
+          && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
 	{
 	  hXcore->Fill( fData->Xcore, weight );
 	  if( fInput == 0 )
@@ -784,8 +781,10 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	    {
 	      if( fData->ntubes[j] > ntubes_min )
 		{
-		  rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az, fTel_y[j], -1.*fTel_x[j], fTel_z[j] );
+		  rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az, 
+                                                            fTel_y[j], -1.*fTel_x[j], fTel_z[j] );
 		  hR[j]->Fill( rdist1, weight );
+// camera distance is calculated relative to centre of camera (should be: wobble offset position (TODO))
 		  hdistR[j]->Fill( rdist1, sqrt( fData->cen_x[j]*fData->cen_x[j]+fData->cen_y[j]*fData->cen_y[j]), weight );
 		}
 	    }
@@ -816,7 +815,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		  if( fInput == 0 )
 		  {
 		      hcen_x[j]->Fill( fData->cen_x[j], weight );
-		      hcen_y[j]->Fill( -1.*fData->cen_y[j], weight );
+		      hcen_y[j]->Fill( fData->cen_y[j], weight );
 		  }
 		  else
 		  {
