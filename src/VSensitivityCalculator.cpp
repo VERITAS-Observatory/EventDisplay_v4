@@ -96,7 +96,7 @@ void VSensitivityCalculator::reset()
 
 // source strength values (in Crab units)
 // units: fraction of source strenght
-    fSourceStrength_min = 0.003;
+    fSourceStrength_min = 0.0003;
     fSourceStrength_max = 3.5;
     fSourceStrength_step = 0.005;
     setSourceStrengthVector_CU();
@@ -108,7 +108,7 @@ void VSensitivityCalculator::reset()
     fPlottingCrabFlux_CU.push_back( 1.e-1 );
     fPlottingCrabFlux_CU.push_back( 1.e-2 );
     fPlottingCrabFlux_CU.push_back( 1.e-3 );
-//    fPlottingCrabFlux_CU.push_back( 1.e-4 );
+    fPlottingCrabFlux_CU.push_back( 1.e-4 );
 
 // sensitivity graph
     gSensitivityvsEnergy = 0;
@@ -496,7 +496,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
     }
 /////////////////////////////////////////////////////
 // calculate integral spectrum
-    if( bInt )
+    if( bInt && bUnit != "CU" )
     {
        const int np = 1000;
        double *x = new double[np];
@@ -635,7 +635,6 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
                                                  fPlottingMarkerStyle, fPlottingMarkerSize, 
 						 fPlottingFillStyle, fPlottingLineStyle );
 
-//    gSensitivityvsEnergy->Draw( "l5" );
     gSensitivityvsEnergy->Draw( "p" );
 
     cSensitivity->Update();
@@ -754,38 +753,37 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 
 // observe that the signal rate is defined differently for list_sensitivity() etc...
 // get fraction of Crab flux for XX sigma etc...
-// perform a toy MC to calculate errors (100 times)
-        TH1F iX( "iX", "", 100000, 0., 100. );
-	for( unsigned int q = 0; q < 100; q++ )
+// perform a toy MC to calculate errors (i_N_iter times)
+	const unsigned int i_N_iter = 1000;
+	double i_s_v[i_N_iter];
+	double i_s_x = 0.;
+	double i_s_xx = 0.;
+	int i_s_z = 0;
+	for( unsigned int q = 0; q < i_N_iter; q++ )
 	{
 	     double iN_on  = gRandom->Gaus( non, non_error );
 	     double iN_off = gRandom->Gaus( noff, noff_error );
 	     double i_s = getSensitivity( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
 	                                  iN_off / fDifferentialFlux[i].ObsTime * 60., alpha , -100., 0 );
-	     if( i_s > 0. ) iX.Fill( i_s );
+	     if( i_s > 0 )
+	     {
+	        i_s_v[i_s_z] = i_s;
+		i_s_x   += i_s;
+		i_s_xx  += i_s*i_s;
+		i_s_z++;
+             }
 	}
-// take mean of distribution (distribution is assymmetric, not sure if this would be correct)
-//	s = iX.GetMean();
-//	s = getSensitivity( iD, -100., 0 );
-//	s_error_L = s - iX.GetRMS();
-//	s_error_U = s + iX.GetRMS();
-        if( iX.GetEntries() > 0 && iX.GetRMS() > 0. )
+// take meidan of distribution (distribution is assymmetric, not sure if this would be correct)
+        if( i_s_z > 1 )
 	{
-	   double i_a[] = { 0.16, 0.5, 0.84 };
-	   double i_b[] = { 0.0,  0.0, 0.0  };
-	   iX.GetQuantiles( 3, i_b, i_a );
-	   s = i_b[1];
-	   s_error_L = i_b[0];
-	   s_error_U = i_b[2];
-	   cout << "\t Quantiles " << i_b[1] << "\t" << i_b[1]-i_b[0] << "\t" << i_b[2]-i_b[1] << "\t" << iX.GetEntries() << endl;
-           cout << "\t Mean " << iX.GetMean() << " +- " << iX.GetRMS() << endl;
-        }
-	else
-	{
-	   s = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-	                       noff / fDifferentialFlux[i].ObsTime * 60., alpha, -100., 0 );
-	   s_error_L = s - iX.GetRMS();
-	   s_error_U = s + iX.GetRMS();
+	    double i_a[] = { 0.16, 0.5, 0.84 };
+	    double i_b[] = { 0.0,  0.0, 0.0  };
+	    TMath::Quantiles( i_s_z, 3, i_s_v, i_b, i_a, kFALSE );
+	    cout << "\t Quantiles " << i_b[1] << "\t" << i_b[1]-i_b[0] << "\t" << i_b[2]-i_b[1] << "\t" << i_s_z << endl;
+	    cout << "\t Mean      " << i_s_x/i_s_z << "\t" << 1./(i_s_z-1.)*(i_s_xx-i_s_x*i_s_x) << endl;
+	    s = i_b[1];
+	    s_error_L = i_b[0];
+	    s_error_U = i_b[2];
         }
 
 // Preliminary: catch cases were lower sensitivity cannnot be calculated
@@ -2674,8 +2672,6 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
 	    g->SetLineColor( 2 );
 	    g->SetLineWidth( 3 );
 	    g->Draw( "LZ" );
-	    cout << fixed << "MinEvents (>=" << fEvents_min << "): ";
-	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
          }
       }
    }
@@ -2695,8 +2691,6 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
 	    g->SetLineColor( 3 );
 	    g->SetLineWidth( 3 );
 	    g->Draw( "ZL" );
-	    cout << fixed << "Background rate ratio (>" << fMinBackgroundRateRatio_min << "): ";
-	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
          }
       }
    }
@@ -2716,8 +2710,6 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
 	    g->SetLineColor( 4 );
 	    g->SetLineWidth( 3 );
 	    g->Draw( "LZ" );
-	    cout << fixed << "Significance: (>" << fSignificance_min << " ): ";
-	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
          }
       }
    }
@@ -2737,8 +2729,6 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas *c, double iYVa
 	    g->SetLineColor( 6 );
 	    g->SetLineWidth( 3 );
 	    g->Draw( "LZ" );
-	    cout << fixed << "MinNoBackground: (>" << 0 << " ): ";
-	    cout << "\t" << energy << "\t" << scientific << (*itx).second << endl;
          }
       }
    }

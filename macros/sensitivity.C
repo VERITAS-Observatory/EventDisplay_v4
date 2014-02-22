@@ -10,8 +10,12 @@
 */
 
 #include "TCanvas.h"
+#include "TFile.h"
 #include "TGraph.h"
+#include "TH1F.h"
 #include "TLegend.h"
+#include "TROOT.h"
+#include "TSystem.h"
 
 #include <fstream>
 #include <iostream>
@@ -23,7 +27,7 @@ using namespace std;
 void getPlottingData( bool bIntegral, string bUnit, string iObservatory );
 void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIntegral,
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
-		      string iFluxUnit, unsigned int iCrabSpec_ID );
+		      string iFluxUnit, unsigned int iCrabSpec_ID, string iObservatory, double iObservingTime_h );
 
 void plotDebugComparisionPlots( string iFile, int iColor );
 
@@ -103,93 +107,100 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 //////////////////
 // integral flux
     cout << "FILLING " << bIntegral << "\t" << bUnit << endl;
-    if( bIntegral && bUnit == "PFLUX" )
+    if( bIntegral )
     {
-       fPD.bIntegral = true;
-       fPD.fPlotting_flux_min = 8.e-16;
-       fPD.fPlotting_flux_max = 2.e-10;
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/HESS_IntegralSensitivity_Achieved_Moriond2009.txt" );
-       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "HESS" );
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGIC_IntegralSensitivity_Data_Colin2010_PFLUX.txt" );
-       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC" );
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGICII_IntegralSensitivity_MC_Colin2010_PFLUX.txt" );
-       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC II" );
-
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/GLAST5Y_IntegralSensitivity_LOI_2009_PFLUX.txt" );
-       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "Fermi LAT 5y" );  
-
-       fPD.bSet = true;
-    }
-    else if( bIntegral && bUnit == "CU" )
-    {
-       fPD.bIntegral = true;
-       fPD.fPlotting_flux_min = 0.0002;
-       fPD.fPlotting_flux_max = 0.85;
-      
-       fPD.bSet = true;
-    } 
-    else if( bIntegral && bUnit == "ENERGY" )
-    {
-       fPD.bIntegral = true;
-       fPD.fPlotting_flux_min = 1.e-14;
-       fPD.fPlotting_flux_max = 1.e-11;
-
-       fPD.bSet = true;
-    } 
-// differential flux
-    else if( !bIntegral && bUnit == "PFLUX" )
-    {
-       fPD.bIntegral = false;
-       fPD.fPlotting_flux_min = 2.e-15;
-       fPD.fPlotting_flux_max = 8.e-09;
-       if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+       if( bUnit == "PFLUX" )
        {
-	  fPD.fPlotting_flux_min = 1.e-15;
-	  fPD.fPlotting_flux_max = 2.e-08;
-	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_PFLUX.txt" );
-	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
+	  fPD.bIntegral = true;
+	  fPD.fPlotting_flux_min = 8.e-16;
+	  fPD.fPlotting_flux_max = 2.e-10;
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/HESS_IntegralSensitivity_Achieved_Moriond2009.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "HESS" );
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGIC_IntegralSensitivity_Data_Colin2010_PFLUX.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC" );
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGICII_IntegralSensitivity_MC_Colin2010_PFLUX.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC II" );
+
+	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/GLAST5Y_IntegralSensitivity_LOI_2009_PFLUX.txt" );
+	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "Fermi LAT 5y" );  
+
+	  fPD.bSet = true;
        }
-       else
+       else if( bUnit == "CU" )
        {
-	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_LOI_2009_PFLUX.txt" );
-	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA_LOI" );
-       }
-
-       fPD.bSet = true;
-    }
-    else if( !bIntegral && bUnit == "CU" )
-    {
-       if( iObservatory == "VTS" || iObservatory == "VERITAS" )
-       {
-	  fPD.fPlotting_flux_min = 0.002;
+	  fPD.bIntegral = true;
+	  fPD.fPlotting_flux_min = 0.0002;
 	  fPD.fPlotting_flux_max = 0.85;
-	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_CU.txt" );
-	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
-       }
-       else
+	 
+	  fPD.bSet = true;
+       } 
+       else if( bUnit == "ENERGY" )
        {
-	  fPD.fPlotting_flux_min = 0.001;
-	  fPD.fPlotting_flux_max = 1.;
+	  fPD.bIntegral = true;
+	  fPD.fPlotting_flux_min = 1.e-14;
+	  fPD.fPlotting_flux_max = 1.e-11;
+
+	  fPD.bSet = true;
+       } 
+    }
+/////////////////////////////////////////////////
+// differential flux
+    else
+    {
+       if( bUnit == "PFLUX" ) 
+       {
+	  fPD.bIntegral = false;
+	  fPD.fPlotting_flux_min = 2.e-15;
+	  fPD.fPlotting_flux_max = 8.e-09;
+	  if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+	  {
+	     fPD.fPlotting_flux_min = 1.e-15;
+	     fPD.fPlotting_flux_max = 2.e-08;
+	     fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_PFLUX.txt" );
+	     fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
+	  }
+	  else
+	  {
+	     fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_LOI_2009_PFLUX.txt" );
+	     fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "CTA_LOI" );
+	  }
+
+	  fPD.bSet = true; 
+       }
+       else if( bUnit == "CU" )
+       {
+	  if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+	  {
+	     fPD.fPlotting_flux_min = 0.002;
+	     fPD.fPlotting_flux_max = 0.85;
+	     fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/MAGIC_DifferentialSensitivity_020dE_1108.1477_CU.txt" );
+	     fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "MAGIC stereo" );
+	  }
+	  else
+	  {
+	     fPD.fPlotting_flux_min = 0.001;
+	     fPD.fPlotting_flux_max = 1.;
+	     fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
+	     fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
+	  }
+
+	  fPD.bSet = true;
+       }
+       else if( bUnit == "ENERGY" )
+       {
 	  fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
 	  fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
-       }
-
-       fPD.bSet = true;
-    }
-    else if( !bIntegral && bUnit == "ENERGY" )
-    {
-       fPD.fSensitivityvsEnergyFromTextTFile.push_back( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/sensitivity/CTA_Typical_DifferentialSensitivity_020dE_Zurich2009_CU.txt" );
-       fPD.fSensitivityvsEnergyFromTextTFile_LegendTitles.push_back( "KB_Zurich2009" );
-       fPD.fPlotting_flux_min = 1.e-14;
-       fPD.fPlotting_flux_max = 2.e-10;
-
-       if( iObservatory == "VTS" || iObservatory == "VERITAS" )
-       {
-	  fPD.fPlotting_flux_min = 2.e-13;
+	  fPD.fPlotting_flux_min = 1.e-14;
 	  fPD.fPlotting_flux_max = 2.e-10;
-       }
 
-       fPD.bSet = true;
+	  if( iObservatory == "VTS" || iObservatory == "VERITAS" )
+	  {
+	     fPD.fPlotting_flux_min = 2.e-13;
+	     fPD.fPlotting_flux_max = 2.e-10;
+	  }
+
+	  fPD.bSet = true;
+       } 
     }
 
 // marker colors and line styles
@@ -208,11 +219,12 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 */
 ////////////////////////////////////////////////////////////////////////////////////
 void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
-                              char *ifile1 = 0, char *ifile2 = 0,
+                              char *iDatafile1 = 0, char *iDatafile2 = 0,
 			      char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
 			      unsigned int iCrabSpec_ID = 6, string iObservatory = "CTA", double iObservingTime_h = 50. )
 {
-     plotSensitivity( ifile1, ifile2, true, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory, iObservingTime_h );
+     plotSensitivity( iDatafile1, iDatafile2, true,
+                      iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory, iObservingTime_h );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -224,13 +236,13 @@ void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
 */
 ////////////////////////////////////////////////////////////////////////////////////
 void plotDifferentialSensitivity( string iFluxUnit = "ENERGY",
-                                  char *ifile1 = 0, char *ifile2 = 0,
+                                  char *iDatafile1 = 0, char *iDatafile2 = 0,
 				  char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
 				  unsigned int iCrabSpec_ID = 5, string iObservatory = "CTA",
 				  double iObservingTime_h = 50. )
 {
-     plotSensitivity( ifile1, ifile2, false, iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, 
-                      iCrabSpec_ID, iObservatory, iObservingTime_h );
+     plotSensitivity( iDatafile1, iDatafile2, false,
+                      iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory, iObservingTime_h );
 }
 
 
@@ -255,7 +267,7 @@ void plotDifferentialSensitivity( string iFluxUnit = "ENERGY",
 void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIntegral,
                       char *iMC_Gamma, char *iMC_Proton, char *iMC_Helium, char *iMC_Electron,
 		      string iFluxUnit, unsigned int iCrabSpec_ID, string iObservatory,
-		      double iObservingTime_h = 50. )
+		      double iObservingTime_h )
 {
 
 // get values for plotting
@@ -508,7 +520,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor )
 
 */
 void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Electron = 0,
-                              unsigned int iCrabSpec_ID = 6, char *iParticleNumberFile = "particleNumbers.tmp.root",
+                              unsigned int iCrabSpec_ID = 6, string iParticleNumberFile = "particleNumbers.tmp.root",
 			      string iObservatory = "CTA" )
 {
     string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
@@ -653,7 +665,7 @@ void plotIRF( string iSubArray, bool iSensitivity, string iObservingTime_H, stri
 
     if( iSensitivity )
     {
-        plotDifferentialSensitivity( "ENERGY", 0, 0, iGammaEffArea, iProtonEffArea, 0, iElectronEffArea );
+//        plotDifferentialSensitivity( "ENERGY", 0, 0, iGammaEffArea, iProtonEffArea, 0, iElectronEffArea );
 	plotDebugComparisionPlots( iIFAE, 2 );
 	plotDebugComparisionPlots( iISDC, 3 );
     }
