@@ -773,7 +773,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 		i_s_z++;
              }
 	}
-// take meidan of distribution (distribution is assymmetric, not sure if this would be correct)
+// take median of distribution (distribution is assymmetric, not sure if this would be correct)
         if( i_s_z > 1 )
 	{
 	    double i_a[] = { 0.16, 0.5, 0.84 };
@@ -784,6 +784,12 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	    s = i_b[1];
 	    s_error_L = i_b[0];
 	    s_error_U = i_b[2];
+        }
+        else 
+        {
+           s = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60., noff / fDifferentialFlux[i].ObsTime * 60., alpha, -100., 0 );
+           s_error_L = 0.;
+           s_error_U = 0.;
         }
 
 // Preliminary: catch cases were lower sensitivity cannnot be calculated

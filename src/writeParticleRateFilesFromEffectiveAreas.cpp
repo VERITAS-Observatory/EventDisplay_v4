@@ -82,7 +82,7 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
        double i_woff_gamma = 0.;
 
        int i_Azbin_proton = 0;
-       double i_index_proton = 2.6;
+       double i_index_proton = 2.5;
        int i_noise_proton = 250;
        double i_woff_proton = 0.;  
        cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl; 
@@ -122,6 +122,7 @@ int main( int argc, char *argv[] )
       cout << endl;
       cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone>";
       cout <<  "<reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
+      cout << argc << endl;
       cout << endl;
       exit( 0 );
    }
