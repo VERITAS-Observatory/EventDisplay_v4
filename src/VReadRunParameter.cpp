@@ -1426,7 +1426,8 @@ void VReadRunParameter::setDirectories()
     char i_text[600];
 
 // outputfilename
-    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 )
+//suppress output file for peds			gain/toffset		low gain/toffset		lpeds			DSTs
+    if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4)
     {
        fRunPara->foutputfileName = "-1";
     } 
