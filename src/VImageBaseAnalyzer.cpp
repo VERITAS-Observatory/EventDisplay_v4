@@ -613,6 +613,10 @@ void VImageBaseAnalyzer::gainCorrect()
 
 
 /*!
+
+  If you add an additional code value, please add the corresponding text 
+  in void VEvndispData::setDeadChannelText()
+
   added maximum time offset (GM)
 
   dead channel coding
@@ -621,8 +625,8 @@ void VImageBaseAnalyzer::gainCorrect()
   - small relative pedvars (3)
   - large relative pedvars (4)
   - outside gain range (5)
-  - small gain vars (6)
-  - large gain vars (7)
+  - small gain variations (6)
+  - large gain deviations (7)
   - large time offset (8)
   - FADC stop signal (9)
   - masked (10)
@@ -677,7 +681,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     double i_meanPedVarRMS = 0.;
     getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
 
-     for ( unsigned int i = 0; i < getNChannels(); i++ )
+    for ( unsigned int i = 0; i < getNChannels(); i++ )
     {
 // FADC stop channels (don't set any other reasons for channels to be dead)
         if( iFirst )
@@ -691,7 +695,6 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
                 }
             }
         }
-
 // time dependent dead channels finder (pedestals in time slices)
         if( usePedestalsInTimeSlices( iLowGain ) )
         {
@@ -741,7 +744,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
             if( (!getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0 )
              || (iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
             {
-                setDead( i, getDeadChannelFinder( iLowGain && getLowGainTOff() )->testTimeOffsets( i, getTOffsets( iLowGain )[i] ), iLowGain );
+                setDead( i, getDeadChannelFinder( iLowGain && getLowGainTOff() )
+			    ->testTimeOffsets( i, getTOffsets( iLowGain )[i] ), iLowGain );
             }
 // test low gain multiplier
 // (this actually do not set anything dead, it sets the mean value low gain multiplier for these channels)
@@ -827,7 +831,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     if( iFirst && fRunPar->fMCNdead > 4 && fRunPar->fsourcetype != 4 && fRunPar->fsourcetype != 6 )
     {
         int iN = 0;
-        unsigned int iPix = 0;
+         unsigned int iPix = 0;
         int iNstep = 0;
         cout << "Telescope " << getTelID()+1 << ": setting randomly channels dead (seed " << getAnaData()->getRandomDeadChannelSeed() << ")" << endl;
         do
@@ -939,8 +943,8 @@ TTree* VImageBaseAnalyzer::makeDeadChannelTree()
     sprintf( hname, "tchannel" );
     sprintf( htitle, "channel state (Telescope %d)", getTelID()+1 );
     TTree *itc = new TTree( hname, htitle );
-    UShort_t istat;
-    UShort_t istatLow;
+    UShort_t istat = 0;
+    UShort_t istatLow = 0;
     itc->Branch( "state", &istat, "state/s" );
     itc->Branch( "stateLow", &istatLow, "stateLow/s" );
 

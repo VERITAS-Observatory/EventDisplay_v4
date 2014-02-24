@@ -266,6 +266,7 @@ void VEvndispData::setDeadChannelText()
     fDeadChannelText.push_back( "disabled: masked" );
     fDeadChannelText.push_back( "disabled: user set" );
     fDeadChannelText.push_back( "disabled: MC set" );
+    fDeadChannelText.push_back( "dead: low gain multiplier" );
 }
 
 bool VEvndispData::get_reconstruction_parameters( string ifile )
