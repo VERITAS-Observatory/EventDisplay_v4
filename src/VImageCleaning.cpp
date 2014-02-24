@@ -308,7 +308,7 @@ bool VImageCleaning::BoundarySearch(int type, float thresh, TF1* fProbCurve, flo
     if((VALIDITYBUF[idx]>1.9&&VALIDITYBUF[idx]<6.1) ) return false;
 
 // check for valid pixel number
-    if( idx >= fData->getDetectorGeo()->getNeighbours().size() ) return false;
+    if( idx >= (int)fData->getDetectorGeo()->getNeighbours().size() ) return false;
 
     float TimeForReSearch=0.;
     bool iffound=false;
@@ -371,7 +371,7 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
         Double_t q=VALIDITY[PixNum];
         if(q<0.5 || INTENSITY[PixNum]<PreCut) continue;
 
-	if( PixNum >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+	if( PixNum >= (int)fData->getDetectorGeo()->getNeighbours().size() ) continue;
 
         for( unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
         {
@@ -398,7 +398,7 @@ int VImageCleaning::NNGroupSearchProbCurve(int type, TF1* fProbCurve, float PreC
 		{
                     if(BoundarySearch(type, mincharge, fProbCurve,dT,3,fData->getDetectorGeo()->getNeighbours()[PixNum][k] )) iffound=true;
                 }
-	        if( PixNum2 >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+	        if( PixNum2 >= (int)fData->getDetectorGeo()->getNeighbours().size() ) continue;
                 for( unsigned int k=0; k < fData->getDetectorGeo()->getNeighbours()[PixNum2].size(); k++ )
 		{
                     if(BoundarySearch(type, mincharge, fProbCurve,dT,3,fData->getDetectorGeo()->getNeighbours()[PixNum2][k] )) iffound=true;
@@ -521,7 +521,7 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, flo
         if(q<0.5 || INTENSITY[PixNum]<PreCut) continue;
         int NNcnt=1;
         int pix1=0, pix2=0, pix3=0, pix4=0;
-	if( PixNum >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+	if( PixNum >= (int)fData->getDetectorGeo()->getNeighbours().size() ) continue;
         for (unsigned int j=0; j < fData->getDetectorGeo()->getNeighbours()[PixNum].size(); j++ )
         {
             const Int_t PixNum2 = fData->getDetectorGeo()->getNeighbours()[PixNum][j];
@@ -557,7 +557,7 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, flo
                 //4 connected pixels
                 for(int n=0;n<3;n++)
 		{
-		    if( nng3[n] >= fData->getDetectorGeo()->getNeighbours().size() ) continue;
+		    if( nng3[n] >= (int)fData->getDetectorGeo()->getNeighbours().size() ) continue;
 		    for( unsigned int jj=0; jj < fData->getDetectorGeo()->getNeighbours()[nng3[n]].size(); jj++ )
                     {
                         const Int_t testpixnum = fData->getDetectorGeo()->getNeighbours()[nng3[n]][jj];
