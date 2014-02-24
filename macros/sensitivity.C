@@ -341,20 +341,20 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 ////////////////////////////////////////////////////////////////////////
     if( iMC_Gamma && iMC_Proton )
     {
-       VSensitivityCalculator b;
-       b.setDebug( false );             // creates lots of output
+       VSensitivityCalculator bb;
+       bb.setDebug( false );             // creates lots of output
 // set Crab Nebula spectrum
-       b.setEnergySpectrumfromLiterature( fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID );
+       bb.setEnergySpectrumfromLiterature( fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID );
 // draw some debugging plots
        char hname[600];
        sprintf( hname, "plotDebug_%d", bIntegral );
-       b.setPlotDebug( hname );
+       bb.setPlotDebug( hname );
 // energy range to be plotted
-       b.setEnergyRange_Lin( 0.01, 250. );
+       bb.setEnergyRange_Lin( 0.01, 250. );
 // significance parameters
-       b.setSignificanceParameter( 5., 10., iObservingTime_h, 0.05, 0.2 );
+       bb.setSignificanceParameter( 5., 10., iObservingTime_h, 0.05, 0.2 );
 // set colors different in case data is plotted
-       if( iData_anasumFile1 ) b.setPlottingStyle( 4, 1, 2, 20, 2., 3002 );
+       if( iData_anasumFile1 ) bb.setPlottingStyle( 4, 1, 2, 20, 2., 3002 );
 
 //////////////////////////////////////////////////////////////////////////
 // select bins and index from gamma and proton effective area files
@@ -401,28 +401,28 @@ void plotSensitivity( char *iData_anasumFile1, char *iData_anasumFile2, bool bIn
 //////////////////////////////////////////////////////////////////////////
 
 // gammas
-       b.setMonteCarloParameters(1, fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
+       bb.setMonteCarloParameters(1, fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
 // protons
-       b.setMonteCarloParameters(14, fPD.fESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
+       bb.setMonteCarloParameters(14, fPD.fESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
                                  i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
 // helium (spectral index?)
        if( iMC_Helium )
        {
-          b.setMonteCarloParameters( 402, fPD.fESpecDataFile_CosmicRays, 1, iMC_Helium, 20., 0, 0.0, 200, 2.0 );
+          bb.setMonteCarloParameters( 402, fPD.fESpecDataFile_CosmicRays, 1, iMC_Helium, 20., 0, 0.0, 200, 2.0 );
        }
 // electrons (spectral index?)
        if( iMC_Electron )
        {
-          b.setMonteCarloParameters( 2, fPD.fESpecDataFile_CosmicRays, 2, iMC_Electron, 20.,
+          bb.setMonteCarloParameters( 2, fPD.fESpecDataFile_CosmicRays, 2, iMC_Electron, 20.,
 	                             i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
        }
 
 // energy range determined by looking at number of noff events (need off events to determine sensitivity)
-       if( bIntegral ) b.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.01, 500. );
-       else            b.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.2, 0.01 );
+       if( bIntegral ) bb.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.01, 500. );
+       else            bb.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.2, 0.01 );
 
-       b.plotSensitivityLimitations( c );
+       bb.plotSensitivityLimitations( c );
     }
     return;
 // plot different limitations in sensitivity calculation
