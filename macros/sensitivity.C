@@ -3,7 +3,7 @@
 
    do help() for help...
 
-   plot sensitivities from Crab Nebula data or simulations (CTA or VERITAS)
+   plot sensitivities from Crab Nebula data or simulations(CTA or VERITAS)
 
    Author: Gernot Maier, Heike Prokoph
 
@@ -221,7 +221,7 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 void plotIntegralSensitivity( string iFluxUnit = "PFLUX",
                               char *iDatafile1 = 0, char *iDatafile2 = 0,
 			      char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Helium = 0, char *iMC_Electron = 0,
-			      unsigned int iCrabSpec_ID = 6, string iObservatory = "CTA", double iObservingTime_h = 50. )
+			      unsigned int iCrabSpec_ID = 5, string iObservatory = "CTA", double iObservingTime_h = 50. )
 {
      plotSensitivity( iDatafile1, iDatafile2, true,
                       iMC_Gamma, iMC_Proton, iMC_Helium, iMC_Electron, iFluxUnit, iCrabSpec_ID, iObservatory, iObservingTime_h );
@@ -520,7 +520,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor )
 
 */
 void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Electron = 0,
-                              unsigned int iCrabSpec_ID = 6, string iParticleNumberFile = "particleNumbers.tmp.root",
+                              unsigned int iCrabSpec_ID = 5, string iParticleNumberFile = "particleNumbers.tmp.root",
 			      string iObservatory = "CTA" )
 {
     string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
