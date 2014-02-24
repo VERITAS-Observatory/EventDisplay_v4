@@ -1,6 +1,12 @@
 #include "VLowGainCalibrator.h"
 
-VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TString dir) {
+VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TString dir, TString outdir) {
+
+	fIsOk=false;
+	if(outdir=="") outdir=dir;
+
+	cout << "Reading from " << dir << endl;
+	cout << "Writing to " << outdir << endl;
 
 	fRun=run;
 	fWindow=sw;
@@ -27,29 +33,31 @@ VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TStrin
 	fInfile = new TFile( iName.Data(), "read");
 	if( !fInfile || fInfile->IsZombie() )  { 
 		cout << "ERROR: Input file " << iName << " does not exist, exiting immediately..." << endl;
-		exit( 2);
+		return ;
 	}
 	fDsttree = (TTree*)fInfile->Get("dst");
 	if( !fDsttree )  { 
 		cout << "ERROR: Input file " << iName << " does not contain a tree named dst, exiting immediately..." << endl;
-		exit( 2);
+		return ;
 	}
 	
 	fDsttree->SetBranchAddress("sumfirst",&sumfirst);
 	fDsttree->SetBranchAddress("sum",&sum);
+	fDsttree->SetBranchAddress("sum2",&sum2);
 	fDsttree->SetBranchAddress("HiLo",&HiLo);
 	fDsttree->SetBranchAddress("sumwindow",&sumwindow);
 	fDsttree->SetBranchAddress("eventNumber",&eventNumber);
 	fDsttree->SetBranchAddress("dead",&dead);
+	fDsttree->SetBranchAddress("RawMax",&RawMax);
 
 	for(int tel=0; tel<fNTel; tel++) {
-		iName.Form("%s/Tel_%d/", dir.Data(), tel+1);
+		iName.Form("%s/Tel_%d/", outdir.Data(), tel+1);
 		gSystem->mkdir(iName.Data(), "r");
-		iName.Form( "%s/Tel_%d/%d.lmult.root", dir.Data(), tel+1, run);
+		iName.Form( "%s/Tel_%d/%d.lmult.root", outdir.Data(), tel+1, run);
 		fOutfile[tel] = new TFile( iName.Data(), "recreate");
 		if( !fOutfile[tel] || fOutfile[tel]->IsZombie() ) {
 			cout << "ERROR: Output file " << iName << " could not be opened, exiting immediately..." << endl;
-			exit( 2);
+			return;
 		}
 		iName.Form( "slopes_%d_%d", tel+1, sw);
 		fOuttree[tel] = new TTree( iName.Data(), iName.Data() );
@@ -60,7 +68,16 @@ VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TStrin
 		fOuttree[tel]->Branch("chi2", 		&fTree_chi2, 		"chi2[2]/D");
 		fOuttree[tel]->Branch("ndf", 		&fTree_ndf, 		"ndf[2]/I");
 		fOuttree[tel]->Branch("status", 	&fTree_status, 		"status[2]/I");
+		fOuttree[tel]->Branch("run", 		&fTree_run,		"run/I");
+		fOuttree[tel]->Branch("tel", 		&fTree_tel,		"tel/I");
 
+		iName.Form( "%s/Tel_%d/%d.debug.root", outdir.Data(), tel+1, run);		
+		fDebugfile[tel] = new TFile( iName.Data(), "recreate");
+		if( !fDebugfile[tel] || fDebugfile[tel]->IsZombie() ) {
+			cout << "ERROR: Output file " << iName << " could not be opened, exiting immediately..." << endl;
+			return ;
+		}
+		
 		iName.Form( "debug_%d_%d", tel+1, sw);
 		fDebugtree[tel] = new TTree( iName.Data(), iName.Data() );
 		fDebugtree[tel]->Branch("channel",	&fTree_Channel,		"channel/I");
@@ -70,20 +87,31 @@ VLowGainCalibrator::VLowGainCalibrator(int run, int sw, bool isInnerHigh, TStrin
 		fDebugtree[tel]->Branch("QMon",		&fTree_QMon,		"QMon/D");
 		fDebugtree[tel]->Branch("QMonMean",	&fTree_QMonMean,	"QMonMean/D");
 		fDebugtree[tel]->Branch("Q",		&fTree_Q,		"Q/D");
+		fDebugtree[tel]->Branch("RawMax",	&fTree_RawMax,		"RawMax/I");
+		fDebugtree[tel]->Branch("run", 		&fTree_run,		"run/I");
+		fDebugtree[tel]->Branch("tel", 		&fTree_tel,		"tel/I");
 		
 
 	}
 	setLowGainMultiplierUsedInDST();
 	setMonitorChargeOptions() ;
 	setFitOptions();
+
+	fTree_run=fRun;
+	fDEBUG=false;
+	fIsOk=true;
+
+	fMaxDSTEvent=1000000;
+	fMinDSTEvent=0;
 	
 }
 
 
 VLowGainCalibrator::~VLowGainCalibrator() { 
 	for(int tel=0; tel<fNTel; tel++) {
-		fMonitorChargeHist[tel]->Delete();
+		if(fMonitorChargeHist[tel]) fMonitorChargeHist[tel]->Delete();
 	}
+	if(fDsttree) fDsttree->Delete();
 }
 
 
@@ -95,14 +123,13 @@ void VLowGainCalibrator::setMonitorChargeOptions( int nLive_min, double sum_min,
 
 } 
 
-void VLowGainCalibrator::setFitOptions( int n_min, double pure_min, double prob_min, double b_max ) {
+void VLowGainCalibrator::setFitOptions( int n_min, double pure_min, double sat_max, double nevents_min, double prob_min, double b_max ) {
 	fFitPure_min = pure_min;
 	fFitNPoints_min = n_min;
 	fFitProb_min = prob_min ;
 	fFitB_max = b_max;
-
-
-		
+	fFitRSat_max = sat_max;
+	fFitNEvents_min=nevents_min;
 
 }
 
@@ -177,7 +204,7 @@ bool VLowGainCalibrator::makeMonitorChargeHists( ) {
 		fMonitorChargeHist[tel]->Reset();
 	}
 
-	for(int iEntry=0; iEntry<fDsttree->GetEntries() ; iEntry++) {
+	for(unsigned int iEntry=fMinDSTEvent; iEntry<fDsttree->GetEntries() && iEntry<fMaxDSTEvent; iEntry++) {
 		fDsttree->GetEntry( iEntry );
 
 		for(int tel=0; tel<4; tel++) {
@@ -384,13 +411,17 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
         fit->SetParLimits(0, npeaks, npeaks);
 	fit->SetNpx(1000);
 
+	TString opt="Q";
+	if(fDEBUG) opt="";
+
 	if( iDraw ) { 
-		h2->Fit("fit");
+		h2->Fit("fit", opt);
 		c1->Update();
 		TString iName=TString::Format("light_t%d_%d", tel+1, fWindow);
 		c1->SetName( iName.Data() );
-		fOutfile[tel]->cd();
+		fDebugfile[tel]->cd();
 		c1->Write();
+		c1->Close();
 	}
 	else        h2->Fit("fit","N");
 
@@ -406,7 +437,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 		fLightLevelMeanError[tel].push_back( fit->GetParError(3*i+4) );
 		if( fDEBUG ) cout << "mean:   " << fLightLevelMean[tel][i] << " +/- " << fLightLevelMeanError[tel][i] << endl;
 
-		fLightLevelSigma[tel].push_back( fit->GetParameter(3*i+5) );
+		fLightLevelSigma[tel].push_back( TMath::Abs( fit->GetParameter(3*i+5)) );
 		fLightLevelSigmaError[tel].push_back( fit->GetParError(3*i+5) );
 		if( fDEBUG ) cout << "sigma:  " << fLightLevelSigma[tel][i] << " +/- " << fLightLevelSigmaError[tel][i] << endl;
 	    }
@@ -416,7 +447,11 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 	    cout << "ERROR: Fit of the peaks did not converge for telescope " << tel+1 << "!" << endl;
 	    resetLightLevels(tel);
 	} 
+    	if(fit) fit->Delete();
     }
+    h2->Delete();
+    iline->Delete();
+  
     delete s;
 }
 	
@@ -493,6 +528,7 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 		for(int iChan=fChan_start; iChan<fChan_stop; iChan++) {
 			for(int hilo=0; hilo<2; hilo++) {
 				fN[tel][iChan][hilo].assign( fNLightLevels[tel], 0);
+				fNSat[tel][iChan][hilo].assign( fNLightLevels[tel], 0);
 				fY[tel][iChan][hilo].assign( fNLightLevels[tel], 0);
 				fY2[tel][iChan][hilo].assign( fNLightLevels[tel], 0);
 				
@@ -500,13 +536,15 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 		}//chan
 	}//tel
 
-	for(int ientry=0; ientry<fDsttree->GetEntries(); ientry++) {
+	for(unsigned int ientry=fMinDSTEvent; ientry<fDsttree->GetEntries() && ientry<fMaxDSTEvent ; ientry++) {
 
 		fDsttree->GetEntry(ientry);
 
 		for(int tel=0; tel<fNTel; tel++) {
+		
+			fTree_tel=tel+1;
 
-			if( fNLightLevels[tel] == 0 ) continue;	//don't bother if there are no light levels.
+			//if( fNLightLevels[tel] == 0 ) continue;	//don't bother if there are no light levels.
 
 			double qmon = calcMonitorCharge(tel);
 			int level=-1;
@@ -555,17 +593,19 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 	//todo test this			if( fabs( sumfirst[tel][iChan] - start[ HiLo[tel][iChan] ] ) > 2*start2[ HiLo[tel][iChan] ] ) continue; 				
 
 				if( level > -1 ) {
-					fN [tel][iChan][ HiLo[tel][iChan] ][level]++;
-					fY [tel][iChan][ HiLo[tel][iChan] ][level]+=sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0);
-					fY2[tel][iChan][ HiLo[tel][iChan] ][level]+=TMath::Power( sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) , 2) ;
+					fN   [tel][iChan][ HiLo[tel][iChan] ][level]++;
+					fNSat[tel][iChan][ HiLo[tel][iChan] ][level]+=( RawMax[tel][iChan]==255 ? 1 : 0 );
+					fY   [tel][iChan][ HiLo[tel][iChan] ][level]+=sum2[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0);
+					fY2  [tel][iChan][ HiLo[tel][iChan] ][level]+=TMath::Power( sum2[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) , 2) ;
 				}
 				if( isDebugChannel( iChan ) ) {
 					fTree_eventNumber=eventNumber;
 					fTree_Channel=iChan;
 					fTree_level=level;
 					fTree_hilo=HiLo[tel][iChan];
-					fTree_Q=sum[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) ;
+					fTree_Q=sum2[tel][iChan] / ( HiLo[tel][iChan] ? fLMult[tel] : 1.0) ;
 					fTree_QMon=qmon;
+					fTree_RawMax=RawMax[tel][iChan];
 					if( level>-1 ) fTree_QMonMean=fLightLevelMean[tel][level];
 					else fTree_QMonMean=-1;
 					fDebugtree[tel]->Fill();
@@ -595,6 +635,13 @@ bool VLowGainCalibrator::calculateMeanCharges() {
 bool VLowGainCalibrator::doTheFit() {
 
 	for(int tel=0; tel<fNTel; tel++) {
+
+		int nGood[3] = { 0, 0, 0 };
+		int nBad[3] = { 0, 0, 0 };
+
+
+		fTree_tel=tel+1;	
+
 		for(int iChan=fChan_start; iChan<fChan_stop; iChan++) {
 
 		fTree_Channel=iChan;	
@@ -607,7 +654,11 @@ bool VLowGainCalibrator::doTheFit() {
 				TF1 * f = new TF1 ("f", "[0]*x", 0, 1000);
 				int N=0;
 				for(unsigned int i=0; i<fNLightLevels[tel]; i++) {
-					if(fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] > 0  &&  (double)fN[tel][iChan][hilo][i] / ( fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] ) > fFitPure_min ) { 
+					if( fN[tel][iChan][hilo][i] > fFitNEvents_min 									//min number events
+						&&  (double)fN[tel][iChan][hilo][i] / ( fN[tel][iChan][0][i]+ fN[tel][iChan][1][i] ) > fFitPure_min	//min purity
+						&&  (double)fNSat[tel][iChan][hilo][i] / fN[tel][iChan][hilo][i] < fFitRSat_max				//max saturation
+					 ) {
+ 						
 						t->SetPoint(N, fLightLevelMean[tel][i], fY[tel][iChan][hilo][i] );
 						double eX, eY;
 						eX= fLightLevelSigma[tel][i];
@@ -618,7 +669,8 @@ bool VLowGainCalibrator::doTheFit() {
 				}// light levels
 				if( N < fFitNPoints_min ) {
 					if( fDEBUG ) {
-						cout << "Warning: Less than " << fFitNPoints_min << " point for Tel " << tel+1 << ", channel " << iChan  << " " << hilo << ", not fitting." << endl; 
+						cout << "Warning: Less than " << fFitNPoints_min << " point" << (fFitNPoints_min==1 ? "": "s" ) << " for Tel " << tel+1 << ", channel " << iChan  << " " << hilo ;
+						cout << ", not fitting." << endl; 
 					}
 					fTree_status[hilo] = NO_POINTS;
 					fTree_m[hilo] = -1;
@@ -634,7 +686,7 @@ bool VLowGainCalibrator::doTheFit() {
 					t->Fit(f, opt.Data() );
 
 					if (fDEBUG || isDebugChannel(iChan) ) { 
-						fOutfile[tel]->cd();
+						fDebugfile[tel]->cd();
 						t->Write();
 							
 					}
@@ -652,14 +704,28 @@ bool VLowGainCalibrator::doTheFit() {
 					//else if( TMath::Abs( b ) / berr  > fFitB_max ) fTree_status[hilo] = NOT_PROPORTIONAL;
 					else fTree_status[hilo] = GOOD;
 
+
 				}
 				f->Delete();
 				t->Delete();
 			
 			}//hilo
-	
+
+			if(fTree_status[0]==GOOD) nGood[0]++;
+			else nBad[0]++; 	
+		
+			if(fTree_status[1]==GOOD) nGood[1]++;
+			else nBad[1]++; 	
+		
+			if(fTree_status[0]==GOOD && fTree_status[1]==GOOD) nGood[2]++;
+			else nBad[2]++; 	
+		
 			fOuttree[tel]->Fill();
 		}//chan
+		
+		TString out=TString::Format("RUN %d T%d good/bad: %3d/%3d high,  %3d/%3d low,  %3d/%3d total." , fRun, tel+1, nGood[0], nBad[0],  nGood[1], nBad[1],  nGood[2], nBad[2] );   
+		cout << out << endl;
+
 	}//tel
 
 	return true;
@@ -667,10 +733,20 @@ bool VLowGainCalibrator::doTheFit() {
 
 bool VLowGainCalibrator::terminate( ) {
 	for(int tel=0; tel<fNTel; tel++) {
-		fOutfile[tel]->cd();
-		fOuttree[tel]->Write();
-		if(fDebugtree[tel] && fDebugtree[tel]->GetEntries() > 0 ) fDebugtree[tel]->Write();
-		fOutfile[tel]->Close();
+
+		if(fOutfile[tel]){
+			fOutfile[tel]->cd();
+			if(fOuttree[tel]) fOuttree[tel]->Write();
+		}
+
+		if( fDebugfile[tel] ) {
+			fDebugfile[tel]->cd();
+			if(fDebugtree[tel] && fDebugtree[tel]->GetEntries() > 0 ) fDebugtree[tel]->Write();
+			if(fOuttree[tel]) fOuttree[tel]->Write();
+		}
+
+		if(fOutfile[tel]) fOutfile[tel]->Close();
+		if( fDebugfile[tel] ) fDebugfile[tel]->Close();
 	}
 	return true;
 }
@@ -685,14 +761,6 @@ bool VLowGainCalibrator::isNewPixel( int tel, int iChan) {
 	return false;
 }
 
-
-bool VLowGainCalibrator::fIsOk() {
-	for(int tel=0; tel<fNTel; tel++) {
-		if( !fDsttree ) return false;	
-		if( !fOutfile[tel] ) return false; 
-	}
-	return true;
-}
 
 
 

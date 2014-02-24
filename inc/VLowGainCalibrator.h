@@ -59,8 +59,10 @@ class VLowGainCalibrator {
 
 	double fFitPure_min;		//min. purity of a light level to be considered for the fit. Eg 0.8 -> 80% of events have to be in high gain/low gain.
 	double fFitNPoints_min;		//min. number of points for the fit (high/low is fitted separately)
+	double fFitRSat_max;		//max. ratio of saturated high gain pixels in level.
 	double fFitProb_min;		//min. fit probability assuming chi2 distribution.
 	double fFitB_max;		//max of abs. value of b (if fitting a*x+b, not used currently).
+	double fFitNEvents_min;		//min number of events in one level to make a data point for the fit.
 
 	TH1D * fMonitorChargeHist[fNTel];	
 	unsigned int fNLightLevels[fNTel];
@@ -71,6 +73,7 @@ class VLowGainCalibrator {
 	vector<double> fLightLevelSigmaError[fNTel];
 
 	vector<int> fN[fNTel][fNPix][2];	//number of entries per level, per tel, per pixel, per high/low gain.
+	vector<int> fNSat[fNTel][fNPix][2];	//number of saturated traces per level, per tel, per pixel, per high/low gain.
 	
 	vector<double> fX[fNTel][fNPix][2];
 	vector<double> fY[fNTel][fNPix][2];	
@@ -83,6 +86,8 @@ class VLowGainCalibrator {
 
 
 	TFile * fOutfile[fNTel];
+	TFile * fDebugfile[fNTel];
+
 	TFile * fInfile;
 
 	TTree * fOuttree[fNTel];
@@ -100,6 +105,9 @@ class VLowGainCalibrator {
 	int fTree_level;
 	double fTree_Q;
 	int fTree_hilo;
+	int fTree_RawMax;
+	int fTree_tel;
+	int fTree_run;
 	
 	vector<double> fLMult;
 	vector<int> fDebugChannels;
@@ -114,22 +122,28 @@ class VLowGainCalibrator {
 	UShort_t HiLo[4][2900];
 	UShort_t sumwindow[4][2900];
 	UShort_t dead[4][2900];
+	Short_t RawMax[4][2900];
 
 	double calcMonitorCharge(int tel, int ientry=-1);
 	double calcMeanMonitorCharge(int tel , int ientry=-1);
 	double calcMedianMonitorCharge(int tel , int ientry=-1);
 
+	bool fIsOk;
+
+	unsigned int fMinDSTEvent;
+	unsigned int fMaxDSTEvent;
+
+  
 //	public:
-	VLowGainCalibrator(int run, int sw, bool isInnerHigh, TString dir= "./"); 
+	VLowGainCalibrator(int run, int sw, bool isInnerHigh, TString dir= "./", TString outdir=""); 
 	~VLowGainCalibrator();
 
 	void setDebug( bool debug=true ) { fDEBUG = debug ; }  
 	void resetLightLevels( );
 	void resetLightLevels( int tel);
 	void setMonitorChargeOptions( int nLive_min=100, double sum_min=-100, bool useMedian=true, double width=2) ;
-	void setFitOptions( int n_min=2, double pure_min=0.8, double prob_min=0.01, double b_max=2.0 );
-	bool fIsOk();
-  
+	void setFitOptions( int n_min=2, double pure_min=0.8, double sat_max=0.8, double nevents_min=0, double prob_min=0.01, double b_max=2.0 );
+
 	bool makeMonitorChargeHists( );
 	int  checkLightLevels( int tel, bool iDraw=false );
 	bool calculateMeanCharges();
@@ -147,6 +161,7 @@ class VLowGainCalibrator {
 	bool isDebugChannel(int channel )			{ return std::find( fDebugChannels.begin(), fDebugChannels.end(), channel ) != fDebugChannels.end(); }   
 	ClassDef(VLowGainCalibrator,3);
 
+	void setDSTEventLimits( unsigned int a, unsigned int b) { fMinDSTEvent=a;  fMaxDSTEvent=b; }
 
 };
 
