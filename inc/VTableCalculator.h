@@ -72,7 +72,6 @@ class VTableCalculator
         bool fEnergy;                             //!< true if tables are used for energy calculation
 	int  fUseMedianEnergy;
 
-        bool fFill1DHistograms;
         bool fFillMedianApproximations;
         vector< vector< TH1F* > > Oh;
         vector< vector< VMedianCalculator* > > OMedian;
