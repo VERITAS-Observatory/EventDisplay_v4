@@ -6,7 +6,7 @@
 
 if [ ! -n "$1" ] && [ ! -n "$2" ] && [ ! -n "$3" ] && [ ! -n "$4" ]
 then
-   echo "./CTA.getAliasesFromGrid.sh <run list> <target directory> <glite command (0=no/1=yes)> <output list file directory>"
+   echo "./CTA.getAliasesFromGrid.sh <run list> <data directory> <glite command (0=no/1=yes)> <output list file directory>"
    echo
    exit
 fi
