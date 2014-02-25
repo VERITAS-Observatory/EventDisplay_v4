@@ -24,8 +24,9 @@ RUN="$2"
 #####################################
 # qsub options
 #   _M_ = -; _X_ = " "
-QSUBOPT="_M_P_X_cta_high"
+QSUBOPT=""
 QSUBOPT="_M_P_X_cta_high_X__M_js_X_10000"
+QSUBOPT="_M_P_X_cta_high"
 
 #####################################
 # output directory for script parameter files
@@ -37,8 +38,11 @@ mkdir -p $PDIR
 if [[ $P2 == "S" ]]
 then
    SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
-   SITE=( "prod2-LeoncitoPP-TIMEIN-NS" )
    ARRAY="subArray.2a.list"
+   SITE=( "prod2-Aar-40deg-NS" )
+   SITE=( "prod2-Leoncito-40deg-NS" )
+   SITE=( "prod2-LeoncitoPP-NS" )
+   ARRAY="subArray.2S-sub.lis"
 elif [[ $P2 == "N" ]]
 then
    SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
@@ -76,16 +80,16 @@ NIMAGESMIN="2"
 
 #####################################
 # observing time [h]
-OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "50h" )
+OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
 
 
 #####################################
 # analysis dates and table dates
 DATE="d20131229"
 TDATE="d20131229"
-DATE="d20140105"
+DATE="d20140218"
 TDATE="d20140105"
 
 #####################################
@@ -131,6 +135,7 @@ do
       do
 	  N=${PARTICLE[$i]}
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/$S.$N"_20deg".list
+#	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".grid.list
 
           ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $QSUBOPT $TRG
        done
@@ -157,7 +162,7 @@ do
 	  ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TABLE $ID $ARRAY $S $MSCWSUBDIRECTORY onSource $QSUBOPT
 	  TABLE="tables_CTA-$S-ID$ID-$TDATE"
 	  echo $TABLE
-#	  ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TABLE $ID $ARRAY $S $MSCWSUBDIRECTORY cone $QSUBOPT
+	  ./CTA.MSCW_ENERGY.sub_analyse_MC.sh $TABLE $ID $ARRAY $S $MSCWSUBDIRECTORY cone $QSUBOPT
 	  continue
         fi
 
@@ -193,7 +198,7 @@ do
 	  then
 	    echo "$AZ " 
 	     ./CTA.TMVA.sub_train.sh $ARRAY onSource $S $PARA $QSUBOPT $AZ
-#	     ./CTA.TMVA.sub_train.sh $ARRAY cone $S $PARA $QSUBOPT $AZ
+	     ./CTA.TMVA.sub_train.sh $ARRAY cone $S $PARA $QSUBOPT $AZ
 ##########################################
 # IRFs: angular resolution
 	  elif [[ $RUN == "ANGRES" ]]
@@ -213,12 +218,12 @@ do
 # IRFs: effective areas after gamma/hadron cuts
 	  elif [[ $RUN == "CUTS" ]]
 	  then
-	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.V2.$DATE $S 0 $QSUBOPT $AZ
+	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.T1.$DATE $S 0 $QSUBOPT $AZ
 ##########################################
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.V2.$DATE $OOTIME DESY.$DATE.Erec$EREC.V3.ID$ID$AZ$NTYPF.$S 0 $ID $S $QSUBOPT
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.T1.$DATE $OOTIME DESY.$DATE.Erec$EREC.T1.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then

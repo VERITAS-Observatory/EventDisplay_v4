@@ -392,17 +392,17 @@ do
 # spectral index & CR spectra
       if [ $PART = "proton" ] || [ $PART = "proton_onSource" ]
       then
-         echo "* ENERGYSPECTRUMINDEX  1 2.6 0.1" >> $MSCF
+         echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
          echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 0" >> $MSCF
       fi
       if [ $PART = "helium" ] 
       then
-         echo "* ENERGYSPECTRUMINDEX  1 2.6 0.1" >> $MSCF
+         echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
          echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 1" >> $MSCF
       fi
       if [ $PART = "electron" ] || [ $PART = "electron_onSource" ]
       then
-         echo "* ENERGYSPECTRUMINDEX  1 3.0 0.1" >> $MSCF
+         echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
          echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 8" >> $MSCF
       fi
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
