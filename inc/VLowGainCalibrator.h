@@ -136,7 +136,7 @@ class VLowGainCalibrator {
   
 //	public:
 	VLowGainCalibrator(int run, int sw, bool isInnerHigh, TString dir= "./", TString outdir=""); 
-	~VLowGainCalibrator();
+	virtual ~VLowGainCalibrator();
 
 	void setDebug( bool debug=true ) { fDEBUG = debug ; }  
 	void resetLightLevels( );
