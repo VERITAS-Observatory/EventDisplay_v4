@@ -18,6 +18,22 @@
 
 using namespace std;
 
+bool readRunParameter( TFile *fIn, string iPara )
+{
+    if( !fIn ) return false;
+
+    VEvndispRunParameter *fPar = 0;
+
+    fPar = (VEvndispRunParameter*)fIn->Get( "runparameterV2" );
+    if( !fPar ) fPar = (VEvndispRunParameter*)fIn->Get( "runparameterDST" );
+    if( !fPar ) return false;
+
+    if( iPara == "-mcsourcefile" ) cout << fPar->fsourcefile << endl;
+
+    return true;
+}
+
+
 bool readMCParameter( TFile *fIn, string iPara )
 {
     if( !fIn ) return false;
@@ -47,8 +63,9 @@ int main( int argc, char *argv[] )
         cout << "print run parameters stored in eventdisplay or mscw_energy file" << endl;
 	cout << endl;
 	cout << "   options: " << endl;
-	cout << "      -mcaz      print MC azimuth angle" << endl;
-        cout << "      -runnumber print MC run number" << endl;
+	cout << "      -mcaz         print MC azimuth angle" << endl;
+        cout << "      -runnumber    print MC run number" << endl;
+        cout << "      -mcsourcefile print source file name" << endl;
         cout << endl;
         exit( 0 );
     }
@@ -58,7 +75,7 @@ int main( int argc, char *argv[] )
     {
         fOption = argv[2];
     }
-    if( fOption != "-mcaz" && fOption != "-runnumber" )
+    if( fOption != "-mcaz" && fOption != "-runnumber" && fOption != "-mcsourcefile" )
     {
        cout << endl;
        cout << "printRunParameter " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
@@ -76,7 +93,14 @@ int main( int argc, char *argv[] )
 
     if( fOption.size() > 0 )  
     {
-       readMCParameter( fIn, fOption );
+       if( fOption == "-mcaz" || fOption == "-runnumber" )
+       {
+           readMCParameter( fIn, fOption );
+       }
+       else
+       {
+           readRunParameter( fIn, fOption );
+       }
        exit( 0 );
     }
 
