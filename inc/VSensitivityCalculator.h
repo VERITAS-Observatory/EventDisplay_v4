@@ -225,7 +225,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         double     getMonteCarloRateFromWeightedRateHistogram( double iE_low, double iE_up, bool iRateError, TH1D *iWeightedRateHistogram );
                                          
 
-	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit, double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin );
+	TGraphAsymmErrors* getSensitivityGraphFromWPPhysFile( string bUnit, double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin, double dE_Log10 );
         void       plot_guidingLines( double x, TGraph *g, bool iHours );
         void       plotEffectiveArea();
 	void       plotDebugPlotsBackgroundParticleNumbers( vector< VDifferentialFlux > iDifferentialFlux,
@@ -305,6 +305,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,20);
+        ClassDef(VSensitivityCalculator,21);
 };
 #endif
