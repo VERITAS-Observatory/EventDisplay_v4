@@ -1,5 +1,6 @@
 /*! \class VPlotWPPhysSensitivity
 
+
 */
 
 #include "VPlotWPPhysSensitivity.h"
@@ -483,6 +484,7 @@ void VPlotWPPhysSensitivity::printSensitivityFigureOfMerit( TGraphAsymmErrors *g
 */
 bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitivity, double iMaxSensitivity, string iUnit )
 {
+   TCanvas *cIntSens = 0;
    TCanvas *cSens = 0;
    TCanvas *cSensInter = 0;
    TCanvas *cBck = 0;
@@ -504,9 +506,15 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 	 if( iUnit == "ENERGY" )  a->setFluxRange_ENERG( iMinSensitivity, iMaxSensitivity );
 	 else if( iUnit == "CU" ) a->setFluxRange_CU( iMinSensitivity, iMaxSensitivity );
 	 TCanvas *c_temp = 0;
+	 // cSens name = cSensitivity (default from VSensitivityCalculator::fPlot_CanvasName )
 	 c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fData[i]->fPlottingColor[j], iUnit, 
 	  		                                                 0.2, fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
 	 if( c_temp ) cSens = c_temp;
+	 // cIntSens name (changing VSensitivityCalculator::fPlot_CanvasName default value) 
+	 a->setPlotCanvasName("cIntegratedSensitivity" );
+	 c_temp = a->plotIntegralSensitivityvsEnergyFromCrabSpectrum( cIntSens, "CTA-PHYS", fData[i]->fPlottingColor[j], iUnit, 
+	  		                                                  fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
+	 if( c_temp ) cIntSens = c_temp;
 	 if( z == 0 ) c_temp = a->plotSignalBackgroundRates( cBck, true, 2.e-7, 14. );   // plot also protons and electrons
 	 else         c_temp = a->plotSignalBackgroundRates( cBck, false, 2.e-7, 14. );
 	 if( c_temp ) cBck = c_temp;
@@ -541,6 +549,16 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
      }
    }
 // print results
+   if( cIntSens )
+   {
+      plotLegend( cIntSens, false );
+      if( iPrint.size() > 0 )
+      {
+	  char hname[2000];
+	  sprintf( hname, "%s-IntegratedSensitivity.eps", iPrint.c_str() );
+	  cIntSens->Print( hname );
+      }
+   }
    if( cSens )
    {
       plotLegend( cSens, false );
@@ -619,8 +637,9 @@ bool VPlotWPPhysSensitivity::plotLegend( TCanvas *c, bool iDown, bool iLeft, boo
 
 bool VPlotWPPhysSensitivity::addDataSets( string iDataSettxtFile, string iDirectionString )
 {
-   unsigned int z_site = 0;
-   for( ;; )
+    std::cout<<"VPlotWPPhysSensitivity::addDataSets "<<std::endl;
+    unsigned int z_site = 0;
+    for( ;; )
    {
        fData.push_back( new VSiteData() );
        if( !fData.back()->addDataSet( iDataSettxtFile, z_site, iDirectionString ) )

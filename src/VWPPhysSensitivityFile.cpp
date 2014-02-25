@@ -66,6 +66,25 @@ bool VWPPhysSensitivityFile::initializeHistograms( int iEnergyXaxisNbins, double
    char htitle[200];
    fOffsetCounter = iOffsetCounter;
 
+// integrated sensitivity 
+   sprintf( hname, "IntSens" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fIntSensitivity = new TH1F( hname, "Int. Sens.", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   fIntSensitivity->SetXTitle( "log_{10} (E_{th}/TeV)" );
+   fIntSensitivity->SetYTitle( "E_{th} times IntegratedFluxSensitivity(E>E_{th}) [erg cm^{-2} s^{-1}]" );
+   fIntSensitivity->Print();
+   hisList.push_back( fIntSensitivity );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fIntSensitivity );
+
+   sprintf( hname, "IntSensCU" );
+   if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
+   fIntSensitivityCU = new TH1F( hname, "Int. Sens. (CU)", iEnergyXaxisNbins, iEnergyXaxis_min, iEnergyXaxis_max );
+   fIntSensitivityCU->SetXTitle( "log_{10} (E_{th}/TeV)" );
+   fIntSensitivityCU->SetYTitle( "Integral Flux Sensitivity (E>E_{th}) [C.U.]" );
+   fIntSensitivityCU->Print();
+   hisList.push_back( fIntSensitivityCU );
+   if( fOffsetCounter == 9999 ) hisListToDisk.push_back( fIntSensitivityCU );
+
 // sensitivity and background rates
    sprintf( hname, "DiffSens" );
    if( fOffsetCounter < 9999 ) sprintf( hname, "%s_%d", hname, fOffsetCounter );
@@ -582,10 +601,18 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
     i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", 0.2, 0.01, 1.e6 );
     i_Sens.fillSensitivityHistograms( fSensitivity, fBGRate, fBGRateSqDeg, fProtRate, fProtRateSqDeg, fElecRate, fElecRateSqDeg, iHighEnergyFilling );
     if( iFill1D ) i_Sens.fillSensitivityLimitsHistograms( fSensitivityLimits );
+    // re-use i_Sens to calculate the integrated sensitivity 0.2 -> -1
+    i_Sens.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "ENERGY", -1, 0.01, 1.e6 );
+    i_Sens.fillSensitivityHistograms( fIntSensitivity);
 
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", 0.2, 0.01, 1.e6 );
     i_SensCU.fillSensitivityHistograms( fSensitivityCU, fBGRate, fBGRateSqDeg, fProtRate, fProtRateSqDeg, fElecRate, fElecRateSqDeg, iHighEnergyFilling );
     if( iFill1D ) i_SensCU.fillSensitivityLimitsHistograms( fSensitivityCULimits );
+    // re-use i_SensCU to calculate the integrated sensitivity 0.2 -> -1
+    i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", -1, 0.01, 1.e6 );
+    i_SensCU.fillSensitivityHistograms( fIntSensitivityCU);
+
+
 
     return true;
 }

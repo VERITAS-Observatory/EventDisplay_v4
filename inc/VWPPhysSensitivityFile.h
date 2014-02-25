@@ -54,6 +54,10 @@ class VWPPhysSensitivityFile
     vector< TH1F* > fSensitivityLimits;
     TH1F* fSensitivityCU;
     vector< TH1F* > fSensitivityCULimits;
+    TH1F* fIntSensitivity;
+    //vector< TH1F* > fIntSensitivityLimits;
+    TH1F* fIntSensitivityCU;
+    //vector< TH1F* > fIntSensitivityCULimits;
     TH1F* fBGRate;
     TH1F* fBGRateSqDeg;
     TH1F* fProtRate;

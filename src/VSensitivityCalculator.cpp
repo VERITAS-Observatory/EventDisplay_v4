@@ -1364,27 +1364,30 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
        }
        else
        {
-          cout << "getting integral sensitivity histograms" << endl;
+           h = get_CTA_IRF_Histograms( "IntSensE2Erg", fMCCTA_cameraoffset_deg );
+           if( !h ) h = get_CTA_IRF_Histograms( "IntSens", fMCCTA_cameraoffset_deg );
+	   cout << "getting integral sensitivity histograms" << endl;
        }
     }
     else
     {
-       if( dE_log10 > 0. )
-       {
-           h = get_CTA_IRF_Histograms( "DiffSensCU", fMCCTA_cameraoffset_deg );
-       }
-       else
-       {
-          cout << "getting integral sensitivity histograms" << endl;
-       }
+	if( dE_log10 > 0. )
+	{
+	    h = get_CTA_IRF_Histograms( "DiffSensCU", fMCCTA_cameraoffset_deg );
+	}
+	else
+	{
+	    h = get_CTA_IRF_Histograms( "IntSensCU", fMCCTA_cameraoffset_deg );
+	    cout << "getting integral sensitivity histograms" << endl;
+	}
     }
     if( h ) 
     {
-       g = new TGraphAsymmErrors( 1 );
-       get_Graph_from_Histogram( h, g, false, false, 1.e3, log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
-       setGraphPlottingStyle( g, 1, 1, 20, 2 );
+	g = new TGraphAsymmErrors( 1 );
+	get_Graph_from_Histogram( h, g, false, false, 1.e3, log10(iEnergyMin_TeV_lin), log10(iEnergyMax_TeV_lin) );
+	setGraphPlottingStyle( g, 1, 1, 20, 2 );
     }
-
+    
 // background rates
     h = 0;
     h = get_CTA_IRF_Histograms( "BGRate", fMCCTA_cameraoffset_deg );
@@ -1532,6 +1535,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     VEnergySpectrumfromLiterature i_Crab( fMC_Data[1]->fSpectralParameterFile );
     cout << "\t reading Crab Nebula spectrum with ID" <<  fMC_Data[1]->fSpectralParameterID << endl;
     if( i_Crab.isZombie() ) return a;
+    std::cout<<"VSensitivityCalcualtor::getDifferentialFluxVectorfromMC Crab "<<std::endl;
     i_Crab.listValues( fMC_Data[1]->fSpectralParameterID );
 
 ///////////////////////////////////////////////////////////////////
@@ -1747,12 +1751,13 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
    for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
    {
       if( (*i_MCData_iterator).first == 1 ) continue;   // ignore gamma rays
-
+      //std::cout<<"i_MCData_iterator "<<i_MCData_iterator<<std::endl;
 ///////////////////////////////////////////////////////////////////
 // get CR spectrum from literature
       VEnergySpectrumfromLiterature i_CR( (*i_MCData_iterator).second->fSpectralParameterFile );
       cout << "\t reading CR spectrum with ID" <<  (*i_MCData_iterator).second->fSpectralParameterID << endl;
       if( i_CR.isZombie() ) return a;
+    std::cout<<"VSensitivityCalcualtor::getDifferentialFluxVectorfromMC CR "<<std::endl;
       i_CR.listValues( (*i_MCData_iterator).second->fSpectralParameterID );
 
 // get CR rate for a certain ze, az, noise, wobble offset
