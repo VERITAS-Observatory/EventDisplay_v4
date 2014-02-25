@@ -110,7 +110,7 @@ echo "
 * ENERGYAXISBINS 60
 * AZIMUTHBINS 1
 * FILLMONTECARLOHISTOS 0
-* ENERGYSPECTRUMINDEX 20 2.0 0.1
+* ENERGYSPECTRUMINDEX 40 1.5 0.1
 * FILLMONTECARLOHISTOS 0
 * SHAPECUTINDEX 0
 * CUTFILE $LOGDIR/$FXIR-$CUTS.dat
@@ -126,7 +126,7 @@ echo "
 	 chmod u+x $FNAM.sh
 	 echo $FNAM.sh
 # submit job
-         qsub -l os=sl6 -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=10G -V -o $LDIR -e $LDIR "$FNAM.sh"
+         qsub -l os=sl6 -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=10G -V -o $LDIR -e $LDIR "$FNAM.sh"
 
 	 echo "writing run parameter file to $LOGDIR/$FFIR.dat"
 	 echo "writing analysis parameter files to $FNAM.sh"
