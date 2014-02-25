@@ -159,9 +159,10 @@ class VLowGainCalibrator {
 	void addDebugChannel( int channel )			{ fDebugChannels.push_back(channel); }
 	void setAllDebugChannels() 				{ fDebugChannels.clear(); for(int i=fChan_start; i<fChan_stop; i++) fDebugChannels.push_back(i); }
 	bool isDebugChannel(int channel )			{ return std::find( fDebugChannels.begin(), fDebugChannels.end(), channel ) != fDebugChannels.end(); }   
-	ClassDef(VLowGainCalibrator,3);
 
 	void setDSTEventLimits( unsigned int a, unsigned int b) { fMinDSTEvent=a;  fMaxDSTEvent=b; }
+
+	ClassDef(VLowGainCalibrator,4);
 
 };
 
