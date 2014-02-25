@@ -66,7 +66,7 @@ class VImageCleaning
         int   NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, float PreCut);
         void  ScaleCombFactors(int type, float scale);
         void  ResetCombFactors(int type);
-        float ImageCleaningCharge(int type, double NSBscale, int& ngroups);
+        float ImageCleaningCharge(int type, int& ngroups);
         void  cleanNNImageFixed();
         void  cleanNNImagePedvars();
         bool  InitNNImageCleaning();

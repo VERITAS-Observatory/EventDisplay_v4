@@ -23,7 +23,7 @@ VImageCleaning::VImageCleaning( VEvndispData *iData )
        kInitNNImageCleaning = InitNNImageCleaning();
     }
     nRings        = 3;
-    CoincWinLimit = 25;   // GMGM what unit is this?
+    CoincWinLimit = 8;   // GMGM what unit is this?
 }
 
 void VImageCleaning::printDataError( string iFunctionName )
@@ -187,10 +187,11 @@ int VImageCleaning::LocMin(int n, float *ptr, float &min) //ptr[i]>0
  */
 bool VImageCleaning::InitNNImageCleaning()
 {
+    /*
     TFile* fDSTfile=new TFile( fData->getRunParameter()->fsourcefile.c_str() );
     if( !fDSTfile->IsZombie() )
     {
-// GMGM is this trigsim only?
+// GMGM is this trigsim only?  yes
         TTree* fDST_triggerHeader=(TTree*)fDSTfile->Get( "RunHeader" );
         if( fDST_triggerHeader)
         {
@@ -204,17 +205,26 @@ bool VImageCleaning::InitNNImageCleaning()
 
             float  fElecTypeHeader[ElecHeaderDim*NumOfTelTypes];
             fDST_triggerHeader->SetBranchAddress("ElecTypeHeader",fElecTypeHeader);
+            float  fFlashCamElecTypeHeader[ElecHeaderDim*NumOfTelTypes];
+            fDST_triggerHeader->SetBranchAddress("FlashCamElecTypeHeader",fFlashCamElecTypeHeader);
             fDST_triggerHeader->GetEntry(0);
             for(int t=0;t<NumOfTelTypes;t++){
                 fData->getRunParameter()->fFWHMtrigger[t]=fElecTypeHeader[t*ElecHeaderDim+3];
                 fData->getRunParameter()->fFWHMdata[t]=fElecTypeHeader[t*ElecHeaderDim+15];
                 fData->getRunParameter()->fFADCsampleRate[t]=fElecTypeHeader[t*ElecHeaderDim+13];
-                cout<<" TelType:"<<t<<" TrigFWHM:"<<fData->getRunParameter()->fFWHMtrigger[t]<<" DataFWHM:"<<fData->getRunParameter()->fFWHMdata[t]<<
-                    " SampleRate:"<<fData->getRunParameter()->fFADCsampleRate[t]<<" [phe/fadc]:"<<fData->getRunParameter()->fFADCtoPhe[t]<<endl;
+                if(fData->getRunParameter()->fPerformFlashCamAnalysis[t])
+                {
+                    fData->getRunParameter()->fFWHMtrigger[t]=fFlashCamElecTypeHeader[t*ElecHeaderDim+3];
+                    fData->getRunParameter()->fFWHMdata[t]=fFlashCamElecTypeHeader[t*ElecHeaderDim+15];
+                    fData->getRunParameter()->fFADCsampleRate[t]=fFlashCamElecTypeHeader[t*ElecHeaderDim+13];
+                }
+                cout<<" TelType:"<<t<<" TrigFWHM:"<<fData->getRunParameter()->fFWHMtrigger[t]<<"[ns]  DataFWHM:"<<fData->getRunParameter()->fFWHMdata[t]<<
+                    "[ns]  SampleRate:"<<fData->getRunParameter()->fFADCsampleRate[t]<<"[GHz] "<<endl;
             }
         }
         fDSTfile->Close();
     }
+    */
     TString refIPR, MSTrefIPR, SSTrefIPR;
     TString prefixProd2="";
 #ifdef CTA_PROD2
@@ -259,7 +269,7 @@ bool VImageCleaning::InitNNImageCleaning()
         fProb3nnrelCurves->AddAt(RateContour(t,"ProbCurve3nnrel",fMinRate,3,CombFactor[2],0,ChargeMax),t);
         fProb2plus1Curves->AddAt(RateContour(t,"ProbCurve2plus1",fMinRate,3,CombFactor[1],0,ChargeMax),t);
         fProb2nnCurves->AddAt(RateContour(t,"ProbCurve2nn",fMinRate,2,CombFactor[3],0,ChargeMax),t);
-        fProbBoundCurves->AddAt(RateContourBound(t,"ProbCurveBound",fMinRate,4.0*std::pow(0.6,0.3333)/std::pow(fNSBscale,0.3333),CombFactor[4],0,ChargeMax),t);
+        fProbBoundCurves->AddAt(RateContourBound(t,"ProbCurveBound",fMinRate,4.0,CombFactor[4],0,ChargeMax),t);
         fFADCsampleRate[t]=fData->getRunParameter()->fFADCsampleRate[t];
         if(fFADCtoPhe[t]<0.) fFADCtoPhe[t]=1;  // working in FADC counts directly
         //fFADCtoPhe[t]=fData->getRunParameter()->fFADCtoPhe[t];
@@ -575,10 +585,10 @@ int VImageCleaning::NNGroupSearchProbCurveRelaxed(int type, TF1* fProbCurve, flo
                             pix4=testpixnum;
                             float groupsize=INTENSITY[pix1]+INTENSITY[pix2]+INTENSITY[pix3]+INTENSITY[pix4];
                             if(groupsize>PreCut*4.*1.5){
-                                VALIDITYBUF[pix1]=6;
-                                VALIDITYBUF[pix2]=6;
-                                VALIDITYBUF[pix3]=6;
-                                VALIDITYBUF[pix4]=6;
+                                if(VALIDITYBUF[pix1]<5.9) VALIDITYBUF[pix1]=6;
+                                if(VALIDITYBUF[pix2]<5.9) VALIDITYBUF[pix2]=6;
+                                if(VALIDITYBUF[pix3]<5.9) VALIDITYBUF[pix3]=6;
+                                if(VALIDITYBUF[pix4]<5.9) VALIDITYBUF[pix4]=6;
                             }
                             //cout<<"group size:"<<groupsize<<endl;
                         }
@@ -659,11 +669,12 @@ void VImageCleaning::DiscardTimeOutlayers(int type)
  *
  *
  */
-float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroups)
+float VImageCleaning::ImageCleaningCharge(int type, int& ngroups)
 {
     unsigned int numpix=fData->getDetectorGeo()->getNumChannels();
     float corr=1.;
-    float PreThresh[5]={2.0/corr,3.0/corr,2.8/corr, 5.2/corr,1.8/corr};   // GMGM what is 2.0,2.0,....? Why 5 elements in array? 5 teltypes?
+    //                 [p.e.]4nn   2+1      3nn       2nn      Bound.   Bound Ref Charge
+    float PreThresh[6]={2.0/corr,3.0/corr,2.8/corr, 5.2/corr,1.8/corr, 4.0/corr};
 // GMGM hardcoded number of telescope type, why is this not an array?
     if(type==1)FillPreThresholds(gIPR, PreThresh);
     if(type==2)FillPreThresholds(gIPR2, PreThresh);
@@ -676,16 +687,16 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
     ResetCombFactors(type);
     for ( unsigned int p=0;p<numpix; p++)
     {
-        if(INTENSITY[p]>PreThresh[4]*sqrt(NSBscale)/sqrt(0.6)) { VALIDITY[p]=1; VALIDITYBUF[p]=1;  } // GMGM why here and in the following sqrt(0.6)?
+        if(INTENSITY[p]>PreThresh[4]) { VALIDITY[p]=1; VALIDITYBUF[p]=1;  } // GMGM why here and in the following sqrt(0.6)?
         else               { VALIDITY[p]=-1; VALIDITYBUF[p]=-1;}
     }
 
     //*************** Image Cleaning ******************************************************************************************
-    ngroups=NNGroupSearchProbCurve(type,(TF1*)fProb2nnCurves->At(type), PreThresh[3]*sqrt(NSBscale)/sqrt(0.6));            for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==2) VALIDITY[p]=2; }
-    ngroups+=NNGroupSearchProbCurve(type,(TF1*)fProb2plus1Curves->At(type), PreThresh[1]*sqrt(NSBscale)/sqrt(0.6));        for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==3 ||VALIDITYBOUND[p]==3) VALIDITY[p]=3; }
-    ngroups+=NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb3nnrelCurves->At(type), PreThresh[2]*sqrt(NSBscale)/sqrt(0.6)); for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==5) VALIDITY[p]=5; }
-    ngroups+=NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]*sqrt(NSBscale)/sqrt(0.6));    for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==6) VALIDITY[p]=6; }
-    //ngroups+=NNGroupSearchProbCurve(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]*sqrt(NSBscale)/sqrt(0.6));           for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==4) VALIDITY[p]=4; }
+    ngroups=NNGroupSearchProbCurve(type,(TF1*)fProb2nnCurves->At(type), PreThresh[3]);            for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==2) VALIDITY[p]=2; }
+    ngroups+=NNGroupSearchProbCurve(type,(TF1*)fProb2plus1Curves->At(type), PreThresh[1]);        for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==3 ||VALIDITYBOUND[p]==3) VALIDITY[p]=3; }
+    ngroups+=NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb3nnrelCurves->At(type), PreThresh[2]); for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==5) VALIDITY[p]=5; }
+    ngroups+=NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]);    for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==6) VALIDITY[p]=6; }
+    //ngroups+=NNGroupSearchProbCurve(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]);           for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==4) VALIDITY[p]=4; }
  // GMGM don't understund PreThresh[..] index
     // *********************************************************************
     //*********************************************************************
@@ -736,16 +747,16 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
     if(ngroups>0)
     {
         ScaleCombFactors(type,float(nboundsearchpix)/(numpix*1.5));
-        NNGroupSearchProbCurve(type,(TF1*)fProb2nnCurves->At(type), 0.8*PreThresh[3]*sqrt(NSBscale)/sqrt(0.6)); // GMGM why are thresholds scaled by 0.8 or 0.9?
+        NNGroupSearchProbCurve(type,(TF1*)fProb2nnCurves->At(type), 0.8*PreThresh[3]); // GMGM why are thresholds scaled by 0.8 or 0.9?
         for(unsigned int p=0;p<numpix;p++){if(VALIDITY[p]>1.9) continue; if(VALIDITYBUF[p]==2) VALIDITY[p]=2; }
 
-        NNGroupSearchProbCurve(type,(TF1*)fProb2plus1Curves->At(type), 0.8*PreThresh[1]*sqrt(NSBscale)/sqrt(0.6));
+        NNGroupSearchProbCurve(type,(TF1*)fProb2plus1Curves->At(type), 0.8*PreThresh[1]);
         for(unsigned int p=0;p<numpix;p++){if(VALIDITY[p]>1.9) continue;if(VALIDITYBUF[p]==3 ||VALIDITYBOUND[p]==3) VALIDITY[p]=3; }
 
-        NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb3nnrelCurves->At(type),0.8* PreThresh[2]*sqrt(NSBscale)/sqrt(0.6));
+        NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb3nnrelCurves->At(type),0.8*PreThresh[2]);
         for(unsigned int p=0;p<numpix;p++){if(VALIDITY[p]>1.9) continue;if(VALIDITYBUF[p]==5) VALIDITY[p]=5; }
 
-        NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb4nnCurves->At(type), 0.9*PreThresh[0]*sqrt(NSBscale)/sqrt(0.6));
+        NNGroupSearchProbCurveRelaxed(type,(TF1*)fProb4nnCurves->At(type), 0.9*PreThresh[0]);
         for(unsigned int p=0;p<numpix;p++){if(VALIDITY[p]>1.9) continue;if(VALIDITYBUF[p]==6) VALIDITY[p]=6; }
         ResetCombFactors(type);
     }
@@ -785,20 +796,25 @@ float VImageCleaning::ImageCleaningCharge(int type, double NSBscale, int& ngroup
                 }
             }
             if(n>0.5){
-                if(INTENSITY[idx]<PreThresh[4]*sqrt(NSBscale)/sqrt(0.6)) continue;
+                if(INTENSITY[idx]<PreThresh[4]) continue;
                 TIMESReSearch[idx]=time/float(n);
                 float dT=fabs(TIMES[idx]-TIMESReSearch[idx]);
+                fProbCurveBound->SetParameter(1,PreThresh[5]);
                 float charges[2]={INTENSITY[idx],fProbCurveBound->GetParameter(1)}; float refth=0.; LocMin(2,charges,refth);
 
                 fProbCurveBound->SetParameter(2,2.*(1.+ncorepix*(iRing)*pow(double(iRing+1),2.)));
-                if(dT<7.&& dT<fProbCurveBound->Eval(refth)){
+                if(dT<0.6*CoincWinLimit && dT<fProbCurveBound->Eval(refth)){
                     VALIDITY[idx]=iRing+7;
                     //cout<<"pix:"<<idx<<" dt:"<<dT<<" Intensity:"<<INTENSITY[idx]<<" refth:"<<refth<<" Eval:"<<fProbCurveBound->Eval(refth)<<endl;
                 }
             }
         }
     } // loop over rings
-    if(ncorepix>4) {DiscardIsolatedPixels(type); DiscardTimeOutlayers(type);}
+    if(ncorepix>4) {
+        // order is important
+        DiscardTimeOutlayers(type);
+        DiscardIsolatedPixels(type);
+    }
     
 
     for(unsigned int p=0;p<numpix;p++)
@@ -849,12 +865,12 @@ void VImageCleaning::cleanNNImageFixed()
     //measure IPR
     float FADCslice=fData->getDetectorGeo()->getLengthOfSampleTimeSlice(fData->getTelID());
     unsigned int nsamples=fData->getNSamples(fData->getTelID());
-    float ScanWindow=float(nsamples-30)*FADCslice; //ns                      // GMGM what is 30?
-//    CalcSliceRMS();
+    float ScanWindow=float(0.5*nsamples)*FADCslice; //ns    half of long FADC trace is used for signal extraction in VTraceHandler (long trace files should ve used for IPR determination)
     if(fData->getRunParameter()->fTraceIntegrationMethod[fData->getTelID()] == 4)
     {
+        int EventCntLimit=400000;  // statistics needed to get IPRs with good quality up to ~40 phe threshold
         FillIPR(type);
-        if(IPR[type][0]>=400000.){GetIPRGraph(type,ScanWindow);}           // GMGM what is 400000.?
+        if(IPR[type][0]>=EventCntLimit){GetIPRGraph(type,ScanWindow);}
     }
 //prepare for image cleaning
     for ( unsigned int i=0; i < i_nchannel; i++)
@@ -868,7 +884,7 @@ void VImageCleaning::cleanNNImageFixed()
             TIMES[i]=fData->getTraceAverageTime()[i]*FADCslice; if(TIMES[i]<1.5) {INTENSITY[i]=0;}
         }
     }
-    sizecheck = ImageCleaningCharge(type, fNSBscale, ngroups);
+    sizecheck = ImageCleaningCharge(type, ngroups);
     //set pixel's flags
     unsigned int ncorepix=0;
 //    unsigned int nimagepix=0;
@@ -889,7 +905,6 @@ void VImageCleaning::cleanNNImageFixed()
             fData->setBorder( i, false);
             if( fData->getDetectorGeo()->getAnaPixel()[i] > 0 && !fData->getDead(fData->getHiLo()[i])[i] )
             {
-// GM check with Maxim
                 if(VALIDITY[i]>1.9&&VALIDITY[i]<6.1) {fData->setImage( i, true ); ncorepix++;}
                 if(VALIDITY[i]>6.1) fData->setBorder( i, true );
                 //if(VALIDITY[i]>1.9&&INTENSITY[i]>BorderEdge) {fData->setImage( i, true ); ncorepix++;}
@@ -939,18 +954,23 @@ void VImageCleaning::cleanNNImagePedvars()
 void VImageCleaning::FillPreThresholds(TGraph* gipr, float NNthresh[5])
 {
     // assuming monotonous ipr curve (as it should be)
-    float ThreshFreq[5]={8.5E6,2.4E6,3.2E6,1.0E5,1.1E7};
-//    float iprres=gipr->GetXaxis()->GetXmax()-gipr->GetXaxis()->GetXmin()/float(gipr->GetN());
-    for(int i=0;i<5;i++)
+    //                    4nn   2+1   3nn   2nn   bound  ref for bound
+    //float ThreshFreq[6]={8.5E6,2.4E6,4.2E6,1.01E5,1.1E7,8.555E5};
+    float ThreshFreq[6]={8.5E6,2.4E6,4.2E6,1.01E5,1.1E7,4.0E5};
+    float gXres=(gipr->GetXaxis()->GetXmax()-gipr->GetXaxis()->GetXmin())/gipr->GetN();
+    for(int i=0;i<6;i++)
     {
-        for(int t=0;t<5.*gipr->GetN();t++){
-            float val=gipr->Eval(float(t)/5.);
-            if(val<ThreshFreq[i]) {NNthresh[i]=float(t)/5.; break;}
+        for(int t=0;t<gipr->GetN();t++){
+            float x=gipr->GetXaxis()->GetXmin() + gXres*(float(t));
+            float val=gipr->Eval(x);
+            if(val<=ThreshFreq[i]) {NNthresh[i]=x;  break;}
         }
     }
-    for(int i=0;i<5;i++){
-        //std::cout<<"thresh:"<<NNthresh[i]<<" phe( approx. valid for Prod2 LST):"<<NNthresh[i]/33.<<std::endl;
+    if(NNthresh[4]<0.001){NNthresh[4]=0.85*NNthresh[0];} //pre-threshold for boundary, if not set by IPR curve scanning
+    for(int i=0;i<6;i++){
+       // std::cout<<"thresh:"<<NNthresh[i]<<" phe( approx. valid for Prod2 LST):"<<NNthresh[i]/33.<<std::endl;
     }
+
 }
 
 void VImageCleaning::CalcSliceRMS()  //TEMP
