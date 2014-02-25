@@ -117,6 +117,7 @@ class VTableLookupDataHandler
         ULong64_t fTel_type[VDST_MAXTELESCOPES];
 	map<ULong64_t, unsigned int > fList_of_Tel_type;
 	map<ULong64_t, unsigned int >::iterator fList_of_Tel_type_iterator;
+        vector< unsigned int > fTel_type_counter;
 // telescope pointing
         double fTelElevation[VDST_MAXTELESCOPES];
         double fTelAzimuth[VDST_MAXTELESCOPES];
@@ -157,6 +158,7 @@ class VTableLookupDataHandler
 	bool   copyMCRunheader();
         void   copyMCTree();
 	void   copy_telconfig();
+        void   initializeTelTypeVector();
         int    fillNextEvent( bool bShort );
 	void   printCutStatistics();
         bool   randomSelected();

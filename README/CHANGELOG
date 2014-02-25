@@ -1,6 +1,12 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140225 (GM) significant (huge) changes in lookup tables filling
+                use median approximator for efficient and faster filling;
+                reduces memory requirements by factor of 8-15,
+                speed up by factor of 2-3;
+                should not affect any reading of lookup tables
+
 * 20140219 (GM) anasum event tree: added 'isgamma' variable
 
 * 20140219 (GM) bug fix for LL fitting and failed calculation

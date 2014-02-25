@@ -680,10 +680,10 @@ TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2 *h, string inewHistogramNa
    float ymax = h->GetYaxis()->GetBinLowEdge( 1 ) +  h->GetYaxis()->GetBinWidth( 1 );
    if( ymax > 0 ) ymax = h->GetYaxis()->GetBinLowEdge( nBinY_max ) + h->GetYaxis()->GetBinWidth( nBinY_max ); 	
 
-   TH2F *hNew = new TH2F( inewHistogramName.c_str(), h->GetTitle(), nBinX_max - nBinX_min + 1, xmin, xmax, nBinY_max, ymin, ymax );
+   TH2F *hNew = new TH2F( inewHistogramName.c_str(), "", nBinX_max - nBinX_min + 1, xmin, xmax, nBinY_max, ymin, ymax );
    hNew->SetXTitle( h->GetXaxis()->GetTitle() );
    hNew->SetYTitle( h->GetYaxis()->GetTitle() );
-   hNew->SetZTitle( h->GetZaxis()->GetTitle() );
+   hNew->SetZTitle( h->GetZaxis()->GetTitle() ); 
    hNew->Sumw2();
 
    for( int i = nBinX_min; i <= nBinX_max; i++ )

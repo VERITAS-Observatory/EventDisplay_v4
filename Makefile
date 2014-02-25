@@ -401,6 +401,7 @@ MSCOBJECTS=	./obj/Cshowerpars.o ./obj/Cmodel3Dpars.o ./obj/Ctpars.o \
                 ./obj/VStar.o ./obj/VStar_Dict.o \
                 ./obj/VUtilities.o \
                 ./obj/VASlalib.o \
+		./obj/VMedianCalculator.o \
                 ./obj/VSkyCoordinatesUtilities.o \
                 ./obj/VDB_Connection.o \
 		./obj/mscw_energy.o

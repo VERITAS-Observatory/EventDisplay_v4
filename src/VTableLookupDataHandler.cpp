@@ -248,6 +248,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     }
     if( fIsModel3D ) fmodel3Dpars->GetEntry( fEventCounter );
 
+// count all events
+    fNStats_All++;
 ////////////////////////////////////////////////////
 // read first all entries needed for run modes (filling and reading)
     fNMethods = fshowerpars->NMethods;
@@ -325,14 +327,15 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
     }
 
 // test here reconstructed and stop if necessary
-    if( !isReconstructed() )
+// GMG
+/*    if( !isReconstructed() )
     {
        if( fDebug > 1 ) cout << "\t NO RECONSTRUCTION " << fEventCounter << endl;
        fEventStatus = false;
        fEventCounter++;
        fNStats_Chi2Cut++;
        return 0;
-    }  
+    }   */
 
     fZe = fshowerpars->Ze[fMethod];
     fAz = fshowerpars->Az[fMethod];
@@ -408,7 +411,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
             if( fDebug > 1 ) cout << "\t CUT FAILED" << endl;
             return 0;
         }
-else fEventStatus = true;
+        else fEventStatus = true;
     }
 
 // loop over all telescopes
@@ -627,6 +630,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
        
 // print everything to the screen
     cout << endl << "total number of telescopes: " << fNTel << endl;
+    initializeTelTypeVector();
     for( unsigned int i = 0; i < fNTel; i++ )
     {
         cout << "\t telescope " << i+1 << "\t";
@@ -1486,7 +1490,7 @@ void VTableLookupDataHandler::reset()
 void VTableLookupDataHandler::calcDistances( int nimages )
 {
 // check for successfull reconstruction
-    if( nimages > 1 && fZe >=0. && fYcore >  -9998. && fYcore > -9998. )
+    if( nimages > 1 && fZe >=0. && fYcore > -9998. && fYcore > -9998. )
     {
        for( unsigned int tel = 0; tel < fNTel; tel++ )
        {
@@ -1775,8 +1779,6 @@ void VTableLookupDataHandler::resetAll()
 */
 bool VTableLookupDataHandler::cut( bool bWrite )
 {
-// count all events
-    fNStats_All++;
 // require at least two images
     if( fNImages < (int)fTLRunParameter->fTableFillingCut_NImages_min )
     {
@@ -1809,12 +1811,12 @@ bool VTableLookupDataHandler::cut( bool bWrite )
     {
        if( fMCxoff*fMCxoff+fMCyoff*fMCyoff < fMC_distance_to_cameracenter_min*fMC_distance_to_cameracenter_min )
        {
-  fNStats_WobbleMinCut++;
+          fNStats_WobbleMinCut++;
           return false;
        }
        if( fMCxoff*fMCxoff+fMCyoff*fMCyoff > fMC_distance_to_cameracenter_max*fMC_distance_to_cameracenter_max )
        {
-  fNStats_WobbleMaxCut++;
+          fNStats_WobbleMaxCut++;
           return false;
        } 
     }
@@ -2055,12 +2057,31 @@ double* VTableLookupDataHandler::getMCDistanceToCore( ULong64_t iTelType )
 
 unsigned int VTableLookupDataHandler::getTelType_arraycounter( unsigned int iTelID )
 {
-    unsigned int z = 0;
-    for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin(); fList_of_Tel_type_iterator != fList_of_Tel_type.end(); fList_of_Tel_type_iterator++ )
+/*    unsigned int z = 0;
+    for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin(); 
+         fList_of_Tel_type_iterator != fList_of_Tel_type.end(); fList_of_Tel_type_iterator++ )
     {
        if( fTel_type[iTelID] == fList_of_Tel_type_iterator->first ) return z;
        z++;
     }
+    return 999999; */
+    if( iTelID < fTel_type_counter.size() ) return fTel_type_counter[iTelID];
+
     return 999999;
+}
+
+void VTableLookupDataHandler::initializeTelTypeVector()
+{
+    fTel_type_counter.clear();
+    for( unsigned int iTelID = 0; iTelID < fNTel; iTelID++ )
+    {
+        unsigned int z = 0;
+        for( fList_of_Tel_type_iterator = fList_of_Tel_type.begin(); 
+             fList_of_Tel_type_iterator != fList_of_Tel_type.end(); fList_of_Tel_type_iterator++ )
+        {
+           if( fTel_type[iTelID] == fList_of_Tel_type_iterator->first ) fTel_type_counter.push_back( z );
+           z++;
+        }
+    }
 }
 

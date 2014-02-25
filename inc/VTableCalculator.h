@@ -12,6 +12,7 @@
 
 #include "VGlobalRunParameter.h"
 #include "VHistogramUtilities.h"
+#include "VMedianCalculator.h"
 #include "VStatistics.h"
 
 #include <cmath>
@@ -71,7 +72,10 @@ class VTableCalculator
         bool fEnergy;                             //!< true if tables are used for energy calculation
 	int  fUseMedianEnergy;
 
+        bool fFill1DHistograms;
+        bool fFillMedianApproximations;
         vector< vector< TH1F* > > Oh;
+        vector< vector< VMedianCalculator* > > OMedian;
         TProfile2D *hMean;
         TH2F* hMedian;
         string hMedianName;
@@ -89,6 +93,7 @@ class VTableCalculator
 	bool    fwrite;
 
 	bool   create1DHistogram( int i, int j );
+        bool   createMedianApprox( int i, int j );
         double getWeightMeanBinContent( TH2F*, int, int, double, double );
 	void   fillMPV( TH2F*, int, int, TH1F*, double, double );
 	double interpolate( TH2F* h, double x, double y, bool iError );

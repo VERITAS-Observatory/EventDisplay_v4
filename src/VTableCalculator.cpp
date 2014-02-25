@@ -48,13 +48,17 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 {
     setDebug();
 
+// use 1D histograms to calculate medians (more precise, but needs much more memory and is slower)
+    fWrite1DHistograms = false;
+// use median approximation (faster)
+    fFillMedianApproximations = true;
+
     setConstants( iPE );
 // using lookup tables to calculate energies
     fEnergy = iEnergy;
     fUseMedianEnergy = iUseMedianEnergy;
     fReadHistogramsFromFile = false;
 
-    fWrite1DHistograms = true;
     fHName_Add = hname_add;
 
     fName = fpara;
@@ -117,8 +121,14 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
         for (i=0;i<NumSize;i++)
         {
             vector< TH1F* > iH1;
-            for (j=0;j<NumDist;j++) iH1.push_back( 0 );	        
+            vector< VMedianCalculator* > iM1;
+            for (j=0;j<NumDist;j++)
+            {
+               iH1.push_back( 0 );	        
+               iM1.push_back( 0 );
+            }
             Oh.push_back( iH1 );
+            OMedian.push_back( iM1 );
         }
     }
 /////////////////////////////////////////
@@ -156,6 +166,19 @@ void VTableCalculator::setBinning()
         fBinning1DXhigh = 250.;
         HistBins = int( fBinning1DXhigh / 0.005 );
     }
+}
+
+bool VTableCalculator::createMedianApprox( int i, int j )
+{
+   if( i >= 0 && j >= 0 && i < (int)OMedian.size() && j < (int)OMedian[i].size() && !OMedian[i][j] )
+   {
+      OMedian[i][j] = new VMedianCalculator();
+   }
+   else
+   {
+      return false;
+   }
+   return true;
 }
  
 bool VTableCalculator::create1DHistogram( int i, int j )
@@ -264,14 +287,11 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
 
 ///////////////////////////////////
 // EVALUATION OF HISTOGRAMS 
-	cout << "\t msc tables: evaluating " << fName << " histograms ";
+	cout << "\t tables (msc style): evaluating " << fName << " histograms ";
 
         float med = 0.;
 	float sigma = 0.;
-	int id = 0;
-
-        char hisname[800];
-        char histitle[800];
+        int   nevents = 0;
 
 	double i_a[] = { 0.16, 0.5, 0.84 };
 	double i_b[] = { 0.0,  0.0, 0.0  };
@@ -281,44 +301,55 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
         {
             for( int j = 0; j < NumDist; j++ )
             {
-		if( !Oh[i][j] ) continue;
-
-	        if( Oh[i][j]->GetEntries() > 5 )
-		{
-		   Oh[i][j]->GetQuantiles( 3, i_b, i_a );
-		   med   = i_b[1];
-		   sigma = i_b[2] - i_b[0];
+// use 1D histograms for median calculation
+                if( fWrite1DHistograms && Oh[i][j] &&  Oh[i][j]->GetEntries() > 5 )
+                {
+                   Oh[i][j]->GetQuantiles( 3, i_b, i_a );
+                   med     = i_b[1];
+                   sigma   = i_b[2] - i_b[0];
+                   nevents = Oh[i][j]->GetEntries(); 
                 }
-		else
-		{
-		   med = 0.;
-		   sigma = 0.;
+// use approx median calculation
+                else if( fFillMedianApproximations && OMedian[i][j] && OMedian[i][j]->getN() > 5 )
+                {
+                   med     = OMedian[i][j]->getMedian();
+                   sigma   = OMedian[i][j]->getMedianWidth();
+                   nevents = OMedian[i][j]->getN();
+                }
+                else
+                {
+                   med = 0.;
+                   sigma = 0.;
+                   nevents = 0;
                 }
                 hMedian->SetBinContent( i+1, j+1, med );
-		hMedian->SetBinError( i+1, j+1, sigma );
+                hMedian->SetBinError( i+1, j+1, sigma );
                 hSigma->SetBinContent( i+1, j+1, sigma );
-                if( Oh[i][j]->GetEntries() > 5 ) hNevents->SetBinContent( i+1, j+1, Oh[i][j]->GetEntries() );
-		else if( fEnergy )
-		{
-		   hMean->SetBinContent( i+1, j+1, 0. );
-                }
-		if( fEnergy )
-		{
-		   fillMPV( hMPV, i+1, j+1, Oh[i][j], med, sigma );
-		   hMPV->SetBinError( i+1, j+1, sigma );
-                }
-
-                id=i*1000+j;
-                sprintf( hisname , "h%d",id);
-                sprintf( histitle, "h%d",id);
-// write 1D histograms to file
-                if( fOutDir && fWrite1DHistograms && Oh[i][j]->GetEntries() > 0 )
+                if( nevents > 5 ) hNevents->SetBinContent( i+1, j+1, nevents );
+                else if( fEnergy )
                 {
-                    fOutDir->cd();
-                    iDir1D->cd();
-                    Oh[i][j]->Write();
+                   hMean->SetBinContent( i+1, j+1, 0. );
                 }
-		delete Oh[i][j];
+                if( fEnergy && fWrite1DHistograms )
+                {
+                   fillMPV( hMPV, i+1, j+1, Oh[i][j], med, sigma );
+                   hMPV->SetBinError( i+1, j+1, sigma );
+                }
+// write 1D histograms to file
+                if( fWrite1DHistograms && Oh[i][j] )
+                {
+                    if( fOutDir && Oh[i][j]->GetEntries() > 0 )
+                    {
+                        fOutDir->cd();
+                        iDir1D->cd();
+                        Oh[i][j]->Write();
+                    }
+                    delete Oh[i][j];
+                }
+                else if( fFillMedianApproximations && OMedian[i][j] )
+                {
+                   delete OMedian[i][j];
+                }
             }
         }
 // write 2D histograms to file
@@ -331,66 +362,82 @@ void VTableCalculator::terminate( TDirectory *iOut, char *xtitle )
             if( hNevents && hSigma )  hSigma->SetEntries( hNevents->GetEntries() );
 // reduce size of the 2D histograms
             TH2F *h = 0;
-	    string n = hMedian->GetName();
-	    h = VHistogramUtilities::reduce2DHistogramSize( hMedian, n + "_new" );
-	    if( h && hMedian )
-	    {
-               cout << "(" << hMedian->GetEntries() << " entries)";
-	       delete hMedian;
-	       if( h ) 
-	       {
-		  h->SetName( n.c_str() );
-	          h->Write();
-               }
-	       delete h;
+            string n;
+            if( hMedian )
+            {
+                n = hMedian->GetName();
+                h = VHistogramUtilities::reduce2DHistogramSize( hMedian, n + "_new" );
+                if( h )
+                {
+                   cout << "(" << hMedian->GetEntries() << " entries)";
+                   delete hMedian;
+                   if( h ) 
+                   {
+                      h->SetName( n.c_str() );
+                      h->Write();
+                   }
+                   delete h;
+                }
             }
-	    n = hMPV->GetName();
-	    h = VHistogramUtilities::reduce2DHistogramSize( hMPV, n + "_new" );
-	    if( h && hMPV )
-	    {
-	       delete hMPV;
-	       if( h )
-	       {
-		  h->SetName( n.c_str() );
-	          h->Write();
-               }
-	       delete h;
+            if( hMPV )
+            {
+                n = hMPV->GetName();
+                h = VHistogramUtilities::reduce2DHistogramSize( hMPV, n + "_new" );
+                if( h )
+                {
+                   delete hMPV;
+                   if( h )
+                   {
+                      h->SetName( n.c_str() );
+                      h->Write();
+                   }
+                   delete h;
+                }
             }
-	    n = hSigma->GetName();
-	    h = VHistogramUtilities::reduce2DHistogramSize( hSigma, n + "_new" );
-	    if( h && hSigma )
-	    {
-	       delete hSigma;
-	       if( h )
-	       {
-		  h->SetName( n.c_str() );
-	          h->Write();
-               }
-	       delete h;
+            if( hSigma )
+            {
+                n = hSigma->GetName();
+                h = VHistogramUtilities::reduce2DHistogramSize( hSigma, n + "_new" );
+                if( h )
+                {
+                   delete hSigma;
+                   if( h )
+                   {
+                      h->SetName( n.c_str() );
+                      h->Write();
+                   }
+                   delete h;
+                }
             }
-	    n = hMean->GetName();
-	    h = VHistogramUtilities::reduce2DHistogramSize( hMean, n + "_new" );
-	    if( h && hMean )
-	    {
-	       delete hMean;
-	       if( h )
-	       {
-		  h->SetName( n.c_str() );
-	          h->Write();
-               }
-	       delete h;
+            if( hMean )
+            {
+                n = hMean->GetName();
+                h = VHistogramUtilities::reduce2DHistogramSize( hMean, n + "_new" );
+                if( h )
+                {
+                   delete hMean;
+                   if( h )
+                   {
+                      h->SetName( n.c_str() );
+                      h->Write();
+                   }
+                   delete h;
+                }
             }
-	    n = hNevents->GetName();
-	    h = VHistogramUtilities::reduce2DHistogramSize( hNevents, n + "_new" );
-	    if( h && hNevents )
-	    {
-	       delete hNevents;
-	       if( h )
-	       {
-		  h->SetName( n.c_str() );
-	          h->Write();
-               }
-	       delete h;
+            if( hNevents )
+            {
+                n = hNevents->GetName();
+                h = VHistogramUtilities::reduce2DHistogramSize( hNevents, n + "_new" );
+                if( h )
+                {
+                   delete hNevents;
+                   if( h )
+                   {
+                      h->SetName( n.c_str() );
+                      h->Write();
+                   }
+                   delete h;
+                }
             }
             cout << endl;
         }
@@ -442,35 +489,43 @@ double VTableCalculator::calc( int ntel, double *r, double *s, double *w, double
 ///////////////////////////////////////////////////////////////////////////////////////
     if( fwrite )
     {
-        int i_Oh_size = (int)Oh.size();
 // don't allow zero or negative weights
         if( chi2 <= 0. ) return -99.;
 // loop over all telescopes
         double i_logs = 0.;
+        int ir = 0;
+        int is = 0.;
+        int i_Oh_size = 0;
+        if( fWrite1DHistograms ) i_Oh_size = (int)Oh.size();
+        else                     i_Oh_size = (int)OMedian.size();
+// loop over all telescopes
         for( tel = 0; tel < ntel; tel++ )
         {
             if( s[tel] > 0. && r[tel] >= 0. && w[tel] > fBinning1DXlow && w[tel] < fBinning1DXhigh )
             {
 // check limits (to avoid under/overflows)
-		if( r[tel] > hMedian->GetYaxis()->GetXmax() ) continue;
+		ir = hMedian->GetYaxis()->FindFixBin( r[tel] ) - 1;
+                if( ir == NumDist ) continue; 
                 i_logs = log10( s[tel] );
-                if( i_logs > hMedian->GetXaxis()->GetXmax() ) continue;
-
-
-// calculate log energy (translate from TeV to GeV)
-		int is = hMedian->GetXaxis()->FindBin( i_logs ) - 1;
-		int ir = hMedian->GetYaxis()->FindBin( r[tel] ) - 1;
+		is = hMedian->GetXaxis()->FindFixBin( i_logs ) - 1;
+                if( is == NumSize ) continue; 
 // reject showers in the first size bin
-                if( ir >= 0 && is >= 0 && is < i_Oh_size && ir < (int)Oh[is].size() )
+                if( ir >= 0 && is >= 0 && is < i_Oh_size )
                 {
-		    if( !Oh[is][ir] )
-		    {
-		       if( !create1DHistogram( is, ir ) ) continue;
-                    }
+                   if( fWrite1DHistograms && ir < (int)Oh[is].size() )
+                   {
+		      if( !Oh[is][ir] ) if( !create1DHistogram( is, ir ) ) continue;
 // fill width/length/energy into a 1D and 2D histogram
 // (chi2 is here an external weight (from e.g. spectral weighting))
-                    Oh[is][ir]->Fill( w[tel], chi2 );
-                    hMean->Fill( i_logs, r[tel], w[tel] * chi2 );
+                     Oh[is][ir]->Fill( w[tel], chi2 );
+                   }
+                   if( fFillMedianApproximations && ir < (int)OMedian.size() )
+                   {
+                      if( !OMedian[is][ir] ) if( !createMedianApprox( is, ir ) ) continue;
+// weight is ignored in the approx median calculation
+                      OMedian[is][ir]->fill( w[tel] );
+                   }
+                   hMean->Fill( i_logs, r[tel], w[tel] * chi2 );
                 }
             }
         }
@@ -793,8 +848,8 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
 {
    if( !h ) return 0.;
 
-   int i_x = h->GetXaxis()->FindBin( x );
-   int i_y = h->GetYaxis()->FindBin( y );
+   int i_x = h->GetXaxis()->FindFixBin( x );
+   int i_y = h->GetYaxis()->FindFixBin( y );
 // handle under and overflows ( bin nBinsX+1 is needed)
    if( i_x == 0 || i_y == 0 || i_x == h->GetNbinsX() || i_y == h->GetNbinsY() )
    {
