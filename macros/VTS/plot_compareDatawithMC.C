@@ -1,6 +1,10 @@
 /*! \file  plot_compareDatawithMC
  *  \brief compare image and shower parameter distribution of simulations and on/off data
  *
+ *  ==========================================================================================
+ *  THIS MACRO HAS BEEN REPLACED BY A CLASS IN THE SHARED LIBRARY: VPlotCompareDataWithMC
+ *  ==========================================================================================
+ *
  *  \Author Gernot Maier
  *
  */
