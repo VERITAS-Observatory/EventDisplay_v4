@@ -29,6 +29,7 @@ if [ $SIMU = "GRISU" ]
 then
 # subdirectory with date where evndisp simulation files are found
     DSET="analysis_d20131031"
+    DSET="analysis_d20140224"
 # directory with input file
     DDIR="$VERITAS_DATA_DIR/analysis/EVDv400/"$ARRAY"_FLWO/gamma_"$IZE"deg_750m/wobble_"$WOFF"/"$DSET"_ATM"$ATMO"_"$ANAC"_NOISE"$NOISEX"/*.root"
 else
