@@ -52,7 +52,7 @@ if( $ARRAY == "V5" ) then
     set CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
 endif
 if( $ARRAY == "V6" ) then
-    set CFG="EVN_V6_Upgrade_20121127_v420.txt"
+    set CFG="EVN_V6_Upgrade_20121127_v420_CARE.txt"
 endif
 ##############################################################################################
 
