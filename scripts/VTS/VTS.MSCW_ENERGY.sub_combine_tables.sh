@@ -55,7 +55,7 @@ rm -f  $FNAM-1.sh
 chmod u+x $FNAM.sh
 
 # submit the job
-qsub -l h_cpu=20:29:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+qsub -l h_cpu=20:29:00 -l os=sl6 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 
 
 exit
