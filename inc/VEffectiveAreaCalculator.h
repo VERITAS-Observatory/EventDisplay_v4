@@ -181,6 +181,9 @@ class VEffectiveAreaCalculator
 	double fEMC;
 	double fCRweight;                         // #/s/sr (the right unit for the ctools acceptance map) This normalise the map to the CR spectrum	
                                                   // Needs option ESPECTRUM_FOR_WEIGHTING to be turned on, which only make sense for CR
+	bool fsolid_angle_norm_done;              
+	double fsolid_angle_norm;                   // solid angle normalisation needed for the CRweight filled in fAcceptance_AfterCuts_tree (for the histogram it is done later in VSensitivityCalculator)
+	void Calculate_Bck_solid_angle_norm();
 
 
 // effective area smoothing
@@ -206,7 +209,7 @@ class VEffectiveAreaCalculator
         void   copyProfileHistograms( TProfile*,  TProfile* );
         void   copyHistograms( TH1*,  TH1*, bool );
         double getAzMean( double azmin, double azmax );
-	double getCRWeight( double iEMC_TeV_log10, TH1* h ,bool per_second_per_sr=false);
+	double getCRWeight( double iEMC_TeV_log10, TH1* h ,bool for_back_map=false);
         bool   getEffectiveAreasFromFitFunction( TTree*, double azmin, double azmax, double ispectralindex );
         void   getEffectiveAreasFromFitFunction( unsigned int, unsigned int, double, double&, double& );
         double getEffectiveAreasFromHistograms( double erec, double ze, double woff, double iPedVar,

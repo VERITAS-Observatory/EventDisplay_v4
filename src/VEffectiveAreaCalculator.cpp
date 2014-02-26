@@ -271,6 +271,12 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     fAcceptance_AfterCuts_tree->Branch("CRweight",&fCRweight,"CRweight/D");
 
 
+    fsolid_angle_norm_done = false;              
+    fsolid_angle_norm = 1.;
+
+
+
+
 }
 
 
@@ -1632,6 +1638,7 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 		 fYoff_derot_aC = d->Yoff_derot;
 		 fErec = eRecLin;
 		 fEMC  = d->MCe0;
+		 if(i < 1000) std::cout<<"LUCIE  getMCSolidAngleNormalization() "<<getMCSolidAngleNormalization()<<std::endl;
 		 fCRweight = getCRWeight( d->MCe0, hVEmc[0][az_bin_index] ,true);//So that the acceptance can be normalised to the CR spectrum. 
 		 // when running on gamma, this should return 1.
 		 fAcceptance_AfterCuts_tree->Fill();
@@ -1671,6 +1678,9 @@ bool VEffectiveAreaCalculator::fill( TH1D *hE0mc, CData *d,
 // don't do anything between here and the end of the loop! Never!
     }                                             // end of loop
 /////////////////////////////////////////////////////////////////////////////
+
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // calculate effective areas and fill output trees
@@ -2731,18 +2741,13 @@ bool VEffectiveAreaCalculator::setMonteCarloEnergyRange( double iMin, double iMa
  * note that this requires the MC spectrum to be a power law
  *
  */
-double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool per_second_per_sr )
+double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool for_back_map )
 {
-   if( !h || !fRunPara ) return 1.;
+    if( !h || !fRunPara ) return 1.;
+    
+    if( !fRunPara->fCREnergySpectrum ) return 1.;
 
-   if( !fRunPara->fCREnergySpectrum ) return 1.;
 
-   double O_cr = 1.;
-// solid angle normalization is applied in VSensitivityCalculator
-/*   if( fRunPara->fViewcone_max > 0. )
-   {
-      O_cr = 2. * TMath::Pi() * (1.-cos( fRunPara->fViewcone_max * TMath::DegToRad()));
-   }  */
 
 // normalization of MC spectrum
    double c_ig = 1.;
@@ -2755,16 +2760,51 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
 // number of MC events in this energy bin
    double n_mc = c_mc * TMath::Power( iEMC_TeV_lin, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) );
 
-// number of expected CR events / min in this energy bin
-   double n_cr = fMC_ScatterArea * O_cr * fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) * 1.e4 * 60.;
+// number of expected CR events /min/sr 
+   double n_cr = fMC_ScatterArea * fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) * 1.e4 * 60.;
+   // fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) returns the differential flux multiplied by the energy
 
-// (ctools) for the acceptance map construction, the weight must be in #/sr/s/TeV
-   if( per_second_per_sr ) n_cr = n_cr/60.;
+// (ctools) for the acceptance map construction, the weight is in #/s/sr
+   if( for_back_map ){
+       //need to normalize this number considering the cone in which the particle are simulated and the offset bin we are in now.
+       if(! fsolid_angle_norm_done) Calculate_Bck_solid_angle_norm();
+       n_cr = fsolid_angle_norm*n_cr/60.;
+       if( n_mc != 0. ){
+	   return n_cr / n_mc;
+       }else{
+	   return 0.;
+       }
+   }else{
+       // getMCSolidAngleNormalization() return a ratio of solid angle (only for gamma? not sure this thing returning something else than 1 here, ever...)
+       if( getMCSolidAngleNormalization() > 0. ) n_cr /= getMCSolidAngleNormalization();// do we want to leave this line here?
+       // the solid angle normalization is done in VSensitivityCalculator
+       // return #/min/sr
+       if( n_mc != 0. ) return n_cr / n_mc;
+       return 0.;
+   }
+}
 
-   if( getMCSolidAngleNormalization() > 0. ) n_cr /= getMCSolidAngleNormalization();
+// Calculate the ratio between the solid angle of the cone where the MC have been done and the solid angle of the offset bin considered
+void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm(){
+ 
 
-   // return #/sr/time/TeV (?)
-   if( n_mc != 0. ) return n_cr / n_mc;
+    if( fRunPara->fViewcone_max > 0. )
+    {
+	// solid angle in which the particule have been simulated (only need ratio no drop 2Pi)
+	double SolidAngle_MCScatterAngle  =  (1.-cos( fRunPara->fViewcone_max * TMath::DegToRad()));
+	// solid angle of the offset bin considered for the current analysis 
+	double SolidAngle_OffSetBin = 1;
+	// this is written at a time when the offset bin are stored in theta2cut when running makeEffectiveArea on background event (for statistic reason no the2cut are applied)
+	// in this case the theta2 values are not energy dependent
+	double offmin = sqrt(fCuts->fCut_Theta2_min);
+	double offmax = sqrt(fCuts->fCut_Theta2_max);
+	SolidAngle_OffSetBin=  (1.-cos( offmax  * TMath::DegToRad())) -  (1.-cos( offmin  * TMath::DegToRad()));
 
-   return 0.;
+	fsolid_angle_norm = SolidAngle_MCScatterAngle/SolidAngle_OffSetBin;
+	fsolid_angle_norm_done = true;
+	
+    }  
+    
+    
+    return;
 }
