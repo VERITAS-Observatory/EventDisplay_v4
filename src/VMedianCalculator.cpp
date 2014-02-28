@@ -27,19 +27,22 @@ void VMedianCalculator::reset()
    prob[1] = 0.50;
    prob[2] = 0.84;
 
-   setNExact();
+   setNExact( 100000 );
    setEta();
 }
 
 void VMedianCalculator::fill( double ivalue )
 {
-// for small sets: calculate exact median
+// approximation: use just first nDim_exact events
     if( n_counter < nDim_exact )
     {
        x.push_back( ivalue );
     }
+
+////////////////////////////////////////////////////////////////////////////////
+// median approximation is not accurate enough
 // for larger sets: calculate average
-    else if( n_counter == nDim_exact )
+/*    else if( n_counter == nDim_exact )
     {
         for( unsigned int f = 0; f < x.size(); f++ )
         {
@@ -49,7 +52,7 @@ void VMedianCalculator::fill( double ivalue )
             }
         }
 // vector is not needed anymore
-//      x.clear();
+        x.clear();
     }
 // add a new value for the approximation
    if( n_counter >= nDim_exact )
@@ -58,7 +61,7 @@ void VMedianCalculator::fill( double ivalue )
       {
         quantiles[i] += eta * (TMath::Sign( 1., ivalue - quantiles[i] ) + 2. * prob[i] - 1. );
       }
-   }
+   } */
 
 // mean and rms
    mean_x  += ivalue;
@@ -83,28 +86,20 @@ double VMedianCalculator::getRMS()
 
 double VMedianCalculator::getMedian()
 {
-   if( n_counter < nDim_exact )
-   {
-       double* i_x = &x[0];
-       double i_a[] = { prob[0], prob[1], prob[2] };
-       double i_b[] = { 0.0,  0.0, 0.0  };
-       TMath::Quantiles( n_counter, 3, i_x, i_b, i_a, kFALSE );
-       return i_b[1];
-   }
-
-   return quantiles[1];
+   double * i_x = &x[0];
+   int i_n = (int)x.size();
+   double i_a[] = { prob[0], prob[1], prob[2] };
+   double i_b[] = { 0.0,  0.0, 0.0  };
+   TMath::Quantiles( i_n, 3, i_x, i_b, i_a, kFALSE );
+   return i_b[1];
 }
 
 double VMedianCalculator::getMedianWidth()
 {
-   if( n_counter < nDim_exact )
-   {
-       double* i_x = &x[0];
-       double i_a[] = { prob[0], prob[1], prob[2] };
-       double i_b[] = { 0.0,  0.0, 0.0  };
-       TMath::Quantiles( n_counter, 3, i_x, i_b, i_a, kFALSE );
-       return (i_b[2] - i_b[0]);
-   }
-
-   return quantiles[2] - quantiles[0];
+   double* i_x = &x[0];
+   int i_n = (int)x.size();
+   double i_a[] = { prob[0], prob[1], prob[2] };
+   double i_b[] = { 0.0,  0.0, 0.0  };
+   TMath::Quantiles( i_n, 3, i_x, i_b, i_a, kFALSE );
+   return (i_b[2] - i_b[0]);
 }

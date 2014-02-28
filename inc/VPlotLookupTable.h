@@ -40,6 +40,7 @@ class VPlotLookupTableData
 
    TH2F*  hmedian;
    TH2F*  hmean;
+   TH2F*  hmpv;
    TH2F*  hsigma;
    TH2F*  hnevents;
 
@@ -64,7 +65,7 @@ class VPlotLookupTable : public VPlotUtilities, public VHistogramUtilities
 
    bool    checkTableName( string iTableName );
    TH2F*   divide2DHistograms( TH2F *h1, TH2F *h2, char *hname );
-   void    plot2DHistogram( TH2F *h, unsigned int iSetID, string htitle, int iCanvasX, double i_min = -999., double i_max = -999. );
+   void    plot2DHistogram( TH2F *h, unsigned int iSetID, string htitle, int iCanvasX, double i_min = -999., double i_max = -999., bool iLogZ = false );
 
 
    public:

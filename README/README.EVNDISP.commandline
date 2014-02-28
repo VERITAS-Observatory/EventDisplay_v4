@@ -81,8 +81,8 @@ Calibration:
 
 Pointing: 
 ---------
-	 -elevation 				 telescope elevation (preli)
-	 -azimuth 				 telescope azimuth (preli)
+	 -elevation 				 telescope elevation
+	 -azimuth 				 telescope azimuth 
 	 -target TARGET 			 telescope is pointed to this target (use -print targets to print available targets)
 	 -printtargets 				 print available targets
 	 -declination=DEC 			 target is at this declination (J2000)

@@ -663,10 +663,10 @@ bool VTableEnergyCalculator::readHistograms()
     }
     if( !hMedian )
     {
-        cout << "\t energy tables info: table histograms not found in " << gDirectory->GetName();
-	if( fOutDir ) cout << ", " << fOutDir->GetPath();
-	cout << endl;
-//        exit( -1 );
+	if( fOutDir )
+        {
+           cout << "\t energy tables info: table histograms not found in " << fOutDir->GetPath() << endl;
+        }
     }
 
     return true;

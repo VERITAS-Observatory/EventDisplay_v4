@@ -923,7 +923,7 @@ void VTableCalculator::fillMPV( TH2F *h, int i, int j, TH1F *h1D, double iMedian
 // try a Landau fit
    TF1 iLandau( "iLandau", "TMath::Landau(x,[0],[1],0)*[2]", iMedianValue/3., iMedianValue*3. );
    iLandau.SetParameters( iMedianValue, iSigmaValue, h1D->GetEntries() );
-// do not allow the most probably to more than x3 off the median
+// do not allow the most probable value to be more than x3 off the median
    iLandau.SetParLimits( 0, iMedianValue/3., iMedianValue*3. ); 
    h1D->Fit( &iLandau, "QMNR" );
 // require >10% fit probability to use Landau most probable value
@@ -943,7 +943,7 @@ void VTableCalculator::fillMPV( TH2F *h, int i, int j, TH1F *h1D, double iMedian
    }
    else
    {
-     h->SetBinContent( i, j, iMedianValue ); 
+      h->SetBinContent( i, j, iMedianValue ); 
    }
 
 }

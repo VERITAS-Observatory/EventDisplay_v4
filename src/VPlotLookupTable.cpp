@@ -38,7 +38,7 @@ void VPlotLookupTable::printLookupTables()
     }
 }
 
-void VPlotLookupTable::plot2DHistogram( TH2F *h, unsigned int iSetID, string ititle, int iCanvasX, double i_min, double i_max )
+void VPlotLookupTable::plot2DHistogram( TH2F *h, unsigned int iSetID, string ititle, int iCanvasX, double i_min, double i_max, bool iZLog )
 {
    if( !h )
    {
@@ -61,6 +61,7 @@ void VPlotLookupTable::plot2DHistogram( TH2F *h, unsigned int iSetID, string iti
    cE->SetGridy( 0 );
    cE->SetLeftMargin( 0.13 );
    cE->SetRightMargin( 0.16 );
+   if( iZLog && (i_min < -998. || i_min>0. ) && h->GetEntries() > 0. ) cE->SetLogz( 1 ); 
    cE->Draw();
 
    h->SetStats( 0 );
@@ -110,10 +111,11 @@ void VPlotLookupTable::plotLookupTables( unsigned int iSetID )
       cout << "VPlotLookupTable::plotLookupTables error: setID to large (should be <" << fLookupTableData.size() << endl;
       return;
    }
-   plot2DHistogram( fLookupTableData[iSetID]->hmedian, iSetID, "median", 10 );
-   plot2DHistogram( fLookupTableData[iSetID]->hmean,   iSetID, "mean", 50 );
-   plot2DHistogram( fLookupTableData[iSetID]->hsigma,  iSetID, "sigma", 100 );
-   plot2DHistogram( fLookupTableData[iSetID]->hnevents,iSetID, "number of events", 150 );
+   plot2DHistogram( fLookupTableData[iSetID]->hmedian, iSetID, "median", 10, -999., -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
+   plot2DHistogram( fLookupTableData[iSetID]->hmean,   iSetID, "mean", 100, -999., -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
+   plot2DHistogram( fLookupTableData[iSetID]->hmpv,    iSetID, "mpv", 200, -999., -999., ( fLookupTableData[iSetID]->fLookupTable == "energySR" ) );
+   plot2DHistogram( fLookupTableData[iSetID]->hsigma,  iSetID, "sigma", 300, -999., -999., false );
+   plot2DHistogram( fLookupTableData[iSetID]->hnevents,iSetID, "number of events", 400, -999., -999., true );
 
 // divide mean by median
     if( fLookupTableData[iSetID]->hmedian && fLookupTableData[iSetID]->hmean )
@@ -121,11 +123,23 @@ void VPlotLookupTable::plotLookupTables( unsigned int iSetID )
         char hname[200];
 	sprintf( hname, "hMM_%d", iSetID );
 
-	TH2F* hMM = divide2DHistograms( fLookupTableData[iSetID]->hmedian, fLookupTableData[iSetID]->hmean, hname );
+	TH2F* hMM = divide2DHistograms( fLookupTableData[iSetID]->hmean, fLookupTableData[iSetID]->hmedian, hname );
 	if( hMM ) hMM->SetZTitle( "mean / median" );
 
 	plot2DHistogram( hMM, iSetID, "mean / median", 200, 0.95, 1.05 );
     }
+// divide MPV by median
+    if( fLookupTableData[iSetID]->hmedian && fLookupTableData[iSetID]->hmpv )
+    {
+        char hname[200];
+	sprintf( hname, "hMP_%d", iSetID );
+
+	TH2F* hMP = divide2DHistograms( fLookupTableData[iSetID]->hmpv, fLookupTableData[iSetID]->hmedian, hname );
+	if( hMP ) hMP->SetZTitle( "mpv/ median" );
+
+	plot2DHistogram( hMP, iSetID, "mpv / median", 200, 0.95, 1.05 );
+    }
+
 
 }
 
@@ -217,6 +231,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
    {
        fLookupTableData.back()->hmedian = (TH2F*)gDirectory->Get( "width_median_tb" );
        fLookupTableData.back()->hmean = (TH2F*)gDirectory->Get( "width_mean_tb" );
+       fLookupTableData.back()->hmpv = (TH2F*)gDirectory->Get( "width_mpv_tb" );
        fLookupTableData.back()->hsigma = (TH2F*)gDirectory->Get( "width_sigma_tb" );
        fLookupTableData.back()->hnevents = (TH2F*)gDirectory->Get( "width_nevents_tb" );
    }
@@ -224,6 +239,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
    {
        fLookupTableData.back()->hmedian = (TH2F*)gDirectory->Get( "length_median_tb" );
        fLookupTableData.back()->hmean = (TH2F*)gDirectory->Get( "length_mean_tb" );
+       fLookupTableData.back()->hmpv = (TH2F*)gDirectory->Get( "length_mpv_tb" );
        fLookupTableData.back()->hsigma = (TH2F*)gDirectory->Get( "length_sigma_tb" );
        fLookupTableData.back()->hnevents = (TH2F*)gDirectory->Get( "length_nevents_tb" );
    }
@@ -231,6 +247,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
    {
        fLookupTableData.back()->hmedian = (TH2F*)gDirectory->Get( "hMedian_energy_tb" );
        fLookupTableData.back()->hsigma = (TH2F*)gDirectory->Get( "hSigma_energy_tb" );
+       fLookupTableData.back()->hmpv = 0;
        fLookupTableData.back()->hnevents = (TH2F*)gDirectory->Get( "hNevents_energy_tb" );
        fLookupTableData.back()->hmean = (TH2F*)gDirectory->Get( "hMean_energy_tb" );
    }
@@ -238,6 +255,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
    {
        fLookupTableData.back()->hmedian = (TH2F*)gDirectory->Get( "energySR_median_tb" );
        fLookupTableData.back()->hmean = (TH2F*)gDirectory->Get( "energySR_mean_tb" );
+       fLookupTableData.back()->hmpv = (TH2F*)gDirectory->Get( "energySR_mpv_tb" );
        fLookupTableData.back()->hsigma = (TH2F*)gDirectory->Get( "energySR_sigma_tb" );
        fLookupTableData.back()->hnevents = (TH2F*)gDirectory->Get( "energySR_nevents_tb" );
    }
@@ -281,6 +299,7 @@ VPlotLookupTableData::VPlotLookupTableData()
 
    hmedian = 0;
    hmean = 0;
+   hmpv = 0;
    hsigma = 0;
    hnevents = 0;
 }
