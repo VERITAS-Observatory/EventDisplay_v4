@@ -2849,15 +2849,30 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	  cout << nPixel << "\t" << getPedvars( true ).size();
 	  cout << " (telescope " << getTelID()+1 << ")" << endl;
        }
-// gains
+////////////////
+// relative gains
        if( nPixel == getGains( false ).size() )
        {
+// mean conversion factor
+          float i_z = 0;
+          float i_meanC = 0;
+          for( unsigned int p = 0; p < nPixel; p++ )
+          {
+              if( fConv_high[p] > 0. )
+              {
+                 i_z++;
+                 i_meanC += fConv_high[p];
+              }
+          }
+          if( i_z > 0. && i_meanC > 0. ) i_meanC /= i_z;
+          else                           i_meanC  = 1.;
+// calculate relative gain
           for( unsigned int p = 0; p < nPixel; p++ )
 	  {
 	     if( fConv_high[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
 	     {
-		getGains( false )[p] = 1./fConv_high[p];
-		if( getGainDist( false ) ) getGainDist( false )->Fill( 1./fConv_high[p] );
+		getGains( false )[p] = fConv_high[p] / i_meanC;
+		if( getGainDist( false ) ) getGainDist( false )->Fill( fConv_high[p] / i_meanC );
              }
 	     else
 	     {
@@ -2877,10 +2892,10 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 // use high-gain conversion and understand differences between low and high gain as multiplication factor
           for( unsigned int p = 0; p < nPixel; p++ )
 	  {
-	     if( fConv_high[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
+	     if( getGains( false )[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
 	     {
-		getGains( true )[p] = 1./fConv_high[p];
-		if( getGainDist( true ) ) getGainDist( true )->Fill( 1./fConv_high[p] );
+		getGains( true )[p] = getGains( false )[p];
+		if( getGainDist( true ) ) getGainDist( true )->Fill( getGains( true )[p] );
 		setLowGainMultiplier( fConv_low[p] / fConv_high[p], p );
              }
 	     else

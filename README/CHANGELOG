@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140301 (GM) CTA DST: added relative gain calibration
+                (pixel-to-pixel variation in gain was ignored
+                 until now)
+
 * 20140225 (GM) significant (huge) changes in lookup tables filling
                 use median approximator for efficient and faster filling;
                 reduces memory requirements by factor of 8-15,
