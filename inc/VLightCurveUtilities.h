@@ -60,7 +60,7 @@ class VLightCurveUtilities
     double getVariabilityIndex( TGraphAsymmErrors *g, double iSystematicFraction = 0. );
     bool   getXRTTimeSettings() { return fXRTTimeSettings; }
     bool   isZombie() { return fIsZombie; }
-    void   printLightCurve( bool bFullDetail = true );
+    void   printLightCurve( int bFullDetail = 1 );
     void   printLightCurveLaTexTableRow( double iSigmaMinFluxLimits = -99., double iFluxMultiplicator = 1., bool iPrintPhaseValues = false );
     void   printLightCurveDCF();
     void   printLightCurveWiki( double iMinEnergy_TeV = 1. );

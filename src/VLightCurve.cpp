@@ -170,7 +170,7 @@ bool VLightCurve::fill( double iEMin_TeV, double iEMax_TeV, bool iPrint )
    fEnergy_min_TeV = iEMin_TeV;
    fEnergy_max_TeV = iEMax_TeV;
 
-   cout << "filling data for " << fDataType << endl;
+   cout << "filling data for data type " << fDataType << endl;
 
    if( fDataType == "TeV_anasum" )     return fillTeV_anasum( iPrint );
    else if( fDataType == "TeV_ascii" ) return fillTeV_ascii(  iPrint );
@@ -239,7 +239,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
        else                   sprintf( htitle, "light curve" );
        if( fPhase_Period_days > 0. )
        { 
-          sprintf( hname, "%s_%d_%d_%d_%d", iCanvasName.c_str(), (int)fPhase_MJD0, (int)fPhase_Period_days, (int)fPhasePlotting, (int)(fEnergy_min_TeV*1000.) );
+          sprintf( hname, "%s_%d_%d_%d_%d", iCanvasName.c_str(), (int)fPhase_MJD0, (int)fPhase_Period_days, 
+	                                                         (int)fPhasePlotting, (int)(fEnergy_min_TeV*1000.) );
 	  sprintf( htitle, "%s, T_{0}=%.1f, period=%.1f days", fName.c_str(), fPhase_MJD0, fPhase_Period_days );
        }
 

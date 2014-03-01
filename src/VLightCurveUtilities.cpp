@@ -266,7 +266,7 @@ void VLightCurveUtilities::printLightCurveDCF()
    }
 }
 
-void VLightCurveUtilities::printLightCurve( bool bFullDetail )
+void VLightCurveUtilities::printLightCurve( int bFullDetail )
 {
 // print light curve with many details
    if( bFullDetail )
@@ -280,8 +280,25 @@ void VLightCurveUtilities::printLightCurve( bool bFullDetail )
 	     double iMJD_mean = fLightCurveData[i]->getMJD();
 	     cout << ", Phase " << getPhase( iMJD_mean );
 	 }
-	 if( fLightCurveData[i]->fRunList.size() > 0 ) cout << " # runs: " << fLightCurveData[i]->fRunList.size();
+	 if( fLightCurveData[i]->fRunList.size() > 0 )
+	 {
+	    if( fLightCurveData[i]->fRunList.back() == -1 )
+	    {
+	       cout << " # runs: " << fLightCurveData[i]->fRunList.size()-1;
+            }
+	    else
+	    {
+	       cout << " # runs: " << fLightCurveData[i]->fRunList.size();
+            }
+         }
 	 cout << endl;
+	 if( bFullDetail == 2 )
+	 {
+	     for( unsigned int z = 0; z < fLightCurveData[i]->fRunList.size(); z++ )
+	     {
+	       cout << "\tRUN " << fLightCurveData[i]->fRunList[z] << endl;
+             }
+         }
 	 if( fLightCurveData[i]->fNon >= 0. ) cout << "\tNon " << fLightCurveData[i]->fNon << "\tNoff " << fLightCurveData[i]->fNoff;
 	 cout << "\t Significance: " << fLightCurveData[i]->fSignificance;
 	 cout << "\t Tot Time [h]: " << fLightCurveData[i]->fRunTime/3600.;

@@ -184,10 +184,10 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
     }
 
     int nentries = fData->fChain->GetEntries();
-//    if( fDebug )
+    if( fDebug )
     {
-       cout << "total number of runs: " << nentries;
-       cout << " (" << iRunMin << ", " << iRunMax << ")" << endl;
+       cout << "total number of runs: " << nentries-1;
+       cout << " (run number interval [" << iRunMin << ", " << iRunMax << "])" << endl;
     }
 
     for( int i = 0; i < nentries; i++ )
@@ -665,17 +665,14 @@ double VFluxCalculation::getFluxInErgs( double iF, double iE )
 */
 void VFluxCalculation::calculateFluxes()
 {
-
-  vector < double > IntraFlux;
-  vector < double > IntraFluxE;
-  vector < double > IntraFluxConstant;
-  vector < double > IntraFluxConstantE;
-  vector < double > IntraFluxCI_lo_1sigma;
-  vector < double > IntraFluxCI_up_1sigma;
-  vector < double > IntraFluxCI_lo_3sigma;
-  vector < double > IntraFluxCI_up_3sigma;
-
-
+    vector < double > IntraFlux;
+    vector < double > IntraFluxE;
+    vector < double > IntraFluxConstant;
+    vector < double > IntraFluxConstantE;
+    vector < double > IntraFluxCI_lo_1sigma;
+    vector < double > IntraFluxCI_up_1sigma;
+    vector < double > IntraFluxCI_lo_3sigma;
+    vector < double > IntraFluxCI_up_3sigma;
 
     if( fDebug )
     {
@@ -777,7 +774,7 @@ void VFluxCalculation::calculateFluxes()
 	  }
 	else  // fMaxEnergy != MAX_SAFE_MC_ENERGY
 	  {
-	    cout << "Calculating Integral fluxes within the restricted range [" << fMinEnergy << " TeV, "  << fMaxEnergy << " TeV]  " << endl;
+	    if( fDebug ) cout << "Calculating Integral fluxes within the restricted range [" << fMinEnergy << " TeV, "  << fMaxEnergy << " TeV]  " << endl;
 	    if( fMinEnergy > 0. )
 	      {
 		fRunFlux[i]             = -1./( fAlpha + 1. ) * fRunFluxConstant[i] 
@@ -892,7 +889,7 @@ void VFluxCalculation::calculateFluxes()
 		}
 	      else  // fMaxEnergy != MAX_SAFE_MC_ENERGY)
 		{
-		  cout << "Calculating Integral fluxes within the restricted range [" << fMinEnergy << " TeV, "  << fMaxEnergy << " TeV]  " << endl;
+		  if( fDebug ) cout << "Calculating Integral fluxes within the restricted range [" << fMinEnergy << " TeV, "  << fMaxEnergy << " TeV]  " << endl;
 		  if( fMinEnergy > 0. )
 		    {
 		      IntraFlux.push_back(-1./( fAlpha + 1. ) * IntraFluxConstant[t] * 
@@ -982,8 +979,6 @@ void VFluxCalculation::setSpectralParameters( double iMinEnergy_TeV, double  E0,
       fMaxEnergy = MAX_SAFE_MC_ENERGY;
     fE0 = E0;
     fAlpha = alpha;
-
-    cout << " Setting maximum energy for flux calculation to " << fMaxEnergy << " [TeV]" << endl;
 }
 
 /*

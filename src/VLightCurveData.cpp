@@ -105,9 +105,13 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
    fFluxCalculation.setSignificanceParameters( -999., -999. );
    fFluxCalculation.setSignificanceParameters( iThresholdSignificance, iMinEvents, iUpperLimit, iUpperlimitMethod, iLiMaEqu );
    if(fEnergy_max_TeV > 0.)     
+   {
      fFluxCalculation.setSpectralParameters( iMinEnergy, E0, alpha, fEnergy_max_TeV );
+   }
    else
+   {
      fFluxCalculation.setSpectralParameters( iMinEnergy, E0, alpha );
+   }
      
 
 // reset min/max values
