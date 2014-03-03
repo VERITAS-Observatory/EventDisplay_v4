@@ -199,6 +199,8 @@ HESSIOINCLUDEFLAGS = -I $(HESSIOSYS)/include/
 # CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA_SC=2
 # 2013 PROD2
 CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_PROD2 -DCTA_PROD2_TRGMASK
+# SC MST FLAGS (needs 201312 hessio version)
+# CXXFLAGS        += $(HESSIOINCLUDEFLAGS) -DCTA -DCTA_SC=3
 endif
 ########################################################
 # profiler (gperftools)
