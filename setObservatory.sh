@@ -5,14 +5,21 @@
 # Autor: Gernot Maier
 #
 
-if [ ! -n "$1" ]
+if [ ! -n "$1" ] || [ $1 = "-h" ] || [ $1 = "-help" ]
 then
    echo 
    echo "set the environmental variables for EVNDISP"
    echo 
    echo "   source ./setObservatory.sh <observatory = CTA or VERITAS/VTS>"
    echo 
-   exit
+   echo "    (this is needed to find e.g. the parameter or lookup table files)"
+   echo 
+   if [[ "${BASH_SOURCE[0]}" != "${0}" ]]
+   then
+      kill -INT $$
+   else
+      exit
+   fi
 fi
 OBSERVATORY=$1
 
