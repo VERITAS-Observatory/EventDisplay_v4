@@ -21,6 +21,7 @@ LOGF=FLL
 PEDFILE=PPPP
 TRGMASKDIR=TRIGGGG
 PPOP=UUUU
+STEPSIZE=STST
 
 # set array
 FIELD=$SUBA
@@ -38,29 +39,43 @@ then
    exit
 fi
 
-echo "getting line $ILINE from list"
+# get file list (of $STEPSIZE files)
+let "ILINE = $ILINE * $STEPSIZE"
+echo "getting line(s) $ILINE from list"
 echo "list: $ILIST"
-IFIL=`head -n $ILINE $ILIST | tail -n 1`
-echo "DATA FILE $IFIL"
+IFIL=`head -n $ILINE $ILIST | tail -n $STEPSIZE`
+IFIL0=`head -n $ILINE $ILIST | tail -n 1`
+echo "DATA FILE(S)"
+echo $IFIL
+# copy files on temporary disk
+echo
+echo "COPYING FILES TO $TMPDIR"
 cp -v -f $IFIL $TMPDIR"/"
+du -h -c $TMPDIR
 # log file directory
 DATE=`date +"%y%m%d"`
 mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF
 
-if [ ! -e $IFIL ]
-then
-   echo "ERROR: SIMTELFILE does not exist"
-   exit
-fi
+for F in $FIL
+do
+    if [ ! -e $F ]
+    then
+       echo "ERROR: SIMTELFILE does not exist:"
+       echo $F
+       exit
+    fi
+done
 
 #####################################
 # output file
-OFIL=`basename $IFIL .gz`
+OFIL=`basename $IFIL0 .gz`
+echo
 echo "OUTPUT FILE $OFIL"
 
 #####################################
 # trigmask file (optional)
-if [ $TRGMASKDIR != "FALSE" ]
+echo $TRGMASKDIR
+if [[ ! -z "$TRGMASKDIR" ]] && [[ "$TRGMASKDIR" == "TRUE" ]]
 then
    if [[ $DSET == *Leoncito* ]] || [[ $DSET == *Aar* ]]
    then
@@ -106,7 +121,9 @@ do
 
 ####################################################################
 # execute converter
-   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST $COPT -a $CTA_EVNDISP_AUX_DIR/DetectorGeometry/CTA.prod2$N.lis -o $TMPDIR/$OFIL.root $TMPDIR/$OFIL.gz >& $TMPDIR/$OFIL.$N.convert.log
+   SIMFIL=`ls $TMPDIR/*.simtel.gz`
+   echo "TMPDIR FILES " $SIMFIL
+   $EVNDISPSYS/bin/CTA.convert_hessio_to_VDST $COPT -a $CTA_EVNDISP_AUX_DIR/DetectorGeometry/CTA.prod2$N.lis -o $TMPDIR/$OFIL.root $SIMFIL >& $TMPDIR/$OFIL.$N.convert.log
 
 ####################################################################
 # execute eventdisplay
@@ -116,16 +133,21 @@ do
 # get runnumber and azimuth and rename output files
   MCAZ=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -mcaz`
   RUNN=`$EVNDISPSYS/bin/printRunParameter $TMPDIR/$OFIL.root -runnumber`
-  rm -f -v $TMPDIR/$OFIL.root
-  cp -v -f $TMPDIR/$RUNN.root $ODIR/$RUNN"_"$ILINE"_"$MCAZ"deg.root"
+  cp -v -f $TMPDIR/[0-9]*.root $ODIR/$RUNN"_"$ILINE"_"$MCAZ"deg.root"
 
 ####################################################################
 # move dst (if required ) and evndisp files to data directory
-   if [ $KEEP == "1" ]
+   if [ "$KEEP" == "1" ]
    then
       mkdir -p $ODIR/VDST
       cp -v -f $TMPDIR/$OFIL.root $ODIR/VDST/
    fi
+   ls -lh $TMPDIR/*.root
+# clean up 
+   rm -f $TMPDIR/$OFIL.root
+   rm -f $TMPDIR/[0-9]*.root
+   echo "==================================================================="
+   echo
 done
 
 ####################################################################

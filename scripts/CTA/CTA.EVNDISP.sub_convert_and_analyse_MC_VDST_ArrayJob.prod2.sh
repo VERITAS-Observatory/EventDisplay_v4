@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # script to convert sim_tel output files and then run eventdisplay analysis
 #
@@ -84,57 +84,94 @@ then
     exit
 fi
 
+#########################################
+# output directory for error/output from batch system
+# in case you submit a lot of scripts: QLOG=/dev/null
+DATE=`date +"%y%m%d"`
+
+# output directory for shell scripts and run lists
+SHELLDIR=$CTA_USER_DATA_DIR"/queueShellDir/"
+mkdir -p $SHELLDIR
+
+# skeleton script
+FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2_v2"
+
+# log files
+QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
+mkdir -p $QLOG
+#QLOG="/dev/null"
+
+# pedestals
+# PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
+PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
+
 # get run list and number of runs
 if [ ! -e $RUNLIST ]
 then
   echo "list of simtelarray files not found: $RUNLIST"
   exit
 fi
-NRUN=`wc -l $RUNLIST | awk '{print $1}'`
-RUNFROMTO="1-$NRUN"
+RUNLISTN=`basename $RUNLIST`
 
-#########################################
-# output directory for error/output from batch system
-# in case you submit a lot of scripts: QLOG=/dev/null
-DATE=`date +"%y%m%d"`
+#########################################################################3
+# separate job for north and south
+for D in 0 180
+do
 
-# output directory for shell scripts
-SHELLDIR=$CTA_USER_DATA_DIR"/queueShellDir/"
-mkdir -p $SHELLDIR
+# run lists for north or south
+    RUNLISTNdeg=$SHELLDIR/$RUNLISTN.$D
+    rm -f $RUNLISTNdeg
+    grep "_$D" $RUNLIST > $RUNLISTNdeg
 
-# skeleton script
-FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
+    NRUN=`wc -l $RUNLISTNdeg | awk '{print $1}'`
+    RUNFROMTO="1-$NRUN"
+    STEPSIZE=1
+    NSTEP=1
 
-# log files
-#QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
-#mkdir -p $QLOG
-QLOG="/dev/null"
+# combine files to bunches of $STEPSIZE
+    if [[ $TRGMASKDIR == "FALSE" ]] || [[ ! -n $TRGMASKDIR ]]
+    then
+        STEPSIZE=10
+# smaller step size for on source gammas
+        if [[ $PART == "gamma_onSource" ]]
+        then
+           STEPSIZE=5
+        fi
+        let "NSTEP = $NRUN / $STEPSIZE"
+        let "NTES  = $NSTEP * $STEPSIZE"
+        if [[ $NTES -ne $NRUN ]]
+        then
+            let "NSTEP = $NSTEP + 1"
+        fi
+        RUNFROMTO="1-$NSTEP"
+    fi
 
-# pedestals
-# PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
-PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Aar/Calibration/Aar.peds.root"
+    echo "submitting $NRUN jobs ($NSTEP steps of size $STEPSIZE, $RUNFROMTO)"
 
-echo "submitting $RUNFROMTO"
+    FNAM="$SHELLDIR/EV-$DSET-$PART-$FLL-$D"
 
-FNAM="$SHELLDIR/EV-$DSET-$PART-$FLL"
+    LIST=`awk '{printf "%s ",$0} END {print ""}' $ARRAY`
 
-LIST=`awk '{printf "%s ",$0} END {print ""}' $ARRAY`
+    sed -e "s|SIMTELLIST|$RUNLISTNdeg|" \
+        -e "s|PAAART|$PART|" \
+        -e "s!ARRAY!$LIST!" \
+        -e "s|KEEEEEEP|$KEEP|" \
+        -e "s|ARC|$ARRAYCUTS|" \
+        -e "s|DATASET|$DSET|" \
+        -e "s|FLL|$FLL|" \
+        -e "s|PPPP|$PEDFIL|" \
+        -e "s!UUUU!$PPOPT!" \
+        -e "s|STST|$STEPSIZE|" \
+        -e "s|TRIGGGG|$TRGMASKDIR|" $FSCRIPT.sh > $FNAM.sh
 
-sed -e "s|SIMTELLIST|$RUNLIST|" \
-    -e "s|PAAART|$PART|" \
-    -e "s!ARRAY!$LIST!" \
-    -e "s|KEEEEEEP|$KEEP|" \
-    -e "s|ARC|$ARRAYCUTS|" \
-    -e "s|DATASET|$DSET|" \
-    -e "s|FLL|$FLL|" \
-    -e "s|PPPP|$PEDFIL|" \
-    -e "s!UUUU!$PPOPT!" \
-    -e "s|TRIGGGG|$TRGMASKDIR|" $FSCRIPT.sh > $FNAM.sh
+    chmod u+x $FNAM.sh
+    echo $FNAM.sh
 
-chmod u+x $FNAM.sh
-echo $FNAM.sh
-
-qsub $QSUBOPT -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os=sl6 -l tmpdir_size=10G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh" 
+    if [[ $NRUN -ne 0 ]]
+    then
+        qsub $QSUBOPT -t $RUNFROMTO:1  -l h_cpu=47:29:00 -l os=sl6 -l tmpdir_size=40G -l h_vmem=4G -V -o $QLOG -e $QLOG "$FNAM.sh" 
+    fi
+done
 
 echo "writing shell script to $FNAM.sh"
 echo "writing queue log and error files to $QLOG"
