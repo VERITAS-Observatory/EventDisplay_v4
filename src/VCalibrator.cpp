@@ -2871,8 +2871,8 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	  {
 	     if( fConv_high[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
 	     {
-		getGains( false )[p] = fConv_high[p] / i_meanC;
-		if( getGainDist( false ) ) getGainDist( false )->Fill( fConv_high[p] / i_meanC );
+		getGains( false )[p] = 1./fConv_high[p];
+		if( getGainDist( false ) ) getGainDist( false )->Fill( i_meanC / fConv_high[p] );
              }
 	     else
 	     {

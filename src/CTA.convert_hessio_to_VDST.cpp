@@ -1419,6 +1419,7 @@ int main(int argc, char **argv)
       cout << "exiting..." << endl;
       exit( -1 );
     }
+    cout << "opening simtel file " << input_fname << endl;
 
     fflush(stdout);
     fprintf(stderr,"%s\n",input_fname);
