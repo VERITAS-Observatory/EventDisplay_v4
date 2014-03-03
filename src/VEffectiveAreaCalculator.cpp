@@ -270,7 +270,6 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     fAcceptance_AfterCuts_tree->Branch("EMC",&fEMC,"EMC/D");
     fAcceptance_AfterCuts_tree->Branch("CRweight",&fCRweight,"CRweight/D");
 
-
     fsolid_angle_norm_done = false;              
     fsolid_angle_norm = 1.;
 
@@ -2764,9 +2763,9 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
    double n_cr = fMC_ScatterArea * fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) * 1.e4 * 60.;
    // fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) returns the differential flux multiplied by the energy
 
-// (ctools) for the acceptance map construction, the weight is in #/s/sr
+// (ctools) for the acceptance map construction, the weight is in #/s ()
    if( for_back_map ){
-       //need to normalize this number considering the cone in which the particle are simulated and the offset bin we are in now.
+       //need to normalize this number considering the cone in which the particle are simulated (the offset bin is not consider so the binning can be changed later).
        if(! fsolid_angle_norm_done) Calculate_Bck_solid_angle_norm();
        n_cr = fsolid_angle_norm*n_cr/60.;
        if( n_mc != 0. ){
@@ -2790,17 +2789,10 @@ void VEffectiveAreaCalculator::Calculate_Bck_solid_angle_norm(){
 
     if( fRunPara->fViewcone_max > 0. )
     {
-	// solid angle in which the particule have been simulated (only need ratio no drop 2Pi)
-	double SolidAngle_MCScatterAngle  =  (1.-cos( fRunPara->fViewcone_max * TMath::DegToRad()));
-	// solid angle of the offset bin considered for the current analysis 
-	double SolidAngle_OffSetBin = 1;
-	// this is written at a time when the offset bin are stored in theta2cut when running makeEffectiveArea on background event (for statistic reason no the2cut are applied)
-	// in this case the theta2 values are not energy dependent
-	double offmin = sqrt(fCuts->fCut_Theta2_min);
-	double offmax = sqrt(fCuts->fCut_Theta2_max);
-	SolidAngle_OffSetBin=  (1.-cos( offmax  * TMath::DegToRad())) -  (1.-cos( offmin  * TMath::DegToRad()));
+	// solid angle in which the particule have been simulated 
+	double SolidAngle_MCScatterAngle  =  2*TMath::Pi() * (1.-cos( fRunPara->fViewcone_max * TMath::DegToRad()));
 
-	fsolid_angle_norm = SolidAngle_MCScatterAngle/SolidAngle_OffSetBin;
+	fsolid_angle_norm = SolidAngle_MCScatterAngle;
 	fsolid_angle_norm_done = true;
 	
     }  
