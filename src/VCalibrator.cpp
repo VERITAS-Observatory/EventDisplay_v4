@@ -1981,7 +1981,7 @@ void VCalibrator::initialize()
 				     || (getRunParameter()->fsourcetype == 2 && getRunParameter()->fsimu_pedestalfile.size() > 0 ) ),
 				     getRunParameter()->freadCalibfromDB,
 				     isDST_MC(),
-	                             getDebugFlag(), getRunParameter()->frunmode );
+	                             getDebugFlag(), getRunParameter()->frunmode, isTeltoAna( i ) );
         if( fReader->getDataFormat() == "grisu" ) fCalData.back()->setReader( fReader );
    }
 // define histograms and output files for pedestal calculation

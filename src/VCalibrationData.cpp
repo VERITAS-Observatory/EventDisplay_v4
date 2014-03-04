@@ -107,7 +107,7 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 
 void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples, bool iUsePedestalsInTimeSlices,
                                    bool iLowGainUsePedestalsInTimeSlices, bool iPedsFromPLine, bool iReadCalibDB, 
-				   bool i_isDSTMC, bool iDebug, int iRunMode )
+				   bool i_isDSTMC, bool iDebug, int iRunMode, bool isTeltoAna )
 {
     if( iDebug ) cout << "VCalibrationData::initialize " << i_channel << "\t" << fTelID << endl;
 
@@ -145,9 +145,13 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
           }
 	  else
 	  {
-	     sprintf( c_name, "%s.root", fFileName[i].c_str() );
-	     fFile[i] = new TFile( c_name, "READ" );
-	     if( fFile[i]->IsZombie() ) fFile[i] = 0;
+             if( isTeltoAna )
+             {
+                 sprintf( c_name, "%s.root", fFileName[i].c_str() );
+                 fFile[i] = new TFile( c_name, "READ" );
+                 if( fFile[i]->IsZombie() ) fFile[i] = 0;
+             }
+             else fFile[i] = 0;
 	  }
        }
        else fFile[i] = 0;

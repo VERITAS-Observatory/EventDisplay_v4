@@ -148,7 +148,7 @@ class VCalibrationData
 
         void initialize( unsigned int iChannel, unsigned int nSamples = 24, bool iTimeSlices = true,
 	                 bool iLowGainTimeSlices = false, bool iPedsFromPLine = false, bool iReadCalibDB = false,
-			 bool i_isDSTMC = false, bool iDebug = false, int iRunMode = -1 );
+			 bool i_isDSTMC = false, bool iDebug = false, int iRunMode = -1, bool isTelToAna = true );
 
 	valarray< double >& getLowGainMultiplier( unsigned int iSumWindow = 9999 );
 	valarray< double >& getLowGainMultiplierError( unsigned int iSumWindow = 9999 );
