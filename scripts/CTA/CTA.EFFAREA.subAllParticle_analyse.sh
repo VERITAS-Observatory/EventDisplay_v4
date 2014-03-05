@@ -82,7 +82,7 @@ VARRAY=`awk '{printf "%s ",$0} END {print ""}' $SUBAR`
 # (don't expect to have cone for all data sets)
 if [ $GMOD = "0" ]
 then
-   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]]
+   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]] || [[ $DSET = prod1-cta-ul* ]]
    then
       VPART=( "gamma_onSource" "gamma_cone" "electron" "proton" "electron_onSource" "proton_onSource" )
    elif [ $DSET = "VTS" ]
@@ -92,7 +92,7 @@ then
       VPART=( "gamma_onSource" "electron_onSource" "proton_onSource" )
    fi
 else
-   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]]
+   if [ $DSET = "cta-ultra3" ] || [ $DSET = "v_leeds" ] || [[ $DSET = prod2* ]] || [[ $DSET = prod1-cta-ul* ]]
    then
       VPART=( "gamma_onSource" "gamma_cone" )
    else
