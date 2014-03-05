@@ -83,11 +83,14 @@ if [ -z "$NTYPEMIN_2" ]
 then
    NTYPEMIN_2=0
 fi
+
 ANADIR=`grep MSCWSUBDIRECTORY  $ANAPAR | awk {'print $2'}`
 EREC=`grep ENERGYRECONSTRUCTIONMETHOD $ANAPAR | awk {'print $2'}`
 TMVACUT=`grep TMVASUBDIR $ANAPAR | awk {'print $2'}`
 EFFAREADIR=`grep EFFAREASUBDIR $ANAPAR | awk {'print $2'}`
 OBSTIME=`grep OBSERVINGTIME_H $ANAPAR | awk {'print $2'}`
+GETXOFFYOFFAFTERCUTS=`grep GETXOFFYOFFAFTERCUTS $ANAPAR | awk  {'print $2'}`
+
 if [ -z "$ANADIR" ] || [ -z "$NIMAGESMIN" ] || [ -z "$EREC" ] || [ -z "$TMVACUT" ] || [ -z "$EFFAREADIR" ] || [ -z "$OBSTIME" ] || [ -z "$NTYPEMIN_0" ]
 then
   echo "error: analysis parameter file not correct: $ANAPAR" 
@@ -394,6 +397,11 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
          echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 0" >> $MSCF
+	 if  [ $GETXOFFYOFFAFTERCUTS = "yes" ]
+	 then	
+	     echo "* GETXOFFYOFFAFTERCUTS 1" >> $MSCF
+	 fi    
+
       fi
       if [ $PART = "helium" ] 
       then
@@ -404,6 +412,10 @@ do
       then
          echo "* ENERGYSPECTRUMINDEX  1 2.5 0.1" >> $MSCF
          echo "* ESPECTRUM_FOR_WEIGHTING $CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat 8" >> $MSCF
+	 if  [ $GETXOFFYOFFAFTERCUTS = "yes" ]
+	 then
+	 echo "* GETXOFFYOFFAFTERCUTS 1" >> $MSCF
+	 fi
       fi
       if [ $PART = "gamma_onSource" ] || [ $PART = "gamma_cone" ]
       then
