@@ -94,7 +94,7 @@ SHELLDIR=$CTA_USER_DATA_DIR"/queueShellDir/"
 mkdir -p $SHELLDIR
 
 # skeleton script
-FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2_v2"
+FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
 
 # log files
 QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
