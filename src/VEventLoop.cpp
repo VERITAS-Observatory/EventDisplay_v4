@@ -912,7 +912,7 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
             fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
         }
-	if( fLowGainMultiplierWarning < 3 ) {  //look for low gain multiplier with nominal window = sumwindow_1. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+	if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC==0) {  //look for low gain multiplier with nominal window = sumwindow_1. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
 	    bool found = false;
 	    for(  unsigned int j=0; j<getLowGainDefaultSumWindows().size() ; j++) {
 	   	if(getLowGainDefaultSumWindows()[j] == fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]]) found=true; 
@@ -936,7 +936,7 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
             fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
         }
-	if( fLowGainMultiplierWarning < 3 ) {  //look for low gain multiplier with nominal window = sumwindow_2. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+	if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC==0 ) {  //look for low gain multiplier with nominal window = sumwindow_2. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
 	    bool found = false;
 	    for( unsigned int j=0; j<getLowGainDefaultSumWindows().size() ;j++) {
 	   	if(getLowGainDefaultSumWindows()[j] == fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]]) found=true; 
@@ -960,7 +960,7 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
             fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 2;
         } 
-	if( fLowGainMultiplierWarning < 3 ) { //look for low gain multiplier with nominal window = sumwindow_pass1. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+	if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC==0 ) { //look for low gain multiplier with nominal window = sumwindow_pass1. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
 	    bool found = false;
 	    for(  unsigned int j=0; j<getLowGainDefaultSumWindows().size() ; j++) {
 	   	if(getLowGainDefaultSumWindows()[j] == fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]]) found=true; 
