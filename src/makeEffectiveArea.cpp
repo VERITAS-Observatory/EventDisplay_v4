@@ -303,7 +303,7 @@ int main( int argc, char *argv[] )
        if( fEffectiveAreaCalculator.getHistogramhEmc() ) fEffectiveAreaCalculator.getHistogramhEmc()->Write();
 
        if( fRunPara->fgetXoff_Yoff_afterCut && fEffectiveAreaCalculator.getAcceptance_AfterCuts()){
-	   cout << "writing tree (" << fEffectiveAreaCalculator.getTree()->GetName() << ") to " << fOutputfile->GetName() << endl;
+	   cout << "writing acceptance tree (" << fEffectiveAreaCalculator.getAcceptance_AfterCuts()->GetName() << ") to " << fOutputfile->GetName() << endl;
       	   fOutputfile->cd();
 	   fEffectiveAreaCalculator.getAcceptance_AfterCuts()->Write();
        }

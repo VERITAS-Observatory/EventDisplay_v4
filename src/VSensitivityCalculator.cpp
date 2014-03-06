@@ -1757,7 +1757,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
       VEnergySpectrumfromLiterature i_CR( (*i_MCData_iterator).second->fSpectralParameterFile );
       cout << "\t reading CR spectrum with ID" <<  (*i_MCData_iterator).second->fSpectralParameterID << endl;
       if( i_CR.isZombie() ) return a;
-    std::cout<<"VSensitivityCalcualtor::getDifferentialFluxVectorfromMC CR "<<std::endl;
+      std::cout<<"VSensitivityCalculator::getDifferentialFluxVectorfromMC CR "<<std::endl;
       i_CR.listValues( (*i_MCData_iterator).second->fSpectralParameterID );
 
 // get CR rate for a certain ze, az, noise, wobble offset
@@ -1790,7 +1790,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 // take care of space angle and theta2 cut normalisation
 //////////////////////////////////////////////////////////////////////////////////////////
 
-// CR spectrum is given as dN/dt/dA/dOmega (Omega = space angle)
+// CR spectrum is given as dN/dt/dOmega (Omega = space angle)
 // multiply CR rate by space angle used in CORSIKA (scattering angle)
 	   v_flux_NOff[(*i_MCData_iterator).first][i]       *= (*i_MCData_iterator).second->SolidAngle_MCScatterAngle;
 	   v_flux_NOff_error[(*i_MCData_iterator).first][i] *= (*i_MCData_iterator).second->SolidAngle_MCScatterAngle;
