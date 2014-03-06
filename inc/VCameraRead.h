@@ -87,7 +87,7 @@ class VCameraRead : public VGlobalRunParameter
         vector< vector<float> > fTOff;            //!< toffsets
 // electronics
         bool                  fLowGainIsSet;       //!< low gain multiplier is set in cfg file
-        vector< double >      fLowGainMultiplier;  //!< low gain multiplier (usually 6.)
+        vector< double >      fLowGainMultiplier_Trace;  //!< low gain multiplier (usually 6.)
         vector< unsigned int> fLowGainActivator;  //!< threshold for low gain activation (usually 255)
 
         void                 cleanNeighbourList();
@@ -138,7 +138,7 @@ class VCameraRead : public VGlobalRunParameter
         vector<float>&       getCameraCentreOffset() { return fCameraCentreOffset; }
         vector<float>&       getCameraRotation() { return fCameraRotation; }
         vector<unsigned int> getLowGainThreshold() { return fLowGainActivator; }
-        vector< double >     getLowGainMultiplier() { return fLowGainMultiplier; }
+        vector< double >     getLowGainMultiplier_Trace() { return fLowGainMultiplier_Trace; }
         vector<unsigned int>& getMCPixel()        //!< get pixel number v[real]=mc (pixel numbering different in MC and reality)
         {
             return fMix;
@@ -287,7 +287,7 @@ class VCameraRead : public VGlobalRunParameter
         void                 setConfigDir( string iDir ) { fConfigDir = iDir; }
 	bool                 setLengthOfSampleTimeSlice( unsigned int iTelID, float iSample_time_slice );
 	void                 setTelID_matrix( map< unsigned int, unsigned int > m ) { fTelIDGrisu = m; }
-        bool                 setLowGainMultiplier( unsigned int iTel, double ival );
+        bool                 setLowGainMultiplier_Trace( unsigned int iTel, double ival );
         bool                 setLowGainThreshold( unsigned int iTel, unsigned int ival );
         void                 setCoordinateTransformer( float iX = 1., float iY = 1. ) { fCoordinateTransformerX = iX; fCoordinateTransformerY = iY; }
                                                   //!< set telescope ID for getters

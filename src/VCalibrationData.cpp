@@ -42,7 +42,6 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
     fBoolLowGainTOff = false;
 
     fSumWindow = 0;
-    setLowGainMultiplierFixedSummationWindow();
 
     fTS_ped_temp_time = 0.;
 
@@ -200,13 +199,11 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
     fLowGainAverageTzero.resize( i_channel, 0. );
     fLowGainAverageTzerovars.resize( i_channel, 0. );
 
-// low gain multiplier settings (per summation window)
+
     itemp_ped.resize( i_channel, 1. );
-    fLowGainMultiplier.resize( nSamples+1, itemp_ped );
-    itemp_ped = 0.;
-    fLowGainMultiplierError.resize( nSamples+1, itemp_ped );
-    fLowGainMultiplier_Mean.resize( nSamples+1, 1. );
-    fLowGainMultiplier_RMS.resize( nSamples+1, 0. );
+// low gain multiplier settings
+	fLowGainMultiplier_Trace = 0;
+	fLowGainMultiplier_Camera.resize( i_channel, 0.);
 
     if( iDebug ) cout << "END VCalibrationData::initialize " << endl;
 }
@@ -322,22 +319,12 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // no DST analysis
-    if( !iDST )
+   if( !iDST )
     {
-       if( !gDirectory->FindObject( "calibration" ) )
-       {
-	   TDirectory *iNewDir = gDirectory->mkdir( "calibration" );
-	   if( iNewDir ) iNewDir->cd();
-	   else
-	   {
-	       cout << "VCalibrationData::terminate: Error in creating calibration directory in: " << iDir->GetName() << endl;
-	       iDir->cd();
-	       return false;
-	   }
-       }
 
 // fill tree with used calibration data
        const unsigned int iMAXSUMWINDOWS = 1000;
+       const unsigned int iMAXDEFWINDOWS = 10;
        char hname[200];
        char htitle[200];
        sprintf( hname, "calib_%d", fTelID+1 );
@@ -353,9 +340,11 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
        double itzerovar = 0.;
        double ipedlowgain = 0.;
        double ipedvarlowgain = 0.;
-       double igainMult[iMAXSUMWINDOWS];
-       double igainMultE[iMAXSUMWINDOWS];
-       double igainlowgain = 0.; 
+       double igainlowgain = 0.;
+       double ilowgainmultiplier_trace = 0;
+       double ilowgainmultiplier_sum[iMAXDEFWINDOWS][iMAXSUMWINDOWS]; 
+       unsigned int inlowgaindefaultsumwindows;
+       double ilowgaindefaultsumwindows[iMAXDEFWINDOWS];
        double igainvarlowgain = 0.;
        double itofflowgain = 0.;
        double itoffvarlowgain = 0.;
@@ -371,8 +360,9 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
        {
           pedvarV[i] = 0.;
 	  pedvarLowGainV[i] = 0.;
-	  igainMult[i] = 0.;
-	  igainMultE[i] = 0.;
+	  for(  unsigned int j = 0; j < iMAXDEFWINDOWS; j++ ) {
+		ilowgainmultiplier_sum[j][i]=0;
+	  }
        }
        TTree *fCalibrationTree = new TTree( hname, htitle );
        fCalibrationTree->Branch( "pix", &ipix, "pix/I" );
@@ -398,9 +388,12 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
        fCalibrationTree->Branch( "toffvarLowGain", &itoffvarlowgain, "toffvarLowGain/D" );
        fCalibrationTree->Branch( "tzeroLowGain", &itzerolowgain, "tzeroLowGain/D" );
        fCalibrationTree->Branch( "tzerovarLowGain", &itzerovarlowgain, "tzerovarLowGain/D" );
-       fCalibrationTree->Branch( "gainMult", igainMult, "gainMult[nsumwindows]/D" );
-       fCalibrationTree->Branch( "gainMultE", igainMultE, "gainMultE[nsumwindows]/D" );
+       fCalibrationTree->Branch( "lowgainmultiplier_trace", &ilowgainmultiplier_trace, "lowgainmultiplier_trace/D" );
+       fCalibrationTree->Branch( "lowgainmultiplier_sum", &ilowgainmultiplier_sum, "lowgainmultiplier_sum[10][1000]/D" ); //HF: lots of 0s, but root doesn't like 2D-variable arrays in trees.
+       fCalibrationTree->Branch( "nlowgaindefaultsumwindows", &inlowgaindefaultsumwindows, "nlowgaindefaultsumwindows/i" );
+       fCalibrationTree->Branch( "lowgaindefaultsumwindows", &ilowgaindefaultsumwindows, "lowgaindefaultsumwindows[nlowgaindefaultsumwindows]/D" );
 
+ 
        if( fPeds.size() == fPedrms.size() && fPeds.size() == fGains.size() && fPeds.size() == fGainvars.size()
         && fPeds.size() == fTOffsets.size() && fPeds.size() == fTOffsetvars.size() && fPeds.size() == fLowGainPeds.size() )
        {
@@ -439,20 +432,20 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		      if( i < fVLowGainPedvars[s].size() ) pedvarLowGainV[s] = fVLowGainPedvars[s][i];
                    }
 	       } 
-	       if( nsumwindows < iMAXSUMWINDOWS )
-	       {
-	          for( unsigned int s = 0; s < fLowGainMultiplier.size(); s++ )
-		  {
-		     if( i < fLowGainMultiplier[s].size() )
-		     {
-		        if( i < fLowGainMultiplier[s].size() ) igainMult[s]  = fLowGainMultiplier[s][i];
-                     }
-	             if( i < fLowGainMultiplierError[s].size() )
-		     {
-		        if( i < fLowGainMultiplierError[s].size() ) igainMultE[s] = fLowGainMultiplierError[s][i];
-                     }
-                  }
-               }
+
+		ilowgainmultiplier_trace = fLowGainMultiplier_Trace ;
+		inlowgaindefaultsumwindows = getLowGainDefaultSumWindows().size();
+		
+		for( unsigned int k = 0; k < inlowgaindefaultsumwindows && k<iMAXDEFWINDOWS; k++ )	{
+			ilowgaindefaultsumwindows[k]=getLowGainDefaultSumWindows()[k];
+			for( unsigned int j = 1; j <= nsumwindows && j<iMAXSUMWINDOWS; j++ )	{
+				ilowgainmultiplier_sum[k][j] = getLowGainMultiplier_Sum(getLowGainDefaultSumWindows()[k], j);
+			}
+		}
+
+
+
+
 	       if( i < fLowGainGains.size() ) igainlowgain = fLowGainGains[i];
 	       if( i < fLowGainGains_DefaultSetting.size() ) fLowGainGains_DefaultSetting[i] = false;
 	       if( i < fLowGainGainvars.size() ) igainvarlowgain = fLowGainGainvars[i];
@@ -700,97 +693,28 @@ void VCalibrationData::getmeanPedvars( double &imean, double &irms, bool iLowGai
     if( its_n > 1. ) irms = sqrt( 1./(its_n-1.) * ( its_sum2 - 1./its_n * its_sum * its_sum ) );
 }
 
-unsigned int VCalibrationData::setSummationWindow( unsigned int iSumWindow )
-{
-   if( fLowGainMultiplier_FixedSummationWindow == 9999 ) return iSumWindow;
 
-   return fLowGainMultiplier_FixedSummationWindow;
+
+double VCalibrationData::getLowGainMultiplier_Sum( int iSumWindow, int jSumWindow )  { 	
+	std::pair<int, int> temp( iSumWindow, jSumWindow );
+	if( fLowGainMultiplier_Sum.count( temp ) == 0 ) return 0; 
+	else return fLowGainMultiplier_Sum.at( temp );
 }
+/*
+The LowGainSumCorrection is used to correct the integrated charge, calculated from the trace * fLowGainMultiplier_Trace, with the low gain multiplier for a given sum window/nominal sum window. It returns 1 (no correction needed) if the low gain multiplier is 0 ( i.e. non-existent) .
+*/
+double VCalibrationData::getLowGainSumCorrection(int iSumWindow,int jSumWindow,bool HiLo) {
+	if(!HiLo) return 1.0;
+	if ( getLowGainMultiplier_Sum(iSumWindow,jSumWindow)==0 || getLowGainMultiplier_Trace()==0) return 1.0; 
+	return getLowGainMultiplier_Sum(iSumWindow,jSumWindow)/ fLowGainMultiplier_Trace ;
+} 
 
-
-bool VCalibrationData::setLowGainMultiplier( double iV, unsigned int iChannel, unsigned int iSumWindow )
-{
-    if( iSumWindow == 9999 )
-    {
-       for( unsigned int i = 0; i < fLowGainMultiplier.size(); i++ ) 
-       {
-          fLowGainMultiplier[i][iChannel] = iV;
-       }
-       return true;
-    }
-    iSumWindow = setSummationWindow( iSumWindow );
-    if( iSumWindow < fLowGainMultiplier.size() && iChannel < fLowGainMultiplier[iSumWindow].size() )
-    {
-        fLowGainMultiplier[iSumWindow][iChannel]  = iV;
+bool VCalibrationData::setLowGainMultiplier_Sum( int iSumWindow, int jSumWindow ,double lmult) { 
+	std::pair<int, int> temp( iSumWindow, jSumWindow );
+	fLowGainMultiplier_Sum[temp] = lmult;
 	return true;
-    }
-    return false;
 }
-
-bool VCalibrationData::setRMSLowGainMultiplier( double g, unsigned int iSumWindow )
-{
-   iSumWindow = setSummationWindow( iSumWindow );
-   if( iSumWindow < fLowGainMultiplier_RMS.size() )
-   {
-      fLowGainMultiplier_RMS[iSumWindow] = g;
-      return true;
-   }
-   else if( iSumWindow == 9999 )
-   {
-      for( unsigned int i = 0; i < fLowGainMultiplier_RMS.size(); i++ ) fLowGainMultiplier_RMS[i] = g;
-      return true;
-   }
-   return false;
-}
-
-bool VCalibrationData::setMeanLowGainMultiplier( double g, unsigned int iSumWindow )
-{
-   iSumWindow = setSummationWindow( iSumWindow );
-   if( iSumWindow < fLowGainMultiplier_Mean.size() )
-   {
-      fLowGainMultiplier_Mean[iSumWindow] = g;
-      return true;
-   }
-   else if( iSumWindow == 9999 )
-   {
-      for( unsigned int i = 0; i < fLowGainMultiplier_Mean.size(); i++ ) fLowGainMultiplier_Mean[i] = g;
-      return true;
-   }
-   return false;
-}
-
-double VCalibrationData::getMeanLowGainMultiplier( unsigned int iSumWindow )
-{
-   iSumWindow = setSummationWindow( iSumWindow );
-   if( iSumWindow < fLowGainMultiplier_Mean.size() ) return fLowGainMultiplier_Mean[iSumWindow];
-
-   return -1.;
-}
-
-double VCalibrationData::getRMSLowGainMultiplier( unsigned int iSumWindow )
-{
-   iSumWindow = setSummationWindow( iSumWindow );
-   if( iSumWindow < fLowGainMultiplier_RMS.size() ) return fLowGainMultiplier_RMS[iSumWindow];
-
-   return -1.;
-}
-
-valarray< double >& VCalibrationData::getLowGainMultiplier( unsigned int iSumWindow )
-{
-   iSumWindow = setSummationWindow( iSumWindow );
-   if( iSumWindow < fLowGainMultiplier.size() ) return fLowGainMultiplier[iSumWindow];
-
-   return fValArrayDouble;
-}
-
-valarray< double >& VCalibrationData::getLowGainMultiplierError( unsigned int iSumWindow )
-{
-   iSumWindow = setSummationWindow( iSumWindow );
-   if( iSumWindow < fLowGainMultiplierError.size() ) return fLowGainMultiplierError[iSumWindow];
-
-   return fValArrayDouble;
-}
-    
+  
 
 /*!
     get smallest non-zero pedestal value
@@ -847,9 +771,4 @@ void VCalibrationData::recoverLowGainPedestals()
    }
 }
 
-bool VCalibrationData::setLowGainMultiplierFixedSummationWindow( unsigned int iSumWindow )
-{
-   fLowGainMultiplier_FixedSummationWindow = iSumWindow;
 
-   return true;
-}

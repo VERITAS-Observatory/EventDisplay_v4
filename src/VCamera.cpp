@@ -373,7 +373,7 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 setPMTColorScheme( fData->getDeadUI( true ), false, 0., 12., "low gain channel status", false, true, true );
                 break;
             case C_LOWGAIN:
-                setPMTColorScheme( fData->getLowGainMultiplier(), false, 100., 0., "multiplier", false );
+                setPMTColorScheme( fData->getLowGainMultiplier_Camera( ), false, 100., 0., "multiplier", false );
                 break;
             case C_TRIGGER_EVNDISP:
                 setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );

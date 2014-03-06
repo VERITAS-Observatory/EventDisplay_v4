@@ -19,6 +19,7 @@
 #include <string>
 #include <valarray>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -43,8 +44,6 @@ class VCalibrationData
 	vector< TH1F* >  fHisto_variance;
 
         VVirtualDataReader  *fReader;
-
-	unsigned int setSummationWindow( unsigned int iSumWindow );
 
 	TH1F* getHistogram( unsigned int iTel, unsigned int iChannel, unsigned int iWindowSize,  VCalibrationData::E_PEDTYPE, ULong64_t iTelType = 99999 );
 	TH1F* getHistoDist( int iType, bool iDist );
@@ -101,12 +100,24 @@ class VCalibrationData
         vector< double > fVmeanLowGainPedvars;
         vector< double > fVmeanRMSLowGainPedvars;
 
-// low gain multiplier
-        vector< valarray<double> > fLowGainMultiplier;
-        vector< valarray<double> > fLowGainMultiplierError;
-        vector< double >           fLowGainMultiplier_Mean;
-        vector< double >           fLowGainMultiplier_RMS;
-	unsigned int               fLowGainMultiplier_FixedSummationWindow;   //! if this is set to a reasonable value: all summation window requests are ignored
+// low gain multipliers
+/*
+We now have 2 types of low gain multipliers. Both are currently assumed to be the same for all channels in a telescope, but can vary between telescopes. Both are read in from the calibrationlist.lowgain.dat. 
+
+fLowGainMultiplier_Trace is used for plotting the trace, for the trace max, and as a default if the correct multiplier is not available.
+
+fLowGainMultiplier_Sum should be used for everything involving integrated traces. It has 2 'indices'. The first one is the 'nominal sumwindow' (eg. 6 for sums, 16 for sums2). The second one is the actual sumwindow used in a given pixel/event, depending on the shower/trace timing. The low gain multipliers are determined from HiLo runs by comparing the charge-vs-monitor charge ratio in the high-gain range, read out at the 'nominal' sum window, and the charge-vs-monitor-charge ratio in the low gain range, read out at the 'actual' window.
+
+In the analysis, the setTrace function is always called with the fLowGainMultiplier_Trace. In the setSums / setSums2 function, we multiply the trace integral with the lowgainsumcorrection, which is just the ratio of fLowGainMultiplier_Sum over fLowGainMultiplier_Trace for a given sum window. This function returns 1 if the fLowGainMultiplier_Sum is 0, i.e. doesn't exist for a given sumwindow.
+
+The low gain multiplier values are saved in a map so that we are flexible about which combination of sum windows are read in. The 'keys' are pairs of ints, corresponding to the 2 indices. Because of that, it can be hard to see just from the map which sumwindows are available. Sometimes we might want to check if the user has specified a nominal sumwindow for which she hasn't supplied the low gain multipliers. For that purpose, we also keep track of the nominal sum windows for which *some* low gain multiplier was read in in the fLowGainDefaultSumWindows vector.
+*/	
+
+	double fLowGainMultiplier_Trace;				// This corresponds to the 'old' LG multiplier -> is used for Max, traces, ...
+	std::map< std::pair<int, int>, double> fLowGainMultiplier_Sum;  // new low gain multipliers. 1st index: sw for sum / sum2 , ie small/large integration window. 2nd index: actual sumwindow that was read out.	
+	valarray<double> fLowGainMultiplier_Camera;			// for plotting. 
+	vector<int> fLowGainDefaultSumWindows;				// remember default sumwindows for which low gain multipliers have been read in. 
+
 
 // average tzero
         double fAverageTZero_highgain;
@@ -150,10 +161,12 @@ class VCalibrationData
 	                 bool iLowGainTimeSlices = false, bool iPedsFromPLine = false, bool iReadCalibDB = false,
 			 bool i_isDSTMC = false, bool iDebug = false, int iRunMode = -1, bool isTelToAna = true );
 
-	valarray< double >& getLowGainMultiplier( unsigned int iSumWindow = 9999 );
-	valarray< double >& getLowGainMultiplierError( unsigned int iSumWindow = 9999 );
-	double              getMeanLowGainMultiplier( unsigned int iSumWindow = 9999 );
-	double              getRMSLowGainMultiplier( unsigned int iSumWindow = 9999 );
+	double getLowGainMultiplier_Trace( ) { return fLowGainMultiplier_Trace ; }
+	valarray<double>& getLowGainMultiplier_Camera( ) { return fLowGainMultiplier_Camera ; }
+	double getLowGainMultiplier_Sum( int iSumWindow, int jSumWindow ) ;
+
+	double getLowGainSumCorrection(int iSumWindow,int jSumWindow,bool HiLo=true) ;
+	vector<int>& getLowGainDefaultSumWindows() { return fLowGainDefaultSumWindows; }
 
         unsigned int getTelID() { return fTelID; }
         valarray< int >&     getMJDTS_vector() { return fTS_MJD; }
@@ -174,10 +187,9 @@ class VCalibrationData
         unsigned int getTSTimeIndex( double iTime, unsigned int& i1, unsigned int& i2, double& ifrac1, double& ifrac2 );
 
 	void     recoverLowGainPedestals();
-	bool     setLowGainMultiplierFixedSummationWindow( unsigned int iSumWindow = 9999 );
-        bool     setLowGainMultiplier( double iV, unsigned int iChannel, unsigned int iSumWindow );
-	bool     setMeanLowGainMultiplier( double g, unsigned int iSumWindow = 9999 );
-	bool     setRMSLowGainMultiplier( double g, unsigned int iSumWindow = 9999 );
+	bool 	setLowGainMultiplier_Trace( double lmult) { fLowGainMultiplier_Trace = lmult; fLowGainMultiplier_Camera=lmult ; return true;} 
+	bool 	setLowGainMultiplier_Sum( int iSumWindow, int jSumWindow ,double lmult) ; 
+
         void     setPeds( unsigned int iChannel, double iPed, bool iLowGain = false );
         void     setReader( VVirtualDataReader* f ) { fReader = f; }
 	void     setSumWindows( unsigned int isw ) { fSumWindow = isw; }

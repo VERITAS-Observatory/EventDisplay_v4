@@ -29,8 +29,6 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
         fDEAD_gaindev_min = -1.e2;
         fDEAD_gaindev_max = 2.;
         fDEAD_toffset_max = 20.;
-        fDEAD_gainmult_min = 0.;
-        fDEAD_gainmult_max = 1.e6;
     }
     else
     {
@@ -47,8 +45,6 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
         fDEAD_gaindev_min = -1.e2;
         fDEAD_gaindev_max = 2.;
         fDEAD_toffset_max = 20.;
-        fDEAD_gainmult_min = 0.;
-        fDEAD_gainmult_max = 1.e6;
     }
 }
 
@@ -141,13 +137,6 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
                 is_stream >> iTemp;
                 fDEAD_toffset_max = atof( iTemp.c_str() );
             }
-            else if( iTemp == "GAINMULTIPLIER" )
-            {
-                is_stream >> iTemp;
-                fDEAD_gainmult_min = atof( iTemp.c_str() );
-                is_stream >> iTemp;
-                fDEAD_gainmult_max = atof( iTemp.c_str() );
-            }
             else
             {
                 cout << "unknown identifier: " << iTemp << endl;
@@ -182,7 +171,6 @@ void VDeadChannelFinder::printDeadChannelDefinition()
     cout << "Gaindev [" << fDEAD_gaindev_min << "," << fDEAD_gaindev_max << "]" << endl;
     cout << "Telescope " << fTelID+1 << ":";
     cout << "\tToff [" << fDEAD_toffset_max << "], ";
-    if( fLowGain ) cout << "LowGainMult [" << fDEAD_gainmult_min << "," << fDEAD_gainmult_max << "]";
     cout << endl;
 }
 
@@ -212,31 +200,6 @@ unsigned int VDeadChannelFinder::testPedestalVariations( unsigned int ichannel, 
     {
         if( fDebug ) cout << "testPedestalVariations (2): " << ichannel << " " << fDEAD_pedvar_min << " " << iPedVar << endl;
         return 2;
-    }
-
-    return 0;
-}
-
-
-unsigned int VDeadChannelFinder::testGainMultiplier( unsigned int ichannel, double iGMVar, double imeanGM, double irmsGM )
-{
-// no gain multiplier for high gain channels
-    if( !fLowGain ) return 0;
-
-// low gain multiplier set from .cfg file: rms = 0
-// (do not fix this value on return)
-    if( irmsGM < 1.e-3 ) return 0;
-
-// test low gain multiplier
-    if( iGMVar < imeanGM - fDEAD_gainmult_min * irmsGM )
-    {
-        if( fDebug ) cout << "testGainMultiplier (13): " << ichannel << " " << fDEAD_gainmult_min << " " << irmsGM << " " << imeanGM - fDEAD_gainmult_min * irmsGM << " " << iGMVar << endl;
-        return 13;
-    }
-    if( iGMVar > imeanGM + fDEAD_gainmult_max * irmsGM )
-    {
-        if( fDebug ) cout << "testGainMultiplier (13): " << ichannel << " " << fDEAD_gainmult_max << " " << irmsGM << " " << imeanGM + fDEAD_gainmult_max * irmsGM << " " << iGMVar << endl;
-        return 13;
     }
 
     return 0;

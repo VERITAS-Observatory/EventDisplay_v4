@@ -45,6 +45,7 @@ VEventLoop::VEventLoop( VEvndispRunParameter *irunparameter )
     fNextEventStatus = false;
     fEndCalibrationRunNow = false;
     fBoolSumWindowChangeWarning = 0;
+    fLowGainMultiplierWarning = 0;
 
     setRunNumber( fRunPar->frunnumber );
 
@@ -150,7 +151,7 @@ void VEventLoop::printRunInfos()
            cout << "\t no trace integration" << endl;
         }
         getImageCleaningParameter()->print();
-        if( getCalData()->getLowGainMultiplierDistribution() && getCalData()->getLowGainMultiplierDistribution()->GetEntries() > 0 )
+        if( getCalData()->getLowGainMultiplierDistribution() && getCalData()->getLowGainMultiplierDistribution()->GetEntries() > 0 )	
         {
             cout << "\t low gain multiplier: \t" << setprecision( 3 ) << getCalData()->getLowGainMultiplierDistribution()->GetMean();
             if( getCalData()->getLowGainMultiplierDistribution()->GetRMS() > 1.e-3 )
@@ -900,17 +901,31 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
      exit( -1 );
   }
 
-// check the requested sumwindow is not larger than the number of samples
+// check the requested sumwindow is not larger than the number of samples. Also check that correct low gain multipliers were read in for all 'reset' sum windows.
         if( (int)getNSamples() < (int)fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] )
         {
             if( fBoolSumWindowChangeWarning < 1 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
-    {
+    	    {
          cout << "VEventLoop::analyzeEvent: resetting summation window 1 from ";
  cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " to " << getNSamples() << endl;
             }
             fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
         }
+	if( fLowGainMultiplierWarning < 3 ) {  //look for low gain multiplier with nominal window = sumwindow_1. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+	    bool found = false;
+	    for(  unsigned int j=0; j<getLowGainDefaultSumWindows().size() ; j++) {
+	   	if(getLowGainDefaultSumWindows()[j] == fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]]) found=true; 
+	    }
+	    if (! found) { 
+		if( fRunPar->frunmode == 0 && !fRunPar->fdisplaymode && !fRunPar->fNoCalibNoPb) {
+			cout << "VEventLoop::analyzeEvent error: No low gain multipliers available for sumwindow 1 (" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " samples), exiting" << endl;
+			exit(-1);
+		}
+		fLowGainMultiplierWarning++;
+		cout << "VEventLoop::analyzeEvent() warning: No low gain multipliers available for sumwindow 1 (" << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " samples), will use trace multiplier." << endl;
+	    }
+	} 
         if( (int)getNSamples() < (int)fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] )
         {
             if( fBoolSumWindowChangeWarning < 1 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
@@ -921,6 +936,20 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
             fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 1;
         }
+	if( fLowGainMultiplierWarning < 3 ) {  //look for low gain multiplier with nominal window = sumwindow_2. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+	    bool found = false;
+	    for( unsigned int j=0; j<getLowGainDefaultSumWindows().size() ;j++) {
+	   	if(getLowGainDefaultSumWindows()[j] == fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]]) found=true; 
+	    }
+	    if (! found) { 
+		if( fRunPar->frunmode == 0 && !fRunPar->fdisplaymode && !fRunPar->fNoCalibNoPb) {
+			cout << "VEventLoop::analyzeEvent error: No low gain multipliers available for sumwindow 2 (" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] << " samples), exiting" << endl;
+			exit(-1);
+		}
+		fLowGainMultiplierWarning++;
+		cout << "VEventLoop::analyzeEvent() warning: No low gain multipliers available for sumwindow 2 (" << fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] << " samples), will use trace multiplier." << endl;
+	    }
+	}
         if( (int)getNSamples() < fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] && fRunPar->fDoublePass )
         {
             if( fBoolSumWindowChangeWarning < 2 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 4 )
@@ -931,7 +960,20 @@ if( getTelID() < fBoolPrintSample.size() && fBoolPrintSample[getTelID()] && !isD
             fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
             fBoolSumWindowChangeWarning = 2;
         } 
-
+	if( fLowGainMultiplierWarning < 3 ) { //look for low gain multiplier with nominal window = sumwindow_pass1. If not found, exit for data analysis. Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+	    bool found = false;
+	    for(  unsigned int j=0; j<getLowGainDefaultSumWindows().size() ; j++) {
+	   	if(getLowGainDefaultSumWindows()[j] == fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]]) found=true; 
+	    }
+	    if (! found) { 
+		if( fRunPar->frunmode == 0 && !fRunPar->fdisplaymode && !fRunPar->fNoCalibNoPb ) {
+			cout << "VEventLoop::analyzeEvent error: No low gain multipliers available for sumwindow pass1 (" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] << " samples), exiting" << endl;
+			exit(-1);
+		}
+		fLowGainMultiplierWarning++;
+		cout << "VEventLoop::analyzeEvent() warning: No low gain multipliers available for sumwindow pass1 (" << fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] << " samples), will use trace multiplier." << endl;
+	    }
+	}
         switch( fRunMode )
         {
 /////////////////

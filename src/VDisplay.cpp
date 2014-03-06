@@ -623,9 +623,9 @@ TH1D* VDisplay::fillFADC( int i_channel, TH1D* i_his )
    {
       itemp = fEventLoop->getReader()->getSample_double( i_hitIndexPair.second, i, false );
 // undo highlow
-      if( i_channel < (int)fEventLoop->getLowGainMultiplier().size() && fEventLoop->getHiLo()[i_channel] )
+	if( fEventLoop->getHiLo()[i_channel] )
       {
-  itemp  = (itemp-fEventLoop->getPeds(fEventLoop->getHiLo()[i_channel])[i_channel])*fEventLoop->getLowGainMultiplier()[i_channel];
+  itemp  = (itemp-fEventLoop->getPeds(fEventLoop->getHiLo()[i_channel])[i_channel])*fEventLoop->getLowGainMultiplier_Trace();
   itemp += fEventLoop->getPeds(fEventLoop->getHiLo()[i_channel])[i_channel];
       }
            } 
@@ -790,7 +790,7 @@ void VDisplay::drawFADC( bool iFit )
                       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
                       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
                       chanID, 
-                      fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+                      fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier_Trace() ); 
                 }
                 else
                 {
@@ -798,7 +798,7 @@ void VDisplay::drawFADC( bool iFit )
                       fEventLoop->getPeds(fEventLoop->getHiLo()[chanID])[chanID],
                       fEventLoop->getPedrms(fEventLoop->getHiLo()[chanID])[chanID],
                       chanID, 
-                      fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier()[chanID] );
+                      fEventLoop->getHiLo()[fSelectedChan - 200000]*fEventLoop->getLowGainMultiplier_Trace() ); 
                 }
                 fFitTraceHandler->setMinuitPrint( false );
                 if( fFitTraceHandler->getFitted() )
@@ -1221,10 +1221,11 @@ void VDisplay::setFADCText()
 // pedestal variance    
     if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] > 0 )
     {
-       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), integration window %d",
+       sprintf( cTemp, "ped var %.2f (low gain: %.2f), 1st window %d, LG mult %.2f",
                 fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
                 fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel])[iChannel],
-                fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] );
+                fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] ,
+		fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_1[ fEventLoop->getAnalyzer()->getTelID() ] , fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] ) ); 
     }
     else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
     {
@@ -1233,10 +1234,11 @@ void VDisplay::setFADCText()
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     if( fEventLoop->getAnalyzer()->getSumWindow_2() > 0 )
     {
-       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), 2nd integration window %d",
+       sprintf( cTemp, "ped var %.2f (low gain: %.2f), 2nd window %d, LG mult %.2f",
                 fEventLoop->getAnalyzer()->getPedvars( false, fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] )[iChannel],
                 fEventLoop->getAnalyzer()->getPedvars( true, fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] )[iChannel],
-                fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] );
+                fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] ,
+		fEventLoop->getLowGainMultiplier_Sum( fEventLoop->getRunParameter()->fsumwindow_2[ fEventLoop->getAnalyzer()->getTelID() ]  , fEventLoop->getAnalyzer()->getCurrentSumWindow_2()[iChannel] ) ); 
     }
     else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
     {
@@ -1246,10 +1248,11 @@ void VDisplay::setFADCText()
     if( fEventLoop->getRunParameter()->fDoublePass && fEventLoop->getAnalyzer()->getSumWindow_Pass1() > 0 )
     {
        int iSW = fEventLoop->getAnalyzer()->getSumWindow_Pass1();
-       sprintf( cTemp, "pedestal variance %.2f (low gain: %.2f), DP1 integration window %d",
+       sprintf( cTemp, "ped var %.2f (low gain: %.2f), DP1 window %d, LG mult %.2f",
                 fEventLoop->getAnalyzer()->getPedvars( false, iSW )[iChannel],
-fEventLoop->getAnalyzer()->getPedvars( true, iSW )[iChannel],
-iSW );
+		fEventLoop->getAnalyzer()->getPedvars( true, iSW )[iChannel],
+		iSW  ,
+		fEventLoop->getLowGainMultiplier_Sum(  fEventLoop->getRunParameter()->fsumwindow_pass1[ fEventLoop->getAnalyzer()->getTelID() ] , iSW ));
     }
     else if( fEventLoop->getAnalyzer()->getCurrentSumWindow()[iChannel] == 0 )
     {
@@ -1279,12 +1282,9 @@ iSW );
        fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     }
 // low gain multiplier
-    if( iChannel < fEventLoop->getAnalyzer()->getLowGainMultiplier().size() 
-     && iChannel < fEventLoop->getAnalyzer()->getLowGainMultiplierError().size() )
-    {
-       sprintf( cTemp, "low gain multiplier: %.2f+-%.2f", fEventLoop->getAnalyzer()->getLowGainMultiplier()[iChannel], fEventLoop->getAnalyzer()->getLowGainMultiplierError()[iChannel] );
-       fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-    }
+   sprintf( cTemp, "low gain multiplier (trace): %.2f", fEventLoop->getAnalyzer()->getLowGainMultiplier_Trace() );
+   fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+
 // pulse sum
     sprintf( cTemp, "pulse sum %.1f (2ndWi: %.1f) pulse max %.1f (raw max: %.1f) pulse width: %.1f", fEventLoop->getData()->getSums()[iChannel], 
   fEventLoop->getData()->getSums2()[iChannel],

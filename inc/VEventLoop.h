@@ -33,6 +33,8 @@
 #include <map>
 #include <string>
 
+#include <algorithm> 
+
 using namespace std;
 
 class VEventLoop : public VEvndispData
@@ -68,6 +70,7 @@ class VEventLoop : public VEvndispData
         bool fChangedCut;                         //!< check if any cut is applied
 
         int fBoolSumWindowChangeWarning;
+        int fLowGainMultiplierWarning;
 	vector< unsigned int > fGPSClockWarnings;
 
         bool fNextEventStatus;                    //!< for stopping event loop from display

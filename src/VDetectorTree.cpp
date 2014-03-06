@@ -125,7 +125,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
             nPixel = iDet->getNChannels( i );
             nSamples = iDet->getNSamples( i );
 	    Sample_time_slice = iDet->getLengthOfSampleTimeSlice(i);
-	    fHiLoScale = iDet->getLowGainMultiplier()[i];
+	    fHiLoScale = iDet->getLowGainMultiplier_Trace()[i];
 	    fHiLoThreshold = iDet->getLowGainThreshold()[i];
 	    fHiLoOffset = 0.;
             if( nPixel < fMaxPixel )
@@ -247,7 +247,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry *iDet, TTree *iTree )
         iDet->getNChannels()[i] = nPixel;
 	iDet->setNSamples( i, nSamples, true );
 	iDet->setLengthOfSampleTimeSlice( i, Sample_time_slice );
-	iDet->setLowGainMultiplier( i, fHiLoScale );
+	iDet->setLowGainMultiplier_Trace( i, fHiLoScale );
 	iDet->setLowGainThreshold( i, (unsigned int)fHiLoThreshold );
 
 // fudge to be able to read old files with mixup of mirror area and number of mirrors

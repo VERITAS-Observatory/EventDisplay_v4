@@ -42,6 +42,8 @@ then
    echo "optional parameter:"
    echo 
    echo "    [runnumber]             runnumber (can be different from actual runnnumber)"
+   echo
+   echo "further optional parameter (NOT NEEDED IN 99.999% OF ALL APPLICATIONS)"
    echo "    [TARGET]                targets are for example: Crab, Mrk421, 1es2344, lsi+61303"
    echo "                            (for more do evndisp -printtargets)" 
    echo "    [WOBBLENORTH]           wobble offsets north (e.g.0.5) or south (e.g. -0.5) in [deg]"
@@ -55,6 +57,8 @@ then
    echo "----------------------------------------------------------------------------------------"
    exit
 fi
+
+OPT="-highres -readcalibdb -display=1"
 
 # telescope to analyze
 if [ $1 != "-1" ]

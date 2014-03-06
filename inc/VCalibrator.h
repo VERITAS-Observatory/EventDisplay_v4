@@ -70,13 +70,13 @@ class VCalibrator : public VImageBaseAnalyzer
 	unsigned int getNumberOfEventsUsedInCalibration( vector< int > iE, int iTelID );
 	unsigned int getNumberOfEventsUsedInCalibration( map< ULong64_t, int > iE, int iTelID );
 	TFile* getPedestalRootFile( ULong64_t iTel );
-	int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 );
+	int  readLowGainCalibrationValues_fromCalibFile( string iVariable = "LOWGAINPED", unsigned int iTel = 9999, int iSumWindow = 9999 ); 
 	string getCalibrationFileName( int iTel, int irun, string iSuffix );
         void readCalibrationData();
         bool readCalibrationDatafromDSTFiles( string iSourceFile );
 	void readfromVOFFLINE_DB(int gain_or_toff, string &iFile, vector< unsigned int >& VchannelList, vector< double >& Vmean, vector< double >& Vrms );
         void readGains( bool iLowGain = false );
-        bool readLowGainMultiplier( int iSumWindow );
+        bool readLowGainMultiplier( ); 
         bool readPeds( string iFile, bool, unsigned int );
 	bool readPeds_from_grisufile( bool, unsigned int );
 	bool readPeds_from_rootfile( string iFile, bool, unsigned int );

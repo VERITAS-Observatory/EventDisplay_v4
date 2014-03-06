@@ -270,7 +270,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
                     {
                         fReader->selectHitChan(i);
                         fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[chanID], getPedrms()[chanID], chanID, i,
-			                         getLowGainMultiplier()[chanID]*getHiLo()[chanID] );
+			                         getLowGainMultiplier_Trace()*getHiLo()[chanID] );
 // loop over all summation windows
                         unsigned int iTempSW = fpedcal_mean[telID][chanID].size();
                         if( getRunParameter()->fCalibrationSumWindow < (int)iTempSW ) iTempSW = getRunParameter()->fCalibrationSumWindow;

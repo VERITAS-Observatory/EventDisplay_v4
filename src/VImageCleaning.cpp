@@ -1967,7 +1967,7 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 
 	      fData->getTraceHandler()->setTrace( fData->getReader(), fData->getNSamples(),fData->getPeds(fData->getHiLo()[i_channelHitID])[i_channelHitID], 
 				                  fData->getPedrms(fData->getHiLo()[i_channelHitID])[i_channelHitID], i_channelHitID, i,
-				                  fData->getLowGainMultiplier( true )[i_channelHitID]*fData->getHiLo()[i_channelHitID] );
+				                  fData->getLowGainMultiplier_Trace()*fData->getHiLo()[i_channelHitID] );
 
 	      vImageTraces[i_channelHitID] = fData->getTraceHandler()->getTrace();
 	  }

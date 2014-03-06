@@ -39,18 +39,15 @@ class VDeadChannelFinder
         double fDEAD_gaindev_min;
         double fDEAD_gaindev_max;
         double fDEAD_toffset_max;
-        double fDEAD_gainmult_min;
-        double fDEAD_gainmult_max;
 
     public:
 
         VDeadChannelFinder( int irunmode = 0, unsigned int iTelID = 0, bool bLowGain = false, bool isMC = false );
         ~VDeadChannelFinder() {};
         void      printDeadChannelDefinition();
-//     void      printChannelSummary( unsigned int, unsigned int );
+//      void      printChannelSummary( unsigned int, unsigned int );
         void      printSummary();
         bool      readDeadChannelFile( string iFile );
-        unsigned int testGainMultiplier( unsigned int, double, double, double );
         unsigned int testGains( unsigned int, double );
         unsigned int testGainVariations( unsigned int,double );
         unsigned int testGainDev( unsigned int, double, double, bool );

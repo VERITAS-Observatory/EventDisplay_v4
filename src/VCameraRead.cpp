@@ -365,8 +365,8 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
                 i_stream >> i_char; i_stream >> i_char;
                 if( !i_stream.eof() )
                 {
-                    i_stream >> fLowGainMultiplier[0];
-                    for( unsigned int i = 0; i < fNTel; i++ ) fLowGainMultiplier[i] = fLowGainMultiplier[0];
+                    i_stream >> fLowGainMultiplier_Trace[0];
+                    for( unsigned int i = 0; i < fNTel; i++ ) fLowGainMultiplier_Trace[i] = fLowGainMultiplier_Trace[0];
                     i_stream >> fLowGainActivator[0];
                     for( unsigned int i = 0; i < fNTel; i++ ) fLowGainActivator[i] = fLowGainActivator[0];
                     fLowGainIsSet = true;
@@ -387,7 +387,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel  )
             i_stream >> i_char; i_stream >> i_char;
             i_stream >> i_telID;
             if( i_telID > 0 ) i_telID -= 1;
-            if( i_telID < fNTel ) i_stream >> fLowGainMultiplier[i_telID];
+            if( i_telID < fNTel ) i_stream >> fLowGainMultiplier_Trace[i_telID];
             fLowGainIsSet = true;
         }
 // mirror design
@@ -885,7 +885,7 @@ void VCameraRead::resetTelVectors()
     fNMirrors.assign( fNTel, 0 );
     fMirrorArea.assign( fNTel, 0. );
     fCameraFieldofView.assign( fNTel, 3.5 );
-    fLowGainMultiplier.assign( fNTel, 6.0 );
+    fLowGainMultiplier_Trace.assign( fNTel, 6.0 );
     fLowGainActivator.assign( fNTel, 255 );
 // set default values for array of four telescopes
 //  later this values are overwritten by the values from the .cfg file
@@ -1033,12 +1033,12 @@ float VCameraRead::getOuterEdgeDistance( unsigned int i )
 }
 
 
-bool VCameraRead::setLowGainMultiplier( unsigned int iTel, double ival )
+bool VCameraRead::setLowGainMultiplier_Trace( unsigned int iTel, double ival )
 {
-    if( iTel < fLowGainMultiplier.size() ) fLowGainMultiplier[iTel] = ival;
+    if( iTel < fLowGainMultiplier_Trace.size() ) fLowGainMultiplier_Trace[iTel] = ival;
     else
     {
-        cout << "VCameraRead::setLowGainMultiplier: invalid low gain multiplier, set value to 1" << endl;
+        cout << "VCameraRead::setLowGainMultiplier_Trace: invalid low gain multiplier, set value to 1" << endl;
         return false;
     }
     return true;

@@ -835,7 +835,8 @@ bool VGrIsuReader::getNextShowerEvent()
                 {
                     double iT = ftempSampleFL[i];
                     iT -= fdefaultPed;
-                    iT /= fDetectorGeo->getLowGainMultiplier()[i_telID];
+             //       iT /= fDetectorGeo->getLowGainMultiplier()[i_telID];
+                      iT /= fDetectorGeo->getLowGainMultiplier_Trace()[i_telID];
                     iT += fdefaultPed;
                     ftempSampleFL[i] = (int)(iT+fPeds[i_telID][i_channel]-fdefaultPed);
                 }

@@ -539,7 +539,7 @@ struct frogs_imgtmplt_in VFrogs::frogs_convert_from_ed(int eventNumber, int adc_
 	  //rtn.scope[tel].q[pix]=fData->getData()->getSums()[pix]/dc2pe; //(SV): getLowGainMultiplier removed 
 	  //rtn.scope[tel].ped[pix]=fData->getData()->getPedvars(true,18)[pix]*frogs_pedwidth_correction/dc2pe;
 	  rtn.scope[tel].ped[pix]=
-	    fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]*fData->getData()->getLowGainMultiplier()[pix]/dc2pe;
+	    fData->getData()->getPedvars( fData->getData()->getHiLo()[pix], fData->getCurrentSumWindow_2()[pix] )[pix]/dc2pe; 
 	}
 	else
         {
