@@ -143,9 +143,11 @@ int main( int argc, char *argv[] )
    int iOffSetCounter = -1;
    if( iOnSource == "onSource" )    iOffSetCounter = 0;
    else if( iOnSource == "cone" ) iOffSetCounter = 8;
+   else if( iOnSource == "offset_7_bin_Norm_Pointing" ) iOffSetCounter = 7;
+   else if( iOnSource == "offset_9_bin_WARSAW" )    iOffSetCounter = 9;
    else
    {
-        cout << "invalid off source descriptor; should be: onSource or cone" << endl;
+       cout <<iOnSource << " invalid off source descriptor; should be: onSource or cone" << endl;
 	exit( -1 );
    }
 
@@ -157,6 +159,20 @@ int main( int argc, char *argv[] )
    string iMC_Electron = "electron";
    string iMC_Electron_onSource = "electron_onSource";
    
+   if( iOnSource == "offset_9_bin_WARSAW" ){
+       iMC_Gamma_cone ="gamma_0-20_WARSAW";
+       iMC_Proton="proton_0-20_rER_WARSAW";
+       iMC_Electron = "";
+       iMC_Gamma_onSource = "";
+   }
+   if( iOnSource == "offset_7_bin_Norm_Pointing" ){
+       iMC_Gamma_cone ="gamma_0-20_Norm_Pointing";
+       iMC_Proton="proton_0-20_rER_Norm_Pointing";
+       iMC_Electron = "";
+       iMC_Gamma_onSource = "";
+   }
+
+
    char iGamma[800];
    char iProton[800];
    char iElectron[800];
