@@ -7,12 +7,12 @@
 ##############################################
 
 
-if [ $# -ne 2 ]
+if [ $# -ne 2 ] 
 then
    echo 
-   echo "./CTA.runProd2Analysis.sh <N/S> <run mode>"
+   echo "./CTA.runProd2Analysis.sh <N/S/P1> <run mode>"
    echo
-   echo "  N=prod2-North, S=prod2-South"
+   echo "  N=prod2-North, S=prod2-South, P1=prod1"
    echo
    echo "  possible run modes are EVNDISP MAKETABLES ANATABLES TRAIN ANGRES QC PARTFIL CUTS PHYS "
    echo
@@ -25,7 +25,7 @@ RUN="$2"
 # qsub options
 #   _M_ = -; _X_ = " "
 QSUBOPT=""
-QSUBOPT="_M_P_X_cta_high_X__M_js_X_10000"
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_100000"
 QSUBOPT="_M_P_X_cta_high"
 
 #####################################
@@ -34,29 +34,13 @@ PDIR="$CTA_USER_LOG_DIR/tempRunParameterDir/"
 mkdir -p $PDIR
 
 #####################################
-# sites & sub array lists
-if [[ $P2 == "S" ]]
-then
-   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-lowE-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-Leoncito-NS" "prod2-LeoncitoTrigv2-NS" "prod2-Aar-500m-NS" )
-   ARRAY="subArray.2a.list"
-   SITE=( "prod2-Aar-40deg-NS" )
-   SITE=( "prod2-Leoncito-40deg-NS" )
-   SITE=( "prod2-LeoncitoPP-NS" )
-   ARRAY="subArray.2S-sub.lis"
-elif [[ $P2 == "N" ]]
-then
-   SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
-   SITE=( "prod2-Tenerife-NS" )
-   ARRAY="subArray.2NN.list"
-   ARRAY="subArray.2NN-fullList.list"
-else
-   echo "error: unknown site; allowed are N or S"
-   exit
-fi
+# analysis dates and table dates
+DATE="d20140225"
+TDATE="d20140225"
 
 #####################################
-# particle types
-PARTICLE=( "gamma_onSource" "gamma_cone" "electron" "proton" )
+# reconstruction IDs
+RECID="0"
 
 #####################################
 # shower directions
@@ -66,8 +50,46 @@ PARTICLE=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 MCAZ=( "_180deg" "_0deg" "" )
 
 #####################################
-# reconstruction IDs
-RECID="0"
+# sites & sub array lists
+
+############################
+# SOUTH
+if [[ $P2 == "S" ]]
+then
+# data sets without trgmask files
+   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS"  "prod2-Aar-500m-NS" )
+# array settings
+   ARRAY="subArray.2a.list"
+   ARRAY="subArray.2S-sub.lis"
+# data sets with trgmask files
+   SITE=( "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-NS" )
+# tmp
+   SITE=( "prod2-Aar-NS" "prod2-Aar-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-SAC100-lowE-NS" )
+# 40 deg data sets
+   SITE=( "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" )
+############################
+# NORTH
+elif [[ $P2 == "N" ]]
+then
+   SITE=( "prod2-Tenerife-NS" )
+   ARRAY="subArray.2NN.list"
+   SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
+   ARRAY="subArray.2NN-fullList.list"
+elif [[ $P2 == "P1" ]]
+then
+  SITE=( "prod1-cta-ultra3" )
+  ARRAY=( "subArray.I-noLST.list" )
+  RECID="2"
+  DATE="d20130415"
+  MCAZ=( "" )
+else
+   echo "error: unknown site; allowed are N or S"
+   exit
+fi
+
+#####################################
+# particle types
+PARTICLE=( "gamma_onSource" "gamma_cone" "electron" "proton" )
 
 #####################################
 # energy reconstruction
@@ -81,16 +103,9 @@ NIMAGESMIN="2"
 #####################################
 # observing time [h]
 OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
-OBSTIME=( "50h" )
 OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
+OBSTIME=( "50h" )
 
-
-#####################################
-# analysis dates and table dates
-DATE="d20131229"
-TDATE="d20131229"
-DATE="d20140218"
-TDATE="d20140105"
 
 #####################################
 # loop over all sites
@@ -135,7 +150,8 @@ do
       do
 	  N=${PARTICLE[$i]}
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/$S.$N"_20deg".list
-#	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".grid.list
+	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".grid.list
+	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".HD.list
 
           ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $QSUBOPT $TRG
        done
@@ -191,6 +207,7 @@ do
 	  echo "ENERGYRECONSTRUCTIONMETHOD $EREC" >> $PARA
 	  echo "NIMAGESMIN $NIMAGESMIN" >> $PARA
 	  echo "OBSERVINGTIME_H $OOTIME" >> $PARA
+          echo "GETXOFFYOFFAFTERCUTS yes" >> $PARA
 	  EFFDIR="/lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/$S/$EFFDIR/"
 ##########################################
 # train BDTs   
@@ -218,12 +235,12 @@ do
 # IRFs: effective areas after gamma/hadron cuts
 	  elif [[ $RUN == "CUTS" ]]
 	  then
-	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.T1.$DATE $S 0 $QSUBOPT $AZ
+	    ./CTA.EFFAREA.subAllParticle_analyse.sh $ARRAY ANASUM.GammaHadron.TMVA $PARA BDT.R1.$DATE $S 0 $QSUBOPT $AZ
 ##########################################
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.T1.$DATE $OOTIME DESY.$DATE.Erec$EREC.T1.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.R1.$DATE $OOTIME DESY.$DATE.Erec$EREC.R1.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then

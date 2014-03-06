@@ -54,7 +54,7 @@ done
 # make dCache list exectuable
 chmod u+x $4/$TLIS.dcache
 # sort glite file lists
-grep -v storm $4/$TLIS.glite >! $4/$TLIS.glite.ln2p3
-grep storm $4/$TLIS.glite >! $4/$TLIS.glite.storm
+grep -v storm $4/$TLIS.glite > $4/$TLIS.glite.ln2p3
+grep storm $4/$TLIS.glite > $4/$TLIS.glite.storm
 
 exit

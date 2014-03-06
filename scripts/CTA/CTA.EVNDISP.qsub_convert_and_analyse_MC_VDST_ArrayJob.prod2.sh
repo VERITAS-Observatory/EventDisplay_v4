@@ -51,7 +51,6 @@ echo $IFIL
 echo
 echo "COPYING FILES TO $TMPDIR"
 cp -v -f $IFIL $TMPDIR"/"
-du -h -c $TMPDIR
 # log file directory
 DATE=`date +"%y%m%d"`
 mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF
