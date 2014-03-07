@@ -372,12 +372,16 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 
 bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill1D )
 {
+
+    std::cout<<"VWPPhysSensitivityFile::fillHistograms1D "<<std::endl;
+    
    char hname[2000];
 ////////////////////////////////////////////////////////////////////////
 // instrument response function reader
    VInstrumentResponseFunctionReader i_IRF;
    if( fOffsetCounter < 9999 )
    {
+       std::cout<<" fDataFile_gamma_cone "<< fDataFile_gamma_cone <<std::endl;
       sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone.c_str(), fOffsetCounter );
    }
    else
@@ -388,6 +392,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
       }	  
       else
       {
+	  std::cout<<" fDataFile_gamma_onSource "<< fDataFile_gamma_onSource <<std::endl;
          sprintf( hname, "%s/%s.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
       }	 
    }
@@ -572,13 +577,19 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 // electron offset
     else
     {
+       if( fDataFile_electron_onSource.size() > 0 )
+       {
         sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_electron.c_str(), fOffsetCounter );
+       }
+       else sprintf( hname, "NOFILE" );
+
     }
     string iMC_Electron = hname;
 
 // initialize sensitivity calculator
 
 // gammas
+    std::cout<<" iMC_Gamma "<< iMC_Gamma <<std::endl;
     i_Sens.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma, -10., 10., "ENERGY" );
     i_SensCU.setMonteCarloParameters(1, fCrabSpectrumFile, fCrabSpectrumID, iMC_Gamma, 20.,
@@ -670,6 +681,9 @@ bool VWPPhysSensitivityFile::terminate()
 
 void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
 {
+
+    std::cout<<"VWPPhysSensitivityFile::setDataFiles "<<fObservatory<<std::endl;
+
     fSubArray = iA;
 
 // set data files for CTA
@@ -703,6 +717,22 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
        fDataFile_proton = "proton_20deg_050deg_NOISE200_ID30_SW05.eff";
        fDataFile_electron = "electron_20deg_050deg_NOISE200_ID30_SW05.eff";
     } 
+    else if( isVTS() == 9 ) // CTA Norm_Pointing (on cone 0-20)
+    {
+	char hname[200];
+	sprintf( hname, "%d", iRecID );
+	fDataFile_gamma_onSource = ""; // should not be used in this case
+	fDataFile_gamma_cone = "gamma_0-20_Norm_Pointing." + fSubArray + "_ID" + hname + ".eff-";
+	fDataFile_proton = "proton_0-20_rER_Norm_Pointing." + fSubArray + "_ID" + hname + ".eff-";
+	fDataFile_electron = "";
+	
+	
+    }
+ 
+    std::cout<<"fDataFile_gamma_cone "<<fDataFile_gamma_cone <<std::endl;
+    std::cout<<"fDataFile_proton     "<<fDataFile_proton <<std::endl;
+
+
 }
 
 /*
@@ -717,6 +747,7 @@ unsigned int VWPPhysSensitivityFile::isVTS()
     if( fObservatory == "V4" ) return 4;
     if( fObservatory == "V5" ) return 5;
     if( fObservatory == "V6" ) return 6;
+    if( fObservatory == "CTA_Norm_Pointing_7bin" ) return 9;
 
     return 0;
 }
