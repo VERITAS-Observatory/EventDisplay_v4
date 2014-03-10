@@ -856,6 +856,9 @@ int VAnaSumRunParameter::loadLongFileList(string i_listfilename, bool bShortList
 // cuts are in the effective area files
             if( fVersion >= 7 )
             {
+// check if IRF runparameters are consistent with ANASUM.runparameter file
+		checkAnasumParameter( i_sT.fEffectiveAreaFile ); 
+
                 i_sT.fCutFile = temp;
 // source radius (actually (source radius)^2 )
 // (read theta2 cut from cut file)
@@ -1212,6 +1215,59 @@ bool VAnaSumRunParameter::readCutParameter( string ifile, double &iSourceRadius,
 
    return true;
 }
+
+/*
+ *  Check if requested anasum runparameter make sense, i.e.,
+ *  - energy reconstruction method should be the same as in effective area file
+ *  - spectral index should be in the range of simulated index range
+ *
+ */
+bool VAnaSumRunParameter::checkAnasumParameter( string ifile ) 
+{
+    string iEffFile = VUtilities::testFileLocation( ifile, "EffectiveAreas", true );
+    TFile *iF  = new TFile( iEffFile.c_str() );
+    if( iF->IsZombie() )
+    {
+	cout << "VAnaSumRunParameter::checkAnasumParameter error opening file to read IRF parameters: " << endl;
+	cout << "\t" << ifile << endl;
+	cout << "exiting..." << endl;
+	exit( EXIT_FAILURE );
+    }
+    VInstrumentResponseFunctionRunParameter *iIRF = (VInstrumentResponseFunctionRunParameter*)iF->Get( "makeEffectiveArea_runparameter" );
+    if( !iIRF )
+    {
+	cout << "VAnaSumRunParameter::checkAnasumParameter error reading IRF parameter from file: " << endl;
+	cout << "\t" << ifile << endl;
+	cout << "exiting..." << endl;
+	exit( EXIT_FAILURE );
+    }
+    else 
+    {
+// check energy reconstruction method
+	if( iIRF->fEnergyReconstructionMethod != fEnergyReconstructionMethod )
+	{
+	    cout << "VAnaSumRunParameter::checkAnasumParameter error in energy reconstruction method specified in runparameter file. " << endl;
+	    cout << "\t Effective area file (" << ifile << ") uses energy reconstruction method " << iIRF->fEnergyReconstructionMethod << endl;
+	    cout << "\t but energy reconstruction method " << fEnergyReconstructionMethod << " is requested in the anasum runparameter file. " << endl;
+	    cout << "exiting..." << endl;
+	    exit( EXIT_FAILURE );
+	}
+// check spectral index range 
+	double iIndexMin = iIRF->fSpectralIndexMin;
+	double iIndexMax = iIRF->fSpectralIndexMin + iIRF->fNSpectralIndex*iIRF->fSpectralIndexStep;
+	if( fEnergyReconstructionSpectralIndex < iIndexMin || fEnergyReconstructionSpectralIndex > iIndexMax )
+	{
+	    cout << "VAnaSumRunParameter::checkAnasumParameter warning: spectral index out of range. " << endl; 
+	    cout << "\t Requested spectral index (" << fEnergyReconstructionSpectralIndex << ") is outsided the range simulated [" 
+		 << iIndexMin << "-" << iIndexMax << "]." << endl << endl;
+	}
+    }
+    
+    if( iF ) iF->Close();
+    
+    return true;
+}
+
 
 
 double VAnaSumRunParameter::readMaximumDistance( string ifile )

@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "VGammaHadronCuts.h"
+#include "VInstrumentResponseFunctionRunParameter.h"
 #include "VEvndispRunParameter.h"
 #include "VGlobalRunParameter.h"
 
@@ -138,6 +139,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
         void checkNumberOfArguments( int im, int narg, string isf, string isl, int iversion, bool ishortlist );
         double getRingWidth( double sr, double rr, double rat );
         bool   readCutParameter( string ifile, double &iSourceRadius, double &iMaximumDistance );
+        bool   checkAnasumParameter( string ifile );
         double readMaximumDistance( string );
         double readSourceRadius( string iCutFile );
         int  returnWithError( string iL, string iM, string iC = "" );
