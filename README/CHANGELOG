@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140312 (GM) CTA trgmask command line changes:
+                expect now trgmask directory (not file)
+
 * 20140306 (HF, HP) improved low gain calibration routines
                 requires updated calibrationlist.LowGain.dat
                 calculates correctly the integration window

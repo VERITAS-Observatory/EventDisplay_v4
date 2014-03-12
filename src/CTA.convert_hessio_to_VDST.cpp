@@ -221,7 +221,7 @@ static void syntax (char *program)
    printf("   -o dst filename  (name of dst output file)\n" );
    printf("   -f on=1/off=0    (write FADC samples to DST file;default=0)\n" );
    printf("   -c pedfile.root  (file with pedestals and pedestal variances)\n");
-   printf("   -t triggmask.file.gz (file with trigger mask (corrections for Spring 2013 prod2 production)\n");
+   printf("   -t <trgmask directory> (directory with trigger mask files (corrections for Spring 2013 prod2 production)\n");
    printf("   -r on=1/off=0    (apply camera plate scaling for DC telescopes; default=1)\n" );
    printf("   -d <nbits dyn.>  (dynamic range of readout (e.g. 12 for 12 bit. Switch to low gain)\n" );      
    printf("   -pe              (fill leaf with photoelectrons into DST tree (default: off)\n" );
@@ -242,6 +242,7 @@ bool read_trigger_mask( string trg_mask_file )
 {
 #ifdef CTA_PROD2_TRGMASK
    struct trgmask_set *tms = (trgmask_set*)calloc(1,sizeof(struct trgmask_set));
+   if( fTriggerMask_hash_set ) free( fTriggerMask_hash_set );
    fTriggerMask_hash_set = (trgmask_hash_set*)calloc(1,sizeof(struct trgmask_hash_set));
 
    IO_BUFFER *iobuf = allocate_io_buffer(1000000L);
@@ -1177,7 +1178,7 @@ int main(int argc, char **argv)
    string config_file = "";             // file with list of telescopes
    string dst_file = "dst.root";        // output dst file
    string ped_file = "";                // file with pedestal and pedestal variances
-   string trg_mask_file = "";           // file with trigger information
+   string trg_mask_dir = "";            // directory with trigger information (only for 2013 prod2 MC)
    bool   fWriteFADC = false;           // fill FADC traces into converter
    unsigned int fDynamicRange = 0;      // dynamic range (for decision of high/low gain)
    bool   fApplyCameraScaling = true;   // apply camera plate scaling according for DC telescopes
@@ -1291,7 +1292,7 @@ int main(int argc, char **argv)
       }
       else if (strcmp(argv[1],"-t") == 0 )
       {
-         trg_mask_file = argv[2];
+         trg_mask_dir = argv[2];
 	 argc -= 2;
 	 argv += 2;
 	 continue;
@@ -1434,8 +1435,15 @@ int main(int argc, char **argv)
 
 /////////////////////////////////////////////
 // read in trigger mask
-   if( trg_mask_file.size() > 0 )
+   if( trg_mask_dir.size() > 0 )
    {
+       string iFile = f_inputfilename;
+       if( iFile.find_last_of( "/\\") != string::npos )
+       {
+          iFile = iFile.substr( iFile.find_last_of( "/\\")+1, 
+                                iFile.find( "simtel.gz" )-iFile.find_last_of( "/\\") - 1 );
+       }
+       string trg_mask_file = trg_mask_dir + iFile + "trgmask.gz";
        read_trigger_mask( trg_mask_file );
    }
 
