@@ -8,9 +8,6 @@
 
 set TFIL=TABLEFILE
 set RECID=RECONSTRUCTIONID
-set WOFFMIN=WOMIIIIIN
-set WOFFMAX=WOMAXXXXX
-set WOFFMEA=WOMEEEEAN
 set ARRAY=ARRRRRRR
 set DDIR="DATADIRECT"
 set DSET="DATASET"
@@ -33,13 +30,12 @@ rm -f $LDIR/$TFIL-$ARRAY.log
 rm -f $LDIR/$TFIL-$ARRAY.root
 
 # options for table filling
-#set MOPT="-pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -mindistancetocameracenter=$WOFFMIN -maxdistancetocameracenter=$WOFFMAX -maxCoreError=250 -minImages=2"
-set MOPT="$SETOFF -pe -filltables=1 -ze=20. -noise=250 -woff=$WOFFMEA -maxCoreError=250 -minImages=2 -limitEnergyReconstruction"
+# set MOPT="$SETOFF -pe -filltables=1 -ze=20. -noise=250 -woff=0.0 -maxCoreError=250 -minImages=2 -limitEnergyReconstruction"
+set MOPT="$SETOFF -pe -filltables=1 -ze=20. -noise=250 -woff=0.0 -maxCoreError=250 -minImages=2 -limitEnergyReconstruction -write1DHistograms"
 
 #########################################
 # fill tables
 cd $EVNDISPSYS/bin/
-# ./mscw_energy $MOPT -arrayrecid=$RECID -tablefile "$ODIR/$TFIL-W$WOFFMEA-$ARRAY.root" -inputfile "$DDIR*.root" > $LDIR/$TFIL-W$WOFFMEA-$ARRAY.log
 ./mscw_energy $MOPT -arrayrecid=$RECID -tablefile "$ODIR/$TFIL-$ARRAY.root" -inputfile "$DDIR*.root" > $LDIR/$TFIL-$ARRAY.log
 #########################################
 

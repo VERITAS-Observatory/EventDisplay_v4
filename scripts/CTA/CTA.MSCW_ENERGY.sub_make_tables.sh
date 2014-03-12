@@ -49,18 +49,9 @@ QSUBOPT=${QSUBOPT//_M_/-}
 #########################################
 if [ $CONE == "TRUE" ]
 then
-#   OFFMIN=( 0.0 1.0 2.0 3.00 3.50 4.00 4.50 5.00 5.50 )
-#   OFFMAX=( 1.0 2.0 3.0 3.50 4.00 4.50 5.00 5.50 6.00 )
-#   OFFMEA=( 0.5 1.5 2.5 3.25 3.75 4.25 4.75 5.25 5.75 )
-   OFFMIN=( "-1.e10" )
-   OFFMAX=( "1.e10" )
-   OFFMEA=( 0.0 )
    CTAOFF="-CTAoffAxisBins"
    DSUF="gamma_cone/[1-9]"
 else
-   OFFMIN=( "-1.e10" )
-   OFFMAX=( "1.e10" )
-   OFFMEA=( 0.0 )
    CTAOFF=""
    DSUF="gamma_onSource/[1-9]"
    TFIL="$TFIL-onAxis"
@@ -108,37 +99,23 @@ do
 # table file
    TAFIL=$TFIL
 
-#########################################
-#loop over wobble offsets
-#########################################
-
-   for (( M = 0 ; M < $NOFF; M++ ))
-   do
-      MINDIST=${OFFMIN[$M]}
-      MAXDIST=${OFFMAX[$M]}
-      MEANDIST=${OFFMEA[$M]}
-
 # run scripts
-      FNAM="$SHELLDIR/EMSCW.table-$TAFIL-W$MEANDIST-$ARRAY"
-      cp $FSCRIPT.sh $FNAM.sh
-      cp $FSCRIPT.sh $FNAM.sh
+  FNAM="$SHELLDIR/EMSCW.table-$TAFIL-W$MEANDIST-$ARRAY"
+  cp $FSCRIPT.sh $FNAM.sh
+  cp $FSCRIPT.sh $FNAM.sh
 
-      sed -i -e "s|TABLEFILE|$TAFIL|" \
-             -e "s|RECONSTRUCTIONID|$RECID|" \
-             -e "s|WOMIIIIIN|$MINDIST|" \
-             -e "s|WOMEEEEAN|$MEANDIST|" \
-             -e "s|ARRRRRRR|$ARRAY|" \
-             -e "s|WOMAXXXXX|$MAXDIST|" \
-             -e "s|DATADIRECT|$DDIR|" \
-             -e "s|DATASET|$DSET|" \
-	     -e "s|CTAOFF|$CTAOFF|" $FNAM.sh
+  sed -i -e "s|TABLEFILE|$TAFIL|" \
+         -e "s|RECONSTRUCTIONID|$RECID|" \
+         -e "s|ARRRRRRR|$ARRAY|" \
+         -e "s|DATADIRECT|$DDIR|" \
+         -e "s|DATASET|$DSET|" \
+         -e "s|CTAOFF|$CTAOFF|" $FNAM.sh
 
-      chmod u+x $FNAM.sh
-      echo "shell script " $FNAM.sh
+  chmod u+x $FNAM.sh
+  echo "shell script " $FNAM.sh
 
 # submit the job
-      qsub $QSUBOPT -l os=sl6 -l h_cpu=47:45:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
-   done
+  qsub $QSUBOPT -l os=sl6 -l h_cpu=47:45:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 echo "shell scripts are written to $SHELLDIR"
