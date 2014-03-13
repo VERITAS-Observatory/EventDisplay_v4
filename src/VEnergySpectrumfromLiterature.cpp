@@ -575,7 +575,7 @@ void VEnergySpectrumfromLiterature::listValues( unsigned int i )
       sprintf( hname, ", f = (%.3f +- %.3f)", fData[i].Parameter[2], fData[i].ParError[2] );
       cout << hname;
     }
-    cout << endl;
+    cout << fixed << setprecision( 2 ) << endl;
     cout << "\t " << fData[i].EnergyRange_min << " < E [TeV] < " << fData[i].EnergyRange_max << endl;
     if( fData[i].FluxV_energy.size() > 0 )
     {
@@ -583,11 +583,12 @@ void VEnergySpectrumfromLiterature::listValues( unsigned int i )
 	 cout << "\t\t  [TeV] \t [cm^-2 s^-1 TeV^-1] \t [cm^-2 s^-1 TeV^-1]" << endl;
 	 for( unsigned int t = 0; t < fData[i].FluxV_energy.size(); t++ )
 	 {
-	     cout << "\t\t";
-	     cout << setprecision( 4 );
+	     cout << "\t\t" << setprecision( 4 ) << fixed;
 	     cout << fData[i].FluxV_energy[t] << "\t\t";
+	     cout << setprecision( 2 ) << scientific;
 	     cout << fData[i].FluxV_DiffFlux[t] << "\t\t";
-	     cout << fData[i].FluxV_DiffFluxError[t] << endl;
+	     cout << fData[i].FluxV_DiffFluxError[t];
+	     cout << resetiosflags(ios_base::scientific) << endl;
 	 }
     }
     cout << "\t(" << fData[i].Reference << ")" << endl;
