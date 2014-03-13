@@ -98,8 +98,8 @@ FSCRIPT="CTA.EVNDISP.qsub_convert_and_analyse_MC_VDST_ArrayJob.prod2"
 
 # log files
 QLOG=$CTA_USER_LOG_DIR/$DATE/EVNDISP-$PART-$DSET/
-mkdir -p $QLOG
-#QLOG="/dev/null"
+# mkdir -p $QLOG
+QLOG="/dev/null"
 
 # pedestals
 # PEDFIL="$CTA_USER_DATA_DIR/analysis/AnalysisData/prod2-Leoncito/Calibration/Leoncito.peds.root"
@@ -124,31 +124,43 @@ do
     grep "_$D" $RUNLIST > $RUNLISTNdeg
 
     NRUN=`wc -l $RUNLISTNdeg | awk '{print $1}'`
+    if [[ $NRUN = "0" ]]
+    then
+       if [[ $D = "0" ]]
+       then
+          grep north $RUNLIST > $RUNLISTNdeg
+       else
+          grep south $RUNLIST > $RUNLISTNdeg
+       fi
+       NRUN=`wc -l $RUNLISTNdeg | awk '{print $1}'`
+    fi
     RUNFROMTO="1-$NRUN"
     STEPSIZE=1
     NSTEP=1
 
 # combine files to bunches of $STEPSIZE
-    if [[ $TRGMASKDIR == "FALSE" ]] || [[ ! -n $TRGMASKDIR ]]
-    then
+#    if [[ $TRGMASKDIR == "FALSE" ]] || [[ ! -n $TRGMASKDIR ]]
+#    then
         STEPSIZE=10
 # smaller step size for on source gammas
-        if [[ $PART == "gamma_onSource" ]]
+        NARRAY=`wc -l $ARRAY`
+        echo $NARRAY
+        if [[ $NARRAY > 2 ]] && [[ $PART == "gamma_onSource" ]]
         then
            STEPSIZE=5
         fi
-        let "NSTEP = $NRUN / $STEPSIZE"
-        let "NTES  = $NSTEP * $STEPSIZE"
-        if [[ $NTES -ne $NRUN ]]
-        then
-            let "NSTEP = $NSTEP + 1"
-        fi
-        RUNFROMTO="1-$NSTEP"
+#    fi
+    let "NSTEP = $NRUN / $STEPSIZE"
+    let "NTES  = $NSTEP * $STEPSIZE"
+    if [[ $NTES -ne $NRUN ]]
+    then
+        let "NSTEP = $NSTEP + 1"
     fi
+    RUNFROMTO="1-$NSTEP"
 
     echo "submitting $NRUN jobs ($NSTEP steps of size $STEPSIZE, $RUNFROMTO)"
 
-    FNAM="$SHELLDIR/EV-$DSET-$PART-$FLL-$D"
+    FNAM="$SHELLDIR/$DSET-$PART-$FLL-$D"
 
     LIST=`awk '{printf "%s ",$0} END {print ""}' $ARRAY`
 

@@ -47,10 +47,20 @@ IFIL=`head -n $ILINE $ILIST | tail -n $STEPSIZE`
 IFIL0=`head -n $ILINE $ILIST | tail -n 1`
 echo "DATA FILE(S)"
 echo $IFIL
+################################
 # copy files on temporary disk
 echo
 echo "COPYING FILES TO $TMPDIR"
-cp -v -f $IFIL $TMPDIR"/"
+# check if files are on local disc or on dCache
+# (note: DESY only, this can not handle mixed lists)
+if [[ $IFIL = *acs* ]]
+then
+  export DCACHE_CLIENT_ACTIVE=1
+  dccp $IFIL $TMPDIR"/"
+else
+  cp -v -f $IFIL $TMPDIR"/"
+fi
+###############################
 # log file directory
 DATE=`date +"%y%m%d"`
 mkdir -p $CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF
@@ -76,36 +86,37 @@ echo "OUTPUT FILE $OFIL"
 echo $TRGMASKDIR
 if [[ ! -z "$TRGMASKDIR" ]] && [[ "$TRGMASKDIR" == "TRUE" ]]
 then
-   if [[ $DSET == *Leoncito* ]] || [[ $DSET == *Aar* ]]
-   then
-      FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
-      echo "FIL $FFIL"
-   elif [[ $DSET == *SAC* ]]
-   then
-      if [[ $PART == "gamma_cone" ]] && [[  $DSET == *SAC084* ]]
-      then
-	FFIL=`basename $TMPDIR/$OFIL.gz ___cta-prod2_desert-SACx0.84_cone10.simtel.gz`
-      else
-	FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
-      fi
-   fi
-   TRIGF=`find $TRGMASKDIR -name $FFIL*trgmask*`
-   if [ -n "$TRIGF" ] && [ -e "$TRIGF" ]
-   then
-      COPT="$COPT -t $TRIGF"
-      echo "CONVERTER OPTIONS: $COPT"
-   else
-      ELOG="$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/$OFIL.error.trg.log"
-      rm -f $ELOG
-      touch $ELOG
-      echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL >> $ELOG
-      echo "search directory: $TRGMASKDIR" >> $ELOG
-      echo "search string: $FFIL" >> $ELOG
-      echo "found: $TRIGF" >> $ELOG
-      echo "error, cannot analyse this file..." >> $ELOG
-      exit
-   fi
+   COPT="$COPT -t $TRGMASKDIR"
 fi
+#   if [[ $DSET == *Leoncito* ]] || [[ $DSET == *Aar* ]]
+#   then
+#      FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
+#      echo "FIL $FFIL"
+#   elif [[ $DSET == *SAC* ]]
+#   then
+#      if [[ $PART == "gamma_cone" ]] && [[  $DSET == *SAC084* ]]
+#      then
+#	FFIL=`basename $TMPDIR/$OFIL.gz ___cta-prod2_desert-SACx0.84_cone10.simtel.gz`
+#      else
+#	FFIL=`basename $TMPDIR/$OFIL.gz .simtel.gz`
+#      fi
+#   fi
+#   TRIGF=`find $TRGMASKDIR -name $FFIL*trgmask*`
+#   if [ -n "$TRIGF" ] && [ -e "$TRIGF" ]
+#   then
+#      COPT="$COPT -t $TRIGF"
+#      echo "CONVERTER OPTIONS: $COPT"
+#   else
+#      ELOG="$CTA_USER_LOG_DIR"/analysis/AnalysisData/"$DSET/LOGFILES-$DATE-$LOGF/$OFIL.error.trg.log"
+#      rm -f $ELOG
+#      touch $ELOG
+#      echo "COULD NOT FIND TRGMASK FILE for SIMTEL FILE " $IFIL >> $ELOG
+#      echo "search directory: $TRGMASKDIR" >> $ELOG
+#      echo "search string: $FFIL" >> $ELOG
+#      echo "found: $TRIGF" >> $ELOG
+#      echo "error, cannot analyse this file..." >> $ELOG
+#      exit
+#   fi
 
 ####################################################################
 # loop over all arrays
