@@ -78,7 +78,7 @@ void VCamera::setUpCamera()
     fFillStyleFADCTrig = 3144;
     if( fPlotPaper ) fFillStyleFADCTrig = 0;
     fFillStylePos = 1001;
-    fFillStyleNeg = 4000;
+    fFillStyleNeg = 0;
     fTelescopeEllipseColor = 1;
 
 
@@ -129,14 +129,14 @@ void VCamera::setUpCamera()
 // PMTs (outer shell)
         fgraphTubes.push_back(  new TEllipse( x, y, rx, ry ) );
         fgraphTubes.back()->SetFillColor( fColorEmpty );
-        fgraphTubes.back()->SetFillStyle( 4000 );
+        fgraphTubes.back()->SetFillStyle( 0 );
         fgraphTubes.back()->SetUniqueID( 200000 + i );
         fgraphTubes.back()->SetLineColor( 15 );
 // PMT values
         fgraphTubesEntry.push_back( new TEllipse( x, y, rx * fmaxRad * 0.5, ry * fmaxRad * 0.5 ) );
         fgraphTubesEntry.back()->SetLineColor( 10 );
         fgraphTubesEntry.back()->SetFillColor( 10 );
-        fgraphTubesEntry.back()->SetFillStyle( 4000 );
+        fgraphTubesEntry.back()->SetFillStyle( 0 );
         fgraphTubesEntry.back()->SetUniqueID( 200000+i );
 // channel numbering
         sprintf( c_number, "%d", i );
@@ -169,7 +169,7 @@ fgraphMarker.back()->SetUniqueID( 200000 + i );
     fCameraFOV->SetLineWidth( 2 );
     fCameraFOV->SetLineColor( 14 );
     fCameraFOV->SetLineStyle( 2 );
-    fCameraFOV->SetFillStyle( 4000 );
+    fCameraFOV->SetFillStyle( 0 );
 // channel with photodiode signal
     fPhotoDiode = new TBox( 0.05, 0.75,  0.08, 0.78 );
     fPhotoDiode->SetLineColor( 5 );
@@ -181,18 +181,18 @@ fgraphMarker.back()->SetUniqueID( 200000 + i );
 // ellipse representing the shower image
     fAnaEllipse = new TEllipse();
     fAnaEllipse->SetLineColor( 7 );
-    fAnaEllipse->SetFillStyle( 4000 );
+    fAnaEllipse->SetFillStyle( 0 );
     fAnaEllipse->SetLineWidth( 2 );
     fAnaEllipse->SetUniqueID( 2999 );
 // circles representing the muon ring radius +/- 1 sigma_radius
     fAnaEllipse1 = new TEllipse();
     fAnaEllipse1->SetLineColor( 5 );
-    fAnaEllipse1->SetFillStyle( 4000 );
+    fAnaEllipse1->SetFillStyle( 0 );
     fAnaEllipse1->SetLineWidth( 1 );
     fAnaEllipse1->SetUniqueID( 2990 );
     fAnaEllipse2 = new TEllipse();
     fAnaEllipse2->SetLineColor( 5 );
-    fAnaEllipse2->SetFillStyle( 4000 );
+    fAnaEllipse2->SetFillStyle( 0 );
     fAnaEllipse2->SetLineWidth( 2 );
     fAnaEllipse2->SetUniqueID( 2991 );
 
@@ -202,7 +202,7 @@ fgraphMarker.back()->SetUniqueID( 200000 + i );
 // ellipse representing the shower image (log likelihood)
     fAnaEllipseLL = new TEllipse();
     fAnaEllipseLL->SetLineColor( 5 );
-    fAnaEllipseLL->SetFillStyle( 4000 );
+    fAnaEllipseLL->SetFillStyle( 0 );
     fAnaEllipseLL->SetLineWidth( 2 );
     fAnaEllipseLL->SetUniqueID( 2998 );
 // event text (top left corner) + image parameter line at bottom (last entry in vector)
@@ -491,7 +491,7 @@ break;
                 fTheta2Circle[t]->SetY1( convertY(0.) );
                 fTheta2Circle[t]->SetR1( convertX(0.5*(t+1), 0.) );
                 fTheta2Circle[t]->SetR2( convertY(0.5*(t+1), 0.) );
-                fTheta2Circle[t]->SetFillStyle( 4000 );
+                fTheta2Circle[t]->SetFillStyle( 0 );
                 fTheta2Circle[t]->Draw();
             }
         }

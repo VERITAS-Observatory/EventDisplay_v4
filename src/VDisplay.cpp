@@ -189,50 +189,8 @@ void VDisplay::printCanvas( TPad *priCanvas )
     new TGFileDialog(fClient->GetRoot(), this, kFDSave,&fi);
     if (!fi.fFilename) return;
 
-// work around the nontransparent analysis ellipse, first set all 4000-fill styles to 3000
-// only for ps/eps
-//   (this is a workaround of a root bug)
-    string iFil = fi.fFilename;
-    vector< TEllipse * > ivell;
-    vector< TPad * > ivpad;
-    if( iFil.find( ".ps" ) < iFil.size() || iFil.find( ".eps" ) < iFil.size() )
-    {
-        TIter next( priCanvas->GetListOfPrimitives() );
-        string i_oname="";
-        while( TObject *obj = next() )
-        {
-            i_oname = obj->ClassName();
-            if( i_oname == "TPad" )
-            {
-                TPad *i_pad = (TPad*)obj;
-                ivpad.push_back( i_pad );
-                i_pad->cd();
-                TIter nextpad( i_pad->GetListOfPrimitives() );
-                while( TObject *obj_pad = nextpad() )
-                {
-                    i_oname = obj_pad->ClassName();
-                    if( i_oname == "TEllipse" )
-                    {
-                        TEllipse *i_ell = (TEllipse*)obj_pad;
-                        if( i_ell->GetFillStyle() == 4000 )
-                        {
-                            ivell.push_back( i_ell );
-                            ivell.back()->SetFillStyle( 3000 );
-                        }
-                    }
-                }
-            }
-            priCanvas->cd();
-        }
-    }
-
     priCanvas->Print( fi.fFilename );
 
-// now set all fill styles back to 4000
-    for( unsigned int i = 0; i < ivell.size(); i++ ) ivell[i]->SetFillStyle( 4000 );
-    for( unsigned int i = 0; i < ivpad.size(); i++ ) ivpad[i]->Update();
-
-// end of workaround
     priCanvas->Update();
 }
 
