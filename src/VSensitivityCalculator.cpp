@@ -950,7 +950,7 @@ bool VSensitivityCalculator::printSensitivity()
 TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, bool bIntegralSensitivity )
 {
      char htitle[400];
-     TCanvas *iCanvas = new TCanvas( fPlot_CanvasName.c_str(), "sensitivity vs energy", 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
+     TCanvas *iCanvas = new TCanvas( fPlot_CanvasName.c_str(), fPlot_CanvasTitle.c_str(), 10, 10, fPlot_CanvasSize_x, fPlot_CanvasSize_y );
      iCanvas->SetGridx( 0 );
      iCanvas->SetGridy( 0 );
      iCanvas->SetLeftMargin( 0.15 );

@@ -486,7 +486,7 @@ int VHistogramUtilities::findBinInGraph( TGraph *g, double x )
    for( int i = 0; i < g->GetN(); i++ )
    {
        g->GetPoint( i, i_x, i_y );
-       i_x_low = g->GetErrorXlow( i );
+       i_x_low  = g->GetErrorXlow( i );
        i_x_high = g->GetErrorXhigh( i );
 
        if( x > i_x - i_x_low && x <= i_x + i_x_high ) return i;

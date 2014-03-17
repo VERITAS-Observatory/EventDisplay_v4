@@ -168,6 +168,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 // plotting values
         TH1D*  hnull;
 	string fPlot_CanvasName;
+	string fPlot_CanvasTitle;
 	int    fPlot_CanvasSize_x;
 	int    fPlot_CanvasSize_y;
         double fPlot_flux_PFLUX_min;
@@ -279,7 +280,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 	void     setBackgroundMissingParticleFraction( double iB = 0. ) { fMC_BackgroundMissingParticleFraction = iB; }
         void     setDebug( bool iDebug = true ) { fDebug = iDebug; }
 	void     setPlotCanvasSize( int x = 600, int y = 600 ) { fPlot_CanvasSize_x = x; fPlot_CanvasSize_y = y; }
-	void     setPlotCanvasName( string iN = "cSensitivity" ) { fPlot_CanvasName = iN; }
+	void     setPlotCanvasName( string iN = "cSensitivity", string iT = "sensitivity vs energy" ) { fPlot_CanvasName = iN; fPlot_CanvasTitle = iT; }
 	void     setPlotCrabFluxLineValues( vector< double > iF ) { fPlottingCrabFlux_CU = iF; }
         void     setPlotDebug( string iName ) { fPlotDebugName = iName; }
         bool     setCurrentDataSet( unsigned int iD );
@@ -305,6 +306,6 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
         void     setSourceStrengthVector_CU( vector< double > );
 	void     setWriteParticleNumberFile( string iFile ) { fDebugParticleNumberFile = iFile; }
 
-        ClassDef(VSensitivityCalculator,21);
+        ClassDef(VSensitivityCalculator,22);
 };
 #endif

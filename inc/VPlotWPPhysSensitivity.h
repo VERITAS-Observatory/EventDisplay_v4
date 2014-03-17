@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -49,11 +50,11 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
    double fSensitivityFOM_error;
 
 // projected sensitvity plots
-   vector< double > fProjectionEnergy_min_logTeV;
-   vector< double > fProjectionEnergy_max_logTeV;
-   vector< TGraphAsymmErrors* > fProjectionSensitivityvsCameraOffset;
+   vector< double >  fProjectionEnergy_min_logTeV;
+   vector< double >  fProjectionEnergy_max_logTeV;
+   map< string, vector< TGraphAsymmErrors* > > fProjectionSensitivityvsCameraOffset;
 
-   void    fillProjectedSensitivityPlot( unsigned int i, VSensitivityCalculator *iS );
+   void    fillProjectedSensitivityPlot( unsigned int i, TGraphAsymmErrors *g );
    void    initialProjectedSensitivityPlots();
    bool    plotLegend( TCanvas *c = 0, bool iDown = false, bool iLeft = false, bool iAddFirst = true );
 

@@ -14,6 +14,7 @@ void VSiteData::reset()
     fSite_B_S = 0.;
     fSite_B_dB = 0.;
     fSiteRequirementID = 0;
+    fReferenceSiteName = "";
 
     fObservationTime_s.clear();
     fCameraOffset_deg.clear();
@@ -64,7 +65,7 @@ bool VSiteData::checkIntegrity()
 void VSiteData::print()
 {
    cout << fSiteName << " at ";
-   cout << fSite_asl << " m, N: " << fSite_B_N << " muG, S: " << fSite_B_S << " muG" << endl;
+   cout << fSite_asl << " m, N: " << fSite_B_N << " muG, S: " << fSite_B_S << " muG" << " (reference site " << fReferenceSiteName << ")" << endl;
    for( unsigned int i = 0; i < fSiteFileName.size(); i++ )
    {
       cout << "\t " << fObservationTime_s[i]/3600. << "h, array " << fArray[i] << ", offset " << fCameraOffset_deg[i] <<  " deg";
@@ -125,6 +126,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 	 if( iTemp != iListOfSites[iSiteCounter] ) continue;
 	 fSiteName = iTemp;
       }
+      if( !is_stream.eof() ) is_stream >> fReferenceSiteName;
       if( !is_stream.eof() ) is_stream >> fSite_asl;
       if( !is_stream.eof() ) is_stream >> fSite_B_N;
       if( !is_stream.eof() ) is_stream >> fSite_B_S;
@@ -279,7 +281,21 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
        }
        TFile *iFile = new TFile( iFileName.c_str() );
        if( iFile->IsZombie() ) return 0;
-       TH1F *h = (TH1F*)iFile->Get( "DiffSens" );
+       TH1F *h = 0;
+       if( fCameraOffset_deg[f] < 1.e-2 )
+       {
+	  h = (TH1F*)iFile->Get( "DiffSens" );
+       }
+       else
+       {
+          TH2F *h2 = (TH2F*)iFile->Get( "DiffSens_offaxis" );
+	  if( h2 )
+	  {
+	     char hname[200];
+	     sprintf( hname, "DiffSens_%d", (int)fCameraOffset_deg[f]*100 );
+	     h = (TH1F*)h2->ProjectionX( hname, h2->GetYaxis()->FindBin( fCameraOffset_deg[f] ), h2->GetYaxis()->FindBin( fCameraOffset_deg[f] ) );
+          }
+       }
        if( !h ) return 0;
 
        if( fDebug )
@@ -299,7 +315,8 @@ TGraphAsymmErrors* VSiteData::getCombinedSensitivityGraph( bool iInterpolate, st
 		iGraphSensitivity->SetPoint( z, h->GetXaxis()->GetBinCenter( i ), h->GetBinContent( i ) );
 		if( h->GetBinError( i ) < h->GetBinContent( i ) )
 		{
-		   iGraphSensitivity->SetPointError( z, h->GetXaxis()->GetBinWidth( i )/2., h->GetXaxis()->GetBinWidth( i )/2., h->GetBinError( i ), h->GetBinError( i ) );
+		   iGraphSensitivity->SetPointError( z, h->GetXaxis()->GetBinWidth( i )/2., h->GetXaxis()->GetBinWidth( i )/2.,
+		                                                                            h->GetBinError( i ), h->GetBinError( i ) );
                 }
 		else
 		{

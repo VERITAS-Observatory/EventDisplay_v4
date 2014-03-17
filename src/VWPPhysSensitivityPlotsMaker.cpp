@@ -45,6 +45,7 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string 
    a.addDataSets( iDataSetFile, iDirectionString );
    a.plotIRF( fPrintingOptions, 50., 5.e7, 0.3 );
    a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
+   a.plotProjectedSensitivities( 0, 5. );
    a.plotSensitivityRatio( fPrintingOptions, 0.4, 4.1 ); 
 // Southern sites: 30 GeV - 100 TeV
    if( fPlotCTARequirements < 3 ) a.printSensitivityFigureOfMerit( 0.03, 100. );
@@ -102,6 +103,7 @@ void VWPPhysSensitivityPlotsMaker::compareOffAxisSensitivities( string iSubArray
 	  a.setEnergyRange_Lin_TeV( fMinEnergy_TeV, fMaxEnergy_TeV );
 	  for( unsigned int k = 0; k < fOffAxisAngle.size(); k++ )
 	  {
+		cout << "\t adding " << fListofDataSets[j] << ", " << fListOfArrays[i] << ", " << fObservingTime_s << ", " << fOffAxisAngle[k] << ", " << k << ", " << j << endl;
 		a.addDataSet( fListofDataSets[j], fListOfArrays[i], fObservingTime_s, fOffAxisAngle[k], "", k+1, j+1 );
 	  }
 	  string iP = "";

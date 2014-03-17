@@ -6,6 +6,7 @@
 #include "TFile.h"
 #include "TGraphAsymmErrors.h"
 #include "TH1F.h"
+#include "TH2F.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -31,6 +32,7 @@ class VSiteData
     float            fSite_B_S;
     float            fSite_B_dB;
     float            fSiteRequirementID;
+    string           fReferenceSiteName;
     vector< string > fSiteFileName;
     vector< bool   > fSiteFile_exists;
     vector< float >  fSiteFile_Emin;
