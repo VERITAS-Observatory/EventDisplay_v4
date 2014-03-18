@@ -16,6 +16,7 @@ VDSTTree::VDSTTree()
     fFullTree = false;
 
     setFADC();
+    setFillPELeaf();
 
     fMCtree = 0;
     fDST_tree = 0;
@@ -246,6 +247,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
         fDSTpointElevation[i] = 0.;
     }
 
+// for all non-CTA DSTs
     if( !iIsCTADST )
     {
 	for( unsigned int i = 0; i < iMaxNTel; i++ )
@@ -286,23 +288,33 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
        }
     } 
 
-    std::fill( &fDSTRecord[0][0], &fDSTRecord[0][0]+VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 1 );
     memset( fDSTdead, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTdead[0][0] ) );
     memset( fDSTZeroSuppressed, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTZeroSuppressed[0][0] ) );
-    memset( fDSTsumwindow, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTsumwindow[0][0] ) );
-    memset( fDSTsumfirst, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTsumfirst[0][0] ) );
-    memset( fDSTHiLo, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTHiLo[0][0] ) );
-    memset( fDSTMax, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTMax[0][0] ) );
     memset( fDSTL1trig, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTL1trig[0][0] ) );
-    memset( fDSTPe, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTPe[0][0] ) );
-    std::fill( &fDSTsums[0][0], &fDSTsums[0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 0. );
-    std::fill( &fDSTsums2[0][0], &fDSTsums2[0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 0. );
-    std::fill( &fDSTpulsetiming[0][0][0], &fDSTpulsetiming[0][0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS*VDST_MAXTIMINGLEVELS, 0. );
-    std::fill( &fDSTpulsetiminglevels[0][0], &fDSTpulsetiminglevels[0][0] + VDST_MAXTELESCOPES*VDST_MAXTIMINGLEVELS, 0. ); 
+// FADC mode
     if( fReadWriteFADC )
     {
        memset( fDSTtrace, 0, VDST_MAXTELESCOPES*VDST_MAXSUMWINDOW*VDST_MAXCHANNELS*sizeof( fDSTtrace[0][0][0] ));
     }
+// QADC mode
+    else
+    {
+        std::fill( &fDSTRecord[0][0], &fDSTRecord[0][0]+VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 1 );
+        std::fill( &fDSTsums[0][0], &fDSTsums[0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 0. );
+        std::fill( &fDSTsums2[0][0], &fDSTsums2[0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS, 0. );
+        std::fill( &fDSTpulsetiming[0][0][0], &fDSTpulsetiming[0][0][0] + VDST_MAXTELESCOPES*VDST_MAXCHANNELS*VDST_MAXTIMINGLEVELS, 0. );
+        std::fill( &fDSTpulsetiminglevels[0][0], &fDSTpulsetiminglevels[0][0] + VDST_MAXTELESCOPES*VDST_MAXTIMINGLEVELS, 0. ); 
+        memset( fDSTsumwindow, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTsumwindow[0][0] ) );
+        memset( fDSTsumfirst, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTsumfirst[0][0] ) );
+        memset( fDSTMax, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTMax[0][0] ) );
+    }
+// write PEs
+    if( fFillPELeaf )
+    {
+        memset( fDSTPe, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTPe[0][0] ) );
+    }
+    memset( fDSTHiLo, 0, VDST_MAXTELESCOPES*VDST_MAXCHANNELS*sizeof( fDSTHiLo[0][0] ) );
+
 }
 
 /*

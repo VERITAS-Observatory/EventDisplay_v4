@@ -368,8 +368,8 @@ bool DST_fillMCEvent( VDSTTree *fData, AllHessData *hsdata )
    fData->fDSTrunnumber = hsdata->run_header.run;
    fData->fDSTprimary = hsdata->mc_shower.primary_id;
    fData->fDSTenergy = hsdata->mc_shower.energy;
-   fData->fDSTaz = hsdata->mc_shower.azimuth * 45./atan( 1. );
-   fData->fDSTze = 90. - hsdata->mc_shower.altitude * 45./atan( 1. );
+   fData->fDSTaz = hsdata->mc_shower.azimuth * TMath::RadToDeg();
+   fData->fDSTze = 90. - hsdata->mc_shower.altitude * TMath::RadToDeg();
 // Observe: transform to VERITAS coordinate system
 // x: East, y: North
    fData->fDSTxcore = -1.* hsdata->mc_event.ycore;
@@ -502,8 +502,8 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    {
       if( telescope_list.find( hsdata->event.trackdata[i].tel_id ) != telescope_list.end() )
       {
-	 fData->fDSTpointAzimuth[z] = hsdata->event.trackdata[i].azimuth_raw * 45./atan(1.);
-	 fData->fDSTpointElevation[z] = hsdata->event.trackdata[i].altitude_raw * 45./atan(1.);
+	 fData->fDSTpointAzimuth[z] = hsdata->event.trackdata[i].azimuth_raw * TMath::RadToDeg();
+	 fData->fDSTpointElevation[z] = hsdata->event.trackdata[i].altitude_raw * TMath::RadToDeg();
 	 z++;
       }
    }
@@ -537,7 +537,7 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	 if( hsdata->event.teldata[telID].known == 0 ) continue;
 #endif
 ////////////////////////////////////////////////
-// get pixel (QADC) data
+// get pixel data
          fData->fDSTTelescopeZeroSupression[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->zero_sup_mode;
 	 fData->fDSTnumSamples[i_ntel_data] = (unsigned short int)hsdata->event.teldata[telID].raw->num_samples;
 	 if( iWriteFADC && fData->fDSTnumSamples[i_ntel_data] == 0 )
@@ -551,44 +551,40 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 	 {
 	    fGlobalMaxNumberofSamples = fData->fDSTnumSamples[i_ntel_data];
          }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// find time integration type required for DST
-// (not sure if this really has to be done for every event and all telescopes)
-	 for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
-	 {
-	     if( t < (int)fData->getDSTpulsetiminglevelsN() )
-	     {
-	         if( getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
-		 {
-		    fData->fDSTpulsetiminglevels[i_ntel_data][getTimingLevelIndex(t)] = hsdata->event.teldata[telID].pixtm->time_level[t];
-                 }
-             }
-	 }
+/////////////////////////////////////
+// set maximum number of pixels (needed for efficient resetting of DST arrays)
 	 if( hsdata->camera_set[telID].num_pixels < VDST_MAXCHANNELS )
 	 {
-// set maximum number of pixels (needed for efficient resetting of DST arrays)
 	    bool iLowGain = false;
 	    if( (unsigned int)hsdata->camera_set[telID].num_pixels > fGlobalMaxNumberofPixels )
 	    {
 	       fGlobalMaxNumberofPixels = (unsigned int)hsdata->camera_set[telID].num_pixels;
             }
+/////////////////////////////////////
 // loop over all pixel
 	    for( int p = 0; p < hsdata->camera_set[telID].num_pixels; p++ )
 	    {
 		fData->fDSTChan[i_ntel_data][p] =  0;
 		fData->fDSTdead[i_ntel_data][p] = !(hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p]);
-		fData->fDSTRecord[i_ntel_data][p] = hsdata->event.teldata[telID].raw->significant[p];
-		fData->fDSTsums[i_ntel_data][p] = (float)(TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP, iLowGain ) * 100. ))/100.;
 // set low gain switch
 		fData->fDSTHiLo[i_ntel_data][p] = iLowGain;
-// pe count
-		if( fFillPELeaf ) fData->fDSTPe[i_ntel_data][p] = hsdata->mc_event.mc_pe_list[telID].pe_count[p];										
+
+///////////////////////////////////
+// fill pe counting
+		if( fFillPELeaf )
+                {
+                   fData->fDSTPe[i_ntel_data][p] = hsdata->mc_event.mc_pe_list[telID].pe_count[p];
+                }
+///////////////////////
 // fill FADC trace
 		unsigned int iTraceIsZero = 1;
    	        if( iWriteFADC )
 		{
-		   iTraceIsZero = 0;
+// check zero suppression (for FADC case only)
+                   if( iTraceIsZero > 0 )   fData->fDSTZeroSuppressed[i_ntel_data][p] = 0;
+                   else                     fData->fDSTZeroSuppressed[i_ntel_data][p] = 1;
+// read FADC trace
+                   iTraceIsZero = 0;
 		   iLowGain = false;
 		   if( hsdata->event.teldata[telID].raw->adc_known[HI_GAIN][p] == 1 )
 		   {
@@ -602,10 +598,10 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 			 }
 		      }
                    }
-// preli: no low-gain filled
-
+// low gain
 		   if( iLowGain && hsdata->event.teldata[telID].raw->adc_known[LO_GAIN][p] == 1 )
 		   {
+                   cout << "XXX " << endl;
 		      if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[LO_GAIN] )
 		      {
 			 for( int t = 0; t < hsdata->event.teldata[telID].raw->num_samples; t++ )
@@ -617,43 +613,53 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
 		      }
                    } 
 		} 
-// check zero suppression (for FADC case only)
-		if( iTraceIsZero > 0 )   fData->fDSTZeroSuppressed[i_ntel_data][p] = 0;
-		else  
-		{
-		   fData->fDSTZeroSuppressed[i_ntel_data][p] = 1;
-                }
-
+/////////////////////////////
+// fill QADC results
+                else
+                {
+                    fData->fDSTRecord[i_ntel_data][p] = hsdata->event.teldata[telID].raw->significant[p];
+                    fData->fDSTsums[i_ntel_data][p] = (float)(TMath::Nint( calibrate_pixel_amplitude( hsdata, telID, p, FLAG_AMP_TMP, iLowGain ) * 100. ))/100.;
 // fill timing information
-		for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
-		{
-		   if( t < (int)fData->getDSTpulsetiminglevelsN() && getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
-		   {
-		      fData->fDSTpulsetiming[i_ntel_data][getTimingLevelIndex(t)][p] = hsdata->event.teldata[telID].pixtm->timval[p][t];
-		      if( getTimingLevelIndex(t) == 1 && fData->fDSTsums[i_ntel_data][p] > fData->getDSTMeanPulseTimingMinLightLevel()
-		                                      && hsdata->event.teldata[telID].pixtm->timval[p][t] > 1.e-1 )
-		      {
-		         fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->timval[p][t], 
-                                                                  hsdata->event.teldata[telID].raw->num_samples );
-                      }
-                   }
+                    for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
+                     {
+                         if( t < (int)fData->getDSTpulsetiminglevelsN() )
+                         {
+                             if( getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
+                             {
+                                fData->fDSTpulsetiminglevels[i_ntel_data][getTimingLevelIndex(t)] = hsdata->event.teldata[telID].pixtm->time_level[t];
+                             }
+                         }
+                    }
+                    for( int t = 0; t < hsdata->event.teldata[telID].pixtm->num_types; t++ )
+                    {
+                       if( t < (int)fData->getDSTpulsetiminglevelsN() && getTimingLevelIndex( t ) < fData->getDSTpulsetiminglevelsN() )
+                       {
+                          fData->fDSTpulsetiming[i_ntel_data][getTimingLevelIndex(t)][p] = hsdata->event.teldata[telID].pixtm->timval[p][t];
+                          if( getTimingLevelIndex(t) == 1 && fData->fDSTsums[i_ntel_data][p] > fData->getDSTMeanPulseTimingMinLightLevel()
+                                                          && hsdata->event.teldata[telID].pixtm->timval[p][t] > 1.e-1 )
+                          {
+                             fData->fillDSTMeanPulseTiming( telID, p, hsdata->event.teldata[telID].pixtm->timval[p][t], 
+                                                                      hsdata->event.teldata[telID].raw->num_samples );
+                          }
+                       }
+                    }
+                    fData->fDSTMax[i_ntel_data][p] = (short)(hsdata->event.teldata[telID].pixtm->pulse_sum_loc[HI_GAIN][p]);
+                    if( FLAG_AMP_TMP > 0 )
+                    {
+                       fData->fDSTsumwindow[i_ntel_data][p] = hsdata->event.teldata[telID].pixtm->after_peak;
+                       fData->fDSTsumwindow[i_ntel_data][p] -= hsdata->event.teldata[telID].pixtm->before_peak;
+                    }
+                    else fData->fDSTsumwindow[i_ntel_data][p] = hsdata->pixel_set[telID].sum_bins;
                 }
-		fData->fDSTMax[i_ntel_data][p] = (short)(hsdata->event.teldata[telID].pixtm->pulse_sum_loc[HI_GAIN][p]);
-		if( FLAG_AMP_TMP > 0 )
-		{
-		   fData->fDSTsumwindow[i_ntel_data][p] = hsdata->event.teldata[telID].pixtm->after_peak;
-		   fData->fDSTsumwindow[i_ntel_data][p] -= hsdata->event.teldata[telID].pixtm->before_peak;
-		}
-		else fData->fDSTsumwindow[i_ntel_data][p] = hsdata->pixel_set[telID].sum_bins;
 	    }
 	 }
 	 else
 	 {
 	    cout << "ERROR: number of pixels too high: " << telID + 1 << "\t";
 	    cout << hsdata->camera_set[telID].num_pixels << "\t" << VDST_MAXCHANNELS << endl;
-	    exit( 0 );
+	    exit( EXIT_FAILURE );
 	 }
-
+//////////////////////////////
 // get local trigger data (this is not corrected for clipping!)
 	 unsigned int i_nL1trig = 0;
 	 for( int p = 0; p < hsdata->event.teldata[telID].trigger_pixels.pixels; p++ )
@@ -671,15 +677,16 @@ bool DST_fillEvent( VDSTTree *fData, AllHessData *hsdata, map< unsigned int, flo
    fGlobalNTelPreviousEvent = i_ntel_data;
    fData->fDSTntel_data = i_ntel_data;
 
-// MC
+///////////////////
+// MC event data
    fData->fDSTprimary = hsdata->mc_shower.primary_id;
    fData->fDSTenergy = hsdata->mc_shower.energy;
-   fData->fDSTaz = hsdata->mc_shower.azimuth * 45./atan( 1. );
-   fData->fDSTze = 90.-hsdata->mc_shower.altitude * 45./atan( 1. );
+   fData->fDSTaz = hsdata->mc_shower.azimuth * TMath::RadToDeg();
+   fData->fDSTze = 90.-hsdata->mc_shower.altitude * TMath::RadToDeg();
 // Observe: transform to VERITAS coordinate system
 // x: East, y: North
    fData->fDSTxcore = -1.*hsdata->mc_event.ycore;
-   fData->fDSTycore = hsdata->mc_event.xcore;
+   fData->fDSTycore =     hsdata->mc_event.xcore;
 /////////////////////////////////////////////////////////////////////////////
 // calculate offset in camera coordinates from telescope and MC direction
 // (OBS: this assumes that all telescopes point into the same direction)
@@ -750,9 +757,9 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
    }
 // the following variables are needed for reading of external pedestal files
    float iT_sumwindow[VDST_MAXSUMWINDOW];
-   float iT_pedmean = 0.;
    float iT_pedvars[VDST_MAXSUMWINDOW];
 
+// definition of calibration tree
    TTree *t = new TTree( "calibration", "calibration data" );
 
    char hname[200];
@@ -774,6 +781,7 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
    t->Branch( "tzero_rms_tel", &fTZeroRMS, "tzero_rms_tel/F" ); 
    t->Branch( "tzero_n_tel", &fTZeroN, "tzero_n_tel/F" ); 
 
+///////////////////////////////////////////////////////
 // open external file with pedestals
    TFile *iPedFile = 0;
    if( ipedfile.size() > 0 )
@@ -801,7 +809,23 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
 	  cout << "\t adjust arrays..." << endl;
 	  exit( -1 );
        }
-// fill pedestals from external root file
+// pedestal (always taken from hessio file)
+       for( unsigned int p = 0; p < nPixel; p++ )
+       {
+          if( hsdata->tel_moni[itel].num_ped_slices > 0. )
+          {
+             fPed_high[p] = hsdata->tel_moni[itel].pedestal[HI_GAIN][p] / (double)(hsdata->tel_moni[itel].num_ped_slices);
+             fPed_low[p] = hsdata->tel_moni[itel].pedestal[LO_GAIN][p] / (double)(hsdata->tel_moni[itel].num_ped_slices);
+          }
+          else
+          {
+             fPed_high[p] = 0.;
+             fPed_low[p] = 0.;
+          }
+       }
+
+///////////////////////////////////////////////////////////////////////////////////
+// fill pedestal variances from external root file
        if( iPedFile && fTelescopeType.find( itel ) != fTelescopeType.end() )
        {
           std::ostringstream iSname;
@@ -810,103 +834,71 @@ TTree* DST_fillCalibrationTree( VDSTTree *fData, AllHessData *hsdata, map< unsig
 	  if( !iT )
 	  {
 	      cout << "DST_fillCalibrationTree error: pedestal tree not found for telescope " << itel << " (type " <<  fTelescopeType[itel] << ")" << endl;
-	      exit( -1 );
+	      exit( EXIT_FAILURE );
           }
 // now copy values over
           iT->SetBranchAddress( "nsumwindows", &fnum_sumwindow );
 	  iT->SetBranchAddress( "sumwindow", iT_sumwindow );
-	  iT->SetBranchAddress( "pedmean", &iT_pedmean );
 	  iT->SetBranchAddress( "pedvars", iT_pedvars );
 
 	  if( iT->GetEntries() < nPixel )
 	  {
 	      cout << "DST_fillCalibrationTree error: number of pixels different in pedestal tree: " << nPixel << "\t" << iT->GetEntries() << endl;
-	      exit( -1 );
+	      exit( EXIT_FAILURE );
           }
 
 	  for( unsigned int p = 0; p < nPixel; p++ )
 	  {
 	      iT->GetEntry( p );
 
-	      fPed_high[p] = iT_pedmean;
-	      if( hsdata->tel_moni[itel].num_ped_slices > 0. )
-	      {
-		fPed_low[p] = hsdata->tel_moni[itel].pedestal[LO_GAIN][p] / (double)(hsdata->tel_moni[itel].num_ped_slices);
-	      }
-	      else
-	      {
-		 fPed_low[p] =0.;
-	      }
 	      for( unsigned int w = 0; w < fnum_sumwindow; w++ )
 	      {
 	         fPedvar_high[p*VDST_MAXSUMWINDOW+w] = iT_pedvars[w];
 		 fPedvar_low[p*VDST_MAXSUMWINDOW+w] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
               }
-	      fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
-	      fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
-	      fTZero[p] = -999.;
-	      if( fData )
-	      {
-		fTZero[p] = fData->getDSTMeanPulseTiming( itel, p );
-              }
           }
-          if( fData )
-          {
-             fTZeroMean = fData->getDSTMeanPulseTimingPerTelescope( itel );
-             fTZeroMedian = fData->getDSTMedianPulseTimingPerTelescope( itel );
-             fTZeroRMS = fData->getDSTRMSPulseTimingPerTelescope( itel );
-             fTZeroN = fData->getDSTNEventsPulseTimingPerTelescope( itel );
-          }
-	  for( unsigned int w = 0; w < fnum_sumwindow; w++ )
-	  {
-	      fsumwindow[w] = (unsigned int)(TMath::Nint( iT_sumwindow[w] ));
-          }
-
           if( i_curDir ) i_curDir->cd();
        }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // read calibration data from simtel files
+// (not clear yet how to use this information later in the analysis)
        else
        {
-	  for( unsigned int p = 0; p < nPixel; p++ )
-	  {
-	     if( hsdata->tel_moni[itel].num_ped_slices > 0. )
-	     {
-		fPed_high[p] = hsdata->tel_moni[itel].pedestal[HI_GAIN][p] / (double)(hsdata->tel_moni[itel].num_ped_slices);
-		fPed_low[p] = hsdata->tel_moni[itel].pedestal[LO_GAIN][p] / (double)(hsdata->tel_moni[itel].num_ped_slices);
-	     }
-	     else
-	     {
-		fPed_high[p] = 0.;
-		fPed_low[p] = 0.;
-	     }
-	     fnum_sumwindow = 1;
-             fsumwindow[0] = (unsigned int)hsdata->tel_moni[itel].num_ped_slices;
-	     for( unsigned int w = 0; w < fnum_sumwindow; w++ )
-	     {
-		fPedvar_high[p*VDST_MAXSUMWINDOW+w] = hsdata->tel_moni[itel].noise[HI_GAIN][p];
+           for( unsigned int p = 0; p < nPixel; p++ )
+           {
+	      fnum_sumwindow = 1;
+              fsumwindow[0] = (unsigned int)hsdata->tel_moni[itel].num_ped_slices;
+	      for( unsigned int w = 0; w < fnum_sumwindow; w++ )
+	      {
+	 	fPedvar_high[p*VDST_MAXSUMWINDOW+w] = hsdata->tel_moni[itel].noise[HI_GAIN][p];
 		fPedvar_low[p*VDST_MAXSUMWINDOW+w] = hsdata->tel_moni[itel].noise[LO_GAIN][p];
-             }
-	     fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
-	     fConv_low[p] = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
-	     if( fData )
-	     {
-		fTZero[p] = fData->getDSTMeanPulseTiming( itel, p );
-             }
-	     else
-	     {
-	        fTZero[p] = -999.;
-             }
-	  }
+              }
+           }
+       }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// dc/pe conversion and pulse arrival time
+       for( unsigned int p = 0; p < nPixel; p++ )
+       {
+          fConv_high[p] = hsdata->tel_lascal[itel].calib[HI_GAIN][p] * CALIB_SCALE;
+          fConv_low[p]  = hsdata->tel_lascal[itel].calib[LO_GAIN][p] * CALIB_SCALE;
+          fTZero[p] = -999.;
           if( fData )
           {
-             fTZeroMean = fData->getDSTMeanPulseTimingPerTelescope( itel );
-             fTZeroMedian = fData->getDSTMedianPulseTimingPerTelescope( itel );
-             fTZeroRMS = fData->getDSTRMSPulseTimingPerTelescope( itel );
-             fTZeroN = fData->getDSTNEventsPulseTimingPerTelescope( itel );
+            fTZero[p] = fData->getDSTMeanPulseTiming( itel, p );
           }
-       }
-
-       t->Fill();
+      }
+      if( fData )
+      {
+         fTZeroMean = fData->getDSTMeanPulseTimingPerTelescope( itel );
+         fTZeroMedian = fData->getDSTMedianPulseTimingPerTelescope( itel );
+         fTZeroRMS = fData->getDSTRMSPulseTimingPerTelescope( itel );
+         fTZeroN = fData->getDSTNEventsPulseTimingPerTelescope( itel );
+      }
+      for( unsigned int w = 0; w < fnum_sumwindow; w++ )
+      {
+          fsumwindow[w] = (unsigned int)(TMath::Nint( iT_sumwindow[w] ));
+      }
+      t->Fill();
      }
    }
    delete [] fPedvar_high;
@@ -1380,6 +1372,7 @@ int main(int argc, char **argv)
       exit( -1 );
   }
   fDST->setFADC( fWriteFADC );
+  fDST->setFillPELeaf( fFillPELeaf );
   fDST->initDSTTree( false );
   fDST->initMCTree();
 

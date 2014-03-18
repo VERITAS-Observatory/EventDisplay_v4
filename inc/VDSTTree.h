@@ -102,6 +102,7 @@ class VDSTTree
         float fDSTPDSum[VDST_MAXTELESCOPES];
 //////////////////////////////////////////////////////////////////////////////////////
 // photoelectrons	
+        bool  fFillPELeaf;
 	unsigned int fDSTPe[VDST_MAXTELESCOPES][VDST_MAXCHANNELS]; // sum of Che pe in each pixel	
 // fit parameter
         float fDSTChi2[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
@@ -155,6 +156,7 @@ class VDSTTree
 			       unsigned int iMaxNSamples = VDST_MAXSUMWINDOW,
 			       bool iTriggerReset = false, bool iIsCTADST = false );
 	void setFADC( bool iFADC = false ) { fReadWriteFADC = iFADC; }
+        void setFillPELeaf( bool iPE = false ) { fFillPELeaf = iPE; }
         void setMC( bool iMC = true ) { fMC = iMC; }
 
 // getters for all variables
