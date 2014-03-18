@@ -1,6 +1,9 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140318 (GM, CB) introduced simple trace max replacement
+                for sum calculation
+
 * 20140318 (GM) CTA bug fix in writing of pedestals
                 (average pedestals are used, not the
                 pixel wise values)

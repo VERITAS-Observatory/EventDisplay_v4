@@ -516,7 +516,7 @@ void VTraceHandler::setPulseTimingLevels( vector< float > iP )
 bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 {
 // check method numbers
-   if( iT > 4 ) return false;
+   if( iT > 5 ) return false;
 
    fTraceIntegrationMethod = iT;
 
@@ -549,6 +549,15 @@ double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw )
     {
         return getQuickMaximumSum( 0.5*fpTrace.size(), fpTrace.size(),fLast - fFirst, fRaw );            // extractor 2
         //return getMaxSumWithOverSampling( 0.5*fpTrace.size(), fpTrace.size(),0,fLast - fFirst, fRaw );   //extractor 3
+    }
+// return simle the trace maximum as trace sum
+    else if( fTraceIntegrationMethod == 5 ) 
+    {
+	double peakamplitude = getTraceMax(); 
+	double result = 0; 
+        if (fRaw)  result = peakamplitude + fPed;  
+        if (!fRaw) result = peakamplitude;  
+	return result; 
     }
 
     return 0.;

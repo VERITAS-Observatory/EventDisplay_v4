@@ -1,6 +1,6 @@
 //! VDST   data summarizer class (stores pixel sums and times in a tree)
 #ifndef VDST_H
-#define VDST_h
+#define VDST_H
 
 #include "TFile.h"
 #include "TTree.h"
