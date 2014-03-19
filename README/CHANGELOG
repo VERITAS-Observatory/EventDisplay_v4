@@ -1,6 +1,10 @@
 Change log eventdisplay analysis package
 ========================================
 
+* 20140319 (GM) updated mscw_energy to take new location of 
+                calibration trees in eventdisplay files into 
+                account (bugzilla Bug 154)
+
 * 20140318 (GM, CB) introduced simple trace max replacement
                 for sum calculation
 

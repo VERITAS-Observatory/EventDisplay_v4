@@ -804,11 +804,13 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     if( fIsMC ) cout << " (source files are Monte Carlo)";
     cout << endl;
 
-// calculating median of pedvar distribution (not of input data is of PE format)
+////////////////////////////////////////////////////////////////////////////////////
+// calculating median of pedvar distribution (not if input data is of PE format)
     fNoiseLevel.clear();
     fCurrentNoiseLevel.assign( fNTel, 0. );
     for( unsigned int i = 0; i < fNTel; i++ )
     {
+// standard data format
         if( !fTLRunParameter->fPE )
         {
             if( fDebug > 1 ) cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope " << i+1 << endl;
@@ -816,13 +818,26 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
             TChain iPedVars( iName );
             for( unsigned int f = 0; f < finputfile.size(); f++ )
             {
-               sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile[f].c_str(), i+1, i+1 );
+               gErrorIgnoreLevel = 5000;
+               sprintf( iDir, "%s/Tel_%d/calib_%d", finputfile[f].c_str(), i+1, i+1 );
                if( !iPedVars.Add( iDir ) )
                {
                   cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
                   cout << "exiting..." << endl;
                   exit( -1 );
                }
+               if( iPedVars.GetEntries() == 0 )
+               {
+// backwards compatibility: read calibration tree from a different directory (note: this produces a root error message)
+                   sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile[f].c_str(), i+1, i+1 );
+                   if( !iPedVars.Add( iDir ) )
+                   {
+                      cout << "VTableLookupDataHandler::setInputFile: error while retrieving pedvars trees" << endl;
+                      cout << "exiting..." << endl;
+                      exit( -1 );
+                   }
+               }
+               gErrorIgnoreLevel = 0;
             }
             gErrorIgnoreLevel = 5000;
             double pedvar = 0.;

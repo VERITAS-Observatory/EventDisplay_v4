@@ -509,7 +509,6 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory 
             fMeanPedVarsOff /= fNMeanElevation;
         }
         cout << "\t mean elevation: " << fMeanElevationOn << " (ON), " << fMeanElevationOff << " (OFF)" << endl;
-// (GM: not calculated correctly)        cout << "\t mean azimuth: " << fMeanAzimuthOn << " (ON), " << fMeanAzimuthOff << " (OFF)" << endl;
         cout << "\t trigger rate : " << fMeanRawRateOn << " Hz (ON), " << fMeanRawRateOff << " Hz (Off)" << endl;
         cout << "\t mean pedvars: " << fMeanPedVarsOn << " (ON), " << fMeanPedVarsOff << " (OFF)" << endl;
     }

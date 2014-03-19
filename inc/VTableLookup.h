@@ -114,6 +114,7 @@ class VTableLookup
 	unsigned int getWobbleBin( double w );
         void interpolate( VTablesToRead *s1, double w1, VTablesToRead *s2, double w2, VTablesToRead *s, double w, bool iCos = false );
 	void readLookupTable();
+        void   readNoiseLevel( bool bWriteToRunPara = true ); // read noise level from pedvar histograms of data files
 	bool sanityCheckLookupTableFile( bool iPrint = false);       
 
     public:
@@ -124,7 +125,6 @@ class VTableLookup
 	int    getNTel() { return fNTel; }
         bool   initialize( VTableLookupRunParameter* );
         void   loop();                              // loop over all events
-        void   readNoiseLevel( bool bWriteToRunPara = true ); // read noise level from pedvar histograms of data files
         bool   setInputFiles( vector< string > iInputFiles ); // set input files from evndisp
         void   setEnergyCorrection( bool iEcorr ) { bEcorr = iEcorr; }   // apply energy correction for shower maximum
         void   setMCTableFiles( string, string, string ); // set MC table file names (reading tables)

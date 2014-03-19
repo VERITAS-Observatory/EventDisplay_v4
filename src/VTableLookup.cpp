@@ -728,7 +728,7 @@ void VTableLookup::readLookupTable()
 // get noise level for this event
 	     readNoiseLevel( false );
 
-                if( fDebug == 2 ) cout << endl << endl << "DEBUG  NEW EVENT " << fData->getEventCounter() << endl;
+             if( fDebug == 2 ) cout << endl << endl << "DEBUG  NEW EVENT " << fData->getEventCounter() << endl;
 /////////////////////////////
 // NOISE (low) ZENITH (low)
                 if( fDebug == 2 ) cout << "DEBUG  NOISE LOW ZENITH LOW" << endl;
@@ -1103,7 +1103,7 @@ void VTableLookup::readNoiseLevel( bool bWriteToRunPara )
 {
     if( !fData ) return;
 
-    fNoiseLevel = fData->getNoiseLevel( !bWriteToRunPara );
+    fNoiseLevel     = fData->getNoiseLevel( !bWriteToRunPara );
     fMeanNoiseLevel = fData->getMeanNoiseLevel( !bWriteToRunPara );
 
     fTelToAnalyze.assign( fNoiseLevel.size(), false );
@@ -1321,7 +1321,7 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
     else
     {
 // read pedvars
-        readNoiseLevel();
+        readNoiseLevel( true );
 // read tables from disk
         setMCTableFiles( fTLRunParameter->tablefile, "tb", fTLRunParameter->fInterpolateString );
 // set output files
