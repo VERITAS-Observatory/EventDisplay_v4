@@ -55,7 +55,6 @@ class VDBRunInfo
         string fWeather;
 	vector< unsigned int > fLaserRunID;
 
-//	TSQLServer*            connectToSQLServer( string iDBserver );
 	vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
         void                   readRunInfoFromDB( string iDBserver);
 	unsigned int           readRunDQM( string iDBserver, int run_number , unsigned int config_mask);

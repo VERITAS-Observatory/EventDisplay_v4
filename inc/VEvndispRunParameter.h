@@ -52,6 +52,10 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	string fDBRunType;                        // run type according to DB
 	string fDBRunStartTimeSQL;                // run start (SQL type)
 	string fDBRunStoppTimeSQL;                // run stopp (SQL type)
+        double fDBDataStartTimeMJD;               // run start (mjd)
+        double fDBDataStoppTimeMJD;               // run stopp (mjd)
+        double fDBDataStartTimeSecOfDay;          // run start (sec of day)
+        double fDBDataStoppTimeSecOfDay;          // run stopp (sec of day)
 
 // run parameters
         int    frunnumber;                        // runnumber
@@ -303,7 +307,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool         isMC() { return fIsMC; }
 	void         setPulseZeroIndex();
 	void         setSystemParameters();
+        bool         useDB() { return fuseDB; }
 
-        ClassDef(VEvndispRunParameter,139); //(increase this number)
+        ClassDef(VEvndispRunParameter,141); //(increase this number)
 };
 #endif

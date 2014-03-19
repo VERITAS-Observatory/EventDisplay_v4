@@ -25,6 +25,7 @@ namespace VSkyCoordinatesUtilities
    void   getDifferenceInCameraCoordinates( double tel_ze, double tel_az, double shower_ze,  double shower_az, float &x, float &y, float &z );
    void   getEquatorialCoordinates( int MJD, double time, double az, double ze, double &dec, double &ra );
    double getMJD( int i_year, int i_month, int i_day );
+   int    getMJD_from_SQLstring( string iSQLData, double &mjd, double &sec_of_day );
    void   getRotatedShowerDirection( double ze, double az, double y, double x, double &rze, double &raz );
    double getTargetShiftWest( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg );
    double getTargetShiftNorth( double iTargetRA_deg, double iTargetDec_deg, double ira_deg, double idec_deg );

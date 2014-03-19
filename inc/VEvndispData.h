@@ -17,6 +17,7 @@
 #include <VBaseRawDataReader.h>
 #endif
 #include <VPEReader.h>
+#include <VDB_PixelDataReader.h>
 #include <VEvndispRunParameter.h>
 #include <VFitTraceHandler.h>
 #include <VStarCatalogue.h>
@@ -74,8 +75,11 @@ class VEvndispData
 #ifndef NOVBF
         static VBaseRawDataReader *fRawDataReader;
 #endif
-        static VDSTReader    *fDSTReader;
-        static VPEReader *fPEReader;
+        static VDSTReader *fDSTReader;
+        static VPEReader  *fPEReader;
+
+// DB pixel data
+        static VDB_PixelDataReader *fDB_PixelDataReader;
 
 // event data
         static unsigned int fEventNumber;         //!< current event number (array event)
@@ -145,6 +149,9 @@ class VEvndispData
 
 // star catalogue
         static VStarCatalogue *fStarCatalogue;
+
+// dummy vector
+        static vector< float > fDummyVector_float;
 
     public:
         VEvndispData();
@@ -219,11 +226,15 @@ class VEvndispData
         vector<int>&        getImageUser() { return fAnaData[fTelID]->fImageUser; }
         vector<bool>&       getLLEst() { return fAnaData[fTelID]->fLLEst; }
         TList*              getIntegratedChargeHistograms() { return fAnaData[fTelID]->getIntegratedChargeHistograms(); }
-	valarray<double>& getLowGainMultiplier_Camera() { return fCalData[fTelID]->getLowGainMultiplier_Camera() ; } 
-	vector<int>& getLowGainDefaultSumWindows() { return fCalData[fTelID]->fLowGainDefaultSumWindows ; }
-	double getLowGainMultiplier_Trace( ) { return fCalData[fTelID]->getLowGainMultiplier_Trace() ; }
-	double getLowGainMultiplier_Sum( int iWindow, int jWindow ) { return fCalData[fTelID]->getLowGainMultiplier_Sum( iWindow, jWindow); } 
-	double getLowGainSumCorrection( int iSumWindow, int jSumWindow , bool HiLo=true ) {  return fCalData[fTelID]->getLowGainSumCorrection( iSumWindow,jSumWindow , HiLo ) ; } 
+        float               getL1Rate( unsigned int iChannel ) { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getL1Rate( getTelID(), iChannel, getEventMJD(), getEventTime() );
+                                                                 else return 0.; }
+        vector< float >     getL1Rates() { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getL1Rates( getTelID(), getEventMJD(), getEventTime() ); 
+                                           else return fDummyVector_float; }
+	valarray<double>&   getLowGainMultiplier_Camera() { return fCalData[fTelID]->getLowGainMultiplier_Camera() ; } 
+	vector<int>&        getLowGainDefaultSumWindows() { return fCalData[fTelID]->fLowGainDefaultSumWindows ; }
+	double              getLowGainMultiplier_Trace( ) { return fCalData[fTelID]->getLowGainMultiplier_Trace() ; }
+	double              getLowGainMultiplier_Sum( int iWindow, int jWindow ) { return fCalData[fTelID]->getLowGainMultiplier_Sum( iWindow, jWindow); } 
+	double              getLowGainSumCorrection( int iSumWindow, int jSumWindow , bool HiLo=true ) {  return fCalData[fTelID]->getLowGainSumCorrection( iSumWindow,jSumWindow , HiLo ) ; } 
         bool                getLowGainPedestals() { return fCalData[fTelID]->fBoolLowGainPedestals; }
         bool                getLowGainGains() { return fCalData[fTelID]->fBoolLowGainGains; }
         bool                getLowGainTOff() { return fCalData[fTelID]->fBoolLowGainTOff; }
@@ -262,10 +273,13 @@ class VEvndispData
         valarray<double>&   getPedvars( unsigned int iSW, bool iLowGain = false ) { return getPedvars( iLowGain, iSW ); }
         valarray<double>&   getPedvarsLowGain() { return getPedvars( true ); }
 
-        vector< valarray<double> >& getPedvarsAllSumWindows(  bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fVPedvars; else return fCalData[fTelID]->fVLowGainPedvars; }
+        vector< valarray<double> >& getPedvarsAllSumWindows(  bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fVPedvars; 
+                                                                                        else return fCalData[fTelID]->fVLowGainPedvars; }
 // getter for pedestal rms
-        valarray<double>&   getPedrms( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fPedrms; else return fCalData[fTelID]->fLowGainPedsrms; }
+        valarray<double>&   getPedrms( bool iLowGain = false ) { if( !iLowGain ) return fCalData[fTelID]->fPedrms; 
+                                                                 else return fCalData[fTelID]->fLowGainPedsrms; }
         valarray<double>&   getPedsLowGainrms() { return fCalData[fTelID]->fLowGainPedsrms; }
+        VDB_PixelDataReader* getDBPixelDataReader() { return fDB_PixelDataReader; }
 // padding stuff (probably out of date)
 /////////////// end pedestals //////////////////////////////
 
@@ -509,15 +523,11 @@ class VEvndispData
         void                setTraceWidth( double iV ) { fAnaData[fTelID]->fTraceWidth = iV; }
         void                setTraceWidth( unsigned int iChannel, double iS ) { fAnaData[fTelID]->fTraceWidth[iChannel] = iS; }
         void                setTraceWidth( valarray< double > iV ) { fAnaData[fTelID]->fTraceWidth = iV; }
-        void                setTrigger( bool iIm )// MS
+        void                setTrigger( bool iIm )
         {
             fAnaData[fTelID]->fTrigger.assign( fDetectorGeo->getNChannels( fTelID ), iIm );
         }
-                                                  // MS
-        void                setTrigger( unsigned int iChannel, bool iIm )
-        {
-            fAnaData[fTelID]->fTrigger[iChannel] = iIm;
-        }
+        void                setTrigger( unsigned int iChannel, bool iIm ) { fAnaData[fTelID]->fTrigger[iChannel] = iIm; }
 	void                setPulseTiming( vector< valarray< double > > iPulseTiming, bool iCorrected );
 	void                setPulseTiming( float iTZero, bool iCorrected );
 	void                setPulseTiming( unsigned int iChannel, vector< float > iTZero, bool iCorrected );

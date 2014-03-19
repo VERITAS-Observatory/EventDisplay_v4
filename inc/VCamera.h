@@ -32,10 +32,14 @@ class VCamera
     private:
         bool        fDebug;                       //!< debug switch
 
-        VEvndispData*      fData;                        //!< pointer to data class
+        VEvndispData*      fData;                 //!< pointer to data class
         unsigned int fTelescope;                  //!< this is the camera of telescope fTelescope
 
-        enum cameraMode {C_CHARGE, C_TZERO, C_TRIGGER,C_HIT,C_HILO,C_TIMING,C_SUMWINDOW, C_SUMWINDOWSTART, C_PEDMEAN,C_PEDVAR,C_PEDMEANLOW,C_PEDVARLOW,C_GAINS,C_GAINVARS,C_GAINSLOW,C_GAINVARSLOW,C_TOFF,C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW, C_TRIGGER_EVNDISP, C_TEMPLATE, C_MODEL3D}; // added Model3D, JG
+        enum cameraMode {C_CHARGE, C_TZERO, C_TRIGGER,C_HIT,C_HILO,C_TIMING,C_SUMWINDOW, C_SUMWINDOWSTART, 
+                         C_PEDMEAN,C_PEDVAR,C_PEDMEANLOW,C_PEDVARLOW,C_GAINS,C_GAINVARS,C_GAINSLOW,C_GAINVARSLOW,
+                         C_TOFF,C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW, 
+                         C_L1, C_HV, C_CURRENTS,
+                         C_TRIGGER_EVNDISP, C_TEMPLATE, C_MODEL3D}; 
 
         unsigned int fcameraModus;                //!< camera modus (trigger/charge/hit/timing/etc.)
         bool fBoolAllinOne;                       //!< plot all images in one camera
@@ -59,7 +63,7 @@ class VCamera
         TMarker *fAnaShowerDir;                   //!< reconstructed shower direction
         TMarker *fAnaShowerCentroid;              //!< image centroid
         TMarker *fMCShowerDir;                    //!< MC shower direction
-	TMarker *fModel3DShowerDir;               //!< Model3D shower direction, JG
+	TMarker *fModel3DShowerDir;               //!< Model3D shower direction
         TMarker *fCameraCentreDir;                //!< camera centre
         TEllipse *fCameraCentreEllipse;
         double fmaxPlot;                          //!< relative size of camera (0.5 = full canvas)
@@ -139,12 +143,14 @@ class VCamera
         valarray<double>& rescaleSums( valarray<double>&, bool );
                                                   //!< fill fgraphTubesEntry values
         void           setPMTColorOnOff( const vector<bool>&, int iColor, int iFillPos, int iFillNeg );
-	void           setPMTColorOff( const vector<bool>& ); //JG
+	void           setPMTColorOff( const vector<bool>& ); 
                                                   //!< fill fgraphTubesEntry values
         void           setPMTColorScheme( vector<unsigned int>, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool iDrawDead, bool iLowGain = false );
+        void           setPMTColorScheme( vector<float>, bool i_select, double zmin, double zmax, string i_axisTitle, 
+                                                         bool i_scale, bool iDrawDead, bool iLowGain = false, bool iDrawAllChannels = false );
         void           setPMTColorScheme( valarray<unsigned int>, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool iDrawDead, bool iLowGain = false );
-        void           setPMTColorScheme( valarray<double>, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale );
-        void           setPMTColorScheme( valarray<double>, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool iDrawDead, bool iLowGain = false );
+        void           setPMTColorScheme( valarray<double>, bool i_select, double zmin, double zmax, string i_axisTitle,
+                                                            bool i_scale, bool iDrawDead = false, bool iLowGain = false, bool iDrawAllChannels = false );
         void           setUpCamera();             //!< initialize the camera
                                                   //!< setup camera in charge/timing mode
         void           setPMTColorForChargeTiming();
@@ -153,9 +159,7 @@ class VCamera
         VCamera() {}
                                                   //!< standard constructor for telescope iTelescope
         VCamera( unsigned int iTelescope, VEvndispData *fData );
-        virtual ~VCamera()                        //!< clean up
-        {
-        }
+        virtual ~VCamera() {}                       //!< clean up
         void draw( double, int, bool );           //!< draw camera
         int getChannel( int x, int y );           //!< get channel at canvas position x,y after mouse click
                                                   //!< get channel at canvas position x,y after mouse click

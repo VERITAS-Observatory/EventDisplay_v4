@@ -52,6 +52,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 // timing vector
         vector< double > fTimeVec;
 
+        double adjustTimeSliceLength( double iLengthofTimeSlice, double iRunStartTime, double iRunStoppTime );
         void fillTimeSlice( unsigned int );
         void reset();
 
@@ -67,12 +68,13 @@ class VPedestalCalculator : public VImageBaseAnalyzer
         vector< vector< vector< vector< float > > > > v_pedvar;
 
         VPedestalCalculator();
-        ~VPedestalCalculator() {}
+       ~VPedestalCalculator() {}
 
         void doAnalysis( bool iLowGain = false );
         vector< TTree* > getPedestalTree() { return fTree; }
         bool initialize();
-        bool initialize( bool, unsigned int, double, int, int );
+        bool initialize( bool ibCalibrationRun, unsigned int iNPixel, double iLengthofTimeSlice, int iSumFirst, int iSumWindow, 
+                         double iRunStartTime = -99., double iRunStoppTime = -99. );
         void terminate( bool iWrite = true );
 };
 #endif

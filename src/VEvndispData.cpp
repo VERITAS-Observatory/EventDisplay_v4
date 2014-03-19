@@ -266,6 +266,9 @@ void VEvndispData::setDeadChannelText()
     fDeadChannelText.push_back( "disabled: masked" );
     fDeadChannelText.push_back( "disabled: user set" );
     fDeadChannelText.push_back( "disabled: MC set" );
+    fDeadChannelText.push_back( "dead: L1 rates out of range" );
+    fDeadChannelText.push_back( "dead: HV values out of range" );
+    fDeadChannelText.push_back( "dead: currents out of range" );
 }
 
 bool VEvndispData::get_reconstruction_parameters( string ifile )
@@ -490,6 +493,10 @@ VImageParameter* VEvndispData::getImageParameters( int iselect )
 }
 
 
+/*
+ * read parameters for dead channel search
+ *
+ */
 bool VEvndispData::initializeDeadChannelFinder()
 {
     for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
@@ -907,6 +914,9 @@ VFitTraceHandler* VEvndispData::fFitTraceHandler = 0;
 vector< bool > VEvndispData::fCalibrated;
 vector< VCalibrationData* > VEvndispData::fCalData;
 
+// DB pixel data
+VDB_PixelDataReader* VEvndispData::fDB_PixelDataReader = 0;
+
 // dead channel finders
 vector< VDeadChannelFinder* > VEvndispData::fDeadChannelDefinition_HG;
 vector< VDeadChannelFinder* > VEvndispData::fDeadChannelDefinition_LG;
@@ -935,3 +945,6 @@ valarray<double> VEvndispData::fPlotRawPedestals;
 
 // star catalogue
 VStarCatalogue* VEvndispData::fStarCatalogue = 0;
+
+// dummy vectors
+vector< float > VEvndispData::fDummyVector_float;

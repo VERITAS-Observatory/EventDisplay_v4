@@ -113,10 +113,7 @@ class VEventLoop : public VEvndispData
         void        setCutNArrayImages( int );    //!< set minimal number of images
         void        setCutNTrigger( int );        //!< set minimal number of trigged tubes
                                                   //!< cuts apply only to one telescope
-        void        setCutSingleTelescope( bool ic )
-        {
-            fCutTelescope = ic;
-        }
+        void        setCutSingleTelescope( bool ic ) { fCutTelescope = ic; }
         void        setNextEventStatus( bool i_stat ) { fNextEventStatus = i_stat; }
         void        shutdown();                   //!< write out all results to root files
 };

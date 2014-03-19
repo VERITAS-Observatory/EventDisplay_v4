@@ -346,8 +346,12 @@ void VImageAnalyzer::terminate()
 // write calibration summaries
         if( getRunParameter()->fsourcetype != 7 ) getCalibrationData()->terminate( getDead( false ), getDead( true ) );
 // write dead channel tree
+// note: this writes the dead channel list of the last event to this tree
+//       (dead channel list is time dependent!)
         TTree *iT = makeDeadChannelTree();
         if( iT ) iT->Write();
+// write DB pixel data (if available)
+        if( getDBPixelDataReader() && getDBPixelDataReader()->getDBStatus() ) getDBPixelDataReader()->writeDataTree( getTelID() );
 // write histograms
         if( !isMC() ) getAnaHistos()->terminate( fOutputfile );
 // write pointing data from db to disk (if available)

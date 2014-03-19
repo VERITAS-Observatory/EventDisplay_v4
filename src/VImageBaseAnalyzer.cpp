@@ -622,7 +622,7 @@ void VImageBaseAnalyzer::gainCorrect()
 
   added maximum time offset (GM)
 
-  dead channel coding
+  dead channel coding (see also VEvndispData::setDeadChannelText())
   - outside pedestal range (1)
   - small absolute pedvars (2)
   - small relative pedvars (3)
@@ -734,7 +734,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 // gain/toff/low gain values are not time dependent
         if( iFirst )
         {
-            if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0 && !( getRunParameter()->fNextDayGainHack && getGains( iLowGain )[i]==1.0) )
+            if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0 
+             && !( getRunParameter()->fNextDayGainHack && getGains( iLowGain )[i]==1.0) )
                || (iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
             {
                 setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
@@ -772,6 +773,23 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         }
     }
 /////////////////////////////////////////////////////
+// read DB pixel values and check values
+    if( getDBPixelDataReader() && getDBPixelDataReader()->getDBStatus() )
+    {
+// check L1 rates
+       vector< unsigned int > iL1Rates_dead = getDBPixelDataReader()->getL1_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
+                                               getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_min(), 
+                                               getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_max() );
+// do not allow L1 rates to kill a significant part of the camera
+       if( iL1Rates_dead.size() < getNChannels()/2 )
+       {
+           for( unsigned int i = 0; i < iL1Rates_dead.size(); i++ )
+           {
+               if( iL1Rates_dead[i] < getNChannels() ) setDead( iL1Rates_dead[i], 13, iLowGain );
+           }
+       }
+    }
+/////////////////////////////////////////////////////
 
 // check number of dead channels, print warning for more than 30 dead channels
     unsigned int n_dead = 0;
@@ -805,7 +823,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         {
             cout << "Error: Number of dead channel is comparable to total number of channels" << endl;
             cout << "Exiting..." << endl;
-            exit( 0 );
+            printDeadChannels();
+            exit( EXIT_FAILURE );
         }
     }
 // set random dead channels in camera (unless it's a GrISU run, in which case
@@ -919,14 +938,20 @@ int VImageBaseAnalyzer::fillSaturatedChannels()
    return z;
 }
 
-
+/*
+ * write list of dead channels into a tree
+ *
+ * note: this is probably called at the end of the run
+ *       the tree will be filled with the dead channel
+ *       configuration of the last event
+ *       (but the dead channel configuration is time dependent)
+ *
+ */
 TTree* VImageBaseAnalyzer::makeDeadChannelTree()
 {
-    char hname[200];
     char htitle[200];
-    sprintf( hname, "tchannel" );
     sprintf( htitle, "channel state (Telescope %d)", getTelID()+1 );
-    TTree *itc = new TTree( hname, htitle );
+    TTree *itc = new TTree( "tchannel", htitle );
     UShort_t istat = 0;
     UShort_t istatLow = 0;
     itc->Branch( "state", &istat, "state/s" );
@@ -938,7 +963,6 @@ TTree* VImageBaseAnalyzer::makeDeadChannelTree()
         if( i < getDead( true ).size() ) istatLow = (UShort_t)getDead(true)[i];
         itc->Fill();
     }
-
     return itc;
 }
 
@@ -1074,7 +1098,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                     {
                         corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
                     }
-                    if( corrfirst < 0 ) corrfirst = getSumFirst();
+                    if( corrfirst < 0 ) corrfirst = 0;
                 }
 ////////////////////
 // high gain channel
@@ -1100,7 +1124,8 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 // calculate end of integration window
 // (depends on user settings and length of readout window)
 //////////////////////////////////////////////////////////////////////////////////
-                int corrlast = getFADCTraceIntegrationPosition( corrfirst + getCurrentSumWindow()[i_channelHitID] );
+//                int corrlast = getFADCTraceIntegrationPosition( corrfirst + getCurrentSumWindow()[i_channelHitID] );
+                int corrlast = getFADCTraceIntegrationPosition( corrfirst + getDynamicSummationWindow( i_channelHitID ) );
                 setTCorrectedSumLast( i_channelHitID, corrlast );
 // set current summation window
                 setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );

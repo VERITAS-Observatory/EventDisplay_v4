@@ -1068,7 +1068,8 @@ void VCalibrator::readCalibrationData()
 
 /*
 
- reading pedestal from root file
+    reading pedestal from root file
+    (DST source file)
 
 */
 bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned int i_SumWindow )
@@ -1082,7 +1083,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
       infile_root.close();
       iFile += ".root";
       TFile iFPed( iFile.c_str() );
-      char hname[20];
+      char hname[200];
       sprintf( hname, "tPeds_%d", fTelID+1 );
       TTree *tPed = (TTree*)gDirectory->Get( hname );
       if( !tPed )

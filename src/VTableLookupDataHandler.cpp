@@ -463,16 +463,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 
             if( !bShort )
             {
-                if( fEventDisplayFileFormat > 3 )
-                {
-                    fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
-                    fmeanPedvar_ImageT[i] = ftpars[i]->meanPedvar_Image;
-                }
-                else
-                {
-                    fCurrentNoiseLevel[i] = fNoiseLevel[i];
-                    fmeanPedvar_ImageT[i] = fNoiseLevel[i];
-                }
+                fCurrentNoiseLevel[i] = ftpars[i]->meanPedvar_Image;
+                fmeanPedvar_ImageT[i] = ftpars[i]->meanPedvar_Image;
                 fntubes[i] = ftpars[i]->ntubes;
                 fnsat[i] = ftpars[i]->nsat;
                 fnlowgain[i] = ftpars[i]->nlowgain;

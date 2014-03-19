@@ -163,6 +163,8 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
         fDBStatus = false;
         return;
     }
+    double iStarttime = 0.;
+    double iStopptime = 0.;
 
 // get date
     if( db_row->GetField( 4 ) )
@@ -178,18 +180,21 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
         if( iTemp.size() > 8 )
         {
 	    fDataStartTimeSQL = iTemp;
-            fDataStartTime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
+            iStarttime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
             fDataStartTimeHMS = atoi( iTemp.substr( 11, 2 ).c_str() ) * 10000 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 17, 2 ).c_str() );
+            fDataStartTime = atoi( iTemp.substr( 11, 2 ).c_str() ) * 60*60 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 60 + atoi( iTemp.substr( 17, 2 ).c_str() );
         }
         else
 	{
-	   fDataStartTime = 0;
+	   iStarttime = 0;
+           fDataStartTime = 0;
 	   fDataStartTimeHMS = 0;
 	   fDataStartTimeSQL = "";
         }
     }
     else
     {
+       iStarttime = 0;
        fDataStartTime = 0;
        fDataStartTimeHMS = 0;
        fDataStartTimeSQL = "";
@@ -200,18 +205,21 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
         if( iTemp.size() > 8 )
         {
 	    fDataStoppTimeSQL = iTemp;
-            fDataStoppTime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
+            iStopptime = atoi( iTemp.substr( 0, 4 ).c_str() ) * 10000 + atoi( iTemp.substr( 5, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 8, 2 ).c_str() );
             fDataStoppTimeHMS = atoi( iTemp.substr( 11, 2 ).c_str() ) * 10000 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 100 + atoi( iTemp.substr( 17, 2 ).c_str() );
+            fDataStoppTime = atoi( iTemp.substr( 11, 2 ).c_str() ) * 60*60 + atoi( iTemp.substr( 14, 2 ).c_str() ) * 60 + atoi( iTemp.substr( 17, 2 ).c_str() );
         }
         else
 	{
-	    fDataStoppTime = 0;
+	    iStopptime = 0;
+            fDataStoppTime = 0.;
 	    fDataStoppTimeHMS = 0;
 	    fDataStoppTimeSQL = "";
         }
     }
     else
     {
+       iStopptime = 0;
        fDataStoppTime = 0;
        fDataStoppTimeHMS = 0;
        fDataStoppTimeSQL = "";
@@ -228,20 +236,21 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
     if( db_row->GetField( 19 ) ) fTargetName = db_row->GetField( 19 );
     else                         fTargetName = "";
 
-    double imjd;
-    int j;
-    int iy = fDataStartTime/10000;
-    int im = (fDataStartTime-(fDataStartTime/10000)*10000)/100;
-    int id = (fDataStartTime-(fDataStartTime/100)*100);
-    if( fDataStartTime > 0 ) slaCldj( iy, im, id, &imjd, &j );
+    double imjd = 0.;
+    int j = 0;
+    int iy = iStarttime/10000;
+    int im = (iStarttime-(iStarttime/10000)*10000)/100;
+    int id = (iStarttime-(iStarttime/100)*100);
+    if( iStarttime > 0 ) slaCldj( iy, im, id, &imjd, &j );
     else imjd = 0.;
     fDataStartTimeMJD = imjd;
-    iy = fDataStoppTime/10000;
-    im = (fDataStoppTime-(fDataStoppTime/10000)*10000)/100;
-    id = (fDataStoppTime-(fDataStoppTime/100)*100);
-    if( fDataStoppTime > 0 ) slaCldj( iy, im, id, &imjd, &j );
+    iy = iStopptime/10000;
+    im = (iStopptime-(iStopptime/10000)*10000)/100;
+    id = (iStopptime-(iStopptime/100)*100);
+    if( iStopptime > 0 ) slaCldj( iy, im, id, &imjd, &j );
     else imjd = 0.;
     fDataStoppTimeMJD  = imjd;
+// calculate start and stop time
 
     if( db_row->GetField( 1 ) ) fRunType = db_row->GetField( 1 );
     if( db_row->GetField( 2 ) ) fObservingMode = db_row->GetField( 2 );
@@ -326,7 +335,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 void VDBRunInfo::print()
 {
     cout << "Reading run info from database for run " << fRunNumber << ":" << endl;
-    cout << "Date: " << fDBDate;
+    cout << "Date: " << fDBDate << "(" << fDataStartTimeSQL << "," << fDataStoppTimeSQL << ")";
     cout << ", Duration: " << fDuration << " [s]";
     cout << ", " << fRunType << ", " << fObservingMode << ", " << fRunStatus;
     cout << ", Weather: " << fWeather << endl;

@@ -5,6 +5,25 @@
 
 #include "VSkyCoordinatesUtilities.h"
 
+int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double &i_mjd, double &sec_of_day )
+{
+    int i_year  = atoi( iSQLData.substr( 0, 4 ).c_str() );
+    int i_month = atoi( iSQLData.substr( 5, 2 ).c_str() );
+    int i_day   = atoi( iSQLData.substr( 8, 2 ).c_str() );
+
+// MJD
+    int i_stat = 0;
+    if( i_year > 0 ) slaCldj(i_year,i_month,i_day,&i_mjd,&i_stat);
+    else             i_mjd = 0;
+
+// fraction of day
+    sec_of_day  = atof( iSQLData.substr( 11, 2 ).c_str() )*60.*60.;
+    sec_of_day += atof( iSQLData.substr( 14, 2 ).c_str() )*60.;
+    sec_of_day += atof( iSQLData.substr( 17, 2 ).c_str() );
+
+    return i_stat;
+}
+
 double VSkyCoordinatesUtilities::getMJD( int i_year, int i_month, int i_day )
 {
     double i_mjd = 0.;

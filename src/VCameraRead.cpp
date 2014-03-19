@@ -1161,3 +1161,13 @@ bool VCameraRead::setLengthOfSampleTimeSlice( unsigned int iTelID, float iSample
    }
    return false;
 }
+
+vector< unsigned int > VCameraRead::getNumChannelVector()
+{
+   vector< unsigned int > iN;
+   for( unsigned int i = 0; i < fXTube.size(); i++ )
+   {
+      iN.push_back( fXTube[fTelID].size() );
+   }
+   return iN;
+}

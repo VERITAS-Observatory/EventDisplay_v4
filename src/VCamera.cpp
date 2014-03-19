@@ -304,12 +304,12 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 break;
             case C_PEDVAR:
             {
-        if( fData->getRunParameter()->fsourcetype != 7 || fData->getReader()->hasFADCTrace() )
-{
-   valarray< double > i_pedvars( 0., fData->getPedvars().size() );
-   for( unsigned int ii = 0; ii < i_pedvars.size(); ii++ ) i_pedvars[ii] = fData->getPedvars( fData->getCurrentSumWindow()[ii] )[ii];
-   if( !bFixScale ) setPMTColorScheme( i_pedvars, false, 100., 0., "charge", false );
-   else          setPMTColorScheme( i_pedvars, false, 5., 20., "charge", false );
+                if( fData->getRunParameter()->fsourcetype != 7 || fData->getReader()->hasFADCTrace() )
+                {
+                   valarray< double > i_pedvars( 0., fData->getPedvars().size() );
+                   for( unsigned int ii = 0; ii < i_pedvars.size(); ii++ ) i_pedvars[ii] = fData->getPedvars( fData->getCurrentSumWindow()[ii] )[ii];
+                   if( !bFixScale ) setPMTColorScheme( i_pedvars, false, 100., 0., "charge", false );
+                   else          setPMTColorScheme( i_pedvars, false, 5., 20., "charge", false );
                 }
             }
             break;
@@ -345,13 +345,13 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 else             setPMTColorScheme( fData->getPeds(true), false, 10., 25., "charge", false );
                 break;
             case C_PEDVARLOW:
-            {
-                valarray< double > i_pedvars( 0., fData->getPedvars().size() );
-                for( unsigned int ii = 0; ii < i_pedvars.size(); ii++ ) i_pedvars[ii] = fData->getPedvars( fData->getCurrentSumWindow()[ii], true )[ii];
-                if( !bFixScale ) setPMTColorScheme( i_pedvars, false, 100., 0., "charge", false );
-                else          setPMTColorScheme( i_pedvars, false, 5., 20., "charge", false );
-            }
-            break;
+                {
+                    valarray< double > i_pedvars( 0., fData->getPedvars().size() );
+                    for( unsigned int ii = 0; ii < i_pedvars.size(); ii++ ) i_pedvars[ii] = fData->getPedvars( fData->getCurrentSumWindow()[ii], true )[ii];
+                    if( !bFixScale ) setPMTColorScheme( i_pedvars, false, 100., 0., "charge", false );
+                    else          setPMTColorScheme( i_pedvars, false, 5., 20., "charge", false );
+                }
+                break;
             case C_GAINSLOW:
                 if( !bFixScale ) setPMTColorScheme( fData->getGains(true), false, 100., 0., "gain", false );
                 else             setPMTColorScheme( fData->getGains(true), false, 0.8, 1.2, "gain", false );
@@ -373,7 +373,10 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                 setPMTColorScheme( fData->getDeadUI( true ), false, 0., 12., "low gain channel status", false, true, true );
                 break;
             case C_LOWGAIN:
-                setPMTColorScheme( fData->getLowGainMultiplier_Camera( ), false, 100., 0., "multiplier", false );
+                setPMTColorScheme( fData->getLowGainMultiplier_Camera(), false, 100., 0., "multiplier", false );
+                break;
+            case C_L1:
+                setPMTColorScheme( fData->getL1Rates(), false, 100., 0., "L1 rates", false, false, false, true );
                 break;
             case C_TRIGGER_EVNDISP:
                 setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
@@ -384,17 +387,16 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
                   setPMTColorScheme( fData->getTemplateMu(), false,  -1.0, 1.1*fData->getTemplateMuMax(), "photons [p.e.]", false );
                 }
                 break;
-    case C_MODEL3D:  //JG
-        if( fData->getRunParameter()->fUseDisplayModel3D ) {
-  double minSum = 0;
-  double maxSum = 0;
-  getMinMax( fData->getSums(), minSum, maxSum );
-  //// if( fPlotColor ) setPMTColorScheme( fData->getSums(), false,  100., 0., "charge [d.c.]", true );
-  /// setPMTColorScheme( fData->getModel3DMu(), false,  100, 0., "Model3D signal [d.c.]", false );
-  setPMTColorScheme( fData->getModel3DMu(), false,  minSum, maxSum, "Model3D signal [d.c.]", false );
-  setPMTColorOff( fData->getModel3DClean() );
-}
-break;
+            case C_MODEL3D: 
+                if( fData->getRunParameter()->fUseDisplayModel3D )
+                {
+                    double minSum = 0;
+                    double maxSum = 0;
+                    getMinMax( fData->getSums(), minSum, maxSum );
+                    setPMTColorScheme( fData->getModel3DMu(), false,  minSum, maxSum, "Model3D signal [d.c.]", false );
+                    setPMTColorOff( fData->getModel3DClean() );
+                }
+                break;
 
             default:
                 break;
@@ -813,6 +815,14 @@ void VCamera::drawEventText()
     }
 }
 
+void VCamera::setPMTColorScheme( vector< float > v_value, bool i_select, double zmin, double zmax, string i_axisTitle, 
+                                                          bool i_scale, bool i_DrawDead, bool iLowGain, bool iDrawAllChannels )
+{
+    valarray<double> it(v_value.size());
+    for( unsigned int i = 0; i < v_value.size(); i++ ) it[i] = (double)(v_value[i]);
+
+    setPMTColorScheme( it, i_select, zmin, zmax, i_axisTitle, i_scale, i_DrawDead, iLowGain, iDrawAllChannels );
+}
 
 void VCamera::setPMTColorScheme( vector<unsigned int> v_value, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool i_DrawDead, bool iLowGain )
 {
@@ -843,17 +853,13 @@ void VCamera::setPMTColorScheme( valarray<unsigned int> v_value, bool i_select, 
    \par i_select timing plot (min/max values predefined)
    \par zmin     minimum value of color scheme axis
    \par zmax     maximum value of color scheme axis (if zmin=100.&&zmax=0. then min/max values are taken from v_value)
-\par i_axisTitle title of color axis
-\par i_scale
-\par i_DrawDead  draw contents of dead channels
+   \par i_axisTitle title of color axis
+   \par i_scale
+   \par i_DrawDead  draw contents of dead channels
 
 */
-void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale )
-{
-  setPMTColorScheme( v_value, i_select, zmin, zmax, i_axisTitle, i_scale, false );
-}
-
-void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double zmin, double zmax, string i_axisTitle, bool i_scale, bool i_DrawDead, bool iLowGain )
+void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double zmin, double zmax, string i_axisTitle, 
+                                                           bool i_scale, bool i_DrawDead, bool iLowGain, bool iDrawAllChannels )
 {
     if( fDebug ) cout << "VCamera::setPMTColorScheme" << endl;
 // do not draw PMTs for allinone mode
@@ -878,7 +884,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
         fncolors = gStyle->GetNumberOfColors();
         fndivz   = gStyle->GetNumberContours();
     }
-
+//////////////////////////////////////////////////////////////
 // timing plot
     if( i_select )
     {
@@ -899,6 +905,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
         if( zmin == 100. ) wlmin = i_min * 0.995;
         else               wlmin = zmin;
     }
+//////////////////////////////////////////////////////////////
     else
     {
 // get maximum and minima in v_value
@@ -957,11 +964,15 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
 // now assign colours the PMTs
 //  image pixels have full radius
 //  border pixels have 60% radius
-//  other pixels have 30% radius
+//  other pixels have 20% radius
     double scaler = 1.;
+//////////////////////////////////////////////
+// expect length of v_value to be npixel
     for( unsigned int i = 0; i < v_value.size(); i++ )
     {
-        bool iDrawChannel = (!(fData->getDead( iLowGain )[i]&&!(fData->getDeadRecovered(iLowGain)[i]&&(fData->getImage()[i]||fData->getBorder()[i])) ) && fData->getImageUser()[i] != -1 );
+        bool iDrawChannel = (!(fData->getDead( fData->getHiLo()[i] )[i]&&!(fData->getDeadRecovered(iLowGain)[i]&&(fData->getImage()[i]||fData->getBorder()[i])) ) 
+                            && fData->getImageUser()[i] != -1 );
+        if( iDrawAllChannels ) iDrawChannel = true;
 // draw only dead channels for channel status plot
         if( i_DrawDead ) iDrawChannel = !iDrawChannel;
 // hit channels
@@ -972,8 +983,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
             else
             {
                 if( i_select ) scaler = 0.;
-                else           scaler = 0.10;
-//     else           scaler = 0.03;
+                else           scaler = 0.20;
             }
             if( !i_scale ) scaler = 1.; 
             w1 = v_value[i];

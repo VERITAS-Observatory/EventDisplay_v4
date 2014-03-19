@@ -338,7 +338,7 @@ void VDisplay::updateCamera( Int_t i )
         for( unsigned int t = 0; t < fTelescopesToShow.size(); t++ )
         {
             fEventLoop->getAnalyzer()->setTelID( fTelescopesToShow[t] );
-    if( t == 0 ) fCamera[fTelescopesToShow[t]]->setFirstTelescopeToDraw();
+            if( t == 0 ) fCamera[fTelescopesToShow[t]]->setFirstTelescopeToDraw();
             if( fEventLoop->getAnalyzer()->getImageParameters() )
             {
 // draw one camera into the camera canvas
@@ -1169,7 +1169,16 @@ void VDisplay::setFADCText()
 // channel number
     sprintf( cTemp, "telescope %d channel %d (NN %d)", fTelescope+1, fSelectedChan - 200000, fEventLoop->getDetectorGeometry()->getNNeighbours()[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-    fTextFADC.push_back( new TText( xL, yT, "" ) );
+// L1/HV/currents (if available)
+    if( fEventLoop->getDBPixelDataReader() && fEventLoop->getDBPixelDataReader()->getDBStatus() )
+    {
+       sprintf( cTemp, "L1 rate %.2e Hz", fEventLoop->getL1Rate( fSelectedChan - 200000 ) );
+       fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    }
+    else
+    {
+        fTextFADC.push_back( new TText( xL, yT, "" ) );
+    }
 // integration window size
     sprintf( cTemp, "integration window: from sample %d to %d", fEventLoop->getAnalyzer()->getTCorrectedSumFirst()[iChannel], fEventLoop->getAnalyzer()->getTCorrectedSumLast()[iChannel] );
     fTextFADC.push_back( new TText( xL, yT, cTemp ) );
@@ -1297,14 +1306,13 @@ iChannel < fEventLoop->getAnalyzer()->getCurrentSumWindow().size() )
       fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     }
 
-// Model3D Value (JG)
+// Model3D Value
 
     if( fEventLoop->getRunParameter()->fUseDisplayModel3D )
-      {
-/// JG
-sprintf( cTemp, "Model3D: %.2f", fEventLoop->getData()->getModel3DMu()[iChannel]);
-fTextFADC.push_back( new TText( xL, yT, cTemp ) );
-      }
+    {
+        sprintf( cTemp, "Model3D: %.2f", fEventLoop->getData()->getModel3DMu()[iChannel]);
+        fTextFADC.push_back( new TText( xL, yT, cTemp ) );
+    }
     
 // dead channel text
 
@@ -1524,11 +1532,25 @@ if( ihis ) ihis->SetAxisRange( 0., 250. );
             iMeanDistributionValue = fEventLoop->getMeanAverageTZero();
         } 
     }
+// low gain multiplier
     else if( E_cameraIdent( fCameraDisplay ) == C_LOWGAIN )
     {
         ihis = fEventLoop->getCalData( fTelescope )->getLowGainMultiplierDistribution();
         if( ihis ) ihis->SetAxisRange( 0., 10. );
     }
+// L1 rates
+    else if( E_cameraIdent( fCameraDisplay ) == C_L1 )
+    {
+       if( fEventLoop->getDBPixelDataReader() )
+       {
+           ihis = fEventLoop->getDBPixelDataReader()->getL1Histogram( fTelescope, fEventLoop->getEventMJD(), 
+                                                                                  fEventLoop->getEventTime() );
+       }
+   }
+
+
+////////////////////////////////////////////
+// plot everything
     if( ihis )
     {
         ihis->SetLineWidth( 2 );
@@ -1887,6 +1909,7 @@ void VDisplay::defineGui()
     fNEntryGoto->Associate( this );
     fHorizontalEvent->AddFrame( fNEntryGoto, fL4 );
     fComboCameraView = new TGComboBox( fHorizontalEvent, B_VIEW );
+// the entries must be the same as E_cameraIdent
     fComboCameraView->AddEntry( "charge", 0 );
     fComboCameraView->AddEntry( "tzeros", 1 );
     fComboCameraView->AddEntry( "trigger", 2 );
@@ -1910,9 +1933,12 @@ void VDisplay::defineGui()
     fComboCameraView->AddEntry( "tzero average (low)", 20 );
     fComboCameraView->AddEntry( "status (high)", 21 );
     fComboCameraView->AddEntry( "status (low)", 22 );
-    fComboCameraView->AddEntry( "trigger-evndisp", 23 );
-    fComboCameraView->AddEntry( "template (frogs)", 24 );
-    fComboCameraView->AddEntry( "model3D", 25 ); //JG
+    fComboCameraView->AddEntry( "L1 rates", 23 );
+    fComboCameraView->AddEntry( "HV", 24 );
+    fComboCameraView->AddEntry( "currents", 25 );
+    fComboCameraView->AddEntry( "trigger-evndisp", 26 );
+    fComboCameraView->AddEntry( "template (frogs)", 27 );
+    fComboCameraView->AddEntry( "model3D", 28 ); 
     fComboCameraView->Select( 0 );
     fComboCameraView->Associate( this );
     fComboCameraView->Resize( 110, 20 );

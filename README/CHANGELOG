@@ -8,6 +8,37 @@ Change log eventdisplay analysis package
                 (average pedestals are used, not the
                 pixel wise values)
 
+* 20140317 (GM) low-gain integration window settings:
+                fixed settings and width of integration window
+                for double pass window start < 0;
+                fixed length of integration window for
+                first pass for low gain
+
+* 20140317 (GM) setting of number of samples (VTS):
+                this failed before if first events were
+                incomplete (e.g. runs 71717 or 72217)
+                added consistency checks and require
+                that nsamples is the same in all telescopes
+                for VTS. Stop if no consistent result
+                is achieved after 1000000 events.
+                (VEventLoop)
+
+* 20140317 (GM) plotting: correctly assign dead channel
+                color for low-gain dead channel (plotted
+                only if channel is in low gain)
+
+* 20140317 (GM) significant improvements for dead channel
+                finder: read now L1 rates from VTS DB and
+                use them for dead channel identification;
+                plotting of L1 rates in display; HV and 
+                currents are in preparation
+
+* 20140317 (GM) added automatic adjustment of time slice
+                length for time dependent pedestal 
+                calculation (with fixed slice length it
+                could happen that the last window is only
+                a few seconds long)
+
 * 20140312 (GM) CTA trgmask command line changes:
                 expect now trgmask directory (not file)
 

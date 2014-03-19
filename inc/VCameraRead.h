@@ -161,6 +161,7 @@ class VCameraRead : public VGlobalRunParameter
         {
             return fPatch;
         }
+        vector< unsigned int > getNumChannelVector();
         unsigned int         getNumChannels()     //!< get number of channels in this camera
         {
             return fXTube[fTelID].size();
@@ -269,6 +270,7 @@ class VCameraRead : public VGlobalRunParameter
         {
             return fYTube[iTel];
         }
+
         bool                 initialize( unsigned int i_Ntel, vector< string > iCamera );
                                                   //!< set number of telescopes and channels (only necessary for readCameraFile() )
         bool                 initialize( unsigned int iNtel, unsigned int iNchannel );

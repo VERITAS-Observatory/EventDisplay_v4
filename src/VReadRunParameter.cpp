@@ -879,6 +879,15 @@ void VReadRunParameter::test_and_adjustParams()
 
 // test if this is a DST file
     getRunParametersFromDST();
+// standard VTS analysis
+    if( fRunPara->frunmode == 0 && fRunPara->getObservatory().find( "VERITAS" ) != string::npos
+     && fRunPara->fIsMC == 0 )
+    {
+       if( !fRunPara->fNoCalibNoPb )
+       {  
+          fRunPara->freadCalibfromDB = true;
+       }
+    }
 // set pulse timing for DST case
     if( fRunPara->frunmode == 4 && fRunPara->getObservatory().find( "VERITAS" ) == string::npos )
     {
@@ -1059,6 +1068,10 @@ void VReadRunParameter::test_and_adjustParams()
 	    fRunPara->fDBRunType = i_DBinfo.getRunType();
 	    fRunPara->fDBRunStartTimeSQL = i_DBinfo.getDataStartTimeSQL();
 	    fRunPara->fDBRunStoppTimeSQL = i_DBinfo.getDataStoppTimeSQL();
+            fRunPara->fDBDataStartTimeMJD = i_DBinfo.getDataStartTimeMJD();
+            fRunPara->fDBDataStoppTimeMJD = i_DBinfo.getDataStoppTimeMJD();
+            fRunPara->fDBDataStartTimeSecOfDay = i_DBinfo.getDataStartTime();
+            fRunPara->fDBDataStoppTimeSecOfDay = i_DBinfo.getDataStoppTime();
 	    fRunPara->fRunDuration = (float)i_DBinfo.getDuration();
             if( fTelToAna == 0 ) fTelToAna = i_DBinfo.getTelToAna();
 // get source file from run number (if run number is given and no sourcefile)

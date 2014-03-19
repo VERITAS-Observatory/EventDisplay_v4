@@ -1,5 +1,6 @@
-/*!
-
+/*!  \class VDeadChannelFinder
+ *   \brief find channels which are dead or deliver inconsistent data
+ *
  */
 
 #include "VDeadChannelFinder.h"
@@ -29,6 +30,8 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
         fDEAD_gaindev_min = -1.e2;
         fDEAD_gaindev_max = 2.;
         fDEAD_toffset_max = 20.;
+        fDEAD_l1rates_min = 0.;
+        fDEAD_l1rates_max = 1.e20;
     }
     else
     {
@@ -45,6 +48,8 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
         fDEAD_gaindev_min = -1.e2;
         fDEAD_gaindev_max = 2.;
         fDEAD_toffset_max = 20.;
+        fDEAD_l1rates_min = 0.;
+        fDEAD_l1rates_max = 1.e20;
     }
 }
 
@@ -137,6 +142,13 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
                 is_stream >> iTemp;
                 fDEAD_toffset_max = atof( iTemp.c_str() );
             }
+            else if( iTemp == "L1RATES" )
+            {
+                is_stream >> iTemp;
+                fDEAD_l1rates_min = atof( iTemp.c_str() );
+                is_stream >> iTemp;
+                fDEAD_l1rates_max = atof( iTemp.c_str() );
+            }
             else
             {
                 cout << "unknown identifier: " << iTemp << endl;
@@ -168,7 +180,8 @@ void VDeadChannelFinder::printDeadChannelDefinition()
     cout << "Telescope " << fTelID+1 << ":";
     cout << "\tGain [" << fDEAD_gain_min << "," << fDEAD_gain_max << "], ";
     cout << "Gainvar [" << fDEAD_gainvar_min << "," << fDEAD_gainvar_max << "], ";
-    cout << "Gaindev [" << fDEAD_gaindev_min << "," << fDEAD_gaindev_max << "]" << endl;
+    cout << "Gaindev [" << fDEAD_gaindev_min << "," << fDEAD_gaindev_max << "]";
+    cout << "L1rates [" << fDEAD_l1rates_min << "," << fDEAD_l1rates_max << "]" << endl;
     cout << "Telescope " << fTelID+1 << ":";
     cout << "\tToff [" << fDEAD_toffset_max << "], ";
     cout << endl;
@@ -306,16 +319,3 @@ unsigned int VDeadChannelFinder::testTimeOffsets( unsigned int ichannel, double 
 
     return 0;
 }
-
-
-/*
-void VDeadChannelFinder::printChannelSummary( unsigned int iTelID, unsigned int chanID, unsigned int t )
-{
-   cout << "T" << iTelID+1 << " channel " << chanID << " dead: ";
-   bitset< 24 > b( t );
-
-   if( b.test( 1 ) ) cout << " outside pedestal range,";
-   if( b.test( 2 ) ) cout << " small pedestal variation,";
-
-   cout << endl;
-} */

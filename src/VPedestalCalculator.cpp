@@ -28,17 +28,18 @@ bool VPedestalCalculator::initialize()
 }
 
 
-bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixel, double iLengthofTimeSlice, int iSumFirst, int iSumWindow )
+bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixel, double iLengthofTimeSlice,
+                                      int iSumFirst, int iSumWindow, double iRunStartTime, double iRunStoppTime )
 {
     if( fDebug ) cout << "VPedestalCalculator::initialize " << iNPixel << " " << iLengthofTimeSlice << " " << iSumFirst << " " << iSumWindow << endl;
     bCalibrationRun = ibCalibrationRun;
-    fLengthofTimeSlice = iLengthofTimeSlice;
+    fLengthofTimeSlice = adjustTimeSliceLength( iLengthofTimeSlice, iRunStartTime, iRunStoppTime );
     fSumFirst = iSumFirst;
     fSumWindow = iSumWindow;
     fNPixel = iNPixel;
-
     cout << endl;
-    cout << "Initialize pedestal calculator (length of time slice: " << fLengthofTimeSlice << " [s], sum window starts at ";
+    cout << "VPedestalCalculator::initialize, adjusted length of time slice from " << iLengthofTimeSlice << "s to " << fLengthofTimeSlice << "s";
+    cout << " (length of time slice: " << fLengthofTimeSlice << " [s], sum window starts at ";
     cout << fSumFirst << " with lengths up to " << fSumWindow << " samples)" << endl;
 // test if camera is not too big
     if( getDetectorGeo()->getNChannels()[getTelID()] > fNPixel )
@@ -243,12 +244,9 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
         else if( t - fTimeVec[telID] > fLengthofTimeSlice )
         {
             time = t;
-
             fillTimeSlice( telID );
-
             fTimeVec[telID] = t;
-
-        }                                         // if( t - fTimeVec[telID] > fLengthofTimeSlice )
+        }  // if( t - fTimeVec[telID] > fLengthofTimeSlice )
 ///////////////////////////////////////////////////////
 
         double i_tr_sum = 0.;
@@ -359,4 +357,25 @@ void VPedestalCalculator::reset()
         xRot[i] = 0.;
         yRot[i] = 0.;
     }
+}
+
+/*
+ * stretch time slices to match the run lengths
+ *
+ * (avoid small time bins at the end of runs)
+ */
+double VPedestalCalculator::adjustTimeSliceLength( double iLengthofTimeSlice, double iRunStartTime, double iRunStoppTime )
+{
+    if( iRunStartTime < 0. || iRunStoppTime < 0. || iLengthofTimeSlice <= 0. ) return iLengthofTimeSlice;
+
+    double iRunLength = iRunStoppTime - iRunStartTime;
+
+    double iNSlices = (int)( (iRunStoppTime - iRunStartTime)/iLengthofTimeSlice );
+    if( iNSlices > 0. )
+    {
+       double iR = iRunLength - iNSlices * iLengthofTimeSlice;
+       return iLengthofTimeSlice + iR / iNSlices;
+    }
+
+    return iLengthofTimeSlice;
 }

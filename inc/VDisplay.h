@@ -80,8 +80,13 @@ class VDisplay : public TGMainFrame
         B_NWIN,B_NSUM,B_NIMA,B_NBOR,
         B_FITPMT,B_ADDPMT,B_REMOVEPMT,B_RESETPMT,B_NFADC, B_NVIEW
     };
-//! camera display identifier
-    enum E_cameraIdent {C_CHARGE, C_TZERO, C_TRIGGER,C_HIT,C_HILO,C_TIMING, C_SUMWINDOW, C_SUMWINDOWSTART, C_PEDMEAN,C_PEDVAR,C_PEDMEANLOW,C_PEDVARLOW,C_GAINS,C_GAINVARS,C_GAINSLOW,C_GAINVARSLOW,C_TOFF,C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW, C_TRIGGER_EVNDISP, C_TEMPLATE, C_MODEL3D }; // JG
+// camera display identifier (each of them will appear in the drop down menu for a camera display)
+// note: these have to be copied into VCamera
+    enum E_cameraIdent {C_CHARGE, C_TZERO, C_TRIGGER,C_HIT,C_HILO,C_TIMING, C_SUMWINDOW, C_SUMWINDOWSTART, 
+                        C_PEDMEAN,C_PEDVAR,C_PEDMEANLOW,C_PEDVARLOW,C_GAINS,C_GAINVARS,C_GAINSLOW,C_GAINVARSLOW,
+                        C_TOFF,C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW,
+                        C_L1, C_HV, C_CURRENTS,
+                        C_TRIGGER_EVNDISP, C_TEMPLATE, C_MODEL3D };
 //! FADC/ana tab identifier
     enum E_fadcIDENT{F_FADC, F_ANA};
 
