@@ -14,10 +14,10 @@ Command line syntax:
 Required auxilliary files:
 
    file with analysis run parameters
-       see example $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EFFECTIVEAREA.runparameter
+       see example $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EFFECTIVEAREA.runparameter
 
    definition of gamma/hadron cuts
-       see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.GammaHadron.dat
+       see example $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.GammaHadron.dat
 
 ---------------------------------------------------
 

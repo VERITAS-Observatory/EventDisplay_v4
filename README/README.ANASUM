@@ -31,21 +31,21 @@ Lists and parameter files:
 
    analysis parameter file with binning, coordinates of sky map pointings, exclusion regions etc:
 
-	see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.runparameter
+	see example $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter
 
    run list:
 
-        see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.runlist
+        see example $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runlist
 
    definition of gamma/hadron cuts:
 	
-	see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.GammaHadron.dat
+	see example $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.GammaHadron.dat
 
 	Please check VERITAS analysis wiki for the standard cut files
 
    list of time cuts (to remove an arbitrary time interval during a run):
 
-	see example $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/ANASUM.timemask.dat
+	see example $VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.timemask.dat
 
 	The time cut file is defined in the analysis parameter file (keyword TIMEMASKFILE)
 
@@ -53,9 +53,9 @@ Lists and parameter files:
 
 Required instrument response function files:
 
-   effective areas, see $VERITAS_EVNDISP_ANA_DIR/EffectiveAreas
+   effective areas, see $VERITAS_EVNDISP_AUX_DIR/EffectiveAreas
 
-   radial acceptances, see $VERITAS_EVNDISP_ANA_DIR/RadialAcceptances
+   radial acceptances, see $VERITAS_EVNDISP_AUX_DIR/RadialAcceptances
 	
 --------------------------------------------------------
 

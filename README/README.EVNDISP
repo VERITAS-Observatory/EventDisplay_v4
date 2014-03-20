@@ -39,32 +39,32 @@ Option to display events:
 Required auxilliary files:
 
    global run parameters (e.g. observatory location and links to database)
-   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.global.runparameter
+   $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EVNDISP.global.runparameter
 
    analysis and reconstruction parameter file, see e.g.
-   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.reconstruction.runparameter
+   $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EVNDISP.reconstruction.runparameter
 
 Optional auxiliary files:
 
    [VTS] list of special channels (e.g. L2 channels, channels to remove from the analysis)
-   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.specialchannels.dat
+   $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EVNDISP.specialchannels.dat
 
    [VTS] list of criteria to find malfunctioning channels
-   $VERITAS_EVNDISP_ANA_DIR/Parameterfiles/EVNDISP.validchannels.dat
+   $VERITAS_EVNDISP_AUX_DIR/Parameterfiles/EVNDISP.validchannels.dat
 
 ----------------------------------------------
 
 Calibration data:
 
    [VTS] Calibration files (relative gains and time offsets, pedestals) are located in
-   $VERITAS_EVNDISP_ANA_DIR/Calibration/Tel_NN
+   $VERITAS_EVNDISP_AUX_DIR/Calibration/Tel_NN
 
    [VTS] Run numbers for low-gain calibration:
-   $VERITAS_EVNDISP_ANA_DIR/Calibration/calibrationlist.LowGain.dat
+   $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat
 
    [VTS] The following file is ONLY needed in case non-standard flasher files are used
    (or no connection to the VERITAS DB could be established):
-   $VERITAS_EVNDISP_ANA_DIR/Calibration/calibrationlist.dat
+   $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.dat
 
    [CTA] No calibration files are needed (data is included in EVNDISP DST files)
 
@@ -73,7 +73,7 @@ Calibration data:
 Detector configuration:
 
    [VTS] Detector configuration files (with telescope positions, pixel positions, etc):
-   $VERITAS_EVNDISP_ANA_DIR/DetectorGeometry/*.cfg
+   $VERITAS_EVNDISP_AUX_DIR/DetectorGeometry/*.cfg
 
    [CTA] Detector configuration is read from EVNDISP DST file (telconfig tree)
    

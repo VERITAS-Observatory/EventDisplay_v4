@@ -41,7 +41,7 @@ For additional optional options, see further below.
 Lookup table files:
 	
 	lookup table files are expected to be in 
-	$VERITAS_EVNDISP_ANA_DIR/Tables/
+	$VERITAS_EVNDISP_AUX_DIR/Tables/
 
 --------------------------------------------
 
