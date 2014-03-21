@@ -32,6 +32,8 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
         fDEAD_toffset_max = 20.;
         fDEAD_l1rates_min = 0.;
         fDEAD_l1rates_max = 1.e20;
+        fDead_HVrms_min = 1.e20;
+        fDead_HVrms_max = 1.e20;
     }
     else
     {
@@ -50,6 +52,8 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
         fDEAD_toffset_max = 20.;
         fDEAD_l1rates_min = 0.;
         fDEAD_l1rates_max = 1.e20;
+        fDead_HVrms_min = 1.e20;
+        fDead_HVrms_max = 1.e20;
     }
 }
 
@@ -149,6 +153,13 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
                 is_stream >> iTemp;
                 fDEAD_l1rates_max = atof( iTemp.c_str() );
             }
+            else if( iTemp == "HVRMS" )
+            {
+                is_stream >> iTemp;
+                fDead_HVrms_min = atof( iTemp.c_str() );
+                is_stream >> iTemp;
+                fDead_HVrms_max = atof( iTemp.c_str() );
+            }
             else
             {
                 cout << "unknown identifier: " << iTemp << endl;
@@ -180,11 +191,10 @@ void VDeadChannelFinder::printDeadChannelDefinition()
     cout << "Telescope " << fTelID+1 << ":";
     cout << "\tGain [" << fDEAD_gain_min << "," << fDEAD_gain_max << "], ";
     cout << "Gainvar [" << fDEAD_gainvar_min << "," << fDEAD_gainvar_max << "], ";
-    cout << "Gaindev [" << fDEAD_gaindev_min << "," << fDEAD_gaindev_max << "]";
-    cout << "L1rates [" << fDEAD_l1rates_min << "," << fDEAD_l1rates_max << "]" << endl;
-    cout << "Telescope " << fTelID+1 << ":";
-    cout << "\tToff [" << fDEAD_toffset_max << "], ";
-    cout << endl;
+    cout << "Gaindev [" << fDEAD_gaindev_min << "," << fDEAD_gaindev_max << "], ";
+    cout << "Toff [" << fDEAD_toffset_max << "]" << endl;
+    cout << "\t L1rates [" << fDEAD_l1rates_min << "," << fDEAD_l1rates_max << "], ";
+    cout << "HVrms [" << fDead_HVrms_min << "," << fDead_HVrms_max << "]" << endl;
 }
 
 

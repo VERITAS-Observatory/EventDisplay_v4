@@ -378,6 +378,12 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
             case C_L1:
                 setPMTColorScheme( fData->getL1Rates(), false, 100., 0., "L1 rates", false, false, false, true );
                 break;
+            case C_HV:
+                setPMTColorScheme( fData->getHV(), false, 100., 0., "HV [V]", false, false, false, true );
+                break;
+            case C_CURRENTS:
+                setPMTColorScheme( fData->getCurrents(), false, 100., 0., "Currents", false, false, false, true );
+                break;
             case C_TRIGGER_EVNDISP:
                 setPMTColorOnOff( fData->getTrigger(), fColorTrigger, fColorTrigger, fFillStylePos );
                 break;

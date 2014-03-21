@@ -1,139 +1,156 @@
 Change log eventdisplay analysis package
 ========================================
 
-* 20140319 (GM) updated mscw_energy to take new location of 
-                calibration trees in eventdisplay files into 
-                account (bugzilla Bug 154)
+(please observe the wiki syntax)
 
-* 20140318 (GM, CB) introduced simple trace max replacement
-                for sum calculation
+* 20140319 (GM)
+updated mscw_energy to take new location of calibration trees in eventdisplay files into account (bugzilla Bug 154)
 
-* 20140318 (GM) CTA bug fix in writing of pedestals
-                (average pedestals are used, not the
-                pixel wise values)
+* 20140318 (GM, CB)
+introduced simple trace max replacement for sum calculation
 
-* 20140317 (GM) low-gain integration window settings:
-                fixed settings and width of integration window
-                for double pass window start < 0;
-                fixed length of integration window for
-                first pass for low gain
+* 20140318 (GM)
+CTA bug fix in writing of pedestals (average pedestals are used, not the pixel wise values)
 
-* 20140317 (GM) setting of number of samples (VTS):
-                this failed before if first events were
-                incomplete (e.g. runs 71717 or 72217)
-                added consistency checks and require
-                that nsamples is the same in all telescopes
-                for VTS. Stop if no consistent result
-                is achieved after 1000000 events.
-                (VEventLoop)
+* 20140317 (GM)
+low-gain integration window settings: fixed settings and width of integration window for double pass window start < 0;
+fixed length of integration window for first pass for low gain
 
-* 20140317 (GM) plotting: correctly assign dead channel
-                color for low-gain dead channel (plotted
-                only if channel is in low gain)
+* 20140317 (GM)
+setting of number of samples (VTS): 
+this failed before if first events were incomplete 
+(e.g. runs 71717 or 72217)
+added consistency checks and require
+that nsamples is the same in all telescopes
+for VTS. Stop if no consistent result
+is achieved after 1000000 events.
+(VEventLoop)
 
-* 20140317 (GM) significant improvements for dead channel
-                finder: read now L1 rates from VTS DB and
-                use them for dead channel identification;
-                plotting of L1 rates in display; HV and 
-                currents are in preparation
+* 20140317 (GM) 
+plotting: correctly assign dead channel
+color for low-gain dead channel (plotted
+only if channel is in low gain)
 
-* 20140317 (GM) added automatic adjustment of time slice
-                length for time dependent pedestal 
-                calculation (with fixed slice length it
-                could happen that the last window is only
-                a few seconds long)
+* 20140317 (GM)
+significant improvements for dead channel
+finder: read now L1 rates from VTS DB and
+use them for dead channel identification;
+plotting of L1 rates in display; HV and 
+currents are in preparation
 
-* 20140312 (GM) CTA trgmask command line changes:
-                expect now trgmask directory (not file)
+* 20140317 (GM) 
+added automatic adjustment of time slice
+length for time dependent pedestal 
+calculation (with fixed slice length it
+could happen that the last window is only
+a few seconds long)
 
-* 20140306 (HF, HP) improved low gain calibration routines
-                requires updated calibrationlist.LowGain.dat
-                calculates correctly the integration window
-                dependent low-gain multiplier
+* 20140312 (GM)
+CTA trgmask command line changes:
+expect now trgmask directory (not file)
 
-* 20140301 (GM) CTA DST: added relative gain calibration
-                (pixel-to-pixel variation in gain was ignored
-                 until now)
+* 20140306 (HF, HP)
+improved low gain calibration routines
+requires updated calibrationlist.LowGain.dat
+calculates correctly the integration window
+dependent low-gain multiplier
 
-* 20140225 (GM) significant (huge) changes in lookup tables filling
-                use median approximator for efficient and faster filling;
-                reduces memory requirements by factor of 8-15,
-                speed up by factor of 2-3;
-                should not affect any reading of lookup tables
+* 20140301 (GM)
+CTA DST: added relative gain calibration
+(pixel-to-pixel variation in gain was ignored until now)
 
-* 20140219 (GM) anasum event tree: added 'isgamma' variable
+* 20140225 (GM)
+significant (huge) changes in lookup tables filling
+use median approximator for efficient and faster filling;
+reduces memory requirements by factor of 8-15,
+speed up by factor of 2-3;
+should not affect any reading of lookup tables
 
-* 20140219 (GM) bug fix for LL fitting and failed calculation
-                of error matrix: image angle was calculated
-		incorrectly; fixed in 
-		VArrayAnalyzer::recalculatePhi()
+* 20140219 (GM) 
+anasum event tree: added 'isgamma' variable
 
-* 20140219 (GM) NN-time image cleaning: removed dependencies
-                on fixed image cleaning; update and checked
+* 20140219 (GM)
+bug fix for LL fitting and failed calculation
+of error matrix: image angle was calculated
+incorrectly; fixed in VArrayAnalyzer::recalculatePhi()
 
-* 20140218 (GM) mscw_energy: allow now to copy MC histograms 
-                for a single spectral index only (useful for CTA)
+* 20140219 (GM)
+NN-time image cleaning: removed dependencies
+on fixed image cleaning; update and checked
 
-* 20140213 (GM) moved and updated the data/MC comparison
-                functions; improved functionality
-                now part of the shared library
+* 20140218 (GM)
+mscw_energy: allow now to copy MC histograms 
+for a single spectral index only (useful for CTA)
 
-* 20140211 (GM) changed range of spectral index
-                for effective area calculations
-                to 1.5 - 5.4
+* 20140213 (GM)
+moved and updated the data/MC comparison
+functions; improved functionality
+now part of the shared library
 
-* 20140211 (GM) anasum can now read the gamma/hadron
-                cuts from the effective area files.
-                Simply remove the gamma/hadron file name
-                from the anasum input run list.
+* 20140211 (GM)
+changed range of spectral index for effective area calculations
+to 1.5 - 5.4
 
-* 20140211 (GM) bug fix: dead time was read from wrong
-                histograms in anasum
-                (might have introduced a 1-3% systematic
-                 shift in fluxes)
+* 20140211 (GM)
+anasum can now read the gamma/hadron
+cuts from the effective area files.
+Simply remove the gamma/hadron file name
+from the anasum input run list.
 
-* 20140130 (GM) changed settings for PSF plotting
-                in sky maps
+* 20140211 (GM)
+bug fix: dead time was read from wrong
+histograms in anasum
+(might have introduced a 1-3% systematic
+shift in fluxes)
 
-* 20140124 (GM) implemented average tzero calculation
-                (mean arrival pulse time)
-                command line parameter:
-                e.g. -averagetzerofiducialradius=0.75
+* 20140130 (GM)
+changed settings for PSF plotting in sky maps
 
-* 20140124 (GM) changed low-gain dead channel classification 
-                (Eventdisplay-WG/931)
-                low-gain channels are dead now when
-                their corresponding high-gain is dead
+* 20140124 (GM) 
+implemented average tzero calculation
+(mean arrival pulse time)
+command line parameter:
+e.g. -averagetzerofiducialradius=0.75
 
-* 20140124 (GM) dead low-gain channels are now ignored
-                in LL fit (VImageParameterCalculation)
+* 20140124 (GM)
+changed low-gain dead channel classification 
+(Eventdisplay-WG/931)
+low-gain channels are dead now when
+their corresponding high-gain is dead
 
-* 20131222 (GM) fixed reading of wobble offsets for
-                zero offset pointings
+* 20140124 (GM)
+dead low-gain channels are now ignored
+in LL fit (VImageParameterCalculation)
 
-* 20131220 (GM) fixed warnings and errors from clang++
+* 20131222 (GM)
+fixed reading of wobble offsets for zero offset pointings
 
-* 20131220 (GM) allow to print list of image and border 
-                pixels from display
+* 20131220 (GM) 
+fixed warnings and errors from clang++
 
-* 20131220 (GM) optimized calculation of mean average T0
-                for CTA DST; use now median average T0 per
-		telescope type (was: average per telescope)
-		use also only centre fraction of camera
-		(new command line parameter 
-		averagetzerofiducialradius )
+* 20131220 (GM)
+allow to print list of image and border pixels from display
 
-* 20131219 (GM) significant changes in window settings for
-                charge integration;
-                summation window of second pass are now always
-                start at T0+sumwindowShift (was fixed for second
-                window of second pass);
-                command line parameter -fixwindow2 is set to 0 by
-                default (was 1)
-                adding shift in summation window now to all window
-                settings (this is set in the parameter file by
-                * -1 FADCSUMMATIONSTART 2 -1
-                removed parameter fTraceWindowShift_DoublePassSmallImages
+* 20131220 (GM)
+optimized calculation of mean average T0
+for CTA DST; use now median average T0 per
+telescope type (was: average per telescope)
+use also only centre fraction of camera
+(new command line parameter 
+averagetzerofiducialradius )
+
+* 20131219 (GM)
+significant changes in window settings for
+charge integration;
+summation window of second pass are now always
+start at T0+sumwindowShift (was fixed for second
+window of second pass);
+command line parameter -fixwindow2 is set to 0 by
+default (was 1)
+adding shift in summation window now to all window
+settings (this is set in the parameter file by
+-1 FADCSUMMATIONSTART 2 -1
+removed parameter fTraceWindowShift_DoublePassSmallImages
 
 *************************************************************
 ******* 20131219 trunk is now 4.40, to indicate        ******

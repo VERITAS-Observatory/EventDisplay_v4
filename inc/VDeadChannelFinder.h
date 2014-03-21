@@ -41,11 +41,15 @@ class VDeadChannelFinder
         double fDEAD_toffset_max;
         double fDEAD_l1rates_min;
         double fDEAD_l1rates_max;
+        double fDead_HVrms_min;
+        double fDead_HVrms_max;
 
     public:
 
         VDeadChannelFinder( int irunmode = 0, unsigned int iTelID = 0, bool bLowGain = false, bool isMC = false );
         ~VDeadChannelFinder() {};
+        double    getDeadChannelDefinition_HVrms_min() { return fDead_HVrms_min; }
+        double    getDeadChannelDefinition_HVrms_max() { return fDead_HVrms_max; }
         double    getDeadChannelDefinition_L1Rates_min() { return fDEAD_l1rates_min; }
         double    getDeadChannelDefinition_L1Rates_max() { return fDEAD_l1rates_max; }
         void      printDeadChannelDefinition();

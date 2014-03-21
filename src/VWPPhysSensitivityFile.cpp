@@ -372,48 +372,59 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 
 bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill1D )
 {
-
-    std::cout<<"VWPPhysSensitivityFile::fillHistograms1D "<<std::endl;
-    
-   char hname[2000];
-////////////////////////////////////////////////////////////////////////
-// instrument response function reader
-   VInstrumentResponseFunctionReader i_IRF;
+// expect certain directory and file naming
+   ostringstream iEffectiveAreaFile;
    if( fOffsetCounter < 9999 )
    {
        std::cout<<" fDataFile_gamma_cone "<< fDataFile_gamma_cone <<std::endl;
-      sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone.c_str(), fOffsetCounter );
+       iEffectiveAreaFile << iDataDirectory << "/" << fDataFile_gamma_cone << fOffsetCounter << ".root";
+//       sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone.c_str(), fOffsetCounter );
    }
    else
    {
       if( isVTS() == 0 )
       {
-         sprintf( hname, "%s/%s0.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
+         iEffectiveAreaFile << iDataDirectory << "/" << fDataFile_gamma_onSource  << "0.root";
       }	  
       else
       {
 	  std::cout<<" fDataFile_gamma_onSource "<< fDataFile_gamma_onSource <<std::endl;
-         sprintf( hname, "%s/%s.root", iDataDirectory.c_str(), fDataFile_gamma_onSource.c_str() );
-      }	 
+          iEffectiveAreaFile << iDataDirectory << "/" << fDataFile_gamma_onSource  << ".root";
+      }	  
    }
    cout << endl;
    cout << "=================================================================" << endl;
-   cout << "reading " << hname << endl;
+   cout << "reading " << iEffectiveAreaFile.str() << endl;
    cout << endl;
+
+   return (fillIRFHistograms( iEffectiveAreaFile.str() ) && fillSensitivityHistograms( iDataDirectory, iFill1D ) );
+}
+
+
+bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile )
+{
+
+    std::cout<<"VWPPhysSensitivityFile::fillHistograms1D "<<std::endl;
+    
+////////////////////////////////////////////////////////////////////////
+// instrument response function reader
+   VInstrumentResponseFunctionReader i_IRF;
+///////////////////////////////////////////////////////////////////////
 // CTA data 
    if( isVTS() == 0 )
    {
-      if( !i_IRF.fillData( hname ) )
+      if( !i_IRF.fillData( iEffectiveAreaFile.c_str() ) )
       {
-	 cout << "VWPPhysSensitivityFile::fillHistograms1D error filling data from " << hname << endl;
+	 cout << "VWPPhysSensitivityFile::fillHistograms1D error filling data from " << iEffectiveAreaFile.c_str() << endl;
          return false;
       }
    }
+///////////////////////////////////////////////////////////////////////
 // VERITAS data
    else
    {
-      if( isVTS() == 5 && !i_IRF.fillData( hname, 20, 0.5, 16, 2.0, 130 ) ) return false;
-      if( isVTS() == 6 && !i_IRF.fillData( hname, 20, 0.5, 16, 2.0, 200 ) ) return false;
+      if( isVTS() == 5 && !i_IRF.fillData( iEffectiveAreaFile.c_str(), 20, 0.5, 16, 2.0, 130 ) ) return false;
+      if( isVTS() == 6 && !i_IRF.fillData( iEffectiveAreaFile.c_str(), 20, 0.5, 16, 2.0, 200 ) ) return false;
    }
 // fill angular resolution histograms
    i_IRF.fillResolutionHistogram( fAngRes68, "68", "t_angular_resolution" );
@@ -426,6 +437,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
    i_IRF.fillEffectiveAreasHistograms( fEffArea, "", fEffAreaMC );
 // fill effective area histograms (80%)
    i_IRF.fillEffectiveAreasHistograms( fEffArea80, "80" );
+   char hname[2000];
    if( i_IRF.getMigrationMatrix() )
    {
       if( fOffsetCounter < 9999 ) sprintf( hname, "MigMatrix_%d", fOffsetCounter );
@@ -450,9 +462,16 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
       hisList.push_back( hhEsysMCRelative );
       if( fOffsetCounter == 9999 ) hisListToDisk.push_back( hhEsysMCRelative );
    }
+   return true;
+}
 
-////////////////////////////////////////////////////////////////////////
-// sensitivity plots
+/*
+   sensitivity histograms
+*/
+bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, bool iFill1D )
+{
+   char hname[2000];
+
     VSensitivityCalculator i_Sens;
 //    i_Sens.setDebug( true );
     VSensitivityCalculator i_SensCU;
@@ -622,8 +641,6 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
     // re-use i_SensCU to calculate the integrated sensitivity 0.2 -> -1
     i_SensCU.calculateSensitivityvsEnergyFromCrabSpectrum( "MC", "CU", -1, 0.01, 1.e6 );
     i_SensCU.fillSensitivityHistograms( fIntSensitivityCU);
-
-
 
     return true;
 }

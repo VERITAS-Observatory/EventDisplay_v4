@@ -268,7 +268,7 @@ void VEvndispData::setDeadChannelText()
     fDeadChannelText.push_back( "disabled: MC set" );
     fDeadChannelText.push_back( "dead: L1 rates out of range" );
     fDeadChannelText.push_back( "dead: HV values out of range" );
-    fDeadChannelText.push_back( "dead: currents out of range" );
+    fDeadChannelText.push_back( "dead: currents out of range" );   // not used (yet)
 }
 
 bool VEvndispData::get_reconstruction_parameters( string ifile )

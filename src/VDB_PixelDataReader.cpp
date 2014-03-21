@@ -9,6 +9,8 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
 {
     setDebug( true );
 
+    fNPixel = nPixel_per_telescope;
+
 //////////////////////////////////////////////////////////////////
 // coding of different data vectors:
 //  ID = 0: L1 rates
@@ -18,7 +20,6 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
     fPixelDataType.push_back( "L1_Rates" );
     fPixelDataType.push_back( "HV" );
     fPixelDataType.push_back( "Currents" );
-
 
 // define data vectors and histograms
     char htitle[800];
@@ -107,9 +108,18 @@ void VDB_PixelDataReader::fillDataRow( unsigned int iDataType, string iTimeStamp
             }
         }
     }
+    else
+    {
+        cout << "VDB_PixelDataReader::fillDataRow(): invalid data type: " << iDataType << endl;
+    }
 }
 
-bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber )
+/*
+ * access the VERITAS DB and retrieve all values
+ * (this is the only function where the DB is queried)
+ *
+ */
+bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, string iDBStartTimeSQL, string fDBRunStoppTimeSQL )
 {
    if( fDebug )
    {
@@ -119,14 +129,19 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber )
    stringstream iTempS;
    iTempS << iDBserver << "/VERITAS";
    char c_query[1000];
-   sprintf( c_query, "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp > tblRun_Info.data_start_time AND timestamp <  tblRun_Info.data_end_time AND tblRun_Info.run_id=%d", runNumber );
-
    VDB_Connection my_connection( iTempS.str(), "readonly", "" ) ; 
    if( !my_connection.Get_Connection_Status() )
    {
 	fDBStatus = false;
 	return false;
     }
+
+/////////////////////////////////////////////////////
+// read L1 rates
+
+   sprintf( c_query, "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp" );
+   sprintf( c_query, "%s > tblRun_Info.data_start_time AND timestamp <  tblRun_Info.data_end_time AND tblRun_Info.run_id=%d", c_query, runNumber );
+
     if(!my_connection.make_query(c_query) )
     {
       	fDBStatus = false;
@@ -144,9 +159,69 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber )
                fDBStatus = false;
                return false;
            }
-           fillDataRow( 0, db_row->GetField( 0 ), atoi( db_row->GetField( 1 )), atoi( db_row->GetField( 2 )), atof( db_row->GetField( 3 )) );
+// mysql> describe tblL1_TriggerInfo;
+// +--------------+----------------------+------+-----+---------------------+-------+
+// | Field        | Type                 | Null | Key | Default             | Extra |
+// +--------------+----------------------+------+-----+---------------------+-------+
+// | timestamp    | datetime             |      | PRI | 0000-00-00 00:00:00 |       |
+// | run_id       | int(11)              |      | PRI | 0                   |       |
+// | telescope_id | tinyint(3) unsigned  |      | PRI | 0                   |       |
+// | pixel_id     | smallint(5) unsigned |      | PRI | 0                   |       |
+// | rate         | float                | YES  |     | NULL                |       |
+// +--------------+----------------------+------+-----+---------------------+-------+
+           if(  db_row->GetField( 0 ) &&  db_row->GetField( 1 ) && db_row->GetField( 2 ) && db_row->GetField( 3 ) )
+           {
+               fillDataRow( 0, db_row->GetField( 0 ), atoi( db_row->GetField( 1 )), atoi( db_row->GetField( 2 )), atof( db_row->GetField( 3 )) );
+           }
        }
     }
+
+/////////////////////////////////////////////////////
+// read HV and currents measured
+
+    for( unsigned int i = 0; i < getNTel(); i++ )
+    {
+        sprintf( c_query, "select * FROM tblHV_Telescope%d_Status WHERE channel > 0 AND", i );
+        sprintf( c_query, "%s (db_start_time > \"%s\") AND (db_start_time < \"%s\")", c_query, iDBStartTimeSQL.c_str(), fDBRunStoppTimeSQL.c_str() );
+
+        if(!my_connection.make_query(c_query) )
+        {
+            fDBStatus = false;
+            cout << "FAILED" << endl;
+            return false;
+        }  
+        TSQLResult *db_res = my_connection.Get_QueryResult();
+
+        if( db_res && db_res->GetRowCount() > 0 )
+        {
+           while( TSQLRow *db_row = db_res->Next() )
+           {
+               if( !db_row )
+               {
+                   cout << "VDB_PixelDataReader::readFromDB: failed reading a DB row" << endl;
+                   fDBStatus = false;
+                   return false;
+               }
+// +---------------+----------------------+------+-----+---------------------+-------+
+// | Field         | Type                 | Null | Key | Default             | Extra |
+// +---------------+----------------------+------+-----+---------------------+-------+
+// | db_start_time | datetime             |      | PRI | 0000-00-00 00:00:00 |       |
+// | db_end_time   | datetime             | YES  | MUL | NULL                |       |
+// | channel       | smallint(5) unsigned |      | PRI | 0                   |       |
+// | voltage_meas  | float                | YES  |     | NULL                |       |
+// | current_meas  | float                | YES  |     | NULL                |       |
+// +---------------+----------------------+------+-----+---------------------+-------+
+               if( db_row->GetField( 1 ) && db_row->GetField( 2 ) && db_row->GetField( 3 ) )
+               {
+                   fillDataRow( 1, db_row->GetField( 1 ), i, atoi( db_row->GetField( 2 ) )-1, atof( db_row->GetField( 3 )) );
+               }
+               if( db_row->GetField( 1 ) && db_row->GetField( 2 ) && db_row->GetField( 4 ) )
+               {
+                   fillDataRow( 2, db_row->GetField( 1 ), i, atoi( db_row->GetField( 2 ) )-1, atof( db_row->GetField( 4 )) );
+               }
+           }
+        }
+    } 
 
     print();
 
@@ -256,7 +331,13 @@ float VDB_PixelDataReader::getValue( unsigned int iDataType, unsigned int iTel, 
 
 
 /*
- * return a vector of size npixel
+ * return a data vector of size npixel
+ *
+ * different 'incomplete' returns:
+ *
+ * case 1: iDataType is an invalid data type:  zero size vector is returned
+ * case 2: iTel is an invalid telescope number:  zero size vector is returned
+ * case 3: iMJD is insided any known time interval: vector of size npixel filled with zeros is returned
  */
 vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime )
 {
@@ -290,7 +371,8 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
                            fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t];
 // first and/or last time bin is sometimes not filled (run start/end and L1 rate interval star mismatch)
 // use in this case the L1 rates from second bin
-                           if( fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 1 )
+// (note: only for L1 rates)
+                           if( iDataType == 0 && fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 1 )
                            {
                                if( t == 0 )
                                {
@@ -315,12 +397,39 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
  * return list of channels with data outside of the given range
  *
  */
-vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime, float i_min, float i_max )
+vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDataType, unsigned int iTel, int iMJD, 
+                                                                float iTime, float i_min, float i_max, bool bRMS )
 {
     vector< unsigned int > i_channelList;
 // fills fDummyReturnVector with data
     getDataVector( iDataType, iTel, iMJD, iTime );
     if( fDummyReturnVector.size() == 0 ) return i_channelList;
+
+// for relative differences, calculate mean and rms
+    double i_mean = 0.; 
+    double i_rms = 0.;
+    if( bRMS )
+    {
+        double i_mean2 = 0.; 
+        double i_n = 0.;
+        for( unsigned int i = 0; i < fDummyReturnVector.size(); i++ )
+        {
+           if( fDummyReturnVector[i] > 0. )
+           {
+               i_mean  += fDummyReturnVector[i];
+               i_mean2 += fDummyReturnVector[i]*fDummyReturnVector[i];
+               i_n++;
+           }
+        }
+        if( i_n > 1 )
+        {
+            i_rms = sqrt( (1./(i_n-1.))*(i_mean2-i_mean*i_mean/i_n) );
+            i_mean /= i_n;
+        }
+
+        i_min = i_mean - TMath::Abs( i_min ) * i_rms;
+        i_max = i_mean + TMath::Abs( i_max ) * i_rms;
+    }
 
     for( unsigned int i = 0; i < fDummyReturnVector.size(); i++ )
     {

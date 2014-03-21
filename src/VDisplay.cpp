@@ -1172,7 +1172,9 @@ void VDisplay::setFADCText()
 // L1/HV/currents (if available)
     if( fEventLoop->getDBPixelDataReader() && fEventLoop->getDBPixelDataReader()->getDBStatus() )
     {
-       sprintf( cTemp, "L1 rate %.2e Hz", fEventLoop->getL1Rate( fSelectedChan - 200000 ) );
+       sprintf( cTemp, "L1 rate %.2e Hz, HV %d, I %.2f", fEventLoop->getL1Rate( fSelectedChan - 200000 ), 
+                                                    (int)fEventLoop->getHV( fSelectedChan - 200000 ),
+                                                         fEventLoop->getCurrent( fSelectedChan - 200000 ) );
        fTextFADC.push_back( new TText( xL, yT, cTemp ) );
     }
     else
@@ -1547,7 +1549,24 @@ if( ihis ) ihis->SetAxisRange( 0., 250. );
                                                                                   fEventLoop->getEventTime() );
        }
    }
-
+// HV
+    else if( E_cameraIdent( fCameraDisplay ) == C_HV )
+    {
+       if( fEventLoop->getDBPixelDataReader() )
+       {
+           ihis = fEventLoop->getDBPixelDataReader()->getHVHistogram( fTelescope, fEventLoop->getEventMJD(), 
+                                                                                  fEventLoop->getEventTime() );
+       }
+   }
+// Currents
+    else if( E_cameraIdent( fCameraDisplay ) == C_CURRENTS )
+    {
+       if( fEventLoop->getDBPixelDataReader() )
+       {
+           ihis = fEventLoop->getDBPixelDataReader()->getCurrentsHistogram( fTelescope, fEventLoop->getEventMJD(), 
+                                                                                        fEventLoop->getEventTime() );
+       }
+   }
 
 ////////////////////////////////////////////
 // plot everything

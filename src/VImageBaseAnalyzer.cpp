@@ -788,7 +788,19 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
                if( iL1Rates_dead[i] < getNChannels() ) setDead( iL1Rates_dead[i], 13, iLowGain );
            }
        }
-    }
+// check measured HVs
+      vector< unsigned int > iHV_dead = getDBPixelDataReader()->getHV_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
+                                            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_min(),
+                                            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_max() );
+// do not allow HV to kill a significant part of the camera
+       if( iHV_dead.size() < getNChannels()/2 )
+       {
+           for( unsigned int i = 0; i < iHV_dead.size(); i++ )
+           {
+               if( iHV_dead[i] < getNChannels() ) setDead( iHV_dead[i], 14, iLowGain );
+           }
+       } 
+   }
 /////////////////////////////////////////////////////
 
 // check number of dead channels, print warning for more than 30 dead channels
@@ -809,12 +821,24 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 
     setNDead( n_dead, iLowGain );
 
-    if( iFirst && getNDead( iLowGain ) > 30 )
+    if( iFirst )
     {
-        cout << "WARNING: number of dead";
-        if( !iLowGain ) cout << " high gain ";
-        else            cout << " low gain ";
-        cout << "channels on telescope " << getTelID()+1 << " exceeds 30: " << n_dead << endl;
+// print warning if more than 30 channels are dead
+        if( getNDead( iLowGain ) > 30 )
+        {
+            cout << "WARNING: number of dead";
+            if( !iLowGain ) cout << " high gain ";
+            else            cout << " low gain ";
+            cout << "channels on telescope " << getTelID()+1 << " exceeds 30: " << n_dead << endl;
+        }
+// print info when less than 30 channels are dead
+        else
+        {
+            cout << "Number of dead";
+            if( !iLowGain ) cout << " high gain ";
+            else            cout << " low gain ";
+            cout << "channels on telescope " << getTelID()+1 << ": " << n_dead << endl;
+        }
 
 // do not allow to run eventdisplay with all channels dead in the low channels one of the telescopes
 // (GM) why low-gain channels?? Why not all?

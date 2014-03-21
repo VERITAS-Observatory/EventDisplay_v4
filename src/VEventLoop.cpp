@@ -420,7 +420,8 @@ bool VEventLoop::initEventLoop( string iFileName )
 	{
 		fDB_PixelDataReader = new VDB_PixelDataReader( getDetectorGeo()->getNumChannelVector() );
 		fDB_PixelDataReader->setDebug( fRunPar->fDebug );
-		fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber );
+		fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber, 
+                                                 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
 	}
 	
 	// set event number vector

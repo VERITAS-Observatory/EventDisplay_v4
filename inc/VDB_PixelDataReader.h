@@ -47,6 +47,8 @@ class VDB_PixelDataReader
 
     bool  fDebug;
     bool  fDBStatus;
+
+    vector< unsigned int > fNPixel;
     
     vector< float > fDummyReturnVector;
 
@@ -55,7 +57,8 @@ class VDB_PixelDataReader
     vector< vector< TH1F* > >  fPixelData_histogram;
 
     void fillDataRow( unsigned int iDataType, string iTimeStamp, int iTel, int iPix, float iData );
-    vector< unsigned int > getDeadChannelList( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime, float i_min, float i_max );
+    vector< unsigned int > getDeadChannelList( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime, 
+                                               float i_min, float i_max, bool bRMS = false );
     vector< float > getDataVector( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime );
     TH1F*           getDataHistogram( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime );
     float           getValue( unsigned int iDataType, unsigned int iTel, unsigned int iChannel, int iMJD, float iTime );
@@ -66,9 +69,9 @@ class VDB_PixelDataReader
    ~VDB_PixelDataReader() {};
     bool   getDBStatus() { return fDBStatus; }
     vector< unsigned int > getL1_DeadChannelList( unsigned int iTel, int iMJD, float iTime, float i_min, float i_max ) 
-                                                  { return getDeadChannelList( 0, iTel, iMJD, iTime, i_min, i_max ); }
+                                                  { return getDeadChannelList( 0, iTel, iMJD, iTime, i_min, i_max, false ); }
     vector< unsigned int > getHV_DeadChannelList( unsigned int iTel, int iMJD, float iTime, float i_min, float i_max ) 
-                                                  { return getDeadChannelList( 1, iTel, iMJD, iTime, i_min, i_max ); }
+                                                  { return getDeadChannelList( 1, iTel, iMJD, iTime, i_min, i_max, true ); }
     vector< unsigned int > getCurrents_DeadChannelList( unsigned int iTel, int iMJD, float iTime, float i_min, float i_max ) 
                                                   { return getDeadChannelList( 2, iTel, iMJD, iTime, i_min, i_max ); }
     TH1F*           getL1Histogram( unsigned int iTel, int iMJD, float iTime ) { return getDataHistogram( 0, iTel, iMJD, iTime ); }
@@ -77,12 +80,13 @@ class VDB_PixelDataReader
     float           getL1Rate( unsigned int iTel, unsigned int iChannel, int iMJD, float iTime ) { return getValue( 0, iTel, iChannel, iMJD, iTime ); }
     float           getHV( unsigned int iTel, unsigned int iChannel, int iMJD, float iTime ) { return getValue( 1, iTel, iChannel, iMJD, iTime ); }
     float           getCurrent( unsigned int iTel, unsigned int iChannel, int iMJD, float iTime ) { return getValue( 2, iTel, iChannel, iMJD, iTime ); }
-    vector< float > getL1Rates( unsigned int iTel, int iMJD, float iTime ) { return getDataVector( 0, iTel, iMJD, iTime ); }
-    vector< float > getHV( unsigned int iTel, int iMJD, float iTime ) { return getDataVector( 1, iTel, iMJD, iTime ); }
     vector< float > getCurrents( unsigned int iTel, int iMJD, float iTime ) { return getDataVector( 2, iTel, iMJD, iTime ); }
+    vector< float > getHV( unsigned int iTel, int iMJD, float iTime ) { return getDataVector( 1, iTel, iMJD, iTime ); }
+    vector< float > getL1Rates( unsigned int iTel, int iMJD, float iTime ) { return getDataVector( 0, iTel, iMJD, iTime ); }
+    unsigned int    getNTel() { return fNPixel.size(); }
     void   print();
     void   print( string iDatatype, unsigned int iTelID, unsigned int iPixel );
-    bool   readFromDB( string DBServer, unsigned int runNumber );
+    bool   readFromDB( string DBServer, unsigned int runNumber, string iDBStartTimeSQL, string fDBRunStoppTimeSQL );
     void   setDebug( bool iB = false ) { fDebug = iB; }
     bool   writeDataTree( unsigned int iTel );
 };

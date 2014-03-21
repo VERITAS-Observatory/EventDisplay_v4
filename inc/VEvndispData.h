@@ -228,7 +228,15 @@ class VEvndispData
         TList*              getIntegratedChargeHistograms() { return fAnaData[fTelID]->getIntegratedChargeHistograms(); }
         float               getL1Rate( unsigned int iChannel ) { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getL1Rate( getTelID(), iChannel, getEventMJD(), getEventTime() );
                                                                  else return 0.; }
+        float               getHV( unsigned int iChannel ) { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getHV( getTelID(), iChannel, getEventMJD(), getEventTime() );
+                                                                 else return 0.; }
+        float               getCurrent( unsigned int iChannel ) { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getCurrent( getTelID(), iChannel, getEventMJD(), getEventTime() );
+                                                                 else return 0.; }
         vector< float >     getL1Rates() { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getL1Rates( getTelID(), getEventMJD(), getEventTime() ); 
+                                           else return fDummyVector_float; }
+        vector< float >     getHV() { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getHV( getTelID(), getEventMJD(), getEventTime() ); 
+                                           else return fDummyVector_float; }
+        vector< float >     getCurrents() { if( fDB_PixelDataReader ) return fDB_PixelDataReader->getCurrents( getTelID(), getEventMJD(), getEventTime() ); 
                                            else return fDummyVector_float; }
 	valarray<double>&   getLowGainMultiplier_Camera() { return fCalData[fTelID]->getLowGainMultiplier_Camera() ; } 
 	vector<int>&        getLowGainDefaultSumWindows() { return fCalData[fTelID]->fLowGainDefaultSumWindows ; }

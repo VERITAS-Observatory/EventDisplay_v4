@@ -81,7 +81,7 @@ int main( int argc, char *argv[] )
 // observing time
     iData->setObservationTime( fObservingTime_h );
 // output file
-    if( !iData->initializeOutputFile( fOutputFile ) ) exit( -1 );
+    if( !iData->initializeOutputFile( fOutputFile ) ) exit( EXIT_FAILURE );
 // Crab spectrum from HEGRA (CTA default)
     iData->setCrabSpectrum( "$CTA_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
 // CR spectra (protons + electrons)
