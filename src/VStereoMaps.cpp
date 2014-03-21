@@ -981,7 +981,7 @@ bool VStereoMaps::initialize_ReflectedRegionModel()
                             x_t = ids * cos( phi_i );
                             y_t = ids * sin( phi_i );
 
-// check if off source region is not included in this off position (require to be at least 1.5*times theta2 circle away)
+// check if off source region is not included in this off position (require to be at least 2.0*times theta2 circle away)
                             if( (x_t-x)*(x_t-x)+(y_t-y)*(y_t-y) > (2.+fRunList.fRE_distanceSourceOff)*(2.+fRunList.fRE_distanceSourceOff)*fRunList.fSourceRadius )
                             {
 // check if real source region is not included in this off position
