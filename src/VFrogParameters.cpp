@@ -8,7 +8,7 @@
 
 VFrogParameters::VFrogParameters()
 {
-
+    fDebug = false;
     fTreeFrog = 0;
     reset();
 

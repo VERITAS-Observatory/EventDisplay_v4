@@ -46,6 +46,10 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fTrigSimInputcard = "";
 
     fDBRunType = "";
+    fDBDataStartTimeMJD = 0.;
+    fDBDataStoppTimeMJD = 0.;
+    fDBDataStartTimeSecOfDay = 0.;
+    fDBDataStoppTimeSecOfDay = 0.;
     fDBRunStartTimeSQL = "";
     fDBRunStoppTimeSQL = "";
     fsimu_pedestalfile = "";
@@ -112,7 +116,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
     fDBTracking = true;
     fDBCameraRotationMeasurements = true;
     fDBVPM = true;
-    fDBUncalibratedVPM = false; //JG
+    fDBUncalibratedVPM = false;
 #else
     fDBTracking = false;
     fDBCameraRotationMeasurements = false;
@@ -275,12 +279,19 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
        ifActiveType[i] = false;
     }
 
-
 // parallaxwidth  // MS
     fPWmethod = -1;            // MS default is to use cleaned CFD trigger map
     fPWcleanNeighbors = 2;     // MS: default number of neighbors required for identifying center pixels in the trigger map
     fPWcleanThreshold = 26.0;  // MS: default is about 5.3 dc/pe for VERITAS (5 sample integration window), i.e. cleaning of ~5 pe
     fPWlimit = 0;              // MS: default is no restriction on the number of trigger pixels transmitted to moment-generating function
+
+    fTrigSimInputcard = "";
+    fTrigThreshFile = "";
+    fNSBdatabaseFile = "";
+    fIPR1File = "";
+    fIPR2File = "";
+    fIPR3File = "";
+    fIPR4File = "";
 
 }
 

@@ -1634,7 +1634,7 @@ void VCalibrator::readGains( bool iLowGain )
 		   infile.getline(buffer,100);
 		   unsigned int ch;
 		   float mean,rms;
-		   sscanf(buffer,"%d %f %f",&ch,&mean,&rms);
+		   sscanf(buffer,"%u %f %f",&ch,&mean,&rms);
                    VchannelList.push_back( ch );
 		   Vmean.push_back( mean );
 		   Vvar.push_back( rms );
@@ -1800,7 +1800,7 @@ bool VCalibrator::readAverageTZeros( bool iLowGain )
       if( getTelID() < getDetectorGeometry()->getFieldofView().size() && getRunParameter()->faverageTZeroFiducialRadius > 0. &&
           getRunParameter()->faverageTZeroFiducialRadius < 1. )
       {
-          cout << ", use inner " << getRunParameter()->faverageTZeroFiducialRadius*100. << "\% of camera";
+          cout << ", use inner " << getRunParameter()->faverageTZeroFiducialRadius*100. << "% of camera";
       }
       cout << ")" << endl;
       return true;
@@ -1882,7 +1882,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 		   infile.getline (buffer,100);
 		   unsigned int ch;
 		   float mean,rms;
-		   sscanf(buffer,"%d %f %f",&ch,&mean,&rms);
+		   sscanf(buffer,"%u %f %f",&ch,&mean,&rms);
                    VchannelList.push_back( ch );
 		   Vmean.push_back( mean );
 		   Vvar.push_back( rms );
@@ -1916,8 +1916,9 @@ void VCalibrator::readTOffsets( bool iLowGain )
     }
     else if(getRunParameter()->fNoCalibNoPb || iLowGain || getRunParameter()->fIsMC )
     {
-	if(iLowGain) std::cout<<"Low Gain "<<std::endl;
-	std::cout<<"VCalibrator::readTOffsets() info: TOffsets are set to 0"<<std::endl; 
+	std::cout<<"VCalibrator::readTOffsets() info: TOffsets are set to 0";
+	if(iLowGain) std::cout<<" (low gain)";
+        cout <<std::endl; 
 	if(!iLowGain) std::cout<<"VCalibrator::readTOffsets() info: TOffsets are not tested to find dead channels "<<std::endl;
 	setTOffsets( 0., iLowGain );
 	setTOffsetvars( 0.1, iLowGain );

@@ -1268,6 +1268,7 @@ void VReadRunParameter::test_and_adjustParams()
 	    fRunPara->fTraceIntegrationMethod_pass1.push_back( fRunPara->fTraceIntegrationMethod_pass1[0] );
 	    fRunPara->fLogLikelihoodLoss_min.push_back( fRunPara->fLogLikelihoodLoss_min[0] );
 	    fRunPara->fLogLikelihood_Ntubes_min.push_back( fRunPara->fLogLikelihood_Ntubes_min[0] );
+            fRunPara->fSumWindowMaxTimedifferenceToDoublePassPosition.push_back( fRunPara->fSumWindowMaxTimedifferenceToDoublePassPosition[0] );
         }
     }
 

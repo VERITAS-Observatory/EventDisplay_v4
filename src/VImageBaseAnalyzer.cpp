@@ -837,7 +837,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
             cout << "Number of dead";
             if( !iLowGain ) cout << " high gain ";
             else            cout << " low gain ";
-            cout << "channels on telescope " << getTelID()+1 << ": " << n_dead << endl;
+            cout << "channels on telescope " << getTelID()+1 << " (at first event):\t" << n_dead << endl;
         }
 
 // do not allow to run eventdisplay with all channels dead in the low channels one of the telescopes
@@ -1117,10 +1117,17 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
                 {
 // get new tzero for sumwindow starting at corrfirst to the end of the window
                     corrfirst=0;        
-                    float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
-                    if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
+                    try
                     {
-                        corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
+                        float iT0 = fTraceHandler->getPulseTiming( corrfirst, getNSamples(), 0, getNSamples() ).at( getRunParameter()->fpulsetiming_tzero_index );
+                        if( corrfirst - iT0 < getSumWindowMaxTimedifferenceToDoublePassPosition() )
+                        {
+                            corrfirst = TMath::Nint( iT0 ) + getSumWindowShift();
+                        } 
+                    }
+                    catch( const std::out_of_range& oor )
+                    {
+                       cout << "VImageBaseAnalyzer::calcSecondTZerosSums: out of Range error: " << oor.what() << endl;
                     }
                     if( corrfirst < 0 ) corrfirst = 0;
                 }

@@ -178,20 +178,20 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 
         double fNSBscale;                                     //
 
-        float  fFADCPedestal[VDST_MAXTELESCOPES];             // fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
-        float  fFADCPedestalSig[VDST_MAXTELESCOPES];          // fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
-        float  fFlashCamFADCPedestal[VDST_MAXTELESCOPES];     // FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
-        float  fFlashCamFADCPedestalSig[VDST_MAXTELESCOPES];  // FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
+        float  fFADCPedestal[VDST_MAXTELESCOPES];             //! fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
+        float  fFADCPedestalSig[VDST_MAXTELESCOPES];          //! fadc pedestal+baselineshift, taken from external NSB database if fShowerOnly=true
+        float  fFlashCamFADCPedestal[VDST_MAXTELESCOPES];     //! FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
+        float  fFlashCamFADCPedestalSig[VDST_MAXTELESCOPES];  //! FlashCam fadc pedestal+baselineshift sigma, taken from external NSB database if fShowerOnly=true
 
-        float  fFADCsampleRate[VDST_MAXTELTYPES];             // FADC sample rate in GHz
-        float  fFlashCamFADCtoPhe[VDST_MAXTELTYPES];          // default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
-        float  fFlashCamFADCsampleRate[VDST_MAXTELTYPES];     // FADC sample rate in GHz
-        float  fFADCtoPhe[VDST_MAXTELTYPES];                  // default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
-        bool   fPerformFlashCamAnalysis[VDST_MAXTELTYPES];    // flag if FlashCam FADC should be taken for analysis
-        double fFWHMdata[VDST_MAXTELTYPES];                   // ns FWHM of dataline pulse
-        double fFWHMtrigger[VDST_MAXTELTYPES];                // ns FWHM of triggerline pulse (except FlashCam)
-        double fIntegWindow[VDST_MAXTELTYPES];                // ns
-        bool   ifActiveType[VDST_MAXTELTYPES];                // if telescope of this type is activated for analysis
+        float  fFADCsampleRate[VDST_MAXTELTYPES];             //! FADC sample rate in GHz
+        float  fFlashCamFADCtoPhe[VDST_MAXTELTYPES];          //! default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
+        float  fFlashCamFADCsampleRate[VDST_MAXTELTYPES];     //! FADC sample rate in GHz
+        float  fFADCtoPhe[VDST_MAXTELTYPES];                  //! default conversion factor c[phes/fadc]: [phes]=c*[fadc] for certain integ. window (4slices)
+        bool   fPerformFlashCamAnalysis[VDST_MAXTELTYPES];    //! flag if FlashCam FADC should be taken for analysis
+        double fFWHMdata[VDST_MAXTELTYPES];                   //! ns FWHM of dataline pulse
+        double fFWHMtrigger[VDST_MAXTELTYPES];                //! ns FWHM of triggerline pulse (except FlashCam)
+        double fIntegWindow[VDST_MAXTELTYPES];                //! ns
+        bool   ifActiveType[VDST_MAXTELTYPES];                //! if telescope of this type is activated for analysis
 
 // FADC timing parameters
         vector< float > fpulsetiminglevels;       // levels at which timing of FADC pulses is calculated
@@ -279,8 +279,8 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
         bool fdstwriteallpixel;                   // write all information of all pixel into dst output files
 
 // trigsim parameters (note: different telescope IDs!)
-        map< unsigned int, int >   fTrigSim_referenceTrigger;
-	map< unsigned int, float > fTrigSim_threshold;
+        map< unsigned int, int >   fTrigSim_referenceTrigger;         //!
+	map< unsigned int, float > fTrigSim_threshold;                //!
         TString  fTrigSimInputcard;                      // input card for trigsim and next-neighbour image cleaning
         TString  fTrigThreshFile;
         TString  fNSBdatabaseFile;
@@ -309,6 +309,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 	void         setSystemParameters();
         bool         useDB() { return fuseDB; }
 
-        ClassDef(VEvndispRunParameter,141); //(increase this number)
+        ClassDef(VEvndispRunParameter,143); //(increase this number)
 };
 #endif

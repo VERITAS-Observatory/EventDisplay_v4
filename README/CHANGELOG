@@ -3,6 +3,9 @@ Change log eventdisplay analysis package
 
 (please observe the wiki syntax)
 
+* 20140321 (GM)
+added HV and Current reading from DB (also plotting); added HV criteria to dead channel finder
+
 * 20140319 (GM)
 updated mscw_energy to take new location of calibration trees in eventdisplay files into account (bugzilla Bug 154)
 

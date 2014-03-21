@@ -193,7 +193,8 @@ void VDeadChannelFinder::printDeadChannelDefinition()
     cout << "Gainvar [" << fDEAD_gainvar_min << "," << fDEAD_gainvar_max << "], ";
     cout << "Gaindev [" << fDEAD_gaindev_min << "," << fDEAD_gaindev_max << "], ";
     cout << "Toff [" << fDEAD_toffset_max << "]" << endl;
-    cout << "\t L1rates [" << fDEAD_l1rates_min << "," << fDEAD_l1rates_max << "], ";
+    cout << "Telescope " << fTelID+1 << ":";
+    cout << "\tL1rates [" << fDEAD_l1rates_min << "," << fDEAD_l1rates_max << "], ";
     cout << "HVrms [" << fDead_HVrms_min << "," << fDead_HVrms_max << "]" << endl;
 }
 

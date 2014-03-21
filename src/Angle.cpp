@@ -24,11 +24,11 @@
 
 #include"Angle.h"
 
-const double SEphem::Angle::sc_halfPi = 1.57079632679489661923;;
-const double SEphem::Angle::sc_Pi = 3.14159265358979323846;;
-const double SEphem::Angle::sc_3HalfPi = 4.71238898038468985769;;
-const double SEphem::Angle::sc_twoPi = 6.28318530717958647692;;
-const double SEphem::Angle::sc_5HalfPi = 7.85398163397448309615;;
+const double SEphem::Angle::sc_halfPi = 1.57079632679489661923;
+const double SEphem::Angle::sc_Pi = 3.14159265358979323846;
+const double SEphem::Angle::sc_3HalfPi = 4.71238898038468985769;
+const double SEphem::Angle::sc_twoPi = 6.28318530717958647692;
+const double SEphem::Angle::sc_5HalfPi = 7.85398163397448309615;
 const double SEphem::Angle::sc_degPerRad = ANGLE_DEGPERRAD; 
 const double SEphem::Angle::sc_rotPerRad = ANGLE_ROTPERRAD;
 const double SEphem::Angle::sc_hrsPerRad = ANGLE_HRSPERRAD;

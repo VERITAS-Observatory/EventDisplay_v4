@@ -369,7 +369,10 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
    return true;
 }
 
-
+/*
+ * fill IRFs and sensitivity histograms
+ *
+ */
 bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill1D )
 {
 // expect certain directory and file naming
@@ -378,7 +381,6 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
    {
        std::cout<<" fDataFile_gamma_cone "<< fDataFile_gamma_cone <<std::endl;
        iEffectiveAreaFile << iDataDirectory << "/" << fDataFile_gamma_cone << fOffsetCounter << ".root";
-//       sprintf( hname, "%s/%s%d.root", iDataDirectory.c_str(), fDataFile_gamma_cone.c_str(), fOffsetCounter );
    }
    else
    {
@@ -648,8 +650,12 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
 bool VWPPhysSensitivityFile::initializeOutputFile( string iOutputFile )
 {
    char hname[200];
-   sprintf( hname, "%s.%s.%ds.root", iOutputFile.c_str(), fSubArray.c_str(), int(fObservingTime_h*3600.) );
-   string iFileName = hname;
+   string iFileName = iOutputFile;
+   if( fSubArray.size() > 0 && fObservingTime_h > 0. )
+   {
+       sprintf( hname, "%s.%s.%ds.root", iOutputFile.c_str(), fSubArray.c_str(), int(fObservingTime_h*3600.) );
+       iFileName = hname;
+   }
 // define output file
    fOutFile = new TFile( iFileName.c_str(), "RECREATE" );
    if( fOutFile->IsZombie() )
@@ -671,7 +677,7 @@ bool VWPPhysSensitivityFile::terminate()
       cout << "writing histograms to " << fOutFile->GetName() << endl;
       for( unsigned int i = 0; i < hisListToDisk.size(); i++ )
       {
-	 if( hisListToDisk[i] )
+	 if( hisListToDisk[i] && hisListToDisk[i]->GetEntries() > 0 )
 	 {
 	    cout << "\t" << hisListToDisk[i]->GetName() << endl;
 	    hisListToDisk[i]->Write();
@@ -683,7 +689,7 @@ bool VWPPhysSensitivityFile::terminate()
       {
          for( unsigned int i = 0; i < hisListToDiskDebug.size(); i++ )
 	 {
-	    if( hisListToDiskDebug[i] )
+	    if( hisListToDiskDebug[i] && hisListToDiskDebug[i]->GetEntries() > 0 )
 	    {
 	       cout << "\t" << hisListToDiskDebug[i]->GetName() << endl;
 	       hisListToDiskDebug[i]->Write();
