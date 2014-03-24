@@ -25,11 +25,11 @@ VImageAnalyzerData::VImageAnalyzerData( unsigned int iTelID, unsigned int iShort
 		fImageParameterLogL = new VImageParameter( iShortTree );
 	}
 	
-// initialize time since run start
+	// initialize time since run start
 	fTimeSinceRunStart = -1.;
 	fTimeRunStart = 0.;
 	
-// random generator for setting randomly channels dead
+	// random generator for setting randomly channels dead
 	fRandomMakeDeadChannelsSeed = 0;
 	fRandomMakeDeadChannels = new TRandom3( fRandomMakeDeadChannelsSeed );
 	
@@ -107,7 +107,7 @@ void VImageAnalyzerData::initialize( unsigned int iChannels, unsigned int iMaxCh
 	
 	fCorrelationCoefficient.resize( iChannels, false );
 	
-// fit value results
+	// fit value results
 	if( iTraceFit )
 	{
 		fRiseTime.resize( iChannels, 0. );
@@ -129,7 +129,7 @@ void VImageAnalyzerData::initializeMeanPulseHistograms()
 {
 	fFillMeanTraces = true;
 	
-// set mean pulse histograms
+	// set mean pulse histograms
 	hMeanPulses = new TList();
 	char hname[200];
 	char htitle[200];
@@ -179,7 +179,7 @@ void VImageAnalyzerData::setTrace( unsigned int iChannel, vector< double > fT, b
 {
 	if( fFillMeanTraces && iChannel < hMeanPulseLow.size() && iChannel < hMeanPulseHigh.size() )
 	{
-// expect that trace sum is set before!!!
+		// expect that trace sum is set before!!!
 		if( fSums[iChannel] > 0. && getTZeros( true )[iChannel] > 0 )
 		{
 			for( unsigned t = 0; t < fT.size(); t++ )
@@ -251,13 +251,13 @@ double VImageAnalyzerData::getHIGHQE_gainfactor( unsigned int iChannel )
 valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
 {
 
-// return tzero from average pulse time
+	// return tzero from average pulse time
 	if( fTraceIntegrationMethod == 2 || fTraceIntegrationMethod == 3 || fTraceIntegrationMethod == 4 )
 	{
 		return fPulseTimingAverageTime;
 	}
 	
-// return tzero according to pulse timing vector
+	// return tzero according to pulse timing vector
 	if( iCorrected && fpulsetiming_tzero_index < fPulseTimingCorrected.size() )
 	{
 		return fPulseTimingCorrected[fpulsetiming_tzero_index];
@@ -267,7 +267,7 @@ valarray<double>& VImageAnalyzerData::getTZeros( bool iCorrected )
 		return fPulseTimingUncorrected[fpulsetiming_tzero_index];
 	}
 	
-// this is a serious problem and should never happen
+	// this is a serious problem and should never happen
 	cout << "VImageAnalyzerData::getTZeros error: tzero index out of range" << endl;
 	cout << "\t" << fpulsetiming_tzero_index << "\t" << fPulseTimingCorrected.size() << "\t" << fPulseTimingUncorrected.size() << endl;
 	exit( -1 );
@@ -292,7 +292,7 @@ valarray<double>& VImageAnalyzerData::getTraceWidth( bool iCorrected )
 		}
 	}
 	
-// this is a serious problem and should never happen
+	// this is a serious problem and should never happen
 	cout << "VImageAnalyzerData::getTraceWidth error: tzero or width index out of range" << endl;
 	cout << fpulsetiming_width_index << "\t";
 	cout << fPulseTimingCorrected.size() << "\t" << fPulseTimingUncorrected.size() << endl;

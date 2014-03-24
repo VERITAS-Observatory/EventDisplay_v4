@@ -29,7 +29,7 @@ VDeadTime::VDeadTime( bool iIsOn )
 	hgDeadTime = 0;
 	hNEventTime = 0;
 	
-// scalar
+	// scalar
 	hScalarClock = 0;
 	hScalarBusy = 0;
 	hScalarDeadTimeFraction = 0;
@@ -85,7 +85,7 @@ void VDeadTime::defineHistograms( float iRunDuration )
 	
 	char hname[200];
 	
-// histograms for calculating dead vs
+	// histograms for calculating dead vs
 	if( bIsOn )
 	{
 		sprintf( hname, "hTimeDiff_on" );
@@ -172,12 +172,12 @@ void VDeadTime::defineHistograms( float iRunDuration )
 	{
 		sprintf( hname, "hFTimeDiff_off" );
 	}
-//    hFTimeDiff = new TF1( hname, "expo", fTFitMin, fTFitMax );
+	//    hFTimeDiff = new TF1( hname, "expo", fTFitMin, fTFitMax );
 	hFTimeDiff = new TF1( hname, "expo", 1.e-4, 0.2 );
 	hFTimeDiff->SetLineColor( 2 );
 	hisList->Add( hFTimeDiff );
 	
-// scalar related histograms
+	// scalar related histograms
 	if( iRunDuration > 0. )
 	{
 		if( bIsOn )
@@ -245,7 +245,7 @@ void VDeadTime::fillTenMHzClockArray( double time, unsigned int* tenMHzClock )
 	{
 		return;
 	}
-// check if this is the first scalar event
+	// check if this is the first scalar event
 	if( fFirstScalarEvent )
 	{
 		fFirstScalarEvent = false;
@@ -255,10 +255,10 @@ void VDeadTime::fillTenMHzClockArray( double time, unsigned int* tenMHzClock )
 		return;
 	}
 	
-// check time bins and reset variables if needed
+	// check time bins and reset variables if needed
 	int nbin = hScalarClock->FindBin( time - fScalarTimeOfFirstEvent );
 	
-// fill scalar clock
+	// fill scalar clock
 	if( tenMHzClock[0] > fScalarClockLastEvent )
 	{
 		hScalarClock->SetBinContent( nbin, hScalarClock->GetBinContent( nbin ) + double( tenMHzClock[0] - fScalarClockLastEvent ) );
@@ -269,7 +269,7 @@ void VDeadTime::fillTenMHzClockArray( double time, unsigned int* tenMHzClock )
 									 + TMath::Power( 2., 32. ) - 1. - fScalarClockLastEvent
 									 +  double( tenMHzClock[0] ) );
 	}
-// fill busy clock
+	// fill busy clock
 	if( tenMHzClock[1] > fScalarBusyLastEvent )
 	{
 		hScalarBusy->SetBinContent( nbin, hScalarBusy->GetBinContent( nbin ) + double( tenMHzClock[1] - fScalarBusyLastEvent ) );
@@ -343,7 +343,7 @@ double VDeadTime::calculateDeadTimeFromScalars()
 	double iBusy = 0.;
 	double iChi2 = 0.;
 	double iNDF = 0.;
-// calculate mean dead time fraction and errors on dead time histogram
+	// calculate mean dead time fraction and errors on dead time histogram
 	for( int i = 1; i <= hScalarClock->GetNbinsX(); i++ )
 	{
 		iClock += hScalarClock->GetBinContent( i );
@@ -360,10 +360,10 @@ double VDeadTime::calculateDeadTimeFromScalars()
 		
 	}
 	
-// calculate time dependent dead time
+	// calculate time dependent dead time
 	hScalarDeadTimeFraction->Divide( hScalarBusy, hScalarClock );
 	
-// calculate chi2
+	// calculate chi2
 	if( iClock > 0. )
 	{
 		for( int i = 1; i <= hScalarDeadTimeFraction->GetNbinsX(); i++ )
@@ -396,8 +396,8 @@ double VDeadTime::calculateDeadTimeFromScalars()
 
 double VDeadTime::calculateDeadTimeFromTimeDifferences()
 {
-///////////////////////////////////////////////////
-// dead time calculation from time differences
+	///////////////////////////////////////////////////
+	// dead time calculation from time differences
 	if( !hTimeDiff || !hFTimeDiff )
 	{
 		return 0.;
@@ -407,7 +407,7 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
 		return 0.;
 	}
 	
-// assume exponential distributions of dead times
+	// assume exponential distributions of dead times
 	TF1 fFit( "fFit", "expo", fTFitMin, fTFitMax );
 	hTimeDiff->Fit( &fFit, "Q0R" );
 	hFTimeDiff->SetParameter( 0, fFit.GetParameter( 0 ) );
@@ -416,11 +416,11 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
 	double ix = hTimeDiff->GetBinCenter( 1 );
 	double nmiss = 0.;
 	
-// go left in delta t histogram from 0.01, first 0 bin defines dead time
-// (fails for very short runs)
+	// go left in delta t histogram from 0.01, first 0 bin defines dead time
+	// (fails for very short runs)
 	for( int i = hTimeDiff->FindBin( hTimeDiff->GetMean() ); i > 2; i-- )
 	{
-// require  at least three zero bins
+		// require  at least three zero bins
 		if( hTimeDiff->GetBinContent( i ) == 0 && hTimeDiff->GetBinContent( i - 1 ) == 0 && hTimeDiff->GetBinContent( i - 2 ) == 0 )
 		{
 			ix = hTimeDiff->GetBinCenter( i );
@@ -436,8 +436,8 @@ double VDeadTime::calculateDeadTimeFromTimeDifferences()
 		fDeadTimeFrac = 0.;
 	}
 	
-// get dead time dependent on time diff
-
+	// get dead time dependent on time diff
+	
 	int i_np = 0;
 	for( int i = 1; i <= hTimeDiff2D->GetNbinsX(); i++ )
 	{
@@ -595,7 +595,7 @@ void VDeadTime::writeHistograms()
 		hisList->Write();
 	}
 	
-// remove all objects created with new in this class
+	// remove all objects created with new in this class
 	hisList->Delete();
 	delete hisList;
 	hisList = 0;
@@ -622,8 +622,8 @@ bool VDeadTime::readHistograms( TDirectoryFile* iDir )
 	
 	cout << "\t reading dead time histograms from file " << iDir->GetPath() << endl;
 	
-// time difference histograms
-
+	// time difference histograms
+	
 	hTimeDiff = ( TH1D* )iDir->Get( "hTimeDiff_on" );
 	if( hTimeDiff )
 	{
@@ -655,7 +655,7 @@ bool VDeadTime::readHistograms( TDirectoryFile* iDir )
 		hisList->Add( hFTimeDiff );
 	}
 	
-// scalar histograms
+	// scalar histograms
 	hScalarClock = ( TH1D* )iDir->Get( "hScalarClock_on" );
 	if( hScalarClock )
 	{

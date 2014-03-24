@@ -32,7 +32,7 @@ using namespace std;
 class VLowGainCalibrator
 {
 
-//	private:
+		//	private:
 	public:
 	
 		enum status { GOOD, NO_POINTS, BAD_CHI2, NOT_PROPORTIONAL };
@@ -135,7 +135,7 @@ class VLowGainCalibrator
 		unsigned int fMaxDSTEvent;
 		
 		
-//	public:
+		//	public:
 		VLowGainCalibrator( int run, int sw, bool isInnerHigh, TString dir = "./", TString outdir = "" );
 		virtual ~VLowGainCalibrator();
 		

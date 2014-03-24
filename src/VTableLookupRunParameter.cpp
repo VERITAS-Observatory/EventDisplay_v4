@@ -65,16 +65,16 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 
 bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 {
-// check number of command line parameters
+	// check number of command line parameters
 	if( argc < 2 )
 	{
 		printHelp();
 		return false;
 	}
-// =============================================
-// reading command line parameters
-// =============================================
-// read command line parameters
+	// =============================================
+	// reading command line parameters
+	// =============================================
+	// read command line parameters
 	int i = 1;
 	while( i++ < argc )
 	{
@@ -145,7 +145,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "woff" ) < iTemp.size() )
 		{
 			fWobbleOffset = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-// wobble offset is given in float
+			// wobble offset is given in float
 			if( fWobbleOffset < 10 )
 			{
 				fWobbleOffset = ( int )( atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) * 1000 + 0.5 );
@@ -232,7 +232,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-mindistancetocameracenter" ) < iTemp.size() )
 		{
 			fMC_distance_to_cameracenter_min  = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-// looking at squared differences!!
+			// looking at squared differences!!
 			if( fMC_distance_to_cameracenter_min < 0. )
 			{
 				fMC_distance_to_cameracenter_min = 0.;
@@ -322,23 +322,23 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 			fMaxRunTime = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 	}
-// filling of tables requires Monte Carlo
+	// filling of tables requires Monte Carlo
 	if( readwrite == 'W' )
 	{
 		isMC = true;
 	}
-// =============================================
-// end of reading command line parameters
-// =============================================
-
-// require inputfile name
+	// =============================================
+	// end of reading command line parameters
+	// =============================================
+	
+	// require inputfile name
 	if( inputfile.size() == 0 )
 	{
 		cout << "error: no input file" << endl;
 		cout << "...exiting" << endl;
 		return false;
 	}
-// require table file
+	// require table file
 	if( tablefile.size() == 0 )
 	{
 		cout << "error: no lookup table file" << endl;
@@ -346,7 +346,7 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		return false;
 	}
 	
-// set output file name (mainly for VTS analysis with a single inputfile)
+	// set output file name (mainly for VTS analysis with a single inputfile)
 	if( outputfile.size() == 0 && inputfile.size() == 1 )
 	{
 		if( inputfile[0].find( "*" ) < inputfile[0].size() )

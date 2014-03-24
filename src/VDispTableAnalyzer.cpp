@@ -18,7 +18,7 @@ VDispTableAnalyzer::VDispTableAnalyzer( string iFile )
 	f_disp_PhiE = 0.;
 	f_disp_Miss = 0.;
 	
-// open file with disp tables
+	// open file with disp tables
 	fFile = new TFile( iFile.c_str() );
 	cout << "opening disp table file: " << fFile->GetName() << endl;
 	if( fFile->IsZombie() )
@@ -27,7 +27,7 @@ VDispTableAnalyzer::VDispTableAnalyzer( string iFile )
 		bZombie = true;
 		return;
 	}
-// read disp tables from file
+	// read disp tables from file
 	fData = ( VDispTableReader* )fFile->Get( "dispTable" );
 	if( !fData )
 	{
@@ -37,7 +37,7 @@ VDispTableAnalyzer::VDispTableAnalyzer( string iFile )
 	}
 	fData->initialize( true );
 	fData->print( false );
-// at this stage everything should be fine
+	// at this stage everything should be fine
 	bZombie = false;
 }
 
@@ -51,7 +51,7 @@ VDispTableAnalyzer::VDispTableAnalyzer( string iFile )
 */
 float VDispTableAnalyzer::evaluate( float iWidth, float iLength, float iSize, float iPedvar, float iZe, float iAz, bool b2D )
 {
-// get lower bound ze
+	// get lower bound ze
 	float i_ze_low = fData->getLowerZe( iZe );
 	
 	float disp_low      = calculateDisp( iWidth, iLength, iSize, iPedvar, i_ze_low, iAz, b2D );
@@ -60,7 +60,7 @@ float VDispTableAnalyzer::evaluate( float iWidth, float iLength, float iSize, fl
 	float disp_PhiE_low = f_disp_PhiE;
 	float disp_Miss_low = f_disp_Miss;
 	
-// get upper bound ze
+	// get upper bound ze
 	float i_ze_upp = fData->getUpperZe( iZe );
 	
 	float disp_upp      = calculateDisp( iWidth, iLength, iSize, iPedvar, i_ze_upp, iAz, b2D );
@@ -69,8 +69,8 @@ float VDispTableAnalyzer::evaluate( float iWidth, float iLength, float iSize, fl
 	float disp_PhiE_upp = f_disp_PhiE;
 	float disp_Miss_upp = f_disp_Miss;
 	
-// interpolate
-
+	// interpolate
+	
 	f_disp      = interpolate( disp_low, i_ze_low, disp_upp, i_ze_upp, iZe, true );
 	f_dispE     = interpolate( dispE_low, i_ze_low, dispE_upp, i_ze_upp, iZe, true );
 	f_disp_Phi  = interpolate( disp_Phi_low, i_ze_low, disp_Phi_upp, i_ze_upp, iZe, true );
@@ -83,19 +83,19 @@ float VDispTableAnalyzer::evaluate( float iWidth, float iLength, float iSize, fl
 
 double VDispTableAnalyzer::interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos )
 {
-// don't interpolate if one or two values are not valid
+	// don't interpolate if one or two values are not valid
 	if( w1 < -90. || w2 < -90. )
 	{
 		return -99.;
 	}
 	
-// same zenith angle, don't interpolate
+	// same zenith angle, don't interpolate
 	if( TMath::Abs( ze1 - ze2 ) < 1.e-3 )
 	{
 		return ( w1 + w2 ) / 2.;
 	}
 	
-// interpolate
+	// interpolate
 	double id, f1, f2;
 	if( iCos )
 	{
@@ -110,8 +110,8 @@ double VDispTableAnalyzer::interpolate( double w1, double ze1, double w2, double
 		f2 = 1. - ( ze  - ze2 ) / id;
 	}
 	
-// one of the values is not valid:
-// return valid value only when f1/f2 > 0.5 (this value is almost randomly chosen)
+	// one of the values is not valid:
+	// return valid value only when f1/f2 > 0.5 (this value is almost randomly chosen)
 	if( w1 > -90. && w2 < -90. )
 	{
 		if( f1 > 0.5 )
@@ -143,7 +143,7 @@ double VDispTableAnalyzer::interpolate( double w1, double ze1, double w2, double
 */
 float VDispTableAnalyzer::calculateDisp( float iWidth, float iLength, float iSize, float iPedvar, float iZe, float iAz, bool b2D )
 {
-// check for valid size
+	// check for valid size
 	if( iSize > 0. )
 	{
 		iSize = log10( iSize );
@@ -153,41 +153,41 @@ float VDispTableAnalyzer::calculateDisp( float iWidth, float iLength, float iSiz
 		return -99.;
 	}
 	
-// check for valid length
+	// check for valid length
 	float iWidthOLenght = -99.;
 	if( iLength > 0. )
 	{
 		iWidthOLenght = iWidth / iLength;
 	}
 	
-// get corresponding tree entry (ignore wobble offsets)
+	// get corresponding tree entry (ignore wobble offsets)
 	int iEntry = fData->getTreeEntryFinder( iZe, iAz, 0., iPedvar, 0 );
 	
-// reset parameter values
+	// reset parameter values
 	f_disp = 0.;
 	f_dispE = 1.e3;
 	f_disp_Phi = 0.;
 	f_disp_PhiE = 1.e3;
 	f_disp_Miss = 0.;
 	
-// read disp from tree
+	// read disp from tree
 	if( fData->getTree() )
 	{
 		if( iEntry <= fData->getTree()->GetEntries() )
 		{
 			fData->getTree()->GetEntry( iEntry );
 			
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// use width/length histograms
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// use width/length histograms
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			if( b2D )
 			{
 				if( fData->h2D_DispTable && fData->h2D_DispTableN )
 				{
-// find disp bin
+					// find disp bin
 					int x_bin = fData->h2D_DispTable->GetXaxis()->FindBin( iWidthOLenght );
 					int y_bin = fData->h2D_DispTable->GetYaxis()->FindBin( iSize );
-// require at least 5 events per bin
+					// require at least 5 events per bin
 					if( fData->h2D_DispTableN->GetBinContent( x_bin, y_bin ) > 5. )
 					{
 						f_disp = fData->h2D_DispTable->GetBinContent( x_bin, y_bin );
@@ -207,18 +207,18 @@ float VDispTableAnalyzer::calculateDisp( float iWidth, float iLength, float iSiz
 					cout << "VDispTableAnalyzer::evaluate: error no data histograms found" << endl;
 				}
 			}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// use width and length histograms
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// use width and length histograms
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			else
 			{
 				if( fData->h3D_DispTable && fData->h3D_DispTableN )
 				{
-// find disp bin
+					// find disp bin
 					int x_bin = fData->h3D_DispTable->GetXaxis()->FindBin( fData->scaleWidthParameter( iWidth ) );
 					int y_bin = fData->h3D_DispTable->GetYaxis()->FindBin( fData->scaleLengthParameter( iLength ) );
 					int z_bin = fData->h3D_DispTable->GetZaxis()->FindBin( iSize );
-// require at least 5 events per bin
+					// require at least 5 events per bin
 					if( fData->h3D_DispTableN->GetBinContent( x_bin, y_bin, z_bin ) > 5. )
 					{
 						f_disp = fData->h3D_DispTable->GetBinContent( x_bin, y_bin, z_bin );
@@ -293,7 +293,7 @@ void VDispTableAnalyzer::terminate()
 */
 void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< float > x, vector< float > y, vector< float > cosphi, vector< float > sinphi, vector< float > v_disp, vector< float > v_weight )
 {
-// check that vectors are of same size
+	// check that vectors are of same size
 	if( x.size() != v_disp.size() || x.size() != v_weight.size() )
 	{
 		cout << "VDispTableAnalyzer::calculateMeanDirection error: size error " << x.size() << "\t" << v_disp.size() << "\t" << v_weight.size() << endl;
@@ -302,8 +302,8 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
 		return;
 	}
 	
-// use first NTOT_MAX telescopes for event reconstruction only
-// (number of possible combinations is 2^NTOT_MAX )
+	// use first NTOT_MAX telescopes for event reconstruction only
+	// (number of possible combinations is 2^NTOT_MAX )
 	const unsigned int NTOT_MAX = 16;
 	unsigned int iNTel_max = x.size();
 	if( x.size() > NTOT_MAX )
@@ -311,30 +311,30 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
 		iNTel_max = NTOT_MAX;
 	}
 	
-// prepare bit mask to go through all possible combinations of sign for disp calculation
+	// prepare bit mask to go through all possible combinations of sign for disp calculation
 	vector< bitset< NTOT_MAX > > iComb;
 	for( unsigned int i = 0; i < TMath::Power( 2, ( Int_t )iNTel_max ); i++ )
 	{
 		iComb.push_back( i );
 	}
 	
-///////////////////////////////////////////////////
-// calculate RMS of direction
-///////////////////////////////////////////////////
-
+	///////////////////////////////////////////////////
+	// calculate RMS of direction
+	///////////////////////////////////////////////////
+	
 	float iSign = -1.;
 	vector< float > x_mean( iComb.size(), 0. );
 	vector< float > y_mean( iComb.size(), 0. );
 	vector< float > t_weight( iComb.size(), 0. );
 	vector< float > t_RMS( iComb.size(), 0. );
 	
-// loop over all possible binary combinations
+	// loop over all possible binary combinations
 	for( unsigned int i = 0; i < iComb.size(); i++ )
 	{
-// loop over data sample
+		// loop over data sample
 		for( unsigned int k = 0; k < iNTel_max; k++ )
 		{
-// calculate mean direction for this set of signs
+			// calculate mean direction for this set of signs
 			if( iComb[i][k] )
 			{
 				x_mean[i]   += ( x[k] + v_disp[k] * cosphi[k] ) * v_weight[k];
@@ -359,7 +359,7 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
 		}
 	}
 	
-// calculate RMS distance between mean value and each coordinate
+	// calculate RMS distance between mean value and each coordinate
 	for( unsigned int i = 0; i < x_mean.size(); i++ )
 	{
 		for( unsigned int k = 0; k < iNTel_max; k++ )
@@ -382,7 +382,7 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
 		t_RMS[i] *= t_weight[i];
 	}
 	
-// get values with smallest RMS -> return value
+	// get values with smallest RMS -> return value
 	float t_RMS_min = 1.e9;
 	int   t_RMS_bin = 0;
 	for( unsigned int i = 0; i < t_RMS.size(); i++ )
@@ -412,19 +412,19 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
 	xs = x_mean[t_RMS_bin];
 	ys = y_mean[t_RMS_bin];
 	
-// direction calculation is done now if number of images in this event is smaller than NTOT_MAX
+	// direction calculation is done now if number of images in this event is smaller than NTOT_MAX
 	if( x.size() < NTOT_MAX )
 	{
 		return;
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// NTEL > NTOT_MAX
-//
-////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// NTEL > NTOT_MAX
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	float ts = t_weight[t_RMS_bin];
 	
-// use remaining telescope in direction reconstruction
+	// use remaining telescope in direction reconstruction
 	float x1 = 0.;
 	float x2 = 0.;
 	float y1 = 0.;
@@ -435,7 +435,7 @@ void VDispTableAnalyzer::calculateMeanDirection( float& xs, float& ys, vector< f
 		y1 = y[k] - v_disp[k] * sinphi[k];
 		x2 = x[k] + v_disp[k] * cosphi[k];
 		y2 = y[k] + v_disp[k] * sinphi[k];
-// check which set of (x,y) points are closer to direction calculated earlier
+		// check which set of (x,y) points are closer to direction calculated earlier
 		if( sqrt( ( xs - x1 ) * ( xs - x1 ) + ( ys - y1 ) * ( ys - y1 ) ) < sqrt( ( xs - x2 ) * ( xs - x2 ) + ( ys - y2 ) * ( ys - y2 ) ) )
 		{
 			xs += x1 * v_weight[k];

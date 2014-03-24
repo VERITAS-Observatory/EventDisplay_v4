@@ -36,7 +36,7 @@ bool VEnergySpectrum::openDataFile( string iFile, int irun, bool iSourceTypeIsAs
 	fTotalRun = irun;
 	bAsciiDataFile = iSourceTypeIsAscii;
 	
-// open anasum file
+	// open anasum file
 	if( !bAsciiDataFile )
 	{
 		if( !openFile( iFile, fTotalRun ) )
@@ -86,21 +86,21 @@ void VEnergySpectrum::initializeRunVariables()
 	fAnalysisMinEnergy = 0.;
 	fAnalysisMaxEnergy = 1.e10;
 	
-// default values
+	// default values
 	setAddHistogramParameters();
 	setEnergyBinning();
 	setSignificanceParameters();
 	setEnergyThresholdDefinition();
 	setErrorCalculationMethod();
 	
-// set default fitting parameters
+	// set default fitting parameters
 	setSpectralFitFunction();
 	setSpectralFitFluxNormalisationEnergy();
 	setSpectralFitRangeLin();
 	setSpectralFitPlottingStyle();
 	
 	
-// set some plotting parameters
+	// set some plotting parameters
 	setPlottingSpectralWeightForBinCenter();
 	setEnergyInBinDefinition();
 	fPlottingCanvas = 0;
@@ -163,10 +163,10 @@ bool VEnergySpectrum::combineRuns()
 
 bool VEnergySpectrum::openAsciiFile( string iFile )
 {
-// assume that upper and lower errors are given
+	// assume that upper and lower errors are given
 	fErrorCalculationMethod = "UPDOWN";
 	
-// open ascii file
+	// open ascii file
 	ifstream is;
 	is.open( iFile.c_str(), ifstream::in );
 	if( !is )
@@ -181,13 +181,13 @@ bool VEnergySpectrum::openAsciiFile( string iFile )
 		{
 			continue;
 		}
-// comment
+		// comment
 		if( is_line.substr( 0, 1 ) == "*" )
 		{
 			continue;
 		}
 		
-// new data vector
+		// new data vector
 		VDifferentialFlux i_flux;
 		
 		istringstream is_stream( is_line );
@@ -216,7 +216,7 @@ bool VEnergySpectrum::openAsciiFile( string iFile )
 			i_flux.DifferentialFluxError = -99.;
 		}
 		
-// add this bin to data vector
+		// add this bin to data vector
 		fDifferentialFlux.push_back( i_flux );
 		
 	}
@@ -251,26 +251,26 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		cout << "VEnergySpectrum::combineRuns: not using rebinner" << endl;
 	}
 	
-// lin or log axis
+	// lin or log axis
 	bEnergyAxisLinear = bLinearX;
 	
-// check if runs are available and read run values from anasum file
+	// check if runs are available and read run values from anasum file
 	readRunList( runlist, fTotalRun );
 	
-// total observation time
+	// total observation time
 	fTotalObservationTime = 0.;
 	fTotalObservationTimeDeadTimeCorrected = 0.;
 	double i_obsTime = 0.;
-// total normalisation factor
+	// total normalisation factor
 	fTotalNormalisationFactor = 0.;
-// total number of off events
+	// total number of off events
 	double fTotalNOff = 0.;
 	
-// energy threshold calculator (see different definitions of energy thresholds)
+	// energy threshold calculator (see different definitions of energy thresholds)
 	VEnergyThreshold iEnergyThresholdCalculator( fEnergyThresholdFixedValue, fEnergyThresholdFileName );
 	
-///////////////////////////////////////////////////////////////////////
-// loop over all runs in run list
+	///////////////////////////////////////////////////////////////////////
+	// loop over all runs in run list
 	int z = 0;
 	string hname;
 	cout << "combining " << fRunList.size() << " runs" << endl;
@@ -282,7 +282,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 	double i_noffCounts_counter = 0.;
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
-// differential counting histogram 'on'
+		// differential counting histogram 'on'
 		if( bLinearX )
 		{
 			hname = "hLinerecCounts_on";
@@ -292,7 +292,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			hname = "herecCounts_on";
 		}
 		TH1D* i_hErecCountsOn = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms" );
-// differential counting histogram 'off'
+		// differential counting histogram 'off'
 		if( bLinearX )
 		{
 			hname = "hLinerecCounts_off";
@@ -302,7 +302,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			hname = "herecCounts_off";
 		}
 		TH1D* i_hErecCountOff = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms" );
-// histogram with systematic errors (same for on and off)
+		// histogram with systematic errors (same for on and off)
 		hname = "gMeanEnergySystematicError";
 		TGraphErrors* i_hEsys = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
 		if( fAnalysisEnergyThresholdDefinition == 1 && !i_hEsys )
@@ -310,7 +310,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			cout << "WARNING: histogram with systematic error in energy reconstruction not found";
 			cout << " (run " << fRunList[i].runnumber << ")" << endl;
 		}
-// get effective area
+		// get effective area
 		TH1* i_hEffAreaP = ( TH1* )getHistogram( "herecEffectiveArea_on-", fRunList[i].runnumber, "energyHistograms" );
 		TGraphErrors* i_gEff = 0;
 		VHistogramUtilities i_hisUtl;
@@ -318,15 +318,15 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		
 		if( fAnalysisEnergyThresholdDefinition == 2 && !i_gEff )
 		{
-// second choice: try to get off effective areas (might even have better statistics)
+			// second choice: try to get off effective areas (might even have better statistics)
 			hname = "gMeanEffectiveArea_off";
 			i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
 			if( !i_gEff )
 			{
-// third choice for backwards compatibility to v35x version
+				// third choice for backwards compatibility to v35x version
 				hname = "gMeanEffectiveAreaErec";
 				i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
-// fourth choice for backwards compatibility to v35x version
+				// fourth choice for backwards compatibility to v35x version
 				if( !i_gEff )
 				{
 					hname = "gMeanEffectiveAreaErec_off";
@@ -348,14 +348,14 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			cout << "histograms not found for run " << fRunList[i].runnumber << endl;
 			continue;
 		}
-// total number of signal and background event numbers
+		// total number of signal and background event numbers
 		i_nonCounts_counter  += i_hErecCountsOn->GetEntries();
 		i_noffCounts_counter += i_hErecCountOff->GetEntries();
 		
-/////////////////////////////////////////////////////
-// get energy threshold (may depend on ze, az, ...)
-// (for energy threshold definitions see VEnergyThreshold )
-/////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////
+		// get energy threshold (may depend on ze, az, ...)
+		// (for energy threshold definitions see VEnergyThreshold )
+		/////////////////////////////////////////////////////
 		if( fAnalysisEnergyThresholdDefinition == 0 )            // no energy threshold
 		{
 			fRunList[i].energyThreshold = 0.;
@@ -372,15 +372,15 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		{
 			fRunList[i].energyThreshold = iEnergyThresholdCalculator.getEnergy_fixedValue();
 		}
-// print run info
+		// print run info
 		if( fDebug == 1 )
 		{
 			fRunList[i].print();
 		}
 		
-/////////////////////////////////////////////////////
-// rebin energy spectra according to user input
-/////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////
+		// rebin energy spectra according to user input
+		/////////////////////////////////////////////////////
 		if( bUseRebinner && nRebinner == 0 && newBinningGroupings.size() > 0 )
 		{
 			setOriginalBinner( i_hErecCountsOn );
@@ -388,10 +388,10 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		
 		rebinEnergySpectrum( i_hErecCountsOn, fAnalysisEnergyBinning, bLinearX );
 		rebinEnergySpectrum( i_hErecCountOff, fAnalysisEnergyBinning, bLinearX );
-// clone first histogram and make summary histogram
+		// clone first histogram and make summary histogram
 		if( z == 0 )
 		{
-// differential counting histogram 'on'
+			// differential counting histogram 'on'
 			if( bLinearX )
 			{
 				hname = "hLinerecCounts_on";
@@ -404,7 +404,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			rebinEnergySpectrum( hErecCountsOn, fAnalysisEnergyBinning, bLinearX );
 			hErecCountsOn->Reset();
 			hErecCountsOn->SetEntries( 0 );
-// differential counting histogram 'off'
+			// differential counting histogram 'off'
 			if( bLinearX )
 			{
 				hname = "hLinerecCounts_off";
@@ -417,7 +417,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			rebinEnergySpectrum( hErecCountsOff, fAnalysisEnergyBinning, bLinearX );
 			hErecCountsOff->Reset();
 			hErecCountsOff->SetEntries( 0 );
-// histogram with total observation time
+			// histogram with total observation time
 			if( bLinearX )
 			{
 				hname = "hLinerecTotalTime";
@@ -430,7 +430,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			rebinEnergySpectrum( hErecTotalTime, fAnalysisEnergyBinning, bLinearX );
 			hErecTotalTime->Reset();
 			hErecTotalTime->SetEntries( 0 );
-// histogram with total observation time
+			// histogram with total observation time
 			if( bLinearX )
 			{
 				hname = "hLinerecTotalTimeDeadTimeCorrected";
@@ -443,7 +443,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			rebinEnergySpectrum( hErecTotalTimeDeadTimeCorrected, fAnalysisEnergyBinning, bLinearX );
 			hErecTotalTimeDeadTimeCorrected->Reset();
 			hErecTotalTimeDeadTimeCorrected->SetEntries( 0 );
-// histogram with mean effective area
+			// histogram with mean effective area
 			if( bLinearX )
 			{
 				hname = "hLinEffArea";
@@ -460,27 +460,27 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			}
 		}
 		
-/////////////////////////////////////////////////
-// combine histograms
-/////////////////////////////////////////////////
-
-// observation time (note: already corrected for dead time)
+		/////////////////////////////////////////////////
+		// combine histograms
+		/////////////////////////////////////////////////
+		
+		// observation time (note: already corrected for dead time)
 		i_obsTime = fRunList[i].tOn;
-// calculate total observation time (take the energy threshold into account)
+		// calculate total observation time (take the energy threshold into account)
 		addValueToHistogram( hErecTotalTime, i_obsTime, fRunList[i].energyThreshold, bLinearX );
 		fTotalObservationTime += i_obsTime;
 		addValueToHistogram( hErecTotalTimeDeadTimeCorrected, i_obsTime * fRunList[i].deadTimeFraction, fRunList[i].energyThreshold, bLinearX );
 		fTotalObservationTimeDeadTimeCorrected += i_obsTime * fRunList[i].deadTimeFraction;
-// add current histogram to combined histogram (take energy threshold into account)
-// (counting histograms are not dead time corrected)
+		// add current histogram to combined histogram (take energy threshold into account)
+		// (counting histograms are not dead time corrected)
 		addHistogram( hErecCountsOn, i_hErecCountsOn, fRunList[i].energyThreshold, bLinearX );
 		addHistogram( hErecCountsOff, i_hErecCountOff, fRunList[i].energyThreshold, bLinearX );
 		
-// calculation of mean normalisation factor
+		// calculation of mean normalisation factor
 		fTotalNormalisationFactor += fRunList[i].NOff * fRunList[i].alpha;
 		fTotalNOff += fRunList[i].NOff;
 		
-// calculation of mean effective area (weighted by observation time)
+		// calculation of mean effective area (weighted by observation time)
 		addValueToHistogram( hEffArea, i_gEff, i_obsTime, fRunList[i].energyThreshold, bLinearX );
 		
 		z++;
@@ -495,10 +495,10 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		cout << "COUNTING HISTOGRAMS (total) after rebinning: ";
 		cout << hErecCountsOn->GetEntries() << "\t" << hErecCountsOff->GetEntries() << endl;
 	}
-// normalize effective area
+	// normalize effective area
 	hEffArea->Divide( hErecTotalTime );
 	
-// calculate weighted mean normalisation factor
+	// calculate weighted mean normalisation factor
 	if( fTotalNOff > 0. )
 	{
 		fTotalNormalisationFactor /= fTotalNOff;
@@ -628,7 +628,7 @@ void VEnergySpectrum::addValueToHistogram( TH1* h, double iTObs, double iEThresh
 		return;
 	}
 	
-// log energy axis
+	// log energy axis
 	if( !bLinearX && iEThreshold > 0. )
 	{
 		iEThreshold = log10( iEThreshold );
@@ -671,7 +671,7 @@ void VEnergySpectrum::addValueToHistogram( TH1* h, TGraph* g, double iTObs, doub
 		return;
 	}
 	
-// log energy axis
+	// log energy axis
 	if( !bLinearX && iEThreshold > 0. )
 	{
 		iEThreshold = log10( iEThreshold );
@@ -736,7 +736,7 @@ void VEnergySpectrum::addHistogram( TH1* h1, TH1* h2, double iEThreshold, bool b
 		
 		for( int i = 0; i <= h2->GetNbinsX(); i++ )
 		{
-// (default)
+			// (default)
 			if( !fAnalysisHistogramAddingUseLowEdge && h2->GetBinLowEdge( i ) < iEThreshold )
 			{
 				h2->SetBinContent( i, 0. );
@@ -765,10 +765,10 @@ void VEnergySpectrum::rebinEnergySpectrum( TH1D* h, double iER, bool bLinearX )
 		return;
 	}
 	
-// histogram name
+	// histogram name
 	string itemp = h->GetName();
 	
-// get current binning of energy axis
+	// get current binning of energy axis
 	double iBW = h->GetXaxis()->GetBinWidth( 1 );
 	if( iBW - iER > 1.e-5 && !bUseRebinner )
 	{
@@ -805,7 +805,7 @@ void VEnergySpectrum::rebinEnergySpectrum( TH1D* h, double iER, bool bLinearX )
 	}
 	
 	
-// counting and timing histograms are simply rebinned
+	// counting and timing histograms are simply rebinned
 	if( itemp.find( "Counts" ) < itemp.size() || itemp.find( "TotalTime" ) < itemp.size() )
 	{
 		if( bUseRebinner )
@@ -842,12 +842,12 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 		cout << "VEnergySpectrum::calculateDifferentialFluxes() " << hErecCountsOn->GetNbinsX() << endl;
 	}
 	
-// reset data vector
+	// reset data vector
 	fDifferentialFlux.clear();
 	
 	double x = 0.;
 	
-// keep track of on/off events and lost events
+	// keep track of on/off events and lost events
 	double i_non = 0.;
 	double i_noff = 0.;
 	double i_non_cuts = 0.;
@@ -860,19 +860,19 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 		i_noff_lost[i] = 0.;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////
-// loop over all bins in energy spectrum energy spectrum
+	///////////////////////////////////////////////////////////////////////////////////////
+	// loop over all bins in energy spectrum energy spectrum
 	if( fDebug >= 2 )
 	{
 		cout << "VEnergySpectrum::calculateDifferentialFluxes(): starting loop over herec bins: " << hErecCountsOn->GetNbinsX() << endl;
 	}
 	for( int i = 1; i <= hErecCountsOn->GetNbinsX(); i++ )
 	{
-// sum up number of on and off events
+		// sum up number of on and off events
 		i_non  += hErecCountsOn->GetBinContent( i );
 		i_noff += hErecCountsOff->GetBinContent( i );
 		
-// debug output
+		// debug output
 		if( fDebug == 3 )
 		{
 			cout << setprecision( 3 );
@@ -883,9 +883,9 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			cout << "\thOff " << hErecCountsOff->GetBinCenter( i ) << "\t" << hErecCountsOff->GetBinContent( i );
 			cout << "\t" << i_noff << endl;
 		}
-/////////////////////////////////////////////////
-// remove points outside wanted energy bin
-// (lower limit)
+		/////////////////////////////////////////////////
+		// remove points outside wanted energy bin
+		// (lower limit)
 		if( fAnalysisMinEnergy > 0. && hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) <= log10( fAnalysisMinEnergy ) )
 		{
 			i_non_lost[0]  += hErecCountsOn->GetBinContent( i );
@@ -899,7 +899,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			}
 			continue;
 		}
-// (upper limit)
+		// (upper limit)
 		if( fAnalysisMaxEnergy > 0. && hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) > log10( fAnalysisMaxEnergy ) )
 		{
 			i_non_lost[1]  += hErecCountsOn->GetBinContent( i );
@@ -913,8 +913,8 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			}
 			continue;
 		}
-/////////////////////////////////////////////////
-// remove points with no counts at all
+		/////////////////////////////////////////////////
+		// remove points with no counts at all
 		if( hErecCountsOn->GetBinContent( i ) < 0. || hErecCountsOff->GetBinContent( i ) < 0. )
 		{
 			i_non_lost[2]  += hErecCountsOn->GetBinContent( i );
@@ -927,8 +927,8 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			continue;
 		}
 		
-/////////////////////////////////////////////////
-// remove points with no normalisation factor
+		/////////////////////////////////////////////////
+		// remove points with no normalisation factor
 		if( fTotalNormalisationFactor <= 0. )
 		{
 			i_non_lost[3]  += hErecCountsOn->GetBinContent( i );
@@ -941,11 +941,11 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			}
 			continue;
 		}
-/////////////////////////////////////////////////
-// new data vector
+		/////////////////////////////////////////////////
+		// new data vector
 		VDifferentialFlux i_flux;
 		
-// energy (mean point of a log10 bin)
+		// energy (mean point of a log10 bin)
 		x = hErecCountsOn->GetXaxis()->GetBinCenter( i );
 		
 		if( !bEnergyAxisLinear )
@@ -956,7 +956,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 		{
 			i_flux.Energy = x;
 		}
-// lower and upper edge of energy bin
+		// lower and upper edge of energy bin
 		if( !bEnergyAxisLinear )
 		{
 			i_flux.Energy_lowEdge = TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) );
@@ -967,7 +967,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			i_flux.Energy_lowEdge = hErecCountsOn->GetXaxis()->GetBinLowEdge( i );
 			i_flux.Energy_upEdge  = hErecCountsOn->GetXaxis()->GetBinUpEdge( i );
 		}
-// adjust energy (e.g. to spectral weighted bin value)
+		// adjust energy (e.g. to spectral weighted bin value)
 		double x = VMathsandFunctions::getMeanEnergyInBin( fEnergyInBinDefinition, hErecCountsOn->GetXaxis()->GetBinLowEdge( i ),
 				   hErecCountsOn->GetXaxis()->GetBinUpEdge( i ), fPlottingSpectralWeightForBinCenter );
 		if( fEnergyInBinDefinition > 90 )
@@ -993,7 +993,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			i_flux.EnergyWeightedMean = x;
 		}
 		
-// energy intervall dE
+		// energy intervall dE
 		if( bEnergyAxisLinear )
 		{
 			i_flux.dE = hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) - hErecCountsOn->GetXaxis()->GetBinLowEdge( i );
@@ -1003,7 +1003,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			i_flux.dE = TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinUpEdge( i ) ) - TMath::Power( 10., hErecCountsOn->GetXaxis()->GetBinLowEdge( i ) );
 		}
 		
-// get on and off numbers for this bin
+		// get on and off numbers for this bin
 		i_flux.NOn        = hErecCountsOn->GetBinContent( i );
 		i_flux.NOn_error  = sqrt( i_flux.NOn );
 		i_non_cuts       += i_flux.NOn;
@@ -1016,7 +1016,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			cout << "\t\t total counts in bin after cuts: " << i << "\t" << i_non_cuts << "\t" << i_noff_cuts << endl;
 		}
 		i_flux.NOff_alpha = fTotalNormalisationFactor;
-// remove all empty bins
+		// remove all empty bins
 		if( i_flux.NOn == 0 && i_flux.NOff == 0 )
 		{
 			if( fDebug == 3 )
@@ -1025,7 +1025,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			}
 			continue;
 		}
-// observation time
+		// observation time
 		i_flux.ObsTime = hErecTotalTimeDeadTimeCorrected->GetBinContent( i );
 		if( i_flux.ObsTime < 1.e-5 )
 		{
@@ -1036,22 +1036,22 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			continue;
 		}
 		
-// calculate significance (using Li&Ma, note: event number might be too low here for Li & Ma)
+		// calculate significance (using Li&Ma, note: event number might be too low here for Li & Ma)
 		i_flux.Significance = VStatistics::calcSignificance( i_flux.NOn, i_flux.NOff, fTotalNormalisationFactor, fAnalysisLiAndMaEquation );
 		
-// check that if this bin is significant using Rolke et al method
+		// check that if this bin is significant using Rolke et al method
 		TRolke i_Rolke;
 		i_Rolke.SetCLSigmas( fAnalysisSignificance );
 		i_Rolke.SetPoissonBkgKnownEff( ( int )i_flux.NOn, ( int )i_flux.NOff, 1. / fTotalNormalisationFactor, 1. );
 		
-///////////////////////////////////////////////////////////////
-// calculate flux (check first that this is a significant bin)
-///////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////
+		// calculate flux (check first that this is a significant bin)
+		///////////////////////////////////////////////////////////////
 		if( ( ( fErrorCalculationMethod == "Rolke" && i_Rolke.GetLowerLimit() > 0 )
 				|| ( fErrorCalculationMethod == "Poisson" && i_flux.Significance > fAnalysisSignificance ) )
 				&& i_flux.NOn > fAnalysisMinEvents )
 		{
-// calculate flux and Poissonian flux error from event numbers
+			// calculate flux and Poissonian flux error from event numbers
 			double i_ndiff = i_flux.NOn - i_flux.NOff * fTotalNormalisationFactor;
 			i_flux.DifferentialFlux  = i_ndiff;
 			i_flux.DifferentialFlux /= i_flux.dE;
@@ -1064,30 +1064,30 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			{
 				continue;
 			}
-// calculate asymmetric flux errors using TRolke
+			// calculate asymmetric flux errors using TRolke
 			i_Rolke.SetCLSigmas( 1. );
 			if( i_ndiff != 0. )
 			{
 				i_flux.DifferentialFluxError_low = ( i_ndiff - ( double )i_Rolke.GetLowerLimit() ) * i_flux.DifferentialFlux / i_ndiff;
 				i_flux.DifferentialFluxError_up  = ( ( double )i_Rolke.GetUpperLimit() - i_ndiff ) * i_flux.DifferentialFlux  / i_ndiff;
-// recalculate poissonian flux error
+				// recalculate poissonian flux error
 				i_flux.DifferentialFluxError =  sqrt( i_flux.NOn + fTotalNormalisationFactor * fTotalNormalisationFactor * i_flux.NOff )
 												* i_flux.DifferentialFlux / i_ndiff;
 			}
-// that probably does not make sense
+			// that probably does not make sense
 			else
 			{
 				cout << "SHOULD NOT BE HERE XXXX" << endl;
 			}
 		}
-///////////////////////////////
-// calculate upper flux limit
-///////////////////////////////////////
+		///////////////////////////////
+		// calculate upper flux limit
+		///////////////////////////////////////
 		else
 		{
 			i_flux.DifferentialFlux = VStatistics::calcUpperLimit( i_flux.NOn, i_flux.NOff, fTotalNormalisationFactor,
 									  fAnalysisUpperLimits, fAnalysisUpperLimitAlgorithm );
-// scale  upper flux to right value
+			// scale  upper flux to right value
 			if( i_flux.DifferentialFlux > 0. && hEffArea )
 			{
 				if( i_flux.dE > 0. && i_flux.ObsTime > 0. && hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) > 0. )
@@ -1101,14 +1101,14 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			{
 				i_flux.DifferentialFlux = -1.e99;
 			}
-// flux error is negativ for upper flux value
+			// flux error is negativ for upper flux value
 			i_flux.DifferentialFluxError = -1.;
 		}
 		i_flux.fillEvent( fRunList_MJD_min, fRunList_MJD_max );
-// add this bin to data vector
+		// add this bin to data vector
 		fDifferentialFlux.push_back( i_flux );
 		
-// debug output
+		// debug output
 		if( fDebug >= 2 )
 		{
 			cout << setprecision( 8 ) << "E " << i_flux.Energy_lowEdge << " - " << i_flux.Energy_upEdge;
@@ -1125,8 +1125,8 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			cout << endl;
 		}
 	}  // end of loop over all energy bins
-///////////////////////////////////////////
-
+	///////////////////////////////////////////
+	
 	if( fDebug >= 2 )
 	{
 		cout << "total events " << fixed << setprecision( 8 ) << i_non << " " << i_noff;
@@ -1165,16 +1165,16 @@ TCanvas* VEnergySpectrum::plot( TCanvas* c )
 		return 0;
 	}
 	
-// combine historgram of energy spectra from all the runs in the current run lists (herec)
+	// combine historgram of energy spectra from all the runs in the current run lists (herec)
 	if( !bCombineRuns )
 	{
 		combineRuns();
 	}
-// calculate differential fluxes (taking significance parameters into account); some bins might be upper limit
+	// calculate differential fluxes (taking significance parameters into account); some bins might be upper limit
 	calculateDifferentialFluxes();
 	
 	TH1D* hNull = 0;
-// setup canvas for plotting
+	// setup canvas for plotting
 	if( c == 0 )
 	{
 		char hname[600];
@@ -1192,7 +1192,7 @@ TCanvas* VEnergySpectrum::plot( TCanvas* c )
 		hNull->SetMaximum( fPlottingYaxisMax );
 		hNull->SetStats( 0 );
 		hNull->SetXTitle( "log_{10} energy [TeV]" );
-// y-axis: taking multiplication by E^fPlottingMultiplierIndex into account
+		// y-axis: taking multiplication by E^fPlottingMultiplierIndex into account
 		hNull->SetYTitle( "dN/dE [cm^{-2}s^{-1}TeV^{-1}]" );
 		if( fPlottingMultiplierIndex > 1. )
 		{
@@ -1201,13 +1201,13 @@ TCanvas* VEnergySpectrum::plot( TCanvas* c )
 		}
 		hNull->GetYaxis()->SetTitleOffset( 1.6 );
 		
-// plot an empty histogram with the right axes
+		// plot an empty histogram with the right axes
 		plot_nullHistogram( c, hNull, fPlottingLogEnergyAxis, true, hNull->GetYaxis()->GetTitleOffset(), fPlottingMinEnergy, fPlottingMaxEnergy );
 		c->SetLogy( 1 );
 	}
 	c->cd();
 	
-// plot the spectral energy points
+	// plot the spectral energy points
 	plot_energySpectrum();
 	
 	fPlottingCanvas = c;
@@ -1226,17 +1226,17 @@ TCanvas* VEnergySpectrum::plot( TCanvas* c )
 */
 TGraphAsymmErrors* VEnergySpectrum::plot_energySpectrum()
 {
-// expect that vector with differential fluxes is filled
+	// expect that vector with differential fluxes is filled
 	if( fDifferentialFlux.size() == 0 )
 	{
 		return 0;
 	}
 	
-// loop over vector with differential fluxes and plot fluxes or upper flux limits
+	// loop over vector with differential fluxes and plot fluxes or upper flux limits
 	for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
 	{
-// upper flux limits
-// (plot as arrows)
+		// upper flux limits
+		// (plot as arrows)
 		if( fDifferentialFlux[i].DifferentialFluxError < 0. && fPlottingUpperLimits )
 		{
 			if( fDifferentialFlux[i].DifferentialFlux > fPlottingYaxisMin && fDifferentialFlux[i].DifferentialFlux < fPlottingYaxisMax )
@@ -1251,7 +1251,7 @@ TGraphAsymmErrors* VEnergySpectrum::plot_energySpectrum()
 			}
 		}
 	}
-// graph with differential flux points
+	// graph with differential flux points
 	gEnergySpectrum = getEnergySpectrumGraph();
 	if( gEnergySpectrum )
 	{
@@ -1259,7 +1259,7 @@ TGraphAsymmErrors* VEnergySpectrum::plot_energySpectrum()
 		return gEnergySpectrum;
 	}
 	
-// not successful (!)
+	// not successful (!)
 	return 0;
 }
 
@@ -1274,14 +1274,14 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
 	
 	for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
 	{
-// differential flux error <0:  this is an upper flux limit; ignore
+		// differential flux error <0:  this is an upper flux limit; ignore
 		if( fDifferentialFlux[i].DifferentialFluxError < 0. )
 		{
 			continue;
 		}
 		
-// first point: create graph with spectral energies
-// (isn't there a delete missing?)
+		// first point: create graph with spectral energies
+		// (isn't there a delete missing?)
 		if( z == 0 )
 		{
 			gEnergySpectrum = new TGraphAsymmErrors( 1 );
@@ -1290,10 +1290,10 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
 			gEnergySpectrum->SetMarkerSize( fPlottingMarkerSize );
 			gEnergySpectrum->SetMarkerStyle( fPlottingMarkerStyle );
 		}
-// error on flux
+		// error on flux
 		gEnergySpectrum->SetPoint( z, log10( fDifferentialFlux[i].EnergyWeightedMean ),
 								   fDifferentialFlux[i].DifferentialFlux * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
-// error on differential flux
+		// error on differential flux
 		if( fErrorCalculationMethod == "Poisson" )
 		{
 			gEnergySpectrum->SetPointEYhigh( z, fDifferentialFlux[i].DifferentialFluxError * TMath::Power( fDifferentialFlux[i].Energy, fPlottingMultiplierIndex ) );
@@ -1307,13 +1307,13 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
 		z++;
 	}
 	gEnergySpectrum->Print();
-// return graph
+	// return graph
 	if( z > 0 )
 	{
 		return gEnergySpectrum;
 	}
 	
-// not successful (!)
+	// not successful (!)
 	return 0;
 }
 
@@ -1330,37 +1330,37 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
 */
 TF1* VEnergySpectrum::fitEnergySpectrum( string iname, bool bDraw )
 {
-// new fitter
-// (delete missing?)
+	// new fitter
+	// (delete missing?)
 	fSpectralFitter = new VSpectralFitter( iname );
-// set fit function (see IDs in function comments)
+	// set fit function (see IDs in function comments)
 	fSpectralFitter->setSpectralFitFunction( fSpectralFitFunction );
-// all energies in TeV
+	// all energies in TeV
 	fSpectralFitter->setSpectralFitFluxNormalisationEnergy( fSpectralFitFluxNormalisationEnergy );
 	fSpectralFitter->setSpectralFitRangeLin( fSpectralFitEnergy_min, fSpectralFitEnergy_max );
 	fSpectralFitter->setPlottingStyle( fPlottingEnergySpectrumFitLineColor, fPlottingEnergySpectrumFitLineStyle, fPlottingEnergySpectrumFitLineWidth );
 	
-// get energy spectrum
+	// get energy spectrum
 	gEnergySpectrum = getEnergySpectrumGraph();
 	if( gEnergySpectrum )
 	{
-// perform the fit
+		// perform the fit
 		TF1* f = fSpectralFitter->fit( gEnergySpectrum );
 		if( f )
 		{
-// draw everything
+			// draw everything
 			if( bDraw )
 			{
 				f->Draw( "same" );
 			}
-// print results
+			// print results
 			fSpectralFitter->print();
-// return pointer to fit function
+			// return pointer to fit function
 			return f;
 		}
 	}
 	
-// not successful (!)
+	// not successful (!)
 	return 0;
 }
 
@@ -1417,21 +1417,21 @@ void VEnergySpectrum::plotFitValues()
 	tL1->SetTextSize( 0.030 );
 	tL1->DrawLatex( 0.18, 0.23, hname );
 	TLatex* tL2 = new TLatex();
-// get exponent (assume negativ exponent)
+	// get exponent (assume negativ exponent)
 	int i_expV = ( int )( TMath::Log10( fEnergy->GetParameter( 0 ) ) - 0.5 );
-// get mantissa
+	// get mantissa
 	double i_manV = fEnergy->GetParameter( 0 ) * TMath::Power( 10, -1.*( double )i_expV );
 	double i_manE = fEnergy->GetParError( 0 ) * TMath::Power( 10, -1.*( double )i_expV );
-// get spectral index
+	// get spectral index
 	double i_indexV = fEnergy->GetParameter( 1 ) - fPlottingMultiplierIndex;
 	double i_indexE = fEnergy->GetParError( 1 );
-// cutoff energy
+	// cutoff energy
 	double i_ecutoffV;
 	double i_ecutoffE;
-// curvature index
+	// curvature index
 	double i_curvatureV;
 	double i_curvatureE;
-// break energy and second slope for a BPL fit
+	// break energy and second slope for a BPL fit
 	double i_breakenergyV;
 	double i_breakenergyE;
 	double i_index2V;
@@ -1633,7 +1633,7 @@ TCanvas*  VEnergySpectrum::plotCountingHistograms( TCanvas* c )
 	hErecCountsOff_Clone->Scale( fTotalNormalisationFactor );
 	hErecCountsOff_Clone->Draw( "same" );
 	
-// get counting values used for energy reconstruction
+	// get counting values used for energy reconstruction
 	TGraph* gErecOn = new TGraph( 1 );
 	gErecOn->SetMarkerStyle( 24 );
 	gErecOn->SetMarkerColor( 1 );
@@ -1672,7 +1672,7 @@ TCanvas* VEnergySpectrum::plotLifeTimevsEnergy( TCanvas* c )
 		return 0;
 	}
 	
-// total time (not deadtime corrected)
+	// total time (not deadtime corrected)
 	TH1D* h = ( TH1D* )getTotalTimeHistogram( false )->Clone();
 	h->Scale( 1. / 60. );                         //! s -> min
 	h->SetFillColor( 9 );
@@ -1704,7 +1704,7 @@ TCanvas* VEnergySpectrum::plotLifeTimevsEnergy( TCanvas* c )
 	
 	h->Draw( "same" );
 	
-// total time (deadtime corrected)
+	// total time (deadtime corrected)
 	if( getTotalTimeHistogram( true ) )
 	{
 		TH1D* h = ( TH1D* )getTotalTimeHistogram( true )->Clone();
@@ -1737,7 +1737,7 @@ void VEnergySpectrum::plotEventNumbers( Double_t ts )
 				 fDifferentialFlux[i].Significance );
 				 
 		double y  = ( fDifferentialFlux[i].DifferentialFlux + fDifferentialFlux[i].DifferentialFluxError ) * 1.75;
-// upper flux limit
+		// upper flux limit
 		if( fDifferentialFlux[i].DifferentialFluxError < 0. )
 		{
 			y = fDifferentialFlux[i].DifferentialFlux * 1.75;
@@ -1864,8 +1864,8 @@ bool VEnergySpectrum::setErrorCalculationMethod( string iMethod )
 */
 int VEnergySpectrum::getRebinningGrouping( TH1* h, double iNewBinWidth )
 {
-// get current binning of energy axis
-// (assume all bins are the same: is this ok?)
+	// get current binning of energy axis
+	// (assume all bins are the same: is this ok?)
 	double iBW = h->GetXaxis()->GetBinWidth( 1 );
 	if( iBW - iNewBinWidth > 1.e-5 && !bUseRebinner )
 	{
@@ -1893,13 +1893,13 @@ int VEnergySpectrum::getRebinningGrouping( TH1* h, double iNewBinWidth )
 */
 TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierIndex, double i_FitStart_TevLin, double i_FitStop_TeVLin, double i_EnergyBinningLog10 )
 {
-// binning and statistics
+	// binning and statistics
 	setEnergyBinning( i_EnergyBinningLog10 );
 	setEnergyRangeLinear( 0.10, 500. );
 	setSignificanceParameters( 3., 5. );
 	setPlottingMultiplierIndex( iPlottingMultiplierIndex );
 	
-// plotting
+	// plotting
 	setPlottingEnergyRangeLinear( 0.08, 50. );
 	setPlottingYaxis( 1e-15, 1.e-6 );
 	if( iPlottingMultiplierIndex > 2. )
@@ -1907,7 +1907,7 @@ TCanvas* VEnergySpectrum::plotCrabNebulaSpectrum( double iPlottingMultiplierInde
 		setPlottingYaxis( 9.e-12, 2.e-10 );
 	}
 	
-// plot & fit
+	// plot & fit
 	TCanvas* c = plot();
 	
 	setSpectralFitFluxNormalisationEnergy( 1. );

@@ -20,7 +20,7 @@ class CRunSummary : public TObject
 		
 		unsigned int    fCVersion;
 		
-// Declaration of leave types
+		// Declaration of leave types
 		Int_t           runOn;
 		Int_t           runOff;
 		Double_t        MJDOn;
@@ -63,7 +63,7 @@ class CRunSummary : public TObject
 		Double_t        MaxSigniX;
 		Double_t        MaxSigniY;
 		
-// List of branches
+		// List of branches
 		TBranch*        b_runOn;                  //!
 		TBranch*        b_runOff;                 //!
 		TBranch*        b_MJDOn;                  //!
@@ -125,8 +125,8 @@ class CRunSummary : public TObject
 CRunSummary::CRunSummary( TTree* tree )
 {
 	fCVersion = 340;
-// if parameter tree is not specified (or zero), connect the file
-// used to generate this class and read the Tree.
+	// if parameter tree is not specified (or zero), connect the file
+	// used to generate this class and read the Tree.
 	if( tree == 0 )
 	{
 		TFile* f = ( TFile* )gROOT->GetListOfFiles()->FindObject( "output.root" );
@@ -154,7 +154,7 @@ CRunSummary::~CRunSummary()
 
 Int_t CRunSummary::GetEntry( Long64_t entry )
 {
-// Read contents of entry.
+	// Read contents of entry.
 	if( !fChain )
 	{
 		return 0;
@@ -165,7 +165,7 @@ Int_t CRunSummary::GetEntry( Long64_t entry )
 
 Long64_t CRunSummary::LoadTree( Long64_t entry )
 {
-// Set the environment to read one entry
+	// Set the environment to read one entry
 	if( !fChain )
 	{
 		return -5;
@@ -191,13 +191,13 @@ Long64_t CRunSummary::LoadTree( Long64_t entry )
 
 void CRunSummary::Init( TTree* tree )
 {
-// The Init() function is called when the selector needs to initialize
-// a new tree or chain. Typically here the branch addresses of the tree
-// will be set. It is normaly not necessary to make changes to the
-// generated code, but the routine can be extended by the user if needed.
-// Init() will be called many times when running with PROOF.
-
-// Set branch addresses
+	// The Init() function is called when the selector needs to initialize
+	// a new tree or chain. Typically here the branch addresses of the tree
+	// will be set. It is normaly not necessary to make changes to the
+	// generated code, but the routine can be extended by the user if needed.
+	// Init() will be called many times when running with PROOF.
+	
+	// Set branch addresses
 	if( tree == 0 )
 	{
 		return;
@@ -236,7 +236,7 @@ void CRunSummary::Init( TTree* tree )
 		fChain->SetBranchAddress( "pedvarsOn", &pedvarsOn );
 		fChain->SetBranchAddress( "pedvarsOff", &pedvarsOff );
 	}
-// no pedvars given, assume galactic source
+	// no pedvars given, assume galactic source
 	else
 	{
 		fCVersion = 300;
@@ -263,14 +263,14 @@ void CRunSummary::Init( TTree* tree )
 
 Bool_t CRunSummary::Notify()
 {
-// The Notify() function is called when a new file is opened. This
-// can be either for a new TTree in a TChain or when when a new TTree
-// is started when using PROOF. Typically here the branch pointers
-// will be retrieved. It is normaly not necessary to make changes
-// to the generated code, but the routine can be extended by the
-// user if needed.
-
-// Get branch pointers
+	// The Notify() function is called when a new file is opened. This
+	// can be either for a new TTree in a TChain or when when a new TTree
+	// is started when using PROOF. Typically here the branch pointers
+	// will be retrieved. It is normaly not necessary to make changes
+	// to the generated code, but the routine can be extended by the
+	// user if needed.
+	
+	// Get branch pointers
 	b_runOn = fChain->GetBranch( "runOn" );
 	b_runOff = fChain->GetBranch( "runOff" );
 	b_MJDOn = fChain->GetBranch( "MJDOn" );
@@ -327,8 +327,8 @@ Bool_t CRunSummary::Notify()
 
 void CRunSummary::Show( Long64_t entry )
 {
-// Print contents of entry.
-// If entry is not specified, print current entry
+	// Print contents of entry.
+	// If entry is not specified, print current entry
 	if( !fChain )
 	{
 		return;
@@ -340,9 +340,9 @@ void CRunSummary::Show( Long64_t entry )
 Int_t CRunSummary::Cut( Long64_t entry )
 {
 	entry = 0;
-// This function may be called from Loop.
-// returns  1 if entry is accepted.
-// returns -1 otherwise.
+	// This function may be called from Loop.
+	// returns  1 if entry is accepted.
+	// returns -1 otherwise.
 	return 1;
 }
 #endif                                            // #ifdef CRunSummary_cxx

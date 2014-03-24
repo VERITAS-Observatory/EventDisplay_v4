@@ -51,8 +51,8 @@ int main( int argc, char* argv[] )
 	cout << "-----------------------------" << endl;
 	cout << endl;
 	
-/////////////////////////////////////////////////////////////////
-// read command line parameters
+	/////////////////////////////////////////////////////////////////
+	// read command line parameters
 	if( argc != 3 )
 	{
 		cout << endl;
@@ -69,8 +69,8 @@ int main( int argc, char* argv[] )
 	}
 	string fOutputfileName = argv[2];
 	
-/////////////////////////////////////////////////////////////////
-// read run parameters from file
+	/////////////////////////////////////////////////////////////////
+	// read run parameters from file
 	VInstrumentResponseFunctionRunParameter* fRunPara = new VInstrumentResponseFunctionRunParameter();
 	fRunPara->SetName( "makeEffectiveArea_runparameter" );
 	if( !fRunPara->readRunParameterFromTextFile( argv[1] ) )
@@ -79,8 +79,8 @@ int main( int argc, char* argv[] )
 	}
 	fRunPara->print();
 	
-/////////////////////////////////////////////////////////////////
-// open output file and write results to dist
+	/////////////////////////////////////////////////////////////////
+	// open output file and write results to dist
 	TFile* fOutputfile = new TFile( fOutputfileName.c_str(), "RECREATE" );
 	if( fOutputfile->IsZombie() )
 	{
@@ -88,8 +88,8 @@ int main( int argc, char* argv[] )
 		exit( 0 );
 	}
 	
-/////////////////////////////////////////////////////////////////
-// gamma/hadron cuts
+	/////////////////////////////////////////////////////////////////
+	// gamma/hadron cuts
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
 	fCuts->initialize();
 	fCuts->setNTel( fRunPara->telconfig_ntel, fRunPara->telconfig_arraycentre_X, fRunPara->telconfig_arraycentre_Y );
@@ -102,25 +102,25 @@ int main( int argc, char* argv[] )
 	fCuts->initializeCuts( -1, fRunPara->fGammaHadronProbabilityFile );
 	fCuts->printCutSummary();
 	
-/////////////////////////////////////////////////////////////////
-// read MC header (might not be there, no problem; but depend on right input in runparameter file)
+	/////////////////////////////////////////////////////////////////
+	// read MC header (might not be there, no problem; but depend on right input in runparameter file)
 	VMonteCarloRunHeader* iMonteCarloHeader = fRunPara->readMCRunHeader();
 	
-/////////////////////////////////////////////////////////////////
-// stopwatch to keep track of execution time
+	/////////////////////////////////////////////////////////////////
+	// stopwatch to keep track of execution time
 	TStopwatch fStopWatch;
 	
-/////////////////////////////////////////////////////////////////////////////
-// set effective area class
+	/////////////////////////////////////////////////////////////////////////////
+	// set effective area class
 	VEffectiveAreaCalculator fEffectiveAreaCalculator( fRunPara, fCuts );
 	
-/////////////////////////////////////////////////////////////////////////////
-// set effective area Monte Carlo histogram class
+	/////////////////////////////////////////////////////////////////////////////
+	// set effective area Monte Carlo histogram class
 	TFile* fMC_histoFile = 0;
 	VEffectiveAreaCalculatorMCHistograms* fMC_histo = 0;
 	
-/////////////////////////////////////////////////////////////////////////////
-// set angular, core, etc resolution calculation class
+	/////////////////////////////////////////////////////////////////////////////
+	// set angular, core, etc resolution calculation class
 	vector< VInstrumentResponseFunction* > f_IRF;
 	vector< string > f_IRF_Name;
 	vector< string > f_IRF_Type;
@@ -128,15 +128,15 @@ int main( int argc, char* argv[] )
 	string fCuts_AngularResolutionName = "";
 	if( fRunPara->fFillingMode != 3 )
 	{
-// 68% angular resolution file
+		// 68% angular resolution file
 		f_IRF_Name.push_back( "angular_resolution" );
 		f_IRF_Type.push_back( "angular_resolution" );
 		f_IRF_ContainmentProbability.push_back( 0.68 );
-// 80% angular resolution file
+		// 80% angular resolution file
 		f_IRF_Name.push_back( "angular_resolution_080p" );
 		f_IRF_Type.push_back( "angular_resolution" );
 		f_IRF_ContainmentProbability.push_back( 0.80 );
-// use same containment radius as in gamma/hadron cuts
+		// use same containment radius as in gamma/hadron cuts
 		if( fCuts->getAngularResolutionContainmentRadius()
 				&& TMath::Abs( ( float )fCuts->getAngularResolutionContainmentRadius() - 68. ) > 1.e-5
 				&& TMath::Abs( ( float )fCuts->getAngularResolutionContainmentRadius() - 80. ) > 1.e-5 )
@@ -152,11 +152,11 @@ int main( int argc, char* argv[] )
 		}
 		if( fRunPara->fFillingMode != 2 )
 		{
-// core resolution
+			// core resolution
 			f_IRF_Name.push_back( "core_resolution" );
 			f_IRF_Type.push_back( "core_resolution" );
 			f_IRF_ContainmentProbability.push_back( 0.68 );
-// energy resolution
+			// energy resolution
 			f_IRF_Name.push_back( "energy_resolution" );
 			f_IRF_Type.push_back( "energy_resolution" );
 			f_IRF_ContainmentProbability.push_back( 0.68 );
@@ -181,8 +181,8 @@ int main( int argc, char* argv[] )
 	}
 	
 	
-/////////////////////////////////////////////////////////////////////////////
-// load data chain
+	/////////////////////////////////////////////////////////////////////////////
+	// load data chain
 	TChain* c = new TChain( "data" );
 	if( !c->Add( fRunPara->fdatafile.c_str(), -1 ) )
 	{
@@ -196,8 +196,8 @@ int main( int argc, char* argv[] )
 	
 	TH1D* hE0mc = ( TH1D* )gDirectory->Get( "hE0mc" );
 	
-/////////////////////////////////////////////////////////////////////////////
-// fill resolution plots
+	/////////////////////////////////////////////////////////////////////////////
+	// fill resolution plots
 	for( unsigned int i = 0; i < f_IRF_Name.size(); i++ )
 	{
 		if( f_IRF[i] )
@@ -215,17 +215,17 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-/////////////////////////////////////////////////////////////////////////////
-// calculate effective areas
+	/////////////////////////////////////////////////////////////////////////////
+	// calculate effective areas
 	if( !fRunPara->fFillMCHistograms )
 	{
-// set azimuth bins and spectral index bins
-// (make sure that spectral index is positive)
+		// set azimuth bins and spectral index bins
+		// (make sure that spectral index is positive)
 		fEffectiveAreaCalculator.initializeHistograms( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
 	}
 	
-//////////////////////////////////////////////////////////////////////////////
-// MC histograms
+	//////////////////////////////////////////////////////////////////////////////
+	// MC histograms
 	if( fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
 	{
 		fStopWatch.Start();
@@ -242,7 +242,7 @@ int main( int argc, char* argv[] )
 				cout << "Warning: failed reading MC histograms" << endl;
 			}
 		}
-// read MC histograms from a separate file
+		// read MC histograms from a separate file
 		else if( fRunPara->fMCdatafile_histo.size() > 0 )
 		{
 			fMC_histoFile = new TFile( fRunPara->fMCdatafile_histo.c_str() );
@@ -262,7 +262,7 @@ int main( int argc, char* argv[] )
 			fMC_histo->matchDataVectors( fRunPara->fAzMin, fRunPara->fAzMax, fRunPara->fSpectralIndex );
 			fMC_histo->print();
 		}
-// recalulate MC spectra from MCpars tree. Very slow!
+		// recalulate MC spectra from MCpars tree. Very slow!
 		else if( fRunPara->fMCdatafile_tree.size() > 0 && fRunPara->fMCdatafile_tree != "0" )
 		{
 			TChain* c2 = new TChain( "MCpars" );
@@ -287,7 +287,7 @@ int main( int argc, char* argv[] )
 		fStopWatch.Print();
 	}
 	
-// fill effective areas
+	// fill effective areas
 	if( !fRunPara->fFillMCHistograms && fRunPara->fFillingMode != 1 && fRunPara->fFillingMode != 2 )
 	{
 		fOutputfile->cd();
@@ -295,9 +295,9 @@ int main( int argc, char* argv[] )
 		fStopWatch.Print();
 	}
 	
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-// write results to disk
+	/////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////
+	// write results to disk
 	if( !fRunPara->fFillMCHistograms )
 	{
 		if( fEffectiveAreaCalculator.getTree() )
@@ -330,18 +330,18 @@ int main( int argc, char* argv[] )
 			f_IRF[i]->getDataProduct()->Write();
 		}
 	}
-// writing cuts to disk
+	// writing cuts to disk
 	if( fCuts )
 	{
 		fCuts->terminate();
 	}
-// writing monte carlo header to disk
+	// writing monte carlo header to disk
 	if( iMonteCarloHeader )
 	{
 		iMonteCarloHeader->Write();
 	}
 	
-// write run parameters to disk
+	// write run parameters to disk
 	if( fRunPara )
 	{
 		fRunPara->Write();
@@ -356,7 +356,7 @@ VEffectiveAreaCalculatorMCHistograms* copyMCHistograms( TChain* c )
 	VEffectiveAreaCalculatorMCHistograms* iMC_his = 0;
 	if( c )
 	{
-// loop over all files and add MC histograms
+		// loop over all files and add MC histograms
 		TObjArray* fileElements = c->GetListOfFiles();
 		TChainElement* chEl = 0;
 		TIter next( fileElements );

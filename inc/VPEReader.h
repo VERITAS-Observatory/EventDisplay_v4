@@ -54,12 +54,12 @@ class VPEReader : public VVirtualDataReader
 		vector< int > fNumberofFullTrigger;
 		vector< uint8_t > fDummySample;
 		
-// tree variables
+		// tree variables
 		unsigned int fPE_runnumber;
 		unsigned int fPE_eventnumber;
 		unsigned int fPE_eventtype;
 		
-// MC parameters
+		// MC parameters
 		int fPE_primary;
 		float fPE_energy;
 		float fPE_xcore;

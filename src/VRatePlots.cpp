@@ -28,7 +28,7 @@ VRatePlots::VRatePlots( VAnaSumRunParameter* iPar, map< int, double > itime )
 	}
 	fRuns = iruns;
 	
-// define graphs
+	// define graphs
 	hList = new TList();
 	hListRun = new TList();
 	hListTime = new TList();
@@ -181,14 +181,14 @@ void VRatePlots::fill( int irun, double isig, double isigmax, double ion, double
 
 void VRatePlots::fill( vector< double > itime, vector< double > ion, vector< double > ioff, vector< double > isig, vector< double > irate )
 {
-// all vector must have the same length
+	// all vector must have the same length
 	if( itime.size() != ion.size() || itime.size() != ioff.size() || itime.size() != isig.size() || itime.size() != irate.size() )
 	{
 		cout << "VRatePlots::fill error: data vectors with different size" << endl;
 		cout << "\t " << itime.size() << "\t" << ion.size() << "\t" << ioff.size() << "\t" << isig.size() << "\t" << irate.size() << endl;
 		return;
 	}
-// count number of valid points
+	// count number of valid points
 	int inp = 0;
 	for( unsigned int i = 0; i < itime.size(); i++ )
 	{

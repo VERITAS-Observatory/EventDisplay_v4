@@ -42,14 +42,14 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, doub
 {
 	fDataType = "XRT_ascii";
 	
-// read in ascii file
+	// read in ascii file
 	readASCIIFile( iXRTFile, iMJDMin, iMJDMax );
 	if( isZombie() )
 	{
 		return false;
 	}
 	
-// plotting range
+	// plotting range
 	if( fPlottingMJDMin < 0. )
 	{
 		fPlottingMJDMin = getLightCurveMJD_min() - 5.;
@@ -69,21 +69,21 @@ bool VLightCurve::initializeXRTLightCurve( string iXRTFile, double iMJDMin, doub
 */
 bool VLightCurve::initializeTeVLightCurve( string iASCIIFile, double iFluxMultiplier )
 {
-// make sure that this is really a ascii file
+	// make sure that this is really a ascii file
 	if( iASCIIFile.find( ".root" ) != string::npos )
 	{
 		return initializeTeVLightCurve( iASCIIFile, 1., -1., -1. );
 	}
 	fDataType = "TeV_ascii";
 	
-// read in ascii file
+	// read in ascii file
 	readASCIIFile( iASCIIFile, -1., -1., iFluxMultiplier );
 	if( isZombie() )
 	{
 		return false;
 	}
 	
-// plotting range
+	// plotting range
 	if( fPlottingMJDMin < 0. )
 	{
 		fPlottingMJDMin = getLightCurveMJD_min() - 5.;
@@ -108,7 +108,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 	fDayInterval = iDayInterval;
 	fAnaSumFile = iAnaSumFile;
 	
-// read full file to get an overview of all available runs
+	// read full file to get an overview of all available runs
 	fFluxCombined = new VFluxCalculation( fAnaSumFile, 1, 0, 100000, -99., -99., false );
 	if( fFluxCombined->IsZombie() )
 	{
@@ -117,10 +117,10 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 	}
 	fFluxCombined->setTimeBinnedAnalysis( false );
 	
-/////////////////////////////////
-// setup time bins
-
-// get timing vectors (expect them to be sorted from earliest to latest)
+	/////////////////////////////////
+	// setup time bins
+	
+	// get timing vectors (expect them to be sorted from earliest to latest)
 	vector< double > fMJD    = fFluxCombined->getMJD();
 	vector< double > fRunTOn = fFluxCombined->getTOn();
 	if( fMJD.size() < 2 )
@@ -129,7 +129,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 		return false;
 	}
 	
-// get MJD for the case that no time limits are given
+	// get MJD for the case that no time limits are given
 	if( iMJDMin < 0 )
 	{
 		iMJDMin = TMath::Floor( fMJD[0] );
@@ -139,7 +139,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 		iMJDMax = TMath::Floor( fMJD[fMJD.size() - 2] ) + 1;
 	}
 	
-// plotting parameters
+	// plotting parameters
 	if( fPlottingMJDMin < 0. )
 	{
 		fPlottingMJDMin = iMJDMin - 5.;
@@ -161,20 +161,20 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 	
 	cout << "Defining " << iNbins << " time " << ( iNbins == 1 ? "interval" : "intervals" ) << " from " << iMJDMin << " to " << iMJDMax << endl;
 	
-// resetting light curve data vector
+	// resetting light curve data vector
 	fLightCurveData.clear();
 	
-// fill all light curve bins (might be a run, or XX days long)
+	// fill all light curve bins (might be a run, or XX days long)
 	for( unsigned int i = 0; i < iNbins; i++ )
 	{
 		unsigned int z = 0;
-// loop over all runs (using the MJD vector)
+		// loop over all runs (using the MJD vector)
 		for( unsigned int j = 0; j < fMJD.size() - 1; j++ )
 		{
-// check if there are data in this MJD interval
+			// check if there are data in this MJD interval
 			if( fMJD[j] >= iMJDMin + i * fDayInterval && fMJD[j] < iMJDMin + ( i + 1 ) * fDayInterval && fMJD[j] < iMJDMax )
 			{
-// get observing epoch
+				// get observing epoch
 				if( z == 0 )
 				{
 					fLightCurveData.push_back( new VLightCurveData() );
@@ -195,7 +195,7 @@ bool VLightCurve::initializeTeVLightCurve( string iAnaSumFile, double iDayInterv
 			}
 		}
 	}
-// update phase folding values
+	// update phase folding values
 	updatePhaseFoldingValues();
 	
 	return true;
@@ -245,7 +245,7 @@ bool VLightCurve::fillXRT_ascii( bool iPrint )
 
 bool VLightCurve::fillTeV_anasum( bool iPrint )
 {
-// loop over all light curve data and calculate fluxes
+	// loop over all light curve data and calculate fluxes
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -282,7 +282,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 	
 	TH1D* hLightCurve = 0;
 	
-// canvas
+	// canvas
 	if( !iCanvasLightCurve )
 	{
 		sprintf( hname, "%s", iCanvasName.c_str() );
@@ -305,7 +305,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 		fCanvasLightCurve->SetGridx( 0 );
 		fCanvasLightCurve->SetGridy( 0 );
 		
-// histogram values
+		// histogram values
 		if( fPlottingMJDMin < 0. && fPlottingMJDMax < 0. )
 		{
 			fPlottingMJDMin = getLightCurveMJD_min();
@@ -348,7 +348,7 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 		plot_nullHistogram( fCanvasLightCurve, hLightCurve, false, true, 1.2, fPlottingMJDMin, fPlottingMJDMax );
 		
 	}
-// canvas exists - get histogram in canvas
+	// canvas exists - get histogram in canvas
 	else
 	{
 		fCanvasLightCurve = iCanvasLightCurve;
@@ -370,19 +370,19 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 		}
 	}
 	
-////////////////////////////////////////////////////////////////////////
-// flux and upper flux plotting
-
+	////////////////////////////////////////////////////////////////////////
+	// flux and upper flux plotting
+	
 	fLightCurveGraph = new TGraphAsymmErrors( 0 );
 	
-// loop over all measured values
+	// loop over all measured values
 	unsigned int z = 0;
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
-// x-axis: MJD or phase
+		// x-axis: MJD or phase
 		double iMJD_mean =  fLightCurveData[i]->getMJD();
 		double iMJD_error = fLightCurveData[i]->getMJDError();
-// phase dependent analysis
+		// phase dependent analysis
 		if( fPhase_Period_days > 0. )
 		{
 			iMJD_mean = getPhase( iMJD_mean );
@@ -392,8 +392,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 			}
 		}
 		
-/////////////
-// plot fluxes or confidence intervals
+		/////////////
+		// plot fluxes or confidence intervals
 		if( fLightCurveData[i] && fLightCurveData[i]->getFluxError() > 0. )
 		{
 			if( iPlotConfidenceInterval < 0 )
@@ -414,10 +414,10 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 			}
 			else
 			{
-// plot coincidence intervals
+				// plot coincidence intervals
 				double iFMean = 0.5 * ( fLightCurveData[i]->fRunFluxCI_lo_1sigma + fLightCurveData[i]->fRunFluxCI_up_1sigma );
 				fLightCurveGraph->SetPoint( z, iMJD_mean, iFMean );
-// (minimum width -> make sure that line is visible...)
+				// (minimum width -> make sure that line is visible...)
 				if( iMJD_error < 0.3 && !( fPhase_Period_days > 0. ) )
 				{
 					iMJD_error = 0.3;
@@ -427,8 +427,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 			}
 			z++;
 		}
-/////////////
-// plot upper flux limits
+		/////////////
+		// plot upper flux limits
 		else if( fLightCurveData[i]->fUpperFluxLimit > 0. )
 		{
 			double UL = fLightCurveData[i]->fUpperFluxLimit;
@@ -437,8 +437,8 @@ TCanvas* VLightCurve::plotLightCurve( TCanvas* iCanvasLightCurve, string iCanvas
 			setArrowPlottingStyle( fUL );
 			fUL->Draw();
 		}
-/////////////
-// plot observational periods
+		/////////////
+		// plot observational periods
 		else
 		{
 			cout << "no plotting for flux intervall " << i << "\t" << fLightCurveData[i]->fMJD_min << "\t" << fLightCurveData[i]->fMJD_max << ":" << endl;
@@ -498,8 +498,8 @@ bool VLightCurve::plotObservingPeriods( TCanvas* iCanvasLightCurve, string iData
 	iDataFile = "";
 	iColor = 1;
 	
-// read text file with observing periods
-
+	// read text file with observing periods
+	
 	/*
 	
 	    to ob added
@@ -536,7 +536,7 @@ TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax,
 	
 	int iLastBin = 0;
 	double iLast = 0.;
-// get first bin with data
+	// get first bin with data
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -546,7 +546,7 @@ TH1D* VLightCurve::fillObservingIntervallHistogram( bool bPlot, double iPlotMax,
 			break;
 		}
 	}
-// fill histogram
+	// fill histogram
 	for( unsigned int i = iLastBin; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )
@@ -589,10 +589,10 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 		return false;
 	}
 	
-// fill histogram with time intervalls between measurements
+	// fill histogram with time intervalls between measurements
 	fillObservingIntervallHistogram( false );
 	
-// fill mean phase folded light curve
+	// fill mean phase folded light curve
 	TProfile hPTemp( "hT", "", int( 1. / iPhaseBinning ), 0., 1., getFlux_Min(), getFlux_Max() );
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
@@ -601,7 +601,7 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 			hPTemp.Fill( fLightCurveData[i]->getPhase(), fLightCurveData[i]->fFlux );
 		}
 	}
-// copy light curve data
+	// copy light curve data
 	vector< VLightCurveData* > iMCLightCurveData;
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
@@ -611,7 +611,7 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 		}
 	}
 	
-// now start at first flux entry and fill gaps larger than iGapsToFill_days
+	// now start at first flux entry and fill gaps larger than iGapsToFill_days
 	for( unsigned int i = 0; i < fLightCurveData.size() - 1; i++ )
 	{
 		if( bFillRandomMC )
@@ -643,8 +643,8 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 				}
 			}
 		}
-// add to every flux point at phase <0.5 a point a phase +0.5
-// (note some hardcode stuff)
+		// add to every flux point at phase <0.5 a point a phase +0.5
+		// (note some hardcode stuff)
 		else
 		{
 			if( fLightCurveData[i] )
@@ -671,14 +671,14 @@ bool VLightCurve::fillLightCurveMCPhaseFolded( string iOutFile, double iGapsToFi
 			}
 		}
 	}
-// sort new light curve
+	// sort new light curve
 	VLightCurveDataLessThan vlt;
 	sort( iMCLightCurveData.begin(), iMCLightCurveData.end(), vlt );
 	
 	cout << "new MC light curve with " << iMCLightCurveData.size() << " data points" << endl;
 	cout << "\t (assuming a period of " << fPhase_Period_days << " days)" << endl;
 	
-// write light curve
+	// write light curve
 	writeASCIIFile( iOutFile, iMCLightCurveData );
 	
 	return true;
@@ -745,7 +745,7 @@ string VLightCurve::getLightCurveAxisTitle()
 	{
 		if( fEnergy_max_TeV < 0. )
 		{
-// determine number of decimal places (do not allow more than three)
+			// determine number of decimal places (do not allow more than three)
 			if( ( int )( fEnergy_min_TeV * 10. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 100. ) % 10 == 0 && ( int )( fEnergy_min_TeV * 1000. ) % 10 == 0 )
 			{
 				sprintf( hname, "Flux (E>%.0f TeV) [cm^{-2}s^{-1}]", fEnergy_min_TeV );
@@ -788,7 +788,7 @@ string VLightCurve::getLightCurveAxisTitle()
 */
 bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError_low, double iPhaseErrorUp, string iHisName, double iHisMin_y, double iHisMax_y )
 {
-// 2D histogram
+	// 2D histogram
 	if( fMCRandomizedPhaseogram == 0 )
 	{
 		fMCRandomizedPhaseogram = new TH2D( iHisName.c_str(), "", 100, 0., 1., 100, iHisMin_y, iHisMax_y );
@@ -798,7 +798,7 @@ bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError
 	{
 		fMCRandomizedPhaseogram->Reset();
 	}
-// profile histogram
+	// profile histogram
 	if( fMCRandomizedPhaseogramProf == 0 )
 	{
 		iHisName += "prof";
@@ -810,7 +810,7 @@ bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError
 		fMCRandomizedPhaseogramProf->Reset();
 	}
 	
-// keep old period
+	// keep old period
 	double iPhase_Period_days_backup = fPhase_Period_days;
 	
 	double x = 0.;
@@ -834,7 +834,7 @@ bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError
 		
 		for( unsigned int j = 0; j < fLightCurveData.size(); j++ )
 		{
-// second MC cycle: take errors in flux into account
+			// second MC cycle: take errors in flux into account
 			x = getPhase( fLightCurveData[j]->getMJD() );
 			for( unsigned int k = 0; k < iMCCycles; k++ )
 			{
@@ -846,7 +846,7 @@ bool VLightCurve::fillRandomizedPhaseogram( double iMCCycles, double iPhaseError
 		}
 	}
 	
-// restore old phase values
+	// restore old phase values
 	setPhaseFoldingValues( fPhase_MJD0, iPhase_Period_days_backup, fPhasePlotting );
 	
 	return true;
@@ -884,7 +884,7 @@ TCanvas* VLightCurve::plotPhaseDistribution( TCanvas* iCanvasPhaseDist, string i
 		fCanvasPhaseDistribution->Draw();
 	}
 	
-// histograms
+	// histograms
 	sprintf( hname, "hPhaseDist_%d_%d_%d_%s", ( int )fPhase_MJD0, ( int )fPhase_Period_days, ( int )fPhasePlotting, iFluxState.c_str() );
 	hPhaseDist = new TH1D( hname, "", 50, 0., 1. );
 	hPhaseDist->SetStats( 0 );
@@ -892,7 +892,7 @@ TCanvas* VLightCurve::plotPhaseDistribution( TCanvas* iCanvasPhaseDist, string i
 	hPhaseDist->SetXTitle( "orbital phase" );
 	hPhaseDist->SetLineColor( iColor );
 	
-// fill histogram
+	// fill histogram
 	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 	{
 		if( fLightCurveData[i] )

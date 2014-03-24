@@ -91,11 +91,11 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 	fPD.fSensitivityvsEnergyFromTextTFile_LineColor.clear();
 	fPD.fSensitivityvsEnergyFromTextTFile_LineStyle.clear();
 	
-// Crab Nebula and Cosmic ray fluxes
+	// Crab Nebula and Cosmic ray fluxes
 	fPD.fESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
 	fPD.fESpecDataFile_CosmicRays = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
 	
-// energy axis (min and max in TeV)
+	// energy axis (min and max in TeV)
 	fPD.fPlotting_energy_min_TeV = 0.01;
 	fPD.fPlotting_energy_max_TeV = 250.00;
 	if( iObservatory == "VTS" || iObservatory == "VERITAS" )
@@ -104,8 +104,8 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 		fPD.fPlotting_energy_max_TeV = 15.00;
 	}
 	
-//////////////////
-// integral flux
+	//////////////////
+	// integral flux
 	cout << "FILLING " << bIntegral << "\t" << bUnit << endl;
 	if( bIntegral )
 	{
@@ -143,8 +143,8 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 			fPD.bSet = true;
 		}
 	}
-/////////////////////////////////////////////////
-// differential flux
+	/////////////////////////////////////////////////
+	// differential flux
 	else
 	{
 		if( bUnit == "PFLUX" )
@@ -203,7 +203,7 @@ void getPlottingData( bool bIntegral, string bUnit, string iObservatory )
 		}
 	}
 	
-// marker colors and line styles
+	// marker colors and line styles
 	for( unsigned int i = 0; i < fPD.fSensitivityvsEnergyFromTextTFile.size(); i++ )
 	{
 		fPD.fSensitivityvsEnergyFromTextTFile_LineColor.push_back( 6 + i );
@@ -270,7 +270,7 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 					  double iObservingTime_h )
 {
 
-// get values for plotting
+	// get values for plotting
 	getPlottingData( bIntegral, iFluxUnit, iObservatory );
 	if( !fPD.bSet )
 	{
@@ -278,10 +278,10 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 		return;
 	}
 	
-// sensitivity plotter
+	// sensitivity plotter
 	VSensitivityCalculator a;
 	a.setEnergyRange_Lin( fPD.fPlotting_energy_min_TeV, fPD.fPlotting_energy_max_TeV );           // x-axis range: in TeV
-// Monte Carlo only
+	// Monte Carlo only
 	if( iFluxUnit == "PFLUX" )
 	{
 		a.setFluxRange_PFLUX( fPD.fPlotting_flux_min, fPD.fPlotting_flux_max );           // y-axis range: in 1/cm2/s
@@ -296,27 +296,27 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 	}
 	a.setPlotCanvasSize( 900, 600 );                                                              // size of canvases
 	
-// set Crab Nebula spectrum used for relative flux calculation
+	// set Crab Nebula spectrum used for relative flux calculation
 	if( !a.setEnergySpectrumfromLiterature( fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID ) )
 	{
 		return;
 	}
 	
-// lots of debug output
+	// lots of debug output
 	a.setDebug( false );
 	
 	a.setSignificanceParameter( 5., 10., iObservingTime_h, 0.05, 0.2 );
 	
-//////////////////////////////////////////////////////////////////
-// plot sensitivity canvas
+	//////////////////////////////////////////////////////////////////
+	// plot sensitivity canvas
 	TCanvas* c = a.plotCanvas_SensitivityvsEnergy( iFluxUnit, bIntegral );
 	if( !c )
 	{
 		return;
 	}
 	
-//////////////////////////////////////////////////////////////////
-// plot sensitivities from text files
+	//////////////////////////////////////////////////////////////////
+	// plot sensitivities from text files
 	for( unsigned int i = 0; i < fPD.fSensitivityvsEnergyFromTextTFile.size(); i++ )
 	{
 		a.plotSensitivityvsEnergyFromTextTFile( c, fPD.fSensitivityvsEnergyFromTextTFile[i],
@@ -325,9 +325,9 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 	}
 	a.setPlottingStyle( 1, 1, 2, 20, 2., 3002 );
 	
-//////////////////////////////////////////////////////////////////////
-// calculate sensitivities from data taken towards the Crab Nebula
-//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	// calculate sensitivities from data taken towards the Crab Nebula
+	//////////////////////////////////////////////////////////////////////
 	if( iData_anasumFile1 != 0 )
 	{
 		if( bIntegral )
@@ -339,7 +339,7 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 			a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( c, iData_anasumFile1, 1, iFluxUnit, 0.2, 0.05, 8. );
 		}
 	}
-// plot second file
+	// plot second file
 	if( iData_anasumFile2 != 0 )
 	{
 		a.setPlottingStyle( 3, 1, 2, 20, 2., 3002 );
@@ -354,32 +354,32 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 	}
 	
 	
-////////////////////////////////////////////////////////////////////////
-// calculate sensitivities from Monte Carlo effective areas
-////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////
+	// calculate sensitivities from Monte Carlo effective areas
+	////////////////////////////////////////////////////////////////////////
 	if( iMC_Gamma && iMC_Proton )
 	{
 		VSensitivityCalculator bb;
 		bb.setDebug( false );             // creates lots of output
-// set Crab Nebula spectrum
+		// set Crab Nebula spectrum
 		bb.setEnergySpectrumfromLiterature( fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID );
-// draw some debugging plots
+		// draw some debugging plots
 		char hname[600];
 		sprintf( hname, "plotDebug_%d", bIntegral );
 		bb.setPlotDebug( hname );
-// energy range to be plotted
+		// energy range to be plotted
 		bb.setEnergyRange_Lin( 0.01, 250. );
-// significance parameters
+		// significance parameters
 		bb.setSignificanceParameter( 5., 10., iObservingTime_h, 0.05, 0.2 );
-// set colors different in case data is plotted
+		// set colors different in case data is plotted
 		if( iData_anasumFile1 )
 		{
 			bb.setPlottingStyle( 4, 1, 2, 20, 2., 3002 );
 		}
 		
-//////////////////////////////////////////////////////////////////////////
-// select bins and index from gamma and proton effective area files
-// CTA
+		//////////////////////////////////////////////////////////////////////////
+		// select bins and index from gamma and proton effective area files
+		// CTA
 		int i_Azbin_gamma = 0;
 		double i_index_gamma = 2.5;
 		int i_noise_gamma = 250;
@@ -419,27 +419,27 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 			i_woff_electron = 0.;
 		}
 		cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl;
-//////////////////////////////////////////////////////////////////////////
-
-// gammas
+		//////////////////////////////////////////////////////////////////////////
+		
+		// gammas
 		bb.setMonteCarloParameters( 1, fPD.fESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
 									i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
-// protons
+		// protons
 		bb.setMonteCarloParameters( 14, fPD.fESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
 									i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
-// helium (spectral index?)
+		// helium (spectral index?)
 		if( iMC_Helium )
 		{
 			bb.setMonteCarloParameters( 402, fPD.fESpecDataFile_CosmicRays, 1, iMC_Helium, 20., 0, 0.0, 200, 2.0 );
 		}
-// electrons (spectral index?)
+		// electrons (spectral index?)
 		if( iMC_Electron )
 		{
 			bb.setMonteCarloParameters( 2, fPD.fESpecDataFile_CosmicRays, 2, iMC_Electron, 20.,
 										i_Azbin_electron, i_woff_electron, i_noise_electron, i_index_electron );
 		}
 		
-// energy range determined by looking at number of noff events (need off events to determine sensitivity)
+		// energy range determined by looking at number of noff events (need off events to determine sensitivity)
 		if( bIntegral )
 		{
 			bb.plotIntegralSensitivityvsEnergyFromCrabSpectrum( c, "MC", 1, iFluxUnit, 0.01, 500. );
@@ -452,7 +452,7 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 		bb.plotSensitivityLimitations( c );
 	}
 	return;
-// plot different limitations in sensitivity calculation
+	// plot different limitations in sensitivity calculation
 	a.plotSensitivityLimitations( c );
 	
 }
@@ -466,9 +466,9 @@ void plotSensitivity( char* iData_anasumFile1, char* iData_anasumFile2, bool bIn
 void plotSensitivityVStime()
 {
 	VSensitivityCalculator a;
-// V330, theta2 < 0.15, size > 500, mscw/mscl<0.5 (May 2008)
+	// V330, theta2 < 0.15, size > 500, mscw/mscl<0.5 (May 2008)
 	a.addDataSet( 4.97, 0.12, 0.09, "VERITAS (Autumn 2009)" );
-// from Crab data set Autumn 2009. LL R4 theta2 < 0.08 (mscw<0.35 && mscl<0.7; April 2010)
+	// from Crab data set Autumn 2009. LL R4 theta2 < 0.08 (mscw<0.35 && mscl<0.7; April 2010)
 	a.addDataSet( 5.19, 0.27, 0.09, "VERITAS (Spring 2009)" );
 	
 	vector< double > s;
@@ -479,7 +479,7 @@ void plotSensitivityVStime()
 	a.setSourceStrengthVector_CU( s );
 	
 	TCanvas* c = a.plotObservationTimevsFlux( 0, 0, 2 );
-//    a.plotObservationTimevsFlux( 1, c, 1, 2 );
+	//    a.plotObservationTimevsFlux( 1, c, 1, 2 );
 	a.plotObservationTimevsFlux( 0, c, 2 );
 }
 
@@ -505,7 +505,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor )
 	hBGRate       = ( TH1F* )iFile->Get( "BGRate" );
 	hDiffSens     = ( TH1F* )iFile->Get( "DiffSens" );
 	
-// effective area canvas
+	// effective area canvas
 	c = ( TCanvas* )gROOT->GetListOfCanvases()->FindObject( "plotDebug_0_1" );
 	if( c && hGammaEffArea )
 	{
@@ -516,7 +516,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor )
 		hGammaEffArea->Draw( "same" );
 	}
 	
-// background rates
+	// background rates
 	c = ( TCanvas* )gROOT->GetListOfCanvases()->FindObject( "plotDebug_0_0" );
 	if( c && hBGRate )
 	{
@@ -528,7 +528,7 @@ void plotDebugComparisionPlots( string iFileName, int iColor )
 		hBGRate->Draw( "same" );
 	}
 	
-// sensitivity
+	// sensitivity
 	c = ( TCanvas* )gROOT->GetListOfCanvases()->FindObject( "iCanvas" );
 	if( c && hDiffSens )
 	{
@@ -560,11 +560,11 @@ void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* i
 	{
 		VSensitivityCalculator b;
 		b.setDebug( false );             // creates lots of output
-// set Crab Nebula spectrum
+		// set Crab Nebula spectrum
 		b.setEnergySpectrumfromLiterature( iESpecDataFile_CrabNebula, iCrabSpec_ID );
-// draw some debugging plots
+		// draw some debugging plots
 		b.setWriteParticleNumberFile( iParticleNumberFile );
-// CTA
+		// CTA
 		int i_Azbin_gamma = 0;
 		double i_index_gamma = 2.5;
 		int i_noise_gamma = 250;
@@ -575,15 +575,15 @@ void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* i
 		int i_noise_proton = 250;
 		double i_woff_proton = 0.;
 		cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl;
-//////////////////////////////////////////////////////////////////////////
-
-// gammas
+		//////////////////////////////////////////////////////////////////////////
+		
+		// gammas
 		b.setMonteCarloParameters( 1, iESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
 								   i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma );
-// protons
+		// protons
 		b.setMonteCarloParameters( 14, iESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
 								   i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton );
-// electrons (spectral index?)
+		// electrons (spectral index?)
 		if( iMC_Electron )
 		{
 			b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 2, iMC_Electron, 20., 0, 0.0, 250, 3.0 );
@@ -646,7 +646,7 @@ void writeAllParticleNumberFiles( char* iSubArrayFile = 0,
 			}
 		}
 		
-// offset files
+		// offset files
 		for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
 		{
 			sprintf( iGamma, "%s.%s_ID%d.eff-%d.root", iMC_Gamma_cone10, SubArray[i].c_str(), iRecID, j );
@@ -698,7 +698,7 @@ void plotIRF( string iSubArray, bool iSensitivity, string iObservingTime_H, stri
 	
 	if( iSensitivity )
 	{
-//        plotDifferentialSensitivity( "ENERGY", 0, 0, iGammaEffArea, iProtonEffArea, 0, iElectronEffArea );
+		//        plotDifferentialSensitivity( "ENERGY", 0, 0, iGammaEffArea, iProtonEffArea, 0, iElectronEffArea );
 		plotDebugComparisionPlots( iIFAE, 2 );
 		plotDebugComparisionPlots( iISDC, 3 );
 	}

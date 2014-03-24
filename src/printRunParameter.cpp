@@ -96,7 +96,7 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		exit( 0 );
 	}
-// command line option
+	// command line option
 	string fOption = "";
 	if( argc == 3 )
 	{
@@ -109,7 +109,7 @@ int main( int argc, char* argv[] )
 		cout << "==========================" << endl;
 	}
 	
-// open file
+	// open file
 	TFile* fIn = new TFile( argv[1] );
 	if( fIn->IsZombie() )
 	{
@@ -151,8 +151,8 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// array analysis cuts
-
+	// array analysis cuts
+	
 	VEvndispReconstructionParameter* fArrayCuts = 0;
 	
 	fArrayCuts = ( VEvndispReconstructionParameter* )fIn->Get( "EvndispReconstructionParameter" );
@@ -178,7 +178,7 @@ int main( int argc, char* argv[] )
 	
 	VMonteCarloRunHeader* fMC = 0;
 	
-//    if( fPar && fPar->fEventDisplayUser != "CTA-DST" )
+	//    if( fPar && fPar->fEventDisplayUser != "CTA-DST" )
 	{
 		fMC = ( VMonteCarloRunHeader* )fIn->Get( "MC_runheader" );
 		if( fMC )

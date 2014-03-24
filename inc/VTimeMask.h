@@ -41,25 +41,25 @@ class VTimeMask
 		Bool_t          set_success;              // If the mask was set from the mask_file
 		Bool_t          override;                 // If we have encountered an error
 		Int_t           outside_count;            // Number of events checked which weren't inside the mask time domain
-// i.e. those before the start or after the end
-
+		// i.e. those before the start or after the end
+		
 		void            initialise( Int_t run_number, Double_t run_startMJD_secs, Double_t run_endMJD_secs, string file_name );
 		// Flake out in a dignified manner.
 		void            problem( string reason, ostream& terminal = cout );
 		
-// Internal time format is exact decimal MJD converted into seconds (<MJD>.<fraction of day> * secs_day)
+		// Internal time format is exact decimal MJD converted into seconds (<MJD>.<fraction of day> * secs_day)
 		static const    Int_t           secs_day    = 24 * 60 * 60;
-// Create internal time format: double VAnaUtils::getUTC(int i_mjd, double i_seconds) returns <MJD>.<fraction of day>
+		// Create internal time format: double VAnaUtils::getUTC(int i_mjd, double i_seconds) returns <MJD>.<fraction of day>
 		Double_t        exactMJD_secs( Int_t MJD, Double_t secsMid ) const
 		{
 			return secs_day * VSkyCoordinatesUtilities::getUTC( MJD, secsMid );
 		}
-// Return integer MJD portion of internal time
+		// Return integer MJD portion of internal time
 		Int_t           timeMJD( Double_t internal_time ) const
 		{
 			return Int_t( floor( internal_time / secs_day ) );
 		}
-// Return seconds since UTC midnight
+		// Return seconds since UTC midnight
 		Double_t        time_secsMid( Double_t internal_time ) const
 		{
 			return internal_time - Double_t( secs_day ) * timeMJD( internal_time );
@@ -72,11 +72,11 @@ class VTimeMask
 		
 	public:
 		VTimeMask();                              // Default constructor gives mask of zero size but reserves storage for 1200 seconds
-//~VTimeMask();	// Remove any ROOT objects with pointers
-// To properly initialise use one of the following constructors: default mask is open for all seconds
-// run_startMJD and run_endMJD are integer MJD; run_startTime and run_endTime are seconds since UTC midnight
+		//~VTimeMask();	// Remove any ROOT objects with pointers
+		// To properly initialise use one of the following constructors: default mask is open for all seconds
+		// run_startMJD and run_endMJD are integer MJD; run_startTime and run_endTime are seconds since UTC midnight
 		VTimeMask( Int_t run_number, Int_t run_startMJD, Double_t run_startTime, Int_t run_endMJD, Double_t run_endTime, string file_name = "" );
-// run_startUTC and run_endUTC are decimal MJD (<MJD>.<fraction of day>) following [double VAnaUtils::getUTC(int i_mjd, double i_seconds)]
+		// run_startUTC and run_endUTC are decimal MJD (<MJD>.<fraction of day>) following [double VAnaUtils::getUTC(int i_mjd, double i_seconds)]
 		VTimeMask( Int_t run_number, Double_t run_startUTC, Double_t run_endUTC, string file_name = "" );
 		
 		// Intialise now
@@ -86,7 +86,7 @@ class VTimeMask
 		Bool_t      setMaskDuringPhaseCuts( Double_t eventUTC );
 		
 		
-// Is the event allowed to pass the mask?
+		// Is the event allowed to pass the mask?
 		Bool_t      checkAgainstMask( Int_t eventMJD, Double_t eventTime )
 		{
 			return checkMaskNow( exactMJD_secs( eventMJD, eventTime ) );
@@ -96,7 +96,7 @@ class VTimeMask
 			return checkMaskNow( secs_day * eventUTC );
 		}
 		
-// Count events passing gamma and direction cuts
+		// Count events passing gamma and direction cuts
 		void        countOn( Double_t eventUTC )
 		{
 			counted.at( Int_t( floor( secs_day * eventUTC - start_time ) ) )++;
@@ -140,12 +140,12 @@ class VTimeMask
 			accepted.assign( mask.size(), 0 );
 		}
 		
-// Various takes on the mean time of the run; all in seconds since the beginning of the run.
+		// Various takes on the mean time of the run; all in seconds since the beginning of the run.
 		Double_t    getMeanTime_Run() const;      // Mid-point of the run
 		Double_t    getMeanTime_Mask() const;     // Weighted by open seconds
 		Double_t    getMeanTime_Events() const;   // Weighted by all events
 		Double_t    getMeanTime_Accepted() const; // Weighted by events in open seconds
-// Various takes on the mean time of the run; all in <MJD>.<fraction of day>
+		// Various takes on the mean time of the run; all in <MJD>.<fraction of day>
 		Double_t    getMeanUTC_Run() const
 		{
 			return ( start_time + getMeanTime_Run() ) / secs_day;
@@ -163,16 +163,16 @@ class VTimeMask
 			return ( start_time + getMeanTime_Accepted() ) / secs_day;
 		}
 		
-//Fill vectors with statistics for use by VRatePlots, over intervals defined as near as possible to a user defined width
+		//Fill vectors with statistics for use by VRatePlots, over intervals defined as near as possible to a user defined width
 		void        getIntervalRates( vector< double >& event_count, vector< double >& interval_time, vector< double >& interval_size, double width ) const;
 		
-// ROOT object versions of the internal arrays, to be saved to a ROOT file.
+		// ROOT object versions of the internal arrays, to be saved to a ROOT file.
 		void        writeObjects() const;
 		const   TBits*      getMaskBits() const;  // Copy of the mask as a TBits object.
-// To check this version of the mask use:
-//	UInt_t GetNbits() const 			- for the size
-//	UInt_t CountBits(UInt_t startBit = 0) const	- for the number of open seconds
-//	Bool_t TestBitNumber( UInt_t second ) const 	- for one entry
+		// To check this version of the mask use:
+		//	UInt_t GetNbits() const 			- for the size
+		//	UInt_t CountBits(UInt_t startBit = 0) const	- for the number of open seconds
+		//	Bool_t TestBitNumber( UInt_t second ) const 	- for one entry
 		// TVector of all events checked against mask.
 		const   TVector*    getCheckedVector() const;
 		// TVector of events allowed to pass the mask.
@@ -180,9 +180,9 @@ class VTimeMask
 		// Read stored ROOT versions of a time mask and fill initialised internal vectors.
 		Bool_t      readObjects( TDirectory* iDir );
 		
-// Display mean times determined according to open portions of the mask and optionally to event counts
+		// Display mean times determined according to open portions of the mask and optionally to event counts
 		void        printMeanTime( Bool_t event_statistics = kFALSE, ostream& terminal = cout ) const;
-// Display summary of mask with optional event counts
+		// Display summary of mask with optional event counts
 		void        printMask( UInt_t interval_seconds = 60, Bool_t event_statistics = kFALSE, ostream& terminal = cout ) const;
 		
 };

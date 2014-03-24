@@ -58,7 +58,7 @@ void plot_2D( bool bMODTRAN = false )
 		a.add_MODTRAN_Atmosphere( "../../../simulation/showerSimulation/data/midlatitudewinter.profile.tp6", "midlatitude winter (MODTRAN)", 4 );
 	}
 	
-//    a.setPlottingPeriod( "all" );
+	//    a.setPlottingPeriod( "all" );
 	a.plot2DProfiles( 1995, 1, 2010, 12 );
 }
 
@@ -208,7 +208,7 @@ void plot_monthly( double iMax = 30. )
 	
 	
 	a.setPlottingPeriod( "monthly_all" );
-//    a.setPlottingPeriod( "day_night" );
+	//    a.setPlottingPeriod( "day_night" );
 	a.plotAverages( 1995, 1, 2010, 12 );
 }
 
@@ -267,27 +267,27 @@ void write_and_plot_MODTRAN( unsigned int iPeriod = 0, double iHeightMaxData = -
 		a.add_CORSIKA_Atmosphere( "../../../simulation/showerSimulation/data/atmprof6.dat", "US 76  (CORSIKA)", 6 );
 	}
 	
-// create and print user atmosphere
+	// create and print user atmosphere
 	a.add_user_Atmosphere( 0, iHeightMaxData, iName );
 	a.write_MODTRAN_UserProfile( 0, iDefaultModel, false );
 	
-// user created atmosphere
-//    a.add_MODTRAN_Atmosphere( "../../../simulation/showerSimulation/data/V.Winter.US76.50km.profile.tp6", "USER", 2, 2 );
+	// user created atmosphere
+	//    a.add_MODTRAN_Atmosphere( "../../../simulation/showerSimulation/data/V.Winter.US76.50km.profile.tp6", "USER", 2, 2 );
 	a.add_MODTRAN_Atmosphere( "../../../simulation/showerSimulation/data/V.Summer.US76.50km.profile.tp6", "USER", 2, 2 );
 	
-// now plot everything
+	// now plot everything
 	a.plotAttributes_ColorChange( true );
 	a.plotAttributes_PlotLegend( true );
 	a.setPlottingRangeHeight( 0., iMax );
 	
-// plotting
+	// plotting
 	a.plotAverages( 1995, 1, 2010, 12 );
 	
-// index of refraction
+	// index of refraction
 	TCanvas* cIndexOfRefraction = a.plotCORSIKA_IndexofRefraction_vs_Heigth( 0, 0., iMax );
 	
-//    a.plotUserAtmosphere_IndexofRefraction_vs_Heigth( cIndexOfRefraction, 0., iMax );
-
+	//    a.plotUserAtmosphere_IndexofRefraction_vs_Heigth( cIndexOfRefraction, 0., iMax );
+	
 }
 
 void write_and_plot_CORSIKA_user_profiles( unsigned int iPeriod = 0, double iMax = 30. )
@@ -324,7 +324,7 @@ void write_and_plot_CORSIKA_user_profiles( unsigned int iPeriod = 0, double iMax
 	else if( iPeriod == 1 )
 	{
 		a.add_MODTRAN_Atmosphere( "../../../simulation/showerSimulation/data/midlatitudewinter.profile.tp6", "midlatitude winter", 4, 2 );
-//       a.add_CORSIKA_Atmosphere("../../../simulation/showerSimulation/data/atmprof3.dat", "midlatitude winter", 6, 2 );
+		//       a.add_CORSIKA_Atmosphere("../../../simulation/showerSimulation/data/atmprof3.dat", "midlatitude winter", 6, 2 );
 		a.add_CORSIKA_Atmosphere( "../../../simulation/showerSimulation/data/atmprof21.dat", "VERITAS winter", 6, 2 );
 		a.add_MODTRAN_Atmosphere( "../../../simulation/showerSimulation/data/V.Winter.US76.50km.profile.tp6", "VERITAS Winter", 2 );
 	}
@@ -335,18 +335,18 @@ void write_and_plot_CORSIKA_user_profiles( unsigned int iPeriod = 0, double iMax
 		a.add_MODTRAN_Atmosphere( "../../../simulation/showerSimulation/data/V.Summer.US76.50km.profile.tp6", "VERITAS Summer", 2 );
 	}
 	
-// now plot everything
+	// now plot everything
 	a.plotAttributes_ColorChange( true );
 	a.plotAttributes_PlotLegend( false );
 	a.setPlottingRangeHeight( 0., iMax );
 	
-// plotting
+	// plotting
 	a.plotAverages( 1995, 1, 2010, 12 );
 	
-// index of refraction
+	// index of refraction
 	TCanvas* cIndexOfRefraction = a.plotCORSIKA_IndexofRefraction_vs_Heigth( 0, 0., iMax );
 	
-// write corsika atmosphere
+	// write corsika atmosphere
 	a.write_CORSIKA_UserProfile( 2, iAtmProf, iName );
 	
 	

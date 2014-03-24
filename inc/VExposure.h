@@ -53,23 +53,23 @@ class VExposure : public TObject, public VGlobalRunParameter
 		bool bPrintVerbose;
 		bool bPrintTimeMask;
 		
-// Type of observing mode
+		// Type of observing mode
 		string fObservingMode;
 		
-// Minimium Duration
+		// Minimium Duration
 		double fMinDuration;
 		
-// Telscope Min Elevation
+		// Telscope Min Elevation
 		double fTelMinElevation;
 		
-// Target Name
+		// Target Name
 		string fTargetSourceName;
 		
-// date range
+		// date range
 		string fStartDate_SQL;
 		string fStopDate_SQL;
 		
-// acceptance curves
+		// acceptance curves
 		TF1* fAcceptance;
 		double fAcceptance_MaxDistance;
 		double fMaximumIntegrationRadius;
@@ -77,7 +77,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 		bool fPlotExtendedSources;
 		bool fPlotSourceNames;
 		
-// list of sources from DB
+		// list of sources from DB
 		VDB_ObservingSources* fVDB_ObservingSources;
 		
 		vector< int > fRun;
@@ -224,8 +224,8 @@ class VExposure : public TObject, public VGlobalRunParameter
 		}
 		
 		vector< unsigned int > getLaserRun( string iDBserver, unsigned int iRunNumber, unsigned int iNTel );
-//	TSQLServer* connectToSQLServer( string iServer );
-
+		//	TSQLServer* connectToSQLServer( string iServer );
+		
 		void addCatalogue( string, int iMarker = 5, int iColor = 50, double iAngle = 45. );
 		void listCatalogues();
 		bool removeCataloge( unsigned int iB );

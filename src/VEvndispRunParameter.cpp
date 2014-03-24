@@ -16,7 +16,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fEventDisplayUser = "";
 	fEventDisplayHost = "";
 	fEventDisplayDate = "";
-// system parameters
+	// system parameters
 	fEventDisplayBuildCompiler = "";
 	fEventDisplayBuildCompilerVersion = "";
 	fEventDisplayBuildArch = "";
@@ -26,11 +26,11 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fEventDisplayBuildROOTVersionInt = 0;
 	fEventDisplaySystemInfo = 0;
 	
-// debug parameters
+	// debug parameters
 	fDebug = false;
 	fPrintSmallArray = true;
 	
-// run parameters
+	// run parameters
 #ifdef RUNWITHDB
 	fuseDB = true;
 #else
@@ -66,7 +66,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	
 	fprintdeadpixelinfo = false ; // DEADCHAN if true, print list of dead pixels to evndisp.log
 	
-// geometry/calibration parameters
+	// geometry/calibration parameters
 	fNTelescopes = 4;                             // there is always at least one telescope
 	fcamera.push_back( "EVN_V4_Autumn2007_20130110.txt" );
 	fCalibrationDataType = 1;  // should be 0 for e.g. CTA DSTs
@@ -101,7 +101,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fNoCalibNoPb = false;
 	fNextDayGainHack = false;
 	
-// pointing parameters
+	// pointing parameters
 	fTargetName = "NONAME";
 	fTargetDec = -999.;
 	fTargetRA = -999.;
@@ -127,7 +127,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPMTextFileDirectory = "";
 	fPointingErrorX.push_back( 0. );
 	fPointingErrorY.push_back( 0. );
-// star catalogue
+	// star catalogue
 	fStarCatalogueName = "";
 	fMinStarBrightness_B = 7.;
 	fMinStarPixelDistance_deg = -1.;
@@ -137,7 +137,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	
 	fLowGainPeds = true;
 	
-// analyzer parameters
+	// analyzer parameters
 	fImageCleaningParameters.push_back( new VImageCleaningRunParameter() );
 	
 	fsumfirst.push_back( 2 );
@@ -165,7 +165,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fUsePedEvents = true;
 	fFADCChargeUnit = "DC";
 	fperformFADCAnalysis = true;
-// pedestal calculation in time slices
+	// pedestal calculation in time slices
 	fLowGainUsePedestalsInTimeSlices = false;
 	fUsePedestalsInTimeSlices = true;
 	fPedestalsInTimeSlices = true;
@@ -179,13 +179,13 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	ftracefitfunction = "ev";
 	freconstructionparameterfile = "EVNDISP.reconstruction.runparameter";
 	
-////////////////////////////////////////////////////////////////////////////////
-// pulse timing (fraction of maximum where times are determined)
-// OBSERVE: there should be a timing level with value 0.5 (for tzero calculations)
-// OBSERVE: this vector is always symmetric around the entry at 1
-//    fpulsetiminglevels.push_back( 0.2 );
+	////////////////////////////////////////////////////////////////////////////////
+	// pulse timing (fraction of maximum where times are determined)
+	// OBSERVE: there should be a timing level with value 0.5 (for tzero calculations)
+	// OBSERVE: this vector is always symmetric around the entry at 1
+	//    fpulsetiminglevels.push_back( 0.2 );
 	fpulsetiminglevels.push_back( 0.5 );
-//    fpulsetiminglevels.push_back( 0.8 );
+	//    fpulsetiminglevels.push_back( 0.8 );
 	fpulsetiminglevels.push_back( 1.0 );
 	unsigned int i_fps = fpulsetiminglevels.size();
 	if( i_fps > 1 )
@@ -195,7 +195,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 			fpulsetiminglevels.push_back( fpulsetiminglevels[i_fps - i - 2] );
 		}
 	}
-// get index for tzero and width
+	// get index for tzero and width
 	setPulseZeroIndex();
 	
 	fWriteTriggerOnly = true;
@@ -203,27 +203,27 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fwriteMCtree = 1;
 	fFillMCHistos = true;
 	
-// muon parameters
+	// muon parameters
 	fmuonmode = false;
 	fhoughmuonmode = false;
 	
-// Frogs parameters
+	// Frogs parameters
 	ffrogsmscwfile = "";
 	ffrogsmode = false;
 	ffrogsRecID = -1;
 	
-// Model3D parameters, JG
+	// Model3D parameters, JG
 	fUseModel3D = false;
 	fUseDisplayModel3D = false;
 	fCreateLnLTable = false;
 	fLnLTableFile = "";
 	
-// output parameters
+	// output parameters
 	ffillhistos = false;                          // obsolete
 	foutputfileName = "";
 	
-// MC parameters
-// offset in telescope numbering (0 for old grisudet version (<3.0.0))
+	// MC parameters
+	// offset in telescope numbering (0 for old grisudet version (<3.0.0))
 	ftelescopeNOffset = 1;
 	fsampleoffset = 0;
 	fUseVBFSampleLength = false;
@@ -236,7 +236,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fMCNdeadboard = 0;
 	fMCScale = 1.;
 	
-// display parameters
+	// display parameters
 	fdisplaymode = false;
 	floopmode = false;
 	fh = 680;                                     // height of main window
@@ -248,16 +248,16 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fPlotPaper = false;
 	fPlotAllInOneMethod = 0;
 	
-// writing of laser pulses
+	// writing of laser pulses
 	fwriteLaserPulseN = 0;
 	fwriteAverageLaserPulse = false;
 	
-// dst parameters
+	// dst parameters
 	fdstfile = "";
 	fdstminntubes = -1;
 	fdstwriteallpixel = true;
 	
-// NN parameters
+	// NN parameters
 	fNSBscale = 0.;
 	for( unsigned int i = 0; i < VDST_MAXTELESCOPES; i++ )
 	{
@@ -279,7 +279,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 		ifActiveType[i] = false;
 	}
 	
-// parallaxwidth  // MS
+	// parallaxwidth  // MS
 	fPWmethod = -1;            // MS default is to use cleaned CFD trigger map
 	fPWcleanNeighbors = 2;     // MS: default number of neighbors required for identifying center pixels in the trigger map
 	fPWcleanThreshold = 26.0;  // MS: default is about 5.3 dc/pe for VERITAS (5 sample integration window), i.e. cleaning of ~5 pe
@@ -314,7 +314,7 @@ void VEvndispRunParameter::print( int iEv )
 		cout << "VEvndispRunParameter::printParams()" << endl;
 	}
 	
-// print less to screen for some variables for large arrays
+	// print less to screen for some variables for large arrays
 	if( fTelToAnalyze.size() >= 10 )
 	{
 		fPrintSmallArray = false;
@@ -673,7 +673,7 @@ void VEvndispRunParameter::print( int iEv )
 		cout << endl << "shortened tree output " << endl;
 	}
 	
-// print analysis parameters
+	// print analysis parameters
 	if( iEv == 2 )
 	{
 		cout << endl;
@@ -687,7 +687,7 @@ void VEvndispRunParameter::print( int iEv )
 		{
 			cout << "Telescope " << fTelToAnalyze[i] + 1 << endl;
 			
-// trace integration method
+			// trace integration method
 			if( fTraceIntegrationMethod[fTelToAnalyze[i]] != 0 )
 			{
 				cout << "\t trace integration method: \t" << fTraceIntegrationMethod[fTelToAnalyze[i]];
@@ -711,14 +711,14 @@ void VEvndispRunParameter::print( int iEv )
 			{
 				cout << "\t no trace integration" << endl;
 			}
-// image cleaning method and values
+			// image cleaning method and values
 			if( i < fImageCleaningParameters.size() )
 			{
 				fImageCleaningParameters[i]->print();
 			}
 			cout << "\t LL edge fit: \t\t\tloss > " << fLogLikelihoodLoss_min[i] << "\t ntubes > " << fLogLikelihood_Ntubes_min[i] << endl;
 			
-// calibration
+			// calibration
 			if( fTelToAnalyze[i] < fGainCorrection.size() && TMath::Abs( fGainCorrection[fTelToAnalyze[i]] ) - 1. > 1.e-2 )
 			{
 				cout << "\t additional gain correction: " << fGainCorrection[fTelToAnalyze[i]];
@@ -816,27 +816,27 @@ void VEvndispRunParameter::printCTA_DST()
 
 void VEvndispRunParameter::setSystemParameters()
 {
-// get date
+	// get date
 	TDatime t_time;
 	fEventDisplayDate = t_time.AsSQLString();
 	
-// get host name
+	// get host name
 	fEventDisplayHost = gSystem->HostName();;
-// get user name
+	// get user name
 	UserGroup_t* i_userGroup = gSystem->GetUserInfo();
 	if( i_userGroup )
 	{
 		fEventDisplayUser = i_userGroup->fUser;
 		delete i_userGroup;
 	}
-// get system parameters
+	// get system parameters
 	fEventDisplayBuildCompiler = gSystem->GetBuildCompiler();
 	fEventDisplayBuildCompilerVersion = gSystem->GetBuildCompilerVersion();
 	fEventDisplayBuildArch = gSystem->GetBuildArch();
 	fEventDisplayBuildNode = gSystem->GetBuildNode();
 	fEventDisplayBuildDir = gSystem->GetBuildDir();
 	gSystem->GetSysInfo( fEventDisplaySystemInfo );
-// get root info
+	// get root info
 	fEventDisplayBuildROOTVersion = gROOT->GetVersion();
 	fEventDisplayBuildROOTVersionInt = gROOT->GetVersionInt();
 }

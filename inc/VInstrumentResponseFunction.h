@@ -30,29 +30,29 @@ class VInstrumentResponseFunction
 		string fName;
 		string fType;
 		
-// data tree
+		// data tree
 		CData*   fData;
 		
-// return data tree
+		// return data tree
 		TTree*    fDataProduct;
 		VInstrumentResponseFunctionData* fIRFData_Tree;
 		
 		unsigned int fEnergyReconstructionMethod;
 		
-// histograms and data
+		// histograms and data
 		vector< vector< VInstrumentResponseFunctionData* > > fIRFData;
 		
-// cuts
+		// cuts
 		VGammaHadronCuts* fAnaCuts;
 		
-// effective area calculation
+		// effective area calculation
 		vector< double > fVMinAz;
 		vector< double > fVMaxAz;
-// spectral weighting
+		// spectral weighting
 		vector< double > fVSpectralIndex;
 		VSpectralWeight* fSpectralWeight;
 		
-// containment probabilities
+		// containment probabilities
 		double  fContainmentProbability;
 		double  fContainmentProbabilityError;
 		

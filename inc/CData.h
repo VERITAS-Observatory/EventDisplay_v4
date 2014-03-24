@@ -37,7 +37,7 @@ class CData
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
 		
-// Declaration of leave types
+		// Declaration of leave types
 		Int_t           runNumber;
 		Int_t           eventNumber;
 		Int_t           MJD;
@@ -46,7 +46,7 @@ class CData
 		Double_t        TelAzimuth[VDST_MAXTELESCOPES];
 		Double_t        TelDec[VDST_MAXTELESCOPES];
 		Double_t        TelRA[VDST_MAXTELESCOPES];
-// MC parameters
+		// MC parameters
 		Int_t           MCprimary;
 		Double_t        MCe0;
 		Double_t        MCxcore;
@@ -138,7 +138,7 @@ class CData
 		//[NTelPairs]
 		Float_t         EmissionHeightT[VDST_MAXTELESCOPES* VDST_MAXTELESCOPES];
 		
-/// model3D parameters ///
+		/// model3D parameters ///
 		Double_t         Smax3D;
 		Double_t         sigmaL3D;
 		Double_t         sigmaT3D;
@@ -155,7 +155,7 @@ class CData
 		Double_t         ErrRWidth3D;
 		bool            Converged3D;
 		
-//FROGS
+		//FROGS
 		Int_t   frogsEventID;
 		Int_t   frogsGSLConStat;
 		Int_t   frogsNB_iter;
@@ -187,7 +187,7 @@ class CData
 		Float_t frogsTelGoodnessBkg2;
 		Float_t frogsTelGoodnessBkg3;
 		
-// List of branches
+		// List of branches
 		TBranch*        b_runNumber;              //!
 		TBranch*        b_eventNumber;            //!
 		TBranch*        b_MJD;                    //!
@@ -196,7 +196,7 @@ class CData
 		TBranch*        b_TelAzimuth;             //!
 		TBranch*        b_TelDec;                 //!
 		TBranch*        b_TelRA;                  //!
-// MC parameter
+		// MC parameter
 		TBranch*        b_MCprimary;
 		TBranch*        b_MCe0;                   //!
 		TBranch*        b_MCxcore;                //!
@@ -280,7 +280,7 @@ class CData
 		TBranch*        b_NTelPairs;              //!
 		TBranch*        b_EmissionHeightT;        //!
 		
-/// model3D parameters ///
+		/// model3D parameters ///
 		TBranch*        b_Smax3D;
 		TBranch*        b_sigmaL3D;
 		TBranch*        b_sigmaT3D;
@@ -297,7 +297,7 @@ class CData
 		TBranch*        b_ErrRWidth3D;
 		TBranch*        b_Converged3D;
 		
-//FROGS
+		//FROGS
 		TBranch* b_frogsEventID;
 		TBranch* b_frogsGSLConStat;
 		TBranch* b_frogsNB_iter;
@@ -379,7 +379,7 @@ CData::~CData()
 
 Int_t CData::GetEntry( Long64_t entry )
 {
-// Read contents of entry.
+	// Read contents of entry.
 	if( !fChain )
 	{
 		return 0;
@@ -397,7 +397,7 @@ Int_t CData::GetEntry( Long64_t entry )
 
 Long64_t CData::LoadTree( Long64_t entry )
 {
-// Set the environment to read one entry
+	// Set the environment to read one entry
 	if( !fChain )
 	{
 		return -5;
@@ -424,19 +424,19 @@ Long64_t CData::LoadTree( Long64_t entry )
 void CData::Init( TTree* tree )
 {
 
-// Set branch addresses
+	// Set branch addresses
 	if( tree == 0 )
 	{
 		return;
 	}
 	
-// get version number
+	// get version number
 	string itemp = tree->GetTitle();
 	if( itemp.find( "VERSION" ) < itemp.size() )
 	{
 		fVersion = atoi( itemp.substr( itemp.find( "VERSION" ) + 7, itemp.size() ).c_str() );
 	}
-// data is in a chain -> get first tree and version number from it
+	// data is in a chain -> get first tree and version number from it
 	else if( tree->IsA() == TChain::Class() )
 	{
 		if( tree->LoadTree( 0 ) >= 0 )
@@ -452,12 +452,12 @@ void CData::Init( TTree* tree )
 			}
 		}
 	}
-// test if this is a MC file
+	// test if this is a MC file
 	if( tree->GetBranchStatus( "MCe0" ) )
 	{
 		fMC = true;
 	}
-// test if second max branch exists
+	// test if second max branch exists
 	if( tree->GetBranchStatus( "SizeSecondMax" ) )
 	{
 		fBOOLSecondMax = true;
@@ -466,22 +466,22 @@ void CData::Init( TTree* tree )
 	{
 		fBOOLtheta2_All = true;
 	}
-// test if teltype branches exist
+	// test if teltype branches exist
 	if( tree->GetBranchStatus( "NTtype" ) )
 	{
 		fBOOLteltype = true;
 	}
-// test if dE branches exist
+	// test if dE branches exist
 	if( tree->GetBranchStatus( "dE" ) )
 	{
 		fBOOLdE = true;
 	}
-// test if frogs stuff exists
+	// test if frogs stuff exists
 	if( tree->GetBranchStatus( "frogsEventID" ) )
 	{
 		fFrogs = true;
 	}
-// test if model3D goodness exists
+	// test if model3D goodness exists
 	if( tree->GetBranchStatus( "Goodness3D" ) )
 	{
 		fModel3D = true;
@@ -519,7 +519,7 @@ void CData::Init( TTree* tree )
 		}
 	}
 	
-// MC tree
+	// MC tree
 	if( fMC )
 	{
 		if( fVersion > 7 )
@@ -655,7 +655,7 @@ void CData::Init( TTree* tree )
 		}
 	}
 	
-//AMC 09102009
+	//AMC 09102009
 	if( fBOOLSecondMax )
 	{
 		fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
@@ -664,8 +664,8 @@ void CData::Init( TTree* tree )
 	{
 		SizeSecondMax = 0.;
 	}
-//AMC 09102009
-
+	//AMC 09102009
+	
 	if( fBOOLtheta2_All )
 	{
 		fChain->SetBranchAddress( "theta2_All", &theta2_All );
@@ -920,14 +920,14 @@ void CData::Init( TTree* tree )
 
 Bool_t CData::Notify()
 {
-// The Notify() function is called when a new file is opened. This
-// can be either for a new TTree in a TChain or when when a new TTree
-// is started when using PROOF. Typically here the branch pointers
-// will be retrieved. It is normaly not necessary to make changes
-// to the generated code, but the routine can be extended by the
-// user if needed.
-
-// Get branch pointers
+	// The Notify() function is called when a new file is opened. This
+	// can be either for a new TTree in a TChain or when when a new TTree
+	// is started when using PROOF. Typically here the branch pointers
+	// will be retrieved. It is normaly not necessary to make changes
+	// to the generated code, but the routine can be extended by the
+	// user if needed.
+	
+	// Get branch pointers
 	b_runNumber = fChain->GetBranch( "runNumber" );
 	b_eventNumber = fChain->GetBranch( "eventNumber" );
 	b_MJD = fChain->GetBranch( "MJD" );
@@ -1084,7 +1084,7 @@ Bool_t CData::Notify()
 	
 	if( fFrogs )
 	{
-//FROGS
+		//FROGS
 		fChain->SetBranchAddress( "frogsEventID", &frogsEventID );
 		fChain->SetBranchAddress( "frogsGSLConStat", &frogsGSLConStat );
 		fChain->SetBranchAddress( "frogsNB_iter", &frogsNB_iter );
@@ -1123,8 +1123,8 @@ Bool_t CData::Notify()
 
 void CData::Show( Long64_t entry )
 {
-// Print contents of entry.
-// If entry is not specified, print current entry
+	// Print contents of entry.
+	// If entry is not specified, print current entry
 	if( !fChain )
 	{
 		return;
@@ -1135,9 +1135,9 @@ void CData::Show( Long64_t entry )
 
 Int_t CData::Cut( Long64_t entry )
 {
-// This function may be called from Loop.
-// returns  1 if entry is accepted.
-// returns -1 otherwise.
+	// This function may be called from Loop.
+	// returns  1 if entry is accepted.
+	// returns -1 otherwise.
 	entry = 0;
 	
 	return 1;

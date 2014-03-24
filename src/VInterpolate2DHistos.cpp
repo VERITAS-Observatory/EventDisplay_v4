@@ -28,7 +28,7 @@ TH2F* VInterpolate2DHistos::doSimpleInterpolation( TH2F* h, string iname, int iw
 	double z = 0.;
 	double imean = 0.;
 	double ierror = 0.;
-// iterate several times over histogram
+	// iterate several times over histogram
 	for( int k = 0; k < maxiter; k++ )
 	{
 		TH2F* htemp = ( TH2F* )hs->Clone();
@@ -36,10 +36,10 @@ TH2F* VInterpolate2DHistos::doSimpleInterpolation( TH2F* h, string iname, int iw
 		{
 			for( int j = 1; j <= hs->GetNbinsY(); j++ )
 			{
-// test if bin has contents
+				// test if bin has contents
 				if( hs->GetBinContent( i, j ) <= 0. )
 				{
-// get mean of all bins around this bin
+					// get mean of all bins around this bin
 					imean = 0.;
 					ierror = 0.;
 					z = 0.;
@@ -116,7 +116,7 @@ TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F
 			z  = hs->GetBinContent( i, j );
 			n  = ( int )( hNevents->GetBinContent( i, j ) * nGausN );
 			
-// loop over all bin entries
+			// loop over all bin entries
 			for( int k = 0; k < n; k++ )
 			{
 				x = fRandom->Gaus( xc, xWidth * nWidth / 2. );
@@ -126,7 +126,7 @@ TH2F* VInterpolate2DHistos::doGaussianInterpolation( TH2F* h, string iname, TH2F
 		}
 	}
 	
-// copy histograms
+	// copy histograms
 	for( int i = 1; i <= hs->GetNbinsX(); i++ )
 	{
 		for( int j = 1; j <= hs->GetNbinsY(); j++ )

@@ -78,14 +78,14 @@ void VImageCleaning::cleanImageFixed( double hithresh, double lothresh, double b
 		}
 	}
 	
-// (preli) set the trigger vector in MC case (preli)
-// trigger vector are image/border tubes
+	// (preli) set the trigger vector in MC case (preli)
+	// trigger vector are image/border tubes
 	if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4
 			|| fData->getReader()->getDataFormatNum() == 6 )
 	{
 		fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
 	}
-// (end of preli)
+	// (end of preli)
 	if( fData->getRunParameter()->frecoverImagePixelNearDeadPixel )
 	{
 		recoverImagePixelNearDeadPixel();
@@ -153,8 +153,8 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
 		}
 	}
 	
-// (preli) set the trigger vector in MC case (preli)
-// trigger vector are image/border tubes
+	// (preli) set the trigger vector in MC case (preli)
+	// trigger vector are image/border tubes
 	if( fData->getReader() )
 	{
 		if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4
@@ -163,8 +163,8 @@ void VImageCleaning::cleanImagePedvars( double hithresh, double lothresh, double
 			fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
 		}
 	}
-// (end of preli)
-
+	// (end of preli)
+	
 	recoverImagePixelNearDeadPixel();
 	fillImageBorderNeighbours();
 }
@@ -285,7 +285,7 @@ bool VImageCleaning::InitNNImageCleaning()
 		gIPR2 = ReadIPRGraph( MSTrefIPR, "IPRcharge" );
 		fFADCtoPhe[2] = ReadConvFactorsHist( MSTrefIPR, "hConvFactors", 1 );
 	}
-//    if(!fData->getRunParameter()->fPerformFlashCamAnalysis[3]){gIPR3=ReadIPRGraph(SSTrefIPR,"IPRcharge");fFADCtoPhe[3]=ReadConvFactorsHist(SSTrefIPR,"hConvFactors",1);}
+	//    if(!fData->getRunParameter()->fPerformFlashCamAnalysis[3]){gIPR3=ReadIPRGraph(SSTrefIPR,"IPRcharge");fFADCtoPhe[3]=ReadConvFactorsHist(SSTrefIPR,"hConvFactors",1);}
 	if( !fData->getRunParameter()->fPerformFlashCamAnalysis[4] )
 	{
 		gIPR4 = ReadIPRGraph( SSTrefIPR, "IPRcharge" );
@@ -302,7 +302,7 @@ bool VImageCleaning::InitNNImageCleaning()
 		gIPR2 = ReadIPRGraph( MSTrefIPR, "IPRchargeFlash" );
 		fFADCtoPhe[2] = ReadConvFactorsHist( MSTrefIPR, "hConvFactors", 2 );
 	}
-//    if(fData->getRunParameter()->fPerformFlashCamAnalysis[3]) {gIPR3=ReadIPRGraph(SSTrefIPR,"IPRchargeFlash");fFADCtoPhe[3]=ReadConvFactorsHist(SSTrefIPR,"hConvFactors",2);}
+	//    if(fData->getRunParameter()->fPerformFlashCamAnalysis[3]) {gIPR3=ReadIPRGraph(SSTrefIPR,"IPRchargeFlash");fFADCtoPhe[3]=ReadConvFactorsHist(SSTrefIPR,"hConvFactors",2);}
 	if( fData->getRunParameter()->fPerformFlashCamAnalysis[4] )
 	{
 		gIPR4 = ReadIPRGraph( SSTrefIPR, "IPRchargeFlash" );
@@ -314,7 +314,7 @@ bool VImageCleaning::InitNNImageCleaning()
 		return false;
 	}
 	
-// GMGM what are these values?
+	// GMGM what are these values?
 	float fFakeImageProb = 0.5E-3; // 0.2%  for LST ->less for MST, SST
 	float SimTime = 100.; //ns
 	float fMinRate = fFakeImageProb / ( SimTime * 1E-9 * float( 3 ) ); //ns
@@ -347,7 +347,7 @@ bool VImageCleaning::InitNNImageCleaning()
 		//fFADCtoPhe[t]=fData->getRunParameter()->fFADCtoPhe[t];
 		std::cout << "fFADCtoPhe[" << t << "]=" << fFADCtoPhe[t] << " ChargeMax:" << gIPR->GetXaxis()->GetXmax() << " ifActiveType:" << fData->getRunParameter()->ifActiveType[t] << std::endl;
 	}
-// init IPRs
+	// init IPRs
 	fIPRdim = 200;
 	IPR = new float* [VDST_MAXTELTYPES];
 	for( int t = 0; t < VDST_MAXTELTYPES; t++ )
@@ -398,7 +398,7 @@ bool VImageCleaning::BoundarySearch( int type, float thresh, TF1* fProbCurve, fl
 		return false;
 	}
 	
-// check for valid pixel number
+	// check for valid pixel number
 	if( idx >= ( int )fData->getDetectorGeo()->getNeighbours().size() )
 	{
 		return false;
@@ -1024,7 +1024,7 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 	float corr = 1.;
 	//                 [p.e.]4nn   2+1      3nn       2nn      Bound.   Bound Ref Charge
 	float PreThresh[6] = {2.0 / corr, 3.0 / corr, 2.8 / corr, 5.2 / corr, 1.8 / corr, 4.0 / corr};
-// GMGM hardcoded number of telescope type, why is this not an array?
+	// GMGM hardcoded number of telescope type, why is this not an array?
 	if( type == 1 )
 	{
 		FillPreThresholds( gIPR, PreThresh );
@@ -1091,7 +1091,7 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 		}
 	}
 	//ngroups+=NNGroupSearchProbCurve(type,(TF1*)fProb4nnCurves->At(type), PreThresh[0]);           for(unsigned int p=0;p<numpix;p++){if(VALIDITYBUF[p]==4) VALIDITY[p]=4; }
-// GMGM don't understund PreThresh[..] index
+	// GMGM don't understund PreThresh[..] index
 	// *********************************************************************
 	//*********************************************************************
 	// Boundary
@@ -1122,7 +1122,7 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 			{
 				continue;
 			}
-// GMGM assume hexagon in the following?
+			// GMGM assume hexagon in the following?
 			if( ( iRing > 0 ) && ( VALIDITYBOUNDBUF[idx] < iRing + 7 ) && ( VALIDITYBOUNDBUF[idx] > 1.9 ) )
 			{
 				continue;
@@ -1416,7 +1416,7 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 			imageflag++;
 		}
 	}
-// GMGM    if(imageflag==0) SIZE=-1;
+	// GMGM    if(imageflag==0) SIZE=-1;
 	if( imageflag == 0 )
 	{
 		SIZE = 0.;
@@ -1438,7 +1438,7 @@ void VImageCleaning::cleanNNImageFixed()
 	{
 		printDataError( "VImageCleaning::cleanNNImageFixed image cleaning not initialized" );
 	}
-// calculates the valarray of tubes to be included in the parameterization
+	// calculates the valarray of tubes to be included in the parameterization
 	fData->setImage( false );
 	fData->setBorder( false );
 	fData->setBrightNonImage( false );
@@ -1463,7 +1463,7 @@ void VImageCleaning::cleanNNImageFixed()
 			GetIPRGraph( type, ScanWindow );
 		}
 	}
-//prepare for image cleaning
+	//prepare for image cleaning
 	for( unsigned int i = 0; i < i_nchannel; i++ )
 	{
 		INTENSITY[i] = 0;
@@ -1482,7 +1482,7 @@ void VImageCleaning::cleanNNImageFixed()
 	sizecheck = ImageCleaningCharge( type, ngroups );
 	//set pixel's flags
 	unsigned int ncorepix = 0;
-//    unsigned int nimagepix=0;
+	//    unsigned int nimagepix=0;
 	if( ngroups > 0 )
 	{
 	
@@ -1498,7 +1498,7 @@ void VImageCleaning::cleanNNImageFixed()
 			}
 		}
 		
-//        float BorderEdge=2.*sqrt(fNSBscale)/sqrt(0.6)*pow(sizecheck/40.,0.76);
+		//        float BorderEdge=2.*sqrt(fNSBscale)/sqrt(0.6)*pow(sizecheck/40.,0.76);
 		//float BorderEdge=2.*sqrt(fNSBscale)/sqrt(0.6)*pow(maxcharge/7.,0.76);
 		//cout<<"BorderEdge:"<<BorderEdge<<" maxcharge:"<<maxcharge<<" ratio:"<<maxcharge/sizecheck<<endl;
 		for( unsigned int i = 0; i < i_nchannel; i++ )
@@ -1777,8 +1777,8 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 			timeCutPixel = tpix + 0.1;                     // added some uncertenties adhoc
 		}
 	}
-//     cout << "TimeImageCleaning: TC = " << timeCutPixel << " / " << timeCutCluster << " L = " << loop_max << endl;
-
+	//     cout << "TimeImageCleaning: TC = " << timeCutPixel << " / " << timeCutCluster << " L = " << loop_max << endl;
+	
 	fData->setImage( false );
 	fData->setBorder( false );
 	fData->setBrightNonImage( false );
@@ -1803,7 +1803,7 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 			{
 				fData->setImage( i, true );
 			}
-//	    if( fData->getSums()[i] > brightthresh ) fData->setBrightNonImage( i, true );
+			//	    if( fData->getSums()[i] > brightthresh ) fData->setBrightNonImage( i, true );
 		}
 		else
 		{
@@ -1812,7 +1812,7 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 			{
 				fData->setImage( i, true );
 			}
-//	    if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) fData->setBrightNonImage( i, true );
+			//	    if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) fData->setBrightNonImage( i, true );
 		}
 	}
 	
@@ -1936,9 +1936,9 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		fData->setClusterCenx( cluster, i_clustercenx );
 		fData->setClusterCeny( cluster, i_clusterceny );
 		
-//       cout << "### " << cluster << " Npix=" << i_clusterNpix << " size=" << i_clustersize << " time=" << i_clustertime
-// 	   << " cenx=" << i_clustercenx << " ceny=" << i_clusterceny << endl;
-
+		//       cout << "### " << cluster << " Npix=" << i_clusterNpix << " size=" << i_clustersize << " time=" << i_clustertime
+		// 	   << " cenx=" << i_clustercenx << " ceny=" << i_clusterceny << endl;
+		
 		if( i_clustersize == -99 )
 		{
 			fData->setMainClusterID( 0 );
@@ -1950,11 +1950,11 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		}
 		cluster++;
 	}
-//     cout << "MAIN CLUSTER " << getMainClusterID()
-// 	 << ": Npix=" << getClusterNpix()[ getMainClusterID() ]
-// 	 << " Size=" << getClusterSize()[ getMainClusterID() ]
-// 	 << " Time=" << getClusterTime()[ getMainClusterID() ] << endl;
-
+	//     cout << "MAIN CLUSTER " << getMainClusterID()
+	// 	 << ": Npix=" << getClusterNpix()[ getMainClusterID() ]
+	// 	 << " Size=" << getClusterSize()[ getMainClusterID() ]
+	// 	 << " Time=" << getClusterTime()[ getMainClusterID() ] << endl;
+	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// STEP 4: eliminate all clusters with time differences > Tcluster to the main cluster
 	//
@@ -2002,17 +2002,17 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 				
 				if( i_ID == cluster && fData->getImage()[i] )
 				{
-// 		    cout<< "  " <<i_ID << "  delta_T  = " << fabs(xtime - xtimemain) << endl;
-// 		    cout<< "  " <<i_ID << "  time diff= " << fabs( getClusterTime()[i_ID] - getClusterTime()[getMainClusterID()]) << endl;
-// 		    cout<< i_ID << " " << i << ": " << getClusterTime()[i_ID] << "-" << getClusterTime()[getMainClusterID()] << "="
-// 			<< getClusterTime()[i_ID] - getClusterTime()[getMainClusterID()]
-// 			<< " fabs(" << i_clusterXtime << "-" << i_mainXtime << "=" << i_clusterXtime - i_mainXtime << ") = "
-// 			<< fabs( (getClusterTime()[i_ID]-getClusterTime()[getMainClusterID()]) - (i_clusterXtime - i_mainXtime) ) << endl;
-
+					// 		    cout<< "  " <<i_ID << "  delta_T  = " << fabs(xtime - xtimemain) << endl;
+					// 		    cout<< "  " <<i_ID << "  time diff= " << fabs( getClusterTime()[i_ID] - getClusterTime()[getMainClusterID()]) << endl;
+					// 		    cout<< i_ID << " " << i << ": " << getClusterTime()[i_ID] << "-" << getClusterTime()[getMainClusterID()] << "="
+					// 			<< getClusterTime()[i_ID] - getClusterTime()[getMainClusterID()]
+					// 			<< " fabs(" << i_clusterXtime << "-" << i_mainXtime << "=" << i_clusterXtime - i_mainXtime << ") = "
+					// 			<< fabs( (getClusterTime()[i_ID]-getClusterTime()[getMainClusterID()]) - (i_clusterXtime - i_mainXtime) ) << endl;
+					
 					if( fabs( ( fData->getClusterTime()[i_ID] - fData->getClusterTime()[fData->getMainClusterID()] ) - ( i_clusterXtime - i_mainXtime ) ) > timeCutCluster )
 					{
-// 			cout << " --> "<< i << " cluster time cleaning : "
-// 			     << fabs( (getClusterTime()[i_ID]-getClusterTime()[getMainClusterID()]) - (i_clusterXtime - i_mainXtime) ) <<  endl;
+						// 			cout << " --> "<< i << " cluster time cleaning : "
+						// 			     << fabs( (getClusterTime()[i_ID]-getClusterTime()[getMainClusterID()]) - (i_clusterXtime - i_mainXtime) ) <<  endl;
 						fData->setImage( i, false );
 						fData->setClusterID( i, -99 );
 					}
@@ -2037,12 +2037,12 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 				
 				if( i_ID != fData->getMainClusterID() && fabs( fData->getClusterTime()[i_ID] - fData->getClusterTime()[fData->getMainClusterID()] ) > timeCutCluster )
 				{
-// 		    cout << "----> "<< i << " was removed with cluster time cleaning" << endl;
+					// 		    cout << "----> "<< i << " was removed with cluster time cleaning" << endl;
 					fData->setImage( i, false );
 					fData->setClusterID( i, -99 );
 					
-// 	      if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) setBrightNonImage( i, true );
-//  	      if( fData->getSums()[i] > hithresh  * i_pedvars_i ) setBrightNonImage( i, true );
+					// 	      if( fData->getSums()[i] > brightthresh  * i_pedvars_i ) setBrightNonImage( i, true );
+					//  	      if( fData->getSums()[i] > hithresh  * i_pedvars_i ) setBrightNonImage( i, true );
 				}
 			}
 		}
@@ -2067,9 +2067,9 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		double i_pedvars_k = 0.;
 		for( unsigned int i = 0; i < i_nchannel; i++ )
 		{
-// 	    if (fData->getDetectorGeo()->getAnaPixel()[i] < 1 ||
-//  		fData->getClusterID()[i] == 0 || fData->getClusterID()[i] == -99 ) continue;
-
+			// 	    if (fData->getDetectorGeo()->getAnaPixel()[i] < 1 ||
+			//  		fData->getClusterID()[i] == 0 || fData->getClusterID()[i] == -99 ) continue;
+			
 			i_ID = fData->getClusterID()[i];
 			if( fData->getImage()[i] || fData->getBorder()[i] )
 			{
@@ -2121,7 +2121,7 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 	
 	mergeClusters();
 	
-//     for( unsigned int i = 0; i < i_nchannel; i++ ) setClusterID( i, 0 );
+	//     for( unsigned int i = 0; i < i_nchannel; i++ ) setClusterID( i, 0 );
 	for( int x = 0; x <= i_cluster; x++ )
 	{
 		fData->setClusterNpix( x, 0 );
@@ -2169,9 +2169,9 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 		fData->setClusterSize( cluster, i_clustersize );
 		fData->setClusterTime( cluster, i_clustertime );
 		
-//       if( i_clusterNpix > 0 )
-// 	cout << "     CLUSTER " <<cluster<< ": Npix=" <<i_clusterNpix<< " Size=" <<i_clustersize<< " Time=" << i_clustertime << endl;
-
+		//       if( i_clusterNpix > 0 )
+		// 	cout << "     CLUSTER " <<cluster<< ": Npix=" <<i_clusterNpix<< " Size=" <<i_clustersize<< " Time=" << i_clustertime << endl;
+		
 		if( i_clustersize == -99 )
 		{
 			fData->setMainClusterID( 0 );
@@ -2227,22 +2227,22 @@ void VImageCleaning::cleanImageWithTiming( double hithresh, double lothresh, dou
 	
 	
 	
-//       cout << "BRIGHT NON IMAGES : ";
-//       for( unsigned int i = 0; i < i_nchannel; i++ )
-//       {
-//       // check for bright non images
-//       if( fData->getBrightNonImage()[i] )
-//       {
-//       if( fData->getImage()[i] ) setBrightNonImage( i, false );
-//       else if( fData->getBorder()[i] ) setBrightNonImage( i, false );
-//       }
-
-//       if( fData->getBrightNonImage()[i] )
-//       cout << i << ", ";
-//       }
-//       cout << endl;
-
-
+	//       cout << "BRIGHT NON IMAGES : ";
+	//       for( unsigned int i = 0; i < i_nchannel; i++ )
+	//       {
+	//       // check for bright non images
+	//       if( fData->getBrightNonImage()[i] )
+	//       {
+	//       if( fData->getImage()[i] ) setBrightNonImage( i, false );
+	//       else if( fData->getBorder()[i] ) setBrightNonImage( i, false );
+	//       }
+	
+	//       if( fData->getBrightNonImage()[i] )
+	//       cout << i << ", ";
+	//       }
+	//       cout << endl;
+	
+	
 	if( fData->getReader()->getDataFormatNum() == 1 || fData->getReader()->getDataFormatNum() == 4 || fData->getReader()->getDataFormatNum() == 6 )
 	{
 		fData->getReader()->setTrigger( fData->getImage(), fData->getBorder() );
@@ -2298,27 +2298,27 @@ void VImageCleaning::removeSmallClusters( int minPix )
 			continue;
 		}
 		
-// remove clusters with less then minPix
+		// remove clusters with less then minPix
 		if( fData->getClusterNpix()[i_cluster] < minPix )
 		{
-// 	  if( fData->getImage()[i] || fData->getBorder()[i] ) cout << "ELIMINATOR ACTIVE for cluster " << i_cluster << " : ";
-
+			// 	  if( fData->getImage()[i] || fData->getBorder()[i] ) cout << "ELIMINATOR ACTIVE for cluster " << i_cluster << " : ";
+			
 			if( fData->getImage()[i] )
 			{
-// 	      cout << i << ", ";
+				// 	      cout << i << ", ";
 				fData->setImage( i, false );
 				fData->setClusterID( i, -99 );
 			}
 			else if( fData->getBorder()[i] )
 			{
-// 	      cout << i << ", ";
+				// 	      cout << i << ", ";
 				fData->setBorder( i, false );
 				fData->setClusterID( i, -99 );
 			}
-// 	  cout << endl;
+			// 	  cout << endl;
 		}
 		
-// remove single core pixels with less than two direct border pixels
+		// remove single core pixels with less than two direct border pixels
 		int c1 = 0;
 		int c2 = 0;
 		
@@ -2358,13 +2358,13 @@ void VImageCleaning::removeSmallClusters( int minPix )
 		
 		if( c1 + c2 < 2 && fData->getImage()[i] )
 		{
-// 	  cout << "----> "<< i << " was removed as single core pixel (incl ";
+			// 	  cout << "----> "<< i << " was removed as single core pixel (incl ";
 			fData->setImage( i, false );
 			fData->setBorder( i, false );
 			fData->setBrightNonImage( i, true );
 			fData->setClusterID( i, -99 );
 			
-// remove the rest of the single core cluster (if it exists)
+			// remove the rest of the single core cluster (if it exists)
 			unsigned int i_neighbour_size = fData->getDetectorGeo()->getNNeighbours()[i];
 			for( unsigned int j = 0; j < i_neighbour_size; j++ )
 			{
@@ -2372,20 +2372,20 @@ void VImageCleaning::removeSmallClusters( int minPix )
 				if( fData->getBorder()[k] )
 				{
 					fData->setBorder( k, false );
-// 		  cout << k << " ";
-
+					// 		  cout << k << " ";
+					
 					for( unsigned l = 0; l < fData->getDetectorGeo()->getNNeighbours()[k]; l++ )
 					{
 						unsigned int m = fData->getDetectorGeo()->getNeighbours()[k][l];
 						if( fData->getBorder()[m] )
 						{
 							fData->setBorder( m, false );
-// 			  cout << m << " ";
+							// 			  cout << m << " ";
 						}
 					}
 				}
 			}
-// 	  cout << ")" << endl;
+			// 	  cout << ")" << endl;
 		}
 	}
 	
@@ -2402,9 +2402,9 @@ void VImageCleaning::fillImageBorderNeighbours()
 	{
 		if( fData->getImage()[i] || fData->getBorder()[i] )
 		{
-// a pixel is its own neighbour :-)
+			// a pixel is its own neighbour :-)
 			fData->getImageBorderNeighbour()[i] = true;
-// loop over all neighbours
+			// loop over all neighbours
 			unsigned int i_neighbour_size = fData->getDetectorGeo()->getNNeighbours()[i];
 			for( unsigned int j = 0; j < i_neighbour_size; j++ )
 			{
@@ -2485,8 +2485,8 @@ void VImageCleaning::cleanTriggerFixed( double hithresh, double lothresh )
 	{
 		cout << "VImageCleaning::cleanTriggerFixed() " << hithresh << "\t" << lothresh << endl;
 	}
-// MS: produce a trigger-level cleaned image. The logic here is that one might want to require
-// only patches of 3 nearest neighbors to constitute a valid center pixel.
+	// MS: produce a trigger-level cleaned image. The logic here is that one might want to require
+	// only patches of 3 nearest neighbors to constitute a valid center pixel.
 	fData->setTrigger( false );
 	unsigned int i_nchannel = fData->getNChannels();
 	
@@ -2499,7 +2499,7 @@ void VImageCleaning::cleanTriggerFixed( double hithresh, double lothresh )
 			{
 				if( fData->getReader()->getFullTrigVec()[i] )
 				{
-// ensure that at least XX neighbors are above this threshold
+					// ensure that at least XX neighbors are above this threshold
 					int local_neighbors = 0;
 					for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[i].size(); j++ )
 					{
@@ -2521,7 +2521,7 @@ void VImageCleaning::cleanTriggerFixed( double hithresh, double lothresh )
 			{
 				if( fData->getSums()[i] > fData->getRunParameter()->fPWcleanThreshold )
 				{
-// ensure that at least XX neighbors are above this threshold
+					// ensure that at least XX neighbors are above this threshold
 					int local_neighbors = 0;
 					for( unsigned int j = 0; j < fData->getDetectorGeo()->getNeighbours()[i].size(); j++ )
 					{
@@ -2576,10 +2576,10 @@ void VImageCleaning::cleanTriggerFixed( double hithresh, double lothresh )
 		
 	}
 	
-// assume that the image has been cleaned according to spec, then a new parameter will decide
-// wether  to apply a reduction in the number of pixels transmitted:
-// This will mask all pixels past the cut-off to be ZERO
-
+	// assume that the image has been cleaned according to spec, then a new parameter will decide
+	// wether  to apply a reduction in the number of pixels transmitted:
+	// This will mask all pixels past the cut-off to be ZERO
+	
 	if( fData->getRunParameter()->fPWlimit > 0 )                   // then we'll transmit up to a fixed number of pixels per sector
 	{
 		const int n_sectors = 3;
@@ -2778,15 +2778,15 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 		
 		if( nimage > 3 && nimage < pixThresh )
 		{
-//Build a list of pixels near the image pixels
-//Loop over image/border pixels
+			//Build a list of pixels near the image pixels
+			//Loop over image/border pixels
 			for( unsigned int o = 0; o < ImagePixelList.size(); o++ )
 			{
 				unsigned int i = ImagePixelList[o];
-//Get the neighbours of this image pixel
+				//Get the neighbours of this image pixel
 				for( unsigned int j = 0; j < fData->getDetectorGeo()->getNNeighbours()[i]; j++ )
 				{
-//Check if it is already included in the neighbour list
+					//Check if it is already included in the neighbour list
 					bool have = false;
 					k = fData->getDetectorGeo()->getNeighbours()[i][j];
 					for( unsigned int p = 0; p < NearbyPixelList.size(); p++ )
@@ -2797,7 +2797,7 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 							break;
 						}
 					}
-//Check if it is already included in the image pixel list
+					//Check if it is already included in the image pixel list
 					for( unsigned int p = 0; p < ImagePixelList.size(); p++ )
 					{
 						if( ImagePixelList[p] == k )
@@ -2806,7 +2806,7 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 							break;
 						}
 					}
-//Add to neighbour list if necessary
+					//Add to neighbour list if necessary
 					if( !have )
 					{
 						NearbyPixelList.push_back( k );
@@ -2828,7 +2828,7 @@ void VImageCleaning::cleanImageTraceCorrelate( double sigNoiseThresh, double cor
 					double corv = getTraceCorrelationValue( AvePulseMean, tMean, AvePulseVar, tVar, avepulse, vImageTraces[k] );
 					double sn = fData->getSums()[k] / fData->getPedvars( fData->getCurrentSumWindow()[k], fData->getHiLo()[k] )[k];
 					
-// require that correlation coefficient and signal/noise is above certain thresholds
+					// require that correlation coefficient and signal/noise is above certain thresholds
 					if( corv > corrThresh && sn > sigNoiseThresh )
 					{
 						fData->setBorder( k, true );

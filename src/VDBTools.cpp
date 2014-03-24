@@ -34,7 +34,7 @@ bool VDB_ObservingSources::fill( TSQLServer* i_db )
 	
 	char c_query[1000];
 	
-// read source data
+	// read source data
 	sprintf( c_query, "select * from tblObserving_Sources" );
 	
 	TSQLResult* db_res = i_db->Query( c_query );

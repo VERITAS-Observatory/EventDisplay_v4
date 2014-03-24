@@ -66,12 +66,12 @@ bool VSimulationDataReader::printSimulationHeader( VPacket* packet, int bPrintCF
 		{
 			cout << "\t\t telescope " << i + 1 << ": " << h->fArray[i].fRelTelLocSouthM << "\t" << h->fArray[i].fRelTelLocEastM << "\t" << h->fArray[i].fRelTelLocUpM << endl;
 		}
-// this might print the complete .cfg file
+		// this might print the complete .cfg file
 		if( h->fSimConfigFile.size() && bPrintCFG == 1 )
 		{
 			cout << h->fSimConfigFile << endl;
 		}
-// find config file name. The line should look like this: "  (cfg file /path/to/file)\n"
+		// find config file name. The line should look like this: "  (cfg file /path/to/file)\n"
 		if( h->fSimConfigFile.size() && bPrintCFG == 2 )
 		{
 			size_t index_start = h->fSimConfigFile.find( "(cfg file" );
@@ -107,14 +107,14 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 		return 0;
 	}
 	
-// new MC run header
+	// new MC run header
 	VMonteCarloRunHeader* iMCRunHeader = new VMonteCarloRunHeader();
 	iMCRunHeader->SetName( "MC_runheader" );
 	
 	iMCRunHeader->runnumber = h->fRunNumber;
 	iMCRunHeader->detector_Simulator = h->fSimulator;
 	iMCRunHeader->detector_date = h->fDateOfSimsUTC;
-// CORSIKA/grisudet
+	// CORSIKA/grisudet
 	if( ( int )h->fSimulationPackage == 1 )
 	{
 		iMCRunHeader->shower_prog_id = 1;
@@ -123,8 +123,8 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 	iMCRunHeader->atmosphere = ( int )h->fAtmosphericModel;
 	iMCRunHeader->obsheight = ( double )h->fObsAltitudeM;
 	
-// read long string of fSimConfigFile and extract all the necessary information
-// (very dependent on structure of string -> will soon be replace by a VGrisuSimulationRunHeader)
+	// read long string of fSimConfigFile and extract all the necessary information
+	// (very dependent on structure of string -> will soon be replace by a VGrisuSimulationRunHeader)
 	if( h->fSimConfigFile.size() > 0 )
 	{
 		istringstream is_stream( h->fSimConfigFile );
@@ -370,7 +370,7 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 				{
 					is_stream >> iATM;
 				}
-// (GM) simulation header in MC vbf file is not filled properly (yet)
+				// (GM) simulation header in MC vbf file is not filled properly (yet)
 				if( iATM != 0 )
 				{
 					iMCRunHeader->atmosphere = iATM;
@@ -412,12 +412,12 @@ VMonteCarloRunHeader* VSimulationDataReader::fillSimulationHeader( VPacket* pack
 			
 		}
 	}
-// scatter mode (y=0)
+	// scatter mode (y=0)
 	if( TMath::Abs( iMCRunHeader->core_range[1] ) < 1.e-5 )
 	{
 		iMCRunHeader->core_pos_mode = 1;
 	}
-// geomagnetic field
+	// geomagnetic field
 	iMCRunHeader->B_total = sqrt( iMCRunHeader->B_total * iMCRunHeader->B_total + iMCRunHeader->B_inclination * iMCRunHeader->B_inclination );
 	if( iMCRunHeader->B_total > 0. )
 	{
@@ -457,14 +457,14 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
 	fMCZe = 0.;
 	fMCAz = 0.;
 	
-// get local trigger information
-// this should be somewhere else, since trigger info is
-// no simulation data (preliminary)
+	// get local trigger information
+	// this should be somewhere else, since trigger info is
+	// no simulation data (preliminary)
 	uint32_t eventNumber = 0;
 	if( packet->hasArrayEvent() )
 	{
 		VArrayEvent* i_ae =  packet->getArrayEvent();
-// this vector has size 255
+		// this vector has size 255
 		fLocalTrigger = i_ae->getExpectedTelescopes();
 		if( i_ae->hasEventNumber() )
 		{
@@ -487,10 +487,10 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
 			cout << "\t\t\t VSimulationDataReader::setSimulationData(): hasSimulationData(), eventnumber " << eventNumber << endl;
 		}
 		fSimulationData = packet->getSimulationData();
-///////////////////////////////////////////////////////////////////////
-// VBF is currently not backward compatible (d20061130)
-// VBF doesn not show any version change from compatible version
-// (compile with -DVBF_021)
+		///////////////////////////////////////////////////////////////////////
+		// VBF is currently not backward compatible (d20061130)
+		// VBF doesn not show any version change from compatible version
+		// (compile with -DVBF_021)
 #ifdef VBF_021
 		fMCprimary = ( int )fSimulationData->id;
 		fMCenergy = fSimulationData->e;
@@ -500,23 +500,23 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
 		fMCAz = fSimulationData->phi;
 		fTel_Elevation = 0.;
 		fTel_Azimuth = 0.;
-////////////////////////////////////////////////////////////////////////////////////////////
-// newer versions
-////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////
+		// newer versions
+		////////////////////////////////////////////////////////////////////////////////////////////
 #else
 		fRunNumber = fSimulationData->fRunNumber;
 		fEventNumber = fSimulationData->fEventNumber;
 		fMCprimary = ( int )fSimulationData->fCORSIKAParticleID;
-// eventdisplay works in [TeV]
+		// eventdisplay works in [TeV]
 		fMCenergy = fSimulationData->fEnergyGeV / 1.e3;
 		fMCX = fSimulationData->fCoreEastM;
-// grisu coordinate system is with y towards north
+		// grisu coordinate system is with y towards north
 		fMCY = -1.*fSimulationData->fCoreSouthM;
 		fMCZe = fSimulationData->fPrimaryZenithDeg;
 		fMCAz = fSimulationData->fPrimaryAzimuthDeg;
 		fTel_Elevation = 90. - fSimulationData->fObservationZenithDeg;
 		fTel_Azimuth = fSimulationData->fObservationAzimuthDeg;
-
+		
 		float x = 0.;
 		float y = 0.;
 		float z = 0.;
@@ -525,8 +525,8 @@ bool VSimulationDataReader::setSimulationData( VPacket* packet )
 		fMCXoff = x;
 		fMCYoff = y;
 #endif
-// calculate direction cosinii
-// (this might be different to what VGrisuReader reads from the MC file
+		// calculate direction cosinii
+		// (this might be different to what VGrisuReader reads from the MC file
 		float degrad = 45. / atan( 1. );
 		fMCXcos = sin( ( fMCZe ) / degrad ) * cos( ( fMCAz ) / degrad );
 		// rounding error

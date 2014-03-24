@@ -41,23 +41,23 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 		double                      fEnergy_min_TeV;
 		double                      fEnergy_max_TeV;
 		
-// spectral parameters (assuming power law)
+		// spectral parameters (assuming power law)
 		double fMinEnergy;   //!< calculate flux limit above this energy [TeV]
 		double fMaxEnergy;   //!< maximum energy to be taken into account [TeV]
 		double fE0;          //!< calculate flux at this energy [TeV]
 		double fAlpha;       //!< assumed spectral index
 		
-// significance and upper flux limit parameters
+		// significance and upper flux limit parameters
 		int    fLiMaEqu;
 		double fThresholdSignificance;
 		double fMinEvents;
 		double fUpperLimit;
 		int    fUpperLimitMethod;
 		
-// light curve filling
+		// light curve filling
 		TH1D*    fObservingInvervallHisto;
 		
-// plotting
+		// plotting
 		TCanvas* fCanvasLightCurve;
 		double   fPlottingMJDMin;
 		double   fPlottingMJDMax;
@@ -71,7 +71,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 		string   fRateAxisTitle;
 		bool     fRateAxisTitleUnSet;
 		
-// private functions
+		// private functions
 		bool     fillTeV_anasum( bool iPrint );
 		bool     fillTeV_ascii( bool iPrint );
 		bool     fillXRT_ascii( bool iPrint );

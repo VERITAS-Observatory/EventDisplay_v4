@@ -292,7 +292,7 @@ void VOrbitalPhase::copyInputFile()
 void VOrbitalPhase::copyDirectory( TDirectory* source )
 {
 
-//   from http://root.cern.ch/phpBB2/viewtopic.php?t=2789
+	//   from http://root.cern.ch/phpBB2/viewtopic.php?t=2789
 	//   Author: Rene Brun
 	TDirectory* savdir = gDirectory;
 	TDirectory* adir;

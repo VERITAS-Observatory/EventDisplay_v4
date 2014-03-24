@@ -34,7 +34,7 @@ class VLightCurveUtilities
 	
 		vector< VLightCurveData* >  fLightCurveData;
 		
-// phases
+		// phases
 		double   fPhase_MJD0;
 		double   fPhase_Period_days;
 		double   fPhaseError_low_fPhase_Period_days;

@@ -24,7 +24,7 @@ VMultipleGrIsuReader::VMultipleGrIsuReader( unsigned int nFiles, vector< unsigne
 		fLocalTrigger.push_back( false );
 	}
 	fNoiseFileReader = 0;
-// initialize pointing vectors
+	// initialize pointing vectors
 	fTelElevation.assign( fNFiles, 0. );
 	fTelAzimuth.assign( fNFiles, 0. );
 }
@@ -37,24 +37,24 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
 	
 	map< unsigned int, unsigned int > iTelGrisu = iD->getTelIDGrisu();
 	
-//////////////////////////////////////////////////////////////////
-// make file names
+	//////////////////////////////////////////////////////////////////
+	// make file names
 	cout << "VMultipleGrIsuReader::init source file: " << fNFiles << endl;
 	for( unsigned int i = 0; i < fNFiles; i++ )
 	{
-// check if this telescope should be analyzed
+		// check if this telescope should be analyzed
 		bool bAna = false;
 		for( unsigned int t = 0; t < fTeltoAna.size(); t++ ) if( fTeltoAna[t] == i )
 			{
 				bAna = true;
 			}
 			
-// make file names for source file
+		// make file names for source file
 		if( bAna )
 		{
-// get telescope ID mixing map
-// (this is for the case when N telescope are simulated in corsika and grisu, but
-//  eventdisplay should analyse a subset only)
+			// get telescope ID mixing map
+			// (this is for the case when N telescope are simulated in corsika and grisu, but
+			//  eventdisplay should analyse a subset only)
 			if( iTelGrisu.find( i ) != iTelGrisu.end() )
 			{
 				sprintf( hname, "%s.T%d", i_sourcefile.c_str(), iTelGrisu[i] + 1 );
@@ -72,17 +72,17 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
 		}
 	}
 	
-/////////////////////////////////////////////////////////
-// create noise file reader
-// (one single noise file for all grisu files)
+	/////////////////////////////////////////////////////////
+	// create noise file reader
+	// (one single noise file for all grisu files)
 	if( iSingleExternalPedFile )
 	{
 		fNoiseFileReader = new VNoiseFileReader( 0, iExPedFile );
 		fNoiseFileReader->init( iD, 1, i_sumwindow, fDebug, iseed );
 		fNoiseFileReader->setDefaultGrisuPed( iDefaultPed );
 	}
-/////////////////////////////////////////////////////////
-// create all the readers
+	/////////////////////////////////////////////////////////
+	// create all the readers
 	for( unsigned int i = 0; i < fNFiles; i++ )
 	{
 		if( fSourceFileName[i].size() > 0 )
@@ -94,12 +94,12 @@ bool VMultipleGrIsuReader::init( VDetectorGeometry* iD, string i_sourcefile, vec
 			else
 			{
 				fReader.push_back( new VGrIsuReader( iD, 1, fSourceFileName[i], i_sumwindow, i_telnumberoffset, i_sampleoffset, ifadcscale, fDebug, iseed, "" ) );
-// fill random pedestals for all the readers
+				// fill random pedestals for all the readers
 				fillRandomPeds( fReader.back(), iseed * 3 );
 			}
-// reading from multiple files
+			// reading from multiple files
 			fReader.back()->setMultiGrIsuReader( true );
-// one telescope per file
+			// one telescope per file
 			fReader.back()->setTelescopeID( 0 );
 		}
 		else
@@ -131,7 +131,7 @@ void VMultipleGrIsuReader::fillRandomPeds( VGrIsuReader* g, int iseed )
 		g->assignGrisuPeds( fNoiseFileReader->getFullNoiseVec()[0][0].size() );
 	}
 	
-// randomize all values
+	// randomize all values
 	if( fNoiseFileReader->getPeds().size() == g->getPeds().size() && g->getPedvars().size() == fNoiseFileReader->getPedvars().size() && g->getPedvarsAllSumWindows().size() == fNoiseFileReader->getPedvarsAllSumWindows().size() && g->getPedRMS().size() == fNoiseFileReader->getPedRMS().size() )
 	{
 		for( unsigned int i = 0; i < fNoiseFileReader->getPeds().size(); i++ )
@@ -588,7 +588,7 @@ unsigned int VMultipleGrIsuReader::getNTelLocalTrigger()
 
 bool VMultipleGrIsuReader::hasArrayTrigger()
 {
-// require at least two telescopes with local trigger
+	// require at least two telescopes with local trigger
 	unsigned int ntrig = 0;
 	
 	for( unsigned int i = 0; i < fReader.size(); i++ )
@@ -654,16 +654,16 @@ bool VMultipleGrIsuReader::getNextEvent()
 	bool iB = true;
 	for( unsigned int i = 0; i < fReader.size(); i++ )
 	{
-/////////////////////////////////////////////////////////////////
-// get next event from each file
+		/////////////////////////////////////////////////////////////////
+		// get next event from each file
 		bool iC = false;
 		if( fReader[i] && fSelectedTelescope[i] )
 		{
 			iC = fReader[i]->getNextEvent();
 		}
 		iB = ( iC && iB );
-/////////////////////////////////////////////////////////////////
-// set the local trigger for this telescope
+		/////////////////////////////////////////////////////////////////
+		// set the local trigger for this telescope
 		if( fReader[i] && fSelectedTelescope[i] )
 		{
 			fLocalTrigger[i] = fReader[i]->getLocalTrigger()[0];
@@ -672,8 +672,8 @@ bool VMultipleGrIsuReader::getNextEvent()
 		{
 			fLocalTrigger[i] = 0;
 		}
-/////////////////////////////////////////////////////////////////
-// get telescope poiting
+		/////////////////////////////////////////////////////////////////
+		// get telescope poiting
 		if( fReader[i] && fSelectedTelescope[i] )
 		{
 			fTelElevation[i] = fReader[i]->getTelElevation()[0];
@@ -685,8 +685,8 @@ bool VMultipleGrIsuReader::getNextEvent()
 			fTelAzimuth[i]   = 0.;
 		}
 	}
-/////////////////////////////////////////////////////////////
-// set eventstatuts to 999 for the case of no success
+	/////////////////////////////////////////////////////////////
+	// set eventstatuts to 999 for the case of no success
 	if( !iB )
 	{
 		setEventStatus( 999 );

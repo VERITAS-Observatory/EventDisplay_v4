@@ -83,7 +83,7 @@ class VGrIsuReader : public VVirtualDataReader
 		unsigned int fNoiseTraceStart;
 		bool bNoiseTraceFilled;
 		
-// trigger values (vectors [NTelescope])
+		// trigger values (vectors [NTelescope])
 		int fArrayTrigger;
 		vector< bool > fLocalTrigger;             //! bit coded integer, 1 for local trigger
 		vector< float > fLocalTriggerTime;
@@ -110,17 +110,17 @@ class VGrIsuReader : public VVirtualDataReader
 		vector< uint8_t >  vv8;
 		vector< vector< uint8_t > > v8;           //!< ignore
 		
-// traces for background
+		// traces for background
 		TFile* fTraceFile;                        //!< file for background trace library
 		string fTraceFileName;
 		vector< TTree* > fTraceTree;              //!< vector for background trace trees (one per telescope, preliminary)
 		short int fTrace[500][64];                //!< background trace array
 		
-//  random dead channels
+		//  random dead channels
 		int fMCNdead;                             //!< number of pixels set randomly dead
 		int fMCNdeadboard;                        //!< number of boards set randomly dead (10 dead pixels in a row)
 		
-// MC values
+		// MC values
 		int fMC_primary;                          //!< MC primary type
 		float  fMC_energy;                        //!< MC primary energy in TeV
 		float  fMC_X;                             //!< MC x-coordinate of impact point on ground plane
@@ -132,7 +132,7 @@ class VGrIsuReader : public VVirtualDataReader
 		float  fMC_Xoffset;                       //!< MC x coordinate of source location in degrees
 		float  fMC_Yoffset;                       //!< MC y coordinate of source location in degrees
 		
-// telescope pointing
+		// telescope pointing
 		vector< double > fTelElevation;           //!< telescope pointing, elevation [deg]
 		vector< double > fTelAzimuth;             //!< telescope pointing, azimuth [deg]
 		
@@ -168,7 +168,7 @@ class VGrIsuReader : public VVirtualDataReader
 		{
 			return fSourceFileName;
 		}
-// raweventparser
+		// raweventparser
 		//!<
 		std::pair< bool, uint32_t > getChannelHitIndex( uint32_t );
 		uint32_t                    getRunNumber()
@@ -180,7 +180,7 @@ class VGrIsuReader : public VVirtualDataReader
 		{
 			return fEventNumber;
 		}
-// don't know the difference between hit and trig
+		// don't know the difference between hit and trig
 		//!< get hit vector
 		std::vector< bool >         getFullHitVec()
 		{
@@ -380,7 +380,7 @@ class VGrIsuReader : public VVirtualDataReader
 			return false;
 		}
 		
-// rawfile
+		// rawfile
 		//!< read in next event
 		bool                        getNextEvent();
 		//!< create next pedestal event
@@ -388,7 +388,7 @@ class VGrIsuReader : public VVirtualDataReader
 		//!< read next shower event from file
 		bool                        getNextShowerEvent();
 		
-// MC
+		// MC
 		bool                       isMC()         //!< GrIsu type data is always MC
 		{
 			return true;

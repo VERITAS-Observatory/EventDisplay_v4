@@ -30,12 +30,12 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 {
 	public:
 	
-// local host parameters
+		// local host parameters
 		string fEventDisplayUser;
 		string fEventDisplayHost;
 		string fEventDisplayDate;
 		
-// computer system parameters
+		// computer system parameters
 		string fEventDisplayBuildCompiler;
 		string fEventDisplayBuildCompilerVersion;
 		string fEventDisplayBuildArch;
@@ -43,11 +43,11 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		string fEventDisplayBuildDir;
 		SysInfo_t* fEventDisplaySystemInfo;
 		
-// root parameters
+		// root parameters
 		string fEventDisplayBuildROOTVersion;
 		int    fEventDisplayBuildROOTVersionInt;
 		
-// DB parameters
+		// DB parameters
 		bool   fuseDB;
 		string fDBRunType;                        // run type according to DB
 		string fDBRunStartTimeSQL;                // run start (SQL type)
@@ -57,7 +57,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		double fDBDataStartTimeSecOfDay;          // run start (sec of day)
 		double fDBDataStoppTimeSecOfDay;          // run stopp (sec of day)
 		
-// run parameters
+		// run parameters
 		int    frunnumber;                        // runnumber
 		int    frunmode;                          // run mode
 		//    (0=analysis, 1=pedestal calculation, 2=gain/toffset calculation,
@@ -78,23 +78,23 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		
 		float  fRunDuration;                      // duration of runs in [s]
 		
-// output parameters
+		// output parameters
 		bool   ffillhistos;                       // fill some analysis histograms
 		string foutputfileName;                   // file name for analysis output (root file), -1 = no output
 		
-// debugging
+		// debugging
 		bool  fDebug;                             // print debug output
 		bool  fPrintSmallArray;                   // some printout for small arrays only
 		unsigned int fPrintAnalysisProgress;      // print a line each time this number of events have been processed
 		unsigned int fPrintGrisuHeader;		  // Print full grisu header, includeing detector config file used in grisu simulations (sims only, from VBF header), OR name of config file for detector simulation if available
 		
-// array/telescope geometry parameters
+		// array/telescope geometry parameters
 		unsigned int fNTelescopes;                // number of telescopes
 		vector<string> fcamera;                   // name of camera configuration files
 		vector< unsigned int > fTelToAnalyze;     // analyze only this telescope (Telescope 1 = 0!! )
 		bool   fUseVBFSampleLength;               // use number of samples from VBF file (ignore .cfg file)
 		
-// pointing parameters
+		// pointing parameters
 		string fTargetName;                       // target name
 		double fTargetDec;                        // target declination [deg] (J2000)
 		double fTargetRA;                         // target RA [deg] (J2000)
@@ -114,7 +114,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		double fCheckPointing;                    // stop run if pointing difference between calculated pointing direction and vbf is larger than this value
 		bool fDBCameraRotationMeasurements;       // read camera rotations from DB
 		
-// calibration (pedestals, gains, etc.)
+		// calibration (pedestals, gains, etc.)
 		bool   fcalibrationrun;                   // true if this is a pedestal/gain/toff calculation run
 		string fcalibrationfile;                  // file with file names for calibration
 		bool freadCalibfromDB;                    // if true, calibration information are read in VOFFLINE DB
@@ -156,7 +156,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fL2TimeCorrect;                    // use L2 pulses to correct FADC times (default: on )
 		unsigned fCalibrationDataType;            // for DSTs: kind of calibration data available: 1: full (peds, pedvars, etc). 0: (no calibration data)
 		
-// FADC integration
+		// FADC integration
 		string  fFADCChargeUnit;                  // FADC charge unit (DC or PE)
 		vector< unsigned int > fTraceIntegrationMethod;   // trace integration method
 		vector< unsigned int > fTraceIntegrationMethod_pass1;   // trace integration method for pass 1 (doublepass only)
@@ -193,16 +193,16 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		double fIntegWindow[VDST_MAXTELTYPES];                //! ns
 		bool   ifActiveType[VDST_MAXTELTYPES];                //! if telescope of this type is activated for analysis
 		
-// FADC timing parameters
+		// FADC timing parameters
 		vector< float > fpulsetiminglevels;       // levels at which timing of FADC pulses is calculated
 		unsigned int fpulsetiming_tzero_index;
 		unsigned int fpulsetiming_width_index;
 		unsigned int fpulsetiming_max_index;
 		
-// image cleaning
+		// image cleaning
 		vector< VImageCleaningRunParameter* >  fImageCleaningParameters;
 		
-// image analysis
+		// image analysis
 		int    fImageLL;                          // loglikelihood image parameterisation 0=off/1=on/2=verbose mode (default: 0=off )
 		vector< float > fLogLikelihoodLoss_min;   // do loglikelihood image parameterisation if loss is larger than this value
 		vector< int > fLogLikelihood_Ntubes_min; //  do loglikelihood image parameterisation if ntubes is larger than this value
@@ -211,9 +211,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   fFillImageBorderNeighbours;
 		bool   fSmoothDead;                       // smooth dead pixels (default: off )
 		
-// reconstruction parameter file
+		// reconstruction parameter file
 		string freconstructionparameterfile;      // reconstruction parameter file
-// MC parameters
+		// MC parameters
 		string fsimu_pedestalfile;                // use external pedestal file for MC
 		int    fsimu_noiselevel;                  // noise level used for this external file
 		double fsimu_pedestalfile_DefaultPed;     // default pedestal for Grisu MC (must be the same is in grisu .cfg file)
@@ -231,13 +231,13 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		int fMCNdeadboard;                        // number of boards set randomly dead (10 dead pixels in a row)
 		double fMCScale;                          // scale factor for MC data
 		
-// tree filling
+		// tree filling
 		unsigned int fShortTree;                  // 0: full tree; 1: short tree
 		unsigned int fwriteMCtree;                // 0: do not write MC tree
 		bool fWriteTriggerOnly;                   // true: write triggered events for simulation only
 		bool fFillMCHistos;                       // true: fill MC histograms with thrown events
 		
-// display parameters
+		// display parameters
 		bool   fdisplaymode;                      // display mode or command line mode
 		bool   floopmode;                         // infinite event loop
 		unsigned int fw;                          // main window width
@@ -247,38 +247,38 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool fPlotPaper;                          // clean up plots for papers and talks (no dead channels, no small text, ...)
 		unsigned int fPlotAllInOneMethod;         // from which method are the angular reconstruction results to taken to plot in all in one window
 		
-// star catalogue
+		// star catalogue
 		string fStarCatalogueName;
 		float  fMinStarBrightness_B;
 		float  fMinStarPixelDistance_deg;        // closest distance of a pixel to a bright star
 		int    fMinStarNTubes;                   // closest distance analysis applies only for image smaller than this number
 		
-// muon parameters
+		// muon parameters
 		bool fmuonmode;                           // search for complete muon rings, Martin
-// Hough transform muon parameters
+		// Hough transform muon parameters
 		bool fhoughmuonmode;                      // Use hough transform muon analysis
 		
-// Frogs parameters
+		// Frogs parameters
 		bool ffrogsmode;                          // for Frogs template Analysis, GH
 		string ffrogsmscwfile;			  // frogs file for getting table energy
 		int ffrogsRecID;			  // RecID or Cut_ID Frogs Uses - combine with table
 		
-// Model3D
+		// Model3D
 		bool fUseModel3D;                         // use Model3D analysis, JG
 		bool fUseDisplayModel3D;                  // display Model3D generated images, JG
 		bool fCreateLnLTable;                     // create lookup table for likelihood
 		string fLnLTableFile;                     // read lookup table for likelihood from this file
 		
-// write pulse histograms to gain files
+		// write pulse histograms to gain files
 		int  fwriteLaserPulseN;                    // number of pulse histogram written to gain file
 		bool fwriteAverageLaserPulse;              // write average laser pulse to file
 		
-// dst parameters
+		// dst parameters
 		string fdstfile;                          // dst output file name (root file)
 		int fdstminntubes;                        // write only events with more than fdstminntubes ntubes into dst file
 		bool fdstwriteallpixel;                   // write all information of all pixel into dst output files
 		
-// trigsim parameters (note: different telescope IDs!)
+		// trigsim parameters (note: different telescope IDs!)
 		map< unsigned int, int >   fTrigSim_referenceTrigger;         //!
 		map< unsigned int, float > fTrigSim_threshold;                //!
 		TString  fTrigSimInputcard;                      // input card for trigsim and next-neighbour image cleaning
@@ -289,13 +289,13 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		TString  fIPR3File;
 		TString  fIPR4File;
 		
-// Parallaxwidth
+		// Parallaxwidth
 		int fPWmethod;                            // how to make the trigger-map to calculate the trigger-level image parameters
 		int fPWcleanNeighbors;                    // number of neighbors required for a center pixel to survive the cleaning procedure
 		float fPWcleanThreshold;                  // cleaning threshold to use to determine hit pixels from the summed FADC charge (dc)
 		int fPWlimit;                             // limits the number of pixels transmitted per sector, if =0, then the function is ignored and no cut is applied on the generation of the trigger map
 		
-// functions
+		// functions
 		void print();
 		void print( int iEV );
 		void printCTA_DST();

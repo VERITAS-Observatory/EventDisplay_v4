@@ -45,7 +45,7 @@ class VEvndispReconstructionParameter : public TNamed
 		vector< int > fNImages_min;
 		vector< double > fAxesAngles_min;
 		
-// [methodID][telescope type] (not telescope number!!)
+		// [methodID][telescope type] (not telescope number!!)
 		vector< vector< int > >    fLocalNtubes_min;
 		vector< vector< int > >    fLocalNLowGain_max;
 		vector< vector< double > > fLocalDistance_min;
@@ -68,7 +68,7 @@ class VEvndispReconstructionParameter : public TNamed
 		vector< vector< double > > fMCEnergy_linTeV_max;
 		
 		vector< bool > fUseEventdisplayPointing;
-// C. Duke: 20oct06  added vector to store select image results
+		// C. Duke: 20oct06  added vector to store select image results
 		vector< vector< bool > > fLocalUseImage;
 		
 		vector< string > fMLPFileName;

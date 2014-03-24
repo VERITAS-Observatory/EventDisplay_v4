@@ -17,7 +17,7 @@ class VImageParameter
 		unsigned int fShortTree;                 // if set, only a subset of the parameters are written to the tree of parameters
 		
 	public:
-// global parameters
+		// global parameters
 		int fTelID;                               //!< telescope ID
 		int runNumber;
 		int eventNumber;
@@ -29,7 +29,7 @@ class VImageParameter
 		
 		unsigned int eventStatus;
 		
-// telescope parameters
+		// telescope parameters
 		double fimagethresh;                      //!< parameter for image threshold
 		double fborderthresh;                     //!< parameter for border threshold
 		int fsumfirst;                            //!< parameter for window summation start
@@ -40,12 +40,12 @@ class VImageParameter
 		int fncluster_uncleaned;                  //!< number of clusters after image cleaning
 		unsigned short int fTrig_type;            //  trigger type (e.g. in CTA prod2)
 		
-// telescope position in shower parameter
+		// telescope position in shower parameter
 		double Tel_x_SC;                          //!< telescope position in shower coordinates
 		double Tel_y_SC;                          //!< telescope position in shower coordinates
 		double Tel_z_SC;                          //!< telescope position in shower coordinates
 		
-// image parameters
+		// image parameters
 		float fmeanPed_Image;                     //!< mean pedestal in this image
 		float fmeanPedvar_Image;                  //!< mean pedestal variation in this image
 		float f_d;                                //!< see Fegan 1997, Table 6
@@ -80,7 +80,7 @@ class VImageParameter
 		float fracLow;                            //!< fraction of image size in low gain pixel
 		float fui;                                //!< fraction of image/border pixel under estimate image ellipse
 		
-// muon parameters
+		// muon parameters
 		float muonX0;                             //!< center of muon ring X-coord
 		float muonY0;                             //!< center of muon ring Y-coord
 		float muonXC;                             //!< center of muon ring X-coord of centroid
@@ -91,7 +91,7 @@ class VImageParameter
 		int   muonValid;                          //!< 0/1 depending on wether it satisfies criteria
 		float muonIPCorrectedSize;                //!< total amount of light in muon ring corrected by impact paameter
 		
-// Hough transform muon parameters
+		// Hough transform muon parameters
 		double 	houghAP; 						  //!< AP parameter
 		double 	houghTD; 					      //!< TD parameter
 		int 	houghNpix; 						  //!< Number of hit pixels
@@ -99,7 +99,7 @@ class VImageParameter
 		double 	houghContained; 			  //!< Distance from the center of the ring to the center of the camera plus the ring radius in mm
 		int 	houghMuonValid;					  //!< 0/1 depending on whether it satisfies the Hough transform muon ID criteria
 		
-// signal section
+		// signal section
 		unsigned short int ntubes;                //!< number of tubes in the picture
 		unsigned short int trig_tubes;            //!< number of tubes selected in the trigger algorithm
 		unsigned short int ntubesBrightNoImage;   //!< number of tubes which are bright but not in the image
@@ -114,7 +114,7 @@ class VImageParameter
 		unsigned short int  index_of_max[3];      //!< The tube indices of the max[3] values
 		float frac[3];                            //!< fraction of maximum digital counts
 		
-// timing parameters
+		// timing parameters
 		float tgrad_x;                            //!< Timing gradient in X-direction
 		float tint_x;                             //!< Timing intercept for X-direction
 		float tgrad_dx;                           //!< error in timing gradient in X-direction
@@ -124,7 +124,7 @@ class VImageParameter
 		float tmax;                               //!< time maximum for image/border pixels
 		float tmean;                              //!< mean time of image/border pixels
 		
-// MC parameters
+		// MC parameters
 		unsigned short int MCprimary;
 		float MCenergy;
 		float MCxcore;
@@ -136,7 +136,7 @@ class VImageParameter
 		float MCTel_Xoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
 		float MCTel_Yoff;                         //!< source offset in MC in deg (grisudet telescope coordinate system)
 		
-// log likelihood fit parameters and erros
+		// log likelihood fit parameters and erros
 		int ntfit;                                //!< number of restored tubes
 		float Fitmin;
 		float Fitedm;

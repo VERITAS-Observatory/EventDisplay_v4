@@ -102,14 +102,14 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 			}
 			cout << is_line << endl;
 			is_stream >> temp;
-// ENERGYSPECTRUMINDEX <number of indexes> <minimum spectral index> <step size>
+			// ENERGYSPECTRUMINDEX <number of indexes> <minimum spectral index> <step size>
 			if( temp == "ENERGYSPECTRUMINDEX" )
 			{
 				is_stream >> fNSpectralIndex;
 				is_stream >> fSpectralIndexMin;
 				is_stream >> fSpectralIndexStep;
 			}
-// MONTECARLOENERGYRANGE <MC min energy [TeV]> <MC max energy [TeV]> <MC spectral index>
+			// MONTECARLOENERGYRANGE <MC min energy [TeV]> <MC max energy [TeV]> <MC spectral index>
 			else if( temp == "MONTECARLOENERGYRANGE" )
 			{
 				cout << "readInputFileList: setting user defined Monte Carlo energy values (shouldn't be necessary)" << endl;
@@ -126,7 +126,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fMCEnergy_index;
 				}
 			}
-// fill MC histograms
+			// fill MC histograms
 			else if( temp == "FILLMONTECARLOHISTOS" )
 			{
 				if( !is_stream.eof() )
@@ -134,7 +134,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fFillMCHistograms;
 				}
 			}
-// get Tree with Xoff and Yoff (and derot) after cut
+			// get Tree with Xoff and Yoff (and derot) after cut
 			else if( temp == "GETXOFFYOFFAFTERCUTS" )
 			{
 				if( !is_stream.eof() )
@@ -142,7 +142,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fgetXoff_Yoff_afterCut;
 				}
 			}
-// energy reconstruction method
+			// energy reconstruction method
 			else if( temp == "ENERGYRECONSTRUCTIONMETHOD" )
 			{
 				if( !is_stream.eof() )
@@ -150,7 +150,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fEnergyReconstructionMethod;
 				}
 			}
-// number of bins on log10 energy axis
+			// number of bins on log10 energy axis
 			else if( temp == "ENERGYAXISBINS" )
 			{
 				if( !is_stream.eof() )
@@ -158,7 +158,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fEnergyAxisBins_log10;
 				}
 			}
-// energy reconstruction quality
+			// energy reconstruction quality
 			else if( temp == "ENERGYRECONSTRUCTIONQUALITY" )
 			{
 				if( !is_stream.eof() )
@@ -166,7 +166,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fIgnoreEnergyReconstructionQuality;
 				}
 			}
-// number of azimuth bins
+			// number of azimuth bins
 			else if( temp == "AZIMUTHBINS" )
 			{
 				if( !is_stream.eof() )
@@ -174,7 +174,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fAzimuthBins;
 				}
 			}
-// isotropic arrival directions
+			// isotropic arrival directions
 			else if( temp == "ISOTROPICARRIVALDIRECTIONS" )
 			{
 				if( !is_stream.eof() )
@@ -182,7 +182,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fIsotropicArrivalDirections;
 				}
 			}
-// ignore first fraction NN of events, scale MC distributions accordingly
+			// ignore first fraction NN of events, scale MC distributions accordingly
 			else if( temp == "IGNOREFRACTIONOFEVENTS" )
 			{
 				if( !is_stream.eof() )
@@ -190,7 +190,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fIgnoreFractionOfEvents;
 				}
 			}
-// telescope type dependent cuts
+			// telescope type dependent cuts
 			else if( temp == "TELESCOPETYPECUTS" )
 			{
 				if( !is_stream.eof() )
@@ -205,11 +205,11 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fCutFileName;
 				}
 			}
-// * SCATTERMODE <core scatter radius [m]> <type of CORSIKA simulations (FLAT or VIEWCONE)>
+			// * SCATTERMODE <core scatter radius [m]> <type of CORSIKA simulations (FLAT or VIEWCONE)>
 			else if( temp == "SCATTERMODE" )
 			{
 				cout << "readInputFileList: setting user defined scatter values (shouldn't be necessary)" << endl;
-// read scatter radius
+				// read scatter radius
 				if( !is_stream.eof() )
 				{
 					is_stream >> fCoreScatterRadius;
@@ -231,7 +231,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					return false;
 				}
 			}
-// read input data file name
+			// read input data file name
 			else if( temp == "SIMULATIONFILE_DATA" )
 			{
 				if( !is_stream.eof() )
@@ -239,7 +239,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fdatafile;
 				}
 			}
-// file with MC trees (set to "0" if not available)
+			// file with MC trees (set to "0" if not available)
 			else if( temp == "SIMULATIONFILE_MC" )
 			{
 				if( !is_stream.eof() )
@@ -247,7 +247,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fMCdatafile_tree;
 				}
 			}
-// file with MC histograms
+			// file with MC histograms
 			else if( temp == "SIMULATIONFILE_HISTO" || temp == "SIMULATIONFILE_MCHISTO" )
 			{
 				if( !is_stream.eof() )
@@ -255,7 +255,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fMCdatafile_histo;
 				}
 			}
-// file with probabilities for gamma/hadron separation (should be a friend to the data tree)
+			// file with probabilities for gamma/hadron separation (should be a friend to the data tree)
 			else if( temp == "GAMMAHADRONPROBABILITYFILE" )
 			{
 				if( !is_stream.eof() )
@@ -263,7 +263,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fGammaHadronProbabilityFile;
 				}
 			}
-// name pointing to energy spectra used in event weighting
+			// name pointing to energy spectra used in event weighting
 			else if( temp == "ESPECTRUM_FOR_WEIGHTING" )
 			{
 				if( !is_stream.eof() )
@@ -275,7 +275,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fCREnergySpectrumID;
 				}
 			}
-//DS manually input the zenith
+			//DS manually input the zenith
 			else if( temp == "ZENITH" ) //DS
 			{
 				if( !is_stream.eof() )
@@ -283,7 +283,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fze;    //DS
 				}
 			}
-//DS manually input the zenith
+			//DS manually input the zenith
 			else if( temp == "NOISE" ) //DS
 			{
 				if( !is_stream.eof() )
@@ -291,7 +291,7 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 					is_stream >> fnoise;    //DS
 				}
 			}
-//DS manually input the wobble
+			//DS manually input the wobble
 			else if( temp == "WOBBLEISOTROPIC" ) //DS
 			{
 				if( !is_stream.eof() )
@@ -303,23 +303,23 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 	}
 	cout << "========================================" << endl << endl;
 	
-//////////////////////////////////////////////////////////////////////////////////////
-// fill some parameters
-
-// read run parameters from this file
+	//////////////////////////////////////////////////////////////////////////////////////
+	// fill some parameters
+	
+	// read run parameters from this file
 	if( !readRunParameters( fdatafile ) )
 	{
 		return false;
 	}
 	
-// read spectral energy parameters
+	// read spectral energy parameters
 	if( !readCRSpectralParameters() )
 	{
 		return false;
 	}
 	
-/////////////////////////////////////////////////////////////////
-// define azimuth bins
+	/////////////////////////////////////////////////////////////////
+	// define azimuth bins
 	fAzMin.clear();
 	fAzMax.clear();
 	if( fAzimuthBins )
@@ -336,14 +336,14 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameterFromTextFile( stri
 			fAzMax.push_back( fAzMax.back() + 22.5 );
 		}
 	}
-// (no az cut)
+	// (no az cut)
 	fAzMin.push_back( -1.e3 );
 	fAzMax.push_back( +1.e3 );
-// WARNING: if this last rule changes (if the last bin is NOT filled ANY MORE with all simulated event regardless of their az)
-//          then the az_bin_index must be changed in VEffectiveAreaCalculator::fill
-
-/////////////////////////////////////////////////////////////////
-// define  spectral index bins
+	// WARNING: if this last rule changes (if the last bin is NOT filled ANY MORE with all simulated event regardless of their az)
+	//          then the az_bin_index must be changed in VEffectiveAreaCalculator::fill
+	
+	/////////////////////////////////////////////////////////////////
+	// define  spectral index bins
 	fSpectralIndex.clear();
 	for( unsigned int i = 0; i < fNSpectralIndex; i++ )
 	{
@@ -380,7 +380,7 @@ VMonteCarloRunHeader* VInstrumentResponseFunctionRunParameter::readMCRunHeader()
 	}
 	
 	fCoreScatterRadius = iMC->core_range[0];
-// check if core scattering area is circular
+	// check if core scattering area is circular
 	if( fCoreScatterRadius < 1.e-5 && iMC->core_pos_mode == 1 )
 	{
 		fCoreScatterRadius = iMC->core_range[1];
@@ -393,7 +393,7 @@ VMonteCarloRunHeader* VInstrumentResponseFunctionRunParameter::readMCRunHeader()
 	{
 		fCoreScatterMode = "FLAT";
 	}
-// get view cone
+	// get view cone
 	fViewcone_min = iMC->viewcone[0];
 	fViewcone_max = iMC->viewcone[1];
 	if( fMCEnergy_min > -90. )
@@ -440,8 +440,8 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 	}
 	fpedvar = fR->meanpedvars;
 	
-// get wobble offset from first event in file
-// (should not change during a simulation run!)
+	// get wobble offset from first event in file
+	// (should not change during a simulation run!)
 	TTree* i_data = ( TTree* )iFile->Get( "data" );
 	if( !i_data )
 	{
@@ -471,10 +471,10 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 		}
 	}
 	
-////////////////////////////////////////////////
-// read array parameters
-////////////////////////////////////////
-// get number of telescopes from file
+	////////////////////////////////////////////////
+	// read array parameters
+	////////////////////////////////////////
+	// get number of telescopes from file
 	TTree* t = ( TTree* )iFile->Get( "telconfig" );
 	Ctelconfig* telconfig = new Ctelconfig( t );
 	if( telconfig->IsZombie() )
@@ -487,14 +487,14 @@ bool VInstrumentResponseFunctionRunParameter::readRunParameters( string ifilenam
 	telconfig_arraycentre_Y = telconfig->getArrayCentreY();
 	telconfig_arraymax      = telconfig->getArrayMaxSize();
 	
-////////////////////////////////////////
-
+	////////////////////////////////////////
+	
 	return true;
 }
 
 bool VInstrumentResponseFunctionRunParameter::testRunparameters()
 {
-// check that there is at least one MC input file given
+	// check that there is at least one MC input file given
 	if( fMCdatafile_tree.size() == 0 && fMCdatafile_histo.size() == 0 )
 	{
 		cout << "VInstrumentResponseFunctionRunParameter::testRunparameters() error:" << endl;

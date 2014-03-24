@@ -97,7 +97,7 @@ int main( int argc, char* argv[] )
 		}
 		cout << "now reading file " << f << ": " << fInFiles[f] << endl;
 		
-//loop on all entries of this directory
+		//loop on all entries of this directory
 		TKey* key;
 		TIter nextkey( fIn->GetListOfKeys() );
 		while( ( key = ( TKey* )nextkey() ) )
@@ -136,11 +136,11 @@ int main( int argc, char* argv[] )
  */
 void copyDirectory( TDirectory* source, const char* hx )
 {
-//copy all objects and subdirs of directory source as a subdir of the current directory
+	//copy all objects and subdirs of directory source as a subdir of the current directory
 	TDirectory* savdir = gDirectory;
 	TDirectory* adir = 0;
 	
-// 1. case: top directory exists
+	// 1. case: top directory exists
 	if( hx )
 	{
 		adir = ( TDirectory* )savdir->Get( hx );
@@ -152,7 +152,7 @@ void copyDirectory( TDirectory* source, const char* hx )
 	
 	if( !adir )
 	{
-// 2. case: make top directory
+		// 2. case: make top directory
 		if( hx )
 		{
 			adir = savdir->mkdir( hx );
@@ -169,7 +169,7 @@ void copyDirectory( TDirectory* source, const char* hx )
 		}
 	}
 	adir->cd();
-//loop on all entries of this directory
+	//loop on all entries of this directory
 	TKey* key;
 	TIter nextkey( source->GetListOfKeys() );
 	while( ( key = ( TKey* )nextkey() ) )
@@ -203,7 +203,7 @@ void copyDirectory( TDirectory* source, const char* hx )
 				cout << "writing " << iName << "\t" << obj->GetName() << endl;
 				cout << gDirectory->GetPath() << endl;
 			}
-// copy only median and mpv histogram
+			// copy only median and mpv histogram
 			if( iName.find( "median" ) != string::npos
 					|| iName.find( "Median" ) != string::npos
 					|| iName.find( "mpv" ) != string::npos

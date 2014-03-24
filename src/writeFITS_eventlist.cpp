@@ -31,15 +31,15 @@ using namespace std;
 int writeTELARRAY( string iInputFile, string iOutputFile )
 {
 
-// read templates from template directory
+	// read templates from template directory
 	char* TEMPLATE_DIR;
 	TEMPLATE_DIR = getenv( "EVLIOSYS" );
 	
 	char templ[1200];
 	sprintf( templ, "%s/../templates/evl/1.0.0/EventList.tpl", TEMPLATE_DIR );
 	
-///////////////////////////////
-// open and read data file
+	///////////////////////////////
+	// open and read data file
 	TFile* mscwfile = new TFile( iInputFile.c_str() );
 	if( mscwfile->IsZombie() )
 	{
@@ -48,13 +48,13 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
 		exit( EXIT_FAILURE );
 	}
 	
-//////////////////////////////////////
-// header
-
-
-//////////////////////////////////////
-// array and telescope configuration
-
+	//////////////////////////////////////
+	// header
+	
+	
+	//////////////////////////////////////
+	// array and telescope configuration
+	
 	TTree* fTreeDet = ( TTree* )mscwfile->Get( "telconfig" );
 	if( !fTreeDet )
 	{
@@ -64,7 +64,7 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
 	}
 	
 	
-// define tree
+	// define tree
 	UInt_t fNTel = 0;
 	int fTelID = 0;
 	float fTelxpos = 0.;
@@ -160,8 +160,8 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
 		fTreeDet->SetBranchAddress( "MirrorArea", &fMirrorArea );
 	}
 	
-///////////////////////////////////////////////////////////////////
-// FITS record: telescope array
+	///////////////////////////////////////////////////////////////////
+	// FITS record: telescope array
 	FITSRecord recTelArray( iOutputFile, templ, "TELARRAY" );
 	recTelArray.setVerbose( 0 );
 	
@@ -231,8 +231,8 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
 	}
 	recTelArray.finishWriting();
 	
-/////////////////////////////////////////////////////////////////////
-
+	/////////////////////////////////////////////////////////////////////
+	
 	/*    int    event_id = -9999;
 	    bool flags = 0;
 	    int    multip = -9999;
@@ -419,12 +419,12 @@ int writeTELARRAY( string iInputFile, string iOutputFile )
 	
 	    }
 	*/
-//    rec2.write();
-//    rec3.write();
-
-//    rec2.finishWriting();
-//    rec3.finishWriting();
-
+	//    rec2.write();
+	//    rec3.write();
+	
+	//    rec2.finishWriting();
+	//    rec3.finishWriting();
+	
 	mscwfile->Close();
 	
 	return 0;

@@ -21,8 +21,8 @@ using namespace std;
 
 int main( int argc, char* argv[] )
 {
-/////////////////////
-// input parameters
+	/////////////////////
+	// input parameters
 	if( argc != 4 )
 	{
 		cout << endl;
@@ -43,24 +43,24 @@ int main( int argc, char* argv[] )
 	cout << "\t output file:\t" << fOutputFile << endl;
 	cout << endl;
 	
-/////////////////////
-// initialization
+	/////////////////////
+	// initialization
 	VWPPhysSensitivityFile* iData = new VWPPhysSensitivityFile();
-//    iData->setDebug( true );
+	//    iData->setDebug( true );
 	iData->setObservatory( fObservatory );
-// output file
+	// output file
 	if( !iData->initializeOutputFile( fOutputFile ) )
 	{
 		exit( EXIT_FAILURE );
 	}
-// Crab spectrum from HEGRA (CTA default)
+	// Crab spectrum from HEGRA (CTA default)
 	iData->setCrabSpectrum( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 5 );
-// CR spectra (protons + electrons)
+	// CR spectra (protons + electrons)
 	iData->setCosmicRaySpectrum( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat", 0, 8 );
 	
-/////////////////////////////////////
-// on source histograms
-// initialize histogram with the standard binning used in the VTS WP Phys group
+	/////////////////////////////////////
+	// on source histograms
+	// initialize histogram with the standard binning used in the VTS WP Phys group
 	iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, 9999 );
 	
 	if( !iData->fillIRFHistograms( fEffectiveAreaFile ) );

@@ -357,7 +357,7 @@ bool VLowGainCalibrator::findLightLevels( bool iDraw )
 void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool iDraw )
 {
 	resetLightLevels( tel );
-// check first that monitoring charge histogram exists
+	// check first that monitoring charge histogram exists
 	if( ( int )fMonitorChargeHist[tel]->GetEntries() == 0 )
 	{
 		cout << "ERROR: Could not find histogram with monitoring charges for telescope " << tel + 1 << "." << endl;
@@ -374,11 +374,11 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 		fMonitorChargeHist[tel]->Draw();
 	}
 	
-// exclude the zero light level for finding the light levels
-// (might be greater than zero in case the median is used)
+	// exclude the zero light level for finding the light levels
+	// (might be greater than zero in case the median is used)
 	fMonitorChargeHist[tel]->GetXaxis()->SetRangeUser( 10, 1000 );
 	
-// find peaks (there should be 7 if the flasher is ok)
+	// find peaks (there should be 7 if the flasher is ok)
 	int iLightLevel = 7;
 	TSpectrum* s = new TSpectrum( 2 * iLightLevel );
 	if( iDraw )
@@ -463,7 +463,7 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 	}
 	
 	
-// estimate background using a linear fitting method
+	// estimate background using a linear fitting method
 	TF1* iline = new TF1( "iline", "pol1", 0, 1000 );
 	fMonitorChargeHist[tel]->Fit( "iline", "qn" );
 	fMonitorChargeHist[tel]->GetXaxis()->SetRangeUser( 0, 1000 );
@@ -479,8 +479,8 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 		cout << "         Please manually inspect the histogram for goodness of this calibration run." << endl << endl;
 	}
 	
-// eliminate peaks with light level zero
-// and too small peaks at the background level
+	// eliminate peaks with light level zero
+	// and too small peaks at the background level
 	int npeaks = 0;
 	for( int i = 0; i < iNfound; i++ )
 	{
@@ -602,15 +602,15 @@ void VLowGainCalibrator::findLightLevels( int tel, int iPeakSignificance , bool 
 int VLowGainCalibrator::checkLightLevels( int tel, bool iDraw )
 {
 
-// check if light levels have been set
+	// check if light levels have been set
 	if( fNLightLevels[tel] == 0 )
 	{
 		cout << endl << "ERROR: No light levels found for telescope " << tel + 1 << "." << endl;
 		return 0;
 	}
 	
-//  check if light levels are distinct
-//  default: they should not overlap at the 2 sigma level
+	//  check if light levels are distinct
+	//  default: they should not overlap at the 2 sigma level
 	bool twopeaks = false;
 	for( unsigned int i = 0; i < fNLightLevels[tel] - 1; i++ )
 	{

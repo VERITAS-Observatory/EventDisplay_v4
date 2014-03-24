@@ -69,15 +69,15 @@ class VTableLookup
 		// fDirectionOffset[nnoiselevel][nze][nwoff]
 		vector< vector< vector< double > > > fTableDirectionOffset;
 		
-// tables
-// fmscw[noise][ze][woff][az][tel]
+		// tables
+		// fmscw[noise][ze][woff][az][tel]
 		vector< vector< vector< vector< vector< ULong64_t > > > > > fTelType_tables;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscw;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fmscl;
 		vector< vector< vector< vector< vector< VTableEnergyCalculator* > > > > > fenergyEnergyvsRadius;;
 		vector< vector< vector< vector< vector< VTableCalculator* > > > > > fenergySizevsRadius;
 		
-// used for calculations
+		// used for calculations
 		VTableCalculator* f_calc_msc;
 		VTableCalculator* f_calc_energySR;
 		VTableEnergyCalculator* f_calc_energy;

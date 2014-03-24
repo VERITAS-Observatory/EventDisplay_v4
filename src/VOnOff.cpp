@@ -34,9 +34,9 @@ VOnOff::VOnOff()
 
 VOnOff::~VOnOff()
 {
-// remove all objects in hList
+	// remove all objects in hList
 	hList->Delete();
-// remove hList
+	// remove hList
 	delete hList;
 }
 
@@ -44,7 +44,7 @@ VOnOff::~VOnOff()
 void VOnOff::setTitles( TH1* his, string iname, string ititle, string ytitle )
 {
 	string itemp;
-// set names and titles
+	// set names and titles
 	itemp = his->GetName();
 	itemp.replace( itemp.rfind( "on" ), 2, iname );
 	his->SetName( itemp.c_str() );
@@ -102,13 +102,13 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 	
 	hPList->Clear();
 	
-// update normalisation factor
+	// update normalisation factor
 	i_norm_alpha *= i_norm;
 	
-///////////////////////////////////////////////////////////////
-// fill parameter histograms
-
-// create diff histograms
+	///////////////////////////////////////////////////////////////
+	// fill parameter histograms
+	
+	// create diff histograms
 	createHistograms( iponlist, hPList );
 	
 	TIter nextp( hPList );
@@ -118,24 +118,24 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 	{
 		hTemp->Reset();
 		setTitles( hTemp, "diff", " (ON-OFF)", "" );
-// get on/off histograms
+		// get on/off histograms
 		TH1* hon  = ( TH1* )n_onp();
 		TH1* hoff = ( TH1* )n_offp();
 		
-// calculate difference
+		// calculate difference
 		itemp = hon->GetName();
-// htheta2 histogram (note: calculated from one reflected region only!)
+		// htheta2 histogram (note: calculated from one reflected region only!)
 		if( itemp.find( "htheta2" ) == 0 )
 		{
 			hTemp->Add( hon, hoff, 1., -1.*i_norm );
 			hTheta2_diff = ( TH1D* )hTemp;
 		}
-// energy histogram with x-axis in logE or linE
+		// energy histogram with x-axis in logE or linE
 		else if( itemp.find( "herec" ) == 0 || itemp.find( "hLinerec" ) == 0 )
 		{
 			hTemp->Add( hon, hoff, 1., -1.*i_norm_alpha );
 		}
-// all other histograms
+		// all other histograms
 		else
 		{
 			if( !isCombined )
@@ -149,7 +149,7 @@ void VOnOff::doOnOffforParameterHistograms( TList* iponlist, TList* ipofflist, d
 			}
 		}
 		
-// fill the corresponding lists
+		// fill the corresponding lists
 		if( itemp.find( "herec" ) == 0 || itemp.find( "hLinerec" ) == 0 )
 		{
 			hListEnergyHistograms->Add( hTemp );
@@ -178,11 +178,11 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, double i_
 	
 	hSList->Clear();
 	
-//////////////////////////////////////////////
-
-// fill sky maps
-
-// create diff histograms
+	//////////////////////////////////////////////
+	
+	// fill sky maps
+	
+	// create diff histograms
 	createHistograms( ionlist, hSList );
 	
 	TIter next( hSList );
@@ -192,14 +192,14 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, double i_
 	{
 		hTemp->Reset();
 		setTitles( hTemp, "diff", " (ON-OFF)", "" );
-// get on/off histograms
+		// get on/off histograms
 		TH1* hon  = ( TH1* )n_on();
 		TH1* hoff = ( TH1* )n_off();
 		
-// calculate difference
+		// calculate difference
 		itemp = hTemp->ClassName();
 		
-// do only 2D histograms
+		// do only 2D histograms
 		if( itemp == "TH2D" )
 		{
 			for( int i = 1; i <= hTemp->GetNbinsX(); i++ )
@@ -208,8 +208,8 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, double i_
 				for( int j = 1; j <= hTemp->GetNbinsY(); j++ )
 				{
 					int j_a = ialpha->GetYaxis()->FindBin( hTemp->GetYaxis()->GetBinCenter( j ) );
-// normalisation factor must be nonzero
-// (GM) (why on value? why off value?)
+					// normalisation factor must be nonzero
+					// (GM) (why on value? why off value?)
 					if( ialpha->GetBinContent( i_a, j_a ) != 0. && hon->GetBinContent( i, j ) != 0. && hoff->GetBinContent( i, j ) != 0. )
 					{
 						hTemp->SetBinContent( i, j, hon->GetBinContent( i, j ) - hoff->GetBinContent( i, j )*ialpha->GetBinContent( i_a, j_a ) );
@@ -253,11 +253,11 @@ void VOnOff::doOnOff( TList* ionlist, TList* iofflist, double i_norm )
 	{
 		hTemp->Reset();
 		setTitles( hTemp, "diff", " (ON-OFF)", "" );
-// get on/off histograms
+		// get on/off histograms
 		TH1* hon  = ( TH1* )n_on();
 		TH1* hoff = ( TH1* )n_off();
 		
-// calculate difference
+		// calculate difference
 		hTemp->Add( hon, hoff, 1., -1.*i_norm );
 		
 		hList->Add( hTemp );
@@ -292,7 +292,7 @@ void VOnOff::doQfactors( TList* ionlist, TList* iofflist, double i_norm )
 		itemp = hon->ClassName();
 		if( itemp == "TH1D" )
 		{
-// qfactor on low bound cut
+			// qfactor on low bound cut
 			hTemp = new TH1D( *( ( TH1D* )hon ) );
 			hTemp->Reset();
 			hQList->Add( hTemp );
@@ -317,7 +317,7 @@ void VOnOff::doQfactors( TList* ionlist, TList* iofflist, double i_norm )
 				hTemp->SetBinError( i, 0. );
 			}
 			
-// qfactor on high bound cut
+			// qfactor on high bound cut
 			hTemp = new TH1D( *( ( TH1D* )hon ) );
 			hTemp->Reset();
 			hQList->Add( hTemp );
@@ -389,7 +389,7 @@ TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha, string itit
 			{
 				hmap_stereo_sig->SetBinContent( j, k, -9999. );
 			}
-// get maximum in 2D sky map
+			// get maximum in 2D sky map
 			if( hmap_stereo_sig->GetBinContent( j, k ) > i_sigmax )
 			{
 				i_sigmax = hmap_stereo_sig->GetBinContent( j, k );
@@ -403,10 +403,10 @@ TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha, string itit
 	}
 	setTitles( hmap_stereo_sig, "sig", " (Significance ON-OFF)", "" );
 	
-// clean histogram edges
-//    cleanSigHistogram( hmap_stereo_sig, -9000. );
-
-// write maximum significance to screen
+	// clean histogram edges
+	//    cleanSigHistogram( hmap_stereo_sig, -9000. );
+	
+	// write maximum significance to screen
 	if( i_sigmax > 0. && ititle.size() < 1 )
 	{
 		cout << "\t " << setprecision( 4 ) << i_sigmax << " (On: " << i_sigon << ", Off: " << i_sigoff;
@@ -475,7 +475,7 @@ TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, double i_norm )
 	}
 	setTitles( hmap_stereo_sig, "sig", " (Significance ON-OFF)", "" );
 	
-// write maximum significance to screen
+	// write maximum significance to screen
 	if( i_sigmax > 0. )
 	{
 		cout << "\t " << i_sigmax << " (On: " << i_sigon << ", Off: " << i_sigoff << ", Norm: " << i_norm << ")";
@@ -505,7 +505,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC )
 	
 	TDirectory* wDir = 0;
 	
-// write all sky plots into sky histogram directory
+	// write all sky plots into sky histogram directory
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "skyHistograms" );
 	if( !wDir )
@@ -529,7 +529,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC )
 		hSigUC->Write();
 	}
 	
-// write all stereo parameter histograms
+	// write all stereo parameter histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "stereoParameterHistograms" );
 	if( !wDir )
@@ -545,7 +545,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC )
 		hListStereoParameterHistograms->Write();
 	}
 	
-// write all energy histograms
+	// write all energy histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "energyHistograms" );
 	if( !wDir )
@@ -561,7 +561,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC )
 		hListEnergyHistograms->Write();
 	}
 	
-// write all random forest histograms
+	// write all random forest histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "randomForestHistograms" );
 	if( !wDir )
@@ -577,7 +577,7 @@ void VOnOff::writeHistograms( TH2D* hSig, TH2D* hSigUC )
 		hListRandomForestHistograms->Write();
 	}
 	
-// write all quality factor histograms
+	// write all quality factor histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "qualityFactorHistograms" );
 	if( !wDir )
@@ -646,7 +646,7 @@ void VOnOff::cleanSigHistogram( TH2D* h, double imin )
 		return;
 	}
 	
-// do nothing for uncorrelated plots
+	// do nothing for uncorrelated plots
 	string itemp;
 	itemp = h->GetName();
 	if( itemp.find( "UC" ) < itemp.size() )
@@ -658,9 +658,9 @@ void VOnOff::cleanSigHistogram( TH2D* h, double imin )
 	
 	int i_del = 0;
 	
-// code 2D bins by xbin*100000 + j
-
-// from bottom to top
+	// code 2D bins by xbin*100000 + j
+	
+	// from bottom to top
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
 		for( int j = 1; j <= h->GetNbinsY(); j++ )
@@ -673,7 +673,7 @@ void VOnOff::cleanSigHistogram( TH2D* h, double imin )
 			}
 		}
 	}
-// from left to right
+	// from left to right
 	for( int j = 1; j <= h->GetNbinsY(); j++ )
 	{
 		for( int i = 1; i <= h->GetNbinsX(); i++ )
@@ -686,7 +686,7 @@ void VOnOff::cleanSigHistogram( TH2D* h, double imin )
 			}
 		}
 	}
-// from right to left
+	// from right to left
 	for( int j = h->GetNbinsY(); j > 0; j-- )
 	{
 		for( int i = h->GetNbinsX(); i > 0; i-- )
@@ -699,7 +699,7 @@ void VOnOff::cleanSigHistogram( TH2D* h, double imin )
 			}
 		}
 	}
-// from top to bottom
+	// from top to bottom
 	for( int i = h->GetNbinsX(); i > 0; i-- )
 	{
 		for( int j = h->GetNbinsY(); j > 0; j-- )
@@ -713,7 +713,7 @@ void VOnOff::cleanSigHistogram( TH2D* h, double imin )
 		}
 	}
 	
-// now reset the outer bins
+	// now reset the outer bins
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
 		for( int j = 1; j <= h->GetNbinsY(); j++ )

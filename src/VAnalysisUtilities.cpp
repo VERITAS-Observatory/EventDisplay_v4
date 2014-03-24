@@ -162,7 +162,7 @@ bool VAnalysisUtilities::readTargetCoordinatesFromtRunSummary( TTree* t, int ion
 	{
 		t->GetEntry( i );
 		
-// order matters!
+		// order matters!
 		if( fSkyMapCentreDecJ2000 < -90. || ( TMath::Abs( fSkyMapCentreRAJ2000 ) < 1.e-8 && TMath::Abs( fSkyMapCentreDecJ2000 ) < 1.e-8 ) )
 		{
 			if( TMath::Abs( fTargetRAJ2000 ) < 1.e-8  && TMath::Abs( fTargetDecJ2000 ) < 1.e-8 )
@@ -265,11 +265,11 @@ TGraph* VAnalysisUtilities::calcCumulativeSig( int iTot )
 	for( int i = 0; i < nentries; i++ )
 	{
 		ctRunSum->GetEntry( i );
-// exclude runs with 0 rate and no error on rate
+		// exclude runs with 0 rate and no error on rate
 		if( ctRunSum->runOn > 0 && !( TMath::Abs( ctRunSum->Rate ) < 1.e-5 && TMath::Abs( ctRunSum->RateE ) < 1.e-5 ) )
 		{
 		
-// cumulative significance vs time
+			// cumulative significance vs time
 			cum_Non += ctRunSum->NOn;
 			cum_Noff += ctRunSum->NOff;
 			cum_alpha += ctRunSum->OffNorm;
@@ -288,7 +288,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
 {
 	VRunList i_temp;
 	
-// reset run list
+	// reset run list
 	fRunList.clear();
 	
 	CRunSummary* c = getRunSummaryTree( iTot );
@@ -308,7 +308,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
 		
 		if( c->runOn > 0 )
 		{
-// check if this run is in runlist
+			// check if this run is in runlist
 			bFoundRun = false;
 			if( irunlist.size() > 0 )
 			{
@@ -359,7 +359,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
 				i_temp.phase = i_temp.phase - TMath::Floor( i_temp.phase );
 			}
 			
-// apply run list cuts
+			// apply run list cuts
 			bool iCut = true;
 			for( unsigned int i = 0; i < fRunListCut_MJD_min.size(); i++ )
 			{

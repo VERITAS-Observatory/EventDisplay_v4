@@ -45,12 +45,12 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		
 		VMonteCarloRunHeader* fMonteCarloHeader;
 		
-// QADC values
+		// QADC values
 		std::valarray<double> fSums;
 		std::valarray<double> fTraceMax;
 		std::vector< valarray< double > > fTracePulseTiming;
 		
-// placeholders
+		// placeholders
 		std::valarray<double> v;
 		std::vector< std::valarray<double> > vv;
 		
@@ -71,7 +71,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 			return fSourceFileName;
 		}
 		
-// raweventparser
+		// raweventparser
 		virtual bool                hasAT()
 		{
 			return false;
@@ -237,7 +237,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		bool                        isZeroSuppressed( unsigned int iChannel );
 		bool                        wasLossyCompressed();
 		
-// rawfile
+		// rawfile
 		virtual bool                getNextEvent() = 0;
 		bool                        setTelescopeID( unsigned int iTelID );
 		
@@ -274,7 +274,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		{
 			return getSMC_Az();
 		}
-// sky to camera coordinates
+		// sky to camera coordinates
 		float                      getMC_Xoffset()
 		{
 			return -1. * getSMC_Xoffset();
@@ -284,7 +284,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 			return -1. * getSMC_Yoffset();
 		}
 		
-// return QADC values
+		// return QADC values
 		valarray< double >&        getSums( unsigned int iNChannel = 99999 );
 		valarray< double >&        getTraceMax( unsigned int iNChannel = 99999 );
 		valarray< double >&        getTraceRawMax( unsigned int iNChannel = 99999 )
@@ -293,7 +293,7 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		}
 		vector< valarray< double > >& getTracePulseTiming( unsigned int iNChannel = 99999 );
 		
-// noise file related stuff
+		// noise file related stuff
 		valarray<double>&          getPeds();
 		valarray<double>&          getPedvars();
 		vector< valarray<double> >& getPedvarsAllSumWindows();
@@ -301,10 +301,10 @@ class VBaseRawDataReader : public VVirtualDataReader, public VSimulationDataRead
 		bool                       initTraceNoiseGenerator( unsigned int, string, VDetectorGeometry*, vector<int>, bool, int, double, vector<double> );
 		void                       setSumWindow( unsigned int iTelID, int isw );
 		
-//      vector< bool >&             getLocalTrigger() { return getSLocalTrigger(); }
-//      unsigned int               getNTelLocalTrigger();         //!< return number of telescopes with local trigger
-//      bool                       hasLocalTrigger( unsigned int iTel );
-
+		//      vector< bool >&             getLocalTrigger() { return getSLocalTrigger(); }
+		//      unsigned int               getNTelLocalTrigger();         //!< return number of telescopes with local trigger
+		//      bool                       hasLocalTrigger( unsigned int iTel );
+		
 		vector< double >           getTelElevation()
 		{
 			return fTelElevation;

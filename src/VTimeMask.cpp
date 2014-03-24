@@ -88,8 +88,8 @@ void            VTimeMask::problem( string reason, ostream& terminal )
 	override = kTRUE;
 	terminal    << "VTimeMask error: improperly initialised (" << reason << ")" << endl
 				<< "                 Will pass all events and take first event as start time." << endl;
-//terminal	<<"The story so far ..."<< endl;
-//printMask( 0, kTRUE );
+	//terminal	<<"The story so far ..."<< endl;
+	//printMask( 0, kTRUE );
 }
 
 
@@ -106,13 +106,13 @@ Bool_t          VTimeMask::setMask( Int_t run_number, Double_t run_startUTC, Dou
 
 Bool_t          VTimeMask::setMask()
 {
-// Variables for user input
+	// Variables for user input
 	Int_t run_number    = -1;
 	Int_t mask_start    = -1;
 	Int_t mask_width    = -1;
 	Int_t mask_mode     =  0;
 	
-// Variables for derived quantities
+	// Variables for derived quantities
 	Int_t mask_end      = -1;
 	
 	if( !mask_file.empty() )
@@ -126,7 +126,7 @@ Bool_t          VTimeMask::setMask()
 		else
 		{
 			cout << "\t setting time-mask from file " << mask_file << endl;
-// Retrieve each line and parse
+			// Retrieve each line and parse
 			string settings_str = "";
 			while( getline( settings_file, settings_str ) )
 			{
@@ -141,7 +141,7 @@ Bool_t          VTimeMask::setMask()
 								>> mask_width
 								>> mask_mode;
 								
-// Check sanity of user input (oh, those crazy users!)
+				// Check sanity of user input (oh, those crazy users!)
 				// Correct run number
 				if( run_number != run_id )
 				{
@@ -171,7 +171,7 @@ Bool_t          VTimeMask::setMask()
 						<< " secs " << ( mask_mode == 0 ? "closed" : "open" )
 						<< " starting at " << mask_start << " seconds ..." << endl;
 						
-// Derive limits of mask
+				// Derive limits of mask
 				mask_end = mask_start + mask_width;
 				mask_end = ( mask_end < Int_t( mask.size() ) ? mask_end : mask.size() );
 				
@@ -181,7 +181,7 @@ Bool_t          VTimeMask::setMask()
 				}
 				
 				set_success = kTRUE;
-//printMask(100);
+				//printMask(100);
 			}
 		}
 	}
@@ -252,7 +252,7 @@ Bool_t           VTimeMask::checkMaskNow( Double_t now )
 
 Bool_t          VTimeMask::loadMaskNow( Double_t now )
 {
-// Let's start at the beginning
+	// Let's start at the beginning
 	if( mask.empty() )
 	{
 		start_time = now;
@@ -264,7 +264,7 @@ Bool_t          VTimeMask::loadMaskNow( Double_t now )
 		return kFALSE;
 	}
 	
-// Ensure mask can contain this instant
+	// Ensure mask can contain this instant
 	if( mask.size() == UInt_t( instant ) )
 	{
 		mask.push_back( kTRUE );
@@ -338,13 +338,13 @@ Double_t        VTimeMask::getMeanTime_Run() const
 	Double_t    count       = Double_t( mask.size() );
 	Double_t    sum         = 0;
 	
-// Accumulate weighted sum and weighted count
+	// Accumulate weighted sum and weighted count
 	for( UInt_t t = 0; t < mask.size(); t++ )
 	{
 		sum     += ( t + 0.5 );                   // Weight by center of mask bin
 	}
 	
-// Calculate weighted mean
+	// Calculate weighted mean
 	return ( count > 0 ? sum / count : -1. );
 }
 
@@ -354,7 +354,7 @@ Double_t        VTimeMask::getMeanTime_Mask() const
 	Double_t    count       = Double_t( getEffectiveDuration() );
 	Double_t    sum         = 0;
 	
-// Accumulate weighted sum and weighted count
+	// Accumulate weighted sum and weighted count
 	for( UInt_t t = 0; t < mask.size(); t++ )
 	{
 		if( mask.at( t ) )
@@ -363,7 +363,7 @@ Double_t        VTimeMask::getMeanTime_Mask() const
 		}
 	}
 	
-// Calculate weighted mean
+	// Calculate weighted mean
 	return ( count > 0 ? sum / count : -1. );
 }
 
@@ -373,14 +373,14 @@ Double_t        VTimeMask::getMeanTime_Events() const
 	Double_t    count       = Double_t( getEventsTotal() );
 	Double_t    sum         = 0;
 	
-// Accumulate weighted sum and weighted count
+	// Accumulate weighted sum and weighted count
 	for( UInt_t t = 0; t < mask.size(); t++ )
 	{
 		// Weight by center of mask bin
 		sum         += ( t + 0.5 ) * checked.at( t );
 	}
 	
-// Calculate weighted mean
+	// Calculate weighted mean
 	return ( count > 0 ? sum / count : -1. );
 }
 
@@ -390,14 +390,14 @@ Double_t        VTimeMask::getMeanTime_Accepted() const
 	Double_t    count       = Double_t( getAcceptedTotal() );
 	Double_t    sum         = 0;
 	
-// Accumulate weighted sum and weighted count
+	// Accumulate weighted sum and weighted count
 	for( UInt_t t = 0; t < mask.size(); t++ )
 	{
 		// Weight by center of mask bin
 		sum         += ( t + 0.5 ) * accepted.at( t );
 	}
 	
-// Calculate weighted mean
+	// Calculate weighted mean
 	return ( count > 0 ? sum / count : -1. );
 }
 
@@ -417,19 +417,19 @@ void            VTimeMask::printMeanTime( Bool_t event_statistics, ostream& term
 		accepted_res    = getMeanTime_Accepted();
 	}
 	
-// Accumulate output
+	// Accumulate output
 	ostringstream   all_str( "" );
 	ostringstream   open_str( "" );
 	ostringstream   event_str( "" );
 	ostringstream   accepted_str( "" );
 	
-// Formatting for VStereoAnalysis output
+	// Formatting for VStereoAnalysis output
 	all_str << "\t ";
 	open_str << "\t ";
 	event_str << "\t ";
 	accepted_str << "\t ";
 	
-// Labels
+	// Labels
 	all_str << "Mean of run:\t\t\t";
 	open_str << "Mean of mask:\t\t\t";
 	event_str << "Mean of events:\t\t";
@@ -475,7 +475,7 @@ void            VTimeMask::printMeanTime( Bool_t event_statistics, ostream& term
 		accepted_str << "N/A (zero length)";
 	}
 	
-//Display on STDOUT or STDERR
+	//Display on STDOUT or STDERR
 	terminal << endl << "\t Mean times from time mask for run (start on MJD):\t " << run_id << "\t (" << getMaskStartTime() << " secs on " << getMaskStartMJD() << ")" << endl;
 	terminal                    <<  all_str.str() << endl;
 	if( event_statistics )
@@ -491,7 +491,7 @@ void            VTimeMask::printMeanTime( Bool_t event_statistics, ostream& term
 		terminal     <<  accepted_str.str() << endl;
 	}
 	
-//terminal<< endl;
+	//terminal<< endl;
 }
 
 
@@ -503,7 +503,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 	}
 	Int_t column_width = event_statistics ? 5 : 4 ;
 	
-// Set-up the rows of the table
+	// Set-up the rows of the table
 	ostringstream   interval_str( "" );
 	ostringstream   open_str( "" );
 	ostringstream   openFrac_str( "" );
@@ -517,7 +517,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 	acceptedFrac_str.setf( ios_base::fixed, ios_base::floatfield );
 	acceptedFrac_str.precision( 2 );
 	
-// Formatting for VStereoAnalysis output
+	// Formatting for VStereoAnalysis output
 	interval_str << "\t ";
 	open_str << "\t ";
 	openFrac_str << "\t ";
@@ -525,7 +525,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 	accepted_str << "\t ";
 	acceptedFrac_str << "\t ";
 	
-// Preface with totals for the entire run
+	// Preface with totals for the entire run
 	interval_str            << "Run (";
 	interval_str.width( 4 );
 	interval_str            << mask.size() << " secs)"               << " | ";
@@ -554,7 +554,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 		acceptedFrac_str    << "N/A"                         << " | ";
 	}
 	
-//Row titles
+	//Row titles
 	interval_str        << "Interval (" << interval_seconds << " secs)"    << "\t| ";
 	open_str        << "Open (secs)\t"               << "\t| ";
 	openFrac_str        << "Open Fraction"               << "\t| ";
@@ -562,7 +562,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 	accepted_str        << "Accepted Events"             << "\t| ";
 	acceptedFrac_str    << "Accepted Fraction"               << "\t| ";
 	
-// Load the rows of the time-mask table
+	// Load the rows of the time-mask table
 	UInt_t interval             = 0;
 	UInt_t interval_count       = 0;
 	Double_t open_count         = 0;
@@ -571,7 +571,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 	
 	for( UInt_t t = 0; t < mask.size(); t++ )
 	{
-// Accumulate statistics
+		// Accumulate statistics
 		interval_count++;
 		if( mask.at( t ) )
 		{
@@ -580,7 +580,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 		checked_count += checked.at( t );
 		accepted_count += accepted.at( t );
 		
-// Dump output for a completed interval and prepare for the next one
+		// Dump output for a completed interval and prepare for the next one
 		if( interval_count == interval_seconds )
 		{
 			interval_str.width( column_width );
@@ -612,7 +612,7 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 		}
 		
 	}
-// Dump output for any remaining partial interval
+	// Dump output for any remaining partial interval
 	if( interval_count != 0 )
 	{
 		interval_str.width( column_width );
@@ -637,11 +637,11 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 		}
 	}
 	
-//Display on STDOUT or STDERR
+	//Display on STDOUT or STDERR
 	terminal    << endl << "\t Time mask for run: " << run_id << endl;
 	
-// VStereoAnalysis takes run start as second event and run end as penultimate event (might be fixed sometime ... ?),
-// so under normal circumstances you can expect up to two events outside the mask domain.
+	// VStereoAnalysis takes run start as second event and run end as penultimate event (might be fixed sometime ... ?),
+	// so under normal circumstances you can expect up to two events outside the mask domain.
 	if( outside_count > 2 ) terminal   << "VTimeMask warning: " << outside_count << ( outside_count == 1 ? " event" : " events" )
 										   << " rejected because " << ( outside_count == 1 ? "it" : "they" )
 										   << " fell outside the time domain of the mask!" << endl;
@@ -669,8 +669,8 @@ void            VTimeMask::printMask( UInt_t interval_seconds, Bool_t event_stat
 		}
 	}
 	
-//terminal	<< endl;
-
+	//terminal	<< endl;
+	
 	return;
 }
 
@@ -729,17 +729,17 @@ void            VTimeMask::writeObjects() const
 		wDir->cd();
 	}
 	
-// Mask objects 'newed'
+	// Mask objects 'newed'
 	const   TBits*      iMaskBits   = getMaskBits();
 	const   TVector*    iCheckedVector = getCheckedVector();
 	const   TVector*    iAcceptedVector = getAcceptedVector();
 	
-// Write mask objects
+	// Write mask objects
 	iMaskBits->Write( "maskBits" );
 	iCheckedVector->Write( "checkedEvtsVector" );
 	iAcceptedVector->Write( "acceptedEvtsVector" );
 	
-// remove all objects created with new in this class
+	// remove all objects created with new in this class
 	delete iMaskBits;
 	delete iCheckedVector;
 	delete iAcceptedVector;
@@ -796,12 +796,12 @@ Bool_t          VTimeMask::readObjects( TDirectory* iDir )
 	
 	cout << "Reading time mask from file " << iDir->GetPath() << endl;
 	
-//Fetch objects
+	//Fetch objects
 	const   TBits*      iMaskBits       = ( TBits* ) iDir->Get( "maskBits" );
 	const   TVector*    iCheckedVector  = ( TVector* ) iDir->Get( "checkedEvtsVector" );
 	const   TVector*    iAcceptedVector = ( TVector* ) iDir->Get( "acceptedEvtsVector" );
 	
-//Parse into internal structures
+	//Parse into internal structures
 	UInt_t maskSize = iMaskBits->GetNbits();
 	
 	mask.resize( maskSize, kTRUE );
@@ -811,17 +811,17 @@ Bool_t          VTimeMask::readObjects( TDirectory* iDir )
 	for( UInt_t i = 0; i < maskSize; i++ )
 	{
 		mask.at( i )      = iMaskBits->TestBitNumber( i );
-// The following contains ROOT of a graphic nature: viewer discretion is advised.
+		// The following contains ROOT of a graphic nature: viewer discretion is advised.
 		checked.at( i )   = UInt_t( ( iCheckedVector->GetMatrixArray() )[i] );
 		accepted.at( i )  = UInt_t( ( iAcceptedVector->GetMatrixArray() )[i] );
 	}
 	
-// Does ROOT 'new' objects when it gets them from a file?
-// remove all objects created with new in this class
-//delete iMaskBits;
-//delete iCheckedVector;
-//delete iAcceptedVector;
-
+	// Does ROOT 'new' objects when it gets them from a file?
+	// remove all objects created with new in this class
+	//delete iMaskBits;
+	//delete iCheckedVector;
+	//delete iAcceptedVector;
+	
 	return kTRUE;
 }
 

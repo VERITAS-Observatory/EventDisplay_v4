@@ -82,7 +82,7 @@ bool readInputParameter( string i_filename )
 			{
 				continue;
 			}
-// print runparameter to stdout
+			// print runparameter to stdout
 			cout << is_line << endl;
 			if( is_stream.eof() )
 			{
@@ -189,7 +189,7 @@ int main( int argc, char* argv[] )
 		exit( 0 );
 	}
 	
-// run timing
+	// run timing
 	TStopwatch fStopWatch;
 	fStopWatch.Start();
 	
@@ -198,16 +198,16 @@ int main( int argc, char* argv[] )
 		exit( 0 );
 	}
 	
-// output root file
+	// output root file
 	string iTableFile = argv[2];
 	
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// disp table
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// disp table
 	VDispTable* fDisp = new VDispTable( fNTel, iTableFile );
 	fDisp->setQualityCuts( f_ntubes_min, f_size_min, f_length_min, f_loss_max );
 	fDisp->setWidthLengthScalingParameters( fWidthScaleParameter, fLengthScaleParameter );
 	
-// add four azimuth bins
+	// add four azimuth bins
 	fDisp->addAzBin( 135., -135. );
 	fDisp->addAzBin( -135., -45. );
 	fDisp->addAzBin( -45., 45. );
@@ -215,7 +215,7 @@ int main( int argc, char* argv[] )
 	
 	fDisp->setDataVectors( f_ze, f_woff, f_noise );
 	
-// loop over all files
+	// loop over all files
 	for( unsigned int i = 0; i < f_ze.size(); i++ )
 	{
 		for( unsigned int j = 0; j < f_woff.size(); j++ )
@@ -235,7 +235,7 @@ int main( int argc, char* argv[] )
 				{
 					iName.replace( iName.find( "__NOISELEVEL__" ), 14, f_noise[k] );
 				}
-// hardwired file name (!)
+				// hardwired file name (!)
 				iName += "100" + f_ze[i] + ".root";
 				
 				float iNoise = fDisp->fillTable( iName, atof( f_ze[i].c_str() ), atof( f_woff[j].c_str() ), fNTotEvents );

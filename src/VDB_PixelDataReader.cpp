@@ -11,17 +11,17 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
 	
 	fNPixel = nPixel_per_telescope;
 	
-//////////////////////////////////////////////////////////////////
-// coding of different data vectors:
-//  ID = 0: L1 rates
-//  ID = 1: HV
-//  ID = 3: currents
-//  note: this is propagated into the data vector fPixelData
+	//////////////////////////////////////////////////////////////////
+	// coding of different data vectors:
+	//  ID = 0: L1 rates
+	//  ID = 1: HV
+	//  ID = 3: currents
+	//  note: this is propagated into the data vector fPixelData
 	fPixelDataType.push_back( "L1_Rates" );
 	fPixelDataType.push_back( "HV" );
 	fPixelDataType.push_back( "Currents" );
 	
-// define data vectors and histograms
+	// define data vectors and histograms
 	char htitle[800];
 	char hname[800];
 	for( unsigned int t = 0; t < fPixelDataType.size(); t++ )
@@ -30,17 +30,17 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
 		vector< TH1F* > i_his;
 		for( unsigned int i = 0; i < nPixel_per_telescope.size(); i++ )
 		{
-// histograms
+			// histograms
 			sprintf( hname, "h_%s_tel%d", fPixelDataType[t].c_str(), i + 1 );
 			sprintf( htitle, "%s (tel %d)", fPixelDataType[t].c_str(), i + 1 );
 			i_his.push_back( new TH1F( hname, htitle, 200, 0., 1. ) );
 			i_his.back()->SetXTitle( fPixelDataType[t].c_str() );
-// data
+			// data
 			vector< VDB_PixelData* > iP;
 			for( unsigned int j = 0; j < nPixel_per_telescope[i]; j++ )
 			{
 				iP.push_back( new VDB_PixelData( fPixelDataType[t] ) );
-// preliminary: set sampling interval to 60s
+				// preliminary: set sampling interval to 60s
 				iP.back()->fTimeBinWidth_s = 60.;
 			}
 			iD.push_back( iP );
@@ -48,7 +48,7 @@ VDB_PixelDataReader::VDB_PixelDataReader( vector< unsigned int > nPixel_per_tele
 		fPixelData.push_back( iD );
 		fPixelData_histogram.push_back( i_his );
 	}
-//////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
 }
 
 void VDB_PixelDataReader::print( string iDataType, unsigned int iTelID, unsigned int iPixel )
@@ -136,9 +136,9 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 		return false;
 	}
 	
-/////////////////////////////////////////////////////
-// read L1 rates
-
+	/////////////////////////////////////////////////////
+	// read L1 rates
+	
 	sprintf( c_query, "select timestamp, telescope_id, pixel_id, rate from tblL1_TriggerInfo, tblRun_Info where timestamp" );
 	sprintf( c_query, "%s > tblRun_Info.data_start_time AND timestamp <  tblRun_Info.data_end_time AND tblRun_Info.run_id=%d", c_query, runNumber );
 	
@@ -159,16 +159,16 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 				fDBStatus = false;
 				return false;
 			}
-// mysql> describe tblL1_TriggerInfo;
-// +--------------+----------------------+------+-----+---------------------+-------+
-// | Field        | Type                 | Null | Key | Default             | Extra |
-// +--------------+----------------------+------+-----+---------------------+-------+
-// | timestamp    | datetime             |      | PRI | 0000-00-00 00:00:00 |       |
-// | run_id       | int(11)              |      | PRI | 0                   |       |
-// | telescope_id | tinyint(3) unsigned  |      | PRI | 0                   |       |
-// | pixel_id     | smallint(5) unsigned |      | PRI | 0                   |       |
-// | rate         | float                | YES  |     | NULL                |       |
-// +--------------+----------------------+------+-----+---------------------+-------+
+			// mysql> describe tblL1_TriggerInfo;
+			// +--------------+----------------------+------+-----+---------------------+-------+
+			// | Field        | Type                 | Null | Key | Default             | Extra |
+			// +--------------+----------------------+------+-----+---------------------+-------+
+			// | timestamp    | datetime             |      | PRI | 0000-00-00 00:00:00 |       |
+			// | run_id       | int(11)              |      | PRI | 0                   |       |
+			// | telescope_id | tinyint(3) unsigned  |      | PRI | 0                   |       |
+			// | pixel_id     | smallint(5) unsigned |      | PRI | 0                   |       |
+			// | rate         | float                | YES  |     | NULL                |       |
+			// +--------------+----------------------+------+-----+---------------------+-------+
 			if( db_row->GetField( 0 ) &&  db_row->GetField( 1 ) && db_row->GetField( 2 ) && db_row->GetField( 3 ) )
 			{
 				fillDataRow( 0, db_row->GetField( 0 ), atoi( db_row->GetField( 1 ) ), atoi( db_row->GetField( 2 ) ), atof( db_row->GetField( 3 ) ) );
@@ -176,9 +176,9 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 		}
 	}
 	
-/////////////////////////////////////////////////////
-// read HV and currents measured
-
+	/////////////////////////////////////////////////////
+	// read HV and currents measured
+	
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		sprintf( c_query, "select * FROM tblHV_Telescope%d_Status WHERE channel > 0 AND", i );
@@ -202,15 +202,15 @@ bool VDB_PixelDataReader::readFromDB( string iDBserver, unsigned int runNumber, 
 					fDBStatus = false;
 					return false;
 				}
-// +---------------+----------------------+------+-----+---------------------+-------+
-// | Field         | Type                 | Null | Key | Default             | Extra |
-// +---------------+----------------------+------+-----+---------------------+-------+
-// | db_start_time | datetime             |      | PRI | 0000-00-00 00:00:00 |       |
-// | db_end_time   | datetime             | YES  | MUL | NULL                |       |
-// | channel       | smallint(5) unsigned |      | PRI | 0                   |       |
-// | voltage_meas  | float                | YES  |     | NULL                |       |
-// | current_meas  | float                | YES  |     | NULL                |       |
-// +---------------+----------------------+------+-----+---------------------+-------+
+				// +---------------+----------------------+------+-----+---------------------+-------+
+				// | Field         | Type                 | Null | Key | Default             | Extra |
+				// +---------------+----------------------+------+-----+---------------------+-------+
+				// | db_start_time | datetime             |      | PRI | 0000-00-00 00:00:00 |       |
+				// | db_end_time   | datetime             | YES  | MUL | NULL                |       |
+				// | channel       | smallint(5) unsigned |      | PRI | 0                   |       |
+				// | voltage_meas  | float                | YES  |     | NULL                |       |
+				// | current_meas  | float                | YES  |     | NULL                |       |
+				// +---------------+----------------------+------+-----+---------------------+-------+
 				if( db_row->GetField( 1 ) && db_row->GetField( 2 ) && db_row->GetField( 3 ) )
 				{
 					fillDataRow( 1, db_row->GetField( 1 ), i, atoi( db_row->GetField( 2 ) ) - 1, atof( db_row->GetField( 3 ) ) );
@@ -258,7 +258,7 @@ bool VDB_PixelDataReader::writeDataTree( unsigned int iTel )
 		if( fPixelData[i][iTel].size() > 0 )
 		{
 			nPixel = fPixelData[i][iTel].size();
-// loop over all MJDs (assuming the same for all pixel)
+			// loop over all MJDs (assuming the same for all pixel)
 			for( unsigned int t = 0; t < fPixelData[i][iTel][0]->fMJD.size(); t++ )
 			{
 				mjd  = fPixelData[i][iTel][0]->fMJD[t];
@@ -289,17 +289,17 @@ bool VDB_PixelDataReader::writeDataTree( unsigned int iTel )
  */
 TH1F* VDB_PixelDataReader::getDataHistogram( unsigned int iDataType, unsigned int iTel, int iMJD, float iTime )
 {
-// fills fDummyReturnVector with data
+	// fills fDummyReturnVector with data
 	getDataVector( iDataType, iTel, iMJD, iTime );
 	if( fDummyReturnVector.size() == 0 )
 	{
 		return 0;
 	}
 	
-// get min/maximum
+	// get min/maximum
 	float v_min = *std::min_element( fDummyReturnVector.begin(), fDummyReturnVector.end() );
 	float v_max = *std::max_element( fDummyReturnVector.begin(), fDummyReturnVector.end() );
-// make sure that min/max give a valid histogram
+	// make sure that min/max give a valid histogram
 	if( v_min < 0. )
 	{
 		v_min = 0.;
@@ -329,7 +329,7 @@ TH1F* VDB_PixelDataReader::getDataHistogram( unsigned int iDataType, unsigned in
  */
 float VDB_PixelDataReader::getValue( unsigned int iDataType, unsigned int iTel, unsigned int iChannel, int iMJD, float iTime )
 {
-// fills fDummyReturnVector with data
+	// fills fDummyReturnVector with data
 	getDataVector( iDataType, iTel, iMJD, iTime );
 	if( fDummyReturnVector.size() == 0 )
 	{
@@ -358,41 +358,41 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
 {
 	fDummyReturnVector.clear();
 	
-// is this a good data type ID?
+	// is this a good data type ID?
 	if( iDataType < fPixelData.size() )
 	{
-// check telescope number
+		// check telescope number
 		if( iTel < fPixelData[iDataType].size() )
 		{
-// reset return vector
+			// reset return vector
 			fDummyReturnVector.assign( fPixelData[iDataType][iTel].size(), 0. );
-// loop over all pixel
+			// loop over all pixel
 			for( unsigned int i = 0; i < fPixelData[iDataType][iTel].size(); i++ )
 			{
-// loop over all pixel times to get correct time
+				// loop over all pixel times to get correct time
 				if( fPixelData[iDataType][iTel][i]->fMJD.size() > 1 )
 				{
 					for( unsigned int t = 0; t < fPixelData[iDataType][iTel][i]->fMJD.size(); t++ )
 					{
-// this should never happen
+						// this should never happen
 						if( TMath::Abs( fPixelData[iDataType][iTel][i]->fMJD[t] - iMJD ) > 1.e-1 )
 						{
 							continue;
 						}
-// first measurement is sometimes a bit late: look in a wide search window
+						// first measurement is sometimes a bit late: look in a wide search window
 						double iTimeBinWidth = fPixelData[iDataType][iTel][i]->fTimeBinWidth_s;
 						if( t == 0 )
 						{
 							iTimeBinWidth *= 4.;
 						}
-// check time and fill return vector
+						// check time and fill return vector
 						if( iTime >= fPixelData[iDataType][iTel][i]->fsec_of_day[t] - iTimeBinWidth
 								&& iTime < fPixelData[iDataType][iTel][i]->fsec_of_day[t] )
 						{
 							fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t];
-// first and/or last time bin is sometimes not filled (run start/end and L1 rate interval star mismatch)
-// use in this case the L1 rates from second bin
-// (note: only for L1 rates)
+							// first and/or last time bin is sometimes not filled (run start/end and L1 rate interval star mismatch)
+							// use in this case the L1 rates from second bin
+							// (note: only for L1 rates)
 							if( iDataType == 0 && fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 1 )
 							{
 								if( t == 0 )
@@ -422,14 +422,14 @@ vector< unsigned int > VDB_PixelDataReader::getDeadChannelList( unsigned int iDa
 		float iTime, float i_min, float i_max, bool bRMS )
 {
 	vector< unsigned int > i_channelList;
-// fills fDummyReturnVector with data
+	// fills fDummyReturnVector with data
 	getDataVector( iDataType, iTel, iMJD, iTime );
 	if( fDummyReturnVector.size() == 0 )
 	{
 		return i_channelList;
 	}
 	
-// for relative differences, calculate mean and rms
+	// for relative differences, calculate mean and rms
 	double i_mean = 0.;
 	double i_rms = 0.;
 	if( bRMS )

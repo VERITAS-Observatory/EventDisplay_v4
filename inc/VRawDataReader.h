@@ -20,8 +20,8 @@ class VRawDataReader : public VBaseRawDataReader
 {
 
 	private:
-//   vector< vector< bool > > fFullTrigVec;  // MS: This might be here by mistake..?
-
+		//   vector< vector< bool > > fFullTrigVec;  // MS: This might be here by mistake..?
+		
 	protected:
 		vector< VRawDataFileRead* > fFileRead;
 		vector< VRawEventData* > fEvent;

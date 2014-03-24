@@ -57,13 +57,13 @@ class VSourceGeometryFitter : public VAnalysisUtilities, public VPlotUtilities
 		double fYStart;
 		double fPSF;
 		
-// sky map to be fitted
+		// sky map to be fitted
 		TH2D* fHisSkyMap;
 		
-// default fitter data
+		// default fitter data
 		vector< VSourceGeometryFitterData* > fDefaultFitterData;
 		
-// fitter used
+		// fitter used
 		VSourceGeometryFitterData*            fFitter;
 		
 		void setFitterDefaultData();
@@ -129,18 +129,18 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 	
 		VFun_PSFDescription_2DGauss_Chi2( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
 		
-/////////////////////////////////
-// function to be minimized
+		/////////////////////////////////
+		// function to be minimized
 		double operator()( const std::vector<double>& par ) const
 		{
-// check size fo parameter vector
+			// check size fo parameter vector
 			if( par.size() != 5 )
 			{
 				cout << "VFun_PSFDescription_2DGauss_Chi2: error in parameter vector size; expect 5, is " << par.size() << endl;
 				return 0.;
 			}
 			
-// set variables
+			// set variables
 			double x = 0.;
 			double y = 0.;
 			
@@ -151,7 +151,7 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 			double t2 = 0.;
 			double sigmaSource2 = par[2] * par[2];
 			
-// loop over sky map
+			// loop over sky map
 			if( hSkyMap )
 			{
 				int nbinsX = hSkyMap->GetNbinsX();
@@ -159,7 +159,7 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 				for( int i = 1; i <= nbinsX; i++ )
 				{
 					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-// check x-range
+					// check x-range
 					if( x > xmax )
 					{
 						continue;
@@ -171,7 +171,7 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 					for( int j = 1; j <= nbinsY; j++ )
 					{
 						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-// check y-range
+						// check y-range
 						if( y > ymax )
 						{
 							continue;
@@ -181,26 +181,26 @@ class VFun_PSFDescription_2DGauss_Chi2 : public ROOT::Minuit2::FCNBase
 							continue;
 						}
 						
-// skip empty bins
+						// skip empty bins
 						if( hSkyMap->GetBinContent( i, j ) <= 0. )
 						{
 							continue;
 						}
 						
-// calculate theta2
+						// calculate theta2
 						t2 = ( x - par[3] ) * ( x - par[3] ) + ( y - par[4] ) * ( y - par[4] );
 						
-// calculate expectation from model function
+						// calculate expectation from model function
 						fT = par[0] + par[1] * TMath::Exp( -1.*t2 / 2. / sigmaSource2 );
 						if( isnan( fT ) )
 						{
 							continue;
 						}
 						
-// get value and error in histogram
+						// get value and error in histogram
 						fH = hSkyMap->GetBinContent( i, j );
 						
-// calculate chi2
+						// calculate chi2
 						if( fH != 0. && fH > -90. )
 						{
 							sum += ( fT - fH ) * ( fT - fH ) / fH;
@@ -237,17 +237,17 @@ class VFun_PSFDescription_2DGauss_LL : public ROOT::Minuit2::FCNBase
 	
 		VFun_PSFDescription_2DGauss_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
 		
-/////////////////////////////////
-// function to be minimized
+		/////////////////////////////////
+		// function to be minimized
 		double operator()( const std::vector<double>& par ) const
 		{
-// check size fo parameter vector
+			// check size fo parameter vector
 			if( par.size() != 3 )
 			{
 				cout << "VFun_PSFDescription_2DGauss_LL: error in parameter vector size; expect 3, is " << par.size() << endl;
 			}
 			
-// initialize variables
+			// initialize variables
 			double  LL = 0.;
 			double  sum = 0.;
 			double  meanX  = par[0];
@@ -265,7 +265,7 @@ class VFun_PSFDescription_2DGauss_LL : public ROOT::Minuit2::FCNBase
 				for( int i = 1; i <= nbinsX; i++ )
 				{
 					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-// check x-range
+					// check x-range
 					if( x > xmax )
 					{
 						continue;
@@ -277,7 +277,7 @@ class VFun_PSFDescription_2DGauss_LL : public ROOT::Minuit2::FCNBase
 					for( int j = 1; j <= nbinsY; j++ )
 					{
 						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-// check y-range
+						// check y-range
 						if( y > ymax )
 						{
 							continue;
@@ -289,16 +289,16 @@ class VFun_PSFDescription_2DGauss_LL : public ROOT::Minuit2::FCNBase
 						
 						n = hSkyMap->GetBinContent( i, j );
 						
-// check for valid entries
+						// check for valid entries
 						if( n > -999. )
 						{
-// calculate log-likelihood
+							// calculate log-likelihood
 							sum  = ( x - meanX ) * ( x - meanX ) / sigma / sigma ;
 							sum += ( y - meanY ) * ( y - meanY ) / sigma / sigma ;
 							sum *= -1. / 2. ;
 							sum  = sqrt( 1. / 2. / M_PI / sigma / sigma ) * exp( sum );
 							
-// assume Poisson fluctuations (neglecting background noise)
+							// assume Poisson fluctuations (neglecting background noise)
 							if( n > 0. && sum > 0. )
 							{
 								LL += n * log( sum ) - sum - n * log( n ) + n;
@@ -342,17 +342,17 @@ class VFun_PSFDescription_LinearSuperposition2DGauss_LL: public ROOT::Minuit2::F
 	
 		VFun_PSFDescription_LinearSuperposition2DGauss_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1. );
 		
-/////////////////////////////////
-// function to be minimized
+		/////////////////////////////////
+		// function to be minimized
 		double operator()( const std::vector<double>& par ) const
 		{
-// check size fo parameter vector
+			// check size fo parameter vector
 			if( par.size() != 5 )
 			{
 				cout << "VFun_PSFDescription_LinearSuperposition2DGauss_LL: error in parameter vector size; expect 5, is " << par.size() << endl;
 			}
 			
-// initialize variables
+			// initialize variables
 			double  LL = 0.;
 			double  sum = 0.;
 			double  sum1 = 0.; // central spot
@@ -375,7 +375,7 @@ class VFun_PSFDescription_LinearSuperposition2DGauss_LL: public ROOT::Minuit2::F
 				for( int i = 1; i <= nbinsX; i++ )
 				{
 					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-// check x-range
+					// check x-range
 					if( x > xmax )
 					{
 						continue;
@@ -387,7 +387,7 @@ class VFun_PSFDescription_LinearSuperposition2DGauss_LL: public ROOT::Minuit2::F
 					for( int j = 1; j <= nbinsY; j++ )
 					{
 						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-// check y-range
+						// check y-range
 						if( y > ymax )
 						{
 							continue;
@@ -399,10 +399,10 @@ class VFun_PSFDescription_LinearSuperposition2DGauss_LL: public ROOT::Minuit2::F
 						
 						n = hSkyMap->GetBinContent( i, j );
 						
-// check for valid entries
+						// check for valid entries
 						if( n > -999. )
 						{
-// calculate log-likelihood
+							// calculate log-likelihood
 							sum1  = ( x - meanX ) * ( x - meanX ) / sigma1 / sigma1 ;
 							sum1 += ( y - meanY ) * ( y - meanY ) / sigma1 / sigma1 ;
 							sum1 *= -1. / 2. ;
@@ -415,7 +415,7 @@ class VFun_PSFDescription_LinearSuperposition2DGauss_LL: public ROOT::Minuit2::F
 							sum += ( 1 - alpha ) * sqrt( 1. / 2. / M_PI / sigma2 / sigma2 ) * exp( sum2 );
 							
 							
-// assume Poisson fluctuations (neglecting background noise)
+							// assume Poisson fluctuations (neglecting background noise)
 							if( n > 0. && sum > 0. )
 							{
 								LL += n * log( sum ) - sum - n * log( n ) + n;
@@ -465,18 +465,18 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 	
 		VFun_SourceDescription_RadialSymmetricSource_Chi2( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
 		
-/////////////////////////////////
-// function to be minimized
+		/////////////////////////////////
+		// function to be minimized
 		double operator()( const std::vector<double>& par ) const
 		{
-// check size fo parameter vector
+			// check size fo parameter vector
 			if( par.size() != 4 )
 			{
 				cout << "VFun_SourceDescription_RadialSymmetricSource_Chi2: error in parameter vector size; expect 4, is " << par.size() << endl;
 				return 0.;
 			}
 			
-// set variables
+			// set variables
 			double x = 0.;
 			double y = 0.;
 			
@@ -487,7 +487,7 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 			double t2 = 0.;
 			double sigmaSRC = par[2];
 			
-// loop over sky map
+			// loop over sky map
 			if( hSkyMap )
 			{
 				int nbinsX = hSkyMap->GetNbinsX();
@@ -495,7 +495,7 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 				for( int i = 1; i <= nbinsX; i++ )
 				{
 					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-// check x-range
+					// check x-range
 					if( x > xmax )
 					{
 						continue;
@@ -507,7 +507,7 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 					for( int j = 1; j <= nbinsY; j++ )
 					{
 						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-// check y-range
+						// check y-range
 						if( y > ymax )
 						{
 							continue;
@@ -517,26 +517,26 @@ class VFun_SourceDescription_RadialSymmetricSource_Chi2 : public ROOT::Minuit2::
 							continue;
 						}
 						
-// skip empty bins
+						// skip empty bins
 						if( hSkyMap->GetBinContent( i, j ) <= 0. )
 						{
 							continue;
 						}
 						
-// calculate theta2
+						// calculate theta2
 						t2 = ( x - par[0] ) * ( x - par[0] ) + ( y - par[1] ) * ( y - par[1] );
 						
-// calculate expectation from model function
+						// calculate expectation from model function
 						fT = par[3] * TMath::Exp( -1.*t2 / 2. / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF ) );
 						if( isnan( fT ) )
 						{
 							continue;
 						}
 						
-// get value and error in histogram
+						// get value and error in histogram
 						fH = hSkyMap->GetBinContent( i, j );
 						
-// calculate chi2
+						// calculate chi2
 						if( fH != 0. && fH > -90. )
 						{
 							sum += ( fT - fH ) * ( fT - fH ) / fH;
@@ -672,18 +672,18 @@ class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCN
 	
 		VFun_SourceDescription_RadialSymmetricSource_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
 		
-/////////////////////////////////
-// function to be minimized
+		/////////////////////////////////
+		// function to be minimized
 		double operator()( const std::vector<double>& par ) const
 		{
-// check size fo parameter vector
+			// check size fo parameter vector
 			if( par.size() != 3 )
 			{
 				cout << "VFun_SourceDescription_RadialSymmetricSource_LL: error in parameter vector size; expect 3, is " << par.size() << endl;
 			}
 			
 			
-// initialize variables
+			// initialize variables
 			double  LL = 0.;
 			double  sum = 0.;
 			double  meanX = par[0];
@@ -701,7 +701,7 @@ class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCN
 				for( int i = 1; i <= nbinsX; i++ )
 				{
 					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-// check x-range
+					// check x-range
 					if( x > xmax )
 					{
 						continue;
@@ -713,7 +713,7 @@ class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCN
 					for( int j = 1; j <= nbinsY; j++ )
 					{
 						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-// check y-range
+						// check y-range
 						if( y > ymax )
 						{
 							continue;
@@ -725,17 +725,17 @@ class VFun_SourceDescription_RadialSymmetricSource_LL: public ROOT::Minuit2::FCN
 						
 						n = hSkyMap->GetBinContent( i, j );
 						
-// check for valid entries
+						// check for valid entries
 						if( n > -999. )
 						{
-// calculate log-likelihood
+							// calculate log-likelihood
 							sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
 							sum += ( y - meanY ) * ( y - meanY ) / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
 							sum *= -1. / 2.;
 							sum  = exp( sum );
 							sum *= 1. / 2. / M_PI / ( sigmaSRC * sigmaSRC + sigmaPSF * sigmaPSF );
 							
-// assume Poisson fluctuations (neglecting background noise)
+							// assume Poisson fluctuations (neglecting background noise)
 							if( n > 0. && sum > 0. )
 							{
 								LL += n * log( sum ) - sum - n * log( n ) + n;
@@ -779,18 +779,18 @@ class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FC
 	
 		VFun_SourceDescription_RadialAsymmetricSource_LL( TH2D* iSkymap = 0, double i_xmin = -1., double i_xmax = 1., double i_ymin = -1., double i_ymax = 1., double i_psf = 0.063 );
 		
-/////////////////////////////////
-// function to be minimized
+		/////////////////////////////////
+		// function to be minimized
 		double operator()( const std::vector<double>& par ) const
 		{
-// check size fo parameter vector
+			// check size fo parameter vector
 			if( par.size() != 5 )
 			{
 				cout << "VFun_SourceDescription_RadialAsymmetricSource_LL: error in parameter vector size; expect 5, is " << par.size() << endl;
 			}
 			
 			
-// initialize variables
+			// initialize variables
 			double  LL = 0.;
 			double  sum = 0.;
 			//    double  rho =  par[0];
@@ -813,7 +813,7 @@ class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FC
 				for( int i = 1; i <= nbinsX; i++ )
 				{
 					x = hSkyMap->GetXaxis()->GetBinCenter( i );
-// check x-range
+					// check x-range
 					if( x > xmax )
 					{
 						continue;
@@ -825,7 +825,7 @@ class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FC
 					for( int j = 1; j <= nbinsY; j++ )
 					{
 						y = hSkyMap->GetYaxis()->GetBinCenter( j );
-// check y-range
+						// check y-range
 						if( y > ymax )
 						{
 							continue;
@@ -837,10 +837,10 @@ class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FC
 						
 						n = hSkyMap->GetBinContent( i, j );
 						
-// check for valid entries
+						// check for valid entries
 						if( n > -999. )
 						{
-// calculate log-likelihood
+							// calculate log-likelihood
 							sum  = ( x - meanX ) * ( x - meanX ) / ( sigmaX * sigmaX + sigmaPSF * sigmaPSF );
 							sum += ( y - meanY ) * ( y - meanY ) / ( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
 							sum += -2. * rho * ( x - meanX ) / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) * ( y - meanY ) / sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF );
@@ -848,7 +848,7 @@ class VFun_SourceDescription_RadialAsymmetricSource_LL: public ROOT::Minuit2::FC
 							sum  = exp( sum );
 							sum *= 1. / 2. / M_PI / sqrt( sigmaX * sigmaX + sigmaPSF * sigmaPSF ) /  sqrt( sigmaY * sigmaY + sigmaPSF * sigmaPSF ) / sqrt( 1. - rho * rho );
 							
-// assume Poisson fluctuations (neglecting background noise)
+							// assume Poisson fluctuations (neglecting background noise)
 							if( n > 0. && sum > 0. )
 							{
 								LL += n * log( sum ) - sum - n * log( n ) + n;

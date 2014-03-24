@@ -35,43 +35,43 @@ void VEnergySpectrumfromLiterature::setFunctions()
 {
 	sEnergyFun a;
 	
-// power law
+	// power law
 	a.Name = "PL";
 	a.Description = "power law";
 	a.NumParameters = 3;
 	fEnergyFun.push_back( a );
 	
-// power law with exponential cut off
+	// power law with exponential cut off
 	a.Name = "PLEC";
 	a.Description = "power law with exponential cut off";
 	a.NumParameters = 4;
 	fEnergyFun.push_back( a );
 	
-// curved power law
+	// curved power law
 	a.Name = "VPL";
 	a.Description = "curved power law";
 	a.NumParameters = 4;
 	fEnergyFun.push_back( a );
 	
-// broken power law
+	// broken power law
 	a.Name = "BRPL";
 	a.Description = "broken power law";
 	a.NumParameters = 6;
 	fEnergyFun.push_back( a );
 	
-// broken power law (2)
+	// broken power law (2)
 	a.Name = "BRPL_2";
 	a.Description = "broken power law (2)";
 	a.NumParameters = 4;
 	fEnergyFun.push_back( a );
 	
-// power law with exponential cut off (with beta factor for cut-off strength)
+	// power law with exponential cut off (with beta factor for cut-off strength)
 	a.Name = "PLEC_SF";
 	a.Description = "power law with exponential cut off (+cut-off strength)";
 	a.NumParameters = 5;
 	fEnergyFun.push_back( a );
 	
-// power law with exponential cut off (Gaussian factor)
+	// power law with exponential cut off (Gaussian factor)
 	a.Name = "PLEC_GF";
 	a.Description = "power law with exponential cut off (Gaussian factor)";
 	a.NumParameters = 6;
@@ -80,7 +80,7 @@ void VEnergySpectrumfromLiterature::setFunctions()
 
 bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrint )
 {
-// clear existing data
+	// clear existing data
 	fData.clear();
 	
 	ifstream is;
@@ -101,7 +101,7 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
 	
 	sData itemp;
 	
-// vectors for diff flux
+	// vectors for diff flux
 	vector< double > diff_e;
 	vector< double > diff_v;
 	vector< double > diff_ve;
@@ -174,7 +174,7 @@ bool VEnergySpectrumfromLiterature::readValuesFromFile( string ifile, bool iPrin
 			}
 			itemp.Parameter = v;
 			itemp.ParError = ve;
-// energy range
+			// energy range
 			is_stream >> is_temp;
 			itemp.EnergyRange_min = atof( is_temp.c_str() );
 			is_stream >> is_temp;
@@ -263,9 +263,9 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 		cout << "WARNING: getEnergySpectrumWithErrors does not work with different multiplier index" << endl;
 	}
 	
-// number of points in graph
+	// number of points in graph
 	int nPoints = 100;
-// number of random cycles
+	// number of random cycles
 	int nRandom = 10000;
 	
 	TGraphAsymmErrors* g = new TGraphAsymmErrors( nPoints );
@@ -295,7 +295,7 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 	double ymin = 0.;
 	double ymax = 0.;
 	
-// energy axis range
+	// energy axis range
 	double xmin = 0.;
 	double xmax = 0.;
 	f->GetRange( xmin, xmax );
@@ -309,15 +309,15 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 		return 0;
 	}
 	
-//////////////////////////////////////////////////////////////
-// make histograms
+	//////////////////////////////////////////////////////////////
+	// make histograms
 	if( fRandomErrorHistograms.size() == 0 )
 	{
 		char hname[600];
 		for( int i = 0; i < nPoints; i++ )
 		{
 			x = xmin + i * ( xmax - xmin ) / ( double )( nPoints - 1 );
-// get minimum and maximum for histogram
+			// get minimum and maximum for histogram
 			ymin = 0.01 * f->Eval( x );
 			ymax = 100. * f->Eval( x );
 			
@@ -333,15 +333,15 @@ TGraphAsymmErrors* VEnergySpectrumfromLiterature::getEnergySpectrumWithErrors( u
 		}
 	}
 	
-/////////////////////////////////////////////////////////////////
-// now loop over all points and calculate error range
+	/////////////////////////////////////////////////////////////////
+	// now loop over all points and calculate error range
 	for( int i = 0; i < nPoints; i++ )
 	{
 		x = xmin + i * ( xmax - xmin ) / ( double )( nPoints - 1 );
 		
 		for( int r = 0; r < nRandom; r++ )
 		{
-// set random parameters
+			// set random parameters
 			for( int p = 0; p < nPara; p++ )
 			{
 				fTemp->SetParameter( p, gRandom->Gaus( f->GetParameter( p ), f->GetParError( p ) ) );
@@ -366,7 +366,7 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 	
 	TF1* f = 0;
 	
-// define energy range
+	// define energy range
 	double xmin = 0.;
 	double xmax = 0.;
 	if( iEnergyMin_Lin < 0. || iEnergyMax_Lin < 0. )
@@ -396,11 +396,11 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 		}
 	}
 	
-// define functions
+	// define functions
 	char hname[600];
 	char h_exponent[600];
 	char h_energy[600];
-// define energy variabile (log or lin)
+	// define energy variabile (log or lin)
 	if( bLogEnergy )
 	{
 		sprintf( h_energy, "TMath::Power( 10, x )" );
@@ -414,42 +414,42 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 	{
 		if( fEnergyFun[fData[iID].Type].NumParameters == fData[iID].Parameter.size() && fEnergyFun[fData[iID].Type].NumParameters == fData[iID].ParError.size() )
 		{
-// power law
+			// power law
 			if( fData[iID].Type == 0 )
 			{
 				sprintf( hname, "[0] * TMath::Power( %s / %f, [1] ) ", h_energy, fData[iID].Parameter[0] );
 			}
-// power law with exponential cut off
+			// power law with exponential cut off
 			else if( fData[iID].Type == 1 )
 			{
 				sprintf( h_exponent, "TMath::Exp( -1.* %s  / [1] )", h_energy );
 				sprintf( hname, "[0] * TMath::Power( %s / %f, [2] ) * %s", h_energy, fData[iID].Parameter[0], h_exponent );
 			}
-// curved power law (e.g. ApJ 674, 1037 (2008))
+			// curved power law (e.g. ApJ 674, 1037 (2008))
 			else if( fData[iID].Type == 2 )
 			{
 				sprintf( h_exponent, "[1]+[2]*TMath::Log10( %s / %f )", h_energy, fData[iID].Parameter[0] );
 				sprintf( hname, "[0] * TMath::Power( %s / %f, %s )", h_energy, fData[iID].Parameter[0], h_exponent );
 			}
-// broken power law (e.g. A&A 457, 899 (2006))
+			// broken power law (e.g. A&A 457, 899 (2006))
 			else if( fData[iID].Type == 3 )
 			{
 				sprintf( hname, "[1]*TMath::Power( %s / [0], [2] ) ", h_energy );
 				sprintf( hname, "%s * TMath::Power( 1. + TMath::Power( %s / [0], 1./[4] ), [4]*([3]-[2]) )", hname, h_energy );
 			}
-// broken power law (2)
+			// broken power law (2)
 			else if( fData[iID].Type == 4 )
 			{
 				sprintf( hname, "[1]*TMath::Power( %s / %f, -1. ) ", h_energy, fData[iID].Parameter[0] );
 				sprintf( hname, "%s * TMath::Power( 1. + TMath::Power( %s / [0], [2] ), -1. )", hname, h_energy );
 			}
-// power law with exponential cut off (with beta factor for cut-off strength)
+			// power law with exponential cut off (with beta factor for cut-off strength)
 			else if( fData[iID].Type == 5 )
 			{
 				sprintf( h_exponent, "TMath::Exp( -1.* TMath::Power( %s  / [1], [3] ) )", h_energy );
 				sprintf( hname, "[0] * TMath::Power( %s / %f, [2] ) * %s", h_energy, fData[iID].Parameter[0], h_exponent );
 			}
-// power law with exponential cut off (Gaussian factor)
+			// power law with exponential cut off (Gaussian factor)
 			else if( fData[iID].Type == 6 )
 			{
 				sprintf( hname, "[0]*TMath::Power( %s / %f, [4] ) ", h_energy, fData[iID].Parameter[0] );
@@ -467,13 +467,13 @@ TF1* VEnergySpectrumfromLiterature::getEnergySpectrum( unsigned int iID, bool bL
 		return 0;
 	}
 	
-// plotting multiplier
+	// plotting multiplier
 	sprintf( hname, "%s * TMath::Power( %s, %f )", hname, h_energy, fPlottingMultiplierIndex );
 	
-// create function
+	// create function
 	f = new TF1( fData[iID].Name.c_str(), hname, xmin, xmax );
 	
-// set parameters
+	// set parameters
 	for( unsigned int i = 1; i < fData[iID].Parameter.size(); i++ )
 	{
 		f->SetParameter( i - 1, fData[iID].Parameter[i] );
@@ -509,7 +509,7 @@ bool VEnergySpectrumfromLiterature::prepare_integration( unsigned int iID, doubl
 	
 	fIntegral_TF1->CalcGaussLegendreSamplingPoints( 1000, fIntegral_x, fIntegral_y, 1.e-15 );
 	
-// save that this function has already been integrated
+	// save that this function has already been integrated
 	fIntegral_ID = iID;
 	
 	return true;
@@ -725,8 +725,8 @@ TCanvas* VEnergySpectrumfromLiterature::plot( string iSelection, TCanvas* c )
 	
 	vector< unsigned int > v_id;
 	
-// read list (seperated by spaces)
-
+	// read list (seperated by spaces)
+	
 	string itemp;
 	istringstream is_stream( iSelection );
 	while( !is_stream.eof() )

@@ -36,7 +36,7 @@ class Cshowerpars
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
 		
-// Declaration of leave types
+		// Declaration of leave types
 		Int_t           runNumber;
 		Int_t           eventNumber;
 		UInt_t          eventStatus;
@@ -123,7 +123,7 @@ class Cshowerpars
 		Float_t        MCycore_SC;
 		Float_t        MCzcore_SC;
 		
-// List of branches
+		// List of branches
 		TBranch*        b_runNumber;              //!
 		TBranch*        b_eventNumber;            //!
 		TBranch*        b_MJD;                    //!
@@ -240,7 +240,7 @@ Cshowerpars::~Cshowerpars()
 
 Int_t Cshowerpars::GetEntry( Long64_t entry )
 {
-// Read contents of entry.
+	// Read contents of entry.
 	if( !fChain )
 	{
 		return 0;
@@ -262,7 +262,7 @@ Int_t Cshowerpars::GetEntry( Long64_t entry )
 
 Long64_t Cshowerpars::LoadTree( Long64_t entry )
 {
-// Set the environment to read one entry
+	// Set the environment to read one entry
 	if( !fChain )
 	{
 		return -5;
@@ -289,7 +289,7 @@ Long64_t Cshowerpars::LoadTree( Long64_t entry )
 void Cshowerpars::Init( TTree* tree )
 {
 
-// Set branch addresses
+	// Set branch addresses
 	if( tree == 0 )
 	{
 		return;
@@ -705,8 +705,8 @@ Bool_t Cshowerpars::Notify()
 
 void Cshowerpars::Show( Long64_t entry )
 {
-// Print contents of entry.
-// If entry is not specified, print current entry
+	// Print contents of entry.
+	// If entry is not specified, print current entry
 	if( !fChain )
 	{
 		return;
@@ -717,9 +717,9 @@ void Cshowerpars::Show( Long64_t entry )
 
 Int_t Cshowerpars::Cut( Long64_t entry )
 {
-// This function may be called from Loop.
-// returns  1 if entry is accepted.
-// returns -1 otherwise.
+	// This function may be called from Loop.
+	// returns  1 if entry is accepted.
+	// returns -1 otherwise.
 	return 1;
 }
 #endif                                            // #ifdef Cshowerpars_cxx

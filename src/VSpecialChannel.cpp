@@ -14,7 +14,7 @@ VSpecialChannel::VSpecialChannel( unsigned int iTelID )
 	
 	fDebug = false;
 	
-// zombie until successfull reading of a file
+	// zombie until successfull reading of a file
 	fIsZombie = true;
 	
 	fSpecialChannelFile = "";
@@ -27,9 +27,9 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 {
 	if( ifile.size() >  0 )
 	{
-// special channel file is in camera geometry directory
+		// special channel file is in camera geometry directory
 		ifile = iDirectory + "/" + ifile;
-// open text file
+		// open text file
 		ifstream is;
 		is.open( ifile.c_str(), ifstream::in );
 		if( !is )
@@ -63,7 +63,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 			istringstream is_stream( is_line );
 			is_stream >> is_temp;
 			
-// check range of runs
+			// check range of runs
 			is_stream >> is_temp;
 			if( is_temp == "RUN" )
 			{
@@ -84,32 +84,32 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 					continue;
 				}
 				bRunFound = true;
-// is this too optimistic??
+				// is this too optimistic??
 				fIsZombie = false;
 			}
 			if( bRunFound )
-// check telescope numbering
+				// check telescope numbering
 			{
 				if( atoi( is_temp.c_str() ) != ( int )( getTelID() + 1 ) )
 				{
 					continue;
 				}
 				
-///////////////////////////////////////
-// special channel types
-//
-// known types:
-//              L2:     L2 signal to determine crate jitter
-//              HIGHQE: high efficiency PMT gain factor
-//
-///////////////////////////////////////
+				///////////////////////////////////////
+				// special channel types
+				//
+				// known types:
+				//              L2:     L2 signal to determine crate jitter
+				//              HIGHQE: high efficiency PMT gain factor
+				//
+				///////////////////////////////////////
 				is_stream >> is_temp;
 				
-///////////////////////////////////////
-// L2 channels
+				///////////////////////////////////////
+				// L2 channels
 				if( is_temp == "L2" )
 				{
-// number of L2 channels
+					// number of L2 channels
 					is_stream >> is_temp;
 					int i_n = atoi( is_temp.c_str() );
 					getFADCstopTrigChannelID().clear();
@@ -121,7 +121,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 					}
 					else
 					{
-// now read L2 channels
+						// now read L2 channels
 						for( unsigned int t = 0; t < getFADCstopTrigChannelID().size(); t++ )
 						{
 							is_stream >> is_temp;
@@ -129,13 +129,13 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 						}
 					}
 				}
-//////////////////////////////////////////
-// channel status
+				//////////////////////////////////////////
+				// channel status
 				else if( is_temp == "STATUS" )
 				{
 					if( !is_stream.eof() )
 					{
-// get status flag
+						// get status flag
 						unsigned int iStatusFlag = 1;
 						is_stream >> iStatusFlag;
 						fChannelStatus.clear();
@@ -148,8 +148,8 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 					}
 					
 				}
-///////////////////////////////////////
-// HIGHQE channels
+				///////////////////////////////////////
+				// HIGHQE channels
 				else if( is_temp == "HIGHQE" )
 				{
 					if( !is_stream.eof() )
@@ -167,7 +167,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 						}
 						else
 						{
-// what is an appropriate reaction here?
+							// what is an appropriate reaction here?
 							cout << "VSpecialChannel::readSpecialChannels warning: found channel " << iC << " twice " << endl;
 						}
 					}
@@ -175,10 +175,10 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 			}
 		}
 		is.close();
-//////////////////////////////////////////////////////////////
-// print channels to screen
-
-// print L2 channels
+		//////////////////////////////////////////////////////////////
+		// print channels to screen
+		
+		// print L2 channels
 		if( getFADCstopTrigChannelID().size() > 0 )
 		{
 			cout << "Telescope " << getTelID() + 1 << ": ";
@@ -189,7 +189,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 			}
 			cout << endl;
 		}
-// print HIQE_gainfactors
+		// print HIQE_gainfactors
 		if( fHIGHQE_gainfactor.size() > 0 )
 		{
 			cout << "Telescope " << getTelID() + 1 << ": ";
@@ -201,7 +201,7 @@ bool VSpecialChannel::readSpecialChannels( int iRun, string ifile, string iDirec
 			}
 			cout << endl;
 		}
-// print status bit
+		// print status bit
 		if( fChannelStatus.size() > 0 )
 		{
 			cout << "Telescope " << getTelID() + 1 << ": ";

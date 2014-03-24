@@ -49,7 +49,7 @@ class VFitTraceHandler : public VTraceHandler
 		
 		unsigned int fMC_FADCTraceStart;          // start of FADC trace (in case the simulated trace is longer than needed)
 		
-// analysis histograms
+		// analysis histograms
 		TH1D* fHfitstat;
 		int fnstat;                               //!< fit status ( bad if < 3 )
 		TH1D* fHchi2;

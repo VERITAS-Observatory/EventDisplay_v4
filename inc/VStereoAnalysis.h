@@ -130,9 +130,9 @@ class VStereoAnalysis
 		map< int, double > fRunMJDStart;
 		map< int, double > fRunMJDStopp;
 		map< int, double > fRunMJD;               // Default value is mid-point; modified to mean time of accepted events by fillHistograms
-// If fRunMJD is defined from a VRunSummary.fRunMJD it will contain extra ON/OFF runs
-// because the VRunSummary.fRunMJD is a union of all the runs:
-// always access via the run index to be sure of getting the correct run
+		// If fRunMJD is defined from a VRunSummary.fRunMJD it will contain extra ON/OFF runs
+		// because the VRunSummary.fRunMJD is a union of all the runs:
+		// always access via the run index to be sure of getting the correct run
 		map< int, double > fRunDuration;          // Raw run length from data tree
 		map< int, double > fRunExposure;          // Open portion of time mask
 		vector< VStereoHistograms* > fHisto;
@@ -191,7 +191,7 @@ class VStereoAnalysis
 		
 		double fTreeSelected_MVA;
 		
-/// model3D parameters ///
+		/// model3D parameters ///
 		double fTreeSelected_Smax3D;
 		double fTreeSelected_sigmaL3D;
 		double fTreeSelected_sigmaT3D;
@@ -208,7 +208,7 @@ class VStereoAnalysis
 		double fTreeSelected_ErrRWidth3D;
 		bool fTreeSelected_Converged3D;
 		
-/// frogs ///
+		/// frogs ///
 		int   fTreeSelescted_frogsEventID;
 		int   fTreeSelescted_frogsGSLConStat;
 		int   fTreeSelescted_frogsNB_iter;
@@ -257,10 +257,10 @@ class VStereoAnalysis
 		VGammaHadronCuts* fCuts;                  //!< Parameter Cuts
 		VTimeMask* fTimeMask;                     //!< Time Cuts
 		
-// dead time calculators
+		// dead time calculators
 		vector< VDeadTime* > fDeadTime;
 		
-// rate counters
+		// rate counters
 		vector< vector< double > > fRateCounts;
 		vector< vector< double > > fRateTime;
 		vector< vector< double > > fRateTimeIntervall;
@@ -268,7 +268,7 @@ class VStereoAnalysis
 		vector< double > fRateTimeTot;
 		vector< double > fRateTimeIntervallTot;
 		
-// directories
+		// directories
 		TDirectory* fDirTot;
 		vector< TDirectory* > fDirTotRun;
 		
@@ -285,12 +285,12 @@ class VStereoAnalysis
 		bool init_TreeWithAllGamma( int irun ) ; // WRITEALLGAMMATOTREE
 		void reset_TreeWithAllGamma() ; // WRITEALLGAMMATOTREE
 		
-// derotation and J2000
+		// derotation and J2000
 		void getDerotatedCoordinates( unsigned int, double i_UTC, double x, double y, double& x_derot, double& y_derot );
 		
 		int  getDataRunNumber() const;            // Check for existence of fDataRun and try to retrieve run number from first entry of the tree
 		
-// Returning frogs value for
+		// Returning frogs value for
 		double getXcore()
 		{
 			if( fDataRun->fFrogs )
@@ -342,7 +342,7 @@ class VStereoAnalysis
 		double getYoff()
 		{
 			if( fDataRun->fFrogs )
-// -1 sign difference for frogs ED
+				// -1 sign difference for frogs ED
 			{
 				return -1.0 * fDataRun->frogsYS;
 			}

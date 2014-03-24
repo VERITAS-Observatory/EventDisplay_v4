@@ -29,12 +29,12 @@ class VDispTable
 		unsigned int fNTel;
 		vector< float > fAz_min;
 		vector< float > fAz_max;
-// 2D histograms
+		// 2D histograms
 		vector< TProfile2D* > h2D_AzDispTable;
 		vector< TH2F* >       h2D_AzDispTableN;
 		vector< TProfile2D* > h2D_AzDispPhiTable;
 		vector< TProfile2D* > h2D_AzDispMissTable;
-// 3D histograms
+		// 3D histograms
 		vector< TProfile3D* > h3D_AzDispTable;
 		vector< TH3F* >       h3D_AzDispTableN;
 		vector< TProfile3D* > h3D_AzDispPhiTable;
@@ -43,11 +43,11 @@ class VDispTable
 		TFile* fTableFile;
 		VDispTableReader* fData;
 		
-// scaling parameter
+		// scaling parameter
 		double fWidthScaleParameter;
 		double fLengthScaleParameter;
 		
-// quality cuts
+		// quality cuts
 		int    fQC_Ntubes_min;
 		double fQC_Size_min;
 		double fQC_Length_min;

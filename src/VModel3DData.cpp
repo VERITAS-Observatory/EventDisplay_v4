@@ -158,21 +158,21 @@ void VModel3DData::initModel3D( unsigned int iNTel3D, vector<unsigned int>& iNpi
 		}
 	}
 	
-//// Hillas image parameters
-//  fcen_x3D.resize( fNTel3D, 0 );
-//  fcen_y3D.resize( fNTel3D, 0 );
-//  fsize3D.resize( fNTel3D, 0 );
-//  fcosphi3D.resize( fNTel3D, 0 );
-//  fsinphi3D.resize( fNTel3D, 0 );
-//  flength3D.resize( fNTel3D, 0 );
-//  fwidth3D.resize( fNTel3D, 0 );
-//
-//// points in camera for length and width
-//  flengthInX3D.resize( fNTel3D, 0 );
-//  flengthInY3D.resize( fNTel3D, 0 );
-//  flengthOutX3D.resize( fNTel3D, 0 );
-//  flengthOutY3D.resize( fNTel3D, 0 );
-//
+	//// Hillas image parameters
+	//  fcen_x3D.resize( fNTel3D, 0 );
+	//  fcen_y3D.resize( fNTel3D, 0 );
+	//  fsize3D.resize( fNTel3D, 0 );
+	//  fcosphi3D.resize( fNTel3D, 0 );
+	//  fsinphi3D.resize( fNTel3D, 0 );
+	//  flength3D.resize( fNTel3D, 0 );
+	//  fwidth3D.resize( fNTel3D, 0 );
+	//
+	//// points in camera for length and width
+	//  flengthInX3D.resize( fNTel3D, 0 );
+	//  flengthInY3D.resize( fNTel3D, 0 );
+	//  flengthOutX3D.resize( fNTel3D, 0 );
+	//  flengthOutY3D.resize( fNTel3D, 0 );
+	//
 	///////////////////
 	
 	// model start parameters
@@ -315,7 +315,7 @@ void VModel3DData::initEventModel3D()
 	fErrorsigmaT3D = 0;
 	fErrorNc3D = 0;
 	
-// shower direction
+	// shower direction
 	fXoffModel3D = -9999;
 	fYoffModel3D = -9999;
 	fXoffDeRot3D = -9999;

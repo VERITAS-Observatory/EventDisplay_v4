@@ -14,7 +14,7 @@ VDeadChannelFinder::VDeadChannelFinder( int irunmode, unsigned int iTelID, bool 
 	fLowGain = iLowGain;
 	fIsMC = isMC;
 	
-// default values for high gain channels
+	// default values for high gain channels
 	if( !fLowGain )
 	{
 		fDEAD_ped_min = 5.0;
@@ -92,19 +92,19 @@ bool VDeadChannelFinder::readDeadChannelFile( string ifile )
 	
 	while( getline( is, iLine ) )
 	{
-// line without '*' in the beginning are ignored
+		// line without '*' in the beginning are ignored
 		if( iLine.size() > 0 && iLine.substr( 0, 1 ) == "*" )
 		{
 			istringstream is_stream( iLine );
 			is_stream >> iTemp;
-// telescope number
+			// telescope number
 			is_stream >> iTemp;
 			t_temp = atoi( iTemp.c_str() ) - 1;
 			if( t_temp >= 0 && t_temp != ( int )fTelID )
 			{
 				continue;
 			}
-// high or low gain values
+			// high or low gain values
 			is_stream >> iTemp;
 			if( iTemp == "HIGHGAIN" && fLowGain )
 			{
@@ -196,7 +196,7 @@ void VDeadChannelFinder::printSummary()
 
 void VDeadChannelFinder::printDeadChannelDefinition()
 {
-// print dead channel definitions
+	// print dead channel definitions
 	cout << "Telescope " << fTelID + 1 << ":";
 	cout << " dead channel selection criteria: ";
 	if( fLowGain )
@@ -225,7 +225,7 @@ void VDeadChannelFinder::printDeadChannelDefinition()
 
 unsigned int VDeadChannelFinder::testPedestals( unsigned int ichannel, double iPeds )
 {
-// test pedestal range
+	// test pedestal range
 	if( iPeds < fDEAD_ped_min )
 	{
 		if( fDebug )
@@ -249,7 +249,7 @@ unsigned int VDeadChannelFinder::testPedestals( unsigned int ichannel, double iP
 
 unsigned int VDeadChannelFinder::testPedestalVariations( unsigned int ichannel, double iPedVar )
 {
-// test pedvars (!=0)
+	// test pedvars (!=0)
 	if( iPedVar <= fDEAD_pedvar_min )
 	{
 		if( fDebug )
@@ -265,7 +265,7 @@ unsigned int VDeadChannelFinder::testPedestalVariations( unsigned int ichannel, 
 
 unsigned int VDeadChannelFinder::testPedestalVariationsMinOut( unsigned int ichannel, double iPedVar, double imeanPed, double irmsPed )
 {
-// test if pedvars is an outlier
+	// test if pedvars is an outlier
 	if( iPedVar < imeanPed - fDEAD_peddev_min * irmsPed )
 	{
 		if( fDebug )
@@ -283,7 +283,7 @@ unsigned int VDeadChannelFinder::testPedestalVariationsMinOut( unsigned int icha
 
 unsigned int VDeadChannelFinder::testPedestalVariationsMaxOut( unsigned int ichannel, double iPedVar, double imeanPed, double irmsPed )
 {
-// test if pedvars is an outlier
+	// test if pedvars is an outlier
 	if( iPedVar > imeanPed + fDEAD_peddev_max * irmsPed )
 	{
 		if( fDebug )

@@ -40,7 +40,7 @@ class VVirtualDataReader
 		
 	public:
 		VVirtualDataReader();
-//        VVirtualDataReader() throw (VFileException);
+		//        VVirtualDataReader() throw (VFileException);
 		virtual                            ~VVirtualDataReader() {}
 		
 		//!< get data format (MC/rawdata/MCvbf/Rawvbf)
@@ -82,7 +82,7 @@ class VVirtualDataReader
 		{
 			return true;
 		}
-// raweventparser
+		// raweventparser
 		virtual std::pair< bool, uint32_t > getChannelHitIndex( uint32_t ) = 0;
 		virtual uint32_t                    getEventNumber() = 0;
 		virtual uint8_t                     getNewEventType()
@@ -174,7 +174,7 @@ class VVirtualDataReader
 		}
 		virtual bool                        wasLossyCompressed() = 0;
 		
-// rawfile
+		// rawfile
 		virtual bool                        getNextEvent() = 0;
 		virtual bool                        getPrevEvent()
 		{
@@ -192,7 +192,7 @@ class VVirtualDataReader
 		}
 #endif
 		
-// telescopes pointing
+		// telescopes pointing
 		virtual std::vector< double >       getTelElevation()
 		{
 			return d;
@@ -202,7 +202,7 @@ class VVirtualDataReader
 			return d;
 		}
 		
-// MC
+		// MC
 		virtual void                       setTrigger( vector<bool> iImage, vector<bool> iBorder ) {}
 		virtual bool                       isMC() //!< is data MC?
 		{
@@ -345,7 +345,7 @@ class VVirtualDataReader
 			return 0;
 		}
 		
-// DST returns
+		// DST returns
 		virtual std::valarray< double >&     getSums( unsigned int iNChannel = 99999 )
 		{
 			return v;

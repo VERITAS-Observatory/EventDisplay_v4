@@ -31,7 +31,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		vector< double > fMeanPointingMismatch;   //!< mean pointing mismatch between eventdisplay and vbf (per telescope)
 		vector< double > fNMeanPointingMismatch;
 		
-// temporary variables needed for array reconstruction
+		// temporary variables needed for array reconstruction
 		vector< unsigned int > telID;
 		vector< float > x;
 		vector< float > y;
@@ -56,8 +56,8 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		vector< float > ytelnew;
 		vector< float > ztelnew;
 		
-// private functions
-
+		// private functions
+		
 		void calcShowerDirection_and_Core();      //!< calculate shower core and direction
 		void checkPointing();                     //!< check for mismatching between different pointing values
 		void prepareforCoreReconstruction( unsigned int iMeth, float xs, float ys );
@@ -88,7 +88,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		void initAnalysis();
 		void initOutput();
 		void terminate();
-//        void initOuput();                         //!< check for output file,
+		//        void initOuput();                         //!< check for output file,
 		void initTree();
 };
 #endif

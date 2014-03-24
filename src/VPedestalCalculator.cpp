@@ -12,7 +12,7 @@ VPedestalCalculator::VPedestalCalculator()
 {
 	fDebug = getDebugFlag();
 	
-// default parameters (can be adjusted later in initialize()
+	// default parameters (can be adjusted later in initialize()
 	fLengthofTimeSlice = 180.;                     // in [s]
 	fSumWindow = 24;
 	fNPixel = 500;
@@ -44,7 +44,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	cout << "VPedestalCalculator::initialize, adjusted length of time slice from " << iLengthofTimeSlice << "s to " << fLengthofTimeSlice << "s";
 	cout << " (length of time slice: " << fLengthofTimeSlice << " [s], sum window starts at ";
 	cout << fSumFirst << " with lengths up to " << fSumWindow << " samples)" << endl;
-// test if camera is not too big
+	// test if camera is not too big
 	if( getDetectorGeo()->getNChannels()[getTelID()] > fNPixel )
 	{
 		cout << "=================================" << endl;
@@ -55,7 +55,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		getRunParameter()->fPedestalsInTimeSlices = false;
 		return false;
 	}
-// test if summation window is not to big
+	// test if summation window is not to big
 	if( ( unsigned int )fSumWindow > VDST_MAXSUMWINDOW )
 	{
 		cout << "=================================" << endl;
@@ -66,17 +66,17 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		getRunParameter()->fPedestalsInTimeSlices = false;
 		return false;
 	}
-// initialize data readers
+	// initialize data readers
 	if( !initializeDataReader() )
 	{
 		cout << "VPedestalCalculator::initialize, error: cannot initialize data readers" << endl;
 		cout << "exiting..." << endl;
 		exit( -1 );
 	}
-// reset all variables
+	// reset all variables
 	reset();
 	
-// set up the trees
+	// set up the trees
 	TDirectory* iDir = gDirectory;
 	
 	char hname[200];
@@ -97,7 +97,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		v_temp_pedvar.push_back( iped_cal );
 	}
 	
-// vectors
+	// vectors
 	vector< int > iv_vint;
 	vector< float > iv_vdouble;
 	vector< double > iv_vdoubleX;
@@ -106,7 +106,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 	
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 	{
-// define data vectors
+		// define data vectors
 		v_MJD.push_back( iv_vint );
 		v_time.push_back( iv_vdoubleX );
 		v_pedEntries.push_back( iv_vvdouble );
@@ -116,7 +116,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		setTelID( i );
 		unsigned int t = getTeltoAna()[i];
 		
-// define the output tree
+		// define the output tree
 		if( !bCalibrationRun )
 		{
 		
@@ -142,17 +142,17 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 			sprintf( hname, "yRot[%d]/D", fNPixel );
 			fTree[i]->Branch( "yRot", yRot, hname );
 		}
-// fill x and y positions of pixels (unrotated, don't change during run)
+		// fill x and y positions of pixels (unrotated, don't change during run)
 		getDetectorGeo()->setTelID( t );
 		for( unsigned int p = 0; p < getDetectorGeo()->getNChannels()[getTelID()]; p++ )
 		{
 			x[p] = getDetectorGeo()->getXUnrotated()[p];
 			y[p] = getDetectorGeo()->getYUnrotated()[p];
 		}
-// get run number
+		// get run number
 		runNumber = getRunNumber();
 		
-// define the pedvars histograms (temporary, not written to the output files)
+		// define the pedvars histograms (temporary, not written to the output files)
 		iped_cal2.clear();
 		for( unsigned int p = 0; p < fNPixel; p++ )
 		{
@@ -167,7 +167,7 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 		fpedcal_mean.push_back( iped_cal2 );
 		fpedcal_mean2.push_back( iped_cal2 );
 		
-// define the time vector
+		// define the time vector
 		fTimeVec.push_back( 0 );
 	}
 	iDir->cd();
@@ -183,10 +183,10 @@ bool VPedestalCalculator::initialize( bool ibCalibrationRun, unsigned int iNPixe
 
 void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 {
-// loop over all channels
+	// loop over all channels
 	for( unsigned int p = 0; p < fpedcal_mean[telID].size(); p++ )
 	{
-// loop over all summation windows
+		// loop over all summation windows
 		unsigned int iTempSW = fpedcal_mean[telID][p].size();
 		if( getRunParameter()->fCalibrationSumWindow < ( int )iTempSW )
 		{
@@ -194,13 +194,13 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 		}
 		for( unsigned int w = 0; w < iTempSW; w++ )
 		{
-// get pedestal values
+			// get pedestal values
 			if( fpedcal_n[telID][p][w] > 0. )
 			{
 				v_temp_pedEntries[p][w] = fpedcal_n[telID][p][w];
 				v_temp_ped[p][w]        = fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] / ( double )( w + 1 );
-// root use 1/n and not 1./(n-1) in rms calculation: for consistency use the same here (shouldn't matter)
-//	      v_temp_pedvar[p][w]     = sqrt( 1./(fpedcal_n[telID][p][w]-1.) * ( fpedcal_mean2[telID][p][w] - fpedcal_mean[telID][p][w]*fpedcal_mean[telID][p][w]/fpedcal_n[telID][p][w] ) );
+				// root use 1/n and not 1./(n-1) in rms calculation: for consistency use the same here (shouldn't matter)
+				//	      v_temp_pedvar[p][w]     = sqrt( 1./(fpedcal_n[telID][p][w]-1.) * ( fpedcal_mean2[telID][p][w] - fpedcal_mean[telID][p][w]*fpedcal_mean[telID][p][w]/fpedcal_n[telID][p][w] ) );
 				v_temp_pedvar[p][w]     = sqrt( 1. / ( fpedcal_n[telID][p][w] ) * TMath::Abs( fpedcal_mean2[telID][p][w] - fpedcal_mean[telID][p][w] * fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] ) );
 			}
 			else
@@ -213,20 +213,20 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 			fpedcal_mean[telID][p][w] = 0.;
 			fpedcal_mean2[telID][p][w] = 0.;
 		}
-// deroate the pixel coordinates
+		// deroate the pixel coordinates
 		if( getTelID() < getPointing().size() && getPointing()[getTelID()] )
 		{
 			getPointing()[getTelID()]->derotateCoords( VSkyCoordinatesUtilities::getUTC( getEventMJD(), getEventTime() ), x[p], y[p], xRot[p], yRot[p] );
 		}
 	}
 	
-// fill the tree
+	// fill the tree
 	if( telID < fTree.size() && fTree[telID] )
 	{
 		fTree[telID]->Fill();
 	}
 	
-// fill the data vectors
+	// fill the data vectors
 	v_MJD[telID].push_back( getEventMJD() );
 	v_time[telID].push_back( getEventTime() );
 	v_pedEntries[telID].push_back( v_temp_pedEntries );
@@ -238,7 +238,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
 void VPedestalCalculator::doAnalysis( bool iLowGain )
 {
 	double t = getEventTime();
-// get right index for tel id
+	// get right index for tel id
 	unsigned int telID = 99;
 	for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 	{
@@ -249,27 +249,27 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 		}
 	}
 	
-// temporary vectors
+	// temporary vectors
 	if( telID < fTimeVec.size() )
 	{
 		if( fTimeVec[telID] == 0 )
 		{
 			fTimeVec[telID] = t;
 		}
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-// end of a time slice
+		///////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////
+		// end of a time slice
 		else if( t - fTimeVec[telID] > fLengthofTimeSlice )
 		{
 			time = t;
 			fillTimeSlice( telID );
 			fTimeVec[telID] = t;
 		}  // if( t - fTimeVec[telID] > fLengthofTimeSlice )
-///////////////////////////////////////////////////////
-
+		///////////////////////////////////////////////////////
+		
 		double i_tr_sum = 0.;
-// calculate the sums (don't use calcsums because it overwrites getSums() )
-// and fill the histograms
+		// calculate the sums (don't use calcsums because it overwrites getSums() )
+		// and fill the histograms
 		for( unsigned int i = 0; i < getNChannels(); i++ )
 		{
 			if( i < getReader()->getNumChannelsHit() )
@@ -279,18 +279,18 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 				{
 					chanID = fReader->getHitID( i );
 					
-// don't use low gain channels
+					// don't use low gain channels
 					if( chanID >= getHiLo().size() || ( iLowGain && !getHiLo()[chanID] ) )
 					{
 						continue;
 					}
-// check for dead channels
+					// check for dead channels
 					if( !getDead()[chanID] && chanID < fpedcal_mean[telID].size() )
 					{
 						fReader->selectHitChan( i );
 						fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[chanID], getPedrms()[chanID], chanID, i,
 												 getLowGainMultiplier_Trace()*getHiLo()[chanID] );
-// loop over all summation windows
+						// loop over all summation windows
 						unsigned int iTempSW = fpedcal_mean[telID][chanID].size();
 						if( getRunParameter()->fCalibrationSumWindow < ( int )iTempSW )
 						{
@@ -356,12 +356,12 @@ void VPedestalCalculator::terminate( bool iWrite )
 			iDir->cd();
 		}
 	}
-// fill last timing bin
+	// fill last timing bin
 	else
 	{
 		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 		{
-// this is not for pointing checks, don't care about pixel rotation
+			// this is not for pointing checks, don't care about pixel rotation
 			fillTimeSlice( i );
 		}
 	}

@@ -35,7 +35,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	
 	fEventStatus = true;
 	
-// random number generator is needed only for random selection of events (optional)
+	// random number generator is needed only for random selection of events (optional)
 	fRandom = new TRandom3();
 	setSelectRandom( fTLRunParameter->fSelectRandom, fTLRunParameter->fSelectRandomSeed );
 	
@@ -55,17 +55,17 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	fEventWeight = 1.;
 	fIsModel3D = false; //(JG)
 	
-/////////////////////////////////////////////////////////////////////////////////////
-// weighting of energy spectrum
-// MC input spectrum
+	/////////////////////////////////////////////////////////////////////////////////////
+	// weighting of energy spectrum
+	// MC input spectrum
 	fMCSpectralIndex = 2.0;
 	fMCMinEnergy = 0.05;
 	fMCMaxEnergy = 50.;
-// spectral index events are weighted to
+	// spectral index events are weighted to
 	fSpectralIndex = 2.0;
-/////////////////////////////////////////////////////////////////////////////////////
-
-// MC spectra histograms
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	// MC spectra histograms
 	hisList = new TList();
 	hE0mc = new TH1D( "hE0mc", "MC energy spectrum", 1000, -2., 2. );
 	hE0mc->SetXTitle( "log_{10} energy_{MC} [TeV]" );
@@ -97,7 +97,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	hZe->SetXTitle( "cos(Ze)" );
 	hisList->Add( hZe );
 	
-// same with triggered events
+	// same with triggered events
 	hE0trig = new TH1D( "hE0trig", "MC energy spectrum (triggered events)", 1000, -2., 2. );
 	hE0trig->SetXTitle( "log_{10} energy_{MC} [TeV]" );
 	hE0trig->SetYTitle( "number of events" );
@@ -124,7 +124,7 @@ VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunPa
 	hWE0trig->SetZTitle( "number of showers" );
 	hisList->Add( hWE0trig );
 	
-// time cuts
+	// time cuts
 	fMaxTotalTime = fTLRunParameter->fMaxRunTime;
 	fTotalTime = 0.;
 	fTotalTime0 = 0.;
@@ -159,7 +159,7 @@ void VTableLookupDataHandler::fillMChistograms()
 {
 	if( fIsMC )
 	{
-// fill histograms with all simulated events
+		// fill histograms with all simulated events
 		double ilogE = log10( fMCEnergy );
 		double idist = sqrt( fMCxcore * fMCxcore + fMCycore * fMCycore );
 		double ioff  = sqrt( fMCxoff * fMCxoff + fMCyoff * fMCyoff );
@@ -169,7 +169,7 @@ void VTableLookupDataHandler::fillMChistograms()
 		hWE0mc->Fill( ilogE, ioff );
 		hXYmc->Fill( fMCxcore, fMCycore );
 		hZe->Fill( fMCze );
-// fill histograms with all triggered events (require array trigger, at least 2 telescopes)
+		// fill histograms with all triggered events (require array trigger, at least 2 telescopes)
 		if( fNTrig >= 2 )
 		{
 			hE0trig->Fill( ilogE );
@@ -229,13 +229,13 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 		{
 			return false;
 		}
-// dead time calculation
+		// dead time calculation
 		if( !fIsMC && getEventNumber() != 999999 )
 		{
 			fDeadTime->fillDeadTime( time );
 		}
 		
-// return false for non-valid (maybe not reconstructed?) event
+		// return false for non-valid (maybe not reconstructed?) event
 		if( iNE == 0 )
 		{
 			return true;
@@ -250,9 +250,9 @@ bool VTableLookupDataHandler::getNextEvent( bool bShort )
 			ftheta2 = ( fXoff - fMCxoff ) * ( fXoff - fMCxoff ) + ( fYoff - fMCyoff ) * ( fYoff - fMCyoff );
 		}
 		
-// calculate distances
+		// calculate distances
 		calcDistances( fNImages );
-// calculate emission height (not for writing of tables)
+		// calculate emission height (not for writing of tables)
 		if( fNImages > 1 && !fwrite )
 		{
 			calcEmissionHeights();
@@ -278,10 +278,10 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		fmodel3Dpars->GetEntry( fEventCounter );
 	}
 	
-// count all events
+	// count all events
 	fNStats_All++;
-////////////////////////////////////////////////////
-// read first all entries needed for run modes (filling and reading)
+	////////////////////////////////////////////////////
+	// read first all entries needed for run modes (filling and reading)
 	fNMethods = fshowerpars->NMethods;
 	if( fMethod >= fNMethods )
 	{
@@ -292,7 +292,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	}
 	fNImages = fshowerpars->NImages[fMethod];
 	fchi2 = fshowerpars->Chi2[fMethod];
-// for table filling: check as soon as possible if the event is useful
+	// for table filling: check as soon as possible if the event is useful
 	if( fwrite && !isReconstructed() )
 	{
 		fEventStatus = false;
@@ -300,7 +300,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		fNStats_Chi2Cut++;
 		return 0;
 	}
-// fill MC parameters
+	// fill MC parameters
 	if( fIsMC )
 	{
 		fMCEnergy = fshowerpars->MCe0;
@@ -319,7 +319,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 	}
 	
-// the following variables are not set in table filling mode
+	// the following variables are not set in table filling mode
 	if( !fwrite )
 	{
 		runNumber = fshowerpars->runNumber;
@@ -362,8 +362,8 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 	}
 	
-// test here reconstructed and stop if necessary
-// GMG
+	// test here reconstructed and stop if necessary
+	// GMG
 	/*    if( !isReconstructed() )
 	    {
 	       if( fDebug > 1 ) cout << "\t NO RECONSTRUCTION " << fEventCounter << endl;
@@ -394,7 +394,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 	fXoff_derot = fshowerpars->XoffDeRot[fMethod];
 	fYoff_derot = fshowerpars->YoffDeRot[fMethod];
 	
-// fill Model3D parameters (JG)
+	// fill Model3D parameters (JG)
 	if( fIsModel3D )
 	{
 		fSmax3D = fmodel3Dpars->Smax3D;
@@ -426,7 +426,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		if( fImgSel_list[i] )
 		{
 			fImgSel_list_short[ii] = i;
-// count the number of telescopes of this type
+			// count the number of telescopes of this type
 			NImages_Ttype[getTelType_arraycounter( i )]++;
 			ii++;
 		}
@@ -443,7 +443,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		fstdP = fshowerpars->stdp[fMethod];
 	}
 	
-// for filling of lookup tables: first do quality cuts, if not return
+	// for filling of lookup tables: first do quality cuts, if not return
 	if( fwrite )
 	{
 		if( !cut( true ) )
@@ -462,7 +462,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 	}
 	
-// loop over all telescopes
+	// loop over all telescopes
 	bitset<8 * sizeof( unsigned long )> i_nimage; // for imagepattern
 	i_nimage.reset();
 	
@@ -487,7 +487,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 				fReadTPars = false;
 			}
 		}
-// read only those telescope which were part of the reconstruction
+		// read only those telescope which were part of the reconstruction
 		if( fReadTPars )
 		{
 			if( !ftpars[i] )
@@ -616,7 +616,7 @@ bool VTableLookupDataHandler::checkIfFilesInChainAreRecovered( TChain* c )
 bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 {
 	finputfile = iInput;
-// need to find suffix .root: add it if it doesn't exist
+	// need to find suffix .root: add it if it doesn't exist
 	for( unsigned int i = 0; i < finputfile.size(); i++ )
 	{
 		if( finputfile[i].find( ".root" ) == string::npos )
@@ -628,9 +628,9 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		cout << finputfile[i] << endl;
 	}
 	
-//////////////////////////////////////////////////////////////////////////////////////
-// get telescope configuration
-// get it from the telescope configuration tree (if avaible), else assume two telescope setup
+	//////////////////////////////////////////////////////////////////////////////////////
+	// get telescope configuration
+	// get it from the telescope configuration tree (if avaible), else assume two telescope setup
 	fTtelconfig = new TChain( "telconfig" );
 	int iNFil_sum = 0;
 	for( unsigned int i = 0; i < finputfile.size(); i++ )
@@ -644,7 +644,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		iNFil_sum += iNFil;
 	}
 	cout << iNFil_sum << " file(s) in chain " << endl;
-// don't check each file for CTA sims -> this is very inefficent and it takes a long time
+	// don't check each file for CTA sims -> this is very inefficent and it takes a long time
 	if( !fTLRunParameter->fPE && fTLRunParameter->readwrite != 'W' )
 	{
 		if( checkIfFilesInChainAreRecovered( fTtelconfig ) )
@@ -660,7 +660,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	{
 		ftelconfig = new Ctelconfig( fTtelconfig );
 		ftelconfig->GetEntry( 0 );
-// read in telescope configuration
+		// read in telescope configuration
 		fNTel = ftelconfig->NTel;
 		if( fNTel > getMaxNbrTel() )
 		{
@@ -685,7 +685,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 				fList_of_Tel_type[ftelconfig->TelType] = 1;
 			}
 		}
-// number of different telescope types
+		// number of different telescope types
 		fNTelTypes = ( int )fList_of_Tel_type.size();
 	}
 	else
@@ -695,7 +695,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		exit( -1 );
 	}
 	
-// print everything to the screen
+	// print everything to the screen
 	cout << endl << "total number of telescopes: " << fNTel << endl;
 	initializeTelTypeVector();
 	for( unsigned int i = 0; i < fNTel; i++ )
@@ -713,13 +713,13 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		cout << "  " << fList_of_Tel_type_iterator->first << " (" << fList_of_Tel_type_iterator->second << " telescopes)";
 	}
 	cout << endl;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// copy telescope positions to emission height calculator
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	// copy telescope positions to emission height calculator
 	fEmissionHeightCalculator->setTelescopePositions( fNTel, fTelX, fTelY, fTelZ );
 	
-// define trigger histogram
+	// define trigger histogram
 	Int_t nBinsX = 0;
 	if( fNTel < 28 )
 	{
@@ -734,17 +734,17 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	hTrigPattern->SetFillColor( 4 );
 	hTrigPattern->SetYTitle( "% of all triggered events" );
 	hTrigPattern->GetYaxis()->SetTitleOffset( 1.2 );
-// might result in dodgy root files for large numbers of telescopes
-//    hisList->Add( hTrigPattern );
-
+	// might result in dodgy root files for large numbers of telescopes
+	//    hisList->Add( hTrigPattern );
+	
 	hImagePattern = new TH1D( "hImagePattern", "", nBinsX, 0., ( double )nBinsX );
 	hImagePattern->SetStats( 0 );
 	hImagePattern->SetFillColor( 4 );
 	hImagePattern->SetYTitle( "% of all reconstructed events" );
 	hImagePattern->GetYaxis()->SetTitleOffset( 1.2 );
-// might result in dodgy root files for large numbers of telescopes
-//    hisList->Add( hImagePattern );
-
+	// might result in dodgy root files for large numbers of telescopes
+	//    hisList->Add( hImagePattern );
+	
 	sTrigPattern.push_back( "Tel.1" );
 	sTrigPattern.push_back( "Tel.2" );
 	sTrigPattern.push_back( "Tel.1+2" );
@@ -766,7 +766,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		sTrigPattern.push_back( "Tel.2+3+4" );
 		sTrigPattern.push_back( "Tel.1+2+3+4" );
 	}
-// this does not work for too many telescopes
+	// this does not work for too many telescopes
 	if( fNTel > 4 && fNTel < 10 )
 	{
 		char hLabl[200];
@@ -785,9 +785,9 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	char iName[100];
 	char iDir[1000];
 	unsigned int bShort = false;
-// get shower parameter tree
+	// get shower parameter tree
 	fTshowerpars = new TChain( "showerpars" );
-// get model3Dpars tree
+	// get model3Dpars tree
 	if( fIsModel3D )
 	{
 		fTmodel3Dpars = new TChain( "model3Dpars" );
@@ -807,14 +807,14 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		cout << "exiting..." << endl;
 		exit( -1 );
 	}
-// check validity of showerpars tree
+	// check validity of showerpars tree
 	if( !fTshowerpars->GetBranchStatus( "runNumber" ) )
 	{
 		cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (2b)" << endl;
 		cout << "exiting..." << endl;
 		exit( -1 );
 	}
-// check if input data is MC
+	// check if input data is MC
 	if( fTshowerpars->GetBranchStatus( "MCe0" ) )
 	{
 		fIsMC = true;
@@ -826,17 +826,17 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 		cout << "input data is not Monte Carlo type" << endl;
 	}
 	
-// update runparameters
+	// update runparameters
 	fTLRunParameter->update( fTshowerpars );
-// don't set maximum number of entries anymore (not needed, and it takes a long time)
-//    if( fNEntries == 0 || fNEntries >=fTshowerpars->GetEntries() ) fNEntries = fTshowerpars->GetEntries();
-// get file format version of eventdisplay (tree version)
+	// don't set maximum number of entries anymore (not needed, and it takes a long time)
+	//    if( fNEntries == 0 || fNEntries >=fTshowerpars->GetEntries() ) fNEntries = fTshowerpars->GetEntries();
+	// get file format version of eventdisplay (tree version)
 	if( fTLRunParameter )
 	{
 		fEventDisplayFileFormat = fTLRunParameter->getEVNDISP_TREE_VERSION();
 		bShort                  = ( unsigned int )fTLRunParameter->getEVNDISP_TREE_isShort( fTshowerpars->GetTree() );
 	}
-// check file format
+	// check file format
 	if( fEventDisplayFileFormat >= 2 )
 	{
 		if( bShort )
@@ -851,13 +851,13 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	{
 		fEventDisplayFileFormat = 1;
 	}
-// for table filling: minimizing reading of trees
+	// for table filling: minimizing reading of trees
 	if( fwrite )
 	{
 		bShort = 2;
 	}
 	
-// get individual image parameter trees
+	// get individual image parameter trees
 	TChain* iT;
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
@@ -873,7 +873,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 			cout << "VTableLookupDataHandler::setInputFile: error while retrieving data trees (3)" << endl;
 			exit( -1 );
 		}
-// get first entry to check if chain is there
+		// get first entry to check if chain is there
 		gErrorIgnoreLevel = 5000;
 		if( iT->GetEntry( 0 ) > 0 )
 		{
@@ -906,13 +906,13 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 	}
 	cout << endl;
 	
-////////////////////////////////////////////////////////////////////////////////////
-// calculating median of pedvar distribution (not if input data is of PE format)
+	////////////////////////////////////////////////////////////////////////////////////
+	// calculating median of pedvar distribution (not if input data is of PE format)
 	fNoiseLevel.clear();
 	fCurrentNoiseLevel.assign( fNTel, 0. );
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
-// standard data format
+		// standard data format
 		if( !fTLRunParameter->fPE )
 		{
 			if( fDebug > 1 )
@@ -933,7 +933,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 				}
 				if( iPedVars.GetEntries() == 0 )
 				{
-// backwards compatibility: read calibration tree from a different directory (note: this produces a root error message)
+					// backwards compatibility: read calibration tree from a different directory (note: this produces a root error message)
 					sprintf( iDir, "%s/Tel_%d/calibration/calib_%d", finputfile[f].c_str(), i + 1, i + 1 );
 					if( !iPedVars.Add( iDir ) )
 					{
@@ -989,7 +989,7 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
 				cout << "VTableLookupDataHandler::setInputFile() calculating pedvar for telescope (results): " << i + 1 << "\t" << yq[0] << endl;
 			}
 		}
-// PE format -> ignore noise level calculation
+		// PE format -> ignore noise level calculation
 		else
 		{
 			fNoiseLevel.push_back( 0. );
@@ -1031,14 +1031,14 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		}
 	}
 	
-// open output file
+	// open output file
 	fOutFile = new TFile( foutputfile.c_str(), iOption.c_str() );
 	if( fOutFile->IsZombie() )
 	{
 		cout << "VTableLookupDataHandler::setOutputFile error while opening output file " << foutputfile << "\t" << iOption << endl;
 		exit( -1 );
 	}
-// define output tree
+	// define output tree
 	char iTT[2000];
 	
 	if( fEventDisplayFileFormat < 6 )
@@ -1101,7 +1101,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		fOTree->Branch( "WobbleE", &fWobbleE, "WobbleE/D" );
 	}
 	
-// MC parameters
+	// MC parameters
 	if( fIsMC )
 	{
 		fOTree->Branch( "MCprimary", &fMCPrimary, "MCprimary/I" );
@@ -1109,7 +1109,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		fOTree->Branch( "MCxcore", &fMCxcore, "MCxcore/D" );
 		fOTree->Branch( "MCycore", &fMCycore, "MCycore/D" );
 		sprintf( iTT, "MCR[%d]/D", fNTel );
-// (nowhere needed)        fOTree->Branch( "MCR", fMCR, iTT );
+		// (nowhere needed)        fOTree->Branch( "MCR", fMCR, iTT );
 		if( !fShortTree )
 		{
 			fOTree->Branch( "MCxcore_SC", &fMCxcore_SC, "MCxcore_SC/D" );
@@ -1137,7 +1137,7 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 	fOTree->Branch( "NImages", &fNImages, "NImages/I" );
 	fOTree->Branch( "ImgSel", &fImgSel, "ImgSel/l" );
 	
-// telescope type related variables
+	// telescope type related variables
 	fOTree->Branch( "ImgSel_list",  fImgSel_list_short, "ImgSel_list[NImages]/i" );
 	fOTree->Branch( "NTtype", &fNTelTypes, "NTtype/I" );
 	fOTree->Branch( "NImages_Ttype", NImages_Ttype, "NImages_Ttype[NTtype]/i" );
@@ -1355,10 +1355,10 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 bool VTableLookupDataHandler::readRunParameter()
 {
 
-// get run parameter (only if a single inputfile is read)
+	// get run parameter (only if a single inputfile is read)
 	if( fEventDisplayFileFormat > 1 )
 	{
-// get list of files in chain
+		// get list of files in chain
 		TObjArray* fileElements = fTshowerpars->GetListOfFiles();
 		TChainElement* chEl = 0;
 		TIter next( fileElements );
@@ -1430,7 +1430,7 @@ void VTableLookupDataHandler::printCutStatistics()
 bool VTableLookupDataHandler::terminate( TNamed* iM )
 {
 	printCutStatistics();
-// scale pattern histogram to %
+	// scale pattern histogram to %
 	if( hTrigPattern->GetEntries() > 0 )
 	{
 		hTrigPattern->Scale( 1. / hTrigPattern->GetEntries() * 100. );
@@ -1473,9 +1473,9 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 			cout << "\t writing MC debug histograms" << endl;
 			hisList->Write();
 		}
-// see if there is a dead time object on file, if not: write the one filled here
-// (note: at this stage, the scalars cannot be used and the dead time might be
-//         underestimated)
+		// see if there is a dead time object on file, if not: write the one filled here
+		// (note: at this stage, the scalars cannot be used and the dead time might be
+		//         underestimated)
 		if( !fIsMC )
 		{
 			writeDeadTimeHistograms();
@@ -1509,7 +1509,7 @@ void VTableLookupDataHandler::writeDeadTimeHistograms()
 		exit( -1 );
 	}
 	
-// use chain to get list of files
+	// use chain to get list of files
 	TChain iTel( "telconfig" );
 	int iNFil = 0;
 	for( unsigned int i = 0; i < finputfile.size(); i++ )
@@ -1568,7 +1568,7 @@ void VTableLookupDataHandler::copy_telconfig()
 */
 bool VTableLookupDataHandler::copyMCRunheader()
 {
-// use chain to get list of files
+	// use chain to get list of files
 	TChain iTel( "telconfig" );
 	int iNFil = 0;
 	for( unsigned int i = 0; i < finputfile.size(); i++ )
@@ -1627,7 +1627,7 @@ void VTableLookupDataHandler::copyMCHistograms()
 	VEffectiveAreaCalculatorMCHistograms* iMC_his = 0;
 	if( fTshowerpars )
 	{
-// loop over all files and add MC histograms
+		// loop over all files and add MC histograms
 		TObjArray* fileElements = fTshowerpars->GetListOfFiles();
 		if( !fileElements )
 		{
@@ -1727,7 +1727,7 @@ void VTableLookupDataHandler::reset()
 */
 void VTableLookupDataHandler::calcDistances( int nimages )
 {
-// check for successfull reconstruction
+	// check for successfull reconstruction
 	if( nimages > 1 && fZe >= 0. && fYcore > -9998. && fYcore > -9998. )
 	{
 		for( unsigned int tel = 0; tel < fNTel; tel++ )
@@ -2081,7 +2081,7 @@ void VTableLookupDataHandler::resetAll()
 	{
 		fR_telType[i] = 0.;
 	}
-//    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fMCR[i] = 0.;
+	//    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fMCR[i] = 0.;
 	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
 	{
 		ftmscw[i] = 0.;
@@ -2139,7 +2139,7 @@ void VTableLookupDataHandler::resetAll()
 	fMC_distance_to_cameracenter_min = 0.;
 	fMC_distance_to_cameracenter_max = 1.e10;
 	
-// Model3D parameters (JG)
+	// Model3D parameters (JG)
 	fSmax3D = 0;
 	fsigmaL3D = 0;
 	fsigmaT3D = 0;
@@ -2156,7 +2156,7 @@ void VTableLookupDataHandler::resetAll()
 	fErrRWidth3D = 0;
 	fConverged3D = false;
 	
-// cut efficiency counter
+	// cut efficiency counter
 	fNStats_All = 0;
 	fNStats_Rec = 0;
 	fNStats_NImagesCut = 0;
@@ -2173,20 +2173,20 @@ void VTableLookupDataHandler::resetAll()
 */
 bool VTableLookupDataHandler::cut( bool bWrite )
 {
-// require at least two images
+	// require at least two images
 	if( fNImages < ( int )fTLRunParameter->fTableFillingCut_NImages_min )
 	{
 		fNStats_NImagesCut++;
 		return false;
 	}
 	
-// number of reconstructed events
+	// number of reconstructed events
 	fNStats_Rec++;
 	
-// try to get better looking events for table filling
+	// try to get better looking events for table filling
 	if( bWrite )
 	{
-// core error cut
+		// core error cut
 		if( ( ( fXcore - fMCxcore ) * ( fXcore - fMCxcore ) + ( fYcore - fMCycore ) * ( fYcore - fMCycore ) )
 				> fTLRunParameter->fTableFillingCut_CoreError_max * fTLRunParameter->fTableFillingCut_CoreError_max )
 		{
@@ -2221,7 +2221,7 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 
 bool VTableLookupDataHandler::randomSelected()
 {
-// random event selection
+	// random event selection
 	if( fSelectRandom > 0. )
 	{
 		if( fRandom->Uniform() > fSelectRandom )
@@ -2257,10 +2257,10 @@ double VTableLookupDataHandler::calculateMeanNoiseLevel( bool bCurrentNoiseLevel
 	double z = 0.;
 	double m = 0.;
 	
-// time dependent pedestal variations
+	// time dependent pedestal variations
 	if( bCurrentNoiseLevel )
 	{
-// use bit coded image list for older showerpars tree format or for small total numbers of telescopes
+		// use bit coded image list for older showerpars tree format or for small total numbers of telescopes
 		if( fEventDisplayFileFormat < 7 || getNTel() < 5 )
 		{
 			bitset<8 * sizeof( unsigned long )> i_nimage( fImgSel );
@@ -2279,7 +2279,7 @@ double VTableLookupDataHandler::calculateMeanNoiseLevel( bool bCurrentNoiseLevel
 				}
 			}
 		}
-// this should work even for very large telescopes
+		// this should work even for very large telescopes
 		else
 		{
 			for( unsigned int i = 0; i < fCurrentNoiseLevel.size(); i++ )
@@ -2292,7 +2292,7 @@ double VTableLookupDataHandler::calculateMeanNoiseLevel( bool bCurrentNoiseLevel
 			}
 		}
 	}
-// pedestal variations are constant over whole run
+	// pedestal variations are constant over whole run
 	else
 	{
 		for( unsigned int i = 0; i < fNoiseLevel.size(); i++ )
@@ -2342,7 +2342,7 @@ double VTableLookupDataHandler::getTelElevation()
 			}
 		}
 	}
-// get telescope with maximum votes
+	// get telescope with maximum votes
 	unsigned int i_max = 0;
 	for( unsigned int i = 0; i < i_votes.size(); i++ ) if( i_votes[i] > i_votes[i_max] )
 		{

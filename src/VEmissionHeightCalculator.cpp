@@ -37,7 +37,7 @@ VEmissionHeightCalculator::VEmissionHeightCalculator( string iInputfile )
 	fEmissionHeightChi2 = 0.;
 	fEmissionHeightT.assign( 1000, -99. );
 	
-// hardwired available zenith angle
+	// hardwired available zenith angle
 	fZe.push_back( "00" );
 	fZe.push_back( "20" );
 	fZe.push_back( "30" );
@@ -47,10 +47,10 @@ VEmissionHeightCalculator::VEmissionHeightCalculator( string iInputfile )
 		fZeDouble.push_back( atof( fZe[i].c_str() ) );
 	}
 	
-// define some debug histograms
+	// define some debug histograms
 	double maxHeigth = 40.;
 	
-// height distribution
+	// height distribution
 	hHeight = new TH1D( "hHeight", "", ( int )( maxHeigth / 2. ), 0., maxHeigth );
 	hHeight->SetStats( 0 );
 	hHeight->SetLineWidth( 2 );
@@ -67,8 +67,8 @@ VEmissionHeightCalculator::VEmissionHeightCalculator( string iInputfile )
 	hHeightEsysProf->SetXTitle( "distance of maximum emission [km]" );
 	hHeightEsysProf->SetYTitle( "log_{10} E_{rec} - log_{10} E_{MC}" );
 	
-// read in output file
-
+	// read in output file
+	
 	if( iInputfile.size() == 0 )
 	{
 		cout << "VEmissionHeightCalculator:: error opening file with energy correction curves" << endl;
@@ -137,29 +137,29 @@ double VEmissionHeightCalculator::getEnergyCorrectionOrEmissionHeight( double* c
 	
 	double fTelescopeDistanceSC = 0.;
 	double fImageDistance = 0.;
-// counter for telescope pairs
+	// counter for telescope pairs
 	int nTPair = 0;
 	
-// reset emission heights
+	// reset emission heights
 	fEmissionHeight = 0.;
 	fEmissionHeightChi2 = 0.;
-// loop over all telescope pairs
+	// loop over all telescope pairs
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		for( unsigned int j = i; j < fNTel; j++ )
 		{
-// require elevation > 0. (test if telescope is present in analysis)
+			// require elevation > 0. (test if telescope is present in analysis)
 			if( i != j )
 			{
 				if( el[i] > 0. && el[j] > 0. && size[i] > 0 && size[j] > 0 )
 				{
-// get tangens of distance between the two image centroids
+					// get tangens of distance between the two image centroids
 					fImageDistance = TMath::Tan( imageDistance( cen_x[i], cen_x[j], cen_y[i], cen_y[j] ) / TMath::RadToDeg() );
 					if( fImageDistance > 0. )
 					{
-// get distance between the two telescopes in shower coordinates
+						// get distance between the two telescopes in shower coordinates
 						fTelescopeDistanceSC = getTelescopeDistanceSC( i, j, az[i], el[i] );
-// calculate emission height [km]
+						// calculate emission height [km]
 						iEmissionHeightTemp = fTelescopeDistanceSC / fImageDistance / 1.e3;
 						if( bEcorrect )
 						{
@@ -173,7 +173,7 @@ double VEmissionHeightCalculator::getEnergyCorrectionOrEmissionHeight( double* c
 						{
 							iEsys += iEsysTemp;
 							iEsys2 += iEsysTemp * iEsysTemp;
-// weight for pairwise emission height calculation
+							// weight for pairwise emission height calculation
 							iEmissionHeightWeightTemp = 1. / ( ( 1. / log10( size[i] ) ) + ( 1. / log10( size[j] ) ) );
 							iEmissionHeightWeight    += iEmissionHeightWeightTemp;
 							iEmissionHeight          += iEmissionHeightTemp * iEmissionHeightWeightTemp;
@@ -191,11 +191,11 @@ double VEmissionHeightCalculator::getEnergyCorrectionOrEmissionHeight( double* c
 			}
 		}
 	}
-// return mean correction factor (mean of values from all telescope pairs)
+	// return mean correction factor (mean of values from all telescope pairs)
 	fNTelPairs = nTPair;
 	if( iNEsys > 0. && iEmissionHeightWeight > 0. )
 	{
-// calculate correction factor
+		// calculate correction factor
 		if( iNEsys > 1. )
 		{
 			fEsysError = sqrt( 1. / ( iNEsys - 1. ) * ( iEsys2 - 1. / iNEsys * iEsys * iEsys ) );
@@ -205,7 +205,7 @@ double VEmissionHeightCalculator::getEnergyCorrectionOrEmissionHeight( double* c
 			fEsysError = 0.;
 		}
 		fEsys = iEsys / iNEsys;
-// calculate mean emission height
+		// calculate mean emission height
 		fEmissionHeight = iEmissionHeight / iEmissionHeightWeight;
 		iEmissionHeight2 /= iEmissionHeightWeight;
 		if( iNEsys > 1. )
@@ -216,7 +216,7 @@ double VEmissionHeightCalculator::getEnergyCorrectionOrEmissionHeight( double* c
 		{
 			fEmissionHeightChi2 = 0.;
 		}
-// fill histograms
+		// fill histograms
 		if( bEcorrect )
 		{
 			hHeight->Fill( fEmissionHeight );
@@ -299,7 +299,7 @@ double VEmissionHeightCalculator::getEnergyCorrectionFromFunction( double iEmiss
 {
 	double ze = 90. - iEl;
 	
-// zenith angle lower and upper limit
+	// zenith angle lower and upper limit
 	unsigned int ize_low = 0;
 	unsigned int ize_up = 0;
 	
@@ -393,13 +393,13 @@ void VEmissionHeightCalculator::write()
 double VEmissionHeightCalculator::interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos,
 		double iLimitforInterpolation, double iMinValidValue )
 {
-// don't interpolate if both values are not valid
+	// don't interpolate if both values are not valid
 	if( w1 < iMinValidValue && w2 < iMinValidValue )
 	{
 		return -99.;
 	}
 	
-// same x-value, don't interpolate
+	// same x-value, don't interpolate
 	if( fabs( ze1 - ze2 ) < 1.e-3 )
 	{
 		if( w1 < iMinValidValue )
@@ -413,7 +413,7 @@ double VEmissionHeightCalculator::interpolate( double w1, double ze1, double w2,
 		return ( w1 + w2 ) / 2.;
 	}
 	
-// interpolate
+	// interpolate
 	double id = 0.;
 	double f1 = 0.;
 	double f2 = 0.;
@@ -430,8 +430,8 @@ double VEmissionHeightCalculator::interpolate( double w1, double ze1, double w2,
 		f2 = 1. - ( ze  - ze2 ) / id;
 	}
 	
-// one of the values is not valid:
-// return valid value only when f1 or f2 > iLimitforInterPolation
+	// one of the values is not valid:
+	// return valid value only when f1 or f2 > iLimitforInterPolation
 	if( w1 > iMinValidValue && w2 < iMinValidValue )
 	{
 		if( f1 > iLimitforInterpolation )

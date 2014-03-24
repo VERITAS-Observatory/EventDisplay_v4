@@ -50,7 +50,7 @@ void VPlotUtilities::plot_nullHistogram( TPad* c, TH1* h, bool bLogX, bool bLogY
 		h->Draw( "AH" );
 		iPad->Update();
 		
-// X-axis
+		// X-axis
 		TGaxis* x1 = new TGaxis( iPad->GetUxmin(), iPad->GetUymin(), iPad->GetUxmax(), iPad->GetUymin(), xmin, xmax, 510, "G" );
 		string xtitle = h->GetXaxis()->GetTitle();
 		if( xtitle.size() > 0 && xtitle.find( "log_{10}" ) != string::npos && xtitle.find( "log_{10}" ) != xtitle.size() )
@@ -68,7 +68,7 @@ void VPlotUtilities::plot_nullHistogram( TPad* c, TH1* h, bool bLogX, bool bLogY
 		TGaxis* x2 = new TGaxis( iPad->GetUxmin(), iPad->GetUymax(), iPad->GetUxmax(), iPad->GetUymax(), xmin, xmax, 510, "-UG" );
 		x2->Draw();
 		
-// y-axis
+		// y-axis
 		if( bLogY )
 		{
 			TGaxis* y1 = new TGaxis( iPad->GetUxmin(), iPad->GetUymin(), iPad->GetUxmin(), iPad->GetUymax(), h->GetMinimum(), h->GetMaximum(), 510, "G" );
@@ -294,7 +294,7 @@ TGaxis* VPlotUtilities::getColorAxisAxis( double x1, double x2, double y1, doubl
 	double ymin = 0.;
 	double ymax = 0.;
 	
-// plot axis on the right side
+	// plot axis on the right side
 	TBox* iBox = new TBox();
 	for( int i = 0; i < fColorAxis_ncont; i++ )
 	{

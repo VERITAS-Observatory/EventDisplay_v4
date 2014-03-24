@@ -87,8 +87,8 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 			// TEMP
 			cout << "\tJ2000   \t\t RA=" << setprecision( 6 ) << fTargetRA* TMath::RadToDeg() << " dec=" << fTargetDec* TMath::RadToDeg() << endl;
 		}
-// ENDTEMP
-// precess target coordinates
+		// ENDTEMP
+		// precess target coordinates
 		double ofy = VSkyCoordinatesUtilities::precessTarget( iMJD, fTargetRA, fTargetDec );
 		
 		if( !fSupressStdoutText )
@@ -96,7 +96,7 @@ void VSkyCoordinates::precessTarget( int iMJD, int iTelID )
 			cout << "\tMJD " << iMJD << " (" << setprecision( 6 ) << ofy << ")";
 			cout << "\t RA=" << fTargetRA* TMath::RadToDeg() << " dec=" << fTargetDec* TMath::RadToDeg() << endl;
 		}
-// precess telescope coordinates
+		// precess telescope coordinates
 		VSkyCoordinatesUtilities::precessTarget( iMJD, fTelRA, fTelDec );
 		
 		fPrecessed = true;
@@ -116,13 +116,13 @@ bool VSkyCoordinates::setTargetJ2000( double iDec, double iRA )
 	fTargetDecJ2000 = iDec / TMath::RadToDeg();
 	fTargetRAJ2000  = iRA / TMath::RadToDeg();
 	
-// unprecessed -> precess later in the analysis
+	// unprecessed -> precess later in the analysis
 	fTargetDec = iDec / TMath::RadToDeg();
 	fTargetRA  = iRA / TMath::RadToDeg();
 	
 	fTelDecJ2000 = iDec / TMath::RadToDeg();
 	fTelRAJ2000  = iRA / TMath::RadToDeg();
-// unprecessed -> precess later in the analysis
+	// unprecessed -> precess later in the analysis
 	fTelDec = iDec / TMath::RadToDeg();
 	fTelRA  = iRA / TMath::RadToDeg();
 	
@@ -178,32 +178,32 @@ void VSkyCoordinates::updatePointing( int MJD, double time )
 	double iSid = 0.;
 	double az = 0.;
 	double el = 0.;
-// convert time to fraction of a day
+	// convert time to fraction of a day
 	iTime = time / 86400.;
-// get Greenwich sideral time
+	// get Greenwich sideral time
 	iSid = slaGmsta( ( double )MJD, iTime );
-// calculate local sideral time
+	// calculate local sideral time
 	iSid = iSid - fObsLongitude;
-// calculate hour angle
+	// calculate hour angle
 	ha = slaDranrm( iSid - fTelRA );
-// get horizontal coordinates
+	// get horizontal coordinates
 	slaDe2h( ha, fTelDec, fObsLatitude, &az, &el );
-// from [rad] to [deg]
+	// from [rad] to [deg]
 	el *= TMath::RadToDeg();
 	az *= TMath::RadToDeg();
 	
-// telescope elevation/azimuth calculated from source coordinates and time
+	// telescope elevation/azimuth calculated from source coordinates and time
 	fTelAzimuthCalculated   = ( float )az;
 	fTelElevationCalculated = ( float )el;
 	fTelElevation = fTelElevationCalculated;
 	fTelAzimuth   = fTelAzimuthCalculated;
 	
-//////////////////////////////////////////////////
-// set target azimuth/elevation
-
-// calculate hour angle
+	//////////////////////////////////////////////////
+	// set target azimuth/elevation
+	
+	// calculate hour angle
 	ha = slaDranrm( iSid - fTargetRA );
-// get horizontal coordinates
+	// get horizontal coordinates
 	fTargetAzimuth = 0.;
 	fTargetElevation = 0.;
 	slaDe2h( ha, fTargetDec, fObsLatitude, &fTargetAzimuth, &fTargetElevation );
@@ -311,7 +311,7 @@ double VSkyCoordinates::getDerotationAngle( int iMJD, double iTime )
 
 double VSkyCoordinates::getDerotationAngle( double i_UTC )
 {
-//! Returns the camera derotation angle in radians
+	//! Returns the camera derotation angle in radians
 	return -slaPa( getHourAngle( i_UTC ), fTelDec, fObsLatitude );
 }
 
@@ -374,7 +374,7 @@ void VSkyCoordinates::setWobbleOffset( double iNorth, double iEast, int iTelID, 
 		cout << ", (delta ra, delta dec) = (" << i_RADiff << ", " << i_decDiff << ")";
 		cout << endl;
 		
-// set J2000 telescope coordinates
+		// set J2000 telescope coordinates
 		fTelRAJ2000 = fTelRA;
 		fTelDecJ2000 = fTelDec;
 		VSkyCoordinatesUtilities::precessTarget( 51544., fTelRAJ2000, fTelDecJ2000, iMJD );

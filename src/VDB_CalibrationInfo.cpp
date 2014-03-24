@@ -338,11 +338,11 @@ bool VDB_CalibrationInfo::test_file_format( TString file_to_be_copied )
 
 	bool good_format = false;
 	
-//............................
-// TO DO
-//............................
-
-
+	//............................
+	// TO DO
+	//............................
+	
+	
 	good_format = true;
 	
 	return good_format;
@@ -409,7 +409,7 @@ bool VDB_CalibrationInfo::Read_the_DB()
 		return false;
 		
 	}
-// HARDWIRED TOTAL NUMBER OF CHANNELS
+	// HARDWIRED TOTAL NUMBER OF CHANNELS
 	if( Vchannel.size() < 499 )
 	{
 		cout << "ERROR laser run  " << fcurrent_run << " tel " << fcurrent_tel << " has " << Vchannel.size() << " channel filled in the DB. Should be 499" << std::endl;

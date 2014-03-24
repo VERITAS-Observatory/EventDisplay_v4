@@ -80,7 +80,7 @@ namespace VStatistics
 		else
 		{
 			Sig17 = 2.*( Non * log( oneplusalphaoveralpha * ( Non / Ntot ) ) + Noff * log( oneplusalpha * ( Noff / Ntot ) ) );
-// value in brackets can be a small negative number
+			// value in brackets can be a small negative number
 			if( TMath::Abs( Sig17 ) < 1.e-5 )
 			{
 				Sig17 = 0.;
@@ -112,8 +112,8 @@ namespace VStatistics
 		
 		liandma( nOn, nOff, norm,
 				 nSig, limaSig5, limaSig9, limaSig17 );
-//  if( !isnormal( limaSig17 ) ) return 0.;
-
+		//  if( !isnormal( limaSig17 ) ) return 0.;
+		
 		if( iLiMaForm == 5 )
 		{
 			return limaSig5;
@@ -126,16 +126,16 @@ namespace VStatistics
 		return limaSig17;
 	}
 	
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-//
-// upper limit calculations
-//
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-
+	///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// upper limit calculations
+	//
+	///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	
 	/*
 	    Gaussian approximation, equ 10 and following paragraph of Helene (1983)
 	*/
@@ -205,12 +205,12 @@ namespace VStatistics
 	*/
 	inline double calcUpperLimit( double nOn, double nOff, double ratio, double CL, int iMethod = 0 )
 	{
-// Helene taking ratio into account
+		// Helene taking ratio into account
 		if( iMethod == 0 || iMethod == 2 )
 		{
 			return Helene( nOn, nOff, ratio, CL );
 		}
-// Helene, equ (2)
+		// Helene, equ (2)
 		else if( iMethod == 1 )
 		{
 			double mypars[5];
@@ -220,7 +220,7 @@ namespace VStatistics
 			mypars[3] = 1. - CL;
 			mypars[4] = ( double )iMethod;
 			
-//! ICP and JB agree this is correct:
+			//! ICP and JB agree this is correct:
 			if( nOn < nOff )
 			{
 				nOn = nOff;
@@ -231,7 +231,7 @@ namespace VStatistics
 			f.SetNpx( 10000 );
 			return f.GetX( 0.0 , 0.0, 100000, 1.e-10, 1000 );
 		}
-// Feldman & Cousins
+		// Feldman & Cousins
 		else if( iMethod == 3 )
 		{
 			TFeldmanCousins i_FeldmanCousins( CL );
@@ -254,10 +254,10 @@ namespace VStatistics
 			}
 			return i_FeldmanCousins.CalculateUpperLimit( nOn, ratio * nOff );
 		}
-// Rolke Model 3 Background - Gaussian, Efficiency - Gaussian
-//
-// method4_em    efficiency
-// method4_sdem  standard deviation of efficiency
+		// Rolke Model 3 Background - Gaussian, Efficiency - Gaussian
+		//
+		// method4_em    efficiency
+		// method4_sdem  standard deviation of efficiency
 		else if( iMethod == 4 )
 		{
 			TRolke i_Rolke;
@@ -269,8 +269,8 @@ namespace VStatistics
 			
 			return i_Rolke.GetUpperLimit();
 		}
-// Rolke Model 4 Background - Poisson, Efficiency - known
-// method5_e    efficiency
+		// Rolke Model 4 Background - Poisson, Efficiency - known
+		// method5_e    efficiency
 		else if( iMethod == 5 && ratio > 0. )
 		{
 			TRolke i_Rolke;
@@ -298,13 +298,13 @@ namespace VStatistics
 	inline double interpolate( double w1, double ze1, double w2, double ze2, double ze, bool iCos = false,
 							   double iLimitforInterpolation = 0.5, double iMinValidValue = -90. )
 	{
-// don't interpolate if both values are not valid
+		// don't interpolate if both values are not valid
 		if( w1 < iMinValidValue && w2 < iMinValidValue )
 		{
 			return -99.;
 		}
 		
-// same x-value, don't interpolate
+		// same x-value, don't interpolate
 		if( fabs( ze1 - ze2 ) < 1.e-3 )
 		{
 			if( w1 < iMinValidValue )
@@ -318,7 +318,7 @@ namespace VStatistics
 			return ( w1 + w2 ) / 2.;
 		}
 		
-// interpolate
+		// interpolate
 		double id = 0.;
 		double f1 = 0.;
 		double f2 = 0.;
@@ -335,8 +335,8 @@ namespace VStatistics
 			f2 = 1. - ( ze  - ze2 ) / id;
 		}
 		
-// one of the values is not valid:
-// return valid value only when f1 or f2 > iLimitforInterPolation
+		// one of the values is not valid:
+		// return valid value only when f1 or f2 > iLimitforInterPolation
 		if( w1 > iMinValidValue && w2 < iMinValidValue )
 		{
 			if( f1 > iLimitforInterpolation )

@@ -278,7 +278,7 @@ bool VBaseRawDataReader::initTraceNoiseGenerator( unsigned int iType, string iT,
 	}
 	fNoiseFileReader = new VNoiseFileReader( iType, iT );
 	
-// preliminary: use value from Telescope 1 for all telescopes
+	// preliminary: use value from Telescope 1 for all telescopes
 	double iCorrection = 1.;
 	if( iFADCCorrect.size() > 0 && iFADCCorrect[0] > 0. )
 	{
@@ -338,7 +338,7 @@ uint8_t VBaseRawDataReader::getSample( unsigned channel, unsigned sample, bool i
 
 std::vector< uint8_t > VBaseRawDataReader::getSamplesVec()
 {
-// standard way
+	// standard way
 	if( !fNoiseFileReader )
 	{
 		if( fEvent[fTelID] )
@@ -488,7 +488,7 @@ vector< valarray< double > >& VBaseRawDataReader::getTracePulseTiming( unsigned 
 {
 	if( fTelID < fEvent.size() && fEvent[fTelID] )
 	{
-// check only first entry (anyway a dummy vector)
+		// check only first entry (anyway a dummy vector)
 		if( fTracePulseTiming.size() == VDST_MAXTIMINGLEVELS && fTracePulseTiming[0].size() == iNChannel )
 		{
 			return fTracePulseTiming;

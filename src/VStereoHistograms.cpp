@@ -10,8 +10,8 @@
 
 VStereoHistograms::VStereoHistograms( string i_hsuffix, double ibinsize, double ibinsizeUC, double iEnergyBinSize, double iTimeBinSize, double iTimeMin, double iTimeMax, bool iIsOn )
 {
-//   defineHistograms( i_count, irun, i_hsuffix, ibinsize, ibinsizeUC, iEnergyBinSize, iIsOn );
-
+	//   defineHistograms( i_count, irun, i_hsuffix, ibinsize, ibinsizeUC, iEnergyBinSize, iIsOn );
+	
 	bIsOn = iIsOn;
 	fHisSuffix = i_hsuffix;
 	fBinSize = ibinsize;
@@ -60,8 +60,8 @@ void VStereoHistograms::defineHistograms()
 	hmap_alpha_off = 0;
 	hmap_alpha_offUC = 0;
 	
-///////////////////////////////////
-// limits of 2D sky plots (uneven to get a bin exactly on the source position)
+	///////////////////////////////////
+	// limits of 2D sky plots (uneven to get a bin exactly on the source position)
 	double xmin = fSkyMapSizeXmin - fBinSize / 2.;
 	double xmax = fSkyMapSizeXmax - fBinSize / 2.;
 	double xminUC =  fSkyMapSizeXmin - fBinSizeUC / 2.;
@@ -82,17 +82,17 @@ void VStereoHistograms::defineHistograms()
 	int ybin   = ( int )( ( ymax - ymin ) / fBinSize + 0.5 );
 	int ybinUC = ( int )( ( ymax - ymin ) / fBinSizeUC + 0.5 );
 	
-///////////////////////////////////
-// limits of energy histograms
-// log energy axis
+	///////////////////////////////////
+	// limits of energy histograms
+	// log energy axis
 	double i_emin = -2.;
 	double i_emax =  2.2;
 	int    i_ebin = int( ( i_emax - i_emin ) / fBinSizeEnergy + 0.5 );
-// linear energy axis
+	// linear energy axis
 	double i_Linemin = 0.05;
 	double i_Linemax = 50.;
 	int    i_Linebin = int( ( i_Linemax - i_Linemin ) / 0.01 );
-// 2D time binning
+	// 2D time binning
 	double i_tmin = fTimeMin;
 	double i_tmax = fTimeMax;
 	int i_tbin = int( ( i_tmax - i_tmin ) / fBinSizeTime + 0.5 );
@@ -177,7 +177,7 @@ void VStereoHistograms::defineHistograms()
 	hListStereoParameterHistograms->Add( hmean_dist );
 	hListNameofParameterHistograms["hmean_dist"] = hmean_dist;
 	
-//! setup unrotated sky map
+	//! setup unrotated sky map
 	sprintf( i_key, "hxyoff_stereo_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Stereo Map on Camera (%s)", fHisSuffix.c_str() );
 	hxyoff_stereo = new TH2D( i_key, i_name, xbin, xmin, xmax, ybin, ymin, ymax );
@@ -187,7 +187,7 @@ void VStereoHistograms::defineHistograms()
 	hListSkyMaps->Add( hxyoff_stereo );
 	hListNameofSkyMaps.push_back( i_key );
 	
-//! setup the sky map histogram
+	//! setup the sky map histogram
 	sprintf( i_key, "hmap_stereo_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Stereo Sky Map (%s)", fHisSuffix.c_str() );
 	hmap_stereo = new TH2D( i_key, i_name, xbin, xmin, xmax, xbin, ymin, ymax );
@@ -197,8 +197,8 @@ void VStereoHistograms::defineHistograms()
 	hListSkyMaps->Add( hmap_stereo );
 	hListNameofSkyMaps.push_back( i_key );
 	
-//! setup the sky map histogram for the background normalisation
-// this histogram must have the same binning definition as hmap_stereo !!!!
+	//! setup the sky map histogram for the background normalisation
+	// this histogram must have the same binning definition as hmap_stereo !!!!
 	sprintf( i_key, "hmap_alpha_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Alpha Sky Map (%s)", fHisSuffix.c_str() );
 	hmap_alpha = new TH2D( i_key, i_name, xbin, xmin, xmax, ybin, ymin, ymax );
@@ -235,7 +235,7 @@ void VStereoHistograms::defineHistograms()
 	hListNameofSkyMaps.push_back( i_key );
 	
 	
-//! setup the sky map histogram
+	//! setup the sky map histogram
 	sprintf( i_key, "hmap_stereoUC_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Stereo Sky Map, uncorrelated (%s)", fHisSuffix.c_str() );
 	hmap_stereoUC = new TH2D( i_key, i_name, xbinUC, xminUC, xmaxUC, ybinUC, yminUC, ymaxUC );
@@ -245,8 +245,8 @@ void VStereoHistograms::defineHistograms()
 	hListSkyMapsUC->Add( hmap_stereoUC );
 	hListNameofSkyMaps.push_back( i_key );
 	
-//! setup the sky map histogram for the background normalisation
-// this histogram must have the same binning definition as hmap_stereo !!!!
+	//! setup the sky map histogram for the background normalisation
+	// this histogram must have the same binning definition as hmap_stereo !!!!
 	sprintf( i_key, "hmap_alphaUC_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Alpha Sky Map, uncorrelated (%s)", fHisSuffix.c_str() );
 	hmap_alphaUC = new TH2D( i_key, i_name, xbinUC, xminUC, xmaxUC, ybinUC, yminUC, ymaxUC );
@@ -276,7 +276,7 @@ void VStereoHistograms::defineHistograms()
 	hListSkyMapsUC->Add( hmap_alphaNormUC );
 	hListNameofSkyMaps.push_back( i_key );
 	
-//! setup the ground plane core map histogram
+	//! setup the ground plane core map histogram
 	sprintf( i_key, "hcore_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Core Position Map (%s)", fHisSuffix.c_str() );
 	hcore = new TH2D( i_key, i_name, 100, -200, 200, 100, -200, 200 );
@@ -297,7 +297,7 @@ void VStereoHistograms::defineHistograms()
 	hListStereoParameterHistograms->Add( hmsc );
 	hListNameofParameterHistograms["hmsc"] = hmsc;
 	
-//! setup mscw histogram
+	//! setup mscw histogram
 	sprintf( i_key, "hmscw_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "MSCW Histogram (%s)", fHisSuffix.c_str() );
 	hmscw = new TH1D( i_key, i_name, 200, -5., 10. );
@@ -308,7 +308,7 @@ void VStereoHistograms::defineHistograms()
 	hListStereoParameterHistograms->Add( hmscw );
 	hListNameofParameterHistograms["hmscw"] = hmscw;
 	
-//! setup mscl histogram
+	//! setup mscl histogram
 	sprintf( i_key, "hmscl_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "MSCL Histogram(%s)", fHisSuffix.c_str() );
 	hmscl = new TH1D( i_key, i_name, 200, -5., 10. );
@@ -319,7 +319,7 @@ void VStereoHistograms::defineHistograms()
 	hListStereoParameterHistograms->Add( hmscl );
 	hListNameofParameterHistograms["hmscl"] = hmscl;
 	
-//! setup rf histogram
+	//! setup rf histogram
 	sprintf( i_key, "hrf_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "rf Histogram (%s)", fHisSuffix.c_str() );
 	hrf = new TH1D( i_key, i_name, 200, 0., 1. );
@@ -412,8 +412,8 @@ void VStereoHistograms::defineHistograms()
 	hListEnergyHistograms->Add( hLinerecEffectiveArea );
 	hListNameofParameterHistograms["hLinerecEffectiveArea"] = hLinerecEffectiveArea;
 	
-// rate histograms
-
+	// rate histograms
+	
 	sprintf( i_key, "hrate_1sec_%s", fHisSuffix.c_str() );
 	hrate_1sec = new TH1D( i_key, "One Second Count rate", 100, -2.0, 2.0 );
 	hrate_1sec->SetXTitle( "Time [MJD]" );
@@ -452,7 +452,7 @@ void VStereoHistograms::defineHistograms()
 	hImagePatternAfterCuts->SetYTitle( "number of events" );
 	hisRateList->Add( hImagePatternAfterCuts );
 	
-// set xtitles for trigger pattern histograms
+	// set xtitles for trigger pattern histograms
 	vector< string > i_xtitle;
 	i_xtitle.push_back( "Tel.1" );
 	i_xtitle.push_back( "Tel.2" );
@@ -534,7 +534,7 @@ void VStereoHistograms::writeHistograms()
 	
 	TDirectory* wDir = 0;
 	
-// write all sky plots into sky histogram directory
+	// write all sky plots into sky histogram directory
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "skyHistograms" );
 	if( !wDir )
@@ -547,10 +547,10 @@ void VStereoHistograms::writeHistograms()
 	}
 	hListSkyMaps->Write();
 	hListSkyMapsUC->Write();
-// delete sky plots from memory
+	// delete sky plots from memory
 	deleteSkyPlots();
 	
-// write all stereo parameter histograms
+	// write all stereo parameter histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "stereoParameterHistograms" );
 	if( !wDir )
@@ -563,7 +563,7 @@ void VStereoHistograms::writeHistograms()
 	}
 	hListStereoParameterHistograms->Write();
 	
-// write all energy histograms
+	// write all energy histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "energyHistograms" );
 	if( !wDir )
@@ -576,7 +576,7 @@ void VStereoHistograms::writeHistograms()
 	}
 	hListEnergyHistograms->Write();
 	
-// write all random forest histograms
+	// write all random forest histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "randomForestHistograms" );
 	if( !wDir )
@@ -589,7 +589,7 @@ void VStereoHistograms::writeHistograms()
 	}
 	hListRandomForestParameterHistograms->Write();
 	
-// write all rate histograms
+	// write all rate histograms
 	iDir->cd();
 	wDir = ( TDirectory* )iDir->Get( "rawRateHistograms" );
 	if( !wDir )
@@ -603,7 +603,7 @@ void VStereoHistograms::writeHistograms()
 	hisRateList->Write();
 	hisRateList->Delete();
 	
-// delete all parameter histograms from heap
+	// delete all parameter histograms from heap
 	deleteParameterHistograms();
 	
 	iDir->cd();
@@ -656,7 +656,7 @@ bool VStereoHistograms::readHistograms( TList* iL, string iDir )
 {
 	TDirectory* wDir = 0;
 	
-// write all sky plots into sky histogram directory
+	// write all sky plots into sky histogram directory
 	wDir = ( TDirectory* )gDirectory->Get( iDir.c_str() );
 	if( !wDir )
 	{
@@ -678,7 +678,7 @@ bool VStereoHistograms::readHistograms( TList* iL, string iDir )
 		TNamed* ho = ( TNamed* )key->ReadObj();
 		iTemp = ho->GetName();
 		
-// get only on/off histograms
+		// get only on/off histograms
 		if( iTemp.find( "_diff" ) < iTemp.size() )
 		{
 			ho->Delete();
@@ -720,7 +720,7 @@ bool VStereoHistograms::readSkyPlots()
 {
 	TDirectory* wDir = 0;
 	
-// write all sky plots into sky histogram directory
+	// write all sky plots into sky histogram directory
 	wDir = ( TDirectory* )gDirectory->Get( "skyHistograms" );
 	if( !wDir )
 	{
@@ -739,7 +739,7 @@ bool VStereoHistograms::readSkyPlots()
 	{
 		TNamed* ho = ( TNamed* )key->ReadObj();
 		iTemp = ho->GetName();
-// get only on and off histograms
+		// get only on and off histograms
 		if( iTemp.find( "_diff" ) < iTemp.size() || iTemp.find( "_sig" ) < iTemp.size() )
 		{
 			ho->Delete();
@@ -848,7 +848,7 @@ void VStereoHistograms::makeRateHistograms( double iStart, double iStopp )
 		return;
 	}
 	
-// reset bins for rate histograms
+	// reset bins for rate histograms
 	hrate_1sec->Reset();
 	hrate_10sec->Reset();
 	hrate_1min->Reset();
@@ -893,8 +893,8 @@ void VStereoHistograms::writeObjects( string iFile, string iDirectory, TObject* 
 		iDir->cd();
 		return;
 	}
-//   cout << "\t\t copying objects from file " << iFile << " to directory " << iDirectory << endl;
-// open input file
+	//   cout << "\t\t copying objects from file " << iFile << " to directory " << iDirectory << endl;
+	// open input file
 	TFile fIn( iFile.c_str(), "READ" );
 	if( fIn.IsZombie() )
 	{
@@ -908,7 +908,7 @@ void VStereoHistograms::writeObjects( string iFile, string iDirectory, TObject* 
 			wDir->cd();
 			g->Write();
 		}
-/////////////////////////////////////////////////
+		/////////////////////////////////////////////////
 	}
 	else if( iDirectory == "RadialAcceptances" )
 	{

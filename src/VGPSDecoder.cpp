@@ -4,8 +4,8 @@ void VGPSDecoder::decode( uint32_t word0, uint32_t word1, uint32_t word2 )
 throw()
 {
 
-// hopefully code below is endian independant!
-
+	// hopefully code below is endian independant!
+	
 	uint16_t TimeArray[5];
 	TimeArray[0] = word0 & 0x0000FFFF;
 	TimeArray[1] = ( word0 & 0xFFFF0000 ) >> 16;
@@ -13,14 +13,14 @@ throw()
 	TimeArray[3] = ( word1 & 0xFFFF0000 ) >> 16;
 	TimeArray[4] = word2 & 0x0000FFFF;
 	
-//   uint32_t timeVal[3];
-//   timeVal[0]=word0;
-//   timeVal[1]=word1;
-//   timeVal[2]=word2;
-//   uint16_t *TimeArray = (uint16_t*)timeVal;
-
-// what follows as copied from Scott:
-
+	//   uint32_t timeVal[3];
+	//   timeVal[0]=word0;
+	//   timeVal[1]=word1;
+	//   timeVal[2]=word2;
+	//   uint16_t *TimeArray = (uint16_t*)timeVal;
+	
+	// what follows as copied from Scott:
+	
 	fGPSStatus = ( TimeArray[1] >> 4 & 0xF );
 	
 	fGPSDays = 100 * ( TimeArray[0] & 0x000F )

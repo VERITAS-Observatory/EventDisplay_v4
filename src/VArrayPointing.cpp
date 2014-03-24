@@ -38,7 +38,7 @@ void VArrayPointing::initializePointingTree()
 	fPointingTree->Branch( "TargetDecJ2000", &fTargetDecJ2000, "TargetDecJ2000/D" );
 	fPointingTree->Branch( "TargetRA", &fTargetRA, "TargetRA/D" );
 	fPointingTree->Branch( "TargetDec", &fTargetDec, "TargetDec/D" );
-// TelAzimuth and TelAzimthCalculate should be the same (same for Elevation)
+	// TelAzimuth and TelAzimthCalculate should be the same (same for Elevation)
 	fPointingTree->Branch( "TelAzimuth", &fTelAzimuth, "TelAzimuth/D" );
 	fPointingTree->Branch( "TelElevation", &fTelElevation, "TelElevation/D" );
 	fPointingTree->Branch( "TelAzimuthCalculated", &fTelAzimuthCalculated, "TelAzimuthCalculated/F" );

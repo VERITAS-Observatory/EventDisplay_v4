@@ -98,7 +98,7 @@ void VGrIsuAnalyzer::tel_impact( float xcos, float ycos, float xfield, float yfi
 		dl = 0.;
 	}
 	
-// (GM) small number check
+	// (GM) small number check
 	for( unsigned int i = 0; i < 3; i++ ) if( TMath::Abs( c[i] ) < 1.e-5 )
 		{
 			c[i] = 0.;
@@ -177,7 +177,7 @@ void VGrIsuAnalyzer::setup_matrix( float matrix[3][3], float dl, float dm, float
 		matrix[2][2] = 1;
 	}
 	
-// invert matrix for rotations from shower coordinates into ground coordinates
+	// invert matrix for rotations from shower coordinates into ground coordinates
 	if( bInvers )
 	{
 		float temp = 0.;
@@ -260,8 +260,8 @@ passes through the point (x[i],y[i]) and has slope m[i].
 	*sy = -999.;
 	*std = 0.0;
 	
-// check length of vectors
-
+	// check length of vectors
+	
 	if( x.size() == num_images && y.size() == num_images && w.size() == num_images && m.size() == num_images )
 	{
 		for( unsigned int i = 0; i < num_images; i++ )
@@ -418,13 +418,13 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x, vector<float> y, vector
 	vector< float > weight;
 	num_images = x.size();
 	
-// get intersections for all possible two-telescope combinations
+	// get intersections for all possible two-telescope combinations
 	for( unsigned int i = 0; i < x.size(); i++ )
 	{
 		for( unsigned int j = i + 1; j < x.size(); j++ )
 		{
 			get_intersection( x[i], mx[i], y[i], my[i], x[j], mx[j], y[j], my[j], &a1, &a2, &xc, &yc );
-// is the intersection on the right side?
+			// is the intersection on the right side?
 			if( a1 > 0. && a2 > 0. )
 			{
 				xcore.push_back( xc );
@@ -433,7 +433,7 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x, vector<float> y, vector
 			}
 		}
 	}
-// calculate weighted mean
+	// calculate weighted mean
 	for( unsigned int i = 0; i < xcore.size(); i++ )
 	{
 		*sx += weight[i] * xcore[i];
@@ -445,7 +445,7 @@ int VGrIsuAnalyzer::two_line_intersect( vector<float> x, vector<float> y, vector
 		*sx /= wsum;
 		*sy /= wsum;
 	}
-// calculate weighted variance
+	// calculate weighted variance
 	for( unsigned int i = 0; i < xcore.size(); i++ )
 	{
 		*std += weight[i] * ( ( xcore[i] - *sx ) * ( xcore[i] - *sx ) + ( ycore[i] - *sy ) * ( ycore[i] - *sy ) );
@@ -477,7 +477,7 @@ bool VGrIsuAnalyzer::get_intersection( float x1, float mx1, float y1, float my1,
 	*xc = 0.;
 	*yc = 0.;
 	
-// accept currently no zero direction vectors
+	// accept currently no zero direction vectors
 	if( mx1 == 0. || my1 == 0. )
 	{
 		return false;

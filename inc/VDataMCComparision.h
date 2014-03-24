@@ -36,7 +36,7 @@ class VDataMCComparision
 		
 		bool bBckData;
 		
-// wobble north offset
+		// wobble north offset
 		double fWobbleNorth;
 		double fWobbleEast;
 		bool   fWobbleFromDataTree;
@@ -45,19 +45,19 @@ class VDataMCComparision
 		double fAzMax;
 		bool fAzRange;
 		
-// spectral weighting
+		// spectral weighting
 		VSpectralWeight* fSpectralWeight;
 		
-// data tree
+		// data tree
 		CData* fData;
 		
-// cuts
+		// cuts
 		VGammaHadronCuts* fCuts;
 		bool fCalculateMVAValues;
 		
-// list with all histograms
+		// list with all histograms
 		TList* hisList;
-// stereo histograms
+		// stereo histograms
 		TH1D* htheta2;
 		TH1D* hltheta2;
 		TH1D* hMSCW;
@@ -81,7 +81,7 @@ class VDataMCComparision
 		vector< TH1D* > hR;
 		vector< TH2D* > hdistR;
 		
-// single telescope histograms
+		// single telescope histograms
 		vector<TH1D* > hdist;
 		vector<TH1D* > hntubes;
 		vector<TH1D* > hnlowgain;

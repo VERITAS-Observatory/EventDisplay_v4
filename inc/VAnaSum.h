@@ -88,10 +88,10 @@ class VAnaSum
 		map< int, double > fRunExposureOn;        //!< exposure per run (on)
 		map< int, double > fRunExposureOff;       //!< exposure per run (off)
 		
-//map< int, double >  fRunMJD;	//Moved to VStereoAnalysis
-//map< int, double >  fRunMJDStart;	//Moved to VStereoAnalysis
-//map< int, double >  fRunMJDStopp;	//Moved to VStereoAnalysis
-//Perhaps the following should go to VStereoAnalysis too ...
+		//map< int, double >  fRunMJD;	//Moved to VStereoAnalysis
+		//map< int, double >  fRunMJDStart;	//Moved to VStereoAnalysis
+		//map< int, double >  fRunMJDStopp;	//Moved to VStereoAnalysis
+		//Perhaps the following should go to VStereoAnalysis too ...
 		map< int, double > fRunAzMeanOn;
 		map< int, double > fRunAzMinOn;
 		map< int, double > fRunAzMaxOn;
@@ -101,7 +101,7 @@ class VAnaSum
 		map< int, double > fRunPedVarsOn;
 		map< int, double > fRunPedVarsOff;
 		
-// output file and directories
+		// output file and directories
 		TFile* fOPfile;                           //!< Output file
 		
 		TDirectory* fTotalDir;                    //!< directory with combined results (output directory)
@@ -115,15 +115,15 @@ class VAnaSum
 		//!< single telescope directories, one per run and telescope (first index: run, second index: telescope)
 		vector< vector< TDirectory* > > fMonoRunDir;
 		
-// Mono Analysis
+		// Mono Analysis
 		vector<VMonoPlots*> fMonoOn;              //!< Mono analysis plots for ON source (one per telescope)
 		vector<VMonoPlots*> fMonoOff;             //!< Mono analysis plots for OFF source (one per telescope)
 		
-// Stereo analysis
+		// Stereo analysis
 		VStereoAnalysis* fStereoOn;               //!< Analysis plots for stereo parameters
 		VStereoAnalysis* fStereoOff;              //!< Analysis plots for stereo parameters
 		
-// summary
+		// summary
 		VRatePlots* fRatePlots;                   //!< significance and rate plots vs time
 		vector< VRatePlots* > fMonoRatePlots;
 		VRunSummary* fRunSummary;

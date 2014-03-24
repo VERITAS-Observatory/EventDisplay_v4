@@ -44,13 +44,13 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 	}
 	f_boolCommandline = true;
 	int i = 1;
-// no command line parameters
+	// no command line parameters
 	if( argc == 1 )
 	{
 		printHelp();
 		return false;
 	}
-// read all command line parameters
+	// read all command line parameters
 	while( i++ < argc )
 	{
 		string iTemp  = argv[i - 1];
@@ -61,7 +61,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			iTemp2 = argv[i];
 		}
 		iTemp = VUtilities::lowerCase( iTemp );
-// print help text
+		// print help text
 		if( iTemp.find( "help" ) < iTemp.size() )
 		{
 			printHelp();
@@ -76,11 +76,11 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fShowPhotoDiode = true;
 		}
-// camera
+		// camera
 		else if( iTemp.find( "camera" ) < iTemp.size() && !( iTemp.find( "cameradirectory" ) < iTemp.size() )
 				 && !( iTemp.find( "cameracoordinatetransformx" ) < iTemp.size() )  && !( iTemp.find( "cameracoordinatetransformy" ) < iTemp.size() ) )
 		{
-// reading iTemp1, to get upper/lower cases right
+			// reading iTemp1, to get upper/lower cases right
 			fRunPara->fcamera[0] = iTemp1.substr( iTemp1.rfind( "=" ) + 1, iTemp1.size() );
 			fusercamera = true;
 		}
@@ -88,7 +88,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fUseVBFSampleLength = true;
 		}
-// number of telescopes (>0)
+		// number of telescopes (>0)
 		else if( iTemp.find( "ntel" ) < iTemp.size() )
 		{
 			fRunPara->fNTelescopes = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -98,12 +98,12 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				return false;
 			}
 		}
-// display mode
+		// display mode
 		else if( iTemp.find( "disp" ) < iTemp.size() )
 		{
 			fRunPara->fdisplaymode = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// muon mode
+		// muon mode
 		else if( iTemp.find( "muon" ) < iTemp.size() )
 		{
 			fRunPara->fmuonmode = 1;
@@ -112,7 +112,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fhoughmuonmode = 1;
 		}
-// NN or trigSim input card
+		// NN or trigSim input card
 		else if( iTemp.find( "nncleaninginputcard" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -121,7 +121,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-// Frogs mode
+		// Frogs mode
 		else if( iTemp.find( "frogs" ) < iTemp.size() )
 		{
 			fRunPara->ffrogsmode = 1;
@@ -147,7 +147,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogsRecID = -1;
 			};
 		}
-// Model3D, JG
+		// Model3D, JG
 		else if( iTemp.find( "model3d" ) < iTemp.size() )
 		{
 			fRunPara->fUseModel3D = true;
@@ -179,7 +179,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fUseModel3D = true;
 			fRunPara->fCreateLnLTable = true;
 		}
-// source file
+		// source file
 		else if( iTemp.find( "sourcefi" ) < iTemp.size() )
 		{
 			checkSecondArgument( iTemp1, iTemp2, true );
@@ -193,7 +193,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->fsourcefile = "";
 			}
 		}
-// pedestal file for grisu simulations
+		// pedestal file for grisu simulations
 		else if( iTemp.find( "pedestalfile" ) < iTemp.size() )
 		{
 			checkSecondArgument( iTemp1, iTemp2, true );
@@ -203,12 +203,12 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-// for pedestal calculation: write results into a single root file
+		// for pedestal calculation: write results into a single root file
 		else if( iTemp.find( "singlepedestalrootfile" ) < iTemp.size() )
 		{
 			fRunPara->fPedestalSingleRootFile = ( bool )atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// user name
+		// user name
 		else if( iTemp.find( "user" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -217,7 +217,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-// file with dead channel definition
+		// file with dead channel definition
 		else if( iTemp.find( "deadchannelfile" ) < iTemp.size() )
 		{
 			checkSecondArgument( iTemp1, iTemp2, true );
@@ -227,7 +227,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-// noise level of external grisu pedestal file
+		// noise level of external grisu pedestal file
 		else if( iTemp.find( "pedestalnoiselevel" ) < iTemp.size() )
 		{
 			fRunPara->fsimu_noiselevel = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -236,7 +236,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fsimu_pedestalfile_DefaultPed = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// calibration file
+		// calibration file
 		else if( iTemp.find( "calibrationfi" ) < iTemp.size() && !( iTemp.find( "lowgain" ) < iTemp.size() ) )
 		{
 			checkSecondArgument( iTemp1, iTemp2, true );
@@ -323,7 +323,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->freconstructionparameterfile = "";
 			}
 		}
-// dst output file
+		// dst output file
 		else if( iTemp.find( "dstfile" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -336,7 +336,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->fdstfile = "dstfile.root";
 			}
 		}
-// star catalogue
+		// star catalogue
 		else if( iTemp.find( "starcatalogue" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -349,17 +349,17 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fMinStarBrightness_B = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// write all pixel to dst file
+		// write all pixel to dst file
 		else if( iTemp.find( "dstallpixel" ) < iTemp.size() )
 		{
 			fRunPara->fdstwriteallpixel  = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// minimal number of tubes for dst event
+		// minimal number of tubes for dst event
 		else if( iTemp.find( "dstntubes" ) < iTemp.size() )
 		{
 			fRunPara->fdstminntubes = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// calculate pedestal variations on a short time scale
+		// calculate pedestal variations on a short time scale
 		else if( iTemp.find( "pedestalsintimeslices" ) < iTemp.size() && !( iTemp.find( "pedestalsintimeslicessumwindow" ) < iTemp.size() )
 				 && !( iTemp.find( "pedestalsintimeslicessumfirst" ) < iTemp.size() )
 				 && !( iTemp.find( "usepedestalsintimeslices" ) < iTemp.size() )
@@ -382,7 +382,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fLowGainUsePedestalsInTimeSlices = bool( atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() ) );
 		}
-// parameter for pedestal variations on a short time scale for tracking tests
+		// parameter for pedestal variations on a short time scale for tracking tests
 		else if( iTemp.find( "pedestalslengthoftimeslice" ) < iTemp.size() )
 		{
 			fRunPara->fPedestalsLengthOfTimeSlice = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -401,7 +401,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fCalibrationIntSumMin = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// fast plotting without pedestals
+		// fast plotting without pedestals
 		else if( iTemp.find( "plotraw" ) < iTemp.size() )
 		{
 			fRunPara->fPlotRaw = true;
@@ -426,7 +426,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fFillMCHistos = true;
 		}
-// use db for run infos
+		// use db for run infos
 		else if( iTemp.find( "usedbinfo" ) < iTemp.size() && !( iTemp.find( "donotusedbinfo" ) < iTemp.size() ) )
 		{
 			fRunPara->fuseDB = true;
@@ -436,22 +436,22 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fuseDB = false;
 		}
-// ignore configuration file versions
+		// ignore configuration file versions
 		else if( iTemp.find( "ignorecfgversions" ) < iTemp.size() )
 		{
 			fRunPara->fIgnoreCFGversions = true;
 		}
-// print analysis progress
+		// print analysis progress
 		else if( iTemp.find( "printanalysisprogress" ) < iTemp.size() || iTemp.find( "pap" ) < iTemp.size() )
 		{
 			fRunPara->fPrintAnalysisProgress = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// nice plots for talks/papers
+		// nice plots for talks/papers
 		else if( iTemp.find( "plotpaper" ) < iTemp.size() )
 		{
 			fRunPara->fPlotPaper = true;
 		}
-// set run number from command line (default: get it from source file name)
+		// set run number from command line (default: get it from source file name)
 		else if( iTemp.rfind( "runnum" ) < iTemp.size() || iTemp == "run" )
 		{
 			fRunPara->frunnumber = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -460,11 +460,11 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fGainCorrection[0] = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// which telescope should be analyzed
+		// which telescope should be analyzed
 		else if( iTemp.rfind( "teltoana" ) < iTemp.size() )
 		{
 			fTelToAnaString = iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() );
-// comma separated list
+			// comma separated list
 			if( fTelToAnaString.find( "," ) < fTelToAnaString.size() )
 			{
 				fTelToAna = 0;
@@ -474,37 +474,37 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fTelToAna = ( unsigned int )( atoi( fTelToAnaString.c_str() ) );
 			}
 		}
-// elevation
+		// elevation
 		else if( iTemp.rfind( "elevat" ) < iTemp.size() )
 		{
 			fRunPara->felevation = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// azimuth
+		// azimuth
 		else if( iTemp.rfind( "azimuth" ) < iTemp.size() )
 		{
 			fRunPara->fazimuth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// target declination
+		// target declination
 		else if( iTemp.rfind( "declination" ) < iTemp.size() )
 		{
 			fRunPara->fTargetDec = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// target ra [J2000]
+		// target ra [J2000]
 		else if( iTemp.rfind( "rightascension" ) < iTemp.size() )
 		{
 			fRunPara->fTargetRA = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// target declination offset [J2000]
+		// target declination offset [J2000]
 		else if( iTemp.rfind( "decoffset" ) < iTemp.size() )
 		{
 			fRunPara->fTargetDecOffset = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// target ra offset
+		// target ra offset
 		else if( iTemp.rfind( "raoffset" ) < iTemp.size() )
 		{
 			fRunPara->fTargetRAOffset = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// target name
+		// target name
 		else if( iTemp.rfind( "target" ) < iTemp.size() )
 		{
 			if( iTemp2.size() > 0 )
@@ -517,33 +517,33 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->fTargetName = "";
 			}
 		}
-// these two command line settings might be overwritten by values read from the data base
-// wobble offset NORTH
+		// these two command line settings might be overwritten by values read from the data base
+		// wobble offset NORTH
 		else if( iTemp.rfind( "wobblenorth" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_wobblenorth" ) < iTemp.size() ) )
 		{
 			fRunPara->fWobbleNorth = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// wobble offset EAST
+		// wobble offset EAST
 		else if( iTemp.rfind( "wobbleeast" ) < iTemp.size() && !( iTemp.rfind( "overwritedb_wobbleneast" ) < iTemp.size() ) )
 		{
 			fRunPara->fWobbleEast = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// these two command line settings are never overwritten by values read from the data base
+		// these two command line settings are never overwritten by values read from the data base
 		else if( iTemp.rfind( "overwritedb_wobblenorth" ) < iTemp.size() )
 		{
 			fWobbleNorth_overwriteDB = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// wobble offset EAST
+		// wobble offset EAST
 		else if( iTemp.rfind( "overwritedb_wobbleneast" ) < iTemp.size() )
 		{
 			fWobbleEast_overwriteDB = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// pointing check
+		// pointing check
 		else if( iTemp.rfind( "checkpointing" ) < iTemp.size() )
 		{
 			fRunPara->fCheckPointing  = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// pointing error x
+		// pointing error x
 		else if( iTemp.rfind( "-pointingerrorx" ) < iTemp.size() )
 		{
 			unsigned int iTelID = 0;
@@ -553,7 +553,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			f_pointingErrorX[iTelID] = ix;
 			fRunPara->fDBTracking = false;
 		}
-// pointing error y
+		// pointing error y
 		else if( iTemp.rfind( "-pointingerrory" ) < iTemp.size() )
 		{
 			unsigned int iTelID = 0;
@@ -624,12 +624,12 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				return false;
 			}
 		}
-// min laser charge
+		// min laser charge
 		else if( iTemp.rfind( "lasermin" ) < iTemp.size() )
 		{
 			fRunPara->fLaserSumMin = ( double )atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// run mode
+		// run mode
 		else if( iTemp.rfind( "mod" ) < iTemp.size() )
 		{
 			fRunPara->frunmode = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -640,7 +640,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				return false;
 			}
 		}
-// number of events
+		// number of events
 		else if( iTemp.rfind( "neve" ) < iTemp.size() && !( iTemp.find( "calibrationnevents" ) < iTemp.size() ) )
 		{
 			fRunPara->fnevents = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -653,7 +653,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fNCalibrationEvents  = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-// first event number (skip to this point)
+		// first event number (skip to this point)
 		else if( iTemp.rfind( "firstevent" ) < iTemp.size() )
 		{
 			fRunPara->fFirstEvent = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -670,7 +670,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		}
 		
 		
-// source type
+		// source type
 		else if( iTemp.find( "type" ) < iTemp.size() )
 		{
 			fRunPara->fsourcetype = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
@@ -679,7 +679,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				cout << "unknown sourcetype " << fRunPara->fsourcetype << endl;
 				return false;
 			}
-// MC grisu file
+			// MC grisu file
 			if( fRunPara->fsourcetype == 1 || fRunPara->fsourcetype == 2
 					|| fRunPara->fsourcetype == 5 || fRunPara->fsourcetype == 6
 					|| fRunPara->fsourcetype == 7 )
@@ -735,7 +735,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				i++;
 			}
 		}
-// analysis output file
+		// analysis output file
 		else if( iTemp.find( "output" ) < iTemp.size() && iTemp != "outputdirectory" && iTemp != "printoutputfile" )
 		{
 			if( iTemp2.size() > 0 )
@@ -922,10 +922,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		}
 	}
 	
-// test and adjust some parameters
+	// test and adjust some parameters
 	test_and_adjustParams();
 	
-// read trigsim input card
+	// read trigsim input card
 	if( fRunPara->fTrigSimInputcard.Length() > 0 )
 	{
 		readTrigSimInputCard( fRunPara->fTrigSimInputcard );
@@ -948,9 +948,9 @@ void VReadRunParameter::test_and_adjustParams()
 		cout << "VReadRunParameter::test_and_adjustParams()" << endl;
 	}
 	
-// test if this is a DST file
+	// test if this is a DST file
 	getRunParametersFromDST();
-// standard VTS analysis
+	// standard VTS analysis
 	if( fRunPara->frunmode == 0 && fRunPara->getObservatory().find( "VERITAS" ) != string::npos
 			&& fRunPara->fIsMC == 0 )
 	{
@@ -959,7 +959,7 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->freadCalibfromDB = true;
 		}
 	}
-// set pulse timing for DST case
+	// set pulse timing for DST case
 	if( fRunPara->frunmode == 4 && fRunPara->getObservatory().find( "VERITAS" ) == string::npos )
 	{
 		fRunPara->fpulsetiminglevels.clear();
@@ -975,14 +975,14 @@ void VReadRunParameter::test_and_adjustParams()
 				fRunPara->fpulsetiminglevels.push_back( fRunPara->fpulsetiminglevels[i_fps - i - 2] );
 			}
 		}
-// calculate tzero index and width index
+		// calculate tzero index and width index
 		fRunPara->setPulseZeroIndex();
 	}
 	
 	fRunPara->setSystemParameters();
 	
-/////////////////////////////////////////////////////////////////
-// MC adjustments
+	/////////////////////////////////////////////////////////////////
+	// MC adjustments
 	if( fRunPara->fIsMC > 0 )
 	{
 		fRunPara->fDBTracking = false;
@@ -992,7 +992,7 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fLowGainCalibrationFile = "";
 	}
 	
-// CTA/AGIS adjustments
+	// CTA/AGIS adjustments
 	if( fRunPara->getObservatory().find( "cta" ) != string::npos || fRunPara->getObservatory().find( "CTA" ) != string::npos
 			|| fRunPara->getObservatory().find( "agis" ) != string::npos || fRunPara->getObservatory().find( "AGIS" ) != string::npos )
 	{
@@ -1000,20 +1000,20 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fDeadChannelFile = "";
 	}
 	
-////////////////////////////////////////////////////
-// get runnumbers from file name (if source file is given)
+	////////////////////////////////////////////////////
+	// get runnumbers from file name (if source file is given)
 	if( fRunPara->frunnumber <= 0 )
 	{
 		if( fRunPara->fsourcefile.find( "pure" ) < fRunPara->fsourcefile.size() )
 		{
 			fRunPara->frunnumber = atoi( fRunPara->fsourcefile.substr( fRunPara->fsourcefile.rfind( "/" ) + 1, fRunPara->fsourcefile.rfind( "." ) ).c_str() );
 		}
-// MC (grisu)
+		// MC (grisu)
 		else if( fRunPara->fsourcefile.find( "grisu" ) < fRunPara->fsourcefile.size() )
 		{
 			fRunPara->frunnumber = atoi( fRunPara->fsourcefile.substr( fRunPara->fsourcefile.rfind( "/" ) + 4, 6 ).c_str() );
 		}
-// vbf
+		// vbf
 		else if( fRunPara->fsourcefile.find( "vbf" ) < fRunPara->fsourcefile.size() || fRunPara->fsourcefile.find( "cvbf" ) < fRunPara->fsourcefile.size() )
 		{
 			fRunPara->frunnumber = atoi( fRunPara->fsourcefile.substr( fRunPara->fsourcefile.rfind( "/" ) + 1, fRunPara->fsourcefile.rfind( "." ) ).c_str() );
@@ -1022,7 +1022,7 @@ void VReadRunParameter::test_and_adjustParams()
 				fRunPara->fsourcetype = 3;
 			}
 		}
-// dst
+		// dst
 		else if( fRunPara->fsourcefile.find( "dst" ) < fRunPara->fsourcefile.size() )
 		{
 			fRunPara->frunnumber = atoi( fRunPara->fsourcefile.substr( fRunPara->fsourcefile.rfind( "/" ) + 4, 6 ).c_str() );
@@ -1032,11 +1032,11 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->frunnumber = atoi( fRunPara->fsourcefile.substr( fRunPara->fsourcefile.rfind( "/" ) + 1, fRunPara->fsourcefile.size() ).c_str() );
 		}
 	}
-/////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-// settings for pedestal and gain calculations
+	/////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////
+	// settings for pedestal and gain calculations
 	if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 7 )
 	{
 		if( fRunPara->frunmode != 7 )
@@ -1044,14 +1044,14 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->fcalibrationfile = "";
 		}
 		fRunPara->fDBTracking = false;
-//        fRunPara->fuseDB = false;
+		//        fRunPara->fuseDB = false;
 		fRunPara->fcalibrationrun = true;
 	}
 	if( fRunPara->frunmode != 1 && fRunPara->frunmode != 6 )
 	{
 		fRunPara->fPedestalsInTimeSlices = false;
 	}
-// low gain pedestals: ignore sample length in cfg file
+	// low gain pedestals: ignore sample length in cfg file
 	if( fRunPara->frunmode == 6 )
 	{
 		fRunPara->fUseVBFSampleLength = true;
@@ -1060,8 +1060,8 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fLowGainUsePedestalsInTimeSlices = false;
 	}
 	
-/////////////////////////////////////////////////////////////////
-// set vector sizes for calibration numbers
+	/////////////////////////////////////////////////////////////////
+	// set vector sizes for calibration numbers
 	for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
 	{
 		if( i >= fRunPara->fGainFileNumber.size() )
@@ -1084,7 +1084,7 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 		if( !fRunPara->fPlotRaw )
 		{
-// writing low gain pedestals
+			// writing low gain pedestals
 			if( fRunPara->frunmode == 6 )
 			{
 				if( i >= fRunPara->fPedLowGainFileNumber.size() )
@@ -1096,11 +1096,11 @@ void VReadRunParameter::test_and_adjustParams()
 					fRunPara->fPedLowGainFileNumber[i] = fRunPara->frunnumber;
 				}
 			}
-// reading low gain pedestals
+			// reading low gain pedestals
 			else
 			{
-//	      if( i >= fRunPara->fPedLowGainFileNumber.size() ) fRunPara->fPedLowGainFileNumber.push_back( 36862 );
-//	      else                                              fRunPara->fPedLowGainFileNumber[i] = 36862;
+				//	      if( i >= fRunPara->fPedLowGainFileNumber.size() ) fRunPara->fPedLowGainFileNumber.push_back( 36862 );
+				//	      else                                              fRunPara->fPedLowGainFileNumber[i] = 36862;
 				if( i >= fRunPara->fPedLowGainFileNumber.size() )
 				{
 					fRunPara->fPedLowGainFileNumber.push_back( 0 );
@@ -1136,7 +1136,7 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->fTZeroLowGainFileNumber.push_back( 0 );
 		}
 	}
-// gain and toff calculation: set output run numbers
+	// gain and toff calculation: set output run numbers
 	if( fRunPara->frunmode == 2 || fRunPara->frunmode == 5 )
 	{
 		for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
@@ -1147,16 +1147,16 @@ void VReadRunParameter::test_and_adjustParams()
 			fRunPara->fTOffLowGainFileNumber[i] = fRunPara->frunnumber;
 		}
 	}
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-// read run info from database
+	/////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////
+	// read run info from database
 	if( fRunPara->fuseDB )
 	{
 		VDBRunInfo i_DBinfo( fRunPara->frunnumber, fRunPara->getDBServer(), fRunPara->fNTelescopes );
 		if( i_DBinfo.isGood() )
 		{
 			fRunPara->fTargetName = i_DBinfo.getTargetName();
-// DB coordinates are in J2000
+			// DB coordinates are in J2000
 			fRunPara->fTargetDec = i_DBinfo.getTargetDec();
 			fRunPara->fTargetRA = i_DBinfo.getTargetRA();
 			if( fWobbleNorth_overwriteDB < -9998. )
@@ -1193,11 +1193,11 @@ void VReadRunParameter::test_and_adjustParams()
 			{
 				fTelToAna = i_DBinfo.getTelToAna();
 			}
-// get source file from run number (if run number is given and no sourcefile)
+			// get source file from run number (if run number is given and no sourcefile)
 			if( fRunPara->fsourcefile.size() < 1 )
 			{
 				char iname[5000];
-// set raw data directories
+				// set raw data directories
 				if( fRunPara->getDirectory_VBFRawData().size() > 0 )
 				{
 					sprintf( iname, "%s/d%d/%d.cvbf", fRunPara->getDirectory_VBFRawData().c_str(), i_DBinfo.getRunDate(), fRunPara->frunnumber );
@@ -1214,7 +1214,7 @@ void VReadRunParameter::test_and_adjustParams()
 				fRunPara->fsourcefile = iname;
 			}
 			
-// get laser runs
+			// get laser runs
 			if( fRunPara->frunmode != 2 && fRunPara->frunmode != 5 )
 			{
 				vector< unsigned int > iL = i_DBinfo.getLaserRun();
@@ -1243,14 +1243,14 @@ void VReadRunParameter::test_and_adjustParams()
 			exit( 0 );
 		}
 	}
-// muon runs need long tree
+	// muon runs need long tree
 	if( fRunPara->fmuonmode || fRunPara->fhoughmuonmode )
 	{
 		fRunPara->fShortTree = false;
 	}
 	
-/////////////////////////////////////////////////////////////////
-// check if sourcefile is given
+	/////////////////////////////////////////////////////////////////
+	// check if sourcefile is given
 	if( fRunPara->fsourcefile.size() < 1 )
 	{
 		cout << "error: no sourcefile (test failed in VReadRunParameter)" << endl;
@@ -1266,7 +1266,7 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fsourcetype = 3;
 	}
 	
-// bz2 and gz reading does not work for vbf files; dont allow
+	// bz2 and gz reading does not work for vbf files; dont allow
 	if( fRunPara->fsourcefile.find( "vbf" ) < fRunPara->fsourcefile.size() )
 	{
 		if( fRunPara->fsourcefile.find( ".gz" ) < fRunPara->fsourcefile.size() || fRunPara->fsourcefile.find( ".bz2" ) < fRunPara->fsourcefile.size() )
@@ -1276,8 +1276,8 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// can't apply T-point corrections to pointing monitor data
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// can't apply T-point corrections to pointing monitor data
 	if( fRunPara->fDBTrackingCorrections.size() > 0 && fRunPara->fPMTextFileDirectory.size() > 0 )
 	{
 		cout << "error: can't apply T-point corrections to pointing monitor data" << endl;
@@ -1285,7 +1285,7 @@ void VReadRunParameter::test_and_adjustParams()
 		exit( -1 );
 	}
 	
-// switch of display in calibration and dst mode
+	// switch of display in calibration and dst mode
 	if( fRunPara->fdisplaymode == true && fRunPara->frunmode != 0 )
 	{
 		fRunPara->fdisplaymode = 0;
@@ -1295,13 +1295,13 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fWriteTriggerOnly = false;
 	}
 	
-// fRunPara->fImageLL: values between 0-2
+	// fRunPara->fImageLL: values between 0-2
 	if( fRunPara->fImageLL < 0 && fRunPara->fImageLL > 2 )
 	{
 		cout << "warning: logl parameter out of range, setting it to 1" << endl;
 		fRunPara->fImageLL = 1;
 	}
-// check fadc trace scaling
+	// check fadc trace scaling
 	if( fRunPara->fMCScale <= 0. )
 	{
 		cout << "errors: fadcscale <= 0" << endl;
@@ -1309,7 +1309,7 @@ void VReadRunParameter::test_and_adjustParams()
 	}
 	
 	
-// set target name for calibration runs
+	// set target name for calibration runs
 	if( fRunPara->frunmode == 1 && fRunPara->fTargetName == "NONAME" )
 	{
 		fRunPara->fTargetName = "wy";
@@ -1327,7 +1327,7 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fTargetName = "laser";
 	}
 	
-// remove .cam if present
+	// remove .cam if present
 	for( unsigned int i = 0; i < fRunPara->fcamera.size(); i++ )
 	{
 		if( fRunPara->fcamera[i].find( ".cam" ) < fRunPara->fcamera[i].size() )
@@ -1337,37 +1337,37 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-//////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////
-// set default camera configurations
+	//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	// set default camera configurations
 	if( !fusercamera )
 	{
-////////////////////////////////////////////
-// configuration from Sept 2009 to July 2012: V5
-// (after the T1 move)
+		////////////////////////////////////////////
+		// configuration from Sept 2009 to July 2012: V5
+		// (after the T1 move)
 		if( fRunPara->frunnumber > 46642 && fRunPara->frunnumber < 63409 )
 		{
 			fRunPara->fcamera[0] = "EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt";
 		}
-////////////////////////////////////////////
-// configuration until August 2009: V4
-// (before the T1 move)
+		////////////////////////////////////////////
+		// configuration until August 2009: V4
+		// (before the T1 move)
 		else if( fRunPara->frunnumber <= 46642 )
 		{
 			fRunPara->fcamera[0] = "EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt";
 		}
-////////////////////////////////////////////
-// configuration from Sep 2012: V6
-// (after the PMT and camera upgrade
+		////////////////////////////////////////////
+		// configuration from Sep 2012: V6
+		// (after the PMT and camera upgrade
 		else
 		{
 			fRunPara->fcamera[0] = "EVN_V6_Upgrade_20121127_v420.txt";
 		}
 	}
-//////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////
-
-// set camera file name to dstfile for dst reading
+	//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// set camera file name to dstfile for dst reading
 	if( fRunPara->fsourcetype == 4 || fRunPara->fsourcetype == 7 )
 	{
 		for( unsigned int t = 0; t < fRunPara->fcamera.size(); t++ )
@@ -1378,18 +1378,18 @@ void VReadRunParameter::test_and_adjustParams()
 	
 	setDirectories();
 	
-// for command line case, all parameters are the same for all telescopes
-// !preli!
-// this will go with a configuration file or connection to a database
+	// for command line case, all parameters are the same for all telescopes
+	// !preli!
+	// this will go with a configuration file or connection to a database
 	if( f_boolCommandline )
 	{
-// start at 1, parameters for first telescope are filled by default
+		// start at 1, parameters for first telescope are filled by default
 		for( unsigned int i = 1; i < fRunPara->fNTelescopes; i++ )
 		{
 			fRunPara->fcamera.push_back( fRunPara->fcamera[0] );
 			fRunPara->fImageCleaningParameters.push_back( new VImageCleaningRunParameter() );
 			fRunPara->fImageCleaningParameters.back()->setTelID( i );
-// use fixed image/border thresholds for the case of no pedvars in the DSTs
+			// use fixed image/border thresholds for the case of no pedvars in the DSTs
 			if( fRunPara->fCalibrationDataType == 0 )
 			{
 				fRunPara->fImageCleaningParameters.back()->fUseFixedThresholds = true;
@@ -1409,7 +1409,7 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-// set pointing errors
+	// set pointing errors
 	fRunPara->fPointingErrorX.clear();
 	fRunPara->fPointingErrorY.clear();
 	for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
@@ -1432,11 +1432,11 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-// set telescope to analyse
-//   1,2,3 = Telescope 1,2,3
-//   12    = Telescope 1,2
-//   23    = Telescope 2,3
-//
+	// set telescope to analyse
+	//   1,2,3 = Telescope 1,2,3
+	//   12    = Telescope 1,2
+	//   23    = Telescope 2,3
+	//
 	fRunPara->fTelToAnalyze.clear();
 	if( fTelToAna != 0 && fRunPara->fNTelescopes < 10 && fTelToAna > 10 )
 	{
@@ -1475,7 +1475,7 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 		sort( fRunPara->fTelToAnalyze.begin(), fRunPara->fTelToAnalyze.end() );
 	}
-// nothing set: analyse all telescope
+	// nothing set: analyse all telescope
 	else
 	{
 		for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
@@ -1484,7 +1484,7 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-// check if it is possible to analyze the requested telescope
+	// check if it is possible to analyze the requested telescope
 	if( fRunPara->fTelToAnalyze.size() > fRunPara->fNTelescopes )
 	{
 		cout << "error: can't analyze this telescope ";
@@ -1501,7 +1501,7 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-// gain/toff only per telescope
+	// gain/toff only per telescope
 	if( ( fRunPara->fTelToAnalyze.size() > 1 || fRunPara->fTelToAnalyze.size() == 0 ) && ( fRunPara->frunmode == 2 || fRunPara->frunmode == 5 ) )
 	{
 		cout << fRunPara->fTelToAnalyze.size() << "\t" << fRunPara->frunmode << endl;
@@ -1509,14 +1509,14 @@ void VReadRunParameter::test_and_adjustParams()
 		exit( -1 );
 	}
 	
-// double pass and fixed window start is incompatible
+	// double pass and fixed window start is incompatible
 	if( fRunPara->fDoublePass && fRunPara->fFixWindowStart )
 	{
 		cout << "doublepass and fixed position of integration window is incompatible!" << endl;
 		cout << "...exiting" << endl;
 		exit( -1 );
 	}
-// set trace window shift to zero for fixed window start
+	// set trace window shift to zero for fixed window start
 	if( fRunPara->fFixWindowStart )
 	{
 		for( unsigned int t = 0; t < fRunPara->fTraceWindowShift.size(); t++ )
@@ -1529,7 +1529,7 @@ void VReadRunParameter::test_and_adjustParams()
 		}
 	}
 	
-// MS: throws an error if its a simulation file and it was asked to calculate the PW parameters from the CFD hits, since CFDs don't exist in the simulation record
+	// MS: throws an error if its a simulation file and it was asked to calculate the PW parameters from the CFD hits, since CFDs don't exist in the simulation record
 	if( fRunPara->fIsMC > 0 && ( fRunPara->fPWmethod == 0 || fRunPara->fPWmethod == 1 ) )
 	{
 		cout << " GrISU simulations don't have true CFD hits! PWmethod=" << fRunPara->fPWmethod << " can only be used with data with CFD hits." << endl;
@@ -1603,8 +1603,8 @@ void VReadRunParameter::setDirectories()
 {
 	char i_text[600];
 	
-// outputfilename
-//suppress output file for peds			gain/toffset		low gain/toffset		lpeds			DSTs
+	// outputfilename
+	//suppress output file for peds			gain/toffset		low gain/toffset		lpeds			DSTs
 	if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 4 )
 	{
 		fRunPara->foutputfileName = "-1";
@@ -1613,7 +1613,7 @@ void VReadRunParameter::setDirectories()
 	{
 		sprintf( i_text, "%s/%d.root", fRunPara->getDirectory_EVNDISPOutput().c_str(), fRunPara->frunnumber );
 		fRunPara->foutputfileName = i_text;
-// check if output directory exists, otherwise create it
+		// check if output directory exists, otherwise create it
 		string i_worDir;
 		i_worDir = gSystem->WorkingDirectory();
 		if( !gSystem->cd( fRunPara->getDirectory_EVNDISPOutput().c_str() ) )
@@ -1632,7 +1632,7 @@ void VReadRunParameter::setDirectories()
 		gSystem->cd( i_worDir.c_str() );
 	}
 	
-// check if calibration directories exist, otherwise crate
+	// check if calibration directories exist, otherwise crate
 	if( fRunPara->frunmode == 1 || fRunPara->frunmode == 2 || fRunPara->frunmode == 5 || fRunPara->frunmode == 6 || fRunPara->frunmode == 7 )
 	{
 		for( unsigned int i = 0; i < fRunPara->fNTelescopes; i++ )
@@ -1677,7 +1677,7 @@ void VReadRunParameter::isCompiledWithDB()
 */
 bool VReadRunParameter::getRunParametersFromDST()
 {
-// check if suffix is .root (required for dst files)
+	// check if suffix is .root (required for dst files)
 	if( fRunPara->fsourcefile.size() < 6 || fRunPara->fsourcefile.substr( fRunPara->fsourcefile.size() - 5, 5 ) != ".root" )
 	{
 		return false;
@@ -1688,14 +1688,14 @@ bool VReadRunParameter::getRunParametersFromDST()
 	}
 	
 	cout << "reading run parameters from dst file: " << fRunPara->fsourcefile << endl;
-// open dst file
+	// open dst file
 	TFile iF( fRunPara->fsourcefile.c_str() );
 	if( iF.IsZombie() )
 	{
 		cout << "VReadRunParameter::getRunParametersFromDST error opening DST file: " << fRunPara->fsourcefile << endl;
 		exit( EXIT_FAILURE );
 	}
-// check if this is a MC or data DST
+	// check if this is a MC or data DST
 	if( ( TTree* )iF.Get( "mc" ) )
 	{
 		fRunPara->fsourcetype = 7;
@@ -1737,10 +1737,10 @@ bool VReadRunParameter::getRunParametersFromDST()
 		fRunPara->fpulsetiminglevels = iV->fpulsetiminglevels;
 		fRunPara->setPulseZeroIndex();
 	}
-// no run parameters found
+	// no run parameters found
 	else
 	{
-// get dst tree and read run number and number of telescopes
+		// get dst tree and read run number and number of telescopes
 		TTree* t = ( TTree* )iF.Get( "dst" );
 		if( !t )
 		{

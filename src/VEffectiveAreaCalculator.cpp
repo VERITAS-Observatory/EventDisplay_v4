@@ -25,13 +25,13 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	}
 	reset();
 	
-// no effective area file present
+	// no effective area file present
 	bNOFILE = true;
 	
-// number of bins for histograms
+	// number of bins for histograms
 	nbins = fRunPara->fEnergyAxisBins_log10;
 	
-// cuts
+	// cuts
 	fCuts = icuts;
 	fZe.push_back( fRunPara->fze );
 	fAreaRadius.push_back( fRunPara->fCoreScatterRadius );
@@ -49,18 +49,18 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	setWobbleOffset( fRunPara->fXoff, fRunPara->fYoff );
 	setNoiseLevel( fRunPara->fnoise, fRunPara->fpedvar );
 	
-// spectral weighting class
+	// spectral weighting class
 	fSpectralWeight = new VSpectralWeight();
 	setMonteCarloEnergyRange( fRunPara->fMCEnergy_min, fRunPara->fMCEnergy_max, TMath::Abs( fRunPara->fMCEnergy_index ) );
 	
-// define output tree (all histograms are written to this tree)
+	// define output tree (all histograms are written to this tree)
 	hisTreeList = new TList();
 	
-// these histograms are filled into the output tree
+	// these histograms are filled into the output tree
 	char hname[400];
 	char htitle[400];
 	
-// define range and binning of energy axis of effective area plots
+	// define range and binning of energy axis of effective area plots
 	cout << "histogram parameters (bins, log10(Emin), log10(Emax)): " << nbins;
 	cout << ", " << fEnergyAxis_minimum_defaultValue << ", " << fEnergyAxis_maximum_defaultValue << endl;
 	sprintf( htitle, "title" );
@@ -126,14 +126,14 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	gEffAreaRec->SetTitle( htitle );
 	hisTreeList->Add( gEffAreaRec );
 	
-// spectral weight
+	// spectral weight
 	sprintf( hname, "hEmcSWeight" );
 	hEmcSWeight = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 0., 1.e12 );
 	hEmcSWeight->SetXTitle( "log_{10} energy_{MC} [TeV]" );
 	hEmcSWeight->SetYTitle( "spectral weight" );
 	hisTreeList->Add( hEmcSWeight );
 	
-// histograms for energy reconstruction quality
+	// histograms for energy reconstruction quality
 	sprintf( hname, "hEsysRec" );
 	hEsysRec = new TProfile( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, -1000., 1000., "s" );
 	hEsysRec->SetXTitle( "energy_{rec} [TeV]" );
@@ -158,7 +158,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hEsysMCRelativeRMS->SetYTitle( "energy bias (E_{rec}-E_{MC})/E_{MC}" );
 	hisTreeList->Add( hEsysMCRelativeRMS );
 	
-// use CTA WP Phys binning
+	// use CTA WP Phys binning
 	sprintf( hname, "hEsysMCRelative2D" );
 	hEsysMCRelative2D = new TH2D( hname, htitle, nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue, 300, 0., 3. );
 	hEsysMCRelative2D->SetXTitle( "energy_{MC} [TeV]" );
@@ -192,7 +192,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hResponseMatrixQC->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrixQC );
 	
-// following CTA WP Phys binning convention
+	// following CTA WP Phys binning convention
 	sprintf( hname, "hEmcCutCTA" );
 	hEmcCutCTA = new TH2D( hname, htitle, 500, -2.3, 2.7, 500, -2.3, 2.7 );
 	hEmcCutCTA->SetYTitle( "energy_{MC} [TeV]" );
@@ -205,8 +205,8 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hResponseMatrixFineQC->SetXTitle( "energy_{rec} [TeV]" );
 	hisTreeList->Add( hResponseMatrixFineQC );
 	
-// weighted rate
-// (use CTA binning, 5 bins per decade)
+	// weighted rate
+	// (use CTA binning, 5 bins per decade)
 	sprintf( hname, "hWeightedRate" );
 	hWeightedRate = new TH1D( hname, htitle, 30, -2.9, 3.1 );
 	hWeightedRate->Sumw2();
@@ -214,7 +214,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 	hWeightedRate->SetYTitle( "entries" );
 	hisTreeList->Add( hWeightedRate );
 	
-// individual cuts
+	// individual cuts
 	vector< string > iCutName;
 	iCutName.push_back( "hEcutTrigger" );
 	iCutName.push_back( "hEcutFiducialArea" );
@@ -301,7 +301,7 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 		iT_TH2D.clear();
 		iT_TProfile.clear();
 		
-// histograms for effective area calculation
+		// histograms for effective area calculation
 		iT_TH1D.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
@@ -422,7 +422,7 @@ void VEffectiveAreaCalculator::initializeHistograms( vector< double > iAzMin, ve
 		}
 		hVEmcSWeight.push_back( iT_TProfile );
 		
-// histograms for energy reconstruction quality
+		// histograms for energy reconstruction quality
 		iT_TProfile.clear();
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
@@ -624,36 +624,36 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 	
 	fRunPara = 0;
 	
-// MC intervalls
+	// MC intervalls
 	fMCZe = iMCZe;
 	
-// no effective area file present
+	// no effective area file present
 	bNOFILE = false;
-// no input file available, return always 1 for all corrections
+	// no input file available, return always 1 for all corrections
 	if( iInputFile == "NOFILE" )
 	{
 		bNOFILE = true;
 		return;
 	}
-// effective area smoothing
+	// effective area smoothing
 	fSmoothIter = iSmoothIter;
 	fSmoothThreshold = iSmoothThreshold;
 	
-// no weighting
+	// no weighting
 	fSpectralWeight = 0;
 	
-// effective areas vs E_MC or E_rec
+	// effective areas vs E_MC or E_rec
 	fEffectiveAreaVsEnergyMC = iEffectiveAreaVsEnergyMC;
 	
-// mean effective area
+	// mean effective area
 	gMeanEffectiveArea = new TGraphAsymmErrors( 1 );
 	gMeanEffectiveArea->SetName( "gMeanEffectiveArea" );
 	gMeanEffectiveArea->SetMarkerStyle( 20 );
 	gMeanEffectiveArea->SetMarkerColor( fEffectiveAreaVsEnergyMC + 1 );
 	gMeanEffectiveArea->SetLineColor( fEffectiveAreaVsEnergyMC + 1 );
 	
-// mean effective area for Time BINS
-
+	// mean effective area for Time BINS
+	
 	gTimeBinnedMeanEffectiveArea = new TGraph2DErrors( 1 );
 	gTimeBinnedMeanEffectiveArea->SetName( "gTimeBinnedMeanEffectiveArea" );
 	gTimeBinnedMeanEffectiveArea->SetMarkerStyle( 20 );
@@ -667,10 +667,10 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 	}
 	
 	
-// current directory
+	// current directory
 	fGDirectory = gDirectory;
 	
-// test if input file with effective areas exists
+	// test if input file with effective areas exists
 	iInputFile = VUtilities::testFileLocation( iInputFile, "EffectiveAreas", true );
 	if( iInputFile.size() == 0 )
 	{
@@ -685,13 +685,13 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 	}
 	cout << "\t reading effective areas from " << fIn.GetName() << endl;
 	
-// test which kind of file is available
-//    i) effective areas values for each energy bin (bEffectiveAreasareHistograms = true)
-//   ii) fit functions to effective area histograms (bEffectiveAreasareFunctions = true)
-//       (favorable, to avoid binning effects)
-//
-//  prefer fit function over histograms
-//
+	// test which kind of file is available
+	//    i) effective areas values for each energy bin (bEffectiveAreasareHistograms = true)
+	//   ii) fit functions to effective area histograms (bEffectiveAreasareFunctions = true)
+	//       (favorable, to avoid binning effects)
+	//
+	//  prefer fit function over histograms
+	//
 	bEffectiveAreasareFunctions = false;
 	bEffectiveAreasareHistograms = false;
 	if( getEffectiveAreasFromFitFunction( ( TTree* )gDirectory->Get( "EffFit" ), azmin, azmax, iSpectralIndex ) )
@@ -719,7 +719,7 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
 
 double VEffectiveAreaCalculator::getAzMean( double azmin, double azmax )
 {
-// mean azimuth angle
+	// mean azimuth angle
 	double iAzMean = 0.;
 	if( azmin > 120. && azmax < -120. )
 	{
@@ -750,20 +750,20 @@ bool VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( TTree* iEffFit,
 		return false;
 	}
 	
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-// this is currently not functional
-//
+	////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	// this is currently not functional
+	//
 	cout << "EFFECTIVE AREA FROM FIT FUNCTON IS CURRENTLY NOT FUNCTIONAL. USE HISTOGRAMS." << endl;
 	return false;
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
+	////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	
 	TF1* ifEff = 0;
 	int iAMC;
-//
-// mean azimuth angle
+	//
+	// mean azimuth angle
 	double iAzMean = getAzMean( azmin, azmax );
 	
 	double TazMin, TazMax, index;
@@ -798,8 +798,8 @@ bool VEffectiveAreaCalculator::getEffectiveAreasFromFitFunction( TTree* iEffFit,
 			continue;
 		}
 		
-// test az bin
-// expect bin like [135,-135]
+		// test az bin
+		// expect bin like [135,-135]
 		if( TazMin > TazMax )
 		{
 			if( iAzMean < TazMin && iAzMean > TazMax )
@@ -873,12 +873,12 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		i_hEMC = new TH1D( "hEmc", "", nbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
 	}
 	
-// mean azimuth angle
+	// mean azimuth angle
 	double iAzMean = getAzMean( azmin, azmax );
 	int i_az = 0;
 	
-////////////////////////////
-// define input tree
+	////////////////////////////
+	// define input tree
 	double TazMin, TazMax, index;
 	double Tpedvar = 1.;
 	TProfile* i_hEsysMCRelative = 0;
@@ -917,11 +917,11 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		return false;
 	}
 	
-////////////////////////////////////////////////////////////////////////////////////
-// prepare the energy vectors
-// (binning should be the same for all entries in the effective area tree)
-////////////////////////////////////////////////////////////////////////////////////
-
+	////////////////////////////////////////////////////////////////////////////////////
+	// prepare the energy vectors
+	// (binning should be the same for all entries in the effective area tree)
+	////////////////////////////////////////////////////////////////////////////////////
+	
 	iEffArea->GetEntry( 0 );
 	
 	if( !i_hEMC )
@@ -985,11 +985,11 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		}
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
-// fill ze, woff, noise, index vectors
-/////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
+	// fill ze, woff, noise, index vectors
+	/////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
 	bool i_ze_F = false;
 	unsigned int i_index_ze = 0;
 	bool i_woff_F = false;
@@ -1006,15 +1006,15 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 	
 	bool fLotsOfPrintOuts = false;
 	
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-// loop over all entries in effective area tree
-// (not sure if this is really necessary, in the end a few entries are only needed)
+	///////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// loop over all entries in effective area tree
+	// (not sure if this is really necessary, in the end a few entries are only needed)
 	for( int i = 0; i < iEffArea->GetEntries(); i++ )
 	{
 		iEffArea->GetEntry( i );
 		
-// check binning of effective areas
+		// check binning of effective areas
 		if( i_hEMC && ( int )i_hEMC->GetNbinsX() != ( int )fNBins )
 		{
 			cout << "VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms error: effective area curve with different binning";
@@ -1022,24 +1022,24 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			cout << "abort reading effective area tree..." << endl;
 			return false;
 		}
-///////////////////////////////////////////////////
-// check the azimuth range
-///////////////////////////////////////////////////
-
-// expect a couple of az bins and then a last bin with the average azimuth bin; typically [-1000., 1000.]
-// this is the sign to read effective areas
+		///////////////////////////////////////////////////
+		// check the azimuth range
+		///////////////////////////////////////////////////
+		
+		// expect a couple of az bins and then a last bin with the average azimuth bin; typically [-1000., 1000.]
+		// this is the sign to read effective areas
 		if( fabs( TazMin ) > 5.e2 || fabs( TazMax ) > 5.e2 )
 		{
 			iInvMax = 1.e5;
 			iEffArea->GetEntry( iIndexAz );
 			
-///////////////////////////////////////////////////
-// zenith angle
-///////////////////////////////////////////////////
+			///////////////////////////////////////////////////
+			// zenith angle
+			///////////////////////////////////////////////////
 			i_ze_F = false;
 			for( unsigned z = 0; z < fZe.size(); z++ )
 			{
-// this has to be a relatively large value due to wobble offsets up to 2.0 deg
+				// this has to be a relatively large value due to wobble offsets up to 2.0 deg
 				if( fabs( fZe[z] - ze ) < 2.0 )
 				{
 					i_index_ze = z;
@@ -1047,9 +1047,9 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 					break;
 				}
 			}
-// (GM) TODO check if it is really necessary to have the
-//           zenith angles hardwired -> are they offset
-//           by the wobble offset?
+			// (GM) TODO check if it is really necessary to have the
+			//           zenith angles hardwired -> are they offset
+			//           by the wobble offset?
 			if( !i_ze_F )
 			{
 				for( unsigned int w = 0; w < fMCZe.size(); w++ )
@@ -1062,9 +1062,9 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				}
 				i_index_ze = fZe.size() - 1;
 			}
-///////////////////////////////////////////////////
-// wobble offset
-///////////////////////////////////////////////////
+			///////////////////////////////////////////////////
+			// wobble offset
+			///////////////////////////////////////////////////
 			if( i_index_ze < fEff_WobbleOffsets.size() )
 			{
 				i_woff_F = false;
@@ -1090,9 +1090,9 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				fEff_WobbleOffsets.push_back( itemp );
 				i_index_woff = fEff_WobbleOffsets[i_index_ze].size() - 1;
 			}
-///////////////////////////////////////////////////
-// noise level
-///////////////////////////////////////////////////
+			///////////////////////////////////////////////////
+			// noise level
+			///////////////////////////////////////////////////
 			if( i_index_ze < fEff_Noise.size() )
 			{
 				if( i_index_woff < fEff_Noise[i_index_ze].size() )
@@ -1130,9 +1130,9 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				fEff_Noise.push_back( iitemp );
 				i_index_noise = fEff_Noise[i_index_ze][i_index_woff].size() - 1;
 			}
-///////////////////////////////////////////////////
-// spectral index
-///////////////////////////////////////////////////
+			///////////////////////////////////////////////////
+			// spectral index
+			///////////////////////////////////////////////////
 			if( i_index_ze < fEff_SpectralIndex.size() )
 			{
 				if( i_index_woff < fEff_SpectralIndex[i_index_ze].size() )
@@ -1195,9 +1195,9 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				cout << i_index_ze << " " << i_index_woff << " " << i_index_noise << " " << i_index_index << "\t" << i_ID << endl;
 			}
 			
-///////////////////////////////////////////////////
-// read effective area and load into maps
-///////////////////////////////////////////////////
+			///////////////////////////////////////////////////
+			// read effective area and load into maps
+			///////////////////////////////////////////////////
 			if( nbins <= 0 )
 			{
 				cout << "WARNING : incomplete effective areas for id " << i_ID << endl;
@@ -1228,7 +1228,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 				cout << endl;
 				cout << "please check if this falls into your parameter space" << endl;
 			}
-// effective areas vs energy (decision on vs MC, rec energy etc. has been made earlier)
+			// effective areas vs energy (decision on vs MC, rec energy etc. has been made earlier)
 			for( unsigned int e = 0; e < fNBins; e++ )
 			{
 				i_temp_Eff[e] = 0.;
@@ -1253,15 +1253,15 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			fEff_EsysMCRelative[i_ID] = i_temp_Esys;
 			fEff_EsysMCRelativeE[i_ID] = i_temp_EsysE;
 			
-// this is neeeded only if there are no azimuth dependent effective areas
+			// this is neeeded only if there are no azimuth dependent effective areas
 			iIndexAz++;
 			
 			continue;
 		}
-///////////////////////////////////////////////////
-// test az bin
-///////////////////////////////////////////////////
-// expect bin like [135,-135]
+		///////////////////////////////////////////////////
+		// test az bin
+		///////////////////////////////////////////////////
+		// expect bin like [135,-135]
 		iInvMean = getAzMean( TazMin, TazMax );
 		if( TazMax < 0. && TazMin > 0. )
 		{
@@ -1293,7 +1293,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			}
 		}
 	}
-///////////////////////////////////////////////////
+	///////////////////////////////////////////////////
 	if( fZe.size() == 0 )
 	{
 		cout << "Error: no effective areas found in effective area tree" << endl;
@@ -1323,7 +1323,7 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 		smoothEffectiveAreas( fEffArea_map );
 	}
 	
-///////////////////////////////////////////////////
+	///////////////////////////////////////////////////
 	if( fLotsOfPrintOuts )
 	{
 		cout << "ze size " << fZe.size() << endl;
@@ -1361,8 +1361,8 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms( TTree* iE
 			}
 		}
 	}
-///////////////////////////////////////////////////
-
+	///////////////////////////////////////////////////
+	
 	return true;
 }
 
@@ -1407,8 +1407,8 @@ void VEffectiveAreaCalculator::reset()
 	
 	fSpectralIndex = 2.0;
 	
-// Important: changing this means probably that the values used in
-// VEffectiveAreaCalculatorMCHistograms have to be changed as well
+	// Important: changing this means probably that the values used in
+	// VEffectiveAreaCalculatorMCHistograms have to be changed as well
 	fEnergyAxis_minimum_defaultValue = -2.0;
 	fEnergyAxis_maximum_defaultValue = 4.0;
 	
@@ -1493,13 +1493,13 @@ double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
 		if( fRunPara->fViewcone_max > 0. && fCuts->fCut_CameraFiducialSize_MC_max > 0. && fCuts->fCut_CameraFiducialSize_MC_max < 1000.
 				&& fCuts->fCut_CameraFiducialSize_MC_max < fRunPara->fViewcone_max )
 		{
-// solid angle of simulated showers
+			// solid angle of simulated showers
 			double iSN_mc = ( 1. - cos( fRunPara->fViewcone_max * TMath::DegToRad() ) );
 			if( fRunPara->fViewcone_min > 0. )
 			{
 				iSN_mc -= ( 1. - cos( fRunPara->fViewcone_min * TMath::DegToRad() ) );
 			}
-// solid angle of angular bin
+			// solid angle of angular bin
 			double iSN_cu = ( 1. - cos( fCuts->fCut_CameraFiducialSize_MC_max * TMath::DegToRad() ) );
 			if( fCuts->fCut_CameraFiducialSize_MC_min > 0. )
 			{
@@ -1523,16 +1523,16 @@ double VEffectiveAreaCalculator::getMCSolidAngleNormalization()
 */
 bool VEffectiveAreaCalculator::getMonteCarloSpectra( VEffectiveAreaCalculatorMCHistograms* iMC_histo )
 {
-// get solid angle normalization
+	// get solid angle normalization
 	double iSolAngleNorm = getMCSolidAngleNormalization();
 	cout << "VEffectiveAreaCalculator::getMonteCarloSpectra: solid angle normalization factor: " << iSolAngleNorm << endl;
 	
 	char hname[800];
-// loop over az bins
-// (MC az [-180., 180.])
+	// loop over az bins
+	// (MC az [-180., 180.])
 	for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
 	{
-// loop over all spectral index
+		// loop over all spectral index
 		for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
 		{
 			if( s < hVEmc.size() && i_az < hVEmc[s].size() )
@@ -1591,7 +1591,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 {
 	bool bDebugCuts = false;          // lots of debug output
 	
-// make sure that vectors are initialized
+	// make sure that vectors are initialized
 	unsigned int ize = 0;      // should always be zero
 	if( ize >= fZe.size() )
 	{
@@ -1600,14 +1600,14 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	}
 	resetHistogramsVectors( ize );
 	
-// do not require successfull energy reconstruction
+	// do not require successfull energy reconstruction
 	if( fIgnoreEnergyReconstruction )
 	{
 		iMethod = 100;
 	}
 	
-//////////////////////////////////////////////////////////////////
-// total Monte Carlo core scatter area (depends on CORSIKA shower core scatter mode)
+	//////////////////////////////////////////////////////////////////
+	// total Monte Carlo core scatter area (depends on CORSIKA shower core scatter mode)
 	fMC_ScatterArea = 0.;
 	if( fScatterMode[ize] == "VIEWCONE" )
 	{
@@ -1622,12 +1622,12 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		cout << "VEffectiveAreaCalculator::fill ERROR: unknown CORSIKA scatter mode: " << fScatterMode[ize] << endl;
 		return false;
 	}
-// reset unique event counter
+	// reset unique event counter
 	fUniqueEventCounter.clear();
 	int iSuccessfullEventStatistics = 0;
 	
-//////////////////////////////////////////////////////////////////
-// print some run information
+	//////////////////////////////////////////////////////////////////
+	// print some run information
 	cout << endl;
 	cout << "calculating effective areas: " << endl;
 	cout << "\t zenith angle: " << fZe[ize];
@@ -1657,7 +1657,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	}
 	cout << endl;
 	
-// make sure that all data pointers exist
+	// make sure that all data pointers exist
 	if( !d || !iMC_histo )
 	{
 		cout << "VEffectiveAreaCalculator::fill error: no data tree or MC histograms: " << endl;
@@ -1665,29 +1665,29 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		return false;
 	}
 	
-// spectral weight
+	// spectral weight
 	double i_weight = 1.;
-// reconstructed energy (TeV, log10)
+	// reconstructed energy (TeV, log10)
 	double eRec = 0.;
 	double eRecLin = 0.;
-// MC energy (TeV, log10)
+	// MC energy (TeV, log10)
 	double eMC = 0.;
 	
-////////////////////////////////////////////////////////////////////////////
-// get MC histograms
+	////////////////////////////////////////////////////////////////////////////
+	// get MC histograms
 	if( !getMonteCarloSpectra( iMC_histo ) )
 	{
 		cout << "VEffectiveAreaCalculator::fill error while getting MC spectra" << endl;
 		return false;
 	}
 	
-////////////////////////////////////////////////////////////////////////////
-// reset cut statistics
+	////////////////////////////////////////////////////////////////////////////
+	// reset cut statistics
 	fCuts->resetCutStatistics();
 	
-///////////////////////////////////////////////////////
-// get full data set and loop over all entries
-///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	// get full data set and loop over all entries
+	///////////////////////////////////////////////////////
 	Long64_t d_nentries = d->fChain->GetEntries();
 	Long64_t i_start = 0;
 	if( fRunPara && fRunPara->fIgnoreFractionOfEvents > 0. )
@@ -1709,7 +1709,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	{
 		d->GetEntry( i );
 		
-// update cut statistics
+		// update cut statistics
 		fCuts->newEvent();
 		
 		if( bDebugCuts )
@@ -1718,7 +1718,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			cout << "EVENT entry number " << i << endl;
 		}
 		
-// apply MC cuts
+		// apply MC cuts
 		if( bDebugCuts )
 		{
 			cout << "#0 CUT MC " << fCuts->applyMCXYoffCut( d->MCxoff, d->MCyoff, false ) << endl;
@@ -1729,16 +1729,16 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			continue;
 		}
 		
-// log of MC energy
+		// log of MC energy
 		eMC = log10( d->MCe0 );
 		
-// fill trigger cuts
+		// fill trigger cuts
 		hEcutSub[0]->Fill( eMC, 1. );
 		
-////////////////////////////////
-// apply general quality and gamma/hadron separation cuts
-
-// apply reconstruction cuts
+		////////////////////////////////
+		// apply general quality and gamma/hadron separation cuts
+		
+		// apply reconstruction cuts
 		if( bDebugCuts )
 		{
 			cout << "#1 CUT applyInsideFiducialAreaCut ";
@@ -1746,21 +1746,21 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			cout << "\t" << fCuts->applyStereoQualityCuts( iMethod, false, i, true ) << endl;
 		}
 		
-// apply fiducial area cuts
+		// apply fiducial area cuts
 		if( !fCuts->applyInsideFiducialAreaCut( true ) )
 		{
 			continue;
 		}
 		hEcutSub[1]->Fill( eMC, 1. );
 		
-// apply reconstruction quality cuts
+		// apply reconstruction quality cuts
 		if( !fCuts->applyStereoQualityCuts( iMethod, true, i , true ) )
 		{
 			continue;
 		}
 		hEcutSub[2]->Fill( eMC, 1. );
 		
-// apply telescope type cut (e.g. for CTA simulations)
+		// apply telescope type cut (e.g. for CTA simulations)
 		if( fTelescopeTypeCutsSet )
 		{
 			if( bDebugCuts )
@@ -1775,10 +1775,10 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		hEcutSub[3]->Fill( eMC, 1. );
 		
 		
-//////////////////////////////////////
-// apply direction cut
-//
-// point source cut; use MC shower direction as reference direction
+		//////////////////////////////////////
+		// apply direction cut
+		//
+		// point source cut; use MC shower direction as reference direction
 		if( !fIsotropicArrivalDirections )
 		{
 			if( !fCuts->applyDirectionCuts( iMethod, true ) )
@@ -1786,8 +1786,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				continue;
 			}
 		}
-// background cut; use (0,0) as reference direction
-// (command line option -d)
+		// background cut; use (0,0) as reference direction
+		// (command line option -d)
 		else
 		{
 			if( !fCuts->applyDirectionCuts( iMethod, true, 0., 0. ) )
@@ -1797,8 +1797,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		}
 		hEcutSub[4]->Fill( eMC, 1. );
 		
-//////////////////////////////////////
-// apply energy reconstruction quality cut
+		//////////////////////////////////////
+		// apply energy reconstruction quality cut
 		if( !fIgnoreEnergyReconstruction )
 		{
 			if( bDebugCuts )
@@ -1812,8 +1812,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		}
 		hEcutSub[5]->Fill( eMC, 1. );
 		
-// skip event if no energy has been reconstructed
-// get energy according to which reconstruction method
+		// skip event if no energy has been reconstructed
+		// get energy according to which reconstruction method
 		if( iMethod == 0 && d->Erec > 0. )
 		{
 			eRec = log10( d->Erec );
@@ -1834,21 +1834,21 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			continue;
 		}
 		
-///////////////////////////////////////////
-// fill response matrix after quality cuts
-
-// loop over all az bins
+		///////////////////////////////////////////
+		// fill response matrix after quality cuts
+		
+		// loop over all az bins
 		for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
 		{
-// check at what azimuth bin we are
+			// check at what azimuth bin we are
 			if( fZe[ize] > 3. )
 			{
-// confine MC az to -180., 180.
+				// confine MC az to -180., 180.
 				if( d->MCaz > 180. )
 				{
 					d->MCaz -= 360.;
 				}
-// expect bin like [135,-135]
+				// expect bin like [135,-135]
 				if( fVMinAz[i_az] > fVMaxAz[i_az] )
 				{
 					if( d->MCaz < fVMinAz[i_az] && d->MCaz > fVMaxAz[i_az] )
@@ -1856,7 +1856,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 						continue;
 					}
 				}
-// expect bin like [-135,-45.]
+				// expect bin like [-135,-45.]
 				else
 				{
 					if( d->MCaz < fVMinAz[i_az] || d->MCaz > fVMaxAz[i_az] )
@@ -1865,7 +1865,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 					}
 				}
 			}
-// loop over all spectral index
+			// loop over all spectral index
 			for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
 			{
 				if( hVResponseMatrixQC[s][i_az] )
@@ -1879,8 +1879,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			}
 		}
 		
-//////////////////////////////////////
-// apply gamma hadron cuts
+		//////////////////////////////////////
+		// apply gamma hadron cuts
 		if( bDebugCuts )
 		{
 			cout << "#3 CUT ISGAMMA " << fCuts->isGamma( i ) << endl;
@@ -1891,8 +1891,8 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 		}
 		hEcutSub[6]->Fill( eMC, 1. );
 		
-// unique event counter
-// (make sure that map doesn't get too big)
+		// unique event counter
+		// (make sure that map doesn't get too big)
 		if( iSuccessfullEventStatistics >= 0 )
 		{
 			iSuccessfullEventStatistics++;
@@ -1918,18 +1918,18 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			iSuccessfullEventStatistics--;
 		}
 		
-// loop over all az bins
+		// loop over all az bins
 		for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
 		{
-// check at what azimuth bin we are
+			// check at what azimuth bin we are
 			if( fZe[ize] > 3. )
 			{
-// confine MC az to -180., 180.
+				// confine MC az to -180., 180.
 				if( d->MCaz > 180. )
 				{
 					d->MCaz -= 360.;
 				}
-// expect bin like [135,-135]
+				// expect bin like [135,-135]
 				if( fVMinAz[i_az] > fVMaxAz[i_az] )
 				{
 					if( d->MCaz < fVMinAz[i_az] && d->MCaz > fVMaxAz[i_az] )
@@ -1937,7 +1937,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 						continue;
 					}
 				}
-// expect bin like [-135,-45.]
+				// expect bin like [-135,-45.]
 				else
 				{
 					if( d->MCaz < fVMinAz[i_az] || d->MCaz > fVMaxAz[i_az] )
@@ -1947,7 +1947,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				}
 			}
 			
-//fill tree with acceptance information after cuts (needed to construct background model in ctools)
+			//fill tree with acceptance information after cuts (needed to construct background model in ctools)
 			if( fRunPara->fgetXoff_Yoff_afterCut )
 			{
 				fXoff_aC = d->Xoff;
@@ -1966,10 +1966,10 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			}
 			
 			
-// loop over all spectral index
+			// loop over all spectral index
 			for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
 			{
-// weight by spectral index
+				// weight by spectral index
 				if( fSpectralWeight )
 				{
 					fSpectralWeight->setSpectralIndex( fVSpectralIndex[s] );
@@ -1979,7 +1979,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				{
 					i_weight = 0.;
 				}
-// fill true MC energy (hVEmc is in true MC energies)
+				// fill true MC energy (hVEmc is in true MC energies)
 				if( hVEcut[s][i_az] )
 				{
 					hVEcut[s][i_az]->Fill( eMC, i_weight );
@@ -2040,47 +2040,47 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				{
 					hVResponseMatrixProfile[s][i_az]->Fill( eRec, eMC );
 				}
-// events weighted by CR spectra
+				// events weighted by CR spectra
 				if( hVWeightedRate[s][i_az] )
 				{
 					hVWeightedRate[s][i_az]->Fill( eRec, getCRWeight( d->MCe0, hVEmc[s][i_az] ) );
 				}
 			}
 		}
-// don't do anything between here and the end of the loop! Never!
+		// don't do anything between here and the end of the loop! Never!
 	}                                             // end of loop
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// calculate effective areas and fill output trees
-//
-/////////////////////////////////////////////////////////////////////////////
-
+	/////////////////////////////////////////////////////////////////////////////
+	
+	
+	
+	/////////////////////////////////////////////////////////////////////////////
+	//
+	// calculate effective areas and fill output trees
+	//
+	/////////////////////////////////////////////////////////////////////////////
+	
 	ze = fZe[ize];
 	fTNoise = fNoise[ize];
-// WARNING: hardwired values - not used to my knowledge anywhere? (GM)
+	// WARNING: hardwired values - not used to my knowledge anywhere? (GM)
 	fTNoisePE = ( double )( fNoise[ize] ) / 0.15 * 1.e9;
 	fTPedvar = fPedVar[ize];
 	fXoff = fXWobble[ize];
 	fYoff = fYWobble[ize];
 	fWoff = sqrt( fXoff * fXoff + fYoff * fYoff );
 	
-// loop over all spectral index
+	// loop over all spectral index
 	for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
 	{
 		fSpectralIndex = fVSpectralIndex[s];
-// loop over all az bins
+		// loop over all az bins
 		for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
 		{
 			fAzBin = ( int )i_az;
 			fMinAz = fVMinAz[i_az];
 			fMaxAz = fVMaxAz[i_az];
 			
-// bayesdivide works only for weights == 1
-// errors might be wrong, since histograms are filled with weights != 1
+			// bayesdivide works only for weights == 1
+			// errors might be wrong, since histograms are filled with weights != 1
 			if( !binomialDivide( gEffAreaMC, hVEcut[s][i_az], hVEmc[s][i_az] ) )
 			{
 				cout << "VEffectiveAreaCalculator::fill: error calculating effective area vs MC energy" << endl;
@@ -2107,7 +2107,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 			}
 			double x = 0.;
 			double y = 0.;
-// effective area vs MC energy
+			// effective area vs MC energy
 			nbins = gEffAreaMC->GetN();
 			for( int i = 0; i < nbins; i++ )
 			{
@@ -2121,13 +2121,13 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				gEffAreaMC->SetPointEYhigh( i, seff_U[i] );
 			}
 			
-// effective area vs reconstructed energy (approx)
+			// effective area vs reconstructed energy (approx)
 			Rec_nbins = gEffAreaRec->GetN();
 			for( int i = 0; i < Rec_nbins; i++ )
 			{
 				gEffAreaRec->GetPoint( i, x, y );
 				Rec_e0[i] = x;
-// this is an approximation, since scatter area is defined over E_MC (GM: don't understand this comment)
+				// this is an approximation, since scatter area is defined over E_MC (GM: don't understand this comment)
 				Rec_eff[i] = y * fMC_ScatterArea;
 				Rec_seff_L[i] = gEffAreaRec->GetErrorYlow( i ) * fMC_ScatterArea;
 				Rec_seff_U[i] = gEffAreaRec->GetErrorYhigh( i ) * fMC_ScatterArea;
@@ -2136,7 +2136,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				gEffAreaRec->SetPointEYhigh( i, Rec_seff_U[i] );
 			}
 			
-// copy all histograms
+			// copy all histograms
 			resetHistograms( ize );
 			copyHistograms( hEmc, hVEmc[s][i_az], false );
 			copyHistograms( hEcut, hVEcut[s][i_az], false );
@@ -2165,7 +2165,7 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 	
 	fCuts->printCutStatistics();
 	
-// print out uniqueness of events
+	// print out uniqueness of events
 	/*    cout << "event statistics: " << endl;
 	    if( iSuccessfullEventStatistics > 0 )
 	    {
@@ -2207,27 +2207,27 @@ double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, doubl
 		return 1.;
 	}
 	
-///////////////////////////////////////////
-// read effective areas from histograms
-// (this is the default case)
-///////////////////////////////////////////
+	///////////////////////////////////////////
+	// read effective areas from histograms
+	// (this is the default case)
+	///////////////////////////////////////////
 	if( bEffectiveAreasareHistograms )
 	{
 		return getEffectiveAreasFromHistograms( erec, ze, woff, iPedVar, iSpectralIndex, bAddtoMeanEffectiveArea, iEffectiveAreaVsEnergyMC );
 	}
 	
-///////////////////////////////////////////
-// read effective areas from functions
-// (do not do this unless you know what your are doing)
-///////////////////////////////////////////
-
+	///////////////////////////////////////////
+	// read effective areas from functions
+	// (do not do this unless you know what your are doing)
+	///////////////////////////////////////////
+	
 	if( bEffectiveAreasareFunctions )
 	{
-// get upper and lower zenith angle bins
+		// get upper and lower zenith angle bins
 		unsigned int ize_low = 0;
 		unsigned int ize_up = 0;
 		
-// log10 of energy
+		// log10 of energy
 		double lerec = log10( erec );
 		
 		if( ze <= fZe[0] )
@@ -2261,10 +2261,10 @@ double VEffectiveAreaCalculator::getEffectiveArea( double erec, double ze, doubl
 			ie_zeup =  0.;
 		}
 		
-// interpolate between zenith angles (weighted by cos(ze))
+		// interpolate between zenith angles (weighted by cos(ze))
 		double ieff = VStatistics::interpolate( ie_zelow, fZe[ize_low], ie_zeup, fZe[ize_up], ze, true, 0.5, -90. );
 		
-// return inverse
+		// return inverse
 		if( ieff != 0. )
 		{
 			return 1. / ieff;
@@ -2329,7 +2329,7 @@ vector< unsigned int > VEffectiveAreaCalculator::getUpperLowBins( vector< double
 		return i_temp;
 	}
 	
-// look for closest values
+	// look for closest values
 	double i_diff_upper = 1.e10;
 	unsigned int i_diff_upper_index = 0;
 	double i_diff_lower = 1.e10;
@@ -2366,48 +2366,48 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 {
 	vector< double > i_eff_temp( fNBins, 0. );
 	
-// log10 of energy
+	// log10 of energy
 	if( erec <= 0. )
 	{
 		return 0.;
 	}
 	double lerec = log10( erec );
 	
-// calculate mean values
+	// calculate mean values
 	fEffectiveAreas_meanZe     += ze;
 	fEffectiveAreas_meanWoff   += woff;
 	fEffectiveAreas_meanPedVar += iPedVar;
 	fEffectiveAreas_meanIndex   = iSpectralIndex;
 	fEffectiveAreas_meanN++;
 	
-////////////////////////////////////////////////////////
-// get upper and lower zenith angle bins
-////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+	// get upper and lower zenith angle bins
+	////////////////////////////////////////////////////////
 	vector< unsigned int > i_ze_bins = getUpperLowBins( fZe, ze );
 	vector< vector< double > > i_ze_eff_temp( 2, i_eff_temp );
 	for( unsigned int i = 0; i < i_ze_bins.size(); i++ )
 	{
-////////////////////////////////////////////////////////
-// get lower and upper wobble offset bins
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
+		// get lower and upper wobble offset bins
+		////////////////////////////////////////////////////////
 		if( i_ze_bins[i] < fEff_WobbleOffsets.size() )
 		{
 			vector< unsigned int > i_woff_bins = getUpperLowBins( fEff_WobbleOffsets[i_ze_bins[i]], woff );
 			vector< vector< double > > i_woff_eff_temp( 2, i_eff_temp );
 			for( unsigned int w = 0; w < i_woff_bins.size(); w++ )
 			{
-////////////////////////////////////////////////////////
-// get lower and upper noise bins
-////////////////////////////////////////////////////////
+				////////////////////////////////////////////////////////
+				// get lower and upper noise bins
+				////////////////////////////////////////////////////////
 				if( i_ze_bins[i] < fEff_Noise.size() && i_woff_bins[w] < fEff_Noise[i_ze_bins[i]].size() )
 				{
 					vector< unsigned int > i_noise_bins = getUpperLowBins( fEff_Noise[i_ze_bins[i]][i_woff_bins[w]], iPedVar );
 					vector< vector< double > > i_noise_eff_temp( 2, i_eff_temp );
 					for( unsigned int n = 0; n < i_noise_bins.size(); n++ )
 					{
-////////////////////////////////////////////////////////
-// get lower and upper spectral index bins
-////////////////////////////////////////////////////////
+						////////////////////////////////////////////////////////
+						// get lower and upper spectral index bins
+						////////////////////////////////////////////////////////
 						if( i_ze_bins[i] < fEff_SpectralIndex.size()
 								&& i_woff_bins[w] < fEff_SpectralIndex[i_ze_bins[i]].size()
 								&& i_noise_bins[n] < fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]].size() )
@@ -2436,7 +2436,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 							cout << endl;
 							return -1.;
 						}
-////////////////////////////////////////////////////////
+						////////////////////////////////////////////////////////
 					}
 					i_woff_eff_temp[w] = interpolate_effectiveArea( iPedVar,
 										 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
@@ -2475,7 +2475,7 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 		return -1.;
 	}
 	
-// mean effective area calculation
+	// mean effective area calculation
 	if( bAddtoMeanEffectiveArea && fVMeanEffectiveArea.size() == i_eff_temp.size() )
 	{
 		for( unsigned int i = 0; i < i_eff_temp.size(); i++ )
@@ -2494,9 +2494,9 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 		fNTimeBinnedMeanEffectiveArea++;
 	}
 	
-/////////////////////////////////////////
-// effective area for a specific energy
-/////////////////////////////////////////
+	/////////////////////////////////////////
+	// effective area for a specific energy
+	/////////////////////////////////////////
 	double i_eff_e = 1.;
 	unsigned int ie0_low = 0;
 	unsigned int ie0_up = 0;
@@ -2521,10 +2521,10 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
 		}
 	}
 	
-///////////////////////////////////
-// linear interpolate between energies
-///////////////////////////////////
-
+	///////////////////////////////////
+	// linear interpolate between energies
+	///////////////////////////////////
+	
 	i_eff_e = VStatistics::interpolate( i_eff_temp[ie0_low], fEff_E0[ie0_low], i_eff_temp[ie0_up], fEff_E0[ie0_up], lerec, false );
 	
 	if( i_eff_e > 0. )
@@ -2731,14 +2731,14 @@ bool VEffectiveAreaCalculator::binomialDivide( TGraphAsymmErrors* g, TH1D* hrec,
 		if( hmc->GetBinContent( b ) > 0 && hrec->GetBinContent( b ) > 0 )
 		{
 			pj = hrec->GetBinContent( b ) / hmc->GetBinContent( b );
-// error calculation for effective areas
-//    choose method with setStatisticsOption()
-//  this far from being straightforward!
-//  none of the methods works consistently, therefore the simplest (normal) solution
-//  is used.
-//  note: approach is only correct for unweighted histograms
-//
-// error calculation assuming normal distributions
+			// error calculation for effective areas
+			//    choose method with setStatisticsOption()
+			//  this far from being straightforward!
+			//  none of the methods works consistently, therefore the simplest (normal) solution
+			//  is used.
+			//  note: approach is only correct for unweighted histograms
+			//
+			// error calculation assuming normal distributions
 			if( !fClopperPearson )
 			{
 				pr = hrec->GetBinError( b );
@@ -2754,14 +2754,14 @@ bool VEffectiveAreaCalculator::binomialDivide( TGraphAsymmErrors* g, TH1D* hrec,
 				sj_low = sqrt( sj_low );
 				sj_up  = sj_low;
 			}
-// Clopper-Pearson error calculation
+			// Clopper-Pearson error calculation
 			else
 			{
 				sj_low = pj - TEfficiency::ClopperPearson( ( int )hmc->GetBinContent( b ), ( int )hrec->GetBinContent( b ), 0.6827, false );
 				sj_up  = TEfficiency::ClopperPearson( ( int )hmc->GetBinContent( b ), ( int )hrec->GetBinContent( b ), 0.6827, true ) - pj;
 			}
 			
-// fill effective area graphs
+			// fill effective area graphs
 			g->SetPoint( z, hmc->GetBinCenter( b ), pj );
 			g->SetPointError( z, 0., 0., sj_low, sj_up );
 			z++;
@@ -2792,13 +2792,13 @@ void VEffectiveAreaCalculator::smoothEffectiveAreas( map< unsigned int, vector< 
 					continue;
 				}
 				
-// upwards outlier
+				// upwards outlier
 				if( itemp[k] / itemp[k - 1] > ( 1. + fSmoothThreshold ) && itemp[k] / itemp[k + 1] > ( 1. + fSmoothThreshold ) )
 				{
 					itemp[k] = 0.5 * ( itemp[k - 1] + itemp[k + 1] );
 				}
 				
-// downwards outlier
+				// downwards outlier
 				if( itemp[k] / itemp[k - 1] < ( 1. - fSmoothThreshold ) && itemp[k] / itemp[k + 1] < ( 1. - fSmoothThreshold ) )
 				{
 					itemp[k] = 0.5 * ( itemp[k - 1] + itemp[k + 1] );
@@ -2831,7 +2831,7 @@ void VEffectiveAreaCalculator::copyProfileHistograms( TProfile* h1,  TProfile* h
 			if( h2->GetBinEntries( b ) > 0. )
 			{
 				double iE = h2->GetBinError( b );
-//		h1->SetBinError( b, iE );
+				//		h1->SetBinError( b, iE );
 				if( iEOption != "s" )
 				{
 					iE = h2->GetBinError( b ) * sqrt( h2->GetBinEntries( b ) );
@@ -3171,34 +3171,34 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 	vector< double > i_eff_temp;
 	vector< double > i_eff_tempE;
 	
-////////////////////////////////////////////////////////
-// get upper and lower zenith angle bins
-////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+	// get upper and lower zenith angle bins
+	////////////////////////////////////////////////////////
 	vector< unsigned int > i_ze_bins = getUpperLowBins( fZe, fEffectiveAreas_meanZe );
 	vector< vector< double > > i_ze_eff_temp( 2, hX );
 	for( unsigned int i = 0; i < i_ze_bins.size(); i++ )
 	{
-////////////////////////////////////////////////////////
-// get lower and upper wobble offset bins
-////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////
+		// get lower and upper wobble offset bins
+		////////////////////////////////////////////////////////
 		if( i_ze_bins[i] < fEff_WobbleOffsets.size() )
 		{
 			vector< unsigned int > i_woff_bins = getUpperLowBins( fEff_WobbleOffsets[i_ze_bins[i]], fEffectiveAreas_meanWoff );
 			vector< vector< double > > i_woff_eff_temp( 2, hX );
 			for( unsigned int w = 0; w < i_woff_bins.size(); w++ )
 			{
-////////////////////////////////////////////////////////
-// get lower and upper noise bins
-////////////////////////////////////////////////////////
+				////////////////////////////////////////////////////////
+				// get lower and upper noise bins
+				////////////////////////////////////////////////////////
 				if( i_ze_bins[i] < fEff_Noise.size() && i_woff_bins[w] < fEff_Noise[i_ze_bins[i]].size() )
 				{
 					vector< unsigned int > i_noise_bins = getUpperLowBins( fEff_Noise[i_ze_bins[i]][i_woff_bins[w]], fEffectiveAreas_meanPedVar );
 					vector< vector< double > > i_noise_eff_temp( 2, hX );
 					for( unsigned int n = 0; n < i_noise_bins.size(); n++ )
 					{
-////////////////////////////////////////////////////////
-// get lower and upper spectral index bins
-////////////////////////////////////////////////////////
+						////////////////////////////////////////////////////////
+						// get lower and upper spectral index bins
+						////////////////////////////////////////////////////////
 						if( i_ze_bins[i] < fEff_SpectralIndex.size() && i_woff_bins[w] < fEff_SpectralIndex[i_ze_bins[i]].size()
 								&& i_noise_bins[n] < fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]].size() )
 						{
@@ -3210,7 +3210,7 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
 												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
 												  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
 												  fEff_EsysMCRelative[i_ID_0], fEff_EsysMCRelative[i_ID_1], false );
-// don't interpolate errors, assume they are more or less constant
+							// don't interpolate errors, assume they are more or less constant
 							i_eff_tempE = fEff_EsysMCRelativeE[i_ID_0];
 							
 						}
@@ -3271,7 +3271,7 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
 	
 	
 	
-// normalization of MC spectrum
+	// normalization of MC spectrum
 	double c_ig = 1.;
 	if( fRunPara->fIgnoreFractionOfEvents > 0. )
 	{
@@ -3282,14 +3282,14 @@ double VEffectiveAreaCalculator::getCRWeight( double iEMC_TeV_lin, TH1* h, bool 
 				  / ( TMath::Power( fRunPara->fMCEnergy_max, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. )
 					  - TMath::Power( fRunPara->fMCEnergy_min, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) + 1. ) );
 					  
-// number of MC events in this energy bin
+	// number of MC events in this energy bin
 	double n_mc = c_mc * TMath::Power( iEMC_TeV_lin, -1.*TMath::Abs( fRunPara->fMCEnergy_index ) );
 	
-// number of expected CR events /min/sr
+	// number of expected CR events /min/sr
 	double n_cr = fMC_ScatterArea * fRunPara->fCREnergySpectrum->Eval( log10( iEMC_TeV_lin ) ) * 1.e4 * 60.;
 	// fRunPara->fCREnergySpectrum->Eval( log10(iEMC_TeV_lin) ) returns the differential flux multiplied by the energy
 	
-// (ctools) for the acceptance map construction, the weight is in #/s ()
+	// (ctools) for the acceptance map construction, the weight is in #/s ()
 	if( for_back_map )
 	{
 		//need to normalize this number considering the cone in which the particle are simulated (the offset bin is not consider so the binning can be changed later).

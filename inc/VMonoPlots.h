@@ -69,7 +69,7 @@ class VMonoPlots
 		void makeCentroidsMap();
 		void makeTwoD_BoxSmooth();
 		
-//! boolean inline functions to apply the cuts
+		//! boolean inline functions to apply the cuts
 		bool cutAlpha()
 		{
 			if( fData->alpha[fTelID] > fCuts->fAlpha_min && fData->alpha[fTelID] < fCuts->fAlpha_max )
@@ -158,7 +158,7 @@ class VMonoPlots
 		TList* hListParameterHistograms;
 		TList* hListSkyMaps;
 		
-// parameter histograms
+		// parameter histograms
 		TH1D* halpha;                             //!< Alpha Histogram
 		TH1D* hlength;                            //!< Length Histogram
 		TH1D* hwidth;                             //!< Width Histogram
@@ -170,7 +170,7 @@ class VMonoPlots
 		TH1D* hntubes;                            //!< Histogram of number of pixels in image
 		TH1D* hlogsize;                           //!< Histogram of log10(size)
 		
-// sky maps
+		// sky maps
 		TH2D* hcen_cam;                           //!< Map of image centroids on the camera (i.e. no derotation)
 		TH2D* hcen_sky;                           //!< Map of image centroids on the sky (i.e. after derotation)
 		TH2D* hmap;                               //!< Map of reconstructed source position

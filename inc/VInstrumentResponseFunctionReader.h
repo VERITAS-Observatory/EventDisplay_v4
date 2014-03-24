@@ -50,9 +50,9 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		string fFile;
 		string fA_MC;
 		
-//////////////////////////////////
-// conditions
-//////////////////////////////////
+		//////////////////////////////////
+		// conditions
+		//////////////////////////////////
 		double fZe;
 		double fWoff;
 		int    fAzbin;
@@ -62,55 +62,55 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		float  fEnergyLinTeV_min;
 		float  fEnergyLinTeV_max;
 		
-//////////////////////////////////
-// data
-//////////////////////////////////
-// effective areas
+		//////////////////////////////////
+		// data
+		//////////////////////////////////
+		// effective areas
 		TGraphAsymmErrors* gEffArea_MC;
 		TGraphAsymmErrors* gEffArea_Rec;
-// effective area ratios
+		// effective area ratios
 		TGraphAsymmErrors* gEffArea_MC_Ratio;
 		TGraphAsymmErrors* gEffArea_Rec_Ratio;
-// energy spectra
+		// energy spectra
 		TH1D* hEmc;
 		TH1D* hEcut;
 		TH1D* hEcut_rec;
 		TH1D* hEcutUW;
 		TH1D* hEcut_recUW;
-// energy reconstruction matrix
+		// energy reconstruction matrix
 		TH2D* hERecMatrix;
 		TProfile* hERecMatrixProfile;
 		TH2D* hERecMatrixCoarse;
 		TH2D* hERecMatrixQC;
 		TH2D* hERecMatrixCoarseQC;
-// e_rec/e_mc
+		// e_rec/e_mc
 		TH2D* hEsysMCRelative2D;
 		TProfile* hEsysMCRelative;
-// 2D energy error distribution
+		// 2D energy error distribution
 		TH2D* hEsys;
-// energy resolution
+		// energy resolution
 		TGraphErrors* gEnergyResolution;
-// energy bias
+		// energy bias
 		TGraphErrors* gEnergyBias_Mean;
 		TGraphErrors* gEnergyBias_Median;
 		TGraphErrors* gEnergyLogBias_Mean;
 		TGraphErrors* gEnergyLogBias_Median;
-// angular resolution (filled for CTA only)
+		// angular resolution (filled for CTA only)
 		TGraphErrors* gAngularResolution;
 		TGraphErrors* gAngularResolution80;             // 80% containment radius for angular resolution
-// cut efficiencies
+		// cut efficiencies
 		vector< TH1D* > hCutEfficiency;
 		vector< TH1D* > hCutEfficiencyRelativePlots;
-// weight histograms
+		// weight histograms
 		TH1D* hWeightedRate;
 		
-// resolution graphs
+		// resolution graphs
 		vector< string >                           fIRF_TreeNames;
 		vector< VInstrumentResponseFunctionData* > fIRF_Data;
 		
-//////////////////////////////////
-// plotting
-//////////////////////////////////
+		//////////////////////////////////
+		// plotting
+		//////////////////////////////////
 		string fPlotOption;
 		int    fColor;
 		int    fLineStyle;

@@ -112,28 +112,28 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		
 		bool fDebug;
 		
-// source strength vector (to plot and to list)
+		// source strength vector (to plot and to list)
 		vector< double > fSourceStrength;
 		double fSourceStrength_min;
 		double fSourceStrength_max;
 		double fSourceStrength_step;
 		
-// energy spectrum from literature
+		// energy spectrum from literature
 		VEnergySpectrumfromLiterature* fEnergySpectrumfromLiterature;
 		unsigned int fEnergySpectrumfromLiterature_ID;
 		vector< TGraph* > fCrabFlux_SourceStrength;
 		
-// TMVA cut optimization results
+		// TMVA cut optimization results
 		VTMVAEvaluatorResults* fTMVAEvaluatorResults;
 		bool   fRequireCutsToBeOptimized;
 		
-// observing time
+		// observing time
 		double fObservationTime_h;                  // [h]
 		double fObservationTime_min;
 		double fObservationTime_max;
 		int    fObservationTime_steps;
 		
-// significance calculation
+		// significance calculation
 		unsigned int fLiAndMaEqu;
 		double       fSignificance_min;
 		double       fEvents_min;
@@ -151,7 +151,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		double fEnergy_max_Log;
 		double fEnergy_dE_log10;
 		
-// data vectors for MC and int/diff sensitivity calculation
+		// data vectors for MC and int/diff sensitivity calculation
 		map< unsigned int, VSensitivityCalculatorDataResponseFunctions* > fMC_Data;                        //! [particle ID]
 		map< unsigned int, VSensitivityCalculatorDataResponseFunctions* >::iterator fMC_Data_iterator;     //! [particle ID]
 		VSensitivityCalculatorDataResponseFunctions fMC_GammaData;
@@ -165,7 +165,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		vector< sSensitivityData > fData;
 		map< unsigned int, TGraph* > fGraphObsvsTime;
 		
-// plotting values
+		// plotting values
 		TH1D*  hnull;
 		string fPlot_CanvasName;
 		string fPlot_CanvasTitle;
@@ -178,23 +178,23 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
 		double fPlot_flux_CU_min;
 		double fPlot_flux_CU_max;
 		
-// sensitivity and rate graph
+		// sensitivity and rate graph
 		TGraphAsymmErrors* gSensitivityvsEnergy;
 		TGraphAsymmErrors* gSignalRate;
 		TGraphAsymmErrors* gBGRate;
-//	TGraphErrors *gProtonRate;
-//	TGraphErrors *gElectronRate;
+		//	TGraphErrors *gProtonRate;
+		//	TGraphErrors *gElectronRate;
 		TGraphAsymmErrors* gProtonRate;
 		TGraphAsymmErrors* gElectronRate;
 		
-// plotting debug stuff
+		// plotting debug stuff
 		vector< TCanvas* > cPlotDebug;
 		string fPlotDebugName;
 		string fDebugParticleNumberFile;                // write non/noff to disk
-// values of Crab fluxes to be plotted as lines into the sensitivity vs energy graph (in Crab Units)
+		// values of Crab fluxes to be plotted as lines into the sensitivity vs energy graph (in Crab Units)
 		vector< double > fPlottingCrabFlux_CU;
 		
-// private functions
+		// private functions
 		bool       checkCutOptimization( double iEnergy );
 		bool       checkDataSet( unsigned int iD, string iName );
 		bool       checkUnits( string iUnit );

@@ -160,8 +160,8 @@ struct frogs_imgtmplt_out frogs_img_tmplt_old( struct frogs_imgtmplt_in* d )
 	}
 	
 	//Optimize the likelihood
-//  rtn=frogs_likelihood_optimization(d,&tmplt);
-
+	//  rtn=frogs_likelihood_optimization(d,&tmplt);
+	
 	//Release memory used in the data structure
 	frogs_release_memory( d );
 	
@@ -276,7 +276,7 @@ frogs_likelihood_optimization( struct frogs_imgtmplt_in* d,
 	s = gsl_multifit_fdfsolver_alloc( T, n, p );
 	gsl_multifit_fdfsolver_set( s, &func, x );
 	
-//Loop on iterations
+	//Loop on iterations
 	int status = 0;
 	unsigned int iter = 0;
 	do
@@ -1133,7 +1133,7 @@ struct frogs_imgtemplate frogs_read_template_elev_old( float elevation )
 	//Above 65 deg we use the 70 deg template for now
 	if( elevation >= 65.0 )
 	{
-//    char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
+		//    char template_file_name[FROGS_FILE_NAME_MAX_LENGTH];
 		char template_file_name[256];
 		strcpy( template_file_name, "$OBS_EVNDISP_ANA_DIR/Templates/elev70X0.0-4.0s0.5r085.tmplt" );
 		rtn = frogs_read_template_file( template_file_name );
@@ -2010,8 +2010,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 		
 		return mu000;
 	}
-//================================================================
-//================================================================
+	//================================================================
+	//================================================================
 #ifdef CONVOLUTION
 	double frogs_chertemplate_quad( float lambda, float log10e, float b, float x,
 									float y, struct frogs_imgtemplate * tmplt,
@@ -2294,8 +2294,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			return mu000;
 			
 		}
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		double frogs_get_tmplt_val( int il, int iloge, int ib, int ix, int iy,
 									struct frogs_imgtemplate * tmplt )
 		{
@@ -2321,8 +2321,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			double rtn = tmplt->c[index];
 			return rtn;
 		}
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		int frogs_print_param_spc_point( struct frogs_imgtmplt_out output )
 		{
 			/*This function can be used to print out the results or the current
@@ -2350,8 +2350,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			
 			return FROGS_OK;
 		}
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		double frogs_linear_interpolation( float x1, float x2, double y1, double y2,
 										   float x )
 		{
@@ -2365,8 +2365,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			rtn = y1 * ( x - x2 ) / ( x1 - x2 ) + y2 * ( x - x1 ) / ( x2 - x1 );
 			return rtn;
 		}
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		double frogs_quadratic_interpolation( float x1, float x2, float x3, double y1,
 											  double y2, double y3, float x )
 		{
@@ -2382,8 +2382,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 				  + y3 * ( x - x1 ) * ( x - x2 ) / ( ( x3 - x1 ) * ( x3 - x2 ) );
 			return rtn;
 		}
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		float floatwrap( float x, float min, float max )
 		{
 			/*This function returns a value between min and max. It is periodic
@@ -2414,8 +2414,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			return rtn;
 		}
 		
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		float frogs_get_overlapping_area( gsl_rng * r, float x, float y, float pixradius,
 										  float X, float Y, float dX, float dY )
 		{
@@ -2465,8 +2465,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			return dX * dY * nIN / nTOTAL;
 		}
 		
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		void frogs_fill_prob_density( struct frogs_probability_array * parray )
 		{
 			/*This function fills the probability density table to speed up the calculations
@@ -2495,8 +2495,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			
 		}
 		
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		double frogs_read_prob_array_table( struct frogs_probability_array * prob_array, double q, double mu, double ped )
 		{
 		
@@ -2566,8 +2566,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 		}
 		
 		
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 		int frogs_printfrog()
 		{
 			/*This function clearly is the most important one of the project. */
@@ -2587,9 +2587,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			return FROGS_OK;
 		}
 		
-//================================================================
-//================================================================
-
+		//================================================================
+		//================================================================
+		
 		void frogs_differential_evolution( struct frogs_imgtmplt_in * d,
 										   struct frogs_imgtemplate * tmplt,
 										   struct frogs_probability_array * prob_array )
@@ -3053,9 +3053,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 				t_bestit = gt_best;
 				
 				
-//    }//if ....
-//======Output Part=====================================================
-
+				//    }//if ....
+				//======Output Part=====================================================
+				
 				if( gi_gen % i_refresh == 0 ) //refresh control
 				{
 #ifdef DO_PLOTTING
@@ -3116,9 +3116,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 		}
 		
 		
-//================================================================
-//================================================================
-
+		//================================================================
+		//================================================================
+		
 		t_pop frogs_evaluate( struct frogs_imgtmplt_in * d,
 							  struct frogs_imgtemplate * tmplt,
 							  struct frogs_probability_array * prob_array,
@@ -3302,9 +3302,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			
 		}
 		
-//================================================================
-//================================================================
-
+		//================================================================
+		//================================================================
+		
 		int frogs_left_vector_wins( t_pop t_trial, t_pop t_target )
 		/**C*F****************************************************************
 		**
@@ -3341,9 +3341,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			}
 		}
 		
-//================================================================
-//================================================================
-
+		//================================================================
+		//================================================================
+		
 		void frogs_permute( gsl_rng * r, int ia_urn2[], int i_urn2_depth, int i_NP, int i_avoid )
 		/**C*F****************************************************************
 		**
@@ -3401,9 +3401,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 		}
 		
 		
-//================================================================
-//================================================================
-
+		//================================================================
+		//================================================================
+		
 		void  frogs_assigna2b( int i_D, float fa_a[], float fa_b[] )
 		/**C*F****************************************************************
 		**
@@ -3436,9 +3436,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			}
 		}
 		
-//================================================================
-//================================================================
-
+		//================================================================
+		//================================================================
+		
 		/**C*F****************************************************************
 		**
 		** Function       :void sort (t_pop ta_ary[], int i_len)
@@ -3493,8 +3493,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			} //while (step > 1)
 		} //end of sort()
 		
-//================================================================
-//================================================================
+		//================================================================
+		//================================================================
 #ifdef CONVOLUTION
 		double frogs_chertemplate_no_int( float lambda, float log10e, float b, float x,
 										  float y, struct frogs_imgtemplate * tmplt,
@@ -3588,9 +3588,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 				return mu000;
 			}
 			
-//================================================================
-//================================================================
-
+			//================================================================
+			//================================================================
+			
 			float frogs_change_coordinate_system( float i_ze, float i_az, float x, float y, float z, int axis, bool bInv )
 			{
 			

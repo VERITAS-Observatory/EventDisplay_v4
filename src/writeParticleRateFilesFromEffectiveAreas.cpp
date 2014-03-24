@@ -71,14 +71,14 @@ void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* i
 	
 	if( iMC_Gamma && iMC_Proton )
 	{
-// use sensitivity calculator for differential flux calculation
+		// use sensitivity calculator for differential flux calculation
 		VSensitivityCalculator b;
 		b.setDebug( false );             // creates lots of output (if set to true)
-// set Crab Nebula spectrum
+		// set Crab Nebula spectrum
 		b.setEnergySpectrumfromLiterature( iESpecDataFile_CrabNebula, iCrabSpec_ID );
-// set output result file name
+		// set output result file name
 		b.setWriteParticleNumberFile( iParticleNumberFile );
-// CTA
+		// CTA
 		int i_Azbin_gamma = 0;
 		double i_index_gamma = 2.5;
 		int i_noise_gamma = 250;
@@ -89,22 +89,22 @@ void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* i
 		int i_noise_proton = 250;
 		double i_woff_proton = 0.;
 		cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl;
-//////////////////////////////////////////////////////////////////////////
-
-// gammas
+		//////////////////////////////////////////////////////////////////////////
+		
+		// gammas
 		b.setMonteCarloParameters( 1, iESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
 								   i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma,
 								   -1.9 );
-// protons
+		// protons
 		b.setMonteCarloParameters( 14, iESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
 								   i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton,
 								   -1.9 );
-// electrons (spectral index?)
+		// electrons (spectral index?)
 		if( iMC_Electron )
 		{
 			b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 8, iMC_Electron, 20., 0, 0.0, 250, 3.0, -1.9 );
 		}
-// calculate differential fluxes for 5 bins per decade (0.2)
+		// calculate differential fluxes for 5 bins per decade (0.2)
 		b.calculateParticleNumberGraphs_MC( 0.2 );
 	}
 }
@@ -145,7 +145,7 @@ int main( int argc, char* argv[] )
 		iAngResDir = argv[5];
 	}
 	
-// hardwired total number of off source bins
+	// hardwired total number of off source bins
 	int iOffSetCounter = -1;
 	if( iOnSource == "onSource" )
 	{
@@ -169,7 +169,7 @@ int main( int argc, char* argv[] )
 		exit( -1 );
 	}
 	
-// effective area file names
+	// effective area file names
 	string iMC_Gamma_onSource = "gamma_onSource";
 	string iMC_Gamma_cone = "gamma_cone";
 	string iMC_Proton = "proton";
@@ -200,7 +200,7 @@ int main( int argc, char* argv[] )
 	
 	cout << "STARTING SUBARRAY " << SubArray << endl;
 	
-// on-axis rates
+	// on-axis rates
 	if( iMC_Gamma_onSource.size() > 0 )
 	{
 		sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
@@ -215,7 +215,7 @@ int main( int argc, char* argv[] )
 		{
 			writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
 		}
-// angular resolution histogram
+		// angular resolution histogram
 		if( iAngResDir.size() > 0 )
 		{
 			sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
@@ -223,7 +223,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// off-axis rates
+	// off-axis rates
 	for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
 	{
 	
@@ -240,7 +240,7 @@ int main( int argc, char* argv[] )
 		{
 			writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
 		}
-// angular resolution histogram
+		// angular resolution histogram
 		if( iAngResDir.size() > 0 )
 		{
 			sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );

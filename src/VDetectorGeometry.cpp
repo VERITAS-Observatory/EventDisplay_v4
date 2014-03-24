@@ -25,10 +25,10 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
 	setCoordinateTransformer( iCoordinateTransformerX, iCoordinateTransformerY );
 	setSourceType( iSourceType );
 	
-// set directory with all configuration files
+	// set directory with all configuration files
 	setConfigDir( iDir );
 	
-// detector configuration file from GrIsu (.cfg)
+	// detector configuration file from GrIsu (.cfg)
 	if( iCamera[0].find( ".cfg" ) < iCamera[0].size() || iCamera[0].find( ".txt" ) < iCamera[0].size() )
 	{
 		if( fDebug )
@@ -37,7 +37,7 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
 		}
 		readGrisucfg( iCamera[0], iNTel );
 	}
-// camera configuration from .cam file (default telescope positions)
+	// camera configuration from .cam file (default telescope positions)
 	else
 	{
 		if( !initialize( iNTel, iCamera ) )
@@ -54,14 +54,14 @@ VDetectorGeometry::VDetectorGeometry( unsigned int iNTel, vector< string > iCame
 	
 	for( unsigned int i = 0; i < iNTel; i++ )
 	{
-// set channels and samples
+		// set channels and samples
 		setTelID( i );
 		fNChannels.push_back( getNumChannels() );
 		fNSamples.push_back( getNumSamples() );
 		fSampleWarning.push_back( true );
 	}
 	
-//    if( fDebug ) print();
+	//    if( fDebug ) print();
 	if( fDebug )
 	{
 		cout << "END: VDetectorGeometry::VDetectorGeometry" << endl;
@@ -83,7 +83,7 @@ void VDetectorGeometry::setNSamples( unsigned int iTelID, unsigned int iNSamples
 {
 	if( iTelID < fNSamples.size() )
 	{
-// ignore if samples length from cfg is shorter than request sample length (except if iForceSet is set)
+		// ignore if samples length from cfg is shorter than request sample length (except if iForceSet is set)
 		if( fNSamples[iTelID] < iNSamples && !iForceSet )
 		{
 			if( fSampleWarning[iTelID] )

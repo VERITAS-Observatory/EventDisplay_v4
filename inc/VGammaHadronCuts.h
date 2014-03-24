@@ -84,24 +84,24 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		CData* fData;                                       //! transient
 		string fDataDirectory;
 		
-// cut selector
+		// cut selector
 		int fGammaHadronCutSelector;                            // see description at beginning of VGammaHadronCuts.cpp
 		int fDirectionCutSelector;
 		
-// array characteristics (number of telescopes, centre of array)
+		// array characteristics (number of telescopes, centre of array)
 		unsigned int fNTel;
 		double       fArrayCentre_X;
 		double       fArrayCentre_Y;
 		
-// number of possible telescope combinations
+		// number of possible telescope combinations
 		unsigned int fNLTrigs;
 		
-// values calculated from shower/image parameter
+		// values calculated from shower/image parameter
 		double fMeanImageDistance;
 		double fMeanImageLength;
 		double fMeanImageWidth;
 		
-// event by event cuts (read in from an additional friend tree, used by random forest analysis, pulsar analysis, etc)
+		// event by event cuts (read in from an additional friend tree, used by random forest analysis, pulsar analysis, etc)
 		TFile* fProbabilityCut_File;                  //!
 		TTree* fProbabilityCut_Tree;                  //!
 		int fProbabilityCut_QualityFlag;              // quality flag for probability cut 0: cut estimation failed; >0 successful probability estimation
@@ -109,8 +109,8 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		unsigned int fProbabilityCut_ProbID;          // array element to be used from fProbabilityCut_SelectionCut[]
 		double fProbabilityCut_SelectionCut[VANACUTS_PROBSELECTIONCUTS_MAX];    // selection cut
 		
-//////////////////////////
-// TMVA evaluator
+		//////////////////////////
+		// TMVA evaluator
 		VTMVAEvaluator* fTMVAEvaluator;                             //!
 		string          fTMVA_MVAMethod;
 		string          fTMVAWeightFile;
@@ -128,15 +128,15 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		TGraph*         fTMVABoxCut_Theta2_max;
 		double          fTMVA_EvaluationResult;
 		VTMVAEvaluatorResults* fTMVAEvaluatorResults;
-// TMVA results read from the
-
-// orbital phase analysis
+		// TMVA results read from the
+		
+		// orbital phase analysis
 		TFile* fPhaseCut_File;                                      //!
 		TTree* fPhaseCut_Tree;                                      //!
 		double fOrbitalPhase;
 		
-// parameters for energy dependent theta2 cuts
-// (implemented for MC only)
+		// parameters for energy dependent theta2 cuts
+		// (implemented for MC only)
 		string fFileNameAngRes;
 		TFile* fFileAngRes;                                         //!
 		string fF1AngResName;
@@ -145,11 +145,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double       fAngRes_AbsoluteMinimum;
 		double       fAngRes_AbsoluteMaximum;
 		unsigned int fAngResContainmentProbability;
-// energy dependent theta2 cuts from IRF file
+		// energy dependent theta2 cuts from IRF file
 		TGraphErrors* fIRFAngRes;
 		
 		
-// cut statistics
+		// cut statistics
 		VGammaHadronCutsStatistics* fStats;                       //!
 		
 		bool   applyProbabilityCut( int i, bool fIsOn );
@@ -161,14 +161,14 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   initProbabilityCuts( string iDir );
 		bool   initTMVAEvaluator( string iTMVAFile, unsigned int iTMVAWeightFileIndex_min, unsigned int iTMVAWeightFileIndex_max );
 		
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
+		////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////
+		
 	public:
 	
 	
-// cut variable values
-// mono cuts
+		// cut variable values
+		// mono cuts
 		double fAlpha_min;
 		double fAlpha_max;
 		double fDistance_min;
@@ -183,7 +183,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		double fAsymm_max;
 		double fSize_min;
 		double fSize_max;
-// stereo cuts
+		// stereo cuts
 		double fCut_MeanImageDistance_min;
 		double fCut_MeanImageDistance_max;
 		double fCut_MeanImageLength_min;
@@ -406,7 +406,7 @@ class VGammaHadronCuts : public VAnalysisUtilities
 			fArrayCentre_X = iX;
 			fArrayCentre_Y = iY;
 		}
-//        void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
+		//        void   setShowerCoreCuts( double xmin, double xmax, double ymin, double ymax, double iEdge = -1. );
 		void   setTheta2Cut( double it2 )
 		{
 			fCut_Theta2_max = it2;

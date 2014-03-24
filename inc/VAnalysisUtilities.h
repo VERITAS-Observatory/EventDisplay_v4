@@ -46,16 +46,16 @@ class VAnalysisUtilities : public TNamed
 		// anasum data file
 		TFile* fAnasumDataFile;                                                //!
 		
-// run list
+		// run list
 		double fRunList_MJD_min;
 		double fRunList_MJD_max;
 		vector< VRunList > fRunList;
 		
-// phase folding
+		// phase folding
 		double  fPhase_MJD0;
 		double  fPhase_Period_days;
 		
-// run list cuts
+		// run list cuts
 		vector< double > fRunListCut_MJD_min;
 		vector< double > fRunListCut_MJD_max;
 		vector< double > fRunListCut_Phase_min;

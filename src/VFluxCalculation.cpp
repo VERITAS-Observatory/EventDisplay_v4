@@ -72,24 +72,24 @@ void VFluxCalculation::reset()
 	fFile.clear();
 	fData = 0;
 	
-// long printout
+	// long printout
 	fDebug = true;
 	
-// formula for significance calulation from Li & Ma
+	// formula for significance calulation from Li & Ma
 	fLiMaEqu = 17;
 	
-// calculate fluxes above this energy
+	// calculate fluxes above this energy
 	fMinEnergy = 0.;
-// maximum energy (not clear what defines this value)
+	// maximum energy (not clear what defines this value)
 	fMaxEnergy = 300.;
-// assumed spectral parameters
+	// assumed spectral parameters
 	fE0 = 1.;                                     // [TeV]
 	fAlpha = -2.5;
 	
-// significance parameters: decide when to calculate fluxes and when upper limits
+	// significance parameters: decide when to calculate fluxes and when upper limits
 	setSignificanceParameters( 3., 5., 0.99, 0, 17 );
 	
-// graphs
+	// graphs
 	gFluxElevation = 0;
 	fCanvasFluxesVSMJD = 0;
 	
@@ -170,7 +170,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 	
 	resetRunList();
 	
-// loop over all files
+	// loop over all files
 	char hname[2000];
 	if( !fData )
 	{
@@ -218,7 +218,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 	{
 		fData->GetEntry( i );
 		
-// check run min/max requirements
+		// check run min/max requirements
 		if( fData->runOn > 0 && fData->runOn < iRunMin )
 		{
 			continue;
@@ -227,7 +227,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 		{
 			continue;
 		}
-// check MJD min/max requirements
+		// check MJD min/max requirements
 		if( iMJDMin > 0. && fData->MJDOn < iMJDMin && fData->runOn != -1 )
 		{
 			continue;
@@ -237,7 +237,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 			continue;
 		}
 		
-// skip runs with zero elevation (no events)
+		// skip runs with zero elevation (no events)
 		if( fData->elevationOn < 5. && fData->elevationOff < 5 )
 		{
 			if( fDebug )
@@ -251,7 +251,7 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 		fRunMJD.push_back( fData->MJDOn );
 		fRunTOn.push_back( fData->tOn );
 		fRunDeadTime.push_back( fData->DeadTimeFracOn );
-// mean zenith angle for this run
+		// mean zenith angle for this run
 		if( fData->elevationOn > 1. )
 		{
 			fRunZe.push_back( 90. - fData->elevationOn );
@@ -262,9 +262,9 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 		}
 		fRunWobbleOffset.push_back( sqrt( fData->WobbleNorth * fData->WobbleNorth + fData->WobbleWest * fData->WobbleWest ) );
 		fRunPedvars.push_back( fData->pedvarsOn );
-// number of gamma-like events per run (this might be overwritten later)
+		// number of gamma-like events per run (this might be overwritten later)
 		fRunNdiff.push_back( fData->NOn - fData->NOff * fData->OffNorm );
-// error on number of gamma-like events
+		// error on number of gamma-like events
 		fRunNdiffE.push_back( sqrt( fData->NOn + fData->NOff *  fData->OffNorm *  fData->OffNorm ) );
 		if( fData->tOn > 0. )
 		{
@@ -310,13 +310,13 @@ unsigned int VFluxCalculation::loadRunList( int iRunMin, int iRunMax, unsigned i
 		return 0;
 	}
 	
-// recalculate some of the total values
+	// recalculate some of the total values
 	double itot = 0.;
 	double itotNorm = 0.;
 	double im = 0.;
 	double itotze = 0.;
 	double itotdead = 0.;
-// calculate mean norm (weighted by observation time)
+	// calculate mean norm (weighted by observation time)
 	for( unsigned int r = 0; r < fRunList.size(); r++ )
 	{
 		if( fRunList[r] > 0 )
@@ -412,15 +412,15 @@ bool VFluxCalculation::openDataFile( vector< string > ifile )
 */
 double VFluxCalculation::integrateEffectiveAreaInterval( double x0, double x1, double x2, double ieff_mean )
 {
-// return value
+	// return value
 	double i_InterEffArea = 0.;
 	
-// energy bin
+	// energy bin
 	double iE_low = TMath::Power( 10., ( x0 + x1 ) / 2. );
 	double iE_up  = TMath::Power( 10., ( x1 + x2 ) / 2. );
 	double dE = 0.;
 	
-// apply lower energy threshold cut
+	// apply lower energy threshold cut
 	if( iE_up  < fMinEnergy )
 	{
 		return -99.;
@@ -429,7 +429,7 @@ double VFluxCalculation::integrateEffectiveAreaInterval( double x0, double x1, d
 	{
 		iE_low = fMinEnergy;
 	}
-// MC statistic only good up to this energy
+	// MC statistic only good up to this energy
 	if( iE_low > fMaxEnergy )
 	{
 		return -99.;
@@ -439,13 +439,13 @@ double VFluxCalculation::integrateEffectiveAreaInterval( double x0, double x1, d
 		iE_up = fMaxEnergy;
 	}
 	
-// width of energy bin (on linear scale)
+	// width of energy bin (on linear scale)
 	dE = iE_up - iE_low;
 	
-// integrate spectral weighted effective area
-// using trapezoidal rule
+	// integrate spectral weighted effective area
+	// using trapezoidal rule
 	i_InterEffArea  = ieff_mean * dE * 0.5 * ( TMath::Power( iE_up / fE0, fAlpha ) + TMath::Power( iE_low / fE0, fAlpha ) );
-// (correction term at E_low in order to maximize second derivative)
+	// (correction term at E_low in order to maximize second derivative)
 	i_InterEffArea -=  1. / 12. * dE * dE * dE * ieff_mean * fAlpha * ( fAlpha - 1. ) / fE0 / fE0
 					   * TMath::Power( iE_low / fE0, fAlpha - 2. );
 					   
@@ -471,7 +471,7 @@ void VFluxCalculation::getIntegralEffectiveArea()
 		cout << endl;
 	}
 	
-// loop over all files
+	// loop over all files
 	for( unsigned int f = 0; f < fFile.size(); f++ )
 	{
 		if( bZombie || !fFile[f] )
@@ -479,7 +479,7 @@ void VFluxCalculation::getIntegralEffectiveArea()
 			return;
 		}
 		
-// loop over all runs in this file
+		// loop over all runs in this file
 		fFile[f]->cd();
 		if( fDebug )
 		{
@@ -488,7 +488,7 @@ void VFluxCalculation::getIntegralEffectiveArea()
 		char hname[800];
 		for( unsigned int i = 0; i < fRunList.size(); i++ )
 		{
-// don't have effective areas for combined run histograms
+			// don't have effective areas for combined run histograms
 			if( fDebug && fRunList[i] > 0 )
 			{
 				cout << "Calculating effective area for run " << fRunList[i] << endl;
@@ -514,20 +514,20 @@ void VFluxCalculation::getIntegralEffectiveArea()
 				cout << "continue..." << endl;
 				continue;
 			}
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// graphs with mean effective areas (mean for given run; filled in anasum)
-/////////////////////////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			// graphs with mean effective areas (mean for given run; filled in anasum)
+			/////////////////////////////////////////////////////////////////////////////////////////////////
 			TGraphAsymmErrors* g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveArea" );
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// found graph with effective areas
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			// found graph with effective areas
 			if( !g )
 			{
-// try go get off graph
+				// try go get off graph
 				g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveArea_off" );
 				if( !g )
 				{
-// backwards compatibility to files prodcued with v35x
+					// backwards compatibility to files prodcued with v35x
 					g = ( TGraphAsymmErrors* )gDirectory->Get( "gMeanEffectiveAreaEMC" );
 					if( !g )
 					{
@@ -548,13 +548,13 @@ void VFluxCalculation::getIntegralEffectiveArea()
 			double ieff_meanA = 0.;
 			double x0, x1, x2;
 			
-/////////////////////////////////////////////////////////////////////
-// calculate spectral weighted integral effective area
+			/////////////////////////////////////////////////////////////////////
+			// calculate spectral weighted integral effective area
 			fRunEffArea[i] = 0.;
-// loop over all bins in effective area histogram
+			// loop over all bins in effective area histogram
 			for( int b = 1; b < g->GetN() - 1; b++ )
 			{
-// get energies and effective areas
+				// get energies and effective areas
 				g->GetPoint( b - 1, x0, ieff_mean );
 				g->GetPoint( b + 1, x2, ieff_mean );
 				g->GetPoint( b  , x1, ieff_mean );
@@ -569,10 +569,10 @@ void VFluxCalculation::getIntegralEffectiveArea()
 					continue;
 				}
 				
-// integral effective area
+				// integral effective area
 				ieff_meanA += ieff_mean;
 			}
-// debug output
+			// debug output
 			if( fDebug )
 			{
 				cout << " t_obs " << setprecision( 5 ) << fRunTOn[i] / 60. << " [min],";
@@ -580,19 +580,19 @@ void VFluxCalculation::getIntegralEffectiveArea()
 				cout << ", integral effective area [m^2]: " << ieff_meanA << endl;
 			}
 			
-/////////////////////////////////////////////////////////////////////
-// TIME dependent effective areas
-/////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////
+			// TIME dependent effective areas
+			/////////////////////////////////////////////////////////////////////
 			if( fTimebinned )
 			{
 				vector < double > i_IntraEffArea;
 				
-// read effective area graphs for time binned intra run light curves
+				// read effective area graphs for time binned intra run light curves
 				TGraph2DErrors* g_time = ( TGraph2DErrors* )gDirectory->Get( "gTimeBinnedMeanEffectiveArea" );
-// find 2D graph with time dependent effective areas
+				// find 2D graph with time dependent effective areas
 				if( !g_time )
 				{
-// if not try go get off graph
+					// if not try go get off graph
 					g_time = ( TGraph2DErrors* )gDirectory->Get( "gTimeBinnedMeanEffectiveArea_off" );
 					if( !g_time )
 					{
@@ -603,23 +603,23 @@ void VFluxCalculation::getIntegralEffectiveArea()
 					}
 				}
 				
-// calculate spectral weighted integral effective area
+				// calculate spectral weighted integral effective area
 				double* Xaxis = g_time->GetX();
 				double* Yaxis = g_time->GetY();
 				double* Zaxis = g_time->GetZ();
 				double InterEffArea = 0.;
 				
-// Time of first bin
+				// Time of first bin
 				double Time = 0.;
 				if( Zaxis )
 				{
 					Time = Zaxis[0];
 				}
 				
-// loop over all points in effective area histogram
+				// loop over all points in effective area histogram
 				for( int b = 1; b < g_time->GetN(); b++ )
 				{
-// get energies and effective areas
+					// get energies and effective areas
 					x0 = Xaxis[b - 1];
 					x2 = Xaxis[b + 1];
 					x1 = Xaxis[b];
@@ -635,7 +635,7 @@ void VFluxCalculation::getIntegralEffectiveArea()
 						continue;
 					}
 					
-// increment time bin counter
+					// increment time bin counter
 					if( Zaxis[b] > Time )
 					{
 						Time = Zaxis[b];
@@ -649,12 +649,12 @@ void VFluxCalculation::getIntegralEffectiveArea()
 		}
 	}
 	
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-
-// calculate mean effective area for all runs (weighted by observation time)
-// (expect run = -1 in last element of vector)
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	
+	// calculate mean effective area for all runs (weighted by observation time)
+	// (expect run = -1 in last element of vector)
 	double iTTot = 0.;
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
@@ -718,7 +718,7 @@ void VFluxCalculation::printResults()
 	cout << endl << endl;
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
-// (GM) how can this happen?
+		// (GM) how can this happen?
 		if( i >= fRunEffArea.size() )
 		{
 			cout << "FluxCalculation::printResults() error: i >= fRunEffArea.size(): " << fRunEffArea.size() << "\t" << fRunList.size() << endl;
@@ -761,7 +761,7 @@ void VFluxCalculation::printResults()
 			printf( "\t Upper Flux Limit F(E > %.3f TeV, %.2f ) [C.U. (Whipple)]: %.4f", fMinEnergy, fUpperLimit, getFluxInCrabUnits( fRunFlux[i], fMinEnergy ) );
 			cout << endl;
 			VDifferentialFlux a;
-// convert integral flux limit to a differential flux
+			// convert integral flux limit to a differential flux
 			double iDF = -1. * fRunFlux[i] * ( fAlpha + 1 ) / fMinEnergy;
 			printf( "\t Upper Flux Limit F(E > %e Hz, %.2f ) [ergs/s/cm^2]: %e", a.convertEnergy_TeV_to_Hz( fMinEnergy ), fUpperLimit, a.convertPhotonFlux_to_Ergs( fMinEnergy, iDF, true ) );
 			cout << endl;
@@ -778,7 +778,7 @@ void VFluxCalculation::printResults()
 */
 double VFluxCalculation::getFluxInCrabUnits( double iF, double iE, double iGamma )
 {
-// Whipple (Hillas 1998)
+	// Whipple (Hillas 1998)
 	double iCrab = 3.2e-7 / ( iGamma - 1. ) * TMath::Power( iE, -iGamma + 1. ) / 1.e4;
 	
 	return iF / iCrab;
@@ -791,7 +791,7 @@ double VFluxCalculation::getFluxInCrabUnits( double iF, double iE, double iGamma
 */
 double VFluxCalculation::getFluxInErgs( double iF, double iE )
 {
-// TeV to eV
+	// TeV to eV
 	iE *= 1.e12;
 	
 	iF *= iE;
@@ -824,7 +824,7 @@ void VFluxCalculation::calculateFluxes()
 		cout << "------------------" << endl;
 	}
 	
-// calculate total dead time corrected observation time
+	// calculate total dead time corrected observation time
 	double iTot = 0.;
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
@@ -839,8 +839,8 @@ void VFluxCalculation::calculateFluxes()
 	}
 	
 	double iEffNorm = 0.;
-//////////////////////////////////////////////////////////////
-// loop over all runs in run list
+	//////////////////////////////////////////////////////////////
+	// loop over all runs in run list
 	for( unsigned int i = 0; i < fRunList.size(); i++ )
 	{
 	
@@ -853,7 +853,7 @@ void VFluxCalculation::calculateFluxes()
 		IntraFluxCI_lo_3sigma.clear();
 		IntraFluxCI_up_3sigma.clear();
 		
-// effective area * observation time / dead time
+		// effective area * observation time / dead time
 		if( fRunList[i] > 0 )
 		{
 			iEffNorm = fRunEffArea[i] * fRunTOn[i] * ( 1. - fRunDeadTime[i] );
@@ -863,7 +863,7 @@ void VFluxCalculation::calculateFluxes()
 			iEffNorm = fRunEffArea[i] * iTot;
 		}
 		
-// calculate fluxes (numbers/norm)
+		// calculate fluxes (numbers/norm)
 		if( iEffNorm > 0. )
 		{
 			if( fRunUFL[i] < 0. )
@@ -890,8 +890,8 @@ void VFluxCalculation::calculateFluxes()
 			fRunFluxCI_lo_3sigma[i] = 0.;
 			fRunFluxCI_up_3sigma[i] = 0.;
 		}
-///////////////////////////////////////////////////////////////
-// calculate integral flux
+		///////////////////////////////////////////////////////////////
+		// calculate integral flux
 		if( fMaxEnergy == MAX_SAFE_MC_ENERGY )
 		{
 			if( fMinEnergy > 0. )
@@ -971,7 +971,7 @@ void VFluxCalculation::calculateFluxes()
 		}
 		
 		
-// Time BINs
+		// Time BINs
 		if( i < fIntraRunEffArea.size() )
 		{
 			for( unsigned int t = 0; t < fIntraRunEffArea[i].size(); t++ )
@@ -1176,7 +1176,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 	}
 	fMinEnergy = iMinEnergy;
 	
-// loop over all files
+	// loop over all files
 	for( unsigned int f = 0; f < fFile.size(); f++ )
 	{
 		if( !fFile[f] || !fFile[f]->cd() )
@@ -1200,8 +1200,8 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 		vector < double > IntraNdiffE;
 		
 		char hname[200];
-///////////////////////////////////////////////////
-// loop over all runs in run list
+		///////////////////////////////////////////////////
+		// loop over all runs in run list
 		for( unsigned int i = 0; i < fRunList.size(); i++ )
 		{
 			IntraNon.clear();
@@ -1209,12 +1209,12 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 			IntraNdiff.clear();
 			IntraNdiffE.clear();
 			
-// calculate number of events above given energy threshold for this run
+			// calculate number of events above given energy threshold for this run
 			if( ( int )fRunList[i] > 0 )
 			{
 				sprintf( hname, "run_%d/stereo/energyHistograms", ( int )fRunList[i] );
 				
-// OBS!!!
+				// OBS!!!
 				if( !fFile[f]->Get( hname ) )
 				{
 					continue;
@@ -1242,7 +1242,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 						return;
 					}
 				}
-// get number of on events above energy threshold
+				// get number of on events above energy threshold
 				fRunNon[i] = 0.;
 				for( int b = hon->GetNbinsX(); b > 0; b-- )
 				{
@@ -1257,7 +1257,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 					fRunNon[i] += hon->GetBinContent( b );
 				}
 				iTotOn += fRunNon[i];
-// get number of on events above energy threshold in Time BIN
+				// get number of on events above energy threshold in Time BIN
 				if( fTimebinned && hon2DtimeBinned )
 				{
 					for( int t = 0; t < hon2DtimeBinned->GetNbinsY(); t++ )
@@ -1281,7 +1281,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 					}
 				}
 				
-// get number of off events above energy threshold
+				// get number of off events above energy threshold
 				fRunNoff[i] = 0.;
 				for( int b = hoff->GetNbinsX(); b > 0; b-- )
 				{
@@ -1298,7 +1298,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 				}
 				iTotOff += fRunNoff[i];
 				
-// get number of off events above energy threshold in Time BIN
+				// get number of off events above energy threshold in Time BIN
 				if( fTimebinned && hoff2DtimeBinned )
 				{
 					for( int t = 0; t < hoff2DtimeBinned->GetNbinsY(); t++ )
@@ -1323,15 +1323,15 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 					}
 				}
 				
-// mean off norm
+				// mean off norm
 				if( fRunNorm[i] > 0. )
 				{
 					iTotOffNorm += 1. / fRunNorm[i];
 					iTotOffNormN++;
 				}
 			}
-////////////////////////
-// calculate number of events above given energy threshold for all runs
+			////////////////////////
+			// calculate number of events above given energy threshold for all runs
 			else
 			{
 				fRunNon[i] = iTotOn;
@@ -1342,10 +1342,10 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 					fRunNorm[i] = 1. / iTotOffNorm;
 				}
 			}
-////////////////////////
-// calculate N_diff
+			////////////////////////
+			// calculate N_diff
 			fRunNdiff[i] = fRunNon[i] - fRunNoff[i] * fRunNorm[i];
-// assuming poisson errors
+			// assuming poisson errors
 			fRunNdiffE[i] = sqrt( fRunNon[i] + fRunNoff[i] * fRunNorm[i] * fRunNorm[i] );
 			if( fRunTOn[i] > 0. )
 			{
@@ -1373,7 +1373,7 @@ void VFluxCalculation::getNumberOfEventsAboveEnergy( double iMinEnergy )
 				gDirectory->RecursiveRemove( hoff );
 			}
 			
-// Fill IntraRun Vectors
+			// Fill IntraRun Vectors
 			fIntraRunNon.push_back( IntraNon );
 			fIntraRunNoff.push_back( IntraNoff );
 			fIntraRunNdiff.push_back( IntraNdiff );
@@ -1435,7 +1435,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 		
 		if( fRunNorm[i] > 0. )
 		{
-// calculcate significance
+			// calculcate significance
 			fRunSigni[i] = VStatistics::calcSignificance( fRunNon[i], fRunNoff[i], fRunNorm[i], fLiMaEqu );
 			
 			if( i < fIntraRunNon.size() && i < fIntraRunNoff.size() )
@@ -1450,7 +1450,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 				IntraSigni.push_back( -99. );
 			}
 			
-// calculate upper flux if necessary
+			// calculate upper flux if necessary
 			if( fRunSigni[i] < fThresholdSignificance || fRunNon[i] < fMinEvents )
 			{
 				if( fDebug )
@@ -1468,7 +1468,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 			else
 			{
 				fRunUFL[i] = -99.;
-// calculate confidence intervals for fluxes
+				// calculate confidence intervals for fluxes
 				TRolke i_Rolke;
 				i_Rolke.SetCLSigmas( 1. );
 				i_Rolke.SetPoissonBkgKnownEff( ( int )fRunNon[i], ( int )fRunNoff[i], 1. / fRunNorm[i], 1. );
@@ -1479,7 +1479,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 				fRunCI_lo_3sigma[i] = i_Rolke.GetLowerLimit();
 				fRunCI_up_3sigma[i] = i_Rolke.GetUpperLimit();
 			}
-//Time BINs
+			//Time BINs
 			if( fTimebinned && i < fIntraRunNon.size() && i < fIntraRunNoff.size() )
 			{
 				for( unsigned int t = 0; t < fIntraRunNon[i].size(); t++ )
@@ -1496,7 +1496,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
 					else
 					{
 						IntraUFL.push_back( -99. );
-// calculate confidence intervals for fluxes
+						// calculate confidence intervals for fluxes
 						TRolke i_Rolke;
 						i_Rolke.SetCLSigmas( 1. );
 						i_Rolke.SetPoissonBkgKnownEff( ( int )fIntraRunNon[i][t], ( int )fIntraRunNoff[i][t], 1. / fRunNorm[i], 1. );
@@ -1552,7 +1552,7 @@ void VFluxCalculation::getFluxConfidenceInterval( int irun, double& iFlux_low, d
 	{
 		if( irun == fRunList[i] )
 		{
-// return flux values
+			// return flux values
 			if( b1Sigma )
 			{
 				iFlux_low = fRunFluxCI_lo_1sigma[i];
@@ -1578,7 +1578,7 @@ void VFluxCalculation::getFlux( int irun, double& iFlux, double& iFluxE, double&
 	{
 		if( irun == fRunList[i] )
 		{
-// return flux values
+			// return flux values
 			if( fRunUFL[i] < 0. )
 			{
 				iFlux = fRunFlux[i];
@@ -1607,19 +1607,19 @@ void VFluxCalculation::calculateIntegralFlux( double iMinEnergy )
 {
 	fMinEnergy = iMinEnergy;
 	
-// get number of events above threshold energy
+	// get number of events above threshold energy
 	if( fMinEnergy > 0. )
 	{
 		getNumberOfEventsAboveEnergy( fMinEnergy );
 	}
 	
-// calculate significances and upper limits
+	// calculate significances and upper limits
 	calculateSignificancesAndUpperLimits();
 	
-// calculate integrated spectral weighted effective areas
+	// calculate integrated spectral weighted effective areas
 	getIntegralEffectiveArea();
 	
-// calculate fluxes and upper flux limits
+	// calculate fluxes and upper flux limits
 	calculateFluxes();
 }
 
@@ -2156,14 +2156,14 @@ TGraphErrors* VFluxCalculation::plotFluxesInBINs( int run, char* iTex, double iM
 	}
 	else if( run > 0 )
 	{
-// get run number
+		// get run number
 		unsigned iRunIndex = getIndexOfRun( run );
 		if( iRunIndex >= fIntraRunFlux.size() )
 		{
 			cout << "run not found " << run << endl;
 			return 0;
 		}
-// loop over all time bins
+		// loop over all time bins
 		for( unsigned int t = 0; t < fIntraRunFlux[iRunIndex].size(); t++ )
 		{
 			if( fRunMJD[iRunIndex] > 10 )
@@ -2264,7 +2264,7 @@ void VFluxCalculation::cleanRunList()
 		{
 			iRemovePos.push_back( i );
 			fRunTOn[fRunTOn.size() - 1] += fRunTOn[i];
-// fRunZe[fRunTOff.size()-1]
+			// fRunZe[fRunTOff.size()-1]
 			fRunNon[fRunNon.size() - 1] += fRunNon[i];
 			fRunNoff[fRunNoff.size() - 1] += fRunNoff[i];
 		}
@@ -2312,7 +2312,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 	char hname[500];
 	
 	string sFluxMult = "";
-//    double fluxMult = 1.e7;
+	//    double fluxMult = 1.e7;
 	double fluxMult = 1.;
 	
 	map< int, double > iTDay;
@@ -2359,7 +2359,7 @@ TGraphErrors* VFluxCalculation::plotFluxesVSMJDDaily( char* iTex, double iMJDOff
 				iFluxDay[p->first] = iFluxDay[p->first] / p->second;
 				iFluxDayError[p->first] = sqrt( iFluxDayError[p->first] / p->second / p->second );
 				
-// fluxes in 1/[cm2 s ]
+				// fluxes in 1/[cm2 s ]
 				gFluxMJDDay->SetPoint( z, p->first - iMJDOffset, iFluxDay[p->first] * fluxMult );
 				gFluxMJDDay->SetPointError( z, 0., iFluxDayError[p->first] * fluxMult );
 				z++;
@@ -2468,7 +2468,7 @@ bool VFluxCalculation::readRXTE( string ifile )
 		fRXTE->reset();
 	}
 	
-// expect at least a few runs in the run list (-1 is one!)
+	// expect at least a few runs in the run list (-1 is one!)
 	if( fRunMJD.size() < 2 )
 	{
 		return false;
@@ -2488,7 +2488,7 @@ bool VFluxCalculation::readRXTE( string ifile )
 		}
 	}
 	cout << "RUNLIST : " << fRunMJD.size() << "\t" << iminMJD << "\t" << imaxMJD << endl;
-//   return fRXTE->readFile( ifile, "RXTE", getOrbitStart( iminMJD ), getOrbitEnd( imaxMJD ) );
+	//   return fRXTE->readFile( ifile, "RXTE", getOrbitStart( iminMJD ), getOrbitEnd( imaxMJD ) );
 	return fRXTE->readFile( ifile, "RXTE", 0., 0. );
 }
 

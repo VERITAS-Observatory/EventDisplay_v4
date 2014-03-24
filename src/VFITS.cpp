@@ -150,7 +150,7 @@ bool VFITS::writeNightlyFlux( bool iPrint )
 bool VFITS::writeSignificanceDistribution( bool iPrint )
 {
 	cout << " Write significance distribution to fits file" << endl;
-// get all histograms
+	// get all histograms
 	TH2D* hmap_stereo_sig = 0;
 	TH2D* hmap_stereo_on = 0;
 	
@@ -161,8 +161,8 @@ bool VFITS::writeSignificanceDistribution( bool iPrint )
 		cout << " Got necessary histograms from file" << endl;
 	}
 	
-// get 1D histograms
-
+	// get 1D histograms
+	
 	vector<pair<TH1D*, string> > vhist;
 	// with source
 	TH1D* hsig_1Dall  = get_Bin_Distribution( hmap_stereo_sig, -1, 1.2, 0., false, hmap_stereo_on );
@@ -188,11 +188,11 @@ bool VFITS::writeSignificanceDistribution( bool iPrint )
 		cout << " transformed significance distribution into FITS-table" << endl;
 	}
 	
-//     vector<int> hdunums;
-//     hdunums.push_back(WriteTH1DFits(hsig_1D,"significanceDist", "significance", "w/o Source", "sigma", "counts ", iPrint));
-//     hdunums.push_back(WriteTH1DFits(hsig_1Dall,"significanceDistAll", "significance", "w/ Source", "sigma", "counts ", iPrint));
-//     hdunums.push_back(WriteTH1DFits(hsig_1Dtest,"significanceDistTest", "significance", "w/o Source", "sigma", "counts ", iPrint));
-
+	//     vector<int> hdunums;
+	//     hdunums.push_back(WriteTH1DFits(hsig_1D,"significanceDist", "significance", "w/o Source", "sigma", "counts ", iPrint));
+	//     hdunums.push_back(WriteTH1DFits(hsig_1Dall,"significanceDistAll", "significance", "w/ Source", "sigma", "counts ", iPrint));
+	//     hdunums.push_back(WriteTH1DFits(hsig_1Dtest,"significanceDistTest", "significance", "w/o Source", "sigma", "counts ", iPrint));
+	
 	return true;
 }
 /********************************************/

@@ -123,9 +123,9 @@ VFitTraceHandler::VFitTraceHandler( string iFit )
 		exit( -1 );
 	}
 	fH1TraceData = new TH1D( "fH1TraceHandlerData", "", ( int )fMaxSamples, 0., fMaxSamples );
-// plotting histogram
+	// plotting histogram
 	fH1Trace = new TH1D( "fH1TraceHandler", "", fF1Trace->GetNpx(), 0., fMaxSamples );
-// diagnostic histograms (chi2, fitstat)
+	// diagnostic histograms (chi2, fitstat)
 	fHchi2 = new TH1D( "fHchi2", "Tracefit: chi2", 100, 0., 10. );
 	fHchi2->SetXTitle( "chi2" );
 	fHfitstat = new TH1D( "fHfitstat", "Tracefit: status of error matrix", 4, 0., 4. );
@@ -172,7 +172,7 @@ void VFitTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSam
 		return;
 	}
 	
-// copy trace
+	// copy trace
 	if( iNSamples != fpTrace.size() )
 	{
 		fpTrace.clear();
@@ -212,7 +212,7 @@ void VFitTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double ped
 	fPed = ped;
 	fPedrms = pedrms;
 	
-// copy trace
+	// copy trace
 	unsigned int i_tsize = pTrace.size();
 	if( i_tsize != fpTrace.size() )
 	{
@@ -242,7 +242,7 @@ void VFitTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedr
 	fPed = ped;
 	fPedrms = pedrms;
 	
-// copy trace
+	// copy trace
 	unsigned int i_tsize = pTrace.size();
 	if( i_tsize != fpTrace.size() )
 	{
@@ -275,71 +275,71 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
 	
 	fH1TraceData->Reset();
 	fH1Trace->SetLineStyle( 1 );
-// check if histogram size is still correct
+	// check if histogram size is still correct
 	if( ( int )fpTrace.size() != ( int )fH1TraceData->GetNbinsX() )
 	{
 		fH1TraceData->SetBins( ( int )fpTrace.size(), 0., ( double )fpTrace.size() );
 	}
-// fill histogram
+	// fill histogram
 	for( unsigned int i = 0; i < fpTrace.size(); i++ )
 	{
 		fH1TraceData->SetBinContent( i + 1, -1. * fpTrace[i] );
-// errors are signal+rms of pedestal
+		// errors are signal+rms of pedestal
 		fH1TraceData->SetBinError( i + 1, sqrt( fabs( fpTrace[i] - fPed ) + fPedrms * fPedrms ) / 2. );
 	}
 	
-// find start parameters
+	// find start parameters
 	double ipeak = 0.;
 	int ipeakpos = 0;
 	getQuickMax( 0, fpTrace.size(), ipeak, ipeakpos );
 	int ipeakStartX = 0;
 	ipeakStartX = ( int )getQuickTZero( 0, fpTrace.size() );
 	
-// fit only if peak value of trace is above threshold
+	// fit only if peak value of trace is above threshold
 	if( ipeak > fFitThresh * fPedrms )
 	{
 		if( fFitFunction == "ev" )
 		{
-// fit in samples
+			// fit in samples
 			fF1Trace->SetParameters( -1.*ipeak, ipeakpos, 0.6, 1.6, -1.*fPed );
-// fit in ns
-//	 fF1Trace->SetParameters( -1.*ipeak, ipeakpos*2, 1.2, 3.0, -1.*fPed );
+			// fit in ns
+			//	 fF1Trace->SetParameters( -1.*ipeak, ipeakpos*2, 1.2, 3.0, -1.*fPed );
 			fF1Trace->SetParNames( "Constant", "Mean", "Sigma", "Alpha", "Pedestal" );
 			fF1Trace->FixParameter( 4, -1.*fPed );
-// constant always negative
+			// constant always negative
 			fF1Trace->SetParLimits( 0, -5.e5, 0. );
-// fit in samples
+			// fit in samples
 			fF1Trace->SetParLimits( 2, 0.01, 20. );
-// fit in ns
-//	 fF1Trace->SetParLimits( 2, 0.1, 20. );
+			// fit in ns
+			//	 fF1Trace->SetParLimits( 2, 0.1, 20. );
 			fF1Trace->SetParLimits( 3, 0., 20. );
 		}
 		else if( fFitFunction == "grisu" )
 		{
-// fit in samples
+			// fit in samples
 			fF1Trace->SetParameters( 2.4, 8.0, 0., ipeakpos, -1.*ipeak,  -1.*fPed );
-// fit in ns
-//         fF1Trace->SetParameters( 2.4, 8.0, 0., 2.*ipeakpos, -1.*ipeak,  -1.*fPed );
+			// fit in ns
+			//         fF1Trace->SetParameters( 2.4, 8.0, 0., 2.*ipeakpos, -1.*ipeak,  -1.*fPed );
 			fF1Trace->SetParNames( "RT", "FT", "RC", "T0", "Constant", "Pedestal" );
 			fF1Trace->FixParameter( 2, 0. );
 			fF1Trace->SetParLimits( 0, 0., 20. );
 			fF1Trace->SetParLimits( 1, 0., 2000. );
 		}
 		
-// now fit everything
+		// now fit everything
 		if( !fMinuitPrint )
 		{
-//         fH1TraceData->Fit( fF1Trace, "0Q" );
+			//         fH1TraceData->Fit( fF1Trace, "0Q" );
 			fH1TraceData->Fit( fF1Trace, "E" );
 		}
 		else
 		{
 			fH1TraceData->Fit( fF1Trace, "E" );
 		}
-// pulse maximum
+		// pulse maximum
 		fTraceMax =  fF1Trace->GetMinimum( ( double )0., ( double )fMaxSamples );
 		fTraceMaxX = fF1Trace->GetMinimumX( ( double )0., ( double )fMaxSamples );
-// status of the error matrix
+		// status of the error matrix
 		double edm = 0.;
 		double amin = 0.;
 		double errdef = 0.;
@@ -351,10 +351,10 @@ void VFitTraceHandler::fitTrace( unsigned int chanID )
 			fH1Trace->SetLineStyle( 2 );
 		}
 		fHfitstat->Fill( fnstat );
-// chi2
+		// chi2
 		fChi2 = fF1Trace->GetChisquare() / ( fH1TraceData->GetNbinsX() - fF1Trace->GetNumberFreeParameters() );
 		fHchi2->Fill( fChi2 );
-// parameters
+		// parameters
 		if( fnstat > 0 )
 		{
 			fHxbar->Fill( ( double )chanID, fF1Trace->GetParameter( 1 ) );
@@ -462,8 +462,8 @@ TH1D* VFitTraceHandler::getFitHis()
 		fH1Trace->SetBinContent( i, ieval );
 	}
 	return fH1Trace;
-// preli! Want to see the error bars
-//   return fH1TraceData;
+	// preli! Want to see the error bars
+	//   return fH1TraceData;
 }
 
 

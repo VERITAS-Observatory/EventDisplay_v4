@@ -40,7 +40,7 @@ class VDeadTime
 		TH1D* hNEventTime;
 		TList* hisList;
 		
-// scalar related histograms
+		// scalar related histograms
 		TH1D* hScalarClock;
 		TH1D* hScalarBusy;
 		TH1D* hScalarDeadTimeFraction;

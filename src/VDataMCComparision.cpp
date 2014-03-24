@@ -24,13 +24,13 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
 	fCuts = 0;
 	fCalculateMVAValues = false;
 	
-// specral weighting (might be read from MC run header)
+	// specral weighting (might be read from MC run header)
 	fSpectralWeight = new VSpectralWeight();
 	fSpectralWeight->setMCParameter( 2.0, 0.05, 20. );
-// index MC events are weighted to
+	// index MC events are weighted to
 	fSpectralWeight->setSpectralIndex( 2.5 );
 	
-// setting all variables
+	// setting all variables
 	hisList = 0;
 	htheta2 = 0;
 	hltheta2 = 0;
@@ -277,7 +277,7 @@ void VDataMCComparision::defineHistograms()
 		hTel2D.push_back( hdistR.back() );
 	}
 	
-// telescope numbering starts at 1!
+	// telescope numbering starts at 1!
 	for( int i = 1; i <= fNTel; i++ )
 	{
 		if( bBckData )
@@ -556,11 +556,11 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts,
 
 bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts )
 {
-// quality cuts
+	// quality cuts
 	double fCoreMax_QC = 350.;       // cut on core distance
 	int    fNImages_min = 3;         // minimum number of images per event
 	fNImages_min = 2;
-// stereo cuts
+	// stereo cuts
 	double theta2_cut = 0.035;
 	if( iSingleTelescopeCuts > 0 || iSingleTelescopeCuts == -2 )
 	{
@@ -577,7 +577,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	double msl_min = -1.2;
 	double size2ndmax_min = 0.;
 	
-// single telescope cuts
+	// single telescope cuts
 	int    ntubes_min = 4;
 	double alpha_max = 8.;
 	double length_min = 0.12;
@@ -588,7 +588,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	double dist_min = -10.;
 	double dist_max = 1.e10;
 	
-// chain data files
+	// chain data files
 	TChain* iC = new TChain( "data" );
 	if( !iC->Add( ifile.c_str() ) )
 	{
@@ -600,7 +600,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	{
 		iC->SetTitle( iC->GetFile()->Get( "data" )->GetTitle() );
 		
-// get MC data
+		// get MC data
 		VMonteCarloRunHeader* iMC_H = ( VMonteCarloRunHeader* )iC->GetFile()->Get( "MC_runheader" );
 		if( iMC_H )
 		{
@@ -609,7 +609,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 				fSpectralWeight->setMCParameter( -1.*iMC_H->spectral_index, iMC_H->E_range[0], iMC_H->E_range[1] );
 				fSpectralWeight->print();
 				
-// Deals with CARE sims without full information in the run header
+				// Deals with CARE sims without full information in the run header
 				if( fSpectralWeight->getSpectralWeight( 1.0 ) == 0 )
 				{
 					cout << "WARNING: Probably something gone funky with the MC runheader" << endl;
@@ -688,21 +688,21 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 		fInput = 2;
 	}
 	
-////////////////////////////////////////////////////////////
-// VGammaHadronCuts is needed for calulate of MVA values
+	////////////////////////////////////////////////////////////
+	// VGammaHadronCuts is needed for calulate of MVA values
 	if( fCalculateMVAValues )
 	{
 		initialGammaHadronCuts();
 	}
 	
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-// now loop over all events
+	////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////
+	// now loop over all events
 	for( int i = 0; i < nentries; i++ )
 	{
 		fData->GetEntry( i );
 		
-// define astro object (each time a new run starts)
+		// define astro object (each time a new run starts)
 		if( iOldRun != fData->runNumber && fWobbleFromDataTree )
 		{
 		
@@ -737,14 +737,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			iOldRun = fData->runNumber;
 		}
 		
-// nimage cut
+		// nimage cut
 		if( fData->NImages < fNImages_min )
 		{
 			continue;
 		}
 		
-/////////////////////////////////////////////////
-// quality cuts
+		/////////////////////////////////////////////////
+		// quality cuts
 		if( fData->EChi2S < 0 )
 		{
 			continue;
@@ -762,36 +762,36 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			continue;
 		}
 		
-// AZ cut to check azimuth dependence of core distance distributions
+		// AZ cut to check azimuth dependence of core distance distributions
 		if( fAzRange && ( fData->Az < fAzMin || fData->Az > fAzMax ) )
 		{
 			continue;
 		}
 		
-/////////////////////////////////////////////////
-// direction cut
+		/////////////////////////////////////////////////
+		// direction cut
 		theta2 = fData->theta2;
-// get correct theta2 for wobble runs
-// (off data)
+		// get correct theta2 for wobble runs
+		// (off data)
 		if( fInput == 2 )
 		{
 			theta2 = ( fData->Yoff_derot - fWobbleNorth ) * ( fData->Yoff_derot - fWobbleNorth )
 					 + ( fData->Xoff_derot - fWobbleEast ) * ( fData->Xoff_derot - fWobbleEast );
 		}
-// MC data
+		// MC data
 		else if( fInput == 0 )
 		{
 			theta2 = ( fData->Yoff - fData->MCyoff ) * ( fData->Yoff - fData->MCyoff )
 					 + ( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff );
 		}
-// on data
+		// on data
 		else
 		{
 			theta2 = ( fData->Yoff_derot + fWobbleNorth ) * ( fData->Yoff_derot + fWobbleNorth )
 					 + ( fData->Xoff_derot + fWobbleEast ) * ( fData->Xoff_derot + fWobbleEast );
 		}
 		
-// MC energy and spectral weight is filled for simulations only
+		// MC energy and spectral weight is filled for simulations only
 		if( fInput == 0 && fData->MCe0 > 0 )
 		{
 			hErec->Fill( log10( fData->MCe0 ) );
@@ -809,11 +809,11 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			weight = 1.;
 		}
 		
-/////////////////////////////////////////////
-// fill histograms with all cuts applied
-//
-
-// quality cuts & theta2 cut only
+		/////////////////////////////////////////////
+		// fill histograms with all cuts applied
+		//
+		
+		// quality cuts & theta2 cut only
 		if( fSingleTelescopeCuts < -1 )
 		{
 			if( theta2 <= theta2_min || theta2 > theta2_cut )
@@ -826,10 +826,10 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			}
 		}
 		
-/////////////////////////////////////////////////////////
-//   ---    apply single telescope cuts  ----
-/////////////////////////////////////////////////////////
-//   apply single telescope cuts to the named telescope
+		/////////////////////////////////////////////////////////
+		//   ---    apply single telescope cuts  ----
+		/////////////////////////////////////////////////////////
+		//   apply single telescope cuts to the named telescope
 		if( fSingleTelescopeCuts > 0 )
 		{
 			if( fWobbleNorth != 0. || fWobbleEast != 0. )
@@ -925,8 +925,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			}
 		}
 		
-////////////////////////////////////////////////////////////////////////////////////////////////
-// stereo parameters
+		////////////////////////////////////////////////////////////////////////////////////////////////
+		// stereo parameters
 		if( fSingleTelescopeCuts != -1
 				|| ( theta2 >= theta2_min && theta2 < theta2_cut
 					 && fData->MSCW < msw_max && fData->MSCW > msw_min && fData->MSCL < msl_max && fData->MSCL > msl_min ) )
@@ -946,8 +946,8 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			}
 			
 			
-///////////////////////////////////////////////////////////////
-// core position relative to each telescope
+			///////////////////////////////////////////////////////////////
+			// core position relative to each telescope
 			for( int j = 0; j < fNTel; j++ )
 			{
 				if( fData->ntubes[j] > ntubes_min )
@@ -955,14 +955,14 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 					rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az,
 							 fTel_y[j], -1.*fTel_x[j], fTel_z[j] );
 					hR[j]->Fill( rdist1, weight );
-// camera distance is calculated relative to centre of camera (should be: wobble offset position (TODO))
+					// camera distance is calculated relative to centre of camera (should be: wobble offset position (TODO))
 					hdistR[j]->Fill( rdist1, sqrt( fData->cen_x[j]*fData->cen_x[j] + fData->cen_y[j]*fData->cen_y[j] ), weight );
 				}
 			}
 			
-///////////////////////////////////////////////////////////////
-// single telescope distributions
-//  (loop over all images
+			///////////////////////////////////////////////////////////////
+			// single telescope distributions
+			//  (loop over all images
 			for( int t = 0; t < fData->NImages; t++ )
 			{
 				int j = fData->ImgSel_list[t];

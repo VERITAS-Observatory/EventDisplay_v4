@@ -30,7 +30,7 @@ VShowerParameters::VShowerParameters( int iNTel, unsigned int iShortTree, unsign
 	for( unsigned int i = 0; i < fNMethods; i++ )
 	{
 		fTelIDImageSelected.push_back( it );
-//C. Duke 19Oct06
+		//C. Duke 19Oct06
 		fTelIDImageSelected_bitcode[i] = 0;
 		fShower_Xoff_DISP.push_back( i_f );
 		fShower_Yoff_DISP.push_back( i_f );
@@ -82,7 +82,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		fTreeSC->Branch( "PointingErrorX", fTelPointingErrorX, "PointingErrorX[NTel]/F" );
 		fTreeSC->Branch( "PointingErrorY", fTelPointingErrorY, "PointingErrorY[NTel]/F" );
 		
-//C. Duke 19Oct06 added locations of telescopes in SC plane
+		//C. Duke 19Oct06 added locations of telescopes in SC plane
 		sprintf( i_des, "Tel_x_SC[%d]/F", fNTel );
 		fTreeSC->Branch( "Tel_x_SC", fTel_x_SC, i_des );
 		sprintf( i_des, "Tel_y_SC[%d]/F", fNTel );
@@ -90,7 +90,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		sprintf( i_des, "Tel_z_SC[%d]/F", fNTel );
 		fTreeSC->Branch( "Tel_z_SC", fTel_z_SC, i_des );
 		
-// added C.Duke 21dec06
+		// added C.Duke 21dec06
 		fTreeSC->Branch( "TargetElev", &fTargetElevation, "TargetElev/F" );
 		fTreeSC->Branch( "TargetAzim", &fTargetAzimuth, "TargetAzim/F" );
 		fTreeSC->Branch( "TargetDec", &fTargetDec, "TargetDec/F" );
@@ -103,10 +103,10 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	fTreeSC->Branch( "LTrig", &fLTrig, "LTrig/l" );
 	fTreeSC->Branch( "Trig_list", fTrig_list, "Trig_list[NTrig]/s" );
 	fTreeSC->Branch( "Trig_type", fTrig_type, "Trig_type[NTrig]/s" );
-///////////////////////////////////
-// reconstructed shower parameters
-
-// number of different methods
+	///////////////////////////////////
+	// reconstructed shower parameters
+	
+	// number of different methods
 	sprintf( i_des, "NMethods/i" );
 	fTreeSC->Branch( "NMethods", &fNMethods, i_des );
 	if( fShortTree < 1 )
@@ -118,7 +118,7 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	sprintf( i_des, "NImages[NMethods]/s" );
 	fTreeSC->Branch( "NImages", fShowerNumImages, i_des );
 	
-// C. Duke 19Oct06  added bitmapped unsigned int array for images selected
+	// C. Duke 19Oct06  added bitmapped unsigned int array for images selected
 	sprintf( i_des, "ImgSel[NMethods]/l" );
 	fTreeSC->Branch( "ImgSel", fTelIDImageSelected_bitcode , i_des );
 	sprintf( i_des, "ImgSel_list[NMethods][%d]/b", VDST_MAXTELESCOPES );
@@ -151,9 +151,9 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		sprintf( i_des, "ra[NMethods]/F" );
 		fTreeSC->Branch( "ra", fRA, i_des );
 	}
-///////////////////////////////////////////////////////////////
-// (debug only)
-// should be commented for general analysis
+	///////////////////////////////////////////////////////////////
+	// (debug only)
+	// should be commented for general analysis
 	if( fShortTree < 1 )
 	{
 		sprintf( i_des, "NPairXY/i" );
@@ -171,8 +171,8 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 		sprintf( i_des, "PairDispWeight[NPairXY]/F" );
 		fTreeSC->Branch( "PairDispWeight", fShower_PairDispWeight, i_des );
 	}
-// (end debug only)
-///////////////////////////////////////////////////////////////
+	// (end debug only)
+	///////////////////////////////////////////////////////////////
 	sprintf( i_des, "Xcore[NMethods]/F" );
 	fTreeSC->Branch( "Xcore", fShowerXcore, i_des );
 	sprintf( i_des, "Ycore[NMethods]/F" );
@@ -189,45 +189,45 @@ void VShowerParameters::initTree( string iName, string iTitle, bool iMC )
 	sprintf( i_des, "Chi2[NMethods]/F" );
 	fTreeSC->Branch( "Chi2", fShower_Chi2, i_des );
 	
-//JG Model3D parameters (only written if run parameter set for model3D)
-//    if( fShortTree == 99 ) {
-//      fTreeSC->Branch( "Sel3D", &fSel3D, "Sel3D/F" );
-//      fTreeSC->Branch( "Saz3D", &fSaz3D, "Saz3D/F" );
-//      fTreeSC->Branch( "Xcore3D", &fXcore3D, "Xcore3D/F" );
-//      fTreeSC->Branch( "Ycore3D", &fYcore3D, "Ycore3D/F" );
-//      fTreeSC->Branch( "Smax3D", &fSmax3D, "Smax3D/F" );
-//      fTreeSC->Branch( "sigmaL3D", &fsigmaL3D, "sigmaL3D/F" );
-//      fTreeSC->Branch( "sigmaT3D", &fsigmaT3D, "sigmaT3D/F" );
-//      fTreeSC->Branch( "Nc3D", &fNc3D, "Nc3D/F" );
-//      fTreeSC->Branch( "Xoff3D", &fXoffModel3D, "Xoff3D/F" );
-//      fTreeSC->Branch( "Yoff3D", &fYoffModel3D, "Yoff3D/F" );
-//      fTreeSC->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/F" );
-//      fTreeSC->Branch( "Depth3D", &fDepth3D, "Depth3D/F" );
-//      fTreeSC->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/F" );
-//      fTreeSC->Branch( "ErrRWidth3D", &fErrRWidth3D, "ErrRWidth3D/F" );
-//      fTreeSC->Branch( "Converged3D", &fConverged3D, "Converged3D/b" );
-//      /// debug below ///
-//      fTreeSC->Branch( "StartGoodness3D", &fStartGoodness3D, "StartGoodness3D/F" );
-//      fTreeSC->Branch( "StartSel3D",   &fStartSel3D,   "StartSel3D/F" );
-//      fTreeSC->Branch( "StartSaz3D",   &fStartSaz3D,   "StartSaz3D/F" );
-//      fTreeSC->Branch( "StartXcore3D", &fStartXcore3D, "StartXcore3D/F" );
-//      fTreeSC->Branch( "StartYcore3D", &fStartYcore3D, "StartYcore3D/F" );
-//      fTreeSC->Branch( "StartSmax3D",  &fStartSmax3D,  "StartSmax3D/F" );
-//      fTreeSC->Branch( "StartsigmaL3D",&fStartsigmaL3D,"StartsigmaL3D/F" );
-//      fTreeSC->Branch( "StartsigmaT3D",&fStartsigmaT3D,"StartsigmaT3D/F" );
-//      fTreeSC->Branch( "StartNc3D",    &fStartNc3D,    "StartNc3D/F" );
-//      fTreeSC->Branch( "ErrorSel3D",   &fErrorSel3D,   "ErrorSel3D/F" );
-//      fTreeSC->Branch( "ErrorSaz3D",   &fErrorSaz3D,   "ErrorSaz3D/F" );
-//      fTreeSC->Branch( "ErrorXcore3D", &fErrorXcore3D, "ErrorXcore3D/F" );
-//      fTreeSC->Branch( "ErrorYcore3D", &fErrorYcore3D, "ErrorYcore3D/F" );
-//      fTreeSC->Branch( "ErrorSmax3D",  &fErrorSmax3D,  "ErrorSmax3D/F" );
-//      fTreeSC->Branch( "ErrorsigmaL3D",&fErrorsigmaL3D,"ErrorsigmaL3D/F" );
-//      fTreeSC->Branch( "ErrorsigmaT3D",&fErrorsigmaT3D,"ErrorsigmaT3D/F" );
-//      fTreeSC->Branch( "ErrorNc3D",    &fErrorNc3D,    "ErrorNc3D/F" );
-//
-//    }
-
-// MC parameters
+	//JG Model3D parameters (only written if run parameter set for model3D)
+	//    if( fShortTree == 99 ) {
+	//      fTreeSC->Branch( "Sel3D", &fSel3D, "Sel3D/F" );
+	//      fTreeSC->Branch( "Saz3D", &fSaz3D, "Saz3D/F" );
+	//      fTreeSC->Branch( "Xcore3D", &fXcore3D, "Xcore3D/F" );
+	//      fTreeSC->Branch( "Ycore3D", &fYcore3D, "Ycore3D/F" );
+	//      fTreeSC->Branch( "Smax3D", &fSmax3D, "Smax3D/F" );
+	//      fTreeSC->Branch( "sigmaL3D", &fsigmaL3D, "sigmaL3D/F" );
+	//      fTreeSC->Branch( "sigmaT3D", &fsigmaT3D, "sigmaT3D/F" );
+	//      fTreeSC->Branch( "Nc3D", &fNc3D, "Nc3D/F" );
+	//      fTreeSC->Branch( "Xoff3D", &fXoffModel3D, "Xoff3D/F" );
+	//      fTreeSC->Branch( "Yoff3D", &fYoffModel3D, "Yoff3D/F" );
+	//      fTreeSC->Branch( "Goodness3D", &fGoodness3D, "Goodness3D/F" );
+	//      fTreeSC->Branch( "Depth3D", &fDepth3D, "Depth3D/F" );
+	//      fTreeSC->Branch( "RWidth3D", &fRWidth3D, "RWidth3D/F" );
+	//      fTreeSC->Branch( "ErrRWidth3D", &fErrRWidth3D, "ErrRWidth3D/F" );
+	//      fTreeSC->Branch( "Converged3D", &fConverged3D, "Converged3D/b" );
+	//      /// debug below ///
+	//      fTreeSC->Branch( "StartGoodness3D", &fStartGoodness3D, "StartGoodness3D/F" );
+	//      fTreeSC->Branch( "StartSel3D",   &fStartSel3D,   "StartSel3D/F" );
+	//      fTreeSC->Branch( "StartSaz3D",   &fStartSaz3D,   "StartSaz3D/F" );
+	//      fTreeSC->Branch( "StartXcore3D", &fStartXcore3D, "StartXcore3D/F" );
+	//      fTreeSC->Branch( "StartYcore3D", &fStartYcore3D, "StartYcore3D/F" );
+	//      fTreeSC->Branch( "StartSmax3D",  &fStartSmax3D,  "StartSmax3D/F" );
+	//      fTreeSC->Branch( "StartsigmaL3D",&fStartsigmaL3D,"StartsigmaL3D/F" );
+	//      fTreeSC->Branch( "StartsigmaT3D",&fStartsigmaT3D,"StartsigmaT3D/F" );
+	//      fTreeSC->Branch( "StartNc3D",    &fStartNc3D,    "StartNc3D/F" );
+	//      fTreeSC->Branch( "ErrorSel3D",   &fErrorSel3D,   "ErrorSel3D/F" );
+	//      fTreeSC->Branch( "ErrorSaz3D",   &fErrorSaz3D,   "ErrorSaz3D/F" );
+	//      fTreeSC->Branch( "ErrorXcore3D", &fErrorXcore3D, "ErrorXcore3D/F" );
+	//      fTreeSC->Branch( "ErrorYcore3D", &fErrorYcore3D, "ErrorYcore3D/F" );
+	//      fTreeSC->Branch( "ErrorSmax3D",  &fErrorSmax3D,  "ErrorSmax3D/F" );
+	//      fTreeSC->Branch( "ErrorsigmaL3D",&fErrorsigmaL3D,"ErrorsigmaL3D/F" );
+	//      fTreeSC->Branch( "ErrorsigmaT3D",&fErrorsigmaT3D,"ErrorsigmaT3D/F" );
+	//      fTreeSC->Branch( "ErrorNc3D",    &fErrorNc3D,    "ErrorNc3D/F" );
+	//
+	//    }
+	
+	// MC parameters
 	if( iMC )
 	{
 		fTreeSC->Branch( "MCprim", &MCprimary, "MCprimary/I" );
@@ -276,7 +276,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 	fNTrig = 0;
 	fLTrig = 0;
 	
-// added C.Duke 21dec06
+	// added C.Duke 21dec06
 	fTargetElevation = 0.0;
 	fTargetAzimuth   = 0.0;
 	fTargetDec       = 0.0;
@@ -284,7 +284,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 	fWobbleNorth     = 0.0;
 	fWobbleEast      = 0.0;
 	
-// reconstructed shower parameters
+	// reconstructed shower parameters
 	fNumImages = 0;
 	for( unsigned int i = 0; i < fNMethods; i++ )
 	{
@@ -337,7 +337,7 @@ void VShowerParameters::reset( unsigned int iNTel )
 		fTel_y_SC[j] = 0.;
 		fTel_z_SC[j] = 0.;
 	}
-// MC parameters
+	// MC parameters
 	MCprimary = 0;
 	MCenergy = 0.;
 	MCxcore = 0.;

@@ -55,7 +55,7 @@ class VCalibrationData
 		
 		vector<int> fChannelStatus;               //!< pixel status
 		
-// pedestals
+		// pedestals
 		valarray< int > fTS_MJD;                  //!< MJD for pedestals in time slices
 		valarray< double > fTS_time;              //!< time for pedestals in time slices
 		valarray<double> fPeds;                   //!< mean pedestal
@@ -77,7 +77,7 @@ class VCalibrationData
 		valarray< valarray< double > > fLowGainTS_fVmeanPedvars;          //! time dependent mean pedestal variation [time slice][summation window]
 		valarray< valarray< double > > fLowGainTS_fVmeanRMSPedvars;       //!< time dependent RMS of pedestal variation [time slice][summation window]
 		
-// high gain channels
+		// high gain channels
 		valarray<double>  fPedrms;                //!< pedestal variance
 		vector< double > fVmeanPedvars;           //!< mean pedestal variance (for different sumwindows)
 		vector< double > fVmeanRMSPedvars;        //!< RMS pedestal variance (for different sumwindows)
@@ -91,7 +91,7 @@ class VCalibrationData
 		valarray<double> fAverageTzero;
 		valarray<double> fAverageTzerovars;
 		
-// low gain channels
+		// low gain channels
 		bool fBoolLowGainPedestals;
 		
 		valarray<double> fLowGainPedsrms;         //!< low gain mean pedestal variance
@@ -100,7 +100,7 @@ class VCalibrationData
 		vector< double > fVmeanLowGainPedvars;
 		vector< double > fVmeanRMSLowGainPedvars;
 		
-// low gain multipliers
+		// low gain multipliers
 		/*
 		We now have 2 types of low gain multipliers. Both are currently assumed to be the same for all channels in a telescope, but can vary between telescopes. Both are read in from the calibrationlist.lowgain.dat.
 		
@@ -119,11 +119,11 @@ class VCalibrationData
 		vector<int> fLowGainDefaultSumWindows;				// remember default sumwindows for which low gain multipliers have been read in.
 		
 		
-// average tzero
+		// average tzero
 		double fAverageTZero_highgain;
 		double fAverageTZero_lowgain;
 		
-// low gain: time offsets
+		// low gain: time offsets
 		bool fBoolLowGainTOff;
 		valarray<double> fLowGainTOffsets;        //!< time offsets
 		valarray<double> fLowGainTOffsetvars;     //!< time offset variance

@@ -38,7 +38,7 @@ class VAtmosphereSoundings
 		
 		vector< string > fListTextFile;
 		
-// tree writing and reading
+		// tree writing and reading
 		TFile* fDataFile;
 		TTree* fDataTree;
 		
@@ -62,7 +62,7 @@ class VAtmosphereSoundings
 		
 		string           fTXTSearch_DataString;
 		
-// data containers
+		// data containers
 		vector< VAtmosphereSoundingData* > fData;                         // profile from soundings data
 		vector< VAtmosphereSoundingData* > fDataInterpol;
 		vector< VAtmosphereSoundingData* > fDataCORSIKAMODTRAN;           // CORSIKA/MODTRAN profile
@@ -72,11 +72,11 @@ class VAtmosphereSoundings
 		vector <double> fHeights;
 		vector <double> fModtranHeights;
 		
-// periods to calculate average over
+		// periods to calculate average over
 		map< unsigned int, string > fPlottingPeriodFiles;
 		map< unsigned int, vector< unsigned int > > fPlottingPeriodDates;
 		
-// plotting
+		// plotting
 		bool   fPlotRelativePlots;
 		bool   fBoolColorChange;
 		vector< TLegend* > fPlottingLegend;
@@ -87,7 +87,7 @@ class VAtmosphereSoundings
 		double fPlottingHeight_min;
 		double fPlottingHeight_max;
 		
-// observatory
+		// observatory
 		double fObservatoryLatitude;
 		double fObservatoryHeight_km;
 		

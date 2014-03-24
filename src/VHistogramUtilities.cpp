@@ -76,8 +76,8 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 	}
 	
 	int zz = 0;
-//////////////////////////////////////////////////////////////////////
-// median
+	//////////////////////////////////////////////////////////////////////
+	// median
 	if( iMeanType == "median" )
 	{
 		double i_a[] = { 0.32, 0.5, 0.68 };
@@ -104,8 +104,8 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 			}
 		}
 	}
-//////////////////////////////////////////////////////////////////////
-// mean
+	//////////////////////////////////////////////////////////////////////
+	// mean
 	else
 	{
 		for( int b = 1; b <= iP->GetNbinsX(); b++ )
@@ -136,8 +136,8 @@ TGraphErrors* VHistogramUtilities::get_Profile_from_TH2D( TH2D* iP, TGraphErrors
 		}
 	}
 	
-//////////////////////////////////////////////////////////////////////
-// rebinning
+	//////////////////////////////////////////////////////////////////////
+	// rebinning
 	if( rbin == 2 )
 	{
 		int z = 0;
@@ -171,7 +171,7 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 		return 0;
 	}
 	
-// clone input histogram
+	// clone input histogram
 	char hname[600];
 	if( iNewHistoName.size() == 0 )
 	{
@@ -183,7 +183,7 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 	}
 	TH2* iHInter = ( TH2* )hResponseMatrix->Clone( hname );
 	
-// calculate median energy for each y-bin (true energy axis)
+	// calculate median energy for each y-bin (true energy axis)
 	double xq[] = { 0.16, 0.50, 0.84 };
 	double yq[] = { 0.0,  0.0, 0.0  };
 	TH1D hOff( "hMeanOffset", "", 100, -2., 2. );
@@ -198,7 +198,7 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 			{
 				h->GetQuantiles( 3, yq, xq );
 			}
-// count number of filled bins
+			// count number of filled bins
 			unsigned int i_filled = 0;
 			for( int j = 1; j <= h->GetNbinsX(); j++ )
 			{
@@ -225,11 +225,11 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 		}
 	}
 	hOff.GetQuantiles( 3, yq, xq );
-//////////////////////////////////
-// interpolate the missing bins
+	//////////////////////////////////
+	// interpolate the missing bins
 	double y = 0;
 	double x = 0.;
-// rms shouldn't be larger than bin width
+	// rms shouldn't be larger than bin width
 	double rms = yq[2] - yq[1];
 	if( rms > iHInter->GetXaxis()->GetBinWidth( 1 ) )
 	{
@@ -237,12 +237,12 @@ TH2* VHistogramUtilities::interpolateResponseMatrix( TH2* hResponseMatrix, strin
 	}
 	for( unsigned int i = 0; i < iYBinToInterpolate.size(); i++ )
 	{
-// don't interpolate the smallest energies
+		// don't interpolate the smallest energies
 		if( iYBinToInterpolate[i] <= iyBinFirstToInterpolate )
 		{
 			continue;
 		}
-// fill a normal distribution at the median position
+		// fill a normal distribution at the median position
 		y = iHInter->GetYaxis()->GetBinCenter( iYBinToInterpolate[i] );
 		for( unsigned int j = 0; j < 100; j++ )
 		{
@@ -293,7 +293,7 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 		return 0;
 	}
 	
-// clone input histogram
+	// clone input histogram
 	char hname[600];
 	sprintf( hname, "%s_CUMU", iH_in->GetName() );
 	TH1D* iH_out = ( TH1D* )iH_in->Clone( hname );
@@ -302,7 +302,7 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	if( iLeft_to_right )
 	{
 		iH_out->SetBinContent( 1, iH_in->GetBinContent( 1 ) );
-// loop over all bins
+		// loop over all bins
 		for( int i = 2; i <= iH_in->GetNbinsX(); i++ )
 		{
 			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i - 1 ) );
@@ -311,7 +311,7 @@ TH1D* VHistogramUtilities::get_Cumulative_Histogram( TH1D* iH_in, bool iNormaliz
 	else
 	{
 		iH_out->SetBinContent( iH_in->GetNbinsX(), iH_in->GetBinContent( iH_in->GetNbinsX() ) );
-// loop over all bins
+		// loop over all bins
 		for( int i = iH_in->GetNbinsX(); i > 2; i-- )
 		{
 			iH_out->SetBinContent( i, iH_in->GetBinContent( i ) + iH_out->GetBinContent( i + 1 ) );
@@ -336,13 +336,13 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 		return 0;
 	}
 	
-// no distance cut for rmax < 0
+	// no distance cut for rmax < 0
 	if( rmax < 0. )
 	{
 		rmax = 1.e6;
 	}
 	
-// get binning
+	// get binning
 	int nbin = 100;
 	double xmin = 9999999.;
 	double xmax = h->GetMaximum() * 1.5;
@@ -394,26 +394,26 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 		h1D = new TH1D( hname, "", nbin, xmin, xmax );
 	}
 	
-// fill the histogram
+	// fill the histogram
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
 		double x_r = h->GetXaxis()->GetBinCenter( i );
 		for( int j = 1; j <= h->GetNbinsY(); j++ )
 		{
-// exclude bins with no on counts
+			// exclude bins with no on counts
 			if( hTest && hTest->GetBinContent( i, j ) == 0. )
 			{
 				continue;
 			}
 			
 			double y_r = h->GetYaxis()->GetBinCenter( j );
-// radius cut
+			// radius cut
 			if( TMath::Sqrt( x_r * x_r + y_r * y_r ) > rmax )
 			{
 				continue;
 			}
 			
-// exclusion regions
+			// exclusion regions
 			bool iBBreak = false;
 			for( int e = 0; e < iExcN; e++ )
 			{
@@ -427,7 +427,7 @@ TH1D* VHistogramUtilities::get_Bin_Distribution( TH2D* h, int ion, double rmax, 
 			{
 				continue;
 			}
-// exclude bins around center of sky map
+			// exclude bins around center of sky map
 			if( TMath::Sqrt( x_r * x_r + y_r * y_r ) > rSource )
 			{
 				h1D->Fill( h->GetBinContent( i, j ) );
@@ -501,7 +501,7 @@ bool VHistogramUtilities::get_Graph_from_Histogram( TH1* h, TGraphAsymmErrors* g
 			}
 			else
 			{
-// remove unrealistic errors (e.g. error is iCutUnrealisticErrorsx the bin content)
+				// remove unrealistic errors (e.g. error is iCutUnrealisticErrorsx the bin content)
 				if( iCutUnrealisticErrors > 0. && h->GetBinContent( i ) && h->GetBinError( i ) / h->GetBinContent( i ) > iCutUnrealisticErrors )
 				{
 					g->SetPointEYlow( z, 0. );
@@ -550,13 +550,13 @@ TH1F* VHistogramUtilities::get_CTA_IRF_Histograms( string iHistogramName, double
 	TH1F* h = 0;
 	TH2F* h2D = 0;
 	char hname[200];
-// gamma-ray effective area
-// get on-axis results
+	// gamma-ray effective area
+	// get on-axis results
 	if( iCameraOffset <= 1.e-2 )
 	{
 		h = ( TH1F* )gDirectory->Get( iHistogramName.c_str() );
 	}
-// get off-axis results
+	// get off-axis results
 	else
 	{
 		sprintf( hname, "%s_offaxis", iHistogramName.c_str() );
@@ -773,7 +773,7 @@ TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D* h, string inewHis
 	hNew->SetYTitle( "containment" );
 	hNew->SetZTitle( "angular resolution [deg]" );
 	
-// loop over all energy bins
+	// loop over all energy bins
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
 		double iTot = 0.;
@@ -785,7 +785,7 @@ TH2D* VHistogramUtilities::calculateContainmentDistance( TH2D* h, string inewHis
 		{
 			continue;
 		}
-// integrate from high to low y values
+		// integrate from high to low y values
 		double iSum = 0.;
 		for( int j = 1; j <= h->GetNbinsY(); j++ )
 		{
@@ -814,7 +814,7 @@ TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2* h, string inewHistogramNa
 	int nBinY_min = 99999;
 	int nBinY_max = -1;
 	
-// get minima and maxima
+	// get minima and maxima
 	for( int i = 1; i <= h->GetNbinsX(); i++ )
 	{
 		for( int j = 1; j <= h->GetNbinsY(); j++ )
@@ -848,7 +848,7 @@ TH2F* VHistogramUtilities::reduce2DHistogramSize( TH2* h, string inewHistogramNa
 		nBinY_max = h->GetNbinsY();
 	}
 	nBinY_min = 1;
-// create new histogram with reduced binning
+	// create new histogram with reduced binning
 	float xmin = h->GetXaxis()->GetBinLowEdge( 1 );
 	if( nBinX_min > 0 )
 	{

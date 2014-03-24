@@ -147,7 +147,7 @@ unsigned int VExposure::getLaserDate( unsigned int iRunNumber )
 	{
 		return -1;
 	}
-// get date
+	// get date
 	if( db_row->GetField( 6 ) )
 	{
 		string iTemp = db_row->GetField( 6 );
@@ -204,13 +204,13 @@ bool VExposure::readFromDB()
 			break;
 		}
 		
-// all fields should be defined (check if field #19 is there)
+		// all fields should be defined (check if field #19 is there)
 		if( !db_row->GetField( 19 ) )
 		{
 			continue;
 		}
 		itemp = db_row->GetField( 19 );
-// don't use laser or charge injection runs
+		// don't use laser or charge injection runs
 		if( itemp == "NOSOURCE" )
 		{
 			continue;
@@ -221,7 +221,7 @@ bool VExposure::readFromDB()
 			continue;
 		}
 		itemp = db_row->GetField( 1 );
-// check if this run is an observing run
+		// check if this run is an observing run
 		if( fObservingMode == "Normal" )
 		{
 			if( itemp != "observing" )
@@ -229,7 +229,7 @@ bool VExposure::readFromDB()
 				continue;
 			}
 		}
-// check if this run is an observing/redHV/UVFilter run
+		// check if this run is an observing/redHV/UVFilter run
 		else if( fObservingMode == "Special" )
 		{
 			if( itemp != "observing" && itemp != "obsFilter" && itemp != "obsLowHV" )
@@ -240,35 +240,35 @@ bool VExposure::readFromDB()
 		
 		fRunObsMode.push_back( itemp );
 		
-// get run status
+		// get run status
 		if( !db_row->GetField( 3 ) )
 		{
 			continue;
 		}
 		itemp = db_row->GetField( 3 );
-// don't use aborted runs
+		// don't use aborted runs
 		if( itemp == "aborted" )
 		{
 			continue;
 		}
-// don't use runs which are started only
+		// don't use runs which are started only
 		if( itemp == "started" )
 		{
 			continue;
 		}
-// don't use runs which are defined only
+		// don't use runs which are defined only
 		if( itemp == "defined" )
 		{
 			continue;
 		}
-// don't use runs which are prepared only
+		// don't use runs which are prepared only
 		if( itemp == "prepared" )
 		{
 			continue;
 		}
 		
-// get date
-
+		// get date
+		
 		if( db_row->GetField( 6 ) )
 		{
 			string iTemp = db_row->GetField( 6 );
@@ -287,8 +287,8 @@ bool VExposure::readFromDB()
 			cout << db_row->GetField( 1 ) << " " << db_row->GetField( 3 ) << " " << flush;
 		}
 		
-//////
-// get source coordinates
+		//////
+		// get source coordinates
 		double iRa = 0.;
 		double iDec = 0.;
 		itemp = db_row->GetField( 19 );
@@ -306,8 +306,8 @@ bool VExposure::readFromDB()
 		fRunoffsetDec.push_back( atof( db_row->GetField( 16 ) ) * 180. / TMath::Pi() );
 		fRunConfigMask.push_back( atoi( db_row->GetField( 10 ) ) );
 		
-//////
-// get galactic coordinates
+		//////
+		// get galactic coordinates
 		double i_b = 0.;
 		double i_l = 0.;
 		iRa  += fRunoffsetRA.back();
@@ -325,8 +325,8 @@ bool VExposure::readFromDB()
 			cout << " " << fRunGalLong1958.back() << " " << fRunGalLat1958.back() << " " << flush;
 		}
 		
-//////
-// calculate MJD, etc.
+		//////
+		// calculate MJD, etc.
 		int iMJD = 0;
 		double iTime1 = 0.;
 		double iTime2 = 0.;
@@ -372,10 +372,10 @@ bool VExposure::readFromDB()
 		}
 		fRun.push_back( atoi( itemp.c_str() ) );
 		
-//       itemp = db_row->GetField( 2 );
+		//       itemp = db_row->GetField( 2 );
 		fRunStatus.push_back( "" );
 		
-// Wobble Stuff
+		// Wobble Stuff
 		double fWobbleNorth = -9999.;
 		double fWobbleEast = -9999.;
 		
@@ -418,25 +418,25 @@ bool VExposure::readFromDB()
 		fWobbleN.push_back( fWobbleNorth );
 		fWobbleE.push_back( fWobbleEast );
 		
-//////
-// get local coordinates
-
+		//////
+		// get local coordinates
+		
 		double ha = 0.;
 		double iSid = 0.;
 		double az, el;
-// get Greenwich sideral time
+		// get Greenwich sideral time
 		iSid = slaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
-// calculate local sideral time
+		// calculate local sideral time
 		iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
-// calculate hour angle
+		// calculate hour angle
 		ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
-// get horizontal coordinates
+		// get horizontal coordinates
 		slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
-// fill vectors
+		// fill vectors
 		fRunTelElevation.push_back( el * 180. / TMath::Pi() );
 		fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
 		
-////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////
 		if( fDebug )
 		{
 			cout << fRunStatus.back() << " " << fRun.back() << flush;
@@ -489,55 +489,55 @@ bool VExposure::readFromDBList()
 			break;
 		}
 		
-//////
-// all fields should be defined (check if field #19 is there)
+		//////
+		// all fields should be defined (check if field #19 is there)
 		if( !db_row->GetField( 19 ) )
 		{
 			continue;
 		}
 		itemp = db_row->GetField( 19 );
-// don't use laser or charge injection runs
-//TEMPTEMPTEMP      if( itemp == "NOSOURCE" ) continue; // Removed to allow -r option to download laser runs
-
-//////
-// check if this run is an observing run
+		// don't use laser or charge injection runs
+		//TEMPTEMPTEMP      if( itemp == "NOSOURCE" ) continue; // Removed to allow -r option to download laser runs
+		
+		//////
+		// check if this run is an observing run
 		if( !db_row->GetField( 1 ) )
 		{
 			continue;
 		}
 		itemp = db_row->GetField( 1 );
-//TEMPTEMPTEMP      if( itemp != "observing" ) continue; // Removed to allow -r option to download laser runs
-
-//////
-// get run status
+		//TEMPTEMPTEMP      if( itemp != "observing" ) continue; // Removed to allow -r option to download laser runs
+		
+		//////
+		// get run status
 		if( !db_row->GetField( 3 ) )
 		{
 			continue;
 		}
 		itemp = db_row->GetField( 3 );
-// don't use aborted runs
+		// don't use aborted runs
 		if( itemp == "aborted" )
 		{
 			continue;
 		}
-// don't use runs which are started only
+		// don't use runs which are started only
 		if( itemp == "started" )
 		{
 			continue;
 		}
-// don't use runs which are defined only
+		// don't use runs which are defined only
 		if( itemp == "defined" )
 		{
 			continue;
 		}
-// don't use runs which are prepared only
+		// don't use runs which are prepared only
 		if( itemp == "prepared" )
 		{
 			continue;
 		}
 		
-// get date
-
+		// get date
+		
 		if( db_row->GetField( 6 ) )
 		{
 			string iTemp = db_row->GetField( 6 );
@@ -547,8 +547,8 @@ bool VExposure::readFromDBList()
 			}
 		}
 		
-//////
-// get source coordinates
+		//////
+		// get source coordinates
 		double iRa = 0.;
 		double iDec = 0.;
 		itemp = db_row->GetField( 19 );
@@ -566,13 +566,13 @@ bool VExposure::readFromDBList()
 		fRunoffsetDec.push_back( atof( db_row->GetField( 16 ) ) * 180. / TMath::Pi() );
 		fRunConfigMask.push_back( atoi( db_row->GetField( 10 ) ) );
 		
-//observing mode
+		//observing mode
 		itemp = db_row->GetField( 1 );
 		fRunObsMode.push_back( itemp );
 		
-//////
-// Wobble Stuff
-
+		//////
+		// Wobble Stuff
+		
 		double fWobbleNorth = -9999.;
 		double fWobbleEast = -9999.;
 		
@@ -621,8 +621,8 @@ bool VExposure::readFromDBList()
 		fWobbleN.push_back( fWobbleNorth );
 		fWobbleE.push_back( fWobbleEast );
 		
-//////
-// get galactic coordinates
+		//////
+		// get galactic coordinates
 		double i_b = 0.;
 		double i_l = 0.;
 		iRa  += fRunoffsetRA.back();
@@ -640,8 +640,8 @@ bool VExposure::readFromDBList()
 			cout << " " << fRunGalLong1958.back() << " " << fRunGalLat1958.back() << " " << flush;
 		}
 		
-//////
-// calculate MJD, etc.
+		//////
+		// calculate MJD, etc.
 		int iMJD = 0;
 		double iTime1 = 0.;
 		double iTime2 = 0.;
@@ -687,28 +687,28 @@ bool VExposure::readFromDBList()
 		}
 		fRun.push_back( atoi( itemp.c_str() ) );
 		
-//       itemp = db_row->GetField( 2 );
+		//       itemp = db_row->GetField( 2 );
 		fRunStatus.push_back( "" );
 		
-//////
-// get local coordinates
-
+		//////
+		// get local coordinates
+		
 		double ha = 0.;
 		double iSid = 0.;
 		double az, el;
-// get Greenwich sideral time
+		// get Greenwich sideral time
 		iSid = slaGmsta( ( double )iMJD, ( iTime1 + iTime2 ) / 2. / 86400. );
-// calculate local sideral time
+		// calculate local sideral time
 		iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
-// calculate hour angle
+		// calculate hour angle
 		ha = slaDranrm( iSid - iRa / 180. * TMath::Pi() );
-// get horizontal coordinates
+		// get horizontal coordinates
 		slaDe2h( ha, iDec / 180. * TMath::Pi(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &az, &el );
-// fill vectors
+		// fill vectors
 		fRunTelElevation.push_back( el * 180. / TMath::Pi() );
 		fRunTelAzimuth.push_back( az * 180. / TMath::Pi() );
 		
-////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////
 		if( fDebug )
 		{
 			cout << fRunStatus.back() << " " << fRun.back() << flush;
@@ -932,8 +932,8 @@ void VExposure::fillExposureMap()
 	
 	double r_dist = 0.;
 	
-//////////////////////////////////////////////////////////////////////
-// loop over all runs and fill the map
+	//////////////////////////////////////////////////////////////////////
+	// loop over all runs and fill the map
 	for( unsigned int i = 0; i < fRunGalLong1958.size(); i++ )
 	{
 		double l = fRunGalLong1958[i];
@@ -959,7 +959,7 @@ void VExposure::fillExposureMap()
 		{
 			double b_pos = fMapGal2D->GetYaxis()->GetBinCenter( b );
 			
-// calculate extension in longitude
+			// calculate extension in longitude
 			int i_r_l = 1;
 			if( cos( b_pos * TMath::Pi() / 180. ) > 0. )
 			{
@@ -988,7 +988,7 @@ void VExposure::fillExposureMap()
 								  fRunGalLat1958[i] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
 				if( r_dist < fMaximumIntegrationRadius && fRunDuration[i] > 0. )
 				{
-// galactic longitudes are from 180. to -180.
+					// galactic longitudes are from 180. to -180.
 					l_pos *= -1.;
 					fMapGal2D->Fill( l_pos, b_pos, fRunDuration[i] / 3600. );
 					fRadAccMapGal2D->Fill( l_pos, b_pos, fRunDuration[i] / 3600. * getAcceptance( r_dist ) );
@@ -998,8 +998,8 @@ void VExposure::fillExposureMap()
 	}
 	cout << "entries " << fMapGal2D->GetEntries() << endl;
 	
-/////////////////////////////////
-// calculate aitoff projection
+	/////////////////////////////////
+	// calculate aitoff projection
 	double al = 0.;
 	double ab = 0.;
 	double xl = 0.;
@@ -1023,8 +1023,8 @@ void VExposure::fillExposureMap()
 			fRadAccMapGal2D_aitoff->SetBinContent( bl, bb, fRadAccMapGal2D->GetBinContent( i, j ) );
 		}
 	}
-// now plot everything
-
+	// now plot everything
+	
 	gStyle->SetPalette( 1 );
 	set_plot_style();
 	
@@ -1062,7 +1062,7 @@ void VExposure::plot_HESSSkySurvey( TCanvas* c )
 	
 	c->cd();
 	
-// first phase
+	// first phase
 	TBox* ib1 = new TBox( -30., -3., 30., 3 );
 	ib1->SetFillStyle( 0 );
 	ib1->SetLineColor( 14 );
@@ -1089,22 +1089,22 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 		return 0;
 	}
 	
-// canvas
+	// canvas
 	TCanvas* cGal = new TCanvas( iName.c_str(), iTitle.c_str(), ix, iy, iwx, iwy );
 	cGal->SetGridx( 0 );
 	cGal->SetGridy( 0 );
 	cGal->SetRightMargin( 0.15 );
 	cGal->Draw();
 	
-// set axis ranges of galactic map
+	// set axis ranges of galactic map
 	h->SetAxisRange( ibmin, ibmax, "Y" );
 	h->SetAxisRange( -1.*ilmax, -1.*ilmin, "X" );
 	
 	h->Draw( "A colz" );
 	h->SetZTitle( "exposure [h]" );
 	
-// plot axis
-
+	// plot axis
+	
 	TF1* IncValues = new TF1( "IncValues", "-x", ilmin, ilmax );
 	IncValues->SetNpx( 500 );
 	
@@ -1119,11 +1119,11 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 	decAxis->SetTextColor( h->GetXaxis()->GetTitleColor() );
 	decAxis->SetLineColor( h->GetXaxis()->GetAxisColor() );
 	decAxis->SetTitle( "galactic longitude [deg]" );
-//  decAxis->SetNdivisions( 510 );
+	//  decAxis->SetNdivisions( 510 );
 	decAxis->SetTitle( "galactic latitude [deg]" );
 	decAxis->Draw();
 	
-//   TGaxis *raLowerAxis = new TGaxis( cGal->GetUxmin()-ilmax - h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin-h->GetYaxis()->GetBinWidth(1)/2. , cGal->GetUxmin()-ilmin+h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin -h->GetYaxis()->GetBinWidth(1)/2. , "IncValues", 4 );
+	//   TGaxis *raLowerAxis = new TGaxis( cGal->GetUxmin()-ilmax - h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin-h->GetYaxis()->GetBinWidth(1)/2. , cGal->GetUxmin()-ilmin+h->GetYaxis()->GetBinWidth( 1 )/2., cGal->GetUymin()+ibmin -h->GetYaxis()->GetBinWidth(1)/2. , "IncValues", 4 );
 	TGaxis* raLowerAxis = new TGaxis( cGal->GetUxmin() - ilmax - h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2. , cGal->GetUxmin() - ilmin + h->GetYaxis()->GetBinWidth( 1 ) / 2., cGal->GetUymin() + ibmin - h->GetYaxis()->GetBinWidth( 1 ) / 2. , "IncValues", 4 );
 	raLowerAxis->SetTitleFont( h->GetXaxis()->GetTitleFont() );
 	raLowerAxis->SetTitleSize( h->GetXaxis()->GetTitleSize() );
@@ -1135,7 +1135,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 	raLowerAxis->SetTextColor( h->GetXaxis()->GetTitleColor() );
 	raLowerAxis->SetLineColor( h->GetXaxis()->GetAxisColor() );
 	raLowerAxis->SetTitle( "galactic longitude [deg]" );
-//   raLowerAxis->SetNdivisions( 510 );
+	//   raLowerAxis->SetNdivisions( 510 );
 	raLowerAxis->Draw();
 	
 	for( unsigned int t = 0; t < fCatalogue.size(); t++ )
@@ -1151,7 +1151,7 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 		plotVTSObjects( bAitoff, ibmin, ibmax, ilmin, ilmax, 5, 1, 45., h );
 	}
 	
-// draw aitoff coordinate system
+	// draw aitoff coordinate system
 	if( bAitoff )
 	{
 		drawAitoffCoordinateSystem();
@@ -1250,8 +1250,8 @@ void VExposure::analyseCatalogue( string iCatalogue, double ibmin, double ibmax,
 {
 	VStarCatalogue* s = new VStarCatalogue();
 	s->init( 54626., iCatalogue );
-//    s->printCatalogue();
-
+	//    s->printCatalogue();
+	
 	double l = 0.;
 	double b = 0.;
 	string l_name = "";
@@ -1291,14 +1291,14 @@ void VExposure::plotObject( double l, double b, string l_name, double iExtension
 	}
 	if( l > ilmin && l < ilmax && b > ibmin && b < ibmax )
 	{
-// aitoff projections?
+		// aitoff projections?
 		double ab = b;
 		double al = -1.*l;
 		if( bAitoff )
 		{
 			aitoff2xy( l, b, al, ab );
 		}
-// extended?
+		// extended?
 		if( iExtension > 0. && fPlotExtendedSources )
 		{
 			TEllipse* m = new TEllipse( al, ab, iExtension, iExtension );
@@ -1376,7 +1376,7 @@ void VExposure::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
 	}
 	int y, m, d, h, min, s, ms, l;
 	double gMJD;
-// get y, m, d
+	// get y, m, d
 	y = atoi( itemp.substr( 0, 4 ).c_str() );
 	m = atoi( itemp.substr( 4, 2 ).c_str() );
 	d = atoi( itemp.substr( 6, 2 ).c_str() );
@@ -1391,7 +1391,7 @@ void VExposure::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip 
 	{
 		ms = 0;
 	}
-// calculate MJD
+	// calculate MJD
 	slaCldj( y, m, d, &gMJD, &l );
 	MJD = ( int )gMJD;
 	Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
@@ -1484,15 +1484,15 @@ bool VExposure::readAcceptanceCurveFromFile( string iFile, double iAcceptance_Ma
 */
 bool VExposure::doDQM( unsigned int iID, double iMinDuration )
 {
-//   if( iID >= (unsigned int)fRun.size() ) return false;
-
-// check run duration
+	//   if( iID >= (unsigned int)fRun.size() ) return false;
+	
+	// check run duration
 	if( fRunDuration[iID] < iMinDuration )
 	{
 		return false;
 	}
 	
-// HARDWIRED: require at least three telescopes
+	// HARDWIRED: require at least three telescopes
 	if( fRunConfigMask[iID] == 0 )
 	{
 		return false;
@@ -1553,7 +1553,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 		tev->init( 54626., iTeVCatalogue );
 	}
 	
-// file for event list
+	// file for event list
 	TFile* fEventListfile = 0;
 	TEventList* fEventList_tevcat = 0;
 	TEventList* fEventList_inFOV = 0;
@@ -1577,8 +1577,8 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 	double r_centre = 0.;
 	double r_VA_object = 0.;
 	
-////////////////////////////////////////////////////////
-// loop over all objects in catalogue
+	////////////////////////////////////////////////////////
+	// loop over all objects in catalogue
 	cout << "total number of objects in catalogue: " << s->getNStar() << endl;
 	for( unsigned int i = 0; i < s->getNStar(); i++ )
 	{
@@ -1597,11 +1597,11 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 		cout << endl;
 		
 		
-////////////////////////////////////////////////////////
-// check if this catalogue object is in second catalogue
+		////////////////////////////////////////////////////////
+		// check if this catalogue object is in second catalogue
 		int tev_select = -1;
 		
-// loop over second catalogue
+		// loop over second catalogue
 		for( unsigned int j = 0; j < tev->getNStar(); j++ )
 		{
 			double r = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180., tev->getStarRA2000( j ) * TMath::Pi() / 180., tev->getStarDec2000( j ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
@@ -1622,38 +1622,38 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 			cout << endl;
 		}
 		
-////////////////////////////////////////////////////////////////
-// now check if object is in FOV
-
-// loop over all runs
+		////////////////////////////////////////////////////////////////
+		// now check if object is in FOV
+		
+		// loop over all runs
 		r_tot = 0.;
 		r_tot_V5 = 0.;
 		iVERITAS_targets.clear();
 		for( unsigned int j = 0; j < fRunRA.size(); j++ )
 		{
-// calculate distance of catalogue object to camera center
+			// calculate distance of catalogue object to camera center
 			r_centre = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
 								( fRunRA[j] + fRunoffsetRA[j] ) * TMath::Pi() / 180., ( fRunDec[j] + fRunoffsetDec[j] ) * TMath::Pi() / 180. ) * 180. / TMath::Pi();
-// do dqm
+			// do dqm
 			if( !doDQM( j, iMinDuration ) )
 			{
 				continue;
 			}
 			
-// check if the catalogue object is close enough
+			// check if the catalogue object is close enough
 			if( r_centre < iR )
 			{
-// calculate distance of catalogue object to VERITAS object
+				// calculate distance of catalogue object to VERITAS object
 				r_VA_object = slaDsep( s->getStarRA2000( i ) * TMath::Pi() / 180., s->getStarDec2000( i ) * TMath::Pi() / 180.,
 									   fRunRA[j] * TMath::Pi() / 180., fRunDec[j] * TMath::Pi() / 180. ) * 180. / TMath::Pi();
-// total time on object (all array configurations)
+				// total time on object (all array configurations)
 				r_tot += fRunDuration[j];
-// total time on object (new array configuration only)
+				// total time on object (new array configuration only)
 				if( fRun[j] > 46642 )
 				{
 					r_tot_V5 += fRunDuration[j];
 				}
-// print some information about this run
+				// print some information about this run
 				cout << "\tRUN " << fRun[j];
 				if( fRunSourceID[j].size() > 0 )
 				{
@@ -1665,7 +1665,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 				cout << "\t DIST " << r_centre << " deg";
 				cout << "\t DIST (VTS pointing) " << r_VA_object << " deg";
 				cout << endl;
-// mean calculation
+				// mean calculation
 				r_centre_mean += r_centre;
 				r_VA_object_mean += r_VA_object;
 				r_meanElevation += fRunTelElevation[j];
@@ -1673,7 +1673,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 				iVERITAS_targets.insert( fRunSourceID[j] );
 			}
 		}
-// print summary only if some data was taken
+		// print summary only if some data was taken
 		if( r_tot > 0. )
 		{
 			if( fEventList_inFOV )
@@ -1691,10 +1691,10 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 					fEventList_inFOV_noTevcat->Enter( i );
 				}
 			}
-///////////////////////////////////
-// add a line to the tex table
-///////////////////////////////////
-// green: known TeV source
+			///////////////////////////////////
+			// add a line to the tex table
+			///////////////////////////////////
+			// green: known TeV source
 			if( tev_select >= 0 && tev->getStarName( tev_select ) != "NONAME" )
 			{
 				sprintf( iTexTable, "{\\color{green} %s}", s->getStarName( i ).c_str() );
@@ -1731,7 +1731,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 				{
 					sprintf( iTexTable, "%s %s, ", iTexTable, a.c_str() );
 				}
-//		 else                                  sprintf( iTexTable, "%s %s ", iTexTable, a.c_str() );
+				//		 else                                  sprintf( iTexTable, "%s %s ", iTexTable, a.c_str() );
 				else
 				{
 					sprintf( iTexTable, "%s ...", iTexTable );
@@ -1788,7 +1788,7 @@ void VExposure::printListOfRuns( string iCatalogue, double iR, double iMinDurati
 					}
 				}
 			}
-//	     else sprintf( iTexTable, "%s & ", iTexTable );
+			//	     else sprintf( iTexTable, "%s & ", iTexTable );
 			sprintf( iTexTable, "%s \\\\", iTexTable );
 			string iTe = iTexTable;
 			fTexTable.push_back( iTe );
@@ -1819,7 +1819,7 @@ void VExposure::printTexTable()
 		cout << "Error: no entries in tex table" << endl;
 		return;
 	}
-// print header
+	// print header
 	cout << "\\documentclass{article}" << endl;
 	cout << "\\usepackage[pdftex]{graphicx,color}" << endl;
 	cout << "\\usepackage{longtable}" << endl;
@@ -1831,7 +1831,7 @@ void VExposure::printTexTable()
 	cout << "\\renewcommand{\\baselinestretch}{1.5}" << endl;
 	cout << "\\begin{document}" << endl;
 	
-// print table
+	// print table
 	cout << "\\begin{footnotesize}" << endl;
 	cout << "\\begin{landscape}" << endl;
 	cout << "\\begin{longtable}{l|c|c|c|c|c|c|c|c}" << endl;
@@ -1870,7 +1870,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
 	double r_dist = 0.;
 	double r_tot = 0.;
 	
-// read list with runs which passed dqm
+	// read list with runs which passed dqm
 	vector< int > i_vDQMList;
 	if( iDQMfileList.size() > 0 )
 	{
@@ -1916,7 +1916,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
 		
 		if( r_dist < iR && fRunDuration[i] > iMinDuration )
 		{
-// check if this file passed the dqm
+			// check if this file passed the dqm
 			bool bPassed = false;
 			for( unsigned int q = 0; q < i_vDQMList.size(); q++ )
 			{
@@ -1951,7 +1951,7 @@ void VExposure::printListOfRuns( double il, double ib, double iR, double iMinDur
 			cout << endl;
 			if( os )
 			{
-// do not write T1T2 runs to disk
+				// do not write T1T2 runs to disk
 				if( fRunConfigMask[i] != 3 )
 				{
 					os << fRun[i] << endl;
@@ -2017,7 +2017,7 @@ void VExposure::plotMarker( double l, double b, double r, string iText, int iMar
 		{
 			aitoff2xy( l, b, al, ab );
 		}
-// extended?
+		// extended?
 		if( r > 0. )
 		{
 			TEllipse* m = new TEllipse( al, ab, r, r );
@@ -2123,11 +2123,11 @@ void VExposure::printListOfRuns()
 	double Total_Time = 0;
 	vector< int > tcut;
 	
-//////////////////////////////////
-// loop over all runs
+	//////////////////////////////////
+	// loop over all runs
 	for( unsigned int j = 0; j < fRunRA.size(); j++ )
 	{
-// total time on object (new array configuration only)
+		// total time on object (new array configuration only)
 		if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
 		{
 			cout << fixed ;
@@ -2302,7 +2302,7 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
 	
 	cout << "ANSUM output: " << endl;
 	
-// loop over all runs
+	// loop over all runs
 	for( unsigned int j = 0; j < fRunRA.size(); j++ )
 	{
 		fepoch = "";
@@ -2395,7 +2395,7 @@ void VExposure::outputAnasumRunlist( string fAnasumFile )
 		freplace += fepoch;
 		freplace += fconfig;
 		
-// total time on object (new array configuration only)
+		// total time on object (new array configuration only)
 		if( fRunTelElevation[j] >= fTelMinElevation && fRunDuration[j] >= fMinDuration )
 		{
 		
@@ -2662,7 +2662,7 @@ vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iR
 			if( !db_row )
 			{
 				cout << "VDBRunInfo: failed reading a row from DB for run " << iRunNumber << endl;
-//              fDBStatus = false;
+				//              fDBStatus = false;
 				return fLaserRunID;
 			}
 			iLaserList.push_back( atoi( db_row->GetField( 0 ) ) );
@@ -2680,7 +2680,7 @@ vector< unsigned int > VExposure::getLaserRun( string iDBserver, unsigned int iR
 	fLaserRunID.assign( iNTel, 0 );
 	for( unsigned int t = 0; t < iNTel; t++ )
 	{
-// check if this run is excluded from group
+		// check if this run is excluded from group
 		for( unsigned int i = 0; i < iLaserList.size(); i++ )
 		{
 			bitset< 8 > ibit( iLaserExclude[i] );

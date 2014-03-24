@@ -89,18 +89,18 @@ void VSensitivityCalculator::reset()
 	
 	fPlotDebugName = "";
 	
-// Li & Ma formula for significance calculation (use 17, 5 or 9)
+	// Li & Ma formula for significance calculation (use 17, 5 or 9)
 	fLiAndMaEqu = 17;
 	
 	fSetEvents_minCutOnly = false;
 	
-// source strength values (in Crab units)
-// units: fraction of source strenght
+	// source strength values (in Crab units)
+	// units: fraction of source strenght
 	fSourceStrength_min = 0.0003;
 	fSourceStrength_max = 3.5;
 	fSourceStrength_step = 0.005;
 	setSourceStrengthVector_CU();
-// values of Crab fluxes to be plotted as lines into the sensitivity vs energy graph (in Crab Units)
+	// values of Crab fluxes to be plotted as lines into the sensitivity vs energy graph (in Crab Units)
 	fPlottingCrabFlux_CU.push_back( 1.e3 );
 	fPlottingCrabFlux_CU.push_back( 1.e2 );
 	fPlottingCrabFlux_CU.push_back( 1.e1 );
@@ -110,7 +110,7 @@ void VSensitivityCalculator::reset()
 	fPlottingCrabFlux_CU.push_back( 1.e-3 );
 	fPlottingCrabFlux_CU.push_back( 1.e-4 );
 	
-// sensitivity graph
+	// sensitivity graph
 	gSensitivityvsEnergy = 0;
 	gBGRate = 0;
 	gProtonRate = 0;
@@ -168,11 +168,11 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 	double s = 0.;
 	double t = fObservationTime_h * 60.;            // h -> min
 	
-// fSignal = gamma-ray + background rates in source region
-// fBackground = background counts in off source regions
-// (observe that this is different from the standard definition used in addDataSet() (which are rates, etc))
-
-// calculate signal (non - alpha * noff) rate
+	// fSignal = gamma-ray + background rates in source region
+	// fBackground = background counts in off source regions
+	// (observe that this is different from the standard definition used in addDataSet() (which are rates, etc))
+	
+	// calculate signal (non - alpha * noff) rate
 	double n_diff = iSignal - iBackground * iAlpha;
 	
 	if( fDebug && energy > 0. )
@@ -188,14 +188,14 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 	}
 	
 	bool bSuccess = false;
-// minimum number of background events
+	// minimum number of background events
 	if( iFillStatistics == 4 )
 	{
 		if( iBackground * iAlpha > 0. )
 		{
 			return -1.;
 		}
-// TMP
+		// TMP
 		else
 		{
 			return 0.01;
@@ -203,8 +203,8 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 	}
 	
 	unsigned i_nMax = fSourceStrength.size() - 1;
-// Loop optimization
-// calculate start for iFillStatistics == 0
+	// Loop optimization
+	// calculate start for iFillStatistics == 0
 	if( iFillStatistics == 0 )
 	{
 		for( unsigned int n = i_nMax; n > 0; n-- )
@@ -217,39 +217,39 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 		}
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////
-// loop over the source strength vector and check different sensitivity criteria
+	/////////////////////////////////////////////////////////////////////////////////
+	// loop over the source strength vector and check different sensitivity criteria
 	for( unsigned int n = i_nMax; n > 0; n-- )
 	{
 		f = fSourceStrength[n];
 		
-// default significance calculation
+		// default significance calculation
 		s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha ),
 										   t * iBackground, iAlpha, fLiAndMaEqu );
-// significance calculation for Crab flares (don't use!)
-//        s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha + n_diff),
-//	                                   t * ( iBackground + n_diff / iAlpha ), iAlpha, fLiAndMaEqu );
-
-//////////////////////////////////////////////////////////////////////////
-// check if this set of observations passes the significance criteria
-//////////////////////////////////////////////////////////////////////////
-// require a certain significance
+		// significance calculation for Crab flares (don't use!)
+		//        s = VStatistics::calcSignificance( t * ( f * n_diff + iBackground * iAlpha + n_diff),
+		//	                                   t * ( iBackground + n_diff / iAlpha ), iAlpha, fLiAndMaEqu );
+		
+		//////////////////////////////////////////////////////////////////////////
+		// check if this set of observations passes the significance criteria
+		//////////////////////////////////////////////////////////////////////////
+		// require a certain significance
 		bool bPassed_MinimumSignificance = ( s >= fSignificance_min );
-// require a minimum number of events
+		// require a minimum number of events
 		bool bPassed_MinimumSignalEvents = ( t * f * n_diff >= fEvents_min );
-// require background events
-// (removes most sensitivity values at large energies, but otherwise transition zone
-//  between signal and background limited zone not well defined)
-// NOTE: this cut depends on your MC statistics, not on the sensitivity of your observatory
+		// require background events
+		// (removes most sensitivity values at large energies, but otherwise transition zone
+		//  between signal and background limited zone not well defined)
+		// NOTE: this cut depends on your MC statistics, not on the sensitivity of your observatory
 		bool bPasses_MinimumNumberofBackGroundEvents = ( iBackground * iAlpha > 0. );
-// require the signal to be larger than a certain fraction of background
+		// require the signal to be larger than a certain fraction of background
 		bool bPasses_MinimumSystematicCut = false;
 		if( iBackground * iAlpha > 0. )
 		{
 			bPasses_MinimumSystematicCut = ( f * n_diff / ( iBackground * iAlpha ) >= fMinBackgroundRateRatio_min );
 		}
 		
-// PRELI: allow calculation of sensitivity in event limited region
+		// PRELI: allow calculation of sensitivity in event limited region
 		if( bPasses_MinimumNumberofBackGroundEvents )
 		{
 			fSetEvents_minCutOnly = false;
@@ -261,7 +261,7 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 			bPassed_MinimumSignificance = true;
 		}
 		
-// sensitivity limitation histograms
+		// sensitivity limitation histograms
 		if( iFillStatistics != 0 )
 		{
 			if( ( iFillStatistics == 1 && bPassed_MinimumSignificance )
@@ -275,7 +275,7 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 			continue;
 		}
 		
-// standard sensitivity calculation
+		// standard sensitivity calculation
 		if( bPassed_MinimumSignificance && bPassed_MinimumSignalEvents
 				&& bPasses_MinimumSystematicCut
 				&& bPasses_MinimumNumberofBackGroundEvents )
@@ -306,7 +306,7 @@ double VSensitivityCalculator::getSensitivity( double iSignal, double iBackgroun
 		return -1.;
 	}
 	
-// return flux value in CU that passed significance criteria
+	// return flux value in CU that passed significance criteria
 	return f;
 }
 
@@ -425,7 +425,7 @@ void VSensitivityCalculator::setSourceStrengthVector_CU( vector< double > iF )
 {
 	fSourceStrength = iF;
 	
-// sort in reverse order
+	// sort in reverse order
 	sort( fSourceStrength.begin(), fSourceStrength.end() );
 	reverse( fSourceStrength.begin(), fSourceStrength.end() );
 }
@@ -460,37 +460,37 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		cout << "VSensitivityCalculator::getCrabSpectrum " << i_fCrabFlux.size() << endl;
 	}
 	
-// check if Crab spectrum is already defined
+	// check if Crab spectrum is already defined
 	if( i_fCrabFlux.size() == fCrabFlux_SourceStrength.size() && !bReset )
 	{
 		return fCrabFlux_SourceStrength;
 	}
 	
-// temporary function describing Crab spectrum
+	// temporary function describing Crab spectrum
 	TF1* i_fFunCrabFlux = 0;
-// temporary graph
+	// temporary graph
 	TGraph* i_GraphCrabFlux = new TGraph( 100 );
 	
-// hardwired Crab spectra
-// (better: use spectral from external text file)
+	// hardwired Crab spectra
+	// (better: use spectral from external text file)
 	if( fEnergySpectrumfromLiterature == 0 )
 	{
 		char hname[800];
 		unsigned int i_CrabSpectrum_ID = 1;              // NOTE: hardwired to 1!
 		
-// Whipple Crab spectrum (1989)
+		// Whipple Crab spectrum (1989)
 		if( i_CrabSpectrum_ID == 0 )
 		{
 			double i_gamma = -2.49;
 			double i_Norm = 3.20e-11;
 			sprintf( hname, "%e*TMath::Power( x, %f)", i_Norm, i_gamma );
 		}
-// MAGIC curved Crab spectrum
+		// MAGIC curved Crab spectrum
 		else if( i_CrabSpectrum_ID == 1 )
 		{
 			sprintf( hname, "6.0e-10*TMath::Power( x/0.3, -2.31 - 0.26*log10( x/0.3 ) )" );
 		}
-// HEGRA Crab spectrum
+		// HEGRA Crab spectrum
 		else if( i_CrabSpectrum_ID == 2 )
 		{
 			double i_gamma = -2.62;
@@ -511,7 +511,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		}
 		i_fFunCrabFlux = new TF1( "i_fFunCrabFlux" , hname, TMath::Power( 10., fEnergy_min_Log ), 10000. );
 	}
-// use spectrum from text file
+	// use spectrum from text file
 	else
 	{
 		if( bUnit == "PFLUX" || bUnit == "ENERGY" )
@@ -530,8 +530,8 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		vector< TGraph* > xx;
 		return xx;
 	}
-/////////////////////////////////////////////////////
-// calculate integral spectrum
+	/////////////////////////////////////////////////////
+	// calculate integral spectrum
 	if( bInt && bUnit != "CU" )
 	{
 		const int np = 1000;
@@ -541,12 +541,12 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		double iY = 0.;
 		
 		i_fFunCrabFlux->CalcGaussLegendreSamplingPoints( np, x, y, 1.e-15 );
-// loop over different Crab flux
+		// loop over different Crab flux
 		for( int p = 0; p < i_GraphCrabFlux->GetN(); p++ )
 		{
-// equal intervall in logE
+			// equal intervall in logE
 			iE = fEnergy_min_Log + p * ( fEnergy_max_Log - fEnergy_min_Log ) / i_GraphCrabFlux->GetN();
-// integrate above this energy
+			// integrate above this energy
 			iY = i_fFunCrabFlux->IntegralFast( np, x, y, TMath::Power( 10., iE ), 10000. );
 			if( bUnit == "ENERGY" )
 			{
@@ -557,18 +557,18 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		delete x;
 		delete y;
 	}
-/////////////////////////////////////////////////////
-// calculate differental spectrum
+	/////////////////////////////////////////////////////
+	// calculate differental spectrum
 	else
 	{
 		double iE = 0.;
 		double iY = 0.;
-// loop over different Crab fluxes
+		// loop over different Crab fluxes
 		for( int p = 0; p < i_GraphCrabFlux->GetN(); p++ )
 		{
-// equal intervall in logE
+			// equal intervall in logE
 			iE = fEnergy_min_Log + p * ( fEnergy_max_Log - fEnergy_min_Log ) / i_GraphCrabFlux->GetN();
-// differential flux
+			// differential flux
 			iY = i_fFunCrabFlux->Eval( TMath::Power( 10., iE ) );
 			if( bUnit == "ENERGY" )
 			{
@@ -578,7 +578,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
 		}
 	}
 	
-// now fill a vector with graph for the different flux values needed
+	// now fill a vector with graph for the different flux values needed
 	double xx = 0.;
 	double yy = 0.;
 	fCrabFlux_SourceStrength.clear();
@@ -666,7 +666,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 		string bUnit, double dE_Log10 )
 {
 
-// get canvas
+	// get canvas
 	if( cSensitivity == 0 )
 	{
 		cSensitivity = plotCanvas_SensitivityvsEnergy( bUnit, ( dE_Log10 < 0. ) );
@@ -681,7 +681,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromCrabSpectrum( TCanva
 		return cSensitivity;
 	}
 	
-// plot everything
+	// plot everything
 	setGraphPlottingStyle( gSensitivityvsEnergy, fPlottingColor, fPlottingLineWidth,
 						   fPlottingMarkerStyle, fPlottingMarkerSize,
 						   fPlottingFillStyle, fPlottingLineStyle );
@@ -716,8 +716,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	cout << "==============================================" << endl;
 	fEnergy_dE_log10 = dE_Log10;
 	
-// get vector with integral and differential Crab-like spectra for different flux levels
-// (use Whipple spectrum)
+	// get vector with integral and differential Crab-like spectra for different flux levels
+	// (use Whipple spectrum)
 	TGraph* i_fFunCrabFlux = getCrabSpectrum( ( dE_Log10 < 0. ), bUnit, true );
 	if( !i_fFunCrabFlux )
 	{
@@ -725,8 +725,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 		return 0;
 	}
 	
-//////////////////////////////////////////////////////////////////////////////////////
-// get differential flux vector (used for differential and integral flux calculations)
+	//////////////////////////////////////////////////////////////////////////////////////
+	// get differential flux vector (used for differential and integral flux calculations)
 	double alpha = 1.;
 	vector< VDifferentialFlux > fDifferentialFlux;
 	if( iAnasumCrabFile == "MC" )
@@ -737,7 +737,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	{
 		fDifferentialFlux = getDifferentialFluxVectorfromCTA_MC( dE_Log10, alpha );
 	}
-// read sensitivity directly from root file
+	// read sensitivity directly from root file
 	else if( iAnasumCrabFile == "CTA-PHYS" )
 	{
 		gSensitivityvsEnergy = getSensitivityGraphFromWPPhysFile( bUnit, iEnergyMin_TeV_lin, iEnergyMax_TeV_lin, dE_Log10 );
@@ -759,7 +759,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	}
 	cout << "evaluating differential flux vector (size " << fDifferentialFlux.size() << ")" << endl;
 	
-// this is the range of fluxes which will be searched
+	// this is the range of fluxes which will be searched
 	setSourceStrengthRange_CU( -5., 10., 4. / 1000., true );
 	
 	double non = 0;
@@ -770,20 +770,20 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 	double s_error_U = 0.;
 	double s_error_L = 0.;
 	
-// create sensitivity vs energy graph
+	// create sensitivity vs energy graph
 	gSensitivityvsEnergy = new TGraphAsymmErrors( 1 );
 	gSensitivityvsEnergy->SetTitle( "" );
 	
-// often no background simulations (off events) available at high energies
-// don't really need it, since fEvents_min is the important one
+	// often no background simulations (off events) available at high energies
+	// don't really need it, since fEvents_min is the important one
 	fSetEvents_minCutOnly = true;
 	
-/////////////////////////////////////////////////////////////////
-// loop over all on and off counts and calculate sensitivity
+	/////////////////////////////////////////////////////////////////
+	// loop over all on and off counts and calculate sensitivity
 	int z = 0;
 	for( int i = fDifferentialFlux.size() - 1; i >= 0; i-- )
 	{
-// integral spectrum: add number of events
+		// integral spectrum: add number of events
 		if( dE_Log10 < 0. )
 		{
 			non        += fDifferentialFlux[i].NOn;
@@ -791,7 +791,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 			non_error  += fDifferentialFlux[i].NOn_error * fDifferentialFlux[i].NOn_error;
 			noff_error += fDifferentialFlux[i].NOff_error * fDifferentialFlux[i].NOff_error;
 		}
-// differential spectrum: number of events per differential bin
+		// differential spectrum: number of events per differential bin
 		else
 		{
 			non        = fDifferentialFlux[i].NOn;
@@ -802,21 +802,21 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 		non_error  = sqrt( non_error );
 		noff_error = sqrt( noff_error );
 		
-// skip all zero entries
+		// skip all zero entries
 		if( TMath::Abs( non ) < 1.e-2 && TMath::Abs( noff ) < 1.e-2 )
 		{
 			continue;
 		}
-// set errors to zero for no off events
+		// set errors to zero for no off events
 		if( TMath::Abs( noff ) < 1e-2 )
 		{
 			noff = 0.;
 			noff_error = 0.;
 		}
 		
-// observe that the signal rate is defined differently for list_sensitivity() etc...
-// get fraction of Crab flux for XX sigma etc...
-// perform a toy MC to calculate errors (i_N_iter times)
+		// observe that the signal rate is defined differently for list_sensitivity() etc...
+		// get fraction of Crab flux for XX sigma etc...
+		// perform a toy MC to calculate errors (i_N_iter times)
 		const unsigned int i_N_iter = 1000;
 		double i_s_v[i_N_iter];
 		double i_s_x = 0.;
@@ -836,7 +836,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 				i_s_z++;
 			}
 		}
-// take median of distribution (distribution is assymmetric, not sure if this would be correct)
+		// take median of distribution (distribution is assymmetric, not sure if this would be correct)
 		if( i_s_z > 1 )
 		{
 			double i_a[] = { 0.16, 0.5, 0.84 };
@@ -855,17 +855,17 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 			s_error_U = 0.;
 		}
 		
-// Preliminary: catch cases were lower sensitivity cannnot be calculated
+		// Preliminary: catch cases were lower sensitivity cannnot be calculated
 		if( s_error_L < 0. )
 		{
 			s_error_L = s;
 			s_error_U = s;
 		}
-// weighted energy of this bin
+		// weighted energy of this bin
 		double energy = TMath::Log10( fDifferentialFlux[i].EnergyWeightedMean );
-// (int) of energy for maps
+		// (int) of energy for maps
 		int energy_intX3 = ( int )( energy * 1.e3 );
-// get sensitivity limititations
+		// get sensitivity limititations
 		fSignificanceLimited[energy_intX3]        = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
 				noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 1 );
 		fMinEventsLimited[energy_intX3]           = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
@@ -875,7 +875,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 		fMinNoBackground[energy_intX3]            = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
 				noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 4 );
 				
-// fill sensitivity graphs
+		// fill sensitivity graphs
 		double f1 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_lowEdge ) );
 		double f2 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_upEdge ) );
 		
@@ -883,7 +883,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 				&& fDifferentialFlux[i].Energy > iEnergyMin_TeV_lin && fDifferentialFlux[i].Energy < iEnergyMax_TeV_lin
 				&& checkCutOptimization( fDifferentialFlux[i].Energy ) )
 		{
-// integral sensitivity
+			// integral sensitivity
 			if( dE_Log10 < 0. )
 			{
 				if( bUnit == "CU" )
@@ -899,7 +899,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 					gSensitivityvsEnergy->SetPointEYlow( z, i_fFunCrabFlux->Eval( energy ) * TMath::Abs( s - s_error_L ) );
 				}
 			}
-// differential sensitivity
+			// differential sensitivity
 			else
 			{
 				if( bUnit == "PFLUX" )
@@ -937,8 +937,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 			cout << "\t systematics: " << fMinBackgroundEventsLimited[energy_intX3] << endl;
 			cout << "\t no background: " << fMinNoBackground[energy_intX3] << endl;
 		}
-// sensitivity limitiations
-// (TMP differential sensitivity only)
+		// sensitivity limitiations
+		// (TMP differential sensitivity only)
 		if( dE_Log10 > 0. )
 		{
 			if( bUnit == "ENERGY" )
@@ -956,8 +956,8 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 				fMinNoBackground[energy_intX3]            *= ( f1 - f2 ) / fDifferentialFlux[i].dE;
 			}
 		}
-// print some debugging information
-//	if( fDebug )
+		// print some debugging information
+		//	if( fDebug )
 		{
 			cout << fixed << "FLUX RESULTS " << z << ":\t" << fDifferentialFlux[i].EnergyWeightedMean << " [TeV]\t";
 			cout << fDifferentialFlux[i].Energy << " [TeV]";
@@ -1032,7 +1032,7 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 	
 	hnull = new TH1D( "hnullSens", "", 10, fEnergy_min_Log, fEnergy_max_Log );
 	hnull->SetStats( 0 );
-// integral sensitivity
+	// integral sensitivity
 	if( bIntegralSensitivity )
 	{
 		hnull->SetXTitle( "log_{10} energy E_{t} [TeV]" );
@@ -1055,7 +1055,7 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 			hnull->SetMinimum( fPlot_flux_CU_min );
 		}
 	}
-// differential sensitivity
+	// differential sensitivity
 	else
 	{
 	
@@ -1083,7 +1083,7 @@ TCanvas* VSensitivityCalculator::plotCanvas_SensitivityvsEnergy( string bUnit, b
 	plot_nullHistogram( iCanvas, hnull, true, true, 1.7, TMath::Power( 10., fEnergy_min_Log ), TMath::Power( 10., fEnergy_max_Log ) );
 	iCanvas->SetLogy( 1 );
 	
-// get vector with integral or differential Crab-like spectra for different flux levels
+	// get vector with integral or differential Crab-like spectra for different flux levels
 	vector< TGraph* > i_fFunCrabFlux = getCrabSpectrum( fPlottingCrabFlux_CU, bIntegralSensitivity, bUnit, false );
 	
 	for( unsigned int i = 0; i < fPlottingCrabFlux_CU.size(); i++ )
@@ -1141,7 +1141,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas* 
 		int iColor, double iLineWidth, int iLineStyle,
 		string bUnit, bool bIntegralSensitivity )
 {
-// check if canvas exists, otherwise create a new one
+	// check if canvas exists, otherwise create a new one
 	if( c == 0 )
 	{
 		c = plotCanvas_SensitivityvsEnergy( bUnit, bIntegralSensitivity );
@@ -1152,7 +1152,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas* 
 	}
 	c->cd();
 	
-// graph with sensitivity values: read them directly from the text file
+	// graph with sensitivity values: read them directly from the text file
 	TGraph* g = new TGraph( gSystem->ExpandPathName( iTextFile.c_str() ) );
 	cout << "reading " << iTextFile << " with " << g->GetN() << " data points." << endl;
 	if( g->IsZombie() || g->GetN() < 1 )
@@ -1165,7 +1165,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas* 
 	g->SetLineWidth( ( Width_t )iLineWidth );
 	g->SetLineStyle( iLineStyle );
 	
-// check what units the data is in
+	// check what units the data is in
 	string i_fileUnit = "PFLUX";
 	if( iTextFile.find( "ENERGY" ) < iTextFile.size() )
 	{
@@ -1176,13 +1176,13 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas* 
 		i_fileUnit = "CU";
 	}
 	
-// convert energy to log10( energy )
+	// convert energy to log10( energy )
 	double i_Energy = 0.;
 	double i_fluxSensitivity = 0.;
 	for( int i = 0; i < g->GetN(); i++ )
 	{
 		g->GetPoint( i, i_Energy, i_fluxSensitivity );
-// convert flux
+		// convert flux
 		if( bUnit == "ENERGY" && i_fileUnit != "ENERGY" )
 		{
 			i_fluxSensitivity *= i_Energy * 1.e12 * fConstant_Flux_To_Ergs;
@@ -1190,7 +1190,7 @@ TCanvas* VSensitivityCalculator::plotSensitivityvsEnergyFromTextTFile( TCanvas* 
 		i_Energy = log10( i_Energy );
 		g->SetPoint( i, i_Energy, i_fluxSensitivity );
 	}
-// draw sensitivity graph
+	// draw sensitivity graph
 	g->Draw( "c" );
 	
 	c->Update();
@@ -1375,20 +1375,20 @@ double VSensitivityCalculator::calculateObservationTimevsFlux( unsigned int iD )
 	int z_max = fGraphObsvsTime[iD]->GetN();
 	for( int i = 0; i < z_max; i++ )
 	{
-// take logarithmic steps in flux [log10 CU]
+		// take logarithmic steps in flux [log10 CU]
 		x =   TMath::Log10( fSourceStrength_min ) + ( TMath::Log10( fSourceStrength_max )
 				- TMath::Log10( fSourceStrength_min ) ) / ( double )fGraphObsvsTime[iD]->GetN() * ( double )i;
-// linear flux [CU]
+		// linear flux [CU]
 		x =   TMath::Power( 10., x );
 		
-// loop over possible observation lengths
+		// loop over possible observation lengths
 		bool bSuccess = false;
 		for( int j = 0; j < fObservationTime_steps; j++ )
 		{
-// log10 hours
+			// log10 hours
 			t = TMath::Log10( fObservationTime_min ) + ( TMath::Log10( fObservationTime_max ) -
 					TMath::Log10( fObservationTime_min ) ) / ( double )fObservationTime_steps * ( double )j;
-// log10 hours to min
+			// log10 hours to min
 			t = TMath::Power( 10., t ) * 60.;
 			
 			s = VStatistics::calcSignificance( iG * t * x + iB * t * alpha, iB * t, alpha, fLiAndMaEqu );
@@ -1495,7 +1495,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
 		return 0;
 	}
 	cout << "reading CTA-MC file (unit=" << bUnit << "): " << fMCCTA_File << endl;
-// sensitivities
+	// sensitivities
 	if( bUnit == "ENERGY" )
 	{
 		if( dE_log10 > 0. )
@@ -1535,7 +1535,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
 		setGraphPlottingStyle( g, 1, 1, 20, 2 );
 	}
 	
-// background rates
+	// background rates
 	h = 0;
 	h = get_CTA_IRF_Histograms( "BGRate", fMCCTA_cameraoffset_deg );
 	if( h )
@@ -1544,7 +1544,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
 		get_Graph_from_Histogram( h, gBGRate, true, false, -1., log10( iEnergyMin_TeV_lin ), log10( iEnergyMax_TeV_lin ) );
 		setGraphPlottingStyle( gBGRate, 1, 2, 20, 2 );
 	}
-// proton rates
+	// proton rates
 	h = 0;
 	h = get_CTA_IRF_Histograms( "ProtRate", fMCCTA_cameraoffset_deg );
 	if( !h )
@@ -1557,7 +1557,7 @@ TGraphAsymmErrors* VSensitivityCalculator::getSensitivityGraphFromWPPhysFile( st
 		get_Graph_from_Histogram( h, gProtonRate, true, 0., log10( iEnergyMin_TeV_lin ), log10( iEnergyMax_TeV_lin ) );
 		setGraphPlottingStyle( gProtonRate, 1, 2, 21, 2 );
 	}
-// electron rates
+	// electron rates
 	h = 0;
 	h = get_CTA_IRF_Histograms( "ElecRate", fMCCTA_cameraoffset_deg );
 	if( !h )
@@ -1613,7 +1613,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		return a;
 	}
 	VMonteCarloRateCalculator iMCR;
-// setting up differential flux vector
+	// setting up differential flux vector
 	for( int i = 1; i <= hEff->GetNbinsX(); i++ )
 	{
 		if( hEff->GetBinContent( i ) > 0. && hBck->GetBinContent( i ) > 0. )
@@ -1623,7 +1623,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 			i_flux.Energy_upEdge = hEff->GetBinLowEdge( i ) + hEff->GetBinWidth( i );
 			i_flux.Energy_lowEdge_bin = i;
 			i_flux.Energy_upEdge_bin = i;
-// energies are on linear scale
+			// energies are on linear scale
 			i_flux.Energy_lowEdge = TMath::Power( 10., i_flux.Energy_lowEdge );
 			i_flux.Energy_upEdge  = TMath::Power( 10., i_flux.Energy_upEdge );
 			i_flux.dE = i_flux.Energy_upEdge - i_flux.Energy_lowEdge;
@@ -1631,16 +1631,16 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 			i_flux.EnergyWeightedMean = i_flux.Energy;
 			i_flux.ObsTime = fObservationTime_h * 60. * 60.;
 			
-// number of background events
+			// number of background events
 			i_flux.NOff = hBck->GetBinContent( i ) * i_flux.ObsTime;
 			i_flux.NOff_error = sqrt( i_flux.NOff );
-// number of signal events
+			// number of signal events
 			i_flux.NOn = iMCR.getMonteCarloRate( iEnergy, iEff, fEnergySpectrumfromLiterature, fEnergySpectrumfromLiterature_ID,
 												 i_flux.Energy_lowEdge_bin, i_flux.Energy_upEdge_bin );
 			i_flux.NOn *= i_flux.ObsTime / 60.;
 			i_flux.NOn += i_flux.NOff;
 			i_flux.NOn_error  = sqrt( i_flux.NOn );
-// multiply off events by alpha (number of background regions)
+			// multiply off events by alpha (number of background regions)
 			i_flux.NOff /= fAlpha;
 			i_flux.NOff_error /= fAlpha;
 			
@@ -1649,7 +1649,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	}
 	iNorm = fAlpha;
 	
-// this is not necessary when count rates are read from CTA WP Phys file
+	// this is not necessary when count rates are read from CTA WP Phys file
 	fRequireCutsToBeOptimized = false;
 	
 	return a;
@@ -1664,12 +1664,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 {
 	vector< VDifferentialFlux > a;
 	iNorm = 0.;
-// iterator with MC data
+	// iterator with MC data
 	char hname[800];
 	map< unsigned int, VSensitivityCalculatorDataResponseFunctions* >::iterator i_MCData_iterator;
 	
-///////////////////////////////////////////////////////////////////
-// check if data is complete (need at least gamma-ray data)
+	///////////////////////////////////////////////////////////////////
+	// check if data is complete (need at least gamma-ray data)
 	if( fMC_Data.find( 1 ) == fMC_Data.end() )
 	{
 		return getDifferentialFluxVectorfromMC_ErrorMessage( "no gamma-ray MC data given" );
@@ -1679,12 +1679,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		return getDifferentialFluxVectorfromMC_ErrorMessage( "MC Data vector not large enough (should be >=2)" );
 	}
 	
-///////////////////////////////////////////////////////////////////
-// differential flux vector (for gammas and background particles)
+	///////////////////////////////////////////////////////////////////
+	// differential flux vector (for gammas and background particles)
 	vector< VDifferentialFlux > v_flux;
 	
-///////////////////////////////////////////////////////////////////
-// get Crab spectrum from literature ( index [1] is gamma-ray)
+	///////////////////////////////////////////////////////////////////
+	// get Crab spectrum from literature ( index [1] is gamma-ray)
 	VEnergySpectrumfromLiterature i_Crab( fMC_Data[1]->fSpectralParameterFile );
 	cout << "\t reading Crab Nebula spectrum with ID" <<  fMC_Data[1]->fSpectralParameterID << endl;
 	if( i_Crab.isZombie() )
@@ -1694,9 +1694,9 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	std::cout << "VSensitivityCalcualtor::getDifferentialFluxVectorfromMC Crab " << std::endl;
 	i_Crab.listValues( fMC_Data[1]->fSpectralParameterID );
 	
-///////////////////////////////////////////////////////////////////
-// get effective areas for gamma-rays and background particles
-
+	///////////////////////////////////////////////////////////////////
+	// get effective areas for gamma-rays and background particles
+	
 	if( fDebug )
 	{
 		cout << "get MC effective areas" << endl;
@@ -1709,11 +1709,11 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		}
 	}
 	
-///////////////////////////////////////////////////////////////////
-// set up energy binning for differential flux vector
-
-///////////////////////////////////////////////////////////////////
-// binning in gamma and proton effective areas must be the same (number of bins, range, and bin width)
+	///////////////////////////////////////////////////////////////////
+	// set up energy binning for differential flux vector
+	
+	///////////////////////////////////////////////////////////////////
+	// binning in gamma and proton effective areas must be the same (number of bins, range, and bin width)
 	for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
 	{
 		if( ( *i_MCData_iterator ).first == 1 )
@@ -1740,10 +1740,10 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		}
 	}
 	
-// integral sensitivity: take existing energy binning (from gammas)
+	// integral sensitivity: take existing energy binning (from gammas)
 	double iBinSize = ( fMC_Data[1]->effArea_Emax - fMC_Data[1]->effArea_Emin ) / fMC_Data[1]->effArea_Ebins;
-// offset between gamma and background effective areas
-// (offset in effective area vector, determine first filled value)
+	// offset between gamma and background effective areas
+	// (offset in effective area vector, determine first filled value)
 	map< unsigned int, int > iEnergyScaleOffset;
 	for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
 	{
@@ -1765,32 +1765,32 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		}
 	}
 	
-///////////////////////////////////////////////////////////////////
-// GAMMA RAYS (signal)
-///////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////
-// INTEGRAL SENSITIVITY
-////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////
+	// GAMMA RAYS (signal)
+	///////////////////////////////////////////////////////////////////
+	
+	////////////////////////////////////////////////////////////////
+	// INTEGRAL SENSITIVITY
+	////////////////////////////////////////////////////////////////
 	if( dE_Log10 < 0. )
 	{
 		for( unsigned int i = 0; i < fMC_Data[1]->energy.size(); i++ )
 		{
 			VDifferentialFlux i_flux;
-// energy bins in sensitivity curve
+			// energy bins in sensitivity curve
 			i_flux.Energy_lowEdge = fMC_Data[1]->energy[i] - iBinSize / 2.;
 			i_flux.Energy_upEdge  = fMC_Data[1]->energy[i] + iBinSize / 2.;
 			i_flux.Energy_lowEdge_bin = i;
 			i_flux.Energy_upEdge_bin = i;
-// energies are on linear scale
+			// energies are on linear scale
 			i_flux.Energy_lowEdge = TMath::Power( 10., i_flux.Energy_lowEdge );
 			i_flux.Energy_upEdge  = TMath::Power( 10., i_flux.Energy_upEdge );
 			
 			i_flux.dE = i_flux.Energy_upEdge - i_flux.Energy_lowEdge;
-// simplified (maybe should somehow be weighted by the shape of the energy spectrum)
+			// simplified (maybe should somehow be weighted by the shape of the energy spectrum)
 			i_flux.Energy = ( i_flux.Energy_lowEdge + i_flux.Energy_upEdge ) / 2.;
 			i_flux.EnergyWeightedMean = i_flux.Energy;
-// convert from [h] to [s]
+			// convert from [h] to [s]
 			i_flux.ObsTime = fObservationTime_h * 60. * 60.;
 			
 			v_flux.push_back( i_flux );
@@ -1809,12 +1809,12 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 			}
 		}
 	}
-////////////////////////////////////////////////////////////////
-// DIFFERENTIAL SENSITIVITY
-////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	// DIFFERENTIAL SENSITIVITY
+	////////////////////////////////////////////////////////////////
 	else
 	{
-// dE_Log10 must be a multiple of effective area energy bin size
+		// dE_Log10 must be a multiple of effective area energy bin size
 		if( dE_Log10 < iBinSize )
 		{
 			return getDifferentialFluxVectorfromMC_ErrorMessage( "error: dE_log10 smaller than bin size of effective areas" );
@@ -1824,30 +1824,30 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 			return getDifferentialFluxVectorfromMC_ErrorMessage( "error: dE_Log10 must be a multiple of effective area energy bin size" );
 		}
 		
-// minimum and maximum energy in differential sensitivity curve defined by extrema of true (MC!) energy
-// (despite there might be reconstructed energies with lower/higher values)
+		// minimum and maximum energy in differential sensitivity curve defined by extrema of true (MC!) energy
+		// (despite there might be reconstructed energies with lower/higher values)
 		double iBinEnergyMin = fMC_Data[1]->effArea_Emin;
 		if( fDebug )
 		{
 			cout << "VSensitivityCalculator::getDifferentialFluxVectorfromMC: minimum energy: " << iBinEnergyMin << endl;
 		}
-// use first bin low edge of gamma-ray effective area
+		// use first bin low edge of gamma-ray effective area
 		if( fMC_Data[1]->energy_lowEdge.size() > 0 )
 		{
 			iBinEnergyMin = fMC_Data[1]->energy_lowEdge[0];
 		}
-// now fill vector with energies and energy bins
+		// now fill vector with energies and energy bins
 		while( iBinEnergyMin < fMC_Data[1]->effArea_Emax )
 		{
 			VDifferentialFlux i_flux;
 			
 			bool i_eff_found = false;
-// lower energy bin
+			// lower energy bin
 			for( unsigned int i = 0; i < fMC_Data[1]->energy.size(); i++ )
 			{
 				if( TMath::Abs( fMC_Data[1]->energy[i] - iBinSize / 2. - iBinEnergyMin ) < 1.e-2 )
 				{
-// temporary assignment: Energy_lowEdge should be on lin scale, here it is on log scale
+					// temporary assignment: Energy_lowEdge should be on lin scale, here it is on log scale
 					i_flux.Energy_lowEdge = fMC_Data[1]->energy[i] - iBinSize / 2.;
 					i_flux.Energy_lowEdge_bin = i;
 					i_eff_found = true;
@@ -1856,20 +1856,20 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 			}
 			if( i_eff_found )
 			{
-// upper energy bin
+				// upper energy bin
 				if( i_flux.Energy_lowEdge_bin + int( dE_Log10 / iBinSize ) < fMC_Data[1]->energy.size() )
 				{
 					i_flux.Energy_upEdge     = i_flux.Energy_lowEdge + dE_Log10;
 					i_flux.Energy_upEdge_bin = i_flux.Energy_lowEdge_bin + int( dE_Log10 / iBinSize ) - 1;
-// energies are on linear scale
+					// energies are on linear scale
 					i_flux.Energy_lowEdge = TMath::Power( 10., i_flux.Energy_lowEdge );
 					i_flux.Energy_upEdge  = TMath::Power( 10., i_flux.Energy_upEdge );
 					
 					i_flux.dE = i_flux.Energy_upEdge - i_flux.Energy_lowEdge;
-// simplified
+					// simplified
 					i_flux.Energy = ( i_flux.Energy_lowEdge + i_flux.Energy_upEdge ) / 2.;
 					i_flux.EnergyWeightedMean = i_flux.Energy;
-// convert from [h] to [s]
+					// convert from [h] to [s]
 					i_flux.ObsTime = fObservationTime_h * 60. * 60.;
 					
 					v_flux.push_back( i_flux );
@@ -1896,10 +1896,10 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		}
 	}
 	
-///////////////////////////////////////////////////////////////////
-// get gamma rate [1/min] for a certain ze, az, noise, wobble offset
-///////////////////////////////////////////////////////////////////
-// for integral sensitivity set energy bins according to effective areas
+	///////////////////////////////////////////////////////////////////
+	// get gamma rate [1/min] for a certain ze, az, noise, wobble offset
+	///////////////////////////////////////////////////////////////////
+	// for integral sensitivity set energy bins according to effective areas
 	if( fDebug )
 	{
 		cout << "Calculate rates for gamma rays" << endl;
@@ -1916,15 +1916,15 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	}
 	
 	
-///////////////////////////////////////////////////////////////////
-// COSMIC RAYS (background)
-///////////////////////////////////////////////////////////////////
-
+	///////////////////////////////////////////////////////////////////
+	// COSMIC RAYS (background)
+	///////////////////////////////////////////////////////////////////
+	
 	map< unsigned int, vector< double > > v_flux_NOff;
 	map< unsigned int, vector< double > > v_flux_NOff_error;
 	
-// loop over all background files
-// (i.e. background particle types, usually electrons=2 and protons=14)
+	// loop over all background files
+	// (i.e. background particle types, usually electrons=2 and protons=14)
 	for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
 	{
 		if( ( *i_MCData_iterator ).first == 1 )
@@ -1932,8 +1932,8 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 			continue;    // ignore gamma rays
 		}
 		//std::cout<<"i_MCData_iterator "<<i_MCData_iterator<<std::endl;
-///////////////////////////////////////////////////////////////////
-// get CR spectrum from literature
+		///////////////////////////////////////////////////////////////////
+		// get CR spectrum from literature
 		VEnergySpectrumfromLiterature i_CR( ( *i_MCData_iterator ).second->fSpectralParameterFile );
 		cout << "\t reading CR spectrum with ID" << ( *i_MCData_iterator ).second->fSpectralParameterID << endl;
 		if( i_CR.isZombie() )
@@ -1943,7 +1943,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		std::cout << "VSensitivityCalculator::getDifferentialFluxVectorfromMC CR " << std::endl;
 		i_CR.listValues( ( *i_MCData_iterator ).second->fSpectralParameterID );
 		
-// get CR rate for a certain ze, az, noise, wobble offset
+		// get CR rate for a certain ze, az, noise, wobble offset
 		for( unsigned int i = 0; i < v_flux.size(); i++ )
 		{
 			v_flux_NOff[( *i_MCData_iterator ).first].push_back( 0. );
@@ -1951,7 +1951,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		}
 		
 		VMonteCarloRateCalculator iMCR;
-// loop over all energy bins
+		// loop over all energy bins
 		for( unsigned int i = 0; i < v_flux.size(); i++ )
 		{
 			v_flux_NOff[( *i_MCData_iterator ).first][i]       =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin,
@@ -1969,16 +1969,16 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 					( *i_MCData_iterator ).second->hWeightedRate,
 					v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
 					
-//////////////////////////////////////////////////////////////////////////////////////////
-// take care of space angle and theta2 cut normalisation
-//////////////////////////////////////////////////////////////////////////////////////////
-
-// CR spectrum is given as dN/dt/dOmega (Omega = space angle)
-// multiply CR rate by space angle used in CORSIKA (scattering angle)
+			//////////////////////////////////////////////////////////////////////////////////////////
+			// take care of space angle and theta2 cut normalisation
+			//////////////////////////////////////////////////////////////////////////////////////////
+			
+			// CR spectrum is given as dN/dt/dOmega (Omega = space angle)
+			// multiply CR rate by space angle used in CORSIKA (scattering angle)
 			v_flux_NOff[( *i_MCData_iterator ).first][i]       *= ( *i_MCData_iterator ).second->SolidAngle_MCScatterAngle;
 			v_flux_NOff_error[( *i_MCData_iterator ).first][i] *= ( *i_MCData_iterator ).second->SolidAngle_MCScatterAngle;
-// scale direction cut CR solid angle to gamma-ray solid angle
-// (CR theta2 might be larger than gamma-ray, simply to gain statistics under the assumption of a flat angular acceptance)
+			// scale direction cut CR solid angle to gamma-ray solid angle
+			// (CR theta2 might be larger than gamma-ray, simply to gain statistics under the assumption of a flat angular acceptance)
 			double iSolidAngle_Gamma =  fMC_Data[1]->getSolidAngle_DirectionCut( v_flux[i].Energy );
 			double iSolidAngle_Bck   = ( *i_MCData_iterator ).second->getSolidAngle_DirectionCut( v_flux[i].Energy );
 			if( iSolidAngle_Bck > 0. )
@@ -1993,17 +1993,17 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 					cout << endl;
 				}
 			}
-// missing helium (etc) simulations
+			// missing helium (etc) simulations
 			v_flux_NOff[( *i_MCData_iterator ).first][i]       *= ( 1. + fMC_BackgroundMissingParticleFraction );
 			v_flux_NOff_error[( *i_MCData_iterator ).first][i] *= ( 1. + fMC_BackgroundMissingParticleFraction );
 		}
 	}
 	
-//////////////////////////////////
-// now sum up all background
-//////////////////////////////////
-
-// add background rate to signal rate (NOn is gamma-ray + background rate in signal region)
+	//////////////////////////////////
+	// now sum up all background
+	//////////////////////////////////
+	
+	// add background rate to signal rate (NOn is gamma-ray + background rate in signal region)
 	map< unsigned int, vector< double > >::iterator v_flux_NOff_iter;
 	for( unsigned int i = 0; i < v_flux.size(); i++ )
 	{
@@ -2012,7 +2012,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		{
 			if( i < ( *v_flux_NOff_iter ).second.size() )
 			{
-// require at least some proton events
+				// require at least some proton events
 				if( i < v_flux_NOff[14].size() && v_flux_NOff[14][i] > 0. )
 				{
 					v_flux[i].NOn  += ( *v_flux_NOff_iter ).second[i];
@@ -2021,7 +2021,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 			}
 		}
 	}
-// error calculation
+	// error calculation
 	for( unsigned int i = 0; i < v_flux.size(); i++ )
 	{
 		v_flux[i].NOn_error = v_flux[i].NOn_error * v_flux[i].NOn_error;
@@ -2046,9 +2046,9 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		plotDebugPlotsBackgroundParticleNumbers( v_flux, v_flux_NOff, v_flux_NOff_error );
 	}
 	
-// calculate mean alpha
-
-// scale by alpha
+	// calculate mean alpha
+	
+	// scale by alpha
 	double alpha = 0.;
 	double zz = 0;
 	for( i_MCData_iterator = fMC_Data.begin(); i_MCData_iterator != fMC_Data.end(); i_MCData_iterator++ )
@@ -2084,9 +2084,9 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		plotEffectiveArea();
 	}
 	
-////////////////////////////////////////////////////
-// calculate number of on/off events from rates
-////////////////////////////////////////////////////
+	////////////////////////////////////////////////////
+	// calculate number of on/off events from rates
+	////////////////////////////////////////////////////
 	double iTotG = 0.;
 	double iTotB = 0.;
 	if( v_flux.size() > 0 )
@@ -2113,7 +2113,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		}
 	}
 	
-////////////////////////////////////////////////////
+	////////////////////////////////////////////////////
 	iNorm = alpha;  // (norm is a return value)
 	return v_flux;
 }
@@ -2123,7 +2123,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 
 vector< VDifferentialFlux > VSensitivityCalculator::getDifferentFluxVectorfromData( string iAnasumCrabFile, double dE_Log10, double& iNorm )
 {
-// read energy spectrum from file
+	// read energy spectrum from file
 	VEnergySpectrum e( iAnasumCrabFile );
 	if( e.isZombie() )
 	{
@@ -2186,11 +2186,11 @@ void VSensitivityCalculator::setMonteCarloParameters( unsigned int iParticleID,
 		return;
 	}
 	
-// create a new MC data object
+	// create a new MC data object
 	VSensitivityCalculatorDataResponseFunctions* f = new VSensitivityCalculatorDataResponseFunctions();;
 	fMC_Data[iParticleID] = f;
 	
-// fill data
+	// fill data
 	f->fParticleID = iParticleID;
 	f->fSpectralParameterFile = gSystem->ExpandPathName( iSpectralParameterFile.c_str() );
 	f->fSpectralParameterID = iSpectralParameterID;
@@ -2243,7 +2243,7 @@ double VSensitivityCalculator::getMonteCarloRateFromWeightedRateHistogram( doubl
 	iE_low = log10( iE_low ) + 0.01;
 	iE_up  = log10( iE_up ) - 0.01;
 	
-// find lower bin (assume identical binning in weightedratehistogram and energy vector
+	// find lower bin (assume identical binning in weightedratehistogram and energy vector
 	int iHis_minBin = iWeightedRateHistogram->GetXaxis()->FindBin( iE_low );
 	int iHis_maxBin = iWeightedRateHistogram->GetXaxis()->FindBin( iE_up );
 	
@@ -2281,26 +2281,26 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
 		bool iRateError, VMonteCarloRateCalculator* iMCR,
 		double iE_low, double iE_up )
 {
-// first choice: use weighted rate histograms if available
+	// first choice: use weighted rate histograms if available
 	if( iMCPara.hWeightedRate )
 	{
 		return getMonteCarloRateFromWeightedRateHistogram( iE_low, iE_up, iRateError, iMCPara.hWeightedRate );
 	}
 	
-// otherwise use effective areas to calculate MC rates
+	// otherwise use effective areas to calculate MC rates
 	if( !iMCR )
 	{
 		return 0.;
 	}
 	
-// return error on rate (from error on effective area, which is derived from MC statistics)
+	// return error on rate (from error on effective area, which is derived from MC statistics)
 	if( iRateError )
 	{
 		return iMCR->getMonteCarloRate( iMCPara.energy, iMCPara.effArea_error, &i_Espec, iMCPara.fSpectralParameterID,
 										iE_low_bin, iE_up_bin, hResponseMatrix, getDebug() );
 	}
 	
-// return rate calculated from MC effective areas
+	// return rate calculated from MC effective areas
 	return iMCR->getMonteCarloRate( iMCPara.energy, iMCPara.effArea, &i_Espec, iMCPara.fSpectralParameterID,
 									iE_low_bin, iE_up_bin, hResponseMatrix, getDebug() );
 }
@@ -2312,19 +2312,19 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
 		VMonteCarloRateCalculator* iMCR, TH1D* iWeightedRate,
 		double iE_low, double iE_up )
 {
-// first choice: use weighted rate histograms if available
+	// first choice: use weighted rate histograms if available
 	if( iWeightedRate )
 	{
 		return getMonteCarloRateFromWeightedRateHistogram( iE_low, iE_up, iRateError, iWeightedRate );
 	}
 	
-// otherwise use effective areas to calculate MC rates
+	// otherwise use effective areas to calculate MC rates
 	if( !iMCR )
 	{
 		return 0.;
 	}
 	
-// return rate calculated from MC effective areas
+	// return rate calculated from MC effective areas
 	return iMCR->getMonteCarloRate( e, eff, &i_Espec, e_lit_ID,
 									iE_low_bin, iE_up_bin, -1., -1., hResponseMatrix, e_gamma, getDebug() );
 }
@@ -2336,9 +2336,9 @@ double VSensitivityCalculator::getMonteCarlo_Rate( unsigned int iE_low_bin, unsi
 */
 bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions* iMCPara, double dE_Log10 )
 {
-//////////////////////////////////////////////////////////////////////////////////////
-// read effective areas from file
-//////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
+	// read effective areas from file
+	//////////////////////////////////////////////////////////////////////////////////////
 	TFile fEff( iMCPara->fEffectiveAreaFile.c_str() );
 	if( fEff.IsZombie() )
 	{
@@ -2369,13 +2369,13 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	iMCPara->energy.clear();
 	iMCPara->effArea.clear();
 	
-// loop over all effective areas in effective area tree and read the appropriate one
+	// loop over all effective areas in effective area tree and read the appropriate one
 	bool bFound = false;
 	for( unsigned int i = 0; i < c->fChain->GetEntries(); i++ )
 	{
 		c->GetEntry( i );
 		
-// do selection of effective areas only if there are several effective areas
+		// do selection of effective areas only if there are several effective areas
 		if( c->fChain->GetEntries() > 1 )
 		{
 			if( TMath::Abs( c->index - iMCPara->index ) > 1.e-2 )
@@ -2393,7 +2393,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 				continue;
 			}
 			
-// ignore everything else for non-gammas (wobble offsets and zenith angles)
+			// ignore everything else for non-gammas (wobble offsets and zenith angles)
 			if( iMCPara->fParticleID == 1 )
 			{
 				if( TMath::Abs( c->ze - iMCPara->ze ) > 2. )
@@ -2410,12 +2410,12 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		cout << "\t found effective area " << i << " with " << c->nbins << " bins" << endl;
 		bFound = true;
 		
-/////////////////////////////////////////////////////////
-// get weighted rate histograms
-//
-//   used for energy binning
-
-// copy weighted rate histogram
+		/////////////////////////////////////////////////////////
+		// get weighted rate histograms
+		//
+		//   used for energy binning
+		
+		// copy weighted rate histogram
 		if( c->hWeightedRate )
 		{
 			char hname[1000];
@@ -2431,7 +2431,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 				iMCPara->hWeightedRate->SetBinError( i, c->hWeightedRate->GetBinError( i ) );
 			}
 			
-// set energy binning (note: this is fixed by hWeightedRate histogram)
+			// set energy binning (note: this is fixed by hWeightedRate histogram)
 			for( int i = 1; i <= iMCPara->hWeightedRate->GetNbinsX(); i++ )
 			{
 				if( iMCPara->hWeightedRate->GetBinContent( i ) )
@@ -2442,9 +2442,9 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 				}
 			}
 			
-/////////////////////////////////////////////////////////
-// fill effective areas vs reconstructed energy (log10!)
-
+			/////////////////////////////////////////////////////////
+			// fill effective areas vs reconstructed energy (log10!)
+			
 			for( unsigned int i = 0; i < iMCPara->energy.size(); i++ )
 			{
 				int z = 0;
@@ -2465,7 +2465,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 					iMCPara->effArea_error.back() = sqrt( iMCPara->effArea_error.back() ) / z;
 				}
 			}
-// get global energy binning
+			// get global energy binning
 			iMCPara->effArea_Ebins = iMCPara->hWeightedRate->GetNbinsX();
 			iMCPara->effArea_Emin  = iMCPara->hWeightedRate->GetXaxis()->GetXmin();
 			iMCPara->effArea_Emax  = iMCPara->hWeightedRate->GetXaxis()->GetXmax();
@@ -2492,7 +2492,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		}
 		break;
 	}
-// remove single filled bins in effective areas
+	// remove single filled bins in effective areas
 	bool bGoodBin = false;
 	if( iMCPara->energy.size() > 1 )
 	{
@@ -2516,9 +2516,9 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	{
 		cout << "\t no effective area found!" << endl;
 	}
-// (end of treatment of effective areas)
-
-// copy response matrix for energy reconstruction
+	// (end of treatment of effective areas)
+	
+	// copy response matrix for energy reconstruction
 	if( c->hResponseMatrix )
 	{
 		char hname[1000];
@@ -2531,7 +2531,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 										   c->hResponseMatrix->GetNbinsY(),
 										   c->hResponseMatrix->GetYaxis()->GetXmin(), c->hResponseMatrix->GetYaxis()->GetXmax() );
 		TH2D* i_hResponse = c->hResponseMatrix;
-// for cosmic rays: interpolate response matrix
+		// for cosmic rays: interpolate response matrix
 		if( iMCPara->fParticleID != 1 && iMCPara->fParticleID != 2 )
 		{
 			cout << "\t interpolating response matrix for particle type " << iMCPara->fParticleID << endl;
@@ -2549,15 +2549,15 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		}
 	}
 	
-//////////////////////////////////////////////////////////////////////////////////////
-// read MC parameters in case run header is available
-// (e.g. diffuse scatter angle used in simtel simulations)
-//////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
+	// read MC parameters in case run header is available
+	// (e.g. diffuse scatter angle used in simtel simulations)
+	//////////////////////////////////////////////////////////////////////////////////////
 	VMonteCarloRunHeader* iMCHeader = ( VMonteCarloRunHeader* )fEff.Get( "MC_runheader" );
 	if( iMCHeader )
 	{
 		cout << "reading Monte Carlo header" << endl;
-// diffuse scatter angle
+		// diffuse scatter angle
 		if( iMCHeader->diffuse )
 		{
 			iMCPara->theta2_MCScatterAngle = iMCHeader->viewcone[1] * iMCHeader->viewcone[1];
@@ -2573,14 +2573,14 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 	}
 	iMCPara->SolidAngle_MCScatterAngle = 2. * TMath::Pi() * ( 1. - cos( sqrt( iMCPara->theta2_MCScatterAngle ) * TMath::Pi() / 180. ) );
 	
-//////////////////////////////////////////////////////////////////////////////////////
-// calculate solid angle from analysis cuts (or from input parameter theta2)
-// (independent of energy binning of differential sensitivity curves)
-//////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
+	// calculate solid angle from analysis cuts (or from input parameter theta2)
+	// (independent of energy binning of differential sensitivity curves)
+	//////////////////////////////////////////////////////////////////////////////////////
 	VGammaHadronCuts* iCuts = ( VGammaHadronCuts* )fEff.Get( "GammaHadronCuts" );
 	if( iCuts )
 	{
-// theta2 might be energy dependent
+		// theta2 might be energy dependent
 		cout << "calculating solid angle from analysis cuts (might be energy dependent)" << endl;
 		cout << "\t TMVA CUT " << iCuts->getDirectionCutSelector() << endl;
 		iMCPara->theta2_min = iCuts->getTheta2Cut_min();       // theta2 min assumed to be energy independent
@@ -2589,8 +2589,8 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 			iMCPara->theta2_min = 0.;
 		}
 		
-// solid angle vs energy is stored in a TGraph
-// (note that lower cut on theta2 is not a function of energy)
+		// solid angle vs energy is stored in a TGraph
+		// (note that lower cut on theta2 is not a function of energy)
 		iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV = new TGraph( 1000 );
 		iMCPara->gTheta2Cuts_vsEnergylgTeV = new TGraph( 1000 );
 		
@@ -2601,7 +2601,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		{
 			e = fEnergy_min_Log + i * ( fEnergy_max_Log - fEnergy_min_Log ) / iMCPara->gSolidAngle_DirectionCut_vs_EnergylgTeV->GetN();
 			
-// VGammaHadronCuts::getTheta2Cut_max work with lin E
+			// VGammaHadronCuts::getTheta2Cut_max work with lin E
 			itheta2 = iCuts->getTheta2Cut_max( TMath::Power( 10., e ) );
 			if( itheta2 > 0. )
 			{
@@ -2620,8 +2620,8 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 			iMCPara->gTheta2Cuts_vsEnergylgTeV->SetPoint( i, e, itheta2 );
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// read sucess of TMVA cut optimization from gamma/hadron cuts
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// read sucess of TMVA cut optimization from gamma/hadron cuts
 	fTMVAEvaluatorResults = ( VTMVAEvaluatorResults* )fEff.Get( "TMVAEvaluatorResults" );
 	if( fTMVAEvaluatorResults )
 	{
@@ -2878,7 +2878,7 @@ void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlu
 			z++;
 		}
 	}
-// write graphs with on and off events to disk
+	// write graphs with on and off events to disk
 	if( fDebugParticleNumberFile.size() > 0 )
 	{
 		cout << "writing graphs with on/off events to file: " << fDebugParticleNumberFile << endl;
@@ -2957,7 +2957,7 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas* c, double iYVa
 	}
 	c->cd();
 	
-// get maximum in histogram
+	// get maximum in histogram
 	if( iYValue < -100. )
 	{
 		if( !hnull )
@@ -2975,7 +2975,7 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas* c, double iYVa
 	cout << fSignificanceLimited.size() << "\t" << fMinBackgroundEventsLimited.size();
 	cout << "\t" << fMinNoBackground.size() << endl;
 	
-// minimum number of events
+	// minimum number of events
 	if( fMinEventsLimited.size() > 0 )
 	{
 		cout << "Minimum number of events limited: red " << endl;
@@ -2994,7 +2994,7 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas* c, double iYVa
 			}
 		}
 	}
-// background event ratio limited
+	// background event ratio limited
 	if( fMinBackgroundEventsLimited.size() > 0 )
 	{
 		cout << "Background rate ratio limited: green" << endl;
@@ -3013,7 +3013,7 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas* c, double iYVa
 			}
 		}
 	}
-// significance
+	// significance
 	if( fSignificanceLimited.size() > 0 )
 	{
 		cout << "Significance limited: blue" << endl;
@@ -3032,7 +3032,7 @@ void VSensitivityCalculator::plotSensitivityLimitations( TCanvas* c, double iYVa
 			}
 		}
 	}
-// no background events
+	// no background events
 	if( fMinNoBackground.size() > 0 )
 	{
 		cout << "No background events limited: purple" << endl;
@@ -3121,14 +3121,14 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
 	{
 		fillSensitivityHistogramfromGraph( gSensitivityvsEnergy, iSensitivity, 1. );
 	}
-// make sure the high-energy filling only is done when sensitivities are filled
+	// make sure the high-energy filling only is done when sensitivities are filled
 	else
 	{
 		iHighEnergyFilling = false;
 	}
 	if( iBGRate && gBGRate )
 	{
-// rate histogram are filled in 1/s, graphs are in 1/min
+		// rate histogram are filled in 1/s, graphs are in 1/min
 		fillSensitivityHistogramfromGraph( gBGRate, iBGRate, 1. / 60. );
 	}
 	fillBackroundvsSquareDegree( gBGRate, iBGRateSqDeg );
@@ -3143,8 +3143,8 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
 		fillBackroundvsSquareDegree( gElectronRate, iElectronRateSqDeg );
 	}
 	
-// go again over the high energy part of the sensitivity curve and check conditions for sensitivity:
-// is signal number critera fullfilled early enough so that it can be used?
+	// go again over the high energy part of the sensitivity curve and check conditions for sensitivity:
+	// is signal number critera fullfilled early enough so that it can be used?
 	if( iHighEnergyFilling )
 	{
 		double x = 0.;
@@ -3168,7 +3168,7 @@ bool VSensitivityCalculator::fillSensitivityHistograms( TH1F* iSensitivity, TH1F
 					}
 				}
 			}
-// fill (don't allow negative sensitivity)
+			// fill (don't allow negative sensitivity)
 			if( iFillBins && y > 0. )
 			{
 				iSensitivity->SetBinContent( i_x, y );
@@ -3398,7 +3398,7 @@ VSensitivityCalculatorDataResponseFunctions::VSensitivityCalculatorDataResponseF
 
 VSensitivityCalculatorDataResponseFunctions::~VSensitivityCalculatorDataResponseFunctions()
 {
-//   if( hResponseMatrix ) delete hResponseMatrix;
+	//   if( hResponseMatrix ) delete hResponseMatrix;
 }
 
 double VSensitivityCalculatorDataResponseFunctions::getSolidAngle_DirectionCut( double e )
@@ -3417,7 +3417,7 @@ double VSensitivityCalculatorDataResponseFunctions::getSolidAngle_DirectionCut( 
 void VSensitivityCalculatorDataResponseFunctions::initializeHistograms( string iU )
 {
 	char hname[1000];
-// preliminary initialization
+	// preliminary initialization
 	sprintf( hname, "%s_%d_%d_%d_%d_%s", fName.c_str(), fParticleID, ( int )( woff * 1000 ), az, ( int )( index * 100 ), iU.c_str() );
 	hResponseMatrix = new TH2D( hname, "B", 5, 0., 1., 5, 0., 1. );
 	sprintf( hname, "%s1D_%d_%d_%d_%d_%s", fName.c_str(), fParticleID, ( int )( woff * 1000 ), az, ( int )( index * 100 ), iU.c_str() );

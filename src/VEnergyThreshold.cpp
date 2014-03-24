@@ -322,7 +322,7 @@ double VEnergyThreshold::getEnergyThreshold( TH1D* h, bool bLogEnergyAxis, bool 
 	
 	int iMaxBin = h->GetMaximumBin();
 	
-// weighed bin of three largest bins
+	// weighed bin of three largest bins
 	if( !bFit )
 	{
 		double iTotWeight = 0.;
@@ -343,7 +343,7 @@ double VEnergyThreshold::getEnergyThreshold( TH1D* h, bool bLogEnergyAxis, bool 
 			feth /= iTotWeight;
 		}
 	}
-// fit region around maximum by pol5
+	// fit region around maximum by pol5
 	else
 	{
 		double i_negX = 0.08;
@@ -451,25 +451,25 @@ double VEnergyThreshold::getEnergyThreshold( VRunList* iRunData )
 		cout << fEnergyThresholdFileName.size() << " " << fEnergyThresholdFixedValue << endl;
 	}
 	
-// no file with energy thresholds given; return fixed value
+	// no file with energy thresholds given; return fixed value
 	if( fEnergyThresholdFileName.size() <= 0 )
 	{
 		return fEnergyThresholdFixedValue;
 	}
 	
-// no run data given, return 0 energy threshold
+	// no run data given, return 0 energy threshold
 	if( iRunData == 0 )
 	{
 		return 0.001;
 	}
 	
-// open file with energy thresholds
+	// open file with energy thresholds
 	if( !fEnergyThresholdFile && !openEnergyThresholdFile() )
 	{
 		return 0.001;
 	}
 	
-// interpolate between energy thresholds
+	// interpolate between energy thresholds
 	return interpolateEnergyThreshold( iRunData );
 }
 
@@ -498,8 +498,8 @@ bool VEnergyThreshold::openEnergyThresholdFile()
 	cout << "total number of entries in energy threshold tree: " << nentries << endl;
 	
 	fTreeEth->SetBranchAddress( "ze", &fze );
-// DO THIS WITH INTEGERS!!!!!
-// read in all entries and see what values are available
+	// DO THIS WITH INTEGERS!!!!!
+	// read in all entries and see what values are available
 	vector< double > fv_Ze;
 	fv_Ze.reserve( nentries );
 	
@@ -553,7 +553,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	vector< string > iName;
 	vector< string > iTitle;
 	
-// energy threshold vs spectral index
+	// energy threshold vs spectral index
 	iName.push_back( "spectral index" );
 	iDraw.push_back( var + "*1.e3:index" );
 	sprintf( hname, "az == %d && noise == %d && TMath::Abs( ze - %f ) < 0.1 && TMath::Abs( Woff - %f ) < 0.05", az, noise, ze, woff );
@@ -561,7 +561,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	sprintf( hname, "ze=%d deg, woff = %.2f deg, noise level = %d", ( int )ze, woff, noise );
 	iTitle.push_back( hname );
 	
-// energy threshold vs zenith angle
+	// energy threshold vs zenith angle
 	iName.push_back( "zenith angle [deg]" );
 	iDraw.push_back( var + "*1.e3:ze" );
 	sprintf( hname, "az == %d && noise == %d && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( Woff - %f ) < 0.05", az, noise, index, woff );
@@ -569,7 +569,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	sprintf( hname, "woff = %.2f deg, noise level = %d, spectral index = %.1f", woff, noise, index );
 	iTitle.push_back( hname );
 	
-// energy threshold vs wobble offsets
+	// energy threshold vs wobble offsets
 	iName.push_back( "wobble offset [deg]" );
 	iDraw.push_back( var + "*1.e3:Woff" );
 	sprintf( hname, "az == %d && noise == %d && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( ze - %f ) < 0.05", az, noise, index, ze );
@@ -577,7 +577,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	sprintf( hname, "ze=%d deg, noise level = %d, spectral index = %.1f", ( int )ze, noise, index );
 	iTitle.push_back( hname );
 	
-// energy threshold vs pedestal variations
+	// energy threshold vs pedestal variations
 	iName.push_back( "pedestal variation" );
 	iDraw.push_back( var + "*1.e3:pedvar" );
 	sprintf( hname, "az == %d && TMath::Abs( Woff - %f ) < 0.05 && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( ze - %f ) < 0.05", az, woff, index, ze );
@@ -585,7 +585,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 	sprintf( hname, "ze=%d deg, woff = %.2f deg, spectral index = %.1f", ( int )ze, woff, index );
 	iTitle.push_back( hname );
 	
-// energy threshold vs azimuth angle
+	// energy threshold vs azimuth angle
 	iName.push_back( "azimuth angle [deg]" );
 	iDraw.push_back( var + "*1.e3:azMin+30." );
 	sprintf( hname, "az != 16 && noise == %d && TMath::Abs( Woff - %f ) < 0.05 && TMath::Abs( index - %f ) < 0.1 && TMath::Abs( ze - %f ) < 0.05", noise, woff, index, ze );
@@ -650,7 +650,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 				fTreeEth->Draw( iDraw[i].c_str(), iCut[i].c_str(), ( plot_option + "same" ).c_str() );
 			}
 		}
-// search for last plotted graph in TPad
+		// search for last plotted graph in TPad
 		TGraph* g = 0;
 		TObjLink* lnk = gPad->GetListOfPrimitives()->FirstLink();
 		while( lnk )
@@ -667,7 +667,7 @@ void VEnergyThreshold::plot_energyThresholds( string var, double ze, double woff
 			g->SetLineWidth( ( Width_t )fPlottingLineWidth );
 			g->Draw( plot_option.c_str() );
 		}
-// draw titles
+		// draw titles
 		/*        TText *tx = 0;
 			if( i < iTitle.size() )
 			{

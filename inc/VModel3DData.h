@@ -38,14 +38,14 @@ class VModel3DData
 		
 		unsigned int fNtotPixel3D; // total number of selected pixels in full array
 		
-//// telescope configuration parameters ////
+		//// telescope configuration parameters ////
 		// for each telescope
 		vector< vector< double > > flocTel3D; // location of telescope on ground
 		vector<double> fMarea3D;              // mirror area (m^2)
 		// for each telescope and pixel
 		vector< vector< double > > fomegapix3D; // solid angle for each telescope and pixel
 		
-//// pointing for each telescope (sub-array pointing not implemented) ////
+		//// pointing for each telescope (sub-array pointing not implemented) ////
 		vector<double> fTze3D; // zenith
 		vector<double> fTaz3D; // azimuth
 		vector<double> fT3D;   // "T" vector of telescope pointing
@@ -55,7 +55,7 @@ class VModel3DData
 		vector< vector< double > > fpY3D; // "p" vector (Y in ground coordinates)
 		vector< vector< double > > fpZ3D; // "p" vector (Z in ground coordinates)
 		
-//// general coordinate frame conversion ////
+		//// general coordinate frame conversion ////
 		// for three dimensional space
 		vector<double> fxg3D;   // X ground coordinate (unit base vectors)
 		vector<double> fyg3D;   // Y ground coordinate (unit base vectors)
@@ -65,18 +65,18 @@ class VModel3DData
 		vector<double> fysg3D;  // Y sky unit base vector in ground coordinate frame
 		vector<double> fzsg3D;  // Z sky unit base vector in ground coordinate frame
 		
-//// Model3D calculated signals ////
+		//// Model3D calculated signals ////
 		// for each telescope and pixel
 		vector< vector< double > > fMu3D; // Model3D calculated signal
 		vector<double> fMuTel3D;          // Model3D total signal in each telescope
 		
-////// pixel signals (sums), cleaning, and pedvars ////
+		////// pixel signals (sums), cleaning, and pedvars ////
 		// for each telescope and pixel
 		vector< vector< bool > > fClean3D;         // pixels passing cleaning
 		vector< vector< float > > fMeasuredSum3D; // measured signal
 		vector< vector< float > > fPedvar3D;      // measured pedvars
 		
-////// model start parameters ////
+		////// model start parameters ////
 		double fStartSel3D;    // model: elevation of shower direction (deg)
 		double fStartSaz3D;    // model: azimuth of shower direction (deg)
 		double fStartXcore3D;  // model: X shower core in ground coordinates
@@ -86,7 +86,7 @@ class VModel3DData
 		double fStartsigmaT3D; // model: transverse (3D-width)
 		double fStartNc3D;     // model: number of Cherenkov photons in shower
 		
-//// model fit parameters ////
+		//// model fit parameters ////
 		double fSel3D;         // model: elevation of shower direction (deg)
 		double fSaz3D;         // model: azimuth of shower direction (deg)
 		double fXcore3D;       // model: X shower core in ground coordinates
@@ -96,12 +96,12 @@ class VModel3DData
 		double fsigmaT3D;      // model: transverse (3D-width)
 		double fNc3D;          // model: number of Cherenkov photons in shower
 		
-//// slant depth and reduced Width ////
+		//// slant depth and reduced Width ////
 		double fDepth3D;       // model: slant depth of shower maximum
 		double fRWidth3D;      // model: reduced 3D-width
 		double fErrRWidth3D;   // model: error in reduced 3D-width
 		
-//// TEST TEST TEST error in fit parameters ////
+		//// TEST TEST TEST error in fit parameters ////
 		double fErrorSel3D;    // model: elevation of shower direction (deg)
 		double fErrorSaz3D;    // model: azimuth of shower direction (deg)
 		double fErrorXcore3D;  // model: X shower core in ground coordinates
@@ -111,7 +111,7 @@ class VModel3DData
 		double fErrorsigmaT3D; // model: transverse (3D-width)
 		double fErrorNc3D;     // model: number of Cherenkov photons in shower
 		
-//// TEST TEST TEST model step size for fit parameters ////
+		//// TEST TEST TEST model step size for fit parameters ////
 		float fStepSel3D;    // model: elevation of shower direction (deg)
 		float fStepSaz3D;    // model: azimuth of shower direction (deg)
 		float fStepXcore3D;  // model: X shower core in ground coordinates
@@ -121,24 +121,24 @@ class VModel3DData
 		float fStepsigmaT3D; // model: transverse (3D-width)
 		float fStepNc3D;     // model: number of Cherenkov photons in shower
 		
-////// derived shower direction from model ////
+		////// derived shower direction from model ////
 		double fXoffModel3D; // model shower direction
 		double fYoffModel3D; // model shower direction
 		double fXoffDeRot3D; // model shower direction (derotated)
 		double fYoffDeRot3D; // model shower direction (derotated)
 		
-////// goodness-of-fit ////
+		////// goodness-of-fit ////
 		bool fConverged3D;              // fit converged
 		unsigned int fNDF3D;            // number of degrees of freedom
 		vector<unsigned int> fNDFTel3D; // NDF for each telescope
 		double fStartGOF3D;             // starting goodness of fit
 		double fGOF3D;                  // best-fit goodness of fit
 		
-//// FUNCTIONS ////
-//// initialize ////
+		//// FUNCTIONS ////
+		//// initialize ////
 		void initModel3D( unsigned int iNTel3D, vector<unsigned int>& iNpix3D );
 		void initEventModel3D(); // reset (called for each event)
-//// vector geometry ////
+		//// vector geometry ////
 		void norm3D( double& ax, double& ay, double& az ); // normalize the vector
 		void cross3D( double ax, double ay, double az, double bx, double by, double bz, double& cx, double& cy, double& cz ); // compute the cross product
 		double dot3D( double ax, double ay, double az, double bx, double by, double bz ); // compute the dot product

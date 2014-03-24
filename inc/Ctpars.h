@@ -35,7 +35,7 @@ class Ctpars
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
 		
-// Declaration of leave types
+		// Declaration of leave types
 #ifdef TREES_VERSION2
 		Int_t           telID;
 		Int_t           runNumber;
@@ -161,7 +161,7 @@ class Ctpars
 		Int_t           Fitstat;
 #endif
 		
-// List of branches
+		// List of branches
 		TBranch*        b_telID;                  //!
 		TBranch*        b_runNumber;              //!
 		TBranch*        b_MJD;                    //!
@@ -285,7 +285,7 @@ Ctpars::~Ctpars()
 
 Int_t Ctpars::GetEntry( Long64_t entry )
 {
-// Read contents of entry.
+	// Read contents of entry.
 	if( !fChain )
 	{
 		return 0;
@@ -296,7 +296,7 @@ Int_t Ctpars::GetEntry( Long64_t entry )
 
 Long64_t Ctpars::LoadTree( Long64_t entry )
 {
-// Set the environment to read one entry
+	// Set the environment to read one entry
 	if( !fChain )
 	{
 		return -5;
@@ -323,7 +323,7 @@ Long64_t Ctpars::LoadTree( Long64_t entry )
 void Ctpars::Init( TTree* tree )
 {
 
-// Set branch addresses
+	// Set branch addresses
 	if( tree == 0 )
 	{
 		return;
@@ -332,8 +332,8 @@ void Ctpars::Init( TTree* tree )
 	fCurrent = -1;
 	fChain->SetMakeClass( 1 );
 	
-/////////////////////////////////////////////////
-//    bShort = 2:  read limited number of branched needed for lookup table filling
+	/////////////////////////////////////////////////
+	//    bShort = 2:  read limited number of branched needed for lookup table filling
 	if( bShort <= 2 )
 	{
 		if( fVersion > 3 && fChain->GetBranchStatus( "meanPedvar_Image" ) )
@@ -356,7 +356,7 @@ void Ctpars::Init( TTree* tree )
 		}
 		size = 0.;
 	}
-//    bShort = 1:  read limited number of branches needed for lookup table analysis
+	//    bShort = 1:  read limited number of branches needed for lookup table analysis
 	if( bShort <= 1 )
 	{
 		if( fChain->GetBranchStatus( "eventNumber" ) )
@@ -418,7 +418,7 @@ void Ctpars::Init( TTree* tree )
 		fChain->SetBranchAddress( "asymmetry", &asymmetry );
 		fChain->SetBranchAddress( "tgrad_x", &tgrad_x );
 		fChain->SetBranchAddress( "Fitstat", &Fitstat );
-// reset variables which are not read out
+		// reset variables which are not read out
 		alpha = 0.;
 		los = 0.;
 		phi = 0.;
@@ -430,7 +430,7 @@ void Ctpars::Init( TTree* tree )
 		index_of_max[2] = 0;
 		tchisq_x = 0.;
 	}
-// bShort == 0: read all branches
+	// bShort == 0: read all branches
 	if( bShort == 0 )
 	{
 		fChain->SetBranchAddress( "alpha", &alpha );
@@ -473,7 +473,7 @@ Bool_t Ctpars::Notify()
 	b_tchisq_x = 0;
 	b_Fitstat = 0;
 	
-// get branch pointers
+	// get branch pointers
 	if( bShort <= 2 )
 	{
 		if( fVersion > 3 && fChain->GetBranchStatus( "meanPedvar_Image" ) )
@@ -560,8 +560,8 @@ Bool_t Ctpars::Notify()
 
 void Ctpars::Show( Long64_t entry )
 {
-// Print contents of entry.
-// If entry is not specified, print current entry
+	// Print contents of entry.
+	// If entry is not specified, print current entry
 	if( !fChain )
 	{
 		return;
@@ -572,9 +572,9 @@ void Ctpars::Show( Long64_t entry )
 
 Int_t Ctpars::Cut( Long64_t entry )
 {
-// This function may be called from Loop.
-// returns  1 if entry is accepted.
-// returns -1 otherwise.
+	// This function may be called from Loop.
+	// returns  1 if entry is accepted.
+	// returns -1 otherwise.
 	return 1;
 }
 #endif                                            // #ifdef Ctpars_cxx

@@ -36,7 +36,7 @@ class VXRayData : public TObject
 		bool bDebug;
 		
 	public:
-// X-ray data
+		// X-ray data
 		vector< double > fMJD;
 		vector< double > fPhase;
 		vector< double > fPhi;
@@ -74,7 +74,7 @@ class VFluxCalculation : public TObject
 		
 		bool fTimebinned;
 		
-// input parameters read from anasum file (from run summary tree)
+		// input parameters read from anasum file (from run summary tree)
 		vector< double > fRunList;                //!< run number
 		vector< double > fRunMJD;                 //!< MJD
 		vector< double > fRunTOn;                 //!< life time [s]
@@ -106,7 +106,7 @@ class VFluxCalculation : public TObject
 		vector< double > fRunCI_up_3sigma;        //!< counts: upper value of 3 sigma confidence interval
 		vector< vector< double > > fIntraRunCI_up_3sigma;
 		
-// intermediate results
+		// intermediate results
 		vector< double > fRunEffArea;             //!< normalize effective area
 		vector < vector< double > > fIntraRunEffArea;
 		vector< double > fRunFluxConstant;        //!< flux constant or upper flux limit constant per run
@@ -126,24 +126,24 @@ class VFluxCalculation : public TObject
 		vector< double > fRunFluxCI_up_3sigma;    //!< flux: upper value of 3 sigma confidence interval
 		vector< vector< double > > fIntraRunFluxCI_up_3sigma;
 		
-// spectral parameters (assuming power law)
+		// spectral parameters (assuming power law)
 		double fMinEnergy;                        //!< calculate flux limit above this energy [TeV]
 		double fMaxEnergy;                        //!< maximum energy to be taken into account [TeV]
 		double fE0;                               //!< calculate flux normalization at this energy [TeV]
 		double fAlpha;                            //!< assumed spectral index
 		
 		
-// significance and upper flux limit parameters
+		// significance and upper flux limit parameters
 		int    fLiMaEqu;
 		double fThresholdSignificance;
 		double fMinEvents;
 		double fUpperLimit;
 		int    fUpperLimitMethod;
 		
-// X-ray data
+		// X-ray data
 		VXRayData* fRXTE;
 		
-// graphs
+		// graphs
 		TGraphErrors* gFluxElevation;
 		TCanvas* fCanvasFluxesVSMJD;
 		TCanvas* fCanvasFluxesInBINs;

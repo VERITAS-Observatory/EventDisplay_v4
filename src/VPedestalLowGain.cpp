@@ -54,7 +54,7 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
 {
 	char hname[2000];
 	
-// read root file
+	// read root file
 	sprintf( hname, "%s.root", iFile.c_str() );
 	TFile* fFile = new TFile( hname );
 	if( fFile->IsZombie() )
@@ -88,7 +88,7 @@ TFile* VPedestalLowGain::readLowGainHistograms( string iFile, unsigned int iChan
 		}
 	}
 	
-// read text file
+	// read text file
 	sprintf( hname, "%s", iFile.c_str() );
 	ifstream is;
 	is.open( hname, ifstream::in );
@@ -128,7 +128,7 @@ bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
 {
 	char hname[2000];
 	
-// write root file
+	// write root file
 	sprintf( hname, "%s.root", iOutFileName.c_str() );
 	TFile iF( hname, "RECREATE" );
 	if( iF.IsZombie() )
@@ -149,7 +149,7 @@ bool VPedestalLowGain::writeLowGainPedestalFile( string iOutFileName )
 	
 	iF.Close();
 	
-// write text file
+	// write text file
 	sprintf( hname, "%s", iOutFileName.c_str() );
 	ofstream is;
 	is.open( hname, ifstream::out );
@@ -217,7 +217,7 @@ vector< double > VPedestalLowGain::readPedestalFiles( string iFile )
 {
 	vector< double > iPed;
 	
-// read text file
+	// read text file
 	ifstream is;
 	is.open( iFile.c_str(), ifstream::in );
 	if( !is )

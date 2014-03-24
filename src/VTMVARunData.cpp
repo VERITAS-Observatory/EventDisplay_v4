@@ -15,7 +15,7 @@ VTMVARunData::VTMVARunData()
 	
 	fTrainGammaHadronSeparation = false;
 	fTrainReconstructionQuality = true;
-// default
+	// default
 	fTrainGammaHadronSeparation = true;
 	fTrainReconstructionQuality = false;
 	
@@ -33,7 +33,7 @@ VTMVARunData::VTMVARunData()
 	
 	fNTtype = -1;
 	
-//   fReconstructionQualityTarget = "TMath::Abs((ErecS-MCe0)/MCe0)";
+	//   fReconstructionQualityTarget = "TMath::Abs((ErecS-MCe0)/MCe0)";
 	fReconstructionQualityTarget = "ErecS/MCe0";
 	fReconstructionQualityTargetName = "EQuality";
 }
@@ -49,7 +49,7 @@ bool VTMVARunData::openDataFiles()
 	{
 		cout << "VTMVARunData::openDataFiles()" << endl;
 	}
-// open signal trees
+	// open signal trees
 	fSignalFile.clear();
 	fSignalTree.clear();
 	
@@ -69,8 +69,8 @@ bool VTMVARunData::openDataFiles()
 			cout << "aborting..." << endl;
 			return false;
 		}
-// get for first tree the number of telescope types
-// (note this is the source of the the Error in <TLeafI::GetLen>: Leaf counter is greater than maximum! messages
+		// get for first tree the number of telescope types
+		// (note this is the source of the the Error in <TLeafI::GetLen>: Leaf counter is greater than maximum! messages
 		if( fNTtype < 0 )
 		{
 			Int_t NTtype = 0;
@@ -82,7 +82,7 @@ bool VTMVARunData::openDataFiles()
 			fNTtype = NTtype;
 		}
 	}
-// open background trees
+	// open background trees
 	fBackgroundFile.clear();
 	fBackgroundTree.clear();
 	for( unsigned int i = 0; i < fBackgroundFileName.size(); i++ )
@@ -108,10 +108,10 @@ bool VTMVARunData::openDataFiles()
 		cout << "VTMVARunData::openDataFiles() open output files " << endl;
 	}
 	
-///////////////////////////////////////////////////////////////////
-// check how many events there are in signal and background trees (after cuts)
-
-// loop over all energy bins
+	///////////////////////////////////////////////////////////////////
+	// check how many events there are in signal and background trees (after cuts)
+	
+	// loop over all energy bins
 	TEntryList* i_SignalList = 0;
 	TEntryList* i_BackgroundList = 0;
 	bool iEnoughEvents = true;
@@ -168,8 +168,8 @@ bool VTMVARunData::openDataFiles()
 	}
 	
 	
-///////////////////////////////////////////////////////////////////
-// open output file
+	///////////////////////////////////////////////////////////////////
+	// open output file
 	if( fOutputFileName.size() > 0 && fOutputDirectoryName.size() > 0 )
 	{
 		for( unsigned int i = 0; i < fEnergyCutData.size(); i++ )
@@ -274,7 +274,7 @@ void VTMVARunData::print()
 		cout << "[" << fEnergyCutData[i]->fEnergyCut_Log10TeV_min << ", " << fEnergyCutData[i]->fEnergyCut_Log10TeV_max << "]";
 	}
 	cout << endl;
-// all bins should use same energy reconstruction method
+	// all bins should use same energy reconstruction method
 	if( fEnergyCutData.size() > 0 && fEnergyCutData[0] )
 	{
 		cout << "energy reconstruction method " << fEnergyCutData[0]->fEnergyReconstructionMethod << endl;
@@ -340,9 +340,9 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 			}
 			
 			is_stream >> temp;
-///////////////////////////////////////////////////////////////////////////////////////////
-// MVA method and options
-///////////////////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// MVA method and options
+			///////////////////////////////////////////////////////////////////////////////////////////
 			if( temp == "MVA_METHOD" )
 			{
 				if( !is_stream.eof() )
@@ -360,7 +360,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					fMVAMethod_Options.push_back( "" );
 				}
 			}
-// Box cuts: kept for backwards compatibility
+			// Box cuts: kept for backwards compatibility
 			if( temp == "OPTIMIZATION_METHOD" )
 			{
 				if( !is_stream.eof() )
@@ -375,8 +375,8 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-///////////////////////////////////////////////////////////////////////////////////////////
-// training variables
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// training variables
 			if( temp == "VARIABLE" )
 			{
 				if( !is_stream.eof() )
@@ -413,7 +413,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// spectator variables
+			// spectator variables
 			if( temp == "SPECTATOR" )
 			{
 				if( !is_stream.eof() )
@@ -421,7 +421,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					fSpectatorVariable.push_back( is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ) );
 				}
 			}
-// preselection cut
+			// preselection cut
 			if( temp == "SELECTION_CUTS" )
 			{
 				if( !is_stream.eof() )
@@ -434,7 +434,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// MC arrival direction cut
+			// MC arrival direction cut
 			if( temp == "MCXYOFF" )
 			{
 				if( !is_stream.eof() )
@@ -448,14 +448,14 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 			}
 			
-// prepare training options
+			// prepare training options
 			if( temp == "PREPARE_TRAINING_OPTIONS" )
 			{
 				if( !is_stream.eof() )
 				{
 					fPrepareTrainingOptions = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() ).c_str();
 					fPrepareTrainingOptions = VUtilities::removeSpaces( fPrepareTrainingOptions );
-// remove all spaces
+					// remove all spaces
 				}
 				else
 				{
@@ -463,7 +463,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// signal weight
+			// signal weight
 			if( temp == "SIGNALWEIGHT" )
 			{
 				if( !is_stream.eof() )
@@ -476,7 +476,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// signal files
+			// signal files
 			if( temp == "SIGNALFILE" )
 			{
 				if( !is_stream.eof() )
@@ -490,7 +490,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// background weight
+			// background weight
 			if( temp == "BACKGROUNDWEIGHT" )
 			{
 				if( !is_stream.eof() )
@@ -503,7 +503,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// background files
+			// background files
 			if( temp == "BACKGROUNDFILE" )
 			{
 				if( !is_stream.eof() )
@@ -517,7 +517,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// output file
+			// output file
 			if( temp == "OUTPUTFILE" )
 			{
 				if( !is_stream.eof() )
@@ -534,7 +534,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					return false;
 				}
 			}
-// energy bins
+			// energy bins
 			if( temp == "ENERGYBINS" )
 			{
 				vector< double > iEnergyCut_Log10TeV_min;
@@ -550,28 +550,28 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 				}
 				iEMethod = ( unsigned int )TMath::Nint( iT );
 				
-// read in energy bin
+				// read in energy bin
 				while( !is_stream.eof() )
 				{
 					is_stream >> iT;
 					iEnergyCut_Log10TeV_min.push_back( iT );
 				}
-// sort
+				// sort
 				sort( iEnergyCut_Log10TeV_min.begin(), iEnergyCut_Log10TeV_min.end() );
-// check sanity
+				// check sanity
 				if( iEnergyCut_Log10TeV_min.size() < 2 )
 				{
 					cout << "VTMVARunData::readConfigurationFile error: need at least two energy bins " << iEnergyCut_Log10TeV_min.size() << endl;
 					return false;
 				}
-// fill maximum bins
+				// fill maximum bins
 				for( unsigned int i = 1; i < iEnergyCut_Log10TeV_min.size(); i++ )
 				{
 					iEnergyCut_Log10TeV_max.push_back( iEnergyCut_Log10TeV_min[i] );
 				}
-// remove last minimum
+				// remove last minimum
 				iEnergyCut_Log10TeV_min.pop_back();
-// fill cuts
+				// fill cuts
 				for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
 				{
 					ostringstream iCut;
@@ -585,7 +585,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					}
 					iEnergyCut.push_back( iCut.str().c_str() );
 				}
-// filling everything into the energy data structure
+				// filling everything into the energy data structure
 				fEnergyCutData.clear();
 				for( unsigned int i = 0; i < iEnergyCut_Log10TeV_min.size(); i++ )
 				{
@@ -598,7 +598,7 @@ bool VTMVARunData::readConfigurationFile( char* iC )
 					fEnergyCutData.back()->fEnergyReconstructionMethod = iEMethod;
 				}
 			}
-// minimum number of events
+			// minimum number of events
 			if( temp == "MINEVENTS" )
 			{
 				if( !is_stream.eof() )

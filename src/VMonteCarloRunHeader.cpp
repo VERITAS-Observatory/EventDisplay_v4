@@ -132,7 +132,7 @@ void VMonteCarloRunHeader::print()
 	cout << "CORSIKA interaction detail: lowE " << corsika_low_E_detail << ", highE " << corsika_high_E_detail;
 	cout << ", interaction models: lowE " << corsika_low_E_model << ", highE " << corsika_high_E_model;
 	cout << ", transition energy " << corsika_low_high_E << " GeV" << endl;
-// print CHERENKOV FLAG
+	// print CHERENKOV FLAG
 	cout << "CORSIKA iact options: " << corsika_iact_options << endl;
 	bitset<32> EVTH76 = corsika_iact_options;
 	for( unsigned int i = 0; i < 10; i++ )

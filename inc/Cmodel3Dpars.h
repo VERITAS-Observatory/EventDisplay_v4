@@ -21,7 +21,7 @@ class Cmodel3Dpars
 		TTree*          fChain;                   //!pointer to the analyzed TTree or TChain
 		Int_t           fCurrent;                 //!current Tree number in a TChain
 		
-// Declaration of leave types
+		// Declaration of leave types
 		Int_t           eventNumber;
 		// Model3D (JG)
 		bool            bModel3D;
@@ -41,7 +41,7 @@ class Cmodel3Dpars
 		Float_t         ErrRWidth3D;
 		bool            Converged3D;
 		
-// List of branches
+		// List of branches
 		TBranch*        b_eventNumber;            //!
 		// Model3D (JG)
 		TBranch*        b_Smax3D;
@@ -98,7 +98,7 @@ Cmodel3Dpars::~Cmodel3Dpars()
 
 Int_t Cmodel3Dpars::GetEntry( Long64_t entry )
 {
-// Read contents of entry.
+	// Read contents of entry.
 	if( !fChain )
 	{
 		return 0;
@@ -112,7 +112,7 @@ Int_t Cmodel3Dpars::GetEntry( Long64_t entry )
 
 Long64_t Cmodel3Dpars::LoadTree( Long64_t entry )
 {
-// Set the environment to read one entry
+	// Set the environment to read one entry
 	if( !fChain )
 	{
 		return -5;
@@ -139,7 +139,7 @@ Long64_t Cmodel3Dpars::LoadTree( Long64_t entry )
 void Cmodel3Dpars::Init( TTree* tree )
 {
 
-// Set branch addresses
+	// Set branch addresses
 	if( tree == 0 )
 	{
 		return;
@@ -195,8 +195,8 @@ Bool_t Cmodel3Dpars::Notify()
 
 void Cmodel3Dpars::Show( Long64_t entry )
 {
-// Print contents of entry.
-// If entry is not specified, print current entry
+	// Print contents of entry.
+	// If entry is not specified, print current entry
 	if( !fChain )
 	{
 		return;
@@ -207,9 +207,9 @@ void Cmodel3Dpars::Show( Long64_t entry )
 
 Int_t Cmodel3Dpars::Cut( Long64_t entry )
 {
-// This function may be called from Loop.
-// returns  1 if entry is accepted.
-// returns -1 otherwise.
+	// This function may be called from Loop.
+	// returns  1 if entry is accepted.
+	// returns -1 otherwise.
 	return 1;
 }
 #endif                                            // #ifdef Cmodel3Dpars_cxx

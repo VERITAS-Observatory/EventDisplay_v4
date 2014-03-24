@@ -112,14 +112,14 @@ class VTMVAEvaluator : public TNamed, public VPlotUtilities
 		
 		double   fSpectralIndexForEnergyWeighting;        // used to calculate the spectral weighted mean of an energy bin
 		
-// cut values (energy dependent)
+		// cut values (energy dependent)
 		vector< double > fBoxCutValue_theta2;
 		
 		vector< vector< Double_t > > fBoxCutValue_min;
 		vector< vector< Double_t > > fBoxCutValue_max;
 		vector< vector< string > >   fBoxCutValue_Name;
 		
-// gamma/hadron separation variables
+		// gamma/hadron separation variables
 		float    fNImages;
 		float    fMSCW;
 		float    fMSCL;

@@ -57,8 +57,8 @@ VCalibrationData::VCalibrationData( unsigned int iTel, string iDir, string iPedf
 	setAverageTZero( 0., true );
 	setAverageTZero( 0., false );
 	
-// summary histograms
-
+	// summary histograms
+	
 	hisList = new TList();
 	
 	char hname[200];
@@ -158,7 +158,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	{
 		if( fFileName[i].size() > 0 && !fPedFromPLine && !i_isDSTMC )
 		{
-// readcalibDB: gains and toffs are read from the VDB
+			// readcalibDB: gains and toffs are read from the VDB
 			if( fFileName[i].find( "gain" ) != string::npos && iReadCalibDB )
 			{
 				fFile[i] = 0;
@@ -167,7 +167,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 			{
 				fFile[i] = 0;
 			}
-// tzero calculation (file is opened later)
+			// tzero calculation (file is opened later)
 			else if( fFileName[i].find( "tzero" ) != string::npos && iRunMode == 7 )
 			{
 				fFile[i] = 0;
@@ -202,9 +202,9 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	valarray< valarray< double > > itemp_pedvars;
 	itemp_pedvars.resize( nSamples + 1, itemp_ped );
 	
-// (time dependent pedestal vectors are initialzed in VCalibrator)
-
-// high gain channels
+	// (time dependent pedestal vectors are initialzed in VCalibrator)
+	
+	// high gain channels
 	fPeds.resize( i_channel, 20. );
 	fVPedvars.resize( nSamples + 1, sqrt( fPeds ) );
 	fPedrms.resize( i_channel, 0. );
@@ -223,7 +223,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	fAverageTzero.resize( i_channel, 0. );
 	fAverageTzerovars.resize( i_channel, 0. );
 	
-// low gain channels
+	// low gain channels
 	fLowGainPeds.resize( i_channel, 20. );
 	fVLowGainPedvars.resize( nSamples + 1, fLowGainPeds );
 	fVmeanLowGainPedvars.resize( nSamples + 1, 0. );
@@ -240,7 +240,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 	
 	
 	itemp_ped.resize( i_channel, 1. );
-// low gain multiplier settings
+	// low gain multiplier settings
 	fLowGainMultiplier_Trace = 0;
 	fLowGainMultiplier_Camera.resize( i_channel, 0. );
 	
@@ -389,12 +389,12 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 {
 	TDirectory* iDir = gDirectory;
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-// no DST analysis
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// no DST analysis
 	if( !iDST )
 	{
 	
-// fill tree with used calibration data
+		// fill tree with used calibration data
 		const unsigned int iMAXSUMWINDOWS = 1000;
 		const unsigned int iMAXDEFWINDOWS = 10;
 		char hname[200];
@@ -602,8 +602,8 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 			}
 		}
 		fCalibrationTree->Write();
-// do not write histograms -> same information as in fCalibrationTree
-//       hisList->Write();
+		// do not write histograms -> same information as in fCalibrationTree
+		//       hisList->Write();
 	}
 	
 	iDir->cd();
@@ -623,7 +623,7 @@ unsigned int VCalibrationData::getTSTimeIndex( double iTime, unsigned int& i1, u
 	
 	if( iTS_size > 0 )
 	{
-// time is before first time point
+		// time is before first time point
 		if( iTime < getTimeTS_vector()[0] )
 		{
 			i1 = 0;
@@ -631,7 +631,7 @@ unsigned int VCalibrationData::getTSTimeIndex( double iTime, unsigned int& i1, u
 			ifrac1 = 1.;
 			ifrac2 = 0.;
 		}
-// time is after first time point
+		// time is after first time point
 		else if( iTime > getTimeTS_vector()[iTS_size - 1] )
 		{
 			i1 = iTS_size - 1;
@@ -639,13 +639,13 @@ unsigned int VCalibrationData::getTSTimeIndex( double iTime, unsigned int& i1, u
 			ifrac1 = 0.;
 			ifrac2 = 1.;
 		}
-// time is in between
+		// time is in between
 		else
 		{
-// get index for closest time point
+			// get index for closest time point
 			unsigned int iIndex = 0;
 			double iMaxDiff = 1.e15;
-// time is smaller than closest time point
+			// time is smaller than closest time point
 			for( unsigned int i = 0; i < iTS_size; i++ )
 			{
 				if( fabs( getTimeTS_vector()[i] - iTime ) < iMaxDiff )
@@ -654,7 +654,7 @@ unsigned int VCalibrationData::getTSTimeIndex( double iTime, unsigned int& i1, u
 					iIndex = i;
 				}
 			}
-// get indexes and fractions
+			// get indexes and fractions
 			i1 = iIndex;
 			if( iTime - getTimeTS_vector()[iIndex] > 0 )
 			{
@@ -698,7 +698,7 @@ unsigned int VCalibrationData::getTSTimeIndex( double iTime, unsigned int& i1, u
 
 valarray<double>& VCalibrationData::getPeds( bool iLowGain, double iTime )
 {
-// return time dependent pedestals
+	// return time dependent pedestals
 	if( usePedestalsInTimeSlices( iLowGain ) && iTime > 0. && getPedsTS_vector( iLowGain ).size() > 0. )
 	{
 		if( fabs( iTime - fTS_ped_temp_time ) < 1.e-3 )
@@ -738,24 +738,24 @@ valarray<double>& VCalibrationData::getPeds( bool iLowGain, double iTime )
 
 valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW, double iTime )
 {
-//////////////////////////////////////////////////////////
-// pedvars in time slices
-//////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////
+	// pedvars in time slices
+	//////////////////////////////////////////////////////////
 	if( usePedestalsInTimeSlices( iLowGain ) && iTime > 0. && getPedvarsVTS_vector( iLowGain ).size() > 0. )
 	{
-// check validity of summation window
+		// check validity of summation window
 		if( iSW > 0 && iSW - 1 < getPedvarsVTS_vector( iLowGain )[0].size() )
 		{
-// pedvars is available for this time (maybe filled by a previous call for another channel)
+			// pedvars is available for this time (maybe filled by a previous call for another channel)
 			if( fTS_pedvar_temp_time.find( iSW ) != fTS_pedvar_temp_time.end() && fabs( iTime - fTS_pedvar_temp_time[iSW] ) < 1.e-3 )
 			{
 				fTS_pedvar_temp_time[iSW] = iTime;
 				return fTS_pedvar_temp[iSW];
 			}
-// no search for a pedvars for given time
+			// no search for a pedvars for given time
 			fTS_pedvar_temp_time[iSW] = iTime;
 			
-// get time index
+			// get time index
 			unsigned int i1 = 0;
 			unsigned int i2 = 0;
 			double ifrac1 = 0.;
@@ -767,7 +767,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 				fTS_pedvar_temp[iSW].resize( getPedvarsVTS_vector( iLowGain )[i1][iSW - 1].size(), 0. );
 			}
 			
-// loop over all channels and calculate pedvars for this time (weighted mean between time bins)
+			// loop over all channels and calculate pedvars for this time (weighted mean between time bins)
 			for( unsigned int i = 0; i < fTS_pedvar_temp[iSW].size(); i++ )
 			{
 				fTS_pedvar_temp[iSW][i] = ( ifrac1 * getPedvarsVTS_vector( iLowGain )[i1][iSW - 1][i] + ifrac2 * getPedvarsVTS_vector( iLowGain )[i2][iSW - 1][i] );
@@ -786,9 +786,9 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 			exit( 0 );
 		}
 	}
-//////////////////////////////////////////////////////////
-// time independent pedestal variations
-// most DST styles are without time-dependent pedestals -> ped/pedvars vector have length 1
+	//////////////////////////////////////////////////////////
+	// time independent pedestal variations
+	// most DST styles are without time-dependent pedestals -> ped/pedvars vector have length 1
 	if( iLowGain )
 	{
 		if( iSW < fVLowGainPedvars.size() )
@@ -812,7 +812,7 @@ valarray<double>& VCalibrationData::getPedvars( bool iLowGain, unsigned int iSW,
 		}
 	}
 	
-// should never arrive here
+	// should never arrive here
 	return fValArrayDouble;
 }
 
@@ -984,7 +984,7 @@ void VCalibrationData::recoverLowGainPedestals()
 				iN++;
 			}
 		}
-// recover pedvars
+		// recover pedvars
 		if( iN > 0. )
 		{
 			iM /= iN;

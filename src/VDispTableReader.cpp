@@ -64,7 +64,7 @@ bool VDispTableReader::isHistoBinningSet( string iVariableName )
 
 bool VDispTableReader::setHistoBinning( string iVariableName, int iBin, double iMin, double iMax )
 {
-// test variable name
+	// test variable name
 	bool iFound = false;
 	for( unsigned int i = 0; i < fHisto_ListOfVariables.size(); i++ )
 	{
@@ -84,7 +84,7 @@ bool VDispTableReader::setHistoBinning( string iVariableName, int iBin, double i
 		return false;
 	}
 	
-// set histogram variables
+	// set histogram variables
 	fHisto_binning[iVariableName] = iBin;
 	fHisto_min[iVariableName] = iMin;
 	fHisto_max[iVariableName] = iMax;
@@ -114,7 +114,7 @@ bool VDispTableReader::plot( int iEntry )
 			h2D_DispTable->SetYTitle( "log_{10} size" );
 			h2D_DispTable->Draw( "colz" );
 			
-// draw errors
+			// draw errors
 			c = new TCanvas( "cDisperror", "disp table (errors)", 110, 10, 600, 400 );
 			c->Draw();
 			TH2D* h2D_DispTableError = ( TH2D* )h2D_DispTable->Clone( "h2D_DispTableError" );
@@ -178,11 +178,11 @@ bool VDispTableReader::plot( int iEntry )
 
 bool VDispTableReader::initialize( bool iRead )
 {
-//////////////////////////////////////////////////////////////////////////////////////////////
-//
-// prepare data tree for writing
-//
-//////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// prepare data tree for writing
+	//
+	//////////////////////////////////////////////////////////////////////////////////////////////
 	if( !iRead )
 	{
 		if( !isHistoBinningSet( "WidthOverLength" ) )
@@ -202,7 +202,7 @@ bool VDispTableReader::initialize( bool iRead )
 			return false;
 		}
 		
-// list of histograms
+		// list of histograms
 		hisList = new TList;
 		
 		h2D_DispTable = new TH2F( "h2D_DispTable", "disp table", fHisto_binning["WidthOverLength"], fHisto_min["WidthOverLength"], fHisto_max["WidthOverLength"], fHisto_binning["Size"], fHisto_min["Size"], fHisto_max["Size"] );
@@ -259,11 +259,11 @@ bool VDispTableReader::initialize( bool iRead )
 			fData->Branch( hisList, 32000, 0 );
 		}
 	}
-//////////////////////////////////////////////////////////////////////////////////////////////
-//
-// prepare data tree for reading
-//
-//////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// prepare data tree for reading
+	//
+	//////////////////////////////////////////////////////////////////////////////////////////////
 	else
 	{
 		if( fData )
@@ -285,7 +285,7 @@ bool VDispTableReader::initialize( bool iRead )
 			fData->SetBranchAddress( "h3D_DispMissTable", &h3D_DispMissTable );
 			fData->SetBranchAddress( "h3D_DispTableN", &h3D_DispTableN );
 			
-// fill data vectors
+			// fill data vectors
 			f_ze.clear();
 			f_az_min.clear();
 			f_az_max.clear();
@@ -449,7 +449,7 @@ bool VDispTableReader::fill( float i_ze, unsigned int i_az, float i_az_min, floa
 	woff = i_woff;
 	pedvar = i_meanPedvars;
 	
-// fill 2D histograms
+	// fill 2D histograms
 	for( int x = 0; x <= iH2D->GetNbinsX(); x++ )
 	{
 		for( int y = 0; y <= iH2D->GetNbinsY(); y++ )
@@ -466,7 +466,7 @@ bool VDispTableReader::fill( float i_ze, unsigned int i_az, float i_az_min, floa
 			}
 		}
 	}
-// fill 3D histograms
+	// fill 3D histograms
 	for( int x = 0; x <= iH3D->GetNbinsX(); x++ )
 	{
 		for( int y = 0; y <= iH3D->GetNbinsY(); y++ )
@@ -487,10 +487,10 @@ bool VDispTableReader::fill( float i_ze, unsigned int i_az, float i_az_min, floa
 		}
 	}
 	
-// fill data tree
+	// fill data tree
 	fData->Fill();
 	
-// check that vectors are filled correctly
+	// check that vectors are filled correctly
 	if( fData->GetEntries() - 1 == ( int )( f_ze.size() ) )
 	{
 		f_ze.push_back( ze );
@@ -581,13 +581,13 @@ void VDispTableReader::print( bool bDetailed )
 
 unsigned int VDispTableReader::getAzBin( float az )
 {
-// be sure that az is bin intervall [-180., 180.]
+	// be sure that az is bin intervall [-180., 180.]
 	if( az > 180. )
 	{
 		az -= 360.;
 	}
-// expect first bin to be of type [135,-135]
-// otherwise like [-45,45]
+	// expect first bin to be of type [135,-135]
+	// otherwise like [-45,45]
 	for( unsigned int i = 0; i < f_az_min.size(); i++ )
 	{
 		if( i == 0 && ( az > f_az_min[0] || az < f_az_max[0] ) )
@@ -683,11 +683,11 @@ int VDispTableReader::getTreeEntryFinder( float iZe, float iAz, float iWoff, flo
 	unsigned int i_noise_bin = 0;
 	
 	float i_diff = 1.e9;
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// zenith angle
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-// get closest ze value
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// zenith angle
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	// get closest ze value
 	if( iZe_Inter == 0 )
 	{
 		i_ze_bin = 0;
@@ -700,7 +700,7 @@ int VDispTableReader::getTreeEntryFinder( float iZe, float iAz, float iWoff, flo
 			}
 		}
 	}
-// get closest lower or upper value
+	// get closest lower or upper value
 	else
 	{
 		unsigned int i_ze_bin_up  = 0;
@@ -716,15 +716,15 @@ int VDispTableReader::getTreeEntryFinder( float iZe, float iAz, float iWoff, flo
 		}
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// azimuth angle
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// azimuth angle
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	i_az_bin = getAzBin( iAz );
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// wobble offset (ignored?)
-/////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// wobble offset (ignored?)
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	i_woff_bin = 0;
 	i_diff = 1.e9;
 	for( unsigned int i = 0; i < f_woff.size(); i++ )
@@ -736,9 +736,9 @@ int VDispTableReader::getTreeEntryFinder( float iZe, float iAz, float iWoff, flo
 		}
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// noise value (get closest value)
-/////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// noise value (get closest value)
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	i_diff = 1.e9;
 	i_noise_bin = 0;
 	for( unsigned int i = 0; i < f_noise.size(); i++ )
@@ -750,8 +750,8 @@ int VDispTableReader::getTreeEntryFinder( float iZe, float iAz, float iWoff, flo
 		}
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// now get tree entry number
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// now get tree entry number
 	unsigned int iEntryID = getTreeEntryID( i_ze_bin, i_az_bin, i_woff_bin, i_noise_bin );
 	
 	return getTreeEntryFinder( iEntryID );

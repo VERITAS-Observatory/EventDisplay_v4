@@ -42,12 +42,12 @@ class VRadialAcceptance
 		
 		unsigned int fEnergyReconstructionMethod;
 		
-// regions excluded from background
+		// regions excluded from background
 		vector<double> fXE;
 		vector<double> fYE;
 		vector<double> fRE;
 		
-// calculate acceptance from data
+		// calculate acceptance from data
 		VGammaHadronCuts*    fCuts;
 		VAnaSumRunParameter* fRunPar;
 		
@@ -57,7 +57,7 @@ class VRadialAcceptance
 		TH1F* hscale;
 		TH1F* hPhiDist;
 		TH1F* hPhiDistDeRot;
-// acceptance curves as mean over all runs
+		// acceptance curves as mean over all runs
 		vector< double > fZe;                      //!< ze bins (upper limit of zenith angle bin)
 		double fAzCut_min;
 		double fAzCut_max;
@@ -71,17 +71,17 @@ class VRadialAcceptance
 		unsigned int     fAccZeFitMinBin;          //!< range (in bins) for normalisation of acceptance curves
 		unsigned int     fAccZeFitMaxBin;
 		
-// acceptance vs yoff vs xoff
+		// acceptance vs yoff vs xoff
 		TH2F* hXYAccTot;
 		TH2F* hXYAccTotDeRot;
 		TH1F* hXYAccTotDeRotPhiDependentSlice ;
 		TH1F* hXYAccTotDeRotRadiusDependentSlice000 ;
 		vector< TH2F* > hXYAccRun;
 		
-// acceptance curves run wise, but mean over all zenith angles
+		// acceptance curves run wise, but mean over all zenith angles
 		vector< TH1F* > hAccRun;                  //!< run dependent acceptance curves
 		
-// number of raw files used to calculate acceptance
+		// number of raw files used to calculate acceptance
 		double fNumberOfRawFiles;
 		
 		// 2D acceptance stuff
@@ -121,7 +121,7 @@ class VRadialAcceptance
 		vector <TH1F*> hXYAccNImagesRadiusDependentSlice000 ; // pie slice centered on   0 deg +- rad_phiwidth
 		vector <TH1F*> hXYAccNImagesPhiDependentSlice ; // donut band from phi_minradius to phi_maxradius
 		
-// get acceptance curves from a file
+		// get acceptance curves from a file
 		TFile* fAccFile;
 		
 		void scaleArea( TH1F* );

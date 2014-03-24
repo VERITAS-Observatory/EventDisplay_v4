@@ -25,7 +25,7 @@ class VDeadChannelFinder
 		bool         fLowGain;
 		bool         fIsMC;
 		
-// dead channel definitions
+		// dead channel definitions
 		double fDEAD_ped_min;
 		double fDEAD_ped_max;
 		double fDEAD_pedvar_min;

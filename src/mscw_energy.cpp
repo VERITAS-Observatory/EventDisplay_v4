@@ -48,7 +48,7 @@ void printParametersFromFile( string ff )
 
 int main( int argc, char* argv[] )
 {
-// timing
+	// timing
 	TStopwatch fStopWatch;
 	fStopWatch.Start();
 	
@@ -75,7 +75,7 @@ int main( int argc, char* argv[] )
 	}
 	fTLRunParameter->print();
 	
-// create lookup tables
+	// create lookup tables
 	VTableLookup* fTLook = new VTableLookup( fTLRunParameter->readwrite, fTLRunParameter->fDebug );
 	if( !fTLook->initialize( fTLRunParameter ) )
 	{
@@ -95,7 +95,7 @@ int main( int argc, char* argv[] )
 		cout << "\t maximum run time [s]: " << fTLook->getMaxTotalTime() << endl;
 	}
 	
-// loop over all events
+	// loop over all events
 	fTLook->loop();
 	
 	cout << "... end of loop" << endl;
@@ -103,6 +103,6 @@ int main( int argc, char* argv[] )
 	fStopWatch.Stop();
 	fStopWatch.Print();
 	
-// write tables to disk
+	// write tables to disk
 	fTLook->terminate();
 }

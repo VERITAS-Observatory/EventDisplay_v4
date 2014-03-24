@@ -55,7 +55,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
 
 bool VInstrumentResponseFunctionReader::initializeIRFData()
 {
-// read angular and core resolution
+	// read angular and core resolution
 	fIRF_TreeNames.push_back( "t_angular_resolution" );
 	fIRF_TreeNames.push_back( "t_angular_resolution_080p" );
 	fIRF_TreeNames.push_back( "t_core_resolution" );
@@ -86,12 +86,12 @@ bool VInstrumentResponseFunctionReader::fillData( string iDataLine, int iDataID 
 		return false;
 	}
 	is_stream >> temp;
-// check set number
+	// check set number
 	if( atoi( temp.c_str() ) != iDataID )
 	{
 		return false;
 	}
-// read this line
+	// read this line
 	is_stream >> fFile;
 	is_stream >> temp;
 	fZe = atof( temp.c_str() );
@@ -105,7 +105,7 @@ bool VInstrumentResponseFunctionReader::fillData( string iDataLine, int iDataID 
 	fNoise = atoi( temp.c_str() );
 	is_stream >> fA_MC;
 	
-// plotting options
+	// plotting options
 	is_stream >> fPlotOption;
 	is_stream >> temp;
 	fPlottingColor = atoi( temp.c_str() );
@@ -134,15 +134,15 @@ bool VInstrumentResponseFunctionReader::fillData( string iFile, double iZe, doub
 
 bool VInstrumentResponseFunctionReader::fillData()
 {
-// read in all the necessary data from the effective area tree
-
+	// read in all the necessary data from the effective area tree
+	
 	if( !getDataFromFile() )
 	{
 		fIsZombie = true;
 		return false;
 	}
 	
-// calculate ratio of cut - efficiencies
+	// calculate ratio of cut - efficiencies
 	if( !calculateCutEfficiencies() )
 	{
 		return false;
@@ -165,7 +165,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 	bool bLinX = false;  // energy axis for effective areas
 	
 	TH1F* h = 0;
-// gamma-ray effective area vs reconstruction energy
+	// gamma-ray effective area vs reconstruction energy
 	h = get_CTA_IRF_Histograms( "EffectiveArea", fWoff );
 	if( !h )
 	{
@@ -180,7 +180,7 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 	gEffArea_Rec->SetName( "gEffArea_Rec" );
 	setGraphPlottingStyle( gEffArea_Rec );
 	get_Graph_from_Histogram( h, gEffArea_Rec, false, bLinX );
-// gamma-ray effective area vs true energy
+	// gamma-ray effective area vs true energy
 	h = get_CTA_IRF_Histograms( "EffectiveAreaEtrue", fWoff );
 	if( !h )
 	{
@@ -206,14 +206,14 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 		gEffArea_MC = 0;
 	}
 	
-///////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////
-// name and axis units are not consistent in the CTA files!!!
-///////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////
-// energy resolution
+	///////////////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////////////
+	// name and axis units are not consistent in the CTA files!!!
+	///////////////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////////////
+	// energy resolution
 	h = 0;
 	gEnergyResolution = new TGraphErrors( 1 );
 	h = ( TH1F* )get_CTA_IRF_Histograms( "ERes", fWoff );
@@ -226,8 +226,8 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 		get_Graph_from_Histogram( h, gEnergyResolution, true, 0., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max ) );
 		setGraphPlottingStyle( gEnergyResolution );
 	}
-///////////////////////////////////////////////////////////////
-// energy bias
+	///////////////////////////////////////////////////////////////
+	// energy bias
 	h = 0;
 	gEnergyBias_Mean = new TGraphErrors( 1 );
 	h = ( TH1F* )get_CTA_IRF_Histograms( "Ebias", fWoff );
@@ -240,18 +240,18 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 		get_Graph_from_Histogram( h, gEnergyBias_Mean, true, -100., log10( fEnergyLinTeV_min ), log10( fEnergyLinTeV_max ) );
 		setGraphPlottingStyle( gEnergyBias_Mean );
 	}
-///////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////
-// 68% angular resolution
+	///////////////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////////////
+	// 68% angular resolution
 	h = 0;
 	gAngularResolution = new TGraphErrors( 1 );
 	h = ( TH1F* )get_CTA_IRF_Histograms( "AngRes", fWoff );
-// try Paris style file
+	// try Paris style file
 	if( !h )
 	{
 		h = ( TH1F* )get_CTA_IRF_Histograms( "AngResolution68", fWoff );
-// arcmin -> deg
+		// arcmin -> deg
 		if( h )
 		{
 			h->Scale( 1. / 60. );
@@ -263,16 +263,16 @@ bool VInstrumentResponseFunctionReader::getDataFromCTAFile()
 		setGraphPlottingStyle( gAngularResolution );
 	}
 	
-///////////////////////////////////////////////////////////////
-// 80% angular resolution
+	///////////////////////////////////////////////////////////////
+	// 80% angular resolution
 	h = 0;
 	gAngularResolution80 = new TGraphErrors( 1 );
 	h = ( TH1F* )get_CTA_IRF_Histograms( "AngRes80", fWoff );
-// try Paris style file
+	// try Paris style file
 	if( !h )
 	{
 		h = ( TH1F* )get_CTA_IRF_Histograms( "AngResolution80", fWoff );
-// arcmin -> deg
+		// arcmin -> deg
 		if( h )
 		{
 			h->Scale( 1. / 60. );
@@ -315,14 +315,14 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		return false;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-// read effective areas
-//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	// read effective areas
+	//
 	TTree* t = ( TTree* )iFile->Get( "fEffArea" );
-// not effective area tree - is this a CTA file?
+	// not effective area tree - is this a CTA file?
 	if( !t )
 	{
-// try to read CTA file
+		// try to read CTA file
 		if( !getDataFromCTAFile() )
 		{
 			cout << "Error: effective area histogram not found in CTA-style file" << endl;
@@ -334,7 +334,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		}
 	}
 	
-// read IRF from a EVNDISP response file
+	// read IRF from a EVNDISP response file
 	CEffArea* c = new CEffArea( t );
 	
 	bool bFound = false;
@@ -347,10 +347,10 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			cout << "VInstrumentResponseFunctionReader::getDataFromFile: reading event " << j << endl;
 		}
 		
-// ignore all values if there is only one entry in this tree
+		// ignore all values if there is only one entry in this tree
 		if( c->fChain->GetEntries() > 1 )
 		{
-// azimuth
+			// azimuth
 			if( fDebug )
 			{
 				cout << "\t AZ: tree entry " << j << "\t az " << c->az << "\t az bin " << fAzbin << endl;
@@ -359,7 +359,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			{
 				continue;
 			}
-// spectral index
+			// spectral index
 			if( fDebug )
 			{
 				cout << "\t Index: " << j << "\t" << c->index << "\t " << fIndex << endl;
@@ -368,7 +368,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			{
 				continue;
 			}
-// wobble offset
+			// wobble offset
 			if( fDebug )
 			{
 				cout << "\t Woff: " << j << "\t" << c->Woff << "\t" << fWoff << endl;
@@ -377,7 +377,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			{
 				continue;
 			}
-// noise level
+			// noise level
 			if( fDebug )
 			{
 				cout << "\t Noise: " << j << "\t" << c->noise << "\t" << fNoise << endl;
@@ -386,7 +386,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			{
 				continue;
 			}
-// zenith angle
+			// zenith angle
 			if( fDebug )
 			{
 				cout << "\t Ze: " << j << "\t" << c->ze << "\t" << fZe << endl;
@@ -399,7 +399,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		cout << "\t FOUND EFFECTIVE AREA (entry " << j << ")" << endl;
 		bFound = true;
 		
-// get effective areas
+		// get effective areas
 		if( c->gEffAreaMC )
 		{
 			gEffArea_MC  = ( TGraphAsymmErrors* )c->gEffAreaMC->Clone();
@@ -440,7 +440,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		{
 			gEffArea_Rec = 0;
 		}
-// get energy spectra
+		// get energy spectra
 		if( c->hEmc )
 		{
 			hEmc = ( TH1D* )c->hEmc->Clone();
@@ -468,26 +468,26 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			setHistogramPlottingStyle( hEcut_recUW );
 			hEcut_recUW->SetMarkerStyle( hEcutUW->GetMarkerStyle() + 4 );
 		}
-// get energy reconstruction matrix
+		// get energy reconstruction matrix
 		hERecMatrix = ( TH2D* )c->hEmcCutCTA;
 		hERecMatrixProfile = ( TProfile* )c->hResponseMatrixProfile;
 		hERecMatrixCoarse = ( TH2D* )c->hResponseMatrix;
 		hERecMatrixQC = ( TH2D* )c->hResponseMatrixFineQC;
 		hERecMatrixCoarseQC = ( TH2D* )c->hResponseMatrixQC;
-// get error in energy reconstruction
+		// get error in energy reconstruction
 		hEsys = ( TH2D* )c->hEsys2D;
-// erec/emc
+		// erec/emc
 		hEsysMCRelative = ( TProfile* )c->hEsysMCRelative;
 		hEsysMCRelative2D = ( TH2D* )c->hEsysMCRelative2D;
-// get energy resolution (!!)
-//       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
-// energy resolution caluclation as 68% value
-//       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
-// energy resolution is RMS
+		// get energy resolution (!!)
+		//       getEnergyResolutionPlot( (TProfile*)c->hEsysMCRelative );
+		// energy resolution caluclation as 68% value
+		//       getEnergyResolutionPlot68( (TH2D*)c->hEsysMCRelative2D );
+		// energy resolution is RMS
 		getEnergyResolutionPlot( ( TH2D* )c->hEsysMCRelativeRMS );
-//       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
+		//       getEnergyResolutionPlot( (TProfile*)c->hEsysRec );
 		setGraphPlottingStyle( gEnergyResolution );
-// get energy bias
+		// get energy bias
 		gEnergyBias_Mean = get_Profile_from_TH2D( ( TH2D* )c->hEsysMCRelativeRMS, 0, "mean", 1, -10., 0. );
 		setGraphPlottingStyle( gEnergyBias_Mean );
 		gEnergyBias_Median = get_Profile_from_TH2D( ( TH2D* )c->hEsysMCRelativeRMS, 0, "median", 1, -10., 0. );
@@ -496,9 +496,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		setGraphPlottingStyle( gEnergyLogBias_Mean, 1, 1., 7 );
 		gEnergyLogBias_Median = get_Profile_from_TH2D( ( TH2D* )c->hEsys2D, 0, "median", 1, -10. );
 		setGraphPlottingStyle( gEnergyLogBias_Median );
-// get rate histograms
+		// get rate histograms
 		hWeightedRate = ( TH1D* )c->hWeightedRate;
-// get cut efficiencies
+		// get cut efficiencies
 		if( c->hhEcutTrigger )
 		{
 			hCutEfficiency.push_back( ( TH1D* )c->hhEcutTrigger->Clone() );
@@ -563,9 +563,9 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		break;
 	}
 	
-//////////////////////////////////////////////////////////////
-// read resolution files
-
+	//////////////////////////////////////////////////////////////
+	// read resolution files
+	
 	for( unsigned int i = 0; i < fIRF_TreeNames.size(); i++ )
 	{
 		cout << "reading IRF " << fIRF_TreeNames[i].c_str() << endl;
@@ -613,16 +613,16 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
 			cout << "VInstrumentResponseFunctionReader::getDataFromFile (resolution data): reading event " << j << endl;
 		}
 		
-// check that there is data for this tree entry
+		// check that there is data for this tree entry
 		if( !c )
 		{
 			continue;
 		}
 		
-// ignore all values if there is only one entry in this tree
+		// ignore all values if there is only one entry in this tree
 		if( t->GetEntries() > 1 )
 		{
-// azimuth
+			// azimuth
 			if( fDebug )
 			{
 				cout << "IRF AZ: " << j << ", found: " << c->fAz_bin << ", searched for: " << fAzbin << endl;
@@ -631,7 +631,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
 			{
 				continue;
 			}
-// spectral index
+			// spectral index
 			if( fDebug )
 			{
 				cout << "IRF Index: " << j << ", found: " << c->fSpectralIndex << ", searched for: " << fIndex << endl;
@@ -640,7 +640,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
 			{
 				continue;
 			}
-// wobble offset
+			// wobble offset
 			if( fDebug )
 			{
 				cout << "IRF Woff: " << j << ", found: " << c->fWobble << ", searched for: " << fWoff << endl;
@@ -649,7 +649,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
 			{
 				continue;
 			}
-// noise level
+			// noise level
 			if( fDebug )
 			{
 				cout << "IRF Noise: " << j << ", found: " << c->fNoise << ", searched for: " << fNoise << endl;
@@ -658,7 +658,7 @@ VInstrumentResponseFunctionData* VInstrumentResponseFunctionReader::getIRFFromFi
 			{
 				continue;
 			}
-// zenith angle
+			// zenith angle
 			if( fDebug )
 			{
 				cout << "IRF Ze: " << j << ", found: " << c->fZe << ", searched for: " << fZe << endl;
@@ -709,7 +709,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D* iP, dou
 		TH1D* h = iP->ProjectionY( "p_x", b, b + 1 );
 		if( h && h->GetEntries() > 3. )
 		{
-// calculate quantiles
+			// calculate quantiles
 			double xq[3];
 			double yq[3];
 			/*	    xq[0] = 0.5-0.6826895/2.;
@@ -719,22 +719,22 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot68( TH2D* iP, dou
 			            if( iP->GetXaxis()->GetBinCenter( b ) < iMinEnergy ) continue;
 			// +-1 sigma around median
 				    e_res = (yq[2]-yq[0])*0.5; */
-// 68% distribution around 1 (bb_ref, expected value)
+			// 68% distribution around 1 (bb_ref, expected value)
 			TH1D hh( "h", "", h->GetNbinsX(), 0., h->GetXaxis()->GetXmax() - 1. );
 			double bb_ref = iReferenceValue;
-// < -998: relative to mean
+			// < -998: relative to mean
 			if( iReferenceValue < -998. )
 			{
 				bb_ref = h->GetMean();
 			}
-// >  998: relative to median
+			// >  998: relative to median
 			else if( iReferenceValue > 998. )
 			{
 				xq[0] = 0.50;
 				h->GetQuantiles( 1, yq, xq );
 				bb_ref = yq[0];
 			}
-// fill 1D histogram before integration
+			// fill 1D histogram before integration
 			for( int bb = 1; bb <= h->GetNbinsX(); bb++ )
 			{
 				if( h->GetBinCenter( bb ) < bb_ref )
@@ -855,7 +855,7 @@ void VInstrumentResponseFunctionReader::getEnergyResolutionPlot( TProfile* iP, i
 bool VInstrumentResponseFunctionReader::calculateCutEfficiencies()
 {
 	char hname[200];
-// create histograms
+	// create histograms
 	for( unsigned int i = 0; i < hCutEfficiency.size(); i++ )
 	{
 		if( hCutEfficiency[i] )
@@ -869,7 +869,7 @@ bool VInstrumentResponseFunctionReader::calculateCutEfficiencies()
 			hCutEfficiencyRelativePlots.push_back( 0 );
 		}
 	}
-// calculate relative plots
+	// calculate relative plots
 	for( unsigned int i = 0; i < hCutEfficiencyRelativePlots.size(); i++ )
 	{
 		if( hCutEfficiencyRelativePlots[i] )
@@ -924,7 +924,7 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
 		
 		for( int k = 0; k < g0->GetN(); k++ )
 		{
-//	   g0->GetPoint( k, x0, y0 );
+			//	   g0->GetPoint( k, x0, y0 );
 			x0 = x1;
 			y0 = g0->Eval( x0 );
 			y0_U = g0->GetErrorYhigh( k );
@@ -936,15 +936,15 @@ TGraphAsymmErrors* VInstrumentResponseFunctionReader::calculateEffectiveAreaRati
 				{
 					g->SetPoint( z, x0, y1 / y0 );
 					
-// note: standard error propagation not correct in this case
+					// note: standard error propagation not correct in this case
 					e = y1_U * y1_U / y0 / y0 + y1 * y1 / y0 / y0 / y0 / y0 * y0_U * y0_U;
 					g->SetPointEYhigh( z, sqrt( e ) );
-// (Preli)
+					// (Preli)
 					g->SetPointEYhigh( z, 0. );
 					
 					e = y1_L * y1_L / y0 / y0 + y1 * y1 / y0 / y0 / y0 / y0 * y0_L * y0_L;
 					g->SetPointEYlow( z, sqrt( e ) );
-// (Preli)
+					// (Preli)
 					g->SetPointEYlow( z, 0. );
 					
 					z++;
@@ -1044,9 +1044,9 @@ bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F* h, string iMea
 		cout << "VInstrumentResponseFunctionReader::fillBiasHistograms warning: bias graph with no points" << endl;
 		return false;
 	}
-// reset histogram binning
+	// reset histogram binning
 	double x_axis[g->GetN() + 1];
-// Obs: assume fixed binning:
+	// Obs: assume fixed binning:
 	double i_binWidth = 0.5 * ( g->GetX()[1] - g->GetX()[0] );
 	for( int i = 0; i < g->GetN(); i++ )
 	{
@@ -1054,7 +1054,7 @@ bool VInstrumentResponseFunctionReader::fillBiasHistograms( TH1F* h, string iMea
 	}
 	x_axis[g->GetN()] = g->GetX()[g->GetN() - 1] + i_binWidth;
 	h->SetBins( g->GetN(), x_axis );
-// fill histogram
+	// fill histogram
 	double x = 0.;
 	double y = 0.;
 	for( int i = 0; i < g->GetN(); i++ )
@@ -1087,7 +1087,7 @@ bool VInstrumentResponseFunctionReader::fillResolutionHistogram( TH1F* h, string
 		{
 			if( j < fIRF_Data.size() && fIRF_Data[j] )
 			{
-// try to get EVNDISP resolution graph
+				// try to get EVNDISP resolution graph
 				TGraphErrors* g = fIRF_Data[j]->fResolutionGraph[VInstrumentResponseFunctionData::E_DIFF];
 				if( iResolutionTreeName == "t_energy_resolution" )
 				{

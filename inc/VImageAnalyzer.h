@@ -31,7 +31,7 @@ class VImageAnalyzer : public VImageBaseAnalyzer
 		
 		bool fInit;
 		
-// temporary vectors for dead pixel smoothing
+		// temporary vectors for dead pixel smoothing
 		vector< unsigned int > savedDead;
 		vector< unsigned int > savedDeadLow;
 		valarray< double > savedGains;

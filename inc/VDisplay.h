@@ -61,7 +61,7 @@ class VDisplay : public TGMainFrame
 {
 		RQ_OBJECT( "VDisplay" )
 		
-//! menu identifier
+		//! menu identifier
 		enum E_menuIdentifer
 		{
 			M_FILE_PRINTC, M_FILE_PRINTF, M_FILE_PRINTA, M_FILE_PRINTCA, M_FILE_PRINTB, M_FILE_PRINTTG,
@@ -80,21 +80,21 @@ class VDisplay : public TGMainFrame
 			B_NWIN, B_NSUM, B_NIMA, B_NBOR,
 			B_FITPMT, B_ADDPMT, B_REMOVEPMT, B_RESETPMT, B_NFADC, B_NVIEW
 		};
-// camera display identifier (each of them will appear in the drop down menu for a camera display)
-// note: these have to be copied into VCamera
+		// camera display identifier (each of them will appear in the drop down menu for a camera display)
+		// note: these have to be copied into VCamera
 		enum E_cameraIdent {C_CHARGE, C_TZERO, C_TRIGGER, C_HIT, C_HILO, C_TIMING, C_SUMWINDOW, C_SUMWINDOWSTART,
 							C_PEDMEAN, C_PEDVAR, C_PEDMEANLOW, C_PEDVARLOW, C_GAINS, C_GAINVARS, C_GAINSLOW, C_GAINVARSLOW,
 							C_TOFF, C_TOFFLOW, C_LOWGAIN, C_CALTZERO, C_CALTZEROLOW, C_STATUS, C_STATUSLOW,
 							C_L1, C_HV, C_CURRENTS,
 							C_TRIGGER_EVNDISP, C_TEMPLATE, C_MODEL3D
 						   };
-//! FADC/ana tab identifier
+		//! FADC/ana tab identifier
 		enum E_fadcIDENT {F_FADC, F_ANA};
 		
 	private:
 		bool fDebug;
 		VEventLoop* fEventLoop;                   //!< main event loop, steering of data reading
-//  vector<VCamera* > fCamera;                   //!< vector of fNTelescopes cameras
+		//  vector<VCamera* > fCamera;                   //!< vector of fNTelescopes cameras
 		map<unsigned int, VCamera* > fCamera;     //!< vector of fNTelescopes cameras
 		vector< unsigned int > fTelescopesToShow; //!< vector with telescope numbers for plotting
 		VDisplayBirdsEye* fBirdsEye;                 //!< drawing the telescopes from above
@@ -180,18 +180,18 @@ class VDisplay : public TGMainFrame
 		TGGroupFrame* fGroupTelFrame;
 		TGHorizontalFrame* fGroupAnaFrame;
 		TGHorizontalFrame* fGroupSetFrame;
-// frame with display radio buttons
+		// frame with display radio buttons
 		TGButtonGroup* fGroupOptDis;
 		TGRadioButton* fRadioB1;
 		TGRadioButton* fRadioB2;
 		TGRadioButton* fRadioB3;
 		TGRadioButton* fRadioB4;
-// frame with telescope radio buttons
+		// frame with telescope radio buttons
 		TGButtonGroup* fGroupOptTel;
 		TGRadioButton* fRadioTA;
 		vector< TGRadioButton* > fRadioTel;
 		
-// frame with cut optiones
+		// frame with cut optiones
 		TGGroupFrame* fGroupOptCut;
 		TGLabel* fLabelOptATri;
 		TGNumberEntry* fNEntryOATri;
@@ -201,7 +201,7 @@ class VDisplay : public TGMainFrame
 		TGNumberEntry* fNEntryOTri;
 		TGLabel* fLabelOptCuts;
 		TGTextEntry* fTextOptCuts;
-// frame with analysis fields
+		// frame with analysis fields
 		TGGroupFrame* fGroupOptAna;
 		TGLabel* fLabelOptWin;
 		TGNumberEntry* fNEntryOWin;
@@ -287,9 +287,9 @@ class VDisplay : public TGMainFrame
 		VDisplay( const TGWindow* p, unsigned int w, unsigned int h, VEventLoop* iEventLoop );
 		virtual ~VDisplay();                      //!< destructor
 		
-//  void setDisplayTraceFit(bool infit){fTraceFit=infit;}
-
-// slots
+		//  void setDisplayTraceFit(bool infit){fTraceFit=infit;}
+		
+		// slots
 		void     CloseWindow();                   //!< close application (TGMainFrame method)
 		void     selectAnaTab( Int_t );           //!< select tab for FADC/analysis
 		//!< select channel for FADC histogram by clicking on channel

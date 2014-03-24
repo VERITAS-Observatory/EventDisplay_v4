@@ -33,7 +33,7 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 		cout << "void VCalibrator::calculatePedestals()" << endl;
 	}
 	
-// get telescope type
+	// get telescope type
 	ULong64_t iTelType = 0;
 	if( getTelID() < getDetectorGeometry()->getTelType().size() )
 	{
@@ -45,8 +45,8 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 		cout << getTelID() << "\t" << getDetectorGeometry()->getTelType().size() << endl;
 		exit( -1 );
 	}
-//////////////////////////////////////////////////////////////////////////////
-// first call (first event?): define histograms and output files for pedestals
+	//////////////////////////////////////////////////////////////////////////////
+	// first call (first event?): define histograms and output files for pedestals
 	if( !getCalibrated() )
 	{
 		string ioutfile;
@@ -56,7 +56,7 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 			cout << "\t void VCalibrator::calculatePedestals(): creating histograms and files:";
 			cout << " tel " << getTelID() + 1 << ", type " << iTelType << endl;
 		}
-// define output files
+		// define output files
 		if( !iLowGain )
 		{
 			ioutfile = fPedFileNameC[getTelID()] + ".root";
@@ -91,16 +91,16 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 			cout << " (no single or array of output files defined)" << endl;
 			exit( -1 );
 		}
-// init histograms etc (only done before first event)
+		// init histograms etc (only done before first event)
 		if( fReader->getMaxChannels() )
 		{
-//          if( hped_vec.find( iTelType ) == hped_vec.end() && ! )
+			//          if( hped_vec.find( iTelType ) == hped_vec.end() && ! )
 			{
 				unsigned int z = 0;
-// loop over all sumwindows
+				// loop over all sumwindows
 				for( unsigned int i = 0; i < hped_vec[iTelType].size(); i++ )
 				{
-// loop over all channels
+					// loop over all channels
 					for( unsigned int j = 0; j < hped_vec[iTelType][i].size(); j++ )
 					{
 						if( !hped_vec[iTelType][i][j] )
@@ -129,16 +129,16 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 	
 	fillHiLo();
 	
-// calculate pedestals for current telescope
+	// calculate pedestals for current telescope
 	fNumberPedestalEvents[iTelType]++;
-// loop over all sumwindows
+	// loop over all sumwindows
 	for( unsigned int i = 0; i < hped_vec[iTelType].size(); i++ )
 	{
 		calcSums( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst + ( i + 1 ), true, iLowGain );
-// loop over all channels
+		// loop over all channels
 		for( unsigned int j = 0; j < hped_vec[iTelType][i].size(); j++ )
 		{
-// exclude low gain channels from pedestal calculation
+			// exclude low gain channels from pedestal calculation
 			if( j < getHiLo().size() )
 			{
 				if( iLowGain && !getHiLo()[j] )
@@ -150,9 +150,9 @@ void VCalibrator::calculatePedestals( bool iLowGain )
 					continue;
 				}
 			}
-// calculate pedestals only for channels with valid hitbit
-//   important if trying to generate pedestals for zero supressed
-//   runs without injected pedestal events
+			// calculate pedestals only for channels with valid hitbit
+			//   important if trying to generate pedestals for zero supressed
+			//   runs without injected pedestal events
 			if( j < getSums().size() )
 			{
 				if( fRunPar->fRunIsZeroSuppressed )
@@ -192,22 +192,22 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 	}
 	
 	string ioutfile;
-// boolean to keep track which files have been written
-// (this is historically a mess)
+	// boolean to keep track which files have been written
+	// (this is historically a mess)
 	map< ULong64_t, bool > iFileWritten;
 	for( unsigned int i = 0; i < getDetectorGeometry()->getTelType_list().size(); i++ )
 	{
 		iFileWritten[getDetectorGeometry()->getTelType_list()[i]] = false;
 	}
 	
-/////////////////////////////////////////////////////////////////
-// loop over all telescopes
+	/////////////////////////////////////////////////////////////////
+	// loop over all telescopes
 	for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
 	{
 		unsigned int t = getTeltoAna()[tel];
 		ULong64_t telType = getDetectorGeometry()->getTelType()[t];
 		
-// make one pedestal file per telescope
+		// make one pedestal file per telescope
 		if( !iLowGain )
 		{
 			ioutfile = fPedFileNameC[t];
@@ -238,11 +238,11 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 			{
 				cout << "\t\t" << getPedestalRootFile( telType )->GetName() << endl;
 			}
-////////////////////////////////////////////////////////////
-// write pedestal and pedestal variances to an ascii file
+			////////////////////////////////////////////////////////////
+			// write pedestal and pedestal variances to an ascii file
 			if( iWriteAsciiFile )
 			{
-// loop over all channels
+				// loop over all channels
 				ofstream os( ioutfile.c_str() );
 				if( !os )
 				{
@@ -251,7 +251,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				}
 				for( unsigned int i = 0; i < hped_vec[telType][0].size(); i++ )
 				{
-// get pedestal and pedestal variances from pedestal histograms
+					// get pedestal and pedestal variances from pedestal histograms
 					os << t << " " << i << " ";
 					if( hped_vec[telType][fRunPar->fCalibrationSumWindow - 1][i] )
 					{
@@ -261,7 +261,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 					{
 						os << 0. << " ";
 					}
-// loop over all window sizes
+					// loop over all window sizes
 					for( unsigned int j = 0; j < hped_vec[telType].size(); j++ )
 					{
 						if( hped_vec[telType][j][i] )
@@ -286,7 +286,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 				exit( -1 );
 			}
 			fillPedestalTree( tel, iPedestalCalculator );
-// write 1D histograms
+			// write 1D histograms
 			std::ostringstream iSname;
 			iSname << "distributions_" << telType;
 			TDirectory* i_dist = getPedestalRootFile( telType )->mkdir( iSname.str().c_str() );
@@ -307,7 +307,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 			iFileWritten[telType] = true;
 		}
 	}                                             // end loop over all telescopes
-// delete all histograms
+	// delete all histograms
 	map< ULong64_t, TClonesArray* >::iterator i_PedestalsHistoClonesArray_iter;
 	for( i_PedestalsHistoClonesArray_iter = fPedestalsHistoClonesArray.begin();
 			i_PedestalsHistoClonesArray_iter != fPedestalsHistoClonesArray.end(); i_PedestalsHistoClonesArray_iter++ )
@@ -317,7 +317,7 @@ void VCalibrator::writePeds( bool iLowGain, VPedestalCalculator* iPedestalCalcul
 			i_PedestalsHistoClonesArray_iter->second->Delete();
 		}
 	}
-// close all files
+	// close all files
 	cout << "Closing all pedestal files " << endl;
 	map< ULong64_t, TFile* >::iterator iPedOutFile_iter;
 	for( iPedOutFile_iter = fPedOutFile.begin(); iPedOutFile_iter != fPedOutFile.end(); iPedOutFile_iter++ )
@@ -372,7 +372,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		return false;
 	}
 	
-// get telescope type
+	// get telescope type
 	ULong64_t iTelType = 0;
 	if( t < getDetectorGeometry()->getTelType().size() )
 	{
@@ -405,7 +405,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		ipedv[i] = 0.;
 	}
 	UInt_t inevents = 0;
-// pedestals in time slices
+	// pedestals in time slices
 	const Int_t nSlices = 500;
 	UInt_t TSnSlices = 0;
 	if( iPedestalInTimeSlices && t < iPedestalInTimeSlices->v_MJD.size() )
@@ -439,7 +439,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 	iPedTree->Branch( "pedmean", &iped, "pedmean/F" );
 	iPedTree->Branch( "pedvars", ipedv, "pedvars[nsumwindow]/F" );
 	iPedTree->Branch( "nevents", &inevents, "nevents/i" );
-// fill this part only if time dependent pedestals are calculated
+	// fill this part only if time dependent pedestals are calculated
 	if( iPedestalInTimeSlices )
 	{
 		iPedTree->Branch( "TSnSlices", &TSnSlices, "TSnSlices/i" );
@@ -456,14 +456,14 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 		}
 	}
 	
-////////////////////////////////////////////////////////////////////////////////
-// tree filling
-
-// loop over all channels
+	////////////////////////////////////////////////////////////////////////////////
+	// tree filling
+	
+	// loop over all channels
 	for( unsigned int i = 0; i < hped_vec[iTelType][0].size(); i++ )
 	{
 		ichannel = ( Int_t )i;
-// get pedestal and pedestal variances from pedestal histograms
+		// get pedestal and pedestal variances from pedestal histograms
 		if( fRunPar->fCalibrationSumWindow > 0 )
 		{
 			iped = hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetMean() / ( double )fRunPar->fCalibrationSumWindow;
@@ -473,17 +473,17 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 			iped = 0.;
 		}
 		inevents = ( Int_t )hped_vec[iTelType][fRunPar->fCalibrationSumWindow - 1][i]->GetEntries();
-// loop over all window sizes
+		// loop over all window sizes
 		insumw = ( UInt_t )hped_vec[iTelType].size();
 		for( unsigned int j = 0; j < hped_vec[iTelType].size(); j++ )
 		{
 			isumw[j] = ( Float_t )j + 1;
 			ipedv[j] = hped_vec[iTelType][j][i]->GetRMS();
 		}
-// time dependent pedestals
+		// time dependent pedestals
 		if( iPedestalInTimeSlices )
 		{
-// loop over all time slices
+			// loop over all time slices
 			TSnSlices = ( UInt_t )iPedestalInTimeSlices->v_MJD[tel].size();
 			for( unsigned int ts = 0; ts < iPedestalInTimeSlices->v_MJD[tel].size(); ts++ )
 			{
@@ -498,7 +498,7 @@ bool VCalibrator::fillPedestalTree( unsigned int tel, VPedestalCalculator* iPede
 					}
 					TSnevents[ts] = ( UInt_t )iPedestalInTimeSlices->v_pedEntries[tel][ts][i][iSW_mean];
 					TSpedmean[ts] = iPedestalInTimeSlices->v_ped[tel][ts][i][iSW_mean];
-// check summation windows
+					// check summation windows
 					unsigned int iSW_temp = iPedestalInTimeSlices->v_pedvar[tel][ts][i].size();
 					if( iSW_temp > TSpedvar.size() )
 					{
@@ -540,14 +540,14 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 		}
 	}
 	
-// use same histogram definitions as in toff calculation
+	// use same histogram definitions as in toff calculation
 	if( fReader->getMaxChannels() > 0 && htzero.size() == 0 )
 	{
 		int telID = 0;
 		for( unsigned int t = 0; t < getNTel(); t++ )
 		{
 			telID = t + 1;
-// create histograms
+			// create histograms
 			vector< TH1F* > ih_tzero;
 			for( unsigned int i = 0; i < getNChannels(); i++ )
 			{
@@ -561,7 +561,7 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 			}
 			htzero.push_back( ih_tzero );
 		}
-// root output files
+		// root output files
 		string ioutfile;
 		for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
 		{
@@ -595,7 +595,7 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 	
 	findDeadChans( iLowGain, ( fNumberTZeroEvents[fTelID] == 0 ) );
 	
-// calculate sums and tzeros
+	// calculate sums and tzeros
 	calcSums( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow, false );
 	calcTZeros( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow );
 	
@@ -605,8 +605,8 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 	}
 	
 	fNumberTZeroEvents[fTelID]++;
-////////////////////////
-// fill tzeros
+	////////////////////////
+	// fill tzeros
 	for( unsigned int i = 0; i < getNChannels(); i++ )
 	{
 		if( iLowGain && !getHiLo()[i] )
@@ -618,7 +618,7 @@ void VCalibrator::calculateAverageTZero( bool iLowGain )
 			continue;
 		}
 		
-// require a min sum for tzero filling
+		// require a min sum for tzero filling
 		if( getSums()[i] > fRunPar->fCalibrationIntSumMin && !getDead()[i] && !getMasked()[i] && getTZeros()[i] > 0. )
 		{
 			if( i < htzero[fTelID].size() && htzero[fTelID][i] )
@@ -691,7 +691,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 	{
 		findDeadChans( iLowGain );
 		
-// root output files are gain/toff file.root
+		// root output files are gain/toff file.root
 		if( !iLowGain )
 		{
 			opfgain = new TFile( ( fGainFileNameC[getTelID()] + ".root" ).c_str(), "RECREATE" );
@@ -709,7 +709,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 		cout << "calculate gains and toffsets with summation window " << fRunPar->fCalibrationSumWindow;
 		cout << " (start at " << fRunPar->fCalibrationSumFirst << ")" << endl;
 		
-// create histograms
+		// create histograms
 		for( unsigned int i = 0; i < getNChannels(); i++ )
 		{
 			char gainkey[100];
@@ -766,7 +766,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 	
 	fillHiLo();
 	
-//! calculate sums and tzeros
+	//! calculate sums and tzeros
 	calcSums( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow, false );
 	calcTZeros( fRunPar->fCalibrationSumFirst, fRunPar->fCalibrationSumFirst + fRunPar->fCalibrationSumWindow );
 	
@@ -775,8 +775,8 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 		FADCStopCorrect();
 	}
 	
-//////////////////////////////////////////
-// test if this is a laser event (by sum of total charge in all channels )
+	//////////////////////////////////////////
+	// test if this is a laser event (by sum of total charge in all channels )
 	bool i_laser = false;
 	double i_total = 0;
 	for( unsigned int i = 0; i < getNChannels(); i++ )
@@ -790,7 +790,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 	if( i_laser )
 	{
 		fNumberGainEvents[fTelID]++;
-// (GM) write pulse to disk, pulse histograms for each event in one directory
+		// (GM) write pulse to disk, pulse histograms for each event in one directory
 		char i_name[200];
 		char i_title[200];
 		TDirectory* i_curDir = ( TDirectory* )opfgain;
@@ -803,7 +803,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 			i_pulseDir = gDirectory->mkdir( i_name, i_name );
 		}
 		
-// need number of saturated PMTs for laser calibration
+		// need number of saturated PMTs for laser calibration
 		int n_lowgain = 0;
 		for( unsigned int i = 0; i < fReader->getNumChannelsHit(); i++ )
 		{
@@ -813,7 +813,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 				n_lowgain += 1;
 			}
 		}
-// don't do anything if there are not enough channels in low or high gain
+		// don't do anything if there are not enough channels in low or high gain
 		if( !iLowGain && n_lowgain >  10 )
 		{
 			return;
@@ -827,7 +827,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 		int countsums = 0;
 		double m_tzero = 0;
 		double m_sums = 0;
-// calculate total sum
+		// calculate total sum
 		for( unsigned int i = 0; i < getNChannels(); i++ )
 		{
 			if( iLowGain && !getHiLo()[i] )
@@ -859,8 +859,8 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 			m_tzero /= counttzero;
 		}
 		
-// (GM) subtract pedestals
-// (GM) set number of entries in hpulse to number of pulses added up
+		// (GM) subtract pedestals
+		// (GM) set number of entries in hpulse to number of pulses added up
 		double tcorr = 0.;
 		for( unsigned int i = 0; i < getNChannels(); i++ )
 		{
@@ -875,7 +875,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 			
 			if( m_sums > 0.1 || fRunPar->fLaserSumMin < 0. )
 			{
-// fill average traces
+				// fill average traces
 				if( getRunParameter()->fwriteAverageLaserPulse )
 				{
 					double this_content = 0.;
@@ -899,7 +899,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 											i_pulse->SetBinContent( this_bin, this_content );
 										}
 										hpulse[i]->Fill( this_bin, this_content );
-// time corrected pulse
+										// time corrected pulse
 										if( getTZeros()[i] > -99. )
 										{
 											tcorr = getTZeros()[i] - m_tzero;
@@ -928,7 +928,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 				{
 					continue;
 				}
-// fill gain and toffset histograms
+				// fill gain and toffset histograms
 				if( ( getSums()[i] > fRunPar->fCalibrationIntSumMin || fRunPar->fLaserSumMin < 0. ) && !getDead()[i] && !getMasked()[i] )
 				{
 					hgain[i]->Fill( ( float )getSums()[i] / m_sums );
@@ -1169,24 +1169,24 @@ void VCalibrator::readCalibrationData()
 	{
 		setTelID( getTeltoAna()[i] );
 		
-// read high gain gains
+		// read high gain gains
 		if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 )
 		{
 			readGains( false );
-// read low gain gains
+			// read low gain gains
 			if( fLowGainGainFileNameC[getTeltoAna()[i]].size() > 0 )
 			{
 				readGains( true );
 				setLowGainGains();
 			}
-// set low gain gains equal to high gain gains
+			// set low gain gains equal to high gain gains
 			else
 			{
 				getGains( true ) = getGains( false );
 			}
 		}
 		
-// read average tzeros
+		// read average tzeros
 		if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5
 				&& getRunParameter()->frunmode != 7 && getRunParameter()->frunmode != 8 )
 		{
@@ -1201,15 +1201,15 @@ void VCalibrator::readCalibrationData()
 			}
 		}
 		
-// read high gain pedestals
+		// read high gain pedestals
 		readPeds( fPedFileNameC[getTelID()], false, getSumWindow() );
 		
-// read low gain pedestals
+		// read low gain pedestals
 		if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
 		{
 			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
 		}
-// no low gain peds available -> set low gain peds to high gain peds (not sure if this is a good idea)
+		// no low gain peds available -> set low gain peds to high gain peds (not sure if this is a good idea)
 		else
 		{
 			getPedsLowGain() = getPeds();
@@ -1219,14 +1219,14 @@ void VCalibrator::readCalibrationData()
 			getmeanRMSPedvarsAllSumWindow( true ) = getmeanRMSPedvarsAllSumWindow( false );
 		}
 		
-// read low gain multipliers
+		// read low gain multipliers
 		readLowGainMultiplier( );
 		
 		if( getRunParameter()->frunmode != 2 && getRunParameter()->frunmode != 5 )
 		{
-// read high gain channel time offsets
+			// read high gain channel time offsets
 			readTOffsets( false );
-// read low gain channel time offsets
+			// read low gain channel time offsets
 			if( fLowGainToffFileNameC.size() > 0 )
 			{
 				readTOffsets( true );
@@ -1238,18 +1238,18 @@ void VCalibrator::readCalibrationData()
 			}
 		}
 		
-// read pixel status
+		// read pixel status
 		readPixelstatus();
 		
-// read summation window dependend values for second summation window
+		// read summation window dependend values for second summation window
 		readPeds( fPedFileNameC[getTeltoAna()[i]], false, getSumWindow_2() );
 		
-// read low gain pedestals
+		// read low gain pedestals
 		if( fLowGainPedFileNameC[getTeltoAna()[i]].size() > 0 )
 		{
 			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
 		}
-// (preli) fill high gain value if low value is not available
+		// (preli) fill high gain value if low value is not available
 		else
 		{
 			for( unsigned int g = 0; g < getPedsLowGain().size(); g++ )
@@ -1281,7 +1281,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 	ifstream infile_root;
 	infile_root.open( ( iFile + ".root" ).c_str(), ifstream::in );
 	
-// Temporary: do not read it for low gain channels
+	// Temporary: do not read it for low gain channels
 	if( infile_root && usePedestalsInTimeSlices( iLowGain ) )
 	{
 		infile_root.close();
@@ -1362,7 +1362,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 				tPed->SetBranchAddress( i_branchname, iTSpedvars[i] );
 			}
 		}
-// initialize time dependant pedestal vectors
+		// initialize time dependant pedestal vectors
 		if( tPed->GetEntries() > 0 )
 		{
 			valarray< double > i_ts_temp_peds;
@@ -1370,32 +1370,32 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 			valarray< valarray< double > > i_ts_temp_pedvar;
 			i_ts_temp_pedvar.resize( getNSamples() + 1, i_ts_temp_peds );
 			
-// for first event only, expect that all channels have same number of time slices
+			// for first event only, expect that all channels have same number of time slices
 			tPed->GetEntry( 0 );
 			
 			if( iTSnSlices > 0 )
 			{
-// prepare time vectors
+				// prepare time vectors
 				getCalData()->getMJDTS_vector().resize( iTSnSlices, 0 );
 				getCalData()->getTimeTS_vector().resize( iTSnSlices, 0. );
 				
-// prepare pedestal vector
+				// prepare pedestal vector
 				getCalData()->getPedsTS_vector( iLowGain ).resize( iTSnSlices, i_ts_temp_peds );
 				
-// prepare pedestal variation vector
+				// prepare pedestal variation vector
 				getCalData()->getPedvarsVTS_vector( iLowGain ).resize( iTSnSlices, i_ts_temp_pedvar );
 			}
 		}
-/////////////////////////////////////////////////////////////////////////////////
-// loop over tree entries and read pedestals and pedestal variations from tree
-/////////////////////////////////////////////////////////////////////////////////
-
-// loop over all channels
+		/////////////////////////////////////////////////////////////////////////////////
+		// loop over tree entries and read pedestals and pedestal variations from tree
+		/////////////////////////////////////////////////////////////////////////////////
+		
+		// loop over all channels
 		for( int i = 0; i < tPed->GetEntries(); i++ )
 		{
 			tPed->GetEntry( i );
 			
-// fix summation window
+			// fix summation window
 			if( insumw > getLargestSumWindow() )
 			{
 				insumw = getLargestSumWindow();
@@ -1406,7 +1406,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 				continue;
 			}
 			
-// read pedestal and fill pedestal distributions
+			// read pedestal and fill pedestal distributions
 			getPeds( iLowGain, -99. )[ichannel] = iped;
 			if( !iLowGain )
 			{
@@ -1416,7 +1416,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 			{
 				getPedLowGainDist()->Fill( iped );
 			}
-// read pedestal variation as function of summation window
+			// read pedestal variation as function of summation window
 			for( unsigned int sw = 0; sw < insumw; sw++ )
 			{
 				unsigned int icurrent_sw = ( unsigned int )TMath::Nint( isumw[sw] );
@@ -1460,19 +1460,19 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 					cout << "VCalibrator::readPeds: using pedestals for window " << isumw[insumw - 1] << " for low gain channels" << endl;
 				}
 			}
-// read date for pedestals in time slices
+			// read date for pedestals in time slices
 			if( iTSnSlices > 0 )
 			{
-// fill vectors
+				// fill vectors
 				for( unsigned int ts = 0; ts < iTSnSlices; ts++ )
 				{
-// read time for first entry only
+					// read time for first entry only
 					if( i == 0 )
 					{
 						getCalData()->getMJDTS_vector()[ts] = iTSMJD[ts];
 						getCalData()->getTimeTS_vector()[ts] = iTStime[ts];
 					}
-// pedestals and pedvars
+					// pedestals and pedvars
 					getCalData()->getPedsTS_vector( iLowGain )[ts][i] = iTSpedmean[ts];
 					for( unsigned int sw = 0; sw < insumw; sw++ )
 					{
@@ -1486,9 +1486,9 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 		}                                 // for( int i = 0; i < tPed->GetEntries(); i++ )
 		tPed->ResetBranchAddresses();
 		
-/////////////////////////////////////////////////////////////////////////////////
-// calculate mean and RMS pedvars for time slices
-/////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////
+		// calculate mean and RMS pedvars for time slices
+		/////////////////////////////////////////////////////////////////////////////////
 		valarray< double > its_mean( 0., getNSamples() + 1 );
 		valarray< double > its_rms( 0., getNSamples() + 1 );
 		getCalData()->getMeanPedvarsVTS_vector( iLowGain ).resize( getCalData()->getPedvarsVTS_vector( iLowGain ).size(), its_mean );
@@ -1526,7 +1526,7 @@ bool VCalibrator::readPeds_from_rootfile( string iFile, bool iLowGain, unsigned 
 			}
 			getCalData()->getMeanPedvarsVTS_vector( iLowGain )[ts] = its_mean;
 			getCalData()->getMeanRMSPedvarsVTS_vector( iLowGain )[ts] = its_rms;
-// everything seemed to worked find
+			// everything seemed to worked find
 			return true;
 		}
 	}
@@ -1562,7 +1562,7 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 	cout << "Telescope " << getTelID() + 1 << ": ";
 	cout << iFile << endl;
 	
-// resetting all vectors
+	// resetting all vectors
 	getPeds( iLowGain, -99. ) = 1.0;
 	getPedvars( iLowGain, i_SumWindow, -99. ) = 1.0;
 	getPedrms( iLowGain ) = 1.0;
@@ -1571,21 +1571,21 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 	float mean = 0.;
 	float rms = 0.;
 	int i_testCounter = 0;
-// loop over pedestal file (text format)
+	// loop over pedestal file (text format)
 	string i_Line;
 	while( getline( infile, i_Line ) )
 	{
 		if( i_Line.size() > 0 )
 		{
 			std::istringstream is_stream( i_Line );
-// telescope number
+			// telescope number
 			is_stream >> tel;
 			if( tel == fTelID )
 			{
 				i_testCounter++;
-// channel number
+				// channel number
 				is_stream >> ch;
-// pedestal
+				// pedestal
 				is_stream >> mean;
 				if( ch < getPeds( iLowGain, -99. ).size() )
 				{
@@ -1600,7 +1600,7 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 					}
 				}
 				unsigned int count = 0;
-// pedestal variances
+				// pedestal variances
 				do
 				{
 					count += 1;
@@ -1608,7 +1608,7 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 					{
 						is_stream >> rms;
 					}
-// ther might be more than NSamples values in the file; stop when reached NSamples
+					// ther might be more than NSamples values in the file; stop when reached NSamples
 					if( ( count == i_SumWindow || ( iLowGain && count == getNSamples() ) )  && ch < getPedvars( iLowGain, i_SumWindow, -99. ).size() )
 					{
 						getPedvars( iLowGain, i_SumWindow, -99. )[ch] = rms;
@@ -1678,7 +1678,7 @@ bool VCalibrator::readPeds_from_grisufile( bool iLowGain, unsigned int i_SumWind
 	getPedvarsAllSumWindows( iLowGain ) = fReader->getPedvarsAllSumWindows();
 	getPedrms( iLowGain ) = fReader->getPedRMS();
 	
-// fill pedestal distributions
+	// fill pedestal distributions
 	if( !iLowGain )
 	{
 		for( unsigned int i = 0; i < getPeds( iLowGain, -99. ).size(); i++ )
@@ -1716,10 +1716,10 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
 		cout << "VCalibrator::readPeds() " << getTelID() + 1 << "\t" << i_pedfile << endl;
 	}
 	
-// set input file
+	// set input file
 	string iFile = i_pedfile;
-//////////////////////////////////////////////
-// reset histograms with pedestal distributions
+	//////////////////////////////////////////////
+	// reset histograms with pedestal distributions
 	if( !iLowGain )
 	{
 		getPedvarsDist()->Reset();
@@ -1732,25 +1732,25 @@ bool VCalibrator::readPeds( string i_pedfile, bool iLowGain, unsigned int i_SumW
 	}
 	if( iFile.size() > 0 && getRunParameter()->fsimu_pedestalfile.size() == 0 )
 	{
-// read pedestals from root file
+		// read pedestals from root file
 		if( !readPeds_from_rootfile( i_pedfile, iLowGain, i_SumWindow ) )
 		{
 			readPeds_from_textfile( i_pedfile, iLowGain, i_SumWindow );
 		}
 	}
-////////////////////////////////////////////////////////////////
-// getting pedestals directly from MC (grisu) file
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	// getting pedestals directly from MC (grisu) file
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 	else if( fReader->getDataFormat() == "grisu" || ( getRunParameter()->fsourcetype == 2 && getRunParameter()->fsimu_pedestalfile.size() > 0 ) )
 	{
 		readPeds_from_grisufile( iLowGain, i_SumWindow );
 	}
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-
-// mean pedvar calculation
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	
+	// mean pedvar calculation
 	if( getPedvarsAllSumWindows( iLowGain ).size() == getmeanPedvarsAllSumWindow( iLowGain ).size() )
 	{
 		double i_n = 0.;
@@ -1827,7 +1827,7 @@ void VCalibrator::readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< 
 		string sversion = cversion;
 		iFile += sversion;
 	}
-// to avoid double file
+	// to avoid double file
 	time_t rawtime;
 	struct tm* timeinfo;
 	time( &rawtime );
@@ -1837,7 +1837,7 @@ void VCalibrator::readfromVOFFLINE_DB( int gain_or_toff, string& iFile, vector< 
 	string NOW = today_now;
 	iFile += NOW;
 	
-// fill the data into vectors
+	// fill the data into vectors
 	if( !getRunParameter()->freadCalibfromDB_save_file )
 	{
 		iFile = "";
@@ -1888,7 +1888,7 @@ void VCalibrator::readGains( bool iLowGain )
 	}
 	int nZero = 0;	//counts number of channels with 0 gain.
 	
-// don't read gains for runmode = 2
+	// don't read gains for runmode = 2
 	if( iFile.size() > 0 && getRunParameter()->frunmode != 2 )
 	{
 		setGains( 1.0, iLowGain );
@@ -1909,13 +1909,13 @@ void VCalibrator::readGains( bool iLowGain )
 		}
 		cout << "from: " << endl;
 		cout << "Telescope " << getTelID() + 1 << ": ";
-// read gain from DB
+		// read gain from DB
 		if( !iLowGain && getRunParameter()->freadCalibfromDB )
 		{
 			cout << "VOFFLINE DB" << endl;
 			readfromVOFFLINE_DB( 1, iFile, VchannelList, Vmean, Vvar );
 		}
-// read gains from external file
+		// read gains from external file
 		else
 		{
 			cout << iFile << endl;
@@ -1971,9 +1971,9 @@ void VCalibrator::readGains( bool iLowGain )
 			}
 		}
 		
-//this is mostly for the nextday analysis. If flasher analysis failed (all gains 0) we want to have all gains 1 instead of eventdisplay exiting with 499 dead pixels.
-//turn on with -nextdaygainhack. Not recommended for regular analysis.
-//this is a bit risky as we can miss 'bad' channels (gains won't be tested...).
+		//this is mostly for the nextday analysis. If flasher analysis failed (all gains 0) we want to have all gains 1 instead of eventdisplay exiting with 499 dead pixels.
+		//turn on with -nextdaygainhack. Not recommended for regular analysis.
+		//this is a bit risky as we can miss 'bad' channels (gains won't be tested...).
 		if( getRunParameter()->fNextDayGainHack && nZero > 200 )
 		{
 			cout << "VCalibrator::readGains(): Warning: " << nZero << " channels in Tel " <<  getTelID() + 1 << " had 0 gain. All rel. gains will be set to 1." << endl;
@@ -2023,7 +2023,7 @@ void VCalibrator::readGains( bool iLowGain )
 		exit( -1 );
 	}
 	
-// apply additional gain corrections
+	// apply additional gain corrections
 	getGains() /= getRunParameter()->fGainCorrection[getTelID()];
 	
 	
@@ -2113,8 +2113,8 @@ bool VCalibrator::readAverageTZeros( bool iLowGain )
 		{
 			t->GetEntry( i );
 			
-// choose median of distribution as typical average
-// (distribution is assymetric)
+			// choose median of distribution as typical average
+			// (distribution is assymetric)
 			setAverageTZero( i, itzero_med, iLowGain );
 			setAverageTZerovars( i, itzero_var, iLowGain );
 			if( getAverageTZeroDist( iLowGain ) )
@@ -2192,13 +2192,13 @@ void VCalibrator::readTOffsets( bool iLowGain )
 		}
 		cout << "from: " << endl;
 		cout << "Telescope " << getTelID() + 1 << ": ";
-// read toffs from DB
+		// read toffs from DB
 		if( !iLowGain && getRunParameter()->freadCalibfromDB )
 		{
 			cout << "VOFFLINE DB" << endl;
 			readfromVOFFLINE_DB( 2, iFile, VchannelList, Vmean, Vvar );
 		}
-// read toffs from external file
+		// read toffs from external file
 		else
 		{
 			cout << iFile << endl;
@@ -2304,7 +2304,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	}
 	
 	
-// check if toffs are saved to disk
+	// check if toffs are saved to disk
 	if( getRunParameter()->freadCalibfromDB && !getRunParameter()->freadCalibfromDB_save_file )
 	{
 		char rm_calib_info_file[800];
@@ -2328,13 +2328,13 @@ void VCalibrator::initialize()
 		cout << "VCalibrator::initialize()" << endl;
 	}
 	
-// set the data readers
+	// set the data readers
 	initializeDataReader();
 	
 	getCalibrationRunNumbers();
 	
-////////////////////////////////////////////////////////////////
-// create the calibration data structures
+	////////////////////////////////////////////////////////////////
+	// create the calibration data structures
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		setTelID( i );
@@ -2359,7 +2359,7 @@ void VCalibrator::initialize()
 			fCalData.back()->setReader( fReader );
 		}
 	}
-// define histograms and output files for pedestal calculation
+	// define histograms and output files for pedestal calculation
 	vector<ULong64_t> i_TelTypeList = getDetectorGeometry()->getTelType_list();
 	if( fRunPar->frunmode == 1 || fRunPar->frunmode == 6 )
 	{
@@ -2384,15 +2384,15 @@ void VCalibrator::initialize()
 				i_nclones += ihped.size();
 			}
 			hped_vec[i_TelTypeList[t]] = iped_vec;
-// number of pedestal events
+			// number of pedestal events
 			fNumberPedestalEvents[i_TelTypeList[t]] = 0;
 			fPedestalsHistoClonesArray[i_TelTypeList[t]] = new TClonesArray( "TH1F", i_nclones );
 		}
-// create a TClonesArray for all pedestals histograms
-
+		// create a TClonesArray for all pedestals histograms
+		
 	}
-////////////////////////////////////////////////////////////////
-// read the calibration files
+	////////////////////////////////////////////////////////////////
+	// read the calibration files
 	if( fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 4 )
 	{
 		if( fRunPar->frunmode != 1 && fRunPar->frunmode != 6 && fRunPar->frunmode != 2 )
@@ -2400,7 +2400,7 @@ void VCalibrator::initialize()
 			readCalibrationData();
 		}
 	}
-// PE mode: set gains to 1
+	// PE mode: set gains to 1
 	else
 	{
 		for( unsigned int tel = 0; tel < getTeltoAna().size(); tel++ )
@@ -2410,14 +2410,14 @@ void VCalibrator::initialize()
 			readGains( false );
 			readGains( true );
 		}
-// read peds from DST file (for DST MC source file)
+		// read peds from DST file (for DST MC source file)
 		if( fRunPar->frunmode != 1 && ( fRunPar->fsourcetype == 7 || fRunPar->fsourcetype == 4 ) )
 		{
 			readCalibrationDatafromDSTFiles( fRunPar->fsourcefile );
 		}
 	}
 	
-// initialize dead  channel finder
+	// initialize dead  channel finder
 	initializeDeadChannelFinder();
 }
 
@@ -2530,17 +2530,17 @@ void VCalibrator::getCalibrationRunNumbers()
 		cout << "VCalibrator::getCalibrationRunNumbers()" << endl;
 	}
 	
-// initialize vectors
+	// initialize vectors
 	setCalibrationFileNames();
 	
-// reading peds etc from grisu files
+	// reading peds etc from grisu files
 	if( getRunParameter()->fsimu_pedestalfile.size() > 0 )
 	{
 		cout << "VCalibrator::getCalibrationRunNumbers() info: taking calibration from grisu files" << endl;
 		return;
 	}
 	
-// get calibration run numbers from calibration text file
+	// get calibration run numbers from calibration text file
 	int iCaliLines = 0;
 	if( getRunParameter()->fcalibrationfile.size() > 0 )
 	{
@@ -2567,18 +2567,18 @@ void VCalibrator::getCalibrationRunNumbers()
 	      if( iLowGainMultLines > 0 ) setCalibrationFileNames();
 	    } */
 	
-// take pedestals from grisu output file ('P'-lines), gains=1, and toff = 0.
+	// take pedestals from grisu output file ('P'-lines), gains=1, and toff = 0.
 	if( iCaliLines == 0 && ( fReader->getDataFormat() == "grisu" || getRunParameter()->fsimu_pedestalfile.size() > 0 ) )
 	{
 		cout << "VCalibrator::getCalibrationRunNumbers() info: taking calibration from grisu files" << endl;
 		return;
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// no information found for this runnumber
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// no information found for this runnumber
 	if( iCaliLines == 0 )
 	{
-// for dst, take dst.ped
+		// for dst, take dst.ped
 		if( fReader->getDataFormat() == "DST" || fReader->getDataFormat() == "PE" )
 		{
 			for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2586,7 +2586,7 @@ void VCalibrator::getCalibrationRunNumbers()
 				fPedFileNameC[i] = "dst";
 			}
 		}
-// plot raw: don't need any calibration data
+		// plot raw: don't need any calibration data
 		else if( getRunParameter()->fPlotRaw )
 		{
 			for( unsigned int i = 0; i < getNTel(); i++ )
@@ -2594,7 +2594,7 @@ void VCalibrator::getCalibrationRunNumbers()
 				fPedFileNameC[i] = "";
 			}
 		}
-// calibration run numbers are taken from DB
+		// calibration run numbers are taken from DB
 		else if( getRunParameter()->fsimu_pedestalfile.size() == 0 &&
 				 getRunParameter()->fuseDB && getRunParameter()->frunmode != 2 &&
 				 getRunParameter()->frunmode != 5 &&
@@ -2603,22 +2603,22 @@ void VCalibrator::getCalibrationRunNumbers()
 		{
 			cout << "VCalibrator::getCalibrationRunNumbers() info: using laser file number from DB" << endl;
 		}
-// for laser files: take data file run number for pedestals and gains
+		// for laser files: take data file run number for pedestals and gains
 		else if( getRunParameter()->fDBRunType == "flasher" )
 		{
 			cout << "VCalibrator::getCalibrationRunNumbers() info: laser/flasher files, using run number for pedestals and gains" << endl;
 		}
-// this is an calibration run
+		// this is an calibration run
 		else if( getRunParameter()->fsimu_pedestalfile.size() == 0 && getRunParameter()->fcalibrationrun )
 		{
 			cout << "VCalibrator::getCalibrationRunNumbers() info: calibration run, using run number for pedestals, tzeros and gains" << endl;
 		}
-// this is a MC run
+		// this is a MC run
 		else if( getRunParameter()->fsimu_pedestalfile.size() == 0 && getRunParameter()->fIsMC )
 		{
 			cout << "VCalibrator::getCalibrationRunNumbers() info: MC run, using run number for pedestals, tzeros and gains" << endl;
 		}
-// no calibration data: problem
+		// no calibration data: problem
 		else
 		{
 			cout << "VCalibrator::getCalibrationRunNumbers() error: no calibration information found for run ";
@@ -2636,7 +2636,7 @@ void VCalibrator::getCalibrationRunNumbers()
 		}
 	}
 	
-// append suffixes
+	// append suffixes
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		if( fPixFileNameC[i].size() > 0 )
@@ -2652,7 +2652,7 @@ void VCalibrator::getCalibrationRunNumbers()
 int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, unsigned int iTelescopeSelect, int iSumWindow )
 {
 	int iLinesFound = 0;
-// open file with calibration information
+	// open file with calibration information
 	string is_Temp;
 	is_Temp = fRunPar->getDirectory_EVNDISPCalibrationData();
 	is_Temp += getRunParameter()->fLowGainCalibrationFile;
@@ -2681,7 +2681,7 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 		if( is_line.size() > 0 )
 		{
 			istringstream is_stream( is_line );
-// only line with '*' as first characters are valid lines
+			// only line with '*' as first characters are valid lines
 			is_stream >> is_Temp;
 			if( is_Temp != "*" )
 			{
@@ -2711,7 +2711,7 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 					continue;
 				}
 				is_stream >> iRunMax;
-// check run number range
+				// check run number range
 				if( getRunNumber() >= iRunMin && getRunNumber() <= iRunMax )
 				{
 				
@@ -2799,7 +2799,7 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 
 int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 {
-// open file with calibration information
+	// open file with calibration information
 	string is_Temp;
 	is_Temp = fRunPar->getDirectory_EVNDISPCalibrationData();
 	is_Temp += getRunParameter()->fcalibrationfile;
@@ -2822,14 +2822,14 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 		if( is_line.size() > 0 )
 		{
 			istringstream is_stream( is_line );
-// only line with '*' as first characters are valid lines
+			// only line with '*' as first characters are valid lines
 			is_stream >> is_Temp;
 			if( is_Temp != "*" && is_Temp != "*V1" && is_Temp != "*V2" && is_Temp != "*V3" && is_Temp != "*V4" )
 			{
 				continue;
 			}
 			
-// get version number
+			// get version number
 			if( is_Temp == "*V2" )
 			{
 				fCalibrationfileVersion = 2;
@@ -2843,7 +2843,7 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 				fCalibrationfileVersion = 4;
 			}
 			
-// get and check run number
+			// get and check run number
 			is_stream >> is_Temp;
 			if( atoi( is_Temp.c_str() ) != getRunNumber() )
 			{
@@ -2854,38 +2854,38 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 			cout << "reading calibration information (version " << fCalibrationfileVersion << ")" << endl;
 			cout << is_line << endl;
 			
-// get telescope numbers
+			// get telescope numbers
 			is_stream >> is_Temp;
 			iTel = atoi( is_Temp.c_str() ) - 1;
 			
-// get ped file number
+			// get ped file number
 			is_stream >> iPed;
 			
-// get gain file number
+			// get gain file number
 			if( !is_stream.eof() )
 			{
 				is_stream >> iGain;
 			}
 			
-// get toff file number
+			// get toff file number
 			if( !is_stream.eof() )
 			{
 				is_stream >> iToff;
 			}
 			
-// get pixel status number
+			// get pixel status number
 			if( !is_stream.eof() )
 			{
 				is_stream >> iPix;
 			}
 			
-// get pad file number
+			// get pad file number
 			if( !is_stream.eof() )
 			{
 				is_stream >> iPad;
 			}
 			
-// get low gain pedestal file number
+			// get low gain pedestal file number
 			if( fCalibrationfileVersion > 1 )
 			{
 				if( !is_stream.eof() )
@@ -2907,7 +2907,7 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 				iLowGainPeds = "-2";
 			}
 			
-// low gain gains and time offsets
+			// low gain gains and time offsets
 			if( fCalibrationfileVersion > 3 )
 			{
 				if( !is_stream.eof() )
@@ -2920,7 +2920,7 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 				}
 			}
 			
-// get low gain multiplier file name
+			// get low gain multiplier file name
 			if( fCalibrationfileVersion > 2 )
 			{
 				if( !is_stream.eof() )
@@ -2929,7 +2929,7 @@ int VCalibrator::getCalibrationRunNumbers_fromCalibFile()
 				}
 			}
 			
-// iTel < 0: valid for all telescopes
+			// iTel < 0: valid for all telescopes
 			if( iTel < 0 )
 			{
 				for( unsigned int i = 0; i < getNTel(); i++ )
@@ -3042,7 +3042,7 @@ void VCalibrator::readPixelstatus()
 		cout << "reading pixel status from ";
 		cout << "Telescope " << getTelID() + 1 << ": ";
 		cout << fPixFileNameC[getTelID()] << endl;
-// open pedestal file
+		// open pedestal file
 		ifstream is;
 		is.open( fPixFileNameC[getTelID()].c_str(), ifstream::in );
 		if( !is )
@@ -3088,10 +3088,10 @@ void VCalibrator::readPixelstatus()
 bool VCalibrator::readLowGainMultiplier( )
 {
 
-//////////////////////////////////////////////////////////////////
-// read low gain multiplier from low gain calibration file
-// (one value per telescope & sumwindow)
-
+	//////////////////////////////////////////////////////////////////
+	// read low gain multiplier from low gain calibration file
+	// (one value per telescope & sumwindow)
+	
 	if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
 	{
 		cout << "Telescope " << getTelID() + 1 << ": ";
@@ -3100,9 +3100,9 @@ bool VCalibrator::readLowGainMultiplier( )
 		readLowGainCalibrationValues_fromCalibFile( "LOWGAINMULTIPLIER_SUM", getTelID(), 0 );
 		getDetectorGeometry()->setLowGainMultiplier_Trace( getTelID(), getCalData()->getLowGainMultiplier_Trace() );
 	}
-//////////////////////////////////////////////////////////////////
-// fill low gain multipliers set in .cfg file
-// (one value per telescope)
+	//////////////////////////////////////////////////////////////////
+	// fill low gain multipliers set in .cfg file
+	// (one value per telescope)
 	else if( getDetectorGeometry()->isLowGainSet() )
 	{
 		setLowGainMultiplier_Trace( getDetectorGeometry()->getLowGainMultiplier_Trace()[getTelID()] );
@@ -3145,10 +3145,10 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	unsigned int fnum_sumwindow = 1;
 	unsigned int fsumwindow[VDST_MAXSUMWINDOW];
 	float fPed_high[VDST_MAXCHANNELS];
-//   float fPedvar_high2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+	//   float fPedvar_high2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
 	float* fPedvar_high = new float[VDST_MAXCHANNELS * VDST_MAXSUMWINDOW];
 	float fPed_low[VDST_MAXCHANNELS];
-//   float fPedvar_low2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
+	//   float fPedvar_low2D[VDST_MAXCHANNELS][VDST_MAXSUMWINDOW];
 	float* fPedvar_low = new float[VDST_MAXCHANNELS * VDST_MAXSUMWINDOW];
 	float fConv_high[VDST_MAXCHANNELS];
 	float fConv_low[VDST_MAXCHANNELS];
@@ -3164,7 +3164,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 	t->SetBranchAddress( "num_sumwindow", &fnum_sumwindow );
 	t->SetBranchAddress( "sumwindow", fsumwindow );
 	t->SetBranchAddress( "ped_high", fPed_high );
-// check if this is a old or new style pedvar tree
+	// check if this is a old or new style pedvar tree
 	bool iPedVarTreeTypeNew = true;
 	if( t->GetLeaf( "pedvar_high" ) )
 	{
@@ -3193,7 +3193,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		t->SetBranchAddress( "tzero", ftzero );
 	}
 	
-// reset histograms with pedestal distributions
+	// reset histograms with pedestal distributions
 	if( getPedvarsDist() )
 	{
 		getPedvarsDist()->Reset();
@@ -3211,7 +3211,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		getPedLowGainDist()->Reset();
 	}
 	
-// histogram for average tzero calculation (per telescope type)
+	// histogram for average tzero calculation (per telescope type)
 	vector<ULong64_t> iTelType = getDetectorGeometry()->getTelType_list();
 	vector< TH1D* > iH_averageTZero;
 	char hname[200];
@@ -3233,13 +3233,13 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		
 		setTelID( i );
 		
-// no calibration data available for this telescope
+		// no calibration data available for this telescope
 		if( nPixel == 0 )
 		{
 			continue;
 		}
 		
-// pedestals
+		// pedestals
 		if( nPixel == getPeds( false ).size() )
 		{
 			for( unsigned int p = 0; p < nPixel; p++ )
@@ -3276,7 +3276,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 			cout << nPixel << "\t" << getPeds( true ).size();
 			cout << " (telescope " << getTelID() + 1 << ")" << endl;
 		}
-// pedvars
+		// pedvars
 		if( nPixel == getPedvars( false ).size() )
 		{
 			for( unsigned int p = 0; p < nPixel; p++ )
@@ -3345,11 +3345,11 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 			cout << nPixel << "\t" << getPedvars( true ).size();
 			cout << " (telescope " << getTelID() + 1 << ")" << endl;
 		}
-////////////////
-// relative gains
+		////////////////
+		// relative gains
 		if( nPixel == getGains( false ).size() )
 		{
-// mean conversion factor
+			// mean conversion factor
 			float i_z = 0;
 			float i_meanC = 0;
 			for( unsigned int p = 0; p < nPixel; p++ )
@@ -3368,7 +3368,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 			{
 				i_meanC  = 1.;
 			}
-// calculate relative gain
+			// calculate relative gain
 			for( unsigned int p = 0; p < nPixel; p++ )
 			{
 				if( fConv_high[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
@@ -3394,7 +3394,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		}
 		if( nPixel == getGains( true ).size() )
 		{
-// use high-gain conversion and understand differences between low and high gain as multiplication factor
+			// use high-gain conversion and understand differences between low and high gain as multiplication factor
 			for( unsigned int p = 0; p < nPixel; p++ )
 			{
 				if( getGains( false )[p] > 0. && !getRunParameter()->fIgnoreDSTGains )
@@ -3419,13 +3419,13 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 			cout << nPixel << "\t" << getGains( true ).size();
 			cout << " (telescope " << getTelID() + 1 << ")" << endl;
 		}
-////////////////
-// tzeros
+		////////////////
+		// tzeros
 		if( nPixel == getAverageTZeros( false ).size() )
 		{
 			double i_mean = 0.;
 			double i_nn = 0.;
-// get teltype counter
+			// get teltype counter
 			unsigned int iTelTypeC = 0;
 			for( unsigned int t = 0; t < iTelType.size(); t++ )
 			{
@@ -3438,7 +3438,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 			for( unsigned int p = 0; p < nPixel; p++ )
 			{
 				getAverageTZeros( false )[p] = ftzero[p];
-// check if this pixel is inside the averateTZeroFiducialRadius
+				// check if this pixel is inside the averateTZeroFiducialRadius
 				if( getRunParameter()->faverageTZeroFiducialRadius < 1. )
 				{
 					double d = getDetectorGeometry()->getOuterEdgeDistance( p );
@@ -3468,21 +3468,21 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		}
 	}
 	
-////////////////////////////////////////////////////////////////////////////
-// get average tzero per telescope type
-// use median, as outliers are expected
+	////////////////////////////////////////////////////////////////////////////
+	// get average tzero per telescope type
+	// use median, as outliers are expected
 	for( int i = 0; i < t->GetEntries(); i++ )
 	{
 		t->GetEntry( i );
 		
 		setTelID( i );
 		
-// no calibration data available for this telescope
+		// no calibration data available for this telescope
 		if( nPixel == 0 )
 		{
 			continue;
 		}
-// get teltype counter
+		// get teltype counter
 		unsigned int iTelTypeC = 0;
 		for( unsigned int t = 0; t < iTelType.size(); t++ )
 		{
@@ -3504,7 +3504,7 @@ bool VCalibrator::readCalibrationDatafromDSTFiles( string iDSTfile )
 		}
 	}
 	
-// cleanup
+	// cleanup
 	delete [] fPedvar_high;
 	delete [] fPedvar_low;
 	

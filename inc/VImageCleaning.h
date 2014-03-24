@@ -25,15 +25,15 @@ class VImageCleaning
 		VImageCleaning( VEvndispData* iData = 0 );
 		~VImageCleaning() {}
 		
-// tailcut cleaning
+		// tailcut cleaning
 		void cleanImageFixed( double iimagethresh, double iborderthresh, double brightthresh = -999. );
 		void cleanImagePedvars( double hithresh, double lothresh, double brightthresh );
 		
-// time cluster cleaning
+		// time cluster cleaning
 		void cleanImageFixedWithTiming( double, double, double, double, double, int, int );
 		void cleanImagePedvarsWithTiming( double, double, double, double, double, int, int );
 		
-// NN image cleaning
+		// NN image cleaning
 		bool  kInitNNImageCleaning;
 		unsigned int fIPRdim;
 		TObjArray* fProb4nnCurves;
@@ -60,7 +60,7 @@ class VImageCleaning
 		int   LocMin( int n, float* ptr, float& min );
 		int   LocMax( int n, float* ptr, float& max );
 		
-// main functions
+		// main functions
 		bool  BoundarySearch( int type, float thresh, TF1* fProbCurve, float refdT, int refvalidity, int idx );
 		int   NNGroupSearchProbCurve( int type, TF1* fProbCurve, float PreCut );
 		int   NNGroupSearchProbCurveRelaxed( int type, TF1* fProbCurve, float PreCut );
@@ -77,14 +77,14 @@ class VImageCleaning
 		void  FillPreThresholds( TGraph* gipr, float NNthresh[5] ); // defines pre-search thresholds for nn-groups (below this threshold group is not searched)
 		TGraphErrors* GetIPRGraph( unsigned int teltype, float ScanWidow );
 		void  CalcSliceRMS();
-// MS
+		// MS
 		void cleanTriggerFixed( double hithresh, double lothresh );
 		
 		void addImageChannel( unsigned int iChannel );                      // add this pixel to image
 		void removeImageChannel( unsigned int iChannel );                   // remove this pixel from image
 		void resetImageChannel( unsigned int iChannel );                    // reset this pixel to standard value
 		
-// trace correlation cleaning (AMc)
+		// trace correlation cleaning (AMc)
 		void cleanImageTraceCorrelate( double sumThresh, double corrThresh, double pixThresh );
 };
 #endif

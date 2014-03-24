@@ -134,7 +134,7 @@ bool VSpectralEnergyDistribution::readFermiData( string name, string ifile, doub
 			is_stream >> is_temp;
 			double iT_max = atof( is_temp.c_str() );
 			
-// check if following line is at a different time period (if yes, clear the vector and start again)
+			// check if following line is at a different time period (if yes, clear the vector and start again)
 			if( z > 0 && ( TMath::Abs( i_photonFlux.back().MJD_min - iT_min ) > 1.e-2 || ( TMath::Abs( i_photonFlux.back().MJD_max - iT_max ) > 1.e-2 ) ) )
 			{
 				i_pF_temp.energy_Hz.clear();
@@ -153,7 +153,7 @@ bool VSpectralEnergyDistribution::readFermiData( string name, string ifile, doub
 		i_pF_temp.Marker = imarker;
 		i_pF_temp.Color = icolor;
 		
-// energy [GeV]
+		// energy [GeV]
 		double i_eV = 0.;
 		is_stream >> is_temp;
 		i_eV = atof( is_temp.c_str() ) * 1.e9;
@@ -244,11 +244,11 @@ bool VSpectralEnergyDistribution::readFermiData( string name, string ifile, doub
 */
 bool VSpectralEnergyDistribution::readSED( string ifile )
 {
-// set up the data structure
+	// set up the data structure
 	sPhotonFlux i_pF_temp;
 	vector< sPhotonFlux > i_photonFlux;
 	
-// read ascii file
+	// read ascii file
 	ifstream is;
 	is.open( ifile.c_str(), ifstream::in );
 	if( !is )
@@ -373,7 +373,7 @@ bool VSpectralEnergyDistribution::readSED( string ifile )
 					i_pF_temp.flux_error_up_ergscms.back() = 0.;
 				}
 			}
-// no upper limits for < X-ray frequencies (work around)
+			// no upper limits for < X-ray frequencies (work around)
 			if( i_pF_temp.energy_Hz.back() < 5.e18 && TMath::Abs( i_pF_temp.flux_error_down_ergscms.back() ) < 1.e-20 && TMath::Abs( i_pF_temp.flux_error_up_ergscms.back() ) < 1.e-20 )
 			{
 				i_pF_temp.flux_error_down_ergscms.back() = 1.e-19;
@@ -431,7 +431,7 @@ An upper limit is drawn for fluxes with errors <= 0.
 */
 bool VSpectralEnergyDistribution::readDataFile( string name, string ifile, double MJD_min, double MJD_max, bool bPrint, int imarker, int icolor )
 {
-// set up the data structure
+	// set up the data structure
 	sPhotonFlux i_pF_temp;
 	vector< sPhotonFlux > i_photonFlux;
 	
@@ -472,7 +472,7 @@ bool VSpectralEnergyDistribution::readDataFile( string name, string ifile, doubl
 			is_stream >> is_temp;
 			double iT_max = atof( is_temp.c_str() );
 			
-// check if following line is at a different time period (if yes, clear the vector and start again)
+			// check if following line is at a different time period (if yes, clear the vector and start again)
 			if( z > 0 && ( TMath::Abs( i_photonFlux.back().MJD_min - iT_min ) > 1.e-2 || ( TMath::Abs( i_photonFlux.back().MJD_max - iT_max ) > 1.e-2 ) ) )
 			{
 				i_pF_temp.energy_Hz.clear();
@@ -491,7 +491,7 @@ bool VSpectralEnergyDistribution::readDataFile( string name, string ifile, doubl
 		i_pF_temp.Marker = imarker;
 		i_pF_temp.Color = icolor;
 		
-// energy [Hz]
+		// energy [Hz]
 		is_stream >> is_temp;
 		double iHz = atof( is_temp.c_str() );
 		if( iHz <= 0. )
@@ -561,7 +561,7 @@ An upper limit is drawn for fluxes with errors <= 0.
 */
 bool VSpectralEnergyDistribution::readXMMData( string name, string ifile, double MJD_min, double MJD_max, bool bPrint, int imarker, int icolor, bool iModel, int iFormat )
 {
-// set up the data structure
+	// set up the data structure
 	sPhotonFlux i_pF_temp;
 	vector< sPhotonFlux > i_photonFlux;
 	
@@ -584,7 +584,7 @@ bool VSpectralEnergyDistribution::readXMMData( string name, string ifile, double
 		
 		istringstream is_stream( is_line );
 		
-// use data from one instrument only
+		// use data from one instrument only
 		if( is_line.substr( 0, 2 ) == "NO" )
 		{
 			break;
@@ -613,7 +613,7 @@ bool VSpectralEnergyDistribution::readXMMData( string name, string ifile, double
 			i_pF_temp.flux_error_down_ergscms.clear();
 		}
 		
-// energy [keV]
+		// energy [keV]
 		double i_eV = 0.;
 		if( iFormat == 0 )
 		{
@@ -639,18 +639,18 @@ bool VSpectralEnergyDistribution::readXMMData( string name, string ifile, double
 		i_pF_temp.energy_Hz.push_back( iHz );
 		i_pF_temp.energy_Hz_min.push_back( i_pF_temp.energy_Hz.back() );
 		i_pF_temp.energy_Hz_max.push_back( i_pF_temp.energy_Hz.back() );
-// energy bin width (not used)
+		// energy bin width (not used)
 		if( iFormat == 0 )
 		{
 			is_stream >> is_temp;
 		}
-// fluxes
+		// fluxes
 		if( iFormat == 0 )
 		{
 			is_stream >> is_temp;
 			double i_flMeasured = atof( is_temp.c_str() );
-// values are keV^2 / cm2 / keV / s -> transform to eV / cm2 / s
-// convert eV to ergs
+			// values are keV^2 / cm2 / keV / s -> transform to eV / cm2 / s
+			// convert eV to ergs
 			double i_fl = i_flMeasured * TMath::Qe() * 1.e3 / 1.e-7;
 			i_pF_temp.flux_ergscms.push_back( i_fl );
 			is_stream >> is_temp;
@@ -729,7 +729,7 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
 		bool bPrint, int imarker, int icolor, bool bAverage,
 		double iPlotMagnitudeMultiplier, bool bCorrection, string icorfile )
 {
-// set up the data structure
+	// set up the data structure
 	sPhotonFlux i_pF_temp;
 	vector< sPhotonFlux > i_photonFlux;
 	
@@ -831,7 +831,7 @@ TGraphErrors* VSpectralEnergyDistribution::readOpticalData( string iname, string
 			i_pF_temp.MJD_min /= z;
 			i_pF_temp.MJD_max /= z;
 			i_pF_temp.flux_ergscms.push_back( flux_ergscms / z );
-// no error on fluxes for average values (keep it small and non-zero)
+			// no error on fluxes for average values (keep it small and non-zero)
 			i_pF_temp.flux_error_up_ergscms.push_back( 1.e-20 );
 			i_pF_temp.flux_error_down_ergscms.push_back( 1.e-20 );
 			i_photonFlux.push_back( i_pF_temp );
@@ -957,7 +957,7 @@ double VSpectralEnergyDistribution::getEffectiveWavelength( string iband, string
 			break;
 		}
 	}
-// micrometer to meter
+	// micrometer to meter
 	iWL /= 1.e6;
 	
 	if( fDebug )
@@ -1020,7 +1020,7 @@ bool VSpectralEnergyDistribution::readGalacticExtinction( string ifile, bool iPr
 		cout << "successfully opened file " << ifile << endl;
 	}
 	
-//    vector< sGalacticExtinction > fGalacticExtinction;
+	//    vector< sGalacticExtinction > fGalacticExtinction;
 	sGalacticExtinction iGalExt;
 	
 	string iband[9];
@@ -1032,7 +1032,7 @@ bool VSpectralEnergyDistribution::readGalacticExtinction( string ifile, bool iPr
 	int i = 0;
 	while( getline( is, is_line ) )
 	{
-//	if( iPrint ) cout << is_line << endl;
+		//	if( iPrint ) cout << is_line << endl;
 		stringstream is_stream( is_line );
 		
 		int k = 0;
@@ -1130,11 +1130,11 @@ double VSpectralEnergyDistribution::getFluxfromMagnitude( double magnitude, stri
 	
 	double f_vu = 0;
 	
-// calculate spectral flux density (see Skinner 1996 page 3)
+	// calculate spectral flux density (see Skinner 1996 page 3)
 	f_vu = TMath::Power( 10., -1.* magnitude / 2.5 ) * f_0;
-// convert Jansky to erg/s/m2/Hz
+	// convert Jansky to erg/s/m2/Hz
 	f_vu *= 1.e-19;
-// convert from 1/m2 to 1/cm2
+	// convert from 1/m2 to 1/cm2
 	f_vu *= 1.e-4;
 	
 	return f_vu;
@@ -1199,7 +1199,7 @@ TCanvas* VSpectralEnergyDistribution::plot( TCanvas* c, int bLegend, int canvas_
 		iL = new TLegend( 0.5, 0.73, 0.95, 0.95 );
 	}
 	
-// set up graphs and draw them
+	// set up graphs and draw them
 	for( unsigned int i = 0; i < fSpectralFlux.size(); i++ )
 	{
 		if( fSpectralFlux[i].size() == 0 )
@@ -1209,7 +1209,7 @@ TCanvas* VSpectralEnergyDistribution::plot( TCanvas* c, int bLegend, int canvas_
 		
 		for( unsigned int j = 0; j < fSpectralFlux[i].size(); j++ )
 		{
-// check if observations are in allowed MJD range
+			// check if observations are in allowed MJD range
 			if( fSpectralFlux[i][j].MJD_min < fMJDMin && fSpectralFlux[i][j].MJD_max < fMJDMin )
 			{
 				continue;
@@ -1225,7 +1225,7 @@ TCanvas* VSpectralEnergyDistribution::plot( TCanvas* c, int bLegend, int canvas_
 			g->SetMarkerSize( 1 );
 			g->SetMarkerStyle( fSpectralFlux[i][j].Marker );
 			
-// loop over all data points
+			// loop over all data points
 			int z = 0;
 			for( unsigned int k = 0; k < fSpectralFlux[i][j].energy_Hz.size(); k++ )
 			{
@@ -1286,8 +1286,8 @@ void VSpectralEnergyDistribution::printASCII()
 	multimap< double, double > iFlux_U;
 	multimap< double, double > iFlux_D;
 	
-////////////////////////////////////
-// loop over all data sets
+	////////////////////////////////////
+	// loop over all data sets
 	for( unsigned int i = 0; i < fSpectralFlux.size(); i++ )
 	{
 		if( fSpectralFlux[i].size() == 0 )
@@ -1297,7 +1297,7 @@ void VSpectralEnergyDistribution::printASCII()
 		
 		for( unsigned int j = 0; j < fSpectralFlux[i].size(); j++ )
 		{
-// check if observations are in allowed MJD range
+			// check if observations are in allowed MJD range
 			if( fSpectralFlux[i][j].MJD_min < fMJDMin && fSpectralFlux[i][j].MJD_max < fMJDMin )
 			{
 				continue;
@@ -1329,8 +1329,8 @@ void VSpectralEnergyDistribution::printASCII()
 		}
 	}
 	
-// print everthing sorted by energy
-// (terrible coding...)
+	// print everthing sorted by energy
+	// (terrible coding...)
 	vector< string > itemp;
 	char hname[600];
 	
@@ -1459,15 +1459,15 @@ TCanvas* VSpectralEnergyDistribution::plotPowerLaw( TCanvas* c, string iName, do
 	f->SetLineColor( iLineColor );
 	f->SetLineStyle( iLineStyle );
 	
-// plot power law only
+	// plot power law only
 	if( !bPlotButterfly )
 	{
 		f->Draw( "same" );
 	}
-// plot a butterfly taking the error on flux normalization and index into account
-// NOTE: assume that both are uncorrelated;
-//       if correlated: do not use, error will be underestimated
-//
+	// plot a butterfly taking the error on flux normalization and index into account
+	// NOTE: assume that both are uncorrelated;
+	//       if correlated: do not use, error will be underestimated
+	//
 	else
 	{
 		TGraphErrors* g = new TGraphErrors( 1 );

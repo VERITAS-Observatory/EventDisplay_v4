@@ -59,7 +59,7 @@ class VImageParameterCalculation : public TObject
 		double redang( double angle, double maxI );  //!< reduce angle to intervall [0.,maxI]
 		void   setImageBorderPixelPosition( VImageParameter* iPar );
 		
-// Hough transform
+		// Hough transform
 		VHoughTransform* fHoughTransform;
 		
 	public:
@@ -74,7 +74,7 @@ class VImageParameterCalculation : public TObject
 		//Impact parameter correction factor for size
 		float correctSizeInMuonRing();
 		
-//Hough transform
+		//Hough transform
 		void houghInitialization(); 				//Initialize the Hough transform class
 		void houghMuonRingFinder();                 //!< fit a single ring to the image to look for muons
 		void houghSizeInMuonRing();                 //! calculate the brightness of the muon ring

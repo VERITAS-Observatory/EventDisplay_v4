@@ -67,7 +67,7 @@ void VAtmosphereSoundingData::setdefaultvalues( unsigned int iN )
 		fGraphScaledDensityHeight->Delete();
 	}
 	
-// set default values
+	// set default values
 	for( unsigned int i = 0; i < iN; i++ )
 	{
 		fPressure_Pa.push_back( -9999. );

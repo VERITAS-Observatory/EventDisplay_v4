@@ -51,24 +51,24 @@ class VEvndispData
 		static int  fDebugLevel;
 		static int  fNDebugMessages;
 		
-// global run parameters
+		// global run parameters
 		static int fRunNumber;                    //!< run number
 		static VEvndispRunParameter* fRunPar;          //!< all command line/configuration parameters
 		
-// telescope data
+		// telescope data
 		static unsigned int fNTel;                //!< total number of telescopes
 		static unsigned int fTelID;               //!< telescope number of current telescope
 		static vector< unsigned int > fTeltoAna;  //!< analyze only this subset of telescopes (this is dynamic and can change from event to event)
-// telescope pointing (one per telescope)
+		// telescope pointing (one per telescope)
 		static VArrayPointing* fArrayPointing;
 		static vector< VPointing* > fPointing;
-// no pointing information
+		// no pointing information
 		static bool fNoTelescopePointing;
-// cameras
+		// cameras
 		static VDetectorGeometry* fDetectorGeo;
 		static VDetectorTree* fDetectorTree;
 		
-// reader
+		// reader
 		VVirtualDataReader*  fReader;
 		static VGrIsuReader* fGrIsuReader;
 		static VMultipleGrIsuReader* fMultipleGrIsuReader;
@@ -78,10 +78,10 @@ class VEvndispData
 		static VDSTReader* fDSTReader;
 		static VPEReader*  fPEReader;
 		
-// DB pixel data
+		// DB pixel data
 		static VDB_PixelDataReader* fDB_PixelDataReader;
 		
-// event data
+		// event data
 		static unsigned int fEventNumber;         //!< current event number (array event)
 		//!< event number of telescope event
 		static vector< unsigned int > fTelescopeEventNumber;
@@ -95,62 +95,62 @@ class VEvndispData
 		static vector< vector< int > > fTriggeredTel;
 		static vector< int > fTriggeredTelN;
 		
-// event status from data reader
+		// event status from data reader
 		static unsigned long int fExpectedEventStatus;
 		static unsigned int fNumberofGoodEvents;
 		static unsigned int fNumberofIncompleteEvents;
-// event status from analysis
+		// event status from analysis
 		//!< 0: good event
 		static unsigned int fAnalysisArrayEventStatus;
 		//!< 0: good event
 		static vector< unsigned int > fAnalysisTelescopeEventStatus;
 		
-// global trace handler
+		// global trace handler
 		static VTraceHandler* fTraceHandler;
 		static VFitTraceHandler* fFitTraceHandler;
 		
-// calibrator and calibration data
+		// calibrator and calibration data
 		static vector< bool > fCalibrated;        //!< this telescope is calibrated
 		//! data class for calibration data
 		static vector< VCalibrationData* > fCalData;
-// dead channel finder
+		// dead channel finder
 		static vector< VDeadChannelFinder* > fDeadChannelDefinition_HG;
 		static vector< VDeadChannelFinder* > fDeadChannelDefinition_LG;
 		
-//  analysis cuts
+		//  analysis cuts
 		//!< cuts for array analysis
 		static VEvndispReconstructionParameter* fEvndispReconstructionParameter;
 		
-// analysis results
+		// analysis results
 		static TFile* fOutputfile;                //!< root output file for image parameter trees, histograms, etc.
 		static vector< TDirectory* > fAnaDir;     //! directories in root file
 		static vector< VImageAnalyzerData* > fAnaData; //!< data class with analysis results for each telescope
 		//!< data class with analysis results from all telescopes
 		static VShowerParameters* fShowerParameters;
 		static VFrogParameters* fFrogParameters;
-//	static vector< VFrogImageData* > fFrogData;    //!< frogs Template tube information
+		//	static vector< VFrogImageData* > fFrogData;    //!< frogs Template tube information
 		static VModel3DParameters* fModel3DParameters;
 		static VMCParameters* fMCParameters;      //!< data class with MC parameters
 		
-// timing results
+		// timing results
 		static vector< TGraphErrors* > fXGraph;   //!< Long axis timing graph
 		static vector< TGraphErrors* > fYGraph;   //!< Short axis timing graph
 		static vector< TGraphErrors* > fRGraph;   //!< Radial timing graph
 		
-// default pedestals for plotraw option
+		// default pedestals for plotraw option
 		static valarray<double> fPlotRawPedestals;
 		
-// set detector geometry
+		// set detector geometry
 		unsigned int        checkSummationWindow( unsigned int iTelID, unsigned int iSumWindow );
 		void                setDetectorGeometry( unsigned int iNTel, vector< string > icamera , string idir );
 		
-// names of dead channels
+		// names of dead channels
 		static vector< string > fDeadChannelText;
 		
-// star catalogue
+		// star catalogue
 		static VStarCatalogue* fStarCatalogue;
 		
-// dummy vector
+		// dummy vector
 		static vector< float > fDummyVector_float;
 		
 	public:
@@ -159,7 +159,7 @@ class VEvndispData
 		void                dumpTreeData();       //!< print all tree data to stdout
 		void                endOfRunInfo();       //!< print some statistics at end of run
 		bool                get_reconstruction_parameters( string ifile );
-// getters apply always to current telescope (fTelID) if telID is not a function argument
+		// getters apply always to current telescope (fTelID) if telID is not a function argument
 		VImageAnalyzerData*      getAnaData( unsigned int iTel )
 		{
 			if( iTel < fAnaData.size() )
@@ -716,15 +716,15 @@ class VEvndispData
 			return fCalData[fTelID]->getPedvarsDist( true );
 		}
 		
-///////////////// pedestals /////////////////////////////////
-// getters for pedestals
+		///////////////// pedestals /////////////////////////////////
+		// getters for pedestals
 		valarray<double>&   getPeds( bool iLowGain = false, double iTime = -99. );
 		valarray<double>&   getPedsLowGain( double iTime = -99. )
 		{
 			return getPeds( true, iTime );
 		}
 		
-// getters for pedestal variation
+		// getters for pedestal variation
 		valarray<double>&   getPedvars( bool iLowGain = false, unsigned int iSW = 0, double iTime = -99. );
 		valarray<double>&   getPedvars( unsigned int iSW, bool iLowGain = false )
 		{
@@ -746,7 +746,7 @@ class VEvndispData
 				return fCalData[fTelID]->fVLowGainPedvars;
 			}
 		}
-// getter for pedestal rms
+		// getter for pedestal rms
 		valarray<double>&   getPedrms( bool iLowGain = false )
 		{
 			if( !iLowGain )
@@ -766,9 +766,9 @@ class VEvndispData
 		{
 			return fDB_PixelDataReader;
 		}
-// padding stuff (probably out of date)
-/////////////// end pedestals //////////////////////////////
-
+		// padding stuff (probably out of date)
+		/////////////// end pedestals //////////////////////////////
+		
 		valarray<double>&   getRawTZeros()
 		{
 			return fAnaData[fTelID]->getTZeros( false );
@@ -1394,7 +1394,7 @@ class VEvndispData
 				fAnaData[fTelID]->fZeroSuppressed[iChannel] = iZ;
 			}
 		}
-/////////////// time image cleaning /////////////////////
+		/////////////// time image cleaning /////////////////////
 		double           getTimeCutPixel()
 		{
 			if( getImageCleaningParameter() )
@@ -1515,7 +1515,7 @@ class VEvndispData
 		{
 			return fAnaData[fTelID]->fncluster_uncleaned;
 		}; //HP
-/////////////// pedestals /////////////////////
+		/////////////// pedestals /////////////////////
 		void                setPeds( unsigned int iChannel, double iPed, bool iLowGain = false )
 		{
 			fCalData[fTelID]->setPeds( iChannel, iPed, iLowGain );
@@ -1524,7 +1524,7 @@ class VEvndispData
 		{
 			fCalData[fTelID]->fPedFromPLine = true;
 		}
-/////////////// end pedestals /////////////////////
+		/////////////// end pedestals /////////////////////
 		void                setRootDir( unsigned int iTel, TDirectory* iDir )
 		{
 			fAnaDir[iTel] = iDir;

@@ -31,7 +31,7 @@ VLibNovaSunAndMoon::VLibNovaSunAndMoon( double MJD )
 
 void VLibNovaSunAndMoon::reset()
 {
-// VERITAS basecamp (default values)
+	// VERITAS basecamp (default values)
 	fObserver.lat = 31.675;
 	fObserver.lng = 249.0478;
 	
@@ -48,9 +48,9 @@ void VLibNovaSunAndMoon::getMoonElevationAzimuth( double& el, double& az )
 	struct ln_equ_posn equ;
 	struct ln_hrz_posn hrz;
 	
-// get lunar position in equatorial coordinates
+	// get lunar position in equatorial coordinates
 	ln_get_lunar_equ_coords( fJD, &equ );
-// transform to horizontal coordinates
+	// transform to horizontal coordinates
 	ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 	
 	el = hrz.alt;
@@ -63,9 +63,9 @@ double VLibNovaSunAndMoon::getMoonElevation()
 	struct ln_equ_posn equ;
 	struct ln_hrz_posn hrz;
 	
-// get lunar position in equatorial coordinates
+	// get lunar position in equatorial coordinates
 	ln_get_lunar_equ_coords( fJD, &equ );
-// transform to horizontal coordinates
+	// transform to horizontal coordinates
 	ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 	
 	return hrz.alt;
@@ -76,9 +76,9 @@ double VLibNovaSunAndMoon::getMoonAzimuth()
 	struct ln_equ_posn equ;
 	struct ln_hrz_posn hrz;
 	
-// get lunar position in equatorial coordinates
+	// get lunar position in equatorial coordinates
 	ln_get_lunar_equ_coords( fJD, &equ );
-// transform to horizontal coordinates
+	// transform to horizontal coordinates
 	ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 	
 	return hrz.az;
@@ -126,9 +126,9 @@ double VLibNovaSunAndMoon::getSunElevation()
 	struct ln_equ_posn equ;
 	struct ln_hrz_posn hrz;
 	
-// get lunar position in equatorial coordinates
+	// get lunar position in equatorial coordinates
 	ln_get_solar_equ_coords( fJD, &equ );
-// transform to horizontal coordinates
+	// transform to horizontal coordinates
 	ln_get_hrz_from_equ( &equ, &fObserver, fJD, &hrz );
 	
 	return hrz.alt;

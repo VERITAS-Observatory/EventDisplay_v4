@@ -46,7 +46,7 @@ float isRMSZero( TTree* t, string iVar )
 	float i_n = 0.;
 	t->SetBranchAddress( iVar.c_str(), &f );
 	
-// check first 1000 entries;
+	// check first 1000 entries;
 	int nentries = 1000;
 	if( t->GetEntries() < nentries )
 	{
@@ -90,7 +90,7 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 			continue;
 		}
 		
-// output file name
+		// output file name
 		ostringstream iFileName;
 		iFileName << iOutputDir << "/" << iOutputName << "_" << fMapOfTrainingTree_iter->first << ".tmva.root";
 		TFile i_tmva( iFileName.str().c_str(), "RECREATE" );
@@ -100,20 +100,20 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 			return false;
 		}
 		
-// set output directory
+		// set output directory
 		gSystem->mkdir( iOutputDir.c_str() );
 		TString iOutputDirectory( iOutputDir.c_str() );
 		gSystem->ExpandPathName( iOutputDirectory );
 		( TMVA::gConfig().GetIONames() ).fWeightFileDir = iOutputDirectory;
 		
-// tmva regression
+		// tmva regression
 		TMVA::Factory* factory = new TMVA::Factory( "BDTDisp", &i_tmva, "V" );
 		factory->AddVariable( "width", 'F' );
 		factory->AddVariable( "length", 'F' );
 		factory->AddVariable( "size", 'F' );
-//       factory->AddVariable( "asym", 'F' );
+		//       factory->AddVariable( "asym", 'F' );
 		factory->AddVariable( "loss", 'F' );
-// add pedvar only if different from 0 (for CTA: always zero)
+		// add pedvar only if different from 0 (for CTA: always zero)
 		/*       if( isRMSZero( fMapOfTrainingTree_iter->second, "meanPedvar_Image" ) > 1.e-2 )
 		       {
 		          factory->AddVariable( "meanPedvar_Image", 'F' );
@@ -121,11 +121,11 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 		factory->AddVariable( "tgrad_x*tgrad_x", 'F' );
 		
 		factory->AddTarget( "disp", 'F' );
-//       factory->AddTarget( "dispPhi", 'F' );
-
+		//       factory->AddTarget( "dispPhi", 'F' );
+		
 		factory->AddRegressionTree( fMapOfTrainingTree_iter->second, 1. );
 		
-// quality cuts
+		// quality cuts
 		TCut fQualityCut = "size>0.&&ntubes>3.&&length>0.";
 		
 		factory->PrepareTrainingAndTestTree( fQualityCut, "nTrain_Regression=0:nTest_Regression=0:SplitMode=Random:NormMode=NumEvents:!V" );
@@ -161,7 +161,7 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName )
 {
 
-// telescope configuration
+	// telescope configuration
 	TChain i_telChain( "telconfig" );
 	i_telChain.Add( iInputFile.c_str(), 0 );
 	
@@ -169,8 +169,8 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 	i_tel.GetEntry( 0 );
 	unsigned int i_ntel = i_tel.NTel;
 	
-// training trees (one per telescope type)
-
+	// training trees (one per telescope type)
+	
 	float cen_x = -1.;
 	float cen_y = -1.;
 	float sinphi = -1.;
@@ -237,12 +237,12 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 	}
 	cout << "filling training trees for " << fMapOfTrainingTree.size() << " telescope types" << endl;
 	
-// get showerpars tree
+	// get showerpars tree
 	TChain i_showerparsTree( "showerpars" );
 	i_showerparsTree.Add( iInputFile.c_str(), 0 );
 	Cshowerpars i_showerpars( &i_showerparsTree, true, 6, true );
 	
-// loop over all telescopes and fill training trees
+	// loop over all telescopes and fill training trees
 	for( unsigned int i = 0; i < i_ntel; i++ )
 	{
 		i_tel.GetEntry( i );
@@ -262,7 +262,7 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 			i_showerpars.GetEntry( n );
 			i_tpars.GetEntry( n );
 			
-// quality cuts
+			// quality cuts
 			if( i_tpars.ntubes < 4 || i_tpars.size < 0 || i_tpars.loss > 0.2 )
 			{
 				continue;
@@ -290,7 +290,7 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 			MCycore = i_showerpars.MCycore;
 			MCaz = i_showerpars.MCaz;
 			
-// calculate disp (observe sign convention for MCyoff)
+			// calculate disp (observe sign convention for MCyoff)
 			disp = sqrt( ( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
 			dispPhi = TMath::ATan2( sinphi, cosphi ) - TMath::ATan2( cen_y + MCyoff, cen_x - MCxoff );
 			
@@ -320,7 +320,7 @@ int main( int argc, char* argv[] )
 	string fOutputDir = argv[2];
 	string fOutputName = argv[3];
 	
-// output file
+	// output file
 	ostringstream iFileName;
 	iFileName << fOutputDir << "/" << fOutputName << ".root";
 	TFile iO( iFileName.str().c_str(), "RECREATE" );
@@ -329,13 +329,13 @@ int main( int argc, char* argv[] )
 		cout << "Error creating output file: " << iFileName.str() << endl;
 		return false;
 	}
-// fill training file
+	// fill training file
 	if( !writeTrainingFile( fInputFile, fOutputDir, fOutputName ) )
 	{
 		cout << "error writing training file " << endl;
 		exit( -1 );
 	}
-// write training tree to output file
+	// write training tree to output file
 	map< ULong64_t, TTree* >::iterator fMapOfTrainingTree_iter;
 	for( fMapOfTrainingTree_iter = fMapOfTrainingTree.begin(); fMapOfTrainingTree_iter != fMapOfTrainingTree.end(); fMapOfTrainingTree_iter++ )
 	{
@@ -345,10 +345,10 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// train TMVA
+	// train TMVA
 	trainTMVA( fOutputDir, fOutputName );
 	
-// close output file
+	// close output file
 	iO.Close();
 	
 }

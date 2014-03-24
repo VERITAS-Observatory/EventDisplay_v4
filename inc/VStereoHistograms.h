@@ -54,13 +54,13 @@ class VStereoHistograms
 		vector< string > hListNameofSkyMaps;      //!< list with histogram names of sky maps
 		TList* hListSkyMapsUC;                    //!< list with sky maps (uncorrelated bins)
 		
-// data quality monitoring
+		// data quality monitoring
 		TH1D* hTriggerPatternBeforeCuts;
 		TH1D* hTriggerPatternAfterCuts;
 		TH1D* hImagePatternBeforeCuts;
 		TH1D* hImagePatternAfterCuts;
 		
-// parameter histograms
+		// parameter histograms
 		TH1D* htheta2;                            //!< Theta2 Histogram
 		TH1D* hmean_width;                        //!< Mean Width Histogram
 		TH1D* hmean_length;                       //!< Mean Length Histogram
@@ -74,39 +74,39 @@ class VStereoHistograms
 		TH1D* hemissC2;                           //!< mean emission height Chi2
 		TH1D* herecChi2;                          //!< chi2 from energy reconstruction
 		
-// ratio of signal to background area (from energy dependent theta2 cut)
+		// ratio of signal to background area (from energy dependent theta2 cut)
 		TH1D* hmap_MeanSignalBackgroundAreaRatio; //!< signal to background area ratio
 		TH1D* hmap_MeanSignalBackgroundAreaRatioUC; //!< signal to background area ratio
 		
-// random forest histograms
+		// random forest histograms
 		TH1D* hrf;                                //!< random forest classifier
 		
-// energy histograms (logarithmic energy axis)
+		// energy histograms (logarithmic energy axis)
 		TH1D* herecCounts;                        //!< reconstructed energy
 		TH2D* herecCounts2DtimeBinned;            //!< reconstructed energy (2D)
-//time-dependent differential energy spectrum
+		//time-dependent differential energy spectrum
 		TH2D* herecWeights;                       //!< weights vs.  reconstructed energy
 		TProfile* herecEffectiveArea;             //!< effective area vs reconstructed energy
-// energy histograms (linear energy axis)
+		// energy histograms (linear energy axis)
 		TH1D* hLinerecCounts;                     //!< reconstructed energy
 		TH2D* hLinerecCounts2DtimeBinned;
 		TH2D* hLinerecWeights;                    //!< weights vs.  reconstructed energy
 		TProfile* hLinerecEffectiveArea;          //!< effective area vs reconstructed energy
 		
-// sky maps (uncorrelated)
+		// sky maps (uncorrelated)
 		TH2D* hmap_stereoUC;                      //!< Sky map (correlated bins)
 		TH2D* hmap_alphaUC;                       //!< Background normalisation map (correlated bins)
 		TH2D* hmap_alpha_offUC;                   //!< Background normalisation map, off map for on run (correlated bins)
 		TH2D* hmap_alphaNormUC;                   //!< Background normalisation map  (correlated bins)
 		
-// sky maps (correlated)
+		// sky maps (correlated)
 		TH2D* hxyoff_stereo;                      //!< xyoff map on camera
 		TH2D* hmap_stereo;                        //!< Sky map (correlated bins)
 		TH2D* hmap_alpha;                         //!< Background normalisation map (correlated bins)
 		TH2D* hmap_alpha_off;                     //!< Background normalisation map, off map for on run (correlated bins)
 		TH2D* hmap_alphaNorm;                     //!< Background normalisation map  (correlated bins)
 		
-// rate lists
+		// rate lists
 		TList* hisRateList;
 		TH1D* hrate_1sec;                         //!< Event Rate Histogram (1 second bins)
 		TH1D* hrate_10sec;                        //!< Event Rate Histogram (10 second bins)

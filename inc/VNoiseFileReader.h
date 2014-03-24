@@ -24,7 +24,7 @@ class VNoiseFileReader
 		
 		VGrIsuReader* fGrIsuReader;
 		
-// placeholders
+		// placeholders
 		std::valarray<double> v;
 		std::vector< std::valarray<double> > vv;
 		std::vector< vector< uint8_t > > v8;

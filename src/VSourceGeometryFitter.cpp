@@ -173,7 +173,7 @@ void VSourceGeometryFitter::setFitterDefaultData()
 	////////
 	// SRC 3: radial symmetric 2D source, LL
 	////////
-// 2D Normal distribution,convolved with PSF (LL)
+	// 2D Normal distribution,convolved with PSF (LL)
 	fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
 	fDefaultFitterData.back()->fFitterName = "RadialSymmetricSource_LL";
 	fDefaultFitterData.back()->fFitterDescription = "Bi-variate normal function with rho=0 (correlation coefficient) convolved with PSF";
@@ -200,7 +200,7 @@ void VSourceGeometryFitter::setFitterDefaultData()
 	////////
 	// SRC 4: radial asymmetric 2D source
 	////////
-// 2D Normal distribution,convolved with PSF (LL)
+	// 2D Normal distribution,convolved with PSF (LL)
 	fDefaultFitterData.push_back( new VSourceGeometryFitterData() );
 	fDefaultFitterData.back()->fFitterName = "RadialAsymmetricSource_LL";
 	fDefaultFitterData.back()->fFitterDescription = "Bi-variate normal function convolved with PSF";
@@ -358,15 +358,15 @@ TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, str
 		cout << "\t no sky map set" << endl;
 		return 0;
 	}
-// preliminary
+	// preliminary
 	double xcenter = -1 * fXStart;
 	double ycenter = -1 * fYStart;
 	
-// style settings
+	// style settings
 	default_settings();
 	setHistogramPlottingStyle( fHisSkyMap, 1.5 );
 	
-// signi
+	// signi
 	char hname[800];
 	char htitle[800];
 	sprintf( hname, "c_skymap_%d", fRunNumber );
@@ -414,13 +414,13 @@ TCanvas* VSourceGeometryFitter::plot( double rmax, double zmin, double zmax, str
 	
 	fHisSkyMap->Draw( iPlotMode.data() );
 	
-// plot reconstructed source geometry
+	// plot reconstructed source geometry
 	plotSourceGeometry();
 	
-// plot fit result
+	// plot fit result
 	plotFitResult();
 	
-// return canvas
+	// return canvas
 	return c_sky;
 }
 
@@ -430,14 +430,14 @@ void VSourceGeometryFitter::plotFitResult()
 	{
 		return;
 	}
-// check right number of parameters
+	// check right number of parameters
 	if( fFitter->fFitResult_Parameter.size() != fFitter->fParameterName.size() || fFitter->fFitResult_ParameterError.size() != fFitter->fParameterName.size() )
 	{
 		return;
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////////////
-// symmetric Gauss fit
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// symmetric Gauss fit
 	if( fFitter->fFitterName == "2DGauss_Chi2" )
 	{
 		if( fHisSkyMap )
@@ -459,8 +459,8 @@ void VSourceGeometryFitter::plotFitResult()
 			hFitResult->SetYTitle( "dN/d#Theta^{2}" );
 			setHistogramPlottingStyle( hFitResult, 1, 2. );
 			
-// fill theta2 histogram
-
+			// fill theta2 histogram
+			
 			double x = 0.;
 			double y = 0.;
 			double t2 = 0.;
@@ -472,18 +472,18 @@ void VSourceGeometryFitter::plotFitResult()
 				for( int j = 1; j <= nbinsY; j++ )
 				{
 					y = fHisSkyMap->GetYaxis()->GetBinCenter( j );
-// calculate theta2
+					// calculate theta2
 					t2 = ( x - fFitter->fFitResult_Parameter[3] ) * ( x - fFitter->fFitResult_Parameter[3] ) + ( y - fFitter->fFitResult_Parameter[4] ) * ( y - fFitter->fFitResult_Parameter[4] );
-// fill histogram
+					// fill histogram
 					if( fHisSkyMap->GetBinContent( i, j ) > -90. )
 					{
 						hFitResult->Fill( t2, fHisSkyMap->GetBinContent( i, j ) );
 					}
 				}
 			}
-// plot histogram
+			// plot histogram
 			hFitResult->Draw();
-// plot fit function
+			// plot fit function
 			sprintf( hname, "fFitResult_%d", fRunNumber );
 			sprintf( htitle, "%f + %f*TMath::Exp( -1.*x/ 2. / %f / %f)", fFitter->fFitResult_Parameter[0], fFitter->fFitResult_Parameter[1], fFitter->fFitResult_Parameter[2], fFitter->fFitResult_Parameter[2] );
 			TF1* fFitResult = new TF1( hname, htitle, hFitResult->GetXaxis()->GetXmin(), hFitResult->GetXaxis()->GetXmax() );
@@ -719,7 +719,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
 		return;
 	}
 	
-// get sky map histogram
+	// get sky map histogram
 	fHisSkyMap = ( TH2D* )getHistogram( iHisName, fRunNumber, "skyHistograms" );
 	
 	if( !fHisSkyMap )
@@ -728,16 +728,16 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
 		return;
 	}
 	
-//////////////////////////////////////
-// define minuit
-//////////////////////////////////////
+	//////////////////////////////////////
+	// define minuit
+	//////////////////////////////////////
 	TFitterMinuit* fSourceGeometryFitter_MINUIT = new TFitterMinuit();
 	
-//////////////////////////////////////
-// set fit function
-//////////////////////////////////////
-
-// Source #1 radial symmetric source, Chi2
+	//////////////////////////////////////
+	// set fit function
+	//////////////////////////////////////
+	
+	// Source #1 radial symmetric source, Chi2
 	VFun_SourceDescription_RadialSymmetricSource_Chi2 fcn_RadialSymmetricSource_Chi2( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
 	if( fFitter->fFitterName == "RadialSymmetricSource_Chi2" )
 	{
@@ -751,7 +751,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
 		fFitter->fParameterUpperLimit[1] = yStart + xyRange;
 	}
 	
-// Source #2 radial asymmetric source, Chi2
+	// Source #2 radial asymmetric source, Chi2
 	/*  VFun_SourceDescription_RadialAsymmetricSource_Chi2 fcn_RadialAsymmetricSource_Chi2( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
 	if( fFitter->fFitterName == "RadialAsymmetricSource_Chi2" )
 	{
@@ -766,7 +766,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
 	  }*/
 	
 	
-// Source #3 radial symmetric source, LL
+	// Source #3 radial symmetric source, LL
 	VFun_SourceDescription_RadialSymmetricSource_LL fcn_RadialSymmetricSource_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
 	if( fFitter->fFitterName == "RadialSymmetricSource_LL" )
 	{
@@ -780,7 +780,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
 		fFitter->fParameterUpperLimit[1] = yStart + xyRange;
 	}
 	
-// Source #4 radial asymmetric source, LL
+	// Source #4 radial asymmetric source, LL
 	VFun_SourceDescription_RadialAsymmetricSource_LL fcn_RadialAsymmetricSource_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange, fPSF );
 	if( fFitter->fFitterName == "RadialAsymmetricSource_LL" )
 	{
@@ -796,7 +796,7 @@ void VSourceGeometryFitter::fitSource( string iHisName, double xStart, double yS
 	
 	
 	//// 0thers
-// Source description #3
+	// Source description #3
 	/*    VFun_SourceDescription_2DNormal_LL fcn_2DNormal_LL( fHisSkyMap, xStart - xyRange, xStart + xyRange, yStart - xyRange, yStart + xyRange );
 	    if( fFitter->fFitterName == "2DAsymGauss_LL" )
 	    {

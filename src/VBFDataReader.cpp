@@ -79,7 +79,7 @@ bool VBFDataReader::getNextEvent()
 			fEventNumber = index - 1;
 			index++;
 			
-// check if this is a simulation header
+			// check if this is a simulation header
 			if( pack->hasSimulationHeader() )
 			{
 				printSimulationHeader( pack, fPrintDetectorConfig );
@@ -96,7 +96,7 @@ bool VBFDataReader::getNextEvent()
 					fTelElevation.push_back( getSMC_TelPointing_Elevation() );
 					fTelAzimuth.push_back( getSMC_TelPointing_Azimuth() );
 				}
-// get eventnumber from simulation package
+				// get eventnumber from simulation package
 				fEventNumber = getSMC_eventNumber();
 				bSimulations = true;
 			}
@@ -122,7 +122,7 @@ bool VBFDataReader::getNextEvent()
 				setEventStatus( 0 );
 				bitset< 8 * sizeof( ULong64_t ) > ib;
 				
-// check if event for requested telescopes are available
+				// check if event for requested telescopes are available
 				bool bComplete = true;
 				for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 				{
@@ -326,7 +326,7 @@ uint16_t VBFDataReader::getATGPSYear()
 	}
 	else
 	{
-// horrible fudge for a period where GPS is off by a year (VERITAS)
+		// horrible fudge for a period where GPS is off by a year (VERITAS)
 		if( at->getRunNumber() > 33242 && at->getRunNumber() < 33254 )
 		{
 			return at->getGPSYear() + 1;

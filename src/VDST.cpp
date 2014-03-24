@@ -15,18 +15,18 @@ VDST::VDST( bool iMode, bool iMC )
 	{
 		cout << "VDST::VDST()" << endl;
 	}
-// laser run as source file? (Hardcoded, should be in VEvndispRunParameter)
+	// laser run as source file? (Hardcoded, should be in VEvndispRunParameter)
 	fBLaser = false;
 	
-// initalize flag (true after first event)
+	// initalize flag (true after first event)
 	fDSTini = false;
 	fDSTfile = 0;
-// no dst output, don't do anything
+	// no dst output, don't do anything
 	if( !iMode )
 	{
 		return;
 	}
-// open dst output file
+	// open dst output file
 	fDSTfile = new TFile( getRunParameter()->fdstfile.c_str(), "RECREATE" );
 	if( fDSTfile->IsZombie() )
 	{
@@ -71,33 +71,33 @@ void VDST::fill()
 	{
 		return;
 	}
-// init base analyzer
+	// init base analyzer
 	if( !fDSTini )
 	{
 		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
 		{
 			setTelID( getTeltoAna()[i] );
-// set summation vectors
+			// set summation vectors
 			setAnaData();
-// find dead channels
+			// find dead channels
 			findDeadChans( false, true );
 			findDeadChans( true, true );
 			
-// set special channels
+			// set special channels
 			setSpecialChannels();
 		}
 		fDSTini = true;
 	}
-// get geometry
+	// get geometry
 	fDSTntel = getNTel();
-// test geometry
+	// test geometry
 	if( fDSTntel > VDST_MAXTELESCOPES || ( int )getNChannels() > VDST_MAXCHANNELS )
 	{
 		cout << "void VDST::fill(): error: too many cameras or pmts, maximum is " << VDST_MAXTELESCOPES << "/" << VDST_MAXCHANNELS << endl;
 		exit( -1 );
 	}
-// ignore following code
-// (GM) XXXX check muon/laser list
+	// ignore following code
+	// (GM) XXXX check muon/laser list
 	/*     int iZ = 0;
 	     for( unsigned int k = 0; k < vEventList.size(); k++ )
 	     {
@@ -106,8 +106,8 @@ void VDST::fill()
 	    else break;
 	     }
 	     if( iZ > 12 ) return;  */
-// (GM) XXXX end check muon/laser list
-// get basic event data
+	// (GM) XXXX end check muon/laser list
+	// get basic event data
 	fDSTrunnumber = getRunNumber();
 	fDSTeventnumber = getEventNumber();
 	fDSTeventtype = ( unsigned int )( getReader()->getATEventType() );
@@ -118,15 +118,15 @@ void VDST::fill()
 	fDSTgps4 = getReader()->getGPS4();
 	fDSTgpsyear = ( unsigned int )getReader()->getATGPSYear() + 2000;
 	fDSTATgpsyear = ( unsigned int )getReader()->getATGPSYear();
-// update pointing
-// get pointing and local trigger (stored as unsigned long)
+	// update pointing
+	// get pointing and local trigger (stored as unsigned long)
 	bitset<8 * sizeof( unsigned long ) > i_localTrigger;
 	fDSTNTrig = 0;
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
 		if( isTeltoAna( i ) )
 		{
-// local trigger
+			// local trigger
 			if( fReader->hasLocalTrigger( i ) )
 			{
 				i_localTrigger.set( i, 1 );
@@ -137,7 +137,7 @@ void VDST::fill()
 			{
 				fDSTLTrig_list[i] = 0;
 			}
-// pointing
+			// pointing
 			getPointing()[i]->setTelPointing( getEventMJD(), getEventTime() );
 			if( i < fReader->getTelAzimuth().size() )
 			{
@@ -158,12 +158,12 @@ void VDST::fill()
 		}
 	}
 	fDSTLTrig = i_localTrigger.to_ulong();
-// fill DST tree only for triggered events
+	// fill DST tree only for triggered events
 	if( fMC && getRunParameter()->fIsMC == 2 && fDSTLTrig == 0 )
 	{
 		return;
 	}
-// get the Monte Carlo data
+	// get the Monte Carlo data
 	if( fMC )
 	{
 		fDSTprimary = fReader->getMC_primary();
@@ -175,7 +175,7 @@ void VDST::fill()
 		fDSTTel_xoff = ( float )fReader->getMC_Xoffset();
 		fDSTTel_yoff = ( float )fReader->getMC_Yoffset();
 	}
-// check if there was an array trigger, otherwise skip event
+	// check if there was an array trigger, otherwise skip event
 	if( fReader->isMC() && fDSTLTrig == 0 )
 	{
 		resetDataVectors();
@@ -183,19 +183,19 @@ void VDST::fill()
 		return;
 	}
 	
-// temporary variable
+	// temporary variable
 	vector< float >  t_PulseTimingTemp;
 	
-// ntel is always to total number of telescopes in the DST file
+	// ntel is always to total number of telescopes in the DST file
 	fDSTntel_data = getNTel();
 	for( unsigned int i = 0; i < fDSTntel_data; i++ )
 	{
 		fDSTtel_data[i] = i;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// loop over all telescope and analyse channel by channel
-// get sums and toffsets
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// loop over all telescope and analyse channel by channel
+	// get sums and toffsets
 	int intubes = 0;
 	for( unsigned int i = 0; i < getNTel(); i++ )
 	{
@@ -205,23 +205,23 @@ void VDST::fill()
 			intubes = 0;
 			setTelID( i );
 			
-// set number of samples
+			// set number of samples
 			setNSamples( fReader->getNumSamples() );
-// set hilo
+			// set hilo
 			fillHiLo();
-// find dead channels (time dependent)
-//	findDeadChans( false, false );
-//	findDeadChans( true, false );
-// integrate FADC traces -> calculate integrated charges and pulse timing
+			// find dead channels (time dependent)
+			//	findDeadChans( false, false );
+			//	findDeadChans( true, false );
+			// integrate FADC traces -> calculate integrated charges and pulse timing
 			calcTZerosSums( getSumFirst(), getSumFirst() + getSumWindow(), getTraceIntegrationMethod() );
-// image cleaning if image threshold is > 0.
+			// image cleaning if image threshold is > 0.
 			if( getImageThresh() > 0. )
 			{
 				if( fVImageCleaning )
 				{
 					fVImageCleaning->cleanImagePedvars( getImageThresh(), getBorderThresh(), getBorderThresh() );
 				}
-// NOTE: DOUBLE PASS IS NOT WORKING FOR DSTs, this call should not be here!!!!
+				// NOTE: DOUBLE PASS IS NOT WORKING FOR DSTs, this call should not be here!!!!
 				if( getRunParameter()->fDoublePass )
 				{
 					calcSecondTZerosSums();
@@ -238,13 +238,13 @@ void VDST::fill()
 			}
 			fDSTPDMax[i] = 0.;
 			fDSTPDSum[i] = 0.;
-// calculate total sum over all channels
+			// calculate total sum over all channels
 			for( unsigned int j = 0; j < getNChannels(); j++ )
 			{
 				i_total += getSums()[j];
 			}
 		}
-// fill pulse timing level
+		// fill pulse timing level
 		if( fRunPar->fpulsetiminglevels.size() < getDSTpulsetiminglevelsN() )
 		{
 			for( unsigned int t = 0; t < fRunPar->fpulsetiminglevels.size(); t++ )
@@ -253,21 +253,21 @@ void VDST::fill()
 			}
 		}
 		
-// fill dst arrays
+		// fill dst arrays
 		for( unsigned int j = 0; j < getNChannels(); j++ )
 		{
 			fDSTChan[i][j] = j;
 			
-// fill values for this event, this telescope and this pixel if:
-//    i) this is a valid laser event
-//           or
-//   ii) fRunPar->fdstwriteallpixel is set to true
-//           or
-//  iii) this is a border or image pixel
+			// fill values for this event, this telescope and this pixel if:
+			//    i) this is a valid laser event
+			//           or
+			//   ii) fRunPar->fdstwriteallpixel is set to true
+			//           or
+			//  iii) this is a border or image pixel
 			if( isTeltoAna( i ) && ( ( !fBLaser || ( i_total > fRunPar->fLaserSumMin ) ) && ( fRunPar->fdstwriteallpixel || getBorder()[j] || getImage()[j] ) ) )
 			{
 				intubes++;
-// for laser only
+				// for laser only
 				if( fBLaser )
 				{
 					int corrfirst = TMath::Nint( getTZeros()[j] ) - 3;
@@ -278,7 +278,7 @@ void VDST::fill()
 					fDSTdead[i][j] = ( unsigned int )getDead()[j];
 					fDSTsumwindow[i][j] = getCurrentSumWindow()[j];
 					fDSTsumfirst[i][j] = getTCorrectedSumFirst()[j];
-// fill pulse timing
+					// fill pulse timing
 					if( fRunPar->fpulsetiminglevels.size() < getDSTpulsetiminglevelsN() )
 					{
 						t_PulseTimingTemp = fTraceHandler->getPulseTiming( corrfirst, corrfirst + getSumWindow(), 0, getNSamples() );
@@ -293,7 +293,7 @@ void VDST::fill()
 					fDSTMax[i][j] = ( short )i_max;
 					fDSTRawMax[i][j] = ( short )( i_max + getPeds( getHiLo()[j] )[j] );
 				}
-// normal data
+				// normal data
 				else
 				{
 					fDSTsums[i][j] = ( float )getSums()[j]; // ignore dead low gain channels
@@ -356,7 +356,7 @@ void VDST::fill()
 			fDSTL2TrigType[i] = ( int )getReader()->getLocalTriggerType( i );
 		}
 	}
-// only write events with more than NN ntubes to disk (for one telescope only)
+	// only write events with more than NN ntubes to disk (for one telescope only)
 	if( getNTel() == 1 && intubes < getRunParameter()->fdstminntubes )
 	{
 		return;
@@ -371,7 +371,7 @@ void VDST::terminate()
 	{
 		cout << "VDST::terminate()" << endl;
 	}
-// now write everything to disk
+	// now write everything to disk
 	if( fDSTfile )
 	{
 		if( fDSTfile->cd() )
@@ -380,7 +380,7 @@ void VDST::terminate()
 			cout << "\t total number of events in dst tree: " << fDST_tree->GetEntries() << endl;
 			fDST_tree->Write();
 			getRunParameter()->Write();
-// write detector tree
+			// write detector tree
 			if( getDetectorTree() )
 			{
 				if( fDebug )
@@ -389,7 +389,7 @@ void VDST::terminate()
 				}
 				getDetectorTree()->Write();
 			}
-// write pulse shape histograms
+			// write pulse shape histograms
 			if( fDSTfile->mkdir( "meanPulses" )->cd() )
 			{
 				for( unsigned int i = 0; i < getNTel(); i++ )
@@ -401,7 +401,7 @@ void VDST::terminate()
 					}
 				}
 			}
-// write pulse sum histograms
+			// write pulse sum histograms
 			if( fDSTfile->mkdir( "pulseSums" )->cd() )
 			{
 				for( unsigned int i = 0; i < getNTel(); i++ )
@@ -413,7 +413,7 @@ void VDST::terminate()
 					}
 				}
 			}
-// write calibration data
+			// write calibration data
 			writeCalibrationData();
 		}
 		fDSTfile->Close();
@@ -427,12 +427,12 @@ bool VDST::writeCalibrationData()
 		fDSTfile->cd();
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DST analysis
-// (same code as in c_VDST)
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// DST analysis
+	// (same code as in c_VDST)
 	int fTelID = 0;
 	unsigned int nPixel = 0;
-// integration window
+	// integration window
 	unsigned int fnum_sumwindow = 1;
 	unsigned int fsumwindow[VDST_MAXSUMWINDOW];
 	float fPed_high[VDST_MAXCHANNELS];

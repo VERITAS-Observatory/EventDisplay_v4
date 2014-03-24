@@ -36,7 +36,7 @@ class VModel3DParameters
 		void reset();        //!< reset all tree variable to standard values
 		
 		int eventNumber;
-// Model3D parameters, JG //
+		// Model3D parameters, JG //
 		float fSel3D;    // elevation of shower direction (deg)
 		float fSaz3D;    // azimuth of shower direction (deg)
 		float fXcore3D;  // shower core in ground coordinates

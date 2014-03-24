@@ -81,7 +81,7 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		
 		double fDeadTimeFraction;
 		
-// parameters to be used in anasum
+		// parameters to be used in anasum
 		double meanpedvars;                       // mean pedvar
 		vector< double > pedvars;                 // mean pedvar per telescope
 		

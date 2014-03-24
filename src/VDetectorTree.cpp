@@ -43,7 +43,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
 		return false;
 	}
 	
-// define tree
+	// define tree
 	int fTelID = 0;
 	unsigned int fTelID_hyperArray = 0;
 	ULong64_t fTelType = 1;
@@ -102,7 +102,7 @@ bool VDetectorTree::fillDetectorTree( VDetectorGeometry* iDet )
 		fTreeDet->Branch( "RTubeDeg", fRTubeDeg, "RTubeDeg[NPixel]/F" );
 	}
 	
-// fill the tree
+	// fill the tree
 	if( iDet != 0 )
 	{
 		for( unsigned int i = 0; i < iDet->getNTel(); i++ )
@@ -196,7 +196,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree )
 	
 	cout << "Reading the detector tree: " << iTree->GetName() << endl;
 	
-// versioning due to bug in assigning mirror and nmirror variables
+	// versioning due to bug in assigning mirror and nmirror variables
 	unsigned int iDetTreeVersion = 1;
 	string iN = iTree->GetTitle();
 	if( iN.find( "v2" ) != string::npos )
@@ -204,7 +204,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree )
 		iDetTreeVersion = 2;
 	}
 	
-// define tree
+	// define tree
 	float fFocalLength = 0.;
 	float fCameraScaleFactor = 1.;
 	float fCameraCentreOffset = 0.;
@@ -325,7 +325,7 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree )
 		iDet->setLowGainMultiplier_Trace( i, fHiLoScale );
 		iDet->setLowGainThreshold( i, ( unsigned int )fHiLoThreshold );
 		
-// fudge to be able to read old files with mixup of mirror area and number of mirrors
+		// fudge to be able to read old files with mixup of mirror area and number of mirrors
 		if( iDetTreeVersion > 1 )
 		{
 			iDet->getNMirrors()[i] = ( unsigned int )fMirrorArea;
@@ -340,8 +340,8 @@ bool VDetectorTree::readDetectorTree( VDetectorGeometry* iDet, TTree* iTree )
 		
 		for( unsigned int p = 0; p < nPixel; p++ )
 		{
-// change camera coordinate system to VERITAS one
-// (GM) (-y,-x is as well ok, check this with offset MC)
+			// change camera coordinate system to VERITAS one
+			// (GM) (-y,-x is as well ok, check this with offset MC)
 			if( p < iDet->getX( i ).size() )
 			{
 				iDet->getX( i )[p] = fYTubeDeg[p];

@@ -36,16 +36,16 @@ class VTMVARunData : public TNamed
 	
 		string            fName;
 		
-// run type
+		// run type
 		bool fTrainGammaHadronSeparation;
 		bool fTrainReconstructionQuality;
 		
-// output file
+		// output file
 		string            fOutputFileName;
 		string            fOutputDirectoryName;
 		vector< TFile* >  fOutputFile;
 		
-// training data
+		// training data
 		double            fSignalWeight;
 		vector< string >  fSignalFileName;
 		vector< TFile* >  fSignalFile;
@@ -55,17 +55,17 @@ class VTMVARunData : public TNamed
 		vector< TFile* >  fBackgroundFile;
 		vector< TTree* >  fBackgroundTree;
 		
-// list of training variables
+		// list of training variables
 		vector< string >  fTrainingVariable;
 		vector< char >    fTrainingVariableType;
 		vector< float >   fTrainingVariable_CutRangeMin;
 		vector< float >   fTrainingVariable_CutRangeMax;
 		vector< string >  fTrainingVariable_VarProp;
 		
-// spectator variables
+		// spectator variables
 		vector< string > fSpectatorVariable;
 		
-// quality and energy cuts
+		// quality and energy cuts
 		unsigned int      fMinSignalEvents;
 		unsigned int      fMinBackgroundEvents;
 		TCut              fQualityCuts;
@@ -73,14 +73,14 @@ class VTMVARunData : public TNamed
 		string            fPrepareTrainingOptions;
 		vector< VTMVARunDataEnergyCut* > fEnergyCutData;
 		
-// analysis variables
+		// analysis variables
 		int               fNTtype;
 		
-// MVA methods
+		// MVA methods
 		vector< string >  fMVAMethod;
 		vector< string >  fMVAMethod_Options;
 		
-// reconstruction quality target
+		// reconstruction quality target
 		string            fReconstructionQualityTarget;
 		string            fReconstructionQualityTargetName;
 		

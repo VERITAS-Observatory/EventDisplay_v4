@@ -37,8 +37,8 @@ void VHiLoTools::help()
 
 	cout << "VHiLoTools:  Tools for analysing and looking at HiLo runs" << endl << endl;
 	
-//cout << "void makeRootFileFromDSTFile( int tel, int iSumWindow, int ifile1, int ifile2, string dataDir )" << endl << endl;
-
+	//cout << "void makeRootFileFromDSTFile( int tel, int iSumWindow, int ifile1, int ifile2, string dataDir )" << endl << endl;
+	
 	cout << "void getMeanRMS( string ifile, int tel, int sumwindow, bool bPlot)" << endl << endl;
 	cout << "Used to get mean and RMS of HiLo run" << endl << endl;
 	
@@ -223,7 +223,7 @@ vector<double> VHiLoTools::lowGainCalib( TFile* dstfile, TFile* dstfile18, int t
 			cout << "HELP!: eventNumbers not matching... " << i;
 		}
 		
-// do zeroing
+		// do zeroing
 		loNUM = 0;
 		hiNUM = 0;
 		loAverage = 0.;
@@ -231,7 +231,7 @@ vector<double> VHiLoTools::lowGainCalib( TFile* dstfile, TFile* dstfile18, int t
 		hiAverage = 0.;
 		hiAverage2 = 0.;
 		
-//   Hi Gain Stuff (Low Voltage half of Camera)
+		//   Hi Gain Stuff (Low Voltage half of Camera)
 		for( int chan = lowLOW; chan < lowHI; chan++ )
 		{
 			if( HiLo18[tel][chan] == 0 )
@@ -246,7 +246,7 @@ vector<double> VHiLoTools::lowGainCalib( TFile* dstfile, TFile* dstfile18, int t
 		}
 		loAverage /= loNUM;
 		
-//    Low Gain Stuff (Normal Voltage half of Camera)
+		//    Low Gain Stuff (Normal Voltage half of Camera)
 		if( 1 )
 		{
 		
@@ -354,7 +354,7 @@ vector<double> VHiLoTools::lowGainCalib( TFile* dstfile, TFile* dstfile18, int t
 	double breakpoint = -999.;
 	breakpoint = xpos[TOP - 1];
 	
-// Low Gain
+	// Low Gain
 	if( bPlot )
 	{
 		TCanvas* c2 = new TCanvas( "c2", "c2", 510, 0, 500, 500 );

@@ -44,7 +44,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		
 		string fDataSetName;                      //! name for histogram, canvases, etc. (no spaces, special characters)
 		
-// vector with differential flux values and upper limits
+		// vector with differential flux values and upper limits
 		vector< VDifferentialFlux > fDifferentialFlux;
 		
 		double fAnalysisMinEnergy;                // linear energy axis [TeV]
@@ -65,7 +65,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		int    fAnalysisUpperLimitAlgorithm;
 		string fErrorCalculationMethod;
 		
-// spectral fit variables
+		// spectral fit variables
 		VSpectralFitter* fSpectralFitter;
 		int    fSpectralFitFunction;              // 0: power law
 		// Default: 1 TeV
@@ -73,7 +73,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		double fSpectralFitEnergy_min;
 		double fSpectralFitEnergy_max;
 		
-// plotting variables
+		// plotting variables
 		TCanvas* fPlottingCanvas;
 		// spectral weight to calculate bin centers
 		double fPlottingSpectralWeightForBinCenter;
@@ -87,7 +87,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		TGraphAsymmErrors* gEnergySpectrum;
 		TGraphErrors* gEnergySpectrumFitResiduals;
 		
-// rebinning of energy spectra
+		// rebinning of energy spectra
 		TH1D* nRebinner;
 		TH1D* nOriginalBinner;
 		
@@ -111,32 +111,32 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		TH1*   setVariableBinning( TH1* a );
 		void   setOriginalBinner( TH1* a );
 		
-// histograms
+		// histograms
 		TH1D* hErecCountsOn;
 		TH1D* hErecCountsOff;
 		TH1D* hErecTotalTime;
 		TH1D* hErecTotalTimeDeadTimeCorrected;
 		TH1D* hEffArea;
 		
-// definition of energy value in a log bin
+		// definition of energy value in a log bin
 		unsigned int fEnergyInBinDefinition;    // 0 = mean of (lin) energy, 1 = barycentric mean, 2 = spectral weighted mean
 		
-// energy thresholds
+		// energy thresholds
 		string fEnergyThresholdFileName;
 		double fEnergyThresholdFixedValue;
 		
-// total numbers
+		// total numbers
 		double fTotalObservationTime;
 		double fTotalObservationTimeDeadTimeCorrected;
 		double fTotalNormalisationFactor;
 		
-// initialize all variables
+		// initialize all variables
 		void               initializeRunVariables();
-// fill and plot energy spectrum graph
+		// fill and plot energy spectrum graph
 		TGraphAsymmErrors* plot_energySpectrum();
 		
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
 	public:
 	
 		VEnergySpectrum();

@@ -73,9 +73,9 @@ class VRunSummary
 		double MaxSigniX;
 		double MaxSigniY;
 		
-////////////////
-// variables used for total analysis only
-//
+		////////////////
+		// variables used for total analysis only
+		//
 		map< int, double >  fRunMJD;
 		double fTotalExposureOn;
 		double fTotalExposureOff;

@@ -46,7 +46,7 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 	sprintf( hname, "%s.root", outputfile );
 	cout << "merging " << i_nMerged << " files to " << hname << endl;
 	
-// set branches to be included in merged files
+	// set branches to be included in merged files
 	if( !bFull )
 	{
 		f.SetBranchStatus( "*", 0 );
@@ -63,25 +63,25 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		f.SetBranchStatus( "nbins", 1 );
 		f.SetBranchStatus( "e0", 1 );
 		f.SetBranchStatus( "eff", 1 );
-// errors not needed for standard analysis
-//        f.SetBranchStatus( "seff_L", 1 );
-//        f.SetBranchStatus( "seff_U", 1 );
+		// errors not needed for standard analysis
+		//        f.SetBranchStatus( "seff_L", 1 );
+		//        f.SetBranchStatus( "seff_U", 1 );
 		f.SetBranchStatus( "Rec_nbins", 1 );
 		f.SetBranchStatus( "Rec_e0", 1 );
 		f.SetBranchStatus( "Rec_eff", 1 );
-// errors not needed for standard analysis
-//        f.SetBranchStatus( "Rec_seff_L", 1 );
-//        f.SetBranchStatus( "Rec_seff_U", 1 );
-// needed for compatibility to v3.30
-//        f.SetBranchStatus( "hEmc", 1 );
-// needed for systematic error calculation
+		// errors not needed for standard analysis
+		//        f.SetBranchStatus( "Rec_seff_L", 1 );
+		//        f.SetBranchStatus( "Rec_seff_U", 1 );
+		// needed for compatibility to v3.30
+		//        f.SetBranchStatus( "hEmc", 1 );
+		// needed for systematic error calculation
 		f.SetBranchStatus( "hEsysMCRelative", 1 );
 	}
 	f.Merge( hname );
 	cout << "done.." << endl;
 	
-// get one example of hEmc
-// (this is needed later to get the binning right)
+	// get one example of hEmc
+	// (this is needed later to get the binning right)
 	TFile* fO = new TFile( hname, "UPDATE" );
 	if( fO->IsZombie() )
 	{
@@ -97,8 +97,8 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		hEmc->Reset();
 		hEmc->Write();
 	}
-// get one example of IRF-runparameters for later checks in the analysis
-// (this assumes they are the same in all merged files!)
+	// get one example of IRF-runparameters for later checks in the analysis
+	// (this assumes they are the same in all merged files!)
 	TFile* ifirst = f.GetFile();
 	if( !ifirst )
 	{
@@ -115,8 +115,8 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 		exit( EXIT_FAILURE );
 	}
 	iRunPara->Write();
-// get one example of the gamma-hadron cuts
-// (this assume they are the same in all merged files!)
+	// get one example of the gamma-hadron cuts
+	// (this assume they are the same in all merged files!)
 	VGammaHadronCuts* iCuts = ( VGammaHadronCuts* )ifirst->Get( "GammaHadronCuts" );
 	if( iCuts )
 	{
@@ -132,7 +132,7 @@ void merge( string ifile, char* outputfile, bool bFull = false )
 	}
 	fO->Close();
 	
-// merge all log files
+	// merge all log files
 	if( ifile.find( ".root" ) != string::npos )
 	{
 		sprintf( hname, "cat %s*.log > %s.log", ifile.substr( ifile.size() - 5, ifile.size() ).c_str(), outputfile );

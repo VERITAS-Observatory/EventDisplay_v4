@@ -76,15 +76,15 @@ class VSpectralEnergyDistribution
 		
 		string fName;                             // project name
 		
-// constants
+		// constants
 		vector< sPhotoMetricBand >      fPhotoMetricBand;
 		vector< sGalacticExtinction >   fGalacticExtinction;
 		
-// data sets
+		// data sets
 		// [dataset][data points]
 		vector< vector< sPhotonFlux > > fSpectralFlux;
 		
-// plot/print variables
+		// plot/print variables
 		double fMJDMin;
 		double fMJDMax;
 		

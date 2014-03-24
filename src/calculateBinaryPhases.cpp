@@ -31,7 +31,7 @@ int main( int argc, char* argv[] )
 	cout << "(Note: missing documentation)" << endl;
 	
 	
-// binary analysis : calculates the orbital phase in a binary system, file extension will be "orb"
+	// binary analysis : calculates the orbital phase in a binary system, file extension will be "orb"
 	VOrbitalPhase* fOrb = new VOrbitalPhase();
 	fOrb->initialize( argc, argv );
 	// this can be done from the command line. These functions can overwrite those, though.

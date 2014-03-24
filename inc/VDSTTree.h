@@ -38,7 +38,7 @@ class VDSTTree
 		bool fMC;
 		bool fFullTree;
 		
-// temporary telescope counter
+		// temporary telescope counter
 		int fTelescopeCounter_temp;
 		
 		unsigned int fDSTnchannel[VDST_MAXTELESCOPES];
@@ -53,12 +53,12 @@ class VDSTTree
 		unsigned int fDSTgps4;
 		unsigned int fDSTgpsyear;
 		unsigned int fDSTATgpsyear;
-// triggered telescopes
+		// triggered telescopes
 		unsigned int fDSTLTrig;
 		unsigned int fDSTNTrig;
 		unsigned int fDSTLTrig_list[VDST_MAXTELESCOPES];
-// maximum number of telescopes is VDST_MAXTELESCOPES
-// maximum number of channels per camera VDST_MAXCHANNELS
+		// maximum number of telescopes is VDST_MAXTELESCOPES
+		// maximum number of channels per camera VDST_MAXCHANNELS
 		unsigned int fDSTntel;
 		unsigned int fDSTntel_data;
 		unsigned int fDSTtel_data[VDST_MAXTELESCOPES];
@@ -67,11 +67,11 @@ class VDSTTree
 		
 		unsigned short int fDSTChan[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		
-// data recording parameters
+		// data recording parameters
 		unsigned short int fDSTRecord[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		unsigned short int fDSTTelescopeZeroSupression[VDST_MAXTELESCOPES];
 		
-// adc parameters
+		// adc parameters
 		float        fDSTsums[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];                // integrated charge
 		float        fDSTsums2[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];                // integrated charge
 		unsigned short int fDSTdead[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
@@ -80,7 +80,7 @@ class VDSTTree
 		unsigned short int fDSTsumfirst[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		float        fDSTt0[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		short        fDSTMax[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-// assume that all pulse timing levels are the same for all channels in a telescope
+		// assume that all pulse timing levels are the same for all channels in a telescope
 		float        fDSTpulsetiminglevels[VDST_MAXTELESCOPES][VDST_MAXTIMINGLEVELS];
 		float        fDSTpulsetiming[VDST_MAXTELESCOPES][VDST_MAXTIMINGLEVELS][VDST_MAXCHANNELS];
 		short int    fDSTRawMax[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
@@ -91,41 +91,41 @@ class VDSTTree
 		unsigned short int fDSTN255[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		unsigned short int fDSTnL1trig[VDST_MAXTELESCOPES];
 		unsigned short int fDSTL1trig[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-//////////////////////////////////////////////////////////////////////////////////////
-// FADC traces
+		//////////////////////////////////////////////////////////////////////////////////////
+		// FADC traces
 		bool               fReadWriteFADC;
 		unsigned short int fDSTnumSamples[VDST_MAXTELESCOPES];
 		unsigned short int fDSTtrace[VDST_MAXTELESCOPES][VDST_MAXSUMWINDOW][VDST_MAXCHANNELS];
-//////////////////////////////////////////////////////////////////////////////////////
-// photodiode (VTS only)
+		//////////////////////////////////////////////////////////////////////////////////////
+		// photodiode (VTS only)
 		float fDSTPDMax[VDST_MAXTELESCOPES];
 		float fDSTPDSum[VDST_MAXTELESCOPES];
-//////////////////////////////////////////////////////////////////////////////////////
-// photoelectrons
+		//////////////////////////////////////////////////////////////////////////////////////
+		// photoelectrons
 		bool  fFillPELeaf;
 		unsigned int fDSTPe[VDST_MAXTELESCOPES][VDST_MAXCHANNELS]; // sum of Che pe in each pixel
-// fit parameter
+		// fit parameter
 		float fDSTChi2[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-//!< rise time 10-90%
+		//!< rise time 10-90%
 		float fDSTRT[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-//!< fall time 10-90%
+		//!< fall time 10-90%
 		float fDSTFT[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-//!< rise time parameter from fit
+		//!< rise time parameter from fit
 		float fDSTRTpar[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-//!< fall time parameter from fit
+		//!< fall time parameter from fit
 		float fDSTFTpar[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-//< trace width
+		//< trace width
 		float fDSTTraceWidth[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
-//!< trace norm
+		//!< trace norm
 		float fDSTTraceNorm[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		
-// mean pulse timing
+		// mean pulse timing
 		float fDSTMeanPulseTiming[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		float fDSTMeanPulseTiming_N[VDST_MAXTELESCOPES][VDST_MAXCHANNELS];
 		float fDSTMeanPulseTimingMinLightLevel;
 		TH1F* fDSTMeanPulseTimingHistogram[VDST_MAXTELESCOPES];
-//////////////////////////////////////////////////////////////////////////////////////
-// MC parameters
+		//////////////////////////////////////////////////////////////////////////////////////
+		// MC parameters
 		unsigned short int fDSTprimary;
 		float fDSTenergy;
 		float fDSTxcore;
@@ -135,7 +135,7 @@ class VDSTTree
 		float fDSTTel_xoff;
 		float fDSTTel_yoff;
 		
-//////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////
 		VDSTTree();
 		~VDSTTree() {}
 		map< unsigned int, float> getArrayConfig()
@@ -183,7 +183,7 @@ class VDSTTree
 			fMC = iMC;
 		}
 		
-// getters for all variables
+		// getters for all variables
 		uint32_t     getDSTRunNumber()
 		{
 			return fDSTrunnumber;
@@ -319,7 +319,7 @@ class VDSTTree
 		{
 			return fDSTenergy;
 		}
-// VERITAS coordinate system: x -> east, y-> north
+		// VERITAS coordinate system: x -> east, y-> north
 		float        getDSTMCxcore()              // [m]
 		{
 			return fDSTxcore;

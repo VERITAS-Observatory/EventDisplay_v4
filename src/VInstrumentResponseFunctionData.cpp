@@ -48,7 +48,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 	
 	fHistogramList = new TList();
 	
-// histograms
+	// histograms
 	vector< string > iHisName;
 	vector< string > iHisXaxisName;
 	vector< string > iHisYaxisName;
@@ -58,17 +58,17 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 	vector< int >    iHisNbinsY;
 	vector< double > iHisYmin;
 	vector< double > iHisYmax;
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// NOTE:   look at E_HISTOID before changing anything here
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// angular resolution plots
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// NOTE:   look at E_HISTOID before changing anything here
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// angular resolution plots
 	if( fType == "angular_resolution" )
 	{
-// angular difference vs. energy
+		// angular difference vs. energy
 		iHisName.push_back( "AngE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "angular diff. (R,MC) [deg]" );
@@ -78,7 +78,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 5. );
-// (angular difference)^2 vs. energy
+		// (angular difference)^2 vs. energy
 		iHisName.push_back( "AngE0_2_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "(angular diff.)^{2} (R,MC) [deg^{2}]" );
@@ -88,7 +88,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 5. );
-// angular resolution vs number of images per telescope
+		// angular resolution vs number of images per telescope
 		iHisName.push_back( "AngNImages" + fName );
 		iHisXaxisName.push_back( "number of images" );
 		iHisYaxisName.push_back( "angular diff. (R,MC) [deg]" );
@@ -98,7 +98,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 5. );
-// angular resolution vs core distance
+		// angular resolution vs core distance
 		iHisName.push_back( "AngCoreDistance" + fName );
 		iHisXaxisName.push_back( "distance to array center [m]" );
 		iHisYaxisName.push_back( "angular diff. (R,MC) [deg]" );
@@ -108,7 +108,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 5. );
-// angular error vs. energy
+		// angular error vs. energy
 		iHisName.push_back( "AngErrorE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "angular error (R,MC) [deg]" );
@@ -118,7 +118,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( -5. );
 		iHisYmax.push_back( 5. );
-// not defined here
+		// not defined here
 		iHisName.push_back( "AngRelativeErrorE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "relative angular error (R,MC)" );
@@ -129,11 +129,11 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisYmin.push_back( -5. );
 		iHisYmax.push_back( 5. );
 	}
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// core resolution plots
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// core resolution plots
 	else if( fType == "core_resolution" )
 	{
-// core position difference vs. energy
+		// core position difference vs. energy
 		iHisName.push_back( "CoreE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "core position diff. (R,MC) [m]" );
@@ -143,7 +143,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 300. );
-// (core position difference)^2 vs. energy
+		// (core position difference)^2 vs. energy
 		iHisName.push_back( "CoreE0_2_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "(core position diff.)^{2} (R,MC) [m^{2}]" );
@@ -153,7 +153,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 300.*300. );
-// core position resolution vs number of images per telescope
+		// core position resolution vs number of images per telescope
 		iHisName.push_back( "CoreNImages" + fName );
 		iHisXaxisName.push_back( "number of images" );
 		iHisYaxisName.push_back( "core position diff. (R,MC) [m]" );
@@ -163,7 +163,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 300. );
-// core position resolution vs core distance
+		// core position resolution vs core distance
 		iHisName.push_back( "CoreCoreDistance" + fName );
 		iHisXaxisName.push_back( "distance to array center [m]" );
 		iHisYaxisName.push_back( "core position diff. (R,MC) [m]" );
@@ -173,7 +173,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 300. );
-// core position error vs energy
+		// core position error vs energy
 		iHisName.push_back( "CoreErrorE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "core position error (R,MC) [m]" );
@@ -183,7 +183,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( -300. );
 		iHisYmax.push_back( 300. );
-// not defined here
+		// not defined here
 		iHisName.push_back( "CoreRelativeErrorE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "core position angular error (R,MC)" );
@@ -194,11 +194,11 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisYmin.push_back( -5. );
 		iHisYmax.push_back( 5. );
 	}
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// energy resolution plots
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// energy resolution plots
 	else if( fType == "energy_resolution" )
 	{
-// energy difference vs. energy
+		// energy difference vs. energy
 		iHisName.push_back( "EnergE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "log_{10} E_{rec} - log_{10} E_{MC}" );
@@ -208,7 +208,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( -2. );
 		iHisYmax.push_back( 2. );
-// (energy difference)^2 vs. energy
+		// (energy difference)^2 vs. energy
 		iHisName.push_back( "EnergE0_2_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "(log_{10} E_{rec} - log_{10} E_{MC})^2" );
@@ -218,7 +218,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 45000 );
 		iHisYmin.push_back( 0. );
 		iHisYmax.push_back( 4. );
-// energy resolution vs number of images per telescope
+		// energy resolution vs number of images per telescope
 		iHisName.push_back( "EnergNImages" + fName );
 		iHisXaxisName.push_back( "number of images" );
 		iHisYaxisName.push_back( "log_{10} E_{rec} - log_{10} E_{MC}" );
@@ -228,7 +228,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( -2. );
 		iHisYmax.push_back( 2. );
-// energy resolution vs core distance
+		// energy resolution vs core distance
 		iHisName.push_back( "EnergCoreDistance" + fName );
 		iHisXaxisName.push_back( "distance to array center [m]" );
 		iHisYaxisName.push_back( "log_{10} E_{rec} - log_{10} E_{MC}" );
@@ -238,7 +238,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( -2. );
 		iHisYmax.push_back( 2. );
-// energy reconstruction error vs. energy (used for energy systematics)
+		// energy reconstruction error vs. energy (used for energy systematics)
 		iHisName.push_back( "EnergErrorE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "log_{10} E_{rec} - log_{10} E_{MC}" );
@@ -248,7 +248,7 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisNbinsY.push_back( 2500 );
 		iHisYmin.push_back( -2. );
 		iHisYmax.push_back( 2. );
-// not defined here
+		// not defined here
 		iHisName.push_back( "EnergyRelativeErrorE0_" + fName );
 		iHisXaxisName.push_back( "log_{10} energy [TeV]" );
 		iHisYaxisName.push_back( "#Delta energy resolution" );
@@ -259,24 +259,24 @@ bool VInstrumentResponseFunctionData::initialize( string iName, string iType, un
 		iHisYmin.push_back( -2. );
 		iHisYmax.push_back( 2. );
 	}
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// create histograms
-/////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// create histograms
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	for( unsigned int i = 0; i < iHisName.size(); i++ )
 	{
-// 2D histo
+		// 2D histo
 		f2DHisto.push_back( new TH2D( ( "h" + iHisName[i] ).c_str(), "", iHisNbinsX[i], iHisXmin[i], iHisXmax[i], iHisNbinsY[i], iHisYmin[i], iHisYmax[i] ) );
 		f2DHisto.back()->SetXTitle( iHisXaxisName[i].c_str() );
 		f2DHisto.back()->SetYTitle( iHisYaxisName[i].c_str() );
 		fHistogramList->Add( f2DHisto.back() );
 		
-// corresponding resolution graph
+		// corresponding resolution graph
 		fResolutionGraph.push_back( new TGraphErrors( 1 ) );
 		fResolutionGraph.back()->SetName( ( "g" + iHisName[i] ).c_str() );
 		fResolutionGraph.back()->SetTitle();
 		fHistogramList->Add( fResolutionGraph.back() );
 		
-// containment probability
+		// containment probability
 		fContainmentProbability.push_back( 0. );
 		
 	}
@@ -314,16 +314,16 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 		return;
 	}
 	
-// default is true here
+	// default is true here
 	bool bPlotResolution_vs_reconstructedEnergy = true;
 	
-// simple quality check (FOV shouldn't be larger than 50 deg)
+	// simple quality check (FOV shouldn't be larger than 50 deg)
 	if( fData->Xoff < -50. || fData->Yoff < -50. )
 	{
 		return;
 	}
 	
-// get reconstructed energy
+	// get reconstructed energy
 	double iErec_lin = -99.e6;
 	if( fEnergyReconstructionMethod == 0 && fData->Erec > 0. )
 	{
@@ -341,30 +341,30 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 	double iDiff = -99.e6;
 	double iError = -99.e6;
 	double iErrorRelative = -99.e6;
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// angular resolution
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// angular resolution
 	if( fType_numeric == 0 )
 	{
-// angular difference
+		// angular difference
 		iDiff = sqrt( ( fData->Xoff - fData->MCxoff ) * ( fData->Xoff - fData->MCxoff ) +
 					  ( fData->Yoff - fData->MCyoff ) * ( fData->Yoff - fData->MCyoff ) );
-// error
+		// error
 		iError = sqrt( fData->Xoff * fData->Xoff + fData->Xoff * fData->Xoff ) -
 				 sqrt( fData->MCxoff * fData->MCxoff + fData->MCyoff * fData->MCyoff );
-// relative error (not sure if it is useful)
+		// relative error (not sure if it is useful)
 		iErrorRelative = -99.e6;
 	}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// core resolution
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// core resolution
 	else if( fType_numeric == 1 )
 	{
-// core difference
+		// core difference
 		iDiff = sqrt( ( fData->Xcore - fData->MCxcore ) * ( fData->Xcore - fData->MCxcore ) +
 					  ( fData->Ycore - fData->MCycore ) * ( fData->Ycore - fData->MCycore ) );
-// core error
+		// core error
 		iError = sqrt( fData->Xcore * fData->Xcore + fData->Xcore * fData->Xcore ) -
 				 sqrt( fData->MCxcore * fData->MCxcore + fData->MCycore * fData->MCycore );
-// relative error
+		// relative error
 		if( sqrt( fData->MCxcore * fData->MCxcore + fData->MCycore * fData->MCycore ) > 0. )
 		{
 			iErrorRelative = iError / sqrt( fData->MCxcore * fData->MCxcore + fData->MCycore * fData->MCycore );
@@ -374,8 +374,8 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 			iErrorRelative = -99.e6;
 		}
 	}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// energy resolution
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// energy resolution
 	else if( fType_numeric == 2 )
 	{
 		if( fData->MCe0 > 0. )
@@ -399,41 +399,41 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 	}
 	
 	
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// fill histograms
-
-// difference vs energy
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// fill histograms
+	
+	// difference vs energy
 	if( E_DIFF < f2DHisto.size() && f2DHisto[E_DIFF] )
 	{
 		f2DHisto[E_DIFF]->Fill( log10( iErec_lin ), iDiff, iWeight );
 	}
 	
-// squared difference vs energy
+	// squared difference vs energy
 	if( E_DIFF2 < f2DHisto.size() && f2DHisto[E_DIFF2] )
 	{
 		f2DHisto[E_DIFF2]->Fill( log10( iErec_lin ), iDiff * iDiff, iWeight );
 	}
 	
-// difference vs number of images
+	// difference vs number of images
 	if( E_NIMAG < f2DHisto.size() && f2DHisto[E_NIMAG] )
 	{
 		f2DHisto[E_NIMAG]->Fill( fData->NImages, iDiff, iWeight );
 	}
 	
-// difference vs core distance
+	// difference vs core distance
 	if( E_DIST < f2DHisto.size() && f2DHisto[E_DIST] )
 	{
 		f2DHisto[E_DIST]->Fill( sqrt( ( fData->MCxcore - fArrayCentre_X ) * ( fData->MCxcore - fArrayCentre_X ) +
 									  ( fData->MCycore - fArrayCentre_Y ) * ( fData->MCycore - fArrayCentre_Y ) ), iDiff, iWeight );
 	}
 	
-// error vs energy
+	// error vs energy
 	if( E_ERROR < f2DHisto.size() && f2DHisto[E_ERROR] )
 	{
 		f2DHisto[E_ERROR]->Fill( log10( iErec_lin ), iError, iWeight );
 	}
 	
-// relative error vs energy
+	// relative error vs energy
 	if( E_RELA < f2DHisto.size() && f2DHisto[E_RELA] && iErrorRelative > -98.e6 )
 	{
 		f2DHisto[E_RELA]->Fill( log10( iErec_lin ), iErrorRelative, iWeight );
@@ -443,7 +443,7 @@ void VInstrumentResponseFunctionData::fill( double iWeight )
 
 bool VInstrumentResponseFunctionData::terminate( double iContainmentProbability, double iContainmentProbabilityError )
 {
-// calculate XX% values (default is 68%)
+	// calculate XX% values (default is 68%)
 	for( unsigned int i = 0; i < f2DHisto.size(); i++ )
 	{
 		fContainmentProbability[i] = iContainmentProbability;
@@ -451,7 +451,7 @@ bool VInstrumentResponseFunctionData::terminate( double iContainmentProbability,
 		{
 			calculateResolution( f2DHisto[i], fResolutionGraph[i], f2DHisto[i]->GetName(), iContainmentProbability, iContainmentProbabilityError );
 		}
-// for relative plots get mean and spread from each bin in the histogram
+		// for relative plots get mean and spread from each bin in the histogram
 		else
 		{
 			get_Profile_from_TH2D( f2DHisto[i], fResolutionGraph[i], "meanS" );
@@ -476,22 +476,22 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
 	
 	char iname[800];
 	
-// set number of points in graph
+	// set number of points in graph
 	iResult->Set( iHistogram->GetNbinsX() );
 	
-// temporary vectors
+	// temporary vectors
 	vector< double > vEnergy;
 	vector< double > vRes;
 	vector< double > vResE;
 	
 	double i_energy = 0.;
 	
-//////////////////////////////////////////////////////////////////////////////
-// loop over all energy bins and project each bin into a TH1D
+	//////////////////////////////////////////////////////////////////////////////
+	// loop over all energy bins and project each bin into a TH1D
 	for( int i = 1; i <= iHistogram->GetNbinsX(); i++ )
 	{
 	
-// define temporary histogram and fill with projection
+		// define temporary histogram and fill with projection
 		if( iHistoName.size() > 0 )
 		{
 			sprintf( iname, "%s_%d", iHistoName.c_str(), i );
@@ -506,10 +506,10 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
 		
 		i_energy = iHistogram->GetBinCenter( i );
 		
-//////////////////////////////////////////////////////////
-// calculate containment
+		//////////////////////////////////////////////////////////
+		// calculate containment
 		double iTotSum = 0.;
-// get total number of events in histogram
+		// get total number of events in histogram
 		for( int j = 1; j <= iTemp->GetNbinsX(); j++ )
 		{
 			iTotSum += iTemp->GetBinContent( j );
@@ -524,8 +524,8 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
 				{
 					vEnergy.push_back( i_energy );
 					vRes.push_back( iTemp->GetBinCenter( j ) );
-//	       vResE.push_back( getResolutionErrorfromToyMC( iTemp->GetBinCenter( j ), iTemp->GetEntries() ) );
-// require at least 20 events to calculate a good RMS
+					//	       vResE.push_back( getResolutionErrorfromToyMC( iTemp->GetBinCenter( j ), iTemp->GetEntries() ) );
+					// require at least 20 events to calculate a good RMS
 					if( iTemp->GetEntries() > 20. )
 					{
 						vResE.push_back( iTemp->GetRMS() / sqrt( iTemp->GetEntries() ) );
@@ -548,7 +548,7 @@ TList*  VInstrumentResponseFunctionData::calculateResolution( TH2D* iHistogram, 
 		}
 	}
 	
-// fill graph
+	// fill graph
 	iResult->Set( ( int )vEnergy.size() );
 	for( unsigned i = 0; i < vEnergy.size(); i++ )
 	{
@@ -566,20 +566,20 @@ double VInstrumentResponseFunctionData::getResolutionErrorfromToyMC( double i68,
 		return 0.;
 	}
 	
-// number of times to run the experiment
+	// number of times to run the experiment
 	const int nRun = 100;
 	
-// histogram with results from each experiment
+	// histogram with results from each experiment
 	TH1D h68( "h68", "h68", 1000, 0., 1.5 );
 	
-// histogram with angular differences
+	// histogram with angular differences
 	TH1D hDiff( "hDiff", "", 1000, 0., 1.0 );
 	
-// normal distribution
+	// normal distribution
 	TF1 f( "f", "gaus(0)", 0., 5. );
 	f.SetParameter( 0, 1. );
 	f.SetParameter( 1, 0. );
-// normalized to 2D distribution, see Minuit table 7.1
+	// normalized to 2D distribution, see Minuit table 7.1
 	f.SetParameter( 2, i68 / sqrt( 2.41 ) );
 	
 	double x = 0;

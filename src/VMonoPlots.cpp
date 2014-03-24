@@ -19,7 +19,7 @@ VMonoPlots::VMonoPlots( bool ison, CData* tree, string i_hsuffix, VAnaSumRunPara
 	f_eta = 1.35;
 	f_r0  = 0.25;
 	
-//   if (tree != 0)  cout << "Telescope " << fTelID+1 << ": Found parameter tree. Histogram suffix " << i_hsuffix << endl;
+	//   if (tree != 0)  cout << "Telescope " << fTelID+1 << ": Found parameter tree. Histogram suffix " << i_hsuffix << endl;
 	if( tree == 0 )
 	{
 		cout << "VMonoPlots::VMonoPlots error: tree not found " << fTelID << endl;
@@ -103,9 +103,9 @@ VMonoPlots::VMonoPlots( bool ison, CData* tree, string i_hsuffix, VAnaSumRunPara
 	hisList->Add( hntubes );
 	hListParameterHistograms->Add( hntubes );
 	
-// 2D plots
-
-//! setup the sky map histogram
+	// 2D plots
+	
+	//! setup the sky map histogram
 	sprintf( i_key, "hmap_%s", i_hsuffix.c_str() );
 	hmap = new TH2D( i_key, "Sky Map", 50, -2.0, 2.0, 50, -2.0, 2.0 );
 	hmap->SetXTitle( "X-Position on Sky (degrees)" );
@@ -113,7 +113,7 @@ VMonoPlots::VMonoPlots( bool ison, CData* tree, string i_hsuffix, VAnaSumRunPara
 	hisList->Add( hmap );
 	hListSkyMaps->Add( hmap );
 	
-//! setup the centroid map histogram
+	//! setup the centroid map histogram
 	sprintf( i_key, "hcen_cam_%s", i_hsuffix.c_str() );
 	hcen_cam = new TH2D( i_key, "Centroid Map on Camera", 50, -2.0, 2.0, 50, -2.0, 2.0 );
 	hcen_cam->SetXTitle( "X-Position on Camera (degrees)" );
@@ -121,7 +121,7 @@ VMonoPlots::VMonoPlots( bool ison, CData* tree, string i_hsuffix, VAnaSumRunPara
 	hisList->Add( hcen_cam );
 	hListSkyMaps->Add( hcen_cam );
 	
-//! setup the derotated centroid map histogram
+	//! setup the derotated centroid map histogram
 	sprintf( i_key, "hcen_sky_%s",  i_hsuffix.c_str() );
 	hcen_sky = new TH2D( i_key, "Centroid Map on Sky", 50, -2.0, 2.0, 50, -2.0, 2.0 );
 	hcen_sky->SetXTitle( "X-Position on Sky (degrees)" );
@@ -135,18 +135,18 @@ VMonoPlots::VMonoPlots( bool ison, CData* tree, string i_hsuffix, VAnaSumRunPara
 	while( TH1* obj = ( TH1* )next() )
 	{
 		obj->Sumw2();
-// add telescope number to title
+		// add telescope number to title
 		sprintf( hname, "%s (Telescope %d)", obj->GetTitle(), fTelID + 1 );
 		obj->SetTitle( hname );
 	}
 	
-////// PRELIMINARY ////////////
-//
-//  should be a vector of VAstroSources to work with different pair offsets
-//
-//      use here always detail from first entry in fRunPar->fRunList
-
-//! define the source parameters
+	////// PRELIMINARY ////////////
+	//
+	//  should be a vector of VAstroSources to work with different pair offsets
+	//
+	//      use here always detail from first entry in fRunPar->fRunList
+	
+	//! define the source parameters
 	VTargets fTarget;
 	double i_ra = 0;
 	double i_dec = 0;
@@ -176,7 +176,7 @@ VMonoPlots::VMonoPlots( bool ison, CData* tree, string i_hsuffix, VAnaSumRunPara
 		fAstro->setTelRA_deg( i_ra + i_off );
 	}
 	
-//! define the cuts
+	//! define the cuts
 	fCuts = new VGammaHadronCuts();
 	fCuts->resetCutValues();
 }
@@ -297,14 +297,14 @@ void VMonoPlots::writeHistograms()
 
 void VMonoPlots::calcSourceLocation( double i_eta, double& i_xorig, double& i_yorig )
 {
-//! Calculate the source location using the method of Lessard et al. (Astropart. Phys, 15, 1, 2001).
-//! Asymmetry is taken into account (I think -need to check this)
+	//! Calculate the source location using the method of Lessard et al. (Astropart. Phys, 15, 1, 2001).
+	//! Asymmetry is taken into account (I think -need to check this)
 	double i_disp = 0;
 	if( fData->length[fTelID] > 0. )
 	{
 		i_disp = i_eta * ( 1. - fData->width[fTelID] / fData->length[fTelID] );
 	}
-//! first source origin
+	//! first source origin
 	double i_delta_x = i_disp * fData->cosphi[fTelID];
 	double i_delta_y = i_disp * fData->sinphi[fTelID];
 	i_xorig = fData->cen_x[fTelID] - i_delta_x;
@@ -326,20 +326,20 @@ void VMonoPlots::makeCentroidsMap()
 
 void VMonoPlots::makeTwoD_BoxSmooth()
 {
-//! Constructs a 2D skymap of reconstructed source location on the camera plane
-//! smoothed by a box (i.e accept all events within a given radius)
-//! f_r0 is the radius of the smoothing box
-
+	//! Constructs a 2D skymap of reconstructed source location on the camera plane
+	//! smoothed by a box (i.e accept all events within a given radius)
+	//! f_r0 is the radius of the smoothing box
+	
 	double i_xo, i_yo;
 	calcSourceLocation( f_eta, i_xo, i_yo );
 	
-//! Derotate the source Location
+	//! Derotate the source Location
 	double i_UTC = VSkyCoordinatesUtilities::getUTC( fData->MJD, fData->Time );
 	double i_xderot = 0.;
 	double i_yderot = 0.;
 	fAstro->derotateCoords( i_UTC, i_xo, i_yo, i_xderot, i_yderot );
 	
-//! loop over all bins and fill those within box radius
+	//! loop over all bins and fill those within box radius
 	for( Int_t i = 0; i < hmap->GetNbinsX(); i++ )
 	{
 		for( Int_t j = 0; j < hmap->GetNbinsY(); j++ )

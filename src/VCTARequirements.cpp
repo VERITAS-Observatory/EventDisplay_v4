@@ -29,11 +29,11 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 {
 	fSetOfRequirementID = iRequirementID;
 	
-////////////////////////////////////////////////////////////
-// requirements
-// from MAN-PO/121004, version 2.5, June 14, 2013
-
-// from Figure 4
+	////////////////////////////////////////////////////////////
+	// requirements
+	// from MAN-PO/121004, version 2.5, June 14, 2013
+	
+	// from Figure 4
 	fReqAngularResolution = new TGraph( 4 );
 	fReqAngularResolution->SetPoint( 0, log10( 0.03 ), 0.28 );
 	fReqAngularResolution->SetPoint( 1, log10( 0.10 ), 0.15 );
@@ -43,7 +43,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 	
 	fGoalAngularResolution = 0;
 	
-// from Figure 5
+	// from Figure 5
 	fReqEnergyResolution = new TGraph( 4 );
 	fReqEnergyResolution->SetPoint( 0, log10( 0.03 ), 0.40 );
 	fReqEnergyResolution->SetPoint( 1, log10( 0.10 ), 0.20 );
@@ -53,13 +53,13 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 	
 	fGoalEnergyResolution = 0;
 	
-////////////////////////////////////////////////////////////
-// sensitivity requirements
-
-// SOUTH 50 h
+	////////////////////////////////////////////////////////////
+	// sensitivity requirements
+	
+	// SOUTH 50 h
 	if( fSetOfRequirementID == 0 )
 	{
-// from JH (mail 2013/08/30)
+		// from JH (mail 2013/08/30)
 		fReqDifferentialSensitivity = new TGraph( 1 );
 		setGraphPlottingStyle( fReqDifferentialSensitivity, 2, 1., 20, 1., 0, 2 );
 		fGoalDifferentialSensitivity = new TGraph( 1 );
@@ -72,7 +72,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 					TMath::Power( 10., -1.9 + 0.05 * i ) ) );
 		}
 	}
-// SOUTH 5 h
+	// SOUTH 5 h
 	else if( fSetOfRequirementID == 1 )
 	{
 		fReqDifferentialSensitivity = new TGraph( 1 );
@@ -84,7 +84,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 					TMath::Power( 10., -1.9 + 0.05 * i ) ) );
 		}
 	}
-// SOUTH 0.5 h
+	// SOUTH 0.5 h
 	else if( fSetOfRequirementID == 2 )
 	{
 		fReqDifferentialSensitivity = new TGraph( 1 );
@@ -96,10 +96,10 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 					TMath::Power( 10., -1.9 + 0.05 * i ) ) );
 		}
 	}
-// NORTH 50 h
+	// NORTH 50 h
 	else if( fSetOfRequirementID == 3 )
 	{
-// from JH (mail 2013/08/30)
+		// from JH (mail 2013/08/30)
 		fReqDifferentialSensitivity = new TGraph( 1 );
 		setGraphPlottingStyle( fReqDifferentialSensitivity, 2, 1., 20, 1., 0, 2 );
 		fGoalDifferentialSensitivity = new TGraph( 1 );
@@ -112,7 +112,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 					TMath::Power( 10., -1.9 + 0.05 * i ) ) );
 		}
 	}
-// NORTH 5 h
+	// NORTH 5 h
 	else if( fSetOfRequirementID == 4 )
 	{
 		fReqDifferentialSensitivity = new TGraph( 1 );
@@ -124,7 +124,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 					TMath::Power( 10., -1.9 + 0.05 * i ) ) );
 		}
 	}
-// NORTH 0.5 h
+	// NORTH 0.5 h
 	else if( fSetOfRequirementID == 5 )
 	{
 		fReqDifferentialSensitivity = new TGraph( 1 );
@@ -142,10 +142,10 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 		return false;
 	}
 	
-////////////////////////////////////////////////////////
-// effective areas
-
-// SOUTH
+	////////////////////////////////////////////////////////
+	// effective areas
+	
+	// SOUTH
 	if( fSetOfRequirementID == 0 || fSetOfRequirementID == 1 || fSetOfRequirementID == 2 )
 	{
 		fReqEnergyRange_min = 0.02;
@@ -160,7 +160,7 @@ bool VCTARequirements::setRequirement( int iRequirementID )
 		fGoalEffectiveArea->SetPoint( 4, log10( 100.00 ), 7.0e6 );
 		setGraphPlottingStyle( fGoalEffectiveArea, 3 );
 	}
-// NORTH
+	// NORTH
 	else if( fSetOfRequirementID == 3 || fSetOfRequirementID == 4 || fSetOfRequirementID == 5 )
 	{
 		fReqEnergyRange_min = 0.02;
@@ -326,7 +326,7 @@ double VCTARequirements::getFOVRequirement( double iE_lin_TeV )
 		return 2.5;
 	}
 	
-// 0.1 - 300 TeV
-
+	// 0.1 - 300 TeV
+	
 	return 3.;
 }

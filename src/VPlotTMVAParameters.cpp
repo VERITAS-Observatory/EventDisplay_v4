@@ -28,7 +28,7 @@ void VPlotTMVAParameters::plot( bool iPrint )
 	for( unsigned int i = 0; i < hSignalEfficiency.size(); i++ )
 	{
 	
-// signal and background efficiency
+		// signal and background efficiency
 		sprintf( hname, "cTMVA_S_BC_%d", i );
 		sprintf( htitle, "signal/background efficiency distribution (energy bin %d)", i );
 		TCanvas* c = new TCanvas( hname, htitle, 100 + i * 20, 100 + i * 20, 400, 400 );
@@ -54,7 +54,7 @@ void VPlotTMVAParameters::plot( bool iPrint )
 		}
 		
 		
-// MVA cut variable
+		// MVA cut variable
 		sprintf( hname, "cTMVA_MVA_%d", i );
 		sprintf( htitle, "MVA cut variable(energy bin %d)", i );
 		TCanvas* d = new TCanvas( hname, htitle, 600 + i * 20, 100 + i * 20, 400, 400 );
@@ -115,7 +115,7 @@ void VPlotTMVAParameters::initializeWeightFiles( string iDirectory, string iTMVA
 		return;
 	}
 	
-// loop over all sub arrays, get efficiency from optimization and fill them into histograms
+	// loop over all sub arrays, get efficiency from optimization and fill them into histograms
 	char hname[2000];
 	for( unsigned int i = 0; i < fSubArrays.size(); i++ )
 	{

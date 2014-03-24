@@ -101,7 +101,7 @@ void VImageAnalyzerHistograms::terminate( TFile* outputfile )
 	}
 	TDirectory* iDir = gDirectory;
 	
-// make histo directory
+	// make histo directory
 	if( !gDirectory->FindObject( "histograms" ) )
 	{
 		gDirectory->mkdir( "histograms" )->cd();

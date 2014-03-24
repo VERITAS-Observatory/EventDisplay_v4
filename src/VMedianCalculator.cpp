@@ -36,15 +36,15 @@ void VMedianCalculator::reset()
 
 void VMedianCalculator::fill( double ivalue )
 {
-// approximation: use just first nDim_exact events
+	// approximation: use just first nDim_exact events
 	if( n_counter < nDim_exact )
 	{
 		x.push_back( ivalue );
 	}
 	
-////////////////////////////////////////////////////////////////////////////////
-// median approximation is not accurate enough
-// for larger sets: calculate average
+	////////////////////////////////////////////////////////////////////////////////
+	// median approximation is not accurate enough
+	// for larger sets: calculate average
 	/*    else if( n_counter == nDim_exact )
 	    {
 	        for( unsigned int f = 0; f < x.size(); f++ )
@@ -66,7 +66,7 @@ void VMedianCalculator::fill( double ivalue )
 	      }
 	   } */
 	
-// mean and rms
+	// mean and rms
 	mean_x  += ivalue;
 	mean_xx += ivalue * ivalue;
 	

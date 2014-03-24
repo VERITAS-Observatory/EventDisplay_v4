@@ -37,17 +37,17 @@ bool CorrectionParameters::
 doAzElCorrections( double& az_driveangle, double& el_driveangle,
 				   const double& tel_az_driveangle, bool do_corrections ) const
 {
-// In:  az_driveangle     - azimuth of source [0 to 2pi]
-//      el_driveangle     - elevation of source [0 to pi/2]
-//      tel_az_driveangle - scope azimuth drive angle [-3pi/2 to 3pi/2]
-//      do_corrections    - enable corrections
-//
-// Out: az_driveangle     - target azimuth drive angle [-3pi/2 to 3pi/2]
-//      el_driveangle     - target elevation drive angle
-//
-// Return: true -  target can be pointed at
-//         false - target cannot be pointed at due to mis-alignments
-
+	// In:  az_driveangle     - azimuth of source [0 to 2pi]
+	//      el_driveangle     - elevation of source [0 to pi/2]
+	//      tel_az_driveangle - scope azimuth drive angle [-3pi/2 to 3pi/2]
+	//      do_corrections    - enable corrections
+	//
+	// Out: az_driveangle     - target azimuth drive angle [-3pi/2 to 3pi/2]
+	//      el_driveangle     - target elevation drive angle
+	//
+	// Return: true -  target can be pointed at
+	//         false - target cannot be pointed at due to mis-alignments
+	
 #if 0
 	Debug::stream()
 			<< "DO: In "
@@ -63,40 +63,40 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 	
 	if( ( enable_offsets ) && ( do_corrections ) && ( enable_corrections ) )
 	{
-// ----------------------------------------------------------------------
-// 1: Compensate for flexure in the mount
-// ----------------------------------------------------------------------
-
-// I can see this perhaps been more appropriate as correction 4,
-// but lets see how we get on with it here. Also there is an
-// elevation effect on azimuth, and an effect /of/ azimuth on
-// both elevation and azimuth but I expect them to be small.
-
+		// ----------------------------------------------------------------------
+		// 1: Compensate for flexure in the mount
+		// ----------------------------------------------------------------------
+		
+		// I can see this perhaps been more appropriate as correction 4,
+		// but lets see how we get on with it here. Also there is an
+		// elevation effect on azimuth, and an effect /of/ azimuth on
+		// both elevation and azimuth but I expect them to be small.
+		
 		// zero at zenith
 		el = el - ( flex_el_A * cos( el ) + flex_el_B * sin( 2 * el ) );
 		
-// Transform to Cartesians for next corrections
+		// Transform to Cartesians for next corrections
 		double ud = sin( el );
 		double ns = cos( el ) * cos( az );
 		double ew = cos( el ) * sin( az );
 		
-// ----------------------------------------------------------------------
-// 2: Rotate to account for non-level AZ plane
-// ----------------------------------------------------------------------
-
+		// ----------------------------------------------------------------------
+		// 2: Rotate to account for non-level AZ plane
+		// ----------------------------------------------------------------------
+		
 		Angle::rotateCartesians( -az_ew, ew, ud );
 		Angle::rotateCartesians( -az_ns, ns, ud );
 		
-// ----------------------------------------------------------------------
-// 3: Account for focal plane mis-alignment perp to the EL drive axis
-// 4: EL drive axis mis-alignment in the UD-EW plane
-// ----------------------------------------------------------------------
-
-// I cannot think of a way of inverting 3/4 without doing it
-// iteratively in the forwards direction.
-
-// Initial guess: just do the transformations in
-// reverse.. should get us close to the correct point.
+		// ----------------------------------------------------------------------
+		// 3: Account for focal plane mis-alignment perp to the EL drive axis
+		// 4: EL drive axis mis-alignment in the UD-EW plane
+		// ----------------------------------------------------------------------
+		
+		// I cannot think of a way of inverting 3/4 without doing it
+		// iteratively in the forwards direction.
+		
+		// Initial guess: just do the transformations in
+		// reverse.. should get us close to the correct point.
 		az = atan2( ew, ns );
 		el = atan2( ud, sqrt( ns * ns + ew * ew ) );
 		
@@ -108,9 +108,9 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 		Angle::rotateCartesians( -el_udew, ew, ud );
 		Angle::rotateCartesians( az, ns, ew );
 		
-// xaz and xel are estimates of the drive az and el which would
-// give the real az and el if they were uncorrected using the
-// undoCorrections routines below
+		// xaz and xel are estimates of the drive az and el which would
+		// give the real az and el if they were uncorrected using the
+		// undoCorrections routines below
 		double xaz = atan2( ew, ns );
 		double xel = atan2( ud, sqrt( ew * ew + ns * ns ) );
 		
@@ -120,15 +120,15 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 		int i = 0;
 		do
 		{
-// ---------- This code copied from undoCorrections below -----------
+			// ---------- This code copied from undoCorrections below -----------
 			ud = 0;
 			ns = cos( fp_az );
 			ew = sin( fp_az );
 			Angle::rotateCartesians( xel, ns, ud );
 			Angle::rotateCartesians( el_udew, ew, ud );
 			Angle::rotateCartesians( xaz, ns, ew );
-// ------------------------------------------------------------------
-
+			// ------------------------------------------------------------------
+			
 			there = SphericalCoords::makeLatLongRad( atan2( ud, sqrt( ew * ew + ns * ns ) ),
 					atan2( ew, ns ) );
 					
@@ -164,11 +164,11 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 		az = xaz;
 		el = xel;
 		
-// ----------------------------------------------------------------------
-// 5: Scale for gear ratio
-// ----------------------------------------------------------------------
-
-// CW & CCW cases must be handled seperately in scaling
+		// ----------------------------------------------------------------------
+		// 5: Scale for gear ratio
+		// ----------------------------------------------------------------------
+		
+		// CW & CCW cases must be handled seperately in scaling
 		az1 = fmod( fmod( az, Angle::sc_twoPi ) + Angle::sc_twoPi, Angle::sc_twoPi );
 		az2 = az1 - Angle::sc_twoPi;
 		
@@ -182,10 +182,10 @@ doAzElCorrections( double& az_driveangle, double& el_driveangle,
 		az2 = az1 - Angle::sc_twoPi;
 	}
 	
-// --------------------------------------------------------------------------
-// 6: Subtract Offsets
-// --------------------------------------------------------------------------
-
+	// --------------------------------------------------------------------------
+	// 6: Subtract Offsets
+	// --------------------------------------------------------------------------
+	
 	if( ( enable_offsets ) && ( do_corrections ) )
 	{
 		az1 = az1 - az_offset;
@@ -263,10 +263,10 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
 			<< Angle::toDeg( az_driveangle ) << std::endl;
 #endif
 			
-// --------------------------------------------------------------------------
-// 1: Add offsets
-// --------------------------------------------------------------------------
-
+	// --------------------------------------------------------------------------
+	// 1: Add offsets
+	// --------------------------------------------------------------------------
+	
 	double az = az_driveangle + az_offset;
 	double el = el_driveangle + el_offset;
 	
@@ -283,51 +283,51 @@ undoAzElCorrections( double& az_driveangle, double& el_driveangle,
 	
 	if( enable_corrections )
 	{
-// ----------------------------------------------------------------------
-// 2: Remove gear ratio scaling
-// ----------------------------------------------------------------------
-
+		// ----------------------------------------------------------------------
+		// 2: Remove gear ratio scaling
+		// ----------------------------------------------------------------------
+		
 		az = fmod( az * az_ratio + Angle::sc_twoPi, Angle::sc_twoPi );
 		el = el * el_ratio;
 		
-// ----------------------------------------------------------------------
-// 3: EL drive axis mis-alignment in the UD-EW plane
-// 4: Focal plane mis-alignment perp to the EL drive axis
-// ----------------------------------------------------------------------
-
-// Pretend scope is at 0,0 -- find direction of the focal plane
-// mis-aligment and rotate it up to the El
+		// ----------------------------------------------------------------------
+		// 3: EL drive axis mis-alignment in the UD-EW plane
+		// 4: Focal plane mis-alignment perp to the EL drive axis
+		// ----------------------------------------------------------------------
+		
+		// Pretend scope is at 0,0 -- find direction of the focal plane
+		// mis-aligment and rotate it up to the El
 		double ud = 0;
 		double ns = cos( fp_az );
 		double ew = sin( fp_az );
 		Angle::rotateCartesians( el, ns, ud );
 		
-// Rotate coords down in the UD-EW plane.
+		// Rotate coords down in the UD-EW plane.
 		Angle::rotateCartesians( el_udew, ew, ud );
 		
-// Rotate to correct AZ.
+		// Rotate to correct AZ.
 		Angle::rotateCartesians( az, ns, ew );
 		
-// ----------------------------------------------------------------------
-// 5: Rotate to account for non-level AZ plane
-// ----------------------------------------------------------------------
-
+		// ----------------------------------------------------------------------
+		// 5: Rotate to account for non-level AZ plane
+		// ----------------------------------------------------------------------
+		
 		Angle::rotateCartesians( az_ns, ns, ud );
 		Angle::rotateCartesians( az_ew, ew, ud );
 		
-// Back to Spherical coordinates
+		// Back to Spherical coordinates
 		az = atan2( ew, ns );
 		el = atan2( ud, sqrt( ew * ew + ns * ns ) );
 		
-// ----------------------------------------------------------------------
-// 6: Compensate for flexure in the mount
-// ----------------------------------------------------------------------
-
-// I can see this perhaps been more appropriate as correction 3,
-// but lets see how we get on with it here. Also there is an
-// elevation effect on azimuth, and an effect /of/ azimuth on
-// both elevation and azimuth but I expect them to be small.
-
+		// ----------------------------------------------------------------------
+		// 6: Compensate for flexure in the mount
+		// ----------------------------------------------------------------------
+		
+		// I can see this perhaps been more appropriate as correction 3,
+		// but lets see how we get on with it here. Also there is an
+		// elevation effect on azimuth, and an effect /of/ azimuth on
+		// both elevation and azimuth but I expect them to be small.
+		
 		double real_el = el;
 		double last_el;
 		

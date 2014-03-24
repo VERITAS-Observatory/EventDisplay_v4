@@ -25,15 +25,15 @@ using namespace std;
 class VTableCalculator
 {
 	public:
-// creator: reads or writes table
-// mode can be 'r' or 'w'
+		// creator: reads or writes table
+		// mode can be 'r' or 'w'
 		VTableCalculator( int intel = 0 , bool iEnergy = false, bool iPE = false );
 		VTableCalculator( string fpara, string hname, char m, TDirectory* iDir, bool iEnergy, bool iPE = false, int iUseMedianEnergy = 1 );
 		
-// Destructor
+		// Destructor
 		~VTableCalculator() {}
 		
-// Fill Histos and Calc Mean Scaled Width
+		// Fill Histos and Calc Mean Scaled Width
 		double calc( int ntel, double* r, double* s, double* w, double* mt, double& chi2, double& dE, double* st = 0 );
 		const char* getInputTable()
 		{
@@ -87,7 +87,7 @@ class VTableCalculator
 		
 		float fMinShowerPerBin;        // minimum number per bin required (table writing)
 		
-// histogram definitions
+		// histogram definitions
 		int   NumSize;
 		float amp_offset;
 		float amp_delta;
@@ -111,7 +111,7 @@ class VTableCalculator
 		string hMedianName;
 		vector< TH2F* > hVMedian;
 		
-// histogram interpolation
+		// histogram interpolation
 		int fInterPolWidth;
 		int fInterPolIter;
 		

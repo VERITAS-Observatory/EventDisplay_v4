@@ -46,21 +46,21 @@ void VPointing::setTelPointing( int MJD, double time, bool iUseDB, bool iFillPoi
 {
 	fUseDB = iUseDB;
 	
-// update pointing
+	// update pointing
 	updatePointing( MJD, time );
 	
-// telescope elevation/azimuth calculated from VERITAS DB entries
+	// telescope elevation/azimuth calculated from VERITAS DB entries
 	if( fUseDB )
 	{
 		updatePointingfromDB( fMJD, fTime );
 	}
-// calulation from source should always be successful
+	// calulation from source should always be successful
 	else
 	{
 		fEventStatus = 1;
 	}
 	
-// now set the global elevation/azimuth to be used for the analysis
+	// now set the global elevation/azimuth to be used for the analysis
 	if( fUseDB && fPointingType > 1 )
 	{
 		fTelElevation = fTelElevationDB;
@@ -72,7 +72,7 @@ void VPointing::setTelPointing( int MJD, double time, bool iUseDB, bool iFillPoi
 		fTelAzimuth   = fTelAzimuthCalculated;
 	}
 	
-// fill pointing tree
+	// fill pointing tree
 	if( iFillPointingTree )
 	{
 		fillPointingTree();
@@ -127,19 +127,19 @@ void VPointing::getPointingFromDB( int irun, string iTCorrection, string iVPMDir
 */
 bool VPointing::updatePointingfromDB( int MJD, double iTime )
 {
-// do something if we read stuff from the db
+	// do something if we read stuff from the db
 	if( fPointingDB )
 	{
 		fPointingDB->updatePointing( MJD, iTime );
 		
-// telescope pointings
+		// telescope pointings
 		fTelAzimuthDB   = fPointingDB->getTelAzimuthDB();
 		fTelElevationDB = fPointingDB->getTelElevationDB();
 		fEventStatus    = fPointingDB->getEventStatus();
 		
 		if( fEventStatus != 3 )
 		{
-// calculate pointing error in camera coordinates (using slalib)
+			// calculate pointing error in camera coordinates (using slalib)
 			double iPx = 0.;
 			double iPy = 0.;
 			int j = 0;
@@ -148,12 +148,12 @@ bool VPointing::updatePointingfromDB( int MJD, double iTime )
 					  &iPx, &iPy, &j );
 			if( j == 0 )
 			{
-// azimuth from North to East
+				// azimuth from North to East
 				fPointingErrorX = iPx * TMath::RadToDeg();
-// evndisp camera is upside down
+				// evndisp camera is upside down
 				fPointingErrorY = iPy * TMath::RadToDeg();
 			}
-// star not on tangent plane
+			// star not on tangent plane
 			else
 			{
 				fPointingErrorX = 0.;
@@ -189,7 +189,7 @@ bool VPointing::updatePointingfromDB( int MJD, double iTime )
 */
 void VPointing::terminate( bool i_isMC )
 {
-// don't do anything for MC
+	// don't do anything for MC
 	if( i_isMC )
 	{
 		return;
@@ -216,7 +216,7 @@ void VPointing::terminate( bool i_isMC )
 		cout << "WARNING: LARGE MISMATCH BETWEEN EVENTDISPLAY AND DB POINTING DATA FOR TELESCOPE " << getTelID() + 1 << endl;
 	}
 	
-//  write results to disk
+	//  write results to disk
 	if( fPointingDB )
 	{
 		TTree* t = fPointingDB->getTreePointingDB();

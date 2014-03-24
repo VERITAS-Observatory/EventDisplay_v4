@@ -145,8 +145,8 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
 {
 	unsigned int i_oldDataSize = fData.size();
 	
-/////////////////////////////////////////////////////////////////////////
-// add a root file
+	/////////////////////////////////////////////////////////////////////////
+	// add a root file
 	if( iFile.size() > 4 && iFile.substr( iFile.size() - 4, 4 ) == "root" )
 	{
 		TFile f( iFile.c_str() );
@@ -169,7 +169,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
 				AngRes = ( TH1F* )f.Get( "AngRes" );
 			}
 			
-// add a eventdisplay style root file
+			// add a eventdisplay style root file
 			if( gE0 && gE0->GetN() > 0 )
 			{
 				cout << "Adding a eventdisplay style data set: " << iFile << endl;
@@ -187,7 +187,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
 					{
 						continue;
 					}
-// accept only 4 sigma points (preliminary)
+					// accept only 4 sigma points (preliminary)
 					if( gE0->GetErrorY( i ) > 0. && y / gE0->GetErrorY( i ) < 4. )
 					{
 						continue;
@@ -203,7 +203,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
 					fData.back()->gData->Print();
 				}
 			}
-// add a CTA production style root file
+			// add a CTA production style root file
 			else if( AngRes )
 			{
 				cout << "Adding a CTA production style data set " << iFile << endl;
@@ -219,8 +219,8 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
 						continue;
 					}
 					fData.back()->gData->SetPoint( i - 1, AngRes->GetXaxis()->GetBinCenter( i ), AngRes->GetBinContent( i ) );
-//		fData.back()->gData->SetPointEYhigh( i, AngRes->GetBinError( i ) );
-//		fData.back()->gData->SetPointEYlow( i, AngRes->GetBinError( i ) );
+					//		fData.back()->gData->SetPointEYhigh( i, AngRes->GetBinError( i ) );
+					//		fData.back()->gData->SetPointEYlow( i, AngRes->GetBinError( i ) );
 					fData.back()->gData->SetPointEYhigh( i - 1, 0. );
 					fData.back()->gData->SetPointEYlow( i - 1, 0. );
 				}
@@ -236,7 +236,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
 			}
 		}
 	}
-// assume that everything else is a text file
+	// assume that everything else is a text file
 	else
 	{
 		TGraph g( iFile.c_str() );
@@ -276,7 +276,7 @@ bool VStereoReconstruction::addDataSet( string iTitle, string iFile, double emin
 			}
 		}
 	}
-// do some automatic coloring/title, etc.
+	// do some automatic coloring/title, etc.
 	if( i_oldDataSize < fData.size() )
 	{
 		fData.back()->fTitle = iTitle;
@@ -327,7 +327,7 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
 		fData.clear();
 	}
 	
-// temporary data set
+	// temporary data set
 	string iFile;
 	string iName;
 	int     iColor;
@@ -342,7 +342,7 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
 	bool bEnergyAxis_linear_GeV = false;
 	bool bResolutionAxis_arcmin = false;
 	
-// open text file
+	// open text file
 	ifstream is;
 	is.open( ifile.c_str(), ifstream::in );
 	if( !is )
@@ -364,13 +364,13 @@ bool VStereoReconstruction::readDataSetsfromTextFile( string ifile, unsigned int
 				continue;
 			}
 			is_stream >> temp;
-// check set number
+			// check set number
 			if( ( unsigned int )( atoi( temp.c_str() ) ) != iSet )
 			{
 				continue;
 			}
 			
-// read file name
+			// read file name
 			is_stream >> iFile;
 			is_stream >> temp;
 			emin = atof( temp.c_str() );

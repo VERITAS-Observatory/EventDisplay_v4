@@ -135,8 +135,8 @@ sRunParameter getRunParameter( string ifile )
 int main( int argc, char* argv[] )
 {
 
-//////////////////////////////////////////////
-// read input parameters
+	//////////////////////////////////////////////
+	// read input parameters
 	if( argc != 5 )
 	{
 		cout << endl;
@@ -150,16 +150,16 @@ int main( int argc, char* argv[] )
 	cout << "binaryVisibility" << endl;
 	cout << "----------------" << endl;
 	cout << endl;
-// start date in MJD
+	// start date in MJD
 	double fMJDStart = atof( argv[1] );
-// stopp date in MJD
+	// stopp date in MJD
 	double fMJDStopp = atof( argv[2] );
 	if( fMJDStart >= fMJDStopp )
 	{
 		cout << "invalid MJD range " << fMJDStart << " " << fMJDStopp << endl;
 		exit( 0 );
 	}
-// binning in time
+	// binning in time
 	double fMJDInt = atof( argv[3] );
 	if( fMJDInt <= 0. )
 	{
@@ -174,7 +174,7 @@ int main( int argc, char* argv[] )
 	
 	sRunParameter fRunParameter = getRunParameter( fParaFile );
 	
-// binning and number of MJD days
+	// binning and number of MJD days
 	double fMJDBin = 1. / ( 24.*60. / fMJDInt );
 	unsigned int fMJDDays = ( unsigned int )( ( fMJDStopp - fMJDStart ) + 0.5 );
 	
@@ -189,18 +189,18 @@ int main( int argc, char* argv[] )
 	cout << "\t number of days: " << fMJDDays;
 	cout << ", binning in MJD: " << fMJDBin << endl;
 	
-///////////////////////////////////////
-// astronomical objects
-
-// sun and moon rise time
+	///////////////////////////////////////
+	// astronomical objects
+	
+	// sun and moon rise time
 	VLibNovaSunAndMoon* fSunAndMoon = new VLibNovaSunAndMoon( fRunParameter.fObservatory_longitude, fRunParameter.fObservatory_latitude );
 	
-// object
+	// object
 	VLibNovaStar* fObject = new VLibNovaStar( fRunParameter.fObject_ra, fRunParameter.fObject_dec, fRunParameter.fObservatory_longitude, fRunParameter.fObservatory_latitude );
 	
-// time and elevation
+	// time and elevation
 	int fNMJD = ( int )( ( fMJDStopp - fMJDStart ) / fMJDBin );
-// vector of length 3: no moon, illumination < 30%, illumination > 30%
+	// vector of length 3: no moon, illumination < 30%, illumination > 30%
 	vector< double > fMoonFrac_min;
 	vector< double > fMoonFrac_max;
 	fMoonFrac_min.push_back( -1. );
@@ -218,8 +218,8 @@ int main( int argc, char* argv[] )
 	vector< double > fMoonElevation;
 	vector< double > fMoonIllumination;
 	
-/////////////////////////////////////////////
-// loop over time intervall
+	/////////////////////////////////////////////
+	// loop over time intervall
 	cout << "\t number of intervalls in time: " << fNMJD << endl;
 	
 	double fMJD;
@@ -228,7 +228,7 @@ int main( int argc, char* argv[] )
 	double iObjE = 0.;
 	double iMoonF = 0.;
 	
-// total time in different phase bins
+	// total time in different phase bins
 	vector< vector< double > > fObsTimePhase;
 	for( unsigned int i = 0; i < fMoonFrac_min.size(); i++ )
 	{
@@ -237,8 +237,8 @@ int main( int argc, char* argv[] )
 	}
 	double fPhase = 0.;
 	
-///////////////////////////////////////////////////
-// loop over all time bins
+	///////////////////////////////////////////////////
+	// loop over all time bins
 	for( int i = 0; i < fNMJD; i++ )
 	{
 		fMJD = fMJDStart + fMJDBin * i;
@@ -251,8 +251,8 @@ int main( int argc, char* argv[] )
 		
 		iObjE = fObject->getElevation( fMJD );
 		
-///////////////////////////
-// orbital phase
+		///////////////////////////
+		// orbital phase
 		if( fRunParameter.fObject_t0 > 0. && fRunParameter.fObject_orbit > 0. )
 		{
 			fPhase = ( fMJD + 2400000.5 - fRunParameter.fObject_t0 ) / fRunParameter.fObject_orbit
@@ -267,10 +267,10 @@ int main( int argc, char* argv[] )
 			fPhase = 0;
 		}
 		
-///////////////////////////
-// fill object elevation
-
-// object above minimum elevation and sun below horizon
+		///////////////////////////
+		// fill object elevation
+		
+		// object above minimum elevation and sun below horizon
 		if( iObjE > fRunParameter.fObservingMinElevation && iSunE < fRunParameter.fSunMaxElevation && iMoonE < fRunParameter.fMoonMaxElevation )
 		{
 			if( fDebug )
@@ -278,12 +278,12 @@ int main( int argc, char* argv[] )
 				cout << "MDJ " << fMJD << "\t Phase " << fPhase << "\t Phase * 10 " << ( int )( fPhase * 10. ) << " Moon " << iMoonF << " " << iMoonE << endl;
 			}
 			
-// loop over all moon illuminations
+			// loop over all moon illuminations
 			for( unsigned int j = 0; j < fMoonFrac_min.size(); j++ )
 			{
 				if( iMoonF > fMoonFrac_min[j] && iMoonF < fMoonFrac_max[j] )
 				{
-// moon below horizon: this is always filled into the first bin
+					// moon below horizon: this is always filled into the first bin
 					if( iMoonE < 0. )
 					{
 						fObjMJD[0].push_back( fMJD );
@@ -300,15 +300,15 @@ int main( int argc, char* argv[] )
 			}
 		}
 		
-// fill moon elevation
+		// fill moon elevation
 		fMoonMJD.push_back( fMJD );
 		fMoonElevation.push_back( iMoonE );
 		fMoonIllumination.push_back( iMoonF );
 	}
 	
-/////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-// draw everything
+	/////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////
+	// draw everything
 	TApplication app( "app", &argc, argv );
 	gROOT->SetStyle( "Plain" );
 	
@@ -324,13 +324,13 @@ int main( int argc, char* argv[] )
 	
 	hnull->Draw();
 	
-// one graph for every moon illumation and every MJD
+	// one graph for every moon illumation and every MJD
 	vector< TGraph* > i_graph;
 	vector< vector< TGraph* > > gObject;
 	int z = 0;
 	int i_oldMJD = 0;
 	int i_newMJD = 0;
-//   for( unsigned int i = 0; i < fMoonFrac.size(); i++ )
+	//   for( unsigned int i = 0; i < fMoonFrac.size(); i++ )
 	for( unsigned int f = fMoonFrac_min.size(); f > 0; f-- )
 	{
 		unsigned int i = f - 1;
@@ -364,7 +364,7 @@ int main( int argc, char* argv[] )
 		gObject.push_back( i_graph );
 	}
 	
-// moon
+	// moon
 	i_oldMJD = 0;
 	i_newMJD = 0;
 	vector< TGraph* > gMoon;
@@ -403,7 +403,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// draw lines at different phases
+	// draw lines at different phases
 	cout << endl;
 	char hname[400];
 	if( fRunParameter.fObject_orbit > 0. && fRunParameter.fObject_t0 > 0 && fRunParameter.fObject_nphases > 0 )
@@ -444,7 +444,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// print to file
+	// print to file
 	if( fRunParameter.fObject_printname.size() > 0 )
 	{
 		sprintf( hname, "Visibility%s_MJD%d.eps", fRunParameter.fObject_printname.c_str(), ( int )fMJDStart );
@@ -452,7 +452,7 @@ int main( int argc, char* argv[] )
 		sprintf( hname, "Visibility%s_MJD%d.jpg", fRunParameter.fObject_printname.c_str(), ( int )fMJDStart );
 		cCan->Print( hname );
 	}
-// available time for observations
+	// available time for observations
 	cout << endl;
 	cout << "observability: " << endl;
 	double fMaxObs = 0.;
@@ -476,7 +476,7 @@ int main( int argc, char* argv[] )
 	{
 		cout << "\t Moon illumination [" << fMoonFrac_min[i] << "," << fMoonFrac_max[i] << "]: " << fObsTot[i] << " h" << endl;
 	}
-// plot observation time vs phase
+	// plot observation time vs phase
 	if( fRunParameter.fObject_orbit > 0. && fRunParameter.fObject_t0 > 0. )
 	{
 		TCanvas* cCObs = new TCanvas( "cObs", "observation time", 850, 10, 400, 400 );
@@ -509,7 +509,7 @@ int main( int argc, char* argv[] )
 				hObsTime.back()->Draw( "same" );
 			}
 		}
-// print results to file
+		// print results to file
 		if( fRunParameter.fObject_printname.size() > 0 )
 		{
 			sprintf( hname, "VisibilityTot%s_MJD%d.eps", fRunParameter.fObject_printname.c_str(), ( int )fMJDStart );

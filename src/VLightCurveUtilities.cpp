@@ -63,7 +63,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 {
 	resetLightCurveData();
 	
-// read in ascii file
+	// read in ascii file
 	ifstream is( iFile.c_str() );
 	if( !is )
 	{
@@ -89,11 +89,11 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		
 		istringstream is_stream( is_line );
 		
-//! no errors are catched here..
+		//! no errors are catched here..
 		is_stream >> iTemp1;     // second since fXRTMissionTimeStart or MJD (depends on fXRTTimeSettings)
 		is_stream >> iTemp2;     // error [s]
 		
-// times are given in XRT mission sec.
+		// times are given in XRT mission sec.
 		if( fXRTTimeSettings )
 		{
 			iTemp1  = fXRTMissionTimeStart + iTemp1 / ( 24.0 * 60.0 * 60.0 );
@@ -110,13 +110,13 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 		}
 		
 		fLightCurveData.push_back( new VLightCurveData() );
-// second column is observing intervall
+		// second column is observing intervall
 		if( fASCIIFormSecondColumnIsObservingInterval )
 		{
 			fLightCurveData.back()->fMJD_Data_min = iTemp1 - iTemp2;
 			fLightCurveData.back()->fMJD_Data_max = iTemp1 + iTemp2;
 		}
-// second column is MJD max
+		// second column is MJD max
 		else
 		{
 			fLightCurveData.back()->fMJD_Data_min = iTemp1;
@@ -171,7 +171,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 			fLightCurveData.back()->fFluxErrorUp   = iTemp2;
 			fLightCurveData.back()->fFluxState = iTemp4;
 		}
-// error < 0 -> upper flux limit
+		// error < 0 -> upper flux limit
 		else if( iTemp1 > 0. && iTemp2 < 0. )
 		{
 			fLightCurveData.back()->fUpperFluxLimit = iTemp1;
@@ -183,7 +183,7 @@ bool VLightCurveUtilities::readASCIIFile( string iFile, double iMJDMin, double i
 	}
 	is.close();
 	
-// update phase folding values
+	// update phase folding values
 	updatePhaseFoldingValues();
 	
 	cout << "VLightCurve::readASCIIFile() total number of light curve data: " << fLightCurveData.size() << endl;
@@ -210,18 +210,18 @@ void VLightCurveUtilities::printLightCurveLaTexTableRow( double iSigmaMinFluxLim
 			cout << setprecision( 2 ) << getPhase( fLightCurveData[i]->getMJD() ) << " & ";
 		}
 		cout << "VERITAS & ";
-// observing time in minutes
+		// observing time in minutes
 		cout << ( int )( fLightCurveData[i]->fRunTime / 60. ) << " & ";
-// mean elevation
+		// mean elevation
 		cout << setprecision( 1 ) << fixed << fLightCurveData[i]->fRunElevation << " & ";
-// on and off events
+		// on and off events
 		cout << ( int )fLightCurveData[i]->fNon  << " & ";
 		cout << ( int )fLightCurveData[i]->fNoff << " & ";
-// alpha
+		// alpha
 		cout << setprecision( 2 ) << fixed << fLightCurveData[i]->fNoffAlpha << " & ";
-// significance
+		// significance
 		cout << setprecision( 1 ) << fLightCurveData[i]->fSignificance << " & ";
-// flux (with error) or upper flux limit)
+		// flux (with error) or upper flux limit)
 		if( iSigmaMinFluxLimits != 1 )
 		{
 			cout << fixed;
@@ -307,7 +307,7 @@ void VLightCurveUtilities::printLightCurveDCF()
 
 void VLightCurveUtilities::printLightCurve( int bFullDetail )
 {
-// print light curve with many details
+	// print light curve with many details
 	if( bFullDetail )
 	{
 		for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
@@ -359,13 +359,13 @@ void VLightCurveUtilities::printLightCurve( int bFullDetail )
 			}
 		}
 	}
-// print values useful for e.g. z-correlation analysis
+	// print values useful for e.g. z-correlation analysis
 	else
 	{
 		for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
 		{
 			cout << "Light-curve point: ";
-//         cout << "  "    << fixed << setprecision( 2 ) << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
+			//         cout << "  "    << fixed << setprecision( 2 ) << fLightCurveData[i]->fMJD_min << " - " << fLightCurveData[i]->fMJD_max;
 			cout << "  "    << fixed << setprecision( 2 ) << fLightCurveData[i]->getMJD() << " +- " << fLightCurveData[i]->getMJDError();
 			if( fPhase_Period_days > 0. )
 			{
@@ -638,7 +638,7 @@ double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double i
 	double w_sum = 0.;
 	double w_F = 0.;
 	
-// fill vectors and calculate weights
+	// fill vectors and calculate weights
 	double x = 0.;
 	double y = 0.;
 	for( int i = 0; i < g->GetN(); i++ )
@@ -659,14 +659,14 @@ double VLightCurveUtilities::getVariabilityIndex( TGraphAsymmErrors* g, double i
 		}
 	}
 	
-// mean weighted flux
+	// mean weighted flux
 	double F_mean = 0.;
 	if( w_sum > 0. )
 	{
 		F_mean = w_F / w_sum;
 	}
 	
-// calculate variability index
+	// calculate variability index
 	double V = 0.;
 	for( unsigned int j = 0; j < F.size(); j++ )
 	{

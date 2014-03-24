@@ -45,7 +45,7 @@ bool VNoiseFileReader::init( VDetectorGeometry* iD, unsigned int intel, vector<i
 		return false;
 	}
 	
-// initialize grisu reader
+	// initialize grisu reader
 	if( fNoiseFileType == 0 )
 	{
 		fGrIsuReader = new VGrIsuReader( iD, intel,  fNoiseFileName, iSW, iDebug, iseed, iFADCorrect );

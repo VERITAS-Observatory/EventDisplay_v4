@@ -38,18 +38,18 @@ class VCameraRead : public VGlobalRunParameter
 		map< unsigned int, unsigned int > fTelIDGrisu;
 		unsigned int fNTel;                       //!< number of telescopes
 		string fConfigDir;                        //!< directory with geometry config files
-// telescope type
+		// telescope type
 		vector< ULong64_t > fTelType;
-// telescope positions
+		// telescope positions
 		vector< float > fTelXpos;                 //!< telescope X position in [m]
 		vector< float > fTelYpos;                 //!< telescope Y position in [m]
 		vector< float > fTelZpos;                 //!< telescope Z position in [m]
 		vector< float > fTelRad;                  //!< telescope mirror radius in [m]
-// mirror design
+		// mirror design
 		vector< float > fMirFocalLength;          //!< mirror focal length in [m]
 		vector< unsigned int > fNMirrors;         //!< number of mirros
 		vector< float > fMirrorArea;              //!< mirror area
-// camera data
+		// camera data
 		vector< string > fCameraName;             //!< camera name
 		vector< float > fCameraScaleFactor;       //!< camera stretch factor
 		vector< float > fCameraCentreOffset;      //!< camera centre offset [deg]
@@ -59,7 +59,7 @@ class VCameraRead : public VGlobalRunParameter
 		vector< unsigned int > fCNChannels;       //!< number of channels
 		vector< unsigned int > fCNSamples;        //!< number of FADC samples
 		vector< float > fSample_time_slice;       //!< length of time slice
-// 2D camera data
+		// 2D camera data
 		vector< vector<float> > fXTube;           //!< x-position of tube in [deg] (in camera coordinates)
 		vector< vector<float> > fYTube;           //!< y-position of tube in [deg] (in camera coordiantes)
 		vector< vector<float> > fRTube;           //!< tube radius in [deg]
@@ -74,18 +74,18 @@ class VCameraRead : public VGlobalRunParameter
 		vector< vector< vector<int> > > fNeighbour; //!< neighbour identifier
 		unsigned int fMaxNeighbour;               //!< maximal number of neighbours
 		vector< unsigned int > fCameraCentreTubeIndex;  //!< vector index of centre tube
-// pattern trigger
+		// pattern trigger
 		int fNPatches;                            //!< number of trigger patches
 		vector< vector<int> > fPatch;             //!< pattern trigger patches
 		
 		vector<unsigned int> fMix;                //!< pixel number in real data .cam file
 		vector<unsigned int> fXim;                //!< pixel number in real data .cam file
-// calibration data
+		// calibration data
 		double fDefPed;                           //!< default pedestal
 		int fFADCRange;                           //!< FADC range
 		vector< vector<float> > fGain;            //!< gain
 		vector< vector<float> > fTOff;            //!< toffsets
-// electronics
+		// electronics
 		bool                  fLowGainIsSet;       //!< low gain multiplier is set in cfg file
 		vector< double >      fLowGainMultiplier_Trace;  //!< low gain multiplier (usually 6.)
 		vector< unsigned int> fLowGainActivator;  //!< threshold for low gain activation (usually 255)
@@ -98,7 +98,7 @@ class VCameraRead : public VGlobalRunParameter
 		void                 resetNeighbourLists( bool bMaxN = true );
 		void                 resetTelVectors();
 		
-// coordinate transformer
+		// coordinate transformer
 		float    fCoordinateTransformerX;
 		float    fCoordinateTransformerY;
 		

@@ -34,10 +34,10 @@ VAtmosphereSoundings::VAtmosphereSoundings()
 	fDataFile = 0;
 	fDataTree = 0;
 	
-//////////////////////////////////////////////////////////////////////////////////
-// hardwired search strings for reading of sounding text files (preliminary)
+	//////////////////////////////////////////////////////////////////////////////////
+	// hardwired search strings for reading of sounding text files (preliminary)
 	fTXTSearch_DataString = "72274 TUS Tucson Observations at";
-//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
 }
 
 void VAtmosphereSoundings::setModtranHeights()
@@ -126,7 +126,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 	
 	cout << "number of files in file list: " << fListTextFile.size() << endl;
 	
-// open all files and read sounding data
+	// open all files and read sounding data
 	string iTemp;
 	for( unsigned int i = 0; i < fListTextFile.size(); i++ )
 	{
@@ -147,7 +147,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 				continue;
 			}
 			
-///////////////////////// search for a valid date
+			///////////////////////// search for a valid date
 			if( is_line.find( fTXTSearch_DataString ) < is_line.size() )
 			{
 				istringstream is_stream( is_line.substr( is_line.find( fTXTSearch_DataString ) + fTXTSearch_DataString.size(), fTXTSearch_DataString.size() ) );
@@ -161,7 +161,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 				is_stream >> iTemp;
 				int iYear = atoi( iTemp.c_str() );
 				
-// get MJD
+				// get MJD
 				double iMJD = 0;
 				int j = 0;
 				slaCldj( iYear, iMonth, iDay, &iMJD, &j );
@@ -170,13 +170,13 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 					cout << "VAtmosphereSoundings::readSoundingsFromTextFile: error: invalid data: " << is_line << endl;
 					continue;
 				}
-// preli!
+				// preli!
 				if( iHour == 0 )
 				{
 					iMJD += 0.5;
 				}
 				
-// a valid new data starts a new entry
+				// a valid new data starts a new entry
 				fData.push_back( new VAtmosphereSoundingData() );
 				fData.back()->MJD   = iMJD;
 				fData.back()->Year  = iYear;
@@ -184,8 +184,8 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 				fData.back()->Day   = iDay;
 				fData.back()->Hour  = ( double )iHour;
 				z = 0;
-///////////////////////// read a full entry
-// expect first entry 7 lines after date
+				///////////////////////// read a full entry
+				// expect first entry 7 lines after date
 				while( getline( is, is_line ) )
 				{
 					if( is_line.size() <= 0 )
@@ -272,7 +272,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						{
 							fData.back()->fRelativeHumidity.push_back( -9999. );
 						}
-// mixing ratio
+						// mixing ratio
 						iT = -9999.;
 						if( !is_stream.eof() )
 						{
@@ -286,7 +286,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						{
 							fData.back()->fMixingRatio_gkg.push_back( -9999. );
 						}
-// wind direction
+						// wind direction
 						iT = -9999.;
 						if( !is_stream.eof() )
 						{
@@ -300,7 +300,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 						{
 							fData.back()->fWindDirection_deg.push_back( -9999. );
 						}
-// wind speed
+						// wind speed
 						iT = -9999.;
 						if( !is_stream.eof() )
 						{
@@ -321,7 +321,7 @@ bool VAtmosphereSoundings::readSoundingsFromTextFile( string iFileList )
 			}
 		}
 	}
-// fill remaining fields
+	// fill remaining fields
 	fillWaterVaporDensity();
 	fillAtmosphericDensity();
 	fillAtmosphericThickness();
@@ -406,7 +406,7 @@ void VAtmosphereSoundings::fillAtmosphericPressure( VAtmosphereSoundingData* iDa
 		return;
 	}
 	
-// calculate graviational constant for the given observatory latitude and height
+	// calculate graviational constant for the given observatory latitude and height
 	double phi = fObservatoryLatitude * atan( 1. ) / 45.;
 	double g = 9.780327 * ( 1. + 0.0053024 * ( sin( phi ) * sin( phi ) ) - 0.0000058 * sin( 2.*phi ) * sin( 2.*phi ) ) - 3.086e-6 * fObservatoryHeight_km * 1.e3;
 	
@@ -448,7 +448,7 @@ void VAtmosphereSoundings::fillAtmosphericThickness( VAtmosphereSoundingData* iD
 		return;
 	}
 	
-// calculate graviational constant
+	// calculate graviational constant
 	double phi = fObservatoryLatitude * atan( 1. ) / 45.;
 	double g = 9.780327 * ( 1. + 0.0053024 * ( sin( phi ) * sin( phi ) ) - 0.0000058 * sin( 2.*phi ) * sin( 2.*phi ) ) - 3.086e-6 * fObservatoryHeight_km * 1.e3;
 	
@@ -579,7 +579,7 @@ int VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, i
 		cout << "VAtmosphereSoundings::read_MODTRAN_Atmosphere: error opening MODTRAN tp6 file" << iFile << endl;
 		return -1;
 	}
-// for now: only tp6 files can be read
+	// for now: only tp6 files can be read
 	if( iFile.find( "tp6" ) >= iFile.size() )
 	{
 		return false;
@@ -599,9 +599,9 @@ int VAtmosphereSoundings::read_MODTRAN_Atmosphere( string iFile, string iName, i
 	
 	int found_profile = 0;
 	
-//reading in tp6 file line by line
-//atmospheric profiles (incl. def. values where we didn't give anything) start with a line containing  "ATMOSPHERIC PROFILES")
-
+	//reading in tp6 file line by line
+	//atmospheric profiles (incl. def. values where we didn't give anything) start with a line containing  "ATMOSPHERIC PROFILES")
+	
 	while( getline( is, is_line ) )
 	{
 		if( is_line.length() == 0 )
@@ -775,7 +775,7 @@ void VAtmosphereSoundings::fillAtmosphericDensity( VAtmosphereSoundingData* iDat
 				relativeHumidity = iData->fRelativeHumidity[j];
 			}
 			double dewpoint    = -9999;
-// calculate dew point: if not available
+			// calculate dew point: if not available
 			if( j < iData->fDewPoint_K.size() && iData->fDewPoint_K[j] > -300. )
 			{
 				dewpoint = iData->fDewPoint_K[j];
@@ -799,12 +799,12 @@ void VAtmosphereSoundings::fillAtmosphericDensity( VAtmosphereSoundingData* iDat
 			}
 			else
 			{
-// dry air
+				// dry air
 				if( TMath::Abs( relativeHumidity ) < 1.e-2 )
 				{
 					d = ( pressure / R_d / temperature );
 				}
-// wet air
+				// wet air
 				else
 				{
 					double pressure_vapore = getAmosphericVaporPressure( dewpoint );
@@ -895,7 +895,7 @@ double VAtmosphereSoundings::getDewPoint( double T, double R, int iMethod )
 		return -9999.;
 	}
 	
-// not sure if this makes sense
+	// not sure if this makes sense
 	if( TMath::Abs( R ) < 1.e-3 )
 	{
 		return 0.;
@@ -908,7 +908,7 @@ double VAtmosphereSoundings::getDewPoint( double T, double R, int iMethod )
 		d = TMath::Power( R / 100., 1. / 8. ) * ( 112. + 0.9 * ( T - 273.15 ) ) + 0.1 * ( T - 273.15 ) - 112.;
 		d += 273.15;
 	}
-// Magnus-Tetens formula
+	// Magnus-Tetens formula
 	else if( iMethod == 1 )
 	{
 		double alpha = 17.27 * ( T - 273.15 ) / ( 237.7 + ( T - 273.15 ) ) + log( R / 1.e2 );
@@ -916,8 +916,8 @@ double VAtmosphereSoundings::getDewPoint( double T, double R, int iMethod )
 		d += 273.15;
 	}
 	else if( iMethod == 2 )
-// NOAA
-//  (http://www.srh.noaa.gov/images/epz/wxcalc/rhTdFromWetBulb.pdf)
+		// NOAA
+		//  (http://www.srh.noaa.gov/images/epz/wxcalc/rhTdFromWetBulb.pdf)
 	{
 		double es = 6.112 * TMath::Exp( 17.67 * ( T - 273.15 ) / ( T - 273.15 + 243.5 ) );
 		double e  = R / 1.e2 * es;
@@ -959,9 +959,9 @@ double VAtmosphereSoundings::getAmosphericVaporPressure( double T )
 	
 	double Es = eso / TMath::Power( p, 8. ) * 1.e2;             // vapour pressure [mb->pascal]
 	
-// alternative calculation (less accurate)
-//   double Es = 6.1078 * TMath::Power( 10., 7.5*T/(237.3+T) ) * 1.e2;
-
+	// alternative calculation (less accurate)
+	//   double Es = 6.1078 * TMath::Power( 10., 7.5*T/(237.3+T) ) * 1.e2;
+	
 	return Es;
 }
 
@@ -1157,7 +1157,7 @@ unsigned int VAtmosphereSoundings::getHistogramIdentifier( unsigned int i )
 		{
 			return checkPlottingPeriodIdentifier( i );
 		}
-// choose similar winter months
+		// choose similar winter months
 		else if( fPlottingPeriod == "winter" )
 		{
 			if( fData[i]->Month == 12 || fData[i]->Month <= 3 )
@@ -1165,7 +1165,7 @@ unsigned int VAtmosphereSoundings::getHistogramIdentifier( unsigned int i )
 				return 1;
 			}
 		}
-// choose summer months outside of monsoon season
+		// choose summer months outside of monsoon season
 		else if( fPlottingPeriod == "summer" )
 		{
 			if( fData[i]->Month == 6 || fData[i]->Month == 9 )
@@ -1222,7 +1222,7 @@ bool VAtmosphereSoundings::readPlottingPeriodsFromTextFile( string iFile )
 	fPlottingPeriodFiles.clear();
 	fPlottingPeriodDates.clear();
 	
-// get file names with run dates
+	// get file names with run dates
 	ifstream is;
 	is.open( iFile.c_str() );
 	if( !is )
@@ -1249,7 +1249,7 @@ bool VAtmosphereSoundings::readPlottingPeriodsFromTextFile( string iFile )
 	is.close();
 	cout << "reading plotting periods from " << fPlottingPeriodFiles.size() << " files " << endl;
 	
-// get run dates from different files
+	// get run dates from different files
 	map< unsigned int, string >::iterator i_iter;
 	for( i_iter = fPlottingPeriodFiles.begin(); i_iter != fPlottingPeriodFiles.end(); i_iter++ )
 	{
@@ -1312,7 +1312,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 	vector< double > iYmin;
 	vector< double > iYmax;
 	
-// temperature vs height
+	// temperature vs height
 	iXaxis.push_back( "height [km]" );
 	iYaxis.push_back( "temperature [K]" );
 	iXbin.push_back( 50 );
@@ -1327,7 +1327,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 		iYmax.back() = 360.;
 	}
 	
-// dewpoint vs height
+	// dewpoint vs height
 	iXaxis.push_back( "height [km]" );
 	iYaxis.push_back( "dewpoint [K]" );
 	iXbin.push_back( 50 );
@@ -1342,7 +1342,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 		iYmax.back() = 360.;
 	}
 	
-// pressure vs height
+	// pressure vs height
 	iXaxis.push_back( "height [km]" );
 	iYaxis.push_back( "pressure [Pa]" );
 	iXbin.push_back( 50 );
@@ -1357,7 +1357,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 		iYmax.back() = 6.;
 	}
 	
-// density vs height
+	// density vs height
 	iXaxis.push_back( "height [km]" );
 	iYaxis.push_back( "density * exp( height/7.739 km ) [g/cm2]" );
 	if( fPlotRelativePlots )
@@ -1378,7 +1378,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 		iYmax.back() = 0.0017;
 	}
 	
-// relative humidity vs height
+	// relative humidity vs height
 	iXaxis.push_back( "height [km]" );
 	iYaxis.push_back( "relative humidity [%]" );
 	if( fPlotRelativePlots )
@@ -1399,7 +1399,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 		iYmax.back() = 1.e2;
 	}
 	
-// thickness vs height
+	// thickness vs height
 	iXaxis.push_back( "height [km]" );
 	iYaxis.push_back( "atmospheric thickness [g/cm2]" );
 	if( fPlotRelativePlots )
@@ -1420,7 +1420,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 		iYmax.back() = 1.2e3;
 	}
 	
-// log density vs height
+	// log density vs height
 	iXaxis.push_back( "height [km]" );
 	iYaxis.push_back( "log(density [g/cm3])" );
 	if( fPlotRelativePlots )
@@ -1440,8 +1440,8 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 	}
 	
 	
-/////////////////////////////
-// create and fill histograms
+	/////////////////////////////
+	// create and fill histograms
 	char hname[800];
 	char htitle[800];
 	
@@ -1475,12 +1475,12 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 		hProfileAll[k]->SetMarkerStyle( 7 );
 	}
 	
-// loop over all data sets and plot them
+	// loop over all data sets and plot them
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		unsigned int iID = getHistogramIdentifier( i );
 		
-// ignore all 0 identifiers
+		// ignore all 0 identifiers
 		if( iID == 0 )
 		{
 			continue;
@@ -1525,7 +1525,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 					hMonthly[k][iID]->SetYTitle( iYaxis[k].c_str() );
 				}
 			}
-// check time range
+			// check time range
 			if( fData[i]->Year * 100 + fData[i]->Month >= ( int )( iYearStart * 100 + iMonthStart )
 					&& fData[i]->Year * 100 + fData[i]->Month <= ( int )( iYearStop * 100 + iMonthStop ) )
 			{
@@ -1697,9 +1697,9 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 			}
 		}
 	}
-/////////////////////////////////////////////////////////////////////////
-// plot everything
-
+	/////////////////////////////////////////////////////////////////////////
+	// plot everything
+	
 	TCanvas* cTemp = 0;
 	
 	if( !bSames )
@@ -1825,7 +1825,7 @@ void VAtmosphereSoundings::plotProfiles( unsigned int iYearStart, unsigned int i
 				}
 			}
 		}
-// add CORSIKA and user defined atmosphere plots
+		// add CORSIKA and user defined atmosphere plots
 		if( k == 0 )
 		{
 			plotCORSIKA_Temperature_vs_Height( cTemp );
@@ -1949,7 +1949,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 	double iYmin = 0.;
 	double iYmax = 0.;
 	
-// density vs height
+	// density vs height
 	if( iPlotID == 0 )
 	{
 		iHTitle = "CORSIKADH";
@@ -1962,7 +1962,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 			iYmin = 0.0004;
 		}
 	}
-// index of refraction vs height
+	// index of refraction vs height
 	else if( iPlotID == 1 )
 	{
 		iHTitle = "CORSIKANH";
@@ -1975,7 +1975,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 			iYmin = 0.15e-3;
 		}
 	}
-// temperature vs height
+	// temperature vs height
 	else if( iPlotID == 2 )
 	{
 		iHTitle = "CORSIKATH";
@@ -1984,7 +1984,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 		iYmin = 150;
 		iYmax = 350;
 	}
-// ozone vs height
+	// ozone vs height
 	else if( iPlotID == 3 )
 	{
 		iHTitle = "CORSIKAO3";
@@ -1993,7 +1993,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 		iYmin = 1.e-8;
 		iYmax = 1.e-1;
 	}
-// relative humidity vs height
+	// relative humidity vs height
 	else if( iPlotID == 4 )
 	{
 		iHTitle = "CORSIKAO4";
@@ -2002,7 +2002,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 		iYmin = 0.;
 		iYmax = 100.;
 	}
-// dew point vs height
+	// dew point vs height
 	else if( iPlotID == 5 )
 	{
 		iHTitle = "CORSIKAO5";
@@ -2011,7 +2011,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 		iYmin = 100.;
 		iYmax = 400.;
 	}
-// pressure vs height
+	// pressure vs height
 	else if( iPlotID == 6 )
 	{
 		iHTitle = "CORSIKAO6";
@@ -2020,7 +2020,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 		iYmin = 0.;
 		iYmax = 1.e6;
 	}
-// thickness vs height
+	// thickness vs height
 	else if( iPlotID == 7 )
 	{
 		iHTitle = "CORSIKAO7";
@@ -2031,7 +2031,7 @@ TCanvas* VAtmosphereSoundings::plotCORSIKA( TCanvas* c, int iPlotID, vector< VAt
 	}
 	
 	
-//////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////
 	bool bNewCanvas = true;
 	if( c )
 	{
@@ -2185,27 +2185,27 @@ bool VAtmosphereSoundings::add_user_Atmosphere( unsigned int iIndexCORSIKAMODTRA
 		cout << "VAtmosphereSoundings::add_user_profile: empty data set (MODTRAN): " << iIndexCORSIKAMODTRAN << endl;
 		return false;
 	}
-//////////////////////////////////////////////////////////////////////
-// create a new user profile
+	//////////////////////////////////////////////////////////////////////
+	// create a new user profile
 	fDataUserProfile.push_back( new VAtmosphereSoundingData() );
 	fDataUserProfile.back()->Name  = iName;
 	
-// use height steps from Monte Carlo
+	// use height steps from Monte Carlo
 	fDataUserProfile.back()->setdefaultvalues( fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN]->fHeight_m.size() );
 	for( unsigned int i = 0; i < fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN]->fHeight_m.size(); i++ )
 	{
 		fDataUserProfile.back()->fHeight_m[i] = fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN]->fHeight_m[i];
 	}
 	
-// pressure
+	// pressure
 	fDataUserProfile.back()->fPressure_Pa = getDataVectorForUserAtmosphere( iHeightMaxData, fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN], "pressure" );
-// temperature
+	// temperature
 	fDataUserProfile.back()->fTemperature_K = getDataVectorForUserAtmosphere( iHeightMaxData, fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN], "temperature" );
-// dew point
+	// dew point
 	fDataUserProfile.back()->fDewPoint_K = getDataVectorForUserAtmosphere( iHeightMaxData, fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN], "dewpoint" );
-// relative humidity
+	// relative humidity
 	fDataUserProfile.back()->fRelativeHumidity = getDataVectorForUserAtmosphere( iHeightMaxData, fDataCORSIKAMODTRAN[iIndexCORSIKAMODTRAN], "relhumid" );
-// dew point (from relative humidity and temperature)
+	// dew point (from relative humidity and temperature)
 	/*   for( unsigned int i = 0; i < fDataUserProfile.back()->fRelativeHumidity.size(); i++ )
 	   {
 	      if( i < fDataUserProfile.back()->fDewPoint_K.size() )
@@ -2217,9 +2217,9 @@ bool VAtmosphereSoundings::add_user_Atmosphere( unsigned int iIndexCORSIKAMODTRA
 	         fDataUserProfile.back()->fDewPoint_K.push_back( getDewPoint( fDataUserProfile.back()->fTemperature_K[i], fDataUserProfile.back()->fRelativeHumidity[i], 1 ) );
 	      }
 	   } */
-// atmospheric thickness
+	// atmospheric thickness
 	fillAtmosphericThickness( fDataUserProfile.back() );
-// atmospheric density
+	// atmospheric density
 	fillAtmosphericDensity( fDataUserProfile.back() );
 	
 	return true;
@@ -2237,10 +2237,10 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 	f.assign( iDataMonteCarlo->fHeight_m.size(), 0. );
 	n.assign( iDataMonteCarlo->fHeight_m.size(), 0. );
 	
-// km -> m
+	// km -> m
 	iHeightMaxData *= 1.e3;
 	
-// type IDs
+	// type IDs
 	unsigned int iTypeID = 0;
 	if( iType == "pressure" )
 	{
@@ -2259,13 +2259,13 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 		iTypeID = 4;
 	}
 	
-// unknown type
+	// unknown type
 	if( iTypeID == 0 )
 	{
 		return f;
 	}
 	
-// calculate height bins
+	// calculate height bins
 	vector< double > iHeight_min( iDataMonteCarlo->fHeight_m.size(), 0. );
 	vector< double > iHeight_max( iDataMonteCarlo->fHeight_m.size(), 0. );
 	
@@ -2293,28 +2293,28 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 		}
 	}
 	
-// loop over all data sets
+	// loop over all data sets
 	for( unsigned int i = 0; i < fData.size(); i++ )
 	{
 		unsigned int iID = getHistogramIdentifier( i );
 		
-// ignore all 0 identifiers
+		// ignore all 0 identifiers
 		if( iID == 0 )
 		{
 			continue;
 		}
 		
-////////////////////////////////////////////////////////////////////////
-// pressure
+		////////////////////////////////////////////////////////////////////////
+		// pressure
 		if( iTypeID == 1 )
 		{
-// loop over this data set
+			// loop over this data set
 			for( unsigned int j = 0; j < fData[i]->fPressure_Pa.size(); j++ )
 			{
 				if( fData[i]->fPressure_Pa[j] > 0. )
 				{
-// fill data value for heights < iHeightMaxData
-//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
+					// fill data value for heights < iHeightMaxData
+					//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
 					{
 						for( unsigned int k = 1; k < iDataMonteCarlo->fHeight_m.size(); k++ )
 						{
@@ -2328,17 +2328,17 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 				}
 			}
 		}
-////////////////////////////////////////////////////////////////////////
-// temperature
+		////////////////////////////////////////////////////////////////////////
+		// temperature
 		else if( iTypeID == 2 )
 		{
-// loop over this data set
+			// loop over this data set
 			for( unsigned int j = 0; j < fData[i]->fTemperature_K.size(); j++ )
 			{
 				if( fData[i]->fTemperature_K[j] > 0. )
 				{
-// fill data value for heights < iHeightMaxData
-//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
+					// fill data value for heights < iHeightMaxData
+					//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
 					{
 						for( unsigned int k = 1; k < iDataMonteCarlo->fHeight_m.size(); k++ )
 						{
@@ -2352,17 +2352,17 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 				}
 			}
 		}
-////////////////////////////////////////////////////////////////////////
-// dew point
+		////////////////////////////////////////////////////////////////////////
+		// dew point
 		else if( iTypeID == 3 )
 		{
-// loop over this data set
+			// loop over this data set
 			for( unsigned int j = 0; j < fData[i]->fDewPoint_K.size(); j++ )
 			{
 				if( fData[i]->fDewPoint_K[j] > 0. )
 				{
-// fill data value for heights < iHeightMaxData
-//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
+					// fill data value for heights < iHeightMaxData
+					//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
 					{
 						for( unsigned int k = 1; k < iDataMonteCarlo->fHeight_m.size(); k++ )
 						{
@@ -2376,17 +2376,17 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 				}
 			}
 		}
-////////////////////////////////////////////////////////////////////////
-// relative humidity
+		////////////////////////////////////////////////////////////////////////
+		// relative humidity
 		else if( iTypeID == 4 )
 		{
-// loop over this data set
+			// loop over this data set
 			for( unsigned int j = 0; j < fData[i]->fRelativeHumidity.size(); j++ )
 			{
 				if( fData[i]->fRelativeHumidity[j] >= 0. && fData[i]->fRelativeHumidity[j] <= 100. )
 				{
-// fill data value for heights < iHeightMaxData
-//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
+					// fill data value for heights < iHeightMaxData
+					//		if( fData[i]->fHeight_m[j] < iHeightMaxData )
 					{
 						for( unsigned int k = 1; k < iDataMonteCarlo->fHeight_m.size(); k++ )
 						{
@@ -2402,8 +2402,8 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 		}
 	}
 	
-////////////////////////////////////////////////////////////////////////
-// calculate mean value
+	////////////////////////////////////////////////////////////////////////
+	// calculate mean value
 	for( unsigned int i = 0; i < f.size(); i++ )
 	{
 		if( i < n.size() && n[i] > 0. )
@@ -2415,7 +2415,7 @@ vector< double > VAtmosphereSoundings::getDataVectorForUserAtmosphere( double iH
 			f[i]  = -9999;
 		}
 		
-// fill MC values for > iHeightMaxData
+		// fill MC values for > iHeightMaxData
 		if( iDataMonteCarlo->fHeight_m[i] >= iHeightMaxData )
 		{
 			if( iTypeID == 1 )
@@ -2453,21 +2453,21 @@ bool VAtmosphereSoundings::write_MODTRAN_UserProfile( unsigned int iIndexUserDat
 		return false;
 	}
 	
-////////////////////////////////////////////////////////////
-// CARD 2C:	ML, IRD1, IRD2, HMODEL
-// FORMAT (315, A20)
+	////////////////////////////////////////////////////////////
+	// CARD 2C:	ML, IRD1, IRD2, HMODEL
+	// FORMAT (315, A20)
 	printf( "%5d", ( int )fDataUserProfile[iIndexUserData]->fHeight_m.size() );
 	printf( "%5d", 0 );
 	printf( "%5d", 0 );
-//   printf( "%65s\n", iProfileName.c_str() );
+	//   printf( "%65s\n", iProfileName.c_str() );
 	cout << endl;
 	
-////////////////////////////////////////////////////////////
-// CARD 2C1: ZM, P, T, (WMOL(J), J = 1, 3), (JCHAR(J), J = 1, 14), JCHARX
-// FORMAT (F10.3, 5E10.3, 14A1, 1X, A1)
-
-////////////////////////////////////////////////////////////
-// pressure
+	////////////////////////////////////////////////////////////
+	// CARD 2C1: ZM, P, T, (WMOL(J), J = 1, 3), (JCHAR(J), J = 1, 14), JCHARX
+	// FORMAT (F10.3, 5E10.3, 14A1, 1X, A1)
+	
+	////////////////////////////////////////////////////////////
+	// pressure
 	for( unsigned int i = 0; i < fDataUserProfile[iIndexUserData]->fHeight_m.size(); i++ )
 	{
 		printf( "%10.3f", fDataUserProfile[iIndexUserData]->fHeight_m[i] / 1.e3 );
@@ -2481,12 +2481,12 @@ bool VAtmosphereSoundings::write_MODTRAN_UserProfile( unsigned int iIndexUserDat
 			printf( "%10.3f", 1.e-3 );    // MODTRAN requires pressure > 0.
 		}
 		
-////////////////////////////////////////////////////////////
-// temperature
+		////////////////////////////////////////////////////////////
+		// temperature
 		printf( "%10.3f", fDataUserProfile[iIndexUserData]->fTemperature_K[i] );
 		
-////////////////////////////////////////////////////////////
-// dew point or relative humidity
+		////////////////////////////////////////////////////////////
+		// dew point or relative humidity
 		if( iWriteDewPoint )
 		{
 			printf( "%10.3f", fDataUserProfile[iIndexUserData]->fDewPoint_K[i] );
@@ -2496,8 +2496,8 @@ bool VAtmosphereSoundings::write_MODTRAN_UserProfile( unsigned int iIndexUserDat
 			printf( "%10.3f", fDataUserProfile[iIndexUserData]->fRelativeHumidity[i] );    // relative humdity (in percent)
 		}
 		
-////////////////////////////////////////////////////////////
-// remaining values need by MODTRAN
+		////////////////////////////////////////////////////////////
+		// remaining values need by MODTRAN
 		printf( "%10.3f", 0. );
 		printf( "%10.3f", 0. );
 		if( iWriteDewPoint )
@@ -2669,7 +2669,7 @@ double VAtmosphereSoundings::getInterpolation( double h, VAtmosphereSoundingData
 		}
 	}
 	
-// interpolate
+	// interpolate
 	if( iLup > iLlo && TMath::Abs( iData->fHeight_m[iLlo] - iData->fHeight_m[iLup] ) > 1.e-2 )
 	{
 		f = yup + ( h - iData->fHeight_m[iLup] ) * ( yup - ylo ) / ( iData->fHeight_m[iLlo] - iData->fHeight_m[iLup] );

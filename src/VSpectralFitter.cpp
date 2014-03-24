@@ -45,21 +45,21 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 		fFitName = fitname;
 	}
 	
-// define fit function
+	// define fit function
 	defineFitFunction();
 	
-// gets the current default fitter
+	// gets the current default fitter
 	TVirtualFitter* fitter = TVirtualFitter::GetFitter();
 	
 	if( fSpectralFitFunction == 2 ) // i.e. for the broken power law
 	{
-// Change the tolerance of the EDM, and loosen the convergence condition, since BPL has more free parameters
+		// Change the tolerance of the EDM, and loosen the convergence condition, since BPL has more free parameters
 		fitter->SetPrecision( 1E-1 ); // Note the EDM is 0.001 * 1E-2 * (some constant), otherwise there is problem with convergence
 		cout << "Setting default tolerance EDM to ~ 1.E-4" << endl;
 		cout << "Coder's WARNING: Use this with care, and check the output of the fitter and the Error Matrix is not from MINOS" << endl;
 	}
 	
-// fit
+	// fit
 	if( fSpectralFitFunction == 2 ) // i.e. for the broken power law
 	{
 		g->Fit( fFitFunction, "0MNREV" );    // more verbose
@@ -69,7 +69,7 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
 		g->Fit( fFitFunction, "0MNER" );
 	}
 	
-// covariance matrix
+	// covariance matrix
 	if( fitter )
 	{
 		cout << "IGNORING FITTER" << endl;
@@ -125,8 +125,8 @@ bool VSpectralFitter::defineFitFunction()
 	char hname[2000];
 	string iFitName_lin = fFitName + "_lin";
 	
-/////////////////////////////////////////////////////////
-// power law
+	/////////////////////////////////////////////////////////
+	// power law
 	if( fSpectralFitFunction == 0 )
 	{
 		cout << "Fitfunction: power law" << endl;
@@ -134,12 +134,12 @@ bool VSpectralFitter::defineFitFunction()
 		fFitFunction = new TF1( fFitName.c_str(), hname, log10( fSpectralFitEnergy_min ), log10( fSpectralFitEnergy_max ) );
 		fFitFunction->SetParameter( 0, 1.e-7 );
 		fFitFunction->SetParameter( 1, -2.5 );
-// linear axis
+		// linear axis
 		sprintf( hname, "[0] * TMath::Power( x/ %f, [1] )", fSpectralFitFluxNormalisationEnergy );
 		fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
 	}
-/////////////////////////////////////////////////////////
-// power law with exponential cutoff
+	/////////////////////////////////////////////////////////
+	// power law with exponential cutoff
 	else if( fSpectralFitFunction == 1 )
 	{
 		cout << "Fitfunction: power law with exponential cutoff" << endl;
@@ -151,7 +151,7 @@ bool VSpectralFitter::defineFitFunction()
 		sprintf( hname, "[0] * TMath::Power( x  / %f, [1] ) * TMath::Exp( -1. * x / [2] )", fSpectralFitFluxNormalisationEnergy );
 		fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
 	}
-// broken power law fit
+	// broken power law fit
 	else if( fSpectralFitFunction == 2 )
 	{
 		cout << "Fitfunction: broken power law" << endl;
@@ -164,11 +164,11 @@ bool VSpectralFitter::defineFitFunction()
 		//fFitFunction->SetParLimits( 1, -10., 10. );
 		//fFitFunction->SetParLimits( 2, -10., 10. );
 		//fFitFunction->SetParLimits( 3, 0.05, 100. );
-// linear axis
+		// linear axis
 		sprintf( hname, "((x<[3]) * [0] * TMath::Power( x/ [3], [1] )) + ((x>=[3]) * [0] * TMath::Power( x/ [3], [2] ))" );
 		fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
 	}
-//curved power law fit
+	//curved power law fit
 	else if( fSpectralFitFunction == 3 )
 	{
 		cout << "curved power law fit" << endl;
@@ -184,10 +184,10 @@ bool VSpectralFitter::defineFitFunction()
 		return false;
 	}
 	
-// set all parameters for the function with linear energy axis
+	// set all parameters for the function with linear energy axis
 	updateFitFunction_lin();
 	
-// set plotting style
+	// set plotting style
 	if( fFitFunction )
 	{
 		fFitFunction->SetLineStyle( fPlottingEnergySpectrumLineStyle );
@@ -255,7 +255,7 @@ double VSpectralFitter::getIntegralFlux( double iMinEnergy_TeV, double iMaxEnerg
 		return -99999.;
 	}
 	
-// analytical calculation for power law (fSpectralFitFunction == 0)
+	// analytical calculation for power law (fSpectralFitFunction == 0)
 	/*   if( fSpectralFitFunction == 0 )
 	   {
 	       if( fFitFunction_lin->GetParameter( 1 ) != -1. )

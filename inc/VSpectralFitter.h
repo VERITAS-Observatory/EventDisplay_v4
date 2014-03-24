@@ -33,7 +33,7 @@ class VSpectralFitter : public TObject
 		double fSpectralFitEnergy_min;                   // [TeV] linear axis
 		double fSpectralFitEnergy_max;                   // [TeV] linear axis
 		
-// plotting variables
+		// plotting variables
 		int    fPlottingEnergySpectrumLineColor;
 		int    fPlottingEnergySpectrumLineStyle;
 		float  fPlottingEnergySpectrumLineWidth;

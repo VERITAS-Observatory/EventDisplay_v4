@@ -24,12 +24,12 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
 	
 		bool     fDebug;
 		
-// cuts
+		// cuts
 		bool     fMCCuts;
 		double   fArrayxyoff_MC_min;
 		double   fArrayxyoff_MC_max;
 		
-// spectral weight calculator
+		// spectral weight calculator
 		VSpectralWeight*           fSpectralWeight;                 //! backwards compatibility
 		vector< VSpectralWeight* > fVSpectralWeight;                //!
 		double   fMCEnergyRange_TeV_min;
@@ -44,12 +44,12 @@ class VEffectiveAreaCalculatorMCHistograms : public TNamed
 		
 	public:
 	
-// azimuth and spectral index bins
+		// azimuth and spectral index bins
 		vector< double > fVMinAz;
 		vector< double > fVMaxAz;
 		vector< double > fVSpectralIndex;
 		
-// MC histograms
+		// MC histograms
 		vector< vector< TH1D* > > hVEmc;                     // [spectral index][az]
 		vector< vector< TProfile* > > hVEmcSWeight;          // [spectral index][az]
 		

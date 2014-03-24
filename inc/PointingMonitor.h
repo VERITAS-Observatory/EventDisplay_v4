@@ -34,7 +34,7 @@ using namespace std;
 namespace pointingmonitor
 {
 
-/// Structure holding the calibrated LED positions and the rotation and scale of the PMTs and the sky camera
+	/// Structure holding the calibrated LED positions and the rotation and scale of the PMTs and the sky camera
 	struct CameraParameters
 	{
 		bool isValid;                        ///< True if the object contains valid parameters
@@ -57,7 +57,7 @@ namespace pointingmonitor
 	};
 	
 	
-/// Structure holding the calibration parameters
+	/// Structure holding the calibration parameters
 	struct CalibrationParameters
 	{
 		bool isValid;                        ///< True if the object contains valid parameters
@@ -90,7 +90,7 @@ namespace pointingmonitor
 	};
 	
 	
-/// Structure holding the MJD(UTC) time and the uncalibrated pointing
+	/// Structure holding the MJD(UTC) time and the uncalibrated pointing
 	struct UncalibratedPointing
 	{
 		double mjd;                          ///< Modified Julian Date
@@ -112,7 +112,7 @@ namespace pointingmonitor
 	};
 	
 	
-/// Structure holding the MJD(UTC) time and the calibrated pointing
+	/// Structure holding the MJD(UTC) time and the calibrated pointing
 	struct CalibratedPointing
 	{
 		double mjd;                          ///< Modified Julian Date

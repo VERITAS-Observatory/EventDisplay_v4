@@ -170,9 +170,9 @@ TString get_downloaded_laser_path( unsigned int RunNumber, unsigned int Date );
 //------------------------------------
 int main( int argc, char* argv[] )
 {
-//int main() {
-
-//--- indicate if the function has succeeded
+	//int main() {
+	
+	//--- indicate if the function has succeeded
 	bool_all_is_downloaded = false;
 	bool_EVNDanalysis_prepared = false;
 	bool_EVNDanalysis_done = false;
@@ -289,16 +289,16 @@ int main( int argc, char* argv[] )
 TString get_new_laser_run_list()
 {
 
-//--- Create File with the list of new laser run (to be updated in the VOFFLINE DB)
-
-//--- create the name of the file
+	//--- Create File with the list of new laser run (to be updated in the VOFFLINE DB)
+	
+	//--- create the name of the file
 	TString NEW_laser_list = "Laser_RunMaskExclMissDate_NEW_LIST_";
 	NEW_laser_list += fNOW;
-//--- create the file
+	//--- create the file
 	FILE* NEW_laser_list_File;
 	NEW_laser_list_File = fopen( NEW_laser_list.Data(), "w" );
 	
-//--- Create file for downloading the laser run
+	//--- Create file for downloading the laser run
 	TString NEW_laser_list_for_download = get_name_for_download( NEW_laser_list );
 	FILE* NEW_laser_list_File_for_download;
 	if( fdownload_new_laser_run )
@@ -306,14 +306,14 @@ TString get_new_laser_run_list()
 		NEW_laser_list_File_for_download = fopen( NEW_laser_list_for_download.Data(), "w" );
 	}
 	
-//--- get the list of all laser run from VERITAS DB
+	//--- get the list of all laser run from VERITAS DB
 	vector< unsigned int > VERITAS_DB_LaserRunNumber;
 	vector< unsigned int > VERITAS_DB_LaserConfigMask;
 	vector< unsigned int > VERITAS_DB_LaserExclTel;
 	vector< unsigned int > VERITAS_DB_LaserDate;
 	read_laserRUN_fromVERITAS_DB( VERITAS_DB_LaserRunNumber, VERITAS_DB_LaserConfigMask, VERITAS_DB_LaserExclTel, VERITAS_DB_LaserDate );
 	
-//--- get the list of laser run from VOFFSET (for a given analysis version)
+	//--- get the list of laser run from VOFFSET (for a given analysis version)
 	vector< vector < unsigned int > > VOFFLINE_DB_LaserRunNumber_Tel;
 	vector< vector < string > > VOFFLINE_DB_Laserdate_Tel;
 	vector< vector < string > > VOFFLINE_DB_Laserversion_Tel;
@@ -330,8 +330,8 @@ TString get_new_laser_run_list()
 		save_list_currently_in_DB( fNOW, VERITAS_DB_LaserRunNumber, VERITAS_DB_LaserConfigMask, VERITAS_DB_LaserExclTel, VERITAS_DB_LaserDate, VOFFLINE_DB_LaserRunNumber_Tel, VOFFLINE_DB_Laserdate_Tel, VOFFLINE_DB_Laserversion_Tel );
 	}
 	
-//--- compare the list of laser run from VERITAS DB with the one from VOFFLINE
-
+	//--- compare the list of laser run from VERITAS DB with the one from VOFFLINE
+	
 	//--- loop on the laser run in VERITAS data base
 	std::cout << "Checking wich laser/flasher run are missing from VOFFLINE DB " << std::endl;
 	for( unsigned int i_run = 0 ; i_run < VERITAS_DB_LaserRunNumber.size(); i_run++ )
@@ -864,10 +864,10 @@ void write_calib_DB( TString new_laser_run_list_name )
 void global_look_calibration( vector< unsigned int > VLaserRunNumner, vector< unsigned int > VLaserMaskListTel )
 {
 
-//........................
-//... TO DO
-//........................
-
+	//........................
+	//... TO DO
+	//........................
+	
 	return;
 }
 
@@ -884,7 +884,7 @@ bool construct_VOFFLINE_calibration_writing_file( FILE*& wDB_file )
 	
 	
 	printf( "writing ---Run %d Tel %4d \n", fcurrent_run, fcurrent_tel );
-//    fprintf(wDB_file, "--- Tel %d \n",fcurrent_tel);
+	//    fprintf(wDB_file, "--- Tel %d \n",fcurrent_tel);
 	//-- get the name of the calibration root file
 	TString file_gain_root = get_name_calib_file( fCalib_dir, "gain.root", fcurrent_tel, fcurrent_run );
 	TString file_toff_root = get_name_calib_file( fCalib_dir, "toff.root", fcurrent_tel, fcurrent_run );
@@ -949,17 +949,17 @@ int parseOptions( int argc, char* argv[] )
 		switch( c )
 		{
 			case 0:
-//                if(long_options[option_index].flag != 0)
-//                    break;
-//                printf ("option %s", long_options[option_index].name);
-//                if (optarg)
-//                    printf (" with arg %s", optarg);
+				//                if(long_options[option_index].flag != 0)
+				//                    break;
+				//                printf ("option %s", long_options[option_index].name);
+				//                if (optarg)
+				//                    printf (" with arg %s", optarg);
 				printf( "\n" );
 				break;
 			case 'h':
-// EVNDISP standard way to show the option without having to recompile the whole thing
-// should work together with a script that call the binary of this compiled file
-// the scripts has to call set observatory
+				// EVNDISP standard way to show the option without having to recompile the whole thing
+				// should work together with a script that call the binary of this compiled file
+				// the scripts has to call set observatory
 				char* ENV;
 				ENV = getenv( "OBS_EVNDISP_ANA_DIR" );
 				char readme[500];
@@ -1221,7 +1221,7 @@ bool test_gain_toff( TString file_root_name_gain, TString file_root_name_toff , 
 //---------------------------------------------------------------------------
 unsigned long Check_telmissing_from_VOFFDB( unsigned int VERITAS_DB_LaserRunNumber_i_run, unsigned int VERITAS_DB_LaserConfigMask_i_run, unsigned int VERITAS_DB_LaserExclTel_i_run, vector< vector < unsigned int > > VOFFLINE_DB_LaserRunNumber_Tel )
 {
-//    printf ("-------- %d %d %d \n",VERITAS_DB_LaserRunNumber_i_run,VERITAS_DB_LaserConfigMask_i_run, VERITAS_DB_LaserExclTel_i_run);
+	//    printf ("-------- %d %d %d \n",VERITAS_DB_LaserRunNumber_i_run,VERITAS_DB_LaserConfigMask_i_run, VERITAS_DB_LaserExclTel_i_run);
 	bitset<4> missing_tel; // with this we list the telescope missing from VOFFLINE DB
 	missing_tel.reset();
 	fcurrent_run = VERITAS_DB_LaserRunNumber_i_run;
@@ -1230,14 +1230,14 @@ unsigned long Check_telmissing_from_VOFFDB( unsigned int VERITAS_DB_LaserRunNumb
 	for( unsigned i_tel = 0; i_tel < list_of_tel.size(); i_tel++ )
 	{
 		int tel_indice = list_of_tel[i_tel] - 1;
-//	    std::cout<<"Tel  "<<list_of_tel[i_tel]<<std::endl;
+		//	    std::cout<<"Tel  "<<list_of_tel[i_tel]<<std::endl;
 		//--- loop on the run in VOFFLINE DB
 		bool run_in_voff_db = false;
 		for( unsigned int i_run_voff = 0; i_run_voff < VOFFLINE_DB_LaserRunNumber_Tel[tel_indice].size(); i_run_voff++ )
 		{
 			if( VERITAS_DB_LaserRunNumber_i_run == VOFFLINE_DB_LaserRunNumber_Tel[tel_indice][i_run_voff] )
 			{
-//		    std::cout<<"VOFFLINE == VERITAS "<<std::endl;
+				//		    std::cout<<"VOFFLINE == VERITAS "<<std::endl;
 				run_in_voff_db = true;
 				break;
 			}
@@ -1438,34 +1438,34 @@ string WriteQuery_to_getLaserRun_fromVERITAS_DB()
 	//sprintf( c_query, "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time , big_table.db_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time,Info.db_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE  grp_cmt.group_type = 'laser' AND grp_cmt.group_id = grp.group_id AND grp.run_id = Info.run_id AND (Info.run_type = 'laser' OR Info.run_type = 'flasher') ORDER BY grp_cmt.excluded_telescopes ) AS big_table GROUP BY run_id;");
 	sprintf( c_query, "SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes, big_table.data_start_time , big_table.db_start_time FROM (SELECT Info.run_id, Info.run_type, Info.config_mask,Info.data_start_time,Info.db_start_time , grp_cmt.excluded_telescopes, grp_cmt.group_type, grp_cmt.group_id FROM tblRun_Info AS Info, tblRun_Group AS grp, tblRun_GroupComment AS grp_cmt WHERE  grp_cmt.group_type = 'laser' AND grp_cmt.group_id = grp.group_id AND grp.run_id = Info.run_id AND (Info.run_type = 'laser' OR Info.run_type = 'flasher') ORDER BY grp_cmt.excluded_telescopes ) AS big_table GROUP BY run_id,excluded_telescopes ;" );
 	
-// if laser run belong to two different laser group with two different excluded_telescope, the smaller excluded_telescope is taken into account (so that the VOFFLINE DB is filled with for the maximum number of telescopes)
-//SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes big_table.data_start_time FROM
-//              (
-//               SELECT
-//                     Info.run_id,
-//                     Info.run_type,
-//                     Info.config_mask,
-//                     Info.data_start_time,
-//                     grp_cmt.excluded_telescopes,
-//                     grp_cmt.group_type,
-//                     grp_cmt.group_id
-//               FROM
-//                     tblRun_Info         AS Info,
-//                     tblRun_Group        AS grp,
-//                     tblRun_GroupComment AS grp_cmt
-//               WHERE
-//                     grp_cmt.group_type = 'laser'
-//                 AND grp_cmt.group_id = grp.group_id
-//                 AND grp.run_id = Info.run_id
-//                 AND (Info.run_type = 'laser' OR Info.run_type = 'flasher')
-//
-//               ORDER BY
-//                     grp_cmt.excluded_telescopes
-//               )
-//         AS big_table
-//
-//         GROUP BY big_table.run_id;
-
+	// if laser run belong to two different laser group with two different excluded_telescope, the smaller excluded_telescope is taken into account (so that the VOFFLINE DB is filled with for the maximum number of telescopes)
+	//SELECT big_table.run_id, big_table.config_mask, big_table.excluded_telescopes big_table.data_start_time FROM
+	//              (
+	//               SELECT
+	//                     Info.run_id,
+	//                     Info.run_type,
+	//                     Info.config_mask,
+	//                     Info.data_start_time,
+	//                     grp_cmt.excluded_telescopes,
+	//                     grp_cmt.group_type,
+	//                     grp_cmt.group_id
+	//               FROM
+	//                     tblRun_Info         AS Info,
+	//                     tblRun_Group        AS grp,
+	//                     tblRun_GroupComment AS grp_cmt
+	//               WHERE
+	//                     grp_cmt.group_type = 'laser'
+	//                 AND grp_cmt.group_id = grp.group_id
+	//                 AND grp.run_id = Info.run_id
+	//                 AND (Info.run_type = 'laser' OR Info.run_type = 'flasher')
+	//
+	//               ORDER BY
+	//                     grp_cmt.excluded_telescopes
+	//               )
+	//         AS big_table
+	//
+	//         GROUP BY big_table.run_id;
+	
 	string query = c_query;
 	return query;
 }
@@ -1503,23 +1503,23 @@ string WriteQuery_to_getLaserRun_fromVOFFLINE_DB( unsigned int Tel_num )
 	query += " ORDER BY update_time) as big_table GROUP BY big_table.run_id;";
 	
 	
-//SELECT big_table.run_id, big_table.code_version, big_table.update_time  FROM
-//             (
-//             SELECT run_id, code_version, update_time  FROM tblEventDisplay_Analysis_Calibration_Flasher
-//
-//            WHERE
-//                  telescope = %u
-//
-//                  update_time > %s
-//
-//                  code_version = %s
-//
-//            ORDER BY update_time
-//            )
-//            as big_table
-//
-//            GROUP BY big_table.run_id;
-
+	//SELECT big_table.run_id, big_table.code_version, big_table.update_time  FROM
+	//             (
+	//             SELECT run_id, code_version, update_time  FROM tblEventDisplay_Analysis_Calibration_Flasher
+	//
+	//            WHERE
+	//                  telescope = %u
+	//
+	//                  update_time > %s
+	//
+	//                  code_version = %s
+	//
+	//            ORDER BY update_time
+	//            )
+	//            as big_table
+	//
+	//            GROUP BY big_table.run_id;
+	
 	return query;
 }
 
@@ -1549,7 +1549,7 @@ int get_date_from_tblRun_Info_data_start_time( string iTemp )
 
 void Set_the_time()
 {
-//--- retrieve today's date
+	//--- retrieve today's date
 	time_t rawtime;
 	struct tm* timeinfo;
 	time( &rawtime );
@@ -1743,7 +1743,7 @@ void check_run_calib( vector< int >  ListTel , vector< int >& list_of_valid_tel,
 	fprintf( pbFile, "--- RUN %d      has %d/%d telescope(s) with valid calibration: \n", fcurrent_run, ( int ) list_of_valid_tel.size(), ( int ) ListTel.size() );
 	//  std::cout<<"--- 1 "<<std::endl;
 	fprintf( pbFile, "--- (Display: $EVNDISPSYS/scripts/VTS/VTS.EVNDISP.display %s %s ) \n", ltel_not_good.Data(), get_downloaded_laser_path( fcurrent_run, fcurrent_date ).Data() ); // bob done to be tested
-//   std::cout<<"--- 2 "<<std::endl;
+	//   std::cout<<"--- 2 "<<std::endl;
 	printf( "--- (Display: $EVNDISPSYS/scripts/VTS/VTS.EVNDISP.display %s %d ) \n", ltel_not_good.Data(), fcurrent_run );
 	// std::cout<<"--- 3 "<<std::endl;
 	
@@ -1795,15 +1795,15 @@ void check_run_calib( unsigned int RunNumber, int  mask, int excluded_tel_mask )
 TH1F* get_h_from_TTree( TFile* file_root, TString string_arbre, TString want, TString condition, TString histo_name, TString histo_bin, bool normalised )
 {
 
-//    std::cout<<"get_h_from_TTree "<<std::endl;
-
+	//    std::cout<<"get_h_from_TTree "<<std::endl;
+	
 	TTree* arbre_gain = ( TTree* ) file_root->Get( string_arbre.Data() )  ;
 	
 	// initial want, for example gain
 	want += ">>hsqrt";
 	want += histo_bin; // for exemple (500,0,10)
 	
-//    std::cout<<"want "<<want<<std::endl;
+	//    std::cout<<"want "<<want<<std::endl;
 	//   std::cout<<"condition "<<condition<<std::endl;
 	arbre_gain->Draw( want, condition, "goff" );
 	

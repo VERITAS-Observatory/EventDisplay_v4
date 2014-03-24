@@ -95,18 +95,18 @@ int main( int argc, char* argv[] )
 	cout << "replacing Xoff/Yoff by random value inside a circle of radius " << fMaxTheta << " deg" << endl;
 	cout << "replace MCxoff/MCyoff by 0,0 " << endl;
 	
-// random generator
+	// random generator
 	TRandom3* fRandom = new TRandom3( fRandomSeed );
 	
-// get list of files to change
+	// get list of files to change
 	vector< string > iFileList = getListofFiles( argv[1] );
 	string i_outputDir = argv[2];
 	
-// loop over all input files
+	// loop over all input files
 	for( unsigned int f = 0; f < iFileList.size(); f++ )
 	{
 	
-// input data file
+		// input data file
 		string iIfile = iFileList[f];
 		
 		TFile* fInput = new TFile( iIfile.c_str() );
@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
 			cout << "exit..." << endl;
 			exit( -1 );
 		}
-// input data tree
+		// input data tree
 		TTree* fInputData = ( TTree* )fInput->Get( "data" );
 		if( !fInputData )
 		{
@@ -133,7 +133,7 @@ int main( int argc, char* argv[] )
 		fInputData->SetBranchAddress( "MCyoff", &fMCYoff );
 		Int_t nentries = ( Int_t )fInputData->GetEntries();
 		
-// output data file
+		// output data file
 		string iOfile = i_outputDir + "/" + gSystem->BaseName( iFileList[f].c_str() );
 		if( iIfile == iOfile )
 		{
@@ -147,13 +147,13 @@ int main( int argc, char* argv[] )
 			exit( -1 );
 		}
 		
-// output data tree
+		// output data tree
 		TTree* fOutputData = fInputData->CloneTree( 0 );
 		
 		double i_theta = 0.;
 		double i_r = 0.;
 		
-// loop over all entries
+		// loop over all entries
 		cout << "Looping over " << nentries << " events in " << fInput->GetName() << endl;
 		for( Int_t i = 0; i < nentries; i++ )
 		{

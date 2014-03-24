@@ -49,7 +49,7 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		vector< vector< float > > v_temp_ped;
 		vector< vector< float > > v_temp_pedvar;
 		
-// timing vector
+		// timing vector
 		vector< double > fTimeVec;
 		
 		double adjustTimeSliceLength( double iLengthofTimeSlice, double iRunStartTime, double iRunStoppTime );

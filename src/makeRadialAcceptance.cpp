@@ -44,10 +44,10 @@ int main( int argc, char* argv[] )
 	cout << "determine radial acceptance from off events (after cuts)" << endl;
 	cout << endl;
 	
-// read options from command line
+	// read options from command line
 	parseOptions( argc, argv );
 	
-// read file list from run list file
+	// read file list from run list file
 	if( listfilename.size() > 0 )
 	{
 		fRunPara->loadLongFileList( listfilename, true );
@@ -70,7 +70,7 @@ int main( int argc, char* argv[] )
 		exit( -1 );
 	}
 	
-// read gamma/hadron cuts from cut file
+	// read gamma/hadron cuts from cut file
 	VGammaHadronCuts* fCuts = new VGammaHadronCuts();
 	fCuts->setNTel( ntel );
 	if( cutfilename.size() > 0 )
@@ -95,7 +95,7 @@ int main( int argc, char* argv[] )
 	
 	char ifile[1800];
 	
-// create output file
+	// create output file
 	TFile* fo = new TFile( outfile.c_str(), "RECREATE" );
 	if( fo->IsZombie() )
 	{
@@ -126,7 +126,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// az dependent measurement
+	// az dependent measurement
 	vector< VRadialAcceptance* > facc_az;
 	vector< string > fDirName;
 	vector< string > fDirTitle;
@@ -166,18 +166,18 @@ int main( int argc, char* argv[] )
 	{
 		sprintf( ifile, "%s/%d.mscw.root", datadir.c_str(), fRunPara->fRunList[i].fRunOff );
 		cout << "now chaining " << ifile << " (wobble offset " << -1.*fRunPara->fRunList[i].fWobbleNorth << ", " << fRunPara->fRunList[i].fWobbleWest << ")" << endl;
-// test if file exists
+		// test if file exists
 		TFile fTest( ifile );
 		if( fTest.IsZombie() )
 		{
 			cout << "error: file not found, " << ifile << endl;
 			exit( -1 );
 		}
-// get data tree
+		// get data tree
 		TTree* c = ( TTree* )fTest.Get( "data" );
 		CData* d = new CData( c, false, 5, true );
 		
-// Check number of telescopes in run
+		// Check number of telescopes in run
 		VEvndispRunParameter* iParV2 = ( VEvndispRunParameter* )fTest.Get( "runparameterV2" );
 		if( iParV2 )
 		{
@@ -190,9 +190,9 @@ int main( int argc, char* argv[] )
 			}
 		}
 		
-// pointer to data tree
+		// pointer to data tree
 		fCuts->setDataTree( d );
-// set gamma/hadron cuts
+		// set gamma/hadron cuts
 		fCuts->initializeCuts( fRunPara->fRunList[i].fRunOff, datadir );
 		
 		if( !d )
@@ -200,7 +200,7 @@ int main( int argc, char* argv[] )
 			cout << "makeRadialAcceptance: no data tree defined: run " << fRunPara->fRunList[i].fRunOff << endl;
 			return false;
 		}
-// data trees and cuts
+		// data trees and cuts
 		int nentries = d->fChain->GetEntries();
 		if( entries > 0 )
 		{
@@ -217,7 +217,7 @@ int main( int argc, char* argv[] )
 		int neventStats = 0;
 		int i_entries_after_cuts = 0;
 		
-// loop over all entries in data trees and fill acceptance curves
+		// loop over all entries in data trees and fill acceptance curves
 		for( int n = 0; n < nentries; n++ )
 		{
 			d->GetEntry( n );
@@ -249,8 +249,8 @@ int main( int argc, char* argv[] )
 		fTest.Close();
 	}
 	
-// write acceptance files to disk
-
+	// write acceptance files to disk
+	
 	facc->calculate2DBinNormalizationConstant() ;
 	facc->terminate( facc_dir );
 	for( unsigned int a = 0; a < facc_az_dir.size(); a++ )

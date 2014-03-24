@@ -16,26 +16,26 @@ VCameraRead::VCameraRead()
 	fDebug = false;
 	fNTel = 0;
 	fTelID = 0;
-// configuration file type
+	// configuration file type
 	fCFGtype = 0;
-// pixel type
+	// pixel type
 	fPixelType = 1;
-// maximal number of neighbours is 6 (for circular pixel type)
+	// maximal number of neighbours is 6 (for circular pixel type)
 	fMaxNeighbour = 6;
-// default directory for cfg files
+	// default directory for cfg files
 	fConfigDir = "../data/detector_geometry/";
-// default pedestal
+	// default pedestal
 	fDefPed = 20.;
 	fFADCRange = 256;
-// default number of patches
+	// default number of patches
 	fNPatches = 91;
-// default GrIsu version
+	// default GrIsu version
 	fGrIsuVersion = 500;
-// low gain multiplier
+	// low gain multiplier
 	fLowGainIsSet = false;
-// coordinate transformers
+	// coordinate transformers
 	setCoordinateTransformer( 1., 1. );
-// default source type
+	// default source type
 	fsourcetype = 3;
 }
 
@@ -53,7 +53,7 @@ bool VCameraRead::setTelID( unsigned int iTel )
 	{
 		fTelID = 0;
 		cout << " VCameraRead::setTelID() error: telescope ID out of range: requested " << iTel << ", current " << fTelID << ", ntel: " << fNTel << endl;
-//      cout << "                                setting ID to zero" << endl;
+		//      cout << "                                setting ID to zero" << endl;
 		cout << "   ...exiting" << endl;
 		exit( -1 );
 		return false;
@@ -77,7 +77,7 @@ bool VCameraRead::initialize( unsigned int iNtel, vector< string > iCamera )
 	fNTel = iNtel;
 	resetTelVectors();
 	fCameraName = iCamera;
-// get number of channels
+	// get number of channels
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		string iCameraFile = fConfigDir + iCamera[i] + ".cam";
@@ -213,7 +213,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 			is_stream >> fYTube[fTelID][i_ch];
 			is_stream >> i_char;
 			is_stream >> fRTube[fTelID][i_ch];
-// reading neighbours
+			// reading neighbours
 			is_stream >> i_char;
 			unsigned int j = 0;
 			while( !is_stream.eof() && i_char.substr( 0, 1 ) == "N" )
@@ -225,7 +225,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 				is_stream >> i_char;
 				j++;
 			}
-// maybe there is some information about triggers and dead channels
+			// maybe there is some information about triggers and dead channels
 			if( !is_stream.eof() && i_char.substr( 0, 4 ) == "TRIG" )
 			{
 				is_stream >> fTrigTube[fTelID][i_ch];
@@ -238,7 +238,7 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 					is_stream >> fAnaTube[fTelID][i_ch];
 				}
 			}
-// get convertion from MC tube numbering to real data tube numbering
+			// get convertion from MC tube numbering to real data tube numbering
 			if( !is_stream.eof() )
 			{
 				is_stream >> i_char;
@@ -254,9 +254,9 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 	
 	if( fXim.size() > 0 )
 	{
-// revert mixing vector
+		// revert mixing vector
 		unsigned int i_max = 0;
-// ?? (GM)
+		// ?? (GM)
 		for( unsigned int i = 0; i < fXim.size(); i++ ) if( fXim[i] > i_max )
 			{
 				i_max = fXim[i];
@@ -271,9 +271,9 @@ bool VCameraRead::readCameraFile( string iCameraFile )
 		{
 			fMix[fXim[i]] = i;
 		}
-// preliminary!!!
+		// preliminary!!!
 		fMix[0] = 0;
-//   for( unsigned int i = 0; i < fXim.size(); i++ ) cout << i << "\t" << fXim[i] << "\t" << fMix[i] << endl;
+		//   for( unsigned int i = 0; i < fXim.size(); i++ ) cout << i << "\t" << fXim[i] << "\t" << fMix[i] << endl;
 	}
 	
 	inFileStream.close();
@@ -316,8 +316,8 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 	
 	while( getline( inFileStream, iline ) )
 	{
-// '*' in line
-// to be more stable, allow whitespaces (' ' and '\t' ) before '*'
+		// '*' in line
+		// to be more stable, allow whitespaces (' ' and '\t' ) before '*'
 		std::size_t index = iline.find_first_not_of( " \t" );
 		if( index == string::npos )
 		{
@@ -328,9 +328,9 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			continue;    //first non-whitespace char is not '*'
 		}
 		
-//        if( iline.substr( 0, 1 ) != "*" && ) continue;
+		//        if( iline.substr( 0, 1 ) != "*" && ) continue;
 		istringstream i_stream( iline );
-// GrIsu version (4.0.0 = 400, 4.1.1 = 411)
+		// GrIsu version (4.0.0 = 400, 4.1.1 = 411)
 		if( iline.find( "VERSN" ) < iline.size() )
 		{
 			if( iline.find( "." ) < iline.size() )
@@ -348,7 +348,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			cout << endl;
 			cout << "reading detector configuration file (GrIsu version " << fGrIsuVersion << ")" << endl;
 		}
-// telescope file type
+		// telescope file type
 		if( iline.find( "CFGTYPE" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -356,7 +356,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			i_stream >> fCFGtype;
 			cout << "\t (file type " << fCFGtype << ")" << endl;
 		}
-// nubmer of telescopes
+		// nubmer of telescopes
 		if( iline.find( "NBRTL" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -372,8 +372,8 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			}
 			resetTelVectors();
 		}
-// telescope IDs
-// (used if telescope number in simulation is different then in eventdisplay or cfg file)
+		// telescope IDs
+		// (used if telescope number in simulation is different then in eventdisplay or cfg file)
 		else if( iline.find( "TELID" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -390,7 +390,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			}
 			fTelIDGrisu[i_telID] = i_telID_SIMU;
 		}
-// telescope positions
+		// telescope positions
 		else if( iline.find( "TLLOC" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -411,8 +411,8 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				cout << "VCameraRead telescope positions: " << fTelXpos[i_telID] << "\t" << fTelYpos[i_telID] << "\t" << fTelZpos[i_telID] << " (id=" << i_telID << ")" << endl;
 			}
 		}
-// FADC
-// (there is only one FADC record for all telescopes)
+		// FADC
+		// (there is only one FADC record for all telescopes)
 		else if( iline.find( "FADCS" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -421,8 +421,8 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			i_stream >> i_char;
 			i_stream >> fDefPed;
 			i_stream >> fFADCRange;
-//////////////////////////////////////////////
-// IMPORTANT: IGNORING SAMPLE SETTINGS FROM CFG FILE HERE!!!! (GM)
+			//////////////////////////////////////////////
+			// IMPORTANT: IGNORING SAMPLE SETTINGS FROM CFG FILE HERE!!!! (GM)
 			i_stream >> fCNSamples[0];
 			if( fsourcetype != 1 && fsourcetype != 5 )
 			{
@@ -432,8 +432,8 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			{
 				fCNSamples[i] = fCNSamples[0];
 			}
-//////////////////////////////////////////////
-// hi/lo gains
+			//////////////////////////////////////////////
+			// hi/lo gains
 			if( fGrIsuVersion >= 411 )
 			{
 				i_stream >> i_char;
@@ -454,7 +454,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				}
 			}
 		}
-// length of a time slice
+		// length of a time slice
 		else if( iline.find( "SIMUL" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -465,7 +465,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				fSample_time_slice[i] = fSample_time_slice[0];
 			}
 		}
-// low gain multiplier (not a grisu line)
+		// low gain multiplier (not a grisu line)
 		else if( iline.find( "LOWMULT" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -481,7 +481,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			}
 			fLowGainIsSet = true;
 		}
-// mirror design
+		// mirror design
 		else if( iline.find( "MIROR" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -501,7 +501,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				cout << "VCameraRead mirrors: " << i_telID + 1 << " " << fTelRad[i_telID] << " " << fMirFocalLength[i_telID] << endl;
 			}
 		}
-// number of pixels
+		// number of pixels
 		else if( iline.find( "CAMRA" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -525,7 +525,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 					fCNChannels[t] = fCNChannels[0];
 				}
 		}
-// camera rotation (not a original grisu line)
+		// camera rotation (not a original grisu line)
 		else if( iline.find( "CAROT" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -541,7 +541,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				fTelID = i_telID;
 			}
 		}
-// place scale change ( scale factor, offsets, camera rotation)
+		// place scale change ( scale factor, offsets, camera rotation)
 		else if( iline.find( "CAMPLATE" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -558,7 +558,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				i_stream >> fCameraRotation[i_telID];
 			}
 		}
-// tube stuff
+		// tube stuff
 		else if( iline.find( "PMPIX" ) < iline.size() )
 		{
 			if( fXTubeMM.size() == 0 )
@@ -603,7 +603,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				i_stream >> fGain[i_telID][i_chan];
 			}
 		}
-// neighbour list
+		// neighbour list
 		else if( iline.find( "NGHBR" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -636,7 +636,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 					if( !i_stream.eof() )
 					{
 						i_stream >> fNeighbour[i_telID][i_chan][j];
-// grisu starts at 1 with counting, evndisp at 0
+						// grisu starts at 1 with counting, evndisp at 0
 						fNeighbour[i_telID][i_chan][j] -= 1;
 					}
 					else
@@ -646,7 +646,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				}
 			}
 		}
-// pattern trigger
+		// pattern trigger
 		else if( iline.find( "PSTON" ) < iline.size() )
 		{
 			i_stream >> i_char;
@@ -677,7 +677,7 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 			i_stream >> i_char;
 			i_stream >> i_char;
 			fPixelType = ( unsigned int )atoi( i_char.c_str() );
-// square pixel allow 8 neighbours
+			// square pixel allow 8 neighbours
 			if( fPixelType == 3 )
 			{
 				fMaxNeighbour = 8;
@@ -704,19 +704,19 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 		fillTelescopeVectors();
 	}
 	
-// convert from mm to deg
+	// convert from mm to deg
 	convertMMtoDeg();
 	
-// stretch and move camera
+	// stretch and move camera
 	stretchAndMoveCamera();
 	
-// rotate the camera
+	// rotate the camera
 	rotateCamera();
 	
-// clean neighbour lists
+	// clean neighbour lists
 	cleanNeighbourList();
 	
-// set camera centre tube index
+	// set camera centre tube index
 	setCameraCentreTubeIndex();
 	
 	if( fDebug )
@@ -848,7 +848,7 @@ void VCameraRead::readPixelFile( string iFile )
 						if( j < fNeighbour[i_telID][i_chan].size() )
 						{
 							is_stream >> fNeighbour[i_telID][i_chan][j];
-// grisu starts at 1 with counting, evndisp at 0
+							// grisu starts at 1 with counting, evndisp at 0
 							fNeighbour[i_telID][i_chan][j] -= 1;
 						}
 						else
@@ -994,8 +994,8 @@ void VCameraRead::print( bool bDetailed )
 		cout << "Focal length: " << fMirFocalLength[i] << " [m], ";
 		cout << "FOV: " << fCameraFieldofView[i] << " [deg], ";
 		cout << "NChannel: " << fCNChannels[i];
-// number of samples are determined with the first event, possible not known yet
-//        cout << "NSamples: " << fCNSamples[i] << endl;
+		// number of samples are determined with the first event, possible not known yet
+		//        cout << "NSamples: " << fCNSamples[i] << endl;
 		if( fXTube.size() > 0 )
 		{
 			if( bDetailed )
@@ -1037,7 +1037,7 @@ void VCameraRead::convertMMtoDeg()
 	{
 		for( unsigned int j = 0; j < fXTube[i].size(); j++ )
 		{
-// transform coordinates
+			// transform coordinates
 			fXTubeMM[i][j] *= fCoordinateTransformerX;
 			fYTubeMM[i][j] *= fCoordinateTransformerY;
 			
@@ -1060,7 +1060,7 @@ void VCameraRead::stretchAndMoveCamera()
 	}
 	
 	cout << "camera plate scaled by";
-// stretch
+	// stretch
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		cout << " T" << i + 1 << ": " << fCameraScaleFactor[i];
@@ -1131,14 +1131,14 @@ void VCameraRead::resetTelVectors()
 	fCameraRotation.assign( fNTel, 0. );
 	fTelIDGrisu.clear();
 	fTelType.clear();
-//////////////////////////////////////////////////////////////////////////
-// each telescope is different
+	//////////////////////////////////////////////////////////////////////////
+	// each telescope is different
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		fTelType.push_back( i + 1 );
 	}
-// set fTelType to same value for similar telescopes
-//////////////////////////////////////////////////////////////////////////
+	// set fTelType to same value for similar telescopes
+	//////////////////////////////////////////////////////////////////////////
 	fTelXpos.assign( fNTel, 0. );
 	fTelYpos.assign( fNTel, 0. );
 	fTelZpos.assign( fNTel, 0. );
@@ -1152,8 +1152,8 @@ void VCameraRead::resetTelVectors()
 	fCameraFieldofView.assign( fNTel, 3.5 );
 	fLowGainMultiplier_Trace.assign( fNTel, 6.0 );
 	fLowGainActivator.assign( fNTel, 255 );
-// set default values for array of four telescopes
-//  later this values are overwritten by the values from the .cfg file
+	// set default values for array of four telescopes
+	//  later this values are overwritten by the values from the .cfg file
 	if( fNTel == 4 )
 	{
 		fTelXpos[0] = 0.;
@@ -1244,7 +1244,7 @@ bool VCameraRead::makeNeighbourList()
 {
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
-// check if all tubes have the same size
+		// check if all tubes have the same size
 		double i_TubeRadius_0 = 0.;
 		
 		if( getTubeRadius_MM( i ).size() > 0 )
@@ -1264,7 +1264,7 @@ bool VCameraRead::makeNeighbourList()
 		{
 			continue;
 		}
-// get minimum distance between tubes
+		// get minimum distance between tubes
 		double iTubeDistance_min = 1.e5;
 		for( unsigned int j = 0; j < getTubeRadius_MM( i ).size(); j++ )
 		{
@@ -1280,8 +1280,8 @@ bool VCameraRead::makeNeighbourList()
 		}
 		iTubeDistance_min *= 0.5;
 		
-// now find all tubes which less then 2*iTubeDistance_min*sqrt(2) away (should also work for grid)
-// ignore all channels with
+		// now find all tubes which less then 2*iTubeDistance_min*sqrt(2) away (should also work for grid)
+		// ignore all channels with
 		for( unsigned int j = 0; j < getTubeRadius_MM( i ).size(); j++ )
 		{
 			for( unsigned int k = 0; k < j; k++ )
@@ -1404,7 +1404,7 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 		return false;
 	}
 	
-// read camera rotations from DB
+	// read camera rotations from DB
 	if( iReadRotationsFromDB )
 	{
 		stringstream iTempS;
@@ -1443,7 +1443,7 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 			{
 				itelID = atoi( db_row->GetField( 0 ) );
 			}
-// check entry version
+			// check entry version
 			if( itelID >= 0 && itelID < ( int )iVersion.size() )
 			{
 				if( db_row->GetField( 1 ) && atoi( db_row->GetField( 1 ) ) > iVersion[itelID] )
@@ -1460,7 +1460,7 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 				}
 			}
 		}
-//       i_DB->Close();
+		//       i_DB->Close();
 	}
 	
 	cout << "\t (rotations from DB [deg]: ";
@@ -1470,7 +1470,7 @@ bool VCameraRead::readDetectorGeometryFromDB( string iDBStartTime, bool iReadRot
 	}
 	cout << ")" << endl;
 	
-// rotate the camera
+	// rotate the camera
 	rotateCamera();
 	if( fDebug )
 	{

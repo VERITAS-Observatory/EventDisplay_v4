@@ -37,7 +37,7 @@ void VInstrumentResponseFunction::setRunParameter( VInstrumentResponseFunctionRu
 	
 	fVMinAz = iRunPara->fAzMin;
 	fVMaxAz = iRunPara->fAzMax;
-// preli: use only first spectral index bin
+	// preli: use only first spectral index bin
 	if( iRunPara->fSpectralIndex.size() > 0 )
 	{
 		fVSpectralIndex.clear();
@@ -94,8 +94,8 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 		fIRFData.push_back( i_irf );
 	}
 	
-// output tree
-
+	// output tree
+	
 	fIRFData_Tree = new VInstrumentResponseFunctionData();
 	
 	sprintf( hname, "t_%s", fName.c_str() );
@@ -107,24 +107,24 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 
 bool VInstrumentResponseFunction::fill()
 {
-// data is needed
+	// data is needed
 	if( !fData )
 	{
 		return false;
 	}
-// cut are needed
+	// cut are needed
 	if( !fAnaCuts )
 	{
 		return false;
 	}
 	
-// spectral weight
+	// spectral weight
 	double i_weight = 1.;
-// MC energy (log10)
-
-///////////////////////////////////
-// get full data set
-///////////////////////////////////
+	// MC energy (log10)
+	
+	///////////////////////////////////
+	// get full data set
+	///////////////////////////////////
 	Long64_t d_nentries = fData->fChain->GetEntries();
 	cout << "VInstrumentResponseFunction " << fName << " (" << fType << "): total number of data events: " << d_nentries << endl;
 	for( Long64_t i = 0; i < d_nentries; i++ )
@@ -133,49 +133,49 @@ bool VInstrumentResponseFunction::fill()
 		
 		fAnaCuts->newEvent( false );
 		
-// apply MC cuts
+		// apply MC cuts
 		if( !fAnaCuts->applyMCXYoffCut( fData->MCxoff, fData->MCyoff, true ) )
 		{
 			continue;
 		}
 		
-////////////////////////////////
-// apply general quality and gamma/hadron separation cuts
-// apply fiducial area cuts
+		////////////////////////////////
+		// apply general quality and gamma/hadron separation cuts
+		// apply fiducial area cuts
 		if( !fAnaCuts->applyInsideFiducialAreaCut( true ) )
 		{
 			continue;
 		}
 		
-// apply reconstruction quality cuts
+		// apply reconstruction quality cuts
 		if( !fAnaCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, true, i , true ) )
 		{
 			continue;
 		}
 		
-// apply telescope type cut
-//	 if( fAnaCuts->applyTelTypeTest( true ) ) continue;
-
-// apply gamma/hadron cuts
+		// apply telescope type cut
+		//	 if( fAnaCuts->applyTelTypeTest( true ) ) continue;
+		
+		// apply gamma/hadron cuts
 		if( !fAnaCuts->isGamma( i, true ) )
 		{
 			continue;
 		}
 		
-//////////////////////////////////////
-// loop over all az bins
+		//////////////////////////////////////
+		// loop over all az bins
 		for( unsigned int i_az = 0; i_az < fVMinAz.size(); i_az++ )
 		{
 		
-// check which azimuth bin we are
+			// check which azimuth bin we are
 			if( fData->MCze > 3. )
 			{
-// confine MC az to -180., 180.
+				// confine MC az to -180., 180.
 				if( fData->MCaz > 180. )
 				{
 					fData->MCaz -= 360.;
 				}
-// expect bin like [135,-135]
+				// expect bin like [135,-135]
 				if( fVMinAz[i_az] > fVMaxAz[i_az] )
 				{
 					if( fData->MCaz < fVMinAz[i_az] && fData->MCaz > fVMaxAz[i_az] )
@@ -183,7 +183,7 @@ bool VInstrumentResponseFunction::fill()
 						continue;
 					}
 				}
-// expect bin like [-135,-45.]
+				// expect bin like [-135,-45.]
 				else
 				{
 					if( fData->MCaz < fVMinAz[i_az] || fData->MCaz > fVMaxAz[i_az] )
@@ -192,10 +192,10 @@ bool VInstrumentResponseFunction::fill()
 					}
 				}
 			}
-// loop over all spectral index
+			// loop over all spectral index
 			for( unsigned int s = 0; s < fVSpectralIndex.size(); s++ )
 			{
-// weight by spectral index
+				// weight by spectral index
 				if( fSpectralWeight )
 				{
 					fSpectralWeight->setSpectralIndex( fVSpectralIndex[s] );
@@ -206,7 +206,7 @@ bool VInstrumentResponseFunction::fill()
 					i_weight = 0.;
 				}
 				
-// fill histograms
+				// fill histograms
 				if( s < fIRFData.size() && i_az < fIRFData[s].size() )
 				{
 					if( fIRFData[s][i_az] )
@@ -217,9 +217,9 @@ bool VInstrumentResponseFunction::fill()
 			}
 		}
 	}
-//    fAnaCuts->printCutStatistics();
-
-// fill resolution graphs
+	//    fAnaCuts->printCutStatistics();
+	
+	// fill resolution graphs
 	cout << "VInstrumentResponseFunction::terminate ";
 	cout << " (integration probability: " << fContainmentProbability << ")" << endl;
 	for( unsigned int i = 0; i < fIRFData.size(); i++ )
@@ -233,7 +233,7 @@ bool VInstrumentResponseFunction::fill()
 		}
 	}
 	
-// fill data product tree
+	// fill data product tree
 	cout << "VInstrumentResponseFunction:: fill data tree ";
 	if( fIRFData.size() > 0 )
 	{

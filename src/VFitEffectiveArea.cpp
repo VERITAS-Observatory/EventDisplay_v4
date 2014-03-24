@@ -21,13 +21,13 @@ VFitEffectiveArea::VFitEffectiveArea( string ifile )
 	
 	fCanvasMaximum = 1.e5;
 	
-// his list for output tree
+	// his list for output tree
 	hList = new TList();
 	
-// fit function (on log Aeff scale)
+	// fit function (on log Aeff scale)
 	fEff = new TF1( "fEffLog", fun_eff, -1.5, 2.0, 7 );
 	fEff->SetLineColor( 2 );
-// fit function (on lin Aeff scale)
+	// fit function (on lin Aeff scale)
 	fEffLin = new TF1( "fEffLin", fun_effLin, -1.5, 2.0, 7 );
 	fEffLin->SetLineColor( 2 );
 	hList->Add( fEffLin );
@@ -164,12 +164,12 @@ void VFitEffectiveArea::resetFitParameters()
 		return;
 	}
 	
-// set start parameters for fit
+	// set start parameters for fit
 	fEff->SetParameter( 0, 3.5e4 );
 	fEff->SetParameter( 1, 25. );
-// for two telescopes and Arec
-//       fEff->SetParLimits( 1, 15.0, 50.5 );
-//       fEff->SetParLimits( 1, 8.0, 50.5 );
+	// for two telescopes and Arec
+	//       fEff->SetParLimits( 1, 15.0, 50.5 );
+	//       fEff->SetParLimits( 1, 8.0, 50.5 );
 	fEff->SetParLimits( 1, 5.0, 50.5 );
 	fEff->SetParameter( 2, 1.2 );
 	fEff->SetParLimits( 2, 0.01, 2.0 );
@@ -177,11 +177,11 @@ void VFitEffectiveArea::resetFitParameters()
 	fEff->SetParameter( 4, 1.361931e+05 );
 	fEff->SetParameter( 5, -6.917310e+04 );
 	fEff->SetParameter( 6, 0.4 );
-// often the fit reaches that limit, but making it smaller worsens the fit
-//       fEff->SetParLimits( 6, -0.2, 0.7 );
-// for two telescopes and Arec
-//       fEff->SetParLimits( 6, -0.7, 0.6+i*0.1 );
-// for three telescopes and Arec
+	// often the fit reaches that limit, but making it smaller worsens the fit
+	//       fEff->SetParLimits( 6, -0.2, 0.7 );
+	// for two telescopes and Arec
+	//       fEff->SetParLimits( 6, -0.7, 0.6+i*0.1 );
+	// for three telescopes and Arec
 	fEff->SetParLimits( 6, -0.7, 0. );
 	
 	setLinearFitParameters();
@@ -196,7 +196,7 @@ void VFitEffectiveArea::setLinearFitParameters()
 		return;
 	}
 	
-// set parameters for linear Aeff axis
+	// set parameters for linear Aeff axis
 	fEffLin->SetParameter( 0, fEff->GetParameter( 0 ) );
 	fEffLin->SetParameter( 1, fEff->GetParameter( 1 ) );
 	fEffLin->SetParameter( 2, fEff->GetParameter( 2 ) );
@@ -304,16 +304,16 @@ double fun_eff( double* e, double* p )
 	
 	double f = 0.;
 	
-// combined power law at low energies
+	// combined power law at low energies
 	if( x < p[6] )
 	{
 		f = p[0] * TMath::Power( 10, ( x - p[3] ) * p[1] ) / ( 1 + TMath::Power( 10, ( x - p[3] ) * ( p[1] - p[2] ) ) );
 	}
 	else
 	{
-// polinominal at high energies
-
-// match derivatives at x = p[6]
+		// polinominal at high energies
+		
+		// match derivatives at x = p[6]
 		double d  = ( 1 + TMath::Power( 10, ( p[6] - p[3] ) * ( p[1] - p[2] ) ) );
 		d *= d;
 		if( d != 0. )
@@ -338,7 +338,7 @@ double fun_eff( double* e, double* p )
 			d = 1.;
 		}
 		
-// match function values at x = p[6]
+		// match function values at x = p[6]
 		double c = p[0] * TMath::Power( 10, ( p[6] - p[3] ) * p[1] ) / ( 1 + TMath::Power( 10, ( p[6] - p[3] ) * ( p[1] - p[2] ) ) );
 		f2 = p[6] * d + p[6] * p[6] * p[4] + p[6] * p[6] * p[6] * p[5];
 		if( f2 != 0. )
@@ -350,7 +350,7 @@ double fun_eff( double* e, double* p )
 			c = 1.;
 		}
 		
-// calculate polynominal
+		// calculate polynominal
 		f = c + x * d + x * x * p[4] + x * x * x * p[5];
 	}
 	if( f > 0. )
@@ -362,7 +362,7 @@ double fun_eff( double* e, double* p )
 		return 0.;
 	}
 	
-// should never arrive here
+	// should never arrive here
 	return f;
 }
 

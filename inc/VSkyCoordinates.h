@@ -42,7 +42,7 @@ class VSkyCoordinates
 		double fWobbleNorth;                      //!< [deg] wobble offset north
 		double fWobbleEast;                       //!< [deg] wobble offset east
 		
-// telescope orientation
+		// telescope orientation
 		double fTelAzimuth;                       //!< [deg]  return value to be used in the analysis
 		double fTelElevation;                     //!< [deg]  return value to be used in the analysis
 		float  fTelAzimuthCalculated;             //!< [deg]  elevation from source coordinates

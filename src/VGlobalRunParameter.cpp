@@ -7,12 +7,12 @@
 
 VGlobalRunParameter::VGlobalRunParameter( bool bSetGlobalParameter )
 {
-// read global parameters
+	// read global parameters
 	if( bSetGlobalParameter )
 	{
 		if( !bReadRunParameter )
 		{
-// set directories
+			// set directories
 			setDirectories();
 			if( !readRunparameterFile( getDirectory_EVNDISPParameterFiles() + "EVNDISP.global.runparameter" ) )
 			{
@@ -72,7 +72,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 			{
 				continue;
 			}
-// print runparameter to stdout
+			// print runparameter to stdout
 			if( !is_stream.eof() )
 			{
 				is_stream >> temp;
@@ -98,7 +98,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 				else if( temp == "DBSERVER" )
 				{
 					fDBServer = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
-// remove all white spaces
+					// remove all white spaces
 					string iTT;
 					for( unsigned int i = 0; i < fDBServer.length(); i++ )
 					{
@@ -112,7 +112,7 @@ bool VGlobalRunParameter::readRunparameterFile( string i_filename )
 				else if( temp == "VTSRAWDATA" )
 				{
 					fRawDataServer  = is_stream.str().substr( is_stream.tellg(), is_stream.str().size() );
-// remove all white spaces
+					// remove all white spaces
 					string iTT;
 					for( unsigned int i = 0; i < fRawDataServer.length(); i++ )
 					{
@@ -166,14 +166,14 @@ bool VGlobalRunParameter::setDirectory_EVNDISPCalibrationData( string iDir )
 
 bool VGlobalRunParameter::setDirectories()
 {
-//////////////////////////////////////////////////////////////////////
-// get directories with all analysis data
+	//////////////////////////////////////////////////////////////////////
+	// get directories with all analysis data
 	string data_dir = "";
 	if( gSystem->Getenv( "OBS_EVNDISP_ANA_DIR" ) )
 	{
 		data_dir = gSystem->Getenv( "OBS_EVNDISP_ANA_DIR" );
 	}
-// assume that by default a VERITAS analysis is requested
+	// assume that by default a VERITAS analysis is requested
 	else if( gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
 	{
 		data_dir = gSystem->Getenv( "VERITAS_EVNDISP_AUX_DIR" );
@@ -187,7 +187,7 @@ bool VGlobalRunParameter::setDirectories()
 		fEVNDISPAnaDataDirectory = data_dir;
 		fEVNDISPAnaDataDirectory += "/";
 	}
-// test if directory exists
+	// test if directory exists
 	if( gSystem->AccessPathName( fEVNDISPAnaDataDirectory.c_str() ) )
 	{
 		cout << "VGlobalRunParameter::setDirectories(): cannot find directory with EVNDISP analysis data" << endl;
@@ -197,28 +197,28 @@ bool VGlobalRunParameter::setDirectories()
 		cout << "exiting..." << endl;
 		exit( -1 );
 	}
-// by default: calibration directory = fEVNDISPAnaDataDirectory
+	// by default: calibration directory = fEVNDISPAnaDataDirectory
 	if( fEVNDISPCalibrationDataDirectory.size() == 0 )
 	{
 		fEVNDISPCalibrationDataDirectory = fEVNDISPAnaDataDirectory;
 	}
-//////////////////////////////////////////////////////////////////////
-// raw data is expected to be here
+	//////////////////////////////////////////////////////////////////////
+	// raw data is expected to be here
 	const char* raw_dir = gSystem->Getenv( "VERITAS_DATA_DIR" );
 	if( raw_dir )
 	{
 		fVBFRawDataDirectory = raw_dir;
-// test if data directory exists
-//       if( !gSystem->AccessPathName( (fVBFRawDataDirectory + "/data/").c_str() ) ) fVBFRawDataDirectory += "/data/";
-
+		// test if data directory exists
+		//       if( !gSystem->AccessPathName( (fVBFRawDataDirectory + "/data/").c_str() ) ) fVBFRawDataDirectory += "/data/";
+		
 	}
 	else
 	{
 		fVBFRawDataDirectory = "./data/";
 	}
 	
-//////////////////////////////////////////////////////////////////////
-// output is written to this directory (unless stated otherwise on command line)
+	//////////////////////////////////////////////////////////////////////
+	// output is written to this directory (unless stated otherwise on command line)
 	const char* cal_out = gSystem->Getenv( "OBS_USER_DATA_DIR" );
 	if( cal_out )
 	{

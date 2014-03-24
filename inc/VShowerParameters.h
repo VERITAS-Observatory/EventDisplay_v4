@@ -37,19 +37,19 @@ class VShowerParameters
 		int    fsourcetype;                       //!< source type (0=rawdata,1=GrIsu)
 		string fsourcefile;                       //!< name of data file
 		
-// geometry and run parameters
+		// geometry and run parameters
 		unsigned int fNTelescopes;                //!< number of telescopes
 		bool   fDoublePass;                       //!< double pass image cleaning (default: off )
 		int fTraceFit;                            //!< tracefit mode or getquick mode (-1.=no fitting, 0=fit all PMTs, else: fit only PMTs with maximum ftracefit x tracerm
 		
-// pointing information
-// calculated from time and source position
+		// pointing information
+		// calculated from time and source position
 		float fTelElevation[VDST_MAXTELESCOPES];
 		float fTelAzimuth[VDST_MAXTELESCOPES];
-// from vbf
+		// from vbf
 		float fTelElevationVBF[VDST_MAXTELESCOPES];
 		float fTelAzimuthVBF[VDST_MAXTELESCOPES];
-// difference between calculation and vbf
+		// difference between calculation and vbf
 		float fTelPointingMismatch[VDST_MAXTELESCOPES];
 		float fTelDec[VDST_MAXTELESCOPES];
 		float fTelRA[VDST_MAXTELESCOPES];
@@ -57,18 +57,18 @@ class VShowerParameters
 		float fTelPointingErrorY[VDST_MAXTELESCOPES];
 		
 		unsigned int fNMethods;
-// array reconstruction method
+		// array reconstruction method
 		uint16_t fMethodID[VDST_MAXRECMETHODS];
 		
-// trigger information
+		// trigger information
 		unsigned int fNTrig;                      //!< number of telescopes with local triggers
 		ULong64_t fLTrig;                         //!< local trigger vector, bit coded
 		//!< list of telescopes with local triggers (length of array is fNTrig)
 		unsigned short int fTrig_list[VDST_MAXTELESCOPES];
 		unsigned short int fTrig_type[VDST_MAXTELESCOPES];
-// reconstruction parameters
+		// reconstruction parameters
 		unsigned int fNumImages;                  //!< total number of images
-// C. Duke 19Oct06
+		// C. Duke 19Oct06
 		//!< images selected bitcoded
 		ULong64_t fTelIDImageSelected_bitcode[VDST_MAXRECMETHODS];
 		//!< list of telescopes with images selected (length of array is fNMethods)
@@ -86,15 +86,15 @@ class VShowerParameters
 		float fShowerZe[VDST_MAXRECMETHODS];      //!< shower zenith angle in [deg]
 		float fShowerAz[VDST_MAXRECMETHODS];      //!< shower azimuth angle in [deg]
 		
-//------------------------------
-//added C.Duke 21dec06
+		//------------------------------
+		//added C.Duke 21dec06
 		float fTargetElevation;
 		float fTargetAzimuth;
 		float fTargetDec;
 		float fTargetRA;
 		float fWobbleNorth;
 		float fWobbleEast;
-//----------------------------
+		//----------------------------
 		float fDec[VDST_MAXRECMETHODS];           //!< declination of shower [deg]
 		float fRA[VDST_MAXRECMETHODS];            //!< right ascension of shower [deg]
 		float fShower_Xoffset[VDST_MAXRECMETHODS];//!< offset of direction from camera center [deg]
@@ -103,7 +103,7 @@ class VShowerParameters
 		vector< vector< float > > fShower_Yoff_DISP;
 		vector< vector< float > > fShower_Weight_DISP;
 		
-// (debug use only)
+		// (debug use only)
 		unsigned int fShower_NPair;               //! number of pairs
 		float fShower_PairXS[VDST_MAXRECMETHODS];  //! pairwise X (observe: debugging only) (geo)
 		float fShower_PairYS[VDST_MAXRECMETHODS];  //! pairwise Y (observe: debugging only) (geo)
@@ -111,8 +111,8 @@ class VShowerParameters
 		float fShower_PairYD[VDST_MAXRECMETHODS];  //! pairwise Y (observe: debugging only) (disp)
 		float fShower_PairAngDiff[VDST_MAXRECMETHODS];  //! pairwise angdiff (observe: debugging only)
 		float fShower_PairDispWeight[VDST_MAXRECMETHODS];  //! pairwise disp weight (observe: debugging only)
-// (end debug use only)
-
+		// (end debug use only)
+		
 		//!< offset of direction from camera center [deg] (derotated)
 		float fShower_XoffsetDeRot[VDST_MAXRECMETHODS];
 		//!< offset of direction from camera center [deg] (derotated);
@@ -140,41 +140,41 @@ class VShowerParameters
 		float MCycore_SC;                         //!< MC core position in shower coordinates
 		float MCzcore_SC;                         //!< MC core position in shower coordinates
 		
-// Model3D parameters, JG //
-//	float fSel3D;    // elevation of shower direction (deg)
-//	float fSaz3D;    // azimuth of shower direction (deg)
-//	float fXcore3D;  // shower core in ground coordinates
-//	float fYcore3D;  // shower core in ground coordinates
-//	float fSmax3D;   // height of shower maximum (along the shower axis)
-//	float fsigmaL3D; // longitudinal (3D-length)
-//	float fsigmaT3D; // transverse (3D-width)
-//	float fNc3D;     // total number of Cherenkov photons emitted by the shower
-//	float fXoffModel3D;  // model sky direction
-//	float fYoffModel3D;  // model sky direction
-//	float fGoodness3D;   // model goodness of fit
-//	float fDepth3D;      // model: slant depth of shower maximum
-//	float fRWidth3D;     // model: reduced 3D-width
-//	float fErrRWidth3D;  // model: error in reduced 3D-width
-//	bool fConverged3D;   // model: fit converged
-//        /// debug ///
-//	float fStartGoodness3D;   // model goodness of fit
-//	float fStartSel3D;    // Start elevation of shower direction (deg)
-//	float fStartSaz3D;    // Start azimuth of shower direction (deg)
-//	float fStartXcore3D;  // Start shower core in ground coordinates
-//	float fStartYcore3D;  // Start shower core in ground coordinates
-//	float fStartSmax3D;   // Start height of shower maximum (along the shower axis)
-//	float fStartsigmaL3D; // Start longitudinal (3D-length)
-//	float fStartsigmaT3D; // Start transverse (3D-width)
-//	float fStartNc3D;     // Start total number of Cherenkov photons emitted by the shower
-//	float fErrorSel3D;    // Start elevation of shower direction (deg)
-//	float fErrorSaz3D;    // Start azimuth of shower direction (deg)
-//	float fErrorXcore3D;  // Start shower core in ground coordinates
-//	float fErrorYcore3D;  // Start shower core in ground coordinates
-//	float fErrorSmax3D;   // Start height of shower maximum (along the shower axis)
-//	float fErrorsigmaL3D; // Start longitudinal (3D-length)
-//	float fErrorsigmaT3D; // Start transverse (3D-width)
-//	float fErrorNc3D;     // Start total number of Cherenkov photons emitted
-
+		// Model3D parameters, JG //
+		//	float fSel3D;    // elevation of shower direction (deg)
+		//	float fSaz3D;    // azimuth of shower direction (deg)
+		//	float fXcore3D;  // shower core in ground coordinates
+		//	float fYcore3D;  // shower core in ground coordinates
+		//	float fSmax3D;   // height of shower maximum (along the shower axis)
+		//	float fsigmaL3D; // longitudinal (3D-length)
+		//	float fsigmaT3D; // transverse (3D-width)
+		//	float fNc3D;     // total number of Cherenkov photons emitted by the shower
+		//	float fXoffModel3D;  // model sky direction
+		//	float fYoffModel3D;  // model sky direction
+		//	float fGoodness3D;   // model goodness of fit
+		//	float fDepth3D;      // model: slant depth of shower maximum
+		//	float fRWidth3D;     // model: reduced 3D-width
+		//	float fErrRWidth3D;  // model: error in reduced 3D-width
+		//	bool fConverged3D;   // model: fit converged
+		//        /// debug ///
+		//	float fStartGoodness3D;   // model goodness of fit
+		//	float fStartSel3D;    // Start elevation of shower direction (deg)
+		//	float fStartSaz3D;    // Start azimuth of shower direction (deg)
+		//	float fStartXcore3D;  // Start shower core in ground coordinates
+		//	float fStartYcore3D;  // Start shower core in ground coordinates
+		//	float fStartSmax3D;   // Start height of shower maximum (along the shower axis)
+		//	float fStartsigmaL3D; // Start longitudinal (3D-length)
+		//	float fStartsigmaT3D; // Start transverse (3D-width)
+		//	float fStartNc3D;     // Start total number of Cherenkov photons emitted by the shower
+		//	float fErrorSel3D;    // Start elevation of shower direction (deg)
+		//	float fErrorSaz3D;    // Start azimuth of shower direction (deg)
+		//	float fErrorXcore3D;  // Start shower core in ground coordinates
+		//	float fErrorYcore3D;  // Start shower core in ground coordinates
+		//	float fErrorSmax3D;   // Start height of shower maximum (along the shower axis)
+		//	float fErrorsigmaL3D; // Start longitudinal (3D-length)
+		//	float fErrorsigmaT3D; // Start transverse (3D-width)
+		//	float fErrorNc3D;     // Start total number of Cherenkov photons emitted
+		
 		VShowerParameters( int iNTel = 4, unsigned int iShortTree = 0, unsigned int iNMethods = 1 );
 		~VShowerParameters();
 		

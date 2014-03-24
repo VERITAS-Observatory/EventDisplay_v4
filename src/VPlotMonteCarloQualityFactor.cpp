@@ -31,65 +31,65 @@ void VPlotMonteCarloQualityFactor::setMSCCuts( double iMSCW_min, double iMSCW_ma
 
 void VPlotMonteCarloQualityFactor::initializeHistograms()
 {
-// number of bins
+	// number of bins
 	int iBinning = 100;
 	
-// parameters for different variables
-
-// MSCW
+	// parameters for different variables
+	
+	// MSCW
 	fData["MSCW"] = new VPlotMonteCarloQualityFactorData();
 	fData["MSCW"]->fVar_min = -2.;
 	fData["MSCW"]->fVar_max =  5.;
-// MSCL
+	// MSCL
 	fData["MSCL"] = new VPlotMonteCarloQualityFactorData();
 	fData["MSCL"]->fVar_min = -2.;
 	fData["MSCL"]->fVar_max =  5.;
-// dE
+	// dE
 	fData["dE"] = new VPlotMonteCarloQualityFactorData();
 	fData["dE"]->fVar_min =  0.;
 	fData["dE"]->fVar_max =  0.5;
-// EChi2  (actually log10(EChi2)
+	// EChi2  (actually log10(EChi2)
 	fData["EChi2"] = new VPlotMonteCarloQualityFactorData();
 	fData["EChi2"]->fVar_min =  -3.;
 	fData["EChi2"]->fVar_max =  5.;
-// EmissionHeight
+	// EmissionHeight
 	fData["EmissionHeight"] = new VPlotMonteCarloQualityFactorData();
 	fData["EmissionHeight"]->fVar_min =  0.;
 	fData["EmissionHeight"]->fVar_max =  50.;
-// EmissionHeightChi2
+	// EmissionHeightChi2
 	fData["EmissionHeightChi2"] = new VPlotMonteCarloQualityFactorData();
 	fData["EmissionHeightChi2"]->fVar_min =  -200.;
 	fData["EmissionHeightChi2"]->fVar_max =   200.;
 	
-// create histograms
+	// create histograms
 	char hname[800];
-//   char htitle[800];
+	//   char htitle[800];
 	map< string, VPlotMonteCarloQualityFactorData* >::iterator iData;
 	for( iData = fData.begin(); iData != fData.end(); iData++ )
 	{
 		sprintf( hname, "hSi_%s", ( *iData ).first.c_str() );
-//      sprintf( htitle, "%s (signal)", (*iData).first.c_str() );
+		//      sprintf( htitle, "%s (signal)", (*iData).first.c_str() );
 		( *iData ).second->hSignal = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
 		( *iData ).second->hSignal->SetXTitle( ( *iData ).first.c_str() );
 		( *iData ).second->hSignal->SetYTitle( "normalized number of events" );
 		setHistogramPlottingStyle( ( *iData ).second->hSignal, 1, 2, 1., 1, 1, 3003 );
 		
 		sprintf( hname, "hBc_%s", ( *iData ).first.c_str() );
-//      sprintf( htitle, "%s (background)", (*iData).first.c_str() );
+		//      sprintf( htitle, "%s (background)", (*iData).first.c_str() );
 		( *iData ).second->hBackground = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
 		( *iData ).second->hBackground->SetXTitle( ( *iData ).first.c_str() );
 		( *iData ).second->hBackground->SetYTitle( "normalized number of events" );
 		setHistogramPlottingStyle( ( *iData ).second->hBackground, 2, 2, 1., 1, 1, 3003 );
 		
 		sprintf( hname, "hQl_%s", ( *iData ).first.c_str() );
-//      sprintf( htitle, "%s (q-factor, lower bound)", (*iData).first.c_str() );
+		//      sprintf( htitle, "%s (q-factor, lower bound)", (*iData).first.c_str() );
 		( *iData ).second->hQFactors_LowerCut = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
 		( *iData ).second->hQFactors_LowerCut->SetXTitle( ( *iData ).first.c_str() );
 		( *iData ).second->hQFactors_LowerCut->SetYTitle( "q-factor" );
 		setHistogramPlottingStyle( ( *iData ).second->hQFactors_LowerCut, 1, 2, 1., 1, 1, 3003 );
 		
 		sprintf( hname, "hQu_%s", ( *iData ).first.c_str() );
-//      sprintf( htitle, "%s (q-factor, upper bound)", (*iData).first.c_str() );
+		//      sprintf( htitle, "%s (q-factor, upper bound)", (*iData).first.c_str() );
 		( *iData ).second->hQFactors_UpperCut = new TH1D( hname, "", iBinning, ( *iData ).second->fVar_min, ( *iData ).second->fVar_max );
 		( *iData ).second->hQFactors_UpperCut->SetXTitle( ( *iData ).first.c_str() );
 		( *iData ).second->hQFactors_UpperCut->SetYTitle( "q-factor" );
@@ -189,7 +189,7 @@ void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double
 	
 	map< string, VPlotMonteCarloQualityFactorData* >::iterator iData;
 	
-// loop over all energy bins
+	// loop over all energy bins
 	int  iNbin = int( ( iEmax - iEmin ) / iEbin );
 	cout << "Energy binning: " << iNbin << "\t" << iEmin << "\t" << iEmax << "\t" << iEbin << endl;
 	for( int i = 0; i < iNbin; i++ )
@@ -201,7 +201,7 @@ void VPlotMonteCarloQualityFactor::fillEnergyDependence( int iMaxNevents, double
 		cout << "Energybin: " << i << "\t" << iEmin + i* iEbin << "\t" << iEmin + ( i + 1 )*iEbin << endl;
 		fill( iMaxNevents );
 		
-// get maximum values from q-factor histograms
+		// get maximum values from q-factor histograms
 		for( iData = fData.begin(); iData != fData.end(); iData++ )
 		{
 			( *iData ).second->gQFactor_LowerCutE->SetPoint( i, iEmin + i * iEbin + 0.5 * iEbin, ( *iData ).second->hQFactors_LowerCut->GetBinCenter( ( *iData ).second->hQFactors_LowerCut->GetMaximumBin() ) );
@@ -223,13 +223,13 @@ bool VPlotMonteCarloQualityFactor::fill( int iMaxNevents )
 		return false;
 	}
 	
-// fill signal histograms
+	// fill signal histograms
 	fill( iMaxNevents, fSignalChain, true );
 	
-// fill background histograms
+	// fill background histograms
 	fill( iMaxNevents, fBackgroundChain, false );
 	
-// calculate q-factors
+	// calculate q-factors
 	calculateQfactors();
 	
 	return true;
@@ -257,7 +257,7 @@ void VPlotMonteCarloQualityFactor::calculateQfactors()
 			iBTot += hB->GetBinContent( i );
 		}
 		
-// calculate quality factor (upper)
+		// calculate quality factor (upper)
 		double iS = 0.;
 		double iB = 0.;
 		for( int i = 1; i <= hS->GetNbinsX(); i++ )
@@ -274,7 +274,7 @@ void VPlotMonteCarloQualityFactor::calculateQfactors()
 				hQU->SetBinContent( i, 0. );
 			}
 		}
-// calculate quality factor (lower)
+		// calculate quality factor (lower)
 		iS = 0.;
 		iB = 0.;
 		for( int i = hS->GetNbinsX(); i > 0; i-- )
@@ -291,8 +291,8 @@ void VPlotMonteCarloQualityFactor::calculateQfactors()
 				hQL->SetBinContent( i, 0. );
 			}
 		}
-// normalise distributions to number of entries
-// normalise distributions to number of entries
+		// normalise distributions to number of entries
+		// normalise distributions to number of entries
 		if( iSTot > 0. )
 		{
 			hS->Scale( 1. / iSTot );
@@ -396,7 +396,7 @@ void VPlotMonteCarloQualityFactor::fill( int iMaxNevents, CData* c, bool bSignal
 			continue;
 		}
 		
-// quality cuts
+		// quality cuts
 		if( c->Chi2 < 0 )
 		{
 			continue;
@@ -418,11 +418,11 @@ void VPlotMonteCarloQualityFactor::fill( int iMaxNevents, CData* c, bool bSignal
 			continue;
 		}
 		
-// fill histograms
+		// fill histograms
 		iHis[0]->Fill( c->MSCW );
 		iHis[1]->Fill( c->MSCL );
 		
-// apply basic shape cut
+		// apply basic shape cut
 		if( c->MSCW < fMSCW_min )
 		{
 			continue;
@@ -469,7 +469,7 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
 	map< string, VPlotMonteCarloQualityFactorData* >::iterator iData;
 	for( iData = fData.begin(); iData != fData.end(); iData++ )
 	{
-// parameter histograms
+		// parameter histograms
 		sprintf( hname, "cQ_%s", ( *iData ).first.c_str() );
 		sprintf( htitle, "%s", ( *iData ).first.c_str() );
 		TCanvas* cHis = new TCanvas( hname, htitle, 10 + z * 30, 100, 1300, 800 );
@@ -482,7 +482,7 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
 		( *iData ).second->hSignal->Draw();
 		( *iData ).second->hBackground->Draw( "same" );
 		
-// upper q factor
+		// upper q factor
 		iP = ( TPad* )cHis->cd( 2 );
 		iP->SetGridx( 0 );
 		iP->SetGridy( 0 );
@@ -499,7 +499,7 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
 		( *iData ).second->hQFactors_UpperCut->Draw();
 		( *iData ).second->hQFactors_LowerCut->Draw( "same" );
 		
-// draw energy dependence of q-factor variable
+		// draw energy dependence of q-factor variable
 		if( ( *iData ).second->gQFactor_LowerCutE->GetN() > 2 )
 		{
 			iP = ( TPad* )cHis->cd( 3 );
@@ -513,7 +513,7 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
 			sprintf( hname, "value at maximum q-factor (%s)", ( *iData ).first.c_str() );
 			( *iData ).second->gQFactor_LowerCutE->GetHistogram()->SetYTitle( hname );
 			( *iData ).second->gQFactor_UpperCutE->Draw( "lp" );
-// plot mean value for all energies
+			// plot mean value for all energies
 			double iMaxLower = ( *iData ).second->hQFactors_LowerCut->GetBinCenter( ( *iData ).second->hQFactors_LowerCut->GetMaximumBin() );
 			double iMaxUpper = ( *iData ).second->hQFactors_UpperCut->GetBinCenter( ( *iData ).second->hQFactors_UpperCut->GetMaximumBin() );
 			
@@ -530,7 +530,7 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
 			iLLower->Draw();
 			
 		}
-// draw energy dependence of q-factor maximum
+		// draw energy dependence of q-factor maximum
 		if( ( *iData ).second->gQFactorMax_LowerCutE->GetN() > 2 )
 		{
 			iP = ( TPad* )cHis->cd( 4 );
@@ -545,7 +545,7 @@ void VPlotMonteCarloQualityFactor::plot( bool iPrint )
 			( *iData ).second->gQFactorMax_LowerCutE->GetHistogram()->SetYTitle( hname );
 			( *iData ).second->gQFactorMax_UpperCutE->Draw( "lp" );
 			
-// plot mean value for all energies
+			// plot mean value for all energies
 			double iMaxLower = ( *iData ).second->hQFactors_LowerCut->GetBinContent( ( *iData ).second->hQFactors_LowerCut->GetMaximumBin() );
 			double iMaxUpper = ( *iData ).second->hQFactors_UpperCut->GetBinContent( ( *iData ).second->hQFactors_UpperCut->GetMaximumBin() );
 			

@@ -25,7 +25,7 @@ bool VZDCF::readZDCF( string iFile )
 
 	fZDCFData.clear();
 	
-// read in ascii file
+	// read in ascii file
 	ifstream is( iFile.c_str() );
 	if( !is )
 	{
@@ -45,7 +45,7 @@ bool VZDCF::readZDCF( string iFile )
 		
 		fZDCFData.push_back( new VZDCFData() );
 		
-//! no errors are catched here..
+		//! no errors are catched here..
 		is_stream >> fZDCFData.back()->tau;
 		is_stream >> fZDCFData.back()->sigma_tau_neg;
 		is_stream >> fZDCFData.back()->sigma_tau_pos;
@@ -177,10 +177,10 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
 {
 	char hname[800];
 	char htitle[800];
-// empty histogram for axis
+	// empty histogram for axis
 	TH1D* hZDCF = 0;
 	
-// canvas
+	// canvas
 	if( !c )
 	{
 		if( bzdcf )
@@ -207,7 +207,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
 			sprintf( hname, "hZDCF_sig" );
 		}
 		
-// histogram values
+		// histogram values
 		if( taumin < -9990. )
 		{
 			taumin = getZDCFData_tau_min( true ) - 5.;
@@ -268,7 +268,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
 		}
 	}
 	
-// fill graph
+	// fill graph
 	TGraphAsymmErrors* g = new TGraphAsymmErrors( 1 );
 	setGraphPlottingStyle( ( TGraph* )g, 1, 1., 20, 1. );
 	
@@ -288,7 +288,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
 				z++;
 			}
 			else
-// plot dcf / error
+				// plot dcf / error
 			{
 				double e = 0.5 * ( fZDCFData[i]->dcf_error_up + fZDCFData[i]->dcf_error_low );
 				if( e != 0. )
@@ -302,8 +302,8 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
 		}
 	}
 	
-// draw ML intervall
-
+	// draw ML intervall
+	
 	if( fMLPeakposition > -9998. )
 	{
 		TBox* iB = new TBox( fML1Sigmainterval_low, hZDCF->GetMinimum(), fML1Sigmainterval_up, hZDCF->GetMaximum() );
@@ -316,7 +316,7 @@ TCanvas* VZDCF::plot( TCanvas* c, bool bzdcf, double taumin, double taumax, doub
 		iL->Draw();
 	}
 	
-// draw graph
+	// draw graph
 	g->Draw( "p" );
 	
 	return c;

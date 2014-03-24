@@ -49,10 +49,10 @@ namespace SEphem
 			static std::string loadFilename( unsigned scope_num );
 			static std::string saveFilename( unsigned scope_num );
 			
-// ------------------------------------------------------------------------
-// CORRECTION PARAMETERS
-// ------------------------------------------------------------------------
-
+			// ------------------------------------------------------------------------
+			// CORRECTION PARAMETERS
+			// ------------------------------------------------------------------------
+			
 			bool enable_offsets;
 			bool enable_corrections;
 			bool enable_vff;

@@ -42,19 +42,19 @@ class VGlobalRunParameter
 		static double       fObservatory_Height_m;
 		
 		
-// OUTPUT TREE VERSION
-//
-// changes from 5 to 6: LTrig  now ULong64_t
-//                      ImgSel now ULong64_t
-// changes from 6 to 7: introduced list of selected telescopes
-//
-// changes from 7 to 8: add MC primary to showerpars
+		// OUTPUT TREE VERSION
+		//
+		// changes from 5 to 6: LTrig  now ULong64_t
+		//                      ImgSel now ULong64_t
+		// changes from 6 to 7: introduced list of selected telescopes
+		//
+		// changes from 7 to 8: add MC primary to showerpars
 		static unsigned int fEVNDISP_TREE_VERSION;
 		
 		static string    fDBServer;                                         // database location (VTS)
 		static string    fRawDataServer;                                    // location of raw data (VTS)
 		
-// DIRECTORIES
+		// DIRECTORIES
 		static string fEVNDISPAnaDataDirectory;          // directory where all data (detectorgeometry, ...) is expected and written to (output file)
 		static string fVBFRawDataDirectory;              // directory with VERITAS vbf data (vbf files)
 		static string fEVNDISPCalibrationDataDirectory;  // directory where calibration data is expected and written to

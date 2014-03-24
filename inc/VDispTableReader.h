@@ -47,24 +47,24 @@ class VDispTableReader : public TNamed
 		float az_max;
 		float woff;
 		float pedvar;
-// 2D histograms
+		// 2D histograms
 		TH2F* h2D_DispTable;
 		TH2F* h2D_DispPhiTable;
 		TH2F* h2D_DispTableN;
 		TH2F* h2D_DispMissTable;
-// 3D histograms
+		// 3D histograms
 		TH3F* h3D_DispTable;
 		TH3F* h3D_DispPhiTable;
 		TH3F* h3D_DispTableN;
 		TH3F* h3D_DispMissTable;
-// histogram binning
+		// histogram binning
 		vector< string > fHisto_ListOfVariables;
 		map< string, int >    fHisto_binning;
 		map< string, double > fHisto_min;
 		map< string, double > fHisto_max;
 		
 		
-// disp table scaling
+		// disp table scaling
 		double fWidthScaleParameter;
 		double fLengthScaleParameter;
 		

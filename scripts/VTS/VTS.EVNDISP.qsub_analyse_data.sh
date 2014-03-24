@@ -86,6 +86,7 @@ endif
 # set OPT="$OPT -calibrationfile calibrationlist.dat"
 # double passed correction
 #set OPT="$OPT -nodp2005"
+#set OPT="$OPT -nevents=15000"
 
 #########################################
 # run eventdisplay

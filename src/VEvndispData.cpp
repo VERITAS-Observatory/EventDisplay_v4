@@ -16,7 +16,7 @@
 VEvndispData::VEvndispData()
 {
 	fReader = 0;
-//   fDetectorGeo = 0;
+	//   fDetectorGeo = 0;
 }
 
 
@@ -27,9 +27,9 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
 {
 	fTeltoAna = iT;
 	
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// fExpectedEventStatus is used in VDisplay -> don't allow to display more than 8*sizeof(size_t) telescope (64?)
-//
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// fExpectedEventStatus is used in VDisplay -> don't allow to display more than 8*sizeof(size_t) telescope (64?)
+	//
 	bitset<8 * sizeof( size_t )> ib;
 	for( unsigned int i = 0; i < iT.size(); i++ )
 	{
@@ -65,15 +65,15 @@ void VEvndispData::setTeltoAna( vector< unsigned int > iT )
 	{
 		fExpectedEventStatus = ( unsigned long int ) ib.to_ulong();
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// init event counting statistics
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	// init event counting statistics
 	vector< int > itemp;
 	itemp.assign( fNTel + 1, 0 );
 	fTriggeredTel.assign( fNTel, itemp );
 	fTriggeredTelN.assign( getTeltoAna().size() + 1, 0 );
 	
-// analysis event status
+	// analysis event status
 	fAnalysisArrayEventStatus = 0;
 	fAnalysisTelescopeEventStatus.assign( fNTel, 0 );
 }
@@ -145,7 +145,7 @@ bool VEvndispData::initializeDataReader()
 	}
 	
 	fReader->setTeltoAna( fTeltoAna );
-// PRELI: require right now that all telescopes should have FADCs (or not)
+	// PRELI: require right now that all telescopes should have FADCs (or not)
 	bool iperformFADCAnalysis = true;
 	for( unsigned int i = 0; i < getRunParameter()->fTraceIntegrationMethod.size(); i++ )
 	{
@@ -237,21 +237,21 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
 			cout << "\t T" << i + 1 << "\t" << iCamera[i] << endl;
 		}
 	}
-// read detector geometry from a configuration file and/or DB
-// (all cases but DSTs)
+	// read detector geometry from a configuration file and/or DB
+	// (all cases but DSTs)
 	if( getRunParameter()->fsourcetype != 7 && getRunParameter()->fsourcetype != 4 )
 	{
 		fDetectorGeo = new VDetectorGeometry( iNTel, iCamera, iDir, fDebug,
 											  getRunParameter()->fCameraCoordinateTransformX, getRunParameter()->fCameraCoordinateTransformY,
 											  getRunParameter()->fsourcetype );
-// get camera rotations from the DB
+		// get camera rotations from the DB
 		if( getRunParameter()->fDBCameraRotationMeasurements )
 		{
 			fDetectorGeo->readDetectorGeometryFromDB( getRunParameter()->fDBRunStartTimeSQL, getRunParameter()->fDBCameraRotationMeasurements );
 		}
 	}
-// for DST files: read detector geometry from DST file
-// (telconfig tree)
+	// for DST files: read detector geometry from DST file
+	// (telconfig tree)
 	else
 	{
 		fDetectorGeo = new VDetectorGeometry( iNTel, fDebug );
@@ -275,7 +275,7 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
 			cout << "VEvndispData::setDetectorGeometry reading detector geometry from DST file" << endl;
 		}
 	}
-// print most important parameters of the detector
+	// print most important parameters of the detector
 	if( fDetectorGeo )
 	{
 		fDetectorGeo->print( false );
@@ -333,7 +333,7 @@ bool VEvndispData::get_reconstruction_parameters( string ifile )
 	unsigned int iNMethods = 0;
 	if( ifile.size() > 0 )
 	{
-// read array analysis cuts
+		// read array analysis cuts
 		if( ifile.find( "/" ) != string::npos )
 		{
 			iNMethods = fEvndispReconstructionParameter->read_arrayAnalysisCuts( ifile );
@@ -369,11 +369,11 @@ bool VEvndispData::get_reconstruction_parameters( string ifile )
 */
 void VEvndispData::dumpTreeData()
 {
-//////////////////////////////////////////////////////////////////////////////
-//
-// THIS PRODUCES A SEGMENTATION FAULT
-//
-//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//
+	// THIS PRODUCES A SEGMENTATION FAULT
+	//
+	//////////////////////////////////////////////////////////////////////////////
 	/*    if( fDetectorTree )
 	    {
 	        cout << endl << "telescopes" << endl;
@@ -383,7 +383,7 @@ void VEvndispData::dumpTreeData()
 	        fDetectorTree->getTree()->Scan();
 	        cout << endl;
 	    } */
-//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
 	if( fShowerParameters )
 	{
 		fShowerParameters->getTree()->Show( -1 );
@@ -471,7 +471,7 @@ void VEvndispData::endOfRunInfo()
 	cout << endl;
 	cout << "Event statistics:" << endl;
 	cout << "-----------------" << endl;
-// print this only for a small number of telescopes
+	// print this only for a small number of telescopes
 	if( fTriggeredTel.size() < 10 )
 	{
 		cout << "\t Multiplicity:  | ";
@@ -559,16 +559,16 @@ void VEvndispData::printDeadChannelList() // DEADCHAN
 
 	cout << "==================================" << endl;
 	cout << "Dead Channel Listing" << endl;
-// loop over gains
+	// loop over gains
 	for( unsigned int iHiLo = 0 ; iHiLo < 2 ; iHiLo++ )
 	{
-// loop over telescopes
+		// loop over telescopes
 		for( unsigned int jTel = 0 ; jTel < getTeltoAna().size() ; jTel++ )
 		{
 			setTelID( getTeltoAna()[jTel] ) ;
 			unsigned int ndead = 0;
 			
-// loop over dead channels
+			// loop over dead channels
 			for( unsigned int iChan = 0; iChan < getDead( iHiLo ).size(); iChan++ )
 			{
 				if( getDead( iHiLo )[iChan] > 0 )
@@ -705,7 +705,7 @@ int VEvndispData::getDebugLevel()
 {
 	int nDebugMessagesMax = 100;
 	
-// allow a maximum of 100 debug messages
+	// allow a maximum of 100 debug messages
 	if( fNDebugMessages > nDebugMessagesMax )
 	{
 		return 2;
@@ -730,7 +730,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int im
 		iT = imax - imin;
 	}
 	
-// this should never happen
+	// this should never happen
 	if( iT > getNSamples() )
 	{
 		cout << "VEvndispData::setCurrentSummationWindow (a) error: summation window too large ";
@@ -759,7 +759,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int imin, unsigned int im
 
 void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned int imin, unsigned int imax, bool iSecondWindow )
 {
-// first summation window
+	// first summation window
 	if( !iSecondWindow )
 	{
 		if( imax > imin )
@@ -771,7 +771,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned in
 			fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
 		}
 		
-// this should never happen
+		// this should never happen
 		if( fAnaData[fTelID]->fCurrentSummationWindow[iChannel] > getNSamples() )
 		{
 			cout << "VEvndispData::setCurrentSummationWindow (b) error: summation window too large: ";
@@ -779,7 +779,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned in
 			fAnaData[fTelID]->fCurrentSummationWindow[iChannel] = 0;
 		}
 	}
-// second summation window
+	// second summation window
 	else
 	{
 		if( imax > imin )
@@ -791,7 +791,7 @@ void VEvndispData::setCurrentSummationWindow( unsigned int iChannel, unsigned in
 			fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] = 0;
 		}
 		
-// this should never happen
+		// this should never happen
 		if( fAnaData[fTelID]->fCurrentSummationWindow_2[iChannel] > getNSamples() )
 		{
 			cout << "VEvndispData::setCurrentSummationWindow (2nd window) (b) error: summation window too large: ";
@@ -873,14 +873,14 @@ void VEvndispData::setPulseTiming( float iP, bool iCorrected )
 
 void VEvndispData::setPulseTiming( unsigned int iChannel, vector< float > iP, bool iCorrected )
 {
-// check pulse timing vector sizes
+	// check pulse timing vector sizes
 	if( iP.size() != getPulseTiming( iCorrected ).size() )
 	{
 		cout << "VEvndispData::setPulseTiming( unsigned int iChannel, vector< float > iP ) vector size problem: ";
 		cout << iP.size() << "\t" << getPulseTiming( iCorrected ).size() << endl;
 		return;
 	}
-// fill all values
+	// fill all values
 	for( unsigned int i = 0; i < getPulseTiming( iCorrected ).size(); i++ )
 	{
 		if( iChannel < getPulseTiming( iCorrected )[i].size() )
@@ -892,8 +892,8 @@ void VEvndispData::setPulseTiming( unsigned int iChannel, vector< float > iP, bo
 
 void VEvndispData::setPulseTimingCorrection( unsigned int iChannel, double iCorrection )
 {
-// pulse timing parameters <= fpulsetiming_tzero_index are corrected
-// (all times later are pulse widths)
+	// pulse timing parameters <= fpulsetiming_tzero_index are corrected
+	// (all times later are pulse widths)
 	if( getRunParameter()->fpulsetiming_tzero_index < getPulseTiming( true ).size() )
 	{
 		for( unsigned int i = 0; i <= getRunParameter()->fpulsetiming_tzero_index; i++ )
@@ -1076,20 +1076,20 @@ bool VEvndispData::initializeStarCatalogue( int iMJD, double iTime )
  */
 unsigned int VEvndispData::getDead( unsigned int iChannel, bool iLowGain = false )
 {
-// high gain channels:
+	// high gain channels:
 	if( !iLowGain )
 	{
 		return getDead( iLowGain )[iChannel];
 	}
 	
-// for low gain channels only:
-
-// low gain is dead
+	// for low gain channels only:
+	
+	// low gain is dead
 	if( getDead( iLowGain )[iChannel] )
 	{
 		return getDead( iLowGain )[iChannel];
 	}
-// low gain is ok, but high gain is dead
+	// low gain is ok, but high gain is dead
 	return getDead( false )[iChannel];
 }
 

@@ -244,7 +244,7 @@ void VFrogs::initOutput()
 		printf( "FROGPUT: Frogs Output File Exists\n" );
 		return;
 	}
-// otherwise create it
+	// otherwise create it
 	if( fRunPar->foutputfileName != "-1" )
 	{
 		printf( "FROGPUT: Frogs foutputfileName = -1 : Attempt to create file\n" );
@@ -496,7 +496,7 @@ void VFrogs::finishFrogs( TFile* f )
 		( ( TTree* )f->Get( "frogspars" ) )->CloneTree()->Write();
 	}
 	
-// Close the files
+	// Close the files
 	mscwFrogsFile->Close();
 	
 	return;

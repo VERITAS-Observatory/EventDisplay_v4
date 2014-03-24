@@ -11,7 +11,7 @@
 
 VDSTTree::VDSTTree()
 {
-// source data monte carlo?
+	// source data monte carlo?
 	fMC = true;
 	fFullTree = false;
 	
@@ -21,7 +21,7 @@ VDSTTree::VDSTTree()
 	fMCtree = 0;
 	fDST_tree = 0;
 	
-// initialize
+	// initialize
 	fTelescopeCounter_temp = -1;
 	fDSTLTrig = 0;
 	fDSTNTrig = 0;
@@ -85,7 +85,7 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 {
 	char tname[1000];
 	
-// DST tree definition
+	// DST tree definition
 	fDST_tree = new TTree( "dst", "data summary tree" );
 	fDST_tree->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
 	fDST_tree->Branch( "runNumber", &fDSTrunnumber, "runNumber/i" );
@@ -102,10 +102,10 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 		fDST_tree->Branch( "gps4", &fDSTgps4, "gps4/i" );
 	}
 	fDST_tree->Branch( "ntel", &fDSTntel, "ntel/i" );
-// all following array are filled for all telescopes
+	// all following array are filled for all telescopes
 	fDST_tree->Branch( "Paz", &fDSTpointAzimuth, "Paz[ntel]/F" );
 	fDST_tree->Branch( "Pel", fDSTpointElevation, "Pel[ntel]/F" );
-// following arrays are filled only for all triggered telescopes
+	// following arrays are filled only for all triggered telescopes
 	fDST_tree->Branch( "ltrig", &fDSTLTrig, "ltrig/i" );
 	fDST_tree->Branch( "ntrig", &fDSTNTrig, "ntrig/i" );
 	fDST_tree->Branch( "ltrig_list", fDSTLTrig_list, "ltrig_list[ntrig]/i" );
@@ -118,7 +118,7 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 		}
 		fDST_tree->Branch( "L2TrigType", fDSTL2TrigType, "L2TrigType[ntrig]/s" );
 	}
-// following arrays are filed only for all telescopes with data
+	// following arrays are filed only for all telescopes with data
 	fDST_tree->Branch( "ntel_data", &fDSTntel_data, "ntel_data/i" );
 	fDST_tree->Branch( "tel_data", fDSTtel_data, "tel_data[ntel_data]/i" );
 	fDST_tree->Branch( "tel_zero_suppression", fDSTTelescopeZeroSupression, "tel_zero_suppression[ntel_data]/s" );
@@ -145,7 +145,7 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 	fDST_tree->Branch( "tzero", fDSTt0, tname );
 	sprintf( tname, "Width[ntel_data][%d]/F", VDST_MAXCHANNELS );
 	fDST_tree->Branch( "Width", fDSTTraceWidth, tname );
-// timing levels
+	// timing levels
 	sprintf( tname, "pulsetiminglevel[ntel_data][%d]/F", VDST_MAXTIMINGLEVELS );
 	fDST_tree->Branch( "pulsetiminglevel", fDSTpulsetiminglevels, tname );
 	sprintf( tname, "pulsetiming[ntel_data][%d][%d]/F", VDST_MAXTIMINGLEVELS, VDST_MAXCHANNELS );
@@ -164,7 +164,7 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 		sprintf( tname, "N255[ntel_data][%d]/s", VDST_MAXCHANNELS );
 		fDST_tree->Branch( "N255", fDSTN255, tname );
 	}
-// FADC trace
+	// FADC trace
 	fDST_tree->Branch( "numSamples", fDSTnumSamples, "numSamples[ntel_data]/s" );
 	if( fReadWriteFADC )
 	{
@@ -172,20 +172,20 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 		fDST_tree->Branch( "Trace", fDSTtrace, tname );
 	}
 	
-//PhotoElectrons
+	//PhotoElectrons
 	if( fMC )//to be changed to something like fReadPE...
 	{
 		sprintf( tname, "Pe[ntel_data][%d]/i", VDST_MAXCHANNELS );
 		fDST_tree->Branch( "Pe", fDSTPe, tname );
 	}
-// photo diode data
+	// photo diode data
 	if( iPhotoDiode )
 	{
 		fDST_tree->Branch( "PDMax", fDSTPDMax, "PDMax[ntel_data]/F" );
 		fDST_tree->Branch( "PDSum", fDSTPDSum, "PDSum[ntel_data]/F" );
 	}
 	
-// trace fit part might be out of date
+	// trace fit part might be out of date
 	if( iTraceFit )
 	{
 		sprintf( tname, "Chi2[ntel_data][%d]/F", VDST_MAXCHANNELS );
@@ -202,7 +202,7 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 		fDST_tree->Branch( "Norm", fDSTTraceNorm, tname );
 	}
 	
-// MC block
+	// MC block
 	if( fMC )
 	{
 		fDST_tree->Branch( "MCprim", &fDSTprimary, "MCprimary/s" );
@@ -223,7 +223,7 @@ bool VDSTTree::initDSTTree( bool iFullTree, bool iPhotoDiode, bool iTraceFit )
 void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsigned int iMaxPrevNTel, unsigned int iMaxNChannels,
 								 unsigned int iMaxNTimingLevels, unsigned int iMaxNSamples, bool iTriggerReset, bool iIsCTADST )
 {
-// reset the data vectors
+	// reset the data vectors
 	if( iMaxNTel >= VDST_MAXTELESCOPES )
 	{
 		iMaxNTel = VDST_MAXTELESCOPES;
@@ -245,7 +245,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 		iMaxNSamples = VDST_MAXSUMWINDOW;
 	}
 	
-// reset trigger data
+	// reset trigger data
 	fDSTLTrig = 0;
 	fDSTNTrig = 0;
 	for( unsigned int i = 0; i < iMaxNTel; i++ )
@@ -255,20 +255,20 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 		fDSTLTtime[i] = 0.;
 		fDSTL2TrigType[i] = 0;
 	}
-// return if previous event changed trigger variables only
+	// return if previous event changed trigger variables only
 	if( iTriggerReset )
 	{
 		return;
 	}
 	
-// loop over telescopes
+	// loop over telescopes
 	for( unsigned int i = 0; i < iMaxNTel; i++ )
 	{
 		fDSTpointAzimuth[i] = 0.;
 		fDSTpointElevation[i] = 0.;
 	}
 	
-// for all non-CTA DSTs
+	// for all non-CTA DSTs
 	if( !iIsCTADST )
 	{
 		for( unsigned int i = 0; i < iMaxNTel; i++ )
@@ -292,7 +292,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 		}
 	}
 	
-// loop over all telescopes with data in the previous event
+	// loop over all telescopes with data in the previous event
 	for( unsigned int i = 0; i < iMaxPrevNTel; i++ )
 	{
 		fDSTtel_data[i] = 0;
@@ -318,12 +318,12 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 	memset( fDSTdead, 0, VDST_MAXTELESCOPES * VDST_MAXCHANNELS * sizeof( fDSTdead[0][0] ) );
 	memset( fDSTZeroSuppressed, 0, VDST_MAXTELESCOPES * VDST_MAXCHANNELS * sizeof( fDSTZeroSuppressed[0][0] ) );
 	memset( fDSTL1trig, 0, VDST_MAXTELESCOPES * VDST_MAXCHANNELS * sizeof( fDSTL1trig[0][0] ) );
-// FADC mode
+	// FADC mode
 	if( fReadWriteFADC )
 	{
 		memset( fDSTtrace, 0, VDST_MAXTELESCOPES * VDST_MAXSUMWINDOW * VDST_MAXCHANNELS * sizeof( fDSTtrace[0][0][0] ) );
 	}
-// QADC mode
+	// QADC mode
 	else
 	{
 		std::fill( &fDSTRecord[0][0], &fDSTRecord[0][0] + VDST_MAXTELESCOPES * VDST_MAXCHANNELS, 1 );
@@ -335,7 +335,7 @@ void VDSTTree::resetDataVectors( unsigned int iCH, unsigned int iMaxNTel, unsign
 		memset( fDSTsumfirst, 0, VDST_MAXTELESCOPES * VDST_MAXCHANNELS * sizeof( fDSTsumfirst[0][0] ) );
 		memset( fDSTMax, 0, VDST_MAXTELESCOPES * VDST_MAXCHANNELS * sizeof( fDSTMax[0][0] ) );
 	}
-// write PEs
+	// write PEs
 	if( fFillPELeaf )
 	{
 		memset( fDSTPe, 0, VDST_MAXTELESCOPES * VDST_MAXCHANNELS * sizeof( fDSTPe[0][0] ) );
@@ -352,7 +352,7 @@ bool VDSTTree::initDSTTree( TTree* t, TTree* c )
 	fDST_tree = t;
 	fDST_conf = c;
 	
-// inform about empty trees
+	// inform about empty trees
 	if( fDST_tree && fDST_tree->GetEntries() == 0 )
 	{
 		cout << "DST tree found: no entries" << endl;

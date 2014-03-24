@@ -11,7 +11,7 @@
 VPlotLookupTable::VPlotLookupTable()
 {
 
-// list of valid lookup table names
+	// list of valid lookup table names
 	fListOfTableNames.push_back( "mscw" );
 	fListOfTableNames.push_back( "mscl" );
 	fListOfTableNames.push_back( "energyER" );
@@ -141,7 +141,7 @@ void VPlotLookupTable::plotLookupTables( unsigned int iSetID )
 	plot2DHistogram( fLookupTableData[iSetID]->hsigma,  iSetID, "sigma", 300, -999., -999., false );
 	plot2DHistogram( fLookupTableData[iSetID]->hnevents, iSetID, "number of events", 400, -999., -999., true );
 	
-// divide mean by median
+	// divide mean by median
 	if( fLookupTableData[iSetID]->hmedian && fLookupTableData[iSetID]->hmean )
 	{
 		char hname[200];
@@ -155,7 +155,7 @@ void VPlotLookupTable::plotLookupTables( unsigned int iSetID )
 		
 		plot2DHistogram( hMM, iSetID, "mean / median", 200, 0.95, 1.05 );
 	}
-// divide MPV by median
+	// divide MPV by median
 	if( fLookupTableData[iSetID]->hmedian && fLookupTableData[iSetID]->hmpv )
 	{
 		char hname[200];
@@ -187,7 +187,7 @@ void VPlotLookupTable::plotRelativeTables( unsigned int iSetID1, unsigned int iS
 		return;
 	}
 	
-// median
+	// median
 	char hname[200];
 	sprintf( hname, "hMM_DIV_median_%d_%d", iSetID1, iSetID2 );
 	
@@ -201,7 +201,7 @@ void VPlotLookupTable::plotRelativeTables( unsigned int iSetID1, unsigned int iS
 	sprintf( hname, "median (%d/%d)", iSetID1, iSetID2 );
 	plot2DHistogram( hMM_median, iSetID1, hname, 500, iMin, iMax );
 	
-// sigma
+	// sigma
 	sprintf( hname, "hMM_DIV_sigma_%d_%d", iSetID1, iSetID2 );
 	
 	TH2F* hMM_sigma = divide2DHistograms( fLookupTableData[iSetID1]->hsigma, fLookupTableData[iSetID2]->hsigma, hname );
@@ -214,7 +214,7 @@ void VPlotLookupTable::plotRelativeTables( unsigned int iSetID1, unsigned int iS
 	sprintf( hname, "sigma (%d/%d)", iSetID1, iSetID2 );
 	plot2DHistogram( hMM_sigma, iSetID1, hname, 550, iMin, iMax );
 	
-// mean
+	// mean
 	sprintf( hname, "hMM_DIV_mean_%d_%d", iSetID1, iSetID2 );
 	
 	TH2F* hMM_mean = divide2DHistograms( fLookupTableData[iSetID1]->hmean, fLookupTableData[iSetID2]->hmean, hname );
@@ -231,7 +231,7 @@ void VPlotLookupTable::plotRelativeTables( unsigned int iSetID1, unsigned int iS
 
 bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, int ze, int az, int telID, int noise, int woff )
 {
-// add a new data set
+	// add a new data set
 	if( !checkTableName( iTable ) )
 	{
 		return false;
@@ -244,7 +244,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
 		return false;
 	}
 	char hname[600];
-// create full directory name
+	// create full directory name
 	sprintf( hname, "NOISE_%05d/ze_%03d/woff_%04d/az_%d/tel_%d", noise, ze * 10, woff, az, telID );
 	if( !fI->cd( hname ) )
 	{
@@ -252,7 +252,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
 		return false;
 	}
 	cout << "directory: " << hname << endl;
-//  variable directory
+	//  variable directory
 	sprintf( hname, "%s", iTable.c_str() );
 	if( !gDirectory->cd( hname ) )
 	{
@@ -260,7 +260,7 @@ bool VPlotLookupTable::addLookupTable( string iLookupTableFile, string iTable, i
 		return false;
 	}
 	
-// now everything seems to be fine, fill new data entry
+	// now everything seems to be fine, fill new data entry
 	fLookupTableData.push_back( new VPlotLookupTableData() );
 	fLookupTableData.back()->fLookupTable = iTable;
 	fLookupTableData.back()->fLookupTableFileName = iLookupTableFile;

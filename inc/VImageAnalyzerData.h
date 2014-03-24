@@ -33,7 +33,7 @@ class VImageAnalyzerData
 		bool fFillMeanTraces;
 		bool fFillPulseSum;
 		
-// image analysis data
+		// image analysis data
 		VImageParameter* fImageParameter;             //!< image parameter from geometrical analysis
 		VImageParameter* fImageParameterLogL;         //!< image parameter from log likelihood analysis
 		VImageAnalyzerHistograms* fAnaHistos;               //!< analysis test histograms
@@ -67,7 +67,7 @@ class VImageAnalyzerData
 		valarray<unsigned int> fTCorrectedSumLast;
 		valarray<unsigned int> fCurrentSummationWindow;
 		valarray<unsigned int> fCurrentSummationWindow_2;
-// trace fitting results
+		// trace fitting results
 		valarray<double> fRiseTime;               //!< 10-90% rise time of pulse
 		valarray<double> fFallTime;               //!< 90-10% fall time of pulse
 		valarray<double> fRiseTimePar;            //!< left side pulse parameter of pulse
@@ -78,14 +78,14 @@ class VImageAnalyzerData
 		valarray<double> fTraceMax;               //!< trace maximum
 		valarray<unsigned int> fTraceN255;
 		valarray<double> fRawTraceMax;            //!< raw trace maximum
-// cleaning
+		// cleaning
 		vector<bool> fImage;
 		vector<int> fImageUser;                   //!< channels which are enabled/disables by the user
 		vector<bool> fBorder;
 		vector<bool> fTrigger;                    //!< MS: pixels selected by trigger algorithm
 		vector<bool> fBrightNonImage;             //!< pixel above non image threshold
 		vector<bool> fImageBorderNeighbour;       //!< image and border pixel plus their neighbours
-// time cleaning
+		// time cleaning
 		vector<int> fClusterNpix;                 //!< HP: numer of pixels in cluster
 		vector<int> fClusterID;                   //!< HP: cluster ID
 		int fMainClusterID;                       //!< HP: main cluster ID
@@ -95,20 +95,20 @@ class VImageAnalyzerData
 		vector<double> fClusterCeny;              //!< HP: cenY of the cluster
 		int fncluster_cleaned;                    //!< HP: number of clusters
 		int fncluster_uncleaned;                  //!< HP: number of clusters before cluster rejection
-// correlation cleaning
+		// correlation cleaning
 		vector<double> fCorrelationCoefficient;  // correlation coefficient
-// time since run start
+		// time since run start
 		double fTimeSinceRunStart;                //!< time since run start
 		double fTimeRunStart;                     //!< time of first event in run
 		
-// special channels
+		// special channels
 		VSpecialChannel* fSpecialChannel;
 		
-// FADCstop info
+		// FADCstop info
 		vector< double > fFADCstopTZero;
 		vector< double > fFADCstopSum;
 		
-// mean pulse histograms
+		// mean pulse histograms
 		TList* hMeanPulses;
 		vector< TProfile2D* > hMeanPulseHigh;     //!< high gain mean pulse
 		vector< TProfile2D* > hMeanPulseLow;      //!< low gainpulse  mean pulse
@@ -116,7 +116,7 @@ class VImageAnalyzerData
 		vector< TH1F* > hPulseSumHigh;            //!< integrated charge for high gain channels
 		vector< TH1F* > hPulseSumLow;             //!< integrated charge for low gain channels
 		
-// dummy vector
+		// dummy vector
 		vector< unsigned int > iDummyVectorUI;
 		
 		VImageAnalyzerData( unsigned int iTelID, unsigned int iShortTree = 0, bool bCalibration = false );

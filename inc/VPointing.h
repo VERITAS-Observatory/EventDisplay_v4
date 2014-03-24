@@ -33,7 +33,7 @@ class VPointing : public VSkyCoordinates
 		
 		float  fTelAzimuthDB;                     //!< [deg]  azimuth from VTS DB (from positioner or pointing monitor)
 		float  fTelElevationDB;                   //!< [deg]  elevation from VTS DB (from positioner or pointing monitor)
-// difference between DB/VPM pointing and position
+		// difference between DB/VPM pointing and position
 		float fPointingErrorX;                    //!< [deg]
 		float fPointingErrorY;                    //!< [deg]
 		unsigned int fMeanPointingErrorN;
@@ -44,7 +44,7 @@ class VPointing : public VSkyCoordinates
 		VPointingDB* fPointingDB;
 		TTree* fPointingTree;
 		
-// private functions
+		// private functions
 		void initializePointingTree();
 		bool updatePointingfromDB( int, double );
 		

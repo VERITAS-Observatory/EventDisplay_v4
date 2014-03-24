@@ -121,7 +121,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 	string iTemp = "";
 	string iTempSite = "";
 	
-// get list of sites
+	// get list of sites
 	vector< string > iListOfSites;
 	while( getline( is, is_line ) )
 	{
@@ -129,7 +129,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		if( !is_stream.eof() )
 		{
 			is_stream >> iTemp;
-// ignore lines with '#' in the beginning
+			// ignore lines with '#' in the beginning
 			if( iTemp == "#" )
 			{
 				continue;
@@ -148,14 +148,14 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 			}
 		}
 	}
-// no more sites
+	// no more sites
 	if( iSiteCounter >= iListOfSites.size() )
 	{
 		return false;
 	}
 	cout << "reading from " << iDataList << " : " << iSiteCounter << "=" << iListOfSites[iSiteCounter] << endl;
 	
-// reset stream (??!?!?!)
+	// reset stream (??!?!?!)
 	is.close();
 	is.open( iDataList.c_str(), ifstream::in );
 	
@@ -166,7 +166,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		if( !is_stream.eof() )
 		{
 			is_stream >> iTemp;
-// ignore lines with '#' in the beginning
+			// ignore lines with '#' in the beginning
 			if( iTemp == "#" )
 			{
 				continue;
@@ -200,7 +200,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		if( !is_stream.eof() )
 		{
 			is_stream >> iTemp;
-// add direction string
+			// add direction string
 			if( iTemp.find( "NIM" ) != string::npos && iDirectionString.size() > 0 )
 			{
 				iTemp.insert( iTemp.find( "NIM" ), iDirectionString );
@@ -288,7 +288,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		{
 			fLegend.push_back( "" );
 		}
-// fill up remaining vectors
+		// fill up remaining vectors
 		fGraphSensitivity.push_back( 0 );
 		z++;
 	}
@@ -299,7 +299,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		cout << "VSiteData::addDataSet: integrity: " << checkIntegrity() << endl;
 	}
 	
-// add observing time to legend
+	// add observing time to legend
 	char hname[200];
 	for( unsigned int i = 0; i < fObservationTime_s.size(); i++ )
 	{
@@ -317,7 +317,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		}
 	}
 	
-// set data files correctly
+	// set data files correctly
 	for( unsigned int i = 0; i < fSiteFileName.size(); i++ )
 	{
 		stringstream sobs( stringstream::in | stringstream::out );
@@ -349,7 +349,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 		}
 	}
 	
-// check that file exists
+	// check that file exists
 	for( unsigned int i = 0; i < fSiteFileName.size(); i++ )
 	{
 		TFile iF( fSiteFileName[i].c_str() );

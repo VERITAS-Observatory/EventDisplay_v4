@@ -84,7 +84,7 @@ class VCamera
 		
 		vector< TEllipse* > fTheta2Circle;
 		
-// things plotted while showing the channel numbers
+		// things plotted while showing the channel numbers
 		int fPrintChannel;                        //!< print channel numbers (0=none,1=channels,2=tubes)
 		vector<TText*> fTextChannelNumber;        //!< channel number
 		vector<TText*> fTextTubeNumber;           //!< tube number
@@ -93,7 +93,7 @@ class VCamera
 		TLine* fEllipseLine;
 		TLine* fCenterLine;
 		
-// stuff need for color scheme mode
+		// stuff need for color scheme mode
 		unsigned int fPlotColor;                  //!< color scheme plot (1) or circles size plot (0)
 		TGaxis* fColourAxis;                      //!< axis on the right to color palette
 		int fncolors;                             //!< number of colors in current style
@@ -104,7 +104,7 @@ class VCamera
 		bool fFirstTelescopeToDraw;
 		int  fTelescopeEllipseColor;
 		
-// color definitions
+		// color definitions
 		unsigned int fColorEmpty;
 		unsigned int fColorImage;
 		unsigned int fColorImageUser;

@@ -48,19 +48,19 @@ int fRandomSeed = 17;
 */
 bool testCommandlineArguments()
 {
-// MONO ANALYSIS PROBABLY DOES NOT WORK ANYMORE
+	// MONO ANALYSIS PROBABLY DOES NOT WORK ANYMORE
 	if( analysisType != 3 && analysisType != 4 )
 	{
 		cout << "Mono analysis not well tested and disabled; DO NOT USE!" << endl;
 		return false;
 	}
-// require a runlist file
+	// require a runlist file
 	if( listfilename.size() < 1 && listShortfilename.size() < 1 )
 	{
 		cout << "error: missing required command line argument --runlist (-l) or --shortlist (-s)" << endl;
 		return false;
 	}
-// require data directory
+	// require data directory
 	if( datadir.size() < 1 )
 	{
 		cout << "error: missing required command line argument --datadir (-d)" << endl;
@@ -86,17 +86,17 @@ int main( int argc, char* argv[] )
 		exit( 0 );
 	}
 	
-// initialize analysis
+	// initialize analysis
 	VAnaSum* anasum = new VAnaSum( datadir, analysisType );
 	anasum->initialize( listfilename, listShortfilename, singletel - 1, runType, outfile, fRandomSeed, fRunParameterfile );
 	cout << endl;
 	
-// mono analysis (GM: THIS HAS NOT BEEN USED SINCE PROTOTYPE TIMES - PROBABLY DOES NOT WORK ANYMORE)
+	// mono analysis (GM: THIS HAS NOT BEEN USED SINCE PROTOTYPE TIMES - PROBABLY DOES NOT WORK ANYMORE)
 	if( analysisType == 0 || analysisType == 1 )
 	{
 		anasum->doMonoAnalysis( ( analysisType == 1 ) || ( analysisType == 5 ) );
 	}
-// stereo analysis (default)
+	// stereo analysis (default)
 	else if( analysisType == 3 || analysisType == 4 )
 	{
 		anasum->doStereoAnalysis( ( analysisType == 3 ) || ( analysisType == 5 ) );
@@ -106,7 +106,7 @@ int main( int argc, char* argv[] )
 		cout << endl << "error: unknown run analysisType" << endl;
 		exit( -1 );
 	}
-// clean up and write results to disk
+	// clean up and write results to disk
 	anasum->terminate();
 	
 	cout << endl << "analysis results written to " << outfile << endl;

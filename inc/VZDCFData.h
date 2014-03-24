@@ -26,7 +26,7 @@ class VZDCFData
 		
 		void print();
 		
-//   ClassDef( VZDCFData, 1 );
+		//   ClassDef( VZDCFData, 1 );
 };
 
 #endif

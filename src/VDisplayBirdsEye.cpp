@@ -20,7 +20,7 @@ VDisplayBirdsEye::VDisplayBirdsEye()
 		cout << "VDisplayBirdsEye::VDisplayBirdsEye" << endl;
 	}
 	fPlotPaper = false;
-// half width of field (in [m], draw it from +- fFieldX/Y)
+	// half width of field (in [m], draw it from +- fFieldX/Y)
 	fFieldX = 300.;
 	fFieldY = 300.;
 	fFieldCentreX = 0.;
@@ -107,18 +107,18 @@ void VDisplayBirdsEye::draw( TPad* iPad )
 	iPad->SetEditable( true );
 	iPad->cd();
 	gPad->Clear();
-// no scaling, canvas is a square (otherwise distortion)
+	// no scaling, canvas is a square (otherwise distortion)
 	fXScale = 1.;
 	fYScale = 1.;
-// calculate telescope positions
+	// calculate telescope positions
 	setGeometry();
-// draw the telescopes
-//    drawTelescopes();
+	// draw the telescopes
+	//    drawTelescopes();
 	drawTelescopes_with_sizeAxis();
-// draw event info and reconstructed shower parameters
+	// draw event info and reconstructed shower parameters
 	drawEventText();
 	iPad->Update();
-//   iPad->SetEditable( false );
+	//   iPad->SetEditable( false );
 }
 
 
@@ -134,16 +134,16 @@ void VDisplayBirdsEye::drawEventText()
 	unsigned int iM = fData->getRunParameter()->fPlotAllInOneMethod;
 	
 	fTextRec.clear();
-// run and event number:
+	// run and event number:
 	sprintf( iText, "Run/Event: %d/%d", fData->getRunNumber(), fData->getEventNumber() );
 	fTextRec.push_back( new TText( 0.02, 0.96, iText ) );
-// mc text
+	// mc text
 	if( fData->getReader()->isMC() )
 	{
 		sprintf( iText, "MC: E=%.2f, Ze=%.0f, Az=%.0f, Xoff=%.2f, Yoff=%.2f, Xcore=%.0f, Ycore=%.0f", fData->getShowerParameters()->MCenergy, fData->getShowerParameters()->MCze, fData->getShowerParameters()->MCaz, fData->getShowerParameters()->MCTel_Xoff, fData->getShowerParameters()->MCTel_Yoff, fData->getShowerParameters()->MCxcore, fData->getShowerParameters()->MCycore );
 		fTextRec.push_back( new TText( 0.02, 0.12, iText ) );
 	}
-// shower reconstruction text
+	// shower reconstruction text
 	sprintf( iText, "%u tel in stereo analysis (ID%d):", fData->getShowerParameters()->fShowerNumImages[iM], iM );
 	for( unsigned int i = 0; i < fData->getNTel(); i++ )
 	{
@@ -153,8 +153,8 @@ void VDisplayBirdsEye::drawEventText()
 		}
 	}
 	fTextRec.push_back( new TText( 0.02, 0.09, iText ) );
-// triggered events
-// (any trigger condition)
+	// triggered events
+	// (any trigger condition)
 	sprintf( iText, "%u tel triggered: ", fData->getShowerParameters()->fNTrig );
 	for( unsigned int i = 0; i < fData->getShowerParameters()->fNTrig; i++ )
 	{
@@ -178,7 +178,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
 {
 	for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
 	{
-// telescopes (circles)
+		// telescopes (circles)
 		fElTel[i]->SetX1( convertX( fTelPosX[i] ) );
 		fElTel[i]->SetY1( convertY( fTelPosY[i] ) );
 		fElTel[i]->SetR1( scaleX( fTelRad[i] ) );
@@ -190,7 +190,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
 		fElTelImage[i]->SetR2( scaleY( fTelRad[i] ) );
 	}
 	
-// get min/max size or nphotons
+	// get min/max size or nphotons
 	double iMin = 1.e20;
 	double iMax = 0.;
 	for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
@@ -208,7 +208,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
 	}
 	setColorAxisDataVector_minmax( iMin * 0.99, iMax * 1.01 );
 	
-// fill histogram
+	// fill histogram
 	unsigned int i_tel_with_images = 0;
 	for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
 	{
@@ -216,7 +216,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
 		if( fData->getImageParameters()->size > 0. )
 		{
 			i_tel_with_images++;
-// plot telescopes
+			// plot telescopes
 			fElTelImage[i]->SetFillStyle( 1001 );
 			fElTelImage[i]->SetR1( scaleX( fTelRad[i] + 3.*fTelRad[i] * ( log10( fData->getImageParameters()->size ) - iMin ) / ( iMax - iMin ) ) );
 			fElTelImage[i]->SetR2( scaleX( fTelRad[i] + 3.*fTelRad[i] * ( log10( fData->getImageParameters()->size ) - iMin ) / ( iMax - iMin ) ) );
@@ -244,7 +244,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
 			}
 			iLT->Draw();
 		}
-// telescope identifier (T1,T2,etc.); draw only if less than 10 telescopes
+		// telescope identifier (T1,T2,etc.); draw only if less than 10 telescopes
 		if( fData->getTeltoAna().size() < 10 )
 		{
 			fTextTel[i]->Draw();
@@ -257,7 +257,7 @@ void VDisplayBirdsEye::drawTelescopes_with_sizeAxis()
 			}
 		}
 	}
-// plot shower axis
+	// plot shower axis
 	if( i_tel_with_images )
 	{
 		TGaxis* g = getColorAxisAxis( 0.92, 0.94, 0.70, 0.98, "log_{10} size", 10 );
@@ -286,12 +286,12 @@ void VDisplayBirdsEye::drawTelescopes()
 		cout << "VDisplayBirdsEye::drawTelescopes()" << endl;
 	}
 	
-///////////////////////////////
-// now loop over all telescopes
-///////////////////////////////
+	///////////////////////////////
+	// now loop over all telescopes
+	///////////////////////////////
 	for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
 	{
-// telescopes (circles)
+		// telescopes (circles)
 		fElTel[i]->SetX1( convertX( fTelPosX[i] ) );
 		fElTel[i]->SetY1( convertY( fTelPosY[i] ) );
 		fElTel[i]->SetR1( scaleX( fTelRad[i] ) );
@@ -304,7 +304,7 @@ void VDisplayBirdsEye::drawTelescopes()
 		{
 			fElTel[i]->SetFillColor( 1 );
 		}
-// triggered telescopes are bold/red lined
+		// triggered telescopes are bold/red lined
 		if( fData->getReader()->hasLocalTrigger( fData->getTeltoAna()[i] ) )
 		{
 			fElTel[i]->SetLineColor( 2 );
@@ -316,7 +316,7 @@ void VDisplayBirdsEye::drawTelescopes()
 			fElTel[i]->SetLineWidth( 1 );
 		}
 		fElTel[i]->Draw();
-// telescope identifier (T1,T2,etc.); draw only if less than 10 telescopes
+		// telescope identifier (T1,T2,etc.); draw only if less than 10 telescopes
 		if( fData->getTeltoAna().size() < 10 )
 		{
 			fTextTel[i]->Draw();
@@ -327,9 +327,9 @@ void VDisplayBirdsEye::drawTelescopes()
 
 void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 {
-// reconstruction method to draw
+	// reconstruction method to draw
 	unsigned int iM = fData->getRunParameter()->fPlotAllInOneMethod;
-// image line coordinates
+	// image line coordinates
 	float i_x1 = 0.;
 	float i_y1 = 0.;
 	float i_x2 = 0.;
@@ -341,8 +341,8 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 	float i_z = 0.;
 	float i_xcos = 0.;
 	float i_ycos = 0.;
-// telescope are transformed into shower coordinates using MC real shower direction
-// telescopes are transformed into telescope pointing coordinates
+	// telescope are transformed into shower coordinates using MC real shower direction
+	// telescopes are transformed into telescope pointing coordinates
 	if( fData )
 	{
 		double degrad = 45. / atan( 1. );
@@ -364,13 +364,13 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 	
 	for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
 	{
-// image lines
+		// image lines
 		if( fData->getShowerParameters()->fTelIDImageSelected[iM].size() > 0
 				&& fData->getShowerParameters()->fTelIDImageSelected[iM][fData->getTeltoAna()[i]] )
 		{
-// image line coordinates in ground coordinates
-// image lines connects the reconstructed shower position with the centroid position
-// (assuming telescopes are pointing into shower direction)
+			// image line coordinates in ground coordinates
+			// image lines connects the reconstructed shower position with the centroid position
+			// (assuming telescopes are pointing into shower direction)
 			double i_y = -1.*fData->getShowerParameters()->fShower_Yoffset[iM];
 			double i_x = -1.*fData->getShowerParameters()->fShower_Xoffset[iM];
 			if( fData->getDetectorGeo()->getGrIsuVersion() >= 412 )
@@ -407,7 +407,7 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 					i_y2 = convertY( fTelPosY[i] );
 				}
 				
-// set image line coordinates
+				// set image line coordinates
 				fLiImage[i]->SetX1( i_x1 );
 				fLiImage[i]->SetX2( i_x2 );
 				fLiImage[i]->SetY1( i_y1 );
@@ -418,11 +418,11 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 		}
 		else
 		{
-// don't draw anything
+			// don't draw anything
 		}
 		
 	}
-// draw MC core position as a black cross
+	// draw MC core position as a black cross
 	if( fData->getReader()->isMC() )
 	{
 		fMarkerMCCore = new TMarker( convertX( fData->getShowerParameters()->MCxcore_SC ), convertY( fData->getShowerParameters()->MCycore_SC ), 28 );
@@ -430,8 +430,8 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 		fMarkerMCCore->SetMarkerSize( 1.5 );
 		fMarkerMCCore->Draw();
 	}
-// draw reconstructed shower cores with different colors (method 0 = color 2, method 1 = color 3, method 2 = color 4, ...)
-// draw the cores only for succesfull reconstruction (Chi2>=0.)
+	// draw reconstructed shower cores with different colors (method 0 = color 2, method 1 = color 3, method 2 = color 4, ...)
+	// draw the cores only for succesfull reconstruction (Chi2>=0.)
 	fMarkerCore.clear();
 	fMarkerCore.push_back( new TMarker( convertX( fData->getShowerParameters()->fShowerXcore_SC[iM] ), convertY( fData->getShowerParameters()->fShowerYcore_SC[iM] ), 3 ) );
 	fMarkerCore.back()->SetMarkerColor( 1 );
@@ -440,10 +440,10 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 	{
 		fMarkerCore.back()->Draw();
 	}
-// draw coordinate system
-// two arrow somewhere in the lower left corner of the canvas
-// the red arrow indicates the x-axis, the black the y-axis
-// (GM) not sure if the coordinate systems are correct
+	// draw coordinate system
+	// two arrow somewhere in the lower left corner of the canvas
+	// the red arrow indicates the x-axis, the black the y-axis
+	// (GM) not sure if the coordinate systems are correct
 	float i_startx = 55.;
 	i_startx = 0.;
 	float i_stopx = i_startx + 35.;
@@ -457,12 +457,12 @@ void VDisplayBirdsEye::drawImageLines_and_Corepositions()
 		fAxis_SC_X = new TArrow( convertX( i_x1_SC ), convertY( i_y1_SC ), convertX( i_x2_SC ), convertY( i_y2_SC ), 0.03, "|>" );
 		fAxis_SC_X->SetFillColor( 2 );
 		fAxis_SC_X->SetLineColor( 2 );
-//      fAxis_SC_X->Draw();
+		//      fAxis_SC_X->Draw();
 		tel_impact( i_xcos, i_ycos, i_startx, i_starty, 0., &i_x1_SC, &i_y1_SC, &i_z, false );
 		tel_impact( i_xcos, i_ycos, i_startx, i_stopy, 0., &i_x2_SC, &i_y2_SC, &i_z, false );
 		fAxis_SC_Y = new TArrow( convertX( i_x1_SC ), convertY( i_y1_SC ), convertX( i_x2_SC ), convertY( i_y2_SC ), 0.03, "|>" );
 		fAxis_SC_Y->SetFillColor( 1 );
-//      fAxis_SC_Y->Draw();
+		//      fAxis_SC_Y->Draw();
 	}
 }
 
@@ -494,7 +494,7 @@ void VDisplayBirdsEye::setGeometry()
 	{
 		cout << "VDisplayBirdsEye::setGeometry()" << endl;
 	}
-// reset all data vectors
+	// reset all data vectors
 	fNTel = fData->getTeltoAna().size();
 	fTelPosX.clear();
 	fTelPosY.clear();
@@ -507,10 +507,10 @@ void VDisplayBirdsEye::setGeometry()
 	double i_meanX = 0.;
 	double i_meanY = 0.;
 	double i_meanN = 0.;
-// calculate centre of array and  size of field to display
+	// calculate centre of array and  size of field to display
 	for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
 	{
-// get telescopes in shower coordinates
+		// get telescopes in shower coordinates
 		fData->setTelID( fData->getTeltoAna()[i] );
 		fTelPosX.push_back( fData->getImageParameters( fData->getRunParameter()->fImageLL )->Tel_x_SC );
 		fTelPosY.push_back( fData->getImageParameters( fData->getRunParameter()->fImageLL )->Tel_y_SC );
@@ -543,15 +543,15 @@ void VDisplayBirdsEye::setGeometry()
 	for( unsigned int i = 0; i < fData->getTeltoAna().size(); i++ )
 	{
 		fData->setTelID( fData->getTeltoAna()[i] );
-// set telescope radius
+		// set telescope radius
 		fTelRad.push_back( fData->getDetectorGeo()->getTelRadius()[fData->getTeltoAna()[i]] );
-// define telescopes at circles in canvas
+		// define telescopes at circles in canvas
 		fElTel.push_back( new TEllipse( convertX( fTelPosX[i] ), convertY( fTelPosY[i] ), scaleX( fTelRad[i] ), scaleY( fTelRad[i] ) ) );
-// define shower image
+		// define shower image
 		fElTelImage.push_back( new TEllipse( convertX( fTelPosX[i] ), convertY( fTelPosY[i] ), scaleX( fTelRad[i] ), scaleY( fTelRad[i] ) ) );
-// get image parameters
+		// get image parameters
 		fParameters.push_back( fData->getImageParameters( fData->getRunParameter()->fImageLL ) );
-// set telescope label
+		// set telescope label
 		if( fData->getTeltoAna().size() < 10 )
 		{
 			sprintf( i_text, "T%d", fData->getTeltoAna()[i] + 1 );
@@ -572,7 +572,7 @@ void VDisplayBirdsEye::setGeometry()
 			fTextTel.back()->SetTextAngle( 45. );
 		}
 		fTextTel.back()->SetTextColor( 13 );
-// set line representing the main image shower axis
+		// set line representing the main image shower axis
 		fLiImage.push_back( new TLine( 0., 0., 1., 1. ) );
 		fLiImage.back()->SetLineStyle( 3 );
 		fLiImage.back()->SetLineWidth( 1 );

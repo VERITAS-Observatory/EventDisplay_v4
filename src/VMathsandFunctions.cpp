@@ -62,19 +62,19 @@ double VMathsandFunctions::getSpectralWeightedMeanEnergy( double e_min_log10, do
 	double xL = TMath::Power( 10., e_min_log10 );
 	double xU = TMath::Power( 10., e_max_log10 );
 	
-// return mean (log value, mean on the linear scale)
+	// return mean (log value, mean on the linear scale)
 	if( iSpectralIndex == 0. )
 	{
 		return TMath::Log10( 0.5 * ( xL + xU ) );
 	}
 	
-// upper limit of bin should be larger than lower limit
+	// upper limit of bin should be larger than lower limit
 	if( xU <= xL )
 	{
 		return e_min_log10;
 	}
 	
-// calculate weighted mean
+	// calculate weighted mean
 	double xM = 0.;
 	xM = 1. / ( iSpectralIndex + 1. ) / ( xU - xL ) * ( TMath::Power( xU, iSpectralIndex + 1. ) - TMath::Power( xL, iSpectralIndex + 1. ) );
 	xM = TMath::Log10( xM ) / iSpectralIndex;
@@ -98,9 +98,9 @@ double VMathsandFunctions::getBaryCentricMeanEnergy( double e_min_log10, double 
 	double xU = TMath::Power( 10., e_max_log10 );
 	
 	double xM = -99.e99;
-// normalisation
+	// normalisation
 	xM  = ( iSpectralIndex + 1. ) / ( TMath::Power( xU, iSpectralIndex + 1. ) - TMath::Power( xL, iSpectralIndex + 1. ) );
-// integration
+	// integration
 	xM *=  1. / ( iSpectralIndex + 2. ) * ( TMath::Power( xU, iSpectralIndex + 2. ) - TMath::Power( xL, iSpectralIndex + 2. ) );
 	
 	if( xM > 0. )

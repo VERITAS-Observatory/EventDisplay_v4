@@ -225,12 +225,12 @@ void VRunSummary::print()
 bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_directory, vector< VAnaSumRunParameterDataClass > iRunList )
 {
 
-// current directory
+	// current directory
 	TDirectory* iCurrentDirectory = gDirectory;
 	
 	char i_temp[2000];
 	
-// reset variables
+	// reset variables
 	fRunMJD.clear();
 	
 	fTotalExposureOn = 0.;
@@ -249,10 +249,10 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 	fMeanPedVarsOn = 0.;
 	fMeanPedVarsOff = 0.;
 	
-// loop over all runs
+	// loop over all runs
 	for( unsigned int i = 0; i < iRunList.size(); i++ )
 	{
-// open anasum file
+		// open anasum file
 		sprintf( i_temp, "%s/%d.anasum.root", iDataDirectory.c_str(), iRunList[i].fRunOn );
 		
 		TFile iInputfile( i_temp );
@@ -268,7 +268,7 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 			cout << "exiting..." << endl;
 			exit( -1 );
 		}
-// read anasum tree from file
+		// read anasum tree from file
 		TTree* i_runSumTree = ( TTree* )gDirectory->Get( "tRunSummary" );
 		if( !i_runSumTree )
 		{
@@ -278,8 +278,8 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 		}
 		CRunSummary i_runSum( i_runSumTree );
 		
-// create tree
-// (this expects that trees from anasum file and runSummary tree defined here are the same)
+		// create tree
+		// (this expects that trees from anasum file and runSummary tree defined here are the same)
 		if( i == 0 )
 		{
 			if( fRunSummaryTree )
@@ -306,11 +306,11 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 			i_runSum.GetEntry( n );
 			if( i_runSum.runOn == iRunList[i].fRunOn )
 			{
-// copy entries to new run summary tree
+				// copy entries to new run summary tree
 				fRunSummaryTree->CopyAddresses( i_runSumTree );
 				fRunSummaryTree->CopyEntries( i_runSumTree, 1 );
 				
-// add values to run list
+				// add values to run list
 				fRunMJD[runOn] = i_runSum.MJDOn;
 				fRunMJD[runOff] = i_runSum.MJDOff;
 				fTotalExposureOn += i_runSum.tOn;
@@ -329,7 +329,7 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 				fMeanPedVarsOff += i_runSum.pedvarsOff;
 				fNMeanElevation++;
 				
-// check if all targets are the same in file
+				// check if all targets are the same in file
 				if( fNMeanElevation == 0. )
 				{
 					iTargetRA = i_runSum.TargetRA;
@@ -361,7 +361,7 @@ bool VRunSummary::fill( string iDataDirectory, string i_inputfile_total_director
 		}
 		fRunSummaryTree->AutoSave();
 		
-// set target coordinates
+		// set target coordinates
 		fTotTargetRA = iTargetRA;
 		fTotTargetDec = iTargetDec;
 		fTotTargetRAJ2000 = iTargetRAJ2000;

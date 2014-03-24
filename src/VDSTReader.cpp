@@ -27,7 +27,7 @@ VDSTReader::VDSTReader( string isourcefile, bool iMC, int iNTel, bool iDebug )
 	
 	fDSTTree = new VDSTTree();
 	
-// open source file and init tree
+	// open source file and init tree
 	init();
 }
 
@@ -64,7 +64,7 @@ bool VDSTReader::init()
 		cout << " VDSTReader::init()" << endl;
 	}
 	
-// open file
+	// open file
 	fDSTfile = new TFile( fSourceFileName.c_str() );
 	if( fDSTfile->IsZombie() )
 	{
@@ -73,7 +73,7 @@ bool VDSTReader::init()
 		exit( -1 );
 	}
 	
-// get and init tree
+	// get and init tree
 	if( !fDSTfile->Get( "dst" ) || !fDSTfile->Get( "telconfig" ) )
 	{
 		cout << "Error reading DST tree from dst file" << endl;
@@ -86,7 +86,7 @@ bool VDSTReader::init()
 		fNChannel.push_back( fDSTTree->getDSTNChannels( i ) );
 	}
 	
-// init data vectors
+	// init data vectors
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
 		valarray< double > i_temp( 0., fNChannel[i] );
@@ -115,7 +115,7 @@ bool VDSTReader::init()
 		fDSTl2trig_type.push_back( 0 );
 		fLTtime.push_back( 0. );
 		fLDTtime.push_back( 0. );
-// FADC Trace
+		// FADC Trace
 		vector< uint16_t > i_trace_sample( VDST_MAXSUMWINDOW, 0 );
 		vector< vector< uint16_t > > i_trace_sample_VV;
 		for( unsigned int t = 0; t < VDST_MAXCHANNELS; t++ )
@@ -160,7 +160,7 @@ bool VDSTReader::getNextEvent()
 	int i_succ = 0;
 	i_succ = fDSTTree->getDSTTree()->GetEntry( fDSTtreeEvent );
 	
-// no next event
+	// no next event
 	if( i_succ <= 0 )
 	{
 		setEventStatus( 999 );
@@ -173,7 +173,7 @@ bool VDSTReader::getNextEvent()
 		return false;
 	}
 	
-// fill data vectors
+	// fill data vectors
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
 		fTelAzimuth[i] = fDSTTree->getDSTTelAzimuth( i );
@@ -197,12 +197,12 @@ bool VDSTReader::getNextEvent()
 		}
 		fNumberofFullTrigger[i] = fDSTTree->getNTrigL1( i );
 	}
-// get local trigger
+	// get local trigger
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
 		fDSTvltrig[i] = fDSTTree->getDSTLocalTrigger( i );
 	}
-// get local trigger time
+	// get local trigger time
 	if( fMC )
 	{
 		for( unsigned int i = 0; i < fNTelescopes; i++ )
@@ -212,13 +212,13 @@ bool VDSTReader::getNextEvent()
 			fDSTl2trig_type[i] = fDSTTree->getDSTL2TriggerType( i );
 		}
 	}
-// get FADC trace
+	// get FADC trace
 	if( fPerformFADCAnalysis && fDSTTree->getFADC() )
 	{
 		for( unsigned int i = 0; i < fNTelescopes; i++ )
 		{
 			fDSTTree->setTelCounter( i );
-// telescope is not read out
+			// telescope is not read out
 			if( fNumSamples[i] == 0 )
 			{
 				continue;
@@ -233,9 +233,9 @@ bool VDSTReader::getNextEvent()
 		}
 	}
 	
-// successfull event
+	// successfull event
 	setEventStatus( 1 );
-// increment tree event number
+	// increment tree event number
 	fDSTtreeEvent++;
 	return true;
 }

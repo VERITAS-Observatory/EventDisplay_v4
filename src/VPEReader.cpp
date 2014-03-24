@@ -24,7 +24,7 @@ VPEReader::VPEReader( string isourcefile, vector< unsigned int > iTeltoAna, VDet
 	
 	fTeltoAna = iTeltoAna;
 	
-// set up detector geometry
+	// set up detector geometry
 	fDetectorGeometry = iD;
 	if( !fDetectorGeometry )
 	{
@@ -42,10 +42,10 @@ VPEReader::VPEReader( string isourcefile, vector< unsigned int > iTeltoAna, VDet
 		fLocalTrigger.push_back( false );
 	}
 	
-// pe data is always MC data
+	// pe data is always MC data
 	fMC = true;
 	
-// open source file and init tree
+	// open source file and init tree
 	init();
 }
 
@@ -67,7 +67,7 @@ bool VPEReader::init()
 		cout << " VPEReader::init() " << endl;
 	}
 	
-// init data vectors
+	// init data vectors
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
 		valarray< double > i_temp( 0., fNChannel[i] );
@@ -88,7 +88,7 @@ bool VPEReader::init()
 		fTelElevation.push_back( 0. );
 	}
 	
-// open file
+	// open file
 	fPE_file = new TFile( fSourceFileName.c_str() );
 	if( fPE_file->IsZombie() )
 	{
@@ -97,16 +97,16 @@ bool VPEReader::init()
 		exit( -1 );
 	}
 	
-// set up all trees
+	// set up all trees
 	cout << "reading PE file: checking trees..." << endl;
-// get single pe tree vector
-
+	// get single pe tree vector
+	
 	char hname[2000];
 	bool bFirst = true;
 	map< unsigned int, unsigned int > iTelGrisu = fDetectorGeometry->getTelIDGrisu();
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
-// check if this telescope should be analyzed
+		// check if this telescope should be analyzed
 		bool bAna = false;
 		for( unsigned int t = 0; t < fTeltoAna.size(); t++ ) if( fTeltoAna[t] == i )
 			{
@@ -188,7 +188,7 @@ bool VPEReader::getNextEvent()
 	fNLocalTrigger = 0;
 	fArrayTrigger = false;
 	
-// loop over all trees
+	// loop over all trees
 	for( unsigned int i = 0; i < fPE_Tree.size(); i++ )
 	{
 		if( !fPE_Tree[i] )
@@ -205,8 +205,8 @@ bool VPEReader::getNextEvent()
 		
 		fPE_Tree[i]->getEntry( fPE_treeEvent );
 		
-// get MC info from first tree
-
+		// get MC info from first tree
+		
 		if( fPE_Tree[i]->isFull() )
 		{
 			fPE_eventnumber = fPE_Tree[i]->fEventNumber + 1;
@@ -237,7 +237,7 @@ bool VPEReader::getNextEvent()
 			{
 				fTelAzimuth[t] = fPE_az * degrad;
 			}
-// add wobble offset
+			// add wobble offset
 			double az = 0.;
 			double ze = 0.;
 			VSkyCoordinatesUtilities::getRotatedShowerDirection( fPE_ze * degrad, fPE_az * degrad, fPE_Tel_yoff, -1.*fPE_Tel_xoff, ze, az );
@@ -296,7 +296,7 @@ bool VPEReader::getNextEvent()
 		}
 	}
 	
-// fill data vectors
+	// fill data vectors
 	for( unsigned int i = 0; i < fNTelescopes; i++ )
 	{
 		for( unsigned int j = 0; j < fNChannel[i]; j++ )
@@ -309,7 +309,7 @@ bool VPEReader::getNextEvent()
 		}
 	}
 	
-// get local trigger time
+	// get local trigger time
 	if( fMC )
 	{
 		fLTtime.clear();
@@ -320,7 +320,7 @@ bool VPEReader::getNextEvent()
 		}
 	}
 	
-// array trigger requires simply 2 telescope with non-zero size
+	// array trigger requires simply 2 telescope with non-zero size
 	if( fNLocalTrigger > 1 )
 	{
 		fArrayTrigger = true;
@@ -329,13 +329,13 @@ bool VPEReader::getNextEvent()
 	{
 		fArrayTrigger = false;
 	}
-// single telescope analysis
+	// single telescope analysis
 	if( fNTelescopes == 1 && fNLocalTrigger == 1 )
 	{
 		fArrayTrigger = true;
 	}
 	
-// increment tree event number
+	// increment tree event number
 	fPE_treeEvent++;
 	
 	return true;

@@ -213,7 +213,7 @@ void VModelLnL::pixelLnLGauss( double s, double pixel_var, double pixel_nsb, dou
 		return;
 	}
 	
-//// TEST: Gaussian test (good for high signal) /////////
+	//// TEST: Gaussian test (good for high signal) /////////
 	double exnoise = 0.4; //TEST: 40% resolution from HESS
 	double ped = pixel_var; // use pedvar
 	

@@ -51,10 +51,10 @@ class VStereoReconstruction : public VPlotUtilities
 		string fName;
 		bool bDebug;
 		
-// vector containing all the plotting data
+		// vector containing all the plotting data
 		vector< VStereoReconstructionData* > fData;
 		
-// plotting variables
+		// plotting variables
 		string fPlottingVariable;
 		TCanvas* fPlottingCanvas;
 		// spectral weight to calculate bin centers

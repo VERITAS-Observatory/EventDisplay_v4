@@ -68,11 +68,11 @@ unsigned int VGammaHadronCutsStatistics::getCounterValue( unsigned int iCut )
 
 void VGammaHadronCutsStatistics::fill()
 {
-// fill data tree
+	// fill data tree
 	fCut_bitset_ulong = fCut_bitset.to_ulong();
 	fData->Fill();
 	
-// reset bit counter
+	// reset bit counter
 	fCut_bitset.reset();
 	fCut_bitset_ulong = 0;
 }

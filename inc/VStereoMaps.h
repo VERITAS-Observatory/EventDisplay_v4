@@ -32,7 +32,7 @@ class VStereoMaps
 		VAnaSumRunParameterDataClass fRunList;
 		CData* fData;
 		
-// theta2 cut (might be energy dependent)
+		// theta2 cut (might be energy dependent)
 		double fTheta2Cut_Max;
 		
 		double fTargetShiftWest;
@@ -40,7 +40,7 @@ class VStereoMaps
 		
 		bool   fTMPL_RE_nMaxoffsource;
 		
-// regions excluded from sky maps
+		// regions excluded from sky maps
 		vector<double> vXTOEXCLUDE;
 		vector<double> vYTOEXCLUDE;
 		vector<double> vRTOEXCLUDE;
@@ -66,7 +66,7 @@ class VStereoMaps
 		
 		void makeTwoDStereo_BoxSmooth( double, double, double, double, double );
 		
-// theta2 calculation
+		// theta2 calculation
 		unsigned int fTheta2_length;
 		vector< double > fTheta2;
 		vector< double > fTheta2_weight;
@@ -75,7 +75,7 @@ class VStereoMaps
 		
 		void initialize_theta2();
 		
-// RING BACKGROUND MODEL
+		// RING BACKGROUND MODEL
 		TFile* fRM_file;
 		
 		bool fill_RingBackgroundModel( double, double, double, double, int, bool );
@@ -83,7 +83,7 @@ class VStereoMaps
 		void RM_calculate_norm();
 		void RM_getAlpha( bool );
 		
-// REFLECTED REGION MODEL:
+		// REFLECTED REGION MODEL:
 		vector< vector< sRE_REGIONS > > fRE_off;  //!< off region parameters
 		double fRE_roffTemp;                      //!< radius of off source region
 		
@@ -92,14 +92,14 @@ class VStereoMaps
 		bool initialize_ReflectedRegionModel();
 		void initialize_ReflectedRegionHistograms();
 		
-// histograms related to reflected region model
+		// histograms related to reflected region model
 		TH2D* hRE_NRegions;
 		TTree* hRE_regions;
 		
 		bool initialize_Histograms();
 		TList* hAuxHisList;                       //!< histograms needed for various calculations
 		
-// some variables needed for efficient filling
+		// some variables needed for efficient filling
 		double f_RE_binXW;
 		double f_RE_binYW;
 		int f_RE_xstart;
@@ -110,12 +110,12 @@ class VStereoMaps
 		int f_RE_WW;
 		int f_RE_WN;
 		
-// FOV BACKGROUND MODEL
+		// FOV BACKGROUND MODEL
 		bool fill_FOVBackgroundModel( double, double, double, double, int, bool );
 		bool initialize_FOVBackgroundModel( bool iIsOn );
 		void FOVM_getAlpha( bool );
 		
-// etc
+		// etc
 		void   cleanup();                         // delete all objects not needed anymore
 		bool   defineAcceptance();
 		//!< return if event is in on region

@@ -111,7 +111,7 @@ void readInputfile( string fInputFile )
 				continue;
 			}
 			
-// check that there are enough parameters in this line
+			// check that there are enough parameters in this line
 			istringstream is_check( is_line );
 			int z = 0;
 			while( !is_check.eof() )
@@ -199,7 +199,7 @@ int main( int argc, char* argv[] )
 	
 	string fOutputfile = argv[3];
 	
-// test number of telescopes
+	// test number of telescopes
 	int iNT = 0;
 	for( unsigned int i = 0; i < fInputData.size(); i++ )
 	{
@@ -218,12 +218,12 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// -------- end of reading input parameters
-
-// output file
+	// -------- end of reading input parameters
+	
+	// output file
 	TFile* fout = new TFile( fOutputfile.c_str(), "RECREATE" );
 	
-// now analyse the data
+	// now analyse the data
 	vector< VDataMCComparision* > fStereoCompare;
 	VDataMCComparision* fStereoCompareOn = 0;
 	VDataMCComparision* fStereoCompareOff = 0;
@@ -234,7 +234,7 @@ int main( int argc, char* argv[] )
 		cout << "----" << endl;
 		fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, false, fInputData[i].fNTelescopes ) );
 		fStereoCompare.back()->setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
-// get telescope coordinates
+		// get telescope coordinates
 		fStereoCompare.back()->resetTelescopeCoordinates();
 		for( int t = 0; t < fInputData[i].fNTelescopes; t++ )
 		{
@@ -247,7 +247,7 @@ int main( int argc, char* argv[] )
 		{
 			fStereoCompare.back()->setWobbleFromDataTree();
 		}
-// fill histograms
+		// fill histograms
 		fStereoCompare.back()->fillHistograms( fInputData[i].fFileName, fSingleTelescopeCuts );
 		fStereoCompare.back()->writeHistograms( fout );
 		
@@ -262,7 +262,7 @@ int main( int argc, char* argv[] )
 		cout << endl;
 	}
 	
-// calculate difference histograms
+	// calculate difference histograms
 	cout << "DIFF" << endl;
 	cout << "----" << endl;
 	VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", false, iNT );

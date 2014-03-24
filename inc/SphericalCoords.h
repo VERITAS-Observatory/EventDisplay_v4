@@ -38,10 +38,10 @@ namespace SEphem
 				rationalize();
 			}
 			
-// ----------------------------------------------------------------------
-// Getters
-// ----------------------------------------------------------------------
-
+			// ----------------------------------------------------------------------
+			// Getters
+			// ----------------------------------------------------------------------
+			
 			const Angle& theta() const
 			{
 				return m_theta;
@@ -141,10 +141,10 @@ namespace SEphem
 			void separationAndDirectionTo( const SphericalCoords& c,
 										   Angle& s, Angle& d ) const;
 										   
-// ----------------------------------------------------------------------
-// Setters
-// ----------------------------------------------------------------------
-
+			// ----------------------------------------------------------------------
+			// Setters
+			// ----------------------------------------------------------------------
+			
 			void set( const Angle& theta, const Angle& phi )
 			{
 				m_theta = theta;
@@ -196,10 +196,10 @@ namespace SEphem
 				setDeg( 90 - latitude, longitude );
 			}
 			
-// ----------------------------------------------------------------------
-// Operations
-// ----------------------------------------------------------------------
-
+			// ----------------------------------------------------------------------
+			// Operations
+			// ----------------------------------------------------------------------
+			
 			void rotate( const Angle& phi, const Angle& theta, const Angle& psi )
 			{
 				rotateRad( phi, theta, psi );
@@ -219,18 +219,18 @@ namespace SEphem
 				rotateRad( Angle::frRot( phi ), Angle::frRot( theta ), Angle::frRot( psi ) );
 			}
 			
-// ----------------------------------------------------------------------
-// Wobble
-// ----------------------------------------------------------------------
-
+			// ----------------------------------------------------------------------
+			// Wobble
+			// ----------------------------------------------------------------------
+			
 			inline void wobble( const double theta_rad, const double phi_rad );
 			inline bool wobble_inv( const double theta_rad, const double phi_rad,
 									const double tol_rad = 1e-11 );
 									
-// ----------------------------------------------------------------------
-// Static functions and constants
-// ----------------------------------------------------------------------
-
+			// ----------------------------------------------------------------------
+			// Static functions and constants
+			// ----------------------------------------------------------------------
+			
 			static SphericalCoords make( Angle theta, Angle phi );
 			static SphericalCoords makeRad( double theta, double phi );
 			static SphericalCoords makeDeg( double theta, double phi );
@@ -268,7 +268,7 @@ namespace SEphem
 		const double sin_theta = sin( theta );
 		const double xx = x * cos_theta + z * sin_theta;
 		const double zz = z * cos_theta - x * sin_theta;
-// ATAN2 BETTEAR THAN ACOS FOR SMALL ANGLES
+		// ATAN2 BETTEAR THAN ACOS FOR SMALL ANGLES
 		set( atan2( sqrt( y * y + xx * xx ), zz ), atan2( y, xx ) );
 		m_phi.rotateRad( phi );
 	}
@@ -276,10 +276,10 @@ namespace SEphem
 	inline Angle
 	SphericalCoords::separation( const SphericalCoords& c ) const
 	{
-// -------------------------------------------------------------------
-// ASTRONOMICAL ALGORITHMS RECOMMENDS NOT USING USUAL FORMULA
-// SINCE IT IS INACCURATE AT SMALL ANGLES, INSTEAD USE CARTESIANS
-// -------------------------------------------------------------------
+		// -------------------------------------------------------------------
+		// ASTRONOMICAL ALGORITHMS RECOMMENDS NOT USING USUAL FORMULA
+		// SINCE IT IS INACCURATE AT SMALL ANGLES, INSTEAD USE CARTESIANS
+		// -------------------------------------------------------------------
 #if HELL_FREEZES_OVER
 		double cosang = cos( c.m_theta ) * cos( m_theta ) +
 						sin( c.m_theta ) * sin( m_theta ) * cos( c.m_phi - m_phi );

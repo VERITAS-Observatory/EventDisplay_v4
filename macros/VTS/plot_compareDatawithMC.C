@@ -125,8 +125,8 @@ void getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
 		return;
 	}
 	double z = 0.;
-////////////////////////////////////
-// scale to same contents (integral)
+	////////////////////////////////////
+	// scale to same contents (integral)
 	if( bContents == 1 )
 	{
 		int i_min = 1;
@@ -170,8 +170,8 @@ void getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
 			s_sims = z / s_sims;
 		}
 	}
-//////////////////////////////////
-// scale to same maximum
+	//////////////////////////////////
+	// scale to same maximum
 	else if( bContents == 2 )
 	{
 		s_sims = h_sims->GetMaximum();
@@ -183,8 +183,8 @@ void getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
 		}
 		s_diff = 1.;
 	}
-//////////////////////////////////
-// scale to peak (three bins around maximum)
+	//////////////////////////////////
+	// scale to peak (three bins around maximum)
 	else if( bContents == 3 )
 	{
 		int imaxbin = h_sims->GetMaximumBin();
@@ -215,7 +215,7 @@ void getScaling( TH1D* h_sims, TH1D* h_diff, double& s_sims, double& s_diff,
 		s_diff = 1.;
 	}
 	
-// make sure that results are positiv
+	// make sure that results are positiv
 	if( s_sims < 0. )
 	{
 		s_sims *= -1.;
@@ -377,7 +377,7 @@ void multiplicity_plots( char* ffile = "stereo_compare.root" )
 	
 	TDirectory* fDir = openFile( ffile );
 	
-// get the scaling between simulations and data
+	// get the scaling between simulations and data
 	double s_sims = 1.;
 	double s_diff = 1.;
 	getScaling( fDir, s_sims, s_diff, "MSCW", 1 );
@@ -385,7 +385,7 @@ void multiplicity_plots( char* ffile = "stereo_compare.root" )
 	char hname[600];
 	char htitle[600];
 	
-// canvases
+	// canvases
 	sprintf( hname, "cTrigger_%s", ffile );
 	sprintf( htitle, "multiplicity plots (%s)", ffile );
 	TCanvas* cTrigger = new TCanvas( hname, htitle, 10, 10, 800, 400 );
@@ -448,7 +448,7 @@ void multiplicity_plots( char* ffile = "stereo_compare.root" )
 	hImgSel_SIMS->SetYTitle( "number of showers [a.u.]" );
 	hImgSel_DIFF->Draw( "same" );
 	
-// relative plots
+	// relative plots
 	cTriggerRel->cd( 1 );
 	sprintf( hname, "%s_RE", hNImages_SIMS->GetName() );
 	TH1D* hNImages_Rel = ( TH1D* )hNImages_SIMS->Clone( hname );
@@ -590,11 +590,11 @@ void plot_energyDependentDistributions( TDirectory* fDir, string iVariable, int 
 	double Chi2Prob = 0.;
 	double Chi2Sig = 0.;
 	
-// get the scaling between simulations and data
+	// get the scaling between simulations and data
 	double s_sims = 1.;
 	double s_diff = 1.;
-//  getScaling( fDir, s_sims, s_diff, iVariable.c_str(), 2 );
-
+	//  getScaling( fDir, s_sims, s_diff, iVariable.c_str(), 2 );
+	
 	char hname[600];
 	char htitle[600];
 	sprintf( hname, "c_%s_%s", iVariable.c_str(), fDir->GetName() );
@@ -614,7 +614,7 @@ void plot_energyDependentDistributions( TDirectory* fDir, string iVariable, int 
 		return;
 	}
 	
-// loop over all bins in energy
+	// loop over all bins in energy
 	for( int i = 1; i <= h_sims->GetXaxis()->GetNbins(); i++ )
 	{
 		sprintf( hname, "h%sErec_SIMS_%d", iVariable.c_str(), i );
@@ -640,13 +640,13 @@ void plot_energyDependentDistributions( TDirectory* fDir, string iVariable, int 
 		hSims->SetMaximum( hSims->GetMaximum() * 1.8 );
 		hSims->SetMinimum( 0. );
 		
-// calculate matching of distributions
+		// calculate matching of distributions
 		KSProb = hSims->KolmogorovTest( hDiff );
 		KSSig  = TMath::ErfInverse( 1. - KSProb ) * TMath::Sqrt( 2. );
 		Chi2Prob = hDiff->Chi2Test( hSims, "WW" );
 		Chi2Sig = TMath::ErfInverse( 1. - Chi2Prob ) * TMath::Sqrt( 2. );
 		
-// draw histograms
+		// draw histograms
 		c_MS->cd( i );
 		hSims->Draw();
 		hDiff->Draw( "same" );
@@ -1361,7 +1361,7 @@ void distance_plots( char* ifile = "stereo_compare.root", int fNTel = 4, bool bP
 		iCsi++;
 		iCoo++;
 		
-// relative plots
+		// relative plots
 		if( hR_sims[i] && hR_diff[i] )
 		{
 			sprintf( hname, "hR_RE_%d", i );
@@ -1444,21 +1444,21 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 		cout << "error: unknown plotting mode (allowed are SIMSDIFF, ONOFF, REL)" << endl;
 		return;
 	}
-// open file
+	// open file
 	TDirectory* fDir = openFile( ifile );
 	
 	double KSProb = 0;
 	double KSSig = 0;
 	char text[1000];
-// scaling factor
+	// scaling factor
 	double s_sims = 1.;
 	double s_diff = 1.;
 	char htitle[600];
 	sprintf( htitle, "width_%d", telid );
 	getScaling( fDir, s_sims, s_diff, htitle, iScalingMethod );
 	
-//////////////////////////////////////
-// histogram names to be plotted
+	//////////////////////////////////////
+	// histogram names to be plotted
 	vector< string > hname;
 	vector< int >    f_rebin;
 	vector< int >   f_logy;
@@ -1540,7 +1540,7 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 	f_x_min.push_back( -7.5 );
 	f_x_max.push_back( 7.5 );
 	
-// loop over all histograms and plot them
+	// loop over all histograms and plot them
 	char hn[600];
 	char cn[600];
 	char ct[600];
@@ -1552,7 +1552,7 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 	TH1D* hrel = 0;
 	
 	TCanvas* hc = 0;
-// canvas for all in one
+	// canvas for all in one
 	if( iOneCanvas )
 	{
 		sprintf( cn, "image parameter comparision (telescope %d, file %s, %s)", telid, ifile, iPlot.c_str() );
@@ -1564,8 +1564,8 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 	}
 	TLegend* iL = 0;
 	
-/////////////////////////////////////////////////
-// loop over all histograms and plot them
+	/////////////////////////////////////////////////
+	// loop over all histograms and plot them
 	for( unsigned int j = 0; j < hname.size(); j++ )
 	{
 		sprintf( hn, "h%s_%d_SIMS", hname[j].c_str(), telid );
@@ -1598,15 +1598,15 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 		}
 		sprintf( htitle, "%s_%d", hname[j].c_str(), telid );
 		getScaling( fDir, s_sims, s_diff, htitle, iScalingMethod );
-// normalize sims histograms to data histograms
+		// normalize sims histograms to data histograms
 		hsims->Scale( s_sims );
 		hdiff->Scale( s_diff );
-// rebin histograms
+		// rebin histograms
 		hsims->Rebin( f_rebin[j] );
 		hdiff->Rebin( f_rebin[j] );
 		hon->Rebin( f_rebin[j] );
 		hoff->Rebin( f_rebin[j] );
-// relative histograms
+		// relative histograms
 		if( hsims && hdiff )
 		{
 			sprintf( hn, "h%s_%d_RE", hname[j].c_str(), telid );
@@ -1687,8 +1687,8 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 		hoff->SetAxisRange( f_x_min[j], f_x_max[j] );
 		hrel->SetAxisRange( f_x_min[j], f_x_max[j] );
 		
-////////////////////////////////////////////////
-// difference plots
+		////////////////////////////////////////////////
+		// difference plots
 		if( iPlot == "SIMSDIFF" )
 		{
 			hdiff->Draw( "cle" );
@@ -1705,8 +1705,8 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 				iL0->Draw();
 			}
 		}
-////////////////////////////////////////////////
-// on/off plots
+		////////////////////////////////////////////////
+		// on/off plots
 		else if( iPlot == "ONOFF" )
 		{
 			hon->Draw( "cle" );
@@ -1716,8 +1716,8 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 			sprintf( cn, "off telescope %d", telid );
 			iL->AddEntry( hoff, cn, "pl" );
 		}
-////////////////////////////////////////////////
-// relative plots
+		////////////////////////////////////////////////
+		// relative plots
 		else if( iPlot == "REL" )
 		{
 			hrel->Draw( "cle" );
@@ -1727,7 +1727,7 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 			iL->Draw();
 		}
 		
-// line for mscwt and msclt histograms
+		// line for mscwt and msclt histograms
 		if( iPlot != "REL" )
 		{
 			if( hname[j] == "mscwt" || hname[j] == "msclt" )
@@ -1737,7 +1737,7 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 				iLine->Draw();
 			}
 		}
-// line at 1 for relative plots
+		// line at 1 for relative plots
 		else
 		{
 			TLine* iLine = new TLine( f_x_min[j], 1., f_x_max[j], 1. );
@@ -1746,7 +1746,7 @@ void single_telescope( int telid = 1, char* ifile = "stereo_compare.root", strin
 		}
 		if( iPlot == "SIMSDIFF" || iPlot == "REL" )
 		{
-// calculate probabilities of agreement
+			// calculate probabilities of agreement
 			KSProb = hsims->KolmogorovTest( hdiff );
 			KSSig = TMath::ErfInverse( 1 - KSProb ) * TMath::Sqrt( 2 );
 			if( KSProb != 0 )
@@ -1946,8 +1946,8 @@ void plot_msc( char* ffile = "stereo_compare.root", char* offFile = 0, char* hel
 	TLegend* iLegend = new TLegend( 0.4, 0.60, 0.85, 0.85 );
 	iLegend->AddEntry( hMSC_sims, "simulations (#gamma-rays)", "pl" );
 	iLegend->AddEntry( hMSC_diff, "On-Off (Crab data)", "pl" );
-//  iLegend->AddEntry( hCR, "simulations (Cosmic-rays)", "l" );
-//  iLegend->AddEntry( hMSC_off_ana, "data (Cosmic-rays)", "l" );
+	//  iLegend->AddEntry( hCR, "simulations (Cosmic-rays)", "l" );
+	//  iLegend->AddEntry( hMSC_off_ana, "data (Cosmic-rays)", "l" );
 	iLegend->Draw();
 }
 

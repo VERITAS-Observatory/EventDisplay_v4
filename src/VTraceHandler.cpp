@@ -70,7 +70,7 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 		return;
 	}
 	
-// copy trace
+	// copy trace
 	if( iNSamples != fpTrace.size() )
 	{
 		fpTrace.clear();
@@ -102,7 +102,7 @@ void VTraceHandler::setTrace( vector<uint16_t> pTrace, double ped, double pedrms
 	fPedrms = pedrms;
 	fChanID = iChanID;
 	reset();
-// copy trace
+	// copy trace
 	unsigned int i_tsize = pTrace.size();
 	if( i_tsize != fpTrace.size() )
 	{
@@ -127,7 +127,7 @@ void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms,
 	fPedrms = pedrms;
 	fChanID = iChanID;
 	reset();
-// copy trace
+	// copy trace
 	unsigned int i_tsize = pTrace.size();
 	if( i_tsize != fpTrace.size() )
 	{
@@ -149,7 +149,7 @@ void VTraceHandler::setTrace( vector<uint8_t> pTrace, double ped, double pedrms,
 
 bool VTraceHandler::apply_lowgain( double iHiLo )
 {
-// hilo switch is set
+	// hilo switch is set
 	if( iHiLo > 0. )
 	{
 		for( int i = 0; i < fpTrazeSize; i++ )
@@ -165,7 +165,7 @@ bool VTraceHandler::apply_lowgain( double iHiLo )
 
 void VTraceHandler::calcQuickPed( int fFirst, int fLast )
 {
-// calculates the pedestal for this channel
+	// calculates the pedestal for this channel
 	double pedsum = 0;
 	int count = 0;
 	
@@ -186,7 +186,7 @@ void VTraceHandler::calcQuickPed( int fFirst, int fLast )
 	{
 		pedsum = 0;
 	}
-//cout << pedsum << " " << count <<endl;
+	//cout << pedsum << " " << count <<endl;
 	fPed = pedsum;
 }
 
@@ -196,8 +196,8 @@ double VTraceHandler::getQuickSum( int fFirst, int fLast, bool fRaw )
 	double sum = 0.;
 	for( int i = fFirst; i < fLast; i++ )
 	{
-// require that trace is >0.
-// (CTA MC write trace values above a certain signal only)
+		// require that trace is >0.
+		// (CTA MC write trace values above a certain signal only)
 		if( i < fpTrazeSize && fpTrace[i] > 0. )
 		{
 			if( !fRaw )
@@ -342,30 +342,30 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 	{
 		fFirst = 0;
 	}
-// reset pulse timing vector
+	// reset pulse timing vector
 	for( unsigned int i = 0; i < fpulsetiming.size(); i++ )
 	{
 		fpulsetiming[i] = 0.;
 	}
 	unsigned int m_pos = 0;
 	
-// by definition are there always an odd number of values -> centre values is 1
+	// by definition are there always an odd number of values -> centre values is 1
 	double i_trace = 0.;
 	
-// get pulse maximum
+	// get pulse maximum
 	double trace_max = 0.;
 	unsigned int n255 = 0;
 	int maxpos = 0;
 	getQuickMax( fFirst, fLast, trace_max, maxpos, n255 );
 	fpulsetiming[fpulsetiming_maxPV] = ( float )maxpos + 0.5;
 	
-// first half of the pulse
-// (loop backwards over pulse)
+	// first half of the pulse
+	// (loop backwards over pulse)
 	bool bBreak = false;
 	for( int i = maxpos; i >= fTFirst ; i-- )
 	{
 		i_trace = fpTrace[i] - fPed;
-// loop over all pulse level
+		// loop over all pulse level
 		for( unsigned int m = 0; m < fpulsetiming_maxPV; m++ )
 		{
 			m_pos = fpulsetiming_maxPV - 1 - m;
@@ -386,15 +386,15 @@ vector< float >& VTraceHandler::getPulseTiming( int fFirst, int fLast, int fTFir
 			break;
 		}
 	}
-// second half of the pulse: contains pulse widths
-// (loop forwards over pulse)
+	// second half of the pulse: contains pulse widths
+	// (loop forwards over pulse)
 	bBreak = false;
 	if( maxpos > 0 )
 	{
 		for( int i = maxpos; i < fTLast; i++ )
 		{
 			i_trace = fpTrace[i] - fPed;
-// loop over all pulse level
+			// loop over all pulse level
 			for( unsigned int m_pos = fpulsetiming_maxPV + 1; m_pos < fpulsetiminglevels_size; m_pos++ )
 			{
 				if( m_pos < fpulsetiminglevels_size && fpulsetiming[m_pos] < 1.e-5 )
@@ -435,7 +435,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 	n255 = 0;
 	tmax = -10000.;
 	maxpos = -100;
-// high gain channel
+	// high gain channel
 	if( !fHiLo )
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -453,7 +453,7 @@ void VTraceHandler::getQuickMax( int fFirst, int fLast, double& tmax, int& maxpo
 			fMax = tmax;
 		}
 	}
-// low gain channel
+	// low gain channel
 	else
 	{
 		if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -528,7 +528,7 @@ double VTraceHandler::getQuickPulseWidth( int fFirst, int fLast, double fPed )
 	double p50_min = 0.;
 	double p50_max = 0.;
 	unsigned int n255 = 0;
-// first get pulse maximum
+	// first get pulse maximum
 	getQuickMax( fFirst, fLast, imax, maxpos, n255 );
 	
 	if( fFirst >= 0 && fFirst < fLast && fLast <= fpTrazeSize )
@@ -586,7 +586,7 @@ double VTraceHandler::getLinInterpol( double y5, int x1, double y1, int x2, doub
 	{
 		a = ( y2 - y1 ) / ( double )( x2 - x1 );
 	}
-// shift by 0.5 to locate bin center
+	// shift by 0.5 to locate bin center
 	if( a != 0. && x2 + 0.5 > 0 )
 	{
 		b = y2 - a * ( ( double )( x2 ) + 0.5 );
@@ -620,7 +620,7 @@ void VTraceHandler::setPulseTimingLevels( vector< float > iP )
 */
 bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 {
-// check method numbers
+	// check method numbers
 	if( iT > 5 )
 	{
 		return false;
@@ -633,32 +633,32 @@ bool VTraceHandler::setTraceIntegrationmethod( unsigned int iT )
 
 double VTraceHandler::getTraceSum( int fFirst, int fLast, bool fRaw )
 {
-// integrate from fFirst to fLast
+	// integrate from fFirst to fLast
 	if( fTraceIntegrationMethod == 1 )
 	{
 		fSumWindowFirst = fFirst;
 		fSumWindowLast  = fLast;
 		return getQuickSum( fFirst, fLast, fRaw );
 	}
-// find maximum integral
+	// find maximum integral
 	else if( fTraceIntegrationMethod == 2 )
 	{
 		//return getQuickMaximumSum( 0, 0.5*fpTrace.size(),fLast - fFirst, fRaw );
 		return getQuickMaximumSum( 0, fpTrace.size(), fLast - fFirst, fRaw );
 	}
-// extraction with oversampling (less time clustering (due to limited sampling) even for short window
+	// extraction with oversampling (less time clustering (due to limited sampling) even for short window
 	else if( fTraceIntegrationMethod == 3 )
 	{
 		//return getMaxSumWithOverSampling(0,0.5*fpTrace.size(),0, fLast-fFirst, fRaw);
 		return getMaxSumWithOverSampling( 0, fpTrace.size(), 0, fLast - fFirst, fRaw );
 	}
-// TEMP: IPR calculation from long traces for extractors 2/3
+	// TEMP: IPR calculation from long traces for extractors 2/3
 	else if( fTraceIntegrationMethod == 4 )
 	{
 		return getQuickMaximumSum( 0.5 * fpTrace.size(), fpTrace.size(), fLast - fFirst, fRaw );         // extractor 2
 		//return getMaxSumWithOverSampling( 0.5*fpTrace.size(), fpTrace.size(),0,fLast - fFirst, fRaw );   //extractor 3
 	}
-// return simle the trace maximum as trace sum
+	// return simle the trace maximum as trace sum
 	else if( fTraceIntegrationMethod == 5 )
 	{
 		double peakamplitude = getTraceMax();
@@ -1154,7 +1154,7 @@ double VTraceHandler::getMaxSumWithOverSampling( unsigned int iSearchStart, unsi
 			xmax2 += ProcessedFADC[i];
 		}
 		// extract charge for small window **********************************
-//        for (unsigned int i = 0; i < nfine - int(integwin); i++){
+		//        for (unsigned int i = 0; i < nfine - int(integwin); i++){
 		for( unsigned int i = SearchStart; i < SearchEnd; i++ )
 		{
 			if( charge < xmax )

@@ -64,7 +64,7 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 		iTreeVector = iRun->fBackgroundTree;
 	}
 	
-// add cut on number of telescope (per type) for
+	// add cut on number of telescope (per type) for
 	if( iVariable.find( "NImages_Ttype" ) != string::npos
 			|| iVariable.find( "EmissionHeightChi2" ) != string::npos )
 	{
@@ -82,7 +82,7 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 		h = 0;
 		if( iTreeVector[i] )
 		{
-// fill a histogram with the variable to be checked
+			// fill a histogram with the variable to be checked
 			sprintf( hname, "hXX_%d", i );
 			h = new TH1D( hname, "", 100, -1.e5, 1.e5 );
 			Long64_t iNEntriesBlock = 0;
@@ -100,7 +100,7 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 				if( h->GetRMS() > 1.e-5 )
 				{
 					cout << "\t variable " << iVariable << " ok, RMS: " << h->GetRMS() << ", tree: " << i;
-// (confusing)	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax();
+					// (confusing)	       cout << ", nbins " << h->GetNbinsX() << ", xmin " << h->GetXaxis()->GetXmin() << ", xmax " << h->GetXaxis()->GetXmax();
 					cout << ", entries " << h->GetEntries();
 					cout << endl;
 					h->Delete();
@@ -113,7 +113,7 @@ double checkIfVariableIsConstant( VTMVARunData* iRun, TCut iCut, string iVariabl
 			h->Delete();
 		}
 	}
-// means: variable is in all trees constant
+	// means: variable is in all trees constant
 	cout << "\t warning: constant variable  " << iVariable << " in ";
 	if( iSignal )
 	{
@@ -161,7 +161,7 @@ bool trainReconstructionQuality( VTMVARunData* iRun, unsigned int iEnergyBin )
 
 bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronSeparation )
 {
-// sanity checks
+	// sanity checks
 	if( !iRun )
 	{
 		return false;
@@ -175,21 +175,21 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 	
 	TMVA::Tools::Instance();
 	
-// set output directory
+	// set output directory
 	gSystem->mkdir( iRun->fOutputDirectoryName.c_str() );
 	TString iOutputDirectory( iRun->fOutputDirectoryName.c_str() );
 	gSystem->ExpandPathName( iOutputDirectory );
 	( TMVA::gConfig().GetIONames() ).fWeightFileDir = iOutputDirectory;
 	
-//////////////////////////////////////////
-// defining training class
+	//////////////////////////////////////////
+	// defining training class
 	TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFileName.c_str(), iRun->fOutputFile[iEnergyBin], "V" );
 	
-////////////////////////////
-// train gamma/hadron separation
+	////////////////////////////
+	// train gamma/hadron separation
 	if( iTrainGammaHadronSeparation )
 	{
-// adding signal and background trees
+		// adding signal and background trees
 		for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
 		{
 			factory->AddSignalTree( iRun->fSignalTree[i], iRun->fSignalWeight );
@@ -199,8 +199,8 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 			factory->AddBackgroundTree( iRun->fBackgroundTree[i], iRun->fBackgroundWeight );
 		}
 	}
-////////////////////////////
-// train reconstruction quality
+	////////////////////////////
+	// train reconstruction quality
 	else
 	{
 		for( unsigned int i = 0; i < iRun->fSignalTree.size(); i++ )
@@ -210,17 +210,17 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		factory->AddRegressionTarget( iRun->fReconstructionQualityTarget.c_str(), iRun->fReconstructionQualityTargetName.c_str() );
 	}
 	
-// quality cuts before filling
+	// quality cuts before filling
 	TCut iCut = iRun->fQualityCuts && iRun->fMCxyoffCut && iRun->fEnergyCutData[iEnergyBin]->fEnergyCut;
 	
-// adding training variables
+	// adding training variables
 	if( iRun->fTrainingVariable.size() != iRun->fTrainingVariableType.size() )
 	{
 		cout << "train: error: training-variable vectors have different size" << endl;
 		return false;
 	}
 	
-// check split mode
+	// check split mode
 	bool iSplitBlock = false;
 	if( iRun->fPrepareTrainingOptions.find( "SplitMode=Block" ) != string::npos )
 	{
@@ -228,9 +228,9 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		iSplitBlock = true;
 	}
 	
-// loop over all trainingvariables and add them to TMVA
-// (test first if variable is constant, TMVA will stop when a variable
-//  is constant)
+	// loop over all trainingvariables and add them to TMVA
+	// (test first if variable is constant, TMVA will stop when a variable
+	//  is constant)
 	for( unsigned int i = 0; i < iRun->fTrainingVariable.size(); i++ )
 	{
 		if( iRun->fTrainingVariable[i].find( "NImages_Ttype" ) != string::npos )
@@ -240,13 +240,13 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 				ostringstream iTemp;
 				iTemp << iRun->fTrainingVariable[i] << "[" << j << "]";
 				ostringstream iTempCut;
-// require at least 2 image per telescope type
+				// require at least 2 image per telescope type
 				iTempCut << iTemp.str() << ">1";
 				TCut iCutCC = iTempCut.str().c_str();
 				double iSignalMean = checkIfVariableIsConstant( iRun, iCut && iCutCC, iTemp.str(), true, iSplitBlock );
 				double iBckMean    = checkIfVariableIsConstant( iRun, iCut && iCutCC, iTemp.str(), false, iSplitBlock );
-// check if the training variable is constant
-// (checkIfVariableIsConstant returns -9999 if RMS of variable is >0)
+				// check if the training variable is constant
+				// (checkIfVariableIsConstant returns -9999 if RMS of variable is >0)
 				cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
 				if( ( TMath::Abs( iSignalMean - iBckMean ) > 1.e-6
 						|| TMath::Abs( iSignalMean + 9999. ) < 1.e-2 || TMath::Abs( iBckMean + 9999. ) < 1.e-2 )
@@ -263,7 +263,7 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 		}
 		else
 		{
-// check if the training variable is constant
+			// check if the training variable is constant
 			double iSignalMean = checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), true, iSplitBlock );
 			double iBckMean    = checkIfVariableIsConstant( iRun, iCut, iRun->fTrainingVariable[i].c_str(), false, iSplitBlock );
 			cout << "\t mean values " << iSignalMean << "\t" << iBckMean << endl;
@@ -279,28 +279,28 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 			}
 		}
 	}
-// adding spectator variables
+	// adding spectator variables
 	for( unsigned int i = 0; i < iRun->fSpectatorVariable.size(); i++ )
 	{
 		factory->AddSpectator( iRun->fSpectatorVariable[i].c_str() );
 	}
 	
-//////////////////////////////////////////
-// prepare training events
-// nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
+	//////////////////////////////////////////
+	// prepare training events
+	// nTrain Signal=5000:nTrain Background=5000: nTest Signal=4000:nTest Background=5000
 	factory->PrepareTrainingAndTestTree( iRun->fQualityCuts && iRun->fMCxyoffCut &&
 										 iRun->fEnergyCutData[iEnergyBin]->fEnergyCut,
 										 iRun->fPrepareTrainingOptions );
 										 
-//////////////////////////////////////////
-// book all methods
+	//////////////////////////////////////////
+	// book all methods
 	char hname[6000];
 	char htitle[6000];
 	
 	for( unsigned int i = 0; i < iRun->fMVAMethod.size(); i++ )
 	{
-//////////////////////////
-// BOOSTED DECISION TREES
+		//////////////////////////
+		// BOOSTED DECISION TREES
 		if( iRun->fMVAMethod[i] == "BDT" )
 		{
 			if( iTrainGammaHadronSeparation )
@@ -320,8 +320,8 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 				factory->BookMethod( TMVA::Types::kBDT, htitle );
 			}
 		}
-//////////////////////////
-// MLPs
+		//////////////////////////
+		// MLPs
 		else if( iRun->fMVAMethod[i] == "MLP" )
 		{
 			if( iTrainGammaHadronSeparation )
@@ -341,9 +341,9 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 				factory->BookMethod( TMVA::Types::kMLP, htitle );
 			}
 		}
-//////////////////////////
-// BOX CUTS
-// (note: box cuts needs additional checking, as it might be outdated)
+		//////////////////////////
+		// BOX CUTS
+		// (note: box cuts needs additional checking, as it might be outdated)
 		else if( iRun->fMVAMethod[i] == "BOXCUTS" )
 		{
 			if( i < iRun->fMVAMethod_Options.size() )
@@ -369,14 +369,14 @@ bool train( VTMVARunData* iRun, unsigned int iEnergyBin, bool iTrainGammaHadronS
 	}
 	
 	
-//////////////////////////////////////////
-// start training
-
+	//////////////////////////////////////////
+	// start training
+	
 	factory->TrainAllMethods();
 	
-//////////////////////////////////////////
-// evaluate results
-
+	//////////////////////////////////////////
+	// evaluate results
+	
 	factory->TestAllMethods();
 	
 	factory->EvaluateAllMethods();
@@ -407,13 +407,13 @@ int main( int argc, char* argv[] )
 	cout << "=================================" << endl;
 	cout << endl;
 	
-//////////////////////////////////////
-// data object
+	//////////////////////////////////////
+	// data object
 	VTMVARunData* fData = new VTMVARunData();
 	fData->fName = "OO";
 	
-//////////////////////////////////////
-// read run parameters from configuration file
+	//////////////////////////////////////
+	// read run parameters from configuration file
 	if( !fData->readConfigurationFile( argv[1] ) )
 	{
 		cout << "error opening or reading run parameter file (";
@@ -423,17 +423,17 @@ int main( int argc, char* argv[] )
 	}
 	fData->print();
 	
-//////////////////////////////////////
-// read and prepare data files
+	//////////////////////////////////////
+	// read and prepare data files
 	if( !fData->openDataFiles() )
 	{
 		cout << "error opening data files" << endl;
 		exit( EXIT_FAILURE );
 	}
 	
-//////////////////////////////////////
-// train MVA
-// (one training per energy bin)
+	//////////////////////////////////////
+	// train MVA
+	// (one training per energy bin)
 	cout << "Total number of energy bins: " << fData->fEnergyCutData.size() << endl;
 	cout << "================================" << endl << endl;
 	for( unsigned int i = 0; i < fData->fEnergyCutData.size(); i++ )

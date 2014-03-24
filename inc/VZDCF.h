@@ -23,7 +23,7 @@ class VZDCF : public VPlotUtilities
 {
 	private:
 	
-// 1 sigma interval and peak
+		// 1 sigma interval and peak
 		double fMLPeakposition;
 		double fML1Sigmainterval_low;
 		double fML1Sigmainterval_up;

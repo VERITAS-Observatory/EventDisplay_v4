@@ -26,15 +26,15 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 {
 	private:
 	
-// data tree
+		// data tree
 		CData*   fData;               //!
 		
-// energy binning
+		// energy binning
 		int     fHistogrambinningEnergy_TeV_Log;
 		double  fHistogrambinningEnergy_Min_Tev_Log;
 		double  fHistogrambinningEnergy_Max_Tev_Log;
 		
-// array centre
+		// array centre
 		double  fArrayCentre_X;
 		double  fArrayCentre_Y;
 		
@@ -45,15 +45,15 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		
 	public:
 	
-// list of function types
+		// list of function types
 		vector< string > fListofResponseFunctionTypes;
 		
-// basic data
+		// basic data
 		string  fName;
 		string  fType;                // descripes type of response function (e.g. angular resolution or core resolution)
 		int     fType_numeric;        //    (same as integer)
 		
-// characteristics (all angles in [deg])
+		// characteristics (all angles in [deg])
 		double  fZe;
 		int     fAz_bin;
 		double  fAz_min;
@@ -70,7 +70,7 @@ class VInstrumentResponseFunctionData : public TObject, public VHistogramUtiliti
 		
 		unsigned int fEnergyReconstructionMethod;
 		
-// list of histograms
+		// list of histograms
 		enum    E_HISTOID { E_DIFF, E_DIFF2, E_NIMAG, E_DIST, E_ERROR, E_RELA };
 		TList*                     fHistogramList;
 		vector< TH2D* >            f2DHisto;

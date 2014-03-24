@@ -114,7 +114,7 @@ bool VLightCurveData::fillTeVEvndispData( string iAnaSumFile, double iThresholdS
 	}
 	
 	
-// reset min/max values
+	// reset min/max values
 	double iMJDMin = 1.e10;
 	double iMJDMax = -1.;
 	for( unsigned int i = 0; i < fFluxCalculation.getMJD().size(); i++ )

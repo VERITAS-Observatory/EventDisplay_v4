@@ -48,7 +48,7 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
 		vector< vector< double > > fPhaseRateEPerRun;
 		vector< vector< double > > fPhaseSigniPerRun;
 		
-// daily values
+		// daily values
 		vector< double > fDayDate;
 		vector< double > fDayMJD;
 		vector< double > fDayPhase;
@@ -71,7 +71,7 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
 		double fMinElevation;
 		double fMaxElevation;
 		
-// orbital phase related variables
+		// orbital phase related variables
 		unsigned int fNPhaseBins;
 		double fPhaseOrbit;
 		double fPhaseT0;

@@ -43,17 +43,17 @@ class VDB_CalibrationInfo
 		string fquery_read;
 		int flong_char_query;
 		
-//------------------- Writing function related
+		//------------------- Writing function related
 		string please_give_the_password();//needed
 		string WriteQuery_to_write_in_DB();//needed
 		
 		bool test_file_format( TString file_to_be_copied ); // security TO DO
 		
-//------------------- reading function
+		//------------------- reading function
 		void Create_query_read();
 		bool Read_the_DB();
 		
-// data vectors
+		// data vectors
 		vector < unsigned int > Vchannel;
 		vector < double > Vmean;
 		vector < double > Vvar;

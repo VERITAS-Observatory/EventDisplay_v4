@@ -19,7 +19,7 @@ VPlotSensitivityfromLisFiles::VPlotSensitivityfromLisFiles()
 {
 	fDebug = true;
 	
-// set variable names and min/max
+	// set variable names and min/max
 	fVarName.push_back( "E1" );
 	fVarMin[fVarName.back()] =  -2.0;
 	fVarMax[fVarName.back()] =   2.5;
@@ -115,7 +115,7 @@ bool VPlotSensitivityfromLisFiles::addLisFile( string iFile, string iCut )
 		return false;
 	}
 	
-// read file and fill data vector
+	// read file and fill data vector
 	string is_line;
 	string temp;
 	bool bMean = false;
@@ -191,7 +191,7 @@ void VPlotSensitivityfromLisFiles::listDataSets()
 
 bool VPlotSensitivityfromLisFiles::printDataSet( unsigned int iID )
 {
-// get ID index
+	// get ID index
 	iID = getID_Index( iID );
 	if( iID == 9999 )
 	{
@@ -240,7 +240,7 @@ unsigned int VPlotSensitivityfromLisFiles::getID_Index( unsigned int iID )
 
 TCanvas* VPlotSensitivityfromLisFiles::plot( string iVName, unsigned int iID, TCanvas* c, Style_t iLineStyle, Style_t iMarkerStyle )
 {
-// get ID index
+	// get ID index
 	iID = getID_Index( iID );
 	if( iID == 9999 )
 	{
@@ -275,8 +275,8 @@ TCanvas* VPlotSensitivityfromLisFiles::plot( string iVName, unsigned int iID, TC
 		hnull->Draw();
 	}
 	
-// fill graph
-
+	// fill graph
+	
 	TGraph* g = new TGraph( 1 );
 	setGraphPlottingStyle( g, iID + 1, 2., iMarkerStyle, 1, 0, iLineStyle );
 	
@@ -341,19 +341,19 @@ bool VPlotSensitivityfromLisFiles::removeDataSet( unsigned int iID )
 bool VPlotSensitivityfromLisFiles::applycuts( double amp, double NTel, double NPix )
 {
 	set< unsigned int > fRemoveID;
-// amplituden cut
+	// amplituden cut
 	if( TMath::Abs( amp ) > 1.e-2 )
 	{
 		for( unsigned int i = 0; i < fData.size(); i++ )
 		{
 			if( fData[i]->fVar["Amp"].size() > 0 )
 			{
-// remove all data sets with this amplitude
+				// remove all data sets with this amplitude
 				if( amp > 0. && TMath::Abs( fData[i]->fVar["Amp"][0] - amp ) < 1.e-2 )
 				{
 					fRemoveID.insert( fData[i]->fID );
 				}
-// remove all data sets with a different amplitude
+				// remove all data sets with a different amplitude
 				if( amp < 0. && TMath::Abs( fData[i]->fVar["Amp"][0] + amp ) > 1.e-2 )
 				{
 					fRemoveID.insert( fData[i]->fID );
@@ -361,7 +361,7 @@ bool VPlotSensitivityfromLisFiles::applycuts( double amp, double NTel, double NP
 			}
 		}
 	}
-// pixel cut
+	// pixel cut
 	if( TMath::Abs( NPix ) > 1.e-2 )
 	{
 		for( unsigned int i = 0; i < fData.size(); i++ )
@@ -379,7 +379,7 @@ bool VPlotSensitivityfromLisFiles::applycuts( double amp, double NTel, double NP
 			}
 		}
 	}
-// ntel cut
+	// ntel cut
 	if( TMath::Abs( NTel ) > 1.e-2 )
 	{
 		for( unsigned int i = 0; i < fData.size(); i++ )
@@ -398,7 +398,7 @@ bool VPlotSensitivityfromLisFiles::applycuts( double amp, double NTel, double NP
 		}
 	}
 	
-// now remove all marked data sets
+	// now remove all marked data sets
 	set< unsigned int >::iterator a;
 	
 	for( a = fRemoveID.begin(); a != fRemoveID.end(); a++ )

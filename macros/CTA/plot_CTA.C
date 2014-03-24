@@ -109,7 +109,7 @@ void VPlotCTAArrayLayout::printArrayCosts()
 		}
 	}
 	
-// in MEuro
+	// in MEuro
 	float euro_LST = 6.3;
 	float euro_MST = 1.725;
 	float euro_SST = 0.50;
@@ -133,7 +133,7 @@ bool VPlotCTAArrayLayout::setSubArray( string iSubArrayFile )
 	{
 		return true;
 	}
-// read list of telescope IDs
+	// read list of telescope IDs
 	ifstream is;
 	is.open( iSubArrayFile.c_str(), ifstream::in );
 	if( !is )
@@ -223,7 +223,7 @@ bool VPlotCTAArrayLayout::readArrayFromRootFile( string iFile )
 		fTelescopeList.back()->fTelID_hyperArray = ( int )iTelIDHA;
 		fTelescopeList.back()->fTel_x = iTelX;
 		fTelescopeList.back()->fTel_y = iTelY;
-// LSTs (1)
+		// LSTs (1)
 		if( iTelType == 138704810 || iTelType == 141305009 || iTelType == 141305109 )
 		{
 			fTelescopeList.back()->fTelTypeName = "23m-LST";
@@ -231,28 +231,28 @@ bool VPlotCTAArrayLayout::readArrayFromRootFile( string iFile )
 			fTelescopeList.back()->fMarkerSize = 2;
 			fTelescopeList.back()->fMarkerType = 24;
 		}
-// standard MSTs (2)
+		// standard MSTs (2)
 		else if( iTelType == 10007818 || iTelType == 10408418 || iTelType == 10008118 )
 		{
 			fTelescopeList.back()->fTelTypeName = "12m-MST";
 			fTelescopeList.back()->fMarkerColor = 1;
 			fTelescopeList.back()->fMarkerSize = 1.5;
 		}
-// large pixel MSTs (4)
+		// large pixel MSTs (4)
 		else if( iTelType == 10009725 )
 		{
 			fTelescopeList.back()->fTelTypeName = "12m-MST-LPix";
 			fTelescopeList.back()->fMarkerColor = 6;
 			fTelescopeList.back()->fMarkerSize = 1.5;
 		}
-// standard SSTs (3)
+		// standard SSTs (3)
 		else if( iTelType == 3709725 || iTelType == 3709425 || iTelType == 3710125 )
 		{
 			fTelescopeList.back()->fTelTypeName = "7m-DC-SST";
 			fTelescopeList.back()->fMarkerColor = 3;
 			fTelescopeList.back()->fMarkerSize = 1;
 		}
-// 7m telescopes (5, prod1) or SCT (prod2)
+		// 7m telescopes (5, prod1) or SCT (prod2)
 		else if( iTelType == 7309930  || iTelType == 201509515 )
 		{
 			fTelescopeList.back()->fTelTypeName = "4m-SC-SST";
@@ -417,7 +417,7 @@ TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax
 	
 	hnull->Draw();
 	
-// check that sub array is set
+	// check that sub array is set
 	if( fTelescopeList_subArray.size() == 0 )
 	{
 		fTelescopeList_subArray = fTelescopeList;
@@ -442,7 +442,7 @@ TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax
 		
 		
 	}
-// draw array name
+	// draw array name
 	if( iname.size() > 0 )
 	{
 		TText* it = new TText( -1.*0.9 * xmax, 0.75 * ymax, iname.c_str() );
@@ -454,13 +454,13 @@ TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax
 }
 void VPlotCTAArrayLayout::printTelescopeDistances( int iTelID, float iDistanceMax )
 {
-// check that sub array is set
+	// check that sub array is set
 	if( fTelescopeList_subArray.size() == 0 )
 	{
 		fTelescopeList_subArray = fTelescopeList;
 	}
 	
-// get telescope
+	// get telescope
 	unsigned int iTelID_sub = 99999;
 	for( unsigned int i = 0; i < fTelescopeList_subArray.size(); i++ )
 	{
@@ -475,7 +475,7 @@ void VPlotCTAArrayLayout::printTelescopeDistances( int iTelID, float iDistanceMa
 		return;
 	}
 	
-// fill list
+	// fill list
 	multimap< float, unsigned int > iSortedListOfTelescopes;
 	for( unsigned int i = 0; i < fTelescopeList_subArray.size(); i++ )
 	{
@@ -489,7 +489,7 @@ void VPlotCTAArrayLayout::printTelescopeDistances( int iTelID, float iDistanceMa
 		}
 	}
 	
-// print list
+	// print list
 	for( multimap<float, unsigned int>::iterator it = iSortedListOfTelescopes.begin(); it != iSortedListOfTelescopes.end(); ++it )
 	{
 		if( it->second < fTelescopeList_subArray.size() && it->first < iDistanceMax )

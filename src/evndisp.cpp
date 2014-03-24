@@ -28,11 +28,11 @@ TMinuit* fLLFitter;
 
 int main( int argc, char* argv[] )
 {
-// some timing
+	// some timing
 	TStopwatch fStopWatch;
 	fStopWatch.Start();
 	
-// print version only
+	// print version only
 	if( argc == 2 )
 	{
 		string fCommandLine = argv[1];
@@ -44,7 +44,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// read the command line parameters
+	// read the command line parameters
 	VReadRunParameter* fReadRunParameter = new VReadRunParameter();
 	if( !fReadRunParameter->readCommandline( argc, argv ) )
 	{
@@ -52,14 +52,14 @@ int main( int argc, char* argv[] )
 	}
 	fReadRunParameter->getRunParameter()->print();
 	
-// initialize main loop
+	// initialize main loop
 	VEventLoop mainEventLoop( fReadRunParameter->getRunParameter() );
 	if( !mainEventLoop.initEventLoop() )
 	{
 		exit( -1 );
 	}
 	
-// no display, command line mode
+	// no display, command line mode
 	if( !fReadRunParameter->getRunParameter()->fdisplaymode )
 	{
 		mainEventLoop.loop( fReadRunParameter->getRunParameter()->fnevents );
@@ -67,10 +67,10 @@ int main( int argc, char* argv[] )
 		fStopWatch.Print();
 		mainEventLoop.shutdown();
 	}
-// display mode
+	// display mode
 	else
 	{
-// number of options set to one, otherwise TApplication prints sometimes help text (don't know how to switch that of in ROOT)
+		// number of options set to one, otherwise TApplication prints sometimes help text (don't know how to switch that of in ROOT)
 		Int_t targv = 1;
 		TApplication app( "app", &targv, argv );
 		VDisplay display( gClient->GetRoot(), fReadRunParameter->getRunParameter()->fw, fReadRunParameter->getRunParameter()->fh, &mainEventLoop );

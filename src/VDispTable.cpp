@@ -39,7 +39,7 @@ VDispTable::VDispTable( unsigned int iNTel, string ioutFile )
 
 bool VDispTable::prepareTraining( string iOutFile )
 {
-// create output file
+	// create output file
 	fTableFile = new TFile( iOutFile.c_str(), "RECREATE" );
 	cout << "creating output table file: " << fTableFile->GetName() << endl;
 	if( fTableFile->IsZombie() )
@@ -49,7 +49,7 @@ bool VDispTable::prepareTraining( string iOutFile )
 		exit( 0 );
 	}
 	
-// create data class
+	// create data class
 	fData = new VDispTableReader();
 	fData->SetName( "dispTable" );
 	fData->initialize( false );
@@ -87,7 +87,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
 	char hname[500];
 	char htitle[500];
 	
-// 2D disp tables
+	// 2D disp tables
 	if( fData->h2D_DispTable )
 	{
 		sprintf( hname, "h2D_DispTable_%d", ( int )fAz_min.size() );
@@ -126,7 +126,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
 		h2D_AzDispMissTable.back()->SetZTitle( "miss" );
 	}
 	
-// 3D disp tables
+	// 3D disp tables
 	if( fData->h3D_DispTable )
 	{
 		sprintf( hname, "h3D_DispTable_%d", ( int )fAz_min.size() );
@@ -165,7 +165,7 @@ void VDispTable::addAzBin( float iMin, float iMax, bool iPe )
 		sprintf( hname, "h3D_DispMiss_%d", ( int )fAz_min.size() );
 		sprintf( htitle, "error in reconstruction (%f < az < %f; %d)", fAz_min.back(), fAz_max.back(), ( int )fAz_min.size() );
 		h3D_AzDispMissTable.push_back( new TProfile3D( hname, htitle, fData->h3D_DispMissTable->GetNbinsX(), fData->h3D_DispMissTable->GetXaxis()->GetXmin(), fData->h3D_DispMissTable->GetXaxis()->GetXmax(), fData->h3D_DispMissTable->GetNbinsY(), fData->h3D_DispMissTable->GetYaxis()->GetXmin(), fData->h3D_DispMissTable->GetYaxis()->GetXmax(), fData->h3D_DispMissTable->GetNbinsZ(), fData->h3D_DispMissTable->GetZaxis()->GetXmin(), fData->h3D_DispMissTable->GetZaxis()->GetXmax() ) );
-//       h3D_AzDispMissTable.push_back( new TProfile3D( hname, htitle, iScaleWidth_bin, 0., 1., iScaleLength_bin, 0., 1., iSize_bin, iSize_min, iSize_max ) );
+		//       h3D_AzDispMissTable.push_back( new TProfile3D( hname, htitle, iScaleWidth_bin, 0., 1., iScaleLength_bin, 0., 1., iSize_bin, iSize_min, iSize_max ) );
 		h3D_AzDispMissTable.back()->SetXTitle( "f(width)" );
 		h3D_AzDispMissTable.back()->SetXTitle( "f(length)" );
 		h3D_AzDispMissTable.back()->SetYTitle( "log_{10} size" );
@@ -230,18 +230,18 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 {
 	char hname[600];
 	
-/////////////////////////////////////////////////////////////////////////////////////
-// reset variables
-/////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
+	// reset variables
+	/////////////////////////////////////////////////////////////////////////////////////
 	float disp = 0.;
 	float dispPhi = 0.;
 	unsigned int azBin = 0;
 	
-// assume same pedvars for all telescopes (is this true in the simulations?)
+	// assume same pedvars for all telescopes (is this true in the simulations?)
 	float i_meanPedvars = 0.;
 	float i_meanPedvarsN = 0.;
 	
-// reset histograms
+	// reset histograms
 	fData->reset();
 	for( unsigned int i = 0; i < h2D_AzDispTable.size(); i++ )
 	{
@@ -257,11 +257,11 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 	}
 	
 	
-/////////////////////////////////////////////////////////////////////////////////////
-// prepare MC data files and trees
-/////////////////////////////////////////////////////////////////////////////////////
-
-// data file with MC input
+	/////////////////////////////////////////////////////////////////////////////////////
+	// prepare MC data files and trees
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	// data file with MC input
 	TFile iFile( iMCFile.c_str() );
 	if( iFile.IsZombie() )
 	{
@@ -271,7 +271,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 	
 	cout << "filling tables for " << iMCFile << endl;
 	
-// get showerpars tree
+	// get showerpars tree
 	TTree* s = ( TTree* )iFile.Get( "showerpars" );
 	if( !s )
 	{
@@ -284,7 +284,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 		return false;
 	}
 	
-// get tpars trees (fNTel times)
+	// get tpars trees (fNTel times)
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
 		sprintf( hname, "Tel_%d/tpars", i + 1 );
@@ -308,8 +308,8 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 		}
 		cout << "\t telescope " << i + 1 << ", " << c->fChain->GetEntries() << " entries in data tree" << endl;
 		
-/////////////////////////////////////////////////////////////////////////////////////
-// loop over all events for this telescope
+		/////////////////////////////////////////////////////////////////////////////////////
+		// loop over all events for this telescope
 		if( iNentries < 0 )
 		{
 			iNentries = c->fChain->GetEntries();
@@ -324,16 +324,16 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 			c->GetEntry( n );
 			m->GetEntry( n );
 			
-// apply quality cuts
+			// apply quality cuts
 			if( isGoodEvent( c ) )
 			{
 				i_meanPedvars += c->meanPedvar_Image;
 				i_meanPedvarsN++;
 				
-// calculate disp (observe sign convention for MCyoff)
+				// calculate disp (observe sign convention for MCyoff)
 				disp  = sqrt( ( c->cen_y + m->MCyoff ) * ( c->cen_y + m->MCyoff ) + ( c->cen_x - m->MCxoff ) * ( c->cen_x - m->MCxoff ) );
 				disp  = TMath::Abs( disp );
-// dispPhi is always between 0 and 90 deg -> estimation of error of major axis
+				// dispPhi is always between 0 and 90 deg -> estimation of error of major axis
 				dispPhi = TMath::Abs( TMath::ATan2( c->sinphi, c->cosphi ) - TMath::ATan2( c->cen_y + m->MCyoff, c->cen_x - m->MCxoff ) );
 				if( dispPhi > TMath::PiOver2() * 3. )
 				{
@@ -348,21 +348,21 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 					dispPhi  = TMath::Pi() - dispPhi;
 				}
 				
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// fill tables
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// fill tables
 				azBin = fData->getAzBin( m->MCaz );
 				if( azBin < h2D_AzDispTable.size() )
 				{
-// 2D tables
+					// 2D tables
 					h2D_AzDispTable[azBin]->Fill( c->width / c->length, log10( c->size ), disp );
 					h2D_AzDispTableN[azBin]->Fill( c->width / c->length, log10( c->size ) );
 					h2D_AzDispPhiTable[azBin]->Fill( c->width / c->length, log10( c->size ), dispPhi );
-// 3D tables
+					// 3D tables
 					h3D_AzDispTable[azBin]->Fill( fData->scaleWidthParameter( c->width ), fData->scaleLengthParameter( c->length ), log10( c->size ), disp );
 					h3D_AzDispTableN[azBin]->Fill( fData->scaleWidthParameter( c->width ), fData->scaleLengthParameter( c->length ), log10( c->size ) );
 					h3D_AzDispPhiTable[azBin]->Fill( fData->scaleWidthParameter( c->width ), fData->scaleLengthParameter( c->length ), log10( c->size ), dispPhi );
 				}
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}
 	}
@@ -372,10 +372,10 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 	}
 	cout << "\t mean pedvars: " << i_meanPedvars << endl;
 	
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-// loop a second time over all events to estimate error in reconstruction
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// loop a second time over all events to estimate error in reconstruction
 	cout << endl << "second loop for error estimation..." << endl;
 	for( unsigned int i = 0; i < fNTel; i++ )
 	{
@@ -400,7 +400,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 		}
 		cout << "\t telescope " << i + 1 << ", " << c->fChain->GetEntries() << " entries in data tree" << endl;
 		
-// loop over all events for this telescope
+		// loop over all events for this telescope
 		double miss = 0.;
 		int x_bin = 0;
 		int y_bin = 0;
@@ -420,35 +420,35 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 			c->GetEntry( n );
 			m->GetEntry( n );
 			
-// quality cuts
+			// quality cuts
 			if( isGoodEvent( c ) )
 			{
 				azBin = fData->getAzBin( m->MCaz );
 				if( azBin < h2D_AzDispTable.size() )
 				{
-//////////////////////////////////////////////////////////////////////////////////////
-// 2D
-// get disp values from histograms
+					//////////////////////////////////////////////////////////////////////////////////////
+					// 2D
+					// get disp values from histograms
 					x_bin = h2D_AzDispTable[azBin]->GetXaxis()->FindBin( c->width / c->length );
 					y_bin = h2D_AzDispTable[azBin]->GetYaxis()->FindBin( log10( c->size ) );
 					disp =  h2D_AzDispTable[azBin]->GetBinContent( x_bin, y_bin );
-// calculate reconstructed shower direction
+					// calculate reconstructed shower direction
 					x_s = c->cen_x - disp * c->cosphi;
 					y_s = c->cen_y - disp * c->sinphi;
-// calculate deviation from true shower direction and fill this into a tree
+					// calculate deviation from true shower direction and fill this into a tree
 					miss = sqrt( ( m->MCxoff - x_s ) * ( m->MCxoff - x_s ) + ( m->MCyoff + y_s ) * ( m->MCyoff + y_s ) );
 					h2D_AzDispMissTable[azBin]->Fill( c->width / c->length, log10( c->size ), miss );
-//////////////////////////////////////////////////////////////////////////////////////
-// 3D
-// get disp values from histograms
+					//////////////////////////////////////////////////////////////////////////////////////
+					// 3D
+					// get disp values from histograms
 					x_bin = h3D_AzDispTable[azBin]->GetXaxis()->FindBin( fData->scaleWidthParameter( c->width ) );
 					y_bin = h3D_AzDispTable[azBin]->GetXaxis()->FindBin( fData->scaleLengthParameter( c->length ) );
 					z_bin = h3D_AzDispTable[azBin]->GetYaxis()->FindBin( log10( c->size ) );
 					disp =  h3D_AzDispTable[azBin]->GetBinContent( x_bin, y_bin, z_bin );
-// calculate reconstructed shower direction
+					// calculate reconstructed shower direction
 					x_s = c->cen_x - disp * c->cosphi;
 					y_s = c->cen_y - disp * c->sinphi;
-// calculate deviation from true shower direction and fill this into a tree
+					// calculate deviation from true shower direction and fill this into a tree
 					miss = sqrt( ( m->MCxoff - x_s ) * ( m->MCxoff - x_s ) + ( m->MCyoff + y_s ) * ( m->MCyoff + y_s ) );
 					h3D_AzDispMissTable[azBin]->Fill( fData->scaleWidthParameter( c->width ), fData->scaleLengthParameter( c->length ), log10( c->size ), miss );
 				}
@@ -456,7 +456,7 @@ bool VDispTable::fillTable( string iMCFile, float i_ze, float i_woff, int iNentr
 		}
 	}
 	
-// fill data carrier
+	// fill data carrier
 	for( unsigned int i = 0; i < fAz_min.size(); i++ )
 	{
 		fData->fill( i_ze, i, fAz_min[i], fAz_max[i], i_woff, i_meanPedvars, ( TH2* )h2D_AzDispTable[i], ( TH2* )h2D_AzDispTableN[i], ( TH2* )h2D_AzDispPhiTable[i], ( TH2* )h2D_AzDispMissTable[i], ( TH3* )h3D_AzDispTable[i], ( TH3* )h3D_AzDispTableN[i], ( TH3* )h3D_AzDispPhiTable[i], ( TH3* )h3D_AzDispMissTable[i] );

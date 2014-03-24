@@ -79,9 +79,9 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
 	
 	i_phi *= TMath::Power( iE0, -1.*i_gamma );
 	
-// dN
+	// dN
 	double y1 = 0.;
-// rate
+	// rate
 	double iTot = 0.;
 	double x1 = 0.;
 	double x2 = 0.;
@@ -89,7 +89,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
 	
 	for( unsigned int i = 0; i < e.size(); i++ )
 	{
-// get lower and upper energy bin
+		// get lower and upper energy bin
 		if( i == 0 )
 		{
 			x1 = e[i];
@@ -105,22 +105,22 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
 			x1 = e[i] - ( e[i] - e[i - 1] ) / 2.;
 			x2 = e[i] + ( e[i + 1] - e[i] ) / 2.;
 		}
-// effective area (m2 -> cm2) (fluxes are given in cm^-2)
+		// effective area (m2 -> cm2) (fluxes are given in cm^-2)
 		y1 = eff[i] * 1.e4;
 		
-// calculate number of events per energy bin
-// (energy (x) is in log E [TeV]
-
-// (this is the integral flux above energy of upper bin edge)
+		// calculate number of events per energy bin
+		// (energy (x) is in log E [TeV]
+		
+		// (this is the integral flux above energy of upper bin edge)
 		i_bflux  = i_phi / ( i_gamma + 1 ) * pow( pow( 10., x2 ), i_gamma + 1 );
-// (subtract integral flux above energy of lower bin edge)
+		// (subtract integral flux above energy of lower bin edge)
 		i_bflux  -= i_phi / ( i_gamma + 1 ) * pow( pow( 10., x1 ), i_gamma + 1 );
 		
-// multiply flux by effective areas
-// (this is the number of gammas per energy bin (dN not dN/dE)
+		// multiply flux by effective areas
+		// (this is the number of gammas per energy bin (dN not dN/dE)
 		y1  *= i_bflux;
 		
-// this is approximate, iEMin and iEMax can be much smaller than intervall x1, x2
+		// this is approximate, iEMin and iEMax can be much smaller than intervall x1, x2
 		if( x1 > iEMin && x2 < iEMax )
 		{
 			iTot += y1;
@@ -138,7 +138,7 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double >& e, vector
 		return 0.;
 	}
 	
-// convert rate [1/s] to [1/min]
+	// convert rate [1/s] to [1/min]
 	return iTot * 60.;
 }
 
@@ -316,12 +316,12 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 	{
 		e_gamma = e;
 	}
-// check bin region
+	// check bin region
 	if( iEMinBin > e_gamma.size() )
 	{
 		return 0.;
 	}
-// adjust maximum bin
+	// adjust maximum bin
 	if( iEMaxBin > e_gamma.size() - 1 )
 	{
 		iEMaxBin = e_gamma.size() - 1;
@@ -334,15 +334,15 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 		return -99.;
 	}
 	
-// check function ID of cosmic ray / gamma spectrum
+	// check function ID of cosmic ray / gamma spectrum
 	if( !e_lit || !e_lit->isValidID( e_lit_ID ) )
 	{
 		return -99.;
 	}
 	
-// dN
+	// dN
 	double y1 = 0.;
-// rate
+	// rate
 	double iTot = 0.;
 	double x1 = 0.;
 	double x2 = 0.;
@@ -360,10 +360,10 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 		cout << endl;
 	}
 	
-// loop over energy intervall in units of effective area vector
+	// loop over energy intervall in units of effective area vector
 	for( unsigned int i = iEMinBin; i <= iEMaxBin; i++ )
 	{
-// get energy bin min/max
+		// get energy bin min/max
 		if( i == 0 )
 		{
 			x1 = e_gamma[i];
@@ -383,9 +383,9 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 		{
 			cout << "\t\t integrate [" << x1 << ", " << x2 << "]" << endl;
 		}
-// =================================================================
-// apply response matrix
-// (important: expect same binning in response matrix and effective area vector!)
+		// =================================================================
+		// apply response matrix
+		// (important: expect same binning in response matrix and effective area vector!)
 		if( iResponseMatrix )
 		{
 			i_Rec_Bin = iResponseMatrix->GetXaxis()->FindBin( e_gamma[i] );
@@ -398,39 +398,39 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 				j_Rec_Bin = iResponseMatrix->GetYaxis()->FindBin( e[j] );
 				if( iResponseMatrix->GetBinContent( i_Rec_Bin, j_Rec_Bin ) > 1.e-7 )
 				{
-// effective area (m2 -> cm2) * response matrix element
+					// effective area (m2 -> cm2) * response matrix element
 					y1 = eff[j] * 1.e4 * iResponseMatrix->GetBinContent( i_Rec_Bin, j_Rec_Bin );
-// get integral flux for this bin
+					// get integral flux for this bin
 					i_bflux = e_lit->getIntegralFlux( pow( 10., iResponseMatrix->GetYaxis()->GetBinLowEdge( j_Rec_Bin ) ),
 													  pow( 10., iResponseMatrix->GetYaxis()->GetBinUpEdge( j_Rec_Bin ) ), e_lit_ID );
-// multiply flux by effective areas
-// (this is the number of gammas per energy bin (dN not dN/dE))
+					// multiply flux by effective areas
+					// (this is the number of gammas per energy bin (dN not dN/dE))
 					y1 *= i_bflux;
-// total flux
+					// total flux
 					iTot += y1;
 				}
 			}
 		}
-// =================================================================
+		// =================================================================
 		else
 		{
-// effective area (m2 -> cm2)
+			// effective area (m2 -> cm2)
 			y1 = eff[i] * 1.e4;
 			
-// calculate number of events per energy bin
-// (energy (x) is in log E [TeV]
-
-// get integral flux for this bin
+			// calculate number of events per energy bin
+			// (energy (x) is in log E [TeV]
+			
+			// get integral flux for this bin
 			i_bflux = e_lit->getIntegralFlux( pow( 10., x1 ), pow( 10., x2 ), e_lit_ID );
 			
-// multiply flux by effective areas
-// (this is the number of gammas per energy bin (dN not dN/dE)
+			// multiply flux by effective areas
+			// (this is the number of gammas per energy bin (dN not dN/dE)
 			y1  *= i_bflux;
 			
-// this is approximate, iEMin and iEMax can be much smaller than intervall x1, x2
+			// this is approximate, iEMin and iEMax can be much smaller than intervall x1, x2
 			if( iEMin > 0. && iEMax > 0. )
 			{
-// total flux
+				// total flux
 				if( x1 - log10( iEMin ) > -1.e-3 && log10( iEMax ) - x2 > -1.e3 )
 				{
 					iTot += y1;
@@ -447,6 +447,6 @@ double VMonteCarloRateCalculator::getMonteCarloRate( vector< double > e, vector<
 		cout << "\tRate [1/s]: " << iTot << " Rate [1/min]: " << iTot * 60. << endl;
 	}
 	
-// convert rate [1/s] to [1/min]
+	// convert rate [1/s] to [1/min]
 	return iTot * 60.;
 }

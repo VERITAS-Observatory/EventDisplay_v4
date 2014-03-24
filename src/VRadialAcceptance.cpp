@@ -61,7 +61,7 @@ VRadialAcceptance::VRadialAcceptance( string ifile )
 	}
 	cout << "\t total number of acceptance curves: " << fAccZe.size() << " (found in " << ifile;
 	
-// count number of raw files used to calculate acceptances
+	// count number of raw files used to calculate acceptances
 	TKey* key;
 	TIter nextkey( fAccFile->GetListOfKeys() );
 	while( ( key = ( TKey* )nextkey() ) )
@@ -100,22 +100,22 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 		cout << "exiting..";
 		exit( -1 );
 	}
-// maximum distance to camera center for which events are taken into account:
+	// maximum distance to camera center for which events are taken into account:
 	fCut_CameraFiducialSize_max = fCuts->fCut_CameraFiducialSize_max;
 	
 	fRunPar = irunpar;
 	
-// upper limit for zenith angle interal (18 == [0,18.])
+	// upper limit for zenith angle interal (18 == [0,18.])
 	/*   fZe.push_back( 20. );
 	   fZe.push_back( 30. );
 	   fZe.push_back( 40. ); */
 	fZe.push_back( 70. );
 	
-// maximal offset
+	// maximal offset
 	double xymax = 5.0;
 	int nxybin = 50;
 	
-// range used to normalise acceptance histograms
+	// range used to normalise acceptance histograms
 	fAccZeFitMinBin = 2;
 	fAccZeFitMaxBin = 5;
 	
@@ -167,8 +167,8 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 		
 		ize = fZe[i];
 	}
-// 2D histogram (not normalized)
-
+	// 2D histogram (not normalized)
+	
 	double hr = 3.0 ;
 	int hn = 40 ;
 	hXYAccTot = new TH2F( "hXYaccTot", "",  hn, -hr, hr, hn, -hr, hr );
@@ -182,7 +182,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 	hXYAccTotDeRot->Sumw2();
 	hList->Add( hXYAccTotDeRot );
 	
-// azimuth dependent radial acceptance histograms
+	// azimuth dependent radial acceptance histograms
 	fPhiMin.clear();
 	fPhiMax.clear();
 	fPhiMin.push_back( 135.0 );
@@ -198,7 +198,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 	}
 	for( unsigned int i = 0; i < fPhiMin.size(); i++ )
 	{
-// camera coordinates
+		// camera coordinates
 		sprintf( hname, "hAccPhi_%d", i );
 		sprintf( htitle, "%.0f < Phi < %.0f", fPhiMin[i], fPhiMax[i] );
 		hAccPhi.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
@@ -210,7 +210,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 		hList->Add( hAccPhi.back() );
 		hListNormalizeHistograms->Add( hAccPhi.back() );
 		hListFitHistograms->Add( hAccPhi.back() );
-// derotated camera coordinates
+		// derotated camera coordinates
 		sprintf( hname, "hAccPhiDerot_%d", i );
 		sprintf( htitle, "%.0f < Phi < %.0f (derot)", fPhiMin[i], fPhiMax[i] );
 		hAccPhiDerot.push_back( new TH1F( hname, htitle, nxybin, 0., xymax ) );
@@ -303,7 +303,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 		
 	}
 	
-// run dependent acceptance curves
+	// run dependent acceptance curves
 	for( unsigned int i = 0; i < fRunPar->fRunList.size(); i++ )
 	{
 		sprintf( hname, "hAccRun_%d", fRunPar->fRunList[i].fRunOff );
@@ -489,19 +489,19 @@ bool VRadialAcceptance::isExcluded( double x, double y )
  */
 bool VRadialAcceptance::isExcludedfromBackground( double x, double y )
 {
-// event outside fiducial area
+	// event outside fiducial area
 	if( isExcluded( x, y ) )
 	{
 		return true;
 	}
 	
-// source region (source radius + safety (fDS))
+	// source region (source radius + safety (fDS))
 	if( fDs >= 0. && ( ( x - fXs ) * ( x - fXs ) + ( y - fYs ) * ( y - fYs ) ) < ( ( fRs + fDs ) * ( fRs + fDs ) ) )
 	{
 		return true;
 	}
 	
-//Other regions to exclude from background (read from runparameter)
+	//Other regions to exclude from background (read from runparameter)
 	for( unsigned int i = 0; i < fXE.size(); i ++ )
 	{
 		if( ( x - fXE[i] ) * ( x - fXE[i] ) + ( y - fYE[i] ) * ( y - fYE[i] ) < fRE[i]*fRE[i] )
@@ -564,16 +564,16 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 	double i_Phi = 0.;
 	bool bPassed = false;
 	
-// apply some basic quality cuts
+	// apply some basic quality cuts
 	if( fCuts->applyInsideFiducialAreaCut() && fCuts->applyStereoQualityCuts( fEnergyReconstructionMethod, false, entry, true ) )
 	{
-// gamma/hadron cuts
+		// gamma/hadron cuts
 		if( !fCuts->isGamma( entry, false ) )
 		{
 			return 0;
 		}
 		
-// az cut
+		// az cut
 		bool bFill = false;
 		if( fAzCut_min < fAzCut_max )
 		{
@@ -593,12 +593,12 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 		{
 			return 0;
 		}
-// no more cuts after this statement
+		// no more cuts after this statement
 		bPassed = true;
 		
 		idist = sqrt( iData->Xoff * iData->Xoff + iData->Yoff * iData->Yoff );
 		
-// fill 2D distribution of events
+		// fill 2D distribution of events
 		hXYAccTot->Fill( iData->Xoff, iData->Yoff );
 		hXYAccTotDeRot->Fill( iData->Xoff_derot, iData->Yoff_derot );
 		
@@ -683,7 +683,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 				hAccPhi[j]->Fill( idist );
 			}
 		}
-// fill azimuth angle dependend histograms (derotated camera coordinates)
+		// fill azimuth angle dependend histograms (derotated camera coordinates)
 		i_Phi = atan2( iData->Yoff_derot, iData->Xoff_derot ) * TMath::RadToDeg();
 		hPhiDistDeRot->Fill( i_Phi );
 		for( unsigned int j = 0; j < fPhiMin.size(); j++ )
@@ -712,7 +712,7 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 				hAccPhiDerot[j]->Fill( idist );
 			}
 		}
-// fill run dependent histograms
+		// fill run dependent histograms
 		for( unsigned int j = 0; j < fRunPar->fRunList.size(); j++ )
 		{
 			if( iData->runNumber == fRunPar->fRunList[j].fRunOff )
@@ -750,9 +750,9 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 		cout << "VRadialAcceptance::terminate() error accessing directory  " << iDirectory->GetName() << endl;
 		exit( -1 );
 	}
-/////////////////////////////////////
-// normalize radial acceptance histograms
-// scale everything to mean value of first three bins
+	/////////////////////////////////////
+	// normalize radial acceptance histograms
+	// scale everything to mean value of first three bins
 	if( fAccZeFitMinBin == fAccZeFitMaxBin )
 	{
 		cout << "Error: normalisation range for acceptance curves not well defined: " << fAccZeFitMinBin << "\t" << fAccZeFitMaxBin << endl;
@@ -762,7 +762,7 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 		double isc = 0.;
 		double i_normBin = ( double )( fAccZeFitMaxBin - fAccZeFitMinBin );
 		cout << "VRadialAcceptance::terminate: scaling histograms to bins " << fAccZeFitMinBin << " to " << fAccZeFitMaxBin << endl;
-// scale all histograms in hListNormalizeHistograms
+		// scale all histograms in hListNormalizeHistograms
 		TIter next( hListNormalizeHistograms );
 		while( TH1F* h = ( TH1F* )next() )
 		{
@@ -789,13 +789,13 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 	}
 	
 	
-/////////////////////////////////////
-// analyze and fit histograms
+	/////////////////////////////////////
+	// analyze and fit histograms
 	string i_hname;
 	TIter next( hListFitHistograms );
 	while( TH1F* h = ( TH1F* )next() )
 	{
-// fit function
+		// fit function
 		i_hname = h->GetName();
 		i_hname.replace( 0, 1, "f" );
 		TF1* ffit = new TF1( i_hname.c_str(), VRadialAcceptance_fit_acceptance_function, 0., fCut_CameraFiducialSize_max, 5 );
@@ -807,7 +807,7 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 		ffit->SetParameter( 4, 0.2 );
 		ffit->SetParLimits( 4, 0., 0.5 );
 		hList->Add( ffit );
-// fit histogram
+		// fit histogram
 		i_hname = h->GetName();
 		i_hname += "Fit";
 		TH1F* hfit = new TH1F( i_hname.c_str(), h->GetTitle(), h->GetNbinsX(), h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax() );
@@ -815,18 +815,18 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 		hfit->SetYTitle( h->GetYaxis()->GetTitle() );
 		hList->Add( hfit );
 		
-// fill the fitting histogram
+		// fill the fitting histogram
 		for( int j = 1; j < hfit->GetNbinsX(); j++ )
 		{
 			hfit->SetBinContent( j, h->GetBinContent( j ) ) ;
 		}
 		
-// fit the data and fill histograms
+		// fit the data and fill histograms
 		cout << "fitting acceptance curves (" << h->GetName() << ") ..." << endl << endl;
 		double i_eval = 0.;
 		hfit->Fit( ffit, "0REM" );
 		hfit->SetBins( 1000, 0., 5. );
-// replace bin content by values from the fit function (set max to 1 and min to 0)
+		// replace bin content by values from the fit function (set max to 1 and min to 0)
 		for( int j = 1; j < hfit->GetNbinsX(); j++ )
 		{
 			i_eval = ffit->Eval( hfit->GetBinCenter( j ) );
@@ -852,7 +852,7 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 	}
 	cout << "-----------------------------------------" << endl << endl;
 	
-// write total number of entries in each histogram (ze) to screen
+	// write total number of entries in each histogram (ze) to screen
 	cout << "total number of events per zenith angle bin " << endl;
 	for( unsigned int i = 0; i < hAccZe.size(); i++ )
 	{
@@ -863,7 +863,7 @@ bool VRadialAcceptance::terminate( TDirectory* iDirectory )
 	
 	hList->Write();
 	
-// write cuts to disk
+	// write cuts to disk
 	if( fCuts )
 	{
 		fCuts->SetName( "GammaHadronCuts" );

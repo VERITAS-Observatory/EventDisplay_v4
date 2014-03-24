@@ -106,9 +106,9 @@ void VModel3DFn::calcModel3DFn( unsigned int iTel, unsigned int iPix, const doub
 	double tSzen = ( 90. - fSel ) * ( TMath::Pi() / 180. ); // in radians
 	double tSaz = fSaz * ( TMath::Pi() / 180. ); // in radians
 	
-////////////////////////////////////////////////////////////////
-//// Lemoine-Goumard 2006, equation 5 //////////////////////////
-
+	////////////////////////////////////////////////////////////////
+	//// Lemoine-Goumard 2006, equation 5 //////////////////////////
+	
 	//// get Bs, Bp, u, epsilon, deltaB, sigmaU, sigmaD ///////
 	
 	double Bs = dot( fxB[0][iTel], fxB[1][iTel], fxB[2][iTel], fs[0], fs[1], fs[2] );
@@ -203,16 +203,16 @@ void VModel3DFn::calcModel3DFn( unsigned int iTel, unsigned int iPix, const doub
 	double dEq5dNc = exp( fNc - 0.5 * ( -( ( ( pow( fsigmaL, 2 ) - pow( fsigmaT, 2 ) ) * pow( -fSmax + flocTel3D[2][iTel] * cos( tSzen ) + ( flocTel3D[0][iTel] - fXcore ) * cos( tSaz ) * sin( tSzen ) + flocTel3D[1][iTel] * sin( tSzen ) * sin( tSaz ) - fYcore * sin( tSzen ) * sin( tSaz ) + ( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ) ) * ( ipZ * ( -flocTel3D[2][iTel] + fSmax * cos( tSzen ) ) + ipX * ( -flocTel3D[0][iTel] + fXcore + fSmax * cos( tSaz ) * sin( tSzen ) ) + ipY * ( -flocTel3D[1][iTel] + fYcore + fSmax * sin( tSzen ) * sin( tSaz ) ) ), 2 ) ) / ( pow( fsigmaT, 2 ) * ( pow( fsigmaT, 2 ) * pow( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ), 2 ) + pow( fsigmaL, 2 ) * ( 1 - pow( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ), 2 ) ) ) ) ) + ( pow( -flocTel3D[2][iTel] + fSmax * cos( tSzen ), 2 ) + pow( -flocTel3D[0][iTel] + fXcore + fSmax * cos( tSaz ) * sin( tSzen ), 2 ) + pow( -flocTel3D[1][iTel] + fYcore + fSmax * sin( tSzen ) * sin( tSaz ), 2 ) - pow( ipZ * ( -flocTel3D[2][iTel] + fSmax * cos( tSzen ) ) + ipX * ( -flocTel3D[0][iTel] + fXcore +  fSmax * cos( tSaz ) * sin( tSzen ) ) + ipY * ( -flocTel3D[1][iTel] + fYcore +  fSmax * sin( tSzen ) * sin( tSaz ) ), 2 ) ) / pow( fsigmaT, 2 ) ) ) / ( 2.*fsigmaT * TMath::Pi() * sqrt( pow( fsigmaT, 2 ) * pow( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ), 2 ) + pow( fsigmaL, 2 ) * ( 1 - pow( ipZ * cos( tSzen ) +  ipX * cos( tSaz ) * sin( tSzen ) +  ipY * sin( tSzen ) * sin( tSaz ), 2 ) ) ) );
 	
 	
-//// include dIedSel and dIedSaz ////
-
+	//// include dIedSel and dIedSaz ////
+	
 	double dIedSel = ( exp( ( eta - acos( ipZ * cos( tSzen ) +  ipX * cos( tSaz ) * sin( tSzen ) +  ipY * sin( tSzen ) * sin( tSaz ) ) ) / ( 4.*eta ) ) * eta * K * ( -( ( ipX * TMath::Pi() * cos( tSzen ) * cos( tSaz ) ) / 180. ) + ( ipZ * TMath::Pi() * sin( tSzen ) ) / 180. - ( ipY * TMath::Pi() * cos( tSzen ) * sin( tSaz ) ) / 180. ) ) / ( pow( acos( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ) ), 2 ) * sqrt( 1 - pow( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ), 2 ) ) ) + ( exp( ( eta - acos( ipZ * cos( tSzen ) +  ipX * cos( tSaz ) * sin( tSzen ) +  ipY * sin( tSzen ) * sin( tSaz ) ) ) / ( 4.*eta ) ) * K * ( -( ( ipX * TMath::Pi() * cos( tSzen ) * cos( tSaz ) ) / 180. ) + ( ipZ * TMath::Pi() * sin( tSzen ) ) / 180. - ( ipY * TMath::Pi() * cos( tSzen ) * sin( tSaz ) ) / 180. ) ) / ( 4.*acos( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ) ) * sqrt( 1 - pow( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ), 2 ) ) );
 	
 	double dIedSaz = ( exp( ( eta - acos( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ) ) ) / ( 4.*eta ) ) * eta * K * ( ( ipY * TMath::Pi() * cos( tSaz ) * sin( tSzen ) ) / 180. - ( ipX * TMath::Pi() * sin( tSzen ) * sin( tSaz ) ) / 180. ) ) / ( pow( acos( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ) ), 2 ) * sqrt( 1 - pow( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ), 2 ) ) ) + ( exp( ( eta - acos( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ) ) ) / ( 4.*eta ) ) * K * ( ( ipY * TMath::Pi() * cos( tSaz ) * sin( tSzen ) ) / 180. - ( ipX * TMath::Pi() * sin( tSzen ) * sin( tSaz ) ) / 180. ) ) / ( 4.*acos( ipZ * cos( tSzen ) +   ipX * cos( tSaz ) * sin( tSzen ) +  ipY * sin( tSzen ) * sin( tSaz ) ) *  sqrt( 1 - pow( ipZ * cos( tSzen ) + ipX * cos( tSaz ) * sin( tSzen ) + ipY * sin( tSzen ) * sin( tSaz ), 2 ) ) );
 	
 	
-////////////////////////////////////////////////////
-///////////////////////////////////////////////////
-
+	////////////////////////////////////////////////////
+	///////////////////////////////////////////////////
+	
 	if( epsilon <= eta )
 	{
 		grad[0] = Ie * dEq5dSel;
@@ -236,12 +236,12 @@ void VModel3DFn::calcModel3DFn( unsigned int iTel, unsigned int iPix, const doub
 	grad[4] *= 1000.; // rescale fSmax
 	grad[5] *= 1000.; // rescale fsigmaL
 	
-////////// check for nan ////////////////
-// if(!isfinite(val)) {
-//   val = 0;
-// }
-// for (unsigned int iPar = 0; iPar < grad.size(); iPar++) grad[iPar] = 0;
-
+	////////// check for nan ////////////////
+	// if(!isfinite(val)) {
+	//   val = 0;
+	// }
+	// for (unsigned int iPar = 0; iPar < grad.size(); iPar++) grad[iPar] = 0;
+	
 }
 
 //// standard normal cumulative distribution function (CDF) ////

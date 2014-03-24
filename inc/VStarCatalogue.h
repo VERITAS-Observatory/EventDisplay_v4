@@ -40,7 +40,7 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 		vector< VStar* > fStars;
 		vector< VStar* > fStarsinFOV;
 		
-// telescope pointing
+		// telescope pointing
 		unsigned int fTel_telescopeID;
 		double       fTel_deRotationAngle_deg;
 		double       fTel_ra;
@@ -59,7 +59,7 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 		bool          init( double MJD );
 		bool          init( double MJD, string iCatalogue );
 		
-//    void          getStar( unsigned int ID, double &dec, double &ra, double &brightness );
+		//    void          getStar( unsigned int ID, double &dec, double &ra, double &brightness );
 		double        getDistanceToClosestStar( double x_cam_deg, double y_cam_deg );
 		unsigned int  getNStar()
 		{

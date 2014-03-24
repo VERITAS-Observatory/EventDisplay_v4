@@ -18,7 +18,7 @@ bool VImageBaseAnalyzer::setSpecialChannels()
 		cout << "VImageBaseAnalyzer::setSpecialChannels " << getEventNumber() << endl;
 	}
 	
-// set masked (FADC trig) channels
+	// set masked (FADC trig) channels
 	if( getFADCstopTrig().size() > 0 )
 	{
 		for( unsigned int i = 0; i < getMasked().size(); i++ )
@@ -53,10 +53,10 @@ bool VImageBaseAnalyzer::setSpecialChannels()
 		fRunPar->fL2TimeCorrect = false;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////
-// set channel status
-//
-// Note: dead channel settings overwrite all pre-existing settings
+	///////////////////////////////////////////////////////////////////////////////////
+	// set channel status
+	//
+	// Note: dead channel settings overwrite all pre-existing settings
 	for( unsigned int i = 0; i < getChannelStatus().size(); i++ )
 	{
 		if( getAnaData()->getSpecialChannel() )
@@ -67,8 +67,8 @@ bool VImageBaseAnalyzer::setSpecialChannels()
 			}
 		}
 	}
-///////////////////////////////////////////////////////////////////////////////////
-
+	///////////////////////////////////////////////////////////////////////////////////
+	
 	return true;
 }
 
@@ -87,14 +87,14 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 	}
 	int sw_original = iLast - iFirst ;
 	
-// for DST source file, ignore everything and just get the sums and tzeros
+	// for DST source file, ignore everything and just get the sums and tzeros
 	if( getRunParameter()->frunmode != 1 && ( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 ) )
 	{
 		setSums( fReader->getSums() );
 		return;
 	}
 	
-// check integration range
+	// check integration range
 	if( iFirst < 0 )
 	{
 		if( getDebugFlag() )
@@ -112,10 +112,10 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 		iLast = ( int )getNSamples();
 	}
 	
-// calculates the sum over a sample range for all channels
+	// calculates the sum over a sample range for all channels
 	setSums( 0. );
 	unsigned int nhits = fReader->getNumChannelsHit();
-// exclude photodiode from this
+	// exclude photodiode from this
 	if( nhits > getDead( false ).size() )
 	{
 		nhits = getDead( false ).size();
@@ -127,7 +127,7 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-// for low gain pedestal calibration: ignore high gain channels
+			// for low gain pedestal calibration: ignore high gain channels
 			if( iLowGainOnly && i_channelHitID < getHiLo().size() && !getHiLo()[i_channelHitID] )
 			{
 				continue;
@@ -148,7 +148,7 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 											 getPedrms( getHiLo()[i_channelHitID] )[i_channelHitID],
 											 i_channelHitID, i, getLowGainMultiplier_Trace()*getHiLo()[i_channelHitID] );
 				}
-// make sure that trace integration is set (important for pedestal calculations in QADC runs)
+				// make sure that trace integration is set (important for pedestal calculations in QADC runs)
 				if( getTraceIntegrationMethod() != 0 )
 				{
 					fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
@@ -188,14 +188,14 @@ void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 	{
 		cout << "VImageBaseAnalyzer::calcTZeros() " << fFirst << "\t" << fLast << endl;
 	}
-// for DST source file, ignore everything and just get the sums and tzeros
+	// for DST source file, ignore everything and just get the sums and tzeros
 	if( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 )
 	{
 		setPulseTiming( fReader->getTracePulseTiming(), true );
 		setPulseTiming( fReader->getTracePulseTiming(), false );
 		return;
 	}
-// check integration range
+	// check integration range
 	if( fFirst < 0 )
 	{
 		if( getDebugFlag() )
@@ -212,11 +212,11 @@ void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 		}
 		fLast = ( int )getNSamples();
 	}
-// calculates the rising edge time for all channels
+	// calculates the rising edge time for all channels
 	setPulseTiming( 0., true );
 	
 	unsigned int nhits = fReader->getNumChannelsHit();
-// exclude photodiode from this
+	// exclude photodiode from this
 	if( nhits > getDead( false ).size() )
 	{
 		nhits = getDead( false ).size();
@@ -260,19 +260,19 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 		cout << "VImageBaseAnalyzer::FADCStopCorrect()" << endl;
 	}
 	
-// don't do this if there is no L2 trigger
+	// don't do this if there is no L2 trigger
 	if( !getReader()->hasLocalTrigger( getTelID() ) )
 	{
 		return;
 	}
 	
-// don't do this if there are no FADCs
+	// don't do this if there are no FADCs
 	if( !getReader()->hasFADCTrace() )
 	{
 		return;
 	}
 	
-// do the FADC stop correction only if all channels are set
+	// do the FADC stop correction only if all channels are set
 	if( getFADCstopTrig().size() == 0 )
 	{
 		return;
@@ -280,7 +280,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 	unsigned int i_channelHitID = 0;
 	setFADCStopOffsets( 0. );
 	
-// special treatment of channels with i_channelHitID beyond camera channels (e.g. 499)
+	// special treatment of channels with i_channelHitID beyond camera channels (e.g. 499)
 	unsigned int iPedFADCTrigChan = 1000000;
 	for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
 	{
@@ -290,12 +290,12 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 		}
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////
-// now get channel jitter
-
+	///////////////////////////////////////////////////////////////////////////////////////
+	// now get channel jitter
+	
 	for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
 	{
-//  calculate TZero for first crate trigger signal
+		//  calculate TZero for first crate trigger signal
 		pair< bool, uint32_t > i_hitIndexPair = fReader->getChannelHitIndex( ( unsigned int )getFADCstopTrig()[t] );
 		if( !i_hitIndexPair.first )
 		{
@@ -319,7 +319,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 				{
 					fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[i_channelHitID], getPedrms()[i_channelHitID], i_channelHitID, i, 0. );
 				}
-// take pedestal from another FADC trig channel
+				// take pedestal from another FADC trig channel
 				else if( iPedFADCTrigChan < getPeds().size() && !getZeroSuppressed()[iPedFADCTrigChan] )
 				{
 					fTraceHandler->setTrace( fReader, getNSamples(), getPeds()[iPedFADCTrigChan], getPedrms()[iPedFADCTrigChan], i_channelHitID, i, 0. );
@@ -330,7 +330,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 					continue;
 				}
 				fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
-// calculate t0
+				// calculate t0
 				if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
 				{
 					crateTZero = fTraceHandler->getFADCTiming( 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
@@ -340,7 +340,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 					}
 				}
 				getFADCstopTZero()[t] = crateTZero;
-// calculate offsets
+				// calculate offsets
 				if( t > 0 )
 				{
 					if( getFADCstopTZero()[0] > 0 &&  crateTZero > 0 )
@@ -359,25 +359,25 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 					}
 					unsigned int iC_start = 0;
 					unsigned int iC_stop =  0;
-// crate 2
+					// crate 2
 					if( t == 1 )
 					{
 						iC_start = 130;
 						iC_stop =  250;
 					}
-// crate 3
+					// crate 3
 					else if( t == 2 )
 					{
 						iC_start = 250;
 						iC_stop =  380;
 					}
-// crate 4
+					// crate 4
 					else if( t == 3 )
 					{
 						iC_start = 380;
 						iC_stop =  getTZeros().size();
 					}
-// apply offset
+					// apply offset
 					for( unsigned int j = iC_start; j < iC_stop; j++ )
 					{
 						if( j != i )
@@ -416,7 +416,7 @@ void VImageBaseAnalyzer::calcTCorrectedSums( int iFirst, int iLast )
 {
 
 	int sw_original = iLast - iFirst;
-// for DST source file, ignore everything and just get the sums and tzeros
+	// for DST source file, ignore everything and just get the sums and tzeros
 	if( fReader->getDataFormatNum() == 4 || fReader->getDataFormatNum() == 6 )
 	{
 		setSums( fReader->getSums() );
@@ -427,10 +427,10 @@ void VImageBaseAnalyzer::calcTCorrectedSums( int iFirst, int iLast )
 		return;
 	}
 	
-// calculates the sum over a sample range, corrected for time offsets, for all channels
+	// calculates the sum over a sample range, corrected for time offsets, for all channels
 	setSums( 0. );
 	unsigned int nhits = fReader->getNumChannelsHit();
-// exclude photodiode from this
+	// exclude photodiode from this
 	if( nhits > getDead( false ).size() )
 	{
 		nhits = getDead( false ).size();
@@ -514,9 +514,9 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 		cout << "VImageBaseAnalyzer::calcTZerosSums() \t" << iFirstSum << "\t" << iLastSum << endl;
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////
-// DST source file,
-// ignore everything and just get the sums and tzeros from data trees
+	/////////////////////////////////////////////////////////////////////////////////
+	// DST source file,
+	// ignore everything and just get the sums and tzeros from data trees
 	if( !fReader->hasFADCTrace() || !getRunParameter()->doFADCAnalysis() )
 	{
 		if( getDebugFlag() )
@@ -533,10 +533,10 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 		return;
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////
-// FAD trace analysis
-
-// reset the data vectors
+	/////////////////////////////////////////////////////////////////////////////////
+	// FAD trace analysis
+	
+	// reset the data vectors
 	if( getTraceFit() > -1 )
 	{
 		setTraceRiseTime( 0. );
@@ -550,12 +550,12 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 	setSums( 0. );
 	setSums2( 0. );
 	
-/////////////////////////////////////////////////////////////////////////////////////////////
-// calculates the sum over a sample range, corrected for time offsets, for all channels
-/////////////////////////////////////////////////////////////////////////////////////////////
-
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// calculates the sum over a sample range, corrected for time offsets, for all channels
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	
 	unsigned int nhits = fReader->getNumChannelsHit();
-// exclude photodiode from this (which would be channel Nchannel + 1 )
+	// exclude photodiode from this (which would be channel Nchannel + 1 )
 	if( nhits > getDead( false ).size() )
 	{
 		nhits = getDead( false ).size();
@@ -567,9 +567,9 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 	int corrfirst = 0;
 	int corrlast = 0;
 	
-//////////////////////////////////////////////////////////////////
-// loop over all channels
-//////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////
+	// loop over all channels
+	//////////////////////////////////////////////////////////////////
 	for( unsigned int i = 0; i < nhits; i++ )
 	{
 		unsigned int i_channelHitID = 0;
@@ -587,18 +587,18 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			}
 			continue;
 		}
-/////////////////////////////////////////////////////////////////
-// calculate tzero and sums for good channels only
-/////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////
+		// calculate tzero and sums for good channels only
+		/////////////////////////////////////////////////////////////////
 		if( i_channelHitID < ndead_size && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
 		{
-// initialize trace handler
+			// initialize trace handler
 			fTraceHandler->setTrace( fReader, getNSamples(),
 									 getPeds( getHiLo()[i_channelHitID] )[i_channelHitID], getPedrms( getHiLo()[i_channelHitID] )[i_channelHitID],
 									 i_channelHitID, i, getLowGainMultiplier_Trace()*getHiLo()[i_channelHitID] );
 			fTraceHandler->setTraceIntegrationmethod( iTraceIntegrationMethod );
 			
-// get time offsets (from laser/flasher calibration): make sure that trace integration starts at the same time in all channels
+			// get time offsets (from laser/flasher calibration): make sure that trace integration starts at the same time in all channels
 			int offset = 0;
 			if( !getRunParameter()->fFixWindowStart )
 			{
@@ -612,12 +612,12 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 				}
 			}
 			
-///////////////////////////////////////////
-// determine summation window parameters
-// start and end of summation window
+			///////////////////////////////////////////
+			// determine summation window parameters
+			// start and end of summation window
 			corrfirst = getFADCTraceIntegrationPosition( iFirstSum + offset );
 			corrlast  = getFADCTraceIntegrationPosition( iLastSum + offset );
-// calculate timing parameters (raw and corrected; tzero correction happens later)
+			// calculate timing parameters (raw and corrected; tzero correction happens later)
 			if( getSumWindowStart_at_T0() )
 			{
 				setPulseTiming( i_channelHitID, fTraceHandler->getPulseTiming( 0, getNSamples(), 0, getNSamples() ), true );
@@ -626,26 +626,26 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			{
 				setPulseTiming( i_channelHitID, fTraceHandler->getPulseTiming( corrfirst, corrlast, 0, getNSamples() ), true );
 			}
-// shift the summation window if necessary
+			// shift the summation window if necessary
 			if( getSumWindowShift() != 0 && !getRunParameter()->fFixWindowStart )
 			{
 				corrfirst = getFADCTraceIntegrationPosition( iFirstSum + ( int )getTOffsets()[i_channelHitID] + getSumWindowShift() );
 				corrlast  = getFADCTraceIntegrationPosition( corrfirst + ( iLastSum - iFirstSum ) );
 			}
-// use T0 as start of integraction window:
+			// use T0 as start of integraction window:
 			if( getSumWindowStart_at_T0() )
 			{
 				corrfirst = getFADCTraceIntegrationPosition( getPulseTiming()[getRunParameter()->fpulsetiming_tzero_index][i_channelHitID] + getSumWindowShift() );
 				corrlast  = getFADCTraceIntegrationPosition( corrfirst + ( iLastSum - iFirstSum ) );
 			}
-// set current summation window (might change from pixel to pixel and event to event
+			// set current summation window (might change from pixel to pixel and event to event
 			setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );
 			
-///////////////////////////////////////////
-// integrate trace
+			///////////////////////////////////////////
+			// integrate trace
 			setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_pass1[fTelID] , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
 			
-// fill parameters characterizing the trace
+			// fill parameters characterizing the trace
 			setTCorrectedSumFirst( i_channelHitID, fTraceHandler->getTraceIntegrationFirst() );
 			setTCorrectedSumLast( i_channelHitID, fTraceHandler->getTraceIntegrationLast() );
 			setTraceAverageTime( i_channelHitID, fTraceHandler->getTraceAverageTime() );
@@ -657,11 +657,11 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			{
 				setTrace( i_channelHitID, fTraceHandler->getTrace(), getHiLo()[i_channelHitID], getPeds( getHiLo()[i_channelHitID] )[i_channelHitID] );
 			}
-/////////////////
-// no doublepass: fill summation windows and pass2 sum
+			/////////////////
+			// no doublepass: fill summation windows and pass2 sum
 			if( !getRunParameter()->fDoublePass )
 			{
-// don't fill pulse timing in first pass of double pass (saves time)
+				// don't fill pulse timing in first pass of double pass (saves time)
 				if( getFillPulseSum() )
 				{
 					getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
@@ -670,10 +670,10 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 				setSums2( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw )* getLowGainSumCorrection( fRunPar->fsumwindow_2[fTelID] , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
 				setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, true );
 			}
-//////////////////////////////////////////////////
-
-// get results for trace fitting
-// rise and fall time are 10/90% values
+			//////////////////////////////////////////////////
+			
+			// get results for trace fitting
+			// rise and fall time are 10/90% values
 			if( getTraceFit() > -1 )
 			{
 				setTraceChi2( i_channelHitID, fTraceHandler->getTraceChi2() );
@@ -684,9 +684,9 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 				setTraceNorm( i_channelHitID, fTraceHandler->getTraceNorm() );
 			}
 		}
-/////////////////////////////////////////////////////////////////
-// calculate size of FADC stop channel
-// (note that this does not catch FADC stop channels in channel 499)
+		/////////////////////////////////////////////////////////////////
+		// calculate size of FADC stop channel
+		// (note that this does not catch FADC stop channels in channel 499)
 		else
 		{
 			for( unsigned int c = 0; c < getFADCstopTrig().size(); c++ )
@@ -712,7 +712,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 			}
 		}
 	}
-// fill tzero vector with uncorrected times
+	// fill tzero vector with uncorrected times
 	setPulseTiming( getPulseTiming( true ), false );
 }
 
@@ -727,24 +727,24 @@ void VImageBaseAnalyzer::gainCorrect()
 		cout << "void VImageBaseAnalyzer::gainCorrect()" << endl;
 	}
 	
-// do not gain correct if traces where not calculated by evndisp (using e.g. sim_telarray analysis results)
+	// do not gain correct if traces where not calculated by evndisp (using e.g. sim_telarray analysis results)
 	if( !getRunParameter()->doFADCAnalysis() )
 	{
 		return;
 	}
 	
-// loop over all channels
+	// loop over all channels
 	unsigned int nc = getSums().size();
 	for( unsigned int i = 0; i < nc; i++ )
 	{
-// apply gain correction for HIGHQE channels
-// (e.g. V5 with 6 highqe pixels installed in T3)
+		// apply gain correction for HIGHQE channels
+		// (e.g. V5 with 6 highqe pixels installed in T3)
 		double iHIGHQE = getHIGHQE_gainfactor( i );
 		if( iHIGHQE <= 0. )
 		{
 			iHIGHQE = 1.;
 		}
-// correct gains
+		// correct gains
 		if( getGains()[i] > 0  && !getDead( getHiLo()[i] )[i] )
 		{
 			setSums( i, getSums()[i] / ( getGains()[i] * iHIGHQE ) );
@@ -795,15 +795,15 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 		cout << "VImageBaseAnalyzer::findDeadChans( bool iLowGain ) T" << getTelID() + 1 << endl;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-// do not set anything dead for PE-mode
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// do not set anything dead for PE-mode
 	if( getRunParameter()->fsourcetype == 6 )
 	{
 		return;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DST: read dead channel list from DST file
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// DST: read dead channel list from DST file
 	if( getRunParameter()->fsourcetype == 7 || getRunParameter()->fsourcetype == 4 )
 	{
 		for( unsigned int i = 0; i < getNChannels(); i++ )
@@ -817,7 +817,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 				setDead( i, 0, iLowGain );
 			}
 		}
-// getFullAnaVec()[i]: -1: dead channel, 0: channel does not exist, 1 channel o.k.
+		// getFullAnaVec()[i]: -1: dead channel, 0: channel does not exist, 1 channel o.k.
 		if( getNChannels() >= getDetectorGeometry()->getAnaPixel().size() )
 		{
 			for( unsigned int i = 0; i < getNChannels(); i++ )
@@ -831,36 +831,36 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 		return;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-// for plotting ignore dead channels (no pedestal information available)
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// for plotting ignore dead channels (no pedestal information available)
 	if( getRunParameter()->fPlotRaw )
 	{
 		return;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-// find dead channels from calibration and event data
-
-// check if dead channel configuration is time dependent
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// find dead channels from calibration and event data
+	
+	// check if dead channel configuration is time dependent
 	if( !iFirst && !usePedestalsInTimeSlices( iLowGain ) )
 	{
 		return;
 	}
 	
-// reset dead channel vector
+	// reset dead channel vector
 	if( iFirst )
 	{
 		setDead( false, iLowGain );
 	}
 	
-// get mean and rms of pedvar
+	// get mean and rms of pedvar
 	double i_meanPedVar = 0.;
 	double i_meanPedVarRMS = 0.;
 	getmeanPedvars( i_meanPedVar, i_meanPedVarRMS, iLowGain, getSumWindow() );
 	
 	for( unsigned int i = 0; i < getNChannels(); i++ )
 	{
-// FADC stop channels (don't set any other reasons for channels to be dead)
+		// FADC stop channels (don't set any other reasons for channels to be dead)
 		if( iFirst )
 		{
 			for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
@@ -872,15 +872,15 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 				}
 			}
 		}
-// time dependent dead channels finder (pedestals in time slices)
+		// time dependent dead channels finder (pedestals in time slices)
 		if( usePedestalsInTimeSlices( iLowGain ) )
 		{
-// reset bits for ped settings
+			// reset bits for ped settings
 			setDead( i, 1, iLowGain, false, true );
 			setDead( i, 2, iLowGain, false, true );
 			setDead( i, 3, iLowGain, false, true );
 			setDead( i, 4, iLowGain, false, true );
-// check values
+			// check values
 			setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
 					 ->testPedestals( i, getPeds( iLowGain )[i] ), iLowGain );
 			setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
@@ -890,7 +890,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
 					 ->testPedestalVariationsMaxOut( i, getPedvars( iLowGain, getSumWindow() )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
 		}
-// same data for whole run
+		// same data for whole run
 		else if( iFirst )
 		{
 			setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
@@ -903,9 +903,9 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 					 ->testPedestalVariationsMaxOut( i, getPedvars( iLowGain )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
 		}
 		
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// time independent values
-// gain/toff/low gain values are not time dependent
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// time independent values
+		// gain/toff/low gain values are not time dependent
 		if( iFirst )
 		{
 			if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0
@@ -926,18 +926,18 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 						 ->testTimeOffsets( i, getTOffsets( iLowGain )[i] ), iLowGain );
 			}
 			
-// test pixel status (from pix file in calibration directory)
+			// test pixel status (from pix file in calibration directory)
 			if( getChannelStatus()[i] <= 0 )
 			{
 				setDead( i, 11, iLowGain );
 			}
 		}
 		
-/////////////////////////////////////////////////////
-// set channels dead from .cfg file
+		/////////////////////////////////////////////////////
+		// set channels dead from .cfg file
 		if( iFirst && fReader->isMC() )
 		{
-// getFullAnaVec()[i]: -1: dead channel, 0: channel does not exist, 1 channel o.k.
+			// getFullAnaVec()[i]: -1: dead channel, 0: channel does not exist, 1 channel o.k.
 			if( fReader->getDataFormatNum() == 1 && getNChannels() >= fReader->getFullAnaVec().size() )
 			{
 				if( fReader->getFullAnaVec()[i] == 0 )
@@ -958,15 +958,15 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			}
 		}
 	}
-/////////////////////////////////////////////////////
-// read DB pixel values and check values
+	/////////////////////////////////////////////////////
+	// read DB pixel values and check values
 	if( getDBPixelDataReader() && getDBPixelDataReader()->getDBStatus() )
 	{
-// check L1 rates
+		// check L1 rates
 		vector< unsigned int > iL1Rates_dead = getDBPixelDataReader()->getL1_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
 											   getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_min(),
 											   getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_max() );
-// do not allow L1 rates to kill a significant part of the camera
+		// do not allow L1 rates to kill a significant part of the camera
 		if( iL1Rates_dead.size() < getNChannels() / 2 )
 		{
 			for( unsigned int i = 0; i < iL1Rates_dead.size(); i++ )
@@ -977,11 +977,11 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 				}
 			}
 		}
-// check measured HVs
+		// check measured HVs
 		vector< unsigned int > iHV_dead = getDBPixelDataReader()->getHV_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
 										  getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_min(),
 										  getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_max() );
-// do not allow HV to kill a significant part of the camera
+		// do not allow HV to kill a significant part of the camera
 		if( iHV_dead.size() < getNChannels() / 2 )
 		{
 			for( unsigned int i = 0; i < iHV_dead.size(); i++ )
@@ -993,9 +993,9 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			}
 		}
 	}
-/////////////////////////////////////////////////////
-
-// check number of dead channels, print warning for more than 30 dead channels
+	/////////////////////////////////////////////////////
+	
+	// check number of dead channels, print warning for more than 30 dead channels
 	unsigned int n_dead = 0;
 	for( unsigned int i = 0; i < getDead( iLowGain ).size(); i++ )
 	{
@@ -1018,7 +1018,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 	
 	if( iFirst )
 	{
-// print warning if more than 30 channels are dead
+		// print warning if more than 30 channels are dead
 		if( getNDead( iLowGain ) > 30 )
 		{
 			cout << "WARNING: number of dead";
@@ -1032,7 +1032,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			}
 			cout << "channels on telescope " << getTelID() + 1 << " exceeds 30: " << n_dead << endl;
 		}
-// print info when less than 30 channels are dead
+		// print info when less than 30 channels are dead
 		else
 		{
 			cout << "Number of dead";
@@ -1047,9 +1047,9 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			cout << "channels on telescope " << getTelID() + 1 << " (at first event):\t" << n_dead << endl;
 		}
 		
-// do not allow to run eventdisplay with all channels dead in the low channels one of the telescopes
-// (GM) why low-gain channels?? Why not all?
-//        if( iLowGain && getNDead( iLowGain ) == getNChannels() )
+		// do not allow to run eventdisplay with all channels dead in the low channels one of the telescopes
+		// (GM) why low-gain channels?? Why not all?
+		//        if( iLowGain && getNDead( iLowGain ) == getNChannels() )
 		if( getNDead( iLowGain ) == getNChannels() )
 		{
 			cout << "Error: Number of dead channel is comparable to total number of channels" << endl;
@@ -1058,10 +1058,10 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 			exit( EXIT_FAILURE );
 		}
 	}
-// set random dead channels in camera (unless it's a GrISU run, in which case
-// setting dead here might be double-dipping.  Require fMCNdead > 4 because
-// there will be 4 dead pixels at minimum in a real camera due to the L2
-// triggers used to correct timing jitter on the FADC crates.
+	// set random dead channels in camera (unless it's a GrISU run, in which case
+	// setting dead here might be double-dipping.  Require fMCNdead > 4 because
+	// there will be 4 dead pixels at minimum in a real camera due to the L2
+	// triggers used to correct timing jitter on the FADC crates.
 	if( iFirst && fRunPar->fMCNdead > 4 && fRunPar->fsourcetype != 4 && fRunPar->fsourcetype != 6 )
 	{
 		int iN = 0;
@@ -1071,14 +1071,14 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 		do
 		{
 			iPix = getAnaData()->getRandomDeadChannel();
-// check if this one is alread dead
+			// check if this one is alread dead
 			if( !( getDead( iLowGain ).at( iPix ) ) )
 			{
 				setDead( iPix, 10, iLowGain );
 				iN++;
 			}
 			iNstep++;
-// avoid too large loop
+			// avoid too large loop
 			if( iNstep > 10000 )
 			{
 				cout << "VImageBaseAnalyzer::findDeadChans: too many dead "
@@ -1094,7 +1094,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 
 void VImageBaseAnalyzer::timingCorrect()
 {
-// apply timing correction
+	// apply timing correction
 	const unsigned int nc = getTZeros().size();
 	if( nc == getTOffsets().size() )
 	{
@@ -1127,7 +1127,7 @@ unsigned int VImageBaseAnalyzer::fillZeroSuppressed()
 
 unsigned int VImageBaseAnalyzer::fillHiLo()
 {
-// reset all channels
+	// reset all channels
 	setHiLo( false );
 	int z = 0;
 	unsigned int chID = 0;
@@ -1149,7 +1149,7 @@ unsigned int VImageBaseAnalyzer::fillHiLo()
 				{
 					cout << "VImageBaseAnalyzer::fillHiLo(), index out of range (fReader->getHitID) " << i;
 					cout << "(Telescope " << getTelID() + 1 << ", event " << getEventNumber() << ")" << endl;
-// flag this event
+					// flag this event
 					getAnalysisTelescopeEventStatus()[getTelID()] = 1;
 					setDebugLevel( 1 );
 				}
@@ -1229,19 +1229,19 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 	}
 	bool fDebugTrace = false;
 	
-// get number of channels
+	// get number of channels
 	unsigned int nhits = fReader->getNumChannelsHit();
-// exclude photodiode from this
+	// exclude photodiode from this
 	if( nhits > getDead( false ).size() )
 	{
 		nhits = getDead( false ).size();
 	}
 	
-// set integration window
+	// set integration window
 	unsigned int iSumWindow = getSumWindow();
 	setTCorrectedSumFirst( getSumFirst() );
-// set dynamic integration window
-// (depending on the measured integrated charge in first pass)
+	// set dynamic integration window
+	// (depending on the measured integrated charge in first pass)
 	for( unsigned int i = 0; i < nhits; i++ )
 	{
 		unsigned int i_channelHitID = 0;
@@ -1273,7 +1273,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		}
 	}
 	
-// reinitialize arrays
+	// reinitialize arrays
 	setSums( 0. );
 	setSums2( 0. );
 	setImage( false );
@@ -1287,35 +1287,35 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 	float xtime = 0.;
 	int corrfirst = 0;
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// loop over all hit channel
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// loop over all hit channel
+	///////////////////////////////////////////////////////////////////////////////////////////////////
 	for( unsigned int i = 0; i < nhits; i++ )
 	{
 		unsigned int i_channelHitID = 0;
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-// dead channels are excluded
+			// dead channels are excluded
 			if( i_channelHitID < getHiLo().size() && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
 			{
-// trace handler
+				// trace handler
 				fTraceHandler->setTrace( fReader, getNSamples(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
 										 getPedrms( getHiLo()[i_channelHitID] )[i_channelHitID], i_channelHitID, i,
 										 getLowGainMultiplier_Trace( )*getHiLo()[i_channelHitID] );
 				fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
 				
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// calculate start of integration window (window 1 of pass 2)
-//
-// double pass method: use time gradient along the long-axis of the image to calculate expected T0
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// position of the PMT in camera coordinates
+				//////////////////////////////////////////////////////////////////////////////////////////////////
+				// calculate start of integration window (window 1 of pass 2)
+				//
+				// double pass method: use time gradient along the long-axis of the image to calculate expected T0
+				//////////////////////////////////////////////////////////////////////////////////////////////////
+				// position of the PMT in camera coordinates
 				xpmt = getDetectorGeo()->getX()[i_channelHitID] - getImageParameters()->cen_x;
 				ypmt = getDetectorGeo()->getY()[i_channelHitID] - getImageParameters()->cen_y;
-// position along the major axis of the image
+				// position along the major axis of the image
 				xpos = xpmt * getImageParameters()->cosphi + ypmt * getImageParameters()->sinphi;
-// fit time along the major axis of the image (hardwired check!)
+				// fit time along the major axis of the image (hardwired check!)
 				if( abs( getImageParameters()->tgrad_x ) < 200 )
 				{
 					xtime = getImageParameters()->tgrad_x * xpos + getImageParameters()->tint_x;
@@ -1324,8 +1324,8 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 				{
 					xtime = getSumFirst();
 				}
-// fit times are corrected for TOffsets and FADCStopOffsets.
-// undo this to get integration window in FADC trace.
+				// fit times are corrected for TOffsets and FADCStopOffsets.
+				// undo this to get integration window in FADC trace.
 				corrfirst = ( int )( xtime + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]
 									 + getSumWindowShift() );
 				if( fDebugTrace )
@@ -1334,13 +1334,13 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 					cout << " : fit " << xtime << ", toff " << getTOffsets()[i_channelHitID];
 					cout << ", sumwindowshift " << getSumWindowShift() << " corrfirst " << corrfirst << endl;
 				}
-// no success in start of integration window
-// (usually happens when first pass of cleaning returned no image/border pixels)
+				// no success in start of integration window
+				// (usually happens when first pass of cleaning returned no image/border pixels)
 				if( corrfirst < getSumFirst() )
 				{
-// take average tzero per telescope and pixel
-//                   corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
-// take average tzero per telescope (more stable than previous statement)
+					// take average tzero per telescope and pixel
+					//                   corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+					// take average tzero per telescope (more stable than previous statement)
 					corrfirst = ( int )( getMeanAverageTZero() - 0.5 + getTOffsets()[i_channelHitID]
 										 - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift() );
 					if( fDebugTrace )
@@ -1349,11 +1349,11 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 						cout << " : mean " << getMeanAverageTZero() << ", corrfirst " << corrfirst << endl;
 					}
 				}
-///////////////////
-// low gain channel have different time -> use tzero (do not do this for DST sims)
+				///////////////////
+				// low gain channel have different time -> use tzero (do not do this for DST sims)
 				if( getHiLo()[i_channelHitID] && getRunParameter()->fsourcetype != 7 )
 				{
-// get new tzero for sumwindow starting at corrfirst to the end of the window
+					// get new tzero for sumwindow starting at corrfirst to the end of the window
 					corrfirst = 0;
 					try
 					{
@@ -1372,9 +1372,9 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 						corrfirst = 0;
 					}
 				}
-////////////////////
-// high gain channel
-// integration start might be before sample 0 -> set to average t0
+				////////////////////
+				// high gain channel
+				// integration start might be before sample 0 -> set to average t0
 				else if( corrfirst < 0 )
 				{
 					unsigned int isw = getDynamicSummationWindow( i_channelHitID );
@@ -1386,38 +1386,38 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 					{
 						isw += corrfirst;
 					}
-// take average tzero per telescope and pixel
-//                      corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
-// take average tzero per telescope (more stable than previous statement)
+					// take average tzero per telescope and pixel
+					//                      corrfirst = (int)(getAverageTZeros()[i_channelHitID]-0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID]);
+					// take average tzero per telescope (more stable than previous statement)
 					corrfirst = getFADCTraceIntegrationPosition(
 									getMeanAverageTZero() - 0.5 + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID] + getSumWindowShift() );
 					setCurrentSummationWindow( i_channelHitID, corrfirst, isw, false );
 				}
-// integration start is at beyond last sample: set to last sample
+				// integration start is at beyond last sample: set to last sample
 				corrfirst = getFADCTraceIntegrationPosition( corrfirst );
-// set start of integration window (sum window 1)
+				// set start of integration window (sum window 1)
 				setTCorrectedSumFirst( i_channelHitID, corrfirst );
 				
-//////////////////////////////////////////////////////////////////////////////////
-// calculate end of integration window
-// (depends on user settings and length of readout window)
-//////////////////////////////////////////////////////////////////////////////////
-//                int corrlast = getFADCTraceIntegrationPosition( corrfirst + getCurrentSumWindow()[i_channelHitID] );
+				//////////////////////////////////////////////////////////////////////////////////
+				// calculate end of integration window
+				// (depends on user settings and length of readout window)
+				//////////////////////////////////////////////////////////////////////////////////
+				//                int corrlast = getFADCTraceIntegrationPosition( corrfirst + getCurrentSumWindow()[i_channelHitID] );
 				int corrlast = getFADCTraceIntegrationPosition( corrfirst + getDynamicSummationWindow( i_channelHitID ) );
 				setTCorrectedSumLast( i_channelHitID, corrlast );
-// set current summation window
+				// set current summation window
 				setCurrentSummationWindow( i_channelHitID, corrfirst, corrlast, false );
 				
-///////////////////////////////////
-// calculate pulse sums
-///////////////////////////////////
-// sum for first summation window
+				///////////////////////////////////
+				// calculate pulse sums
+				///////////////////////////////////
+				// sum for first summation window
 				setSums( i_channelHitID, fTraceHandler->getTraceSum( corrfirst, corrlast, fRaw ) * getLowGainSumCorrection( fRunPar->fsumwindow_1[fTelID] , corrlast - corrfirst, getHiLo()[i_channelHitID] ) );
 				if( getFillPulseSum() )
 				{
 					getAnaData()->fillPulseSum( i_channelHitID, getSums()[i_channelHitID], getHiLo()[i_channelHitID] );
 				}
-// sum for second summation window
+				// sum for second summation window
 				if( getRunParameter()->fFixWindowStart_sumwindow2 )
 				{
 					corrfirst = getFADCTraceIntegrationPosition( getSumFirst() + getTOffsets()[i_channelHitID] - getFADCStopOffsets()[i_channelHitID] );
@@ -1454,20 +1454,20 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 */
 unsigned int VImageBaseAnalyzer::getDynamicSummationWindow( unsigned int i_channelHitID )
 {
-// low gain: return larger integration window (from size2)
+	// low gain: return larger integration window (from size2)
 	if( getHiLo()[i_channelHitID] )
 	{
 		return getSumWindow_2();
 	}
-// for integrated pulses below a certain threshold: return smallest dynamical window
+	// for integrated pulses below a certain threshold: return smallest dynamical window
 	if( getSums()[i_channelHitID] < 0 )
 	{
 		return getSumWindow();
 	}
 	
-// calculate integration window
-// (not implemented yet)
-
+	// calculate integration window
+	// (not implemented yet)
+	
 	return getSumWindow();
 }
 

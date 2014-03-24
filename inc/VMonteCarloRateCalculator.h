@@ -40,7 +40,7 @@ class VMonteCarloRateCalculator : public VPlotUtilities
 		VMonteCarloRateCalculator( string iFile );
 		virtual ~VMonteCarloRateCalculator() {}
 		
-// fill rates
+		// fill rates
 		double getMonteCarloRate( int nbins, double* e0, double* eff, double i_gamma, double i_phi, double iE0 = 1.,
 								  double iEMin = 1.e-20, double iEMax = 1.e20, double bDebug = false );
 		double getMonteCarloRate( vector< double >& e, vector< double >& eff, double i_gamma, double i_phi, double iE0 = 1.,
@@ -55,7 +55,7 @@ class VMonteCarloRateCalculator : public VPlotUtilities
 								  unsigned int iEMinBin, unsigned int iEMaxBin, double iEMin, double iEMax, TH2* iResponseMatrix,
 								  vector< double > e_gamma, bool bDebug );
 								  
-// read rates
+		// read rates
 		TCanvas* plot_MonteCarloRate_vs_wobbleOffsets( TCanvas* c = 0, double ze = 20., int az = 16, int noise = 200, string iPlottingOption = "3" );
 		TGraphAsymmErrors* getMonteCarloRate_vs_wobbleOffsets( double ze = 20., int az = 16, int noise = 200 );
 		

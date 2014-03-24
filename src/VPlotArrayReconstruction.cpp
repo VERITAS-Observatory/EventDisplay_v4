@@ -126,7 +126,7 @@ void VPlotArrayReconstruction::read_eventdisplay_file()
 	}
 	cout << "total number of telescopes: " << telPos_x.size() << endl;
 	
-// showerpars tree
+	// showerpars tree
 	fshowerpars = ( TTree* )fFile->Get( "showerpars" );
 	if( !fshowerpars )
 	{
@@ -134,7 +134,7 @@ void VPlotArrayReconstruction::read_eventdisplay_file()
 		bZombie = true;
 		return;
 	}
-// tpars trees
+	// tpars trees
 	char hname[600];
 	for( unsigned int i = 0; i < telPos_x.size(); i++ )
 	{
@@ -453,7 +453,7 @@ TCanvas* VPlotArrayReconstruction::groundPlot( int iEventNumber )
 	hGround->SetZTitle( "log_{10} size" );
 	hGround->GetZaxis()->SetTitleOffset( 1.2 );
 	hGround->GetYaxis()->SetTitleOffset( 1.5 );
-// plot everything
+	// plot everything
 	if( !cGround )
 	{
 		sprintf( hname, "cGround_%s", fName.c_str() );
@@ -472,14 +472,14 @@ TCanvas* VPlotArrayReconstruction::groundPlot( int iEventNumber )
 	
 	hGround->Draw( );
 	
-// plot telescope positions
+	// plot telescope positions
 	for( unsigned int i = 0; i < telPos_x.size(); i++ )
 	{
 		TEllipse* iE = new TEllipse( telPos_x[i], telPos_y[i], telPos_r[i], telPos_r[i] );
 		iE->Draw();
 	}
 	
-// get min/max size or nphotons
+	// get min/max size or nphotons
 	double iMin = 1.e20;
 	double iMax = 0.;
 	for( unsigned int i = 0; i < fsize.size(); i++ )
@@ -506,12 +506,12 @@ TCanvas* VPlotArrayReconstruction::groundPlot( int iEventNumber )
 	}
 	setColorAxisDataVector_minmax( iMin * 0.98, iMax * 1.02 );
 	
-// fill histogram
+	// fill histogram
 	for( unsigned int i = 0; i < telPos_x.size(); i++ )
 	{
 		if( i < fsize.size() && fsize[i] > 0. )
 		{
-// plot telescopes
+			// plot telescopes
 			TEllipse* iT = new TEllipse( telPos_x[i], telPos_y[i], telPos_r[i]*fPlotTelescopeScale, telPos_r[i]*fPlotTelescopeScale );
 			iT->SetFillStyle( 1001 );
 			iT->SetFillColor( getColorAxisColor( log10( fsize[i] ) ) );
@@ -532,14 +532,14 @@ TCanvas* VPlotArrayReconstruction::groundPlot( int iEventNumber )
 			iLT->Draw();
 		}
 	}
-// plot shower axis
+	// plot shower axis
 	TGaxis* g = getColorAxisAxis( fPlotxmin + 0.05 * ( fPlotxmax - fPlotxmin ), fPlotxmin + 0.09 * ( fPlotxmax - fPlotxmin ), fPlotymin + 0.09 * ( fPlotymax - fPlotymin ) / 2., fPlotymin + 0.4 * ( fPlotymax - fPlotymin ), "log_{10} size", 10 );
 	if( g && iMax > 0. )
 	{
 		g->Draw();
 	}
 	
-// plot core positions
+	// plot core positions
 	TMarker* icoreMC = new TMarker( fMCxcore, fMCycore, 5 );
 	icoreMC->Draw();
 	if( fchi2[0] >= 0 )
@@ -550,13 +550,13 @@ TCanvas* VPlotArrayReconstruction::groundPlot( int iEventNumber )
 	
 	if( fshowerpars && bPlotImageAxes )
 	{
-// plot image lines
+		// plot image lines
 		for( unsigned int i = 0; i < fsize.size(); i++ )
 		{
 			if( fsize[i] > fSizeCut )
 			{
 				double fPlotTelescopeScale = ( fPlotxmax - fPlotxmin ) / 2.;
-// distance between image centre and reconstruction direction
+				// distance between image centre and reconstruction direction
 				double iMC_dist = sqrt( ( telPos_x[i] - fMCxcore ) * ( telPos_x[i] - fMCxcore ) + ( telPos_y[i] - fMCycore ) * ( telPos_y[i] - fMCycore ) );
 				double iRE_dist = sqrt( ( telPos_x[i] - fxcore[0] ) * ( telPos_x[i] - fxcore[0] ) + ( telPos_y[i] - fycore[0] ) * ( telPos_y[i] - fycore[0] ) );
 				if( fnimages[0] > 0 )
@@ -654,29 +654,29 @@ TCanvas* VPlotArrayReconstruction::cameraPlot( int iEventNumber )
 	hCamera->SetYTitle( "y [deg]" );
 	hCamera->Draw();
 	
-// plot camera size
+	// plot camera size
 	TEllipse* iC = new TEllipse( 0., 0., fPlotFOV / 2., fPlotFOV / 2. );
 	iC->SetLineWidth( 1 );
 	iC->SetLineStyle( 3 );
 	iC->SetFillStyle( 1001 );
 	iC->SetFillColor( 18 );
 	iC->Draw();
-// plot central pixel
+	// plot central pixel
 	TEllipse* iZ = new TEllipse( 0., 0., fPlotPixelSize / 2., fPlotPixelSize / 2. );
 	iZ->SetFillStyle( 1001 );
 	iZ->SetFillColor( 1 );
 	iZ->Draw();
-// plot reconstructed core position
+	// plot reconstructed core position
 	TMarker* iM = new TMarker( fxoff[0], -1.*fyoff[0], 5 );
 	iM->SetMarkerSize( 2 );
 	iM->SetMarkerColor( 2 );
 	iM->Draw();
 	
-// draw analysis results
+	// draw analysis results
 	if( fshowerpars )
 	{
 	
-// get min/max size
+		// get min/max size
 		double iMin = 1.e20;
 		double iMax = 0.;
 		for( unsigned int i = 0; i < fsize.size(); i++ )
@@ -696,21 +696,21 @@ TCanvas* VPlotArrayReconstruction::cameraPlot( int iEventNumber )
 		{
 			if( i < fsize.size() && fsize[i] )
 			{
-// draw hillas ellipse
+				// draw hillas ellipse
 				TEllipse* iE = new TEllipse( fcen_x[i], fcen_y[i], flength[i], fwidth[i], 0., 360., fphi[i] * 180. / TMath::Pi() );
 				iE->SetFillColor( getColorAxisColor( log10( fsize[i] ) ) );
 				iE->SetFillStyle( 1001 );
 				iE->SetLineColor( getColorAxisColor( log10( fsize[i] ) ) );
 				iE->Draw();
 				
-// draw length axis of images
+				// draw length axis of images
 				if( bPlotImageAxes )
 				{
-//		if( fImgSel[i] )
+					//		if( fImgSel[i] )
 					if( fsize[i] > fSizeCut )
 					{
 						double iScale = fPlotFOV / 2.;
-// distance between image centre and reconstruction direction
+						// distance between image centre and reconstruction direction
 						double iMC_dist = sqrt( ( fcen_x[i] - fMCxoff ) * ( fcen_x[i] - fMCxoff ) + ( fcen_y[i] - fMCyoff ) * ( fcen_y[i] - fMCyoff ) );
 						double iRE_dist = sqrt( ( fcen_x[i] - fxoff[0] ) * ( fcen_x[i] - fxoff[0] ) + ( fcen_y[i] - fyoff[0] ) * ( fcen_y[i] - fyoff[0] ) );
 						iScale = max( iMC_dist, iRE_dist ) * 1.1;
@@ -726,7 +726,7 @@ TCanvas* VPlotArrayReconstruction::cameraPlot( int iEventNumber )
 					}
 				}
 			}
-// plot shower axis
+			// plot shower axis
 			TGaxis* g = getColorAxisAxis( 0.85 * fPlotFOV / 2., 0.91 * fPlotFOV / 2., 0.6 * fPlotFOV / 2., 0.98 * fPlotFOV / 2., "log_{10} size", 10 );
 			if( g && iMax > 0. )
 			{

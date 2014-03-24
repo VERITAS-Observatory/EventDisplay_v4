@@ -55,7 +55,7 @@ class VEffectiveAreaCalculator
 		vector< vector< vector< double > > > fEff_Noise;
 		vector< vector< vector< vector< double > > > > fEff_SpectralIndex;
 		
-// effective areas (reading of effective areas)
+		// effective areas (reading of effective areas)
 		unsigned int fNBins;
 		vector< double > fEff_E0;
 		map< unsigned int, vector< double > > fEffArea_map;
@@ -72,7 +72,7 @@ class VEffectiveAreaCalculator
 		
 		TGraphErrors* gMeanSystematicErrorGraph;
 		
-// unique event counting
+		// unique event counting
 		map< unsigned int, unsigned short int> fUniqueEventCounter;
 		
 		vector< double > fAreaRadius;
@@ -92,14 +92,14 @@ class VEffectiveAreaCalculator
 		bool fIsotropicArrivalDirections;
 		bool fTelescopeTypeCutsSet;
 		
-// effective area calculation
+		// effective area calculation
 		vector< double > fVMinAz;
 		vector< double > fVMaxAz;
-// spectral weighting
+		// spectral weighting
 		vector< double > fVSpectralIndex;
 		VSpectralWeight* fSpectralWeight;
 		
-// list of histograms
+		// list of histograms
 		vector< vector< TList* > > hList;
 		
 		vector< vector< TH1D* > > hVEmc;
@@ -186,7 +186,7 @@ class VEffectiveAreaCalculator
 		void Calculate_Bck_solid_angle_norm();
 		
 		
-// effective area smoothing
+		// effective area smoothing
 		int fSmoothIter;
 		double fSmoothThreshold;
 		
@@ -194,14 +194,14 @@ class VEffectiveAreaCalculator
 		bool bEffectiveAreasareHistograms;
 		bool fClopperPearson;                    // statistic option for error calculation
 		
-// mean values from getEffectiveAreas
+		// mean values from getEffectiveAreas
 		double fEffectiveAreas_meanZe;
 		double fEffectiveAreas_meanWoff;
 		double fEffectiveAreas_meanPedVar;
 		double fEffectiveAreas_meanIndex;
 		double fEffectiveAreas_meanN;
 		
-// effective areas fit functions
+		// effective areas fit functions
 		vector< TF1* > fEffAreaFitFunction;
 		
 		TGraphAsymmErrors* applyResponseMatrix( TH2* h, TGraphAsymmErrors* g );

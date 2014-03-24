@@ -27,7 +27,7 @@ VTableEnergyCalculator::VTableEnergyCalculator( int intel )
 	hNevents = 0;
 	hMean = 0;
 	
-// minimum number per bin required for reconstruction
+	// minimum number per bin required for reconstruction
 	fMinShowerPerBin = 5.;
 	
 	Omode = 'r';
@@ -51,7 +51,7 @@ VTableEnergyCalculator::VTableEnergyCalculator( const char* hname_add, char m, T
 	fInterPolWidth = 1;
 	fInterPolIter = 3;
 	
-// minimum number per bin required for reconstruction
+	// minimum number per bin required for reconstruction
 	fMinShowerPerBin = 5.;
 	
 	Omode  = m;
@@ -72,12 +72,12 @@ VTableEnergyCalculator::VTableEnergyCalculator( const char* hname_add, char m, T
 	char htitle[800];
 	char hname[800];
 	
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-// table making
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-
+	/////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+	// table making
+	/////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+	
 	if( ( Omode == 'w' ) || ( Omode == 'W' ) )
 	{
 		if( !fOutDir->IsWritable() )
@@ -88,7 +88,7 @@ VTableEnergyCalculator::VTableEnergyCalculator( const char* hname_add, char m, T
 		
 		/* HSTOGRAM BOOKING */
 		
-// median size
+		// median size
 		sprintf( hname, "hMedian_energy_%s", hname_add );
 		if( fUseMedianEnergy )
 		{
@@ -123,11 +123,11 @@ VTableEnergyCalculator::VTableEnergyCalculator( const char* hname_add, char m, T
 	}
 	else
 	{
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-// table reading
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////
+		// table reading
+		/////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////
 		sprintf( hname, "hMedian_energy_%s", hname_add );
 		hMedianName = hname;
 		
@@ -149,20 +149,20 @@ VTableEnergyCalculator::VTableEnergyCalculator( const char* hname_add, char m, T
 
 void VTableEnergyCalculator::setConstants()
 {
-// energy axis: range from 1 GeV to 1000 TeV
+	// energy axis: range from 1 GeV to 1000 TeV
 	/*   eNumEne = 120;
 	   eE0Min  = 0.001;
 	   eE0Max  = 1000; */
-// energy axis: range from 10 GeV to 316 TeV
+	// energy axis: range from 10 GeV to 316 TeV
 	eNumEne = 90;
 	eE0Min  = 0.01;
 	eE0Max  = TMath::Power( 10., 2.5 );
 	
-// core axis: 100 x 15m = 1.5 km
+	// core axis: 100 x 15m = 1.5 km
 	eNumDist   = 100;
 	edist_delta = 15;
 	
-// size bins (log10 axis)
+	// size bins (log10 axis)
 	eHistBins = 1000;
 	exlow     = 0.;
 	exhigh    = 10.;
@@ -171,7 +171,7 @@ void VTableEnergyCalculator::setConstants()
 
 void VTableEnergyCalculator::initialize()
 {
-// minimum event size per telescope
+	// minimum event size per telescope
 	fMinSize = 0.;
 	fMaxDistance = 999999.;
 }
@@ -198,7 +198,7 @@ void VTableEnergyCalculator::terminate( TDirectory* iOutDir, char* xtitle )
 		cout << endl;
 		TDirectory* iDir1D = 0;
 		
-// number of events
+		// number of events
 		if( fOutDir )
 		{
 			fOutDir->cd();
@@ -212,7 +212,7 @@ void VTableEnergyCalculator::terminate( TDirectory* iOutDir, char* xtitle )
 			hNevents->SetYTitle( "distance to shower core [m]" );
 			hNevents->SetZTitle( "# of events" );
 			
-// sigma
+			// sigma
 			sprintf( hname, "hSigma_energy_%s", fHName_add.c_str() );
 			sprintf( htitle, "energy vs. distance vs. log10 size (sigma), %s", fHName_add.c_str() );
 			hSigma = new TH2F( hname, htitle, eNumEne, log10( eE0Min ), log10( eE0Max ), eNumDist, 0., eNumDist * edist_delta );
@@ -220,7 +220,7 @@ void VTableEnergyCalculator::terminate( TDirectory* iOutDir, char* xtitle )
 			hSigma->SetYTitle( "distance to shower core [m]" );
 			hSigma->SetZTitle( "log_{10} size (sigma)" );
 			
-// make output directory for 1D histograms
+			// make output directory for 1D histograms
 			iDir1D = fOutDir->mkdir( "histos1D" );
 		}
 		
@@ -336,9 +336,9 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 	int ir = 0;
 	double amp = 0.;
 	double bincenter = 0.;
-////////////////////////////////
-// FILL TABLES
-////////////////////////////////
+	////////////////////////////////
+	// FILL TABLES
+	////////////////////////////////
 	if( ( Omode == 'w' ) || ( Omode == 'W' ) )
 	{
 		for( tel = 0; tel < ntel; tel++ )
@@ -346,21 +346,21 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 			if( e != 0. && s[tel] > fMinSize && r[tel] >= 0. && r[tel] < fMaxDistance )
 			{
 				ie = hMean->GetXaxis()->FindBin( log10( e ) ) - 1;
-// if energy is smaller than lower limit of energy range: fill into first bin
+				// if energy is smaller than lower limit of energy range: fill into first bin
 				if( ie < 0 )
 				{
 					ie = 0;
 				}
 				bincenter = TMath::Power( 10., hMean->GetXaxis()->GetBinCenter( ie + 1 ) );
 				
-// scale to bincenter
-// (GM) changed: change now to bin center on logarithmic scale
+				// scale to bincenter
+				// (GM) changed: change now to bin center on logarithmic scale
 				amp = log10( s[tel] * bincenter / e );
 				
 				ir = hMean->GetYaxis()->FindBin( r[tel] ) - 1;
 				if( ir >= 0 && isnormal( amp ) && isnormal( chi2 ) )
 				{
-// check for overflow bins
+					// check for overflow bins
 					if( ( unsigned int )ie < Oh.size() && ( unsigned int )ir < Oh[ie].size() )
 					{
 						if( !Oh[ie][ir] )
@@ -375,9 +375,9 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 		}
 		return -1.;
 	}
-/////////////////////////////////////////
-// READ TABLES (compute energy values) //
-/////////////////////////////////////////
+	/////////////////////////////////////////
+	// READ TABLES (compute energy values) //
+	/////////////////////////////////////////
 	else
 	{
 		double med = 0.;
@@ -385,14 +385,14 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 		double logEnergy = 0.;
 		double weight = 0.;
 		
-// reset energy and echi values
+		// reset energy and echi values
 		chi2 = -99.;
 		for( tel = 0; tel < ntel; tel++ )
 		{
 			et[tel] = -99.;
 		}
 		
-// energy per telescope
+		// energy per telescope
 		double a[VDST_MAXTELESCOPES];
 		double b[VDST_MAXTELESCOPES];
 		int k = 0;
@@ -402,11 +402,11 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 			cout << "VTableEnergyCalculator::calc(): number of telescopes " << ntel << endl;
 		}
 		
-/////////////////////////////////////////////////////
-// loop over all telescopes
+		/////////////////////////////////////////////////////
+		// loop over all telescopes
 		for( tel = 0; tel < ntel; tel++ )
 		{
-// check for minimum size and distance to telescope values
+			// check for minimum size and distance to telescope values
 			if( s[tel] > fMinSize && r[tel] >= 0. && r[tel] < fMaxDistance )
 			{
 				if( fDebug )
@@ -420,8 +420,8 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 						cout << "\t\t VTableEnergyCalculator::calc(): passed maximum local distance cut for telescope " << tel << endl;
 					}
 					
-// get energy from table
-//   (med is energy estimator for this telescope)
+					// get energy from table
+					//   (med is energy estimator for this telescope)
 					get_logEnergy2D( log10( s[tel] ), r[tel], med, sigma, tel );
 					
 					if( fDebug )
@@ -431,15 +431,15 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 					
 					if( sigma > 0. )
 					{
-////////////////////////////////////////////////
-// apply correction from VEnergyCorrection
+						////////////////////////////////////////////////
+						// apply correction from VEnergyCorrection
 						med -= esys;
 						
-// add energy and weight per telescope to mean energy
+						// add energy and weight per telescope to mean energy
 						logEnergy += med / ( sigma * sigma );
 						weight    += 1. / ( sigma * sigma );
 						
-// store energy per telescope
+						// store energy per telescope
 						if( med > -90. )
 						{
 							et[tel] = pow( 10., med );
@@ -455,9 +455,9 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 				}
 			}
 		}  // end of loop over all telescopes
-/////////////////////////////////////////////////////
-
-// calculate mean energy
+		/////////////////////////////////////////////////////
+		
+		// calculate mean energy
 		if( weight > 0. )
 		{
 			logEnergy /= weight;
@@ -466,14 +466,14 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 			{
 				chi2 = 0.;
 				double z1 = 0.;
-//////////////////////////////////////////////////////////////////////
-// OLD dE definition
-//	 	dE   = 0.;
-//                int z2 = 0;
-//		double linEnergy = pow(10.,logEnergy);
-//////////////////////////////////////////////////////////////////////
-
-// loop over all telescopes with valid energy
+				//////////////////////////////////////////////////////////////////////
+				// OLD dE definition
+				//	 	dE   = 0.;
+				//                int z2 = 0;
+				//		double linEnergy = pow(10.,logEnergy);
+				//////////////////////////////////////////////////////////////////////
+				
+				// loop over all telescopes with valid energy
 				for( int j = 0; j < k; j++ )
 				{
 					if( b[j] != 0. )
@@ -481,14 +481,14 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 						chi2  += ( logEnergy - a[j] ) * ( logEnergy - a[j] ) / b[j] / b[j];
 						z1++;
 					}
-//////////////////////////////////////////////////////////////////////
-// OLD dE definition
-//		    if( linEnergy > 0 )
-//		    {
-//		        dE +=  ( TMath::Power( 10., a[j] ) - linEnergy ) / linEnergy;
-//			z2++;
-//                    }
-//////////////////////////////////////////////////////////////////////
+					//////////////////////////////////////////////////////////////////////
+					// OLD dE definition
+					//		    if( linEnergy > 0 )
+					//		    {
+					//		        dE +=  ( TMath::Power( 10., a[j] ) - linEnergy ) / linEnergy;
+					//			z2++;
+					//                    }
+					//////////////////////////////////////////////////////////////////////
 				}
 				if( z1 > 1 )
 				{
@@ -498,13 +498,13 @@ double VTableEnergyCalculator::calc( int ntel, double e, double* r, double* s, d
 				{
 					chi2 = -99.;
 				}
-//////////////////////////////////////////////////////////////////////
-// OLD dE definition
-//		if( z2 > 0 ) dE   /= z2;
-//////////////////////////////////////////////////////////////////////
-//		else         dE   = -99.;
-// NEW dE definition
-// use sqrt of weights
+				//////////////////////////////////////////////////////////////////////
+				// OLD dE definition
+				//		if( z2 > 0 ) dE   /= z2;
+				//////////////////////////////////////////////////////////////////////
+				//		else         dE   = -99.;
+				// NEW dE definition
+				// use sqrt of weights
 				dE = sqrt( 1. / weight );
 			}
 			else
@@ -551,21 +551,21 @@ void VTableEnergyCalculator::get_logEnergy( double logSize, int ir, double& med,
 		return;
 	}
 	
-// weird things happen at the upper end of the histograms
+	// weird things happen at the upper end of the histograms
 	int i_eNumEneMax = hM->GetNbinsX() - 4;
 	int i = 0;
 	int j = 0;
 	int ij = 0;
-////////////////////
-// get energy bin number for corresponding size
-// this assumes strict proportionality between energy and size for a given distance
-
-// check if size is too small
+	////////////////////
+	// get energy bin number for corresponding size
+	// this assumes strict proportionality between energy and size for a given distance
+	
+	// check if size is too small
 	for( i = 1; i <= i_eNumEneMax; i++ )
 	{
 		if( hM->GetBinContent( i, ir ) > logSize )
 		{
-// check that the next 4 bins are higher than the current one (be more robust against fluctuations)
+			// check that the next 4 bins are higher than the current one (be more robust against fluctuations)
 			bool i_bContinue = false;
 			for( int k = 1; k < 5; k++ )
 			{
@@ -592,17 +592,17 @@ void VTableEnergyCalculator::get_logEnergy( double logSize, int ir, double& med,
 			break;
 		}
 	}
-////////////////////
-// check consistency between both methods
-
-// discard event for inconsistent results
+	////////////////////
+	// check consistency between both methods
+	
+	// discard event for inconsistent results
 	if( i - j != 0 )
 	{
 		med  = -99.;
 		sigma = -99.;
 		return;
 	}
-// consistent results
+	// consistent results
 	else
 	{
 		ij = i;
@@ -613,13 +613,13 @@ void VTableEnergyCalculator::get_logEnergy( double logSize, int ir, double& med,
 		ij--;
 	}
 	
-// interpolation
+	// interpolation
 	double s1 = hM->GetBinContent( ij, ir );
 	double s2 = hM->GetBinContent( ij + 1, ir );
 	double w1 = hM->GetBinError( ij, ir );
 	double w2 = hM->GetBinError( ij + 1, ir );
 	
-// (GM) do not interpolate beyond largest size (s2 > logSize)
+	// (GM) do not interpolate beyond largest size (s2 > logSize)
 	if( ( s1 > 0. ) && ( s2 > 0. ) && ( w1 > 0. ) && ( w2 > 0. ) && ( s2 > logSize ) )
 	{
 		double e1 = hM->GetXaxis()->GetBinCenter( ij );
@@ -653,7 +653,7 @@ void VTableEnergyCalculator::get_logEnergy( double logSize, int ir, double& med,
 */
 void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double& med, double& sigma, unsigned int itel )
 {
-// get histogram
+	// get histogram
 	TH2F* hM = hMedian;
 	if( hVMedian.size() > 0 && itel < hVMedian.size() )
 	{
@@ -664,9 +664,9 @@ void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double& 
 		return;
 	}
 	
-// get bin number for distance r
+	// get bin number for distance r
 	int ir1 = hM->GetYaxis()->FindBin( r );
-// check that r is not in under or overflow of histograms
+	// check that r is not in under or overflow of histograms
 	if( ir1 < 1 || ir1 >= hM->GetNbinsY() )
 	{
 		med = -99.;
@@ -677,7 +677,7 @@ void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double& 
 		}
 		return;
 	}
-// check if distance r is larger or smaller than corresponding bin center (interpolation)
+	// check if distance r is larger or smaller than corresponding bin center (interpolation)
 	if( r < hM->GetYaxis()->GetBinCenter( ir1 ) && ir1 > 1 )
 	{
 		ir1--;
@@ -690,12 +690,12 @@ void VTableEnergyCalculator::get_logEnergy2D( double logSize, double r, double& 
 	double s1 = 0.;
 	double s2 = 0.;
 	
-// get energies for these two radius bins
+	// get energies for these two radius bins
 	get_logEnergy( logSize, ir1, e1, s1, itel );
 	get_logEnergy( logSize, ir1 + 1, e2, s2, itel );
 	
-// interpolate between distance bins
-// (if there is only one estimator, use only that)
+	// interpolate between distance bins
+	// (if there is only one estimator, use only that)
 	if( e1 > -99 && e2 > -99 )
 	{
 		med   = ( 1. - rest ) * e1 + rest * e2;
@@ -792,8 +792,8 @@ bool VTableEnergyCalculator::readHistograms()
 		
 		fReadHistogramsFromFile = true;
 		
-// interpolate or smooth 2D histograms
-// (switched of for efficiency reasons
+		// interpolate or smooth 2D histograms
+		// (switched of for efficiency reasons
 		/*        if( fInterpolationString.size() > 0 )
 		        {
 		            VInterpolate2DHistos iInter;

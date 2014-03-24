@@ -54,13 +54,13 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 {
 	setDebug();
 	
-// use 1D histograms to calculate medians (more precise, but needs much more memory and is slower)
+	// use 1D histograms to calculate medians (more precise, but needs much more memory and is slower)
 	fWrite1DHistograms = false;
-// use median approximation (faster)
+	// use median approximation (faster)
 	fFillMedianApproximations = true;
 	
 	setConstants( iPE );
-// using lookup tables to calculate energies
+	// using lookup tables to calculate energies
 	fEnergy = iEnergy;
 	fUseMedianEnergy = iUseMedianEnergy;
 	fReadHistogramsFromFile = false;
@@ -96,8 +96,8 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 	int j = 0;
 	char hname[1000];
 	
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// table writing
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// table writing
 	if( fwrite )
 	{
 		if( !fOutDir->IsWritable() )
@@ -108,7 +108,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 		
 		/* HSTOGRAM BOOKING */
 		char htitle[1000];
-// median of variable
+		// median of variable
 		sprintf( hname, "%s_median_%s", fpara.c_str(), fHName_Add.c_str() );
 		sprintf( htitle, "%s vs. dist. vs. log10 size (median)", fpara.c_str() );
 		hMedian = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
@@ -123,7 +123,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 			sprintf( htitle, "%s (median) [TeV]", fpara.c_str() );
 		}
 		hMedian->SetZTitle( htitle );
-// mean and rms
+		// mean and rms
 		sprintf( hname, "%s_mean_%s", fpara.c_str(), fHName_Add.c_str() );
 		sprintf( htitle, "%s vs. dist. vs. log10 size (mean)", fpara.c_str() );
 		hMean = new TProfile2D( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist, fBinning1DXlow, fBinning1DXhigh );
@@ -138,7 +138,7 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 			sprintf( htitle, "%s (mean) [TeV]", fpara.c_str() );
 		}
 		hMean->SetZTitle( htitle );
-// 1d histograms for variable distribution
+		// 1d histograms for variable distribution
 		for( i = 0; i < NumSize; i++ )
 		{
 			vector< TH1F* > iH1;
@@ -152,9 +152,9 @@ VTableCalculator::VTableCalculator( string fpara, string hname_add, char m, TDir
 			OMedian.push_back( iM1 );
 		}
 	}
-/////////////////////////////////////////
-// table reading
-/////////////////////////////////////////
+	/////////////////////////////////////////
+	// table reading
+	/////////////////////////////////////////
 	else
 	{
 		fReadHistogramsFromFile = false;
@@ -249,7 +249,7 @@ void VTableCalculator::setConstants( bool iPE )
 	xhigh = 1.;
 	fMinShowerPerBin = 5.;
 	
-// binning is different for MC with values in PE
+	// binning is different for MC with values in PE
 	if( iPE )
 	{
 		NumSize = 45;
@@ -276,21 +276,21 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 		return;
 	}
 	
-/////////////////////////////////////////////////////////////////////////////////////////////
-// table writing
-/////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// table writing
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	if( fwrite )
 	{
 		TDirectory* iDir1D = 0;
-// make output directory for 1D histograms
+		// make output directory for 1D histograms
 		if( fOutDir )
 		{
 			iDir1D = fOutDir->mkdir( "histos1D" );
 		}
 		
-///////////////////////////////////
-// 2D histograms
-// number of events
+		///////////////////////////////////
+		// 2D histograms
+		// number of events
 		char hname[1000];
 		char htitle[1000];
 		sprintf( hname, "%s_nevents_%s", fName.c_str(), fHName_Add.c_str() );
@@ -299,7 +299,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 		hNevents->SetXTitle( "log_{10} size" );
 		hNevents->SetYTitle( "distance [m]" );
 		hNevents->SetZTitle( "# of events/bin" );
-// most probable of variable
+		// most probable of variable
 		sprintf( hname, "%s_mpv_%s", fName.c_str(), fHName_Add.c_str() );
 		sprintf( htitle, "%s vs. dist. vs. log10 size (mpv)", fName.c_str() );
 		TH2F* hMPV = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
@@ -314,7 +314,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 			sprintf( htitle, "%s (mpv) [TeV]", fName.c_str() );
 		}
 		hMPV->SetZTitle( htitle );
-// sigma of median (16-84% (2sigma for Gauss))
+		// sigma of median (16-84% (2sigma for Gauss))
 		sprintf( hname, "%s_sigma_%s", fName.c_str(), fHName_Add.c_str() );
 		sprintf( htitle, "%s vs. dist. vs. log10 size (sigma)", fName.c_str() );
 		TH2F* hSigma = new TH2F( hname, htitle, NumSize, amp_offset, amp_offset + NumSize * amp_delta, NumDist, 0., dist_delta * NumDist );
@@ -330,8 +330,8 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 		}
 		hSigma->SetZTitle( htitle );
 		
-///////////////////////////////////
-// EVALUATION OF HISTOGRAMS
+		///////////////////////////////////
+		// EVALUATION OF HISTOGRAMS
 		cout << "\t tables (msc style): evaluating " << fName << " histograms ";
 		
 		float med = 0.;
@@ -341,12 +341,12 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 		double i_a[] = { 0.16, 0.5, 0.84 };
 		double i_b[] = { 0.0,  0.0, 0.0  };
 		
-// loop over all size bin and distance bins
+		// loop over all size bin and distance bins
 		for( int i = 0; i < NumSize; i++ )
 		{
 			for( int j = 0; j < NumDist; j++ )
 			{
-// use 1D histograms for median calculation
+				// use 1D histograms for median calculation
 				if( fWrite1DHistograms && Oh[i][j] &&  Oh[i][j]->GetEntries() > 5 )
 				{
 					Oh[i][j]->GetQuantiles( 3, i_b, i_a );
@@ -354,7 +354,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 					sigma   = i_b[2] - i_b[0];
 					nevents = Oh[i][j]->GetEntries();
 				}
-// use approx median calculation
+				// use approx median calculation
 				else if( fFillMedianApproximations && OMedian[i][j] && OMedian[i][j]->getN() > 5 )
 				{
 					med     = OMedian[i][j]->getMedian();
@@ -383,7 +383,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 					fillMPV( hMPV, i + 1, j + 1, Oh[i][j], med, sigma );
 					hMPV->SetBinError( i + 1, j + 1, sigma );
 				}
-// write 1D histograms to file
+				// write 1D histograms to file
 				if( fWrite1DHistograms && Oh[i][j] )
 				{
 					if( fOutDir && Oh[i][j]->GetEntries() > 0 )
@@ -400,7 +400,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 				}
 			}
 		}
-// write 2D histograms to file
+		// write 2D histograms to file
 		if( fOutDir && hNevents->GetEntries() > 0 )
 		{
 			fOutDir->cd();
@@ -420,7 +420,7 @@ void VTableCalculator::terminate( TDirectory* iOut, char* xtitle )
 			{
 				hSigma->SetEntries( hNevents->GetEntries() );
 			}
-// reduce size of the 2D histograms
+			// reduce size of the 2D histograms
 			TH2F* h = 0;
 			string n;
 			if( hMedian )
@@ -543,21 +543,21 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 {
 	int tel = 0;
 	
-///////////////////////////////////////////////////////////////////////////////////////
-// fill the tables
-//
-// ntel and size/width etc arrays are expected to be values from same telescope types
-// therefore: ntel = number of telescopes of same type
-// (fill one mscw table for each telescope type)
-///////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////
+	// fill the tables
+	//
+	// ntel and size/width etc arrays are expected to be values from same telescope types
+	// therefore: ntel = number of telescopes of same type
+	// (fill one mscw table for each telescope type)
+	///////////////////////////////////////////////////////////////////////////////////////
 	if( fwrite )
 	{
-// don't allow zero or negative weights
+		// don't allow zero or negative weights
 		if( chi2 <= 0. )
 		{
 			return -99.;
 		}
-// loop over all telescopes
+		// loop over all telescopes
 		double i_logs = 0.;
 		int ir = 0;
 		int is = 0.;
@@ -570,12 +570,12 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 		{
 			i_Oh_size = ( int )OMedian.size();
 		}
-// loop over all telescopes
+		// loop over all telescopes
 		for( tel = 0; tel < ntel; tel++ )
 		{
 			if( s[tel] > 0. && r[tel] >= 0. && w[tel] > fBinning1DXlow && w[tel] < fBinning1DXhigh )
 			{
-// check limits (to avoid under/overflows)
+				// check limits (to avoid under/overflows)
 				ir = hMedian->GetYaxis()->FindFixBin( r[tel] ) - 1;
 				if( ir == NumDist )
 				{
@@ -587,7 +587,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 				{
 					continue;
 				}
-// reject showers in the first size bin
+				// reject showers in the first size bin
 				if( ir >= 0 && is >= 0 && is < i_Oh_size )
 				{
 					if( fWrite1DHistograms && ir < ( int )Oh[is].size() )
@@ -596,8 +596,8 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 							{
 								continue;
 							}
-// fill width/length/energy into a 1D and 2D histogram
-// (chi2 is here an external weight (from e.g. spectral weighting))
+						// fill width/length/energy into a 1D and 2D histogram
+						// (chi2 is here an external weight (from e.g. spectral weighting))
 						Oh[is][ir]->Fill( w[tel], chi2 );
 					}
 					if( fFillMedianApproximations && ir < ( int )OMedian.size() )
@@ -606,7 +606,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 							{
 								continue;
 							}
-// weight is ignored in the approx median calculation
+						// weight is ignored in the approx median calculation
 						OMedian[is][ir]->fill( w[tel] );
 					}
 					hMean->Fill( i_logs, r[tel], w[tel] * chi2 );
@@ -615,17 +615,17 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 		}
 		return -99.;
 	}
-/////////////////////////////////////////////////////////
-// END OF writing/filling lookup tables
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-// read table
-// compute mean or mean scaled width/length value
-//
+	/////////////////////////////////////////////////////////
+	// END OF writing/filling lookup tables
+	/////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////
+	// read table
+	// compute mean or mean scaled width/length value
+	//
 	else
 	{
 	
-// tables are accessed for the first time: get the from the file
+		// tables are accessed for the first time: get the from the file
 		if( !fReadHistogramsFromFile )
 		{
 			cout << "read tables from " << fOutDir->GetPath() << endl;
@@ -645,13 +645,13 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 		double sigma = 0.;
 		double value = 0.;
 		double weight = 0.;
-// energy per telescope
+		// energy per telescope
 		vector< double > energy_tel;
 		vector< double > sigma2_tel;
 		vector< double > sigma2_tel_noRadiusWeigth;
 		vector< double > sigma_tel;
 		
-// reset everything
+		// reset everything
 		for( tel = 0; tel < ntel; tel++ )
 		{
 			mt[tel] = -99.;
@@ -661,14 +661,14 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 			}
 		}
 		
-////////////////////////////////////////////////////
-// loop over all telescopes
-////////////////////////////////////////////////////
+		////////////////////////////////////////////////////
+		// loop over all telescopes
+		////////////////////////////////////////////////////
 		for( tel = 0; tel < ntel; tel++ )
 		{
 			if( r[tel] >= 0. && s[tel] > 0 )
 			{
-// get expected value and sigma of expected value
+				// get expected value and sigma of expected value
 				if( hMedian )
 				{
 					med   = interpolate( hMedian, log10( s[tel] ), r[tel], false );
@@ -696,9 +696,9 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 						cout << ", size " << s[tel] << ", distance " << r[tel] << endl;
 					}
 				}
-// accept only values > 0
-// (expeced width/length should be > 0)
-// (log10 energy should be > 0, good reason why we work in GeV here)
+				// accept only values > 0
+				// (expeced width/length should be > 0)
+				// (log10 energy should be > 0, good reason why we work in GeV here)
 				if( med > 0. )
 				{
 					mt[tel] = med;
@@ -720,32 +720,32 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 						cout << ", size " << s[tel] << ", distance " << r[tel] << endl;
 					}
 				}
-// weighted mean
+				// weighted mean
 				if( med > 0. )
 				{
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-// mean scaled calculation
+					///////////////////////////////////////////////////////////////////////////////////////////////////////
+					// mean scaled calculation
 					if( !fEnergy && sigma > 0. && w )
 					{
-// handle showers with (width==0.) correctly
+						// handle showers with (width==0.) correctly
 						if( w[tel] > 0. )
 						{
 							value  += ( w[tel] - med ) / sigma * ( med * med ) / ( sigma * sigma );
 						}
 						weight += ( med * med ) / ( sigma * sigma );
 					}
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-// energy calculation
+					///////////////////////////////////////////////////////////////////////////////////////////////////////
+					// energy calculation
 					else if( fEnergy && sigma > 0. )
 					{
-// store energy per telescope
+						// store energy per telescope
 						energy_tel.push_back( med );
-// store expected relative error
+						// store expected relative error
 						sigma_tel.push_back( sigma / med );
-// use relative error as weighting (otherwise: significant bias towards lower energies
+						// use relative error as weighting (otherwise: significant bias towards lower energies
 						sigma2_tel.push_back( med / ( sigma * sigma ) );
 						sigma2_tel_noRadiusWeigth.push_back( 1. / ( sigma * sigma ) );
-// add addional weight for events inside or outside the light pool
+						// add addional weight for events inside or outside the light pool
 						if( r[tel] < 140. )
 						{
 							sigma2_tel.back() = sigma2_tel.back() * 100.;
@@ -764,9 +764,9 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 				}
 			}
 		}
-////////////////////////////////////////////////////////////////
-// mean scaled value
-// (MSCW/MSCL)
+		////////////////////////////////////////////////////////////////
+		// mean scaled value
+		// (MSCW/MSCL)
 		if( !fEnergy )
 		{
 			if( weight > 0 )
@@ -778,16 +778,16 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 				return -99.;
 			}
 		}
-///////////////////////////////////////////////////////////////
-// Energy calculation only
-///////////////////////////////////////////////////////////////
-// calculate mean energy
+		///////////////////////////////////////////////////////////////
+		// Energy calculation only
+		///////////////////////////////////////////////////////////////
+		// calculate mean energy
 		if( energy_tel.size() > 0 )
 		{
-// Occasionally one energy is significantly off and distorts the mean.
-// therefore: get rid of N sigma outliers
-// use robust statistics (median and mean absolute error)
-// Note: applied only to larger events > 4 telescopes
+			// Occasionally one energy is significantly off and distorts the mean.
+			// therefore: get rid of N sigma outliers
+			// use robust statistics (median and mean absolute error)
+			// Note: applied only to larger events > 4 telescopes
 			double median = TMath::Median( energy_tel.size(), &energy_tel[0] );
 			double meanAbsoluteError = VStatistics::getMeanAbsoluteError( energy_tel );
 			weight = 0.;
@@ -804,7 +804,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 				value /= weight;
 			}
 			
-// loop over number if images with valid entries
+			// loop over number if images with valid entries
 			if( energy_tel.size() > 1 )
 			{
 				chi2 = 0.;
@@ -840,8 +840,8 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 				{
 					dE = 0.;
 				}
-// changed 2013/08/10
-//                dE = sqrt( 1./weight );
+				// changed 2013/08/10
+				//                dE = sqrt( 1./weight );
 			}
 			else
 			{
@@ -856,7 +856,7 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 		}
 	}
 	
-// should never reach this point
+	// should never reach this point
 	return -99.;
 }
 
@@ -881,7 +881,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
 	
 	double ibc = 0.;
 	
-// get bin centers
+	// get bin centers
 	double i_bc_x0 = h->GetXaxis()->GetBinCenter( ix0 );
 	double i_bc_y0 = h->GetYaxis()->GetBinCenter( iy0 );
 	int ix1 = ix0;
@@ -908,9 +908,9 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
 	double weight = 0.;
 	double dist = 0.;
 	
-// first bin (x,y is inside this bin)
+	// first bin (x,y is inside this bin)
 	dist = sqrt( ( i_bc_x0 - x ) * ( i_bc_x0 - x ) + ( i_bc_y0 - y ) * ( i_bc_y0 - y ) );
-// return bin content if x,y is very close to bin center
+	// return bin content if x,y is very close to bin center
 	if( fabs( dist ) < 1.e-5 )
 	{
 		return h->GetBinContent( ix0, iy0 );
@@ -920,7 +920,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
 	weight += dist;
 	ibc += h->GetBinContent( ix0, iy0 ) * dist;
 	
-// second bin
+	// second bin
 	if( h->GetBinContent( ix1, iy0 ) > 0. )
 	{
 		dist = sqrt( ( i_bc_x1 - x ) * ( i_bc_x1 - x ) + ( i_bc_y0 - y ) * ( i_bc_y0 - y ) );
@@ -931,7 +931,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
 		}
 	}
 	
-// third bin
+	// third bin
 	if( h->GetBinContent( ix1, iy1 ) > 0. && dist > 0. )
 	{
 		dist = sqrt( ( i_bc_x1 - x ) * ( i_bc_x1 - x ) + ( i_bc_y1 - y ) * ( i_bc_y1 - y ) );
@@ -942,7 +942,7 @@ double VTableCalculator::getWeightMeanBinContent( TH2F* h, int ix0, int iy0, dou
 		}
 	}
 	
-// fourth bin
+	// fourth bin
 	if( h->GetBinContent( ix0, iy1 ) > 0. )
 	{
 		dist = sqrt( ( i_bc_x0 - x ) * ( i_bc_x0 - x ) + ( i_bc_y1 - y ) * ( i_bc_y1 - y ) );
@@ -1009,7 +1009,7 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
 	
 	int i_x = h->GetXaxis()->FindFixBin( x );
 	int i_y = h->GetYaxis()->FindFixBin( y );
-// handle under and overflows ( bin nBinsX+1 is needed)
+	// handle under and overflows ( bin nBinsX+1 is needed)
 	if( i_x == 0 || i_y == 0 || i_x == h->GetNbinsX() || i_y == h->GetNbinsY() )
 	{
 		if( iError )
@@ -1034,7 +1034,7 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
 	double e2 = 0.;
 	double v = 0.;
 	
-// first interpolate on distance axis, then on size axis
+	// first interpolate on distance axis, then on size axis
 	if( !iError )
 	{
 		e1 = VStatistics::interpolate( h->GetBinContent( i_x, i_y ), h->GetYaxis()->GetBinCenter( i_y ),
@@ -1058,8 +1058,8 @@ double VTableCalculator::interpolate( TH2F* h, double x, double y, bool iError )
 									   
 		v = VStatistics::interpolate( e1, h->GetXaxis()->GetBinCenter( i_x ), e2, h->GetXaxis()->GetBinCenter( i_x + 1 ), x, false );
 	}
-// final check on consistency of results
-// (don't expect to reconstruct anything below 1 GeV)
+	// final check on consistency of results
+	// (don't expect to reconstruct anything below 1 GeV)
 	if( e1 > 1.e-3 && e2 < 1.e-3 )
 	{
 		return e1;
@@ -1086,27 +1086,27 @@ void VTableCalculator::fillMPV( TH2F* h, int i, int j, TH1F* h1D, double iMedian
 		return;
 	}
 	
-// only fit well filled histograms -> otherwise will median
+	// only fit well filled histograms -> otherwise will median
 	if( h1D->GetEntries() <= 50 || iMedianValue <= 0. )
 	{
 		h->SetBinContent( i, j, iMedianValue );
 		return;
 	}
-// don't do anything if difference between mean and median is <15%
+	// don't do anything if difference between mean and median is <15%
 	if( iMedianValue > 0. && TMath::Abs( ( iMedianValue - h1D->GetMean() ) / iMedianValue ) < 0.15 )
 	{
 		h->SetBinContent( i, j, iMedianValue );
 		return;
 	}
 	
-/////////////////////////////////////////
-// try a Landau fit
+	/////////////////////////////////////////
+	// try a Landau fit
 	TF1 iLandau( "iLandau", "TMath::Landau(x,[0],[1],0)*[2]", iMedianValue / 3., iMedianValue * 3. );
 	iLandau.SetParameters( iMedianValue, iSigmaValue, h1D->GetEntries() );
-// do not allow the most probable value to be more than x3 off the median
+	// do not allow the most probable value to be more than x3 off the median
 	iLandau.SetParLimits( 0, iMedianValue / 3., iMedianValue * 3. );
 	h1D->Fit( &iLandau, "QMNR" );
-// require >10% fit probability to use Landau most probable value
+	// require >10% fit probability to use Landau most probable value
 	if( TMath::Prob( iLandau.GetChisquare(), iLandau.GetNDF() ) > 0.1
 			&& iLandau.GetParameter( 0 ) > 0. && iMedianValue / iLandau.GetParameter( 0 ) < 2.5 )
 	{

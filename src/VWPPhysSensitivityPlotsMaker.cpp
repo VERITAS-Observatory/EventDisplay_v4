@@ -22,9 +22,9 @@ VWPPhysSensitivityPlotsMaker::VWPPhysSensitivityPlotsMaker()
 	iOffAxisValue.push_back( 2.5 );
 	iOffAxisValue.push_back( 3.25 );
 	iOffAxisValue.push_back( 3.75 );
-//    iOffAxisValue.push_back( 4.25 );
-//    iOffAxisValue.push_back( 4.75 );
-
+	//    iOffAxisValue.push_back( 4.25 );
+	//    iOffAxisValue.push_back( 4.75 );
+	
 	cout << "VWPPhysSensitivityPlotsMaker: hardwired offsets from camera center: ";
 	for( unsigned int i = 0; i < iOffAxisValue.size(); i++ )
 	{
@@ -50,12 +50,12 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string 
 	a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
 	a.plotProjectedSensitivities( 0, 5. );
 	a.plotSensitivityRatio( fPrintingOptions, 0.4, 4.1 );
-// Southern sites: 30 GeV - 100 TeV
+	// Southern sites: 30 GeV - 100 TeV
 	if( fPlotCTARequirements < 3 )
 	{
 		a.printSensitivityFigureOfMerit( 0.03, 100. );
 	}
-// Northern sites: 30 GeV - 20 TeV
+	// Northern sites: 30 GeV - 20 TeV
 	else
 	{
 		a.printSensitivityFigureOfMerit( 0.03, 20. );
@@ -145,7 +145,7 @@ void VWPPhysSensitivityPlotsMaker::resetVectors()
 
 bool VWPPhysSensitivityPlotsMaker::writeTexFileBody( string iTexFile, string iTexFileTitle )
 {
-// tex file
+	// tex file
 	cout << "Writing tex file: " << iTexFile << endl;
 	ofstream os;
 	os.open( iTexFile.c_str() );
@@ -155,7 +155,7 @@ bool VWPPhysSensitivityPlotsMaker::writeTexFileBody( string iTexFile, string iTe
 		return false;
 	}
 	
-// intro
+	// intro
 	os << "\\documentclass[11pt]{scrartcl}" << endl;
 	os << "\\usepackage[a4paper,landscape,scale=0.9]{geometry}" << endl;
 	os << "\\usepackage{graphicx}" << endl;
@@ -173,7 +173,7 @@ bool VWPPhysSensitivityPlotsMaker::writeTexFileBody( string iTexFile, string iTe
 	
 	os << "\\newpage" << endl;
 	
-// images
+	// images
 	if( fListOfArrays.size() > 0 )
 	{
 		for( unsigned int i = 0; i < fListOfArrays.size(); i++ )
@@ -205,7 +205,7 @@ bool VWPPhysSensitivityPlotsMaker::writeTexFileBody( string iTexFile, string iTe
 		os << "\\clearpage" << endl;
 		os << endl << endl;
 	}
-// tex file closing
+	// tex file closing
 	os << endl;
 	os << "\\end{document}" << endl;
 	

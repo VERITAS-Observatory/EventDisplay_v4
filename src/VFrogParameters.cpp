@@ -23,7 +23,7 @@ void VFrogParameters::initTree( string iName, string iTitle )
 	fTreeFrog->SetMaxTreeSize( 1000 * Long64_t( 2000000000 ) );
 	fTreeFrog->SetAutoSave( 1000 );
 	
-//  Branches:
+	//  Branches:
 	fTreeFrog->Branch( "frogsEventID", &frogsEventID, "frogsEventID/I" );
 	fTreeFrog->Branch( "frogsGSLConStat", &frogsGSLConStat, "frogsGSLConStat/I" );
 	fTreeFrog->Branch( "frogsNB_iter", &frogsNB_iter, "frogsNB_iter/I" );
@@ -69,7 +69,7 @@ void VFrogParameters::initTree( string iName, string iTitle )
 void VFrogParameters::reset()
 {
 
-//  0 all the values
+	//  0 all the values
 	frogsEventID     = 0;
 	frogsGSLConStat  = 0;
 	frogsNB_iter     = 0;

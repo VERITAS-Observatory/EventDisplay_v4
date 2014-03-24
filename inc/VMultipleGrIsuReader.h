@@ -42,17 +42,17 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 		
 		vector< bool > fLocalTrigger;
 		
-// telescope pointing
+		// telescope pointing
 		vector< double > fTelElevation;           //!< telescope pointing, elevation [deg]
 		vector< double > fTelAzimuth;             //!< telescope pointing, azimuth [deg]
 		
-///////////////////////////////////////////////////////////////////////////
-// needed for good return values only
+		///////////////////////////////////////////////////////////////////////////
+		// needed for good return values only
 		std::vector< bool > vv_bool;
 		std::valarray< double > vvv_valarray;
 		std::vector< valarray<double> > vvv_v_vvv_valarray;
-///////////////////////////////////////////////////////////////////////////
-
+		///////////////////////////////////////////////////////////////////////////
+		
 		bool          checkTelescopeID( unsigned int );
 		void          fillRandomPeds( VGrIsuReader* g, int iseed );
 		VGrIsuReader* getReader();
@@ -70,7 +70,7 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 			return 1;
 		}
 		string                      getSourceFileName();
-// raweventparser
+		// raweventparser
 		//!<
 		std::pair< bool, uint32_t > getChannelHitIndex( uint32_t );
 		uint32_t                    getRunNumber()
@@ -78,7 +78,7 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 			return 0;
 		}
 		uint32_t                    getEventNumber();
-// don't know the difference between hit and trig
+		// don't know the difference between hit and trig
 		std::vector< bool >         getFullHitVec();
 		std::vector< bool >         getFullTrigVec();
 		int                         getNumberofFullTrigger();
@@ -172,7 +172,7 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 			return false;
 		}
 		
-// rawfile
+		// rawfile
 		//!< read in next event
 		bool                        getNextEvent();
 		//!< create next pedestal event
@@ -180,7 +180,7 @@ class VMultipleGrIsuReader : public VVirtualDataReader
 		//!< read next shower event from file
 		bool                        getNextShowerEvent();
 		
-// MC
+		// MC
 		bool                       isMC()         //!< GrIsu type data is always MC
 		{
 			return true;

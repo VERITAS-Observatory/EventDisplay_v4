@@ -24,15 +24,15 @@ using namespace std;
 class VTableEnergyCalculator
 {
 	public:
-// creator: reads or writes table
-// mode can be 'r' or 'w'
+		// creator: reads or writes table
+		// mode can be 'r' or 'w'
 		VTableEnergyCalculator( int intel = 0 );
 		VTableEnergyCalculator( const char* fname, char m, TDirectory* iDir, bool iUseMedian = true, string iInterpolate = "" );
 		
-// Destructor
+		// Destructor
 		~VTableEnergyCalculator() {}
 		
-// Fill Histos and Compute Energy
+		// Fill Histos and Compute Energy
 		double calc( int ntel, double e, double* r, double* s, double* et, double& chi2, double& dE, double eys );
 		TH2F* getHistoMedian();
 		TH2F* getHistoSigma();
@@ -87,7 +87,7 @@ class VTableEnergyCalculator
 		bool  fUseMedianEnergy;
 		float fMinShowerPerBin;        // minimum number per bin required (table writing)
 		
-// BINNING DEFINITION FOR LOOKUP TABLES
+		// BINNING DEFINITION FOR LOOKUP TABLES
 		int   eNumEne;               // number of bins on energy axis
 		float eE0Min;                // minimum energy linE [TeV] (must be >0)
 		float eE0Max;                // maximum energy linE [TeV] (must be >0)
@@ -118,14 +118,14 @@ class VTableEnergyCalculator
 		double fMinSize;                          //!< minimum size per telescope to be included in the analysis
 		double fMaxDistance;                      //!< maximum distance of shower core from telescope [m]
 		
-// energy correction stuff
+		// energy correction stuff
 		vector< double > sstop;
 		vector< double > fstart;
 		vector< double > fstop;
 		vector< double > p0;
 		vector< double > p1;
 		
-// histogram interpolation
+		// histogram interpolation
 		int fInterPolWidth;
 		int fInterPolIter;
 		

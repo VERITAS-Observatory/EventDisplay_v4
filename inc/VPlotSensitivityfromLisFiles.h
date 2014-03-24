@@ -28,7 +28,7 @@ class VLisFileData
 		string  fName;
 		string  fFileName;
 		
-// data from list file
+		// data from list file
 		map< string, vector< double > > fVar;
 		
 		VLisFileData();
@@ -44,14 +44,14 @@ class VPlotSensitivityfromLisFiles : public VPlotUtilities
 	
 		bool fDebug;
 		
-// Variables
+		// Variables
 		vector< string > fVarName;
 		
-// min/max for plotting
+		// min/max for plotting
 		map< string, double > fVarMin;
 		map< string, double > fVarMax;
 		
-// data
+		// data
 		vector< VLisFileData* > fData;
 		
 	public:

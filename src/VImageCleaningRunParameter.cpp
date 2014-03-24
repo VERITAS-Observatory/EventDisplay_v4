@@ -13,18 +13,18 @@ VImageCleaningRunParameter::VImageCleaningRunParameter()
 	fUseFixedThresholds = false;
 	fImageCleaningMethod = 0;
 	
-// default two-level threshold cleaning
+	// default two-level threshold cleaning
 	fimagethresh = 5.0;
 	fborderthresh = 2.5;
 	fbrightnonimagetresh = 2.5;
 	
-// time cluster cleaning
+	// time cluster cleaning
 	ftimecutpixel = 0.5;   //HP
 	ftimecutcluster = 2.0; //HP
 	fminpixelcluster = 3;  //HP
 	floops = 2;            //HP
 	
-// Trace Correlation Cleaning
+	// Trace Correlation Cleaning
 	fCorrelationCleanBoardThresh = 1.0; //AMc S/N ratio of 1
 	fCorrelationCleanCorrelThresh = 0.75; //AMc Sample correlation coefficient of 0.75
 	fCorrelationCleanNpixThresh = 15;  //AMc Images whose number of pixels is above this value will skip correlation cleaning

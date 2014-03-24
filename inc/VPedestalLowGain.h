@@ -50,7 +50,7 @@ class VPedestalLowGain
 		VPedestalLowGain();
 		~VPedestalLowGain() {}
 		
-// combine two low gain pedestal files
+		// combine two low gain pedestal files
 		bool readLowGainPedestalFiles( string iFile1, string iFile2 );
 		void setChannelNumberRange( unsigned int iChannel1_min = 0, unsigned int iChannel1_max = 249, unsigned int iChannel2_min = 250, unsigned int iChannel2_max = 499 );
 		void setSummationWindowRange( unsigned int iSumWindow_min = 1, unsigned int iSumWindow_max = 20 )
@@ -65,7 +65,7 @@ class VPedestalLowGain
 		bool combineLowGainPedestalFileForAllTelescopes( unsigned int iNTel, string iCalibrationDirectory, string iRun1, string iRun2, string iOutRun );
 		bool writeLowGainPedestalFile( string iOutFileName );
 		
-// compare two low gain pedestal files
+		// compare two low gain pedestal files
 		void printDifferences( double iTolerance = 0.5 );
 		bool readPedestalFiles( string iFile1, string iFile2 );
 		

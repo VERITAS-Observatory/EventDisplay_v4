@@ -28,15 +28,15 @@ double getNorm( string ifile )
 {
 
 
-//    TTree *t = 0;
-
+	//    TTree *t = 0;
+	
 	TFile* fIn = new TFile( ifile.c_str() );
 	if( fIn->IsZombie() )
 	{
 		exit( -1 );
 	}
 	
-// get normalization from run summary tree
+	// get normalization from run summary tree
 	fIn->cd( "total_1/stereo" );
 	TTree* t = ( TTree* )gDirectory->Get( "tRunSummary" );
 	
@@ -85,7 +85,7 @@ TChain* getTreeWithSelectedEvents( string ifile, bool iOn = true )
 		return 0;
 	}
 	
-// get some numbers from the run summary tree
+	// get some numbers from the run summary tree
 	fIn->cd( "total_1/stereo" );
 	t = ( TTree* )gDirectory->Get( "tRunSummary" );
 	if( t )
@@ -125,7 +125,7 @@ int main( int argc, char* argv[] )
 		exit( 0 );
 	}
 	
-// Histograms
+	// Histograms
 	TH1F* hOn_NImages = new TH1F( "hNImages", "hNImages", 5, 0, 5 );
 	TH1F* hOn_MSCW = new TH1F( "hMSCW", "hMSCW", 100, -2., 2. );
 	TH1F* hOn_MSCL = new TH1F( "hMSCL", "hMSCL", 100, -2., 2. );
@@ -143,13 +143,13 @@ int main( int argc, char* argv[] )
 	string fInput = argv[1];
 	string fOutput = argv[2];
 	
-// get normalisation factor
+	// get normalisation factor
 	double fNorm;
 	fNorm = getNorm( fInput );
 	cout << "Normalisation factor: " << fNorm << endl;
 	
 	
-// get input chain
+	// get input chain
 	TChain* tOn = ( TChain* )getTreeWithSelectedEvents( fInput, true );
 	TChain* tOff = ( TChain* )getTreeWithSelectedEvents( fInput, false );
 	if( !tOn || !tOff )
@@ -177,12 +177,12 @@ int main( int argc, char* argv[] )
 	tOff->SetBranchAddress( "EChi2", &echi2 );
 	tOff->SetBranchAddress( "EmissionHeightChi2", &emissionHeight );
 	
-// cut values
+	// cut values
 	double mscw_step = 0.025;
 	unsigned int    mscw_min_n = 1;
 	double mscw_min_start = -1.2;
-//    unsigned int    mscw_max_n = 41;
-//    double mscw_max_start =  0.;
+	//    unsigned int    mscw_max_n = 41;
+	//    double mscw_max_start =  0.;
 	unsigned int    mscw_max_n = 1;
 	//    double mscw_max_start =  0.35;
 	double mscw_max_start =  5.0;
@@ -190,15 +190,15 @@ int main( int argc, char* argv[] )
 	double mscl_step = 0.025;
 	unsigned int    mscl_min_n = 1;
 	double mscl_min_start = -1.2;
-//   unsigned int    mscl_max_n = 41;
-//    double mscl_max_start =  0.;
+	//   unsigned int    mscl_max_n = 41;
+	//    double mscl_max_start =  0.;
 	unsigned int    mscl_max_n = 1;
 	//    double mscl_max_start =  0.7;
 	double mscl_max_start =  5.0;
 	
 	double theta2_step = 0.001;
-//    unsigned int    theta2_max_n = 41;
-//    double theat2_max_start = 0.005;
+	//    unsigned int    theta2_max_n = 41;
+	//    double theat2_max_start = 0.005;
 	unsigned int    theta2_max_n = 1;
 	double theat2_max_start = 0.008;
 	
@@ -208,8 +208,8 @@ int main( int argc, char* argv[] )
 	double emm_max_start = 1.e12;
 	
 	double echi2_step = 0.1;
-//    unsigned int echi2_n = 41;
-//    double echi2_max_start = -1.;
+	//    unsigned int echi2_n = 41;
+	//    double echi2_max_start = -1.;
 	unsigned int echi2_n = 1;
 	double echi2_max_start = 1.e99;
 	
@@ -221,7 +221,7 @@ int main( int argc, char* argv[] )
 	vector< double > echi2_max;
 	vector< double > emm_max;
 	
-// results
+	// results
 	vector< double > source;                      // source strength
 	vector< double > non;
 	vector< double > noff;
@@ -332,8 +332,8 @@ int main( int argc, char* argv[] )
 			{
 				continue;
 			}
-//            if( emissionHeight > emm_max[c] ) continue;
-
+			//            if( emissionHeight > emm_max[c] ) continue;
+			
 			non[c]++;
 		}
 	}
@@ -380,18 +380,18 @@ int main( int argc, char* argv[] )
 				}
 			}
 			//            if( theta2 < 0 || theta2 > theta2_max[c] ) continue;
-//            if( emissionHeight > emm_max[c] ) continue;
-
+			//            if( emissionHeight > emm_max[c] ) continue;
+			
 			noff[c]++;
 		}
 	}
 	
 	
-// output tree
-
+	// output tree
+	
 	TFile* fO = new TFile( fOutput.c_str(), "RECREATE" );
 	
-//    TTree *t = new TTree( "topt", "cut optimization" );
+	//    TTree *t = new TTree( "topt", "cut optimization" );
 	double t_mscw_min;
 	double t_mscw_max;
 	double t_mscl_min;
@@ -456,35 +456,35 @@ int main( int argc, char* argv[] )
 			}
 			
 		}
-//        t->Fill();
+		//        t->Fill();
 	}
-//    cout << "writing results to output file" << endl;
-
-//    TCanvas *cNImages = new TCanvas("cNImages","cNImages",0,0,500,500);
-//    hOn_NImages->Draw();
-//    hOff_NImages->Draw("same");
-//    cNImages->Update();
-//    TCanvas *cMSCW = new TCanvas("cMSCW","cMSCW",0,0,500,500);
-//    hOn_MSCW->Draw();
-//    hOff_MSCW->Draw("same");
-//    cMSCW->Update();
-//    TCanvas *cMSCL = new TCanvas("cMSCL","cMSCL",0,0,500,500);
-//    hOn_MSCL->Draw();
-//    hOff_MSCL->Draw("same");
-//    cMSCL->Update();
-//    TCanvas *ctheta2 = new TCanvas("ctheta2","ctheta2",0,0,500,500);
-//    hOn_theta2->Draw();
-//    hOff_theta2->Draw("same");
-//    ctheta2->Update();
-//    TCanvas *cEChi2 = new TCanvas("cEChi2","cEChi2",0,0,500,500);
-//    hOn_EChi2->Draw();
-//    hOff_EChi2->Draw("same");
-//    cEChi2->Update();
-//    TCanvas *cEmissionHeightChi2 = new TCanvas("cEmissionHeightChi2","cEmissionHeightChi2",0,0,500,500);
-//    hOn_EmissionHeightChi2->Draw();
-//    hOff_EmissionHeightChi2->Draw("same");
-//    cEmissionHeightChi2->Update();
-
+	//    cout << "writing results to output file" << endl;
+	
+	//    TCanvas *cNImages = new TCanvas("cNImages","cNImages",0,0,500,500);
+	//    hOn_NImages->Draw();
+	//    hOff_NImages->Draw("same");
+	//    cNImages->Update();
+	//    TCanvas *cMSCW = new TCanvas("cMSCW","cMSCW",0,0,500,500);
+	//    hOn_MSCW->Draw();
+	//    hOff_MSCW->Draw("same");
+	//    cMSCW->Update();
+	//    TCanvas *cMSCL = new TCanvas("cMSCL","cMSCL",0,0,500,500);
+	//    hOn_MSCL->Draw();
+	//    hOff_MSCL->Draw("same");
+	//    cMSCL->Update();
+	//    TCanvas *ctheta2 = new TCanvas("ctheta2","ctheta2",0,0,500,500);
+	//    hOn_theta2->Draw();
+	//    hOff_theta2->Draw("same");
+	//    ctheta2->Update();
+	//    TCanvas *cEChi2 = new TCanvas("cEChi2","cEChi2",0,0,500,500);
+	//    hOn_EChi2->Draw();
+	//    hOff_EChi2->Draw("same");
+	//    cEChi2->Update();
+	//    TCanvas *cEmissionHeightChi2 = new TCanvas("cEmissionHeightChi2","cEmissionHeightChi2",0,0,500,500);
+	//    hOn_EmissionHeightChi2->Draw();
+	//    hOff_EmissionHeightChi2->Draw("same");
+	//    cEmissionHeightChi2->Update();
+	
 	hOn_NImages->Write();
 	hOff_NImages->Write();
 	hOn_MSCW->Write();
@@ -499,7 +499,7 @@ int main( int argc, char* argv[] )
 	hOff_EmissionHeightChi2->Write();
 	
 	
-//    t->Write();
+	//    t->Write();
 	fO->Close();
 	
 	return 0;

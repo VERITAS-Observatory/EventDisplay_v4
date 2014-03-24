@@ -40,10 +40,10 @@ int main( int argc, char* argv[] )
 		exit( -1 );
 	}
 	
-// get DBservers
+	// get DBservers
 	VGlobalRunParameter* fRunPara = new VGlobalRunParameter();
 	
-// DB run info
+	// DB run info
 	VDBRunInfo i_DBinfo( fRunNumber, fRunPara->getDBServer(), fNTel );
 	if( i_DBinfo.isGood() )
 	{

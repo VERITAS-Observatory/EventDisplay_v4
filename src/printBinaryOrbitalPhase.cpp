@@ -52,7 +52,7 @@ int main( int argc, char* argv[] )
 	string object = argv[5];
 	double orbit = 0.;
 	double t0 = 0.;
-// LS I+61 303 timing
+	// LS I+61 303 timing
 	if( object == "LS I +61 303" )
 	{
 		orbit = 26.4960;
@@ -63,7 +63,7 @@ int main( int argc, char* argv[] )
 		orbit = 315.;
 		t0 = 54857.;
 	}
-// user given timing parameters
+	// user given timing parameters
 	if( argc == 8 )
 	{
 		orbit = atof( argv[6] );
@@ -75,13 +75,13 @@ int main( int argc, char* argv[] )
 	cout << ", Orbit [d]: " << orbit;
 	cout << endl << endl;
 	
-// get mjd for given date
+	// get mjd for given date
 	slaCldj( year, month, day, &djm, &j );
 	if( j == 0 )
 	{
 		if( !bPrintWholeYear )
 		{
-// calculate orbital phase
+			// calculate orbital phase
 			cout << "Orbital phase of " << object << " for " << year << "-" << month << "-" << day << ", MJD " << djm << ": ";
 			cout << ( djm - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit ) << endl;
 		}
@@ -90,7 +90,7 @@ int main( int argc, char* argv[] )
 			float p = 0.;
 			float p_old = p;
 			double djm_old = djm;
-// 10 day intervall
+			// 10 day intervall
 			for( int i = 0; i < 366; i++ )
 			{
 				p = ( djm  - t0 ) / orbit - ( int )( ( djm - t0 ) / orbit );

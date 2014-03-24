@@ -65,7 +65,7 @@ bool VRawDataReader::getNextEvent()
 		}
 		else
 		{
-//	 fEventParser[i]->setEvent(fEvent[i]);
+			//	 fEventParser[i]->setEvent(fEvent[i]);
 			if( fDataFormat == "MCvbf" )
 			{
 				// ugly, but same data for all telescopes

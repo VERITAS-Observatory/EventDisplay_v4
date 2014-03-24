@@ -77,12 +77,12 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 		TH1D* htheta2_off;
 		TH1D* htheta2_diff;
 		
-// helper functions
+		// helper functions
 		TH1D* doQfactors( TH1D* hon, TH1D* hoff, TH1D* hdiff, bool bUpper, int iMethod, double iSourceStrength );
 		TH2D* reflectXaxis( TH2D* h = 0, char* iNewName = 0 );
 		
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
 	public:
 	
 		VPlotAnasumHistograms();
@@ -92,13 +92,13 @@ class VPlotAnasumHistograms : public VAnalysisUtilities, public VPlotUtilities, 
 		void convert_derotated_RADECJ2000( double x = 0, double y = 0, double xerr = 0, double yerr = 0 );
 		
 		void drawPSF( TCanvas* c = 0, string iFile = 0, TH2D* h2 = 0, float iPSF = 0.1 );
-//   void fit_energy(double minE = -0.5, double maxE = 0.5 );
+		//   void fit_energy(double minE = -0.5, double maxE = 0.5 );
 		bool openDataFile( string ifile, int ion = -1 );
 		
 		void help();                                                       // this will print all available functions
 		
 		
-// plotting functions
+		// plotting functions
 		void            plot_deadTimes();
 		void            plot_mscPlots( int irebin = 2, double xmin = -2., double xmax = 4., string mscwfile = "" );
 		void            plot_qualityHistograms( double iSourceStrength = 1., bool bUpper = true, int iMethod = 0 );

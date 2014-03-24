@@ -69,12 +69,12 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
 	
 	for( unsigned int i = 0; i < fNFrequencies; i++ )
 	{
-// frequency
+		// frequency
 		f  =  fFrequency_min + ( double )i * ( fFrequency_max - fFrequency_min ) / ( ( double )fNFrequencies );
 		f += 0.5 * ( fFrequency_max - fFrequency_min ) / ( ( double )fNFrequencies );
 		w  = 2.* TMath::Pi() * f;
 		
-// tau
+		// tau
 		double i_sin = 0.;
 		double i_cos = 0.;
 		for( unsigned j = 0; j < fLightCurveData.size(); j++ )
@@ -87,8 +87,8 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
 		}
 		tau = TMath::ATan2( i_sin, i_cos ) / 2. / w;
 		
-// LS power
-
+		// LS power
+		
 		double i_A_num = 0.;
 		double i_A_den = 0.;
 		double i_B_num = 0.;
@@ -99,7 +99,7 @@ void VLombScargle::fillPeriodigram( bool iShuffle )
 		for( unsigned j = 0; j < fLightCurveData.size(); j++ )
 		{
 			unsigned int k = j;
-// shuffle light curve for toy MC
+			// shuffle light curve for toy MC
 			if( iShuffle && fRandom )
 			{
 				k = fRandom->Integer( fLightCurveData.size() );
@@ -181,7 +181,7 @@ void VLombScargle::plotProbabilityLevels( bool iPlotinColor )
 	
 	fPeriodigramCanvas->cd();
 	
-// trials = number of frequencies
+	// trials = number of frequencies
 	double i_z = 0.;
 	char hname[100];
 	
@@ -239,7 +239,7 @@ void VLombScargle::plotProbabilityLevelsFromToyMC( unsigned int iMCCycles, unsig
 	}
 	fRandom->SetSeed( iSeed );
 	
-// 2D histogram for counting
+	// 2D histogram for counting
 	double y_max = 1000.;
 	if( fPeriodigramHisto->GetMaximum() > 0. )
 	{
@@ -247,7 +247,7 @@ void VLombScargle::plotProbabilityLevelsFromToyMC( unsigned int iMCCycles, unsig
 	}
 	TH2D hC( "hC", "", fNFrequencies, fFrequency_min, fFrequency_max, 10000, 0., y_max );
 	
-// shuffle light curves and fill histogram
+	// shuffle light curves and fill histogram
 	for( unsigned int i = 0; i < iMCCycles; i++ )
 	{
 		if( i % 500 == 0 )
@@ -262,7 +262,7 @@ void VLombScargle::plotProbabilityLevelsFromToyMC( unsigned int iMCCycles, unsig
 		}
 	}
 	
-// calculate probability levels
+	// calculate probability levels
 	cout << "calculating probability levels" << endl;
 	
 	TCanvas* c = new TCanvas( "c", "Toy MC probability level calculation (debug histogram)", 400, 500, 500, 500 );
@@ -292,7 +292,7 @@ void VLombScargle::plotProbabilityLevelsFromToyMC( unsigned int iMCCycles, unsig
 			{
 				if( TMath::Abs( iH->GetBinContent( k ) - 1. ) > 1.e-10 )
 				{
-// trials
+					// trials
 					double iProb = TMath::Power( iH->GetBinContent( k ), ( double )fNFrequencies );
 					if( iProb > fProbabilityLevels[i] )
 					{

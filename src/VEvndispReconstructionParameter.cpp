@@ -32,7 +32,7 @@ VEvndispReconstructionParameter::VEvndispReconstructionParameter( vector< ULong6
 	
 	fTel_type_V = i_telType;
 	
-// get set with telescope types
+	// get set with telescope types
 	for( unsigned int i = 0; i < i_telType.size(); i++ )
 	{
 		fTel_type.insert( fTel_type_V[i] );
@@ -58,7 +58,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		VImageParameter* iImageParameter, unsigned short int iLocalTriggerType,
 		VStarCatalogue* iStarCatalogue )
 {
-// sanity checks
+	// sanity checks
 	if( iMeth >= fNMethods )
 	{
 		cout << "VEvndispReconstructionParameter::applyArrayAnalysisCuts error: invalid method number " << iMeth << "\t" << fNMethods << endl;
@@ -83,10 +83,10 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		cout << "APPLY ARRAY ANALYSIS CUTS FOR METHOD " << iMeth << " AND TELESCOPE " << iTel + 1 << ", TYPE " << iTelType << endl;
 	}
 	
-// return value
+	// return value
 	bool iArrayCut = true;
 	
-// eventstatus
+	// eventstatus
 	if( iImageParameter->eventStatus > 0 )
 	{
 		iArrayCut = false;
@@ -96,10 +96,10 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// L2 trigger type (mainly for CTA prod2)
-
-// 9999: any trigger
+	////////////////////////////////////////////
+	// L2 trigger type (mainly for CTA prod2)
+	
+	// 9999: any trigger
 	if( fL2TriggerType[iMeth][iTelType] != 9999 )
 	{
 		bitset< 8 > i_L2TrigType( iLocalTriggerType );
@@ -117,8 +117,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// image size
+	////////////////////////////////////////////
+	// image size
 	if( iImageParameter->size < fSize_min[iMeth][iTelType] || iImageParameter->size <= 0. )
 	{
 		iArrayCut = false;
@@ -129,8 +129,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// number of ntubes (<=!!!)
+	////////////////////////////////////////////
+	// number of ntubes (<=!!!)
 	if( iImageParameter->ntubes <= fLocalNtubes_min[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -141,8 +141,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// number of saturated channels
+	////////////////////////////////////////////
+	// number of saturated channels
 	if( iImageParameter->nlowgain > fLocalNLowGain_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -153,8 +153,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// image length
+	////////////////////////////////////////////
+	// image length
 	if( iImageParameter->length < fLength_min[iMeth][iTelType] || iImageParameter->length > fLength_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -165,8 +165,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// image width
+	////////////////////////////////////////////
+	// image width
 	if( iImageParameter->width < fWidth_min[iMeth][iTelType] || iImageParameter->width > fWidth_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -177,8 +177,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// image distance to camera centre
+	////////////////////////////////////////////
+	// image distance to camera centre
 	if( iImageParameter->dist < fLocalDistance_min[iMeth][iTelType] || iImageParameter->dist > fLocalDistance_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -189,8 +189,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// image alpha
+	////////////////////////////////////////////
+	// image alpha
 	if( iImageParameter->alpha < fLocalAlpha_min[iMeth][iTelType] || iImageParameter->alpha > fLocalAlpha_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -201,8 +201,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// loss cut
+	////////////////////////////////////////////
+	// loss cut
 	if( iImageParameter->loss > fLoss_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -213,14 +213,14 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// cut on successfull LL reconstruction on the edge of the FOV
+	////////////////////////////////////////////
+	// cut on successfull LL reconstruction on the edge of the FOV
 	if( fRunPara )
 	{
 		if( iTel < fRunPara->fLogLikelihoodLoss_min.size() )
 		{
-// (GM) changed d20120405 if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 && iImageParameter->Fitstat >=0 )
-// (GM): fitstat cut: do we have to require a successfull covariance matrix? Not clear...
+			// (GM) changed d20120405 if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 2 && iImageParameter->Fitstat >=0 )
+			// (GM): fitstat cut: do we have to require a successfull covariance matrix? Not clear...
 			if( iImageParameter->loss > fRunPara->fLogLikelihoodLoss_min[iTel] && iImageParameter->Fitstat < 1 )
 			{
 				iArrayCut = false;
@@ -230,7 +230,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 					cout << iImageParameter->Fitstat << endl;
 				}
 			}
-// check number of events at the edge of the FOV
+			// check number of events at the edge of the FOV
 			if( iTel < fRunPara->fLogLikelihoodLoss_min.size() && iTel < fRunPara->fLogLikelihood_Ntubes_min.size() )
 			{
 				if( iImageParameter->loss   >  fRunPara->fLogLikelihoodLoss_min[iTel]
@@ -248,8 +248,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// width/length cut
+	////////////////////////////////////////////
+	// width/length cut
 	if( iImageParameter->length > 0. && iImageParameter->width / iImageParameter->length > fWidthLength_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -260,8 +260,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// image asymmetry
+	////////////////////////////////////////////
+	// image asymmetry
 	if( iImageParameter->asymmetry < fAsym_min[iMeth][iTelType] || iImageParameter->asymmetry > fAsym_max[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -272,8 +272,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// fui: fraction of image under 2D Gauss
+	////////////////////////////////////////////
+	// fui: fraction of image under 2D Gauss
 	if( iImageParameter->fui < fFui_min[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -284,8 +284,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-////////////////////////////////////////////
-// user set: remove image
+	////////////////////////////////////////////
+	// user set: remove image
 	if( !fLocalUseImage[iMeth][iTelType] )
 	{
 		iArrayCut = false;
@@ -295,8 +295,8 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		}
 	}
 	
-/////////////////////////////////////////////
-// MC only: cut on MC energy (use with care!)
+	/////////////////////////////////////////////
+	// MC only: cut on MC energy (use with care!)
 	if( fRunPara->isMC()
 			&& ( ( iImageParameter->MCenergy < fMCEnergy_linTeV_min[iMeth][iTelType] || iImageParameter->MCenergy > fMCEnergy_linTeV_max[iMeth][iTelType] ) ) )
 	{
@@ -309,9 +309,9 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 		
 	}
 	
-////////////////////////////////////////////
-// remove image which is too close to a bright star
-// (use list of image and border pixels)
+	////////////////////////////////////////////
+	// remove image which is too close to a bright star
+	// (use list of image and border pixels)
 	if( iStarCatalogue && fRunPara && iImageParameter->ntubes < fRunPara->fMinStarNTubes )
 	{
 		for( unsigned int i = 0; i < iImageParameter->fImageBorderPixelPosition_x.size(); i++ )
@@ -351,7 +351,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
 */
 void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 {
-// first check if record ID already exists
+	// first check if record ID already exists
 	for( unsigned int i = 0; i < fRecordCounter.size(); i++ )
 	{
 		if( fRecordCounter[i] == iRecordID )
@@ -361,15 +361,15 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 	}
 	fNMethods++;
 	
-// standard values
-
+	// standard values
+	
 	vector< int > i_t;
 	vector< double > i_d;
 	vector< bool > i_b;
 	vector< unsigned int > i_u;
 	
 	fRecordCounter.push_back( iRecordID );
-// standard array reconstruction method is '0'
+	// standard array reconstruction method is '0'
 	fMethodID.push_back( 0 );
 	fNImages_min.push_back( 2 );
 	fAxesAngles_min.push_back( 0. );
@@ -462,7 +462,7 @@ void VEvndispReconstructionParameter::addNewMethod( unsigned int iRecordID )
 		i_d.push_back( 1.e3 );
 	}
 	fLocalAlpha_max.push_back( i_d );
-// C. Duke 20oct06
+	// C. Duke 20oct06
 	i_b.clear();
 	for( unsigned int i = 0; i < fNTel_type; i++ )
 	{
@@ -712,14 +712,14 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 	
 	while( getline( is, iLine ) )
 	{
-// line without '*' in the beginning are ignored
+		// line without '*' in the beginning are ignored
 		if( iLine.size() > 0 && iLine.substr( 0, 1 ) == "*" )
 		{
 			istringstream is_stream( iLine );
 			is_stream >> iTemp;
-// proceed
+			// proceed
 			is_stream >> iTemp;
-// telescope type
+			// telescope type
 			v_temp.clear();
 			if( atoi( iTemp.c_str() ) >= 0 )
 			{
@@ -743,13 +743,13 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 			{
 				t_temp = -1;
 			}
-// unknown telescope types
+			// unknown telescope types
 			if( t_temp == -2 )
 			{
 				continue;
 			}
 			
-// read variable identifier
+			// read variable identifier
 			is_stream >> iTemp;
 			iTemp = VUtilities::upperCase( iTemp );
 			is_stream >> iTemp2;
@@ -778,8 +778,8 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				iTemp5 = "";
 			}
 			
-//////////////////////////////////////////////////////////////////////////////////////////////
-// fadc trace analysis
+			//////////////////////////////////////////////////////////////////////////////////////////////
+			// fadc trace analysis
 			if( iTemp == "FADCANALYSIS" && fRunPara )
 			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
@@ -794,7 +794,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
-// double pass options
+			// double pass options
 			else if( iTemp == "FADCDOUBLEPASS" && fRunPara )
 			{
 				if( iTemp2.size() > 0 )
@@ -827,7 +827,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						}
 					}
 				}
-// set double pass error option
+				// set double pass error option
 				if( iTemp5.size() > 0 )
 				{
 					fRunPara->fDoublePassErrorWeighting2005 = !( bool )atoi( iTemp5.c_str() );
@@ -853,7 +853,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						}
 						else
 						{
-// window 1 and 2 are the same unless stated differently
+							// window 1 and 2 are the same unless stated differently
 							if( i < fRunPara->fsumwindow_2.size() )
 							{
 								fRunPara->fsumwindow_2[i] = atoi( iTemp2.c_str() );
@@ -898,7 +898,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
-// image cleaning parameters
+			// image cleaning parameters
 			else if( iTemp == "IMAGECLEANINGMETHOD" && fRunPara )
 			{
 				for( unsigned int i = 0; i < fTel_type_V.size(); i++ )
@@ -1068,19 +1068,19 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				continue;
 			}
 			
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// A NEW RECORD STARTS ALWAYS WITH 'RECMETHOD'
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
+			/////////////////////////////////////////////////
+			/////////////////////////////////////////////////
+			/////////////////////////////////////////////////
+			// A NEW RECORD STARTS ALWAYS WITH 'RECMETHOD'
+			/////////////////////////////////////////////////
+			/////////////////////////////////////////////////
 			if( iTemp == "RECMETHOD" )
 			{
 				m_temp = fNMethods;
-// reset all parameters for this method number
+				// reset all parameters for this method number
 				addNewMethod( m_temp );
 				fMethodID[m_temp] = atoi( iTemp2.c_str() );
-// hardwired: allowed array reconstruction numbers
+				// hardwired: allowed array reconstruction numbers
 				if( fMethodID[m_temp] != 0 && fMethodID[m_temp] != 3 && fMethodID[m_temp] != 4
 						&& fMethodID[m_temp] != 5 && fMethodID[m_temp] != 6 && fMethodID[m_temp] != 7 && fMethodID[m_temp] != 8 && fMethodID[m_temp] != 9 )
 				{
@@ -1091,7 +1091,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				}
 				continue;
 			}
-// check if a first record was created
+			// check if a first record was created
 			if( m_temp < 0 || fMethodID.size() == 0 )
 			{
 				cout << "VEvndispReconstructionParameter::read_arrayAnalysisCuts error: no valid set of cuts found " << endl;
@@ -1188,7 +1188,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						fSize_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
 					}
 			}
-// trigger type (used e.g. in CTA prod2)
+			// trigger type (used e.g. in CTA prod2)
 			else if( iTemp == "L2TRIGGERTYPE" )
 			{
 				if( t_temp < 0 ) for( unsigned int i = 0; i < fL2TriggerType[m_temp].size(); i++ )
@@ -1299,7 +1299,7 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						fLocalAlpha_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
 					}
 			}
-// C. Duke 20oct06 new record in cut file
+			// C. Duke 20oct06 new record in cut file
 			else if( iTemp == "USEIMAGE" )
 			{
 				if( t_temp >= 0 )                 // use defaults for telescope number < 0

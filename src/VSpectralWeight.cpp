@@ -51,7 +51,7 @@ void VSpectralWeight::calculateMCFluxConstant()
 		fMCFluxConstant = 1.;
 		return;
 	}
-// solid angle
+	// solid angle
 	double iS = 2. * TMath::Pi() * ( 1. - cos( fMCMaxConeAngle_deg * TMath::DegToRad() ) );
 	
 	double iP = TMath::Power( fMCMaxEnergy_TeV_Lin, -1.*fMCSpectralIndex + 1 ) - TMath::Power( fMCMinEnergy_TeV_Lin, -1.*fMCSpectralIndex + 1 );
@@ -100,7 +100,7 @@ void VSpectralWeight::setSpectralIndex( double iG, bool iPrint )
 */
 double VSpectralWeight::getSpectralWeight( double iE_TeV_lin )
 {
-// weighting for IRFs
+	// weighting for IRFs
 	if( fEnergySpectrum == 0 )
 	{
 		if( fabs( fIndex - fMCSpectralIndex ) < 0.01 )
@@ -112,7 +112,7 @@ double VSpectralWeight::getSpectralWeight( double iE_TeV_lin )
 			return fSpectralWeightAlpha * TMath::Power( iE_TeV_lin, -1.*fIndex + fMCSpectralIndex );
 		}
 	}
-// exact weighting for CR spectra (arbitrary function)
+	// exact weighting for CR spectra (arbitrary function)
 	else
 	{
 		double d = fMCFluxConstant * TMath::Power( iE_TeV_lin, -1.*fMCSpectralIndex );

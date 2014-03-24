@@ -13,17 +13,17 @@ class VCTASensitivityRequirements
 {
 	private:
 	
-// TeV to erg conversion factor:
+		// TeV to erg conversion factor:
 		static double sce()
 		{
 			return 1.6022;
 		}
-// m^-2 to cm^-2 conversion factor:
+		// m^-2 to cm^-2 conversion factor:
 		static double sca()
 		{
 			return 1.e-4;
 		}
-// Total conversion factor
+		// Total conversion factor
 		static double sc()
 		{
 			return sce() * sca();
@@ -46,7 +46,7 @@ class VCTASensitivityRequirements
 			return sce() * E;
 		}
 		
-// South, 50 h:
+		// South, 50 h:
 		static double f50( double x )
 		{
 			return 10.00 * pow( x / 1600., 1.50 ) +
@@ -154,7 +154,7 @@ class VCTASensitivityRequirements
 			return fnsp5( E ); // [Crab Units]
 		}
 		
-// South, 0.5 h:
+		// South, 0.5 h:
 		static double f05( double x )
 		{
 			return 1000.*pow( x / 1400., 1.58 ) +
@@ -182,7 +182,7 @@ class VCTASensitivityRequirements
 			return fsp05( E ); // [Crab Units]
 		}
 		
-// North, 0.5 h:
+		// North, 0.5 h:
 		static double fn05( double x )
 		{
 			return 11000.*pow( x / 1400., 1.68 ) +
@@ -209,9 +209,9 @@ class VCTASensitivityRequirements
 			return fnsp05( E ); // [Crab Units]
 		}
 		
-// Goal sensitivities, only derived for 50 hours observation time:
-
-// Goal South, 50 h:
+		// Goal sensitivities, only derived for 50 hours observation time:
+		
+		// Goal South, 50 h:
 		static double fd50( double x )
 		{
 			return 6.50 * pow( x / 1600., 1.50 ) +
@@ -238,7 +238,7 @@ class VCTASensitivityRequirements
 			return fdes50( E ); // [Crab Units]
 		}
 		
-// Goal North, 50 h:
+		// Goal North, 50 h:
 		static double fnd50( double x )
 		{
 			return 100.0 * pow( x / 1600., 1.74 ) +

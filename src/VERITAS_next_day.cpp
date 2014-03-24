@@ -36,8 +36,8 @@ int main( int argc, char* argv[] )
 	bool fDebug = false;
 	bool fMergeFITSFiles = true;
 	
-/////////////////////////////////////////
-// read command line parameters
+	/////////////////////////////////////////
+	// read command line parameters
 	if( argc == 1 )
 	{
 		help();
@@ -55,8 +55,8 @@ int main( int argc, char* argv[] )
 		fDebug = true;
 	}
 	
-/////////////////////////////////////////
-// calculate total fluxes and upper limits
+	/////////////////////////////////////////
+	// calculate total fluxes and upper limits
 	double fMinEnergy = 0.2;
 	double fGamma = 2.49;
 	double iFlux , iFluxE, iFluxUL, iFluxInCU, iFluxULinCU , var1, var2;
@@ -72,7 +72,7 @@ int main( int argc, char* argv[] )
 	flux->setSignificanceParameters( -5., -5. );
 	flux->calculateFluxes( fMinEnergy, false );
 	//flux->printResults();
-//calculate upper limits for all runs even when significance >= 3
+	//calculate upper limits for all runs even when significance >= 3
 	VFluxCalculation* fluxUL = new VFluxCalculation( ifile );
 	if( fluxUL->IsZombie() )
 	{
@@ -83,14 +83,14 @@ int main( int argc, char* argv[] )
 	fluxUL->calculateFluxes( fMinEnergy, false );
 	
 	
-// read run list
+	// read run list
 	VAnalysisUtilities a;
 	a.openFile( fDataFile, -1, true, fDebug );
 	if( !a.IsZombie() )
 	{
 		CRunSummary* c = a.getRunSummaryTree( -1 );
 		
-// open output stream
+		// open output stream
 		ofstream fResults;
 		fResults.open( ( fOUTFile + ".dat" ).c_str() );
 		if( fResults && c )
@@ -193,9 +193,9 @@ int main( int argc, char* argv[] )
 			}
 		}
 		
-/////////////////////////////////////////
-// convert to fits
-
+		/////////////////////////////////////////
+		// convert to fits
+		
 		cout << "---------Start production of FITS ouput file ------" << endl;
 		VFITS f( fDataFile, fOUTFile + ".fits" , fTargetName, fMergeFITSFiles, fDebug );
 		f.writeCumSignificance( fDebug );

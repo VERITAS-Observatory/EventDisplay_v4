@@ -39,7 +39,7 @@ int main( int argc, char* argv[] )
 	
 	string ieff = argv[1];
 	string ioffile = argv[2];
-// energy threshold
+	// energy threshold
 	double fEnergyThreshold = atof( argv[3] );
 	cout << "energy threshold: " << fEnergyThreshold << " TeV" << endl;
 	if( fEnergyThreshold < 1.e-2 )
@@ -83,7 +83,7 @@ int main( int argc, char* argv[] )
 	}
 	CEffArea* c = new CEffArea( t );
 	
-// Crab Nebula Spectra
+	// Crab Nebula Spectra
 	vector< unsigned int > fID;
 	fID.push_back( 1 );                           // Whipple
 	fID.push_back( 5 );                           // HEGRA
@@ -104,14 +104,14 @@ int main( int argc, char* argv[] )
 		fESpecFun.push_back( fESpec );
 	}
 	
-// error checks
+	// error checks
 	if( fESpecFun.size() != fID.size() )
 	{
 		cout << "Error: vector mismatch - check code" << endl;
 		exit( -1 );
 	}
 	
-// print everything
+	// print everything
 	for( unsigned int i = 0; i < fESpecFun.size(); i++ )
 	{
 		if( fESpecFun[i] )
@@ -120,13 +120,13 @@ int main( int argc, char* argv[] )
 		}
 	}
 	
-// rate calculator
+	// rate calculator
 	VMonteCarloRateCalculator* fMCR = new VMonteCarloRateCalculator();
 	
 	cout << endl;
 	cout << "reading " << c->fChain->GetEntries() << " effective areas " << endl;
 	
-// loop over all effective areas and calculate expected rates
+	// loop over all effective areas and calculate expected rates
 	unsigned int iN = c->fChain->GetEntries();
 	for( unsigned int i = 0; i < iN; i++ )
 	{
@@ -155,7 +155,7 @@ int main( int argc, char* argv[] )
 			feffectivearea.push_back( c->eff[e] );
 		}
 		
-// hardwire Whipple spectrum (much faster than outer functino call)
+		// hardwire Whipple spectrum (much faster than outer functino call)
 		nrates = 1;
 		MCrate[0] = fMCR->getMonteCarloRate( fenergy, feffectivearea, -2.440, 3.250e-11, 1., fEnergyThreshold, 1.e7, bDebug );
 		/*        for( unsigned int t = 0; t < fESpecFun.size(); t++ )

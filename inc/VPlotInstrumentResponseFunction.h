@@ -29,23 +29,23 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 		bool   fDebug;
 		string fName;
 		
-// effective area data
+		// effective area data
 		vector< VInstrumentResponseFunctionReader* > fData;
 		
-// resolution fitter
+		// resolution fitter
 		string fFunction_fitResolution;
 		double fXmin_fitResolution;
 		double fXmax_fitResolution;
 		TF1*   fTF1_fitResolution;
 		
-// last plotted graph
+		// last plotted graph
 		TGraphErrors* gLastPlottedGraph;
 		
-// canvas size
+		// canvas size
 		int    fCanvasSize_X;
 		int    fCanvasSize_Y;
 		
-// general resolution plotter
+		// general resolution plotter
 		TCanvas* plotResolution( string iName, string iCanvasTitle, string iYTitle,
 								 double iYmin, double iYmax, string iResolutionTreeName, string iXaxis );
 		TCanvas* plotResolution2D( unsigned int iDataSetID, string iName, string iCanvasTitle, string iYTitle,

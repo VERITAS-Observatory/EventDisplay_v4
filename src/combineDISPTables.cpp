@@ -57,7 +57,7 @@ int main( int argc, char* argv[] )
 	}
 	is.close();
 	
-// new disp table (merger product)
+	// new disp table (merger product)
 	TFile* fTot = new TFile( fOutFile.c_str(), "RECREATE" );
 	if( fTot->IsZombie() )
 	{
@@ -68,8 +68,8 @@ int main( int argc, char* argv[] )
 	fData->SetName( "dispTable" );
 	fData->initialize( false );
 	
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// loop over all files
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// loop over all files
 	for( unsigned int i = 0; i < fInputFile.size(); i++ )
 	{
 		cout << "now reading " << fInputFile[i] << endl;
@@ -79,7 +79,7 @@ int main( int argc, char* argv[] )
 			cout << "error reading input file " << fInputFile[i] << endl;
 			exit( -1 );
 		}
-// read disp table from this file
+		// read disp table from this file
 		VDispTableReader* a = ( VDispTableReader* )f.Get( "dispTable" );
 		if( !a )
 		{
@@ -93,7 +93,7 @@ int main( int argc, char* argv[] )
 			cout << "error: no tree in disp table in " << fInputFile[i] << endl;
 			exit( -1 );
 		}
-// loop over all file entries
+		// loop over all file entries
 		for( int j = 0; j < t->GetEntries(); j++ )
 		{
 			t->GetEntry( j );
@@ -110,7 +110,7 @@ int main( int argc, char* argv[] )
 		}
 		f.Close();
 	}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	fTot->cd();
 	fData->Write();
 	cout << "==================================================================================" << endl;

@@ -151,7 +151,7 @@ unsigned int VDBRunInfo::readRunDQM( string iDBserver, int run_number , unsigned
 			return config_mask;
 		}
 		
-// Check if the mask is 0
+		// Check if the mask is 0
 		if( ConfigMaskDQM == 0 )
 		{
 			return config_mask;
@@ -220,7 +220,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	double iStarttime = 0.;
 	double iStopptime = 0.;
 	
-// get date
+	// get date
 	if( db_row->GetField( 4 ) )
 	{
 		string iTemp = db_row->GetField( 4 );
@@ -340,8 +340,8 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 		imjd = 0.;
 	}
 	fDataStoppTimeMJD  = imjd;
-// calculate start and stop time
-
+	// calculate start and stop time
+	
 	if( db_row->GetField( 1 ) )
 	{
 		fRunType = db_row->GetField( 1 );
@@ -395,7 +395,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 		fWobbleNorth = 0.;
 		fWobbleEast = -0.5;
 	}
-// get config mask
+	// get config mask
 	if( db_row->GetField( 10 ) )
 	{
 		fConfigMask = ( unsigned int )( atoi( db_row->GetField( 10 ) ) );
@@ -465,7 +465,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 		fTelToAna = 1234;
 	}
 	
-// get source coordinates
+	// get source coordinates
 	sprintf( c_query, "select * from tblObserving_Sources where source_id like convert( _utf8 \'%s\' using latin1)", fTargetName.c_str() );
 	if( !my_connection.make_query( c_query ) )
 	{
@@ -561,8 +561,8 @@ vector< unsigned int > VDBRunInfo::getLaserRun( string iDBserver, unsigned int i
 	fLaserRunID.assign( iNTel, 0 );
 	for( unsigned int t = 0; t < iNTel; t++ )
 	{
-// check if this run is excluded from group
-// also check if telescope is within the config mask (taking DQM cuts into account)
+		// check if this run is excluded from group
+		// also check if telescope is within the config mask (taking DQM cuts into account)
 		for( unsigned int i = 0; i < iLaserList.size(); i++ )
 		{
 			bitset< 8 > ibit( iLaserExclude[i] );

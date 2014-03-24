@@ -42,7 +42,7 @@ void VPlotPPUT::getMergedFigureOfMerits( VSiteData* iSite, float* fom, float* fo
 		return;
 	}
 	
-// calculate figure of merrit:
+	// calculate figure of merrit:
 	VPlotWPPhysSensitivity b;
 	b.setCTARequirements( iSite->fSiteRequirementID );
 	cout << iSite->fSiteName << "\t" << iDirectionString << endl;
@@ -63,7 +63,7 @@ void VPlotPPUT::setPPUTRange( float pput_min, float pput_max )
 
 void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bPlotPredictions )
 {
-// linear fits are valid in these ranges
+	// linear fits are valid in these ranges
 	double alt_min = 1300.;
 	double alt_max = 4000.;
 	double b_min = 0.;
@@ -98,7 +98,7 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 		fSite[i]->print();
 	}
 	
-// plotting preparation
+	// plotting preparation
 	TCanvas* cPPUT_height = new TCanvas( "cEH", "PPUT vs height", 10, 10, 600, 500 );
 	cPPUT_height->SetGridx( 0 );
 	cPPUT_height->SetGridy( 0 );
@@ -137,10 +137,10 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 	}
 	
 	
-////////////////////////////////////////////////////
-// PPUT analysis
-////////////////////////////////////////////////////
-
+	////////////////////////////////////////////////////
+	// PPUT analysis
+	////////////////////////////////////////////////////
+	
 	TGraph2DErrors* iSens_vs_height_vs_bfield = new TGraph2DErrors( 1 );
 	
 	float fom = 0.;
@@ -148,7 +148,7 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 	
 	int z = 0;
 	
-// loop over all sites
+	// loop over all sites
 	for( unsigned int i = 0; i < fSite.size(); i++ )
 	{
 		if( !fSite[i] )
@@ -159,9 +159,9 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 		{
 			continue;
 		}
-////////////////////
-// define graphs
-
+		////////////////////
+		// define graphs
+		
 		TGraphAsymmErrors* iSens_vs_height = new TGraphAsymmErrors( 1 );
 		iSens_vs_height->SetMarkerStyle( 20 + i );
 		iSens_vs_height->SetMarkerSize( 1.5 );
@@ -190,9 +190,9 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 		iSens_vs_bfield_S->SetMarkerSize( 1.5 );
 		iSens_vs_bfield_S->SetLineColor( 3 );
 		
-///////////////////
-// north+south pointing average
-
+		///////////////////
+		// north+south pointing average
+		
 		getMergedFigureOfMerits( fSite[i], &fom, &fom_error );
 		
 		iSens_vs_height->SetPoint( 0, fSite[i]->fSite_asl, fom );
@@ -201,9 +201,9 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 		iSens_vs_bfield->SetPoint( 0, fSite[i]->fSite_B_dB, fom );
 		iSens_vs_bfield->SetPointError( 0, 0., 0., fom_error, fom_error );
 		
-///////////////////
-// north pointing
-
+		///////////////////
+		// north pointing
+		
 		getMergedFigureOfMerits( fSite[i], &fom, &fom_error, "_0deg" );
 		
 		iSens_vs_height_N->SetPoint( 0, fSite[i]->fSite_asl, fom );
@@ -219,9 +219,9 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 			z++;
 		}
 		
-///////////////////
-// south pointing
-
+		///////////////////
+		// south pointing
+		
 		getMergedFigureOfMerits( fSite[i], &fom, &fom_error, "_180deg" );
 		
 		iSens_vs_height_S->SetPoint( 0, fSite[i]->fSite_asl, fom );
@@ -249,8 +249,8 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 		printCanvas( cPPUT_B, "-pput-vs-bfield.eps" );
 	}
 	
-//////////////////////////////
-// fit 2D plane and plot
+	//////////////////////////////
+	// fit 2D plane and plot
 	TCanvas* cB2D = new TCanvas( "cEB2D", "FOM vs altitude vs bfield", 810, 10, 600, 500 );
 	iSens_vs_height_vs_bfield->SetTitle( "" );
 	
@@ -264,11 +264,11 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 	cout << "Chi2 = " << f2D->GetChisquare() << ", NDF = " << f2D->GetNDF() << endl;
 	
 	
-// 2D histogram prediction
+	// 2D histogram prediction
 	cB2D->cd();
 	cB2D->SetRightMargin( 0.15 );
 	cB2D->SetLeftMargin( 0.12 );
-//   TH2F *h2DP = new TH2F( "h2DP", "", 1000, alt_min, alt_max, b_min, b_max );
+	//   TH2F *h2DP = new TH2F( "h2DP", "", 1000, alt_min, alt_max, b_min, b_max );
 	TH2F* h2DP = ( TH2F* )f2D->CreateHistogram();
 	if( h2DP )
 	{
@@ -291,14 +291,14 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 	}
 	printCanvas( cB2D, "-2D-PPUT.eps" );
 	
-// plot predictions into the 1D plots
+	// plot predictions into the 1D plots
 	if( bPlotPredictions && cPPUT_height && cPPUT_B )
 	{
 	
 		for( unsigned int i = 0; i < fSite.size(); i++ )
 		{
 			cPPUT_height->cd();
-// fit doesn't work at very low altitude
+			// fit doesn't work at very low altitude
 			if( fSite[i]->fSite_asl < 1300. )
 			{
 				continue;

@@ -40,8 +40,8 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 		tpars->Branch( "Time",  &time,  "time/D" );
 	}
 	tpars->Branch( "eventType", &eventType, "eventType/s" );
-// tpars tree have same number of events as showerpars tree:
-// showerpars->AddFriend( "Tel_3/tpars", "3224.v3.root" );
+	// tpars tree have same number of events as showerpars tree:
+	// showerpars->AddFriend( "Tel_3/tpars", "3224.v3.root" );
 	if( fShortTree < 1 )
 	{
 		tpars->Branch( "eventNumber",  &eventNumber,  "eventNumber/I" );
@@ -60,12 +60,12 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 		tpars->Branch( "fncluster_uncleaned", &fncluster_uncleaned, "fncluster_uncleaned/I" );
 	}
 	
-// telescope position in shower coordinates
-//tpars->Branch( "Tel_x_SC", &Tel_x_SC, "Tel_x_SC/D" );
-//tpars->Branch( "Tel_y_SC", &Tel_y_SC, "Tel_y_SC/D" );
-//tpars->Branch( "Tel_z_SC", &Tel_z_SC, "Tel_z_SC/D" );
-
-// MC parameters
+	// telescope position in shower coordinates
+	//tpars->Branch( "Tel_x_SC", &Tel_x_SC, "Tel_x_SC/D" );
+	//tpars->Branch( "Tel_y_SC", &Tel_y_SC, "Tel_y_SC/D" );
+	//tpars->Branch( "Tel_z_SC", &Tel_z_SC, "Tel_z_SC/D" );
+	
+	// MC parameters
 	if( iMC && fShortTree < 1 )
 	{
 		tpars->Branch( "MCprim", &MCprimary, "MCprimary/s" );
@@ -80,7 +80,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 		tpars->Branch( "MCTel_Yoff", &MCTel_Yoff, "MCTel_Yoff/F" );
 	}
 	
-// image parameters
+	// image parameters
 	if( fShortTree < 1 )
 	{
 		tpars->Branch( "meanPed_Image", &fmeanPed_Image, "meanPed_Image/F" );
@@ -150,7 +150,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 		tpars->Branch( "tchisq_x", &tchisq_x, "tchisq_x/F" );
 	}
 	
-// muon parameters (Iterative fit muon analysis)
+	// muon parameters (Iterative fit muon analysis)
 	if( fShortTree < 1 )
 	{
 		tpars->Branch( "muonX0", &muonX0, "muonX0/F" );
@@ -165,7 +165,7 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 		
 	}
 	
-// muon parameters (Hough transform)
+	// muon parameters (Hough transform)
 	if( fShortTree < 1 )
 	{
 	
@@ -178,8 +178,8 @@ void VImageParameter::initTree( string iName, string iTitle, bool iMC, bool iLL 
 		
 	}
 	
-// log likelihood fit errors/results
-
+	// log likelihood fit errors/results
+	
 	tpars->Branch( "Fitstat", &Fitstat, "Fitstat/I" );
 	if( iLL )
 	{
@@ -222,7 +222,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 		MJD = 0;
 		eventStatus = 0;
 		
-// telescope parameters
+		// telescope parameters
 		fimagethresh = 4.;
 		fborderthresh = 2.;
 		fsumfirst = 8;
@@ -230,13 +230,13 @@ void VImageParameter::reset( unsigned int resetLevel )
 		fsumwindow_2 = 5;
 		fLocalTrigger = 0;
 		
-// telescope positions in shower coordinates
+		// telescope positions in shower coordinates
 		Tel_x_SC = 0.;
 		Tel_y_SC = 0.;
 		Tel_z_SC = 0.;
 	}
 	
-// MC parameters
+	// MC parameters
 	MCprimary = 0;
 	MCenergy = 0.;
 	MCxcore = 0.;
@@ -247,7 +247,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 	MCLocalDelayedTriggerTime = 0.;
 	MCTel_Xoff = 0.;
 	MCTel_Yoff = 0.;
-//image parameters
+	//image parameters
 	fTrig_type = 0;
 	f_d = 0.;
 	f_s = 0.;
@@ -281,7 +281,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 	sinphi = 0.;
 	cosphi = 0.;
 	asymmetry = 0.;
-// Heike's image cleaning
+	// Heike's image cleaning
 	fncluster_cleaned = 0;
 	fncluster_uncleaned = 0;
 	
@@ -309,7 +309,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 		frac[i] = 0.;
 	}
 	
-// timing parameters
+	// timing parameters
 	tint_x = 0.;
 	tgrad_x = 0.;
 	tint_dx = 0.;
@@ -319,7 +319,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 	tmax = 0.;
 	tmean = 0.;
 	
-// log likelihood fit parameters and erros
+	// log likelihood fit parameters and erros
 	ntfit = 0;
 	Fitmin = 0.;
 	Fitedm = 0.;
@@ -341,7 +341,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 	signal = 0.;
 	dsignal = 0.;
 	
-// Iterative fit muon analysis
+	// Iterative fit muon analysis
 	muonX0 = 0.;
 	muonY0 = 0.;
 	muonXC = 0.;
@@ -352,7 +352,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 	muonIPCorrectedSize = 0.;
 	muonValid = 0;
 	
-// Hough transform muon parameters
+	// Hough transform muon parameters
 	houghAP = 0.;
 	houghTD = 0.;
 	houghNpix = 0;
@@ -372,7 +372,7 @@ void VImageParameter::printParameters()
 
 bool VImageParameter::hasImage()
 {
-// (GM) contains now number of bad channels   if( bad != 0 ) return false;
+	// (GM) contains now number of bad channels   if( bad != 0 ) return false;
 	if( ntubes > 0 )
 	{
 		return true;

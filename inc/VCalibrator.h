@@ -45,9 +45,9 @@ class VCalibrator : public VImageBaseAnalyzer
 		vector<TH1F* > htoff;
 		vector<TProfile* > htoff_vs_sum;
 		
-// average Tzero calculation
+		// average Tzero calculation
 		vector< TFile* > fTZeroOutFile;
-// one histogram per telescope and channel
+		// one histogram per telescope and channel
 		vector< vector< TH1F* > > htzero;
 		
 		vector< string > fPedFileNameC;

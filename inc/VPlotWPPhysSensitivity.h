@@ -45,11 +45,11 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		bool fPlotCTARequirementGoals;
 		VCTARequirements* fPlotCTARequirements;
 		
-// FOM variables
+		// FOM variables
 		double fSensitivityFOM;
 		double fSensitivityFOM_error;
 		
-// projected sensitvity plots
+		// projected sensitvity plots
 		vector< double >  fProjectionEnergy_min_logTeV;
 		vector< double >  fProjectionEnergy_max_logTeV;
 		map< string, vector< TGraphAsymmErrors* > > fProjectionSensitivityvsCameraOffset;

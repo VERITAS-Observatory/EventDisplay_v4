@@ -98,26 +98,26 @@ class VAnaSumRunParameterDataClass
 		
 		string fEffectiveAreaFile;                // file with effective areas, use NOFILE if not avaible
 		
-// all models
+		// all models
 		unsigned int fNBoxSmooth;
 		
-// ON/OFF MODEL
+		// ON/OFF MODEL
 		double fOO_alpha;
 		
-// RING BACKGROUND MODEL
+		// RING BACKGROUND MODEL
 		double fRM_RingRadius;                    // ring radius [deg]
 		double fRM_RingWidth;                     // ring width [deg]
 		
-// REFLECTED REGION MODEL
+		// REFLECTED REGION MODEL
 		double fRE_distanceSourceOff;             // minimal distance of off source regions in number of background regions from the source region
 		int fRE_nMinoffsource;                    // minmum number of off source regions (default 3)
 		int fRE_nMaxoffsource;                    // maximum number of off source regions (default 7)
 		
-// FOV BACKGROUND MODEL
+		// FOV BACKGROUND MODEL
 		double fFOV_SourceRadius;                 //!< source radius [deg] (to be use to exclude the source)
 		double fFOV_offdist;                      //!< minimum distance of background events from source region [deg]
 		
-// TEMPLATE MODEL
+		// TEMPLATE MODEL
 		double fTE_mscw_min;
 		double fTE_mscw_max;
 		double fTE_mscl_min;
@@ -148,7 +148,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		
 	public:
 	
-// bin sizes and sky map sizes
+		// bin sizes and sky map sizes
 		double fTimeIntervall;                    // length of time intervalls in seconds for rate plots and short term histograms
 		double fSkyMapBinSize;                    // bin size for sky maps [deg]
 		double fSkyMapBinSizeUC;                  // bin size for uncorrelated sky maps [deg]
@@ -157,7 +157,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		double fSkyMapSizeYmin;                   // [deg]
 		double fSkyMapSizeYmax;                   // [deg]
 		
-// position relative to which 1D histograms are filled
+		// position relative to which 1D histograms are filled
 		double fTargetShiftNorth;
 		double fTargetShiftWest;
 		double fTargetShiftRAJ2000;               // [deg]
@@ -169,7 +169,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		double fSkyMapCentreDecJ2000;             // [deg]
 		
 		
-// energy reconstruction
+		// energy reconstruction
 		double fEnergyReconstructionSpectralIndex;
 		unsigned int fEnergyReconstructionMethod;
 		double fEnergySpectrumBinSize;
@@ -183,25 +183,25 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		bool fModel3D;
 		int fFrogs;
 		
-// vector with all run parameters
+		// vector with all run parameters
 		vector< VAnaSumRunParameterDataClass > fRunList;
-// map with all run parameters (sorted after onrun)
+		// map with all run parameters (sorted after onrun)
 		map< int, VAnaSumRunParameterDataClass > fMapRunList;
 		
-// background model
+		// background model
 		int    fTMPL_fBackgroundModel;
 		
-// RING BACKGROUND MODEL
+		// RING BACKGROUND MODEL
 		double fTMPL_RM_RingRadius;                  // ring radius [deg]
 		double fTMPL_RM_RingWidth;                   // ring width [deg]
 		
-// REFLECTED REGION MODEL
+		// REFLECTED REGION MODEL
 		double fTMPL_RE_distanceSourceOff;          // minimal distance of off source regions in number of background regions from the source region
 		int    fTMPL_RE_nMinoffsource;              // minmum number of off source regions (default 3)
 		int    fTMPL_RE_nMaxoffsource;              // maximum number of off source regions (default 7)
 		bool   fTMPL_RE_RemoveOffRegionsRandomly;   // removal of excess off regions
 		
-// analysis TMPL file
+		// analysis TMPL file
 		string fTMPL_CutFile;
 		double fTMPL_SourceRadius;
 		double fTMPL_maxradius;
@@ -210,7 +210,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		
 		vector< VAnaSumRunParameterListOfExclusionRegions* > fExclusionRegions;   // list of exclusion regions
 		
-// star exclusion regions
+		// star exclusion regions
 		string fStarCatalogue;
 		double fStarMinBrightness;
 		string fStarBand;
