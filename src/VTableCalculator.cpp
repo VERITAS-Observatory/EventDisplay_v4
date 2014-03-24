@@ -208,7 +208,7 @@ bool VTableCalculator::createMedianApprox( int i, int j )
 	return true;
 }
 
-bool VTableCalculator::create1DHistogram( int i, int j )
+bool VTableCalculator::create1DHistogram( int i, int j, double w_first_event )
 {
 	if( i >= 0 && j >= 0 && i < ( int )Oh.size() && j < ( int )Oh[i].size() && !Oh[i][j] )
 	{
@@ -226,7 +226,34 @@ bool VTableCalculator::create1DHistogram( int i, int j )
 		double id1 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 );
 		double id2 = hMedian->GetYaxis()->GetBinLowEdge( j + 1 ) + hMedian->GetYaxis()->GetBinWidth( j + 1 );
 		sprintf( histitle, "%.2f < log10 size < %.2f, %.1f < r < %.1f (%s)", is1, is2, id1, id2, fHName_Add.c_str() );
-		Oh[i][j] = new TH1F( hisname, histitle, HistBins, fBinning1DXlow, fBinning1DXhigh );
+		
+		int n_bins   = HistBins;
+		float x_low  = fBinning1DXlow;
+		float x_high = fBinning1DXhigh;
+		//////////////////////////////////////////////////
+		// set adaptive binning for filling of energies
+		// note: reason is memory problems (mainly for CTA)
+		// this is a crude fix to the problem
+		// something better should be found
+		if( fEnergy )
+		{
+			x_low = w_first_event / 100.;
+			if( x_low < fBinning1DXlow )
+			{
+				x_low = fBinning1DXlow;
+			}
+			x_high = w_first_event * 100.;
+			// <1 TeV: 5 GeV binning
+			n_bins = int( ( x_high - x_low ) / 0.005 );
+			// >1 TeV: 25 GeV binning
+			if( w_first_event > 1. )
+			{
+				x_low  = fBinning1DXlow;
+				x_high = fBinning1DXhigh;
+				n_bins = int( ( x_high - x_low ) / 0.025 );
+			}
+		}
+		Oh[i][j] = new TH1F( hisname, histitle, n_bins, x_low, x_high );
 		Oh[i][j]->SetXTitle( fName.c_str() );
 	}
 	else
@@ -592,21 +619,36 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 				{
 					if( fWrite1DHistograms && ir < ( int )Oh[is].size() )
 					{
-						if( !Oh[is][ir] ) if( !create1DHistogram( is, ir ) )
+						if( !Oh[is][ir] ) if( !create1DHistogram( is, ir, w[tel] ) )
 							{
 								continue;
 							}
 						// fill width/length/energy into a 1D and 2D histogram
 						// (chi2 is here an external weight (from e.g. spectral weighting))
+						//============================================================================================================
+						// PRELIMINARY_START
+						if( fEnergy )
+						{
+							if( w[tel] < Oh[is][ir]->GetXaxis()->GetXmin() || w[tel] > Oh[is][ir]->GetXaxis()->GetXmax() )
+							{
+								cout << "Energy table filling: value (" << w[tel] << ") out of range:";
+								cout << Oh[is][ir]->GetXaxis()->GetXmin() << "\t" << Oh[is][ir]->GetXaxis()->GetXmax() << endl;
+							}
+						}
+						// PRELIMINARY_END
+						//============================================================================================================
 						Oh[is][ir]->Fill( w[tel], chi2 );
 					}
 					if( fFillMedianApproximations && ir < ( int )OMedian.size() )
 					{
-						if( !OMedian[is][ir] ) if( !createMedianApprox( is, ir ) )
+						if( !OMedian[is][ir] )
+						{
+							// weight is ignored in the approx median calculation
+							if( !createMedianApprox( is, ir ) )
 							{
 								continue;
 							}
-						// weight is ignored in the approx median calculation
+						}
 						OMedian[is][ir]->fill( w[tel] );
 					}
 					hMean->Fill( i_logs, r[tel], w[tel] * chi2 );
