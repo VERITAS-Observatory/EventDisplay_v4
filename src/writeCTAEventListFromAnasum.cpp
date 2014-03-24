@@ -398,7 +398,7 @@ int main( int argc, char* argv[] )
 	
 	// Establish Reference MJD (0.0 in MET time)
 	// This is defined by:
-	//   "The beginning of the UTC day of the earliest run in the database" 
+	//   "The beginning of the UTC day of the earliest run in the database"
 	//
 	// Earliest Run: 30576 , 2006-05-01, UTC 08:28
 	int    mjdrefi = 0   ; // day in MJD when MET is 0.0  (integer part only)

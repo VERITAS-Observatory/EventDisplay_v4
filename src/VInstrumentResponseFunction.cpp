@@ -71,6 +71,10 @@ bool VInstrumentResponseFunction::initialize( string iName, string iType, unsign
 	cout << ", spectral index bins: " << fVSpectralIndex.size() << endl;
 	cout << " ze=" << iZe << ", wobble (" << iXoff << ", " << iYoff << "), ";
 	cout << "noise=" << iNoise << ", pedvars=" << iPedvars;
+	if( fVSpectralIndex.size() == 1 )
+	{
+		cout << ", spectral index " << fVSpectralIndex[0];
+	}
 	cout << ")" << endl;
 	
 	char hname[800];

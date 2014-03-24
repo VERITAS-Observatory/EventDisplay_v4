@@ -21,6 +21,7 @@
 
 #include "CEffArea.h"
 #include "VAnalysisUtilities.h"
+#include "VGammaHadronCuts.h"
 #include "VHistogramUtilities.h"
 #include "VInstrumentResponseFunctionData.h"
 #include "VPlotUtilities.h"
@@ -33,6 +34,8 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 	
 		bool   fIsZombie;
 		bool   fDebug;
+		
+		int    fGammaHadronCuts_directionCut_selector;
 		
 		bool                             calculateCutEfficiencies();
 		TGraphAsymmErrors*               calculateEffectiveAreaRatios( TGraphAsymmErrors* g0, TGraphAsymmErrors* g1 );

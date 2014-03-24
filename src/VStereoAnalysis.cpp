@@ -760,7 +760,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	}
 	else
 	{
-	fDeadTime[fHisCounter]->calculateDeadTime();
+		fDeadTime[fHisCounter]->calculateDeadTime();
 	}
 	fDeadTime[fHisCounter]->printDeadTime();
 	
@@ -841,9 +841,9 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		if( fTreeWithEventsForCtools && fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
 		{
 			save_TreeWithEventsForCtools() ;
-	}
+		}
 		
-}
+	}
 }
 
 
@@ -2555,9 +2555,6 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	fTreeCTOOLS_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
 	fTreeCTOOLS_Xoff           = c->Xoff ;           // camera coordinates (tangential coordinate in the nominal system)
 	fTreeCTOOLS_Yoff           = c->Yoff ;           // camera coordinates (tangential coordinate in the nominal system)
-	
-	// Show some info
-	int nShow = 1500 ;
 	
 	// RA- and DEC-aligned Wobbles
 	fTreeCTOOLS_WobbleWest  = getWobbleWest()  ;

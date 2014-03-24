@@ -191,13 +191,13 @@ int main( int argc, char* argv[] )
 	{
 		if( mode == 1 )
 		{
-		// target's ra and decl in degrees
-		vsky->setTargetJ2000( decl[i_row] * TMath::RadToDeg() , ra[i_row] * TMath::RadToDeg() ) ;
-		// day that you're looking for elev and azimuth on
-		vsky->precessTarget( mjdDay[i_row], telescope ) ;
-		// calculate new param
-		vsky->updatePointing( mjdDay[i_row], mjdSecondsOfDay[i_row] ) ;
-		printf( "%f %f %f\n", mjd[i_row], vsky->getTargetElevation(), vsky->getTargetAzimuth() ) ;
+			// target's ra and decl in degrees
+			vsky->setTargetJ2000( decl[i_row] * TMath::RadToDeg() , ra[i_row] * TMath::RadToDeg() ) ;
+			// day that you're looking for elev and azimuth on
+			vsky->precessTarget( mjdDay[i_row], telescope ) ;
+			// calculate new param
+			vsky->updatePointing( mjdDay[i_row], mjdSecondsOfDay[i_row] ) ;
+			printf( "%f %f %f\n", mjd[i_row], vsky->getTargetElevation(), vsky->getTargetAzimuth() ) ;
 			// not sure why mode=1 gives weird answers, mode=2 seems to match up with the values in the database-generated log
 			// e.g. veritasm.sao.arizona.edu/DQM/cgi-bin/loggen/query_night?search=runid&format=html&dqm=1&dqm_inst=&4unid=54679
 		}

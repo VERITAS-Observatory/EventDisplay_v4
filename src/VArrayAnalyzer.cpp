@@ -338,11 +338,11 @@ void VArrayAnalyzer::calcTelescopePointing()
 		}
 	}
 }
-	
+
 // fill reduced pointing data (1 row per second,
 // instead of 1 per line like VArrayPointing::fillPointingTree() )
 void VArrayAnalyzer::generateReducedPointingTreeData()
-	{
+{
 	double MJDStart = 0 ; // start MJD of run
 	double MJDStopp = 0 ; // end   MJD of run
 	double TimeStart = 0.0 ; // start Time of run
@@ -350,21 +350,21 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
 	VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStartTimeSQL, MJDStart, TimeStart );
 	VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStoppTimeSQL, MJDStopp, TimeStopp );
 	
-	int    iMJD  = TMath::Nint(MJDStart);
+	int    iMJD  = TMath::Nint( MJDStart );
 	double iTime = TimeStart ;
 	int    timeDur = 0 ;
-	while( iMJD <= TMath::Nint(MJDStopp)  &&  iTime < TimeStopp )
-		{
+	while( iMJD <= TMath::Nint( MJDStopp )  &&  iTime < TimeStopp )
+	{
 		// loop over run duration, 1 loop per second
 		iTime += 1.0 ;
 		
 		// cycle to next MJD if needed
 		if( iTime >= 86400.0 )
-			{
+		{
 			iTime = iTime - 86400.0 ;
 			iMJD += 1 ;
-			}
-	
+		}
+		
 		// set time, init telescope pointing
 		setAnalysisArrayEventStatus( 0 );
 		getShowerParameters()->reset( getNTel() );
@@ -376,7 +376,7 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
 		getShowerParameters()->MJD  = iMJD  ;
 		//calcTelescopePointing() ;
 		updatePointingToArbitraryTime( iMJD, iTime ) ;
-
+		
 		// fill pointing to tree in VArrayPointing
 		getArrayPointing()->fillPntReduced() ;
 		timeDur += 1 ;
