@@ -2402,6 +2402,7 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			  0 .---|-----|-----|---------------------> x
 			   0   min   max   2*max-min
 			*/
+			return x; //(SV)
 			
 			float rtn;
 			if( min > max )
@@ -2665,6 +2666,9 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 				fa_maxbound[1] = minbound * d->startpt.ys;
 			}
 			
+			minbound = 0.5;
+			maxbound = 1.5;
+			
 			fa_minbound[2] = minbound * d->startpt.xp;
 			fa_maxbound[2] = maxbound * d->startpt.xp;
 			if( d->startpt.xp < 0 )
@@ -2688,6 +2692,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			}
 			else
 			{
+				minbound = 0.9;
+				maxbound = 1.1;
 				double e = pow( 10, d->startpt.log10e );
 				double emin = e * minbound;
 				double emax = e * maxbound;

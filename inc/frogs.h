@@ -335,7 +335,7 @@ float frogs_change_coordinate_system( float i_ze, float i_az, float x, float y, 
 //=======================================================================
 //=======================================================================
 
-//#define DIFF_EVOLUTION 1
+#define DIFF_EVOLUTION 1
 #define BOUND_CONSTR   1 // If defined the bounds fa_minbound[] and fa_maxbound[]
 // are not only used for initializing the vector population
 // but also used to keep the population within these bounds
