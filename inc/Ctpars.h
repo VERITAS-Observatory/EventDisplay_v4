@@ -267,7 +267,10 @@ Ctpars::Ctpars( TTree* tree, bool iMC, int iVersion, unsigned int iShort )
 	bMC = iMC;
 	bShort = iShort;
 	fVersion = iVersion;
-	tree->SetCacheSize( 10000000 );
+	// forward I/O
+	// is supposed to speed up reading significantly
+	// problem: large memory consumption (>12 GB for certain cta arrays)
+	//    tree->SetCacheSize(10000000);
 	
 	Init( tree );
 }
