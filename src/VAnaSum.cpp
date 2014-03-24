@@ -325,16 +325,23 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 			char i_temp1[2000];
 			sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn, fSuffix.c_str() );
 			TFile* oldfile = new TFile( i_temp1 );
-			TTree* iTree = ( TTree* )oldfile->Get( "telconfig" );
-			TTree* newtree = iTree->CloneTree();
-			newtree->Print();
-			newtree->SetDirectory( fStereoRunDir.back() );
-			
+                        if( !oldfile->IsZombie() )
+                        {
+                            TTree* iTree = ( TTree* )oldfile->Get( "telconfig" );
+                            if( iTree )
+                            {
+                                TTree* newtree = iTree->CloneTree();
+                                newtree->SetDirectory( fStereoRunDir.back() );
+                            }
 			// copy TTree pointingDataReduced to anasum.root file
-			TTree* jTree = ( TTree* )oldfile->Get( "pointingDataReduced" );
-			TTree* newtreej = jTree->CloneTree();
-			newtreej->Print();
-			newtreej->SetDirectory( fStereoRunDir.back() );
+                            TTree* jTree = ( TTree* )oldfile->Get( "pointingDataReduced" );
+                            if( jTree )
+                            {
+                                TTree* newtreej = jTree->CloneTree();
+                                newtreej->Print();
+                                newtreej->SetDirectory( fStereoRunDir.back() );
+                            }
+		        }	
 			
 			// write the TTree's telconfig, pointingDataReduced, and runparameterV2 to the anasum.root file
 			fStereoRunDir.back()->Write();

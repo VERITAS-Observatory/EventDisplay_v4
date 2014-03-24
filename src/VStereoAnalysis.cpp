@@ -770,7 +770,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	fRunMJD[irun] = fTimeMask->getMeanUTC_Mask();
 	fTimeMask->printMask( 100, kTRUE );
 	fTimeMask->printMeanTime( kTRUE );
-	fTimeMask->displayMask() ;
+//	fTimeMask->displayMask() ;
 	
 	return i_count;
 }
