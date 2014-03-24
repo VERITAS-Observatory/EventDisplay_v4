@@ -225,8 +225,6 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 	}
 	
 	
-	// NKH 1D histogram settings
-	
 	// for PhiDependentSlice hists
 	phi_minphi = 0.0 ;
 	phi_maxphi = 2 * TMath::Pi() ;
@@ -250,7 +248,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 	sprintf( htitle, "1D histogram from Xoff_derot and Yoff_derot, with All Events, RadiusDependentSlice%03d (Pie Slice)\n, from Phi %3.1f to %3.1f radians", centerdeg, centerdeg - ( rad_phiwidth * 180 / 3.1415 ), centerdeg + ( rad_phiwidth * 180 / 3.1415 ) ) ;
 	hXYAccTotDeRotRadiusDependentSlice000 = new TH1F( hname, htitle, rad_nbins, rad_minrad, rad_maxrad ) ;
 	
-	// NKH 2D histograms, sorted by ImgSel
+	// 2D histograms, sorted by ImgSel
 	TH2F* tmphist2 ;
 	TH1F* tmphist1 ;
 	for( int i = 0 ; i <= 15 ; i++ )
@@ -278,7 +276,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
 	}
 	
 	
-	// NKH 2D histograms, sorted by NImages
+	// 2D histograms, sorted by NImages
 	for( int i = 0 ; i <= 4 ; i++ )
 	{
 		sprintf( hname, "hAccNImages_%d", i ) ;
@@ -602,13 +600,12 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 		hXYAccTot->Fill( iData->Xoff, iData->Yoff );
 		hXYAccTotDeRot->Fill( iData->Xoff_derot, iData->Yoff_derot );
 		
-		// NKH
 		hXYAccImgSel[iData->ImgSel]->Fill( iData->Xoff_derot, iData->Yoff_derot ) ;
 		hXYAccImgSelPreDeRot[iData->ImgSel]->Fill( iData->Xoff, iData->Yoff ) ;
 		hXYAccNImages[iData->NImages]->Fill( iData->Xoff_derot, iData->Yoff_derot ) ;
 		hXYAccNImagesPreDeRot[iData->NImages]->Fill( iData->Xoff, iData->Yoff ) ;
 		
-		// NKH 1D histograms
+		// 1D histograms
 		// Radius Dependent Histograms
 		eventradius = sqrt( iData->Xoff_derot * iData->Xoff_derot + iData->Yoff_derot * iData->Yoff_derot ) ;
 		eventphi    = atan2( iData->Yoff_derot, iData->Xoff_derot ) ; // radians
@@ -616,11 +613,6 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 		{
 			eventphi += 2 * TMath::Pi() ;    // atan2 is from -pi to pi, we want 0 to 2pi
 		}
-		//eventcount++ ;
-		//if ( eventcount < 10 )
-		//{
-		//	printf( "NKH eventcount:%d Xod:%3.1f Yod:%3.1f Radius:%3.1f Ang(Rad):%3.1f Ang(Deg):%5.1f\n", eventcount, iData->Xoff_derot, iData->Yoff_derot, eventradius, eventphi, eventphi*180.0/3.141592 ) ;
-		//}
 		
 		// PhiDependentSlice Fill
 		if( eventradius > phi_minradius && eventradius < phi_maxradius )
@@ -628,7 +620,6 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 			hXYAccTotDeRotPhiDependentSlice->Fill( eventphi ) ;
 			hXYAccImgSelPhiDependentSlice[iData->ImgSel]->Fill( eventphi ) ;
 			hXYAccNImagesPhiDependentSlice[iData->NImages]->Fill( eventphi ) ;
-			//if ( eventcount < 10 ) cout << "  NKH filled to PhiDependentSlice[" << iData->ImgSel << "]" << endl;
 		}
 		
 		// RadiusDependentSlice000 Fill
@@ -637,7 +628,6 @@ int VRadialAcceptance::fillAcceptanceFromData( CData* iData, int entry )
 			hXYAccTotDeRotRadiusDependentSlice000->Fill( eventradius ) ;
 			hXYAccImgSelRadiusDependentSlice000[iData->ImgSel]->Fill( eventradius ) ;
 			hXYAccNImagesRadiusDependentSlice000[iData->NImages]->Fill( eventradius ) ;
-			//if ( eventcount < 10 ) cout << "  NKH filled to RadiusDependentSlice[" << iData->ImgSel << "]" << endl;
 		}
 		
 		// fill zenith angle dependent histograms
@@ -931,7 +921,7 @@ Double_t VRadialAcceptance_fit_acceptance_function( Double_t* x, Double_t* par )
 // using 2d histogram of derotated Xoff and Yoff CData->Xoff_derot, CData->Yoff_derot
 double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) // radius in degrees
 {
-	cout << "NKH VRadialAcceptance::calculate2DBinNormalizationConstant" << endl;
+	cout << "VRadialAcceptance::calculate2DBinNormalizationConstant" << endl;
 	
 	double normconst = 1.0 ;
 	int nbinsx = hXYAccTotDeRot->GetNbinsX() ;
@@ -943,7 +933,6 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
 	double avgbintotal = 0.0 ;
 	
 	// loop over all bins in hXYAccTot
-	//cout << "NKH ~ loop over all bins" << endl ;
 	for( int i_bin = 1 ; i_bin <= nbins ; i_bin++ )
 	{
 		// find bin center and content
@@ -952,7 +941,6 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
 		bincenty = hXYAccTotDeRot->GetYaxis()->GetBinCenter( i_biny ) ;
 		iradius  = sqrt( bincentx * bincentx + bincenty * bincenty ) ;
 		binCont  = hXYAccTotDeRot->GetBinContent( i_binx, i_biny ) ;
-		//cout << "NKH ~ loop: (x,y,cont):" << bincentx << "  " << bincenty << "  " << binCont << endl ;
 		if( iradius < radius )  // bin center < 0.3 deg
 		{
 			avgbintotal += binCont ;
@@ -964,7 +952,7 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
 	if( fExtraHistogramMode > 0 )
 	{
 		char buff[250] ;
-		cout << "NKH VRadialAcceptance::calculate2DBinNormalizationConstant - writing hists" << endl;
+		cout << "VRadialAcceptance::calculate2DBinNormalizationConstant - writing hists" << endl;
 		// write 2d hist to text file
 		if( hXYAccTotDeRot != 0 )
 		{
@@ -1102,7 +1090,6 @@ double VRadialAcceptance::calculate2DBinNormalizationConstant( double radius ) /
 	{
 		normconst = avgbintotal / avgbincount ;
 		f2DBinNormalizationConstant = normconst ;
-		//cout << "NKH ~ calculateNormalizationConstant(" << radius << ") = " << normconst << endl;
 		return normconst ;
 	}
 	return normconst ;
@@ -1131,7 +1118,6 @@ void VRadialAcceptance::Write1DHistToTextFile( TH1F* hist, string& basename, int
 		i = ( int )hist->GetBin( binx ) ;
 		if( hist->IsBinOverflow( i ) || hist->IsBinUnderflow( i ) )
 		{
-			cout << "NKH ~ WriteHist: bin " << i << " (" << binx << ") is over/under-flow bin!" << endl;
 			continue ;
 		}
 		bincenx = hist->GetXaxis()->GetBinCenter( binx ) ;
@@ -1218,7 +1204,6 @@ void VRadialAcceptance::Write2DHistToTextFile( TH2F* hist, string& basename )
 			i = ( int )hist->GetBin( binx, biny ) ;
 			if( hist->IsBinOverflow( i ) || hist->IsBinUnderflow( i ) )
 			{
-				cout << "NKH ~ WriteHist: bin " << i << " (" << binx << "," << biny << ") is over/under-flow bin!" << endl;
 				continue ;
 			}
 			bincenx = hist->GetXaxis()->GetBinCenter( binx ) ;
@@ -1298,15 +1283,12 @@ int VRadialAcceptance::Set2DAcceptanceMode( int mode )
 
 void VRadialAcceptance::SetExtraHistogramDirectory( string histdir )
 {
-	//cout << "NKH SetExtraHistogramDirectory(" << histdir << ")" << endl;
-	//cout << "NKH     fExtraHistogramMode = 1 " << endl;
 	fExtraHistogramMode = 1 ;
 	fExtraHistogramDir = histdir ;
 }
 
 int VRadialAcceptance::SetExtraHistogramMode( int ehm )
 {
-	//cout << "NKH SetExtraHistogramMode(" << ehm << ")" << endl;
 	fExtraHistogramMode = ehm ;
 	return fExtraHistogramMode ;
 }

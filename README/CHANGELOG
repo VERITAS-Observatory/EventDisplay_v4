@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140324 (NKH, submitted by GM)
+Added converter to ctools (writeCTAEventListFromAnasum)
+Significant changes throughout the chain and added functionality
+
 * 20140323 (GM)
 EVNDISP is now using source code formatting (astyle)
 http://astyle.sourceforge.net/astyle.html

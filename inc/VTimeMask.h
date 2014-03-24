@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 
@@ -21,12 +22,13 @@
 #include <TROOT.h>
 #include <TBits.h>
 #include <TVector.h>
+#include <TNamed.h>
 
 #include "VSkyCoordinatesUtilities.h"
 
 using namespace std;
 
-class VTimeMask
+class VTimeMask : public TNamed
 {
 	private:
 		Int_t           run_id;                   // Run number
@@ -80,6 +82,11 @@ class VTimeMask
 		VTimeMask( Int_t run_number, Double_t run_startUTC, Double_t run_endUTC, string file_name = "" );
 		
 		// Intialise now
+		// To read in the 'timeMask' directory from an anasum file,
+		// you need to first do
+		// VTimeMask * vtm = VTimeMask( runid, runstart, runend ) ;
+		// vtm->readObjects( timeMaskDirectory ) ;
+		// vtm->setMask( runid, runstart, runend ) ;
 		Bool_t      setMask( Int_t run_number, Double_t run_startUTC, Double_t run_endUTC, string file_name = "" );
 		Bool_t      setMask();                    // Retrieve user-defined mask from mask_file
 		
@@ -87,6 +94,8 @@ class VTimeMask
 		
 		
 		// Is the event allowed to pass the mask?
+		// if true, then that instant of time passes the cut
+		// if false, does not pass cut.
 		Bool_t      checkAgainstMask( Int_t eventMJD, Double_t eventTime )
 		{
 			return checkMaskNow( exactMJD_secs( eventMJD, eventTime ) );
@@ -101,6 +110,7 @@ class VTimeMask
 		{
 			counted.at( Int_t( floor( secs_day * eventUTC - start_time ) ) )++;
 		}
+		
 		
 		Bool_t      getMaskStatus() const         // Has the mask encountered any errors; is it still active?
 		{
@@ -184,6 +194,14 @@ class VTimeMask
 		void        printMeanTime( Bool_t event_statistics = kFALSE, ostream& terminal = cout ) const;
 		// Display summary of mask with optional event counts
 		void        printMask( UInt_t interval_seconds = 60, Bool_t event_statistics = kFALSE, ostream& terminal = cout ) const;
+		// display entire mask as a block of 0's and 1's, divided up into lines of 1 minute
+		// much better for visually seeing the mask
+		void        displayMask( ostream& terminal = cout ) ;
+		string      getMaskFileName()
+		{
+			return mask_file ;
+		}
 		
+		ClassDef( VTimeMask, 3 ) ;
 };
 #endif                                            /* ifndef VTIMEMASK_H */

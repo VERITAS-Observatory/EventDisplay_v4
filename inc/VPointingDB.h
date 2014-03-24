@@ -83,7 +83,6 @@ class VPointingDB : public VGlobalRunParameter
 		bool getDBRunInfo();
 		void getDBMJDTime( string itemp, int& MJD, double& Time, bool bStrip );
 		void getDBSourceCoordinates( string iSource, float& iEVNTargetDec, float& iEVNTargetRA );
-		void getHorizonCoordinates( int MJD, double time, double dec, double ra, double& az, double& ze );
 		bool readPointingFromDB();
 		bool readPointingCalibratedVPMFromDB();
 		bool readPointingUncalibratedVPMFromDB();
@@ -160,5 +159,6 @@ class VPointingDB : public VGlobalRunParameter
 		void   setObservatory( double iLongitude_deg = 0., double iLatitude_deg = 0. );
 		bool   terminate();
 		bool   updatePointing( int MJD, double iTime );
+		void   getHorizonCoordinates( int MJD, double time, double dec, double ra, double& az, double& ze );
 };
 #endif

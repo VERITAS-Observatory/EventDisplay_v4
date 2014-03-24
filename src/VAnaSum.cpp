@@ -140,6 +140,7 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 		cout << "VAnaSum::initialize error creating directory stereo in output file " << fOPfile->GetName() << endl;
 		exit( -1 );
 	}
+	
 	// make mono directories
 	if( fAnalysisType == 0 || fAnalysisType == 1 || fAnalysisType == 5 )
 	{
@@ -245,6 +246,19 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 				sprintf( i_title, "stereo results for run %d", fRunPara->fRunList[j].fRunOn );
 				fRunDir.back()->cd();
 				fStereoRunDir.push_back( fRunDir.back()->mkdir( i_temp, i_title ) );
+				
+				/*           fStereoRunDir.back()->cd();
+				         char i_temp1[2000];
+				         sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn,fSuffix.c_str() );
+				         TFile *oldfile = new TFile(i_temp1);
+				         TTree *iTree = (TTree*)oldfile->Get("telconfig");
+				
+				         TTree *newtree = iTree->CloneTree();
+				         newtree->Print();
+				         newtree->SetDirectory( fStereoRunDir.back() );
+				       fStereoRunDir.back()->Write();
+				       */
+				
 				if( !fStereoRunDir.back() )
 				{
 					cout << "VAnaSum::initialize error creating stereo run directory ";
@@ -305,6 +319,31 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 			
 			// get noise level
 			fRunPedVarsOff[fRunPara->fRunList[j].fRunOff] = getNoiseLevel( fRunPara->fRunList[j].fRunOff );
+			
+			// copy TTree telconfig to anasum.root file
+			fStereoRunDir.back()->cd();
+			char i_temp1[2000];
+			sprintf( i_temp1, "%s%s%d%s", fDatadir.c_str(), fPrefix.c_str(), fRunPara->fRunList[j].fRunOn, fSuffix.c_str() );
+			TFile* oldfile = new TFile( i_temp1 );
+			TTree* iTree = ( TTree* )oldfile->Get( "telconfig" );
+			TTree* newtree = iTree->CloneTree();
+			newtree->Print();
+			newtree->SetDirectory( fStereoRunDir.back() );
+			
+			// copy TTree pointingDataReduced to anasum.root file
+			TTree* jTree = ( TTree* )oldfile->Get( "pointingDataReduced" );
+			TTree* newtreej = jTree->CloneTree();
+			newtreej->Print();
+			newtreej->SetDirectory( fStereoRunDir.back() );
+			
+			// write the TTree's telconfig, pointingDataReduced, and runparameterV2 to the anasum.root file
+			fStereoRunDir.back()->Write();
+			
+			// copy VEvndispRunParameter 'runparameterV2' to anasum.root file
+			fStereoRunDir.back()->cd();
+			VEvndispRunParameter* evnrunpar = ( VEvndispRunParameter* )oldfile->Get( "runparameterV2" );
+			evnrunpar->Write();
+			
 		}
 		
 		// set up mono plots
@@ -319,7 +358,6 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 				fMonoOff.push_back( new VMonoPlots( false, 0, i_temp, fRunPara, i ) );
 			}
 		}
-		
 	}
 	cout << "-----------------------------------------------------------------------(5)" << endl;
 	
@@ -682,6 +720,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// close data files, etc.
 	fStereoOn->terminate();
 	fStereoOff->terminate();
+	
 	
 	// clean up
 	delete fstereo_onoff;

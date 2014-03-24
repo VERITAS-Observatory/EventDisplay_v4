@@ -39,7 +39,15 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	fTreeWithAllGamma = 0 ; // WRITEALLGAMMATOTREE
 	
 	fRunPara = irunpara;
+	fTreeWithEventsForCtools = 0 ; // WRITEEVENTTREEFORCTOOLS
+	fDeadTimeStorage = 0.0 ;
 	
+	fVsky = new VSkyCoordinates() ;
+	fVsky->supressStdoutText( true ) ;
+	fVsky->setObservatory( VGlobalRunParameter::getObservatory_Longitude_deg(),
+						   VGlobalRunParameter::getObservatory_Latitude_deg() );
+						   
+						   
 	// calculating run start, end and duration (verifies data trees)
 	if( !bTotalAnalysisOnly )
 	{
@@ -382,6 +390,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 		init_TreeWithAllGamma( irun );
 	}
 	
+	if( fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+	{
+		init_TreeWithEventsForCtools( irun );
+	}
+	
 	// spectral energy reconstruction (effective areas, etc.)
 	// effective area class
 	VEffectiveAreaCalculator fEnergy( fRunPara->fRunList[fHisCounter].fEffectiveAreaFile, iAzMin, iAzMax, iPedVar,
@@ -429,6 +442,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	
 	double i_count = 0.;
 	int nentries_run = 0;
+	
+	
+	
+	
+	
 	
 	/////////////////////////////////////////////////////////////////////
 	// loop over all entries/events in the data tree
@@ -603,6 +621,11 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				fill_TreeWithAllGamma( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
 			}
 			
+			if( fIsOn && bIsGamma && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+			{
+				fill_TreeWithEventsForCtools( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
+			}
+			
 			/////////////////////////////////////////////////////////
 			// histograms after all cuts ( shape and direction cuts )
 			//
@@ -731,14 +754,23 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	// get mean effective area for TIME BINs
 	gTimeBinnedMeanEffectiveArea = ( TGraph2DErrors* )fEnergy.getTimeBinnedMeanEffectiveArea()->Clone();
 	// get dead time
+	if( fHisCounter == 0 )
+	{
+		fDeadTimeStorage = fDeadTime[fHisCounter]->calculateDeadTime();
+	}
+	else
+	{
 	fDeadTime[fHisCounter]->calculateDeadTime();
+	}
 	fDeadTime[fHisCounter]->printDeadTime();
+	
 	
 	// get mean run times after time cuts
 	fRunExposure[irun] = fTimeMask->getEffectiveDuration();
 	fRunMJD[irun] = fTimeMask->getMeanUTC_Mask();
 	fTimeMask->printMask( 100, kTRUE );
 	fTimeMask->printMeanTime( kTRUE );
+	fTimeMask->displayMask() ;
 	
 	return i_count;
 }
@@ -762,6 +794,11 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 	else
 	{
 		fTimeMask->writeObjects();
+		if( bOn )
+		{
+			VTimeMask* iTimeMask = ( VTimeMask* )fTimeMask->Clone();
+			iTimeMask->Write( "vtimemask" );
+		}
 		fHisto[fHisCounter]->writeHistograms();
 		fDeadTime[fHisCounter]->writeHistograms();
 		// copy effective areas and radial acceptance to anasum output file
@@ -800,7 +837,13 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		{
 			fTreeWithAllGamma->Write() ; // or maybe ->AutoSave() ?
 		}
+		
+		if( fTreeWithEventsForCtools && fIsOn && fRunPara->fWriteEventTreeForCtools )  // WRITEEVENTTREEFORCTOOLS
+		{
+			save_TreeWithEventsForCtools() ;
 	}
+		
+}
 }
 
 
@@ -1358,7 +1401,8 @@ double VStereoAnalysis::getDeadTimeFraction()
 		// dead time depending on time mask
 		if( fTimeMask && fTimeMask->getMask().size() > 0 )
 		{
-			return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask() );
+			return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask().size() );
+			//return fDeadTime[fHisCounter]->getDeadTimeFraction( fTimeMask->getMask() );
 		}
 		return fDeadTime[fHisCounter]->getDeadTimeFraction();
 	}
@@ -2415,3 +2459,202 @@ void VStereoAnalysis::fill_TreeWithAllGamma( CData* c , double i_xderot, double 
 	
 }
 
+bool VStereoAnalysis::init_TreeWithEventsForCtools( int irun ) // WRITEEVENTTREEFORCTOOLS
+{
+
+	cout << endl;
+	cout << " :: init_TreeWithEventsForCtools( " << irun << " )" << endl;
+	cout << endl;
+	
+	if( fTreeWithEventsForCtools )
+	{
+		delete fTreeWithEventsForCtools;
+	}
+	if( !fRunPara )
+	{
+		return false;
+	}
+	
+	char hname[200];
+	char htitle[200];
+	sprintf( hname, "TreeWithEventsForCtools" );
+	sprintf( htitle, "all gamma events with X,Y and Time for run %d, in a format for CTOOL's Event List format", irun );
+	
+	fTreeWithEventsForCtools = new TTree( hname, htitle );
+	
+	fTreeWithEventsForCtools->Branch( "runNumber",      &fTreeCTOOLS_runNumber,      "runNumber/I" );
+	fTreeWithEventsForCtools->Branch( "eventNumber",    &fTreeCTOOLS_eventNumber,    "eventNumber/I" );
+	fTreeWithEventsForCtools->Branch( "timeOfDay",      &fTreeCTOOLS_Time,           "timeOfDay/D" );
+	fTreeWithEventsForCtools->Branch( "dayMJD",         &fTreeCTOOLS_MJD,            "dayMJD/I" );
+	fTreeWithEventsForCtools->Branch( "Energy",         &fTreeCTOOLS_Erec,           "Erec/D" );
+	fTreeWithEventsForCtools->Branch( "EnergyS",        &fTreeCTOOLS_ErecS,          "ErecS/D" );
+	fTreeWithEventsForCtools->Branch( "Energy_Err",     &fTreeCTOOLS_Erec_Err,       "Erec_Err/D" );
+	fTreeWithEventsForCtools->Branch( "EnergyS_Err",    &fTreeCTOOLS_ErecS_Err,      "ErecS_Err/D" );
+	fTreeWithEventsForCtools->Branch( "XGroundCore",    &fTreeCTOOLS_XGroundCore,    "XGroundCore/D" );
+	fTreeWithEventsForCtools->Branch( "YGroundCore",    &fTreeCTOOLS_YGroundCore,    "YGroundCore/D" );
+	fTreeWithEventsForCtools->Branch( "Xderot",         &fTreeCTOOLS_Xderot,         "Xderot/D" );
+	fTreeWithEventsForCtools->Branch( "Yderot",         &fTreeCTOOLS_Yderot,         "Yderot/D" );
+	fTreeWithEventsForCtools->Branch( "NImages",        &fTreeCTOOLS_NImages,        "NImages/I" );
+	fTreeWithEventsForCtools->Branch( "ImgSel",         &fTreeCTOOLS_ImgSel,         "ImgSel/I" );
+	fTreeWithEventsForCtools->Branch( "MSCW",           &fTreeCTOOLS_MSCW,           "MSCW/D" );
+	fTreeWithEventsForCtools->Branch( "MSCL",           &fTreeCTOOLS_MSCL,           "MSCL/D" );
+	fTreeWithEventsForCtools->Branch( "MWR"           , &fTreeCTOOLS_MWR,            "MWR/D" );
+	fTreeWithEventsForCtools->Branch( "MLR"           , &fTreeCTOOLS_MLR,            "MLR/D" );
+	fTreeWithEventsForCtools->Branch( "TargetRA"      , &fTreeCTOOLS_TargetRA,       "TargetRA/D" );
+	fTreeWithEventsForCtools->Branch( "TargetDEC"     , &fTreeCTOOLS_TargetDEC,      "TargetDEC/D" );
+	fTreeWithEventsForCtools->Branch( "RA"            , &fTreeCTOOLS_RA,             "RA/D" );
+	fTreeWithEventsForCtools->Branch( "DEC"           , &fTreeCTOOLS_DEC,            "DEC/D" );
+	fTreeWithEventsForCtools->Branch( "Az"            , &fTreeCTOOLS_Az,             "Az/D" );
+	fTreeWithEventsForCtools->Branch( "El"            , &fTreeCTOOLS_El,             "El/D" );
+	fTreeWithEventsForCtools->Branch( "EmissionHeight", &fTreeCTOOLS_EmissionHeight, "EmissionHeight/D" );
+	fTreeWithEventsForCtools->Branch( "Xoff"          , &fTreeCTOOLS_Xoff          , "Xoff/D" );
+	fTreeWithEventsForCtools->Branch( "Yoff"          , &fTreeCTOOLS_Yoff          , "Yoff/D" );
+	fTreeWithEventsForCtools->Branch( "GregYear"      , &fTreeCTOOLS_GregYear      , "GregYear/D" );
+	fTreeWithEventsForCtools->Branch( "GregMonth"     , &fTreeCTOOLS_GregMonth     , "GregMonth/D" );
+	fTreeWithEventsForCtools->Branch( "GregDay"       , &fTreeCTOOLS_GregDay       , "GregDay/D" );
+	cout << endl;
+	
+	
+	cout << " :: init_TreeWithEventsForCtools()" << endl;
+	cout << endl;
+	
+	
+	
+	return true;
+}
+
+void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) // WRITEEVENTTREEFORCTOOLS
+{
+	//cout << endl;
+	//cout << " -- fill_TreeWithAllGamma()" << endl;
+	if( !c )
+	{
+		return;
+	}
+	
+	fTreeCTOOLS_runNumber      = c->runNumber;    // Run Number
+	fTreeCTOOLS_eventNumber    = c->eventNumber;  // Event Number
+	fTreeCTOOLS_Time           = c->Time;         // Time of day (seconds) of gamma ray event
+	fTreeCTOOLS_MJD            = c->MJD;          // Day of epoch (days)
+	fTreeCTOOLS_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
+	fTreeCTOOLS_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coodinates (deg)
+	fTreeCTOOLS_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
+	fTreeCTOOLS_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
+	fTreeCTOOLS_Erec           = c->Erec;         // Reconstructed Gamma Energy (TeV)
+	fTreeCTOOLS_Erec_Err       = c->dE;           // Reconstructed Gamma Energy (TeV) Error
+	fTreeCTOOLS_ErecS          = c->ErecS;        // Reconstructed Gamma Energy (TeV)
+	fTreeCTOOLS_ErecS_Err      = c->dES;          // Reconstructed Gamma Energy (TeV) Error
+	fTreeCTOOLS_XGroundCore    = c->Xcore;        // Gamma Ray Core-Ground intersection location (north?)
+	fTreeCTOOLS_YGroundCore    = c->Ycore;        // Gamma Ray Core-Ground intersection location (east?)
+	fTreeCTOOLS_NImages        = c->NImages;      // Number of images used in reconstruction?
+	fTreeCTOOLS_ImgSel         = c->ImgSel;       // 4-bit binary code describing which telescopes had images
+	fTreeCTOOLS_MSCW           = c->MSCW ;        // mean scaled width
+	fTreeCTOOLS_MSCL           = c->MSCL ;        // mean scaled length
+	fTreeCTOOLS_MWR            = c->MWR ;
+	fTreeCTOOLS_MLR            = c->MLR ;
+	fTreeCTOOLS_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
+	fTreeCTOOLS_Xoff           = c->Xoff ;           // camera coordinates (tangential coordinate in the nominal system)
+	fTreeCTOOLS_Yoff           = c->Yoff ;           // camera coordinates (tangential coordinate in the nominal system)
+	
+	// Show some info
+	int nShow = 1500 ;
+	
+	// RA- and DEC-aligned Wobbles
+	fTreeCTOOLS_WobbleWest  = getWobbleWest()  ;
+	fTreeCTOOLS_WobbleNorth = getWobbleNorth() ;
+	
+	// pointing target
+	fTreeCTOOLS_TargetRA  = fRunPara->fRunList[0].fTargetRAJ2000  ;
+	fTreeCTOOLS_TargetDEC = fRunPara->fRunList[0].fTargetDecJ2000 ;
+	
+	// need the telescope pointing for the TangentPoint (RA/DEC of Telescope Pointing?)
+	double CenterPoint_RA  = ( fTreeCTOOLS_TargetRA  + fTreeCTOOLS_WobbleWest ) ;
+	double CenterPoint_DEC = ( fTreeCTOOLS_TargetDEC + fTreeCTOOLS_WobbleNorth ) ;
+	CenterPoint_RA      *= TMath::DegToRad() ;
+	CenterPoint_DEC     *= TMath::DegToRad() ;
+	double Spherical_RA  = 0.0 ;
+	double Spherical_DEC = 0.0 ;
+	slaDtp2s( fTreeCTOOLS_Xderot * TMath::DegToRad(),
+			  fTreeCTOOLS_Yderot * TMath::DegToRad(),
+			  CenterPoint_RA,   CenterPoint_DEC,
+			  &Spherical_RA,    &Spherical_DEC ) ;
+	//Spherical_RA   *= TMath::RadToDeg() ;
+	//Spherical_DEC  *= TMath::RadToDeg() ;
+	fTreeCTOOLS_RA  = Spherical_RA  * TMath::RadToDeg() ;
+	fTreeCTOOLS_DEC = Spherical_DEC * TMath::RadToDeg() ;;
+	
+	// Convert from spherical RA and DEC to Azimuth and Zenith
+	//double ObsLat_rad   = VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad() ;
+	//double EventRA_rad  = fTreeCTOOLS_RA  * TMath::DegToRad() ;
+	//double EventDEC_rad = fTreeCTOOLS_DEC * TMath::DegToRad() ;
+	//double Az_rad = 0.0 ;
+	double Az_deg = 0.0 ;
+	//double El_rad = 0.0 ;
+	double El_deg = 0.0 ;
+	
+	// calculate hour angle (HOUR ANGLE != RIGHT ASCENSION)
+	// taken from VSkyCoordinates::updatePointing()
+	//double iTime = c->Time / 86400. ;
+	//double iSid  = slaGmsta( (double)c->MJD, iTime ) ;
+	//iSid = iSid - ( VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad() ) ;
+	//double ha = slaDranrm( iSid - Spherical_RA ) ;
+	
+	// convert to degrees and do calculation
+	double Spherical_RA_deg  = Spherical_RA  * TMath::RadToDeg() ;
+	double Spherical_DEC_deg = Spherical_DEC * TMath::RadToDeg() ;
+	//slaDe2h( ha, Spherical_DEC, ObsLat_rad, &Az_rad, &El_rad ) ;
+	
+	//Az_deg = Az_rad * TMath::RadToDeg() ;
+	//El_deg = El_rad * TMath::RadToDeg() ;
+	// target's ra and decl in degrees
+	//vsky->setTargetJ2000( decl[i_row] * TMath::RadToDeg() , ra[i_row] * TMath::RadToDeg() ) ;
+	fVsky->setTargetJ2000( Spherical_DEC_deg , Spherical_RA_deg ) ;
+	// day that you're looking for elev and azimuth on
+	//fVsky->precessTarget( mjdDay[i_row], telescope ) ;
+	//fullMJD = (double)(fTreeCTOOLS_MJD + (fTreeCTOOLS_Time/86400.0)) ;
+	fVsky->precessTarget( fTreeCTOOLS_MJD, 0 ) ;
+	// calculate new param
+	fVsky->updatePointing( fTreeCTOOLS_MJD, fTreeCTOOLS_Time ) ;
+	Az_deg = fVsky->getTargetAzimuth() ;
+	El_deg = fVsky->getTargetElevation() ;
+	fTreeCTOOLS_Az = Az_deg ;
+	fTreeCTOOLS_El = El_deg ;
+	
+	// Convert MJD to Year, Month, and Day
+	fTreeCTOOLS_GregYear  = 0 ;
+	fTreeCTOOLS_GregMonth = 0 ;
+	fTreeCTOOLS_GregDay   = 0 ;
+	double junk1 = 0.0 ;
+	int junk2 = 0 ;
+	slaDjcl( c->MJD, &fTreeCTOOLS_GregYear, &fTreeCTOOLS_GregMonth, &fTreeCTOOLS_GregDay, &junk1, &junk2 ) ;
+	
+	
+	if( fTreeWithEventsForCtools )
+	{
+		fTreeWithEventsForCtools->Fill();
+	}
+	
+}
+
+void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
+{
+	// save our ctools tree
+	fTreeWithEventsForCtools->Write() ; // or maybe ->AutoSave() ?
+	
+	fRunPara->fScalarDeadTimeFrac = fDeadTime[0]->getScalarDeadTimeFraction() ;
+	fRunPara->SetName( "VAnaSumRunParameter" );
+	fRunPara->Write() ;
+	
+	VAnaSumRunParameterDataClass* vasr = new VAnaSumRunParameterDataClass() ;
+	vasr->fWobbleNorth = 0.5 ;
+	vasr->fRunOn = 65543 ;
+	vasr->SetName( "VASRPDC" ) ;
+	vasr->Write() ;
+	
+	fCDataTreeClone = fDataRunTree->CloneTree() ;
+	fCDataTreeClone->SetName( "cdatatree" );
+	fCDataTreeClone->Write();
+	//fDataRunTree->Write() ;
+	// see VStereoAnalysis::getDataFromFile() for figuring out the CData
+	
+}

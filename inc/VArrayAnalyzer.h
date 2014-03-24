@@ -85,6 +85,9 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		VArrayAnalyzer();
 		~VArrayAnalyzer();
 		void doAnalysis();
+		void calcTelescopePointing();
+		void generateReducedPointingTreeData();
+		void updatePointingToArbitraryTime( int iMJD, double iTime ) ;
 		void initAnalysis();
 		void initOutput();
 		void terminate();

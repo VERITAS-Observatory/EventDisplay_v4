@@ -1096,6 +1096,7 @@ void VTableLookup::interpolate( VTablesToRead* s1, double w1, VTablesToRead* s2,
 void VTableLookup::terminate()
 {
 	fData->terminate( fTLRunParameter );
+	
 	if( freadwrite == 'w' || freadwrite == 'W' )
 	{
 		cout << "writing tables to disk (outputfile is " << fLookupTableFile->GetName() << ")" << endl;
@@ -1134,6 +1135,7 @@ void VTableLookup::terminate()
 			cout << endl << "\t total number of ignored events: " << fNumberOfIgnoredeEvents << endl;
 		}
 	}
+	
 	////////////////////////////////////////////////////////////////////
 	// (GM): large amount of objects read from subdirectory of the tablefile might result in
 	//       excessive time needed to close the tablefile

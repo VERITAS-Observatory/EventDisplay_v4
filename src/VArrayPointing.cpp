@@ -47,6 +47,17 @@ void VArrayPointing::initializePointingTree()
 	fPointingTree->Branch( "TelDecJ2000", &fTelDecJ2000, "TelDecJ2000/D" );
 	fPointingTree->Branch( "TelRA", &fTelRA, "TelRA/D" );
 	fPointingTree->Branch( "TelDec", &fTelDec, "TelDec/D" );
+	
+	
+	sprintf( hname, "pointingDataReduced" );
+	sprintf( htitle, "pointing information for the entire array, at 1 interpolated measurement per second" );
+	fPntReduced = new TTree( hname, htitle );
+	fPntReduced->Branch( "MJD",          &fMJD,          "MJD/i" );
+	fPntReduced->Branch( "Time",         &fTime,         "Time/D" );
+	fPntReduced->Branch( "TelAzimuth",   &fTelAzimuth,   "TelAzimuth/D" );
+	fPntReduced->Branch( "TelElevation", &fTelElevation, "TelElevation/D" );
+	fPntReduced->Branch( "TelRAJ2000",   &fTelRAJ2000,   "TelRAJ2000/D" );
+	fPntReduced->Branch( "TelDecJ2000",  &fTelDecJ2000,  "TelDecJ2000/D" );
 }
 
 
@@ -58,11 +69,23 @@ void VArrayPointing::fillPointingTree()
 	}
 }
 
+void VArrayPointing::fillPntReduced()
+{
+	if( fPntReduced )
+	{
+		fPntReduced->Fill();
+	}
+}
+
 void VArrayPointing::terminate()
 {
 	if( fPointingTree )
 	{
 		fPointingTree->Write();
+	}
+	if( fPntReduced )
+	{
+		fPntReduced->Write() ;
 	}
 }
 

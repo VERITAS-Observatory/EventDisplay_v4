@@ -86,7 +86,9 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool  fDebug;                             // print debug output
 		bool  fPrintSmallArray;                   // some printout for small arrays only
 		unsigned int fPrintAnalysisProgress;      // print a line each time this number of events have been processed
-		unsigned int fPrintGrisuHeader;		  // Print full grisu header, includeing detector config file used in grisu simulations (sims only, from VBF header), OR name of config file for detector simulation if available
+		unsigned int fPrintGrisuHeader;           // Print full grisu header, includeing detector config file used in
+		//   grisu simulations (sims only, from VBF header), OR name of
+		//   config file for detector simulation if available
 		
 		// array/telescope geometry parameters
 		unsigned int fNTelescopes;                // number of telescopes
@@ -318,6 +320,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 143 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 145 ); //(increase this number)
 };
 #endif

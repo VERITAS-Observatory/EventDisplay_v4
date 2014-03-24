@@ -64,6 +64,7 @@ class VDBRunInfo
 	
 		VDBRunInfo( int irun, string iDBserver, unsigned int iNTel );
 		~VDBRunInfo() {}
+
 		int    getRunDate()
 		{
 			return fDBDate;

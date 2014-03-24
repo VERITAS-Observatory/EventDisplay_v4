@@ -4,7 +4,6 @@
 #define VStereoAnalysis_H
 
 #include "CData.h"
-
 #include "VGammaHadronCuts.h"
 #include "VAnaSumRunParameter.h"
 #include "VASlalib.h"
@@ -16,6 +15,7 @@
 #include "VSkyCoordinates.h"
 #include "VSkyCoordinatesUtilities.h"
 #include "VTargets.h"
+#include "VPointingDB.h"
 
 #include "TDirectory.h"
 #include "TDirectoryFile.h"
@@ -27,6 +27,9 @@
 #include "TMath.h"
 #include "TRandom3.h"
 #include "TTree.h"
+#include "TParameter.h"
+#include "TObject.h"
+#include "TNamed.h"
 
 #include <iostream>
 #include <map>
@@ -189,6 +192,44 @@ class VStereoAnalysis
 		double fTreeAll_MWR;
 		double fTreeAll_MLR;
 		
+		TTree* fTreeWithEventsForCtools ;
+		int     fTreeCTOOLS_runNumber;
+		int     fTreeCTOOLS_eventNumber;
+		double  fTreeCTOOLS_Time;
+		int     fTreeCTOOLS_MJD;
+		double  fTreeCTOOLS_Xoff;
+		double  fTreeCTOOLS_Yoff;
+		double  fTreeCTOOLS_Xderot;
+		double  fTreeCTOOLS_Yderot;
+		double  fTreeCTOOLS_TargetRA;
+		double  fTreeCTOOLS_TargetDEC;
+		double  fTreeCTOOLS_RA;
+		double  fTreeCTOOLS_DEC;
+		double  fTreeCTOOLS_Erec;
+		double  fTreeCTOOLS_ErecS;
+		double  fTreeCTOOLS_Erec_Err;
+		double  fTreeCTOOLS_ErecS_Err;
+		double  fTreeCTOOLS_XGroundCore;
+		double  fTreeCTOOLS_YGroundCore;
+		int     fTreeCTOOLS_NImages;
+		int     fTreeCTOOLS_ImgSel;
+		double  fTreeCTOOLS_MSCW;
+		double  fTreeCTOOLS_MSCL;
+		double  fTreeCTOOLS_MWR;
+		double  fTreeCTOOLS_MLR;
+		double  fTreeCTOOLS_WobbleNorth ;
+		double  fTreeCTOOLS_WobbleWest ;
+		double  fTreeCTOOLS_Az ;
+		double  fTreeCTOOLS_El ;
+		double  fTreeCTOOLS_EmissionHeight ;
+		int     fTreeCTOOLS_GregYear  ;
+		int     fTreeCTOOLS_GregMonth ;
+		int     fTreeCTOOLS_GregDay   ;
+		TTree* fCDataTreeClone ;
+		double  fDeadTimeStorage ;
+		//double fullMJD ;
+		VSkyCoordinates* fVsky ;  // for RADec to AzimElev conversion
+		
 		double fTreeSelected_MVA;
 		
 		/// model3D parameters ///
@@ -285,6 +326,10 @@ class VStereoAnalysis
 		bool init_TreeWithAllGamma( int irun ) ; // WRITEALLGAMMATOTREE
 		void reset_TreeWithAllGamma() ; // WRITEALLGAMMATOTREE
 		
+		void fill_TreeWithEventsForCtools( CData* c , double i_xderot, double i_yderot, unsigned int icounter, double i_UTC , double fEVDVersionSign ) ; // WRITEEVENTTREEFORCTOOLS
+		bool init_TreeWithEventsForCtools( int irun ) ; // WRITEEVENTTREEFORCTOOLS
+		void save_TreeWithEventsForCtools() ;           // WRITEEVENTTREEFORCTOOLS
+		
 		// derotation and J2000
 		void getDerotatedCoordinates( unsigned int, double i_UTC, double x, double y, double& x_derot, double& y_derot );
 		
@@ -358,3 +403,4 @@ class VStereoAnalysis
 		
 };
 #endif
+

@@ -109,13 +109,10 @@ int main( int argc, char* argv[] )
 	VRadialAcceptance* facc = new VRadialAcceptance( fCuts, fRunPara );
 	
 	// set facc to write extra histograms if necessary
-	//cout << "NKH histdir.size() = " << histdir.size() << " ." << endl;
 	if( histdir.size() > 0 )
 	{
-		//cout << "NKH histdir.size() > 0 !!!" << endl;
 		if( stat( histdir.c_str(), &sb ) == 0 && S_ISDIR( sb.st_mode ) ) // then directory 'histdir' exists
 		{
-			//cout << "NKH directory exists!" << endl;
 			//facc->SetExtraHistogramMode( 1 ) ;
 			facc->SetExtraHistogramDirectory( histdir ) ;
 		}

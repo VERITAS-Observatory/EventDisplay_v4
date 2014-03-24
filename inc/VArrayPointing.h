@@ -19,6 +19,11 @@ class VArrayPointing : public VSkyCoordinates
 	
 		TTree* fPointingTree;
 		
+		// smaller version of fPointingTree
+		// contains pointing info at 1/second, instead of 1/event
+		// pointing is from interpolated
+		TTree* fPntReduced;
+		
 		void initializePointingTree();
 		
 	public:
@@ -26,6 +31,7 @@ class VArrayPointing : public VSkyCoordinates
 		VArrayPointing( bool bInitTree = true );
 		~VArrayPointing() {}
 		void fillPointingTree();
+		void fillPntReduced();
 		void terminate();
 		
 };

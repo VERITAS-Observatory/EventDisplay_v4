@@ -940,6 +940,10 @@ void slaDtp2s( double xi, double eta, double raz, double decz,
  **
  **  Given:
  **     xi,eta      double   tangent plane rectangular coordinates
+ **                          (xi and eta are equivalent to VERITAS's
+ **                          derotated camera coordinates Xderot
+ **                          and Yderot, NOT the tangent plane RA/Dec,
+ **                          (e.g. Xderot + wobbleWest + TargetRA))
  **     raz,decz    double   spherical coordinates of tangent point
  **
  **  Returned:

@@ -126,12 +126,12 @@ class CData
 		Float_t         MLR;
 		Double_t        Erec;
 		Double_t        EChi2;
-		Double_t        dE;
+		Double_t        dE;        // Error on Erec
 		Double_t        ErecS;
 		Double_t        EChi2S;
-		Double_t        dES;
-		Double_t        SizeSecondMax;            //AMC 09102009
-		Double_t        theta2_All[25];           //AMC 10122009
+		Double_t        dES;       // Error on ErecS
+		Double_t        SizeSecondMax;
+		Double_t        theta2_All[25];
 		Float_t         EmissionHeight;
 		Float_t         EmissionHeightChi2;
 		UInt_t          NTelPairs;
@@ -273,8 +273,8 @@ class CData
 		TBranch*        b_EChi2;                  //!
 		TBranch*        b_ErecS;                  //!
 		TBranch*        b_EChi2S;                 //!
-		TBranch*        b_SizeSecondMax;          //AMC 09102009
-		TBranch*        b_theta2_All;             //AMC 10122009
+		TBranch*        b_SizeSecondMax;          //!
+		TBranch*        b_theta2_All;             //!
 		TBranch*        b_EmissionHeight;         //!
 		TBranch*        b_EmissionHeightChi2;     //!
 		TBranch*        b_NTelPairs;              //!
@@ -655,7 +655,6 @@ void CData::Init( TTree* tree )
 		}
 	}
 	
-	//AMC 09102009
 	if( fBOOLSecondMax )
 	{
 		fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
@@ -664,7 +663,6 @@ void CData::Init( TTree* tree )
 	{
 		SizeSecondMax = 0.;
 	}
-	//AMC 09102009
 	
 	if( fBOOLtheta2_All )
 	{

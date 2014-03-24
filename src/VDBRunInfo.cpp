@@ -7,6 +7,10 @@
 
 #include "VDBRunInfo.h"
 
+//
+// irun      : runnumber to pull info for
+// iDBserver : database url to get runinfo from, usually from VGlobalRunParameter->getDBServer()
+// iNTel     : number of telescopes to look for?
 VDBRunInfo::VDBRunInfo( int irun, string iDBserver, unsigned int iNTel )
 {
 	fRunNumber = irun;

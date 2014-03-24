@@ -1,7 +1,7 @@
 /* VTimeMask.cpp
  * Created: Mon  2 Mar 00:11:01 2009
  * Author: Michael McCutcheon
- * $Id: VTimeMask.cpp,v 1.1.2.2.8.1.2.2 2010/03/08 07:45:10 gmaier Exp $
+ *
  */
 
 #include "VTimeMask.h"
@@ -52,7 +52,6 @@ void            VTimeMask::initialise( Int_t run_number, Double_t run_start, Dou
 	{
 		mask_file = file_name;
 	}
-	
 	set_success                             = kFALSE;
 	override                                = kFALSE;
 	outside_count                               = 0;
@@ -125,7 +124,7 @@ Bool_t          VTimeMask::setMask()
 		}
 		else
 		{
-			cout << "\t setting time-mask from file " << mask_file << endl;
+			//cout <<"\t setting time-mask from file "<< mask_file << endl;
 			// Retrieve each line and parse
 			string settings_str = "";
 			while( getline( settings_file, settings_str ) )
@@ -157,10 +156,12 @@ Bool_t          VTimeMask::setMask()
 					mask_width = mask_width + mask_start;
 					mask_start = 0;
 				}
+				// Mask width should be finite
 				if( mask_width < 1 )
 				{
-					continue;    // Mask width should be finite
+					continue;
 				}
+				
 				// Mask mode should represent a boolean
 				if( mask_mode != 0 && mask_mode != 1 )
 				{
@@ -222,7 +223,7 @@ Bool_t VTimeMask::setMaskDuringPhaseCuts( Double_t now )
 
 
 
-Bool_t           VTimeMask::checkMaskNow( Double_t now )
+Bool_t VTimeMask::checkMaskNow( Double_t now )
 {
 	if( override )
 	{
@@ -823,6 +824,45 @@ Bool_t          VTimeMask::readObjects( TDirectory* iDir )
 	//delete iAcceptedVector;
 	
 	return kTRUE;
+}
+
+
+void VTimeMask::displayMask( ostream& terminal )
+{
+	double currMJD = 0.0 ;
+	double startMJD = start_time / secs_day ;
+	double stopMJD  = ( start_time + mask.size() ) / secs_day ;
+	//terminal << "~~~~~~~~~~~~~~~~~~~" << endl;
+	//terminal.precision(8) ;
+	//terminal << "startMJD:" << startMJD << endl ;
+	//terminal << "stopMJD :" << stopMJD  << endl ;
+	// loop through every second of the run
+	for( int i_dur = 0 ; i_dur < 10000 ; i_dur++ )
+	{
+		currMJD = startMJD + ( i_dur / ( 24.*60.*60. ) ) ;
+		if( currMJD >= stopMJD )
+		{
+			break ;
+		}
+		// every minute since beginning of the run, start a new line
+		if( i_dur % 60 == 0 )
+		{
+			terminal << endl ;
+			terminal << " TIMEMASK RUN"    ;
+			terminal.precision( 0 ) ;
+			terminal << fixed << setw( 5 )  << run_id  ;
+			terminal << " - MJD:" ;
+			terminal.precision( 5 ) ;
+			terminal << fixed << setw( 11 ) << currMJD ;
+			terminal << " - sec:" ;
+			terminal.precision( 0 ) ;
+			terminal << fixed << setw( 4 )  << i_dur   ;
+			terminal << " - "     ;
+		}
+		// display mask status at currMJD
+		terminal << checkMaskNow( secs_day * currMJD ) ;
+	}
+	terminal << endl;
 }
 
 

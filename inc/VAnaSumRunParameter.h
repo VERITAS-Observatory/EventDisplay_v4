@@ -8,6 +8,7 @@
 #include "TLeaf.h"
 #include "TMath.h"
 #include "TTree.h"
+#include "TNamed.h"
 
 #include <fstream>
 #include <iostream>
@@ -44,7 +45,7 @@ class VAnaSumRunParameterListOfExclusionRegions
 };
 
 
-class VAnaSumRunParameterDataClass
+class VAnaSumRunParameterDataClass : public TNamed
 {
 
 	public:
@@ -123,13 +124,15 @@ class VAnaSumRunParameterDataClass
 		double fTE_mscl_min;
 		double fTE_mscl_max;
 		
+		
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
 		
 		VAnaSumRunParameterDataClass();
 		~VAnaSumRunParameterDataClass() {}
+		ClassDef( VAnaSumRunParameterDataClass, 1 );
 };
 
-class VAnaSumRunParameter : public VGlobalRunParameter
+class VAnaSumRunParameter : public TNamed, public VGlobalRunParameter
 {
 	private:
 	
@@ -180,6 +183,7 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		
 		bool fWriteAllGammaToTree ; // WRITEALLGAMMATOTREE
 		int f2DAcceptanceMode ; // USE2DACCEPTANCE
+		bool fWriteEventTreeForCtools ; // WRITEEVENTTREEFORCTOOLS
 		bool fModel3D;
 		int fFrogs;
 		
@@ -216,10 +220,13 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		string fStarBand;
 		double fStarExlusionRadius;
 		
+		// for saving the deadtime fraction for ctools
+		double fScalarDeadTimeFrac ;
+		
 		string fTimeMaskFile;
 		
 		VAnaSumRunParameter();
-		~VAnaSumRunParameter() {}
+		~VAnaSumRunParameter() {} ;
 		unsigned int getMaxNumberofTelescopes();
 		int  getInputFileVersionNumber()
 		{
@@ -243,6 +250,9 @@ class VAnaSumRunParameter : public VGlobalRunParameter
 		bool setTargetShifts( unsigned int i, double west, double north, double ra, double dec );
 		bool writeListOfExcludedSkyRegions();
 		bool getListOfExcludedSkyRegions( TFile* f );
+		
+		//void Write() { TObject::Write() ; } ;
+		ClassDef( VAnaSumRunParameter, 3 ) ;
 		
 };
 #endif

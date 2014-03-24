@@ -74,5 +74,9 @@ class VDeadTime
 		bool   readHistograms( TDirectoryFile* iDir );
 		void   reset();
 		void   writeHistograms();
+		double getScalarDeadTimeFraction()
+		{
+			return fScalarDeadTimeFrac ;
+		}
 };
 #endif

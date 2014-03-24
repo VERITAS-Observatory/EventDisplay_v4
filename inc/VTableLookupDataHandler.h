@@ -288,8 +288,8 @@ class VTableLookupDataHandler
 		//!< (note that maximum array length should be larger than MaxNbrTel
 		float  fEmissionHeightT[VDST_MAXTELESCOPES];
 		
-		double fSizeSecondMax;                    //AMC 09102009
-		double ftheta2_All[25];                   //AMC 10122009
+		double fSizeSecondMax;
+		double ftheta2_All[25];
 		
 		// Model3D parameters (JG)
 		bool fIsModel3D;  // data contains Model3D parameters

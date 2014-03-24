@@ -216,62 +216,7 @@ void VArrayAnalyzer::initEvent()
 	getShowerParameters()->time = getEventTime();
 	getShowerParameters()->MJD  = getEventMJD();
 	
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	// get the telescope pointing
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	// MC readers
-	// source file is Grisu MC, MC DST, or MC Pe
-	if( fReader->isMC() )
-	{
-		getArrayPointing()->setMC();
-		// calculate mean el and az from all telescopes (should probably be the same for all)
-		double i_el = 0.;
-		double i_az = 0.;
-		double i_n = 0.;
-		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
-		{
-			if( getTeltoAna()[i] < fReader->getTelElevation().size() && getTeltoAna()[i] < fReader->getTelAzimuth().size() )
-			{
-				i_el += fReader->getTelElevation()[getTeltoAna()[i]];
-				i_az += fReader->getTelAzimuth()[getTeltoAna()[i]];
-				i_n++;
-			}
-			if( i_n > 0. )
-			{
-				getArrayPointing()->setTelElevation( i_el / i_n );
-				getArrayPointing()->setTelAzimuth( i_az / i_n );
-			}
-		}
-		if( i_n < 1.e-2 )
-		{
-			getArrayPointing()->setTelElevation( 0. );
-			getArrayPointing()->setTelAzimuth( 0. );
-		}
-	}
-	// set pointing direction from command line
-	else if( getRunParameter()->felevation > 0. && getRunParameter()->fazimuth > 0. )
-	{
-		getArrayPointing()->setTelElevation( getRunParameter()->felevation );
-		getArrayPointing()->setTelAzimuth( getRunParameter()->fazimuth );
-	}
-	// set pointing direction with target
-	// target is set via command line, getPointing() is initiated in run/VEventLoop::initEventLoop()
-	else
-	{
-		if( getArrayPointing()->isSet() && getArrayPointing()->getTargetName() != "laser" )
-		{
-			// this calculates telescope elevation and azimuth from telescope pointing in ra and dec
-			getArrayPointing()->updatePointing( getImageParameters()->MJD, getImageParameters()->time );
-			if( !getArrayPointing()->isPrecessed() )
-			{
-				getArrayPointing()->precessTarget( getImageParameters()->MJD, -1 );
-				// set wobble offsets
-				getArrayPointing()->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, -1, getImageParameters()->MJD );
-				getArrayPointing()->updatePointing( getImageParameters()->MJD, getImageParameters()->time );
-			}
-		}
-	}
+	calcTelescopePointing() ;
 	getArrayPointing()->fillPointingTree();
 	
 	// set telescope pointing for data (again) and fill pointing tree
@@ -332,6 +277,111 @@ void VArrayAnalyzer::initEvent()
 	}
 }
 
+
+// do all the calculations just before we write data to the
+// pointingData TTree, so we can do it per-event or per-time
+void VArrayAnalyzer::calcTelescopePointing()
+{
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	// get the telescope pointing
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	// MC readers
+	// source file is Grisu MC, MC DST, or MC Pe
+	if( fReader->isMC() )
+	{
+		getArrayPointing()->setMC();
+		// calculate mean el and az from all telescopes (should probably be the same for all)
+		double i_el = 0.;
+		double i_az = 0.;
+		double i_n = 0.;
+		for( unsigned int i = 0; i < getTeltoAna().size(); i++ )
+		{
+			if( getTeltoAna()[i] < fReader->getTelElevation().size() && getTeltoAna()[i] < fReader->getTelAzimuth().size() )
+			{
+				i_el += fReader->getTelElevation()[getTeltoAna()[i]];
+				i_az += fReader->getTelAzimuth()[getTeltoAna()[i]];
+				i_n++;
+			}
+			if( i_n > 0. )
+			{
+				getArrayPointing()->setTelElevation( i_el / i_n );
+				getArrayPointing()->setTelAzimuth( i_az / i_n );
+			}
+		}
+		if( i_n < 1.e-2 )
+		{
+			getArrayPointing()->setTelElevation( 0. );
+			getArrayPointing()->setTelAzimuth( 0. );
+		}
+	}
+	// set pointing direction from command line
+	else if( getRunParameter()->felevation > 0. && getRunParameter()->fazimuth > 0. )
+	{
+		getArrayPointing()->setTelElevation( getRunParameter()->felevation );
+		getArrayPointing()->setTelAzimuth( getRunParameter()->fazimuth );
+	}
+	// set pointing direction with target
+	// target is set via command line, getPointing() is initiated in run/VEventLoop::initEventLoop()
+	else
+	{
+		if( getArrayPointing()->isSet() && getArrayPointing()->getTargetName() != "laser" )
+		{
+			getArrayPointing()->updatePointing( getImageParameters()->MJD, getImageParameters()->time );
+			if( !getArrayPointing()->isPrecessed() )
+			{
+				getArrayPointing()->precessTarget( getImageParameters()->MJD, -1 );
+				// set wobble offsets
+				getArrayPointing()->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, -1, getImageParameters()->MJD );
+				getArrayPointing()->updatePointing( getImageParameters()->MJD, getImageParameters()->time );
+			}
+		}
+	}
+}
+	
+// fill reduced pointing data (1 row per second,
+// instead of 1 per line like VArrayPointing::fillPointingTree() )
+void VArrayAnalyzer::generateReducedPointingTreeData()
+	{
+	double MJDStart = 0 ; // start MJD of run
+	double MJDStopp = 0 ; // end   MJD of run
+	double TimeStart = 0.0 ; // start Time of run
+	double TimeStopp = 0.0 ; // end   Time of run
+	VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStartTimeSQL, MJDStart, TimeStart );
+	VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStoppTimeSQL, MJDStopp, TimeStopp );
+	
+	int    iMJD  = TMath::Nint(MJDStart);
+	double iTime = TimeStart ;
+	int    timeDur = 0 ;
+	while( iMJD <= TMath::Nint(MJDStopp)  &&  iTime < TimeStopp )
+		{
+		// loop over run duration, 1 loop per second
+		iTime += 1.0 ;
+		
+		// cycle to next MJD if needed
+		if( iTime >= 86400.0 )
+			{
+			iTime = iTime - 86400.0 ;
+			iMJD += 1 ;
+			}
+	
+		// set time, init telescope pointing
+		setAnalysisArrayEventStatus( 0 );
+		getShowerParameters()->reset( getNTel() );
+		getShowerParameters()->runNumber    = getRunNumber();
+		getShowerParameters()->eventNumber  = 103 ;
+		getShowerParameters()->fsourcetype  = fReader->getDataFormatNum();
+		getShowerParameters()->fNTelescopes = 4 ;
+		getShowerParameters()->time = iTime ;
+		getShowerParameters()->MJD  = iMJD  ;
+		//calcTelescopePointing() ;
+		updatePointingToArbitraryTime( iMJD, iTime ) ;
+
+		// fill pointing to tree in VArrayPointing
+		getArrayPointing()->fillPntReduced() ;
+		timeDur += 1 ;
+	}
+}
 
 /*!
     this routine is called once at the beginning of the analysis
@@ -475,6 +525,8 @@ void VArrayAnalyzer::terminate()
 	{
 		cout << "void VArrayAnalyzer::terminate()" << endl;
 	}
+	
+	generateReducedPointingTreeData() ;
 	
 	for( unsigned int i = 0; i < fDispAnalyzer.size(); i++ )
 	{
@@ -2192,4 +2244,30 @@ bool VArrayAnalyzer::updatePointingToStarCatalogue( unsigned int iTelescope )
 			iTel_ra, iTel_dec, iScale );
 			
 	return true;
+}
+
+// for getting the interpolated pointing at a specific MJD and Time
+// for filling the pointingDataReduced TTree in the evndisp.<>.root file
+void VArrayAnalyzer::updatePointingToArbitraryTime( int iMJD, double iTime )
+{
+
+	// same conditions as above
+	if( !fReader->isMC() &&
+			!( getRunParameter()->felevation > 0.0 ) &&
+			!( getRunParameter()->fazimuth > 0.0 ) &&
+			getArrayPointing()->isSet() &&
+			( getArrayPointing()->getTargetName() != "laser" ) )
+	{
+	
+		getArrayPointing()->updatePointing( iMJD, iTime );
+		if( !getArrayPointing()->isPrecessed() )
+		{
+			getArrayPointing()->precessTarget( iMJD, -1 );
+			// set wobble offsets
+			getArrayPointing()->setWobbleOffset( getRunParameter()->fWobbleNorth, getRunParameter()->fWobbleEast, -1, iMJD );
+			getArrayPointing()->updatePointing( iMJD, iTime );
+		}
+		
+	}
+	
 }

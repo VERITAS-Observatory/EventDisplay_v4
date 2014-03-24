@@ -1491,6 +1491,27 @@ bool VTableLookupDataHandler::terminate( TNamed* iM )
 			copyMCHistograms();
 		}
 		
+		///////////////////////////////////////////////////////////////////////////
+		// copy TTree 'pointingDataReduced' from evndisp.<>.root to mscw.<>.root
+		if( finputfile.size() > 1 )
+		{
+			cout << "Warning, VTableLookupDataHandler->finputfile.size() isn't 1, not sure which input file to copy TTree 'pointingDataReduced' from, copying from file finputfile[0]:" << finputfile[0] << endl;
+		}
+		// not sure why we don't want to do this for MC
+		if( finputfile.size() > 0 && !fIsMC )
+		{
+			TFile* inpMscwFile = new TFile( finputfile[0].c_str(), "READ" ) ;
+			TTree* iTree       = ( TTree* )inpMscwFile->Get( "pointingDataReduced" );
+			TTree* newtree     = iTree->CloneTree();
+			fOutFile->cd();
+			newtree->Write();
+		}
+		else
+		{
+			cout << "Warning, VTableLookupDataHandler->finputfile has size 0, unable to copy TTree 'pointingDataReduced' to file " << fOutFile->GetName() << endl;
+		}
+		
+		
 		fOutFile->Close();
 		cout << "...outputfile closed" << endl;
 		cout << "(" << fOutFile->GetName() << ")" << endl;

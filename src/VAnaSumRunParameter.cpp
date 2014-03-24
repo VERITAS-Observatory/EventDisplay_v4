@@ -150,12 +150,17 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	// or do we only keep the ones that pass ON/OFF region cuts?
 	fWriteAllGammaToTree = false ; // WRITEALLGAMMATOTREE
 	
+	fWriteEventTreeForCtools = false ;
+	
 	fFrogs = 0;
 	fModel3D = false; // MODEL3DANALYSIS
 	
 	// if 0, use default 1D radial acceptance
 	// if >0, use alternate 2D-dependent acceptance
 	f2DAcceptanceMode = 0 ; // USE2DACCEPTANCE
+	
+	// for deadtime fraction storage CTOOLS
+	fScalarDeadTimeFrac = 0.0 ;
 	
 	// set monte carlo zenith angles
 	setMCZenith();
@@ -567,7 +572,19 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			else if( temp == "USE2DACCEPTANCE" )
 			{
 				f2DAcceptanceMode = ( unsigned int )atoi( temp2.c_str() ) ;
-				cout << "NKH Setting f2DAcceptanceMode = " << f2DAcceptanceMode << endl;
+			}
+			
+			///////////////////////////////////////////////////////////
+			// WRITEEVENTTREEFORCTOOLS
+			// adds an extra tree "run_#####/stereo/TreeWithEventsForCtools" to anasum.#####.root,
+			// containing info for converting veritas data to CTOOLs event list format
+			else if( temp == "WRITEEVENTTREEFORCTOOLS" )
+			{
+				unsigned int tmpWriteAll = ( unsigned int )atoi( temp2.c_str() ) ;
+				if( tmpWriteAll == 1 )
+				{
+					fWriteEventTreeForCtools = true ;
+				}
 			}
 			
 			/// use Model3D analysis ///
@@ -1789,3 +1806,11 @@ VAnaSumRunParameterListOfExclusionRegions::VAnaSumRunParameterListOfExclusionReg
 	fExcludeFromBackground_StarBrightness_V = -9999.;
 	fExcludeFromBackground_StarBrightness_B = -9999.;
 }
+
+/* Deconstructor for vtables error */
+/*
+VAnaSumRunParameter::~VAnaSumRunParameter()
+{
+
+}
+*/

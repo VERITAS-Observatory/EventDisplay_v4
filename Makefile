@@ -238,7 +238,8 @@ all VTS:	evndisp \
 	compareDatawithMC \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
-	VTS.getRun_TimeElevAzim
+	VTS.getRun_TimeElevAzim \
+	writeCTAEventListFromAnasum
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
@@ -438,7 +439,7 @@ ACCOBJECT = 	./obj/makeRadialAcceptance.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 		./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-		./obj/VAnaSumRunParameter.o \
+		./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		 ./obj/VUtilities.o 
@@ -476,7 +477,7 @@ ACCOBJECT = ./obj/VTS.getRun_TimeElevAzim.o \
 		./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 		./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
-		./obj/VAnaSumRunParameter.o \
+		./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTargets.o \
@@ -534,11 +535,11 @@ ANASUMOBJECTS =	./obj/VAnaSum.o ./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_
 		./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
                 ./obj/VStereoAnalysis.o ./obj/VMonoPlots.o \
                 ./obj/VSkyCoordinates.o \
-                ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o \
+                ./obj/VOnOff.o ./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VStereoMaps.o ./obj/VRatePlots.o \
 		./obj/VRadialAcceptance.o ./obj/VEffectiveAreaCalculator.o ./obj/VRunSummary.o \
 		./obj/VDeadTime.o \
-		./obj/VTimeMask.o ./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o ./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 		./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
@@ -615,7 +616,7 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VExposure.o ./obj/VExposure_Dict.o \
 		./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 		./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
-		./obj/VAnaSumRunParameter.o \
+		./obj/VAnaSumRunParameter.o ./obj/VAnaSumRunParameter_Dict.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VInterpolate2DHistos.o ./obj/VInterpolate2DHistos_Dict.o \
@@ -667,7 +668,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VWPPhysSensitivityPlotsMaker.o ./obj/VWPPhysSensitivityPlotsMaker_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
 		./obj/VCTARequirements.o ./obj/VCTARequirements_Dict.o \
-		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o
+		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o \
+		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
@@ -836,6 +838,32 @@ printBinaryOrbitalPhase:	$(PRINTBINARYOBJ)
 
 
 ########################################################
+# writeCTAEventListFromAnasum
+# for converting post-cuts event lists to CTA's format
+########################################################
+
+# remove ./obj/VTargets.o AS SOON AS POSSIBLE!
+writeCTAEventListFromAnasumOBJ  = $(SHAREDOBJS)
+writeCTAEventListFromAnasumOBJ += ./obj/Angle.o
+writeCTAEventListFromAnasumOBJ += ./obj/CorrectionParameters.o
+writeCTAEventListFromAnasumOBJ += ./obj/FITSRecord.o 
+writeCTAEventListFromAnasumOBJ += ./obj/PointingMonitor.o
+writeCTAEventListFromAnasumOBJ += ./obj/VDBRunInfo.o
+writeCTAEventListFromAnasumOBJ += ./obj/VPointingDB.o
+writeCTAEventListFromAnasumOBJ += ./obj/VTargets.o
+writeCTAEventListFromAnasumOBJ += ./obj/VTimeMask.o
+writeCTAEventListFromAnasumOBJ += ./obj/VTimeMask_Dict.o
+writeCTAEventListFromAnasumOBJ += ./obj/VTrackingCorrections.o
+writeCTAEventListFromAnasumOBJ += ./obj/writeCTAEventListFromAnasum.o
+
+./obj/writeCTAEventListFromAnasum.o:   ./src/writeCTAEventListFromAnasum.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+writeCTAEventListFromAnasum:   $(writeCTAEventListFromAnasumOBJ)
+	$(LD) $(LDFLAGS) $^ $(GLIBS) $(OutPutOpt) ./bin/$@
+	@echo "$@ done"
+
+########################################################
 # writeCTAWPPhysSensitivityFiles 
 ########################################################
 WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
@@ -849,8 +877,7 @@ WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
-			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
-			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \ ./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
 			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \

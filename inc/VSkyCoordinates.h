@@ -132,6 +132,14 @@ class VSkyCoordinates
 		{
 			return fWobbleEast;
 		}
+		unsigned int getMJD()
+		{
+			return fMJD ;
+		}
+		double getTime()
+		{
+			return fTime ;
+		}
 		bool   initStarCatalogue( string iCatalogueName, double iMJD, double xmin, double xmax, double ymin, double ymax,
 								  double iRASkyMapCentreJ2000, double iDecSkyMapCentreJ2000 );
 		bool   isPrecessed()

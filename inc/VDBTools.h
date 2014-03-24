@@ -1,7 +1,7 @@
 //! VDBTools VERITAS DB tools
 
 #ifndef VDBTools_H
-#define VDBTools_h
+#define VDBTools_H
 
 #include <TMath.h>
 #include <TSQLResult.h>
