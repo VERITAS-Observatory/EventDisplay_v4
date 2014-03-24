@@ -2642,11 +2642,13 @@ void VStereoAnalysis::save_TreeWithEventsForCtools() // WRITEEVENTTREEFORCTOOLS
 	fRunPara->SetName( "VAnaSumRunParameter" );
 	fRunPara->Write() ;
 	
+	/*
 	VAnaSumRunParameterDataClass* vasr = new VAnaSumRunParameterDataClass() ;
 	vasr->fWobbleNorth = 0.5 ;
 	vasr->fRunOn = 65543 ;
 	vasr->SetName( "VASRPDC" ) ;
 	vasr->Write() ;
+	*/
 	
 	fCDataTreeClone = fDataRunTree->CloneTree() ;
 	fCDataTreeClone->SetName( "cdatatree" );
