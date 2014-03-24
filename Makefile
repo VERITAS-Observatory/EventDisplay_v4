@@ -238,8 +238,7 @@ all VTS:	evndisp \
 	compareDatawithMC \
 	VTS.getRunListFromDB \
 	VTS.getLaserRunFromDB \
-	VTS.getRun_TimeElevAzim \
-	writeCTAEventListFromAnasum
+	VTS.getRun_TimeElevAzim
 
 CTA:	evndisp \
         CTA.convert_hessio_to_VDST \
