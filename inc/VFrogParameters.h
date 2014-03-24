@@ -14,60 +14,69 @@ using namespace std;
 
 class VFrogParameters
 {
-    private:
-        bool fDebug;
-        TTree *fTreeFrog;                         //!< output tree
-        unsigned int fNTel;                       //!< number of telescopes
-
-    public:
-
-        VFrogParameters();
-        ~VFrogParameters();
-
-        void fill() { if( fTreeFrog ) fTreeFrog->Fill(); }
-        TTree *getTree() { return fTreeFrog; }
-        void initTree( string, string );
-        void printParameters();                   //!< write tree parameters to standard output
-        void reset();                             //!< reset all tree variable to standard values
-
-        int   frogsEventID;
-        int   frogsGSLConStat;
-        int   frogsNB_iter;
-        int   frogsNImages;
-        float frogsXS;
-        float frogsXSerr;
-        float frogsYS;
-        float frogsYSerr;
-        float frogsXP;
-        float frogsXPerr;
-        float frogsYP;
-        float frogsYPerr;
-        float frogsXPGC;
-        float frogsYPGC;
-        float frogsEnergy;
-        float frogsEnergyerr;
-        float frogsLambda;
-        float frogsLambdaerr;
-        float frogsGoodnessImg;
-        int   frogsNpixImg;
-        float frogsGoodnessBkg;
-        int   frogsNpixBkg;
-
-	float frogsXPStart;
-	float frogsYPStart;
-	float frogsXPED;
-	float frogsYPED;
-	float frogsXSStart;
-	float frogsYSStart;
-
-	float frogsTelGoodnessImg0;
-	float frogsTelGoodnessImg1;
-	float frogsTelGoodnessImg2;
-	float frogsTelGoodnessImg3;
-	float frogsTelGoodnessBkg0;
-	float frogsTelGoodnessBkg1;
-	float frogsTelGoodnessBkg2;
-	float frogsTelGoodnessBkg3;
-
+	private:
+		bool fDebug;
+		TTree* fTreeFrog;                         //!< output tree
+		unsigned int fNTel;                       //!< number of telescopes
+		
+	public:
+	
+		VFrogParameters();
+		~VFrogParameters();
+		
+		void fill()
+		{
+			if( fTreeFrog )
+			{
+				fTreeFrog->Fill();
+			}
+		}
+		TTree* getTree()
+		{
+			return fTreeFrog;
+		}
+		void initTree( string, string );
+		void printParameters();                   //!< write tree parameters to standard output
+		void reset();                             //!< reset all tree variable to standard values
+		
+		int   frogsEventID;
+		int   frogsGSLConStat;
+		int   frogsNB_iter;
+		int   frogsNImages;
+		float frogsXS;
+		float frogsXSerr;
+		float frogsYS;
+		float frogsYSerr;
+		float frogsXP;
+		float frogsXPerr;
+		float frogsYP;
+		float frogsYPerr;
+		float frogsXPGC;
+		float frogsYPGC;
+		float frogsEnergy;
+		float frogsEnergyerr;
+		float frogsLambda;
+		float frogsLambdaerr;
+		float frogsGoodnessImg;
+		int   frogsNpixImg;
+		float frogsGoodnessBkg;
+		int   frogsNpixBkg;
+		
+		float frogsXPStart;
+		float frogsYPStart;
+		float frogsXPED;
+		float frogsYPED;
+		float frogsXSStart;
+		float frogsYSStart;
+		
+		float frogsTelGoodnessImg0;
+		float frogsTelGoodnessImg1;
+		float frogsTelGoodnessImg2;
+		float frogsTelGoodnessImg3;
+		float frogsTelGoodnessBkg0;
+		float frogsTelGoodnessBkg1;
+		float frogsTelGoodnessBkg2;
+		float frogsTelGoodnessBkg3;
+		
 };
 #endif

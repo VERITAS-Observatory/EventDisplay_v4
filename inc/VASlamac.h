@@ -49,7 +49,7 @@
 
 /* dmod(A,B) - A modulo B (double) */
 #define dmod(A,B) ((B)!=0.0?((A)*(B)>0.0?(A)-(B)*floor((A)/(B))\
-:(A)+(B)*floor(-(A)/(B))):(A))
+							 :(A)+(B)*floor(-(A)/(B))):(A))
 
 /* logicals */
 #if !defined(FALSE) || ((FALSE)!=0)

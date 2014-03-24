@@ -24,39 +24,42 @@ using namespace std;
 
 class VImageAnalyzer : public VImageBaseAnalyzer
 {
-    private:
-        bool fDebug;
-	VImageCleaning* fVImageCleaning;                            //!< image cleaning
-        VImageParameterCalculation* fVImageParameterCalculation;    //!< image calculation
-
-        bool fInit;
-
+	private:
+		bool fDebug;
+		VImageCleaning* fVImageCleaning;                            //!< image cleaning
+		VImageParameterCalculation* fVImageParameterCalculation;    //!< image calculation
+		
+		bool fInit;
+		
 // temporary vectors for dead pixel smoothing
-        vector< unsigned int > savedDead;
-        vector< unsigned int > savedDeadLow;
-        valarray< double > savedGains;
-        valarray< double > savedGainsLow;
-
-        void fillOutputTree();                    //!< fill tree with image parameterisation results
-	void imageCleaning();                     //!< image cleaning
-        bool initEvent();                         //! reset image calculation for next event
-	void muonRingAnalysis();                  //! muon ring analysis
-	void houghMuonRingAnalysis();                  //! hough transform muon ring analysis
-        void printTrace( int i_channel );         //!< print trace information for one channel (debugging)
-        void setAnaDir( unsigned int iTel );      //!< set directories in root output file
-        void setNTrigger();
-        void smoothDeadTubes();                   //!< reduce the effect of dead tubes
-
-    public:
-        VImageAnalyzer();
-       ~VImageAnalyzer();
-
-        void doAnalysis();                        //!< do the actual analysis (called for each event)
-	VImageCleaning*  getImageCleaner() { return fVImageCleaning; }   //! return pointer to image cleaner
-        void initAnalysis();                      //!< set the data vectors, read the calibration data (called once at the beginning of the analysis)
-        void initOutput();                        //!< open outputfile
-        void initTrees();                         //!  intitalize output tree
-        void shutdown();                          //!< close outputfile
-        void terminate();                         //!< write results to disk
+		vector< unsigned int > savedDead;
+		vector< unsigned int > savedDeadLow;
+		valarray< double > savedGains;
+		valarray< double > savedGainsLow;
+		
+		void fillOutputTree();                    //!< fill tree with image parameterisation results
+		void imageCleaning();                     //!< image cleaning
+		bool initEvent();                         //! reset image calculation for next event
+		void muonRingAnalysis();                  //! muon ring analysis
+		void houghMuonRingAnalysis();                  //! hough transform muon ring analysis
+		void printTrace( int i_channel );         //!< print trace information for one channel (debugging)
+		void setAnaDir( unsigned int iTel );      //!< set directories in root output file
+		void setNTrigger();
+		void smoothDeadTubes();                   //!< reduce the effect of dead tubes
+		
+	public:
+		VImageAnalyzer();
+		~VImageAnalyzer();
+		
+		void doAnalysis();                        //!< do the actual analysis (called for each event)
+		VImageCleaning*  getImageCleaner()
+		{
+			return fVImageCleaning;    //! return pointer to image cleaner
+		}
+		void initAnalysis();                      //!< set the data vectors, read the calibration data (called once at the beginning of the analysis)
+		void initOutput();                        //!< open outputfile
+		void initTrees();                         //!  intitalize output tree
+		void shutdown();                          //!< close outputfile
+		void terminate();                         //!< write results to disk
 };
 #endif

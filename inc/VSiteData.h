@@ -20,42 +20,45 @@ using namespace std;
 
 class VSiteData
 {
-   private:
-
-    bool             fDebug;
-
-   public:
-
-    string           fSiteName;
-    float            fSite_asl;
-    float            fSite_B_N;
-    float            fSite_B_S;
-    float            fSite_B_dB;
-    float            fSiteRequirementID;
-    string           fReferenceSiteName;
-    vector< string > fSiteFileName;
-    vector< bool   > fSiteFile_exists;
-    vector< float >  fSiteFile_Emin;
-    vector< float >  fSiteFile_Emax;
-    vector< float >  fObservationTime_s;
-    vector< float >  fCameraOffset_deg;
-    vector< string > fArray;
-    vector< TGraphAsymmErrors* > fGraphSensitivity;
-
-    vector< int >    fPlottingColor;
-    vector< int >    fPlottingLineStyle;
-    vector< int >    fPlottingFillStyle;
-    vector< string > fLegend;
-
-
-    VSiteData();
-   ~VSiteData() {}
-    bool  addDataSet( string iDataList, unsigned int iSiteCounter, string iDirectionString = "" );
-    bool  checkIntegrity();
-    TGraphAsymmErrors* getCombinedSensitivityGraph( bool iInterpolate = false, string iDirectionString = "" );
-    void  print();
-    void  reset();
-    void  setDebug( bool iB = false ) { fDebug = iB; }
+	private:
+	
+		bool             fDebug;
+		
+	public:
+	
+		string           fSiteName;
+		float            fSite_asl;
+		float            fSite_B_N;
+		float            fSite_B_S;
+		float            fSite_B_dB;
+		float            fSiteRequirementID;
+		string           fReferenceSiteName;
+		vector< string > fSiteFileName;
+		vector< bool   > fSiteFile_exists;
+		vector< float >  fSiteFile_Emin;
+		vector< float >  fSiteFile_Emax;
+		vector< float >  fObservationTime_s;
+		vector< float >  fCameraOffset_deg;
+		vector< string > fArray;
+		vector< TGraphAsymmErrors* > fGraphSensitivity;
+		
+		vector< int >    fPlottingColor;
+		vector< int >    fPlottingLineStyle;
+		vector< int >    fPlottingFillStyle;
+		vector< string > fLegend;
+		
+		
+		VSiteData();
+		~VSiteData() {}
+		bool  addDataSet( string iDataList, unsigned int iSiteCounter, string iDirectionString = "" );
+		bool  checkIntegrity();
+		TGraphAsymmErrors* getCombinedSensitivityGraph( bool iInterpolate = false, string iDirectionString = "" );
+		void  print();
+		void  reset();
+		void  setDebug( bool iB = false )
+		{
+			fDebug = iB;
+		}
 };
 
 

@@ -1,0 +1,17 @@
+--style=allman
+--indent=force-tab=4
+--indent-classes
+--indent-switches
+--indent-namespaces
+--pad-paren-in
+--indent-labels
+--indent-preproc-define
+--add-brackets
+--pad-oper
+--unpad-paren
+--fill-empty-lines
+--align-pointer=type
+--preserve-date
+--verbose
+--formatted
+--suffix=none

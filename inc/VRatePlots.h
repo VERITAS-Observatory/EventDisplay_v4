@@ -18,39 +18,39 @@ using namespace std;
 
 class VRatePlots
 {
-    private:
-
-        vector< int > fRuns;
-        map< int, double > fTime;
-
-        TList *hList;
-        TList *hListTime;
-        TList *hListRun;
-
-        TGraph *hSig_run;
-        TGraph *hSigMax_run;
-        TGraphErrors *hOn_run;
-        TGraphErrors *hOff_run;
-        TGraphErrors *hRate_run;
-
-        TGraph *hSig_time;
-        TGraph *hSigMax_time;
-        TGraphErrors *hOn_time;
-        TGraphErrors *hOff_time;
-        TGraphErrors *hRate_time;
-
-        void defineRunGraphs( int );
-        void defineTimeGraphs( int );
-
-    public:
-
-        VRatePlots();
-        VRatePlots( VAnaSumRunParameter*, map< int, double > );
-        ~VRatePlots() {}
-        void fill( int irun, double iMJD, double isig, double isigmax, double ion, double ioff, double irate );
-        void fill( int irun, double isig, double isigmax, double ion, double ioff, double irate );
-        void fill(  vector< double > itime, vector< double > ion, vector< double > ioff, vector< double > isig, vector< double > irate );
-        void write();
-        void write( string );
+	private:
+	
+		vector< int > fRuns;
+		map< int, double > fTime;
+		
+		TList* hList;
+		TList* hListTime;
+		TList* hListRun;
+		
+		TGraph* hSig_run;
+		TGraph* hSigMax_run;
+		TGraphErrors* hOn_run;
+		TGraphErrors* hOff_run;
+		TGraphErrors* hRate_run;
+		
+		TGraph* hSig_time;
+		TGraph* hSigMax_time;
+		TGraphErrors* hOn_time;
+		TGraphErrors* hOff_time;
+		TGraphErrors* hRate_time;
+		
+		void defineRunGraphs( int );
+		void defineTimeGraphs( int );
+		
+	public:
+	
+		VRatePlots();
+		VRatePlots( VAnaSumRunParameter*, map< int, double > );
+		~VRatePlots() {}
+		void fill( int irun, double iMJD, double isig, double isigmax, double ion, double ioff, double irate );
+		void fill( int irun, double isig, double isigmax, double ion, double ioff, double irate );
+		void fill( vector< double > itime, vector< double > ion, vector< double > ioff, vector< double > isig, vector< double > irate );
+		void write();
+		void write( string );
 };
 #endif

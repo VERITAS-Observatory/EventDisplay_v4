@@ -14,21 +14,24 @@ using namespace std;
 
 class VMLPAnalyzer
 {
-    private:
-
-        bool bZombie;
-
-        TFile *fFile;
-        TMultiLayerPerceptron *fMLP;
-
-        Double_t fmlp_var[10];                    //!< input variables for the MLP
-
-    public:
-
-        VMLPAnalyzer( string iFile = "" );
-        ~VMLPAnalyzer() {}
-        float evaluate( float& width, float& length, float& asym, float& size, float& dist );
-        bool isZombie() { return bZombie; }
-        void terminate();
+	private:
+	
+		bool bZombie;
+		
+		TFile* fFile;
+		TMultiLayerPerceptron* fMLP;
+		
+		Double_t fmlp_var[10];                    //!< input variables for the MLP
+		
+	public:
+	
+		VMLPAnalyzer( string iFile = "" );
+		~VMLPAnalyzer() {}
+		float evaluate( float& width, float& length, float& asym, float& size, float& dist );
+		bool isZombie()
+		{
+			return bZombie;
+		}
+		void terminate();
 };
 #endif

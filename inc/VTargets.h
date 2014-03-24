@@ -22,35 +22,35 @@ using namespace std;
 
 class VTargets
 {
-    private:
-        vector< string > fTargetCode;
-        vector< string > fTargetName;
-        vector< string > fDec2000;
-        vector< double > fDec2000rad;
-        vector< string > fRA2000;
-        vector< double > fRA2000rad;
-
-        unsigned int fIndexSelected;
-
-        void convertCoordinates();
-        double getDecrad( string );
-        double getRArad( string );
-        string lowerCase(string& s);
-
-    public:
-
-        VTargets();
-        ~VTargets() {}
-        string getTargetCode();
-        double getTargetDecJ2000();
-        string getTargetName();
-        double getTargetRAJ2000();
-        void printTargets();                      // print target list to stdout
-        bool readTargets( string iTargetFile );   // read targets from a text file
-                                                  // use this target
-        bool selectTargetbyName( string iTargetName );
-                                                  // use this target
-        bool selectTargetbyCode( string iTargetName );
-        void setTarget( string iname, double iRaJ2000, double iDecJ2000 );
+	private:
+		vector< string > fTargetCode;
+		vector< string > fTargetName;
+		vector< string > fDec2000;
+		vector< double > fDec2000rad;
+		vector< string > fRA2000;
+		vector< double > fRA2000rad;
+		
+		unsigned int fIndexSelected;
+		
+		void convertCoordinates();
+		double getDecrad( string );
+		double getRArad( string );
+		string lowerCase( string& s );
+		
+	public:
+	
+		VTargets();
+		~VTargets() {}
+		string getTargetCode();
+		double getTargetDecJ2000();
+		string getTargetName();
+		double getTargetRAJ2000();
+		void printTargets();                      // print target list to stdout
+		bool readTargets( string iTargetFile );   // read targets from a text file
+		// use this target
+		bool selectTargetbyName( string iTargetName );
+		// use this target
+		bool selectTargetbyCode( string iTargetName );
+		void setTarget( string iname, double iRaJ2000, double iDecJ2000 );
 };
 #endif

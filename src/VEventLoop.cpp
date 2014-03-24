@@ -289,30 +289,39 @@ bool VEventLoop::initEventLoop( string iFileName )
 							z++;
 						}
 					}
-                                        // found samples for all telescopes
+					// found samples for all telescopes
 					if( z == i_nSampleSet.size() )
 					{
-                                        // require that sample length is the same in all telescopes
-                                        // (note: this is a strong requirement, but should be ok for
-                                        //  VTS (VBF is assumed to be VTS)
-                                                unsigned int i_tempSampeLength = 0;
-                                                bool iAll_are_the_same = true;
-                                                if( fRunPar->fTelToAnalyze.size() > 0 ) i_tempSampeLength = getNSamples( fRunPar->fTelToAnalyze[0] );
-                                                for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
-                                                {
-                                                   if( i_tempSampeLength != getNSamples( fRunPar->fTelToAnalyze[i] ) ) iAll_are_the_same = false;
-                                                }
-						if( iAll_are_the_same ) break;
+						// require that sample length is the same in all telescopes
+						// (note: this is a strong requirement, but should be ok for
+						//  VTS (VBF is assumed to be VTS)
+						unsigned int i_tempSampeLength = 0;
+						bool iAll_are_the_same = true;
+						if( fRunPar->fTelToAnalyze.size() > 0 )
+						{
+							i_tempSampeLength = getNSamples( fRunPar->fTelToAnalyze[0] );
+						}
+						for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
+						{
+							if( i_tempSampeLength != getNSamples( fRunPar->fTelToAnalyze[i] ) )
+							{
+								iAll_are_the_same = false;
+							}
+						}
+						if( iAll_are_the_same )
+						{
+							break;
+						}
 					}
 					i_counter++;
 					if( i_counter == 1000 )
 					{
 						cout << "VEventLoop warning: could not find number of samples in the first 1000 events";
-                                                cout << " (this is normal for runs with event losses at the beginning)" << endl;
+						cout << " (this is normal for runs with event losses at the beginning)" << endl;
 					}
 					if( i_counter > 999999 )
 					{
-                                                cout << "VEventLoop warning: could not find number of samples in the first 999999 events" << endl;
+						cout << "VEventLoop warning: could not find number of samples in the first 999999 events" << endl;
 						break;
 					}
 				}
@@ -322,12 +331,12 @@ bool VEventLoop::initEventLoop( string iFileName )
 					cout << "exiting..." << endl;
 					exit( -1 );
 				}
-                                cout << "Found consistent number of samples in vbf file after " << i_counter+1 << " event(s): ";
-                                for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
-                                {
-                                    cout << "T" << fRunPar->fTelToAnalyze[i]+1 << ": " << getNSamples( fRunPar->fTelToAnalyze[i] ) << " ";
-                                }
-                                cout << endl;
+				cout << "Found consistent number of samples in vbf file after " << i_counter + 1 << " event(s): ";
+				for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
+				{
+					cout << "T" << fRunPar->fTelToAnalyze[i] + 1 << ": " << getNSamples( fRunPar->fTelToAnalyze[i] ) << " ";
+				}
+				cout << endl;
 				///////////////////////////////////////////////////////////////
 			}
 			// sourcefile is MC vbf file; noise is read from separate file
@@ -420,8 +429,8 @@ bool VEventLoop::initEventLoop( string iFileName )
 	{
 		fDB_PixelDataReader = new VDB_PixelDataReader( getDetectorGeo()->getNumChannelVector() );
 		fDB_PixelDataReader->setDebug( fRunPar->fDebug );
-		fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber, 
-                                                 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
+		fDB_PixelDataReader->readFromDB( fRunPar->getDBServer(), fRunPar->frunnumber,
+										 fRunPar->fDBRunStartTimeSQL, fRunPar->fDBRunStoppTimeSQL );
 	}
 	
 	// set event number vector
@@ -1117,9 +1126,9 @@ int VEventLoop::analyzeEvent()
 			fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] = getNSamples();
 			fBoolSumWindowChangeWarning = 1;
 		}
-                //look for low gain multiplier with nominal window = sumwindow_1. If not found, exit for data analysis. 
-                //Just warn for display, calib runs, or if nocalibnoproblem is enabled.
-		if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC == 0 && ( fRunPar->frunmode == 0 || fRunPar->frunmode == 3 || fRunPar->frunmode==4 ) )
+		//look for low gain multiplier with nominal window = sumwindow_1. If not found, exit for data analysis.
+		//Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+		if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC == 0 && ( fRunPar->frunmode == 0 || fRunPar->frunmode == 3 || fRunPar->frunmode == 4 ) )
 		{
 			bool found = false;
 			for( unsigned int j = 0; j < getLowGainDefaultSumWindows().size() ; j++ )
@@ -1134,12 +1143,12 @@ int VEventLoop::analyzeEvent()
 				if( fRunPar->frunmode == 0 && !fRunPar->fdisplaymode && !fRunPar->fNoCalibNoPb )
 				{
 					cout << "VEventLoop::analyzeEvent error: No low gain multipliers available for sumwindow 1 (";
-                                        cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " samples), exiting" << endl;
+					cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " samples), exiting" << endl;
 					exit( -1 );
 				}
 				fLowGainMultiplierWarning++;
 				cout << "VEventLoop::analyzeEvent() warning: No low gain multipliers available for sumwindow 1 (";
-                                cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " samples), will use trace multiplier." << endl;
+				cout << fRunPar->fsumwindow_1[fRunPar->fTelToAnalyze[i]] << " samples), will use trace multiplier." << endl;
 			}
 		}
 		if( ( int )getNSamples() < ( int )fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] )
@@ -1152,9 +1161,9 @@ int VEventLoop::analyzeEvent()
 			fRunPar->fsumwindow_2[fRunPar->fTelToAnalyze[i]] = getNSamples();
 			fBoolSumWindowChangeWarning = 1;
 		}
-                // look for low gain multiplier with nominal window = sumwindow_2. If not found, exit for data analysis. 
-                // Just warn for display, calib runs, or if nocalibnoproblem is enabled.
-		if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC == 0 && ( fRunPar->frunmode == 0 || fRunPar->frunmode == 3 || fRunPar->frunmode==4 ) ) 
+		// look for low gain multiplier with nominal window = sumwindow_2. If not found, exit for data analysis.
+		// Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+		if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC == 0 && ( fRunPar->frunmode == 0 || fRunPar->frunmode == 3 || fRunPar->frunmode == 4 ) )
 		{
 			bool found = false;
 			for( unsigned int j = 0; j < getLowGainDefaultSumWindows().size() ; j++ )
@@ -1185,9 +1194,9 @@ int VEventLoop::analyzeEvent()
 			fRunPar->fsumwindow_pass1[fRunPar->fTelToAnalyze[i]] = getNSamples();
 			fBoolSumWindowChangeWarning = 2;
 		}
-                // look for low gain multiplier with nominal window = sumwindow_pass1. If not found, exit for data analysis. 
-                // Just warn for display, calib runs, or if nocalibnoproblem is enabled.
-		if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC == 0 && ( fRunPar->frunmode == 0 || fRunPar->frunmode == 3 || fRunPar->frunmode==4 ) )
+		// look for low gain multiplier with nominal window = sumwindow_pass1. If not found, exit for data analysis.
+		// Just warn for display, calib runs, or if nocalibnoproblem is enabled.
+		if( fLowGainMultiplierWarning < 3 && fRunPar->fIsMC == 0 && ( fRunPar->frunmode == 0 || fRunPar->frunmode == 3 || fRunPar->frunmode == 4 ) )
 		{
 			bool found = false;
 			for( unsigned int j = 0; j < getLowGainDefaultSumWindows().size() ; j++ )

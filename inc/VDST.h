@@ -21,20 +21,20 @@ using namespace std;
 
 class VDST : public VImageBaseAnalyzer, public VDSTTree
 {
-    private:
-        bool fBLaser;
-	VImageCleaning* fVImageCleaning;
-        TFile *fDSTfile;
-
-        bool fDSTini;
-
-	bool writeCalibrationData();
-
-    public:
-        VDST( bool iMode, bool iMC );
-       ~VDST();
-        void fill();                              //!< fill dst tree
-        void initialize();
-        void terminate();                         //!< write dst tree do disk
+	private:
+		bool fBLaser;
+		VImageCleaning* fVImageCleaning;
+		TFile* fDSTfile;
+		
+		bool fDSTini;
+		
+		bool writeCalibrationData();
+		
+	public:
+		VDST( bool iMode, bool iMC );
+		~VDST();
+		void fill();                              //!< fill dst tree
+		void initialize();
+		void terminate();                         //!< write dst tree do disk
 };
 #endif

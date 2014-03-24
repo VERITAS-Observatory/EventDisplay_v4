@@ -18,26 +18,29 @@ using namespace std;
 
 class VPlotTMVAParameters
 {
-   private:
-
-    vector< string > fSubArrays;
-    string  fDataDirectory;
-
-    vector< TH1D* > hSignalEfficiency;
-    vector< TH1D* > hBackgroundEfficiency;
-    vector< TH1D* > hMVA;
-
-    bool initializeHistograms( unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
-
-   public:
-    VPlotTMVAParameters();
-   ~VPlotTMVAParameters() {}
-
-    void initializeWeightFiles( string iDirectory, string iTMVADirectory,
-                                unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
-    void plot( bool iPrint = false );
-    void setDirectories( string iDataDirectory ) { fDataDirectory = iDataDirectory; }
-    bool setSubArrays( string iSubarrayFile );
+	private:
+	
+		vector< string > fSubArrays;
+		string  fDataDirectory;
+		
+		vector< TH1D* > hSignalEfficiency;
+		vector< TH1D* > hBackgroundEfficiency;
+		vector< TH1D* > hMVA;
+		
+		bool initializeHistograms( unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
+		
+	public:
+		VPlotTMVAParameters();
+		~VPlotTMVAParameters() {}
+		
+		void initializeWeightFiles( string iDirectory, string iTMVADirectory,
+									unsigned int iWeightFileIndex_min, unsigned int iWeightFileIndex_max );
+		void plot( bool iPrint = false );
+		void setDirectories( string iDataDirectory )
+		{
+			fDataDirectory = iDataDirectory;
+		}
+		bool setSubArrays( string iSubarrayFile );
 };
 
 

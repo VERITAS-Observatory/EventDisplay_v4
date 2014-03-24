@@ -15,19 +15,19 @@ using namespace std;
 
 class VArrayPointing : public VSkyCoordinates
 {
-  private:
-
-  TTree *fPointingTree;
-
-  void initializePointingTree();
-
-  public:
-
-   VArrayPointing( bool bInitTree = true );
-  ~VArrayPointing() {}
-   void fillPointingTree();
-   void terminate();
-
+	private:
+	
+		TTree* fPointingTree;
+		
+		void initializePointingTree();
+		
+	public:
+	
+		VArrayPointing( bool bInitTree = true );
+		~VArrayPointing() {}
+		void fillPointingTree();
+		void terminate();
+		
 };
 
 #endif

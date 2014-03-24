@@ -40,7 +40,7 @@
 
 //double slaAirmas ( double zd );
 
-void slaAltaz ( double ha, double dec, double phi, double *az, double *azd, double *azdd, double *el, double *eld, double *eldd, double *pa, double *pad, double *padd );
+void slaAltaz( double ha, double dec, double phi, double* az, double* azd, double* azdd, double* el, double* eld, double* eldd, double* pa, double* pad, double* padd );
 
 ////void slaAmp ( double ra, double da, double date, double eq, double *rm, double *dm );
 
@@ -64,7 +64,7 @@ void slaAltaz ( double ha, double dec, double phi, double *az, double *azd, doub
 
 ////void slaCaldj ( int iy, int im, int id, double *djm, int *j );
 
-void slaCalyd ( int iy, int im, int id, int *ny, int *nd, int *j );
+void slaCalyd( int iy, int im, int id, int* ny, int* nd, int* j );
 
 //void slaCc2s ( float v[3], float *a, float *b );
 
@@ -72,9 +72,9 @@ void slaCalyd ( int iy, int im, int id, int *ny, int *nd, int *j );
 
 ////void slaCd2tf ( int ndp, float days, char *sign, int ihmsf[4] );
 
-void slaCldj ( int iy, int im, int id, double *djm, int *j );
+void slaCldj( int iy, int im, int id, double* djm, int* j );
 
-void slaClyd ( int iy, int im, int id, int *ny, int *nd, int *jstat );
+void slaClyd( int iy, int im, int id, int* ny, int* nd, int* jstat );
 
 //void slaCombn ( int nsel, int ncand, int list[], int *j );
 
@@ -82,7 +82,7 @@ void slaClyd ( int iy, int im, int id, int *ny, int *nd, int *jstat );
 
 //void slaCr2tf ( int ndp, float angle, char *sign, int ihmsf[4] );
 
-void slaCs2c ( float a, float b, float v[3] );
+void slaCs2c( float a, float b, float v[3] );
 
 //void slaCs2c6 ( float a, float b, float r, float ad, float bd, float rd, float v[6] );
 
@@ -98,33 +98,33 @@ void slaCs2c ( float a, float b, float v[3] );
 
 ////void slaDav2m ( double axvec[3], double rmat[3][3] );
 
-double slaDbear ( double a1, double b1, double a2, double b2 );
+double slaDbear( double a1, double b1, double a2, double b2 );
 
 //void slaDbjin ( char *string, int *nstrt, double *dreslt, int *jf1, int *jf2 );
 
 //void slaDc62s ( double v[6], double *a, double *b, double *r, double *ad, double *bd, double *rd );
 
-void slaDcc2s ( double v[3], double *a, double *b );
+void slaDcc2s( double v[3], double* a, double* b );
 
 ////void slaDcmpf ( double coeffs[6], double *xz, double *yz, double *xs, double *ys, double *perp, double *orient );
 
-void slaDcs2c ( double a, double b, double v[3] );
+void slaDcs2c( double a, double b, double v[3] );
 
-void slaDd2tf ( int ndp, double days, char *sign, int ihmsf[4] );
+void slaDd2tf( int ndp, double days, char* sign, int ihmsf[4] );
 
-void slaDe2h ( double ha, double dec, double phi, double *az, double *el );
+void slaDe2h( double ha, double dec, double phi, double* az, double* el );
 
-void slaDeuler ( const char *order, double phi, double theta, double psi, double rmat[3][3] );
+void slaDeuler( const char* order, double phi, double theta, double psi, double rmat[3][3] );
 
 //void slaDfltin ( char *string, int *nstrt, double *dreslt, int *jflag );
 
-void slaDh2e ( double az, double el, double phi, double *ha, double *dec);
+void slaDh2e( double az, double el, double phi, double* ha, double* dec );
 
-void slaDimxv ( double dm[3][3], double va[3], double vb[3] );
+void slaDimxv( double dm[3][3], double va[3], double vb[3] );
 
 ////void slaDjcal ( int ndp, double djm, int iymdf[4], int *j );
 
-void slaDjcl ( double djm, int *iy, int *im, int *id, double *fd, int *j );
+void slaDjcl( double djm, int* iy, int* im, int* id, double* fd, int* j );
 
 //void slaDm2av ( double rmat[3][3], double axvec[3] );
 
@@ -134,25 +134,25 @@ void slaDjcl ( double djm, int *iy, int *im, int *id, double *fd, int *j );
 
 //void slaDmxm ( double a[3][3], double b[3][3], double c[3][3] );
 
-void slaDmxv ( double dm[3][3], double va[3], double vb[3] );
+void slaDmxv( double dm[3][3], double va[3], double vb[3] );
 
 // double slaDpav ( double v1[3], double v2[3] );
 
-void slaDr2af ( int ndp, double angle, char *sign, int idmsf[4] );
+void slaDr2af( int ndp, double angle, char* sign, int idmsf[4] );
 
-void slaDr2tf ( int ndp, double angle, char *sign, int ihmsf[4] );
+void slaDr2tf( int ndp, double angle, char* sign, int ihmsf[4] );
 
-double slaDrange ( double angle );
+double slaDrange( double angle );
 
-double slaDranrm ( double angle );
+double slaDranrm( double angle );
 
 //void slaDs2c6 ( double a, double b, double r, double ad, double bd, double rd, double v[6] );
 
-void slaDs2tp ( double ra, double dec, double raz, double decz, double *xi, double *eta, int *j );
+void slaDs2tp( double ra, double dec, double raz, double decz, double* xi, double* eta, int* j );
 
-double slaDsep ( double a1, double b1, double a2, double b2 );
+double slaDsep( double a1, double b1, double a2, double b2 );
 
-double slaDsepv ( double v1[3], double v2[3] );
+double slaDsepv( double v1[3], double v2[3] );
 
 //double slaDt ( double epoch );
 
@@ -160,7 +160,7 @@ double slaDsepv ( double v1[3], double v2[3] );
 
 ////void slaDtf2r ( int ihour, int imin, double sec, double *rad, int *j );
 
-void slaDtp2s ( double xi, double eta, double raz, double decz, double *ra, double *dec );
+void slaDtp2s( double xi, double eta, double raz, double decz, double* ra, double* dec );
 
 //void slaDtp2v ( double xi, double eta, double v0[3], double v[3] );
 
@@ -172,11 +172,11 @@ void slaDtp2s ( double xi, double eta, double raz, double decz, double *ra, doub
 
 ////void slaDv2tp ( double v[3], double v0[3], double *xi, double *eta, int *j );
 
-double slaDvdv ( double va[3], double vb[3] );
+double slaDvdv( double va[3], double vb[3] );
 
-void slaDvn ( double v[3], double uv[3], double *vm );
+void slaDvn( double v[3], double uv[3], double* vm );
 
-void slaDvxv ( double va[3], double vb[3], double vc[3] );
+void slaDvxv( double va[3], double vb[3], double vc[3] );
 
 //void slaE2h ( float ha, float dec, float phi, float *az, float *el );
 
@@ -205,7 +205,7 @@ void slaDvxv ( double va[3], double vb[3], double vc[3] );
 
 //double slaEqeqx ( double date );
 
-void slaEqgal ( double dr, double dd, double *dl, double *db );
+void slaEqgal( double dr, double dd, double* dl, double* db );
 
 //void slaEtrms ( double ep, double ev[3] );
 
@@ -229,7 +229,7 @@ void slaEqgal ( double dr, double dd, double *dl, double *db );
 
 //void slaFlotin ( char *string, int *nstrt, float *reslt, int *jflag );
 
-void slaGaleq ( double dl, double db, double *dr, double *dd );
+void slaGaleq( double dl, double db, double* dr, double* dd );
 
 //void slaGalsup ( double dl, double db, double *dsl, double *dsb );
 
@@ -237,9 +237,9 @@ void slaGaleq ( double dl, double db, double *dr, double *dd );
 
 ////void slaGeoc ( double p, double h, double *r, double *z );
 
-double slaGmst ( double ut1 );
+double slaGmst( double ut1 );
 
-double slaGmsta ( double date, double ut1 );
+double slaGmsta( double date, double ut1 );
 
 //void slaH2e ( float az, float el, float phi, float *ha, float *dec );
 
@@ -283,13 +283,13 @@ double slaGmsta ( double date, double ut1 );
 
 ////void slaObs ( int n, char *c, char *name, double *w, double *p, double *h );
 
-double slaPa ( double ha, double dec, double phi );
+double slaPa( double ha, double dec, double phi );
 
 //double slaPav ( float v1[3], float v2[3] );
 
 //void slaPcd ( double disco, double *x, double *y );
 
-void slaPda2h ( double p, double d, double a, double *h1, int *j1, double *h2, int *j2 );
+void slaPda2h( double p, double d, double a, double* h1, int* j1, double* h2, int* j2 );
 
 ////void slaPdq2h ( double p, double d, double q, double *h1, int *j1, double *h2, int *j2 );
 
@@ -307,14 +307,14 @@ void slaPda2h ( double p, double d, double a, double *h1, int *j1, double *h2, i
 
 //void slaPm ( double r0, double d0, double pr, double pd, double px, double rv, double ep0, double ep1, double *r1, double *d1 );
 
-//void slaPolmo ( double elongm, double phim, double xp, double yp, double *elong, double *phi, double *daz ); 
-void slaPrebn ( double bep0, double bep1, double rmatp[3][3] );
+//void slaPolmo ( double elongm, double phim, double xp, double yp, double *elong, double *phi, double *daz );
+void slaPrebn( double bep0, double bep1, double rmatp[3][3] );
 
-void slaPrec ( double ep0, double ep1, double rmatp[3][3] );
+void slaPrec( double ep0, double ep1, double rmatp[3][3] );
 
 //void slaPrecl ( double ep0, double ep1, double rmatp[3][3] );
 
-void slaPreces ( const char sys[3], double ep0, double ep1, double *ra, double *dc );
+void slaPreces( const char sys[3], double ep0, double ep1, double* ra, double* dc );
 
 //void slaPrenut ( double epoch, double date, double rmatpn[3][3] );
 
@@ -356,9 +356,9 @@ void slaPreces ( const char sys[3], double ep0, double ep1, double *ra, double *
 
 //void slaS2tp ( float ra, float dec, float raz, float decz, float *xi, float *eta, int *j );
 
-float slaSep ( float a1, float b1, float a2, float b2 );
+float slaSep( float a1, float b1, float a2, float b2 );
 
-float slaSepv ( float v1[3], float v2[3] );
+float slaSepv( float v1[3], float v2[3] );
 
 //void slaSmat ( int n, float *a, float *y, float *d, int *jf, int *iw );
 
@@ -378,7 +378,7 @@ float slaSepv ( float v1[3], float v2[3] );
 
 //void slaTps2c ( float xi, float eta, float ra, float dec, float *raz1, float *decz1, float *raz2, float *decz2, int *n );
 
-//void slaTpv2c ( float xi, float eta, float v[3], float v01[3], float v02[3], int *n ); 
+//void slaTpv2c ( float xi, float eta, float v[3], float v01[3], float v02[3], int *n );
 //void slaUe2el ( double u[], int jformr, int *jform, double *epoch, double *orbinc, double *anode, double *perih, double *aorq, double *e, double *aorl, double *dm, int *jstat );
 
 //void slaUe2pv ( double date, double u[], double pv[], int *jstat );
@@ -387,7 +387,7 @@ float slaSepv ( float v1[3], float v2[3] );
 
 //void slaV2tp ( float v[3], float v0[3], float *xi, float *eta, int *j );
 
-float slaVdv ( float va[3], float vb[3] );
+float slaVdv( float va[3], float vb[3] );
 
 //void slaVn ( float v[3], float uv[3], float *vm );
 

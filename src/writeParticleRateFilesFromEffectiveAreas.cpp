@@ -1,4 +1,4 @@
-/* writeParticleRateFilesFromEffectiveAreas 
+/* writeParticleRateFilesFromEffectiveAreas
 
    write files with particle number spectra for on (gamma) and off (protons+electrons) counts
 
@@ -25,85 +25,88 @@
 using namespace std;
 
 /*
- 
+
  calculate angular angular resolution vs containment radius vs energy
 */
-void writeAngResHistogram( char *iMC_Gamma = 0, string iParticleNumberFile = "particleNumbers.tmp.root" )
+void writeAngResHistogram( char* iMC_Gamma = 0, string iParticleNumberFile = "particleNumbers.tmp.root" )
 {
-   if( !iMC_Gamma ) return;
-
-   VInstrumentResponseFunctionReader iR;
-   iR.fillData( iMC_Gamma );
-   for( unsigned int i = 0; i < iR.fIRF_TreeNames.size(); i++ )
-   {
-       if( iR.fIRF_TreeNames[i] == "t_angular_resolution_080p" )
-       {
-	   TH2D *h = 0;
-	   if( i < iR.fIRF_Data.size() && iR.fIRF_Data[i] )
-	   {
-	       h = iR.fIRF_Data[i]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF];
-	   }
-	   TH2D *hRes = VHistogramUtilities::calculateContainmentDistance( h, "AngResCumulative" );
-	   if( hRes )
-	   {
-	      TFile hh( iParticleNumberFile.c_str(), "update" );
-	      cout << "writing angular resolution histogram to " << hh.GetName() << endl;
-	      hRes->Write();
-	      hh.Close();
-	   }
-	   break;
-       }
-  }
+	if( !iMC_Gamma )
+	{
+		return;
+	}
+	
+	VInstrumentResponseFunctionReader iR;
+	iR.fillData( iMC_Gamma );
+	for( unsigned int i = 0; i < iR.fIRF_TreeNames.size(); i++ )
+	{
+		if( iR.fIRF_TreeNames[i] == "t_angular_resolution_080p" )
+		{
+			TH2D* h = 0;
+			if( i < iR.fIRF_Data.size() && iR.fIRF_Data[i] )
+			{
+				h = iR.fIRF_Data[i]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF];
+			}
+			TH2D* hRes = VHistogramUtilities::calculateContainmentDistance( h, "AngResCumulative" );
+			if( hRes )
+			{
+				TFile hh( iParticleNumberFile.c_str(), "update" );
+				cout << "writing angular resolution histogram to " << hh.GetName() << endl;
+				hRes->Write();
+				hh.Close();
+			}
+			break;
+		}
+	}
 }
 
 
 
 
-void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *iMC_Electron = 0,
-                              unsigned int iCrabSpec_ID = 5, string iParticleNumberFile = "particleNumbers.tmp.root",
-			      string iObservatory = "CTA" )
+void writeParticleNumberFile( char* iMC_Gamma = 0, char* iMC_Proton = 0, char* iMC_Electron = 0,
+							  unsigned int iCrabSpec_ID = 5, string iParticleNumberFile = "particleNumbers.tmp.root",
+							  string iObservatory = "CTA" )
 {
-    string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
-    string iESpecDataFile_CosmicRays = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
-
-    if( iMC_Gamma && iMC_Proton )
-    {
+	string iESpecDataFile_CrabNebula = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat";
+	string iESpecDataFile_CosmicRays = "$" + iObservatory + "_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CR.dat";
+	
+	if( iMC_Gamma && iMC_Proton )
+	{
 // use sensitivity calculator for differential flux calculation
-       VSensitivityCalculator b;
-       b.setDebug( false );             // creates lots of output (if set to true)
+		VSensitivityCalculator b;
+		b.setDebug( false );             // creates lots of output (if set to true)
 // set Crab Nebula spectrum
-       b.setEnergySpectrumfromLiterature( iESpecDataFile_CrabNebula, iCrabSpec_ID );
+		b.setEnergySpectrumfromLiterature( iESpecDataFile_CrabNebula, iCrabSpec_ID );
 // set output result file name
-       b.setWriteParticleNumberFile( iParticleNumberFile );
+		b.setWriteParticleNumberFile( iParticleNumberFile );
 // CTA
-       int i_Azbin_gamma = 0;
-       double i_index_gamma = 2.5;
-       int i_noise_gamma = 250;
-       double i_woff_gamma = 0.;
-
-       int i_Azbin_proton = 0;
-       double i_index_proton = 2.5;
-       int i_noise_proton = 250;
-       double i_woff_proton = 0.;  
-       cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl; 
+		int i_Azbin_gamma = 0;
+		double i_index_gamma = 2.5;
+		int i_noise_gamma = 250;
+		double i_woff_gamma = 0.;
+		
+		int i_Azbin_proton = 0;
+		double i_index_proton = 2.5;
+		int i_noise_proton = 250;
+		double i_woff_proton = 0.;
+		cout << "SETTING EFFECTIVE AREA SEARCH VALUES TO " << iObservatory << endl;
 //////////////////////////////////////////////////////////////////////////
 
 // gammas
-       b.setMonteCarloParameters( 1, iESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
-                                  i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma,
-				  -1.9 );
+		b.setMonteCarloParameters( 1, iESpecDataFile_CrabNebula, iCrabSpec_ID, iMC_Gamma, 20.,
+								   i_Azbin_gamma, i_woff_gamma, i_noise_gamma, i_index_gamma,
+								   -1.9 );
 // protons
-       b.setMonteCarloParameters( 14, iESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
-                                  i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton,
-				  -1.9 );
+		b.setMonteCarloParameters( 14, iESpecDataFile_CosmicRays, 0, iMC_Proton, 20.,
+								   i_Azbin_proton, i_woff_proton, i_noise_proton, i_index_proton,
+								   -1.9 );
 // electrons (spectral index?)
-       if( iMC_Electron )
-       {
-          b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 8, iMC_Electron, 20., 0, 0.0, 250, 3.0, -1.9 );
-       }
+		if( iMC_Electron )
+		{
+			b.setMonteCarloParameters( 2, iESpecDataFile_CosmicRays, 8, iMC_Electron, 20., 0, 0.0, 250, 3.0, -1.9 );
+		}
 // calculate differential fluxes for 5 bins per decade (0.2)
-       b.calculateParticleNumberGraphs_MC( 0.2 );
-    }
+		b.calculateParticleNumberGraphs_MC( 0.2 );
+	}
 }
 
 /*
@@ -115,117 +118,134 @@ void writeParticleNumberFile( char *iMC_Gamma = 0, char *iMC_Proton = 0, char *i
     (for all sub arrays)
 
 */
-int main( int argc, char *argv[] )
+int main( int argc, char* argv[] )
 {
-   if( argc != 5 && argc != 6 )
-   {
-      cout << endl;
-      cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone>";
-      cout <<  "<reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
-      cout << argc << endl;
-      cout << endl;
-      exit( 0 );
-   }
-
-   cout << endl;
-   cout << "writeParticleRateFilesFromEffectiveAreas" << endl;
-   cout << "========================================" << endl;
-   cout << endl;
-
-   string SubArray = argv[1];
-   string iOnSource = argv[2];
-   int    iRecID = atoi( argv[3] );
-   string iDataDir = argv[4];
-   string iAngResDir = "";
-   if( argc == 6 ) iAngResDir = argv[5];
-
+	if( argc != 5 && argc != 6 )
+	{
+		cout << endl;
+		cout << "writeParticleRateFilesFromEffectiveAreas <sub array> <onSource/cone>";
+		cout <<  "<reconstruction ID> <directory with effective areas> [directory with angular resolution files]" << endl;
+		cout << argc << endl;
+		cout << endl;
+		exit( 0 );
+	}
+	
+	cout << endl;
+	cout << "writeParticleRateFilesFromEffectiveAreas" << endl;
+	cout << "========================================" << endl;
+	cout << endl;
+	
+	string SubArray = argv[1];
+	string iOnSource = argv[2];
+	int    iRecID = atoi( argv[3] );
+	string iDataDir = argv[4];
+	string iAngResDir = "";
+	if( argc == 6 )
+	{
+		iAngResDir = argv[5];
+	}
+	
 // hardwired total number of off source bins
-   int iOffSetCounter = -1;
-   if( iOnSource == "onSource" )    iOffSetCounter = 0;
-   else if( iOnSource == "cone" ) iOffSetCounter = 8;
-   else if( iOnSource == "offset_7_bin_Norm_Pointing" ) iOffSetCounter = 7;
-   else if( iOnSource == "offset_9_bin_WARSAW" )    iOffSetCounter = 9;
-   else
-   {
-       cout <<iOnSource << " invalid off source descriptor; should be: onSource or cone" << endl;
-	exit( -1 );
-   }
-
+	int iOffSetCounter = -1;
+	if( iOnSource == "onSource" )
+	{
+		iOffSetCounter = 0;
+	}
+	else if( iOnSource == "cone" )
+	{
+		iOffSetCounter = 8;
+	}
+	else if( iOnSource == "offset_7_bin_Norm_Pointing" )
+	{
+		iOffSetCounter = 7;
+	}
+	else if( iOnSource == "offset_9_bin_WARSAW" )
+	{
+		iOffSetCounter = 9;
+	}
+	else
+	{
+		cout << iOnSource << " invalid off source descriptor; should be: onSource or cone" << endl;
+		exit( -1 );
+	}
+	
 // effective area file names
-   string iMC_Gamma_onSource = "gamma_onSource";
-   string iMC_Gamma_cone = "gamma_cone";
-   string iMC_Proton = "proton"; 
-   string iMC_Proton_onSource = "proton_onSource"; 
-   string iMC_Electron = "electron";
-   string iMC_Electron_onSource = "electron_onSource";
-   
-   if( iOnSource == "offset_9_bin_WARSAW" ){
-       iMC_Gamma_cone ="gamma_0-20_WARSAW";
-       iMC_Proton="proton_0-20_rER_WARSAW";
-       iMC_Electron = "";
-       iMC_Gamma_onSource = "";
-   }
-   if( iOnSource == "offset_7_bin_Norm_Pointing" ){
-       iMC_Gamma_cone ="gamma_0-20_Norm_Pointing";
-       iMC_Proton="proton_0-20_rER_Norm_Pointing";
-       iMC_Electron = "";
-       iMC_Gamma_onSource = "";
-   }
-
-
-   char iGamma[800];
-   char iProton[800];
-   char iElectron[800];
-   char iParticleNumberFile[800];
-
-   cout << "STARTING SUBARRAY " << SubArray << endl;
-
+	string iMC_Gamma_onSource = "gamma_onSource";
+	string iMC_Gamma_cone = "gamma_cone";
+	string iMC_Proton = "proton";
+	string iMC_Proton_onSource = "proton_onSource";
+	string iMC_Electron = "electron";
+	string iMC_Electron_onSource = "electron_onSource";
+	
+	if( iOnSource == "offset_9_bin_WARSAW" )
+	{
+		iMC_Gamma_cone = "gamma_0-20_WARSAW";
+		iMC_Proton = "proton_0-20_rER_WARSAW";
+		iMC_Electron = "";
+		iMC_Gamma_onSource = "";
+	}
+	if( iOnSource == "offset_7_bin_Norm_Pointing" )
+	{
+		iMC_Gamma_cone = "gamma_0-20_Norm_Pointing";
+		iMC_Proton = "proton_0-20_rER_Norm_Pointing";
+		iMC_Electron = "";
+		iMC_Gamma_onSource = "";
+	}
+	
+	
+	char iGamma[800];
+	char iProton[800];
+	char iElectron[800];
+	char iParticleNumberFile[800];
+	
+	cout << "STARTING SUBARRAY " << SubArray << endl;
+	
 // on-axis rates
-   if( iMC_Gamma_onSource.size() > 0 )
-   {
-      sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
-      sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-      sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-      if( iMC_Electron_onSource.size() > 0 )
-      {
-	 sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-	 writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
-      }
-      else
-      {
-	  writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
-      }
+	if( iMC_Gamma_onSource.size() > 0 )
+	{
+		sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.00.root", iDataDir.c_str(), SubArray.c_str() );
+		sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
+		sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
+		if( iMC_Electron_onSource.size() > 0 )
+		{
+			sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
+			writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
+		}
+		else
+		{
+			writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
+		}
 // angular resolution histogram
-      if( iAngResDir.size() > 0 )
-      {
-         sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
-	 writeAngResHistogram( iGamma, iParticleNumberFile );
-      }
-   }
-
+		if( iAngResDir.size() > 0 )
+		{
+			sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_onSource.c_str(), SubArray.c_str(), iRecID, 0 );
+			writeAngResHistogram( iGamma, iParticleNumberFile );
+		}
+	}
+	
 // off-axis rates
-   for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
-   {
-
-      sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.%d.root", iDataDir.c_str(), SubArray.c_str(), j );
-      sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
-      sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton.c_str(), SubArray.c_str(), iRecID, j );
-
-      if( iMC_Electron.size() > 0 )
-      {
-	 sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron.c_str(), SubArray.c_str(), iRecID, j );
-	 writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
-      }
-      else
-      {
-	 writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
-      }
+	for( int j = 0; j < iOffSetCounter; j++ ) // use first bin on source particle file
+	{
+	
+		sprintf( iParticleNumberFile, "%s/ParticleNumbers.%s.%d.root", iDataDir.c_str(), SubArray.c_str(), j );
+		sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
+		sprintf( iProton, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Proton.c_str(), SubArray.c_str(), iRecID, j );
+		
+		if( iMC_Electron.size() > 0 )
+		{
+			sprintf( iElectron, "%s/%s.%s_ID%d.eff-%d.root", iDataDir.c_str(), iMC_Electron.c_str(), SubArray.c_str(), iRecID, j );
+			writeParticleNumberFile( iGamma, iProton, iElectron, 5, iParticleNumberFile );
+		}
+		else
+		{
+			writeParticleNumberFile( iGamma, iProton, 0, 5, iParticleNumberFile );
+		}
 // angular resolution histogram
-      if( iAngResDir.size() > 0 )
-      {
-         sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
-	 writeAngResHistogram( iGamma, iParticleNumberFile );
-      }
-   }
+		if( iAngResDir.size() > 0 )
+		{
+			sprintf( iGamma, "%s/%s.%s_ID%d.eff-%d.root", iAngResDir.c_str(), iMC_Gamma_cone.c_str(), SubArray.c_str(), iRecID, j );
+			writeAngResHistogram( iGamma, iParticleNumberFile );
+		}
+	}
 }
 

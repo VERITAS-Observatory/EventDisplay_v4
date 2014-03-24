@@ -22,56 +22,72 @@ using namespace std;
 
 class VDB_Connection
 {
-protected:
-    
-    TSQLServer *f_db;
-    TSQLResult *fdb_res;
-
-    bool Connect();
-    bool fDB_Connection_successfull;
-    bool fDB_Query_successfull;
-
-    string fDBserver;
-    string fconnection_mode;
-    string fconnection_option;
-
-    int fMAX_PROCESS;
-    int fNumb_Connection;
-
-public:    
-    VDB_Connection(); // default constructor
-    
-    VDB_Connection(string DBserver, string connection_mode, string connection_option);
-    
-    ~VDB_Connection() { 
-	//std::cout<<"VDB_Connection Destructor "<<std::endl;
-	if(f_db){ 
-	    //std::cout<<"VDB_Connection::Connect CLOSING  server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
-	    Close_Connection();
-	}
-
-
-    }
-    
-    bool make_query(const char* the_query);
-
-    bool Get_Connection_Status(){return fDB_Connection_successfull;}
-    bool Get_Query_Status(){return fDB_Query_successfull;}
-    TSQLResult * Get_QueryResult(){return fdb_res;}
-    TSQLServer * Get_ConnectionResult(){return f_db;}
-
-
-    void Close_Connection(){ 
-	if( f_db ){ 
-	    //std::cout<<"VDB_Connection::Close_Connection server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
-	    f_db->Close();   
-	    f_db = 0;  
-	}
-	return;
-    }
-    
-    int  Get_Nb_Connection();
-    
+	protected:
+	
+		TSQLServer* f_db;
+		TSQLResult* fdb_res;
+		
+		bool Connect();
+		bool fDB_Connection_successfull;
+		bool fDB_Query_successfull;
+		
+		string fDBserver;
+		string fconnection_mode;
+		string fconnection_option;
+		
+		int fMAX_PROCESS;
+		int fNumb_Connection;
+		
+	public:
+		VDB_Connection(); // default constructor
+		
+		VDB_Connection( string DBserver, string connection_mode, string connection_option );
+		
+		~VDB_Connection()
+		{
+			//std::cout<<"VDB_Connection Destructor "<<std::endl;
+			if( f_db )
+			{
+				//std::cout<<"VDB_Connection::Connect CLOSING  server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
+				Close_Connection();
+			}
+			
+			
+		}
+		
+		bool make_query( const char* the_query );
+		
+		bool Get_Connection_Status()
+		{
+			return fDB_Connection_successfull;
+		}
+		bool Get_Query_Status()
+		{
+			return fDB_Query_successfull;
+		}
+		TSQLResult* Get_QueryResult()
+		{
+			return fdb_res;
+		}
+		TSQLServer* Get_ConnectionResult()
+		{
+			return f_db;
+		}
+		
+		
+		void Close_Connection()
+		{
+			if( f_db )
+			{
+				//std::cout<<"VDB_Connection::Close_Connection server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
+				f_db->Close();
+				f_db = 0;
+			}
+			return;
+		}
+		
+		int  Get_Nb_Connection();
+		
 };
 
 #endif

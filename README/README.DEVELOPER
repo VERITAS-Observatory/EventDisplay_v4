@@ -1,18 +1,36 @@
 
 Please contact Gernot Maier for coordination before starting any significant development.
 
-svn checkout of EVNDISP
-=======================
+svn
+===
+
+## svn checkout of EVNDISP
 
 svn checkout https://svnsrv.desy.de/desy/EVNDISP
 
-
-Creating your own svn branch
-============================
+## svn: creating your own svn branch
 
 svn copy  https://svnsrv.desy.de/desy/EVNDISP/trunk https://svnsrv.desy.de/desy/EVNDISP/branches/my-dev-400 -m 'test of how to create a branch'
 
-Tagging
-=======
+## svn: tagging
 
 svn copy https://svnsrv.desy.de/desy/EVNDISP/trunk https://svnsrv.desy.de/desy/EVNDISP/tags/my-tag -m 'tag something'
+
+## svn: merging trunk with branch
+
+svn merge --reintegrate https://svnsrv.desy.de/desy/EVNDISP/branches/my-dev
+
+Source code formatting
+======================
+
+astyle is used for source code formatting since 03/2014
+http://astyle.sourceforge.net/
+
+Usage:
+
+do either
+ make formatSourceCode
+ or
+  astyle  --options=./.astylerc <.cpp, .h or .C file> 
+
+All options are saved in the .astylerc file.

@@ -20,32 +20,35 @@ using namespace std;
 
 class VTMVADispAnalyzer
 {
-   private:
-
-   bool fDebug;
-   bool bZombie;
-
-   vector<ULong64_t> fTelescopeTypeList;
-   map< ULong64_t, TMVA::Reader* > fTMVAReader;
-
-   float fWidth;
-   float fLength;
-   float fSize;
-   float fPedvar;
-   float fTGrad;
-   float fZe;
-   float fAz;
-   float fAsymm;
-
-   public:
-
-   VTMVADispAnalyzer( string iFile, vector< ULong64_t > iTelTypeList );
-  ~VTMVADispAnalyzer() {}
-
-   float evaluate( float iWidth, float iLength, float iSize, float iPedvar, float itgrad, float iZe, float iAz, float asymm, ULong64_t iTelType );
-   bool isZombie() { return bZombie; }
-   void terminate();
-
+	private:
+	
+		bool fDebug;
+		bool bZombie;
+		
+		vector<ULong64_t> fTelescopeTypeList;
+		map< ULong64_t, TMVA::Reader* > fTMVAReader;
+		
+		float fWidth;
+		float fLength;
+		float fSize;
+		float fPedvar;
+		float fTGrad;
+		float fZe;
+		float fAz;
+		float fAsymm;
+		
+	public:
+	
+		VTMVADispAnalyzer( string iFile, vector< ULong64_t > iTelTypeList );
+		~VTMVADispAnalyzer() {}
+		
+		float evaluate( float iWidth, float iLength, float iSize, float iPedvar, float itgrad, float iZe, float iAz, float asymm, ULong64_t iTelType );
+		bool isZombie()
+		{
+			return bZombie;
+		}
+		void terminate();
+		
 };
 
 #endif
