@@ -390,14 +390,18 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
 								&& iTime < fPixelData[iDataType][iTel][i]->fsec_of_day[t] )
 						{
 							fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t];
-							// first and/or last time bin is sometimes not filled (run start/end and L1 rate interval star mismatch)
+							// first two and/or last time bin is sometimes not filled (run start/end and L1 rate interval star mismatch)
 							// use in this case the L1 rates from second bin
 							// (note: only for L1 rates)
 							if( iDataType == 0 && fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 1 )
 							{
-								if( t == 0 )
+								if( t == 0 || t == 1 )
 								{
 									fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t + 1];
+                                                                        if( fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 3 )
+                                                                        {
+                                                                           fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t + 2];
+                                                                        }
 								}
 								else if( t == fPixelData[iDataType][iTel][i]->fMJD.size() - 1 )
 								{

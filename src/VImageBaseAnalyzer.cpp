@@ -848,7 +848,11 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 	}
 	
 	// reset dead channel vector
-	if( iFirst )
+	if( fRunPar->fMCNdead && iFirst )
+	{
+		setDead( false, iLowGain );
+	}
+        else
 	{
 		setDead( false, iLowGain );
 	}
@@ -861,17 +865,14 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 	for( unsigned int i = 0; i < getNChannels(); i++ )
 	{
 		// FADC stop channels (don't set any other reasons for channels to be dead)
-		if( iFirst )
-		{
-			for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
-			{
-				if( getFADCstopTrig()[t] == i )
-				{
-					setDead( i, 9, iLowGain );
-					continue;
-				}
-			}
-		}
+                for( unsigned int t = 0; t < getFADCstopTrig().size(); t++ )
+                {
+                        if( getFADCstopTrig()[t] == i )
+                        {
+                                setDead( i, 9, iLowGain );
+                                continue;
+                        }
+                }
 		// time dependent dead channels finder (pedestals in time slices)
 		if( usePedestalsInTimeSlices( iLowGain ) )
 		{
@@ -891,7 +892,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 					 ->testPedestalVariationsMaxOut( i, getPedvars( iLowGain, getSumWindow() )[i], i_meanPedVar, i_meanPedVarRMS ), iLowGain );
 		}
 		// same data for whole run
-		else if( iFirst )
+		else
 		{
 			setDead( i, getDeadChannelFinder( iLowGain && getLowGainPedestals() )
 					 ->testPedestals( i, getPeds( iLowGain )[i] ), iLowGain );
@@ -905,37 +906,33 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// time independent values
-		// gain/toff/low gain values are not time dependent
-		if( iFirst )
-		{
-			if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0
-					&& !( getRunParameter()->fNextDayGainHack && getGains( iLowGain )[i] == 1.0 ) )
-					|| ( iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
-			{
-				setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
-						 ->testGains( i, getGains( iLowGain )[i] ), iLowGain );
-				setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
-						 ->testGainVariations( i, getGainvars( iLowGain && getLowGainGains() )[i] ), iLowGain );
-				setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
-						 ->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i] , getGains_DefaultValue( iLowGain )[i] ), iLowGain );
-			}
-			if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0 )
-					|| ( iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
-			{
-				setDead( i, getDeadChannelFinder( iLowGain && getLowGainTOff() )
-						 ->testTimeOffsets( i, getTOffsets( iLowGain )[i] ), iLowGain );
-			}
-			
-			// test pixel status (from pix file in calibration directory)
-			if( getChannelStatus()[i] <= 0 )
-			{
-				setDead( i, 11, iLowGain );
-			}
-		}
-		
+		// gain/toff/low gain 
+                if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fGainFileNumber[getTelID()] > 0
+                                && !( getRunParameter()->fNextDayGainHack && getGains( iLowGain )[i] == 1.0 ) )
+                                || ( iLowGain && getRunParameter()->fGainLowGainFileNumber[getTelID()] > 0 ) )
+                {
+                        setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
+                                         ->testGains( i, getGains( iLowGain )[i] ), iLowGain );
+                        setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
+                                         ->testGainVariations( i, getGainvars( iLowGain && getLowGainGains() )[i] ), iLowGain );
+                        setDead( i, getDeadChannelFinder( iLowGain && getLowGainGains() )
+                                         ->testGainDev( i, getGains( iLowGain )[i], getGainvars( iLowGain && getLowGainGains() )[i] , getGains_DefaultValue( iLowGain )[i] ), iLowGain );
+                }
+                if( ( !getRunParameter()->fNoCalibNoPb && !iLowGain && getRunParameter()->fTOffFileNumber[getTelID()] > 0 )
+                                || ( iLowGain && getRunParameter()->fTOffLowGainFileNumber[getTelID()] > 0 ) )
+                {
+                        setDead( i, getDeadChannelFinder( iLowGain && getLowGainTOff() )
+                                         ->testTimeOffsets( i, getTOffsets( iLowGain )[i] ), iLowGain );
+                }
+                
+                // test pixel status (from pix file in calibration directory)
+                if( getChannelStatus()[i] <= 0 )
+                {
+                        setDead( i, 11, iLowGain );
+                }
 		/////////////////////////////////////////////////////
 		// set channels dead from .cfg file
-		if( iFirst && fReader->isMC() )
+		if( fReader->isMC() )
 		{
 			// getFullAnaVec()[i]: -1: dead channel, 0: channel does not exist, 1 channel o.k.
 			if( fReader->getDataFormatNum() == 1 && getNChannels() >= fReader->getFullAnaVec().size() )
@@ -956,7 +953,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 					setDead( i, 12, iLowGain );
 				}
 			}
-		}
+                }
 	}
 	/////////////////////////////////////////////////////
 	// read DB pixel values and check values
