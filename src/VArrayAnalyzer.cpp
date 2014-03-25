@@ -495,7 +495,11 @@ void VArrayAnalyzer::initTree()
 	{
 		cout << "void VArrayAnalyzer::initTrees() " <<  endl;
 	}
-	
+	if( !fOutputfile )
+	{
+		cout <<  "VArrayAnalyzer::initTrees() warning: No output file, will not initialize trees." <<  endl;
+		return;
+	}
 	fOutputfile->cd();
 	// now book the tree (for MC with additional MC block)
 	char i_text[300];
