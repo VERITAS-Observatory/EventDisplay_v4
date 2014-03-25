@@ -398,10 +398,10 @@ vector< float > VDB_PixelDataReader::getDataVector( unsigned int iDataType, unsi
 								if( t == 0 || t == 1 )
 								{
 									fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t + 1];
-                                                                        if( fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 3 )
-                                                                        {
-                                                                           fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t + 2];
-                                                                        }
+									if( fDummyReturnVector[i] < 1.e-2 && fPixelData[iDataType][iTel][i]->fData.size() > 3 )
+									{
+										fDummyReturnVector[i] = fPixelData[iDataType][iTel][i]->fData[t + 2];
+									}
 								}
 								else if( t == fPixelData[iDataType][iTel][i]->fMJD.size() - 1 )
 								{

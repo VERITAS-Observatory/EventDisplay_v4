@@ -106,10 +106,16 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	
 	// define the cuts
 	fCuts = new VGammaHadronCuts();
-        char hname[200];
-        if( fIsOn ) sprintf( hname, "GammaHadronCuts" );
-        else        sprintf( hname, "GammaHadronCuts_off" );
-        fCuts->SetName( hname );
+	char hname[200];
+	if( fIsOn )
+	{
+		sprintf( hname, "GammaHadronCuts" );
+	}
+	else
+	{
+		sprintf( hname, "GammaHadronCuts_off" );
+	}
+	fCuts->SetName( hname );
 	fCuts->resetCutValues();
 	fCuts->setDataTree( 0 );
 	fCuts->setDataDirectory( iDataDir );
@@ -774,7 +780,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	fRunMJD[irun] = fTimeMask->getMeanUTC_Mask();
 	fTimeMask->printMask( 100, kTRUE );
 	fTimeMask->printMeanTime( kTRUE );
-//	fTimeMask->displayMask() ;
+	//	fTimeMask->displayMask() ;
 	
 	return i_count;
 }
@@ -797,7 +803,10 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 	}
 	else
 	{
-                if( fCuts ) fCuts->Write();
+		if( fCuts )
+		{
+			fCuts->Write();
+		}
 		fTimeMask->writeObjects();
 		if( bOn )
 		{

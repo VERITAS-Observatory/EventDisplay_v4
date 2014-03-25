@@ -269,7 +269,7 @@ void VEvndispData::setDetectorGeometry( unsigned int iNTel, vector< string > iCa
 			exit( -1 );
 		}
 		VDetectorTree iDetectorTree;
-		iDetectorTree.readDetectorTree( fDetectorGeo, iTree, (getRunParameter()->getObservatory() != "VERITAS" ) );
+		iDetectorTree.readDetectorTree( fDetectorGeo, iTree, ( getRunParameter()->getObservatory() != "VERITAS" ) );
 		if( fDebug )
 		{
 			cout << "VEvndispData::setDetectorGeometry reading detector geometry from DST file" << endl;
