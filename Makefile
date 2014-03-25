@@ -930,6 +930,10 @@ WRITEVTSPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/VDifferentialFlux.o ./obj/VDifferentialFlux_Dict.o \
 			./obj/VMonteCarloRateCalculator.o ./obj/VMonteCarloRateCalculator_Dict.o \
 			./obj/VMonteCarloRunHeader.o ./obj/VMonteCarloRunHeader_Dict.o \
+			./obj/VEvndispRunParameter.o  ./obj/VEvndispRunParameter_Dict.o \
+			./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+			./obj/VSkyCoordinatesUtilities.o \
+			./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
 			./obj/VStatistics_Dict.o \
 			./obj/VUtilities.o \
 			./obj/Ctelconfig.o

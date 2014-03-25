@@ -129,7 +129,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		bool fillResolutionHistogram( TH1F* h = 0, string iContainmentRadius = "68", string iResolutionTreeName = "t_angular_resolution" );
 		bool fillData();
 		bool fillData( string iDataLine, int iDataID );
-		bool fillData( string iFile, double iZe = 20., double iWoff = 0.5, int iAzBin = 0, double iIndex = 2.4, int iNoise = 200, string iA_MC = "A_MC" );
+		bool fillData( string iFile, double iZe = 20., double iWoff = 0.5, int iAzBin = 0, double iIndex = 2.0, int iNoise = 200, string iA_MC = "A_MC" );
 		TH2D* getRecvsMCEnergy()
 		{
 			return hEsysMCRelative2D;

@@ -77,7 +77,7 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	{
 		cout << "VStereoAnalysis::VStereoAnalysis fatal error, directory and run list different ";
 		cout << iDirRun.size() << "\t" << fRunPara->fRunList.size() << endl;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	// define histograms and rate counters
 	vector< double > i_v;
@@ -106,6 +106,10 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
 	
 	// define the cuts
 	fCuts = new VGammaHadronCuts();
+        char hname[200];
+        if( fIsOn ) sprintf( hname, "GammaHadronCuts" );
+        else        sprintf( hname, "GammaHadronCuts_off" );
+        fCuts->SetName( hname );
 	fCuts->resetCutValues();
 	fCuts->setDataTree( 0 );
 	fCuts->setDataDirectory( iDataDir );
@@ -793,6 +797,7 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 	}
 	else
 	{
+                if( fCuts ) fCuts->Write();
 		fTimeMask->writeObjects();
 		if( bOn )
 		{
