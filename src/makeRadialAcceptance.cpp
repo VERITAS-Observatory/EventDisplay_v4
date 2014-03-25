@@ -29,7 +29,7 @@ string listfilename = "";
 string cutfilename = "";
 string simpleListFileName = "";
 string outfile = "acceptance.root";
-unsigned int ntel = 4;
+unsigned int ntel = 4;                   // this shouldn't be changed unless you really unterstand why
 string datadir = "../eventdisplay/output";
 int entries = -1;
 string histdir = "" ;
@@ -182,7 +182,7 @@ int main( int argc, char* argv[] )
 			{
 				cout << endl;
 				cout << "error: Number of Telecopes ntel " << ntel << " does not equal number in run " << iParV2->fTelToAnalyze.size() << " (defaul ntel 4)." << endl;
-				cout << "To specify us -n ntel option" << endl;
+				//            cout << "To specify us -n ntel option" << endl;
 				exit( -1 );
 			}
 		}
@@ -278,7 +278,7 @@ int parseOptions( int argc, char* argv[] )
 			{"srunlist", required_argument, 0, 's'},
 			{"cutfile", required_argument, 0, 'c'},
 			{"outfile", required_argument, 0, 'o'},
-			{"ntel", required_argument, 0, 'n'},
+			//            {"ntel", required_argument, 0, 'n'},
 			{"entries", required_argument, 0, 'n'},
 			{"datadir", required_argument, 0, 'd'},
 			{"writehists", optional_argument, 0, 'w'},
@@ -315,7 +315,7 @@ int parseOptions( int argc, char* argv[] )
 				cout << "-s --srunlist [simple run list file name]" << endl;
 				cout << "-c --cutfile [cut file name]" << endl;
 				cout << "-d --datadir [directory for input mscw root files]" << endl;
-				cout << "-n --ntel [number of telescopes, default=4]" << endl;
+				//                cout << "-n --ntel [number of telescopes, default=4]" << endl;
 				cout << "-o --outfile [output ROOT file name]" << endl;
 				cout << "-e --entries [number of entries]" << endl;
 				cout << "-w --writehists [directory]" << endl ;
@@ -338,9 +338,9 @@ int parseOptions( int argc, char* argv[] )
 				cout << "Simple List File Name is " << optarg << endl;
 				simpleListFileName = optarg;
 				break;
-			case 'n':
-				ntel = ( unsigned int )atoi( optarg );
-				break;
+			//            case 'n':
+			//                ntel=(unsigned int)atoi(optarg);
+			//                break;
 			case 'c':
 				cutfilename = optarg;
 				cout << "Cut File Name is " << cutfilename << endl;
