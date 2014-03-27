@@ -488,15 +488,23 @@ void VLightCurve::setSpectralParameters( double iMinEnergy, double  E0, double a
 }
 
 
-bool VLightCurve::plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor )
+bool VLightCurve::plotObservingPeriods( TCanvas* iCanvasLightCurve, int iColor )
 {
 	if( !iCanvasLightCurve || !iCanvasLightCurve->cd() )
 	{
 		return false;
 	}
-	
-	iDataFile = "";
-	iColor = 1;
+/* very ugly ...	
+	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+	{
+	   if( fLightCurveData[i] )
+	   {
+	       cout << "XX " << 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max) << endl;
+	       TLine *iL = new TLine( 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max), 1.e-12, 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max), 1.2e-12 );
+	       iL->Draw();
+           }
+        }
+	*/
 	
 	// read text file with observing periods
 	

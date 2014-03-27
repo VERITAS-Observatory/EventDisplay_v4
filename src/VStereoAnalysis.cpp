@@ -453,11 +453,6 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	double i_count = 0.;
 	int nentries_run = 0;
 	
-	
-	
-	
-	
-	
 	/////////////////////////////////////////////////////////////////////
 	// loop over all entries/events in the data tree
 	for( int i = 0; i < nentries; i++ )

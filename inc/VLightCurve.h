@@ -113,7 +113,7 @@ class VLightCurve : public VPlotUtilities, public VLightCurveUtilities
 		bool     initializeXRTLightCurve( string iXRTFile, double iMJDMin = -1., double iMJDMax = -1. );
 		TCanvas* plotLightCurve( TCanvas* iCanvasLightCurve = 0, string iCanvasName = "cL", int iPlotConfidenceInterval = -1,
 								 string iPlottingOption = "p", double iMaxMJDError = -1. );
-		bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, string iDataFile, int iColor );
+		bool     plotObservingPeriods( TCanvas* iCanvasLightCurve, int iColor );
 		TCanvas* plotPhaseDistribution( TCanvas* iCanvasPhaseDist = 0, string iCanvasName = "cPD", string iFluxState = "", int iColor = 1 );
 		void     setPlottingParameter( double iPlottingMJDMin, double iPlottingMJDMax );
 		void     setSignificanceParameters( double iThresholdSignificance = -9999., double iMinEvents = -9999.,

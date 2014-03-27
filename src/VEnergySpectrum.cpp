@@ -430,6 +430,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			rebinEnergySpectrum( hErecTotalTime, fAnalysisEnergyBinning, bLinearX );
 			hErecTotalTime->Reset();
 			hErecTotalTime->SetEntries( 0 );
+			hErecTotalTime->SetYTitle( "observing time [s]" );
 			// histogram with total observation time
 			if( bLinearX )
 			{
@@ -443,6 +444,7 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			rebinEnergySpectrum( hErecTotalTimeDeadTimeCorrected, fAnalysisEnergyBinning, bLinearX );
 			hErecTotalTimeDeadTimeCorrected->Reset();
 			hErecTotalTimeDeadTimeCorrected->SetEntries( 0 );
+			hErecTotalTimeDeadTimeCorrected->SetYTitle( "observing time [s]" );
 			// histogram with mean effective area
 			if( bLinearX )
 			{
