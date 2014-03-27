@@ -347,8 +347,9 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
 	double MJDStopp = 0 ; // end   MJD of run
 	double TimeStart = 0.0 ; // start Time of run
 	double TimeStopp = 0.0 ; // end   Time of run
-	VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStartTimeSQL, MJDStart, TimeStart );
-	VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStoppTimeSQL, MJDStopp, TimeStopp );
+	int i_stat_1 = VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStartTimeSQL, MJDStart, TimeStart );
+	int i_stat_2 = VSkyCoordinatesUtilities::getMJD_from_SQLstring( getRunParameter()->fDBRunStoppTimeSQL, MJDStopp, TimeStopp );
+	if( i_stat_1 != 0 || i_stat_2 != 0 ) return;
 	
 	int    iMJD  = TMath::Nint( MJDStart );
 	double iTime = TimeStart ;
