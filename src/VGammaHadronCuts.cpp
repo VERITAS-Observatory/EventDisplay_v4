@@ -2560,7 +2560,7 @@ void VGammaHadronCuts::terminate()
 	}
 	else
 	{
-		cout << "NO TMVAEVALUATOR RESULTS " << endl;
+		cout << "No TMVAEvaluator Results." << endl;
 	}
 	
 	Write();
