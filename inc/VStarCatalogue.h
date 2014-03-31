@@ -50,7 +50,6 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 		bool readCatalogue();
 		VStar* readCommaSeparatedLine_Fermi( string, int, VStar* );
 		VStar* readCommaSeparatedLine_Fermi_Catalogue( string, int, VStar* );
-		bool   readVERITASsourcesfromDB( string );
 		
 	public:
 	
@@ -100,6 +99,7 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 		void          printStarsInFOV();
 		void          printStarsInFOV( double iMinBrightness, string iBand = "B" );
 		void          purge();
+		bool          readVERITASsourcesfromDB( string );
 		unsigned int  setFOV( double ra_deg, double dec_deg, double FOV_x, double FOV_y, bool bJ2000 = true, double iBrightness = 9999., string iBand = "B" );
 		unsigned int  setFOV( string ra_hour, string dec, double FOV_x, double FOV_y, bool bJ2000 = true );
 		void          setTelescopePointing( unsigned int iTelID = 0, double iDerotationAngle = 0.,
@@ -108,6 +108,6 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 		
 		bool          checkTextBlocks( string iL, unsigned int iV );
 		
-		ClassDef( VStarCatalogue, 6 );
+		ClassDef( VStarCatalogue, 7 );
 };
 #endif
