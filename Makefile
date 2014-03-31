@@ -876,7 +876,8 @@ WRITECTAPHYSOBJ=	./obj/VWPPhysSensitivityFile.o \
 			./obj/CEffArea.o ./obj/CEffArea_Dict.o \
 			./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
 			./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
-			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \ ./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+			./obj/VInstrumentResponseFunctionData.o ./obj/VInstrumentResponseFunctionData_Dict.o \
+			./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
 			./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o \
 			./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
 			./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
