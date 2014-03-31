@@ -1246,7 +1246,8 @@ TCanvas*  VPlotInstrumentResponseFunction::plotResolution( string iName, string 
 	TCanvas* iResolutionPlottingCanvas = new TCanvas( hname, iCanvasTitle.c_str(), 210, 10, fCanvasSize_X, fCanvasSize_Y );
 	iResolutionPlottingCanvas->SetGridx( 0 );
 	iResolutionPlottingCanvas->SetGridy( 0 );
-	iResolutionPlottingCanvas->SetLeftMargin( 0.13 );
+	iResolutionPlottingCanvas->SetLeftMargin( 0.15 );
+	iResolutionPlottingCanvas->SetRightMargin( 0.07 );
 	
 	sprintf( hname, "har_%s_%s", iName.c_str(), iXaxis.c_str() );
 	TH1D* har = new TH1D( hname, "", 100, i_Plotting_L_Min, i_Plotting_L_Max );

@@ -99,7 +99,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		}
 		
 		bool setPlotCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false );
-		bool setCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = false )
+		bool setCTARequirements( int iRequirementID = -1, bool iPlotRequirementGoals = true )
 		{
 			return setPlotCTARequirements( iRequirementID, iPlotRequirementGoals );
 		}

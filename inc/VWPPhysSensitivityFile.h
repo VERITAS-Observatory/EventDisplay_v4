@@ -78,7 +78,7 @@ class VWPPhysSensitivityFile
 		VWPPhysSensitivityFile();
 		~VWPPhysSensitivityFile() {}
 		
-		bool fillIRFHistograms( string iEffectiveAreaFile );
+		bool fillIRFHistograms( string iEffectiveAreaFile, double iZe = 20., double iWoff = 0. );
 		bool fillHistograms1D( string iDataDirectory, bool iFill1D = true );
 		bool fillHistograms2D( vector< double > iWobble_min, vector< double > iWobble_max );
 		bool fillSensitivityHistograms( string iDataDirectory, bool iFill1D = true );

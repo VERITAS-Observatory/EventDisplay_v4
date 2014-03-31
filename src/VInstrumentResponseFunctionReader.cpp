@@ -50,6 +50,7 @@ VInstrumentResponseFunctionReader::VInstrumentResponseFunctionReader()
 	gEnergyLogBias_Median = 0;
 	gAngularResolution = 0;
 	gAngularResolution80 = 0;
+	gEffArea_Recp80 = 0;
 	hWeightedRate = 0;
 	
 	initializeIRFData();
@@ -337,7 +338,10 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		}
 	}
 	
+
+        ////////////////////////////////////////////////////////////////////
 	// read IRF from a EVNDISP response file
+        ////////////////////////////////////////////////////////////////////
 	CEffArea* c = new CEffArea( t );
 	
 	bool bFound = false;
@@ -350,7 +354,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			cout << "VInstrumentResponseFunctionReader::getDataFromFile: reading event " << j << endl;
 		}
 		
-		// ignore all values if there is only one entry in this tree
+		// ignore all checks if there is only one entry in this tree
 		if( c->fChain->GetEntries() > 1 )
 		{
 			// azimuth
@@ -402,7 +406,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		cout << "\t FOUND EFFECTIVE AREA (entry " << j << ")" << endl;
 		bFound = true;
 		
-		// get effective areas
+		// get effective areas (these are effective area after the usual angular cut)
 		if( c->gEffAreaMC )
 		{
 			gEffArea_MC  = ( TGraphAsymmErrors* )c->gEffAreaMC->Clone();
@@ -443,7 +447,7 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		{
 			gEffArea_Rec = 0;
 		}
-		// get energy spectra
+		// get energy counting histogram
 		if( c->hEmc )
 		{
 			hEmc = ( TH1D* )c->hEmc->Clone();
@@ -565,19 +569,6 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 		
 		break;
 	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////
-	// read gamma/hadron cuts
-	VGammaHadronCuts* i_cuts = ( VGammaHadronCuts* )iFile->Get( "GammaHadronCuts" );
-	if( i_cuts )
-	{
-		// check if theta2 graph was used
-		fGammaHadronCuts_directionCut_selector = i_cuts->getDirectionCutSelector();
-	}
-	else
-	{
-		fGammaHadronCuts_directionCut_selector = 0;
-	}
-	
 	//////////////////////////////////////////////////////////////
 	// read resolution files
 	
@@ -596,6 +587,75 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 			cout << " ...found" << endl;
 			bFound = true;
 		}
+	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	// now fill effective areas for 80% containment radius
+	//
+	// for this: read theta2 cut, get containment radius for this theta2 cut,
+	//           then scale the effective areas accordingly
+
+	// read gamma/hadron cuts
+	VGammaHadronCuts* i_cuts = ( VGammaHadronCuts* )iFile->Get( "GammaHadronCuts" );
+	if( i_cuts )
+	{
+		// check if theta2 graph was used
+		fGammaHadronCuts_directionCut_selector = i_cuts->getDirectionCutSelector();
+		// read theta2 from disk
+		if( gEffArea_Rec )
+		{
+		   double i_x = 0;
+		   double i_y = 0.;
+		   int z = 0;
+		   for( unsigned int i = 0; i <fIRF_TreeNames.size(); i++ )
+		   {
+		      if( fIRF_TreeNames[i] == "t_angular_resolution" && fIRF_Data[i] )
+		      {
+                         // 2D angular difference histogram
+			 TH2D* hRes = (TH2D*)fIRF_Data[i]->f2DHisto[VInstrumentResponseFunctionData::E_DIFF];
+			 if( hRes )
+			 {
+			     z = 0;
+			     gEffArea_Recp80 = new TGraphAsymmErrors( 1 );
+			     setGraphPlottingStyle( gEffArea_Recp80, 2 );
+// loop over all energies (x-axis of hRes) and get containment level for given theta2 cut
+			     float i_ffactor_80p = 1.;
+			     for( int p = 0; p < gEffArea_Rec->GetN(); p++ )
+			     {
+				gEffArea_Rec->GetPoint( p, i_x, i_y );
+				i_ffactor_80p = i_cuts->getTheta2Cut_max( TMath::Power( 10., i_x ) );
+				if( i_ffactor_80p > 0. ) i_ffactor_80p = sqrt( i_ffactor_80p );
+// integrate and calculate contaiment level for this bin in log10 energy
+                                int i_bin = hRes->GetXaxis()->FindBin( i_x );
+				double iTot = 0.;
+				for( int j = 1; j <= hRes->GetNbinsY(); j++ ) iTot += hRes->GetBinContent( i_bin, j );
+			        if( iTot < 1.e-12 ) continue;
+                                double iSum = 0.;
+				for( int j = 1; j <= hRes->GetNbinsY(); j++ )
+				{
+				   iSum += hRes->GetBinContent( i_bin, j );
+				   if( hRes->GetYaxis()->GetBinCenter( j ) > i_ffactor_80p )
+				   {
+				       if( iSum/iTot > 0. )
+				       {
+					  gEffArea_Recp80->SetPoint( z, i_x, i_y * 0.8 / iSum * iTot );
+					  gEffArea_Recp80->SetPointEYhigh( z, gEffArea_Rec->GetErrorYhigh( p )  * 0.8 / iSum * iTot );
+					  gEffArea_Recp80->SetPointEYlow( z, gEffArea_Rec->GetErrorYlow( p )  * 0.8 / iSum * iTot );
+					  z++;
+                                       }
+				       break;
+                                   }
+                                }
+                             }
+                         }
+			 break; // found the angular resolution tree
+                      }
+                   }
+		   if( gEffArea_Recp80 ) gEffArea_Recp80->Print();
+                }
+	}
+	else
+	{
+		fGammaHadronCuts_directionCut_selector = 0;
 	}
 	
 	if( !bFound )
@@ -979,32 +1039,39 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
 	{
 		return false;
 	}
+	TGraphAsymmErrors *g = gEffArea_Rec;
 	
 	double i_EffAreaScaleFactor = 1.;
 	// make sure that 80% containment radius effective areas are available
 	if( fGammaHadronCuts_directionCut_selector > 0 && iContainmentRadius.size() > 0 )
 	{
-		cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms() warning: " << endl;
-		cout << "\t assuming that effective areas are calculated using a 68\% containment on direction" << endl;
-		cout << "\t (this is hard coded!!!)" << endl;
-		i_EffAreaScaleFactor = 0.80 / 0.68;
+		if( iContainmentRadius == "80" )
+		{
+		   cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms() warning: " << endl;
+		   cout << "\t assuming that effective areas are calculated using a 68\% containment on direction" << endl;
+		   cout << "\t (this is hard coded!!!)" << endl;
+		   i_EffAreaScaleFactor = 0.80 / 0.68;
+                }
 	}
-	else if( iContainmentRadius.size() > 0 )
+	else if( iContainmentRadius.size() > 0 && iContainmentRadius == "80" )
 	{
-		return false;
+		cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms: ";
+		cout << "found scaled effective areeas for 80\% case " << endl;
+		if( gEffArea_Recp80 ) g = gEffArea_Recp80;
+		else return false;
 	}
 	
-	if( gEffArea_Rec )
+	if( g )
 	{
 		double x = 0.;
 		double y = 0.;
-		for( int i = 0; i < gEffArea_Rec->GetN(); i++ )
+		for( int i = 0; i < g->GetN(); i++ )
 		{
-			gEffArea_Rec->GetPoint( i, x, y );
+			g->GetPoint( i, x, y );
 			if( y > 0. )
 			{
 				hEffRec->SetBinContent( hEffRec->FindBin( x ), y  * i_EffAreaScaleFactor );
-				hEffRec->SetBinError( hEffRec->FindBin( x ), 0.5 * ( gEffArea_Rec->GetErrorYlow( i ) + gEffArea_Rec->GetErrorYhigh( i ) ) );
+				hEffRec->SetBinError( hEffRec->FindBin( x ), 0.5 * ( g->GetErrorYlow( i ) + g->GetErrorYhigh( i ) ) );
 			}
 		}
 	}

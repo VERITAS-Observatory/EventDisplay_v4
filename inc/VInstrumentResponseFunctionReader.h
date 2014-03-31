@@ -71,6 +71,7 @@ class VInstrumentResponseFunctionReader : public VAnalysisUtilities, public VPlo
 		// effective areas
 		TGraphAsymmErrors* gEffArea_MC;
 		TGraphAsymmErrors* gEffArea_Rec;
+		TGraphAsymmErrors* gEffArea_Recp80;
 		// effective area ratios
 		TGraphAsymmErrors* gEffArea_MC_Ratio;
 		TGraphAsymmErrors* gEffArea_Rec_Ratio;

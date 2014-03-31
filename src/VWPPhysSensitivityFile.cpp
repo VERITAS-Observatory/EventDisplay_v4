@@ -510,8 +510,12 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 	return ( fillIRFHistograms( iEffectiveAreaFile.str() ) && fillSensitivityHistograms( iDataDirectory, iFill1D ) );
 }
 
+/*
 
-bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile )
+   read IRF histograms from effective area file and translate them to 
+   CTA WP Phys format
+*/
+bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile, double iZe, double iWoff )
 {
 
 	std::cout << "VWPPhysSensitivityFile::fillHistograms1D " << std::endl;
@@ -523,7 +527,7 @@ bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile )
 	// CTA data
 	if( isVTS() == 0 )
 	{
-		if( !i_IRF.fillData( iEffectiveAreaFile.c_str() ) )
+		if( !i_IRF.fillData( iEffectiveAreaFile.c_str(), iZe, iWoff  ) )
 		{
 			cout << "VWPPhysSensitivityFile::fillHistograms1D error filling data from " << iEffectiveAreaFile.c_str() << endl;
 			return false;
@@ -552,7 +556,7 @@ bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile )
 	// fill effective area histograms (68%)
 	i_IRF.fillEffectiveAreasHistograms( fEffArea, "", fEffAreaMC );
 	// fill effective area histograms (80%)
-	i_IRF.fillEffectiveAreasHistograms( fEffArea80, "80" );
+	i_IRF.fillEffectiveAreasHistograms( fEffArea80, "80", 0 );
 	char hname[2000];
 	if( i_IRF.getMigrationMatrix() )
 	{
