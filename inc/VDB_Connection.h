@@ -45,10 +45,8 @@ class VDB_Connection
 		
 		~VDB_Connection()
 		{
-			//std::cout<<"VDB_Connection Destructor "<<std::endl;
 			if( f_db )
 			{
-				//std::cout<<"VDB_Connection::Connect CLOSING  server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
 				Close_Connection();
 			}
 			
@@ -79,7 +77,6 @@ class VDB_Connection
 		{
 			if( f_db )
 			{
-				//std::cout<<"VDB_Connection::Close_Connection server "<<fDBserver<<" mode "<<fconnection_mode<<" option "<<fconnection_option <<std::endl;
 				f_db->Close();
 				f_db = 0;
 			}

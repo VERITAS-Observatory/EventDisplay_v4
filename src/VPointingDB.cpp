@@ -77,7 +77,7 @@ bool VPointingDB::initialize( string iTPointCorrection, string iVPMDirectory, bo
 	{
 		cout << "VPointingDB: failed to connect to database server: " << iTempS << endl;
 		fStatus = false;
-		exit( -1 );
+		exit( EXIT_FAILURE );
 	}
 	
 	fStatus = getDBRunInfo();
@@ -313,24 +313,34 @@ void VPointingDB::getDBMJDTime( string itemp, int& MJD, double& Time, bool bStri
 	int y, m, d, h, min, s, ms, l;
 	double gMJD;
 	// get y, m, d
-	y = atoi( itemp.substr( 0, 4 ).c_str() );
-	m = atoi( itemp.substr( 4, 2 ).c_str() );
-	d = atoi( itemp.substr( 6, 2 ).c_str() );
-	h = atoi( itemp.substr( 8, 2 ).c_str() );
-	min = atoi( itemp.substr( 10, 2 ).c_str() );
-	s = atoi( itemp.substr( 12, 2 ).c_str() );
-	if( !bStrip )
+	
+	try
 	{
-		ms = atoi( itemp.substr( 14, 3 ).c_str() );
+		y = atoi( itemp.substr( 0, 4 ).c_str() );
+		m = atoi( itemp.substr( 4, 2 ).c_str() );
+		d = atoi( itemp.substr( 6, 2 ).c_str() );
+		h = atoi( itemp.substr( 8, 2 ).c_str() );
+		min = atoi( itemp.substr( 10, 2 ).c_str() );
+		s = atoi( itemp.substr( 12, 2 ).c_str() );
+		if( !bStrip )
+		{
+			ms = atoi( itemp.substr( 14, 3 ).c_str() );
+		}
+		else
+		{
+			ms = 0;
+		}
+		// calculate MJD
+		slaCldj( y, m, d, &gMJD, &l );
+		MJD = ( int )gMJD;
+		Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 	}
-	else
+	catch( const std::out_of_range& oor )
 	{
-		ms = 0;
+		MJD = 0;
+		Time = 0.;
+		cout << "VPointingDB::getDBMJDTime() error: DB time string too short " << itemp.size() << ", " << oor.what() << endl;
 	}
-	// calculate MJD
-	slaCldj( y, m, d, &gMJD, &l );
-	MJD = ( int )gMJD;
-	Time = h * 60.*60. + min * 60. + s + ms / 1.e3;
 }
 
 
@@ -353,41 +363,57 @@ bool VPointingDB::getDBRunInfo()
 	}
 	
 	TSQLResult* db_res = fmy_connection->Get_QueryResult();
+	if( !db_res )
+	{
+		return false;
+	}
 	
 	TSQLRow* db_row = db_res->Next();
-	
-	string itemp = db_row->GetField( 6 );
-	getDBMJDTime( itemp, fMJDRunStart, fTimeRunStart, true );
-	itemp = db_row->GetField( 7 );
-	getDBMJDTime( itemp, fMJDRunStopp, fTimeRunStopp, true );
-	// add 1 min to be save
-	fTimeRunStopp += 60.;
-	
-	fDBSourceName = db_row->GetField( 19 );
-	getDBSourceCoordinates( fDBSourceName, fDBTargetDec, fDBTargetRA );
-	
-	float dist = atof( db_row->GetField( 17 ) );
-	float angl = atof( db_row->GetField( 18 ) );
-	
-	if( fabs( angl ) < 0.1 )
+	if( !db_row )
 	{
-		fDBWobbleNorth = dist;
-		fDBWobbleEast = 0.;
+		return false;
 	}
-	else if( fabs( angl - 90. ) < 0.1 )
+	
+	if( db_row->GetField( 6 ) && db_row->GetField( 7 ) && db_row->GetField( 17 ) &&
+			db_row->GetField( 18 ) && db_row->GetField( 19 ) )
 	{
-		fDBWobbleNorth = 0.;
-		fDBWobbleEast = dist;
+		string itemp = db_row->GetField( 6 );
+		getDBMJDTime( itemp, fMJDRunStart, fTimeRunStart, true );
+		itemp = db_row->GetField( 7 );
+		getDBMJDTime( itemp, fMJDRunStopp, fTimeRunStopp, true );
+		// add 1 min to be save
+		fTimeRunStopp += 60.;
+		
+		fDBSourceName = db_row->GetField( 19 );
+		getDBSourceCoordinates( fDBSourceName, fDBTargetDec, fDBTargetRA );
+		
+		float dist = atof( db_row->GetField( 17 ) );
+		float angl = atof( db_row->GetField( 18 ) );
+		
+		if( fabs( angl ) < 0.1 )
+		{
+			fDBWobbleNorth = dist;
+			fDBWobbleEast = 0.;
+		}
+		else if( fabs( angl - 90. ) < 0.1 )
+		{
+			fDBWobbleNorth = 0.;
+			fDBWobbleEast = dist;
+		}
+		else if( fabs( angl - 180. ) < 0.1 )
+		{
+			fDBWobbleNorth = -1.*dist;
+			fDBWobbleEast = 0.;
+		}
+		else if( fabs( angl - 270. ) < 0.1 )
+		{
+			fDBWobbleNorth = 0.;
+			fDBWobbleEast = -1.*dist;
+		}
 	}
-	else if( fabs( angl - 180. ) < 0.1 )
+	else
 	{
-		fDBWobbleNorth = -1.*dist;
-		fDBWobbleEast = 0.;
-	}
-	else if( fabs( angl - 270. ) < 0.1 )
-	{
-		fDBWobbleNorth = 0.;
-		fDBWobbleEast = -1.*dist;
+		return false;
 	}
 	
 	return true;
