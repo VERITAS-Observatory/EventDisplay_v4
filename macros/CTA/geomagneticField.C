@@ -8,7 +8,7 @@ double orthogonal( double zenith_deg, double azimuth_deg, double B_z, double B_x
     double x = -sin( zenith_deg * TMath::DegToRad() ) * sin( azimuth_deg * TMath::DegToRad() ) * B_z;
     double y =  sin( zenith_deg * TMath::DegToRad() ) * cos( azimuth_deg * TMath::DegToRad() ) * B_z
 	       - cos( zenith_deg * TMath::DegToRad() ) * B_x;  
-    double z = sin( zenith_deg * TMath::DegToRad() ) * sin( zenith_deg * TMath::DegToRad() ) * B_x;
+    double z = sin( zenith_deg * TMath::DegToRad() ) * sin( azimuth_deg * TMath::DegToRad() ) * B_x;
 
     return sqrt( x*x + y*y + z*z );
 }
@@ -73,8 +73,8 @@ void printBField_at_CTA_sites()
 	      cout << " B_tot = " << fB_tot[i] << ", inclination " << fInclination_deg[i];
 	      cout << " deg, declination " << fDeclination_deg[i] << " deg, ";
 	      double B_h = fB_tot[i] * cos( fInclination_deg[i] * TMath::DegToRad() );
-	      double B_z = fB_tot[i] * sin( fInclination_deg[i] * TMath::DegToRad() );
 	      double B_x = B_h * cos( fDeclination_deg[i] * TMath::DegToRad() );
+	      double B_z = fB_tot[i] * sin( fInclination_deg[i] * TMath::DegToRad() );
 	      cout << "B_h = " << B_h;
 	      cout << ", B_z = " << B_z;
 	      cout << ", B_x = " << B_x;
