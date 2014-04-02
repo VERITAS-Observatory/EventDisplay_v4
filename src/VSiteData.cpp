@@ -321,7 +321,7 @@ bool VSiteData::addDataSet( string iDataList, unsigned int iSiteCounter, string 
 	for( unsigned int i = 0; i < fSiteFileName.size(); i++ )
 	{
 		stringstream sobs( stringstream::in | stringstream::out );
-		sobs << fObservationTime_s[i];
+		sobs << fixed << TMath::Nint( fObservationTime_s[i] );
 		if( fSiteFileName[i].find( "DESY" ) != string::npos )
 		{
 			iTemp = "data/DESY/" + fSiteFileName[i] + "." + fArray[i] + ".";
