@@ -21,7 +21,9 @@ static inline std::string &ltrim( std::string &s) {
 	return s ;
 }
 static inline std::string &rchop( std::string &s ) {
-	s.erase( s.begin() + s.find_first_of(" "), s.end() ) ;
+	if ( s.find_first_of(" ") != std::string::npos ) {
+		s.erase( s.begin() + s.find_first_of(" "), s.end() ) ;
+	}
 	return s ;
 }
 bool is_number( const std::string& s) {
@@ -109,8 +111,10 @@ int main( int argc, char* argv[] )
 		if ( fin.good() ) {
 			while ( std::getline( fin, file_line ) ) {
 				//cout << "line:    '" << file_line << "'" << endl;
-				rchop(ltrim(file_line)) ; // clean up the line
-				//cout << "         '" << file_line << "'" << endl;
+				ltrim(file_line) ; // clean up the line
+				//cout << "    ltrim:'" << file_line << "'" << endl;
+				rchop(file_line) ; // clean up the line
+				//cout << "    rchop:'" << file_line << "'" << endl;
 				if ( is_number( file_line ) ) {
 					runnumber = atoi( file_line.c_str() ) ;
 					if( runnumber < 9999 or runnumber > 99999 )
@@ -130,10 +134,10 @@ int main( int argc, char* argv[] )
 			return 1;
 		}
 	}
-	cout << "runlist.size(): " << runlist.size() << endl;
+	//cout << "runlist.size(): " << runlist.size() << endl;
 
 	VGlobalRunParameter* blah = new VGlobalRunParameter() ;
-	cout << " VGlobal->getDBServer(): " << blah->getDBServer() << endl;
+	//cout << " VGlobal->getDBServer(): " << blah->getDBServer() << endl;
 	// start connection
 	//string db_name = "mysql://romulus.ucsc.edu/" ;
 	//TSQLServer * f_db = TSQLServer::Connect( db_name.c_str(), "readonly" , "" );
@@ -149,7 +153,7 @@ int main( int argc, char* argv[] )
 	}
 	
 	for ( unsigned int i_run=0 ; i_run<runlist.size() ; i_run++ ) {
-		cout << "examining run " << runlist[i_run] << "..." << endl;
+		cout << "Downloading observatory data for run " << runlist[i_run] << "..." << endl;
 		runnumber = runlist[i_run] ;
 		
 		// get run start and finish, # of telescopes
