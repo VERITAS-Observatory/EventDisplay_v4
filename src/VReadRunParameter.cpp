@@ -989,7 +989,12 @@ void VReadRunParameter::test_and_adjustParams()
 		fRunPara->fuseDB = false;
 		fRunPara->fL2TimeCorrect = false;
 		fRunPara->fDBCameraRotationMeasurements = false;
-		fRunPara->fLowGainCalibrationFile = "";
+		// this is for example required for Grisudet sims, when low gains are read from
+		// the cfg file
+		if( fRunPara->fLowGainCalibrationFile == "NOFILE" || (fRunPara->fsourcetype == 4 || fRunPara->fsourcetype == 7 ) )
+		{
+			fRunPara->fLowGainCalibrationFile = "";
+		}
 	}
 	
 	// CTA/AGIS adjustments
@@ -1099,8 +1104,6 @@ void VReadRunParameter::test_and_adjustParams()
 			// reading low gain pedestals
 			else
 			{
-				//	      if( i >= fRunPara->fPedLowGainFileNumber.size() ) fRunPara->fPedLowGainFileNumber.push_back( 36862 );
-				//	      else                                              fRunPara->fPedLowGainFileNumber[i] = 36862;
 				if( i >= fRunPara->fPedLowGainFileNumber.size() )
 				{
 					fRunPara->fPedLowGainFileNumber.push_back( 0 );

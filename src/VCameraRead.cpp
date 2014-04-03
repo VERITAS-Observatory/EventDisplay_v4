@@ -441,12 +441,12 @@ bool VCameraRead::readGrisucfg( string iFile, unsigned int iNTel )
 				if( !i_stream.eof() )
 				{
 					i_stream >> fLowGainMultiplier_Trace[0];
-					for( unsigned int i = 0; i < fNTel; i++ )
+					for( unsigned int i = 1; i < fNTel; i++ )
 					{
 						fLowGainMultiplier_Trace[i] = fLowGainMultiplier_Trace[0];
 					}
 					i_stream >> fLowGainActivator[0];
-					for( unsigned int i = 0; i < fNTel; i++ )
+					for( unsigned int i = 1; i < fNTel; i++ )
 					{
 						fLowGainActivator[i] = fLowGainActivator[0];
 					}

@@ -43,27 +43,27 @@ string fObservatory;
 
 bool readRunParameterFile( string ifile )
 {
-    fMCset.clear();
-
-    ifstream is;
-    is.open( ifile.c_str(), ifstream::in );
-    if( !is )
-    {
-	     cout << "error opening run parameter file " << ifile << endl;
-	     return false;
-    }
-    string is_line;
-    string temp;
-    cout << endl;
-    cout << "========================================" << endl;
-    cout << "run parameter file(" << ifile << ")" << endl;
-     
-    while( getline( is, is_line ) )
-    {
-	     if( is_line.size() > 0 )
-	     {
-		     istringstream is_stream( is_line );
-		     is_stream >> temp;
+	fMCset.clear();
+	
+	ifstream is;
+	is.open( ifile.c_str(), ifstream::in );
+	if( !is )
+	{
+		cout << "error opening run parameter file " << ifile << endl;
+		return false;
+	}
+	string is_line;
+	string temp;
+	cout << endl;
+	cout << "========================================" << endl;
+	cout << "run parameter file(" << ifile << ")" << endl;
+	
+	while( getline( is, is_line ) )
+	{
+		if( is_line.size() > 0 )
+		{
+			istringstream is_stream( is_line );
+			is_stream >> temp;
 			if( temp != "*" )
 			{
 				continue;
@@ -76,26 +76,26 @@ bool readRunParameterFile( string ifile )
 				is_stream >> temp;
 				if( is_stream.eof() )
 				{
-				    cout << "error while reading MCset line" << endl;
-				    return false;
-                                }
+					cout << "error while reading MCset line" << endl;
+					return false;
+				}
 				is_stream >> fMCset[atof( temp.c_str() )];
 			}
 			// anasum file
 			else if( temp == "ANASUMFILE" )
 			{
-			        is_stream >> fAnaSumFile;
-                        }
+				is_stream >> fAnaSumFile;
+			}
 			// observatory
 			else if( temp == "OBSERVATORY" )
 			{
-			        is_stream >> fObservatory;
-                        }
-              }
-      }
-      is.close();
-
-      return true;
+				is_stream >> fObservatory;
+			}
+		}
+	}
+	is.close();
+	
+	return true;
 }
 
 int main( int argc, char* argv[] )
@@ -109,7 +109,10 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		exit( 0 );
 	}
-	if( !readRunParameterFile( argv[1] ) ) return false;
+	if( !readRunParameterFile( argv[1] ) )
+	{
+		return false;
+	}
 	string fOutputFile = argv[2];
 	
 	cout << endl;
@@ -118,20 +121,23 @@ int main( int argc, char* argv[] )
 	unsigned int z = 0;
 	for( map<double, string>::iterator it = fMCset.begin(); it != fMCset.end(); ++it )
 	{
-	   cout << "\t offset " << it->first << " deg, ";
-	   cout << "effective area file: " << it->second;
-	   if( z == 0 ) cout << " (used for on-axis histograms)";
-	   cout << endl;
-	   z++;
-        }
+		cout << "\t offset " << it->first << " deg, ";
+		cout << "effective area file: " << it->second;
+		if( z == 0 )
+		{
+			cout << " (used for on-axis histograms)";
+		}
+		cout << endl;
+		z++;
+	}
 	cout << "\t anasum file:\t" << fAnaSumFile << endl;
 	cout << "\t output file:\t" << fOutputFile << endl;
 	cout << endl;
 	if( fMCset.size() == 0 )
 	{
-	    cout << "error: no effective area files given" << endl;
-	    return false;
-        }
+		cout << "error: no effective area files given" << endl;
+		return false;
+	}
 	
 	/////////////////////
 	// initialization
@@ -153,24 +159,24 @@ int main( int argc, char* argv[] )
 	// initialize histogram with the standard binning used in the VTS WP Phys group
 	iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, 9999 );
 	
-// first element is used for on source histograms
+	// first element is used for on source histograms
 	if( !iData->fillIRFHistograms( fMCset.begin()->second, 20., fMCset.begin()->first ) )
 	{
 		cout << "error filling on source histograms" << endl;
 	}
-// off-axis histograms
+	// off-axis histograms
 	z = 0;
 	vector< double > i_woff;
 	for( map<double, string>::iterator it = fMCset.begin(); it != fMCset.end(); ++it )
 	{
-	    iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, z );
-	    if( !iData->fillIRFHistograms( it->second, 20., it->first ) )
-	    {
-	       cout << "error filling off soure histograms: " << it->second << "\t" << it->first << endl;
-            }
-	    i_woff.push_back( it->first );
-	    z++;
-        }
+		iData->initializeHistograms( 21, -1.9, 2.3, 500, -1.9, 2.3, 400, -2.3, 2.7, z );
+		if( !iData->fillIRFHistograms( it->second, 20., it->first ) )
+		{
+			cout << "error filling off soure histograms: " << it->second << "\t" << it->first << endl;
+		}
+		i_woff.push_back( it->first );
+		z++;
+	}
 	iData->fillHistograms2D( i_woff, i_woff );
 	
 	iData->terminate();
@@ -255,5 +261,5 @@ int main( int argc, char* argv[] )
 		}
 		iF.Close();
 	}
-	cout << endl << "all histograms written to " << fOutputFile << endl; 
+	cout << endl << "all histograms written to " << fOutputFile << endl;
 }

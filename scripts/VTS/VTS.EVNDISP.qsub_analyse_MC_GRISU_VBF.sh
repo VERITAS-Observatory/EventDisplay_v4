@@ -198,6 +198,7 @@ set PEDOPT="-pedestalfile $NOISEFILE -pedestalseed=$RRR -pedestalDefaultPedestal
 
 ##### MC options #####
 # restrict average tzero calculation to inner part of the camera
+# (note that we are simulating gamma rays in general)
 # set MCOPT="-sourcetype=2 -camera=$CFG -averagetzerofiducialradius=0.60"
 # default options
 set MCOPT="-sourcetype=2 -camera=$CFG"
@@ -217,7 +218,7 @@ $EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=
 ##############################################################################################
 # run eventdisplay 
 ##############################################################################################
-$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$RRR.log
+$EVNDISPSYS/bin/evndisp -runnumber=$SRUN -writenomctree -sourcefile $XFIL -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$RRR.root -teltoana=$TTA $MCOPT $PEDOPT -calibrationdirectory $ODIR -lowgaincalibrationfile NOFILE >& $ODIR/$RRR.log
 ##############################################################################################
 
   sleep 10s

@@ -512,7 +512,7 @@ bool VWPPhysSensitivityFile::fillHistograms1D( string iDataDirectory, bool iFill
 
 /*
 
-   read IRF histograms from effective area file and translate them to 
+   read IRF histograms from effective area file and translate them to
    CTA WP Phys format
 */
 bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile, double iZe, double iWoff )
@@ -527,7 +527,7 @@ bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile, doubl
 	// CTA data
 	if( isVTS() == 0 )
 	{
-		if( !i_IRF.fillData( iEffectiveAreaFile.c_str(), iZe, iWoff  ) )
+		if( !i_IRF.fillData( iEffectiveAreaFile.c_str(), iZe, iWoff ) )
 		{
 			cout << "VWPPhysSensitivityFile::fillHistograms1D error filling data from " << iEffectiveAreaFile.c_str() << endl;
 			return false;

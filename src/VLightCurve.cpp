@@ -494,17 +494,17 @@ bool VLightCurve::plotObservingPeriods( TCanvas* iCanvasLightCurve, int iColor )
 	{
 		return false;
 	}
-/* very ugly ...	
-	for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
-	{
-	   if( fLightCurveData[i] )
-	   {
-	       cout << "XX " << 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max) << endl;
-	       TLine *iL = new TLine( 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max), 1.e-12, 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max), 1.2e-12 );
-	       iL->Draw();
-           }
-        }
-	*/
+	/* very ugly ...
+		for( unsigned int i = 0; i < fLightCurveData.size(); i++ )
+		{
+		   if( fLightCurveData[i] )
+		   {
+		       cout << "XX " << 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max) << endl;
+		       TLine *iL = new TLine( 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max), 1.e-12, 0.5*(fLightCurveData[i]->fPhase_Data_min+fLightCurveData[i]->fPhase_Data_max), 1.2e-12 );
+		       iL->Draw();
+	           }
+	        }
+		*/
 	
 	// read text file with observing periods
 	

@@ -9,10 +9,10 @@ int VSkyCoordinatesUtilities::getMJD_from_SQLstring( string iSQLData, double& i_
 {
 	if( iSQLData.size() < 19 )
 	{
-	   i_mjd = 0;
-	   sec_of_day = 0;
-	   return -99;
-        }
+		i_mjd = 0;
+		sec_of_day = 0;
+		return -99;
+	}
 	int i_year  = atoi( iSQLData.substr( 0, 4 ).c_str() );
 	int i_month = atoi( iSQLData.substr( 5, 2 ).c_str() );
 	int i_day   = atoi( iSQLData.substr( 8, 2 ).c_str() );

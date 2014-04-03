@@ -39,7 +39,7 @@ else
 fi
 
 
-SOPT="-display=1 -runnumber=$RUNN -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISEV"
+SOPT="-display=1 -runnumber=$RUNN -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISEV -lowgaincalibrationfile NOFILE"
 
 # default noise levels
 PEDLEV="16."

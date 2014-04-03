@@ -2207,11 +2207,12 @@ void VCalibrator::readTOffsets( bool iLowGain )
 			infile.open( iFile.c_str(), ifstream::in );
 			if( !infile )
 			{
-				cout << "VCalibrator::readTOffsets() warning: input file " << iFile << " cannot be opened.\n" ;
+				cout << "VCalibrator::readTOffsets() warning: input file " << iFile << " cannot be opened." << endl;
 				
 				if( getRunParameter()->fDBRunType == "flasher" || getRunParameter()->fDBRunType == "laser" )
 				{
-					cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0.\n" ;
+					cout << "Telescope " << getTelID() + 1 << ": ";
+					cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0." << endl;
 					use_default = true;
 				}
 				else
@@ -2221,10 +2222,10 @@ void VCalibrator::readTOffsets( bool iLowGain )
 						std::cout << "Error: No toff information available " << std::endl;
 						std::cout << "exiting... " << std::endl;
 						std::cout << "          please set option: -nocalibnoproblem , when launching EVNDISP if you want to continue anyway (all TOffsets will be set to 0) " << std::endl;
-						exit( -1 );
+						exit( EXIT_FAILURE );
 						
 					}
-					
+					cout << "Telescope " << getTelID() + 1 << ": ";
 					cout << "VCalibrator::readTOffsets() info: all tOffsets set to 0.\n" ;
 					use_default = true;
 				}
@@ -2272,6 +2273,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 					}
 					else
 					{
+						cout << "Telescope " << getTelID() + 1 << ": ";
 						cout << "VCalibrator::readTOffsets(): channel out of range: " << VchannelList[i] << "\t" << getTOffsets().size() << endl;
 					}
 				}
@@ -2280,6 +2282,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	}
 	else if( getRunParameter()->fNoCalibNoPb || iLowGain || getRunParameter()->fIsMC )
 	{
+		cout << "Telescope " << getTelID() + 1 << ": ";
 		std::cout << "VCalibrator::readTOffsets() info: TOffsets are set to 0";
 		if( iLowGain )
 		{
@@ -2288,6 +2291,7 @@ void VCalibrator::readTOffsets( bool iLowGain )
 		cout << std::endl;
 		if( !iLowGain )
 		{
+			cout << "Telescope " << getTelID() + 1 << ": ";
 			std::cout << "VCalibrator::readTOffsets() info: TOffsets are not tested to find dead channels " << std::endl;
 		}
 		setTOffsets( 0., iLowGain );
@@ -2315,8 +2319,6 @@ void VCalibrator::readTOffsets( bool iLowGain )
 	{
 		std::cout << "calibration information are stored in  " << iFile << std::endl;
 	}
-	
-	
 	
 }
 
@@ -2551,7 +2553,7 @@ void VCalibrator::getCalibrationRunNumbers()
 		}
 	}
 	int iLowGainCaliLines = 0;
-	if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
+	if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 && !getRunParameter()->fIsMC )
 	{
 		iLowGainCaliLines = readLowGainCalibrationValues_fromCalibFile( "LOWGAINPED" );
 		if( iLowGainCaliLines > 0 )
@@ -2559,13 +2561,6 @@ void VCalibrator::getCalibrationRunNumbers()
 			setCalibrationFileNames();
 		}
 	}
-	
-	/*    int iLowGainMultLines = 0;
-	    if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
-	    {
-	      iLowGainMultLines = readLowGainCalibrationValues_fromCalibFile( "FILELOWGAINMULTIPLIER" );
-	      if( iLowGainMultLines > 0 ) setCalibrationFileNames();
-	    } */
 	
 	// take pedestals from grisu output file ('P'-lines), gains=1, and toff = 0.
 	if( iCaliLines == 0 && ( fReader->getDataFormat() == "grisu" || getRunParameter()->fsimu_pedestalfile.size() > 0 ) )
@@ -2758,6 +2753,7 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 						}
 						else if( iVariable == "LOWGAINMULTIPLIER_TRACE" && atof( iValueString.c_str() ) > 0. && iTel == ( int )iTelescopeSelect )
 						{
+							cout << "Telescope " << getTelID() + 1 << ": ";
 							cout << "VCalibrator::readLowGainMultiplier():  LOWGAINMULTIPLIER_TRACE " << iTel << ": " <<  atof( iValueString.c_str() ) << endl;
 							setLowGainMultiplier_Trace( atof( iValueString.c_str() ) );
 						}
@@ -2781,6 +2777,7 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 							}
 							if( jsum - 1 != jmax )
 							{
+								cout << "Telescope " << getTelID() + 1 << ": ";
 								cout << "VCalibrator::readLowGainCalibrationValues_fromCalibFile: warning, you claim to have low gain multpliers from sw " << jmin << " to " << jmax ;
 								cout << ", but the last value read in corresponds to sw " << jsum - 1 << ". Please check your config file, line " << endl;
 								cout << is_line << endl;
@@ -3078,11 +3075,7 @@ void VCalibrator::readPixelstatus()
 
 /*!
 
-     NOTE: READING LOW GAIN MULTIPLIERS FROM TREES NEED SOME WORK
-
-     SHOULD BE AS WELL ONE LOW GAIN MULTIPLIER PER SUMMATION WINDOW
-
-     TODO: check that this is read out correctly for all summation windows
+     get low gain multiplier (might be summation window dependent)
 
 */
 bool VCalibrator::readLowGainMultiplier( )
@@ -3091,7 +3084,6 @@ bool VCalibrator::readLowGainMultiplier( )
 	//////////////////////////////////////////////////////////////////
 	// read low gain multiplier from low gain calibration file
 	// (one value per telescope & sumwindow)
-	
 	if( getRunParameter()->fLowGainCalibrationFile.size() > 0 && getRunParameter()->frunmode != 6 )
 	{
 		cout << "Telescope " << getTelID() + 1 << ": ";
@@ -3105,6 +3097,8 @@ bool VCalibrator::readLowGainMultiplier( )
 	// (one value per telescope)
 	else if( getDetectorGeometry()->isLowGainSet() )
 	{
+		cout << "Telescope " << getTelID() + 1 << ": ";
+		cout << "reading low gain multiplier from cfg file: " << getDetectorGeometry()->getLowGainMultiplier_Trace()[getTelID()] << endl;
 		setLowGainMultiplier_Trace( getDetectorGeometry()->getLowGainMultiplier_Trace()[getTelID()] );
 	}
 	return true;
