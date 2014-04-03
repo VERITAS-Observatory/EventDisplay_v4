@@ -37,9 +37,26 @@ int main( int argc, char* argv[] )
 	// parse argument
 	if( argc != 3 )
 	{
-		cout << "Error, needs runnumber argument." << endl;
+		cout << "Error, needs runnumber or runlist argument." << endl;
 		cout << "For Example:" << endl;
-		cout << "  $ VTS.getRun_TimeElevAzim 65765" << endl;
+		cout << "  $ VTS.getRun_TimeElevAzim -r 65765" << endl;
+		cout << " or " << endl;
+		cout << "  $ VTS.getRun_TimeElevAzim -f mysimplerunlist.dat" << endl;
+		cout << endl;
+		cout << "Outputdata will be in the format:" << endl;
+		cout << "RUN##### MJD(days) Elevation(degs) Azimuth(degs)" << endl;
+		cout << "RUN##### MJD(days) Elevation(degs) Azimuth(degs)" << endl;
+		cout << "RUN##### MJD(days) Elevation(degs) Azimuth(degs)" << endl;
+		cout << "RUN##### MJD(days) Elevation(degs) Azimuth(degs)" << endl;
+		cout << endl;
+		cout << "* there will be one line per ~2 seconds of observatory operation" << endl;
+		cout << "* elevation is degrees above the local horizon" << endl;
+		cout << "* azimuth is degrees from North(0deg) to East(90deg)" << endl;
+		cout << "* to only get the data (and strip out the other text), do:" << endl;
+		cout << "  $ VTS.getRun_TimeElevAzim -f mysimplerunlist.dat | grep -P \"^RUN\\d{5}\"" << endl;
+		cout << "* or a specific run's data with:" << endl;
+		cout << "  $ VTS.getRun_TimeElevAzim -f mysimplerunlist.dat | grep -P \"^RUN66565\"" << endl;
+		cout << endl;
 		return 1 ;
 	}
 	
@@ -260,8 +277,10 @@ int main( int argc, char* argv[] )
 		//f_db->Close() ;
 		
 		// convert pointing data from ra/dec to elev/azi
-		float lat = 31.675  ; // observatory coordinates
-		float lon = 110.952 ;
+		//float lat = 31.675  ; // observatory coordinates
+		float lat = blah->getObservatory_Latitude_deg() ;
+		//float lon = 110.952 ;
+		float lon = blah->getObservatory_Longitude_deg() ;
 		double lon_rad = lon * TMath::DegToRad() ;
 		double lat_rad = lat * TMath::DegToRad() ;
 		VSkyCoordinates* vsky = new VSkyCoordinates() ;
