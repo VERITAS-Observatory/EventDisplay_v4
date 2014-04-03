@@ -2,13 +2,26 @@
          calculate the geomagnetic field compontents at the CTA site candidates
 */
 
-double orthogonal( double zenith_deg, double azimuth_deg, double B_z, double B_x )
+double orthogonal_H_Z( double zenith_deg, double azimuth_deg, double B_z, double B_h )
 {
 
     double x = -sin( zenith_deg * TMath::DegToRad() ) * sin( azimuth_deg * TMath::DegToRad() ) * B_z;
     double y =  sin( zenith_deg * TMath::DegToRad() ) * cos( azimuth_deg * TMath::DegToRad() ) * B_z
+	       - cos( zenith_deg * TMath::DegToRad() ) * B_h;  
+    double z = sin( zenith_deg * TMath::DegToRad() ) * sin( azimuth_deg * TMath::DegToRad() ) * B_h;
+
+    return sqrt( x*x + y*y + z*z );
+}
+
+double orthogonal_X_Y_Z( double zenith_deg, double azimuth_deg, double B_z, double B_x, double B_y )
+{
+
+    double x = cos( zenith_deg * TMath::DegToRad() ) * B_y 
+	       - sin( zenith_deg * TMath::DegToRad() ) * sin( azimuth_deg * TMath::DegToRad() ) * B_z; 
+    double y =  sin( zenith_deg * TMath::DegToRad() ) * cos( azimuth_deg * TMath::DegToRad() ) * B_z
 	       - cos( zenith_deg * TMath::DegToRad() ) * B_x;  
-    double z = sin( zenith_deg * TMath::DegToRad() ) * sin( azimuth_deg * TMath::DegToRad() ) * B_x;
+    double z = sin( zenith_deg * TMath::DegToRad() ) * sin( azimuth_deg * TMath::DegToRad() ) * B_x
+	       - sin( zenith_deg * TMath::DegToRad() ) * cos( azimuth_deg * TMath::DegToRad() ) * B_y;
 
     return sqrt( x*x + y*y + z*z );
 }
@@ -69,16 +82,25 @@ void printBField_at_CTA_sites()
       {
 	 for( unsigned int k = 0; k < fAz.size(); k++ )
 	 {
-              cout << "\t Ze=" << fZe[j] << " deg, Az=" << fAz[k] << " deg: ";
+         cout << "\t Ze=" << fZe[j] << " deg, Az=" << fAz[k] << " deg: ";
 	      cout << " B_tot = " << fB_tot[i] << ", inclination " << fInclination_deg[i];
 	      cout << " deg, declination " << fDeclination_deg[i] << " deg, ";
 	      double B_h = fB_tot[i] * cos( fInclination_deg[i] * TMath::DegToRad() );
 	      double B_x = B_h * cos( fDeclination_deg[i] * TMath::DegToRad() );
+	      double B_y = B_h * sin( fDeclination_deg[i] * TMath::DegToRad() );
 	      double B_z = fB_tot[i] * sin( fInclination_deg[i] * TMath::DegToRad() );
 	      cout << "B_h = " << B_h;
 	      cout << ", B_z = " << B_z;
 	      cout << ", B_x = " << B_x;
-	      cout << ", B_orth = " << orthogonal( fZe[j], fAz[k], B_z, B_x ) << endl;
+	      cout << ", B_y = " << B_y;
+	      if(  fDeclination_deg[i] == 0. )
+	      {
+	          cout << ", B_orth = " << orthogonal_H_Z( fZe[j], fAz[k], B_z, B_h ) << endl;
+	      }
+	      else
+	      {
+	          cout << ", B_orth = " << orthogonal_X_Y_Z( fZe[j], fAz[k], B_z, B_x, B_y ) << endl;
+	      }
 	 }
       }
    }
