@@ -360,17 +360,18 @@ TCanvas* VPlotWPPhysSensitivity::plotProjectedSensitivities( TCanvas* c, double 
 	return cC;
 }
 
-bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, double ymax )
+bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, double ymax, bool iRatoToGoal )
 {
 	char hname[200];
 	char htitle[200];
-	sprintf( hname, "cSensRatio" );
-	sprintf( htitle, "ratio of sensitivities" );
+	sprintf( hname, "cSensRatio_%d", (int)iRatoToGoal );
+	if( iRatoToGoal ) sprintf( htitle, "ratio of sensitivities (to goal)" );
+	else              sprintf( htitle, "ratio of sensitivities (to requirement)" );
 	TCanvas* cSensRatio = new TCanvas( hname, htitle, 200, 200, 900, 600 );
 	cSensRatio->SetGridy( 0 );
 	cSensRatio->SetGridx( 0 );
 	
-	sprintf( hname, "hSensRatio" );
+	sprintf( hname, "hSensRatio_%d", (int)iRatoToGoal );
 	TH1D* hNull = new TH1D( hname, "", 10, log10( fMinEnergy_TeV ), log10( fMaxEnergy_TeV ) );
 	hNull->SetStats( 0 );
 	hNull->SetXTitle( "log_{10} energy [TeV]" );
@@ -390,7 +391,8 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	TGraph* gRelG = 0;
 	if( fPlotCTARequirements )
 	{
-		gRelG = fPlotCTARequirements->getRequiredDifferentalSensitivity();
+		if( !iRatoToGoal ) gRelG = fPlotCTARequirements->getRequiredDifferentalSensitivity();
+		else               gRelG = fPlotCTARequirements->getGoalDifferentialSensitivity();
 		if( !gRelG )
 		{
 			return false;
@@ -431,7 +433,9 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 	// plot goal sensitivity
 	if( fPlotCTARequirementGoals )
 	{
-		TGraphAsymmErrors* gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getGoalDifferentialSensitivity();
+		TGraphAsymmErrors* gRelGoal = 0;
+		if(  !iRatoToGoal ) gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getGoalDifferentialSensitivity();
+		else               gRelGoal = ( TGraphAsymmErrors* )fPlotCTARequirements->getRequiredDifferentalSensitivity();
 		if( gRelGoal )
 		{
 			TGraphAsymmErrors* g = new TGraphAsymmErrors();
@@ -454,7 +458,8 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 		if( iPrint.size() > 0 )
 		{
 			char hname[2000];
-			sprintf( hname, "%s-SensitivityRatio.eps", iPrint.c_str() );
+			if( iRatoToGoal )  sprintf( hname, "%s-SensitivityRatioGoal.eps", iPrint.c_str() );
+			else               sprintf( hname, "%s-SensitivityRatio.eps", iPrint.c_str() );
 			if( cSensRatio )
 			{
 				cSensRatio->Print( hname );

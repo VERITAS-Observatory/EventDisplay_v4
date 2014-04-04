@@ -82,7 +82,7 @@ class VPlotWPPhysSensitivity : public VPlotUtilities
 		bool plotIRF( string iPrint = "", double iEffAreaMin = 50., double iEffAreaMax = 5.e7, double iEnergyResolutionMax = 0.5 );
 		TCanvas* plotProjectedSensitivities( TCanvas*, double iMaxOffset, int iColor = -1 );
 		bool plotSensitivity( string iPrint = "", double iMinSensitivity = 4.e-14, double iMaxSensitivity = 2.5e-10, string iUnit = "ENERGY" );
-		bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2. );
+		bool plotSensitivityRatio( string iPrint, double ymin = 0.01, double ymax = 2., bool iRatoToGoal = false );
 		void printSensitivityFigureOfMerit( TGraphAsymmErrors* gSensitivity, double iEmin_TeV = 0.03, double iEmax_TeV = 100., string iAnalysis = "" );
 		void printSensitivityFigureOfMerit( double iEmin_TeV = 0.03, double iEmax_TeV = 100. );
 		void reset();

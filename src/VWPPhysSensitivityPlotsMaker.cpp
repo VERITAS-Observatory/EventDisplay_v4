@@ -50,6 +50,7 @@ void VWPPhysSensitivityPlotsMaker::compareDataSets( string iDataSetFile, string 
 	a.plotSensitivity( fPrintingOptions, fSensitivity_min, fSensitivity_max, fSensitivity_Unit );
 	a.plotProjectedSensitivities( 0, 5. );
 	a.plotSensitivityRatio( fPrintingOptions, 0.4, 4.1 );
+	a.plotSensitivityRatio( fPrintingOptions, 0.2, 1.8, true );
 	// Southern sites: 30 GeV - 100 TeV
 	if( fPlotCTARequirements < 3 )
 	{
