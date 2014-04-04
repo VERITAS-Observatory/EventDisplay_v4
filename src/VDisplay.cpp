@@ -457,6 +457,7 @@ void VDisplay::makeMoviePicture()
 	
 	if( fMoviePictNumber % fEventLoop->getNTel() == 0 || fCameraDisplay != C_TIMING )
 	{
+        // can be changed to any graphical output
 		sprintf( i_Temp, "_%.5d.gif", fMoviePictNumber );
 		suffix = i_Temp;
 		// no printout Info in <TCanvas::Print>: ....
@@ -843,15 +844,7 @@ void VDisplay::drawFADC( bool iFit )
 	// plot trace of one channel (click on channel)
 	if( fSelectedChan >= 200000 && !fEventLoop->getZeroSuppressed()[fSelectedChan - 200000] )
 	{
-		// photodiode
-		if( fEventLoop->getRunParameter()->fShowPhotoDiode && fSelectedChan == 2499 )
-		{
-			sprintf( histitle, "Photodiode (Channel 499, Telescope %d)", fTelescope + 1 );
-		}
-		else
-		{
-			sprintf( histitle, "Channel #%d (Telescope %d)", fSelectedChan - 200000, fTelescope + 1 );
-		}
+                sprintf( histitle, "Channel #%d (Telescope %d)", fSelectedChan - 200000, fTelescope + 1 );
 		
 		// fill histogram with fadc trace
 		fHisFADC = fillFADC( fSelectedChan - 200000, fHisFADC );
@@ -1121,14 +1114,7 @@ void VDisplay::drawFADC( bool iFit )
 	if( fSelectedChan >= 200000 && fEventLoop->getZeroSuppressed()[fSelectedChan - 200000] )
 	{
 		setFADCText();
-		if( fEventLoop->getRunParameter()->fShowPhotoDiode && fSelectedChan == 2499 )
-		{
-			sprintf( histitle, "Photodiode (Channel 499, Telescope %d)", fTelescope + 1 );
-		}
-		else
-		{
-			sprintf( histitle, "Channel #%d (Telescope %d)", fSelectedChan - 200000, fTelescope + 1 );
-		}
+		sprintf( histitle, "Channel #%d (Telescope %d)", fSelectedChan - 200000, fTelescope + 1 );
 		fHisFADC->SetTitle( histitle );
 		fHisFADC->SetStats( 0 );
 		fCanvasFADC->SetEditable( 1 );

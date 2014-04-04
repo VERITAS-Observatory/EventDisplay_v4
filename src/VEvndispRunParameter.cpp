@@ -243,7 +243,6 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fw = 1000;                                    // width of main window
 	fh = 650;                                     // height of main window
 	fw = 975;                                     // width of main window
-	fShowPhotoDiode = false;
 	fPlotRaw = false;
 	fPlotPaper = false;
 	fPlotAllInOneMethod = 0;

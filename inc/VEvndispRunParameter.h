@@ -244,7 +244,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		bool   floopmode;                         // infinite event loop
 		unsigned int fw;                          // main window width
 		unsigned int fh;                          // main window height
-		bool fShowPhotoDiode;                     // show photodiode signal
 		bool fPlotRaw;                            // plot raw values only, used fpeds = 0
 		bool fPlotPaper;                          // clean up plots for papers and talks (no dead channels, no small text, ...)
 		unsigned int fPlotAllInOneMethod;         // from which method are the angular reconstruction results to taken to plot in all in one window
@@ -320,6 +319,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 145 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 146 ); //(increase this number)
 };
 #endif

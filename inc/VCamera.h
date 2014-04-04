@@ -54,9 +54,6 @@ class VCamera
 		vector<TMarker*> fgraphMarker;            //!< a marker to be plot on top of the tubes
 		TEllipse* fCameraOuterEdge;
 		TEllipse* fCameraFOV;
-		bool fShowPhotoDiode;
-		TBox* fPhotoDiode;                        //!< photodiode entry
-		TText* fPhotoDiodeText;
 		TEllipse* fAnaEllipse;                    //!< reconstructed image
 		TEllipse* fAnaEllipse1;                   //!< reconstructed image
 		TEllipse* fAnaEllipse2;                   //!< reconstructed image

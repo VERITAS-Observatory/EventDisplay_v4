@@ -34,7 +34,7 @@ VDST::VDST( bool iMode, bool iMC )
 		exit( -1 );
 	}
 	
-	initDSTTree( true, getRunParameter()->fShowPhotoDiode, getTraceFit() > -1 );
+	initDSTTree( true, false, getTraceFit() > -1 );
 	setMC( iMC );
 	
 	fVImageCleaning = new VImageCleaning( getData() );

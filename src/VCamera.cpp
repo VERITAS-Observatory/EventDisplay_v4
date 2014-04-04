@@ -29,8 +29,6 @@ VCamera::VCamera( unsigned int iTel, VEvndispData* iData )
 	fAnaVis = true;
 	fPlotPaper = fData->getRunParameter()->fPlotPaper;
 	
-	fShowPhotoDiode = fData->getRunParameter()->fShowPhotoDiode;
-	
 	bFixScale = false;                            /* set fixed scale for colz plots */
 	
 	setUpCamera();
@@ -182,14 +180,6 @@ void VCamera::setUpCamera()
 	fCameraFOV->SetLineColor( 14 );
 	fCameraFOV->SetLineStyle( 2 );
 	fCameraFOV->SetFillStyle( 0 );
-	// channel with photodiode signal
-	fPhotoDiode = new TBox( 0.05, 0.75,  0.08, 0.78 );
-	fPhotoDiode->SetLineColor( 5 );
-	fPhotoDiode->SetFillColor( 5 );
-	fPhotoDiode->SetUniqueID( 200000 + fData->getDetectorGeo()->getNChannels()[getTelescopeNumber()] );
-	fPhotoDiodeText = new TText( fPhotoDiode->GetX1() + 0.005, fPhotoDiode->GetY1() + 0.007, "PD" );
-	fPhotoDiodeText->SetTextFont( 42 );
-	fPhotoDiodeText->SetTextSize( 0.0175 );
 	// ellipse representing the shower image
 	fAnaEllipse = new TEllipse();
 	fAnaEllipse->SetLineColor( 7 );
@@ -610,12 +600,6 @@ void VCamera::draw( double i_max, int iEventNumber, bool iAllinOne )
 				fTheta2Circle[t]->SetFillStyle( 0 );
 				fTheta2Circle[t]->Draw();
 			}
-		}
-		// draw photodiode
-		if( !fBoolAllinOne && fShowPhotoDiode )
-		{
-			fPhotoDiode->Draw();
-			fPhotoDiodeText->Draw();
 		}
 		// draw the ellipse from image parameters
 		// don't draw anything for hit/timing/ped mean/ped var/gains/toffsets
@@ -1769,24 +1753,6 @@ int VCamera::getChannel( int px, int py, TObject* objSel )
 	}
 	fCanvas->Update();
 	fCanvas->SetEditable( false );
-	// check photodiode
-	if( fShowPhotoDiode )
-	{
-		if( x > fPhotoDiode->GetX1() && x < fPhotoDiode->GetX2() && y > fPhotoDiode->GetY1() && fPhotoDiode->GetY2() )
-		{
-			if( objSel > 0 )
-			{
-				if( objSel == fPhotoDiode || objSel == fPhotoDiodeText )
-				{
-					return fPhotoDiode->GetUniqueID();
-				}
-				else
-				{
-					return -1;
-				}
-			}
-		}
-	}
 	fCanvas->Update();
 	fCanvas->SetEditable( false );
 	return -1;

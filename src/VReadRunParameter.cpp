@@ -72,9 +72,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			fRunPara->fDebug = true;
 			fDebug = true;
 		}
-		else if( iTemp.find( "photodiode" ) < iTemp.size() )
+		// nice plots for talks/papers
+		else if( iTemp.find( "plotpape" ) != string::npos )
 		{
-			fRunPara->fShowPhotoDiode = true;
+			fRunPara->fPlotPaper = true;
 		}
 		// camera
 		else if( iTemp.find( "camera" ) < iTemp.size() && !( iTemp.find( "cameradirectory" ) < iTemp.size() )
@@ -147,18 +148,16 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogsRecID = -1;
 			};
 		}
-		// Model3D, JG
+		// Model3D
 		else if( iTemp.find( "model3d" ) < iTemp.size() )
 		{
 			fRunPara->fUseModel3D = true;
-			//fRunPara->fShortTree = 99; //JGtest?
 			fRunPara->fLnLTableFile = "table_LnL.root";
 		}
 		else if( iTemp.find( "plot3d" ) < iTemp.size() )
 		{
 			fRunPara->fUseModel3D = true;
 			fRunPara->fUseDisplayModel3D = true;
-			//fRunPara->fShortTree = 99; //JGtest?
 			fRunPara->fLnLTableFile = "table_LnL.root";
 			fRunPara->fdisplaymode = 1;
 		}
@@ -258,6 +257,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->freadCalibfromDB_versionquery = atoi( iTemp2.c_str() );
+                                i++;
 			}
 			else
 			{
@@ -274,6 +274,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->freadCalibfromDB_versionquery = atoi( iTemp2.c_str() );
+                                i++;
 			}
 			else
 			{
@@ -445,11 +446,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		else if( iTemp.find( "printanalysisprogress" ) < iTemp.size() || iTemp.find( "pap" ) < iTemp.size() )
 		{
 			fRunPara->fPrintAnalysisProgress = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		// nice plots for talks/papers
-		else if( iTemp.find( "plotpaper" ) < iTemp.size() )
-		{
-			fRunPara->fPlotPaper = true;
 		}
 		// set run number from command line (default: get it from source file name)
 		else if( iTemp.rfind( "runnum" ) < iTemp.size() || iTemp == "run" )
@@ -913,7 +909,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fPrintGrisuHeader = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
-		
 		else if( i > 1 )
 		{
 			cout << "unknown command line parameter: " << iTemp << endl;
