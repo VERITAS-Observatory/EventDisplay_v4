@@ -90,7 +90,7 @@ endif
 ##############################################################################################
 # output directory
 ##############################################################################################
-set ODIR=$YDIR/analysisCARE_d20140127_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
+set ODIR=$YDIR/analysisCARE_d20140403_ATM"$ATMO"_"$TTA"_NOISE"$NOISE"/
 mkdir -p $ODIR
 
 ##############################################################################################
@@ -134,6 +134,12 @@ set MCOPT="-shorttree -sourcetype=2 -camera=$CFG"
 echo "RUNNUMBER $RUN"
 echo "EVNDISP outputfile root file written to $ODIR/$RUN.root"
 echo "EVNDISP log file written to $ODIR/$RUN.dat"
+
+#### Low gain calibration ####
+if (! -e $ODIR/calibrationlist.LowGain.dat ) then
+    mkdir -p $ODIR/Calibration
+    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/
+endif
 
 ##############################################################################################
 # run eventdisplay 
