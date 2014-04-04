@@ -163,8 +163,7 @@ bool VTMVARunData::openDataFiles()
 		cout << "ERROR: not enough signal or/and background events" << endl;
 		cout << "please adjust energy intervals " << endl;
 		cout << "exiting..." << endl;
-		cout << endl;
-		exit( 0 );
+		exit( EXIT_FAILURE );
 	}
 	
 	

@@ -72,6 +72,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		double fSpectralFitFluxNormalisationEnergy;
 		double fSpectralFitEnergy_min;
 		double fSpectralFitEnergy_max;
+
+                double fOffsetDistance;                  // offset distance to get correct counting histograms
 		
 		// plotting variables
 		TCanvas* fPlottingCanvas;
@@ -235,6 +237,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 										int iLiAndMa = 17, int iULAlgo = 0 );
 										
 		TF1* fitEnergySpectrum( string iname = "fit", bool bDraw = true );
+                void setOffsetdistance( double iOff = -9999. )  { fOffsetDistance = iOff; }
 		void setSpectralFitFunction( int iD  = 0 )
 		{
 			fSpectralFitFunction = iD;
@@ -292,6 +295,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		}
 		
 		
-		ClassDef( VEnergySpectrum, 13 );
+		ClassDef( VEnergySpectrum, 14 );
 };
 #endif

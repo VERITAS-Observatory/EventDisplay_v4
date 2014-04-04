@@ -302,6 +302,7 @@ EVNOBJECTS =    ./obj/VVirtualDataReader.o \
 		./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
 		./obj/VEffectiveAreaCalculatorMCHistograms.o ./obj/VEffectiveAreaCalculatorMCHistograms_Dict.o \
 		./obj/VSpectralWeight.o ./obj/VSpectralWeight_Dict.o \
+		./obj/VTableLookupRunParameter.o ./obj/VTableLookupRunParameter_Dict.o \
 		./obj/VPedestalCalculator.o \
 		./obj/VDeadChannelFinder.o \
 		./obj/VSpecialChannel.o \

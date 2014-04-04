@@ -85,8 +85,8 @@ void VStereoHistograms::defineHistograms()
 	///////////////////////////////////
 	// limits of energy histograms
 	// log energy axis
-	double i_emin = -2.;
-	double i_emax =  2.2;
+	double i_emin = -1.9;
+	double i_emax =  2.3;
 	int    i_ebin = int( ( i_emax - i_emin ) / fBinSizeEnergy + 0.5 );
 	// linear energy axis
 	double i_Linemin = 0.05;
@@ -96,6 +96,10 @@ void VStereoHistograms::defineHistograms()
 	double i_tmin = fTimeMin;
 	double i_tmax = fTimeMax;
 	int i_tbin = int( ( i_tmax - i_tmin ) / fBinSizeTime + 0.5 );
+        // distance to camera centre axis
+        double i_t_offmin = 0.;
+        double i_t_offmax = 4.;
+        int i_t_offbin = TMath::Nint( (i_t_offmax-i_t_offmin)/0.25 );
 	
 	sprintf( i_key, "htheta2_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "#theta^{2} Histogram (%s)", fHisSuffix.c_str() );
@@ -136,16 +140,6 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( herecChi2 );
 	hListStereoParameterHistograms->Add( herecChi2 );
 	hListNameofParameterHistograms["herecChi2"] = herecChi2;
-	
-	sprintf( i_key, "hZetaTau_%s", fHisSuffix.c_str() );
-	sprintf( i_name, "#theta^{2} Histogram, ZetaTau (%s)", fHisSuffix.c_str() );
-	hZetaTau = new TH1D( i_key, i_name, 500, 0., 2.0 );
-	hZetaTau->SetXTitle( "#theta^{2} [deg^{2}]" );
-	hZetaTau->SetYTitle( "No. of Events" );
-	hisList->Add( hZetaTau );
-	hListParameterHistograms->Add( hZetaTau );
-	hListStereoParameterHistograms->Add( hZetaTau );
-	hListNameofParameterHistograms["hZetaTau"] = hZetaTau;
 	
 	sprintf( i_key, "hmean_width_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "Mean Width Histogram (%s)", fHisSuffix.c_str() );
@@ -329,6 +323,17 @@ void VStereoHistograms::defineHistograms()
 	hListParameterHistograms->Add( hrf );
 	hListRandomForestParameterHistograms->Add( hrf );
 	hListNameofParameterHistograms["hrf"] = hrf;
+
+	sprintf( i_key, "herecCounts2D_vs_distance_%s", fHisSuffix.c_str() );
+	sprintf( i_name, "counting histogram (energy vs distance to camera centre [deg]) (%s)", fHisSuffix.c_str() );
+	herecCounts2D_vs_distance = new TH2D( i_key, i_name, i_ebin, i_emin, i_emax, i_t_offbin, i_t_offmin, i_t_offmax );
+	herecCounts2D_vs_distance->SetXTitle( "log_{10} energy [TeV]" );
+	herecCounts2D_vs_distance->SetZTitle( "No. of events" );
+	herecCounts2D_vs_distance->SetYTitle( "distance to camera centre [deg]" );
+	hisList->Add( herecCounts2D_vs_distance );
+	hListParameterHistograms->Add( herecCounts2D_vs_distance );
+	hListEnergyHistograms->Add( herecCounts2D_vs_distance );
+	hListNameofParameterHistograms["herecCounts2D_vs_distance"] = herecCounts2D_vs_distance;
 	
 	sprintf( i_key, "herecCounts2DtimeBinned_%s", fHisSuffix.c_str() );
 	sprintf( i_name, "counting histogram (energy) (%s)", fHisSuffix.c_str() );
@@ -415,19 +420,19 @@ void VStereoHistograms::defineHistograms()
 	// rate histograms
 	
 	sprintf( i_key, "hrate_1sec_%s", fHisSuffix.c_str() );
-	hrate_1sec = new TH1D( i_key, "One Second Count rate", 100, -2.0, 2.0 );
+	hrate_1sec = new TH1D( i_key, "One Second Count rate", 100, i_emin, i_emax );
 	hrate_1sec->SetXTitle( "Time [MJD]" );
 	hrate_1sec->SetYTitle( "Rate (Hz)" );
 	hisRateList->Add( hrate_1sec );
 	
 	sprintf( i_key, "hrate_10sec_%s", fHisSuffix.c_str() );
-	hrate_10sec = new TH1D( i_key, "Ten Second Count rate", 50, -2.0, 2.0 );
+	hrate_10sec = new TH1D( i_key, "Ten Second Count rate", 50, i_emin, i_emax );
 	hrate_10sec->SetXTitle( "Time [MJD]" );
 	hrate_10sec->SetYTitle( "Rate (per 10 seconds)" );
 	hisRateList->Add( hrate_10sec );
 	
 	sprintf( i_key, "hrate_1min_%s", fHisSuffix.c_str() );
-	hrate_1min = new TH1D( i_key, "One Minute Count rate", 50, -2.0, 2.0 );
+	hrate_1min = new TH1D( i_key, "One Minute Count rate", 50, i_emin, i_emax ); 
 	hrate_1min->SetXTitle( "Time [MJD]" );
 	hrate_1min->SetYTitle( "Rate (per minute)" );
 	hisRateList->Add( hrate_1min );

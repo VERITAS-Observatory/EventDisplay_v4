@@ -83,7 +83,8 @@ class VStereoHistograms
 		
 		// energy histograms (logarithmic energy axis)
 		TH1D* herecCounts;                        //!< reconstructed energy
-		TH2D* herecCounts2DtimeBinned;            //!< reconstructed energy (2D)
+		TH2D* herecCounts2DtimeBinned;            //!< reconstructed energy vs observing time (2D)
+                TH2D* herecCounts2D_vs_distance;              //!< reconstructed energy vs distance to camera centre
 		//time-dependent differential energy spectrum
 		TH2D* herecWeights;                       //!< weights vs.  reconstructed energy
 		TProfile* herecEffectiveArea;             //!< effective area vs reconstructed energy

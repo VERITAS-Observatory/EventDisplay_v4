@@ -407,7 +407,7 @@ bool VAnalysisUtilities::readRunList( vector< int > irunlist, int iTot )
 /*!
    get a histogram/function/graph/etc from an anasum output file
 */
-TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string dirname )
+TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string dirname, double iSlizeY )
 {
 	if( !fAnasumDataFile )
 	{
@@ -444,10 +444,22 @@ TObject* VAnalysisUtilities::getHistogram( string hisname, int runnumber, string
 	
 	TObject* h = ( TObject* )iDir->Get( hisname.c_str() );
 	
-	if( h )
+	if( h && iSlizeY < -9998. )
 	{
 		return h->Clone();
 	}
+        else if( h )
+        {
+           string iClassName = h->ClassName();
+           if( iClassName.find( "TH2" ) != string::npos )
+           {
+              TH2 *i_h2 = (TH2*)h;
+              string iN = hisname + "px";
+              TH1 *i_h = (TH1*)i_h2->ProjectionX( iN.c_str(), i_h2->GetYaxis()->FindBin( iSlizeY ), i_h2->GetYaxis()->FindBin( iSlizeY ) );
+              return i_h->Clone();
+           }
+        }
+
 	
 	return 0;
 }

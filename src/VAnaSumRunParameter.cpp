@@ -113,7 +113,7 @@ VAnaSumRunParameter::VAnaSumRunParameter()
 	
 	// parameter for energy spectra (in log E)
 	fEnergyReconstructionSpectralIndex = 2.5;
-	fEnergyReconstructionMethod = 0;
+	fEnergyReconstructionMethod = 1;
 	fEffectiveAreaVsEnergyMC = 1;             // default: use effective areas vs reconstructed energy (accurate method)
 	fEnergySpectrumBinSize = 0.05;
 	fEnergyEffectiveAreaSmoothingIterations = -1;
@@ -515,7 +515,25 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 			else if( temp == "ENERGYRECONSTRUCTIONMETHOD" )
 			{
 				fEnergyReconstructionMethod = ( unsigned int )atoi( temp2.c_str() );
-				if( fEnergyReconstructionMethod > 1 )
+                                // print a clear warning if method 0 is selected
+                                if( fEnergyReconstructionMethod == 0 )
+                                {
+                                        cout << endl;
+                                        cout << "WARNING: energy reconstruction 0 is no longer valid. For any standard analysise, please use method 1 by:" << endl;
+                                        cout << "  open your anasum run parameter file and replace " << endl;
+                                        cout << "* ENERGYRECONSTRUCTIONMETHOD 0" << endl;
+                                        cout << "   by " << endl;
+                                        cout << "* ENERGYRECONSTRUCTIONMETHOD 1" << endl;
+                                        cout << "(if you really want to use method 0, you will have to look into the code to find the detour" << endl;
+                                        return 0;
+                                }
+                                // horrible detour to make sure that users don't use the wrong method
+                                else if( fEnergyReconstructionMethod == 100 )
+                                {
+                                    cout << "Warning: using energy reconstruction method 0" << endl;
+                                    fEnergyReconstructionMethod = 0;
+                                }
+				else if( fEnergyReconstructionMethod > 1 )
 				{
 					cout << "Unknown parameter for ENERGYRECONSTRUCTIONMETHOD in parameter file " << i_filename << ": " << temp2 << endl;
 					cout << "allowed values are 0 and 1" << endl;

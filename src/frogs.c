@@ -1082,7 +1082,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation )
 	FILE* fu; //file pointer
 	if( ( fu = fopen( FROGS_TEMPLATE_LIST_PATH, "r" ) ) == NULL )
 	{
-		printf( "%s\n", FROGS_TEMPLATE_LIST_PATH );
+		printf( "FROGS template file list: %s\n", FROGS_TEMPLATE_LIST_PATH );
 		frogs_showxerror( "Failed opening the template files list file" );
 	}
 	
@@ -1180,6 +1180,7 @@ frogs_read_template_file(
 	//open file
 	if( ( fu = fopen( fname, "r" ) ) == NULL )
 	{
+                printf( "%s\n", fname );
 		frogs_showxerror( "Failed opening the template file" );
 	}
 	

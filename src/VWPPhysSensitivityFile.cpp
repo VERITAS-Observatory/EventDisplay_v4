@@ -537,11 +537,11 @@ bool VWPPhysSensitivityFile::fillIRFHistograms( string iEffectiveAreaFile, doubl
 	// VERITAS data
 	else
 	{
-		if( isVTS() == 5 && !i_IRF.fillData( iEffectiveAreaFile.c_str(), 20, 0.5, 16, 2.0, 130 ) )
+		if( isVTS() == 5 && !i_IRF.fillData( iEffectiveAreaFile.c_str(), iZe, iWoff, 16, 2.0, 130 ) )
 		{
 			return false;
 		}
-		if( isVTS() == 6 && !i_IRF.fillData( iEffectiveAreaFile.c_str(), 20, 0.5, 16, 2.0, 200 ) )
+		if( isVTS() == 6 && !i_IRF.fillData( iEffectiveAreaFile.c_str(), iZe, iWoff, 16, 2.0, 150 ) )
 		{
 			return false;
 		}
@@ -827,10 +827,11 @@ bool VWPPhysSensitivityFile::terminate()
 		{
 			if( hisListToDisk[i] && hisListToDisk[i]->GetEntries() > 0 )
 			{
-				cout << "\t" << hisListToDisk[i]->GetName() << endl;
+				cout << hisListToDisk[i]->GetName() << ", ";
 				hisListToDisk[i]->Write();
 			}
 		}
+                cout << endl;
 		// debug histograms
 		TDirectory* iD = fOutFile->mkdir( "debug", "additional debug histograms" );
 		if( iD && iD->cd() )
@@ -839,10 +840,11 @@ bool VWPPhysSensitivityFile::terminate()
 			{
 				if( hisListToDiskDebug[i] && hisListToDiskDebug[i]->GetEntries() > 0 )
 				{
-					cout << "\t" << hisListToDiskDebug[i]->GetName() << endl;
+					cout << hisListToDiskDebug[i]->GetName() << ", ";
 					hisListToDiskDebug[i]->Write();
 				}
 			}
+                        cout << endl;
 		}
 		
 		fOutFile->Close();

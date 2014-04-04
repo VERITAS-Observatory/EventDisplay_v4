@@ -8,6 +8,7 @@
 #include "TFile.h"
 #include "TGaxis.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TMath.h"
 #include "TObject.h"
 #include "TGraph.h"
@@ -71,7 +72,7 @@ class VAnalysisUtilities : public TNamed
 		
 		bool     closeFile();
 		TGraph*  calcCumulativeSig( int iTot );
-		TObject* getHistogram( string, int, string );
+		TObject* getHistogram( string, int, string,  double iSlizeY = -9999. );
 		TChain*  getTreeWithSelectedEvents( string iFile, bool iOn );
 		double   getNormalisationFactor( int iRun = -1 );
 		vector< int > getRunListVector();
@@ -141,6 +142,6 @@ class VAnalysisUtilities : public TNamed
 		void     setRunListCutPhaseRange( double iPhaseMin = -1., double iPhaseMax = -1. );
 		void     setRunListCutPhaseRangeVector( vector< double > iPhaseMinV, vector< double > iPhaseMaxV );
 		
-		ClassDef( VAnalysisUtilities, 12 );
+		ClassDef( VAnalysisUtilities, 13 );
 };
 #endif

@@ -1005,7 +1005,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	// require certain quality in stereo reconstruction
 	if( fData->Chi2 < fCut_Chi2_min || fData->Chi2 > fCut_Chi2_max )
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eArrayChi2 );
@@ -1017,7 +1017,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	// apply number of images cut
 	if( fData->NImages < fCut_NImages_min || fData->NImages > fCut_NImages_max )
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eNImages );
@@ -1031,7 +1031,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		// quality cut for MSCW/L reconstruction cuts
 		if( fGammaHadronCutSelector % 10 < 1 && ( fData->MSCW < -50. || fData->MSCL < -50. ) )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eMSC_Quality );
@@ -1041,7 +1041,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		// quality cut for MWR/MLR reconstruction cuts
 		if( fGammaHadronCutSelector % 10 == 3 && ( fData->MWR < -50. || fData->MLR < -50. ) )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eMSC_Quality );
@@ -1055,7 +1055,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		{
 			if( fData->Erec > 0. && fData->EChi2 <= 0. )
 			{
-				if( bCount )
+				if( bCount && fStats )
 				{
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
@@ -1064,7 +1064,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 			}
 			if( fData->Erec < fCut_Erec_min )
 			{
-				if( bCount )
+				if( bCount && fStats )
 				{
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
@@ -1073,7 +1073,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 			}
 			if( fData->Erec > fCut_Erec_max )
 			{
-				if( bCount )
+				if( bCount && fStats )
 				{
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
@@ -1085,7 +1085,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		{
 			if( fData->ErecS > 0. && fData->EChi2S <= 0. )
 			{
-				if( bCount )
+				if( bCount && fStats )
 				{
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
@@ -1094,7 +1094,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 			}
 			if( fData->ErecS < fCut_Erec_min )
 			{
-				if( bCount )
+				if( bCount && fStats )
 				{
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
@@ -1103,7 +1103,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 			}
 			if( fData->ErecS > fCut_Erec_max )
 			{
-				if( bCount )
+				if( bCount && fStats )
 				{
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eErec );
@@ -1143,7 +1143,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	
 	if( iR < fCut_AverageCoreDistanceToTelescopes_min || iR > fCut_AverageCoreDistanceToTelescopes_max )
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eCorePos );
@@ -1152,7 +1152,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	}
 	if( iR_min > fCut_MinimumCoreDistanceToTelescopes_max )
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eCorePos );
@@ -1169,7 +1169,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		{
 			if( !fCut_ImgSelect[fData->ImgSel] )
 			{
-				if( bCount )
+				if( bCount && fStats )
 				{
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 					fStats->updateCutCounter( VGammaHadronCutsStatistics::eLTrig );
@@ -1179,7 +1179,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 		}
 		else
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eLTrig );
@@ -1192,7 +1192,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	// apply cuts on second max
 	if( fData->SizeSecondMax < fCut_SizeSecondMax_min || fData->SizeSecondMax > fCut_SizeSecondMax_max )
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eSizeSecondMax );
@@ -1206,7 +1206,7 @@ bool VGammaHadronCuts::applyStereoQualityCuts( unsigned int iEnergyReconstructio
 	{
 		if( !applyProbabilityCut( iEntry , fIsOn ) )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eStereoQuality );
 			}
@@ -1229,7 +1229,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 	{
 		if( fData->EChi2 < fCut_EChi2_min || fData->EChi2 > fCut_EChi2_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1237,7 +1237,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 		}
 		if( fData->Erec < fCut_Erec_min || fData->Erec > fCut_Erec_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1245,7 +1245,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 		}
 		if( fData->dE < fCut_dE_min || fData->dE > fCut_dE_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1260,7 +1260,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 	{
 		if( fData->EChi2S < fCut_EChi2_min || fData->EChi2S > fCut_EChi2_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1268,7 +1268,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 		}
 		if( fData->ErecS < fCut_Erec_min || fData->ErecS > fCut_Erec_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1276,7 +1276,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 		}
 		if( fData->dES < fCut_dE_min || fData->dES > fCut_dE_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1287,7 +1287,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 	{
 		if( fData->EChi2S < fCut_EChi2_min || fData->EChi2S > fCut_EChi2_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1295,7 +1295,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 		}
 		if( fData->ErecS < fCut_Erec_min || fData->ErecS > fCut_Erec_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1303,7 +1303,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 		}
 		if( fData->dES < fCut_dE_min || fData->dES > fCut_dE_max )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eEnergyRec );
 			}
@@ -1317,7 +1317,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 	// unknown reconstruction method
 	else
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eError );
 		}
@@ -1353,7 +1353,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 		}
 		if( !applyStereoShapeCuts() )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
 			}
@@ -1375,7 +1375,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 		}
 		if( !applyProbabilityCut( i, fIsOn ) )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
 			}
@@ -1392,7 +1392,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 		}
 		if( !applyTMVACut( i ) )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
 			}
@@ -1409,7 +1409,7 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 		}
 		if( !applyFrogsCut( i, fIsOn ) )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eIsGamma );
 			}
@@ -2005,7 +2005,7 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool 
 	
 	if( xy > fCut_CameraFiducialSize_max * fCut_CameraFiducialSize_max )
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
 		}
@@ -2016,7 +2016,7 @@ bool VGammaHadronCuts::applyInsideFiducialAreaCut( float Xoff, float Yoff, bool 
 	{
 		if( xy < fCut_CameraFiducialSize_min * fCut_CameraFiducialSize_min )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eXYoff );
 			}
@@ -2044,7 +2044,7 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 	
 	if( xy > fCut_CameraFiducialSize_MC_max * fCut_CameraFiducialSize_MC_max )
 	{
-		if( bCount )
+		if( bCount && fStats )
 		{
 			fStats->updateCutCounter( VGammaHadronCutsStatistics::eMC_XYoff );
 		}
@@ -2055,7 +2055,7 @@ bool VGammaHadronCuts::applyMCXYoffCut( double xoff, double yoff, bool bCount )
 	{
 		if( xy < fCut_CameraFiducialSize_MC_min * fCut_CameraFiducialSize_MC_min )
 		{
-			if( bCount )
+			if( bCount && fStats )
 			{
 				fStats->updateCutCounter( VGammaHadronCutsStatistics::eMC_XYoff );
 			}
@@ -2085,7 +2085,7 @@ bool VGammaHadronCuts::applyTelTypeTest( bool bCount )
 		icut = ( icut || fNTelTypeCut[i]->test( fData ) );
 	}
 	
-	if( bCount && !icut )
+	if( bCount && fStats && !icut )
 	{
 		fStats->updateCutCounter( VGammaHadronCutsStatistics::eTelType );
 	}
@@ -2226,7 +2226,7 @@ bool VGammaHadronCuts::applyDirectionCuts( unsigned int fEnergyReconstructionMet
 		return true;
 	}
 	
-	if( bCount )
+	if( bCount && fStats )
 	{
 		fStats->updateCutCounter( VGammaHadronCutsStatistics::eDirection );
 	}

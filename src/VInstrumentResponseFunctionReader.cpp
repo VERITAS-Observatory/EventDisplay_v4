@@ -659,10 +659,6 @@ bool VInstrumentResponseFunctionReader::getDataFromFile()
 					break; // found the angular resolution tree
 				}
 			}
-			if( gEffArea_Recp80 )
-			{
-				gEffArea_Recp80->Print();
-			}
 		}
 	}
 	else
@@ -1068,7 +1064,7 @@ bool VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms( TH1F* hEff
 	else if( iContainmentRadius.size() > 0 && iContainmentRadius == "80" )
 	{
 		cout << "VInstrumentResponseFunctionReader::fillEffectiveAreasHistograms: ";
-		cout << "found scaled effective areeas for 80\% case " << endl;
+		cout << "found scaled effective areas for 80\% case " << endl;
 		if( gEffArea_Recp80 )
 		{
 			g = gEffArea_Recp80;

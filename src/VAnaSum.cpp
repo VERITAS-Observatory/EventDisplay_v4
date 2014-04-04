@@ -338,7 +338,6 @@ void VAnaSum::initialize( string i_LongListFilename, string i_ShortListFilename,
 				if( jTree )
 				{
 					TTree* newtreej = jTree->CloneTree();
-					newtreej->Print();
 					newtreej->SetDirectory( fStereoRunDir.back() );
 				}
 			}

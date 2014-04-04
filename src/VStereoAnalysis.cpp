@@ -249,7 +249,7 @@ int VStereoAnalysis::getDataRunNumber() const
 /*!
  *
  *  fill all histograms and maps
- *  (main loop)
+ *  (main event loop)
  *
  *  int irun  runnumber to be analyzed, set irun = -1 to analyze all runs in data chain
  *
@@ -328,6 +328,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	bIsGamma = false;
 	// event direction is inside search region (e.g. reflected region)
 	bool bDirectionCuts = false;
+        // successfull energy reconstruction
+        bool bEnergyQualityCuts = false;
 	
 	// rate vectors
 	vector< double > iRateCounts;
@@ -466,7 +468,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			
 			// UTC time
 			i_UTC = VSkyCoordinatesUtilities::getUTC( fDataRun->MJD, fDataRun->Time );
-			
+
 			// phase cuts - this is also a time cut that adds to the previously initialized mask
 			if( !fCuts->applyPhaseCut( i ) )
 			{
@@ -521,14 +523,10 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 			
 			// stereo quality cuts (e.g. successful direction, mscw, mscl reconstruction)
-			
-			//	     if ( fRunPara->fFrogs != 1 )
-			//	     {
 			if( !fCuts->applyStereoQualityCuts( fRunPara->fEnergyReconstructionMethod, false, i , fIsOn ) )
 			{
 				continue;
 			}
-			//	     }
 			
 			// fill image and trigger pattern histograms
 			fHisto[fHisCounter]->hTriggerPatternBeforeCuts->Fill( fDataRun->LTrig );
@@ -543,12 +541,15 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			// gamma/hadron cuts
 			bIsGamma = fCuts->isGamma( i, false, fIsOn );
 			
-			// fill on/offstereo maps
+			// fill on/offstereo maps and directoin cut
 			bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
 										 fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
 			bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
 										   fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
+                        // energy reconstruction cut
+                        bEnergyQualityCuts = fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod );
 										   
+                        /////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// following histograms (theta2, mscw, mscl, core position, etc.)  assume source at given target position
 			
 			// theta2 ---
@@ -630,6 +631,27 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			{
 				fill_TreeWithEventsForCtools( fDataRun, i_xderot, i_yderot, icounter, i_UTC, fEVDVersionSign );
 			}
+			/////////////////////////////////////////////////////////
+			// histograms after gamma and energy reconstruction cuts
+                        if( bIsGamma && bEnergyQualityCuts )
+                        {
+                            // number of events as expected in a theta2 circle at the given offset
+                            double iWeight = 1.;
+                            // solid angle of this bin
+                            double i_ymax = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinUpEdge( 
+                                                              fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
+                            double i_ymin = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinLowEdge( 
+                                                              fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
+                            double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax * TMath::Pi() / 180. ) );
+                            iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin * TMath::Pi() / 180. ) );
+                            iWeight = fCuts->getTheta2Cut_max( iErec );
+                            if( iWeight > 0. )
+                            {
+                                iWeight = 2. * TMath::Pi() * ( 1. - cos( sqrt( iWeight )  * TMath::Pi() / 180. ) );
+                                iWeight /= iSoli;
+                                fHisto[fHisCounter]->herecCounts2D_vs_distance->Fill( log10( iErec ), iDirectionOffset, iWeight );
+                            }
+                        }
 			
 			/////////////////////////////////////////////////////////
 			// histograms after all cuts ( shape and direction cuts )
@@ -644,7 +666,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 				// ##################################
 				// spectral energy reconstruction
 				// apply energy reconstruction cuts
-				if( fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod ) )
+				if( bEnergyQualityCuts )
 				{
 					// require valid effective area valid for this event
 					// effective areas depend on ze, wobble offset, pedestal variation, etc
@@ -719,7 +741,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	}
 	// END: loop over all entries/events in the data tree
 	/////////////////////////////////////////////////////////////////////
-	
+        
 	fEnergy.setTimeBin( iEffAreaTimeBin[i_t_bins] - i_time_intervall / 2 - f_t_in_s_min[irun] );
 	fEnergy.setTimeBinnedMeanEffectiveArea();
 	fEnergy.resetTimeBin();
@@ -1186,7 +1208,6 @@ double VStereoAnalysis::combineHistograms()
 			{
 				continue;
 			}
-			
 			h1->Add( h2 );
 		}
 		fHisto[h]->deleteParameterHistograms();

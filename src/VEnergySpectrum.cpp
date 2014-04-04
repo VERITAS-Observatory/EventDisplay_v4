@@ -92,6 +92,7 @@ void VEnergySpectrum::initializeRunVariables()
 	setSignificanceParameters();
 	setEnergyThresholdDefinition();
 	setErrorCalculationMethod();
+        setOffsetdistance();
 	
 	// set default fitting parameters
 	setSpectralFitFunction();
@@ -290,8 +291,9 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		else
 		{
 			hname = "herecCounts_on";
+                        if( fOffsetDistance > -998. ) hname = "herecCounts2D_vs_distance_on";
 		}
-		TH1D* i_hErecCountsOn = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms" );
+		TH1D* i_hErecCountsOn = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
 		// differential counting histogram 'off'
 		if( bLinearX )
 		{
@@ -300,18 +302,19 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		else
 		{
 			hname = "herecCounts_off";
+                        if( fOffsetDistance > -998. ) hname = "herecCounts2D_vs_distance_off";
 		}
-		TH1D* i_hErecCountOff = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms" );
+		TH1D* i_hErecCountOff = ( TH1D* )getHistogram( hname, fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
 		// histogram with systematic errors (same for on and off)
 		hname = "gMeanEnergySystematicError";
-		TGraphErrors* i_hEsys = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
+		TGraphErrors* i_hEsys = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
 		if( fAnalysisEnergyThresholdDefinition == 1 && !i_hEsys )
 		{
 			cout << "WARNING: histogram with systematic error in energy reconstruction not found";
 			cout << " (run " << fRunList[i].runnumber << ")" << endl;
 		}
 		// get effective area
-		TH1* i_hEffAreaP = ( TH1* )getHistogram( "herecEffectiveArea_on-", fRunList[i].runnumber, "energyHistograms" );
+		TH1* i_hEffAreaP = ( TH1* )getHistogram( "herecEffectiveArea_on-", fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
 		TGraphErrors* i_gEff = 0;
 		VHistogramUtilities i_hisUtl;
 		i_hisUtl.get_Graph_from_Histogram( i_hEffAreaP, i_gEff );
@@ -320,17 +323,17 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 		{
 			// second choice: try to get off effective areas (might even have better statistics)
 			hname = "gMeanEffectiveArea_off";
-			i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
+			i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
 			if( !i_gEff )
 			{
 				// third choice for backwards compatibility to v35x version
 				hname = "gMeanEffectiveAreaErec";
-				i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
+				i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
 				// fourth choice for backwards compatibility to v35x version
 				if( !i_gEff )
 				{
 					hname = "gMeanEffectiveAreaErec_off";
-					i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas" );
+					i_gEff = ( TGraphErrors* )getHistogram( hname, fRunList[i].runnumber, "EffectiveAreas", fOffsetDistance );
 					if( !i_gEff )
 					{
 						cout << "WARNING: no mean effective area graph found, ignoring run ";
