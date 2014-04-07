@@ -64,9 +64,6 @@ class VAnaSum
 		double getAzRange( int i_run, string i_treename, double& azmin, double& azmax );
 		double getNoiseLevel( int i_run );
 		
-		bool bTotalAnalysisOnly;
-		bool bUpdateAnalysis;
-		unsigned int fAnalysis;
 		set< int > fOldRunList;
 		
 		unsigned int fAnalysisType;               // (see anasum.cpp)
