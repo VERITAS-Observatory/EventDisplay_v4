@@ -539,7 +539,8 @@ int main( int argc, char* argv[] )
 	recEVENTS.writeHeader( "DATE_OBS", string( dateobs ) ) ;        // human readable run-start date string
 	recEVENTS.writeHeader( "DEC_OBJ" , evndispRunPar->fTargetDec ) ;  // Dec of the target object in view
 	recEVENTS.writeHeader( "EQUINOX" , 2000.0 ) ;                   // which JXXXX RA/Dec epoch to use for all RA/Dec in here
-	recEVENTS.writeHeader( "EXTNAME" , string( "events" ) ) ;
+	//recEVENTS.writeHeader( "EXTNAME" , string( "events" ) ) ;
+	recEVENTS.writeHeader( "EXTNAME" , string( "EVENTS" ) ) ;
 	recEVENTS.writeHeader( "OBJECT"  , evndispRunPar->fTargetName ) ;
 	recEVENTS.writeHeader( "OBS_ID"  , runid ) ;
 	recEVENTS.writeHeader( "RA_OBJ"  , evndispRunPar->fTargetRA ) ;
@@ -737,6 +738,7 @@ int main( int argc, char* argv[] )
 		//printf( "%3d: Event %6d to %s\n", i, EventNumber, outfile ) ;
 		//if ( i==0 ) recEVENTS.writeHeader( "OBS_ID", RunNumber ) ;
 	}
+	printf( " RunNumber %d, %d events written.\n", RunNumber, totalEvents ) ;
 	
 	
 	///////////////////////////////////
