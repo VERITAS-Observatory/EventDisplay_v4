@@ -431,8 +431,8 @@ int main( int argc, char* argv[] )
 	double az_pnt  = 0.0 ;
 	calc_Avg_RADec_from_Pointing( chainPointData, ra_pnt,  dec_pnt ) ;
 	calc_Avg_AltAz_from_Pointing( chainPointData, alt_pnt, az_pnt ) ;
-	//cout << "  ra_pnt :" << ra_pnt  << endl;
-	//cout << "  dec_pnt:" << dec_pnt << endl;
+	cout << "  ra_pnt :" << ra_pnt  << endl;
+	cout << "  dec_pnt:" << dec_pnt << endl;
 	//cout << "  alt_pnt:" << alt_pnt << endl;
 	//cout << "  az_pnt :" << az_pnt  << endl;
 	
@@ -738,7 +738,7 @@ int main( int argc, char* argv[] )
 		//printf( "%3d: Event %6d to %s\n", i, EventNumber, outfile ) ;
 		//if ( i==0 ) recEVENTS.writeHeader( "OBS_ID", RunNumber ) ;
 	}
-	printf( " RunNumber %d, %d events written.\n", RunNumber, totalEvents ) ;
+	printf( "RunNumber %d, %d events written.\n", RunNumber, totalEvents ) ;
 	
 	
 	///////////////////////////////////
@@ -1071,10 +1071,6 @@ void calc_Avg_RADec_from_Pointing( TChain* ch, double& ra, double& dec )
 	unsigned int i = 0 ;
 	for( i = 0; i <= npts - 1 ; i++ )
 	{
-		if( i > 40 )
-		{
-			break ;
-		}
 		ch->GetEntry( i );
 		if( debug )
 		{
