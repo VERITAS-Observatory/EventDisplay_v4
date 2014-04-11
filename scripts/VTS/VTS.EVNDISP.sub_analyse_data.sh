@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # script run eventdisplay analysis for VTS data 
 #
@@ -68,6 +68,10 @@ mkdir -p $QLOG
 # skeleton script
 FSCRIPT="VTS.EVNDISP.qsub_analyse_data"
 
+# create extra stdout for duplication of command output
+# look for ">&5" below
+exec 5>&1
+
 #########################################
 # loop over all files in files loop
 for AFIL in $FILES
@@ -83,13 +87,19 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-# run locally or on cluster
-   SUBC=`./readSubmissionCommand.sh submissionCommands.dat EVNDISP`
-   if [[ $SUBC = "SHELLSUB" ]]
-   then
-      tcsh -b $FNAM.sh
-   else
-      qsub ${SUBC##*QSUB} -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+	# run locally or on cluster
+	SUBC=`./readSubmissionCommand.sh submissionCommands.dat EVNDISP`
+	if [[ $SUBC = "SHELLSUB" ]]
+	then
+		tcsh -b $FNAM.sh
+	else
+		QSUBDATA=$( qsub ${SUBC##*QSUB} -o $QLOG/ -e $QLOG/ "$FNAM.sh" | tee >(cat - >&5) )
+		JOBID=$( echo "$QSUBDATA" | grep -E "Your job" | awk '{ print $3 }' )
+		echo "RUN$AFIL SCRIPT $FNAM.sh"
+        echo "RUN$AFIL JOBID $JOBID"
+		echo "RUN$AFIL OLOG $FNAM.sh.o$JOBID"
+        echo "RUN$AFIL ELOG $FNAM.sh.e$JOBID"
+		echo
    fi
 # (old command)
 #   qsub -V -l h_cpu=41:29:00 -l os=sl6 -l h_vmem=2000M -l tmpdir_size=10G -o $QLOG/ -e $QLOG/ "$FNAM.sh"

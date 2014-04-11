@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # script to analyse VTS data files with lookup tables
 #
@@ -44,6 +44,10 @@ DATE=`date +"%y%m%d"`
 QLOG=$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANADATA
 mkdir -p $QLOG
 
+# create extra stdout for duplication of command output
+# look for ">&5" below
+exec 5>&1
+
 # skeleton script
 FSCRIPT="VTS.MSCW_ENERGY.qsub_analyse_data"
 
@@ -64,7 +68,17 @@ do
    chmod u+x $FNAM.sh
    echo $FNAM.sh
 
-   qsub -S /bin/tcsh -l os=sl6 -l h_cpu=00:29:00 -l h_vmem=2000M -l tmpdir_size=4G -V -o $QLOG -e $QLOG "$FNAM.sh"
+	QSUBDATA=$( qsub -S /bin/tcsh -l os=sl6 -l h_cpu=00:29:00 -l h_vmem=2000M -l tmpdir_size=4G -V -o $QLOG -e $QLOG "$FNAM.sh"  | tee >(cat ->&5) )
+	JOBID=$( echo "$QSUBDATA" | grep -E "Your job" | awk '{ print $3 }' )
+
+	# tell the user basic info about the job submission
+	echo "RUN$AFIL SCRIPT $FNAM.sh"
+	echo "RUN$AFIL JOBID $JOBID"
+	echo "RUN$AFIL OLOG $FNAM.sh.o$JOBID"
+	echo "RUN$AFIL ELOG $FNAM.sh.e$JOBID"
+	echo
+
+
 done
 
 exit

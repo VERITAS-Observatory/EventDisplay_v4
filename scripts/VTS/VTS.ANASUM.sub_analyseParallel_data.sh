@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # script to analyse data files with anasum (parallel analysis)
 #
@@ -35,6 +35,10 @@ if [ ! -f "$FLIST" ] ; then
     echo "Error, anasum runlist '$FLIST' not found, exiting..."
     exit 1
 fi
+
+# create extra stdout for duplication of command output
+# look for ">&5" below
+exec 5>&1
 
 #########################################
 # directory for run scripts
@@ -92,7 +96,12 @@ do
 
        chmod u+x $FSCRIPT.sh
 
-       qsub -l os=sl6 -V -l h_cpu=12:29:30 -l h_vmem=4000M -l tmpdir_size=1G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"
+		QSUBDATA=$( qsub -l os=sl6 -V -l h_cpu=12:29:30 -l h_vmem=4000M -l tmpdir_size=1G -o $LDIR/ -e $LDIR/ "$FSCRIPT.sh"  | tee >(cat - >&5) )
+		JOBID=$( echo "$QSUBDATA" | grep -E "Your job" | awk '{ print $3 }' )
+		echo "RUN$RUN SCRIPT $FSCRIPT.sh"
+		echo "RUN$RUN JOBID $JOBID"
+		echo "RUN$RUN ELOG $FSCRIPT.sh.e$JOBID"
+		echo "RUN$RUN OLOG $FSCRIPT.sh.o$JOBID"
 
     fi
 done 

@@ -41,6 +41,7 @@ cd $EVNDISPSYS/bin/
 if( $CALIB == "1" || $CALIB == "2" ) then
     rm -f $LDIR/$RUN.ped.log
     ./evndisp -runnumber=$RUN -runmode=1 >& $LDIR/$RUN.ped.log
+	echo "RUN$RUN PEDLOG $LDIR/$RUN.ped.log"
 endif
 
 #########################################
@@ -67,6 +68,7 @@ set OPT="$OPT -readCalibDB "
 if( $CALIB == "1" || $CALIB == "3" ) then
     rm -f $LDIR/$RUN.tzero.log
     ./evndisp -runnumber=$RUN -runmode=7 $OPT >& $LDIR/$RUN.tzero.log
+	echo "RUN$RUN TZEROLOG $LDIR/$RUN.tzero.log"
 endif
 
 #########################################
@@ -92,6 +94,7 @@ endif
 # run eventdisplay
 rm -f $LDIR/$RUN.log
 ./evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $DDIR/$RUN.root $OPT >& $LDIR/$RUN.log
+echo "RUN$RUN EVNLOG $LDIR/$RUN.log"
 
 #########################################
 # sleep for 20 s 
@@ -100,5 +103,6 @@ sleep 20s
 #########################################
 # mv data file from tmp dir to data dir
 mv -f -v $DDIR/$RUN.root $ODIR/$RUN.root
+echo "RUN$RUN DATAOUT $ODIR/$RUN.root"
 
 exit

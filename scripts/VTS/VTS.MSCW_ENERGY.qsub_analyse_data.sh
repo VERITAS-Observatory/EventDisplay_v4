@@ -33,8 +33,10 @@ rm -f $LDIR/$BFIL.mscw.log
 cp -v -f $IFIL $ADIR
 
 $EVNDISPSYS/bin/mscw_energy -tablefile $TFIL.root -arrayrecid=$RECID -inputfile $ADIR/$BFIL.root -writeReconstructedEventsOnly=1 > $LDIR/$BFIL.mscw.log
+echo "RUN$BFIL MSCWLOG $LDIR/$BFIL.mscw.log"
 
 cp -v -f $ADIR/$BFIL.mscw.root $ODIR/
+echo "RUN$BFIL DATAOUT $ODIR/$BFIL.mscw.root"
 rm -f $ADIR/$BFIL.root
 
 exit

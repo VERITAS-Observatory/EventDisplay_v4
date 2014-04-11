@@ -15,6 +15,9 @@ set RUNP=RUNPARA
 source $EVNDISPSYS/setObservatory.tcsh VERITAS
 
 $EVNDISPSYS/bin/anasum -f $RUNP -l $FLIST -d $DDIR -o $ODIR/$ONAM.root >! $ODIR/$ONAM.log
+echo "RUN`basename $ONAME .anasum` ANASUMLOG $ODIR/$ONAM.log"
+echo "RUN`basename $ONAME .anasum` DATAOUT $ODIR/$ONAM.root"
+
 
 exit
 
