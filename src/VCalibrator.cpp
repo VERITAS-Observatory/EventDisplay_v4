@@ -759,6 +759,47 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 			sprintf( ic, "TOffset distribution (tel %d, channel %d)", getTelID() + 1, i );
 			htoff.push_back( new TH1F( toffkey, ic, 150, imin, imax ) );
 		}
+
+		if( getRunParameter()->fWriteExtraCalibTree ) 
+		{
+			opfgain->cd();
+
+			//Extra calib output.
+			fExtra_sum = new vector<double>(getNChannels(), -99);
+			fExtra_ped = new vector<double>(getNChannels(), -99);
+			fExtra_pedVar = new vector<double>(getNChannels(), -99);
+			fExtra_tzero = new vector<double>(getNChannels(), -99);
+			fExtra_HiLo = new vector<short>(getNChannels(), -99);
+			fExtra_sumfirst = new vector<short>(getNChannels(), -99);
+			fExtra_sumwindow = new vector<short>(getNChannels(), -99);
+			fExtra_dead = new vector<short>(getNChannels(), -99);
+			fExtra_use = new vector<short>(getNChannels(), -99);
+			fExtra_QMon=0;
+			fExtra_nMon=0;
+			fExtra_TZeroMon=0;
+			fExtra_nHiLo=0;	
+			fExtra_eventNumber=0;
+			fExtra_nPix=getNChannels();
+			TString title=TString::Format("charges_%d", fTelID + 1);
+			tExtra_ChargeTree = new TTree( title.Data(), "extra calib output (charges/monitor charge per event)" );
+			tExtra_ChargeTree->Branch( "eventNumber", &fExtra_eventNumber );
+			tExtra_ChargeTree->Branch( "QMon", &fExtra_QMon );		
+			tExtra_ChargeTree->Branch( "TZeroMon", &fExtra_TZeroMon );			
+			tExtra_ChargeTree->Branch( "nMon", &fExtra_nMon );			
+			tExtra_ChargeTree->Branch( "nHiLo", &fExtra_nHiLo);	
+			tExtra_ChargeTree->Branch( "nPix", &fExtra_nPix );		
+			tExtra_ChargeTree->Branch( "Q", &fExtra_sum->at(0), "sum[nPix]/D" );			
+			tExtra_ChargeTree->Branch( "ped", &fExtra_ped->at(0), "ped[nPix]/D" );			
+			tExtra_ChargeTree->Branch( "pedVar", &fExtra_pedVar->at(0), "pedVar[nPix]/D" );			
+			tExtra_ChargeTree->Branch( "sumwindow", &fExtra_sumwindow->at(0), "sumwindow[nPix]/S" );			
+			tExtra_ChargeTree->Branch( "sumfirst", &fExtra_sumfirst->at(0), "sumfirst[nPix]/S" );			
+			tExtra_ChargeTree->Branch( "dead", &fExtra_dead->at(0), "dead[nPix]/S" );				
+			tExtra_ChargeTree->Branch( "use", &fExtra_use->at(0), "use[nPix]/S" );			
+			tExtra_ChargeTree->Branch( "HiLo", &fExtra_HiLo->at(0), "HiLo[nPix]/S" );			
+			tExtra_ChargeTree->Branch( "tzero", &fExtra_tzero->at(0), "tzero[nPix]/S" );			
+			
+		}
+
 		setSpecialChannels();
 		
 		setCalibrated();
@@ -858,12 +899,36 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 		{
 			m_tzero /= counttzero;
 		}
+
+		if( getRunParameter()->fWriteExtraCalibTree ) 
+		{
+			fExtra_nMon=countsums;
+			fExtra_QMon=m_sums;
+			fExtra_TZeroMon=m_tzero;
+			fExtra_nHiLo=n_lowgain;	
+			fExtra_eventNumber=fEventNumber;
+		}
+
 		
 		// (GM) subtract pedestals
 		// (GM) set number of entries in hpulse to number of pulses added up
 		double tcorr = 0.;
 		for( unsigned int i = 0; i < getNChannels(); i++ )
 		{
+			if( getRunParameter()->fWriteExtraCalibTree ) 
+			{
+				//Extra calib output.
+				fExtra_sum->at(i)=getSums()[i];
+				fExtra_tzero->at(i)=getTZeros()[i];
+				fExtra_ped->at(i)=getPeds()[i];
+				fExtra_HiLo->at(i)=getHiLo()[i];
+				fExtra_sumfirst->at(i)=getRunParameter()->fCalibrationSumFirst;
+				fExtra_sumwindow->at(i)=getSumWindow();
+				fExtra_dead->at(i)=getDead()[i];
+				fExtra_use->at(i)=0; //will be set to 1 later is sum>limit etc.
+			}
+
+
 			int i_entries = ( int )hpulse[i]->GetEntries();
 			if( getRunParameter()->fwriteLaserPulseN > 0 )
 			{
@@ -931,6 +996,11 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 				// fill gain and toffset histograms
 				if( ( getSums()[i] > fRunPar->fCalibrationIntSumMin || fRunPar->fLaserSumMin < 0. ) && !getDead()[i] && !getMasked()[i] )
 				{
+					if( getRunParameter()->fWriteExtraCalibTree ) 
+					{
+						fExtra_use->at(i)=1;
+					}
+
 					hgain[i]->Fill( ( float )getSums()[i] / m_sums );
 					if( getTZeros()[i] >= 0. )
 					{
@@ -939,6 +1009,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 						htoff_vs_sum[i]->Fill( ( float )getSums()[i], ( float )getTZeros()[i] - m_tzero );
 					}
 				}
+
 				if( getRunParameter()->fwriteLaserPulseN > 0 )
 				{
 					i_pulse->Write();
@@ -958,6 +1029,13 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 			getRunParameter()->fwriteLaserPulseN--;
 		}
 		i_curDir->cd();
+
+		if( getRunParameter()->fWriteExtraCalibTree )
+		{ 
+			tExtra_ChargeTree->Fill();
+		}
+
+
 	}
 }
 
@@ -1015,6 +1093,11 @@ void VCalibrator::writeGains( bool iLowGain )
 				htcpulse[i]->Write();
 			}
 		}
+		if( getRunParameter()->fWriteExtraCalibTree ) 
+		{
+			tExtra_ChargeTree->Write();
+		}
+
 		TTree* iTG = fillCalibrationSummaryTree( t, "gain", hgain );
 		if( iTG )
 		{

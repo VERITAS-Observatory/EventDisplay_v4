@@ -909,6 +909,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fPrintGrisuHeader = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+		else if( iTemp.rfind( "writeextracalibtree" ) < iTemp.size() )
+		{
+			fRunPara->fWriteExtraCalibTree = true;
+		}
 		else if( i > 1 )
 		{
 			cout << "unknown command line parameter: " << iTemp << endl;

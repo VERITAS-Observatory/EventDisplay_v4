@@ -51,6 +51,8 @@ Output:
 	                                         channels to <runnumber>.evndisp.log 
 						 each line will contain the word DEADCHAN for easy grep-ability, 
 						 and the reason(s) the channel was disabled
+	-writeextracalibtree			 In gain calculating mode: Write additional tree into gain.root file containing channel charge, tzero,
+						 and monitor charge for all flasher events. 
 
 Detector definition:
 --------------------
