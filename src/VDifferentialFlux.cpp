@@ -100,6 +100,7 @@ void VDifferentialFlux::printClean( bool bSED )
 		if( DifferentialFluxError > 0. )
 		{
 			cout << scientific << setprecision( 3 ) <<  "\t " << DifferentialFlux << "   " << DifferentialFluxError;
+			cout << " (" << DifferentialFluxError_low << ", " << DifferentialFluxError_up << ")";
 		}
 		else
 		{

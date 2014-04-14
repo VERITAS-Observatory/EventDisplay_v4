@@ -115,12 +115,12 @@ void VPlotCTAArrayLayout::printArrayCosts()
 	float euro_SST = 0.50;
 	
 	cout << endl;
-	cout << "# of LSTs: " << iLST << " (" << iLST* euro_LST << ")" <<  endl;
-	cout << "# of MSTs: " << iMST << " (" << iMST* euro_MST << ")" << endl;
-	cout << "# of DCSSTs: " << iDCSST << " (" << iDCSST* euro_SST << ")" << endl;
-	cout << "# of SCSSTs: " << iSCSST << " (" << iSCSST* euro_SST << ")" << endl;
+	cout << "# of LSTs: " << iLST << " (" << iLST* euro_LST << " MEuro)" <<  endl;
+	cout << "# of MSTs: " << iMST << " (" << iMST* euro_MST << " MEuro)" << endl;
+	cout << "# of DCSSTs: " << iDCSST << " (" << iDCSST* euro_SST << " MEuro)" << endl;
+	cout << "# of SCSSTs: " << iSCSST << " (" << iSCSST* euro_SST << " MEuro)" << endl;
 	cout << "===============================================" << endl;
-	cout << "Tot: " << iLST* euro_LST + iMST* euro_MST + iDCSST* euro_SST + iSCSST* euro_SST << endl;
+	cout << "Tot: " << iLST* euro_LST + iMST* euro_MST + iDCSST* euro_SST + iSCSST* euro_SST << " MEuro" << endl;
 	cout << endl;
 	
 }

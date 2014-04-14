@@ -87,7 +87,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		bool   fPlottingLogEnergyAxis;            // plot log or lin values on energy axis (default=true)
 		bool   fPlottingUpperLimits;              // plot upper limits
 		TGraphAsymmErrors* gEnergySpectrum;
-		TGraphErrors* gEnergySpectrumFitResiduals;
+		TGraphAsymmErrors* gEnergySpectrumFitResiduals;
 		
 		// rebinning of energy spectra
 		TH1D* nRebinner;
@@ -200,8 +200,8 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		TCanvas*  plotCountingHistograms( TCanvas* c = 0 );
 		void      plotEventNumbers( Double_t ts = 0.02 );
 		void      plotFitValues();
-		TCanvas*  plotMeanEffectiveArea( TCanvas* c = 0 );
-		TCanvas*  plotResiduals( TCanvas* c = 0 );
+		TCanvas*  plotMeanEffectiveArea( TCanvas* c = 0, double i_effMin = 0., double i_effMax = -99. );
+		TCanvas*  plotResiduals( TCanvas* c = 0, TF1 *f = 0 );
 		TCanvas*  plotLifeTimevsEnergy( TCanvas* c = 0 );
 		
 		void printEnergyBins();
@@ -295,6 +295,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 		}
 		
 		
-		ClassDef( VEnergySpectrum, 14 );
+		ClassDef( VEnergySpectrum, 15 );
 };
 #endif

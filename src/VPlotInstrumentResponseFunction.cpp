@@ -629,11 +629,11 @@ unsigned int VPlotInstrumentResponseFunction::getNumberOfGoodDataSets()
 	return z;
 }
 
-void VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iDataSetID, double ymin, double ymax )
+TCanvas* VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iDataSetID, double ymin, double ymax )
 {
 	if( !checkDataSetID( iDataSetID ) )
 	{
-		return;
+		return 0;
 	}
 	
 	char hname[200];
@@ -685,6 +685,7 @@ void VPlotInstrumentResponseFunction::plotEffectiveAreaRatio( unsigned int iData
 		
 		g->Draw( fData[i]->fPlotOption.c_str() );
 	}
+	return iEffectiveAreaRatioPlottingCanvas;
 }
 
 TCanvas* VPlotInstrumentResponseFunction::plotEnergyResolution( double ymax )

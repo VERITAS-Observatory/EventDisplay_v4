@@ -1058,6 +1058,13 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 		{
 			// calculate flux and Poissonian flux error from event numbers
 			double i_ndiff = i_flux.NOn - i_flux.NOff * fTotalNormalisationFactor;
+			if( fErrorCalculationMethod == "Rolke" )
+			{
+			   // this is wrong, but people want to have a mean value instead of a 1 sigma range
+			   i_Rolke.SetCLSigmas( 1.e-4 );
+			   i_ndiff = 0.5*(i_Rolke.GetLowerLimit()+i_Rolke.GetUpperLimit());
+                        }
+			cout << "\t" << i_ndiff << endl;
 			i_flux.DifferentialFlux  = i_ndiff;
 			i_flux.DifferentialFlux /= i_flux.dE;
 			i_flux.DifferentialFlux /= i_flux.ObsTime;
@@ -1073,8 +1080,8 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			i_Rolke.SetCLSigmas( 1. );
 			if( i_ndiff != 0. )
 			{
-				i_flux.DifferentialFluxError_low = ( i_ndiff - ( double )i_Rolke.GetLowerLimit() ) * i_flux.DifferentialFlux / i_ndiff;
-				i_flux.DifferentialFluxError_up  = ( ( double )i_Rolke.GetUpperLimit() - i_ndiff ) * i_flux.DifferentialFlux  / i_ndiff;
+				i_flux.DifferentialFluxError_low = TMath::Abs(( i_ndiff - i_Rolke.GetLowerLimit() ) * i_flux.DifferentialFlux / i_ndiff);
+				i_flux.DifferentialFluxError_up  = TMath::Abs((i_Rolke.GetUpperLimit() - i_ndiff ) * i_flux.DifferentialFlux  / i_ndiff);
 				// recalculate poissonian flux error
 				i_flux.DifferentialFluxError =  sqrt( i_flux.NOn + fTotalNormalisationFactor * fTotalNormalisationFactor * i_flux.NOff )
 												* i_flux.DifferentialFlux / i_ndiff;
@@ -1498,7 +1505,7 @@ void VEnergySpectrum::plotFitValues()
     plot residuals between fit function and differential energy spectrum
 
 */
-TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c )
+TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c, TF1 *f )
 {
 	if( !fSpectralFitter )
 	{
@@ -1509,28 +1516,42 @@ TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c )
 		return 0;
 	}
 	
-	gEnergySpectrumFitResiduals = new TGraphErrors( gEnergySpectrum->GetN() );
+	gEnergySpectrumFitResiduals = new TGraphAsymmErrors( gEnergySpectrum->GetN() );
 	gEnergySpectrumFitResiduals->SetMarkerColor( fPlottingColor );
 	gEnergySpectrumFitResiduals->SetLineColor( fPlottingColor );
 	gEnergySpectrumFitResiduals->SetMarkerSize( fPlottingMarkerSize );
 	gEnergySpectrumFitResiduals->SetMarkerStyle( fPlottingMarkerStyle );
-	
-	TF1* f = fSpectralFitter->getSpectralFitFunction();
-	if( !f )
+
+	if( fSpectralFitter && !f )
 	{
-		return 0;
-	}
+	   f = fSpectralFitter->getSpectralFitFunction();
+	   if( !f )
+	   {
+		   return 0;
+	   }
+        }
 	
 	double x, y;
-	double ye = 0.;
+	double ye_l = 0.;
+	double ye_u = 0.;
 	for( int i = 0; i < gEnergySpectrumFitResiduals->GetN(); i++ )
 	{
 		gEnergySpectrum->GetPoint( i, x, y );
-		ye = gEnergySpectrum->GetErrorY( i );
+		if( fErrorCalculationMethod == "Poisson" )
+		{
+		   ye_l = gEnergySpectrum->GetErrorY( i );
+		   ye_u = gEnergySpectrum->GetErrorY( i );
+                }
+		else
+		{
+		   ye_l = gEnergySpectrum->GetErrorYlow( i );
+		   ye_u = gEnergySpectrum->GetErrorYhigh( i );
+                }
 		if( f->Eval( x ) > 0. )
 		{
 			gEnergySpectrumFitResiduals->SetPoint( i, x, ( y - f->Eval( x ) ) / f->Eval( x ) );
-			gEnergySpectrumFitResiduals->SetPointError( i, 0., ye / f->Eval( x ) );
+			gEnergySpectrumFitResiduals->SetPointEYhigh( i, ye_u / f->Eval( x ) );
+			gEnergySpectrumFitResiduals->SetPointEYlow( i, ye_l / f->Eval( x ) );
 		}
 	}
 	if( !c )
@@ -1562,7 +1583,7 @@ TCanvas* VEnergySpectrum::plotResiduals( TCanvas* c )
 	return c;
 }
 
-TCanvas* VEnergySpectrum::plotMeanEffectiveArea( TCanvas* c )
+TCanvas* VEnergySpectrum::plotMeanEffectiveArea( TCanvas* c, double i_effMin, double i_effMax )
 {
 	if( !hEffArea )
 	{
@@ -1583,15 +1604,18 @@ TCanvas* VEnergySpectrum::plotMeanEffectiveArea( TCanvas* c )
 		sprintf( hname, "hNullEF_%s", fDataSetName.c_str() );
 		TH1D* hNullGT = new TH1D( hname, "", 100, log10( fPlottingMinEnergy ), log10( fPlottingMaxEnergy ) );
 		hNullGT->SetStats( 0 );
-		hNullGT->SetXTitle( "log_{10} energy [TeV]" );
+		hNullGT->SetXTitle( "log_{10} energy_{rec} [TeV]" );
 		hNullGT->SetYTitle( "effective area [m^{2}" );
 		hNullGT->GetYaxis()->SetTitleOffset( 1.3 );
-		hNullGT->SetMaximum( hEffArea->GetMaximum() * 1.2 );
+		hNullGT->SetMinimum( i_effMin );
+		if( i_effMax < 0. ) hNullGT->SetMaximum( hEffArea->GetMaximum() * 1.2 );
+		else                hNullGT->SetMaximum( i_effMax );
 		hNullGT->SetMinimum( 0.5 );
 		hNullGT->Draw();
 	}
 	c->cd();
 	
+	hEffArea->SetLineColor( fPlottingColor );
 	hEffArea->Draw( "same" );
 	
 	return c;

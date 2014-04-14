@@ -84,7 +84,7 @@ class VPlotInstrumentResponseFunction : public VPlotUtilities, public VHistogram
 		void         plotCutEfficiency( unsigned int iDataSetID = 0 );
 		void         plotCutEfficiencyRatio( unsigned int iDataSetID = 0, unsigned int iCutID = 999, double iPlotMaximum = 1.2 );
 		TCanvas*     plotEffectiveArea( double iEffAreaMax_m2 = -1. );
-		void         plotEffectiveAreaRatio( unsigned int iDataSetID = 0, double ymin = 0., double ymax = 1.3 );
+		TCanvas*     plotEffectiveAreaRatio( unsigned int iDataSetID = 0, double ymin = 0., double ymax = 1.3 );
 		TCanvas*     plotEnergyReconstructionBias( string iM = "mean", double ymin = -1., double ymax = 1., bool iLogBias = false );
 		void         plotEnergyReconstructionBias2D( unsigned int iDataSetID = 0, double iYmin = 0., double iYmax = 3. );
 		void         plotEnergyReconstructionLogBias( string iM = "mean", double ymin = -1., double ymax = 1. );
