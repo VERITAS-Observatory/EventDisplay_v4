@@ -106,6 +106,12 @@ if( $ARRAY == "V6" ) then
    set RUN="96$RUN"
 endif
 
+#### Low gain calibration ####
+if (! -e $ODIR/calibrationlist.LowGain.dat ) then
+    mkdir -p $ODIR/Calibration
+    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/
+endif
+
 ##############################################################################################
 # calculate pedestals
 ##############################################################################################
@@ -135,11 +141,6 @@ echo "RUNNUMBER $RUN"
 echo "EVNDISP outputfile root file written to $ODIR/$RUN.root"
 echo "EVNDISP log file written to $ODIR/$RUN.dat"
 
-#### Low gain calibration ####
-if (! -e $ODIR/calibrationlist.LowGain.dat ) then
-    mkdir -p $ODIR/Calibration
-    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/
-endif
 
 ##############################################################################################
 # run eventdisplay 

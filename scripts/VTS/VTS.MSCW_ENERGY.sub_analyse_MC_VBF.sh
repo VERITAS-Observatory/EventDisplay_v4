@@ -51,7 +51,7 @@ then
 # CARE
 else
     RUNN="9"
-    ZE=( 20 00 30 35 )
+    ZE=( 20 00 30 35 40 45 50 55 60 65 )
     NOISE=(  50  80 120 170 230 290  370  450 )
     WOBBLE=( 0.5 )
 fi
@@ -67,7 +67,8 @@ DATE=`date +"%y%m%d"`
 FDIR=$VERITAS_USER_LOG_DIR"/"$DATE/MSCW.ANATABLES/
 mkdir -p $FDIR
 # directory for run log files
-LDIR=/dev/null
+# LDIR=/dev/null
+LDIR=$FDIR
 
 ##############################################
 # loop over all ze/noise/wobble offsets

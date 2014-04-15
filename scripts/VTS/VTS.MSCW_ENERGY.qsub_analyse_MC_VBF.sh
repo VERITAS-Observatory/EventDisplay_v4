@@ -38,7 +38,7 @@ if( $SIM == "GRISU" ) then
     set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*[0-9].root"
 else if( $SIM == "CARE" ) then
 # date of analysis
-    set DAT="d20140127"
+    set DAT="d20140403"
 # output files are written to this directory
 # set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
     set ODIR=/lustre/fs9/group/cta/users/maierg/VERITAS/analysis/EVDv400/"$ARRAY"_FLWO/mscw_CARE_ATM"$ATMOS"_"$DAT"
@@ -52,7 +52,7 @@ endif
 # long output file (with all telescope-wise image variables)
 # set MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 # short output file
-set MOPT="-noNoTrigger -nomctree -shorttree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
+set MOPT="-noNoTrigger -nomctree -noshorttree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TFIL.root"
 
 ###############################################
 # temporary directory
@@ -68,7 +68,7 @@ echo "temporary directory $DDIR"
 ###############################################
 # output file name
 ###############################################
-set OFIL="$PART"_"$ZE"deg_750m_w"$WOFF"_ID"$RECID"_ana"$ANAC"_NOISE$NOISE"_"$RUNN
+set OFIL="$PART"_"$ZE"deg_750m_w"$WOFF"_ID"$RECID"_ana"$ANAC"_NOISE$NOISE"_"$RUNN.mscw
 mkdir -p $ODIR
 
 ###############################################

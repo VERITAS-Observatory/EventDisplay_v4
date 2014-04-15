@@ -24,8 +24,10 @@ ARRAY=( "V6" "V5" "V4" )
 ARRAY=( "V6" )
 # reconstruction IDs (=4 and 3-telescope combinations)
 ID=( "0" "1" "2" "3" "4" )
+ID=( "0" )
 # atmospheres
 ATM=( "21" "22" )
+ATM=( "21" )
 # table file
 if [[ $SIMS == "GRISU" ]]
 then
@@ -38,8 +40,14 @@ fi
 # CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-SuperSoft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open" )
 # CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" "ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open" )
 # CUTS=( "med" "soft" "open" )
-CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" )
-CUTS=( "med" )
+CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" )
+CUTS=( "soft" )
+CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Ext-005CU-Soft" )
+CUTS=( "softExt" )
+CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Hard" )
+CUTS=( "hard" )
+CUTFIL=( "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate" "ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft" )
+CUTS=( "med" "soft" )
 
 #########################
 # loop over all epochs
@@ -61,7 +69,7 @@ do
 # make tables
       if [[ $RUN == "MAKETABLES" ]]
       then
-         echo "  ./VTS.MSCW_ENERGY.sub_make_tables.sh $T 0 $W $A $SIMS"
+         ./VTS.MSCW_ENERGY.sub_make_tables.sh $T 0 $W $A $SIMS
       fi
 
 ######################################
@@ -89,9 +97,9 @@ do
                then
                    D="/lustre/fs5/group/cta/VERITAS/analysis/EVDv400/"$A"_FLWO/mscw_ATM"$W"_d20131031"
                else
-                   D="$VERITAS_DATA_DIR/analysis/EVDv400/"$A"_FLWO/mscw_CARE_ATM"$W"_d20140127"
+                   D="$VERITAS_DATA_DIR/analysis/EVDv400/"$A"_FLWO/mscw_CARE_ATM"$W"_d20140403"
                fi
-               ./VTS.EFFAREA.sub_analyse.sh $C $A"-"$F"-ATM"$W"-ID"$I $I 1234 $D $SIMS
+               ./VTS.EFFAREA.sub_analyse.sh $C $SIMS-$A"-"$F"-ATM"$W"-ID"$I $I 1234 $D $SIMS
             done
          fi
 

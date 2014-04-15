@@ -36,8 +36,9 @@ then
     WOFF=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
     NN="1"
 else
-    IZE=( 00 20 30 35 )
+    IZE=( 00 20 30 35 40 45 )
     INOI=(  50  80 120 170 230 290  370  450 )
+    INOI=(  50  80 120 170 230 370  450 )
     WOFF=( 0.5 )
     NN="9"
 fi
@@ -91,7 +92,7 @@ do
 # MC files and directory names
 ############################################################################################
 # data file to be analyzed
-	 TFIL=gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana"$ARRAY"_NOISE${INOI[$j]}_"$NN".root
+	 TFIL=gamma_${IZE[$i]}deg_750m_w"${WOFF[$k]}"_ID"$REID"_ana"$ARRAY"_NOISE${INOI[$j]}_"$NN".*root
          FFIL=$FDIR"/"$TFIL
 	 if [ ! -e $FFIL ]
 	 then
@@ -112,6 +113,7 @@ echo "
 * AZIMUTHBINS 1
 * FILLMONTECARLOHISTOS 0
 * ENERGYSPECTRUMINDEX 40 1.5 0.1
+ ENERGYSPECTRUMINDEX  20 2.0 0.1
 * FILLMONTECARLOHISTOS 0
 * SHAPECUTINDEX 0
 * CUTFILE $LOGDIR/$FXIR-$CUTS.dat

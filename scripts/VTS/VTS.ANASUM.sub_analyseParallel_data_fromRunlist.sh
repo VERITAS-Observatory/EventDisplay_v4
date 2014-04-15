@@ -59,11 +59,13 @@ then
 elif [[ "$CUTS" == *soft* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft.dat"
+   EFFAREA="effArea-d20140403-CARE-cut-N3-Point-005CU-Soft-ATM21-V6-T1234-d20131115.root"
    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-$ATMO-EPOCHSETTING-T1234-d20131115.root"
    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-EPOCHSETTING-T1234.root"
 elif [[ $CUTS = *moderate* ]]
 then
    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate.dat"
+   EFFAREA="effArea-d20140403-CARE-cut-N3-Point-005CU-Moderate-ATM21-V6-T1234-d20131115.root"
    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-$ATMO-EPOCHSETTING-T1234-d20131115.root"
    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 # UV Filter
@@ -71,9 +73,9 @@ then
 #   RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
 elif [[ $CUTS = *hard* ]]
 then
-  CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Hard.dat"
-  EFFAREA="effArea-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
-  RADACC="radialAcceptance-d20120909-cut-N3-Point-005CU-Moderate-EPOCHSETTING-d20121218.root"
+  CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Hard.dat"
+  EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Hard-$ATMO-EPOCHSETTING-T1234-d20131115.root"
+  RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-EPOCHSETTING-T1234.root"
 # energy dependent theta2 cut
 elif [[ $CUTS = *VT2* ]]
 then
