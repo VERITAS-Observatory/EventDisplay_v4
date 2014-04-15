@@ -9,10 +9,24 @@
 #
 
 
-NAM="$1"
-if [ ! "$NAM" ] ; then
-	echo ; echo "Need a source name" ; echo
+
+if [[ "$#" != 1 ]] ; then
+	echo "$0:"
+	echo "Generate a simple runlist from an input source name,"
+	echo "  and print it to terminal, one line per runnumber."
+	echo
+	echo "example:"
+	echo "  $ $0 \"Crab\""
+	echo "  54115
+  54116
+  54173
+  54174"
+	echo
+	echo "Source names must match those found in the database,"
+	echo "  and can be searched for with 'findSourceNamesLike.sh"
+	exit 1
 fi
+NAM="$1"
 
 MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' $VERITAS_EVNDISP_ANA_DIR/ParameterFiles/EVNDISP.global.runparameter | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
 if [ ! -n "$MYSQLDB" ] ; then

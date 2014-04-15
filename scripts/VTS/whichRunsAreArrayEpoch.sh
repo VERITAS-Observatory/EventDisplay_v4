@@ -8,27 +8,32 @@ ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or fro
 #echo "\$ISPIPEFILE: '$ISPIPEFILE'"
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)
 	if ! [ $# -eq 2 ] ; then # the human didn't add any arguments, and we must tell them so
-		echo "Prints the run numbers that are of the specific run versions runs."
-		echo "  for just V4 runs, do"
-		echo "    $ `basename $0` 4 <file of runs>"
-		echo "  for just V5 runs, do"
-		echo "    $ `basename $0` 5 <file of runs>"
-		echo "  to print all V5 and V6 runs, do"
-		echo "    $ `basename $0` 56 <file of runs>"
+		echo
+		echo "Prints the run numbers that belong to specific array epochs (aka V4, V5, or V6)."
+		echo
+		echo "For just V4 runs, do"
+		echo "  $ `basename $0` 4 <file of runs>"
+		echo
+		echo "For just V5 runs, do"
+		echo "  $ `basename $0` 5 <file of runs>"
+		echo
+		echo "To print all V5 and V6 runs, do"
+		echo "  $ `basename $0` 56 <file of runs>"
+		echo
+		echo "Also works with pipes:"
+		echo "  $ cat <file of runs> | `basename $0` 46"
+		echo
 		exit
 	fi
 fi
 
 # if we find 4, 5, or 6 in $1, then set appropriate flags
 V4FLAG=false
-if [[ "$1" == *4* ]] ; then
-	V4FLAG=true ; fi
 V5FLAG=false
-if [[ "$1" == *5* ]] ; then
-	V5FLAG=true ; fi
 V6FLAG=false
-if [[ "$1" == *6* ]] ; then
-	V6FLAG=true ; fi
+if [[ "$1" == *4* ]] ; then V4FLAG=true ; fi
+if [[ "$1" == *5* ]] ; then V5FLAG=true ; fi
+if [[ "$1" == *6* ]] ; then V6FLAG=true ; fi
 
 # list of run_id's to read in
 RUNFILE=$2
@@ -42,7 +47,7 @@ RUNLIST=`cat $RUNFILE`
 # first run of V5 : 46642 
 # first run of V6 : 63373  
 for i in ${RUNLIST[@]} ; do
-	if $V4FLAG ; then
+	if $V4FLAG ; then 
 		if [ "$i" -le "46641" ] ; then 
 			echo "$i"
 		fi
