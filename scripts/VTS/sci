@@ -1,0 +1,693 @@
+#!/bin/bash
+CWD=$PWD
+########################################
+#
+# Written by Nathan Kelley-Hoskins
+# Feb 2013
+#
+
+###################################################
+# HOW DO I USE THIS ?                             #
+# put this in a new directory,                    #
+# add your runlist file to that directory,        #
+# edit the settings below, then use the commands  #
+# 'evndisp', 'mscw', 'anpar', and 'anmer' to      #
+# run stages of the analysis                      #
+###################################################
+
+#############################################################################
+#
+# ANALYSIS SETTINGS:
+#
+
+# Which event display installation do you want to use?
+# if not set, you must have EVNDISPSYS defined ($ echo "$EVNDISPSYS" )
+# (full path please)
+#export EVNDISPSYS="/afs/ifh.de/user/n/nkelhos/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk"
+
+#-----------------------------------------------------------------------
+# Which runlist do you want to use?
+# It should be a simple list of veritas runnumbers.
+# (full path please)
+RUNLIST="$CWD/runlist.crabV6.dat"
+#RUNLIST="$CWD/runlist.repair.dat"
+
+#-----------------------------------------------------------------------
+# What kind of cuts do you want to use?
+# Currently supports 'soft', 'moderate', or 'hard'
+CUTS="soft"
+
+#-----------------------------------------------------------------------
+# What kind of background do you want to use?
+# 'ring' or 'refl' (for reflected)
+BACKGROUND="refl" # ring or [refl, reflect, reflected]
+
+#-----------------------------------------------------------------------
+# If using 'ring' background, 
+# how how big should the radius of the the 'on' region be, in degrees?
+RINGCENT="0.5"
+# and how big should the 'off' ring be, in units of 'on'-region areas?
+RINGAREA="10"
+
+#-----------------------------------------------------------------------
+# if using 'refl' background,
+# what should be the minimum distance between off region edges, in degrees?
+REFLWOBOFF="0.5"
+# whats the minimum number of off regions we should use?
+REFLMINREG="1"
+# and the maximum number of off regions to use?
+REFLMAXREG="10"
+
+#-----------------------------------------------------------------------
+# what should we name the final output root file?
+# (full path please)
+FINALOUTPUT="$CWD/anmer.output.root" # name of final merged-anasum file
+
+#-----------------------------------------------------------------------
+# which anasum runparameter file should we use?
+# (full path please)
+RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab"
+
+# for the radial acceptance file, what date should be used
+# in the radial acceptance filename?
+# e.g. radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-V5-T234.root
+#                        ^^^^^^^^
+# (all other parts of filename will be figured out automatically)
+RADECDATE="20131115"
+
+# for the mscw lookup tables, what date should be used in the filename?
+# e.g. table_d20131115_GrIsuDec12_ATM22_V5_ID0
+#             ^^^^^^^^
+# (all other parts of filename will be figured out automatically)
+TABLEDATE="20131115"
+
+# for the gamma-hadron cut file, what date should be used in the filename?
+# ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-Soft.dat
+#                     ^^^^^^^^
+# (all other parts of filename will be figured out automatically)
+GAMHADCUTDATE="20130411"
+
+# for the effective area file, what two dates should be used in the filename? 
+# effArea-d????????-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d????????.root
+#          ^EFDATE1                                         ^EFDATE2
+# (all other parts of filename will be figured out automatically)
+EFDATE1="20131031"
+EFDATE2="20131115"
+
+#
+# END ANALYSIS SETTINGS
+#
+###########################################################################################
+
+
+BINNAME="$0"
+if [[ $# < 1 || ! $1 =~ (evndisp|mscw|anpar|anmer|jobs|kill) ]] ; then 
+	echo ; echo "Include a stage (evndisp, mscw, anpar, anmer) please, (optional 'check' afterwards)"
+	echo " $ $BINNAME evndisp         # run the 'event display' stage"
+	echo " $ $BINNAME evndisp check   # after evndisp, check its log and datafiles for problems"
+	echo " $ $BINNAME mscw            # run the 'mean scaled width' stage"
+	echo " $ $BINNAME mscw check      # after mscw, check its log and datafiles for problems"
+	echo " $ $BINNAME anpar           # run the 'anasum parallel' stage"
+	echo " $ $BINNAME anpar check     # after anpar, check its log and datafiles for problems"
+	echo " $ $BINNAME anmer           # merge the anasum parallel files "
+	echo "Or, a command:"
+	echo "  $ $BINNAME jobs   # show progress of all of this project's jobs, updating every 90 seconds, and block until jobs are done"
+	echo "  $ $BINNAME kill   # halt all this project's jobs"
+	echo ; exit 1
+fi
+
+CONORM="\033[0;00m"
+CORED="\033[1;31m"    ; COTRED="\033[0;31m"
+COPURPLE="\033[1;35m" ; COTPURPLE="\033[0;35m" 
+COGREEN="\033[1;32m"  ; COTGREEN="\033[0;32m"
+COYELLOW="\033[1;33m" ; COTYELLOW="\033[0;33m"
+COCYAN="\033[1;36m"   ; COTCYAN="\033[0;36m"
+COBLUE="\033[1;34m"   ; COTBLUE="\033[0;34m"
+exec 5>&1 # extra place to duplicate output to stdout, look for >&5
+
+if [ ! -d "$EVNDISPSYS" ] ; then
+	echo "error, \$EVNDISPSYS=$EVNDISPSYS isn't a valid directory, exiting..."
+	exit 1
+fi
+
+if [ ! -e "$RUNLIST" ] ; then
+	echo "error, \$RUNLIST=$RUNLIST needs to be a valid file, exiting..."
+fi
+
+# needed to transfer files from evndisp to mscw stage and to anpar stage
+EVNDISPDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
+
+STAGE=$1
+CHK=$2
+if [ "$CHK" = "check" ] ; then
+	CHECKFLAG=true
+else
+	CHECKFLAG=false
+fi
+
+SCIDIR="$CWD/sd"
+mkdir -p $SCIDIR
+
+RUNNINGJOBS="$SCIDIR/runningjobs" # file containing job numbers from the last action
+if [[ "$1" == "jobs" ]] ; then # print run status
+	if [ -e "$RUNNINGJOBS" ] ; then # the RUNNINGJOBS file exists and we can do stuff
+		while true ; do
+			JOBLIST=`cat $RUNNINGJOBS`
+			JOBSWAITING=0
+			JOBSINPROGRESS=0
+			JOBSERRORED=0
+			ALLJOBS=$( qstat -u $USER | tail -n +3 | awk '{printf "%s %s %s\n", $1, $3, $5}')
+			#echo "ALLJOBS:$ALLJOBS"
+			for AJOB in $JOBLIST ; do
+				JOBLINE=$( echo "$ALLJOBS" | grep "$AJOB" )
+				JOBSTATE=$( echo "$JOBLINE" | awk '{print $3}' )
+				#echo "JOB:$AJOB"
+				#echo "  JOBLINE:$JOBLINE"
+				#echo "  JOBSTATE:$JOBSTATE"
+				if   [ "$JOBSTATE" == "qw" ] ; then JOBSWAITING=$((JOBSWAITING+1))
+				elif [ "$JOBSTATE" == "r"  ] ; then JOBSINPROGRESS=$((JOBSINPROGRESS+1))
+				elif [ "$JOBSTATE" == "E"  ] ; then JOBSERRORED=$((JOBSERRORED+1))
+				fi
+			done
+			JOBSDONE=$(( $(echo "$JOBLIST" | wc -l ) - (JOBSWAITING+JOBSINPROGRESS+JOBSERRORED) )) # how many jobs are not waiting, running, or errored
+			RUNNINGSTAGE=$( cat "$SCIDIR/stage" )
+			echo ; echo "$BINNAME $RUNNINGSTAGE jobs:"
+			echo -e "  ${COTBLUE}$JOBSWAITING jobs waiting${CONORM}"
+			echo -e "  ${COTCYAN}$JOBSINPROGRESS jobs in progress${CONORM}"
+			echo -e "  ${COTGREEN}$JOBSDONE jobs complete${CONORM}"
+			if [ "$JOBSERRORED" -gt "0" ] ; then # let the user know some jobs have errored
+				echo -e "  ${CORED}$JOBSERRORED jobs in the error state${CONORM}"
+			fi
+			echo
+			if [ "$((JOBSWAITING+JOBSINPROGRESS+JOBSERRORED))" -le "0" ] ; then
+                #echo -ne "\007" ; sleep 0.12 ;
+                #echo -ne "\007" ; sleep 0.12 ; 
+                #echo -ne "\007" ## I beep for the users.
+                break
+            else
+                sleep 90
+            fi
+		done
+	else
+		echo "This directory currently has no jobs running."
+	fi
+	exit 0
+fi
+
+if [[ "$1" == "kill" ]] ; then # kill all running jobs
+	if [ -e "$RUNNINGJOBS" ] ; then
+		JOBLIST=`cat $RUNNINGJOBS`
+		for AJOB in $JOBLIST ; do
+			qdel "$AJOB"
+		done
+		rm -rf $RUNNINGJOBS
+	else
+		echo "No currently running jobs to kill."
+	fi
+	exit 0
+fi
+
+function setupMSCWRunlists {
+	TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V4_ID0"
+	TABLEFILESUMMV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V4_ID0"
+	TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V5_ID0"
+	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V5_ID0"
+	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V6_ID0"
+	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V6_ID0"
+	RUNLISTSUMMV4="$SCIDIR/runlist.summer.V4"
+	RUNLISTWINTV4="$SCIDIR/runlist.winter.V4"
+	RUNLISTSUMMV5="$SCIDIR/runlist.summer.V5"
+	RUNLISTWINTV5="$SCIDIR/runlist.winter.V5"
+	RUNLISTSUMMV6="$SCIDIR/runlist.summer.V6"
+	RUNLISTWINTV6="$SCIDIR/runlist.winter.V6"
+	cd $EVNDISPSYS/scripts/VTS
+	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 4 > $RUNLISTSUMMV4
+	RUNLIST.whichRunsAreAtmosphere.sh w $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 4 > $RUNLISTWINTV4
+	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 5 > $RUNLISTSUMMV5
+	RUNLIST.whichRunsAreAtmosphere.sh w $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 5 > $RUNLISTWINTV5
+	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 6 > $RUNLISTSUMMV6
+	RUNLIST.whichRunsAreAtmosphere.sh w $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 6 > $RUNLISTWINTV6
+	cd $CWD
+}
+
+# make list of run-specific parameter files
+PARAMFILELIST="$SCIDIR/paramfilelist.dat"
+ANASUMRUNLIST="$CWD/AnasumRunList.dat"
+RUNNUMBERS=`cat $RUNLIST`
+function makeParamFile {
+    rm -rf $PARAMFILELIST
+    rm -rf $ANASUMRUNLIST
+    # generate basic param files
+	#                               GHCut            RadAcc     EF1      EF2      Table
+	$EVNDISPSYS/scripts/VTS/generateParamFiles.sh "$CUTS" "$GAMHADCUTDATE" "$RADECDATE" 20131031 20131115 "$TABLEDATE" 3 "$RUNLIST" > "$PARAMFILELIST"
+    
+    # now put these filenames in the AnasumRunList format
+    # fill AnasumRunList with each run's info
+    # GENERATE ANASUMRUNLIST
+    #echo "" > $ANASUMRUNLIST
+    rm -rf "$ANASUMRUNLIST"
+	echo "Making Param File, using $BACKGROUND background method"
+    for ARUN in $RUNNUMBERS ; do
+        ARCUTSFILE=$(      grep "R$ARUN" "$PARAMFILELIST" | grep -oE "\S*ANASUM.GammaHadron\S*" )
+        AREFFAREAFILE=$(   grep "R$ARUN" "$PARAMFILELIST" | grep -oE "\S*effArea\S*"            )
+        ARRADIALACCFILE=$( grep "R$ARUN" "$PARAMFILELIST" | grep -oE "\S*radialAcceptance\S*"   ) 
+        #ARRADIALACCFILE="imgselAcceptFile.root"
+		if [[ $BACKGROUND == ring ]] ; then
+            echo "* $ARUN $ARUN 0 $ARCUTSFILE 1 $AREFFAREAFILE $RINGCENT $RINGAREA $ARRADIALACCFILE" >> $ANASUMRUNLIST
+		elif [[ $BACKGROUND == refl* ]] ; then
+            echo "* $ARUN $ARUN 0 $ARCUTSFILE 2 $AREFFAREAFILE $REFLWOBOFF $REFLMINREG $REFLMAXREG $ARRADIALACCFILE" >> $ANASUMRUNLIST
+		else
+			echo -e "${COTRED}Error, unrecognized background keyword '$BACKGROUND', must be 'ring' or 'refl', exiting...${CONORM}"
+			exit 1
+        fi
+    done
+}
+#if [ ! $CHECKFLAG -a "$STAGE" != "jobs" ] ; then
+#	generateParamFiles.sh "$CUTS" 20130411 3 "$RUNLIST" > "$PARAMFILELIST"
+#fi
+
+function countStrings {
+	local searchstring="$1"
+	declare -a argAry1=("${!2}")
+	#echo "argAry1: ${argAry1[@]}"
+	local ERRORCOUNT=0
+	local tmpcnt=0
+	for i in "${argAry1[@]}" ; do
+		tmpcnt=0
+		tmpcnt=$( grep -c -E -i $searchstring "$i" )
+		ERRORCOUNT=$((ERRORCOUNT+tmpcnt))
+		#echo "  $tmpcnt : $i"
+	done
+	#echo " ERRORCOUNT : $ERRORCOUNT"
+	echo "$ERRORCOUNT"
+}
+
+function formatwarncount {
+	local WARNCOUNT="$1"
+	if [[ $WARNCOUNT != 1 ]] ; then plural="s" ; fi
+	if [[ $WARNCOUNT  > 0 ]] ; then 
+		WARNCOUNTSTR=$( printf "${COTYELLOW}%3d warning%s${CONORM}" $WARNCOUNT "$plural" )
+	else
+		WARNCOUNTSTR=" "
+	fi
+	echo -e "$WARNCOUNTSTR"
+
+}
+
+function formaterrorcount {
+	local ERRORCOUNT="$1"
+	local plural=""
+	if [[ $ERRORCOUNT != 1 ]] ; then plural="s" ; fi
+	if [[ $ERRORCOUNT  > 0 ]] ; then 
+		ERRORCOUNTSTR=$( printf "${COTRED}%3d error%s${CONORM}" $ERRORCOUNT "$plural" )
+	else
+		ERRORCOUNTSTR=" "
+	fi
+	echo -e "$ERRORCOUNTSTR"
+
+}
+
+function checkLogFileForProblems {
+    TARGFILE="$1"
+    REALFILE="`readlink -f "$TARGFILE"`"
+    if [ ! -e "$TARGFILE" ] ; then
+        echo -e "sci checkLogFileForProblems: ${CORED}file '${TARGFILE}' not found... exiting.${CONORM}"
+        exit
+    fi
+    OUTSTRING="`grep -iE 'recov|warning|error|segmentation' $TARGFILE`"
+    OUTSTRING="$OUTSTRING `grep -i 'NKH' $TARGFILE`"
+    #OUTSTRING=$( echo "$OUTSTRING" | tr ' ' '' )
+    OUTSTRING=$( echo "$OUTSTRING" | sed -e 's/ //g' )
+    if [ ! -z "$OUTSTRING" ] ; then # $OUTSTRING is not empty, print ALL THE MESSAGES
+        echo -e "${COTBLUE}~~~~~~~~~~~ Found in ${REALFILE}${CONORM}"
+        GREP_COLOR="1;33" grep --color=always -E -i 'warning|recov' $TARGFILE
+        GREP_COLOR="1;31" grep --color=always -E -i 'error|segmentation' $TARGFILE
+        #GREP_COLOR="1;31" grep --color -E -i 'segmentation' $TARGFILE
+        GREP_COLOR="1;36" grep --color=always -E -i 'NKH' $TARGFILE
+    else
+        echo -e "${COTBLUE}~~~~~~~~~~~ Looked at file ${TARGFILE}${CONORM}"
+    fi
+}
+
+# simple 'run complete' or 'run  incomplete!!" output
+function checkForSuccess {
+	local TARGFILE="$1"
+	local SEARCHSTR="$2"
+	local REALFILE="`readlink -f "$TARGFILE"`"
+	if [ ! -e "$TARGFILE" ] ; then
+		echo -e "`basename $BINNAME`: ${CORED}file '${TARGFILE}' not found... exiting.${CONORM}"
+		exit
+	fi
+	local OUTSTRING="`grep -i "$SEARCHSTR" $TARGFILE`"
+	if [ -z "$OUTSTRING" ] ; then # OUTSTRING has length zero, and run may be bad
+		echo -e "${COTRED}run looks bad!!${CONORM}"
+		else # run is probably ok
+		echo -e "run looks healthy"
+	fi
+}
+
+#full filename and string match output
+function checkLogFileForStageSuccess {
+	local TARGFILE="$1"
+	local SEARCHSTR="$2"
+	local REALFILE="`readlink -f "$TARGFILE"`"
+	if [ ! -e "$TARGFILE" ] ; then
+		echo -e "`basename $BINNAME`: ${CORED}file '${TARGFILE}' not found... exiting.${CONORM}"
+		exit
+	fi
+	#local SEARCHSTR="...outputfile closed"
+	local OUTSTRING="`grep -i "$SEARCHSTR" $TARGFILE`"
+	if [ -z "$OUTSTRING" ] ; then
+		echo -e "${COTBLUE}~~~~~~~~~~~ From file ${REALFILE} :${CONORM}"
+		echo -e "${COTBLUE}~~~~~~~~~~~${CONORM} ${COTRED}Warning: `basename $TARGFILE .anasum.log` may not have ended properly...${CONORM}"
+	else
+		echo -e "${COTBLUE}~~~~~~~~~~~ From file ${REALFILE} :${CONORM}"
+		echo -e "${COTBLUE}~~~~~~~~~~~${CONORM} Run seems healthy..."
+		#GREP_COLOR="0;36" grep --color=always -i "$SEARCHSTR" $TARGFILE
+	fi
+}
+
+function checkIfAnyJobsAreRunning {
+	#echo "checkIfAnyJobsAreRunning"
+	JOBSARERUNNING=false
+	if [ -e "$RUNNINGJOBS" ] ; then
+		JOBSTOCHECK=`cat $RUNNINGJOBS`
+		JOBDATA=$( qstat -u $USER | tail -n +3 | awk '{ print $1 }' )
+		NUMBEROFRUNNINGJOBS=0
+		for AJOB in $JOBSTOCHECK ; do
+			STATUS=$( echo "$JOBDATA" | grep "$AJOB" )
+			#echo "STATUS:'$STATUS'"
+			if [ ! -z "$STATUS" ] ; then
+				#echo "checkIfAnyJobsAreRunning: Yes!"
+				JOBSARERUNNING=true
+				break
+			fi
+		done
+	fi
+	if $JOBSARERUNNING ; then
+		echo "Jobs are currently running. Please wait."
+		exit 0
+	fi
+}
+#checkIfAnyJobsAreRunning
+#echo "JOBSARERUNNING:$JOBSARERUNNING"
+#exit 1
+
+function updateRunningJobList {
+	local INPUTDATA="$1"
+	local ACTIVEJOBS=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{print $3}' )
+	rm -rf "$RUNNINGJOBS" ;
+	for AJOB in $ACTIVEJOBS ; do
+		#echo "updateRunningJobList: Adding job: $AJOB"
+		echo "$AJOB" >> $RUNNINGJOBS
+	done
+
+}
+
+
+ANASUMOUTPUTDIR=$CWD"/arf"
+mkdir -p $ANASUMOUTPUTDIR
+
+
+# s1 event display
+if [[ "$STAGE" == "evndisp" ]] ; then
+	EVNJOBSUB="$SCIDIR/qsubdata.evndisp"
+	if ! $CHECKFLAG ; then 
+		checkIfAnyJobsAreRunning
+		makeParamFile
+		
+		# evndisp #########################################################
+		echo -e "${COBLUE}Stage evndisp${CONORM}"
+		echo "$STAGE" > "$SCIDIR/stage"
+		cd $EVNDISPSYS/scripts/VTS
+		#QSUBDATA=$(./VTS.EVNDISP.sub_analyse_data.sh $RUNLIST 1 | tee >(cat - >&5) )  ####### EVNDISP
+		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPDIR 1 | tee >(cat - >&5) )  ####### EVNDISP
+		rm -rf "$EVNJOBSUB"
+		echo "$QSUBDATA" > "$EVNJOBSUB"
+		updateRunningJobList "$QSUBDATA"
+		
+	else # check the stage results
+		checkIfAnyJobsAreRunning
+		# evndisp check #########################################################
+		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo "checking the evndisp stage" 
+		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
+		QSUBDATA=$(cat "$EVNJOBSUB")
+		while read ARUN ; do
+			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }')
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }')
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }')
+			checkLogFileForProblems "$OLOG"
+			checkLogFileForProblems "$ELOG"
+			if [ -e "$OLOG" ] ; then
+				EVNLOG=$(   cat "$OLOG" | grep "RUN$ARUN EVNLOG"   | awk '{ print $3 }' )
+				#DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN DATAOUT"  | awk '{ print $3 }' )
+				PEDLOG=$(   cat "$OLOG" | grep "RUN$ARUN PEDLOG"   | awk '{ print $3 }' )
+				TZEROLOG=$( cat "$OLOG" | grep "RUN$ARUN TZEROLOG" | awk '{ print $3 }' )
+				checkLogFileForProblems "$PEDLOG"
+				checkLogFileForProblems "$TZEROLOG"
+				checkLogFileForProblems "$EVNLOG"
+				checkLogFileForStageSuccess "$EVNLOG" "Final checks on result file (seems to be OK):"
+			else
+				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
+			fi
+		done < $RUNLIST
+		
+		echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		OLOG=$( echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG" | head -n 1 | awk '{ print $3 }' )
+		DFDIR=$( cat $OLOG | grep -P "^RUN\d{5} EVNLOG" | awk '{ print $3 }' )
+		DFDIR=$( dirname $DFDIR )
+		echo -e "~~~~~~~~~~~ Evndisp Datafiles stored in $DFDIR/ $CONORM"
+		while read ARUN ; do
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG" | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG" | awk '{ print $3 }' )
+			LOGFILES=()
+			if [ -e "$OLOG" ] ; then
+				DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN DATAOUT"  | awk '{ print $3 }' )
+				EVNLOG=$(   cat "$OLOG" | grep "RUN$ARUN EVNLOG"   | awk '{ print $3 }' )
+				PEDLOG=$(   cat "$OLOG" | grep "RUN$ARUN PEDLOG"   | awk '{ print $3 }' )
+				TZEROLOG=$( cat "$OLOG" | grep "RUN$ARUN TZEROLOG" | awk '{ print $3 }' )
+				LOGFILES=("$OLOG" "$ELOG" "$PEDLOG" "$TZEROLOG" "$EVNLOG" )
+				WARNCOUNT=$( countStrings "warn" LOGFILES[@] )
+				WARNCOUNTSTR=$( formatwarncount "$WARNCOUNT" )
+				ERRORCOUNT=$( countStrings "error" LOGFILES[@] )
+				ERRORCOUNTSTR=$( formaterrorcount "$ERRORCOUNT" ) # convert ERRORCOUNT to "$ERRORCOUNT errors" with color and plurality
+				if [ -e "$DATAFILE" ] ; then
+					DFBASE=$( basename $DATAFILE )
+					DFSIZE=`stat -c %s $DATAFILE`
+					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+					RUNSUCCESS=$( checkForSuccess "$EVNLOG" "Final checks on result file (seems to be OK):")
+					printf "%10s is %3dMB, last modified %19s %12s %11s  : %s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+				else 
+					echo -e "${COTRED}`basename ${DATAFILE}` not found!${CONORM}"
+				fi
+			else
+				echo -e "${COTRED}${OLOG} not found!${CONORM}"
+			fi
+		done < $RUNLIST
+
+		exit
+
+	fi
+fi
+
+# s2 mscw
+if [[ "$STAGE" == "mscw" ]] ; then
+	MSCWJOBSUB="$SCIDIR/qsubdata.mscw"
+	if ! $CHECKFLAG ; then
+		checkIfAnyJobsAreRunning
+		setupMSCWRunlists
+		makeParamFile
+		# mscw #########################################################
+		echo -e "${COBLUE}Stage 2 - Mean Scale Calculation${CONORM}"
+		echo -e "Feeding files from $EVNDISPDIR"
+		echo "$STAGE" > "$SCIDIR/stage"
+		cd $EVNDISPSYS/scripts/VTS
+		#./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILE $EVNDISPDIR $RUNLIST
+		QSUBDATA=""
+		NRUNS=$( cat $RUNLISTWINTV4 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+			#QSUBDATA="$QSUBDATA \n"$( ./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILEWINTV4 $EVNDISPDIR $RUNLISTWINTV4 | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV4 $EVNDISPDIR $TABLEFILEWINTV4 | tee >(cat ->&5) ) ; fi
+		NRUNS=$( cat $RUNLISTSUMMV4 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+			#QSUBDATA="$QSUBDATA \n"$( ./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILESUMMV4 $EVNDISPDIR $RUNLISTSUMMV4 | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV4 $EVNDISPDIR $TABLEFILESUMMV4 | tee >(cat ->&5) ) ; fi
+		NRUNS=$( cat $RUNLISTWINTV5 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+			#QSUBDATA="$QSUBDATA \n"$( ./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILEWINTV5 $EVNDISPDIR $RUNLISTWINTV5 | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV5 $EVNDISPDIR $TABLEFILEWINTV5 | tee >(cat ->&5) ) ; fi
+		NRUNS=$( cat $RUNLISTSUMMV5 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+			#QSUBDATA="$QSUBDATA \n"$( ./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILESUMMV5 $EVNDISPDIR $RUNLISTSUMMV5 | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV5 $EVNDISPDIR $TABLEFILESUMMV5 | tee >(cat ->&5) ) ; fi
+		NRUNS=$( cat $RUNLISTWINTV6 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+			#QSUBDATA="$QSUBDATA \n"$( ./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILEWINTV6 $EVNDISPDIR $RUNLISTWINTV6 | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV6 $EVNDISPDIR $TABLEFILEWINTV6 | tee >(cat ->&5) ) ; fi
+		NRUNS=$( cat $RUNLISTSUMMV6 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+			#QSUBDATA="$QSUBDATA \n"$( ./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILESUMMV6 $EVNDISPDIR $RUNLISTSUMMV6 | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV6 $EVNDISPDIR $TABLEFILESUMMV6 | tee >(cat ->&5) ) ; fi
+		rm -rf "$MSCWJOBSUB"
+		echo "$QSUBDATA" > "$MSCWJOBSUB"
+		updateRunningJobList "$QSUBDATA"
+	else
+		#checkIfAnyJobsAreRunning
+		# mscw check #########################################################
+		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo "checking the mscw stage" 
+		QSUBDATA=$(cat "$MSCWJOBSUB")
+		while read ARUN ; do
+			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+			checkLogFileForProblems "$OLOG"
+			checkLogFileForProblems "$ELOG"
+			if [ -e "$OLOG" ] ; then
+				MSCWLOG=$(   cat "$OLOG" | grep "RUN$ARUN MSCWLOG"   | awk '{ print $3 }' )
+				checkLogFileForProblems "$MSCWLOG"
+				checkLogFileForStageSuccess "$MSCWLOG" "...outputfile closed"
+			else
+				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
+			fi
+		done < $RUNLIST
+
+		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"    | head -n 1 | awk '{ print $3 }' )
+		DFDIR=$( cat $OLOG        | grep -P "^RUN\d{5} MSCWLOG" | awk '{ print $3 }' )
+		DFDIR=$( dirname $DFDIR )
+		echo
+		echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo -e "~~~~~~~~~~~ MSCW Datafiles stored in $DFDIR/$CONORM"
+		while read ARUN ; do
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG" | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG" | awk '{ print $3 }' )
+			if [ -e "$OLOG" ] ; then
+				DATAFILE=$(  cat "$OLOG" | grep "RUN$ARUN DATAOUT"   | awk '{ print $3 }' )
+				MSCWLOG=$(   cat "$OLOG" | grep "RUN$ARUN MSCWLOG"   | awk '{ print $3 }' )
+				LOGFILES=("$OLOG" "$ELOG" "$MSCWLOG" )
+				WARNCOUNT=$( countStrings "warn" LOGFILES[@] )
+				WARNCOUNTSTR=$( formatwarncount "$WARNCOUNT" )
+				ERRORCOUNT=$( countStrings "error" LOGFILES[@] )
+				ERRORCOUNTSTR=$( formaterrorcount "$ERRORCOUNT" ) # convert ERRORCOUNT to "$ERRORCOUNT errors" with color and plurality
+				if [ -e "$DATAFILE" ] ; then
+					DFBASE=$( basename $DATAFILE )
+					DFSIZE=`stat -c %s $DATAFILE`
+					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+					RUNSUCCESS=$( checkForSuccess "$MSCWLOG" "...outputfile closed" )
+					#printf "%10s is %3dMB, last modified %19s %s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$RUNSUCCESS"
+					printf "%10s is %3dMB, last modified %19s %12s %11s  : %s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+				else echo -e "${COTRED}${DATAFILE} not found!${CONORM}" ; fi
+			else
+				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
+			fi
+		done < $RUNLIST
+	fi
+fi
+
+# s3 anasum_parallel (anpar)
+if [[ "$STAGE" == "anpar" ]] ; then
+	ANPARJOBSUB="$SCIDIR/qsubdata.anpar"
+	if ! $CHECKFLAG ; then
+		checkIfAnyJobsAreRunning
+		makeParamFile
+		# anpar #########################################################
+		echo -e "${COBLUE}Stage 3 - Anasum Parallel${CONORM}"
+		echo "$STAGE" > "$SCIDIR/stage"
+		cd $EVNDISPSYS/scripts/VTS
+		echo "PWD:$PWD"
+		echo "CWD:$CWD"
+		#./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $VERITAS_USER_DATA_DIR/analysis/EVD400-d20121218/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE
+		#QSUBDATA=$( ./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $EVNDISPDIR/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
+		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh $ANASUMRUNLIST $EVNDISPDIR $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
+		updateRunningJobList "$QSUBDATA"
+		rm -rf "$ANPARJOBSUB"
+        echo "$QSUBDATA" > "$ANPARJOBSUB"
+        sleep 2
+	else
+		#checkIfAnyJobsAreRunning
+		# anpar check #########################################################
+		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ; echo "checking the anpar stage" 
+		QSUBDATA=$( cat $ANPARJOBSUB )
+		for ARUN in $RUNNUMBERS ; do # check batch and log files
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+			checkLogFileForProblems "$OLOG"
+			checkLogFileForProblems "$ELOG"
+			if [ -e "$OLOG" ] ; then
+				ANPARLOG=$(   cat "$OLOG" | grep "RUN$ARUN ANPARLOG"   | awk '{ print $3 }' )
+				checkLogFileForProblems "$ANPARLOG"
+				checkLogFileForStageSuccess "$ANPARLOG" "analysis results written to"
+			else
+				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
+			fi
+		done < $RUNLIST
+		
+		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"     | head -n 1 | awk '{ print $3 }' )
+		DFDIR=$( cat $OLOG        | grep -P "^RUN\d{5} ANPARLOG" | awk '{ print $3 }' )
+		DFDIR=$( dirname $DFDIR )
+		echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo -e "~~~~~~~~~~~ ANASUM Datafiles stored in $DFDIR/$CONORM"
+		while read ARUN ; do
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }')
+			if [ -e "$OLOG" ] ; then
+				DATAFILE=$(  cat "$OLOG" | grep "RUN$ARUN DATAOUT"   | awk '{ print $3 }' )
+				ANPARLOG=$(  cat "$OLOG" | grep "RUN$ARUN ANPARLOG"  | awk '{ print $3 }' )
+				LOGFILES=("$OLOG" "$ELOG" "$MSCWLOG" )
+				WARNCOUNT=$( countStrings "warn" LOGFILES[@] )
+				WARNCOUNTSTR=$( formatwarncount "$WARNCOUNT" )
+				ERRORCOUNT=$( countStrings "error" LOGFILES[@] )
+				ERRORCOUNTSTR=$( formaterrorcount "$ERRORCOUNT" ) # convert ERRORCOUNT to "$ERRORCOUNT errors" with color and plurality
+                RUNSIGMA=$( grep -E "ALL RUNS" "$ANPARLOG" | grep -oP '\d{1,3}\.\d{0,2} sigma' | grep -oP '\d{1,3}\.\d{0,2}')
+				if [ -e "$DATAFILE" ] ; then
+					DFBASE=$( basename $DATAFILE )
+					DFSIZE=`stat -c %s $DATAFILE`
+					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+					RUNSUCCESS=$( checkForSuccess "$ANPARLOG" "analysis results written to" )
+					printf "%10s is %3dMB, last modified %19s sigma=%5s %12s %11s  : %s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$RUNSIGMA" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+				else echo -e "${COTRED}Run $ARUN : ${DATAFILE} not found!${CONORM}" ; fi
+			else
+				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
+			fi
+		done < $RUNLIST
+
+	fi
+fi
+
+# s4 anasum
+if [[ "$STAGE" == "anmer" ]] ; then
+	FINALOUTPUTLOG="$CWD/`basename $FINALOUTPUT .root`.log"
+	if $CHECKFLAG ; then
+		checkIfAnyJobsAreRunning
+		# check the stage results
+		echo "Checking the anmer stage"
+		checkLogFileForProblems $FINALOUTPUTLOG
+		DATAFILE="$FINALOUTPUT"
+		if [ -e "$DATAFILE" ] ; then
+			DFBASE=$( basename $DATAFILE )
+			DFSIZE=`stat -c %s $DATAFILE`
+			DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+			printf "%10s is %3dMB, last modified %19s %12s %11s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR"
+		else echo -e "${COTRED}${DATAFILE} not found!${CONORM}" ; fi
+	else
+		checkIfAnyJobsAreRunning
+		makeParamFile
+		echo -e "${COBLUE}Stage 4 - Anasum Merge${CONORM}"
+		echo "$STAGE" > "$SCIDIR/stage"
+		#cd $EVNDISPSYS/bin
+		#nice -n 19 ./anasum -d $ANASUMOUTPUTDIR -l $ANASUMRUNLIST -i 1 -f $RUNPARAMFILE -o $FINALOUTPUT 2>&1 | tee "$FINALOUTPUTLOG"
+		cd $EVNDISPSYS/scripts/VTS
+		nice -n 19 ./ANALYSIS.anasum_combine.sh $ANASUMRUNLIST $ANASUMOUTPUTDIR $FINALOUTPUT $RUNPARAMFILE | tee "$FINALOUTPUTLOG"
+		updateRunningJobList ""
+	fi
+fi
+
