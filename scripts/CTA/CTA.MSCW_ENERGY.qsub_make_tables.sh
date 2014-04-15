@@ -26,7 +26,7 @@ mkdir -p $LDIR
 
 # delete old log files
 rm -f $LDIR/$TFIL-$ARRAY.log
-# delete old table file
+# delete old table file (mscw_energy would otherwise stop with an error message)
 rm -f $LDIR/$TFIL-$ARRAY.root
 
 # options for table filling

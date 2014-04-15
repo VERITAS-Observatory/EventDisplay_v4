@@ -108,7 +108,7 @@ fi
 DATE=`date +"%y%m%d"`
 LDIR=$CTA_USER_LOG_DIR/$DATE/TMVATRAINING/
 mkdir -p $LDIR
-# QDIR=$LDIR
+#QDIR=$LDIR
 QDIR="/dev/null"
 echo "log directory: " $LDIR
 echo "queue log directory: " $QDIR
@@ -203,7 +203,7 @@ do
 
 #################################
 # submit job to queue
-	 qsub $QSUBOPT -V -l os="sl6" -l h_cpu=41:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
+	 qsub $QSUBOPT -V -l os="sl6" -l h_cpu=11:29:00 -l h_vmem=8000M -l tmpdir_size=5G -o $QDIR -e $QDIR "$FNAM.sh"
      done
   done
 done

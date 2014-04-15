@@ -37,7 +37,7 @@ do
    sed -n "$l,$k p" $1 > $LLIST
 # run glite-transfer-submit
   ftsid=`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.d.$z.list`
-#   echo "ftsid=\`glite-transfer-submit -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.d.$z.list\`"
+#  ftsid=`glite-transfer-submit -s https://fts3-node1-kit.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -f $2/tmplists/tmplist.d.$z.list`
    echo "   glite ID $ftsid"
 
 # test for maximum number of jobs
@@ -50,5 +50,6 @@ done
 echo
 echo "check transfer status with:"
 echo "glite-transfer-status -s https://fts-fzk.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -l <glite ID>"
+# echo "glite-transfer-status -s https://fts3-node1-kit.gridka.de:8443/glite-data-transfer-fts/services/FileTransfer -l <glite ID>"
 
 exit

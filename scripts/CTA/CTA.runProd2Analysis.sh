@@ -25,7 +25,7 @@ RUN="$2"
 # qsub options
 #   _M_ = -; _X_ = " "
 QSUBOPT=""
-QSUBOPT="_M_P_X_cta_high_X__M_js_X_100000"
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_90000"
 QSUBOPT="_M_P_X_cta_high"
 
 #####################################
@@ -37,6 +37,9 @@ mkdir -p $PDIR
 # analysis dates and table dates
 DATE="d20140225"
 TDATE="d20140225"
+
+DATE="d20140309"
+TDATE="d20140309"
 
 #####################################
 # reconstruction IDs
@@ -59,20 +62,29 @@ then
 # data sets without trgmask files
    SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS"  "prod2-Aar-500m-NS" )
 # array settings
-   ARRAY="subArray.2a.list"
-   ARRAY="subArray.2S-sub.lis"
+   ARRAY="subArray.2a-noLST.list"
 # data sets with trgmask files
    SITE=( "prod2-Aar-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" "prod2-Leoncito-NS" )
 # tmp
-   SITE=( "prod2-Aar-NS" "prod2-Aar-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-SAC100-lowE-NS" )
+   SITE=( "prod2-Leoncito-NS" "prod2-Aar-NS" "prod2-Aar-lowE-NS" )
 # 40 deg data sets
-   SITE=( "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" )
+   SITE=( "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS" "prod2-SAC100-NS" "prod2-SAC084-NS" )
+   SITE=( "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" "prod2-LeoncitoPP-40deg-NS" )
+   SITE=( "prod2-Aar-NS" )
+   SITE=( "prod2-LeoncitoPP-40deg-NS" "prod2-LeoncitoPP-NS" "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" )
+   SITE=( "prod2-SAC100-NS" "prod2-Leoncito-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS"  "prod2-Aar-500m-NS" "prod2-SAC084-NS" "prod2-Aar-NS" )
+   SITE=( "prod2-Aar-lowE-NS" "prod2-Aar-NS" "prod2-Leoncito-NS" )
+   SITE=( "prod2-SAC084-NS" )
+   SITE=( "prod2-LeoncitoPP-40deg-NS" )
+   ARRAY="subArray.2S-sub.lis"
+   SITE=( "prod2-Aar-500m-NS" )
+   ARRAY="subArray.2a.list"
+   SITE=( "prod2-LeoncitoPP-NS" )
+   ARRAY="subArray.2S-sub-RC.lis"
 ############################
 # NORTH
 elif [[ $P2 == "N" ]]
 then
-   SITE=( "prod2-Tenerife-NS" )
-   ARRAY="subArray.2NN.list"
    SITE=( "prod2-US-NS" "prod2-SPM-NS" "prod2-Tenerife-NS" )
    ARRAY="subArray.2NN-fullList.list"
 elif [[ $P2 == "P1" ]]
@@ -103,8 +115,9 @@ NIMAGESMIN="2"
 #####################################
 # observing time [h]
 OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
-OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
+OBSTIME=( "100h" "500h" "1000h" )
 OBSTIME=( "50h" )
+OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
 
 
 #####################################
@@ -122,6 +135,7 @@ do
 #####################################
 # trigmask files
 # (needed only for prod2 files with trigger bug)
+# 20140313: this is partly broken...(works for Lenocito)
    if [[ $S == "prod2-Aar-NS" ]]
    then
       TRG="/lustre/fs13/group/cta/prod2/Aar/simtel/trgmask/"
@@ -149,9 +163,10 @@ do
       for ((i = 0; i < ${#PARTICLE[@]}; i++ ))
       do
 	  N=${PARTICLE[$i]}
+	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".dcache.list
+	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".grid.list.fullList
 	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/$S.$N"_20deg".list
-	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".grid.list
-	  LIST=/afs/ifh.de/group/cta/scratch/maierg/LOGS/CTA/runLists/prod2/40deg/$S.$N"".HD.list
+          echo $LIST
 
           ./CTA.EVNDISP.sub_convert_and_analyse_MC_VDST_ArrayJob.prod2.sh $ARRAY $LIST $N $S 0 $i $QSUBOPT $TRG
        done
@@ -240,7 +255,7 @@ do
 # CTA WP Phys files
 	  elif [[ $RUN == "PHYS" ]]
 	  then
-	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.R1.$DATE $OOTIME DESY.$DATE.Erec$EREC.R1.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
+	    ./CTA.WPPhysWriter.sub.sh $ARRAY $EFFDIR/BDT.R1.$DATE $OOTIME DESY.$DATE.Erec$EREC.R2.ID$ID$AZ$NTYPF.$S 1 $ID $S $QSUBOPT
 # unknown run set
 	  elif [[ $RUN != "EVNDISP" ]]
 	  then

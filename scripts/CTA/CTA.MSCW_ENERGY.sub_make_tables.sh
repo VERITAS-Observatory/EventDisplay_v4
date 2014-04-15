@@ -115,7 +115,7 @@ do
   echo "shell script " $FNAM.sh
 
 # submit the job
-  qsub $QSUBOPT -l os=sl6 -l h_cpu=47:45:00 -l h_vmem=8000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
+  qsub $QSUBOPT -l os=sl6 -l h_cpu=47:45:00 -l h_vmem=12000M -V -o $QLOG/ -e $QLOG/ "$FNAM.sh"
 done
 
 echo "shell scripts are written to $SHELLDIR"

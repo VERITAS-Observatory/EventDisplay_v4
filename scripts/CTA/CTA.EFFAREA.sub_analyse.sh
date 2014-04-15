@@ -471,7 +471,7 @@ do
      then
 	qsub $QSUBOPT -l os="sl6" -l h_cpu=5:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      else
-	qsub $QSUBOPT -l os="sl6" -l h_cpu=11:29:00 -l h_vmem=6000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
+	qsub $QSUBOPT -l os="sl6" -l h_cpu=11:29:00 -l h_vmem=4000M -l tmpdir_size=1G  -V -o $QDIR -e $QDIR "$QSHELLDIR/$FNAM.sh"
      fi
    done
 done
