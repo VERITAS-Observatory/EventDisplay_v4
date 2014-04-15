@@ -1,0 +1,20 @@
+### Submission Commands ###
+# Select the desired submission command by placing an
+# asterisk and space in front of it; if multiple commands
+# are asterisked, the last command will be used
+###
+
+# generic qsub with logging
+  qsub -o $LOGDIR/ -e $LOGDIR/
+
+# DESY batch farm
+* qsub -V -l os=sl6 -l h_cpu=$h_cpu -l h_vmem=$h_vmem -l tmpdir_size=$tmpdir_size -o $LOGDIR/ -e $LOGDIR/
+
+# DESY batch farm -- no qsub logs
+  qsub -V -l os=sl6 -l h_cpu=$h_cpu -l h_vmem=$h_vmem -l tmpdir_size=$tmpdir_size -j y -o /dev/null
+
+# University of Iowa
+  qsub -q all.q -ckpt user -j y -o /dev/null
+
+# Local parallel execution using GNU parallel
+  parallel -j `grep -ic ^processor /proc/cpuinfo`
