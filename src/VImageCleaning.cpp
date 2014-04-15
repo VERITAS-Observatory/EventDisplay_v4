@@ -1146,15 +1146,9 @@ void  VImageCleaning::SetNeighborRings( int type, unsigned short* VALIDITYBOUNDB
 			{
 				continue;
 			}
-			unsigned int     nnmax = 0;
-			int neighbor[7];
-			//            GetNeighbors(type,neighbor,idx);
 			float time = 0.;
 			float refthresh = 0.;
 			int n = 0;
-			//            for(int j=1;j<7;j++) {if(neighbor[j]>=0) nnmax++;}
-			//            for(unsigned int j=1; j<=nnmax; j++){
-			//                const Int_t idx2 = neighbor[j];
 			if( idx >= fData->getDetectorGeo()->getNeighbours().size() )
 			{
 				continue;
@@ -1313,7 +1307,6 @@ float VImageCleaning::ImageCleaningCharge( int type, int& ngroups )
 	unsigned int nboundary = 0;
 	float TIMESReSearch[numpix];
 	unsigned short VALIDITYBOUNDBUF[numpix];
-	unsigned short TESTVALIDITY[numpix];
 	float REFTHRESH[numpix];
 	
 	//*****************************************************************************************************************
