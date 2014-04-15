@@ -56,7 +56,13 @@ echo "COPYING FILES TO $TMPDIR"
 if [[ $IFIL = *acs* ]]
 then
   export DCACHE_CLIENT_ACTIVE=1
-  dccp $IFIL $TMPDIR"/"
+  for F in $IFIL
+  do
+     echo "F $F"
+     G=`basename $F`
+     echo "G $G"
+     dccp $F $TMPDIR"/"$G
+  done
 else
   cp -v -f $IFIL $TMPDIR"/"
 fi

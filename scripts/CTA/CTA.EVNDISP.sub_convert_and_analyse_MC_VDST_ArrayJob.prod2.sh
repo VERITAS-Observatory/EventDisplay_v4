@@ -44,7 +44,7 @@ fi
 # ARRAYCUTS="EVNDISP.prod2-noDoublepass.reconstruction.runparameter"
 # prod2 TIMENEXTNEIGHBOUR cleaning
 # ARRAYCUTS="EVNDISP.prod2.TIMENEXTNEIGHBOUR.reconstruction.runparameter"
-# PPOPT="\"-ignoredstgains -NNcleaninginputcard /lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/TIMENEXTNEIGHBOUR/Evtdisp.rc\""
+#PPOPT="\"-ignoredstgains -NNcleaninginputcard /lustre/fs9/group/cta/users/maierg/CTA/analysis/AnalysisData/TIMENEXTNEIGHBOUR/Evtdisp.rc.v2\""
 # prod2 default file
 ARRAYCUTS="EVNDISP.prod2.reconstruction.runparameter"
 PPOPT=""
@@ -135,21 +135,18 @@ do
        NRUN=`wc -l $RUNLISTNdeg | awk '{print $1}'`
     fi
     RUNFROMTO="1-$NRUN"
-    STEPSIZE=1
     NSTEP=1
 
 # combine files to bunches of $STEPSIZE
-#    if [[ $TRGMASKDIR == "FALSE" ]] || [[ ! -n $TRGMASKDIR ]]
-#    then
-        STEPSIZE=10
+    STEPSIZE=10
 # smaller step size for on source gammas
-        NARRAY=`wc -l $ARRAY`
-        echo $NARRAY
-        if [[ $NARRAY > 2 ]] && [[ $PART == "gamma_onSource" ]]
-        then
-           STEPSIZE=5
-        fi
-#    fi
+    NARRAY=`wc -l $ARRAY`
+    echo $NARRAY
+#    if [[ $NARRAY > 2 ]] && [[ $PART == "gamma_onSource" ]]
+    if [[ $PART == "gamma_onSource" ]]
+    then
+       STEPSIZE=5
+    fi
     let "NSTEP = $NRUN / $STEPSIZE"
     let "NTES  = $NSTEP * $STEPSIZE"
     if [[ $NTES -ne $NRUN ]]
