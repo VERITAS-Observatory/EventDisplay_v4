@@ -1064,7 +1064,6 @@ void VEnergySpectrum::calculateDifferentialFluxes()
 			   i_Rolke.SetCLSigmas( 1.e-4 );
 			   i_ndiff = 0.5*(i_Rolke.GetLowerLimit()+i_Rolke.GetUpperLimit());
                         }
-			cout << "\t" << i_ndiff << endl;
 			i_flux.DifferentialFlux  = i_ndiff;
 			i_flux.DifferentialFlux /= i_flux.dE;
 			i_flux.DifferentialFlux /= i_flux.ObsTime;
