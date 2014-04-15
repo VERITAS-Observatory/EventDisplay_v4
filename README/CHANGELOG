@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140415 (GM, HF)
+fix of a severe bug: relative gain calculations where completely wrong since Jun 27th 2013 
+(wrong pedestals values are used); requires recalculation of all relative gains since this date
+
 * 20140414 (GM)
 print out differential fluxes errors from Rolke et al, small improvements in IRF plotting
 

@@ -705,7 +705,7 @@ void VCalibrator::calculateGainsAndTOffsets( bool iLowGain )
 			cout << "calculateGainsAndTOffsets() error, can't open output file: " << opfgain->GetName() << endl;
 			exit( -1 );
 		}
-		cout << "opened gain file: " << opfgain->GetName() << endl;
+		cout << "recreated gain file: " << opfgain->GetName() << endl;
 		cout << "calculate gains and toffsets with summation window " << fRunPar->fCalibrationSumWindow;
 		cout << " (start at " << fRunPar->fCalibrationSumFirst << ")" << endl;
 		
@@ -2480,7 +2480,7 @@ void VCalibrator::initialize()
 	// read the calibration files
 	if( fRunPar->fsourcetype != 6 && fRunPar->fsourcetype != 7 && fRunPar->fsourcetype != 4 )
 	{
-		if( fRunPar->frunmode != 1 && fRunPar->frunmode != 6 && fRunPar->frunmode != 2 )
+		if( fRunPar->frunmode != 1 && fRunPar->frunmode != 6 )
 		{
 			readCalibrationData();
 		}

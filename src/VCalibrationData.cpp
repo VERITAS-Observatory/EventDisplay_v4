@@ -174,7 +174,7 @@ void VCalibrationData::initialize( unsigned int i_channel, unsigned int nSamples
 			}
 			else
 			{
-				if( isTeltoAna )
+				if( isTeltoAna && iRunMode != 2 )
 				{
 					sprintf( c_name, "%s.root", fFileName[i].c_str() );
 					fFile[i] = new TFile( c_name, "READ" );
