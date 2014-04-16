@@ -1,6 +1,8 @@
 #!/bin/bash
 # script to analyse VTS raw files (VBF) with eventdisplay
 # Author: Gernot Maier
+#
+# 2014-04-16 (GM) checked
 
 # parameters replaced by parent script using sed
 RUN=RUNFILE
@@ -19,6 +21,9 @@ mkdir -p $TEMPDIR
 
 # eventdisplay reconstruction parameter
 ACUTS="EVNDISP.reconstruction.runparameter"
+
+# set the right observatory and environmental variables
+source $EVNDISPSYS/setObservatory.sh VERITAS
 
 #########################################
 # pedestal calculation

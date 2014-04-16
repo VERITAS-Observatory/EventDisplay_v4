@@ -1,6 +1,8 @@
 #!/bin/bash
 # script to run eventdisplay analysis for VTS data
 # Author: Gernot Maier
+#
+# 2014-04-16 (GM) checked
 
 # qsub parameters
 h_cpu=41:29:00; h_vmem=2000M; tmpdir_size=10G
@@ -68,7 +70,7 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.evndisp_sub"
 for AFILE in $FILES
 do
     echo "Now starting run $AFILE"
-    FSCRIPT="$LOGDIR/EVN.NKH-data-$AFILE"
+    FSCRIPT="$LOGDIR/EVN.data-$AFILE"
 
     sed -e "s|RUNFILE|$AFILE|" \
         -e "s|CALIBRATIONOPTION|$CALIB|" \
@@ -84,7 +86,7 @@ do
     if [[ $SUBC == *qsub* ]]; then
 		
 		# print the job submission output to stdout, while also copying it to QSUBDATA
-        QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat - >&5) ) 
+                QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat - >&5) ) 
 		
 		# get the submitted job's id, after the fact
 		# by looking for "Your job ####### ..."
