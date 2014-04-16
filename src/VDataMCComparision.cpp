@@ -559,7 +559,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 	// quality cuts
 	double fCoreMax_QC = 350.;       // cut on core distance
 	int    fNImages_min = 3;         // minimum number of images per event
-	fNImages_min = 2;
+//	fNImages_min = 2;
 	// stereo cuts
 	double theta2_cut = 0.035;
 	if( iSingleTelescopeCuts > 0 || iSingleTelescopeCuts == -2 )
