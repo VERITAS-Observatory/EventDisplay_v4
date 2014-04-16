@@ -146,7 +146,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			else
 			{
 				fRunPara->ffrogsRecID = -1;
-			};
+			}
 		}
 		// Model3D
 		else if( iTemp.find( "model3d" ) < iTemp.size() )
@@ -254,7 +254,7 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->freadCalibfromDB = true;
 			
-			if( iTemp2.size() > 0 )
+			if( iTemp2.size() > 0 && VUtilities::isInteger( iTemp2 ) )
 			{
 				fRunPara->freadCalibfromDB_versionquery = atoi( iTemp2.c_str() );
                                 i++;

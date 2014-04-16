@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 
@@ -33,5 +34,16 @@ namespace VUtilities
 	string testFileLocation( string iFile, string iDirectory, bool bEVNDISPDATA );
 	
 	double line_point_distance( double x1, double y1, double z1,  double alt, double az, double x, double y, double z );
+
+        // from http://stackoverflow.com/questions/2844817/how-do-i-check-if-a-c-string-is-an-int
+        inline bool isInteger(const std::string & s)
+        {
+           if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
+
+           char * p ;
+           strtol(s.c_str(), &p, 10) ;
+
+           return (*p == 0) ;
+        }
 }
 #endif
