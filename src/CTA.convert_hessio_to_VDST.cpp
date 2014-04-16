@@ -661,7 +661,6 @@ bool DST_fillEvent( VDSTTree* fData, AllHessData* hsdata, map< unsigned int, flo
 						// low gain
 						if( iLowGain && hsdata->event.teldata[telID].raw->adc_known[LO_GAIN][p] == 1 )
 						{
-							cout << "XXX " << endl;
 							if( hsdata->event.teldata[telID].raw->adc_sample && hsdata->event.teldata[telID].raw->adc_sample[LO_GAIN] )
 							{
 								for( int t = 0; t < hsdata->event.teldata[telID].raw->num_samples; t++ )
