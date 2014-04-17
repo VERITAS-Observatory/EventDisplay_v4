@@ -9,10 +9,11 @@ ODIR=OUTDIR
 ONAME=OUTNAME
 RUNP=RUNPARAM
 
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # temporary (scratch) directory
 TEMPDIR=$TMPDIR/ANASUM/
 mkdir -p $TEMPDIR
-
 
 $EVNDISPSYS/bin/anasum   \
 	-f $RUNP             \

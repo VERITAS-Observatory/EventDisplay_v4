@@ -19,6 +19,8 @@ else
 fi
 makedir -p $TEMPDIR
 
+source $EVNDISPSYS/setObservatory.sh VTS
+
 #################################
 # run analysis
 rm -f $ODIR/$BFILE.mscw.log

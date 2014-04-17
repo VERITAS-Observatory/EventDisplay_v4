@@ -10,6 +10,8 @@ MSCWDIR=MSCWDIRECTORY
 VPM=USEVPMPOINTING
 LOGDIR="$ODIR"
 
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # temporary (scratch) directory
 if [[ -n $TMPDIR ]]; then
     TEMPDIR=$TMPDIR/$RUN
