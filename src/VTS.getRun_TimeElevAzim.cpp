@@ -77,10 +77,11 @@ int main( int argc, char* argv[] )
 			case 'r':
 				//cout << "-r detected" << endl;
 				inputmode = IRUN ;
-				if ( ! is_number( optarg ) ) {
-					cout << "Error, argument for -r flag must be an integer, exiting..." << endl;
-					return 1 ;
-				}
+				cout << "optarg: " << optarg << endl;
+				//if ( ! is_number( optarg ) ) {
+				//	cout << "Error, argument for -r flag must be an integer, exiting..." << endl;
+				//	return 1 ;
+				//}
 				inputrun  = atoi( optarg ) ;
 				break ;
 			case 'f':

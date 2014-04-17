@@ -71,11 +71,11 @@ int main( int argc, char* argv[] )
 	bool overwriteFlag = false ;
 	bool maxEventsFlag = false ;
 	unsigned int maxEvents = -1 ;
-	while( ( c = getopt( argc, argv, "a:o:n:hf" ) ) != -1 )
+	while( ( c = getopt( argc, argv, "i:o:n:hf" ) ) != -1 )
 	{
 		switch( c )
 		{
-			case 'a':
+			case 'i':
 				sprintf( INPfname, "%s", optarg ) ;
 				INPfnameStr = INPfname ;
 				break ;
@@ -102,7 +102,7 @@ int main( int argc, char* argv[] )
 	}
 	
 	char examplecmd[150] = "" ;
-	sprintf( examplecmd, "$ %s -a 45538.anasum.root -o mywrittenfile.fits", argv[0] ) ;
+	sprintf( examplecmd, "$ %s -i 45538.anasum.root -o mywrittenfile.fits", argv[0] ) ;
 	
 	if( argc < 5 || helptext )
 	{
@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
 		printf( "   example: \n" );
 		printf( "      %s\n\n", examplecmd ) ;
 		cout << "   Input Arguments are:" << endl;
-		cout << "      -a <fname> : input anasum root file to convert ***" << endl ;
+		cout << "      -i <fname> : input anasum root file to convert ***" << endl ;
 		cout << "      -o <fname> : output fits filename" << endl ;
 		cout << "      -h         : prints help text" << endl << endl;;
 		cout << "   Optional:" << endl;
