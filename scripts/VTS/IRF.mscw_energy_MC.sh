@@ -107,7 +107,7 @@ LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/"
 mkdir -p $LOGDIR
 
 # Job submission script
-SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub.sh"
+SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub"
 
 ######################################################
 # loop over all zenith angles/noise/wobble offsets

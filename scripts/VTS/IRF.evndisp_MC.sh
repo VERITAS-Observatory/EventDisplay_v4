@@ -111,7 +111,7 @@ elif [ $SIMTYPE = "CARE" ]; then
 fi
 
 # Job submission script
-SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub.sh"
+SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
 
 for (( f = 0; f <= $NFILES; f++ )); do
     for ZA in ${ZENITH_ANGLES[@]}; do
@@ -150,7 +150,7 @@ for (( f = 0; f <= $NFILES; f++ )); do
                 fi
                 
                 # increment run number
-                (( $RUNNUM++ ))
+                RUNNUM=$((RUNNUM+1))
             done
         done
     done

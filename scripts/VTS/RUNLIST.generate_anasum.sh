@@ -8,20 +8,20 @@ echo "
 EVNDISP runlist script: generate a VERSION 6 anasum runlist from a simple
 runlist with one run per line
 
-RUNLIST.generate_anasum.sh <run list> <cut set> <background model>
+RUNLIST.generate_anasum.sh <run list> <output dir> <cut set> <background model>
 
 required parameters:
 
     <run list>              simple runlist with a single run number per line
+    
+    <output directory>      location where output anasum list will be written;
+                            file name = <output directory>/<cut set>.anasum.dat
 
     <cut set>               hardcoded cut sets predefined in the script
                             (e.g., soft, moderate, etc.)
     
     <background model>      background model
                             (RE = reflected region, RB = ring background)
-    
-    <output directory>      location where output anasum list will be written;
-                            file name = <output directory>/<cut set>.anasum.dat
     
 --------------------------------------------------------------------------------
 "
@@ -35,10 +35,10 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 
 # Parse command line arguments
 RLIST=$1
-CUTS=$2
-BACKGND=$3
-ODIR=$4
+ODIR=$2
 mkdir -p $ODIR
+CUTS=$3
+BACKGND=$4
 
 # cut definitions (note: $ATM and $VX to be replaced later in the script"
 if [[ $CUTS == *super* ]]; then

@@ -14,12 +14,6 @@ required parameters:
                             this substring
 
 examples:
-    ./RUNLIST.findDBSourceNames.sh GRB111
-    Searching for sources that contain 'GRB111'
-    GRB111005B
-    GRB111029A
-    GRB111225A
-    
     ./RUNLIST.findDBSourceNames.sh PSR
     Searching for sources that contain 'PSR'
     PSR B0355+54
@@ -39,7 +33,6 @@ examples:
     MGRO J1908/SS433 Straddle
     MGROJ1909+06
     MILAGRO C1
-
 
 --------------------------------------------------------------------------------
 "
