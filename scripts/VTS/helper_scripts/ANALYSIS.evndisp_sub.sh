@@ -4,6 +4,9 @@
 #
 # 2014-04-16 (GM) checked
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 RUN=RUNFILE
 CALIB=CALIBRATIONOPTION
@@ -21,9 +24,6 @@ mkdir -p $TEMPDIR
 
 # eventdisplay reconstruction parameter
 ACUTS="EVNDISP.reconstruction.runparameter"
-
-# set the right observatory and environmental variables
-source $EVNDISPSYS/setObservatory.sh VERITAS
 
 #########################################
 # pedestal calculation

@@ -2,6 +2,9 @@
 # script to analyse VTS files using FROGS
 # Author: Gernot Maier
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 RUN=RUNFILE
 CALIB=CALIBRATIONOPTION
@@ -9,8 +12,6 @@ ODIR=OUTPUTDIRECTORY
 MSCWDIR=MSCWDIRECTORY
 VPM=USEVPMPOINTING
 LOGDIR="$ODIR"
-
-source $EVNDISPSYS/setObservatory.sh VTS
 
 # temporary (scratch) directory
 if [[ -n $TMPDIR ]]; then

@@ -5,19 +5,15 @@
 # qsub parameters
 h_cpu=00:29:00; h_vmem=6000M; tmpdir_size=100G
 
-if [ $# -lt 7 ]; then
+if [ $# -lt 5 ]; then
 # begin help message
 echo "
 IRF generation: analyze simulation ROOT files using mscw_energy 
 
-IRF.mscw_energy_MC.sh <input directory> <output directory> <table file> <epoch>
- <atmosphere> <Rec ID> <sim type> [particle]
+IRF.mscw_energy_MC.sh <table file> <epoch> <atmosphere> <Rec ID> <sim type>
+ [particle]
 
 required parameters:
-
-    <input directory>       directory containing MC evndisp ROOT files
-    
-    <output directory>      directory which will store mscw_energy ROOT files
 
     <table file>            mscw_energy lookup table file
     
@@ -53,15 +49,13 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
-INDIR=$1
-ODIR=$2
-TABFILE=$3
+TABFILE=$1
 TABFILE=${TABFILE%%.root}.root
-EPOCH=$4
-ATM=$5
-RECID=$6
-SIMTYPE=$7
-[[ "$8" ]] && PARTICLE=$8 || PARTICLE=1
+EPOCH=$2
+ATM=$3
+RECID=$4
+SIMTYPE=$5
+[[ "$6" ]] && PARTICLE=$6 || PARTICLE=1
 
 # zenith angles/noise/wobble offsets
 if [[ $SIMTYPE == "GRISU" ]]; then
@@ -76,6 +70,10 @@ else
     WOBBLE_OFFSETS=( 0.5 )
 fi
 
+# Particle names
+PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
+PARTICLE_TYPE=${PARTICLE_NAMES[$PARTICLE]}
+
 # Check that table file exists
 if [[ "$TABFILE" == `basename $TABFILE` ]]; then
     TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"
@@ -85,13 +83,28 @@ if [ ! -f "$TABFILE" ]; then
     exit 1
 fi
 
+# input directory containing evndisp_MC products
+if [[ -z $VERITAS_IRF_ANA_DIR ]]; then
+    INDIR="$VERITAS_IRF_ANA_DIR/$EDVERSION/${PARTICLE_TYPE}_${EPOCH}_ATM${ATM}_${SIMTYPE}"
+elif [[ ! -z $VERITAS_IRF_ANA_DIR || ! -d $INDIR ]]; then
+    INDIR="$VERITAS_DATA_DIR/analysis/$EDVERSION/${PARTICLE_TYPE}_${EPOCH}_ATM${ATM}_${SIMTYPE}"
+elif [[ ! -d $INDIR ]]; then
+    echo "Error, could not locate input directory. Locations searched:"
+    echo "$VERITAS_IRF_ANA_DIR/$EDVERSION/${PARTICLE_TYPE}_${EPOCH}_ATM${ATM}_${SIMTYPE}"
+    echo "$VERITAS_DATA_DIR/analysis/$EDVERSION/${PARTICLE_TYPE}_${EPOCH}_ATM${ATM}_${SIMTYPE}"
+    exit 1
+fi
+echo "Input file directory: $INDIR"
+
+# output directory for mscw_energy_MC products
+ODIR="$INDIR/RecID$RECID"
+echo "Output file directory: $ODIR"
+mkdir -p $ODIR
+
 # directory for run scripts
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/"
 mkdir -p $LOGDIR
-
-# output directory for anasum products
-mkdir -p $ODIR
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub.sh"

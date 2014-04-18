@@ -17,4 +17,4 @@
   qsub -q all.q -ckpt user -j y -o /dev/null
 
 # Local parallel execution using GNU parallel
-  parallel -j `grep -ic ^processor /proc/cpuinfo`
+  parallel --no-notice -j `grep -ic ^processor /proc/cpuinfo`

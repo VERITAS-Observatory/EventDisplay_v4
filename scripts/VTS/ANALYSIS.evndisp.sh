@@ -86,7 +86,7 @@ do
     if [[ $SUBC == *qsub* ]]; then
 		
 		# print the job submission output to stdout, while also copying it to QSUBDATA
-                QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat - >&5) ) 
+        QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat - >&5) ) 
 		
 		# get the submitted job's id, after the fact
 		# by looking for "Your job ####### ..."

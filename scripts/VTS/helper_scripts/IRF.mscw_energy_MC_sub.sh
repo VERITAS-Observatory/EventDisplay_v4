@@ -2,6 +2,9 @@
 # script to analyse MC files with lookup tables
 # Author: Gernot Maier
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 INDIR=INPUTDIR
 ODIR=OUTPUTDIR
@@ -14,8 +17,7 @@ EPOCH=ARRAYEPOCH
 PARTICLE=PARTICLETYPE
 SIMTYPE=SIMULATIONTYPE
 RECID=RECONSTRUCTIONID
-
-source $EVNDISPSYS/setObservatory.sh VTS
+TELTOANA="1234"
 
 # file names
 INFILE="${SIMTYPE}_${PARTICLE}_${ZA}deg_${WOBBLE}wob_NOISE${NOISE}_${EPOCH}_ATM${ATM}"

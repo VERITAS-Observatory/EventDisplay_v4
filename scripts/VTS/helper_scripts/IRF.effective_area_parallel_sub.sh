@@ -2,6 +2,9 @@
 # script to calculate effective areas (VERITAS)
 # Author: Gernot Maier
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 RUNPARAMS=RUNPFILE
 OFILE=EAFILENAME

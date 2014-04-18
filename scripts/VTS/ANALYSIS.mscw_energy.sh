@@ -22,7 +22,7 @@ required parameters:
     <table file>            mscw_energy lookup table file
     
 optional parameters:
-Use only when processing files for creating radial acceptances
+(use only when processing files for creating radial acceptances)
     
     [Rec ID]                reconstruction ID
                             (see EVNDISP.reconstruction.runparameter)

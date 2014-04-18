@@ -2,6 +2,7 @@
 # script to analyse laser files 
 # Author: Gernot Maier
 
+# set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS
 
 # parameters replaced by parent script using sed

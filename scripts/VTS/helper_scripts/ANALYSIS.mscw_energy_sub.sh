@@ -2,6 +2,9 @@
 # script to analyse files with lookup tables
 # Author: Gernot Maier
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 TABFILE=TABLEFILE
 RECID=RECONSTRUCTIONID
@@ -18,8 +21,6 @@ else
     TEMPDIR="$VERITAS_USER_DATA_DIR/TMPDIR"
 fi
 makedir -p $TEMPDIR
-
-source $EVNDISPSYS/setObservatory.sh VTS
 
 #################################
 # run analysis

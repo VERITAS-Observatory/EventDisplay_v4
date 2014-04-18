@@ -3,6 +3,9 @@
 # Author: Gernot Maier
 # edited by G Hughes to make summation window a variable
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 RUN=RUNFILE
 PED=PEDESTALS

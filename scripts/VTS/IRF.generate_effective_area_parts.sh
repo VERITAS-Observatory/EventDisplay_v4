@@ -9,22 +9,22 @@ h_cpu=11:29:00; h_vmem=8000M; tmpdir_size=10G
 if [ $# -ne 5 ]; then
 # begin help message
 echo "
-IRF generation: submit jobs from an anasum run list
+IRF generation: create partial effective area files from MC ROOT files
+ (simulations that have been processed by both evndisp_MC and mscw_energy_MC)
 
-IRF.effective_area_parallel.sh <input directory> <cuts file> <epoch> <Rec ID>
+IRF.generate_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID>
  <sim type>
 
 required parameters:
 
-    <input directory>       directory containing processed MC ROOT files
-                            and data file with MC parameters
-        
     <cuts file>             gamma/hadron cuts file
         
     <epoch>                 array epoch (e.g., V4, V5, V6)
                             V4: array before T1 move (before Fall 2009)
                             V5: array after T1 move (Fall 2009 - Fall 2012)
                             V6: array after camera update (after Fall 2012)
+                            
+    <atmosphere>            atmosphere model (21 = winter, 22 = summer)
     
     <Rec ID>                reconstruction ID
                             (see EVNDISP.reconstruction.runparameter)
@@ -45,9 +45,9 @@ bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
-INDIR=$1
-CUTSFILE=$2
-EPOCH=$3
+CUTSFILE=$1
+EPOCH=$2
+ATM=$3
 RECID=$4
 SIMTYPE=$5
 
@@ -67,6 +67,8 @@ fi
 
 # Check that cuts file exists
 CUTSFILE=${CUTSFILE%%.dat}
+CUTS_NAME=`basename $CUTSFILE`
+CUTS_NAME=${CUTS_NAME##ANASUM.GammaHadron.}
 if [[ "$CUTSFILE" == `basename $CUTSFILE` ]]; then
     CUTSFILE="$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/$CUTSFILE.dat"
 else
@@ -77,22 +79,39 @@ if [ ! -f "$CUTSFILE" ]; then
     exit 1
 fi
 
+# input directory containing mscw_energy_MC products
+if [[ -z $VERITAS_IRF_ANA_DIR ]]; then
+    INDIR="$VERITAS_IRF_ANA_DIR/$EDVERSION/gamma_${EPOCH}_ATM${ATM}_${SIMTYPE}/RecID${RECID}"
+elif [[ ! -z $VERITAS_IRF_ANA_DIR || ! -d $INDIR ]]; then
+    INDIR="$VERITAS_DATA_DIR/analysis/$EDVERSION/gamma_${EPOCH}_ATM${ATM}_${SIMTYPE}/RecID${RECID}"
+elif [[ ! -d $INDIR ]]; then
+    echo "Error, could not locate input directory. Locations searched:"
+    echo "$VERITAS_IRF_ANA_DIR/$EDVERSION/gamma_${EPOCH}_ATM${ATM}_${SIMTYPE}/RecID${RECID}"
+    echo "$VERITAS_DATA_DIR/analysis/$EDVERSION/gamma_${EPOCH}_ATM${ATM}_${SIMTYPE}/RecID${RECID}"
+    exit 1
+fi
+echo "Input file directory: $INDIR"
+
+# Output file directory
+if [[ -z $VERITAS_IRF_ANA_DIR ]]; then
+    ODIR="$VERITAS_IRF_ANA_DIR/$EDVERSION/EffectiveAreas/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}/$CUTS_NAME"
+else
+    ODIR="$VERITAS_DATA_DIR/analysis/$EDVERSION/EffectiveAreas/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}/$CUTS_NAME"
+fi
+echo "Output file directory: $ODIR"
+mkdir -p $ODIR
+
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA"
 mkdir -p $LOGDIR
 
-# Output file directory
-ODIR="$VERITAS_EVNDISP_AUX_DIR/EffectiveAreas/$DATE"
-mkdir -p $ODIR
-echo "Writing results to $ODIR"
-
 # copy cuts file to log directory
-cp "$CUTSFILE.dat" "$LOGDIR/$CUTSFILE.dat"
+cp "$CUTSFILE" "$LOGDIR/$CUTSFILE"
 
 #################################
 # template string containing the name of processed simulation root file
-TFILE='gamma_${ZANGLE}deg_750m_w${WOBBLE}_ID${RECID}_ana${EPOCH}_NOISE${NLEVEL}_${SIMID}.root'
+TFILE='gamma_${ZA}deg_750m_w${WOBBLE}_ID${RECID}_ana${EPOCH}_NOISE${NLEVEL}_${SIMID}.root'
 
 # parameter file template which will be filled inside the for loops
 read -r -d '' PARAMFILE << 'PARAMFILECONTENTS'
@@ -104,7 +123,7 @@ read -r -d '' PARAMFILE << 'PARAMFILECONTENTS'
 * ENERGYSPECTRUMINDEX 40 1.5 0.1
 * FILLMONTECARLOHISTOS 0
 * SHAPECUTINDEX 0
-* CUTFILE $LOGDIR/$CUTSFILE.dat
+* CUTFILE $LOGDIR/$CUTSFILE
 * SIMULATIONFILE_DATA $MCFILE
 PARAMFILECONTENTS
 

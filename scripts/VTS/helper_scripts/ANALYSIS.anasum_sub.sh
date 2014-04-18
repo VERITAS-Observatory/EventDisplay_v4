@@ -2,6 +2,9 @@
 # script to analyse files with anasum
 # Author: Gernot Maier
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 FLIST=FILELIST
 INDIR=DATADIR
@@ -9,12 +12,11 @@ ODIR=OUTDIR
 ONAME=OUTNAME
 RUNP=RUNPARAM
 
-source $EVNDISPSYS/setObservatory.sh VTS
-
 # temporary (scratch) directory
 TEMPDIR=$TMPDIR/ANASUM/
 mkdir -p $TEMPDIR
 
+# run anasum
 $EVNDISPSYS/bin/anasum   \
 	-f $RUNP             \
 	-l $FLIST            \

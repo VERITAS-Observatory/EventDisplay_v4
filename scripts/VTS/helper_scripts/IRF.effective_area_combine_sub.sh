@@ -2,6 +2,9 @@
 # script to combine effective areas
 # Author: Gernot Maier
 
+# set observatory environmental variables
+source $EVNDISPSYS/setObservatory.sh VTS
+
 # parameters replaced by parent script using sed
 EAFILES=INPUTFILES
 OFILE=OUTPUTFILE
