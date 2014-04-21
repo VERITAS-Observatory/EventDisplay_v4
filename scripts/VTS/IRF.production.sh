@@ -39,7 +39,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -50,6 +50,16 @@ IRFTYPE=$3
 [[ "$5" ]] && ATMOS=$5 || ATMOS="21 22"
 [[ "$6" ]] && RECID=$6 || RECID="0 1 2 3 4"
 [[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
+
+# Run sims through evndisp and mscw_energy
+bash $(dirname "$0")"/IRF.evndisp_MC.sh $SIMDIR $EPOCH $ATMOS $SIMTYPE"
+sleep 60    # wait for scripts to be submitted
+while JOBS_REMAINING=`qstat -u $USER | grep evndisp_MC | wc -l`
+      echo $JOBS_REMAINING
+      [[ $JOBS_REMAINING > 0 ]]; do
+        
+    sleep 60
+
 
 # Set cuts
 if [[ $CUTSLISTFILE != "" ]]; then

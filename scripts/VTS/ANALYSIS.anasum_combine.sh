@@ -21,7 +21,7 @@ required parameters:
         
     <run parameter file>    anasum run parameter file
                             (in \$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/;
-                             see ANASUM.runparameter.dat for an example)
+                             see ANASUM.runparameter for an example)
 
 IMPORTANT! Run only after all ANALYSIS.anasum_parallel.sh jobs have finished!
 

@@ -160,7 +160,7 @@ for RUN_ID in ${RUN_IDS[@]}; do
         if [[ $USEFROGS != "1" ]]; then
             echo "Calculating average tzeros for run $RUNNUM"
             rm -f $ODIR/$RUNNUM.tzero.log
-            $EVNDISPSYS/bin/evndisp -runmode=7 -sourcetype=2 -sourcefile $VBF_FILE -teltoana=$TELTOANA -runnumber=$RUNNUM -deadchannelfile $DEAD -arraycuts $ACUT -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==50000 $PEDOPT -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.tzero.log
+            $EVNDISPSYS/bin/evndisp -runmode=7 -sourcetype=2 -sourcefile $VBF_FILE -teltoana=$TELTOANA -runnumber=$RUNNUM -deadchannelfile $DEAD -arraycuts $ACUT -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==100000 $PEDOPT -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.tzero.log
         fi
     elif [[ $SIMTYPE = "CARE" ]]; then
         ### eventdisplay CARE run options
@@ -179,7 +179,7 @@ for RUN_ID in ${RUN_IDS[@]}; do
         if [[ $USEFROGS == "1" ]]; then
             $EVNDISPSYS/bin/evndisp -runnumber=$RUNNUM -nevents=$NEVENTS -firstevent=$FIRSTEVENT -sourcefile $VBF_FILE -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -teltoana=$TELTOANA $FROGS $MCOPT $PEDOPT -calibrationdirectory $ODIR &> $ODIR/$ONAME.log
         else
-            $EVNDISPSYS/bin/evndisp -runnumber=$RUNNUM -writenomctree -sourcefile $VBF_FILE -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -teltoana=$TELTOANA $MCOPT $PEDOPT -calibrationdirectory $ODIR &> $ODIR/$ONAME.log
+            $EVNDISPSYS/bin/evndisp -runnumber=$RUNNUM -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -teltoana=$TELTOANA $MCOPT $PEDOPT -calibrationdirectory $ODIR -lowgaincalibrationfile NOFILE &> $ODIR/$ONAME.log
         fi
     elif [[ $SIMTYPE = "CARE" ]]; then
         $EVNDISPSYS/bin/evndisp -runnumber=$RUNNUM -sourcefile $VBF_FILE -deadchannelfile $DEAD -outputfile $DDIR/$ONAME.root -teltoana=$TELTOANA $MCOPT $PEDOPT $OPT &> $ODIR/$ONAME.log

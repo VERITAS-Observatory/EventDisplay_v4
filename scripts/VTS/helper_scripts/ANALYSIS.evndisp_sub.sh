@@ -29,10 +29,7 @@ ACUTS="EVNDISP.reconstruction.runparameter"
 # pedestal calculation
 if [[ $CALIB == "1" || $CALIB == "2" ]]; then
     rm -f $LOGDIR/$RUN.ped.log
-    $EVNDISPSYS/bin/evndisp \
-		-runnumber=$RUN     \
-		-runmode=1          \
-		&> $LOGDIR/$RUN.ped.log
+    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=1 &> $LOGDIR/$RUN.ped.log
 	echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
@@ -62,11 +59,7 @@ OPT="-readCalibDB"
 # average tzero calculation
 if [[ $CALIB == "1" || $CALIB == "3" ]]; then
     rm -f $LOGDIR/$RUN.tzero.log
-    $EVNDISPSYS/bin/evndisp \
-		-runnumber=$RUN     \
-		-runmode=7          \
-		$OPT                \
-		&> $LOGDIR/$RUN.tzero.log
+    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 $OPT &> $LOGDIR/$RUN.tzero.log
 	echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"
 fi
 
@@ -90,12 +83,7 @@ fi
 #########################################
 # run eventdisplay
 rm -f $LOGDIR/$RUN.log
-$EVNDISPSYS/bin/evndisp             \
-	-runnumber=$RUN                 \
-	-reconstructionparameter $ACUTS \
-	-outputfile $TEMPDIR/$RUN.root  \
-	$OPT                            \
-	&> $LOGDIR/$RUN.log
+$EVNDISPSYS/bin/evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root $OPT &> $LOGDIR/$RUN.log
 echo "RUN$RUN EVNLOG $LOGDIR/$RUN.log"
 
 # move data file from tmp dir to data dir

@@ -108,9 +108,8 @@ do
 
     # run locally or on cluster
     SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
+    SUBC=`eval "echo \"$SUBC\""`
     if [[ $SUBC == *qsub* ]]; then
-        SUBC=`eval "echo \"$SUBC\""`
-		
 		# print the job submission output to stdout, while also copying it to QSUBDATA
         QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat ->&5) )
 		

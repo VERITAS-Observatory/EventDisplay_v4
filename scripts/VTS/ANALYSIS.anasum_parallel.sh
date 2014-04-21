@@ -23,7 +23,7 @@ required parameters:
 
     <run parameter file>    anasum run parameter file
                             (in \$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/;
-                             see ANASUM.runparameter.dat for an example)
+                             see ANASUM.runparameter for an example)
 
 IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 
@@ -118,7 +118,6 @@ for ((i=1; i <= $NLINES; i++)); do
         SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
         SUBC=`eval "echo \"$SUBC\""`
         if [[ $SUBC == *qsub* ]]; then
-			
 			# print the job submission output to stdout, while also copying it to QSUBDATA
             QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat - >&5) )
 			

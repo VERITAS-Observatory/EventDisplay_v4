@@ -103,7 +103,6 @@ do
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
     fi
-	echo
 done
 
 # Execute all FSCRIPTs locally in parallel
