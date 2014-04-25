@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140425 (GM)
+bug fix in plotting of cumulative significance: alpha was calculated incorrectly
+(cumulative significance were wrong for analysis with mixed alphas)
+
 * 20140415 (GM, HF)
 fix of a severe bug: relative gain calculations where completely wrong since Jun 27th 2013 
 (wrong pedestals values are used); requires recalculation of all relative gains since this date

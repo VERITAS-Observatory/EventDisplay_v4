@@ -511,6 +511,7 @@ void VPlotRunSummary::fill()
 	// now loop over all runs
 	// need additional counter because of skipped runs
 	int t = 0;
+        int t_f = 0;
 	bool fSetRunRange = false;
 	if( fMinRun < 0 )
 	{
@@ -521,7 +522,6 @@ void VPlotRunSummary::fill()
 	double cum_Noff = 0.;
 	double cum_alpha = 0.;
 	double cum_t = 0.;
-	double cum_N = 0.;
 	
 	bool bBreak = false;
 	
@@ -566,11 +566,12 @@ void VPlotRunSummary::fill()
 		// exclude runs with 0 rate and no error on rate
 		if( c->runOn > 0 && !( TMath::Abs( c->Rate ) < 1.e-5 && TMath::Abs( c->RateE ) < 1.e-5 ) )
 		{
-			cout << c->runOn << " " << c->Rate << " " << c->RateE;
-			cout << "\t" << c->elevationOn;
-			cout << "\t" << sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest );
+			cout << "Run " << c->runOn << ": rate " << c->Rate << " +- " << c->RateE << " g/min";
+			cout << ", elevation: " << c->elevationOn;
+			cout << ", wobble: " << sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest );
+                        cout << ", alpha: " << c->OffNorm;
 			cout << endl;
-			// 1D histgrams
+			// 1D histograms
 			hRate->Fill( c->Rate );
 			hSignificance->Fill( c->Signi );
 			hPedvars->Fill( c->pedvarsOn );
@@ -593,14 +594,22 @@ void VPlotRunSummary::fill()
 			gSignificancevsTime->SetPointError( t, 0., 0. );
 			
 			// cumulative significance vs time
-			cum_Non += c->NOn;
-			cum_Noff += c->NOff;
-			cum_alpha += c->OffNorm;
-			cum_t += c->tOn;
-			cum_N++;
-			
-			gCumSignificancevsTime->SetPoint( t, cum_t / 60., VStatistics::calcSignificance( cum_Non, cum_Noff, cum_alpha / cum_N ) );
-			gCumSignificancevsTime->SetPointError( t, 0., 0. );
+                        if( c->OffNorm > 0 )
+                        {
+                            cum_Non += c->NOn;
+                            cum_Noff += c->NOff;
+                            cum_alpha += c->OffNorm * c->NOff;
+                            cum_t += c->tOn;
+                            
+                            if( cum_Noff > 0. )
+                            {
+                                gCumSignificancevsTime->SetPoint( t_f, cum_t / 60., VStatistics::calcSignificance( cum_Non, cum_Noff, cum_alpha / cum_Noff  ) );
+                                gCumSignificancevsTime->SetPointError( t_f, 0., 0. );
+                                cout << "\t cumulative numbers: non: " << cum_Non << ", noff: " << cum_Noff << ", alpha: " << cum_alpha / cum_Noff;
+                                cout << ", time " << cum_t << ", significance " << VStatistics::calcSignificance( cum_Non, cum_Noff, cum_alpha / cum_Noff ) << endl;
+                                t_f++;
+                            }
+                        }
 			
 			// wobble direction plots
 			int iAng = ( int )( sqrt( c->WobbleNorth * c->WobbleNorth + c->WobbleWest * c->WobbleWest ) * 20. + 0.5 );
@@ -1503,6 +1512,10 @@ TCanvas* VPlotRunSummary::plot_ratevsElevation( bool iOff )
 }
 
 
+/*
+ * plot cumulative significance vs time
+ *
+ */
 TCanvas* VPlotRunSummary::plot_cumSignificance()
 {
 	if( bIsZombie )

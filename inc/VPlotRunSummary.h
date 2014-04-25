@@ -138,6 +138,7 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
 		}
 		void makeNewPhaseRunList( string ifile, string ilist );
 		TCanvas* plot_stats();
+                TCanvas* plot_cumulativeSignificance_vs_time() { return plot_cumSignificance(); }
 		TCanvas* plot_cumSignificance();
 		TCanvas* plot_dailyRates( bool iDeadTimeCorrection = false );
 		TCanvas* plot_rates( bool iOff = false );
@@ -161,6 +162,6 @@ class VPlotRunSummary : public VPlotUtilities, public TObject
 		void writeRunTable();
 		void writeRunTable( string iout, bool iPhases = false, bool iSignificancePerHour = false, bool iCorrectForDeadTimes = false );
 		
-		ClassDef( VPlotRunSummary, 1 );
+		ClassDef( VPlotRunSummary, 2 );
 };
 #endif

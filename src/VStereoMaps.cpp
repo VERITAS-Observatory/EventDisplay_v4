@@ -333,9 +333,10 @@ bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun,
 
     simple box smoothing
 
+    i_MeanSignalBackgroundAreaRatio = ratio of signal to background area (e.g. for energy dependent theta2 cut)
+
 */
-void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, double i_weight,
-		double thetaCutMax, double i_MeanSignalBackgroundAreaRatio )
+void VStereoMaps::makeTwoDStereo_BoxSmooth( double i_xderot, double i_yderot, double i_weight, double thetaCutMax, double i_MeanSignalBackgroundAreaRatio )
 {
 	// fill uncorrelated maps
 	// (only events which fall directly in this bin are counted)

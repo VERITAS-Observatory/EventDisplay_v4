@@ -381,8 +381,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	fMap->setRegionToExclude( fRunPara->fExclusionRegions );
 	fMap->setNoSkyPlots( fNoSkyPlots );
 	fMap->setRunList( fRunPara->fRunList[fHisCounter] );
-	fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, fHisto[fHisCounter]->hmap_alpha,
-						 fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
+	fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, fHisto[fHisCounter]->hmap_alpha, fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
 						 
 	fMapUC->setData( fDataRun );
 	fMapUC->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
@@ -1103,7 +1102,6 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 			{
 				for( int j = 1; j <= halpha_off->GetNbinsY(); j++ )
 				{
-					// loop over all sky maps
 					if( hmap_stereo_off->GetBinContent( i, j ) > 0. )
 					{
 						hmap_alphaNorm->SetBinContent( i, j, halpha_off->GetBinContent( i, j ) / hmap_stereo_off->GetBinContent( i, j ) );
@@ -1122,7 +1120,7 @@ void VStereoAnalysis::scaleAlpha( double inorm, TH2D* halpha_on, TH2D* h_ON, TH2
 /*!
  *   combine histograms from all runs
  *
- *   calculate combined normalisation factor for sigificance calculation
+ *   calculate combined normalisation factor for significance calculation
  */
 double VStereoAnalysis::combineHistograms()
 {
@@ -1136,6 +1134,7 @@ double VStereoAnalysis::combineHistograms()
 	
 	iDir->cd();
 	
+        ///////////////////////////////////////////////////
 	// loop over all runs (= all available histograms)
 	for( unsigned h = 0; h < n_histo; h++ )
 	{
@@ -1178,6 +1177,7 @@ double VStereoAnalysis::combineHistograms()
 				if( fHisto[h]->hmap_alpha_off && fHisto[h]->hmap_alpha_off->GetBinContent( i, j ) > 0. )
 				{
 					fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
+                                        // divide later by total number of off events
 					fHistoTot->hmap_alpha->SetBinContent( i, j, 1. / fHisto[h]->hmap_alpha->GetBinContent( i, j )*fHisto[h]->hmap_stereo->GetBinContent( i, j )
 														  + fHistoTot->hmap_alpha->GetBinContent( i, j ) );
 				}
@@ -1185,7 +1185,7 @@ double VStereoAnalysis::combineHistograms()
 		}
 		fHisto[h]->deleteSkyPlots();
 		iDir->cd();
-	}
+	}  // (end loop over all histograms)
 	
 	// combine parameter (1D) histograms
 	for( unsigned int h = 0; h < n_histo; h++ )
