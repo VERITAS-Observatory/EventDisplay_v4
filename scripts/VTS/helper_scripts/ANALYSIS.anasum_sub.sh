@@ -17,7 +17,12 @@ TEMPDIR=$TMPDIR/ANASUM/
 mkdir -p $TEMPDIR
 
 # run anasum
-$EVNDISPSYS/bin/anasum -f $RUNP -l $FLIST -d $INDIR -o $ODIR/$ONAME.root &> $ODIR/$ONAME.log
+$EVNDISPSYS/bin/anasum   \
+    -f $RUNP             \
+    -l $FLIST            \
+    -d $INDIR            \
+    -o $ODIR/$ONAME.root \
+    &> $ODIR/$ONAME.log
 echo "RUN`basename $ONAME .anasum` ANASUMLOG $ODIR/$ONAME.log"
 echo "RUN`basename $ONAME .anasum` DATAOUT $ODIR/$ONAME.root"
 

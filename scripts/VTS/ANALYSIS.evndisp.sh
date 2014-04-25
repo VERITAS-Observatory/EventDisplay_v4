@@ -12,7 +12,7 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP data analysis: submit jobs from a simple run list
 
-ANALYSIS.evndisp.sh <runlist> <output directory> [calibration] [VPM]
+ANALYSIS.evndisp.sh <runlist> <output directory> [calibration] [VPM] [mscw directory]
 
 required parameters:
 
@@ -29,6 +29,10 @@ optional parameters:
 
     [VPM]                   set to 0 to switch off (default is on)
     
+    [mscw directory]        directory which contains mscw_energy files
+                            only used by frogs analysis, and 
+                            only if \$USEFROGS=true
+
 --------------------------------------------------------------------------------
 "
 #end help message
@@ -48,7 +52,13 @@ RLIST=$1
 ODIR=$2
 mkdir -p $ODIR
 [[ "$3" ]] && CALIB=$3 || CALIB=1
-[[ "$4" ]] && VPM=$4 || VPM=1
+[[ "$4" ]] && VPM=$4   || VPM=1
+
+if [ $USEFROGS ] ; then
+    [[ "$5" ]] && FROGSMSCWDIR="$5"
+else
+    [[ "$5" ]] && FROGSMSCWDIR="EMPTY-set_in_ANALYSIS.evndisp.sh"
+fi
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -72,9 +82,10 @@ do
     echo "Now starting run $AFILE"
     FSCRIPT="$LOGDIR/EVN.data-$AFILE"
 
-    sed -e "s|RUNFILE|$AFILE|" \
-        -e "s|CALIBRATIONOPTION|$CALIB|" \
-        -e "s|OUTPUTDIRECTORY|$ODIR|" \
+    sed -e "s|RUNFILE|$AFILE|"              \
+        -e "s|CALIBRATIONOPTION|$CALIB|"    \
+        -e "s|OUTPUTDIRECTORY|$ODIR|"       \
+        -e "s|MSCWDIRECTORY|$FROGSMSCWDIR|" \
         -e "s|USEVPMPOINTING|$VPM|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh

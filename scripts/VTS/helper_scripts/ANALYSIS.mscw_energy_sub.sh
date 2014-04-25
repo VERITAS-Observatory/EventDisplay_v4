@@ -27,7 +27,12 @@ mkdir -p $TEMPDIR
 rm -f $ODIR/$BFILE.mscw.log
 cp -f -v $INFILE $TEMPDIR
 
-$EVNDISPSYS/bin/mscw_energy -tablefile $TABFILE -arrayrecid=$RECID -inputfile $TEMPDIR/$BFILE.root -writeReconstructedEventsOnly=1 &> $ODIR/$BFILE.mscw.log
+$EVNDISPSYS/bin/mscw_energy         \
+    -tablefile $TABFILE             \
+    -arrayrecid=$RECID              \
+    -inputfile $TEMPDIR/$BFILE.root \
+    -writeReconstructedEventsOnly=1 \
+    &> $ODIR/$BFILE.mscw.log
 
 # move output file from scratch and clean up
 cp -f -v $TEMPDIR/$BFILE.mscw.root $ODIR/$BFILE.mscw.root
