@@ -11,8 +11,12 @@ CWD=$PWD
 # put this in a new directory,                    #
 # add your runlist file to that directory,        #
 # edit the settings below, then use the commands  #
-# 'evndisp', 'mscw', 'anpar', and 'anmer' to      #
-# run stages of the analysis                      #
+# $ sci [evndisp|mscw|anpar|anmer]                #
+# to run stages of the analysis,                  #
+# $ sci jobs                                      #
+# to see currently running jobs, and              #
+# $ sci [evndisp|mscw|anpar|anmer] check          #
+# to check the results of each stage for errors   #
 ###################################################
 
 #############################################################################
@@ -102,6 +106,18 @@ EFDATE2="20131115"
 
 BINNAME="$0"
 if [[ $# < 1 || ! $1 =~ (evndisp|mscw|anpar|anmer|jobs|kill) ]] ; then 
+    echo "
+HOW DO I USE THIS ?                             
+   1. Put this script in a new directory,                    
+   2. Add your runlist file to that directory,        
+   3. Edit the ANALYSIS SETTINGS within this file,
+   4. Run commands:
+        Run stages of the analysis:
+        $ sci [evndisp|mscw|anpar|anmer]                
+        See currently running jobs:
+        $ sci jobs                                      
+        Check the results of each stage for errors
+        $ sci [evndisp|mscw|anpar|anmer] check"
 	echo ; echo "Include a stage (evndisp, mscw, anpar, anmer) please, (optional 'check' afterwards)"
 	echo " $ $BINNAME evndisp         # run the 'event display' stage"
 	echo " $ $BINNAME evndisp check   # after evndisp, check its log and datafiles for problems"
@@ -109,7 +125,7 @@ if [[ $# < 1 || ! $1 =~ (evndisp|mscw|anpar|anmer|jobs|kill) ]] ; then
 	echo " $ $BINNAME mscw check      # after mscw, check its log and datafiles for problems"
 	echo " $ $BINNAME anpar           # run the 'anasum parallel' stage"
 	echo " $ $BINNAME anpar check     # after anpar, check its log and datafiles for problems"
-	echo " $ $BINNAME anmer           # merge the anasum parallel files "
+	echo " $ $BINNAME anmer           # merge the anasum parallel files to one anasum file"
 	echo "Or, a command:"
 	echo "  $ $BINNAME jobs   # show progress of all of this project's jobs, updating every 90 seconds, and block until jobs are done"
 	echo "  $ $BINNAME kill   # halt all this project's jobs"
