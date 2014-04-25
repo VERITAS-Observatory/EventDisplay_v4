@@ -1956,10 +1956,6 @@ bool VEffectiveAreaCalculator::fill( TH1D* hE0mc, CData* d,
 				fYoff_derot_aC = d->Yoff_derot;
 				fErec = eRecLin;
 				fEMC  = d->MCe0;
-				if( i < 1000 )
-				{
-					std::cout << "LUCIE  getMCSolidAngleNormalization() " << getMCSolidAngleNormalization() << std::endl;
-				}
 				fCRweight = getCRWeight( d->MCe0, hVEmc[0][az_bin_index] , true ); //So that the acceptance can be normalised to the CR spectrum.
 				// when running on gamma, this should return 1.
 				fAcceptance_AfterCuts_tree->Fill();
