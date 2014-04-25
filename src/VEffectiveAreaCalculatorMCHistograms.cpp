@@ -78,13 +78,13 @@ void VEffectiveAreaCalculatorMCHistograms::print()
 	
 	for( unsigned int i = 0; i < fVSpectralIndex.size(); i++ )
 	{
-		cout << "\tSpectral index: " << fVSpectralIndex[i] << endl;
+		cout << "\tSpectral index (bin " << i << "): " << fVSpectralIndex[i] << endl;
 		
 		for( unsigned int j = 0; j < fVMinAz.size(); j++ )
 		{
 			if( getHistogram_Emc( j, i ) && getHistogram_Emc( j, i )->GetEntries() > 0 )
 			{
-				cout << "\tAzimuth bin: [" << fVMinAz[j] << ", " << fVMaxAz[j] << "]";
+				cout << "\tAzimuth (bin " << j << "): [" << fVMinAz[j] << ", " << fVMaxAz[j] << "]";
 				cout << "\tEntries (MC): " << getHistogram_Emc( j, i )->GetEntries();
 				if( getHistogram_EmcWeight( j, i ) && getHistogram_EmcWeight( j, i )->GetEntries() > 0 )
 				{
