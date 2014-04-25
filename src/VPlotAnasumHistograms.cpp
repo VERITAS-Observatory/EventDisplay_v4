@@ -2551,25 +2551,35 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 		{
 			hsig_1D->Fit( fG, "Q" );
 			hsig_1D->Fit( "gaus", "Q" );
-			hsig_1D->GetFunction( "gaus" )->SetLineColor( 8 );
-			hsig_1D->GetFunction( "gaus" )->SetLineStyle( 2 );
-			hsig_1D->GetFunction( "gaus" )->Draw( "same" );
-			fG->Draw( "same" );
-			cout << "RUN " << getRunList()[i].runnumber;
-			cout << " ,fit results: mean " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 1 );
-			cout << " +- " << setprecision( 4 ) << hsig_1D->GetFunction( "gaus" )->GetParError( 1 );
-			cout << ", RMS " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 2 );
-			cout << " +- " << setprecision( 4 ) <<  hsig_1D->GetFunction( "gaus" )->GetParError( 2 );
-			cout << ", probability " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetProb();
-			cout << ", Chi2/N " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetChisquare() / hsig_1D->GetFunction( "gaus" )->GetNDF();
-			cout << endl;
+                        cout << "RUN " << getRunList()[i].runnumber;
+                        if( hsig_1D->GetFunction( "gaus" ) )
+                        {
+                            hsig_1D->GetFunction( "gaus" )->SetLineColor( 8 );
+                            hsig_1D->GetFunction( "gaus" )->SetLineStyle( 2 );
+                            hsig_1D->GetFunction( "gaus" )->Draw( "same" );
+                            fG->Draw( "same" );
+                            cout << " ,fit results: mean " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 1 );
+                            cout << " +- " << setprecision( 4 ) << hsig_1D->GetFunction( "gaus" )->GetParError( 1 );
+                            cout << ", RMS " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetParameter( 2 );
+                            cout << " +- " << setprecision( 4 ) <<  hsig_1D->GetFunction( "gaus" )->GetParError( 2 );
+                            cout << ", probability " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetProb();
+                            cout << ", Chi2/N " << setprecision( 3 ) << hsig_1D->GetFunction( "gaus" )->GetChisquare() / hsig_1D->GetFunction( "gaus" )->GetNDF();
+                            cout << endl;
+                        }
+                        else
+                        {
+                            cout << ", error retrieving fit function" << endl;
+                        }
 		}
-		TLine* iM = new TLine( hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmin(),
-							   hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmax() );
-		iM->SetLineStyle( 2 );
-		iM->SetLineColor( 3 );
-		iM->Draw();
-		hsig_1D->Draw( "e hist same" );
+                if( hsig_1D->GetFunction( "gaus" ) )
+                {
+                    TLine* iM = new TLine( hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmin(),
+                                                               hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ), hsig_1D->GetYaxis()->GetXmax() );
+                    iM->SetLineStyle( 2 );
+                    iM->SetLineColor( 3 );
+                    iM->Draw();
+                }
+                hsig_1D->Draw( "e hist same" );
 		hsig_1DAll->Draw( "e hist same" );
 		
 		// run number
@@ -2577,7 +2587,7 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 		
 		gPad->Update();
 		
-		if( hsig_1D->GetEntries() > 0 )
+		if( hsig_1D->GetEntries() > 0 && hsig_1D->GetFunction( "gaus" ) )
 		{
 			hFit_mean->Fill( hsig_1D->GetFunction( "gaus" )->GetParameter( 1 ) );
 			hFit_width->Fill( hsig_1D->GetFunction( "gaus" )->GetParameter( 2 ) );
@@ -2611,6 +2621,9 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 	TLine* lFitRMS = new TLine( 1., 0., 1., hFit_width->GetMaximum() );
 	lFitRMS->SetLineStyle( 2 );
 	lFitRMS->Draw();
+
+        // reset run number
+        setRunNumber( -1 );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
