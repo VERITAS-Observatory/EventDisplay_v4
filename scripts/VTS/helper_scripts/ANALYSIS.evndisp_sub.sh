@@ -96,6 +96,8 @@ if [ $USEFROGS ] ; then
     OPT+=( -frogs $MSCWDIR/$RUN.mscw.root -frogid 0 )
 fi
 
+OPT+=( -nevents=2000 )
+
 #########################################
 # run eventdisplay
 rm -f $LOGDIR/$RUN.log

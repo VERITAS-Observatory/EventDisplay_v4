@@ -23,7 +23,7 @@ $EVNDISPSYS/bin/anasum   \
     -d $INDIR            \
     -o $ODIR/$ONAME.root \
     &> $ODIR/$ONAME.log
-echo "RUN`basename $ONAME .anasum` ANASUMLOG $ODIR/$ONAME.log"
+echo "RUN`basename $ONAME .anasum` ANPARLOG $ODIR/$ONAME.log"
 echo "RUN`basename $ONAME .anasum` DATAOUT $ODIR/$ONAME.root"
 
 exit
