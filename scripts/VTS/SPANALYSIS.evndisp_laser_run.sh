@@ -62,7 +62,7 @@ fi
 OPT="-runmode=$RUNMODE -runnumber=$RUNNUM -lasermin=$LASERMIN -calibrationsumwindow=18 -calibrationsumfirst=2 -reconstructionparameter EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 
 # calculate pedestals (for high gain only)
-if [[ RUNMODE == 2 ]]; then
+if [[ $RUNMODE == 2 ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     $EVNDISPSYS/scripts/VTS/SPANALYSIS.evndisp_pedestal_events.sh $RUNNUM
 fi

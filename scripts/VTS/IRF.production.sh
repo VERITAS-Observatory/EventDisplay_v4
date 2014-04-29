@@ -1,22 +1,20 @@
 #!/bin/bash
 # IRF production script (VERITAS)
+#
 
-if [ $# -lt 3 ]; then
+if [ $# -lt 2 ]; then
 # begin help message
 echo "
 IRF generation: produce a full set of instrument response functions (IRFs)
 
-IRF.production.sh <sim directory> <sim type> <IRF type> [epoch] [atmosphere]
- [Rec ID] [cuts list file]
+IRF.production.sh <sim type> <IRF type> [epoch] [atmosphere] [Rec ID] [cuts list file] [sim directory]
 
 required parameters:
 
-    <sim directory>         directory containing simulation VBF files
-    
     <sim type>              original VBF file simulation type (e.g. GRISU, CARE)
     
     <IRF type>              type of instrument response function to produce
-                            (e.g. TABLE, EFFECTIVEAREA, RADIALACCEPTANCE)
+                            (e.g. EVNDISP, MAKETABLES, ANALYSETABLES, EFFECTIVEAREA, RADIALACCEPTANCE)
     
 optional parameters:
     
@@ -32,6 +30,8 @@ optional parameters:
     [cuts list file]        file containing one gamma/hadron cuts file per line
                             (default: hard-coded standard EventDisplay cuts)
 
+    [sim directory]         directory containing simulation VBF files
+
 --------------------------------------------------------------------------------
 "
 #end help message
@@ -43,25 +43,39 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
-SIMDIR=$1
-SIMTYPE=$2
-IRFTYPE=$3
-[[ "$4" ]] && EPOCH=$4 || EPOCH="V4 V5 V6"
-[[ "$5" ]] && ATMOS=$5 || ATMOS="21 22"
-[[ "$6" ]] && RECID=$6 || RECID="0 1 2 3 4"
-[[ "$7" ]] && CUTSLISTFILE=$7 || CUTSLISTFILE=""
+SIMTYPE=$1
+IRFTYPE=$2
+[[ "$3" ]] && EPOCH=$3 || EPOCH="V4 V5 V6"
+[[ "$4" ]] && ATMOS=$4 || ATMOS="21 22"
+[[ "$5" ]] && RECID=$5 || RECID="0 1 2 3 4"
+[[ "$6" ]] && CUTSLISTFILE=$6 || CUTSLISTFILE=""
+[[ "$7" ]] && SIMDIR=$7 || SIMDIR=""
 
-# Run sims through evndisp and mscw_energy
-bash $(dirname "$0")"/IRF.evndisp_MC.sh $SIMDIR $EPOCH $ATMOS $SIMTYPE"
-sleep 60    # wait for scripts to be submitted
-while JOBS_REMAINING=`qstat -u $USER | grep evndisp_MC | wc -l`
-      echo $JOBS_REMAINING
-      [[ $JOBS_REMAINING > 0 ]]; do
-        
-    sleep 60
+# simulation types and definition of parameter space
+# (todo: remove some of the analysis derived values (e.g. pedvars)
+if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+    # GrISU simulation parameters
+    ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
+    NSB_LEVELS=( 075 100 150 200 250 325 425 550 750 1000 )
+    PEDVAR_LEVELS=( 336 382 457 524 579 659 749 850 986 1138 )        # sumwindow = 6 (needed for lookup table production only)
+#   PEDVAR_LEVELS=( 375 430 515 585 650 740 840 950 1105 1280 )      # sumwindow = 7 (needed for lookup table production only)
+#   PEDVAR_LEVELS=( 535 610 730 840 935 1060 1210 1370 1595 1840 )   # sumwindow = 12 (needed for lookup table production only)
+    WOBBLE_OFFSETS=( 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+    WOBBLE_OFFSETS=( 0.50 )
+    TABLEFILE="table_v441rc_d20140429_GrIsuDec12_ATM21_VX_ID0.root"
+elif [ ${SIMTYPE:0:4} = "CARE" ]; then
+    # CARE simulation parameters
+    ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 )
+    NSB_LEVELS=( 50 80 120 170 230 290 370 450 )
+    PEDVAR_LEVELS=( 349 410 607 683 800 888 1001 1108 )  # sumwindow = 6 (needed for lookup table production only)
+    WOBBLE_OFFSETS=( 0.5 )
+else
+    echo "Invalid simulation type. Exiting..."
+    exit 1
+fi
 
 
-# Set cuts
+# Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
     if [ ! -f $CUTSLISTFILE ]; then
         echo "Error, cuts list file not found, exiting..."
@@ -77,27 +91,43 @@ else
              ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate"
 fi
 
-for CUTS in ${CUTLIST[@]}; do
-    for VX in $EPOCH; do
-        for ATM in $ATMOS; do
-            for ID in $RECID; do
-                echo "Now generating radial acceptance for $CUTS, epoch $VX, ATM$ATM, Rec ID $ID"
 
-                # make tables
-                if [[ $IRFTYPE == "MAKETABLES" ]]
-                then
-                echo "  ./VTS.MSCW_ENERGY.sub_make_tables.sh $T 0 $W $A $SIMTYPE"
-                fi
+for VX in $EPOCH; do
+    for ATM in $ATMOS; do
+        for ZA in ${ZENITH_ANGLES[@]}; do
+            for WOBBLE in ${WOBBLE_OFFSETS[@]}; do
+                NNOISE=${#NSB_LEVELS[@]}
+                for (( i = 0 ; i < $NNOISE; i++ )); do
+                    echo "Now processing epoch $VX, atmo $ATM, zenith angle $ZA, wobble $WOBBLE, noise level ${NSB_LEVELS[$i]}"
+                    # run simulations through evndisp
+                    if [[ $IRFTYPE == "EVNDISP" ]]; then
+                        if [[ -z $SIMDIR ]]; then
+                           if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+                              SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
+                           elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
+                              SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/${SIMTYPE}
+                           fi
+                        fi
+                        ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE ${NSB_LEVELS[$i]} $SIMTYPE
+                    # make tables
+                    elif [[ $IRFTYPE == "MAKETABLES" ]]; then
+                       ./IRF.generate_lookup_table_parts.sh $VX $ATM $ZA $WOBBLE ${NSB_LEVELS[$i]} ${PEDVAR_LEVELS[$i]} 0 $SIMTYPE
+                    # analyse table files
+                    elif [[ $IRFTYPE == "ANALYSETABLES" ]]; then
+                        TFIL="${TABLEFILE/VX/$VX}"
+                        for ID in $RECID; do
+                           ./IRF.mscw_energy_MC.sh $TFIL $VX $ATM $ZA $WOBBLE ${NSB_LEVELS[$i]} $ID $SIMTYPE
+                        done
+                    fi
 
-                # analyse table files
-                if [[ $IRFTYPE == "ANALYSETABLES" ]]; then
-                    ./VTS.MSCW_ENERGY.sub_analyse_MC_VBF.sh $T $I $W $A $SIMTYPE
-                fi
+#### TODO: add effective areas ####
 
-                # analyse effective areas
-                if [[ $IRFTYPE == "EFFECTIVEAREAS" ]]; then
-
-                fi
+#            for CUTS in ${CUTLIST[@]}; do
+#                # analyse effective areas
+#                if [[ $IRFTYPE == "EFFECTIVEAREAS" ]]; then
+#                   echo "effective areas"
+#                fi
+                done
             done
         done
     done

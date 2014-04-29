@@ -70,28 +70,31 @@ elif [[ $CUTS == *soft* ]]; then
 elif [[ $CUTS = *moderate* ]]; then
     CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate.dat"
     EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATM$ATMO-VX-T1234-d20131115.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-VX-T1234.root"
+    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 elif [[ $CUTS = *hard* ]]; then
-    CUTFILE="ANASUM.GammaHadron.d20120909-cut-N3-Point-005CU-Hard.dat"
+    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Hard.dat"
     EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Hard-ATM$ATMO-VX-T1234-d20131115.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Hard-VX-T1234.root"
+    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATM$ATMO-VX-T1234-d20131115.root"
+    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
 fi
 
 # Prepend location within VERITAS_EVNDISP_AUX_DIR
-CUTFILE="$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/$CUTFILE"
-EFFAREA="$VERITAS_EVNDISP_AUX_DIR/EffectiveAreas/$EFFAREA"
-RADACC="$VERITAS_EVNDISP_AUX_DIR/RadialAcceptances/$RADACC"
+# (GM) not needed
+# CUTFILE="$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/$CUTFILE"
+# EFFAREA="$VERITAS_EVNDISP_AUX_DIR/EffectiveAreas/$EFFAREA"
+# RADACC="$VERITAS_EVNDISP_AUX_DIR/RadialAcceptances/$RADACC"
 
 # background model parameters
 if [[ "$BACKGND" == *RB* ]]; then
-    BM="1"
+    BM="RB"
     BMPARAMS="0.6 20"
 elif [[ "$BACKGND" == *RE* ]]; then
-    BM="2"
-    BMPARAMS="0.5 2 10"
+    BM="RE"
+    BMPARAMS="0.1 2 6"
 else
     echo "ERROR: unknown background model: $BACKGND"
     echo "Allowed values are: RE, RB"

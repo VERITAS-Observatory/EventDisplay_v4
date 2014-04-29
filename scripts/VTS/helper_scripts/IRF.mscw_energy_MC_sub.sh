@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse MC files with lookup tables
-# Author: Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS
@@ -12,19 +11,13 @@ TABFILE=TABLEFILE
 ZA=ZENITHANGLE
 NOISE=NOISELEVEL
 WOBBLE=WOBBLEOFFSET
-ATM=ATMOSPHERE
-EPOCH=ARRAYEPOCH
-PARTICLE=PARTICLETYPE
-SIMTYPE=SIMULATIONTYPE
 RECID=RECONSTRUCTIONID
-TELTOANA="1234"
 
 # file names
-INFILE="${SIMTYPE}_${PARTICLE}_${ZA}deg_${WOBBLE}wob_NOISE${NOISE}_${EPOCH}_ATM${ATM}"
-OFILE="${SIMTYPE}_${PARTICLE}_${ZA}deg_${WOBBLE}wob_NOISE${NOISE}_${EPOCH}_ATM${ATM}_ID${RECID}"
+OFILE="${ZA}deg_${WOBBLE}wob_NOISE${NOISE}"
 
 # temporary directory
-if [[ -z $TMPDIR ]]; then 
+if [[ -n "$TMPDIR" ]]; then 
     DDIR="$TMPDIR/MSCW_${ZA}deg_${WOBBLE}deg_NOISE${NOISE}_ID${RECID}"
 else
     DDIR="/tmp/MSCW_${ZA}deg_${WOBBLE}deg_NOISE${NOISE}_ID${RECID}"
@@ -39,7 +32,7 @@ MOPT="-shorttree $MOPT"
 
 # run mscw_energy
 rm -f $ODIR/$OFILE.log
-$EVNDISPSYS/bin/mscw_energy $MOPT -inputfile "$INDIR/$INFILE.root" -outputfile "$DDIR/$OFILE.mscw.root" -noise=$NOISE &> $ODIR/$OFILE.log
+$EVNDISPSYS/bin/mscw_energy $MOPT -inputfile "$INDIR/*[0-9].root" -outputfile "$DDIR/$OFILE.mscw.root" -noise=$NOISE &> $ODIR/$OFILE.log
 
 # cp results file back to data directory and clean up
 cp -f -v $DDIR/$OFILE.mscw.root $ODIR/$OFILE.mscw.root
