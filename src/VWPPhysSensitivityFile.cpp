@@ -414,8 +414,8 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 						if( iClass == "TH1F" )
 						{
 							iHis2D[iHisName2D] = new TH2F( iHisName2D.c_str(), hisList[i]->GetTitle(),
-														   hisList[i]->GetNbinsX(), hisList[i]->GetXaxis()->GetXmin(), hisList[i]->GetXaxis()->GetXmax(),
-														   nbins_woff, woff );
+                                                                                       hisList[i]->GetNbinsX(), hisList[i]->GetXaxis()->GetXmin(), hisList[i]->GetXaxis()->GetXmax(),
+									   	       nbins_woff, woff );
 							iHis2D[iHisName2D]->SetXTitle( hisList[i]->GetXaxis()->GetTitle() );
 							iHis2D[iHisName2D]->SetYTitle( "off-axis angle [deg]" );
 							iHis2D[iHisName2D]->SetZTitle( hisList[i]->GetYaxis()->GetTitle() );
@@ -460,9 +460,9 @@ bool VWPPhysSensitivityFile::fillHistograms2D( vector< double > iWobble_min, vec
 					}
 					if( ( iClass == "TH2F" || iClass == "TH2D" ) && iHis3D.find( iHisName2D ) != iHis3D.end() )
 					{
-						for( int bx = 0; bx < hisList[i]->GetNbinsX(); bx++ )
+						for( int bx = 0; bx <= hisList[i]->GetNbinsX(); bx++ )
 						{
-							for( int by = 0; by < hisList[i]->GetNbinsY(); by++ )
+							for( int by = 0; by <= hisList[i]->GetNbinsY(); by++ )
 							{
 								iHis3D[iHisName2D]->SetBinContent( bx, by, j + 1, hisList[i]->GetBinContent( bx, by ) );
 								iHis3D[iHisName2D]->SetBinError( bx, by, j + 1, hisList[i]->GetBinError( bx, by ) );
@@ -611,9 +611,7 @@ bool VWPPhysSensitivityFile::fillSensitivityHistograms( string iDataDirectory, b
 	char hname[2000];
 	
 	VSensitivityCalculator i_Sens;
-	//    i_Sens.setDebug( true );
 	VSensitivityCalculator i_SensCU;
-	//    i_SensCU.setDebug( true );
 	// set Crab Nebula spectrum
 	i_Sens.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
 	i_SensCU.setEnergySpectrumfromLiterature( fCrabSpectrumFile, fCrabSpectrumID );
@@ -852,12 +850,12 @@ bool VWPPhysSensitivityFile::terminate()
 	return true;
 }
 
-void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
+void VWPPhysSensitivityFile::setDataFiles( string iArray, int iRecID )
 {
 
 	std::cout << "VWPPhysSensitivityFile::setDataFiles " << fObservatory << std::endl;
 	
-	fSubArray = iA;
+	fSubArray = iArray;
 	
 	// set data files for CTA
 	if( isVTS() == 0 )
@@ -910,8 +908,6 @@ void VWPPhysSensitivityFile::setDataFiles( string iA, int iRecID )
 	
 	std::cout << "fDataFile_gamma_cone " << fDataFile_gamma_cone << std::endl;
 	std::cout << "fDataFile_proton     " << fDataFile_proton << std::endl;
-	
-	
 }
 
 /*
