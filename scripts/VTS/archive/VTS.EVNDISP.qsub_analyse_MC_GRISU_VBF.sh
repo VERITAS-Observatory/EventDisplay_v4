@@ -212,7 +212,7 @@ echo "EVNDISP log file written to $ODIR/$RRR.log"
 ##############################################################################################
 echo "CALCULATING AVERAGE TZEROS FOR RUN $SRUN"
 rm -f $ODIR/$SRUN.tzero.log
-$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$SRUN -deadchannelfile $DEAD -arraycuts $ACUT -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==100000 $PEDOPT -calibrationdirectory $ODIR >& $ODIR/$SRUN.tzero.log
+$EVNDISPSYS/bin/evndisp -sourcetype=2 -sourcefile $XFIL -teltoana=$TTA -runmode=7 -runnumber=$SRUN -deadchannelfile $DEAD -arraycuts $ACUT -calibrationsumwindow=20 -calibrationsumfirst=0 -donotusedbinfo -calibrationnevents==100000 $PEDOPT -calibrationdirectory $ODIR -lowgaincalibrationfile NOFILE >& $ODIR/$SRUN.tzero.log
 
 
 ##############################################################################################

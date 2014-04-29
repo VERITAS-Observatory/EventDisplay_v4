@@ -33,7 +33,7 @@ if [[ $SIMS == "GRISU" ]]
 then
     TFIL="table_d20131115_GrIsuDec12_"
 else
-    TFIL="table_d20140204_CareJan1427_"
+    TFIL="table_d20140416_CareJan1427_"
 fi
 # cut files
 # $CUTFIL and $CUTS must be of same length
@@ -97,7 +97,7 @@ do
                then
                    D="/lustre/fs5/group/cta/VERITAS/analysis/EVDv400/"$A"_FLWO/mscw_ATM"$W"_d20131031"
                else
-                   D="$VERITAS_DATA_DIR/analysis/EVDv400/"$A"_FLWO/mscw_CARE_ATM"$W"_d20140403"
+                   D="$VERITAS_DATA_DIR/analysis/EVDv400/"$A"_FLWO/mscw_CARE_ATM"$W"_d20140416"
                fi
                ./VTS.EFFAREA.sub_analyse.sh $C $SIMS-$A"-"$F"-ATM"$W"-ID"$I $I 1234 $D $SIMS
             done

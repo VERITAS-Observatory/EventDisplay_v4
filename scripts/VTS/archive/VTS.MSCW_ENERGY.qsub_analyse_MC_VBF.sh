@@ -39,13 +39,14 @@ if( $SIM == "GRISU" ) then
 else if( $SIM == "CARE" ) then
 # date of analysis
     set DAT="d20140403"
-# output files are written to this directory
-# set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_ATM"$ATMOS"_"$DAT"
-    set ODIR=/lustre/fs9/group/cta/users/maierg/VERITAS/analysis/EVDv400/"$ARRAY"_FLWO/mscw_CARE_ATM"$ATMOS"_"$DAT"
 # directory with MC eventdisplay files
     set SDIR="analysisCARE_"$DAT"_ATM"$ATMOS"_"$ANAC"_NOISE"$NOISE
 # full path to MC eventdisplay files 
     set XDIR=$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/care_Jan1427/"$PART"_"$ZE"deg_750m/wobble_$WOFF/$SDIR/$RUNN*[0-9].root"
+# date of analysis
+    set DAT="d20140416"
+# output files are written to this directory
+    set ODIR="$VERITAS_DATA_DIR"/analysis/EVDv400/"$ARRAY"_FLWO/mscw_CARE_ATM"$ATMOS"_"$DAT"
 endif 
 #############
 # mscw_energy command line options
