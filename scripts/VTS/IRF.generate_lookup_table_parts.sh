@@ -4,12 +4,12 @@
 # qsub parameters
 h_cpu=03:29:00; h_vmem=4000M; tmpdir_size=1G
 
-if [ $# -ne 8 ]; then
+if [ $# -ne 7 ]; then
 # begin help message
 echo "
 IRF generation: create partial (for one point in the parameter space) lookup tables from MC evndisp ROOT files
 
-IRF.generate_lookup_table_parts.sh <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <pedvar level> <Rec ID> <sim type>
+IRF.generate_lookup_table_parts.sh <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <Rec ID> <sim type>
 
 required parameters:
         
@@ -26,8 +26,6 @@ required parameters:
 
     <NSB level>             NSB level of simulations [MHz]
 
-    <pedvar level>          Average pedvar for this NSB level
-    
     <Rec ID>                reconstruction ID
                             (see EVNDISP.reconstruction.runparameter)
     
@@ -49,9 +47,8 @@ ATM=$2
 ZA=$3
 WOBBLE=$4
 NOISE=$5
-PEDVAR=$6
-RECID=$7
-SIMTYPE=$8
+RECID=$6
+SIMTYPE=$7
 PARTICLE_TYPE="gamma"
 
 # EventDisplay version
@@ -91,7 +88,6 @@ rm -f $FSCRIPT.sh
 sed -e "s|ZENITHANGLE|$ZA|" \
     -e "s|WOBBLEOFFSET|$WOBBLE|" \
     -e "s|SIMNOISE|$NOISE|" \
-    -e "s|TABLENOISE|$PEDVAR|" \
     -e "s|ARRAYEPOCH|$EPOCH|" \
     -e "s|ATMOSPHERE|$ATM|" \
     -e "s|RECONSTRUCTIONID|$RECID|" \

@@ -25,7 +25,7 @@ ODIR="$VERITAS_USER_DATA_DIR/analysis/EVD400_DST/$SUMW/"
 mkdir -p $ODIR
 
 # output log files are written to this directory
-LOGDIR="$VERITAS_USER_LOG_DIR/analysis/EVD400_DST/$SUMW/"
+LOGDIR="$ODIR"
 mkdir -p $LOGDIR
 
 # check for the existence of a run parameter file corresponding
