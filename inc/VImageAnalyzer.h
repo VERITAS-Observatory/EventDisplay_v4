@@ -60,6 +60,6 @@ class VImageAnalyzer : public VImageBaseAnalyzer
 		void initOutput();                        //!< open outputfile
 		void initTrees();                         //!  intitalize output tree
 		void shutdown();                          //!< close outputfile
-		void terminate();                         //!< write results to disk
+		void terminate( bool iDebug_IO = false );            //!< write results to disk
 };
 #endif
