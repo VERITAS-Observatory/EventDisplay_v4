@@ -64,7 +64,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		int fNoiseLevel;
 		
 		unsigned int fTableFillingCut_NImages_min;
-		double       fTableFillingCut_CoreError_max;
 		double       fTableFillingCut_WobbleCut_max;
 		double fmaxdist;
 		double fminsize;
@@ -79,8 +78,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		int fNentries;
 		double fMaxRunTime;
 		
-		double fDeadTimeFraction;
-		
 		// parameters to be used in anasum
 		double meanpedvars;                       // mean pedvar
 		vector< double > pedvars;                 // mean pedvar per telescope
@@ -93,6 +90,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
 		void print( int iB = 0 );
 		void printHelp();
 		
-		ClassDef( VTableLookupRunParameter, 22 );
+		ClassDef( VTableLookupRunParameter, 23 );
 };
 #endif

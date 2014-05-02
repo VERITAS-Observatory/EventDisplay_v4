@@ -9,7 +9,8 @@ added additional debug statements for writing to evndisp output file
 * 20140502 (GM)
 lookup table making: read not NSB (pedvar level) directly from simulation 
 file; use as an approximation the mean pedvar level over all telescopes
-adjusted combineLookupTables to allow for minor variations in pedvar levels
+adjusted combineLookupTables to allow for minor variations in pedvar levels;
+removed obsolete lookup table making run parameters from VTableLookupRunParameter)
 
 * 20140502 (GM)
 bug fix in calibration number setting: did not read correctly gain and toff file

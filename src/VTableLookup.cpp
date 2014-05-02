@@ -1508,8 +1508,13 @@ bool VTableLookup::initialize( VTableLookupRunParameter* iTLRunParameter )
 		}
 		
 		string iTitle = ihname;
+                int i_mean_pedvarlevel = (int)(fData->getMeanNoiseLevel()*100);
+                cout << "setting mean pedvar level for table selection to : " << fData->getMeanNoiseLevel() << endl;
+                cout << "   (pedvar levels per telescopes are ";
+                for( unsigned int i = 0; i < fData->getNoiseLevel().size(); i++ ) cout << " " << fData->getNoiseLevel()[i];
+                cout << ")" << endl;
 		setMCTableFiles( fTLRunParameter->tablefile, fTLRunParameter->ze, fTLRunParameter->fWobbleOffset,
-						 fTLRunParameter->fNoiseLevel, "tb", ihname, fTLRunParameter->fWrite1DHistograms );
+				 i_mean_pedvarlevel, "tb", ihname, fTLRunParameter->fWrite1DHistograms );
 						 
 		// set min/max distance to camera center
 		if( fData )

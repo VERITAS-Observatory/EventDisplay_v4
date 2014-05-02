@@ -2204,18 +2204,6 @@ bool VTableLookupDataHandler::cut( bool bWrite )
 	// number of reconstructed events
 	fNStats_Rec++;
 	
-	// try to get better looking events for table filling
-	if( bWrite )
-	{
-		// core error cut
-		if( ( ( fXcore - fMCxcore ) * ( fXcore - fMCxcore ) + ( fYcore - fMCycore ) * ( fYcore - fMCycore ) )
-				> fTLRunParameter->fTableFillingCut_CoreError_max * fTLRunParameter->fTableFillingCut_CoreError_max )
-		{
-			fNStats_CoreErrorCut++;
-			return false;
-		}
-	}
-	
 	if( getWobbleOffset() > fTLRunParameter->fTableFillingCut_WobbleCut_max )
 	{
 		fNStats_WobbleCut++;

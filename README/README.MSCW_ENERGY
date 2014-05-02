@@ -71,7 +71,6 @@ Additional options for table filling:
 	 -debug=UINT             debug output level (0=default, 1=low, 2=high)
 	 -minshowerperbin=INT    minimum number of showers per bin required for analysis (default=5)
 	 -write1DHistograms 	 write 1D-histograms for median determination to disk (default off)
-	 -maxCoreError=MAX 	 use events with small error in core reconstruction only (default = 60 m)
 	 -selectRandom=[0,1] 	 selected events randomly (give probability)
 	 -selectRandomSeed=INT 	 set seed for random select (default=17)
 	 -mindistancetocameracenter=FLOAT  minimum distance of events from camera center (MC distance, default = -1.e10)

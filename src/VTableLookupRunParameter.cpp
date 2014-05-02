@@ -34,9 +34,8 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	esysfile = "";
 	fWrite1DHistograms = false;
 	fSpectralIndex = 2.0;
-	fWobbleOffset = 500;
+	fWobbleOffset = 500;     // integer of wobble offset * 100
 	fNoiseLevel = 250;
-	fTableFillingCut_CoreError_max = 1.e6;
 	fTableFillingCut_NImages_min = 2;
 	fTableFillingCut_WobbleCut_max = 15.;
 	fminsize = 0.;
@@ -54,8 +53,6 @@ VTableLookupRunParameter::VTableLookupRunParameter()
 	
 	fNentries = TChain::kBigNumber;
 	fMaxRunTime = 1.e9;
-	
-	fDeadTimeFraction = 0.5;
 	
 	printpara = "";
 	
@@ -208,10 +205,6 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
 		else if( iTemp.find( "-selectRandomSeed" ) < iTemp.size() )
 		{
 			fSelectRandomSeed = atoi( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
-		}
-		else if( iTemp.find( "-maxCoreError" ) < iTemp.size() )
-		{
-			fTableFillingCut_CoreError_max = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
 		else if( iTemp.find( "-minImages" ) < iTemp.size() )
 		{
@@ -414,14 +407,13 @@ void VTableLookupRunParameter::print( int iP )
 	if( readwrite == 'W' || readwrite == 'w' )
 	{
 		cout << "filling lookup tables for: ";
-		cout << " zenith " << ze << ", direction offset " << fWobbleOffset << " [deg], ";
+		cout << " zenith " << ze << ", direction offset " << fWobbleOffset << "(x0.01) [deg], ";
 		cout << "noise level " << fNoiseLevel << ", spectral index " << fSpectralIndex << endl;
 		if( fWrite1DHistograms )
 		{
 			cout << "write 1D histograms to disk" << endl;
 		}
 		cout << "\t minimum telescope multiplicity: " << fTableFillingCut_NImages_min << endl;
-		cout << "\t maximum allowed uncertainty in core reconstruction [m]: " << fTableFillingCut_CoreError_max << endl;
 		cout << "\t distance to camera: > " << fMC_distance_to_cameracenter_min << " [deg], <";
 		cout << fMC_distance_to_cameracenter_max << " [deg]" << endl;
 	}
@@ -435,11 +427,11 @@ void VTableLookupRunParameter::print( int iP )
 	}
 	if( fUseSelectedImagesOnly )
 	{
-		cout << "use evndisp image selection" << endl;
+		cout << "\t use evndisp image selection" << endl;
 	}
 	else
 	{
-		cout << "use all images" << endl;
+		cout << "\t use all images" << endl;
 	}
 	if( fLimitEnergyReconstruction )
 	{
@@ -454,7 +446,7 @@ void VTableLookupRunParameter::print( int iP )
 	}
 	else
 	{
-		cout << "minimum number of showers required per bin: " << fMinRequiredShowerPerBin << endl;
+		cout << "minimum number of showers required per lookup table bin: " << fMinRequiredShowerPerBin << endl;
 	}
 	if( fUseMedianEnergy == 1 )
 	{
@@ -505,10 +497,6 @@ void VTableLookupRunParameter::print( int iP )
 		{
 			cout << "no pedvar information available" << endl;
 		}
-	}
-	if( TMath::Abs( fDeadTimeFraction - 0.5 ) > 1.e-3 )
-	{
-		cout << "calculated dead time fraction: " << fDeadTimeFraction << endl;
 	}
 }
 
