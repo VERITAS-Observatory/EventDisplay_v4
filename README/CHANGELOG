@@ -2,6 +2,15 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140502 (GM)
+lookup table making: read not NSB (pedvar level) directly from simulation 
+file; use as an approximation the mean pedvar level over all telescopes
+adjusted combineLookupTables to allow for minor variations in pedvar levels
+
+* 20140502 (GM)
+bug fix in calibration number setting: did not read correctly gain and toff file
+numbers from external list  (option:  -calibrationfile calibrationlist.dat)
+
 * 20140425 (GM)
 bug fix in plotting of cumulative significance: alpha was calculated incorrectly
 (cumulative significance were wrong for analysis with mixed alphas)

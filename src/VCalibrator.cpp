@@ -1993,7 +1993,7 @@ void VCalibrator::readGains( bool iLowGain )
 		cout << "from: " << endl;
 		cout << "Telescope " << getTelID() + 1 << ": ";
 		// read gain from DB
-		if( !iLowGain && getRunParameter()->freadCalibfromDB )
+		if( !iLowGain && getRunParameter()->freadCalibfromDB && getRunParameter()->fcalibrationfile.size() == 0 )
 		{
 			cout << "VOFFLINE DB" << endl;
 			readfromVOFFLINE_DB( 1, iFile, VchannelList, Vmean, Vvar );
