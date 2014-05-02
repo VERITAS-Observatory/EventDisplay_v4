@@ -103,7 +103,9 @@ fi
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
 
 INT_WOBBLE=`echo "$WOBBLE*100" | bc | awk -F '.' '{print $1}'`
-if [[ ${#INT_WOBBLE} -lt 3 ]]; then
+if [[ ${#INT_WOBBLE} -lt 2 ]]; then
+   INT_WOBBLE="000"
+elif [[ ${#INT_WOBBLE} -lt 3 ]]; then
    INT_WOBBLE="0$INT_WOBBLE"
 fi
 
