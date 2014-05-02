@@ -73,7 +73,7 @@ class VDeadTime
 		void   printDeadTime();
 		bool   readHistograms( TDirectoryFile* iDir );
 		void   reset();
-		void   writeHistograms();
+		void   writeHistograms( bool iDebug_IO = false );
 		double getScalarDeadTimeFraction()
 		{
 			return fScalarDeadTimeFrac ;

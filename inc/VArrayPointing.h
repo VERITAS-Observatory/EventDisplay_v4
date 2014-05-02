@@ -32,7 +32,7 @@ class VArrayPointing : public VSkyCoordinates
 		~VArrayPointing() {}
 		void fillPointingTree();
 		void fillPntReduced();
-		void terminate();
+		void terminate( bool iDebug_IO = false );
 		
 };
 

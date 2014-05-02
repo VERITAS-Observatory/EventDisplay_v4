@@ -527,7 +527,7 @@ void VArrayAnalyzer::initTree()
     write result tree into ROOT output file
     (called once after finishing the analysis)
 */
-void VArrayAnalyzer::terminate()
+void VArrayAnalyzer::terminate( bool iWriteDebug )
 {
 	if( fDebug )
 	{
@@ -577,7 +577,13 @@ void VArrayAnalyzer::terminate()
 		cout << "writing analysis tree (";
 		cout << getShowerParameters()->getTree()->GetEntries();
 		cout << " entries) to : " << fOutputfile->GetName() << endl;
-		getShowerParameters()->getTree()->Write();
+		int i_nbytes = getShowerParameters()->getTree()->Write();
+                if( iWriteDebug )
+                {
+                   cout << "WRITEDEBUG: showerpars tree (nbytes " << i_nbytes << "): ";
+                   if( fOutputfile ) cout << fOutputfile->Get( "showerpars" );
+                   cout << endl;
+                }
 		///////////////////////////////////////////////////////////////
 		// MC tree and histograms
 		if( isMC() )
@@ -643,18 +649,30 @@ void VArrayAnalyzer::terminate()
 				}
 				iMC_histos.fill( i_ze, i_tMC, true );
 				iMC_histos.print();
-				iMC_histos.Write();
+				int i_nbytes = iMC_histos.Write();
+                                if( iWriteDebug )
+                                {
+                                   cout << "WRITEDEBUG: MC histograms (nbytes " << i_nbytes << "):";
+                                   if( fOutputfile ) cout << fOutputfile->Get( "MChistos" );
+                                   cout << endl;
+                                }
 				// END: filling of MC histograms
 				////////////////////////////////////////////////////////////
 			}
 		}
 		if( getEvndispReconstructionParameter() )
 		{
-			getEvndispReconstructionParameter()->Write();
+			int i_nbytes = getEvndispReconstructionParameter()->Write();
+                        if( iWriteDebug )
+                        {
+                           cout << "WRITEDEBUG: evndisp reconstruction parameters (nbytes " << i_nbytes << "): ";
+                           if( fOutputfile ) cout << fOutputfile->Get( "EvndispReconstructionParameter" );
+                           cout << endl;
+                        }
 		}
 		if( getArrayPointing() )
 		{
-			getArrayPointing()->terminate();
+			getArrayPointing()->terminate( iWriteDebug );
 		}
 		if( fOutputfile )
 		{

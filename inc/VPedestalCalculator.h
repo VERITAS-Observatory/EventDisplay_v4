@@ -78,6 +78,6 @@ class VPedestalCalculator : public VImageBaseAnalyzer
 		bool initialize();
 		bool initialize( bool ibCalibrationRun, unsigned int iNPixel, double iLengthofTimeSlice, int iSumFirst, int iSumWindow,
 						 double iRunStartTime = -99., double iRunStoppTime = -99. );
-		void terminate( bool iWrite = true );
+		void terminate( bool iWrite = true, bool bDebug_IO = false );
 };
 #endif

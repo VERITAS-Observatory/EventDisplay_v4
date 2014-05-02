@@ -573,7 +573,7 @@ double VDeadTime::getDeadTimeFraction( vector< bool > iMask )
 }
 
 
-void VDeadTime::writeHistograms()
+void VDeadTime::writeHistograms( bool iDebug_IO )
 {
 	TDirectory* iDir = gDirectory;
 	
@@ -592,7 +592,11 @@ void VDeadTime::writeHistograms()
 	
 	if( hisList )
 	{
-		hisList->Write();
+		int i_nbytes = hisList->Write();
+                if( iDebug_IO )
+                {
+                   cout << "WRITEDEBUG: dead time histograms (nbytes " << i_nbytes << ")" << endl;
+                }
 	}
 	
 	// remove all objects created with new in this class

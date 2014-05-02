@@ -333,7 +333,7 @@ void VPedestalCalculator::doAnalysis( bool iLowGain )
 }
 
 
-void VPedestalCalculator::terminate( bool iWrite )
+void VPedestalCalculator::terminate( bool iWrite, bool iDebug_IO )
 {
 	if( iWrite )
 	{
@@ -349,7 +349,13 @@ void VPedestalCalculator::terminate( bool iWrite )
 					if( i < fTree.size() && fTree[i] )
 					{
 						cout << "\t number of time slices for Telescope " << getTeltoAna()[i] + 1 << ": " << fTree[i]->GetEntries() << endl;
-						fTree[i]->Write();
+						int i_nbytes = fTree[i]->Write();
+                                                if( iDebug_IO )
+                                                {
+                                                    cout << "WRITEDEBUG: pedestal trees (nbytes " << i_nbytes << "):";
+                                                    if( getOutputFile() ) cout << getOutputFile()->Get( fTree[i]->GetName() );
+                                                    cout << endl;
+                                                }
 					}
 				}
 			}

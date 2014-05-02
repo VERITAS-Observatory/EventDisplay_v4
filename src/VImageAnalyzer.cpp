@@ -408,7 +408,7 @@ void VImageAnalyzer::initAnalysis()
 }
 
 
-void VImageAnalyzer::terminate()
+void VImageAnalyzer::terminate( bool iDebug_IO )
 {
 	if( fDebug )
 	{
@@ -449,7 +449,11 @@ void VImageAnalyzer::terminate()
 		// write main output trees
 		if( getImageParameters()->getTree() )
 		{
-			getImageParameters()->getTree()->Write();
+			int i_nbytes = getImageParameters()->getTree()->Write();
+                        if( iDebug_IO )
+                        {
+                           cout << "WRITEDEBUG: tpars trees (nbytes " << i_nbytes << ")" << endl;
+                        }
 		}
 		if( fRunPar->fImageLL )
 		{
@@ -870,6 +874,10 @@ void VImageAnalyzer::shutdown()
 	}
 	if( fOutputfile && fOutputfile->IsOpen() )
 	{
+                fOutputfile->Flush();
+                cout << "closing evndisp output file, final contents: ";
+                fOutputfile->ls();
+                cout << "\t file size: " << fOutputfile->GetSize() << endl;
 		fOutputfile->Close();
 	}
 }

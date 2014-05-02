@@ -90,8 +90,7 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		void updatePointingToArbitraryTime( int iMJD, double iTime ) ;
 		void initAnalysis();
 		void initOutput();
-		void terminate();
-		//        void initOuput();                         //!< check for output file,
+		void terminate( bool iDebug_IO = false );
 		void initTree();
 };
 #endif

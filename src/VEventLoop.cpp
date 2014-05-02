@@ -678,9 +678,12 @@ void VEventLoop::initializeAnalyzers()
 */
 void VEventLoop::shutdown()
 {
+        // additional output for writing to disk
+        bool fDebug_writing = true;
 	if( fDebug )
 	{
 		cout << "VEventLoop::shutdown()" << endl;
+                fDebug_writing = fDebug;
 	}
 	endOfRunInfo();
 	cout << endl << "-----------------------------------------------" << endl;
@@ -693,7 +696,6 @@ void VEventLoop::shutdown()
 		printDeadChannelList();
 	}
 	
-	{
 		// write detector parameter tree to disk
 		if( fOutputfile != 0 && fRunPar->foutputfileName != "-1" )
 		{
@@ -709,7 +711,13 @@ void VEventLoop::shutdown()
 		if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_GTO && fRunPar->frunmode != R_GTOLOW
 				&& fRunPar->frunmode != R_PEDLOW && fRunPar->frunmode != R_TZERO && fRunPar->frunmode != R_TZEROLOW )
 		{
-			fRunPar->Write();
+			int i_nbytes = fRunPar->Write();
+                        if( fDebug_writing )
+                        {
+                            cout << "WRITEDEBUG: runparameters (nbytes " << i_nbytes << "):";
+                            if( fOutputfile ) cout << fOutputfile->Get( "runparameterV2" );
+                            cout << endl;
+                        }
 		}
 		// analysis or trace library mode
 		if( fRunPar->frunmode == R_ANA )
@@ -721,35 +729,47 @@ void VEventLoop::shutdown()
 				{
 					cout << "\t writing detector tree: " << getDetectorTree()->GetName() << endl;
 				}
-				getDetectorTree()->Write();
+				int i_nbytes = getDetectorTree()->Write();
+                                if( fDebug_writing )
+                                {
+                                    cout << "WRITEDEBUG: detector tree (nbytes " << i_nbytes << "):";
+                                    if( fOutputfile ) cout << fOutputfile->Get( "telconfig" );
+                                    cout << endl;
+                                }
 			}
 			// write pedestal variation calculations to output file
 			if( ( fRunPar->frunmode == R_ANA ) && fRunPar->fPedestalsInTimeSlices && fPedestalCalculator )
 			{
-				fPedestalCalculator->terminate();
+				fPedestalCalculator->terminate( true, fDebug_writing );
 			}
 			// calculate and write deadtime calculation to disk
 			if( fDeadTime && !isMC() )
 			{
 				fDeadTime->calculateDeadTime();
 				fDeadTime->printDeadTime();
-				fDeadTime->writeHistograms();
+				fDeadTime->writeHistograms( fDebug_writing );
 			}
 			// write MC run header to output file
 			if( getReader()->getMonteCarloHeader() )
 			{
 				fOutputfile->cd();
 				getReader()->getMonteCarloHeader()->print();
-				getReader()->getMonteCarloHeader()->Write();
+				int i_nbytes = getReader()->getMonteCarloHeader()->Write();
+                                if( fDebug_writing )
+                                {
+                                   cout << "WRITEDEBUG: MC run header(nbytes " << i_nbytes << "):";
+                                   if( fOutputfile ) cout << fOutputfile->Get( "MC_runheader" ); 
+                                   cout << endl;
+                                }
 			}
 			// write array analysis results to output file
 			if( fArrayAnalyzer )
 			{
-				fArrayAnalyzer->terminate();
+				fArrayAnalyzer->terminate( fDebug_writing );
 			}
 			if( fRunPar->fUseModel3D && fModel3D )
 			{
-				fModel3D->terminate();    //JG
+				fModel3D->terminate();
 			}
 #ifndef NOGSL
 			if( fRunPar->ffrogsmode )
@@ -763,7 +783,7 @@ void VEventLoop::shutdown()
 				for( unsigned int i = 0; i < fRunPar->fTelToAnalyze.size(); i++ )
 				{
 					fAnalyzer->setTelID( fRunPar->fTelToAnalyze[i] );
-					fAnalyzer->terminate();
+					fAnalyzer->terminate( fDebug_writing );
 				}
 			}
 			// close output file here (!! CLOSE OUTPUT FILE FOREVER !!)
@@ -789,7 +809,6 @@ void VEventLoop::shutdown()
 		{
 			fDST->terminate();
 		}
-	}
 	// delete readers
 	if( fRunPar->fsourcetype != 0 && fGrIsuReader )
 	{
@@ -820,7 +839,7 @@ void VEventLoop::shutdown()
 		{
 			cout << endl << "Final checks on result file (seems to be OK): " << fRunPar->foutputfileName << endl;
 		}
-		// FROGS finishing here
+                // FROGS finishing here
 #ifndef NOGSL
 		if( fRunPar->ffrogsmode )
 		{
