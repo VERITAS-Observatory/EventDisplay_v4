@@ -1691,7 +1691,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 	{
 		return a;
 	}
-	std::cout << "VSensitivityCalcualtor::getDifferentialFluxVectorfromMC Crab " << std::endl;
+	std::cout << "VSensitivityCalculator::getDifferentialFluxVectorfromMC Crab " << std::endl;
 	i_Crab.listValues( fMC_Data[1]->fSpectralParameterID );
 	
 	///////////////////////////////////////////////////////////////////
@@ -1734,7 +1734,7 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
 		}
 		if( ( *i_MCData_iterator ).second->energy.size() == 0 )
 		{
-			sprintf( hname, "error: effective area (%s) vector with length 0",
+			sprintf( hname, "warning: effective area (%s) vector with length 0",
 					 ( *i_MCData_iterator ).second->fName.c_str() );
 			return getDifferentialFluxVectorfromMC_ErrorMessage( hname );
 		}
