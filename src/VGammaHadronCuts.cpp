@@ -1335,14 +1335,7 @@ bool VGammaHadronCuts::applyEnergyReconstructionQualityCuts( unsigned int iEnerg
 
 bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 {
-	if( fDebug )
-	{
-		cout << "VGammaHadronCuts::isGamma: event " << i;
-		cout << ", cut selector " << fGammaHadronCutSelector;
-		cout << " (" << fGammaHadronCutSelector % 10 << ", " << fGammaHadronCutSelector / 10 << ")";
-		cout << endl;
-	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////
 	// apply box cuts  (e.g. MSCW/MSCL or MWR/MLR)
 	if( fGammaHadronCutSelector % 10 <= 3 )
@@ -1403,10 +1396,6 @@ bool VGammaHadronCuts::isGamma( int i, bool bCount, bool fIsOn )
 	// apply Frogs Cuts
 	else if( fGammaHadronCutSelector / 10 == 5 )
 	{
-		if( fDebug )
-		{
-			cout << "VGammaHadronCuts::isGamma: apply Frogs Cuts" << endl;
-		}
 		if( !applyFrogsCut( i, fIsOn ) )
 		{
 			if( bCount && fStats )
@@ -1452,82 +1441,79 @@ bool VGammaHadronCuts::applyTMVACut( int i )
 
 bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 {
-	if( fDebug )
-	{
-		cout << "VGammaHadronCuts::applyFrogsCut event " << i << endl;
-	}
-	
-	int NTELCUT;
-	double SGCuts;
-	
-	// 1 % Crab
-	
-	if( fData->frogsEnergy > -99. && fData->frogsEnergy < -0.6 )
-	{
-		SGCuts = 0.65;
-	}
-	if( fData->frogsEnergy > -0.6 && fData->frogsEnergy < -0.4 )
-	{
-		SGCuts = 1.00;
-	}
-	if( fData->frogsEnergy > -0.4 && fData->frogsEnergy < -0.2 )
-	{
-		SGCuts = 1.70;
-	}
-	if( fData->frogsEnergy > -0.2 && fData->frogsEnergy <  0.0 )
-	{
-		SGCuts = 2.50;
-	}
-	if( fData->frogsEnergy >  0.0 && fData->frogsEnergy <  99. )
-	{
-		SGCuts = 500.;
-	}
-	
-	if( fData->frogsEnergy > -99. && fData->frogsEnergy < -0.6 )
-	{
-		NTELCUT = 2;
-	}
-	if( fData->frogsEnergy > -0.6 && fData->frogsEnergy < -0.4 )
-	{
-		NTELCUT = 2;
-	}
-	if( fData->frogsEnergy > -0.4 && fData->frogsEnergy < -0.2 )
-	{
-		NTELCUT = 2;
-	}
-	if( fData->frogsEnergy > -0.2 && fData->frogsEnergy <  0.0 )
-	{
-		NTELCUT = 1;
-	}
-	if( fData->frogsEnergy >  0.0 && fData->frogsEnergy <  99. )
-	{
-		NTELCUT = 0;
-	}
-	
-	int NTEL = 0;
-	if( fData->frogsTelGoodnessImg0 > -10. && fData->frogsTelGoodnessImg0 < SGCuts )
-	{
-		NTEL++;
-	}
-	if( fData->frogsTelGoodnessImg1 > -10. && fData->frogsTelGoodnessImg1 < SGCuts )
-	{
-		NTEL++;
-	}
-	if( fData->frogsTelGoodnessImg2 > -10. && fData->frogsTelGoodnessImg2 < SGCuts )
-	{
-		NTEL++;
-	}
-	if( fData->frogsTelGoodnessImg3 > -10. && fData->frogsTelGoodnessImg3 < SGCuts )
-	{
-		NTEL++;
-	}
-	
-	if( NTEL <= NTELCUT )
+
+	if( fData->frogsEnergy < -99. )
 	{
 		return false;
 	}
-	
-	return true;
+	if( fData->MSCW > 0.35 )
+	{
+		return false;
+	}
+	if( fData->MSCL > 0.70 )
+	{
+		return false;
+	}
+	double mean = ( fData->frogsTelGoodnessImg0 + fData->frogsTelGoodnessImg1 + fData->frogsTelGoodnessImg2 + fData->frogsTelGoodnessImg3 ) / 4.;
+	//================= 1% Crab =================//
+	if( fData->frogsEnergy > -1.30 && fData->frogsEnergy <= -0.60 )
+	{
+		if( mean > 0.29 )
+		{
+			return false;
+		}
+		return true;
+	}
+	else if( fData->frogsEnergy > -0.60 && fData->frogsEnergy <= -0.40 )
+	{
+		if( mean > 0.55 )
+		{
+			return false;
+		}
+		return true;
+	}
+	else if( fData->frogsEnergy > -0.40 && fData->frogsEnergy <= -0.22 )
+	{
+		if( mean > 0.75 )
+		{
+			return false;
+		}
+		return true;
+	}
+	else if( fData->frogsEnergy > -0.22 && fData->frogsEnergy <= -0.10 )
+	{
+		if( mean > 1.08 )
+		{
+			return false;
+		}
+		return true;
+	}
+	else if( fData->frogsEnergy > -0.10 && fData->frogsEnergy <= 0.0 )
+	{
+		if( mean > 1.98 )
+		{
+			return false;
+		}
+		return true;
+	}
+	else if( fData->frogsEnergy > 0.00 && fData->frogsEnergy <= 0.30 )
+	{
+		if( mean > 4.50 )
+		{
+			return false;
+		}
+		return true;
+	}
+	else if( fData->frogsEnergy > 0.30 )
+	{
+		if( mean > 4.50 )
+		{
+			return false;
+		}
+		return true;
+	}
+	return false;
+	//================= 1% Crab =================//
 	
 }
 

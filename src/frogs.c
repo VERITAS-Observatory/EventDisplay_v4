@@ -1180,7 +1180,7 @@ frogs_read_template_file(
 	//open file
 	if( ( fu = fopen( fname, "r" ) ) == NULL )
 	{
-                printf( "%s\n", fname );
+		printf( "%s\n", fname );
 		frogs_showxerror( "Failed opening the template file" );
 	}
 	
@@ -3740,4 +3740,8 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 					return FROGS_BAD_NUMBER;
 				}
 			}
+			
+			
+			
+			
 			
