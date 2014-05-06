@@ -1,6 +1,5 @@
 #!/bin/bash
 # script run eventdisplay laser analysis with a queue system
-# Author: Gernot Maier
 
 # qsub parameters
 h_cpu=11:29:00; h_vmem=2000M; tmpdir_size=5G

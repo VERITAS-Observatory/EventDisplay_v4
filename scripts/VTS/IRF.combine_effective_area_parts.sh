@@ -1,6 +1,5 @@
 #!/bin/bash
 # combine many effective area files into one
-# Author: Gernot Maier
 
 # qsub parameters
 h_cpu=5:29:00; h_vmem=6000M; tmpdir_size=10G
@@ -10,8 +9,7 @@ if [ $# -lt 5 ]; then
 echo "
 IRF generation: combine partial effective area files
 
-IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID>
- <sim type> [date]
+IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID> <sim type> [name]
 
 required parameters:
     
@@ -27,16 +25,13 @@ required parameters:
                             
     <sim type>              original VBF file simulation type (e.g. GRISU, CARE)
 
-    optional parameters:
-    
-    [date]                  date of effective area file generation
-                            (default: today's date)
-    
+optional parameters:
+
+   [name]                   name added to the effective area output file
+
 examples:
 
 ./IRF.combine_effective_area_parts.sh ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft.dat V6 21 0 CARE
-
-./IRF.combine_effective_area_parts.sh ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate.dat \"V5 V6\" \"21 22\" \"0 1 2 3 4\" GRISU 20131115
 
 --------------------------------------------------------------------------------
 "
@@ -54,33 +49,28 @@ EPOCH=$2
 ATMOS=$3
 RECID=$4
 SIMTYPE=$5
-[[ "$6" ]] && EADATE=$6 || EADATE=`date +"%Y%m%d"`
+[[ "$6" ]] && EANAME=$6 || EANAME=""
 
 # Generate EA base file name based on cuts file
 CUTS_NAME=`basename $CUTSFILE`
-CUTS_NAME=${CUTS_NAME##ANASUM.GammaHadron.}
+CUTS_NAME=${CUTS_NAME##ANASUM.GammaHadron-}
 CUTS_NAME=${CUTS_NAME%%.dat}
 EANAME="effArea-$CUTS_NAME"
 
-# Check that input directory exists
-if [[ -z $VERITAS_IRF_ANA_DIR ]]; then
-    INDIR="$VERITAS_IRF_ANA_DIR/$EDVERSION/EffectiveAreas/${EPOCH}_ATM${ATMOS}_ID${RECID}/$CUTS_NAME"
-elif [[ ! -z $VERITAS_IRF_ANA_DIR || ! -d $INDIR ]]; then
-    INDIR="$VERITAS_DATA_DIR/analysis/$EDVERSION/EffectiveAreas/${EPOCH}_ATM${ATMOS}_ID${RECID}/$CUTS_NAME"
-elif [[ ! -d $INDIR ]]; then
+# input directory with effective areas
+if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
+fi
+if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
-    echo "$VERITAS_IRF_ANA_DIR/$EDVERSION/EffectiveAreas/${SIMTYPE}/${EPOCH}_ATM${ATMOS}_ID${RECID}/$CUTS_NAME"
-    echo "$VERITAS_DATA_DIR/analysis/$EDVERSION/EffectiveAreas/${SIMTYPE}/${EPOCH}_ATM${ATMOS}_ID${RECID}/$CUTS_NAME"
+    echo "$INDIR"
     exit 1
 fi
 echo "Input file directory: $INDIR"
-INFILES="$INDIR/*"
 
 # Output file directory
-if [[ -z $VERITAS_IRF_ANA_DIR ]]; then
-    ODIR="$VERITAS_IRF_ANA_DIR/$EDVERSION/EffectiveAreas/${SIMTYPE}"
-else
-    ODIR="$VERITAS_DATA_DIR/analysis/$EDVERSION/EffectiveAreas/${SIMTYPE}"
+if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
+   ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas"
 fi
 echo "Output file directory: $ODIR"
 mkdir -p $ODIR
@@ -95,42 +85,38 @@ mkdir -p $LOGDIR
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.effective_area_combine_sub"
 
 # loop over all files/cases
-for VX in $EPOCH; do
-    for ATM in $ATMOS; do
-        for ID in $RECID; do
-            echo "Processing epoch $VX, atmosphere ATM$ATM, RecID $ID"
+echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID"
 
-            # telescope combinations
-            [[ $ID == 0 ]] && T="1234"
-            [[ $ID == 1 ]] && T="234"
-            [[ $ID == 2 ]] && T="134"
-            [[ $ID == 3 ]] && T="124"
-            [[ $ID == 4 ]] && T="123"
+# telescope combinations
+[[ $RECID == 0 ]] && T="1234"
+[[ $RECID == 1 ]] && T="234"
+[[ $RECID == 2 ]] && T="134"
+[[ $RECID == 3 ]] && T="124"
+[[ $RECID == 4 ]] && T="123"
 
-            # output effective area name
-            OFILE="$EANAME-ATM$ATM-$VX-T$T-d$EADATE"
+# output effective area name
+OFILE="$EANAME-ATM$ATMOS-$EPOCH-T$T-d$EANAME"
 
-            FSCRIPT="$LOGDIR/COMB-$CUTSFILE-ATM$ATM-$VX-ID$ID"
-            rm -f $FSCRIPT.sh
+FSCRIPT="$LOGDIR/COMB-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
+rm -f $FSCRIPT.sh
 
-            sed -e "s|INPUTFILES|$INFILES|" \
-                -e "s|OUTPUTFILE|$OFIL|" \
-                -e "s|OUTPUTDIR|$ODIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
+sed -e "s|INPUTFILES|$INFILES|" \
+    -e "s|OUTPUTFILE|$OFIL|" \
+    -e "s|OUTPUTDIR|$ODIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
 	    
-            chmod u+x $FSCRIPT.sh
-            echo $FSCRIPT.sh
+chmod u+x $FSCRIPT.sh
+echo $FSCRIPT.sh
 
-            # run locally or on cluster
-            SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
-            SUBC=`eval "echo \"$SUBC\""`
-            if [[ $SUBC == *qsub* ]]; then
-                $SUBC $FSCRIPT.sh
-            elif [[ $SUBC == *parallel* ]]; then
-                echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
-            fi
-        done
-    done
-done
+exit
+
+# run locally or on cluster
+SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
+SUBC=`eval "echo \"$SUBC\""`
+if [[ $SUBC == *qsub* ]]; then
+    $SUBC $FSCRIPT.sh
+elif [[ $SUBC == *parallel* ]]; then
+    echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+fi
 
 # Execute all FSCRIPTs locally in parallel
 if [[ $SUBC == *parallel* ]]; then

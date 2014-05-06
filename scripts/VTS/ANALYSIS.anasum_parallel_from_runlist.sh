@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse data files with anasum (parallel analysis) from a simple run list
-# Author: Gernot Maier
 
 if [ $# -lt 6 ]; then
 # begin help message
@@ -56,23 +55,23 @@ BACKGND=$6
 
 # cut definitions (note: VX to be replaced later in script)
 if [[ $CUTS == *super* ]]; then
-    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-SuperSoft.dat"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat"
     EFFAREA="effArea-d20131031-cut-N2-Point-005CU-SuperSoft-ATM$ATMO-VX-T1234-d20131115.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-VX-T1234.root"
 elif [[ $CUTS == *open* ]]; then
-    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open.dat"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat"
     EFFAREA="effArea-d20131031-cut-N2-Point-005CU-Open-ATM$ATMO-VX-T1234-d20131115.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-Open-VX-T1234.root"
 elif [[ $CUTS == *soft* ]]; then
-    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft.dat"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SoftSpectrum.dat"
     EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-ATM$ATMO-VX-T1234-d20131115.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-VX-T1234.root"
 elif [[ $CUTS = *moderate* ]]; then
-    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate.dat"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-ModerateSpectrum.dat"
     EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATM$ATMO-VX-T1234-d20131115.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 elif [[ $CUTS = *hard* ]]; then
-    CUTFILE="ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Hard.dat"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat"
     EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Hard-ATM$ATMO-VX-T1234-d20131115.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Hard-VX-T1234.root"
     EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATM$ATMO-VX-T1234-d20131115.root"

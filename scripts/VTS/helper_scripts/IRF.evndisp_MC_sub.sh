@@ -40,7 +40,7 @@ if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
     if [[ $EPOCH == "V4" ]]; then
         if [[ $PARTICLE == "1" ]]; then
-            VBFNAME="$Oct2012_oa_ATM${ATM}_${ZA}deg_${WOG}"
+            VBFNAME="Oct2012_oa_ATM${ATM}_${ZA}deg_${WOG}"
         elif [[ $PARTICLE == "14" ]]; then
             VBFNAME="proton_${ZA}deg_750m_wobble${WOB}_2008_2009_"
         fi

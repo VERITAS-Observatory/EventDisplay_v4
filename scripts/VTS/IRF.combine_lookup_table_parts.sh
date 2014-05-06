@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to combine several table file into one
-# Author: Gernot Maier
 
 # qsub parameters
 h_cpu=20:29:00; h_vmem=8000M; tmpdir_size=10G

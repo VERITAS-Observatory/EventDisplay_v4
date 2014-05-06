@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse data files with anasum (parallel analysis)
-# Author: Gernot Maier
 
 # qsub parameters
 h_cpu=12:29:00; h_vmem=4000M; tmpdir_size=1G

@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse VTS data files with lookup tables
-# Author: Gernot Maier
 
 # qsub parameters
 h_cpu=00:29:00; h_vmem=2000M; tmpdir_size=4G

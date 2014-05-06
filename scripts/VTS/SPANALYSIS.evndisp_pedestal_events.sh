@@ -1,7 +1,5 @@
 #!/bin/bash
 # calculate pedestals
-#  Revision $Id: evndisp.calculate_pedestals,v 1.14.20.1.2.1.4.1.6.1.6.2.2.3.2.3 2010/11/11 10:11:42 gmaier Exp $
-# Author: Gernot Maier
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message

@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse data files with anasum
-# Author: Gernot Maier
 
 # qsub parameters
 h_cpu=8:00:00; h_vmem=4000M; tmpdir_size=10G

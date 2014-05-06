@@ -1,5 +1,4 @@
 #!/bin/bash
-# Author: Gernot Maier
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message

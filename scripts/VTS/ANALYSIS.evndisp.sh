@@ -1,8 +1,5 @@
 #!/bin/bash
 # script to run eventdisplay analysis for VTS data
-# Author: Gernot Maier
-#
-# 2014-04-16 (GM) checked
 
 # qsub parameters
 h_cpu=41:29:00; h_vmem=2000M; tmpdir_size=10G

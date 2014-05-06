@@ -14,7 +14,7 @@ required parameters:
     <sim type>              original VBF file simulation type (e.g. GRISU, CARE)
     
     <IRF type>              type of instrument response function to produce
-                            (e.g. EVNDISP, MAKETABLES, ANALYSETABLES, EFFECTIVEAREA, RADIALACCEPTANCE)
+                            (e.g. EVNDISP, MAKETABLES, ANALYSETABLES, EFFECTIVEAREAS, COMBINEEFFECTIVEAREAS )
     
 optional parameters:
     
@@ -57,18 +57,14 @@ if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     # GrISU simulation parameters
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 075 100 150 200 250 325 425 550 750 1000 )
-    PEDVAR_LEVELS=( 336 382 457 524 579 659 749 850 986 1138 )        # sumwindow = 6 (needed for lookup table production only)
-#   PEDVAR_LEVELS=( 375 430 515 585 650 740 840 950 1105 1280 )      # sumwindow = 7 (needed for lookup table production only)
-#   PEDVAR_LEVELS=( 535 610 730 840 935 1060 1210 1370 1595 1840 )   # sumwindow = 12 (needed for lookup table production only)
-    WOBBLE_OFFSETS=( 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-    WOBBLE_OFFSETS=( 0.50 )
-    TABLEFILE="table_v441rc_d20140429_GrIsuDec12_ATM21_VX_ID0.root"
+    WOBBLE_OFFSETS=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
+    TABLEFILE="table_v441rc_d20140503_GrIsuDec12_ATM21_VX_ID0"
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # CARE simulation parameters
-    ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 )
+    ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 50 80 120 170 230 290 370 450 )
-    PEDVAR_LEVELS=( 349 410 607 683 800 888 1001 1108 )  # sumwindow = 6 (needed for lookup table production only)
     WOBBLE_OFFSETS=( 0.5 )
+    TABLEFILE="table_v441rc_d20140503_CARE_Jan1427_ATM21_VX_ID0"
 else
     echo "Invalid simulation type. Exiting..."
     exit 1
@@ -84,21 +80,31 @@ if [[ $CUTSLISTFILE != "" ]]; then
     # read file containing list of cuts
     IFS=$'\r\n' CUTLIST=($(cat $CUTLISTFILE))
 else
-    # default hard-coded cuts
-    CUTLIST="ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-Open
-             ANASUM.GammaHadron.d20131031-cut-N2-Point-005CU-SuperSoft
-             ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Soft
-             ANASUM.GammaHadron.d20131031-cut-N3-Point-005CU-Moderate"
+    # default list of cuts
+    CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-ModerateSpectrum.dat 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat 
+             ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat" 
 fi
 
-
+# loop over complete parameter space and submit production
 for VX in $EPOCH; do
     for ATM in $ATMOS; do
+       # combine effective areas
+       if [[ $IRFTYPE == "COMBINEEFFECTIVEAREA" ]]; then
+            for ID in $RECID; do
+                for CUTS in ${CUTLIST[@]}; do
+                    echo "combine effective areas $CUTS"
+                   ./IRF.combine_effective_area_parts.sh $CUTS $VX $ATM $ID $SIMTYPE
+                done # cuts
+            done
+            continue
+        fi
         for ZA in ${ZENITH_ANGLES[@]}; do
             for WOBBLE in ${WOBBLE_OFFSETS[@]}; do
-                NNOISE=${#NSB_LEVELS[@]}
-                for (( i = 0 ; i < $NNOISE; i++ )); do
-                    echo "Now processing epoch $VX, atmo $ATM, zenith angle $ZA, wobble $WOBBLE, noise level ${NSB_LEVELS[$i]}"
+                for NOISE in ${NSB_LEVELS[@]}; do
+                    echo "Now processing epoch $VX, atmo $ATM, zenith angle $ZA, wobble $WOBBLE, noise level $NOISE"
                     # run simulations through evndisp
                     if [[ $IRFTYPE == "EVNDISP" ]]; then
                         if [[ -z $SIMDIR ]]; then
@@ -108,29 +114,29 @@ for VX in $EPOCH; do
                               SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/${SIMTYPE}
                            fi
                         fi
-                        ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE ${NSB_LEVELS[$i]} $SIMTYPE
+                        ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE
                     # make tables
                     elif [[ $IRFTYPE == "MAKETABLES" ]]; then
-                       ./IRF.generate_lookup_table_parts.sh $VX $ATM $ZA $WOBBLE ${NSB_LEVELS[$i]} ${PEDVAR_LEVELS[$i]} 0 $SIMTYPE
+                       ./IRF.generate_lookup_table_parts.sh $VX $ATM $ZA $WOBBLE $NOISE 0 $SIMTYPE
                     # analyse table files
                     elif [[ $IRFTYPE == "ANALYSETABLES" ]]; then
                         TFIL="${TABLEFILE/VX/$VX}"
                         for ID in $RECID; do
-                           ./IRF.mscw_energy_MC.sh $TFIL $VX $ATM $ZA $WOBBLE ${NSB_LEVELS[$i]} $ID $SIMTYPE
+                           ./IRF.mscw_energy_MC.sh $TFIL $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
                         done
+                    # analyse effective areas
+                    elif [[ $IRFTYPE == "EFFECTIVEAREAS" ]]; then
+                        for ID in $RECID; do
+                            for CUTS in ${CUTLIST[@]}; do
+                                echo "effective areas $CUTS"
+                               ./IRF.generate_effective_area_parts.sh $CUTS $VX $ATM $ZA $WOBBLE $NOISE $ID $SIMTYPE
+                            done #cuts
+                        done #recID
                     fi
-
-#### TODO: add effective areas ####
-
-#            for CUTS in ${CUTLIST[@]}; do
-#                # analyse effective areas
-#                if [[ $IRFTYPE == "EFFECTIVEAREAS" ]]; then
-#                   echo "effective areas"
-#                fi
-                done
-            done
-        done
-    done
-done
+                done #noise
+            done #wobble
+        done #ZA
+    done #ATM
+done  #VX
 
 exit

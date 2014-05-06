@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to combine effective areas
-# Author: Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS

@@ -1,6 +1,5 @@
 #!/bin/bash
 # read a calibration file produced by write_analysis_scripts.pl
-# Author: Gernot Maier
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message

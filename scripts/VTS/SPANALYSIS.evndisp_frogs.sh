@@ -1,6 +1,5 @@
 #!/bin/bash
 # analyze data files with FROGS
-# Author: Gernot Maier
 
 ## HARDCODED VALUES
 # run options (will be overwritten in DST mode)

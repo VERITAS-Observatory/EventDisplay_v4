@@ -1,6 +1,5 @@
 #!/bin/bash
 # display data files with eventdisplay
-# Author: Gernot Maier
 
 ## HARD-CODED VALUES
 # evndisp reconstruction runparamter

@@ -1,6 +1,5 @@
 #!/bin/bash
 # analyze data files with eventdisplay
-# Author: Gernot Maier
 
 ## HARD-CODED VALUES
 # run options (will be overwritten in DST mode)

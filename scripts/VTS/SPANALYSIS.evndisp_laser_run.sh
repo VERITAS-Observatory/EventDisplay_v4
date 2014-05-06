@@ -1,6 +1,5 @@
 #!/bin/bash
 # analyze a laser/flasher run (calculate pedestals, calculate gains)
-# Author: Gernot Maier
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message

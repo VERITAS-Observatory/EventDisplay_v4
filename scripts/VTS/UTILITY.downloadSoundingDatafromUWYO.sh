@@ -1,7 +1,6 @@
 #!/bin/bash
 # download sounding (balloon) data from UWYO for VERITAS
 # combine the monthly data into one file and create a list of files (in this case just the total file)
-# Author Gernot Maier
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message
