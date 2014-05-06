@@ -1264,7 +1264,7 @@ void VSensitivityCalculator::plotObservationTimevsFluxFromTextFile( TCanvas* c, 
 }
 
 
-TCanvas* VSensitivityCalculator::plotObservationTimevsFlux( unsigned int iD, TCanvas* c, int iLineColor, double iLineWidth )
+TCanvas* VSensitivityCalculator::plotObservationTimevsFlux( unsigned int iD, TCanvas* c, int iLineColor, double iLineWidth, bool bGuidingLines )
 {
 	if( !checkDataSet( iD, "plotObservationTimevsFlux" ) )
 	{
@@ -1304,7 +1304,7 @@ TCanvas* VSensitivityCalculator::plotObservationTimevsFlux( unsigned int iD, TCa
 		fGraphObsvsTime[iD]->Print();
 	}
 	
-	if( bNewCanvas )
+	if( bNewCanvas && bGuidingLines )
 	{
 		for( unsigned int i = 0; i < fSourceStrength.size(); i++ )
 		{
@@ -2492,6 +2492,7 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		}
 		break;
 	}
+	delete c;
 	// remove single filled bins in effective areas
 	bool bGoodBin = false;
 	if( iMCPara->energy.size() > 1 )
