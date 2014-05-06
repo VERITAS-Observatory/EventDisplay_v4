@@ -110,8 +110,7 @@ namespace VStatistics
 			return 0.;
 		}
 		
-		liandma( nOn, nOff, norm,
-				 nSig, limaSig5, limaSig9, limaSig17 );
+		liandma( nOn, nOff, norm, nSig, limaSig5, limaSig9, limaSig17 );
 		//  if( !isnormal( limaSig17 ) ) return 0.;
 		
 		if( iLiMaForm == 5 )
@@ -419,21 +418,6 @@ namespace VStatistics
 	inline double getMedian( vector< double > x )
 	{
 		return TMath::Median( x.size(), &x[0] );
-		
-		/*
-		  (GM) old code: gives seg faults in certain cases
-		     if( x.size() == 0 ) return 0.;
-		
-		     sort( x.begin(), x.end() );
-		
-		     if( x.size() % 2 == 0 )
-		     {
-			 unsigned int l = x.size()/2;
-		
-		         return 0.5*(x[l]+x[l+1]);
-		     }
-		
-		     return x[x.size()/2]; */
 	}
 	
 	/*
