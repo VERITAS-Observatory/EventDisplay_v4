@@ -418,7 +418,7 @@ void VSkyCoordinatesUtilities::getEquatorialCoordinates( int MJD, double time, d
 {
 	double ha = 0.;
 	// transform coordinates
-	slaDh2e( az_deg / TMath::RadToDeg(), ( 90. - ze_deg ) / TMath::RadToDeg(), VGlobalRunParameter::getObservatory_Latitude_deg(), &ha, &dec_deg );
+	slaDh2e( az_deg * TMath::DegToRad(), ( 90. - ze_deg ) * TMath::DegToRad(), VGlobalRunParameter::getObservatory_Latitude_deg() * TMath::DegToRad(), &ha, &dec_deg );
 	// convert hour angle into ra
 	double iTime = 0.;
 	double iSid = 0.;
@@ -427,7 +427,7 @@ void VSkyCoordinatesUtilities::getEquatorialCoordinates( int MJD, double time, d
 	// get Greenwich sideral time
 	iSid = slaGmsta( ( double )MJD, iTime );
 	// calculate local sideral time
-	iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg();
+	iSid = iSid - VGlobalRunParameter::getObservatory_Longitude_deg() * TMath::DegToRad();
 	// calculate right ascension
 	ra_deg = slaDranrm( iSid - ha );
 	

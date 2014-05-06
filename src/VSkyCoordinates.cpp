@@ -228,23 +228,6 @@ void VSkyCoordinates::getEquatorialCoordinates( int MJD, double time, double az,
 		return;
 	}
 	VSkyCoordinatesUtilities::getEquatorialCoordinates( MJD, time, az, ze, dec, ra );
-	/*    double ha = 0.;
-	// transform coordinates
-	    slaDh2e( az/TMath::RadToDeg(), (90.-ze)/TMath::RadToDeg(), fObsLatitude, &ha, &dec );
-	// convert hour angle into ra
-	    double iTime = 0.;
-	    double iSid = 0.;
-	// convert time to fraction of a day
-	    iTime = time / 86400.;
-	// get Greenwich sideral time
-	    iSid = slaGmsta( (double)MJD, iTime );
-	// calculate local sideral time
-	    iSid = iSid - fObsLongitude;
-	// calculate right ascension
-	    ra = slaDranrm( iSid - ha );
-	
-	    dec *= TMath::RadToDeg();
-	    ra  *= TMath::RadToDeg(); */
 }
 
 /*
