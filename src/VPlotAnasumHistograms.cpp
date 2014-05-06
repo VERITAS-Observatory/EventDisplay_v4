@@ -1613,13 +1613,17 @@ vector<sSource> VPlotAnasumHistograms::plot_catalogue( TCanvas* c, string iCatal
 						t->SetTextSize( t->GetTextSize() * 0.5 );
 						t->SetTextColor( iColor );
 						t->Draw();
-						char hname1[100];
-						sprintf( hname1, "%sMag:%.1f", iBand.c_str(), s.getStarBrightness( i, iBand ) ) ;
-						TText*  t1 = new TText( x + 0.19, y + 0.06, hname1 );
-						t1->SetTextAngle( iTextAngle );
-						t1->SetTextSize( t1->GetTextSize() * 0.5 );
-						t1->SetTextColor( iColor );
-						t1->Draw();
+						float iB = s.getStarBrightness( i, iBand );
+						if( iB > -50. && iB < 999 )
+						{
+						   char hname1[100];
+						   sprintf( hname1, "%sMag:%.1f", iBand.c_str(), iB );
+						   TText*  t1 = new TText( x + 0.19, y + 0.06, hname1 );
+						   t1->SetTextAngle( iTextAngle );
+						   t1->SetTextSize( t1->GetTextSize() * 0.5 );
+						   t1->SetTextColor( iColor );
+						   t1->Draw();
+                                                }
 					}
 					// draw a circle for extended sources
 					if( s.getStarMajorDiameter( i ) > 0. )

@@ -294,6 +294,14 @@ bool VStarCatalogue::readCatalogue()
 		{
 			i_Star = readCommaSeparatedLine_Fermi_Catalogue( iLine_sub, zid, i_Star );
 		}
+		else if( fCatalogueVersion == 14 )
+		{
+			i_Star = readCommaSeparatedLine_FAVA( iLine_sub, zid, i_Star );
+		}
+		else if( fCatalogueVersion == 15 )
+		{
+			i_Star = readCommaSeparatedLine_Fermi2nd_Catalogue( iLine_sub, zid, i_Star );
+		}
 		else
 		{
 			istringstream is_stream( iLine_sub );
@@ -453,6 +461,239 @@ bool VStarCatalogue::readCatalogue()
 	return true;
 }
 
+VStar* VStarCatalogue::readCommaSeparatedLine_FAVA( string iLine, int zid, VStar* i_Star )
+{
+	string iT1;
+	string iT2;
+	string iT3;
+
+	i_Star->fStarID = zid;
+	i_Star->fBrightness_V = 9999.;
+	i_Star->fBrightness_B = 9999.;
+	
+	if( iLine.size() == 0 )
+	{
+		return i_Star;
+	}
+	
+	string iTemp = iLine;
+	
+	// star name
+	i_Star->fStarName = iTemp.substr( 0, iTemp.find( "," ) );
+	
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+
+	// ra, dec
+	istringstream is_stream( iTemp );
+	is_stream >> iT1;
+	is_stream >> iT2;
+	is_stream >> iT3;
+	cout << "RA " << zid << " " << iT1.c_str() << " " << iT2.c_str() << " " << iT3.c_str() << endl;
+	i_Star->fRA2000 = 15.*( atof( iT1.c_str() ) + atof( iT2.c_str() ) / 60. + atof( iT3.c_str() ) / 3600. );
+	// dec2000
+	is_stream >> iT1;
+	is_stream >> iT1;
+	is_stream >> iT2;
+	is_stream >> iT3;
+	cout << "Dec " << zid << " " << iT1.c_str() << " " << iT2.c_str() << " " << iT3.c_str() << endl;
+	if( iT1.find( "-", 0 ) != string::npos )
+	{
+		 i_Star->fDec2000 = atof( iT1.c_str() ) - atof( iT2.c_str() ) / 60. - atof( iT3.c_str() ) / 3600.;
+	}
+	else
+	{
+		 i_Star->fDec2000 = atof( iT1.c_str() ) + atof( iT2.c_str() ) / 60. + atof( iT3.c_str() ) / 3600.;
+	}
+
+	return i_Star;
+}
+
+/*
+    2nd Fermi catalogue
+
+*/
+VStar* VStarCatalogue::readCommaSeparatedLine_Fermi2nd_Catalogue( string iLine, int zid, VStar* i_Star )
+{
+	i_Star->fStarID = zid;
+	i_Star->fBrightness_V = 9999.;
+	i_Star->fBrightness_B = 9999.;
+	
+	if( iLine.size() == 0 )
+	{
+		return i_Star;
+	}
+	
+	string iTemp = iLine;
+	
+	// star name
+	i_Star->fStarName = iTemp.substr( 0, iTemp.find( "," ) );
+	
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// ra, dec
+	i_Star->fRA2000 = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fDec2000 = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	
+	// galactic latitude/longitude are calculated from ra, dec
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// ignore 68% values on position
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fMajorDiameter_68 = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fMinorDiameter_68 = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fPositionAngle_68 = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// 95% confidence radius
+	i_Star->fMajorDiameter = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fMinorDiameter = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fPositionAngle = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// significance
+	i_Star->fSignificance = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	
+	for( unsigned int i = 0; i < 4; i++ )
+	{
+		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	}
+	
+	// spectral index
+	i_Star->fSpectralIndex = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fSpectralIndexError = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// 1 GeV to 100 GeV flux
+	i_Star->fFluxEnergyMin.push_back( 1. );
+	i_Star->fFluxEnergyMax.push_back( 1.e2 );
+	i_Star->fFlux.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fFluxError.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+        iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+        iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	// spectral type
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fSpectrumType = iTemp.substr( 0, iTemp.find( "," ) );
+
+	for( unsigned int i = 0; i < 18; i++ )
+	{
+		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	}
+
+	// cutoff energy
+	i_Star->fCutOff_MeV = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fCutOffError_MeV = atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+
+	for( unsigned int i = 0; i < 6; i++ )
+	{
+		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	}
+	
+	// 100 MeV to 300 MeV
+	i_Star->fFluxEnergyMin.push_back( 0.1 );
+	i_Star->fFluxEnergyMax.push_back( 0.3 );
+	i_Star->fFlux.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fFluxError.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// 300 MeV to 1 GeV
+	i_Star->fFluxEnergyMin.push_back( 0.3 );
+	i_Star->fFluxEnergyMax.push_back( 1.0 );
+	i_Star->fFlux.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fFluxError.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// 1 GeV to 3 GeV
+	i_Star->fFluxEnergyMin.push_back( 1.0 );
+	i_Star->fFluxEnergyMax.push_back( 3.0 );
+	i_Star->fFlux.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fFluxError.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// 3 GeV to 10 GeV
+	i_Star->fFluxEnergyMin.push_back( 3.0 );
+	i_Star->fFluxEnergyMax.push_back( 10.0 );
+	i_Star->fFlux.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fFluxError.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	// 10 GeV to 100 GeV
+	i_Star->fFluxEnergyMin.push_back( 10.0 );
+	i_Star->fFluxEnergyMax.push_back( 100.0 );
+	i_Star->fFlux.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	i_Star->fFluxError.push_back( atof( iTemp.substr( 0, iTemp.find( "," ) ).c_str() ) );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	
+	for( unsigned int i = 0; i < 113; i++ )
+	{
+		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	}
+	
+	// Other names
+	for( unsigned int i = 0; i < 72; i++ )
+	{
+		if( iTemp.substr( 0, iTemp.find( "," ) ).size() > 1 )
+		{
+			if( iTemp.substr( 0, iTemp.find( "," ) ) != "  " )
+			{
+				i_Star->fOtherNames.push_back( iTemp.substr( 0, iTemp.find( "," ) ) );
+			}
+			iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+		}
+	}
+	for( unsigned int i = 0; i < 26; i++ )
+	{
+		iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	}
+
+	// classification
+	if( iTemp.substr( 0, iTemp.find( "," ) ).size() > 1 && iTemp.substr( 0, iTemp.find( "," ) ) != "  " )
+	{
+		i_Star->fType =  iTemp.substr( 0, iTemp.find( "," ) );
+	}
+	iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+	for( unsigned int i = 0; i < 5; i++ )
+	{
+		if( iTemp.substr( 0, iTemp.find( "," ) ).size() > 0 )
+		{
+			iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+		}
+	}
+	for( unsigned int i = 0; i < 22; i++ )
+	{
+		if( iTemp.substr( 0, iTemp.find( "," ) ).size() > 1 )
+		{
+			if( iTemp.substr( 0, iTemp.find( "," ) ) != "  " )
+			{
+				i_Star->fAssociations.push_back( iTemp.substr( 0, iTemp.find( "," ) ) );
+			}
+			iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
+		}
+	}
+	i_Star->fQualityFlag = atoi( iTemp.substr( iTemp.rfind( "," )+1, iTemp.size() ).c_str() );
+	return i_Star;
+}
 
 VStar* VStarCatalogue::readCommaSeparatedLine_Fermi_Catalogue( string iLine, int zid, VStar* i_Star )
 {
@@ -611,7 +852,7 @@ VStar* VStarCatalogue::readCommaSeparatedLine_Fermi_Catalogue( string iLine, int
 			iTemp = iTemp.substr( iTemp.find( "," ) + 1, iTemp.size() );
 		}
 	}
-	i_Star->fQualityFlag = atoi( iTemp.substr( 0, iTemp.find( "," ) ).c_str() );
+	i_Star->fQualityFlag = atoi( iTemp.substr( iTemp.rfind( "," )+1, iTemp.size() ).c_str() );
 	return i_Star;
 }
 
@@ -1189,6 +1430,8 @@ bool VStarCatalogue::writeCatalogueToRootFile( string iRootFile )
 	double fFluxEnergyMax[fMaxEnergyBins];
 	double fFlux[fMaxEnergyBins];
 	double fFluxError[fMaxEnergyBins];
+	double fCutOff_MeV = 0;
+	double fCutOffError_MeV = 0;
 	for( unsigned int i = 0; i < fMaxEnergyBins; i++ )
 	{
 		fFluxEnergyMin[i] = 0.;
@@ -1197,6 +1440,7 @@ bool VStarCatalogue::writeCatalogueToRootFile( string iRootFile )
 		fFluxError[i] = 0.;
 	}
 	unsigned int fVariability = 0;
+	Char_t fStarType[300];
 	int fQualityFlag = 0;
 	
 	tCat->Branch( "StarID", &fStarID, "StarID/i" );
@@ -1222,6 +1466,9 @@ bool VStarCatalogue::writeCatalogueToRootFile( string iRootFile )
 	tCat->Branch( "Flux", fFlux, "Flux[NFluxEnergyBins]/D" );
 	tCat->Branch( "FluxError", fFluxError, "FluxError[NFluxEnergyBins]/D" );
 	tCat->Branch( "Variability", &fVariability, "Variability/i" );
+	tCat->Branch( "CutOff_MeV", &fCutOff_MeV, "CutOff_MeV/D" );
+	tCat->Branch( "CutOffError_MeV", &fCutOffError_MeV, "CutOffError_MeV/D" );
+	tCat->Branch( "Class",  &fStarType, "Class/C" );
 	tCat->Branch( "QualityFlag", &fQualityFlag, "QualityFlag/I" );
 	
 	// fill tree
@@ -1246,6 +1493,8 @@ bool VStarCatalogue::writeCatalogueToRootFile( string iRootFile )
 		fSpectralIndexError = fStars[i]->fSpectralIndexError;
 		fQualityFlag = fStars[i]->fQualityFlag;
 		fVariability = fStars[i]->fVariability;
+		fCutOff_MeV  = fStars[i]->fCutOff_MeV;
+		fCutOffError_MeV  = fStars[i]->fCutOffError_MeV;
 		
 		if( fStars[i]->fFluxEnergyMin.size() > 0 && fStars[i]->fFluxEnergyMin.size() == fStars[i]->fFluxEnergyMax.size() && fStars[i]->fFlux.size() == fStars[i]->fFluxEnergyMin.size() && fStars[i]->fFluxError.size() == fStars[i]->fFluxEnergyMin.size() )
 		{
@@ -1258,6 +1507,7 @@ bool VStarCatalogue::writeCatalogueToRootFile( string iRootFile )
 				fFluxError[j] = fStars[i]->fFluxError[j];
 			}
 		}
+		sprintf( fStarType, "%s", fStars[i]->fType.c_str() );
 		tCat->Fill();
 	}
 	

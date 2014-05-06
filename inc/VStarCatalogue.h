@@ -50,6 +50,8 @@ class VStarCatalogue : public TObject, public VGlobalRunParameter
 		bool readCatalogue();
 		VStar* readCommaSeparatedLine_Fermi( string, int, VStar* );
 		VStar* readCommaSeparatedLine_Fermi_Catalogue( string, int, VStar* );
+		VStar* readCommaSeparatedLine_Fermi2nd_Catalogue( string, int, VStar* );
+		VStar* readCommaSeparatedLine_FAVA( string, int, VStar* );
 		
 	public:
 	

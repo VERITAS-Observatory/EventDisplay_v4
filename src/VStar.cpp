@@ -25,6 +25,9 @@ VStar::VStar()
 	fSignificance = 0.;
 	fSpectralIndex = 0.;
 	fSpectralIndexError = 0.;
+	fSpectrumType = "PowerLaw";
+	fCutOff_MeV = -9999.;
+	fCutOffError_MeV = -9999.;
 	fVariability = false;
 	fType = "";
 	fQualityFlag = 0;

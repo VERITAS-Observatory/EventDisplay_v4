@@ -37,6 +37,9 @@ class VStar : public TObject
 		double fSignificance;
 		double fSpectralIndex;
 		double fSpectralIndexError;
+		string fSpectrumType;
+		double fCutOff_MeV;
+		double fCutOffError_MeV;
 		vector< double > fFluxEnergyMin;
 		vector< double > fFluxEnergyMax;
 		vector< double > fFlux;
@@ -53,7 +56,7 @@ class VStar : public TObject
 		double getDistance( VStar* iStar1, VStar* iStar2 = 0 );
 		void   printStar();
 		
-		ClassDef( VStar, 1 );
+		ClassDef( VStar, 2 );
 };
 
 
