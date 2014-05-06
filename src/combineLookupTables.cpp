@@ -50,7 +50,8 @@ string check_for_similar_noise_values( const char* hx )
                 char hname[200];
                 sprintf( hname, "NOISE_%05d", fNoiseLevel[i] );
                 iTemp = hname;
-                cout << "\t found similar noise level, save into directory: " << iTemp << "\t" << fNoiseLevel[i] << endl;
+                cout << "\t found similar noise level, save into directory: " << iTemp << "\t" << fNoiseLevel[i];
+                cout << " (" << fNoiseLevel.size() << ")" << endl;
                 return iTemp;
             }
         }
