@@ -96,7 +96,10 @@ if [ $USEFROGS ] ; then
     OPT+=( -frogs $MSCWDIR/$RUN.mscw.root -frogid 0 )
 fi
 
-#OPT+=( -nevents=2000 )
+if [[ "$FASTDEVMODE" == "yes" ]] ; then
+    echo "Warning, \$FASTDEVMODE=yes, so only processing the first 2000 events."
+    OPT+=( -nevents=2000 )
+fi
 
 #########################################
 # run eventdisplay

@@ -10,7 +10,7 @@ echo "
 EVNDISP data analysis: evndisp FROGS analysis for a simple run list
 
 ANALYSIS.evndisp_frogs.sh <runlist> <mscw directory> <output directory>
- [calibration] [VPM]
+ <array version> [calibration] [VPM]
 
 required parameters:
 
@@ -19,6 +19,9 @@ required parameters:
     <mscw directory>        directory which contains mscw_energy files
     
     <output directory>      directory where output ROOT files will be stored
+
+    <array version>         array version of the runs in the runlist,
+                            e.g. V4, V5, V6.  (aka array epoch)
 
 optional parameters:
     
@@ -39,13 +42,18 @@ fi
 bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
+# create extra stdout for duplication of command output
+# look for ">&5" below
+exec 5>&1
+
 # Parse command line arguments
 RLIST=$1
 MSCWDIR=$2
 ODIR=$3
+ARRAYVERS=$4
 mkdir -p $ODIR
-[[ "$4" ]] && CALIB=$4 || CALIB=1
-[[ "$5" ]] && VPM=$5 || VPM=1
+[[ "$5" ]] && CALIB=$5 || CALIB=1
+[[ "$6" ]] && VPM=$6   || VPM=1
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -68,10 +76,11 @@ do
     echo "Now starting run $AFILE"
     FSCRIPT="$LOGDIR/EVN.data-$AFILE"
 
-    sed -e "s|RUNFILE|$AFILE|" \
+    sed -e "s|RUNFILE|$AFILE|"           \
         -e "s|CALIBRATIONOPTION|$CALIB|" \
-        -e "s|OUTPUTDIRECTORY|$ODIR|"  \
-        -e "s|MSCWDIRECTORY|$MSCWDIR|" \
+        -e "s|OUTPUTDIRECTORY|$ODIR|"    \
+        -e "s|MSCWDIRECTORY|$MSCWDIR|"   \
+        -e "s|ARRRRRRRAAAYY|$ARRAYVERS|" \
         -e "s|USEVPMPOINTING|$VPM|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
@@ -81,7 +90,23 @@ do
     SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
     SUBC=`eval "echo \"$SUBC\""`
     if [[ $SUBC == *qsub* ]]; then
-        $SUBC $FSCRIPT.sh
+        
+		# print the job submission output to stdout, while also copying it to QSUBDATA
+        QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat - >&5) ) 
+        
+		# get the submitted job's id, after the fact
+		# by looking for "Your job ####### ..."
+		JOBID=$( echo "$QSUBDATA" | grep -E "Your job" | awk '{ print $3 }' )
+		
+		# tell the user basic info about the job submission
+		echo "RUN$AFILE JOBID $JOBID"
+		
+		# don't print a .o logfile name if the user specified /dev/null in the qsub command
+		if [[ ! $SUBC == */dev/null* ]] ; then
+			echo "RUN$AFILE OLOG $FSCRIPT.sh.o$JOBID"
+            echo "RUN$AFILE ELOG $FSCRIPT.sh.e$JOBID"
+		fi
+        
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
     fi

@@ -106,8 +106,8 @@ do
 		# don't print a .o logfile name if the user specified /dev/null in the qsub command
 		if [[ ! $SUBC == */dev/null* ]] ; then
 			echo "RUN$AFILE OLOG $FSCRIPT.sh.o$JOBID"
+            echo "RUN$AFILE ELOG $FSCRIPT.sh.e$JOBID"
 		fi
-		echo "RUN$AFILE ELOG $FSCRIPT.sh.e$JOBID"
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
     fi

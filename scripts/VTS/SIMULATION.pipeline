@@ -1,0 +1,431 @@
+#!/bin/bash
+
+PROJECTNAME="TestDiffuseGammas" # description of project or keyname
+PROJECTDATE="20140325"      # date associated with project
+
+# needed for grisu/care stage
+                                    # Directory Format   
+SIMTYPELIST=( "grisu_apr12" )       # simtype_XXXXX    , progname_version, (grisu|care)_(vers)
+PARTICLELIST=(  "gamma" ) #"proton" )  # particle_XXXXXX   , gamma, proton, electron, helium
+ARRAYEPOCHLIST=( 5 ) #6 ) # V4, V5, V6 # arrayepoch_XXXXXXX , 4=V4, 5=V5, 6=V6
+ATMOLIST=( "winter" ) #"summer" )      # atmosphere_XXXXXXX       
+DISPERSALLIST=( "diffuse" ) #"ring" )  # dispersal_XXXXXX , ring is standard, radius Wobble
+WOBBLELIST=( 0.00 ) #0.25 )            # wobble_XXX_deg , unused for dispersal_diffuse
+ZENITHLIST=( 0 20 )                 # zenith_XXX_deg     
+SCATTERLIST=( 750 )            # scatter_XXX_m      
+                                    # stage_XXXXX , same as stage command
+
+PRELUDEJOBS=2     # jobs to run in prelude stage, with logfiles
+FASTDEVRUN="yes"  # if 'yes', do detectorsim stage quickly, with only 2 shower repeats (NBREV 0 2)
+REPLETETESTJOBS=4 # of corsika files to run replete, only when FASTDEVRUN=yes, otherwise uses full jobs
+DEBUGREGEX="NKH"
+
+# load extra functions
+source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
+
+# extra place to duplicate output to stdout, look for >&5
+exec 5>&1 
+
+PROJECTTITLE="${PROJECTDATE}_${PROJECTNAME}"
+NWD=$PWD
+mkdir -p $NWD/$PROJECTTITLE
+if [ "$FASTDEVRUN" == "yes" ] ; then echo -e "${COTYELLOW}Warning, FASTDEVRUN=${FASTDEVRUN}$CONORM" ; fi
+
+CorsikaJobStartNumberList=( [0]=105000 [20]=205000 [30]=305000 [35]=350000 [40]=405000 [45]=455000 [50]=505000 [55]=555000 [60]=605000 [65]=655000 )
+CorsikaNumberOfJobsList=(   [0]=2000   [20]=5000   [30]=5000   [35]=5000   [40]=5000   [45]=5000   [50]=5000   [55]=2500   [60]=2500   [65]=2500   )
+
+# array configuration files
+# stored in $VERITAS_EVNDISP_AUX_DIR/DetectorGeometry
+ARRAYCONFIGFILELIST=(   [4]="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt" \
+                        [5]="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt" \
+                        [6]="EVN_V6_Upgrade_20121127_v420.txt"                )
+
+# stored in ??? somewhere in grisu
+EXTFILELIST=(   [20]="data/V.Crab.US76.50km.profile.ext"   
+                [21]="data/V.Winter.US76.50km.profile.ext" 
+                [22]="data/V.Summer.US76.50km.profile.ext" )
+
+SCIDIR="$PWD/.pipeline"
+mkdir -p "$SCIDIR"
+STAGEFILE="$SCIDIR/stage"
+
+# handle inputs
+STAGE=$1
+[[ "$2" == "check" ]] && CHK=true || CHK=false
+STAGELIST=( "brew" "prelude" "replete" "simmer" "evndisp" "mscw" "anpar" "anmer" "jobs" "kill" )
+if [[ ! "$STAGE" =~ (brew|prelude|replete|simmer|evndisp|mscw|anpar|anmer|jobs|kill) ]] ; then
+    echo "error, command needs to be one of [${STAGELIST[@]}]"
+    exit 1
+fi
+
+function stageStart {
+    echo "$STAGE" > "$STAGEFILE"
+    CHECKWORD=""
+    if $CHK ; then CHECKWORD=" check" ; fi
+    echo -e "${COBLUE}running ${STAGE}${CHECKWORD}...${CONORM}"
+}
+
+RUNNINGJOBS="$SCIDIR/runningjobs" # file containing job numbers from the last action
+# display running jobs
+if [[ "$STAGE" =~ jobs ]] ; then
+    checkIfJobsAreDone "$RUNNINGJOBS" "$STAGEFILE" "30"
+    exit 0
+fi
+
+# kill all running jobs
+if [[ "$STAGE" =~ kill ]] ; then
+    killJobsInJobfile "$RUNNINGJOBS"
+    exit 0
+fi
+
+function tagString {
+    local tagname=$1
+    local tagarg=$2
+    echo "+${tagname}=$tagarg"
+}
+
+function tagDir {
+    local tagname=$1
+    local tagarg=$2
+    echo "${tagname}_$tagarg"
+}
+
+
+SIMTRACK="$SCIDIR/simTracking"     # for prelude replete
+MERGETRACK="$SCIDIR/mergeTracking" # for simmer
+function makeSimTrackingFile {
+    local SAVELOG="$1" # dosave or donotsave
+    rm -rf $SIMTRACK   
+    rm -rf $MERGETRACK
+    touch $SIMTRACK
+    touch $MERGETRACK
+    local SIMTYPETAG=""
+    local PARTICLETAG=""
+    local ARRAYEPOCHTAG=""
+    local DISPERSALTAG=""
+    local WOBBLETAG=""
+    local ZENITHTAG=""
+    local INPUTFILETAG=""
+    local EXTFILETAG=""
+    local SAVELOGTAG=$( tagString "savelog" "$SAVELOG" )
+    local FASTDEVRUNTAG=$( tagString "fastdevrun" "$FASTDEVRUN" )
+    local PROJECTTITLETAG=$( tagString "projecttitle" "$PROJECTTITLE" )
+    for SIMTYPE    in "${SIMTYPELIST[@]}"    ; do
+    for PARTICLE   in "${PARTICLELIST[@]}"   ; do
+    for ARRAYEPOCH in "${ARRAYEPOCHLIST[@]}" ; do
+        ARRAYCONFIGFILE="${ARRAYCONFIGFILELIST[$ARRAYEPOCH]}"
+        for DISPERSAL  in "${DISPERSALLIST[@]}"  ; do
+            # only do one wobble if dispersal is diffuse, 
+            # since diffuse doesn't use the wobble param
+            for ATMO in "${ATMOLIST[@]}" ; do
+                if   [[ "$ATMO" == "winter" ]] ; then ATMOF="21"
+                elif [[ "$ATMO" == "summer" ]] ; then ATMOF="22"
+                else 
+                    echo "Error, \$ATMO='$ATMO', which is a bad atmo code, no extfile defined for this atmo code, exiting..."
+                    exit 1
+                fi
+                EXTFILETAG=$( tagString "extfilename" ${EXTFILELIST[$ATMOF]} ) ; 
+                if [[ "$DISPERSAL" == "diffuse" ]] ; then MIDWOBBLELIST=( 0.0 )
+                else                                      MIDWOBBLELIST=${WOBBLELIST[@]} ; fi
+                for WOBBLE     in ${MIDWOBBLELIST[@]} ; do
+                for SCATTER    in ${SCATTERLIST[@]}   ; do
+                for ZENITH     in ${ZENITHLIST[@]}    ; do
+                    WOBBLE=$( printf "%4.02f" $WOBBLE ) # 0 -> 0.00, 0.5 -> 0.50
+                    ZENITH=$( printf "%02d" $ZENITH )   # 0 -> 00
+                    SIMTYPETAG=$(    tagString "simtype"    "$SIMTYPE"    )
+                    PARTICLETAG=$(   tagString "particle"   "$PARTICLE"   )
+                    ARRAYEPOCHTAG=$( tagString "arrayepoch" "$ARRAYEPOCH" )
+                    DISPERSALTAG=$(  tagString "dispersal"  "$DISPERSAL"  )
+                    echo -e "${COTBLUE}$( printf "%11s %-6s %1s %-7s %-6s %-4s %2s %4s\n" $SIMTYPE $PARTICLE $ARRAYEPOCH $DISPERSAL $ATMO "$WOBBLE" "$ZENITH" "$SCATTER" ) $CONORM"
+                    if [[ "$DISPERSAL" == "diffuse" ]] ; then WOBBLETAG="" 
+                    else                                      WOBBLETAG=$( tagString "wobble" "$WOBBLE" ) ; fi
+
+                    ZENITHTAG=$(      tagString "zenith"      "$ZENITH"          )
+                    ARRAYCONFIGTAG=$( tagString "arrayconfig" "$ARRAYCONFIGFILE" )
+                    CORSIKAJOBSTART=${CorsikaJobStartNumberList[$ZENITH]}
+                    if   [[ "$SAVELOG" == "dosave"    ]] ; then CORSIKANJOBS="$PRELUDEJOBS"
+                    elif [[ "$SAVELOG" == "donotsave" ]] ; then
+                        if [[ "$FASTDEVRUN" == "yes"  ]] ; then CORSIKANJOBS="$REPLETETESTJOBS"
+                        else                                    CORSIKANJOBS="${CorsikaNumberOfJobsList[$ZENITH]}" ; fi
+                    fi
+                    
+                    # assemble output directory
+                    OUTPUTDATADIR="$NWD/$PROJECTTITLE/$(tagDir "simtype" $SIMTYPE)/$(tagDir "particle" $PARTICLE)/$(tagDir "arrayepoch" $ARRAYEPOCH)/$(tagDir "dispersal" $DISPERSAL)/$(tagDir "atmo" $ATMO)/$(tagDir "wobble" $WOBBLE)/$(tagDir "scatter" $SCATTER)/$(tagDir "zenith" $ZENITH)/"
+                    mkdir -p $OUTPUTDATADIR
+                    
+                    # prepare the list of files to merge together
+                    MERGELIST="$OUTPUTDATADIR/mergelist"
+                    rm -rf $MERGELIST
+                    MERGELISTTAG=$(    tagString "mergelist"    "$MERGELIST"                    )
+                    MERGEOUTPUTTAG=$(  tagString "mergeoutput"  "$OUTPUTDATADIR/simmer.vbf.bz2" )
+                    MERGELOGTAG=$(     tagString "mergelog"     "$OUTPUTDATADIR/simmer.log"     )
+                    FIRSTCORSIKATAG=$( tagString "firstcorsika" "$CORSIKAJOBSTART"              )
+                    
+                    # loop over corsika files
+                    for JITER in $( seq $CORSIKAJOBSTART $((CORSIKAJOBSTART+CORSIKANJOBS-1)) ) ; do
+                        CORSIKAFILE="$VERITAS_DATA_DIR/simulations/V5_FLWO/gamma_${ZENITH}deg_${SCATTER}m/corsikaATM${ATMOF}/DAT${JITER}.telescope.bz2"
+                        INPUTFILETAG=$(      tagString "inputcorsikafile" "$CORSIKAFILE" )
+                        CORSIKAJOBITERTAG=$( tagString "corsikajobiter"   "$JITER"       )
+                        if [ ! -f "$CORSIKAFILE" ] ; then
+                            echo -e "${COTYELLOW}Warning, unable to locate input corsika file '$CORSIKAFILE', exiting..."
+                            exit 1
+                        fi
+                        OUTPUTDATAFILEBASE="DAT${JITER}.vbf.bz2"
+                        OUTPUTDATAFILENAME="${OUTPUTDATADIR}/$OUTPUTDATAFILEBASE"
+                        
+                        # save this filename to the merge list
+                        echo "$OUTPUTDATAFILENAME" >> $MERGELIST
+                        
+                        OUTPUTDATAFILETAG=$( tagString "outputdatafile" "$OUTPUTDATAFILENAME" )
+                        OUTPUTLOGFILETAG=$(  tagString "outputlogfile"  "`dirname $OUTPUTDATAFILENAME`/`basename $OUTPUTDATAFILENAME .vbf.bz2`.log" )
+                        PARALLELTAGLINE="$SIMTYPETAG $PARTICLETAG $ARRAYEPOCHTAG $DISPERSALTAG $WOBBLETAG $ZENITHTAG $INPUTFILETAG $CORSIKAJOBITERTAG $EXTFILETAG $ARRAYCONFIGTAG $OUTPUTDATAFILETAG $OUTPUTLOGFILETAG $SAVELOGTAG $FASTDEVRUNTAG"
+                        echo "$PARALLELTAGLINE" >> $SIMTRACK
+                    done
+                    
+                    # add a line to the mergeTracking file
+                    MERGETAGLINE="$MERGELISTTAG $MERGEOUTPUTTAG $MERGELOGTAG $FIRSTCORSIKATAG"
+                    echo "$MERGETAGLINE" >> $MERGETRACK
+                done
+                done
+                done
+            done
+        done
+    done
+    done
+    done
+}
+
+ANATRACK="$SCIDIR/analysisTracking" # for evndisp mscw anpar anmer
+function makeAnaTrackingFile {
+    rm -rf $ANATRACK
+    touch $ANATRACK
+}
+
+# take output from qsub commands, and parse it
+# for job numbers, usually:
+# Your job ##########
+# and add it to the runningJobList
+function updateRunningJobFile {
+    local INPUTDATA="$1"
+    local ACTIVEJOBS=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{print $3}' )
+    rm -rf "$RUNNINGJOBS" ;
+    for AJOB in $ACTIVEJOBS ; do
+        #echo "updateRunningJobFile: Adding job: $AJOB"
+        echo "$AJOB" >> $RUNNINGJOBS
+    done
+}
+
+
+# s brew : make our two tracking files
+if   [[ "$STAGE" == "brew"    ]] ; then
+    stageStart
+    makeSimTrackingFile $PRELUDEJOBS
+    makeAnaTrackingFile
+elif [[ "$STAGE" == "prelude" ]] ; then
+    PRELUDEQSUB="$SCIDIR/qsub.prelude"
+    if ! $CHK ; then
+        stageStart
+        makeSimTrackingFile "dosave"
+        cd $EVNDISPSYS/scripts/VTS
+        QSUBDATA=$( ./helper_scripts/SIMULATION.detectorsim.sh $SIMTRACK "dosavelog" | tee >(cat - >&5) )
+        echo "$QSUBDATA" > $PRELUDEQSUB
+        updateRunningJobFile "$QSUBDATA"
+        echo "Jobs submitted"
+    else
+        stageStart
+        haltIfAnyJobsAreRunning $RUNNINGJOBS
+        QSUBDATA=$( cat $PRELUDEQSUB )
+        JOBID=$(      echo "$QSUBDATA" | grep -P "^JOBID"     | awk '{ print $2 }' )
+        JOBNUM=$(     echo "$JOBID"    | tr '.' ' '           | awk '{ print $1 }' )
+        SCRIPTNAME=$( echo "$QSUBDATA" | grep -P "^SUBSCRIPT" | awk '{ print $2 }' )
+        
+        # batch job exits
+        JOBINFOBIN="jobInfo"
+        if command -v $JOBINFOBIN >/dev/null ; then 
+            echo ; echo -e "${COTBLUE}Batch Jobs:$CONORM"
+            $JOBINFOBIN "$JOBID"
+        else
+            echo >&2 -e "${COTYELLOW}Warning, can't check status of batch jobs because script '$JOBINFOBIN' isn't anywhere in \$PATH, skipping this part"
+        fi
+
+        # log files
+        echo ; echo -e "${COTBLUE}Log Files:$CONORM"
+        LINECOUNT=0
+        while read p ; do
+            if (( $LINECOUNT > 0 )) ; then echo ; fi
+            echo -e "${COTBLUE}~~~~~~ Job ${JOBNUM}.${LINECOUNT}${CONORM}"
+            LINECOUNT=$(( LINECOUNT+1 ))
+            BATCHLOG="$SCRIPTNAME.o$JOBNUM.$LINECOUNT"
+            CORIOREADLOG=$( grep -P "^IOREADLOG" "$BATCHLOG" | awk '{ print $2 }' )
+            DETSIMLOG=$(    grep -P "^DETSIMLOG" "$BATCHLOG" | awk '{ print $2 }' )
+            scanLogFile "BATCHLOG"     "$BATCHLOG"     "$DEBUGREGEX"
+            scanLogFile "CORIOREADLOG" "$CORIOREADLOG" "$DEBUGREGEX"
+            scanLogFile "DETSIMLOG"    "$DETSIMLOG"    "$DEBUGREGEX"
+        done < "$SIMTRACK"
+        
+        # data files
+        echo ; echo -e "${COTBLUE}Datafiles:$CONORM"
+        LINECOUNT=0
+        while read p ; do
+            LINECOUNT=$(( LINECOUNT+1 ))
+            BATCHLOG="$SCRIPTNAME.o$JOBNUM.$LINECOUNT"
+            DATAFILE=$( getTagArgFromTagline "outputdatafile" "$p" )
+            OUTLOG=$(   getTagArgFromTagline "outputlogfile"  "$p" )
+            LOGFILES=( "$BATCHLOG" "$OUTLOG" )
+            WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+            ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+            if [[ -f "$DATAFILE" && ! -z "$DATAFILE" ]] ; then
+                DFBASE=$( basename $DATAFILE )
+                DFSHORT=$( echo "$DATAFILE" | sed -e 's|'$NWD'/||g' )
+                DFSIZE=`stat -c %s $DATAFILE`
+                DFSIZESTR=$( formatFileSize "$DFSIZE" )
+                DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+                RUNSUCCESS=$( checkForSuccess "$OUTLOG" "\-\-\-\- END time")
+                #RUNSUCCESS="not checked yet"
+                printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFSHORT" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+            else
+                echo -e "${COTRED} Error, datafile '$DATAFILE' not found..."
+            fi
+        done < "$SIMTRACK"
+    fi
+    exit 0
+elif [[ "$STAGE" == "replete" ]] ; then
+    REPLETEQSUB="$SCIDIR/qsub.replete"
+    if ! $CHK ; then
+        stageStart
+        makeSimTrackingFile "donotsave"
+        cd $EVNDISPSYS/scripts/VTS
+        QSUBDATA=$( ./helper_scripts/SIMULATION.detectorsim.sh $SIMTRACK "dosavelog" | tee >(cat - >&5) )
+        echo "$QSUBDATA" > $REPLETEQSUB
+        updateRunningJobFile "$QSUBDATA"
+        echo "Jobs submitted"
+    else
+        stageStart
+        haltIfAnyJobsAreRunning $RUNNINGJOBS
+        QSUBDATA=$( cat $REPLETEQSUB )
+        JOBID=$(      echo "$QSUBDATA" | grep -P "^JOBID"     | awk '{ print $2 }' )
+        JOBNUM=$(     echo "$JOBID"    | tr '.' ' '           | awk '{ print $1 }' )
+        SCRIPTNAME=$( echo "$QSUBDATA" | grep -P "^SUBSCRIPT" | awk '{ print $2 }' )
+        
+        # batch job exits
+        JOBINFOBIN="jobInfo"
+        if command -v $JOBINFOBIN >/dev/null ; then 
+            echo ; echo -e "${COTBLUE}Batch Jobs:$CONORM"
+            $JOBINFOBIN "$JOBID"
+        else
+            echo >&2 -e "${COTYELLOW}Warning, can't check status of batch jobs because script '$JOBINFOBIN' isn't anywhere in \$PATH, skipping this part"
+        fi
+        
+        # data files
+        echo ; echo -e "${COTBLUE}Datafiles:$CONORM"
+        LINECOUNT=0
+        while read p ; do
+            LINECOUNT=$(( LINECOUNT+1 ))
+            BATCHLOG="$SCRIPTNAME.o$JOBNUM.$LINECOUNT"
+            DATAFILE=$( getTagArgFromTagline "outputdatafile" "$p" )
+            if [[ -f "$DATAFILE" && ! -z "$DATAFILE" ]] ; then
+                DFBASE=$( basename $DATAFILE )
+                DFSHORT=$( echo "$DATAFILE" | sed -e 's|'$NWD'/||g' )
+                DFSIZE=`stat -c %s $DATAFILE`
+                DFSIZESTR=$( formatFileSize "$DFSIZE" )
+                DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+                printf "%10s is %s, last modified %19s\n" "$DFSHORT" "$DFSIZESTR" "$DFMODDATE"
+            else
+                echo -e "${COTRED} Error, datafile '$DATAFILE' not found..."
+            fi
+        done < "$SIMTRACK"
+        
+    fi
+
+# merge the files
+elif [[ "$STAGE" == "simmer"  ]] ; then
+    SIMMERQSUB="$SCIDIR/qsub.simmer"
+    if ! $CHK ; then
+        stageStart
+        makeSimTrackingFile "dosave"
+        echo "MERGETRACK '$MERGETRACK'"
+        cd $EVNDISPSYS/scripts/VTS
+        QSUBDATA=$( ./helper_scripts/SIMULATION.sim_merge.sh $MERGETRACK | tee >(cat - >&5) )
+        echo "$QSUBDATA" > $SIMMERQSUB
+        updateRunningJobFile "$QSUBDATA"
+        echo "Jobs submitted"
+    else
+        stageStart
+        haltIfAnyJobsAreRunning $RUNNINGJOBS
+        QSUBDATA=$( cat $SIMMERQSUB )
+        JOBID=$(      echo "$QSUBDATA" | grep -P "^JOBID"     | awk '{ print $2 }' )
+        JOBNUM=$(     echo "$JOBID"    | tr '.' ' '           | awk '{ print $1 }' )
+        SCRIPTNAME=$( echo "$QSUBDATA" | grep -P "^SUBSCRIPT" | awk '{ print $2 }' )
+        
+        # batch job exits
+        JOBINFOBIN="jobInfo"
+        if command -v $JOBINFOBIN >/dev/null ; then 
+            echo ; echo -e "${COTBLUE}Batch Jobs:$CONORM"
+            $JOBINFOBIN "$JOBID"
+        else
+            echo >&2 -e "${COTYELLOW}Warning, can't check status of batch jobs because script '$JOBINFOBIN' isn't anywhere in \$PATH, skipping this part"
+        fi
+        
+        # log files
+        echo ; echo -e "${COTBLUE}Log Files:$CONORM"
+        LINECOUNT=0
+        while read p ; do
+            if (( $LINECOUNT > 0 )) ; then echo ; fi
+            echo -e "${COTBLUE}~~~~~~ Job ${JOBNUM}.${LINECOUNT}${CONORM}"
+            LINECOUNT=$(( LINECOUNT+1 ))
+            BATCHLOG="$SCRIPTNAME.o$JOBNUM.$LINECOUNT"
+            scanLogFile "BATCHLOG"     "$BATCHLOG"     "$DEBUGREGEX"
+        done < "$MERGETRACK"
+        
+        # data files
+        echo ; echo -e "${COTBLUE}Datafiles:$CONORM"
+        LINECOUNT=0
+        while read p ; do
+            LINECOUNT=$(( LINECOUNT+1 ))
+            BATCHLOG="$SCRIPTNAME.o$JOBNUM.$LINECOUNT"
+            DATAFILE=$( getTagArgFromTagline "mergeoutput" "$p" )
+            OUTLOG=$(   getTagArgFromTagline "mergelog"  "$p" )
+            LOGFILES=( "$BATCHLOG" "$OUTLOG" )
+            WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+            ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+            if [[ -f "$DATAFILE" && ! -z "$DATAFILE" ]] ; then
+                DFBASE=$( basename $DATAFILE )
+                DFSHORT=$( echo "$DATAFILE" | sed -e 's|'$NWD'/||g' )
+                DFSIZE=`stat -c %s $DATAFILE`
+                DFSIZESTR=$( formatFileSize "$DFSIZE" )
+                DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+                RUNSUCCESS=$( checkForSuccess "$OUTLOG" "\-\-\-\- END time")
+                #RUNSUCCESS="not checked yet"
+                printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFSHORT" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+            else
+                echo -e "${COTRED} Error, datafile '$OUTDATA' not found..."
+            fi
+        done < "$SIMTRACK"
+    fi
+
+elif [[ "$STAGE" == "evndisp" ]] ; then
+    if ! $CHK ; then
+        stageStart
+    else
+        stageStart
+    fi
+elif [[ "$STAGE" == "mscw"    ]] ; then
+    if ! $CHK ; then
+        stageStart
+    else
+        stageStart
+    fi
+elif [[ "$STAGE" == "anpar"   ]] ; then
+    if ! $CHK ; then
+        stageStart
+    else
+        stageStart
+    fi
+elif [[ "$STAGE" == "anmer"   ]] ; then
+    if ! $CHK ; then
+        stageStart
+    else
+        stageStart
+    fi
+fi
+
