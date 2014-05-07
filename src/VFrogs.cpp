@@ -22,6 +22,7 @@ VFrogs::VFrogs()
 
 	fFrogParameters = new VFrogParameters();
 	frogsRecID = getRunParameter()->ffrogsRecID;
+    templatelistname = getRunParameter()->ffrogstemplatelist ;
 	
 	fInitialized = false;
 	
@@ -78,7 +79,8 @@ void VFrogs::doFrogsStuff( int eventNumber )
 		
 		//Call the FROGS analysis
 		struct frogs_imgtmplt_out output;
-		output = frogs_img_tmplt( &d );
+		//output = frogs_img_tmplt( &d );
+		output = frogs_img_tmplt( &d, templatelistname.c_str() );
 		
 		frogsEventID     = output.event_id;
 		frogsGSLConStat  = output.gsl_convergence_status;

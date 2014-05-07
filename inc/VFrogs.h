@@ -186,6 +186,7 @@ class VFrogs : public VEvndispData, public VGrIsuAnalyzer
 		//VVirtualDataReader   *fReader;
 		
 		int frogsRecID;
+        string templatelistname ;
 		
 		int   frogsEventID;
 		int   frogsGSLConStat;

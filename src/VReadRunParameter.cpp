@@ -123,12 +123,15 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			}
 		}
 		// Frogs mode
-		else if( iTemp.find( "frogs" ) < iTemp.size() )
+		//else if( iTemp.find( "frogs" ) < iTemp.size() )
+		else if( iTemp1 == "-frogs" )
 		{
 			fRunPara->ffrogsmode = 1;
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->ffrogsmscwfile = iTemp2;
+                cout << "NKH iTemp1 " << iTemp1 << endl;
+                cout << "NKH   ffrogsmscwfile " << fRunPara->ffrogsmscwfile << endl;
 				i++;
 			}
 			else
@@ -136,16 +139,34 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 				fRunPara->ffrogsmscwfile = "";
 			}
 		}
-		else if( iTemp.find( "frogid" ) < iTemp.size() && fRunPara->ffrogsmode == 1 )
+		//else if( iTemp.find( "frogid" ) < iTemp.size() && fRunPara->ffrogsmode == 1 )
+		else if( iTemp1 == "-frogsid" ) 
 		{
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->ffrogsRecID = atoi( iTemp2.c_str() );
+                cout << "NKH iTemp1 " << iTemp1 << endl;
+                cout << "NKH   ffrogsRecID " << fRunPara->ffrogsRecID << endl;
 				i++;
 			}
 			else
 			{
 				fRunPara->ffrogsRecID = -1;
+			}
+		}
+		//else if( iTemp.find( "templatelistforfrogs" ) < iTemp.size() && fRunPara->ffrogsmode == 1 )
+		else if( iTemp1 == "-templatelistforfrogs" ) 
+		{
+			if( iTemp2.size() > 0 )
+			{
+				fRunPara->ffrogstemplatelist = iTemp2 ;
+                cout << "NKH iTemp1 " << iTemp1 << endl;
+                cout << "NKH   ffrogstemplatelist " << fRunPara->ffrogstemplatelist << endl;
+				i++;
+			}
+			else
+			{
+				fRunPara->ffrogstemplatelist = "" ;
 			}
 		}
 		// Model3D

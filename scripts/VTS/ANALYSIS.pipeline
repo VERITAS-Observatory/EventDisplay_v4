@@ -6,18 +6,18 @@ CWD=$PWD
 # Feb 2013
 #
 
-###################################################
-# HOW DO I USE THIS ?                             #
-# put this in a new directory,                    #
-# add your runlist file to that directory,        #
-# edit the settings below, then use the commands  #
-# $ sci [evndisp|mscw|anpar|anmer]                #
-# to run stages of the analysis,                  #
-# $ sci jobs                                      #
-# to see currently running jobs, and              #
-# $ sci [evndisp|mscw|anpar|anmer] check          #
-# to check the results of each stage for errors   #
-###################################################
+########################################################
+# HOW DO I USE THIS ?                                  #
+# put this in a new directory,                         #
+# add your runlist file to that directory,             #
+# edit the settings below, then use the commands       #
+# $ ANALYSIS.pipeline [evndisp|mscw|anpar|anmer]       #
+# to run stages of the analysis,                       #
+# $ ANALYSIS.pipeline jobs                             #
+# to see currently running jobs, and                   #
+# $ ANALYSIS.pipeline [evndisp|mscw|anpar|anmer] check #
+# to check the results of each stage for errors        #
+########################################################
 
 #############################################################################
 #
@@ -56,13 +56,18 @@ REFLMINREG="1"
 # and the maximum number of off regions to use?
 REFLMAXREG="10"
 
-# where should I store the evndisp and mscw output files?
+# Should we produce the tzero and pedestal files first?
+# These are required to do an analysis.
+# yes/no
+DOCALIB="no"
+
+# Where should we store the evndisp and mscw output files?
 # (full path please)
 # evndisp files will be: $EVNDISPDIR/#####.root, #####.tzero.root, etc
 # mscw files will be 
 EVNDISPDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 
-# which Reconstruction ID (RecID) should we use?
+# Which Reconstruction ID (RecID) should we use?
 # 0, 1, 2, 3, or 4
 # 0 = do mscw stage with all availible images
 # 1 = do mscw stage without using T1 images
@@ -70,6 +75,17 @@ EVNDISPDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 # etc.
 # For regular data analysis, this should be 0
 RECID=0
+
+# In the anasum stage, should we use frogs datafiles as the input?
+# If no, we will use the mscw datafiles instead.
+# To create the frogs datafiles, just run the 'frogs' stage.
+# ATTENTION: AFTER THE 'mscw' STAGE, YOU MUST RUN 
+# THE 'frogs' STAGE FOR THIS OPTION TO FULLY TAKE EFFECT
+# yes/no
+USEFROGS="yes"
+
+# Where should the frogs's output files be stored?
+FROGSDIR="$EVNDISPDIR/frogs"
 
 # where should we put the anasum files (parallel and merged)?
 # (full path please)
@@ -116,7 +132,7 @@ EFDATE2="20131115"
 
 
 BINNAME="$0"
-if [[ $# < 1 || ! $1 =~ (evndisp|mscw|anpar|anmer|jobs|kill) ]] ; then 
+if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|jobs|kill) ]] ; then 
     echo "
 HOW DO I USE THIS ?                             
    1. Put this script in a new directory,                    
@@ -124,17 +140,19 @@ HOW DO I USE THIS ?
    3. Edit the ANALYSIS SETTINGS within this file,
    4. Run commands:
         Run stages of the analysis:
-        $ sci [evndisp|mscw|anpar|anmer]                
+        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer]                
         See currently running jobs:
-        $ sci jobs                                      
+        $ $BINNAME jobs                                      
         Check the results of each stage for errors
-        $ sci [evndisp|mscw|anpar|anmer] check"
+        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer] check"
 	echo
     echo "Include a stage (evndisp, mscw, anpar, anmer) please, (optional 'check' afterwards)"
 	echo " $ $BINNAME evndisp         # run the 'event display' stage"
 	echo " $ $BINNAME evndisp check   # after evndisp, check its log and datafiles for problems"
 	echo " $ $BINNAME mscw            # run the 'mean scaled width' stage"
 	echo " $ $BINNAME mscw check      # after mscw, check its log and datafiles for problems"
+	echo " $ $BINNAME frogs           # run the 'frogs image reconstruction' stage"
+	echo " $ $BINNAME frogs check     # after frogs, check its log and datafiles for problems"
 	echo " $ $BINNAME anpar           # run the 'anasum parallel' stage"
 	echo " $ $BINNAME anpar check     # after anpar, check its log and datafiles for problems"
 	echo " $ $BINNAME anmer           # merge the anasum parallel files to one anasum file"
@@ -182,6 +200,9 @@ mkdir -p $SCIDIR
 # extra functions
 source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
 
+# frogs output directory
+mkdir -p $FROGSDIR
+
 # anasum output directory
 mkdir -p $ANASUMOUTPUTDIR
 
@@ -195,13 +216,16 @@ if [[ "$1" == "kill" ]] ; then # kill all running jobs
     killJobsInJobfile "$RUNNINGJOBS"
 fi
 
-function setupMSCWRunlists {
+function setupFilteredRunlists {
 	TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V4_ID0"
 	TABLEFILESUMMV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V4_ID0"
 	TABLEFILEWINTV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V5_ID0"
 	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V5_ID0"
 	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V6_ID0"
 	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V6_ID0"
+	RUNLISTV4="$SCIDIR/runlist.V4"
+	RUNLISTV5="$SCIDIR/runlist.V5"
+	RUNLISTV6="$SCIDIR/runlist.V6"
 	RUNLISTSUMMV4="$SCIDIR/runlist.summer.V4"
 	RUNLISTWINTV4="$SCIDIR/runlist.winter.V4"
 	RUNLISTSUMMV5="$SCIDIR/runlist.summer.V5"
@@ -209,6 +233,9 @@ function setupMSCWRunlists {
 	RUNLISTSUMMV6="$SCIDIR/runlist.summer.V6"
 	RUNLISTWINTV6="$SCIDIR/runlist.winter.V6"
 	cd $EVNDISPSYS/scripts/VTS
+    RUNLIST.whichRunsAreArrayEpoch.sh 4 $RUNLIST > $RUNLISTV4
+    RUNLIST.whichRunsAreArrayEpoch.sh 5 $RUNLIST > $RUNLISTV5
+    RUNLIST.whichRunsAreArrayEpoch.sh 6 $RUNLIST > $RUNLISTV6
 	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 4 > $RUNLISTSUMMV4
 	RUNLIST.whichRunsAreAtmosphere.sh w $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 4 > $RUNLISTWINTV4
 	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 5 > $RUNLISTSUMMV5
@@ -277,7 +304,9 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		echo -e "${COBLUE}Stage evndisp${CONORM}"
 		echo "$STAGE" > "$STAGEFILE"
 		cd $EVNDISPSYS/scripts/VTS
-		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPDIR 1 | tee >(cat - >&5) )  ####### EVNDISP
+        if [[ "$DOCALIB" = yes ]] ; then CALIBCODE=1
+        else                             CALIBCODE=0 ; fi
+		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPDIR $CALIBCODE | tee >(cat - >&5) )  ####### EVNDISP
 		rm -rf "$EVNJOBSUB"
 		echo "$QSUBDATA" > "$EVNJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
@@ -355,9 +384,9 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		# mscw #########################################################
 		echo -e "${COBLUE}Stage 2 - Mean Scale Calculation${CONORM}"
-		echo -e "Feeding files from $EVNDISPDIR"
+		#echo -e "Feeding files from $EVNDISPDIR"
 		echo "$STAGE" > "$STAGEFILE"
-		setupMSCWRunlists
+		setupFilteredRunlists
 		makeParamFile
 		cd $EVNDISPSYS/scripts/VTS
 		#./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILE $EVNDISPDIR $RUNLIST
@@ -425,9 +454,10 @@ if [[ "$STAGE" == "mscw" ]] ; then
 				if [ -e "$DATAFILE" ] ; then
 					DFBASE=$( basename $DATAFILE )
 					DFSIZE=`stat -c %s $DATAFILE`
+                    DFSIZESTR=$( formatFileSize "$DFSIZE" )
 					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
 					RUNSUCCESS=$( checkForSuccess "$MSCWLOG" "...outputfile closed" )
-					printf "%10s is %3dMB, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+					printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
 				else echo -e "${COTRED}${DATAFILE} not found!${CONORM}" ; fi
 			else
 				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
@@ -436,25 +466,108 @@ if [[ "$STAGE" == "mscw" ]] ; then
 	fi
 fi
 
-# s3 anasum_parallel (anpar)
+# s3 frogs 
+if [[ "$STAGE" == "frogs" ]] ; then
+    FROGSJOBSUB="$SCIDIR/qsubdata.frogs"
+	if ! $CHECKFLAG ; then
+		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		echo -e "${COBLUE}Stage 3 - Frogs Image Reconstruction${CONORM}"
+		setupFilteredRunlists
+		makeParamFile
+        # frogs ########################################################
+		echo "$STAGE" > "$STAGEFILE"
+		cd $EVNDISPSYS/scripts/VTS
+		#QSUBDATA=$( ./ANALYSIS.evndisp_frogs.sh $ANASUMRUNLIST $EVNDISPDIR/RecID${RECID} $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
+        
+		QSUBDATA=""
+		NRUNS=$( cat $RUNLISTV4 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh $RUNLISTV4 $EVNDISPDIR/RecID${RECID} $FROGSDIR V4 | tee >(cat - >&5) ) ; fi
+		NRUNS=$( cat $RUNLISTV5 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh $RUNLISTV5 $EVNDISPDIR/RecID${RECID} $FROGSDIR V5 | tee >(cat - >&5) ) ; fi
+		NRUNS=$( cat $RUNLISTV6 | wc -l )
+		if [ "$NRUNS" -gt "0" ] ; then
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh $RUNLISTV6 $EVNDISPDIR/RecID${RECID} $FROGSDIR V6 | tee >(cat - >&5) ) ; fi
+		updateRunningJobFile "$QSUBDATA"
+		rm -rf "$FROGSJOBSUB"
+        echo "$QSUBDATA" > "$FROGSJOBSUB"
+        sleep 2
+	else
+		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		# frogs check #########################################################
+		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo "checking the frogs stage" 
+		QSUBDATA=$(cat "$FROGSJOBSUB")
+		while read ARUN ; do
+			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+			checkLogFileForProblems "$ELOG" $DEBUGREGEX
+			if [ -e "$OLOG" ] ; then
+				FROGSLOG=$(   cat "$OLOG" | grep "RUN$ARUN FROGSLOG"   | awk '{ print $3 }' )
+				checkLogFileForProblems "$FROGSLOG" $DEBUGREGEX
+				checkLogFileForStageSuccess "$FROGSLOG" "...outputfile closed"
+			else
+				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
+			fi
+		done < $RUNLIST
+
+		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"     | head -n 1 | awk '{ print $3 }' )
+		DFDIR=$( cat $OLOG        | grep -P "^RUN\d{5} FROGSLOG" | awk '{ print $3 }' )
+		DFDIR=$( dirname $DFDIR )
+		echo
+		echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo -e "~~~~~~~~~~~ FROGS Datafiles stored in $DFDIR/$CONORM"
+		while read ARUN ; do
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"      | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"      | awk '{ print $3 }' )
+			if [ -e "$OLOG" ] ; then
+				DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN DATAOUT"   | awk '{ print $3 }' )
+				FROGSLOG=$( cat "$OLOG" | grep "RUN$ARUN FROGSLOG"  | awk '{ print $3 }' )
+				LOGFILES=("$OLOG" "$ELOG" "$FROGSLOG" )
+				WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+				ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+				if [ -e "$DATAFILE" ] ; then
+					DFBASE=$( basename $DATAFILE )
+					DFSIZE=`stat -c %s $DATAFILE`
+                    DFSIZESTR=$( formatFileSize "$DFSIZE" )
+					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+					RUNSUCCESS=$( checkForSuccess "$FROGSLOG" "...outputfile closed" )
+					printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+				else echo -e "${COTRED}${DATAFILE} not found!${CONORM}" ; fi
+			else
+				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
+			fi
+		done < $RUNLIST
+	fi
+fi
+
+# s4 anasum_parallel (anpar)
 if [[ "$STAGE" == "anpar" ]] ; then
 	ANPARJOBSUB="$SCIDIR/qsubdata.anpar"
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		makeParamFile
 		# anpar #########################################################
-		echo -e "${COBLUE}Stage 3 - Anasum Parallel${CONORM}"
+		echo -e "${COBLUE}Stage 4 - Anasum Parallel${CONORM}"
 		echo "$STAGE" > "$STAGEFILE"
 		cd $EVNDISPSYS/scripts/VTS
 		#./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $VERITAS_USER_DATA_DIR/analysis/EVD400-d20121218/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE
 		#QSUBDATA=$( ./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $EVNDISPDIR/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
-		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh $ANASUMRUNLIST $EVNDISPDIR/RecID${RECID} $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
+        if [[ "$USEFROGS" == "yes" ]] ; then INPUTANASUMDIR="$FROGSDIR"
+        else                                 INPUTANASUMDIR="$EVNDISPDIR/RecID${RECID}" ; fi
+		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh $ANASUMRUNLIST $INPUTANASUMDIR $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$ANPARJOBSUB"
         echo "$QSUBDATA" > "$ANPARJOBSUB"
         sleep 2
 	else
-		#haltIfAnyJobsAreRunning $RUNNINGJOBS
+		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		# anpar check #########################################################
 		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ; echo "checking the anpar stage" 
 		QSUBDATA=$( cat $ANPARJOBSUB )
@@ -505,7 +618,7 @@ if [[ "$STAGE" == "anpar" ]] ; then
 	fi
 fi
 
-# s4 anasum
+# s5 anasum
 if [[ "$STAGE" == "anmer" ]] ; then
 	FINALOUTPUTLOG="$CWD/`basename $FINALOUTPUT .root`.log"
 	if $CHECKFLAG ; then

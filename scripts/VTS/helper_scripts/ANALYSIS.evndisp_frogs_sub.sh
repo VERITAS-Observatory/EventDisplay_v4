@@ -11,6 +11,7 @@ CALIB=CALIBRATIONOPTION
 ODIR=OUTPUTDIRECTORY
 MSCWDIR=MSCWDIRECTORY
 VPM=USEVPMPOINTING
+ARRAYVERS=ARRRRRRRAAAYY
 LOGDIR="$ODIR"
 
 # temporary (scratch) directory
@@ -23,6 +24,14 @@ mkdir -p $TEMPDIR
 
 # eventdisplay reconstruction parameter
 ACUTS="EVNDISP.reconstruction.runparameter"
+
+# template list file
+if [[ "$ARRAYVERS" =~ ^(V5|V6)$ ]] ; then
+    TEMPLATELIST="EVNDISP.frogs_template_file_list.$ARRAYVERS.txt"
+else
+    echo "Error, no frogs template list defined for \$ARRAYVERS='$ARRAYVERS', exiting..."
+    exit 1
+fi
 
 #########################################
 # pedestal calculation
@@ -75,7 +84,9 @@ fi
 
 #########################################
 
-OPT+=( -frogs $MSCWDIR/$RUN.mscw.root -frogid 0 )
+OPT+=( -frogs $MSCWDIR/$RUN.mscw.root        )
+OPT+=( -frogsid 0                            )
+OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 
 #########################################
 # run eventdisplay
@@ -86,9 +97,11 @@ $EVNDISPSYS/bin/evndisp             \
     -outputfile $TEMPDIR/$RUN.root  \
     ${OPT[@]}                       \
     &> $LOGDIR/$RUN.log
+echo "RUN$RUN FROGSLOG $LOGDIR/$RUN.log"
 
 # move data file from tmp dir to data dir
 cp -f -v $TEMPDIR/$RUN.root $ODIR/$RUN.root
 rm -f $TEMPDIR/$RUN.root
+echo "RUN$RUN DATAOUT $ODIR/$RUN.root"
 
 exit

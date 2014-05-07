@@ -60,7 +60,7 @@ int frogs_print_raw_event( struct frogs_imgtmplt_in d )
 }
 //================================================================
 //================================================================
-struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d )
+struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, const char * templatelistname )
 {
 	/* This function performs the image template analysis. It returns a
 	   structure of type frogs_imgtmplt_out containing all the useful
@@ -102,7 +102,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d )
 	//If needed read the template file according to elevation
 	if( d->elevation > tmplt.elevmax || d->elevation < tmplt.elevmin )
 	{
-		tmplt = frogs_read_template_elev( d->elevation );
+		tmplt = frogs_read_template_elev( d->elevation, templatelistname );
 	}
 	//Optimize the likelihood
 	rtn = frogs_likelihood_optimization( d, &tmplt, &calib, &prob_array );
@@ -114,7 +114,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d )
 }
 //================================================================
 //================================================================
-struct frogs_imgtmplt_out frogs_img_tmplt_old( struct frogs_imgtmplt_in* d )
+struct frogs_imgtmplt_out frogs_img_tmplt_old( struct frogs_imgtmplt_in* d, const char * templatelistname)
 {
 	/* This function performs the image template analysis. It returns a
 	   structure of type frogs_imgtmplt_out containing all the useful
@@ -155,7 +155,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt_old( struct frogs_imgtmplt_in* d )
 			/*This weird logic is due to the fact that as of now, everything
 			  above 65 degree elevation is analysed with templates at 70 deg.
 			  elevation. Change it if you need. */
-			tmplt = frogs_read_template_elev( d->elevation );
+			tmplt = frogs_read_template_elev( d->elevation, templatelistname );
 		}
 	}
 	
@@ -1052,7 +1052,8 @@ double frogs_integrand_for_averaging( double q, void* par )
 }
 //================================================================
 //================================================================
-struct frogs_imgtemplate frogs_read_template_elev( float elevation )
+//struct frogs_imgtemplate frogs_read_template_elev( float elevation )
+struct frogs_imgtemplate frogs_read_template_elev( float elevation, const char * templatelistname )
 {
 	/* This function reads the file whose name is specified by the variable
 	   FROGS_TEMPLATE_LIST, searching for the first one matching the elevation
@@ -1076,7 +1077,8 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation )
 	{
 		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
 	}
-	sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/EVNDISP.frogs_template_file_list.txt", itemp );
+	//sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/EVNDISP.frogs_template_file_list.txt", itemp );
+	sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/%s", itemp, templatelistname );
 	
 	//Open the template files list file
 	FILE* fu; //file pointer
