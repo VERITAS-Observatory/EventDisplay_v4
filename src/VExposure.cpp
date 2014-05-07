@@ -13,6 +13,8 @@ VExposure::VExposure( int nBinsL, int nBinsB )
 	fDebug = false;
 	fMakeRunList = false;
 	
+	bPlotElevationPlots = false;
+	
 	bPrintVerbose = false;
 	bPrintTimeMask = false;
 	
@@ -918,6 +920,106 @@ bool VExposure::writeRootFile( string iOfile )
 	return true;
 }
 
+/*
+    fill elevation vs galactic coordinates for the given observatory
+
+    (note: preliminary, some numbers are hardwired)
+
+*/
+void VExposure::fillElevationPlot( int iYear, int iMonth, int ze_max_deg )
+{
+	fMapGal2D->Reset();
+	fMapGal2D_aitoff->Reset();
+	
+	vector< int > i_MJD;
+	if( iMonth < 0 )
+	{
+		for( unsigned int i = 0; i < 12; i++ )
+		{
+			if( i == 6 || i == 7 )
+			{
+				continue;
+			}
+			i_MJD.push_back( VSkyCoordinatesUtilities::getMJD( iYear, i + 1, 1 ) );
+		}
+	}
+	else
+	{
+		i_MJD.push_back( VSkyCoordinatesUtilities::getMJD( iYear, iMonth, 1 ) );
+	}
+	
+	double dec = 0.;
+	double ra = 0.;
+	double l = 0.;
+	double b = 0.;
+	
+	cout << "Observatory coordinates: " << getObservatory_Longitude_deg() << "\t" << getObservatory_Latitude_deg() << endl;
+	
+	for( unsigned int i = 0; i < i_MJD.size(); i++ )
+	{
+		// observations from 7 pm to 6 am local time
+		// (hardwired AZ times)
+		for( int t = 120; t < 520; t++ )
+		{
+			double imjd = i_MJD[i];
+			double time = 86400. / 1000.*( double )t;
+			// zenith angle range
+			for( int z = ze_max_deg; z > 0; z-- )
+			{
+				// azimuth range
+				for( int a = 0; a < 360; a++ )
+				{
+					VSkyCoordinatesUtilities::getEquatorialCoordinates( imjd, time, ( double )a, ( double )z, dec, ra );
+					slaEqgal( ra * TMath::DegToRad(), dec * TMath::DegToRad(), &l, &b );
+					
+					l *= TMath::RadToDeg();
+					if( l > 180 )
+					{
+						l -= 360.;
+					}
+					b *= TMath::RadToDeg();
+					
+					int i_l = fMapGal2D->GetXaxis()->FindBin( -1.*l );
+					int i_b = fMapGal2D->GetYaxis()->FindBin( b );
+					if( 90. - ( double )z > fMapGal2D->GetBinContent( i_l, i_b ) )
+					{
+						fMapGal2D->SetBinContent( i_l, i_b, 90. - ( double )z );
+					}
+				}
+			}
+		}
+	}
+	
+	/////////////////////////////////
+	// calculate aitoff projection
+	double al = 0.;
+	double ab = 0.;
+	double xl = 0.;
+	double xb = 0.;
+	int bl = 0;
+	int bb = 0;
+	
+	for( int i = 1; i <= fMapGal2D->GetNbinsX(); i++ )
+	{
+		xl = fMapGal2D->GetXaxis()->GetBinCenter( i );
+		for( int j = 1; j <= fMapGal2D->GetNbinsY(); j++ )
+		{
+			xb = fMapGal2D->GetYaxis()->GetBinCenter( j );
+			
+			aitoff2xy( -1.*xl, xb, al, ab );
+			
+			bl = fMapGal2D_aitoff->GetXaxis()->FindBin( al );
+			bb = fMapGal2D_aitoff->GetYaxis()->FindBin( ab );
+			
+			fMapGal2D_aitoff->SetBinContent( bl, bb, fMapGal2D->GetBinContent( i, j ) );
+		}
+	}
+	gStyle->SetPalette( 1 );
+	set_plot_style();
+	
+	bPlotElevationPlots = true;
+}
+
 
 void VExposure::fillExposureMap()
 {
@@ -1024,7 +1126,6 @@ void VExposure::fillExposureMap()
 		}
 	}
 	// now plot everything
-	
 	gStyle->SetPalette( 1 );
 	set_plot_style();
 	
@@ -1100,8 +1201,19 @@ TCanvas* VExposure::plot2DGalactic( string iName, string iTitle, int ix, int iy,
 	h->SetAxisRange( ibmin, ibmax, "Y" );
 	h->SetAxisRange( -1.*ilmax, -1.*ilmin, "X" );
 	
+	if( bPlotElevationPlots )
+	{
+		cGal->SetGridx( 1 );
+		cGal->SetGridy( 1 );
+		h->SetZTitle( "elevation [deg]" );
+	}
+	else
+	{
+		cGal->SetGridx( 0 );
+		cGal->SetGridy( 0 );
+		h->SetZTitle( "exposure [h]" );
+	}
 	h->Draw( "A colz" );
-	h->SetZTitle( "exposure [h]" );
 	
 	// plot axis
 	

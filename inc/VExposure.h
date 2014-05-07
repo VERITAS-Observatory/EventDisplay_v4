@@ -46,6 +46,8 @@ class VExposure : public TObject, public VGlobalRunParameter
 	
 		bool   fDebug;
 		
+		bool bPlotElevationPlots;
+		
 		bool fMakeRunList;
 		int fSelectLaser;
 		int fDataStartTime; // Start Date
@@ -163,6 +165,7 @@ class VExposure : public TObject, public VGlobalRunParameter
 		bool readFromDB();
 		bool readFromDBList();
 		bool setPlannedObservation( vector<double> ra, vector<double> dec, vector<double> t );
+		void fillElevationPlot( int iYear = 2014, int iMonth = -1, int ze_max_deg = 40 );
 		void fillExposureMap();
 		TH2D* getGalacticMap()
 		{
