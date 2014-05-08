@@ -1150,7 +1150,7 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	{
 	
 		//Set the min number of pixels cut to default value of 10
-		fNpixMin.push_back( 10 );
+		fNpixMin.push_back( 40 );
 		
 		cout << "Failed to read the NPIXMINT" << fTelID + 1 <<  " value from the parameter file." << endl;
 		cout << "Using the default value of "  << fNpixMin[fTelID] << "." << endl;
@@ -1288,3 +1288,24 @@ void VHoughTransform::readHTParameterFile( unsigned int fTelID )
 	
 	
 }//End of readHTParameterFile method
+
+
+//Getter methods 
+
+//Gets the minimum number of hit pixels cut
+int VHoughTransform::getNpixMin( unsigned int fTelID ) {
+
+return fNpixMin[fTelID];
+
+}//End of getNpixMin
+
+
+//Gets the maximum number of hit pixels cut
+int VHoughTransform::getNpixMax( unsigned int fTelID ) {
+
+return fNpixMax[fTelID];
+
+}//End of getNpixMax
+
+
+

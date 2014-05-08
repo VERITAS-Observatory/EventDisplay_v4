@@ -831,8 +831,15 @@ void VImageParameterCalculation::houghMuonPixelDistribution()
 		
 	}
 	
-	//If there is more than one hit pixel, run the Hough transform muon identification code, otherwise set parameters to 0 and exit
-	if( iNpix > 1 )
+	//Read pixel cut values from the Hough transform object
+	int npixMaxVal = 0;
+	int npixMinVal = 0;
+
+	npixMaxVal = fHoughTransform->getNpixMax( fData->getTelID() );//Get the npixmax cut for the given telescope
+	npixMinVal = fHoughTransform->getNpixMin( fData->getTelID() );//Get the npixmin cut for the given telescope
+	
+	//Initial pixel cut. Runthe Hough transform analysis if the event passes the pixel cut. 
+	if( iNpix >= npixMinVal && iNpix <= npixMaxVal )
 	{
 		fHoughTransform->analysis( fData, fParGeo );    //Pass pointers to the data and tree parameters to the Hough transform analysis method and perform analysis.
 	}

@@ -32,6 +32,9 @@ class VHoughTransform
 		
 		void analysis( VEvndispData* fData, VImageParameter* fParGeo ); //Performs the Hough transform analysis
 		
+		int getNpixMin(unsigned int fTelID); //Get the minimum number of hit pixels cut
+
+		int getNpixMax(unsigned int fTelID); //Get the maximum number of hit pixels cut
 		
 	private:
 	
