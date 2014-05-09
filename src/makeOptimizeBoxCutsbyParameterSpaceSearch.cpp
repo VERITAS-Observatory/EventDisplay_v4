@@ -26,10 +26,6 @@ using namespace std;
 
 double getNorm( string ifile )
 {
-
-
-	//    TTree *t = 0;
-	
 	TFile* fIn = new TFile( ifile.c_str() );
 	if( fIn->IsZombie() )
 	{
@@ -114,6 +110,7 @@ int main( int argc, char* argv[] )
 {
 
 
+        cout << endl;
 	cout << "makeOptimizeBoxCutsbyParameterSpaceSearch (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
 	cout << "----------------------------" << endl;
 	
@@ -144,10 +141,8 @@ int main( int argc, char* argv[] )
 	string fOutput = argv[2];
 	
 	// get normalisation factor
-	double fNorm;
-	fNorm = getNorm( fInput );
-	cout << "Normalisation factor: " << fNorm << endl;
-	
+	double fNorm = getNorm( fInput );
+	cout << "Normalisation factor (alpha) " << fNorm << endl;
 	
 	// get input chain
 	TChain* tOn = ( TChain* )getTreeWithSelectedEvents( fInput, true );
@@ -181,20 +176,16 @@ int main( int argc, char* argv[] )
 	double mscw_step = 0.025;
 	unsigned int    mscw_min_n = 1;
 	double mscw_min_start = -1.2;
-	//    unsigned int    mscw_max_n = 41;
-	//    double mscw_max_start =  0.;
-	unsigned int    mscw_max_n = 1;
-	//    double mscw_max_start =  0.35;
-	double mscw_max_start =  5.0;
+	unsigned int    mscw_max_n = 41;
+	double mscw_max_start =  0.;
 	
 	double mscl_step = 0.025;
 	unsigned int    mscl_min_n = 1;
 	double mscl_min_start = -1.2;
-	//   unsigned int    mscl_max_n = 41;
-	//    double mscl_max_start =  0.;
-	unsigned int    mscl_max_n = 1;
-	//    double mscl_max_start =  0.7;
-	double mscl_max_start =  5.0;
+	unsigned int    mscl_max_n = 41;
+	double mscl_max_start =  0.;
+        mscl_max_n = 1;
+        mscl_max_start = 0.7;
 	
 	double theta2_step = 0.001;
 	//    unsigned int    theta2_max_n = 41;
@@ -222,17 +213,17 @@ int main( int argc, char* argv[] )
 	vector< double > emm_max;
 	
 	// results
-	vector< double > source;                      // source strength
+	vector< double > source;                      
 	vector< double > non;
 	vector< double > noff;
 	vector< vector< double > > sig;
 	
+        // source strength
 	source.push_back( 1. );
 	source.push_back( 0.1 );
 	source.push_back( 0.05 );
 	source.push_back( 0.03 );
 	source.push_back( 0.01 );
-	const unsigned int nsources = 5;
 	
 	vector< double > itemp( source.size(), 0. );
 	
@@ -332,7 +323,7 @@ int main( int argc, char* argv[] )
 			{
 				continue;
 			}
-			//            if( emissionHeight > emm_max[c] ) continue;
+			if( emissionHeight > emm_max[c] ) continue;
 			
 			non[c]++;
 		}
@@ -342,12 +333,12 @@ int main( int argc, char* argv[] )
 	{
 		tOff->GetEntry( i );
 		
-		hOff_NImages->Fill( NImages );
-		hOff_MSCW->Fill( MSCW );
-		hOff_MSCL->Fill( MSCL );
-		hOff_theta2->Fill( theta2 );
-		hOff_EChi2->Fill( echi2 );
-		hOff_EmissionHeightChi2->Fill( emissionHeight );
+		hOff_NImages->Fill( NImages, fNorm );
+		hOff_MSCW->Fill( MSCW, fNorm );
+		hOff_MSCL->Fill( MSCL, fNorm );
+		hOff_theta2->Fill( theta2, fNorm );
+		hOff_EChi2->Fill( echi2, fNorm );
+		hOff_EmissionHeightChi2->Fill( emissionHeight, fNorm );
 		
 		for( unsigned int c = 0; c < mscw_min.size(); c++ )
 		{
@@ -380,7 +371,7 @@ int main( int argc, char* argv[] )
 				}
 			}
 			//            if( theta2 < 0 || theta2 > theta2_max[c] ) continue;
-			//            if( emissionHeight > emm_max[c] ) continue;
+			if( emissionHeight > emm_max[c] ) continue;
 			
 			noff[c]++;
 		}
@@ -391,31 +382,57 @@ int main( int argc, char* argv[] )
 	
 	TFile* fO = new TFile( fOutput.c_str(), "RECREATE" );
 	
-	//    TTree *t = new TTree( "topt", "cut optimization" );
-	double t_mscw_min;
-	double t_mscw_max;
-	double t_mscl_min;
-	double t_mscl_max;
-	double t_theta2_max;
-	double t_emm_max;
-	double t_echi2_max;
-	double t_non[nsources];
-	double t_noff;
-	double t_sig[nsources];
+	TTree *t = new TTree( "topt", "cut optimization" );
+        t->SetMarkerStyle(7);
+	double t_mscw_min = 0.;
+	double t_mscw_max = 0.;
+	double t_mscl_min = 0.;
+	double t_mscl_max = 0.;
+	double t_theta2_max = 0.;
+	double t_emm_max = 0.;
+	double t_echi2_max = 0.;
+	unsigned int nsources = source.size();
+        if( nsources >= 10000 ) 
+        {
+             cout << "source strength vector too large" << endl;
+             exit(0);
+        }
+        double t_sourceStrength[10000];
+	double t_non[10000];
+	double t_noff = 0.;
+	double t_sig[10000];
+        double t_obs5sigma[10000];
+        for( int i = 0; i < 10000; i++ )
+        {
+            t_sourceStrength[i] = 0.;
+            t_non[i] = 0.;
+            t_sig[i] = 0.;
+            t_obs5sigma[i] = 0.;
+        }
 	
-	/*
-	    t->Branch( "mscw_min", &t_mscw_min, "mscw_min/D" );
-	    t->Branch( "mscw_max", &t_mscw_max, "mscw_max/D" );
-	    t->Branch( "mscl_min", &t_mscl_min, "mscl_min/D" );
-	    t->Branch( "mscl_max", &t_mscl_max, "mscl_max/D" );
-	    t->Branch( "theta2_max", &t_theta2_max, "theta2_max/D" );
-	    t->Branch( "echi2_max", &t_echi2_max, "echi2_max/D" );
-	    t->Branch( "emm_max", &t_emm_max, "emm_max/D" );
-	    t->Branch( "frog_max", &t_frog_max, "frog_max/D" );
-	    t->Branch( "non", t_non, "non[5]/D" );
-	    t->Branch( "noff", &t_noff, "noff/D" );
-	    t->Branch( "sig", t_sig, "sig[5]/D" );
-	*/
+        t->Branch( "mscw_min", &t_mscw_min, "mscw_min/D" );
+        t->Branch( "mscw_max", &t_mscw_max, "mscw_max/D" );
+        t->Branch( "mscl_min", &t_mscl_min, "mscl_min/D" );
+        t->Branch( "mscl_max", &t_mscl_max, "mscl_max/D" );
+        t->Branch( "theta2_max", &t_theta2_max, "theta2_max/D" );
+        t->Branch( "echi2_max", &t_echi2_max, "echi2_max/D" );
+        t->Branch( "emm_max", &t_emm_max, "emm_max/D" );
+        t->Branch( "nsource", &nsources, "nsource/i" );
+        t->Branch( "CU", t_sourceStrength, "CU[nsource]/D" );
+        t->Branch( "non", t_non, "non[nsource]/D" );
+        t->Branch( "noff", &t_noff, "noff/D" );
+        t->Branch( "sig", t_sig, "sig[nsource]/D" );
+        t->Branch( "obs5sigma", t_obs5sigma, "obs5sigma[nsource]/D" );
+
+        for( unsigned int i = 0; i < source.size(); i++ ) t_sourceStrength[i] = source[i];
+
+        // units are hours
+        int fObservationTime_steps = 1000;
+        double fObservationTime_min = 0.5e-3; 
+        double fObservationTime_max = 5.e4;
+        double fSignificance_min = 5.;
+        double fEvents_min = 0.;
+        
 	
 	cout << endl;
 	cout << "calculating significances" << endl;
@@ -436,54 +453,40 @@ int main( int argc, char* argv[] )
 			if( fNorm > 0. )
 			{
 				t_sig[s] = VStatistics::calcSignificance( t_non[s], noff[c], fNorm );
-			}
-			
-			if( s == 0 )
-			{
-				cout << "Source " << s << endl;
-				cout << "t_mscw_min " << t_mscw_min << endl;
-				cout << "t_mscw_max " << t_mscw_max << endl;
-				cout << "t_mscl_min " << t_mscl_min << endl;
-				cout << "t_mscl_max " << t_mscl_max << endl;
-				cout << "t_theta2_max " << t_theta2_max << endl;
-				cout << "t_echi2_max " << t_echi2_max << endl;
-				cout << "t_emm_max " << t_emm_max << endl;
-				cout << "On " << t_non[s] << endl;
-				cout << "Off " << t_noff << endl;
-				cout << "Sig " << t_sig[s] << endl;
-				cout << endl;
-				
-			}
-			
-		}
-		//        t->Fill();
+// calculate time needed to reach detetection significance
+                                
+                                double iG = t_non[s] / 1111.85;
+                                double iB = noff[c] / 1111.85;
+   
+                               // loop over possible observation lengths
+                                double sig = 0.;
+                                for( int j = 0; j < fObservationTime_steps; j++ )
+                                {    
+                                        // log10 hours
+                                        double i_t = TMath::Log10( fObservationTime_min ) + ( TMath::Log10( fObservationTime_max ) -
+                                                        TMath::Log10( fObservationTime_min ) ) / ( double )fObservationTime_steps * ( double )j;
+                                        // log10 hours to min
+                                        i_t = TMath::Power( 10., i_t ) * 60.; 
+
+/*                                        if( s == 0 )
+                                        {
+                                            cout << i_t << " min: " << iG << "\t" << iB << "\t" << i_t << "\t" << VStatistics::calcSignificance( iG * i_t, iB * i_t, fNorm ) << endl;
+                                        } */
+                                        sig = VStatistics::calcSignificance( iG * i_t, iB * i_t, fNorm );
+                     
+                                        if( sig > fSignificance_min && i_t * iG >= fEvents_min )
+                                        {    
+                                                t_obs5sigma[s] = i_t;
+                                                break;
+                                        }    
+
+                                }
+
+                        }
+                        t->Fill();
+               }
 	}
-	//    cout << "writing results to output file" << endl;
-	
-	//    TCanvas *cNImages = new TCanvas("cNImages","cNImages",0,0,500,500);
-	//    hOn_NImages->Draw();
-	//    hOff_NImages->Draw("same");
-	//    cNImages->Update();
-	//    TCanvas *cMSCW = new TCanvas("cMSCW","cMSCW",0,0,500,500);
-	//    hOn_MSCW->Draw();
-	//    hOff_MSCW->Draw("same");
-	//    cMSCW->Update();
-	//    TCanvas *cMSCL = new TCanvas("cMSCL","cMSCL",0,0,500,500);
-	//    hOn_MSCL->Draw();
-	//    hOff_MSCL->Draw("same");
-	//    cMSCL->Update();
-	//    TCanvas *ctheta2 = new TCanvas("ctheta2","ctheta2",0,0,500,500);
-	//    hOn_theta2->Draw();
-	//    hOff_theta2->Draw("same");
-	//    ctheta2->Update();
-	//    TCanvas *cEChi2 = new TCanvas("cEChi2","cEChi2",0,0,500,500);
-	//    hOn_EChi2->Draw();
-	//    hOff_EChi2->Draw("same");
-	//    cEChi2->Update();
-	//    TCanvas *cEmissionHeightChi2 = new TCanvas("cEmissionHeightChi2","cEmissionHeightChi2",0,0,500,500);
-	//    hOn_EmissionHeightChi2->Draw();
-	//    hOff_EmissionHeightChi2->Draw("same");
-	//    cEmissionHeightChi2->Update();
+	cout << "writing results to output file" << endl;
 	
 	hOn_NImages->Write();
 	hOff_NImages->Write();
@@ -497,9 +500,8 @@ int main( int argc, char* argv[] )
 	hOff_EChi2->Write();
 	hOn_EmissionHeightChi2->Write();
 	hOff_EmissionHeightChi2->Write();
-	
-	
-	//    t->Write();
+	t->Write();
+
 	fO->Close();
 	
 	return 0;
