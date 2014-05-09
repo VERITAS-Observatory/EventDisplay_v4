@@ -103,18 +103,20 @@ fi
 
 #########################################
 # run eventdisplay
+LOGOUTFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
 $EVNDISPSYS/bin/evndisp             \
     -runnumber=$RUN                 \
     -reconstructionparameter $ACUTS \
     -outputfile $TEMPDIR/$RUN.root  \
     ${OPT[@]}                       \
-    &> $LOGDIR/$RUN.log
-echo "RUN$RUN EVNLOG $LOGDIR/$RUN.log"
+    &> "$LOGOUTFILE"
+echo "RUN$RUN EVNDISPLOG $LOGOUTFILE"
 
 # move data file from tmp dir to data dir
-cp -f -v $TEMPDIR/$RUN.root $ODIR/$RUN.root
-echo "RUN$RUN DATAOUT $ODIR/$RUN.root"
+DATAOUT="$ODIR/$RUN.root"
+cp -f -v $TEMPDIR/$RUN.root $DATAOUT
+echo "RUN$RUN EVNDISPDATA $DATAOUT"
 rm -f $TEMPDIR/$RUN.root
 
 exit

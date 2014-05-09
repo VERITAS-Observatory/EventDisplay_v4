@@ -476,7 +476,7 @@ void VEvndispRunParameter::print( int iEv )
 	cout << "runmode: " << frunmode << endl;
 	if( fnevents > 0 )
 	{
-		cout << "number of events to analyse: " << fnevents << endl;
+		cout << "NKH number of events to analyse: " << fnevents << endl;
 	}
 	if( fNCalibrationEvents > 0 )
 	{

@@ -80,7 +80,15 @@ void VFrogs::doFrogsStuff( int eventNumber )
 		//Call the FROGS analysis
 		struct frogs_imgtmplt_out output;
 		//output = frogs_img_tmplt( &d );
-		output = frogs_img_tmplt( &d, templatelistname.c_str() );
+		char templatelistnamecstr[FROGS_FILE_NAME_MAX_LENGTH] ;
+        int maxchar     = FROGS_FILE_NAME_MAX_LENGTH - 1 ;
+        
+        // 'formatbuff' is so we only put the first "FROGS_FILE_NAME_MAX_LENGTH-1" characters of the templatelistname string into the char array 'templatelistnamecstr'
+        char formatbuff[20] ;
+        sprintf( formatbuff, "%%.%ds", maxchar ) ; 
+        sprintf( templatelistnamecstr, formatbuff, templatelistname.c_str() ) ;
+        
+		output = frogs_img_tmplt( &d, templatelistnamecstr );
 		
 		frogsEventID     = output.event_id;
 		frogsGSLConStat  = output.gsl_convergence_status;

@@ -60,7 +60,7 @@ int frogs_print_raw_event( struct frogs_imgtmplt_in d )
 }
 //================================================================
 //================================================================
-struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, const char * templatelistname )
+struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, char templatelistname[FROGS_FILE_NAME_MAX_LENGTH] )
 {
 	/* This function performs the image template analysis. It returns a
 	   structure of type frogs_imgtmplt_out containing all the useful
@@ -99,13 +99,18 @@ struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, const ch
 		firstcall = 0;
 		frogs_fill_prob_density( &prob_array );
 	}
+    
 	//If needed read the template file according to elevation
+	fprintf( stderr, "NKH ready to get the proper template file...\n" ) ;
 	if( d->elevation > tmplt.elevmax || d->elevation < tmplt.elevmin )
 	{
 		tmplt = frogs_read_template_elev( d->elevation, templatelistname );
 	}
+    fprintf( stderr, "NKH got the right template file...\n" );
+    
 	//Optimize the likelihood
 	rtn = frogs_likelihood_optimization( d, &tmplt, &calib, &prob_array );
+    fprintf( stderr, "NKH frogs_likelihood_optimization() complete\n" ) ;
 	
 	//Release memory used in the data structure
 	frogs_release_memory( d );
@@ -114,7 +119,7 @@ struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, const ch
 }
 //================================================================
 //================================================================
-struct frogs_imgtmplt_out frogs_img_tmplt_old( struct frogs_imgtmplt_in* d, const char * templatelistname)
+struct frogs_imgtmplt_out frogs_img_tmplt_old( struct frogs_imgtmplt_in* d, char templatelistname[FROGS_FILE_NAME_MAX_LENGTH] )
 {
 	/* This function performs the image template analysis. It returns a
 	   structure of type frogs_imgtmplt_out containing all the useful
@@ -1053,7 +1058,7 @@ double frogs_integrand_for_averaging( double q, void* par )
 //================================================================
 //================================================================
 //struct frogs_imgtemplate frogs_read_template_elev( float elevation )
-struct frogs_imgtemplate frogs_read_template_elev( float elevation, const char * templatelistname )
+struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templatelistname[FROGS_FILE_NAME_MAX_LENGTH] )
 {
 	/* This function reads the file whose name is specified by the variable
 	   FROGS_TEMPLATE_LIST, searching for the first one matching the elevation
@@ -1064,6 +1069,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, const char *
 	   3) The file name for that template
 	*/
 	
+    fprintf( stderr, "NKH frogs_read_template_elev( %f , %s )\n", elevation, templatelistname ) ;
 	char* EVN;
 	char FROGS_TEMPLATE_LIST_PATH[500];
 	EVN = getenv( "EVNDISPSYS" );
@@ -1079,12 +1085,13 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, const char *
 	}
 	//sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/EVNDISP.frogs_template_file_list.txt", itemp );
 	sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/%s", itemp, templatelistname );
+    fprintf( stderr, "NKH FROGS_TEMPLATE_LIST_PATH '%s'\n", FROGS_TEMPLATE_LIST_PATH ) ;
 	
 	//Open the template files list file
 	FILE* fu; //file pointer
 	if( ( fu = fopen( FROGS_TEMPLATE_LIST_PATH, "r" ) ) == NULL )
 	{
-		printf( "FROGS template file list: %s\n", FROGS_TEMPLATE_LIST_PATH );
+		fprintf( stderr, "FROGS template file list: %s\n", FROGS_TEMPLATE_LIST_PATH );
 		frogs_showxerror( "Failed opening the template files list file" );
 	}
 	
@@ -1095,13 +1102,16 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, const char *
 	float minel, maxel; //Min and max elevation to use the listed files
 	char fname[500];
 	struct frogs_imgtemplate rtn; //Variable to hold template data
+    fprintf( stderr, "NKH starting to look for templatelist lines...\n" ) ;
 	while( fscanf( fu, "%d%f%f%s", &flag, &minel, &maxel, fname ) != EOF )
 	{
+        fprintf( stderr, "  NKH templatelistline %d %f %f '%s'\n", flag, minel, maxel, fname ) ;
 #ifdef CONVOLUTION
 		if( flag == 1 && elevation >= minel && elevation <= maxel )
 		{
 			fclose( fu ); //Closes the template filename list
 			//fprintf(stdout,"%f %f %s\n",minel,maxel,fname);
+            fprintf( stderr, "      line found! using template '%s'\n", fname ) ;
 			rtn = frogs_read_template_file( fname );
 			rtn.elevmin = minel;
 			rtn.elevmax = maxel;
@@ -1113,6 +1123,7 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, const char *
 		{
 			fclose( fu ); //Closes the template filename list
 			//fprintf(stdout,"%f %f %s\n",minel,maxel,fname);
+            fprintf( stderr, "      line found! using template '%s'\n", fname ) ;
 			rtn = frogs_read_template_file( fname );
 			rtn.elevmin = minel;
 			rtn.elevmax = maxel;
@@ -1180,14 +1191,29 @@ frogs_read_template_file(
 	   as an argument.*/
 	FILE* fu; //file pointer
 	//open file
-	if( ( fu = fopen( fname, "r" ) ) == NULL )
+	fprintf( stderr, "NKH read_template_file( %s )\n", fname ) ; 
+    
+	char* itemp = 0;
+	if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
 	{
-		printf( "%s\n", fname );
+		itemp = getenv( "VERITAS_EVNDISP_AUX_DIR" );
+	}
+	else if( getenv( "VERITAS_EVNDISP_ANA_DIR" ) )
+	{
+		itemp = getenv( "VERITAS_EVNDISP_ANA_DIR" );
+	}
+    char fullfname[FROGS_FILE_NAME_MAX_LENGTH] ; 
+    sprintf( fullfname, "%s/Templates/%s", itemp, fname ) ;
+	fprintf( stderr, "NKH attempting to load template '%s' \n", fullfname ) ;
+    
+	if( ( fu = fopen( fullfname, "r" ) ) == NULL )
+	{
+		printf( "%s\n", fullfname );
 		frogs_showxerror( "Failed opening the template file" );
 	}
 	
 	frogs_printfrog();
-	fprintf( stderr, "Reading template file %s\n", fname );
+	fprintf( stderr, "Reading template file %s\n", fullfname );
 	
 	struct frogs_imgtemplate rtn;
 	//Read the number of dimensions
@@ -1235,7 +1261,7 @@ frogs_read_template_file(
 		fscanf( fu, "%f", &( rtn.c[i] ) );
 	}
 	fclose( fu );
-	fprintf( stderr, "Done reading template file %s\n", fname );
+	fprintf( stderr, "Done reading template file %s\n", fullfname );
 	
 	return rtn;
 }
@@ -2476,17 +2502,22 @@ double frogs_chertemplate_lin( float lambda, float log10e, float b, float x,
 			/*This function fills the probability density table to speed up the calculations
 			  It is filled once at the beginning of the analysis. */
 			
-			fprintf( stderr, "\nFROGS: Filling Probability Density Table ......... " );
+			fprintf( stderr, "\nFROGS: Filling Probability Density Table ......... \n" );
+            int bincount = 0 ;
 			for( int i = 0; i < BIN1; i++ )
 			{
 				double q = ( ( double )i * ( RANGE1 - MIN1 ) / BIN1 + MIN1 );
+                fprintf( stderr, "Now on i-bin # %5d, q=%f\n", bincount, q) ;
+                bincount++ ;
 				for( int j = 0; j < BIN2; j++ )
 				{
 					double mu = ( ( double )j * ( RANGE2 - MIN2 ) / BIN2 + MIN2 );
 					for( int k = 0; k < BIN3; k++ )
 					{
 						double ped = ( double )k * ( RANGE3 - MIN3 ) / BIN3 + MIN3;
+                        //printf( "  ped = %f\n", ped ) ;
 						parray->prob_density_table[i][j][k] = frogs_probability_density( q, mu, ped, 0.35 );
+                        //printf( "  found probability density for bin [%d][%d][%d]\n", i, j, k ) ;
 						if( parray->prob_density_table[i][j][k] < 0. )
 						{
 							printf( "q %f mu %f ped %f pd %f\n", q, mu, ped, parray->prob_density_table[i][j][k] );

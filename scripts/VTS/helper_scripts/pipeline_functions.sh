@@ -30,7 +30,7 @@ exec 5>&1
 
 # spit text out to stderr, so user is
 # more likely to see it
-function echoerr(){ echo "$@" 1>&2 ; }
+function echoerr(){ echo -e "$@" 1>&2 ; }
 
 # count jobs in array-job-code '1-8:1'
 function countArrayJobs {
@@ -190,8 +190,8 @@ function formaterrorcount {
     local ERRORCOUNT=$( countStrings "$ERRORREGEX" argAry1[@] )
     local ERRORCOUNTSTR=""
     local plural=" "
-    if [[ $ERRORCOUNT != 1 ]] ; then plural="s" ; fi
-    if [[ $ERRORCOUNT  > 0 ]] ; then
+    if [[ "$ERRORCOUNT" != 1 ]] ; then plural="s" ; fi
+    if [[ "$ERRORCOUNT"  > 0 ]] ; then
         ERRORCOUNTSTR=$( printf "${COTRED}%3d error%s${CONORM}" $ERRORCOUNT "$plural" )
     else
         ERRORCOUNTSTR=" "
@@ -218,10 +218,15 @@ function checkLogFileForProblems {
     OUTSTRING=$( echo "$OUTSTRING" | sed -e 's/ //g' )
     if [ ! -z "$OUTSTRING" ] ; then # $OUTSTRING is not empty, print ALL THE MESSAGES
         echo -e "${COTBLUE}~~~~~~ Found in ${REALFILE}${CONORM}"
-        GREP_COLOR="1;33" grep --color=always -E -i "$WARNREGEX" $TARGFILE
-        GREP_COLOR="1;31" grep --color=always -E -i "$ERRORREGEX" $TARGFILE
-        #GREP_COLOR="1;31" grep --color -E -i 'segmentation' $TARGFILE
-        GREP_COLOR="1;36" grep --color=always -P $DEBUGREGEX $TARGFILE
+        
+        # yellow for warning-patterns
+        GREP_COLOR="0;33" grep --color=always -E -i "$WARNREGEX" $TARGFILE
+        
+        # red for error-patterns
+        GREP_COLOR="0;31" grep --color=always -E -i "$ERRORREGEX" $TARGFILE
+        
+        # light blue for the debugging-patterns
+        GREP_COLOR="0;35" grep --color=always -P $DEBUGREGEX $TARGFILE
     else
         echo -e "${COTBLUE}~~~~~~ Scanned ${TARGFILE}${CONORM}"
     fi
@@ -372,4 +377,49 @@ function formatFileSize {
     elif (( $BYTESIZE < 1000000000000 )) ; then OUTSTRING=$( printf "%3dGB" $(( BYTESIZE/1000000000 )) )
     fi
     echo "$OUTSTRING"
+}
+
+# if given a filename, check to see if its a valid filename,
+# and that the file actually exists
+# will return true if filename is invalid or doesn't exist
+filenameIsNotHealthy() {
+    local FILENAME=$1  # full filename to check
+    local KEYWORD=$2   # keyword used to locate this file (OLOG,ELOG,EVNDISPLOG, etc)
+    local HUMANNAME=$3 # human-readable name for this file
+    local FOUNDIN=$4   # the logfile '$FILENAME' was found in, by grepping for '$KEYWORD'
+    if [ -z "$FILENAME" ] ; then
+        echoerr "${COTRED}Error, the ${COTYELLOW}${HUMANNAME}${COTRED} '$FILENAME' is an empty string, this should have been printed in logfile '$FOUNDIN' with keyword '$KEYWORD', skipping further checks of this run's files...$CONORM"
+        return 0
+    fi
+    if [ ! -f "$FILENAME" ] ; then
+        echoerr "${COTRED}Error, the ${COTYELLOW}${HUMANNAME}${COTRED} '$FILENAME' doesn't seem to exist, it was listed in $FOUNDIN with keyword '$KEYWORD', skipping further checks of this run's files...$CONORM"
+        return 0
+    fi
+
+    return 1
+}
+
+# human-readable names for the batch's stdout and stderr logfiles,
+# usually something like "scriptname.sh.oJOBNUMBER" or "scriptname.sh.eJOBNUMBER"
+HUMANBATCHSTDOUT="Batch stdout log file"
+HUMANBATCHSTDERR="Batch stderr log file"
+
+# script for checking batch job exit statuses
+BATCHCHECKSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.jobInfo"
+
+# check job numbers listed in QSUBDATA,
+# see if they completed properly,
+# and print for the human
+function checkBatchJobExits {
+    local QSUBDATA=$( cat "$1" )
+    if command -v $BATCHCHECKSCRIPT > /dev/null 2>&1 ; then
+        echo -e "${COTBLUE}checking batch exit statuses${CONORM}"
+        JOBLIST=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{ print $3 }' | tr '.' ' ' )
+        for AJOB in $JOBLIST ; do
+            #echo "jobInfo $AJOB"
+            $BATCHCHECKSCRIPT $AJOB
+        done
+    else
+        echo "can't find '$BATCHCHECKSCRIPT', not checking cluster job exit status..."
+    fi
 }

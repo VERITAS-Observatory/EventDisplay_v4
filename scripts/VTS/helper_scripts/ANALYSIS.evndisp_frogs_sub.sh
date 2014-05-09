@@ -33,6 +33,8 @@ else
     exit 1
 fi
 
+echo "using template list file '$TEMPLATELIST'..."
+
 #########################################
 # pedestal calculation
 if [[ $CALIB == "1" || $CALIB == "2" ]]; then
@@ -88,20 +90,29 @@ OPT+=( -frogs $MSCWDIR/$RUN.mscw.root        )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 
+if [[ "$FASTDEVMODE" == "yes" ]] ; then
+    OPT+=( -nevents=100 )
+    echo "Warning, \$FASTDEVMODE=yes, only processing the first 100 events..."
+fi
+
+echo "using frogs options '${OPT[@]}'"
+
 #########################################
 # run eventdisplay
+LOGOUTFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
 $EVNDISPSYS/bin/evndisp             \
     -runnumber=$RUN                 \
     -reconstructionparameter $ACUTS \
     -outputfile $TEMPDIR/$RUN.root  \
     ${OPT[@]}                       \
-    &> $LOGDIR/$RUN.log
-echo "RUN$RUN FROGSLOG $LOGDIR/$RUN.log"
+    &> $LOGOUTFILE
+echo "RUN$RUN FROGSLOG $LOGOUTFILE"
 
 # move data file from tmp dir to data dir
-cp -f -v $TEMPDIR/$RUN.root $ODIR/$RUN.root
+DATAOUT="$ODIR/$RUN.root"
+cp -f -v $TEMPDIR/$RUN.root $DATAOUT
 rm -f $TEMPDIR/$RUN.root
-echo "RUN$RUN DATAOUT $ODIR/$RUN.root"
+echo "RUN$RUN FROGSDATA $DATAOUT"
 
 exit

@@ -106,9 +106,10 @@ for ((i=1; i <= $NLINES; i++)); do
         echo "Temporary run list written to $RUNTEMPLIST"
 
         sed -e "s|FILELIST|$RUNTEMPLIST|" \
-            -e "s|DATADIR|$INDIR|" \
-            -e "s|OUTDIR|$ODIR|"   \
-            -e "s|OUTNAME|$ONAME|" \
+            -e "s|DATADIR|$INDIR|"        \
+            -e "s|OUTDIR|$ODIR|"          \
+            -e "s|OUTNAME|$ONAME|"        \
+            -e "s|RUNNNNN|$RUN|"          \
             -e "s|RUNPARAM|$RUNP|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
         chmod u+x $FSCRIPT.sh

@@ -130,8 +130,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->ffrogsmscwfile = iTemp2;
-                cout << "NKH iTemp1 " << iTemp1 << endl;
-                cout << "NKH   ffrogsmscwfile " << fRunPara->ffrogsmscwfile << endl;
 				i++;
 			}
 			else
@@ -145,8 +143,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->ffrogsRecID = atoi( iTemp2.c_str() );
-                cout << "NKH iTemp1 " << iTemp1 << endl;
-                cout << "NKH   ffrogsRecID " << fRunPara->ffrogsRecID << endl;
 				i++;
 			}
 			else
@@ -160,8 +156,6 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 			if( iTemp2.size() > 0 )
 			{
 				fRunPara->ffrogstemplatelist = iTemp2 ;
-                cout << "NKH iTemp1 " << iTemp1 << endl;
-                cout << "NKH   ffrogstemplatelist " << fRunPara->ffrogstemplatelist << endl;
 				i++;
 			}
 			else

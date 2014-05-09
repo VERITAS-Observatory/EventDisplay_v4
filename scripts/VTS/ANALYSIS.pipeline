@@ -59,7 +59,7 @@ REFLMAXREG="10"
 # Should we produce the tzero and pedestal files first?
 # These are required to do an analysis.
 # yes/no
-DOCALIB="no"
+DOCALIB=yes
 
 # Where should we store the evndisp and mscw output files?
 # (full path please)
@@ -181,7 +181,12 @@ fi
 # that shows up in the log files.
 # it is used as a Perl-style Regex, aka:
 # grep -P $DEBUGREGEX logfilename
-DEBUGREGEX="NKH|WHITEBOARD"
+DEBUGREGEX="WHITEBOARD"
+
+# if set to yes, some stages will only run
+# for the first few hundred events
+# to allow for very fast testing
+FASTDEVMODE=no
 
 # needed to transfer files from evndisp to mscw stage and to anpar stage
 
@@ -205,6 +210,13 @@ mkdir -p $FROGSDIR
 
 # anasum output directory
 mkdir -p $ANASUMOUTPUTDIR
+
+# alert the user if they are using FASTDEVMODE
+function checkForFASTDEVMODE {
+    if [ "$FASTDEVMODE" = "yes" ] ; then
+        echo -e "${COTYELLOW}Warning, \$FASTDEVMODE=yes, not all events will be processed (this variable is set in ANALYSIS.pipeline)...${CONORM}"
+    fi
+}
 
 STAGEFILE="$SCIDIR/stage"
 RUNNINGJOBS="$SCIDIR/runningjobs" # file containing job numbers from the last action
@@ -279,6 +291,7 @@ function makeParamFile {
     done
 }
 
+
 # take output from qsub commands, and parse it
 # for job numbers, usually:
 # Your job ##########
@@ -301,8 +314,9 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		makeParamFile
 		# evndisp #########################################################
-		echo -e "${COBLUE}Stage evndisp${CONORM}"
+		echo -e "${COBLUE}Stage 1 : Event Reconstruction ${CONORM}"
 		echo "$STAGE" > "$STAGEFILE"
+        checkForFASTDEVMODE
 		cd $EVNDISPSYS/scripts/VTS
         if [[ "$DOCALIB" = yes ]] ; then CALIBCODE=1
         else                             CALIBCODE=0 ; fi
@@ -317,59 +331,90 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		echo "checking the evndisp stage" 
 		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
+        
+        # check qsub submission text for problems
+        echo -e "${COTBLUE}checking job submission text...${CONORM}"
+        checkLogFileForProblems "$EVNJOBSUB" $DEBUGREGEX
+        echo
+        
+        # check batch jobs, if we can
+        checkBatchJobExits "$EVNJOBSUB"
+        echo
+        
 		QSUBDATA=$(cat "$EVNJOBSUB")
 		while read ARUN ; do
-			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
+			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~ Run:$ARUN${CONORM}"
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }')
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }')
 			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }')
+            
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }')
+            if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$EVNJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+            
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }')
+            if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
-			if [ -e "$OLOG" ] ; then
-				EVNLOG=$(   cat "$OLOG" | grep "RUN$ARUN EVNLOG"   | awk '{ print $3 }' )
-				#DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN DATAOUT"  | awk '{ print $3 }' )
-				PEDLOG=$(   cat "$OLOG" | grep "RUN$ARUN PEDLOG"   | awk '{ print $3 }' )
-				TZEROLOG=$( cat "$OLOG" | grep "RUN$ARUN TZEROLOG" | awk '{ print $3 }' )
-				checkLogFileForProblems "$PEDLOG" $DEBUGREGEX
-				checkLogFileForProblems "$TZEROLOG" $DEBUGREGEX
-				checkLogFileForProblems "$EVNLOG" $DEBUGREGEX
-				checkLogFileForStageSuccess "$EVNLOG" "Final checks on result file (seems to be OK):"
-			else
-				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
-			fi
+            
+            if [ "$DOCALIB" == "yes" ] ; then
+                PEDLOG=$(   cat "$OLOG" | grep "RUN$ARUN PEDLOG"   | awk '{ print $3 }' )
+                if filenameIsNotHealthy "$PEDLOG" "PEDLOG" "pedestal log file" "$OLOG"        ; then continue ; fi
+                checkLogFileForProblems "$PEDLOG" $DEBUGREGEX
+                
+                TZEROLOG=$( cat "$OLOG" | grep "RUN$ARUN TZEROLOG" | awk '{ print $3 }' )
+                if filenameIsNotHealthy "$TZEROLOG" "TZEROLOG" "tzero log file" "$OLOG"       ; then continue ; fi
+                checkLogFileForProblems "$TZEROLOG" $DEBUGREGEX
+            fi
+
+            EVNDISPLOG=$(   cat "$OLOG" | grep "RUN$ARUN EVNDISPLOG" | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$EVNDISPLOG" "EVNDISPLOG" "evndisp log file" "$OLOG"  ; then continue ; fi
+            checkLogFileForProblems "$EVNDISPLOG" $DEBUGREGEX
+            
+            checkLogFileForStageSuccess "$EVNDISPLOG" "Final checks on result file (seems to be OK):"
 		done < $RUNLIST
 		
 		echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		OLOG=$( echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG" | head -n 1 | awk '{ print $3 }' )
-		DFDIR=$( cat $OLOG | grep -P "^RUN\d{5} EVNLOG" | awk '{ print $3 }' )
+        if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$EVNJOBSUB"        ; then echo -e "${COTRED}Error, Probably can't find datafiles, because we can't find the batch stdout log file...$CONORM" ; fi
+        
+		DFDIR=$( cat $OLOG | grep -P "^RUN\d{5} EVNDISPLOG" | awk '{ print $3 }' )
 		DFDIR=$( dirname $DFDIR )
 		echo -e "~~~~~~~~~~~ Evndisp Datafiles stored in $DFDIR/ $CONORM"
 		while read ARUN ; do
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+            
 			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG" | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$EVNJOBSUB"        ; then continue ; fi
+            
 			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG" | awk '{ print $3 }' )
-			LOGFILES=()
-			if [ -e "$OLOG" ] ; then
-				DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN DATAOUT"  | awk '{ print $3 }' )
-				EVNLOG=$(   cat "$OLOG" | grep "RUN$ARUN EVNLOG"   | awk '{ print $3 }' )
-				PEDLOG=$(   cat "$OLOG" | grep "RUN$ARUN PEDLOG"   | awk '{ print $3 }' )
-				TZEROLOG=$( cat "$OLOG" | grep "RUN$ARUN TZEROLOG" | awk '{ print $3 }' )
-				LOGFILES=("$OLOG" "$ELOG" "$PEDLOG" "$TZEROLOG" "$EVNLOG" )
-				WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
-				ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
-				if [ -e "$DATAFILE" ] ; then
-					DFBASE=$( basename $DATAFILE )
-					DFSIZE=`stat -c %s $DATAFILE`
-					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
-					RUNSUCCESS=$( checkForSuccess "$EVNLOG" "Final checks on result file (seems to be OK):")
-					printf "%10s is %3dMB, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
-				else 
-					echo -e "${COTRED}`basename ${DATAFILE}` not found!${CONORM}"
-				fi
-			else
-				echo -e "${COTRED}${OLOG} not found!${CONORM}"
-			fi
+            if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
+            
+            DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN EVNDISPDATA"  | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$DATAFILE" "EVNDISPDATA" "evndisp datafile" "$OLOG"   ; then continue ; fi
+            
+            if [ "$DOCALIB" == "yes" ] ; then
+                PEDLOG=$(   cat "$OLOG" | grep "RUN$ARUN PEDLOG"   | awk '{ print $3 }' )
+                if filenameIsNotHealthy "$PEDLOG" "PEDLOG" "pedestal log file"  "$OLOG" ; then continue ; fi
+                
+                TZEROLOG=$( cat "$OLOG" | grep "RUN$ARUN TZEROLOG" | awk '{ print $3 }' )
+                if filenameIsNotHealthy "$TZEROLOG" "TZEROLOG" "tzero log file" "$OLOG" ; then continue ; fi
+            fi
+            
+            EVNDISPLOG=$(   cat "$OLOG" | grep "RUN$ARUN EVNDISPLOG"   | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$EVNDISPLOG" "EVNDISPLOG" "evndisp log file" "$OLOG"  ; then continue ; fi
+            
+            LOGFILES=("$OLOG" "$ELOG" "$EVNDISPLOG" )
+            if [ "$DOCALIB" == "yes" ] ; then
+                LOGFILES=( "$PEDLOG" "$TZEROLOG" )
+            fi
+            WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+            ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+            
+            DFBASE=$( basename $DATAFILE )
+            DFSIZE=`stat -c %s $DATAFILE`
+            DFSIZESTR=$( formatFileSize "$DFSIZE" )
+            DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+            RUNSUCCESS=$( checkForSuccess "$EVNDISPLOG" "Final checks on result file (seems to be OK):")
+            printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
 		done < $RUNLIST
 
 		exit
@@ -386,6 +431,7 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		echo -e "${COBLUE}Stage 2 - Mean Scale Calculation${CONORM}"
 		#echo -e "Feeding files from $EVNDISPDIR"
 		echo "$STAGE" > "$STAGEFILE"
+        checkForFASTDEVMODE
 		setupFilteredRunlists
 		makeParamFile
 		cd $EVNDISPSYS/scripts/VTS
@@ -417,22 +463,35 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		# mscw check #########################################################
 		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		echo "checking the mscw stage" 
+        
+        # check qsub submission text for problems
+        echo -e "${COTBLUE}checking job submission text...${CONORM}"
+        checkLogFileForProblems "$MSCWJOBSUB" $DEBUGREGEX
+        echo
+        
+        # check batch jobs, if we can
+        checkBatchJobExits "$MSCWJOBSUB"
+        echo
+        
 		QSUBDATA=$(cat "$MSCWJOBSUB")
 		while read ARUN ; do
 			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
 			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+            
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$MSCWJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+            
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
-			if [ -e "$OLOG" ] ; then
-				MSCWLOG=$(   cat "$OLOG" | grep "RUN$ARUN MSCWLOG"   | awk '{ print $3 }' )
-				checkLogFileForProblems "$MSCWLOG" $DEBUGREGEX
-				checkLogFileForStageSuccess "$MSCWLOG" "...outputfile closed"
-			else
-				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
-			fi
+            
+            MSCWLOG=$(   cat "$OLOG" | grep "RUN$ARUN MSCWLOG"   | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$MSCWLOG" "MSCWLOG" "mscw log file" "$OLOG"  ; then continue ; fi
+            checkLogFileForProblems "$MSCWLOG" $DEBUGREGEX
+            
+            checkLogFileForStageSuccess "$MSCWLOG" "...outputfile closed"
 		done < $RUNLIST
 
 		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"    | head -n 1 | awk '{ print $3 }' )
@@ -443,25 +502,29 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		echo -e "~~~~~~~~~~~ MSCW Datafiles stored in $DFDIR/$CONORM"
 		while read ARUN ; do
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG" | awk '{ print $3 }' )
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG" | awk '{ print $3 }' )
-			if [ -e "$OLOG" ] ; then
-				DATAFILE=$(  cat "$OLOG" | grep "RUN$ARUN DATAOUT"   | awk '{ print $3 }' )
-				MSCWLOG=$(   cat "$OLOG" | grep "RUN$ARUN MSCWLOG"   | awk '{ print $3 }' )
-				LOGFILES=("$OLOG" "$ELOG" "$MSCWLOG" )
-				WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
-				ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
-				if [ -e "$DATAFILE" ] ; then
-					DFBASE=$( basename $DATAFILE )
-					DFSIZE=`stat -c %s $DATAFILE`
-                    DFSIZESTR=$( formatFileSize "$DFSIZE" )
-					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
-					RUNSUCCESS=$( checkForSuccess "$MSCWLOG" "...outputfile closed" )
-					printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
-				else echo -e "${COTRED}${DATAFILE} not found!${CONORM}" ; fi
-			else
-				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
-			fi
+            
+			OLOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN OLOG"     | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$MSCWJOBSUB" ; then continue ; fi
+            
+			ELOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN ELOG"     | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$MSCWJOBSUB" ; then continue ; fi
+            
+            MSCWLOG=$(  cat "$OLOG"      | grep "RUN$ARUN MSCWLOG"  | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$MSCWLOG"  "MSCWLOG"  "mscw log file" "$OLOG"   ; then continue ; fi
+            
+            DATAFILE=$( cat "$OLOG"      | grep "RUN$ARUN MSCWDATA" | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$DATAFILE" "MSCWDATA" "mscw datafile" "$OLOG"   ; then continue ; fi
+            
+            LOGFILES=("$OLOG" "$ELOG" "$MSCWLOG" )
+            WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+            ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+            
+            DFBASE=$( basename $DATAFILE )
+            DFSIZE=`stat -c %s $DATAFILE`
+            DFSIZESTR=$( formatFileSize "$DFSIZE" )
+            DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+            RUNSUCCESS=$( checkForSuccess "$MSCWLOG" "...outputfile closed" )
+            printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
 		done < $RUNLIST
 	fi
 fi
@@ -472,23 +535,23 @@ if [[ "$STAGE" == "frogs" ]] ; then
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		echo -e "${COBLUE}Stage 3 - Frogs Image Reconstruction${CONORM}"
-		setupFilteredRunlists
-		makeParamFile
-        # frogs ########################################################
 		echo "$STAGE" > "$STAGEFILE"
 		cd $EVNDISPSYS/scripts/VTS
-		#QSUBDATA=$( ./ANALYSIS.evndisp_frogs.sh $ANASUMRUNLIST $EVNDISPDIR/RecID${RECID} $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
+        checkForFASTDEVMODE
+		setupFilteredRunlists
+		makeParamFile
         
+        # frogs ########################################################
 		QSUBDATA=""
 		NRUNS=$( cat $RUNLISTV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh $RUNLISTV4 $EVNDISPDIR/RecID${RECID} $FROGSDIR V4 | tee >(cat - >&5) ) ; fi
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV4" "$EVNDISPDIR/RecID${RECID}" "$FROGSDIR" V4 0 | tee >(cat - >&5) ) ; fi
 		NRUNS=$( cat $RUNLISTV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh $RUNLISTV5 $EVNDISPDIR/RecID${RECID} $FROGSDIR V5 | tee >(cat - >&5) ) ; fi
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV5" "$EVNDISPDIR/RecID${RECID}" "$FROGSDIR" V5 0 | tee >(cat - >&5) ) ; fi
 		NRUNS=$( cat $RUNLISTV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh $RUNLISTV6 $EVNDISPDIR/RecID${RECID} $FROGSDIR V6 | tee >(cat - >&5) ) ; fi
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV6" "$EVNDISPDIR/RecID${RECID}" "$FROGSDIR" V6 0 | tee >(cat - >&5) ) ; fi
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$FROGSJOBSUB"
         echo "$QSUBDATA" > "$FROGSJOBSUB"
@@ -498,22 +561,37 @@ if [[ "$STAGE" == "frogs" ]] ; then
 		# frogs check #########################################################
 		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		echo "checking the frogs stage" 
-		QSUBDATA=$(cat "$FROGSJOBSUB")
+        echo
+        
+        # check qsub submission text for problems
+        echo -e "${COTBLUE}checking job submission text...${CONORM}"
+        checkLogFileForProblems "$FROGSJOBSUB" $DEBUGREGEX
+        echo
+        
+        # check batch jobs, if we can
+        checkBatchJobExits "$FROGSJOBSUB"
+        
+        # scan all log files
+        QSUBDATA=$( cat $FROGSJOBSUB )
 		while read ARUN ; do
-			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
+            echo
+			echo -e "${COBLUE}~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~ Run:$ARUN${CONORM}"
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
 			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+            
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$FROGSJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+            
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$FROGSJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
-			if [ -e "$OLOG" ] ; then
-				FROGSLOG=$(   cat "$OLOG" | grep "RUN$ARUN FROGSLOG"   | awk '{ print $3 }' )
-				checkLogFileForProblems "$FROGSLOG" $DEBUGREGEX
-				checkLogFileForStageSuccess "$FROGSLOG" "...outputfile closed"
-			else
-				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
-			fi
+            
+            FROGSLOG=$( cat "$OLOG" | grep "RUN$ARUN FROGSLOG"  | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$FROGSLOG" "FROGSLOG" "frogs log file" "$OLOG"  ; then continue ; fi
+            checkLogFileForProblems "$FROGSLOG" $DEBUGREGEX
+            
+            checkLogFileForStageSuccess "$FROGSLOG" "Final checks on result file (seems to be OK)"
 		done < $RUNLIST
 
 		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"     | head -n 1 | awk '{ print $3 }' )
@@ -524,25 +602,29 @@ if [[ "$STAGE" == "frogs" ]] ; then
 		echo -e "~~~~~~~~~~~ FROGS Datafiles stored in $DFDIR/$CONORM"
 		while read ARUN ; do
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"      | awk '{ print $3 }' )
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"      | awk '{ print $3 }' )
-			if [ -e "$OLOG" ] ; then
-				DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN DATAOUT"   | awk '{ print $3 }' )
-				FROGSLOG=$( cat "$OLOG" | grep "RUN$ARUN FROGSLOG"  | awk '{ print $3 }' )
-				LOGFILES=("$OLOG" "$ELOG" "$FROGSLOG" )
-				WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
-				ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
-				if [ -e "$DATAFILE" ] ; then
-					DFBASE=$( basename $DATAFILE )
-					DFSIZE=`stat -c %s $DATAFILE`
-                    DFSIZESTR=$( formatFileSize "$DFSIZE" )
-					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
-					RUNSUCCESS=$( checkForSuccess "$FROGSLOG" "...outputfile closed" )
-					printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
-				else echo -e "${COTRED}${DATAFILE} not found!${CONORM}" ; fi
-			else
-				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
-			fi
+            
+			OLOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN OLOG"      | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$OLOG"     "OLOG"      "$HUMANBATCHSTDOUT" "$FROGSJOBSUB" ; then continue ; fi
+            
+			ELOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN ELOG"      | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$ELOG"     "ELOG"      "$HUMANBATCHSTDERR" "$FROGSJOBSUB" ; then continue ; fi
+            
+            DATAFILE=$( cat "$OLOG"      | grep "RUN$ARUN FROGSDATA" | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$DATAFILE" "FROGSDATA" "frogs datafile"    "$OLOG"        ; then continue ; fi
+            
+            FROGSLOG=$( cat "$OLOG"      | grep "RUN$ARUN FROGSLOG"  | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$FROGSLOG" "FROGSLOG"  "frogs log file"    "$OLOG"        ; then continue ; fi
+            
+            LOGFILES=("$OLOG" "$ELOG" "$FROGSLOG" )
+            WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+            ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+            
+            DFBASE=$( basename $DATAFILE )
+            DFSIZE=`stat -c %s $DATAFILE`
+            DFSIZESTR=$( formatFileSize "$DFSIZE" )
+            DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+            RUNSUCCESS=$( checkForSuccess "$FROGSLOG" "Final checks on result file (seems to be OK)" )
+            printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
 		done < $RUNLIST
 	fi
 fi
@@ -556,11 +638,17 @@ if [[ "$STAGE" == "anpar" ]] ; then
 		# anpar #########################################################
 		echo -e "${COBLUE}Stage 4 - Anasum Parallel${CONORM}"
 		echo "$STAGE" > "$STAGEFILE"
+        checkForFASTDEVMODE
 		cd $EVNDISPSYS/scripts/VTS
 		#./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $VERITAS_USER_DATA_DIR/analysis/EVD400-d20121218/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE
 		#QSUBDATA=$( ./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $EVNDISPDIR/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
-        if [[ "$USEFROGS" == "yes" ]] ; then INPUTANASUMDIR="$FROGSDIR"
-        else                                 INPUTANASUMDIR="$EVNDISPDIR/RecID${RECID}" ; fi
+        if [[ "$USEFROGS" == "yes" ]] ; then 
+            INPUTANASUMDIR="$FROGSDIR"
+            echo -e "${COTYELLOW}Using frogs files as input...$CONORM"
+        else
+            INPUTANASUMDIR="$EVNDISPDIR/RecID${RECID}"
+            echo -e "Using mscw files as input..."
+        fi
 		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh $ANASUMRUNLIST $INPUTANASUMDIR $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$ANPARJOBSUB"
@@ -570,49 +658,66 @@ if [[ "$STAGE" == "anpar" ]] ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		# anpar check #########################################################
 		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ; echo "checking the anpar stage" 
+        
+        # check qsub submission text for problems
+        echo -e "${COTBLUE}checking job submission text...${CONORM}"
+        checkLogFileForProblems "$ANPARJOBSUB" $DEBUGREGEX
+        echo
+        
+        # check batch jobs, if we can
+        checkBatchJobExits "$ANPARJOBSUB"
+        echo
+        
 		QSUBDATA=$( cat $ANPARJOBSUB )
 		for ARUN in $RUNNUMBERS ; do # check batch and log files
 			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
 			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+            
+			OLOG=$( echo "$RUNDATA" | grep "RUN$ARUN OLOG" | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$ANPARJOBSUB" ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
+            
+			ELOG=$( echo "$RUNDATA" | grep "RUN$ARUN ELOG" | awk '{ print $3 }' )
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
-			if [ -e "$OLOG" ] ; then
-				ANPARLOG=$(   cat "$OLOG" | grep "RUN$ARUN ANPARLOG"   | awk '{ print $3 }' )
-				checkLogFileForProblems     "$ANPARLOG" $DEBUGREGEX
-				checkLogFileForStageSuccess "$ANPARLOG" "analysis results written to"
-			else
-				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
-			fi
+            if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$ANPARJOBSUB" ; then continue ; fi
+            
+            ANPARLOG=$( cat "$OLOG" | grep "RUN$ARUN ANPARLOG" | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$ANPARLOG" "ANPARLOG" "anasum parallel log file" "$OLOG" ; then continue ; fi
+            checkLogFileForProblems "$ANPARLOG" $DEBUGREGEX
+             
+            checkLogFileForStageSuccess "$ANPARLOG" "analysis results written to"
 		done < $RUNLIST
 		
 		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"     | head -n 1 | awk '{ print $3 }' )
 		DFDIR=$( cat $OLOG        | grep -P "^RUN\d{5} ANPARLOG" | awk '{ print $3 }' )
 		DFDIR=$( dirname $DFDIR )
-		echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		echo -e "~~~~~~~~~~~ ANASUM Datafiles stored in $DFDIR/$CONORM"
 		while read ARUN ; do
 			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+            
 			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }')
-			if [ -e "$OLOG" ] ; then
-				DATAFILE=$(  cat "$OLOG" | grep "RUN$ARUN DATAOUT"   | awk '{ print $3 }' )
-				ANPARLOG=$(  cat "$OLOG" | grep "RUN$ARUN ANPARLOG"  | awk '{ print $3 }' )
-				LOGFILES=("$OLOG" "$ELOG" "$ANPARLOG" )
-				WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
-				ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
-                RUNSIGMA=$( grep -E "ALL RUNS" "$ANPARLOG" | grep -oP '\d{1,3}\.\d{0,2} sigma' | grep -oP '\d{1,3}\.\d{0,2}')
-				if [ -e "$DATAFILE" ] ; then
-					DFBASE=$( basename $DATAFILE )
-					DFSIZE=`stat -c %s $DATAFILE`
-					DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
-					RUNSUCCESS=$( checkForSuccess "$ANPARLOG" "analysis results written to" )
-					printf "%10s is %3dMB, last modified %19s sigma=%5s %12s %11s  : %s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$RUNSIGMA" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
-				else echo -e "${COTRED}Run $ARUN : ${DATAFILE} not found!${CONORM}" ; fi
-			else
-				echo -e "${COTRED}Warning, batch stdout log file $OLOG is missing!"
-			fi
+            if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$ANPARJOBSUB"        ; then continue ; fi
+            
+            ANPARLOG=$(  cat "$OLOG" | grep "RUN$ARUN ANPARLOG"  | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$ANPARLOG" "ANPARLOG" "anasum parallel log file" "$OLOG"  ; then continue ; fi
+            
+            DATAFILE=$(  cat "$OLOG" | grep "RUN$ARUN ANPARDATA"   | awk '{ print $3 }' )
+            if filenameIsNotHealthy "$DATAFILE" "ANPARDATA" "anasum parallel datafile" "$OLOG"   ; then continue ; fi
+            
+            LOGFILES=("$OLOG" "$ELOG" "$ANPARLOG" )
+            WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+            ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+            RUNSIGMA=$( grep -E "ALL RUNS" "$ANPARLOG" | grep -oP '\d{1,3}\.\d{0,2} sigma' | grep -oP '\d{1,3}\.\d{0,2}')
+            
+            DFBASE=$( basename $DATAFILE )
+            DFSIZE=`stat -c %s $DATAFILE`
+            DFSIZESTR=$( formatFileSize "$DFSIZE" )
+            DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+            RUNSUCCESS=$( checkForSuccess "$ANPARLOG" "analysis results written to" )
+            printf "%10s is %s, last modified %19s sigma=%5s %12s %11s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$RUNSIGMA" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+            
 		done < $RUNLIST
 
 	fi
@@ -621,19 +726,7 @@ fi
 # s5 anasum
 if [[ "$STAGE" == "anmer" ]] ; then
 	FINALOUTPUTLOG="$CWD/`basename $FINALOUTPUT .root`.log"
-	if $CHECKFLAG ; then
-		haltIfAnyJobsAreRunning $RUNNINGJOBS
-		# check the stage results
-		echo "Checking the anmer stage"
-		checkLogFileForProblems $FINALOUTPUTLOG $DEBUGREGEX
-		DATAFILE="$FINALOUTPUT"
-		if [ -e "$DATAFILE" ] ; then
-			DFBASE=$( basename $DATAFILE )
-			DFSIZE=`stat -c %s $DATAFILE`
-			DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
-			printf "%10s is %3dMB, last modified %19s %12s %11s\n" "$DFBASE" "$((DFSIZE/1000000))" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR"
-		else echo -e "${COTRED}${DATAFILE} not found!${CONORM}" ; fi
-	else
+	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		makeParamFile
 		echo -e "${COBLUE}Stage 4 - Anasum Merge${CONORM}"
@@ -643,6 +736,27 @@ if [[ "$STAGE" == "anmer" ]] ; then
 		cd $EVNDISPSYS/scripts/VTS
 		nice -n 19 ./ANALYSIS.anasum_combine.sh $ANASUMRUNLIST $ANASUMOUTPUTDIR $FINALOUTPUT $RUNPARAMFILE | tee "$FINALOUTPUTLOG"
 		updateRunningJobFile ""
+     
+    else
+		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		# check the stage results
+		echo "Checking the anmer stage"
+		checkLogFileForProblems $FINALOUTPUTLOG $DEBUGREGEX
+        if filenameIsNotHealthy "$FINALOUTPUTLOG" "FINALOUTPUTLOG" "merged anasum log file" "ANALYSIS.pipeline"  ; then continue ; fi
+        
+		DATAFILE="$FINALOUTPUT"
+        if filenameIsNotHealthy "$DATAFILE" "FINALOUTPUT" "merge anasum datafile" "ANALYSIS.pipeline"  ; then continue ; fi
+        
+        LOGFILES=( "$FINALOUTPUTLOG" )
+        WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+        ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+        RUNSIGMA=$( grep -E "ALL RUNS" "$FINALOUTPUTLOG" | grep -oP '\d{1,3}\.\d{0,2} sigma' | grep -oP '\d{1,3}\.\d{0,2}')
+        
+        DFBASE=$( basename $DATAFILE )
+        DFSIZE=`stat -c %s $DATAFILE`
+        DFSIZESTR=$( formatFileSize "$DFSIZE" )
+        DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+        printf "%10s is %s, last modified %19s sigma=%5s %12s %11s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$RUNSIGMA" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
 	fi
 fi
 

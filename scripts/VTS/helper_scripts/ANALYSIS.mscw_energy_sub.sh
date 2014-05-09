@@ -24,7 +24,8 @@ mkdir -p $TEMPDIR
 
 #################################
 # run analysis
-rm -f $ODIR/$BFILE.mscw.log
+MSCWLOGFILE="$ODIR/$BFILE.mscw.log"
+rm -f $MSCWLOGFILE
 cp -f -v $INFILE $TEMPDIR
 
 $EVNDISPSYS/bin/mscw_energy         \
@@ -32,15 +33,16 @@ $EVNDISPSYS/bin/mscw_energy         \
     -arrayrecid=$RECID              \
     -inputfile $TEMPDIR/$BFILE.root \
     -writeReconstructedEventsOnly=1 \
-    &> $ODIR/$BFILE.mscw.log
+    &> $MSCWLOGFILE
 
 # move output file from scratch and clean up
-cp -f -v $TEMPDIR/$BFILE.mscw.root $ODIR/$BFILE.mscw.root
+MSCWDATAFILE="$ODIR/$BFILE.mscw.root"
+cp -f -v $TEMPDIR/$BFILE.mscw.root $MSCWDATAFILE
 rm -f $TEMPDIR/$BFILE.mscw.root
 rm -f $TEMPDIR/$BFILE.root
 
 # write info to log
-echo "RUN$BFILE MSCWLOG $ODIR/$BFILE.mscw.log"
-echo "RUN$BFILE DATAOUT $ODIR/$BFILE.mscw.root"
+echo "RUN$BFILE MSCWLOG $MSCWLOGFILE"
+echo "RUN$BFILE MSCWDATA $MSCWDATAFILE"
 
 exit

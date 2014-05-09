@@ -64,7 +64,7 @@ FILES=`cat $RLIST`
 
 # Output directory for error/output
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EVNDISP.ANADATA"
+LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/frogs"
 mkdir -p $LOGDIR
 
 # Job submission script

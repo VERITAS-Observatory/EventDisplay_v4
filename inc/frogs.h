@@ -234,14 +234,14 @@ struct frogs_probability_array
 //struct calibration_file read_calibration_file();
 void read_calibration_file( struct calibration_file* calib );
 
-struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, const char * templatelistname );
+struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, char templatelistname[FROGS_FILE_NAME_MAX_LENGTH] );
 //struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d );
 struct frogs_imgtmplt_in frogs_convert_from_grisu( struct array_event* taevnt,
 		struct array* ta,
 		int adc_type,
 		struct array_ped* taped );
 //struct frogs_imgtemplate frogs_read_template_elev( float elevation );
-struct frogs_imgtemplate frogs_read_template_elev( float elevation, const char * templatefilelistname );
+struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templatefilelistname[FROGS_FILE_NAME_MAX_LENGTH] );
 struct frogs_imgtemplate frogs_read_template_file( char fname[FROGS_FILE_NAME_MAX_LENGTH] );
 struct frogs_imgtmplt_out frogs_likelihood_optimization( struct frogs_imgtmplt_in* d,
 		struct frogs_imgtemplate* tmplt, struct calibration_file* calib, struct frogs_probability_array* prob_array );
