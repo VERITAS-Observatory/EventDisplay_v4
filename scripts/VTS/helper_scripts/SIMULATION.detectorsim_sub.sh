@@ -4,6 +4,7 @@
 #$ -l h_vmem=4G
 #$ -l tmpdir_size=30G
 #$ -j y
+#$ -js 20
 #
 
 # set observatory environmental variables
