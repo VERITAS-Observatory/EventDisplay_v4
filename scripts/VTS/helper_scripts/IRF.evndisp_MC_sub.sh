@@ -6,6 +6,8 @@
 source $EVNDISPSYS/setObservatory.sh VTS
 
 # parameters replaced by parent script using sed
+RUNNUM=RUNNUMBER
+SIMDIR=MCVBFDIR
 ZA=ZENITHANGLE
 WOB=DECIMALWOBBLE
 WOG=INTEGERWOBBLE
@@ -13,30 +15,30 @@ NOISE=NOISELEVEL
 EPOCH=ARRAYEPOCH
 ATM=ATMOSPHERE
 PARTICLE=PARTICLETYPE
-SIMDIR=DATADIR
-ODIR=OUTPUTDIR
-RUNNUM=RUNNUMBER
-USEFROGS=FROGSFROGS
-NEVENTS=FROGSEVENTS
 SIMTYPE=SIMULATIONTYPE
+ODIR=OUTPUTDIR
+USEFROGS=FROGSFROGS
+MSCWDIR=FROGSMSCWDIR
+NEVENTS=FROGSEVENTS
 TELTOANA="1234"
 
 # Output file name
 ONAME="$RUNNUM"
 
-# FROGS-specific variables ???
+# FROGS-specific variables (these need to be checked by a FROGS expert...)
 ITER=$((SGE_TASK_ID - 1))
-NUMBER=$(( $ZA + $ITER ))
 FIRSTEVENT=$(($ITER * $NEVENTS))
-FROGSMSCWDIR="$VERITAS_DATA_DIR/EVDv400/V5_FLWO/newtemplate/mscw_ATM21_d20130804/"
-FROGSMSCWFILE="gamma_${ZA}deg_750m_w${WOB}_ID0_ana${TELTOANA}_NOISE${NOISE}_1_${ITER}.root"
+MSCWFILE="gamma_${ZA}deg_750m_w${WOB}_ID0_ana${TELTOANA}_NOISE${NOISE}_1_${ITER}.root"
+echo -e "FROGS MSCW Dir:\n $MSCWDIR"
+echo -e "FROGS MSCW File:\n $MSCWFILE"
+echo "FROGS NEvents: $NEVENTS"
 
 # detector configuration and cuts
 ACUT="EVNDISP.reconstruction.runparameter"
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
 
-if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
     if [[ $EPOCH == "V4" ]]; then
         if [[ $PARTICLE == "1" ]]; then
@@ -77,7 +79,7 @@ if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
         NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
         echo "Noise File: $NOISEFILE"
     fi
-elif [ ${SIMTYPE:0:4} = "CARE" ]; then
+elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     # input files (observe that these might need some adjustments)
     [[ $PARTICLE == "1" ]]  && VBFNAME="gamma_${ZA}deg_750m_${WOB}wob_${NOISE}mhz_up_ATM${ATM}_part0"
     [[ $PARTICLE == "2" ]]  && VBFNAME="electron_${ZA}deg_noise${NOISE}MHz___"
@@ -90,21 +92,25 @@ elif [ ${SIMTYPE:0:4} = "CARE" ]; then
 fi
     
 
-# temporary data directory
-DDIR="$TMPDIR/evn_${ZA}_${NOISE}_${WOB}"
+# temporary directory
+if [[ -n "$TMPDIR" ]]; then 
+    DDIR="$TMPDIR/evn_${ZA}_${NOISE}_${WOG}"
+else
+    DDIR="/tmp/evn_${ZA}_${NOISE}_${WOG}"
+fi
 mkdir -p $DDIR
-echo "Temp data directory: $DDIR"
+echo "Temporary directory: $DDIR"
 
 # loop over simulation files
-if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     VBF_FILE=$VBFNAME"wobb.vbf"
-elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
+elif [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     VBF_FILE="$VBFNAME.cvbf"
 fi
 echo "Now processing $VBF_FILE"
 
 # unzip vbf file to local scratch directory
-if [ ! -e "$DDIR/$VBF_FILE" ]; then
+if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
     if [[ -e "$SIMDIR/$VBF_FILE.gz" ]]; then
         echo "Copying $SIMDIR/${VBF_FILE}.gz to $DDIR"
         cp -f "$SIMDIR/$VBF_FILE.gz" $DDIR/
@@ -122,7 +128,7 @@ if [ ! -e "$DDIR/$VBF_FILE" ]; then
 fi
 
 # check that the uncompressed vbf file exists
-if [ ! -e "$DDIR/$VBF_FILE" ]; then
+if [[ ! -f "$DDIR/$VBF_FILE" ]]; then
     echo "No source file found: $DDIR/$VBF_FILE"
     echo "$SIMDIR/$VBF_FILE*"
     exit 1
@@ -131,14 +137,14 @@ VBF_FILE="$DDIR/$VBF_FILE"
 
 # Low gain calibration
 mkdir -p $ODIR/Calibration
-if [[ ! -e $ODIR/Calibration/calibrationlist.LowGain.dat ]]; then
-   cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/
+if [[ ! -f $ODIR/Calibration/calibrationlist.LowGain.dat ]]; then
+    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/
 fi
 
 ###############################################
 # calculate pedestals
 # (CARE only, GRISU used external noise file)
-if [[ ${SIMTYPE:0:4} = "CARE" ]]; then
+if [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     echo "Calculating pedestals for run $RUNNUM"
     rm -f $ODIR/$RUNNUM.ped.log
     $EVNDISPSYS/bin/evndisp -runmode=1 -sourcetype=2 -sourcefile $VBF_FILE -runnumber=$RUNNUM -calibrationsumfirst=0 -calibrationsumwindow=20 -donotusedbinfo -calibrationdirectory $ODIR &> $ODIR/$RUNNUM.ped.log
@@ -160,11 +166,11 @@ fi
 ###############################################
 # run eventdisplay
 if [[ $USEFROGS == "1" ]]; then
-    FROGS="-frogs $FROGSMSCWDIR/$FROGSMSCWFILE -frogid 0 -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
+    FROGS="-frogs $MSCWDIR/$MSCWFILE -frogid 0 -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
-if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-        MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE"
+if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
+    MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE"
 fi
 echo "Analysing MC file for run $RUNNUM"
 $EVNDISPSYS/bin/evndisp $MCOPT $FROGS &> $ODIR/$ONAME.log

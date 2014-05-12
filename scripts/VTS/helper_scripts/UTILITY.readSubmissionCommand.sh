@@ -21,7 +21,7 @@ fi
 [[ "$1" ]] && CMDFILE=$1 || CMDFILE="submissionCommands.dat"
 
 # Check to make sure submission commands file exists
-if [ ! -f "$CMDFILE" ]; then
+if [[ ! -f "$CMDFILE" ]]; then
     echo "ERROR! Submission command list $CMDFILE not found, exiting..."
     exit 1
 fi
@@ -34,7 +34,7 @@ while read STAR LINE; do
     fi
 done < $CMDFILE
 
-if [ -z "$CMD" ]; then
+if [[ -z "$CMD" ]]; then
     echo "ERROR! No submission command is selected in $CMDFILE."
     exit 1
 else 

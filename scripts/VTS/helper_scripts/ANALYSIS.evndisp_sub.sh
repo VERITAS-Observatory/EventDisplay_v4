@@ -1,8 +1,5 @@
 #!/bin/bash
 # script to analyse VTS raw files (VBF) with eventdisplay
-# Author: Gernot Maier
-#
-# 2014-04-16 (GM) checked
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS
@@ -12,8 +9,12 @@ RUN=RUNFILE
 CALIB=CALIBRATIONOPTION
 ODIR=OUTPUTDIRECTORY
 VPM=USEVPMPOINTING
-MSCWDIR=MSCWDIRECTORY
 LOGDIR="$ODIR"
+
+# Use FROGS if MSCWDIR is not null
+if [[ -n $MSCWDIR ]]; then
+    USEFROGS=true
+fi
 
 # temporary (scratch) directory
 if [[ -n $TMPDIR ]]; then
@@ -21,6 +22,7 @@ if [[ -n $TMPDIR ]]; then
 else
     TEMPDIR="$VERITAS_USER_DATA_DIR/TMPDIR"
 fi
+echo "Scratch dir: $TEMPDIR"
 mkdir -p $TEMPDIR
 
 # eventdisplay reconstruction parameter
@@ -30,10 +32,7 @@ ACUTS="EVNDISP.reconstruction.runparameter"
 # pedestal calculation
 if [[ $CALIB == "1" || $CALIB == "2" ]]; then
     rm -f $LOGDIR/$RUN.ped.log
-    $EVNDISPSYS/bin/evndisp \
-        -runnumber=$RUN     \
-        -runmode=1          \
-        &> $LOGDIR/$RUN.ped.log
+    $EVNDISPSYS/bin/evndisp -runmode=1 -runnumber=$RUN &> $LOGDIR/$RUN.ped.log
 	echo "RUN$RUN PEDLOG $LOGDIR/$RUN.ped.log"
 fi
 
@@ -63,11 +62,7 @@ OPT=( "-readCalibDB" )
 # average tzero calculation
 if [[ $CALIB == "1" || $CALIB == "3" ]]; then
     rm -f $LOGDIR/$RUN.tzero.log
-    $EVNDISPSYS/bin/evndisp \
-        -runnumber=$RUN     \
-        -runmode=7          \
-        ${OPT[@]}           \
-        &> $LOGDIR/$RUN.tzero.log
+    $EVNDISPSYS/bin/evndisp -runnumber=$RUN -runmode=7 ${OPT[@]} &> $LOGDIR/$RUN.tzero.log
 	echo "RUN$RUN TZEROLOG $LOGDIR/$RUN.tzero.log"
 fi
 
@@ -91,32 +86,17 @@ fi
 ## double pass correction
 # OPT+=( -nodp2005 )
 
-# only applied if USEFROGS=true or 0
-if [ $USEFROGS ] ; then
-    OPT+=( -frogs $MSCWDIR/$RUN.mscw.root -frogid 0 )
-fi
-
-if [[ "$FASTDEVMODE" == "yes" ]] ; then
-    echo "Warning, \$FASTDEVMODE=yes, so only processing the first 2000 events."
-    OPT+=( -nevents=2000 )
-fi
-
 #########################################
 # run eventdisplay
-LOGOUTFILE="$LOGDIR/$RUN.log"
+LOGFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
-$EVNDISPSYS/bin/evndisp             \
-    -runnumber=$RUN                 \
-    -reconstructionparameter $ACUTS \
-    -outputfile $TEMPDIR/$RUN.root  \
-    ${OPT[@]}                       \
-    &> "$LOGOUTFILE"
-echo "RUN$RUN EVNDISPLOG $LOGOUTFILE"
+$EVNDISPSYS/bin/evndisp -runnumber=$RUN -reconstructionparameter $ACUTS -outputfile $TEMPDIR/$RUN.root ${OPT[@]} &> "$LOGFILE"
+echo "RUN$RUN EVNDISPLOG $LOGFILE"
 
 # move data file from tmp dir to data dir
-DATAOUT="$ODIR/$RUN.root"
-cp -f -v $TEMPDIR/$RUN.root $DATAOUT
-echo "RUN$RUN EVNDISPDATA $DATAOUT"
+DATAFILE="$ODIR/$RUN.root"
+cp -f -v $TEMPDIR/$RUN.root $DATAFILE
+echo "RUN$RUN EVNDISPDATA $DATAFILE"
 rm -f $TEMPDIR/$RUN.root
 
 exit

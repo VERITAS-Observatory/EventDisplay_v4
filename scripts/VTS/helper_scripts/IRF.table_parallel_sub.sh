@@ -18,7 +18,7 @@ INFILE="${SIMTYPE}_1_${ZA}deg_${WOBBLE}wob_NOISE${NOISE}_${EPOCH}_ATM${ATM}_ID${
 TABFILE="table_${SIMTYPE}_${ZA}deg_${WOBBLE}wob_${TABNOISE}noise_${EPOCH}_ATM${ATM}_ID${RECID}"
 
 # temporary directory
-if [[ -z $TMPDIR ]]; then 
+if [[ -n $TMPDIR ]]; then 
     DDIR="$TMPDIR/MSCW_${ZA}deg_${WOBBLE}deg_NOISE${NOISE}_ID${RECID}"
 else
     DDIR="/tmp/MSCW_${ZA}deg_${WOBBLE}deg_NOISE${NOISE}_ID${RECID}"

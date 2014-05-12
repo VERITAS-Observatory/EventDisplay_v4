@@ -4,7 +4,7 @@
 # qsub parameters
 h_cpu=00:29:00; h_vmem=6000M; tmpdir_size=10G
 
-if [ $# -ne 5 ]; then
+if [[ $# != 5 ]]; then
 # begin help message
 echo "
 IRF generation: create radial acceptances for a set of cuts
@@ -44,7 +44,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -55,14 +55,14 @@ EPOCH=$4
 RECID=$5
 
 # Read runlist
-if [ ! -f "$RLIST" ] ; then
+if [[ ! -f "$RLIST" ]]; then
     echo "Error, runlist $RLIST not found, exiting..."
     exit 1
 fi
 FILES=`cat $RLIST`
 
 # Read cuts list file
-if [ ! -f "$CUTSLISTFILE" ]; then
+if [[ ! -f "$CUTSLISTFILE" ]]; then
     echo "Error, cuts list file not found, exiting..."
     exit 1
 fi
@@ -71,6 +71,7 @@ IFS=$'\r\n' CUTLIST=($(cat $CUTLISTFILE))
 # run scripts and logs are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/RADIAL"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # Job submission script
@@ -83,18 +84,18 @@ for CUTS in ${CUTLIST[@]}; do
             echo "Now generating radial acceptance for $CUTS, epoch $VX, Rec ID $ID"
 
             # telescope combinations
-            [[ $ID == "0" ] && TELES="1234"
-            [[ $ID == "1" ] && TELES="234"
-            [[ $ID == "2" ] && TELES="134"
-            [[ $ID == "3" ] && TELES="124"
-            [[ $ID == "4" ] && TELES="123"
+            [[ $ID == "0" ]] && TELES="1234"
+            [[ $ID == "1" ]] && TELES="234"
+            [[ $ID == "2" ]] && TELES="134"
+            [[ $ID == "3" ]] && TELES="124"
+            [[ $ID == "4" ]] && TELES="123"
 
             # Check that cuts file exists
             CUTSNAME=${CUTS%%.dat}.dat
             if [[ "$CUTSNAME" == `basename $CUTSNAME` ]]; then
                 CUTSFILE="$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles/$CUTSNAME"
             fi
-            if [ ! -f "$CUTSFILE" ]; then
+            if [[ ! -f "$CUTSFILE" ]]; then
                 echo "Error, gamma/hadron cuts file not found, exiting..."
                 exit 1
             fi
@@ -104,12 +105,13 @@ for CUTS in ${CUTLIST[@]}; do
             CUTSNAME=${CUTSNAME%%.dat}
             OFILE="radialAcceptance-$CUTSNAME-$VX-T$TELES"
             ODIR="$VERITAS_EVNDISP_AUX_DIR/RadialAcceptances"
+            echo -e "Output files will be written to:\n $ODIR"
             
             FSCRIPT="$LOGDIR/RADIAL-$CUTSNAME-$VX-$ID"
-            sed -e "s|RUNLIST|$RLIST|" \
-                -e "s|INPUTDIR|$MSCWDIR|" \
+            sed -e "s|RUNLIST|$RLIST|"     \
+                -e "s|INPUTDIR|$MSCWDIR|"  \
                 -e "s|CUTSFILE|$CUTSFILE|" \
-                -e "s|OUTPUTDIR|$ODIR|" \
+                -e "s|OUTPUTDIR|$ODIR|"    \
                 -e "s|OUTPUTFILE|$OFILE|" $SUBSCRIPT > $FSCRIPT.sh
             
             chmod u+x $FNAM.sh
@@ -118,7 +120,8 @@ for CUTS in ${CUTLIST[@]}; do
             SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
             SUBC=`eval "echo \"$SUBC\""`
             if [[ $SUBC == *qsub* ]]; then
-                $SUBC $FSCRIPT.sh
+                JOBID=`$SUBC $FSCRIPT.sh`
+                echo "JOBID: $JOBID"
             elif [[ $SUBC == *parallel* ]]; then
                 echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
             fi

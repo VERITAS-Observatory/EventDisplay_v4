@@ -4,12 +4,13 @@
 # qsub parameters
 h_cpu=5:29:00; h_vmem=6000M; tmpdir_size=10G
 
-if [ $# -lt 5 ]; then
+if [[ $# < 5 ]]; then
 # begin help message
 echo "
 IRF generation: combine partial effective area files
 
-IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID> <sim type> [name]
+IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID>
+ <sim type> [date]
 
 required parameters:
     
@@ -41,12 +42,8 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
-
-# EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
-DATE=`date +"%y%m%d"`
 
 # Parse command line arguments
 CUTSFILE=$1
@@ -64,7 +61,9 @@ CUTS_NAME=${CUTS_NAME%%.dat}
 
 # input directory with effective areas
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
+else
+    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
 fi
 if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
@@ -77,14 +76,17 @@ echo "Input files: $INFILES"
 
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-   ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
+else
+    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
 fi
-echo "Output file directory: $ODIR"
+echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
 
 # Run scripts and log files are written into this directory
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA"
 echo "Writing run scripts and log files to $LOGDIR"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # Job submission script
@@ -101,13 +103,13 @@ echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID"
 [[ $RECID == 4 ]] && T="123"
 
 # output effective area name
-OFIL="effArea-${EANAME}-${CUTS_NAME}-${EPOCH}-ATM${ATMOS}-T${T}"
+OFILE="effArea-${EANAME}-${CUTS_NAME}-${EPOCH}-ATM${ATMOS}-T${T}"
 
 FSCRIPT="$LOGDIR/COMB-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
 rm -f $FSCRIPT.sh
 
 sed -e "s|INPUTFILES|$INFILES|" \
-    -e "s|OUTPUTFILE|$OFIL|" \
+    -e "s|OUTPUTFILE|$OFILE|"   \
     -e "s|OUTPUTDIR|$ODIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
 	    
 chmod u+x $FSCRIPT.sh
@@ -117,14 +119,10 @@ echo $FSCRIPT.sh
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    $SUBC $FSCRIPT.sh
+	JOBID=`$SUBC $FSCRIPT.sh`
+	echo "JOBID: $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
-fi
-
-# Execute all FSCRIPTs locally in parallel
-if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
 fi
 
 exit

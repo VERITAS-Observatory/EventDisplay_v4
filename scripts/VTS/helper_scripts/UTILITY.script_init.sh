@@ -27,7 +27,7 @@ fi
 source $EVNDISPSYS/setObservatory.sh VTS
 
 # EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+export EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
 
 # return 0 if successful
 exit 0

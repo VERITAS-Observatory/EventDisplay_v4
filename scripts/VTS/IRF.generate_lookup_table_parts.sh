@@ -4,12 +4,14 @@
 # qsub parameters
 h_cpu=03:29:00; h_vmem=4000M; tmpdir_size=1G
 
-if [ $# -ne 7 ]; then
+if [[ $# != 7 ]]; then
 # begin help message
 echo "
-IRF generation: create partial (for one point in the parameter space) lookup tables from MC evndisp ROOT files
+IRF generation: create partial (for one point in the parameter space) lookup
+                tables from MC evndisp ROOT files
 
-IRF.generate_lookup_table_parts.sh <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <Rec ID> <sim type>
+IRF.generate_lookup_table_parts.sh <epoch> <atmosphere> <zenith> <offset angle>
+ <NSB level> <Rec ID> <sim type>
 
 required parameters:
         
@@ -38,7 +40,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -51,12 +53,11 @@ RECID=$6
 SIMTYPE=$7
 PARTICLE_TYPE="gamma"
 
-# EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
-
 # input directory containing evndisp products
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    INDIR=$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}"/ze"$ZA"deg_offset"$WOBBLE"deg_NSB"$NOISE"MHz"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
+else
+    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
 fi
 if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
@@ -67,7 +68,9 @@ echo "Input file directory: $INDIR"
 
 # Output file directory
 if [[ ! -z $VERITAS_IRFPRODUCTION_DIR ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/Tables"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/Tables"
+else
+    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/Tables"
 fi
 echo "Output file directory: $ODIR"
 mkdir -p $ODIR
@@ -75,6 +78,7 @@ mkdir -p $ODIR
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.MAKETABLES"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.lookup_table_parallel_sub"
@@ -96,6 +100,7 @@ sed -e "s|ZENITHANGLE|$ZA|" \
     -e "s|OUTPUTDIR|$ODIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
 chmod u+x $FSCRIPT.sh
+echo $FSCRIPT.sh
 
 # run locally or on cluster
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
@@ -104,11 +109,6 @@ if [[ $SUBC == *qsub* ]]; then
     $SUBC $FSCRIPT.sh
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
-fi
-
-# Execute all FSCRIPTs locally in parallel
-if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
 fi
 
 exit

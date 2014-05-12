@@ -31,7 +31,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -43,11 +43,9 @@ fi
 [[ "$3" ]] && LASERMIN=$3 || LASERMIN=50000
 [[ "$4" ]] && RUNMODE=$4  || RUNMODE=2
 if [[ $RUNMODE != 1 ]]; then
-    # high-gain mode
-    RUNMODE=2
+    RUNMODE=2   # high-gain mode
 else
-    # low gain mode
-    RUNMODE=5
+    RUNMODE=5   # low gain mode
 fi
 
 # Check if source vbf file exists
@@ -68,8 +66,7 @@ fi
 
 # calculate gains, looping over all telescopes
 TELTOANA=`echo $TELTOANA | fold -w1`
-for i in $TELTOANA
-do
+for i in $TELTOANA; do
     echo "Calculating gains for run $RUNNUM, telescope $i"
     $EVNDISPSYS/bin/evndisp -teltoana=$i $OPT
 done

@@ -32,12 +32,12 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
 SIMFILE="$1"
-[[ "$2" ]] && RUNNUM=$2    || RUNNUM="65432"
+[[ "$2" ]] && RUNNUM=$2    || RUNNUM="65432"    # this number is arbitrary
 [[ "$3" ]] && NOISELEV=$3  || NOISELEV="200"
 [[ "$4" ]] && NOISEFILE=$4 || NOISEFILE="$VERITAS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISELEV.grisu"
 

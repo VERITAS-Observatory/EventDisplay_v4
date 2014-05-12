@@ -6,7 +6,7 @@
 # OPT="-nevents=2000"
 ## END OF HARDCODED VALUES
 
-if [ $# -lt 2 ]; then
+if [[ $# < 2 ]]; then
 # begin help message
 echo "
 EVNDISP special-purpose analysis: analyse a data file with FROGS and add FROGS
@@ -37,7 +37,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -59,7 +59,7 @@ fi
 
 # Check if mscw_energy file exists
 MSCWFILE="$MSCWDIR/$RUNNUM.mscw.root"
-if [ ! -e $MSCWFILE ]; then
+if [[ ! -f "$MSCWFILE" ]]; then
     echo "ERROR: MSCW file $MSCWFILE does not exist"
     exit 1
 fi

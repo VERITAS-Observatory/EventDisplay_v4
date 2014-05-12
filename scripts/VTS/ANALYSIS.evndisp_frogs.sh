@@ -4,31 +4,25 @@
 # qsub parameters
 h_cpu=14:29:00; h_vmem=2000M; tmpdir_size=10G
 
-if [ $# -lt 2 ]; then
+if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 # begin help message
 echo "
 EVNDISP data analysis: evndisp FROGS analysis for a simple run list
 
-ANALYSIS.evndisp_frogs.sh <runlist> <mscw directory> <output directory>
- <array version> [calibration] [VPM]
+ANALYSIS.evndisp_frogs.sh <runlist> [output directory] [mscw directory] 
+ [pedestals] [VPM]
 
 required parameters:
 
     <runlist>               simple run list with one run number per line
 
-    <mscw directory>        directory which contains mscw_energy files
-    
-    <output directory>      directory where output ROOT files will be stored
-
-    <array version>         array version of the runs in the runlist,
-                            e.g. V4, V5, V6.  (aka array epoch)
-
 optional parameters:
+
+    [output directory]      directory where output ROOT files will be stored
     
-    [calibration]
-          1                 pedestal & average tzero calculation (default)
-          2                 pedestal calculation only
-          3                 average tzero calculation only
+    [mscw directory]        directory which contains mscw_energy files
+    
+    [pedestals]             calculate pedestals (default); set to 0 to skip
 
     [VPM]                   set to 0 to switch off (default is on)
 
@@ -39,48 +33,52 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
-# create extra stdout for duplication of command output
-# look for ">&5" below
-exec 5>&1
+# Load runlist functions
+source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
 
 # Parse command line arguments
 RLIST=$1
-MSCWDIR=$2
-ODIR=$3
-ARRAYVERS=$4
-mkdir -p $ODIR
-[[ "$5" ]] && CALIB=$5 || CALIB=1
-[[ "$6" ]] && VPM=$6   || VPM=1
+[[ "$2" ]] && ODIR=$2    || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
+[[ "$3" ]] && MSCWDIR=$3 || MSCWDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0/"
+[[ "$4" ]] && CALIB=$4   || CALIB=1
+[[ "$5" ]] && VPM=$5     || VPM=1
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
     echo "Error, runlist $RLIST not found, exiting..."
     exit 1
 fi
-FILES=`cat $RLIST`
+RUNNUMS=`cat $RLIST`
 
-# Output directory for error/output
+# Log file directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/frogs"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
+
+# output directory
+echo -e "Output files will be written to:\n $ODIR"
+mkdir -p $ODIR
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.evndisp_frogs_sub"
 
 # loop over all files in files loop
-for AFILE in $FILES
-do
-    echo "Now starting run $AFILE"
-    FSCRIPT="$LOGDIR/EVN.data-$AFILE"
+for RUN in $RUNNUMS; do
+    echo "Now starting run $RUN"
+    FSCRIPT="$LOGDIR/EVN.data-$RUN"
+    
+    # get run array epoch using a run info function
+    EPOCH=`getRunArrayVersion $RUN`
 
-    sed -e "s|RUNFILE|$AFILE|"           \
+    sed -e "s|RUNFILE|$RUN|"             \
         -e "s|CALIBRATIONOPTION|$CALIB|" \
         -e "s|OUTPUTDIRECTORY|$ODIR|"    \
         -e "s|MSCWDIRECTORY|$MSCWDIR|"   \
-        -e "s|ARRRRRRRAAAYY|$ARRAYVERS|" \
+        -e "s|ARRAYEPOCH|$EPOCH|"        \
         -e "s|USEVPMPOINTING|$VPM|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
@@ -90,23 +88,8 @@ do
     SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
     SUBC=`eval "echo \"$SUBC\""`
     if [[ $SUBC == *qsub* ]]; then
-        
-		# print the job submission output to stdout, while also copying it to QSUBDATA
-        QSUBDATA=$( $SUBC $FSCRIPT.sh | tee >(cat - >&5) ) 
-        
-		# get the submitted job's id, after the fact
-		# by looking for "Your job ####### ..."
-		JOBID=$( echo "$QSUBDATA" | grep -E "Your job" | awk '{ print $3 }' )
-		
-		# tell the user basic info about the job submission
-		echo "RUN$AFILE JOBID $JOBID"
-		
-		# don't print a .o logfile name if the user specified /dev/null in the qsub command
-		if [[ ! $SUBC == */dev/null* ]] ; then
-			echo "RUN$AFILE OLOG $FSCRIPT.sh.o$JOBID"
-            echo "RUN$AFILE ELOG $FSCRIPT.sh.e$JOBID"
-		fi
-        
+        JOBID=`$SUBC $FSCRIPT.sh`
+        echo "RUN $RUN: JOBID $JOBID"
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
     fi

@@ -26,7 +26,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -39,27 +39,25 @@ DDIR="$VERITAS_DATA_DIR/data/"
 CALIBDIR="$VERITAS_EVNDISP_AUX_DIR/Calibration/"
 
 # Read runlist
-if [ ! -f "$RLIST" ]; then
+if [[ ! -f "$RLIST" ]]; then
     echo "Error, runlist $RLIST not found, exiting..."
     exit 1
 fi
-FILES=`cat $RLIST`
+RUNNUMS=`cat $RLIST`
 
-for AFILE in $FILES
-do
-    for i in $TELTOANA
-    do
-        RUN=`$EVNDISPSYS/bin/VTS.getLaserRunFromDB $i $AFILE`
-        echo "Checking telescope $i, laser run $RUN, data run $AFILE:"
+for RUN in $RUNNUMS; do
+    for i in $TELTOANA; do
+        RUN=`$EVNDISPSYS/bin/VTS.getLaserRunFromDB $i $RUN`
+        echo "Checking telescope $i, laser run $RUN, data run $RUN:"
         echo "$CALIBDIR/Tel_$i/$RUN.gain.root"
         
-        if [ ! -e "$CALIBDIR/Tel_$i/$RUN.gain.root" ]; then
+        if [[ ! -f "$CALIBDIR/Tel_$i/$RUN.gain.root" ]]; then
             echo "Processing gains from laser/flash run $RUN, telescope $i"
-            BFILE=`find -L $DDIR -name "$RUN.cvbf"`
-            if [ -e $BFILE ]; then
-                $EVNDISPSYS/scripts/VTS/SPANALYSIS.evndisp_laser_run.sh $i $BFILE
+            RUNFILE=`find -L $DDIR -name "$RUN.cvbf"`
+            if [[ -f $RUNFILE ]]; then
+                $EVNDISPSYS/scripts/VTS/SPANALYSIS.evndisp_laser_run.sh $i $RUNFILE
             else
-                echo "Missing laser/flasher file $BFILE, please download it"
+                echo "Missing laser/flasher file $RUNFILE, please download it"
             fi
         else
             echo "...gain and toffset files already on disk"

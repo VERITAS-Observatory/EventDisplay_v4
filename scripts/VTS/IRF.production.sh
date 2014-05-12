@@ -2,19 +2,21 @@
 # IRF production script (VERITAS)
 #
 
-if [ $# -lt 2 ]; then
+if [[ $# < 2 ]]; then
 # begin help message
 echo "
 IRF generation: produce a full set of instrument response functions (IRFs)
 
-IRF.production.sh <sim type> <IRF type> [epoch] [atmosphere] [Rec ID] [cuts list file] [sim directory]
+IRF.production.sh <sim type> <IRF type> [epoch] [atmosphere] [Rec ID]
+ [cuts list file] [sim directory]
 
 required parameters:
 
     <sim type>              original VBF file simulation type (e.g. GRISU, CARE)
     
     <IRF type>              type of instrument response function to produce
-                            (e.g. EVNDISP, MAKETABLES, ANALYSETABLES, EFFECTIVEAREAS, COMBINEEFFECTIVEAREAS )
+                            (e.g. EVNDISP, ANALYSE_TABLES, MAKE_TABLES,
+                                  EFFECTIVE_AREA, COMBINE_EFFECTIVE_AREAS)
     
 optional parameters:
     
@@ -70,6 +72,12 @@ else
     exit 1
 fi
 
+# Starting run numbers for evndisp analysis
+if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+    RUNNUM="970000"
+elif [ ${SIMTYPE:0:4} = "CARE" ]; then
+    RUNNUM="980000"
+fi
 
 # Set gamma/hadron cuts
 if [[ $CUTSLISTFILE != "" ]]; then
@@ -110,12 +118,13 @@ for VX in $EPOCH; do
                     if [[ $IRFTYPE == "EVNDISP" ]]; then
                         if [[ -z $SIMDIR ]]; then
                            if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-                              SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
+                              SIMDIR="$VERITAS_DATA_DIR/simulations/${VX}_FLWO/grisu/ATM$ATM"
                            elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
-                              SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/${SIMTYPE}
+                              SIMDIR="$VERITAS_DATA_DIR/simulations/${VX}_FLWO/$SIMTYPE"
                            fi
                         fi
-                        ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE
+                        ./IRF.evndisp_MC.sh $RUNNUM $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE
+                        ((RUNNUM++))
                     # make tables
                     elif [[ $IRFTYPE == "MAKETABLES" ]]; then
                        ./IRF.generate_lookup_table_parts.sh $VX $ATM $ZA $WOBBLE $NOISE 0 $SIMTYPE

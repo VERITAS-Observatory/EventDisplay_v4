@@ -24,7 +24,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -36,9 +36,9 @@ fi
 
 # Check if source vbf file exists
 SF=`find -L $VERITAS_DATA_DIR/data -name "$RUNNUM.cvbf"`
-if [ ${#SF} = 0 ]; then
+if [[ ${#SF} = 0 ]]; then
     echo "ERROR: VERITAS source file $RUNNUM.cvbf not found in $VERITAS_DATA_DIR/data/"
-    exit
+    exit 1
 fi
 
 # run options

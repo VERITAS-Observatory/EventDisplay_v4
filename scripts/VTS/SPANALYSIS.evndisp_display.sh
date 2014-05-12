@@ -14,8 +14,8 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP special-purpose analysis: display data file and write results to file
 
-SPANALYSIS.evndisp_display.sh <sourcefile> [telescope number] [run number]
- [TARGET] [WOBBLENORTH] [WOBBLEEAST] [RAOFFSET]
+SPANALYSIS.evndisp_display.sh <sourcefile> [teltoana] [run number] [TARGET]
+ [WOBBLENORTH] [WOBBLEEAST] [RAOFFSET]
 
 required parameters:
 
@@ -47,7 +47,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -63,7 +63,7 @@ fi
 [[ "$7" ]] && OPT="$OPT -raoffset=$7"
 
 # Check if source file exists
-if [ ! -e $RUNFILE ]; then
+if [[ ! -f $RUNFILE ]]; then
     echo "ERROR: VERITAS source file $RUNFILE not found"
     exit 1
 fi

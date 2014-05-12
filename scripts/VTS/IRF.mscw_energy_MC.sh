@@ -4,12 +4,13 @@
 # qsub parameters
 h_cpu=00:29:00; h_vmem=6000M; tmpdir_size=100G
 
-if [ $# -lt 8 ]; then
+if [[ $# < 8 ]]; then
 # begin help message
 echo "
 IRF generation: analyze simulation evndisp ROOT files using mscw_energy 
 
-IRF.mscw_energy_MC.sh <table file> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <Rec ID> <sim type> [particle]
+IRF.mscw_energy_MC.sh <table file> <epoch> <atmosphere> <zenith> <offset angle>
+ <NSB level> <Rec ID> <sim type> [particle]
 
 required parameters:
 
@@ -47,7 +48,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -62,9 +63,6 @@ RECID=$7
 SIMTYPE=$8
 [[ "$9" ]] && PARTICLE=$9 || PARTICLE=1
 
-# EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
-
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
 PARTICLE_TYPE=${PARTICLE_NAMES[$PARTICLE]}
@@ -73,33 +71,37 @@ PARTICLE_TYPE=${PARTICLE_NAMES[$PARTICLE]}
 if [[ "$TABFILE" == `basename $TABFILE` ]]; then
     TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"
 fi
-if [ ! -f "$TABFILE" ]; then
+if [[ ! -f "$TABFILE" ]]; then
     echo "Error, table file not found, exiting..."
     exit 1
 fi
 
 # input directory containing evndisp products
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    INDIR=$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}"/ze"$ZA"deg_offset"$WOBBLE"deg_NSB"$NOISE"MHz"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
+else
+    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
 fi
 if [[ ! -d $INDIR ]]; then
-    echo "Error, could not locate input directory. Locations searched:"
-    echo "$INDIR"
+    echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
     exit 1
 fi
 echo "Input file directory: $INDIR"
 
-# Output file directory
-if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
-fi
-echo "Output file directory: $ODIR"
-mkdir -p $ODIR
-
 # directory for run scripts
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANATABLES/"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
+
+# Output file directory
+if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
+else
+    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
+fi
+echo -e "Output files will be written to:\n $ODIR"
+mkdir -p $ODIR
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.mscw_energy_MC_sub"
@@ -116,20 +118,17 @@ sed -e "s|INPUTDIR|$INDIR|" \
     -e "s|WOBBLEOFFSET|$WOBBLE|" \
     -e "s|RECONSTRUCTIONID|$RECID|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
-echo "writing $FSCRIPT.sh"
+chmod u+x $FSCRIPT.sh
+echo "Run script written to: $FSCRIPT"
 
 # run locally or on cluster
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    $SUBC $FSCRIPT.sh
+    JOBID=`$SUBC $FSCRIPT.sh`
+    echo "JOBID: $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
-fi
-
-# Execute all FSCRIPTs locally in parallel
-if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
 fi
 
 exit

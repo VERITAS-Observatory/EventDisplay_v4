@@ -4,7 +4,7 @@
 # qsub parameters
 h_cpu=20:29:00; h_vmem=8000M; tmpdir_size=10G
 
-if [ $# -lt 4 ]; then
+if [[ $# < 4 ]]; then
 # begin help message
 echo "
 IRF generation: create a lookup table from a set of partial table files
@@ -39,34 +39,36 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
-INDIR=$1
-[[ "$2" ]] && TABDATE=$2 || TABDATE=`date +"%Y%m%d"`
-[[ "$3" ]] && SIMDATE=$3 || SIMDATE=""
+EPOCH=$1
+ATM=$2
+RECID=$3
+SIMTYPE=$4
+[[ "$5" ]] && TABDATE=$5 || TABDATE=`date +"%Y%m%d"`
+[[ "$6" ]] && SIMDATE=$6
 
 # input directory containing partial table files
-if [[ -z $VERITAS_IRF_ANA_DIR ]]; then
-    INDIR="$VERITAS_IRF_ANA_DIR/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
-elif [[ ! -z $VERITAS_IRF_ANA_DIR || ! -d $INDIR ]]; then
-    INDIR="$VERITAS_DATA_DIR/analysis/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
-elif [[ ! -d $INDIR ]]; then
-    echo "Error, could not locate input directory. Locations searched:"
-    echo "$VERITAS_IRF_ANA_DIR/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
-    echo "$VERITAS_DATA_DIR/analysis/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
+if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
+else
+    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
+fi
+if [[ ! -d $INDIR ]]; then
+    echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
     exit 1
 fi
 echo "Input file directory: $INDIR"
 
 # Output file directory
-if [[ -z $VERITAS_IRF_ANA_DIR ]]; then
-    ODIR="$VERITAS_IRF_ANA_DIR/$EDVERSION/Tables/"
+if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/Tables/"
 else
-    ODIR="$VERITAS_DATA_DIR/analysis/$EDVERSION/Tables/"
+    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/Tables/"
 fi
-echo "Output file directory: $ODIR"
+echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
 
 # Create list of partial table files
@@ -79,7 +81,7 @@ TESTFILE=${TESTFILE%%'.root'}
 SIMTYPE=${TESTFILE%%_*}
 PARAMS=V${TESTFILE##*V}
 OFILE="table_d${TABDATE}_${SIMTYPE}${SIMDATE}_${PARAMS}"
-if [[ -e $OFILE ]]; then
+if [[ -f $OFILE ]]; then
     echo "ERROR: table file $ODIR/$OFILE exists; move it or delete it"
     exit 1
 fi
@@ -87,6 +89,7 @@ fi
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.MAKETABLES"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # Job submission script
@@ -103,14 +106,10 @@ chmod u+x $FSCRIPT.sh
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    $SUBC $FSCRIPT.sh
+    JOBID=`$SUBC $FSCRIPT.sh`
+    echo "JOBID: $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
-fi
-
-# Execute all FSCRIPTs locally in parallel
-if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
 fi
 
 exit

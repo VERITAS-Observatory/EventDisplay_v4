@@ -22,25 +22,25 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
 RLIST=$1
 
 # Read runlist
-if [ ! -f "$RLIST" ] ; then
+if [[ ! -f "$RLIST" ]] ; then
     echo "Error, runlist $RLIST not found, exiting..."
     exit 1
 fi
-FILES=`cat $RLIST`
+RUNNUMS=`cat $RLIST`
 echo "Laser files to analyze:"
-echo $FILES
+echo $RUNNUMS
 
 # Output directory for error/output from batch system
-# if submitting a lot of scripts, use LOGDIR=/dev/null
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EVNDISP.ANADATA"
+echo "Log files will be written to: $LOGDIR"
 mkdir -p $LOGDIR
 
 # Job submission script
@@ -48,17 +48,16 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.evndisp_laser_sub"
 
 #########################################
 # loop over all files in files loop
-for AFILE in $FILES
-do
+for RUN in $RUNNUMS; do
     # check if laser file exists
-    DFILE=`find -L $VERITAS_DATA_DIR/data/ -name "$AFILE.cvbf"`
+    DFILE=`find -L $VERITAS_DATA_DIR/data/ -name "$RUN.cvbf"`
     if [ -z "$DFILE" ]; then
-        echo "Error: laser vbf file not found for run $AFILE"
+        echo "Error: laser vbf file not found for run $RUN"
     else
-        echo "Now starting laser run $AFILE"
-        FSCRIPT="$LOGDIR/EVN.laser-$AFILE"
+        echo "Now starting laser run $RUN"
+        FSCRIPT="$LOGDIR/EVN.laser-$RUN"
 
-        sed -e "s|RUNFILE|$AFILE|" \
+        sed -e "s|RUNFILE|$RUN|" \
             -e "s|LOGDIRECTORY|$LOGDIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
         chmod u+x $FSCRIPT.sh
@@ -68,7 +67,8 @@ do
         SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
         SUBC=`eval "echo \"$SUBC\""`
         if [[ $SUBC == *qsub* ]]; then
-            $SUBC $FSCRIPT.sh
+            JOBID=`$SUBC $FSCRIPT.sh`
+            echo "RUN $RUN: JOBID $JOBID"
         elif [[ $SUBC == *parallel* ]]; then
             echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
         fi

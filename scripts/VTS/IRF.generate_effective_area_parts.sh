@@ -5,25 +5,26 @@
 # qsub parameters
 h_cpu=11:29:00; h_vmem=8000M; tmpdir_size=10G
 
-if [ $# -ne 8 ]; then
+if [[ $# != 8 ]]; then
 # begin help message
 echo "
 IRF generation: create partial effective area files from MC ROOT files
  (simulations that have been processed by both evndisp_MC and mscw_energy_MC)
 
-IRF.generate_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <Rec ID> <sim type>
+IRF.generate_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <zenith>
+ <offset angle> <NSB level> <Rec ID> <sim type>
 
 required parameters:
 
-    <cuts file>             gamma/hadron cuts file
-                            (located in \$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles)
+    <cuts file>             gamma/hadron cuts file (located in 
+                             \$VERITAS_EVNDISP_AUX_DIR/GammaHadronCutFiles)
         
     <epoch>                 array epoch (e.g., V4, V5, V6)
                             V4: array before T1 move (before Fall 2009)
                             V5: array after T1 move (Fall 2009 - Fall 2012)
                             V6: array after camera update (after Fall 2012)
                             
-    <atmosphere>            atmosphere model (e.g. 21 = winter, 22 = summer)
+    <atmosphere>            atmosphere model (21 = winter, 22 = summer)
 
     <zenith>                zenith angle of simulations [deg]
 
@@ -44,11 +45,8 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
-
-# EventDisplay version
-EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
 
 # Parse command line arguments
 CUTSFILE=$1
@@ -59,6 +57,8 @@ WOBBLE=$5
 NOISE=$6
 RECID=$7
 SIMTYPE=$8
+PARTICLE_TYPE="gamma"
+
 # Check that cuts file exists
 CUTSFILE=${CUTSFILE%%.dat}
 CUTS_NAME=`basename $CUTSFILE`
@@ -68,33 +68,35 @@ if [[ "$CUTSFILE" == `basename $CUTSFILE` ]]; then
 else
     CUTSFILE="$CUTSFILE.dat"
 fi
-if [ ! -f "$CUTSFILE" ]; then
+if [[ ! -f "$CUTSFILE" ]]; then
     echo "Error, gamma/hadron cuts file not found, exiting..."
     exit 1
 fi
-PARTICLE_TYPE="gamma"
 
 # input directory containing mscw_energy_MC products
-if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
- INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID$RECID"
-fi
-if [[ ! -d $INDIR ]]; then
-    echo "Error, could not locate input directory. Locations searched:"
-    echo "$INDIR"
+if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/RecID${RECID}"
+elif [[ -z $VERITAS_IRFPRODUCTION_DIR || ! -d $INDIR ]]; then
+    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/RecID${RECID}"
+elif [[ ! -d $INDIR ]]; then
+    echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
     exit 1
 fi
 echo "Input file directory: $INDIR"
 
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
+else
+    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
 fi
-echo "Output file directory: $ODIR"
+echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
 
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # copy cuts file to log directory
@@ -104,13 +106,13 @@ CUTSFILE=`basename $CUTSFILE`
 #################################
 # template string containing the name of processed simulation root file
 MCFILE="${INDIR}/${ZA}deg_${WOBBLE}wob_NOISE${NOISE}.mscw.root"
-if [ ! -e ${MCFILE} ]; then
+if [[ ! -f ${MCFILE} ]]; then
     echo "Input mscw file not found: ${MCFILE}"
     exit 1
 fi
 
-# parameter file template which will be filled inside the for loops
-read -r -d '' PARAMFILE << 'PARAMFILECONTENTS'
+# parameter file template
+PARAMFILE="
 * FILLINGMODE 0
 * ENERGYRECONSTRUCTIONMETHOD 1
 * ENERGYAXISBINS 60
@@ -119,9 +121,7 @@ read -r -d '' PARAMFILE << 'PARAMFILECONTENTS'
 * ENERGYSPECTRUMINDEX 40 1.5 0.1
 * FILLMONTECARLOHISTOS 0
 * CUTFILE $LOGDIR/$CUTSFILE
-* SIMULATIONFILE_DATA $MCFILE
-PARAMFILECONTENTS
-
+* SIMULATIONFILE_DATA $MCFILE"
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.effective_area_parallel_sub"
@@ -146,14 +146,10 @@ echo $FSCRIPT.sh
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    $SUBC $FSCRIPT.sh
+    JOBID=`$SUBC $FSCRIPT.sh`
+    echo "JOBID: $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
-fi
-
-# Execute all FSCRIPTs locally in parallel
-if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
 fi
 
 exit

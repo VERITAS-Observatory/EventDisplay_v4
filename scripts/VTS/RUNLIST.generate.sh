@@ -94,6 +94,6 @@ while read -r RUNID; do
 		FINALARRAY+=("$RUNID")
 		echo "$RUNID"
 	fi
-done < <($MYSQL -e " select run_id from VOFFLINE.tblRun_Analysis_Comments where status = 'good_run' and (tel_cut_mask is NULL or tel_cut_mask in $TEL_CUT_MASKS) and data_category = 'science' and usable_duration >= '00:${MIN_DURATION}:00' and run_id in ${RUN_IDS[@]} ;")
+done < <($MYSQL -e "select run_id from VOFFLINE.tblRun_Analysis_Comments where status = 'good_run' and (tel_cut_mask is NULL or tel_cut_mask in $TEL_CUT_MASKS) and data_category = 'science' and usable_duration >= '00:${MIN_DURATION}:00' and run_id in ${RUN_IDS[@]}")
 
 exit

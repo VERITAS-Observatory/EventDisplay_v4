@@ -4,7 +4,7 @@
 # qsub parameters
 h_cpu=11:29:00; h_vmem=4000M; tmpdir_size=40G
 
-if [ $# -lt 2 ]; then
+if [[ $# < 2 ]]; then
 # begin help message
 echo "
 EVNDISP DST maker: submit jobs from a simple run list
@@ -29,7 +29,7 @@ exit
 fi
 
 # Run init script
-bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
+bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
@@ -38,16 +38,16 @@ SUMW=$2
 [[ "$3" ]] && PED=$3 || PED="1"
 
 # Read runlist
-if [ ! -f "$RLIST" ]; then
+if [[ ! -f "$RLIST" ]]; then
     echo "Error, runlist $RLIST not found, exiting..."
     exit 1
 fi
-FILES=`cat $RLIST`
+RUNNUMS=`cat $RLIST`
 
-# Output directory for error/output from batch system
-# if submitting a lot of scripts, use LOGDIR=/dev/null
+# run scripts are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EVNDISP.ANADATA"
+echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # Job submission script
@@ -55,12 +55,11 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.make_DST_sub"
 
 #########################################
 # loop over all files in files loop
-for AFILE in $FILES
-do
-    echo "Now starting run $AFILE"
-    FSCRIPT="$LOGDIR/EVN.DST-$AFILE-$SUMW"
+for RUN in $RUNNUMS; do
+    echo "Now starting run $RUN"
+    FSCRIPT="$LOGDIR/EVN.DST-$RUN-$SUMW"
 
-    sed -e "s|RUNFILE|$AFILE|" \
+    sed -e "s|RUNFILE|$RUN|" \
         -e "s|PEDESTALS|$PED|" \
         -e "s|SUMWINDOW|$SUMW|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
@@ -71,7 +70,8 @@ do
     SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
     SUBC=`eval "echo \"$SUBC\""`
     if [[ $SUBC == *qsub* ]]; then
-        $SUBC $FSCRIPT.sh
+        JOBID=`$SUBC $FSCRIPT.sh`
+		echo "RUN $RUN: JOBID $JOBID"
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
     fi
