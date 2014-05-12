@@ -1029,7 +1029,8 @@ void VImageParameterCalculation::calcParameters()
 			
 			const double si = ( double )fData->getSums()[j]; // charge (dc)
 			sumsig += si;
-			sumsig_2 += ( double )fData->getSums2()[j];
+                        const double si2 = ( double )fData->getSums2()[j];
+			sumsig_2 += si2;
 			// sum in outer ring
 			if( getDetectorGeo()->getNNeighbours()[j] < getDetectorGeo()->getMaxNeighbour() )
 			{
@@ -1056,7 +1057,7 @@ void VImageParameterCalculation::calcParameters()
 			}
 			if( fData->getHiLo()[j] )
 			{
-				sumLowGain += si;
+				sumLowGain += si2;
 			}
 			
 			const double sixi = si * xi;
@@ -1091,9 +1092,9 @@ void VImageParameterCalculation::calcParameters()
 		fParGeo->loss = 0.;
 		fParGeo->lossAndDead = 0.;
 	}
-	if( sumLowGain > 0. )
+	if( sumLowGain > 0. && sumsig_2 > 0. )
 	{
-		fParGeo->fracLow = sumLowGain / sumsig;
+		fParGeo->fracLow = sumLowGain / sumsig_2;
 	}
 	else
 	{
