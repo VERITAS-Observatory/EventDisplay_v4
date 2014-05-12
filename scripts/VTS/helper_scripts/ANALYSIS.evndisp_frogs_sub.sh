@@ -86,12 +86,24 @@ fi
 
 #########################################
 
-OPT+=( -frogs $MSCWDIR/$RUN.mscw.root        )
+# copy the mscw file so we don't overwrite it
+INPUTMSCW="$RUN.mscw.root"
+cp $MSCWDIR/$INPUTMSCW $TEMPDIR/$INPUTMSCW
+
+# the output is this file, after evndisp edits it
+chmod u+w $TEMPDIR/$INPUTMSCW 
+
+echo
+ll -ahrt $TEMPDIR
+echo
+
+#OPT+=( -frogs $MSCWDIR/$RUN.mscw.root        )
+OPT+=( -frogs $TEMPDIR/$INPUTMSCW            )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 
 if [[ "$FASTDEVMODE" == "yes" ]] ; then
-    OPT+=( -nevents=100 )
+    OPT+=( -nevents=50 )
     echo "Warning, \$FASTDEVMODE=yes, only processing the first 100 events..."
 fi
 
@@ -101,17 +113,25 @@ echo "using frogs options '${OPT[@]}'"
 # run eventdisplay
 LOGOUTFILE="$LOGDIR/$RUN.log"
 rm -f $LOGDIR/$RUN.log
-$EVNDISPSYS/bin/evndisp             \
-    -runnumber=$RUN                 \
-    -reconstructionparameter $ACUTS \
-    -outputfile $TEMPDIR/$RUN.root  \
-    ${OPT[@]}                       \
+$EVNDISPSYS/bin/evndisp                \
+    -runnumber=$RUN                    \
+    -reconstructionparameter $ACUTS    \
+    -outputfile $TEMPDIR/$RUN.tmp.root \ 
+    ${OPT[@]}                          \
     &> $LOGOUTFILE
 echo "RUN$RUN FROGSLOG $LOGOUTFILE"
 
+# we don't actually output to $TEMPDIR/$RUN.tmp.root,
+# we overwrite $TEMPDIR/$INPUTMSCW instead
+# from the -frogs option
+
+echo
+ll -ahrt $TEMPDIR
+echo
+
 # move data file from tmp dir to data dir
-DATAOUT="$ODIR/$RUN.root"
-cp -f -v $TEMPDIR/$RUN.root $DATAOUT
+DATAOUT="$ODIR/$RUN.mscw.root"
+cp -f -v $TEMPDIR/$INPUTMSCW $DATAOUT
 rm -f $TEMPDIR/$RUN.root
 echo "RUN$RUN FROGSDATA $DATAOUT"
 

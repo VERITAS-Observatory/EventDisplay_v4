@@ -89,7 +89,7 @@ FROGSDIR="$EVNDISPDIR/frogs"
 
 # where should we put the anasum files (parallel and merged)?
 # (full path please)
-ANASUMOUTPUTDIR=$CWD"/arf"
+ANASUMOUTPUTDIR="$CWD/arf"
 
 # what should we name the final output root file?
 # will be put in $ANASUMOUTPUTDIR
@@ -125,6 +125,10 @@ GAMHADCUTDATE="20130411"
 EFDATE1="20131031"
 EFDATE2="20131115"
 
+# Which directory should we keep the morphed ctools datafiles?
+# used by (mutate) stage
+CTOOLSDIR="$CWD/ctoolsdata"
+
 #
 # END ANALYSIS SETTINGS
 #
@@ -132,7 +136,7 @@ EFDATE2="20131115"
 
 
 BINNAME="$0"
-if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|jobs|kill) ]] ; then 
+if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|jobs|kill) ]] ; then 
     echo "
 HOW DO I USE THIS ?                             
    1. Put this script in a new directory,                    
@@ -186,7 +190,7 @@ DEBUGREGEX="WHITEBOARD"
 # if set to yes, some stages will only run
 # for the first few hundred events
 # to allow for very fast testing
-FASTDEVMODE=no
+export FASTDEVMODE=yes
 
 # needed to transfer files from evndisp to mscw stage and to anpar stage
 
@@ -221,12 +225,13 @@ function checkForFASTDEVMODE {
 STAGEFILE="$SCIDIR/stage"
 RUNNINGJOBS="$SCIDIR/runningjobs" # file containing job numbers from the last action
 if [[ "$1" == "jobs" ]] ; then # print run status
-    checkIfJobsAreDone "$RUNNINGJOBS" "$STAGEFILE" 90
+    checkIfJobsAreDone "$RUNNINGJOBS" "$STAGEFILE" 30
 fi
 
 if [[ "$1" == "kill" ]] ; then # kill all running jobs
     killJobsInJobfile "$RUNNINGJOBS"
 fi
+
 
 function setupFilteredRunlists {
 	TABLEFILEWINTV4="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V4_ID0"
@@ -428,7 +433,7 @@ if [[ "$STAGE" == "mscw" ]] ; then
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		# mscw #########################################################
-		echo -e "${COBLUE}Stage 2 - Mean Scale Calculation${CONORM}"
+		echo -e "${COBLUE}Stage 2 - Mean Scale Length/Width Calculation${CONORM}"
 		#echo -e "Feeding files from $EVNDISPDIR"
 		echo "$STAGE" > "$STAGEFILE"
         checkForFASTDEVMODE
@@ -729,7 +734,7 @@ if [[ "$STAGE" == "anmer" ]] ; then
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		makeParamFile
-		echo -e "${COBLUE}Stage 4 - Anasum Merge${CONORM}"
+		echo -e "${COBLUE}Stage 5a - Anasum Merge${CONORM}"
 		echo "$STAGE" > "$STAGEFILE"
 		#cd $EVNDISPSYS/bin
 		#nice -n 19 ./anasum -d $ANASUMOUTPUTDIR -l $ANASUMRUNLIST -i 1 -f $RUNPARAMFILE -o $FINALOUTPUT 2>&1 | tee "$FINALOUTPUTLOG"
@@ -741,8 +746,8 @@ if [[ "$STAGE" == "anmer" ]] ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		# check the stage results
 		echo "Checking the anmer stage"
-		checkLogFileForProblems $FINALOUTPUTLOG $DEBUGREGEX
         if filenameIsNotHealthy "$FINALOUTPUTLOG" "FINALOUTPUTLOG" "merged anasum log file" "ANALYSIS.pipeline"  ; then continue ; fi
+		checkLogFileForProblems $FINALOUTPUTLOG $DEBUGREGEX
         
 		DATAFILE="$FINALOUTPUT"
         if filenameIsNotHealthy "$DATAFILE" "FINALOUTPUT" "merge anasum datafile" "ANALYSIS.pipeline"  ; then continue ; fi
@@ -760,3 +765,49 @@ if [[ "$STAGE" == "anmer" ]] ; then
 	fi
 fi
 
+# s6 mutate
+if [[ "$STAGE" == "mutate" ]] ; then
+	if ! $CHECKFLAG ; then
+		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		echo -e "${COBLUE}Stage 5b - Mutate (convert) Anasum Parallel files to CTOOL's Data Format${CONORM}"
+        
+        cd $EVNDISPSYS/bin
+        while read ARUN ; do
+            # this stage runs quite fast (~10seconds per run)
+            # so we wont run it in parallel
+            writeCTAEventListFromAnasum                \
+                -i "$ANASUMOUTPUDIR/$ARUN.anasum.root" \
+                -o "$CTOOLSDIR/$ARUN.ctools.fits"      \
+                2>&1                                   \
+                >  "$CTOOLSDIR/$ARUN.ctools.log"
+        done < $RUNLIST
+        
+    else
+		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		# check the stage results
+		echo "Checking the mutate stage"
+        
+        # check log files
+        while read ARUN ; do
+			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
+            checkLogFileForProblems "$CTOOLSDIR/$ARUN.ctools.log" $DEBUGREGEX
+        done < $RUNLIST
+        
+        # check data files
+		echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		echo -e "~~~~~~~~~~~ CTOOLS Datafiles stored in $CTOOLSDIR/$CONORM"
+        while read ARUN ; do
+            LOGFILES=("$CTOOLSDIR/$ARUN.ctools.log" )
+            WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
+            ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
+            
+            DATAFILE="$CTOOLSDIR/$ARUN.ctools.fits"
+            DFBASE=$( basename $DATAFILE )
+            DFSIZE=`stat -c %s $DATAFILE`
+            DFSIZESTR=$( formatFileSize "$DFSIZE" )
+            DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+            RUNSUCCESS=$( checkForSuccess "$CTOOLSDIR/$ARUN.ctools.log" "analysis results written to" )
+            printf "%10s is %s, last modified %19s sigma=%5s %12s %11s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$RUNSIGMA" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+        done < $RUNLIST
+    fi
+fi
