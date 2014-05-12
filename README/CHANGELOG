@@ -3,6 +3,11 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 * 20140512 (GM)
+bug fix in calculated of position of exclusion regions given
+in anasum runparameter file: negative declinations where calculated
+incorrectly
+
+* 20140512 (GM)
 updates and improvement on box cut optimizer
 added a plotting routine (VPlotOptimalCut)
 

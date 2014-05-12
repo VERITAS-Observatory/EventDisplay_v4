@@ -473,6 +473,7 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				}
 				fExclusionRegions.push_back( new VAnaSumRunParameterListOfExclusionRegions() );
 				
+                                // ra
 				double d_tt = 0.;
 				d_tt += ( double )atof( temp2.c_str() );
 				is_stream >> temp2;
@@ -480,13 +481,18 @@ int VAnaSumRunParameter::readRunParameter( string i_filename )
 				is_stream >> temp2;
 				d_tt += ( double )atof( temp2.c_str() ) / 3600.;
 				fExclusionRegions.back()->fExcludeFromBackground_RAJ2000 = d_tt / 24. * 360.;
+                                // dec
+                                bool bNeg = false;
 				d_tt = 0.;
 				is_stream >> temp2;
 				d_tt += ( double )atof( temp2.c_str() );
+                                if( d_tt < 0 ) bNeg = true;
 				is_stream >> temp2;
-				d_tt += ( double )atof( temp2.c_str() ) / 60.;
+				if( !bNeg ) d_tt += ( double )atof( temp2.c_str() ) / 60.;
+                                else        d_tt -= ( double )atof( temp2.c_str() ) / 60.;
 				is_stream >> temp2;
-				d_tt += ( double )atof( temp2.c_str() ) / 3600.;
+				if( !bNeg ) d_tt += ( double )atof( temp2.c_str() ) / 3600.;
+                                else        d_tt -= ( double )atof( temp2.c_str() ) / 3600.;
 				fExclusionRegions.back()->fExcludeFromBackground_DecJ2000 = d_tt;
 				is_stream >> temp2;
 				fExclusionRegions.back()->fExcludeFromBackground_Radius = ( double )atof( temp2.c_str() );
