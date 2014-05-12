@@ -94,7 +94,7 @@ mkdir -p $ODIR
 
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
-LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA"
+LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/"
 mkdir -p $LOGDIR
 
 # copy cuts file to log directory
@@ -118,7 +118,6 @@ read -r -d '' PARAMFILE << 'PARAMFILECONTENTS'
 * FILLMONTECARLOHISTOS 0
 * ENERGYSPECTRUMINDEX 40 1.5 0.1
 * FILLMONTECARLOHISTOS 0
-* SHAPECUTINDEX 0
 * CUTFILE $LOGDIR/$CUTSFILE
 * SIMULATIONFILE_DATA $MCFILE
 PARAMFILECONTENTS
@@ -130,7 +129,7 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.effective_area_parallel_su
 echo "Processing Zenith = $ZA, Noise = $NOISE, Wobble = $WOBBLE"
             
 # create makeEffectiveArea parameter file
-EAPARAMS="EffArea-ID${RECID}-Ze${ZA}deg-${WOBBLE}wob-${NOISE}-${CUTS_NAME}"
+EAPARAMS="EffArea-${SIMTYPE}-${EPOCH}-ID${RECID}-Ze${ZA}deg-${WOBBLE}wob-${NOISE}-${CUTS_NAME}"
 rm -f "$LOGDIR/$EAPARAMS.dat"
 eval "echo \"$PARAMFILE\"" > $LOGDIR/$EAPARAMS.dat
 

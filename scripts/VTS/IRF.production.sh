@@ -86,13 +86,14 @@ else
              ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat 
              ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat 
              ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat" 
+#    CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat "
 fi
 
 # loop over complete parameter space and submit production
 for VX in $EPOCH; do
     for ATM in $ATMOS; do
        # combine effective areas
-       if [[ $IRFTYPE == "COMBINEEFFECTIVEAREA" ]]; then
+       if [[ $IRFTYPE == "COMBINEEFFECTIVEAREAS" ]]; then
             for ID in $RECID; do
                 for CUTS in ${CUTLIST[@]}; do
                     echo "combine effective areas $CUTS"

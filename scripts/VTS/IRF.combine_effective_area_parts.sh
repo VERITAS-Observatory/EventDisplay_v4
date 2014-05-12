@@ -28,6 +28,7 @@ required parameters:
 optional parameters:
 
    [name]                   name added to the effective area output file
+                            (default is today's date)
 
 examples:
 
@@ -43,40 +44,45 @@ fi
 bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+DATE=`date +"%y%m%d"`
+
 # Parse command line arguments
 CUTSFILE=$1
 EPOCH=$2
 ATMOS=$3
 RECID=$4
 SIMTYPE=$5
-[[ "$6" ]] && EANAME=$6 || EANAME=""
+[[ "$6" ]] && EANAME=$6 || EANAME="${DATE}"
+PARTICLE_TYPE="gamma"
 
 # Generate EA base file name based on cuts file
 CUTS_NAME=`basename $CUTSFILE`
 CUTS_NAME=${CUTS_NAME##ANASUM.GammaHadron-}
 CUTS_NAME=${CUTS_NAME%%.dat}
-EANAME="effArea-$CUTS_NAME"
 
 # input directory with effective areas
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
 fi
 if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
     echo "$INDIR"
     exit 1
 fi
+INFILES="$INDIR/*ID${RECID}*.root"
 echo "Input file directory: $INDIR"
+echo "Input files: $INFILES"
 
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-   ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas"
+   ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
 fi
 echo "Output file directory: $ODIR"
 mkdir -p $ODIR
 
 # Run scripts and log files are written into this directory
-DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EFFAREA"
 echo "Writing run scripts and log files to $LOGDIR"
 mkdir -p $LOGDIR
@@ -95,7 +101,7 @@ echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID"
 [[ $RECID == 4 ]] && T="123"
 
 # output effective area name
-OFILE="$EANAME-ATM$ATMOS-$EPOCH-T$T-d$EANAME"
+OFIL="effArea-${EANAME}-${CUTS_NAME}-${EPOCH}-ATM${ATMOS}-T${T}"
 
 FSCRIPT="$LOGDIR/COMB-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
 rm -f $FSCRIPT.sh
@@ -106,8 +112,6 @@ sed -e "s|INPUTFILES|$INFILES|" \
 	    
 chmod u+x $FSCRIPT.sh
 echo $FSCRIPT.sh
-
-exit
 
 # run locally or on cluster
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
