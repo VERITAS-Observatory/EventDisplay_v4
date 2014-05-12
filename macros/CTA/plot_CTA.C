@@ -51,8 +51,8 @@ class VPlotCTAArrayLayout
 		VPlotCTAArrayLayout();
 		~VPlotCTAArrayLayout() {}
 		
-		TCanvas* plot_array( string iArrayName = "", double xmax = 1450., double ymax = 1450., bool drawTelescopeNumbers = true );
-		void     plot_fromList( string iArrayFile, string iPrefix, string iDir, double xmax = 1450., double ymax = 1450.,
+		TCanvas* plot_array( string iArrayName = "", double xmax = 1450., double ymax = 1450., string iPrintCanvas = "", bool drawTelescopeNumbers = true );
+		void     plot_fromList( string iArrayFile, string iDir, double xmax = 1450., double ymax = 1450.,
 								bool drawTelescopeNumbers = true );
 		bool     readArrayFromRootFile( string iFile );
 		void     printArrayCosts();
@@ -374,19 +374,8 @@ void VPlotCTAArrayLayout::drawTelescope( VPlotCTAArrayLayout_TelescopeList* iD, 
 /*
      plot array layout
 
-     INPUT:
-
-     ifile        eventdisplay or mscw root file
-     iname        name of array (e.g. J)
-     iMarkerMult  increase marker size by this factor
-     xmax/ymax    maximum extension of array to plot (in [m])
-
-     OUTPUT:
-
-     plots
-
 */
-TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax, bool drawTelescopeNumbers )
+TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax, string iPrintCanvas, bool drawTelescopeNumbers )
 {
 	char hname[200];
 	char htitle[200];
@@ -449,6 +438,11 @@ TCanvas* VPlotCTAArrayLayout::plot_array( string iname, double xmax, double ymax
 		it->SetTextSize( it->GetTextSize() * 1.5 );
 		it->Draw();
 	}
+	if( iPrintCanvas.size() > 0 )
+	{
+	    sprintf( hname, "%s.%s", iname.c_str(), iPrintCanvas.c_str() );
+	    c->Print( hname );
+        }
 	
 	return c;
 }
@@ -520,7 +514,7 @@ vector< string > VPlotCTAArrayLayout::getListofArrrays( string iArrayFile )
 	return SubArray;
 }
 
-void VPlotCTAArrayLayout::plot_fromList( string iArrayFile, string iPrefix, string iDir, double xmax, double ymax, bool drawTelescopeNumbers )
+void VPlotCTAArrayLayout::plot_fromList( string iArrayFile, string iDir, double xmax, double ymax, bool drawTelescopeNumbers )
 {
 	vector< string > iSubArray = getListofArrrays( iArrayFile );
 	if( iSubArray.size() == 0 )
@@ -530,13 +524,13 @@ void VPlotCTAArrayLayout::plot_fromList( string iArrayFile, string iPrefix, stri
 	
 	for( unsigned int i = 0; i < iSubArray.size(); i++ )
 	{
-		string iName = iDir + "/CTA.prod2" + iPrefix + "." + iSubArray[i] + ".lis";
+		string iName = iDir + "/CTA.prod2" + iSubArray[i] + ".lis";
 		cout << iName << endl;
 		if( setSubArray( iName ) )
 		{
-			iName = iPrefix + "-" + iSubArray[i];
-			TCanvas* c = plot_array( iName, xmax, ymax, drawTelescopeNumbers );
-			iName += ".eps";
+			iName = iSubArray[i];
+			TCanvas* c = plot_array( iName, xmax, ymax, "", drawTelescopeNumbers );
+			iName += ".pdf";
 			c->Print( iName.c_str() );
 		}
 	}
