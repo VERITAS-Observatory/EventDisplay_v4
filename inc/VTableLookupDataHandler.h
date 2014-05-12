@@ -230,6 +230,7 @@ class VTableLookupDataHandler
 		double fsizeCorr [VDST_MAXTELESCOPES];
 		double fsize_telType[VDST_MAXTELESCOPES];
 		double floss     [VDST_MAXTELESCOPES];
+                double ffracLow  [VDST_MAXTELESCOPES];
 		double fmax1     [VDST_MAXTELESCOPES];
 		double fmax2     [VDST_MAXTELESCOPES];
 		double fmax3     [VDST_MAXTELESCOPES];

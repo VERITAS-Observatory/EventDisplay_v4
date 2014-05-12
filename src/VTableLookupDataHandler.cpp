@@ -502,6 +502,7 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 			fsize[i] = ftpars[i]->size;
 			fsize2[i] = ftpars[i]->size2;
 			floss[i] = ftpars[i]->loss;
+                        ffracLow[i] = ftpars[i]->fracLow;
 			fwidth[i] = ftpars[i]->width;
 			flength[i] = ftpars[i]->length;
 			
@@ -1197,6 +1198,8 @@ bool VTableLookupDataHandler::setOutputFile( string iOutput, string iOption, str
 		fOTree->Branch( "size2", fsize2, iTT );
 		sprintf( iTT, "loss[%d]/D", fNTel );
 		fOTree->Branch( "loss", floss, iTT );
+		sprintf( iTT, "fracLow[%d]/D", fNTel );
+		fOTree->Branch( "fracLow", ffracLow, iTT );
 		sprintf( iTT, "max1[%d]/D", fNTel );
 		fOTree->Branch( "max1", fmax1, iTT );
 		sprintf( iTT, "max2[%d]/D", fNTel );
@@ -1794,6 +1797,7 @@ void VTableLookupDataHandler::resetImageParameters( unsigned int i )
 	fsize[i] = 0.;
 	fsize2[i] = 0.;
 	floss[i] = 0.;
+        ffracLow[i] = 0.;
 	fwidth[i] = 0.;
 	flength[i] = 0.;
 	fmeanPedvar_ImageT[i] = 0.;
@@ -1916,17 +1920,8 @@ void VTableLookupDataHandler::resetAll()
 	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
 	{
 		fTelElevation[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fTelAzimuth[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fTelDec[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fTelRA[i] = 0.;
 	}
 	fTargetElev = 0.;
@@ -1955,13 +1950,7 @@ void VTableLookupDataHandler::resetAll()
 	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
 	{
 		fImgSel_list[i] = false;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fImgSel_list_short[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		NImages_Ttype[i] = 0;
 	}
 	fimg2_ang = 0.;
@@ -1985,146 +1974,41 @@ void VTableLookupDataHandler::resetAll()
 	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
 	{
 		fdist[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fsize[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fsize2[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fsizeCorr[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fsize_telType[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		floss[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
+                ffracLow[i] = 0.;
 		fmax1[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fmax2[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fmax3[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fmaxindex1[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fmaxindex2[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fmaxindex3[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fwidth[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		flength[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fntubes[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fmeanPedvar_ImageT[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fnsat[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fnlowgain[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		falpha[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		flos[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fasym[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fcen_x[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fcen_y[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fcosphi[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fsinphi[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		ftgrad_x[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fFitstat[i] = 0;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		ftchisq_x[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fR[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fR_telType[i] = 0.;
-	}
-	//    for( unsigned int i = 0; i < getMaxNbrTel(); i++ ) fMCR[i] = 0.;
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		ftmscw[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		ftmscl[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		ftmscw_sigma[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		ftmscl_sigma[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fE[i] = 0.;
-	}
-	for( unsigned int i = 0; i < getMaxNbrTel(); i++ )
-	{
 		fES[i] = 0.;
 	}
 	for( unsigned int i = 0; i < 25; i++ )
