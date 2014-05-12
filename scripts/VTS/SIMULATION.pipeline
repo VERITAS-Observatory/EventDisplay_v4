@@ -12,7 +12,7 @@ ATMOLIST=( "winter" ) #"summer" )      # atmosphere_XXXXXXX
 DISPERSALLIST=( "diffuse" ) #"ring" )  # dispersal_XXXXXX , ring is standard, radius Wobble
 WOBBLELIST=( 0.00 ) #0.25 )            # wobble_XXX_deg , unused for dispersal_diffuse
 ZENITHLIST=( 0 20 )                 # zenith_XXX_deg     
-SCATTERLIST=( 750 )            # scatter_XXX_m      
+SCATTERLIST=( 750 )                 # scatter_XXX_m      
                                     # stage_XXXXX , same as stage command
 
 PRELUDEJOBS=2     # jobs to run in prelude stage, with logfiles
@@ -21,7 +21,7 @@ REPLETETESTJOBS=4 # of corsika files to run replete, only when FASTDEVRUN=yes, o
 DEBUGREGEX="NKH"
 
 # load extra functions
-source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
+source "$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh"
 
 # extra place to duplicate output to stdout, look for >&5
 exec 5>&1 
@@ -77,18 +77,6 @@ if [[ "$STAGE" =~ kill ]] ; then
     killJobsInJobfile "$RUNNINGJOBS"
     exit 0
 fi
-
-function tagString {
-    local tagname=$1
-    local tagarg=$2
-    echo "+${tagname}=$tagarg"
-}
-
-function tagDir {
-    local tagname=$1
-    local tagarg=$2
-    echo "${tagname}_$tagarg"
-}
 
 
 SIMTRACK="$SCIDIR/simTracking"     # for prelude replete
@@ -227,6 +215,7 @@ elif [[ "$STAGE" == "prelude" ]] ; then
         stageStart
         makeSimTrackingFile "dosave"
         cd $EVNDISPSYS/scripts/VTS
+        # brew ##############################################
         QSUBDATA=$( ./helper_scripts/SIMULATION.detectorsim.sh $SIMTRACK "dosavelog" | tee >(cat - >&5) )
         echo "$QSUBDATA" > $PRELUDEQSUB
         updateRunningJobFile "$QSUBDATA"
@@ -234,6 +223,7 @@ elif [[ "$STAGE" == "prelude" ]] ; then
     else
         stageStart
         haltIfAnyJobsAreRunning $RUNNINGJOBS
+        # brew check ##############################################
         QSUBDATA=$( cat $PRELUDEQSUB )
         JOBID=$(      echo "$QSUBDATA" | grep -P "^JOBID"     | awk '{ print $2 }' )
         JOBNUM=$(     echo "$JOBID"    | tr '.' ' '           | awk '{ print $1 }' )
@@ -295,6 +285,7 @@ elif [[ "$STAGE" == "replete" ]] ; then
         stageStart
         makeSimTrackingFile "donotsave"
         cd $EVNDISPSYS/scripts/VTS
+        # replete ##############################################
         QSUBDATA=$( ./helper_scripts/SIMULATION.detectorsim.sh $SIMTRACK "dosavelog" | tee >(cat - >&5) )
         echo "$QSUBDATA" > $REPLETEQSUB
         updateRunningJobFile "$QSUBDATA"
@@ -302,6 +293,7 @@ elif [[ "$STAGE" == "replete" ]] ; then
     else
         stageStart
         haltIfAnyJobsAreRunning $RUNNINGJOBS
+        # replete check ##############################################
         QSUBDATA=$( cat $REPLETEQSUB )
         JOBID=$(      echo "$QSUBDATA" | grep -P "^JOBID"     | awk '{ print $2 }' )
         JOBNUM=$(     echo "$JOBID"    | tr '.' ' '           | awk '{ print $1 }' )
@@ -343,6 +335,7 @@ elif [[ "$STAGE" == "simmer"  ]] ; then
     if ! $CHK ; then
         stageStart
         makeSimTrackingFile "dosave"
+        # simmer ##############################################
         echo "MERGETRACK '$MERGETRACK'"
         cd $EVNDISPSYS/scripts/VTS
         QSUBDATA=$( ./helper_scripts/SIMULATION.sim_merge.sh $MERGETRACK | tee >(cat - >&5) )
@@ -352,19 +345,14 @@ elif [[ "$STAGE" == "simmer"  ]] ; then
     else
         stageStart
         haltIfAnyJobsAreRunning $RUNNINGJOBS
+        # simmer check ##############################################
         QSUBDATA=$( cat $SIMMERQSUB )
         JOBID=$(      echo "$QSUBDATA" | grep -P "^JOBID"     | awk '{ print $2 }' )
         JOBNUM=$(     echo "$JOBID"    | tr '.' ' '           | awk '{ print $1 }' )
         SCRIPTNAME=$( echo "$QSUBDATA" | grep -P "^SUBSCRIPT" | awk '{ print $2 }' )
         
         # batch job exits
-        JOBINFOBIN="jobInfo"
-        if command -v $JOBINFOBIN >/dev/null ; then 
-            echo ; echo -e "${COTBLUE}Batch Jobs:$CONORM"
-            $JOBINFOBIN "$JOBID"
-        else
-            echo >&2 -e "${COTYELLOW}Warning, can't check status of batch jobs because script '$JOBINFOBIN' isn't anywhere in \$PATH, skipping this part"
-        fi
+        checkBatchJobExits "$SIMMERQSUB"
         
         # log files
         echo ; echo -e "${COTBLUE}Log Files:$CONORM"
@@ -373,8 +361,16 @@ elif [[ "$STAGE" == "simmer"  ]] ; then
             if (( $LINECOUNT > 0 )) ; then echo ; fi
             echo -e "${COTBLUE}~~~~~~ Job ${JOBNUM}.${LINECOUNT}${CONORM}"
             LINECOUNT=$(( LINECOUNT+1 ))
+            
             BATCHLOG="$SCRIPTNAME.o$JOBNUM.$LINECOUNT"
-            scanLogFile "BATCHLOG"     "$BATCHLOG"     "$DEBUGREGEX"
+            if filenameIsNotHealthy "$BATCHLOG" "(constructed name)" "$HUMANBATCHSTDOUT" "$MERGETRACK" ; then continue ; fi
+            checkLogFileForProblems "$BATCHLOG" $DEBUGREGEX
+            #scanLogFile "BATCHLOG"     "$BATCHLOG"     "$DEBUGREGEX"
+            
+            OUTLOG=$(   getTagArgFromTagline "mergelog"  "$p" )
+            if filenameIsNotHealthy "$OUTLOG" "+mergelog=" "simulation merging log file" "$MERGETRACK" ; then continue ; fi
+            checkLogFileForProblems "$OUTLOG" $DEBUGREGEX
+            
         done < "$MERGETRACK"
         
         # data files
@@ -382,25 +378,29 @@ elif [[ "$STAGE" == "simmer"  ]] ; then
         LINECOUNT=0
         while read p ; do
             LINECOUNT=$(( LINECOUNT+1 ))
+            
             BATCHLOG="$SCRIPTNAME.o$JOBNUM.$LINECOUNT"
-            DATAFILE=$( getTagArgFromTagline "mergeoutput" "$p" )
+            if filenameIsNotHealthy "$BATCHLOG" "(constructed name)" "$HUMANBATCHSTDOUT" "$MERGETRACK" ; then continue ; fi
+            
             OUTLOG=$(   getTagArgFromTagline "mergelog"  "$p" )
+            if filenameIsNotHealthy "$OUTLOG" "+mergelog=" "simulation merging log file" "$MERGETRACK" ; then continue ; fi
+            
             LOGFILES=( "$BATCHLOG" "$OUTLOG" )
             WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
             ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )
-            if [[ -f "$DATAFILE" && ! -z "$DATAFILE" ]] ; then
-                DFBASE=$( basename $DATAFILE )
-                DFSHORT=$( echo "$DATAFILE" | sed -e 's|'$NWD'/||g' )
-                DFSIZE=`stat -c %s $DATAFILE`
-                DFSIZESTR=$( formatFileSize "$DFSIZE" )
-                DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
-                RUNSUCCESS=$( checkForSuccess "$OUTLOG" "\-\-\-\- END time")
-                #RUNSUCCESS="not checked yet"
-                printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFSHORT" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
-            else
-                echo -e "${COTRED} Error, datafile '$OUTDATA' not found..."
-            fi
-        done < "$SIMTRACK"
+            
+            DATAFILE=$( getTagArgFromTagline "mergeoutput" "$p" )
+            if filenameIsNotHealthy "$DATAFILE" "+mergeoutput=" "simulation merging datafile" "$MERGETRACK" ; then continue ; fi
+            
+            DFBASE=$( basename $DATAFILE )
+            DFSHORT=$( echo "$DATAFILE" | sed -e 's|'$NWD'/||g' )
+            DFSIZE=`stat -c %s $DATAFILE`
+            DFSIZESTR=$( formatFileSize "$DFSIZE" )
+            DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
+            #RUNSUCCESS=$( checkForSuccess "$OUTLOG" "\-\-\-\- END time")
+            RUNSUCCESS="not checked yet"
+            printf "%10s is %s, last modified %19s %12s %10s  : %s\n" "$DFSHORT" "$DFSIZESTR" "$DFMODDATE" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+        done < "$MERGETRACK"
     fi
 
 elif [[ "$STAGE" == "evndisp" ]] ; then

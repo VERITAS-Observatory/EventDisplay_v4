@@ -414,7 +414,7 @@ function checkBatchJobExits {
     local QSUBDATA=$( cat "$1" )
     if command -v $BATCHCHECKSCRIPT > /dev/null 2>&1 ; then
         echo -e "${COTBLUE}checking batch exit statuses${CONORM}"
-        JOBLIST=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{ print $3 }' | tr '.' ' ' )
+        JOBLIST=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{ print $3 }' | tr '.' ' ' | awk '{ print $1 }' )
         for AJOB in $JOBLIST ; do
             #echo "jobInfo $AJOB"
             $BATCHCHECKSCRIPT $AJOB
@@ -423,3 +423,16 @@ function checkBatchJobExits {
         echo "can't find '$BATCHCHECKSCRIPT', not checking cluster job exit status..."
     fi
 }
+
+function tagString {
+    local tagname=$1
+    local tagarg=$2
+    echo "+${tagname}=$tagarg"
+}
+
+function tagDir {
+    local tagname=$1
+    local tagarg=$2
+    echo "${tagname}_$tagarg"
+}
+

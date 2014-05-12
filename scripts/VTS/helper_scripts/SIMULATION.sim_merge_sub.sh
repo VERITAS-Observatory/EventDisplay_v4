@@ -28,217 +28,93 @@ MERGETRACKLINE=$( sed $LINENUMBER'q;d' $MERGETRACKFILE )
 echo "Loading line: '$MERGETRACKLINE'"
 echo "$MERGETRACKLINE" | tr '+' '\n' | awk '{ printf "  %s\n", $0 }'
 
-
 MERGELIST=$(    getTagArgFromTagline "mergelist"    "$MERGETRACKLINE" )
 MERGEOUTPUT=$(  getTagArgFromTagline "mergeoutput"  "$MERGETRACKLINE" )
 MERGELOG=$(     getTagArgFromTagline "mergelog"     "$MERGETRACKLINE" )
 FIRSTCORSIKA=$( getTagArgFromTagline "firstcorsika" "$MERGETRACKLINE" )
 
-echo "NKH MERGELIST '$MERGELIST'"
-echo "NKH MERGEOUTPUT '$MERGEOUTPUT'"
-echo "NKH MERGELOG '$MERGELOG'"
-echo "NKH FIRSTCORSIKA'$FIRSTCORSIKA'"
-
-rm -rf $MERGEOUTPUT
-rm -rf $MERGELOG
+#echo "NKH MERGELIST '$MERGELIST'"
+#echo "NKH MERGEOUTPUT '$MERGEOUTPUT'"
+#echo "NKH MERGELOG '$MERGELOG'"
+#echo "NKH FIRSTCORSIKA'$FIRSTCORSIKA'"
 
 # prepare the output directory
 OUTPUTDIR=$( dirname $MERGEOUTPUT )
 mkdir -p $OUTPUTDIR
 
+cp "$MERGELIST" .
+ORIGMERGELIST=$( basename "$MERGELIST" )
+TMPMERGELIST="$TMPDIR/mergelist.tmp"
+TMPMERGEDIR="$TMPDIR/mergedir"
+TMPOUTPUT=$( basename "$MERGEOUTPUT" )
+TMPOUTPUT=${TMPOUTPUT%.bz2}
+TMPLOG=$( basename "$MERGELOG" )
+mkdir -p "$TMPMERGEDIR"
 
-exit 0
+while read mergefile ; do
+    echo "line: $mergefile"
+    
+    # check if file exists
+    if [ ! -f "$mergefile" ] ; then 
+        echo "Error, tried to merge '$mergefile', which doesn't seem to exist, exiting..."
+        exit 1
+    fi
+    
+    # copy it to the temp dir
+    cp "$mergefile" "$TMPMERGEDIR/"
+    SINGLEVBF="$TMPMERGEDIR/`basename $mergefile`"
+    
+    # un-bzip2 it if needed
+    if [[ "${SINGLEVBF##*.}" == "bz2" ]] ; then
+        bzip2 -d "$SINGLEVBF"
+        SINGLEVBF="${SINGLEVBF%.bz2}"
+    fi
+    
+    # and add it to the tmpdir mergelist
+    echo "$SINGLEVBF" >> "$TMPMERGELIST"
+    
+done < "$ORIGMERGELIST"
 
-# load job variables
-INPUTCORSIKA=$(   getTagArgFromTagline "inputcorsikafile" "$MERGETRACKLINE" )
-CRUN=$(           getTagArgFromTagline "corsikajobiter"   "$MERGETRACKLINE" )
-OUTPUTDATAFILE=$( getTagArgFromTagline "outputdatafile"   "$MERGETRACKLINE" )
-OUTPUTLOGFILE=$(  getTagArgFromTagline "outputlogfile"    "$MERGETRACKLINE" )
-ARRAYCONFIG=$(    getTagArgFromTagline "arrayconfig"      "$MERGETRACKLINE" )
-EXTFILENAME=$(    getTagArgFromTagline "extfilename"      "$MERGETRACKLINE" )
-ARRAYEPOCH=$(     getTagArgFromTagline "arrayepoch"       "$MERGETRACKLINE" )
-FASTDEVRUN=$(     getTagArgFromTagline "fastdevrun"       "$MERGETRACKLINE" )
-DISPERSAL=$(      getTagArgFromTagline "dispersal"        "$MERGETRACKLINE" )
-PARTICLE=$(       getTagArgFromTagline "particle"         "$MERGETRACKLINE" )
-SIMTYPE=$(        getTagArgFromTagline "simtype"          "$MERGETRACKLINE" )
-SAVELOG=$(        getTagArgFromTagline "savelog"          "$MERGETRACKLINE" )
-WOBBLE=$(         getTagArgFromTagline "wobble"           "$MERGETRACKLINE" )
+# see whats in TMPDIR
 echo
-SIMBASE=$( echo "$SIMTYPE" | tr '_' ' ' | awk '{ print $1 }' | sed -e 's|^ *||' -e 's| *$||' | grep -oP "[A-Za-z]+" )
+ls -lh $TMPDIR
+echo
 
-if [[ "$FASTDEVRUN" == "yes" ]] ; then
-    echo "Warning, using FASTDEVRUN, will not process all events"
+# see whats in our TMPMERGEDIR
+echo
+ls -ls "$TMPMERGEDIR"
+echo
+
+# merge all the tempdir
+cd $SIMUSYS
+mergeVBF "$TMPMERGELIST" "$TMPOUTPUT" 98765 > "$TMPLOG" 2>&1
+
+# copy merged log to location
+rm -rf $MERGELOG
+cp $TMPLOG $MERGELOG
+echo "LINE MERGELOG $MERGELOG"
+
+# copy tmpmergelog to location
+cp "$TMPMERGELIST" `dirname $MERGELIST`/
+echo "LINE TMPMERGELIST `dirname $MERGELIST`/`basename $TMPMERGELIST`"
+
+# self-check for problems
+if [ ! -f "$TMPOUTPUT" ] ; then
+    echo "Error, mergeVBF should have created file '$TMPOUTPUT' by now, something is wrong, exiting..."
+    exit 1
 fi
 
-rm -rf $OUTPUTDATAFILE
-rm -rf $OUTPUTLOGFILE
-
-OUTPUTLOGDIR=$( dirname $OUTPUTLOGFILE )
-
-# start the detsim
-if [[ "$SIMBASE" == "grisu" ]] ; then
-    echo
-    echo "Starting detector simulation with GrISU"
-    
-    # get array config file
-    cp -fv $VERITAS_EVNDISP_AUX_DIR/DetectorGeometry/$ARRAYCONFIG .
-    
-    # set up pilot file
-    PILOT="DAT${CRUN}.pilot"
-    touch $PILOT
-    
-    # setup grisu files
-    FIFOFILE="DAT${CRUN}.grisu.fifo"
-    GLOG="DAT${CRUN}.log"
-    OUTPUTVBF=$( basename $OUTPUTDATAFILE )
-    OUTPUTVBF=${OUTPUTVBF%.bz2}
-    
-    # fill the pilot file
-    echo "* ARRAY $TMPDIR/$ARRAYCONFIG" >> $PILOT
-    echo "* CHERP $TMPDIR/$FIFOFILE"    >> $PILOT
-    echo "* LOGBK $TMPDIR/$GLOG"        >> $PILOT
-    echo "* VBFOF $TMPDIR/$OUTPUTVBF"   >> $PILOT
-
-    if   [[ "$ARRAYEPOCH" == "4" ]] ; then echo "* VBFST 2009-07-22 02:00:00.000000000  GPS"  >> $PILOT
-    elif [[ "$ARRAYEPOCH" == "5" ]] ; then echo "* VBFST 2009-09-10 02:00:00.000000000  GPS"  >> $PILOT
-    elif [[ "$ARRAYEPOCH" == "6" ]] ; then echo "* VBFST 2012-10-10 02:00:00.000000000  GPS"  >> $PILOT
-    else ( echo "Error, invalid ARRAYEPOCH '$ARRAYEPOCH', exiting..." ; exit 1 )
-    fi
-
-    SEED=$(( CRUN * 10 ))
-    echo "* VBFTM 200.0 1 1"                      >> $PILOT
-    echo "* VBFPR $USER $CRUN 1275 1 1" >> $PILOT
-    echo "* RANDM -$SEED"                         >> $PILOT
-    echo "* NBRPR 0 1"                            >> $PILOT
-
-    # check needed arguments
-    if [[ ! "$DISPERSAL" =~ (diffuse|ring) ]] ; then
-        echo "Error, Unrecognized DISPERSAL argument '$DISPERSAL', exiting..." ; exit 1
-    fi
-    if [[ ! "$PARTICLE" =~ (gamma|electron|proton|helium) ]] ; then
-        echo "Error, urecognized PARTICLE argument '$PARTICLE', exiting..." ; exit 1
-    fi
-    
-    # fill source info
-    NREPEATS=0
-    DIFFUSERADIUS=0.0
-    if   [[ "$PARTICLE" == "gamma"    ]] ; then
-        NREPEATS=8
-        DIFFUSERADIUS=2.75
-    elif [[ "$PARTICLE" == "electron" ]] ; then
-        NREPEATS=10
-        DIFFUSERADIUS=2.00
-    elif [[ "$PARTICLE" == "proton" ]] ; then
-        NREPEATS=10
-        DIFFUSERADIUS=4.0
-    elif [[ "$PARTICLE" == "helium" ]] ; then
-        NREPEATS=15
-        DIFFUSERADIUS=4.0
-    fi
-    if   [[ "$DISPERSAL" == "diffuse" ]] ; then echo "* SOURC 0.0 0.0 $DIFFUSERADIUS 31.675" >> $PILOT
-    elif [[ "$DISPERSAL" == "ring"    ]] ; then echo "* SOURC 0.0 $WOBBLE 0.0 31.675"        >> $PILOT
-    fi
-    
-    if   [ "$FASTDEVRUN"   == "yes"     ] ; then 
-        NREPEATS=2
-        echo "FASTDEVRUN: NREPEATS=$NREPEATS"
-    fi
-    echo "* NBREV 0 $NREPEATS" >> $PILOT
-    
-    # noise info (no noise)
-    echo "* NOISE 0. 0. 0." >> $PILOT
-    echo "* NUMPE 0"        >> $PILOT
-    echo "* FRECP 0"        >> $PILOT
-    echo "* NOPIX 0"        >> $PILOT
-    echo "* USEOC 0"        >> $PILOT
-    echo "* GRIDF 1 15 15"  >> $PILOT
-    echo "* GRIDP 1 19 19"  >> $PILOT
-    
-    # show the pilot file
-    if [[ "$SAVELOG" == "dosave" ]] ; then
-        cp -f $TMPDIR/$PILOT $OUTPUTLOGDIR/$PILOT
-        echo "PILOT $OUTPUTLOGDIR/$PILOT"
-    fi
-    echo "PILOT FILE $PILOT :"
-    cat $PILOT | awk '{ printf "PILOT:%s\n", $0 }'
-    echo
-
-    # get corsika file
-    cp $INPUTCORSIKA .
-    CORSIKAFILE=$( basename $INPUTCORSIKA )
-    bzip2 -d $CORSIKAFILE
-    CORSIKAFILE=${CORSIKAFILE%.bz2}
-    
-    # set up extra options
-    COROPTS=()
-    if [ "$FASTDEVRUN" == "yes" ] ; then
-        COROPTS+=( -nevents 150 )
-        echo "Warning, corsikaIOreader -nevents 150"
-    fi
-
-    # run corsikaIOreader
-    echo "corsikaIOreader beginning!"
-    IOREADLOG="DAT${CRUN}.corsikaIOreader.log"
-    cd $SIMUSYS
-    ./corsikaIOreader                              \
-        -cors $TMPDIR/DAT$CRUN.telescope           \
-        -abs "$EXTFILENAME"                        \
-        -grisu "$TMPDIR/$FIFOFILE"                 \
-        -shorthisto $TMPDIR/DAT${CRUN}.ioread.root \
-        -queff 0.5                                 \
-        -seed "$CRUN"                              \
-        -cfg "$TMPDIR/$ARRAYCONFIG"                \
-        ${COROPTS[@]}                              \
-        > $TMPDIR/$IOREADLOG
-    echo "corsikaIOreader done!"
-    cd $TMPDIR
-    
-    # copy the corsikaIOreader logfile so the user can read it
-    if [[ "$SAVELOG" == "dosave" ]] ; then
-        cp -f $TMPDIR/$IOREADLOG $OUTPUTLOGDIR/$IOREADLOG
-        echo "IOREADLOG $OUTPUTLOGDIR/$IOREADLOG"
-    fi
-    echo
-    
-    # run grisu
-    echo "grisudet beginning!"
-    GRISULOG=$( basename $OUTPUTLOGFILE )
-    $GRISUSYS/grisudet $TMPDIR/$PILOT > $TMPDIR/$GRISULOG
-    echo "grisudet done!"
-    
-    # copy the grisu log file so the user can read it
-    if [[ "$SAVELOG" == "dosave" ]] ; then
-        cp $TMPDIR/$GRISULOG $OUTPUTLOGDIR/$GRISULOG
-        echo "DETSIMLOG $OUTPUTLOGDIR/$GRISULOG"
-    fi
-    
-    if [ ! -f "$TMPDIR/$OUTPUTVBF" ] ; then
-        echo "error, output file '$TMPDIR/$OUTPUTVBF' is supposed to exist at this point, but doesn't. exiting..."
-        exit 1
-    fi
-    
-    # if output datafile should be bzipped, do so
-    if [[ "${OUTPUTDATAFILE##*.}" == "bz2" ]] ; then
-        bzip2 -z $TMPDIR/$OUTPUTVBF
-        OUTPUTVBF="${OUTPUTVBF}.bz2"
-    fi
-    
-    # move datafile to output directory
-    mv -f $TMPDIR/$OUTPUTVBF $OUTPUTDATAFILE
-    if [[ ! -f "$OUTPUTDATAFILE" ]] ; then
-        echo "Error, failed to properly move file $TMPDIR/$OUTPUTVBF to $OUTPUTDATAFILE"
-        exit 1
-    fi
-    
-    # display info
-    echo "PWD $PWD"
-    ls -lh
-    echo
-    
-    
-    
-elif [[ "$SIMBASE" == "care" ]] ; then
-    echo "Using detector simulatior CARE..."
-
+# bzip2 if necessary
+if [[ "${OUTPUTDATAFILE##*.}" == "bz2" ]] ; then
+    bzip2 -z $TMPOUTPUT
+    TMPOUTPUT="${TMPOUTPUT}.bz2"
 fi
+
+# copy merged datafile to target
+rm -rf $MERGEOUTPUT
+cp $TMPOUTPUT $MERGEOUTPUT
+echo "LINE MERGEDATA $MERGEOUTPUT"
+
+
+exit 0 
 
