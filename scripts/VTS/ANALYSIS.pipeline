@@ -30,7 +30,8 @@ CWD=$PWD
 #export EVNDISPSYS="/afs/ifh.de/user/n/nkelhos/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk"
 
 # Which runlist do you want to use?
-# It should be a simple list of veritas runnumbers.
+# It should be a simple list of veritas runnumbers,
+# one per line.
 # (full path please)
 RUNLIST="$CWD/runlist.crab.dat"
 
@@ -97,7 +98,7 @@ FINALOUTPUT="anmer.output.root"
 
 # which anasum runparameter file should we use?
 # (full path please)
-RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab"
+RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab.ctools"
 
 # For the radial acceptance file, what date should be used
 # in the radial acceptance filename?
@@ -215,6 +216,9 @@ mkdir -p $FROGSDIR
 # anasum output directory
 mkdir -p $ANASUMOUTPUTDIR
 
+# ctools output directory
+mkdir -p $CTOOLSDIR
+
 # alert the user if they are using FASTDEVMODE
 function checkForFASTDEVMODE {
     if [ "$FASTDEVMODE" = "yes" ] ; then
@@ -225,7 +229,7 @@ function checkForFASTDEVMODE {
 STAGEFILE="$SCIDIR/stage"
 RUNNINGJOBS="$SCIDIR/runningjobs" # file containing job numbers from the last action
 if [[ "$1" == "jobs" ]] ; then # print run status
-    checkIfJobsAreDone "$RUNNINGJOBS" "$STAGEFILE" 30
+    checkIfJobsAreDone "$RUNNINGJOBS" "$STAGEFILE" 90
 fi
 
 if [[ "$1" == "kill" ]] ; then # kill all running jobs
@@ -772,14 +776,15 @@ if [[ "$STAGE" == "mutate" ]] ; then
 		echo -e "${COBLUE}Stage 5b - Mutate (convert) Anasum Parallel files to CTOOL's Data Format${CONORM}"
         
         cd $EVNDISPSYS/bin
+        echo "now here: $PWD"
+        echo "output data going here: $CTOOLSDIR"
         while read ARUN ; do
             # this stage runs quite fast (~10seconds per run)
             # so we wont run it in parallel
-            writeCTAEventListFromAnasum                \
-                -i "$ANASUMOUTPUDIR/$ARUN.anasum.root" \
-                -o "$CTOOLSDIR/$ARUN.ctools.fits"      \
-                2>&1                                   \
-                >  "$CTOOLSDIR/$ARUN.ctools.log"
+            #echo "$ANASUMOUTPUTDIR/$ARUN.anasum.root"
+            echo "Producing $CTOOLSDIR/$ARUN.ctools.fits ..."
+            writeCTAEventListFromAnasum -f -i "$ANASUMOUTPUTDIR/$ARUN.anasum.root" -o "$CTOOLSDIR/$ARUN.ctools.fits" >  "$CTOOLSDIR/$ARUN.ctools.log" 2>&1  
+            #echo
         done < $RUNLIST
         
     else
@@ -790,7 +795,9 @@ if [[ "$STAGE" == "mutate" ]] ; then
         # check log files
         while read ARUN ; do
 			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
-            checkLogFileForProblems "$CTOOLSDIR/$ARUN.ctools.log" $DEBUGREGEX
+            CTOOLSLOG="$CTOOLSDIR/$ARUN.ctools.log"
+            checkLogFileForProblems     "$CTOOLSLOG" $DEBUGREGEX
+            checkLogFileForStageSuccess "$CTOOLSLOG" "Conversion from .* complete"
         done < $RUNLIST
         
         # check data files
@@ -806,8 +813,9 @@ if [[ "$STAGE" == "mutate" ]] ; then
             DFSIZE=`stat -c %s $DATAFILE`
             DFSIZESTR=$( formatFileSize "$DFSIZE" )
             DFMODDATE=`stat -c %y $DATAFILE | cut -f1 -d.`
-            RUNSUCCESS=$( checkForSuccess "$CTOOLSDIR/$ARUN.ctools.log" "analysis results written to" )
-            printf "%10s is %s, last modified %19s sigma=%5s %12s %11s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$RUNSIGMA" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
+            NEVENTS=$( cat "$CTOOLSDIR/$ARUN.ctools.log" | grep -P "RunNumber \d+, \d+ events written." | grep -oP ", \d+ events" | grep -oP "\d+" )
+            RUNSUCCESS=$( checkForSuccess "$CTOOLSDIR/$ARUN.ctools.log" "Conversion from .* complete" )
+            printf "%10s is %s, last modified %19s events=%5s %12s %11s  : %s\n" "$DFBASE" "$DFSIZESTR" "$DFMODDATE" "$NEVENTS" "$WARNCOUNTSTR" "$ERRORCOUNTSTR" "$RUNSUCCESS"
         done < $RUNLIST
     fi
 fi
