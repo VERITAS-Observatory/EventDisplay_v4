@@ -2548,9 +2548,6 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
 		}
 		
 		hsig_1D->Draw( "e hist" );
-		TLine* iL = new TLine( 0., hsig_1D->GetYaxis()->GetXmin(), 0., hsig_1D->GetYaxis()->GetXmax() );
-		iL->SetLineStyle( 2 );
-		iL->Draw();
 		if( hsig_1D->GetEntries() > 0 )
 		{
 			hsig_1D->Fit( fG, "Q" );
@@ -2585,7 +2582,10 @@ void VPlotAnasumHistograms::plot_skyPlots_perRun( string iHistoName, double rmax
                 }
                 hsig_1D->Draw( "e hist same" );
 		hsig_1DAll->Draw( "e hist same" );
-		
+		TLine* iL = new TLine( 0., hsig_1D->GetYaxis()->GetXmin(), 0., hsig_1D->GetMaximum() );
+		iL->SetLineStyle( 2 );
+		iL->Draw();
+                
 		// run number
 		iT->Draw();
 		
