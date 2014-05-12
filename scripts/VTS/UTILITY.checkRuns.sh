@@ -1,10 +1,13 @@
 #!/bin/bash
 #
 # VTS.checkRuns.sh
-# Small scritp that quickly check the ED and mscw log files for errors and warnings.
+# Small script that quickly check the ED and mscw log files for errors and warnings.
 # Also prints out the ped values - quick check for missing flasher info.
 #
 # Gareth
+#
+# NOTE: THIS SCRIPT DOESN'T REALLY WORK YET (SG)
+
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
     echo "checkRuns.sh <runlist> <Rec ID>"

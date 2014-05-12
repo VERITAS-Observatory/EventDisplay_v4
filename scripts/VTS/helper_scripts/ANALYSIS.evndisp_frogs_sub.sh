@@ -97,13 +97,13 @@ ll -ahrt $TEMPDIR
 echo
 
 #OPT+=( -frogs $MSCWDIR/$RUN.mscw.root       )
-OPT+=( -frogs $MSCWDIR/INPUTMSCW             )
+OPT+=( -frogs $TEMPDIR/INPUTMSCW             )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 
-if [[ "$FASTDEVMODE" == "yes" ]] ; then
-    OPT+=( -nevents=100 )
-    echo "Warning, \$FASTDEVMODE=yes, only processing the first 100 events..."
+if [[ "$FASTDEVMODE" == "yes" ]]; then
+    OPT+=( -nevents=50 )
+    echo "Warning, \$FASTDEVMODE=yes, only processing the first 50 events..."
 fi
 
 echo "using frogs options '${OPT[@]}'"

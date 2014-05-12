@@ -1,5 +1,6 @@
 #!/bin/bash
 # script to extract simulation VBF files before running them through evndisp
+# THIS IS A WORK IN PROGESS; IT MAY NOT ACTUALLY BE USED
 # Scott Griffiths
 
 # set observatory environmental variables
