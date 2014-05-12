@@ -678,8 +678,9 @@ void VEventLoop::initializeAnalyzers()
 */
 void VEventLoop::shutdown()
 {
-        // additional output for writing to disk
-        bool fDebug_writing = true;
+        // additional output for writing to disk (MC only)
+        bool fDebug_writing = false;
+        if( isMC() ) fDebug_writing = true;
 	if( fDebug )
 	{
 		cout << "VEventLoop::shutdown()" << endl;
