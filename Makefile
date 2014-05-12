@@ -669,7 +669,8 @@ SHAREDOBJS= 	./obj/VRunList.o ./obj/VRunList_Dict.o \
 		./obj/VPedestalLowGain.o ./obj/VPedestalLowGain_Dict.o \
 		./obj/VCTARequirements.o ./obj/VCTARequirements_Dict.o \
 		./obj/VLowGainCalibrator.o ./obj/VLowGainCalibrator_Dict.o \
-		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o
+		./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
+		./obj/VPlotOptimalCut.o ./obj/VPlotOptimalCut_Dict.o
 
 ifeq ($(ROOT_MINUIT2),yes)
   SHAREDOBJS	+= ./obj/VSourceGeometryFitter.o ./obj/VSourceGeometryFitter_Dict.o
@@ -1135,7 +1136,22 @@ trainTMVAforGammaHadronSeparation_TrainingFile:	$(MAKEOPTCUTTMVATRAININGOBJ)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 makeOptimizeBoxCutsbyParameterSpaceSearch:	./obj/CData.o \
+						./obj/VTMVAEvaluator.o ./obj/VTMVAEvaluator_Dict.o \
 						./obj/VGlobalRunParameter.o ./obj/VGlobalRunParameter_Dict.o \
+						./obj/VEvndispRunParameter.o ./obj/VEvndispRunParameter_Dict.o \
+						./obj/CRunSummary.o ./obj/CRunSummary_Dict.o \
+						./obj/VMathsandFunctions.o ./obj/VMathsandFunctions_Dict.o  \
+						./obj/VPlotUtilities.o ./obj/VPlotUtilities_Dict.o \
+						./obj/VHistogramUtilities.o ./obj/VHistogramUtilities_Dict.o \
+						./obj/VRunList_Dict.o ./obj/VRunList.o \
+					        ./obj/VSkyCoordinatesUtilities.o \
+				                ./obj/VASlalib.o \
+			                        ./obj/VUtilities.o  \
+						./obj/VAnalysisUtilities.o ./obj/VAnalysisUtilities_Dict.o \
+						./obj/VTimeMask.o ./obj/VTimeMask_Dict.o \
+						./obj/VImageCleaningRunParameter.o ./obj/VImageCleaningRunParameter_Dict.o \
+						./obj/VGammaHadronCutsStatistics.o ./obj/VGammaHadronCutsStatistics_Dict.o \
+						./obj/VGammaHadronCuts.o ./obj/VGammaHadronCuts_Dict.o ./obj/CData.o \
 						./obj/makeOptimizeBoxCutsbyParameterSpaceSearch.o 
 	$(LD) $(LDFLAGS) $^ $(GLIBS) -L./lib $(OutPutOpt) ./bin/$@
 	@echo "$@ done"

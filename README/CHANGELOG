@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140512 (GM)
+updates and improvement on box cut optimizer
+added a plotting routine (VPlotOptimalCut)
+
 * 20140502 (GM)
 added additional debug statements for writing to evndisp output file
 (will go in the final release)
