@@ -60,7 +60,7 @@ REFLMAXREG="10"
 # Should we produce the tzero and pedestal files first?
 # These are required to do an analysis.
 # yes/no
-DOCALIB=yes
+DOCALIB=no
 
 # Where should we store the evndisp and mscw output files?
 # (full path please)
@@ -92,8 +92,8 @@ FROGSDIR="$EVNDISPDIR/frogs"
 # (full path please)
 ANASUMOUTPUTDIR="$CWD/arf"
 
-# what should we name the final output root file?
-# will be put in $ANASUMOUTPUTDIR
+# what should we name the final merged anasum
+# output root file? It will be put in $ANASUMOUTPUTDIR
 FINALOUTPUT="anmer.output.root"
 
 # which anasum runparameter file should we use?
@@ -307,7 +307,7 @@ function makeParamFile {
 # and add it to the runningJobList
 function updateRunningJobFile {
     local INPUTDATA="$1"
-    local ACTIVEJOBS=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{print $3}' )
+    local ACTIVEJOBS=$( echo "$QSUBDATA" | grep -oP "JOBID [0-9.-:]+" | awk '{print $2}' )
     rm -rf "$RUNNINGJOBS" ;
     for AJOB in $ACTIVEJOBS ; do
         #echo "updateRunningJobFile: Adding job: $AJOB"
@@ -353,14 +353,14 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		QSUBDATA=$(cat "$EVNJOBSUB")
 		while read ARUN ; do
 			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~ Run:$ARUN${CONORM}"
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }')
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN $ARUN SCRIPT" | awk '{ print $4 }')
             
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }')
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN OLOG"   | awk '{ print $4 }')
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$EVNJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
             
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }')
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN ELOG"   | awk '{ print $4 }')
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
             
@@ -658,7 +658,7 @@ if [[ "$STAGE" == "anpar" ]] ; then
             INPUTANASUMDIR="$EVNDISPDIR/RecID${RECID}"
             echo -e "Using mscw files as input..."
         fi
-		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh $ANASUMRUNLIST $INPUTANASUMDIR $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
+		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh "$ANASUMRUNLIST" "$ANASUMOUTPUTDIR" "$RUNPARAMFILE" "$INPUTANASUMDIR" | tee >(cat - >&5) )
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$ANPARJOBSUB"
         echo "$QSUBDATA" > "$ANPARJOBSUB"

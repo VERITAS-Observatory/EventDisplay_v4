@@ -90,7 +90,15 @@ SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
     JOBID=`$SUBC $FSCRIPT.sh`
-    echo "RUN $AFILE: JOBID $JOBID"
+    
+    # account for -terse changing the job number format
+    if [[ $SUBC != *-terse* ]] ; then
+        echo "without -terse!"      # need to match VVVVVVVV  8539483  and 3843483.1-4:2
+        JOBID=$( echo "$JOBID" | grep -oP "Your job [0-9.-:]+" | awk '{ print $3 }' )
+    fi
+    
+    echo "RUN $AFILE JOBID $JOBID"
+    
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
     cat $LOGDIR/runscripts.dat | $SUBC

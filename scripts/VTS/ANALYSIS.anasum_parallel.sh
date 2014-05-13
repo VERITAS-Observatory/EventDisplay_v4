@@ -55,7 +55,7 @@ if [[ "$RUNP" == `basename $RUNP` ]]; then
     RUNP="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/$RUNP"
 fi
 if [[ ! -f "$RUNP" ]]; then
-    echo "Error, anasum run parameter file not found, exiting..."
+    echo "Error, anasum run parameter file '$RUNP' not found, exiting..."
     exit 1
 fi
 
@@ -89,6 +89,7 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.anasum_sub"
 
 # loop over all runs
 for ((i=1; i <= $NLINES; i++)); do
+    echo
     LINE=`head -n $i $TEMPLIST | tail -n 1`
     RUN=`head -n $i $TEMPLIST | tail -n 1 | awk '{print $2}'`
 
@@ -120,7 +121,20 @@ for ((i=1; i <= $NLINES; i++)); do
         SUBC=`eval "echo \"$SUBC\""`
         if [[ $SUBC == *qsub* ]]; then
             JOBID=`$SUBC $FSCRIPT.sh`
-			echo "RUN $RUN: JOBID $JOBID"
+            
+            # account for -terse changing the job number format
+            if [[ $SUBC != *-terse* ]] ; then
+                echo "without -terse!"      # need to match VVVVVVVV  8539483  and 3843483.1-4:2
+                JOBID=$( echo "$JOBID" | grep -oP "Your job [0-9.-:]+" | awk '{ print $3 }' )
+            fi
+            
+			echo "RUN $RUN JOBID $JOBID"
+            echo "RUN $RUN SCRIPT $FSCRIPT.sh"
+            if [[ $SUBC != */dev/null* ]] ; then
+                echo "RUN $RUN OLOG $FSCRIPT.sh.o$JOBID"
+                echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
+            fi
+            
         elif [[ $SUBC == *parallel* ]]; then
             echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
         fi
