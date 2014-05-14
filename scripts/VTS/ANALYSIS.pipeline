@@ -193,7 +193,7 @@ DEBUGREGEX="WHITEBOARD"
 # if set to yes, some stages will only run
 # for the first few hundred events
 # to allow for very fast testing
-export FASTDEVMODE=yes
+export FASTDEVMODE=no
 
 # needed to transfer files from evndisp to mscw stage and to anpar stage
 
