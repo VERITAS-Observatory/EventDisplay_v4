@@ -6,7 +6,7 @@
 ACUT="EVNDISP.reconstruction.SW18_noDoublePass.runparameter"
 ACUT="EVNDISP.reconstruction.runparameter"
 # run options
-OPT="-display=1 -teltoana=$TEL -reconstructionparameter $ACUT -vbfnsamples -readCalibDB"
+OPT="-display=1 -reconstructionparameter $ACUT -vbfnsamples "
 ## END OF HARD-CODED VALUES
 
 if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
@@ -14,18 +14,22 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP special-purpose analysis: display data file and write results to file
 
-SPANALYSIS.evndisp_display.sh <sourcefile> [teltoana] [run number] [TARGET]
+SPANALYSIS.evndisp_display.sh <sourcefile> [teltoana] [calib] [highres] [run number] [TARGET]
  [WOBBLENORTH] [WOBBLEEAST] [RAOFFSET]
 
-required parameters:
+required parameter:
 
     <sourcefile>            VERITAS data file (vbf or cvbf file)
 
-optional parameter:
-
+optional parameters:
+ 
     [teltoana]              use 1 for T1 only, 13 for T1 and T3 only, etc.
                             (default telescope combination is 1234)
                             
+    [calib]		    0 or nocalib for -nocalibnoprolem, 1 or db for -readCalibDB [default], 2 or raw for -plotraw & -nocalibnoproblem
+
+    [highres]		    0 or lowres for regular window (default), 1 or highres for -highres, 2 or paper for -plotpaper
+
     [run number]            run number (can differ from actual run number)
     
     [TARGET]                target name (Crab, Mrk421, 1es2344, lsi+61303)
@@ -56,11 +60,28 @@ RUNFILE=$1
 if [[ $TELTOANA == "-1" ]]; then
     TELTOANA="1234"
 fi
-[[ "$3" ]] && OPT="$OPT -runnumber=$3"
-[[ "$4" ]] && OPT="$OPT -target $4"
-[[ "$5" ]] && OPT="$OPT -wobblenorth=$5"
-[[ "$6" ]] && OPT="$OPT -wobbleeast=$6"
-[[ "$7" ]] && OPT="$OPT -raoffset=$7"
+
+if [[ "$3" == "0" ]] || [[ "$3" == "nocalib" ]] ; then
+	CALIBOPT=" -nocalibnoproblem "
+elif   [[ "$3" == "2" ]] || [[ "$3" == "raw" ]] ; then 
+	CALIBOPT=" -plotraw -nocalibnoproblem "
+else
+	CALIBOPT=" -readCalibDB "
+fi
+
+if [[ "$4" == "1" ]] || [[ "$4" == "highres" ]]; then
+	PLOTOPT=" -highres "
+elif   [[ "$4" == "2" ]] || [[ "$4" == "paper" ]] ; then 
+	PLOTOPT=" -highres -plotpaper "
+fi
+
+OPT="$OPT $PLOTOPT $CALIBOPT "
+
+[[ "$5" ]] && OPT="$OPT -runnumber=$5"
+[[ "$6" ]] && OPT="$OPT -target $6"
+[[ "$7" ]] && OPT="$OPT -wobblenorth=$7"
+[[ "$8" ]] && OPT="$OPT -wobbleeast=$8"
+[[ "$9" ]] && OPT="$OPT -raoffset=$9"
 
 # Check if source file exists
 if [[ ! -f $RUNFILE ]]; then
