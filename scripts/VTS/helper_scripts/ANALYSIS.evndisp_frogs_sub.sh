@@ -97,7 +97,7 @@ ll -ahrt $TEMPDIR
 echo
 
 #OPT+=( -frogs $MSCWDIR/$RUN.mscw.root       )
-OPT+=( -frogs $TEMPDIR/INPUTMSCW             )
+OPT+=( -frogs $TEMPDIR/$INPUTMSCW             )
 OPT+=( -frogsid 0                            )
 OPT+=( -templatelistforfrogs "$TEMPLATELIST" )
 
