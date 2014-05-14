@@ -101,16 +101,13 @@ struct frogs_imgtmplt_out frogs_img_tmplt( struct frogs_imgtmplt_in* d, char tem
 	}
     
 	//If needed read the template file according to elevation
-	fprintf( stderr, "NKH ready to get the proper template file...\n" ) ;
 	if( d->elevation > tmplt.elevmax || d->elevation < tmplt.elevmin )
 	{
 		tmplt = frogs_read_template_elev( d->elevation, templatelistname );
 	}
-    fprintf( stderr, "NKH got the right template file...\n" );
     
 	//Optimize the likelihood
 	rtn = frogs_likelihood_optimization( d, &tmplt, &calib, &prob_array );
-    fprintf( stderr, "NKH frogs_likelihood_optimization() complete\n" ) ;
 	
 	//Release memory used in the data structure
 	frogs_release_memory( d );
@@ -1069,7 +1066,6 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 	   3) The file name for that template
 	*/
 	
-    fprintf( stderr, "NKH frogs_read_template_elev( %f , %s )\n", elevation, templatelistname ) ;
 	char* EVN;
 	char FROGS_TEMPLATE_LIST_PATH[500];
 	EVN = getenv( "EVNDISPSYS" );
@@ -1085,7 +1081,6 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 	}
 	//sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/EVNDISP.frogs_template_file_list.txt", itemp );
 	sprintf( FROGS_TEMPLATE_LIST_PATH, "%s/ParameterFiles/%s", itemp, templatelistname );
-    fprintf( stderr, "NKH FROGS_TEMPLATE_LIST_PATH '%s'\n", FROGS_TEMPLATE_LIST_PATH ) ;
 	
 	//Open the template files list file
 	FILE* fu; //file pointer
@@ -1102,10 +1097,8 @@ struct frogs_imgtemplate frogs_read_template_elev( float elevation, char templat
 	float minel, maxel; //Min and max elevation to use the listed files
 	char fname[500];
 	struct frogs_imgtemplate rtn; //Variable to hold template data
-    fprintf( stderr, "NKH starting to look for templatelist lines...\n" ) ;
 	while( fscanf( fu, "%d%f%f%s", &flag, &minel, &maxel, fname ) != EOF )
 	{
-        fprintf( stderr, "  NKH templatelistline %d %f %f '%s'\n", flag, minel, maxel, fname ) ;
 #ifdef CONVOLUTION
 		if( flag == 1 && elevation >= minel && elevation <= maxel )
 		{
@@ -1191,7 +1184,6 @@ frogs_read_template_file(
 	   as an argument.*/
 	FILE* fu; //file pointer
 	//open file
-	fprintf( stderr, "NKH read_template_file( %s )\n", fname ) ; 
     
 	char* itemp = 0;
 	if( getenv( "VERITAS_EVNDISP_AUX_DIR" ) )
@@ -1204,7 +1196,6 @@ frogs_read_template_file(
 	}
     char fullfname[FROGS_FILE_NAME_MAX_LENGTH] ; 
     sprintf( fullfname, "%s/Templates/%s", itemp, fname ) ;
-	fprintf( stderr, "NKH attempting to load template '%s' \n", fullfname ) ;
     
 	if( ( fu = fopen( fullfname, "r" ) ) == NULL )
 	{
