@@ -212,6 +212,9 @@ mkdir -p $SCIDIR
 # extra functions
 source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
 
+# evndisp output directory
+mkdir -p $EVNDISPDIR
+
 # frogs output directory
 mkdir -p $FROGSDIR
 
