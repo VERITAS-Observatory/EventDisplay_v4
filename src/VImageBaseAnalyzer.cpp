@@ -133,7 +133,7 @@ void VImageBaseAnalyzer::calcSums( int iFirst, int iLast, bool iMakingPeds, bool
 				continue;
 			}
 			
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
 			{
 				fReader->selectHitChan( i );
 				if( iMakingPeds )
@@ -228,7 +228,8 @@ void VImageBaseAnalyzer::calcTZeros( int fFirst, int fLast )
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
+
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
 			{
 				if( getDebugFlag() )
 				{
@@ -443,7 +444,8 @@ void VImageBaseAnalyzer::calcTCorrectedSums( int iFirst, int iLast )
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-			if( i_channelHitID < getHiLo().size() && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
+
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
 			{
 				fReader->selectHitChan( i );
 				fTraceHandler->setTrace( fReader, getNSamples(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],
@@ -590,7 +592,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 		/////////////////////////////////////////////////////////////////
 		// calculate tzero and sums for good channels only
 		/////////////////////////////////////////////////////////////////
-		if( i_channelHitID < ndead_size && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
+		if( i_channelHitID < ndead_size && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
 		{
 			// initialize trace handler
 			fTraceHandler->setTrace( fReader, getNSamples(),
@@ -745,7 +747,7 @@ void VImageBaseAnalyzer::gainCorrect()
 			iHIGHQE = 1.;
 		}
 		// correct gains
-		if( getGains()[i] > 0  && !getDead( getHiLo()[i] )[i] )
+		if( getGains()[i] > 0  && !getDead( i, getHiLo()[i] ) )
 		{
 			setSums( i, getSums()[i] / ( getGains()[i] * iHIGHQE ) );
 		}
@@ -753,7 +755,7 @@ void VImageBaseAnalyzer::gainCorrect()
 		{
 			setSums( i, 0. );
 		}
-		if( getGains()[i] > 0  && !getDead( getHiLo()[i] )[i] )
+		if( getGains()[i] > 0  && !getDead( i, getHiLo()[i] ) )
 		{
 			setSums2( i, getSums2()[i] / ( getGains()[i] * iHIGHQE ) );
 		}
@@ -1245,7 +1247,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		try
 		{
 			i_channelHitID = fReader->getHitID( i );
-			if( i_channelHitID < getHiLo().size() && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
 			{
 				if( getRunParameter()->fDynamicIntegrationWindow )
 				{
@@ -1294,7 +1296,7 @@ void VImageBaseAnalyzer::calcSecondTZerosSums()
 		{
 			i_channelHitID = fReader->getHitID( i );
 			// dead channels are excluded
-			if( i_channelHitID < getHiLo().size() && !getDead( getHiLo()[i_channelHitID] )[i_channelHitID] )
+			if( i_channelHitID < getHiLo().size() && i_channelHitID < getDead( getHiLo()[i_channelHitID] ).size() && !getDead( i_channelHitID, getHiLo()[i_channelHitID]) ) 
 			{
 				// trace handler
 				fTraceHandler->setTrace( fReader, getNSamples(), getPeds( getHiLo()[i_channelHitID] )[i_channelHitID],

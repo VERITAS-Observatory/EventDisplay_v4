@@ -675,7 +675,7 @@ void VCamera::setPMTColorForChargeTiming()
 		//   - not dead, or a dead channel recovered by the loglikelihood method
 		//   - a hit
 		//   - not switched of by the user
-		if( ( !( fData->getDead()[i] && !( fData->getDeadRecovered()[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) ) || fData->getLLEst()[i] ) && fData->getImageUser()[i] != -1 )
+		if( ( !( fData->getDead(i, fData->getHiLo()[i] ) && !( fData->getDeadRecovered()[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) ) || fData->getLLEst()[i] ) && fData->getImageUser()[i] != -1 )
 		{
 			// set tube radii
 			fgraphTubesEntry[i]->SetR1( fgraphTubes[i]->GetR1()*abs( fPMTData[i] ) * fmaxRad );
@@ -711,7 +711,7 @@ void VCamera::setPMTColorForChargeTiming()
 				}
 			}
 			// dead channels estimated by the loglikelihood method
-			else if( fData->getDead()[i] && ( fData->getLLEst()[i] || fData->getDeadRecovered()[i] ) )
+			else if( fData->getDead(i, fData->getHiLo()[i] ) && ( fData->getLLEst()[i] || fData->getDeadRecovered()[i] ) )
 			{
 				fgraphTubesEntry[i]->SetLineColor( fColorEstimated );
 				fgraphTubesEntry[i]->SetFillColor( fColorEstimated );
@@ -894,11 +894,11 @@ void VCamera::drawEventText()
 	fTextEvent[5]->SetTitle( iText );
 	int i_numtrig = 0;
 	int i_numtrig2 = 0;
-	for( unsigned int i = 0; i < fData->getDead().size(); i++ ) if( fData->getDead()[i] )
+	for( unsigned int i = 0; i < fData->getDead().size(); i++ ) if( fData->getDead( i, false ) )
 		{
 			i_numtrig++;
 		}
-	for( unsigned int i = 0; i < fData->getDead( true ).size(); i++ ) if( fData->getDead( true )[i] )
+	for( unsigned int i = 0; i < fData->getDead( true ).size(); i++ ) if( fData->getDead( i, true ) )
 		{
 			i_numtrig2++;
 		}
@@ -1198,7 +1198,7 @@ void VCamera::setPMTColorScheme( valarray<double> v_value, bool i_select, double
 	// expect length of v_value to be npixel
 	for( unsigned int i = 0; i < v_value.size(); i++ )
 	{
-		bool iDrawChannel = ( !( fData->getDead( fData->getHiLo()[i] )[i] && !( fData->getDeadRecovered( iLowGain )[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) )
+		bool iDrawChannel = ( !( fData->getDead( i, fData->getHiLo()[i] ) && !( fData->getDeadRecovered( iLowGain )[i] && ( fData->getImage()[i] || fData->getBorder()[i] ) ) )
 							  && fData->getImageUser()[i] != -1 );
 		if( iDrawAllChannels )
 		{
@@ -1300,7 +1300,7 @@ void VCamera::setPMTColorOnOff( const vector<bool>& v_value, int iColor, int iFi
 			break;
 		}
 		// PMTs which are not that and a hit
-		if( !fData->getDead()[i] )
+		if( !fData->getDead(i, fData->getHiLo()[i] ) )
 		{
 			// true: draw filled circle according to the fill color/style
 			if( v_value[i] )
@@ -1348,7 +1348,7 @@ void VCamera::setPMTColorOff( const vector<bool>& v_value )
 		{
 			break;
 		}
-		if( !fData->getDead()[i] )
+		if( !fData->getDead(i, fData->getHiLo()[i] ) )
 		{
 			if( ! v_value[i] )   // draw empty circle
 			{
@@ -1822,7 +1822,7 @@ valarray<double>& VCamera::rescaleSums( valarray<double>& v_value, bool iOffset 
 		// maximum/minimum
 		for( unsigned i = 0; i < i_v_valueSize; i++ )
 		{
-			if( ( !fData->getDead()[i] || fData->getLLEst()[i] ) )
+			if( ( !fData->getDead(i, fData->getHiLo()[i] ) || fData->getLLEst()[i] ) )
 			{
 				if( abs( v_value[i] ) > imax )
 				{
@@ -1888,7 +1888,7 @@ double VCamera::getMax( valarray<double>& i_val )
 	// assume that nothing is smaller than that
 	double max = -1.e10;
 	//   for( unsigned int i = 0; i < i_val.size(); i++ ) if( !fData->getDead()[i] ) { max = i_val[i]; break; }
-	for( unsigned int i = 0; i < iSize; i++ ) if( !fData->getDead()[i] && i_val[i] > max )
+	for( unsigned int i = 0; i < iSize; i++ ) if( !fData->getDead(i, fData->getHiLo()[i] ) && i_val[i] > max )
 		{
 			max = i_val[i];
 		}
@@ -1906,7 +1906,7 @@ double VCamera::getMin( valarray<double>& i_val )
 	// assume that nothing is bigger than that
 	double min = 1.e10;
 	//   for( unsigned int i = 0; i < i_val.size(); i++ ) if( !fData->getDead()[i] ) { min = i_val[i]; break; }
-	for( unsigned int i = 0; i < iSize; i++ ) if( !fData->getDead()[i] && i_val[i] < min )
+	for( unsigned int i = 0; i < iSize; i++ ) if( !fData->getDead(i, fData->getHiLo()[i] ) && i_val[i] < min )
 		{
 			min = i_val[i];
 		}
@@ -1926,7 +1926,7 @@ void VCamera::getMinMax( valarray<double>& i_val, double& imin, double& imax )
 	double max = -1.e10;
 	for( unsigned int i = 0; i < iSize; i++ )
 	{
-		if( !fData->getDead()[i] && fData->getImageUser()[i] != -1 )
+		if( !fData->getDead(i, fData->getHiLo()[i] ) && fData->getImageUser()[i] != -1 )
 		{
 			if( i_val[i] < min )
 			{
