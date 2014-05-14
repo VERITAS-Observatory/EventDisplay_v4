@@ -39,6 +39,8 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 # Load runlist functions
 source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
 
+echo "which getRunArrayVersion `which getRunArrayVersion`"
+
 # Parse command line arguments
 RLIST=$1
 [[ "$2" ]] && ODIR=$2    || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"

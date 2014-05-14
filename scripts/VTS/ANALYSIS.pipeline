@@ -145,11 +145,11 @@ HOW DO I USE THIS ?
    3. Edit the ANALYSIS SETTINGS within this file,
    4. Run commands:
         Run stages of the analysis:
-        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer]                
+        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate]                
         See currently running jobs:
         $ $BINNAME jobs                                      
         Check the results of each stage for errors
-        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer] check"
+        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate] check"
 	echo
     echo "Include a stage (evndisp, mscw, anpar, anmer) please, (optional 'check' afterwards)"
 	echo " $ $BINNAME evndisp         # run the 'event display' stage"
@@ -160,6 +160,8 @@ HOW DO I USE THIS ?
 	echo " $ $BINNAME frogs check     # after frogs, check its log and datafiles for problems"
 	echo " $ $BINNAME anpar           # run the 'anasum parallel' stage"
 	echo " $ $BINNAME anpar check     # after anpar, check its log and datafiles for problems"
+	echo " $ $BINNAME mutate          # after anpar, convert anasum parallel files to ctool's fits format"
+	echo " $ $BINNAME mutate check    # after anpar, check the mutate stage's log and datafiles"
 	echo " $ $BINNAME anmer           # merge the anasum parallel files to one anasum file"
 	echo "Or, a command:"
 	echo "  $ $BINNAME jobs   # show progress of all of this project's jobs, updating every 90 seconds, and block until jobs are done"
@@ -382,19 +384,19 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		done < $RUNLIST
 		
 		echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-		OLOG=$( echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG" | head -n 1 | awk '{ print $3 }' )
+		OLOG=$( echo "$QSUBDATA" | grep -P "^RUN \d+ OLOG" | head -n 1 | awk '{ print $4 }' )
         if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$EVNJOBSUB"        ; then echo -e "${COTRED}Error, Probably can't find datafiles, because we can't find the batch stdout log file...$CONORM" ; fi
         
 		DFDIR=$( cat $OLOG | grep -P "^RUN\d{5} EVNDISPLOG" | awk '{ print $3 }' )
 		DFDIR=$( dirname $DFDIR )
 		echo -e "~~~~~~~~~~~ Evndisp Datafiles stored in $DFDIR/ $CONORM"
 		while read ARUN ; do
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
             
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG" | awk '{ print $3 }' )
+			OLOG=$(    echo "$RUNDATA"  | grep -P "^RUN $ARUN OLOG" | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$EVNJOBSUB"        ; then continue ; fi
             
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG" | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep -P "^RUN $ARUN ELOG" | awk '{ print $4 }' )
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
             
             DATAFILE=$( cat "$OLOG" | grep "RUN$ARUN EVNDISPDATA"  | awk '{ print $3 }' )
@@ -448,22 +450,22 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		QSUBDATA=""
 		NRUNS=$( cat $RUNLISTWINTV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV4 $EVNDISPDIR $TABLEFILEWINTV4 $RECID | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV4 $TABLEFILEWINTV4 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV4 $EVNDISPDIR $TABLEFILESUMMV4 $RECID | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV4 $TABLEFILESUMMV4 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTWINTV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV5 $EVNDISPDIR $TABLEFILEWINTV5 $RECID | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV5 $TABLEFILEWINTV5 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV5 $EVNDISPDIR $TABLEFILESUMMV5 $RECID | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV5 $TABLEFILESUMMV5 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTWINTV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV6 $EVNDISPDIR $TABLEFILEWINTV6 $RECID | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV6 $TABLEFILEWINTV6 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV6 $EVNDISPDIR $TABLEFILESUMMV6 $RECID | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV6 $TABLEFILESUMMV6 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		rm -rf "$MSCWJOBSUB"
 		echo "$QSUBDATA" > "$MSCWJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
@@ -485,14 +487,14 @@ if [[ "$STAGE" == "mscw" ]] ; then
 		QSUBDATA=$(cat "$MSCWJOBSUB")
 		while read ARUN ; do
 			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN $ARUN SCRIPT" | awk '{ print $4 }' )
             
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN OLOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$MSCWJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
             
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN ELOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$EVNJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
             
@@ -503,19 +505,19 @@ if [[ "$STAGE" == "mscw" ]] ; then
             checkLogFileForStageSuccess "$MSCWLOG" "...outputfile closed"
 		done < $RUNLIST
 
-		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"    | head -n 1 | awk '{ print $3 }' )
+		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN \d+ OLOG"    | head -n 1 | awk '{ print $4 }' )
 		DFDIR=$( cat $OLOG        | grep -P "^RUN\d{5} MSCWLOG" | awk '{ print $3 }' )
 		DFDIR=$( dirname $DFDIR )
 		echo
 		echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		echo -e "~~~~~~~~~~~ MSCW Datafiles stored in $DFDIR/$CONORM"
 		while read ARUN ; do
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
             
-			OLOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN OLOG"     | awk '{ print $3 }' )
+			OLOG=$(     echo "$RUNDATA"  | grep "RUN $ARUN OLOG"     | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$MSCWJOBSUB" ; then continue ; fi
             
-			ELOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN ELOG"     | awk '{ print $3 }' )
+			ELOG=$(     echo "$RUNDATA"  | grep "RUN $ARUN ELOG"     | awk '{ print $4 }' )
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$MSCWJOBSUB" ; then continue ; fi
             
             MSCWLOG=$(  cat "$OLOG"      | grep "RUN$ARUN MSCWLOG"  | awk '{ print $3 }' )
@@ -554,13 +556,13 @@ if [[ "$STAGE" == "frogs" ]] ; then
 		QSUBDATA=""
 		NRUNS=$( cat $RUNLISTV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV4" "$EVNDISPDIR/RecID${RECID}" "$FROGSDIR" V4 0 | tee >(cat - >&5) ) ; fi
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV4" "$FROGSDIR" "$EVNDISPDIR/RecID${RECID}" 0 | tee >(cat - >&5) ) ; fi
 		NRUNS=$( cat $RUNLISTV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV5" "$EVNDISPDIR/RecID${RECID}" "$FROGSDIR" V5 0 | tee >(cat - >&5) ) ; fi
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV5" "$FROGSDIR" "$EVNDISPDIR/RecID${RECID}" 0 | tee >(cat - >&5) ) ; fi
 		NRUNS=$( cat $RUNLISTV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV6" "$EVNDISPDIR/RecID${RECID}" "$FROGSDIR" V6 0 | tee >(cat - >&5) ) ; fi
+            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV6" "$FROGSDIR" "$EVNDISPDIR/RecID${RECID}" 0 | tee >(cat - >&5) ) ; fi
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$FROGSJOBSUB"
         echo "$QSUBDATA" > "$FROGSJOBSUB"
@@ -585,14 +587,14 @@ if [[ "$STAGE" == "frogs" ]] ; then
 		while read ARUN ; do
             echo
 			echo -e "${COBLUE}~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~ Run:$ARUN${CONORM}"
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN $ARUN SCRIPT" | awk '{ print $4 }' )
             
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }' )
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN OLOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$FROGSJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
             
-			ELOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN ELOG"   | awk '{ print $3 }' )
+			ELOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN ELOG"   | awk '{ print $4 }' )
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$FROGSJOBSUB"        ; then continue ; fi
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
             
@@ -603,19 +605,19 @@ if [[ "$STAGE" == "frogs" ]] ; then
             checkLogFileForStageSuccess "$FROGSLOG" "Final checks on result file (seems to be OK)"
 		done < $RUNLIST
 
-		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"     | head -n 1 | awk '{ print $3 }' )
-		DFDIR=$( cat $OLOG        | grep -P "^RUN\d{5} FROGSLOG" | awk '{ print $3 }' )
+		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN \d+ OLOG"     | head -n 1 | awk '{ print $4 }' )
+		DFDIR=$( cat $OLOG        | grep -P "^RUN\d+ FROGSLOG" | awk '{ print $3 }' )
 		DFDIR=$( dirname $DFDIR )
 		echo
 		echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		echo -e "~~~~~~~~~~~ FROGS Datafiles stored in $DFDIR/$CONORM"
 		while read ARUN ; do
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
             
-			OLOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN OLOG"      | awk '{ print $3 }' )
+			OLOG=$(     echo "$RUNDATA"  | grep "RUN $ARUN OLOG"      | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG"     "OLOG"      "$HUMANBATCHSTDOUT" "$FROGSJOBSUB" ; then continue ; fi
             
-			ELOG=$(     echo "$RUNDATA"  | grep "RUN$ARUN ELOG"      | awk '{ print $3 }' )
+			ELOG=$(     echo "$RUNDATA"  | grep "RUN $ARUN ELOG"      | awk '{ print $4 }' )
             if filenameIsNotHealthy "$ELOG"     "ELOG"      "$HUMANBATCHSTDERR" "$FROGSJOBSUB" ; then continue ; fi
             
             DATAFILE=$( cat "$OLOG"      | grep "RUN$ARUN FROGSDATA" | awk '{ print $3 }' )
@@ -680,14 +682,14 @@ if [[ "$STAGE" == "anpar" ]] ; then
 		QSUBDATA=$( cat $ANPARJOBSUB )
 		for ARUN in $RUNNUMBERS ; do # check batch and log files
 			echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~" ; echo -e "~~~~~~~~~~~ Run:$ARUN${CONORM}"
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
-			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN$ARUN SCRIPT" | awk '{ print $3 }' )
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
+			SCRIPT=$(  echo "$RUNDATA"  | grep "RUN $ARUN SCRIPT" | awk '{ print $4 }' )
             
-			OLOG=$( echo "$RUNDATA" | grep "RUN$ARUN OLOG" | awk '{ print $3 }' )
+			OLOG=$( echo "$RUNDATA" | grep "RUN $ARUN OLOG" | awk '{ print $4 }' )
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$ANPARJOBSUB" ; then continue ; fi
 			checkLogFileForProblems "$OLOG" $DEBUGREGEX
             
-			ELOG=$( echo "$RUNDATA" | grep "RUN$ARUN ELOG" | awk '{ print $3 }' )
+			ELOG=$( echo "$RUNDATA" | grep "RUN $ARUN ELOG" | awk '{ print $4 }' )
 			checkLogFileForProblems "$ELOG" $DEBUGREGEX
             if filenameIsNotHealthy "$ELOG" "ELOG" "$HUMANBATCHSTDERR" "$ANPARJOBSUB" ; then continue ; fi
             
@@ -698,15 +700,15 @@ if [[ "$STAGE" == "anpar" ]] ; then
             checkLogFileForStageSuccess "$ANPARLOG" "analysis results written to"
 		done < $RUNLIST
 		
-		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN\d{5} OLOG"     | head -n 1 | awk '{ print $3 }' )
+		OLOG=$(  echo "$QSUBDATA" | grep -P "^RUN \d+ OLOG"     | head -n 1 | awk '{ print $4 }' )
 		DFDIR=$( cat $OLOG        | grep -P "^RUN\d{5} ANPARLOG" | awk '{ print $3 }' )
 		DFDIR=$( dirname $DFDIR )
 		echo ; echo -e "${COBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		echo -e "~~~~~~~~~~~ ANASUM Datafiles stored in $DFDIR/$CONORM"
 		while read ARUN ; do
-			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN$ARUN" )
+			RUNDATA=$( echo "$QSUBDATA" | grep -P "^RUN $ARUN" )
             
-			OLOG=$(    echo "$RUNDATA"  | grep "RUN$ARUN OLOG"   | awk '{ print $3 }')
+			OLOG=$(    echo "$RUNDATA"  | grep "RUN $ARUN OLOG"   | awk '{ print $4 }')
             if filenameIsNotHealthy "$OLOG" "OLOG" "$HUMANBATCHSTDOUT" "$ANPARJOBSUB"        ; then continue ; fi
             
             ANPARLOG=$(  cat "$OLOG" | grep "RUN$ARUN ANPARLOG"  | awk '{ print $3 }' )
@@ -734,7 +736,7 @@ fi
 
 # s5 anasum
 if [[ "$STAGE" == "anmer" ]] ; then
-	FINALOUTPUTLOG="$CWD/`basename $FINALOUTPUT .root`.log"
+	FINALOUTPUTLOG="${ANASUMOUTPUTDIR}/`basename $FINALOUTPUT .root`.log"
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		makeParamFile
@@ -750,10 +752,10 @@ if [[ "$STAGE" == "anmer" ]] ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
 		# check the stage results
 		echo "Checking the anmer stage"
-        if filenameIsNotHealthy "$FINALOUTPUTLOG" "FINALOUTPUTLOG" "merged anasum log file" "ANALYSIS.pipeline"  ; then continue ; fi
+        if filenameIsNotHealthy "$FINALOUTPUTLOG" "(filename constructed in ANALYSIS.pipeline)" "merged anasum log file" "ANALYSIS.pipeline"  ; then continue ; fi
 		checkLogFileForProblems $FINALOUTPUTLOG $DEBUGREGEX
         
-		DATAFILE="$FINALOUTPUT"
+		DATAFILE="${ANASUMOUTPUTDIR}/${FINALOUTPUT}"
         if filenameIsNotHealthy "$DATAFILE" "FINALOUTPUT" "merge anasum datafile" "ANALYSIS.pipeline"  ; then continue ; fi
         
         LOGFILES=( "$FINALOUTPUTLOG" )

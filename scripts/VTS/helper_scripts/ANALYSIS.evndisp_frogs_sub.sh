@@ -29,7 +29,7 @@ ACUTS="EVNDISP.reconstruction.runparameter"
 if [[ "$ARRAYVERS" =~ ^(V5|V6)$ ]]; then
     TEMPLATELIST="EVNDISP.frogs_template_file_list.$ARRAYVERS.txt"
 else
-    echo "Error, no frogs template list defined for \$ARRAYVERS='$ARRAYVERS', exiting..."
+    echo "Error (helper_scripts/ANALYSIS.evndisp_frogs.sh), no frogs template list defined for \$ARRAYVERS='$ARRAYVERS', exiting..."
     exit 1
 fi
 echo "Using template list file '$TEMPLATELIST'..."
