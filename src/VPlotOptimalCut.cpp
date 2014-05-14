@@ -54,6 +54,7 @@ double VPlotOptimalCut::getCutValue( string iVariable, int iEntryNumber )
        fData->SetBranchAddress( iVariable.c_str(), &iValue );
        if( fData->GetEntry( iEntryNumber ) > 0 )
        {
+           fData->ResetBranchAddresses();
            return iValue;
        }
    }
@@ -87,16 +88,17 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
    if( !hoff ) return;
    hoff->Draw( "same" );
 
-   if( bPrint )
-   {
-      sprintf( hname, "%s.eps", iVariable.c_str() );
-      c->Print( hname );
-   }
-
    double i_opt_min = getCutValue( iVariable + "_min", i_opt_n );
    double i_opt_max = getCutValue( iVariable + "_max", i_opt_n );
 
    cout << "Optimal cut values (" << iVariable << "): " << i_opt_min << ", " << i_opt_max << endl;
+
+   // size is on a log scale, also EChi2 and EmissionheightChi2
+   if( iVariable.find( "SizeSecond" ) != string::npos || iVariable.find( "Chi2" ) != string::npos  )
+   {
+       if( i_opt_min > 0. ) i_opt_min = log10( i_opt_min );
+       if( i_opt_max > 0. ) i_opt_max = log10( i_opt_max );
+   }
 
    if( i_opt_min > -9998. )
    {
@@ -109,9 +111,17 @@ void VPlotOptimalCut::plotHistograms( string iVariable, int i_opt_n, bool bPrint
    {
        TLine *iL = new TLine( i_opt_max, hon->GetMinimum(), i_opt_max, hon->GetMaximum() );
        iL->SetLineStyle( 2 );
-       iL->SetLineColor( 3 );
+       iL->SetLineColor( 4 );
        iL->Draw();
    }
+
+   // print all canvases
+   if( bPrint )
+   {
+      sprintf( hname, "%s.eps", iVariable.c_str() );
+      c->Print( hname );
+   }
+
 }
 
 /*
@@ -126,26 +136,26 @@ void VPlotOptimalCut::plotOptimalCuts( string iVariable, int iSourceStrength, bo
    char hname[200];
    char htitle[200];
    sprintf( hname, "c%s_opt_%d_%d_%d", iVariable.c_str(), iMax, (int)size, iSourceStrength );
-   sprintf( htitle, "optimial cut (%s, %d, %d, %d)", iVariable.c_str(), iMax, (int)size, iSourceStrength );
+   sprintf( htitle, "optimal cut (%s, %d, %d, %d)", iVariable.c_str(), iMax, (int)size, iSourceStrength );
    TCanvas *c = new TCanvas( hname, htitle, 610, 10, 500, 400 );
    c->SetGridx( 0 );
    c->SetGridy( 0 );
    c->Draw();
    if( !iMax )
    {
-      sprintf( hname, "obs5sigma[%d]/60.:%s_min", iSourceStrength, iVariable.c_str() );
+      sprintf( hname, "obs5sigma[%d]:%s_min", iSourceStrength, iVariable.c_str() );
    }
    else
    {
-      sprintf( hname, "obs5sigma[%d]/60.:%s_max", iSourceStrength, iVariable.c_str() );
+      sprintf( hname, "obs5sigma[%d]:%s_max", iSourceStrength, iVariable.c_str() );
    }
    if( size > 0 )
    {
-       sprintf( htitle, "TMath::Abs( SizeSecondMax_min - %f ) < 10.&&obs5sigma[%d]/60.<%f", size, iSourceStrength, iMaxObs );
+       sprintf( htitle, "TMath::Abs( SizeSecondMax_min - %f ) < 10.&&obs5sigma[%d]<%f", size, iSourceStrength, iMaxObs );
    }
    else
    {
-       sprintf( htitle, "SizeSecondMax_min>0.&&obs5sigma[%d]/60.<%f", iSourceStrength, iMaxObs );
+       sprintf( htitle, "SizeSecondMax_min>0.&&obs5sigma[%d]<%f", iSourceStrength, iMaxObs );
    }
    cout << hname << endl;
    cout << htitle << endl;
