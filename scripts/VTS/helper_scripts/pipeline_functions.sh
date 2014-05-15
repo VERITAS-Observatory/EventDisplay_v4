@@ -411,10 +411,13 @@ BATCHCHECKSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.jobInfo"
 # see if they completed properly,
 # and print for the human
 function checkBatchJobExits {
+	#local JOBFILE="$1"
     local QSUBDATA=$( cat "$1" )
     if command -v $BATCHCHECKSCRIPT > /dev/null 2>&1 ; then
         echo -e "${COTBLUE}checking batch exit statuses${CONORM}"
-        JOBLIST=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{ print $3 }' | tr '.' ' ' | awk '{ print $1 }' )
+        #JOBLIST=$( echo "$QSUBDATA" | grep -e "Your job" | awk '{ print $3 }' | tr '.' ' ' | awk '{ print $1 }' )
+        JOBLIST=$( echo "$QSUBDATA" | grep -P "RUN \d+ JOBID \d+" | awk '{ print $4 }' | tr '.' ' ' | awk '{ print $1 }' )
+        #JOBLIST=$( cat "$JOBFILE" )
         for AJOB in $JOBLIST ; do
             #echo "jobInfo $AJOB"
             $BATCHCHECKSCRIPT $AJOB

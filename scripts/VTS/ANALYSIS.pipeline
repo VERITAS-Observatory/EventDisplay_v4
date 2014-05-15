@@ -24,8 +24,8 @@ CWD=$PWD
 # ANALYSIS SETTINGS:
 #
 
-# Which event display installation do you want to use?
-# if not set, you must have EVNDISPSYS defined ($ echo "$EVNDISPSYS" )
+# OPTIONAL: Which event display installation do you want to use?
+# if you leave this commented out, you must have EVNDISPSYS defined ($ echo "$EVNDISPSYS" )
 # (full path please)
 #export EVNDISPSYS="/afs/ifh.de/user/n/nkelhos/scratch/VERITAS/EVNDISP/EVNDISP-400/trunk"
 
@@ -37,19 +37,19 @@ RUNLIST="$CWD/runlist.crab.dat"
 
 # What kind of cuts do you want to use?
 # Currently supports 'soft', 'moderate', or 'hard'
-CUTS="soft"
+CUTS="moderate"
 
 # What kind of background do you want to use?
 # 'ring' or 'refl' (for reflected)
 BACKGROUND="refl" # ring or [refl, reflect, reflected]
 
-# If using 'ring' background, 
+# IF USING 'ring' BACKGROUND:
 # how how big should the radius of the the 'on' region be, in degrees?
 RINGCENT="0.5"
 # and how big should the 'off' ring be, in units of 'on'-region areas?
 RINGAREA="10"
 
-# if using 'refl' background,
+# IF USING 'refl' BACKGROUND:
 # what should be the minimum distance between off region edges, in degrees?
 REFLWOBOFF="0.5"
 # whats the minimum number of off regions we should use?
@@ -64,16 +64,17 @@ DOCALIB=yes
 
 # Where should we store the evndisp and mscw output files?
 # (full path please)
-# evndisp files will be: $EVNDISPDIR/#####.root, #####.tzero.root, etc
-# mscw files will be 
-EVNDISPDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
+# evndisp files will be: $EVNDISPOUTPUTDIR/#####.root, #####.tzero.root, etc
+# mscw files will be put in RecIDX within this directory (see next option)
+EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 
 # Which Reconstruction ID (RecID) should we use?
 # 0, 1, 2, 3, or 4
-# 0 = do mscw stage with all availible images
+# 0 = do mscw stage with all available images
 # 1 = do mscw stage without using T1 images
 # 2 = do mscw stage without using T2 images
-# etc.
+# 3 = do mscw stage without using T3 images
+# 4 = do mscw stage without using T4 images
 # For regular data analysis, this should be 0
 RECID=0
 
@@ -86,17 +87,17 @@ RECID=0
 USEFROGS="yes"
 
 # Where should the frogs's output files be stored?
-FROGSDIR="$EVNDISPDIR/frogs"
+FROGSOUTPUTDIR="$EVNDISPOUTPUTDIR/frogs"
 
-# where should we put the anasum files (parallel and merged)?
+# Where should we put the anasum output files (parallel and merged)?
 # (full path please)
 ANASUMOUTPUTDIR="$CWD/arf"
 
-# what should we name the final merged anasum
+# What should we name the final merged anasum
 # output root file? It will be put in $ANASUMOUTPUTDIR
 FINALOUTPUT="anmer.output.root"
 
-# which anasum runparameter file should we use?
+# Which anasum runparameter file should we use?
 # (full path please)
 RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab.ctools"
 
@@ -105,24 +106,29 @@ RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab.c
 # e.g. radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-V5-T234.root
 #                        ^^^^^^^^
 # (all other parts of filename will be figured out automatically)
+# format: YYYYMMDD
 RADECDATE="20131115"
 
-# for the mscw lookup tables, what date should be used in the filename?
+# For the mscw lookup tables, what date should be used in the filename?
 # e.g. table_d20131115_GrIsuDec12_ATM22_V5_ID0
 #             ^^^^^^^^
 # (all other parts of filename will be figured out automatically)
+# format: YYYYMMDD
 TABLEDATE="20131115"
 
-# for the gamma-hadron cut file, what date should be used in the filename?
+# For the gamma-hadron cut file, what date should be used in the filename?
 # ANASUM.GammaHadron.d20130411-cut-N2-Point-005CU-Soft.dat
 #                     ^^^^^^^^
 # (all other parts of filename will be figured out automatically)
-GAMHADCUTDATE="20130411"
+# format: YYYYMMDD
+#GAMHADCUTDATE="20130411"
+GAMHADCUTDATE="20131031"
 
-# for the effective area file, what two dates should be used in the filename? 
-# effArea-d????????-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d????????.root
+# For the effective area file, what two dates should be used in the filename? 
+# effArea-d20131031-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20131115.root
 #          ^EFDATE1                                         ^EFDATE2
 # (all other parts of filename will be figured out automatically)
+# format: YYYYMMDD
 EFDATE1="20131031"
 EFDATE2="20131115"
 
@@ -140,33 +146,38 @@ BINNAME="$0"
 if [[ $# < 1 || ! $1 =~ (evndisp|mscw|frogs|anpar|anmer|mutate|jobs|kill) ]] ; then 
     echo "
 HOW DO I USE THIS ?                             
-   1. Put this script in a new directory,                    
+   1. Copy this script into a new directory,                    
    2. Add your runlist file to that directory,        
-   3. Edit the ANALYSIS SETTINGS within this file,
-   4. Run commands:
-        Run stages of the analysis:
+   3. Edit the ANALYSIS SETTINGS within your copied ANALYSIS.pipeline file,
+   4. Run a stage of the analysis:
+		
+        i) Submit stage jobs to the cluster:
         $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate]                
-        See currently running jobs:
-        $ $BINNAME jobs                                      
-        Check the results of each stage for errors
-        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate] check"
-	echo
-    echo "Include a stage (evndisp, mscw, anpar, anmer) please, (optional 'check' afterwards)"
-	echo " $ $BINNAME evndisp         # run the 'event display' stage"
-	echo " $ $BINNAME evndisp check   # after evndisp, check its log and datafiles for problems"
-	echo " $ $BINNAME mscw            # run the 'mean scaled width' stage"
-	echo " $ $BINNAME mscw check      # after mscw, check its log and datafiles for problems"
-	echo " $ $BINNAME frogs           # run the 'frogs image reconstruction' stage"
-	echo " $ $BINNAME frogs check     # after frogs, check its log and datafiles for problems"
-	echo " $ $BINNAME anpar           # run the 'anasum parallel' stage"
-	echo " $ $BINNAME anpar check     # after anpar, check its log and datafiles for problems"
-	echo " $ $BINNAME mutate          # after anpar, convert anasum parallel files to ctool's fits format"
-	echo " $ $BINNAME mutate check    # after anpar, check the mutate stage's log and datafiles"
-	echo " $ $BINNAME anmer           # merge the anasum parallel files to one anasum file"
-	echo "Or, a command:"
-	echo "  $ $BINNAME jobs   # show progress of all of this project's jobs, updating every 90 seconds, and block until jobs are done"
-	echo "  $ $BINNAME kill   # halt all this project's jobs"
-	echo ; exit 1
+		
+        ii) Check if jobs are done:
+        $ $BINNAME jobs
+		
+        iii) Check the results of the stage for errors
+        $ $BINNAME [evndisp|mscw|frogs|anpar|anmer|mutate] check
+		
+Stages of Event Display: (evndisp, mscw, frogs, anpar, anmer) please,
+  (optional 'check' afterwards)
+  $ $BINNAME evndisp         # run the 'event display' stage
+  $ $BINNAME evndisp check   # after evndisp, check its log and datafiles for problems
+  $ $BINNAME mscw            # run the 'mean scaled width' stage
+  $ $BINNAME mscw check      # after mscw, check its log and datafiles for problems
+  $ $BINNAME frogs           # run the 'frogs image reconstruction' stage
+  $ $BINNAME frogs check     # after frogs, check its log and datafiles for problems
+  $ $BINNAME anpar           # run the 'anasum parallel' stage
+  $ $BINNAME anpar check     # after anpar, check its log and datafiles for problems
+  $ $BINNAME mutate          # after anpar, convert anasum parallel files to ctool's fits format
+  $ $BINNAME mutate check    # after anpar, check the mutate stage's log and datafiles
+  $ $BINNAME anmer           # after anpar, merge the anasum parallel files to one anasum file
+Other commands:
+  $ $BINNAME jobs   # show progress of all of this project's jobs, updating every 90 seconds, until all jobs are done
+  $ $BINNAME kill   # halt all of this project's jobs
+"
+	exit 1
 fi
 
 exec 5>&1 # extra place to duplicate output to stdout, look for >&5
@@ -213,10 +224,10 @@ mkdir -p $SCIDIR
 source $EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_functions.sh
 
 # evndisp output directory
-mkdir -p $EVNDISPDIR
+mkdir -p $EVNDISPOUTPUTDIR
 
 # frogs output directory
-mkdir -p $FROGSDIR
+mkdir -p $FROGSOUTPUTDIR
 
 # anasum output directory
 mkdir -p $ANASUMOUTPUTDIR
@@ -249,9 +260,6 @@ function setupFilteredRunlists {
 	TABLEFILESUMMV5="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V5_ID0"
 	TABLEFILEWINTV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM21_V6_ID0"
 	TABLEFILESUMMV6="$VERITAS_EVNDISP_AUX_DIR/Tables/table_d${TABLEDATE}_GrIsuDec12_ATM22_V6_ID0"
-	RUNLISTV4="$SCIDIR/runlist.V4"
-	RUNLISTV5="$SCIDIR/runlist.V5"
-	RUNLISTV6="$SCIDIR/runlist.V6"
 	RUNLISTSUMMV4="$SCIDIR/runlist.summer.V4"
 	RUNLISTWINTV4="$SCIDIR/runlist.winter.V4"
 	RUNLISTSUMMV5="$SCIDIR/runlist.summer.V5"
@@ -259,9 +267,6 @@ function setupFilteredRunlists {
 	RUNLISTSUMMV6="$SCIDIR/runlist.summer.V6"
 	RUNLISTWINTV6="$SCIDIR/runlist.winter.V6"
 	cd $EVNDISPSYS/scripts/VTS
-    RUNLIST.whichRunsAreArrayEpoch.sh 4 $RUNLIST > $RUNLISTV4
-    RUNLIST.whichRunsAreArrayEpoch.sh 5 $RUNLIST > $RUNLISTV5
-    RUNLIST.whichRunsAreArrayEpoch.sh 6 $RUNLIST > $RUNLISTV6
 	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 4 > $RUNLISTSUMMV4
 	RUNLIST.whichRunsAreAtmosphere.sh w $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 4 > $RUNLISTWINTV4
 	RUNLIST.whichRunsAreAtmosphere.sh s $RUNLIST | RUNLIST.whichRunsAreArrayEpoch.sh 5 > $RUNLISTSUMMV5
@@ -279,9 +284,13 @@ function makeParamFile {
     rm -rf $PARAMFILELIST
     rm -rf $ANASUMRUNLIST
     # generate basic param files
-	$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh \
-        "$CUTS"       "$GAMHADCUTDATE" "$RADECDATE" 20131031 20131115 "$TABLEDATE" 3      "$RUNLIST" > "$PARAMFILELIST"
-	#   ^cutKeyWord    ^^GHCut           ^^RadAcc   ^^EF1    ^^EF2      ^^Table    ^NTel
+	$EVNDISPSYS/scripts/VTS/helper_scripts/pipeline_generateParamFiles.sh "$CUTS" "$GAMHADCUTDATE" "$RADECDATE" "$EFDATE1" "$EFDATE2" "$TABLEDATE" 3 "$USEFROGS" "$RUNLIST" > "$PARAMFILELIST"
+	PARAMEXIT="$?"
+	#echo "PARAMEXIT:$PARAMEXIT" # =0 if ok, !=0 if bad things happened
+	if [[ "$PARAMEXIT" != "0" ]] ; then # had a problem generating param files
+		echoerr "${COTRED}Error, had a problem generating parameter files (see above text), exiting pipeline...$CONORM"
+		exit 1
+	fi
     
     # now put these filenames in the AnasumRunList format
     # fill AnasumRunList with each run's info
@@ -290,9 +299,17 @@ function makeParamFile {
     rm -rf "$ANASUMRUNLIST"
 	echo "Making Param File, using $BACKGROUND background method"
     for ARUN in $RUNNUMBERS ; do
-        ARCUTSFILE=$(      grep "R$ARUN" "$PARAMFILELIST" | grep -oE "\S*ANASUM.GammaHadron\S*" )
-        AREFFAREAFILE=$(   grep "R$ARUN" "$PARAMFILELIST" | grep -oE "\S*effArea\S*"            )
-        ARRADIALACCFILE=$( grep "R$ARUN" "$PARAMFILELIST" | grep -oE "\S*radialAcceptance\S*"   ) 
+        ARCUTSFILE=$(      grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*ANASUM.GammaHadron\S*" )
+        AREFFAREAFILE=$(   grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*effArea\S*"            )
+        ARRADIALACCFILE=$( grep "RUN$ARUN" "$PARAMFILELIST" | grep -oE "\S*radialAcceptance\S*"   ) 
+		if [[ -z "$ARCUTSFILE" || -z "$AREFFAREAFILE" || -z "$ARRADIALACCFILE" ]] ; then
+			echo -e "${COTRED}Error, couldn't determine an IRF file for Run $ARUN :"
+			if [[ -z "$ARCUTSFILE"      ]] ; then echo -e "${COTRED}   GammaHadronCut   File:'$ARCUTSFILE'      $CONORM" ; fi
+			if [[ -z "$AREFFAREAFILE"   ]] ; then echo -e "${COTRED}   EffectiveArea    File:'$AREFFAREAFILE'   $CONORM" ; fi
+			if [[ -z "$ARRADIALACCFILE" ]] ; then echo -e "${COTRED}   RadialAcceptance File:'$ARRADIALACCFILE' $CONORM" ; fi
+			exit 1
+		fi
+
         #ARRADIALACCFILE="imgselAcceptFile.root"
 		if [[ $BACKGROUND == ring ]] ; then
             echo "* $ARUN $ARUN 0 $ARCUTSFILE 1 $AREFFAREAFILE $RINGCENT $RINGAREA $ARRADIALACCFILE" >> $ANASUMRUNLIST
@@ -320,31 +337,40 @@ function updateRunningJobFile {
     done
 }
 
+function stageBanner {
+	if $CHECKFLAG ; then
+		BANNER="Checking the $STAGE Stage ~~~~~~~~~~~"
+	else
+		BANNER="Running the $STAGE Stage ~~~~~~~~~~~~"
+	fi
+	echo -e "${COTBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$CONORM"
+	echo -e "${COTBLUE}~~~~ $BANNER$CONORM"
+	echo -e "${COTBLUE}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$CONORM"
+}
+
 
 # s1 event display
 if [[ "$STAGE" == "evndisp" ]] ; then
 	EVNJOBSUB="$SCIDIR/qsubdata.evndisp"
 	if ! $CHECKFLAG ; then 
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
-		makeParamFile
+		stageBanner
 		# evndisp #########################################################
-		echo -e "${COBLUE}Stage 1 : Event Reconstruction ${CONORM}"
 		echo "$STAGE" > "$STAGEFILE"
+		makeParamFile
         checkForFASTDEVMODE
 		cd $EVNDISPSYS/scripts/VTS
         if [[ "$DOCALIB" = yes ]] ; then CALIBCODE=1
         else                             CALIBCODE=0 ; fi
-		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPDIR $CALIBCODE | tee >(cat - >&5) )  ####### EVNDISP
+		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE | tee >(cat - >&5) )  ####### EVNDISP
 		rm -rf "$EVNJOBSUB"
 		echo "$QSUBDATA" > "$EVNJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
 		
 	else # check the stage results
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		stageBanner
 		# evndisp check #########################################################
-		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-		echo "checking the evndisp stage" 
-		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
@@ -441,42 +467,40 @@ if [[ "$STAGE" == "mscw" ]] ; then
 	MSCWJOBSUB="$SCIDIR/qsubdata.mscw"
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		stageBanner
 		# mscw #########################################################
-		echo -e "${COBLUE}Stage 2 - Mean Scale Length/Width Calculation${CONORM}"
-		#echo -e "Feeding files from $EVNDISPDIR"
 		echo "$STAGE" > "$STAGEFILE"
         checkForFASTDEVMODE
 		setupFilteredRunlists
 		makeParamFile
 		cd $EVNDISPSYS/scripts/VTS
-		#./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILE $EVNDISPDIR $RUNLIST
+		#./VTS.MSCW_ENERGY.sub_analyse_data.sh $TABLEFILE $EVNDISPOUTPUTDIR $RUNLIST
 		QSUBDATA=""
 		NRUNS=$( cat $RUNLISTWINTV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV4 $TABLEFILEWINTV4 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV4 $TABLEFILEWINTV4 $RECID "$EVNDISPOUTPUTDIR" "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV4 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV4 $TABLEFILESUMMV4 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV4 $TABLEFILESUMMV4 $RECID "$EVNDISPOUTPUTDIR" "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTWINTV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV5 $TABLEFILEWINTV5 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV5 $TABLEFILEWINTV5 $RECID "$EVNDISPOUTPUTDIR" "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV5 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV5 $TABLEFILESUMMV5 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV5 $TABLEFILESUMMV5 $RECID "$EVNDISPOUTPUTDIR" "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTWINTV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV6 $TABLEFILEWINTV6 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTWINTV6 $TABLEFILEWINTV6 $RECID "$EVNDISPOUTPUTDIR" "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		NRUNS=$( cat $RUNLISTSUMMV6 | wc -l )
 		if [ "$NRUNS" -gt "0" ] ; then
-			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV6 $TABLEFILESUMMV6 $RECID "$EVNDISPDIR" "${EVNDISPDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
+			QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.mscw_energy.sh $RUNLISTSUMMV6 $TABLEFILESUMMV6 $RECID "$EVNDISPOUTPUTDIR" "${EVNDISPOUTPUTDIR}/RecID${RECID}" | tee >(cat ->&5) ) ; fi
 		rm -rf "$MSCWJOBSUB"
 		echo "$QSUBDATA" > "$MSCWJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
 	else
-		#haltIfAnyJobsAreRunning $RUNNINGJOBS
+		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		stageBanner
 		# mscw check #########################################################
-		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-		echo "checking the mscw stage" 
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
@@ -548,7 +572,8 @@ if [[ "$STAGE" == "frogs" ]] ; then
     FROGSJOBSUB="$SCIDIR/qsubdata.frogs"
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
-		echo -e "${COBLUE}Stage 3 - Frogs Image Reconstruction${CONORM}"
+		stageBanner
+		# frogs #################################################################
 		echo "$STAGE" > "$STAGEFILE"
 		cd $EVNDISPSYS/scripts/VTS
         checkForFASTDEVMODE
@@ -556,26 +581,16 @@ if [[ "$STAGE" == "frogs" ]] ; then
 		makeParamFile
         
         # frogs ########################################################
-		QSUBDATA=""
-		NRUNS=$( cat $RUNLISTV4 | wc -l )
-		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV4" "$FROGSDIR" "$EVNDISPDIR/RecID${RECID}" 0 | tee >(cat - >&5) ) ; fi
-		NRUNS=$( cat $RUNLISTV5 | wc -l )
-		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV5" "$FROGSDIR" "$EVNDISPDIR/RecID${RECID}" 0 | tee >(cat - >&5) ) ; fi
-		NRUNS=$( cat $RUNLISTV6 | wc -l )
-		if [ "$NRUNS" -gt "0" ] ; then
-            QSUBDATA="$QSUBDATA \n"$( ./ANALYSIS.evndisp_frogs.sh "$RUNLISTV6" "$FROGSDIR" "$EVNDISPDIR/RecID${RECID}" 0 | tee >(cat - >&5) ) ; fi
+		QSUBDATA=$( ./ANALYSIS.evndisp_frogs.sh "$RUNLIST" "$FROGSOUTPUTDIR" "$EVNDISPOUTPUTDIR/RecID${RECID}" 0 | tee >(cat - >&5) )
+		
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$FROGSJOBSUB"
         echo "$QSUBDATA" > "$FROGSJOBSUB"
         sleep 2
 	else
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		stageBanner
 		# frogs check #########################################################
-		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-		echo "checking the frogs stage" 
-        echo
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
@@ -648,21 +663,22 @@ if [[ "$STAGE" == "anpar" ]] ; then
 	ANPARJOBSUB="$SCIDIR/qsubdata.anpar"
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
-		makeParamFile
+		stageBanner
 		# anpar #########################################################
-		echo -e "${COBLUE}Stage 4 - Anasum Parallel${CONORM}"
+		makeParamFile
 		echo "$STAGE" > "$STAGEFILE"
         checkForFASTDEVMODE
 		cd $EVNDISPSYS/scripts/VTS
-		#./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $VERITAS_USER_DATA_DIR/analysis/EVD400-d20121218/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE
-		#QSUBDATA=$( ./VTS.ANASUM.sub_analyseParallel_data.sh $ANASUMRUNLIST $EVNDISPDIR/RecID0 $ANASUMOUTPUTDIR $RUNPARAMFILE | tee >(cat - >&5) )
+		
+		# decide input directory
         if [[ "$USEFROGS" == "yes" ]] ; then 
-            INPUTANASUMDIR="$FROGSDIR"
+            INPUTANASUMDIR="$FROGSOUTPUTDIR"
             echo -e "${COTYELLOW}Using frogs files as input...$CONORM"
         else
-            INPUTANASUMDIR="$EVNDISPDIR/RecID${RECID}"
+            INPUTANASUMDIR="$EVNDISPOUTPUTDIR/RecID${RECID}"
             echo -e "Using mscw files as input..."
         fi
+		
 		QSUBDATA=$( ./ANALYSIS.anasum_parallel.sh "$ANASUMRUNLIST" "$ANASUMOUTPUTDIR" "$RUNPARAMFILE" "$INPUTANASUMDIR" | tee >(cat - >&5) )
 		updateRunningJobFile "$QSUBDATA"
 		rm -rf "$ANPARJOBSUB"
@@ -670,8 +686,8 @@ if [[ "$STAGE" == "anpar" ]] ; then
         sleep 2
 	else
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		stageBanner
 		# anpar check #########################################################
-		echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" ; echo "checking the anpar stage" 
         
         # check qsub submission text for problems
         echo -e "${COTBLUE}checking job submission text...${CONORM}"
@@ -742,19 +758,18 @@ if [[ "$STAGE" == "anmer" ]] ; then
 	FINALOUTPUTLOG="${ANASUMOUTPUTDIR}/`basename $FINALOUTPUT .root`.log"
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
+		stageBanner
+		# anmer #############################################################################
 		makeParamFile
-		echo -e "${COBLUE}Stage 5a - Anasum Merge${CONORM}"
 		echo "$STAGE" > "$STAGEFILE"
-		#cd $EVNDISPSYS/bin
-		#nice -n 19 ./anasum -d $ANASUMOUTPUTDIR -l $ANASUMRUNLIST -i 1 -f $RUNPARAMFILE -o $FINALOUTPUT 2>&1 | tee "$FINALOUTPUTLOG"
 		cd $EVNDISPSYS/scripts/VTS
 		nice -n 19 ./ANALYSIS.anasum_combine.sh $ANASUMRUNLIST $ANASUMOUTPUTDIR $FINALOUTPUT $RUNPARAMFILE | tee "$FINALOUTPUTLOG"
 		updateRunningJobFile ""
      
     else
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
-		# check the stage results
-		echo "Checking the anmer stage"
+		stageBanner
+		# anmer check ######################################################################
         if filenameIsNotHealthy "$FINALOUTPUTLOG" "(filename constructed in ANALYSIS.pipeline)" "merged anasum log file" "ANALYSIS.pipeline"  ; then continue ; fi
 		checkLogFileForProblems $FINALOUTPUTLOG $DEBUGREGEX
         
@@ -774,12 +789,21 @@ if [[ "$STAGE" == "anmer" ]] ; then
 	fi
 fi
 
-# s6 mutate
+# s6 mutate : (convert) Anasum Parallel files to CTOOL's Data Format$
 if [[ "$STAGE" == "mutate" ]] ; then
 	if ! $CHECKFLAG ; then
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
-		echo -e "${COBLUE}Stage 5b - Mutate (convert) Anasum Parallel files to CTOOL's Data Format${CONORM}"
+		stageBanner
+		
+		# check that anasum run parameter file has the WRITEEVENTTREEFORCTOOLS
+		GOODSETTING=$( cat "$RUNPARAMFILE" | grep -P "^\*\s+WRITEEVENTTREEFORCTOOLS\s+1")
+		if [ -z "$GOODSETTING" ] ; then
+			echo -e "${COTYELLOW}Warning, you're trying to convert anasum files to ctool's fits format, but ${COTRED}these anasum files may not have been made with the '* WRITEEVENTTREEFORCTOOLS 1' option${COTYELLOW} in its Anasum Parameter File: '$RUNPARAMFILE'${CONORM}"
+			echo -e "${COTYELLOW}  There is a very good chance this stage will fail.$CONORM"
+		fi
+		
         
+		# mutate ###################################################3
         cd $EVNDISPSYS/bin
         echo "now here: $PWD"
         echo "output data going here: $CTOOLSDIR"
@@ -794,8 +818,8 @@ if [[ "$STAGE" == "mutate" ]] ; then
         
     else
 		haltIfAnyJobsAreRunning $RUNNINGJOBS
-		# check the stage results
-		echo "Checking the mutate stage"
+		stageBanner
+		# mutate check ###################################################3
         
         # check log files
         while read ARUN ; do

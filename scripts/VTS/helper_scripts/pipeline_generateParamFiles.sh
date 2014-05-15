@@ -120,16 +120,16 @@ function huntForParameterFileName {
 		if [ -e "$VERITAS_EVNDISP_ANA_DIR/GlobalDir/$PFDIR/$PF" ] ; then # the file exists in the global dir, and we must link to it
 			LINKTARG=$(readlink -m "$VERITAS_EVNDISP_ANA_DIR/GlobalDir/$PFDIR/$PF")
 			LINKNAME="$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF"
-			echoerr "${COYEL}Warning, For run $RRRUN File $PFDIR/$PF" >&2
-			echoerr "   doesnt exist in your \$VERITAS_EVNDISP_ANA_DIR/$PFDIR ." >&2
-			echoerr "   Adding soft link to the global dir: " >&2
-			echoerr "      $LINKNAME" >&2
-			echoerr "      VVVVV" >&2
-			echoerr "      $LINKTARG ${CONORM}" >&2
-            echoerr " " >&2
+			echoerr "${COYEL}Warning, For run $RRRUN File $PFDIR/$PF"
+			echoerr "   doesnt exist in your \$VERITAS_EVNDISP_ANA_DIR/$PFDIR ."
+			echoerr "   Adding soft link to the global dir: "
+			echoerr "      $LINKNAME"
+			echoerr "      VVVVV"
+			echoerr "      $LINKTARG ${CONORM}"
+            echoerr " "
 			rm -rf "$LINKNAME" ; ln -sf "$LINKTARG" "$LINKNAME" # delete the link if it exists, and make it
 		else # the file doesnt exist anywhere, and the user needs to know
-			echoerr "${CORED}Error: For run $RRRUN Param File Does Not Exist! \$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF ${CONORM}" >&2
+			echoerr "${CORED}Error: For run $RRRUN Param File Does Not Exist! \$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF ${CONORM}"
 			ALLFILESGOOD=false
 			addMissing "\$VERITAS_EVNDISP_ANA_DIR/$PFDIR/$PF"
 		fi
@@ -140,11 +140,11 @@ function huntForParameterFileName {
 HELPFLAG=false
 ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or from a pipe
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} ]] ; then # its a terminal (not a pipe)
-	if ! [ "$#" -eq "8" ] ; then # the human didn't add the right # of arguments
+	if ! [ "$#" -eq "9" ] ; then # the human didn't add the right # of arguments
 		HELPFLAG=true  # and we must print help text then quickly exit
 	fi
 else # its a pipe, and we need to check for 3 args
-	if ! [ "$#" -eq "7" ] ; then
+	if ! [ "$#" -eq "8" ] ; then
 		HELPFLAG=true
 	fi
 fi
@@ -208,7 +208,7 @@ if $HELPFLAG ; then
 fi
 
 # list of run_id's to read in
-RUNFILE=$8
+RUNFILE=$9
 if [ ! -e $RUNFILE ] ; then
 	echo "File $RUNFILE could not be found in $PWD , sorry." >&2 ; exit 1
 fi
@@ -271,6 +271,14 @@ if [[ $7 =~ ^[0-9]{1}$ ]] ; then
 	fi
 else
 	echo -e "${CORED}Error, 7th arg '$7' must be a 1 digit number, the number of telescopes to use ('2' or '3'). Exiting.${CONORM}" >&2 ; exit 1
+fi
+
+# USEFROGS= yes/no
+if [[ $8 =~ ^(yes|no)$ ]] ; then
+	USEFROGS="$8"	
+else
+	echo -e "${CORED}Error, 8th arg '$8' (usefrogs?) must be either yes or no. Exiting.${CONORM}" >&2 ;
+	exit 1
 fi
 
 # energy regime
@@ -351,6 +359,13 @@ for i in ${RUNLIST[@]} ; do
 	#AREADATECODE="d20130521"  # second datecode in the effective area filename
 	#GHCUTDATECODE="$DATECODE" # datecode at the beginning of the gamma-hadron cut filename
 	#TABLEDATECODE="d20130521" # datecode at the beginning of the table filename
+	
+	# frogs code
+	if [ "$USEFROGS" == "yes" ] ; then
+		FROGSCODE="-FROGS"
+	else
+		FROGSCODE=""
+	fi
 
 	# array version
 	# HARDCODE
@@ -361,7 +376,7 @@ for i in ${RUNLIST[@]} ; do
 	#echo "r${i}"
 	
 	# Example: GammaHadronCutFiles/ANASUM.GammaHadron.d20120322-cut-N2-Point-005CU-Soft.dat
-	GHCUTFILE="ANASUM.GammaHadron.d${GHCUTDATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}.dat"
+	GHCUTFILE="ANASUM.GammaHadron.d${GHCUTDATECODE}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}${FROGSCODE}.dat"
 	huntForParameterFileName "GammaHadronCutFiles" "$GHCUTFILE" "$i"
 
 	# Example: RadialAcceptances/radialAcceptance-d20130411-cut-N3-Point-005CU-Soft-V5-T234.root
@@ -369,6 +384,7 @@ for i in ${RUNLIST[@]} ; do
 	huntForParameterFileName "RadialAcceptances" "$ACCEPFILE" "$i"
 
 	# Example: EffectiveAreas/effArea-d20130411-cut-N3-Point-005CU-Soft-ATM22-V5-T1234-d20130521.root
+	echo -e "${COTYELLOW}Warning, Effective area probably depends on if we're using frogs or not.  Fix!!!!$CONORM" >&2
 	AREAFILE="effArea-d${EFDATECODE1}-cut-${NTELCODE}-Point-005CU-${ENERGYCODE}-${ATMOCODE}-${VERSIONCODE}-${TELCOMBOCODE}-d${EFDATECODE2}.root"
 	huntForParameterFileName "EffectiveAreas" "$AREAFILE" "$i"
 
@@ -378,18 +394,20 @@ for i in ${RUNLIST[@]} ; do
 
 	# output format, print to screen, for each run:
 	#r<runid> <accepfile> <areafile> <ghcutfile> <tablefile>
-	echo "R${i} $GHCUTFILE $ACCEPFILE $AREAFILE $TABLEFILE"
+	echo "RUN${i} $GHCUTFILE $ACCEPFILE $AREAFILE $TABLEFILE"
 
 done
 
 if ! $ALLFILESGOOD ; then
+	echoerr ""
 	echoerr "${CORED}Warning! Some needed files do not exist anywhere in \$VERITAS_EVNDISP_ANA_DIR or in the global dir `readlink -m $VERITAS_EVNDISP_ANA_DIR/GlobalDir`." >&2
 	echoerr "${CORED}List of missing files:"
 	for i in "${MISSINGFILELIST[@]}" ; do
 		echoerr "${COTRED}$i${CONORM}"
 	done
-	echoerr "   Please check that the red files exist, and if not, TELL SOMEONE!!${CONORM}" >&2 ; exit 1
-    exit 1
+	echoerr "   Please check that the red files exist, and if not, TELL SOMEONE!!${CONORM}" >&2
+	echoerr ""
+	exit 1
 else
     exit 0
 fi
