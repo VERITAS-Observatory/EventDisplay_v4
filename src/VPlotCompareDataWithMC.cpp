@@ -1401,11 +1401,16 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 1.5 );
 	f_x_max.push_back( 6.50 );
-	hname.push_back( "nlowgain" );
+	hname.push_back( "fraclow" );
 	f_rebin.push_back( 1 );
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 0. );
-	f_x_max.push_back( 40. );
+	f_x_max.push_back( 1. );
+/*	hname.push_back( "nlowgain" );
+	f_rebin.push_back( 1 );
+	f_logy.push_back( 1 );
+	f_x_min.push_back( 0. );
+	f_x_max.push_back( 40. ); */
 	hname.push_back( "los" );
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );

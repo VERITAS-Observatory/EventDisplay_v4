@@ -91,6 +91,7 @@ class CData
 		Double_t        dist[VDST_MAXTELESCOPES];
 		Double_t        size[VDST_MAXTELESCOPES];
 		Double_t        size2[VDST_MAXTELESCOPES];
+                Double_t        fraclow[VDST_MAXTELESCOPES];
 		Double_t        loss[VDST_MAXTELESCOPES];
 		Double_t        max1[VDST_MAXTELESCOPES];
 		Double_t        max2[VDST_MAXTELESCOPES];
@@ -235,7 +236,8 @@ class CData
 		TBranch*        b_meanPedvar_ImageT;      //!
 		TBranch*        b_dist;                   //!
 		TBranch*        b_size;                   //!
-		TBranch*        b_size2;                   //!
+		TBranch*        b_size2;                  //!
+		TBranch*        b_fraclow;                //!
 		TBranch*        b_loss;                   //!
 		TBranch*        b_max1;                   //!
 		TBranch*        b_max2;                   //!
@@ -706,6 +708,17 @@ void CData::Init( TTree* tree )
 				size2[i] = 0.;
 			}
 		}
+		if( fChain->GetBranchStatus( "fracLow" ) )
+		{
+			fChain->SetBranchAddress( "fracLow", fraclow );
+		}
+		else
+		{
+			for( int i = 0; i < VDST_MAXTELESCOPES; i++ )
+			{
+				fraclow[i] = 0.;
+			}
+		}
 		if( fVersion > 2 )
 		{
 			fChain->SetBranchAddress( "loss", loss );
@@ -778,6 +791,7 @@ void CData::Init( TTree* tree )
 			dist[i] = 0.;
 			size[i] = 0.;
 			size2[i] = 0.;
+                        fraclow[i] = 0.;
 			loss[i] = 0.;
 			max1[i] = 0.;
 			max2[i] = 0.;
@@ -1004,6 +1018,7 @@ Bool_t CData::Notify()
 	b_dist = fChain->GetBranch( "dist" );
 	b_size = fChain->GetBranch( "size" );
 	b_size2 = fChain->GetBranch( "size2" );
+	b_fraclow = fChain->GetBranch( "fraclow" );
 	b_max1 = fChain->GetBranch( "max1" );
 	b_max2 = fChain->GetBranch( "max2" );
 	b_max3 = fChain->GetBranch( "max3" );
