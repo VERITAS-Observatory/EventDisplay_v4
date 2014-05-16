@@ -4,27 +4,25 @@
 # qsub parameters
 h_cpu=12:29:00; h_vmem=4000M; tmpdir_size=1G
 
-if [[ $# < 2 ]]; then
+if [ $# -ne 4 ]; then
 # begin help message
 echo "
 ANASUM parallel data analysis: submit jobs from an anasum run list
 
-ANALYSIS.anasum_parallel.sh <anasum run list> <output directory> [run parameter
- file] [mscw directory]
+ANALYSIS.anasum_parallel.sh <anasum run list> <mscw directory>
+ <output directory> <run parameter file>
 
 required parameters:
 
     <anasum run list>       full anasum run list
     
+    <mscw directory>        directory containing the mscw.root files
+    
     <output directory>      anasum output files are written to this directory
-    
-optional parameters:
 
-    [run parameter file]    anasum run parameter file (located in 
-                            \$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/;
-                            default is ANASUM.runparameter)
-    
-    [mscw directory]        directory containing the mscw.root files
+    <run parameter file>    anasum run parameter file
+                            (in \$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/;
+                             see ANASUM.runparameter for an example)
 
 IMPORTANT! Run ANALYSIS.anasum_combine.sh once all parallel jobs have finished!
 
@@ -35,26 +33,30 @@ exit
 fi
 
 # Run init script
-bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
+bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
 # Parse command line arguments
 FLIST=$1
-ODIR=$2
-[[ "$3" ]] && RUNP=$3  || RUNP="ANASUM.runparameter"
-[[ "$4" ]] && INDIR=$4 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID0"
+INDIR=$2
+ODIR=$3
+RUNP=$4
 
 # Check that run list exists
-if [[ ! -f "$FLIST" ]]; then
+if [ ! -f "$FLIST" ]; then
     echo "Error, anasum runlist $FLIST not found, exiting..."
     exit 1
 fi
+
+# create extra stdout for duplication of command output
+# look for ">&5" below
+exec 5>&1
 
 # Check that run parameter file exists
 if [[ "$RUNP" == `basename $RUNP` ]]; then
     RUNP="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/$RUNP"
 fi
-if [[ ! -f "$RUNP" ]]; then
+if [ ! -f "$RUNP" ]; then
     echo "Error, anasum run parameter file '$RUNP' not found, exiting..."
     exit 1
 fi
@@ -62,22 +64,19 @@ fi
 # directory for run scripts
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/ANASUM.ANADATA"
-echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # temporary run list
 DATECODE=`date +%Y%m%d`
 TEMPLIST=`basename $FLIST`
 TEMPLIST="$LOGDIR/$DATECODE.PID$$.$TEMPLIST.tmp"
-echo -e "Temporary run list written to:\n $TEMPLIST"
 rm -f $TEMPLIST
 cat $FLIST | grep "*" >> $TEMPLIST
 
 # output directory
-echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
 ODIRBASE=`basename $ODIR`
-echo -e "Output directory base name:\n $ODIRBASE"
+echo "Output directory base name: $ODIRBASE"
 
 # get list of runs
 NLINES=`cat $TEMPLIST | wc -l`
@@ -104,8 +103,8 @@ for ((i=1; i <= $NLINES; i++)); do
 
         # prepare run scripts
         FSCRIPT="$LOGDIR/qsub_analyse-$DATE-RUN$RUN"
-        echo "Run script written to: $FSCRIPT"
-        echo "Temporary run list written to: $RUNTEMPLIST"
+        echo "Run script written to $FSCRIPT"
+        echo "Temporary run list written to $RUNTEMPLIST"
 
         sed -e "s|FILELIST|$RUNTEMPLIST|" \
             -e "s|DATADIR|$INDIR|"        \
@@ -134,7 +133,6 @@ for ((i=1; i <= $NLINES; i++)); do
                 echo "RUN $RUN OLOG $FSCRIPT.sh.o$JOBID"
                 echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
             fi
-            
         elif [[ $SUBC == *parallel* ]]; then
             echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
         fi
