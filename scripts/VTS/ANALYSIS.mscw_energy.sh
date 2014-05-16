@@ -4,7 +4,7 @@
 # qsub parameters
 h_cpu=00:29:00; h_vmem=2000M; tmpdir_size=4G
 
-if [[ $# < 2 ]]; then
+if [ $# -lt 3 ]; then
 # begin help message
 echo "
 MSCW_ENERGY data analysis: submit jobs from a simple run list
@@ -16,19 +16,20 @@ required parameters:
 
     <runlist>               simple run list with one run number per line
     
-    <table file>            mscw_energy lookup table file (located in 
-                             \$VERITAS_EVNDISP_AUX_DIR/Tables)
+    <evndisp directory>     directory containing evndisp output ROOT files
+    
+    <table file>            mscw_energy lookup table file
     
 optional parameters:
+(use only when processing files for creating radial acceptances)
     
     [Rec ID]                reconstruction ID
+                            (see EVNDISP.reconstruction.runparameter)
                             Set to 0 for all telescopes, 1 to cut T1, etc.
-                            (use only when making radial acceptances)
-                            
-    [evndisp directory]     directory containing evndisp output ROOT files
     
     [output directory]      directory where mscw.root files are written
-                            default: [evndisp directory]/RecID#
+                            default: <evndisp directory>
+                            default with Rec ID: <evndisp directory>/RecID#
 
 --------------------------------------------------------------------------------
 "
@@ -37,41 +38,50 @@ exit
 fi
 
 # Run init script
-bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
+bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
+
+# create extra stdout for duplication of command output
+# look for ">&5" below
+exec 5>&1
 
 # Parse command line arguments
 RLIST=$1
-TABFILE=$2
+INPUTDIR=$2
+TABFILE=$3
 TABFILE=${TABFILE%%.root}.root
-[[ "$3" ]] && ID=$3    || ID=0
-[[ "$4" ]] && INDIR=$4 || INDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
-[[ "$5" ]] && ODIR=$5  || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/RecID$ID"
+[[ "$4" ]] && ID=$4 || ID=0
+if [[ "$5" ]]; then
+    ODIR=$5
+elif [[ "$4" ]]; then
+    # user passed a Rec ID value
+    ODIR=$INPUTDIR/RecID$ID
+else
+    ODIR=$INPUTDIR
+fi
 
 # Read runlist
-if [[ ! -f "$RLIST" ]]; then
+if [ ! -f "$RLIST" ] ; then
     echo "Error, runlist $RLIST not found, exiting..."
     exit 1
 fi
-RUNNUMS=`cat $RLIST`
+FILES=`cat $RLIST`
 
 # Check that table file exists
 if [[ "$TABFILE" == `basename $TABFILE` ]]; then
     TABFILE="$VERITAS_EVNDISP_AUX_DIR/Tables/$TABFILE"
 fi
-if [[ ! -f "$TABFILE" ]]; then
+if [ ! -f "$TABFILE" ]; then
     echo "Error, table file '$TABFILE' not found, exiting..."
     exit 1
 fi
 
 # make output directory if it doesn't exist
-echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
 
 # run scripts are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANADATA"
-echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
 # Job submission script
@@ -79,17 +89,18 @@ SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.mscw_energy_sub"
 
 #########################################
 # loop over all files in files loop
-for RUN in $RUNNUMS; do
-    RUNFILE="$INDIR/$RUN.root"
-    echo "Now analysing $RUNFILE (ID=$ID)"
+for AFILE in $FILES
+do
+    BFILE="$INPUTDIR/$AFILE.root"
+    echo "Now analysing $BFILE (ID=$ID)"
 
-    FSCRIPT="$LOGDIR/MSCW.data-ID$ID-$RUN"
+    FSCRIPT="$LOGDIR/MSCW.data-ID$ID-$AFILE"
     rm -f $FSCRIPT.sh
 
     sed -e "s|TABLEFILE|$TABFILE|" \
         -e "s|RECONSTRUCTIONID|$ID|" \
         -e "s|OUTPUTDIRECTORY|$ODIR|" \
-        -e "s|EVNDISPFILE|$RUNFILE|" $SUBSCRIPT.sh > $FSCRIPT.sh
+        -e "s|EVNDISPFILE|$BFILE|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
     echo $FSCRIPT.sh
@@ -112,7 +123,6 @@ for RUN in $RUNNUMS; do
             echo "RUN $RUN OLOG $FSCRIPT.sh.o$JOBID"
             echo "RUN $RUN ELOG $FSCRIPT.sh.e$JOBID"
         fi
-        
     elif [[ $SUBC == *parallel* ]]; then
         echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
     fi
