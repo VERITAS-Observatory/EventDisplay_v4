@@ -352,6 +352,12 @@ void VDataMCComparision::defineHistograms()
 		hTel.push_back( hsize2.back() );
 		hisList->Add( hsize2.back() );
 
+		sprintf( hname, "hsizeLG_%d_%s", i, fName.c_str() );
+		hsizeLG.push_back( new TH1D( hname, "", 100, 1., 8.0 ) );
+		hsizeLG.back()->SetXTitle( "log_{10} size_{low gain} [d.c.]" );
+		hTel.push_back( hsizeLG.back() );
+		hisList->Add( hsizeLG.back() );
+
 		sprintf( hname, "hfraclow_%d_%s", i, fName.c_str() );
 		hfraclow.push_back( new TH1D( hname, "", 100, 0., 1.0 ) );
 		hfraclow.back()->SetXTitle( "fraclow" );
@@ -988,6 +994,10 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 					if( fData->size2[j] > 0. )
 					{
 						hsize2[j]->Fill( log10( fData->size2[j] ), weight );
+					}
+					if( fData->size2[j] > 0. && fData->fraclow[j] > 0. )
+					{
+						hsizeLG[j]->Fill( log10( fData->size2[j] * fData->fraclow[j] ), weight );
 					}
                                         hfraclow[j]->Fill( fData->fraclow[j], weight );
 					if( fData->max1[j] > 0. )

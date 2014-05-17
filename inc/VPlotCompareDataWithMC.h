@@ -67,7 +67,7 @@ class VPlotCompareDataWithMC
 		void mwr_vs_energy_plots( int iRebin = 4, double xmin =  0.5, double xmax = 1.5 );
 		void multiplicity_plots();
 		bool openDataFile( string ifile );
-		void plot( string iPrintName );
+		void plot( string iPrintName = "" );
 		void single_telescope( int telid = -1 );
 		void single_telescope( int telid, string iPlot, bool iOneCanvas = true,
 							   int iScalingMethod = 1, int i_rebin = 1 );
