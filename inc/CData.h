@@ -25,7 +25,6 @@ class CData
 	public :
 	
 		bool            fMC;
-		bool            fBOOLSecondMax;
 		bool            fBOOLtheta2_All;
 		bool            fBOOLteltype;
 		bool            fBOOLdE;
@@ -340,6 +339,14 @@ class CData
 		virtual void     Loop();
 		virtual Bool_t   Notify();
 		virtual void     Show( Long64_t entry = -1 );
+                bool             isFrogs()
+                {
+                        return fFrogs;
+                }
+                bool             isModel3D()
+                {
+                        return fModel3D;
+                }
 		bool             isMC()
 		{
 			return fMC;
@@ -358,7 +365,6 @@ CData::CData( TTree* tree, bool bMC, int iVersion, bool bShort )
 	fMC = bMC;
 	fShort = bShort;
 	fVersion = iVersion;
-	fBOOLSecondMax = false;
 	fBOOLtheta2_All = false;
 	fBOOLteltype = false;
 	fBOOLdE = false;
@@ -459,11 +465,6 @@ void CData::Init( TTree* tree )
 	{
 		fMC = true;
 	}
-	// test if second max branch exists
-	if( tree->GetBranchStatus( "SizeSecondMax" ) )
-	{
-		fBOOLSecondMax = true;
-	}
 	if( tree->GetBranchStatus( "theta2_All" ) )
 	{
 		fBOOLtheta2_All = true;
@@ -479,7 +480,7 @@ void CData::Init( TTree* tree )
 		fBOOLdE = true;
 	}
 	// test if frogs stuff exists
-	if( tree->GetBranchStatus( "frogsEventID" ) )
+	if( tree->GetBranch( "frogsEventID" ) )
 	{
 		fFrogs = true;
 	}
@@ -657,14 +658,7 @@ void CData::Init( TTree* tree )
 		}
 	}
 	
-	if( fBOOLSecondMax )
-	{
-		fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
-	}
-	else
-	{
-		SizeSecondMax = 0.;
-	}
+        fChain->SetBranchAddress( "SizeSecondMax", &SizeSecondMax );
 	
 	if( fBOOLtheta2_All )
 	{
@@ -925,6 +919,24 @@ void CData::Init( TTree* tree )
 		fChain->SetBranchAddress( "ErrRWidth3D", &ErrRWidth3D );
 		fChain->SetBranchAddress( "Converged3D", &Converged3D );
 	}
+        else
+        {
+              Smax3D = 0.;
+              sigmaL3D = 0.;
+              sigmaT3D = 0.;
+              Nc3D = 0.;
+              Xcore3D = 0.;
+              Ycore3D = 0.;
+              Xoff3D = 0.;
+              Yoff3D = 0.;
+              XoffDeRot3D = 0.;
+              YoffDeRot3D = 0.;
+              Goodness3D = 0.;
+              Depth3D = 0.;
+              RWidth3D = 0.;
+              ErrRWidth3D = 0.;
+              Converged3D = false;
+        }
 	
 	Notify();
 }
@@ -997,14 +1009,7 @@ Bool_t CData::Notify()
 		b_meanPedvar_ImageT = 0;
 	}
 	
-	if( fBOOLSecondMax )
-	{
-		b_SizeSecondMax = fChain->GetBranch( "SizeSecondMax" );
-	}
-	else
-	{
-		b_SizeSecondMax = 0;
-	}
+        b_SizeSecondMax = fChain->GetBranch( "SizeSecondMax" );
 	
 	if( fBOOLtheta2_All )
 	{
@@ -1094,6 +1099,24 @@ Bool_t CData::Notify()
 		b_ErrRWidth3D = fChain->GetBranch( "ErrRWidth3D" );
 		b_Converged3D = fChain->GetBranch( "Converged3D" );
 	}
+        else
+        {
+		b_Smax3D = 0;
+		b_sigmaL3D = 0;
+		b_sigmaT3D = 0;
+		b_Nc3D = 0;
+		b_Xcore3D = 0;
+		b_Ycore3D = 0;
+		b_Xoff3D = 0;
+		b_Yoff3D = 0;
+		b_XoffDeRot3D = 0;
+		b_YoffDeRot3D = 0;
+		b_Goodness3D = 0;
+		b_Depth3D  = 0;
+		b_RWidth3D = 0;
+		b_ErrRWidth3D = 0;
+		b_Converged3D = 0;
+        }
 	
 	if( fFrogs )
 	{
@@ -1129,6 +1152,38 @@ Bool_t CData::Notify()
 		fChain->SetBranchAddress( "frogsTelGoodnessBkg2", &frogsTelGoodnessBkg2 );
 		fChain->SetBranchAddress( "frogsTelGoodnessBkg3", &frogsTelGoodnessBkg3 );
 	}
+        else
+        {
+                frogsEventID = 0;
+                frogsGSLConStat = 0;
+                frogsNB_iter = 0;
+                frogsNImages = 0;
+                frogsXS = 0.;
+                frogsXSerr = 0.;
+                frogsYS = 0.;
+                frogsYSerr = 0.;
+                frogsXP = 0.;
+                frogsXPerr = 0.;
+                frogsYP = 0.;
+                frogsYPerr = 0.;
+                frogsXPGC = 0.;
+                frogsYPGC = 0.;
+                frogsEnergy = 0.;
+                frogsEnergyerr = 0.;
+                frogsLambda = 0.;
+                frogsLambdaerr = 0.;
+                frogsGoodnessImg = 0.;
+                frogsNpixImg = 0;
+                frogsGoodnessBkg = 0.;
+                frogsNpixBkg = 0;
+                frogsTelGoodnessImg0 = 0.;
+                frogsTelGoodnessImg1 = 0.;
+                frogsTelGoodnessImg2 = 0.;
+                frogsTelGoodnessImg3 = 0.;
+                frogsTelGoodnessBkg1 = 0.;
+                frogsTelGoodnessBkg2 = 0.;
+                frogsTelGoodnessBkg3 = 0.;
+        }
 	
 	return kTRUE;
 }

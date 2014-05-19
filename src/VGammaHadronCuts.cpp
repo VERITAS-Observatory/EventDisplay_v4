@@ -1441,6 +1441,12 @@ bool VGammaHadronCuts::applyTMVACut( int i )
 
 bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 {
+        if( !fData->isFrogs() )
+        {
+            cout << "VGammaHadronCuts::applyFrogsCut error: input data (mscw file) without frogs data" << endl;
+            cout << "exiting..." << endl;
+            exit( EXIT_FAILURE );
+        }
 
 	if( fData->frogsEnergy < -99. )
 	{
@@ -2456,8 +2462,16 @@ bool VGammaHadronCuts::setIRFGraph( TGraphErrors* g )
 		cout << "VGammaHadronCuts::setIRFGraph warning: IRF pointer is zero" << endl;
 		return false;
 	}
-	
-	fIRFAngRes = ( TGraphErrors* )g->Clone();
+
+        fIRFAngRes = new TGraphErrors( 1 );
+        double x = 0.;
+        double y = 0.;
+        for( int i = 0; i < g->GetN(); i++ )
+        {
+            g->GetPoint( i, x, y );
+            fIRFAngRes->SetPoint( i, x, y );
+            fIRFAngRes->SetPointError( i, g->GetErrorX( i ), g->GetErrorY( i ) ); 
+        }
 	fIRFAngRes->SetName( "IRFAngRes" );
 	
 	// print results

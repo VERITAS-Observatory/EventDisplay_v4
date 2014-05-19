@@ -822,7 +822,7 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		if( fCuts )
 		{
 			fCuts->Write();
-		}
+		} 
 		fTimeMask->writeObjects();
 		if( bOn )
 		{
@@ -1982,7 +1982,6 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
 			fDataRunTree->AddFriend( fDataFrogsTree );
 		}
 		c = new CData( fDataRunTree );
-		
 	}
 	return c;
 }
