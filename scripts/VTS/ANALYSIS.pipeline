@@ -35,6 +35,9 @@ CWD=$PWD
 # (full path please)
 RUNLIST="$CWD/runlist.crab.dat"
 
+## use Model3D (yes/no)##
+USEMODEL3D="no"
+
 # What kind of cuts do you want to use?
 # Currently supports 'soft', 'moderate', or 'hard'
 CUTS="moderate"
@@ -362,7 +365,10 @@ if [[ "$STAGE" == "evndisp" ]] ; then
 		cd $EVNDISPSYS/scripts/VTS
         if [[ "$DOCALIB" = yes ]] ; then CALIBCODE=1
         else                             CALIBCODE=0 ; fi
-		QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE | tee >(cat - >&5) )  ####### EVNDISP
+        VPM=1 ## on by default
+        if [[ "$USEMODEL3D" == "yes" ]] ; then MODEL3D=1
+        else                                   MODEL3D=0 ; fi
+                QSUBDATA=$(./ANALYSIS.evndisp.sh $RUNLIST $EVNDISPOUTPUTDIR $CALIBCODE $VPM $MODEL3D | tee >(cat - >&5) )
 		rm -rf "$EVNJOBSUB"
 		echo "$QSUBDATA" > "$EVNJOBSUB"
 		updateRunningJobFile "$QSUBDATA"
