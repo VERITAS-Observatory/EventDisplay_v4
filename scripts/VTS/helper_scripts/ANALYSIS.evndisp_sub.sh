@@ -12,11 +12,6 @@ VPM=USEVPMPOINTING
 MODEL3D=USEMODEL3D
 LOGDIR="$ODIR"
 
-# Use FROGS if MSCWDIR is not null
-if [[ -n $MSCWDIR ]]; then
-    USEFROGS=true
-fi
-
 # temporary (scratch) directory
 if [[ -n $TMPDIR ]]; then
     TEMPDIR=$TMPDIR/$RUN

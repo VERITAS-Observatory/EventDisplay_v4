@@ -4,25 +4,24 @@
 # qsub parameters
 h_cpu=00:29:00; h_vmem=2000M; tmpdir_size=4G
 
-if [ $# -lt 3 ]; then
+if [ $# -lt 2 ]; then
 # begin help message
 echo "
 MSCW_ENERGY data analysis: submit jobs from a simple run list
 
-ANALYSIS.mscw_energy.sh <runlist> <evndisp directory> <table file> [Rec ID]
- [output directory]
+ANALYSIS.mscw_energy.sh <runlist> <table file> [evndisp directory] [Rec ID] [output directory]
 
 required parameters:
 
     <runlist>               simple run list with one run number per line
     
-    <evndisp directory>     directory containing evndisp output ROOT files
     
     <table file>            mscw_energy lookup table file
     
 optional parameters:
-(use only when processing files for creating radial acceptances)
     
+    [evndisp directory]     directory containing evndisp output ROOT files
+
     [Rec ID]                reconstruction ID
                             (see EVNDISP.reconstruction.runparameter)
                             Set to 0 for all telescopes, 1 to cut T1, etc.
@@ -37,6 +36,9 @@ optional parameters:
 exit
 fi
 
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
+
 # Run init script
 bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
@@ -47,9 +49,9 @@ exec 5>&1
 
 # Parse command line arguments
 RLIST=$1
-INPUTDIR=$2
-TABFILE=$3
+TABFILE=$2
 TABFILE=${TABFILE%%.root}.root
+[[ "$3" ]] && INPUTDIR=$3 || INPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
 [[ "$4" ]] && ID=$4 || ID=0
 if [[ "$5" ]]; then
     ODIR=$5
@@ -78,11 +80,13 @@ fi
 
 # make output directory if it doesn't exist
 mkdir -p $ODIR
+echo -e "Output files will be written to:\n $ODIR"
 
 # run scripts are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.ANADATA"
 mkdir -p $LOGDIR
+echo -e "Log files will be written to:\n $LOGDIR"
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/ANALYSIS.mscw_energy_sub"

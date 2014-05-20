@@ -9,16 +9,16 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP data analysis: submit jobs from a simple run list
 
-ANALYSIS.evndisp.sh <runlist> <output directory> [calibration] [VPM] [Model3D] [mscw directory]
+ANALYSIS.evndisp.sh <runlist> [output directory] [calibration] [VPM] [Model3D]
 
 required parameters:
 
     <runlist>               simple run list with one run number per line
     
-    <output directory>      directory where output ROOT files will be stored
-
 optional parameters:
     
+    [output directory]      directory where output ROOT files will be stored
+
     [calibration]
           1                 pedestal & average tzero calculation (default)
           2                 pedestal calculation only
@@ -28,10 +28,6 @@ optional parameters:
 
     [Model3D]               set to 1 to switch on  (default is off)
     
-    [mscw directory]        directory which contains mscw_energy files
-                            only used by frogs analysis, and 
-                            only if \$USEFROGS=true
-
 --------------------------------------------------------------------------------
 "
 #end help message
@@ -42,23 +38,20 @@ fi
 bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+
 # create extra stdout for duplication of command output
 # look for ">&5" below
 exec 5>&1
 
 # Parse command line arguments
 RLIST=$1
-ODIR=$2
+[[ "$2" ]] && ODIR=$2 || ODIR="$VERITAS_USER_DATA_DIR/analysis/Results/$EDVERSION/"
 mkdir -p $ODIR
 [[ "$3" ]] && CALIB=$3 || CALIB=1
 [[ "$4" ]] && VPM=$4   || VPM=1
 [[ "$5" ]] && MODEL3D=$5 || MODEL3D=0
-
-if [ $USEFROGS ] ; then
-    [[ "$6" ]] && FROGSMSCWDIR="$6"
-else
-    [[ "$6" ]] && FROGSMSCWDIR="EMPTY-set_in_ANALYSIS.evndisp.sh"
-fi
 
 # Read runlist
 if [ ! -f "$RLIST" ] ; then
@@ -85,7 +78,6 @@ do
     sed -e "s|RUNFILE|$AFILE|"              \
         -e "s|CALIBRATIONOPTION|$CALIB|"    \
         -e "s|OUTPUTDIRECTORY|$ODIR|"       \
-        -e "s|MSCWDIRECTORY|$FROGSMSCWDIR|" \
         -e "s|USEVPMPOINTING|$VPM|" \
         -e "s|USEMODEL3D|$MODEL3D|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
