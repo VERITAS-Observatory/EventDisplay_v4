@@ -9,6 +9,7 @@ RUN=RUNFILE
 CALIB=CALIBRATIONOPTION
 ODIR=OUTPUTDIRECTORY
 VPM=USEVPMPOINTING
+MODEL3D=USEMODEL3D
 LOGDIR="$ODIR"
 
 # Use FROGS if MSCWDIR is not null
@@ -85,6 +86,12 @@ fi
 #
 ## double pass correction
 # OPT+=( -nodp2005 )
+
+# Command line options for Model3D
+if [[ $MODEL3D == "1" ]]; then
+    OPT+=( -model3d -lnlfile "$VERITAS_EVNDISP_AUX_DIR/Tables/table_LnL.root" )
+fi
+
 
 #########################################
 # run eventdisplay
