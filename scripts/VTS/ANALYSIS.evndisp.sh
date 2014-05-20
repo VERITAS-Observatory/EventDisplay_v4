@@ -9,7 +9,7 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP data analysis: submit jobs from a simple run list
 
-ANALYSIS.evndisp.sh <runlist> <output directory> [calibration] [VPM] [mscw directory]
+ANALYSIS.evndisp.sh <runlist> <output directory> [calibration] [VPM] [Model3D] [mscw directory]
 
 required parameters:
 
@@ -25,6 +25,8 @@ optional parameters:
           3                 average tzero calculation only
 
     [VPM]                   set to 0 to switch off (default is on)
+
+    [Model3D]               set to 1 to switch on  (default is off)
     
     [mscw directory]        directory which contains mscw_energy files
                             only used by frogs analysis, and 
@@ -50,11 +52,12 @@ ODIR=$2
 mkdir -p $ODIR
 [[ "$3" ]] && CALIB=$3 || CALIB=1
 [[ "$4" ]] && VPM=$4   || VPM=1
+[[ "$5" ]] && MODEL3D=$5 || MODEL3D=0
 
 if [ $USEFROGS ] ; then
-    [[ "$5" ]] && FROGSMSCWDIR="$5"
+    [[ "$6" ]] && FROGSMSCWDIR="$6"
 else
-    [[ "$5" ]] && FROGSMSCWDIR="EMPTY-set_in_ANALYSIS.evndisp.sh"
+    [[ "$6" ]] && FROGSMSCWDIR="EMPTY-set_in_ANALYSIS.evndisp.sh"
 fi
 
 # Read runlist
@@ -83,7 +86,8 @@ do
         -e "s|CALIBRATIONOPTION|$CALIB|"    \
         -e "s|OUTPUTDIRECTORY|$ODIR|"       \
         -e "s|MSCWDIRECTORY|$FROGSMSCWDIR|" \
-        -e "s|USEVPMPOINTING|$VPM|" $SUBSCRIPT.sh > $FSCRIPT.sh
+        -e "s|USEVPMPOINTING|$VPM|" \
+        -e "s|USEMODEL3D|$MODEL3D|" $SUBSCRIPT.sh > $FSCRIPT.sh
 
     chmod u+x $FSCRIPT.sh
     echo $FSCRIPT.sh
