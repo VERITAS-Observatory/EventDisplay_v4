@@ -26,9 +26,9 @@ mkdir -p $DDIR
 echo "Temporary directory: $DDIR"
 
 # mscw_energy command line options
-MOPT="-noNoTrigger -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TABFILE"
+MOPT="-noNoTrigger -noshorttree -nomctree -writeReconstructedEventsOnly=1 -arrayrecid=$RECID -tablefile $TABFILE"
 # use short output tree
-MOPT="-shorttree $MOPT"
+# MOPT="-shorttree $MOPT"
 
 # run mscw_energy
 rm -f $ODIR/$OFILE.log

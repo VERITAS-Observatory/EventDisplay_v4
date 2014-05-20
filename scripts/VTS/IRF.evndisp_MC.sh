@@ -1,23 +1,20 @@
 #!/bin/bash
 # submit evndisp for grisu/care simulations (analyse all noise levels at the same time)
+#
 
 # qsub parameters
 h_cpu=47:59:00; h_vmem=6000M; tmpdir_size=250G
 
-if [[ $# < 8 ]]; then
+if [ $# -lt 7 ]; then
 # begin help message
 echo "
 IRF generation: analyze simulation VBF files using evndisp 
 
-IRF.evndisp_MC.sh <run number> <sim directory> <epoch> <atmosphere> <zenith>
- <offset angle> <NSB level> <sim type> [particle] [FROGS] [mscw dir] [events]
+IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> [particle] [FROGS] [events]
 
 required parameters:
 
-    <run number>            artificial run number that will be used by evndisp
-                            to keep track of each sim file and param set
-
-    <sim file>              full path (including directory) of MC VBF file
+    <sim directory>         directory containing simulation VBF files
 
     <epoch>                 array epoch (e.g., V4, V5, V6)
                             V4: array before T1 move (before Fall 2009)
@@ -32,8 +29,8 @@ required parameters:
 
     <NSB level>             NSB level of simulations [MHz]
     
-    <sim type>              original VBF file simulation type (e.g. GRISU, CARE,
-                            GRISU_d201404, CARE_V1, etc.)
+    <sim type>              file simulation type (e.g. GRISU, CARE)
+                            (recognized are also types like GRISU_d201404, or CARE_V1)
 
 optional parameters:
     
@@ -42,9 +39,6 @@ optional parameters:
                             (default = 1  -->  gamma)
     
     [FROGS]                 set to 1 to use FROGS (GrISU only! default: off)
-    
-    [mscw directory]        directory which contains mscw_energy files
-                            (FROGS only; default = blank)
     
     [events]                FROGS ONLY: number of events per division
                             (default: 5000000)
@@ -58,22 +52,23 @@ exit
 fi
 
 # Run init script
-bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
+bash "$( cd "$( dirname "$0" )" && pwd )/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
 
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
+
 # Parse command line arguments
-RUNNUM=$1
-SIMDIR=$2
-EPOCH=$3
-ATM=$4
-ZA=$5
-WOBBLE=$6
-NOISE=$7
-SIMTYPE=$8
-[[ "$9" ]] && PARTICLE=$9 || PARTICLE=1
-[[ "${10}" ]] && USEFROGS=${10} || USEFROGS=0
-[[ "${11}" ]] && MSCWDIR=${11}
-[[ "${12}" ]] && NEVENTS=${12}  || NEVENTS=5000000
+SIMDIR=$1
+EPOCH=$2
+ATM=$3
+ZA=$4
+WOBBLE=$5
+NOISE=$6
+SIMTYPE=$7
+[[ "$8" ]] && PARTICLE=$8 || PARTICLE=1
+[[ "$9" ]] && USEFROGS=$9 || USEFROGS=0
+[[ "${10}" ]] && NEVENTS=${10}  || NEVENTS=5000000
 
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
@@ -82,44 +77,55 @@ PARTICLE_TYPE=${PARTICLE_NAMES[$PARTICLE]}
 # directory for run scripts
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/EVNDISP.ANAMCVBF"
-echo -e "Log files will be written to:\n $LOGDIR"
 mkdir -p $LOGDIR
 
-# output directory for evndisp products
-if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
-    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}"
-else
-    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}"
+# output directory for evndisp products (will be manipulated more later in the script)
+if [[ ! -z "$VERITAS_IRFPRODUCTION_DIR" ]]; then
+    ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}"
 fi
+
 [[ $USEFROGS != 0 ]] && ODIR="${ODIR}_FROGS"
-ODIR="$ODIR/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
-echo -e "Output files will be written to:\n $ODIR"
+echo "Output files will be written to: $ODIR"
 mkdir -p $ODIR
 
+# Create a unique set of run numbers
+if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+    [[ $EPOCH == "V4" ]] && RUNNUM="946500"
+    [[ $EPOCH == "V5" ]] && RUNNUM="956500"
+    [[ $EPOCH == "V6" ]] && RUNNUM="966500"
+elif [ ${SIMTYPE:0:4} = "CARE" ]; then
+    [[ $EPOCH == "V4" ]] && RUNNUM="941200"
+    [[ $EPOCH == "V5" ]] && RUNNUM="951200"
+    [[ $EPOCH == "V6" ]] && RUNNUM="961200"
+fi
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.evndisp_MC_sub"
 
 INT_WOBBLE=`echo "$WOBBLE*100" | bc | awk -F '.' '{print $1}'`
-if [[ ${#INT_WOBBLE} < 2 ]]; then
+if [[ ${#INT_WOBBLE} -lt 2 ]]; then
    INT_WOBBLE="000"
-elif [[ ${#INT_WOBBLE} < 3 ]]; then
+elif [[ ${#INT_WOBBLE} -lt 3 ]]; then
    INT_WOBBLE="0$INT_WOBBLE"
 fi
 
+# output dir
+OPDIR=$ODIR"/ze"$ZA"deg_offset"$WOBBLE"deg_NSB"$NOISE"MHz"
+mkdir -p $OPDIR
+echo $OPDIR
+
 # make run script
 FSCRIPT="$LOGDIR/evn-$SIMTYPE-$ZA-$WOBBLE-$NOISE-$EPOCH-ATM$ATM"
-sed -e "s|RUNNUMBER|$RUNNUM|" \
-    -e "s|MCVBFDIR|$SIMDIR|" \
+sed -e "s|DATADIR|$SIMDIR|" \
+    -e "s|RUNNUMBER|$RUNNUM|" \
     -e "s|ZENITHANGLE|$ZA|" \
     -e "s|ATMOSPHERE|$ATM|" \
-    -e "s|OUTPUTDIR|$ODIR|" \
+    -e "s|OUTPUTDIR|$OPDIR|" \
     -e "s|DECIMALWOBBLE|$WOBBLE|" \
     -e "s|INTEGERWOBBLE|$INT_WOBBLE|" \
     -e "s|NOISELEVEL|$NOISE|" \
     -e "s|ARRAYEPOCH|$EPOCH|" \
     -e "s|FROGSFROGS|$USEFROGS|" \
-    -e "s|FROGSMSCWDIR|$MSCWDIR|" \
     -e "s|FROGSEVENTS|$NEVENTS|" \
     -e "s|SIMULATIONTYPE|$SIMTYPE|" \
     -e "s|PARTICLETYPE|$PARTICLE|" $SUBSCRIPT.sh > $FSCRIPT.sh
@@ -131,10 +137,14 @@ echo $FSCRIPT.sh
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    JOBID=`$SUBC $FSCRIPT.sh`
-    echo "RUN $RUNNUM: JOBID $JOBID"
+    $SUBC $FSCRIPT.sh
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
+fi
+                
+# Execute all FSCRIPTs locally in parallel
+if [[ $SUBC == *parallel* ]]; then
+    cat $LOGDIR/runscripts.dat | $SUBC
 fi
 
 exit

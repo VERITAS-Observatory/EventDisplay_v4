@@ -1,6 +1,5 @@
 #!/bin/bash
 # combine tables
-# Author: Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS

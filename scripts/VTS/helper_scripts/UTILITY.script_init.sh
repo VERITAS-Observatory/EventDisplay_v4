@@ -26,8 +26,5 @@ fi
 # set the right observatory (environmental variables)
 source $EVNDISPSYS/setObservatory.sh VTS
 
-# EventDisplay version
-export EDVERSION=`$EVNDISPSYS/bin/evndisp --version | tr -d .`
-
 # return 0 if successful
 exit 0

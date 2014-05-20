@@ -31,7 +31,7 @@ required parameters:
     <Rec ID>                reconstruction ID
                             (see EVNDISP.reconstruction.runparameter)
     
-    <sim type>              original VBF file simulation type (e.g. GRISU, CARE)
+    <sim type>              simulation type (e.g. GRISU, CARE)
     
 --------------------------------------------------------------------------------
 "
@@ -42,6 +42,9 @@ fi
 # Run init script
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
+
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/mscw_energy --version | tr -d .`
 
 # Parse command line arguments
 EPOCH=$1
@@ -56,8 +59,6 @@ PARTICLE_TYPE="gamma"
 # input directory containing evndisp products
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
     INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
-else
-    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/ze${ZA}deg_offset${WOBBLE}deg_NSB${NOISE}MHz"
 fi
 if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
@@ -69,8 +70,6 @@ echo "Input file directory: $INDIR"
 # Output file directory
 if [[ ! -z $VERITAS_IRFPRODUCTION_DIR ]]; then
     ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/Tables"
-else
-    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/Tables"
 fi
 echo "Output file directory: $ODIR"
 mkdir -p $ODIR
