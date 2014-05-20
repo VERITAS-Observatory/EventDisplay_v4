@@ -1043,7 +1043,7 @@ void VImageParameterCalculation::calcParameters()
 				for( unsigned int n = 0; n < getDetectorGeo()->getNeighbours()[j].size(); n++ )
 				{
 					unsigned int k = getDetectorGeo()->getNeighbours()[j][n];
-					if( k < fData->getDead().size() && fData->getDead()[k] )
+					if( k < fData->getDead().size() && fData->getDead(k, fData->getHiLo()[k] ) )
 					{
 						sumDeadRing += si;
 						iDead = true;
@@ -1476,7 +1476,7 @@ vector<bool> VImageParameterCalculation::calcLL( bool iUseSums2 )
 	for( unsigned int j = 0; j < fData->getSums().size(); j++ )
 	{
 		// ignore dead channels
-		if( fData->getDead( fData->getHiLo()[j] )[j] )
+		if( fData->getDead( j, fData->getHiLo()[j] ) )
 		{
 			continue;
 		}
