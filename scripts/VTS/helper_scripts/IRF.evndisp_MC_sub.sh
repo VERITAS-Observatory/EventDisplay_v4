@@ -46,7 +46,6 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         elif [[ $PARTICLE == "14" ]]; then
             VBFNAME="proton_${ZA}deg_750m_wobble${WOB}_2008_2009_"
         fi
-        CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
         NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
         echo "Noise File: $NOISEFILE"
     elif [[ $EPOCH == "V5" ]]; then
@@ -57,7 +56,6 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         elif [[ $PARTICLE == "402" ]]; then
             VBFNAME="helium_${ZA}deg_w${WOB}_"
         fi
-        CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
         NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE$NOISE.grisu"
         echo "Noise File: $NOISEFILE"
     elif [[ $EPOCH == "V6" ]]; then
@@ -75,7 +73,6 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
         elif [[ $PARTICLE == "402" ]]; then
             VBFNAME="helium_${ZA}deg_w${WOB}_"
         fi
-        CFG="EVN_V6_Upgrade_20121127_v420.txt"
         NOISEFILE="$OBS_EVNDISP_ANA_DIR/NOISE/NOISE${NOISE}_20120827_v420.grisu"
         echo "Noise File: $NOISEFILE"
     fi
@@ -85,11 +82,11 @@ elif [ ${SIMTYPE:0:4} == "CARE" ]; then
     [[ $PARTICLE == "2" ]]  && VBFNAME="electron_${ZA}deg_noise${NOISE}MHz___"
     [[ $PARTICLE == "14" ]] && VBFNAME="proton_${ZA}deg_noise${NOISE}MHz___"
 
-    # detector configuration
-    [[ $EPOCH == "V4" ]] && CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
-    [[ $EPOCH == "V5" ]] && CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
-    [[ $EPOCH == "V6" ]] && CFG="EVN_V6_Upgrade_20121127_v420_CARE.txt"
 fi
+# detector configuration
+[[ $EPOCH == "V4" ]] && CFG="EVN_V4_Oct2012_oldArrayConfig_20130428_v420.txt"
+[[ $EPOCH == "V5" ]] && CFG="EVN_V5_Oct2012_newArrayConfig_20121027_v420.txt"
+[[ $EPOCH == "V6" ]] && CFG="EVN_V6_Upgrade_20121127_v420.txt"
     
 
 # temporary directory
@@ -138,7 +135,7 @@ VBF_FILE="$DDIR/$VBF_FILE"
 # Low gain calibration
 mkdir -p $ODIR/Calibration
 if [[ ! -f $ODIR/Calibration/calibrationlist.LowGain.dat ]]; then
-    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGain.dat $ODIR/Calibration/
+    cp -f $VERITAS_EVNDISP_AUX_DIR/Calibration/calibrationlist.LowGainForCare.dat $ODIR/Calibration/calibrationlist.LowGain.dat
 fi
 
 ###############################################
