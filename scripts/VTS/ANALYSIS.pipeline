@@ -209,6 +209,13 @@ DEBUGREGEX="WHITEBOARD"
 # to allow for very fast testing
 export FASTDEVMODE=no
 
+# settings file, any settings in this file will override the above settings
+SETTINGSFILE="analysis.config"
+if [ -f "$SETTINGSFILE" ] ; then
+	echo "Loading settings from settings file '$SETTINGSFILE'..."
+	source "$SETTINGSFILE"
+fi
+
 # needed to transfer files from evndisp to mscw stage and to anpar stage
 
 STAGE=$1
