@@ -122,7 +122,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 	plotLegend( c, true );
 	if( iPrint.size() > 0 )
 	{
-		sprintf( hname, "%s-EffArea.eps", iPrint.c_str() );
+		sprintf( hname, "%s-EffArea.pdf", iPrint.c_str() );
 		if( c )
 		{
 			c->Print( hname );
@@ -139,7 +139,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 	plotLegend( c, false );
 	if( iPrint.size() > 0 )
 	{
-		sprintf( hname, "%s-AngRes.eps", iPrint.c_str() );
+		sprintf( hname, "%s-AngRes.pdf", iPrint.c_str() );
 		if( c )
 		{
 			c->Print( hname );
@@ -158,7 +158,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 	plotLegend( c, false );
 	if( iPrint.size() > 0 )
 	{
-		sprintf( hname, "%s-ERes.eps", iPrint.c_str() );
+		sprintf( hname, "%s-ERes.pdf", iPrint.c_str() );
 		if( c )
 		{
 			c->Print( hname );
@@ -173,7 +173,7 @@ bool VPlotWPPhysSensitivity::plotIRF( string iPrint, double iEffAreaMin, double 
 	plotLegend( c, false );
 	if( iPrint.size() > 0 )
 	{
-		sprintf( hname, "%s-EBias.eps", iPrint.c_str() );
+		sprintf( hname, "%s-EBias.pdf", iPrint.c_str() );
 		if( c )
 		{
 			c->Print( hname );
@@ -458,8 +458,8 @@ bool VPlotWPPhysSensitivity::plotSensitivityRatio( string iPrint, double ymin, d
 		if( iPrint.size() > 0 )
 		{
 			char hname[2000];
-			if( iRatoToGoal )  sprintf( hname, "%s-SensitivityRatioGoal.eps", iPrint.c_str() );
-			else               sprintf( hname, "%s-SensitivityRatio.eps", iPrint.c_str() );
+			if( iRatoToGoal )  sprintf( hname, "%s-SensitivityRatioGoal.pdf", iPrint.c_str() );
+			else               sprintf( hname, "%s-SensitivityRatio.pdf", iPrint.c_str() );
 			if( cSensRatio )
 			{
 				cSensRatio->Print( hname );
@@ -681,7 +681,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 		if( iPrint.size() > 0 )
 		{
 			char hname[2000];
-			sprintf( hname, "%s-IntegratedSensitivity.eps", iPrint.c_str() );
+			sprintf( hname, "%s-IntegratedSensitivity.pdf", iPrint.c_str() );
 			cIntSens->Print( hname );
 		}
 	}
@@ -691,7 +691,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 		if( iPrint.size() > 0 )
 		{
 			char hname[2000];
-			sprintf( hname, "%s-Sensitivity.eps", iPrint.c_str() );
+			sprintf( hname, "%s-Sensitivity.pdf", iPrint.c_str() );
 			cSens->Print( hname );
 		}
 	}
@@ -701,7 +701,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 		if( iPrint.size() > 0 )
 		{
 			char hname[2000];
-			sprintf( hname, "%s-SensitivityInter.eps", iPrint.c_str() );
+			sprintf( hname, "%s-SensitivityInter.pdf", iPrint.c_str() );
 			cSensInter->Print( hname );
 		}
 	}
@@ -711,7 +711,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
 		if( iPrint.size() > 0 )
 		{
 			char hname[2000];
-			sprintf( hname, "%s-BRates.eps", iPrint.c_str() );
+			sprintf( hname, "%s-BRates.pdf", iPrint.c_str() );
 			if( cBck )
 			{
 				cBck->Print( hname );

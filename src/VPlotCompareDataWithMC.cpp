@@ -499,7 +499,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
 	if( fPrintName.size() > 0 )
 	{
 		char hname[200];
-		sprintf( hname, "%s-Trigger.eps", fPrintName.c_str() );
+		sprintf( hname, "%s-Trigger.pdf", fPrintName.c_str() );
 		cTrigger->Print( hname );
 	}
 	
@@ -516,7 +516,7 @@ void VPlotCompareDataWithMC::multiplicity_plots()
 	if( fPrintName.size() > 0 )
 	{
 		char hname[200];
-		sprintf( hname, "%s-TriggerRel.eps", fPrintName.c_str() );
+		sprintf( hname, "%s-TriggerRel.pdf", fPrintName.c_str() );
 		cTriggerRel->Print( hname );
 	}
 	
@@ -578,14 +578,14 @@ void VPlotCompareDataWithMC::plot_singleCanvas( string iHistoName, string iCanva
 	// print the canvas
 	if( fPrintName.size() > 0 )
 	{
-		sprintf( hname, "%s-%s.eps", fPrintName.c_str(), iHistoName.c_str() );
+		sprintf( hname, "%s-%s.pdf", fPrintName.c_str(), iHistoName.c_str() );
 		cEMH->Print( hname );
 	}
 	
 	TCanvas* c = plotRelativePlots( hname, htitle, hHistogram_SIMS, hHistogram_DIFF, 0., iHistoXAxisMax );
 	if( c && fPrintName.size() > 0 )
 	{
-		sprintf( hname, "%s-%sRel.eps", fPrintName.c_str(), iHistoName.c_str() );
+		sprintf( hname, "%s-%sRel.pdf", fPrintName.c_str(), iHistoName.c_str() );
 		c->Print( hname );
 	}
 	
@@ -732,7 +732,7 @@ void VPlotCompareDataWithMC::plot_energyDependentDistributions( string iVariable
 	// print the canvas
 	if( fPrintName.size() > 0 )
 	{
-		sprintf( hname, "%s-%s-%s.eps", fPrintName.c_str(), iVariable.c_str(), iPlot.c_str() );
+		sprintf( hname, "%s-%s-%s.pdf", fPrintName.c_str(), iVariable.c_str(), iPlot.c_str() );
 		c_MS->Print( hname );
 	}
 	
@@ -916,9 +916,9 @@ void VPlotCompareDataWithMC::stereo_parameter( int msc_rebin )
 	if( fPrintName.size() > 0 )
 	{
 		char hn[200];
-		sprintf( hn, "%s-Stereo.eps", fPrintName.c_str() );
+		sprintf( hn, "%s-Stereo.pdf", fPrintName.c_str() );
 		cSD->Print( hn );
-		sprintf( hn, "%s-StereoRel.eps", fPrintName.c_str() );
+		sprintf( hn, "%s-StereoRel.pdf", fPrintName.c_str() );
 		cOO->Print( hn );
 	}
 }
@@ -1059,11 +1059,11 @@ void VPlotCompareDataWithMC::core_plots( int iRebin, int iScaling )
 	if( fPrintName.size() > 0 )
 	{
 		char hn[200];
-		sprintf( hn, "%s-Core.eps", fPrintName.c_str() );
+		sprintf( hn, "%s-Core.pdf", fPrintName.c_str() );
 		cSCore->Print( hn );
-		sprintf( hn, "%s-OnOffCore.eps", fPrintName.c_str() );
+		sprintf( hn, "%s-OnOffCore.pdf", fPrintName.c_str() );
 		cOCore->Print( hn );
-		sprintf( hn, "%s-CoreRel.eps", fPrintName.c_str() );
+		sprintf( hn, "%s-CoreRel.pdf", fPrintName.c_str() );
 		cSCoreRel->Print( hn );
 	}
 }
@@ -1312,9 +1312,9 @@ void VPlotCompareDataWithMC::distance_plots()
 	if( fPrintName.size() > 0 )
 	{
 		char hn[200];
-		sprintf( hn, "%s-Dist.eps", fPrintName.c_str() );
+		sprintf( hn, "%s-Dist.pdf", fPrintName.c_str() );
 		cSDist->Print( hn );
-		sprintf( hn, "%s-DistRel.eps", fPrintName.c_str() );
+		sprintf( hn, "%s-DistRel.pdf", fPrintName.c_str() );
 		cODist->Print( hn );
 	}
 }
@@ -1401,16 +1401,21 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 1.5 );
 	f_x_max.push_back( 6.50 );
+	hname.push_back( "sizeLG" );
+	f_rebin.push_back( 2 );
+	f_logy.push_back( 1 );
+	f_x_min.push_back( 2.5 );
+	f_x_max.push_back( 6. );
 	hname.push_back( "fraclow" );
-	f_rebin.push_back( 1 );
+	f_rebin.push_back( 2 );
 	f_logy.push_back( 1 );
-	f_x_min.push_back( 0. );
+	f_x_min.push_back( 0.0 );
 	f_x_max.push_back( 1. );
-/*	hname.push_back( "nlowgain" );
+	hname.push_back( "nlowgain" );
 	f_rebin.push_back( 1 );
 	f_logy.push_back( 1 );
 	f_x_min.push_back( 0. );
-	f_x_max.push_back( 40. ); */
+	f_x_max.push_back( 40. ); 
 	hname.push_back( "los" );
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );
@@ -1425,12 +1430,12 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );
 	f_x_min.push_back( -2.0 );
-	f_x_max.push_back( 2.0 );
+	f_x_max.push_back( 2.0 ); 
 	hname.push_back( "cen_y" );
 	f_rebin.push_back( i_rebin );
 	f_logy.push_back( 0 );
 	f_x_min.push_back( -2.0 );
-	f_x_max.push_back( 2.0 );
+	f_x_max.push_back( 2.0 ); 
 	hname.push_back( "ntubes" );
 	f_rebin.push_back( 1 );
 	f_logy.push_back( 1 );
@@ -1477,7 +1482,7 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 		hc = new TCanvas( ct, cn, 10, 10, 1300, 800 );
 		hc->SetGridx( 0 );
 		hc->SetGridy( 0 );
-		hc->Divide( 5, 3 );
+		hc->Divide( 6, 3 );
 	}
 	TLegend* iL = 0;
 	
@@ -1589,6 +1594,10 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 		
 		hdiff->SetYTitle( "number of shower [a.u.]" );
 		hdiff->SetMaximum( hdiff->GetMaximum() * 1.5 );
+/*		if( hname[j] == "fraclow" )
+		{
+		    hdiff->SetMaximum( hdiff->GetBinContent( hdiff->FindBin( 0.1 ) ) * 20. );
+                } */
 		hrel->SetYTitle( "sims/data" );
 		hrel->SetMinimum( fRelatePlotRange_min );
 		hrel->SetMaximum( fRelatePlotRange_max );
@@ -1688,7 +1697,7 @@ void VPlotCompareDataWithMC::single_telescope( int telid, string iPlot, bool iOn
 	// print the canvas
 	if( fPrintName.size() > 0 )
 	{
-		sprintf( hn, "%s-SINGLET-%s-T%d.eps", fPrintName.c_str(), iPlot.c_str(), telid );
+		sprintf( hn, "%s-SINGLET-%s-T%d.pdf", fPrintName.c_str(), iPlot.c_str(), telid );
 		hc->Print( hn );
 	}
 }

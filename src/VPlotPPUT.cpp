@@ -241,12 +241,12 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 		iSens_vs_height->Draw( "p" );
 		iSens_vs_height_N->Draw( "p" );
 		iSens_vs_height_S->Draw( "p" );
-		printCanvas( cPPUT_height, "-pput-vs-height.eps" );
+		printCanvas( cPPUT_height, "-pput-vs-height.pdf" );
 		
 		cPPUT_B->cd();
 		iSens_vs_bfield_N->Draw( "p" );
 		iSens_vs_bfield_S->Draw( "p" );
-		printCanvas( cPPUT_B, "-pput-vs-bfield.eps" );
+		printCanvas( cPPUT_B, "-pput-vs-bfield.pdf" );
 	}
 	
 	//////////////////////////////
@@ -289,7 +289,7 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 		}
 		
 	}
-	printCanvas( cB2D, "-2D-PPUT.eps" );
+	printCanvas( cB2D, "-2D-PPUT.pdf" );
 	
 	// plot predictions into the 1D plots
 	if( bPlotPredictions && cPPUT_height && cPPUT_B )
@@ -346,8 +346,8 @@ void VPlotPPUT::plot( unsigned int iSiteRequirementID, string iDataList, bool bP
 			g_B_S->Draw( "p" );
 			
 		}
-		printCanvas( cPPUT_height, "-pput-vs-height-Prediction.eps" );
-		printCanvas( cPPUT_B, "-pput-vs-bfield-Prediction.eps" );
+		printCanvas( cPPUT_height, "-pput-vs-height-Prediction.pdf" );
+		printCanvas( cPPUT_B, "-pput-vs-bfield-Prediction.pdf" );
 	}
 	
 }
