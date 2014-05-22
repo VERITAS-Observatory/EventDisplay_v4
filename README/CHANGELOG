@@ -3,6 +3,11 @@ Change log eventdisplay analysis package
 (please observe the wiki syntax for this file)
 
 * 20140523 (GM)
+new commandline parameter for low-gain pedestal setting:
+-lowgainpedestallevel=<pedlevel>
+(to be used for MC files only)
+
+* 20140523 (GM)
 added command line parameter '--version' to most binaries
 
 * 20140523 (GM)

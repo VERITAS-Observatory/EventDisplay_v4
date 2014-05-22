@@ -171,8 +171,9 @@ Simulations:
 	 -fadcscale=float 			 scale factor for traces (default=1.)
 	 -pedestalseed=int 			 seed for pedestal calculation (default=0)
 	 -pedestalfile FILENAME 		 use pedestals from P lines in this pedestal file (default: Off)
-	 -pedestalnoiselevel=int 		 GrIsu noise level used for external pedestal file (default=250)
-	 -pedestalDefaultPedestal=float 	 GrIsu default pedestals used in simulations (default=15.)
+	 -pedestalnoiselevel=int 		 noise level used for external pedestal file (default=250)
+	 -pedestalDefaultPedestal=float 	 default pedestals used in simulations (default=15.)
+         -lowgainpedestallevel=float             pedestal level to be used for low-gain channels in MC (default=off)
 	 -printGrisuHeader=0/1/2		 0 (default)=nothing, 	
 	                                         1=Reproduce full grisu simulation header including detector config file (from VBF header).
 	 				 	 2=Print config file name that was used for detector simulation, if available.
