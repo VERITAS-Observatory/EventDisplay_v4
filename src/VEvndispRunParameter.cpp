@@ -55,6 +55,7 @@ VEvndispRunParameter::VEvndispRunParameter( bool bSetGlobalParameter ) : VGlobal
 	fsimu_pedestalfile = "";
 	fsimu_noiselevel   = 250;
 	fsimu_pedestalfile_DefaultPed = 20.;
+        fsimu_lowgain_pedestal_DefaultPed = -999.;
 	fPedestalSingleRootFile = false;
 	fnevents = -10000;
 	fFirstEvent = -10000;
@@ -509,8 +510,10 @@ void VEvndispRunParameter::print( int iEv )
 		{
 			cout << "calculate pedestals from " << fsimu_pedestalfile;
 			cout << " with noise level " << fsimu_noiselevel;
-			cout << " (default ped: " << fsimu_pedestalfile_DefaultPed << ")" << endl;
+			cout << " (default ped: " << fsimu_pedestalfile_DefaultPed;
+                        cout << ")" << endl;
 		}
+                if( fsimu_lowgain_pedestal_DefaultPed > 0. ) cout << "Low gain ped assumed: " << fsimu_lowgain_pedestal_DefaultPed;
 		else if( fsourcetype == 1 )
 		{
 			cout << "calculate pedestals from " << fsourcefile << endl;

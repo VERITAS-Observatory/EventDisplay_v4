@@ -250,6 +250,10 @@ bool VReadRunParameter::readCommandline( int argc, char* argv[] )
 		{
 			fRunPara->fsimu_pedestalfile_DefaultPed = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
 		}
+                else if( iTemp.find( "lowgainpedestallevel" ) < iTemp.size()  )
+                {
+                        fRunPara->fsimu_lowgain_pedestal_DefaultPed = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
+                }
 		// calibration file
 		else if( iTemp.find( "calibrationfi" ) < iTemp.size() && !( iTemp.find( "lowgain" ) < iTemp.size() ) )
 		{

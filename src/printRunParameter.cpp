@@ -79,6 +79,18 @@ bool readMCParameter( TFile* fIn, string iPara )
 
 int main( int argc, char* argv[] )
 {
+	// print version only
+	if( argc == 2 )
+	{
+		string fCommandLine = argv[1];
+		if( fCommandLine == "-v" || fCommandLine == "--version" )
+		{
+			VGlobalRunParameter fRunPara;
+			cout << fRunPara.getEVNDISP_VERSION() << endl;
+			exit( 0 );
+		}
+	}
+
 	if( argc != 2 && argc != 3 )
 	{
 		cout << endl;

@@ -220,6 +220,7 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 		string fsimu_pedestalfile;                // use external pedestal file for MC
 		int    fsimu_noiselevel;                  // noise level used for this external file
 		double fsimu_pedestalfile_DefaultPed;     // default pedestal for Grisu MC (must be the same is in grisu .cfg file)
+                double fsimu_lowgain_pedestal_DefaultPed; // default low-gain pedestal level for MC
 		int    fIsMC;                             // source data is Monte Carlo (==1 write all MC events, ==2 write only triggered events)
 		bool   fIgnoreCFGversions;                // ignore configuration file versions
 		
@@ -322,6 +323,6 @@ class VEvndispRunParameter : public TNamed, public VGlobalRunParameter
 			return fuseDB;
 		}
 		
-		ClassDef( VEvndispRunParameter, 148 ); //(increase this number)
+		ClassDef( VEvndispRunParameter, 149 ); //(increase this number)
 };
 #endif

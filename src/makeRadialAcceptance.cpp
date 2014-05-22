@@ -37,6 +37,18 @@ struct stat sb ;
 
 int main( int argc, char* argv[] )
 {
+	// print version only
+	if( argc == 2 )
+	{
+		string fCommandLine = argv[1];
+		if( fCommandLine == "-v" || fCommandLine == "--version" )
+		{
+			VGlobalRunParameter fRunPara;
+			cout << fRunPara.getEVNDISP_VERSION() << endl;
+			exit( 0 );
+		}
+	}
+
 	VAnaSumRunParameter* fRunPara = new VAnaSumRunParameter();
 	
 	cout << endl;

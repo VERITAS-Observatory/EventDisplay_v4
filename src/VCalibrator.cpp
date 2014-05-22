@@ -1292,6 +1292,15 @@ void VCalibrator::readCalibrationData()
 		{
 			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow() );
 		}
+                // use for simulations a fixed value for low-gain pedestal
+                else if( getRunParameter()->fsimu_lowgain_pedestal_DefaultPed > 0. )
+                {
+			getPedsLowGain() = getRunParameter()->fsimu_lowgain_pedestal_DefaultPed;
+			getPedvarsLowGain() = getPedvars();
+			getPedvarsAllSumWindows( true ) = getPedvarsAllSumWindows( false );
+			getmeanPedvarsAllSumWindow( true ) = getmeanPedvarsAllSumWindow( false );
+			getmeanRMSPedvarsAllSumWindow( true ) = getmeanRMSPedvarsAllSumWindow( false );
+                }
 		// no low gain peds available -> set low gain peds to high gain peds (not sure if this is a good idea)
 		else
 		{
@@ -1332,6 +1341,17 @@ void VCalibrator::readCalibrationData()
 		{
 			readPeds( fLowGainPedFileNameC[getTeltoAna()[i]], true, getSumWindow_2() );
 		}
+                // use for simulations a fixed value for low-gain pedestal
+                else if( getRunParameter()->fsimu_lowgain_pedestal_DefaultPed > 0. )
+                {
+			for( unsigned int g = 0; g < getPedsLowGain().size(); g++ )
+			{
+				if( fabs( getPedsLowGain()[g] ) < 0.5 || fabs( getPedvarsLowGain()[g] ) < 0.5 )
+				{
+					getPedsLowGain()[g] = getRunParameter()->fsimu_lowgain_pedestal_DefaultPed;
+				}
+                        }
+                }
 		// (preli) fill high gain value if low value is not available
 		else
 		{
@@ -1635,11 +1655,11 @@ bool VCalibrator::readPeds_from_textfile( string iFile, bool iLowGain, unsigned 
 	cout << "Telescope " << getTelID() + 1;
 	if( !iLowGain )
 	{
-		cout << ": reading pedestals for high gain channels";
+		cout << ": reading pedestals (txt) for high gain channels";
 	}
 	else
 	{
-		cout << ": reading pedestals for low gain channels";
+		cout << ": reading pedestals (txt) for low gain channels";
 	}
 	cout << " and sumwindow " << i_SumWindow << " from: " << endl;
 	cout << "Telescope " << getTelID() + 1 << ": ";

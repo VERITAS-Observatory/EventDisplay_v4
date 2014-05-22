@@ -46,6 +46,18 @@ VEffectiveAreaCalculatorMCHistograms* copyMCHistograms( TChain* c );
 int main( int argc, char* argv[] )
 {
 
+	// print version only
+	if( argc == 2 )
+	{
+		string fCommandLine = argv[1];
+		if( fCommandLine == "-v" || fCommandLine == "--version" )
+		{
+			VGlobalRunParameter fRunPara;
+			cout << fRunPara.getEVNDISP_VERSION() << endl;
+			exit( 0 );
+		}
+	}
+
 	cout << endl;
 	cout << "makeEffectiveArea " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
 	cout << "-----------------------------" << endl;

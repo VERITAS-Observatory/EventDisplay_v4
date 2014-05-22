@@ -2,6 +2,15 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140523 (GM)
+added command line parameter '--version' to most binaries
+
+* 20140523 (GM)
+new version number 4.42
+
+* 20140523 (GM)
+IRF production scripts testing and improvements
+
 * 20140512 (GM)
 bug fix in calculated of position of exclusion regions given
 in anasum runparameter file: negative declinations where calculated
