@@ -83,10 +83,12 @@ mkdir -p $LOGDIR
 if [[ ! -z "$VERITAS_IRFPRODUCTION_DIR" ]]; then
     ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}"
 fi
+# output dir
+OPDIR=$ODIR"/ze"$ZA"deg_offset"$WOBBLE"deg_NSB"$NOISE"MHz"
+mkdir -p $OPDIR
+echo -e "Output files will be written to:\n $OPDIR"
 
 [[ $USEFROGS != 0 ]] && ODIR="${ODIR}_FROGS"
-echo "Output files will be written to: $ODIR"
-mkdir -p $ODIR
 
 # Create a unique set of run numbers
 if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
@@ -109,11 +111,6 @@ elif [[ ${#INT_WOBBLE} -lt 3 ]]; then
    INT_WOBBLE="0$INT_WOBBLE"
 fi
 
-# output dir
-OPDIR=$ODIR"/ze"$ZA"deg_offset"$WOBBLE"deg_NSB"$NOISE"MHz"
-mkdir -p $OPDIR
-echo $OPDIR
-
 # make run script
 FSCRIPT="$LOGDIR/evn-$SIMTYPE-$ZA-$WOBBLE-$NOISE-$EPOCH-ATM$ATM"
 sed -e "s|DATADIR|$SIMDIR|" \
@@ -126,6 +123,7 @@ sed -e "s|DATADIR|$SIMDIR|" \
     -e "s|NOISELEVEL|$NOISE|" \
     -e "s|ARRAYEPOCH|$EPOCH|" \
     -e "s|FROGSFROGS|$USEFROGS|" \
+    -e "s|FROGSMSCWDIR|$MSCWDIR|" \
     -e "s|FROGSEVENTS|$NEVENTS|" \
     -e "s|SIMULATIONTYPE|$SIMTYPE|" \
     -e "s|PARTICLETYPE|$PARTICLE|" $SUBSCRIPT.sh > $FSCRIPT.sh
@@ -137,14 +135,10 @@ echo $FSCRIPT.sh
 SUBC=`$EVNDISPSYS/scripts/VTS/helper_scripts/UTILITY.readSubmissionCommand.sh`
 SUBC=`eval "echo \"$SUBC\""`
 if [[ $SUBC == *qsub* ]]; then
-    $SUBC $FSCRIPT.sh
+    JOBID=`$SUBC $FSCRIPT.sh`
+    echo "RUN $RUNNUM: JOBID $JOBID"
 elif [[ $SUBC == *parallel* ]]; then
     echo "$FSCRIPT.sh &> $FSCRIPT.log" >> $LOGDIR/runscripts.dat
 fi
                 
-# Execute all FSCRIPTs locally in parallel
-if [[ $SUBC == *parallel* ]]; then
-    cat $LOGDIR/runscripts.dat | $SUBC
-fi
-
 exit

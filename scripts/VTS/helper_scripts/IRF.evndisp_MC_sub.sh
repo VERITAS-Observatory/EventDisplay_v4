@@ -7,7 +7,7 @@ source $EVNDISPSYS/setObservatory.sh VTS
 
 # parameters replaced by parent script using sed
 RUNNUM=RUNNUMBER
-SIMDIR=MCVBFDIR
+SIMDIR=DATADIR
 ZA=ZENITHANGLE
 WOB=DECIMALWOBBLE
 WOG=INTEGERWOBBLE
@@ -37,6 +37,7 @@ echo "FROGS NEvents: $NEVENTS"
 ACUT="EVNDISP.reconstruction.runparameter"
 DEAD="EVNDISP.validchannels.dat"
 PEDLEV="16."
+LOWPEDLEV="8."
 
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     # Input files (observe that these might need some adjustments)
@@ -156,6 +157,8 @@ if [[ $USEFROGS != "1" ]]; then
     ### eventdisplay GRISU run options
     if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
         MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE"
+    else
+       MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
     fi
     $EVNDISPSYS/bin/evndisp $MCOPT &> $ODIR/$RUNNUM.tzero.log
 fi
@@ -168,6 +171,8 @@ fi
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
     MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE"
+else
+    MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
 fi
 echo "Analysing MC file for run $RUNNUM"
 $EVNDISPSYS/bin/evndisp $MCOPT $FROGS &> $ODIR/$ONAME.log

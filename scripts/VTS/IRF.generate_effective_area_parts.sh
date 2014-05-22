@@ -36,7 +36,7 @@ required parameters:
                             (see EVNDISP.reconstruction.runparameter)
                             Set to 0 for all telescopes, 1 to cut T1, etc.
         
-    <sim type>              original VBF file simulation type (e.g. GRISU, CARE)
+    <sim type>              simulation type (e.g. GRISU, CARE)
     
 --------------------------------------------------------------------------------
 "
@@ -47,6 +47,9 @@ fi
 # Run init script
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
+
+# EventDisplay version
+EDVERSION=`$EVNDISPSYS/bin/makeEffectiveArea --version | tr -d .`
 
 # Parse command line arguments
 CUTSFILE=$1

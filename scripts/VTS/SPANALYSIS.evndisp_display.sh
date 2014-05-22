@@ -14,8 +14,7 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP special-purpose analysis: display data file and write results to file
 
-SPANALYSIS.evndisp_display.sh <sourcefile> [teltoana] [calib] [highres] [run number] [TARGET]
- [WOBBLENORTH] [WOBBLEEAST] [RAOFFSET]
+SPANALYSIS.evndisp_display.sh <sourcefile> [telescope combination] [calib] [highres] [run number] [TARGET] [WOBBLENORTH] [WOBBLEEAST] [RAOFFSET]
 
 required parameter:
 
