@@ -10,6 +10,6 @@ OFILE=OUTPUTFILE
 ODIR=OUTPUTDIR
 
 # combine the tables
-$EVNDISPSYS/bin/combineLookupTables $FLIST $ODIR/$OFILE.root &> $ODIR/$OFILE.log 
+$EVNDISPSYS/bin/combineLookupTables $ODIR/$FLIST $ODIR/$OFILE.root &> $ODIR/$OFILE.log 
 
 exit

@@ -9,9 +9,11 @@ if [[ $# < 4 ]]; then
 echo "
 IRF generation: create a lookup table from a set of partial table files
 
-IRF.combine_lookup_table_parts.sh <epoch> <atmosphere> <Rec ID> <sim type> [table date] [sim date]
+IRF.combine_lookup_table_parts.sh <table file name> <epoch> <atmosphere> <Rec ID> <sim type>
 
 required parameters:
+
+    <table file name>       file name of combined lookup table
 
     <epoch>                 array epoch (e.g., V4, V5, V6)
     
@@ -23,14 +25,6 @@ required parameters:
                             
     <sim type>              simulation type (e.g. GRISU, CARE)
     
-optional parameters:
-
-    [table date]            table file creation date (e.g. 20131121)
-                            (default: today's date)
-    
-    [sim date]              simulation creation date (e.g. Nov12)
-                            (default: blank)
-
 --------------------------------------------------------------------------------
 "
 #end help message
@@ -45,18 +39,15 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 EDVERSION=`$EVNDISPSYS/bin/combineLookupTables --version | tr -d .`
 
 # Parse command line arguments
-EPOCH=$1
-ATM=$2
-RECID=$3
-SIMTYPE=$4
-[[ "$5" ]] && TABDATE=$5 || TABDATE=`date +"%Y%m%d"`
-[[ "$6" ]] && SIMDATE=$6
+OFILE=$1
+EPOCH=$2
+ATM=$3
+RECID=$4
+SIMTYPE=$5
 
 # input directory containing partial table files
 if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
-else
-    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/Tables/${SIMTYPE}/${EPOCH}_ATM${ATM}_ID${RECID}"
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/${SIMTYPE}/${EPOCH}_ATM${ATM}_gamma/Tables/"
 fi
 if [[ ! -d $INDIR ]]; then
     echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
@@ -67,22 +58,11 @@ echo "Input file directory: $INDIR"
 # Output file directory
 if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
     ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/Tables/"
-else
-    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/Tables/"
 fi
-echo -e "Output files will be written to:\n $ODIR"
+echo -e "Output files will be written to:\n$ODIR"
 mkdir -p $ODIR
 
-# Create list of partial table files
-FLIST=`ls -1 $INDIR | grep table`
 
-# Obtain table information from partial table names
-TESTFILE=FLIST[0]
-TESTFILE=${TESTFILE##"table_"}
-TESTFILE=${TESTFILE%%'.root'}
-SIMTYPE=${TESTFILE%%_*}
-PARAMS=V${TESTFILE##*V}
-OFILE="table_d${TABDATE}_${SIMTYPE}${SIMDATE}_${PARAMS}"
 if [[ -f $OFILE ]]; then
     echo "ERROR: table file $ODIR/$OFILE exists; move it or delete it"
     exit 1
@@ -91,13 +71,20 @@ fi
 # run scripts and output are written into this directory
 DATE=`date +"%y%m%d"`
 LOGDIR="$VERITAS_USER_LOG_DIR/$DATE/MSCW.MAKETABLES"
-echo -e "Log files will be written to:\n $LOGDIR"
+echo -e "Log files will be written to:\n$LOGDIR"
 mkdir -p $LOGDIR
+
+# Create list of partial table files
+FLIST=$OFILE.list
+rm -f $ODIR/$FLIST
+ls -1 $INDIR/*.root > $ODIR/$FLIST
+echo $FLIST
 
 # Job submission script
 SUBSCRIPT="$EVNDISPSYS/scripts/VTS/helper_scripts/IRF.lookup_table_combine_sub"
 
 FSCRIPT="$LOGDIR/CMB-TBL.$DATE.MC"
+
 sed -e "s|TABLELIST|$FLIST|" \
     -e "s|OUTPUTFILE|$OFILE|" \
     -e "s|OUTPUTDIR|$ODIR|" $SUBSCRIPT.sh > $FSCRIPT.sh
