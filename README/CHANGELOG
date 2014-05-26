@@ -2,6 +2,9 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140526 (GM)
+bug fixes in plotting of differential sensitivities
+
 * 20140523 (GM)
 new commandline parameter for low-gain pedestal setting:
 -lowgainpedestallevel=<pedlevel>
