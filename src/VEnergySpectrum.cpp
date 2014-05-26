@@ -314,8 +314,8 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 			cout << " (run " << fRunList[i].runnumber << ")" << endl;
 		}
 		// get effective area
-		TH1* i_hEffAreaP = ( TH1* )getHistogram( "herecEffectiveArea_on-", fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
-		TGraphErrors* i_gEff = 0;
+		TH1* i_hEffAreaP = ( TH1* )getHistogram( "herecEffectiveArea_on", fRunList[i].runnumber, "energyHistograms", fOffsetDistance );
+		TGraphErrors* i_gEff = new TGraphErrors( 0 );
 		VHistogramUtilities i_hisUtl;
 		i_hisUtl.get_Graph_from_Histogram( i_hEffAreaP, i_gEff );
 		
@@ -808,8 +808,7 @@ void VEnergySpectrum::rebinEnergySpectrum( TH1D* h, double iER, bool bLinearX )
 	{
 		return;
 	}
-	
-	
+
 	// counting and timing histograms are simply rebinned
 	if( itemp.find( "Counts" ) < itemp.size() || itemp.find( "TotalTime" ) < itemp.size() )
 	{

@@ -31,10 +31,11 @@ a.list_sensitivity( 0 );
 VSensitivityCalculator a;
 // read Crab spectrum and plot integral sensitivity in Crab Unit (CU)
 // (replace "CU" by "PFLUX" for particle flux [1/m2/s] or energy flux "ENERGY' [erg/cm2/s])
+// (for units other than CU, you need to specify an expected Crab spectrum:
+a.setEnergySpectrumfromLiterature( "$VERITAS_EVNDISP_AUX_DIR/AstroData/TeV_data/EnergySpectrum_literatureValues_CrabNebula.dat", 1 );
 TCanvas *c = a.plotIntegralSensitivityvsEnergyFromCrabSpectrum(0, "myCrabFile.root", 1, "CU" )
 // plot a sensitivity curve from literature on top of it
 a.plotSensitivityvsEnergyFromTextTFile( c, "SensitivityFromTextFile_CU", 2, 2, 2, "CU" );
-
 // plot differential sensitivity (4 bins per decade)
 a.plotDifferentialSensitivityvsEnergyFromCrabSpectrum( 0, "myCrabFile.root", 1, "ENERGY", 0.25 );
 
@@ -610,6 +611,7 @@ TCanvas* VSensitivityCalculator::plotIntegralSensitivityvsEnergyFromCrabSpectrum
 		int iColor, string bUnit,
 		double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin )
 {
+	fRequireCutsToBeOptimized = false;
 	if( fPlotDebugName.size() > 0 )
 	{
 		prepareDebugPlots();
@@ -632,6 +634,7 @@ TCanvas* VSensitivityCalculator::plotDifferentialSensitivityvsEnergyFromCrabSpec
 		double dE_Log10,
 		double iEnergyMin_TeV_lin, double iEnergyMax_TeV_lin )
 {
+	fRequireCutsToBeOptimized = false;
 	if( fPlotDebugName.size() > 0 )
 	{
 		prepareDebugPlots();
@@ -936,6 +939,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
 			cout << "\t events: " << fMinEventsLimited[energy_intX3] << endl;
 			cout << "\t systematics: " << fMinBackgroundEventsLimited[energy_intX3] << endl;
 			cout << "\t no background: " << fMinNoBackground[energy_intX3] << endl;
+			cout << "\t cut optimization: " << checkCutOptimization( fDifferentialFlux[i].Energy )  << endl;
 		}
 		// sensitivity limitiations
 		// (TMP differential sensitivity only)
