@@ -54,13 +54,15 @@ fi
 
 # Set run options
 OPT="-runnumber=$RUNNUM -teltoana=$TELTOANA"
-if [[ $CALDB == "1" ]]; then
+if [[ $CALDB -eq 1 ]]; then
     OPT="$OPT -readCalibDB"
+else
+    OPT="$OPT -nocalibnoproblem"
 fi
 
 # DST production
-if [[ DSTMODE != "0" ]]; then
-    OPT="$OPT -runmode=4 -imagethresh=0 -borderthresh=0 -dstfile $VERITAS_DATA_DIR/eventdisplay_output/$RUNNUM.dst.root"
+if [[ DSTMODE -ne 0 ]]; then
+    OPT="$OPT -runmode=4 -dstfile $VERITAS_DATA_DIR/eventdisplay_output/$RUNNUM.dst.root"
 fi
 
 # Run evndisp

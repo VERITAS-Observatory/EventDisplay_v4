@@ -6,7 +6,7 @@ if [ ! -n "$1" ] || [ "$1" = "-h" ]; then
 echo "
 EVNDISP special-purpose analysis: calculate mean tzeros from a data file
 
-VTS.EVNDISP.analyse_tzeros <run number> [teltoana]
+VTS.EVNDISP.analyse_tzeros <run number> [teltoana] [readcalibdb]
 
 required parameters:
 
@@ -16,6 +16,8 @@ optional parameters:
 
     [teltoana]              use 1 for T1 only, 13 for T1 and T3 only, etc.
                             (default telescope combination is 1234)
+
+    [readcalibdb]           set to 0 to switch off (default is on)
 
 --------------------------------------------------------------------------------
 "
@@ -33,6 +35,7 @@ RUNNUM=$1
 if [[ $TELTOANA == "-1" ]]; then
     TELTOANA="1234"
 fi
+[[ "$3" ]] && CALDB=$3   || CALDB="1"
 
 # Check if source vbf file exists
 SF=`find -L $VERITAS_DATA_DIR/data -name "$RUNNUM.cvbf"`
@@ -41,8 +44,15 @@ if [[ ${#SF} = 0 ]]; then
     exit 1
 fi
 
+if [[ $CALDB == "1" ]]; then
+    OPT="$OPT -readCalibDB"
+else
+    OPT="$OPT -nocalibnoproblem"
+fi
+echo $OPT
+
 # run options
-OPT="-runmode=7 -runnumber=$RUNNUM -teltoana=$TELTOANA -readcalibdb"
+OPT="-runmode=7 -runnumber=$RUNNUM -teltoana=$TELTOANA $OPT"
 
 # Run evndisp
 echo "$EVNDISPSYS/bin/evndisp $OPT"
