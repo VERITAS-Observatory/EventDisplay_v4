@@ -10,7 +10,7 @@ if [ $# -lt 7 ]; then
 echo "
 IRF generation: analyze simulation VBF files using evndisp 
 
-IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> [particle] [FROGS] [events]
+IRF.evndisp_MC.sh <sim directory> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <sim type> [particle] [Model3D] [FROGS] [events]
 
 required parameters:
 
@@ -37,6 +37,8 @@ optional parameters:
     [particle]              type of particle used in simulation:
                             gamma = 1, electron = 2, proton = 14, helium = 402
                             (default = 1  -->  gamma)
+
+    [Model3D]               set to 1 to use Model3D (default: off)
     
     [FROGS]                 set to 1 to use FROGS (GrISU only! default: off)
     
@@ -67,8 +69,9 @@ WOBBLE=$5
 NOISE=$6
 SIMTYPE=$7
 [[ "$8" ]] && PARTICLE=$8 || PARTICLE=1
-[[ "$9" ]] && USEFROGS=$9 || USEFROGS=0
-[[ "${10}" ]] && NEVENTS=${10}  || NEVENTS=5000000
+[[ "$9" ]] && USEMODEL3D=$9 || USEMODEL3D=0
+[[ "${10}" ]] && USEFROGS=${10} || USEFROGS=0
+[[ "${11}" ]] && NEVENTS=${11}  || NEVENTS=5000000
 
 # Particle names
 PARTICLE_NAMES=( [1]=gamma [2]=electron [14]=proton [402]=alpha )
@@ -122,6 +125,7 @@ sed -e "s|DATADIR|$SIMDIR|" \
     -e "s|INTEGERWOBBLE|$INT_WOBBLE|" \
     -e "s|NOISELEVEL|$NOISE|" \
     -e "s|ARRAYEPOCH|$EPOCH|" \
+    -e "s|USEMODEL3DMETHOD|$USEMODEL3D|" \
     -e "s|FROGSFROGS|$USEFROGS|" \
     -e "s|FROGSMSCWDIR|$MSCWDIR|" \
     -e "s|FROGSEVENTS|$NEVENTS|" \
