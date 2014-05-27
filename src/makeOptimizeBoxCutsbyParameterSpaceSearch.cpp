@@ -158,6 +158,7 @@ int main( int argc, char* argv[] )
 		cout << "(some parameter and parameter ranges are hard-coded)" << endl;
 		exit( 0 );
 	}
+        bool bReducedWidth = false;
 	
 	// Histograms
 	TList* hOn = new TList();
@@ -233,16 +234,32 @@ int main( int argc, char* argv[] )
 	float emissionHeightChi2 = 0.;
 	int NImages = 0;
 	tOn->SetBranchAddress( "NImages", &NImages );
-	tOn->SetBranchAddress( "MSCW", &MSCW );
-	tOn->SetBranchAddress( "MSCL", &MSCL );
+        if( !bReducedWidth )
+        {
+            tOn->SetBranchAddress( "MSCW", &MSCW );
+            tOn->SetBranchAddress( "MSCL", &MSCL );
+        }
+        else
+        {
+            tOn->SetBranchAddress( "MWR", &MSCW );
+            tOn->SetBranchAddress( "MLR", &MSCL );
+        }
 	tOn->SetBranchAddress( "theta2", &theta2 );
 	tOn->SetBranchAddress( "EChi2S", &echi2 );
 	tOn->SetBranchAddress( "SizeSecondMax", &size2ndmax );
 	tOn->SetBranchAddress( "EmissionHeight", &emissionHeight );
 	tOn->SetBranchAddress( "EmissionHeightChi2", &emissionHeightChi2 );
 	tOff->SetBranchAddress( "NImages", &NImages );
-	tOff->SetBranchAddress( "MSCW", &MSCW );
-	tOff->SetBranchAddress( "MSCL", &MSCL );
+        if( !bReducedWidth )
+        {
+            tOff->SetBranchAddress( "MSCW", &MSCW );
+            tOff->SetBranchAddress( "MSCL", &MSCL );
+        }
+        else
+        {
+            tOff->SetBranchAddress( "MWR", &MSCW );
+            tOff->SetBranchAddress( "MLR", &MSCL );
+        }
 	tOff->SetBranchAddress( "theta2", &theta2 );
 	tOff->SetBranchAddress( "EChi2S", &echi2 );
 	tOff->SetBranchAddress( "SizeSecondMax", &size2ndmax );
@@ -260,6 +277,13 @@ int main( int argc, char* argv[] )
 	double mscl_step = 0.05;
 	unsigned int    mscl_max_n = 20;
 	double mscl_max_start =  0.;
+
+        if( bReducedWidth )
+        {
+            mscw_max_start = 1.;
+            mscl_max_start = 1.;
+        }
+        
 	
 	// size2ndmax
 	double size_step = 100.;
