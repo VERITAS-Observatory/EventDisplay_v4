@@ -17,6 +17,7 @@ ATM=ATMOSPHERE
 PARTICLE=PARTICLETYPE
 SIMTYPE=SIMULATIONTYPE
 ODIR=OUTPUTDIR
+USEMODEL3D=USEMODEL3DMETHOD
 USEFROGS=FROGSFROGS
 MSCWDIR=FROGSMSCWDIR
 NEVENTS=FROGSEVENTS
@@ -165,6 +166,9 @@ fi
 
 ###############################################
 # run eventdisplay
+if [[ $USEMODEL3D == "1" ]]; then
+    MODEL3D="-model3d -lnlfile $VERITAS_EVNDISP_AUX_DIR/Tables/table_LnL.root"
+fi
 if [[ $USEFROGS == "1" ]]; then
     FROGS="-frogs $MSCWDIR/$MSCWFILE -frogid 0 -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
@@ -175,7 +179,7 @@ else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
 fi
 echo "Analysing MC file for run $RUNNUM"
-$EVNDISPSYS/bin/evndisp $MCOPT $FROGS &> $ODIR/$ONAME.log
+$EVNDISPSYS/bin/evndisp $MCOPT $MODEL3D $FROGS &> $ODIR/$ONAME.log
 
 # remove temporary files
 cp -f -v $DDIR/$ONAME.root $ODIR/$ONAME.root
