@@ -10,7 +10,7 @@ then
    echo
    echo "CTA.check_forProducts_on_dCache_and_Copy.sh <sub array list> <run list> <data directory> <destination dir> <file with missing runs> [MCaz]"
    echo
-   echo " (note: very dependent on file names"
+   echo " (note: very dependent on file names)"
    echo
    exit
 fi

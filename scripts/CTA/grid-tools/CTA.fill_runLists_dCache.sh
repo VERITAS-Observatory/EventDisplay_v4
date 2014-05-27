@@ -38,6 +38,6 @@ done
 grep proton $FILELO.dcache > $FILELO.proton.dcache.list
 grep electron $FILELO.dcache > $FILELO.electron.dcache.list
 grep gamma_ptsrc $FILELO.dcache > $FILELO.gamma_onSource.dcache.list
-grep -v gamma_ptsrc $FILELO.dcache > $FILELO.gamma_cone.dcache.list
+grep -v gamma_ptsrc $FILELO.dcache | grep gamma > $FILELO.gamma_cone.dcache.list
 
 exit

@@ -25,8 +25,8 @@ RUN="$2"
 # qsub options
 #   _M_ = -; _X_ = " "
 QSUBOPT=""
-QSUBOPT="_M_P_X_cta_high_X__M_js_X_90000"
 QSUBOPT="_M_P_X_cta_high"
+QSUBOPT="_M_P_X_cta_high_X__M_js_X_90000"
 
 #####################################
 # output directory for script parameter files
@@ -74,13 +74,11 @@ then
    SITE=( "prod2-LeoncitoPP-40deg-NS" "prod2-LeoncitoPP-NS" "prod2-Aar-40deg-NS" "prod2-Leoncito-40deg-NS" )
    SITE=( "prod2-SAC100-NS" "prod2-Leoncito-NS" "prod2-Aar-lowE-NS" "prod2-SAC100-lowE-NS" "prod2-SAC084-lowE-NS"  "prod2-Aar-500m-NS" "prod2-SAC084-NS" "prod2-Aar-NS" )
    SITE=( "prod2-Aar-lowE-NS" "prod2-Aar-NS" "prod2-Leoncito-NS" )
-   SITE=( "prod2-SAC084-NS" )
-   SITE=( "prod2-LeoncitoPP-40deg-NS" )
-   ARRAY="subArray.2S-sub.lis"
-   SITE=( "prod2-Aar-500m-NS" )
-   ARRAY="subArray.2a.list"
+   SITE=( "prod2-LeoncitoPP-NS" "prod2-Aar-lowE-NS" "prod2-Aar-NS" )
    SITE=( "prod2-LeoncitoPP-NS" )
-   ARRAY="subArray.2S-sub-RC.lis"
+   ARRAY="subArray.prod2-RC-PP.list"
+   SITE=( "prod2-Aar-lowE-NS" "prod2-Aar-NS" )
+   ARRAY="subArray.prod2-RC.list"
 ############################
 # NORTH
 elif [[ $P2 == "N" ]]
@@ -116,8 +114,8 @@ NIMAGESMIN="2"
 # observing time [h]
 OBSTIME=( "5h" "30m" "10m" "1m" "20s" )
 OBSTIME=( "100h" "500h" "1000h" )
-OBSTIME=( "50h" )
 OBSTIME=( "50h" "5h" "30m" "10m" "1m" "20s" )
+OBSTIME=( "50h" )
 
 
 #####################################
