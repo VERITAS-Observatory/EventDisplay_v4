@@ -29,7 +29,6 @@
 #  for using FITS (optional)
 #    FITSSYS (pointing to FITS installation)
 #
-# Gernot Maier 
 ##########################################################################
 SHELL = /bin/sh
 ARCH = $(shell uname)
@@ -38,7 +37,7 @@ ARCH = $(shell uname)
 # basic numbers 
 #############################
 package = EVNDISP
-version = 4.42
+version = 4.43
 distdir = $(package)-$(version)
 ctapara = $(distdir).CTA.runparameter
 vtspara = $(distdir).VTS.runparameter

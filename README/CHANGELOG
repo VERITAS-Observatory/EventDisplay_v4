@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140527 (KB, GM)
+integration of DISP routines into the trunk
+(merge from DISP branch to trunk)
+
 * 20140526 (GM)
 bug fixes in plotting of differential sensitivities
 

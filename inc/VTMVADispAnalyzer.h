@@ -35,14 +35,20 @@ class VTMVADispAnalyzer
 		float fTGrad;
 		float fZe;
 		float fAz;
+		float fLoss;
+		float fDist;
 		float fAsymm;
+		float fXcore;
+		float fYcore;
+		float fcross;
+		float fLTrig;
 		
 	public:
 	
 		VTMVADispAnalyzer( string iFile, vector< ULong64_t > iTelTypeList );
 		~VTMVADispAnalyzer() {}
 		
-		float evaluate( float iWidth, float iLength, float iSize, float iPedvar, float itgrad, float iZe, float iAz, float asymm, ULong64_t iTelType );
+		float evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss, float iTGrad, float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType, float iZe, float iAz );
 		bool isZombie()
 		{
 			return bZombie;

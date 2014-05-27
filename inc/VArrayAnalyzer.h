@@ -48,6 +48,13 @@ class VArrayAnalyzer : public VEvndispData, public VGrIsuAnalyzer
 		vector< float > dist;
 		vector< float > pedvar;
 		vector< float > tgrad;
+		vector< float > xcore;
+		vector< float > ycore;
+		vector< float > cen_y;
+		vector< float > cen_x;
+		vector< float > Xoff;
+		vector< float > Yoff;
+		vector< float > ltrig;
 		vector< float > az;
 		vector< float > ze;
 		vector<ULong64_t> teltype;

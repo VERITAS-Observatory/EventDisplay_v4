@@ -1656,6 +1656,9 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 	pedvar.clear();
 	teltype.clear();
 	tgrad.clear();
+	xcore.clear();
+	ycore.clear();
+	ltrig.clear();
 	ze.clear();
 	az.clear();
 	
@@ -1727,6 +1730,13 @@ void VArrayAnalyzer::prepareforDirectionReconstruction( unsigned int iMethodInde
 			dist.push_back( getImageParameters( getRunParameter()->fImageLL )->dist );
 			pedvar.push_back( getImageParameters( getRunParameter()->fImageLL )->fmeanPedvar_Image );
 			tgrad.push_back( getImageParameters( getRunParameter()->fImageLL )->tgrad_x );
+			cen_x.push_back(  getImageParameters( getRunParameter()->fImageLL )->cen_x );
+			cen_y.push_back(  getImageParameters( getRunParameter()->fImageLL )->cen_y );
+			xcore.push_back( getShowerParameters()->fShowerXcore[0] );
+			ycore.push_back( getShowerParameters()->fShowerYcore[0] );
+			Xoff.push_back(  getShowerParameters()->fShower_Xoffset[0] );
+			Yoff.push_back(  getShowerParameters()->fShower_Xoffset[0] );
+			ltrig.push_back( getShowerParameters()->fLTrig );
 			ze.push_back( 90. - getShowerParameters()->fTelElevation[tel] );
 			az.push_back( getShowerParameters()->fTelAzimuth[tel] );
 			teltype.push_back( getDetectorGeometry()->getTelType()[tel] );
@@ -1822,6 +1832,11 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	
 	num_images = getShowerParameters()->fShowerNumImages[iMethod];
 	
+	rcs_method_4( iMethod );
+
+	float xoff_4 = getShowerParameters()->fShower_Xoffset[iMethod];
+	float yoff_4 = getShowerParameters()->fShower_Yoffset[iMethod];
+       
 	// are there enough images the run an array analysis
 	if( num_images >= ( int )fEvndispReconstructionParameter->fNImages_min[iMethod] )
 	{
@@ -1851,8 +1866,7 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 	
 	for( unsigned int ii = 0; ii < m.size(); ii++ )
 	{
-		disp = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], asym[ii], dist[ii], w[ii], pedvar[ii],
-				tgrad[ii], teltype[ii], ze[ii], az[ii], true );
+		disp = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], asym[ii], dist[ii], w[ii], pedvar[ii], tgrad[ii], loss[ii], cen_x[ii], cen_y[ii], xoff_4, yoff_4, teltype[ii], ze[ii], az[ii], true );
 		v_disp.push_back( disp );
 		if( fDispAnalyzer[iMethod]->getDispE() > 0. )
 		{
@@ -1860,7 +1874,8 @@ int VArrayAnalyzer::rcs_method_5( unsigned int iMethod, unsigned int iDisp )
 		}
 		else
 		{
-			v_weight.push_back( 1. );
+			setTelID( ii );
+			v_weight.push_back( getImageParameters( getRunParameter()->fImageLL )->ntubes * (1. - getImageParameters( getRunParameter()->fImageLL )->width / getImageParameters( getRunParameter()->fImageLL )->length ) );
 		}
 	}
 	fDispAnalyzer[iMethod]->calculateMeanDirection( xs, ys, x, y, cosphi, sinphi, v_disp, v_weight );
@@ -2113,7 +2128,7 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 			{
 				// P1
 				v_disp[0] = fDispAnalyzer[iMethod]->evaluate( width[ii], length[ii], asym[ii], dist[ii], w[ii], pedvar[ii],
-							tgrad[ii], teltype[ii], ze[ii], az[ii], true );
+	                                                     tgrad[ii], loss[ii], cen_y[ii], cen_x[ii], Xoff[ii], Yoff[ii], teltype[ii], ze[ii], az[ii], true );
 				v_x[0] = x[ii];
 				v_y[0] = y[ii];
 				v_cosphi[0] = cosphi[ii];
@@ -2128,7 +2143,7 @@ int VArrayAnalyzer::rcs_method_9( unsigned int iMethod )
 				}
 				// P2
 				v_disp[1] = fDispAnalyzer[iMethod]->evaluate( width[jj], length[jj], asym[ii], dist[ii], w[jj], pedvar[jj],
-							tgrad[jj], teltype[ii], ze[jj], az[jj], true );
+	                                                     tgrad[jj], loss[jj], cen_y[jj], cen_x[jj], Xoff[ii], Yoff[ii], teltype[jj], ze[jj], az[jj], true );
 				v_x[1] = x[jj];
 				v_y[1] = y[jj];
 				v_cosphi[1] = cosphi[jj];

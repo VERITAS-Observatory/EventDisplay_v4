@@ -111,24 +111,18 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 		factory->AddVariable( "width", 'F' );
 		factory->AddVariable( "length", 'F' );
 		factory->AddVariable( "size", 'F' );
-		//       factory->AddVariable( "asym", 'F' );
-		factory->AddVariable( "loss", 'F' );
-		// add pedvar only if different from 0 (for CTA: always zero)
-		/*       if( isRMSZero( fMapOfTrainingTree_iter->second, "meanPedvar_Image" ) > 1.e-2 )
-		       {
-		          factory->AddVariable( "meanPedvar_Image", 'F' );
-		       } */
 		factory->AddVariable( "tgrad_x*tgrad_x", 'F' );
-		
+		factory->AddVariable( "cross", 'F' );       
+		factory->AddVariable( "asym", 'F' );
+		factory->AddVariable( "loss", 'F' );		
 		factory->AddTarget( "disp", 'F' );
-		//       factory->AddTarget( "dispPhi", 'F' );
 		
 		factory->AddRegressionTree( fMapOfTrainingTree_iter->second, 1. );
 		
 		// quality cuts
-		TCut fQualityCut = "size>0.&&ntubes>3.&&length>0.";
+		TCut fQualityCut = "size>100.&&ntubes>4.&&length>0.&&loss<0.2";
 		
-		factory->PrepareTrainingAndTestTree( fQualityCut, "nTrain_Regression=0:nTest_Regression=0:SplitMode=Random:NormMode=NumEvents:!V" );
+		factory->PrepareTrainingAndTestTree( fQualityCut, "nTrain_Regression=1000000:nTest_Regression=100000:SplitMode=Random:NormMode=NumEvents:!V" );
 		
 		
 		ostringstream iMVAName;
@@ -137,7 +131,7 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 		
 		const char* htitle = iMVAName.str().c_str();
 		
-		factory->BookMethod( TMVA::Types::kBDT, htitle , "" );
+		factory->BookMethod( TMVA::Types::kBDT, htitle , "NTrees=2000::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=20:MaxDepth=6" );
 		
 		factory->TrainAllMethodsForRegression();
 		
@@ -171,29 +165,36 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 	
 	// training trees (one per telescope type)
 	
-	float cen_x = -1.;
-	float cen_y = -1.;
-	float sinphi = -1.;
-	float cosphi = -1.;
-	float size = -1.;
-	float ntubes = -1.;
-	float loss = -1.;
-	float asym = -1.;
-	float width = -1.;
-	float length = -1.;
-	float MCe0 = -1.;
-	float MCxoff = -1.;
-	float MCyoff = -1.;
-	float MCxcore = -1.;
-	float MCycore = -1.;
-	float MCaz = -1.;
-	float disp = -1.;
-	float dispPhi = -1.;
-	float dist = -1.;
-	float tgrad_x = -1.;
-	float meanPedvar_Image = -1.;
-	float ze = -1.;
-	float az = -1.;
+	    float cen_x = -1.;
+	    float cen_y = -1.;
+	    float sinphi = -1.;
+	    float cosphi = -1.;
+	    float size = -1.;
+	    float ntubes = -1.;
+	    float loss = -1.;
+	    float asym = -1.;
+	    float width = -1.;
+	    float length = -1.;
+	    float MCe0 = -1.;
+	    float MCxoff = -1.;
+	    float MCyoff = -1.;
+	    float MCxcore = -1.;
+	    float MCycore = -1.;
+	    float Xcore = -1.;
+	    float Ycore = -1.;
+	    float Xoff = -1.;
+	    float Yoff = -1.;
+	    float LTrig = -1.;
+	    float MCaz = -1.;
+	    float disp = -1.;
+	    float NImages = -1.;
+	    float cross = -1.;
+	    float dispPhi = -1.;
+	    float dist = -1.;
+	    float tgrad_x = -1.;
+	    float meanPedvar_Image = -1.;
+	    float ze = -1.;
+	    float az = -1.;
 	
 	fMapOfTrainingTree.clear();
 	cout << "total number of telescopes: " << i_ntel << endl;
@@ -209,29 +210,36 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 			iTreeTitle << "training tree for modified disp method (telescope type " << i_tel.TelType << ")";
 			fMapOfTrainingTree[i_tel.TelType] = new TTree( iTreeName.str().c_str(), iTreeTitle.str().c_str() );
 			
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_x", &cen_x, "cen_x/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_y", &cen_y, "cen_y/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "sinphi", &sinphi, "sinphi/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "cosphi", &cosphi, "cosphi/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "size", &size, "size/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "ntubes", &ntubes, "ntubes/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "loss", &loss, "loss/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "asym", &asym, "asym/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "width", &width, "width/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "length", &length, "length/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "dist", &dist, "dist/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x", &tgrad_x, "tgrad_x/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image", &meanPedvar_Image, "meanPedvar_Image/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCe0", &MCe0, "MCe0/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxoff", &MCxoff, "MCxoff/F " );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCyoff", &MCyoff, "MCyoff/F " );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxcore", &MCxcore, "MCxcore/F " );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCycore", &MCycore, "MCycore/F " );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "MCaz", &MCaz, "MCaz/F " );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Ze", &ze, "Ze/F " );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "Az", &az, "Az/F " );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "disp", &disp, "disp/F" );
-			fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi", &dispPhi, "dispPhi/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_x", &cen_x, "cen_x/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cen_y", &cen_y, "cen_y/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "sinphi", &sinphi, "sinphi/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cosphi", &cosphi, "cosphi/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "size", &size, "size/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "ntubes", &ntubes, "ntubes/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "loss", &loss, "loss/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "asym", &asym, "asym/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "width", &width, "width/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "length", &length, "length/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "dist", &dist, "dist/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "tgrad_x", &tgrad_x, "tgrad_x/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "meanPedvar_Image", &meanPedvar_Image, "meanPedvar_Image/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCe0", &MCe0, "MCe0/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxoff", &MCxoff, "MCxoff/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCyoff", &MCyoff, "MCyoff/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCxcore", &MCxcore, "MCxcore/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCycore", &MCycore, "MCycore/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Xcore", &Xcore, "Xcore/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Ycore", &Ycore, "Ycore/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Xoff", &Xoff, "Xoff/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Yoff", &Yoff, "Yoff/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "LTrig", &LTrig, "LTrig/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "NImages", &NImages, "NImages/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "MCaz", &MCaz, "MCaz/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Ze", &ze, "Ze/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "Az", &az, "Az/F " );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "disp", &disp, "disp/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "cross", &cross, "cross/F" );
+			  fMapOfTrainingTree[i_tel.TelType]->Branch( "dispPhi", &dispPhi, "dispPhi/F" );
 			
 		}
 	}
@@ -251,7 +259,7 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 		iTreeName << "Tel_" << i + 1 << "/tpars";
 		TChain i_tparsTree( iTreeName.str().c_str() );
 		i_tparsTree.Add( iInputFile.c_str(), 0 );
-		Ctpars i_tpars( &i_tparsTree, true, 6, 1 );
+		Ctpars i_tpars( &i_tparsTree, true, 6, true );
 		
 		cout << "\t found tree " << iTreeName.str() << ", entries: " << i_showerpars.fChain->GetEntries() << ", ";
 		cout << i_tpars.fChain->GetEntries() << endl;
@@ -268,30 +276,37 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 				continue;
 			}
 			
-			cen_x = i_tpars.cen_x;
-			cen_y = i_tpars.cen_y;
-			sinphi = i_tpars.sinphi;
-			cosphi = i_tpars.cosphi;
-			size = i_tpars.size;
-			ntubes = i_tpars.ntubes;
-			loss = i_tpars.loss;
-			asym = i_tpars.asymmetry;
-			width = i_tpars.width;
-			length = i_tpars.length;
-			dist = i_tpars.dist;
-			tgrad_x = i_tpars.tgrad_x;
-			meanPedvar_Image = i_tpars.meanPedvar_Image;
-			ze = 90. - i_showerpars.TelElevation[i];
-			az = i_showerpars.TelAzimuth[i];
-			MCe0 = i_showerpars.MCe0;
-			MCxoff = i_showerpars.MCxoff;
-			MCyoff = i_showerpars.MCyoff;
-			MCxcore = i_showerpars.MCxcore;
-			MCycore = i_showerpars.MCycore;
-			MCaz = i_showerpars.MCaz;
+			  cen_x = i_tpars.cen_x;
+			  cen_y = i_tpars.cen_y;
+			  sinphi = i_tpars.sinphi;
+			  cosphi = i_tpars.cosphi;
+			  size = i_tpars.size;
+			  ntubes = i_tpars.ntubes;
+			  loss = i_tpars.loss;
+			  asym = i_tpars.asymmetry;
+			  width = i_tpars.width;
+			  length = i_tpars.length;
+			  dist = i_tpars.dist;
+			  tgrad_x = i_tpars.tgrad_x;
+			  meanPedvar_Image = i_tpars.meanPedvar_Image;
+			  ze = 90.-i_showerpars.TelElevation[i];
+			  az = i_showerpars.TelAzimuth[i];
+			  MCe0 = i_showerpars.MCe0;
+			  MCxoff = i_showerpars.MCxoff;
+			  MCyoff = i_showerpars.MCyoff;
+			  MCxcore = i_showerpars.MCxcore;
+			  MCycore = i_showerpars.MCycore;
+			  Xoff = i_showerpars.Xoff[4];
+			  Yoff = i_showerpars.Yoff[4];
+			  Xcore = i_showerpars.Xcore[4];
+			  Ycore = i_showerpars.Ycore[4];
+			  LTrig = i_showerpars.LTrig;
+			  NImages = i_showerpars.NImages[4];
+			  MCaz = i_showerpars.MCaz;
 			
 			// calculate disp (observe sign convention for MCyoff)
 			disp = sqrt( ( cen_y + MCyoff ) * ( cen_y + MCyoff ) + ( cen_x - MCxoff ) * ( cen_x - MCxoff ) );
+			cross = sqrt( (cen_y+Yoff)*(cen_y+Yoff) + (cen_x-Xoff)*(cen_x-Xoff) );
 			dispPhi = TMath::ATan2( sinphi, cosphi ) - TMath::ATan2( cen_y + MCyoff, cen_x - MCxoff );
 			
 			if( fMapOfTrainingTree.find( i_tel.TelType ) != fMapOfTrainingTree.end() )
@@ -308,8 +323,19 @@ bool writeTrainingFile( string iInputFile, string iOutputDir, string iOutputName
 
 int main( int argc, char* argv[] )
 {
-
+	// print version only
+	if( argc == 2 )
+	{
+		string fCommandLine = argv[1];
+		if( fCommandLine == "-v" || fCommandLine == "--version" )
+		{
+			VGlobalRunParameter fRunPara;
+			cout << fRunPara.getEVNDISP_VERSION() << endl;
+			exit( 0 );
+		}
+	}
 	cout << endl;
+        // print help text
 	if( argc < 4 )
 	{
 		cout << "./trainTMVAforAngularReconstruction <input eventdisplay file (MC)> <output directory> <training file name>" << endl;
@@ -319,6 +345,10 @@ int main( int argc, char* argv[] )
 	string fInputFile = argv[1];
 	string fOutputDir = argv[2];
 	string fOutputName = argv[3];
+
+        cout << "trainTMVAforAngularReconstruction (" << VGlobalRunParameter::getEVNDISP_VERSION() << ")" << endl;
+        cout << "------------------------------------" << endl;
+        cout << endl;
 	
 	// output file
 	ostringstream iFileName;
@@ -327,13 +357,15 @@ int main( int argc, char* argv[] )
 	if( iO.IsZombie() )
 	{
 		cout << "Error creating output file: " << iFileName.str() << endl;
-		return false;
+                cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
 	}
 	// fill training file
 	if( !writeTrainingFile( fInputFile, fOutputDir, fOutputName ) )
 	{
 		cout << "error writing training file " << endl;
-		exit( -1 );
+                cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
 	}
 	// write training tree to output file
 	map< ULong64_t, TTree* >::iterator fMapOfTrainingTree_iter;

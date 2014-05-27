@@ -15,10 +15,15 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 	fLength = 0.;
 	fSize = 0.;
 	fPedvar = 0.;
+	fAsymm = 0.;
 	fTGrad = 0.;
 	fZe = 0.;
 	fAz = 0.;
-	fAsymm = 0.;
+	fLoss = 0.;
+	fXcore = 0.;
+	fYcore = 0.;
+	fcross = 0.;
+	fDist = 0.;
 	
 	fTelescopeTypeList = iTelTypeList;
 	
@@ -31,12 +36,18 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 	
 	for( unsigned int i = 0; i < fTelescopeTypeList.size(); i++ )
 	{
-		fTMVAReader[fTelescopeTypeList[i]] = new TMVA::Reader( "!Color:!Silent" );
-		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "width", &fWidth );
-		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "length", &fLength );
-		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "size", &fSize );
-		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "asym", &fAsymm );
-		fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "tgrad_x", &fTGrad );
+	
+      fTMVAReader[fTelescopeTypeList[i]] = new TMVA::Reader( "!Color:!Silent" );
+      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "width", &fWidth );
+      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "length", &fLength );
+      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "size", &fSize );
+      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "tgrad_x*tgrad_x", &fTGrad );
+//      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "Xcore", &fXcore);
+//      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "Ycore", &fYcore );
+      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "cross", &fcross );
+      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "asym", &fAsymm);
+      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "loss", &fLoss );
+//      fTMVAReader[fTelescopeTypeList[i]]->AddVariable( "dist", &fDist );
 		
 		ostringstream iFileName;
 		iFileName << iFile << fTelescopeTypeList[i] << ".weights.xml";
@@ -52,20 +63,24 @@ VTMVADispAnalyzer::VTMVADispAnalyzer( string iFile, vector<ULong64_t> iTelTypeLi
 	bZombie = false;
 }
 
-float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, float iPedvar,
-								   float itgrad, float iZe, float iAz, float asymm, ULong64_t iTelType )
+float VTMVADispAnalyzer::evaluate( float iWidth, float iLength, float iSize, float iAsymm, float iLoss, float iTGrad, float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType, float iZe, float iAz )
 {
 	fWidth = iWidth;
 	fLength = iLength;
 	fSize = iSize;
-	fPedvar = iPedvar;
-	fTGrad = itgrad;
+	fTGrad = iTGrad * iTGrad;
 	fZe = iZe;
 	fAz = iAz;
-	fAsymm = asymm;
+	fcross = sqrt( (icen_y+yoff_4)*(icen_y+yoff_4) + (icen_x-xoff_4)*(icen_x-xoff_4) );
+	fLoss = iLoss;
+	fAsymm = iAsymm;
+
+	
 	
 	if( fTMVAReader.find( iTelType ) != fTMVAReader.end() && fTMVAReader[iTelType] )
 	{
+	
+	
 		return ( fTMVAReader[iTelType]->EvaluateRegression( "BDTDisp" ) )[0];
 	}
 	

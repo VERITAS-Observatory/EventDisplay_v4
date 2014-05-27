@@ -40,8 +40,8 @@ class VDispAnalyzer
 		
 		void  calculateMeanDirection( float& xs, float& ys, vector< float > x, vector< float > y,
 									  vector< float > cosphi, vector< float > sinphi, vector< float > v_disp, vector< float > v_weight );
-		float evaluate( float iWidth, float iLength, float iAsymm, float iDist, float iSize, float iPedvar, float tgrad, ULong64_t iTelType,
-						float iZe, float iAz, bool b2D = true );
+		float evaluate( float iWidth, float iLength, float iAsymm, float iDist, float iSize, float iPedvar, float itgrad, float iLoss, float icen_x, float icen_y, float xoff_4, float yoff_4, ULong64_t iTelType,
+                     float iZe, float iAz, bool b2D = true );
 		float getDisp()
 		{
 			return f_disp;
