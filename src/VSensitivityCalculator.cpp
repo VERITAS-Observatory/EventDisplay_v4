@@ -2496,7 +2496,6 @@ bool VSensitivityCalculator::getMonteCarlo_EffectiveArea( VSensitivityCalculator
 		}
 		break;
 	}
-	delete c;
 	// remove single filled bins in effective areas
 	bool bGoodBin = false;
 	if( iMCPara->energy.size() > 1 )
