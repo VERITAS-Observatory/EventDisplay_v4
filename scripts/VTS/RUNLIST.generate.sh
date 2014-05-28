@@ -84,6 +84,13 @@ while read -r RUNID; do
 	fi
 done < <($MYSQL -e " select run_id from VERITAS.tblRun_Info where source_id = '$SOURCE_NAME' and run_type = 'observing' and observing_mode = 'wobble' and weather <= $WEATHER and duration >= '00:${MIN_DURATION}:00' and db_start_time >= '$START_DATE' $END_DATE_STR and config_mask in $TEL_MASKS ;")
 
+# check if VERITAS.tblRun_Info had 0 runs for us
+if (( ${#RUNINFOARRAY[@]} <= 0 )) ; then
+	# if so, error out and tell the user why
+	echo "Error, no runs fit current conditions, try loosening arguments.  Exiting..." 2>&1
+	exit 1
+fi
+
 # Convert RUNINFOARRAY to a comma-separated tuple
 RUN_IDS=$(IFS=, ; echo "(${RUNINFOARRAY[*]})")
 
