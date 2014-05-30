@@ -706,7 +706,6 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	// finalize and write everything to disk
 	idir->cd();
 	fstereo_onoff->fill1DSignificanceHistogram();
-	
 	fstereo_onoff->writeHistograms( hStSig, hStSigUC );
 	fStereoOn->writeHistograms( true );
 	fStereoOff->writeHistograms( false );
@@ -714,7 +713,6 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 	{
 		fStereoOff->writeDebugHistograms();
 	}
-	
 	if( onrun == -1 )
 	{
 		// write run summary to disk

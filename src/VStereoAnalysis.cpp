@@ -328,8 +328,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	bIsGamma = false;
 	// event direction is inside search region (e.g. reflected region)
 	bool bDirectionCuts = false;
-        // successfull energy reconstruction
-        bool bEnergyQualityCuts = false;
+	// successfull energy reconstruction
+	bool bEnergyQualityCuts = false;
 	
 	// rate vectors
 	vector< double > iRateCounts;
@@ -382,7 +382,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	fMap->setNoSkyPlots( fNoSkyPlots );
 	fMap->setRunList( fRunPara->fRunList[fHisCounter] );
 	fMap->setHistograms( fHisto[fHisCounter]->hmap_stereo, fHisto[fHisCounter]->hmap_alpha, fHisto[fHisCounter]->hmap_MeanSignalBackgroundAreaRatio );
-						 
+	
 	fMapUC->setData( fDataRun );
 	fMapUC->setTargetShift( fRunPara->fRunList[fHisCounter].fTargetShiftWest, fRunPara->fRunList[fHisCounter].fTargetShiftNorth );
 	fMapUC->setRegionToExclude( fRunPara->fExclusionRegions );
@@ -421,8 +421,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	double newtime = 0.;
 	
 	double i_UTC = 0.;
-	double i_xderot = 0.;
-	double i_yderot = 0.;
+	double i_xderot = -99.;
+	double i_yderot = -99.;
+	double i_theta2 = -99.;
 	
 	// mean direction values
 	fMeanAzimuth = 0.;
@@ -467,7 +468,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			
 			// UTC time
 			i_UTC = VSkyCoordinatesUtilities::getUTC( fDataRun->MJD, fDataRun->Time );
-
+			
 			// phase cuts - this is also a time cut that adds to the previously initialized mask
 			if( !fCuts->applyPhaseCut( i ) )
 			{
@@ -542,13 +543,13 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			
 			// fill on/offstereo maps and directoin cut
 			bDirectionCuts = fMap->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
-										 fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
+										 fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
 			bDirectionCuts = fMapUC->fill( fIsOn, i_xderot, i_yderot, fCuts->getTheta2Cut_max( iErec ),
-										   fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma );
-                        // energy reconstruction cut
-                        bEnergyQualityCuts = fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod );
-										   
-                        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+										   fDataRun->Ze, iErec, fDataRun->runNumber, bIsGamma, i_theta2 );
+			// energy reconstruction cut
+			bEnergyQualityCuts = fCuts->applyEnergyReconstructionQualityCuts( fRunPara->fEnergyReconstructionMethod );
+			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// following histograms (theta2, mscw, mscl, core position, etc.)  assume source at given target position
 			
 			// theta2 ---
@@ -618,7 +619,8 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 					fHisto[fHisCounter]->herecChi2->Fill( iErecChi2 );
 				}
 				// fill a tree with the selected events (after direction cut only)
-				fill_TreeWithSelectedEvents( fDataRun );
+				//fill_TreeWithSelectedEvents( fDataRun );
+				fill_TreeWithSelectedEvents( fDataRun, i_xderot, i_yderot, i_theta2 );
 			}
 			
 			if( fIsOn && bIsGamma && fRunPara->fWriteAllGammaToTree )  // WRITEALLGAMMATOTREE
@@ -632,25 +634,25 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 			}
 			/////////////////////////////////////////////////////////
 			// histograms after gamma and energy reconstruction cuts
-                        if( bIsGamma && bEnergyQualityCuts )
-                        {
-                            // number of events as expected in a theta2 circle at the given offset
-                            double iWeight = 1.;
-                            // solid angle of this bin
-                            double i_ymax = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinUpEdge( 
-                                                              fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
-                            double i_ymin = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinLowEdge( 
-                                                              fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
-                            double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax * TMath::Pi() / 180. ) );
-                            iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin * TMath::Pi() / 180. ) );
-                            iWeight = fCuts->getTheta2Cut_max( iErec );
-                            if( iWeight > 0. )
-                            {
-                                iWeight = 2. * TMath::Pi() * ( 1. - cos( sqrt( iWeight )  * TMath::Pi() / 180. ) );
-                                iWeight /= iSoli;
-                                fHisto[fHisCounter]->herecCounts2D_vs_distance->Fill( log10( iErec ), iDirectionOffset, iWeight );
-                            }
-                        }
+			if( bIsGamma && bEnergyQualityCuts )
+			{
+				// number of events as expected in a theta2 circle at the given offset
+				double iWeight = 1.;
+				// solid angle of this bin
+				double i_ymax = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinUpEdge(
+									fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
+				double i_ymin = fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->GetBinLowEdge(
+									fHisto[fHisCounter]->herecCounts2D_vs_distance->GetYaxis()->FindBin( iDirectionOffset ) );
+				double iSoli = 2. * TMath::Pi() * ( 1. - cos( i_ymax * TMath::Pi() / 180. ) );
+				iSoli       -= 2. * TMath::Pi() * ( 1. - cos( i_ymin * TMath::Pi() / 180. ) );
+				iWeight = fCuts->getTheta2Cut_max( iErec );
+				if( iWeight > 0. )
+				{
+					iWeight = 2. * TMath::Pi() * ( 1. - cos( sqrt( iWeight )  * TMath::Pi() / 180. ) );
+					iWeight /= iSoli;
+					fHisto[fHisCounter]->herecCounts2D_vs_distance->Fill( log10( iErec ), iDirectionOffset, iWeight );
+				}
+			}
 			
 			/////////////////////////////////////////////////////////
 			// histograms after all cuts ( shape and direction cuts )
@@ -740,7 +742,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
 	}
 	// END: loop over all entries/events in the data tree
 	/////////////////////////////////////////////////////////////////////
-        
+	
 	fEnergy.setTimeBin( iEffAreaTimeBin[i_t_bins] - i_time_intervall / 2 - f_t_in_s_min[irun] );
 	fEnergy.setTimeBinnedMeanEffectiveArea();
 	fEnergy.resetTimeBin();
@@ -822,7 +824,7 @@ void VStereoAnalysis::writeHistograms( bool bOn )
 		if( fCuts )
 		{
 			fCuts->Write();
-		} 
+		}
 		fTimeMask->writeObjects();
 		if( bOn )
 		{
@@ -1134,7 +1136,7 @@ double VStereoAnalysis::combineHistograms()
 	
 	iDir->cd();
 	
-        ///////////////////////////////////////////////////
+	///////////////////////////////////////////////////
 	// loop over all runs (= all available histograms)
 	for( unsigned h = 0; h < n_histo; h++ )
 	{
@@ -1177,7 +1179,7 @@ double VStereoAnalysis::combineHistograms()
 				if( fHisto[h]->hmap_alpha_off && fHisto[h]->hmap_alpha_off->GetBinContent( i, j ) > 0. )
 				{
 					fHistoTot->hmap_stereo->SetBinContent( i, j, fHisto[h]->hmap_stereo->GetBinContent( i, j ) + fHistoTot->hmap_stereo->GetBinContent( i, j ) );
-                                        // divide later by total number of off events
+					// divide later by total number of off events
 					fHistoTot->hmap_alpha->SetBinContent( i, j, 1. / fHisto[h]->hmap_alpha->GetBinContent( i, j )*fHisto[h]->hmap_stereo->GetBinContent( i, j )
 														  + fHistoTot->hmap_alpha->GetBinContent( i, j ) );
 				}
@@ -2112,6 +2114,9 @@ bool VStereoAnalysis::init_TreeWithSelectedEvents( int irun, bool isOn )
 		fTreeSelectedEvents->Branch( "frogsTelGoodnessBkg1", &fTreeSelescted_frogsTelGoodnessBkg1, "frogsTelGoodnessBkg1/D" );
 		fTreeSelectedEvents->Branch( "frogsTelGoodnessBkg2", &fTreeSelescted_frogsTelGoodnessBkg2, "frogsTelGoodnessBkg2/D" );
 		fTreeSelectedEvents->Branch( "frogsTelGoodnessBkg3", &fTreeSelescted_frogsTelGoodnessBkg3, "frogsTelGoodnessBkg3/D" );
+		fTreeSelectedEvents->Branch( "frogsXS_derot", &fTreeSelescted_frogsXS_derot, "frogsXS_derot/D" );
+		fTreeSelectedEvents->Branch( "frogsYS_derot", &fTreeSelescted_frogsYS_derot, "frogsYS_derot/D" );
+		fTreeSelectedEvents->Branch( "frogs_theta2", &fTreeSelescted_frogs_theta2, "frogs_theta2/D" );
 	}
 	
 	return true;
@@ -2193,10 +2198,13 @@ void VStereoAnalysis::reset_TreeWithSelectedEvents()
 	fTreeSelescted_frogsTelGoodnessBkg1 = 0.;
 	fTreeSelescted_frogsTelGoodnessBkg2 = 0.;
 	fTreeSelescted_frogsTelGoodnessBkg3 = 0.;
-	
+	fTreeSelescted_frogsXS_derot = 0.;
+	fTreeSelescted_frogsYS_derot = 0.;
+	fTreeSelescted_frogs_theta2  = 0.;
 }
 
-void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c )
+//void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c )
+void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c, double i_xderot, double i_yderot, double i_theta2 )
 {
 	if( !c )
 	{
@@ -2262,28 +2270,28 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c )
 	fTreeSelected_ErrRWidth3D = c->ErrRWidth3D;
 	fTreeSelected_Converged3D = c->Converged3D;
 	/// frogs ///
-	fTreeSelescted_frogsEventID = c->frogsEventID;
-	fTreeSelescted_frogsGSLConStat = c->frogsGSLConStat;
-	fTreeSelescted_frogsNB_iter = c->frogsNB_iter;
-	fTreeSelescted_frogsNImages = c->frogsNImages;
-	fTreeSelescted_frogsXS = c->frogsXS;
-	fTreeSelescted_frogsXSerr = c->frogsXSerr;
-	fTreeSelescted_frogsYS = c->frogsYS;
-	fTreeSelescted_frogsYSerr = c->frogsYSerr;
-	fTreeSelescted_frogsXP = c->frogsXP;
-	fTreeSelescted_frogsXPerr = c->frogsXPerr;
-	fTreeSelescted_frogsYP = c->frogsYP;
-	fTreeSelescted_frogsYPerr = c->frogsYPerr;
-	fTreeSelescted_frogsXPGC = c->frogsXPGC;
-	fTreeSelescted_frogsYPGC = c->frogsYPGC;
-	fTreeSelescted_frogsEnergy = c->frogsEnergy;
-	fTreeSelescted_frogsEnergyerr = c->frogsEnergyerr;
-	fTreeSelescted_frogsLambda = c->frogsLambda;
-	fTreeSelescted_frogsLambdaerr = c->frogsLambdaerr;
+	fTreeSelescted_frogsEventID     = c->frogsEventID;
+	fTreeSelescted_frogsGSLConStat  = c->frogsGSLConStat;
+	fTreeSelescted_frogsNB_iter     = c->frogsNB_iter;
+	fTreeSelescted_frogsNImages     = c->frogsNImages;
+	fTreeSelescted_frogsXS          = c->frogsXS;
+	fTreeSelescted_frogsXSerr       = c->frogsXSerr;
+	fTreeSelescted_frogsYS          = c->frogsYS;
+	fTreeSelescted_frogsYSerr       = c->frogsYSerr;
+	fTreeSelescted_frogsXP          = c->frogsXP;
+	fTreeSelescted_frogsXPerr       = c->frogsXPerr;
+	fTreeSelescted_frogsYP          = c->frogsYP;
+	fTreeSelescted_frogsYPerr       = c->frogsYPerr;
+	fTreeSelescted_frogsXPGC        = c->frogsXPGC;
+	fTreeSelescted_frogsYPGC        = c->frogsYPGC;
+	fTreeSelescted_frogsEnergy      = c->frogsEnergy;
+	fTreeSelescted_frogsEnergyerr   = c->frogsEnergyerr;
+	fTreeSelescted_frogsLambda      = c->frogsLambda;
+	fTreeSelescted_frogsLambdaerr   = c->frogsLambdaerr;
 	fTreeSelescted_frogsGoodnessImg = c->frogsGoodnessImg;
-	fTreeSelescted_frogsNpixImg = c->frogsNpixImg;
+	fTreeSelescted_frogsNpixImg     = c->frogsNpixImg;
 	fTreeSelescted_frogsGoodnessBkg = c->frogsGoodnessBkg;
-	fTreeSelescted_frogsNpixBkg = c->frogsNpixBkg;
+	fTreeSelescted_frogsNpixBkg     = c->frogsNpixBkg;
 	fTreeSelescted_frogsTelGoodnessImg0 = c->frogsTelGoodnessImg0;
 	fTreeSelescted_frogsTelGoodnessImg1 = c->frogsTelGoodnessImg1;
 	fTreeSelescted_frogsTelGoodnessImg2 = c->frogsTelGoodnessImg2;
@@ -2292,6 +2300,9 @@ void VStereoAnalysis::fill_TreeWithSelectedEvents( CData* c )
 	fTreeSelescted_frogsTelGoodnessBkg1 = c->frogsTelGoodnessBkg1;
 	fTreeSelescted_frogsTelGoodnessBkg2 = c->frogsTelGoodnessBkg2;
 	fTreeSelescted_frogsTelGoodnessBkg3 = c->frogsTelGoodnessBkg3;
+	fTreeSelescted_frogsXS_derot = i_xderot;
+	fTreeSelescted_frogsYS_derot = i_yderot;
+	fTreeSelescted_frogs_theta2  = i_theta2;
 	
 	if( fTreeSelectedEvents )
 	{

@@ -115,7 +115,7 @@ void VStereoMaps::setRunList( VAnaSumRunParameterDataClass iL )
 
 */
 bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut_max,
-						double ze, double erec, int irun, bool i_isGamma )
+								double ze, double erec, int irun, bool i_isGamma, double &i_theta2 )
 {
 	fTheta2Cut_Max = theta2Cut_max;
 	if( fTheta2Cut_Max > fRunList.fSourceRadius )
@@ -125,11 +125,13 @@ bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut
 	
 	if( is_on )
 	{
-		return fillOn( x_sky, y_sky, ze, erec, irun, i_isGamma );
+	  //return fillOn( x_sky, y_sky, ze, erec, irun, i_isGamma );
+	  return fillOn( x_sky, y_sky, ze, erec, irun, i_isGamma, i_theta2 );
 	}
 	else
 	{
-		return fillOff( x_sky, y_sky, ze, erec, irun, i_isGamma );
+	  //return fillOff( x_sky, y_sky, ze, erec, irun, i_isGamma );
+	  return fillOff( x_sky, y_sky, ze, erec, irun, i_isGamma, i_theta2 );
 	}
 	
 	return false;
@@ -141,7 +143,8 @@ bool VStereoMaps::fill( bool is_on, double x_sky, double y_sky, double theta2Cut
     fill ON event into a sky map
 
 */
-bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, bool i_isGamma )
+//bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, bool i_isGamma )
+bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, bool i_isGamma, double &i_theta2 )
 {
 	double i_weight = 1.;
 	double i_MeanSignalBackgroundAreaRatio = 1.;
@@ -236,6 +239,7 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
 	// (theta2 cut might be energy dependent)
 	if( theta2 < fTheta2Cut_Max )
 	{
+	  i_theta2 = theta2;
 		return true;
 	}
 	
@@ -247,7 +251,7 @@ bool VStereoMaps::fillOn( double x, double y, double ze, double erec, int irun, 
    fill OFF events into a sky map
 
 */
-bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun, bool i_isGamma )
+bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun, bool i_isGamma, double &i_theta2 )
 {
 	// printout at beginning of each run
 	if( irun != fInitRun )
@@ -271,7 +275,7 @@ bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun,
 	
 	if( fRunList.fBackgroundModel == eONOFF )
 	{
-		return fillOn( x, y, ze, erec, irun, i_isGamma );
+	  return fillOn( x, y, ze, erec, irun, i_isGamma, i_theta2 );
 	}
 	
 	///////////////////////////////////////
@@ -291,7 +295,8 @@ bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun,
 	
 	else if( fRunList.fBackgroundModel == eREFLECTEDREGION )
 	{
-		return fill_ReflectedRegionModel( x, y, irun, i_isGamma );
+	  //return fill_ReflectedRegionModel( x, y, irun, i_isGamma );
+	  return fill_ReflectedRegionModel( x, y, irun, i_isGamma, i_theta2 );
 	}
 	
 	///////////////////////////////////////
@@ -321,7 +326,7 @@ bool VStereoMaps::fillOff( double x, double y, double ze, double erec, int irun,
 		{
 			i_isGamma = false;
 		}
-		return fillOn( x, y, ze, erec, irun, i_isGamma );
+		return fillOn( x, y, ze, erec, irun, i_isGamma, i_theta2 );
 	}
 	
 	return false;
@@ -733,7 +738,8 @@ void VStereoMaps::RE_getAlpha( bool iIsOn )
 	}
 }
 
-bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool i_isGamma )
+//bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool i_isGamma )
+bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool i_isGamma, double &i_theta2 )
 {
 	// at the beginning of each run, set up off regions
 	if( irun != fInitRun )
@@ -852,9 +858,12 @@ bool VStereoMaps::fill_ReflectedRegionModel( double x, double y, int irun, bool 
 				for( unsigned int p = 0; p < i_nr; p++ )
 				{
 					// apply theta2 cut in background region
-					if( ( x - fRE_off[i][j].xoff[p] ) * ( x - fRE_off[i][j].xoff[p] ) + ( y - fRE_off[i][j].yoff[p] ) * ( y - fRE_off[i][j].yoff[p] ) <
-							fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
+				  double theta2 = ( x - fRE_off[i][j].xoff[p] ) * ( x - fRE_off[i][j].xoff[p] ) + ( y - fRE_off[i][j].yoff[p] ) * ( y - fRE_off[i][j].yoff[p] );
+				  //if( ( x - fRE_off[i][j].xoff[p] ) * ( x - fRE_off[i][j].xoff[p] ) + ( y - fRE_off[i][j].yoff[p] ) * ( y - fRE_off[i][j].yoff[p] ) <
+				  //fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
+				  if( theta2 < fRE_off[i][j].roff[p]*fRE_off[i][j].roff[p] )
 					{
+					  i_theta2 = theta2;
 						hmap_stereo->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod );
 						hmap_alpha->Fill( i_cx - fRunList.fWobbleWestMod, i_cy - fRunList.fWobbleNorthMod,
 										  ( double )fRE_off[i][j].noff * f_RE_AreaNorm );

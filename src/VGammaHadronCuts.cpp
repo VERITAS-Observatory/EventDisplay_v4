@@ -116,8 +116,11 @@ VGammaHadronCuts::VGammaHadronCuts()
 	fIRFAngRes = 0;
 	fAngResContainmentProbability = 0;
 	
-	// frogs
-	frogsGoodnessImgCut = 0.;
+	//////////////////////////
+	// FROGS
+	fFileNameFrogsCut   = "";
+	fShowerGoodness     = 0;
+	fBackgroundGoodness = 0;
 	
 	setArrayCentre();
 }
@@ -594,10 +597,58 @@ bool VGammaHadronCuts::readCuts( string i_cutfilename, int iPrint )
 					fNTelTypeCut.back()->fTelType_counter.push_back( atoi( temp.c_str() ) );
 				}
 			}
-			else if( iCutVariable == "goodnessimgcut" )
+			////////////////////////////////////////////////////////////////////////////////////////////////////
+			// FROGS values
+			else if( iCutVariable == "frogscutsfile" )
 			{
-				is_stream >> temp;
-				frogsGoodnessImgCut = atoi( temp.c_str() );
+				if( !is_stream.eof() )
+				{
+					string iFileNameFrogsCut;
+					is_stream >> iFileNameFrogsCut;
+					fFileNameFrogsCut = iFileNameFrogsCut;
+				}
+			}
+			else if( iCutVariable == "frogscutsvariable" )
+			{
+				while( !is_stream.eof() )
+				{
+					string iVariableNameFrogsCut;
+					is_stream >> iVariableNameFrogsCut;
+					if( iVariableNameFrogsCut == "SG" )
+					{
+						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gShowerGoodness" );
+						if( !g )
+						{
+							cout << "VGammaHadronCuts::readCuts error while reading shower goodness graph from " << fFileNameFrogsCut << endl;
+							cout << "exiting..." << endl;
+							exit( EXIT_FAILURE );
+						}
+						else
+						{
+							fShowerGoodness = ( TGraph* )g->Clone();
+							fShowerGoodness->SetName( "BG" );
+							// print results
+							printFrogsCuts( iVariableNameFrogsCut );
+						}
+					}
+					if( iVariableNameFrogsCut == "BG" )
+					{
+						TGraph* g = ( TGraph* )TFile( fFileNameFrogsCut.c_str(), "READ" ).Get( "gBackgroundGoodness" );
+						if( !g )
+						{
+							cout << "VGammaHadronCuts::readCuts error while reading background goodness graph from " << fFileNameFrogsCut << endl;
+							cout << "exiting..." << endl;
+							exit( EXIT_FAILURE );
+						}
+						else
+						{
+							fBackgroundGoodness = ( TGraph* )g->Clone();
+							fBackgroundGoodness->SetName( "BackgroundGoodness" );
+							// print results
+							printFrogsCuts( iVariableNameFrogsCut );
+						}
+					}
+				}
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 			// TMVA values
@@ -1441,18 +1492,35 @@ bool VGammaHadronCuts::applyTMVACut( int i )
 
 bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 {
-        if( !fData->isFrogs() )
-        {
-            cout << "VGammaHadronCuts::applyFrogsCut error: input data (mscw file) without frogs data" << endl;
-            cout << "exiting..." << endl;
-            exit( EXIT_FAILURE );
-        }
-
+	if( !fData->isFrogs() )
+	{
+		cout << "VGammaHadronCuts::applyFrogsCut error: input data (mscw file) without frogs data" << endl;
+		cout << "exiting..." << endl;
+		exit( EXIT_FAILURE );
+	}
+	
 	if( fData->frogsEnergy < -99. )
 	{
 		return false;
 	}
-	if( fData->MSCW > 0.35 )
+	
+	double ShowerGoodnessCut_max = -99.;
+	if( fShowerGoodness->GetN() > 0 )
+	{
+		ShowerGoodnessCut_max = getShowerGoodnessCut_max( fData->frogsEnergy );
+	}
+	
+	double fMeanShowerGoodness = ( fData->frogsTelGoodnessImg0 + fData->frogsTelGoodnessImg1 + fData->frogsTelGoodnessImg2 + fData->frogsTelGoodnessImg3 ) / 4.;
+	
+	if( fMeanShowerGoodness > ShowerGoodnessCut_max )
+	{
+		return false;
+	}
+	
+	return true;
+	
+	/********* back of fag packet cuts ********/
+	/*if( fData->MSCW > 0.35 )
 	{
 		return false;
 	}
@@ -1461,7 +1529,6 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 		return false;
 	}
 	double mean = ( fData->frogsTelGoodnessImg0 + fData->frogsTelGoodnessImg1 + fData->frogsTelGoodnessImg2 + fData->frogsTelGoodnessImg3 ) / 4.;
-	//================= 1% Crab =================//
 	if( fData->frogsEnergy > -1.30 && fData->frogsEnergy <= -0.60 )
 	{
 		if( mean > 0.29 )
@@ -1519,7 +1586,7 @@ bool VGammaHadronCuts::applyFrogsCut( int i, bool fIsOn )
 		return true;
 	}
 	return false;
-	//================= 1% Crab =================//
+	*/
 	
 }
 
@@ -2462,16 +2529,16 @@ bool VGammaHadronCuts::setIRFGraph( TGraphErrors* g )
 		cout << "VGammaHadronCuts::setIRFGraph warning: IRF pointer is zero" << endl;
 		return false;
 	}
-
-        fIRFAngRes = new TGraphErrors( 1 );
-        double x = 0.;
-        double y = 0.;
-        for( int i = 0; i < g->GetN(); i++ )
-        {
-            g->GetPoint( i, x, y );
-            fIRFAngRes->SetPoint( i, x, y );
-            fIRFAngRes->SetPointError( i, g->GetErrorX( i ), g->GetErrorY( i ) ); 
-        }
+	
+	fIRFAngRes = new TGraphErrors( 1 );
+	double x = 0.;
+	double y = 0.;
+	for( int i = 0; i < g->GetN(); i++ )
+	{
+		g->GetPoint( i, x, y );
+		fIRFAngRes->SetPoint( i, x, y );
+		fIRFAngRes->SetPointError( i, g->GetErrorX( i ), g->GetErrorY( i ) );
+	}
 	fIRFAngRes->SetName( "IRFAngRes" );
 	
 	// print results
@@ -2676,3 +2743,34 @@ void VNTelTypeCut::print()
 	cout << endl;
 }
 
+void VGammaHadronCuts::printFrogsCuts( string iVariableNameFrogsCut )
+{
+	cout << "Frogs cut variable: " << iVariableNameFrogsCut << endl;
+	if( iVariableNameFrogsCut == "SG" )
+	{
+		cout << "Number of points: " << fShowerGoodness->GetN() << endl;
+		fShowerGoodness->Print();
+	}
+}
+
+double VGammaHadronCuts::getShowerGoodnessCut_max( double le )
+{
+	double shower_goodness_cut_max = -1.;
+	
+	shower_goodness_cut_max = fShowerGoodness->Eval( le );
+	
+	// for loge outside of graph range, return edge values
+	if( fShowerGoodness->GetN() > 0 && fShowerGoodness->GetX() && fShowerGoodness->GetY() )
+	{
+		if( le < fShowerGoodness->GetX()[0] )
+		{
+			shower_goodness_cut_max = fShowerGoodness->GetY()[0];
+		}
+		if( le > fShowerGoodness->GetX()[fShowerGoodness->GetN() - 1] )
+		{
+			shower_goodness_cut_max = fShowerGoodness->GetY()[fShowerGoodness->GetN() - 1];
+		}
+	}
+	
+	return shower_goodness_cut_max;
+}

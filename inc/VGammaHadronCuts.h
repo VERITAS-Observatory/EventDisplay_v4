@@ -148,6 +148,11 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		// energy dependent theta2 cuts from IRF file
 		TGraphErrors* fIRFAngRes;
 		
+		//////////////////////////
+		// FROGS
+		string  fFileNameFrogsCut;
+		TGraph* fShowerGoodness;     // energy dependent shower goodness cuts
+		TGraph* fBackgroundGoodness; // energy dependent background goodness cuts
 		
 		// cut statistics
 		VGammaHadronCutsStatistics* fStats;                       //!
@@ -239,8 +244,6 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		
 		vector< VNTelTypeCut* > fNTelTypeCut;
 		
-		double frogsGoodnessImgCut;
-		
 		bool   fUseOrbitalPhaseCuts;
 		double fOrbitalPhase_min;
 		double fOrbitalPhase_max;
@@ -262,6 +265,12 @@ class VGammaHadronCuts : public VAnalysisUtilities
 		bool   applyStereoShapeCuts();
 		bool   applyTMVACut( int i );
 		bool   applyTelTypeTest( bool bCount = false );
+		
+		//////////////////////////
+		// FROGS
+		void   printFrogsCuts( string );
+		double getShowerGoodnessCut_max( double );
+		
 		TF1*   getAngularResolutionFunction()
 		{
 			return fF1AngRes;

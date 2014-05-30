@@ -280,6 +280,9 @@ class VStereoAnalysis
 		double fTreeSelescted_frogsTelGoodnessBkg1;
 		double fTreeSelescted_frogsTelGoodnessBkg2;
 		double fTreeSelescted_frogsTelGoodnessBkg3;
+		double fTreeSelescted_frogsXS_derot;
+		double fTreeSelescted_frogsYS_derot;
+		double fTreeSelescted_frogs_theta2;
 		
 		double fTotCount;
 		
@@ -318,7 +321,8 @@ class VStereoAnalysis
 		bool   closeDataFile();
 		CData* getDataFromFile( int i_runNumber );
 		
-		void fill_TreeWithSelectedEvents( CData* );
+		//void fill_TreeWithSelectedEvents( CData* );
+		void fill_TreeWithSelectedEvents( CData*, double, double, double );
 		bool init_TreeWithSelectedEvents( int, bool );
 		void reset_TreeWithSelectedEvents();
 		
