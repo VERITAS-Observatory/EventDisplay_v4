@@ -6,8 +6,7 @@ if [[ $# < 4 ]]; then
 echo "
 ANASUM parallel data analysis: submit jobs using a simple run list
 
-ANALYSIS.anasum_parallel_from_runlist.sh <run list> <output directory>
- <cut set> <background model> [run parameter file] [mscw directory]
+ANALYSIS.anasum_parallel_from_runlist.sh <run list> <output directory> <cut set> <background model> [run parameter file] [mscw directory]
 
 required parameters:
 
@@ -55,26 +54,32 @@ BACKGND=$4
 # cut definitions (note: VX to be replaced later in script)
 if [[ $CUTS == *super* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat"
-    EFFAREA="effArea-d20131031-cut-N2-Point-005CU-SuperSoft-ATMXX-VX-T1234-d20131115.root"
+#    EFFAREA="effArea-d20131031-cut-N2-Point-005CU-SuperSoft-ATM$ATMO-VX-T1234-d20131115.root"
+    EFFAREA="effArea-GRISU-140531-Cut-NTel2-PointSource-SuperSoftSpectrum-VX-ATM$ATMO-T1234.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-SuperSoft-VX-T1234.root"
 elif [[ $CUTS == *open* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat"
-    EFFAREA="effArea-d20131031-cut-N2-Point-005CU-Open-ATMXX-VX-T1234-d20131115.root"
+############### ---- not updated ---- ##############
+#    EFFAREA="effArea-d20131031-cut-N2-Point-005CU-Open-ATM$ATMO-VX-T1234-d20131115.root"
+    EFFAREA="effArea-140512-Cut-NTel2-PointSource-Open-VX-ATM$ATMO-T1234.root"
     RADACC="radialAcceptance-d20131115-cut-N2-Point-005CU-Open-VX-T1234.root"
 elif [[ $CUTS == *soft* ]]; then
-    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-ExtendedSource-SoftSpectrum.dat"
-    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-ATMXX-VX-T1234-d20131115.root"
+    CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat"
+#    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Soft-ATM$ATMO-VX-T1234-d20131115.root"
+    EFFAREA="effArea-GRISU-140531-Cut-NTel3-PointSource-SoftSpectrum-VX-ATM$ATMO-T1234.root"
     RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Soft-VX-T1234.root"
 elif [[ $CUTS = *moderate* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-ModerateSpectrum.dat"
-    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATMXX-VX-T1234-d20131115.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-VX-T1234.root"
+    EFFAREA="effArea-GRISU-140531-Cut-NTel3-PointSource-ModerateSpectrum-VX-ATM$ATMO-T1234.root"
+    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 elif [[ $CUTS = *hard* ]]; then
     CUTFILE="ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat"
-    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Hard-ATMXX-VX-T1234-d20131115.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Hard-VX-T1234.root"
-    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATMXX-VX-T1234-d20131115.root"
-    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-VX-T1234.root"
+#    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Hard-ATM$ATMO-VX-T1234-d20131115.root"
+#    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Hard-VX-T1234.root"
+#    EFFAREA="effArea-d20131031-cut-N3-Point-005CU-Moderate-ATM$ATMO-VX-T1234-d20131115.root"
+    EFFAREA="effArea-140512-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-T1234.root"
+    EFFAREA="effArea-GRISU-140531-Cut-NTel3-PointSource-HardSpectrum-VX-ATM$ATMO-T1234.root"
+    RADACC="radialAcceptance-d20131115-cut-N3-Point-005CU-Moderate-V5-T1234.root"
 else
     echo "ERROR: unknown cut definition: $CUTS"
     exit 1
@@ -132,6 +137,7 @@ RUNS=`cat $RLIST`
 
 for RUN in ${RUNS[@]}; do
     # get array epoch and atmosphere for the run
+    echo $RUN
     EPOCH=`getRunArrayVersion $RUN`
     ATMO=`getRunAtmosphere $RUN`
     
