@@ -11,8 +11,7 @@ echo "
 IRF generation: create partial effective area files from MC ROOT files
  (simulations that have been processed by both evndisp_MC and mscw_energy_MC)
 
-IRF.generate_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <zenith>
- <offset angle> <NSB level> <Rec ID> <sim type>
+IRF.generate_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <zenith> <offset angle> <NSB level> <Rec ID> <sim type>
 
 required parameters:
 
@@ -78,10 +77,9 @@ fi
 
 # input directory containing mscw_energy_MC products
 if [[ -n $VERITAS_IRFPRODUCTION_DIR ]]; then
-    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/RecID${RECID}"
-elif [[ -z $VERITAS_IRFPRODUCTION_DIR || ! -d $INDIR ]]; then
-    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/RecID${RECID}"
-elif [[ ! -d $INDIR ]]; then
+    INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/MSCW_RECID${RECID}"
+fi
+if [[ ! -d $INDIR ]]; then
     echo -e "Error, could not locate input directory. Locations searched:\n $INDIR"
     exit 1
 fi
@@ -90,8 +88,6 @@ echo "Input file directory: $INDIR"
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
     ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
-else
-    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATM}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
 fi
 echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR

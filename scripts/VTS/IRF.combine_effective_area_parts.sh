@@ -9,8 +9,7 @@ if [[ $# < 5 ]]; then
 echo "
 IRF generation: combine partial effective area files
 
-IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID>
- <sim type> [date]
+IRF.combine_effective_area_parts.sh <cuts file> <epoch> <atmosphere> <Rec ID> <sim type> [date]
 
 required parameters:
     
@@ -41,6 +40,9 @@ examples:
 exit
 fi
 
+# date
+DATE=`date +"%y%m%d"`
+
 # Run init script
 bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 [[ $? != "0" ]] && exit 1
@@ -65,8 +67,6 @@ CUTS_NAME=${CUTS_NAME%%.dat}
 # input directory with effective areas
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
     INDIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
-else
-    INDIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas_${CUTS_NAME}"
 fi
 if [[ ! -d $INDIR ]]; then
     echo "Error, could not locate input directory. Locations searched:"
@@ -80,8 +80,6 @@ echo "Input files: $INFILES"
 # Output file directory
 if [[ -n "$VERITAS_IRFPRODUCTION_DIR" ]]; then
     ODIR="$VERITAS_IRFPRODUCTION_DIR/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
-else
-    ODIR="$VERITAS_USER_DATA_DIR/analysis/$EDVERSION/$SIMTYPE/${EPOCH}_ATM${ATMOS}_${PARTICLE_TYPE}/EffectiveAreas"
 fi
 echo -e "Output files will be written to:\n $ODIR"
 mkdir -p $ODIR
@@ -106,9 +104,9 @@ echo "Processing epoch $EPOCH, atmosphere ATM$ATMOS, RecID $RECID"
 [[ $RECID == 4 ]] && T="123"
 
 # output effective area name
-OFILE="effArea-${EANAME}-${CUTS_NAME}-${EPOCH}-ATM${ATMOS}-T${T}"
+OFILE="effArea-$SIMTYPE-${EANAME}-${CUTS_NAME}-${EPOCH}-ATM${ATMOS}-T${T}"
 
-FSCRIPT="$LOGDIR/COMB-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
+FSCRIPT="$LOGDIR/COMB-EFFAREA-$CUTSFILE-ATM$ATMOS-$EPOCH-ID$RECID"
 rm -f $FSCRIPT.sh
 
 sed -e "s|INPUTFILES|$INFILES|" \

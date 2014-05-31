@@ -59,13 +59,13 @@ if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 075 100 150 200 250 325 425 550 750 1000 )
     WOBBLE_OFFSETS=( 0.5 0.00 0.25 0.75 1.00 1.25 1.50 1.75 2.00 )
-    TABLEFILE="table_v442rc_d20140523_GrIsuDec12_ATM21_VX_ID0"
+    TABLEFILE="table_v443rc_d20140528_GrIsuDec12_ATM21_VX_ID0"
 elif [ ${SIMTYPE:0:4} = "CARE" ]; then
     # CARE simulation parameters
     ZENITH_ANGLES=( 00 20 30 35 40 45 50 55 60 65 )
     NSB_LEVELS=( 50 80 120 170 230 290 370 450 )
     WOBBLE_OFFSETS=( 0.5 )
-    TABLEFILE="table_v442rc_d20140523_CARE_Jan1427_ATM21_VX_ID0"
+    TABLEFILE="table_v442rc_d20140527_CARE_Jan1427_ATM21_VX_ID0"
 else
     echo "Invalid simulation type. Exiting..."
     exit 1
@@ -85,8 +85,8 @@ else
     CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat 
              ANASUM.GammaHadron-Cut-NTel3-PointSource-ModerateSpectrum.dat 
              ANASUM.GammaHadron-Cut-NTel3-PointSource-SoftSpectrum.dat 
-             ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat 
-             ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat" 
+             ANASUM.GammaHadron-Cut-NTel3-PointSource-HardSpectrum.dat"
+#             ANASUM.GammaHadron-Cut-NTel2-PointSource-Open.dat" 
 #    CUTLIST="ANASUM.GammaHadron-Cut-NTel2-PointSource-SuperSoftSpectrum.dat "
 fi
 
@@ -118,13 +118,11 @@ for VX in $EPOCH; do
                     echo "Now processing epoch $VX, atmo $ATM, zenith angle $ZA, wobble $WOBBLE, noise level $NOISE"
                     # run simulations through evndisp
                     if [[ $IRFTYPE == "EVNDISP" ]]; then
-                        if [[ -z $SIMDIR ]]; then
-                           if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-                              SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
-                           elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
-                              SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/${SIMTYPE}
-                           fi
-                        fi
+                       if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
+                          SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/grisu/ATM"$ATM"
+                       elif [[ ${SIMTYPE:0:4} = "CARE" ]]; then
+                          SIMDIR=$VERITAS_DATA_DIR/simulations/"$VX"_FLWO/${SIMTYPE}
+                       fi
                         ./IRF.evndisp_MC.sh $SIMDIR $VX $ATM $ZA $WOBBLE $NOISE $SIMTYPE
                     # make tables
                     elif [[ $IRFTYPE == "MAKETABLES" ]]; then
