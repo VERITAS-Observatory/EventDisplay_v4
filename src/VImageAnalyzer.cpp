@@ -876,7 +876,7 @@ void VImageAnalyzer::shutdown()
 	{
                 fOutputfile->Flush();
                 cout << "closing evndisp output file, final contents: ";
-                fOutputfile->ls();
+                if( fReader->isMC() ) fOutputfile->ls();
                 cout << "\t file size: " << fOutputfile->GetSize() << endl;
 		fOutputfile->Close();
 	}

@@ -20,6 +20,7 @@
 #include <bitset>
 
 #include "VDB_Connection.h"
+#include "VSkyCoordinatesUtilities.h"
 
 using namespace std;
 

@@ -2,6 +2,10 @@ Change log eventdisplay analysis package
 ========================================
 (please observe the wiki syntax for this file)
 
+* 20140531 (GM)
+bug fix: analysis of old runs with 0 run duration let to seg fault in 
+dead time calculation
+
 * 20140527 (KB, GM)
 integration of DISP routines into the trunk
 (merge from DISP branch to trunk)

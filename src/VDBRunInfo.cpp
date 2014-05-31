@@ -308,6 +308,15 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
 	{
 		fDuration = 0;
 	}
+        if( TMath::Abs( fDuration < 1.e-4 ) )
+        {
+                double mjd = 0.;
+                double isec_start = 0.;
+                double isec_stopp = 0.;
+                VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStartTimeSQL, mjd, isec_start );
+                VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStoppTimeSQL, mjd, isec_stopp );
+                fDuration = isec_stopp - isec_start;
+        }
 	
 	if( db_row->GetField( 19 ) )
 	{

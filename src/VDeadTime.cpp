@@ -224,6 +224,10 @@ void VDeadTime::defineHistograms( float iRunDuration )
 		hScalarDeadTimeFraction->Sumw2();
 		hisList->Add( hScalarDeadTimeFraction );
 	}
+        else
+        {
+           cout << "Warning: scalars not used for dead time calculation, run duration zero (" << iRunDuration << ")" << endl;
+        }
 	
 }
 
@@ -241,7 +245,7 @@ double VDeadTime::fillDeadTime( double time, unsigned int* tenMHzClock )
 
 void VDeadTime::fillTenMHzClockArray( double time, unsigned int* tenMHzClock )
 {
-	if( !tenMHzClock )
+	if( !tenMHzClock || !hScalarClock )
 	{
 		return;
 	}
