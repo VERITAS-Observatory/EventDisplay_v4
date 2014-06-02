@@ -65,6 +65,7 @@ class VPlotCompareDataWithMC
 		void msc_plots( char* offFile = 0, char* helium = 0, char* proton = 0, double xmin = -1.5, double xmax = 4., string ivar = "MSCW" );
 		void msc_vs_energy_plots( int iRebin = 4, double xmin = -1.5, double xmax = 1.5 );
 		void mwr_vs_energy_plots( int iRebin = 4, double xmin =  0.5, double xmax = 1.5 );
+		void model3D_vs_energy_plots(); 
 		void multiplicity_plots();
 		bool openDataFile( string ifile );
 		void plot( string iPrintName = "" );
