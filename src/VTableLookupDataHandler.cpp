@@ -362,17 +362,6 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
 		}
 	}
 	
-	// test here reconstructed and stop if necessary
-	// GMG
-	/*    if( !isReconstructed() )
-	    {
-	       if( fDebug > 1 ) cout << "\t NO RECONSTRUCTION " << fEventCounter << endl;
-	       fEventStatus = false;
-	       fEventCounter++;
-	       fNStats_Chi2Cut++;
-	       return 0;
-	    }   */
-	
 	fZe = fshowerpars->Ze[fMethod];
 	fAz = fshowerpars->Az[fMethod];
 	fXcore = fshowerpars->Xcore[fMethod];

@@ -415,7 +415,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		double igainlowgain = 0.;
 		double ilowgainmultiplier_trace = 0;
 		double ilowgainmultiplier_sum[iMAXDEFWINDOWS][iMAXSUMWINDOWS];
-		unsigned int inlowgaindefaultsumwindows;
+		unsigned int inlowgaindefaultsumwindows = 0;
 		double ilowgaindefaultsumwindows[iMAXDEFWINDOWS];
 		double igainvarlowgain = 0.;
 		double itofflowgain = 0.;
@@ -432,6 +432,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		{
 			pedvarV[i] = 0.;
 			pedvarLowGainV[i] = 0.;
+                        ilowgaindefaultsumwindows = 0.;
 			for( unsigned int j = 0; j < iMAXDEFWINDOWS; j++ )
 			{
 				ilowgainmultiplier_sum[j][i] = 0;
@@ -554,7 +555,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 					}
 				}
 				
-				ilowgainmultiplier_trace = fLowGainMultiplier_Trace ;
+				ilowgainmultiplier_trace = fLowGainMultiplier_Trace;
 				inlowgaindefaultsumwindows = getLowGainDefaultSumWindows().size();
 				
 				for( unsigned int k = 0; k < inlowgaindefaultsumwindows && k < iMAXDEFWINDOWS; k++ )

@@ -702,6 +702,10 @@ void VEventLoop::shutdown()
 		{
 			fOutputfile->cd();
 		}
+                else if( fRunPar->frunmode == R_DST && fDST && fDST->getDSTFile() )
+                {
+                    fDST->getDSTFile()->cd();
+                }
 		else if( fRunPar->frunmode != R_PED && fRunPar->frunmode != R_PEDLOW
 				 && fRunMode != R_GTO && fRunMode != R_GTOLOW
 				 && fRunMode != R_TZERO && fRunMode != R_TZEROLOW )

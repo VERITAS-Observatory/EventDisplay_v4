@@ -80,9 +80,11 @@ void VTraceHandler::setTrace( VVirtualDataReader* iReader, unsigned int iNSample
 		}
 	}
 	else for( unsigned int i = 0; i < iNSamples; i++ )
+        {
 		{
 			fpTrace[i] = iReader->getSample_double( iHitID, i + fMC_FADCTraceStart, ( i == 0 ) );
 		}
+        }
 		
 	fpTrazeSize = int( fpTrace.size() );
 	if( iHiLo > 0. )

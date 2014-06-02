@@ -2857,7 +2857,7 @@ int VCalibrator::readLowGainCalibrationValues_fromCalibFile( string iVariable, u
 						else if( iVariable == "LOWGAINMULTIPLIER_TRACE" && atof( iValueString.c_str() ) > 0. && iTel == ( int )iTelescopeSelect )
 						{
 							cout << "Telescope " << getTelID() + 1 << ": ";
-							cout << "VCalibrator::readLowGainMultiplier():  LOWGAINMULTIPLIER_TRACE " << iTel << ": " <<  atof( iValueString.c_str() ) << endl;
+							cout << "VCalibrator::readLowGainMultiplier():  LOWGAINMULTIPLIER_TRACE " << iTel+1 << ": " <<  atof( iValueString.c_str() ) << endl;
 							setLowGainMultiplier_Trace( atof( iValueString.c_str() ) );
 						}
 						else if( iVariable == "LOWGAINMULTIPLIER_SUM" && atoi( iValueString.c_str() ) > 0. && iTel == ( int )iTelescopeSelect )
