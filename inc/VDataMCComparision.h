@@ -80,7 +80,17 @@ class VDataMCComparision
 		TH1D* hMVA;
 		vector< TH1D* > hR;
 		vector< TH2D* > hdistR;
-		
+		TH1D* hsigmaT3D;    //JG
+		TH1D* hNc3D;        //JG
+		TH1D* hDepth3D;     //JG
+		TH1D* hRWidth3D;    //JG
+		TH1D* hErrRWidth3D; //JG
+		TH2D* hsigmaT3DErec;    //JG
+		TH2D* hNc3DErec;        //JG
+		TH2D* hDepth3DErec;     //JG
+		TH2D* hRWidth3DErec;    //JG
+		TH2D* hErrRWidth3DErec; //JG
+
 		// single telescope histograms
 		vector<TH1D* > hdist;
 		vector<TH1D* > hntubes;
