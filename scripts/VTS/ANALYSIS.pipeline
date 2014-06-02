@@ -139,6 +139,15 @@ EFDATE2="20131115"
 # used by (mutate) stage
 CTOOLSDIR="$CWD/ctoolsdata"
 
+# Should we use manually-defined laser runs for some runs?
+# (yes/no)
+SCIPIPE_MANUALLASER="yes"
+# If yes, which calibration file should we use to manually define 
+# which runs have which laser runs?
+# The calibration file should be in $VERITAS_EVNDISP_AUX_DIR/Calibration ,
+# and should have the same format as calibrationlist.dat in that directory.
+SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
+
 #
 # END ANALYSIS SETTINGS
 #
@@ -244,6 +253,15 @@ mkdir -p $ANASUMOUTPUTDIR
 
 # ctools output directory
 mkdir -p $CTOOLSDIR
+
+# check that $SCIPIPE_MANUALLASERFILE is a valid
+# file in $VERITAS_EVNDISP_AUX_DIR/Calibration
+if [[ "$SCIPIPE_MANUALLASER" == "yes" ]] ; then
+	if [[ ! -f "$SCIPIPE_MANUALLASERFILE" ]] ; then
+		echo "Error, you specified 'SCIPIPE_MANUALLASER=yes', but the file specified by 'SCIPIPE_MANUALLASERFILE=$SCIPIPE_MANUALLASERFILE' doesn't seem to exist.  Use 'SCIPIPE_MANUALLASER=no', or figure out the right file for SCIPIPE_MANUALLASERFILE, exiting..."
+		exit 1
+	fi
+fi
 
 # alert the user if they are using FASTDEVMODE
 function checkForFASTDEVMODE {
@@ -391,7 +409,7 @@ if [[ "$STAGE" == "evndisp" ]] ; then
         echo
         
         # check batch jobs, if we can
-        checkBatchJobExits "$EVNJOBSUB"
+        checkBatchJobExits "$EVNJOBSUB" "$RUNLIST"
         echo
         
 		QSUBDATA=$(cat "$EVNJOBSUB")
@@ -521,7 +539,7 @@ if [[ "$STAGE" == "mscw" ]] ; then
         echo
         
         # check batch jobs, if we can
-        checkBatchJobExits "$MSCWJOBSUB"
+        checkBatchJobExits "$MSCWJOBSUB" "$RUNLIST"
         echo
         
 		QSUBDATA=$(cat "$MSCWJOBSUB")
@@ -611,7 +629,7 @@ if [[ "$STAGE" == "frogs" ]] ; then
         echo
         
         # check batch jobs, if we can
-        checkBatchJobExits "$FROGSJOBSUB"
+        checkBatchJobExits "$FROGSJOBSUB" "$RUNLIST"
         
         # scan all log files
         QSUBDATA=$( cat $FROGSJOBSUB )
@@ -708,7 +726,7 @@ if [[ "$STAGE" == "anpar" ]] ; then
         echo
         
         # check batch jobs, if we can
-        checkBatchJobExits "$ANPARJOBSUB"
+        checkBatchJobExits "$ANPARJOBSUB" "$RUNLIST"
         echo
         
 		QSUBDATA=$( cat $ANPARJOBSUB )

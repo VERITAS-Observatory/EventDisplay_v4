@@ -77,7 +77,9 @@ fi
 # OPT+=( -raoffset=6.25 )
 #
 ## use text file for calibration information
-# OPT+=( -calibrationfile calibrationlist.dat )
+if [[ "$SCIPIPE_MANUALLASER" == "yes" ]] ; then
+	OPT+=( -calibrationfile "$SCIPIPE_MANUALLASERFILE" )
+fi
 #
 ## double pass correction
 # OPT+=( -nodp2005 )

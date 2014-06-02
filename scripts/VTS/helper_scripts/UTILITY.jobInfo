@@ -15,55 +15,32 @@ ISPIPEFILE=`readlink /dev/fd/0` # check to see if input is from terminal, or fro
 if [[ "$ISPIPEFILE" =~ ^/dev/pts/[0-9]{1,2} && "$#" < "1" ]] ; then # its a terminal (not a pipe)
     #echo "terminal"
     echo "For displaying information about a completed batch job."
-    echo "$ $SELFNAME <runnumber>"
+    echo "$ $SELFNAME <sge job number>"
+	echo "note: just the job number, not the jobnumber.taskid (yes=38717234, no=12842248.1-8:2)"
     exit 1
 #else
     #echo "pipe"
 fi
 
-function getInputs {
-    if read -t 0 ; then
-        cat
-    else
-        echo "$@"
-    fi
-}
-
-# tokenize all job numbers
-RAWJOBNUM=$( getInputs "$@")
-#echo "RAWJOBNUM '$RAWJOBNUM'"
-JOBLIST=()
-for jobnum in $RAWJOBNUM ; do
-    #echo "$jobnum"
-    JOBLIST+=( $jobnum )
-done
-
-if [[ "${#JOBLIST[@]}" != "1" ]] ; then
-    echo "Error, only one job number allowed, you submitted '${JOBLIST[@]}', exiting..."
-    exit 2
+JOBNUM="$1"
+if [[ "$JOBNUM" =~ [^0-9] ]] ; then
+	echo "Error, non-number detected in '$JOBNUM', exiting..."
+	echo "Input must be an integer, e.g:"
+	echo "  $ $SELFNAME 1175496"
+	echo "note: just the job number, not the jobnumber.taskid (yes=38717234, no=12842248.1-8:2)"
+	echo "note: will get the latest job number's info"
+	exit 3
 fi
-
-# check if inputs are numbers
-for jobnum in "${JOBLIST[@]}" ; do
-    if [[ "$jobnum" =~ [^0-9] ]] ; then
-        echo "Error, non-number detected in '$jobnum', exiting..."
-        echo "Input must be an integer, e.g:"
-        echo "  $ $SELFNAME 1175496"
-        exit 3
-    fi
-done
 
 # check if job number is currently running,
 # quit if it still is
 if command -v qstat > /dev/null 2>&1 ; then
-    for jobnum in "${JOBLIST[@]}" ; do
-        JOBISRUNNING=$( qstat -u $USER | grep -P "^$jobnum" )
-        #echo "JOBISRUNNING:'$JOBISRUNNING'"
-        if [[ ! -z "$JOBISRUNNING" ]] ; then
-            echo "Job '$jobnum' is still running, please wait until it's done."
-            exit 4
-        fi
-    done
+	JOBISRUNNING=$( qstat -u $USER | grep -P "^$JOBNUM" )
+	#echo "JOBISRUNNING:'$JOBISRUNNING'"
+	if [[ ! -z "$JOBISRUNNING" ]] ; then
+		echo "Job '$JOBNUM' is still running, please wait until it's done."
+		exit 4
+	fi
 else
     echo "error, can't find program 'qstat'... are you sure you have access to a cluster?"
     exit 5
@@ -106,7 +83,8 @@ DIDWEGETJOBDATA=no
 # check short term job info storage
 if $CHECKSHORT ; then
     # check short-term job info
-    JOBTEXT=$( $SHORTBIN -j ${JOBLIST[@]} 2>&1 )
+    #JOBTEXT=$( $SHORTBIN -j ${JOBLIST[@]} 2>&1 )
+    JOBTEXT=$( $SHORTBIN -j $JOBNUM 2>&1 )
     #echo "JOBTEXT 1 '$JOBTEXT'"
     if [[ ! "$JOBTEXT" =~ "error: job id" ]] ; then
         # format the text, 1 task per line
@@ -116,12 +94,12 @@ if $CHECKSHORT ; then
         DIDWEGETJOBDATA=yes
         #echo "Short Term" ; echo "'$JOBTEXT'"
     fi
-
 fi
         
 # check long term job info storage
 if [[ $CHECKLONG && $DIDWEGETJOBDATA == no ]] ; then
-    JOBTEXT=$( $LONGBIN sgejobs $JOBLIST 2>&1 )
+    #JOBTEXT=$( $LONGBIN sgejobs $JOBLIST 2>&1 )
+    JOBTEXT=$( $LONGBIN sgejobs $JOBNUM 2>&1 )
     #echo "JOBTEXT 2 '$JOBTEXT'"
     if [[ ! "$JOBTEXT" =~ "no jobs submitted for user" ]] ; then
         # format things, 1 task per line
@@ -141,6 +119,36 @@ fi
 
 # loop over tasks
 ANYPROBLEMS="no"
+
+# need to find the latest job submission time (short:qsub_time or long:submission_time)
+#echo "JOBNUM:$JOBNUM"
+if [[ $STORAGEFLAG == short ]] ; then
+	#echo "SHORT!"
+	LATESTJOBSUBTIME="0"
+	LATESTJOBSUBTIMEF=""
+	while read JOBTEXTLINE ; do
+		SUBTIMEFORM=$( echo "$JOBTEXTLINE" | grep -oP "qsub_time .+ start_time " | awk '{ $1=""; $2="" ; $8="" ; print $0 }' | sed -e 's/^ *//' -e 's/ *$//' )
+		#echo "SUBTIMEFORM:'$SUBTIMEFORM'"
+		SUBTIME=$( date -d "$SUBTIMEFORM" +%s )
+		#echo "SUBTIME:'$SUBTIME'"
+		if (( $SUBTIME > $LATESTJOBSUBTIME )) ; then
+			LATESTJOBSUBTIME=$SUBTIME
+			LATESTJOBSUBTIMEF="$SUBTIMEFORM"
+		fi
+	done < <(echo "$JOBTEXT")
+	#echo "LATEST:$LATESTJOBSUBTIME - '$LATESTJOBSUBTIMEF'"
+	LATESTLINES=$(echo "$JOBTEXT" | grep "jobnumber = $JOBNUM" | grep "qsub_time = $LATESTJOBSUBTIMEF")
+	#LATESTLINES=$(echo "$JOBTEXT" | grep "qsub_time = $LATESTJOBSUBTIMEF")
+elif [[ $STORAGEFLAG == long ]] ; then
+	#echo "LONG!"
+	SUBTIME=$( echo "$JOBTEXT" | grep -oP "submission_time = \d+" | grep -oP "\d+" | awk '{ if(max==""){max=$1}; if ($1>max){max=$1}; count+=1} END {print max}' )
+	#echo "$SUBTIME"
+	LATESTLINES=$( echo "$JOBTEXT" | grep "submission_time = $SUBTIME" | grep "job_number = $JOBNUM" )
+fi
+#echo "LATESTLINES:"
+#echo "$LATESTLINES"
+#exit 0
+
 while read -r LINE ; do
     #echo
     #echo "$LINE"
@@ -151,21 +159,30 @@ while read -r LINE ; do
     FAILEDCODE=$( echo "$LINE" | grep -oP "failed = \d+"      | grep -oP "\d+" )
     if   [[ $STORAGEFLAG == short ]] ; then
         JOBNUM=$(   echo "$LINE" | grep -oP "jobnumber = \d+" | grep -oP "\d+" )
-        TASKNUM=$(  echo "$LINE" | grep -oP "taskid = \d+"    | grep -oP "\d+" )
-        JOBSTART=$( echo "$LINE" | grep -oP "start_time = .+ end_time" | awk '{ $1=""; $2="" ; $8="" ; print $0 }' | sed -e 's/^ *//' -e 's/ *$//' )
-        JOBEND=$(   echo "$LINE" | grep -oP "end_time = .+ granted_pe" | awk '{ $1=""; $2="" ; $8="" ; print $0 }' | sed -e 's/^ *//' -e 's/ *$//' )
+        TASKNUM=$(  echo "$LINE" | grep -oP "taskid = (\d+|undefined)"  | awk '{print $3}')
+        JOBSUBTI=$( echo "$LINE" | grep -oP "qsub_time = .+ start_time" | awk '{ $1=""; $2="" ; $8="" ; print $0 }' | sed -e 's/^ *//' -e 's/ *$//' )
+        JOBSTART=$( echo "$LINE" | grep -oP "start_time = .+ end_time"  | awk '{ $1=""; $2="" ; $8="" ; print $0 }' | sed -e 's/^ *//' -e 's/ *$//' )
+        JOBEND=$(   echo "$LINE" | grep -oP "end_time = .+ granted_pe"  | awk '{ $1=""; $2="" ; $8="" ; print $0 }' | sed -e 's/^ *//' -e 's/ *$//' )
         JOBSTART=$( date -d "$JOBSTART" +%s )
         JOBEND=$(   date -d "$JOBEND"   +%s )
+		JOBSUBTIME=$( date -d "$JOBSUBTI" +%s )
+		#echo "JOBSUBTI:'$JOBSUBTI'" 2>&1
+		#echo "SHORT:JOBSUBTIME:'$JOBSUBTIME'" 2>&1
+		
     elif [[ $STORAGEFLAG == long  ]] ; then
-        JOBNUM=$(   echo "$LINE" | grep -oP "job_number = \d+"  | grep -oP "\d+" )
-        TASKNUM=$(  echo "$LINE" | grep -oP "task_number = \d+" | grep -oP "\d+" )
-        JOBSTART=$( echo "$LINE" | grep -oP "start_time = \d+"  | grep -oP "\d+" )
-        JOBEND=$(   echo "$LINE" | grep -oP "end_time = \d+"    | grep -oP "\d+" )
+        JOBNUM=$(     echo "$LINE" | grep -oP "job_number = \d+"      | grep -oP "\d+" )
+        TASKNUM=$(    echo "$LINE" | grep -oP "task_number = \d+"     | grep -oP "\d+" )
+        JOBSUBTIME=$( echo "$LINE" | grep -oP "submission_time = \d+" | grep -oP "\d+" )
+        JOBSTART=$(   echo "$LINE" | grep -oP "start_time = \d+"      | grep -oP "\d+" )
+        JOBEND=$(     echo "$LINE" | grep -oP "end_time = \d+"        | grep -oP "\d+" )
     fi
     #echo "JOBSTART '$JOBSTART'"
     #echo "JOBEND   '$JOBEND'"
     JOBDUR=$(( JOBEND - $JOBSTART ))
     JOBDURTXT=$( date -u -d @${JOBDUR} +"%T" )
+	#echo "JOBSUBTIME:'$JOBSUBTIME'" 2>&1
+	JOBSUBTIMEF=$( date -d @${JOBSUBTIME} +"%Y-%m-%d %H:%m:%S" )
+	JOBSUBTIMESTRING="submitted:$JOBSUBTIMEF"
     
     # construct the exit status text
     if [[ "$FAILEDCODE" != "0" && "$FAILEDCODE" != "100" ]] ; then
@@ -189,9 +206,17 @@ while read -r LINE ; do
         EXITINFO="(ok ) exit_code =   $EXITSTAT"
     fi
     
+	if [ "$TASKNUM" == "undefined" ] ; then
+		TASKSTRING="      "
+	else
+		TASKSTRING="task:$TASKNUM"
+	fi
+	
     # print info for the user
-    echo -e "Job:$JOBNUM  task:$TASKNUM  duration:$JOBDURTXT  $EXITINFO"
-done < <(echo "$JOBTEXT")
+    echo -e "job:$JOBNUM  $TASKSTRING  $JOBSUBTIMESTRING  runtime:$JOBDURTXT  $EXITINFO"
+done < <(echo "$LATESTLINES")
+#done < <(echo "$JOBTEXT")
+exit 0
 
 # properly return an exit status, so external programs
 # can react to bad jobs easily
