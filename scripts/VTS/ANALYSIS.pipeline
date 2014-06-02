@@ -141,7 +141,7 @@ CTOOLSDIR="$CWD/ctoolsdata"
 
 # Should we use manually-defined laser runs for some runs?
 # (yes/no)
-SCIPIPE_MANUALLASER="yes"
+SCIPIPE_MANUALLASER="no"
 # If yes, which calibration file should we use to manually define 
 # which runs have which laser runs?
 # The calibration file should be in $VERITAS_EVNDISP_AUX_DIR/Calibration ,
@@ -194,15 +194,6 @@ fi
 
 exec 5>&1 # extra place to duplicate output to stdout, look for >&5
 
-if [ ! -d "$EVNDISPSYS" ] ; then
-	echo "error, \$EVNDISPSYS=$EVNDISPSYS isn't a valid directory, exiting..."
-	exit 1
-fi
-
-if [ ! -e "$RUNLIST" ] ; then
-	echo "error, \$RUNLIST=$RUNLIST needs to be a valid file, exiting..."
-fi
-
 # keyword to search log files for,
 # any lines matching $DEBUGREGEX will be
 # shown in blue when 'check'ing stages
@@ -224,6 +215,16 @@ if [ -f "$SETTINGSFILE" ] ; then
 	echo "Loading settings from settings file '$SETTINGSFILE'..."
 	source "$SETTINGSFILE"
 fi
+
+if [ ! -d "$EVNDISPSYS" ] ; then
+	echo "error, \$EVNDISPSYS=$EVNDISPSYS isn't a valid directory, exiting..."
+	exit 1
+fi
+
+if [ ! -e "$RUNLIST" ] ; then
+	echo "error, \$RUNLIST=$RUNLIST needs to be a valid file, exiting..."
+fi
+
 
 # needed to transfer files from evndisp to mscw stage and to anpar stage
 
@@ -257,8 +258,8 @@ mkdir -p $CTOOLSDIR
 # check that $SCIPIPE_MANUALLASERFILE is a valid
 # file in $VERITAS_EVNDISP_AUX_DIR/Calibration
 if [[ "$SCIPIPE_MANUALLASER" == "yes" ]] ; then
-	if [[ ! -f "$SCIPIPE_MANUALLASERFILE" ]] ; then
-		echo "Error, you specified 'SCIPIPE_MANUALLASER=yes', but the file specified by 'SCIPIPE_MANUALLASERFILE=$SCIPIPE_MANUALLASERFILE' doesn't seem to exist.  Use 'SCIPIPE_MANUALLASER=no', or figure out the right file for SCIPIPE_MANUALLASERFILE, exiting..."
+	if [[ ! -f "$VERITAS_EVNDISP_AUX_DIR/Calibration/$SCIPIPE_MANUALLASERFILE" ]] ; then
+		echo -e "${COTRED}Error, you specified 'SCIPIPE_MANUALLASER=yes', but the file specified by 'SCIPIPE_MANUALLASERFILE=$SCIPIPE_MANUALLASERFILE' doesn't seem to exist.  Use 'SCIPIPE_MANUALLASER=no', or figure out the right file for SCIPIPE_MANUALLASERFILE, exiting...$CONORM"
 		exit 1
 	fi
 fi
@@ -475,7 +476,7 @@ if [[ "$STAGE" == "evndisp" ]] ; then
             
             LOGFILES=("$OLOG" "$ELOG" "$EVNDISPLOG" )
             if [ "$DOCALIB" == "yes" ] ; then
-                LOGFILES=( "$PEDLOG" "$TZEROLOG" )
+                LOGFILES+=( "$PEDLOG" "$TZEROLOG" )
             fi
             WARNCOUNTSTR=$(  formatwarncount  LOGFILES[@] )
             ERRORCOUNTSTR=$( formaterrorcount LOGFILES[@] )

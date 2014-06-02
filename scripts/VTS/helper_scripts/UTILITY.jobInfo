@@ -181,7 +181,7 @@ while read -r LINE ; do
     JOBDUR=$(( JOBEND - $JOBSTART ))
     JOBDURTXT=$( date -u -d @${JOBDUR} +"%T" )
 	#echo "JOBSUBTIME:'$JOBSUBTIME'" 2>&1
-	JOBSUBTIMEF=$( date -d @${JOBSUBTIME} +"%Y-%m-%d %H:%m:%S" )
+	JOBSUBTIMEF=$( date -d @${JOBSUBTIME} +"%Y-%m-%d %H:%M:%S" )
 	JOBSUBTIMESTRING="submitted:$JOBSUBTIMEF"
     
     # construct the exit status text
