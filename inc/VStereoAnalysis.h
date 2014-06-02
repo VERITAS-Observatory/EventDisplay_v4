@@ -225,6 +225,9 @@ class VStereoAnalysis
 		int     fTreeCTOOLS_GregYear  ;
 		int     fTreeCTOOLS_GregMonth ;
 		int     fTreeCTOOLS_GregDay   ;
+        double  fTreeCTOOLS_Acceptance ;
+        VRadialAcceptance* fCTOOLSAcceptance ;
+
 		TTree* fCDataTreeClone ;
 		double  fDeadTimeStorage ;
 		//double fullMJD ;

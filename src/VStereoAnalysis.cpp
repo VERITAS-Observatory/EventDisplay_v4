@@ -2552,13 +2552,15 @@ bool VStereoAnalysis::init_TreeWithEventsForCtools( int irun ) // WRITEEVENTTREE
 	fTreeWithEventsForCtools->Branch( "GregYear"      , &fTreeCTOOLS_GregYear      , "GregYear/D" );
 	fTreeWithEventsForCtools->Branch( "GregMonth"     , &fTreeCTOOLS_GregMonth     , "GregMonth/D" );
 	fTreeWithEventsForCtools->Branch( "GregDay"       , &fTreeCTOOLS_GregDay       , "GregDay/D" );
+	fTreeWithEventsForCtools->Branch( "Acceptance"    , &fTreeCTOOLS_Acceptance    , "Acceptance/D" );
 	cout << endl;
 	
+	// init acceptance critter
+	fCTOOLSAcceptance = new VRadialAcceptance( fRunPara->fRunList[0].fAcceptanceFile ) ;
+	fCTOOLSAcceptance->Set2DAcceptanceMode( fRunPara->fRunList[0].f2DAcceptanceMode ) ;
 	
 	cout << " :: init_TreeWithEventsForCtools()" << endl;
 	cout << endl;
-	
-	
 	
 	return true;
 }
@@ -2593,8 +2595,8 @@ void VStereoAnalysis::fill_TreeWithEventsForCtools( CData* c , double i_xderot, 
 	fTreeCTOOLS_MWR            = c->MWR ;
 	fTreeCTOOLS_MLR            = c->MLR ;
 	fTreeCTOOLS_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
-	fTreeCTOOLS_Xoff           = c->Xoff ;           // camera coordinates (tangential coordinate in the nominal system)
-	fTreeCTOOLS_Yoff           = c->Yoff ;           // camera coordinates (tangential coordinate in the nominal system)
+	fTreeCTOOLS_Acceptance     = fCTOOLSAcceptance->getAcceptance( i_xderot, i_yderot ) ;
+
 	
 	// RA- and DEC-aligned Wobbles
 	fTreeCTOOLS_WobbleWest  = getWobbleWest()  ;
