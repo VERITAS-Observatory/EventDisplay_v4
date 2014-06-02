@@ -41,7 +41,6 @@ class VTMVADispAnalyzer
 		float fXcore;
 		float fYcore;
 		float fcross;
-		float fLTrig;
 		
 	public:
 	

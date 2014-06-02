@@ -432,7 +432,7 @@ bool VCalibrationData::terminate( vector< unsigned int > iDead, vector< unsigned
 		{
 			pedvarV[i] = 0.;
 			pedvarLowGainV[i] = 0.;
-                        ilowgaindefaultsumwindows = 0.;
+                        ilowgaindefaultsumwindows[i] = 0.;
 			for( unsigned int j = 0; j < iMAXDEFWINDOWS; j++ )
 			{
 				ilowgainmultiplier_sum[j][i] = 0;
