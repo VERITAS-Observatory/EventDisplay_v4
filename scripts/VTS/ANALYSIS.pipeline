@@ -31,19 +31,22 @@ CWD=$PWD
 
 # Which runlist do you want to use?
 # It should be a simple list of veritas runnumbers,
-# one per line.
+# one per line.  Used in all stages.
 # (full path please)
 RUNLIST="$CWD/runlist.crab.dat"
 
 ## use Model3D (yes/no)##
+# Takes effect in the evndisp stage.
 USEMODEL3D="no"
 
 # What kind of cuts do you want to use?
 # Currently supports 'soft', 'moderate', or 'hard'
+# Takes effect in the anpar stage.
 CUTS="moderate"
 
 # What kind of background do you want to use?
 # 'ring' or 'refl' (for reflected)
+# Takes effect in the anpar stage.
 BACKGROUND="refl" # ring or [refl, reflect, reflected]
 
 # IF USING 'ring' BACKGROUND:
@@ -62,10 +65,12 @@ REFLMAXREG="10"
 
 # Should we produce the tzero and pedestal files first?
 # These are required to do an analysis.
+# Takes effect in the evndisp stage.
 # yes/no
 DOCALIB=yes
 
 # Where should we store the evndisp and mscw output files?
+# Takes effect in the evndisp stage.
 # (full path please)
 # evndisp files will be: $EVNDISPOUTPUTDIR/#####.root, #####.tzero.root, etc
 # mscw files will be put in RecIDX within this directory (see next option)
@@ -78,6 +83,7 @@ EVNDISPOUTPUTDIR="$VERITAS_USER_DATA_DIR/analysis/Results/EVD-v423/"
 # 2 = do mscw stage without using T2 images
 # 3 = do mscw stage without using T3 images
 # 4 = do mscw stage without using T4 images
+# Takes effect in the mscw stage.
 # For regular data analysis, this should be 0
 RECID=0
 
@@ -90,17 +96,21 @@ RECID=0
 USEFROGS="yes"
 
 # Where should the frogs's output files be stored?
+# Takes effect in the frogs stage.
 FROGSOUTPUTDIR="$EVNDISPOUTPUTDIR/frogs"
 
 # Where should we put the anasum output files (parallel and merged)?
+# Takes effect in the anpar stage.
 # (full path please)
 ANASUMOUTPUTDIR="$CWD/arf"
 
 # What should we name the final merged anasum
 # output root file? It will be put in $ANASUMOUTPUTDIR
+# Takes effect in the anmer stage.
 FINALOUTPUT="anmer.output.root"
 
 # Which anasum runparameter file should we use?
+# Takes effect in the anpar stage.
 # (full path please)
 RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab.ctools"
 
@@ -110,6 +120,7 @@ RUNPARAMFILE="$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/ANASUM.runparameter.Crab.c
 #                        ^^^^^^^^
 # (all other parts of filename will be figured out automatically)
 # format: YYYYMMDD
+# Takes effect in the anpar stage.
 RADECDATE="20131115"
 
 # For the mscw lookup tables, what date should be used in the filename?
@@ -117,6 +128,7 @@ RADECDATE="20131115"
 #             ^^^^^^^^
 # (all other parts of filename will be figured out automatically)
 # format: YYYYMMDD
+# Takes effect in the mscw stage.
 TABLEDATE="20131115"
 
 # For the gamma-hadron cut file, what date should be used in the filename?
@@ -124,6 +136,7 @@ TABLEDATE="20131115"
 #                     ^^^^^^^^
 # (all other parts of filename will be figured out automatically)
 # format: YYYYMMDD
+# Takes effect in the anpar stage.
 #GAMHADCUTDATE="20130411"
 GAMHADCUTDATE="20131031"
 
@@ -132,21 +145,33 @@ GAMHADCUTDATE="20131031"
 #          ^EFDATE1                                         ^EFDATE2
 # (all other parts of filename will be figured out automatically)
 # format: YYYYMMDD
+# Takes effect in the anpar stage.
 EFDATE1="20131031"
 EFDATE2="20131115"
 
 # Which directory should we keep the morphed ctools datafiles?
-# used by (mutate) stage
+# Takes effect in the mutate stage.
 CTOOLSDIR="$CWD/ctoolsdata"
 
 # Should we use manually-defined laser runs for some runs?
+# Takes effect in the evndisp stage.
 # (yes/no)
-SCIPIPE_MANUALLASER="no"
+export SCIPIPE_MANUALLASER="no"
 # If yes, which calibration file should we use to manually define 
 # which runs have which laser runs?
 # The calibration file should be in $VERITAS_EVNDISP_AUX_DIR/Calibration ,
 # and should have the same format as calibrationlist.dat in that directory.
-SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
+export SCIPIPE_MANUALLASERFILE="calibrationlist.dat"
+
+# Optionally, you can place any of the above settings into
+# a separate config file 'analysis.config' to override their settings.
+# This config file should be in the same directory as the 
+# ANALYSIS.pipeline script.  If you do this, these options must
+# each be preceded by 'export', like so:
+# export RUNLIST="$CWD/runlist.cygnus.dat"
+# export BACKGROUND="refl"
+# export REFLWOBOFF="0.8"
+# export CUTS="soft"
 
 #
 # END ANALYSIS SETTINGS
