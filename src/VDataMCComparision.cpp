@@ -50,6 +50,16 @@ VDataMCComparision::VDataMCComparision( string iname, bool iBackgroundData, int 
 	hImgSel = 0;
 	hEmissionHeight = 0;
 	hMVA = 0;
+	hsigmaT3D = 0;    
+	hNc3D = 0;        
+	hDepth3D = 0;     
+	hRWidth3D = 0;    
+	hErrRWidth3D = 0; 
+	hsigmaT3DErec = 0;    
+	hNc3DErec = 0;        
+	hDepth3DErec = 0;     
+	hRWidth3DErec = 0;    
+	hErrRWidth3DErec = 0; 
 	
 	fAzRange = false;
 	fAzMin = 0.;
@@ -258,8 +268,55 @@ void VDataMCComparision::defineHistograms()
 	hMLRErec->SetYTitle( "mean scaled length [deg]" );
 	hMLRErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
 	hisList->Add( hMLRErec );
-	
-	
+
+	//these histograms are only filled for Model3D analysis
+	sprintf( hname, "hsigmaT3D_%s", fName.c_str() );
+	hsigmaT3D = new TH1D( hname, "", 100, 0., 50. );
+	hsigmaT3D->SetXTitle( "3D width [m]" );
+	hisList->Add( hsigmaT3D );
+	sprintf( hname, "hNc3D_%s", fName.c_str() );
+	hNc3D = new TH1D( hname, "", 100, 0., 20. );
+	hNc3D->SetXTitle( "ln(Nc)" );
+	hisList->Add( hNc3D );
+	sprintf( hname, "hDepth3D_%s", fName.c_str() );
+	hDepth3D = new TH1D( hname, "", 100, 0., 1000. );
+	hDepth3D->SetXTitle( "depth of shower (3D) [g cm^{-2}]" );
+	hisList->Add( hDepth3D );
+	sprintf( hname, "hRWidth3D_%s", fName.c_str() );
+	hRWidth3D = new TH1D( hname, "", 100, 0, 10. );
+	hRWidth3D->SetXTitle( "reduced 3D width [m]" );
+	hisList->Add( hRWidth3D );
+	sprintf( hname, "hErrRWidth3D_%s", fName.c_str() );
+	hErrRWidth3D = new TH1D( hname, "", 100, 0., 0.2 );
+	hErrRWidth3D->SetXTitle( "error in reduced 3D width [m]" );
+	hisList->Add( hErrRWidth3D );
+	//3D vs energy//
+	sprintf( hname, "hsigmaT3DErec_%s", fName.c_str() );
+	hsigmaT3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 50. );
+	hsigmaT3DErec->SetYTitle( "3D width [m]" );
+	hsigmaT3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+	hisList->Add( hsigmaT3DErec );
+	sprintf( hname, "hNc3DErec_%s", fName.c_str() );
+	hNc3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 20. );
+	hNc3DErec->SetYTitle( "ln(Nc)" );
+	hNc3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+	hisList->Add( hNc3DErec );
+	sprintf( hname, "hDepth3DErec_%s", fName.c_str() );
+	hDepth3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 1000. );
+	hDepth3DErec->SetYTitle( "depth of shower (3D) [g cm^{-2}]" );
+	hDepth3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+	hisList->Add( hDepth3DErec );
+	sprintf( hname, "hRWidth3DErec_%s", fName.c_str() );
+	hRWidth3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0, 10. );
+	hRWidth3DErec->SetYTitle( "reduced 3D width [m]" );
+	hRWidth3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+	hisList->Add( hRWidth3DErec );
+	sprintf( hname, "hErrRWidth3DErec_%s", fName.c_str() );
+	hErrRWidth3DErec = new TH2D( hname, "", 6, -1., 1., 100, 0., 0.2 );
+	hErrRWidth3DErec->SetYTitle( "error in reduced 3D width [m]" );
+	hErrRWidth3DErec->SetXTitle( "log_{10} energy_{rec} [TeV]" );
+	hisList->Add( hErrRWidth3DErec );
+		
 	for( int i = 0; i < fNTel; i++ )
 	{
 		sprintf( hname, "hR%d_%s", i + 1, fName.c_str() );
@@ -505,6 +562,27 @@ bool VDataMCComparision::setOnOffHistograms( VDataMCComparision* on, VDataMCComp
 	setEntries( hMWRErec );
 	hMLRErec->Add( on->hMLRErec, off->hMLRErec, 1., norm );
 	setEntries( hMLRErec );
+	//3D//
+	hsigmaT3D->Add( on->hsigmaT3D, off->hsigmaT3D, 1., norm );
+	setEntries( hsigmaT3D );
+	hNc3D->Add( on->hNc3D, off->hNc3D, 1., norm );
+	setEntries( hNc3D );
+	hDepth3D->Add( on->hDepth3D, off->hDepth3D, 1., norm );
+	setEntries( hDepth3D );
+	hRWidth3D->Add( on->hRWidth3D, off->hRWidth3D, 1., norm );
+	setEntries( hRWidth3D );
+	hErrRWidth3D->Add( on->hErrRWidth3D, off->hErrRWidth3D, 1., norm );
+	setEntries( hErrRWidth3D );
+	hsigmaT3DErec->Add( on->hsigmaT3DErec, off->hsigmaT3DErec, 1., norm );
+	setEntries( hsigmaT3DErec );
+	hNc3DErec->Add( on->hNc3DErec, off->hNc3DErec, 1., norm );
+	setEntries( hNc3DErec );
+	hDepth3DErec->Add( on->hDepth3DErec, off->hDepth3DErec, 1., norm );
+	setEntries( hDepth3DErec );
+	hRWidth3DErec->Add( on->hRWidth3DErec, off->hRWidth3DErec, 1., norm );
+	setEntries( hRWidth3DErec );
+	hErrRWidth3DErec->Add( on->hErrRWidth3DErec, off->hErrRWidth3DErec, 1., norm );
+	setEntries( hErrRWidth3DErec );
 	
 	for( unsigned int j = 0; j < hR.size(); j++ )
 	{
@@ -900,7 +978,21 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
 			{
 				hMWRErec->Fill( log10( fData->ErecS ), fData->MWR, weight );
 			}
-			
+			//3D//
+			hsigmaT3D->Fill( fData->sigmaT3D, weight ); 
+			hNc3D->Fill( fData->Nc3D, weight );         
+			hDepth3D->Fill( fData->Depth3D, weight );   
+			hRWidth3D->Fill( fData->RWidth3D, weight ); 
+			hErrRWidth3D->Fill( fData->ErrRWidth3D, weight ); 
+			if( fData->ErecS > 0. )
+			{
+			        hsigmaT3DErec->Fill( log10( fData->ErecS ), fData->sigmaT3D, weight ); 
+				hNc3DErec->Fill( log10( fData->ErecS ), fData->Nc3D, weight ); 
+			        hDepth3DErec->Fill( log10( fData->ErecS ), fData->Depth3D, weight ); 
+				hRWidth3DErec->Fill( log10( fData->ErecS ), fData->RWidth3D, weight ); 
+				hErrRWidth3DErec->Fill( log10( fData->ErecS ), fData->ErrRWidth3D, weight ); 
+			}
+
 		}
 		if( fSingleTelescopeCuts != -1
 				|| ( theta2 >= theta2_min && theta2 < theta2_cut  &&  fData->MSCW < msw_max && fData->MSCW > msw_min ) )
