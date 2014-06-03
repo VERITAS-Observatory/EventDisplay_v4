@@ -1,6 +1,5 @@
 #!/bin/bash
 # generate a radial acceptance file
-# Author: Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS

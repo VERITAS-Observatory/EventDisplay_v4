@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse files with lookup tables
-# Author: Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS
@@ -30,6 +29,7 @@ cp -f -v $INFILE $TEMPDIR
 
 $EVNDISPSYS/bin/mscw_energy         \
     -tablefile $TABFILE             \
+    -noshorttree                    \
     -arrayrecid=$RECID              \
     -inputfile $TEMPDIR/$BFILE.root \
     -writeReconstructedEventsOnly=1 \

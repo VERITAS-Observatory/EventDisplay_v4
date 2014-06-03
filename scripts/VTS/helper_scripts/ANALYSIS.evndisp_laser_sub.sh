@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse laser files 
-# Author: Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS

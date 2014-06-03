@@ -43,6 +43,8 @@ bash $(dirname "$0")"/helper_scripts/UTILITY.script_init.sh"
 # Load runlist functions
 source "$EVNDISPSYS/scripts/VTS/helper_scripts/RUNLIST.run_info_functions.sh"
 
+ATMO="21"
+
 # Parse command line arguments
 RLIST=$1
 ODIR=$2
@@ -137,13 +139,17 @@ RUNS=`cat $RLIST`
 
 for RUN in ${RUNS[@]}; do
     # get array epoch and atmosphere for the run
-    echo $RUN
     EPOCH=`getRunArrayVersion $RUN`
-    ATMO=`getRunAtmosphere $RUN`
+    ATMO=`getRunAtmosphere $RUN $INDIR/$RUN.mscw.root`
+    if [[ $ATMO == "error" ]]; then
+       echo "error finding atmosphere; skipping run $RUN"
+       continue
+    fi
+    echo "RUN $RUN at epoch $EPOCH and atmosphere $ATMO"
     
     # do string replacements
     EFFAREA=${EFFAREA/VX/$EPOCH}
-    EFFAREA=${EFFAREA/ATMXX/$ATMO}
+#    EFFAREA=${EFFAREA/ATMXX/$ATMO}
     RADACC=${RADACC/VX/$EPOCH}
     
     # write line to file

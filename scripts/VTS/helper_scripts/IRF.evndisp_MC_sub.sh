@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to run evndisp for simulations on one of the cluster nodes (VBF)
-# Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS
@@ -30,9 +29,11 @@ ONAME="$RUNNUM"
 ITER=$((SGE_TASK_ID - 1))
 FIRSTEVENT=$(($ITER * $NEVENTS))
 MSCWFILE="gamma_${ZA}deg_750m_w${WOB}_ID0_ana${TELTOANA}_NOISE${NOISE}_1_${ITER}.root"
-echo -e "FROGS MSCW Dir:\n $MSCWDIR"
-echo -e "FROGS MSCW File:\n $MSCWFILE"
-echo "FROGS NEvents: $NEVENTS"
+if [[ $USEFROGS != "1" ]]; then
+    echo -e "FROGS MSCW Dir:\n $MSCWDIR"
+    echo -e "FROGS MSCW File:\n $MSCWFILE"
+    echo "FROGS NEvents: $NEVENTS"
+fi
 
 # detector configuration and cuts
 ACUT="EVNDISP.reconstruction.runparameter"
@@ -106,6 +107,7 @@ if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
 elif [[ ${SIMTYPE:0:4} == "CARE" ]]; then
     VBF_FILE="$VBFNAME.cvbf"
 fi
+echo 
 echo "Now processing $VBF_FILE"
 
 # unzip vbf file to local scratch directory
@@ -157,7 +159,7 @@ if [[ $USEFROGS != "1" ]]; then
     rm -f $ODIR/$RUNNUM.tzero.log
     ### eventdisplay GRISU run options
     if [[ ${SIMTYPE:0:5} = "GRISU" ]]; then
-        MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE"
+        MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
     else
        MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
     fi
@@ -166,15 +168,19 @@ fi
 
 ###############################################
 # run eventdisplay
+###############################################
+# model 3D
 if [[ $USEMODEL3D == "1" ]]; then
     MODEL3D="-model3d -lnlfile $VERITAS_EVNDISP_AUX_DIR/Tables/table_LnL.root"
 fi
+# FROGS
 if [[ $USEFROGS == "1" ]]; then
     FROGS="-frogs $MSCWDIR/$MSCWFILE -frogid 0 -nevents=$NEVENTS -firstevent=$FIRSTEVENT"
 fi
 MCOPT=" -runnumber=$RUNNUM -sourcetype=2 -sourcefile $VBF_FILE  -writenomctree -deadchannelfile $DEAD -arraycuts $ACUT -outputfile $DDIR/$ONAME.root -donotusedbinfo -calibrationdirectory $ODIR"
+# special options for GRISU
 if [[ ${SIMTYPE:0:5} == "GRISU" ]]; then
-    MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE"
+    MCOPT="$MCOPT -pedestalfile $NOISEFILE -pedestalseed=$RUNNUM -pedestalDefaultPedestal=$PEDLEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
 else
     MCOPT="$MCOPT -lowgainpedestallevel=$LOWPEDLEV"
 fi

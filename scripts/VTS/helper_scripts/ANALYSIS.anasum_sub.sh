@@ -1,6 +1,5 @@
 #!/bin/bash
 # script to analyse files with anasum
-# Author: Gernot Maier
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS

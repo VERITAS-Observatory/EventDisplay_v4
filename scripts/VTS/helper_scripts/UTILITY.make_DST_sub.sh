@@ -1,7 +1,5 @@
 #!/bin/bash
 # script to make DSTs
-# Author: Gernot Maier
-# edited by G Hughes to make summation window a variable
 
 # set observatory environmental variables
 source $EVNDISPSYS/setObservatory.sh VTS

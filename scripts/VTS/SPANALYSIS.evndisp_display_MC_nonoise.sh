@@ -41,11 +41,11 @@ SIMFILE="$1"
 [[ "$3" ]] && NOISELEV=$3  || NOISELEV="200"
 [[ "$4" ]] && NOISEFILE=$4 || NOISEFILE="$VERITAS_EVNDISP_AUX_DIR/NOISE/NOISE$NOISELEV.grisu"
 
-# Run options
-OPT="-display=1 -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV"
-
 # default noise level
 PEDLEV="16."
+
+# Run options
+OPT="-display=1 -runnumber=$RUNNUM -plotmethod=0 -sourcetype=2 -pedestalseed=1020 -pedestalnoiselevel=$NOISELEV -lowgaincalibrationfile NOFILE -lowgainpedestallevel=$PEDLEV"
 
 # dead channel definition for MC
 # DEAD="deadChannelDefinition_VERITAS_MC_d20101110.dat"

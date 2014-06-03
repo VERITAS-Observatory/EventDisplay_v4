@@ -12,23 +12,32 @@ getRunArrayVersion() {
 
 getRunAtmosphere() {
     RUN=$1
-
-    # get database url from parameter file
-    MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/EVNDISP.global.runparameter" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
-    if [[ -z "$MYSQLDB" ]] ; then
-       return -1   # error
-    fi
-
-    # mysql login info
-    MYSQL="mysql -u readonly -h $MYSQLDB -D VERITAS -A"
-
-    # read run info from database
-    while read -r RUNID RUNTYPE RUNDATE ; do
-        if [[ "$RUNID" =~ ^[0-9]+$ ]] ; then
-            RUNMODE=$RUNTYPE
-            read YY MM DD HH MI SE <<< ${RUNDATE//[-:]/ }
+    if [[ ! -z "$2" ]] ; then
+       if [ -e $2 ] ; then
+           RUNDATE=`$EVNDISPSYS/bin/printRunParameter $2 -date`
+           read YY MM DD HH MI SE <<< ${RUNDATE//[-:]/ }
+       else
+           echo "error"
+           return   # error
+       fi
+    else
+        # get database url from parameter file
+        MYSQLDB=`grep '^\*[ \t]*DBSERVER[ \t]*mysql://' "$VERITAS_EVNDISP_AUX_DIR/ParameterFiles/EVNDISP.global.runparameter" | egrep -o '[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}\.[[:alpha:]]{1,20}'`
+        if [[ -z "$MYSQLDB" ]] ; then
+           return -1   # error
         fi
-    done < <($MYSQL -e "USE VERITAS ; SELECT run_id, run_type, data_start_time FROM tblRun_Info WHERE run_id = $RUN")
+
+        # mysql login info
+        MYSQL="mysql -u readonly -h $MYSQLDB -D VERITAS -A"
+
+        # read run info from database
+        while read -r RUNID RUNTYPE RUNDATE ; do
+            if [[ "$RUNID" =~ ^[0-9]+$ ]] ; then
+                RUNMODE=$RUNTYPE
+                read YY MM DD HH MI SE <<< ${RUNDATE//[-:]/ }
+            fi
+        done < <($MYSQL -e "USE VERITAS ; SELECT run_id, run_type, data_start_time FROM tblRun_Info WHERE run_id = $RUN")
+    fi
     date="$YY$MM$DD"
     month="$MM"
 
