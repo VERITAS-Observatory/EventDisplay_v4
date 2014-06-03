@@ -41,6 +41,10 @@ bool readRunParameter( TFile* fIn, string iPara )
 	{
 		cout << fPar->fsourcefile << endl;
 	}
+        else if( iPara == "-date" )
+        { 
+                cout << fPar->fDBRunStartTimeSQL << endl;
+        }
 	
 	return true;
 }
@@ -105,6 +109,7 @@ int main( int argc, char* argv[] )
 		cout << "      -mcaz         print MC azimuth angle" << endl;
 		cout << "      -runnumber    print MC run number" << endl;
 		cout << "      -mcsourcefile print source file name" << endl;
+                cout << "      -date         print date of run" << endl;
 		cout << endl;
 		exit( 0 );
 	}
@@ -114,7 +119,7 @@ int main( int argc, char* argv[] )
 	{
 		fOption = argv[2];
 	}
-	if( fOption != "-mcaz" && fOption != "-runnumber" && fOption != "-mcsourcefile" )
+	if( fOption.size() == 0 )
 	{
 		cout << endl;
 		cout << "printRunParameter " << VGlobalRunParameter::getEVNDISP_VERSION() << endl;
