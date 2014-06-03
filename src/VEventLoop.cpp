@@ -723,7 +723,7 @@ void VEventLoop::shutdown()
                             if( fOutputfile ) cout << fOutputfile->Get( "runparameterV2" );
                             cout << endl;
                         }
-		}
+		} 
 		// analysis or trace library mode
 		if( fRunPar->frunmode == R_ANA )
 		{
@@ -789,7 +789,7 @@ void VEventLoop::shutdown()
 				{
 					fAnalyzer->setTelID( fRunPar->fTelToAnalyze[i] );
 					fAnalyzer->terminate( fDebug_writing );
-				}
+				} 
 			}
 			// close output file here (!! CLOSE OUTPUT FILE FOREVER !!)
 			fAnalyzer->shutdown();
@@ -1512,6 +1512,8 @@ int VEventLoop::checkCuts()
 		int muonValid;
 		unsigned short int eventType;
 		int houghMuonValid, houghNpix; //Hough
+                int fitStat = 0;
+                float loss = 0.;
 		
 		i_tree.Branch( "eventType", &eventType, "eventType/s" );
 		i_tree.Branch( "cen_x", &cen_x, "cen_x/F" );
@@ -1528,6 +1530,8 @@ int VEventLoop::checkCuts()
 		i_tree.Branch( "phi", &phi, "phi/F" );
 		i_tree.Branch( "cosphi", &cosphi, "cosphi/F" );
 		i_tree.Branch( "sinphi", &sinphi, "sinphi/F" );
+                i_tree.Branch( "loss", &loss, "loss/F" );
+                i_tree.Branch( "fitStat", &fitStat, "fitStat/I" );
 		i_tree.Branch( "nlowgain", &nlowgain, "nlowgain/s" );
 		i_tree.Branch( "nsat", &nsat, "nsat/s" );
 		i_tree.Branch( "ntubes", &ntubes, "ntubes/s" );
@@ -1593,6 +1597,8 @@ int VEventLoop::checkCuts()
 		miss = fAnalyzer->getImageParameters()->phi;
 		cosphi = fAnalyzer->getImageParameters()->cosphi;
 		sinphi = fAnalyzer->getImageParameters()->sinphi;
+                loss = fAnalyzer->getImageParameters()->loss;
+                fitStat = fAnalyzer->getImageParameters()->Fitstat;
 		ntubes = fAnalyzer->getImageParameters()->ntubes;
 		nsat = fAnalyzer->getImageParameters()->nsat;
 		nlowgain = fAnalyzer->getImageParameters()->nlowgain;

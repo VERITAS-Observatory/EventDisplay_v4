@@ -497,14 +497,6 @@ void VDeadTime::printDeadTime()
 		cout << "\t Scalar: dead time (fraction of missing events): " << fScalarDeadTimeFrac * 100. << "%";
 		cout << " (Chi2 = " << fScalarDeadTimeChi2 << ")" << endl;
 	}
-	else if( hScalarClock )
-	{
-		cout << "SDDDD " << hScalarClock->GetEntries() << endl;
-	}
-	else
-	{
-		cout << "DDDD " << endl;
-	}
 }
 
 

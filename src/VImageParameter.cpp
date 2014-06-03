@@ -319,7 +319,7 @@ void VImageParameter::reset( unsigned int resetLevel )
 	tmax = 0.;
 	tmean = 0.;
 	
-	// log likelihood fit parameters and erros
+	// log likelihood fit parameters and errors
 	ntfit = 0;
 	Fitmin = 0.;
 	Fitedm = 0.;

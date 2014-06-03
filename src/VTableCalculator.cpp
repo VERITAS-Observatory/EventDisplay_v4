@@ -619,10 +619,10 @@ double VTableCalculator::calc( int ntel, double* r, double* s, double* w, double
 				{
 					if( fWrite1DHistograms && ir < ( int )Oh[is].size() )
 					{
-						if( !Oh[is][ir] ) if( !create1DHistogram( is, ir, w[tel] ) )
-							{
-								continue;
-							}
+						if( !Oh[is][ir] && !create1DHistogram( is, ir, w[tel] ) )
+                                                {
+                                                        continue;
+                                                }
 						// fill width/length/energy into a 1D and 2D histogram
 						// (chi2 is here an external weight (from e.g. spectral weighting))
 						//============================================================================================================

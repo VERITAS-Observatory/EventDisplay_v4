@@ -314,7 +314,7 @@ void VDBRunInfo::readRunInfoFromDB( string iDBserver )
                 double isec_start = 0.;
                 double isec_stopp = 0.;
                 VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStartTimeSQL, mjd, isec_start );
-                VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStoppTimeSQL, mjd, isec_stopp );
+                VSkyCoordinatesUtilities::getMJD_from_SQLstring( fDataStoppTimeSQL, mjd, isec_stopp ); 
                 fDuration = isec_stopp - isec_start;
         }
 	

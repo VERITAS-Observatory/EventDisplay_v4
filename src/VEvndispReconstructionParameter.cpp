@@ -602,6 +602,12 @@ void VEvndispReconstructionParameter::print_arrayAnalysisCuts()
 			cout << fSize_min[m][i] << "\t";
 		}
 		cout << endl;
+		cout << "\t\t minimum image width [deg]:\t\t\t\t\t ";
+		for( unsigned int i = 0; i < fWidth_min[m].size(); i++ )
+		{
+			cout << fWidth_min[m][i] << "\t";
+		}
+		cout << endl;
 		cout << "\t\t minimum asym :\t\t\t\t\t\t\t ";
 		for( unsigned int i = 0; i < fAsym_min[m].size(); i++ )
 		{
@@ -1188,6 +1194,17 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 						fSize_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
 					}
 			}
+			else if( iTemp == "MINWIDTH" )
+			{
+				if( t_temp < 0 ) for( unsigned int i = 0; i < fWidth_min[m_temp].size(); i++ )
+					{
+						fWidth_min[m_temp][i] = atof( iTemp2.c_str() );
+					}
+				else for( unsigned int i = 0; i < v_temp.size(); i++ )
+					{
+						fWidth_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
+					}
+			}
 			// trigger type (used e.g. in CTA prod2)
 			else if( iTemp == "L2TRIGGERTYPE" )
 			{
@@ -1209,17 +1226,6 @@ unsigned int VEvndispReconstructionParameter::read_arrayAnalysisCuts( string ifi
 				else for( unsigned int i = 0; i < v_temp.size(); i++ )
 					{
 						fSize_max[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
-					}
-			}
-			else if( iTemp == "MINWIDTH" )
-			{
-				if( t_temp < 0 ) for( unsigned int i = 0; i < fWidth_min[m_temp].size(); i++ )
-					{
-						fWidth_min[m_temp][i] = atof( iTemp2.c_str() );
-					}
-				else for( unsigned int i = 0; i < v_temp.size(); i++ )
-					{
-						fWidth_min[m_temp][v_temp[i]] = atof( iTemp2.c_str() );
 					}
 			}
 			else if( iTemp == "MAXWIDTH" )
