@@ -783,7 +783,6 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 	{
 		return 0;
 	}
-	
 	cout << "filling calibration tree ";
 	if( ipedfile.size() > 0 )
 	{
@@ -908,7 +907,7 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 				if( !iT )
 				{
 					cout << "DST_fillCalibrationTree error: pedestal tree not found for telescope " << itel << " (type " <<  fTelescopeType[itel] << ")" << endl;
-					exit( EXIT_FAILURE );
+                                        return 0;
 				}
 				// now copy values over
 				iT->SetBranchAddress( "nsumwindows", &fnum_sumwindow );
@@ -918,7 +917,7 @@ TTree* DST_fillCalibrationTree( VDSTTree* fData, AllHessData* hsdata, map< unsig
 				if( iT->GetEntries() < nPixel )
 				{
 					cout << "DST_fillCalibrationTree error: number of pixels different in pedestal tree: " << nPixel << "\t" << iT->GetEntries() << endl;
-					exit( EXIT_FAILURE );
+                                        return 0;
 				}
 				
 				for( unsigned int p = 0; p < nPixel; p++ )
