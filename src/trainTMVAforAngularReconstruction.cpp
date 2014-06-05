@@ -107,7 +107,7 @@ bool trainTMVA( string iOutputDir, string iOutputName )
 		( TMVA::gConfig().GetIONames() ).fWeightFileDir = iOutputDirectory;
 		
 		// tmva regression
-		TMVA::Factory* factory = new TMVA::Factory( "BDTDisp", &i_tmva, "V" );
+		TMVA::Factory* factory = new TMVA::Factory( "BDTDisp", &i_tmva, "V:!DrawProgressBar:!Color" );
 		factory->AddVariable( "width", 'F' );
 		factory->AddVariable( "length", 'F' );
 		factory->AddVariable( "size", 'F' );
